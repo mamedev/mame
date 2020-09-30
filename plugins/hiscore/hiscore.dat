@@ -5434,9 +5434,9 @@ sidetrac:
 
 
 venture:
-venture2:
-venture2b:
 venture4:
+venture5a:
+venture5b:
 @:maincpu,program,0380,23,00,53
 
 
@@ -5449,10 +5449,10 @@ fax2:
 ;@s:expro02.cpp
 
 galsnew:
-galsnewu:
 galsnewj:
 galsnewk:
 galsnewt:
+galsnewu:
 @:maincpu,program,c825b6,64,30,31
 
 
@@ -6829,26 +6829,6 @@ gaplust:
 @:maincpu,program,09b6,03,00,00
 
 
-;@s:gauntlet.cpp
-
-; note saves last level completed and high scores
-gauntlet:
-gauntlet2p:
-gauntletr4:
-gauntletr5:
-gauntletr7:
-gauntletr9:
-gauntlets:
-@:maincpu,program,904010,2,0,7
-@:maincpu,program,904de8,c8,00,50
-
-
-; note saves last level completed and high scores
-gaunt2:
-@:maincpu,program,904010,2,0,5
-@:maincpu,program,904de8,c8,00,e3
-
-
 ;@s:gb.cpp
 
 gameboy,tetris:
@@ -7238,7 +7218,7 @@ hvyunitu:
 
 roadf:
 roadf2:
-roadfh
+roadfh:
 roadfu:
 @:maincpu,program,3bd0,10a,01,01
 @:maincpu,program,3066,3,01,00
@@ -8222,8 +8202,8 @@ dbreed:
 
 
 ;dbreedm72:******dragon breed (m72 pcb version)
+dbreedjm72:
 dbreedm72:
-dbreedm72j:
 @:maincpu,program,9096a,03,58,00
 @:maincpu,program,90990,82,58,2e
 @:maincpu,program,90950,01,06,06
@@ -11266,7 +11246,7 @@ ketb:
 @:maincpu,program,801093,1,30,30
 
 
-photoy2k102:
+photoy2k102j:
 photoy2k104:
 @:maincpu,program,80a306,1,12,12
 @:maincpu,program,813452,78,49,40
@@ -11304,14 +11284,14 @@ orlegend105k:
 @:maincpu,program,811918,d4,49,b0
 
 
-drgw2hk:
-@:maincpu,program,80f13a,46,49,40
-
-
 ;********Dragon World II (ver. 110X, Export)
 drgw2:
-dw2v100x:
+drgw2100x:
 @:maincpu,program,80caf8,46,49,40
+
+
+drgw2100hk:
+@:maincpu,program,80f13a,46,49,40
 
 
 ;@s:phoenix.cpp
@@ -18111,7 +18091,7 @@ maydayb:
 ;joustr:******joust (solid red label)
 joust:
 joustr:
-joustwr:
+jousty:
 @:maincpu,program,cfa4,54,f1,f5
 
 

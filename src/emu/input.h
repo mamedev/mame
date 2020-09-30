@@ -31,13 +31,6 @@
 //  CONSTANTS
 //**************************************************************************
 
-// relative devices return ~512 units per onscreen pixel
-constexpr s32 INPUT_RELATIVE_PER_PIXEL = 512;
-
-// absolute devices return values between -65536 and +65536
-constexpr s32 INPUT_ABSOLUTE_MIN = -65536;
-constexpr s32 INPUT_ABSOLUTE_MAX = 65536;
-
 // maximum number of axis/buttons/hats with ITEM_IDs for use by osd layer
 constexpr int INPUT_MAX_AXIS = 8;
 constexpr int INPUT_MAX_BUTTONS = 32;
@@ -543,7 +536,6 @@ public:
 private:
 	// internal helpers
 	void reset_memory();
-	bool code_check_axis(input_device_item &item, input_code code);
 
 	// internal state
 	running_machine &   m_machine;

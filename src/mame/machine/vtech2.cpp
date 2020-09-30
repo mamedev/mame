@@ -152,10 +152,7 @@ uint8_t vtech2_state::mmio_r(offs_t offset)
 
 	offset = ~offset & 0x7ff;
 	if (BIT(offset, 10))
-	{
-		offset = (offset >> 8) & 3;
-		data &= m_io_keyboard[offset + 8]->read();     // ROW A-D
-	}
+		data &= m_io_keyboard[BIT(offset,8,2) + 8]->read();     // ROW A-D
 	else
 	for (u8 i = 0; i < 8; i++)
 		if (BIT(offset, i))

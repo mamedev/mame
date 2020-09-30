@@ -95,7 +95,7 @@ private:
 	optional_device<monsterb_sound_device> m_soundbrd;
 	optional_device<samples_device> m_samples;
 	optional_device<sega_speech_device> m_speech;
-	optional_device<segag80_audio_device> m_g80_audio;
+	optional_device<segag80_audio_device_base> m_g80_audio;
 	optional_device<usb_sound_device> m_usbsnd;
 	optional_device<sega005_sound_device> m_005snd;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -211,7 +211,7 @@ protected:
 	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples) override;
 
 private:
 	// internal state

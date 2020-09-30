@@ -295,7 +295,7 @@ void touchme_state::touchme(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
-	static const s16 speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
+	static const double speaker_levels[] = { 0.0, 1.0, -1.0, 0.0 };
 	m_speaker->set_levels(4, speaker_levels);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -626,7 +626,7 @@ void maniac_state::maniac(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
-	static const s16 speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
+	static const double speaker_levels[] = { 0.0, 1.0, -1.0, 0.0 };
 	m_speaker->set_levels(4, speaker_levels);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -1336,7 +1336,7 @@ void rockpin_state::rockpin(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
-	static const s16 speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
+	static const double speaker_levels[] = { 0.0, 1.0, -1.0, 0.0 };
 	m_speaker->set_levels(4, speaker_levels);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }

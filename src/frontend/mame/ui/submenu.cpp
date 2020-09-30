@@ -20,7 +20,8 @@
 namespace ui {
 std::vector<submenu::option> const submenu::misc_options = {
 	{ submenu::option_type::HEAD, __("Miscellaneous Options") },
-	{ submenu::option_type::UI,   __("Re-select last machine played"),           OPTION_REMEMBER_LAST },
+	{ submenu::option_type::UI,   __("Skip imperfect emulation warnings"),       OPTION_SKIP_WARNINGS },
+	{ submenu::option_type::UI,   __("Re-select last machine launched"),         OPTION_REMEMBER_LAST },
 	{ submenu::option_type::UI,   __("Enlarge images in the right panel"),       OPTION_ENLARGE_SNAPS },
 	{ submenu::option_type::EMU,  __("Cheats"),                                  OPTION_CHEAT },
 	{ submenu::option_type::EMU,  __("Show mouse pointer"),                      OPTION_UI_MOUSE },

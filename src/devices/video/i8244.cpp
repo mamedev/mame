@@ -140,14 +140,12 @@ void i8244_device::device_start()
 
 	save_item(NAME(m_x_beam_pos));
 	save_item(NAME(m_y_beam_pos));
-	save_item(NAME(m_y_latch));
 	save_item(NAME(m_control_status));
 	save_item(NAME(m_collision_status));
-	save_item(NAME(m_pos_hold));
-	save_item(NAME(m_y_hold));
 	save_item(NAME(m_sh_written));
 	save_item(NAME(m_sh_pending));
 	save_item(NAME(m_sh_prescaler));
+	save_item(NAME(m_sh_count));
 	save_item(NAME(m_sh_output));
 	save_item(NAME(m_sh_duty));
 }
@@ -309,7 +307,7 @@ uint8_t i8244_device::read(offs_t offset)
 			data |= (h >= 225 && h < m_bgate_start && get_y_beam() <= m_vblank_start) ? 1 : 0;
 
 			// position strobe status
-			data |= m_pos_hold ? 2 : 0;
+			data |= m_vdc.s.control & 0x02;
 
 			m_irq_func(CLEAR_LINE);
 			m_control_status &= ~0xcc;
@@ -323,34 +321,12 @@ uint8_t i8244_device::read(offs_t offset)
 			break;
 
 		case 0xa4:
-			if (m_y_hold)
-			{
-				data = m_y_latch;
-				m_y_hold = false;
-			}
-			else if (m_pos_hold)
-				data = m_y_beam_pos;
-			else
-				data = get_y_beam();
-
+			data = (m_vdc.s.control & 0x02) ? get_y_beam() : m_y_beam_pos;
 			break;
 
 		case 0xa5:
-		{
-			if (m_pos_hold)
-			{
-				data = m_x_beam_pos;
-				m_pos_hold = false;
-			}
-			else
-				data = get_x_beam();
-
-			// Y is latched when reading X
-			m_y_hold = true;
-			m_y_latch = get_y_beam();
-
+			data = (m_vdc.s.control & 0x02) ? get_x_beam() : m_x_beam_pos;
 			break;
-		}
 
 		default:
 			data = m_vdc.reg[offset];
@@ -387,15 +363,12 @@ void i8244_device::write(offs_t offset, uint8_t data)
 	switch (offset)
 	{
 		case 0xa0:
-			if ((m_vdc.s.control & 0x02) && !(data & 0x02) && !m_pos_hold)
+			if ((m_vdc.s.control & 0x02) && !(data & 0x02))
 			{
 				// toggling strobe bit, tuck away values
 				m_x_beam_pos = get_x_beam();
 				m_y_beam_pos = get_y_beam();
-				m_pos_hold = true;
 			}
-			// note: manual talks about a hblank interrupt on d0, and a sound interrupt on d2,
-			// but tests done on 8244 reveal no such features
 			break;
 
 		case 0xa7: case 0xa8: case 0xa9:
@@ -602,53 +575,6 @@ uint32_t i8244_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 		/* Display objects if enabled */
 		if ( m_vdc.s.control & 0x20 && scanline <= 242 )
 		{
-			/* Regular foreground objects */
-			for ( int i = ARRAY_LENGTH( m_vdc.s.foreground ) - 1; i >= 0; i-- )
-			{
-				int y = m_vdc.s.foreground[i].y;
-				int height = 8 - ( ( ( y >> 1 ) + m_vdc.s.foreground[i].ptr ) & 7 );
-				if (height == 1) height = 8;
-
-				if ( y <= scanline && scanline < y + height * 2 )
-				{
-					uint16_t color = 8 + ( ( m_vdc.s.foreground[i].color >> 1 ) & 0x07 );
-					int offset = ( m_vdc.s.foreground[i].ptr | ( ( m_vdc.s.foreground[i].color & 0x01 ) << 8 ) ) + ( y >> 1 ) + ( ( scanline - y ) >> 1 );
-					uint8_t chr = m_charset[ offset & 0x1FF ];
-					int x = (m_vdc.s.foreground[i].x + 5) * 2;
-
-					for ( uint8_t m = 0x80; m > 0; m >>= 1, x += 2 )
-					{
-						if ( chr & m )
-						{
-							for (int px = x; px < x + 2; px++)
-							{
-								if (cliprect.contains(px, scanline))
-								{
-									// Check collision with self
-									u8 colx = m_collision_map[ px ];
-									if (colx & 0x80)
-									{
-										colx &= ~0x80;
-										m_control_status |= 0x80;
-									}
-
-									// Check if we collide with an already drawn source object
-									if (m_vdc.s.collision & colx)
-										m_collision_status |= 0x80;
-
-									// Check if an already drawn object would collide with us
-									if (m_vdc.s.collision & 0x80)
-										m_collision_status |= colx;
-
-									m_collision_map[ px ] |= 0x80;
-									bitmap.pix16( scanline, px ) = color;
-								}
-							}
-						}
-					}
-				}
-			}
-
 			/* Quad objects */
 			for ( int i = ARRAY_LENGTH( m_vdc.s.quad ) - 1; i >= 0; i-- )
 			{
@@ -695,6 +621,53 @@ uint32_t i8244_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 										m_collision_map[ px ] |= 0x80;
 										bitmap.pix16( scanline, px ) = color;
 									}
+								}
+							}
+						}
+					}
+				}
+			}
+
+			/* Regular foreground objects */
+			for ( int i = ARRAY_LENGTH( m_vdc.s.foreground ) - 1; i >= 0; i-- )
+			{
+				int y = m_vdc.s.foreground[i].y;
+				int height = 8 - ( ( ( y >> 1 ) + m_vdc.s.foreground[i].ptr ) & 7 );
+				if (height == 1) height = 8;
+
+				if ( y <= scanline && scanline < y + height * 2 )
+				{
+					uint16_t color = 8 + ( ( m_vdc.s.foreground[i].color >> 1 ) & 0x07 );
+					int offset = ( m_vdc.s.foreground[i].ptr | ( ( m_vdc.s.foreground[i].color & 0x01 ) << 8 ) ) + ( y >> 1 ) + ( ( scanline - y ) >> 1 );
+					uint8_t chr = m_charset[ offset & 0x1FF ];
+					int x = (m_vdc.s.foreground[i].x + 5) * 2;
+
+					for ( uint8_t m = 0x80; m > 0; m >>= 1, x += 2 )
+					{
+						if ( chr & m )
+						{
+							for (int px = x; px < x + 2; px++)
+							{
+								if (cliprect.contains(px, scanline))
+								{
+									// Check collision with self
+									u8 colx = m_collision_map[ px ];
+									if (colx & 0x80)
+									{
+										colx &= ~0x80;
+										m_control_status |= 0x80;
+									}
+
+									// Check if we collide with an already drawn source object
+									if (m_vdc.s.collision & colx)
+										m_collision_status |= 0x80;
+
+									// Check if an already drawn object would collide with us
+									if (m_vdc.s.collision & 0x80)
+										m_collision_status |= colx;
+
+									m_collision_map[ px ] |= 0x80;
+									bitmap.pix16( scanline, px ) = color;
 								}
 							}
 						}
@@ -767,16 +740,16 @@ uint32_t i8244_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 }
 
 
-void i8244_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void i8244_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	u8 volume = m_vdc.s.sound & 0xf;
-	int sample_on = (m_sh_output & m_vdc.s.sound >> 7) * 0x4000;
+	stream_buffer::sample_t sample_on = (m_sh_output & m_vdc.s.sound >> 7) * 0.5;
 
-	for (int i = 0; i < samples; i++)
+	for (int i = 0; i < outputs[0].samples(); i++)
 	{
 		// clock duty cycle
 		m_sh_duty = (m_sh_duty + 1) & 0xf;
-		outputs[0][i] = (m_sh_duty < volume) ? sample_on : 0;
+		outputs[0].put(i, (m_sh_duty < volume) ? sample_on : 0.0);
 	}
 }
 
@@ -800,19 +773,35 @@ void i8244_device::sound_update()
 		int feedback = m_sh_output;
 		signal >>= 1;
 
-		/* Noise tap is on bits 0 and 5 and fed back to bit 15 */
+		// noise tap is on bits 0 and 5 and fed back to bit 15
 		if (m_vdc.s.sound & 0x10)
 		{
 			feedback ^= signal >> 4 & 1; // pre-shift bit 5
 			signal = (signal & ~0x8000) | (feedback << 15);
 		}
 
-		/* Loop sound */
+		// loop sound
 		signal |= feedback << 23;
 
 		m_vdc.s.shift3 = signal & 0xFF;
 		m_vdc.s.shift2 = ( signal >> 8 ) & 0xFF;
 		m_vdc.s.shift1 = ( signal >> 16 ) & 0xFF;
+
+		// sound interrupt
+		if (++m_sh_count == 24)
+		{
+			m_sh_count = 0;
+			if (m_vdc.s.control & 0x04)
+			{
+				m_control_status |= 0x04;
+				m_irq_func(ASSERT_LINE);
+			}
+		}
 	}
-	m_sh_written = false;
+	else if (m_sh_written)
+	{
+		m_sh_count = 0;
+		m_sh_written = false;
+	}
+
 }

@@ -23,7 +23,7 @@ protected:
 	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 public:
 	void nile_snd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

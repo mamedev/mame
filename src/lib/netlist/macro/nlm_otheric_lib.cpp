@@ -1,7 +1,7 @@
-// license:GPL-2.0+
+// license:CC0
 // copyright-holders:Couriersud
 
-#include "netlist/devices/net_lib.h"
+#include "devices/net_lib.h"
 
 /*
  *   MC14584B: Hex Schmitt Trigger
@@ -43,31 +43,6 @@ NETLIST_END()
 
 //- Identifier:  NE566_DIP
 //- Title: NE566 Voltage Controlled Oscillator
-//- Description: The LM566CN is a general purpose voltage controlled oscillator
-//-    which may be used to generate square and triangula waves, the frequency
-//-    of which is a very linear function of a control voltage. The frequency
-//-    is also a function of an external resistor and capacitor.
-//-
-//-    The LM566CN is specified for operation over the 0°C to a 70°C
-//-    temperature range.
-//-
-//-    Applications
-//-
-//-    - FM modulation
-//-    - Signal generation
-//-    - Function generation
-//-    - Frequency shift keying
-//-    - Tone generation
-//-
-//-    Features
-//-    - Wide supply voltage range: 10V to 24V
-//-    - Very linear modulation characteristics
-//-    - High temperature stability
-//-    - Excellent supply voltage rejection
-//-    - 10 to 1 frequency range with fixed capacitor
-//-    - Frequency programmable by means of current, voltage, resistor or capacitor
-//-
-//.
 //- Pinalias: GND,NC,SQUARE,TRIANGLE,MODULATION,R1,C1,VCC
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
@@ -153,16 +128,76 @@ static NETLIST_START(NE566_DIP)
 
 NETLIST_END()
 
+//- Identifier:  NE555_DIP
+//- Title: NE555 PRECISION TIMERS
+//- Pinalias: GND,TRIG,OUT,RESET,CONT,THRES,DISCH,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow Texas instrument datasheet
+//- Limitations: Internal resistor network currently fixed to 5k
+//-   If TRIG and TRESH are connected overshoot compensation will be enabled.
+//-   The approach is raw but delivers results (at 5 to 10 steps per discharge/charge)
+//-   within a couple of percent. Please take into account that any datasheet
+//-   formulas are idealistic. Neither capacitor, resistor, internal resistor
+//-   tolerances are taken into account. Nor are ambient temperature and chip
+//-   temperature. Thus the result is considered acceptable.
+//-   The datasheet states a maximum discharge of 200mA, this is not modelled
+//-   Instead an impedance of 1 Ohm is used.
+//-
+//- Example: ne555_astable.c,ne555_example
+//- FunctionTable:
+//-
+//-    |RESET|TRIGGER VOLTAGE|THRESHOLD VOLTAGE|OUTPUT|DISCHARGE SWITCH|
+//-    |:---:|:-------------:|:---------------:|:----:|:--------------:|
+//-    |Low  | Irrelevant    | Irrelevant      |  Low |    On          |
+//-    |High | <1/3 VDD      | Irrelevant      | High |    Off         |
+//-    |High | >1/3 VDD      | >2/3 VDD        | Low  |    On          |
+//-    |High | >1/3 VDD      | <2/3 VDD        | As previously established||
+//-
+static NETLIST_START(NE555_DIP)
+
+	NE555(A)
+
+	ALIAS(1, A.GND)      // Pin 1
+	ALIAS(2, A.TRIG)     // Pin 2
+	ALIAS(3, A.OUT)      // Pin 3
+	ALIAS(4, A.RESET)    // Pin 4
+	ALIAS(5, A.CONT)     // Pin 5
+	ALIAS(6, A.THRESH)   // Pin 6
+	ALIAS(7, A.DISCH)    // Pin 7
+	ALIAS(8, A.VCC)      // Pin 8
+
+NETLIST_END()
+
+static NETLIST_START(MC1455P_DIP)
+
+	MC1455P(A)
+
+	ALIAS(1, A.GND)      // Pin 1
+	ALIAS(2, A.TRIG)     // Pin 2
+	ALIAS(3, A.OUT)      // Pin 3
+	ALIAS(4, A.RESET)    // Pin 4
+	ALIAS(5, A.CONT)     // Pin 5
+	ALIAS(6, A.THRESH)   // Pin 6
+	ALIAS(7, A.DISCH)    // Pin 7
+	ALIAS(8, A.VCC)      // Pin 8
+
+NETLIST_END()
+
+static TRUTHTABLE_START(MC14584B_GATE, 1, 1, "")
+	TT_HEAD(" A | Q ")
+	TT_LINE(" 0 | 1 |100")
+	TT_LINE(" 1 | 0 |100")
+	// 2.1V negative going and 2.7V positive going at 5V
+	TT_FAMILY("FAMILY(TYPE=CMOS IVL=0.42 IVH=0.54 OVL=0.05 OVH=0.05 ORL=10.0 ORH=10.0)")
+TRUTHTABLE_END()
+
 NETLIST_START(otheric_lib)
-	TRUTHTABLE_START(MC14584B_GATE, 1, 1, "")
-		TT_HEAD(" A | Q ")
-		TT_LINE(" 0 | 1 |100")
-		TT_LINE(" 1 | 0 |100")
-		// 2.1V negative going and 2.7V positive going at 5V
-		TT_FAMILY("FAMILY(TYPE=CMOS IVL=0.42 IVH=0.54 OVL=0.05 OVH=0.05 ORL=10.0 ORH=10.0)")
-	TRUTHTABLE_END()
+
+	TRUTHTABLE_ENTRY(MC14584B_GATE)
 
 	LOCAL_LIB_ENTRY(MC14584B_DIP)
 	LOCAL_LIB_ENTRY(NE566_DIP)
+	LOCAL_LIB_ENTRY(NE555_DIP)
+	LOCAL_LIB_ENTRY(MC1455P_DIP)
 NETLIST_END()
 

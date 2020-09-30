@@ -39,26 +39,26 @@ license:CC0
 		</screen>
 
 		<!-- 6 buttons at bottom -->
-		<bezel element="calendar">
+		<element ref="calendar">
 			<bounds left="1" top="243" right="26" bottom="262" />
-		</bezel>
-		<bezel element="calc">
+		</element>
+		<element ref="calc">
 			<bounds left="27" top="243" right="53" bottom="262" />
-		</bezel>
-		<bezel element="expense">
+		</element>
+		<element ref="expense">
 			<bounds left="53" top="243" right="80" bottom="262" />
-		</bezel>
-		<bezel element="data">
+		</element>
+		<element ref="data">
 			<bounds left="80" top="243" right="107" bottom="262" />
-		</bezel>
-		<bezel element="apps">
+		</element>
+		<element ref="apps">
 			<bounds left="107" top="243" right="134" bottom="262" />
-		</bezel>
-		<bezel element="find">
+		</element>
+		<element ref="find">
 			<bounds left="134" top="243" right="160" bottom="262" />
-		</bezel>
-		<bezel element="line">
+		</element>
+		<element ref="line">
 			<bounds left="0" top="240" right="160" bottom="241" />
-		</bezel>
+		</element>
 	</view>
 </mamelayout>

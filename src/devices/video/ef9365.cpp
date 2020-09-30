@@ -51,10 +51,6 @@
         for this chip. So i add the interrupt line support, but
         bug(s) is possible.
 
-    The needed charset file charset_ef9365.rom (CRC 8d3053be) is available
-    there : http://hxc2001.free.fr/Squale/rom/charset_ef9365.zip
-    This ROM charset is into the EF9365/EF9366.
-
     To see how to use this driver, have a look to the Squale machine
     driver (squale.cpp).
     If you have any question, don't hesitate to contact me at the email

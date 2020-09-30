@@ -22,22 +22,6 @@
 
 #include <memory>
 
-// FIXME: Move to ptypes
-namespace plib
-{
-	// FORWARD declarations
-	template <typename BASEARENA, std::size_t MINALIGN>
-	class mempool_arena;
-
-	struct aligned_arena;
-	class dynlib_base;
-
-	template<class T, bool debug_enabled>
-	class plog_base;
-
-	struct plog_level;
-} // namespace plib
-
 namespace netlist
 {
 	// -----------------------------------------------------------------------------
@@ -114,10 +98,10 @@ namespace netlist
 	{
 		using BC = plib::constants<T>;
 
-		static inline constexpr T np_VT(T n=BC::one(), T temp=BC::T0()) noexcept
+		static constexpr T np_VT(T n=BC::one(), T temp=BC::T0()) noexcept
 		{ return n * temp * BC::k_b() / BC::Q_e(); }
 
-		static inline constexpr T np_Is() noexcept { return static_cast<T>(1e-15); } // NOLINT
+		static constexpr T np_Is() noexcept { return static_cast<T>(1e-15); } // NOLINT
 
 		/// \brief constant startup gmin
 		///
@@ -125,19 +109,19 @@ namespace netlist
 		/// conductivities with a reasonable value.
 		/// During reset, the object should than make use of exec().gmin()
 		/// to use the actual gmin() value.
-		static inline constexpr T cgmin() noexcept { return BC::magic(1e-9); } // NOLINT
+		static constexpr T cgmin() noexcept { return BC::magic(1e-9); } // NOLINT
 
 		// FIXME: Some objects used 1e-15 for initial gmin. Needs to be
 		//        aligned with cgmin
-		static inline constexpr T cgminalt() noexcept { return BC::magic(1e-15); } // NOLINT
+		static constexpr T cgminalt() noexcept { return BC::magic(1e-15); } // NOLINT
 
 		/// \brief Multiplier applied to VT in np diode models to determine range for constant model
 		///
-		static inline constexpr T diode_min_cutoff_mult() noexcept { return BC::magic(-5.0); } // NOLINT
+		static constexpr T diode_min_cutoff_mult() noexcept { return BC::magic(-5.0); } // NOLINT
 
 		/// \brief Startup voltage used by np diode models
 		///
-		static inline constexpr T diode_start_voltage() noexcept { return BC::magic(0.7); } // NOLINT
+		static constexpr T diode_start_voltage() noexcept { return BC::magic(0.7); } // NOLINT
 
 	};
 
@@ -164,36 +148,7 @@ namespace netlist
 		plib::aligned_arena>;
 	using host_arena   = plib::aligned_arena;
 
-	/// \brief Interface definition for netlist callbacks into calling code
-	///
-	/// A class inheriting from netlist_callbacks_t has to be passed to the netlist_t
-	/// constructor. Netlist does processing during construction and thus needs
-	/// the object passed completely constructed.
-	///
-	class callbacks_t
-	{
-	public:
-
-		callbacks_t() = default;
-		virtual ~callbacks_t() = default;
-
-		PCOPYASSIGNMOVE(callbacks_t, default)
-
-		/// \brief logging callback.
-		///
-		virtual void vlog(const plib::plog_level &l, const pstring &ls) const noexcept = 0;
-
-		/// \brief provide library with static solver implementations.
-		///
-		/// By default no static solvers are provided since these are
-		/// determined by the specific use case. It is up to the implementor
-		/// of a callbacks_t implementation to optionally provide such a collection
-		/// of symbols.
-		///
-		virtual std::unique_ptr<plib::dynlib_base> static_solver_lib() const;
-	};
-
-	using log_type =  plib::plog_base<callbacks_t, NL_DEBUG>;
+	using log_type =  plib::plog_base<NL_DEBUG>;
 
 	//============================================================
 	//  Types needed by various includes
@@ -236,9 +191,9 @@ namespace netlist
 	//  MACROS
 	//============================================================
 
-	template <typename T> inline constexpr netlist_time NLTIME_FROM_NS(T &&t) noexcept { return netlist_time::from_nsec(t); }
-	template <typename T> inline constexpr netlist_time NLTIME_FROM_US(T &&t) noexcept { return netlist_time::from_usec(t); }
-	template <typename T> inline constexpr netlist_time NLTIME_FROM_MS(T &&t) noexcept { return netlist_time::from_msec(t); }
+	template <typename T> constexpr netlist_time NLTIME_FROM_NS(T &&t) noexcept { return netlist_time::from_nsec(t); }
+	template <typename T> constexpr netlist_time NLTIME_FROM_US(T &&t) noexcept { return netlist_time::from_usec(t); }
+	template <typename T> constexpr netlist_time NLTIME_FROM_MS(T &&t) noexcept { return netlist_time::from_msec(t); }
 
 	struct desc_base
 	{
@@ -265,7 +220,7 @@ namespace netlist
 		{
 			static constexpr netlist_time value(std::size_t N)
 			{
-				return NLTIME_FROM_NS(N == 0 ? value0 : value1);
+				return N == 0 ? NLTIME_FROM_NS(value0) : NLTIME_FROM_NS(value1);
 			}
 		};
 
@@ -278,9 +233,9 @@ namespace netlist
 		{
 			static constexpr netlist_time value(std::size_t N)
 			{
-				return NLTIME_FROM_NS(N == 0 ? value0 :
-						N == 1 ? value1 :
-								 value2);
+				return N == 0 ? NLTIME_FROM_NS(value0) :
+					   N == 1 ? NLTIME_FROM_NS(value1) :
+								NLTIME_FROM_NS(value2);
 			}
 		};
 

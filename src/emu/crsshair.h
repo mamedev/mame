@@ -74,6 +74,7 @@ public:
 private:
 	// private helpers
 	void create_bitmap();
+	void update_position();
 
 	// private state
 	running_machine &   m_machine;  // reference to our machine

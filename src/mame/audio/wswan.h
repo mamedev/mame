@@ -59,7 +59,7 @@ protected:
 	virtual void rom_bank_updated() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples) override;
 
 private:
 	void wswan_ch_set_freq( CHAN *ch, uint16_t freq );

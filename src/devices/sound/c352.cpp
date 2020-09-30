@@ -122,14 +122,14 @@ void c352_device::ramp_volume(c352_voice_t &v, int ch, u8 val)
 		v.curr_vol[ch] += (vol_delta > 0) ? -1 : 1;
 }
 
-void c352_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void c352_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *buffer_fl = outputs[0];
-	stream_sample_t *buffer_fr = outputs[1];
-	stream_sample_t *buffer_rl = outputs[2];
-	stream_sample_t *buffer_rr = outputs[3];
+	auto &buffer_fl = outputs[0];
+	auto &buffer_fr = outputs[1];
+	auto &buffer_rl = outputs[2];
+	auto &buffer_rr = outputs[3];
 
-	for (int i = 0; i < samples; i++)
+	for (int i = 0; i < buffer_fl.samples(); i++)
 	{
 		int out[4] = { 0, 0, 0, 0 };
 
@@ -173,10 +173,10 @@ void c352_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 			out[3] += (((v.flags & C352_FLG_PHASEFR) ? -s : s) * v.curr_vol[3]) >> 8;
 		}
 
-		*buffer_fl++ = (s16)(out[0] >> 3);
-		*buffer_fr++ = (s16)(out[1] >> 3);
-		*buffer_rl++ = (s16)(out[2] >> 3);
-		*buffer_rr++ = (s16)(out[3] >> 3);
+		buffer_fl.put_int(i, s16(out[0] >> 3), 32768);
+		buffer_fr.put_int(i, s16(out[1] >> 3), 32768);
+		buffer_rl.put_int(i, s16(out[2] >> 3), 32768);
+		buffer_rr.put_int(i, s16(out[3] >> 3), 32768);
 	}
 }
 
@@ -358,14 +358,14 @@ void c352_device::device_clock_changed()
 	if (m_stream != nullptr)
 		m_stream->set_sample_rate(m_sample_rate_base);
 	else
-		m_stream = machine().sound().stream_alloc(*this, 0, 4, m_sample_rate_base);
+		m_stream = stream_alloc(0, 4, m_sample_rate_base);
 }
 
 void c352_device::device_start()
 {
 	m_sample_rate_base = clock() / m_divider;
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 4, m_sample_rate_base);
+	m_stream = stream_alloc(0, 4, m_sample_rate_base);
 
 	// generate mulaw table (Output similar to namco's VC emulator)
 	int j = 0;

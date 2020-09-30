@@ -1,7 +1,6 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 
-#include "macro/nlm_base_lib.h"
 #include "solver/nld_matrix_solver.h"
 #include "solver/nld_solver.h"
 
@@ -19,17 +18,14 @@
 
 #include <limits>
 
+NETLIST_EXTERNAL(base_lib)
+
 namespace netlist
 {
 
 	// ----------------------------------------------------------------------------------------
 	// callbacks_t
 	// ----------------------------------------------------------------------------------------
-
-	std::unique_ptr<plib::dynlib_base> callbacks_t:: static_solver_lib() const
-	{
-		return std::make_unique<plib::dynlib_static>(nullptr);
-	}
 
 	// ----------------------------------------------------------------------------------------
 	// queue_t
@@ -108,14 +104,11 @@ namespace netlist
 	// ----------------------------------------------------------------------------------------
 
 	netlist_state_t::netlist_state_t(const pstring &name,
-		host_arena::unique_ptr<callbacks_t> &&callbacks)
-	: m_callbacks(std::move(callbacks)) // Order is important here
-	, m_log(*m_callbacks)
+		plib::plog_delegate logger)
+	: m_log(logger)
 	, m_extended_validation(false)
 	, m_dummy_version(1)
 	{
-		m_lib = m_callbacks->static_solver_lib();
-
 		m_setup = plib::make_unique<setup_t, host_arena>(*this);
 		// create the run interface
 		m_netlist = plib::make_unique<netlist_t>(m_pool, *this, name);
@@ -139,14 +132,21 @@ namespace netlist
 		"#define IND_N(ind) ((ind) * 1e-9)   \n"
 		"#define IND_P(ind) ((ind) * 1e-12)  \n";
 		m_setup->parser().add_include<plib::psource_str_t>("netlist/devices/net_lib.h", content);
+
+		// This is for core macro libraries
+		m_setup->parser().add_include<plib::psource_str_t>("devices/net_lib.h", content);
 #if 1
 		NETLIST_NAME(base_lib)(m_setup->parser());
+		//m_setup->parser().register_source<source_pattern_t>("../macro/modules/nlmod_{1}.cpp");
+		//m_setup->parser().register_source<source_pattern_t>("../macro/nlm_{1}.cpp");
 #else
-		// FIXME: This is very slow - need optimized parsing scanning
 #if 1
 		m_setup->parser().register_source<source_pattern_t>("src/lib/netlist/macro/nlm_{1}.cpp");
+		m_setup->parser().register_source<source_pattern_t>("src/lib/netlist/generated/nlm_{1}.cpp");
+		m_setup->parser().register_source<source_pattern_t>("src/lib/netlist/macro/modules/nlmod_{1}.cpp");
 		m_setup->parser().include("base_lib");
 #else
+		// FIXME: This is very slow - need optimized parsing scanning
 		pstring dir = "src/lib/netlist/macro/";
 		//m_setup->parser().register_source<source_pattern_t>("src/lib/netlist/macro/nlm_{}.cpp");
 		m_setup->parser().register_source<source_file_t>(dir + "nlm_base_lib.cpp");
@@ -158,6 +158,11 @@ namespace netlist
 		m_setup->parser().include("base_lib");
 #endif
 #endif
+	}
+
+	void netlist_state_t::set_static_solver_lib(std::unique_ptr<plib::dynlib_base> &&lib)
+	{
+		m_lib = std::move(lib);
 	}
 
 
@@ -209,7 +214,6 @@ namespace netlist
 		ENTRY(NL_USE_MEMPOOL)
 		ENTRY(NL_USE_QUEUE_STATS)
 		ENTRY(NL_USE_COPY_INSTEAD_OF_REFERENCE)
-		ENTRY(NL_AUTO_DEVICES)
 		ENTRY(NL_USE_FLOAT128)
 		ENTRY(NL_USE_FLOAT_MATRIX)
 		ENTRY(NL_USE_LONG_DOUBLE_MATRIX)
@@ -905,7 +909,7 @@ namespace netlist
 	}
 
 
-	plib::psource_t::stream_ptr param_data_t::stream()
+	plib::istream_uptr param_data_t::stream()
 	{
 		return device().state().parser().get_data_stream(str());
 	}
@@ -1025,12 +1029,14 @@ namespace netlist
 				}
 
 				m_time = top->exec_time();
-				auto *const obj(top->object());
+				detail::net_t *const obj(top->object());
 				m_queue.pop();
-				if (obj != nullptr)
-					obj->template update_devs<KEEP_STATS>();
-				else
+
+				if (!!(obj == nullptr))
 					break;
+
+				obj->template update_devs<KEEP_STATS>();
+
 				if (KEEP_STATS)
 					m_perf_out_processed.inc();
 			} while (true);

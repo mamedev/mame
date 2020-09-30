@@ -1321,7 +1321,7 @@ void segag80v_state::init_elim2()
 	m_decrypt = segag80_security(70);
 
 	// configure sound
-	iospace.install_write_handler(0x3e, 0x3f, write8sm_delegate(*m_g80_audio, FUNC(segag80_audio_device::write)));
+	iospace.install_write_handler(0x3e, 0x3f, write8sm_delegate(*m_g80_audio, FUNC(elim_audio_device::write)));
 }
 
 
@@ -1335,7 +1335,7 @@ void segag80v_state::init_elim4()
 	m_decrypt = segag80_security(76);
 
 	// configure sound
-	iospace.install_write_handler(0x3e, 0x3f, write8sm_delegate(*m_g80_audio, FUNC(segag80_audio_device::write)));
+	iospace.install_write_handler(0x3e, 0x3f, write8sm_delegate(*m_g80_audio, FUNC(elim_audio_device::write)));
 
 	// configure inputs
 	iospace.install_write_handler(0xf8, 0xf8, write8smo_delegate(*this, FUNC(segag80v_state::spinner_select_w)));
@@ -1355,7 +1355,7 @@ void segag80v_state::init_spacfury()
 	// configure sound
 	iospace.install_write_handler(0x38, 0x38, write8smo_delegate(*m_speech, FUNC(sega_speech_device::data_w)));
 	iospace.install_write_handler(0x3b, 0x3b, write8smo_delegate(*m_speech, FUNC(sega_speech_device::control_w)));
-	iospace.install_write_handler(0x3e, 0x3f, write8sm_delegate(*m_g80_audio, FUNC(segag80_audio_device::write)));
+	iospace.install_write_handler(0x3e, 0x3f, write8sm_delegate(*m_g80_audio, FUNC(spacfury_audio_device::write)));
 }
 
 
@@ -1371,8 +1371,8 @@ void segag80v_state::init_zektor()
 	// configure sound
 	iospace.install_write_handler(0x38, 0x38, write8smo_delegate(*m_speech, FUNC(sega_speech_device::data_w)));
 	iospace.install_write_handler(0x3b, 0x3b, write8smo_delegate(*m_speech, FUNC(sega_speech_device::control_w)));
-	iospace.install_write_handler(0x3c, 0x3d, write8sm_delegate(*m_g80_audio, FUNC(segag80_audio_device::write_ay)));
-	iospace.install_write_handler(0x3e, 0x3f, write8sm_delegate(*m_g80_audio, FUNC(segag80_audio_device::write)));
+	iospace.install_write_handler(0x3c, 0x3d, write8sm_delegate(*m_g80_audio, FUNC(zektor_audio_device::write_ay)));
+	iospace.install_write_handler(0x3e, 0x3f, write8sm_delegate(*m_g80_audio, FUNC(zektor_audio_device::write)));
 
 	// configure inputs
 	iospace.install_write_handler(0xf8, 0xf8, write8smo_delegate(*this, FUNC(segag80v_state::spinner_select_w)));

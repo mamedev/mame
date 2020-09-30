@@ -67,11 +67,12 @@ Monopoly: The Medal                         ???-?????                 no        
 Monopoly: The Medal 2nd Edition             ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx, Medal
 Mushiking 2K6 2ND                           ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
 Mushiking 2K7 1ST                           ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
-Ocha-Ken Hot Medal                          837-14790    G            ROM  JP     unknown         AAFE-01G03115212, Satellite Medal
+Ocha-Ken Hot Medal (Medalink)               837-14790    G            ROM  JP     unknown         AAFE-01G03115212, Satellite Medal
 Tetris Giant / Tetris Dekaris               834-14970    G  MDA-C0076 CF   ANY    253-5508-0604   AAFE-01G03025212
 Tetris Giant / Tetris Dekaris Ver.2.000     834-14970    G            ROM  ANY    253-5508-0604   AAFE-xxxxxxxxxxx
 Thomas: The Tank Engine                     ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
-Yataimura Kingyosukui (4-player, China)     ???-?????                 CF   EXP    253-5508-0526J  AAFE-xxxxxxxxxxx
+UNO the Medal (Medalink)                    ???-?????                 ROM  JP     253-5508-0526J  AAFE-01G00225212, Satellite Medal
+Yataimura Kingyosukui (4-player, China)     ???-?????                 CF   EXP    unknown         AAFE-xxxxxxxxxxx
 Unknown                                     834-14865                      JAP
 
 REV PCB       IC6s      Flash       AU1500
@@ -558,6 +559,22 @@ ROM_START( tetgiant )
 	ROM_LOAD( "317-0604-com.ic15", 0, 0x800, CRC(a46dfd47) SHA1(9e24739ecaaf85ef3b862485064450db6c607189) )
 ROM_END
 
+ROM_START( unomedal )
+	SEGASP_BIOS
+	ROM_DEFAULT_BIOS( "v201" )
+	SEGASP_JP
+	SEGASP_MISC
+
+	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "ic62",  0x00000000, 0x4000000, CRC(2af0cfb3) SHA1(88e75e547e525d7752f365256ba22411d2f0c7d9) )
+	ROM_LOAD( "ic63",  0x04000000, 0x4000000, CRC(fe375da9) SHA1(b2c6ddf3f15ba801bfa1d0c6ae7ebde0ce6766e9) )
+
+	ROM_PARAMETER( ":rom_board:id", "5502" )  // 2x 512Mbit FlashROMs
+
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-0526-jpn.ic15", 0, 0x800, CRC(14232fb7) SHA1(5fb8f832c760081aec6fdaa3be8535e3d641ae13) )
+ROM_END
+
 
 ROM_START( dinokior )
 	SEGASP_BIOS
@@ -662,7 +679,8 @@ ROM_START( kingyoch )
 	ROM_PARAMETER( ":rom_board:id", "5508" )  // 8x 512Mbit FlashROMs
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
-	ROM_LOAD( "317-0526-jpn.ic15", 0, 0x800, BAD_DUMP CRC(8af67833) SHA1(0b79abf9182c249a6d4976d6fd3b90101d66354f) )
+	// no PIC was provided with CF card, brute forced key
+	ROM_LOAD( "317-unknown.ic15", 0, 0x800, BAD_DUMP CRC(8af67833) SHA1(0b79abf9182c249a6d4976d6fd3b90101d66354f) )
 ROM_END
 
 ROM_START( loveber3 )
@@ -738,6 +756,7 @@ GAME( 2006, lovebero,lovebery,   segasp,    segasp, segasp_state, init_segasp, R
 GAME( 2007, mirworld,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Mirage World (satellite)", GAME_FLAGS )
 GAME( 2007, ochaken, segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Ocha-Ken Hot Medal", GAME_FLAGS )
 GAME( 2009, tetgiant,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Tetris Giant / Tetris Dekaris (Ver.2.000)", GAME_FLAGS )
+GAME( 2009, unomedal,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "UNO the Medal", GAME_FLAGS )
 // These use a CF card
 GAME( 2006, dinokior,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Dinosaur King - Operation: Dinosaur Rescue (USA, Export) (MDA-C0021)", GAME_FLAGS )
 GAME( 2008, dinoki25,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Dinosaur King - D-Team VS. the Alpha Fortress (Export, Ver 2.500) (MDA-C0047)", GAME_FLAGS )

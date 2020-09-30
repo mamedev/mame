@@ -620,20 +620,17 @@ void mos6560_device::soundport_w( int offset, int data )
 
 void mos6560_device::sound_start()
 {
-	int i;
-
-	m_channel = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
+	m_channel = stream_alloc(0, 1, machine().sample_rate());
 
 	/* buffer for fastest played sample for 5 second so we have enough data for min 5 second */
 	m_noisesize = NOISE_FREQUENCY_MAX * NOISE_BUFFER_SIZE_SEC;
-	m_noise = std::make_unique<int8_t[]>(m_noisesize);
+	m_noise = std::make_unique<int8_t []>(m_noisesize);
 	{
 		int noiseshift = 0x7ffff8;
-		char data;
 
-		for (i = 0; i < m_noisesize; i++)
+		for (int i = 0; i < m_noisesize; i++)
 		{
-			data = 0;
+			char data = 0;
 			if (noiseshift & 0x400000)
 				data |= 0x80;
 			if (noiseshift & 0x100000)
@@ -661,16 +658,12 @@ void mos6560_device::sound_start()
 
 	if (m_tonesize > 0)
 	{
-		m_tone = std::make_unique<int16_t[]>(m_tonesize);
+		m_tone = std::make_unique<int16_t []>(m_tonesize);
 
-		for (i = 0; i < m_tonesize; i++)
+		for (int i = 0; i < m_tonesize; i++)
 		{
-			m_tone[i] = (int16_t)(sin (2 * M_PI * i / m_tonesize) * 127 + 0.5);
+			m_tone[i] = int16_t(sin (2 * M_PI * i / m_tonesize) * 127 + 0.5);
 		}
-	}
-	else
-	{
-		m_tone = nullptr;
 	}
 }
 
@@ -891,12 +884,12 @@ void mos6560_device::device_timer(emu_timer &timer, device_timer_id id, int para
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void mos6560_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void mos6560_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	int i, v;
-	stream_sample_t *buffer = outputs[0];
+	auto &buffer = outputs[0];
 
-	for (i = 0; i < samples; i++)
+	for (i = 0; i < buffer.samples(); i++)
 	{
 		v = 0;
 		if (TONE1_ON /*||(m_tone1pos != 0) */ )
@@ -909,7 +902,7 @@ void mos6560_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			if (m_tone1pos >= m_tone1samples)
 			{
 				m_tone1pos = 0;
-				m_tone1samples = machine().sample_rate() / TONE1_FREQUENCY;
+				m_tone1samples = buffer.sample_rate() / TONE1_FREQUENCY;
 				if (m_tone1samples == 0)
 					m_tone1samples = 1;
 			}
@@ -925,7 +918,7 @@ void mos6560_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			if (m_tone2pos >= m_tone2samples)
 			{
 				m_tone2pos = 0;
-				m_tone2samples = machine().sample_rate() / TONE2_FREQUENCY;
+				m_tone2samples = buffer.sample_rate() / TONE2_FREQUENCY;
 				if (m_tone2samples == 0)
 					m_tone2samples = 1;
 			}
@@ -941,7 +934,7 @@ void mos6560_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			if (m_tone3pos >= m_tone3samples)
 			{
 				m_tone3pos = 0;
-				m_tone3samples = machine().sample_rate() / TONE3_FREQUENCY;
+				m_tone3samples = buffer.sample_rate() / TONE3_FREQUENCY;
 				if (m_tone3samples == 0)
 					m_tone3samples = 1;
 			}
@@ -956,12 +949,11 @@ void mos6560_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 				m_noisepos = 0;
 			}
 		}
-		v = (v * VOLUME) << 2;
-		if (v > 32767)
-			buffer[i] = 32767;
-		else if (v < -32767)
-			buffer[i] = -32767;
-		else
-			buffer[i] = v;
+		v *= VOLUME;
+		if (v > 8191)
+			v = 8191;
+		else if (v < -8191)
+			v = -8191;
+		buffer.put_int(i, v, 8192);
 	}
 }

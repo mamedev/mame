@@ -72,11 +72,10 @@ media_auditor::summary media_auditor::audit_media(const char *validation)
 
 				char const *const name(ROM_GETNAME(rom));
 				util::hash_collection const hashes(ROM_GETHASHDATA(rom));
-				device_t *const shared_device(find_shared_device(device, name, hashes, rom_file_size(rom)));
-				const auto dumped(!hashes.flag(util::hash_collection::FLAG_NO_DUMP));
+				device_t *const shared_device(find_shared_device(device, name, hashes, ROM_GETLENGTH(rom)));
 
 				// count the number of files with hashes
-				if (dumped && !ROM_ISOPTIONAL(rom))
+				if (!hashes.flag(util::hash_collection::FLAG_NO_DUMP) && !ROM_ISOPTIONAL(rom))
 				{
 					required++;
 					if (shared_device)
@@ -92,7 +91,7 @@ media_auditor::summary media_auditor::audit_media(const char *validation)
 				if (record)
 				{
 					// count the number of files that are found.
-					if (!device.owner() && ((record->status() == audit_status::GOOD && dumped) || (record->status() == audit_status::FOUND_INVALID && !find_shared_device(device, name, record->actual_hashes(), record->actual_length()))))
+					if ((record->status() == audit_status::GOOD) || ((record->status() == audit_status::FOUND_INVALID) && !find_shared_device(device, name, record->actual_hashes(), record->actual_length())))
 					{
 						found++;
 						if (shared_device)

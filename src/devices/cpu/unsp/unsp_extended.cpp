@@ -64,19 +64,10 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 
 			if (size == 0) size = 8;
 
-			if ((rx - (size - 1)) >= 0)
+			while (size--)
 			{
-				while (size--)
-				{
-					push(m_core->m_r[(rx--) + 8], &m_core->m_r[rb]);
-				}
+				push(m_core->m_r[((rx--)&7) + 8], &m_core->m_r[rb]);
 			}
-			else
-			{
-				logerror("(Ext) push <BAD>\n");
-				unimplemented_opcode(op, ximm);
-			}
-
 			return;
 		}
 		else
@@ -85,25 +76,12 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 			uint8_t size = (ximm & 0x7000) >> 12;
 			uint8_t rx = (ximm & 0x0e00) >> 9;
 
-
 			if (size == 0) size = 8;
 
-			if ((rx - (size - 1)) >= 0)
+			while (size--)
 			{
-				int realrx = 7 - rx;
-
-				while (size--)
-				{
-					m_core->m_r[(realrx++) + 8] = pop(&m_core->m_r[rb]);
-				}
+				m_core->m_r[((++rx)&7) + 8] = pop(&m_core->m_r[rb]);
 			}
-			else
-			{
-				logerror("(Ext) pop <BAD>\n");
-				unimplemented_opcode(op, ximm);
-			}
-
-
 			return;
 		}
 		return;

@@ -26,9 +26,9 @@
 
     Salora Manager
 
-    - keyboard Ctrl+I/J/N don't print out BASIC commands
     - RAM mapping
-    - cassette (figure out correct input level)
+    - cassette (figure out correct input level) - it can load its own recordings if you try a few times;
+    -- The "sonicinvader.wav" found on the net works perfectly with CRUN.
     - floppy (interface cartridge needed)
 
 */
@@ -125,12 +125,28 @@ All IC's shown.
 4116    - Toshiba TMM416P-3 16Kx1 RAM
 CN1     - main board connector (17x2 pin header)
 
+
+Left Keyboard           Right Keyboard
+1    2 3 4 5 6          7 8 9 0 :  -
+CTRL Q W E R T          Y U I O P  RETN
+<-   A S D F G          H J K L dn ->
+SHFT Z X C V B          N M . , /  SHFT
+
+- laser2001, manager: cassette format is incompatible with crvision.
+- manager: appears the joystick is 4-way only.
+- crvision: if you get "ERROR 00" while loading a tape, you can continue to load the remainder of it with CLOAD or CRUN.
+            The bad line(s) will be missing. (behaviour depends on version of Basic)
+
+TODO:
+- manager: paste can lose a character or 2 at the start of a line
+- crvision: paste is very poor
+- crvision: in natural key mode & in paste, shifted characters do not appear.
+- crvision: there is a buzzing noise while carts are running.
+
 */
 
 #include "emu.h"
 #include "includes/crvision.h"
-
-#include "softlist.h"
 #include "speaker.h"
 
 
@@ -183,38 +199,71 @@ void laser2001_state::lasr2001_map(address_map &map)
 
 INPUT_CHANGED_MEMBER( crvision_state::trigger_nmi )
 {
-	m_maincpu->set_input_line(m6502_device::NMI_LINE, newval ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(m6502_device::NMI_LINE, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /*-------------------------------------------------
     INPUT_PORTS( crvision )
+    Each joystick has 8 direction pads. Further,
+    by activating 2 adjacent pads at once, 16
+    directions can be obtained. BASIC only handles
+    the 8 pads. Direction codes per the manual:
+    0 - no direction
+    1 - down
+    2 - down/right
+    3 - right
+    4 - up/right
+    5 - up
+    6 - up/left
+    7 - left
+    8 - down/left
+    when using PRINT JOY(1) [or JOY(2)].
+    As you can see, there are multiple choices as
+    which input to choose. I've taken a guess; if
+    it turns out to be wrong use another option.
 -------------------------------------------------*/
 
 static INPUT_PORTS_START( crvision )
 	// Player 1 Joystick
 
 	PORT_START("PA0.0")
+	//PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_16WAY // 2
+	//PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_16WAY // 3
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("PA0.1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0xfd, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_16WAY PORT_CODE(KEYCODE_PGDN) // 2
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_16WAY // 1
+	//PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_16WAY // 1
+	//PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_16WAY // 1
+	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("PA0.2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	//PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_16WAY // 3
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_16WAY // 3
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1')
-	PORT_BIT( 0xf3, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP ) PORT_16WAY PORT_CODE(KEYCODE_PGUP) // 4
+	//PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_16WAY // 3
+	PORT_BIT( 0xb3, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("PA0.3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
-	PORT_BIT( 0xf7, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_16WAY // 5
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_16WAY PORT_CODE(KEYCODE_HOME) // 6
+	//PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_16WAY // 5
+	//PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_16WAY // 5
+	PORT_BIT( 0xe7, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("PA0.4")
+	//PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_16WAY // 6
+	//PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_16WAY // 7
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("PA0.5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0xdf, IP_ACTIVE_LOW, IPT_UNUSED )
+	//PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_16WAY // 7
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_16WAY // 7
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_16WAY PORT_CODE(KEYCODE_END) // 8
+	//PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_16WAY // 7
+	PORT_BIT( 0x9f, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("PA0.6")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -269,7 +318,7 @@ static INPUT_PORTS_START( crvision )
 
 	PORT_START("PA1.7")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Button 1 / SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Button 1 / SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 
 	// Player 2 Joystick
 
@@ -277,24 +326,28 @@ static INPUT_PORTS_START( crvision )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("PA2.1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2) PORT_CODE(KEYCODE_2_PAD)
-	PORT_BIT( 0xfd, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_16WAY PORT_PLAYER(2) PORT_CODE(KEYCODE_3_PAD) // 2
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_16WAY PORT_PLAYER(2) PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("PA2.2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_PLAYER(2) PORT_CODE(KEYCODE_6_PAD)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
-	PORT_BIT( 0xf3, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP ) PORT_16WAY PORT_PLAYER(2) PORT_CODE(KEYCODE_9_PAD) // 4
+	PORT_BIT( 0xb3, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("PA2.3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2) PORT_CODE(KEYCODE_8_PAD)
-	PORT_BIT( 0xf7, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_16WAY PORT_PLAYER(2) PORT_CODE(KEYCODE_8_PAD)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_16WAY PORT_PLAYER(2) PORT_CODE(KEYCODE_7_PAD) // 6
+	PORT_BIT( 0xe7, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("PA2.4")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("PA2.5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_CODE(KEYCODE_4_PAD)
-	PORT_BIT( 0xdf, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_PLAYER(2) PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_16WAY PORT_PLAYER(2) PORT_CODE(KEYCODE_1_PAD) // 8
+	PORT_BIT( 0x9f, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("PA2.6")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -308,7 +361,7 @@ static INPUT_PORTS_START( crvision )
 	PORT_START("PA3.0")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('U')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RET'N") PORT_CODE(KEYCODE_ENTER) PORT_CHAR('\r')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RET'N") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('P')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('O')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('I')
@@ -365,7 +418,7 @@ static INPUT_PORTS_START( manager )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER) PORT_CHAR('\r')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('-')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('-') PORT_CHAR('#')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E') PORT_CHAR('e')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S') PORT_CHAR('s')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('X') PORT_CHAR('x')
@@ -373,27 +426,27 @@ static INPUT_PORTS_START( manager )
 	PORT_START("Y.1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xC3\x84 \xC3\xA4") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(0x00C4) PORT_CHAR(0x00E4)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xC3\x84 \xC3\xA4") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(0x00C4) PORT_CHAR(0x00E4) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR(';') PORT_CHAR('+')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"') PORT_CHAR('@')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('W') PORT_CHAR('w')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A') PORT_CHAR('a')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z') PORT_CHAR('z')
 
 	PORT_START("Y.2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('I') PORT_CHAR('i')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED) // I
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xC3\x85 \xC3\xA5") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR(0x00C5) PORT_CHAR(0x00E5)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xC3\x85 \xC3\xA5") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR(0x00C5) PORT_CHAR(0x00E5) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q') PORT_CHAR('q')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 
 	PORT_START("Y.3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('N') PORT_CHAR('n')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('X') PORT_CHAR('x')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xC3\x96 \xC3\xB6") PORT_CODE(KEYCODE_COLON) PORT_CHAR(0x00D6) PORT_CHAR(0x00F6)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED) // N
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED) // X
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xC3\x96 \xC3\xB6") PORT_CODE(KEYCODE_COLON) PORT_CHAR(0x00D6) PORT_CHAR(0x00F6) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR(':') PORT_CHAR('*')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('R') PORT_CHAR('r')
@@ -411,9 +464,9 @@ static INPUT_PORTS_START( manager )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('V') PORT_CHAR('v')
 
 	PORT_START("Y.5")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('J') PORT_CHAR('j')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED) // J
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('L') PORT_CHAR('l')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('L') PORT_CHAR('l') PORT_CHAR(UCHAR_MAMEKEY(UP))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR('=')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y') PORT_CHAR('y')
@@ -432,7 +485,7 @@ static INPUT_PORTS_START( manager )
 
 	PORT_START("Y.7")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('X') PORT_CHAR('x')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('N') PORT_CHAR('n')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED) // N
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('O') PORT_CHAR('o')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
@@ -448,11 +501,11 @@ static INPUT_PORTS_START( manager )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 )
 
 	PORT_START("JOY.1")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
 	PORT_START("JOY.2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -462,11 +515,14 @@ static INPUT_PORTS_START( manager )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 
 	PORT_START("JOY.3")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+
+	PORT_START("NMI")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F10) PORT_CHANGED_MEMBER(DEVICE_SELF, crvision_state, trigger_nmi, 0)
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -498,30 +554,34 @@ void crvision_state::pia_pa_w(uint8_t data)
 	m_cassette->output( BIT(data, 7) ? +1.0 : -1.0);
 }
 
-uint8_t crvision_state::read_keyboard(int pa)
+uint8_t crvision_state::read_keyboard(u8 pa)
 {
-	uint8_t value = 0;
+	uint8_t value = 0xff;
 
-	for (int i = 0; i < 8; i++)
+	// Get shift/ctrl keys
+	u8 modifier = m_io_keypad[pa][7]->read() & 0x80;
+
+	// Get normal keys/joystick
+	for (u8 i = 0; i < 6; i++)
 	{
-		switch (pa & 3)
-		{
-			case 0: value = m_inp_pa0[i]->read(); break;
-			case 1: value = m_inp_pa1[i]->read(); break;
-			case 2: value = m_inp_pa2[i]->read(); break;
-			case 3: value = m_inp_pa3[i]->read(); break;
-		}
+		value = m_io_keypad[pa][i]->read() & 0x7f;
 
-		if (value != 0xff)
+		if (value < 0x7f)
 		{
-			if (value == 0xff - (1 << i))
-				return value;
+			if (value == 0x7f - (1 << i))
+				break;
 			else
-				return value - (1 << i);
+			{
+				value -= (1 << i);
+				break;
+			}
 		}
 	}
 
-	return 0xff;
+	value |= modifier;
+
+	//if (value < 0xff) printf("%01X%02X ",pa,value);
+	return value;
 }
 
 uint8_t crvision_state::pia_pa_r()
@@ -561,8 +621,8 @@ uint8_t crvision_state::pia_pb_r()
 
 	uint8_t data = 0xff;
 
-	for (int i = 0; i < 4; i++)
-		if (m_keylatch >> i & 1)
+	for (u8 i = 0; i < 4; i++)
+		if (BIT(m_keylatch, i))
 			data &= read_keyboard(i);
 
 	return data;
@@ -585,8 +645,8 @@ uint8_t laser2001_state::pia_pa_r()
 
 	uint8_t data = 0xff;
 
-	for (int i = 0; i < 8; i++)
-		if (~m_keylatch >> i & 1)
+	for (u8 i = 0; i < 8; i++)
+		if (!BIT(m_keylatch, i))
 			data &= m_inp_y[i]->read();
 
 	return data;
@@ -612,7 +672,7 @@ uint8_t laser2001_state::pia_pb_r()
 {
 	uint8_t data = 0xff;
 
-	for (int i = 0; i < 4; i++)
+	for (u8 i = 0; i < 4; i++)
 		if (~m_joylatch >> i & 1)
 			data &= m_inp_joy[i]->read();
 
@@ -643,7 +703,7 @@ void laser2001_state::pia_pb_w(uint8_t data)
 
 READ_LINE_MEMBER( laser2001_state::pia_ca1_r )
 {
-	return (m_cassette)->input() > -0.1469;
+	return (m_cassette->input() > 0.16) ? 0 : 1;
 }
 
 WRITE_LINE_MEMBER( laser2001_state::pia_ca2_w )
@@ -753,7 +813,7 @@ void crvision_state::creativision(machine_config &config)
 	m_psg->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
@@ -900,13 +960,13 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS               INIT        COMPANY                   FULLNAME                       FLAGS
-CONS( 1982, crvision, 0,        0,      pal,      crvision, crvision_pal_state, empty_init, "Video Technology",       "CreatiVision",                0 )
-CONS( 1982, fnvision, crvision, 0,      pal,      crvision, crvision_pal_state, empty_init, "Video Technology",       "FunVision",                   0 )
-CONS( 1982, crvisioj, crvision, 0,      ntsc,     crvision, crvision_state,     empty_init, "Cheryco",                "CreatiVision (Japan)",        0 )
-CONS( 1982, wizzard,  crvision, 0,      pal,      crvision, crvision_pal_state, empty_init, "Dick Smith Electronics", "Wizzard (Oceania)",           0 )
-CONS( 1982, rameses,  crvision, 0,      pal,      crvision, crvision_pal_state, empty_init, "Hanimex",                "Rameses (Oceania)",           0 )
-CONS( 1983, vz2000,   crvision, 0,      pal,      crvision, crvision_pal_state, empty_init, "Dick Smith Electronics", "VZ 2000 (Oceania)",           0 )
-CONS( 1983, crvisio2, crvision, 0,      pal,      crvision, crvision_pal_state, empty_init, "Video Technology",       "CreatiVision MK-II (Europe)", 0 )
-COMP( 1983, lasr2001, 0,        0,      lasr2001, manager,  laser2001_state,    empty_init, "Video Technology",       "Laser 2001",                  0 )
-//COMP( 1983, vz2001,   lasr2001, 0,      lasr2001, lasr2001, laser2001_state,    empty_init, "Dick Smith Electronics", "VZ 2001 (Oceania)",           0 )
-COMP( 1983, manager,  0,        0,      lasr2001, manager, laser2001_state,     empty_init, "Salora",                 "Manager (Finland)",           0 )
+CONS( 1982, crvision, 0,        0,      pal,      crvision, crvision_pal_state, empty_init, "Video Technology",       "CreatiVision",                MACHINE_SUPPORTS_SAVE )
+CONS( 1982, fnvision, crvision, 0,      pal,      crvision, crvision_pal_state, empty_init, "Video Technology",       "FunVision",                   MACHINE_SUPPORTS_SAVE )
+CONS( 1982, crvisioj, crvision, 0,      ntsc,     crvision, crvision_state,     empty_init, "Cheryco",                "CreatiVision (Japan)",        MACHINE_SUPPORTS_SAVE )
+CONS( 1982, wizzard,  crvision, 0,      pal,      crvision, crvision_pal_state, empty_init, "Dick Smith Electronics", "Wizzard (Oceania)",           MACHINE_SUPPORTS_SAVE )
+CONS( 1982, rameses,  crvision, 0,      pal,      crvision, crvision_pal_state, empty_init, "Hanimex",                "Rameses HVC6502 (Oceania)",   MACHINE_SUPPORTS_SAVE )
+CONS( 1983, vz2000,   crvision, 0,      pal,      crvision, crvision_pal_state, empty_init, "Dick Smith Electronics", "VZ 2000 (Oceania)",           MACHINE_SUPPORTS_SAVE )
+CONS( 1983, crvisio2, crvision, 0,      pal,      crvision, crvision_pal_state, empty_init, "Video Technology",       "CreatiVision MK-II (Europe)", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, lasr2001, 0,        0,      lasr2001, manager,  laser2001_state,    empty_init, "Video Technology",       "Laser 2001",                  MACHINE_SUPPORTS_SAVE )
+//COMP( 1983, vz2001,   lasr2001, 0,      lasr2001, lasr2001, laser2001_state,    empty_init, "Dick Smith Electronics", "VZ 2001 (Oceania)",           MACHINE_SUPPORTS_SAVE )
+COMP( 1983, manager,  0,        0,      lasr2001, manager, laser2001_state,     empty_init, "Salora",                 "Manager (Finland)",           MACHINE_SUPPORTS_SAVE )

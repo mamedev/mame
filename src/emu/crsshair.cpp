@@ -223,6 +223,50 @@ void render_crosshair::create_bitmap()
 
 
 //-------------------------------------------------
+//  update_position - update the crosshair values
+//  for the given player
+//-------------------------------------------------
+
+void render_crosshair::update_position()
+{
+	// read all the lightgun values
+	bool gotx = false, goty = false;
+	for (auto &port : m_machine.ioport().ports())
+		for (ioport_field &field : port.second->fields())
+			if (field.player() == m_player && field.crosshair_axis() != CROSSHAIR_AXIS_NONE && field.enabled())
+			{
+				// handle X axis
+				if (field.crosshair_axis() == CROSSHAIR_AXIS_X)
+				{
+					m_x = field.crosshair_read();
+					gotx = true;
+					if (field.crosshair_altaxis() != 0)
+					{
+						m_y = field.crosshair_altaxis();
+						goty = true;
+					}
+				}
+
+				// handle Y axis
+				else
+				{
+					m_y = field.crosshair_read();
+					goty = true;
+					if (field.crosshair_altaxis() != 0)
+					{
+						m_x = field.crosshair_altaxis();
+						gotx = true;
+					}
+				}
+
+				// if we got both, stop
+				if (gotx && goty)
+					return;
+			}
+}
+
+
+//-------------------------------------------------
 //  animate - update the crosshair state
 //-------------------------------------------------
 
@@ -230,7 +274,7 @@ void render_crosshair::animate(u16 auto_time)
 {
 	// read all the port values
 	if (m_used)
-		m_machine.ioport().crosshair_position(m_player, m_x, m_y);
+		update_position();
 
 	// auto visibility
 	if (m_mode == CROSSHAIR_VISIBILITY_AUTO)

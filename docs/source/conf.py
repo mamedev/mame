@@ -11,9 +11,10 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys, os
+import os.path
+import sys
 
-sys.path.insert(0, os.path.abspath('_ext'))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '_ext'))
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -31,8 +32,8 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
-	'edit_on_github',
-    'sphinxcontrib.rsvgconverter'
+    'sphinxcontrib.rsvgconverter',
+    'edit_on_github'
 ]
 
 edit_on_github_project = 'mamedev/mame'
@@ -145,7 +146,7 @@ html_theme_path = ["../themes/"]
 
 # If true, SmartyPants will be used to convert quotes and dashes to
 # typographically correct entities.
-# This was depreciated in Sphinx 1.6.6
+# This was deprecated in Sphinx 1.6.6
 #html_use_smartypants = True
 
 # We don't want smartquotes in general.

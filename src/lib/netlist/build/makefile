@@ -20,7 +20,12 @@
 #
 #
 
+.DEFAULT_GOAL := all
+
 SRC = ..
+#SRC = $(abspath ..)
+
+PSRC = $(SRC)/plib
 VSBUILD = $(SRC)/buildVS
 DOC = $(SRC)/documentation
 
@@ -49,27 +54,49 @@ TIDY_FLAGSX += -llvmlibc-restrict-system-libc-headers,-llvmlibc-implementation-i
 space :=
 space +=
 TIDY_FLAGS = -p $(OBJ) $(subst $(space),,$(TIDY_FLAGSX))
-TIDY_SOURCES = $(SOURCES)
+TIDY_SOURCES = $(ALLSOURCES)
 
 #TIDY_SOURCES = $(SRC)/devices/nld_7442.cpp $(SRC)/devices/nld_7492.cpp
 
-TIDY_FLAGS = -p $(OBJ) -checks=llvm-include-order,llvm-namespace-comment,modernize-use-override,modernize-use-using -fix
+#TIDY_FLAGS = -p $(OBJ) -checks=llvm-include-order,llvm-namespace-comment,modernize-use-override,modernize-use-using -fix
 #TIDY_FLAGS = -checks=llvm-include-order -fix
 #TIDY_FLAGS = -checks=llvm-namespace-comment -fix
 #TIDY_FLAGS = -checks=modernize-use-override -fix
 #TIDY_FLAGS = -checks=modernize-use-using -fix
 
-ifeq ($(subst Windows_NT,windows,$(OS)),windows)
+ifeq ($(subst Windows_NT,Windows,$(OS)),Windows)
+    HOSTARCH := Windows
+else
+    HOSTARCH := $(shell uname -s)
+endif
+
+ifeq ($(HOSTARCH),Windows)
 OBJ = obj/mingw
 EXESUFFIX = .exe
 DOXYGEN = doxygen.exe
-HOSTARCH = WINDOWS
+CEXTRAFLAGS = -DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0501 -DWIN32_LEAN_AND_MEAN
+LDEXTRAFLAGS = -Wl,--subsystem,console -municode
+LIBS = $(EXTRALIBS)
+MD = @mkdir.exe
+RM = @rm.exe
+SHELL = sh.exe
+else ifeq ($(HOSTARCH),Darwin)
+OBJ = obj/darwin
+EXESUFFIX :=
+DOXYGEN = @doxygen
+LIBS = -lpthread -ldl $(EXTRALIBS)
+MD = @mkdir
+RM = @rm
 else
 OBJ = obj/nix
 EXESUFFIX :=
 DOXYGEN = @./doxygen
-HOSTARCH = NIX
+LIBS = -lpthread -ldl $(EXTRALIBS)
+MD = @mkdir
+RM = @rm
 endif
+
+PYTHON=@python
 
 TIDY_DB = $(OBJ)/compile_commands.json
 
@@ -77,22 +104,19 @@ TIDY_DB = $(OBJ)/compile_commands.json
 #LTO decreases performance :-(
 #LTO = -flto=4  -fuse-linker-plugin -Wodr
 
-CCOREFLAGS = -g -O3 -std=c++14 -I$(CURDIR)/.. -I$(CURDIR)/../..
+CCOREFLAGS = -g -O3 -std=c++14 -I$(SRC) 
 
 CFLAGS =  $(LTO) $(CCOREFLAGS) $(CEXTRAFLAGS)
 LDFLAGS = $(LTO) -g -O3 -std=c++14 $(LDEXTRAFLAGS)
-LIBS = -lpthread -ldl $(EXTRALIBS)
 
 CC = g++
-LD = @g++
-MD = @mkdir
-RM = @rm
+LD = g++
 CLANG_TIDY = clang-tidy-11
 DEPENDCC=$(CC)
 
 
 ifndef FAST
-FAST=0
+FAST=1
 endif
 
 ifeq ($(FAST),1)
@@ -105,7 +129,7 @@ NLOBJ = $(OBJ)
 POBJ = $(OBJ)/plib
 TESTOBJ = $(OBJ)/tests
 
-DEPEND = $(OBJ)/.depend
+DEPEND := $(OBJ)/.depend
 
 OBJDIRS = $(OBJ) \
 			$(OBJ)/analog \
@@ -114,112 +138,52 @@ OBJDIRS = $(OBJ) \
 			$(OBJ)/plib \
 			$(OBJ)/devices \
 			$(OBJ)/macro \
+			$(OBJ)/macro/modules \
 			$(OBJ)/tests \
 			$(OBJ)/tools \
 			$(OBJ)/prg \
 			$(OBJ)/generated \
 
+MODULESOURCES += $(wildcard $(SRC)/macro/modules/*.cpp)
+DEVSOURCES =  $(SRC)/solver/nld_solver.cpp
+DEVSOURCES += $(wildcard $(SRC)/devices/*.cpp)
+DEVSOURCES += $(wildcard $(SRC)/analog/*.cpp)
+DEVSOURCES += $(wildcard $(SRC)/macro/*.cpp)
+DEVSOURCES += $(MODULESOURCES)
 
-OBJS = $(POBJS) $(NLOBJS) $(TESTOBJS)
+TESTSOURCES = $(wildcard $(SRC)/tests/*.cpp)
 
-POBJS := \
-	$(POBJ)/pstring.o \
-	$(POBJ)/pdynlib.o \
-	$(POBJ)/pexception.o \
-	$(POBJ)/pfunction.o \
-	$(POBJ)/pfmtlog.o \
-	$(POBJ)/poptions.o \
-	$(POBJ)/ppreprocessor.o \
-	$(POBJ)/ptokenizer.o \
-	$(POBJ)/putil.o \
+CORESOURCES := \
+	$(SRC)/solver/nld_matrix_solver.cpp \
+	$(SRC)/nl_base.cpp \
+	$(SRC)/nl_parser.cpp \
+	$(SRC)/nl_setup.cpp \
+	$(SRC)/nl_factory.cpp \
+	$(SRC)/tools/nl_convert.cpp \
+	$(SRC)/generated/static_solvers.cpp \
+	$(SRC)/generated/nlm_modules_lib.cpp \
 
-PMAIN := $(POBJ)/pmain.o
+MAINSOURCES = $(SRC)/prg/nltool.cpp $(SRC)/prg/nlwav.cpp
 
-NLOBJS := \
-	$(NLOBJ)/solver/nld_solver.o \
-	$(NLOBJ)/solver/nld_matrix_solver.o \
-	$(NLOBJ)/nl_base.o \
-	$(NLOBJ)/nl_parser.o \
-	$(NLOBJ)/nl_setup.o \
-	$(NLOBJ)/nl_factory.o \
-	$(NLOBJ)/analog/nld_bjt.o \
-	$(NLOBJ)/analog/nld_mosfet.o \
-	$(NLOBJ)/analog/nlid_fourterm.o \
-	$(NLOBJ)/analog/nld_switches.o \
-	$(NLOBJ)/analog/nlid_twoterm.o \
-	$(NLOBJ)/analog/nld_opamps.o \
-	$(NLOBJ)/tools/nl_convert.o \
-	$(NLOBJ)/generated/static_solvers.o \
-	$(NLOBJ)/devices/nld_2102A.o \
-	$(NLOBJ)/devices/nld_tms4800.o \
-	$(NLOBJ)/devices/nld_4006.o \
-	$(NLOBJ)/devices/nld_4013.o \
-	$(NLOBJ)/devices/nld_4017.o \
-	$(NLOBJ)/devices/nld_4020.o \
-	$(NLOBJ)/devices/nld_4053.o \
-	$(NLOBJ)/devices/nld_4066.o \
-	$(NLOBJ)/devices/nld_4316.o \
-	$(NLOBJ)/devices/nld_7448.o \
-	$(NLOBJ)/devices/nld_7450.o \
-	$(NLOBJ)/devices/nld_7473.o \
-	$(NLOBJ)/devices/nld_7474.o \
-	$(NLOBJ)/devices/nld_7475.o \
-	$(NLOBJ)/devices/nld_7483.o \
-	$(NLOBJ)/devices/nld_7485.o \
-	$(NLOBJ)/devices/nld_7492.o \
-	$(NLOBJ)/devices/nld_7490.o \
-	$(NLOBJ)/devices/nld_7493.o \
-	$(NLOBJ)/devices/nld_7497.o \
-	$(NLOBJ)/devices/nld_74107.o \
-	$(NLOBJ)/devices/nld_74113.o \
-	$(NLOBJ)/devices/nld_74123.o \
-	$(NLOBJ)/devices/nld_74125.o \
-	$(NLOBJ)/devices/nld_74153.o \
-	$(NLOBJ)/devices/nld_74161.o \
-	$(NLOBJ)/devices/nld_74163.o \
-	$(NLOBJ)/devices/nld_74164.o \
-	$(NLOBJ)/devices/nld_74165.o \
-	$(NLOBJ)/devices/nld_74166.o \
-	$(NLOBJ)/devices/nld_74174.o \
-	$(NLOBJ)/devices/nld_74175.o \
-	$(NLOBJ)/devices/nld_74192.o \
-	$(NLOBJ)/devices/nld_74193.o \
-	$(NLOBJ)/devices/nld_74194.o \
-	$(NLOBJ)/devices/nld_74365.o \
-	$(NLOBJ)/devices/nld_74377.o \
-	$(NLOBJ)/devices/nld_74393.o \
-	$(NLOBJ)/devices/nld_74ls629.o \
-	$(NLOBJ)/devices/nld_8277.o \
-	$(NLOBJ)/devices/nld_82S16.o \
-	$(NLOBJ)/devices/nld_82S115.o \
-	$(NLOBJ)/devices/nld_9310.o \
-	$(NLOBJ)/devices/nld_9316.o \
-	$(NLOBJ)/devices/nld_9321.o \
-	$(NLOBJ)/devices/nld_9322.o \
-	$(NLOBJ)/devices/nld_am2847.o \
-	$(NLOBJ)/devices/nld_dm9314.o \
-	$(NLOBJ)/devices/nld_dm9334.o \
-	$(NLOBJ)/devices/nld_mm5837.o \
-	$(NLOBJ)/devices/nld_ne555.o \
-	$(NLOBJ)/devices/nld_r2r_dac.o \
-	$(NLOBJ)/devices/nld_roms.o \
-	$(NLOBJ)/devices/nld_tristate.o \
-	$(NLOBJ)/devices/nld_schmitt.o \
-	$(NLOBJ)/devices/nld_legacy.o \
-	$(NLOBJ)/devices/net_lib.o \
-	$(NLOBJ)/devices/nld_log.o \
-	$(NLOBJ)/devices/nlid_proxy.o \
-	$(NLOBJ)/devices/nld_system.o \
-	$(NLOBJ)/devices/nlid_truthtable.o \
-	$(NLOBJ)/macro/nlm_base_lib.o \
-	$(NLOBJ)/macro/nlm_cd4xxx_lib.o \
-	$(NLOBJ)/macro/nlm_opamp_lib.o \
-	$(NLOBJ)/macro/nlm_otheric_lib.o \
-	$(NLOBJ)/macro/nlm_roms_lib.o \
-	$(NLOBJ)/macro/nlm_ttl74xx_lib.o \
+PSOURCES := \
+	$(PSRC)/pstring.cpp \
+	$(PSRC)/pdynlib.cpp \
+	$(PSRC)/pexception.cpp \
+	$(PSRC)/pfunction.cpp \
+	$(PSRC)/pfmtlog.cpp \
+	$(PSRC)/pmain.cpp \
+	$(PSRC)/poptions.cpp \
+	$(PSRC)/ppreprocessor.cpp \
+	$(PSRC)/ptokenizer.cpp \
+	$(PSRC)/putil.cpp \
 
-TESTOBJS := \
-	$(TESTOBJ)/test_pfunction.o \
+NLOBJS = 	$(patsubst $(SRC)%, $(OBJ)%, $(CORESOURCES:.cpp=.o))
+NLDEVOBJS = $(patsubst $(SRC)%, $(OBJ)%, $(DEVSOURCES:.cpp=.o))
+TESTOBJS = 	$(patsubst $(SRC)%, $(OBJ)%, $(TESTSOURCES:.cpp=.o))
+MAINOBJS = 	$(patsubst $(SRC)%, $(OBJ)%, $(MAINSOURCES:.cpp=.o))
+POBJS = 	$(patsubst $(SRC)%, $(OBJ)%, $(PSOURCES:.cpp=.o))
+
+OBJS = $(POBJS) $(NLOBJS) $(NLDEVOBJS) $(TESTOBJS)
 
 VSBUILDS = \
 	$(VSBUILD/netlistlib.vcxproj) \
@@ -237,14 +201,18 @@ DOCS = \
 	$(DOC)/structure.dox.h \
 	$(DOC)/test1-50r.svg \
 
-ALL_OBJS = $(OBJS) $(PMAIN) $(NLOBJ)/prg/nltool.o $(NLOBJ)/prg/nlwav.o
+ALL_OBJS = $(OBJS) $(MAINOBJS)
 
 ALL_TIDY_FILES = $(ALL_OBJS:.o=.json)
-SOURCES = $(patsubst $(OBJ)%, $(SRC)%, $(ALL_OBJS:.o=.cpp))
-ALLFILES = $(SOURCES) $(VSBUILDS) $(DOCS)
+ALLSOURCES = $(DEVSOURCES) $(CORESOURCES) $(TESTSOURCES) $(MAINSOURCES) $(PSOURCES)
+ALLFILES = $(ALLSOURCES) $(VSBUILDS) $(DOCS)
 
-MAKEFILE_TARGETS_WITHOUT_INCLUDE := gcc9 clang clang-5 mingw doc native maketree tidy runtests
+MAKEFILE_TARGETS_WITHOUT_INCLUDE := \
+	clang clang-5 clang-libc gcc9 mingw native nvcc \
+	clean depend doc generated manpages maketree \
+	runtests tidy
 
+BUILD_DIRS = $(OBJDIRS) man html
 
 # git archive HEAD --prefix=project-name-version/ \
 #     --format=zip -o project-name-version.zip
@@ -253,42 +221,41 @@ MAKEFILE_TARGETS_WITHOUT_INCLUDE := gcc9 clang clang-5 mingw doc native maketree
 # PHONY
 #-------------------------------------------------
 
-.PHONY: all gcc9 clang clang-5 mingw doc man native maketree $(DEPEND) depend runtests
+.PHONY: $(MAKEFILE_TARGETS_WITHOUT_INCLUDE)
 
 #-------------------------------------------------
 # all
 #-------------------------------------------------
 
-all: maketree depend $(TARGETS)
+all: maketree $(DEPEND) $(TARGETS)
 
 #-------------------------------------------------
 # clean
 #-------------------------------------------------
 
 clean:
-	$(RM) -rf $(OBJS) $(TARGETS) $(OBJ)/prg/nltool.o $(OBJ)/prg/nlwav.o $(DEPEND) doxy/*
+	$(RM) -rf $(OBJS) $(TARGETS) $(MAINOBJS) $(DEPEND) doxy/*
 
 #-------------------------------------------------
 # nltool
 #-------------------------------------------------
 
-nltool$(EXESUFFIX): $(OBJ)/prg/nltool.o $(PMAIN) $(OBJS)
+nltool$(EXESUFFIX): $(OBJ)/prg/nltool.o $(OBJS)
 	@echo Linking $@...
-	$(LD) -o $@ $(LDFLAGS) $^ $(LIBS)
+	@$(LD) -o $@ $(LDFLAGS) $^ $(LIBS)
 
-nlwav$(EXESUFFIX): $(OBJ)/prg/nlwav.o $(PMAIN) $(OBJS)
+nlwav$(EXESUFFIX): $(OBJ)/prg/nlwav.o $(OBJS)
 	@echo Linking $@...
-	$(LD) -o $@ $(LDFLAGS) $^ $(LIBS)
-
+	@$(LD) -o $@ $(LDFLAGS) $^ $(LIBS)
 
 #-------------------------------------------------
 # directories
 #-------------------------------------------------
 
-$(sort $(OBJDIRS)):
+$(sort $(BUILD_DIRS)):
 	$(MD) -p $@
 
-maketree: $(sort $(OBJDIRS))
+maketree: $(sort $(BUILD_DIRS))
 
 #-------------------------------------------------
 # Special targets
@@ -324,7 +291,8 @@ clang-libc:
 		-Wmissing-variable-declarations -Wno-float-equal -Wconversion \
 		-Wno-c++98-compat -Wno-c++98-compat-pedantic -Wformat-nonliteral \
 		-Wno-exit-time-destructors -Winconsistent-missing-destructor-override \
-		-Wno-return-std-move-in-c++11 -Wno-unreachable-code" \
+		-Wno-return-std-move-in-c++11 -Wno-unreachable-code \
+		-Wno-missing-prototypes" \
 		LDEXTRAFLAGS=-stdlib=libc++
 
 clang-5:
@@ -338,37 +306,27 @@ nvcc:
 		-Xcompiler -O6 -Xcompiler -march=native -ccbin g++-8 " \
 		DEPENDCC=g++
 
-runtests:
-	./nltool$(EXESUFFIX) -c tests
-
-tidy_db: compile_commands_prefix $(ALL_TIDY_FILES) compile_commands_postfix
-
-#
-# Mostly done: -Wno-weak-vtables -Wno-cast-align
-# FIXME:  -Wno-weak-vtables -Wno-weak-template-vtables -Wno-exit-time-destructors
-# FIXME: -Winconsistent-missing-destructor-override : c++ community has diverging opinions on this https://github.com/isocpp/CppCoreGuidelines/issues/721
-# FIXME: -Wunreachable-code : False warnings, this a documented clang bug: https://llvm.org/bugs/show_bug.cgi?id=28994
-# -Wweak-template-vtables
-#
-# These have to be given:
-# -Wno-missing-variable-declarations : Device factory code, on purpose
-
 mingw:
 	$(MAKE) CEXTRAFLAGS="-DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0501 \
 		-DWIN32_LEAN_AND_MEAN" LDEXTRAFLAGS="-Wl,--subsystem,console \
 		-municode" LIBS= MD=@mkdir.exe SHELL=sh.exe DOXYGEN=doxygen.exe $(PARAMS)
 
-#
-# FIXME: Unicode
-#     CEXTRAFLAGS = -DUNICODE -D_UNICODE -municode
-#     LDEXTRAFLAGS = -municode
-#
+#-------------------------------------------------
+# regression tests
+#-------------------------------------------------
 
-man: nltool$(EXESUFFIX) nlwav$(EXESUFFIX)
-	@mkdir -p man
-	@mkdir -p html
-	help2man --include=nltool.help2man --no-info ./nltool$(EXESUFFIX) > man/nltool.1
-	groff -mandoc -Thtml man/nltool.1 > html/nltool.html
+runtests: $(TARGETS)
+	./nltool$(EXESUFFIX) -c tests
+
+#-------------------------------------------------
+# man pages
+#-------------------------------------------------
+
+manpages: maketree $(TARGETS) man/nltool.1 man/nlwav.1 html/nltool.html html/nlwav.html
+
+#-------------------------------------------------
+# documentation
+#-------------------------------------------------
 
 doc:
 	./nltool$(EXESUFFIX) -c docheader > ../documentation/devsyn.dox.h
@@ -378,14 +336,17 @@ doc:
 # depends
 #-------------------------------------------------
 
-$(DEPEND): maketree $(SOURCES)
-	@echo creating $(DEPEND)
-	@rm -f $(DEPEND)
-	@for i in $(SOURCES); do \
-		$(DEPENDCC) $(CCOREFLAGS) -MM $$i -MT `echo $$i | sed -e 's+$(SRC)+$(OBJ)+' -e 's+.cpp+.o+' ` >> $(DEPEND); \
-	done
-
+.PHONY: depend
 depend: $(DEPEND)
+
+$(DEPEND): $(ALLSOURCES) | $(OBJ)
+	@echo creating $(DEPEND)
+	@$(RM) -f $(DEPEND)
+	@for i in $(ALLSOURCES); do \
+		$(DEPENDCC) $(CCOREFLAGS) -MM $$i -MT `echo $$i \
+		| sed -e 's+$(SRC)+$(OBJ)+' -e 's+.cpp+.o+' ` \
+		| sed -e 's_\.\./[a-z]*/\.\./_../_g' >> $(DEPEND); \
+	done
 
 # Include only if the goal needs it
 ifeq ($(filter $(MAKECMDGOALS),$(MAKEFILE_TARGETS_WITHOUT_INCLUDE)),)
@@ -393,16 +354,35 @@ ifeq ($(filter $(MAKECMDGOALS),$(MAKEFILE_TARGETS_WITHOUT_INCLUDE)),)
 endif
 
 #-------------------------------------------------
+# generated
+#-------------------------------------------------
+
+$(SRC)/generated/lib_entries.hxx: $(DEVSOURCES)
+	@echo creating $@
+	$(PYTHON) create_lib_entries.py $^ > $@
+
+$(SRC)/generated/nld_devinc.h: $(DEVSOURCES)
+	@echo creating $@
+	$(PYTHON) create_devinc.py $^ > $@
+
+$(SRC)/generated/nlm_modules_lib.cpp: $(MODULESOURCES)
+	@echo creating $@
+	$(PYTHON) create_modules.py $^ > $@
+
+.PHONY: generated
+generated: $(SRC)/generated/lib_entries.hxx $(SRC)/generated/nld_devinc.h $(SRC)/generated/nlm_modules_lib.cpp
+
+#-------------------------------------------------
 # clang tidy
 #-------------------------------------------------
+
+tidy_db: compile_commands_prefix $(ALL_TIDY_FILES) compile_commands_postfix
+
 tidy: tidy_db
 	@echo running tidy
 	@for i in $(TIDY_SOURCES); do \
 		$(CLANG_TIDY) $$i $(TIDY_FLAGS) -header-filter=.*; \
 	done
-
-tidy_db: compile_commands_prefix $(ALL_TIDY_FILES) compile_commands_postfix
-
 
 #-------------------------------------------------
 # generic rules
@@ -431,6 +411,14 @@ $(OBJ)/%.json: $(SRC)/%.cpp
 	@echo   \"command\": \"$(CC) $(CDEFS) $(CFLAGS) -c $< -o dummy.o\", >> $(TIDY_DB)
 	@echo   \"file\": \"$(CURDIR)/$<\" } >> $(TIDY_DB)
 	@echo "," >> $(TIDY_DB)
+
+man/%.1: %$(EXESUFFIX)
+	@echo Building $@...
+	@help2man --include=$*.help2man --no-info ./$< > $@
+
+html/%.html: man/%.1
+	@echo Building $@...
+	@groff -mandoc -Thtml $< > $@
 
 compile_commands_prefix:
 	@echo "[" > $(TIDY_DB)

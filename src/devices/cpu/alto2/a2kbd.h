@@ -93,8 +93,8 @@
 #define A2_KEY_FR5          MAKE_KEY(3,000)     //!< ADL right function key 5
 
 #else   // ALTO2_DEFINE_CONSTANTS
-#ifndef _A2KBD_H_
-#define _A2KBD_H_
+#ifndef MAME_CPU_ALTO2_A2KBD_H
+#define MAME_CPU_ALTO2_A2KBD_H
 struct {
 	uint16_t bootkey;                         //!< boot key - key code pressed before power on
 	uint16_t matrix[4];                       //!< a bit map of the keys pressed (ioports ROW0 ... ROW3)
@@ -105,5 +105,5 @@ uint16_t kbd_ad_r(offs_t offset);             //!< read the keyboard matrix
 void init_kbd(uint16_t bootkey = 0177777);    //!< initialize the keyboard hardware, optionally set the boot key
 void exit_kbd();                            //!< deinitialize the keyboard hardware
 void reset_kbd();                           //!< reset the keyboard hardware
-#endif // _A2KBD_H_
+#endif // MAME_CPU_ALTO2_A2KBD_H
 #endif  // ALTO2_DEFINE_CONSTANTS

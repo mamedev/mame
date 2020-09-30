@@ -87,50 +87,44 @@ license:CC0
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
 
-		<bezel name="lamp5" element="HOLD" inputtag="IN0" inputmask="0x0400">
+		<element name="lamp5" ref="HOLD" inputtag="IN0" inputmask="0x0400">
 			<bounds x="0.80" y="3.05" width="0.30" height="0.15" />
-		</bezel>
-		<bezel name="lamp6" element="HOLD" inputtag="IN0" inputmask="0x0200">
+		</element>
+		<element name="lamp6" ref="HOLD" inputtag="IN0" inputmask="0x0200">
 			<bounds x="1.15" y="3.05" width="0.30" height="0.15" />
-		</bezel>
-		<bezel name="lamp7" element="HOLD" inputtag="IN0" inputmask="0x0100">
+		</element>
+		<element name="lamp7" ref="HOLD" inputtag="IN0" inputmask="0x0100">
 			<bounds x="1.50" y="3.05" width="0.30" height="0.15" />
-		</bezel>
-		<bezel name="lamp8" element="HOLD" inputtag="IN0" inputmask="0x0080">
+		</element>
+		<element name="lamp8" ref="HOLD" inputtag="IN0" inputmask="0x0080">
 			<bounds x="1.85" y="3.05" width="0.30" height="0.15" />
-		</bezel>4
-		<bezel name="lamp9" element="HOLD" inputtag="IN0" inputmask="0x0040">
+		</element>4
+		<element name="lamp9" ref="HOLD" inputtag="IN0" inputmask="0x0040">
 			<bounds x="2.20" y="3.05" width="0.30" height="0.15" />
-		</bezel>
+		</element>
 
 		<!-- functions of those buttons depends on the DIP switches -->
-		<bezel name="lamp3" element="DEAL" inputtag="IN0" inputmask="0x1000">
+		<element name="lamp3" ref="DEAL" inputtag="IN0" inputmask="0x1000">
 			<bounds x="0.10" y="3.05" width="0.30" height="0.15" />
-		</bezel>
-		<bezel name="lamp2" element="DRAW" inputtag="IN0" inputmask="0x2000">
+		</element>
+		<element name="lamp2" ref="DRAW" inputtag="IN0" inputmask="0x2000">
 			<bounds x="0.45" y="3.05" width="0.30" height="0.15" />
-		</bezel>
-		<bezel name="lamp1" element="CANCEL" inputtag="IN0" inputmask="0x4000">
+		</element>
+		<element name="lamp1" ref="CANCEL" inputtag="IN0" inputmask="0x4000">
 			<bounds x="2.55" y="3.05" width="0.30" height="0.15" />
-		</bezel>
-		<bezel name="lamp0" element="EMPTY" inputtag="IN0" inputmask="0x4000">
+		</element>
+		<element name="lamp0" ref="EMPTY" inputtag="IN0" inputmask="0x4000">
 			<bounds x="2.90" y="3.05" width="0.30" height="0.15" />
-		</bezel>
-		<bezel name="lamp4" element="EMPTY" inputtag="IN0" inputmask="0x4000">
+		</element>
+		<element name="lamp4" ref="EMPTY" inputtag="IN0" inputmask="0x4000">
 			<bounds x="3.25" y="3.05" width="0.30" height="0.15" />
-		</bezel>
+		</element>
 
-		<bezel name="towerlamp0" element="REDLAMP">
+		<element name="towerlamp0" ref="REDLAMP">
 			<bounds x="3.8" y="3.13" width="0.15" height="0.05" />
-		</bezel>
-		<bezel name="towerlamp1" element="WHITELAMP">
+		</element>
+		<element name="towerlamp1" ref="WHITELAMP">
 			<bounds x="3.8" y="3.07" width="0.15" height="0.05" />
-		</bezel>
-	</view>
-
-	<view name="Screen">
-		<screen index="0">
-			<bounds left="0" top="0" right="4" bottom="3" />
-		</screen>
+		</element>
 	</view>
 </mamelayout>

@@ -1100,8 +1100,8 @@ void k056832_device::b_w(offs_t offset, u8 data)
 	}
 }
 
-template<class _BitmapClass>
-int k056832_device::update_linemap( screen_device &screen, _BitmapClass &bitmap, int page, int flags )
+template<class BitmapClass>
+int k056832_device::update_linemap( screen_device &screen, BitmapClass &bitmap, int page, int flags )
 {
 	if (m_page_tile_mode[page])
 		return(0);
@@ -1218,8 +1218,8 @@ int k056832_device::update_linemap( screen_device &screen, _BitmapClass &bitmap,
 	return(0);
 }
 
-template<class _BitmapClass>
-void k056832_device::tilemap_draw_common( screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int layer, uint32_t flags, uint32_t priority )
+template<class BitmapClass>
+void k056832_device::tilemap_draw_common( screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int layer, uint32_t flags, uint32_t priority )
 {
 	uint32_t last_dx, last_visible, new_colorbase, last_active;
 	int sx, sy, ay, tx, ty, width, height;

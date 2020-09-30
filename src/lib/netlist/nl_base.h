@@ -15,6 +15,9 @@
 #include "core/analog.h"
 #include "core/base_objects.h"
 #include "core/device.h"
+#include "core/device_macros.h"
+#include "core/devices.h"
+#include "core/exec.h"
 #include "core/logic.h"
 #include "core/logic_family.h"
 #include "core/netlist_state.h"
@@ -22,9 +25,6 @@
 #include "core/object_array.h"
 #include "core/param.h"
 #include "core/state_var.h"
-#include "core/exec.h"
-#include "core/device_macros.h"
-#include "core/devices.h"
 
 //============================================================
 // Namespace starts

@@ -5,7 +5,9 @@
     drivers/mac128.cpp
     Original-style Macintosh family emulation
 
-    The cutoff here is Macs with 128k-style video and audio and no ADB
+    The cutoff here is Macs with 128k-style video and audio.
+    We also include the SE and Classic, which are basically cost-reduced Mac Pluses with ADB
+    instead of the original keyboard/mouse hardware.
 
     Nate Woods, Raphael Nabet, R. Belmont
 
@@ -99,8 +101,10 @@ c0   8 data bits, Rx disabled
 #include "machine/swim.h"
 #include "machine/timer.h"
 #include "machine/z80scc.h"
+#include "machine/macadb.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "bus/macpds/pds_tpdfpd.h"
 
 #include "formats/ap_dsk35.h"
 
@@ -122,9 +126,11 @@ c0   8 data bits, Rx disabled
 /* tells which model is being emulated (set by macxxx_init) */
 enum mac128model_t
 {
-	MODEL_MAC_128K512K, // 68000 machines
+	MODEL_MAC_128K512K,
 	MODEL_MAC_512KE,
-	MODEL_MAC_PLUS
+	MODEL_MAC_PLUS,
+	MODEL_MAC_SE,
+	MODEL_MAC_CLASSIC
 };
 
 // video parameters
@@ -150,6 +156,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_via(*this, "via6522_0"),
+		m_macadb(*this, "macadb"),
 		m_ram(*this, RAM_TAG),
 		m_ncr5380(*this, "ncr5380"),
 		m_iwm(*this, "fdc"),
@@ -167,42 +174,29 @@ public:
 	void mac512ke(machine_config &config);
 	void mac128k(machine_config &config);
 	void macplus(machine_config &config);
+	void macse(machine_config &config);
+	void macclasc(machine_config &config);
 
 	void init_mac128k512k();
 	void init_mac512ke();
 	void init_macplus();
+	void init_macse();
+	void init_macclassic();
 
 private:
 	required_device<m68000_device> m_maincpu;
 	required_device<via6522_device> m_via;
+	optional_device<macadb_device> m_macadb;
 	required_device<ram_device> m_ram;
 	optional_device<ncr5380_device> m_ncr5380;
 	required_device<applefdc_base_device> m_iwm;
-	required_device<mac_keyboard_port_device> m_mackbd;
+	optional_device<mac_keyboard_port_device> m_mackbd;
 	optional_device<rtc3430042_device> m_rtc;
 
-	required_ioport m_mouse0, m_mouse1, m_mouse2;
+	optional_ioport m_mouse0, m_mouse1, m_mouse2;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-
-	mac128model_t m_model;
-
-	uint32_t m_overlay;
-
-	int m_irq_count, m_ca1_data, m_ca2_data;
-
-	int m_mouse_bit_x;
-	int m_mouse_bit_y;
-	int last_mx, last_my;
-	int count_x, count_y;
-	int m_last_was_x;
-	int m_screen_buffer;
-	emu_timer *m_scan_timer;
-	emu_timer *m_hblank_timer;
-
-	// interrupts
-	int m_scc_interrupt, m_via_interrupt, m_scsi_interrupt, m_last_taken_interrupt;
 
 	void scc_mouse_irq( int x, int y );
 	void set_via_interrupt(int value);
@@ -212,6 +206,7 @@ private:
 
 	uint16_t ram_r(offs_t offset);
 	void ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void ram_w_se(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t ram_600000_r(offs_t offset);
 	void ram_600000_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~ 0);
 	uint16_t mac_via_r(offs_t offset);
@@ -225,26 +220,52 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(mac_scsi_irq);
 	DECLARE_WRITE_LINE_MEMBER(set_scc_interrupt);
 
+	WRITE_LINE_MEMBER(adb_irq_w) { m_adb_irq_pending = state; }
+
 	TIMER_CALLBACK_MEMBER(mac_scanline);
 	TIMER_CALLBACK_MEMBER(mac_hblank);
 	uint32_t screen_update_mac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	uint8_t mac_via_in_a();
 	uint8_t mac_via_in_b();
+	uint8_t mac_via_in_b_se();
 	void mac_via_out_a(uint8_t data);
 	void mac_via_out_b(uint8_t data);
+	void mac_via_out_a_se(uint8_t data);
+	void mac_via_out_b_se(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(mac_via_irq);
 	void mac_driver_init(mac128model_t model);
 	void update_volume();
 
 	void mac512ke_map(address_map &map);
 	void macplus_map(address_map &map);
-private:
+	void macse_map(address_map &map);
+
+	mac128model_t m_model;
+
+	uint32_t m_overlay;
+
+	int m_irq_count, m_ca1_data, m_ca2_data;
+	int m_mouse_bit_x;
+	int m_mouse_bit_y;
+	int last_mx, last_my;
+	int count_x, count_y;
+	int m_last_was_x;
+	int m_screen_buffer;
+	emu_timer *m_scan_timer;
+	emu_timer *m_hblank_timer;
+
+	// interrupts
+	int m_scc_interrupt, m_via_interrupt, m_scsi_interrupt, m_last_taken_interrupt;
+
 	// wait states for accessing the VIA
 	int m_via_cycles;
 	bool m_snd_enable;
 	bool m_main_buffer;
 	int m_snd_vol;
+	int m_adb_irq_pending;
+	int m_drive_select;
+	int m_scsiirq_enable;
 	u16 *m_ram_ptr, *m_rom_ptr;
 	u32 m_ram_mask, m_ram_size;
 
@@ -262,6 +283,29 @@ void mac128_state::machine_start()
 
 	m_scan_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac128_state::mac_scanline), this));
 	m_hblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac128_state::mac_hblank), this));
+
+	save_item(NAME(m_overlay));
+	save_item(NAME(m_irq_count));
+	save_item(NAME(m_ca1_data));
+	save_item(NAME(m_ca2_data));
+	save_item(NAME(m_mouse_bit_x));
+	save_item(NAME(m_mouse_bit_y));
+	save_item(NAME(last_mx));
+	save_item(NAME(last_my));
+	save_item(NAME(count_x));
+	save_item(NAME(count_y));
+	save_item(NAME(m_last_was_x));
+	save_item(NAME(m_screen_buffer));
+	save_item(NAME(m_scc_interrupt));
+	save_item(NAME(m_via_interrupt));
+	save_item(NAME(m_scsi_interrupt));
+	save_item(NAME(m_last_taken_interrupt));
+	save_item(NAME(m_snd_enable));
+	save_item(NAME(m_main_buffer));
+	save_item(NAME(m_snd_vol));
+	save_item(NAME(m_adb_irq_pending));
+	save_item(NAME(m_drive_select));
+	save_item(NAME(m_scsiirq_enable));
 }
 
 void mac128_state::machine_reset()
@@ -278,6 +322,9 @@ void mac128_state::machine_reset()
 	m_irq_count = 0;
 	m_ca1_data = 0;
 	m_ca2_data = 0;
+	m_adb_irq_pending = 0;
+	m_drive_select = 0;
+	m_scsiirq_enable = 0;
 
 	const int next_vpos = m_screen->vpos() + 1;
 	m_scan_timer->adjust(m_screen->time_until_pos(next_vpos), next_vpos);
@@ -289,7 +336,7 @@ uint16_t mac128_state::ram_r(offs_t offset)
 {
 	if (m_overlay)
 	{
-		return m_rom_ptr[offset];
+		return m_rom_ptr[offset & 0x7ffff];
 	}
 
 	return m_ram_ptr[offset & m_ram_mask];
@@ -301,6 +348,12 @@ void mac128_state::ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	{
 		COMBINE_DATA(&m_ram_ptr[offset & m_ram_mask]);
 	}
+}
+
+void mac128_state::ram_w_se(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	m_overlay = 0;
+	COMBINE_DATA(&m_ram_ptr[offset & m_ram_mask]);
 }
 
 uint16_t mac128_state::ram_600000_r(offs_t offset)
@@ -351,13 +404,18 @@ WRITE_LINE_MEMBER(mac128_state::set_scc_interrupt)
 void mac128_state::set_via_interrupt(int value)
 {
 	m_via_interrupt = value;
-	this->field_interrupts();
+	field_interrupts();
 }
 
 void mac128_state::vblank_irq()
 {
 	m_ca1_data ^= 1;
 	m_via->write_ca1(m_ca1_data);
+
+	if (m_macadb)
+	{
+		m_macadb->adb_vblank();
+	}
 
 	if (++m_irq_count == 60)
 	{
@@ -403,7 +461,7 @@ TIMER_CALLBACK_MEMBER(mac128_state::mac_scanline)
 		m_hblank_timer->adjust(m_screen->time_until_pos(scanline, MAC_H_VIS));
 	}
 
-	if (!(scanline % 10))
+	if ((!(scanline % 10)) && (m_model < MODEL_MAC_SE))
 	{
 		mouse_callback();
 	}
@@ -683,7 +741,7 @@ uint16_t mac128_state::mac_autovector_r(offs_t offset)
 
 uint8_t mac128_state::mac_via_in_a()
 {
-	return 0x80;
+	return 0x81;
 }
 
 uint8_t mac128_state::mac_via_in_b()
@@ -704,6 +762,22 @@ uint8_t mac128_state::mac_via_in_b()
 	return val;
 }
 
+uint8_t mac128_state::mac_via_in_b_se()
+{
+	int val = m_macadb->get_adb_state()<<4;
+
+	if (!m_adb_irq_pending)
+	{
+		val |= 0x08;
+	}
+
+	val |= m_rtc->data_r();
+
+//  printf("%s VIA1 IN_B = %02x\n", machine().describe_context().c_str(), val);
+
+	return val;
+}
+
 void mac128_state::mac_via_out_a(uint8_t data)
 {
 //  printf("%s VIA1 OUT A: %02x (PC %x)\n", machine().describe_context().c_str(), data);
@@ -716,13 +790,29 @@ void mac128_state::mac_via_out_a(uint8_t data)
 	m_snd_vol = data & 0x07;
 	update_volume();
 
-	/* Early Mac models had VIA A4 control overlaying.  In the Mac SE (and
-	 * possibly later models), overlay was set on reset, but cleared on the
-	 * first access to the ROM. */
-
+	/* Early Mac models had VIA A4 control overlaying.  In the Mac SE and
+	 * later models, overlay was set on reset, but cleared on the first
+	 * access to the ROM's normal address space. */
 	if (((data & 0x10) >> 4) != m_overlay)
 	{
 		m_overlay = (data & 0x10) >> 4;
+	}
+}
+
+void mac128_state::mac_via_out_a_se(uint8_t data)
+{
+//  printf("%s VIA OUT A: %02x (PC %x)\n", machine().describe_context().c_str(), data);
+
+	//set_scc_waitrequest((data & 0x80) >> 7);
+	m_screen_buffer = (data & 0x40) >> 6;
+	sony_set_sel_line(m_iwm, (data & 0x20) >> 5);
+
+	m_snd_vol = data & 0x07;
+	update_volume();
+
+	if (m_model == MODEL_MAC_SE)    // on SE only this selects which floppy drive (0 = upper, 1 = lower)
+	{
+		m_drive_select = ((data & 0x10) >> 4);
 	}
 }
 
@@ -732,6 +822,22 @@ void mac128_state::mac_via_out_b(uint8_t data)
 
 	m_snd_enable = ((data & 0x80) == 0) ? true : false;
 	update_volume();
+	m_rtc->ce_w((data & 0x04)>>2);
+	m_rtc->data_w(data & 0x01);
+	m_rtc->clk_w((data >> 1) & 0x01);
+}
+
+void mac128_state::mac_via_out_b_se(uint8_t data)
+{
+//  printf("%s VIA OUT B: %02x\n", machine().describe_context().c_str(), data);
+
+	m_snd_enable = ((data & 0x80) == 0) ? true : false;
+	update_volume();
+
+	m_scsiirq_enable = (data & 0x40) ? 0 : 1;
+
+	m_macadb->mac_adb_newaction((data & 0x30) >> 4);
+
 	m_rtc->ce_w((data & 0x04)>>2);
 	m_rtc->data_w(data & 0x01);
 	m_rtc->clk_w((data >> 1) & 0x01);
@@ -823,14 +929,6 @@ void mac128_state::mac_driver_init(mac128model_t model)
 {
 	m_scsi_interrupt = 0;
 	m_model = model;
-#if 0
-	/* set up RAM mirror at 0x600000-0x6fffff (0x7fffff ???) */
-	mac_install_memory(0x600000, 0x6fffff, m_ram->size(), m_ram->pointer(), FALSE, "bank2");
-
-	/* set up ROM at 0x400000-0x4fffff (-0x5fffff for mac 128k/512k/512ke) */
-	mac_install_memory(0x400000, (model >= MODEL_MAC_PLUS) ? 0x4fffff : 0x5fffff,
-		memregion("bootrom")->bytes(), memregion("bootrom")->base(), TRUE, "bank3");
-#endif
 
 	memset(m_ram->pointer(), 0, m_ram->size());
 }
@@ -874,6 +972,8 @@ void mac128_state::init_##label()     \
 MAC_DRIVER_INIT(mac128k512k, MODEL_MAC_128K512K)
 MAC_DRIVER_INIT(mac512ke, MODEL_MAC_512KE)
 MAC_DRIVER_INIT(macplus, MODEL_MAC_PLUS)
+MAC_DRIVER_INIT(macse, MODEL_MAC_SE)
+MAC_DRIVER_INIT(macclassic, MODEL_MAC_CLASSIC)
 
 /***************************************************************************
     ADDRESS MAPS
@@ -899,6 +999,18 @@ void mac128_state::macplus_map(address_map &map)
 	map(0x800000, 0x9fffff).r(m_scc, FUNC(z80scc_device::dc_ab_r)).umask16(0xff00);
 	map(0xa00000, 0xbfffff).w(m_scc, FUNC(z80scc_device::dc_ab_w)).umask16(0x00ff);
 	map(0xc00000, 0xdfffff).rw(FUNC(mac128_state::mac_iwm_r), FUNC(mac128_state::mac_iwm_w));
+	map(0xe80000, 0xefffff).rw(FUNC(mac128_state::mac_via_r), FUNC(mac128_state::mac_via_w));
+	map(0xfffff0, 0xffffff).rw(FUNC(mac128_state::mac_autovector_r), FUNC(mac128_state::mac_autovector_w));
+}
+
+void mac128_state::macse_map(address_map &map)
+{
+	map(0x000000, 0x3fffff).rw(FUNC(mac128_state::ram_r), FUNC(mac128_state::ram_w_se));
+	map(0x400000, 0x4fffff).rom().region("bootrom", 0);
+	map(0x580000, 0x5fffff).rw(FUNC(mac128_state::macplus_scsi_r), FUNC(mac128_state::macplus_scsi_w));
+	map(0x900000, 0x9fffff).r(m_scc, FUNC(z80scc_device::dc_ab_r)).umask16(0xff00);
+	map(0xb00000, 0xbfffff).w(m_scc, FUNC(z80scc_device::dc_ab_w)).umask16(0x00ff);
+	map(0xd00000, 0xdfffff).rw(FUNC(mac128_state::mac_iwm_r), FUNC(mac128_state::mac_iwm_w));
 	map(0xe80000, 0xefffff).rw(FUNC(mac128_state::mac_via_r), FUNC(mac128_state::mac_via_w));
 	map(0xfffff0, 0xffffff).rw(FUNC(mac128_state::mac_autovector_r), FUNC(mac128_state::mac_autovector_w));
 }
@@ -994,7 +1106,6 @@ void mac128_state::mac128k(machine_config &config)
 	m_ram->set_default_size("128K");
 }
 
-
 void mac128_state::macplus(machine_config &config)
 {
 	mac512ke(config);
@@ -1015,6 +1126,45 @@ void mac128_state::macplus(machine_config &config)
 	m_ram->set_extra_options("1M,2M,2560K,4M");
 }
 
+static void mac_sepds_cards(device_slot_interface &device)
+{
+	device.option_add("radiusfpd", PDS_SEDISPLAY);  // Radius Full Page Display card for SE
+}
+
+void mac128_state::macse(machine_config &config)
+{
+	macplus(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mac128_state::macse_map);
+
+	config.device_remove("kbd");
+	config.device_remove("pds");
+
+	MACADB(config, m_macadb, C7M);
+	m_macadb->via_clock_callback().set(m_via, FUNC(via6522_device::write_cb1));
+	m_macadb->via_data_callback().set(m_via, FUNC(via6522_device::write_cb2));
+	m_macadb->adb_irq_callback().set(FUNC(mac128_state::adb_irq_w));
+
+	m_via->readpb_handler().set(FUNC(mac128_state::mac_via_in_b_se));
+	m_via->writepa_handler().set(FUNC(mac128_state::mac_via_out_a_se));
+	m_via->writepb_handler().set(FUNC(mac128_state::mac_via_out_b_se));
+	m_via->cb2_handler().set(m_macadb, FUNC(macadb_device::adb_data_w));
+
+	/* internal ram */
+	m_ram->set_default_size("4M");
+	m_ram->set_extra_options("2M,2560K,4M");
+
+	MACPDS(config, "sepds", "maincpu");
+	MACPDS_SLOT(config, "pds", "sepds", mac_sepds_cards, nullptr);
+}
+
+void mac128_state::macclasc(machine_config &config)
+{
+	macse(config);
+
+	config.device_remove("pds");
+	config.device_remove("sepds");
+}
+
 static INPUT_PORTS_START( macplus )
 	PORT_START("MOUSE0") /* Mouse - button */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Button") PORT_CODE(MOUSECODE_BUTTON1)
@@ -1024,6 +1174,9 @@ static INPUT_PORTS_START( macplus )
 
 	PORT_START("MOUSE2") /* Mouse - Y AXIS */
 	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( macadb )
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -1192,6 +1345,22 @@ ROM_START( macplus ) // same notes as above apply here as well
 	ROMX_LOAD( "rominator-20150225-hi.bin", 0x000000, 0x080000, CRC(a28ba8ec) SHA1(9ddcf500727955c60db0ff24b5ca2458f53fd89a), ROM_SKIP(1) | ROM_BIOS(4) )
 ROM_END
 
+ROM_START( macse )
+	ROM_REGION16_BE(0x100000, "bootrom", 0)
+	ROM_LOAD16_WORD( "macse.rom",  0x00000, 0x40000, CRC(0f7ff80c) SHA1(58532b7d0d49659fd5228ac334a1b094f0241968))
+ROM_END
+
+ROM_START( macsefd )
+	ROM_REGION16_BE(0x100000, "bootrom", 0)
+	ROM_LOAD( "be06e171.rom", 0x000000, 0x040000, CRC(f530cb10) SHA1(d3670a90273d12e53d86d1228c068cb660b8c9d1) )
+ROM_END
+
+ROM_START( macclasc )
+	ROM_REGION16_BE(0x100000, "bootrom", 0) // a49f9914, second half of chip dump is the 6.0.3 XO rom disk
+	// this dump is big endian
+	ROM_LOAD( "341-0813__=c=1983-90_apple__japan__910d_d.27c4096_be.ue1", 0x000000, 0x080000, CRC(510d7d38) SHA1(ccd10904ddc0fb6a1d216b2e9effd5ec6cf5a83d) )
+ROM_END
+
 /*    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT    CLASS         INIT              COMPANY              FULLNAME */
 //COMP( 1983, mactw,    0,       0,      mac128k,  macplus, mac128_state, init_mac128k512k, "Apple Computer",    "Macintosh (4.3T Prototype)",  MACHINE_NOT_WORKING )
 COMP( 1984, mac128k,  0,       0,      mac128k,  macplus, mac128_state, init_mac128k512k, "Apple Computer",    "Macintosh 128k",  MACHINE_NOT_WORKING )
@@ -1200,3 +1369,6 @@ COMP( 1986, mac512ke, macplus, 0,      mac512ke, macplus, mac128_state, init_mac
 COMP( 1985, unitron,  macplus, 0,      mac512ke, macplus, mac128_state, init_mac512ke,    "bootleg (Unitron)", "Mac 512",  MACHINE_NOT_WORKING )
 COMP( 1986, macplus,  0,       0,      macplus,  macplus, mac128_state, init_macplus,     "Apple Computer",    "Macintosh Plus",  MACHINE_NOT_WORKING )
 COMP( 1985, utrn1024, macplus, 0,      macplus,  macplus, mac128_state, init_macplus,     "bootleg (Unitron)", "Unitron 1024",  MACHINE_NOT_WORKING )
+COMP( 1987, macse,    0,       0,      macse,    macadb, mac128_state, init_macse,        "Apple Computer",   "Macintosh SE",  MACHINE_NOT_WORKING )
+COMP( 1987, macsefd,  0,       0,      macse,    macadb, mac128_state, init_macse,        "Apple Computer",   "Macintosh SE (FDHD)",  MACHINE_NOT_WORKING )
+COMP( 1990, macclasc, 0,       0,      macclasc, macadb, mac128_state, init_macclassic,   "Apple Computer",   "Macintosh Classic",  MACHINE_NOT_WORKING )

@@ -28,7 +28,7 @@ void o2_rom_device::device_start()
 
 void o2_rom_device::cart_init()
 {
-	m_cart_mask = (1 << (31 - count_leading_zeros(m_rom_size))) - 1;
+	m_cart_mask = (1 << (31 - count_leading_zeros(m_rom.bytes()))) - 1;
 }
 
 
@@ -39,5 +39,5 @@ void o2_rom_device::cart_init()
 u8 o2_rom_device::read_rom04(offs_t offset)
 {
 	offset = (offset + m_bank * 0x800) & m_cart_mask;
-	return (offset < m_rom_size) ? m_rom[offset] : 0xff;
+	return (offset < m_rom.bytes()) ? m_rom[offset] : 0xff;
 }

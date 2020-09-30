@@ -19,7 +19,6 @@
 enum vtxx_pal_mode {
 	PAL_MODE_VT0x,
 	PAL_MODE_NEW_RGB,
-	PAL_MODE_NEW_VG,
 	PAL_MODE_NEW_RGB12,
 };
 
@@ -40,13 +39,15 @@ public:
 	virtual uint8_t palette_read(offs_t offset) override;
 	virtual void palette_write(offs_t offset, uint8_t data) override;
 
-	virtual uint32_t palette_entries() const override { return 256; }
-	virtual uint32_t palette_indirect_entries() const override { return 4*16*8; }
-	virtual void init_palette() override;
+	void init_vt03_palette_tables(int palmode);
+	void init_vtxx_rgb555_palette_tables();
+	void init_vtxx_rgb444_palette_tables();
 
 	virtual void read_tile_plane_data(int address, int color) override;
 	virtual void shift_tile_plane_data(uint8_t &pix) override;
-	virtual void draw_tile_pixel(uint8_t pix, int color, pen_t back_pen, uint32_t *&dest, const pen_t *color_table) override;
+	virtual void draw_tile_pixel(uint8_t pix, int color, uint32_t back_pen, uint32_t *&dest) override;
+	inline void draw_tile_pixel_inner(uint8_t pen, uint32_t *dest);
+	virtual void draw_back_pen(uint32_t* dst, int back_pen) override;
 
 	virtual void read_sprite_plane_data(int address) override;
 	virtual void make_sprite_pixel_data(uint8_t &pixel_data, int flipx) override;
@@ -70,11 +71,13 @@ protected:
 	bool m_is_pal;
 	bool m_is_50hz;
 
+	uint32_t m_vtpens[0x1000*8];
+	uint32_t m_vtpens_rgb555[0x8000*8];
+	uint32_t m_vtpens_rgb444[0x1000*8];
+
 private:
 	devcb_read8 m_read_bg;
 	devcb_read8 m_read_sp;
-
-	std::unique_ptr<uint8_t[]> m_newpal;
 
 	int m_read_bg4_bg3;
 	int m_va34;
@@ -89,8 +92,6 @@ private:
 	vtxx_pal_mode m_pal_mode = PAL_MODE_VT0x;
 
 	void set_2010_reg(uint8_t data);
-
-	void set_new_pen(int i);
 };
 
 class ppu_vt03pal_device : public ppu_vt03_device {

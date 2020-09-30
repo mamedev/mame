@@ -266,7 +266,7 @@ void tankbatt_state::tankbatt(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, "sound_nl:shoot", "SHOOT.IN", 0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:hit", "HIT.IN", 0);
 
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "R35.2").set_mult_offset(10000.0, 0.0);
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "R35.2").set_mult_offset(10000.0 / 32768.0, 0.0);
 }
 
 

@@ -14,6 +14,7 @@
 #include "cpu/z80/z80.h"
 #include "sound/spkrdev.h"
 #include "video/saa5050.h"
+#include "machine/p2000t_mdcr.h"
 #include "emupal.h"
 
 
@@ -25,6 +26,7 @@ public:
 		, m_videoram(*this, "videoram")
 		, m_maincpu(*this, "maincpu")
 		, m_speaker(*this, "speaker")
+		, m_mdcr(*this, "mdcr")
 		, m_keyboard(*this, "KEY.%u", 0)
 	{
 	}
@@ -52,6 +54,7 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
+	required_device<mdcr_device> m_mdcr;
 
 private:
 	required_ioport_array<10> m_keyboard;

@@ -8,6 +8,6 @@ insert_final_newline = true
 tab_width = 4
 trim_trailing_whitespace = true
 
-[*.py]
+[*.{py,rst}]
 indent_style = space
 tab_width = 8

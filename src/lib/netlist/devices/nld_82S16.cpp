@@ -22,8 +22,7 @@
  *
  */
 
-#include "nld_82S16.h"
-#include "netlist/nl_base.h"
+#include "nl_base.h"
 
 namespace netlist
 {

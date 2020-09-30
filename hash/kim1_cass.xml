@@ -12,6 +12,7 @@ license:CC0
 		<description>Microchess</description>
 		<year>1976</year>
 		<publisher>Micro-ware Ltd</publisher>
+		<info name="usage" value="Press F3, then -00F1=00 -17F9=C1 -1873 enter. When you see 0000 D8 pause tape. Press F3, then -1873 enter. When you see 0000 D8, press F3 enter" />
 
 		<!-- Typed in from book -->
 		<part name="cass" interface="kim1_cass">

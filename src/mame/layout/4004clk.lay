@@ -34,17 +34,17 @@ license:CC0
 
 	<!-- 3*2 neon digits, separated by colons -->
 
-		<bezel name="nixie0" element="digit"><bounds x="0" y="0" width="10" height="15" /></bezel>
-		<bezel name="nixie1" element="digit"><bounds x="10.3" y="0" width="10" height="15" /></bezel>
-		<bezel name="nixie2" element="digit"><bounds x="23.3" y="0" width="10" height="15" /></bezel>
-		<bezel name="nixie3" element="digit"><bounds x="33.6" y="0" width="10" height="15" /></bezel>
-		<bezel name="nixie4" element="digit"><bounds x="46.6" y="0" width="10" height="15" /></bezel>
-		<bezel name="nixie5" element="digit"><bounds x="56.9" y="0" width="10" height="15" /></bezel>
+		<element name="nixie0" ref="digit"><bounds x="0" y="0" width="10" height="15" /></element>
+		<element name="nixie1" ref="digit"><bounds x="10.3" y="0" width="10" height="15" /></element>
+		<element name="nixie2" ref="digit"><bounds x="23.3" y="0" width="10" height="15" /></element>
+		<element name="nixie3" ref="digit"><bounds x="33.6" y="0" width="10" height="15" /></element>
+		<element name="nixie4" ref="digit"><bounds x="46.6" y="0" width="10" height="15" /></element>
+		<element name="nixie5" ref="digit"><bounds x="56.9" y="0" width="10" height="15" /></element>
 
-		<bezel name="neon1" element="dot"><bounds x="21.05" y="4.35" width="1.5" height="1.5" /></bezel>
-		<bezel name="neon0" element="dot"><bounds x="21.05" y="9.15" width="1.5" height="1.5" /></bezel>
-		<bezel name="neon2" element="dot"><bounds x="44.35" y="4.35" width="1.5" height="1.5" /></bezel>
-		<bezel name="neon3" element="dot"><bounds x="44.35" y="9.15" width="1.5" height="1.5" /></bezel>
+		<element name="neon1" ref="dot"><bounds x="21.05" y="4.35" width="1.5" height="1.5" /></element>
+		<element name="neon0" ref="dot"><bounds x="21.05" y="9.15" width="1.5" height="1.5" /></element>
+		<element name="neon2" ref="dot"><bounds x="44.35" y="4.35" width="1.5" height="1.5" /></element>
+		<element name="neon3" ref="dot"><bounds x="44.35" y="9.15" width="1.5" height="1.5" /></element>
 
 	</view>
 </mamelayout>

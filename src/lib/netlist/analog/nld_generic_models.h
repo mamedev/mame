@@ -8,8 +8,7 @@
 /// \file nld_generic_models.h
 ///
 
-#include "netlist/nl_base.h"
-#include "netlist/nl_setup.h"
+#include "nl_base.h"
 
 //
 // Set to 0 to use a linearized diode model in the range exceeding

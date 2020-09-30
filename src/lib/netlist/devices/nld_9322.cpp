@@ -18,8 +18,7 @@
  *
  */
 
-#include "nld_9322.h"
-#include "netlist/nl_base.h"
+#include "nl_base.h"
 
 namespace netlist
 {
@@ -67,18 +66,18 @@ namespace netlist
 		, m_3(*this, "C")
 		, m_4(*this, "D")
 		{
-			register_subalias("A1", m_1.m_A);
-			register_subalias("B1", m_1.m_B);
-			register_subalias("Y1", m_1.m_Y);
-			register_subalias("A2", m_2.m_A);
-			register_subalias("B2", m_2.m_B);
-			register_subalias("Y2", m_2.m_Y);
-			register_subalias("A3", m_3.m_A);
-			register_subalias("B3", m_3.m_B);
-			register_subalias("Y3", m_3.m_Y);
-			register_subalias("A4", m_4.m_A);
-			register_subalias("B4", m_4.m_B);
-			register_subalias("Y4", m_4.m_Y);
+			register_subalias("A1", "A.A");
+			register_subalias("B1", "A.B");
+			register_subalias("Y1", "A.Y");
+			register_subalias("A2", "B.A");
+			register_subalias("B2", "B.B");
+			register_subalias("Y2", "B.Y");
+			register_subalias("A3", "C.A");
+			register_subalias("B3", "C.B");
+			register_subalias("Y3", "C.Y");
+			register_subalias("A4", "D.A");
+			register_subalias("B4", "D.B");
+			register_subalias("Y4", "D.Y");
 
 			connect("A.VCC", "B.VCC");
 			connect("A.VCC", "C.VCC");

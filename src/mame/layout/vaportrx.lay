@@ -45,11 +45,11 @@ license:CC0
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
 
-		<bezel name="lamp0" element="lamp" inputtag="IN1" inputmask="0x0800">
+		<element name="lamp0" ref="lamp" inputtag="IN1" inputmask="0x0800">
 			<bounds x="3.75" y="3.05" width="0.2" height="0.4" />
-		</bezel>
-		<bezel name="lamp1" element="lamp" inputtag="IN1" inputmask="0x0200">
+		</element>
+		<element name="lamp1" ref="lamp" inputtag="IN1" inputmask="0x0200">
 			<bounds x="0.05" y="3.05" width="0.2" height="0.4" />
-		</bezel>
+		</element>
 	</view>
 </mamelayout>

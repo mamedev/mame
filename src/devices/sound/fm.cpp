@@ -2111,12 +2111,11 @@ struct ym2203_state
 } // anonymous namespace
 
 /* Generate samples for one of the YM2203s */
-void ym2203_update_one(void *chip, FMSAMPLE *buffer, int length)
+void ym2203_update_one(void *chip, write_stream_view &buf)
 {
 	ym2203_state *F2203 = (ym2203_state *)chip;
 	FM_OPN *OPN =   &F2203->OPN;
 	int i;
-	FMSAMPLE *buf = buffer;
 	FM_CH   *cch[3];
 
 	cch[0]   = &F2203->CH[0];
@@ -2147,7 +2146,7 @@ void ym2203_update_one(void *chip, FMSAMPLE *buffer, int length)
 	OPN->LFO_PM = 0;
 
 	/* buffering */
-	for (i=0; i < length ; i++)
+	for (i=0; i < buf.samples() ; i++)
 	{
 		/* clear outputs */
 		OPN->out_fm[0] = 0;
@@ -2186,7 +2185,7 @@ void ym2203_update_one(void *chip, FMSAMPLE *buffer, int length)
 			#endif
 
 			/* buffering */
-			buf[i] = lt;
+			buf.put_int(i, lt, 32768);
 		}
 
 		/* timer A control */
@@ -2727,19 +2726,18 @@ static inline void YM2608IRQMaskWrite(FM_OPN *OPN, ym2608_state *F2608, int v)
 }
 
 /* Generate samples for one of the YM2608s */
-void ym2608_update_one(void *chip, FMSAMPLE **buffer, int length)
+void ym2608_update_one(void *chip, std::vector<write_stream_view> &buffer)
 {
 	ym2608_state *F2608 = (ym2608_state *)chip;
 	FM_OPN *OPN   = &F2608->OPN;
 	YM_DELTAT *DELTAT = &F2608->deltaT;
 	int i,j;
-	FMSAMPLE  *bufL,*bufR;
 	FM_CH   *cch[6];
 	int32_t *out_fm = OPN->out_fm;
 
 	/* set bufer */
-	bufL = buffer[0];
-	bufR = buffer[1];
+	auto &bufL = buffer[0];
+	auto &bufR = buffer[1];
 
 	cch[0]   = &F2608->CH[0];
 	cch[1]   = &F2608->CH[1];
@@ -2770,7 +2768,7 @@ void ym2608_update_one(void *chip, FMSAMPLE **buffer, int length)
 
 
 	/* buffering */
-	for(i=0; i < length ; i++)
+	for(i=0; i < bufL.samples() ; i++)
 	{
 		advance_lfo(OPN);
 
@@ -2840,14 +2838,9 @@ void ym2608_update_one(void *chip, FMSAMPLE **buffer, int length)
 			lt += ((out_fm[5]>>1) & OPN->pan[10]);
 			rt += ((out_fm[5]>>1) & OPN->pan[11]);
 
-			lt >>= FINAL_SH;
-			rt >>= FINAL_SH;
-
-			Limit( lt, MAXOUT, MINOUT );
-			Limit( rt, MAXOUT, MINOUT );
 			/* buffering */
-			bufL[i] = lt;
-			bufR[i] = rt;
+			bufL.put_int_clamp(i, lt, 32768 << FINAL_SH);
+			bufR.put_int_clamp(i, rt, 32768 << FINAL_SH);
 
 			#ifdef SAVE_SAMPLE
 				SAVE_ALL_CHANNELS
@@ -3275,19 +3268,18 @@ int ym2608_timer_over(void *chip,int c)
 /* YM2610(OPNB) */
 
 /* Generate samples for one of the YM2610s */
-void ym2610_update_one(void *chip, FMSAMPLE **buffer, int length)
+void ym2610_update_one(void *chip, std::vector<write_stream_view> &buffer)
 {
 	ym2610_state *F2610 = (ym2610_state *)chip;
 	FM_OPN *OPN   = &F2610->OPN;
 	YM_DELTAT *DELTAT = &F2610->deltaT;
 	int i,j;
-	FMSAMPLE  *bufL,*bufR;
 	FM_CH   *cch[4];
 	int32_t *out_fm = OPN->out_fm;
 
 	/* buffer setup */
-	bufL = buffer[0];
-	bufR = buffer[1];
+	auto &bufL = buffer[0];
+	auto &bufR = buffer[1];
 
 	cch[0] = &F2610->CH[1];
 	cch[1] = &F2610->CH[2];
@@ -3323,7 +3315,7 @@ void ym2610_update_one(void *chip, FMSAMPLE **buffer, int length)
 	refresh_fc_eg_chan( OPN, cch[3] );
 
 	/* buffering */
-	for(i=0; i < length ; i++)
+	for(i=0; i < bufL.samples() ; i++)
 	{
 		advance_lfo(OPN);
 
@@ -3386,20 +3378,13 @@ void ym2610_update_one(void *chip, FMSAMPLE **buffer, int length)
 			lt += ((out_fm[5]>>1) & OPN->pan[10]);
 			rt += ((out_fm[5]>>1) & OPN->pan[11]);
 
-
-			lt >>= FINAL_SH;
-			rt >>= FINAL_SH;
-
-			Limit( lt, MAXOUT, MINOUT );
-			Limit( rt, MAXOUT, MINOUT );
-
 			#ifdef SAVE_SAMPLE
 				SAVE_ALL_CHANNELS
 			#endif
 
 			/* buffering */
-			bufL[i] = lt;
-			bufR[i] = rt;
+			bufL.put_int_clamp(i, lt, 32768 << FINAL_SH);
+			bufR.put_int_clamp(i, rt, 32768 << FINAL_SH);
 		}
 
 		/* timer A control */
@@ -3411,19 +3396,18 @@ void ym2610_update_one(void *chip, FMSAMPLE **buffer, int length)
 
 #if BUILD_YM2610B
 /* Generate samples for one of the YM2610Bs */
-void ym2610b_update_one(void *chip, FMSAMPLE **buffer, int length)
+void ym2610b_update_one(void *chip, std::vector<write_stream_view> &buffer)
 {
 	ym2610_state *F2610 = (ym2610_state *)chip;
 	FM_OPN *OPN   = &F2610->OPN;
 	YM_DELTAT *DELTAT = &F2610->deltaT;
 	int i,j;
-	FMSAMPLE  *bufL,*bufR;
 	FM_CH   *cch[6];
 	int32_t *out_fm = OPN->out_fm;
 
 	/* buffer setup */
-	bufL = buffer[0];
-	bufR = buffer[1];
+	auto &bufL = buffer[0];
+	auto &bufR = buffer[1];
 
 	cch[0] = &F2610->CH[0];
 	cch[1] = &F2610->CH[1];
@@ -3453,7 +3437,7 @@ void ym2610b_update_one(void *chip, FMSAMPLE **buffer, int length)
 	refresh_fc_eg_chan( OPN, cch[5] );
 
 	/* buffering */
-	for(i=0; i < length ; i++)
+	for(i=0; i < bufL.samples() ; i++)
 	{
 		advance_lfo(OPN);
 
@@ -3524,20 +3508,13 @@ void ym2610b_update_one(void *chip, FMSAMPLE **buffer, int length)
 			lt += ((out_fm[5]>>1) & OPN->pan[10]);
 			rt += ((out_fm[5]>>1) & OPN->pan[11]);
 
-
-			lt >>= FINAL_SH;
-			rt >>= FINAL_SH;
-
-			Limit( lt, MAXOUT, MINOUT );
-			Limit( rt, MAXOUT, MINOUT );
-
 			#ifdef SAVE_SAMPLE
 				SAVE_ALL_CHANNELS
 			#endif
 
 			/* buffering */
-			bufL[i] = lt;
-			bufR[i] = rt;
+			bufL.put_int_clamp(i, lt, 32768);
+			bufR.put_int_clamp(i, rt, 32768);
 		}
 
 		/* timer A control */

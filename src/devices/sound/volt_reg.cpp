@@ -21,19 +21,16 @@ voltage_regulator_device::voltage_regulator_device(const machine_config &mconfig
 	device_t(mconfig, VOLTAGE_REGULATOR, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
 	m_stream(nullptr),
-	m_output(0x7fff)
+	m_output(1.0)
 {
 }
 
 void voltage_regulator_device::device_start()
 {
-	m_stream = stream_alloc(0, 1, 48000 * 4);
+	m_stream = stream_alloc(0, 1, SAMPLE_RATE_OUTPUT_ADAPTIVE);
 }
 
-void voltage_regulator_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void voltage_regulator_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	for (int samp = 0; samp < samples; samp++)
-	{
-		outputs[0][samp] = m_output;
-	}
+	outputs[0].fill(m_output);
 }

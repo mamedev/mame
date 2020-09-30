@@ -11,50 +11,121 @@ license:CC0
 	<!--
 
 	Language:
-	********0 = US
-	********1 = Italy
-	********2 = Netherlands
+	********0 = US / Canada / Hong Kong
+	********1 = Unused
+	*******22 = Spain / Mexico / Latin America
 	********3 = UK
+	*******23 = Netherlands
 	********4 = Germany
-	********5 = France
-	********6 = Portugal
-	********7 = Spain
+	********5 = France / Canada (French)
+	********6 = Unused
+	********7 = Italy
+
 
 	Dumped | Serial          | Name
 	==============================================================================================
 	       | 80-115600(US)   | What's That Noise (it's 52-280800 on VTech catalog)
 	  NA   | 80-115622(SP)   | ¿Qué ruido es ese? (no ROM cartridge)
+	       | 80-115633(UK)   | What's That Noise? (Storio Pack-in cart)
 	       | 80-280000(US)   | Shrek's Vacation
 	       | 80-280003(UK)   | Shrek's Holiday
 	       | 80-280100(US)   | Toy Story 3
-	       | 80-280200(US)   | Mr. Men/Little Miss
+	       | 80-280103(UK)   | Toy Story 3
+	       | 80-280107(??)   | Toy Story 3 (Italy)
+	       | 80-280122(SP)   | Toy Story 3
+	       | 80-280123(??)   | Toy Story 3 (Netherlands)
+	       | 80-280200(US)   | Mr. Men and Little Miss - Mr. Messy and the Missing Sock
+	       | 80-280203(UK)   | Mr. Men and Little Miss - Mr. Messy and the Missing Sock
 	       | 80-280300(US)   | Disney Fairies - Tinkerbell and The Great Fairy Rescue
+	       | 80-280303(UK)   | Disney Fairies - Tinkerbell and The Great Fairy Rescue
+	       | 80-280304(GER)  | Disney Fairies - Tinkerbell Ein Sommer Voller Abenteuer
+	       | 80-280323(??)   | Disney Fairies - Tinkerbell en de Grote Reddingsoperatie (Netherlands)
 	       | 80-280400(US)   | Scooby Doo! - Scooby Doo and a Mummy, Too!
 	       | 80-280403(UK)   | Scooby Doo! - Scooby Doo and a Mummy, Too!
+	       | 80-280405(FR)   | Scooby Doo! - Momie en folie!
+	       | 80-280407(??)   | Scooby Doo! - Scooby-Doo e una mummia a tu per tu! (Italy)
 	  XX   | 80-280422(SP)   | Scooby Doo! - Scooby Doo y la momia
-	       | 80-280600(US)   | Olivia
+	       | 80-280600(US)   | Olivia Takes Ballet
+	       | 80-280603(UK)   | Olivia Takes Ballet
 	       | 80-280700(US)   | The Little Engine That Could
-	       | 80-280900(US)   | Dora and the Three Little Pigs
-	  XX   | 80-280422(GER)  | Dora und die drei Schweinchen
+	       | 80-280804(GER)  | Rufus in der Stadt (Storio Pack-in cart)
+	       | 80-280???(??)   | Rufus arriva in città (Italy, Storio Pack-in cart, product code unconfirmed)
+	       | 80-280900(US)   | Dora the Explorer - Dora and the Three Little Pigs
+	       | 80-280903(UK)   | Dora the Explorer - Dora and the Three Little Pigs
+	  XX   | 80-280904(GER)  | Dora - Dora und die drei Schweinchen
+	       | 80-280905(FR)   | Dora l'exploratrice - Dora et les trois petit cochons
+	       | 80-280922(SP)   | Dora la exploradora - Dora y los Tres Cerditos
+	       | 80-280923(??)   | Dora - Dora en de Drie Kleine Biggetjes (Netherlands)
 	       | 80-281000(US)   | Mickey Mouse Clubhouse
+	       | 80-281003(UK)   | Mickey Mouse Clubhouse
 	  XX   | 80-281004(GER)  | Micky Maus Wunderhaus
-	       | 80-281100(US)   | Disney Princess
-	       | 80-281103(UK)   | Disney Princess
-	       | 80-281200(US)   | Cars
-	       | 80-281300(US)   | Sesame Street The Happy Scientists
-	       | 80-281400(US)   | SpongeBob SquarePants Model Sponge
+	       | 80-281005(FR)   | La Maison de Mickey
+	       | 80-281022(SP)   | La casa de Mickey Mouse
+	       | 80-281023(??)   | Mickey Mouse Clubhuis - Mickey zoekt en vindt! (Netherlands)
+	       | 80-281100(US)   | Disney Princess - Belle's Special Treat / A Gift from the Heart
+	       | 80-281103(UK)   | Disney Princess - Belle's Special Treat / A Gift from the Heart
+	       | 80-281104(GER)  | Disney Princess - Eine besondere Überraschung für Belle / Das Geburtstagsgeschenk
+	       | 80-281105(FR)   | Disney Princess - Une surprise pour Belle / Un cadeau qui vient du coeur
+	       | 80-281107(??)   | Disney Princess - Una sorpresa speciale / Un regalo dal cuore (Italy)
+	       | 80-281122(SP)   | Disney Princess - Historia de Bella / Historia de Cenicienta
+	       | 80-281123(??)   | Disney Princess - Ein Speciale Verrassing / Ein ???? (Netherlands)
+	       | 80-281200(US)   | Disney/Pixar Cars Toon - Tokyo Mater
+	       | 80-281203(UK)   | Disney/Pixar Cars Toon - Tokyo Mater
+	       | 80-281204(GER)  | Disney/Pixar Cars Toon - Hook in Tokyo
+	       | 80-281300(US)   | Sesame Street - The Happy Scientists
+	       | 80-281400(US)   | SpongeBob SquarePants - Model Sponge
 	  XX   | 80-281404(GER)  | Spongebob Schwammkopf - Ein Schwamm will nach oben
+	       | 80-281405(FR)   | Bob L'éponge - Bob, la star des éponges
+	       | 80-281422(SP)   | Bob Esponja - Modelo Esponja
 	       | 80-281500(US)   | Tangled
+	       | 80-281503(UK)   | Rapunzel
 	  XX   | 80-281504(GER)  | Rapunzel - Neu verföhnt
 	       | 80-281600(US)   | Chuggington - Babysitter Brewster
-	       | 80-281700(US)   | Penguins of Madagascar - The Helmet
+	       | 80-281603(UK)   | Chuggington - Babysitter Brewster
+	       | 80-281604(GER)  | Chuggington - Bastian, der Babysitter
+	       | 80-281605(FR)   | Chuggington - Bruno fait du baby-sitting
+	       | 80-281700(US)   | The Penguins of Madagascar - The Helmet
+	       | 80-281703(UK)   | The Penguins of Madagascar - The Helmet
+	       | 80-281723(??)   | De Pinguïns van Madagascar - De Helm (Netherlands)
 	       | 80-281800(US)   | Kung Fu Panda 2
-	       | 80-281900(US)   | Cars 2
+	       | 80-281803(UK)   | Kung Fu Panda 2
+	       | 80-281900(US)   | Disney/Pixar Cars 2
+	       | 80-281903(UK)   | Disney/Pixar Cars 2
+	       | 80-281904(GER)  | Disney/Pixar Cars 2
+	       | 80-281905(FR)   | Disney/Pixar Cars 2
+	       | 80-281907(??)   | Disney/Pixar Cars 2 (Italy)
+	       | 80-281922(SP)   | Disney/Pixar Cars 2
+	       | 80-281923(??)   | Disney/Pixar Cars 2 (Netherlands)
 	       | 80-282000(US)   | Winnie the Pooh
+	       | 80-282003(UK)   | Winnie the Pooh
+	       | 80-282004(GER)  | Winnie Puuh
+	       | 80-282005(FR)   | Winnie l'ourson
+	       | 80-282022(SP)   | Winnie the Pooh (Found in Spain product catalog, may not have been released)
+	       | 80-282023(??)   | Winnie de Poeh (Netherlands)
 	       | 80-282100(US)   | Super Why! - Attack of the Eraser
-	       | 80-282200(US)   | Madagascar 3
+	       | 80-282200(US)   | Madagascar 3 - Europe's Most Wanted
+	       | 80-282204(GER)  | Madagascar 3 - Flucht durch Europa
+	       | 80-282205(FR)   | Madagascar 3 - Bons baisers d'Europe
+	       | 80-282222(SP)   | Madagascar 3 - De marcha por Europa
+	       | 80-282223(??)   | Madagascar 3 - Op Avontuur in Europa (Netherlands)
 	       | 80-282300(US)   | Dinosaur Train - T.Rex Teeth
-	       | 80-282400(US)   | Hello Kitty's Surprise
+	       | 80-282400(US)   | Hello Kitty - Hello Kitty's Surprise
+	       | 80-282403(UK)   | Hello Kitty - Hello Kitty's Surprise
+	       | 80-282404(GER)  | Hello Kitty - Hello Kittys Überraschung!
+	       | 80-282422(SP)   | Hello Kitty - La sorpresa de Hello Kitty
+	       | 80-282423(??)   | Hello Kitty - Hello Kitty's Verrassing! (Netherlands)
+	       | 80-282700(US)   | Thomas and Friends - Up, Up and Away! Diesel's Special Delivery
+	       | 80-282703(UK)   | Thomas and Friends - Up, Up and Away! Diesel's Special Delivery
+	       | 80-282704(GER)  | Thomas und seine Freunde - Auf und davon Diesel ist neidisch
+
+	       Notes: Storio 1 carts follow an 80-28XXXX(XX) product code sequence. Spain and Netherlands releases use an 80-28XX2X(XX) sequence.
+	       EAN is calculated by using a 341776 prefix, appending the six digit product code, and adding an EAN check number at the end.
+	       EG: 341776 + 280003 + 3 (calculated check digit) = 3417762800033 - Shrek's Holiday (UK.)
+
+	       Two letter Netherlands and Italy suffixes have not yet been confirmed. All items have been confirmed via physical photographs, product code searches,
+	       and online shopping sites, with the exception of Winnie Puuh (Spain) which was listed in a Spanish product catalog and may have not been released.
+
+	       Storio 1 carts come in boxes with an orange stripe in front. Storio carts with a blue stripe in front are only compatible with Storio 2 and later systems.
 
 	-->
 

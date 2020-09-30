@@ -15,11 +15,11 @@
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void cdda_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void cdda_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	get_audio_data(&outputs[0][0], &outputs[1][0], samples);
-	m_audio_volume[0] = int16_t(outputs[0][0]);
-	m_audio_volume[1] = int16_t(outputs[1][0]);
+	get_audio_data(outputs[0], outputs[1]);
+	m_audio_volume[0] = outputs[0].get(0);
+	m_audio_volume[1] = outputs[1].get(0);
 }
 
 //-------------------------------------------------
@@ -31,7 +31,7 @@ void cdda_device::device_start()
 	/* allocate an audio cache */
 	m_audio_cache = std::make_unique<uint8_t[]>(CD_MAX_SECTOR_DATA * MAX_SECTORS );
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock());
+	m_stream = stream_alloc(0, 2, clock());
 
 	m_audio_playing = 0;
 	m_audio_pause = 0;
@@ -159,12 +159,12 @@ int cdda_device::audio_ended()
     converts it to 2 16-bit 44.1 kHz streams
 -------------------------------------------------*/
 
-void cdda_device::get_audio_data(stream_sample_t *bufL, stream_sample_t *bufR, uint32_t samples_wanted)
+void cdda_device::get_audio_data(write_stream_view &bufL, write_stream_view &bufR)
 {
 	int i;
 	int16_t *audio_cache = (int16_t *) m_audio_cache.get();
 
-	while (samples_wanted > 0)
+	for (int sampindex = 0; sampindex < bufL.samples(); )
 	{
 		/* if no file, audio not playing, audio paused, or out of disc data,
 		   just zero fill */
@@ -176,12 +176,12 @@ void cdda_device::get_audio_data(stream_sample_t *bufL, stream_sample_t *bufR, u
 				m_audio_ended_normally = true;
 			}
 
-			memset(bufL, 0, sizeof(stream_sample_t)*samples_wanted);
-			memset(bufR, 0, sizeof(stream_sample_t)*samples_wanted);
+			bufL.fill(0, sampindex);
+			bufR.fill(0, sampindex);
 			return;
 		}
 
-		int samples = samples_wanted;
+		int samples = bufL.samples() - sampindex;
 		if (samples > m_audio_samples)
 		{
 			samples = m_audio_samples;
@@ -190,11 +190,11 @@ void cdda_device::get_audio_data(stream_sample_t *bufL, stream_sample_t *bufR, u
 		for (i = 0; i < samples; i++)
 		{
 			/* CD-DA data on the disc is big-endian */
-			*bufL++ = (int16_t) big_endianize_int16( audio_cache[ m_audio_bptr ] ); m_audio_bptr++;
-			*bufR++ = (int16_t) big_endianize_int16( audio_cache[ m_audio_bptr ] ); m_audio_bptr++;
+			bufL.put_int(sampindex + i, s16(big_endianize_int16( audio_cache[ m_audio_bptr ] )), 32768); m_audio_bptr++;
+			bufR.put_int(sampindex + i, s16(big_endianize_int16( audio_cache[ m_audio_bptr ] )), 32768); m_audio_bptr++;
 		}
 
-		samples_wanted -= samples;
+		sampindex += samples;
 		m_audio_samples -= samples;
 
 		if (m_audio_samples == 0)

@@ -52,7 +52,7 @@ void gomoku_sound_device::device_start()
 	int ch;
 
 	// get stream channels
-	m_stream = stream_alloc(0, 1, clock());
+	m_stream = stream_alloc_legacy(0, 1, clock());
 
 	// allocate a pair of buffers to mix into - 1 second's worth should be more than enough
 	m_mixer_buffer = std::make_unique<short[]>(2 * clock());
@@ -87,10 +87,10 @@ void gomoku_sound_device::device_start()
 
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update in mono
+//  sound_stream_update_legacy - handle a stream update in mono
 //-------------------------------------------------
 
-void gomoku_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void gomoku_sound_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	stream_sample_t *buffer = outputs[0];
 	sound_channel *voice;

@@ -2,7 +2,7 @@
 // copyright-holders:Krzysztof Strzecha,Jon Sturm
 /***************************************************************************
 TI-85 and TI-86 drivers by Krzysztof Strzecha
-TI-83 Plus, TI-84 Plus, and Siliver Edition support by Jon Sturm
+TI-83 Plus, TI-84 Plus, and Silver Edition support by Jon Sturm
 
 Notes:
 1. After start TI-85 waits for ON key interrupt, so press ON key to start

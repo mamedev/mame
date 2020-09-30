@@ -23,9 +23,9 @@ namespace plib {
 	struct pspin_mutex
 	{
 	public:
-		pspin_mutex() noexcept = default;
-		void lock() noexcept{ while (m_lock.test_and_set(std::memory_order_acquire)) { } }
-		void unlock() noexcept { m_lock.clear(std::memory_order_release); }
+		inline pspin_mutex() noexcept = default;
+		inline void lock() noexcept{ while (m_lock.test_and_set(std::memory_order_acquire)) { } }
+		inline void unlock() noexcept { m_lock.clear(std::memory_order_release); }
 	private:
 		PALIGNAS_CACHELINE()
 		std::atomic_flag m_lock = ATOMIC_FLAG_INIT;
@@ -35,8 +35,9 @@ namespace plib {
 	struct pspin_mutex<false>
 	{
 	public:
-		void lock() const noexcept { }
-		void unlock() const noexcept { }
+		inline pspin_mutex() noexcept = default;
+		static inline void lock() /*const*/ noexcept { }
+		static inline void unlock() /*const*/ noexcept { }
 	};
 
 	class psemaphore

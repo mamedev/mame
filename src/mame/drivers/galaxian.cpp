@@ -6129,7 +6129,7 @@ void galaxian_state::konami_sound_1x_ay8910(machine_config &config)
 	NETLIST_STREAM_INPUT(config, "konami:cin1", 1, "R_AY3D_B.R");
 	NETLIST_STREAM_INPUT(config, "konami:cin2", 2, "R_AY3D_C.R");
 
-	NETLIST_STREAM_OUTPUT(config, "konami:cout0", 0, "OUT").set_mult_offset(30000.0 / 0.05, 0.0);
+	NETLIST_STREAM_OUTPUT(config, "konami:cout0", 0, "OUT").set_mult_offset(1.0 / 0.05, 0.0);
 }
 
 
@@ -6186,7 +6186,7 @@ void galaxian_state::konami_sound_2x_ay8910(machine_config &config)
 	NETLIST_STREAM_INPUT(config, "konami:cin3", 3, "R_AY3C_A.R");
 	NETLIST_STREAM_INPUT(config, "konami:cin4", 4, "R_AY3C_B.R");
 	NETLIST_STREAM_INPUT(config, "konami:cin5", 5, "R_AY3C_C.R");
-	NETLIST_STREAM_OUTPUT(config, "konami:cout0", 0, "OUT").set_mult_offset(30000.0 / 0.05, 0.0);
+	NETLIST_STREAM_OUTPUT(config, "konami:cout0", 0, "OUT").set_mult_offset(1.0 / 0.05, 0.0);
 }
 
 
@@ -9538,6 +9538,29 @@ ROM_START( pacmanblv ) /* Video Dens */
 	ROM_LOAD( "pacvideodens-im5610cpe.6l", 0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) ) // Dumped as 82s123
 ROM_END
 
+ROM_START( pacmanblc ) // Calfesa bootleg?
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pr_1.bin", 0x0000, 0x0800, CRC(032dc67e) SHA1(97df85e2faf0d68bb62bf5dcfa905e150bebe09c) ) // unique
+	ROM_LOAD( "pr_2.bin", 0x0800, 0x0800, CRC(3954e41c) SHA1(4b3f838d55ab4b5b93e1bcb26b3661f090a9124f) )
+	ROM_LOAD( "pr_3.bin", 0x1000, 0x0800, CRC(f98c0ceb) SHA1(4faf8b2fb3f109d1196a9ea256328485074a31b9) )
+	ROM_LOAD( "pr_4.bin", 0x1800, 0x0800, CRC(a9cd0082) SHA1(f44ff1ad15d5ee3096f8f44f9c605f32ae2737d9) )
+	ROM_LOAD( "pr_5.bin", 0x2000, 0x0800, CRC(6d475afc) SHA1(4fe6bde352c7dd9572fefaae4b59640b4f4eb8ba) )
+	ROM_LOAD( "pr_6.bin", 0x2800, 0x0800, CRC(cbe863d3) SHA1(97a2ffa6ab33e6061c664dcd1ee57c86a456782f) )
+	ROM_LOAD( "pr_7.bin", 0x3000, 0x0800, CRC(2bbed46e) SHA1(96648411af4ab7c43a9b91f7d0bc25f772fb5177) )
+	//                    0x3800, 0x0800 not populated
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "p_13.bin", 0x0000, 0x0800, CRC(b2ed320b) SHA1(680a6fdcb65cc2d88d10bc85e0b2628f43375c5c) )
+	ROM_LOAD( "p_14.bin", 0x0800, 0x0800, CRC(ab88b2c4) SHA1(d0c829ea8021eae81a2b82d36c35ad8258b115e0) )
+
+	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_LOAD( "p_11.bin", 0x0000, 0x0800, CRC(44a45b72) SHA1(8abd0684a01d6c23ef5cf5f0765458f982316acf) )
+	ROM_LOAD( "p_12.bin", 0x0800, 0x0800, CRC(03ba0eae) SHA1(dce051362bfdf978dcc034de0180bb2ced8419d3) ) // unique
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "im5610.bin", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) ) // same PROM as Moon Cresta, gives very strange colors
+ROM_END
+
 ROM_START( ghostmun )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pac1.bin",     0x0000, 0x1000, CRC(19338c70) SHA1(cc2665b7d534d324627d12025ee099ff415d4214) )
@@ -11660,6 +11683,26 @@ ROM_START( mandingarf )
 	ROM_LOAD( "6e.bin",        0x0000, 0x0020, BAD_DUMP CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) ) // not present, using mandinga PROM
 ROM_END
 
+ROM_START( mandingac )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2716-4.bin",  0x0000, 0x0800, CRC(a684a494) SHA1(76885bb3bdab09f46c7daa25164a2fdaa744742f) ) // 2716
+	ROM_LOAD( "2716-3.bin",  0x0800, 0x0800, CRC(f4038373) SHA1(8823b9816fc4ea03b92e08776c13610980f5ea7a) ) // 2716
+	ROM_LOAD( "2716-1.bin",  0x1000, 0x0800, CRC(96842877) SHA1(043ce4ed2628a209ca21cc42516c02366cd9f1fa) ) // 2716
+	ROM_LOAD( "2716-9.bin",  0x1800, 0x0800, CRC(b69f9f71) SHA1(cb781d61a481c493e89605bc0edc6a092d8b4d56) ) // 2716
+	ROM_LOAD( "2716-8.bin",  0x2000, 0x0800, CRC(400cf1bb) SHA1(06c891f7581b0c1036f6845ea847cd20b6f5dedc) ) // 2716
+	ROM_LOAD( "2716-7.bin",  0x2800, 0x0800, CRC(5382f7ed) SHA1(425ec2c2caf404fc8ab13ee38d6567413022e1a1) ) // 2716
+	ROM_LOAD( "2716-6.bin",  0x3000, 0x0800, CRC(c4e63305) SHA1(e03aed5ad89305ffc243cff8ff147ec82419c7bc) ) // 2716
+	ROM_LOAD( "2716-5.bin",  0x3800, 0x0800, CRC(8a4018ae) SHA1(9aba6f4527c59b0b016038236d5a6074e65966f6) ) // 2716
+	ROM_LOAD( "2716-2.bin",  0xc000, 0x0800, CRC(d8bf57e7) SHA1(421a0fa02fccbc52d460fafec6437bd2b7564056) ) // 2716
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "2716-10.bin", 0x0000, 0x0800, CRC(2082ad0a) SHA1(c6014d9575e92adf09b0961c2158a779ebe940c4) ) // 2716
+	ROM_LOAD( "2716-11.bin", 0x0800, 0x0800, CRC(1891fc68) SHA1(6d03f5092fd73462c9d81c1a64e39120d9f10aea) ) // 2716
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "82s123.bin",  0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) ) // 82s123
+ROM_END
+
 ROM_START( olmandingo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "olmandingo_1.bin",  0x0000, 0x0800, CRC(b5b9fcd9) SHA1(7a134de30041ac18521274f330eb4afe349da2db) )
@@ -11680,24 +11723,24 @@ ROM_START( olmandingo )
 	ROM_LOAD( "olmandingo_pr.bin", 0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
 ROM_END
 
-ROM_START( mandingac )
+ROM_START( olmandingc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "2716-4.bin",  0x0000, 0x0800, CRC(a684a494) SHA1(76885bb3bdab09f46c7daa25164a2fdaa744742f) ) // 2716
-	ROM_LOAD( "2716-3.bin",  0x0800, 0x0800, CRC(f4038373) SHA1(8823b9816fc4ea03b92e08776c13610980f5ea7a) ) // 2716
-	ROM_LOAD( "2716-1.bin",  0x1000, 0x0800, CRC(96842877) SHA1(043ce4ed2628a209ca21cc42516c02366cd9f1fa) ) // 2716
-	ROM_LOAD( "2716-9.bin",  0x1800, 0x0800, CRC(b69f9f71) SHA1(cb781d61a481c493e89605bc0edc6a092d8b4d56) ) // 2716
-	ROM_LOAD( "2716-8.bin",  0x2000, 0x0800, CRC(400cf1bb) SHA1(06c891f7581b0c1036f6845ea847cd20b6f5dedc) ) // 2716
-	ROM_LOAD( "2716-7.bin",  0x2800, 0x0800, CRC(5382f7ed) SHA1(425ec2c2caf404fc8ab13ee38d6567413022e1a1) ) // 2716
-	ROM_LOAD( "2716-6.bin",  0x3000, 0x0800, CRC(c4e63305) SHA1(e03aed5ad89305ffc243cff8ff147ec82419c7bc) ) // 2716
-	ROM_LOAD( "2716-5.bin",  0x3800, 0x0800, CRC(8a4018ae) SHA1(9aba6f4527c59b0b016038236d5a6074e65966f6) ) // 2716
-	ROM_LOAD( "2716-2.bin",  0xc000, 0x0800, CRC(d8bf57e7) SHA1(421a0fa02fccbc52d460fafec6437bd2b7564056) ) // 2716
+	ROM_LOAD( "omc_1-2716.bin",  0x0000, 0x0800, CRC(b5b9fcd9) SHA1(7a134de30041ac18521274f330eb4afe349da2db) )
+	ROM_LOAD( "omc_2-2716.bin",  0x0800, 0x0800, CRC(f4038373) SHA1(8823b9816fc4ea03b92e08776c13610980f5ea7a) )
+	ROM_LOAD( "omc_4-2716.bin",  0x1000, 0x0800, CRC(96842877) SHA1(043ce4ed2628a209ca21cc42516c02366cd9f1fa) )
+	ROM_LOAD( "omc_5-2516.bin",  0x1800, 0x0800, CRC(29873461) SHA1(7d0ee9a82f02163b4cc6a7097e88ae34e96ebf58) )
+	ROM_LOAD( "omc_6-2516.bin",  0x2000, 0x0800, CRC(3f536791) SHA1(e1ba306c4f9063db8d7a9f3d702986d205e480dc) )
+	ROM_LOAD( "omc_7-2516.bin",  0x2800, 0x0800, CRC(5382f7ed) SHA1(425ec2c2caf404fc8ab13ee38d6567413022e1a1) )
+	ROM_LOAD( "omc_8-2716.bin",  0x3000, 0x0800, CRC(e78d0c6d) SHA1(947ac20463384ca0721875954d59ec4ae15b0670) )
+	ROM_LOAD( "omc_9-2516.bin",  0x3800, 0x0800, CRC(8a4018ae) SHA1(9aba6f4527c59b0b016038236d5a6074e65966f6) )
+	ROM_LOAD( "omc_3-2716.bin",  0xc000, 0x0800, CRC(e4cbb827) SHA1(4efa49bd7486b4fa77d7faa130e842f4030f822b) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "2716-10.bin", 0x0000, 0x0800, CRC(2082ad0a) SHA1(c6014d9575e92adf09b0961c2158a779ebe940c4) ) // 2716
-	ROM_LOAD( "2716-11.bin", 0x0800, 0x0800, CRC(1891fc68) SHA1(6d03f5092fd73462c9d81c1a64e39120d9f10aea) ) // 2716
+	ROM_LOAD( "omc_10-2516.bin", 0x0000, 0x0800, CRC(2c51f2f1) SHA1(6a7a7dcedfa1f9f6f1964c7c67f5f766f551a258) )
+	ROM_LOAD( "omc_11-2716.bin", 0x0800, 0x0800, CRC(3029f94f) SHA1(3b432b42e79f8b0a7d65e197f373a04e3c92ff20) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "82s123.bin",  0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) ) // 82s123
+	ROM_LOAD( "omc_27s19.bin",   0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
 ROM_START( theend )
@@ -13206,6 +13249,7 @@ GAME( 1980, streaknga,   streakng, pacmanbl,   streakng,   galaxian_state, init_
 GAME( 1981, pacmanbl,    puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_pacmanbl,   ROT270, "bootleg",                      "Pac-Man (Galaxian hardware, set 1)",                         MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pacmanbla,   puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_pacmanbl,   ROT270, "bootleg",                      "Pac-Man (Galaxian hardware, set 2)",                         MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pacmanblb,   puckman,  pacmanbl,   pacmanblb,  galaxian_state, init_pacmanbl,   ROT90,  "bootleg",                      "Pac-Man (Moon Alien 'AL-10A1' hardware)",                    MACHINE_SUPPORTS_SAVE ) // Doesn't have separate tile / sprite roms, probably should move it
+GAME( 1981, pacmanblc,   puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_pacmanbl,   ROT270, "bootleg (Calfesa)",            "Pac-Man (Calfesa, Spanish bootleg on Galaxian hardware)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )  // same PROM as Moon Cresta, gives very strange colors and sprites get cut
 GAME( 1981, pacmanblv,   puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_pacmanbl,   ROT270, "bootleg (Video Dens)",         "Pac-Man (Video Dens, Spanish bootleg on Galaxian hardware)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, ghostmun,    puckman,  pacmanbl,   streakng,   galaxian_state, init_ghostmun,   ROT90,  "bootleg (Leisure and Allied)", "Ghost Muncher",                                              MACHINE_SUPPORTS_SAVE )
 GAME( 1981, phoenxp2,    phoenix,  galaxian,   phoenxp2,   galaxian_state, init_batman2,    ROT270, "bootleg",                      "Phoenix Part 2",                                             MACHINE_SUPPORTS_SAVE )
@@ -13260,7 +13304,7 @@ GAME( 1981?,spctbird,    mooncrst, mooncrst,   eagle2,     galaxian_state, init_
 GAME( 1980?,smooncrs,    mooncrst, mooncrst,   smooncrs,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Gremlin)",            "Super Moon Cresta (Gremlin, bootleg)",                       MACHINE_SUPPORTS_SAVE ) // Probably a bootleg, still has the 'POR' text in the bottom right corner that the Sonic version has?!
 GAME( 1980, mooncrstso,  mooncrst, mooncrst,   mooncptc,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Sonic)",              "Moon Cresta (SegaSA / Sonic)",                               MACHINE_SUPPORTS_SAVE )
 GAME( 1980?,mooncptc,    mooncrst, mooncrst,   mooncptc,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Petaco S.A.)",        "Moon Cresta (Petaco S.A. Spanish bootleg)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1980?,sirio2,      mooncrst, mooncrst,   mooncptc,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Calfesa S.L.)",       "Sirio II (Calfesa S.L. Spanish Moon Cresta bootleg)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1980?,sirio2,      mooncrst, mooncrst,   mooncptc,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Calfesa S.L.)",       "Sirio II (Calfesa S.L. Spanish Moon Cresta bootleg)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1980?,ataqandr,    mooncrst, mooncrst,   mooncptc,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (FAR S.A.)",           "Ataque Androide - Moon Cresta (FAR S.A. Spanish bootleg)",   MACHINE_SUPPORTS_SAVE )
 // There may be an alternate version called "Star Crest" according to flyers; is it the same?
 GAME( 1980?,sstarcrs,    mooncrst, mooncrst,   mooncrsg,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Taito do Brasil)",    "Super Star Crest",                                       MACHINE_SUPPORTS_SAVE )
@@ -13347,19 +13391,20 @@ GAME( 1981, turpin,      turtles,  turtles,    turpin,     galaxian_state, init_
 GAME( 1981, 600,         turtles,  turtles,    turtles,    galaxian_state, init_turtles,    ROT90,  "Konami",                             "600",                                                            MACHINE_SUPPORTS_SAVE )
 GAME( 1981, turpins,     turtles,  turpins,    turtles,    galaxian_state, init_turtles,    ROT90,  "bootleg",                            "Turpin (bootleg on Super Cobra hardware)",                       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // needs different sound timer
 
-GAME( 1982, amidar,      0,        turtles,    amidaru,    galaxian_state, init_turtles,    ROT90,  "Konami",                             "Amidar",                                                          MACHINE_SUPPORTS_SAVE )
-GAME( 1981, amidar1,     amidar,   turtles,    amidar,     galaxian_state, init_turtles,    ROT90,  "Konami",                             "Amidar (older)",                                                  MACHINE_SUPPORTS_SAVE )
-GAME( 1982, amidaru,     amidar,   turtles,    amidaru,    galaxian_state, init_turtles,    ROT90,  "Konami (Stern Electronics license)", "Amidar (Stern Electronics)",                                      MACHINE_SUPPORTS_SAVE )
-GAME( 1982, amidaro,     amidar,   turtles,    amidaro,    galaxian_state, init_turtles,    ROT90,  "Konami (Olympia license)",           "Amidar (Olympia)",                                                MACHINE_SUPPORTS_SAVE )
-GAME( 1982, amidarb,     amidar,   turtles,    amidaru,    galaxian_state, init_turtles,    ROT90,  "bootleg",                            "Amidar (bootleg)",                                                MACHINE_SUPPORTS_SAVE ) // Similar to Amigo bootleg
-GAME( 1982, amigo,       amidar,   turtles,    amidaru,    galaxian_state, init_turtles,    ROT90,  "bootleg",                            "Amigo (bootleg of Amidar, set 1)",                                MACHINE_SUPPORTS_SAVE )
-GAME( 1982, amigo2,      amidar,   amigo2,     amidaru,    galaxian_state, init_amigo2,     ROT90,  "bootleg",                            "Amigo (bootleg of Amidar, set 2)",                                MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // sound timer might be different?
-GAME( 1982, amidars,     amidar,   scramble,   amidars,    galaxian_state, init_scramble,   ROT90,  "Konami",                             "Amidar (Scramble hardware)",                                      MACHINE_SUPPORTS_SAVE )
-GAME( 1982, mandinga,    amidar,   scramble,   amidars,    galaxian_state, init_mandinga,   ROT90,  "bootleg (Artemi)",                   "Mandinga (Artemi bootleg of Amidar)",                             MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // color PROM needs bitswap<8> on addressing, reference: http://www.youtube.com/watch?v=6uGK4AZxV2U
-GAME( 1982, mandingaeg,  amidar,   scramble,   amidars,    galaxian_state, init_mandingaeg, ROT90,  "bootleg (Electrogame S.A.)",         "Mandinga (Electrogame S.A. bootleg of Amidar)",                   MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, mandingarf,  amidar,   mandingarf, mandingarf, galaxian_state, init_galaxian,   ROT90,  "bootleg (Recreativos Franco S.A.)",  "Mandanga (bootleg of Mandinga on Galaxian hardware, set 1)",      MACHINE_NO_COCKTAIL | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // assume same issue as mandinga
-GAME( 1982, olmandingo,  amidar,   mandingarf, olmandingo, galaxian_state, init_galaxian,   ROT90,  "bootleg",                            "Olivmandingo (Spanish bootleg of Mandinga on Galaxian hardware)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, mandingac,   amidar,   mandingarf, mandingarf, galaxian_state, init_galaxian,   ROT90,  "bootleg (Centromatic)",              "Mandanga (bootleg of Mandinga on Galaxian hardware, set 2)",      MACHINE_NO_COCKTAIL | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // assume same issue as mandinga
+GAME( 1982, amidar,      0,        turtles,    amidaru,    galaxian_state, init_turtles,    ROT90,  "Konami",                             "Amidar",                                                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1981, amidar1,     amidar,   turtles,    amidar,     galaxian_state, init_turtles,    ROT90,  "Konami",                             "Amidar (older)",                                                         MACHINE_SUPPORTS_SAVE )
+GAME( 1982, amidaru,     amidar,   turtles,    amidaru,    galaxian_state, init_turtles,    ROT90,  "Konami (Stern Electronics license)", "Amidar (Stern Electronics)",                                             MACHINE_SUPPORTS_SAVE )
+GAME( 1982, amidaro,     amidar,   turtles,    amidaro,    galaxian_state, init_turtles,    ROT90,  "Konami (Olympia license)",           "Amidar (Olympia)",                                                       MACHINE_SUPPORTS_SAVE )
+GAME( 1982, amidarb,     amidar,   turtles,    amidaru,    galaxian_state, init_turtles,    ROT90,  "bootleg",                            "Amidar (bootleg)",                                                       MACHINE_SUPPORTS_SAVE ) // Similar to Amigo bootleg
+GAME( 1982, amigo,       amidar,   turtles,    amidaru,    galaxian_state, init_turtles,    ROT90,  "bootleg",                            "Amigo (bootleg of Amidar, set 1)",                                       MACHINE_SUPPORTS_SAVE )
+GAME( 1982, amigo2,      amidar,   amigo2,     amidaru,    galaxian_state, init_amigo2,     ROT90,  "bootleg",                            "Amigo (bootleg of Amidar, set 2)",                                       MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // sound timer might be different?
+GAME( 1982, amidars,     amidar,   scramble,   amidars,    galaxian_state, init_scramble,   ROT90,  "Konami",                             "Amidar (Scramble hardware)",                                             MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mandinga,    amidar,   scramble,   amidars,    galaxian_state, init_mandinga,   ROT90,  "bootleg (Artemi)",                   "Mandinga (Artemi bootleg of Amidar)",                                    MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // color PROM needs bitswap<8> on addressing, reference: http://www.youtube.com/watch?v=6uGK4AZxV2U
+GAME( 1982, mandingaeg,  amidar,   scramble,   amidars,    galaxian_state, init_mandingaeg, ROT90,  "bootleg (Electrogame S.A.)",         "Mandinga (Electrogame S.A. bootleg of Amidar)",                          MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mandingarf,  amidar,   mandingarf, mandingarf, galaxian_state, init_galaxian,   ROT90,  "bootleg (Recreativos Franco S.A.)",  "Mandanga (bootleg of Mandinga on Galaxian hardware, set 1)",             MACHINE_NO_COCKTAIL | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // assume same issue as mandinga
+GAME( 1982, mandingac,   amidar,   mandingarf, mandingarf, galaxian_state, init_galaxian,   ROT90,  "bootleg (Centromatic)",              "Mandanga (bootleg of Mandinga on Galaxian hardware, set 2)",             MACHINE_NO_COCKTAIL | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // assume same issue as mandinga
+GAME( 1982, olmandingo,  amidar,   mandingarf, olmandingo, galaxian_state, init_galaxian,   ROT90,  "bootleg",                            "Olivmandingo (Spanish bootleg of Mandinga on Galaxian hardware, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, olmandingc,  amidar,   mandingarf, olmandingo, galaxian_state, init_galaxian,   ROT90,  "bootleg (Calfesa)",                  "Olivmandingo (Spanish bootleg of Mandinga on Galaxian hardware, set 2)", MACHINE_SUPPORTS_SAVE )
 
 // The End/Scramble based hardware
 GAME( 1980, theend,      0,        theend,     theend,     galaxian_state, init_theend,     ROT90,  "Konami",                             "The End",                       MACHINE_SUPPORTS_SAVE )

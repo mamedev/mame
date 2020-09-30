@@ -1747,7 +1747,7 @@ void pokemini_state::device_timer(emu_timer &timer, device_timer_id id, int para
 }
 
 
-static const int16_t speaker_levels[] = {-32768, 0, 32767};
+static const double speaker_levels[] = {-1.0, 0.0, 1.0};
 
 void pokemini_state::video_start()
 {

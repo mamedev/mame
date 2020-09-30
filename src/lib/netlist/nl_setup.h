@@ -8,18 +8,13 @@
 #ifndef NLSETUP_H_
 #define NLSETUP_H_
 
-#define NL_AUTO_DEVICES 0
-
 #include "plib/ppreprocessor.h"
+#include "plib/psource.h"
 #include "plib/pstream.h"
 #include "plib/pstring.h"
-#include "plib/putil.h"
 
 #include "nl_config.h"
 #include "nltypes.h"
-#include "nl_parser.h"
-// FIXME: avoid including factory
-//#include "nl_factory.h"
 
 #include <initializer_list>
 #include <memory>
@@ -28,7 +23,7 @@
 #include <vector>
 
 //============================================================
-//  MACROS / inline netlist definitions
+//  MACROS - netlist definitions
 //============================================================
 
 #define NET_STR(x) # x
@@ -59,8 +54,8 @@
 #define PARAM(name, val)                                                       \
 		setup.register_param(NET_STR(name), NET_STR(val));
 
-#define DEFPARAM(name, val)                                                       \
-		setup.defparam(NET_STR(name), NET_STR(val));
+#define DEFPARAM(name, val)                                                    \
+		setup.register_defparam(NET_STR(name), NET_STR(val));
 
 #define HINT(name, val)                                                        \
 		setup.register_hint(# name , ".HINT_" # val);
@@ -84,18 +79,20 @@ void NETLIST_NAME(name)(netlist::nlparse_t &setup)                             \
 		setup.register_source_proc(# name, &NETLIST_NAME(name));
 
 #define EXTERNAL_SOURCE(name)                                                  \
+		NETLIST_EXTERNAL(name)                                                 \
 		setup.register_source_proc(# name, &NETLIST_NAME(name));
 
-// FIXME: Need to pass in parameter definition
-#define LOCAL_LIB_ENTRY_1(name)                                                \
-		LOCAL_SOURCE(name)                                                     \
+#define LOCAL_LIB_ENTRY_2(type, name)                                          \
+		type ## _SOURCE(name)                                                  \
 		setup.register_lib_entry(# name, "", PSOURCELOC());
 
-#define LOCAL_LIB_ENTRY_2(name, param_spec)                                    \
-		LOCAL_SOURCE(name)                                                     \
+#define LOCAL_LIB_ENTRY_3(type, name, param_spec)                              \
+		type ## _SOURCE(name)                                                  \
 		setup.register_lib_entry(# name, param_spec, PSOURCELOC());
 
-#define LOCAL_LIB_ENTRY(...) PCALLVARARG(LOCAL_LIB_ENTRY_, __VA_ARGS__)
+#define LOCAL_LIB_ENTRY(...) PCALLVARARG(LOCAL_LIB_ENTRY_, LOCAL, __VA_ARGS__)
+
+#define EXTERNAL_LIB_ENTRY(...) PCALLVARARG(LOCAL_LIB_ENTRY_, EXTERNAL, __VA_ARGS__)
 
 #define INCLUDE(name)                                                          \
 		setup.include(# name);
@@ -113,7 +110,7 @@ void NETLIST_NAME(name)(netlist::nlparse_t &setup)                             \
 // -----------------------------------------------------------------------------
 
 #define TRUTHTABLE_START(cname, in, out, pdef_params)                          \
-	{ \
+	NETLIST_START(cname) \
 		netlist::tt_desc desc;                                                 \
 		desc.name = #cname ;                                                   \
 		desc.ni = in;                                                          \
@@ -133,7 +130,11 @@ void NETLIST_NAME(name)(netlist::nlparse_t &setup)                             \
 
 #define TRUTHTABLE_END() \
 		setup.truthtable_create(desc, def_params, std::move(sloc)); \
-	}
+	NETLIST_END()
+
+#define TRUTHTABLE_ENTRY(name)                                                 \
+	LOCAL_SOURCE(name)                                                         \
+	INCLUDE(name)
 
 namespace netlist
 {
@@ -190,13 +191,15 @@ namespace netlist
 		void register_link_fqn(const pstring &sin, const pstring &sout);
 
 		void register_param(const pstring &param, const pstring &value);
-		void register_param(const pstring &param, nl_fptype value);
+
+		// DEFPARAM support
+		void register_defparam(const pstring &name, const pstring &def);
 
 		template <typename T>
 		std::enable_if_t<plib::is_arithmetic<T>::value>
-		register_param_val(const pstring &param, T value)
+		register_param(const pstring &param, T value)
 		{
-			register_param(param, plib::narrow_cast<nl_fptype>(value));
+			register_param_fp(param, plib::narrow_cast<nl_fptype>(value));
 		}
 
 		void register_lib_entry(const pstring &name, const pstring &def_params, plib::source_location &&loc);
@@ -207,41 +210,30 @@ namespace netlist
 		template <typename S, typename... Args>
 		void register_source(Args&&... args)
 		{
-			static_assert(std::is_base_of<plib::psource_t, S>::value, "S must inherit from plib::psource_t");
-
-			auto src(std::make_unique<S>(std::forward<Args>(args)...));
-			m_sources.add_source(std::move(src));
+			m_sources.add_source<S>(std::forward<Args>(args)...);
 		}
 
 		void register_source_proc(const pstring &name, nlsetup_func func);
 
 		void truthtable_create(tt_desc &desc, const pstring &def_params, plib::source_location &&loc);
 
-		// handle namespace
-
-		void namespace_push(const pstring &aname);
-		void namespace_pop();
-		pstring namespace_prefix() const;
-		pstring build_fqn(const pstring &obj_name) const;
-
 		// include other files
 
 		void include(const pstring &netlist_name);
 
-		// used from netlist.cpp (mame)
-		bool device_exists(const pstring &name) const;
+		// handle namespace
+
+		void namespace_push(const pstring &aname);
+		void namespace_pop();
 
 		// FIXME: used by source_t - need a different approach at some time
-		bool parse_stream(plib::psource_t::stream_ptr &&istrm, const pstring &name);
-		bool parse_tokens(const parser_t::token_store &tokens, const pstring &name);
+		bool parse_stream(plib::istream_uptr &&istrm, const pstring &name);
+		bool parse_tokens(const plib::detail::token_store &tokens, const pstring &name);
 
 		template <typename S, typename... Args>
 		void add_include(Args&&... args)
 		{
-			static_assert(std::is_base_of<plib::psource_t, S>::value, "S must inherit from plib::psource_t");
-
-			auto src(std::make_unique<S>(std::forward<Args>(args)...));
-			m_includes.add_source(std::move(src));
+			m_includes.add_source<S>(std::forward<Args>(args)...);
 		}
 
 		void add_define(const pstring &def, const pstring &val)
@@ -250,9 +242,6 @@ namespace netlist
 		}
 
 		void add_define(const pstring &defstr);
-
-		// DEFPARAM support
-		void defparam(const pstring &name, const pstring &def);
 
 		// register a list of logs
 		void register_dynamic_log_devices(const std::vector<pstring> &loglist);
@@ -263,26 +252,27 @@ namespace netlist
 		log_type &log() noexcept { return m_log; }
 		const log_type &log() const noexcept { return m_log; }
 
-		plib::psource_t::stream_ptr get_data_stream(const pstring &name);
+		plib::istream_uptr get_data_stream(const pstring &name);
 
 	private:
+		pstring namespace_prefix() const;
+		pstring build_fqn(const pstring &obj_name) const;
+		void register_param_fp(const pstring &param, nl_fptype value);
+		bool device_exists(const pstring &name) const;
+
 		// FIXME: stale? - remove later
 		void remove_connections(const pstring &pin);
 
 		plib::ppreprocessor::defines_map_type       m_defines;
-		plib::psource_collection_t<>                m_includes;
+		plib::psource_collection_t                  m_includes;
 		std::stack<pstring>                         m_namespace_stack;
-		plib::psource_collection_t<>                m_sources;
+		plib::psource_collection_t                  m_sources;
 		detail::abstract_t &                        m_abstract;
 
-		std::unordered_map<pstring, parser_t::token_store>    m_source_cache;
+		//std::unordered_map<pstring, parser_t::token_store>    m_source_cache;
 		log_type &m_log;
 		unsigned m_frontier_cnt;
 	};
-
-	// -----------------------------------------------------------------------------
-	// inline implementations
-	// -----------------------------------------------------------------------------
 
 } // namespace netlist
 

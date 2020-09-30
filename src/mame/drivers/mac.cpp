@@ -18,7 +18,6 @@
         0xf00000 - 0xffffef     ??? (the ROM appears to be accessing here)
         0xfffff0 - 0xffffff     Auto Vector
 
-
     Interrupts:
         M68K:
             Level 1 from VIA
@@ -41,6 +40,14 @@
           'g 6802c73c' to get to the interesting part (wait past the boot chime).  PPC register r24 is the 68000 PC.
           when the PC hits GetCPUID, the move.l (a2), d0 at PC = 0x10000 will cause an MMU fault (jump to 0xFFF00300).  why?
           a2 = 0x5ffffffc (the CPU ID register).  MMU is unable to resolve this; defect in the MMU emulation probable.
+
+    TODO:
+        - SE and Classic to own driver
+        - Portable and PowerBook 100 to own driver
+        - Remaining PowerBooks to own driver
+        - Quadra 700 to own driver
+        - V8 and friends to own driver
+        - LC3 / LC520 / IIvx / IIvi to own driver
 
 ****************************************************************************/
 
@@ -80,9 +87,6 @@
 #include "bus/nubus/pds30_sigmalview.h"
 #include "bus/nubus/pds30_30hr.h"
 #include "bus/nubus/pds30_mc30.h"
-
-// 68000 PDS cards
-#include "bus/macpds/pds_tpdfpd.h"
 
 #include "machine/macadb.h"
 #include "softlist.h"
@@ -575,35 +579,6 @@ void mac_state::mac_5396_w(offs_t offset, uint8_t data)
     ADDRESS MAPS
 ***************************************************************************/
 
-void mac_state::mac512ke_map(address_map &map)
-{
-	map(0x800000, 0x9fffff).r(FUNC(mac_state::mac_scc_r));
-	map(0xa00000, 0xbfffff).w(FUNC(mac_state::mac_scc_w));
-	map(0xc00000, 0xdfffff).rw(FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w));
-	map(0xe80000, 0xefffff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w));
-	map(0xfffff0, 0xffffff).rw(FUNC(mac_state::mac_autovector_r), FUNC(mac_state::mac_autovector_w));
-}
-
-void mac_state::macplus_map(address_map &map)
-{
-	map(0x580000, 0x5fffff).rw(FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macplus_scsi_w));
-	map(0x800000, 0x9fffff).r(FUNC(mac_state::mac_scc_r));
-	map(0xa00000, 0xbfffff).w(FUNC(mac_state::mac_scc_w));
-	map(0xc00000, 0xdfffff).rw(FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w));
-	map(0xe80000, 0xefffff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w));
-	map(0xfffff0, 0xffffff).rw(FUNC(mac_state::mac_autovector_r), FUNC(mac_state::mac_autovector_w));
-}
-
-void mac_state::macse_map(address_map &map)
-{
-	map(0x580000, 0x5fffff).rw(FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macplus_scsi_w));
-	map(0x900000, 0x9fffff).r(FUNC(mac_state::mac_scc_r));
-	map(0xb00000, 0xbfffff).w(FUNC(mac_state::mac_scc_w));
-	map(0xd00000, 0xdfffff).rw(FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w));
-	map(0xe80000, 0xefffff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w));
-	map(0xfffff0, 0xffffff).rw(FUNC(mac_state::mac_autovector_r), FUNC(mac_state::mac_autovector_w));
-}
-
 void mac_state::macprtb_map(address_map &map)
 {
 	map(0x900000, 0x93ffff).rom().region("bootrom", 0).mirror(0x0c0000);
@@ -728,7 +703,7 @@ void mac_state::maciifx_map(address_map &map)
 // ROM detects the "Jaws" ASIC by checking for I/O space mirrored at 0x01000000 boundries
 void mac_state::macpb140_map(address_map &map)
 {
-	map(0x40000000, 0x400fffff).rom().region("bootrom", 0).mirror(0x0ff00000);
+	map(0x40000000, 0x400fffff).r(FUNC(mac_state::rom_switch_r)).mirror(0x0ff00000);
 
 	map(0x50000000, 0x50001fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x01f00000);
 	map(0x50002000, 0x50003fff).rw(FUNC(mac_state::mac_via2_r), FUNC(mac_state::mac_via2_w)).mirror(0x01f00000);
@@ -745,7 +720,7 @@ void mac_state::macpb140_map(address_map &map)
 
 void mac_state::macpb160_map(address_map &map)
 {
-	map(0x40000000, 0x400fffff).rom().region("bootrom", 0).mirror(0x0ff00000);
+	map(0x40000000, 0x400fffff).r(FUNC(mac_state::rom_switch_r)).mirror(0x0ff00000);
 
 	map(0x50f00000, 0x50f01fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w));
 	map(0x50f02000, 0x50f03fff).rw(FUNC(mac_state::mac_via2_r), FUNC(mac_state::mac_via2_w));
@@ -763,7 +738,7 @@ void mac_state::macpb160_map(address_map &map)
 
 void mac_state::macpb165c_map(address_map &map)
 {
-	map(0x40000000, 0x400fffff).rom().region("bootrom", 0).mirror(0x0ff00000);
+	map(0x40000000, 0x400fffff).r(FUNC(mac_state::rom_switch_r)).mirror(0x0ff00000);
 
 	map(0x50f00000, 0x50f01fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w));
 	map(0x50f02000, 0x50f03fff).rw(FUNC(mac_state::mac_via2_r), FUNC(mac_state::mac_via2_w));
@@ -786,7 +761,7 @@ void mac_state::macpb165c_map(address_map &map)
 
 void mac_state::macpd210_map(address_map &map)
 {
-	map(0x40000000, 0x400fffff).rom().region("bootrom", 0).mirror(0x0ff00000);
+	map(0x40000000, 0x400fffff).r(FUNC(mac_state::rom_switch_r)).mirror(0x0ff00000);
 
 	map(0x50f00000, 0x50f01fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w));
 	map(0x50f02000, 0x50f03fff).rw(FUNC(mac_state::mac_via2_r), FUNC(mac_state::mac_via2_w));
@@ -806,7 +781,7 @@ void mac_state::macpd210_map(address_map &map)
 
 void mac_state::quadra700_map(address_map &map)
 {
-	map(0x40000000, 0x400fffff).rom().region("bootrom", 0).mirror(0x0ff00000);
+	map(0x40000000, 0x400fffff).r(FUNC(mac_state::rom_switch_r)).mirror(0x0ff00000);
 
 	map(0x50000000, 0x50001fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00fc0000);
 	map(0x50002000, 0x50003fff).rw(FUNC(mac_state::mac_via2_r), FUNC(mac_state::mac_via2_w)).mirror(0x00fc0000);
@@ -895,11 +870,6 @@ static void mac_pds030_cards(device_slot_interface &device)
 	device.option_add("mc30",  PDS030_XCEEDMC30);   // Micron/XCEED Technology MacroColor 30
 }
 
-static void mac_sepds_cards(device_slot_interface &device)
-{
-	device.option_add("radiusfpd", PDS_SEDISPLAY);  // Radius Full Page Display card for SE
-}
-
 static void mac_lcpds_cards(device_slot_interface &device)
 {
 }
@@ -973,9 +943,11 @@ void mac_state::add_egret(machine_config &config, int type)
 {
 	EGRET(config, m_egret, type);
 	m_egret->reset_callback().set(FUNC(mac_state::cuda_reset_w));
-	m_egret->linechange_callback().set(FUNC(mac_state::adb_linechange_w));
+	m_egret->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
 	m_egret->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
 	m_egret->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
+	m_macadb->set_mcu_mode(true);
+	m_macadb->adb_data_callback().set(m_egret, FUNC(egret_device::set_adb_line));
 	config.set_perfect_quantum(m_maincpu);
 }
 
@@ -983,9 +955,12 @@ void mac_state::add_cuda(machine_config &config, int type)
 {
 	CUDA(config, m_cuda, type);
 	m_cuda->reset_callback().set(FUNC(mac_state::cuda_reset_w));
-	m_cuda->linechange_callback().set(FUNC(mac_state::adb_linechange_w));
+	m_cuda->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
 	m_cuda->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
 	m_cuda->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
+	m_macadb->set_mcu_mode(true);
+	m_macadb->adb_data_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
+	config.set_perfect_quantum(m_maincpu);
 }
 
 void mac_state::add_asc(machine_config &config, asc_device::asc_type type)
@@ -1027,61 +1002,6 @@ void mac_state::add_pb1xx_vias(machine_config &config)
 	m_via2->irq_handler().set(FUNC(mac_state::mac_via2_irq));
 }
 
-void mac_state::mac512ke_base(machine_config &config)
-{
-	M68000(config, m_maincpu, C7M);       /* 7.8336 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::mac512ke_map);
-	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
-	config.set_maximum_quantum(attotime::from_hz(60));
-
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(C7M*2, MAC_H_TOTAL, 0, MAC_H_VIS, MAC_V_TOTAL, 0, MAC_V_VIS);
-	m_screen->set_screen_update(FUNC(mac_state::screen_update_mac));
-	m_screen->set_palette(m_palette);
-
-	PALETTE(config, m_palette, palette_device::MONOCHROME_INVERTED);
-
-	MCFG_VIDEO_START_OVERRIDE(mac_state,mac)
-
-	SPEAKER(config, "speaker").front_center();
-	DAC_8BIT_PWM(config, m_dac, 0);
-	m_dac->add_route(ALL_OUTPUTS, "speaker", 0.25); // 2 x ls161
-	voltage_regulator_device &vreg(VOLTAGE_REGULATOR(config, "vref", 0));
-	vreg.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vreg.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-
-	add_base_devices(config, true, false);
-
-	VIA6522(config, m_via1, 1000000);
-	m_via1->readpa_handler().set(FUNC(mac_state::mac_via_in_a));
-	m_via1->readpb_handler().set(FUNC(mac_state::mac_via_in_b));
-	m_via1->writepa_handler().set(FUNC(mac_state::mac_via_out_a));
-	m_via1->writepb_handler().set(FUNC(mac_state::mac_via_out_b));
-	m_via1->irq_handler().set(FUNC(mac_state::mac_via_irq));
-
-	RAM(config, m_ram);
-	m_ram->set_default_size("512K");
-}
-
-void mac_state::mac512ke(machine_config &config)
-{
-	mac512ke_base(config);
-}
-
-void mac_state::add_macplus_additions(machine_config &config)
-{
-	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::macplus_map);
-
-	add_scsi(config);
-
-	/* internal ram */
-	m_ram->set_default_size("4M");
-	m_ram->set_extra_options("1M,2M,2560K,4M");
-
-	// software list
-	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
-}
-
 void mac_state::add_nubus(machine_config &config, bool bank1, bool bank2)
 {
 	nubus_device &nubus(NUBUS(config, "nubus", 0));
@@ -1119,43 +1039,6 @@ template <typename T> void mac_state::add_nubus_pds(machine_config &config, cons
 	NUBUS_SLOT(config, slot_tag, "pds", std::forward<T>(opts), nullptr);
 }
 
-void mac_state::macplus(machine_config &config)
-{
-	mac512ke_base(config);
-	add_macplus_additions(config);
-}
-
-void mac_state::macse(machine_config &config)
-{
-	mac512ke_base(config);
-	add_macplus_additions(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::macse_map);
-
-	m_via1->writepb_handler().set(FUNC(mac_state::mac_via_out_b_bbadb));
-	m_via1->cb2_handler().set(FUNC(mac_state::mac_adb_via_out_cb2));
-
-	/* internal ram */
-	m_ram->set_default_size("4M");
-	m_ram->set_extra_options("2M,2560K,4M");
-
-	MACPDS(config, "sepds", "maincpu");
-	MACPDS_SLOT(config, "pds", "sepds", mac_sepds_cards, nullptr);
-}
-
-void mac_state::macclasc(machine_config &config)
-{
-	mac512ke_base(config);
-	add_macplus_additions(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::macse_map);
-
-	m_via1->writepb_handler().set(FUNC(mac_state::mac_via_out_b_bbadb));
-	m_via1->cb2_handler().set(FUNC(mac_state::mac_adb_via_out_cb2));
-
-	/* internal ram */
-	m_ram->set_default_size("4M");
-	m_ram->set_extra_options("2M,2560K,4M");
-}
-
 void mac_state::macprtb(machine_config &config)
 {
 	/* basic machine hardware */
@@ -1176,6 +1059,10 @@ void mac_state::macprtb(machine_config &config)
 	add_base_devices(config);
 	add_scsi(config);
 	add_asc(config, asc_device::asc_type::ASC);
+
+	MACADB(config, m_macadb, C15M);
+	m_macadb->set_pmu_mode(true);
+	m_macadb->set_pmu_is_via1(true);
 
 	VIA6522(config, m_via1, 783360);
 	m_via1->readpa_handler().set(FUNC(mac_state::mac_via_in_a_pmu));
@@ -1208,6 +1095,11 @@ void mac_state::macii(machine_config &config, bool cpu, asc_device::asc_type asc
 
 	add_via1_adb(config, true);
 	add_via2(config);
+
+	MACADB(config, m_macadb, C15M);
+	m_macadb->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
+	m_macadb->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
+	m_macadb->adb_irq_callback().set(FUNC(mac_state::adb_irq_w));
 
 	RAM(config, m_ram);
 	m_ram->set_default_size("2M");
@@ -1283,7 +1175,9 @@ void mac_state::maclc(machine_config &config, bool cpu, bool egret, asc_device::
 	add_nubus_pds(config, "lcpds", mac_lcpds_cards);
 
 	if (egret)
+	{
 		add_egret(config, EGRET_341S0850);
+	}
 }
 
 void mac_state::maclc2(machine_config &config, bool egret)
@@ -1330,7 +1224,9 @@ void mac_state::maclc3(machine_config &config, bool egret)
 	m_ram->set_extra_options("8M,16M,32M,48M,64M,80M");
 
 	if (egret)
+	{
 		add_egret(config, EGRET_341S0851);
+	}
 }
 
 void mac_state::maclc520(machine_config &config)
@@ -1413,6 +1309,11 @@ void mac_state::macse30(machine_config &config)
 	add_via1_adb(config, false);
 	add_via2(config);
 
+	MACADB(config, m_macadb, C15M);
+	m_macadb->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
+	m_macadb->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
+	m_macadb->adb_irq_callback().set(FUNC(mac_state::adb_irq_w));
+
 	RAM(config, m_ram);
 	m_ram->set_default_size("2M");
 	m_ram->set_extra_options("8M,16M,32M,48M,64M,96M,128M");
@@ -1437,6 +1338,9 @@ void mac_state::macpb140(machine_config &config)
 	add_scsi(config);
 	add_base_devices(config, false, true);
 	add_pb1xx_vias(config);
+
+	MACADB(config, m_macadb, C15M);
+	m_macadb->set_pmu_mode(true);
 
 	RAM(config, m_ram);
 	m_ram->set_default_size("2M");
@@ -1482,6 +1386,9 @@ void mac_state::macpb160(machine_config &config)
 	add_scsi(config);
 	add_base_devices(config, false, true);
 	add_pb1xx_vias(config);
+
+	MACADB(config, m_macadb, C15M);
+	m_macadb->set_pmu_mode(true);
 
 	RAM(config, m_ram);
 	m_ram->set_default_size("4M");
@@ -1626,6 +1533,7 @@ void mac_state::pwrmac(machine_config &config)
 	m_ram->set_default_size("8M");
 	m_ram->set_extra_options("16M,32M,64M,128M");
 
+	MACADB(config, m_macadb, C15M);
 	add_cuda(config, CUDA_341S0060);
 }
 
@@ -1660,6 +1568,11 @@ void mac_state::macqd700(machine_config &config)
 
 	add_via2(config);
 
+	MACADB(config, m_macadb, C15M);
+	m_macadb->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
+	m_macadb->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
+	m_macadb->adb_irq_callback().set(FUNC(mac_state::adb_irq_w));
+
 	scsi_port_device &scsibus(SCSI_PORT(config, "scsi"));
 	scsibus.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_6));
 	scsibus.set_slot_device(2, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_5));
@@ -1678,127 +1591,9 @@ void mac_state::macqd700(machine_config &config)
 }
 
 static INPUT_PORTS_START( macadb )
-	PORT_START("MOUSE0") /* Mouse - button */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Button") PORT_CODE(MOUSECODE_BUTTON1)
-
-	PORT_START("MOUSE1") /* Mouse - X AXIS */
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
-
-	PORT_START("MOUSE2") /* Mouse - Y AXIS */
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
-
-		/* This handles the standard (not Extended) Apple ADB keyboard, which is similar to the IIgs's */
-	/* main keyboard */
-
-	PORT_START("KEY0")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)             PORT_CHAR('a') PORT_CHAR('A')
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)             PORT_CHAR('s') PORT_CHAR('S')
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D)             PORT_CHAR('d') PORT_CHAR('D')
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F)             PORT_CHAR('f') PORT_CHAR('F')
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_H)             PORT_CHAR('h') PORT_CHAR('H')
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_G)             PORT_CHAR('g') PORT_CHAR('G')
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)             PORT_CHAR('z') PORT_CHAR('Z')
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_X)             PORT_CHAR('x') PORT_CHAR('X')
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_C)             PORT_CHAR('c') PORT_CHAR('C')
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_V)             PORT_CHAR('v') PORT_CHAR('V')
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_UNUSED)    /* extra key on ISO : */
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)             PORT_CHAR('b') PORT_CHAR('B')
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)             PORT_CHAR('q') PORT_CHAR('Q')
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W)             PORT_CHAR('w') PORT_CHAR('W')
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E)             PORT_CHAR('e') PORT_CHAR('E')
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_R)             PORT_CHAR('r') PORT_CHAR('R')
-
-	PORT_START("KEY1")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y)             PORT_CHAR('y') PORT_CHAR('Y')
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_T)             PORT_CHAR('t') PORT_CHAR('T')
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)             PORT_CHAR('1') PORT_CHAR('!')
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)             PORT_CHAR('2') PORT_CHAR('@')
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)             PORT_CHAR('3') PORT_CHAR('#')
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4)             PORT_CHAR('4') PORT_CHAR('$')
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)             PORT_CHAR('6') PORT_CHAR('^')
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)             PORT_CHAR('5') PORT_CHAR('%')
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)        PORT_CHAR('=') PORT_CHAR('+')
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)             PORT_CHAR('9') PORT_CHAR('(')
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)             PORT_CHAR('7') PORT_CHAR('&')
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)         PORT_CHAR('-') PORT_CHAR('_')
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)             PORT_CHAR('8') PORT_CHAR('*')
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)             PORT_CHAR('0') PORT_CHAR(')')
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE)    PORT_CHAR(']') PORT_CHAR('}')
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)             PORT_CHAR('o') PORT_CHAR('O')
-
-	PORT_START("KEY2")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)             PORT_CHAR('u') PORT_CHAR('U')
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)     PORT_CHAR('[') PORT_CHAR('{')
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_I)             PORT_CHAR('i') PORT_CHAR('I')
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)             PORT_CHAR('p') PORT_CHAR('P')
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Return") PORT_CODE(KEYCODE_ENTER) PORT_CHAR('\r')
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)             PORT_CHAR('l') PORT_CHAR('L')
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_J)             PORT_CHAR('j') PORT_CHAR('J')
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE)         PORT_CHAR('\'') PORT_CHAR('"')
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)             PORT_CHAR('k') PORT_CHAR('K')
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)         PORT_CHAR(';') PORT_CHAR(':')
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)     PORT_CHAR('\\') PORT_CHAR('|')
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)         PORT_CHAR(',') PORT_CHAR('<')
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)         PORT_CHAR('/') PORT_CHAR('?')
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)             PORT_CHAR('n') PORT_CHAR('N')
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)             PORT_CHAR('m') PORT_CHAR('M')
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)          PORT_CHAR('.') PORT_CHAR('>')
-
-	PORT_START("KEY3")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_TAB)           PORT_CHAR('\t')
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)         PORT_CHAR(' ')
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE)         PORT_CHAR('`') PORT_CHAR('~')
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE)     PORT_CHAR(8)
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_UNUSED)    /* keyboard Enter : */
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Esc")     PORT_CODE(KEYCODE_ESC)      PORT_CHAR(27)
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Control") PORT_CODE(KEYCODE_LCONTROL)
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Command / Open Apple") PORT_CODE(KEYCODE_RALT)
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Caps Lock") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Option / Solid Apple") PORT_CODE(KEYCODE_LALT)
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left Arrow") PORT_CODE(KEYCODE_LEFT)      PORT_CHAR(UCHAR_MAMEKEY(LEFT))
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right Arrow") PORT_CODE(KEYCODE_RIGHT)    PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Down Arrow") PORT_CODE(KEYCODE_DOWN)      PORT_CHAR(UCHAR_MAMEKEY(DOWN))
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Up Arrow") PORT_CODE(KEYCODE_UP)          PORT_CHAR(UCHAR_MAMEKEY(UP))
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_UNUSED)    /* ??? */
-
-	/* keypad */
-	PORT_START("KEY4")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_UNUSED)    // 0x40
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL_PAD)           PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))   // 0x41
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_UNUSED)    // 0x42
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ASTERISK)          PORT_CHAR(UCHAR_MAMEKEY(ASTERISK))  // 0x43
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_UNUSED)    // 0x44
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_PLUS_PAD)          PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD)) // 0x45
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_UNUSED)    // 0x46
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Keypad Clear") PORT_CODE(/*KEYCODE_NUMLOCK*/KEYCODE_DEL) PORT_CHAR(UCHAR_MAMEKEY(NUMLOCK))    // 0x47
-	PORT_BIT(0x0700, IP_ACTIVE_HIGH, IPT_UNUSED)    // 0x48, 49, 4a
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH_PAD)         PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD)) // 0x4b
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER_PAD)         PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD)) // 0x4c
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_UNUSED)    // 0x4d
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS_PAD)         PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD)) // 0x4e
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_UNUSED)    // 0x4f
-
-	PORT_START("KEY5")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_UNUSED)    // 0x50
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(/*CODE_OTHER*/KEYCODE_NUMLOCK) PORT_CHAR(UCHAR_MAMEKEY(EQUALS_PAD)) // 0x51
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0_PAD)             PORT_CHAR(UCHAR_MAMEKEY(0_PAD)) // 0x52
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1_PAD)             PORT_CHAR(UCHAR_MAMEKEY(1_PAD)) // 0x53
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD)             PORT_CHAR(UCHAR_MAMEKEY(2_PAD)) // 0x54
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3_PAD)             PORT_CHAR(UCHAR_MAMEKEY(3_PAD)) // 0x55
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4_PAD)             PORT_CHAR(UCHAR_MAMEKEY(4_PAD)) // 0x56
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5_PAD)             PORT_CHAR(UCHAR_MAMEKEY(5_PAD)) // 0x57
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6_PAD)             PORT_CHAR(UCHAR_MAMEKEY(6_PAD)) // 0x58
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7_PAD)             PORT_CHAR(UCHAR_MAMEKEY(7_PAD)) // 0x59
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_UNUSED)    // 0x5a
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8_PAD)             PORT_CHAR(UCHAR_MAMEKEY(8_PAD)) // 0x5b
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9_PAD)             PORT_CHAR(UCHAR_MAMEKEY(9_PAD)) // 0x5c
-	PORT_BIT(0xE000, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
 INPUT_PORTS_START( maciici )
-	PORT_INCLUDE(macadb)
-
 	PORT_START("MONTYPE")
 	PORT_CONFNAME(0x0f, 0x06, "Connected monitor")
 	PORT_CONFSETTING( 0x01, "15\" Portrait Display (640x870)")
@@ -1813,22 +1608,6 @@ INPUT_PORTS_END
   The Mac driver uses a convention of placing the BIOS in "bootrom"
 
 ***************************************************************************/
-
-ROM_START( macse )
-	ROM_REGION16_BE(0x40000, "bootrom", 0)
-	ROM_LOAD16_WORD( "macse.rom",  0x00000, 0x40000, CRC(0f7ff80c) SHA1(58532b7d0d49659fd5228ac334a1b094f0241968))
-ROM_END
-
-ROM_START( macsefd )
-	ROM_REGION16_BE(0x40000, "bootrom", 0)
-	ROM_LOAD( "be06e171.rom", 0x000000, 0x040000, CRC(f530cb10) SHA1(d3670a90273d12e53d86d1228c068cb660b8c9d1) )
-ROM_END
-
-ROM_START( macclasc )
-	ROM_REGION16_BE(0x80000, "bootrom", 0) // a49f9914, second half of chip dump is the 6.0.3 XO rom disk
-	// this dump is big endian
-	ROM_LOAD( "341-0813__=c=1983-90_apple__japan__910d_d.27c4096_be.ue1", 0x000000, 0x080000, CRC(510d7d38) SHA1(ccd10904ddc0fb6a1d216b2e9effd5ec6cf5a83d) )
-ROM_END
 
 ROM_START( maclc )
 	ROM_REGION32_BE(0x100000, "bootrom", 0)
@@ -2028,8 +1807,6 @@ ROM_START( maclc520 )
 ROM_END
 
 /*    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT    CLASS      INIT                COMPANY           FULLNAME */
-COMP( 1987, macse,     0,        0,      macse,    macadb,  mac_state, init_macse,         "Apple Computer", "Macintosh SE",  MACHINE_NOT_WORKING )
-COMP( 1987, macsefd,   0,        0,      macse,    macadb,  mac_state, init_macse,         "Apple Computer", "Macintosh SE (FDHD)",  MACHINE_NOT_WORKING )
 COMP( 1987, macii,     0,        0,      macii,    macadb,  mac_state, init_macii,         "Apple Computer", "Macintosh II",  MACHINE_NOT_WORKING )
 COMP( 1987, maciihmu,  macii,    0,      maciihmu, macadb,  mac_state, init_macii,         "Apple Computer", "Macintosh II (w/o 68851 MMU)", MACHINE_NOT_WORKING )
 COMP( 1988, mac2fdhd,  0,        0,      macii,    macadb,  mac_state, init_maciifdhd,     "Apple Computer", "Macintosh II (FDHD)",  MACHINE_NOT_WORKING )
@@ -2039,7 +1816,6 @@ COMP( 1989, macse30,   mac2fdhd, 0,      macse30,  macadb,  mac_state, init_macs
 COMP( 1989, maciicx,   mac2fdhd, 0,      maciicx,  macadb,  mac_state, init_maciicx,       "Apple Computer", "Macintosh IIcx",  MACHINE_NOT_WORKING )
 COMP( 1989, maciici,   0,        0,      maciici,  maciici, mac_state, init_maciici,       "Apple Computer", "Macintosh IIci", MACHINE_NOT_WORKING )
 COMP( 1990, maciifx,   0,        0,      maciifx,  macadb,  mac_state, init_maciifx,       "Apple Computer", "Macintosh IIfx",  MACHINE_NOT_WORKING )
-COMP( 1990, macclasc,  0,        0,      macclasc, macadb,  mac_state, init_macclassic,    "Apple Computer", "Macintosh Classic",  MACHINE_NOT_WORKING )
 COMP( 1990, maclc,     0,        0,      maclc,    maciici, mac_state, init_maclc,         "Apple Computer", "Macintosh LC", MACHINE_IMPERFECT_SOUND )
 COMP( 1990, maciisi,   0,        0,      maciisi,  maciici, mac_state, init_maciisi,       "Apple Computer", "Macintosh IIsi", MACHINE_NOT_WORKING )
 COMP( 1991, macpb100,  0,        0,      macprtb,  macadb,  mac_state, init_macprtb,       "Apple Computer", "Macintosh PowerBook 100", MACHINE_NOT_WORKING )

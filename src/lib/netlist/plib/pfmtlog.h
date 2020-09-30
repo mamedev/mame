@@ -9,8 +9,10 @@
 #define PFMTLOG_H_
 
 #include "penum.h"
+#include "ppmf.h"
 #include "pstring.h"
 #include "ptypes.h"
+#include "pgsl.h"
 
 #include <limits>
 #include <locale>
@@ -39,7 +41,7 @@ namespace plib {
 	{
 		static constexpr const bool is_signed = std::numeric_limits<T>::is_signed;
 		static char32_t fmt_spec() { return 'u'; }
-		static inline void streamify(std::ostream &s, const T &v)
+		static void streamify(std::ostream &s, const T &v)
 		{
 			s << v;
 		}
@@ -52,7 +54,7 @@ namespace plib {
 		// FIXME: need native support at some time
 		static constexpr const bool is_signed = true;
 		static char32_t fmt_spec() { return 'f'; }
-		static inline void streamify(std::ostream &s, const FLOAT128 &v)
+		static void streamify(std::ostream &s, const FLOAT128 &v)
 		{
 			s << narrow_cast<long double>(v);
 		}
@@ -61,6 +63,19 @@ namespace plib {
 
 	template <typename T>
 	struct ptype_traits;
+
+	template<>
+	struct ptype_traits<compile_info::int128_type>
+	{
+		// FIXME: need native support at some time
+		static constexpr const bool is_signed = true;
+		static char32_t fmt_spec() { return 'd'; }
+		template <typename T, typename = std::enable_if_t<plib::is_arithmetic<T>::value>>
+		static void streamify(std::ostream &s, const T &v)
+		{
+			s << narrow_cast<long long>(v);
+		}
+	};
 
 	template<>
 	struct ptype_traits<bool> : ptype_traits_base<bool>
@@ -159,6 +174,7 @@ namespace plib {
 	};
 	#endif
 
+
 	template<>
 	struct ptype_traits<char *> : ptype_traits_base<char *>
 	{
@@ -172,9 +188,47 @@ namespace plib {
 	};
 
 	template<>
+	struct ptype_traits<const char16_t *> : ptype_traits_base<const char16_t *>
+	{
+		static char32_t fmt_spec() { return 's'; }
+		static void streamify(std::ostream &s, const char16_t *v)
+		{
+			const putf16string su16(v);
+			s << putf8string(su16).c_str();
+		}
+	};
+
+	template<>
+	struct ptype_traits<const char32_t *> : ptype_traits_base<const char32_t *>
+	{
+		static char32_t fmt_spec() { return 's'; }
+		static void streamify(std::ostream &s, const char32_t *v)
+		{
+			const putf32string su32(v);
+			s << putf8string(su32).c_str();
+		}
+	};
+
+	template<>
 	struct ptype_traits<std::string> : ptype_traits_base<std::string>
 	{
 		static char32_t fmt_spec() { return 's'; }
+	};
+
+	template<>
+	struct ptype_traits<putf8string> : ptype_traits_base<putf8string>
+	{
+		static char32_t fmt_spec() { return 's'; }
+	};
+
+	template<>
+	struct ptype_traits<putf16string> : ptype_traits_base<putf16string>
+	{
+		static char32_t fmt_spec() { return 's'; }
+		static void streamify(std::ostream &s, const putf16string &v)
+		{
+			s << putf8string(v).c_str();
+		}
 	};
 
 	template<>
@@ -255,7 +309,7 @@ namespace plib {
 
 		friend std::ostream& operator<<(std::ostream &ostrm, const pfmt &fmt)
 		{
-			ostrm << fmt.m_str;
+			ostrm << putf8string(fmt.m_str);
 			return ostrm;
 		}
 
@@ -290,7 +344,7 @@ namespace plib {
 				if (ret.ret>=0)
 				{
 					ptype_traits<typename std::decay<T>::type>::streamify(strm, std::forward<T>(v));
-					const pstring ps(strm.str());
+					const pstring ps(putf8string(strm.str()));
 					m_str = m_str.substr(0, ret.p) + ps + m_str.substr(ret.p + ret.sl);
 				}
 			} while (ret.ret == 1);
@@ -358,12 +412,16 @@ namespace plib {
 
 	};
 
-	template <class T, plog_level::E L, bool build_enabled = true>
-	class plog_channel : public pfmt_writer_t<plog_channel<T, L, build_enabled>, build_enabled>
+	using plog_delegate = plib::pmfp<void, plog_level, const pstring &>;
+
+	template <plog_level::E L, bool build_enabled = true>
+	class plog_channel : public pfmt_writer_t<plog_channel<L, build_enabled>, build_enabled>
 	{
-		friend class pfmt_writer_t<plog_channel<T, L, build_enabled>, build_enabled>;
+		friend class pfmt_writer_t<plog_channel<L, build_enabled>, build_enabled>;
 	public:
-		explicit plog_channel(T &b) : pfmt_writer_t<plog_channel, build_enabled>(), m_base(b) { }
+		explicit plog_channel(plog_delegate logger)
+		: pfmt_writer_t<plog_channel, build_enabled>()
+		, m_logger(logger) { }
 
 		PCOPYASSIGNMOVE(plog_channel, delete)
 
@@ -372,36 +430,36 @@ namespace plib {
 	protected:
 		void vdowrite(const pstring &ls) const noexcept
 		{
-			m_base.vlog(L, ls);
+			m_logger(L, ls);
 		}
 
 	private:
-		T &m_base;
+		plog_delegate m_logger;
 	};
 
-	template<class T, bool debug_enabled>
+	template<bool debug_enabled>
 	class plog_base
 	{
 	public:
 
-		explicit plog_base(T &proxy)
-		: debug(proxy),
-			info(proxy),
-			verbose(proxy),
-			warning(proxy),
-			error(proxy),
-			fatal(proxy)
+		explicit plog_base(plog_delegate logger)
+		: debug(logger),
+			info(logger),
+			verbose(logger),
+			warning(logger),
+			error(logger),
+			fatal(logger)
 		{}
 
 		PCOPYASSIGNMOVE(plog_base, default)
 		virtual ~plog_base() noexcept = default;
 
-		plog_channel<T, plog_level::DEBUG, debug_enabled> debug;
-		plog_channel<T, plog_level::INFO> info;
-		plog_channel<T, plog_level::VERBOSE> verbose;
-		plog_channel<T, plog_level::WARNING> warning;
-		plog_channel<T, plog_level::ERROR> error;
-		plog_channel<T, plog_level::FATAL> fatal;
+		plog_channel<plog_level::DEBUG, debug_enabled> debug;
+		plog_channel<plog_level::INFO> info;
+		plog_channel<plog_level::VERBOSE> verbose;
+		plog_channel<plog_level::WARNING> warning;
+		plog_channel<plog_level::ERROR> error;
+		plog_channel<plog_level::FATAL> fatal;
 	};
 
 	struct perrmsg

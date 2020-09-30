@@ -122,9 +122,10 @@ public:
 	// rendering info
 	std::mutex          m_render_lock;
 	render_target *     m_target;
-	int                 m_targetview;
+	unsigned            m_targetview;
 	int                 m_targetorient;
 	render_layer_config m_targetlayerconfig;
+	u32                 m_targetvismask;
 
 	// input info
 	std::chrono::system_clock::time_point  m_lastclicktime;

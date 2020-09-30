@@ -58,18 +58,18 @@ license:CC0
 		<screen index="0">
 			<bounds x="0" y="5" width="32" height="16" />
 		</screen>
-		<bezel element="static_yellow"><bounds x="0" y="0" width="32" height="4" /></bezel>
-		<bezel element="static_yellow"><bounds x="0" y="22" width="32" height="4" /></bezel>
+		<element ref="static_yellow"><bounds x="0" y="0" width="32" height="4" /></element>
+		<element ref="static_yellow"><bounds x="0" y="22" width="32" height="4" /></element>
 
-		<bezel name="0.35" element="ind0"><bounds x="0"  y="1" width="8" height="2" /></bezel>
-		<bezel name="1.35" element="ind1"><bounds x="8"  y="1" width="8" height="2" /></bezel>
-		<bezel name="2.35" element="ind2"><bounds x="16" y="1" width="8" height="2" /></bezel>
-		<bezel name="3.35" element="ind3"><bounds x="24" y="1" width="8" height="2" /></bezel>
+		<element name="0.35" ref="ind0"><bounds x="0"  y="1" width="8" height="2" /></element>
+		<element name="1.35" ref="ind1"><bounds x="8"  y="1" width="8" height="2" /></element>
+		<element name="2.35" ref="ind2"><bounds x="16" y="1" width="8" height="2" /></element>
+		<element name="3.35" ref="ind3"><bounds x="24" y="1" width="8" height="2" /></element>
 
-		<bezel name="12.36" element="ind4"><bounds x="0"  y="23" width="8" height="2" /></bezel>
-		<bezel name="13.36" element="ind5"><bounds x="8"  y="23" width="8" height="2" /></bezel>
-		<bezel name="14.36" element="ind6"><bounds x="16" y="23" width="8" height="2" /></bezel>
-		<bezel name="15.36" element="ind7"><bounds x="24" y="23" width="8" height="2" /></bezel>
+		<element name="12.36" ref="ind4"><bounds x="0"  y="23" width="8" height="2" /></element>
+		<element name="13.36" ref="ind5"><bounds x="8"  y="23" width="8" height="2" /></element>
+		<element name="14.36" ref="ind6"><bounds x="16" y="23" width="8" height="2" /></element>
+		<element name="15.36" ref="ind7"><bounds x="24" y="23" width="8" height="2" /></element>
 
 	</view>
 </mamelayout>

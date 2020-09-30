@@ -150,7 +150,7 @@ void prehisle_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 		uint16_t const attr = spriteram16[offs + 2];
 		uint16_t const code = attr & 0x1fff;
 		uint16_t const color = spriteram16[offs + 3] >> 12;
-		uint32_t const priority = (color < 0x4) ? 0 : GFX_PMASK_1; // correct?
+		uint32_t const priority = GFX_PMASK_4 | ((color < 0x4) ? 0 : GFX_PMASK_2); // correct?
 		bool flipx = attr & 0x4000;
 		bool flipy = attr & 0x8000;
 		int16_t sx = spriteram16[offs + 1] & 0x1ff;
@@ -182,9 +182,9 @@ uint32_t prehisle_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 {
 	screen.priority().fill(0, cliprect);
 
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 1);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 1);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 2);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 4);
 	draw_sprites(screen, bitmap, cliprect);
-	m_tx_tilemap->draw(screen, bitmap, cliprect, 0);
 	return 0;
 }

@@ -11,8 +11,8 @@
 #include "nltypes.h"
 #include "plib/palloc.h"
 #include "plib/pmempool.h"
+#include "plib/psource.h"
 #include "plib/ptypes.h"
-#include "plib/putil.h"
 
 #include <tuple>
 #include <utility>
@@ -181,6 +181,7 @@ namespace factory {
 			return dynamic_cast<device_element_t<C> *>(f) != nullptr;
 		}
 
+		bool exists(const pstring &name) const noexcept;
 	private:
 		log_type &m_log;
 	};

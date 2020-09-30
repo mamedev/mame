@@ -862,7 +862,7 @@ discrete_device::~discrete_device(void)
 void discrete_device::device_start()
 {
 	// create the stream
-	//m_stream = machine().sound().stream_alloc(*this, 0, 2, 22257);
+	//m_stream = stream_alloc(0, 2, 22257);
 
 	const discrete_block *intf_start = m_intf;
 
@@ -988,7 +988,7 @@ void discrete_sound_device::device_start()
 		fatalerror("init_nodes() - Couldn't find an output node\n");
 
 	/* initialize the stream(s) */
-	m_stream = machine().sound().stream_alloc(*this,m_input_stream_list.count(), m_output_list.count(), m_sample_rate);
+	m_stream = stream_alloc(m_input_stream_list.count(), m_output_list.count(), m_sample_rate);
 
 	/* Finalize stream_input_nodes */
 	for_each(discrete_dss_input_stream_node **, node, &m_input_stream_list)
@@ -1064,12 +1064,9 @@ void discrete_device::process(int samples)
 //  our sound stream
 //-------------------------------------------------
 
-void discrete_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void discrete_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	int outputnum = 0;
-
-	if (samples == 0)
-		return;
 
 	/* Setup any output streams */
 	for_each(discrete_sound_output_interface **, node, &m_output_list)
@@ -1081,11 +1078,12 @@ void discrete_sound_device::sound_stream_update(sound_stream &stream, stream_sam
 	/* Setup any input streams */
 	for_each(discrete_dss_input_stream_node **, node, &m_input_stream_list)
 	{
-		(*node)->m_ptr = (stream_sample_t *) inputs[(*node)->m_stream_in_number];
+		(*node)->m_inview = &inputs[(*node)->m_stream_in_number];
+		(*node)->m_inview_sample = 0;
 	}
 
 	/* just process it */
-	process(samples);
+	process(outputs[0].samples());
 }
 
 //-------------------------------------------------

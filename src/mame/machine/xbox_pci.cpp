@@ -125,7 +125,9 @@ void mcpx_isalpc_device::map_extra(uint64_t memory_window_start, uint64_t memory
 mcpx_isalpc_device::mcpx_isalpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subsystem_id)
 	: mcpx_isalpc_device(mconfig, tag, owner, clock)
 {
-	set_ids(0x10de01b2, 0xb4, 0, subsystem_id); // revision id must be at least 0xb4, otherwise usb will require a hub
+	// revision id must be at least 0xb4 in the xbox, otherwise usb will require a hub
+	// in the a7n266-c motherboard it has revision 0xc3
+	set_ids(0x10de01b2, 0xb4, 0x060100, subsystem_id);
 }
 
 mcpx_isalpc_device::mcpx_isalpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -162,7 +164,7 @@ void mcpx_isalpc_device::device_start()
 	add_map(0x00000100, M_IO, FUNC(mcpx_isalpc_device::lpc_io));
 	bank_infos[0].adr = 0x8000;
 	status = 0x00b0;
-	command = 0x0081;
+	command = 0x0001;
 	command_mask = 0x01be;
 	for (int a = 0; a < 16; a++)
 		lpcdevices[a] = nullptr;
@@ -491,6 +493,13 @@ void mcpx_isalpc_device::remap()
 
 DEFINE_DEVICE_TYPE(MCPX_SMBUS, mcpx_smbus_device, "mcpx_smbus", "MCPX SMBus Controller")
 
+void mcpx_smbus_device::config_map(address_map &map)
+{
+	pci_device::config_map(map);
+	map(0x3e, 0x3e).r(FUNC(mcpx_smbus_device::minimum_grant_r));
+	map(0x3f, 0x3f).r(FUNC(mcpx_smbus_device::maximum_latency_r));
+}
+
 void mcpx_smbus_device::smbus_io0(address_map &map)
 {
 	map(0x00000000, 0x0000000f).rw(FUNC(mcpx_smbus_device::smbus0_r), FUNC(mcpx_smbus_device::smbus0_w));
@@ -506,11 +515,16 @@ void mcpx_smbus_device::smbus_io2(address_map &map)
 	map(0x00000000, 0x0000001f).noprw();
 }
 
+mcpx_smbus_device::mcpx_smbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subsystem_id)
+	: mcpx_smbus_device(mconfig, tag, owner, clock)
+{
+	set_ids(0x10de01b4, 0xc1, 0x0c0500, subsystem_id);
+}
+
 mcpx_smbus_device::mcpx_smbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, MCPX_SMBUS, tag, owner, clock),
 	m_interrupt_handler(*this)
 {
-	set_ids(0x10de01b4, 0, 0, 0);
 }
 
 void mcpx_smbus_device::device_start()
@@ -525,6 +539,9 @@ void mcpx_smbus_device::device_start()
 	add_map(0x00000020, M_IO, FUNC(mcpx_smbus_device::smbus_io2));
 	bank_infos[2].adr = 0xc200;
 	status = 0x00b0;
+	command = 0x0001;
+	// Min Grant 3
+	// Max Latency 1
 	intr_pin = 1;
 	memset(&smbusst, 0, sizeof(smbusst));
 	for (int b = 0; b < 2; b++)
@@ -654,9 +671,22 @@ void mcpx_smbus_device::smbus1_w(offs_t offset, uint32_t data, uint32_t mem_mask
 
 DEFINE_DEVICE_TYPE(MCPX_OHCI, mcpx_ohci_device, "mcpx_ohci", "MCPX OHCI USB Controller")
 
+void mcpx_ohci_device::config_map(address_map &map)
+{
+	pci_device::config_map(map);
+	map(0x3e, 0x3e).r(FUNC(mcpx_ohci_device::minimum_grant_r));
+	map(0x3f, 0x3f).r(FUNC(mcpx_ohci_device::maximum_latency_r));
+}
+
 void mcpx_ohci_device::ohci_mmio(address_map &map)
 {
 	map(0x00000000, 0x00000fff).rw(FUNC(mcpx_ohci_device::ohci_r), FUNC(mcpx_ohci_device::ohci_w));
+}
+
+mcpx_ohci_device::mcpx_ohci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subsystem_id)
+	: mcpx_ohci_device(mconfig, tag, owner, clock)
+{
+	set_ids(0x10de01c2, 0xc3, 0x0c0310, subsystem_id);
 }
 
 mcpx_ohci_device::mcpx_ohci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -667,7 +697,6 @@ mcpx_ohci_device::mcpx_ohci_device(const machine_config &mconfig, const char *ta
 	maincpu(*this, ":maincpu"),
 	connecteds_count(0)
 {
-	set_ids(0x10de01c2, 0, 0, 0);
 }
 
 void mcpx_ohci_device::plug_usb_device(int port, device_usb_ohci_function_interface *function)
@@ -683,6 +712,7 @@ void mcpx_ohci_device::device_start()
 	add_map(0x00001000, M_MEM, FUNC(mcpx_ohci_device::ohci_mmio));
 	bank_infos[0].adr = 0xfed00000;
 	status = 0x00b0;
+	command = 0x0002;
 	intr_pin = 1;
 	ohci_usb = new ohci_usb_controller();
 	ohci_usb->set_cpu(maincpu.target());
@@ -810,6 +840,13 @@ void mcpx_eth_device::eth_io_w(uint32_t data)
 
 DEFINE_DEVICE_TYPE(MCPX_APU, mcpx_apu_device, "mcpx_apu", "MCP APU")
 
+void mcpx_apu_device::config_map(address_map &map)
+{
+	pci_device::config_map(map);
+	map(0x3e, 0x3e).r(FUNC(mcpx_apu_device::minimum_grant_r));
+	map(0x3f, 0x3f).r(FUNC(mcpx_apu_device::maximum_latency_r));
+}
+
 void mcpx_apu_device::apu_mmio(address_map &map)
 {
 	map(0x00000000, 0x00007ffff).rw(FUNC(mcpx_apu_device::apu_r), FUNC(mcpx_apu_device::apu_w));
@@ -827,6 +864,7 @@ void mcpx_apu_device::device_start()
 	add_map(0x00080000, M_MEM, FUNC(mcpx_apu_device::apu_mmio));
 	bank_infos[0].adr = 0xfe800000;
 	status = 0x00b0;
+	command = 0x0002;
 	intr_pin = 1;
 	memset(apust.memory, 0, sizeof(apust.memory));
 	memset(apust.voices_heap_blockaddr, 0, sizeof(apust.voices_heap_blockaddr));
@@ -999,6 +1037,13 @@ void mcpx_apu_device::apu_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 DEFINE_DEVICE_TYPE(MCPX_AC97_AUDIO, mcpx_ac97_audio_device, "mcpx_ac97_audio", "MCPX AC'97 Audio Codec Interface")
 
+void mcpx_ac97_audio_device::config_map(address_map &map)
+{
+	pci_device::config_map(map);
+	map(0x3e, 0x3e).r(FUNC(mcpx_ac97_audio_device::minimum_grant_r));
+	map(0x3f, 0x3f).r(FUNC(mcpx_ac97_audio_device::maximum_latency_r));
+}
+
 void mcpx_ac97_audio_device::ac97_mmio(address_map &map)
 {
 	map(0x00000000, 0x000000fff).rw(FUNC(mcpx_ac97_audio_device::ac97_audio_r), FUNC(mcpx_ac97_audio_device::ac97_audio_w));
@@ -1014,10 +1059,15 @@ void mcpx_ac97_audio_device::ac97_io1(address_map &map)
 	map(0x00000000, 0x00000007f).rw(FUNC(mcpx_ac97_audio_device::ac97_audio_io1_r), FUNC(mcpx_ac97_audio_device::ac97_audio_io1_w));
 }
 
+mcpx_ac97_audio_device::mcpx_ac97_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subsystem_id)
+	: mcpx_ac97_audio_device(mconfig, tag, owner, clock)
+{
+	set_ids(0x10de01b1, 0xc2, 0x040100, subsystem_id);
+}
+
 mcpx_ac97_audio_device::mcpx_ac97_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, MCPX_AC97_AUDIO, tag, owner, clock)
 {
-	set_ids(0x10de01b1, 0, 0, 0);
 }
 
 void mcpx_ac97_audio_device::device_start()
@@ -1031,6 +1081,7 @@ void mcpx_ac97_audio_device::device_start()
 	add_map(0x00001000, M_MEM, FUNC(mcpx_ac97_audio_device::ac97_mmio));
 	bank_infos[2].adr = 0xfec00000;
 	status = 0x00b0;
+	command = 0x0003;
 	intr_pin = 1;
 	memset(&ac97st, 0, sizeof(ac97st));
 }
@@ -1127,6 +1178,8 @@ void mcpx_ide_device::config_map(address_map &map)
 {
 	pci_device::config_map(map);
 	map(0x08, 0x0b).rw(FUNC(pci_device::class_rev_r), FUNC(mcpx_ide_device::class_rev_w));
+	map(0x3e, 0x3e).r(FUNC(mcpx_ide_device::minimum_grant_r));
+	map(0x3f, 0x3f).r(FUNC(mcpx_ide_device::maximum_latency_r));
 }
 
 void mcpx_ide_device::ide_pri_command(address_map &map)
@@ -1157,6 +1210,12 @@ void mcpx_ide_device::ide_io(address_map &map)
 	map(0x0008, 0x000f).rw("ide2", FUNC(bus_master_ide_controller_device::bmdma_r), FUNC(bus_master_ide_controller_device::bmdma_w));
 }
 
+mcpx_ide_device::mcpx_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subsystem_id)
+	: mcpx_ide_device(mconfig, tag, owner, clock)
+{
+	set_ids(0x10de01bc, 0xc3, 0x01018a, subsystem_id);
+}
+
 mcpx_ide_device::mcpx_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, MCPX_IDE, tag, owner, clock),
 	m_pri(*this, "ide1"),
@@ -1164,7 +1223,6 @@ mcpx_ide_device::mcpx_ide_device(const machine_config &mconfig, const char *tag,
 	m_pri_interrupt_handler(*this),
 	m_sec_interrupt_handler(*this)
 {
-	set_ids(0x10de01bc, 0, 0x01018a, 0);
 }
 
 void mcpx_ide_device::device_start()
@@ -1177,6 +1235,7 @@ void mcpx_ide_device::device_start()
 	add_map(0x00000010, M_IO, FUNC(mcpx_ide_device::ide_io));
 	bank_infos[4].adr = 0xff60;
 	status = 0x00b0;
+	command = 0x0001;
 	m_pri_interrupt_handler.resolve_safe();
 	m_sec_interrupt_handler.resolve_safe();
 }

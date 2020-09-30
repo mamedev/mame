@@ -27,7 +27,7 @@ protected:
 	virtual void device_reset() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	void start_common(uint8_t _shiftreg_mask, int _active_clock_hi);
 
@@ -41,8 +41,8 @@ protected:
 	uint8_t   m_new_digit;
 	uint8_t   m_shiftreg;
 
-	int16_t   m_curr_sample;
-	int16_t   m_next_sample;
+	stream_buffer::sample_t m_curr_sample;
+	stream_buffer::sample_t m_next_sample;
 
 	uint32_t  m_update_count;
 
@@ -70,7 +70,7 @@ protected:
 	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 };
 
 
@@ -84,7 +84,7 @@ protected:
 	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 };
 
 

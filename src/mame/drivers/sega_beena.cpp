@@ -15,9 +15,67 @@
             Needs the internal BIOS dumped.
             Component list / PCB diagram
 
-    cartridge ROM has 'edinburgh' in the header, maybe a system codename?
+    Cartridge ROM has 'edinburgh' in the header, maybe a system codename?
     ROM is also full of OGG files containing the string 'Encoded with Speex speex-1.0.4'
-    as well as .mid files for music
+    as well as .mid files for music.
+
+    Cartridges pinout:
+
+        Glob down, PCB cut corner at upper right
+        Top row of pins A25 on left to A1 on right.
+        Bottom row of pins B25 on left to B1 on right.
+
+        A1  /CE (tied high with resistor)
+        A2  D11
+        A3  D3
+        A4  D10
+        A5  D2
+        A6  D9
+        A7  D1
+        A8  D8
+        A9  D0
+        A10 /OE
+        A11 N/C
+        A12 A0
+        A13 A1
+        A14 A2
+        A15 A3
+        A16 A4
+        A17 A5
+        A18 A6
+        A19 A7
+        A20 A17
+        A21 A18
+        A22 N/C
+        A23 VCC
+        A24 N/C
+        A25 GND
+
+        B1  N/C
+        B2  D4
+        B3  D12
+        B4  D5
+        B5  D13
+        B6  D6
+        B7  D14
+        B8  D7
+        B9  D15
+        B10 A16
+        B11 A15
+        B12 A14
+        B13 A13
+        B14 A12
+        B15 A11
+        B16 A10
+        B17 A9
+        B18 A8
+        B19 A19
+        B20 A20
+        B21 N/C
+        B22 A21
+        B23 VCC
+        B24 N/C
+        B25 GND
 
 *******************************************************************************/
 

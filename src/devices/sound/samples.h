@@ -85,19 +85,18 @@ protected:
 	virtual void device_post_load() override;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	// internal classes
 	struct channel_t
 	{
 		sound_stream *  stream;
-		const int16_t *   source;
-		int32_t           source_length;
-		int32_t           source_num;
-		uint32_t          pos;
-		uint32_t          frac;
-		uint32_t          step;
-		uint32_t          basefreq;
+		const int16_t * source;
+		int32_t         source_num;
+		uint32_t        source_len;
+		double          pos;
+		uint32_t        basefreq;
+		uint32_t        curfreq;
 		bool            loop;
 		bool            paused;
 	};

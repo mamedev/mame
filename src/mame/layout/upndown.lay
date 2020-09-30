@@ -73,33 +73,33 @@ license:CC0
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
 
-		<bezel name="lamp2" element="HOLD">
+		<element name="lamp2" ref="HOLD">
 			<bounds x="0.0" y="3.45" width="0.35" height="0.24" />
-		</bezel>
-		<bezel name="lamp2" element="HOLD">
+		</element>
+		<element name="lamp2" ref="HOLD">
 			<bounds x="0.4" y="3.45" width="0.35" height="0.24" />
-		</bezel>
-		<bezel name="lamp2" element="HOLD">
+		</element>
+		<element name="lamp2" ref="HOLD">
 			<bounds x="0.8" y="3.45" width="0.35" height="0.24" />
-		</bezel>
-		<bezel name="lamp2" element="HOLD">
+		</element>
+		<element name="lamp2" ref="HOLD">
 			<bounds x="1.2" y="3.45" width="0.35" height="0.24" />
-		</bezel>
-		<bezel name="lamp2" element="HOLD">
+		</element>
+		<element name="lamp2" ref="HOLD">
 			<bounds x="1.6" y="3.45" width="0.35" height="0.24" />
-		</bezel>
-		<bezel name="lamp2" element="CANCEL">
+		</element>
+		<element name="lamp2" ref="CANCEL">
 			<bounds x="2.0" y="3.45" width="0.35" height="0.24" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp0" element="BET">
+		<element name="lamp0" ref="BET">
 			<bounds x="2.85" y="3.45" width="0.35" height="0.24" />
-		</bezel>
-		<bezel name="lamp1" element="DEAL">
+		</element>
+		<element name="lamp1" ref="DEAL">
 			<bounds x="3.25" y="3.45" width="0.35" height="0.24" />
-		</bezel>
-		<bezel name="lamp3" element="TAKE">
+		</element>
+		<element name="lamp3" ref="TAKE">
 			<bounds x="3.65" y="3.45" width="0.35" height="0.24" />
-		</bezel>
+		</element>
 	</view>
 </mamelayout>

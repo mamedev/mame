@@ -46,7 +46,6 @@
 */
 
 #include "emu.h"
-#include "softlist.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/compis/graphics.h"
 #include "bus/isbx/isbx.h"
@@ -64,6 +63,7 @@
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "machine/z80sio.h"
+#include "speaker.h"
 
 #define I80186_TAG      "ic1"
 #define I80130_TAG      "ic15"
@@ -785,8 +785,10 @@ void compis_state::compis(machine_config &config)
 
 	MM58174(config, m_rtc, 32.768_kHz_XTAL);
 
+	SPEAKER(config, "cass_snd").front_center();
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "cass_snd", 0.05);
 
 	TIMER(config, "tape").configure_periodic(FUNC(compis_state::tape_tick), attotime::from_hz(44100));
 

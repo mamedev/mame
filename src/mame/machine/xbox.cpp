@@ -964,18 +964,18 @@ void xbox_base_state::xbox_base(machine_config &config)
 	NV2A_RAM(config,        ":pci:00.3", 0, 128); // 128 megabytes
 	MCPX_ISALPC(config,     ":pci:01.0", 0, 0).interrupt_output().set(FUNC(xbox_base_state::maincpu_interrupt));
 	XBOX_SUPERIO(config,    ":pci:01.0:0", 0);
-	MCPX_SMBUS(config,      ":pci:01.1", 0).interrupt_handler().set(":pci:01.0", FUNC(mcpx_isalpc_device::irq11)); //.set(FUNC(xbox_base_state::smbus_interrupt_changed));
+	MCPX_SMBUS(config,      ":pci:01.1", 0, 0).interrupt_handler().set(":pci:01.0", FUNC(mcpx_isalpc_device::irq11)); //.set(FUNC(xbox_base_state::smbus_interrupt_changed));
 	XBOX_PIC16LC(config,    ":pci:01.1:110", 0); // these 3 are on smbus number 1
 	XBOX_CX25871(config,    ":pci:01.1:145", 0);
 	XBOX_EEPROM(config,     ":pci:01.1:154", 0);
-	MCPX_OHCI(config,       ":pci:02.0", 0).interrupt_handler().set(":pci:01.0", FUNC(mcpx_isalpc_device::irq1));  //.set(FUNC(xbox_base_state::ohci_usb_interrupt_changed));
-	MCPX_OHCI(config,       ":pci:03.0", 0);
+	MCPX_OHCI(config,       ":pci:02.0", 0, 0).interrupt_handler().set(":pci:01.0", FUNC(mcpx_isalpc_device::irq1));  //.set(FUNC(xbox_base_state::ohci_usb_interrupt_changed));
+	MCPX_OHCI(config,       ":pci:03.0", 0, 0);
 	MCPX_ETH(config,        ":pci:04.0", 0);
-	MCPX_APU(config,        ":pci:05.0", 0, m_maincpu);
-	MCPX_AC97_AUDIO(config, ":pci:06.0", 0);
+	MCPX_APU(config,        ":pci:05.0", 0, 0, m_maincpu);
+	MCPX_AC97_AUDIO(config, ":pci:06.0", 0, 0);
 	MCPX_AC97_MODEM(config, ":pci:06.1", 0);
 	PCI_BRIDGE(config,      ":pci:08.0", 0, 0x10de01b8, 0);
-	MCPX_IDE(config,        ":pci:09.0", 0).pri_interrupt_handler().set(":pci:01.0", FUNC(mcpx_isalpc_device::irq14));  //.set(FUNC(xbox_base_state::ide_interrupt_changed));
+	MCPX_IDE(config,        ":pci:09.0", 0, 0).pri_interrupt_handler().set(":pci:01.0", FUNC(mcpx_isalpc_device::irq14));  //.set(FUNC(xbox_base_state::ide_interrupt_changed));
 	NV2A_AGP(config,        ":pci:1e.0", 0, 0x10de01b7, 0);
 	NV2A_GPU(config,        ":pci:1e.0:00.0", 0, m_maincpu).interrupt_handler().set(":pci:01.0", FUNC(mcpx_isalpc_device::irq3)); //.set(FUNC(xbox_base_state::nv2a_interrupt_changed));
 

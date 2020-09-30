@@ -94,6 +94,66 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+// ======================> mm5837_source
+
+class mm5837_source
+{
+public:
+	// construction/destruction
+	mm5837_source() :
+		m_shift(0x1ffff)
+	{
+	}
+
+	// reset to base state
+	void reset()
+	{
+		m_shift = 0x1ffff;
+	}
+
+	// clock one time and return the shift value
+	u8 clock()
+	{
+		int tap_14 = BIT(m_shift, 13);
+		int tap_17 = BIT(m_shift, 16);
+		int zero = (m_shift == 0) ? 1 : 0;
+
+		m_shift <<= 1;
+		m_shift |= tap_14 ^ tap_17 ^ zero;
+
+		return BIT(m_shift, 16);
+	}
+
+	// taken from the book 'mims circuit scrapbook, vol. 1'
+	static u32 frequency(double vdd)
+	{
+		// Vdd should be negative -6.2..-15V
+		if (vdd > -6.2 || vdd < -15)
+			throw emu_fatalerror("mm5837 frequency should be -6.2V .. -15V");
+
+		// curve fitting done in excel from this table:
+		// { 0, 0, 0, 0, 0, 0, 1, 2267, 8731, 16382, 23531, 32564, 38347, 40010, 37800, 33173 }
+		double result = 191.98*vdd*vdd*vdd + 5448.4*vdd*vdd + 43388*vdd + 105347;
+
+		// datasheet claims frequency range 24-56kHz at Vdd=-14V, but also lists
+		// maximum cycle times as ranging from 1.1-2.4s; since the 17-bit shift
+		// register cycles after 131072 clocks, we would expect the actual cycle
+		// times to be 2.34-5.46s at the 24-56kHz frequency range, so I'm presuming
+		// that it ticks 2x per "clock", effectively running at 2x the frequency
+		result *= 2;
+
+		// make sure the result isn't TOO crazy
+		result = std::max(result, 100.0);
+		return u32(result);
+	}
+
+	// leave this public for easy saving
+	u32 m_shift;
+};
+
+
+// ======================> mm5837_device
+
 class mm5837_device : public device_t
 {
 public:
@@ -101,7 +161,7 @@ public:
 	mm5837_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configuration
-	void set_vdd_voltage(int voltage) { m_vdd = voltage; }
+	void set_vdd(double voltage) { m_vdd = voltage; }
 	auto output_callback() { return m_output_cb.bind(); }
 
 protected:
@@ -111,24 +171,42 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
-	// taken from the book 'mims circuit scrapbook, vol. 1'
-	// this is the frequency the chip runs at when given a vdd voltage of -0 to -15
-	static constexpr int m_frequency[16] = { 0, 0, 0, 0, 0, 0, 1, 2267, 8731, 16382, 23531, 32564, 38347, 40010, 37800, 33173 };
-
-	// callbacks
-	devcb_write_line m_output_cb;
-
-	// voltage (as positive number)
-	int m_vdd;
-
-	// output timer
-	emu_timer *m_timer;
-
-	// state
-	uint32_t m_shift;
+	// internal state
+	devcb_write_line m_output_cb;     // output callback
+	emu_timer *m_timer;               // output timer
+	double m_vdd;                     // configured voltage
+	mm5837_source m_source;           // noise source
 };
 
-// device type definition
+
+// ======================> mm5837_stream_device
+
+class mm5837_stream_device : public device_t, public device_sound_interface
+{
+public:
+	// construction/destruction
+	mm5837_stream_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// configuration
+	void set_vdd(double voltage) { m_vdd = voltage; }
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+
+private:
+	sound_stream *m_stream;           // sound stream
+	double m_vdd;                     // configured voltage
+	mm5837_source m_source;           // noise source
+};
+
+
+// device type definitions
 DECLARE_DEVICE_TYPE(MM5837, mm5837_device)
+DECLARE_DEVICE_TYPE(MM5837_STREAM, mm5837_stream_device)
+
 
 #endif // MAME_SOUND_MM5837_H

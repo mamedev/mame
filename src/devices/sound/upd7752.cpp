@@ -99,8 +99,9 @@ void upd7752_device::device_stop()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void upd7752_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void upd7752_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
+	outputs[0].fill(0);
 }
 
 //**************************************************************************

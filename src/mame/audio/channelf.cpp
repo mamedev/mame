@@ -30,7 +30,7 @@ void channelf_sound_device::device_start()
 {
 	int rate;
 
-	m_channel = stream_alloc(0, 1, machine().sample_rate());
+	m_channel = stream_alloc_legacy(0, 1, machine().sample_rate());
 	rate = machine().sample_rate();
 
 	/*
@@ -67,10 +67,10 @@ void channelf_sound_device::device_start()
 }
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void channelf_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void channelf_sound_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	uint32_t mask = 0, target = 0;
 	stream_sample_t *buffer = outputs[0];

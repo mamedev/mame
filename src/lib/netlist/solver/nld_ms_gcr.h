@@ -10,11 +10,9 @@
 /// Gaussian elimination using compressed row format.
 ///
 
-#include "plib/mat_cr.h"
-
-//#include "nld_ms_direct.h"
 #include "nld_matrix_solver_ext.h"
 #include "nld_solver.h"
+#include "plib/pmatrix_cr.h"
 #include "plib/pdynlib.h"
 #include "plib/pstream.h"
 #include "plib/vector_ops.h"
@@ -31,7 +29,7 @@ namespace solver
 	{
 	public:
 
-		using mat_type = plib::pGEmatrix_cr_t<plib::pmatrix_cr_t<FT, SIZE>>;
+		using mat_type = plib::pGEmatrix_cr<plib::pmatrix_cr<FT, SIZE>>;
 		using base_type = matrix_solver_ext_t<FT, SIZE>;
 		using fptype = typename base_type::fptype;
 
@@ -98,10 +96,10 @@ namespace solver
 			// During extended validation there is no reason to check for
 			// differences in the generated code since during
 			// extended validation this will be different (and non-functional)
-			if (!this->state().is_extended_validation() && this->state().lib().isLoaded())
+			if (!this->state().is_extended_validation() && this->state().static_solver_lib().isLoaded())
 			{
 				pstring symname = static_compile_name();
-				m_proc.load(this->state().lib(), symname);
+				m_proc.load(this->state().static_solver_lib(), symname);
 				if (m_proc.resolved())
 				{
 					this->state().log().info("External static solver {1} found ...", symname);
@@ -119,7 +117,7 @@ namespace solver
 
 	private:
 
-		using mat_index_type = typename plib::pmatrix_cr_t<FT, SIZE>::index_type;
+		using mat_index_type = typename plib::pmatrix_cr<FT, SIZE>::index_type;
 
 		void generate_code(plib::putf8_fmt_writer &strm);
 
@@ -313,7 +311,7 @@ namespace solver
 		generate_code(strm);
 		strm.writeline("}\n");
 		// some compilers (_WIN32, _WIN64, mac osx) need an explicit cast
-		return std::pair<pstring, pstring>(name, pstring(t.str()));
+		return std::pair<pstring, pstring>(name, putf8string(t.str()));
 	}
 
 	template <typename FT, int SIZE>

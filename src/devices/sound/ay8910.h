@@ -135,7 +135,7 @@ protected:
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	// trampolines for callbacks from fm.cpp
 	static void psg_set_clock(device_t *device, int clock) { downcast<ay8910_device *>(device)->ay_set_clock(clock); }
@@ -268,7 +268,7 @@ private:
 	inline u8 get_envelope_chan(int chan) { return is_expanded_mode() ? chan : 0; }
 
 	inline bool noise_enable(int chan) { return BIT(m_regs[AY_ENABLE], 3 + chan); }
-	inline u8 noise_period() { return is_expanded_mode() ? m_regs[AY_NOISEPER] & 0xff : (m_regs[AY_NOISEPER] & 0x1f) << 1; }
+	inline u8 noise_period() { return is_expanded_mode() ? m_regs[AY_NOISEPER] & 0xff : m_regs[AY_NOISEPER] & 0x1f; }
 	inline u8 noise_output() { return m_rng & 1; }
 
 	inline bool is_expanded_mode() { return ((m_feature & PSG_HAS_EXPANDED_MODE) && ((m_mode & 0xe) == 0xa)); }
@@ -276,7 +276,7 @@ private:
 
 	// internal helpers
 	void set_type(psg_type_t psg_type);
-	inline u16 mix_3D();
+	inline stream_buffer::sample_t mix_3D();
 	void ay8910_write_reg(int r, int v);
 	void build_mixer_table();
 	void ay8910_statesave();
@@ -308,9 +308,9 @@ private:
 	u8 m_vol_enabled[NUM_CHANNELS];
 	const ay_ym_param *m_par;
 	const ay_ym_param *m_par_env;
-	s32 m_vol_table[NUM_CHANNELS][16];
-	s32 m_env_table[NUM_CHANNELS][32];
-	std::unique_ptr<s32[]> m_vol3d_table;
+	stream_buffer::sample_t m_vol_table[NUM_CHANNELS][16];
+	stream_buffer::sample_t m_env_table[NUM_CHANNELS][32];
+	std::unique_ptr<stream_buffer::sample_t[]> m_vol3d_table;
 	int m_flags;          /* Flags */
 	int m_feature;        /* Chip specific features */
 	int m_res_load[3];    /* Load on channel in ohms */

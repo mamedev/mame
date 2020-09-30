@@ -6,7 +6,7 @@
 *        by Robbbert, March 2011.
 *
 *    Described in Electronics Australia magazine during 1982.
-*    Construction and usage: http://messui.the-chronicles.org/comp/eacc.pdf
+*    Construction and usage: http://messui.polygonal-moogle.com/comp/eacc.pdf
 *
 *    The only RAM is the 128 bytes that comes inside the CPU.
 *
@@ -69,15 +69,15 @@ public:
 	void eacc(machine_config &config);
 
 private:
-	DECLARE_READ_LINE_MEMBER( eacc_cb1_r );
-	DECLARE_READ_LINE_MEMBER( eacc_distance_r );
-	DECLARE_READ_LINE_MEMBER( eacc_fuel_sensor_r );
-	uint8_t eacc_keyboard_r();
-	DECLARE_WRITE_LINE_MEMBER( eacc_cb2_w );
-	void eacc_digit_w(uint8_t data);
-	void eacc_segment_w(uint8_t data);
-	TIMER_DEVICE_CALLBACK_MEMBER(eacc_cb1);
-	TIMER_DEVICE_CALLBACK_MEMBER(eacc_nmi);
+	DECLARE_READ_LINE_MEMBER( cb1_r );
+	DECLARE_READ_LINE_MEMBER( distance_r );
+	DECLARE_READ_LINE_MEMBER( fuel_sensor_r );
+	uint8_t keyboard_r();
+	DECLARE_WRITE_LINE_MEMBER( cb2_w );
+	void digit_w(uint8_t data);
+	void segment_w(uint8_t data);
+	TIMER_DEVICE_CALLBACK_MEMBER(cb1_timer);
+	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer);
 	void mem_map(address_map &map);
 	uint8_t m_digit;
 	bool m_cb1;
@@ -153,14 +153,14 @@ void eacc_state::machine_start()
 	save_item(NAME(m_nmi));
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(eacc_state::eacc_cb1)
+TIMER_DEVICE_CALLBACK_MEMBER(eacc_state::cb1_timer)
 {
 	m_cb1 ^= 1; // 15hz
 	if (m_cb2)
 		m_maincpu->set_input_line(M6802_IRQ_LINE, ASSERT_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(eacc_state::eacc_nmi)
+TIMER_DEVICE_CALLBACK_MEMBER(eacc_state::nmi_timer)
 {
 	if (m_cb2)
 	{
@@ -169,27 +169,27 @@ TIMER_DEVICE_CALLBACK_MEMBER(eacc_state::eacc_nmi)
 	}
 }
 
-READ_LINE_MEMBER( eacc_state::eacc_cb1_r )
+READ_LINE_MEMBER( eacc_state::cb1_r )
 {
 	return (m_cb2) ? m_cb1 : 1;
 }
 
-READ_LINE_MEMBER( eacc_state::eacc_distance_r )
+READ_LINE_MEMBER( eacc_state::distance_r )
 {
 	return machine().rand() & 1; // needs random pulses to simulate movement
 }
 
-READ_LINE_MEMBER( eacc_state::eacc_fuel_sensor_r )
+READ_LINE_MEMBER( eacc_state::fuel_sensor_r )
 {
 	return machine().rand() & 1; // needs random pulses to simulate fuel usage
 }
 
-WRITE_LINE_MEMBER( eacc_state::eacc_cb2_w )
+WRITE_LINE_MEMBER( eacc_state::cb2_w )
 {
 	m_cb2 = state;
 }
 
-uint8_t eacc_state::eacc_keyboard_r()
+uint8_t eacc_state::keyboard_r()
 {
 	uint8_t data = m_digit;
 
@@ -205,7 +205,7 @@ uint8_t eacc_state::eacc_keyboard_r()
 	return data;
 }
 
-void eacc_state::eacc_segment_w(uint8_t data)
+void eacc_state::segment_w(uint8_t data)
 {
 	//d7 segment dot
 	//d6 segment c
@@ -239,7 +239,7 @@ void eacc_state::eacc_segment_w(uint8_t data)
 	}
 }
 
-void eacc_state::eacc_digit_w(uint8_t data)
+void eacc_state::digit_w(uint8_t data)
 {
 	if (m_nmi)
 	{
@@ -264,19 +264,19 @@ void eacc_state::eacc(machine_config &config)
 	config.set_default_layout(layout_eacc);
 
 	PIA6821(config, m_pia, 0);
-	m_pia->readpb_handler().set(FUNC(eacc_state::eacc_keyboard_r));
-	m_pia->readca1_handler().set(FUNC(eacc_state::eacc_distance_r));
-	m_pia->readcb1_handler().set(FUNC(eacc_state::eacc_cb1_r));
-	m_pia->readca2_handler().set(FUNC(eacc_state::eacc_fuel_sensor_r));
-	m_pia->writepa_handler().set(FUNC(eacc_state::eacc_segment_w));
-	m_pia->writepb_handler().set(FUNC(eacc_state::eacc_digit_w));
-	m_pia->cb2_handler().set(FUNC(eacc_state::eacc_cb2_w));
+	m_pia->readpb_handler().set(FUNC(eacc_state::keyboard_r));
+	m_pia->readca1_handler().set(FUNC(eacc_state::distance_r));
+	m_pia->readcb1_handler().set(FUNC(eacc_state::cb1_r));
+	m_pia->readca2_handler().set(FUNC(eacc_state::fuel_sensor_r));
+	m_pia->writepa_handler().set(FUNC(eacc_state::segment_w));
+	m_pia->writepb_handler().set(FUNC(eacc_state::digit_w));
+	m_pia->cb2_handler().set(FUNC(eacc_state::cb2_w));
 	m_pia->irqa_handler().set_inputline("maincpu", M6802_IRQ_LINE);
 	m_pia->irqb_handler().set_inputline("maincpu", M6802_IRQ_LINE);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	TIMER(config, "eacc_nmi").configure_periodic(FUNC(eacc_state::eacc_nmi), attotime::from_hz(600));
-	TIMER(config, "eacc_cb1").configure_periodic(FUNC(eacc_state::eacc_cb1), attotime::from_hz(30));
+	TIMER(config, "eacc_nmi").configure_periodic(FUNC(eacc_state::nmi_timer), attotime::from_hz(600));
+	TIMER(config, "eacc_cb1").configure_periodic(FUNC(eacc_state::cb1_timer), attotime::from_hz(30));
 }
 
 

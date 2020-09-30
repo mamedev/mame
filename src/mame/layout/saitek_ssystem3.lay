@@ -206,15 +206,19 @@ license:CC0
 	<group name="lcd1">
 		<bounds x="-1" y="3" width="18" height="8" />
 		<screen index="0" blend="alpha"><bounds x="0" y="4" width="15.8" height="6" /></screen>
-		<element ref="nothing" blend="add" inputtag="IN.4" inputmask="0x00" inputraw="1"><bounds x="-1" y="3" width="18" height="8" /></element>
-		<element ref="lcd_bg" blend="multiply" inputtag="IN.4" inputmask="0x02" inputraw="1"><bounds x="-1" y="3" width="18" height="8" /></element>
+		<element ref="nothing" blend="add" inputtag="IN.4" inputmask="0x00" inputraw="yes"><bounds x="-1" y="3" width="18" height="8" /></element>
+		<element ref="lcd_bg" blend="multiply" inputtag="IN.4" inputmask="0x02" inputraw="yes"><bounds x="-1" y="3" width="18" height="8" /></element>
 	</group>
 
 
 <!-- lcd screen 2 -->
 
 	<element name="whitew"><rect><color red="1" green="1" blue="1" /></rect></element>
-	<element name="lcd2m"><rect><color red="0.69" green="0.69" blue="0.69" /></rect></element>
+
+	<element name="lcd2m" defstate="1">
+		<rect state="1"><color red="1" green="1" blue="1" /></rect>
+		<rect state="0"><color red="0.69" green="0.69" blue="0.69" /></rect>
+	</element>
 
 	<element name="lcd_cb">
 		<rect><bounds x="-2.5" y="-2.5" width="45" height="45" /><color red="0.05" green="0.55" blue="0.4" /></rect>
@@ -262,8 +266,8 @@ license:CC0
 		<screen index="1" blend="alpha"><bounds x="9.8" y="10" width="106" height="108" /></screen>
 		<element ref="lcd_cb" blend="multiply"><bounds x="1.5" y="2.9" width="122.6" height="122.1" /></element>
 
-		<element ref="nothing" blend="add" inputtag="IN.4" inputmask="0x00" inputraw="1"><bounds x="6.2" y="7.6" width="113.3" height="112.8" /></element>
-		<element ref="lcd2m" blend="multiply" inputtag="IN.4" inputmask="0x04" inputraw="1"><bounds x="6.2" y="7.6" width="113.3" height="112.8" /></element>
+		<element ref="nothing" blend="add" inputtag="IN.4" inputmask="0x00" inputraw="yes"><bounds x="6.2" y="7.6" width="113.3" height="112.8" /></element>
+		<element ref="lcd2m" blend="multiply" inputtag="IN.4" inputmask="0x04" inputraw="yes"><bounds x="6.2" y="7.6" width="113.3" height="112.8" /></element>
 	</group>
 
 
@@ -273,83 +277,83 @@ license:CC0
 		<bounds left="-2" right="48" top="2" bottom="32" />
 		<group ref="lcd1"><bounds x="-1" y="3" width="18" height="8" /></group>
 
-		<bezel element="brown"><bounds x="-2" y="12" width="52" height="6" /></bezel>
+		<element ref="brown"><bounds x="-2" y="12" width="52" height="6" /></element>
 
-		<bezel element="switch" inputtag="IN.4" inputmask="0x02" inputraw="1"><bounds x="30.0" y="5.5" width="1.2" height="2.4" /></bezel>
-		<bezel element="switch" inputtag="IN.4" inputmask="0x01" inputraw="1"><bounds x="34.4" y="5.5" width="1.2" height="2.4" /></bezel>
-		<bezel element="switch" inputtag="IN.3" inputmask="0x01"><bounds x="38.8" y="5.5" width="1.2" height="2.4" /><orientation rotate="180" /></bezel>
-		<bezel element="text_u1"><bounds x="28.0" y="8.2" width="5.2" height="0.9" /></bezel>
-		<bezel element="text_u2"><bounds x="32.4" y="8.2" width="5.2" height="0.9" /></bezel>
-		<bezel element="text_u3"><bounds x="36.8" y="8.2" width="5.2" height="0.9" /></bezel>
+		<element ref="switch" inputtag="IN.4" inputmask="0x02" inputraw="yes"><bounds x="30.0" y="5.5" width="1.2" height="2.4" /></element>
+		<element ref="switch" inputtag="IN.4" inputmask="0x01" inputraw="yes"><bounds x="34.4" y="5.5" width="1.2" height="2.4" /></element>
+		<element ref="switch" inputtag="IN.3" inputmask="0x01"><bounds x="38.8" y="5.5" width="1.2" height="2.4" /><orientation rotate="180" /></element>
+		<element ref="text_u1"><bounds x="28.0" y="8.2" width="5.2" height="0.9" /></element>
+		<element ref="text_u2"><bounds x="32.4" y="8.2" width="5.2" height="0.9" /></element>
+		<element ref="text_u3"><bounds x="36.8" y="8.2" width="5.2" height="0.9" /></element>
 
-		<bezel element="text_pk"><bounds x="6.4"  y="23.9" width="1.5" height="1.5" /></bezel>
-		<bezel element="text_pq"><bounds x="12.4" y="23.9" width="1.5" height="1.5" /></bezel>
-		<bezel element="text_pr"><bounds x="18.4" y="23.9" width="1.5" height="1.5" /></bezel>
-		<bezel element="text_pb"><bounds x="24.4" y="23.9" width="1.5" height="1.5" /></bezel>
-		<bezel element="text_pn"><bounds x="30.4" y="23.9" width="1.5" height="1.5" /></bezel>
-		<bezel element="text_pp"><bounds x="36.4" y="23.9" width="1.5" height="1.5" /></bezel>
+		<element ref="text_pk"><bounds x="6.4"  y="23.9" width="1.5" height="1.5" /></element>
+		<element ref="text_pq"><bounds x="12.4" y="23.9" width="1.5" height="1.5" /></element>
+		<element ref="text_pr"><bounds x="18.4" y="23.9" width="1.5" height="1.5" /></element>
+		<element ref="text_pb"><bounds x="24.4" y="23.9" width="1.5" height="1.5" /></element>
+		<element ref="text_pn"><bounds x="30.4" y="23.9" width="1.5" height="1.5" /></element>
+		<element ref="text_pp"><bounds x="36.4" y="23.9" width="1.5" height="1.5" /></element>
 
 		<repeat count="8">
 			<param name="x" start="0" increment="6" />
-			<bezel element="white"><bounds x="~x~" y="20" width="4" height="4" /></bezel>
+			<element ref="white"><bounds x="~x~" y="20" width="4" height="4" /></element>
 		</repeat>
 		<repeat count="8">
 			<param name="x" start="0.4" increment="6" />
 			<param name="i" start="1" increment="1" />
-			<bezel element="text_n~i~"><bounds x="~x~" y="20.1" width="1.5" height="2" /></bezel>
+			<element ref="text_n~i~"><bounds x="~x~" y="20.1" width="1.5" height="2" /></element>
 		</repeat>
 		<repeat count="8">
 			<param name="x" start="2.1" increment="6" />
 			<param name="i" start="1" increment="1" />
-			<bezel element="text_l~i~"><bounds x="~x~" y="21.9" width="1.5" height="2" /></bezel>
+			<element ref="text_l~i~"><bounds x="~x~" y="21.9" width="1.5" height="2" /></element>
 		</repeat>
 
-		<bezel element="white"><bounds x="0"  y="26" width="4" height="4" /></bezel>
-		<bezel element="white"><bounds x="6"  y="26" width="4" height="4" /></bezel>
-		<bezel element="white"><bounds x="18" y="26" width="10" height="4" /></bezel>
-		<bezel element="white"><bounds x="36" y="26" width="4" height="4" /></bezel>
-		<bezel element="white"><bounds x="42" y="26" width="4" height="4" /></bezel>
+		<element ref="white"><bounds x="0"  y="26" width="4" height="4" /></element>
+		<element ref="white"><bounds x="6"  y="26" width="4" height="4" /></element>
+		<element ref="white"><bounds x="18" y="26" width="10" height="4" /></element>
+		<element ref="white"><bounds x="36" y="26" width="4" height="4" /></element>
+		<element ref="white"><bounds x="42" y="26" width="4" height="4" /></element>
 
-		<bezel element="text_n0"><bounds x="0.4" y="26.1" width="1.5" height="2" /></bezel>
-		<bezel element="text_n9"><bounds x="42.4" y="26.1" width="1.5" height="2" /></bezel>
-		<bezel element="text_bxa"><bounds x="6.5" y="26.9" width="3" height="2" /></bezel>
-		<bezel element="text_bxb"><bounds x="18.5" y="26.9" width="9" height="2" /></bezel>
-		<bezel element="black"><bounds x="36.25" y="26.25" width="3.5" height="3.5" /></bezel>
-		<bezel element="white"><bounds x="36.4" y="26.4" width="3.2" height="3.2" /></bezel>
-		<bezel element="text_bxc"><bounds x="36.75" y="26.9" width="2.5" height="2" /></bezel>
+		<element ref="text_n0"><bounds x="0.4" y="26.1" width="1.5" height="2" /></element>
+		<element ref="text_n9"><bounds x="42.4" y="26.1" width="1.5" height="2" /></element>
+		<element ref="text_bxa"><bounds x="6.5" y="26.9" width="3" height="2" /></element>
+		<element ref="text_bxb"><bounds x="18.5" y="26.9" width="9" height="2" /></element>
+		<element ref="black"><bounds x="36.25" y="26.25" width="3.5" height="3.5" /></element>
+		<element ref="white"><bounds x="36.4" y="26.4" width="3.2" height="3.2" /></element>
+		<element ref="text_bxc"><bounds x="36.75" y="26.9" width="2.5" height="2" /></element>
 
-		<bezel element="hl" inputtag="IN.2" inputmask="0x08"><bounds x="0"  y="20" width="4" height="4" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="IN.3" inputmask="0x08"><bounds x="6"  y="20" width="4" height="4" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="IN.3" inputmask="0x04"><bounds x="12" y="20" width="4" height="4" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="IN.2" inputmask="0x04"><bounds x="18" y="20" width="4" height="4" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="IN.1" inputmask="0x04"><bounds x="24" y="20" width="4" height="4" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="IN.1" inputmask="0x02"><bounds x="30" y="20" width="4" height="4" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="IN.2" inputmask="0x02"><bounds x="36" y="20" width="4" height="4" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="IN.3" inputmask="0x02"><bounds x="42" y="20" width="4" height="4" /><color alpha="0.2" /></bezel>
+		<element ref="hl" inputtag="IN.2" inputmask="0x08"><bounds x="0"  y="20" width="4" height="4" /><color alpha="0.2" /></element>
+		<element ref="hl" inputtag="IN.3" inputmask="0x08"><bounds x="6"  y="20" width="4" height="4" /><color alpha="0.2" /></element>
+		<element ref="hl" inputtag="IN.3" inputmask="0x04"><bounds x="12" y="20" width="4" height="4" /><color alpha="0.2" /></element>
+		<element ref="hl" inputtag="IN.2" inputmask="0x04"><bounds x="18" y="20" width="4" height="4" /><color alpha="0.2" /></element>
+		<element ref="hl" inputtag="IN.1" inputmask="0x04"><bounds x="24" y="20" width="4" height="4" /><color alpha="0.2" /></element>
+		<element ref="hl" inputtag="IN.1" inputmask="0x02"><bounds x="30" y="20" width="4" height="4" /><color alpha="0.2" /></element>
+		<element ref="hl" inputtag="IN.2" inputmask="0x02"><bounds x="36" y="20" width="4" height="4" /><color alpha="0.2" /></element>
+		<element ref="hl" inputtag="IN.3" inputmask="0x02"><bounds x="42" y="20" width="4" height="4" /><color alpha="0.2" /></element>
 
-		<bezel element="hl" inputtag="IN.0" inputmask="0x08"><bounds x="0"  y="26" width="4" height="4" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="IN.1" inputmask="0x08"><bounds x="6"  y="26" width="4" height="4" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="IN.0" inputmask="0x04"><bounds x="18" y="26" width="10" height="4" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="IN.2" inputmask="0x01"><bounds x="36" y="26" width="4" height="4" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="IN.0" inputmask="0x02"><bounds x="42" y="26" width="4" height="4" /><color alpha="0.2" /></bezel>
+		<element ref="hl" inputtag="IN.0" inputmask="0x08"><bounds x="0"  y="26" width="4" height="4" /><color alpha="0.2" /></element>
+		<element ref="hl" inputtag="IN.1" inputmask="0x08"><bounds x="6"  y="26" width="4" height="4" /><color alpha="0.2" /></element>
+		<element ref="hl" inputtag="IN.0" inputmask="0x04"><bounds x="18" y="26" width="10" height="4" /><color alpha="0.2" /></element>
+		<element ref="hl" inputtag="IN.2" inputmask="0x01"><bounds x="36" y="26" width="4" height="4" /><color alpha="0.2" /></element>
+		<element ref="hl" inputtag="IN.0" inputmask="0x02"><bounds x="42" y="26" width="4" height="4" /><color alpha="0.2" /></element>
 
-		<bezel element="white2"><bounds x="1.65" y="24.45" width="0.7" height="0.7" /></bezel>
-		<bezel element="white2"><bounds x="43.65" y="24.45" width="0.7" height="0.7" /></bezel>
-		<bezel element="blackb"><bounds x="43.75" y="24.55" width="0.5" height="0.5" /></bezel>
+		<element ref="white2"><bounds x="1.65" y="24.45" width="0.7" height="0.7" /></element>
+		<element ref="white2"><bounds x="43.65" y="24.45" width="0.7" height="0.7" /></element>
+		<element ref="blackb"><bounds x="43.75" y="24.55" width="0.5" height="0.5" /></element>
 
-		<bezel element="text_b2"><bounds x="8"  y="24.3" width="2" height="0.9" /></bezel>
-		<bezel element="text_b3"><bounds x="14" y="24.3" width="2" height="0.9" /></bezel>
-		<bezel element="text_b4"><bounds x="20" y="24.3" width="2" height="0.9" /></bezel>
-		<bezel element="text_b5"><bounds x="26" y="24.1" width="2" height="1.1" /></bezel>
-		<bezel element="text_b6"><bounds x="32" y="24.3" width="2" height="0.9" /></bezel>
-		<bezel element="text_b7"><bounds x="38" y="24.1" width="2" height="1.1" /></bezel>
+		<element ref="text_b2"><bounds x="8"  y="24.3" width="2" height="0.9" /></element>
+		<element ref="text_b3"><bounds x="14" y="24.3" width="2" height="0.9" /></element>
+		<element ref="text_b4"><bounds x="20" y="24.3" width="2" height="0.9" /></element>
+		<element ref="text_b5"><bounds x="26" y="24.1" width="2" height="1.1" /></element>
+		<element ref="text_b6"><bounds x="32" y="24.3" width="2" height="0.9" /></element>
+		<element ref="text_b7"><bounds x="38" y="24.1" width="2" height="1.1" /></element>
 
-		<bezel element="text_b0a"><bounds x="-1" y="30.2" width="6" height="0.9" /></bezel>
-		<bezel element="text_bi"><bounds x="5" y="30.2" width="6" height="0.9" /></bezel>
-		<bezel element="text_bn"><bounds x="35" y="30.2" width="6" height="0.9" /></bezel>
-		<bezel element="text_b9a"><bounds x="41" y="30.2" width="6" height="0.9" /></bezel>
-		<bezel element="text_b0b"><bounds x="-2.3" y="29.2" width="2" height="0.9" /></bezel>
-		<bezel element="text_b9b"><bounds x="46.3" y="29.2" width="2" height="0.9" /></bezel>
+		<element ref="text_b0a"><bounds x="-1" y="30.2" width="6" height="0.9" /></element>
+		<element ref="text_bi"><bounds x="5" y="30.2" width="6" height="0.9" /></element>
+		<element ref="text_bn"><bounds x="35" y="30.2" width="6" height="0.9" /></element>
+		<element ref="text_b9a"><bounds x="41" y="30.2" width="6" height="0.9" /></element>
+		<element ref="text_b0b"><bounds x="-2.3" y="29.2" width="2" height="0.9" /></element>
+		<element ref="text_b9b"><bounds x="46.3" y="29.2" width="2" height="0.9" /></element>
 	</group>
 
 
@@ -358,11 +362,12 @@ license:CC0
 	<view name="Internal Layout (Full)">
 		<bounds left="26" right="100" top="0" bottom="30" />
 		<group ref="main"><bounds x="50" y="0" width="50" height="30" /></group>
+
 		<group ref="lcd2"><bounds x="29.3" y="0.35" width="17.37" height="17.3" /></group>
 
-		<bezel element="brown"><bounds x="26" y="0" width="2" height="30" /></bezel>
-		<bezel element="brown"><bounds x="48" y="0" width="2" height="30" /></bezel>
-		<bezel element="brown"><bounds x="49" y="10" width="2" height="6" /></bezel>
+		<element ref="brown"><bounds x="26" y="0" width="2" height="30" /></element>
+		<element ref="brown"><bounds x="48" y="0" width="2" height="30" /></element>
+		<element ref="brown"><bounds x="49" y="10" width="2" height="6" /></element>
 
 		<repeat count="8">
 			<param name="y" start="1.75" increment="1.93" />
@@ -375,13 +380,13 @@ license:CC0
 			<element ref="text_a~i~"><bounds x="~x~" y="17.2" width="1.5" height="0.9" /></element>
 		</repeat>
 
-		<bezel element="switch2" inputtag="IN.6" inputmask="0x01" inputraw="1"><bounds x="36" y="24" width="4" height="5" /></bezel>
-		<bezel element="switch2" inputtag="IN.4" inputmask="0x04" inputraw="1"><bounds x="42" y="24" width="4" height="5" /></bezel>
+		<element ref="switch2" inputtag="IN.6" inputmask="0x01" inputraw="yes"><bounds x="36" y="24" width="4" height="5" /></element>
+		<element ref="switch2" inputtag="IN.4" inputmask="0x04" inputraw="yes"><bounds x="42" y="24" width="4" height="5" /></element>
 
-		<bezel element="text_cu1"><bounds x="35" y="21.9" width="6" height="0.9" /></bezel>
-		<bezel element="text_cu2"><bounds x="35" y="22.9" width="6" height="0.9" /></bezel>
-		<bezel element="text_cu3"><bounds x="41" y="21.9" width="6" height="0.9" /></bezel>
-		<bezel element="text_cu4"><bounds x="41" y="22.9" width="6" height="0.9" /></bezel>
+		<element ref="text_cu1"><bounds x="35" y="21.9" width="6" height="0.9" /></element>
+		<element ref="text_cu2"><bounds x="35" y="22.9" width="6" height="0.9" /></element>
+		<element ref="text_cu3"><bounds x="41" y="21.9" width="6" height="0.9" /></element>
+		<element ref="text_cu4"><bounds x="41" y="22.9" width="6" height="0.9" /></element>
 	</view>
 
 	<view name="Internal Layout (Master Unit)">

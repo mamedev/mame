@@ -34,6 +34,10 @@ constexpr int AUTO_ALLOC_INPUT  = 65535;
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+class read_stream_view;
+class write_stream_view;
+enum sound_stream_flags : u32;
+
 
 // ======================> device_sound_interface
 
@@ -73,10 +77,13 @@ public:
 	device_sound_interface &reset_routes() { m_route_list.clear(); return *this; }
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) = 0;
+	virtual void sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs);
 
 	// stream creation
+	sound_stream *stream_alloc_legacy(int inputs, int outputs, int sample_rate);
 	sound_stream *stream_alloc(int inputs, int outputs, int sample_rate);
+	sound_stream *stream_alloc(int inputs, int outputs, int sample_rate, sound_stream_flags flags);
 
 	// helpers
 	int inputs() const;
@@ -126,12 +133,13 @@ protected:
 	virtual void interface_post_load() override;
 
 	// sound interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	// internal state
-	u8                  m_outputs;              // number of outputs
-	std::vector<u8>     m_outputmap;            // map of inputs to outputs
-	sound_stream *      m_mixer_stream;         // mixing stream
+	u8 m_outputs;                           // number of outputs
+	std::vector<u8> m_outputmap;            // map of inputs to outputs
+	std::vector<bool> m_output_clear;       // flag for tracking cleared buffers
+	sound_stream *m_mixer_stream;           // mixing stream
 };
 
 // iterator

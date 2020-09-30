@@ -38,7 +38,7 @@ PCB layout:
 
                       2764 2764 2764
 --------------------------------------------------
-  C  - conector
+  C  - connector
   P  - proms
   E  - connector for  big black epoxy block
   D  - dips
@@ -407,6 +407,32 @@ ROM_START( travrusab )
 	ROM_LOAD( "tbp24s10.3",   0x0220, 0x0100, CRC(76062638) SHA1(7378a26cf455d9d3df90929dc665870514c34b54) ) /* sprite lookup table */
 ROM_END
 
+ROM_START( travrusab2 ) // all ROMs match travrusa but the ones where differently stated
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "0.2m3", 0x0000, 0x2000, CRC(c96e81ac) SHA1(5b01269ce05604239b14ba7eaab8250c8ff17591) ) // unique
+	ROM_LOAD( "5.2l3", 0x2000, 0x2000, CRC(145d6b34) SHA1(c9e2bd1d3e62c496e4c5057c4012b069dfcf592d) )
+	ROM_LOAD( "6.2k3", 0x4000, 0x2000, CRC(e1b51383) SHA1(34f4476c1bcc28c53c8ffa7b614f443a329aae13) )
+	ROM_LOAD( "7.2j3", 0x6000, 0x2000, CRC(ab8a3a33) SHA1(e332b6e727083cf508ccec721ce42ccc3aa54e91) ) // same as mototour
+
+	ROM_REGION( 0x8000, "irem_audio:iremsound", 0 )
+	ROM_LOAD( "4.1a1", 0x7000, 0x1000, CRC(a02ad8a0) SHA1(aff80b506dbecabed2a36eb743693940f6a22d16) )
+
+	ROM_REGION( 0x06000, "gfx1", 0 )
+	ROM_LOAD( "1.1e3", 0x0000, 0x2000, CRC(aa8994dd) SHA1(9b326ce52a03d723e5c3c1b5fd4aa8fa7f70f904) )
+	ROM_LOAD( "2.1c3", 0x2000, 0x2000, CRC(3a046dd1) SHA1(65c1dd1c0b5fb72ac5c04e11a577308245e4b312) )
+	ROM_LOAD( "3.1a3", 0x4000, 0x2000, CRC(1cc3d3f4) SHA1(e7ee365d43d783cb6b7df37c6edeadbed35318d9) )
+
+	ROM_REGION( 0x06000, "gfx2", 0 )
+	ROM_LOAD( "8.3n3",  0x0000, 0x2000, CRC(3e2c7a6b) SHA1(abc9eeb656ab6ed5f14e10fc988f75f21ccf037a) )
+	ROM_LOAD( "9.3m3",  0x2000, 0x2000, CRC(13be6a14) SHA1(47861910fe4c46cd72634cf7d834be2da2a0a4f9) )
+	ROM_LOAD( "10.3k3", 0x4000, 0x2000, CRC(6fcc9fdb) SHA1(88f878b9ebf07c5a16f8cb742016cac971ed3f10) )
+
+	ROM_REGION( 0x0320, "proms", 0 )
+	ROM_LOAD( "6349-2.1k2",    0x0000, 0x0200, CRC(c9724350) SHA1(1fac20cdc0a53d94e8f67b49d7dd71d1b9f1f7ef) ) // character palette - last $100 are unused
+	ROM_LOAD( "tbp18s030.3f1", 0x0200, 0x0020, CRC(a1130007) SHA1(9deb0eed75dd06e86f83c819a3393158be7c9dce) ) // sprite palette
+	ROM_LOAD( "mb7052.3h2",    0x0220, 0x0100, CRC(76062638) SHA1(7378a26cf455d9d3df90929dc665870514c34b54) ) // sprite lookup table
+ROM_END
+
 ROM_START( motorace )
 	ROM_REGION( 0x12000, "maincpu", 0 )
 	ROM_LOAD( "mr.cpu",       0x0000, 0x2000, CRC(89030b0c) SHA1(dec4209385bbccff4a3c0d93d6507110ef841331) )    /* encrypted */
@@ -435,11 +461,11 @@ ROM_END
 
 /*
 
-Moto tour is a Tecfri's licensed version of Traverse usa/Zippy Race from Irem
+Moto Tour is a Tecfri licensed version of Traverse USA/Zippy Race from Irem
 
-This version don't have de MSM5202 but still having the sounds produced bt 5202 with a lower quality, I guess it converts the sound data to analog in some way, also this version is unprotected, doesn't have the epoxy block.
+This version doesn't have the MSM5202 but still has the sounds produced by the 5202 with a lower quality, I guess it converts the sound data to analog in some way, also this version is unprotected, doesn't have the epoxy block.
 
-Unfortunately the eproms labels have dissapeared, so I name it similar to Traverse usa but with the letters mt (Moto Tour)
+Unfortunately the eprom's labels have disappeared, so I name it similar to Traverse USA but with the letters mt (Moto Tour)
 
 Rom Info
 
@@ -612,11 +638,12 @@ void travrusa_state::init_shtridrb()
 }
 
 
-GAME( 1983, travrusa, 0,        travrusa, travrusa, travrusa_state, empty_init,    ROT270,                    "Irem",                           "Traverse USA / Zippy Race", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, travrusab,travrusa, travrusa, travrusa, travrusa_state, empty_init,    ROT270,                    "bootleg (I.P.)",                 "Traverse USA (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mototour, travrusa, travrusa, travrusa, travrusa_state, empty_init,    ROT270,                    "Irem (Tecfri license)",          "MotoTour / Zippy Race (Tecfri license)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, motorace, travrusa, travrusa, motorace, travrusa_state, init_motorace, ROT270,                    "Irem (Williams license)",        "MotoRace USA", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, travrusa,   0,        travrusa, travrusa, travrusa_state, empty_init,    ROT270,                    "Irem",                           "Traverse USA / Zippy Race", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, travrusab,  travrusa, travrusa, travrusa, travrusa_state, empty_init,    ROT270,                    "bootleg (I.P.)",                 "Traverse USA (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, travrusab2, travrusa, travrusa, travrusa, travrusa_state, empty_init,    ROT270,                    "bootleg",                        "Traverse USA (bootleg, set 2)", MACHINE_SUPPORTS_SAVE ) // still shows both Irem and Tecfri
+GAME( 1983, mototour,   travrusa, travrusa, travrusa, travrusa_state, empty_init,    ROT270,                    "Irem (Tecfri license)",          "MotoTour / Zippy Race (Tecfri license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, motorace,   travrusa, travrusa, motorace, travrusa_state, init_motorace, ROT270,                    "Irem (Williams license)",        "MotoRace USA", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, shtrider, 0,        shtrider, shtrider, travrusa_state, empty_init,    ROT270|ORIENTATION_FLIP_X, "Seibu Kaihatsu",                 "Shot Rider", MACHINE_SUPPORTS_SAVE ) // possible bootleg
-GAME( 1984, shtridera,shtrider, shtrider, shtrider, travrusa_state, init_shtridra, ROT270|ORIENTATION_FLIP_X, "Seibu Kaihatsu (Sigma license)", "Shot Rider (Sigma license)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, shtriderb,shtrider, shtriderb,shtrider, travrusa_state, init_shtridrb, ROT270|ORIENTATION_FLIP_X, "bootleg",                        "Shot Rider (bootleg)", MACHINE_SUPPORTS_SAVE ) // resets when you attempt to start a game?
+GAME( 1985, shtrider,   0,        shtrider, shtrider, travrusa_state, empty_init,    ROT270|ORIENTATION_FLIP_X, "Seibu Kaihatsu",                 "Shot Rider", MACHINE_SUPPORTS_SAVE ) // possible bootleg
+GAME( 1984, shtridera,  shtrider, shtrider, shtrider, travrusa_state, init_shtridra, ROT270|ORIENTATION_FLIP_X, "Seibu Kaihatsu (Sigma license)", "Shot Rider (Sigma license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, shtriderb,  shtrider, shtriderb,shtrider, travrusa_state, init_shtridrb, ROT270|ORIENTATION_FLIP_X, "bootleg",                        "Shot Rider (bootleg)", MACHINE_SUPPORTS_SAVE ) // resets when you attempt to start a game?

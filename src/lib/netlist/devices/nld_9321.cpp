@@ -18,8 +18,7 @@
  *
  */
 
-#include "nld_9321.h"
-#include "netlist/nl_base.h"
+#include "nl_base.h"
 
 namespace netlist
 {
@@ -40,9 +39,10 @@ namespace netlist
 		{
 		}
 
+	private:
 		NETLIB_HANDLERI(in)
 		{
-			m_enable = m_E() ? 0 : 1;
+			m_enable = m_E() ? false : true;
 			m_o = (m_A[1]() << 1) | m_A[0]();
 			for (std::size_t i=0; i<4; i++)
 				m_D[i].push((i == m_o && m_enable) ? 0 : 1, NLTIME_FROM_NS(21));
@@ -56,7 +56,6 @@ namespace netlist
 				m_D[i].push((i == m_o && m_enable) ? 0 : 1, NLTIME_FROM_NS(18));
 		}
 
-	public:
 		state_var<bool> m_enable;
 		state_var<uint32_t> m_o;
 		object_array_t<logic_input_t, 2> m_A;

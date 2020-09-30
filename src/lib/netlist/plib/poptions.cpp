@@ -95,14 +95,14 @@ namespace plib {
 
 		for (std::size_t i=1; i < argv.size(); )
 		{
-			putf8string arg(argv[i]);
+			pstring arg(argv[i]);
 			option *opt = nullptr;
-			putf8string opt_arg;
+			pstring opt_arg;
 			bool has_equal_arg = false;
 
 			if (!seen_other_args && plib::startsWith(arg, "--"))
 			{
-				auto v = psplit(arg.substr(2),"=");
+				auto v = psplit(arg.substr(2),'=');
 				if (!v.empty() && !v[0].empty())
 				{
 					opt = getopt_long(v[0]);
@@ -171,13 +171,13 @@ namespace plib {
 	pstring options::split_paragraphs(const pstring &text, unsigned width, unsigned indent,
 			unsigned firstline_indent, const pstring &line_end)
 	{
-		auto paragraphs = psplit(text,"\n");
+		auto paragraphs = psplit(text,'\n');
 		pstring ret("");
 
 		for (auto &p : paragraphs)
 		{
 			pstring line = plib::rpad(pstring(""), pstring(" "), firstline_indent);
-			for (auto &s : psplit(p, " "))
+			for (auto &s : psplit(p, ' '))
 			{
 				if (line.length() + s.length() > width)
 				{
@@ -263,7 +263,7 @@ namespace plib {
 				ex += split_paragraphs(example->help(), width, 4, 4) + "\n\n";
 			}
 		}
-		if (ex.length() > 0)
+		if (!ex.empty())
 		{
 			ret += "\n\nExamples:\n\n" + ex;
 		}

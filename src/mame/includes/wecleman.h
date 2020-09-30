@@ -173,8 +173,8 @@ private:
 		int shadow_mode = 0, flags = 0;
 	};
 
-	template<class _BitmapClass> void do_blit_zoom32(_BitmapClass &bitmap, const rectangle &cliprect, const sprite_t &sprite);
-	template<class _BitmapClass> void sprite_draw(_BitmapClass &bitmap, const rectangle &cliprect);
+	template<class BitmapClass> void do_blit_zoom32(BitmapClass &bitmap, const rectangle &cliprect, const sprite_t &sprite);
+	template<class BitmapClass> void sprite_draw(BitmapClass &bitmap, const rectangle &cliprect);
 
 	std::unique_ptr<sprite_t []> m_sprite_list;
 	sprite_t **m_spr_ptr_list;

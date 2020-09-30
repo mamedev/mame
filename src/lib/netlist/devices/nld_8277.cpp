@@ -18,8 +18,7 @@
  *
  */
 
-#include "nld_8277.h"
-#include "netlist/nl_base.h"
+#include "nl_base.h"
 
 namespace netlist
 {
@@ -87,20 +86,16 @@ namespace netlist
 		, m_last_CLKB(*this, "m_last_CLKB", 0)
 		// FIXME: needs family!
 		{
-			register_subalias("RESET", m_RESET);
-			register_subalias("CLK", m_CLK);
-			register_subalias("CLKA", m_CLKA);
-			register_subalias("CLKB", m_CLKB);
-			register_subalias("D0A", m_A.m_D0);
-			register_subalias("D1A", m_A.m_D1);
-			register_subalias("DSA", m_A.m_DS);
-			register_subalias("Q7A", m_A.m_Q7);
-			register_subalias("Q7QA", m_A.m_Q7Q);
-			register_subalias("D0B", m_B.m_D0);
-			register_subalias("D1B", m_B.m_D1);
-			register_subalias("DSB", m_B.m_DS);
-			register_subalias("Q7B", m_B.m_Q7);
-			register_subalias("Q7QB", m_B.m_Q7Q);
+			register_subalias("D0A", "A.D0");
+			register_subalias("D1A", "A.D1");
+			register_subalias("DSA", "A.DS");
+			register_subalias("Q7A", "A.Q7");
+			register_subalias("Q7QA", "A.Q7Q");
+			register_subalias("D0B", "B.D0");
+			register_subalias("D1B", "B.D1");
+			register_subalias("DSB", "B.DS");
+			register_subalias("Q7B", "B.Q7");
+			register_subalias("Q7QB", "B.Q7Q");
 
 			connect("A.VCC", "B.VCC");
 			connect("A.GND", "B.GND");
@@ -116,7 +111,6 @@ namespace netlist
 			m_last_CLKB = 0;
 		}
 
-		friend class NETLIB_NAME(8277_dip);
 	private:
 		NETLIB_HANDLERI(shifter_reset)
 		{
@@ -169,36 +163,7 @@ namespace netlist
 		state_var<uint32_t> m_last_CLKB;
 	};
 
-	NETLIB_OBJECT(8277_dip)
-	{
-		NETLIB_CONSTRUCTOR(8277_dip)
-		, A(*this, "A")
-		{
-			register_subalias("1", A.m_RESET);
-			register_subalias("2", A.m_A.m_Q7Q);
-			register_subalias("3", A.m_A.m_Q7);
-			register_subalias("4", A.m_A.m_DS);
-			register_subalias("5", A.m_A.m_D1);
-			register_subalias("6", A.m_A.m_D0);
-			register_subalias("7", A.m_CLKA);
-			register_subalias("8", "A.GND");
-
-			register_subalias("9",  A.m_CLK);
-			register_subalias("10", A.m_CLKB);
-			register_subalias("11", A.m_B.m_D0);
-			register_subalias("12", A.m_B.m_D1);
-			register_subalias("13", A.m_B.m_DS);
-			register_subalias("14", A.m_B.m_Q7);
-			register_subalias("15", A.m_B.m_Q7Q);
-			register_subalias("16", "A.VCC");
-		}
-		//NETLIB_RESETI() {}
-	private:
-		NETLIB_SUB(8277) A;
-	};
-
 	NETLIB_DEVICE_IMPL(8277,     "TTL_8277",     "+RESET,+CLK,+CLKA,+D0A,+D1A,+DSA,+CLKB,+D0B,+D1B,+DSB,@VCC,@GND")
-	NETLIB_DEVICE_IMPL(8277_dip, "TTL_8277_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

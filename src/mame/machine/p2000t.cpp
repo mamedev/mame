@@ -12,25 +12,25 @@
 #include "emu.h"
 #include "includes/p2000t.h"
 
-#define P2000M_101F_CASDAT  0x01
-#define P2000M_101F_CASCMD  0x02
-#define P2000M_101F_CASREW  0x04
-#define P2000M_101F_CASFOR  0x08
-#define P2000M_101F_KEYINT  0x40
-#define P2000M_101F_PRNOUT  0x80
+#define P2000M_101F_CASDAT 0x01
+#define P2000M_101F_CASCMD 0x02
+#define P2000M_101F_CASREW 0x04
+#define P2000M_101F_CASFOR 0x08
+#define P2000M_101F_KEYINT 0x40
+#define P2000M_101F_PRNOUT 0x80
 
-#define P2000M_202F_PINPUT  0x01
-#define P2000M_202F_PREADY  0x02
-#define P2000M_202F_STRAPN  0x04
-#define P2000M_202F_CASENB  0x08
-#define P2000M_202F_CASPOS  0x10
-#define P2000M_202F_CASEND  0x20
-#define P2000M_202F_CASCLK  0x40
-#define P2000M_202F_CASDAT  0x80
+#define P2000M_202F_PINPUT 0x01
+#define P2000M_202F_PREADY 0x02
+#define P2000M_202F_STRAPN 0x04
+#define P2000M_202F_CASENB 0x08
+#define P2000M_202F_CASPOS 0x10
+#define P2000M_202F_CASEND 0x20
+#define P2000M_202F_CASCLK 0x40
+#define P2000M_202F_CASDAT 0x80
 
-#define P2000M_303F_VIDEO   0x01
+#define P2000M_303F_VIDEO 0x01
 
-#define P2000M_707F_DISA    0x01
+#define P2000M_707F_DISA 0x01
 
 /*
     Keyboard port 0x0x
@@ -46,15 +46,12 @@ uint8_t p2000t_state::p2000t_port_000f_r(offs_t offset)
 {
 	if (m_port_101f & P2000M_101F_KEYINT)
 	{
-		return (
-		m_keyboard[0]->read() & m_keyboard[1]->read() &
-		m_keyboard[2]->read() & m_keyboard[3]->read() &
-		m_keyboard[4]->read() & m_keyboard[5]->read() &
-		m_keyboard[6]->read() & m_keyboard[7]->read() &
-		m_keyboard[8]->read() & m_keyboard[9]->read());
+		return (m_keyboard[0]->read() & m_keyboard[1]->read() & m_keyboard[2]->read()
+				& m_keyboard[3]->read() & m_keyboard[4]->read() & m_keyboard[5]->read()
+				& m_keyboard[6]->read() & m_keyboard[7]->read() & m_keyboard[8]->read()
+				& m_keyboard[9]->read());
 	}
-	else
-	if (offset < 10)
+	else if (offset < 10)
 	{
 		return m_keyboard[offset]->read();
 	}
@@ -62,22 +59,29 @@ uint8_t p2000t_state::p2000t_port_000f_r(offs_t offset)
 		return 0xff;
 }
 
-
 /*
     Input port 0x2x
 
     bit 0 - Printer input
     bit 1 - Printer ready
     bit 2 - Strap N (daisy/matrix)
-    bit 3 - Cassette write enabled
-    bit 4 - Cassette in position
-    bit 5 - Begin/end of tape
-    bit 6 - Cassette read clock
+    bit 3 - Cassette write enabled, 0 = Write enabled
+    bit 4 - Cassette in position,   0 = Cassette in position
+    bit 5 - Begin/end of tape       0 = Beginning or End of tap
+    bit 6 - Cassette read clock     Flips when a bit is available.
     bit 7 - Cassette read data
+
+    Note: bit 6 & 7 are swapped when the cassette is moving in reverse.
 */
 uint8_t p2000t_state::p2000t_port_202f_r()
 {
-	return (0xff);
+	uint8_t data = 0x00;
+	data |= !m_mdcr->wen() << 3;
+	data |= !m_mdcr->cip() << 4;
+	data |= !m_mdcr->bet() << 5;
+	data |= m_mdcr->rdc() << 6;
+	data |= !m_mdcr->rda() << 7;
+	return data;
 }
 
 
@@ -96,6 +100,10 @@ uint8_t p2000t_state::p2000t_port_202f_r()
 void p2000t_state::p2000t_port_101f_w(uint8_t data)
 {
 	m_port_101f = data;
+	m_mdcr->wda(BIT(data, 0));
+	m_mdcr->wdc(BIT(data, 1));
+	m_mdcr->rev(BIT(data, 2));
+	m_mdcr->fwd(BIT(data, 3));
 }
 
 /*
@@ -110,10 +118,7 @@ void p2000t_state::p2000t_port_101f_w(uint8_t data)
     bit 6 - \
     bit 7 - Video disable (0 = enabled)
 */
-void p2000t_state::p2000t_port_303f_w(uint8_t data)
-{
-	m_port_303f = data;
-}
+void p2000t_state::p2000t_port_303f_w(uint8_t data) { m_port_303f = data; }
 
 /*
     Beeper 0x5x
@@ -127,10 +132,7 @@ void p2000t_state::p2000t_port_303f_w(uint8_t data)
     bit 6 - Unused
     bit 7 - Unused
 */
-void p2000t_state::p2000t_port_505f_w(uint8_t data)
-{
-	m_speaker->level_w(BIT(data, 0));
-}
+void p2000t_state::p2000t_port_505f_w(uint8_t data) { m_speaker->level_w(BIT(data, 0)); }
 
 /*
     DISAS 0x7x (P2000M only)
@@ -148,10 +150,7 @@ void p2000t_state::p2000t_port_505f_w(uint8_t data)
     video refresh is disabled when the CPU accesses video memory
 
 */
-void p2000t_state::p2000t_port_707f_w(uint8_t data)
-{
-	m_port_707f = data;
-}
+void p2000t_state::p2000t_port_707f_w(uint8_t data) { m_port_707f = data; }
 
 void p2000t_state::p2000t_port_888b_w(uint8_t data) {}
 void p2000t_state::p2000t_port_8c90_w(uint8_t data) {}

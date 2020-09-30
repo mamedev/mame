@@ -8,8 +8,8 @@
 #ifdef  ALTO2_DEFINE_CONSTANTS
 
 #else   // ALTO2_DEFINE_CONSTANTS
-#ifndef _A2HW_H_
-#define _A2HW_H_
+#ifndef MAME_CPU_ALTO2_A2HW_H
+#define MAME_CPU_ALTO2_A2HW_H
 //! miscellaneous hardware registers in the memory mapped I/O range
 struct {
 	uint16_t eia;             //!< the EIA port at 0177001
@@ -62,5 +62,5 @@ void xbus_w(offs_t offset, uint16_t data);    //!< write an XBUS address (?)
 void init_hw();                               //!< initialize miscellaneous hardware
 void exit_hw();                               //!< deinitialize miscellaneous hardware
 void reset_hw();                              //!< reset miscellaneous hardware
-#endif  // _A2HW_H_
+#endif  // MAME_CPU_ALTO2_A2HW_H
 #endif  // ALTO2_DEFINE_CONSTANTS

@@ -40,90 +40,90 @@ license:CC0
 	</element>
 
 	<view name="Default Layout">
-		<bezel name="LEV1" element="lev1">
-			<bounds x="36" y="2" width="3" height="4" />
-		</bezel>
-		<bezel name="LEV2" element="lev2">
-			<bounds x="38" y="2" width="3" height="4" />
-		</bezel>
-		<bezel name="LEV3" element="lev3">
-			<bounds x="40" y="2" width="3" height="4" />
-		</bezel>
-		<bezel name="LEV4" element="lev4">
-			<bounds x="42" y="2" width="3" height="4" />
-		</bezel>
-
-		<bezel name="TICK0" element="rect">
-			<bounds x="49" y="2" width="2" height="1" />
-		</bezel>
-		<bezel name="TICK1" element="rect">
-			<bounds x="49" y="3" width="2" height="1" />
-		</bezel>
-		<bezel name="TICK2" element="rect">
-			<bounds x="49" y="4" width="2" height="1" />
-		</bezel>
-		<bezel name="TICK3" element="rect">
-			<bounds x="49" y="5" width="2" height="1" />
-		</bezel>
-		<bezel name="TICK4" element="rect">
-			<bounds x="47" y="5" width="2" height="1" />
-		</bezel>
-		<bezel name="TICK5" element="rect">
-			<bounds x="47" y="4" width="2" height="1" />
-		</bezel>
-		<bezel name="TICK6" element="rect">
-			<bounds x="47" y="3" width="2" height="1" />
-		</bezel>
-		<bezel name="TICK7" element="rect">
-			<bounds x="47" y="2" width="2" height="1" />
-		</bezel>
-
-		<bezel name="TRY1" element="disk">
-			<bounds x="69" y="3" width="3" height="3" />
-		</bezel>
-		<bezel name="TRY2" element="disk">
-			<bounds x="73" y="3" width="3" height="3" />
-		</bezel>
-		<bezel name="TRY3" element="disk">
-			<bounds x="71" y="0" width="3" height="3" />
-		</bezel>
-
-		<bezel name="CASS" element="rect">
-			<bounds x="80" y="2" width="4" height="4" />
-		</bezel>
-
-		<bezel name="TIME0" element="digit">
-			<bounds x="62" y="2" width="3" height="4" />
-		</bezel>
-		<bezel name="TIME1" element="digit">
-			<bounds x="58" y="2" width="3" height="4" />
-		</bezel>
-		<bezel name="TIME2" element="digit">
-			<bounds x="54" y="2" width="3" height="4" />
-		</bezel>
-
-		<bezel name="P10" element="digit">
-			<bounds x="28" y="2" width="3" height="4" />
-		</bezel>
-		<bezel name="P11" element="digit">
-			<bounds x="24" y="2" width="3" height="4" />
-		</bezel>
-		<bezel name="P12" element="digit">
-			<bounds x="20" y="2" width="3" height="4" />
-		</bezel>
-
-		<bezel name="P20" element="digit">
-			<bounds x="116" y="2" width="3" height="4" />
-		</bezel>
-		<bezel name="P21" element="digit">
-			<bounds x="112" y="2" width="3" height="4" />
-		</bezel>
-		<bezel name="P22" element="digit">
-			<bounds x="108" y="2" width="3" height="4" />
-		</bezel>
-
 		<screen index="0">
 			<bounds x="0" y="0" width="120" height="24" />
 		</screen>
+
+		<element name="LEV1" ref="lev1">
+			<bounds x="36" y="2" width="3" height="4" />
+		</element>
+		<element name="LEV2" ref="lev2">
+			<bounds x="38" y="2" width="3" height="4" />
+		</element>
+		<element name="LEV3" ref="lev3">
+			<bounds x="40" y="2" width="3" height="4" />
+		</element>
+		<element name="LEV4" ref="lev4">
+			<bounds x="42" y="2" width="3" height="4" />
+		</element>
+
+		<element name="TICK0" ref="rect">
+			<bounds x="49" y="2" width="2" height="1" />
+		</element>
+		<element name="TICK1" ref="rect">
+			<bounds x="49" y="3" width="2" height="1" />
+		</element>
+		<element name="TICK2" ref="rect">
+			<bounds x="49" y="4" width="2" height="1" />
+		</element>
+		<element name="TICK3" ref="rect">
+			<bounds x="49" y="5" width="2" height="1" />
+		</element>
+		<element name="TICK4" ref="rect">
+			<bounds x="47" y="5" width="2" height="1" />
+		</element>
+		<element name="TICK5" ref="rect">
+			<bounds x="47" y="4" width="2" height="1" />
+		</element>
+		<element name="TICK6" ref="rect">
+			<bounds x="47" y="3" width="2" height="1" />
+		</element>
+		<element name="TICK7" ref="rect">
+			<bounds x="47" y="2" width="2" height="1" />
+		</element>
+
+		<element name="TRY1" ref="disk">
+			<bounds x="69" y="3" width="3" height="3" />
+		</element>
+		<element name="TRY2" ref="disk">
+			<bounds x="73" y="3" width="3" height="3" />
+		</element>
+		<element name="TRY3" ref="disk">
+			<bounds x="71" y="0" width="3" height="3" />
+		</element>
+
+		<element name="CASS" ref="rect">
+			<bounds x="80" y="2" width="4" height="4" />
+		</element>
+
+		<element name="TIME0" ref="digit">
+			<bounds x="62" y="2" width="3" height="4" />
+		</element>
+		<element name="TIME1" ref="digit">
+			<bounds x="58" y="2" width="3" height="4" />
+		</element>
+		<element name="TIME2" ref="digit">
+			<bounds x="54" y="2" width="3" height="4" />
+		</element>
+
+		<element name="P10" ref="digit">
+			<bounds x="28" y="2" width="3" height="4" />
+		</element>
+		<element name="P11" ref="digit">
+			<bounds x="24" y="2" width="3" height="4" />
+		</element>
+		<element name="P12" ref="digit">
+			<bounds x="20" y="2" width="3" height="4" />
+		</element>
+
+		<element name="P20" ref="digit">
+			<bounds x="116" y="2" width="3" height="4" />
+		</element>
+		<element name="P21" ref="digit">
+			<bounds x="112" y="2" width="3" height="4" />
+		</element>
+		<element name="P22" ref="digit">
+			<bounds x="108" y="2" width="3" height="4" />
+		</element>
 	</view>
 </mamelayout>

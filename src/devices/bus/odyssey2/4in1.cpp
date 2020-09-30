@@ -35,7 +35,7 @@ void o2_4in1_device::device_start()
 
 void o2_4in1_device::cart_init()
 {
-	if (m_rom_size != 0x1000)
+	if (m_rom.bytes() != 0x1000)
 		fatalerror("o2_4in1_device: ROM size must be 4KB\n");
 }
 

@@ -297,7 +297,7 @@ void mos7360_device::device_start()
 	screen().register_screen_bitmap(m_bitmap);
 
 	// create sound stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
+	m_stream = stream_alloc(0, 1, machine().sample_rate());
 
 	// buffer for fastest played sample for 5 second so we have enough data for min 5 second
 	m_noisesize = NOISE_FREQUENCY_MAX * NOISE_BUFFER_SIZE_SEC;
@@ -458,12 +458,12 @@ void mos7360_device::device_timer(emu_timer &timer, device_timer_id id, int para
 //  our sound stream
 //-------------------------------------------------
 
-void mos7360_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void mos7360_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	int i, v, a;
-	stream_sample_t *buffer = outputs[0];
+	auto &buffer = outputs[0];
 
-	for (i = 0; i < samples; i++)
+	for (i = 0; i < buffer.samples(); i++)
 	{
 		v = 0;
 
@@ -506,7 +506,7 @@ void mos7360_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 		v = v * a;
 
-		buffer[i] = v;
+		buffer.put_int(i, v, 32768);
 	}
 }
 

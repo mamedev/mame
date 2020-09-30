@@ -112,7 +112,10 @@ private:
 	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, int linem, int pri);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+
 	void macrossp_map(address_map &map);
+	void macrossp_es5506_bank1_map(address_map &map);
+	void macrossp_es5506_bank3_map(address_map &map);
 	void macrossp_sound_map(address_map &map);
 };
 

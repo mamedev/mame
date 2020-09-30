@@ -217,7 +217,7 @@ MC6845_ON_UPDATE_ADDR_CHANGED( ecb_grip21_device::grip5_addr_changed )
 }
 */
 
-static const int16_t speaker_levels[] = { -32768, 0, 32767, 0 };
+static const double speaker_levels[] = { -1.0, 0.0, 1.0, 0.0 };
 
 //-------------------------------------------------
 //  I8255A interface

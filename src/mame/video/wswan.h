@@ -16,20 +16,6 @@
 
 #pragma once
 
-
-enum
-{
-	VDP_TYPE_WSWAN = 0,
-	VDP_TYPE_WSC
-};
-
-#define WSWAN_X_PIXELS  (28*8)
-#define WSWAN_Y_PIXELS  (18*8)
-
-
-#define WSWAN_VIDEO_IRQ_CB_MEMBER(_name) void _name(int irq)
-#define WSWAN_VIDEO_DMASND_CB_MEMBER(_name) void _name()
-
 class wswan_video_device : public device_t, public device_video_interface
 {
 public:
@@ -50,6 +36,15 @@ public:
 	void vram_w(offs_t offset, uint8_t data);
 	uint8_t reg_r(offs_t offset);
 	void reg_w(offs_t offset, uint8_t data);
+
+	enum
+	{
+		VDP_TYPE_WSWAN = 0,
+		VDP_TYPE_WSC
+	};
+
+	static const u16 WSWAN_X_PIXELS = (28*8);
+	static const u16 WSWAN_Y_PIXELS = (18*8);
 
 protected:
 	// device-level overrides

@@ -50,13 +50,13 @@ using lib_map_t = std::unordered_map<pstring, lib_map_entry>;
 
 static lib_map_t read_lib_map(const pstring &lm)
 {
-	auto reader = plib::putf8_reader(std::make_unique<std::istringstream>(lm));
+	auto reader = plib::putf8_reader(std::make_unique<std::istringstream>(putf8string(lm)));
 	reader.stream().imbue(std::locale::classic());
 	lib_map_t m;
-	pstring line;
+	putf8string line;
 	while (reader.readline(line))
 	{
-		std::vector<pstring> split(plib::psplit(line, ","));
+		std::vector<pstring> split(plib::psplit(pstring(line), ','));
 		m[plib::trim(split[0])] = { plib::trim(split[1]), plib::trim(split[2]) };
 	}
 	return m;
@@ -342,7 +342,7 @@ void nl_convert_spice_t::convert_block(const str_list &contents)
 
 void nl_convert_spice_t::convert(const pstring &contents)
 {
-	std::vector<pstring> spnl(plib::psplit(contents, "\n"));
+	std::vector<pstring> spnl(plib::psplit(contents, '\n'));
 	std::vector<pstring> after_linecontinuation;
 
 	// Add gnd net
@@ -441,7 +441,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 	if (!line.empty())
 	{
 		//printf("// %s\n", line.c_str());
-		std::vector<pstring> tt(plib::psplit(line, " ", true));
+		std::vector<pstring> tt(plib::psplit(line, ' ', true));
 		double val = 0.0;
 		switch (tt[0].at(0))
 		{
@@ -492,7 +492,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 					model = tt[5];
 				else
 					model = tt[4];
-				std::vector<pstring> m(plib::psplit(model,"{"));
+				std::vector<pstring> m(plib::psplit(model, '{'));
 				if (m.size() == 2)
 				{
 					if (m[1].length() != 4)
@@ -559,7 +559,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 					{
 						pstring devname = plib::pfmt("{}{}")(tt[0], i);
 						pstring nextnet = (i<static_cast<std::size_t>(n)-1) ? plib::pfmt("{}a{}")(tt[1], i) : tt[2];
-						auto net2 = plib::psplit(plib::replace_all(plib::replace_all(tt[sce+i],")",""),"(",""),",");
+						auto net2 = plib::psplit(plib::replace_all(plib::replace_all(tt[sce+i],")",""),"(",""),',');
 						add_device("VCVS", devname, get_sp_val(tt[scoeff+i]));
 						add_term(lastnet, devname, 0);
 						add_term(nextnet, devname, 1);
@@ -762,7 +762,7 @@ void nl_convert_eagle_t::convert(const pstring &contents)
 	tokenizer tok(*this);
 
 	tokenizer::token_store tokstor;
-	plib::putf8_reader u8reader(std::make_unique<std::istringstream>(contents));
+	plib::putf8_reader u8reader(std::make_unique<std::istringstream>(putf8string(contents)));
 
 	tok.append_to_store(&u8reader, tokstor);
 	tok.set_token_source(&tokstor);
@@ -914,7 +914,7 @@ void nl_convert_rinf_t::convert(const pstring &contents)
 	tokenizer tok(*this);
 
 	tokenizer::token_store tokstor;
-	plib::putf8_reader u8reader(std::make_unique<std::istringstream>(contents));
+	plib::putf8_reader u8reader(std::make_unique<std::istringstream>(putf8string(contents)));
 
 	tok.append_to_store(&u8reader, tokstor);
 	tok.set_token_source(&tokstor);

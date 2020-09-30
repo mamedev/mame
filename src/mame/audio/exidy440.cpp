@@ -146,7 +146,7 @@ void exidy440_sound_device::device_start()
 	m_channel_frequency[3] = clock()/2;
 
 	/* get stream channels */
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock());
+	m_stream = stream_alloc_legacy(0, 2, clock());
 
 	/* allocate the sample cache */
 	length = m_samples.bytes() * 16 + MAX_CACHE_ENTRIES * sizeof(sound_cache_entry);
@@ -836,10 +836,10 @@ void exidy440_sound_device::sound_banks_w(offs_t offset, uint8_t data)
 }
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void exidy440_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void exidy440_sound_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	int ch;
 

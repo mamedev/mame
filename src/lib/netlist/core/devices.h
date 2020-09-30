@@ -11,20 +11,11 @@
 /// here directly (e.g. nld_nc_pin).
 ///
 
-#if 0
-#include "core/base_objects.h"
-#include "core/logic.h"
-#include "core/logic_family.h"
-#include "core/netlist_state.h"
-#include "core/nets.h"
-#include "core/object_array.h"
-#include "core/param.h"
-#include "core/state_var.h"
-#include "core/exec.h"
-#endif
 #include "analog.h"
 #include "device.h"
 #include "device_macros.h"
+#include "logic.h"
+#include "param.h"
 
 //============================================================
 // Namespace starts
@@ -84,11 +75,26 @@ namespace netlist
 			{
 			}
 
+			explicit nld_power_pins(device_t &owner, nldelegate delegate)
+			: m_VCC(owner, owner.logic_family()->vcc_pin(), delegate)
+			, m_GND(owner, owner.logic_family()->gnd_pin(), delegate)
+			{
+			}
+
 			// Some devices like the 74LS629 have two pairs of supply pins.
 			explicit nld_power_pins(device_t &owner,
 				const pstring &vcc, const pstring &gnd)
 			: m_VCC(owner, vcc, NETLIB_DELEGATE(noop))
 			, m_GND(owner, gnd, NETLIB_DELEGATE(noop))
+			{
+			}
+
+			// Some devices like the 74LS629 have two pairs of supply pins.
+			explicit nld_power_pins(device_t &owner,
+				const pstring &vcc, const pstring &gnd,
+				nldelegate delegate)
+			: m_VCC(owner, vcc, delegate)
+			, m_GND(owner, gnd, delegate)
 			{
 			}
 

@@ -39,11 +39,11 @@ namespace plib {
 	public:
 		explicit pexception(const pstring &text);
 
-		const pstring &text() const noexcept { return m_text; }
+		const putf8string &text() const noexcept { return m_text; }
 		const char* what() const noexcept override { return m_text.c_str(); }
 
 	private:
-		pstring m_text;
+		putf8string m_text;
 	};
 
 	class file_e : public plib::pexception

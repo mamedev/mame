@@ -225,7 +225,7 @@ polepos_sound_device::polepos_sound_device(const machine_config &mconfig, const 
 
 void polepos_sound_device::device_start()
 {
-	m_stream = stream_alloc(0, 1, OUTPUT_RATE);
+	m_stream = stream_alloc_legacy(0, 1, OUTPUT_RATE);
 	m_sample_msb = m_sample_lsb = 0;
 	m_sample_enable = 0;
 
@@ -251,10 +251,10 @@ void polepos_sound_device::device_reset()
 
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void polepos_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void polepos_sound_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	uint32_t step, clock, slot;
 	uint8_t *base;

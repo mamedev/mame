@@ -54,6 +54,7 @@
 #include "sound/es5506.h"
 
 #include "screen.h"
+#include "speaker.h"
 
 
 /*********************************************************************/
@@ -255,7 +256,12 @@ void gunbustr_state::gunbustr(machine_config &config)
 	m_tc0480scp->set_offsets_flip(-1, 0);
 
 	/* sound hardware */
-	TAITO_EN(config, "taito_en", 0);
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	taito_en_device &taito_en(TAITO_EN(config, "taito_en", 0));
+	taito_en.add_route(0, "lspeaker", 1.0);
+	taito_en.add_route(1, "rspeaker", 1.0);
 }
 
 /***************************************************************************/
@@ -284,7 +290,7 @@ ROM_START( gunbustr )
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "d27-03.bin", 0x00000, 0x80000, CRC(23bf2000) SHA1(49b29e771a47fcd7e6cd4e2704b217f9727f8299) ) /* STY, used to create big sprites on the fly */
 
-	ROM_REGION16_BE( 0x800000, "ensoniq.0" , ROMREGION_ERASE00 )
+	ROM_REGION16_BE( 0x800000, "taito_en:ensoniq" , ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "d27-08.bin", 0x000000, 0x100000, CRC(7c147e30) SHA1(b605045154967050ec06391798da4afe3686a6e1) ) // C8, C9
 	ROM_RELOAD(0x400000,0x100000)
 	ROM_LOAD16_BYTE( "d27-09.bin", 0x200000, 0x100000, CRC(3e060304) SHA1(c4da4a94c168c3a454409d758c3ed45babbab170) ) // CA, CB
@@ -318,7 +324,7 @@ ROM_START( gunbustru )
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "d27-03.bin", 0x00000, 0x80000, CRC(23bf2000) SHA1(49b29e771a47fcd7e6cd4e2704b217f9727f8299) ) /* STY, used to create big sprites on the fly */
 
-	ROM_REGION16_BE( 0x800000, "ensoniq.0" , ROMREGION_ERASE00 )
+	ROM_REGION16_BE( 0x800000, "taito_en:ensoniq" , ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "d27-08.bin", 0x000000, 0x100000, CRC(7c147e30) SHA1(b605045154967050ec06391798da4afe3686a6e1) ) // C8, C9
 	ROM_RELOAD(0x400000,0x100000)
 	ROM_LOAD16_BYTE( "d27-09.bin", 0x200000, 0x100000, CRC(3e060304) SHA1(c4da4a94c168c3a454409d758c3ed45babbab170) ) // CA, CB
@@ -352,7 +358,7 @@ ROM_START( gunbustrj )
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "d27-03.bin", 0x00000, 0x80000, CRC(23bf2000) SHA1(49b29e771a47fcd7e6cd4e2704b217f9727f8299) ) /* STY, used to create big sprites on the fly */
 
-	ROM_REGION16_BE( 0x800000, "ensoniq.0" , ROMREGION_ERASE00 )
+	ROM_REGION16_BE( 0x800000, "taito_en:ensoniq" , ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "d27-08.bin", 0x000000, 0x100000, CRC(7c147e30) SHA1(b605045154967050ec06391798da4afe3686a6e1) ) // C8, C9
 	ROM_RELOAD(0x400000,0x100000)
 	ROM_LOAD16_BYTE( "d27-09.bin", 0x200000, 0x100000, CRC(3e060304) SHA1(c4da4a94c168c3a454409d758c3ed45babbab170) ) // CA, CB

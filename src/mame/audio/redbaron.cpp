@@ -102,16 +102,16 @@ void redbaron_sound_device::device_start()
 		m_vol_crash[i] = 32767 * r0 / (r0 + r1);
 	}
 
-	m_channel = stream_alloc(0, 1, OUTPUT_RATE);
+	m_channel = stream_alloc_legacy(0, 1, OUTPUT_RATE);
 }
 
 
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void redbaron_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void redbaron_sound_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	stream_sample_t *buffer = outputs[0];
 	while( samples-- )

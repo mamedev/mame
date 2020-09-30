@@ -19077,7 +19077,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1261568">
-				<rom name="feti (fetish) (disk 1).hdm" size="1261568" crc="ed8606b0" sha1="d33c06cd8287a25941c508d3edbfc66e2e637875 " offset="0" />
+				<rom name="feti (fetish) (disk 1).hdm" size="1261568" crc="ed8606b0" sha1="d33c06cd8287a25941c508d3edbfc66e2e637875" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">

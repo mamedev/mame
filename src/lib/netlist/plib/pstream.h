@@ -28,7 +28,7 @@ namespace plib {
 	/// \brief wrapper around isteam read
 	///
 	template <typename S, typename T>
-	static inline S & istream_read(S &is, T * data, size_t len)
+	static S & istream_read(S &is, T * data, size_t len)
 	{
 		using ct = typename S::char_type;
 		static_assert((sizeof(T) % sizeof(ct)) == 0, "istream_read sizeof issue");
@@ -39,13 +39,53 @@ namespace plib {
 	/// \brief wrapper around osteam write
 	///
 	template <typename S, typename T>
-	static inline S & ostream_write(S &os, const T * data, size_t len)
+	static S & ostream_write(S &os, const T * data, size_t len)
 	{
 		using ct = typename S::char_type;
 		static_assert((sizeof(T) % sizeof(ct)) == 0, "ostream_write sizeof issue");
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 		return os.write(reinterpret_cast<const ct *>(data), gsl::narrow<std::streamsize>(len * sizeof(T)));
 	}
+
+	/// \brief a named istream pointer container
+	///
+	/// This moveable object allows to pass istream unique pointers with
+	/// information about the origin (filename). This is useful in error
+	/// reporting where the source of the stream has to be logged.
+	///
+	struct istream_uptr
+	{
+		explicit istream_uptr() = default;
+
+		istream_uptr(std::unique_ptr<std::istream> &&strm, const pstring &filename)
+		: m_strm(std::move(strm))
+		, m_filename(filename)
+		{
+		}
+		istream_uptr(const istream_uptr &) = delete;
+		istream_uptr &operator=(const istream_uptr &) = delete;
+		istream_uptr(istream_uptr &&rhs)
+		{
+			m_strm = std::move(rhs.m_strm);
+			m_filename = std::move(rhs.m_filename);
+		}
+		istream_uptr &operator=(istream_uptr &&) /*noexcept*/ = delete;
+
+		~istream_uptr() = default;
+
+		std::istream * operator ->() noexcept { return m_strm.get(); }
+		std::istream & operator *() noexcept { return *m_strm; }
+		pstring filename() { return m_filename; }
+
+		bool empty() { return m_strm == nullptr; }
+
+		// FIXME: workaround input context should accept stream_ptr
+
+		std::unique_ptr<std::istream> release_stream() { return std::move(m_strm); }
+	private:
+		std::unique_ptr<std::istream> m_strm;
+		pstring m_filename;
+	};
 
 ///
 ///
@@ -61,7 +101,6 @@ public:
 
 	putf8_reader(putf8_reader &&rhs) noexcept
 	: m_strm(std::move(rhs.m_strm))
-	, m_linebuf(std::move(rhs.m_linebuf))
 	{
 	}
 
@@ -81,13 +120,12 @@ public:
 	/// \param line pstring reference to the result
 	/// \returns Returns false if at end of file
 	///
-	bool readline(pstring &line)
+	bool readline(putf8string &line)
 	{
 		putf8string::code_t c = 0;
-		m_linebuf = putf8string("");
+		line = "";
 		if (!this->readcode(c))
 		{
-			line = "";
 			return false;
 		}
 		while (true)
@@ -95,11 +133,10 @@ public:
 			if (c == 10)
 				break;
 			if (c != 13) // ignore CR
-				m_linebuf += putf8string(1, c);
+				line += putf8string(1, c);
 			if (!this->readcode(c))
 				break;
 		}
-		line = m_linebuf;
 		return true;
 	}
 
@@ -110,25 +147,23 @@ public:
 	/// \param line pstring reference to the result
 	/// \returns Returns false if at end of file
 	///
-	bool readline_lf(pstring &line)
+	bool readline_lf(putf8string &line)
 	{
 		putf8string::code_t c = 0;
-		m_linebuf = putf8string("");
+		line = "";
 		if (!this->readcode(c))
 		{
-			line = "";
 			return false;
 		}
 		while (true)
 		{
 			if (c != 13) // ignore CR
-				m_linebuf += putf8string(1, c);
+				line += putf8string(1, c);
 			if (c == 10)
 				break;
 			if (!this->readcode(c))
 				break;
 		}
-		line = m_linebuf;
 		return true;
 	}
 
@@ -164,7 +199,6 @@ public:
 	std::istream &stream() { return *m_strm; }
 private:
 	std::unique_ptr<std::istream> m_strm;
-	putf8string m_linebuf;
 };
 
 // -----------------------------------------------------------------------------
@@ -194,7 +228,7 @@ public:
 		// NOLINTNEXTLINE(performance-unnecessary-copy-initialization)
 		const putf8string conv_utf8(text);
 		//m_strm->write(conv_utf8.c_str(), static_cast<std::streamsize>(plib::strlen(conv_utf8.c_str()  )));
-		ostream_write(*m_strm, conv_utf8.c_str(), string_info<pstring>::mem_size(conv_utf8));
+		ostream_write(*m_strm, conv_utf8.c_str(), conv_utf8.size());
 	}
 
 	void write(const pstring::value_type c) const
@@ -255,7 +289,8 @@ public:
 	void write(const pstring &s)
 	{
 		const auto *sm = s.c_str();
-		const auto sl(std::char_traits<pstring::mem_t>::length(sm));
+		//const auto sl(std::char_traits<pstring::mem_t>::length(sm));
+		const auto sl(s.size());
 		write(sl);
 		ostream_write(m_strm, sm, sl);
 	}
@@ -293,7 +328,7 @@ public:
 	{
 		std::size_t sz = 0;
 		read(sz);
-		std::vector<plib::string_info<pstring>::mem_t> buf(sz+1);
+		std::vector<plib::string_info<putf8string>::mem_t> buf(sz+1);
 		m_strm.read(buf.data(), static_cast<std::streamsize>(sz));
 		buf[sz] = 0;
 		s = pstring(buf.data());
@@ -334,8 +369,13 @@ public:
 		pstring_t<pwchar_traits>, pstring_t<putf8_traits>>::type;
 
 	template <typename T>
-	explicit ifstream(const pstring_t<T> name, ios_base::openmode mode = ios_base::in)
+	explicit ifstream(const pstring_t<T> &name, ios_base::openmode mode = ios_base::in)
 	: std::ifstream(filename_type(name).c_str(), mode)
+	{
+	}
+
+	explicit ifstream(const std::string &name, ios_base::openmode mode = ios_base::in)
+	: std::ifstream(filename_type(putf8string(name)).c_str(), mode)
 	{
 	}
 };
@@ -350,8 +390,13 @@ public:
 		pstring_t<pwchar_traits>, pstring_t<putf8_traits>>::type;
 
 	template <typename T>
-	explicit ofstream(const pstring_t<T> name, ios_base::openmode mode = ios_base::out | ios_base::trunc)
+	explicit ofstream(const pstring_t<T> &name, ios_base::openmode mode = ios_base::out | ios_base::trunc)
 	: std::ofstream(filename_type(name).c_str(), mode)
+	{
+	}
+
+	explicit ofstream(const std::string &name, ios_base::openmode mode = ios_base::out | ios_base::trunc)
+	: std::ofstream(filename_type(putf8string(name)).c_str(), mode)
 	{
 	}
 };

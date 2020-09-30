@@ -172,8 +172,8 @@ uint8_t borntofi_state::inputs_r(offs_t offset)
 
 	// Trackball
 
-	x = ioport(offset ? "P2 Trackball X" : "P1 Trackball X")->read();
-	y = ioport(offset ? "P2 Trackball Y" : "P1 Trackball Y")->read();
+	x = ioport(offset ? "P2-TRK.X" : "P1-TRK.X")->read();
+	y = ioport(offset ? "P2-TRK.Y" : "P1-TRK.Y")->read();
 	f = m_screen->frame_number();
 
 	m_input_ret[offset] = (m_input_ret[offset] & 0x14) | (ioport(offset ? "P2_TRACK" : "P1_TRACK")->read() & 0xc3);
@@ -227,10 +227,10 @@ void borntofi_state::main_map(address_map &map)
 
 	map(0x54000, 0x567ff).ram().share("spriteram");
 
-	map(0x57000, 0x57000).portr("P1 Lightgun Y");
-	map(0x57001, 0x57001).portr("P1 Lightgun X");
-	map(0x57002, 0x57002).portr("P2 Lightgun Y");
-	map(0x57003, 0x57003).portr("P2 Lightgun X");
+	map(0x57000, 0x57000).portr("P1-GUN.Y");
+	map(0x57001, 0x57001).portr("P1-GUN.X");
+	map(0x57002, 0x57002).portr("P2-GUN.Y");
+	map(0x57003, 0x57003).portr("P2-GUN.X");
 
 	map(0x60000, 0x6ffff).ram().share("spriteram2");
 
@@ -655,28 +655,28 @@ static INPUT_PORTS_START( borntofi )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x0040, "DSW2:7" )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x0080, "DSW2:8" )
 
-	PORT_START("P1 Lightgun Y")     /* 57000 */
+	PORT_START("P1-GUN.Y")     /* 57000 */
 	PORT_BIT( 0xff, 0xb0, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, (352.0 - 12) / 352, 12.0 / 352, 0) PORT_MINMAX(0x80,0xfc) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_PLAYER(1)
 
-	PORT_START("P1 Lightgun X")     /* 57001 */
+	PORT_START("P1-GUN.X")     /* 57001 */
 	PORT_BIT( 0xff, 0x60, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0x07,0xb7) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_PLAYER(1)
 
-	PORT_START("P2 Lightgun Y")     /* 57002 */
+	PORT_START("P2-GUN.Y")     /* 57002 */
 	PORT_BIT( 0xff, 0xb0, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, (352.0 - 12) / 352, 12.0 / 352, 0) PORT_MINMAX(0x80,0xfc) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_PLAYER(2)
 
-	PORT_START("P2 Lightgun X")     /* 57003 */
+	PORT_START("P2-GUN.X")     /* 57003 */
 	PORT_BIT( 0xff, 0x70, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0x07,0xb7) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_PLAYER(2)
 
-	PORT_START("P1 Trackball Y")    /* 53000 */
+	PORT_START("P1-TRK.Y")    /* 53000 */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(10) PORT_KEYDELTA(5) PORT_PLAYER(1) PORT_RESET
 
-	PORT_START("P1 Trackball X")    /* 53000 */
+	PORT_START("P1-TRK.X")    /* 53000 */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(10) PORT_KEYDELTA(5) PORT_PLAYER(1) PORT_RESET
 
-	PORT_START("P2 Trackball Y")    /* 53001 */
+	PORT_START("P2-TRK.Y")    /* 53001 */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(10) PORT_KEYDELTA(5) PORT_PLAYER(2)
 
-	PORT_START("P2 Trackball X")    /* 53001 */
+	PORT_START("P2-TRK.X")    /* 53001 */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(10) PORT_KEYDELTA(5) PORT_PLAYER(2)
 INPUT_PORTS_END
 

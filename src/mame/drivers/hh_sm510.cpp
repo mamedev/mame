@@ -520,7 +520,7 @@ void hh_sm510_state::sm511_tiger2bit(machine_config &config, u16 width, u16 heig
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo2bit_r1_w));
 
 	// R via 120K resistor, S1 via 39K resistor (eg. tsonic, tsonic2, tbatmana)
-	static const s16 speaker_levels[] = { 0, 0x7fff/3*1, 0x7fff/3*2, 0x7fff };
+	static const double speaker_levels[] = { 0.0, 1.0/3.0, 2.0/3.0, 1.0 };
 	m_speaker->set_levels(4, speaker_levels);
 }
 

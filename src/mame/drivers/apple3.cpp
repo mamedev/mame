@@ -42,7 +42,7 @@ void apple3_state::apple3_map(address_map &map)
 
 static void apple3_cards(device_slot_interface &device)
 {
-	device.option_add("cffa2", A2BUS_CFFA2_6502);       // CFFA2000 Compact Flash for Apple II (www.dreher.net), 6502 firmware
+	device.option_add("cffa2", A2BUS_CFFA2_6502);       // CFFA2.0 Compact Flash for Apple II (www.dreher.net), 6502 firmware
 	device.option_add("applicard", A2BUS_APPLICARD);    // PCPI Applicard
 	device.option_add("thclock", A2BUS_THUNDERCLOCK);   // ThunderWare ThunderClock Plus - driver assumes slot 2 by default
 	device.option_add("mouse", A2BUS_MOUSE);            // Apple II Mouse Card
@@ -103,7 +103,7 @@ void apple3_state::apple3(machine_config &config)
 	m_a2bus->set_space(m_maincpu, AS_PROGRAM);
 	m_a2bus->irq_w().set(FUNC(apple3_state::a2bus_irq_w));
 	m_a2bus->nmi_w().set(FUNC(apple3_state::a2bus_nmi_w));
-	//m_a2bus->inh_w().set(FUNC(apple3_state::a2bus_inh_w));
+	m_a2bus->inh_w().set(FUNC(apple3_state::a2bus_inh_w));
 	m_a2bus->dma_w().set_inputline(m_maincpu, INPUT_LINE_HALT);
 	A2BUS_SLOT(config, "sl1", m_a2bus, apple3_cards, nullptr);
 	A2BUS_SLOT(config, "sl2", m_a2bus, apple3_cards, nullptr);
@@ -356,11 +356,11 @@ INPUT_PORTS_END
 
 ROM_START(apple3)
 	ROM_REGION(0x1000,"maincpu",0)
-	ROM_SYSTEM_BIOS(0, "soshd", "Rob Justice SOSHDBOOT")
-	ROMX_LOAD( "soshdboot.bin", 0x000000, 0x001000, CRC(fd5ac9e2) SHA1(ba466a54ddb7f618c4f18f344754343c5945b417), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(0, "original", "Apple /// boot ROM")
+	ROMX_LOAD( "apple3.rom", 0x0000, 0x1000, CRC(55e8eec9) SHA1(579ee4cd2b208d62915a0aa482ddc2744ff5e967), ROM_BIOS(0))
 
-	ROM_SYSTEM_BIOS(1, "original", "Apple /// boot ROM")
-	ROMX_LOAD( "apple3.rom", 0x0000, 0x1000, CRC(55e8eec9) SHA1(579ee4cd2b208d62915a0aa482ddc2744ff5e967), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "soshd", "Rob Justice SOSHDBOOT")
+	ROMX_LOAD( "soshdboot.bin", 0x000000, 0x001000, CRC(fd5ac9e2) SHA1(ba466a54ddb7f618c4f18f344754343c5945b417), ROM_BIOS(1))
 ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY           FULLNAME */

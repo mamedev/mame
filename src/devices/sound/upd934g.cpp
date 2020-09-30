@@ -49,7 +49,7 @@ upd934g_device::upd934g_device(const machine_config &mconfig, const char *tag, d
 void upd934g_device::device_start()
 {
 	// create sound stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 4, 20000);
+	m_stream = stream_alloc(0, 4, 20000);
 
 	// resolve callbacks
 	m_data_cb.resolve_safe(0);
@@ -85,28 +85,29 @@ void upd934g_device::device_reset()
 //  our sound stream
 //-------------------------------------------------
 
-void upd934g_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void upd934g_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	for (unsigned ch = 0; ch < 4; ch++)
 	{
-		std::fill(&outputs[ch][0], &outputs[ch][samples], 0);
-
 		if (m_ready && m_channel[ch].playing != -1)
 		{
 			uint16_t end = m_addr[m_channel[ch].playing + 1] - 1;
 
-			for (unsigned i = 0; i < samples; i++)
+			for (unsigned i = 0; i < outputs[ch].samples(); i++)
 			{
 				int8_t raw = static_cast<int8_t>(m_data_cb(m_channel[ch].pos));
-				outputs[ch][i] = raw * (m_channel[ch].volume + 1) * 64;
+				outputs[ch].put_int(i, raw * (m_channel[ch].volume + 1), 32768 / 64);
 
 				if (++m_channel[ch].pos >= end)
 				{
 					m_channel[ch].playing = -1;
+					outputs[ch].fill(0, i + 1);
 					break;
 				}
 			}
 		}
+		else
+			outputs[ch].fill(0);
 	}
 }
 

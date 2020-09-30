@@ -47,7 +47,7 @@ void turrett_device::device_start()
 	space().cache(m_cache);
 
 	// Create the sound stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, 44100);
+	m_stream = stream_alloc_legacy(0, 2, 44100);
 
 	// Create the volume table
 	for (int i = 0; i < 0x4f; ++i)
@@ -78,10 +78,10 @@ void turrett_device::device_reset()
 
 
 //-------------------------------------------------
-//  sound_stream_update - update sound stream
+//  sound_stream_update_legacy - update sound stream
 //-------------------------------------------------
 
-void turrett_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void turrett_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	// Silence the buffers
 	memset(outputs[0], 0x00, sizeof(stream_sample_t) * samples);

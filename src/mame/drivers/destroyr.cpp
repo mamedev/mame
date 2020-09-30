@@ -532,7 +532,7 @@ void destroyr_state::destroyr(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, "sound_nl:hexplo", "HE.IN", 0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:lexplo", "LE.IN", 0);
 
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(32767.0, 0.0);
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(1.0, 0.0);
 }
 
 

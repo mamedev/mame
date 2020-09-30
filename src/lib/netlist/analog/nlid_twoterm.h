@@ -34,11 +34,11 @@
 ///
 //
 
-#include "netlist/nl_base.h"
-#include "netlist/nl_setup.h"
-#include "netlist/plib/pfunction.h"
-#include "netlist/solver/nld_solver.h"
+#include "../nl_setup.h"
+#include "nl_base.h"
 #include "nld_generic_models.h"
+#include "plib/pfunction.h"
+#include "solver/nld_solver.h"
 
 // -----------------------------------------------------------------------------
 // Implementation
@@ -54,7 +54,7 @@ namespace analog
 	// -----------------------------------------------------------------------------
 
 	template <class C>
-	inline core_device_t &bselect(bool b, C &d1, core_device_t &d2)
+	static inline core_device_t &bselect(bool b, C &d1, core_device_t &d2)
 	{
 		auto *h = dynamic_cast<core_device_t *>(&d1);
 		return b ? *h : d2;
@@ -635,8 +635,8 @@ namespace analog
 		, m_compiled(*this, "m_compiled")
 		, m_funcparam({nlconst::zero()})
 		{
-			register_subalias("P", P());
-			register_subalias("N", N());
+			register_subalias("P", "1");
+			register_subalias("N", "2");
 			if (!m_func().empty())
 				m_compiled->compile(m_func(), std::vector<pstring>({{pstring("T")}}));
 		}

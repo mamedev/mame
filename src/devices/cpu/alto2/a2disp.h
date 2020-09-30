@@ -190,8 +190,8 @@
  * </PRE>
  */
 
-#ifndef _A2DISP_H_
-#define _A2DISP_H_
+#ifndef MAME_CPU_ALTO2_A2DISP_H
+#define MAME_CPU_ALTO2_A2DISP_H
 struct {
 	uint32_t state;                           //!< current state of the display_state_machine()
 	uint32_t hlc;                             //!< horizontal line counter
@@ -312,5 +312,5 @@ void init_disp();                   //!< initialize the display context
 void exit_disp();                   //!< deinitialize the display context
 void reset_disp();                  //!< reset the display context
 
-#endif  // _A2DISP_H_
+#endif  // MAME_CPU_ALTO2_A2DISP_H
 #endif  // ALTO2_DEFINE_CONSTANTS

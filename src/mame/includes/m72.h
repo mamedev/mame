@@ -93,6 +93,7 @@ public:
 	void init_gallop();
 	void init_m72_8751();
 	void init_dbreedm72();
+	void init_airduelm72();
 	void init_nspirit();
 
 private:
@@ -173,6 +174,7 @@ private:
 	void nspirit_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void loht_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void dbreedm72_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void airduelm72_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void dkgenm72_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void gallop_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void rtype2_port02_w(u8 data);

@@ -14,87 +14,10 @@
 #include "netlist/devices/net_lib.h"
 
 //
-// 556 is just two 555s in one package
-//
-
-static NETLIST_START(NE556_DIP)
-	NE555(A)
-	NE555(B)
-
-	NET_C(A.GND, B.GND)
-	NET_C(A.VCC, B.VCC)
-
-	DIPPINS(      /*        +--------------+        */
-		 A.DISCH, /* 1DISCH |1     ++    14| VCC    */ A.VCC,
-		A.THRESH, /* 1THRES |2           13| 2DISCH */ B.DISCH,
-		  A.CONT, /*  1CONT |3           12| 2THRES */ B.THRESH,
-		 A.RESET, /* 1RESET |4   NE556   11| 2CONT  */ B.CONT,
-		   A.OUT, /*   1OUT |5           10| 2RESET */ B.RESET,
-		  A.TRIG, /*  1TRIG |6            9| 2OUT   */ B.OUT,
-		   A.GND, /*    GND |7            8| 2TRIG  */ B.TRIG
-				  /*        +--------------+        */
-	)
-NETLIST_END()
-
-static NETLIST_START(ICL8038_DIP)
-	VCVS(VI, 1)
-	CCCS(CI1, -1)
-	CCCS(CI2, 2)
-	SYS_COMPD(COMP)
-	SYS_DSW2(SW)
-	VCVS(VO, 1)
-	RES(R_SHUNT, RES_R(50))
-
-	PARAM(VO.RO, 50)
-	PARAM(COMP.MODEL, "FAMILY(TYPE=CUSTOM IVL=0.16 IVH=0.4 OVL=0.01 OVH=0.01 ORL=50 ORH=50)")
-	PARAM(SW.GOFF, 0) // This has to be zero to block current sources
-
-	NET_C(VI.OP, CI1.IN, CI2.IN)
-	NET_C(CI1.OP, VO.IP)
-	NET_C(COMP.Q, SW.I)
-	NET_C(CI2.OP, SW.2)
-	NET_C(COMP.VCC, R_SHUNT.1)
-	NET_C(SW.1, R_SHUNT.2)
-	NET_C(SW.3, VO.IP)
-	NET_C(VO.OP, COMP.IN)
-
-	// Avoid singular Matrix due to G=0 switch
-	RES(RX1, 1e10)
-	RES(RX2, 1e10)
-	NET_C(RX1.1, SW.1)
-	NET_C(RX2.1, SW.3)
-
-	NET_C(COMP.GND, RX1.2, RX2.2)
-
-	RES(R1, 5000)
-	RES(R2, 5000)
-	RES(R3, 5000)
-
-	// Square output wave
-	VCVS(V_SQR, 1)
-	NET_C(COMP.Q, V_SQR.IP)
-
-	NET_C(COMP.GND, SW.GND, VI.ON, VI.IN, CI1.ON, CI2.ON, VO.IN, VO.ON, R2.2, V_SQR.IN, V_SQR.ON)
-	NET_C(COMP.VCC, SW.VCC, R1.2)
-	NET_C(COMP.IP, R1.1, R2.1, R3.1)
-	NET_C(COMP.Q, R3.2)
-
-	ALIAS(11, VI.ON) // GND
-	ALIAS(9, V_SQR.OP) // Square out
-	ALIAS(3, VO.OP) // Triag out
-	ALIAS(8, VI.IP) // VC
-	ALIAS(4, CI1.IP) // R1
-	ALIAS(5, CI2.IP) // R2
-	ALIAS(10, VO.IP) // C1
-	ALIAS(6, COMP.VCC) // V+
-NETLIST_END()
-
-//
 // Main netlist
 //
 
 NETLIST_START(starfire)
-	NET_MODEL("2N3702 PNP(Is=650.6E-18 Xti=3 Eg=1.11 Vaf=115.7 Bf=133.8 Ne=1.832 Ise=97.16f Ikf=1.081 Xtb=1.5 Br=3.73 Nc=2 Isc=0 Ikr=0 Rc=.715 Cjc=14.76p Mjc=.5383 Vjc=.75 Fc=.5 Cje=19.82p Mje=.3357 Vje=.75 Tr=114.1n Tf=761.3p Itf=.65 Vtf=5 Xtf=1.7 Rb=10 mfg=National)")
 	NET_MODEL("LM324_12V OPAMP(TYPE=3 VLH=1.6 VLL=0.16 FPF=5 UGF=500k SLEW=0.3M RI=1000k RO=50 DAB=0.00075)")
 	NET_MODEL("LM324_5V OPAMP(TYPE=3 VLH=0.667 VLL=0.0667 FPF=5 UGF=500k SLEW=0.3M RI=1000k RO=50 DAB=0.00075)")
 
@@ -117,9 +40,6 @@ NETLIST_START(starfire)
 
 	NET_C(VCC, SIZE.VCC, SEXPLO.VCC, STIE.VCC, SLASER.VCC, TRACK.VCC, LOCK.VCC, SCANNER.VCC, OHEAT.VCC)
 	NET_C(GND, SIZE.GND, SEXPLO.GND, STIE.GND, SLASER.GND, TRACK.GND, LOCK.GND, SCANNER.GND, OHEAT.GND)
-
-	LOCAL_SOURCE(NE556_DIP)
-	LOCAL_SOURCE(ICL8038_DIP)
 
 	RES(R12, RES_K(10))
 	RES(R13, RES_K(470))

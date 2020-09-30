@@ -176,17 +176,12 @@ public:
 		, m_blitter_irq_handler(*this)
 		, m_protection1(*this, "protection1")
 		, m_protection2(*this, "protection2")
-		, m_soundlatch(*this, "soundlatch")
-		, m_leds(*this, "led%u", 0U)
 	{ }
 
 	void mjmywrld(machine_config &config);
 	void mjmyster(machine_config &config);
-	void mmpanic(machine_config &config);
 	void nettoqc(machine_config &config);
 	void mjmyornt(machine_config &config);
-	void kotbinsp(machine_config &config);
-	void mjgnight(machine_config &config);
 	void ddenlovrk(machine_config &config);
 	void quizchq(machine_config &config);
 	void mjmyuniv(machine_config &config);
@@ -194,30 +189,20 @@ public:
 	void hgokou(machine_config &config);
 	void seljan2(machine_config &config);
 	void janshinp(machine_config &config);
-	void hkagerou(machine_config &config);
 	void ultrchmp(machine_config &config);
 	void rongrong(machine_config &config);
 	void mjflove(machine_config &config);
-	void hanakanz(machine_config &config);
-	void jongtei(machine_config &config);
 	void akamaru(machine_config &config);
-	void mjchuuka(machine_config &config);
 	void hparadis(machine_config &config);
-	void mjreach1(machine_config &config);
 	void ddenlovr(machine_config &config);
-	void funkyfig(machine_config &config);
 	void hginga(machine_config &config);
-	void daimyojn(machine_config &config);
-	void htengoku(machine_config &config);
 	void sryudens(machine_config &config);
 	void hgokbang(machine_config &config);
 	void quiz365(machine_config &config);
-	void kotbinyo(machine_config &config);
 	void mjschuka(machine_config &config);
 	void ddenlovj(machine_config &config);
 
 	void init_rongrong();
-	void init_momotaro();
 
 	DECLARE_READ_LINE_MEMBER(blitter_irq_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(ddenlovj_blitter_r);
@@ -230,51 +215,45 @@ protected:
 		m_blitter_irq_handler.resolve_safe();
 	}
 
-private:
 	auto blitter_irq() { return m_blitter_irq_handler.bind(); }
 
 	DECLARE_MACHINE_START(ddenlovr);
 	DECLARE_MACHINE_RESET(ddenlovr);
 	DECLARE_VIDEO_START(ddenlovr);
+private:
 	DECLARE_MACHINE_START(rongrong);
-	DECLARE_MACHINE_START(mmpanic);
-	DECLARE_VIDEO_START(mmpanic);
+protected:
 	DECLARE_MACHINE_START(hanakanz);
-	DECLARE_VIDEO_START(hanakanz);
+private:
 	DECLARE_MACHINE_START(sryudens);
 	DECLARE_VIDEO_START(mjflove);
 	DECLARE_MACHINE_START(seljan2);
+protected:
 	DECLARE_MACHINE_START(mjflove);
-	DECLARE_MACHINE_START(funkyfig);
+private:
 	DECLARE_MACHINE_START(mjmyster);
 	DECLARE_MACHINE_START(hparadis);
+protected:
 	uint32_t screen_update_ddenlovr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_htengoku(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+private:
 	DECLARE_WRITE_LINE_MEMBER(ddenlovr_irq);
-	DECLARE_WRITE_LINE_MEMBER(mmpanic_irq);
-	DECLARE_WRITE_LINE_MEMBER(mmpanic_rtc_irq);
-	DECLARE_WRITE_LINE_MEMBER(funkyfig_sound_irq);
 	DECLARE_WRITE_LINE_MEMBER(mjflove_irq);
 	DECLARE_WRITE_LINE_MEMBER(mjflove_rtc_irq);
+	DECLARE_WRITE_LINE_MEMBER(ddenlovr_blitter_irq);
+	DECLARE_WRITE_LINE_MEMBER(ddenlovr_blitter_irq_ack_w);
+	DECLARE_WRITE_LINE_MEMBER(mjflove_blitter_irq);
 
+protected:
 	void ddenlovr_bgcolor_w(uint8_t data);
 	void ddenlovr_bgcolor2_w(uint8_t data);
 	void ddenlovr_priority_w(uint8_t data);
 	void ddenlovr_priority2_w(uint8_t data);
 	void ddenlovr_layer_enable_w(uint8_t data);
 	void ddenlovr_layer_enable2_w(uint8_t data);
-	void hanakanz_blitter_reg_w(uint8_t data);
-	void hanakanz_blitter_data_w(uint8_t data);
 	void ddenlovr_blitter_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(ddenlovr_blitter_irq);
-	DECLARE_WRITE_LINE_MEMBER(ddenlovr_blitter_irq_ack_w);
-	uint8_t rongrong_gfxrom_r();
-	uint16_t ddenlovr_gfxrom_r();
-	DECLARE_WRITE_LINE_MEMBER(ddenlovr_coincounter_0_w);
-	DECLARE_WRITE_LINE_MEMBER(ddenlovr_coincounter_1_w);
-	void rongrong_coincounter_w(uint8_t data);
-	void rongrong_palette_w(offs_t offset, uint8_t data);
+	uint8_t ddenlovr_gfxrom_r();
+	void ddenlovr_palette_w(offs_t offset, uint8_t data);
 	void ddenlovr_palette_base_w(offs_t offset, uint8_t data);
 	void ddenlovr_palette_base2_w(offs_t offset, uint8_t data);
 	void ddenlovr_palette_mask_w(offs_t offset, uint8_t data);
@@ -284,8 +263,12 @@ private:
 	void ddenlovr_transparency_mask_w(offs_t offset, uint8_t data);
 	void ddenlovr_transparency_mask2_w(offs_t offset, uint8_t data);
 	uint8_t unk_r();
-	uint16_t unk16_r();
 	void ddenlovr_select2_w(uint8_t data);
+
+private:
+	DECLARE_WRITE_LINE_MEMBER(ddenlovr_coincounter_0_w);
+	DECLARE_WRITE_LINE_MEMBER(ddenlovr_coincounter_1_w);
+	void rongrong_coincounter_w(uint8_t data);
 	uint8_t rongrong_input2_r();
 	uint16_t quiz365_input2_r();
 	void quiz365_coincounter_w(uint8_t data);
@@ -303,43 +286,16 @@ private:
 	void ultrchmp_protection2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t rongrong_input_r();
 	void rongrong_select_w(uint8_t data);
-	uint8_t magic_r();
-	void mmpanic_rombank_w(uint8_t data);
-	void mmpanic_blitter2_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(mmpanic_blitter_irq);
-	void mmpanic_leds_w(uint8_t data);
-	void mmpanic_leds2_w(uint8_t data);
-	void mmpanic_lockout_w(uint8_t data);
-	uint8_t mmpanic_link_r();
-	uint8_t funkyfig_busy_r();
-	void funkyfig_blitter_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(funkyfig_blitter_irq);
-	void funkyfig_rombank_w(uint8_t data);
-	uint8_t funkyfig_dsw_r();
-	uint8_t funkyfig_coin_r();
-	uint8_t funkyfig_key_r();
-	void funkyfig_lockout_w(uint8_t data);
-	void hanakanz_rombank_w(uint8_t data);
+protected:
 	void hanakanz_keyb_w(uint8_t data);
-	void hanakanz_dsw_w(uint8_t data);
-	uint8_t hanakanz_keyb_r(offs_t offset);
-	uint8_t hanakanz_dsw_r();
-	uint8_t hanakanz_busy_r();
-	uint8_t hanakanz_gfxrom_r(offs_t offset);
-	void hanakanz_coincounter_w(uint8_t data);
-	void hanakanz_palette_w(uint8_t data);
 	uint8_t hanakanz_rand_r();
-	void mjreach1_protection_w(uint8_t data);
-	uint8_t mjreach1_protection_r();
+private:
 	void mjschuka_protection_w(uint8_t data);
 	uint8_t mjschuka_protection_r();
-	uint8_t mjchuuka_keyb_r(offs_t offset);
-	void mjchuuka_blitter_w(offs_t offset, uint8_t data);
-	uint8_t mjchuuka_gfxrom_0_r();
-	uint8_t mjchuuka_gfxrom_1_r();
-	void mjchuuka_palette_w(offs_t offset, uint8_t data);
-	void mjchuuka_coincounter_w(uint8_t data);
+protected:
 	void mjmyster_rambank_w(uint8_t data);
+private:
+	void mjmyster_rombank_w(uint8_t data);
 	void mjmyster_select2_w(uint8_t data);
 	uint8_t mjmyster_coins_r();
 	uint8_t mjmyster_keyb_r();
@@ -371,59 +327,40 @@ private:
 	uint16_t akamaru_dsw_r();
 	uint16_t akamaru_blitter_r();
 	uint16_t akamaru_e0010d_r();
+protected:
 	void mjflove_rombank_w(uint8_t data);
+private:
 	uint8_t mjflove_protection_r();
 	uint8_t mjflove_keyb_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(mjflove_blitter_irq);
 	void mjflove_coincounter_w(uint8_t data);
-	void jongtei_dsw_keyb_w(uint8_t data);
-	uint8_t jongtei_busy_r();
-	uint8_t mjgnight_protection_r();
-	void mjgnight_protection_w(uint8_t data);
-	void mjgnight_coincounter_w(uint8_t data);
 	uint8_t sryudens_keyb_r(offs_t offset);
 	void sryudens_coincounter_w(uint8_t data);
 	void sryudens_rambank_w(uint8_t data);
+protected:
 	uint8_t daimyojn_keyb1_r();
 	uint8_t daimyojn_keyb2_r();
-	void daimyojn_protection_w(uint8_t data);
-	uint8_t daimyojn_protection_r();
-	uint8_t momotaro_protection_r();
-	void daimyojn_palette_sel_w(uint8_t data);
-	void daimyojn_blitter_data_palette_w(uint8_t data);
-	uint8_t daimyojn_year_hack_r(offs_t offset);
+private:
 	void janshinp_coincounter_w(uint8_t data);
 	void seljan2_rombank_w(uint8_t data);
 	void seljan2_palette_enab_w(uint8_t data);
 	void seljan2_palette_w(offs_t offset, uint8_t data);
-	void htengoku_select_w(uint8_t data);
-	void htengoku_coin_w(uint8_t data);
-	uint8_t htengoku_input_r();
-	uint8_t htengoku_coin_r();
-	void htengoku_rombank_w(uint8_t data);
-	void htengoku_blit_romregion_w(uint8_t data);
-	DECLARE_VIDEO_START(htengoku);
-	void htengoku_dsw_w(uint8_t data);
-	uint8_t htengoku_dsw_r();
 	void quizchq_oki_bank_w(uint8_t data);
 	void ddenlovr_oki_bank_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(quiz365_oki_bank1_w);
 	DECLARE_WRITE_LINE_MEMBER(quiz365_oki_bank2_w);
+protected:
 	void ddenlovr_select_w(uint8_t data);
+private:
 	uint8_t quiz365_input_r();
 	void nettoqc_oki_bank_w(uint8_t data);
-	void hanakanz_oki_bank_w(uint8_t data);
-	void mjchuuka_oki_bank_w(uint8_t data);
 	uint8_t hginga_dsw_r();
 	void mjflove_okibank_w(uint8_t data);
-	void jongtei_okibank_w(uint8_t data);
 	uint8_t seljan2_dsw_r();
-	void daimyojn_okibank_w(uint8_t data);
+	uint8_t hgokou_player_r( int player );
 
+protected:
 	void ddenlovr_flipscreen_w( uint8_t data );
 	void ddenlovr_blit_flip_w( uint8_t data );
-	void do_plot( int x, int y, int pen );
-	inline void log_draw_error( int src, int cmd );
 	int blit_draw( int src, int sx );
 	void blit_rect_xywh();
 	void blit_rect_yh();
@@ -433,47 +370,32 @@ private:
 	inline void log_blit(int data );
 	void blitter_w(int blitter, offs_t offset, uint8_t data);
 	void blitter_w_funkyfig(int blitter, offs_t offset, uint8_t data);
+private:
+	void do_plot( int x, int y, int pen );
+	inline void log_draw_error( int src, int cmd );
 	void copylayer(bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer);
-	void mmpanic_update_leds();
-	void mjchuuka_get_romdata();
-	uint8_t hgokou_player_r( int player );
+
 	void akamaru_map(address_map &map);
-	void daimyojn_portmap(address_map &map);
 	void ddenlovj_map(address_map &map);
 	void ddenlovr_map(address_map &map);
 	void ddenlovrk_map(address_map &map);
-	void funkyfig_map(address_map &map);
-	void funkyfig_portmap(address_map &map);
-	void funkyfig_sound_portmap(address_map &map);
-	void hanakanz_map(address_map &map);
-	void hanakanz_portmap(address_map &map);
 	void hginga_map(address_map &map);
 	void hginga_portmap(address_map &map);
 	void hgokbang_portmap(address_map &map);
 	void hgokou_map(address_map &map);
 	void hgokou_portmap(address_map &map);
-	void hkagerou_portmap(address_map &map);
 	void hparadis_map(address_map &map);
 	void hparadis_portmap(address_map &map);
-	void htengoku_io_map(address_map &map);
-	void htengoku_mem_map(address_map &map);
 	void janshinp_map(address_map &map);
 	void janshinp_portmap(address_map &map);
-	void jongtei_portmap(address_map &map);
-	void kotbinsp_portmap(address_map &map);
-	void kotbinyo_portmap(address_map &map);
-	void mjchuuka_portmap(address_map &map);
 	void mjflove_portmap(address_map &map);
-	void mjgnight_portmap(address_map &map);
 	void mjmyster_map(address_map &map);
 	void mjmyster_portmap(address_map &map);
 	void mjmywrld_portmap(address_map &map);
-	void mjreach1_portmap(address_map &map);
+protected:
+	void hanakanz_map(address_map &map);
+private:
 	void mjschuka_portmap(address_map &map);
-	void mmpanic_map(address_map &map);
-	void mmpanic_portmap(address_map &map);
-	void mmpanic_sound_map(address_map &map);
-	void mmpanic_sound_portmap(address_map &map);
 	void nettoqc_map(address_map &map);
 	void quiz365_map(address_map &map);
 	void quizchq_map(address_map &map);
@@ -486,12 +408,13 @@ private:
 	void sryudens_portmap(address_map &map);
 	void ultrchmp_map(address_map &map);
 
+protected:
 	devcb_write_line m_blitter_irq_handler;
 
+private:
 	optional_shared_ptr<uint16_t> m_protection1;
 	optional_shared_ptr<uint16_t> m_protection2;
-	optional_device<generic_latch_8_device> m_soundlatch;
-	output_finder<2> m_leds;
+protected:
 	std::unique_ptr<uint8_t[]>  m_ddenlovr_pixmap[8];
 
 	/* blitter (TODO: merge with the dynax.h, where possible) */
@@ -530,22 +453,184 @@ private:
 	const int *m_ddenlovr_blit_commands;
 	int m_ddenlovr_blit_regs[2];
 
+private:
 	/* ddenlovr misc (TODO: merge with dynax.h, where possible) */
 	uint8_t m_palram[0x200];
 	int m_okibank;
+protected:
 	uint8_t m_prot_val;
+private:
 	uint16_t m_prot_16;
 	uint16_t m_quiz365_protection[2];
 
-	uint16_t m_mmpanic_leds;  /* A led for each of the 9 buttons */
-	uint8_t m_funkyfig_lockout;
-	uint8_t m_romdata[2];
-	int m_palette_index;
 	uint8_t m_hginga_rombank;
 	uint8_t m_mjflove_irq_cause;
-	uint8_t m_daimyojn_palette_sel;
+};
+
+class htengoku_state : public ddenlovr_state
+{
+public:
+	htengoku_state(const machine_config &mconfig, device_type type, const char *tag)
+		: ddenlovr_state(mconfig, type, tag)
+	{ }
+
+	void htengoku(machine_config &config);
+
+private:
+	uint32_t screen_update_htengoku(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	void htengoku_select_w(uint8_t data);
+	void htengoku_coin_w(uint8_t data);
+	uint8_t htengoku_input_r();
+	uint8_t htengoku_coin_r();
+	void htengoku_rombank_w(uint8_t data);
+	void htengoku_blit_romregion_w(uint8_t data);
+	DECLARE_VIDEO_START(htengoku);
+	void htengoku_dsw_w(uint8_t data);
+	uint8_t htengoku_dsw_r();
+
+	void htengoku_io_map(address_map &map);
+	void htengoku_mem_map(address_map &map);
 
 	bitmap_ind16 m_htengoku_layer;
+};
+
+class mmpanic_state : public ddenlovr_state
+{
+public:
+	mmpanic_state(const machine_config &mconfig, device_type type, const char *tag)
+		: ddenlovr_state(mconfig, type, tag)
+		, m_soundlatch(*this, "soundlatch")
+		, m_leds(*this, "led%u", 0U)
+	{ }
+
+	void mmpanic(machine_config &config);
+	void funkyfig(machine_config &config);
+
+private:
+	DECLARE_MACHINE_START(mmpanic);
+	DECLARE_MACHINE_RESET(mmpanic);
+	DECLARE_VIDEO_START(mmpanic);
+	DECLARE_MACHINE_START(funkyfig);
+
+	DECLARE_WRITE_LINE_MEMBER(mmpanic_irq);
+	DECLARE_WRITE_LINE_MEMBER(mmpanic_rtc_irq);
+	DECLARE_WRITE_LINE_MEMBER(funkyfig_sound_irq);
+
+	uint8_t magic_r();
+	void mmpanic_rombank_w(uint8_t data);
+	void mmpanic_blitter2_w(offs_t offset, uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(mmpanic_blitter_irq);
+	void mmpanic_leds_w(uint8_t data);
+	void mmpanic_leds2_w(uint8_t data);
+	void mmpanic_lockout_w(uint8_t data);
+	uint8_t mmpanic_link_r();
+	uint8_t funkyfig_busy_r();
+	void funkyfig_blitter_w(offs_t offset, uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(funkyfig_blitter_irq);
+	void funkyfig_rombank_w(uint8_t data);
+	uint8_t funkyfig_dsw_r();
+	uint8_t funkyfig_coin_r();
+	uint8_t funkyfig_key_r();
+	void funkyfig_lockout_w(uint8_t data);
+
+	void mmpanic_update_leds();
+
+	void funkyfig_map(address_map &map);
+	void funkyfig_portmap(address_map &map);
+	void funkyfig_sound_portmap(address_map &map);
+	void mmpanic_map(address_map &map);
+	void mmpanic_portmap(address_map &map);
+	void mmpanic_sound_map(address_map &map);
+	void mmpanic_sound_portmap(address_map &map);
+
+	required_device<generic_latch_8_device> m_soundlatch;
+	output_finder<2> m_leds;
+
+	uint16_t m_mmpanic_leds;  /* A led for each of the 9 buttons */
+	uint8_t m_funkyfig_lockout;
+};
+
+class hanakanz_state : public ddenlovr_state
+{
+public:
+	hanakanz_state(const machine_config &mconfig, device_type type, const char *tag)
+		: ddenlovr_state(mconfig, type, tag)
+		, m_led(*this, "led")
+	{ }
+
+	void kotbinsp(machine_config &config);
+	void mjgnight(machine_config &config);
+	void hkagerou(machine_config &config);
+	void hanakanz(machine_config &config);
+	void jongtei(machine_config &config);
+	void mjchuuka(machine_config &config);
+	void mjreach1(machine_config &config);
+	void daimyojn(machine_config &config);
+	void kotbinyo(machine_config &config);
+
+	void init_momotaro();
+
+private:
+	DECLARE_VIDEO_START(hanakanz);
+	DECLARE_MACHINE_RESET(hanakanz);
+
+	void hanakanz_blitter_reg_w(uint8_t data);
+	void hanakanz_blitter_data_w(uint8_t data);
+
+	void hanakanz_rombank_w(uint8_t data);
+	//void hanakanz_keyb_w(uint8_t data);
+	void hanakanz_dsw_w(uint8_t data);
+	uint8_t hanakanz_keyb_r(offs_t offset);
+	uint8_t hanakanz_dsw_r();
+	uint8_t hanakanz_busy_r();
+	uint8_t hanakanz_gfxrom_r(offs_t offset);
+	void hanakanz_coincounter_w(uint8_t data);
+	void hanakanz_palette_w(uint8_t data);
+	//uint8_t hanakanz_rand_r();
+	void mjreach1_protection_w(uint8_t data);
+	uint8_t mjreach1_protection_r();
+	uint8_t mjchuuka_keyb_r(offs_t offset);
+	void mjchuuka_blitter_w(offs_t offset, uint8_t data);
+	uint8_t mjchuuka_gfxrom_0_r();
+	uint8_t mjchuuka_gfxrom_1_r();
+	void mjchuuka_palette_w(offs_t offset, uint8_t data);
+	void mjchuuka_coincounter_w(uint8_t data);
+	void jongtei_dsw_keyb_w(uint8_t data);
+	uint8_t jongtei_busy_r();
+	uint8_t mjgnight_protection_r();
+	void mjgnight_protection_w(uint8_t data);
+	void mjgnight_coincounter_w(uint8_t data);
+	//uint8_t daimyojn_keyb1_r();
+	//uint8_t daimyojn_keyb2_r();
+	void daimyojn_protection_w(uint8_t data);
+	uint8_t daimyojn_protection_r();
+	uint8_t momotaro_protection_r();
+	void daimyojn_palette_sel_w(uint8_t data);
+	void daimyojn_blitter_data_palette_w(uint8_t data);
+	uint8_t daimyojn_year_hack_r(offs_t offset);
+	void hanakanz_oki_bank_w(uint8_t data);
+	void mjchuuka_oki_bank_w(uint8_t data);
+	void jongtei_okibank_w(uint8_t data);
+	void daimyojn_okibank_w(uint8_t data);
+
+	void mjchuuka_get_romdata();
+
+	void daimyojn_portmap(address_map &map);
+	void hanakanz_portmap(address_map &map);
+	void hkagerou_portmap(address_map &map);
+	void jongtei_portmap(address_map &map);
+	void kotbinsp_portmap(address_map &map);
+	void kotbinyo_portmap(address_map &map);
+	void mjchuuka_portmap(address_map &map);
+	void mjgnight_portmap(address_map &map);
+	void mjreach1_portmap(address_map &map);
+
+	output_finder<> m_led;
+
+	uint8_t m_romdata[2];
+	int m_palette_index;
+	uint8_t m_daimyojn_palette_sel;
 };
 
 VIDEO_START_MEMBER(ddenlovr_state,ddenlovr)
@@ -643,19 +728,25 @@ VIDEO_START_MEMBER(ddenlovr_state,ddenlovr)
 	save_pointer(NAME(m_ddenlovr_pixmap[7]), 512 * 512);
 }
 
-VIDEO_START_MEMBER(ddenlovr_state,mmpanic)
+VIDEO_START_MEMBER(mmpanic_state,mmpanic)
 {
 	VIDEO_START_CALL_MEMBER(ddenlovr);
 
 	m_extra_layers = 1;
 }
 
-VIDEO_START_MEMBER(ddenlovr_state,hanakanz)
+VIDEO_START_MEMBER(hanakanz_state,hanakanz)
 {
 	VIDEO_START_CALL_MEMBER(ddenlovr);
 
 	m_ddenlovr_blit_rom_bits = 16;
 	m_ddenlovr_blit_commands = hanakanz_commands;
+
+	m_led.resolve();
+
+	save_item(NAME(m_romdata));
+	save_item(NAME(m_palette_index));
+	save_item(NAME(m_daimyojn_palette_sel));
 }
 
 VIDEO_START_MEMBER(ddenlovr_state,mjflove)
@@ -1367,13 +1458,13 @@ g_profiler.stop();
 
 
 
-void ddenlovr_state::hanakanz_blitter_reg_w(uint8_t data)
+void hanakanz_state::hanakanz_blitter_reg_w(uint8_t data)
 {
 	m_ddenlovr_blit_latch = data;
 }
 
 // differences wrt blitter_data_w: registers are shuffled around, hi_bits in the low bits, clip_w/h, includes layers registers
-void ddenlovr_state::hanakanz_blitter_data_w(uint8_t data)
+void hanakanz_state::hanakanz_blitter_data_w(uint8_t data)
 {
 	int hi_bits;
 
@@ -1592,7 +1683,7 @@ WRITE_LINE_MEMBER(ddenlovr_state::ddenlovr_blitter_irq_ack_w)
 }
 
 
-uint8_t ddenlovr_state::rongrong_gfxrom_r()
+uint8_t ddenlovr_state::ddenlovr_gfxrom_r()
 {
 	uint8_t *rom  = memregion("blitter")->base();
 	size_t size = memregion("blitter")->bytes();
@@ -1607,11 +1698,6 @@ uint8_t ddenlovr_state::rongrong_gfxrom_r()
 	m_ddenlovr_blit_address = (m_ddenlovr_blit_address + 1) & 0xffffff;
 
 	return rom[address];
-}
-
-uint16_t ddenlovr_state::ddenlovr_gfxrom_r()
-{
-	return rongrong_gfxrom_r();
 }
 
 
@@ -1770,7 +1856,7 @@ WRITE_LINE_MEMBER(ddenlovr_state::ddenlovr_coincounter_1_w)
 }
 
 
-void ddenlovr_state::rongrong_palette_w(offs_t offset, uint8_t data)
+void ddenlovr_state::ddenlovr_palette_w(offs_t offset, uint8_t data)
 {
 	int r, g, b, d1, d2, indx;
 
@@ -1860,11 +1946,6 @@ uint8_t ddenlovr_state::unk_r()
 	return 0x78;
 }
 
-uint16_t ddenlovr_state::unk16_r()
-{
-	return unk_r();
-}
-
 
 void ddenlovr_state::ddenlovr_select_w(uint8_t data)
 {
@@ -1947,7 +2028,7 @@ void ddenlovr_state::quiz365_map(address_map &map)
 {
 	map(0x000000, 0x17ffff).rom();                                                 // ROM
 
-	map(0x200000, 0x2003ff).w(FUNC(ddenlovr_state::rongrong_palette_w)).umask16(0x00ff);
+	map(0x200000, 0x2003ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w)).umask16(0x00ff);
 
 	map(0x200c02, 0x200c03).r(FUNC(ddenlovr_state::quiz365_protection_r));                          // Protection
 	map(0x200e0a, 0x200e0d).w(FUNC(ddenlovr_state::quiz365_protection_w));                         // Protection
@@ -1964,9 +2045,9 @@ void ddenlovr_state::quiz365_map(address_map &map)
 	map(0x300269, 0x300269).w(FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
 	map(0x30026b, 0x30026b).w(FUNC(ddenlovr_state::ddenlovr_priority_w));
 	map(0x30026d, 0x30026d).w(FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
-	map(0x300270, 0x300271).r(FUNC(ddenlovr_state::unk16_r));                                       // ? must be 78 on startup (not necessary in ddlover)
+	map(0x300271, 0x300271).r(FUNC(ddenlovr_state::unk_r));                                         // ? must be 78 on startup (not necessary in ddlover)
 	map(0x300280, 0x300283).w(FUNC(ddenlovr_state::ddenlovr_blitter_w)).umask16(0x00ff);
-	map(0x300286, 0x300287).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));                             // Video Chip
+	map(0x300287, 0x300287).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));                             // Video Chip
 
 	map(0x3002c1, 0x3002c1).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));// Sound
 	map(0x300300, 0x300303).w("ym2413", FUNC(ym2413_device::write)).umask16(0x00ff);
@@ -2004,7 +2085,7 @@ void ddenlovr_state::ddenlovj_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom(); // ROM
 
-	map(0x200000, 0x2003ff).w(FUNC(ddenlovr_state::rongrong_palette_w)).umask16(0x00ff);
+	map(0x200000, 0x2003ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w)).umask16(0x00ff);
 //  map(0x201000, 0x2017ff).writeonly();                                      // ? B0 on startup, then 00
 
 	map(0x300040, 0x300047).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w)).umask16(0x00ff);
@@ -2014,9 +2095,9 @@ void ddenlovr_state::ddenlovj_map(address_map &map)
 	map(0x300069, 0x300069).w(FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
 	map(0x30006b, 0x30006b).w(FUNC(ddenlovr_state::ddenlovr_priority_w));
 	map(0x30006d, 0x30006d).w(FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
-	map(0x300070, 0x300071).r(FUNC(ddenlovr_state::unk16_r));                                       // ? must be 78 on startup (not necessary in ddlover)
+	map(0x300071, 0x300071).r(FUNC(ddenlovr_state::unk_r));                                         // ? must be 78 on startup (not necessary in ddlover)
 	map(0x300080, 0x300083).w(FUNC(ddenlovr_state::ddenlovr_blitter_w)).umask16(0x00ff);
-	map(0x300086, 0x300087).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));                             // Video Chip
+	map(0x300087, 0x300087).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));                             // Video Chip
 	map(0x3000c0, 0x3000c3).w("ym2413", FUNC(ym2413_device::write)).umask16(0x00ff);
 	map(0x300100, 0x30011f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
 	map(0x300140, 0x300143).w("aysnd", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
@@ -2063,7 +2144,7 @@ void ddenlovr_state::ddenlovrk_map(address_map &map)
 	map(0x100000, 0x100001).ram().r(FUNC(ddenlovr_state::ddenlovrk_protection1_r)).share("protection1");
 	map(0x200000, 0x200001).rw(FUNC(ddenlovr_state::ddenlovrk_protection2_r), FUNC(ddenlovr_state::ddenlovrk_protection2_w)).share("protection2");
 
-	map(0xd00000, 0xd003ff).w(FUNC(ddenlovr_state::rongrong_palette_w)).umask16(0x00ff);
+	map(0xd00000, 0xd003ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w)).umask16(0x00ff);
 //  map(0xd01000, 0xd017ff).ram();                                                    // ? B0 on startup, then 00
 
 	map(0xe00040, 0xe00047).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w)).umask16(0x00ff);
@@ -2075,7 +2156,7 @@ void ddenlovr_state::ddenlovrk_map(address_map &map)
 	map(0xe0006d, 0xe0006d).w(FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
 	map(0xe00070, 0xe00071).nopr();
 	map(0xe00080, 0xe00083).w(FUNC(ddenlovr_state::ddenlovr_blitter_w)).umask16(0x00ff);
-	map(0xe00086, 0xe00087).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));                                 // Video Chip
+	map(0xe00087, 0xe00087).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));                                 // Video Chip
 
 	map(0xe00100, 0xe00101).portr("P1");
 	map(0xe00102, 0xe00103).portr("P2");
@@ -2099,7 +2180,7 @@ void ddenlovr_state::ddenlovr_map(address_map &map)
 
 	map(0x300001, 0x300001).w(FUNC(ddenlovr_state::ddenlovr_oki_bank_w));
 
-	map(0xd00000, 0xd003ff).w(FUNC(ddenlovr_state::rongrong_palette_w)).umask16(0x00ff);
+	map(0xd00000, 0xd003ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w)).umask16(0x00ff);
 //  map(0xd01000, 0xd017ff).ram();                                                   // ? B0 on startup, then 00
 
 	map(0xe00040, 0xe00047).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w)).umask16(0x00ff);
@@ -2109,9 +2190,9 @@ void ddenlovr_state::ddenlovr_map(address_map &map)
 	map(0xe00069, 0xe00069).w(FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
 	map(0xe0006b, 0xe0006b).w(FUNC(ddenlovr_state::ddenlovr_priority_w));
 	map(0xe0006d, 0xe0006d).w(FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
-	map(0xe00070, 0xe00071).r(FUNC(ddenlovr_state::unk16_r));                                           // ? must be 78 on startup (not necessary in ddlover)
+	map(0xe00071, 0xe00071).r(FUNC(ddenlovr_state::unk_r));                                             // ? must be 78 on startup (not necessary in ddlover)
 	map(0xe00080, 0xe00083).w(FUNC(ddenlovr_state::ddenlovr_blitter_w)).umask16(0x00ff);
-	map(0xe00086, 0xe00087).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));                                 // Video Chip
+	map(0xe00087, 0xe00087).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));                                 // Video Chip
 
 	map(0xe00100, 0xe00101).portr("P1");
 	map(0xe00102, 0xe00103).portr("P2");
@@ -2172,7 +2253,7 @@ void ddenlovr_state::nettoqc_map(address_map &map)
 {
 	map(0x000000, 0x17ffff).rom();                                                     // ROM
 
-	map(0x200000, 0x2003ff).w(FUNC(ddenlovr_state::rongrong_palette_w)).umask16(0x00ff);
+	map(0x200000, 0x2003ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w)).umask16(0x00ff);
 	map(0x200c02, 0x200c03).r(FUNC(ddenlovr_state::nettoqc_protection1_r));                             // Protection 1
 	map(0x200e0a, 0x200e0d).writeonly().share("protection1");                       // ""
 	map(0x201000, 0x2017ff).writeonly();                                               // ?
@@ -2184,9 +2265,9 @@ void ddenlovr_state::nettoqc_map(address_map &map)
 	map(0x300069, 0x300069).w(FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
 	map(0x30006b, 0x30006b).w(FUNC(ddenlovr_state::ddenlovr_priority_w));
 	map(0x30006d, 0x30006d).w(FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
-	map(0x300070, 0x300071).r(FUNC(ddenlovr_state::unk16_r));                                           // ? must be 78 on startup (not necessary in ddlover)
+	map(0x300071, 0x300071).r(FUNC(ddenlovr_state::unk_r));                                             // ? must be 78 on startup (not necessary in ddlover)
 	map(0x300080, 0x300083).w(FUNC(ddenlovr_state::ddenlovr_blitter_w)).umask16(0x00ff);
-	map(0x300086, 0x300087).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));                                 // Video Chip
+	map(0x300087, 0x300087).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));                                 // Video Chip
 	map(0x3000c0, 0x3000c3).w("ym2413", FUNC(ym2413_device::write)).umask16(0x00ff);
 	map(0x300100, 0x30011f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
 	map(0x300140, 0x300143).w("aysnd", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
@@ -2225,7 +2306,7 @@ void ddenlovr_state::ultrchmp_map(address_map &map)
 	map(0x224680, 0x224681).ram().r(FUNC(ddenlovr_state::ultrchmp_protection2_r)).share("protection2");    // Protection 2
 	map(0x313570, 0x313571).w(FUNC(ddenlovr_state::ultrchmp_protection2_w));                               // "" + OKI bank
 
-	map(0xd00000, 0xd003ff).w(FUNC(ddenlovr_state::rongrong_palette_w)).umask16(0x00ff);
+	map(0xd00000, 0xd003ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w)).umask16(0x00ff);
 
 	map(0xd00c02, 0xd00c03).r(FUNC(ddenlovr_state::nettoqc_protection1_r));                             // Protection 1
 	map(0xd00e0a, 0xd00e0d).writeonly().share("protection1");                       // ""
@@ -2241,7 +2322,7 @@ void ddenlovr_state::ultrchmp_map(address_map &map)
 	map(0xe0006d, 0xe0006d).w(FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
 	map(0xe00070, 0xe00071).nopr();
 	map(0xe00080, 0xe00083).w(FUNC(ddenlovr_state::ddenlovr_blitter_w)).umask16(0x00ff);
-	map(0xe00086, 0xe00087).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));                                 // Video Chip
+	map(0xe00087, 0xe00087).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));                                 // Video Chip
 
 	map(0xe00100, 0xe00101).portr("P1");
 	map(0xe00102, 0xe00103).portr("P2");
@@ -2300,7 +2381,7 @@ void ddenlovr_state::quizchq_map(address_map &map)
 	map(0x6000, 0x6fff).ram();                                             // RAM
 	map(0x7000, 0x7fff).bankrw("bank2");                                // RAM (Banked)
 	map(0x8000, 0xffff).bankr("bank1");                                // ROM (Banked)
-	map(0x8000, 0x81ff).w(FUNC(ddenlovr_state::rongrong_palette_w));
+	map(0x8000, 0x81ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w));
 }
 
 void ddenlovr_state::quizchq_portmap(address_map &map)
@@ -2308,7 +2389,7 @@ void ddenlovr_state::quizchq_portmap(address_map &map)
 	map.global_mask(0xff);
 
 	map(0x00, 0x01).w(FUNC(ddenlovr_state::ddenlovr_blitter_w));
-	map(0x03, 0x03).r(FUNC(ddenlovr_state::rongrong_gfxrom_r));
+	map(0x03, 0x03).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));
 
 	map(0x20, 0x20).w(FUNC(ddenlovr_state::ddenlovr_select2_w));
 	map(0x21, 0x21).w(FUNC(ddenlovr_state::rongrong_coincounter_w));
@@ -2339,7 +2420,7 @@ void ddenlovr_state::rongrong_map(address_map &map)
 	map(0x6000, 0x6fff).ram();                                             // RAM
 	map(0x7000, 0x7fff).bankrw("bank2");                                // RAM (Banked)
 	map(0x8000, 0xffff).bankr("bank1");                                // ROM (Banked)
-	map(0xf000, 0xf1ff).w(FUNC(ddenlovr_state::rongrong_palette_w));
+	map(0xf000, 0xf1ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w));
 }
 
 void ddenlovr_state::rongrong_portmap(address_map &map)
@@ -2347,7 +2428,7 @@ void ddenlovr_state::rongrong_portmap(address_map &map)
 	map.global_mask(0xff);
 
 	map(0x00, 0x01).w(FUNC(ddenlovr_state::ddenlovr_blitter_w));
-	map(0x03, 0x03).r(FUNC(ddenlovr_state::rongrong_gfxrom_r));
+	map(0x03, 0x03).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));
 
 	map(0x20, 0x2f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 	map(0x40, 0x40).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -2380,48 +2461,48 @@ a0 input select,a2 input read (protection?)
 ***************************************************************************/
 
 
-uint8_t ddenlovr_state::magic_r()
+uint8_t mmpanic_state::magic_r()
 {
 	return 0x01;
 }
 
-void ddenlovr_state::mmpanic_rombank_w(uint8_t data)
+void mmpanic_state::mmpanic_rombank_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x7);
 	/* Bit 4? */
 }
 
-void ddenlovr_state::mmpanic_blitter2_w(offs_t offset, uint8_t data)
+void mmpanic_state::mmpanic_blitter2_w(offs_t offset, uint8_t data)
 {
 	blitter_w(1, offset, data);
 }
 
-WRITE_LINE_MEMBER(ddenlovr_state::mmpanic_blitter_irq)
+WRITE_LINE_MEMBER(mmpanic_state::mmpanic_blitter_irq)
 {
 	if (state)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xdf);    // Z80 - RST 18
 }
 
-void ddenlovr_state::mmpanic_update_leds()
+void mmpanic_state::mmpanic_update_leds()
 {
 	m_leds[0] = m_mmpanic_leds;
 }
 
 /* leds 1-8 */
-void ddenlovr_state::mmpanic_leds_w(uint8_t data)
+void mmpanic_state::mmpanic_leds_w(uint8_t data)
 {
 	m_mmpanic_leds = (m_mmpanic_leds & 0xff00) | data;
 	mmpanic_update_leds();
 }
 /* led 9 */
-void ddenlovr_state::mmpanic_leds2_w(uint8_t data)
+void mmpanic_state::mmpanic_leds2_w(uint8_t data)
 {
 	m_mmpanic_leds = (m_mmpanic_leds & 0xfeff) | (data ? 0x0100 : 0);
 	mmpanic_update_leds();
 }
 
 
-void ddenlovr_state::mmpanic_lockout_w(uint8_t data)
+void mmpanic_state::mmpanic_lockout_w(uint8_t data)
 {
 	if (m_dsw_sel == 0x0c)
 	{
@@ -2431,75 +2512,75 @@ void ddenlovr_state::mmpanic_lockout_w(uint8_t data)
 	}
 }
 
-uint8_t ddenlovr_state::mmpanic_link_r(){ return 0xff; }
+uint8_t mmpanic_state::mmpanic_link_r(){ return 0xff; }
 
 /* Main CPU */
 
-void ddenlovr_state::mmpanic_map(address_map &map)
+void mmpanic_state::mmpanic_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();                                             // ROM
-	map(0x0051, 0x0051).r(FUNC(ddenlovr_state::magic_r));                                   // ?
+	map(0x0051, 0x0051).r(FUNC(mmpanic_state::magic_r));                                   // ?
 	map(0x6000, 0x6fff).ram();                                             // RAM
 	map(0x7000, 0x7fff).bankrw("bank2");                                // RAM (Banked)
 	map(0x8000, 0xffff).bankr("bank1");                                // ROM (Banked)
-	map(0x8000, 0x81ff).w(FUNC(ddenlovr_state::rongrong_palette_w));
+	map(0x8000, 0x81ff).w(FUNC(mmpanic_state::ddenlovr_palette_w));
 }
 
-void ddenlovr_state::mmpanic_portmap(address_map &map)
+void mmpanic_state::mmpanic_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x0f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 
 	// Layers 0-3:
-	map(0x20, 0x23).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w));
-	map(0x24, 0x27).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
-	map(0x28, 0x2b).w(FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
-	map(0x2c, 0x2f).w(FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
-	map(0x34, 0x34).w(FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
-	map(0x35, 0x35).w(FUNC(ddenlovr_state::ddenlovr_priority_w));
-	map(0x36, 0x36).w(FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
-	map(0x38, 0x38).r(FUNC(ddenlovr_state::unk_r));             // ? must be 78 on startup
+	map(0x20, 0x23).w(FUNC(mmpanic_state::ddenlovr_palette_base_w));
+	map(0x24, 0x27).w(FUNC(mmpanic_state::ddenlovr_palette_mask_w));
+	map(0x28, 0x2b).w(FUNC(mmpanic_state::ddenlovr_transparency_pen_w));
+	map(0x2c, 0x2f).w(FUNC(mmpanic_state::ddenlovr_transparency_mask_w));
+	map(0x34, 0x34).w(FUNC(mmpanic_state::ddenlovr_bgcolor_w));
+	map(0x35, 0x35).w(FUNC(mmpanic_state::ddenlovr_priority_w));
+	map(0x36, 0x36).w(FUNC(mmpanic_state::ddenlovr_layer_enable_w));
+	map(0x38, 0x38).r(FUNC(mmpanic_state::unk_r));             // ? must be 78 on startup
 
 	// Layers 4-7:
-	map(0x40, 0x43).w(FUNC(ddenlovr_state::ddenlovr_palette_base2_w));
-	map(0x44, 0x47).w(FUNC(ddenlovr_state::ddenlovr_palette_mask2_w));
-	map(0x48, 0x4b).w(FUNC(ddenlovr_state::ddenlovr_transparency_pen2_w));
-	map(0x4c, 0x4f).w(FUNC(ddenlovr_state::ddenlovr_transparency_mask2_w));
-	map(0x54, 0x54).w(FUNC(ddenlovr_state::ddenlovr_bgcolor2_w));
-	map(0x55, 0x55).w(FUNC(ddenlovr_state::ddenlovr_priority2_w));
-	map(0x56, 0x56).w(FUNC(ddenlovr_state::ddenlovr_layer_enable2_w));
-	map(0x58, 0x58).r(FUNC(ddenlovr_state::unk_r));             // ? must be 78 on startup
+	map(0x40, 0x43).w(FUNC(mmpanic_state::ddenlovr_palette_base2_w));
+	map(0x44, 0x47).w(FUNC(mmpanic_state::ddenlovr_palette_mask2_w));
+	map(0x48, 0x4b).w(FUNC(mmpanic_state::ddenlovr_transparency_pen2_w));
+	map(0x4c, 0x4f).w(FUNC(mmpanic_state::ddenlovr_transparency_mask2_w));
+	map(0x54, 0x54).w(FUNC(mmpanic_state::ddenlovr_bgcolor2_w));
+	map(0x55, 0x55).w(FUNC(mmpanic_state::ddenlovr_priority2_w));
+	map(0x56, 0x56).w(FUNC(mmpanic_state::ddenlovr_layer_enable2_w));
+	map(0x58, 0x58).r(FUNC(mmpanic_state::unk_r));             // ? must be 78 on startup
 
-	map(0x60, 0x61).w(FUNC(ddenlovr_state::ddenlovr_blitter_w));
-	map(0x63, 0x63).r(FUNC(ddenlovr_state::rongrong_gfxrom_r)); // Video Chip
-	map(0x64, 0x65).w(FUNC(ddenlovr_state::mmpanic_blitter2_w));
-	map(0x68, 0x68).w(FUNC(ddenlovr_state::ddenlovr_select_w));
-	map(0x69, 0x69).w(FUNC(ddenlovr_state::mmpanic_lockout_w));
+	map(0x60, 0x61).w(FUNC(mmpanic_state::ddenlovr_blitter_w));
+	map(0x63, 0x63).r(FUNC(mmpanic_state::ddenlovr_gfxrom_r)); // Video Chip
+	map(0x64, 0x65).w(FUNC(mmpanic_state::mmpanic_blitter2_w));
+	map(0x68, 0x68).w(FUNC(mmpanic_state::ddenlovr_select_w));
+	map(0x69, 0x69).w(FUNC(mmpanic_state::mmpanic_lockout_w));
 	map(0x6a, 0x6a).portr("IN0");
 	map(0x6b, 0x6b).portr("IN1");
-	map(0x6c, 0x6d).r(FUNC(ddenlovr_state::mmpanic_link_r));    // Other cabinets?
-	map(0x74, 0x74).w(FUNC(ddenlovr_state::mmpanic_rombank_w));
+	map(0x6c, 0x6d).r(FUNC(mmpanic_state::mmpanic_link_r));    // Other cabinets?
+	map(0x74, 0x74).w(FUNC(mmpanic_state::mmpanic_rombank_w));
 	map(0x78, 0x78).nopw();                // 0, during RST 08 (irq acknowledge?)
 	map(0x7c, 0x7c).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));   // Sound
 	map(0x8c, 0x8c).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x88, 0x88).w(FUNC(ddenlovr_state::mmpanic_leds_w));       // Leds
+	map(0x88, 0x88).w(FUNC(mmpanic_state::mmpanic_leds_w));       // Leds
 	map(0x90, 0x90).nopw();                // written just before port 8c
 	map(0x94, 0x94).portr("DSW1");
 	map(0x98, 0x98).portr("DSW2");
 	map(0x9c, 0x9c).portr("DSW3");       // DSW 1&2 high bits
-	map(0xa6, 0xa6).w(FUNC(ddenlovr_state::mmpanic_leds2_w));      //
+	map(0xa6, 0xa6).w(FUNC(mmpanic_state::mmpanic_leds2_w));      //
 }
 
 /* Sound CPU */
 
-void ddenlovr_state::mmpanic_sound_map(address_map &map)
+void mmpanic_state::mmpanic_sound_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();     // ROM
 	map(0x6000, 0x66ff).ram();     // RAM
 	map(0x8000, 0xffff).rom();     // ROM
 }
 
-void ddenlovr_state::mmpanic_sound_portmap(address_map &map)
+void mmpanic_state::mmpanic_sound_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).r(m_soundlatch, FUNC(generic_latch_8_device::read));
@@ -2519,36 +2600,36 @@ void ddenlovr_state::mmpanic_sound_portmap(address_map &map)
 
 /* Main CPU */
 
-void ddenlovr_state::funkyfig_map(address_map &map)
+void mmpanic_state::funkyfig_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x6fff).ram();
 	map(0x7000, 0x7fff).bankrw("bank2");            // RAM (Banked)
 
 	map(0x8000, 0xffff).bankr("bank1");
-	map(0x8000, 0x81ff).w(FUNC(ddenlovr_state::rongrong_palette_w));
+	map(0x8000, 0x81ff).w(FUNC(mmpanic_state::ddenlovr_palette_w));
 	map(0x8400, 0x87ff).nopw();
 }
 
 
-uint8_t ddenlovr_state::funkyfig_busy_r()
+uint8_t mmpanic_state::funkyfig_busy_r()
 {
 					// bit 0 ?
 	return 0x00;    // bit 7 = blitter busy
 }
 
-void ddenlovr_state::funkyfig_blitter_w(offs_t offset, uint8_t data)
+void mmpanic_state::funkyfig_blitter_w(offs_t offset, uint8_t data)
 {
 	blitter_w_funkyfig(0, offset, data);
 }
 
-WRITE_LINE_MEMBER(ddenlovr_state::funkyfig_blitter_irq)
+WRITE_LINE_MEMBER(mmpanic_state::funkyfig_blitter_irq)
 {
 	if (0) // this vector looks wrong
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xe0); // Z80
 }
 
-void ddenlovr_state::funkyfig_rombank_w(uint8_t data)
+void mmpanic_state::funkyfig_rombank_w(uint8_t data)
 {
 	m_dsw_sel = data;
 
@@ -2557,7 +2638,7 @@ void ddenlovr_state::funkyfig_rombank_w(uint8_t data)
 	membank("bank2")->set_entry(((data & 0xe0) >> 5));
 }
 
-uint8_t ddenlovr_state::funkyfig_dsw_r()
+uint8_t mmpanic_state::funkyfig_dsw_r()
 {
 	if (!BIT(m_dsw_sel, 0))  return ioport("DSW1")->read();
 	if (!BIT(m_dsw_sel, 1))  return ioport("DSW2")->read();
@@ -2566,7 +2647,7 @@ uint8_t ddenlovr_state::funkyfig_dsw_r()
 	return 0xff;
 }
 
-uint8_t ddenlovr_state::funkyfig_coin_r()
+uint8_t mmpanic_state::funkyfig_coin_r()
 {
 	switch (m_input_sel)
 	{
@@ -2577,7 +2658,7 @@ uint8_t ddenlovr_state::funkyfig_coin_r()
 	return 0xff;
 }
 
-uint8_t ddenlovr_state::funkyfig_key_r()
+uint8_t mmpanic_state::funkyfig_key_r()
 {
 	switch (m_input_sel)
 	{
@@ -2588,7 +2669,7 @@ uint8_t ddenlovr_state::funkyfig_key_r()
 	return 0xff;
 }
 
-void ddenlovr_state::funkyfig_lockout_w(uint8_t data)
+void mmpanic_state::funkyfig_lockout_w(uint8_t data)
 {
 	switch (m_input_sel)
 	{
@@ -2607,39 +2688,39 @@ void ddenlovr_state::funkyfig_lockout_w(uint8_t data)
 	}
 }
 
-void ddenlovr_state::funkyfig_portmap(address_map &map)
+void mmpanic_state::funkyfig_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));   // Sound
-	map(0x01, 0x01).w(FUNC(ddenlovr_state::mmpanic_leds_w));       // Leds
+	map(0x01, 0x01).w(FUNC(mmpanic_state::mmpanic_leds_w));       // Leds
 	map(0x02, 0x02).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x04, 0x04).r(FUNC(ddenlovr_state::funkyfig_busy_r));
-	map(0x20, 0x21).w(FUNC(ddenlovr_state::funkyfig_blitter_w));
-	map(0x23, 0x23).r(FUNC(ddenlovr_state::rongrong_gfxrom_r));     // Video Chip
+	map(0x04, 0x04).r(FUNC(mmpanic_state::funkyfig_busy_r));
+	map(0x20, 0x21).w(FUNC(mmpanic_state::funkyfig_blitter_w));
+	map(0x23, 0x23).r(FUNC(mmpanic_state::ddenlovr_gfxrom_r));     // Video Chip
 	map(0x40, 0x4f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 
 	// Layers 0-3:
-	map(0x60, 0x63).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w));
-	map(0x64, 0x67).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
-	map(0x68, 0x6b).w(FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
-	map(0x6c, 0x6f).w(FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
-	map(0x74, 0x74).w(FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
-	map(0x75, 0x75).w(FUNC(ddenlovr_state::ddenlovr_priority_w));
-	map(0x76, 0x76).w(FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
-	map(0x78, 0x78).r(FUNC(ddenlovr_state::unk_r));                 // ? must be 78 on startup
+	map(0x60, 0x63).w(FUNC(mmpanic_state::ddenlovr_palette_base_w));
+	map(0x64, 0x67).w(FUNC(mmpanic_state::ddenlovr_palette_mask_w));
+	map(0x68, 0x6b).w(FUNC(mmpanic_state::ddenlovr_transparency_pen_w));
+	map(0x6c, 0x6f).w(FUNC(mmpanic_state::ddenlovr_transparency_mask_w));
+	map(0x74, 0x74).w(FUNC(mmpanic_state::ddenlovr_bgcolor_w));
+	map(0x75, 0x75).w(FUNC(mmpanic_state::ddenlovr_priority_w));
+	map(0x76, 0x76).w(FUNC(mmpanic_state::ddenlovr_layer_enable_w));
+	map(0x78, 0x78).r(FUNC(mmpanic_state::unk_r));                 // ? must be 78 on startup
 
-	map(0x80, 0x80).w(FUNC(ddenlovr_state::ddenlovr_select2_w));
-	map(0x81, 0x81).w(FUNC(ddenlovr_state::funkyfig_lockout_w));
-	map(0x82, 0x82).r(FUNC(ddenlovr_state::funkyfig_coin_r));
-	map(0x83, 0x83).r(FUNC(ddenlovr_state::funkyfig_key_r));
+	map(0x80, 0x80).w(FUNC(mmpanic_state::ddenlovr_select2_w));
+	map(0x81, 0x81).w(FUNC(mmpanic_state::funkyfig_lockout_w));
+	map(0x82, 0x82).r(FUNC(mmpanic_state::funkyfig_coin_r));
+	map(0x83, 0x83).r(FUNC(mmpanic_state::funkyfig_key_r));
 
-	map(0xa2, 0xa2).w(FUNC(ddenlovr_state::mmpanic_leds2_w));
+	map(0xa2, 0xa2).w(FUNC(mmpanic_state::mmpanic_leds2_w));
 }
 
 
 /* Sound CPU */
 
-void ddenlovr_state::funkyfig_sound_portmap(address_map &map)
+void mmpanic_state::funkyfig_sound_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x02, 0x02).r(m_soundlatch, FUNC(generic_latch_8_device::read));
@@ -2656,7 +2737,7 @@ void ddenlovr_state::funkyfig_sound_portmap(address_map &map)
 
 ***************************************************************************/
 
-void ddenlovr_state::hanakanz_rombank_w(uint8_t data)
+void hanakanz_state::hanakanz_rombank_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x0f);
 	membank("bank2")->set_entry(((data & 0xf0) >> 4));
@@ -2676,12 +2757,12 @@ void ddenlovr_state::hanakanz_keyb_w(uint8_t data)
 	m_keyb = data;
 }
 
-void ddenlovr_state::hanakanz_dsw_w(uint8_t data)
+void hanakanz_state::hanakanz_dsw_w(uint8_t data)
 {
 	m_dsw_sel = data;
 }
 
-uint8_t ddenlovr_state::hanakanz_keyb_r(offs_t offset)
+uint8_t hanakanz_state::hanakanz_keyb_r(offs_t offset)
 {
 	uint8_t val = 0xff;
 
@@ -2695,7 +2776,7 @@ uint8_t ddenlovr_state::hanakanz_keyb_r(offs_t offset)
 	return val;
 }
 
-uint8_t ddenlovr_state::hanakanz_dsw_r()
+uint8_t hanakanz_state::hanakanz_dsw_r()
 {
 	if (!BIT(m_dsw_sel, 0))   return ioport("DSW1")->read();
 	if (!BIT(m_dsw_sel, 1))   return ioport("DSW2")->read();
@@ -2705,12 +2786,12 @@ uint8_t ddenlovr_state::hanakanz_dsw_r()
 	return 0xff;
 }
 
-uint8_t ddenlovr_state::hanakanz_busy_r()
+uint8_t hanakanz_state::hanakanz_busy_r()
 {
 	return 0x80;    // bit 7 == 0 -> blitter busy
 }
 
-uint8_t ddenlovr_state::hanakanz_gfxrom_r(offs_t offset)
+uint8_t hanakanz_state::hanakanz_gfxrom_r(offs_t offset)
 {
 	uint8_t *rom  = memregion("blitter")->base();
 	size_t size = memregion("blitter")->bytes();
@@ -2738,7 +2819,7 @@ uint8_t ddenlovr_state::hanakanz_gfxrom_r(offs_t offset)
 }
 
 
-void ddenlovr_state::hanakanz_coincounter_w(uint8_t data)
+void hanakanz_state::hanakanz_coincounter_w(uint8_t data)
 {
 	// bit 0 = coin counter
 	// bit 1 = out counter
@@ -2756,7 +2837,7 @@ void ddenlovr_state::hanakanz_coincounter_w(uint8_t data)
 #endif
 }
 
-void ddenlovr_state::hanakanz_palette_w(uint8_t data)
+void hanakanz_state::hanakanz_palette_w(uint8_t data)
 {
 	if (m_ddenlovr_blit_latch & 0x80)
 	{
@@ -2774,7 +2855,7 @@ void ddenlovr_state::hanakanz_palette_w(uint8_t data)
 	}
 }
 
-void ddenlovr_state::hanakanz_oki_bank_w(uint8_t data)
+void hanakanz_state::hanakanz_oki_bank_w(uint8_t data)
 {
 	m_oki->set_rom_bank((data >> 6) & 1);
 }
@@ -2784,127 +2865,127 @@ uint8_t ddenlovr_state::hanakanz_rand_r()
 	return machine().rand();
 }
 
-void ddenlovr_state::hanakanz_portmap(address_map &map)
+void hanakanz_state::hanakanz_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x2c, 0x2c).rw(FUNC(ddenlovr_state::hanakanz_busy_r), FUNC(ddenlovr_state::hanakanz_oki_bank_w));
-	map(0x2e, 0x2e).w(FUNC(ddenlovr_state::hanakanz_blitter_reg_w));
-	map(0x30, 0x30).w(FUNC(ddenlovr_state::hanakanz_rombank_w));
-	map(0x31, 0x31).w(FUNC(ddenlovr_state::hanakanz_dsw_w));
-	map(0x32, 0x32).r(FUNC(ddenlovr_state::hanakanz_dsw_r));
-	map(0x80, 0x80).w(FUNC(ddenlovr_state::hanakanz_blitter_data_w));
-	map(0x81, 0x81).w(FUNC(ddenlovr_state::hanakanz_palette_w));
-	map(0x83, 0x84).r(FUNC(ddenlovr_state::hanakanz_gfxrom_r));
+	map(0x2c, 0x2c).rw(FUNC(hanakanz_state::hanakanz_busy_r), FUNC(hanakanz_state::hanakanz_oki_bank_w));
+	map(0x2e, 0x2e).w(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
+	map(0x30, 0x30).w(FUNC(hanakanz_state::hanakanz_rombank_w));
+	map(0x31, 0x31).w(FUNC(hanakanz_state::hanakanz_dsw_w));
+	map(0x32, 0x32).r(FUNC(hanakanz_state::hanakanz_dsw_r));
+	map(0x80, 0x80).w(FUNC(hanakanz_state::hanakanz_blitter_data_w));
+	map(0x81, 0x81).w(FUNC(hanakanz_state::hanakanz_palette_w));
+	map(0x83, 0x84).r(FUNC(hanakanz_state::hanakanz_gfxrom_r));
 	map(0x90, 0x90).portr("SYSTEM");
-	map(0x91, 0x92).r(FUNC(ddenlovr_state::hanakanz_keyb_r));
-	map(0x93, 0x93).w(FUNC(ddenlovr_state::hanakanz_coincounter_w));
-	map(0x94, 0x94).w(FUNC(ddenlovr_state::hanakanz_keyb_w));
-	map(0x96, 0x96).r(FUNC(ddenlovr_state::hanakanz_rand_r));
+	map(0x91, 0x92).r(FUNC(hanakanz_state::hanakanz_keyb_r));
+	map(0x93, 0x93).w(FUNC(hanakanz_state::hanakanz_coincounter_w));
+	map(0x94, 0x94).w(FUNC(hanakanz_state::hanakanz_keyb_w));
+	map(0x96, 0x96).r(FUNC(hanakanz_state::hanakanz_rand_r));
 	map(0xa0, 0xa1).w("ym2413", FUNC(ym2413_device::write));
 	map(0xc0, 0xc0).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xe0, 0xef).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 }
 
 
-void ddenlovr_state::hkagerou_portmap(address_map &map)
+void hanakanz_state::hkagerou_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x2c, 0x2c).rw(FUNC(ddenlovr_state::hanakanz_busy_r), FUNC(ddenlovr_state::hanakanz_oki_bank_w));
-	map(0x2e, 0x2e).w(FUNC(ddenlovr_state::hanakanz_blitter_reg_w));
-	map(0x30, 0x30).w(FUNC(ddenlovr_state::hanakanz_rombank_w));
-	map(0x31, 0x31).w(FUNC(ddenlovr_state::hanakanz_dsw_w));
-	map(0x32, 0x32).r(FUNC(ddenlovr_state::hanakanz_dsw_r));
-	map(0x80, 0x80).w(FUNC(ddenlovr_state::hanakanz_blitter_data_w));
-	map(0x81, 0x81).w(FUNC(ddenlovr_state::hanakanz_palette_w));
-	map(0x83, 0x84).r(FUNC(ddenlovr_state::hanakanz_gfxrom_r));
+	map(0x2c, 0x2c).rw(FUNC(hanakanz_state::hanakanz_busy_r), FUNC(hanakanz_state::hanakanz_oki_bank_w));
+	map(0x2e, 0x2e).w(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
+	map(0x30, 0x30).w(FUNC(hanakanz_state::hanakanz_rombank_w));
+	map(0x31, 0x31).w(FUNC(hanakanz_state::hanakanz_dsw_w));
+	map(0x32, 0x32).r(FUNC(hanakanz_state::hanakanz_dsw_r));
+	map(0x80, 0x80).w(FUNC(hanakanz_state::hanakanz_blitter_data_w));
+	map(0x81, 0x81).w(FUNC(hanakanz_state::hanakanz_palette_w));
+	map(0x83, 0x84).r(FUNC(hanakanz_state::hanakanz_gfxrom_r));
 	map(0xa0, 0xa1).w("ym2413", FUNC(ym2413_device::write));
 	map(0xb0, 0xb0).portr("SYSTEM");
-	map(0xb1, 0xb2).r(FUNC(ddenlovr_state::hanakanz_keyb_r));
-	map(0xb3, 0xb3).w(FUNC(ddenlovr_state::hanakanz_coincounter_w));
-	map(0xb4, 0xb4).w(FUNC(ddenlovr_state::hanakanz_keyb_w));
-	map(0xb6, 0xb6).r(FUNC(ddenlovr_state::hanakanz_rand_r));
+	map(0xb1, 0xb2).r(FUNC(hanakanz_state::hanakanz_keyb_r));
+	map(0xb3, 0xb3).w(FUNC(hanakanz_state::hanakanz_coincounter_w));
+	map(0xb4, 0xb4).w(FUNC(hanakanz_state::hanakanz_keyb_w));
+	map(0xb6, 0xb6).r(FUNC(hanakanz_state::hanakanz_rand_r));
 	map(0xc0, 0xc0).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xe0, 0xef).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 }
 
 
 // same as hkagerou, different inputs, no RTC
-void ddenlovr_state::kotbinyo_portmap(address_map &map)
+void hanakanz_state::kotbinyo_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x2c, 0x2c).rw(FUNC(ddenlovr_state::hanakanz_busy_r), FUNC(ddenlovr_state::hanakanz_oki_bank_w));
-	map(0x2e, 0x2e).w(FUNC(ddenlovr_state::hanakanz_blitter_reg_w));
-	map(0x30, 0x30).w(FUNC(ddenlovr_state::hanakanz_rombank_w));
-	map(0x31, 0x31).w(FUNC(ddenlovr_state::hanakanz_dsw_w));
-	map(0x32, 0x32).r(FUNC(ddenlovr_state::hanakanz_dsw_r));
-	map(0x80, 0x80).w(FUNC(ddenlovr_state::hanakanz_blitter_data_w));
-	map(0x81, 0x81).w(FUNC(ddenlovr_state::hanakanz_palette_w));
-	map(0x83, 0x84).r(FUNC(ddenlovr_state::hanakanz_gfxrom_r));
+	map(0x2c, 0x2c).rw(FUNC(hanakanz_state::hanakanz_busy_r), FUNC(hanakanz_state::hanakanz_oki_bank_w));
+	map(0x2e, 0x2e).w(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
+	map(0x30, 0x30).w(FUNC(hanakanz_state::hanakanz_rombank_w));
+	map(0x31, 0x31).w(FUNC(hanakanz_state::hanakanz_dsw_w));
+	map(0x32, 0x32).r(FUNC(hanakanz_state::hanakanz_dsw_r));
+	map(0x80, 0x80).w(FUNC(hanakanz_state::hanakanz_blitter_data_w));
+	map(0x81, 0x81).w(FUNC(hanakanz_state::hanakanz_palette_w));
+	map(0x83, 0x84).r(FUNC(hanakanz_state::hanakanz_gfxrom_r));
 	map(0xa0, 0xa1).w("ym2413", FUNC(ym2413_device::write));
 	map(0xb0, 0xb0).portr("SYSTEM");
-//  map(0xb1, 0xb2).r(FUNC(ddenlovr_state::hanakanz_keyb_r));
+//  map(0xb1, 0xb2).r(FUNC(hanakanz_state::hanakanz_keyb_r));
 	map(0xb1, 0xb1).portr("KEYB0");
 	map(0xb2, 0xb2).portr("KEYB1");
-	map(0xb3, 0xb3).w(FUNC(ddenlovr_state::hanakanz_coincounter_w));
-//  map(0xb4, 0xb4).w(FUNC(ddenlovr_state::hanakanz_keyb_w));
-	map(0xb6, 0xb6).r(FUNC(ddenlovr_state::hanakanz_rand_r));
+	map(0xb3, 0xb3).w(FUNC(hanakanz_state::hanakanz_coincounter_w));
+//  map(0xb4, 0xb4).w(FUNC(hanakanz_state::hanakanz_keyb_w));
+	map(0xb6, 0xb6).r(FUNC(hanakanz_state::hanakanz_rand_r));
 	map(0xc0, 0xc0).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 //  map(0xe0, 0xef).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 }
 
 
 // same as hkagerou, different inputs, no RTC
-void ddenlovr_state::kotbinsp_portmap(address_map &map)
+void hanakanz_state::kotbinsp_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x2c, 0x2c).rw(FUNC(ddenlovr_state::hanakanz_busy_r), FUNC(ddenlovr_state::hanakanz_oki_bank_w));
-	map(0x2e, 0x2e).w(FUNC(ddenlovr_state::hanakanz_blitter_reg_w));
-	map(0x30, 0x30).w(FUNC(ddenlovr_state::hanakanz_rombank_w));
-	map(0x31, 0x31).w(FUNC(ddenlovr_state::hanakanz_dsw_w));
-	map(0x32, 0x32).r(FUNC(ddenlovr_state::hanakanz_dsw_r));
-	map(0x80, 0x80).w(FUNC(ddenlovr_state::hanakanz_blitter_data_w));
-	map(0x81, 0x81).w(FUNC(ddenlovr_state::hanakanz_palette_w));
-	map(0x83, 0x84).r(FUNC(ddenlovr_state::hanakanz_gfxrom_r));
+	map(0x2c, 0x2c).rw(FUNC(hanakanz_state::hanakanz_busy_r), FUNC(hanakanz_state::hanakanz_oki_bank_w));
+	map(0x2e, 0x2e).w(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
+	map(0x30, 0x30).w(FUNC(hanakanz_state::hanakanz_rombank_w));
+	map(0x31, 0x31).w(FUNC(hanakanz_state::hanakanz_dsw_w));
+	map(0x32, 0x32).r(FUNC(hanakanz_state::hanakanz_dsw_r));
+	map(0x80, 0x80).w(FUNC(hanakanz_state::hanakanz_blitter_data_w));
+	map(0x81, 0x81).w(FUNC(hanakanz_state::hanakanz_palette_w));
+	map(0x83, 0x84).r(FUNC(hanakanz_state::hanakanz_gfxrom_r));
 	map(0xa0, 0xa1).w("ym2413", FUNC(ym2413_device::write));
 	map(0x90, 0x90).portr("SYSTEM");
-//  map(0x91, 0x91).r(FUNC(ddenlovr_state::hanakanz_keyb_r));
+//  map(0x91, 0x91).r(FUNC(hanakanz_state::hanakanz_keyb_r));
 	map(0x91, 0x91).portr("KEYB0");
 	map(0x92, 0x92).portr("KEYB1");
-	map(0x93, 0x93).w(FUNC(ddenlovr_state::hanakanz_coincounter_w));
-//  map(0x94, 0x94).w(FUNC(ddenlovr_state::hanakanz_keyb_w));
-	map(0x96, 0x96).r(FUNC(ddenlovr_state::hanakanz_rand_r));
+	map(0x93, 0x93).w(FUNC(hanakanz_state::hanakanz_coincounter_w));
+//  map(0x94, 0x94).w(FUNC(hanakanz_state::hanakanz_keyb_w));
+	map(0x96, 0x96).r(FUNC(hanakanz_state::hanakanz_rand_r));
 	map(0xc0, 0xc0).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 //  map(0xe0, 0xef).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 }
 
 
-void ddenlovr_state::mjreach1_protection_w(uint8_t data)
+void hanakanz_state::mjreach1_protection_w(uint8_t data)
 {
 	m_prot_val = data;
 }
 
-uint8_t ddenlovr_state::mjreach1_protection_r()
+uint8_t hanakanz_state::mjreach1_protection_r()
 {
 	return m_prot_val;
 }
 
-void ddenlovr_state::mjreach1_portmap(address_map &map)
+void hanakanz_state::mjreach1_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x2c, 0x2c).rw(FUNC(ddenlovr_state::hanakanz_busy_r), FUNC(ddenlovr_state::hanakanz_oki_bank_w));
-	map(0x2e, 0x2e).w(FUNC(ddenlovr_state::hanakanz_blitter_reg_w));
-	map(0x30, 0x30).w(FUNC(ddenlovr_state::hanakanz_rombank_w));
-	map(0x31, 0x31).w(FUNC(ddenlovr_state::hanakanz_dsw_w));
-	map(0x32, 0x32).r(FUNC(ddenlovr_state::hanakanz_dsw_r));
-	map(0x80, 0x80).w(FUNC(ddenlovr_state::hanakanz_blitter_data_w));
-	map(0x81, 0x81).w(FUNC(ddenlovr_state::hanakanz_palette_w));
-	map(0x83, 0x84).r(FUNC(ddenlovr_state::hanakanz_gfxrom_r));
-	map(0x90, 0x90).w(FUNC(ddenlovr_state::hanakanz_keyb_w));
-	map(0x92, 0x92).r(FUNC(ddenlovr_state::hanakanz_rand_r));
-	map(0x93, 0x93).rw(FUNC(ddenlovr_state::mjreach1_protection_r), FUNC(ddenlovr_state::mjreach1_protection_w));
+	map(0x2c, 0x2c).rw(FUNC(hanakanz_state::hanakanz_busy_r), FUNC(hanakanz_state::hanakanz_oki_bank_w));
+	map(0x2e, 0x2e).w(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
+	map(0x30, 0x30).w(FUNC(hanakanz_state::hanakanz_rombank_w));
+	map(0x31, 0x31).w(FUNC(hanakanz_state::hanakanz_dsw_w));
+	map(0x32, 0x32).r(FUNC(hanakanz_state::hanakanz_dsw_r));
+	map(0x80, 0x80).w(FUNC(hanakanz_state::hanakanz_blitter_data_w));
+	map(0x81, 0x81).w(FUNC(hanakanz_state::hanakanz_palette_w));
+	map(0x83, 0x84).r(FUNC(hanakanz_state::hanakanz_gfxrom_r));
+	map(0x90, 0x90).w(FUNC(hanakanz_state::hanakanz_keyb_w));
+	map(0x92, 0x92).r(FUNC(hanakanz_state::hanakanz_rand_r));
+	map(0x93, 0x93).rw(FUNC(hanakanz_state::mjreach1_protection_r), FUNC(hanakanz_state::mjreach1_protection_w));
 	map(0x94, 0x94).portr("SYSTEM");
-	map(0x95, 0x96).r(FUNC(ddenlovr_state::hanakanz_keyb_r));
-	map(0x97, 0x97).w(FUNC(ddenlovr_state::hanakanz_coincounter_w));
+	map(0x95, 0x96).r(FUNC(hanakanz_state::hanakanz_keyb_r));
+	map(0x97, 0x97).w(FUNC(hanakanz_state::hanakanz_coincounter_w));
 	map(0xa0, 0xa1).w("ym2413", FUNC(ym2413_device::write));
 	map(0xc0, 0xc0).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xe0, 0xef).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
@@ -2915,7 +2996,7 @@ void ddenlovr_state::mjreach1_portmap(address_map &map)
      Mahjong Chuukanejyo
 ***************************************************************************/
 
-uint8_t ddenlovr_state::mjchuuka_keyb_r(offs_t offset)
+uint8_t hanakanz_state::mjchuuka_keyb_r(offs_t offset)
 {
 	uint8_t val = 0xff;
 
@@ -2933,13 +3014,13 @@ uint8_t ddenlovr_state::mjchuuka_keyb_r(offs_t offset)
 	return val;
 }
 
-void ddenlovr_state::mjchuuka_blitter_w(offs_t offset, uint8_t data)
+void hanakanz_state::mjchuuka_blitter_w(offs_t offset, uint8_t data)
 {
 	hanakanz_blitter_reg_w(offset >> 8);
 	hanakanz_blitter_data_w(data);
 }
 
-void ddenlovr_state::mjchuuka_get_romdata()
+void hanakanz_state::mjchuuka_get_romdata()
 {
 	uint8_t *rom = memregion("blitter")->base();
 	size_t size = memregion("blitter")->bytes();
@@ -2955,19 +3036,19 @@ void ddenlovr_state::mjchuuka_get_romdata()
 	m_romdata[1] = rom[address + 1];
 }
 
-uint8_t ddenlovr_state::mjchuuka_gfxrom_0_r()
+uint8_t hanakanz_state::mjchuuka_gfxrom_0_r()
 {
 	mjchuuka_get_romdata();
 	m_ddenlovr_blit_address++;
 	return m_romdata[0];
 }
 
-uint8_t ddenlovr_state::mjchuuka_gfxrom_1_r()
+uint8_t hanakanz_state::mjchuuka_gfxrom_1_r()
 {
 	return m_romdata[1];
 }
 
-void ddenlovr_state::mjchuuka_palette_w(offs_t offset, uint8_t data)
+void hanakanz_state::mjchuuka_palette_w(offs_t offset, uint8_t data)
 {
 	uint16_t rgb = (offset & 0xff00) | data;
 
@@ -2987,7 +3068,7 @@ void ddenlovr_state::mjchuuka_palette_w(offs_t offset, uint8_t data)
 	}
 }
 
-void ddenlovr_state::mjchuuka_coincounter_w(uint8_t data)
+void hanakanz_state::mjchuuka_coincounter_w(uint8_t data)
 {
 	// bit 0 = in counter
 	// bit 1 = out counter
@@ -3005,7 +3086,7 @@ void ddenlovr_state::mjchuuka_coincounter_w(uint8_t data)
 #endif
 }
 
-void ddenlovr_state::mjchuuka_oki_bank_w(uint8_t data)
+void hanakanz_state::mjchuuka_oki_bank_w(uint8_t data)
 {
 	// data & 0x08 ?
 	m_oki->set_rom_bank(data & 1);
@@ -3015,16 +3096,16 @@ void ddenlovr_state::mjchuuka_oki_bank_w(uint8_t data)
 #endif
 }
 
-void ddenlovr_state::mjchuuka_portmap(address_map &map)
+void hanakanz_state::mjchuuka_portmap(address_map &map)
 {     // 16 bit I/O
-	map(0x20, 0x20).select(0xff00).w(FUNC(ddenlovr_state::mjchuuka_blitter_w));
-	map(0x21, 0x21).select(0xff00).w(FUNC(ddenlovr_state::mjchuuka_palette_w));
-	map(0x23, 0x23).mirror(0xff00).r(FUNC(ddenlovr_state::mjchuuka_gfxrom_0_r));
-	map(0x40, 0x40).mirror(0xff00).w(FUNC(ddenlovr_state::mjchuuka_coincounter_w));
-	map(0x41, 0x41).mirror(0xff00).w(FUNC(ddenlovr_state::hanakanz_keyb_w));
+	map(0x20, 0x20).select(0xff00).w(FUNC(hanakanz_state::mjchuuka_blitter_w));
+	map(0x21, 0x21).select(0xff00).w(FUNC(hanakanz_state::mjchuuka_palette_w));
+	map(0x23, 0x23).mirror(0xff00).r(FUNC(hanakanz_state::mjchuuka_gfxrom_0_r));
+	map(0x40, 0x40).mirror(0xff00).w(FUNC(hanakanz_state::mjchuuka_coincounter_w));
+	map(0x41, 0x41).mirror(0xff00).w(FUNC(hanakanz_state::hanakanz_keyb_w));
 	map(0x42, 0x42).mirror(0xff00).portr("SYSTEM");
-	map(0x43, 0x44).mirror(0xff00).r(FUNC(ddenlovr_state::mjchuuka_keyb_r));
-	map(0x45, 0x45).mirror(0xff00).r(FUNC(ddenlovr_state::mjchuuka_gfxrom_1_r));
+	map(0x43, 0x44).mirror(0xff00).r(FUNC(hanakanz_state::mjchuuka_keyb_r));
+	map(0x45, 0x45).mirror(0xff00).r(FUNC(hanakanz_state::mjchuuka_gfxrom_1_r));
 	map(0x60, 0x60).mirror(0xff00).portr("DSW1");
 	map(0x61, 0x61).mirror(0xff00).portr("DSW2");
 	map(0x62, 0x62).mirror(0xff00).portr("DSW3");
@@ -3074,7 +3155,7 @@ void ddenlovr_state::mjschuka_portmap(address_map &map)
 	map(0x38, 0x38).nopr();         // ? ack or watchdog
 
 	map(0x40, 0x41).w(FUNC(ddenlovr_state::ddenlovr_blitter_w));
-	map(0x43, 0x43).r(FUNC(ddenlovr_state::rongrong_gfxrom_r));
+	map(0x43, 0x43).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));
 	map(0x50, 0x50).w(FUNC(ddenlovr_state::mjflove_okibank_w));
 
 	map(0x54, 0x54).rw(FUNC(ddenlovr_state::mjschuka_protection_r), FUNC(ddenlovr_state::mjschuka_protection_w));
@@ -3107,8 +3188,13 @@ void ddenlovr_state::mjmyster_map(address_map &map)
 	map(0x6000, 0x6fff).ram();                         // RAM
 	map(0x7000, 0x7fff).bankrw("bank2");            // RAM (Banked)
 	map(0x8000, 0xffff).bankr("bank1");            // ROM/RAM (Banked)
-	map(0xf000, 0xf1ff).w(FUNC(ddenlovr_state::rongrong_palette_w));   // RAM enabled by bit 4 of rombank
+	map(0xf000, 0xf1ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w));   // RAM enabled by bit 4 of rombank
 	map(0xf200, 0xffff).nopw();                    // ""
+}
+
+void ddenlovr_state::mjmyster_rombank_w(uint8_t data)
+{
+	membank("bank1")->set_entry(data & 0x7);
 }
 
 void ddenlovr_state::mjmyster_rambank_w(uint8_t data)
@@ -3189,7 +3275,7 @@ void ddenlovr_state::mjmyster_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x01).w(FUNC(ddenlovr_state::ddenlovr_blitter_w));
-	map(0x03, 0x03).r(FUNC(ddenlovr_state::rongrong_gfxrom_r));
+	map(0x03, 0x03).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));
 	map(0x20, 0x20).w(FUNC(ddenlovr_state::mjmyster_select2_w));
 	map(0x21, 0x21).w(FUNC(ddenlovr_state::mjmyster_coincounter_w));
 	map(0x22, 0x22).r(FUNC(ddenlovr_state::mjmyster_coins_r));
@@ -3239,7 +3325,7 @@ void ddenlovr_state::hginga_map(address_map &map)
 	map(0x7000, 0x7fff).bankrw("bank2");            // RAM (Banked)
 	map(0x8000, 0xffff).bankr("bank1");            // ROM/RAM (Banked)
 	map(0xf601, 0xf601).r(FUNC(ddenlovr_state::hginga_protection_r));
-	map(0xf000, 0xf1ff).w(FUNC(ddenlovr_state::rongrong_palette_w));   // RAM enabled by bit 4 of rombank
+	map(0xf000, 0xf1ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w));   // RAM enabled by bit 4 of rombank
 	map(0xf700, 0xf706).nopw();
 }
 
@@ -3359,7 +3445,7 @@ void ddenlovr_state::hginga_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x01).w(FUNC(ddenlovr_state::hginga_blitter_w));
-	map(0x03, 0x03).r(FUNC(ddenlovr_state::rongrong_gfxrom_r));
+	map(0x03, 0x03).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));
 	map(0x22, 0x23).w("ym2413", FUNC(ym2413_device::write));
 	map(0x24, 0x24).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x26, 0x26).w("aysnd", FUNC(ay8910_device::data_w));
@@ -3459,7 +3545,7 @@ void ddenlovr_state::hgokou_map(address_map &map)
 	map(0x6000, 0x6fff).ram();                         // RAM
 	map(0x7000, 0x7fff).bankrw("bank2");            // RAM (Banked)
 	map(0x8000, 0xffff).bankr("bank1");            // ROM (Banked)
-	map(0xe000, 0xe1ff).w(FUNC(ddenlovr_state::rongrong_palette_w));
+	map(0xe000, 0xe1ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w));
 	map(0xe601, 0xe601).r(FUNC(ddenlovr_state::hgokou_protection_r));
 	map(0xe700, 0xe706).nopw();
 }
@@ -3469,7 +3555,7 @@ void ddenlovr_state::hgokou_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x01).w(FUNC(ddenlovr_state::hginga_blitter_w));
-	map(0x03, 0x03).r(FUNC(ddenlovr_state::rongrong_gfxrom_r));
+	map(0x03, 0x03).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));
 	map(0x20, 0x2f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 	map(0x40, 0x43).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w));
 	map(0x44, 0x47).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
@@ -3523,7 +3609,7 @@ void ddenlovr_state::hgokbang_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x01).w(FUNC(ddenlovr_state::hginga_blitter_w));
-	map(0x03, 0x03).r(FUNC(ddenlovr_state::rongrong_gfxrom_r));
+	map(0x03, 0x03).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));
 	map(0x20, 0x20).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x22, 0x23).w("ym2413", FUNC(ym2413_device::write));
 	map(0x24, 0x24).r("aysnd", FUNC(ay8910_device::data_r));
@@ -3605,14 +3691,14 @@ void ddenlovr_state::hparadis_map(address_map &map)
 	map(0x6000, 0x6fff).ram();                         // RAM
 	map(0x7000, 0x7fff).bankrw("bank2");            // RAM (Banked)
 	map(0x8000, 0xffff).bankr("bank1");            // ROM (Banked)
-	map(0xc000, 0xc1ff).w(FUNC(ddenlovr_state::rongrong_palette_w));
+	map(0xc000, 0xc1ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w));
 }
 
 void ddenlovr_state::hparadis_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x01).w(FUNC(ddenlovr_state::ddenlovr_blitter_w));
-	map(0x03, 0x03).r(FUNC(ddenlovr_state::rongrong_gfxrom_r));
+	map(0x03, 0x03).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));
 	map(0x40, 0x40).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x60, 0x61).w("ym2413", FUNC(ym2413_device::write));
 	map(0x80, 0x83).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w));
@@ -3653,7 +3739,7 @@ void ddenlovr_state::mjmywrld_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x01).w(FUNC(ddenlovr_state::ddenlovr_blitter_w));
-	map(0x03, 0x03).r(FUNC(ddenlovr_state::rongrong_gfxrom_r));
+	map(0x03, 0x03).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));
 	map(0x20, 0x20).w(FUNC(ddenlovr_state::mjmyster_select2_w));
 	map(0x21, 0x21).w(FUNC(ddenlovr_state::mjmyster_coincounter_w));
 	map(0x22, 0x22).r(FUNC(ddenlovr_state::mjmywrld_coins_r));
@@ -3739,7 +3825,7 @@ void ddenlovr_state::akamaru_map(address_map &map)
 	map(0x213570, 0x213571).w(FUNC(ddenlovr_state::akamaru_protection1_w));                            // OKI bank
 	map(0x624680, 0x624681).r(FUNC(ddenlovr_state::akamaru_protection1_r));
 
-	map(0xd00000, 0xd003ff).w(FUNC(ddenlovr_state::rongrong_palette_w)).umask16(0x00ff);
+	map(0xd00000, 0xd003ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w)).umask16(0x00ff);
 	map(0xd00e00, 0xd00e09).nopw();
 	map(0xd01000, 0xd017ff).nopw();                                          // 0
 
@@ -3750,9 +3836,9 @@ void ddenlovr_state::akamaru_map(address_map &map)
 	map(0xe00069, 0xe00069).w(FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
 	map(0xe0006b, 0xe0006b).w(FUNC(ddenlovr_state::ddenlovr_priority_w));
 	map(0xe0006d, 0xe0006d).w(FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
-	map(0xe00070, 0xe00071).r(FUNC(ddenlovr_state::unk16_r));                                           // ? must be 78 on startup (not necessary in ddlover)
+	map(0xe00071, 0xe00071).r(FUNC(ddenlovr_state::unk_r));                                             // ? must be 78 on startup (not necessary in ddlover)
 	map(0xe00080, 0xe00083).w(FUNC(ddenlovr_state::ddenlovr_blitter_w)).umask16(0x00ff);
-	map(0xe00086, 0xe00087).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));                                 // Video Chip
+	map(0xe00087, 0xe00087).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));                                 // Video Chip
 
 	map(0xe00100, 0xe00101).portr("P1");
 	map(0xe00102, 0xe00103).portr("P2");
@@ -3841,7 +3927,7 @@ void ddenlovr_state::mjflove_portmap(address_map &map)
 	map(0x0036, 0x0036).w(FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
 	map(0x0038, 0x0038).nopr();         // ? ack or watchdog
 	map(0x0040, 0x0041).w(FUNC(ddenlovr_state::ddenlovr_blitter_w)).mirror(0xff00);
-	map(0x0043, 0x0043).r(FUNC(ddenlovr_state::rongrong_gfxrom_r));
+	map(0x0043, 0x0043).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));
 	map(0x0080, 0x0081).r(FUNC(ddenlovr_state::mjflove_keyb_r));
 	map(0x0082, 0x0082).portr("SYSTEM");
 	map(0x00da, 0x00da).r(FUNC(ddenlovr_state::mjflove_protection_r)).mirror(0xff00);
@@ -3862,37 +3948,37 @@ void ddenlovr_state::mjflove_portmap(address_map &map)
                           Mahjong Jong-Tei
 ***************************************************************************/
 
-void ddenlovr_state::jongtei_okibank_w(uint8_t data)
+void hanakanz_state::jongtei_okibank_w(uint8_t data)
 {
 	m_oki->set_rom_bank((data >> 4) & 0x07);
 }
 
-void ddenlovr_state::jongtei_dsw_keyb_w(uint8_t data)
+void hanakanz_state::jongtei_dsw_keyb_w(uint8_t data)
 {
 	m_dsw_sel = data;
 	m_keyb = data;
 }
 
-uint8_t ddenlovr_state::jongtei_busy_r()
+uint8_t hanakanz_state::jongtei_busy_r()
 {
 	return 0x04;    // !bit 2 = blitter busy
 }
 
-void ddenlovr_state::jongtei_portmap(address_map &map)
+void hanakanz_state::jongtei_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x2c, 0x2c).rw(FUNC(ddenlovr_state::jongtei_busy_r), FUNC(ddenlovr_state::jongtei_okibank_w));
-	map(0x2e, 0x2e).w(FUNC(ddenlovr_state::hanakanz_blitter_reg_w));
-	map(0x30, 0x30).w(FUNC(ddenlovr_state::hanakanz_rombank_w));
-	map(0x31, 0x31).w(FUNC(ddenlovr_state::jongtei_dsw_keyb_w));
-	map(0x32, 0x32).r(FUNC(ddenlovr_state::hanakanz_dsw_r));
+	map(0x2c, 0x2c).rw(FUNC(hanakanz_state::jongtei_busy_r), FUNC(hanakanz_state::jongtei_okibank_w));
+	map(0x2e, 0x2e).w(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
+	map(0x30, 0x30).w(FUNC(hanakanz_state::hanakanz_rombank_w));
+	map(0x31, 0x31).w(FUNC(hanakanz_state::jongtei_dsw_keyb_w));
+	map(0x32, 0x32).r(FUNC(hanakanz_state::hanakanz_dsw_r));
 	map(0x40, 0x40).portr("SYSTEM");
-	map(0x41, 0x42).r(FUNC(ddenlovr_state::hanakanz_keyb_r));
-	map(0x43, 0x43).w(FUNC(ddenlovr_state::hanakanz_coincounter_w));
-	map(0x46, 0x46).r(FUNC(ddenlovr_state::hanakanz_rand_r));
-	map(0x60, 0x60).w(FUNC(ddenlovr_state::hanakanz_blitter_data_w));
-	map(0x61, 0x61).w(FUNC(ddenlovr_state::hanakanz_palette_w));
-	map(0x63, 0x64).r(FUNC(ddenlovr_state::hanakanz_gfxrom_r));
+	map(0x41, 0x42).r(FUNC(hanakanz_state::hanakanz_keyb_r));
+	map(0x43, 0x43).w(FUNC(hanakanz_state::hanakanz_coincounter_w));
+	map(0x46, 0x46).r(FUNC(hanakanz_state::hanakanz_rand_r));
+	map(0x60, 0x60).w(FUNC(hanakanz_state::hanakanz_blitter_data_w));
+	map(0x61, 0x61).w(FUNC(hanakanz_state::hanakanz_palette_w));
+	map(0x63, 0x64).r(FUNC(hanakanz_state::hanakanz_gfxrom_r));
 	map(0x80, 0x81).w("ym2413", FUNC(ym2413_device::write));
 	map(0xa0, 0xa0).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xc0, 0xcf).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
@@ -3903,11 +3989,11 @@ void ddenlovr_state::jongtei_portmap(address_map &map)
                           Mahjong Gorgeous Night
 ***************************************************************************/
 
-void ddenlovr_state::mjgnight_coincounter_w(uint8_t data)
+void hanakanz_state::mjgnight_coincounter_w(uint8_t data)
 {
 	m_prot_val = data;
 
-	m_leds[0] = BIT(data, 0);  // led? 1 in-game, 0 in service mode / while booting
+	m_led = BIT(data, 0);  // led? 1 in-game, 0 in service mode / while booting
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x04);  // coin-out
 	machine().bookkeeping().coin_counter_w(1, data & 0x08);  // coin-in
@@ -3920,12 +4006,12 @@ void ddenlovr_state::mjgnight_coincounter_w(uint8_t data)
 #endif
 }
 
-void ddenlovr_state::mjgnight_protection_w(uint8_t data)
+void hanakanz_state::mjgnight_protection_w(uint8_t data)
 {
 	m_prot_val = data;
 }
 
-uint8_t ddenlovr_state::mjgnight_protection_r()
+uint8_t hanakanz_state::mjgnight_protection_r()
 {
 	switch (m_prot_val)
 	{
@@ -3935,22 +4021,22 @@ uint8_t ddenlovr_state::mjgnight_protection_r()
 	return m_prot_val;
 }
 
-void ddenlovr_state::mjgnight_portmap(address_map &map)
+void hanakanz_state::mjgnight_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x2c, 0x2c).rw(FUNC(ddenlovr_state::jongtei_busy_r), FUNC(ddenlovr_state::jongtei_okibank_w));
-	map(0x2e, 0x2e).w(FUNC(ddenlovr_state::hanakanz_blitter_reg_w));
-	map(0x30, 0x30).w(FUNC(ddenlovr_state::hanakanz_rombank_w));
-	map(0x31, 0x31).w(FUNC(ddenlovr_state::jongtei_dsw_keyb_w));
-	map(0x32, 0x32).r(FUNC(ddenlovr_state::hanakanz_dsw_r));
+	map(0x2c, 0x2c).rw(FUNC(hanakanz_state::jongtei_busy_r), FUNC(hanakanz_state::jongtei_okibank_w));
+	map(0x2e, 0x2e).w(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
+	map(0x30, 0x30).w(FUNC(hanakanz_state::hanakanz_rombank_w));
+	map(0x31, 0x31).w(FUNC(hanakanz_state::jongtei_dsw_keyb_w));
+	map(0x32, 0x32).r(FUNC(hanakanz_state::hanakanz_dsw_r));
 	map(0x40, 0x40).portr("SYSTEM");
-	map(0x41, 0x42).r(FUNC(ddenlovr_state::hanakanz_keyb_r));
-	map(0x46, 0x46).w(FUNC(ddenlovr_state::mjgnight_coincounter_w));
-	map(0x46, 0x46).r(FUNC(ddenlovr_state::hanakanz_rand_r));
-	map(0x47, 0x47).rw(FUNC(ddenlovr_state::mjgnight_protection_r), FUNC(ddenlovr_state::mjgnight_protection_w));
-	map(0x60, 0x60).w(FUNC(ddenlovr_state::hanakanz_blitter_data_w));
-	map(0x61, 0x61).w(FUNC(ddenlovr_state::hanakanz_palette_w));
-	map(0x63, 0x64).r(FUNC(ddenlovr_state::hanakanz_gfxrom_r));
+	map(0x41, 0x42).r(FUNC(hanakanz_state::hanakanz_keyb_r));
+	map(0x46, 0x46).w(FUNC(hanakanz_state::mjgnight_coincounter_w));
+	map(0x46, 0x46).r(FUNC(hanakanz_state::hanakanz_rand_r));
+	map(0x47, 0x47).rw(FUNC(hanakanz_state::mjgnight_protection_r), FUNC(hanakanz_state::mjgnight_protection_w));
+	map(0x60, 0x60).w(FUNC(hanakanz_state::hanakanz_blitter_data_w));
+	map(0x61, 0x61).w(FUNC(hanakanz_state::hanakanz_palette_w));
+	map(0x63, 0x64).r(FUNC(hanakanz_state::hanakanz_gfxrom_r));
 	map(0x80, 0x81).w("ym2413", FUNC(ym2413_device::write));
 	map(0xa0, 0xa0).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xc0, 0xcf).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
@@ -3967,7 +4053,7 @@ void ddenlovr_state::sryudens_map(address_map &map)
 	map(0x6000, 0x6fff).ram();                         // RAM
 	map(0x7000, 0x7fff).bankrw("bank2");            // RAM (Banked)
 	map(0x8000, 0xffff).bankr("bank1");            // ROM (Banked)
-	map(0xe000, 0xe1ff).w(FUNC(ddenlovr_state::rongrong_palette_w));
+	map(0xe000, 0xe1ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w));
 }
 
 uint8_t ddenlovr_state::sryudens_keyb_r(offs_t offset)
@@ -4027,7 +4113,7 @@ void ddenlovr_state::sryudens_portmap(address_map &map)
 	map(0x36, 0x36).w(FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
 	map(0x38, 0x38).nopr();         // ? ack or watchdog
 	map(0x40, 0x41).w(FUNC(ddenlovr_state::ddenlovr_blitter_w));
-	map(0x43, 0x43).r(FUNC(ddenlovr_state::rongrong_gfxrom_r));
+	map(0x43, 0x43).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));
 	map(0x50, 0x50).r(FUNC(ddenlovr_state::hanakanz_rand_r));
 	map(0x70, 0x70).w(FUNC(ddenlovr_state::quizchq_oki_bank_w));
 	map(0x80, 0x8f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
@@ -4071,7 +4157,7 @@ void ddenlovr_state::janshinp_map(address_map &map)
 	map(0x6000, 0x6fff).ram();                         // RAM
 	map(0x7000, 0x7fff).bankrw("bank2");            // RAM (Banked)
 	map(0x8000, 0xffff).bankr("bank1");            // ROM (Banked)
-	map(0xe000, 0xe1ff).w(FUNC(ddenlovr_state::rongrong_palette_w));
+	map(0xe000, 0xe1ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w));
 }
 
 void ddenlovr_state::janshinp_portmap(address_map &map)
@@ -4095,7 +4181,7 @@ void ddenlovr_state::janshinp_portmap(address_map &map)
 	map(0x36, 0x36).w(FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
 	map(0x38, 0x38).nopr();         // ? ack or watchdog
 	map(0x40, 0x41).w(FUNC(ddenlovr_state::ddenlovr_blitter_w));
-	map(0x43, 0x43).r(FUNC(ddenlovr_state::rongrong_gfxrom_r));
+	map(0x43, 0x43).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));
 	map(0x50, 0x5f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 	map(0x60, 0x60).r(FUNC(ddenlovr_state::hanakanz_rand_r));
 	map(0x70, 0x70).w(FUNC(ddenlovr_state::quizchq_oki_bank_w));
@@ -4126,7 +4212,7 @@ void ddenlovr_state::seljan2_palette_w(offs_t offset, uint8_t data)
 {
 	if ((membank("bank1")->entry() & 0x10) && offset >= 0xb000-0x8000 && offset <= 0xb1ff-0x8000)
 	{
-		rongrong_palette_w(offset - (0xb000-0x8000), data);
+		ddenlovr_palette_w(offset - (0xb000-0x8000), data);
 		memregion("maincpu")->base()[0x90000 + offset] = data;
 	}
 	else
@@ -4167,7 +4253,7 @@ void ddenlovr_state::seljan2_portmap(address_map &map)
 	map(0x36, 0x36).w(FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
 	map(0x38, 0x38).nopr();         // ? ack or watchdog
 	map(0x40, 0x41).w(FUNC(ddenlovr_state::ddenlovr_blitter_w));
-	map(0x43, 0x43).r(FUNC(ddenlovr_state::rongrong_gfxrom_r));
+	map(0x43, 0x43).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));
 	map(0x50, 0x51).w("ym2413", FUNC(ym2413_device::write));
 	map(0x54, 0x54).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x58, 0x58).w("aysnd", FUNC(ay8910_device::address_w));
@@ -4187,7 +4273,7 @@ void ddenlovr_state::seljan2_portmap(address_map &map)
 ***************************************************************************/
 // htengoku uses the mixer chip from ddenlovr
 
-VIDEO_START_MEMBER(ddenlovr_state,htengoku)
+VIDEO_START_MEMBER(htengoku_state,htengoku)
 {
 	VIDEO_START_CALL_MEMBER(ddenlovr);
 	VIDEO_START_CALL_MEMBER(hnoridur);
@@ -4195,7 +4281,7 @@ VIDEO_START_MEMBER(ddenlovr_state,htengoku)
 	m_screen->register_screen_bitmap(m_htengoku_layer);
 }
 
-uint32_t ddenlovr_state::screen_update_htengoku(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t htengoku_state::screen_update_htengoku(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int layer, x, y;
 
@@ -4214,18 +4300,18 @@ uint32_t ddenlovr_state::screen_update_htengoku(screen_device &screen, bitmap_rg
 	return screen_update_ddenlovr(screen, bitmap, cliprect);
 }
 
-void ddenlovr_state::htengoku_select_w(uint8_t data)
+void htengoku_state::htengoku_select_w(uint8_t data)
 {
 	m_input_sel = data;
 	m_keyb = 0;
 }
 
-void ddenlovr_state::htengoku_dsw_w(uint8_t data)
+void htengoku_state::htengoku_dsw_w(uint8_t data)
 {
 	m_dsw_sel = data;
 }
 
-uint8_t ddenlovr_state::htengoku_dsw_r()
+uint8_t htengoku_state::htengoku_dsw_r()
 {
 	if (!BIT(m_dsw_sel, 0)) return ioport("DSW0")->read();
 	if (!BIT(m_dsw_sel, 1)) return ioport("DSW1")->read();
@@ -4237,7 +4323,7 @@ uint8_t ddenlovr_state::htengoku_dsw_r()
 	return 0xff;
 }
 
-void ddenlovr_state::htengoku_coin_w(uint8_t data)
+void htengoku_state::htengoku_coin_w(uint8_t data)
 {
 	switch (m_input_sel)
 	{
@@ -4260,7 +4346,7 @@ void ddenlovr_state::htengoku_coin_w(uint8_t data)
 	}
 }
 
-uint8_t ddenlovr_state::htengoku_input_r()
+uint8_t htengoku_state::htengoku_input_r()
 {
 	static const char *const keynames0[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
 	static const char *const keynames1[] = { "KEY5", "KEY6", "KEY7", "KEY8", "KEY9" };
@@ -4275,7 +4361,7 @@ uint8_t ddenlovr_state::htengoku_input_r()
 	return 0xff;
 }
 
-uint8_t ddenlovr_state::htengoku_coin_r()
+uint8_t htengoku_state::htengoku_coin_r()
 {
 	switch (m_input_sel)
 	{
@@ -4288,12 +4374,12 @@ uint8_t ddenlovr_state::htengoku_coin_r()
 	return 0xff;
 }
 
-void ddenlovr_state::htengoku_rombank_w(uint8_t data)
+void htengoku_state::htengoku_rombank_w(uint8_t data)
 {
 	m_bankdev->set_bank(data & 0x1f);
 }
 
-void ddenlovr_state::htengoku_blit_romregion_w(uint8_t data)
+void htengoku_state::htengoku_blit_romregion_w(uint8_t data)
 {
 	switch (data)
 	{
@@ -4304,35 +4390,35 @@ void ddenlovr_state::htengoku_blit_romregion_w(uint8_t data)
 	logerror("%04x: unmapped romregion=%02X\n", m_maincpu->pc(), data);
 }
 
-void ddenlovr_state::htengoku_io_map(address_map &map)
+void htengoku_state::htengoku_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x01, 0x07).w(m_blitter, FUNC(dynax_blitter_rev2_device::regs_w));       // Blitter
-	map(0x20, 0x20).w(FUNC(ddenlovr_state::htengoku_select_w));      // Controls
-	map(0x21, 0x21).w(FUNC(ddenlovr_state::htengoku_coin_w));        //
-	map(0x22, 0x22).r(FUNC(ddenlovr_state::htengoku_coin_r));         //
-	map(0x23, 0x23).r(FUNC(ddenlovr_state::htengoku_input_r));        //
+	map(0x20, 0x20).w(FUNC(htengoku_state::htengoku_select_w));      // Controls
+	map(0x21, 0x21).w(FUNC(htengoku_state::htengoku_coin_w));        //
+	map(0x22, 0x22).r(FUNC(htengoku_state::htengoku_coin_r));         //
+	map(0x23, 0x23).r(FUNC(htengoku_state::htengoku_input_r));        //
 	map(0x40, 0x40).w("aysnd", FUNC(ay8910_device::address_w));    // AY8910
 	map(0x42, 0x42).r("aysnd", FUNC(ay8910_device::data_r));     //
 	map(0x44, 0x44).w("aysnd", FUNC(ay8910_device::data_w));   //
 	map(0x46, 0x47).w("ym2413", FUNC(ym2413_device::write));        //
 	map(0x80, 0x8f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
-	map(0xa0, 0xa3).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w));    // ddenlovr mixer chip
-	map(0xa4, 0xa7).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
-	map(0xa8, 0xab).w(FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
-	map(0xac, 0xaf).w(FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
+	map(0xa0, 0xa3).w(FUNC(htengoku_state::ddenlovr_palette_base_w));    // ddenlovr mixer chip
+	map(0xa4, 0xa7).w(FUNC(htengoku_state::ddenlovr_palette_mask_w));
+	map(0xa8, 0xab).w(FUNC(htengoku_state::ddenlovr_transparency_pen_w));
+	map(0xac, 0xaf).w(FUNC(htengoku_state::ddenlovr_transparency_mask_w));
 	// b0-b3 ?
-	map(0xb4, 0xb4).w(FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
-	map(0xb5, 0xb5).w(FUNC(ddenlovr_state::ddenlovr_priority_w));
-	map(0xb6, 0xb6).w(FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
-	map(0xb8, 0xb8).r(FUNC(ddenlovr_state::unk_r));               // ? must be 78 on startup
-	map(0xc2, 0xc2).w(FUNC(ddenlovr_state::htengoku_rombank_w));     // BANK ROM Select
-	map(0xc0, 0xc0).w(FUNC(ddenlovr_state::dynax_extra_scrollx_w));  // screen scroll X
-	map(0xc1, 0xc1).w(FUNC(ddenlovr_state::dynax_extra_scrolly_w));  // screen scroll Y
-	map(0xc3, 0xc3).w(FUNC(ddenlovr_state::dynax_vblank_ack_w));     // VBlank IRQ Ack
+	map(0xb4, 0xb4).w(FUNC(htengoku_state::ddenlovr_bgcolor_w));
+	map(0xb5, 0xb5).w(FUNC(htengoku_state::ddenlovr_priority_w));
+	map(0xb6, 0xb6).w(FUNC(htengoku_state::ddenlovr_layer_enable_w));
+	map(0xb8, 0xb8).r(FUNC(htengoku_state::unk_r));               // ? must be 78 on startup
+	map(0xc2, 0xc2).w(FUNC(htengoku_state::htengoku_rombank_w));     // BANK ROM Select
+	map(0xc0, 0xc0).w(FUNC(htengoku_state::dynax_extra_scrollx_w));  // screen scroll X
+	map(0xc1, 0xc1).w(FUNC(htengoku_state::dynax_extra_scrolly_w));  // screen scroll Y
+	map(0xc3, 0xc3).w(FUNC(htengoku_state::dynax_vblank_ack_w));     // VBlank IRQ Ack
 	map(0xc4, 0xc4).w(m_blitter, FUNC(dynax_blitter_rev2_device::pen_w));       // Destination Pen
-	map(0xc5, 0xc5).w(FUNC(ddenlovr_state::dynax_blit_dest_w));      // Destination Layer
-	map(0xc6, 0xc6).w(FUNC(ddenlovr_state::htengoku_blit_romregion_w));  // Blitter ROM bank
+	map(0xc5, 0xc5).w(FUNC(htengoku_state::dynax_blit_dest_w));      // Destination Layer
+	map(0xc6, 0xc6).w(FUNC(htengoku_state::htengoku_blit_romregion_w));  // Blitter ROM bank
 	map(0xe0, 0xe7).w(m_mainlatch, FUNC(ls259_device::write_d1));
 }
 
@@ -4340,7 +4426,7 @@ void ddenlovr_state::htengoku_io_map(address_map &map)
                            Hanafuda Hana Tengoku
 ***************************************************************************/
 
-void ddenlovr_state::htengoku_mem_map(address_map &map)
+void htengoku_state::htengoku_mem_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x6fff).ram().share("nvram");
@@ -4354,22 +4440,22 @@ void dynax_state::htengoku_banked_map(address_map &map)
 	map(0x80000, 0x801ff).w(FUNC(dynax_state::tenkai_palette_w));
 }
 
-void ddenlovr_state::htengoku(machine_config &config)
+void htengoku_state::htengoku(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 20000000 / 4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &ddenlovr_state::htengoku_mem_map);
-	m_maincpu->set_addrmap(AS_IO, &ddenlovr_state::htengoku_io_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &htengoku_state::htengoku_mem_map);
+	m_maincpu->set_addrmap(AS_IO, &htengoku_state::htengoku_io_map);
 	m_maincpu->set_irq_acknowledge_callback("mainirq", FUNC(rst_pos_buffer_device::inta_cb)); // IM 0 needs an opcode on the data bus
 
 	ADDRESS_MAP_BANK(config, m_bankdev, 0);
-	m_bankdev->set_addrmap(0, &ddenlovr_state::htengoku_banked_map);
+	m_bankdev->set_addrmap(0, &htengoku_state::htengoku_banked_map);
 	m_bankdev->set_data_width(8);
 	m_bankdev->set_addr_width(20);
 	m_bankdev->set_stride(0x8000);
 
-	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,dynax)
-	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,dynax)
+	MCFG_MACHINE_START_OVERRIDE(htengoku_state,dynax)
+	MCFG_MACHINE_RESET_OVERRIDE(htengoku_state,dynax)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -4387,9 +4473,9 @@ void ddenlovr_state::htengoku(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(0, 336-1, 0+8, 256-1-8);
-	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_htengoku));
+	m_screen->set_screen_update(FUNC(htengoku_state::screen_update_htengoku));
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
-	m_screen->screen_vblank().set(FUNC(ddenlovr_state::sprtmtch_vblank_w));
+	m_screen->screen_vblank().set(FUNC(htengoku_state::sprtmtch_vblank_w));
 
 	DYNAX_BLITTER_REV2(config, m_blitter, 0);
 	m_blitter->vram_out_cb().set(FUNC(dynax_state::hnoridur_blit_pixel_w));
@@ -4399,14 +4485,14 @@ void ddenlovr_state::htengoku(machine_config &config)
 
 	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0x1000);
 
-	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,htengoku)
+	MCFG_VIDEO_START_OVERRIDE(htengoku_state,htengoku)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	ay8910_device &aysnd(AY8910(config, "aysnd", 20000000 / 16));
-	aysnd.port_a_read_callback().set(FUNC(ddenlovr_state::htengoku_dsw_r));
-	aysnd.port_b_write_callback().set(FUNC(ddenlovr_state::htengoku_dsw_w));
+	aysnd.port_a_read_callback().set(FUNC(htengoku_state::htengoku_dsw_r));
+	aysnd.port_b_write_callback().set(FUNC(htengoku_state::htengoku_dsw_w));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.20);
 
 	YM2413(config, "ym2413", 3579545).add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -4454,12 +4540,12 @@ uint8_t ddenlovr_state::daimyojn_keyb2_r()
 // 1B18: D4 ED 76 C9 CB
 // 1B1D: 96 AF 34 8B 89
 
-void ddenlovr_state::daimyojn_protection_w(uint8_t data)
+void hanakanz_state::daimyojn_protection_w(uint8_t data)
 {
 	m_prot_val = data;
 }
 
-uint8_t ddenlovr_state::daimyojn_protection_r()
+uint8_t hanakanz_state::daimyojn_protection_r()
 {
 	switch (m_prot_val)
 	{
@@ -4475,7 +4561,7 @@ uint8_t ddenlovr_state::daimyojn_protection_r()
 // 1ADD: D4 ED 76 C9 CB
 // 1AE2: D9 E0 7B C4 C6
 
-uint8_t ddenlovr_state::momotaro_protection_r()
+uint8_t hanakanz_state::momotaro_protection_r()
 {
 	switch (m_prot_val)
 	{
@@ -4489,17 +4575,17 @@ uint8_t ddenlovr_state::momotaro_protection_r()
 	return 0xff;
 }
 
-void ddenlovr_state::daimyojn_okibank_w(uint8_t data)
+void hanakanz_state::daimyojn_okibank_w(uint8_t data)
 {
 	m_oki->set_rom_bank((data >> 4) & 0x01);
 }
 
-void ddenlovr_state::daimyojn_palette_sel_w(uint8_t data)
+void hanakanz_state::daimyojn_palette_sel_w(uint8_t data)
 {
 	m_daimyojn_palette_sel = data;
 }
 
-void ddenlovr_state::daimyojn_blitter_data_palette_w(uint8_t data)
+void hanakanz_state::daimyojn_blitter_data_palette_w(uint8_t data)
 {
 	if (m_daimyojn_palette_sel & 0x01)
 		hanakanz_palette_w(data);
@@ -4507,34 +4593,34 @@ void ddenlovr_state::daimyojn_blitter_data_palette_w(uint8_t data)
 		hanakanz_blitter_data_w(data);
 }
 
-uint8_t ddenlovr_state::daimyojn_year_hack_r(offs_t offset)
+uint8_t hanakanz_state::daimyojn_year_hack_r(offs_t offset)
 {
 	// See code at C8D7, 633f holds reg B of the RTC
 	return offset ? 1 : 0;  // year = 0x10 (BCD)
 }
 
-void ddenlovr_state::daimyojn_portmap(address_map &map)
+void hanakanz_state::daimyojn_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x2c, 0x2c).rw(FUNC(ddenlovr_state::jongtei_busy_r), FUNC(ddenlovr_state::daimyojn_okibank_w));
-	map(0x2e, 0x2e).w(FUNC(ddenlovr_state::daimyojn_palette_sel_w));
-	map(0x30, 0x30).w(FUNC(ddenlovr_state::hanakanz_blitter_reg_w));
-	map(0x31, 0x31).w(FUNC(ddenlovr_state::jongtei_dsw_keyb_w));
-	map(0x32, 0x32).r(FUNC(ddenlovr_state::hanakanz_dsw_r));
-	map(0x40, 0x40).w(FUNC(ddenlovr_state::daimyojn_blitter_data_palette_w));
-	map(0x42, 0x44).r(FUNC(ddenlovr_state::hanakanz_gfxrom_r));
+	map(0x2c, 0x2c).rw(FUNC(hanakanz_state::jongtei_busy_r), FUNC(hanakanz_state::daimyojn_okibank_w));
+	map(0x2e, 0x2e).w(FUNC(hanakanz_state::daimyojn_palette_sel_w));
+	map(0x30, 0x30).w(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
+	map(0x31, 0x31).w(FUNC(hanakanz_state::jongtei_dsw_keyb_w));
+	map(0x32, 0x32).r(FUNC(hanakanz_state::hanakanz_dsw_r));
+	map(0x40, 0x40).w(FUNC(hanakanz_state::daimyojn_blitter_data_palette_w));
+	map(0x42, 0x44).r(FUNC(hanakanz_state::hanakanz_gfxrom_r));
 	map(0x80, 0x8f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
-	map(0x8a, 0x8b).r(FUNC(ddenlovr_state::daimyojn_year_hack_r));  // ?
+	map(0x8a, 0x8b).r(FUNC(hanakanz_state::daimyojn_year_hack_r));  // ?
 	map(0xa0, 0xa1).w("ym2413", FUNC(ym2413_device::write));
 	map(0xa2, 0xa2).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xa8, 0xa8).portr("SYSTEM");
-	map(0xaa, 0xaa).r(FUNC(ddenlovr_state::daimyojn_keyb1_r));
-	map(0xac, 0xac).r(FUNC(ddenlovr_state::daimyojn_keyb2_r));
-	map(0xae, 0xae).w(FUNC(ddenlovr_state::hanakanz_coincounter_w));
-	map(0xb0, 0xb0).w(FUNC(ddenlovr_state::mjmyster_rambank_w));
-	map(0xc0, 0xc0).w(FUNC(ddenlovr_state::mjflove_rombank_w));
-	map(0xd0, 0xd0).r(FUNC(ddenlovr_state::hanakanz_rand_r));
-	map(0xe0, 0xe0).rw(FUNC(ddenlovr_state::daimyojn_protection_r), FUNC(ddenlovr_state::daimyojn_protection_w));
+	map(0xaa, 0xaa).r(FUNC(hanakanz_state::daimyojn_keyb1_r));
+	map(0xac, 0xac).r(FUNC(hanakanz_state::daimyojn_keyb2_r));
+	map(0xae, 0xae).w(FUNC(hanakanz_state::hanakanz_coincounter_w));
+	map(0xb0, 0xb0).w(FUNC(hanakanz_state::mjmyster_rambank_w));
+	map(0xc0, 0xc0).w(FUNC(hanakanz_state::mjflove_rombank_w));
+	map(0xd0, 0xd0).r(FUNC(hanakanz_state::hanakanz_rand_r));
+	map(0xe0, 0xe0).rw(FUNC(hanakanz_state::daimyojn_protection_r), FUNC(hanakanz_state::daimyojn_protection_w));
 }
 
 
@@ -9583,8 +9669,6 @@ INPUT_PORTS_END
 
 MACHINE_START_MEMBER(ddenlovr_state,ddenlovr)
 {
-	m_leds.resolve();
-
 	save_item(NAME(m_input_sel));
 	save_item(NAME(m_dsw_sel));
 	save_item(NAME(m_keyb));
@@ -9597,13 +9681,8 @@ MACHINE_START_MEMBER(ddenlovr_state,ddenlovr)
 	save_item(NAME(m_prot_16));
 	save_item(NAME(m_quiz365_protection));
 
-	save_item(NAME(m_mmpanic_leds));
-	save_item(NAME(m_funkyfig_lockout));
-	save_item(NAME(m_romdata));
-	save_item(NAME(m_palette_index));
 	save_item(NAME(m_hginga_rombank));
 	save_item(NAME(m_mjflove_irq_cause));
-	save_item(NAME(m_daimyojn_palette_sel));
 	save_item(NAME(m_palram));
 }
 
@@ -9618,17 +9697,11 @@ MACHINE_RESET_MEMBER(ddenlovr_state,ddenlovr)
 	m_okibank = 0;
 	m_prot_val = 0;
 	m_prot_16 = 0;
-	m_mmpanic_leds = 0;
-	m_funkyfig_lockout = 0;
-	m_palette_index = 0;
 	m_hginga_rombank = 0;
 	m_mjflove_irq_cause = 0;
-	m_daimyojn_palette_sel = 0;
 
 	m_quiz365_protection[0] = 0;
 	m_quiz365_protection[1] = 0;
-	m_romdata[0] = 0;
-	m_romdata[1] = 0;
 
 	memset(m_palram, 0, ARRAY_LENGTH(m_palram));
 
@@ -9644,21 +9717,38 @@ MACHINE_START_MEMBER(ddenlovr_state,rongrong)
 	MACHINE_START_CALL_MEMBER(ddenlovr);
 }
 
-MACHINE_START_MEMBER(ddenlovr_state,mmpanic)
+MACHINE_START_MEMBER(mmpanic_state,mmpanic)
 {
+	m_leds.resolve();
+
 	uint8_t *rom = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 8, &rom[0x10000], 0x8000);
+
+	save_item(NAME(m_mmpanic_leds));
 
 	MACHINE_START_CALL_MEMBER(ddenlovr);
 }
 
-MACHINE_START_MEMBER(ddenlovr_state,funkyfig)
+MACHINE_START_MEMBER(mmpanic_state,funkyfig)
 {
+	m_leds.resolve();
+
 	uint8_t *rom = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 0x10, &rom[0x10000], 0x8000);
 	membank("bank2")->configure_entries(0, 8,    &rom[0x90000], 0x1000);
 
+	save_item(NAME(m_mmpanic_leds));
+	save_item(NAME(m_funkyfig_lockout));
+
 	MACHINE_START_CALL_MEMBER(ddenlovr);
+}
+
+MACHINE_RESET_MEMBER(mmpanic_state,mmpanic)
+{
+	m_mmpanic_leds = 0;
+	m_funkyfig_lockout = 0;
+
+	MACHINE_RESET_CALL_MEMBER(ddenlovr);
 }
 
 MACHINE_START_MEMBER(ddenlovr_state,hanakanz)
@@ -9668,6 +9758,17 @@ MACHINE_START_MEMBER(ddenlovr_state,hanakanz)
 	membank("bank2")->configure_entries(0, 0x10, &rom[0x90000], 0x1000);
 
 	MACHINE_START_CALL_MEMBER(ddenlovr);
+}
+
+MACHINE_RESET_MEMBER(hanakanz_state,hanakanz)
+{
+	m_palette_index = 0;
+	m_daimyojn_palette_sel = 0;
+
+	m_romdata[0] = 0;
+	m_romdata[1] = 0;
+
+	MACHINE_RESET_CALL_MEMBER(ddenlovr);
 }
 
 MACHINE_START_MEMBER(ddenlovr_state,mjmyster)
@@ -9907,7 +10008,7 @@ void ddenlovr_state::rongrong(machine_config &config)
     RST 20 is from the link device?
  */
 
-WRITE_LINE_MEMBER(ddenlovr_state::mmpanic_irq)
+WRITE_LINE_MEMBER(mmpanic_state::mmpanic_irq)
 {
 	if (!state)
 		return;
@@ -9923,25 +10024,25 @@ WRITE_LINE_MEMBER(ddenlovr_state::mmpanic_irq)
 }
 
 
-WRITE_LINE_MEMBER(ddenlovr_state::mmpanic_rtc_irq)
+WRITE_LINE_MEMBER(mmpanic_state::mmpanic_rtc_irq)
 {
 	if (state)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xdf); // Z80 - RST 18, clock
 }
 
-void ddenlovr_state::mmpanic(machine_config &config)
+void mmpanic_state::mmpanic(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 8000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &ddenlovr_state::mmpanic_map);
-	m_maincpu->set_addrmap(AS_IO, &ddenlovr_state::mmpanic_portmap);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mmpanic_state::mmpanic_map);
+	m_maincpu->set_addrmap(AS_IO, &mmpanic_state::mmpanic_portmap);
 
 	Z80(config, m_soundcpu, 3579545);
-	m_soundcpu->set_addrmap(AS_PROGRAM, &ddenlovr_state::mmpanic_sound_map);
-	m_soundcpu->set_addrmap(AS_IO, &ddenlovr_state::mmpanic_sound_portmap);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &mmpanic_state::mmpanic_sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &mmpanic_state::mmpanic_sound_portmap);
 
-	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mmpanic)
-	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
+	MCFG_MACHINE_START_OVERRIDE(mmpanic_state,mmpanic)
+	MCFG_MACHINE_RESET_OVERRIDE(mmpanic_state,mmpanic)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -9949,15 +10050,15 @@ void ddenlovr_state::mmpanic(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(336, 256+22);
 	m_screen->set_visarea(0, 336-1, 5, 256-16+5-1);
-	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_ddenlovr));
+	m_screen->set_screen_update(FUNC(mmpanic_state::screen_update_ddenlovr));
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
-	m_screen->screen_vblank().set(FUNC(ddenlovr_state::mmpanic_irq));
+	m_screen->screen_vblank().set(FUNC(mmpanic_state::mmpanic_irq));
 
 	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0x100);
 
-	blitter_irq().set(FUNC(ddenlovr_state::mmpanic_blitter_irq));
+	blitter_irq().set(FUNC(mmpanic_state::mmpanic_blitter_irq));
 
-	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,mmpanic)  // extra layers
+	MCFG_VIDEO_START_OVERRIDE(mmpanic_state,mmpanic)  // extra layers
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9974,7 +10075,7 @@ void ddenlovr_state::mmpanic(machine_config &config)
 
 	/* devices */
 	msm6242_device &rtc(MSM6242(config, "rtc", XTAL(32'768)));
-	rtc.out_int_handler().set(FUNC(ddenlovr_state::mmpanic_rtc_irq));
+	rtc.out_int_handler().set(FUNC(mmpanic_state::mmpanic_rtc_irq));
 }
 
 
@@ -9990,15 +10091,15 @@ void ddenlovr_state::mmpanic(machine_config &config)
     0xe2 is from the 6242RTC
  */
 
-void ddenlovr_state::hanakanz(machine_config &config)
+void hanakanz_state::hanakanz(machine_config &config)
 {
 	/* basic machine hardware */
 	KL5C80A12(config, m_maincpu, 20'000'000); // KL5C80A12
-	m_maincpu->set_addrmap(AS_PROGRAM, &ddenlovr_state::hanakanz_map);
-	m_maincpu->set_addrmap(AS_IO, &ddenlovr_state::hanakanz_portmap);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hanakanz_state::hanakanz_map);
+	m_maincpu->set_addrmap(AS_IO, &hanakanz_state::hanakanz_portmap);
 
-	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,hanakanz)
-	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
+	MCFG_MACHINE_START_OVERRIDE(hanakanz_state,hanakanz)
+	MCFG_MACHINE_RESET_OVERRIDE(hanakanz_state,hanakanz)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -10006,13 +10107,13 @@ void ddenlovr_state::hanakanz(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(336, 256+22);
 	m_screen->set_visarea(0, 336-1, 5, 256-11-1);
-	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_ddenlovr));
+	m_screen->set_screen_update(FUNC(hanakanz_state::screen_update_ddenlovr));
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->screen_vblank().set("maincpu:kp69", FUNC(kp69_device::ir_w<0>));
 
 	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0x200);
 
-	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,hanakanz) // blitter commands in the roms are shuffled around
+	MCFG_VIDEO_START_OVERRIDE(hanakanz_state,hanakanz) // blitter commands in the roms are shuffled around
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -10027,23 +10128,23 @@ void ddenlovr_state::hanakanz(machine_config &config)
 	rtc.out_int_handler().set("maincpu:kp69", FUNC(kp69_device::ir_w<1>));
 }
 
-void ddenlovr_state::hkagerou(machine_config &config)
+void hanakanz_state::hkagerou(machine_config &config)
 {
 	hanakanz(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_IO, &ddenlovr_state::hkagerou_portmap);
+	m_maincpu->set_addrmap(AS_IO, &hanakanz_state::hkagerou_portmap);
 }
 
-void ddenlovr_state::kotbinyo(machine_config &config)
+void hanakanz_state::kotbinyo(machine_config &config)
 {
 	/* basic machine hardware */
 	KL5C80A12(config, m_maincpu, XTAL(20'000'000)); // !! KL5C80A12CFP @ 10MHz? (actually 4 times faster than Z80) !!
-	m_maincpu->set_addrmap(AS_PROGRAM, &ddenlovr_state::hanakanz_map);
-	m_maincpu->set_addrmap(AS_IO, &ddenlovr_state::kotbinyo_portmap);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hanakanz_state::hanakanz_map);
+	m_maincpu->set_addrmap(AS_IO, &hanakanz_state::kotbinyo_portmap);
 
-	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,hanakanz)
-	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
+	MCFG_MACHINE_START_OVERRIDE(hanakanz_state,hanakanz)
+	MCFG_MACHINE_RESET_OVERRIDE(hanakanz_state,hanakanz)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -10051,13 +10152,13 @@ void ddenlovr_state::kotbinyo(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(336, 256+22);
 	m_screen->set_visarea(0, 336-1-1, 1+4, 256-15-1+4);
-	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_ddenlovr));
+	m_screen->set_screen_update(FUNC(hanakanz_state::screen_update_ddenlovr));
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->screen_vblank().set("maincpu:kp69", FUNC(kp69_device::ir_w<0>));
 
 	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0x200);
 
-	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,hanakanz) // blitter commands in the roms are shuffled around
+	MCFG_VIDEO_START_OVERRIDE(hanakanz_state,hanakanz) // blitter commands in the roms are shuffled around
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -10071,20 +10172,20 @@ void ddenlovr_state::kotbinyo(machine_config &config)
 //  MSM6242(config, "rtc", XTAL(32'768)).out_int_handler().set("maincpu:kp69", FUNC(kp69_device::ir_w<1>));
 }
 
-void ddenlovr_state::kotbinsp(machine_config &config)
+void hanakanz_state::kotbinsp(machine_config &config)
 {
 	kotbinyo(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_IO, &ddenlovr_state::kotbinsp_portmap);
+	m_maincpu->set_addrmap(AS_IO, &hanakanz_state::kotbinsp_portmap);
 }
 
-void ddenlovr_state::mjreach1(machine_config &config)
+void hanakanz_state::mjreach1(machine_config &config)
 {
 	hanakanz(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_IO, &ddenlovr_state::mjreach1_portmap);
+	m_maincpu->set_addrmap(AS_IO, &hanakanz_state::mjreach1_portmap);
 }
 
 
@@ -10097,16 +10198,16 @@ void ddenlovr_state::mjreach1(machine_config &config)
     0xf8 is vblank
     0xfa is from the 6242RTC
  */
-void ddenlovr_state::mjchuuka(machine_config &config)
+void hanakanz_state::mjchuuka(machine_config &config)
 {
 	hanakanz(config);
 
 	/* basic machine hardware */
 	tmpz84c015_device &tmpz(TMPZ84C015(config.replace(), m_maincpu, 8000000));
-	tmpz.set_addrmap(AS_PROGRAM, &ddenlovr_state::hanakanz_map);
-	tmpz.set_addrmap(AS_IO, &ddenlovr_state::mjchuuka_portmap);
-	tmpz.out_pa_callback().set(FUNC(ddenlovr_state::hanakanz_rombank_w));
-	tmpz.out_pb_callback().set(FUNC(ddenlovr_state::mjchuuka_oki_bank_w));
+	tmpz.set_addrmap(AS_PROGRAM, &hanakanz_state::hanakanz_map);
+	tmpz.set_addrmap(AS_IO, &hanakanz_state::mjchuuka_portmap);
+	tmpz.out_pa_callback().set(FUNC(hanakanz_state::hanakanz_rombank_w));
+	tmpz.out_pb_callback().set(FUNC(hanakanz_state::mjchuuka_oki_bank_w));
 
 	m_screen->screen_vblank().set("maincpu", FUNC(tmpz84c015_device::trg0));
 
@@ -10116,33 +10217,33 @@ void ddenlovr_state::mjchuuka(machine_config &config)
 }
 
 
-WRITE_LINE_MEMBER(ddenlovr_state::funkyfig_sound_irq)
+WRITE_LINE_MEMBER(mmpanic_state::funkyfig_sound_irq)
 {
 	if (state)
 		m_soundcpu->set_input_line(0, HOLD_LINE);   // NMI by main cpu
 }
 
-void ddenlovr_state::funkyfig(machine_config &config)
+void mmpanic_state::funkyfig(machine_config &config)
 {
 	mmpanic(config);
 	tmpz84c015_device &tmpz(TMPZ84C015(config.replace(), m_maincpu, 8000000));
-	tmpz.set_addrmap(AS_PROGRAM, &ddenlovr_state::funkyfig_map);
-	tmpz.set_addrmap(AS_IO, &ddenlovr_state::funkyfig_portmap);
-	tmpz.in_pa_callback().set(FUNC(ddenlovr_state::funkyfig_dsw_r));
-	tmpz.out_pb_callback().set(FUNC(ddenlovr_state::funkyfig_rombank_w));
+	tmpz.set_addrmap(AS_PROGRAM, &mmpanic_state::funkyfig_map);
+	tmpz.set_addrmap(AS_IO, &mmpanic_state::funkyfig_portmap);
+	tmpz.in_pa_callback().set(FUNC(mmpanic_state::funkyfig_dsw_r));
+	tmpz.out_pb_callback().set(FUNC(mmpanic_state::funkyfig_rombank_w));
 
-	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,funkyfig)
+	MCFG_MACHINE_START_OVERRIDE(mmpanic_state,funkyfig)
 
 	m_screen->screen_vblank().set(m_maincpu, FUNC(tmpz84c015_device::trg0));
-	m_screen->screen_vblank().append(FUNC(ddenlovr_state::funkyfig_sound_irq));
+	m_screen->screen_vblank().append(FUNC(mmpanic_state::funkyfig_sound_irq));
 
 	subdevice<msm6242_device>("rtc")->out_int_handler().set(m_maincpu, FUNC(tmpz84c015_device::trg1)).invert();
 
-	blitter_irq().set(FUNC(ddenlovr_state::funkyfig_blitter_irq));
+	blitter_irq().set(FUNC(mmpanic_state::funkyfig_blitter_irq));
 
-	m_soundcpu->set_addrmap(AS_IO, &ddenlovr_state::funkyfig_sound_portmap);
+	m_soundcpu->set_addrmap(AS_IO, &mmpanic_state::funkyfig_sound_portmap);
 
-	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,ddenlovr) // no extra layers?
+	MCFG_VIDEO_START_OVERRIDE(mmpanic_state,ddenlovr) // no extra layers?
 }
 
 
@@ -10215,7 +10316,7 @@ void ddenlovr_state::mjmyster(machine_config &config)
 	maincpu.set_addrmap(AS_IO, &ddenlovr_state::mjmyster_portmap);
 	maincpu.in_pa_callback().set_constant(0);
 	maincpu.out_pa_callback().set(FUNC(ddenlovr_state::mjmyster_rambank_w));
-	maincpu.out_pb_callback().set(FUNC(ddenlovr_state::mmpanic_rombank_w));
+	maincpu.out_pb_callback().set(FUNC(ddenlovr_state::mjmyster_rombank_w));
 
 	m_screen->screen_vblank().set(m_maincpu, FUNC(tmpz84c015_device::trg0)).invert();
 
@@ -10327,7 +10428,7 @@ void ddenlovr_state::mjmyuniv(machine_config &config)
 	maincpu.set_addrmap(AS_IO, &ddenlovr_state::mjmyster_portmap);
 	maincpu.in_pa_callback().set_constant(0);
 	maincpu.out_pa_callback().set(FUNC(ddenlovr_state::mjmyster_rambank_w));
-	maincpu.out_pb_callback().set(FUNC(ddenlovr_state::mmpanic_rombank_w));
+	maincpu.out_pb_callback().set(FUNC(ddenlovr_state::mjmyster_rombank_w));
 
 	m_screen->screen_vblank().set(m_maincpu, FUNC(tmpz84c015_device::trg0)).invert();
 
@@ -10353,7 +10454,7 @@ void ddenlovr_state::mjmyornt(machine_config &config)
 	maincpu.set_addrmap(AS_IO, &ddenlovr_state::mjmyster_portmap);
 	maincpu.in_pa_callback().set_constant(0);
 	maincpu.out_pa_callback().set(FUNC(ddenlovr_state::mjmyster_rambank_w));
-	maincpu.out_pb_callback().set(FUNC(ddenlovr_state::mmpanic_rombank_w));
+	maincpu.out_pb_callback().set(FUNC(ddenlovr_state::mjmyster_rombank_w));
 
 	m_screen->screen_vblank().set(m_maincpu, FUNC(tmpz84c015_device::trg0)).invert();
 	m_screen->set_visarea(0, 336-1, 4, 256-16+4-1);
@@ -10438,15 +10539,15 @@ void ddenlovr_state::hparadis(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,hparadis)
 }
 
-void ddenlovr_state::jongtei(machine_config &config)
+void hanakanz_state::jongtei(machine_config &config)
 {
 	/* basic machine hardware */
 	KL5C80A12(config, m_maincpu, XTAL(20'000'000)); // KL5C80A12
-	m_maincpu->set_addrmap(AS_PROGRAM, &ddenlovr_state::hanakanz_map);
-	m_maincpu->set_addrmap(AS_IO, &ddenlovr_state::jongtei_portmap);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hanakanz_state::hanakanz_map);
+	m_maincpu->set_addrmap(AS_IO, &hanakanz_state::jongtei_portmap);
 
-	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,hanakanz)
-	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
+	MCFG_MACHINE_START_OVERRIDE(hanakanz_state,hanakanz)
+	MCFG_MACHINE_RESET_OVERRIDE(hanakanz_state,hanakanz)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -10454,15 +10555,15 @@ void ddenlovr_state::jongtei(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(336, 256);
 	m_screen->set_visarea(0, 336-1, 5, 256-11-1);
-	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_ddenlovr));
+	m_screen->set_screen_update(FUNC(hanakanz_state::screen_update_ddenlovr));
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->screen_vblank().set("maincpu:kp69", FUNC(kp69_device::ir_w<0>));
 
 	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0x200);
 
-	blitter_irq().set(FUNC(ddenlovr_state::mjflove_blitter_irq));
+	//blitter_irq().set(FUNC(hanakanz_state::mjflove_blitter_irq));
 
-	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,hanakanz) // blitter commands in the roms are shuffled around
+	MCFG_VIDEO_START_OVERRIDE(hanakanz_state,hanakanz) // blitter commands in the roms are shuffled around
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -10475,10 +10576,10 @@ void ddenlovr_state::jongtei(machine_config &config)
 	MSM6242(config, "rtc", XTAL(32'768)).out_int_handler().set("maincpu:kp69", FUNC(kp69_device::ir_w<1>));
 }
 
-void ddenlovr_state::mjgnight(machine_config &config)
+void hanakanz_state::mjgnight(machine_config &config)
 {
 	jongtei(config);
-	m_maincpu->set_addrmap(AS_IO, &ddenlovr_state::mjgnight_portmap);
+	m_maincpu->set_addrmap(AS_IO, &hanakanz_state::mjgnight_portmap);
 
 	m_screen->set_size(336, 256);
 	m_screen->set_visarea(0, 336-1, 5-4, 256-11-1-4);
@@ -10652,15 +10753,15 @@ void ddenlovr_state::seljan2(machine_config &config)
 ***************************************************************************/
 
 
-void ddenlovr_state::daimyojn(machine_config &config)
+void hanakanz_state::daimyojn(machine_config &config)
 {
 	/* basic machine hardware */
 	KL5C80A12(config, m_maincpu, XTAL(20'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &ddenlovr_state::hanakanz_map);
-	m_maincpu->set_addrmap(AS_IO, &ddenlovr_state::daimyojn_portmap);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hanakanz_state::hanakanz_map);
+	m_maincpu->set_addrmap(AS_IO, &hanakanz_state::daimyojn_portmap);
 
-	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjflove)
-	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
+	MCFG_MACHINE_START_OVERRIDE(hanakanz_state,mjflove)
+	MCFG_MACHINE_RESET_OVERRIDE(hanakanz_state,hanakanz)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -10668,13 +10769,13 @@ void ddenlovr_state::daimyojn(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(336, 256+22);
 	m_screen->set_visarea(0, 336-1-1, 1, 256-15-1);
-	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_ddenlovr));
+	m_screen->set_screen_update(FUNC(hanakanz_state::screen_update_ddenlovr));
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->screen_vblank().set("maincpu:kp69", FUNC(kp69_device::ir_w<0>));
 
 	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0x200);
 
-	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,hanakanz); // blitter commands in the roms are shuffled around
+	MCFG_VIDEO_START_OVERRIDE(hanakanz_state,hanakanz); // blitter commands in the roms are shuffled around
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -12910,9 +13011,9 @@ ROM_START( seljan2 )
 	ROM_LOAD( "5571.1c", 0x000000, 0x80000, CRC(5a8cd45c) SHA1(25ca573b8ba226fb3f2de48c57b5ced6884eaa63) )  // = 50201.1c (sryudens)
 ROM_END
 
-void ddenlovr_state::init_momotaro()
+void hanakanz_state::init_momotaro()
 {
-	m_maincpu->space(AS_IO).install_read_handler(0xe0, 0xe0, read8smo_delegate(*this, FUNC(ddenlovr_state::momotaro_protection_r)));
+	m_maincpu->space(AS_IO).install_read_handler(0xe0, 0xe0, read8smo_delegate(*this, FUNC(hanakanz_state::momotaro_protection_r)));
 }
 
 /***************************************************************************
@@ -12984,23 +13085,23 @@ ROM_START( htengoku )
 	ROM_LOAD( "6510.11b", 0x280000, 0x20000, CRC(0fdd6edf) SHA1(c6870ab538987110337e6e154cba98391c68fb98) )
 ROM_END
 
-GAME( 1992, htengoku,  0,        htengoku,  htengoku, ddenlovr_state, empty_init,    ROT180, "Dynax",                                     "Hanafuda Hana Tengoku [BET] (Japan)",                                   0)
+GAME( 1992, htengoku,  0,        htengoku,  htengoku, htengoku_state, empty_init,    ROT180, "Dynax",                                     "Hanafuda Hana Tengoku [BET] (Japan)",                                   0)
 
-GAME( 1992, mmpanic,   0,        mmpanic,   mmpanic,  ddenlovr_state, empty_init,    ROT0, "Nakanihon / East Technology (Taito license)", "Monkey Mole Panic (USA)",                                         MACHINE_NO_COCKTAIL  )
+GAME( 1992, mmpanic,   0,        mmpanic,   mmpanic,  mmpanic_state,  empty_init,    ROT0, "Nakanihon / East Technology (Taito license)", "Monkey Mole Panic (USA)",                                         MACHINE_NO_COCKTAIL  )
 // "Waiwai Animal Land" (without the Jr.) should be the original Japanese version of Monkey Mole Panic
 
 GAME( 1993, mjmyorn2,  0,        mjmyornt,  mjmyorn2, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious Orient Part 2 ~ Exotic Dream ~ [BET] (Japan, v1.00)",             MACHINE_NO_COCKTAIL  ) // no copyright warning, assume Japan from game strings
 GAME( 1992, mjmyornt,  mjmyorn2, mjmyornt,  mjmyornt, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious Orient [BET] (Japan, v1.00)",                     MACHINE_NO_COCKTAIL  ) // no copyright warning, assume Japan from game strings
 
-GAME( 1993, funkyfig,  0,        funkyfig,  funkyfig, ddenlovr_state, empty_init,    ROT0, "Nakanihon / East Technology (Taito license)", "The First Funky Fighter (USA, Canada, Mexico / Japan, set 1)",    MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS ) // scrolling, priority?
-GAME( 1993, funkyfiga, funkyfig, funkyfig,  funkyfig, ddenlovr_state, empty_init,    ROT0, "Nakanihon / East Technology (Taito license)", "The First Funky Fighter (USA, Canada, Mexico / Japan, set 2)",    MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS ) // ""
+GAME( 1993, funkyfig,  0,        funkyfig,  funkyfig, mmpanic_state,  empty_init,    ROT0, "Nakanihon / East Technology (Taito license)", "The First Funky Fighter (USA, Canada, Mexico / Japan, set 1)",    MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS ) // scrolling, priority?
+GAME( 1993, funkyfiga, funkyfig, funkyfig,  funkyfig, mmpanic_state,  empty_init,    ROT0, "Nakanihon / East Technology (Taito license)", "The First Funky Fighter (USA, Canada, Mexico / Japan, set 2)",    MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS ) // ""
 
 GAME( 1993, quizchq,   0,        quizchq,   quizchq,  ddenlovr_state, empty_init,    ROT0, "Nakanihon",                                   "Quiz Channel Question (Japan, Ver 1.00)",                        MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1993, quizchql,  quizchq,  quizchq,   quizchq,  ddenlovr_state, empty_init,    ROT0, "Nakanihon (Laxan license)",                   "Quiz Channel Question (Taiwan?, Ver 1.23)",                      MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1993, animaljr,  0,        mmpanic,   animaljr, ddenlovr_state, empty_init,    ROT0, "Nakanihon / East Technology (Taito license)", "Exciting Animal Land Jr. (USA, Canada, Mexico)",                                  MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_SOUND )
-GAME( 1993, animaljrs, animaljr, mmpanic,   animaljr, ddenlovr_state, empty_init,    ROT0, "Nakanihon / East Technology (Taito license)", "Animalandia Jr. (Spanish)",                                       MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_SOUND )
-GAME( 1993, animaljrj, animaljr, mmpanic,   animaljr, ddenlovr_state, empty_init,    ROT0, "Nakanihon / East Technology (Taito license)", "Waiwai Animal Land Jr. (Japan)",                                  MACHINE_NO_COCKTAIL  )
+GAME( 1993, animaljr,  0,        mmpanic,   animaljr, mmpanic_state,  empty_init,    ROT0, "Nakanihon / East Technology (Taito license)", "Exciting Animal Land Jr. (USA, Canada, Mexico)",                                  MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_SOUND )
+GAME( 1993, animaljrs, animaljr, mmpanic,   animaljr, mmpanic_state,  empty_init,    ROT0, "Nakanihon / East Technology (Taito license)", "Animalandia Jr. (Spanish)",                                       MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_SOUND )
+GAME( 1993, animaljrj, animaljr, mmpanic,   animaljr, mmpanic_state,  empty_init,    ROT0, "Nakanihon / East Technology (Taito license)", "Waiwai Animal Land Jr. (Japan)",                                  MACHINE_NO_COCKTAIL  )
 
 GAME( 1994, mjmyster,  0,        mjmyster,  mjmyster, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious World [BET] (Japan, set 1)",                            MACHINE_NO_COCKTAIL  )
 GAME( 1994, mjmywrld,  mjmyster, mjmywrld,  mjmyster, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious World [BET] (Japan, set 2)",                            MACHINE_NO_COCKTAIL  )
@@ -13021,7 +13122,7 @@ GAME( 1994, hparadis,  0,        hparadis,  hparadis, ddenlovr_state, empty_init
 GAME( 1995, hgokou,    0,        hgokou,    hgokou,   ddenlovr_state, empty_init,    ROT0, "Dynax (Alba license)",                        "Hanafuda Hana Gokou [BET] (Japan)",                                     MACHINE_NO_COCKTAIL  )
 GAME( 1995, hgokbang,  hgokou,   hgokbang,  hgokou,   ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Hanafuda Hana Gokou Bangaihen [BET] (Japan)",                           MACHINE_NO_COCKTAIL  )
 
-GAME( 1995, mjdchuka,  0,        mjchuuka,  mjchuuka, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Dai Chuuka Ken [BET] (China, D111)",                        MACHINE_NO_COCKTAIL  )
+GAME( 1995, mjdchuka,  0,        mjchuuka,  mjchuuka, hanakanz_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Dai Chuuka Ken [BET] (China, D111)",                        MACHINE_NO_COCKTAIL  )
 
 GAME( 1995, mjschuka,  0,        mjschuka,  mjschuka, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong Super Dai Chuuka Ken [BET] (Japan, D115)",                      MACHINE_NO_COCKTAIL  )
 
@@ -13034,10 +13135,10 @@ GAME( 1995, ddenlovrk, ddenlovj, ddenlovrk, ddenlovr, ddenlovr_state, empty_init
 GAME( 1995, ddenlovrb, ddenlovj, ddenlovr,  ddenlovr, ddenlovr_state, empty_init,    ROT0, "bootleg",                                     "Don Den Lover Vol. 1 - Heukbaeg-euro Jeonghaja (Korea, bootleg)", MACHINE_NO_COCKTAIL  )
 GAME( 1996, ddenlovr,  ddenlovj, ddenlovr,  ddenlovr, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Don Den Lover Vol. 1 (Hong Kong)",                                MACHINE_NO_COCKTAIL  )
 
-GAME( 1996, hanakanz,  0,        hanakanz,  hanakanz, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Hana Kanzashi (Japan)",                                           MACHINE_NO_COCKTAIL  )
-GAME( 1997, kotbinyo,  hanakanz, kotbinyo,  kotbinyo, ddenlovr_state, empty_init,    ROT0, "Dynax / Shinwhajin",                          "Kkot Bi Nyo (Korea)",                                             MACHINE_NO_COCKTAIL  )
+GAME( 1996, hanakanz,  0,        hanakanz,  hanakanz, hanakanz_state, empty_init,    ROT0, "Dynax",                                       "Hana Kanzashi (Japan)",                                           MACHINE_NO_COCKTAIL  )
+GAME( 1997, kotbinyo,  hanakanz, kotbinyo,  kotbinyo, hanakanz_state, empty_init,    ROT0, "Dynax / Shinwhajin",                          "Kkot Bi Nyo (Korea)",                                             MACHINE_NO_COCKTAIL  )
 
-GAME( 1997, kotbinsp,  0,        kotbinsp,  kotbinsp, ddenlovr_state, empty_init,    ROT0, "Dynax / Shinwhajin",                          "Kkot Bi Nyo Special (Korea)",                                     MACHINE_NO_COCKTAIL  )
+GAME( 1997, kotbinsp,  0,        kotbinsp,  kotbinsp, hanakanz_state, empty_init,    ROT0, "Dynax / Shinwhajin",                          "Kkot Bi Nyo Special (Korea)",                                     MACHINE_NO_COCKTAIL  )
 
 GAME( 1996, akamaru,   0,        akamaru,   akamaru,  ddenlovr_state, empty_init,    ROT0, "Dynax (Nakanihon license)",                   "Panel & Variety Akamaru Q Jousyou Dont-R",                        MACHINE_NO_COCKTAIL  )
 
@@ -13051,16 +13152,16 @@ GAME( 1996, seljan2,   0,        seljan2,   seljan2,  ddenlovr_state, empty_init
 
 GAME( 1996, mjflove,   0,        mjflove,   mjflove,  ddenlovr_state, empty_init,    ROT0, "Nakanihon",                                   "Mahjong Fantasic Love (Japan)",                                   MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1997, hkagerou,  0,        hkagerou,  hkagerou, ddenlovr_state, empty_init,    ROT0, "Nakanihon / Dynax",                           "Hana Kagerou [BET] (Japan)",                                      MACHINE_NO_COCKTAIL  )
+GAME( 1997, hkagerou,  0,        hkagerou,  hkagerou, hanakanz_state, empty_init,    ROT0, "Nakanihon / Dynax",                           "Hana Kagerou [BET] (Japan)",                                      MACHINE_NO_COCKTAIL  )
 
-GAME( 1998, mjchuuka,  0,        mjchuuka,  mjchuuka, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong Chuukanejyo [BET] (China)",                                     MACHINE_NO_COCKTAIL  )
+GAME( 1998, mjchuuka,  0,        mjchuuka,  mjchuuka, hanakanz_state, empty_init,    ROT0, "Dynax",                                       "Mahjong Chuukanejyo [BET] (China)",                                     MACHINE_NO_COCKTAIL  )
 
-GAME( 1998, mjreach1,  0,        mjreach1,  mjreach1, ddenlovr_state, empty_init,    ROT0, "Nihon System",                                "Mahjong Reach Ippatsu [BET] (Japan)",                                   MACHINE_NO_COCKTAIL  )
+GAME( 1998, mjreach1,  0,        mjreach1,  mjreach1, hanakanz_state, empty_init,    ROT0, "Nihon System",                                "Mahjong Reach Ippatsu [BET] (Japan)",                                   MACHINE_NO_COCKTAIL  )
 
-GAME( 1999, jongtei,   0,        jongtei,   jongtei,  ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong Jong-Tei [BET] (Japan, NM532-01)",                              MACHINE_NO_COCKTAIL  )
+GAME( 1999, jongtei,   0,        jongtei,   jongtei,  hanakanz_state, empty_init,    ROT0, "Dynax",                                       "Mahjong Jong-Tei [BET] (Japan, NM532-01)",                              MACHINE_NO_COCKTAIL  )
 
-GAME( 2000, mjgnight,  0,        mjgnight,  mjgnight, ddenlovr_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Gorgeous Night [BET] (Japan, TSM003-01)",                       MACHINE_NO_COCKTAIL  )
+GAME( 2000, mjgnight,  0,        mjgnight,  mjgnight, hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Gorgeous Night [BET] (Japan, TSM003-01)",                       MACHINE_NO_COCKTAIL  )
 
-GAME( 2002, daimyojn,  0,        daimyojn,  daimyojn, ddenlovr_state, empty_init,    ROT0, "Dynax / Techno-Top / Techno-Planning",        "Mahjong Daimyojin [BET] (Japan, T017-PB-00)",                           MACHINE_NO_COCKTAIL  )
+GAME( 2002, daimyojn,  0,        daimyojn,  daimyojn, hanakanz_state, empty_init,    ROT0, "Dynax / Techno-Top / Techno-Planning",        "Mahjong Daimyojin [BET] (Japan, T017-PB-00)",                           MACHINE_NO_COCKTAIL  )
 
-GAME( 2004, momotaro,  0,        daimyojn,  daimyojn, ddenlovr_state, init_momotaro, ROT0, "Techno-Top",                                  "Mahjong Momotarou [BET] (Japan, T027-RB-01)",                             MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 2004, momotaro,  0,        daimyojn,  daimyojn, hanakanz_state, init_momotaro, ROT0, "Techno-Top",                                  "Mahjong Momotarou [BET] (Japan, T027-RB-01)",                             MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

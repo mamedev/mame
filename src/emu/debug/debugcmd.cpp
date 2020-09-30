@@ -122,6 +122,11 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	symtable.add("min", 2, 2, std::bind(&debugger_commands::execute_min, this, _1, _2));
 	symtable.add("max", 2, 2, std::bind(&debugger_commands::execute_max, this, _1, _2));
 	symtable.add("if", 3, 3, std::bind(&debugger_commands::execute_if, this, _1, _2));
+	symtable.add("abs", 1, 1, std::bind(&debugger_commands::execute_abs, this, _1, _2));
+	symtable.add("bit", 2, 3, std::bind(&debugger_commands::execute_bit, this, _1, _2));
+	symtable.add("s8", 1, 1, std::bind(&debugger_commands::execute_s8, this, _1, _2));
+	symtable.add("s16", 1, 1, std::bind(&debugger_commands::execute_s16, this, _1, _2));
+	symtable.add("s32", 1, 1, std::bind(&debugger_commands::execute_s32, this, _1, _2));
 	symtable.add("cpunum", std::bind(&debugger_commands::get_cpunum, this));
 
 	/* add all single-entry save state globals */
@@ -322,9 +327,9 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_cheat.cpu[0] = m_cheat.cpu[1] = 0;
 }
 
-/*-------------------------------------------------
-    execute_min - return the minimum of two values
--------------------------------------------------*/
+//-------------------------------------------------
+//  execute_min - return the minimum of two values
+//-------------------------------------------------
 
 u64 debugger_commands::execute_min(int params, const u64 *param)
 {
@@ -332,9 +337,9 @@ u64 debugger_commands::execute_min(int params, const u64 *param)
 }
 
 
-/*-------------------------------------------------
-    execute_max - return the maximum of two values
--------------------------------------------------*/
+//-------------------------------------------------
+//  execute_max - return the maximum of two values
+//-------------------------------------------------
 
 u64 debugger_commands::execute_max(int params, const u64 *param)
 {
@@ -342,13 +347,66 @@ u64 debugger_commands::execute_max(int params, const u64 *param)
 }
 
 
-/*-------------------------------------------------
-    execute_if - if (a) return b; else return c;
--------------------------------------------------*/
+//-------------------------------------------------
+//  execute_if - if (a) return b; else return c;
+//-------------------------------------------------
 
 u64 debugger_commands::execute_if(int params, const u64 *param)
 {
 	return param[0] ? param[1] : param[2];
+}
+
+
+//-------------------------------------------------
+//  execute_abs - return the absolute value
+//-------------------------------------------------
+
+u64 debugger_commands::execute_abs(int params, const u64 *param)
+{
+	return std::abs(s64(param[0]));
+}
+
+
+//-------------------------------------------------
+//  execute_bit - extract bit field from value
+//-------------------------------------------------
+
+u64 debugger_commands::execute_bit(int params, const u64 *param)
+{
+	if (params == 2)
+		return BIT(param[0], param[1]);
+	else
+		return BIT(param[0], param[1], param[2]);
+}
+
+
+//-------------------------------------------------
+//  execute_s8 - sign-extend from 8 bits
+//-------------------------------------------------
+
+u64 debugger_commands::execute_s8(int params, const u64 *param)
+{
+	return s8(param[0]);
+}
+
+
+//-------------------------------------------------
+//  execute_s16 - sign-extend from 16 bits
+//-------------------------------------------------
+
+u64 debugger_commands::execute_s16(int params, const u64 *param)
+{
+	return s16(param[0]);
+}
+
+
+//-------------------------------------------------
+//  execute_s32 - sign-extend from 32 bits
+//-------------------------------------------------
+
+u64 debugger_commands::execute_s32(int params, const u64 *param)
+{
+	return s32(param[0]);
 }
 
 

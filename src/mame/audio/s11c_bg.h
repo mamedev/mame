@@ -13,9 +13,9 @@
 
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
+#include "sound/dac.h"
 #include "sound/hc55516.h"
 #include "sound/ym2151.h"
-#include "sound/dac.h"
 
 
 class s11c_bg_device : public device_t, public device_mixer_interface

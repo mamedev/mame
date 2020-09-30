@@ -147,7 +147,9 @@ void debug_view_state::recompute()
 	}
 
 	// add a flags entry: flags:xxxxxxxx
-	m_state_list.emplace_back(STATE_GENFLAGS, "flags", source.m_stateintf->state_string_max_length(STATE_GENFLAGS));
+	const device_state_entry *flags = source.m_stateintf->state_find_entry(STATE_GENFLAGS);
+	if (flags != nullptr)
+		m_state_list.emplace_back(STATE_GENFLAGS, "flags", flags->max_length());
 
 	// add a divider entry
 	m_state_list.emplace_back(REG_DIVIDER, "", 0);
@@ -158,7 +160,7 @@ void debug_view_state::recompute()
 		if (entry->divider())
 			m_state_list.emplace_back(REG_DIVIDER, "", 0);
 		else if (entry->visible())
-			m_state_list.emplace_back(entry->index(), entry->symbol(), source.m_stateintf->state_string_max_length(entry->index()));
+			m_state_list.emplace_back(entry->index(), entry->symbol(), entry->max_length());
 	}
 
 	// count the entries and determine the maximum tag and value sizes

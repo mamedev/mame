@@ -64,22 +64,22 @@ void snkwave_device::device_start()
 //  for our sound stream
 //-------------------------------------------------
 
-void snkwave_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void snkwave_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *buffer = outputs[0];
-
-	/* zap the contents of the buffer */
-	memset(buffer, 0, samples * sizeof(*buffer));
+	auto &buffer = outputs[0];
 
 	assert(m_counter < 0x1000);
 	assert(m_frequency < 0x1000);
 
 	/* if no sound, we're done */
 	if (m_frequency == 0xfff)
+	{
+		buffer.fill(0);
 		return;
+	}
 
 	/* generate sound into buffer while updating the counter */
-	while (samples-- > 0)
+	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
 	{
 		int loops;
 		int16_t out = 0;
@@ -104,7 +104,7 @@ void snkwave_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			}
 		}
 
-		*buffer++ = out;
+		buffer.put_int(sampindex, out, 32768);
 	}
 }
 

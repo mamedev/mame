@@ -68,7 +68,7 @@ void sam_mouse_device::device_start()
 
 	// register for savestates
 	save_item(NAME(m_mouse_index));
-	save_pointer(NAME(m_mouse_data), 9);
+	save_item(NAME(m_mouse_data));
 	save_item(NAME(m_mouse_x));
 	save_item(NAME(m_mouse_y));
 }

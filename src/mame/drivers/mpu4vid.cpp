@@ -204,6 +204,7 @@ TODO:
 #include "crmaze4p.lh"
 #include "v4addlad.lh"
 #include "v4barqst.lh"
+#include "v4dbltak.lh"
 #include "v4psi.lh"
 #include "v4strike.lh"
 
@@ -1160,8 +1161,8 @@ static INPUT_PORTS_START( v4vgpok )
 	PORT_INCLUDE( bwbvid )
 
 	PORT_MODIFY("BLACK1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start / Deal / Draw")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_POKER_BET ) // Stake
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_GAMBLE_DEAL ) PORT_NAME("Start / Deal / Draw")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_GAMBLE_BET ) // Stake
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT ) // Collect
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_GAMBLE_LOW )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_GAMBLE_HIGH )
@@ -1542,7 +1543,7 @@ static INPUT_PORTS_START( v4dbltak )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON9) PORT_NAME("Swop")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_START1)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON10) PORT_NAME("Game Select")
 
 	PORT_MODIFY("BLACK2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Cancel/Collect")
@@ -1573,7 +1574,7 @@ static INPUT_PORTS_START( v4dbltak )
 	PORT_DIPNAME( 0x20, 0x00, "Coin Alarm Inhibit" ) PORT_DIPLOCATION("DIL2:06")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("DIL2:07") //If an 'arcade' ROM, this flips, or is unused entirely.
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("DIL2:07")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
 	PORT_DIPNAME( 0x80, 0x00, "Clear MPU Memory" ) PORT_DIPLOCATION("DIL2:08")
@@ -9313,9 +9314,9 @@ GAME(  1996, v4big40j,   v4big40,  bwbvid_oki_bt471,     v4big40,  mpu4vid_state
 GAME(  1996, v4big40f,   v4big40,  bwbvid_oki_bt471,     v4big40,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (S_Site Data + %-Key + OCDM) (MPU4 Video)",GAME_FLAGS )
 
 
-GAME(  1997, v4dbltak,   0,        bwbvid_oki_bt471, v4dbltak,     mpu4vid_state, init_bwbhack,     ROT0, u8"BWB","Double Take (BWB) (Release 4, Arcade Standard, 20p/25p Stake Key, £5/£10/£15 Prize Key) (MPU4 Video)",GAME_FLAGS )
-GAME(  1997, v4dbltaka,  v4dbltak, bwbvid_oki_bt471, v4dbltak,     mpu4vid_state, init_bwbhack,     ROT0, u8"BWB","Double Take (BWB) (Release 4, Arcade Data, 20p/25p Stake Key, £5/£10/£15 Prize Key) (MPU4 Video)",GAME_FLAGS )
-GAME(  1997, v4dbltakb,  v4dbltak, bwbvid_oki_bt471, v4dbltak_perc,mpu4vid_state, init_bwbhack,     ROT0, u8"BWB","Double Take (BWB) (Release 4, S_Site Data, 20p/25p Stake Key, £5/£10/£15 Prize Key, % Key) (MPU4 Video)",GAME_FLAGS )
+GAMEL(  1997, v4dbltak,   0,        bwbvid_oki_bt471, v4dbltak,     mpu4vid_state, init_bwbhack,     ROT0, u8"BWB","Double Take (BWB) (Release 4, Arcade Standard, 20p/25p Stake Key, £5/£10/£15 Prize Key) (MPU4 Video)",GAME_FLAGS,layout_v4dbltak )
+GAMEL(  1997, v4dbltaka,  v4dbltak, bwbvid_oki_bt471, v4dbltak,     mpu4vid_state, init_bwbhack,     ROT0, u8"BWB","Double Take (BWB) (Release 4, Arcade Data, 20p/25p Stake Key, £5/£10/£15 Prize Key) (MPU4 Video)",GAME_FLAGS,layout_v4dbltak )
+GAMEL(  1997, v4dbltakb,  v4dbltak, bwbvid_oki_bt471, v4dbltak_perc,mpu4vid_state, init_bwbhack,     ROT0, u8"BWB","Double Take (BWB) (Release 4, S_Site Data, 20p/25p Stake Key, £5/£10/£15 Prize Key, % Key) (MPU4 Video)",GAME_FLAGS,layout_v4dbltak )
 
 
 GAME(  199?, v4gldrsh,   0,        bwbvid,     v4reno,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Gold Rush (BWB) (Release 8, 20p Fixed, All - Cash) (set 1) (MPU4 Video)",GAME_FLAGS )

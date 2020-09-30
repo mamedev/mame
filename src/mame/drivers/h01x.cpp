@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "includes/h01x.h"
 
-static const int16_t speaker_levels[] = {-32768, 0, 32767, 0};
+static const double speaker_levels[] = {-1.0, 0.0, 1.0, 0.0};
 
 void h01x_state::h01x(machine_config &config)
 {

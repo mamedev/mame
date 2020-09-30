@@ -253,7 +253,7 @@ uint16_t jpmimpct_state::duart_1_r(offs_t offset)
 		}
 		case 0xd:
 		{
-			val = ioport("TEST/DEMO")->read();
+			val = ioport("TEST_DEMO")->read();
 			break;
 		}
 		case 0xe:
@@ -703,7 +703,7 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE PORT_NAME( "Cash Door" )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_TOGGLE PORT_NAME( "Refill Key" )
 
-	PORT_START("TEST/DEMO")
+	PORT_START("TEST_DEMO")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE4 ) PORT_NAME( "Test/Demo" )
 INPUT_PORTS_END
 
@@ -1287,7 +1287,7 @@ INPUT_PORTS_START( tbirds )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE PORT_NAME( "Cash Door" )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_TOGGLE PORT_NAME( "Refill Key" )
 
-	PORT_START("TEST/DEMO")
+	PORT_START("TEST_DEMO")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE4 ) PORT_NAME( "Test/Demo" )
 
 	PORT_START("COINS")

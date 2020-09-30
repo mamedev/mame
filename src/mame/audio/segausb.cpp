@@ -12,9 +12,6 @@
 #include "segausb.h"
 #include "nl_segausb.h"
 
-#include "includes/segag80r.h"
-#include "includes/segag80v.h"
-
 #include <cmath>
 
 
@@ -103,7 +100,7 @@ void usb_sound_device::device_start()
 
 #else
 
-	m_stream = stream_alloc(0, 1, USB_2MHZ_CLOCK);
+	m_stream = stream_alloc_legacy(0, 1, USB_2MHZ_CLOCK);
 
 	m_noise_shift = 0x15555;
 
@@ -136,24 +133,19 @@ void usb_sound_device::device_start()
 	for (int tgroup = 0; tgroup < 3; tgroup++)
 	{
 		timer8253 &group = m_timer_group[tgroup];
-		for (int tchan = 0; tchan < 3; tchan++)
-		{
-			timer8253::channel &channel = group.chan[tchan];
-			save_item(NAME(channel.holding), tgroup * 3 + tchan);
-			save_item(NAME(channel.latchmode), tgroup * 3 + tchan);
-			save_item(NAME(channel.latchtoggle), tgroup * 3 + tchan);
-			save_item(NAME(channel.clockmode), tgroup * 3 + tchan);
-			save_item(NAME(channel.bcdmode), tgroup * 3 + tchan);
-			save_item(NAME(channel.output), tgroup * 3 + tchan);
-			save_item(NAME(channel.lastgate), tgroup * 3 + tchan);
-			save_item(NAME(channel.gate), tgroup * 3 + tchan);
-			save_item(NAME(channel.subcount), tgroup * 3 + tchan);
-			save_item(NAME(channel.count), tgroup * 3 + tchan);
-			save_item(NAME(channel.remain), tgroup * 3 + tchan);
-		}
+		save_item(STRUCT_MEMBER(group.chan, holding), tgroup);
+		save_item(STRUCT_MEMBER(group.chan, latchmode), tgroup);
+		save_item(STRUCT_MEMBER(group.chan, latchtoggle), tgroup);
+		save_item(STRUCT_MEMBER(group.chan, clockmode), tgroup);
+		save_item(STRUCT_MEMBER(group.chan, bcdmode), tgroup);
+		save_item(STRUCT_MEMBER(group.chan, output), tgroup);
+		save_item(STRUCT_MEMBER(group.chan, lastgate), tgroup);
+		save_item(STRUCT_MEMBER(group.chan, gate), tgroup);
+		save_item(STRUCT_MEMBER(group.chan, subcount), tgroup);
+		save_item(STRUCT_MEMBER(group.chan, count), tgroup);
+		save_item(STRUCT_MEMBER(group.chan, remain), tgroup);
 		save_item(NAME(group.env), tgroup);
-		save_item(NAME(group.chan_filter[0].capval), tgroup);
-		save_item(NAME(group.chan_filter[1].capval), tgroup);
+		save_item(STRUCT_MEMBER(group.chan_filter, capval), tgroup);
 		save_item(NAME(group.gate1.capval), tgroup);
 		save_item(NAME(group.gate2.capval), tgroup);
 		save_item(NAME(group.config), tgroup);
@@ -212,7 +204,8 @@ u8 usb_sound_device::status_r()
 {
 	LOG("%s:usb_data_r = %02X\n", machine().describe_context(), (m_out_latch & 0x81) | (m_in_latch & 0x7e));
 
-	m_maincpu->adjust_icount(-200);
+	if (!machine().side_effects_disabled())
+		m_maincpu->adjust_icount(-200);
 
 	// only bits 0 and 7 are controlled by the I8035; the remaining
 	// bits 1-6 reflect the current input latch values
@@ -458,10 +451,10 @@ void usb_sound_device::env_w(int which, u8 offset, u8 data)
 }
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void usb_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void usb_sound_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	stream_sample_t *dest = outputs[0];
 

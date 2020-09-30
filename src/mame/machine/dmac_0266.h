@@ -14,14 +14,13 @@ public:
 	// configuration
 	template <typename T> void set_bus(T &&tag, int spacenum) { m_bus.set_tag(std::forward<T>(tag), spacenum); }
 
-	auto out_int_cb() { return m_int.bind(); }
 	auto dma_r_cb() { return m_dma_r.bind(); }
 	auto dma_w_cb() { return m_dma_w.bind(); }
 
 	void map(address_map &map);
 
-	void irq_w(int state);
-	void drq_w(int state);
+	void eop_w(int state);
+	void req_w(int state);
 
 protected:
 	// device_t overrides
@@ -34,20 +33,18 @@ protected:
 	u32 tcount_r() { return m_tcount; }
 
 	void control_w(u32 data);
-	void tcount_w(offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_tcount); }
-	void tag_w(offs_t offset, u32 data, u32 mem_mask)    { COMBINE_DATA(&m_tag); }
-	void offset_w(offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_offset); }
-	void entry_w(offs_t offset, u32 data, u32 mem_mask)  { COMBINE_DATA(&m_map[m_tag & 0x7f]); }
+	void tcount_w(u32 data) { m_tcount = data; }
+	void tag_w(u32 data)    { m_tag = data; }
+	void offset_w(u32 data) { m_offset = data; }
+	void entry_w(u32 data)  { m_map[m_tag & 0x7f] = data & 0x7fff; }
 
 	// dma logic
 	void soft_reset();
-	void set_int(bool int_state);
 	void dma_check(void *ptr, s32 param);
 
 private:
 	required_address_space m_bus;
 
-	devcb_write_line m_int;
 	devcb_read8 m_dma_r;
 	devcb_write8 m_dma_w;
 
@@ -72,11 +69,10 @@ private:
 	u32 m_tcount;
 	u32 m_tag;
 	u32 m_offset;
-	u32 m_map[128];
+	u32 m_map[129];
 
 	// internal state
-	bool m_int_state;
-	bool m_drq_state;
+	bool m_req_state;
 };
 
 DECLARE_DEVICE_TYPE(DMAC_0266, dmac_0266_device)

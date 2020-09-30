@@ -119,10 +119,11 @@ offs_t t11_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 				case 000:  util::stream_format(stream, "HALT"); break;
 				case 001:  util::stream_format(stream, "WAIT"); break;
 				case 002:  util::stream_format(stream, "RTI"); flags = STEP_OUT; break;
-				case 003:  util::stream_format(stream, "BPT"); break;
-				case 004:  util::stream_format(stream, "IOT"); break;
+				case 003:  util::stream_format(stream, "BPT"); flags = STEP_OVER; break;
+				case 004:  util::stream_format(stream, "IOT"); flags = STEP_OVER; break;
 				case 005:  util::stream_format(stream, "RESET"); break;
-				case 006:  util::stream_format(stream, "RTT"); break;
+				case 006:  util::stream_format(stream, "RTT"); flags = STEP_OUT; break;
+				case 007:  util::stream_format(stream, "MFPT"); break;
 				default:   util::stream_format(stream, ".WORD %06o", op); break;
 			}
 			break;
@@ -135,21 +136,22 @@ offs_t t11_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 			{
 				case 000:
 					if( (lo & 7) == 7 )
-						util::stream_format(stream, "RTS");
+						util::stream_format(stream, "RETURN");
 					else
 						util::stream_format(stream, "RTS   %s", regs[lo & 7]);
 					flags = STEP_OUT;
 					break;
+				// 00023x: SPL (not implemented on T-11)
 				case 040:
 				case 050:
 					switch( lo & 15 )
 					{
 						case 000:  util::stream_format(stream, "NOP"); break;
 						case 017:  util::stream_format(stream, "CCC"); break;
-						case 001:  util::stream_format(stream, "CEC"); break;
-						case 002:  util::stream_format(stream, "CEV"); break;
-						case 004:  util::stream_format(stream, "CEZ"); break;
-						case 010:  util::stream_format(stream, "CEN"); break;
+						case 001:  util::stream_format(stream, "CLC"); break;
+						case 002:  util::stream_format(stream, "CLV"); break;
+						case 004:  util::stream_format(stream, "CLZ"); break;
+						case 010:  util::stream_format(stream, "CLN"); break;
 						default:   util::stream_format(stream, "Ccc   #%02o", lo & 15); break;
 					}
 					break;
@@ -207,7 +209,7 @@ offs_t t11_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 		case 0004400: case 0004500: case 0004600: case 0004700:
 			ea1 = MakeEA<false> (lo, pc, opcodes);
 			if ( (hi & 7) == 7 )
-				util::stream_format(stream, "JSR   %s", ea1);
+				util::stream_format(stream, "CALL  %s", ea1);
 			else
 				util::stream_format(stream, "JSR   %s,%s", regs[hi & 7], ea1);
 			flags = STEP_OVER;
@@ -260,13 +262,17 @@ offs_t t11_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 			ea1 = MakeEA<false> (lo, pc, opcodes);
 			util::stream_format(stream, "ASL   %s", ea1);
 			break;
-/*      case 0006400:
-            util::stream_format(stream, "MARK  #%o", lo);
-            break;*/
+		// 0064xx: MARK (not implemented on T-11)
+		// 0065xx: MFPI (not implemented on T-11)
+		// 0066xx: MTPI (not implemented on T-11)
 		case 0006700:
 			ea1 = MakeEA<false> (lo, pc, opcodes);
 			util::stream_format(stream, "SXT   %s", ea1);
 			break;
+		// 0070xx: CSM (not implemented on T-11)
+		// 0072xx: TSTSET (not implemented on T-11)
+		// 0073xx: WRTLCK (not implemented on T-11)
+
 		case 0010000: case 0010100: case 0010200: case 0010300: case 0010400: case 0010500: case 0010600: case 0010700:
 		case 0011000: case 0011100: case 0011200: case 0011300: case 0011400: case 0011500: case 0011600: case 0011700:
 		case 0012000: case 0012100: case 0012200: case 0012300: case 0012400: case 0012500: case 0012600: case 0012700:
@@ -277,13 +283,7 @@ offs_t t11_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 		case 0017000: case 0017100: case 0017200: case 0017300: case 0017400: case 0017500: case 0017600: case 0017700:
 			ea1 = MakeEA<false> (hi, pc, opcodes);
 			ea2 = MakeEA<false> (lo, pc, opcodes);
-			if (lo == 046)      /* MOV src,-(SP) */
-				util::stream_format(stream, "PUSH  %s", ea1);
-			else
-			if (hi == 026)      /* MOV (SP)+,buffer */
-				util::stream_format(stream, "POP   %s", ea2);
-			else                /* all other */
-				util::stream_format(stream, "MOV   %s,%s", ea1, ea2);
+			util::stream_format(stream, "MOV   %s,%s", ea1, ea2);
 			break;
 		case 0020000: case 0020100: case 0020200: case 0020300: case 0020400: case 0020500: case 0020600: case 0020700:
 		case 0021000: case 0021100: case 0021200: case 0021300: case 0021400: case 0021500: case 0021600: case 0021700:
@@ -346,11 +346,16 @@ offs_t t11_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 			util::stream_format(stream, "ADD   %s,%s", ea1, ea2);
 			break;
 
+		// 070xxx: MUL (not implemented on T-11)
+		// 071xxx: DIV (not implemented on T-11)
+		// 072xxx: ASH (not implemented on T-11)
+		// 073xxx: ASHC (not implemented on T-11)
 		case 0074000: case 0074100: case 0074200: case 0074300: case 0074400: case 0074500: case 0074600: case 0074700:
 			ea1 = MakeEA<false> (lo, pc, opcodes);
 			util::stream_format(stream, "XOR   %s,%s", regs[hi & 7], ea1);
 			break;
-
+		// 075xxx: Floating Instruction Set (not implemented on T-11)
+		// 076xxx: Commercial Instruction Set (not implemented on T-11)
 		case 0077000: case 0077100: case 0077200: case 0077300: case 0077400: case 0077500: case 0077600: case 0077700:
 			addr = (pc - 2 * lo) & 0177777;
 			util::stream_format(stream, "SOB   %s,%06o", regs[hi & 7], addr);
@@ -390,9 +395,11 @@ offs_t t11_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 			break;
 		case 0104000: case 0104100: case 0104200: case 0104300:
 			util::stream_format(stream, "EMT   %03o", op & 0377);
+			flags = STEP_OVER;
 			break;
 		case 0104400: case 0104500: case 0104600: case 0104700:
 			util::stream_format(stream, "TRAP  %03o", op & 0377);
+			flags = STEP_OVER;
 			break;
 
 		case 0105000:
@@ -447,6 +454,8 @@ offs_t t11_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 			ea1 = MakeEA<true> (lo, pc, opcodes);
 			util::stream_format(stream, "MTPS  %s", ea1);
 			break;
+		// 1065xx: MFPD (not implemented on T-11)
+		// 1066xx: MTPD (not implemented on T-11)
 		case 0106700:
 			ea1 = MakeEA<true> (lo, pc, opcodes);
 			util::stream_format(stream, "MFPS  %s", ea1);

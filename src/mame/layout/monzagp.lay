@@ -15,95 +15,95 @@ license:CC0
 		</screen>
 
 		<!-- best scores 1 -->
-		<bezel name="digit33" element="digit">
+		<element name="digit33" ref="digit">
 			<bounds x="10" y="10"  width="15" height="22" />
-		</bezel>
-		<bezel name="digit13" element="digit">
+		</element>
+		<element name="digit13" ref="digit">
 			<bounds x="30" y="10"  width="15" height="22" />
-		</bezel>
-		<bezel name="digit23" element="digit">
+		</element>
+		<element name="digit23" ref="digit">
 			<bounds x="50" y="10"  width="15" height="22" />
-		</bezel>
-		<bezel name="digit03" element="digit">
+		</element>
+		<element name="digit03" ref="digit">
 			<bounds x="70" y="10"  width="15" height="22" />
-		</bezel>
+		</element>
 
 		<!-- best scores 2 -->
-		<bezel name="digit30" element="digit">
+		<element name="digit30" ref="digit">
 			<bounds x="10" y="40"  width="15" height="22" />
-		</bezel>
-		<bezel name="digit10" element="digit">
+		</element>
+		<element name="digit10" ref="digit">
 			<bounds x="30" y="40"  width="15" height="22" />
-		</bezel>
-		<bezel name="digit20" element="digit">
+		</element>
+		<element name="digit20" ref="digit">
 			<bounds x="50" y="40"  width="15" height="22" />
-		</bezel>
-		<bezel name="digit00" element="digit">
+		</element>
+		<element name="digit00" ref="digit">
 			<bounds x="70" y="40"  width="15" height="22" />
-		</bezel>
+		</element>
 
 		<!-- best scores 3 -->
-		<bezel name="digit34" element="digit">
+		<element name="digit34" ref="digit">
 			<bounds x="10" y="70"  width="15" height="22" />
-		</bezel>
-		<bezel name="digit14" element="digit">
+		</element>
+		<element name="digit14" ref="digit">
 			<bounds x="30" y="70"  width="15" height="22" />
-		</bezel>
-		<bezel name="digit24" element="digit">
+		</element>
+		<element name="digit24" ref="digit">
 			<bounds x="50" y="70"  width="15" height="22" />
-		</bezel>
-		<bezel name="digit04" element="digit">
+		</element>
+		<element name="digit04" ref="digit">
 			<bounds x="70" y="70"  width="15" height="22" />
-		</bezel>
+		</element>
 
 		<!-- best scores 4 -->
-		<bezel name="digit32" element="digit">
+		<element name="digit32" ref="digit">
 			<bounds x="10" y="100"  width="15" height="22" />
-		</bezel>
-		<bezel name="digit12" element="digit">
+		</element>
+		<element name="digit12" ref="digit">
 			<bounds x="30" y="100"  width="15" height="22" />
-		</bezel>
-		<bezel name="digit22" element="digit">
+		</element>
+		<element name="digit22" ref="digit">
 			<bounds x="50" y="100"  width="15" height="22" />
-		</bezel>
-		<bezel name="digit02" element="digit">
+		</element>
+		<element name="digit02" ref="digit">
 			<bounds x="70" y="100"  width="15" height="22" />
-		</bezel>
+		</element>
 
 		<!-- best scores 5 -->
-		<bezel name="digit36" element="digit">
+		<element name="digit36" ref="digit">
 			<bounds x="10" y="130"  width="15" height="22" />
-		</bezel>
-		<bezel name="digit16" element="digit">
+		</element>
+		<element name="digit16" ref="digit">
 			<bounds x="30" y="130"  width="15" height="22" />
-		</bezel>
-		<bezel name="digit26" element="digit">
+		</element>
+		<element name="digit26" ref="digit">
 			<bounds x="50" y="130"  width="15" height="22" />
-		</bezel>
-		<bezel name="digit06" element="digit">
+		</element>
+		<element name="digit06" ref="digit">
 			<bounds x="70" y="130"  width="15" height="22" />
-		</bezel>
+		</element>
 
 		<!-- time racing -->
-		<bezel name="digit25" element="digit">
+		<element name="digit25" ref="digit">
 			<bounds x="140" y="130"  width="15" height="22" />
-		</bezel>
-		<bezel name="digit05" element="digit">
+		</element>
+		<element name="digit05" ref="digit">
 			<bounds x="160" y="130"  width="15" height="22" />
-		</bezel>
+		</element>
 
 		<!-- your score -->
-		<bezel name="digit31" element="digit">
+		<element name="digit31" ref="digit">
 			<bounds x="220" y="10"  width="15" height="22" />
-		</bezel>
-		<bezel name="digit11" element="digit">
+		</element>
+		<element name="digit11" ref="digit">
 			<bounds x="240" y="10"  width="15" height="22" />
-		</bezel>
-		<bezel name="digit21" element="digit">
+		</element>
+		<element name="digit21" ref="digit">
 			<bounds x="260" y="10"  width="15" height="22" />
-		</bezel>
-		<bezel name="digit01" element="digit">
+		</element>
+		<element name="digit01" ref="digit">
 			<bounds x="280" y="10"  width="15" height="22" />
-		</bezel>
+		</element>
 	</view>
 </mamelayout>

@@ -146,11 +146,11 @@ void l7a1045_sound_device::device_start()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void l7a1045_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void l7a1045_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	/* Clear the buffers */
-	memset(outputs[0], 0, samples*sizeof(*outputs[0]));
-	memset(outputs[1], 0, samples*sizeof(*outputs[1]));
+	outputs[0].fill(0);
+	outputs[1].fill(0);
 
 	for (int i = 0; i < 32; i++)
 	{
@@ -165,7 +165,7 @@ void l7a1045_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 			uint32_t pos = vptr->pos;
 			uint32_t frac = vptr->frac;
 
-			for (int j = 0; j < samples; j++)
+			for (int j = 0; j < outputs[0].samples(); j++)
 			{
 				int32_t sample;
 				uint8_t data;
@@ -192,8 +192,8 @@ void l7a1045_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 				sample = ((int8_t)(data & 0xfc)) << (3 - (data & 3));
 				frac += step;
 
-				outputs[0][j] += ((sample * vptr->l_volume) >> 9);
-				outputs[1][j] += ((sample * vptr->r_volume) >> 9);
+				outputs[0].add_int(j, sample * vptr->l_volume, 32768 * 512);
+				outputs[1].add_int(j, sample * vptr->r_volume, 32768 * 512);
 			}
 
 			vptr->pos = pos;

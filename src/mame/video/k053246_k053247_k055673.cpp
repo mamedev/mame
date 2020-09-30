@@ -258,8 +258,8 @@ int k053247_device::k053246_is_irq_enabled(void)
  * The rest of the sprite remains normal.
  */
 
-template<class _BitmapClass>
-void k053247_device::k053247_sprites_draw_common(_BitmapClass &bitmap, const rectangle &cliprect)
+template<class BitmapClass>
+void k053247_device::k053247_sprites_draw_common(BitmapClass &bitmap, const rectangle &cliprect)
 {
 #define NUM_SPRITES 256
 
@@ -283,7 +283,7 @@ void k053247_device::k053247_sprites_draw_common(_BitmapClass &bitmap, const rec
 	*/
 	if (palette().shadows_enabled())
 	{
-		if (sizeof(typename _BitmapClass::pixel_t) == 4 && (palette().hilights_enabled()))
+		if (sizeof(typename BitmapClass::pixel_t) == 4 && (palette().hilights_enabled()))
 			shdmask = 3; // enable all shadows and highlights
 		else
 			shdmask = 0; // enable default shadows

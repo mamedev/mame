@@ -514,7 +514,7 @@ void idegdrom_device::ide_cs1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 // The board
 
 static INPUT_PORTS_START(gdrom_board_ioports)
-	PORT_START("DEBUG ONLY")
+	PORT_START("DEBUG_ONLY")
 	PORT_CONFNAME(0x01, 0x00, "Full emulation")
 	PORT_CONFSETTING(0x01, "Enabled")
 	PORT_CONFSETTING(0x00, "Disabled")
@@ -523,8 +523,8 @@ static INPUT_PORTS_START(gdrom_board_ioports)
 	PORT_CONFSETTING(0x00, "No")
 INPUT_PORTS_END
 
-naomi_gdrom_board::naomi_gdrom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: naomi_board(mconfig, NAOMI_GDROM_BOARD, tag, owner, clock),
+naomi_gdrom_board::naomi_gdrom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	naomi_board(mconfig, NAOMI_GDROM_BOARD, tag, owner, clock),
 	work_mode(0),
 	m_maincpu(*this, "dimmcpu"),
 	m_securitycpu(*this, "pic"),
@@ -533,7 +533,7 @@ naomi_gdrom_board::naomi_gdrom_board(const machine_config &mconfig, const char *
 	m_eeprom(*this, "eeprom"),
 	m_315_6154(*this, "pci:00.0"),
 	m_idegdrom(*this, "pci:01.0"),
-	m_debug_dipswitches(*this, "DEBUG ONLY"),
+	m_debug_dipswitches(*this, "DEBUG_ONLY"),
 	picdata(*this, finder_base::DUMMY_TAG),
 	dimm_command(0xffff),
 	dimm_offsetl(0xffff),

@@ -75,7 +75,6 @@ void electron_mode7_device::device_add_mconfig(machine_config &config)
 	m_hd6845->out_vsync_callback().set(FUNC(electron_mode7_device::vsync_changed));
 
 	SAA5050(config, m_trom, 6_MHz_XTAL);
-	m_trom->set_screen_size(40, 25, 40);
 
 	/* pass-through */
 	ELECTRON_EXPANSION_SLOT(config, m_exp, DERIVED_CLOCK(1, 1), electron_expansion_devices, nullptr);

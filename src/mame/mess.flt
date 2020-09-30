@@ -24,6 +24,7 @@ acrnsys.cpp
 acrnsys1.cpp
 actions_atj2279b.cpp
 acvirus.cpp
+adacp150.cpp
 adam.cpp
 adm11.cpp
 adm23.cpp
@@ -128,6 +129,7 @@ br8641.cpp
 braiplus.cpp
 bullet.cpp
 busicom.cpp
+bvm.cpp
 bw12.cpp
 bw2.cpp
 c10.cpp
@@ -253,7 +255,6 @@ elekscmp.cpp
 elektronmono.cpp
 elf.cpp
 elwro800.cpp
-emate.cpp
 emma2.cpp
 emu2.cpp
 emu3.cpp
@@ -329,6 +330,7 @@ gamemachine.cpp
 gamepock.cpp
 gb.cpp
 gba.cpp
+gem_rp.cpp
 generalplus_gpl_unknown.cpp
 generalplus_gpl16250_mobigo.cpp
 generalplus_gpl16250_nand.cpp
@@ -419,6 +421,9 @@ imsai.cpp
 indiana.cpp
 indigo.cpp
 indy_indigo2.cpp
+informer_207_100.cpp
+informer_207_376.cpp
+informer_213.cpp
 instruct.cpp
 inteladv.cpp
 intellec4.cpp
@@ -643,12 +648,14 @@ newbrain.cpp
 news_38xx.cpp
 news_68k.cpp
 news_r3k.cpp
+newton.cpp
 next.cpp
 nforcepc.cpp
 ngen.cpp
 ngp.cpp
 nokia_3310.cpp
 notetaker.cpp
+novag_cexpert.cpp
 novag_cforte.cpp
 novag_const.cpp
 novag_diablo.cpp
@@ -797,6 +804,7 @@ rmnimbus.cpp
 roland_cm32p.cpp
 roland_d10.cpp
 roland_d50.cpp
+roland_jd800.cpp
 roland_jv80.cpp
 roland_jx3p.cpp
 roland_jx8p.cpp
@@ -809,6 +817,7 @@ roland_s50.cpp
 roland_sc55.cpp
 roland_sc88.cpp
 roland_tb303.cpp
+roland_tr505.cpp
 roland_tr606.cpp
 roland_tr707.cpp
 roland_tr909.cpp
@@ -1061,6 +1070,7 @@ vip.cpp
 vis.cpp
 vixen.cpp
 vk100.cpp
+votrhv.cpp
 votrpss.cpp
 votrtnt.cpp
 vp415.cpp
@@ -1068,6 +1078,7 @@ vp60.cpp
 vsmile.cpp
 vsmileb.cpp
 vsmilepro.cpp
+vt_unknown.cpp
 vt100.cpp
 vt1682.cpp
 vt220.cpp
@@ -1120,6 +1131,7 @@ z88.cpp
 z9001.cpp
 zapcomputer.cpp
 zaurus.cpp
+zeebo_qualcomm_adreno130.cpp
 zexall.cpp
 zms8085.cpp
 zorba.cpp

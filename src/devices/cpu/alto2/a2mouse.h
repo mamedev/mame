@@ -8,8 +8,8 @@
 #ifdef  ALTO2_DEFINE_CONSTANTS
 
 #else   // ALTO2_DEFINE_CONSTANTS
-#ifndef _A2MOUSE_H_
-#define _A2MOUSE_H_
+#ifndef MAME_CPU_ALTO2_A2MOUSE_H
+#define MAME_CPU_ALTO2_A2MOUSE_H
 /**
  * @brief PROM madr.a32 contains a lookup table to translate mouse motions
  *
@@ -67,5 +67,5 @@ uint16_t mouse_read();                            //!< return the mouse motion f
 void init_mouse();                              //!< initialize the mouse context
 void exit_mouse();                              //!< deinitialize the mouse context
 void reset_mouse();                             //!< reset the mouse context
-#endif  // _A2MOUSE_H_
+#endif  // MAME_CPU_ALTO2_A2MOUSE_H
 #endif  // ALTO2_DEFINE_CONSTANTS

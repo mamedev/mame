@@ -12551,7 +12551,7 @@ but dumps still have to be confirmed.
 
 	<software name="chester">
 		<description>Chester Cheetah - Too Cool to Fool (USA)</description>
-		<year>1992</year>
+		<year>1993</year>
 		<publisher>Kaneko</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -12562,7 +12562,7 @@ but dumps still have to be confirmed.
 
 	<software name="chesterw">
 		<description>Chester Cheetah - Wild Wild Quest (USA)</description>
-		<year>1992</year>
+		<year>1994</year>
 		<publisher>Kaneko</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -14306,7 +14306,7 @@ but dumps still have to be confirmed.
 
 	<software name="ddragon">
 		<description>Double Dragon (Euro, USA)</description>
-		<year>1993</year>
+		<year>1992</year>
 		<publisher>Ballistic</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
@@ -21423,6 +21423,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+	<!-- this 'prototype' set has also been found on a PAL/UK Radica Out Run 2019 Plug & Play unit (see rad_orun in megadriv_rad.cpp) -->
 	<software name="outr2019up" cloneof="outr2019">
 		<description>Out Run 2019 (USA, Prototype)</description>
 		<year>1993</year>

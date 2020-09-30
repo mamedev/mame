@@ -203,15 +203,15 @@ void saa1099_device::device_clock_changed()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void saa1099_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void saa1099_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	int j, ch;
 	/* if the channels are disabled we're done */
 	if (!m_all_ch_enable)
 	{
 		/* init output data */
-		memset(outputs[LEFT],0,samples*sizeof(*outputs[LEFT]));
-		memset(outputs[RIGHT],0,samples*sizeof(*outputs[RIGHT]));
+		outputs[LEFT].fill(0);
+		outputs[RIGHT].fill(0);
 		return;
 	}
 
@@ -227,7 +227,7 @@ void saa1099_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	}
 
 	/* fill all data needed */
-	for( j = 0; j < samples; j++ )
+	for( j = 0; j < outputs[0].samples(); j++ )
 	{
 		int output_l = 0, output_r = 0;
 
@@ -285,8 +285,8 @@ void saa1099_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			m_noise[ch].counter -= clock_divider;
 		}
 		/* write sound data to the buffer */
-		outputs[LEFT][j] = output_l / 6;
-		outputs[RIGHT][j] = output_r / 6;
+		outputs[LEFT].put_int(j, output_l, 32768 * 6);
+		outputs[RIGHT].put_int(j, output_r, 32768 * 6);
 	}
 }
 
