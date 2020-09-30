@@ -4106,9 +4106,9 @@ class discrete_task;
 class discrete_base_node;
 class discrete_dss_input_stream_node;
 class discrete_device;
-typedef std::vector<discrete_base_node *> node_list_t;
+typedef std::vector<std::unique_ptr<discrete_base_node> > node_list_t;
 typedef std::vector<discrete_dss_input_stream_node *> istream_node_list_t;
-typedef std::vector<discrete_task *> task_list_t;
+typedef std::vector<std::unique_ptr<discrete_task> > task_list_t;
 
 
 /*************************************
@@ -4128,7 +4128,7 @@ typedef std::vector<discrete_task *> task_list_t;
 struct discrete_block
 {
 	int             node;                           /* Output node number */
-	discrete_base_node *(*factory)(discrete_device * pdev, const discrete_block *block);
+	std::unique_ptr<discrete_base_node> (*factory)(discrete_device &pdev, const discrete_block &block);
 	int             type;                           /* see defines below */
 	int             active_inputs;                  /* Number of active inputs on this node type */
 	int             input_node[DISCRETE_MAX_INPUTS];/* input/control nodes */
@@ -4150,7 +4150,7 @@ class discrete_step_interface
 public:
 	virtual ~discrete_step_interface() { }
 
-	virtual void step(void) = 0;
+	virtual void step() = 0;
 	osd_ticks_t         run_time;
 	discrete_base_node *    self;
 };
@@ -4196,7 +4196,7 @@ public:
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
-	virtual ~discrete_device(void);
+	virtual ~discrete_device();
 
 	template<int DiscreteInput>
 	DECLARE_WRITE_LINE_MEMBER(write_line)
@@ -4206,7 +4206,7 @@ public:
 
 	/* --------------------------------- */
 
-	virtual void update_to_current_time(void) const {  }
+	virtual void update_to_current_time() const {  }
 
 	/* process a number of samples */
 	void process(int samples);
@@ -4224,10 +4224,10 @@ public:
 	discrete_base_node *discrete_find_node(int node);
 
 	/* are we profiling */
-	inline int profiling(void) { return m_profiling; }
+	inline int profiling() { return m_profiling; }
 
-	inline int sample_rate(void) { return m_sample_rate; }
-	inline double sample_time(void) { return m_sample_time; }
+	inline int sample_rate() { return m_sample_rate; }
+	inline double sample_time() { return m_sample_time; }
 
 
 protected:
@@ -4255,11 +4255,11 @@ protected:
 private:
 	void discrete_build_list(const discrete_block *intf, sound_block_list_t &block_list);
 	void discrete_sanity_check(const sound_block_list_t &block_list);
-	void display_profiling(void);
+	void display_profiling();
 	void init_nodes(const sound_block_list_t &block_list);
 
 	/* internal node tracking */
-	discrete_base_node **   m_indexed_node;
+	std::unique_ptr<discrete_base_node * []>   m_indexed_node;
 
 	/* tasks */
 	task_list_t             task_list;      /* discrete_task_context * */
@@ -4294,13 +4294,13 @@ public:
 		set_intf(intf);
 	}
 	discrete_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-	virtual ~discrete_sound_device(void) { };
+	virtual ~discrete_sound_device() { };
 
 	/* --------------------------------- */
 
-	virtual void update_to_current_time(void) const override { m_stream->update(); }
+	virtual void update_to_current_time() const override { m_stream->update(); }
 
-	sound_stream *get_stream(void) { return m_stream; }
+	sound_stream *get_stream() { return m_stream; }
 protected:
 
 	// device-level overrides
@@ -4336,13 +4336,14 @@ class discrete_base_node
 	friend class discrete_task;
 
 public:
+	virtual ~discrete_base_node();
 
-	virtual void reset(void) { }
-	virtual void start(void) { }
-	virtual void stop(void) { }
-	virtual void save_state(void);
+	virtual void reset() { }
+	virtual void start() { }
+	virtual void stop() { }
+	virtual void save_state();
 
-	virtual int max_output(void) { return 1; };
+	virtual int max_output() { return 1; };
 
 	inline bool interface(discrete_step_interface *&intf) const { intf = m_step_intf; return (intf != nullptr); }
 	inline bool interface(discrete_input_interface *&intf) const { intf = m_input_intf; return (intf != nullptr); }
@@ -4355,36 +4356,35 @@ public:
 	inline void set_output(int n, double val) { m_output[n] = val; }
 
 	/* Return the node index, i.e. X from NODE(X) */
-	inline int index(void) { return NODE_INDEX(m_block->node); }
+	inline int index() { return NODE_INDEX(m_block->node); }
 
 	/* Return the node number, i.e. NODE(X) */
-	inline int block_node(void) const { return m_block->node;  }
+	inline int block_node() const { return m_block->node;  }
 
 	/* Custom function specific initialisation data */
-	inline const void *custom_data(void) { return m_custom; }
+	inline const void *custom_data() { return m_custom; }
 
 	inline int input_node(int inputnum) { return m_block->input_node[inputnum]; }
 
 	/* Number of active inputs on this node type */
-	inline int          active_inputs(void) { return m_active_inputs; }
+	inline int          active_inputs() { return m_active_inputs; }
 	/* Bit Flags.  1 in bit location means input_is_node */
-	inline int          input_is_node(void) { return m_input_is_node; }
+	inline int          input_is_node() { return m_input_is_node; }
 
-	inline double       sample_time(void) { return m_device->sample_time(); }
-	inline int          sample_rate(void) { return m_device->sample_rate(); }
+	inline double       sample_time() { return m_device->sample_time(); }
+	inline int          sample_rate() { return m_device->sample_rate(); }
 
-	const char *        module_name(void) { return m_block->mod_name; }
-	inline int          module_type(void) const { return m_block->type; }
+	const char *        module_name() { return m_block->mod_name; }
+	inline int          module_type() const { return m_block->type; }
 
 protected:
 
 	discrete_base_node();
-	virtual ~discrete_base_node();
 
 	/* finish node setup after allocation is complete */
 	void init(discrete_device * pdev, const discrete_block *block);
 
-	void resolve_input_nodes(void);
+	void resolve_input_nodes();
 
 	double                          m_output[DISCRETE_MAX_OUTPUTS];     /* The node's last output value */
 	const double *                  m_input[DISCRETE_MAX_INPUTS];       /* Addresses of Input values */
@@ -4406,7 +4406,7 @@ private:
 class discrete_node_base_factory
 {
 public:
-	virtual discrete_base_node *Create(discrete_device * pdev, const discrete_block *block) = 0;
+	virtual std::unique_ptr<discrete_base_node> Create(discrete_device &pdev, const discrete_block &block) = 0;
 	virtual ~discrete_node_base_factory() {}
 };
 
@@ -4414,15 +4414,15 @@ template <class C>
 class discrete_node_factory : public discrete_node_base_factory
 {
 public:
-	discrete_base_node *Create(discrete_device * pdev, const discrete_block *block) override;
+	std::unique_ptr<discrete_base_node> Create(discrete_device &pdev, const discrete_block &block) override;
 };
 
 template <class C>
-discrete_base_node * discrete_node_factory<C>::Create(discrete_device * pdev, const discrete_block *block)
+std::unique_ptr<discrete_base_node> discrete_node_factory<C>::Create(discrete_device &pdev, const discrete_block &block)
 {
-	discrete_base_node *r = auto_alloc_clear(pdev->machine(), <C>());
+	auto r = make_unique_clear<C>();
 
-	r->init(pdev, block);
+	r->init(&pdev, &block);
 	return r;
 }
 
@@ -4442,9 +4442,9 @@ discrete_base_node * discrete_node_factory<C>::Create(discrete_device * pdev, co
  *************************************/
 
 template <class C>
-discrete_base_node *discrete_create_node(discrete_device * pdev, const discrete_block *block)
+std::unique_ptr<discrete_base_node> discrete_create_node(discrete_device &pdev, const discrete_block &block)
 {
-	return discrete_node_factory< C >().Create(pdev, block);
+	return discrete_node_factory<C>().Create(pdev, block);
 }
 
 #define DISCRETE_SOUND_EXTERN(name) extern const discrete_block name[]
