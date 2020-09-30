@@ -31,11 +31,14 @@ public:
 
 	void streetsm(machine_config &config);
 	void pow(machine_config &config);
+	void powb(machine_config &config);
+
+	void init_powb();
 
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
-	required_device<upd7759_device> m_upd7759;
+	optional_device<upd7759_device> m_upd7759;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<snk68_spr_device> m_sprites;
@@ -79,6 +82,7 @@ private:
 	void tile_callback_pow(int &tile, int& fx, int& fy, int& region);
 
 	void pow_map(address_map &map);
+	void powb_sound_io_map(address_map &map);
 };
 
 class searchar_state : public snk68_state

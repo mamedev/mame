@@ -21,7 +21,7 @@ namespace netlist
 	// nld_base_proxy
 	// -----------------------------------------------------------------------------
 
-	static const std::array<std::pair<const char *, const char *>, 3> power_syms = {{ {"VCC", "VEE"}, {"VCC", "GND"}, {"VDD", "VSS"}}};
+	static constexpr std::array<std::pair<const char *, const char *>, 3> power_syms = {{ {"VCC", "VEE"}, {"VCC", "GND"}, {"VDD", "VSS"}}};
 
 	nld_base_proxy::nld_base_proxy(netlist_state_t &anetlist, const pstring &name,
 		const logic_t *inout_proxied)
@@ -122,7 +122,7 @@ namespace netlist
 	, m_RN(*this, "RN")
 	, m_last_state(*this, "m_last_var", terminal_t::OUT_TRISTATE())
 	{
-		register_subalias("Q", m_RN.P());
+		register_subalias("Q", "RN.1");
 
 		log().verbose("D/A Proxy: Found power terminals on device {1}", out_proxied->device().name());
 		if (anetlist.is_extended_validation())

@@ -62,7 +62,7 @@ asc_device::asc_device(const machine_config &mconfig, const char *tag, device_t 
 void asc_device::device_start()
 {
 	// create the stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, 22257);
+	m_stream = stream_alloc(0, 2, 22257);
 
 	memset(m_regs, 0, sizeof(m_regs));
 
@@ -117,22 +117,19 @@ void asc_device::device_timer(emu_timer &timer, device_timer_id tid, int param, 
 //  our sound stream
 //-------------------------------------------------
 
-void asc_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void asc_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *outL, *outR;
 	int i, ch;
 	static uint32_t wtoffs[2] = { 0, 0x200 };
 
-	outL = outputs[0];
-	outR = outputs[1];
+	auto &outL = outputs[0];
+	auto &outR = outputs[1];
 
 	switch (m_regs[R_MODE-0x800] & 3)
 	{
 		case 0: // chip off
-			for (i = 0; i < samples; i++)
-			{
-				outL[i] = outR[i] = 0;
-			}
+			outL.fill(0);
+			outR.fill(0);
 
 			// IIvx/IIvi bootrom indicates VASP updates this flag even when the chip is off
 			if (m_chip_type == asc_type::VASP)
@@ -140,12 +137,18 @@ void asc_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 				if (m_fifo_cap_a < 0x1ff)
 				{
 					m_regs[R_FIFOSTAT-0x800] |= 1;  // fifo A less than half full
+
+					if (m_fifo_cap_a == 0)   // fifo A fully empty
+					{
+						m_regs[R_FIFOSTAT-0x800] |= 2;  // fifo A empty
+					}
 				}
 			}
 			break;
 
 		case 1: // FIFO mode
-			for (i = 0; i < samples; i++)
+		{
+			for (i = 0; i < outL.samples(); i++)
 			{
 				int8_t smpll, smplr;
 
@@ -230,13 +233,15 @@ void asc_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 						break;
 				}
 
-				outL[i] = smpll * 64;
-				outR[i] = smplr * 64;
+				outL.put_int(i, smpll, 32768 / 64);
+				outR.put_int(i, smplr, 32768 / 64);
 			}
 			break;
+		}
 
 		case 2: // wavetable mode
-			for (i = 0; i < samples; i++)
+		{
+			for (i = 0; i < outL.samples(); i++)
 			{
 				int32_t mixL, mixR;
 				int8_t smpl;
@@ -262,10 +267,11 @@ void asc_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 					mixR += smpl*256;
 				}
 
-				outL[i] = mixL>>2;
-				outR[i] = mixR>>2;
+				outL.put_int(i, mixL, 32768 * 4);
+				outR.put_int(i, mixR, 32768 * 4);
 			}
 			break;
+		}
 	}
 
 //  printf("rdA %04x rdB %04x wrA %04x wrB %04x (capA %04x B %04x)\n", m_fifo_a_rdptr, m_fifo_b_rdptr, m_fifo_a_wrptr, m_fifo_b_wrptr, m_fifo_cap_a, m_fifo_cap_b);

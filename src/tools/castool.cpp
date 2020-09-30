@@ -38,6 +38,7 @@
 #include "formats/mz_cas.h"
 #include "formats/orao_cas.h"
 #include "formats/oric_tap.h"
+#include "formats/p2000t_cas.h"
 #include "formats/p6001_cas.h"
 #include "formats/phc25_cas.h"
 #include "formats/pmd_cas.h"
@@ -90,6 +91,7 @@ const struct SupportedCassetteFormats formats[] = {
 	{"mz", mz700_cassette_formats              ,"Sharp MZ-700"},
 	{"orao", orao_cassette_formats             ,"PEL Varazdin Orao"},
 	{"oric", oric_cassette_formats             ,"Tangerine Oric"},
+	{"p2000t", p2000t_cassette_formats         ,"Philips P2000T"},
 	{"pc6001", pc6001_cassette_formats         ,"NEC PC-6001"},
 	{"phc25", phc25_cassette_formats           ,"Sanyo PHC-25"},
 	{"pmd85", pmd85_cassette_formats           ,"Tesla PMD-85"},

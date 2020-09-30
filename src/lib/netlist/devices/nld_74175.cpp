@@ -33,8 +33,7 @@
  *
  */
 
-#include "nld_74175.h"
-#include "netlist/nl_base.h"
+#include "nl_base.h"
 
 // FIXME: optimize
 

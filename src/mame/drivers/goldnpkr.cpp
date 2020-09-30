@@ -5074,7 +5074,7 @@ void blitz_state::megadpkr_banked_map(address_map &map)
 static INPUT_PORTS_START( megadpkr )
 	// Multiplexed - 4x5bits
 	PORT_START("IN0-0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_BET )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )

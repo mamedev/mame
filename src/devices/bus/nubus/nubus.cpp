@@ -32,10 +32,27 @@ nubus_slot_device::nubus_slot_device(const machine_config &mconfig, const char *
 
 nubus_slot_device::nubus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
-	m_nubus_tag(nullptr),
+	device_single_card_slot_interface(mconfig, *this),
+	m_nubus(*this, finder_base::DUMMY_TAG),
 	m_nubus_slottag(nullptr)
 {
+}
+
+//-------------------------------------------------
+//  device_resolve_objects - resolve objects that
+//  may be needed for other devices to set
+//  initial conditions at start time
+//-------------------------------------------------
+
+void nubus_slot_device::device_resolve_objects()
+{
+	device_nubus_card_interface *dev = get_card_device();
+
+	if (dev)
+	{
+		dev->set_nubus_tag(m_nubus.target(), m_nubus_slottag);
+		m_nubus->add_nubus_card(dev);
+	}
 }
 
 //-------------------------------------------------
@@ -44,9 +61,6 @@ nubus_slot_device::nubus_slot_device(const machine_config &mconfig, device_type 
 
 void nubus_slot_device::device_start()
 {
-	device_nubus_card_interface *dev = dynamic_cast<device_nubus_card_interface *>(get_card_device());
-
-	if (dev) dev->set_nubus_tag(m_nubus_tag, m_nubus_slottag);
 }
 
 //**************************************************************************
@@ -215,7 +229,7 @@ WRITE_LINE_MEMBER( nubus_device::irqe_w ) { m_out_irqe_cb(state); }
 device_nubus_card_interface::device_nubus_card_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "nubus"),
 		m_nubus(nullptr),
-		m_nubus_tag(nullptr), m_nubus_slottag(nullptr), m_slot(0), m_next(nullptr)
+		m_nubus_slottag(nullptr), m_slot(0), m_next(nullptr)
 {
 }
 
@@ -230,49 +244,37 @@ device_nubus_card_interface::~device_nubus_card_interface()
 
 void device_nubus_card_interface::interface_pre_start()
 {
-	if (!m_nubus)
+	if (!strncmp(m_nubus_slottag, "pds030", 6))
 	{
-		if (!strncmp(m_nubus_slottag, "pds030", 6))
+		m_slot = 0x9;   // '030 PDS slots phantom slot as NuBus slots $9, $A, and $B
+	}
+	else if (!strncmp(m_nubus_slottag, "lcpds", 6))
+	{
+		m_slot = 0xe;   // LC PDS slots phantom slot as NuBus slot $E
+	}
+	else
+	{
+		// extract the slot number from the last digit of the slot tag
+		int tlen = strlen(m_nubus_slottag);
+
+		if (m_nubus_slottag[tlen-1] == '9')
 		{
-			m_slot = 0x9;   // '030 PDS slots phantom slot as NuBus slots $9, $A, and $B
-		}
-		else if (!strncmp(m_nubus_slottag, "lcpds", 6))
-		{
-			m_slot = 0xe;   // LC PDS slots phantom slot as NuBus slot $E
+			m_slot = (m_nubus_slottag[tlen-1] - '9') + 9;
 		}
 		else
 		{
-			// extract the slot number from the last digit of the slot tag
-			int tlen = strlen(m_nubus_slottag);
-
-			if (m_nubus_slottag[tlen-1] == '9')
-			{
-				m_slot = (m_nubus_slottag[tlen-1] - '9') + 9;
-			}
-			else
-			{
-				m_slot = (m_nubus_slottag[tlen-1] - 'a') + 0xa;
-			}
+			m_slot = (m_nubus_slottag[tlen-1] - 'a') + 0xa;
 		}
+	}
 
-		if (m_slot < 9 || m_slot > 0xe)
-		{
-			fatalerror("Slot %x out of range for Apple NuBus\n", m_slot);
-		}
+	if (m_slot < 9 || m_slot > 0xe)
+	{
+		fatalerror("Slot %x out of range for Apple NuBus\n", m_slot);
+	}
 
-		device_t *const bus = device().machine().device(m_nubus_tag);
-		if (!bus)
-		{
-			fatalerror("Can't find NuBus device %s\n", m_nubus_tag);
-		}
-
-		m_nubus = dynamic_cast<nubus_device *>(bus);
-		if (!m_nubus)
-		{
-			fatalerror("Device %s (%s) is not an instance of nubus_device\n", bus->tag(), bus->name());
-		}
-
-		nubus().add_nubus_card(this);
+	if (!m_nubus)
+	{
+		fatalerror("Can't find NuBus device\n");
 	}
 }
 

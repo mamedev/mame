@@ -36,7 +36,7 @@ public:
 		m_v3t_ram(*this, "v3t_ram"),
 		m_main_ram(*this, "main_ram"),
 		m_cache_ram(*this, "cache_ram"),
-		m_paddle(*this, "Paddle %c", 'A')
+		m_paddle(*this, "Paddle.%c", 'A')
 	{ }
 
 	void sknsk(machine_config &config);

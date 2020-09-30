@@ -84,7 +84,7 @@ debug_view_memory_source::debug_view_memory_source(std::string &&name, void *bas
 	, m_base(base)
 	, m_blocklength(element_size * num_elements)
 	, m_numblocks(num_blocks)
-	, m_blockstride(element_size * block_stride)
+	, m_blockstride(block_stride)
 	, m_offsetxor(0)
 	, m_endianness(ENDIANNESS_NATIVE)
 	, m_prefsize(std::min(element_size, 8))

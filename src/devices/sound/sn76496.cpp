@@ -178,11 +178,6 @@ sn76496_device::sn76496_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-u8106_device::u8106_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sn76496_base_device(mconfig, U8106, tag, 0x4000, 0x01, 0x02, true, false, 8, false, true, owner, clock)
-{
-}
-
 y2404_device::y2404_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sn76496_base_device(mconfig, Y2404, tag, 0x10000, 0x04, 0x08, false, false, 8, false, true, owner, clock)
 {
@@ -238,7 +233,7 @@ void sn76496_base_device::device_start()
 
 	m_ready_handler.resolve_safe();
 
-	m_sound = machine().sound().stream_alloc(*this, 0, (m_stereo? 2:1), sample_rate);
+	m_sound = stream_alloc(0, (m_stereo? 2:1), sample_rate);
 
 	for (i = 0; i < 4; i++) m_volume[i] = 0;
 
@@ -374,16 +369,16 @@ inline bool sn76496_base_device::in_noise_mode()
 	return ((m_register[6] & 4)!=0);
 }
 
-void sn76496_base_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void sn76496_base_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	int i;
-	stream_sample_t *lbuffer = outputs[0];
-	stream_sample_t *rbuffer = (m_stereo)? outputs[1] : nullptr;
+	auto *lbuffer = &outputs[0];
+	auto *rbuffer = m_stereo ? &outputs[1] : nullptr;
 
 	int16_t out;
 	int16_t out2 = 0;
 
-	while (samples > 0)
+	for (int sampindex = 0; sampindex < lbuffer->samples(); sampindex++)
 	{
 		// clock chip once
 		if (m_current_clock > 0) // not ready for new divided clock
@@ -449,9 +444,9 @@ void sn76496_base_device::sound_stream_update(sound_stream &stream, stream_sampl
 
 		if (m_negate) { out = -out; out2 = -out2; }
 
-		*(lbuffer++) = out;
-		if (m_stereo) *(rbuffer++) = out2;
-		samples--;
+		lbuffer->put_int(sampindex, out, 32768);
+		if (m_stereo)
+			rbuffer->put_int(sampindex, out2, 32768);
 	}
 }
 
@@ -477,7 +472,6 @@ void sn76496_base_device::register_for_save_states()
 }
 
 DEFINE_DEVICE_TYPE(SN76496,  sn76496_device,   "sn76496",      "SN76496")
-DEFINE_DEVICE_TYPE(U8106,    u8106_device,     "u8106",        "U8106")
 DEFINE_DEVICE_TYPE(Y2404,    y2404_device,     "y2404",        "Y2404")
 DEFINE_DEVICE_TYPE(SN76489,  sn76489_device,   "sn76489",      "SN76489")
 DEFINE_DEVICE_TYPE(SN76489A, sn76489a_device,  "sn76489a",     "SN76489A")

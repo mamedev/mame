@@ -15,6 +15,21 @@
 
 
 //**************************************************************************
+//  CONSTANTS
+//**************************************************************************
+
+// relative devices return ~512 units per onscreen pixel
+constexpr s32 INPUT_RELATIVE_PER_PIXEL = 512;
+
+// absolute devices return values between -65536 and +65536
+constexpr s32 INPUT_ABSOLUTE_MIN = -65536;
+constexpr s32 INPUT_ABSOLUTE_MAX = 65536;
+
+// invalid memory value for axis polling
+constexpr s32 INVALID_AXIS_VALUE = 0x7fffffff;
+
+
+//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -95,11 +110,13 @@ public:
 	// helpers
 	s32 update_value();
 	void set_memory(s32 value) { m_memory = value; }
+	bool check_axis(input_item_modifier modifier);
 
 	// readers
 	virtual s32 read_as_switch(input_item_modifier modifier) = 0;
 	virtual s32 read_as_relative(input_item_modifier modifier) = 0;
 	virtual s32 read_as_absolute(input_item_modifier modifier) = 0;
+	virtual bool item_check_axis(input_item_modifier modifier) = 0;
 
 protected:
 	// internal state

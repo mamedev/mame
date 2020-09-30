@@ -7,10 +7,13 @@ license:CC0
 	<!-- NOTE: highlight should be a bit star-shaped, not doable in MAME internal layout -->
 
 	<element name="highlight_explosion">
-	<rect><color red="1.0" green="1.0" blue="1.0" /></rect>
-	<disk><color red="0.875" green="1.0" blue="0.125" /></disk>
+		<rect><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<disk><color red="0.875" green="1.0" blue="0.125" /></disk>
 	</element>
-	<element name="static_green"><rect><color red="0.125" green="0.875" blue="0" /></rect></element>
+
+	<element name="static_green">
+		<rect><color red="0.125" green="0.875" blue="0" /></rect>
+	</element>
 
 
 	<view name="Color Overlay">
@@ -18,10 +21,9 @@ license:CC0
 			<bounds left="0" top="0" right="300" bottom="400" />
 		</screen>
 
-		<overlay element="highlight_explosion"><bounds x="117" y="167" width="66" height="66" /></overlay>
+		<element ref="highlight_explosion" blend="multiply"><bounds x="117" y="167" width="66" height="66" /></element>
 
-		<overlay element="static_green"><bounds left="0" top="0" right="300" bottom="33" /></overlay>
-		<overlay element="static_green"><bounds left="0" top="367" right="300" bottom="400" /></overlay>
-
+		<element ref="static_green" blend="multiply"><bounds left="0" top="0" right="300" bottom="33" /></element>
+		<element ref="static_green" blend="multiply"><bounds left="0" top="367" right="300" bottom="400" /></element>
 	</view>
 </mamelayout>

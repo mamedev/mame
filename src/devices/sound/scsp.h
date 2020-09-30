@@ -45,7 +45,7 @@ protected:
 	virtual void rom_bank_updated() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 	enum SCSP_STATE { SCSP_ATTACK, SCSP_DECAY1, SCSP_DECAY2, SCSP_RELEASE };
@@ -148,13 +148,6 @@ private:
 
 	SCSPDSP m_DSP;
 
-	stream_sample_t *m_bufferl;
-	stream_sample_t *m_bufferr;
-	stream_sample_t *m_exts0;
-	stream_sample_t *m_exts1;
-
-	int m_length;
-
 	s16 *m_RBUFDST;   //this points to where the sample will be stored in the RingBuf
 
 	//LFO
@@ -187,7 +180,7 @@ private:
 	void w16(u32 addr, u16 val);
 	u16 r16(u32 addr);
 	inline s32 UpdateSlot(SCSP_SLOT *slot);
-	void DoMasterSamples(int nsamples);
+	void DoMasterSamples(std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs);
 
 	//LFO
 	void LFO_Init();

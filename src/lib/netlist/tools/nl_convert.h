@@ -37,7 +37,7 @@ public:
 
 	virtual ~nl_convert_base_t();
 
-	pstring result() { return pstring(m_buf.str()); }
+	pstring result() { return pstring(putf8string(m_buf.str())); }
 
 	virtual void convert(const pstring &contents) = 0;
 

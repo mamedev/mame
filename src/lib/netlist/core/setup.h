@@ -13,7 +13,7 @@
 #include "../nl_setup.h"
 #include "../nltypes.h"
 
-#include "../plib/ppreprocessor.h"
+//#include "../plib/ppreprocessor.h"
 #include "../plib/pstream.h"
 #include "../plib/pstring.h"
 
@@ -60,6 +60,14 @@ namespace netlist
 		{}
 
 		model_t get_model(const pstring &model);
+
+		std::vector<pstring> known_models() const
+		{
+			std::vector<pstring> ret;
+			for (const auto &e : m_models)
+				ret.push_back(e.first);
+			return ret;
+		}
 
 	private:
 
@@ -148,7 +156,6 @@ namespace netlist
 		// get family -> truthtable
 		const logic_family_desc_t *family_from_model(const pstring &model);
 
-		// FIXME: return param_ref_t
 		param_ref_t find_param(const pstring &param_in) const;
 		// needed by nltool
 		std::vector<pstring> get_terminals_for_device_name(const pstring &devname) const;
@@ -157,8 +164,6 @@ namespace netlist
 		detail::core_terminal_t *find_terminal(const pstring &terminal_in, detail::terminal_type atype, bool required = true) const;
 		detail::core_terminal_t *find_terminal(const pstring &terminal_in, bool required = true) const;
 		pstring de_alias(const pstring &alias) const;
-		// FIXME: only needed by solver code outside of setup_t
-		bool connect(detail::core_terminal_t &t1, detail::core_terminal_t &t2);
 
 		// run preparation
 
@@ -191,6 +196,8 @@ namespace netlist
 		void connect_terminal_output(terminal_t &in, detail::core_terminal_t &out);
 		void connect_terminal_input(terminal_t &term, detail::core_terminal_t &inp);
 		bool connect_input_input(detail::core_terminal_t &t1, detail::core_terminal_t &t2);
+
+		bool connect(detail::core_terminal_t &t1, detail::core_terminal_t &t2);
 
 		// helpers
 		static pstring termtype_as_str(detail::core_terminal_t &in);
@@ -261,7 +268,7 @@ namespace netlist
 		}
 
 	protected:
-		stream_ptr stream(const pstring &name) override;
+		plib::istream_uptr stream(const pstring &name) override;
 
 	private:
 		pstring m_str;
@@ -277,7 +284,7 @@ namespace netlist
 		}
 
 	protected:
-		stream_ptr stream(const pstring &name) override;
+		plib::istream_uptr stream(const pstring &name) override;
 
 	private:
 		pstring m_filename;
@@ -293,7 +300,7 @@ namespace netlist
 		}
 
 	protected:
-		stream_ptr stream(const pstring &name) override;
+		plib::istream_uptr stream(const pstring &name) override;
 
 	private:
 		pstring m_pattern;
@@ -308,10 +315,10 @@ namespace netlist
 		}
 
 	protected:
-		stream_ptr stream(const pstring &name) override;
+		plib::istream_uptr stream(const pstring &name) override;
 
 	private:
-		pstring m_str;
+		std::string m_str;
 	};
 
 	class source_proc_t : public source_netlist_t
@@ -326,30 +333,11 @@ namespace netlist
 		bool parse(nlparse_t &setup, const pstring &name) override;
 
 	protected:
-		stream_ptr stream(const pstring &name) override;
+		plib::istream_uptr stream(const pstring &name) override;
 
 	private:
 		nlsetup_func m_setup_func;
 		pstring m_setup_func_name;
-	};
-
-	class source_token_t : public source_netlist_t
-	{
-	public:
-		source_token_t(const pstring &name, const parser_t::token_store &store)
-		: m_store(store)
-		, m_name(name)
-		{
-		}
-
-		bool parse(nlparse_t &setup, const pstring &name) override;
-
-	protected:
-		stream_ptr stream(const pstring &name) override;
-
-	private:
-		parser_t::token_store m_store;
-		pstring m_name;
 	};
 
 } // namespace netlist

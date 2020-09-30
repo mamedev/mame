@@ -6,11 +6,12 @@ This section covers technical specifications useful to programmers working on MA
 .. toctree::
 	:titlesonly:
 
-	layout_files
-	device_memory_interface
-	device_rom_interface
-	device_disasm_interface
-	floppy
-	nscsi
-	luaengine
-	m6502
+        naming
+        layout_files
+        device_memory_interface
+        device_rom_interface
+        device_disasm_interface
+        floppy
+        nscsi
+        luaengine
+        m6502

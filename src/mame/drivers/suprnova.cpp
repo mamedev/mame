@@ -563,16 +563,16 @@ static INPUT_PORTS_START( skns )        /* 3 buttons, 2 players */
 	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(skns_state, paddle_r<3>) // Paddle D
 	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("Paddle A")
+	PORT_START("Paddle.A")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("Paddle B")
+	PORT_START("Paddle.B")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("Paddle C")
+	PORT_START("Paddle.C")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("Paddle D")
+	PORT_START("Paddle.D")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -623,20 +623,20 @@ static INPUT_PORTS_START( puzzloop )    /* 2 buttons, 2 players, paddle */
 	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNUSED )   /* No Button 3 */
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNUSED )   /* No Button 3 */
 
-	PORT_MODIFY("Paddle A")  /* Paddle A */
+	PORT_MODIFY("Paddle.A")  /* Paddle A */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_MODIFY("Paddle B")  /* Paddle B */
+	PORT_MODIFY("Paddle.B")  /* Paddle B */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_REVERSE PORT_PLAYER(2)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vblokbrk )    /* 3 buttons, 2 players, paddle */
 	PORT_INCLUDE( skns )
 
-	PORT_MODIFY("Paddle A")  /* Paddle A */
+	PORT_MODIFY("Paddle.A")  /* Paddle A */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_MODIFY("Paddle B")  /* Paddle B */
+	PORT_MODIFY("Paddle.B")  /* Paddle B */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_REVERSE PORT_PLAYER(2)
 INPUT_PORTS_END
 

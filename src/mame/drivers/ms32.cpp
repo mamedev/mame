@@ -513,8 +513,8 @@ CUSTOM_INPUT_MEMBER(ms32_state::mahjong_ctrl_r)
 u32 ms32_state::ms32_read_inputs3()
 {
 	int a,b,c,d;
-	a = ioport("AN2?")->read(); // unused?
-	b = ioport("AN2?")->read(); // unused?
+	a = ioport("AN2")->read(); // unused?
+	b = ioport("AN2")->read(); // unused?
 	c = ioport("AN1")->read();
 	d = (ioport("AN0")->read() - 0xb0) & 0xff;
 	return a << 24 | b << 16 | c << 8 | d << 0;
@@ -1524,7 +1524,7 @@ static INPUT_PORTS_START( f1superb )
 	PORT_START("AN1")   // Steering
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(1)
 
-	PORT_START("AN2?")  // Shift + Brake
+	PORT_START("AN2")   // Shift + Brake (AN2?)
 	PORT_DIPNAME( 0x80, 0x80, "Shift Brake" ) // ???
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )

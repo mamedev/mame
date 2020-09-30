@@ -113,13 +113,13 @@ void turrett_state::turrett_sound_map(address_map &map)
  *************************************/
 
 static INPUT_PORTS_START( turrett )
-	PORT_START("PORT 0X")
+	PORT_START("PORT.0X")
 	PORT_BIT( 0x3f, 0x00, IPT_AD_STICK_Y ) PORT_MINMAX(0x20,0x1f) PORT_SENSITIVITY(60) PORT_KEYDELTA(2)
 
-	PORT_START("PORT 4X")
+	PORT_START("PORT.4X")
 	PORT_BIT( 0x3f, 0x00, IPT_AD_STICK_X ) PORT_MINMAX(0x20,0x1f) PORT_SENSITIVITY(60) PORT_KEYDELTA(2)
 
-	PORT_START("PORT CX")
+	PORT_START("PORT.CX")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, 0x00000100)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )   PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, 0x00000200)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BILL1 )      PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, 0x00000400)
@@ -129,7 +129,7 @@ static INPUT_PORTS_START( turrett )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )     PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, 0x00004000)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, 0x00008000)
 
-	PORT_START("PORT DX")
+	PORT_START("PORT.DX")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, 0x00010000)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, 0x00020000)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, 0x00040000)
@@ -139,11 +139,11 @@ static INPUT_PORTS_START( turrett )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, 0x00400000)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, 0x00800000)
 
-	PORT_START("PORT EX")
+	PORT_START("PORT.EX")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Floor mat")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Door Lock") PORT_TOGGLE
 
-	PORT_START("PORT FX")
+	PORT_START("PORT.FX")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Seat Belt") PORT_TOGGLE
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Home")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Emergency Stop") PORT_TOGGLE
@@ -191,17 +191,17 @@ uint32_t turrett_state::update_inputs(void)
 	{
 		if (m_inputs_active & 0x00000001)
 		{
-			val = 0x00 | (ioport("PORT 0X")->read() & 0x3f);
+			val = 0x00 | (ioport("PORT.0X")->read() & 0x3f);
 			m_inputs_active &= ~1;
 		}
 		else if (m_inputs_active & 0x00000002)
 		{
-			val = 0x40 | (ioport("PORT 4X")->read() & 0x3f);
+			val = 0x40 | (ioport("PORT.4X")->read() & 0x3f);
 			m_inputs_active &= ~2;
 		}
 		else if (m_inputs_active & 0x0000ff00)
 		{
-			uint32_t data = ioport("PORT CX")->read();
+			uint32_t data = ioport("PORT.CX")->read();
 			uint32_t bits = m_inputs_active >> 8;
 
 			val = 0xc0;
@@ -219,7 +219,7 @@ uint32_t turrett_state::update_inputs(void)
 		}
 		else if (m_inputs_active & 0x00ff0000)
 		{
-			uint32_t data = ioport("PORT DX")->read();
+			uint32_t data = ioport("PORT.DX")->read();
 			uint32_t bits = m_inputs_active >> 16;
 
 			val = 0xd0;
@@ -237,12 +237,12 @@ uint32_t turrett_state::update_inputs(void)
 		}
 		else if (m_inputs_active & 0x01000000)
 		{
-			val = 0xe0 | ioport("PORT EX")->read();
+			val = 0xe0 | ioport("PORT.EX")->read();
 			m_inputs_active &= ~0x01000000;
 		}
 		else if (m_inputs_active & 0x02000000)
 		{
-			val = 0xf0 | ioport("PORT FX")->read();
+			val = 0xf0 | ioport("PORT.FX")->read();
 			m_inputs_active &= ~0x02000000;
 		}
 	}

@@ -21,13 +21,20 @@
 #include "ui/slider.h"
 #include "ui/text.h"
 
+#include <ctime>
 #include <functional>
+#include <set>
+#include <utility>
 #include <vector>
 
+
 namespace ui {
+
 class menu_item;
 class machine_info;
+
 } // namespace ui
+
 
 /***************************************************************************
     CONSTANTS
@@ -260,9 +267,12 @@ public:
 	virtual void menu_reset() override;
 
 private:
+	using handler_callback_func = std::function<uint32_t (render_container &)>;
+	using device_feature_set = std::set<std::pair<std::string, std::string> >;
+
 	// instance variables
 	render_font *           m_font;
-	std::function<uint32_t (render_container &)> m_handler_callback;
+	handler_callback_func   m_handler_callback;
 	ui_callback_type        m_handler_callback_type;
 	uint32_t                m_handler_param;
 	bool                    m_single_step;
@@ -270,7 +280,7 @@ private:
 	osd_ticks_t             m_showfps_end;
 	bool                    m_show_profiler;
 	osd_ticks_t             m_popup_text_end;
-	std::unique_ptr<uint8_t[]> m_non_char_keys_down;
+	std::unique_ptr<uint8_t []> m_non_char_keys_down;
 	bitmap_argb32           m_mouse_bitmap;
 	render_texture *        m_mouse_arrow_texture;
 	bool                    m_mouse_show;
@@ -280,6 +290,10 @@ private:
 	bool                    m_has_warnings;
 
 	std::unique_ptr<ui::machine_info> m_machine_info;
+	device_feature_set      m_unemulated_features;
+	device_feature_set      m_imperfect_features;
+	std::time_t             m_last_launch_time;
+	std::time_t             m_last_warning_time;
 
 	// static variables
 	static std::string      messagebox_text;
@@ -298,6 +312,8 @@ private:
 
 	// private methods
 	void exit();
+	void config_load(config_type cfg_type, util::xml::data_node const *parentnode);
+	void config_save(config_type cfg_type, util::xml::data_node *parentnode);
 	std::unique_ptr<slider_state> slider_alloc(int id, const char *title, int32_t minval, int32_t defval, int32_t maxval, int32_t incval, void *arg);
 
 	// slider controls

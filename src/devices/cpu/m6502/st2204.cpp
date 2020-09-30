@@ -105,6 +105,7 @@ void st2204_device::device_start()
 	save_item(NAME(m_dms));
 	save_item(NAME(m_dmd));
 	save_item(NAME(m_dcnth));
+	save_item(NAME(intf->dmr));
 
 	mintf = std::move(intf);
 	save_common_registers();
@@ -113,8 +114,8 @@ void st2204_device::device_start()
 	state_add(ST_IRR, "IRR", downcast<mi_st2204 &>(*mintf).irr).mask(0xff);
 	state_add(ST_PRR, "PRR", downcast<mi_st2204 &>(*mintf).prr).mask(0xfff);
 	state_add(ST_DRR, "DRR", downcast<mi_st2204 &>(*mintf).drr).mask(0x7ff);
-	state_add<u16>(ST_IREQ, "IREQ", [this]() { return m_ireq; }, [this](u16 data) { m_ireq = data; update_irq_state(); }).mask(st2xxx_ireq_mask());
-	state_add<u16>(ST_IENA, "IENA", [this]() { return m_iena; }, [this](u16 data) { m_iena = data; update_irq_state(); }).mask(st2xxx_ireq_mask());
+	state_add(ST_IREQ, "IREQ", m_ireq, [this](u16 data) { m_ireq = data; update_irq_state(); }).mask(st2xxx_ireq_mask());
+	state_add(ST_IENA, "IENA", m_iena, [this](u16 data) { m_iena = data; update_irq_state(); }).mask(st2xxx_ireq_mask());
 	for (int i = 0; i < 5; i++)
 	{
 		state_add(ST_PAOUT + i, string_format("P%cOUT", 'A' + i).c_str(), m_pdata[i]);
@@ -127,8 +128,8 @@ void st2204_device::device_start()
 	state_add(ST_PLOUT, "PLOUT", m_pdata[6]);
 	state_add(ST_PCL, "PCL", m_pctrl[6]);
 	state_add(ST_PMCR, "PMCR", m_pmcr);
-	state_add<u8>(ST_PRS, "PRS", [this]() { return m_prs; }, [this](u8 data) { prs_w(data); }).mask(0x60);
-	state_add<u8>(ST_BTEN, "BTEN", [this]() { return m_bten; }, [this](u8 data) { bten_w(data); }).mask(0x1f);
+	state_add(ST_PRS, "PRS", m_prs, [this](u8 data) { prs_w(data); }).mask(0x60);
+	state_add(ST_BTEN, "BTEN", m_bten, [this](u8 data) { bten_w(data); }).mask(0x1f);
 	state_add(ST_BTSR, "BTSR", m_btsr).mask(0x1f);
 	state_add(ST_T0M, "T0M", m_tmode[0]).mask(0x37);
 	state_add(ST_T0C, "T0C", m_tload[0]);
@@ -139,7 +140,7 @@ void st2204_device::device_start()
 	state_add(ST_PSGC, "PSGC", m_psgc).mask(0x7f);
 	state_add(ST_VOL, "VOL", m_vol);
 	state_add(ST_DAC, "DAC", m_dac);
-	state_add<u8>(ST_SYS, "SYS", [this]() { return m_sys; }, [this](u8 data) { sys_w(data); });
+	state_add(ST_SYS, "SYS", m_sys, [this](u8 data) { sys_w(data); });
 	state_add(ST_MISC, "MISC", m_misc).mask(st2xxx_misc_mask());
 	state_add(ST_LSSA, "LSSA", m_lssa);
 	state_add(ST_LVPW, "LVPW", m_lvpw);
@@ -151,6 +152,12 @@ void st2204_device::device_start()
 	state_add(ST_LFRA, "LFRA", m_lfra).mask(0x3f);
 	state_add(ST_LAC, "LAC", m_lac).mask(0x1f);
 	state_add(ST_LPWM, "LPWM", m_lpwm).mask(st2xxx_lpwm_mask());
+	state_add(ST_SCTR, "SCTR", m_sctr);
+	state_add(ST_SCKR, "SCKR", m_sckr).mask(0x7f);
+	state_add(ST_SSR, "SSR", m_ssr).mask(0x77);
+	state_add(ST_UCTR, "UCTR", m_uctr).mask(st2xxx_uctr_mask());
+	state_add(ST_USR, "USTR", m_usr).mask(0x7f);
+	state_add(ST_IRCTR, "IRCTR", m_irctr).mask(0xc7);
 	state_add(ST_BCTR, "BCTR", m_bctr).mask(0x87);
 	state_add(ST_BRS, "BRS", m_brs);
 	state_add(ST_BDIV, "BDIV", m_bdiv);
@@ -175,6 +182,9 @@ void st2204_device::device_reset()
 	m_dac = 0;
 	m_psg_timer->enable(false);
 	m_dac_callback(0);
+
+	downcast<mi_st2204 &>(*mintf).dmr = 0;
+	// other DMA registers are undefined
 }
 
 const char *st2204_device::st2xxx_irq_name(int i) const
@@ -269,6 +279,19 @@ unsigned st2204_device::st2xxx_bt_divider(int n) const
 		return 16384 >> ((n & 1) * 2 + (n >> 1) * 5);
 	else
 		return 0;
+}
+
+u32 st2204_device::tclk_pres_div(u8 mode) const
+{
+	assert(mode < 8);
+	if (mode == 0)
+		return 0x10000;
+	else if (mode < 4)
+		return 0x20000 >> (mode * 2);
+	else if (mode == 4)
+		return 0x100;
+	else
+		return 0x8000 >> (mode * 2);
 }
 
 TIMER_CALLBACK_MEMBER(st2204_device::t0_interrupt)
@@ -582,6 +605,28 @@ void st2204_device::dcnth_w(u8 data)
 	m_dcnth = data & 0x1f;
 }
 
+u8 st2204_device::dmrl_r()
+{
+	return downcast<mi_st2204 &>(*mintf).dmr & 0xff;
+}
+
+void st2204_device::dmrl_w(u8 data)
+{
+	u16 &dmr = downcast<mi_st2204 &>(*mintf).dmr;
+	dmr = (data & m_drr_mask) | (dmr & 0xff00);
+}
+
+u8 st2204_device::dmrh_r()
+{
+	return downcast<mi_st2204 &>(*mintf).dmr >> 8;
+}
+
+void st2204_device::dmrh_w(u8 data)
+{
+	u16 &dmr = downcast<mi_st2204 &>(*mintf).dmr;
+	dmr = ((u16(data) << 8) & m_drr_mask) | (dmr & 0x00ff);
+}
+
 u8 st2204_device::pmem_r(offs_t offset)
 {
 	return downcast<mi_st2204 &>(*mintf).pread(offset);
@@ -654,6 +699,12 @@ void st2204_device::common_map(address_map &map)
 	map(0x004c, 0x004c).rw(FUNC(st2204_device::pl_r), FUNC(st2204_device::pl_w));
 	// PCL is listed as write-only in ST2202 specification, but DynamiDesk suggests otherwise
 	map(0x004e, 0x004e).rw(FUNC(st2204_device::pcl_r), FUNC(st2204_device::pcl_w));
+	map(0x0052, 0x0052).rw(FUNC(st2204_device::sctr_r), FUNC(st2204_device::sctr_w));
+	map(0x0053, 0x0053).rw(FUNC(st2204_device::sckr_r), FUNC(st2204_device::sckr_w));
+	map(0x0054, 0x0054).rw(FUNC(st2204_device::ssr_r), FUNC(st2204_device::ssr_w));
+	map(0x0060, 0x0060).rw(FUNC(st2204_device::uctr_r), FUNC(st2204_device::uctr_w));
+	map(0x0061, 0x0061).rw(FUNC(st2204_device::usr_r), FUNC(st2204_device::ustr_trg_w));
+	map(0x0062, 0x0062).rw(FUNC(st2204_device::irctr_r), FUNC(st2204_device::irctr_w));
 	map(0x0063, 0x0063).rw(FUNC(st2204_device::bctr_r), FUNC(st2204_device::bctr_w));
 	map(0x0066, 0x0066).rw(FUNC(st2204_device::brs_r), FUNC(st2204_device::brs_w));
 	map(0x0067, 0x0067).rw(FUNC(st2204_device::bdiv_r), FUNC(st2204_device::bdiv_w));

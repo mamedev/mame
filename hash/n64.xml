@@ -7879,8 +7879,12 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<publisher>Midway</publisher>
 		<info name="serial" value="NUS-NXGP-EUR"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-NXGP-0]" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-7101]" />
 			<dataarea name="rom" size="12582912">
-				<rom name="nba hangtime (europe).bin" size="12582912" crc="bf05fe53" sha1="004afe25ee5b70b915797ae799bfbf1d92c969a5" />
+				<rom name="nus-nxgp-0.u1" size="12582912" crc="bf05fe53" sha1="004afe25ee5b70b915797ae799bfbf1d92c969a5" />
 			</dataarea>
 		</part>
 	</software>

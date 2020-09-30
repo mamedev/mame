@@ -120,7 +120,7 @@ void es1373_device::device_start()
 	add_map(0x40, M_IO, FUNC(es1373_device::map));
 
 	// create the stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, 44100/2);
+	m_stream = stream_alloc(0, 2, 44100/2);
 
 	m_timer = timer_alloc(0, nullptr);
 	m_timer->adjust(attotime::zero, 0, attotime::from_hz(44100/2/16));
@@ -233,21 +233,24 @@ void es1373_device::device_timer(emu_timer &timer, device_timer_id tid, int para
 //  sound_stream_update - handle update requests for
 //  our sound stream
 //-------------------------------------------------
-void es1373_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void es1373_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	if (m_dac1.enable) {
 		logerror("%s: sound_stream_update DAC1 not implemented yet\n", tag());
 	}
 
 	if (m_dac2.enable) {
-		send_audio_out(m_dac2, ICSTATUS_DAC2_INT_MASK, outputs[0], outputs[1], samples);
+		send_audio_out(m_dac2, ICSTATUS_DAC2_INT_MASK, outputs[0], outputs[1]);
+	} else {
+		outputs[0].fill(0);
+		outputs[1].fill(0);
 	}
 
 	if (m_adc.enable) {
 		if (m_adc.format!=SCTRL_16BIT_MONO) {
 			logerror("%s: sound_stream_update Only SCTRL_16BIT_MONO recorded supported\n", tag());
 		} else {
-			for (int i=0; i<samples; i++) {
+			for (int i=0; i<outputs[0].samples(); i++) {
 				if (m_adc.buf_count<=m_adc.buf_size) {
 					if (LOG_ES)
 						logerror("%s: ADC buf_count: %i buf_size: %i buf_rptr: %i buf_wptr: %i\n", machine().describe_context(),
@@ -292,7 +295,7 @@ void es1373_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 //-------------------------------------------------
 //  send_audio_out - Sends channel audio output data
 //-------------------------------------------------
-void es1373_device::send_audio_out(chan_info& chan, uint32_t intr_mask, stream_sample_t *outL, stream_sample_t *outR, int samples)
+void es1373_device::send_audio_out(chan_info& chan, uint32_t intr_mask, write_stream_view &outL, write_stream_view &outR)
 {
 	// Only transfer PCI data if bus mastering is enabled
 	// Fill initial half buffer
@@ -303,8 +306,9 @@ void es1373_device::send_audio_out(chan_info& chan, uint32_t intr_mask, stream_s
 	//uint32_t sample_size = calc_size(chan.format);
 	// Send data to sound stream
 	bool buf_row_done;
-	for (int i=0; i<samples; i++) {
+	for (int i=0; i<outL.samples(); i++) {
 		buf_row_done = false;
+		int16_t lsamp = 0, rsamp = 0;
 		if (chan.buf_count<=chan.buf_size) {
 			// Only transfer PCI data if bus mastering is enabled
 			// Fill half-buffer when read pointer is at start of next half
@@ -314,7 +318,7 @@ void es1373_device::send_audio_out(chan_info& chan, uint32_t intr_mask, stream_s
 			}
 			if (LOG_ES && i==0)
 				logerror("%s: chan: %X samples: %i buf_count: %X buf_size: %X buf_rptr: %X buf_wptr: %X\n",
-					machine().describe_context(), chan.number, samples, chan.buf_count, chan.buf_size, chan.buf_rptr, chan.buf_wptr);
+					machine().describe_context(), chan.number, outL.samples(), chan.buf_count, chan.buf_size, chan.buf_rptr, chan.buf_wptr);
 			// Buffer is 4 bytes per location, need to switch on sample mode
 			switch (chan.format) {
 				case SCTRL_8BIT_MONO:
@@ -324,23 +328,23 @@ void es1373_device::send_audio_out(chan_info& chan, uint32_t intr_mask, stream_s
 					logerror("es1373_device::send_audio_out SCTRL_8BIT_STEREO not implemented yet\n");
 					break;
 				case SCTRL_16BIT_MONO:
-						// The sound cache is 32 bit wide fifo, so each entry is two mono 16 bit samples
-						if ((chan.buf_count&0x1)) {
-							// Read high 16 bits
-							outL[i] = outR[i] = (int16_t)(m_sound_cache[chan.buf_rptr]>>16);
-							chan.buf_rptr++;
-							buf_row_done = true;
-						} else {
-							// Read low 16 bits
-							outL[i] = outR[i] = (int16_t)(m_sound_cache[chan.buf_rptr]&0xffff);
-						}
-					break;
-				case SCTRL_16BIT_STEREO:
-						// The sound cache is 32 bit wide fifo, so each entry is one stereo 16 bit sample
-						outL[i] = (int16_t) m_sound_cache[chan.buf_rptr]&0xffff;
-						outR[i] = (int16_t) m_sound_cache[chan.buf_rptr]>>16;
+					// The sound cache is 32 bit wide fifo, so each entry is two mono 16 bit samples
+					if ((chan.buf_count&0x1)) {
+						// Read high 16 bits
+						lsamp = rsamp = m_sound_cache[chan.buf_rptr]>>16;
 						chan.buf_rptr++;
 						buf_row_done = true;
+					} else {
+						// Read low 16 bits
+						lsamp = rsamp = m_sound_cache[chan.buf_rptr]&0xffff;
+					}
+					break;
+				case SCTRL_16BIT_STEREO:
+					// The sound cache is 32 bit wide fifo, so each entry is one stereo 16 bit sample
+					lsamp = m_sound_cache[chan.buf_rptr]&0xffff;
+					rsamp = m_sound_cache[chan.buf_rptr]>>16;
+					chan.buf_rptr++;
+					buf_row_done = true;
 					break;
 			}
 			if (LOG_ES_FILE && m_tempCount<1000000) {
@@ -368,10 +372,9 @@ void es1373_device::send_audio_out(chan_info& chan, uint32_t intr_mask, stream_s
 			if (buf_row_done && !(chan.buf_rptr&0xf)) {
 				chan.buf_rptr -= 0x10;
 			}
-		} else {
-			// Send zeros?
-			outL[i] = outR[i] = 0;
 		}
+		outL.put_int(i, lsamp, 32768);
+		outR.put_int(i, rsamp, 32768);
 	}
 }
 

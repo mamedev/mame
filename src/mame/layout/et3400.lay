@@ -168,64 +168,59 @@ license:CC0
 	</element>
 
 	<group name="displays">
-		<cpanel element="surround"><bounds x="0" y="0" width="320" height="132" /></cpanel>
+		<element ref="surround"><bounds x="0" y="0" width="320" height="132" /></element>
 
-		<cpanel name="digit6" element="digit"><bounds x="16" y="16" width="48" height="80" /></cpanel>
-		<cpanel name="digit5" element="digit"><bounds x="64" y="16" width="48" height="80" /></cpanel>
-		<cpanel name="digit4" element="digit"><bounds x="112" y="16" width="48" height="80" /></cpanel>
-		<cpanel name="digit3" element="digit"><bounds x="160" y="16" width="48" height="80" /></cpanel>
-		<cpanel name="digit2" element="digit"><bounds x="208" y="16" width="48" height="80" /></cpanel>
-		<cpanel name="digit1" element="digit"><bounds x="256" y="16" width="48" height="80" /></cpanel>
+		<element name="digit6" ref="digit"><bounds x="16" y="16" width="48" height="80" /></element>
+		<element name="digit5" ref="digit"><bounds x="64" y="16" width="48" height="80" /></element>
+		<element name="digit4" ref="digit"><bounds x="112" y="16" width="48" height="80" /></element>
+		<element name="digit3" ref="digit"><bounds x="160" y="16" width="48" height="80" /></element>
+		<element name="digit2" ref="digit"><bounds x="208" y="16" width="48" height="80" /></element>
+		<element name="digit1" ref="digit"><bounds x="256" y="16" width="48" height="80" /></element>
 
-		<cpanel element="label_h"><bounds x="48" y="100" width="16" height="16" /></cpanel>
-		<cpanel element="label_i"><bounds x="96" y="100" width="16" height="16" /></cpanel>
-		<cpanel element="label_n"><bounds x="144" y="100" width="16" height="16" /></cpanel>
-		<cpanel element="label_z"><bounds x="192" y="100" width="16" height="16" /></cpanel>
-		<cpanel element="label_v"><bounds x="240" y="100" width="16" height="16" /></cpanel>
-		<cpanel element="label_c"><bounds x="288" y="100" width="16" height="16" /></cpanel>
+		<element ref="label_h"><bounds x="48" y="100" width="16" height="16" /></element>
+		<element ref="label_i"><bounds x="96" y="100" width="16" height="16" /></element>
+		<element ref="label_n"><bounds x="144" y="100" width="16" height="16" /></element>
+		<element ref="label_z"><bounds x="192" y="100" width="16" height="16" /></element>
+		<element ref="label_v"><bounds x="240" y="100" width="16" height="16" /></element>
+		<element ref="label_c"><bounds x="288" y="100" width="16" height="16" /></element>
 	</group>
 
 	<group name="keypad">
 		<bounds x="0" y="0" width="3.5" height="6.5" />
 
-		<cpanel element="btn_d" inputtag="X0" inputmask="0x01"><bounds x="0.20" y="0.125" width="1.0" height="1.0" /></cpanel>
-		<cpanel element="btn_e" inputtag="X1" inputmask="0x01"><bounds x="1.25" y="0.125" width="1.0" height="1.0" /></cpanel>
-		<cpanel element="btn_f" inputtag="X2" inputmask="0x01"><bounds x="2.30" y="0.125" width="1.0" height="1.0" /></cpanel>
-		<cpanel element="btn_a" inputtag="X0" inputmask="0x02"><bounds x="0.20" y="1.175" width="1.0" height="1.0" /></cpanel>
-		<cpanel element="btn_b" inputtag="X1" inputmask="0x02"><bounds x="1.25" y="1.175" width="1.0" height="1.0" /></cpanel>
-		<cpanel element="btn_c" inputtag="X2" inputmask="0x02"><bounds x="2.30" y="1.175" width="1.0" height="1.0" /></cpanel>
-		<cpanel element="btn_7" inputtag="X0" inputmask="0x04"><bounds x="0.20" y="2.225" width="1.0" height="1.0" /></cpanel>
-		<cpanel element="btn_8" inputtag="X1" inputmask="0x04"><bounds x="1.25" y="2.225" width="1.0" height="1.0" /></cpanel>
-		<cpanel element="btn_9" inputtag="X2" inputmask="0x04"><bounds x="2.30" y="2.225" width="1.0" height="1.0" /></cpanel>
-		<cpanel element="btn_4" inputtag="X0" inputmask="0x08"><bounds x="0.20" y="3.275" width="1.0" height="1.0" /></cpanel>
-		<cpanel element="btn_5" inputtag="X1" inputmask="0x08"><bounds x="1.25" y="3.275" width="1.0" height="1.0" /></cpanel>
-		<cpanel element="btn_6" inputtag="X2" inputmask="0x08"><bounds x="2.30" y="3.275" width="1.0" height="1.0" /></cpanel>
-		<cpanel element="btn_1" inputtag="X0" inputmask="0x10"><bounds x="0.20" y="4.325" width="1.0" height="1.0" /></cpanel>
-		<cpanel element="btn_2" inputtag="X1" inputmask="0x10"><bounds x="1.25" y="4.325" width="1.0" height="1.0" /></cpanel>
-		<cpanel element="btn_3" inputtag="X2" inputmask="0x10"><bounds x="2.30" y="4.325" width="1.0" height="1.0" /></cpanel>
-		<cpanel element="btn_0" inputtag="X0" inputmask="0x20"><bounds x="0.725" y="5.375" width="1.0" height="1.0" /></cpanel>
-		<cpanel element="btn_rst" inputtag="RESET" inputmask="0x01"><bounds x="1.775" y="5.375" width="1.0" height="1.0" /></cpanel>
+		<element ref="btn_d" inputtag="X0" inputmask="0x01"><bounds x="0.20" y="0.125" width="1.0" height="1.0" /></element>
+		<element ref="btn_e" inputtag="X1" inputmask="0x01"><bounds x="1.25" y="0.125" width="1.0" height="1.0" /></element>
+		<element ref="btn_f" inputtag="X2" inputmask="0x01"><bounds x="2.30" y="0.125" width="1.0" height="1.0" /></element>
+		<element ref="btn_a" inputtag="X0" inputmask="0x02"><bounds x="0.20" y="1.175" width="1.0" height="1.0" /></element>
+		<element ref="btn_b" inputtag="X1" inputmask="0x02"><bounds x="1.25" y="1.175" width="1.0" height="1.0" /></element>
+		<element ref="btn_c" inputtag="X2" inputmask="0x02"><bounds x="2.30" y="1.175" width="1.0" height="1.0" /></element>
+		<element ref="btn_7" inputtag="X0" inputmask="0x04"><bounds x="0.20" y="2.225" width="1.0" height="1.0" /></element>
+		<element ref="btn_8" inputtag="X1" inputmask="0x04"><bounds x="1.25" y="2.225" width="1.0" height="1.0" /></element>
+		<element ref="btn_9" inputtag="X2" inputmask="0x04"><bounds x="2.30" y="2.225" width="1.0" height="1.0" /></element>
+		<element ref="btn_4" inputtag="X0" inputmask="0x08"><bounds x="0.20" y="3.275" width="1.0" height="1.0" /></element>
+		<element ref="btn_5" inputtag="X1" inputmask="0x08"><bounds x="1.25" y="3.275" width="1.0" height="1.0" /></element>
+		<element ref="btn_6" inputtag="X2" inputmask="0x08"><bounds x="2.30" y="3.275" width="1.0" height="1.0" /></element>
+		<element ref="btn_1" inputtag="X0" inputmask="0x10"><bounds x="0.20" y="4.325" width="1.0" height="1.0" /></element>
+		<element ref="btn_2" inputtag="X1" inputmask="0x10"><bounds x="1.25" y="4.325" width="1.0" height="1.0" /></element>
+		<element ref="btn_3" inputtag="X2" inputmask="0x10"><bounds x="2.30" y="4.325" width="1.0" height="1.0" /></element>
+		<element ref="btn_0" inputtag="X0" inputmask="0x20"><bounds x="0.725" y="5.375" width="1.0" height="1.0" /></element>
+		<element ref="btn_rst" inputtag="RESET" inputmask="0x01"><bounds x="1.775" y="5.375" width="1.0" height="1.0" /></element>
 	</group>
 
-	<view name="LED Displays, Terminal and Keypad">
-		<cpanel element="beige"><bounds x="320" y="0" width="172" height="372" /></cpanel>
-		<group ref="displays"><bounds x="0" y="0" width="320" height="132" /></group>
-		<group ref="keypad"><bounds x="336" y="16" width="140" height="260" /></group>
-		<screen index="0"><bounds x="0" y="132" width="320" height="240" /></screen>
-	</view>
-
 	<view name="LED Displays and Terminal">
-		<group ref="displays"><bounds x="0" y="0" width="320" height="132" /></group>
+		<collection name="Keypad">
+			<element ref="beige"><bounds x="320" y="0" width="172" height="372" /></element>
+			<group ref="keypad"><bounds x="336" y="16" width="140" height="260" /></group>
+		</collection>
 		<screen index="0"><bounds x="0" y="132" width="320" height="240" /></screen>
-	</view>
-
-	<view name="LED Displays and Keypad">
-		<cpanel element="beige"><bounds x="0" y="0" width="320" height="424" /></cpanel>
 		<group ref="displays"><bounds x="0" y="0" width="320" height="132" /></group>
-		<group ref="keypad"><bounds x="164" y="148" width="140" height="260" /></group>
 	</view>
 
 	<view name="LED Displays">
+		<collection name="Keypad">
+			<element ref="beige"><bounds x="0" y="0" width="320" height="424" /></element>
+			<group ref="keypad"><bounds x="164" y="148" width="140" height="260" /></group>
+		</collection>
 		<group ref="displays"><bounds x="0" y="0" width="320" height="132" /></group>
 	</view>
 </mamelayout>

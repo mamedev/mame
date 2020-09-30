@@ -20,6 +20,7 @@ public:
 
 	void flush();
 	void transfer(int channel, offs_t channel_spacing, offs_t frame_spacing, offs_t total_frames, int16_t *data);
+	void transfer(int channel, offs_t channel_spacing, offs_t frame_spacing, offs_t total_frames, stream_buffer::sample_t *data);
 	void enable(uint8_t enable);
 	void set_frequency(double frequency);
 	void set_volume(uint16_t volume);
@@ -29,18 +30,18 @@ protected:
 	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 	// internal state
 	/* sound stream and buffers */
 	sound_stream *  m_channel;
-	std::unique_ptr<int16_t[]>         m_buffer;
+	std::vector<stream_buffer::sample_t> m_buffer;
 	uint32_t          m_bufin;
 	uint32_t          m_bufout;
 
 	/* per-channel parameters */
-	int16_t           m_volume;
+	stream_buffer::sample_t m_volume;
 	uint8_t           m_enabled;
 	double          m_frequency;
 };

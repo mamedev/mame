@@ -22,9 +22,9 @@ license:CC0
 		<screen index="0">
 			<bounds x="0" y="0" width="504" height="296" />
 		</screen>
-		<overlay element="overlay">
+		<element ref="overlay" blend="multiply">
 			<bounds x="0" y="0" width="504" height="296" />
-		</overlay>
+		</element>
 
 	</view>
 </mamelayout>

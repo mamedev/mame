@@ -46,7 +46,7 @@
  *
  */
 
-#include "netlist/analog/nlid_twoterm.h"
+#include "analog/nlid_twoterm.h"
 #include "nlid_system.h"
 
 namespace netlist
@@ -120,16 +120,16 @@ namespace netlist
 		//, m_power_pins(*this)
 		{
 
-			register_subalias(pstring(D::gnd()), m_RN.N());
-			register_subalias(pstring(D::vcc()), m_RP.P());
-			register_subalias("C",   m_RN.N());
-			register_subalias("RC",  m_RN.P());
+			register_subalias(pstring(D::gnd()), "RN.2");
+			register_subalias(pstring(D::vcc()), "RP.1");
+			register_subalias("C",   "RN.2");
+			register_subalias("RC",  "RN.1");
 
-			connect(m_RP_Q, m_RP.I());
-			connect(m_RN_Q, m_RN.I());
+			connect("_RP_Q", "RP.I");
+			connect("_RN_Q", "RN.I");
 
-			connect(m_RN.P(), m_RP.N());
-			connect(m_CV, m_RN.P());
+			connect("RN.1", "RP.2");
+			connect("_CV", "RN.1");
 
 			m_RP.m_RON.set(D::RI());
 			m_RN.m_RON.set(D::RI());

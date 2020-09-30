@@ -1098,8 +1098,8 @@ void subsino2_state::new2001_base_map(address_map &map)
 	map(0xa00020, 0xa00025).w(FUNC(subsino2_state::ss9601_scroll_w));
 
 	map(0xc00000, 0xc00001).portr("DSW");
-	map(0xc00002, 0xc00003).portr("IN C");
-	map(0xc00004, 0xc00005).portr("IN AB");
+	map(0xc00002, 0xc00003).portr("IN-C");
+	map(0xc00004, 0xc00005).portr("IN-AB");
 	map(0xc00006, 0xc00007).r(FUNC(subsino2_state::bishjan_serial_r));
 }
 
@@ -1298,10 +1298,10 @@ void subsino2_state::mtrain_map(address_map &map)
 	map(0x0912f, 0x0912f).w(FUNC(subsino2_state::ss9601_byte_lo_w));
 
 	map(0x09140, 0x09142).w(FUNC(subsino2_state::mtrain_outputs_w)).share("outputs");
-	map(0x09143, 0x09143).portr("IN D"); // (not shown in system test) 0x40 serial out, 0x80 serial in
-	map(0x09144, 0x09144).portr("IN A"); // A
-	map(0x09145, 0x09145).portr("IN B"); // B
-	map(0x09146, 0x09146).portr("IN C"); // C
+	map(0x09143, 0x09143).portr("IN-D"); // (not shown in system test) 0x40 serial out, 0x80 serial in
+	map(0x09144, 0x09144).portr("IN-A"); // A
+	map(0x09145, 0x09145).portr("IN-B"); // B
+	map(0x09146, 0x09146).portr("IN-C"); // C
 	map(0x09147, 0x09147).r(FUNC(subsino2_state::dsw_r));
 	map(0x09148, 0x09148).w(FUNC(subsino2_state::dsw_mask_w));
 
@@ -1397,10 +1397,10 @@ void subsino2_state::saklove_io(address_map &map)
 	map(0x0220, 0x0225).w(FUNC(subsino2_state::ss9601_scroll_w));
 
 	map(0x0300, 0x0303).w(FUNC(subsino2_state::saklove_outputs_w)).share("outputs");
-	map(0x0303, 0x0303).portr("IN D"); // 0x40 serial out, 0x80 serial in
-	map(0x0304, 0x0304).portr("IN A");
-	map(0x0305, 0x0305).portr("IN B");
-	map(0x0306, 0x0306).portr("IN C");
+	map(0x0303, 0x0303).portr("IN-D"); // 0x40 serial out, 0x80 serial in
+	map(0x0304, 0x0304).portr("IN-A");
+	map(0x0305, 0x0305).portr("IN-B");
+	map(0x0306, 0x0306).portr("IN-C");
 
 	map(0x0307, 0x0307).r(FUNC(subsino2_state::dsw_r));
 	map(0x0308, 0x0308).w(FUNC(subsino2_state::dsw_mask_w));
@@ -1504,10 +1504,10 @@ void subsino2_state::xplan_common_io(address_map &map)
 	map(0x0300, 0x0300).r(FUNC(subsino2_state::vblank_bit6_r)).w(FUNC(subsino2_state::oki_bank_bit4_w));
 	map(0x0301, 0x0301).w(FUNC(subsino2_state::dsw_mask_w));
 	map(0x0302, 0x0302).r(FUNC(subsino2_state::dsw_r));
-	map(0x0303, 0x0303).portr("IN C");
-	map(0x0304, 0x0304).portr("IN B");
-	map(0x0305, 0x0305).portr("IN A");
-	map(0x0306, 0x0306).portr("IN D"); // 0x40 serial out, 0x80 serial in
+	map(0x0303, 0x0303).portr("IN-C");
+	map(0x0304, 0x0304).portr("IN-B");
+	map(0x0305, 0x0305).portr("IN-A");
+	map(0x0306, 0x0306).portr("IN-D"); // 0x40 serial out, 0x80 serial in
 }
 
 void subsino2_state::xplan_io(address_map &map)
@@ -1718,7 +1718,7 @@ static INPUT_PORTS_START( new2001 )
 	// high byte related to sound communication
 
 	// JAMMA inputs:
-	PORT_START("IN C") // c00002
+	PORT_START("IN-C") // c00002
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN       )
@@ -1729,7 +1729,7 @@ static INPUT_PORTS_START( new2001 )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 	// high byte not read
 
-	PORT_START("IN AB") // c00004
+	PORT_START("IN-AB") // c00004
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE       ) PORT_IMPULSE(1) // service mode (press twice for inputs)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_POKER_HOLD3   ) PORT_NAME("Hold 3 / Black")
@@ -1766,7 +1766,7 @@ static INPUT_PORTS_START( humlan )
 	// high byte related to sound communication
 
 	// JAMMA inputs:
-	PORT_START("IN C") // c00002
+	PORT_START("IN-C") // c00002
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN  )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE       ) PORT_IMPULSE(1) // service mode (press twice for inputs)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // ?
@@ -1777,7 +1777,7 @@ static INPUT_PORTS_START( humlan )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 	// high byte not read
 
-	PORT_START("IN AB") // c00004
+	PORT_START("IN-AB") // c00004
 	// 1st-type panel
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN       )
@@ -1823,7 +1823,7 @@ static INPUT_PORTS_START( expcard )
 	PORT_START("DSW4")
 	// not populated
 
-	PORT_START("IN A")
+	PORT_START("IN-A")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN     )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN     )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN     )
@@ -1833,7 +1833,7 @@ static INPUT_PORTS_START( expcard )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Hold 4 / Small")        // hold 4 / small / decrease sample in test mode
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Hold 1 / Bet")          // hold 1 / bet
 
-	PORT_START("IN B")
+	PORT_START("IN-B")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Hold 2 / Take" )        // hold 2 / take
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Hold 3 / Double Up" )   // hold 3 / double up
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN     )
@@ -1843,7 +1843,7 @@ static INPUT_PORTS_START( expcard )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1       )                                    // coin in
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN     )
 
-	PORT_START("IN C")
+	PORT_START("IN-C")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK  )                                   // stats (keep pressed during boot for service mode)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_CANCEL )                                   // cancel?
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN      )
@@ -1853,7 +1853,7 @@ static INPUT_PORTS_START( expcard )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE      ) PORT_IMPULSE(1)                   // service mode
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN      )
 
-	PORT_START("IN D")
+	PORT_START("IN-D")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN      )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN      )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN      )
@@ -1970,7 +1970,7 @@ static INPUT_PORTS_START( mtrain )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN A")
+	PORT_START("IN-A")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN    )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN    )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN    )
@@ -1980,7 +1980,7 @@ static INPUT_PORTS_START( mtrain )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN    )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN    )
 
-	PORT_START("IN B")
+	PORT_START("IN-B")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN  ) PORT_IMPULSE(5)          // key in
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1         )                          // coin in
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN       )
@@ -1990,7 +1990,7 @@ static INPUT_PORTS_START( mtrain )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  // payout (hopper error)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  // key out
 
-	PORT_START("IN C")
+	PORT_START("IN-C")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_NAME("Stop 3 / Small")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN    )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN    )
@@ -2000,7 +2000,7 @@ static INPUT_PORTS_START( mtrain )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Stop 1 / Take")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN    )
 
-	PORT_START("IN D")  // not shown in test mode
+	PORT_START("IN-D")  // not shown in test mode
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN  )
@@ -2120,7 +2120,7 @@ static INPUT_PORTS_START( strain ) // inputs need verifying
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN A")
+	PORT_START("IN-A")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN    )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN    )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN    )
@@ -2130,7 +2130,7 @@ static INPUT_PORTS_START( strain ) // inputs need verifying
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN    )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN    )
 
-	PORT_START("IN B")
+	PORT_START("IN-B")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN  ) PORT_IMPULSE(5)          // key in
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1         )                          // coin in
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN       )
@@ -2140,7 +2140,7 @@ static INPUT_PORTS_START( strain ) // inputs need verifying
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  // payout (hopper error)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  // key out
 
-	PORT_START("IN C")
+	PORT_START("IN-C")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_NAME("Stop 3")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN    )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN    )
@@ -2150,7 +2150,7 @@ static INPUT_PORTS_START( strain ) // inputs need verifying
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Stop 1 / Take")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN    )
 
-	PORT_START("IN D")  // not shown in test mode
+	PORT_START("IN-D")  // not shown in test mode
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN  )
@@ -2270,7 +2270,7 @@ static INPUT_PORTS_START( tbonusal ) // inputs need verifying
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN A")
+	PORT_START("IN-A")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN    )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN    )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN    )
@@ -2280,7 +2280,7 @@ static INPUT_PORTS_START( tbonusal ) // inputs need verifying
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN    )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN    )
 
-	PORT_START("IN B")
+	PORT_START("IN-B")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN  ) PORT_IMPULSE(5)          // key in
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1         )                          // coin in
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN       )
@@ -2290,7 +2290,7 @@ static INPUT_PORTS_START( tbonusal ) // inputs need verifying
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  // payout (hopper error)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  // key out
 
-	PORT_START("IN C")
+	PORT_START("IN-C")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_NAME("Stop 3")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN    )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN    )
@@ -2300,7 +2300,7 @@ static INPUT_PORTS_START( tbonusal ) // inputs need verifying
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Stop 1 / Take")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN    )
 
-	PORT_START("IN D")  // not shown in test mode
+	PORT_START("IN-D")  // not shown in test mode
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN  )
@@ -2401,7 +2401,7 @@ static INPUT_PORTS_START( saklove )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START("IN A")
+	PORT_START("IN-A")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1  ) PORT_NAME("Bet 1")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2  ) PORT_NAME("Bet 2")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3  ) PORT_NAME("Bet 3")
@@ -2411,7 +2411,7 @@ static INPUT_PORTS_START( saklove )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON5  ) PORT_NAME("Big or Small 1")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4  ) PORT_NAME("Bet Amount")   // 1-5-10
 
-	PORT_START("IN B")
+	PORT_START("IN-B")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START2   )           // selects music in system test / exit
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )  // top 10? / double up?
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // used?
@@ -2421,7 +2421,7 @@ static INPUT_PORTS_START( saklove )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1    )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // used?
 
-	PORT_START("IN C")
+	PORT_START("IN-C")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Statistics")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // used?
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN  )
@@ -2431,7 +2431,7 @@ static INPUT_PORTS_START( saklove )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE  ) PORT_IMPULSE(2)   // service mode
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // used?
 
-	PORT_START("IN D")  // bits 3 and 4 shown in test mode
+	PORT_START("IN-D")  // bits 3 and 4 shown in test mode
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN  )
@@ -2551,7 +2551,7 @@ static INPUT_PORTS_START( treacity )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN A")
+	PORT_START("IN-A")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1  ) PORT_NAME("Bet 1")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2  ) PORT_NAME("Bet 2")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3  ) PORT_NAME("Bet 3")
@@ -2561,7 +2561,7 @@ static INPUT_PORTS_START( treacity )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON5  ) PORT_NAME("Big or Small 1")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4  ) PORT_NAME("Bet Amount")   // 1-5-10
 
-	PORT_START("IN B")
+	PORT_START("IN-B")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START2   )           // selects music in system test / exit
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )  // top 10? / double up?
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // used?
@@ -2571,7 +2571,7 @@ static INPUT_PORTS_START( treacity )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1    )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // used?
 
-	PORT_START("IN C")
+	PORT_START("IN-C")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Statistics")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // used?
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN  )
@@ -2581,7 +2581,7 @@ static INPUT_PORTS_START( treacity )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE  ) PORT_IMPULSE(2)   // service mode
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // used?
 
-	PORT_START("IN D")  // bits 3 and 4 shown in test mode
+	PORT_START("IN-D")  // bits 3 and 4 shown in test mode
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN  )
@@ -2619,7 +2619,7 @@ static INPUT_PORTS_START( xplan )
 	// not populated
 
 	// JAMMA inputs:
-	PORT_START("IN A")
+	PORT_START("IN-A")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1       ) PORT_NAME("A / Play Gambling 1")         // A \__ play gambling game
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2       ) PORT_NAME("C / Play Gambling 2")         // C /
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3       ) PORT_NAME("B / Play Shoot'Em Up")        // B ___ play shoot'em up game
@@ -2629,7 +2629,7 @@ static INPUT_PORTS_START( xplan )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD3   ) PORT_NAME("Hold 3 / Small")              // hold 3 / small / decrease sample in test mode
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD5   ) PORT_NAME("Hold 5 / Bet")                // hold 5 / bet
 
-	PORT_START("IN B")
+	PORT_START("IN-B")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD4   ) PORT_NAME("Hold 4 / Re-Double" )         // hold 4 / re-double?
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2   ) PORT_NAME("Hold 2 / Double Up / Right")  // hold 2 / double up? / right
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER         ) PORT_NAME("Raise") PORT_CODE(KEYCODE_N)  // raise
@@ -2639,7 +2639,7 @@ static INPUT_PORTS_START( xplan )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1         )                                          // coin in
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 
-	PORT_START("IN C")
+	PORT_START("IN-C")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK   )                      // stats (keep pressed during boot for service mode)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN       )
@@ -2649,7 +2649,7 @@ static INPUT_PORTS_START( xplan )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE       )  PORT_IMPULSE(1)     // service mode
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )                      // pay-out
 
-	PORT_START("IN D")  // bits 3 and 4 shown in test mode
+	PORT_START("IN-D")  // bits 3 and 4 shown in test mode
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN       )
@@ -2685,7 +2685,7 @@ static INPUT_PORTS_START( xtrain )
 	// not populated
 
 	// JAMMA inputs:
-	PORT_START("IN A")
+	PORT_START("IN-A")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER)       PORT_NAME("Re-Double") PORT_CODE(KEYCODE_N)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_GAMBLE_HALF) PORT_NAME("Half Double")
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNKNOWN)
@@ -2695,7 +2695,7 @@ static INPUT_PORTS_START( xtrain )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD3) PORT_NAME("Hold 3 / Small")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_GAMBLE_BET)  PORT_NAME("Bet")
 
-	PORT_START("IN B")
+	PORT_START("IN-B")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1) PORT_NAME("Hold 1 / Take" )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP) PORT_NAME("Double Up / Help")
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNKNOWN)
@@ -2705,7 +2705,7 @@ static INPUT_PORTS_START( xtrain )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_COIN1)       PORT_NAME("Coin In")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
 
-	PORT_START("IN C")
+	PORT_START("IN-C")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK) // keep pressed during boot for service mode
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNKNOWN)
@@ -2715,7 +2715,7 @@ static INPUT_PORTS_START( xtrain )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_SERVICE)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT)
 
-	PORT_START("IN D")
+	PORT_START("IN-D")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNKNOWN)
@@ -2729,7 +2729,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( ptrain )
 	PORT_INCLUDE(xtrain)
 
-	PORT_MODIFY("IN B")
+	PORT_MODIFY("IN-B")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 INPUT_PORTS_END
 
@@ -2840,7 +2840,7 @@ static INPUT_PORTS_START( wtrnymph )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN A")
+	PORT_START("IN-A")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN    )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN    )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN    )
@@ -2850,7 +2850,7 @@ static INPUT_PORTS_START( wtrnymph )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN    )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN    )
 
-	PORT_START("IN B")
+	PORT_START("IN-B")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN  ) PORT_IMPULSE(5)          // key in
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1         )                          // coin in
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN       )
@@ -2860,7 +2860,7 @@ static INPUT_PORTS_START( wtrnymph )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  // payout (hopper error)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  // key out
 
-	PORT_START("IN C")
+	PORT_START("IN-C")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_NAME("Stop 3 / Right")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN    )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN    )
@@ -2870,7 +2870,7 @@ static INPUT_PORTS_START( wtrnymph )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Stop 1 / Take / Rotate")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER      ) PORT_NAME("Play Tetris")     PORT_CODE(KEYCODE_T)   // T |__ play Tetris game
 
-	PORT_START("IN D")  // not shown in test mode
+	PORT_START("IN-D")  // not shown in test mode
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN  )

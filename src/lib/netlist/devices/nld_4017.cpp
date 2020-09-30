@@ -37,7 +37,6 @@
  *
  */
 
-#include "nld_4017.h"
 #include "nl_base.h"
 #include "nl_factory.h"
 
@@ -46,7 +45,7 @@ namespace netlist
 	namespace devices
 	{
 
-	template <std::size_t _MaxCount>
+	template <std::size_t MaxCount>
 	NETLIB_OBJECT(CD4017_base)
 	{
 		NETLIB_CONSTRUCTOR_MODEL(CD4017_base, "CD4XXX")
@@ -60,6 +59,7 @@ namespace netlist
 		{
 		}
 
+	private:
 		NETLIB_RESETI()
 		{
 			m_CLK.set_state(logic_t::STATE_INP_LH);
@@ -90,18 +90,17 @@ namespace netlist
 			}
 		}
 
-	public:
 		void update_outputs(const unsigned cnt) noexcept
 		{
-			for (std::size_t i = 0; i < _MaxCount; i++)
+			for (std::size_t i = 0; i < MaxCount; i++)
 				m_Q[i].push(i == cnt, NLTIME_FROM_NS(200));
-			m_CO.push(cnt < _MaxCount / 2, NLTIME_FROM_NS(160));
+			m_CO.push(cnt < MaxCount / 2, NLTIME_FROM_NS(160));
 		}
 		logic_input_t m_CLK;
 		logic_input_t m_CLKEN;
 		logic_input_t m_RESET;
 		logic_output_t m_CO;
-		object_array_t<logic_output_t, _MaxCount> m_Q;
+		object_array_t<logic_output_t, MaxCount> m_Q;
 
 		state_var<unsigned> m_cnt;
 		nld_power_pins m_supply;

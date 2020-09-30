@@ -515,7 +515,7 @@ void flyball_state::flyball(machine_config &config)
 	NETLIST_ANALOG_INPUT(config, "sound_nl:bat_volume", "R75.DIAL");
 	NETLIST_ANALOG_INPUT(config, "sound_nl:main_volume", "R95.DIAL");
 
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(32767.0 / 0.13, -(32767.0 / 0.13) * 0.78);
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(1.0 / 0.13, -(1.0 / 0.13) * 0.78);
 }
 
 

@@ -677,14 +677,13 @@ void pokey_device::step_one_clock(void)
 }
 
 //-------------------------------------------------
-//  stream_generate - handle update requests for
+//  sound_stream_update - handle update requests for
 //  our sound stream
 //-------------------------------------------------
 
-
-void pokey_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void pokey_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *buffer = outputs[0];
+	auto &buffer = outputs[0];
 
 	if (m_output_type == LEGACY_LINEAR)
 	{
@@ -693,26 +692,21 @@ void pokey_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 			out += ((m_out_raw >> (4*i)) & 0x0f);
 		out *= POKEY_DEFAULT_GAIN;
 		out = (out > 0x7fff) ? 0x7fff : out;
-		while( samples > 0 )
-		{
-			*buffer++ = out;
-			samples--;
-		}
+		stream_buffer::sample_t outsamp = out * stream_buffer::sample_t(1.0 / 32768.0);
+		buffer.fill(outsamp);
 	}
 	else if (m_output_type == RC_LOWPASS)
 	{
 		double rTot = m_voltab[m_out_raw];
 
-		double V0 = rTot / (rTot+m_r_pullup) * m_v_ref / 5.0 * 32767.0;
+		double V0 = rTot / (rTot+m_r_pullup) * m_v_ref / 5.0;
 		double mult = (m_cap == 0.0) ? 1.0 : 1.0 - exp(-(rTot + m_r_pullup) / (m_cap * m_r_pullup * rTot) * m_clock_period.as_double());
 
-		while( samples > 0 )
+		for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
 		{
 			/* store sum of output signals into the buffer */
 			m_out_filter += (V0 - m_out_filter) * mult;
-			*buffer++ = m_out_filter;
-			samples--;
-
+			buffer.put(sampindex, m_out_filter);
 		}
 	}
 	else if (m_output_type == OPAMP_C_TO_GROUND)
@@ -727,15 +721,8 @@ void pokey_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 		 * It is approximated by eliminating m_v_ref ( -1.0 term)
 		 */
 
-		double V0 = ((rTot+m_r_pullup) / rTot - 1.0) * m_v_ref  / 5.0 * 32767.0;
-
-		while( samples > 0 )
-		{
-			/* store sum of output signals into the buffer */
-			*buffer++ = V0;
-			samples--;
-
-		}
+		double V0 = ((rTot+m_r_pullup) / rTot - 1.0) * m_v_ref  / 5.0;
+		buffer.fill(V0);
 	}
 	else if (m_output_type == OPAMP_LOW_PASS)
 	{
@@ -744,25 +731,19 @@ void pokey_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 		 * It is approximated by not adding in VRef below.
 		 */
 
-		double V0 = (m_r_pullup / rTot) * m_v_ref  / 5.0 * 32767.0;
+		double V0 = (m_r_pullup / rTot) * m_v_ref  / 5.0;
 		double mult = (m_cap == 0.0) ? 1.0 : 1.0 - exp(-1.0 / (m_cap * m_r_pullup) * m_clock_period.as_double());
 
-		while( samples > 0 )
+		for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
 		{
 			/* store sum of output signals into the buffer */
 			m_out_filter += (V0 - m_out_filter) * mult;
-			*buffer++ = m_out_filter /* + m_v_ref */;       // see above
-			samples--;
+			buffer.put(sampindex, m_out_filter);
 		}
 	}
 	else if (m_output_type == DISCRETE_VAR_R)
 	{
-		int32_t out = m_voltab[m_out_raw];
-		while( samples > 0 )
-		{
-			*buffer++ = out;
-			samples--;
-		}
+		buffer.fill(m_voltab[m_out_raw]);
 	}
 }
 

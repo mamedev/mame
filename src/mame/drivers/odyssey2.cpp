@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol, hap
-/***************************************************************************
+/*******************************************************************************
 
 Driver file to handle emulation of the Magnavox Odyssey 2 (stylized Odyssey²),
 Philips Videopac G7000 and Philips Videopac+ G7400.
@@ -11,7 +11,25 @@ halted due to a hardware defect, wide release continued in 1979.
 
 The 2 joysticks have no clear distinction between player 1 and 2, it differs
 per game. And in MAME it's extra awkward due to the default input mapping
-conflicting with the keyboard.
+conflicting with the keyboard. An easy way to work around this if you're only
+playing 1-player games, is to map both joysticks to the same inputs.
+
+Videopac consoles:
+- Philips Videopac G7000 (Europe, several models)
+- Philips Videopac C52 (France)
+- Philips Odyssey (Brazil)
+- Magnavox Odyssey 2 (US)
+- Radiola Jet 25 (France)
+- Siera Videopac Computer G7000 (France)
+- Schneider Videopac 7000 (Germany)
+- Philips Videopac G7200 (Europe, Videopac with built-in screen)
+- Philips Videojeu N60 (France)
+
+Videopac+ consoles:
+- Philips Videopac+ G7400/G7401 (Europe)
+- Magnavox Odyssey 3 Command Center (US, prototype)
+- Brandt Jopac JO7400 (France)
+- Schneider Videopac 74+ (Germany)
 
 Odyssey 2/Videopac hardware notes:
 - Intel 8048 (1KB internal ROM, 64 bytes internal RAM)
@@ -28,7 +46,7 @@ Videopac+ G7400 hardware notes:
 XTAL notes (differs per model):
 - Odyssey 2: 7.15909MHz
 - G7000: 17.734476MHz
-- C52/N60: 17.812
+- C52/N60: 17.812MHz
 - G7200: 5.911MHz + 3.547MHz
 - G7400: 5.911MHz + 8.867MHz
 - JO7400: 5.911MHz + 3.5625MHz
@@ -36,7 +54,7 @@ XTAL notes (differs per model):
 TODO:
 - backgamm doesn't draw all the chars/sprites, it does multiple screen updates
   and writes to the ptr/color registers, but does not increment the Y regs
-- 824x screen resolution is not strictly defined, height(243) is correct, but
+- screen resolution is not strictly defined, height(243) is correct, but
   horizontal overscan differs depending on monitor/tv? see syracuse for overscan
 - 824x on the real console, overlapping characters on eachother will cause
   glitches (it is used to an advantage in some as-of-yet undumped homebrews)
@@ -44,10 +62,17 @@ TODO:
   hiding them will cause bugs in some Euro games
 - 8245(PAL) video timing is not 100% accurate, though vtotal and htotal should
   be correct
-- ppp(the tetris game) does not work properly on PAL, is this homebrew NTSC-only,
-  or is PAL detection going wrong? It does look like PAL/NTSC detection is working,
-  see internal RAM $3D d7. So maybe it is due to inaccurate PAL video timing.
-  The game does mid-scanline updates.
+- according to tests, 8244 does not have a sound interrupt, but the Philips
+  service test cartridge for 8245 tests for it and fails if it did not get an irq
+- likewise, 8244 does not have a horizontal interrupt, but does 8245 have it?
+- tests done on 8244 suggests that Y(0xa4) is latched when reading X, but
+  that is inconsistent with the Philips service test cartridge: It reads X, Y, X,
+  then waits for 1 scanline, and reads Y again. It expects Y to change. Latching Y
+  will also cause video glitches to look different on some games when compared
+  to the real console, for example powerlrd.
+- ppp(the tetris game) does not work properly on PAL, it does look like PAL/NTSC
+  detection is working, see internal RAM $3D d7. So maybe it is due to inaccurate
+  PAL video timing. The game does mid-scanline video updates.
 - g7400 probably has different video timing too (not same as g7000)
 - g7400 helicopt sometimes locks up at the sea level, timing related?
 - 4in1 and musician are not supposed to work on g7400, but work fine on MAME,
@@ -65,10 +90,12 @@ BTANB:
 - g7400 games don't look correct on odyssey3 and vice versa: ef934x graphics are
   placed lower on odyssey3
 - Blackjack (Videopac 5) does not work on G7400, caused by a removed BIOS routine
+- due to different XTAL ratio on Jopac JO7400, some games that do mid-screen video
+  updates will have glitches on this machine, notably backgamm
 
 Plenty games have minor bugs not worth mentioning here.
 
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -140,10 +167,10 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-class g7400_state : public odyssey2_state
+class videopacp_state : public odyssey2_state
 {
 public:
-	g7400_state(const machine_config &mconfig, device_type type, const char *tag) :
+	videopacp_state(const machine_config &mconfig, device_type type, const char *tag) :
 		odyssey2_state(mconfig, type, tag),
 		m_i8243(*this, "i8243"),
 		m_ef934x(*this, "ef934x")
@@ -187,7 +214,7 @@ void odyssey2_state::machine_start()
 	save_item(NAME(m_p2));
 }
 
-void g7400_state::machine_start()
+void videopacp_state::machine_start()
 {
 	odyssey2_state::machine_start();
 	memset(m_ef934x_extram, 0, sizeof(m_ef934x_extram));
@@ -246,7 +273,7 @@ uint32_t odyssey2_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-uint32_t g7400_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t videopacp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	u8 lum = ~m_p1 >> 4 & 0x08;
 	bitmap_ind16 *ef934x_bitmap = m_ef934x->get_bitmap();
@@ -375,19 +402,19 @@ READ_LINE_MEMBER(odyssey2_state::t1_read)
 
 // G7400-specific
 
-uint8_t g7400_state::io_read(offs_t offset)
+uint8_t videopacp_state::io_read(offs_t offset)
 {
 	u8 data = odyssey2_state::io_read(offset);
 	return io_vpp(offset, data);
 }
 
-void g7400_state::io_write(offs_t offset, uint8_t data)
+void videopacp_state::io_write(offs_t offset, uint8_t data)
 {
 	odyssey2_state::io_write(offset, data);
 	io_vpp(offset, data);
 }
 
-uint8_t g7400_state::io_vpp(offs_t offset, uint8_t data)
+uint8_t videopacp_state::io_vpp(offs_t offset, uint8_t data)
 {
 	if (!(m_p1 & 0x20))
 	{
@@ -401,14 +428,14 @@ uint8_t g7400_state::io_vpp(offs_t offset, uint8_t data)
 	return data;
 }
 
-void g7400_state::p2_write(uint8_t data)
+void videopacp_state::p2_write(uint8_t data)
 {
 	odyssey2_state::p2_write(data);
 	m_i8243->p2_w(m_p2 & 0x0f);
 }
 
 template<int P>
-void g7400_state::i8243_port_w(uint8_t data)
+void videopacp_state::i8243_port_w(uint8_t data)
 {
 	// P4,P5: color mix I8244 side (IC674)
 	// P6,P7: color mix EF9340 side (IC678)
@@ -430,7 +457,7 @@ void g7400_state::i8243_port_w(uint8_t data)
 
 // EF9341 extended RAM
 
-offs_t g7400_state::ef934x_extram_address(offs_t offset)
+offs_t videopacp_state::ef934x_extram_address(offs_t offset)
 {
 	u8 latch = (offset >> 12 & 0x80) | (offset >> 4 & 0x7f);
 	u16 address = (latch & 0x1f) | (offset << 9 & 0x200) | (latch << 3 & 0x400);
@@ -441,12 +468,12 @@ offs_t g7400_state::ef934x_extram_address(offs_t offset)
 		return address | (offset << 4 & 0x60) | (latch << 2 & 0x180);
 }
 
-uint8_t g7400_state::ef934x_extram_r(offs_t offset)
+uint8_t videopacp_state::ef934x_extram_r(offs_t offset)
 {
 	return m_ef934x_extram[ef934x_extram_address(offset)];
 }
 
-void g7400_state::ef934x_extram_w(offs_t offset, uint8_t data)
+void videopacp_state::ef934x_extram_w(offs_t offset, uint8_t data)
 {
 	m_ef934x_extram[ef934x_extram_address(offset)] = data;
 }
@@ -533,7 +560,7 @@ static INPUT_PORTS_START( odyssey2 )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=')
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Y / Yes") PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("N / No") PORT_CODE(KEYCODE_N) PORT_CHAR('N')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Clear") PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL_PAD) PORT_CHAR(8)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Clear") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
 
 	PORT_START("KEY.6")
@@ -617,7 +644,7 @@ static INPUT_PORTS_START( g7400 )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"=  \u2192") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Y / Yes") PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("N / No") PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Clear  ;") PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL_PAD) PORT_CHAR(8) PORT_CHAR(';')
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Clear  ;") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8) PORT_CHAR(';')
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Enter  _") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(10) PORT_CHAR('_')
 
 	PORT_MODIFY("KEY.6")
@@ -674,8 +701,7 @@ void odyssey2_state::odyssey2(machine_config &config)
 
 	/* cartridge */
 	O2_CART_SLOT(config, m_cart, o2_cart, nullptr);
-	SOFTWARE_LIST(config, "cart_list").set_original("odyssey2").set_filter("O2");
-	SOFTWARE_LIST(config, "g7400_list").set_compatible("g7400").set_filter("O2");
+	SOFTWARE_LIST(config, "cart_list").set_original("videopac").set_filter("O2");
 }
 
 void odyssey2_state::videopac(machine_config &config)
@@ -692,7 +718,6 @@ void odyssey2_state::videopac(machine_config &config)
 	m_maincpu->set_clock(17.734476_MHz_XTAL / 3);
 
 	subdevice<software_list_device>("cart_list")->set_filter("VP");
-	subdevice<software_list_device>("g7400_list")->set_filter("VP");
 }
 
 void odyssey2_state::videopacf(machine_config &config)
@@ -705,38 +730,38 @@ void odyssey2_state::videopacf(machine_config &config)
 }
 
 
-void g7400_state::g7400(machine_config &config)
+void videopacp_state::g7400(machine_config &config)
 {
 	/* basic machine hardware */
 	I8048(config, m_maincpu, 5.911_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &g7400_state::odyssey2_mem);
-	m_maincpu->set_addrmap(AS_IO, &g7400_state::odyssey2_io);
-	m_maincpu->p1_out_cb().set(FUNC(g7400_state::p1_write));
-	m_maincpu->p2_in_cb().set(FUNC(g7400_state::p2_read));
-	m_maincpu->p2_out_cb().set(FUNC(g7400_state::p2_write));
-	m_maincpu->bus_in_cb().set(FUNC(g7400_state::bus_read));
+	m_maincpu->set_addrmap(AS_PROGRAM, &videopacp_state::odyssey2_mem);
+	m_maincpu->set_addrmap(AS_IO, &videopacp_state::odyssey2_io);
+	m_maincpu->p1_out_cb().set(FUNC(videopacp_state::p1_write));
+	m_maincpu->p2_in_cb().set(FUNC(videopacp_state::p2_read));
+	m_maincpu->p2_out_cb().set(FUNC(videopacp_state::p2_write));
+	m_maincpu->bus_in_cb().set(FUNC(videopacp_state::bus_read));
 	m_maincpu->t0_in_cb().set("cartslot", FUNC(o2_cart_slot_device::t0_read));
-	m_maincpu->t1_in_cb().set(FUNC(g7400_state::t1_read));
+	m_maincpu->t1_in_cb().set(FUNC(videopacp_state::t1_read));
 	m_maincpu->prog_out_cb().set(m_i8243, FUNC(i8243_device::prog_w));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_screen_update(FUNC(g7400_state::screen_update));
+	m_screen->set_screen_update(FUNC(videopacp_state::screen_update));
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", m_i8244, FUNC(i8244_device::i8244_palette), 16);
 
 	I8243(config, m_i8243);
-	m_i8243->p4_out_cb().set(FUNC(g7400_state::i8243_port_w<0>));
-	m_i8243->p5_out_cb().set(FUNC(g7400_state::i8243_port_w<1>));
-	m_i8243->p6_out_cb().set(FUNC(g7400_state::i8243_port_w<2>));
-	m_i8243->p7_out_cb().set(FUNC(g7400_state::i8243_port_w<3>));
+	m_i8243->p4_out_cb().set(FUNC(videopacp_state::i8243_port_w<0>));
+	m_i8243->p5_out_cb().set(FUNC(videopacp_state::i8243_port_w<1>));
+	m_i8243->p6_out_cb().set(FUNC(videopacp_state::i8243_port_w<2>));
+	m_i8243->p7_out_cb().set(FUNC(videopacp_state::i8243_port_w<3>));
 
 	EF9340_1(config, m_ef934x, (8.867_MHz_XTAL * 2) / 5, "screen");
 	m_ef934x->set_offsets(15, 5);
-	m_ef934x->read_exram().set(FUNC(g7400_state::ef934x_extram_r));
-	m_ef934x->write_exram().set(FUNC(g7400_state::ef934x_extram_w));
+	m_ef934x->read_exram().set(FUNC(videopacp_state::ef934x_extram_r));
+	m_ef934x->write_exram().set(FUNC(videopacp_state::ef934x_extram_w));
 
 	I8245(config, m_i8244, (8.867_MHz_XTAL * 2) / 5);
 	m_i8244->set_screen("screen");
@@ -748,11 +773,10 @@ void g7400_state::g7400(machine_config &config)
 
 	/* cartridge */
 	O2_CART_SLOT(config, m_cart, o2_cart, nullptr);
-	SOFTWARE_LIST(config, "cart_list").set_original("g7400").set_filter("VPP");
-	SOFTWARE_LIST(config, "ody2_list").set_compatible("odyssey2").set_filter("VPP");
+	SOFTWARE_LIST(config, "cart_list").set_original("videopac").set_filter("VPP");
 }
 
-void g7400_state::jo7400(machine_config &config)
+void videopacp_state::jo7400(machine_config &config)
 {
 	g7400(config);
 
@@ -761,7 +785,7 @@ void g7400_state::jo7400(machine_config &config)
 	m_ef934x->set_clock(3.5625_MHz_XTAL);
 }
 
-void g7400_state::odyssey3(machine_config &config)
+void videopacp_state::odyssey3(machine_config &config)
 {
 	g7400(config);
 
@@ -781,7 +805,6 @@ void g7400_state::odyssey3(machine_config &config)
 	PALETTE(config.replace(), "palette", FUNC(odyssey2_state::odyssey2_palette), 16);
 
 	subdevice<software_list_device>("cart_list")->set_filter("O3");
-	subdevice<software_list_device>("ody2_list")->set_filter("O3");
 }
 
 
@@ -790,12 +813,12 @@ void g7400_state::odyssey3(machine_config &config)
     ROM Definitions
 ******************************************************************************/
 
-ROM_START (odyssey2)
+ROM_START (videopac)
 	ROM_REGION(0x0400,"maincpu",0)
 	ROM_LOAD ("o2bios.rom", 0x0000, 0x0400, CRC(8016a315) SHA1(b2e1955d957a475de2411770452eff4ea19f4cee))
 ROM_END
 
-ROM_START (videopac)
+ROM_START (odyssey2)
 	ROM_REGION(0x0400,"maincpu",0)
 	ROM_LOAD ("o2bios.rom", 0x0000, 0x0400, CRC(8016a315) SHA1(b2e1955d957a475de2411770452eff4ea19f4cee))
 ROM_END
@@ -806,7 +829,7 @@ ROM_START (videopacf)
 ROM_END
 
 
-ROM_START (g7400)
+ROM_START (videopacp)
 	ROM_REGION(0x0400,"maincpu",0)
 	ROM_LOAD ("g7400.bin", 0x0000, 0x0400, CRC(e20a9f41) SHA1(5130243429b40b01a14e1304d0394b8459a6fbae))
 ROM_END
@@ -829,11 +852,11 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME       PARENT   CMP MACHINE    INPUT     STATE           INIT        COMPANY, FULLNAME, FLAGS
-COMP( 1979, odyssey2,  0,        0, odyssey2,  odyssey2, odyssey2_state, empty_init, "Magnavox", "Odyssey 2 (US)", MACHINE_SUPPORTS_SAVE )
-COMP( 1978, videopac,  odyssey2, 0, videopac,  odyssey2, odyssey2_state, empty_init, "Philips", "Videopac G7000 (Europe)", MACHINE_SUPPORTS_SAVE )
-COMP( 1979, videopacf, odyssey2, 0, videopacf, odyssey2, odyssey2_state, empty_init, "Philips", "Videopac C52 (France)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT    CMP MACHINE    INPUT     STATE            INIT        COMPANY, FULLNAME, FLAGS
+COMP( 1978, videopac,  0,         0, videopac,  odyssey2, odyssey2_state,  empty_init, "Philips", "Videopac G7000 (Europe)", MACHINE_SUPPORTS_SAVE )
+COMP( 1979, videopacf, videopac,  0, videopacf, odyssey2, odyssey2_state,  empty_init, "Philips", "Videopac C52 (France)", MACHINE_SUPPORTS_SAVE )
+COMP( 1979, odyssey2,  videopac,  0, odyssey2,  odyssey2, odyssey2_state,  empty_init, "Magnavox", "Odyssey 2 (US)", MACHINE_SUPPORTS_SAVE )
 
-COMP( 1983, g7400,     0,        0, g7400,     g7400,    g7400_state,    empty_init, "Philips", "Videopac+ G7400 (Europe)", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, jopac,     g7400,    0, jo7400,    g7400,    g7400_state,    empty_init, "Philips (Brandt license)", "Jopac JO7400 (France)", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, odyssey3,  g7400,    0, odyssey3,  g7400,    g7400_state,    empty_init, "Magnavox", "Odyssey 3 Command Center (US, prototype)", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, videopacp, 0,         0, g7400,     g7400,    videopacp_state, empty_init, "Philips", "Videopac+ G7400 (Europe)", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, jopac,     videopacp, 0, jo7400,    g7400,    videopacp_state, empty_init, "Philips (Brandt license)", "Jopac JO7400 (France)", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, odyssey3,  videopacp, 0, odyssey3,  g7400,    videopacp_state, empty_init, "Philips", "Odyssey 3 Command Center (US, prototype)", MACHINE_SUPPORTS_SAVE )

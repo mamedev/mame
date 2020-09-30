@@ -8,13 +8,12 @@
 
 ***************************************************************************/
 
-#include <cassert>
-
 #include "xmlfile.h"
 
 #include <expat.h>
 
 #include <algorithm>
+#include <cassert>
 #include <cctype>
 #include <cstdlib>
 #include <cstring>
@@ -33,6 +32,37 @@ namespace {
 
 constexpr unsigned TEMP_BUFFER_SIZE(4096U);
 std::locale const f_portable_locale("C");
+
+
+/***************************************************************************
+    UTILITY FUNCTIONS
+***************************************************************************/
+
+void write_escaped(core_file &file, std::string const &str)
+{
+	std::string::size_type pos = 0;
+	while ((str.size() > pos) && (std::string::npos != pos))
+	{
+		std::string::size_type const found = str.find_first_of("\"&<>", pos);
+		if (found != std::string::npos)
+		{
+			file.write(&str[pos], found - pos);
+			switch (str[found])
+			{
+			case '"': file.puts("&quot;"); pos = found + 1; break;
+			case '&': file.puts("&amp;");  pos = found + 1; break;
+			case '<': file.puts("&lt;");   pos = found + 1; break;
+			case '>': file.puts("&gt;");   pos = found + 1; break;
+			default: pos = found;
+			}
+		}
+		else
+		{
+			file.write(&str[pos], str.size() - pos);
+			pos = found;
+		}
+	}
+}
 
 } // anonymous namespace
 
@@ -269,14 +299,24 @@ void data_node::trim_whitespace()
     number of child nodes
 -------------------------------------------------*/
 
-int data_node::count_children() const
+std::size_t data_node::count_children() const
 {
-	int count = 0;
-
 	/* loop over children and count */
+	std::size_t count = 0;
 	for (data_node const *node = get_first_child(); node; node = node->get_next_sibling())
 		count++;
 	return count;
+}
+
+
+/*-------------------------------------------------
+    data_node::count_children - count the
+    number of child nodes
+-------------------------------------------------*/
+
+std::size_t data_node::count_attributes() const
+{
+	return m_attributes.size();
 }
 
 
@@ -582,7 +622,7 @@ const char *data_node::get_attribute_string(const char *attribute, const char *d
     found, return = the provided default
 -------------------------------------------------*/
 
-int data_node::get_attribute_int(const char *attribute, int defvalue) const
+long long data_node::get_attribute_int(const char *attribute, long long defvalue) const
 {
 	char const *const string = get_attribute_string(attribute, nullptr);
 	if (!string)
@@ -590,20 +630,20 @@ int data_node::get_attribute_int(const char *attribute, int defvalue) const
 
 	std::istringstream stream;
 	stream.imbue(f_portable_locale);
-	int result;
+	long long result;
 	if (string[0] == '$')
 	{
 		stream.str(&string[1]);
-		unsigned uvalue;
+		unsigned long long uvalue;
 		stream >> std::hex >> uvalue;
-		result = int(uvalue);
+		result = static_cast<long long>(uvalue);
 	}
 	else if ((string[0] == '0') && ((string[1] == 'x') || (string[1] == 'X')))
 	{
 		stream.str(&string[2]);
-		unsigned uvalue;
+		unsigned long long uvalue;
 		stream >> std::hex >> uvalue;
-		result = int(uvalue);
+		result = static_cast<long long>(uvalue);
 	}
 	else if (string[0] == '#')
 	{
@@ -690,7 +730,7 @@ void data_node::set_attribute(const char *name, const char *value)
     integer value on the node
 -------------------------------------------------*/
 
-void data_node::set_attribute_int(const char *name, int value)
+void data_node::set_attribute_int(const char *name, long long value)
 {
 	set_attribute(name, string_format(f_portable_locale, "%d", value).c_str());
 }
@@ -941,9 +981,13 @@ void data_node::write_recursive(int indent, util::core_file &file) const
 		/* output this tag */
 		file.printf("%*s<%s", indent, "", get_name());
 
-		/* output any attributes */
+		/* output any attributes, escaping as necessary */
 		for (attribute_node const &anode : m_attributes)
-			file.printf(" %s=\"%s\"", anode.name, anode.value);
+		{
+			file.printf(" %s=\"", anode.name);
+			write_escaped(file, anode.value);
+			file.puts("\"");
+		}
 
 		if (!get_first_child() && !get_value())
 		{
@@ -956,8 +1000,12 @@ void data_node::write_recursive(int indent, util::core_file &file) const
 			file.printf(">\n");
 
 			/* if there is a value, output that here */
-			if (get_value())
-				file.printf("%*s%s\n", indent + 4, "", get_value());
+			if (!m_value.empty())
+			{
+				file.printf("%*s", indent + 4, "");
+				write_escaped(file, m_value);
+				file.puts("\n");
+			}
 
 			/* loop over children and output them as well */
 			if (get_first_child())

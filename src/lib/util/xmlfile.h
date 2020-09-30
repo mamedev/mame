@@ -89,8 +89,9 @@ public:
 	data_node *get_parent() { return m_parent; }
 	data_node const *get_parent() const { return m_parent; }
 
-	// count the number of child nodes
-	int count_children() const;
+	// count the number of children
+	std::size_t count_children() const;
+	std::size_t count_attributes() const;
 
 	// get the first child
 	data_node *get_first_child() { return m_first_child; }
@@ -138,7 +139,7 @@ public:
 	const char *get_attribute_string(const char *attribute, const char *defvalue) const;
 
 	// return the integer value of an attribute, or the specified default if not present
-	int get_attribute_int(const char *attribute, int defvalue) const;
+	long long get_attribute_int(const char *attribute, long long defvalue) const;
 
 	// return the format of the given integer attribute
 	int_format get_attribute_int_format(const char *attribute) const;
@@ -150,7 +151,7 @@ public:
 	void set_attribute(const char *name, const char *value);
 
 	// set the integer value of an attribute
-	void set_attribute_int(const char *name, int value);
+	void set_attribute_int(const char *name, long long value);
 
 	// set the float value of an attribute
 	void set_attribute_float(const char *name, float value);

@@ -67,7 +67,6 @@ public:
 	void set_via_data(uint8_t dat) { via_data = dat; }
 	uint8_t get_via_clock() { return via_clock; }
 	void set_adb_line(int linestate) { adb_in = (linestate == ASSERT_LINE) ? true : false; }
-	int get_adb_dtime() { return m_adb_dtime; }
 
 	int rom_offset;
 
@@ -76,7 +75,8 @@ public:
 	auto via_clock_callback() { return write_via_clock.bind(); }
 	auto via_data_callback() { return write_via_data.bind(); }
 
-	devcb_write_line write_reset, write_linechange, write_via_clock, write_via_data;
+	devcb_write_line write_reset, write_linechange;
+	devcb_write_line write_via_clock, write_via_data;
 
 	void egret_map(address_map &map);
 protected:

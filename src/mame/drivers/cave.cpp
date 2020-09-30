@@ -222,7 +222,7 @@ void cave_state::videoregs_w(offs_t offset, u16 data, u16 mem_mask)
 	COMBINE_DATA(&m_videoregs[Chip][offset]);
 	offset <<= 1;
 	// offset 0x04 and 0x06 is offset related?
-	// offset 0x0a is position mode toggle in bit 13-12 (seperated for X and Y?), other bits used but unknown
+	// offset 0x0a is position mode toggle in bit 13-12 (separated for X and Y?), other bits used but unknown
 	// offset 0x68 or 0x78 is commonly watchdog or DMA command?
 	// offset 0x6c or 0x7c is encryption key or CRTC or something else?
 	// offset 0x6e is commonly communication when sound CPU exists
@@ -236,7 +236,7 @@ void cave_state::videoregs_w(offs_t offset, u16 data, u16 mem_mask)
 		offset != 0x68 &&
 		offset != 0x6e &&
 		offset != 0x78)
-		logerror("%s: Unknown videoregs #%02X writtten %04X = %04X & %04X\n",
+		logerror("%s: Unknown videoregs #%02X written %04X = %04X & %04X\n",
 			machine().describe_context(), Chip, offset, data, mem_mask);
 }
 
@@ -1186,6 +1186,31 @@ void cave_state::paceight_map(address_map &map)
 	map(0xe00001, 0xe00001).w(FUNC(cave_state::tjumpman_eeprom_w));                                  // EEPROM
 }
 
+
+/***************************************************************************
+                                   Pac-Carnival
+***************************************************************************/
+
+//TODO: leds need verifying
+
+void cave_state::paccarn_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();                                                                   // ROM
+	map(0x100000, 0x10ffff).ram().share("nvram");                                                    // RAM (battery)
+	map(0x200000, 0x20ffff).ram().share("spriteram.0");                                              // Sprites
+	map(0x300000, 0x307fff).m(m_tilemap[0], FUNC(tilemap038_device::vram_map));                      // Layer 0
+	map(0x400000, 0x40007f).w(FUNC(cave_state::videoregs_w<0>)).share("videoregs.0");                // Video Regs
+	map(0x400000, 0x400007).r(FUNC(cave_state::irq_cause_r));                                        // IRQ Cause
+	map(0x400068, 0x400069).w("watchdog", FUNC(watchdog_timer_device::reset16_w));                   // Watchdog
+	map(0x500000, 0x500001).portr("IN0");                                                            // Inputs + EEPROM + Hopper
+	map(0x500002, 0x500003).portr("IN1");                                                            // Inputs
+	map(0x600000, 0x600005).w(m_tilemap[0], FUNC(tilemap038_device::vregs_w));                       // Layer 0 Control
+	map(0x700000, 0x70ffff).ram().w(m_palette[0], FUNC(palette_device::write16)).share("palette.0"); // Palette
+	map(0x800001, 0x800001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));   // M6295
+	map(0xc00000, 0xc00001).w(FUNC(cave_state::pacslot_leds_w));                                     // Leds + Hopper
+	map(0xe00001, 0xe00001).w(FUNC(cave_state::tjumpman_eeprom_w));                                  // EEPROM
+}
+
 /***************************************************************************
                                     Uo Poko
 ***************************************************************************/
@@ -1690,6 +1715,28 @@ static INPUT_PORTS_START( paceight )
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME( "Right" ) PORT_CODE(KEYCODE_N)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Max Bet" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( paccarn ) // holding together Bet 4 and Bet 8 activates Bet 12 in IO Test Mode
+	PORT_START("IN0")
+	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(10) // credits (impulse needed to coin up reliably)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME( "Bet 4" )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "Bet 2" )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(cave_state, tjumpman_hopper_r)
+
+	PORT_START("IN1")
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_CONFNAME( 0x08, 0x08, "Self Test" )
+	PORT_CONFSETTING(    0x08, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME( "Bet 8" )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Bet 3" )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(10) // medal (impulse needed to coin up reliably)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ppsatan )
@@ -2404,6 +2451,12 @@ void cave_state::paceight(machine_config &config)
 {
 	pacslot(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::paceight_map);
+}
+
+void cave_state::paccarn(machine_config &config)
+{
+	pacslot(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::paccarn_map);
 }
 
 /***************************************************************************
@@ -4099,6 +4152,51 @@ ROM_END
 
 /***************************************************************************
 
+  Pac-Carnival by Namco, 1996
+  Namco N-44 EM VIDEO platform, PCB B0445
+
+  TMP 68HC000P-16
+
+  013 9341E7005
+  038 9429WX704
+
+  OKI M6295 x 2
+
+  Battery
+  93C46 EEPROM (at U24)
+
+  28MHz XTAL
+
+  TODO: doesn't boot. Can be tricked via debugger:
+        when stuck at PC 0x16628, do PC = 0x1662a
+***************************************************************************/
+
+ROM_START( paccarn )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "pl1-mpr0b.u41", 0x00000, 0x80000, CRC(ef6b08ea) SHA1(61fe4db433a154233c4e1efd248ad51ba1d265d0) )
+
+	ROM_REGION( 0x100000, "sprites0", 0 )
+	ROM_LOAD16_BYTE( "pl1-obj0.u52", 0x00000, 0x80000, CRC(1dd7c292) SHA1(e78d4be35c24616a1954910039e381869246a246) )
+	ROM_LOAD16_BYTE( "pl1-obj1.u53", 0x00001, 0x80000, CRC(7b9935d0) SHA1(ef05230689124d0999ba9e472968e04d6e75c405) )
+
+	ROM_REGION( 0x80000, "layer0", 0 )
+	ROM_LOAD16_BYTE( "pl1-cha0.u60", 0x00000, 0x40000, CRC(7977662e) SHA1(5aaa69ffaa62b20196a7b638232716b7c6391490) )
+	ROM_LOAD16_BYTE( "pl1-cha1.u61", 0x00001, 0x40000, CRC(2150eafa) SHA1(e744a0861ee8a76c2bb24f681df38966df5dc9f0) )
+
+	ROM_REGION( 0x40000, "oki1", 0 )
+	ROM_LOAD( "pl1-voi0.u27", 0x00000, 0x40000, CRC(e22b87e3) SHA1(83a6952fb0f695bb74cc5a3a1e24a916b6de9c8e) )
+
+	ROM_REGION( 0x40000, "oki2", ROMREGION_ERASE00 )
+	// empty ROM socket
+
+	ROM_REGION( 0x117 * 3, "plds", 0 ) // all protected
+	ROM_LOAD( "n44u1b.u1",   0x117*0, 0x117, NO_DUMP )
+	ROM_LOAD( "n44u3b.u3",   0x117*1, 0x117, NO_DUMP )
+	ROM_LOAD( "n44u51a.u51", 0x117*2, 0x117, NO_DUMP )
+ROM_END
+
+/***************************************************************************
+
   Poka Poka Satan - wack-a-mole game with one frontal upright screen and two
                     table-top touch screens to bang on with plastic "hammers"
 
@@ -5255,8 +5353,9 @@ GAME( 1996, agalletah,  agallet,  sailormn, cave,     cave_state, init_agallet, 
 
 GAME( 1996, hotdogst,   0,        hotdogst, cave,     cave_state, init_hotdogst,  ROT90,  "Marble (Ace International license)",     "Hotdog Storm (Korea)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1996, pacslot,    0,        pacslot,  pacslot,  cave_state, init_tjumpman,  ROT0,   "Namco",                                  "Pac-Slot",  MACHINE_SUPPORTS_SAVE )
-GAME( 1996, paceight,   0,        paceight, paceight, cave_state, init_tjumpman,  ROT0,   "Namco",                                  "Pac-Eight", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, pacslot,    0,        pacslot,  pacslot,  cave_state, init_tjumpman,  ROT0,   "Namco",                                  "Pac-Slot",     MACHINE_SUPPORTS_SAVE )
+GAME( 1996, paceight,   0,        paceight, paceight, cave_state, init_tjumpman,  ROT0,   "Namco",                                  "Pac-Eight",    MACHINE_SUPPORTS_SAVE )
+GAME( 1996, paccarn,    0,        paccarn,  paccarn,  cave_state, init_tjumpman,  ROT0,   "Namco",                                  "Pac-Carnival", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // stuck at boot. See ROM_LOAD for infos on how to get it to start via debugger
 
 GAME( 1996, ppsatan,    0,        ppsatan,  ppsatan,  cave_state, init_ppsatan,   ROT0,   "Kato Seisakujo Co., Ltd.",               "Poka Poka Satan (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 

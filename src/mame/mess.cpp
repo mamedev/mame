@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    mess.c
+    mess.cpp
 
     Specific (per target) constants
 

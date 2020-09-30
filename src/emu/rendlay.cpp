@@ -9,12 +9,14 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "render.h"
+#include "rendlay.h"
 
 #include "emuopts.h"
-#include "render.h"
 #include "rendfont.h"
-#include "rendlay.h"
 #include "rendutil.h"
+#include "video/rgbutil.h"
+
 #include "vecstream.h"
 #include "xmlfile.h"
 
@@ -31,6 +33,13 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
+
+#define LOG_GROUP_BOUNDS_RESOLUTION (1U << 1)
+#define LOG_INTERACTIVE_ITEMS       (1U << 2)
+
+//#define VERBOSE (LOG_GROUP_BOUNDS_RESOLUTION | LOG_INTERACTIVE_ITEMS)
+#define LOG_OUTPUT_FUNC osd_printf_verbose
+#include "logmacro.h"
 
 
 
@@ -518,6 +527,39 @@ private:
 		return expand(str, str + strlen(str));
 	}
 
+	int parse_int(char const *begin, char const *end, int defvalue)
+	{
+		std::istringstream stream;
+		stream.imbue(f_portable_locale);
+		int result;
+		if (begin[0] == '$')
+		{
+			stream.str(std::string(begin + 1, end));
+			unsigned uvalue;
+			stream >> std::hex >> uvalue;
+			result = int(uvalue);
+		}
+		else if ((begin[0] == '0') && ((begin[1] == 'x') || (begin[1] == 'X')))
+		{
+			stream.str(std::string(begin + 2, end));
+			unsigned uvalue;
+			stream >> std::hex >> uvalue;
+			result = int(uvalue);
+		}
+		else if (begin[0] == '#')
+		{
+			stream.str(std::string(begin + 1, end));
+			stream >> result;
+		}
+		else
+		{
+			stream.str(std::string(begin, end));
+			stream >> result;
+		}
+
+		return stream ? result : defvalue;
+	}
+
 	std::string parameter_name(util::xml::data_node const &node)
 	{
 		char const *const attrib(node.get_attribute_string("name", nullptr));
@@ -547,8 +589,15 @@ private:
 	bool m_cached = false;
 
 public:
-	explicit layout_environment(device_t &device) : m_device(device) { }
-	explicit layout_environment(layout_environment &next) : m_device(next.m_device), m_next(&next) { }
+	explicit layout_environment(device_t &device)
+		: m_device(device)
+	{
+	}
+	explicit layout_environment(layout_environment &next)
+		: m_device(next.m_device)
+		, m_next(&next)
+	{
+	}
 	layout_environment(layout_environment const &) = delete;
 
 	device_t &device() { return m_device; }
@@ -706,35 +755,7 @@ public:
 
 		// similar to what XML nodes do
 		std::pair<char const *, char const *> const expanded(expand(attrib));
-		std::istringstream stream;
-		stream.imbue(f_portable_locale);
-		int result;
-		if (expanded.first[0] == '$')
-		{
-			stream.str(std::string(expanded.first + 1, expanded.second));
-			unsigned uvalue;
-			stream >> std::hex >> uvalue;
-			result = int(uvalue);
-		}
-		else if ((expanded.first[0] == '0') && ((expanded.first[1] == 'x') || (expanded.first[1] == 'X')))
-		{
-			stream.str(std::string(expanded.first + 2, expanded.second));
-			unsigned uvalue;
-			stream >> std::hex >> uvalue;
-			result = int(uvalue);
-		}
-		else if (expanded.first[0] == '#')
-		{
-			stream.str(std::string(expanded.first + 1, expanded.second));
-			stream >> result;
-		}
-		else
-		{
-			stream.str(std::string(expanded.first, expanded.second));
-			stream >> result;
-		}
-
-		return stream ? result : defvalue;
+		return parse_int(expanded.first, expanded.second, defvalue);
 	}
 
 	float get_attribute_float(util::xml::data_node const &node, char const *name, float defvalue)
@@ -749,6 +770,23 @@ public:
 		stream.imbue(f_portable_locale);
 		float result;
 		return (stream >> result) ? result : defvalue;
+	}
+
+	bool get_attribute_bool(util::xml::data_node const &node, char const *name, bool defvalue)
+	{
+		char const *const attrib(node.get_attribute_string(name, nullptr));
+		if (!attrib)
+			return defvalue;
+
+		// first try yes/no strings
+		std::pair<char const *, char const *> const expanded(expand(attrib));
+		if (!std::strcmp("yes", expanded.first) || !std::strcmp("true", expanded.first))
+			return true;
+		if (!std::strcmp("no", expanded.first) || !std::strcmp("false", expanded.first))
+			return false;
+
+		// fall back to integer parsing
+		return parse_int(expanded.first, expanded.second, defvalue ? 1 : 0) != 0;
 	}
 
 	void parse_bounds(util::xml::data_node const *node, render_bounds &result)
@@ -826,14 +864,48 @@ public:
 		case 270:   result = ROT270;    break;
 		default:    throw layout_syntax_error(util::string_format("invalid rotate attribute %d", rotate));
 		}
-		if (!std::strcmp("yes", get_attribute_string(*node, "swapxy", "no")))
+		if (get_attribute_bool(*node, "swapxy", false))
 			result ^= ORIENTATION_SWAP_XY;
-		if (!std::strcmp("yes", get_attribute_string(*node, "flipx", "no")))
+		if (get_attribute_bool(*node, "flipx", false))
 			result ^= ORIENTATION_FLIP_X;
-		if (!std::strcmp("yes", get_attribute_string(*node, "flipy", "no")))
+		if (get_attribute_bool(*node, "flipy", false))
 			result ^= ORIENTATION_FLIP_Y;
 		return result;
 	}
+};
+
+
+class view_environment : public layout_environment
+{
+private:
+	view_environment *const m_next_view = nullptr;
+	char const *const m_name;
+	u32 const m_visibility_mask = 0U;
+	unsigned m_next_visibility_bit = 0U;
+
+public:
+	view_environment(layout_environment &next, char const *name)
+		: layout_environment(next)
+		, m_name(name)
+	{
+	}
+	view_environment(view_environment &next, bool visibility)
+		: layout_environment(next)
+		, m_next_view(&next)
+		, m_name(next.m_name)
+		, m_visibility_mask(next.m_visibility_mask | (u32(visibility ? 1 : 0) << next.m_next_visibility_bit))
+		, m_next_visibility_bit(next.m_next_visibility_bit + (visibility ? 1 : 0))
+	{
+		if (32U < m_next_visibility_bit)
+			throw layout_syntax_error(util::string_format("view '%s' contains too many visibility toggles", m_name));
+	}
+	~view_environment()
+	{
+		if (m_next_view)
+			m_next_view->m_next_visibility_bit = m_next_visibility_bit;
+	}
+
+	u32 visibility_mask() const { return m_visibility_mask; }
 };
 
 } } } // namespace emu::render::detail
@@ -868,12 +940,10 @@ layout_element::make_component_map const layout_element::s_make_component{
 
 layout_element::layout_element(environment &env, util::xml::data_node const &elemnode, const char *dirname)
 	: m_machine(env.machine())
-	, m_defstate(0)
-	, m_maxstate(0)
+	, m_defstate(env.get_attribute_int(elemnode, "defstate", -1))
+	, m_statemask(0)
+	, m_foldhigh(false)
 {
-	// get the default state
-	m_defstate = env.get_attribute_int(elemnode, "defstate", -1);
-
 	// parse components in order
 	bool first = true;
 	render_bounds bounds = { 0.0, 0.0, 0.0, 0.0 };
@@ -888,13 +958,15 @@ layout_element::layout_element(environment &env, util::xml::data_node const &ele
 
 		// accumulate bounds
 		if (first)
-			bounds = newcomp.bounds();
+			bounds = newcomp.overall_bounds();
 		else
-			union_render_bounds(bounds, newcomp.bounds());
+			union_render_bounds(bounds, newcomp.overall_bounds());
 		first = false;
 
 		// determine the maximum state
-		m_maxstate = std::max(m_maxstate, newcomp.maxstate());
+		std::pair<int, bool> const wrap(newcomp.statewrap());
+		m_statemask |= wrap.first;
+		m_foldhigh = m_foldhigh || wrap.second;
 	}
 
 	if (!m_complist.empty())
@@ -902,8 +974,8 @@ layout_element::layout_element(environment &env, util::xml::data_node const &ele
 		// determine the scale/offset for normalization
 		float xoffs = bounds.x0;
 		float yoffs = bounds.y0;
-		float xscale = 1.0f / (bounds.x1 - bounds.x0);
-		float yscale = 1.0f / (bounds.y1 - bounds.y0);
+		float xscale = 1.0F / (bounds.x1 - bounds.x0);
+		float yscale = 1.0F / (bounds.y1 - bounds.y0);
 
 		// normalize all the component bounds
 		for (component::ptr const &curcomp : m_complist)
@@ -911,7 +983,7 @@ layout_element::layout_element(environment &env, util::xml::data_node const &ele
 	}
 
 	// allocate an array of element textures for the states
-	m_elemtex.resize(m_maxstate + 1);
+	m_elemtex.resize((m_statemask + 1) << (m_foldhigh ? 1 : 0));
 }
 
 
@@ -935,7 +1007,7 @@ layout_element::~layout_element()
 
 layout_group::layout_group(util::xml::data_node const &groupnode)
 	: m_groupnode(groupnode)
-	, m_bounds{ 0.0f, 0.0f, 0.0f, 0.0f }
+	, m_bounds{ 0.0F, 0.0F, 0.0F, 0.0F }
 	, m_bounds_resolved(false)
 {
 }
@@ -1053,7 +1125,8 @@ void layout_group::resolve_bounds(environment &env, group_map &groupmap, std::ve
 	{
 		set_render_bounds_xy(m_bounds, 0.0F, 0.0F, 1.0F, 1.0F);
 		environment local(env);
-		resolve_bounds(local, m_groupnode, groupmap, seen, true, false, true);
+		bool empty(true);
+		resolve_bounds(local, m_groupnode, groupmap, seen, empty, false, false, true);
 	}
 	seen.pop_back();
 }
@@ -1063,10 +1136,13 @@ void layout_group::resolve_bounds(
 		util::xml::data_node const &parentnode,
 		group_map &groupmap,
 		std::vector<layout_group const *> &seen,
-		bool empty,
+		bool &empty,
+		bool vistoggle,
 		bool repeat,
 		bool init)
 {
+	LOGMASKED(LOG_GROUP_BOUNDS_RESOLUTION, "Group '%s' resolve bounds empty=%s vistoggle=%s repeat=%s init=%s\n",
+			parentnode.get_attribute_string("name", ""), empty, vistoggle, repeat, init);
 	bool envaltered(false);
 	bool unresolved(true);
 	for (util::xml::data_node const *itemnode = parentnode.get_first_child(); !m_bounds_resolved && itemnode; itemnode = itemnode->get_next_sibling())
@@ -1082,6 +1158,7 @@ void layout_group::resolve_bounds(
 			envaltered = true;
 			if (!unresolved)
 			{
+				LOGMASKED(LOG_GROUP_BOUNDS_RESOLUTION, "Environment altered%s, unresolving groups\n", envaltered ? " again" : "");
 				unresolved = true;
 				for (group_map::value_type &group : groupmap)
 					group.second.set_bounds_unresolved();
@@ -1106,6 +1183,9 @@ void layout_group::resolve_bounds(
 			else
 				union_render_bounds(m_bounds, itembounds);
 			empty = false;
+			LOGMASKED(LOG_GROUP_BOUNDS_RESOLUTION, "Accumulate item bounds (%s %s %s %s) -> (%s %s %s %s)\n",
+					itembounds.x0, itembounds.y0, itembounds.x1, itembounds.y1,
+					m_bounds.x0, m_bounds.y0, m_bounds.x1, m_bounds.y1);
 		}
 		else if (!strcmp(itemnode->get_name(), "group"))
 		{
@@ -1119,6 +1199,10 @@ void layout_group::resolve_bounds(
 				else
 					union_render_bounds(m_bounds, itembounds);
 				empty = false;
+				LOGMASKED(LOG_GROUP_BOUNDS_RESOLUTION, "Accumulate group '%s' reference explicit bounds (%s %s %s %s) -> (%s %s %s %s)\n",
+						itemnode->get_attribute_string("ref", ""),
+						itembounds.x0, itembounds.y0, itembounds.x1, itembounds.y1,
+						m_bounds.x0, m_bounds.y0, m_bounds.x1, m_bounds.y1);
 			}
 			else
 			{
@@ -1143,6 +1227,11 @@ void layout_group::resolve_bounds(
 				else
 					union_render_bounds(m_bounds, itembounds);
 				empty = false;
+				unresolved = false;
+				LOGMASKED(LOG_GROUP_BOUNDS_RESOLUTION, "Accumulate group '%s' reference computed bounds (%s %s %s %s) -> (%s %s %s %s)\n",
+						itemnode->get_attribute_string("ref", ""),
+						itembounds.x0, itembounds.y0, itembounds.x1, itembounds.y1,
+						m_bounds.x0, m_bounds.y0, m_bounds.x1, m_bounds.y1);
 			}
 		}
 		else if (!strcmp(itemnode->get_name(), "repeat"))
@@ -1153,9 +1242,16 @@ void layout_group::resolve_bounds(
 			environment local(env);
 			for (int i = 0; !m_bounds_resolved && (count > i); ++i)
 			{
-				resolve_bounds(local, *itemnode, groupmap, seen, empty, true, !i);
+				resolve_bounds(local, *itemnode, groupmap, seen, empty, false, true, !i);
 				local.increment_parameters();
 			}
+		}
+		else if (!strcmp(itemnode->get_name(), "collection"))
+		{
+			if (!env.get_attribute_string(*itemnode, "name", nullptr))
+				throw layout_syntax_error("collection must have name attribute");
+			environment local(env);
+			resolve_bounds(local, *itemnode, groupmap, seen, empty, true, false, true);
 		}
 		else
 		{
@@ -1165,14 +1261,19 @@ void layout_group::resolve_bounds(
 
 	if (envaltered && !unresolved)
 	{
+		LOGMASKED(LOG_GROUP_BOUNDS_RESOLUTION, "Environment was altered, marking groups unresolved\n");
 		bool const resolved(m_bounds_resolved);
 		for (group_map::value_type &group : groupmap)
 			group.second.set_bounds_unresolved();
 		m_bounds_resolved = resolved;
 	}
 
-	if (!repeat)
+	if (!vistoggle && !repeat)
+	{
+		LOGMASKED(LOG_GROUP_BOUNDS_RESOLUTION, "Marking group '%s' bounds resolved\n",
+				parentnode.get_attribute_string("name", ""));
 		m_bounds_resolved = true;
+	}
 }
 
 
@@ -1185,8 +1286,12 @@ void layout_group::resolve_bounds(
 
 render_texture *layout_element::state_texture(int state)
 {
-	assert(state <= m_maxstate);
-	if (m_elemtex[state].m_texture == nullptr)
+	if (m_foldhigh && (state & ~m_statemask))
+		state = (state & m_statemask) | (((m_statemask << 1) | 1) & ~m_statemask);
+	else
+		state &= m_statemask;
+	assert(m_elemtex.size() > state);
+	if (!m_elemtex[state].m_texture)
 	{
 		m_elemtex[state].m_element = this;
 		m_elemtex[state].m_state = state;
@@ -1204,23 +1309,26 @@ render_texture *layout_element::state_texture(int state)
 
 void layout_element::element_scale(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param)
 {
-	texture *elemtex = (texture *)param;
+	texture const &elemtex(*reinterpret_cast<texture const *>(param));
 
 	// iterate over components that are part of the current state
-	for (auto &curcomp : elemtex->m_element->m_complist)
-		if (curcomp->state() == -1 || curcomp->state() == elemtex->m_state)
+	for (auto const &curcomp : elemtex.m_element->m_complist)
+	{
+		if ((elemtex.m_state & curcomp->statemask()) == curcomp->stateval())
 		{
 			// get the local scaled bounds
+			render_bounds const compbounds(curcomp->bounds(elemtex.m_state));
 			rectangle bounds(
-					render_round_nearest(curcomp->bounds().x0 * dest.width()),
-					render_round_nearest(curcomp->bounds().x1 * dest.width()),
-					render_round_nearest(curcomp->bounds().y0 * dest.height()),
-					render_round_nearest(curcomp->bounds().y1 * dest.height()));
+					render_round_nearest(compbounds.x0 * dest.width()),
+					render_round_nearest(compbounds.x1 * dest.width()),
+					render_round_nearest(compbounds.y0 * dest.height()),
+					render_round_nearest(compbounds.y1 * dest.height()));
 			bounds &= dest.cliprect();
 
 			// based on the component type, add to the texture
-			curcomp->draw(elemtex->m_element->machine(), dest, bounds, elemtex->m_state);
+			curcomp->draw(elemtex.m_element->machine(), dest, bounds, elemtex.m_state);
 		}
+	}
 }
 
 
@@ -1231,13 +1339,10 @@ public:
 	// construction/destruction
 	image_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
 		: component(env, compnode, dirname)
-		, m_hasalpha(false)
+		, m_dirname(dirname ? dirname : "")
+		, m_imagefile(env.get_attribute_string(compnode, "file", ""))
+		, m_alphafile(env.get_attribute_string(compnode, "alphafile", ""))
 	{
-		if (dirname != nullptr)
-			m_dirname = dirname;
-		m_imagefile = env.get_attribute_string(compnode, "file", "");
-		m_alphafile = env.get_attribute_string(compnode, "alphafile", "");
-		m_file = std::make_unique<emu_file>(env.machine().options().art_path(), OPEN_FLAG_READ);
 	}
 
 protected:
@@ -1245,19 +1350,60 @@ protected:
 	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
 		if (!m_bitmap.valid())
-			load_bitmap();
+			load_bitmap(machine);
 
-		bitmap_argb32 destsub(dest, bounds);
-		render_resample_argb_bitmap_hq(destsub, m_bitmap, color());
+		render_color const c(color(state));
+		if (m_hasalpha || (1.0F > c.a))
+		{
+			bitmap_argb32 tempbitmap(dest.width(), dest.height());
+			render_resample_argb_bitmap_hq(tempbitmap, m_bitmap, c);
+			for (s32 y0 = 0, y1 = bounds.top(); bounds.bottom() >= y1; ++y0, ++y1)
+			{
+				u32 const *src(&tempbitmap.pix(y0, 0));
+				u32 *dst(&dest.pix(y1, bounds.left()));
+				for (s32 x1 = bounds.left(); bounds.right() >= x1; ++x1, ++src, ++dst)
+				{
+					rgb_t const a(*src);
+					u32 const aa(a.a());
+					if (255 == aa)
+					{
+						*dst = *src;
+					}
+					else if (aa)
+					{
+						rgb_t const b(*dst);
+						u32 const ba(b.a());
+						if (ba)
+						{
+							u32 const ca((aa * 255) + (ba * (255 - aa)));
+							*dst = rgb_t(
+									u8(ca / 255),
+									u8(((a.r() * aa * 255) + (b.r() * ba * (255 - aa))) / ca),
+									u8(((a.g() * aa * 255) + (b.g() * ba * (255 - aa))) / ca),
+									u8(((a.b() * aa * 255) + (b.b() * ba * (255 - aa))) / ca));
+						}
+						else
+						{
+							*dst = *src;
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			bitmap_argb32 destsub(dest, bounds);
+			render_resample_argb_bitmap_hq(destsub, m_bitmap, c);
+		}
 	}
 
 private:
 	// internal helpers
-	void load_bitmap()
+	void load_bitmap(running_machine &machine)
 	{
-		assert(m_file != nullptr);
+		emu_file file(machine.options().art_path(), OPEN_FLAG_READ);
 
-		ru_imgformat const format = render_detect_image(*m_file, m_dirname.c_str(), m_imagefile.c_str());
+		ru_imgformat const format = render_detect_image(file, m_dirname.c_str(), m_imagefile.c_str());
 		switch (format)
 		{
 		case RENDUTIL_IMGFORMAT_ERROR:
@@ -1265,18 +1411,18 @@ private:
 
 		case RENDUTIL_IMGFORMAT_PNG:
 			// load the basic bitmap
-			m_hasalpha = render_load_png(m_bitmap, *m_file, m_dirname.c_str(), m_imagefile.c_str());
+			m_hasalpha = render_load_png(m_bitmap, file, m_dirname.c_str(), m_imagefile.c_str());
 			break;
 
 		default:
 			// try JPG
-			render_load_jpeg(m_bitmap, *m_file, m_dirname.c_str(), m_imagefile.c_str());
+			render_load_jpeg(m_bitmap, file, m_dirname.c_str(), m_imagefile.c_str());
 			break;
 		}
 
 		// load the alpha bitmap if specified
 		if (m_bitmap.valid() && !m_alphafile.empty())
-			render_load_png(m_bitmap, *m_file, m_dirname.c_str(), m_alphafile.c_str(), true);
+			render_load_png(m_bitmap, file, m_dirname.c_str(), m_alphafile.c_str(), true);
 
 		// if we can't load the bitmap, allocate a dummy one and report an error
 		if (!m_bitmap.valid())
@@ -1298,11 +1444,10 @@ private:
 
 	// internal state
 	bitmap_argb32       m_bitmap;                   // source bitmap for images
-	std::string         m_dirname;                  // directory name of image file (for lazy loading)
-	std::unique_ptr<emu_file> m_file;               // file object for reading image/alpha files
-	std::string         m_imagefile;                // name of the image file (for lazy loading)
-	std::string         m_alphafile;                // name of the alpha file (for lazy loading)
-	bool                m_hasalpha;                 // is there any alpha component present?
+	std::string const   m_dirname;                  // directory name of image file (for lazy loading)
+	std::string const   m_imagefile;                // name of the image file (for lazy loading)
+	std::string const   m_alphafile;                // name of the alpha file (for lazy loading)
+	bool                m_hasalpha = false;         // is there any alpha component present?
 };
 
 
@@ -1320,32 +1465,39 @@ protected:
 	// overrides
 	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
-		// compute premultiplied colors
-		u32 const r = color().r * color().a * 255.0f;
-		u32 const g = color().g * color().a * 255.0f;
-		u32 const b = color().b * color().a * 255.0f;
-		u32 const inva = (1.0f - color().a) * 255.0f;
-
-		// iterate over X and Y
-		for (u32 y = bounds.top(); y <= bounds.bottom(); y++)
+		render_color const c(color(state));
+		if (1.0f <= c.a)
 		{
-			for (u32 x = bounds.left(); x <= bounds.right(); x++)
+			// optimise opaque pixels
+			u32 const f(rgb_t(u8(c.r * 255), u8(c.g * 255), u8(c.b * 255)));
+			s32 const width(bounds.width());
+			for (u32 y = bounds.top(); y <= bounds.bottom(); ++y)
+				std::fill_n(&dest.pix(y, bounds.left()), width, f);
+		}
+		else if (c.a)
+		{
+			// compute premultiplied colors
+			u32 const a(c.a * 255.0F);
+			u32 const r(c.r * c.a * (255.0F * 255.0F));
+			u32 const g(c.g * c.a * (255.0F * 255.0F));
+			u32 const b(c.b * c.a * (255.0F * 255.0F));
+			u32 const inva(255 - a);
+
+			// we're translucent, add in the destination pixel contribution
+			for (u32 y = bounds.top(); y <= bounds.bottom(); ++y)
 			{
-				u32 finalr = r;
-				u32 finalg = g;
-				u32 finalb = b;
-
-				// if we're translucent, add in the destination pixel contribution
-				if (inva > 0)
+				u32 *dst(&dest.pix(y, bounds.left()));
+				for (u32 x = bounds.left(); x <= bounds.right(); ++x, ++dst)
 				{
-					rgb_t dpix = dest.pix32(y, x);
-					finalr += (dpix.r() * inva) >> 8;
-					finalg += (dpix.g() * inva) >> 8;
-					finalb += (dpix.b() * inva) >> 8;
-				}
+					rgb_t const dpix(*dst);
+					u32 const finala((a * 255) + (dpix.a() * inva));
+					u32 const finalr(r + (dpix.r() * inva));
+					u32 const finalg(g + (dpix.g() * inva));
+					u32 const finalb(b + (dpix.b() * inva));
 
-				// store the target pixel, dividing the RGBA values by the overall scale factor
-				dest.pix32(y, x) = rgb_t(finalr, finalg, finalb);
+					// store the target pixel, dividing the RGBA values by the overall scale factor
+					*dst = rgb_t(finala / 255, finalr / finala, finalg / finala, finalb / finala);
+				}
 			}
 		}
 	}
@@ -1367,46 +1519,52 @@ protected:
 	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
 		// compute premultiplied colors
-		u32 const r = color().r * color().a * 255.0f;
-		u32 const g = color().g * color().a * 255.0f;
-		u32 const b = color().b * color().a * 255.0f;
-		u32 const inva = (1.0f - color().a) * 255.0f;
+		render_color const c(color(state));
+		u32 const f(rgb_t(u8(c.r * 255), u8(c.g * 255), u8(c.b * 255)));
+		u32 const a(c.a * 255.0F);
+		u32 const r(c.r * c.a * (255.0F * 255.0F));
+		u32 const g(c.g * c.a * (255.0F * 255.0F));
+		u32 const b(c.b * c.a * (255.0F * 255.0F));
+		u32 const inva(255 - a);
 
 		// find the center
 		float const xcenter = float(bounds.xcenter());
 		float const ycenter = float(bounds.ycenter());
-		float const xradius = float(bounds.width()) * 0.5f;
-		float const yradius = float(bounds.height()) * 0.5f;
-		float const ooyradius2 = 1.0f / (yradius * yradius);
+		float const xradius = float(bounds.width()) * 0.5F;
+		float const yradius = float(bounds.height()) * 0.5F;
+		float const ooyradius2 = 1.0F / (yradius * yradius);
 
 		// iterate over y
-		for (u32 y = bounds.top(); y <= bounds.bottom(); y++)
+		for (u32 y = bounds.top(); y <= bounds.bottom(); ++y)
 		{
-			float ycoord = ycenter - ((float)y + 0.5f);
-			float xval = xradius * sqrtf(1.0f - (ycoord * ycoord) * ooyradius2);
-
 			// compute left/right coordinates
-			s32 left = s32(xcenter - xval + 0.5f);
-			s32 right = s32(xcenter + xval + 0.5f);
+			float const ycoord = ycenter - (float(y) + 0.5F);
+			float const xval = xradius * sqrtf(1.0F - (ycoord * ycoord) * ooyradius2);
+
+			s32 const left = s32(xcenter - xval + 0.5F);
+			s32 const right = s32(xcenter + xval + 0.5F);
 
 			// draw this scanline
-			for (u32 x = left; x < right; x++)
+			if (255 <= a)
 			{
-				u32 finalr = r;
-				u32 finalg = g;
-				u32 finalb = b;
-
-				// if we're translucent, add in the destination pixel contribution
-				if (inva > 0)
+				// optimise opaque pixels
+				std::fill_n(&dest.pix(y, left), right - left, f);
+			}
+			else if (a)
+			{
+				u32 *dst(&dest.pix(y, bounds.left()));
+				for (u32 x = left; x < right; ++x, ++dst)
 				{
-					rgb_t dpix = dest.pix32(y, x);
-					finalr += (dpix.r() * inva) >> 8;
-					finalg += (dpix.g() * inva) >> 8;
-					finalb += (dpix.b() * inva) >> 8;
-				}
+					// we're translucent, add in the destination pixel contribution
+					rgb_t const dpix(*dst);
+					u32 const finala((a * 255) + (dpix.a() * inva));
+					u32 const finalr(r + (dpix.r() * inva));
+					u32 const finalg(g + (dpix.g() * inva));
+					u32 const finalb(b + (dpix.b() * inva));
 
-				// store the target pixel, dividing the RGBA values by the overall scale factor
-				dest.pix32(y, x) = rgb_t(finalr, finalg, finalb);
+					// store the target pixel, dividing the RGBA values by the overall scale factor
+					*dst = rgb_t(finala / 255, finalr / finala, finalg / finala, finalb / finala);
+				}
 			}
 		}
 	}
@@ -1430,7 +1588,7 @@ protected:
 	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
 		render_font *font = machine.render().font_alloc("default");
-		draw_text(*font, dest, bounds, m_string.c_str(), m_textalign);
+		draw_text(*font, dest, bounds, m_string.c_str(), m_textalign, color(state));
 		machine.render().font_free(font);
 	}
 
@@ -1457,14 +1615,14 @@ protected:
 
 	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
-		const rgb_t onpen = rgb_t(0xff,0xff,0xff,0xff);
-		const rgb_t offpen = rgb_t(0x20,0xff,0xff,0xff);
+		rgb_t const onpen = rgb_t(0xff, 0xff, 0xff, 0xff);
+		rgb_t const offpen = rgb_t(0x20, 0xff, 0xff, 0xff);
 
 		// sizes for computation
-		int bmwidth = 250;
-		int bmheight = 400;
-		int segwidth = 40;
-		int skewwidth = 40;
+		int const bmwidth = 250;
+		int const bmheight = 400;
+		int const segwidth = 40;
+		int const skewwidth = 40;
 
 		// allocate a temporary bitmap for drawing
 		bitmap_argb32 tempbitmap(bmwidth + skewwidth, bmheight);
@@ -1498,7 +1656,7 @@ protected:
 		draw_segment_decimal(tempbitmap, bmwidth + segwidth/2, bmheight - segwidth/2, segwidth, BIT(state, 7) ? onpen : offpen);
 
 		// resample to the target size
-		render_resample_argb_bitmap_hq(dest, tempbitmap, color());
+		render_resample_argb_bitmap_hq(dest, tempbitmap, color(state));
 	}
 };
 
@@ -1519,15 +1677,15 @@ protected:
 
 	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
-		const rgb_t onpen = rgb_t(0xff,0xff,0xff,0xff);
-		const rgb_t offpen = rgb_t(0x20,0xff,0xff,0xff);
-		const rgb_t backpen = rgb_t(0x00,0x00,0x00,0x00);
+		rgb_t const onpen = rgb_t(0xff, 0xff, 0xff, 0xff);
+		rgb_t const offpen = rgb_t(0x20, 0xff, 0xff, 0xff);
+		rgb_t const backpen = rgb_t(0x00, 0x00, 0x00, 0x00);
 
 		// sizes for computation
-		int bmwidth = 250;
-		int bmheight = 400;
-		int segwidth = 40;
-		int skewwidth = 40;
+		int const bmwidth = 250;
+		int const bmheight = 400;
+		int const segwidth = 40;
+		int const skewwidth = 40;
 
 		// allocate a temporary bitmap for drawing
 		bitmap_argb32 tempbitmap(bmwidth + skewwidth, bmheight);
@@ -1566,7 +1724,7 @@ protected:
 		apply_skew(tempbitmap, 40);
 
 		// resample to the target size
-		render_resample_argb_bitmap_hq(dest, tempbitmap, color());
+		render_resample_argb_bitmap_hq(dest, tempbitmap, color(state));
 	}
 };
 
@@ -1587,14 +1745,14 @@ protected:
 
 	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
-		const rgb_t onpen = rgb_t(0xff, 0xff, 0xff, 0xff);
-		const rgb_t offpen = rgb_t(0x20, 0xff, 0xff, 0xff);
+		rgb_t const onpen = rgb_t(0xff, 0xff, 0xff, 0xff);
+		rgb_t const offpen = rgb_t(0x20, 0xff, 0xff, 0xff);
 
 		// sizes for computation
-		int bmwidth = 250;
-		int bmheight = 400;
-		int segwidth = 40;
-		int skewwidth = 40;
+		int const bmwidth = 250;
+		int const bmheight = 400;
+		int const segwidth = 40;
+		int const skewwidth = 40;
 
 		// allocate a temporary bitmap for drawing
 		bitmap_argb32 tempbitmap(bmwidth + skewwidth, bmheight);
@@ -1602,83 +1760,83 @@ protected:
 
 		// top bar
 		draw_segment_horizontal(tempbitmap,
-			0 + 2*segwidth/3, bmwidth - 2*segwidth/3, 0 + segwidth/2,
-			segwidth, (state & (1 << 0)) ? onpen : offpen);
+				0 + 2*segwidth/3, bmwidth - 2*segwidth/3, 0 + segwidth/2,
+				segwidth, (state & (1 << 0)) ? onpen : offpen);
 
 		// right-top bar
 		draw_segment_vertical(tempbitmap,
-			0 + 2*segwidth/3, bmheight/2 - segwidth/3, bmwidth - segwidth/2,
-			segwidth, (state & (1 << 1)) ? onpen : offpen);
+				0 + 2*segwidth/3, bmheight/2 - segwidth/3, bmwidth - segwidth/2,
+				segwidth, (state & (1 << 1)) ? onpen : offpen);
 
 		// right-bottom bar
 		draw_segment_vertical(tempbitmap,
-			bmheight/2 + segwidth/3, bmheight - 2*segwidth/3, bmwidth - segwidth/2,
-			segwidth, (state & (1 << 2)) ? onpen : offpen);
+				bmheight/2 + segwidth/3, bmheight - 2*segwidth/3, bmwidth - segwidth/2,
+				segwidth, (state & (1 << 2)) ? onpen : offpen);
 
 		// bottom bar
 		draw_segment_horizontal(tempbitmap,
-			0 + 2*segwidth/3, bmwidth - 2*segwidth/3, bmheight - segwidth/2,
-			segwidth, (state & (1 << 3)) ? onpen : offpen);
+				0 + 2*segwidth/3, bmwidth - 2*segwidth/3, bmheight - segwidth/2,
+				segwidth, (state & (1 << 3)) ? onpen : offpen);
 
 		// left-bottom bar
 		draw_segment_vertical(tempbitmap,
-			bmheight/2 + segwidth/3, bmheight - 2*segwidth/3, 0 + segwidth/2,
-			segwidth, (state & (1 << 4)) ? onpen : offpen);
+				bmheight/2 + segwidth/3, bmheight - 2*segwidth/3, 0 + segwidth/2,
+				segwidth, (state & (1 << 4)) ? onpen : offpen);
 
 		// left-top bar
 		draw_segment_vertical(tempbitmap,
-			0 + 2*segwidth/3, bmheight/2 - segwidth/3, 0 + segwidth/2,
-			segwidth, (state & (1 << 5)) ? onpen : offpen);
+				0 + 2*segwidth/3, bmheight/2 - segwidth/3, 0 + segwidth/2,
+				segwidth, (state & (1 << 5)) ? onpen : offpen);
 
 		// horizontal-middle-left bar
 		draw_segment_horizontal_caps(tempbitmap,
-			0 + 2*segwidth/3, bmwidth/2 - segwidth/10, bmheight/2,
-			segwidth, LINE_CAP_START, (state & (1 << 6)) ? onpen : offpen);
+				0 + 2*segwidth/3, bmwidth/2 - segwidth/10, bmheight/2,
+				segwidth, LINE_CAP_START, (state & (1 << 6)) ? onpen : offpen);
 
 		// horizontal-middle-right bar
 		draw_segment_horizontal_caps(tempbitmap,
-			0 + bmwidth/2 + segwidth/10, bmwidth - 2*segwidth/3, bmheight/2,
-			segwidth, LINE_CAP_END, (state & (1 << 7)) ? onpen : offpen);
+				0 + bmwidth/2 + segwidth/10, bmwidth - 2*segwidth/3, bmheight/2,
+				segwidth, LINE_CAP_END, (state & (1 << 7)) ? onpen : offpen);
 
 		// vertical-middle-top bar
 		draw_segment_vertical_caps(tempbitmap,
-			0 + segwidth + segwidth/3, bmheight/2 - segwidth/2 - segwidth/3, bmwidth/2,
-			segwidth, LINE_CAP_NONE, (state & (1 << 8)) ? onpen : offpen);
+				0 + segwidth + segwidth/3, bmheight/2 - segwidth/2 - segwidth/3, bmwidth/2,
+				segwidth, LINE_CAP_NONE, (state & (1 << 8)) ? onpen : offpen);
 
 		// vertical-middle-bottom bar
 		draw_segment_vertical_caps(tempbitmap,
-			bmheight/2 + segwidth/2 + segwidth/3, bmheight - segwidth - segwidth/3, bmwidth/2,
-			segwidth, LINE_CAP_NONE, (state & (1 << 9)) ? onpen : offpen);
+				bmheight/2 + segwidth/2 + segwidth/3, bmheight - segwidth - segwidth/3, bmwidth/2,
+				segwidth, LINE_CAP_NONE, (state & (1 << 9)) ? onpen : offpen);
 
 		// diagonal-left-bottom bar
 		draw_segment_diagonal_1(tempbitmap,
-			0 + segwidth + segwidth/5, bmwidth/2 - segwidth/2 - segwidth/5,
-			bmheight/2 + segwidth/2 + segwidth/3, bmheight - segwidth - segwidth/3,
-			segwidth, (state & (1 << 10)) ? onpen : offpen);
+				0 + segwidth + segwidth/5, bmwidth/2 - segwidth/2 - segwidth/5,
+				bmheight/2 + segwidth/2 + segwidth/3, bmheight - segwidth - segwidth/3,
+				segwidth, (state & (1 << 10)) ? onpen : offpen);
 
 		// diagonal-left-top bar
 		draw_segment_diagonal_2(tempbitmap,
-			0 + segwidth + segwidth/5, bmwidth/2 - segwidth/2 - segwidth/5,
-			0 + segwidth + segwidth/3, bmheight/2 - segwidth/2 - segwidth/3,
-			segwidth, (state & (1 << 11)) ? onpen : offpen);
+				0 + segwidth + segwidth/5, bmwidth/2 - segwidth/2 - segwidth/5,
+				0 + segwidth + segwidth/3, bmheight/2 - segwidth/2 - segwidth/3,
+				segwidth, (state & (1 << 11)) ? onpen : offpen);
 
 		// diagonal-right-top bar
 		draw_segment_diagonal_1(tempbitmap,
-			bmwidth/2 + segwidth/2 + segwidth/5, bmwidth - segwidth - segwidth/5,
-			0 + segwidth + segwidth/3, bmheight/2 - segwidth/2 - segwidth/3,
-			segwidth, (state & (1 << 12)) ? onpen : offpen);
+				bmwidth/2 + segwidth/2 + segwidth/5, bmwidth - segwidth - segwidth/5,
+				0 + segwidth + segwidth/3, bmheight/2 - segwidth/2 - segwidth/3,
+				segwidth, (state & (1 << 12)) ? onpen : offpen);
 
 		// diagonal-right-bottom bar
 		draw_segment_diagonal_2(tempbitmap,
-			bmwidth/2 + segwidth/2 + segwidth/5, bmwidth - segwidth - segwidth/5,
-			bmheight/2 + segwidth/2 + segwidth/3, bmheight - segwidth - segwidth/3,
-			segwidth, (state & (1 << 13)) ? onpen : offpen);
+				bmwidth/2 + segwidth/2 + segwidth/5, bmwidth - segwidth - segwidth/5,
+				bmheight/2 + segwidth/2 + segwidth/3, bmheight - segwidth - segwidth/3,
+				segwidth, (state & (1 << 13)) ? onpen : offpen);
 
 		// apply skew
 		apply_skew(tempbitmap, 40);
 
 		// resample to the target size
-		render_resample_argb_bitmap_hq(dest, tempbitmap, color());
+		render_resample_argb_bitmap_hq(dest, tempbitmap, color(state));
 	}
 };
 
@@ -1800,7 +1958,7 @@ protected:
 		apply_skew(tempbitmap, 40);
 
 		// resample to the target size
-		render_resample_argb_bitmap_hq(dest, tempbitmap, color());
+		render_resample_argb_bitmap_hq(dest, tempbitmap, color(state));
 	}
 };
 
@@ -1821,14 +1979,14 @@ protected:
 
 	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
-		const rgb_t onpen = rgb_t(0xff, 0xff, 0xff, 0xff);
-		const rgb_t offpen = rgb_t(0x20, 0xff, 0xff, 0xff);
+		rgb_t const onpen = rgb_t(0xff, 0xff, 0xff, 0xff);
+		rgb_t const offpen = rgb_t(0x20, 0xff, 0xff, 0xff);
 
 		// sizes for computation
-		int bmwidth = 250;
-		int bmheight = 400;
-		int segwidth = 40;
-		int skewwidth = 40;
+		int const bmwidth = 250;
+		int const bmheight = 400;
+		int const segwidth = 40;
+		int const skewwidth = 40;
 
 		// allocate a temporary bitmap for drawing, adding some extra space for the tail
 		bitmap_argb32 tempbitmap(bmwidth + skewwidth, bmheight + segwidth);
@@ -1836,92 +1994,94 @@ protected:
 
 		// top bar
 		draw_segment_horizontal(tempbitmap,
-			0 + 2*segwidth/3, bmwidth - 2*segwidth/3, 0 + segwidth/2,
-			segwidth, (state & (1 << 0)) ? onpen : offpen);
+				0 + 2*segwidth/3, bmwidth - 2*segwidth/3, 0 + segwidth/2,
+				segwidth, (state & (1 << 0)) ? onpen : offpen);
 
 		// right-top bar
 		draw_segment_vertical(tempbitmap,
-			0 + 2*segwidth/3, bmheight/2 - segwidth/3, bmwidth - segwidth/2,
-			segwidth, (state & (1 << 1)) ? onpen : offpen);
+				0 + 2*segwidth/3, bmheight/2 - segwidth/3, bmwidth - segwidth/2,
+				segwidth, (state & (1 << 1)) ? onpen : offpen);
 
 		// right-bottom bar
 		draw_segment_vertical(tempbitmap,
-			bmheight/2 + segwidth/3, bmheight - 2*segwidth/3, bmwidth - segwidth/2,
-			segwidth, (state & (1 << 2)) ? onpen : offpen);
+				bmheight/2 + segwidth/3, bmheight - 2*segwidth/3, bmwidth - segwidth/2,
+				segwidth, (state & (1 << 2)) ? onpen : offpen);
 
 		// bottom bar
 		draw_segment_horizontal(tempbitmap,
-			0 + 2*segwidth/3, bmwidth - 2*segwidth/3, bmheight - segwidth/2,
-			segwidth, (state & (1 << 3)) ? onpen : offpen);
+				0 + 2*segwidth/3, bmwidth - 2*segwidth/3, bmheight - segwidth/2,
+				segwidth, (state & (1 << 3)) ? onpen : offpen);
 
 		// left-bottom bar
 		draw_segment_vertical(tempbitmap,
-			bmheight/2 + segwidth/3, bmheight - 2*segwidth/3, 0 + segwidth/2,
-			segwidth, (state & (1 << 4)) ? onpen : offpen);
+				bmheight/2 + segwidth/3, bmheight - 2*segwidth/3, 0 + segwidth/2,
+				segwidth, (state & (1 << 4)) ? onpen : offpen);
 
 		// left-top bar
 		draw_segment_vertical(tempbitmap,
-			0 + 2*segwidth/3, bmheight/2 - segwidth/3, 0 + segwidth/2,
-			segwidth, (state & (1 << 5)) ? onpen : offpen);
+				0 + 2*segwidth/3, bmheight/2 - segwidth/3, 0 + segwidth/2,
+				segwidth, (state & (1 << 5)) ? onpen : offpen);
 
 		// horizontal-middle-left bar
 		draw_segment_horizontal_caps(tempbitmap,
-			0 + 2*segwidth/3, bmwidth/2 - segwidth/10, bmheight/2,
-			segwidth, LINE_CAP_START, (state & (1 << 6)) ? onpen : offpen);
+				0 + 2*segwidth/3, bmwidth/2 - segwidth/10, bmheight/2,
+				segwidth, LINE_CAP_START, (state & (1 << 6)) ? onpen : offpen);
 
 		// horizontal-middle-right bar
 		draw_segment_horizontal_caps(tempbitmap,
-			0 + bmwidth/2 + segwidth/10, bmwidth - 2*segwidth/3, bmheight/2,
-			segwidth, LINE_CAP_END, (state & (1 << 7)) ? onpen : offpen);
+				0 + bmwidth/2 + segwidth/10, bmwidth - 2*segwidth/3, bmheight/2,
+				segwidth, LINE_CAP_END, (state & (1 << 7)) ? onpen : offpen);
 
 		// vertical-middle-top bar
 		draw_segment_vertical_caps(tempbitmap,
-			0 + segwidth + segwidth/3, bmheight/2 - segwidth/2 - segwidth/3, bmwidth/2,
-			segwidth, LINE_CAP_NONE, (state & (1 << 8)) ? onpen : offpen);
+				0 + segwidth + segwidth/3, bmheight/2 - segwidth/2 - segwidth/3, bmwidth/2,
+				segwidth, LINE_CAP_NONE, (state & (1 << 8)) ? onpen : offpen);
 
 		// vertical-middle-bottom bar
 		draw_segment_vertical_caps(tempbitmap,
-			bmheight/2 + segwidth/2 + segwidth/3, bmheight - segwidth - segwidth/3, bmwidth/2,
-			segwidth, LINE_CAP_NONE, (state & (1 << 9)) ? onpen : offpen);
+				bmheight/2 + segwidth/2 + segwidth/3, bmheight - segwidth - segwidth/3, bmwidth/2,
+				segwidth, LINE_CAP_NONE, (state & (1 << 9)) ? onpen : offpen);
 
 		// diagonal-left-bottom bar
 		draw_segment_diagonal_1(tempbitmap,
-			0 + segwidth + segwidth/5, bmwidth/2 - segwidth/2 - segwidth/5,
-			bmheight/2 + segwidth/2 + segwidth/3, bmheight - segwidth - segwidth/3,
-			segwidth, (state & (1 << 10)) ? onpen : offpen);
+				0 + segwidth + segwidth/5, bmwidth/2 - segwidth/2 - segwidth/5,
+				bmheight/2 + segwidth/2 + segwidth/3, bmheight - segwidth - segwidth/3,
+				segwidth, (state & (1 << 10)) ? onpen : offpen);
 
 		// diagonal-left-top bar
 		draw_segment_diagonal_2(tempbitmap,
-			0 + segwidth + segwidth/5, bmwidth/2 - segwidth/2 - segwidth/5,
-			0 + segwidth + segwidth/3, bmheight/2 - segwidth/2 - segwidth/3,
-			segwidth, (state & (1 << 11)) ? onpen : offpen);
+				0 + segwidth + segwidth/5, bmwidth/2 - segwidth/2 - segwidth/5,
+				0 + segwidth + segwidth/3, bmheight/2 - segwidth/2 - segwidth/3,
+				segwidth, (state & (1 << 11)) ? onpen : offpen);
 
 		// diagonal-right-top bar
 		draw_segment_diagonal_1(tempbitmap,
-			bmwidth/2 + segwidth/2 + segwidth/5, bmwidth - segwidth - segwidth/5,
-			0 + segwidth + segwidth/3, bmheight/2 - segwidth/2 - segwidth/3,
-			segwidth, (state & (1 << 12)) ? onpen : offpen);
+				bmwidth/2 + segwidth/2 + segwidth/5, bmwidth - segwidth - segwidth/5,
+				0 + segwidth + segwidth/3, bmheight/2 - segwidth/2 - segwidth/3,
+				segwidth, (state & (1 << 12)) ? onpen : offpen);
 
 		// diagonal-right-bottom bar
 		draw_segment_diagonal_2(tempbitmap,
-			bmwidth/2 + segwidth/2 + segwidth/5, bmwidth - segwidth - segwidth/5,
-			bmheight/2 + segwidth/2 + segwidth/3, bmheight - segwidth - segwidth/3,
-			segwidth, (state & (1 << 13)) ? onpen : offpen);
+				bmwidth/2 + segwidth/2 + segwidth/5, bmwidth - segwidth - segwidth/5,
+				bmheight/2 + segwidth/2 + segwidth/3, bmheight - segwidth - segwidth/3,
+				segwidth, (state & (1 << 13)) ? onpen : offpen);
 
 		// apply skew
 		apply_skew(tempbitmap, 40);
 
 		// comma tail
 		draw_segment_diagonal_1(tempbitmap,
-			bmwidth - (segwidth/2), bmwidth + segwidth,
-			bmheight - (segwidth), bmheight + segwidth*1.5,
-			segwidth/2, (state & (1 << 15)) ? onpen : offpen);
+				bmwidth - (segwidth/2), bmwidth + segwidth,
+				bmheight - (segwidth), bmheight + segwidth*1.5,
+				segwidth/2, (state & (1 << 15)) ? onpen : offpen);
 
 		// decimal point
-		draw_segment_decimal(tempbitmap, bmwidth + segwidth/2, bmheight - segwidth/2, segwidth, (state & (1 << 14)) ? onpen : offpen);
+		draw_segment_decimal(tempbitmap,
+				bmwidth + segwidth/2, bmheight - segwidth/2,
+				segwidth, (state & (1 << 14)) ? onpen : offpen);
 
 		// resample to the target size
-		render_resample_argb_bitmap_hq(dest, tempbitmap, color());
+		render_resample_argb_bitmap_hq(dest, tempbitmap, color(state));
 	}
 };
 
@@ -1942,14 +2102,14 @@ protected:
 
 	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
-		const rgb_t onpen = rgb_t(0xff, 0xff, 0xff, 0xff);
-		const rgb_t offpen = rgb_t(0x20, 0xff, 0xff, 0xff);
+		rgb_t const onpen = rgb_t(0xff, 0xff, 0xff, 0xff);
+		rgb_t const offpen = rgb_t(0x20, 0xff, 0xff, 0xff);
 
 		// sizes for computation
-		int bmwidth = 250;
-		int bmheight = 400;
-		int segwidth = 40;
-		int skewwidth = 40;
+		int const bmwidth = 250;
+		int const bmheight = 400;
+		int const segwidth = 40;
+		int const skewwidth = 40;
 
 		// allocate a temporary bitmap for drawing
 		bitmap_argb32 tempbitmap(bmwidth + skewwidth, bmheight + segwidth);
@@ -1957,102 +2117,103 @@ protected:
 
 		// top-left bar
 		draw_segment_horizontal_caps(tempbitmap,
-			0 + 2*segwidth/3, bmwidth/2 - segwidth/10, 0 + segwidth/2,
-			segwidth, LINE_CAP_START, (state & (1 << 0)) ? onpen : offpen);
+				0 + 2*segwidth/3, bmwidth/2 - segwidth/10, 0 + segwidth/2,
+				segwidth, LINE_CAP_START, (state & (1 << 0)) ? onpen : offpen);
 
 		// top-right bar
 		draw_segment_horizontal_caps(tempbitmap,
-			0 + bmwidth/2 + segwidth/10, bmwidth - 2*segwidth/3, 0 + segwidth/2,
-			segwidth, LINE_CAP_END, (state & (1 << 1)) ? onpen : offpen);
+				0 + bmwidth/2 + segwidth/10, bmwidth - 2*segwidth/3, 0 + segwidth/2,
+				segwidth, LINE_CAP_END, (state & (1 << 1)) ? onpen : offpen);
 
 		// right-top bar
 		draw_segment_vertical(tempbitmap,
-			0 + 2*segwidth/3, bmheight/2 - segwidth/3, bmwidth - segwidth/2,
-			segwidth, (state & (1 << 2)) ? onpen : offpen);
+				0 + 2*segwidth/3, bmheight/2 - segwidth/3, bmwidth - segwidth/2,
+				segwidth, (state & (1 << 2)) ? onpen : offpen);
 
 		// right-bottom bar
 		draw_segment_vertical(tempbitmap,
-			bmheight/2 + segwidth/3, bmheight - 2*segwidth/3, bmwidth - segwidth/2,
-			segwidth, (state & (1 << 3)) ? onpen : offpen);
+				bmheight/2 + segwidth/3, bmheight - 2*segwidth/3, bmwidth - segwidth/2,
+				segwidth, (state & (1 << 3)) ? onpen : offpen);
 
 		// bottom-right bar
 		draw_segment_horizontal_caps(tempbitmap,
-			0 + bmwidth/2 + segwidth/10, bmwidth - 2*segwidth/3, bmheight - segwidth/2,
-			segwidth, LINE_CAP_END, (state & (1 << 4)) ? onpen : offpen);
+				0 + bmwidth/2 + segwidth/10, bmwidth - 2*segwidth/3, bmheight - segwidth/2,
+				segwidth, LINE_CAP_END, (state & (1 << 4)) ? onpen : offpen);
 
 		// bottom-left bar
 		draw_segment_horizontal_caps(tempbitmap,
-			0 + 2*segwidth/3, bmwidth/2 - segwidth/10, bmheight - segwidth/2,
-			segwidth, LINE_CAP_START, (state & (1 << 5)) ? onpen : offpen);
+				0 + 2*segwidth/3, bmwidth/2 - segwidth/10, bmheight - segwidth/2,
+				segwidth, LINE_CAP_START, (state & (1 << 5)) ? onpen : offpen);
 
 		// left-bottom bar
 		draw_segment_vertical(tempbitmap,
-			bmheight/2 + segwidth/3, bmheight - 2*segwidth/3, 0 + segwidth/2,
-			segwidth, (state & (1 << 6)) ? onpen : offpen);
+				bmheight/2 + segwidth/3, bmheight - 2*segwidth/3, 0 + segwidth/2,
+				segwidth, (state & (1 << 6)) ? onpen : offpen);
 
 		// left-top bar
 		draw_segment_vertical(tempbitmap,
-			0 + 2*segwidth/3, bmheight/2 - segwidth/3, 0 + segwidth/2,
-			segwidth, (state & (1 << 7)) ? onpen : offpen);
+				0 + 2*segwidth/3, bmheight/2 - segwidth/3, 0 + segwidth/2,
+				segwidth, (state & (1 << 7)) ? onpen : offpen);
 
 		// horizontal-middle-left bar
 		draw_segment_horizontal_caps(tempbitmap,
-			0 + 2*segwidth/3, bmwidth/2 - segwidth/10, bmheight/2,
-			segwidth, LINE_CAP_START, (state & (1 << 8)) ? onpen : offpen);
+				0 + 2*segwidth/3, bmwidth/2 - segwidth/10, bmheight/2,
+				segwidth, LINE_CAP_START, (state & (1 << 8)) ? onpen : offpen);
 
 		// horizontal-middle-right bar
 		draw_segment_horizontal_caps(tempbitmap,
-			0 + bmwidth/2 + segwidth/10, bmwidth - 2*segwidth/3, bmheight/2,
-			segwidth, LINE_CAP_END, (state & (1 << 9)) ? onpen : offpen);
+				0 + bmwidth/2 + segwidth/10, bmwidth - 2*segwidth/3, bmheight/2,
+				segwidth, LINE_CAP_END, (state & (1 << 9)) ? onpen : offpen);
 
 		// vertical-middle-top bar
 		draw_segment_vertical_caps(tempbitmap,
-			0 + segwidth + segwidth/3, bmheight/2 - segwidth/2 - segwidth/3, bmwidth/2,
-			segwidth, LINE_CAP_NONE, (state & (1 << 10)) ? onpen : offpen);
+				0 + segwidth + segwidth/3, bmheight/2 - segwidth/2 - segwidth/3, bmwidth/2,
+				segwidth, LINE_CAP_NONE, (state & (1 << 10)) ? onpen : offpen);
 
 		// vertical-middle-bottom bar
 		draw_segment_vertical_caps(tempbitmap,
-			bmheight/2 + segwidth/2 + segwidth/3, bmheight - segwidth - segwidth/3, bmwidth/2,
-			segwidth, LINE_CAP_NONE, (state & (1 << 11)) ? onpen : offpen);
+				bmheight/2 + segwidth/2 + segwidth/3, bmheight - segwidth - segwidth/3, bmwidth/2,
+				segwidth, LINE_CAP_NONE, (state & (1 << 11)) ? onpen : offpen);
 
 		// diagonal-left-bottom bar
 		draw_segment_diagonal_1(tempbitmap,
-			0 + segwidth + segwidth/5, bmwidth/2 - segwidth/2 - segwidth/5,
-			bmheight/2 + segwidth/2 + segwidth/3, bmheight - segwidth - segwidth/3,
-			segwidth, (state & (1 << 12)) ? onpen : offpen);
+				0 + segwidth + segwidth/5, bmwidth/2 - segwidth/2 - segwidth/5,
+				bmheight/2 + segwidth/2 + segwidth/3, bmheight - segwidth - segwidth/3,
+				segwidth, (state & (1 << 12)) ? onpen : offpen);
 
 		// diagonal-left-top bar
 		draw_segment_diagonal_2(tempbitmap,
-			0 + segwidth + segwidth/5, bmwidth/2 - segwidth/2 - segwidth/5,
-			0 + segwidth + segwidth/3, bmheight/2 - segwidth/2 - segwidth/3,
-			segwidth, (state & (1 << 13)) ? onpen : offpen);
+				0 + segwidth + segwidth/5, bmwidth/2 - segwidth/2 - segwidth/5,
+				0 + segwidth + segwidth/3, bmheight/2 - segwidth/2 - segwidth/3,
+				segwidth, (state & (1 << 13)) ? onpen : offpen);
 
 		// diagonal-right-top bar
 		draw_segment_diagonal_1(tempbitmap,
-			bmwidth/2 + segwidth/2 + segwidth/5, bmwidth - segwidth - segwidth/5,
-			0 + segwidth + segwidth/3, bmheight/2 - segwidth/2 - segwidth/3,
-			segwidth, (state & (1 << 14)) ? onpen : offpen);
+				bmwidth/2 + segwidth/2 + segwidth/5, bmwidth - segwidth - segwidth/5,
+				0 + segwidth + segwidth/3, bmheight/2 - segwidth/2 - segwidth/3,
+				segwidth, (state & (1 << 14)) ? onpen : offpen);
 
 		// diagonal-right-bottom bar
 		draw_segment_diagonal_2(tempbitmap,
-			bmwidth/2 + segwidth/2 + segwidth/5, bmwidth - segwidth - segwidth/5,
-			bmheight/2 + segwidth/2 + segwidth/3, bmheight - segwidth - segwidth/3,
-			segwidth, (state & (1 << 15)) ? onpen : offpen);
-
-		// comma tail
-		draw_segment_diagonal_1(tempbitmap,
-			bmwidth - (segwidth/2), bmwidth + segwidth,
-			bmheight - (segwidth), bmheight + segwidth*1.5,
-			segwidth/2, (state & (1 << 17)) ? onpen : offpen);
-
-		// decimal point (draw last for priority)
-		draw_segment_decimal(tempbitmap, bmwidth + segwidth/2, bmheight - segwidth/2, segwidth, (state & (1 << 16)) ? onpen : offpen);
+				bmwidth/2 + segwidth/2 + segwidth/5, bmwidth - segwidth - segwidth/5,
+				bmheight/2 + segwidth/2 + segwidth/3, bmheight - segwidth - segwidth/3,
+				segwidth, (state & (1 << 15)) ? onpen : offpen);
 
 		// apply skew
 		apply_skew(tempbitmap, 40);
 
+		// comma tail
+		draw_segment_diagonal_1(tempbitmap,
+				bmwidth - (segwidth/2), bmwidth + segwidth, bmheight - (segwidth), bmheight + segwidth*1.5,
+				segwidth/2, (state & (1 << 17)) ? onpen : offpen);
+
+		// decimal point (draw last for priority)
+		draw_segment_decimal(tempbitmap,
+				bmwidth + segwidth/2, bmheight - segwidth/2,
+				segwidth, (state & (1 << 16)) ? onpen : offpen);
+
 		// resample to the target size
-		render_resample_argb_bitmap_hq(dest, tempbitmap, color());
+		render_resample_argb_bitmap_hq(dest, tempbitmap, color(state));
 	}
 };
 
@@ -2089,7 +2250,7 @@ protected:
 			draw_segment_decimal(tempbitmap, ((dotwidth / 2) + (i * dotwidth)), bmheight / 2, dotwidth, BIT(state, i) ? onpen : offpen);
 
 		// resample to the target size
-		render_resample_argb_bitmap_hq(dest, tempbitmap, color());
+		render_resample_argb_bitmap_hq(dest, tempbitmap, color(state));
 	}
 
 private:
@@ -2117,9 +2278,8 @@ protected:
 
 	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
-		render_font *font = machine.render().font_alloc("default");
-		std::string temp = string_format("%0*d", m_digits, state);
-		draw_text(*font, dest, bounds, temp.c_str(), m_textalign);
+		render_font *const font = machine.render().font_alloc("default");
+		draw_text(*font, dest, bounds, string_format("%0*d", m_digits, state).c_str(), m_textalign, color(state));
 		machine.render().font_free(font);
 	}
 
@@ -2208,10 +2368,11 @@ protected:
 		int use_state = (state + m_stateoffset) % max_state_used;
 
 		// compute premultiplied colors
-		u32 r = color().r * 255.0f;
-		u32 g = color().g * 255.0f;
-		u32 b = color().b * 255.0f;
-		u32 a = color().a * 255.0f;
+		render_color const c(color(state));
+		u32 const r = c.r * 255.0f;
+		u32 const g = c.g * 255.0f;
+		u32 const b = c.b * 255.0f;
+		u32 const a = c.a * 255.0f;
 
 		// get the width of the string
 		render_font *font = machine.render().font_alloc("default");
@@ -2268,7 +2429,7 @@ protected:
 
 					if (m_bitmap[fruit].valid())
 					{
-						render_resample_argb_bitmap_hq(tempbitmap2, m_bitmap[fruit], color());
+						render_resample_argb_bitmap_hq(tempbitmap2, m_bitmap[fruit], c);
 
 						for (int y = 0; y < ourheight/num_shown; y++)
 						{
@@ -2369,10 +2530,11 @@ private:
 		int use_state = (state + m_stateoffset) % max_state_used;
 
 		// compute premultiplied colors
-		u32 r = color().r * 255.0f;
-		u32 g = color().g * 255.0f;
-		u32 b = color().b * 255.0f;
-		u32 a = color().a * 255.0f;
+		render_color const c(color(state));
+		u32 const r = c.r * 255.0f;
+		u32 const g = c.g * 255.0f;
+		u32 const b = c.b * 255.0f;
+		u32 const a = c.a * 255.0f;
 
 		// get the width of the string
 		render_font *font = machine.render().font_alloc("default");
@@ -2427,7 +2589,7 @@ private:
 
 					if (m_bitmap[fruit].valid())
 					{
-						render_resample_argb_bitmap_hq(tempbitmap2, m_bitmap[fruit], color());
+						render_resample_argb_bitmap_hq(tempbitmap2, m_bitmap[fruit], c);
 
 						for (int y = 0; y < dest.height(); y++)
 						{
@@ -2637,10 +2799,206 @@ layout_element::texture &layout_element::texture::operator=(texture &&that)
 //-------------------------------------------------
 
 layout_element::component::component(environment &env, util::xml::data_node const &compnode, const char *dirname)
-	: m_state(env.get_attribute_int(compnode, "state", -1))
-	, m_color(env.parse_color(compnode.get_child("color")))
+	: m_statemask(env.get_attribute_int(compnode, "statemask", env.get_attribute_string(compnode, "state", "")[0] ? ~0 : 0))
+	, m_stateval(env.get_attribute_int(compnode, "state", m_statemask) & m_statemask)
 {
-	env.parse_bounds(compnode.get_child("bounds"), m_bounds);
+	for (util::xml::data_node const *child = compnode.get_first_child(); child; child = child->get_next_sibling())
+	{
+		if (!strcmp(child->get_name(), "bounds"))
+		{
+			int const state(env.get_attribute_int(*child, "state", 0));
+			auto const pos(
+					std::lower_bound(
+						m_bounds.begin(),
+						m_bounds.end(),
+						state,
+						[] (bounds_step const &lhs, int rhs) { return lhs.state < rhs; }));
+			if ((m_bounds.end() != pos) && (state == pos->state))
+			{
+				throw layout_syntax_error(
+						util::string_format(
+							"%s component has duplicate bounds for state %d",
+							compnode.get_name(),
+							state));
+			}
+			bounds_step &ins(*m_bounds.emplace(pos, bounds_step{ state, { 0.0F, 0.0F, 0.0F, 0.0F }, { 0.0F, 0.0F, 0.0F, 0.0F } }));
+			env.parse_bounds(child, ins.bounds);
+		}
+		else if (!strcmp(child->get_name(), "color"))
+		{
+			int const state(env.get_attribute_int(*child, "state", 0));
+			auto const pos(
+					std::lower_bound(
+						m_color.begin(),
+						m_color.end(),
+						state,
+						[] (color_step const &lhs, int rhs) { return lhs.state < rhs; }));
+			if ((m_color.end() != pos) && (state == pos->state))
+			{
+				throw layout_syntax_error(
+						util::string_format(
+							"%s component has duplicate color for state %d",
+							compnode.get_name(),
+							state));
+			}
+			m_color.emplace(pos, color_step{ state, env.parse_color(child), { 0.0F, 0.0F, 0.0F, 0.0F } });
+		}
+	}
+	if (m_bounds.empty())
+	{
+		m_bounds.emplace_back(bounds_step{ 0, { 0.0F, 0.0F, 1.0F, 1.0F }, { 0.0F, 0.0F, 0.0F, 0.0F } });
+	}
+	else
+	{
+		auto i(m_bounds.begin());
+		auto j(i);
+		while (m_bounds.end() != ++j)
+		{
+			assert(j->state > i->state);
+
+			i->delta.x0 = (j->bounds.x0 - i->bounds.x0) / (j->state - i->state);
+			i->delta.x1 = (j->bounds.x1 - i->bounds.x1) / (j->state - i->state);
+			i->delta.y0 = (j->bounds.y0 - i->bounds.y0) / (j->state - i->state);
+			i->delta.y1 = (j->bounds.y1 - i->bounds.y1) / (j->state - i->state);
+
+			i = j;
+		}
+	}
+	if (m_color.empty())
+	{
+		m_color.emplace_back(color_step{ 0, { 1.0F, 1.0F, 1.0F, 1.0F }, { 0.0F, 0.0F, 0.0F, 0.0F } });
+	}
+	else
+	{
+		auto i(m_color.begin());
+		auto j(i);
+		while (m_color.end() != ++j)
+		{
+			assert(j->state > i->state);
+
+			i->delta.a = (j->color.a - i->color.a) / (j->state - i->state);
+			i->delta.r = (j->color.r - i->color.r) / (j->state - i->state);
+			i->delta.g = (j->color.g - i->color.g) / (j->state - i->state);
+			i->delta.b = (j->color.b - i->color.b) / (j->state - i->state);
+
+			i = j;
+		}
+	}
+}
+
+
+//-------------------------------------------------
+//  statewrap - get state wraparound requirements
+//-------------------------------------------------
+
+std::pair<int, bool> layout_element::component::statewrap() const
+{
+	int result(0);
+	bool fold;
+	auto const adjustmask =
+			[&result, &fold] (int val, int mask)
+			{
+				assert(!(val & ~mask));
+				auto const splatright =
+						[] (int x)
+						{
+							for (unsigned shift = 1; (sizeof(x) * 4) >= shift; shift <<= 1)
+								x |= (x >> shift);
+							return x;
+						};
+				int const unfolded(splatright(mask));
+				int const folded(splatright(~mask | splatright(val)));
+				if (unsigned(folded) < unsigned(unfolded))
+				{
+					result |= folded;
+					fold = true;
+				}
+				else
+				{
+					result |= unfolded;
+				}
+			};
+	adjustmask(stateval(), statemask());
+	int max(maxstate());
+	if (m_bounds.size() > 1U)
+		max = (std::max)(max, m_bounds.back().state);
+	if (m_color.size() > 1U)
+		max = (std::max)(max, m_color.back().state);
+	if (0 <= max)
+		adjustmask(max, ~0);
+	return std::make_pair(result, fold);
+}
+
+
+//-------------------------------------------------
+//  overall_bounds - maximum bounds for all states
+//-------------------------------------------------
+
+render_bounds layout_element::component::overall_bounds() const
+{
+	auto i(m_bounds.begin());
+	render_bounds result(i->bounds);
+	while (m_bounds.end() != ++i)
+		union_render_bounds(result, i->bounds);
+	return result;
+}
+
+
+//-------------------------------------------------
+//  bounds - bounds for a given state
+//-------------------------------------------------
+
+render_bounds layout_element::component::bounds(int state) const
+{
+	auto pos(
+			std::lower_bound(
+				m_bounds.begin(),
+				m_bounds.end(),
+				state,
+				[] (bounds_step const &lhs, int rhs) { return lhs.state < rhs; }));
+	if (m_bounds.begin() == pos)
+	{
+		return pos->bounds;
+	}
+	else
+	{
+		--pos;
+		render_bounds result(pos->bounds);
+		result.x0 += pos->delta.x0 * (state - pos->state);
+		result.x1 += pos->delta.x1 * (state - pos->state);
+		result.y0 += pos->delta.y0 * (state - pos->state);
+		result.y1 += pos->delta.y1 * (state - pos->state);
+		return result;
+	}
+}
+
+
+//-------------------------------------------------
+//  color - color for a given state
+//-------------------------------------------------
+
+render_color layout_element::component::color(int state) const
+{
+	auto pos(
+			std::lower_bound(
+				m_color.begin(),
+				m_color.end(),
+				state,
+				[] (color_step const &lhs, int rhs) { return lhs.state < rhs; }));
+	if (m_color.begin() == pos)
+	{
+		return pos->color;
+	}
+	else
+	{
+		--pos;
+		render_color result(pos->color);
+		result.a += pos->delta.a * (state - pos->state);
+		result.r += pos->delta.r * (state - pos->state);
+		result.g += pos->delta.g * (state - pos->state);
+		result.b += pos->delta.b * (state - pos->state);
+		return result;
+	}
 }
 
 
@@ -2650,10 +3008,27 @@ layout_element::component::component(environment &env, util::xml::data_node cons
 
 void layout_element::component::normalize_bounds(float xoffs, float yoffs, float xscale, float yscale)
 {
-	m_bounds.x0 = (m_bounds.x0 - xoffs) * xscale;
-	m_bounds.x1 = (m_bounds.x1 - xoffs) * xscale;
-	m_bounds.y0 = (m_bounds.y0 - yoffs) * yscale;
-	m_bounds.y1 = (m_bounds.y1 - yoffs) * yscale;
+	auto i(m_bounds.begin());
+	i->bounds.x0 = (i->bounds.x0 - xoffs) * xscale;
+	i->bounds.x1 = (i->bounds.x1 - xoffs) * xscale;
+	i->bounds.y0 = (i->bounds.y0 - yoffs) * yscale;
+	i->bounds.y1 = (i->bounds.y1 - yoffs) * yscale;
+
+	auto j(i);
+	while (m_bounds.end() != ++j)
+	{
+		j->bounds.x0 = (j->bounds.x0 - xoffs) * xscale;
+		j->bounds.x1 = (j->bounds.x1 - xoffs) * xscale;
+		j->bounds.y0 = (j->bounds.y0 - yoffs) * yscale;
+		j->bounds.y1 = (j->bounds.y1 - yoffs) * yscale;
+
+		i->delta.x0 = (j->bounds.x0 - i->bounds.x0) / (j->state - i->state);
+		i->delta.x1 = (j->bounds.x1 - i->bounds.x1) / (j->state - i->state);
+		i->delta.y0 = (j->bounds.y0 - i->bounds.y0) / (j->state - i->state);
+		i->delta.y1 = (j->bounds.y1 - i->bounds.y1) / (j->state - i->state);
+
+		i = j;
+	}
 }
 
 
@@ -2661,13 +3036,19 @@ void layout_element::component::normalize_bounds(float xoffs, float yoffs, float
 //  draw_text - draw text in the specified color
 //-------------------------------------------------
 
-void layout_element::component::draw_text(render_font &font, bitmap_argb32 &dest, const rectangle &bounds, const char *str, int align)
+void layout_element::component::draw_text(
+		render_font &font,
+		bitmap_argb32 &dest,
+		const rectangle &bounds,
+		const char *str,
+		int align,
+		const render_color &color)
 {
 	// compute premultiplied colors
-	u32 r = color().r * 255.0f;
-	u32 g = color().g * 255.0f;
-	u32 b = color().b * 255.0f;
-	u32 a = color().a * 255.0f;
+	u32 const r(color.r * 255.0f);
+	u32 const g(color.g * 255.0f);
+	u32 const b(color.b * 255.0f);
+	u32 const a(color.a * 255.0f);
 
 	// get the width of the string
 	float aspect = 1.0f;
@@ -2955,29 +3336,76 @@ struct layout_view::layer_lists { item_list backdrops, screens, overlays, bezels
 //-------------------------------------------------
 
 layout_view::layout_view(
-		environment &env,
+		layout_environment &env,
 		util::xml::data_node const &viewnode,
 		element_map &elemmap,
 		group_map &groupmap)
 	: m_name(make_name(env, viewnode))
-	, m_aspect(1.0f)
-	, m_scraspect(1.0f)
+	, m_effaspect(1.0f)
 	, m_items()
+	, m_defvismask(0U)
 	, m_has_art(false)
 {
 	// parse the layout
 	m_expbounds.x0 = m_expbounds.y0 = m_expbounds.x1 = m_expbounds.y1 = 0;
-	environment local(env);
+	view_environment local(env, m_name.c_str());
 	layer_lists layers;
 	local.set_parameter("viewname", std::string(m_name));
 	add_items(layers, local, viewnode, elemmap, groupmap, ROT0, identity_transform, render_color{ 1.0F, 1.0F, 1.0F, 1.0F }, true, false, true);
+
+	// can't support legacy layers and modern visibility toggles at the same time
+	if (!m_vistoggles.empty() && (!layers.backdrops.empty() || !layers.overlays.empty() || !layers.bezels.empty() || !layers.cpanels.empty() || !layers.marquees.empty()))
+		throw layout_syntax_error("view contains visibility toggles as well as legacy backdrop, overlay, bezel, cpanel and/or marquee elements");
+
+	// create visibility toggles for legacy layers
+	u32 mask(1U);
+	if (!layers.backdrops.empty())
+	{
+		m_vistoggles.emplace_back("Backdrops", mask);
+		for (item &backdrop : layers.backdrops)
+			backdrop.m_visibility_mask = mask;
+		m_defvismask |= mask;
+		mask <<= 1;
+	}
+	if (!layers.overlays.empty())
+	{
+		m_vistoggles.emplace_back("Overlays", mask);
+		for (item &overlay : layers.overlays)
+			overlay.m_visibility_mask = mask;
+		m_defvismask |= mask;
+		mask <<= 1;
+	}
+	if (!layers.bezels.empty())
+	{
+		m_vistoggles.emplace_back("Bezels", mask);
+		for (item &bezel : layers.bezels)
+			bezel.m_visibility_mask = mask;
+		m_defvismask |= mask;
+		mask <<= 1;
+	}
+	if (!layers.cpanels.empty())
+	{
+		m_vistoggles.emplace_back("Control Panels", mask);
+		for (item &cpanel : layers.cpanels)
+			cpanel.m_visibility_mask = mask;
+		m_defvismask |= mask;
+		mask <<= 1;
+	}
+	if (!layers.marquees.empty())
+	{
+		m_vistoggles.emplace_back("Backdrops", mask);
+		for (item &marquee : layers.marquees)
+			marquee.m_visibility_mask = mask;
+		m_defvismask |= mask;
+		mask <<= 1;
+	}
 
 	// deal with legacy element groupings
 	if (!layers.overlays.empty() || (layers.backdrops.size() <= 1))
 	{
 		// screens (-1) + overlays (RGB multiply) + backdrop (add) + bezels (alpha) + cpanels (alpha) + marquees (alpha)
 		for (item &backdrop : layers.backdrops)
-			backdrop.set_blend_mode(BLENDMODE_ADD);
+			backdrop.m_blend_mode = BLENDMODE_ADD;
 		m_items.splice(m_items.end(), layers.screens);
 		m_items.splice(m_items.end(), layers.overlays);
 		m_items.splice(m_items.end(), layers.backdrops);
@@ -2992,7 +3420,7 @@ layout_view::layout_view(
 		for (item &screen : layers.screens)
 		{
 			if (screen.blend_mode() == -1)
-				screen.set_blend_mode(BLENDMODE_ADD);
+				screen.m_blend_mode = BLENDMODE_ADD;
 		}
 		m_items.splice(m_items.end(), layers.backdrops);
 		m_items.splice(m_items.end(), layers.screens);
@@ -3002,7 +3430,7 @@ layout_view::layout_view(
 	}
 
 	// calculate metrics
-	recompute(render_layer_config());
+	recompute(default_visibility_mask(), false);
 	for (group_map::value_type &group : groupmap)
 		group.second.set_bounds_unresolved();
 }
@@ -3024,7 +3452,7 @@ layout_view::~layout_view()
 
 bool layout_view::has_screen(screen_device &screen) const
 {
-	return std::find_if(m_screens.begin(), m_screens.end(), [&screen](auto const &scr) { return &scr.get() == &screen; }) != m_screens.end();
+	return std::find_if(m_screens.begin(), m_screens.end(), [&screen] (auto const &scr) { return &scr.get() == &screen; }) != m_screens.end();
 }
 
 
@@ -3033,36 +3461,48 @@ bool layout_view::has_screen(screen_device &screen) const
 //  ratio of a view and all of its contained items
 //-------------------------------------------------
 
-void layout_view::recompute(render_layer_config layerconfig)
+void layout_view::recompute(u32 visibility_mask, bool zoom_to_screen)
 {
-	// reset the bounds
-	m_bounds.x0 = m_bounds.y0 = m_bounds.x1 = m_bounds.y1 = 0.0f;
-	m_scrbounds.x0 = m_scrbounds.y0 = m_scrbounds.x1 = m_scrbounds.y1 = 0.0f;
+	// reset the bounds and collected active items
+	render_bounds scrbounds{ 0.0f, 0.0f, 0.0f, 0.0f };
+	m_bounds = scrbounds;
+	m_screen_items.clear();
+	m_interactive_items.clear();
+	m_interactive_edges_x.clear();
+	m_interactive_edges_y.clear();
 	m_screens.clear();
 
-	// loop over all layers
+	// loop over items and filter by visibility mask
 	bool first = true;
 	bool scrfirst = true;
 	for (item &curitem : m_items)
 	{
-		// accumulate bounds
-		if (first)
-			m_bounds = curitem.m_rawbounds;
-		else
-			union_render_bounds(m_bounds, curitem.m_rawbounds);
-		first = false;
-
-		// accumulate screen bounds
-		if (curitem.m_screen)
+		if ((visibility_mask & curitem.visibility_mask()) == curitem.visibility_mask())
 		{
-			if (scrfirst)
-				m_scrbounds = curitem.m_rawbounds;
+			// accumulate bounds
+			if (first)
+				m_bounds = curitem.m_rawbounds;
 			else
-				union_render_bounds(m_scrbounds, curitem.m_rawbounds);
-			scrfirst = false;
+				union_render_bounds(m_bounds, curitem.m_rawbounds);
+			first = false;
 
-			// accumulate the screens in use while we're scanning
-			m_screens.emplace_back(*curitem.m_screen);
+			// accumulate visible screens and their bounds bounds
+			if (curitem.screen())
+			{
+				if (scrfirst)
+					scrbounds = curitem.m_rawbounds;
+				else
+					union_render_bounds(scrbounds, curitem.m_rawbounds);
+				scrfirst = false;
+
+				// accumulate active screens
+				m_screen_items.emplace_back(curitem);
+				m_screens.emplace_back(*curitem.screen());
+			}
+
+			// accumulate interactive elements
+			if (!curitem.clickthrough() || curitem.has_input())
+				m_interactive_items.emplace_back(curitem);
 		}
 	}
 
@@ -3070,36 +3510,29 @@ void layout_view::recompute(render_layer_config layerconfig)
 	if (m_expbounds.x1 > m_expbounds.x0)
 		m_bounds = m_expbounds;
 
-	// if we're handling things normally, the target bounds are (0,0)-(1,1)
 	render_bounds target_bounds;
-	if (!layerconfig.zoom_to_screen() || m_screens.empty())
+	if (!zoom_to_screen || scrfirst)
 	{
-		// compute the aspect ratio of the view
-		m_aspect = (m_bounds.x1 - m_bounds.x0) / (m_bounds.y1 - m_bounds.y0);
-
+		// if we're handling things normally, the target bounds are (0,0)-(1,1)
+		m_effaspect = ((m_bounds.x1 > m_bounds.x0) && (m_bounds.y1 > m_bounds.y0)) ? m_bounds.aspect() : 1.0f;
 		target_bounds.x0 = target_bounds.y0 = 0.0f;
 		target_bounds.x1 = target_bounds.y1 = 1.0f;
 	}
-
-	// if we're cropping, we want the screen area to fill (0,0)-(1,1)
 	else
 	{
-		// compute the aspect ratio of the screen
-		m_scraspect = (m_scrbounds.x1 - m_scrbounds.x0) / (m_scrbounds.y1 - m_scrbounds.y0);
-
-		float targwidth = (m_bounds.x1 - m_bounds.x0) / (m_scrbounds.x1 - m_scrbounds.x0);
-		float targheight = (m_bounds.y1 - m_bounds.y0) / (m_scrbounds.y1 - m_scrbounds.y0);
-		target_bounds.x0 = (m_bounds.x0 - m_scrbounds.x0) / (m_bounds.x1 - m_bounds.x0) * targwidth;
-		target_bounds.y0 = (m_bounds.y0 - m_scrbounds.y0) / (m_bounds.y1 - m_bounds.y0) * targheight;
-		target_bounds.x1 = target_bounds.x0 + targwidth;
-		target_bounds.y1 = target_bounds.y0 + targheight;
+		// if we're cropping, we want the screen area to fill (0,0)-(1,1)
+		m_effaspect = ((scrbounds.x1 > scrbounds.x0) && (scrbounds.y1 > scrbounds.y0)) ? scrbounds.aspect() : 1.0f;
+		target_bounds.x0 = (m_bounds.x0 - scrbounds.x0) / scrbounds.width();
+		target_bounds.y0 = (m_bounds.y0 - scrbounds.y0) / scrbounds.height();
+		target_bounds.x1 = target_bounds.x0 + (m_bounds.width() / scrbounds.width());
+		target_bounds.y1 = target_bounds.y0 + (m_bounds.height() / scrbounds.height());
 	}
 
 	// determine the scale/offset for normalization
-	float xoffs = m_bounds.x0;
-	float yoffs = m_bounds.y0;
-	float xscale = (target_bounds.x1 - target_bounds.x0) / (m_bounds.x1 - m_bounds.x0);
-	float yscale = (target_bounds.y1 - target_bounds.y0) / (m_bounds.y1 - m_bounds.y0);
+	float const xoffs = m_bounds.x0;
+	float const yoffs = m_bounds.y0;
+	float const xscale = target_bounds.width() / m_bounds.width();
+	float const yscale = target_bounds.height() / m_bounds.height();
 
 	// normalize all the item bounds
 	for (item &curitem : items())
@@ -3108,6 +3541,32 @@ void layout_view::recompute(render_layer_config layerconfig)
 		curitem.m_bounds.x1 = target_bounds.x0 + (curitem.m_rawbounds.x1 - xoffs) * xscale;
 		curitem.m_bounds.y0 = target_bounds.y0 + (curitem.m_rawbounds.y0 - yoffs) * yscale;
 		curitem.m_bounds.y1 = target_bounds.y0 + (curitem.m_rawbounds.y1 - yoffs) * yscale;
+	}
+
+	// sort edges of interactive items
+	LOGMASKED(LOG_INTERACTIVE_ITEMS, "Recalculated view '%s' with %u interactive items\n",
+			name(), m_interactive_items.size());
+	m_interactive_edges_x.reserve(m_interactive_items.size() * 2);
+	m_interactive_edges_y.reserve(m_interactive_items.size() * 2);
+	for (unsigned i = 0; m_interactive_items.size() > i; ++i)
+	{
+		item &curitem(m_interactive_items[i]);
+		LOGMASKED(LOG_INTERACTIVE_ITEMS, "%u: (%s %s %s %s) hasinput=%s clickthrough=%s\n",
+				i, curitem.bounds().x0, curitem.bounds().y0, curitem.bounds().x1, curitem.bounds().y1, curitem.has_input(), curitem.clickthrough());
+		m_interactive_edges_x.emplace_back(i, curitem.bounds().x0, false);
+		m_interactive_edges_x.emplace_back(i, curitem.bounds().x1, true);
+		m_interactive_edges_y.emplace_back(i, curitem.bounds().y0, false);
+		m_interactive_edges_y.emplace_back(i, curitem.bounds().y1, true);
+	}
+	std::sort(m_interactive_edges_x.begin(), m_interactive_edges_x.end());
+	std::sort(m_interactive_edges_y.begin(), m_interactive_edges_y.end());
+
+	if (VERBOSE & LOG_INTERACTIVE_ITEMS)
+	{
+		for (edge const &e : m_interactive_edges_x)
+			LOGMASKED(LOG_INTERACTIVE_ITEMS, "x=%s %c%u\n", e.position(), e.trailing() ? ']' : '[', e.index());
+		for (edge const &e : m_interactive_edges_y)
+			LOGMASKED(LOG_INTERACTIVE_ITEMS, "y=%s %c%u\n", e.position(), e.trailing() ? ']' : '[', e.index());
 	}
 }
 
@@ -3129,7 +3588,7 @@ void layout_view::resolve_tags()
 
 void layout_view::add_items(
 		layer_lists &layers,
-		environment &env,
+		view_environment &env,
 		util::xml::data_node const &parentnode,
 		element_map &elemmap,
 		group_map &groupmap,
@@ -3164,11 +3623,6 @@ void layout_view::add_items(
 			else
 				env.set_repeat_parameter(*itemnode, init);
 		}
-		else if (!strcmp(itemnode->get_name(), "backdrop"))
-		{
-			layers.backdrops.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
-			m_has_art = true;
-		}
 		else if (!strcmp(itemnode->get_name(), "screen"))
 		{
 			layers.screens.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
@@ -3178,23 +3632,38 @@ void layout_view::add_items(
 			layers.screens.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
 			m_has_art = true;
 		}
+		else if (!strcmp(itemnode->get_name(), "backdrop"))
+		{
+			if (layers.backdrops.empty())
+				osd_printf_warning("Warning: layout view '%s' contains deprecated backdrop element\n", name());
+			layers.backdrops.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
+			m_has_art = true;
+		}
 		else if (!strcmp(itemnode->get_name(), "overlay"))
 		{
+			if (layers.overlays.empty())
+				osd_printf_warning("Warning: layout view '%s' contains deprecated overlay element\n", name());
 			layers.overlays.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
 			m_has_art = true;
 		}
 		else if (!strcmp(itemnode->get_name(), "bezel"))
 		{
+			if (layers.bezels.empty())
+				osd_printf_warning("Warning: layout view '%s' contains deprecated bezel element\n", name());
 			layers.bezels.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
 			m_has_art = true;
 		}
 		else if (!strcmp(itemnode->get_name(), "cpanel"))
 		{
+			if (layers.cpanels.empty())
+				osd_printf_warning("Warning: layout view '%s' contains deprecated cpanel element\n", name());
 			layers.cpanels.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
 			m_has_art = true;
 		}
 		else if (!strcmp(itemnode->get_name(), "marquee"))
 		{
+			if (layers.marquees.empty())
+				osd_printf_warning("Warning: layout view '%s' contains deprecated marquee element\n", name());
 			layers.marquees.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
 			m_has_art = true;
 		}
@@ -3202,7 +3671,7 @@ void layout_view::add_items(
 		{
 			char const *ref(env.get_attribute_string(*itemnode, "ref", nullptr));
 			if (!ref)
-				throw layout_syntax_error("nested group must have ref attribute");
+				throw layout_syntax_error("group instantiation must have ref attribute");
 
 			group_map::iterator const found(groupmap.find(ref));
 			if (groupmap.end() == found)
@@ -3225,7 +3694,7 @@ void layout_view::add_items(
 				grouptrans = found->second.make_transform(grouporient, trans);
 			}
 
-			environment local(env);
+			view_environment local(env, false);
 			add_items(
 					layers,
 					local,
@@ -3244,12 +3713,27 @@ void layout_view::add_items(
 			int const count(env.get_attribute_int(*itemnode, "count", -1));
 			if (0 >= count)
 				throw layout_syntax_error("repeat must have positive integer count attribute");
-			environment local(env);
+			view_environment local(env, false);
 			for (int i = 0; count > i; ++i)
 			{
 				add_items(layers, local, *itemnode, elemmap, groupmap, orientation, trans, color, false, true, !i);
 				local.increment_parameters();
 			}
+		}
+		else if (!strcmp(itemnode->get_name(), "collection"))
+		{
+			char const *name(env.get_attribute_string(*itemnode, "name", nullptr));
+			if (!name)
+				throw layout_syntax_error("collection must have name attribute");
+
+			auto const found(std::find_if(m_vistoggles.begin(), m_vistoggles.end(), [name] (auto const &x) { return x.name() == name; }));
+			if (m_vistoggles.end() != found)
+				throw layout_syntax_error(util::string_format("duplicate collection name '%s'", name));
+
+			m_defvismask |= u32(env.get_attribute_bool(*itemnode, "visible", true) ? 1 : 0) << m_vistoggles.size(); // TODO: make this less hacky
+			view_environment local(env, true);
+			m_vistoggles.emplace_back(name, local.visibility_mask());
+			add_items(layers, local, *itemnode, elemmap, groupmap, orientation, trans, color, false, false, true);
 		}
 		else
 		{
@@ -3264,7 +3748,7 @@ void layout_view::add_items(
 	}
 }
 
-std::string layout_view::make_name(environment &env, util::xml::data_node const &viewnode)
+std::string layout_view::make_name(layout_environment &env, util::xml::data_node const &viewnode)
 {
 	char const *const name(env.get_attribute_string(viewnode, "name", nullptr));
 	if (!name)
@@ -3294,7 +3778,7 @@ std::string layout_view::make_name(environment &env, util::xml::data_node const 
 //-------------------------------------------------
 
 layout_view::item::item(
-		environment &env,
+		view_environment &env,
 		util::xml::data_node const &itemnode,
 		element_map &elemmap,
 		int orientation,
@@ -3303,24 +3787,25 @@ layout_view::item::item(
 	: m_element(find_element(env, itemnode, elemmap))
 	, m_output(env.device(), env.get_attribute_string(itemnode, "name", ""))
 	, m_have_output(env.get_attribute_string(itemnode, "name", "")[0])
-	, m_input_tag(make_input_tag(env, itemnode))
 	, m_input_port(nullptr)
 	, m_input_field(nullptr)
 	, m_input_mask(env.get_attribute_int(itemnode, "inputmask", 0))
-	, m_input_shift(0)
-	, m_input_raw(0 != env.get_attribute_int(itemnode, "inputraw", 0))
+	, m_input_shift(get_input_shift(m_input_mask))
+	, m_input_raw(env.get_attribute_bool(itemnode, "inputraw", 0))
+	, m_clickthrough(env.get_attribute_bool(itemnode, "clickthrough", "yes"))
 	, m_screen(nullptr)
 	, m_orientation(orientation_add(env.parse_orientation(itemnode.get_child("orientation")), orientation))
-	, m_rawbounds(make_bounds(env, itemnode, trans))
 	, m_color(render_color_multiply(env.parse_color(itemnode.get_child("color")), color))
 	, m_blend_mode(get_blend_mode(env, itemnode))
+	, m_visibility_mask(env.visibility_mask())
+	, m_input_tag(make_input_tag(env, itemnode))
+	, m_rawbounds(make_bounds(env, itemnode, trans))
+	, m_has_clickthrough(env.get_attribute_string(itemnode, "clickthrough", "")[0])
 {
 	// fetch common data
 	int index = env.get_attribute_int(itemnode, "index", -1);
 	if (index != -1)
 		m_screen = screen_device_iterator(env.machine().root_device()).byindex(index);
-	for (u32 mask = m_input_mask; (mask != 0) && (~mask & 1); mask >>= 1)
-		m_input_shift++;
 
 	// sanity checks
 	if (strcmp(itemnode.get_name(), "screen") == 0)
@@ -3377,24 +3862,22 @@ int layout_view::item::state() const
 		// if configured to track an output, fetch its value
 		return m_output;
 	}
-	else if (!m_input_tag.empty())
+	else if (m_input_port)
 	{
 		// if configured to an input, fetch the input value
-		if (m_input_port)
+		if (m_input_raw)
 		{
-			if (m_input_raw)
-			{
-				return (m_input_port->read() & m_input_mask) >> m_input_shift;
-			}
-			else
-			{
-				ioport_field const *const field(m_input_field ? m_input_field : m_input_port->field(m_input_mask));
-				if (field)
-					return ((m_input_port->read() ^ field->defvalue()) & m_input_mask) ? 1 : 0;
-			}
+			return (m_input_port->read() & m_input_mask) >> m_input_shift;
+		}
+		else
+		{
+			ioport_field const *const field(m_input_field ? m_input_field : m_input_port->field(m_input_mask));
+			if (field)
+				return ((m_input_port->read() ^ field->defvalue()) & m_input_mask) ? 1 : 0;
 		}
 	}
 
+	// default to zero
 	return 0;
 }
 
@@ -3417,6 +3900,7 @@ void layout_view::item::resolve_tags()
 		m_input_port = m_element->machine().root_device().ioport(m_input_tag);
 		if (m_input_port)
 		{
+			// if there's a matching unconditional field, cache it
 			for (ioport_field &field : m_input_port->fields())
 			{
 				if (field.mask() & m_input_mask)
@@ -3426,6 +3910,10 @@ void layout_view::item::resolve_tags()
 					break;
 				}
 			}
+
+			// if clickthrough isn't explicitly configured, having an I/O port implies false
+			if (!m_has_clickthrough)
+				m_clickthrough = false;
 		}
 	}
 }
@@ -3435,7 +3923,7 @@ void layout_view::item::resolve_tags()
 //  find_element - find element definition
 //---------------------------------------------
 
-layout_element *layout_view::item::find_element(environment &env, util::xml::data_node const &itemnode, element_map &elemmap)
+layout_element *layout_view::item::find_element(view_environment &env, util::xml::data_node const &itemnode, element_map &elemmap)
 {
 	char const *const name(env.get_attribute_string(itemnode, !strcmp(itemnode.get_name(), "element") ? "ref" : "element", nullptr));
 	if (!name)
@@ -3455,7 +3943,7 @@ layout_element *layout_view::item::find_element(environment &env, util::xml::dat
 //---------------------------------------------
 
 render_bounds layout_view::item::make_bounds(
-		environment &env,
+		view_environment &env,
 		util::xml::data_node const &itemnode,
 		layout_group::transform const &trans)
 {
@@ -3474,7 +3962,7 @@ render_bounds layout_view::item::make_bounds(
 //  make_input_tag - get absolute input tag
 //---------------------------------------------
 
-std::string layout_view::item::make_input_tag(environment &env, util::xml::data_node const &itemnode)
+std::string layout_view::item::make_input_tag(view_environment &env, util::xml::data_node const &itemnode)
 {
 	char const *tag(env.get_attribute_string(itemnode, "inputtag", nullptr));
 	return tag ? env.device().subtag(tag) : std::string();
@@ -3485,7 +3973,7 @@ std::string layout_view::item::make_input_tag(environment &env, util::xml::data_
 //  get_blend_mode - explicit or implicit blend
 //---------------------------------------------
 
-int layout_view::item::get_blend_mode(environment &env, util::xml::data_node const &itemnode)
+int layout_view::item::get_blend_mode(view_environment &env, util::xml::data_node const &itemnode)
 {
 	// see if there's a blend mode attribute
 	char const *const mode(env.get_attribute_string(itemnode, "blend", nullptr));
@@ -3510,6 +3998,39 @@ int layout_view::item::get_blend_mode(environment &env, util::xml::data_node con
 		return BLENDMODE_RGB_MULTIPLY;
 	else
 		return BLENDMODE_ALPHA;
+}
+
+
+//---------------------------------------------
+//  get_input_shift - shift to right-align LSB
+//---------------------------------------------
+
+unsigned layout_view::item::get_input_shift(ioport_value mask)
+{
+	unsigned result(0U);
+	while (mask && !BIT(mask, 0))
+	{
+		++result;
+		mask >>= 1;
+	}
+	return result;
+}
+
+
+
+//**************************************************************************
+//  LAYOUT VIEW VISIBILITY TOGGLE
+//**************************************************************************
+
+//-------------------------------------------------
+//  visibility_toggle - constructor
+//-------------------------------------------------
+
+layout_view::visibility_toggle::visibility_toggle(std::string &&name, u32 mask)
+	: m_name(std::move(name))
+	, m_mask(mask)
+{
+	assert(mask);
 }
 
 
@@ -3548,7 +4069,7 @@ layout_file::layout_file(device_t &device, util::xml::data_node const &rootnode,
 		for (util::xml::data_node const *viewnode = mamelayoutnode->get_child("view"); viewnode != nullptr; viewnode = viewnode->get_next_sibling("view"))
 		{
 			// the trouble with allowing errors to propagate here is that it wreaks havoc with screenless systems that use a terminal by default
-			// e.g. intlc44 and intlc440 have a terminal on the tty port by default and have a view with the front panel with the terminal screen
+			// e.g. intlc44 and intlc440 have a terminal on the TTY port by default and have a view with the front panel with the terminal screen
 			// however, they have a second view with just the front panel which is very useful if you're using e.g. -tty null_modem with a socket
 			// if the error is allowed to propagate, the entire layout is dropped so you can't select the useful view
 			try

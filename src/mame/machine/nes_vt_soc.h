@@ -50,7 +50,8 @@ public:
 
 	void set_8000_scramble(uint8_t reg0, uint8_t reg1, uint8_t reg2, uint8_t reg3, uint8_t reg4, uint8_t reg5, uint8_t reg6, uint8_t reg7);
 	void set_410x_scramble(uint8_t reg0, uint8_t reg1);
-	void force_bad_dma() { m_force_baddma = true; };
+	void force_bad_dma() { m_force_baddma = true; }
+	void force_raster_timing_hack() { m_use_raster_timing_hack = true; }
 
 	void set_default_palette_mode(vtxx_pal_mode pmode) { m_default_palette_mode = pmode; }
 
@@ -91,7 +92,6 @@ protected:
 	void psg1_4015_w(uint8_t data);
 	void psg1_4017_w(uint8_t data);
 	void vt_dma_w(uint8_t data);
-	void vt_fixed_dma_w(uint8_t data);
 	void do_dma(uint8_t data, bool has_ntsc_bug);
 	void vt03_4034_w(uint8_t data);
 
@@ -142,7 +142,6 @@ private:
 	address_space_config        m_space_config;
 
 	int m_bankaddr[4];
-	uint16_t m_real_access_address;
 
 	devcb_write8 m_write_0_callback;
 	devcb_read8 m_read_0_callback;
@@ -161,6 +160,7 @@ private:
 	uint8_t m_2012_2017_descramble[0x6]; // passed to PPU in reset
 	vtxx_pal_mode m_default_palette_mode;
 	bool m_force_baddma;
+	bool m_use_raster_timing_hack;
 };
 
 class nes_vt_soc_pal_device : public nes_vt_soc_device

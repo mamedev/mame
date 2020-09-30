@@ -18,7 +18,7 @@
 #define FILTER_CHARGE_TC        0.004
 #define FILTER_MIN              0.0416
 #define FILTER_MAX              1.0954
-#define SAMPLE_GAIN             10000.0
+#define SAMPLE_GAIN             (10000.0 / 32768.0)
 
 
 
@@ -115,7 +115,7 @@ void hc55516_device::start_common(uint8_t _shiftreg_mask, int _active_clock_hi)
 	m_last_clock_state = 0;
 
 	/* create the stream */
-	m_channel = machine().sound().stream_alloc(*this, 0, 1, SAMPLE_RATE);
+	m_channel = stream_alloc(0, 1, SAMPLE_RATE);
 
 	save_item(NAME(m_last_clock_state));
 	save_item(NAME(m_digit));
@@ -186,11 +186,12 @@ void hc55516_device::process_digit()
 	temp = integrator * SAMPLE_GAIN;
 	m_integrator = integrator;
 
+	m_next_sample = temp;
 	/* compress the sample range to fit better in a 16-bit word */
-	if (temp < 0)
-		m_next_sample = (int)(temp / (-temp * (1.0 / 32768.0) + 1.0));
-	else
-		m_next_sample = (int)(temp / (temp * (1.0 / 32768.0) + 1.0));
+/*  if (temp < 0)
+        m_next_sample = (int)(temp / (-temp * (1.0 / 32768.0) + 1.0));
+    else
+        m_next_sample = (int)(temp / (temp * (1.0 / 32768.0) + 1.0));*/
 }
 
 void hc55516_device::clock_w(int state)
@@ -244,20 +245,15 @@ int hc55516_device::clock_state_r()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void hc55516_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void hc55516_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *buffer = outputs[0];
+	auto &buffer = outputs[0];
 	int i;
-	int32_t sample, slope;
-
-	/* zero-length? bail */
-	if (samples == 0)
-		return;
 
 	if (!is_external_oscillator())
 	{
 		/* track how many samples we've updated without a clock */
-		m_update_count += samples;
+		m_update_count += buffer.samples();
 		if (m_update_count > SAMPLE_RATE / 32)
 		{
 			m_update_count = SAMPLE_RATE;
@@ -266,18 +262,18 @@ void hc55516_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	}
 
 	/* compute the interpolation slope */
-	sample = m_curr_sample;
-	slope = ((int32_t)m_next_sample - sample) / samples;
+	stream_buffer::sample_t sample = m_curr_sample;
+	stream_buffer::sample_t slope = (m_next_sample - sample) / buffer.samples();
 	m_curr_sample = m_next_sample;
 
 	if (is_external_oscillator())
 	{
 		/* external oscillator */
-		for (i = 0; i < samples; i++, sample += slope)
+		for (i = 0; i < buffer.samples(); i++, sample += slope)
 		{
 			uint8_t clock_state;
 
-			*buffer++ = sample;
+			buffer.put(i, stream_buffer::sample_t(sample));
 
 			m_update_count++;
 
@@ -297,16 +293,16 @@ void hc55516_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 	/* software driven clock */
 	else
-		for (i = 0; i < samples; i++, sample += slope)
-			*buffer++ = sample;
+		for (i = 0; i < buffer.samples(); i++, sample += slope)
+			buffer.put(i, stream_buffer::sample_t(sample));
 }
 
-void mc3417_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void mc3417_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	hc55516_device::sound_stream_update(stream, inputs, outputs, samples);
+	hc55516_device::sound_stream_update(stream, inputs, outputs);
 }
 
-void mc3418_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void mc3418_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	hc55516_device::sound_stream_update(stream, inputs, outputs, samples);
+	hc55516_device::sound_stream_update(stream, inputs, outputs);
 }

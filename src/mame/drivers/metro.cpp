@@ -97,6 +97,7 @@ driver modified by Hau
 #include "cpu/m68000/m68000.h"
 #include "cpu/upd7810/upd7810.h"
 #include "cpu/h8/h83006.h"
+#include "cpu/z8/z8.h"
 #include "machine/watchdog.h"
 #include "sound/msm5205.h"
 #include "sound/ym2413.h"
@@ -1164,79 +1165,6 @@ void metro_state::mouja_okimap(address_map &map)
 /***************************************************************************
                                 Puzzlet
 ***************************************************************************/
-
-class puzzlet_io_device : public device_t {
-public:
-	puzzlet_io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	DECLARE_WRITE_LINE_MEMBER( ce_w );
-	DECLARE_WRITE_LINE_MEMBER( clk_w );
-
-	auto data_callback() { return data_cb.bind(); }
-
-protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-private:
-	devcb_write_line data_cb;
-	required_ioport port;
-	int ce, clk;
-	int cur_bit;
-	u8 value;
-};
-
-DEFINE_DEVICE_TYPE(PUZZLET_IO, puzzlet_io_device, "puzzlet_io", "Puzzlet Coin/Start I/O")
-
-
-puzzlet_io_device::puzzlet_io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PUZZLET_IO, tag, owner, clock)
-	, data_cb(*this)
-	, port(*this, ":IN0")
-{
-}
-
-void puzzlet_io_device::device_start()
-{
-	data_cb.resolve_safe();
-	save_item(NAME(ce));
-	save_item(NAME(clk));
-	save_item(NAME(cur_bit));
-	save_item(NAME(value));
-	ce = 1;
-	clk = 1;
-}
-
-void puzzlet_io_device::device_reset()
-{
-	cur_bit = 0;
-	value = 0xff;
-}
-
-WRITE_LINE_MEMBER(puzzlet_io_device::ce_w)
-{
-	if(ce && !state) {
-		value = port->read();
-		cur_bit = 0;
-	} else if(!ce && state)
-		data_cb(1);
-
-	ce = state;
-}
-
-WRITE_LINE_MEMBER(puzzlet_io_device::clk_w)
-{
-	if(clk && !state) {
-		if(cur_bit == 8)
-			data_cb(1);
-		else {
-			data_cb((value >> cur_bit) & 1);
-			cur_bit++;
-		}
-	}
-	clk = state;
-}
-
 
 void metro_state::puzzlet_irq_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
@@ -2510,15 +2438,16 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( puzzlet )
-	PORT_START("IN0")       // IN0 - ser B
+	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("START")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_START("IN1")       // IN1 - 7f8880.w
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -3706,10 +3635,12 @@ void metro_state::puzzlet(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &metro_state::puzzlet_io_map);
 
 	/* Coins/service */
-	puzzlet_io_device &coins(PUZZLET_IO(config, "coins", 0));
-	coins.data_callback().set("maincpu:sci1", FUNC(h8_sci_device::rx_w));
-	subdevice<h8_sci_device>("maincpu:sci1")->tx_handler().set("coins", FUNC(puzzlet_io_device::ce_w));
-	subdevice<h8_sci_device>("maincpu:sci1")->clk_handler().set("coins", FUNC(puzzlet_io_device::clk_w));
+	z8_device &coinmcu(Z86E02(config, "coinmcu", 20_MHz_XTAL/5)); // clock divider guessed
+	coinmcu.p0_in_cb().set_ioport("COIN");
+	coinmcu.p2_in_cb().set_ioport("START");
+	coinmcu.p2_out_cb().set("maincpu:sci1", FUNC(h8_sci_device::rx_w)).bit(6);
+	subdevice<h8_sci_device>("maincpu:sci1")->tx_handler().set_inputline("coinmcu", INPUT_LINE_IRQ2).invert();
+	subdevice<h8_sci_device>("maincpu:sci1")->clk_handler().set_inputline("coinmcu", INPUT_LINE_IRQ0).invert();
 
 	/* video hardware */
 	// TODO: looks like game is running in i4220 compatibilty mode, $778000 seems to be an id for the chip?
@@ -5096,7 +5027,7 @@ ROM_START( puzzlet )
 	ROM_REGION( 0x200000, "maincpu", 0 )    /* H8/3007 Code */
 	ROM_LOAD16_WORD_SWAP( "prg1_ver2.u9", 0x000000, 0x200000, CRC(592760da) SHA1(08f7493d2e50831438f53bbf0ae211ec40057da7) )
 
-	ROM_REGION( 0x200, "z86e02", 0 )    /* Zilog Z8 family 8-bit MCU */
+	ROM_REGION( 0x200, "coinmcu", 0 )    /* Zilog Z8 family 8-bit MCU */
 	ROM_LOAD( "z86e02.mcu", 0x000, 0x200, CRC(399fa417) SHA1(f6c57020ea394c858742759050bf4f4b2f1e1fc5) )
 
 	ROM_REGION( 0x400000, "vdp2", 0 )   /* Gfx + Data (Addressable by CPU & Blitter) */
@@ -5111,7 +5042,7 @@ ROM_START( metabee ) // handwritten labels, unpopulated sound chips and ROM. Sti
 	ROM_REGION( 0x200000, "maincpu", 0 )    /* H8/3007 Code */
 	ROM_LOAD16_WORD_SWAP( "medabee2way.u9", 0x000000, 0x200000, CRC(aba51e0f) SHA1(99f18d772a73c499b1b33222b9bae8c1e1d4114b) ) // ST-M27C160 handwritten "メダビー2WAY"
 
-	ROM_REGION( 0x200, "z86e02", 0 )    /* Zilog Z8 family 8-bit MCU */
+	ROM_REGION( 0x200, "coinmcu", 0 )    /* Zilog Z8 family 8-bit MCU */
 	ROM_LOAD( "z86e02.mcu", 0x000, 0x200, NO_DUMP )
 
 	ROM_REGION( 0x800000, "vdp2", 0 )   /* Gfx + Data (Addressable by CPU & Blitter) */

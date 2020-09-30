@@ -22,11 +22,14 @@ public:
 	void inteladv(machine_config &config);
 	void dyndesk(machine_config &config);
 
+	DECLARE_WRITE_LINE_MEMBER(st2205u_power_w);
+	DECLARE_WRITE_LINE_MEMBER(st2202_power_w);
+
 private:
 	void inteladv_map(address_map &map);
 	void dyndesk_map(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<st2xxx_device> m_maincpu;
 };
 
 void inteladv_state::inteladv_map(address_map &map)
@@ -40,19 +43,41 @@ void inteladv_state::dyndesk_map(address_map &map)
 	map(0x800000, 0x807fff).ram();
 }
 
-static INPUT_PORTS_START( inteladv )
+WRITE_LINE_MEMBER(inteladv_state::st2205u_power_w)
+{
+	if (!state)
+		m_maincpu->set_state_int(st2xxx_device::ST_IREQ, m_maincpu->state_int(st2xxx_device::ST_IREQ) | 0x0020);
+}
+
+WRITE_LINE_MEMBER(inteladv_state::st2202_power_w)
+{
+	if (!state)
+		m_maincpu->set_state_int(st2xxx_device::ST_IREQ, m_maincpu->state_int(st2xxx_device::ST_IREQ) | 0x0010);
+}
+
+static INPUT_PORTS_START(inteladv)
+	PORT_START("POWER")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_POWER_ON) PORT_WRITE_LINE_MEMBER(inteladv_state, st2205u_power_w)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(dyndesk)
+	PORT_START("POWER")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_POWER_ON) PORT_WRITE_LINE_MEMBER(inteladv_state, st2202_power_w)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_START)
 INPUT_PORTS_END
 
 void inteladv_state::inteladv(machine_config &config)
 {
 	ST2205U(config, m_maincpu, 4000000);
 	m_maincpu->set_addrmap(AS_DATA, &inteladv_state::inteladv_map);
+	m_maincpu->in_pa_callback().set_ioport("POWER");
 }
 
 void inteladv_state::dyndesk(machine_config &config)
 {
 	ST2202(config, m_maincpu, 4000000);
 	m_maincpu->set_addrmap(AS_DATA, &inteladv_state::dyndesk_map);
+	m_maincpu->in_pa_callback().set_ioport("POWER");
 }
 
 ROM_START( inteladv )
@@ -74,5 +99,5 @@ ROM_END
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME                              FLAGS
 COMP( 2005, inteladv, 0,      0,      inteladv, inteladv, inteladv_state, empty_init, "VTech", "Intelligence Advance E/R (Germany)", MACHINE_IS_SKELETON )
-COMP( 2003, dyndesk,  0,      0,      dyndesk,  inteladv, inteladv_state, empty_init, "VTech", "DynamiDesk (Germany)",               MACHINE_IS_SKELETON )
-COMP( 2012, cars2lap, 0,      0,      dyndesk,  inteladv, inteladv_state, empty_init, "VTech", "CARS 2 Laptop (Germany)",            MACHINE_IS_SKELETON ) // probably doesn't belong here
+COMP( 2003, dyndesk,  0,      0,      dyndesk,  dyndesk,  inteladv_state, empty_init, "VTech", "DynamiDesk (Germany)",               MACHINE_IS_SKELETON )
+COMP( 2012, cars2lap, 0,      0,      dyndesk,  dyndesk,  inteladv_state, empty_init, "VTech", "CARS 2 Laptop (Germany)",            MACHINE_IS_SKELETON ) // probably doesn't belong here

@@ -27,8 +27,9 @@ DEFINE_DEVICE_TYPE(O2_CART_SLOT, o2_cart_slot_device, "o2_cart_slot", "Odyssey 2
 
 device_o2_cart_interface::device_o2_cart_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "odyssey2cart")
-	, m_rom(nullptr)
-	, m_rom_size(0)
+	, m_rom(*this, "rom")
+	, m_exrom(*this, "exrom")
+	, m_voice(*this, "voice")
 {
 }
 
@@ -39,19 +40,6 @@ device_o2_cart_interface::device_o2_cart_interface(const machine_config &mconfig
 
 device_o2_cart_interface::~device_o2_cart_interface()
 {
-}
-
-//-------------------------------------------------
-//  rom_alloc - alloc the space for the cart
-//-------------------------------------------------
-
-void device_o2_cart_interface::rom_alloc(uint32_t size, const char *tag)
-{
-	if (m_rom == nullptr)
-	{
-		m_rom = device().machine().memory().region_alloc(std::string(tag).append(O2SLOT_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
-		m_rom_size = size;
-	}
 }
 
 
@@ -115,11 +103,12 @@ static const o2_slot slot_list[] =
 
 static int o2_get_pcb_id(const char *slot)
 {
-	for (auto & elem : slot_list)
-	{
-		if (!core_stricmp(elem.slot_option, slot))
-			return elem.pcb_id;
-	}
+	if (slot)
+		for (auto & elem : slot_list)
+		{
+			if (!core_stricmp(elem.slot_option, slot))
+				return elem.pcb_id;
+		}
 
 	return 0;
 }
@@ -144,33 +133,35 @@ image_init_result o2_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		uint32_t size = !loaded_through_softlist() ? length() : get_software_region_length("rom");
-		m_cart->rom_alloc(size, tag());
-
 		if (loaded_through_softlist())
 		{
-			memcpy(m_cart->get_rom_base(), get_software_region("rom"), size);
+			load_software_region("rom", m_cart->m_rom);
+			load_software_region("exrom", m_cart->m_exrom);
+			load_software_region("voice", m_cart->m_voice);
 
-			const char *pcb_name = get_feature("slot");
-			if (pcb_name)
-				m_type = o2_get_pcb_id(pcb_name);
+			m_type = o2_get_pcb_id(get_feature("slot"));
 
 			// Videopac+ determines whether the screen should have a border, with a gate connected
 			// to the cartridge B pin. This way, old Videopac games can still run in full screen.
-			m_b = bool(strtoul(get_feature("b_pin"), nullptr, 0)) ? 1 : 0;
+			const char *b_pin = get_feature("b_pin");
+			m_b = b_pin && strtoul(b_pin, nullptr, 0) ? 1 : 0;
 		}
 		else
 		{
-			fread(m_cart->get_rom_base(), size);
-			m_type = (size == 16384) ? O2_RALLY : O2_STD;
+			uint32_t size = length();
+			fread(m_cart->m_rom, size);
+
+			m_type = (size == 0x4000) ? O2_RALLY : O2_STD;
 		}
 
-		m_cart->cart_init();
-
-		return image_init_result::PASS;
+		if (m_cart->get_rom_size() > 0)
+		{
+			m_cart->cart_init();
+			return image_init_result::PASS;
+		}
 	}
 
-	return image_init_result::PASS;
+	return image_init_result::FAIL;
 }
 
 
@@ -184,7 +175,7 @@ std::string o2_cart_slot_device::get_default_card_software(get_default_card_soft
 	{
 		const char *slot_string;
 		uint32_t size = hook.image_file()->size();
-		int type = (size == 16384) ? O2_RALLY : O2_STD;
+		int type = (size == 0x4000) ? O2_RALLY : O2_STD;
 		slot_string = o2_get_slot(type);
 
 		//printf("type: %s\n", slot_string);

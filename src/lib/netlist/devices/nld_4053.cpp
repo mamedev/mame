@@ -23,10 +23,8 @@
  */
 
 
-#include "nld_4053.h"
-
-#include "netlist/analog/nlid_twoterm.h"
-#include "netlist/solver/nld_solver.h"
+#include "analog/nlid_twoterm.h"
+#include "solver/nld_solver.h"
 
 namespace netlist
 {
@@ -47,10 +45,10 @@ namespace netlist
 		, m_inhibit_state(*this, "m_inhibit_state", false)
 		, m_supply(*this)
 		{
-			connect(m_RX.N(), m_RY.N());
-			register_subalias("X", m_RX.P());
-			register_subalias("Y", m_RY.P());
-			register_subalias("XY", m_RX.N());
+			connect("RX.2", "RY.2");
+			register_subalias("X", "RX.1");
+			register_subalias("Y", "RY.1");
+			register_subalias("XY", "RX.2");
 		}
 
 		NETLIB_RESETI()
@@ -61,7 +59,8 @@ namespace netlist
 	private:
 		NETLIB_HANDLERI(controls)
 		{
-			bool newx = false, newy = false;
+			bool newx = false;
+			bool newy = false;
 			if (!on(m_inhibit, m_inhibit_state))
 			{
 				if (!on(m_select, m_select_state))

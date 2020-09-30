@@ -40,12 +40,12 @@ Basic display of LEDs for the SITCOM85
 
 	<view name="Default Layout">
 		<!-- Black background -->
-		<bezel element="background">
+		<element ref="background">
 			<bounds left="34" top="60" right="341" bottom="160" />
-		</bezel>
-		<bezel name="sod_led" element="a_led">
+		</element>
+		<element name="sod_led" ref="a_led">
 			<bounds left="46" top="90" right="56" bottom="100" />
-		</bezel>
+		</element>
 
 		<!-- DL1414 left/right -->
 		<repeat count="2">
@@ -54,9 +54,9 @@ Basic display of LEDs for the SITCOM85
 			<repeat count="4">
 				<param name="digitno" start="~moduleno~" increment="-1" />
 				<param name="digitx" start="~modulex~" increment="34" />
-				<bezel name="digit~digitno~" element="a_digit">
+				<element name="digit~digitno~" ref="a_digit">
 					<bounds x="~digitx~" y="70" width="25" height="50" />
-				</bezel>
+				</element>
 			</repeat>
 		</repeat>
 
@@ -64,12 +64,12 @@ Basic display of LEDs for the SITCOM85
 			<param name="ledno" start="7" increment="-1" />
 			<param name="bx" start="65" increment="15" />
 			<param name="ax" start="185" increment="15" />
-			<bezel name="pb~ledno~" element="b_led">
+			<element name="pb~ledno~" ref="b_led">
 				<bounds x="~bx~" y="140" width="10" height="10" />
-			</bezel>
-			<bezel name="pa~ledno~" element="b_led">
+			</element>
+			<element name="pa~ledno~" ref="b_led">
 				<bounds x="~ax~" y="140" width="10" height="10" />
-			</bezel>
+			</element>
 		</repeat>
 	</view>
 

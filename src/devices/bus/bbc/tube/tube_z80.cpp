@@ -78,7 +78,6 @@ void bbc_tube_z80_device::device_add_mconfig(machine_config &config)
 	m_z80->set_irq_acknowledge_callback(FUNC(bbc_tube_z80_device::irq_callback));
 
 	TUBE(config, m_ula);
-	m_ula->hirq_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_tube_slot_device::irq_w));
 	m_ula->pnmi_handler().set_inputline(m_z80, INPUT_LINE_NMI);
 	m_ula->pirq_handler().set_inputline(m_z80, INPUT_LINE_IRQ0);
 

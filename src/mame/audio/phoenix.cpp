@@ -89,7 +89,7 @@ void phoenix_sound_device::device_start()
 		m_poly18[i] = bits;
 	}
 
-	m_channel = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
+	m_channel = stream_alloc_legacy(0, 1, machine().sample_rate());
 
 	save_item(NAME(m_sound_latch_a));
 	save_item(NAME(m_c24_state.counter));
@@ -520,10 +520,10 @@ void phoenix_sound_device::control_b_w(uint8_t data)
 
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void phoenix_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void phoenix_sound_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	int samplerate = machine().sample_rate();
 	stream_sample_t *buffer = outputs[0];

@@ -68,33 +68,27 @@
 // Diode models
 //
 
-// models copied from https://www.diodes.com/assets/Spice-Models/Discrete-Prodcut-Groups/Zener-Diodes.txt
 #define D_1N914(name) DIODE(name, "1N914")
 #define D_1N914B(name) DIODE(name, "1N914")
-#define D_1N5236B(name) ZDIODE(name, "D(BV=7.5 IS=27.5p RS=33.8 N=1.10 CJO=58.2p VJ=0.750 M=0.330 TT=50.1n)")
-#define D_1N5240(name) ZDIODE(name, "D(BV=10 IS=14.4p RS=32.0 N=1.10 CJO=24.1p VJ=0.750 M=0.330 TT=50.1n)")
-#define D_1N5240B(name) ZDIODE(name, "D(BV=10 IS=14.4p RS=32.0 N=1.10 CJO=24.1p VJ=0.750 M=0.330 TT=50.1n)")
+#define D_1N5236B(name) ZDIODE(name, "1N5236B")
+#define D_1N5240(name) ZDIODE(name, "1N5240")
+#define D_1N5240B(name) ZDIODE(name, "1N5240B")
 
 
 
 //
-// Op-amp models
+// Transistor models
 //
 
-// SPICE model taken directly from Fairchild Semiconductor datasheet
-#define Q_2N3904(name) QBJT_EB(name, "NPN(Is=6.734f Xti=3 Eg=1.11 Vaf=74.03 Bf=416.4 Ne=1.259 Ise=6.734 Ikf=66.78m Xtb=1.5 Br=.7371 Nc=2 Isc=0 Ikr=0 Rc=1 Cjc=3.638p Mjc=.3085 Vjc=.75 Fc=.5 Cje=4.493p Mje=.2593 Vje=.75 Tr=239.5n f=301.2p Itf=.4 Vtf=4 Xtf=2 Rb=10)")
+#define Q_2N3904(name) QBJT_EB(name, "2N3904")
 
-// SPICE model taken directly from Fairchild Semiconductor datasheet
-#define Q_2N3906(name) QBJT_EB(name, "PNP(Is=1.41f Xti=3 Eg=1.11 Vaf=18.7 Bf=180.7 Ne=1.5 Ise=0 Ikf=80m Xtb=1.5 Br=4.977 Nc=2 Isc=0 Ikr=0 Rc=2.5 Cjc=9.728p Mjc=.5776 Vjc=.75 Fc=.5 Cje=8.063p Mje=.3677 Vje=.75 Tr=33.42n Tf=179.3p Itf=.4 Vtf=4 Xtf=6 Rb=10)")
+#define Q_2N3906(name) QBJT_EB(name, "2N3906")
 
-// SPICE model taken from https://www.onsemi.com/support/design-resources/models?rpn=2N6107
-#define Q_2N6107(name) QBJT_EB(name, "PNP(IS=7.62308e-14 BF=6692.56 NF=0.85 VAF=10 IKF=0.032192 ISE=2.07832e-13 NE=2.41828 BR=15.6629 NR=1.5 VAR=1.44572 IKR=0.32192 ISC=4.75e-16 NC=3.9375 RB=7.19824 IRB=0.1 RBM=0.1 RE=0.0001 RC=0.355458 XTB=0.1 XTI=2.97595 EG=1.206 CJE=1.84157e-10 VJE=0.99 MJE=0.347177 TF=6.63757e-09 XTF=1.50003 VTF=1.0001 ITF=1 CJC=1.06717e-10 VJC=0.942679 MJC=0.245405 XCJC=0.8 FC=0.533334 CJS=0 VJS=0.75 MJS=0.5 TR=1.32755e-07 PTF=0 KF=0 AF=1)")
+#define Q_2N6107(name) QBJT_EB(name, "2N6107")
 
-// SPICE model taken from https://www.onsemi.com/support/design-resources/models?rpn=2N6292
-#define Q_2N6292(name) QBJT_EB(name, "NPN(IS=9.3092e-13 BF=2021.8 NF=0.85 VAF=63.2399 IKF=1 ISE=1.92869e-13 NE=1.97024 BR=40.0703 NR=1.5 VAR=0.89955 IKR=10 ISC=4.92338e-16 NC=3.9992 RB=6.98677 IRB=0.1 RBM=0.1 RE=0.0001 RC=0.326141 XTB=0.1 XTI=2.86739 EG=1.206 CJE=1.84157e-10 VJE=0.99 MJE=0.347174 TF=6.73756e-09 XTF=1.49917 VTF=0.997395 ITF=0.998426 CJC=1.06717e-10 VJC=0.942694 MJC=0.245406 XCJC=0.8 FC=0.533405 CJS=0 VJS=0.75 MJS=0.5 TR=6.0671e-08 PTF=0 KF=0 AF=1)")
+#define Q_2N6292(name) QBJT_EB(name, "2N6292")
 
-// SPICE model taken from http://ltwiki.org/files/LTspiceIV/Vendor%20List/Fairchild/2N/index.html
-#define Q_2N5210(name) QBJT_EB(name, "NPN(Is=5.911f Xti=3 Eg=1.11 Vaf=62.37 Bf=809.9 Ne=1.358 Ise=5.911f Ikf=14.26m Xtb=1.5 Br=1.287 Nc=2 Isc=0 Ikr=0 Rc=1.61 Cjc=4.017p Mjc=.3174 Vjc=.75 Fc=.5 Cje=4.973p Mje=.4146 Vje=.75 Tr=4.68n Tf=820.9p Itf=.35 Vtf=4 Xtf=7 Rb=10)")
+#define Q_2N5210(name) QBJT_EB(name, "2N5210")
 
 
 

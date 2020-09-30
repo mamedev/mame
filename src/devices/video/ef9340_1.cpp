@@ -323,9 +323,6 @@ uint8_t ef9340_1_device::ef9341_read( uint8_t command, uint8_t b )
 
 void ef9340_1_device::ef9340_scanline(int vpos)
 {
-	for (int i = 0; i < m_tmp_bitmap.width(); i++)
-		m_tmp_bitmap.pix16(vpos, i) = 0;
-
 	vpos -= m_offset_y;
 	if (vpos < 0)
 		return;
@@ -360,7 +357,7 @@ void ef9340_1_device::ef9340_scanline(int vpos)
 			{
 				// Service row is disabled
 				for (int i = 0; i < 40 * 8; i++)
-					m_tmp_bitmap.pix16(vpos, i) = 8;
+					m_tmp_bitmap.pix16(m_offset_y + vpos, m_offset_x + i) = 8;
 				return;
 			}
 		}
@@ -479,6 +476,11 @@ void ef9340_1_device::ef9340_scanline(int vpos)
 				underline = bool(b & 0x04);
 			}
 		}
+	}
+	else
+	{
+		for (int i = 0; i < 40 * 8; i++)
+			m_tmp_bitmap.pix16(m_offset_y + vpos, m_offset_x + i) = 0;
 	}
 
 	// determine next h parity

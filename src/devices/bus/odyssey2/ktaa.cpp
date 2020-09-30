@@ -30,10 +30,11 @@ void o2_ktaa_device::device_start()
 
 void o2_ktaa_device::cart_init()
 {
-	if (m_rom_size != 0xc00 && m_rom_size != 0xc00*2 && m_rom_size != 0xc00*4)
+	u32 size = m_rom.bytes();
+	if (size != 0xc00 && size != 0xc00*2 && size != 0xc00*4)
 		fatalerror("o2_ktaa_device: ROM size must be multiple of 3KB\n");
 
-	m_bank_mask = (m_rom_size / 0xc00) - 1;
+	m_bank_mask = (size / 0xc00) - 1;
 }
 
 

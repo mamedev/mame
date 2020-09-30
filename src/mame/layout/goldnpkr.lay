@@ -111,41 +111,41 @@ license:CC0
 		<screen index="0">
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
-		<bezel name="lamp0" element="BET" inputtag="IN0-0" inputmask="0x01">
+		<element name="lamp0" ref="BET" inputtag="IN0-0" inputmask="0x01">
 			<bounds x="3.0" y="3.45" width="0.40" height="0.24" />
-		</bezel>
-		<bezel name="lamp1" element="DEAL" inputtag="IN0-0" inputmask="0x08">
+		</element>
+		<element name="lamp1" ref="DEAL" inputtag="IN0-0" inputmask="0x08">
 			<bounds x="2.5" y="3.45" width="0.40" height="0.24" />
-		</bezel>
-		<bezel name="lamp2" element="HOLD" inputtag="IN0-2" inputmask="0x01">
+		</element>
+		<element name="lamp2" ref="HOLD" inputtag="IN0-2" inputmask="0x01">
 			<bounds x="0.0" y="3.13" width="0.40" height="0.24" />
-		</bezel>
-		<bezel name="lamp3" element="D-UP" inputtag="IN0-0" inputmask="0x04">
+		</element>
+		<element name="lamp3" ref="D-UP" inputtag="IN0-0" inputmask="0x04">
 			<bounds x="1.5" y="3.45" width="0.40" height="0.24" />
-		</bezel>
-		<bezel name="lamp4" element="BIG" inputtag="IN0-1" inputmask="0x08">
+		</element>
+		<element name="lamp4" ref="BIG" inputtag="IN0-1" inputmask="0x08">
 			<bounds x="0.5" y="3.45" width="0.40" height="0.24" />
-		</bezel>
-		<bezel name="lamp2" element="HOLD" inputtag="IN0-2" inputmask="0x02">
+		</element>
+		<element name="lamp2" ref="HOLD" inputtag="IN0-2" inputmask="0x02">
 			<bounds x="0.5" y="3.13" width="0.40" height="0.24" />
-		</bezel>
-		<bezel name="lamp2" element="HOLD" inputtag="IN0-2" inputmask="0x04">
+		</element>
+		<element name="lamp2" ref="HOLD" inputtag="IN0-2" inputmask="0x04">
 			<bounds x="1.0" y="3.13" width="0.40" height="0.24" />
-		</bezel>
-		<bezel name="lamp2" element="HOLD" inputtag="IN0-2" inputmask="0x08">
+		</element>
+		<element name="lamp2" ref="HOLD" inputtag="IN0-2" inputmask="0x08">
 			<bounds x="1.5" y="3.13" width="0.40" height="0.24" />
-		</bezel>
-		<bezel name="lamp2" element="HOLD" inputtag="IN0-2" inputmask="0x10">
+		</element>
+		<element name="lamp2" ref="HOLD" inputtag="IN0-2" inputmask="0x10">
 			<bounds x="2.0" y="3.13" width="0.40" height="0.24" />
-		</bezel>
-		<bezel name="lamp3" element="TAKE" inputtag="IN0-1" inputmask="0x04">
+		</element>
+		<element name="lamp3" ref="TAKE" inputtag="IN0-1" inputmask="0x04">
 			<bounds x="2.0" y="3.45" width="0.40" height="0.24" />
-		</bezel>
-		<bezel name="lamp4" element="SMALL" inputtag="IN0-1" inputmask="0x10">
+		</element>
+		<element name="lamp4" ref="SMALL" inputtag="IN0-1" inputmask="0x10">
 			<bounds x="1.0" y="3.45" width="0.40" height="0.24" />
-		</bezel>
-		<bezel name="lamp2" element="CANCEL" inputtag="IN0-0" inputmask="0x10">
+		</element>
+		<element name="lamp2" ref="CANCEL" inputtag="IN0-0" inputmask="0x10">
 			<bounds x="0.0" y="3.45" width="0.40" height="0.24" />
-		</bezel>
+		</element>
 	</view>
 </mamelayout>

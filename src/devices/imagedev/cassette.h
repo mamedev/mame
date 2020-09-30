@@ -102,7 +102,7 @@ public:
 	void seek(double time, int origin);
 
 	// sound stream update overrides
-	void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	void sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples) override;
 	device_sound_interface& set_stereo() { m_stereo = true; return *this; }
 
 protected:

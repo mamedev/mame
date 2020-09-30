@@ -50,29 +50,29 @@ license:CC0
 		<screen index="0">
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
-		<bezel name="0.0" element="rswing">
+		<element name="0.0" ref="rswing">
 			<bounds x="0" y="-0.2" width="2" height="0.2" />
-		</bezel>
-		<bezel name="0.1" element="lswing">
+		</element>
+		<element name="0.1" ref="lswing">
 			<bounds x="0" y="-0.2" width="2" height="0.2" />
-		</bezel>
-		<bezel name="0.2" element="rbunt">
+		</element>
+		<element name="0.2" ref="rbunt">
 			<bounds x="0" y="-0.2" width="2" height="0.2" />
-		</bezel>
-		<bezel name="0.3" element="lbunt">
+		</element>
+		<element name="0.3" ref="lbunt">
 			<bounds x="0" y="-0.2" width="2" height="0.2" />
-		</bezel>
-		<bezel name="2.0" element="rswing">
+		</element>
+		<element name="2.0" ref="rswing">
 			<bounds x="2" y="-0.2" width="2" height="0.2" />
-		</bezel>
-		<bezel name="2.1" element="lswing">
+		</element>
+		<element name="2.1" ref="lswing">
 			<bounds x="2" y="-0.2" width="2" height="0.2" />
-		</bezel>
-		<bezel name="2.2" element="rbunt">
+		</element>
+		<element name="2.2" ref="rbunt">
 			<bounds x="2" y="-0.2" width="2" height="0.2" />
-		</bezel>
-		<bezel name="2.3" element="lbunt">
+		</element>
+		<element name="2.3" ref="lbunt">
 			<bounds x="2" y="-0.2" width="2" height="0.2" />
-		</bezel>
+		</element>
 	</view>
 </mamelayout>

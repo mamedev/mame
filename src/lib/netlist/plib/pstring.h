@@ -74,6 +74,9 @@ public:
 	using size_type = std::size_t;
 	using difference_type = std::ptrdiff_t;
 	using string_type = typename traits_type::string_type;
+	// no non-const const_iterator for now
+	using iterator = pstring_const_iterator<pstring_t<F> >;
+	using const_iterator = pstring_const_iterator<pstring_t<F> >;
 
 	// FIXME: this is ugly
 	struct ref_value_type final
@@ -120,9 +123,20 @@ public:
 		m_str.assign(string, N - 1);
 	}
 
+	// interpret other string as putf8strings
+	template <typename C,
+		class = std::enable_if_t<std::is_same<std::remove_const_t<C>, char>::value
+		&& !std::is_same<std::remove_const_t<C>, mem_t>::value>>
+	pstring_t(C *string);
+
 	explicit pstring_t(const string_type &string)
 		: m_str(string)
 	{ }
+
+	pstring_t(iterator first, iterator last)
+	{
+		m_str.assign(first.p, last.p);
+	}
 
 	pstring_t(const pstring_t &string) = default;
 	pstring_t(pstring_t &&string) noexcept = default;
@@ -146,7 +160,6 @@ public:
 
 	operator string_type () const { return m_str; }
 
-
 	template <typename T,
 		class = std::enable_if_t<!std::is_same<T, pstring_t::traits_type>::value>>
 	pstring_t &operator=(const pstring_t<T> &string)
@@ -157,10 +170,6 @@ public:
 		return *this;
 	}
 
-	// no non-const const_iterator for now
-	using iterator = pstring_const_iterator<pstring_t<F> >;
-	using const_iterator = pstring_const_iterator<pstring_t<F> >;
-
 	iterator begin() noexcept { return iterator(m_str.begin()); }
 	iterator end() noexcept { return iterator(m_str.end()); }
 	const_iterator begin() const noexcept { return const_iterator(m_str.begin()); }
@@ -169,14 +178,28 @@ public:
 	const_iterator cend() const noexcept { return const_iterator(m_str.end()); }
 
 	// C string conversion helpers
-	const mem_t *c_str() const noexcept  {   return static_cast<const mem_t *>(m_str.c_str()); }
-	const mem_t *data() const noexcept  {    return c_str(); }
+	const mem_t *c_str() const noexcept  { return static_cast<const mem_t *>(m_str.c_str()); }
+	const mem_t *data() const noexcept  { return c_str(); }
 
+	/// \brief return number of codes in the string
+	///
+	/// This may report a number less than what \ref size reports. pstrings
+	/// operate on character codes. In the case of utf pstrings thus the physical size
+	/// may be bigger than the logical size.
 	size_type length() const noexcept { return traits_type::len(m_str); }
-	size_type size() const noexcept { return traits_type::len(m_str); }
-	bool empty() const noexcept { return m_str.empty(); }
 
-	pstring_t substr(size_type start, size_type nlen = npos) const;
+	/// \brief return number of memory units in the string
+	///
+	/// This function returns the number of memory units used by a string.
+	/// Depending on the string type the size may be reported as bytes, words
+	/// or quad-words.
+	size_type size() const noexcept { return m_str.size(); }
+
+	bool empty() const noexcept { return m_str.empty(); }
+	void clear() noexcept { m_str.clear(); }
+
+	pstring_t substr(size_type start, size_type nlen) const;
+	pstring_t substr(size_type start) const;
 	int compare(const pstring_t &right) const noexcept;
 
 	size_type find(const pstring_t &search, size_type start = 0) const noexcept;
@@ -190,8 +213,8 @@ public:
 	friend pstring_t operator+(code_t lhs, const pstring_t &rhs) { return pstring_t(1, lhs) += rhs; }
 
 	// comparison operators
-	bool operator==(const pstring_t &string) const noexcept { return (compare(string) == 0); }
-	bool operator!=(const pstring_t &string) const noexcept { return (compare(string) != 0); }
+	bool operator==(const pstring_t &string) const noexcept { return m_str == string.m_str; }
+	bool operator!=(const pstring_t &string) const noexcept { return m_str != string.m_str; }
 
 	bool operator<(const pstring_t &string) const noexcept { return (compare(string) < 0); }
 	bool operator<=(const pstring_t &string) const noexcept { return (compare(string) <= 0); }
@@ -223,10 +246,10 @@ struct pu8_traits
 	using string_type = std::string;
 	static std::size_t len(const string_type &p) noexcept { return p.size(); }
 	static std::size_t codelen(const mem_t *p) noexcept { plib::unused_var(p); return 1; }
-	static std::size_t codelen(const code_t c) noexcept { plib::unused_var(c); return 1; }
+	static std::size_t codelen(code_t c) noexcept { plib::unused_var(c); return 1; }
 	static code_t code(const mem_t *p) noexcept { return *p; }
 	static void encode(const code_t c, string_type &s) { s += static_cast<mem_t>(c); }
-	static const mem_t *nthcode(const mem_t *p, const std::size_t n) noexcept { return &(p[n]); }
+	static const mem_t *nthcode(const mem_t *p, std::size_t n) noexcept { return &(p[n]); }
 };
 
 // No checking, this may deliver invalid codes
@@ -248,52 +271,37 @@ struct putf_traits<1, CT>
 		std::size_t ret = 0;
 		for (const auto &c : p)
 		{
-			if (!((c & 0xC0) == 0x80)) // NOLINT
-				ret++;
+			ret += (!((c & 0xC0) == 0x80)); // NOLINT
 		}
 		return ret;
 	}
 
-	static std::size_t codelen(const mem_t *p) noexcept
+	static constexpr std::size_t codelen(const mem_t *p) noexcept
 	{
 		const auto *p1 = reinterpret_cast<const unsigned char *>(p); // NOLINT(cppcoreguidelines-pro-type-reinterpret
-		if ((*p1 & 0xE0) == 0xC0) // NOLINT
-			return 2;
-		if ((*p1 & 0xF0) == 0xE0) // NOLINT
-			return 3;
-		if ((*p1 & 0xF8) == 0xF0) // NOLINT
-			return 4;
-
-		// valid utf8: ((*p1 & 0x80) == 0x00)
-		// However, we return 1 here.
-		return 1;
+		return ((*p1 & 0x80) == 0x00) ? 1 : // NOLINT
+			   ((*p1 & 0xE0) == 0xC0) ? 2 : // NOLINT
+			   ((*p1 & 0xF0) == 0xE0) ? 3 : // NOLINT
+			   ((*p1 & 0xF8) == 0xF0) ? 4 : // NOLINT
+			   1; // Invalid UTF8 code - ignore
 	}
 
-	static std::size_t codelen(const code_t c) noexcept
+	static constexpr std::size_t codelen(code_t c) noexcept
 	{
-		if (c < 0x0080) // NOLINT
-			return 1;
-		if (c < 0x800) // NOLINT
-			return 2;
-		if (c < 0x10000) // NOLINT
-			return 3;
-		// U+10000 U+1FFFFF
-		return 4; // no checks
+		return (c < 0x00080) ? 1 : // NOLINT
+			   (c < 0x00800) ? 2 : // NOLINT
+			   (c < 0x10000) ? 3 : // NOLINT
+			   4; // U+10000 U+1FFFFF
 	}
 
-	static code_t code(const mem_t *p) noexcept
+	static constexpr code_t code(const mem_t *p) noexcept
 	{
-		const auto *p1 = reinterpret_cast<const unsigned char *>(p); // NOLINT(cppcoreguidelines-pro-type-reinterpret
-		if ((*p1 & 0x80) == 0x00) // NOLINT
-			return *p1;
-		if ((*p1 & 0xE0) == 0xC0) // NOLINT
-			return static_cast<code_t>(((p1[0] & 0x3f) << 6) | (p1[1] & 0x3f)); // NOLINT
-		if ((*p1 & 0xF0) == 0xE0) // NOLINT
-			return static_cast<code_t>(((p1[0] & 0x1f) << 12) | ((p1[1] & 0x3f) << 6) | ((p1[2] & 0x3f) << 0)); // NOLINT
-		if ((*p1 & 0xF8) == 0xF0) // NOLINT
-			return static_cast<code_t>(((p1[0] & 0x0f) << 18) | ((p1[1] & 0x3f) << 12) | ((p1[2] & 0x3f) << 6)  | ((p1[3] & 0x3f) << 0)); // NOLINT
-
-		return 0xFFFD; // NOLINT: unicode-replacement character
+		const auto *p1 = reinterpret_cast<const unsigned char *>(p); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+		return ((*p1 & 0x80) == 0x00) ? *p1 : // NOLINT
+			   ((*p1 & 0xE0) == 0xC0) ? static_cast<code_t>(((p1[0] & 0x3f) << 6) | (p1[1] & 0x3f)) : // NOLINT
+			   ((*p1 & 0xF0) == 0xE0) ? static_cast<code_t>(((p1[0] & 0x1f) << 12) | ((p1[1] & 0x3f) << 6) | ((p1[2] & 0x3f) << 0)) : // NOLINT
+			   ((*p1 & 0xF8) == 0xF0) ? static_cast<code_t>(((p1[0] & 0x0f) << 18) | ((p1[1] & 0x3f) << 12) | ((p1[2] & 0x3f) << 6)  | ((p1[3] & 0x3f) << 0)) : // NOLINT
+			   0xFFFD; // NOLINT: unicode-replacement character
 	}
 
 	static void encode(const code_t c, string_type &s)
@@ -322,7 +330,7 @@ struct putf_traits<1, CT>
 		}
 	}
 
-	static const mem_t *nthcode(const mem_t *p, const std::size_t n) noexcept
+	static const mem_t *nthcode(const mem_t *p, std::size_t n) noexcept
 	{
 		const mem_t *p1 = p;
 		std::size_t i = n;
@@ -360,7 +368,7 @@ struct putf_traits<2, CT>
 		auto c = static_cast<uint16_t>(*p);
 		return ((c & 0xd800) == 0xd800) ? 2 : 1; // NOLINT
 	}
-	static std::size_t codelen(const code_t c) noexcept
+	static std::size_t codelen(code_t c) noexcept
 	{
 		return (c < 0x10000) ? 1 : 2;  // NOLINT: U+10000 U+1FFFFF
 	}
@@ -389,7 +397,7 @@ struct putf_traits<2, CT>
 			s += static_cast<mem_t>(cu);
 		}
 	}
-	static const mem_t *nthcode(const mem_t *p, const std::size_t n) noexcept
+	static const mem_t *nthcode(const mem_t *p, std::size_t n) noexcept
 	{
 		std::size_t i = n;
 		while (i-- > 0)
@@ -417,7 +425,7 @@ struct putf_traits<4, CT>
 		return 1;
 	}
 
-	static std::size_t codelen(const code_t c) noexcept
+	static std::size_t codelen(code_t c) noexcept
 	{
 		plib::unused_var(c);
 		return 1;
@@ -432,7 +440,7 @@ struct putf_traits<4, CT>
 	{
 		s += static_cast<mem_t>(c);
 	}
-	static const mem_t *nthcode(const mem_t *p, const std::size_t n) noexcept
+	static const mem_t *nthcode(const mem_t *p, std::size_t n) noexcept
 	{
 		return p + n;
 	}
@@ -460,6 +468,17 @@ using putf16string = pstring_t<putf16_traits>;
 using putf32string = pstring_t<putf32_traits>;
 using pwstring = pstring_t<pwchar_traits>;
 
+// interpret other string as putf8strings
+template <typename F>
+template <typename C, class>
+pstring_t<F>::pstring_t(C *string)
+{
+	m_str.clear();
+	putf8string utf8(string);
+	for (const auto &c : utf8)
+		*this += c;
+}
+
 namespace plib
 {
 	template<class T>
@@ -471,21 +490,24 @@ namespace plib
 	struct string_info<pstring_t<T>>
 	{
 		using mem_t = typename T::mem_t;
+#if 0
 		static std::size_t mem_size(const pstring_t<T> &s) { return s.mem_t_size(); }
+#endif
 	};
 
 	template<typename T>
 	struct string_info<std::basic_string<T>>
 	{
 		using mem_t = T;
-		static std::size_t mem_size(const std::string &s) { return s.size(); }
+#if 0
+		static std::size_t mem_size(const std::basic_string<T> &s) { return s.size(); }
+#endif
 	};
 } // namespace plib
 
 // custom specialization of std::hash can be injected in namespace std
 namespace std
 {
-
 	template<typename T>
 	struct hash<pstring_t<T>>
 	{

@@ -40,7 +40,6 @@ namespace netlist
 	protected:
 
 		//NETLIB_UPDATE_TERMINALSI() { }
-
 	private:
 		param_model_t m_model;
 	};

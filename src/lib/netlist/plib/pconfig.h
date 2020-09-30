@@ -8,7 +8,7 @@
 /// \file pconfig.h
 ///
 
-/// \brief More accurate measurements if you processor supports RDTSCP.
+/// \brief More accurate measurements the processor supports RDTSCP.
 ///
 #ifndef PHAS_RDTSCP
 #define PHAS_RDTSCP (0)

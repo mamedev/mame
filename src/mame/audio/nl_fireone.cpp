@@ -13,93 +13,10 @@
 #include "netlist/devices/net_lib.h"
 
 //
-// 556 is just two 555s in one package
-//
-
-static NETLIST_START(NE556_DIP)
-	NE555(A)
-	NE555(B)
-
-	NET_C(A.GND, B.GND)
-	NET_C(A.VCC, B.VCC)
-
-	DIPPINS(      /*        +--------------+        */
-		 A.DISCH, /* 1DISCH |1     ++    14| VCC    */ A.VCC,
-		A.THRESH, /* 1THRES |2           13| 2DISCH */ B.DISCH,
-		  A.CONT, /*  1CONT |3           12| 2THRES */ B.THRESH,
-		 A.RESET, /* 1RESET |4   NE556   11| 2CONT  */ B.CONT,
-		   A.OUT, /*   1OUT |5           10| 2RESET */ B.RESET,
-		  A.TRIG, /*  1TRIG |6            9| 2OUT   */ B.OUT,
-		   A.GND, /*    GND |7            8| 2TRIG  */ B.TRIG
-				  /*        +--------------+        */
-	)
-NETLIST_END()
-
-
-//
-// ICL8038 is broadly similar to a 566 VCO, and can be simulated partially as such.
-//
-
-static NETLIST_START(ICL8038_DIP)
-	VCVS(VI, 1)
-	CCCS(CI1, -1)
-	CCCS(CI2, 2)
-	SYS_COMPD(COMP)
-	SYS_DSW2(SW)
-	VCVS(VO, 1)
-	RES(R_SHUNT, RES_R(50))
-
-	PARAM(VO.RO, 50)
-	PARAM(COMP.MODEL, "FAMILY(TYPE=CUSTOM IVL=0.16 IVH=0.4 OVL=0.01 OVH=0.01 ORL=50 ORH=50)")
-	PARAM(SW.GOFF, 0) // This has to be zero to block current sources
-
-	NET_C(VI.OP, CI1.IN, CI2.IN)
-	NET_C(CI1.OP, VO.IP)
-	NET_C(COMP.Q, SW.I)
-	NET_C(CI2.OP, SW.2)
-	NET_C(COMP.VCC, R_SHUNT.1)
-	NET_C(SW.1, R_SHUNT.2)
-	NET_C(SW.3, VO.IP)
-	NET_C(VO.OP, COMP.IN)
-
-	// Avoid singular Matrix due to G=0 switch
-	RES(RX1, 1e10)
-	RES(RX2, 1e10)
-	NET_C(RX1.1, SW.1)
-	NET_C(RX2.1, SW.3)
-
-	NET_C(COMP.GND, RX1.2, RX2.2)
-
-	RES(R1, 5000)
-	RES(R2, 5000)
-	RES(R3, 5000)
-
-	// Square output wave
-	VCVS(V_SQR, 1)
-	NET_C(COMP.Q, V_SQR.IP)
-
-	NET_C(COMP.GND, SW.GND, VI.ON, VI.IN, CI1.ON, CI2.ON, VO.IN, VO.ON, R2.2, V_SQR.IN, V_SQR.ON)
-	NET_C(COMP.VCC, SW.VCC, R1.2)
-	NET_C(COMP.IP, R1.1, R2.1, R3.1)
-	NET_C(COMP.Q, R3.2)
-
-	ALIAS(11, VI.ON) // GND
-	ALIAS(9, V_SQR.OP) // Square out
-	ALIAS(3, VO.OP) // Triag out
-	ALIAS(8, VI.IP) // VC
-	ALIAS(4, CI1.IP) // R1
-	ALIAS(5, CI2.IP) // R2
-	ALIAS(10, VO.IP) // C1
-	ALIAS(6, COMP.VCC) // V+
-NETLIST_END()
-
-//
 // Main netlist
 //
 
 NETLIST_START(fireone)
-	NET_MODEL("2N3704 NPN(IS=26.03f VAF=90.7 Bf=736.1K IKF=.1983 XTB=1.5 BR=1.024 CJC=11.01p CJE=24.07p RB=10 RC=.5 RE=.5 TR=233.8n TF=1.03n ITF=0 VTF=0 XTF=0 mfg=Motorola)")
-
 	SOLVER(Solver, 48000)
 
 	ANALOG_INPUT(V12, 12)
@@ -131,9 +48,6 @@ NETLIST_START(fireone)
 	NET_C(GND, LTORP.GND, LSHPHT.GND, LBOOM.GND, SOUND_OFF_L.GND, SOUND_OFF_R.GND, RTORP.GND, RSHPHT.GND, RBOOM.GND, TORPCOLL.GND, SUBENG.GND, ALERT.GND, SONAR_SYNC.GND)
 	NET_C(VCC, MUSIC_A.VCC, MUSIC_B.VCC, MUSIC_C.VCC)
 	NET_C(GND, MUSIC_A.GND, MUSIC_B.GND, MUSIC_C.GND)
-
-	LOCAL_SOURCE(NE556_DIP)
-	LOCAL_SOURCE(ICL8038_DIP)
 
 	TTL_7406_GATE(IC27_A)
 	TTL_7406_GATE(IC27_B)

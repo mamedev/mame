@@ -7,12 +7,12 @@
 /// \file nlid_system.h
 ///
 
-#include "netlist/analog/nlid_twoterm.h"
-#include "netlist/nl_base.h"
-#include "netlist/nl_factory.h"
-#include "netlist/plib/prandom.h"
-#include "netlist/plib/pstonum.h"
-#include "netlist/plib/putil.h"
+#include "analog/nlid_twoterm.h"
+#include "nl_base.h"
+#include "nl_factory.h"
+#include "plib/prandom.h"
+#include "plib/pstonum.h"
+#include "plib/putil.h"
 
 #include <random>
 
@@ -34,7 +34,7 @@ namespace devices
 		{
 			m_inc = netlist_time::from_fp(plib::reciprocal(m_freq()*nlconst::two()));
 
-			connect(m_feedback, m_Q);
+			connect("FB", "Q");
 		}
 
 		NETLIB_UPDATE_PARAMI()
@@ -74,7 +74,7 @@ namespace devices
 			if (!m_func().empty())
 			{
 				std::vector<pstring> inps;
-				inps.push_back(pstring("T"));
+				inps.emplace_back("T");
 				m_vals.push_back(nlconst::zero());
 				for (int i=0; i < m_N(); i++)
 				{
@@ -85,7 +85,7 @@ namespace devices
 				}
 				m_compiled->compile(m_func(), inps);
 			}
-			connect(m_feedback, m_Q);
+			connect("FB", "Q");
 		}
 		//NETLIB_RESETI();
 		//NETLIB_UPDATE_PARAMI()
@@ -113,100 +113,6 @@ namespace devices
 		state_var<pf_type> m_compiled;
 
 		NETLIB_NAME(power_pins) m_supply;
-	};
-
-	// -----------------------------------------------------------------------------
-	// extclock
-	// -----------------------------------------------------------------------------
-
-	NETLIB_OBJECT(extclock)
-	{
-		NETLIB_CONSTRUCTOR(extclock)
-		, m_freq(*this, "FREQ", nlconst::magic(7159000.0 * 5.0))
-		, m_pattern(*this, "PATTERN", "1,1")
-		, m_offset(*this, "OFFSET", nlconst::zero())
-		, m_feedback(*this, "FB", NETLIB_DELEGATE(first))
-		, m_Q(*this, "Q")
-		, m_cnt(*this, "m_cnt", 0)
-		, m_off(*this, "m_off", netlist_time::zero())
-		{
-			m_inc[0] = netlist_time::from_fp(plib::reciprocal(m_freq()*nlconst::two()));
-
-			connect(m_feedback, m_Q);
-
-			netlist_time base = netlist_time::from_fp(plib::reciprocal(m_freq()*nlconst::two()));
-			std::vector<pstring> pat(plib::psplit(m_pattern(),","));
-			m_off = netlist_time::from_fp(m_offset());
-
-			std::array<std::int64_t, 32> pati = { 0 };
-
-			m_size = static_cast<std::uint8_t>(pat.size());
-			netlist_time::mult_type total = 0;
-			for (unsigned i=0; i<m_size; i++)
-			{
-				pati[i] = plib::pstonum<std::int64_t>(pat[i]);
-				total += pati[i];
-			}
-			netlist_time ttotal = netlist_time::zero();
-			auto sm1 = static_cast<uint8_t>(m_size - 1);
-			for (unsigned i=0; i < sm1; i++)
-			{
-				m_inc[i] = base * pati[i];
-				ttotal += m_inc[i];
-			}
-			m_inc[sm1] = base * total - ttotal;
-
-		}
-
-		NETLIB_RESETI()
-		{
-			m_cnt = 0;
-			m_off = netlist_time::from_fp<decltype(m_offset())>(m_offset());
-			m_feedback.set_delegate(NETLIB_DELEGATE(first));
-		}
-		//NETLIB_UPDATE_PARAMI();
-
-	private:
-
-		NETLIB_HANDLERI(clk2)
-		{
-			m_Q.push((m_cnt & 1) ^ 1, m_inc[m_cnt]);
-			if (++m_cnt >= m_size)
-				m_cnt = 0;
-		}
-
-		NETLIB_HANDLERI(clk2_pow2)
-		{
-			m_Q.push((m_cnt & 1) ^ 1, m_inc[m_cnt]);
-			m_cnt = (++m_cnt) & (m_size-1);
-		}
-
-		NETLIB_HANDLERI(first)
-		{
-			m_Q.push((m_cnt & 1) ^ 1, m_inc[m_cnt] + m_off());
-			m_off = netlist_time::zero();
-			if (++m_cnt >= m_size)
-				m_cnt = 0;
-
-			// continue with optimized clock handlers ....
-
-			if ((m_size & (m_size-1)) == 0) // power of 2?
-				m_feedback.set_delegate(nldelegate(&NETLIB_NAME(extclock)::clk2_pow2, this));
-			else
-				m_feedback.set_delegate(nldelegate(&NETLIB_NAME(extclock)::clk2, this));
-		}
-
-
-		param_fp_t m_freq;
-		param_str_t m_pattern;
-		param_fp_t m_offset;
-
-		logic_input_t m_feedback;
-		logic_output_t m_Q;
-		state_var_u8 m_cnt;
-		std::uint8_t m_size;
-		state_var<netlist_time> m_off;
-		std::array<netlist_time, 32> m_inc;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -337,7 +243,6 @@ namespace devices
 
 	NETLIB_OBJECT(frontier)
 	{
-	public:
 		NETLIB_CONSTRUCTOR(frontier)
 		, m_RIN(*this, "m_RIN", NETLIB_DELEGATE(input))
 		, m_ROUT(*this, "m_ROUT", NETLIB_DELEGATE(input))
@@ -347,22 +252,22 @@ namespace devices
 		, m_p_ROUT(*this, "ROUT", nlconst::magic(50.0))
 
 		{
-			register_subalias("I", m_RIN.P());
-			register_subalias("G", m_RIN.N());
-			connect(m_I, m_RIN.P());
+			register_subalias("I", "m_RIN.1");
+			register_subalias("G", "m_RIN.2");
+			connect("_I", "m_RIN.1");
 
-			register_subalias("_OP", m_ROUT.P());
-			register_subalias("Q", m_ROUT.N());
-			connect(m_Q, m_ROUT.P());
+			register_subalias("_OP", "m_ROUT.1");
+			register_subalias("Q", "m_ROUT.2");
+			connect("_Q", "m_ROUT.1");
 		}
 
+	private:
 		NETLIB_RESETI()
 		{
 			m_RIN.set_G_V_I(plib::reciprocal(m_p_RIN()),0,0);
 			m_ROUT.set_G_V_I(plib::reciprocal(m_p_ROUT()),0,0);
 		}
 
-	private:
 		NETLIB_HANDLERI(input)
 		{
 			m_Q.push(m_I());
@@ -442,7 +347,6 @@ namespace devices
 
 	NETLIB_OBJECT(sys_dsw1)
 	{
-	public:
 		NETLIB_CONSTRUCTOR(sys_dsw1)
 		, m_RON(*this, "RON", nlconst::one())
 		, m_ROFF(*this, "ROFF", nlconst::magic(1.0E20))
@@ -450,8 +354,8 @@ namespace devices
 		, m_I(*this, "I", NETLIB_DELEGATE(input))
 		, m_last_state(*this, "m_last_state", 0)
 		{
-			register_subalias("1", m_R.P());
-			register_subalias("2", m_R.N());
+			register_subalias("1", "_R.1");
+			register_subalias("2", "_R.2");
 		}
 
 		NETLIB_RESETI()
@@ -499,7 +403,6 @@ namespace devices
 
 	NETLIB_OBJECT(sys_dsw2)
 	{
-	public:
 		NETLIB_CONSTRUCTOR(sys_dsw2)
 		, m_R1(*this, "_R1")
 		, m_R2(*this, "_R2")
@@ -509,12 +412,13 @@ namespace devices
 		, m_power_pins(*this)
 		{
 			// connect and register pins
-			register_subalias("1", m_R1.P());
-			register_subalias("2", m_R1.N());
-			register_subalias("3", m_R2.N());
-			connect(m_R1.N(), m_R2.P());
+			register_subalias("1", "_R1.1");
+			register_subalias("2", "_R1.2");
+			register_subalias("3", "_R2.2");
+			connect("_R1.2", "_R2.1");
 		}
 
+	private:
 		NETLIB_RESETI()
 		{
 			m_R1.set_G(m_GOFF());
@@ -523,7 +427,6 @@ namespace devices
 
 		//NETLIB_UPDATE_PARAMI();
 
-	private:
 		NETLIB_HANDLERI(input)
 		{
 			const netlist_sig_t state = m_I();
@@ -568,7 +471,6 @@ namespace devices
 
 	NETLIB_OBJECT(sys_compd)
 	{
-	public:
 		NETLIB_CONSTRUCTOR(sys_compd)
 		, m_IP(*this, "IP", NETLIB_DELEGATE(inputs))
 		, m_IN(*this, "IN", NETLIB_DELEGATE(inputs))
@@ -579,6 +481,7 @@ namespace devices
 		{
 		}
 
+	private:
 		NETLIB_RESETI()
 		{
 			m_last_state = 0;
@@ -586,7 +489,6 @@ namespace devices
 
 		//NETLIB_UPDATE_PARAMI();
 
-	private:
 		NETLIB_HANDLERI(inputs)
 		{
 			const netlist_sig_t state = (m_IP() > m_IN());
@@ -657,14 +559,14 @@ namespace devices
 		, m_dis(*this, "m_dis",m_sigma())
 		{
 
-			register_subalias("1", m_T.P());
-			register_subalias("2", m_T.N());
+			register_subalias("1", "m_T.1");
+			register_subalias("2", "m_T.2");
 		}
 
 	private:
 		NETLIB_HANDLERI(input)
 		{
-			nl_fptype val = m_dis.var()(m_mt.var());
+			nl_fptype val = m_dis()(m_mt());
 			m_T.change_state([this, val]()
 			{
 				m_T.set_G_V_I(plib::reciprocal(m_RI()), val, nlconst::zero());

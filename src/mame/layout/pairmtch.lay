@@ -54,150 +54,150 @@ license:CC0
 
 	<view name="Internal Layout">
 		<bounds left="-15" right="600" top="-11" bottom="805" />
-		<bezel element="static_black">
+		<element ref="static_black">
 			<bounds left="-15" right="600" top="-11" bottom="805" />
-		</bezel>
+		</element>
 
 	<!-- 5 -->
 
-		<bezel name="5.10" element="segc"><bounds x="0" y="0" width="75" height="32" /></bezel>
-		<bezel name="5.10" element="segc"><bounds x="102" y="0" width="75" height="32" /></bezel>
-		<bezel name="5.10" element="segc"><bounds x="204" y="0" width="75" height="32" /></bezel>
-		<bezel name="5.10" element="segc"><bounds x="306" y="0" width="75" height="32" /></bezel>
-		<bezel name="5.10" element="segc"><bounds x="408" y="0" width="75" height="32" /></bezel>
-		<bezel name="5.10" element="segc"><bounds x="510" y="0" width="75" height="32" /></bezel>
+		<element name="5.10" ref="segc"><bounds x="0" y="0" width="75" height="32" /></element>
+		<element name="5.10" ref="segc"><bounds x="102" y="0" width="75" height="32" /></element>
+		<element name="5.10" ref="segc"><bounds x="204" y="0" width="75" height="32" /></element>
+		<element name="5.10" ref="segc"><bounds x="306" y="0" width="75" height="32" /></element>
+		<element name="5.10" ref="segc"><bounds x="408" y="0" width="75" height="32" /></element>
+		<element name="5.10" ref="segc"><bounds x="510" y="0" width="75" height="32" /></element>
 
-		<bezel element="static_black"><bounds x="-1" y="8.666" width="587" height="3" /></bezel>
-		<bezel element="static_black"><bounds x="-1" y="20.333" width="587" height="3" /></bezel>
+		<element ref="static_black"><bounds x="-1" y="8.666" width="587" height="3" /></element>
+		<element ref="static_black"><bounds x="-1" y="20.333" width="587" height="3" /></element>
 
-		<bezel name="5.11" element="c1"><bounds x="0" y="42" width="75" height="95" /></bezel>
+		<element name="5.11" ref="c1"><bounds x="0" y="42" width="75" height="95" /></element>
 
-		<bezel name="5.8" element="segc"><bounds x="102" y="42" width="75" height="95" /></bezel>
-		<bezel name="5.9" element="segr"><bounds x="109.9" y="52" width="59.2" height="75" /></bezel>
+		<element name="5.8" ref="segc"><bounds x="102" y="42" width="75" height="95" /></element>
+		<element name="5.9" ref="segr"><bounds x="109.9" y="52" width="59.2" height="75" /></element>
 
-		<bezel name="5.6" element="segc"><bounds x="204" y="42" width="75" height="95" /></bezel>
-		<bezel name="5.7" element="segr"><bounds x="211.9" y="52" width="59.2" height="75" /></bezel>
+		<element name="5.6" ref="segc"><bounds x="204" y="42" width="75" height="95" /></element>
+		<element name="5.7" ref="segr"><bounds x="211.9" y="52" width="59.2" height="75" /></element>
 
-		<bezel name="5.4" element="segc"><bounds x="306" y="42" width="75" height="95" /></bezel>
-		<bezel name="5.5" element="segr"><bounds x="313.9" y="52" width="59.2" height="75" /></bezel>
+		<element name="5.4" ref="segc"><bounds x="306" y="42" width="75" height="95" /></element>
+		<element name="5.5" ref="segr"><bounds x="313.9" y="52" width="59.2" height="75" /></element>
 
-		<bezel name="5.2" element="segc"><bounds x="408" y="42" width="75" height="95" /></bezel>
-		<bezel name="5.3" element="segr"><bounds x="415.9" y="52" width="59.2" height="75" /></bezel>
+		<element name="5.2" ref="segc"><bounds x="408" y="42" width="75" height="95" /></element>
+		<element name="5.3" ref="segr"><bounds x="415.9" y="52" width="59.2" height="75" /></element>
 
-		<bezel name="5.1" element="c2"><bounds x="510" y="42" width="75" height="95" /></bezel>
+		<element name="5.1" ref="c2"><bounds x="510" y="42" width="75" height="95" /></element>
 
 
 	<!-- 4 -->
 
-		<bezel name="4.10" element="segc"><bounds x="0" y="165" width="75" height="95" /></bezel>
-		<bezel name="4.11" element="segr"><bounds x="7.9" y="175" width="59.2" height="75" /></bezel>
+		<element name="4.10" ref="segc"><bounds x="0" y="165" width="75" height="95" /></element>
+		<element name="4.11" ref="segr"><bounds x="7.9" y="175" width="59.2" height="75" /></element>
 
-		<bezel name="4.8" element="segc"><bounds x="102" y="165" width="75" height="95" /></bezel>
-		<bezel name="4.9" element="segr"><bounds x="109.9" y="175" width="59.2" height="75" /></bezel>
+		<element name="4.8" ref="segc"><bounds x="102" y="165" width="75" height="95" /></element>
+		<element name="4.9" ref="segr"><bounds x="109.9" y="175" width="59.2" height="75" /></element>
 
-		<bezel name="4.6" element="segc"><bounds x="204" y="165" width="75" height="95" /></bezel>
-		<bezel name="4.7" element="segr"><bounds x="211.9" y="175" width="59.2" height="75" /></bezel>
+		<element name="4.6" ref="segc"><bounds x="204" y="165" width="75" height="95" /></element>
+		<element name="4.7" ref="segr"><bounds x="211.9" y="175" width="59.2" height="75" /></element>
 
-		<bezel name="4.4" element="segc"><bounds x="306" y="165" width="75" height="95" /></bezel>
-		<bezel name="4.5" element="segr"><bounds x="313.9" y="175" width="59.2" height="75" /></bezel>
+		<element name="4.4" ref="segc"><bounds x="306" y="165" width="75" height="95" /></element>
+		<element name="4.5" ref="segr"><bounds x="313.9" y="175" width="59.2" height="75" /></element>
 
-		<bezel name="4.2" element="segc"><bounds x="408" y="165" width="75" height="95" /></bezel>
-		<bezel name="4.3" element="segr"><bounds x="415.9" y="175" width="59.2" height="75" /></bezel>
+		<element name="4.2" ref="segc"><bounds x="408" y="165" width="75" height="95" /></element>
+		<element name="4.3" ref="segr"><bounds x="415.9" y="175" width="59.2" height="75" /></element>
 
-		<bezel name="4.0" element="segc"><bounds x="510" y="165" width="75" height="95" /></bezel>
-		<bezel name="4.1" element="segr"><bounds x="517.9" y="175" width="59.2" height="75" /></bezel>
+		<element name="4.0" ref="segc"><bounds x="510" y="165" width="75" height="95" /></element>
+		<element name="4.1" ref="segr"><bounds x="517.9" y="175" width="59.2" height="75" /></element>
 
 
 	<!-- 3 -->
 
-		<bezel name="3.10" element="segc"><bounds x="0" y="288" width="75" height="95" /></bezel>
-		<bezel name="3.11" element="segr"><bounds x="7.9" y="298" width="59.2" height="75" /></bezel>
+		<element name="3.10" ref="segc"><bounds x="0" y="288" width="75" height="95" /></element>
+		<element name="3.11" ref="segr"><bounds x="7.9" y="298" width="59.2" height="75" /></element>
 
-		<bezel name="3.8" element="segc"><bounds x="102" y="288" width="75" height="95" /></bezel>
-		<bezel name="3.9" element="segr"><bounds x="109.9" y="298" width="59.2" height="75" /></bezel>
+		<element name="3.8" ref="segc"><bounds x="102" y="288" width="75" height="95" /></element>
+		<element name="3.9" ref="segr"><bounds x="109.9" y="298" width="59.2" height="75" /></element>
 
-		<bezel name="3.6" element="segc"><bounds x="204" y="288" width="75" height="95" /></bezel>
-		<bezel name="3.7" element="segr"><bounds x="211.9" y="298" width="59.2" height="75" /></bezel>
+		<element name="3.6" ref="segc"><bounds x="204" y="288" width="75" height="95" /></element>
+		<element name="3.7" ref="segr"><bounds x="211.9" y="298" width="59.2" height="75" /></element>
 
-		<bezel name="3.4" element="segc"><bounds x="306" y="288" width="75" height="95" /></bezel>
-		<bezel name="3.5" element="segr"><bounds x="313.9" y="298" width="59.2" height="75" /></bezel>
+		<element name="3.4" ref="segc"><bounds x="306" y="288" width="75" height="95" /></element>
+		<element name="3.5" ref="segr"><bounds x="313.9" y="298" width="59.2" height="75" /></element>
 
-		<bezel name="3.2" element="segc"><bounds x="408" y="288" width="75" height="95" /></bezel>
-		<bezel name="3.3" element="segr"><bounds x="415.9" y="298" width="59.2" height="75" /></bezel>
+		<element name="3.2" ref="segc"><bounds x="408" y="288" width="75" height="95" /></element>
+		<element name="3.3" ref="segr"><bounds x="415.9" y="298" width="59.2" height="75" /></element>
 
-		<bezel name="3.0" element="segc"><bounds x="510" y="288" width="75" height="95" /></bezel>
-		<bezel name="3.1" element="segr"><bounds x="517.9" y="298" width="59.2" height="75" /></bezel>
+		<element name="3.0" ref="segc"><bounds x="510" y="288" width="75" height="95" /></element>
+		<element name="3.1" ref="segr"><bounds x="517.9" y="298" width="59.2" height="75" /></element>
 
 
 	<!-- 2 -->
 
-		<bezel name="2.10" element="segc"><bounds x="0" y="411" width="75" height="95" /></bezel>
-		<bezel name="2.11" element="segr"><bounds x="7.9" y="421" width="59.2" height="75" /></bezel>
+		<element name="2.10" ref="segc"><bounds x="0" y="411" width="75" height="95" /></element>
+		<element name="2.11" ref="segr"><bounds x="7.9" y="421" width="59.2" height="75" /></element>
 
-		<bezel name="2.8" element="segc"><bounds x="102" y="411" width="75" height="95" /></bezel>
-		<bezel name="2.9" element="segr"><bounds x="109.9" y="421" width="59.2" height="75" /></bezel>
+		<element name="2.8" ref="segc"><bounds x="102" y="411" width="75" height="95" /></element>
+		<element name="2.9" ref="segr"><bounds x="109.9" y="421" width="59.2" height="75" /></element>
 
-		<bezel name="2.6" element="segc"><bounds x="204" y="411" width="75" height="95" /></bezel>
-		<bezel name="2.7" element="segr"><bounds x="211.9" y="421" width="59.2" height="75" /></bezel>
+		<element name="2.6" ref="segc"><bounds x="204" y="411" width="75" height="95" /></element>
+		<element name="2.7" ref="segr"><bounds x="211.9" y="421" width="59.2" height="75" /></element>
 
-		<bezel name="2.4" element="segc"><bounds x="306" y="411" width="75" height="95" /></bezel>
-		<bezel name="2.5" element="segr"><bounds x="313.9" y="421" width="59.2" height="75" /></bezel>
+		<element name="2.4" ref="segc"><bounds x="306" y="411" width="75" height="95" /></element>
+		<element name="2.5" ref="segr"><bounds x="313.9" y="421" width="59.2" height="75" /></element>
 
-		<bezel name="2.2" element="segc"><bounds x="408" y="411" width="75" height="95" /></bezel>
-		<bezel name="2.3" element="segr"><bounds x="415.9" y="421" width="59.2" height="75" /></bezel>
+		<element name="2.2" ref="segc"><bounds x="408" y="411" width="75" height="95" /></element>
+		<element name="2.3" ref="segr"><bounds x="415.9" y="421" width="59.2" height="75" /></element>
 
-		<bezel name="2.0" element="segc"><bounds x="510" y="411" width="75" height="95" /></bezel>
-		<bezel name="2.1" element="segr"><bounds x="517.9" y="421" width="59.2" height="75" /></bezel>
+		<element name="2.0" ref="segc"><bounds x="510" y="411" width="75" height="95" /></element>
+		<element name="2.1" ref="segr"><bounds x="517.9" y="421" width="59.2" height="75" /></element>
 
 
 	<!-- 1 -->
 
-		<bezel name="1.10" element="segc"><bounds x="0" y="534" width="75" height="95" /></bezel>
-		<bezel name="1.11" element="segr"><bounds x="7.9" y="544" width="59.2" height="75" /></bezel>
+		<element name="1.10" ref="segc"><bounds x="0" y="534" width="75" height="95" /></element>
+		<element name="1.11" ref="segr"><bounds x="7.9" y="544" width="59.2" height="75" /></element>
 
-		<bezel name="1.8" element="segc"><bounds x="102" y="534" width="75" height="95" /></bezel>
-		<bezel name="1.9" element="segr"><bounds x="109.9" y="544" width="59.2" height="75" /></bezel>
+		<element name="1.8" ref="segc"><bounds x="102" y="534" width="75" height="95" /></element>
+		<element name="1.9" ref="segr"><bounds x="109.9" y="544" width="59.2" height="75" /></element>
 
-		<bezel name="1.6" element="segc"><bounds x="204" y="534" width="75" height="95" /></bezel>
-		<bezel name="1.7" element="segr"><bounds x="211.9" y="544" width="59.2" height="75" /></bezel>
+		<element name="1.6" ref="segc"><bounds x="204" y="534" width="75" height="95" /></element>
+		<element name="1.7" ref="segr"><bounds x="211.9" y="544" width="59.2" height="75" /></element>
 
-		<bezel name="1.4" element="segc"><bounds x="306" y="534" width="75" height="95" /></bezel>
-		<bezel name="1.5" element="segr"><bounds x="313.9" y="544" width="59.2" height="75" /></bezel>
+		<element name="1.4" ref="segc"><bounds x="306" y="534" width="75" height="95" /></element>
+		<element name="1.5" ref="segr"><bounds x="313.9" y="544" width="59.2" height="75" /></element>
 
-		<bezel name="1.2" element="segc"><bounds x="408" y="534" width="75" height="95" /></bezel>
-		<bezel name="1.3" element="segr"><bounds x="415.9" y="544" width="59.2" height="75" /></bezel>
+		<element name="1.2" ref="segc"><bounds x="408" y="534" width="75" height="95" /></element>
+		<element name="1.3" ref="segr"><bounds x="415.9" y="544" width="59.2" height="75" /></element>
 
-		<bezel name="1.0" element="segc"><bounds x="510" y="534" width="75" height="95" /></bezel>
-		<bezel name="1.1" element="segr"><bounds x="517.9" y="544" width="59.2" height="75" /></bezel>
+		<element name="1.0" ref="segc"><bounds x="510" y="534" width="75" height="95" /></element>
+		<element name="1.1" ref="segr"><bounds x="517.9" y="544" width="59.2" height="75" /></element>
 
 
 	<!-- 0 -->
 
-		<bezel name="0.11" element="c3"><bounds x="0" y="657" width="75" height="95" /></bezel>
+		<element name="0.11" ref="c3"><bounds x="0" y="657" width="75" height="95" /></element>
 
-		<bezel name="0.8" element="segc"><bounds x="102" y="657" width="75" height="95" /></bezel>
-		<bezel name="0.9" element="segr"><bounds x="109.9" y="667" width="59.2" height="75" /></bezel>
+		<element name="0.8" ref="segc"><bounds x="102" y="657" width="75" height="95" /></element>
+		<element name="0.9" ref="segr"><bounds x="109.9" y="667" width="59.2" height="75" /></element>
 
-		<bezel name="0.6" element="segc"><bounds x="204" y="657" width="75" height="95" /></bezel>
-		<bezel name="0.7" element="segr"><bounds x="211.9" y="667" width="59.2" height="75" /></bezel>
+		<element name="0.6" ref="segc"><bounds x="204" y="657" width="75" height="95" /></element>
+		<element name="0.7" ref="segr"><bounds x="211.9" y="667" width="59.2" height="75" /></element>
 
-		<bezel name="0.4" element="segc"><bounds x="306" y="657" width="75" height="95" /></bezel>
-		<bezel name="0.5" element="segr"><bounds x="313.9" y="667" width="59.2" height="75" /></bezel>
+		<element name="0.4" ref="segc"><bounds x="306" y="657" width="75" height="95" /></element>
+		<element name="0.5" ref="segr"><bounds x="313.9" y="667" width="59.2" height="75" /></element>
 
-		<bezel name="0.2" element="segc"><bounds x="408" y="657" width="75" height="95" /></bezel>
-		<bezel name="0.3" element="segr"><bounds x="415.9" y="667" width="59.2" height="75" /></bezel>
+		<element name="0.2" ref="segc"><bounds x="408" y="657" width="75" height="95" /></element>
+		<element name="0.3" ref="segr"><bounds x="415.9" y="667" width="59.2" height="75" /></element>
 
-		<bezel name="0.1" element="c4"><bounds x="510" y="657" width="75" height="95" /></bezel>
+		<element name="0.1" ref="c4"><bounds x="510" y="657" width="75" height="95" /></element>
 
-		<bezel name="0.10" element="segr2"><bounds x="0" y="762" width="75" height="32" /></bezel>
-		<bezel name="0.10" element="segr2"><bounds x="102" y="762" width="75" height="32" /></bezel>
-		<bezel name="0.10" element="segr2"><bounds x="204" y="762" width="75" height="32" /></bezel>
-		<bezel name="0.10" element="segr2"><bounds x="306" y="762" width="75" height="32" /></bezel>
-		<bezel name="0.10" element="segr2"><bounds x="408" y="762" width="75" height="32" /></bezel>
-		<bezel name="0.10" element="segr2"><bounds x="510" y="762" width="75" height="32" /></bezel>
+		<element name="0.10" ref="segr2"><bounds x="0" y="762" width="75" height="32" /></element>
+		<element name="0.10" ref="segr2"><bounds x="102" y="762" width="75" height="32" /></element>
+		<element name="0.10" ref="segr2"><bounds x="204" y="762" width="75" height="32" /></element>
+		<element name="0.10" ref="segr2"><bounds x="306" y="762" width="75" height="32" /></element>
+		<element name="0.10" ref="segr2"><bounds x="408" y="762" width="75" height="32" /></element>
+		<element name="0.10" ref="segr2"><bounds x="510" y="762" width="75" height="32" /></element>
 
-		<bezel element="static_black"><bounds x="-1" y="770.666" width="587" height="3" /></bezel>
-		<bezel element="static_black"><bounds x="-1" y="782.333" width="587" height="3" /></bezel>
+		<element ref="static_black"><bounds x="-1" y="770.666" width="587" height="3" /></element>
+		<element ref="static_black"><bounds x="-1" y="782.333" width="587" height="3" /></element>
 
 
 	</view>

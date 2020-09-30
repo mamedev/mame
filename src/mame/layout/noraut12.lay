@@ -167,44 +167,44 @@ license:CC0
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
 
-		<bezel name="lamp2" element="L2">
+		<element name="lamp2" ref="L2">
 			<bounds x="0.55" y="3.03" width="0.20" height="0.20" />
-		</bezel>
-		<bezel name="lamp3" element="L3">
+		</element>
+		<element name="lamp3" ref="L3">
 			<bounds x="1.05" y="3.03" width="0.20" height="0.20" />
-		</bezel>
-		<bezel name="lamp4" element="L4">
+		</element>
+		<element name="lamp4" ref="L4">
 			<bounds x="1.55" y="3.03" width="0.20" height="0.20" />
-		</bezel>
-		<bezel name="lamp5" element="L5">
+		</element>
+		<element name="lamp5" ref="L5">
 			<bounds x="2.05" y="3.03" width="0.20" height="0.20" />
-		</bezel>
-		<bezel name="lamp6" element="L6">
+		</element>
+		<element name="lamp6" ref="L6">
 			<bounds x="2.55" y="3.03" width="0.20" height="0.20" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp7" element="L7">
+		<element name="lamp7" ref="L7">
 			<bounds x="0.55" y="3.28" width="0.20" height="0.20" />
-		</bezel>
-		<bezel name="lamp0" element="L0">
+		</element>
+		<element name="lamp0" ref="L0">
 			<bounds x="1.05" y="3.28" width="0.20" height="0.20" />
-		</bezel>
-		<bezel name="lamp1" element="L1">
+		</element>
+		<element name="lamp1" ref="L1">
 			<bounds x="1.55" y="3.28" width="0.20" height="0.20" />
-		</bezel>
-		<bezel name="lamp8" element="L8">
+		</element>
+		<element name="lamp8" ref="L8">
 			<bounds x="2.05" y="3.28" width="0.20" height="0.20" />
-		</bezel>
-		<bezel name="lamp9" element="L9">
+		</element>
+		<element name="lamp9" ref="L9">
 			<bounds x="2.55" y="3.28" width="0.20" height="0.20" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp10" element="L10">
+		<element name="lamp10" ref="L10">
 			<bounds x="3.05" y="3.03" width="0.40" height="0.20" />
-		</bezel>
-		<bezel name="lamp11" element="L11">
+		</element>
+		<element name="lamp11" ref="L11">
 			<bounds x="3.05" y="3.28" width="0.40" height="0.20" />
-		</bezel>
+		</element>
 
 	</view>
 </mamelayout>

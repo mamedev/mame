@@ -42,7 +42,7 @@ awacs_device::awacs_device(const machine_config &mconfig, const char *tag, devic
 void awacs_device::device_start()
 {
 	// create the stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, 22050);
+	m_stream = stream_alloc(0, 2, 22050);
 
 	memset(m_regs, 0, sizeof(m_regs));
 
@@ -86,20 +86,19 @@ void awacs_device::device_timer(emu_timer &timer, device_timer_id tid, int param
 //  our sound stream
 //-------------------------------------------------
 
-void awacs_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void awacs_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *outL, *outR;
 	int offset = (m_buffer_num == 0) ? m_dma_offset_0 : m_dma_offset_1;
 
-	outL = outputs[0];
-	outR = outputs[1];
+	auto &outL = outputs[0];
+	auto &outR = outputs[1];
 
 	if (m_playback_enable)
 	{
-		for (int i = 0; i < samples; i++)
+		for (int i = 0; i < outL.samples(); i++)
 		{
-			outL[i] = (int16_t)m_dma_space->read_word(offset + m_play_ptr);
-			outR[i] = (int16_t)m_dma_space->read_word(offset + m_play_ptr + 2);
+			outL.put_int(i, s16(m_dma_space->read_word(offset + m_play_ptr)), 32768);
+			outR.put_int(i, s16(m_dma_space->read_word(offset + m_play_ptr + 2)), 32768);
 			m_play_ptr += 4;
 		}
 
@@ -115,11 +114,8 @@ void awacs_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 	}
 	else
 	{
-		for (int i = 0; i < samples; i++)
-		{
-			outL[i] = 0;
-			outR[i] = 0;
-		}
+		outL.fill(0);
+		outR.fill(0);
 	}
 }
 

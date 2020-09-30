@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+// license:CC0
 // copyright-holders:Aaron Giles
 #ifndef MAME_AUDIO_NL_RIPOFF_H
 #define MAME_AUDIO_NL_RIPOFF_H

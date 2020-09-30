@@ -124,7 +124,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	inline uint8_t read_videoram(offs_t offset);
 	inline uint8_t read_colorram(offs_t offset);
@@ -176,8 +176,8 @@ protected:
 	m_noisesamples;   /* count of samples to give out per tone */
 
 	sound_stream *m_channel;
-	std::unique_ptr<int16_t[]> m_tone;
-	std::unique_ptr<int8_t[]> m_noise;
+	std::unique_ptr<int16_t []> m_tone;
+	std::unique_ptr<int8_t []> m_noise;
 
 	emu_timer *m_line_timer;
 };

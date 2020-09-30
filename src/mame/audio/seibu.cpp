@@ -385,7 +385,7 @@ seibu_adpcm_device::seibu_adpcm_device(const machine_config &mconfig, const char
 void seibu_adpcm_device::device_start()
 {
 	m_playing = 0;
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock());
+	m_stream = stream_alloc_legacy(0, 1, clock());
 	m_adpcm.reset();
 
 	save_item(NAME(m_current));
@@ -443,10 +443,10 @@ void seibu_adpcm_device::ctl_w(u8 data)
 
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void seibu_adpcm_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void seibu_adpcm_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	stream_sample_t *dest = outputs[0];
 

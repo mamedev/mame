@@ -415,15 +415,15 @@ int ymz280b_device::generate_pcm16(struct YMZ280BVoice *voice, s16 *buffer, int 
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void ymz280b_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void ymz280b_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *lacc = outputs[0];
-	stream_sample_t *racc = outputs[1];
+	auto &lacc = outputs[0];
+	auto &racc = outputs[1];
 	int v;
 
 	/* clear out the accumulator */
-	memset(lacc, 0, samples * sizeof(lacc[0]));
-	memset(racc, 0, samples * sizeof(racc[0]));
+	lacc.fill(0);
+	racc.fill(0);
 
 	/* loop over voices */
 	for (v = 0; v < 8; v++)
@@ -432,11 +432,10 @@ void ymz280b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		s16 prev = voice->last_sample;
 		s16 curr = voice->curr_sample;
 		s16 *curr_data = m_scratch.get();
-		s32 *ldest = lacc;
-		s32 *rdest = racc;
+		s32 sampindex = 0;
 		u32 new_samples, samples_left;
 		u32 final_pos;
-		int remaining = samples;
+		int remaining = lacc.samples();
 		int lvol = voice->output_left;
 		int rvol = voice->output_right;
 
@@ -453,8 +452,9 @@ void ymz280b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		while (remaining > 0 && voice->output_pos < FRAC_ONE)
 		{
 			int interp_sample = ((s32(prev) * (FRAC_ONE - voice->output_pos)) + (s32(curr) * voice->output_pos)) >> FRAC_BITS;
-			*ldest++ += interp_sample * lvol;
-			*rdest++ += interp_sample * rvol;
+			lacc.add_int(sampindex, interp_sample * lvol, 32768 * 256);
+			racc.add_int(sampindex, interp_sample * rvol, 32768 * 256);
+			sampindex++;
 			voice->output_pos += voice->output_step;
 			remaining--;
 		}
@@ -517,8 +517,9 @@ void ymz280b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			while (remaining > 0 && voice->output_pos < FRAC_ONE)
 			{
 				int interp_sample = ((s32(prev) * (FRAC_ONE - voice->output_pos)) + (s32(curr) * voice->output_pos)) >> FRAC_BITS;
-				*ldest++ += interp_sample * lvol;
-				*rdest++ += interp_sample * rvol;
+				lacc.add_int(sampindex, interp_sample * lvol, 32768 * 256);
+				racc.add_int(sampindex, interp_sample * rvol, 32768 * 256);
+				sampindex++;
 				voice->output_pos += voice->output_step;
 				remaining--;
 			}
@@ -535,12 +536,6 @@ void ymz280b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		/* remember the last samples */
 		voice->last_sample = prev;
 		voice->curr_sample = curr;
-	}
-
-	for (v = 0; v < samples; v++)
-	{
-		outputs[0][v] /= 256;
-		outputs[1][v] /= 256;
 	}
 }
 
@@ -565,7 +560,7 @@ void ymz280b_device::device_start()
 	}
 
 	/* create the stream */
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, INTERNAL_SAMPLE_RATE);
+	m_stream = stream_alloc(0, 2, INTERNAL_SAMPLE_RATE);
 
 	/* allocate memory */
 	assert(MAX_SAMPLE_CHUNK < 0x10000);

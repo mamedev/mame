@@ -2133,8 +2133,8 @@ void primask_copyscrollbitmap(bitmap_rgb32 &dest, const bitmap_rgb32 &src, u32 n
     scrolling to one or more rows/columns
 -------------------------------------------------*/
 
-template<class _BitmapClass>
-static inline void copyscrollbitmap_trans_common(_BitmapClass &dest, const _BitmapClass &src, u32 numrows, const s32 *rowscroll, u32 numcols, const s32 *colscroll, const rectangle &cliprect, u32 trans_pen)
+template<class BitmapClass>
+static inline void copyscrollbitmap_trans_common(BitmapClass &dest, const BitmapClass &src, u32 numrows, const s32 *rowscroll, u32 numcols, const s32 *colscroll, const rectangle &cliprect, u32 trans_pen)
 {
 	// no rowscroll and no colscroll means no scroll
 	if (numrows == 0 && numcols == 0)
@@ -2236,8 +2236,8 @@ void copyscrollbitmap_trans(bitmap_ind16 &dest, const bitmap_ind16 &src, u32 num
 void copyscrollbitmap_trans(bitmap_rgb32 &dest, const bitmap_rgb32 &src, u32 numrows, const s32 *rowscroll, u32 numcols, const s32 *colscroll, const rectangle &cliprect, u32 trans_pen)
 { copyscrollbitmap_trans_common(dest, src, numrows, rowscroll, numcols, colscroll, cliprect, trans_pen); }
 
-template<class _BitmapClass>
-static inline void prio_copyscrollbitmap_trans_common(_BitmapClass &dest, const _BitmapClass &src, u32 numrows, const s32 *rowscroll, u32 numcols, const s32 *colscroll, const rectangle &cliprect, bitmap_ind8 &priority, u32 pmask, u32 trans_pen)
+template<class BitmapClass>
+static inline void prio_copyscrollbitmap_trans_common(BitmapClass &dest, const BitmapClass &src, u32 numrows, const s32 *rowscroll, u32 numcols, const s32 *colscroll, const rectangle &cliprect, bitmap_ind8 &priority, u32 pmask, u32 trans_pen)
 {
 	// no rowscroll and no colscroll means no scroll
 	if (numrows == 0 && numcols == 0)
@@ -2339,8 +2339,8 @@ void prio_copyscrollbitmap_trans(bitmap_ind16 &dest, const bitmap_ind16 &src, u3
 void prio_copyscrollbitmap_trans(bitmap_rgb32 &dest, const bitmap_rgb32 &src, u32 numrows, const s32 *rowscroll, u32 numcols, const s32 *colscroll, const rectangle &cliprect, bitmap_ind8 &priority, u32 pmask, u32 trans_pen)
 { prio_copyscrollbitmap_trans_common(dest, src, numrows, rowscroll, numcols, colscroll, cliprect, priority, pmask, trans_pen); }
 
-template<class _BitmapClass>
-static inline void primask_copyscrollbitmap_trans_common(_BitmapClass &dest, const _BitmapClass &src, u32 numrows, const s32 *rowscroll, u32 numcols, const s32 *colscroll, const rectangle &cliprect, u32 trans_pen, bitmap_ind8 &priority, u8 pcode = 0, u8 pmask = 0xff)
+template<class BitmapClass>
+static inline void primask_copyscrollbitmap_trans_common(BitmapClass &dest, const BitmapClass &src, u32 numrows, const s32 *rowscroll, u32 numcols, const s32 *colscroll, const rectangle &cliprect, u32 trans_pen, bitmap_ind8 &priority, u8 pcode = 0, u8 pmask = 0xff)
 {
 	// no rowscroll and no colscroll means no scroll
 	if (pcode == 0 && pmask == 0xff)

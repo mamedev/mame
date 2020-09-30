@@ -1586,7 +1586,7 @@ void segag80r_state::init_astrob()
 	iospace.install_write_handler(0x3b, 0x3b, write8smo_delegate(*m_speech, FUNC(sega_speech_device::control_w)));
 
 	/* install Astro Blaster sound board */
-	iospace.install_write_handler(0x3e, 0x3f, write8sm_delegate(*m_g80_audio, FUNC(segag80_audio_device::write)));
+	iospace.install_write_handler(0x3e, 0x3f, write8sm_delegate(*m_g80_audio, FUNC(astrob_audio_device::write)));
 }
 
 

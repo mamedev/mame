@@ -7,10 +7,10 @@
 ///
 /// \file net_lib.h
 ///
-/// Discrete netlist implementation.
+/// This file is included by all netlist implementations.
 ///
 
-#include "netlist/nl_setup.h"
+#include "../nl_setup.h"
 
 #ifdef RES_R
 #warning "Do not include rescap.h in a netlist environment"
@@ -28,93 +28,7 @@
 #define IND_P(ind) ((ind) * 1e-12)
 #endif
 
-NETLIST_EXTERNAL(base_lib)
+#include "../generated/nld_devinc.h"
 
-#if NL_AUTO_DEVICES
-#include "nld_devinc.h"
 
-#else
-
-#define SOLVER(name, freq)                                                  \
-		NET_REGISTER_DEVEXT(SOLVER, name, freq)
-
-#include "nld_system.h"
-
-#include "nld_2102A.h"
-#include "nld_4006.h"
-#include "nld_4013.h"
-#include "nld_4017.h"
-#include "nld_4020.h"
-#include "nld_4053.h"
-#include "nld_4066.h"
-#include "nld_4316.h"
-#include "nld_74107.h"
-#include "nld_74113.h"
-#include "nld_74123.h"
-#include "nld_74125.h"
-#include "nld_74153.h"
-#include "nld_74164.h"
-#include "nld_74165.h"
-#include "nld_74166.h"
-#include "nld_74174.h"
-#include "nld_74175.h"
-#include "nld_74192.h"
-#include "nld_74193.h"
-#include "nld_74194.h"
-#include "nld_74365.h"
-#include "nld_74377.h"
-#include "nld_74393.h"
-#include "nld_7448.h"
-#include "nld_7450.h"
-#include "nld_7473.h"
-#include "nld_7474.h"
-#include "nld_7475.h"
-#include "nld_7483.h"
-#include "nld_7485.h"
-#include "nld_7490.h"
-#include "nld_7492.h"
-#include "nld_7493.h"
-#include "nld_7497.h"
-#include "nld_74ls629.h"
-#include "nld_82S115.h"
-#include "nld_82S16.h"
-#include "nld_9316.h"
-#include "nld_9321.h"
-#include "nld_9322.h"
-#include "nld_tms4800.h"
-
-#include "nld_am2847.h"
-#include "nld_8277.h"
-#include "nld_dm9314.h"
-#include "nld_dm9334.h"
-
-#include "nld_mm5837.h"
-#include "nld_ne555.h"
-
-#include "nld_r2r_dac.h"
-
-#include "nld_roms.h"
-
-#include "nld_schmitt.h"
-
-#include "nld_tristate.h"
-
-#include "nld_log.h"
-
-#include "../macro/nlm_cd4xxx_lib.h"
-#include "../macro/nlm_opamp_lib.h"
-#include "../macro/nlm_otheric_lib.h"
-#include "../macro/nlm_roms_lib.h"
-#include "../macro/nlm_ttl74xx_lib.h"
-
-#include "netlist/analog/nld_bjt.h"
-#include "netlist/analog/nld_fourterm.h"
-#include "netlist/analog/nld_mosfet.h"
-#include "netlist/analog/nld_opamps.h"
-#include "netlist/analog/nld_switches.h"
-#include "netlist/analog/nld_twoterm.h"
-
-#include "nld_legacy.h"
-#endif
-
-#endif
+#endif // NET_LIB_H

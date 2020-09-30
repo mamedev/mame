@@ -18,6 +18,7 @@
 #include "machine/timer.h"
 #include "machine/egret.h"
 #include "machine/cuda.h"
+#include "machine/macadb.h"
 #include "bus/nubus/nubus.h"
 #include "bus/macpds/macpds.h"
 #include "machine/applefdc.h"
@@ -36,14 +37,9 @@
 #define MAC_539X_2_TAG "539x_2"
 
 // model helpers
-#define ADB_IS_BITBANG  ((mac->m_model == MODEL_MAC_SE || mac->m_model == MODEL_MAC_CLASSIC) || (mac->m_model >= MODEL_MAC_II && mac->m_model <= MODEL_MAC_IICI) || (mac->m_model == MODEL_MAC_SE30) || (mac->m_model == MODEL_MAC_QUADRA_700))
 #define ADB_IS_BITBANG_CLASS    ((m_model == MODEL_MAC_SE || m_model == MODEL_MAC_CLASSIC) || (m_model >= MODEL_MAC_II && m_model <= MODEL_MAC_IICI) || (m_model == MODEL_MAC_SE30) || (m_model == MODEL_MAC_QUADRA_700))
 #define ADB_IS_EGRET    (m_model >= MODEL_MAC_LC && m_model <= MODEL_MAC_CLASSIC_II) || ((m_model >= MODEL_MAC_IISI) && (m_model <= MODEL_MAC_IIVI))
-#define ADB_IS_EGRET_NONCLASS   (mac->m_model >= MODEL_MAC_LC && mac->m_model <= MODEL_MAC_CLASSIC_II) || ((mac->m_model >= MODEL_MAC_IISI) && (mac->m_model <= MODEL_MAC_IIVI))
 #define ADB_IS_CUDA     ((m_model >= MODEL_MAC_COLOR_CLASSIC && m_model <= MODEL_MAC_LC_580) || ((m_model >= MODEL_MAC_QUADRA_660AV) && (m_model <= MODEL_MAC_QUADRA_630)) || (m_model >= MODEL_MAC_POWERMAC_6100))
-#define ADB_IS_CUDA_NONCLASS        ((mac->m_model >= MODEL_MAC_COLOR_CLASSIC && mac->m_model <= MODEL_MAC_LC_580) || ((mac->m_model >= MODEL_MAC_QUADRA_660AV) && (mac->m_model <= MODEL_MAC_QUADRA_630)) || (mac->m_model >= MODEL_MAC_POWERMAC_6100))
-#define ADB_IS_PM_VIA1_CLASS    (m_model >= MODEL_MAC_PORTABLE && m_model <= MODEL_MAC_PB100)
-#define ADB_IS_PM_VIA2_CLASS    (m_model >= MODEL_MAC_PB140 && m_model <= MODEL_MAC_PBDUO_270c)
 #define ADB_IS_PM_CLASS ((m_model >= MODEL_MAC_PORTABLE && m_model <= MODEL_MAC_PB100) || (m_model >= MODEL_MAC_PB140 && m_model <= MODEL_MAC_PBDUO_270c))
 
 // video parameters for classic Macs
@@ -70,6 +66,7 @@ public:
 		m_awacs(*this, "awacs"),
 		m_egret(*this, EGRET_TAG),
 		m_cuda(*this, CUDA_TAG),
+		m_macadb(*this, "macadb"),
 		m_ram(*this, RAM_TAG),
 		m_scc(*this, "scc"),
 		m_539x_1(*this, MAC_539X_1_TAG),
@@ -77,27 +74,21 @@ public:
 		m_ncr5380(*this, "ncr5380"),
 		m_fdc(*this, "fdc"),
 		m_rtc(*this, "rtc"),
-		m_mouse0(*this, "MOUSE0"),
-		m_mouse1(*this, "MOUSE1"),
-		m_mouse2(*this, "MOUSE2"),
-		m_keys(*this, "KEY%u", 0),
 		m_montype(*this, "MONTYPE"),
-		m_snd_enable(false),
 		m_main_buffer(true),
-		m_snd_vol(7),
 		m_vram(*this,"vram"),
 		m_vram16(*this,"vram16"),
 		m_via2_ca1_hack(0),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_dac(*this, "dac")
+		m_palette(*this, "palette")
 	{
+		m_rom_size = 0;
+		m_rom_ptr = nullptr;
 	}
 
 	void add_scsi(machine_config &config, bool cdrom = false);
 	void add_base_devices(machine_config &config, bool rtc = true, bool super_woz = false);
 	void add_asc(machine_config &config, asc_device::asc_type type = asc_device::asc_type::ASC);
-	void add_macplus_additions(machine_config &config);
 	void add_nubus(machine_config &config, bool bank1 = true, bool bank2 = true);
 	template <typename T> void add_nubus_pds(machine_config &config, const char *slot_tag, T &&opts);
 	void add_via1_adb(machine_config &config, bool macii);
@@ -107,15 +98,10 @@ public:
 	void add_egret(machine_config &config, int type);
 	void add_cuda(machine_config &config, int type);
 
-	void mac512ke_base(machine_config &config);
-	void mac512ke(machine_config &config);
-	void macplus(machine_config &config);
 	void maclc(machine_config &config, bool cpu = true, bool egret = true, asc_device::asc_type asc_type = asc_device::asc_type::V8);
 	void macpb170(machine_config &config);
-	void macclasc(machine_config &config);
 	void maciisi(machine_config &config);
 	void maclc2(machine_config &config, bool egret = true);
-	void macse(machine_config &config);
 	void maclc3(machine_config &config, bool egret = true);
 	void macpd210(machine_config &config);
 	void maciici(machine_config &config);
@@ -242,7 +228,6 @@ public:
 	};
 
 	model_t m_model;
-	int m_drive_select;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -252,6 +237,7 @@ private:
 	optional_device<awacs_device> m_awacs;
 	optional_device<egret_device> m_egret;
 	optional_device<cuda_device> m_cuda;
+	optional_device<macadb_device> m_macadb;
 	required_device<ram_device> m_ram;
 	required_device<scc8530_legacy_device> m_scc;
 	optional_device<ncr539x_device> m_539x_1;
@@ -260,22 +246,12 @@ private:
 	required_device<applefdc_base_device> m_fdc;
 	optional_device<rtc3430042_device> m_rtc;
 
-	required_ioport m_mouse0, m_mouse1, m_mouse2;
-	optional_ioport_array<7> m_keys;
+	//required_ioport m_mouse0, m_mouse1, m_mouse2;
+	//optional_ioport_array<7> m_keys;
 	optional_ioport m_montype;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-
-	/* for Egret and CUDA streaming MCU commands, command types */
-	enum mac_streaming_t
-	{
-		MCU_STREAMING_NONE = 0,
-		MCU_STREAMING_PRAMRD,
-		MCU_STREAMING_PRAMWR,
-		MCU_STREAMING_WRAMRD,
-		MCU_STREAMING_WRAMWR
-	};
 
 	enum
 	{
@@ -287,7 +263,6 @@ private:
 
 
 	uint32_t m_overlay;
-	int m_scsiirq_enable;
 
 	uint32_t m_via2_vbl;
 	uint32_t m_se30_vbl_enable;
@@ -297,44 +272,18 @@ private:
 	TIMER_CALLBACK_MEMBER(overlay_timeout_func);
 	uint32_t rom_switch_r(offs_t offset);
 
-	bool m_snd_enable;
 	bool m_main_buffer;
-	int m_snd_vol;
-
-	/* keyboard matrix to detect transition - macadb needs to stop relying on this */
-	int m_key_matrix[7];
-
-	int m_mouse_bit_x;
-	int m_mouse_bit_y;
-	int last_mx, last_my;
-	int count_x, count_y;
-	int m_last_was_x;
+	int m_adb_irq_pending;
 	int m_screen_buffer;
-
 	int irq_count, ca1_data, ca2_data;
-
-	// Mac ADB state
-	int32_t m_adb_irq_pending, m_adb_waiting_cmd, m_adb_datasize, m_adb_buffer[257];
-	int32_t m_adb_state, m_adb_command, m_adb_send, m_adb_timer_ticks, m_adb_extclock, m_adb_direction;
-	int32_t m_adb_listenreg, m_adb_listenaddr, m_adb_last_talk, m_adb_srq_switch;
-	int32_t m_adb_streaming, m_adb_stream_ptr;
-	int32_t m_adb_linestate;
-	bool  m_adb_srqflag;
-#define kADBKeyBufSize 32
-		uint8_t m_adb_keybuf[kADBKeyBufSize];
-		uint8_t m_adb_keybuf_start;
-		uint8_t m_adb_keybuf_end;
-
-	// Portable/PB100 Power Manager IC comms (chapter 4, "Guide to the Macintosh Family Hardware", second edition)
-	uint8_t m_pm_data_send, m_pm_data_recv, m_pm_ack, m_pm_req, m_pm_cmd[32], m_pm_out[32], m_pm_dptr, m_pm_sptr, m_pm_slen, m_pm_state;
-	uint8_t m_pmu_int_status, m_pmu_last_adb_command, m_pmu_poll;
-	emu_timer *m_pmu_send_timer;
 
 	// 60.15 Hz timer for RBV/V8/Sonora/Eagle/VASP/etc.
 	emu_timer *m_6015_timer;
 
 	// ADB refresh timer, independent of anything else going on
 	emu_timer *m_adbupdate_timer;
+
+	WRITE_LINE_MEMBER(adb_irq_w) { m_adb_irq_pending = state; }
 
 	// RBV and friends (V8, etc)
 	uint8_t m_rbv_regs[256], m_rbv_ier, m_rbv_ifr, m_rbv_type, m_rbv_montype, m_rbv_vbltime;
@@ -365,12 +314,7 @@ private:
 	void set_via2_interrupt(int value);
 	void field_interrupts();
 	void vblank_irq();
-	void adb_talk();
-	void mouse_callback();
 	void rbv_recalc_irqs();
-	void pmu_exec();
-	void mac_adb_newaction(int state);
-	void set_adb_line(int linestate);
 	void update_volume();
 
 	uint16_t mac_via_r(offs_t offset);
@@ -443,11 +387,9 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(drq_539x_1_w);
 
 	DECLARE_WRITE_LINE_MEMBER(cuda_reset_w);
-	DECLARE_WRITE_LINE_MEMBER(adb_linechange_w);
 
 	DECLARE_WRITE_LINE_MEMBER(mac_scsi_irq);
 	DECLARE_WRITE_LINE_MEMBER(mac_asc_irq);
-
 
 	void mac512ke_map(address_map &map);
 	void macii_map(address_map &map);
@@ -466,28 +408,10 @@ private:
 	void pwrmac_map(address_map &map);
 	void quadra700_map(address_map &map);
 
-	int has_adb();
-	void adb_reset();
-	void adb_vblank();
-	int adb_pollkbd(int update);
-	int adb_pollmouse();
-	void adb_accummouse( uint8_t *MouseX, uint8_t *MouseY );
-	void pmu_one_byte_reply(uint8_t result);
-	void pmu_three_byte_reply(uint8_t result1, uint8_t result2, uint8_t result3);
+	inline bool has_adb() { return m_model >= MODEL_MAC_SE; }
 
 	// wait states for accessing the VIA
 	int m_via_cycles;
-
-	// ADB mouse state
-	int m_adb_mouseaddr;
-	int m_adb_lastmousex, m_adb_lastmousey, m_adb_lastbutton, m_adb_mouse_initialized;
-
-	// ADB keyboard state
-	int m_adb_keybaddr;
-	int m_adb_keybinitialized, m_adb_currentkeys[2], m_adb_modifiers;
-
-	// PRAM for ADB MCU HLEs (mostly unused now)
-	uint8_t m_adb_pram[256];
 
 	uint8_t m_oss_regs[0x400];
 
@@ -500,10 +424,13 @@ private:
 	int m_via2_ca1_hack;
 	optional_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
-	optional_device<dac_8bit_pwm_device> m_dac;
+
+	uint32_t m_rom_size;
+	uint32_t *m_rom_ptr;
 
 	emu_timer *m_scanline_timer;
-	emu_timer *m_adb_timer;
+
+	uint8_t m_pm_req, m_pm_state, m_pm_dptr, m_pm_cmd;
 
 	void macgsc_palette(palette_device &palette) const;
 
@@ -534,8 +461,6 @@ private:
 	TIMER_CALLBACK_MEMBER(mac_scanline_tick);
 	TIMER_CALLBACK_MEMBER(dafb_vbl_tick);
 	TIMER_CALLBACK_MEMBER(dafb_cursor_tick);
-	TIMER_CALLBACK_MEMBER(mac_adb_tick);    // macadb.c
-	TIMER_CALLBACK_MEMBER(mac_pmu_tick);    // macadb.c
 	DECLARE_WRITE_LINE_MEMBER(mac_adb_via_out_cb2);
 	uint8_t mac_via_in_a();
 	uint8_t mac_via_in_b();

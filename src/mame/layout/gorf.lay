@@ -3,6 +3,7 @@
 license:CC0
 -->
 <mamelayout version="2">
+	<element name="empty" />
 	<element name="white">
 		<rect>
 			<color red="1.0" green="1.0" blue="1.0" />
@@ -64,111 +65,115 @@ license:CC0
 		</text>
 	</element>
 	<view name="Lamps">
-		<bounds x="-112" y="0" width="524" height="400" />
+		<collection name="Centre Display">
+			<element ref="empty">
+				<bounds x="-112" y="0" width="524" height="400" />
+			</element>
+		</collection>
 		<screen index="0">
 			<bounds x="0" y="0" width="300" height="400" />
 		</screen>
-		<bezel element="white">
+		<element ref="white">
 			<bounds x="324" y="213" width="88" height="180" />
-		</bezel>
-		<bezel element="rank">
+		</element>
+		<element ref="rank">
 			<bounds x="330" y="214" width="76" height="10" />
-		</bezel>
-		<bezel element="black">
+		</element>
+		<element ref="black">
 			<bounds x="328" y="227" width="38" height="50" />
-		</bezel>
-		<bezel element="black">
+		</element>
+		<element ref="black">
 			<bounds x="370" y="227" width="38" height="50" />
-		</bezel>
-		<bezel element="black">
+		</element>
+		<element ref="black">
 			<bounds x="328" y="283" width="38" height="50" />
-		</bezel>
-		<bezel element="black">
+		</element>
+		<element ref="black">
 			<bounds x="370" y="283" width="38" height="50" />
-		</bezel>
-		<bezel element="black">
+		</element>
+		<element ref="black">
 			<bounds x="328" y="339" width="38" height="50" />
-		</bezel>
-		<bezel element="black">
+		</element>
+		<element ref="black">
 			<bounds x="370" y="339" width="38" height="50" />
-		</bezel>
-		<bezel name="lamp0" element="lamp">
-					<bounds x="332" y="234" width="30" height="36" />
-		</bezel>
-		<bezel name="lamp1" element="lamp">
-					<bounds x="374" y="234" width="30" height="36" />
-		</bezel>
-		<bezel name="lamp2" element="lamp">
-					<bounds x="332" y="290" width="30" height="36" />
-		</bezel>
-		<bezel name="lamp3" element="lamp">
-					<bounds x="374" y="290" width="30" height="36" />
-		</bezel>
-		<bezel name="lamp4" element="lamp">
-					<bounds x="332" y="346" width="30" height="36" />
-		</bezel>
-		<bezel name="lamp5" element="lamp">
-					<bounds x="374" y="346" width="30" height="36" />
-		</bezel>
-		<bezel element="yellow">
-					<bounds x="332" y="234" width="30" height="36" />
+		</element>
+		<element name="lamp0" ref="lamp">
+			<bounds x="332" y="234" width="30" height="36" />
+		</element>
+		<element name="lamp1" ref="lamp">
+			<bounds x="374" y="234" width="30" height="36" />
+		</element>
+		<element name="lamp2" ref="lamp">
+			<bounds x="332" y="290" width="30" height="36" />
+		</element>
+		<element name="lamp3" ref="lamp">
+			<bounds x="374" y="290" width="30" height="36" />
+		</element>
+		<element name="lamp4" ref="lamp">
+			<bounds x="332" y="346" width="30" height="36" />
+		</element>
+		<element name="lamp5" ref="lamp">
+			<bounds x="374" y="346" width="30" height="36" />
+		</element>
+		<element ref="yellow">
+			<bounds x="332" y="234" width="30" height="36" />
 			<color alpha=".5" />
-		</bezel>
-		<bezel element="yellow">
-					<bounds x="374" y="234" width="30" height="36" />
+		</element>
+		<element ref="yellow">
+			<bounds x="374" y="234" width="30" height="36" />
 			<color alpha=".5" />
-		</bezel>
-		<bezel element="yellow">
-					<bounds x="332" y="290" width="30" height="36" />
+		</element>
+		<element ref="yellow">
+			<bounds x="332" y="290" width="30" height="36" />
 			<color alpha=".5" />
-		</bezel>
-		<bezel element="yellow">
-					<bounds x="374" y="290" width="30" height="36" />
+		</element>
+		<element ref="yellow">
+			<bounds x="374" y="290" width="30" height="36" />
 			<color alpha=".5" />
-		</bezel>
-		<bezel element="yellow">
-					<bounds x="332" y="346" width="30" height="36" />
+		</element>
+		<element ref="yellow">
+			<bounds x="332" y="346" width="30" height="36" />
 			<color alpha=".5" />
-		</bezel>
-		<bezel element="yellow">
-					<bounds x="374" y="346" width="30" height="36" />
+		</element>
+		<element ref="yellow">
+			<bounds x="374" y="346" width="30" height="36" />
 			<color alpha=".5" />
-		</bezel>
-		<bezel element="spacetext">
+		</element>
+		<element ref="spacetext">
 			<bounds x="332" y="244" width="30" height="7" />
-		</bezel>
-		<bezel element="cadet">
+		</element>
+		<element ref="cadet">
 			<bounds x="332" y="251" width="30" height="7" />
-		</bezel>
-		<bezel element="spacetext">
+		</element>
+		<element ref="spacetext">
 			<bounds x="374" y="244" width="30" height="7" />
-		</bezel>
-		<bezel element="captain">
+		</element>
+		<element ref="captain">
 			<bounds x="374" y="251" width="30" height="7" />
-		</bezel>
-		<bezel element="spacetext">
+		</element>
+		<element ref="spacetext">
 			<bounds x="332" y="300" width="30" height="7" />
-		</bezel>
-		<bezel element="colonel">
+		</element>
+		<element ref="colonel">
 			<bounds x="332" y="307" width="30" height="7" />
-		</bezel>
-		<bezel element="spacetext">
+		</element>
+		<element ref="spacetext">
 			<bounds x="374" y="300" width="30" height="7" />
-		</bezel>
-		<bezel element="general">
+		</element>
+		<element ref="general">
 			<bounds x="374" y="307" width="30" height="7" />
-		</bezel>
-		<bezel element="spacetext">
+		</element>
+		<element ref="spacetext">
 			<bounds x="332" y="356" width="30" height="7" />
-		</bezel>
-		<bezel element="warrior">
+		</element>
+		<element ref="warrior">
 			<bounds x="332" y="363" width="30" height="7" />
-		</bezel>
-		<bezel element="spacetext">
+		</element>
+		<element ref="spacetext">
 			<bounds x="374" y="356" width="30" height="7" />
-		</bezel>
-		<bezel element="avenger">
+		</element>
+		<element ref="avenger">
 			<bounds x="374" y="363" width="30" height="7" />
-		</bezel>
+		</element>
 	</view>
 </mamelayout>

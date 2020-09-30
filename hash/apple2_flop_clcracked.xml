@@ -1443,6 +1443,12 @@ license:CC0
 				<rom name="colorme (4am crack) picture disk - tink tonk - side a.dsk" size="143360" crc="8444dd7f" sha1="14cb015848ec215f928484db6bc5d9abb4693c56" />
 			</dataarea>
 		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Picture Disk - Tink Tonk - Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="colorme (4am crack) picture disk - tink tonk - side b.dsk" size="143360" status="nodump" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="commando">
@@ -3947,6 +3953,7 @@ license:CC0
 		<description>ARCO Computer Preparation for the SAT (cleanly cracked)</description>
 		<year>1984</year>
 		<publisher>ARCO Publishing</publisher>
+		<info name="usage" value="Disk 3 remains missing." />
 		<info name="release" value="2017-04-21"/>
 		<!-- Note from 4AM: Disk 3 was damaged beyond my ability to repair
 		it. -->
@@ -3964,30 +3971,36 @@ license:CC0
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="arco computer preparation for the sat (4am crack) disk 3.dsk" size="143360" status="nodump" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 4"/>
 			<dataarea name="flop" size="143360">
 				<rom name="arco computer preparation for the sat (4am crack) disk 4.dsk" size="143360" crc="7ae59a3d" sha1="26705580544bdb7cd8e2abc965b954ae1dfcee9c" />
 			</dataarea>
 		</part>
-		<part name="flop4" interface="floppy_5_25">
+		<part name="flop5" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 5"/>
 			<dataarea name="flop" size="143360">
 				<rom name="arco computer preparation for the sat (4am crack) disk 5.dsk" size="143360" crc="478a4487" sha1="cc9b159249651201f4e62c5255d3ccecfb6c0ab2" />
 			</dataarea>
 		</part>
-		<part name="flop5" interface="floppy_5_25">
+		<part name="flop6" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 6"/>
 			<dataarea name="flop" size="143360">
 				<rom name="arco computer preparation for the sat (4am crack) disk 6.dsk" size="143360" crc="accf19f2" sha1="aa192a9f2fdf9889e48a560f4e862107e433d7ac" />
 			</dataarea>
 		</part>
-		<part name="flop6" interface="floppy_5_25">
+		<part name="flop7" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 7"/>
 			<dataarea name="flop" size="143360">
 				<rom name="arco computer preparation for the sat (4am crack) disk 7.dsk" size="143360" crc="db3ac57e" sha1="b03962627011dce037bce79a4d6f5031e73f9a16" />
 			</dataarea>
 		</part>
-		<part name="flop7" interface="floppy_5_25">
+		<part name="flop8" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 8"/>
 			<dataarea name="flop" size="143360">
 				<rom name="arco computer preparation for the sat (4am crack) disk 8.dsk" size="143360" crc="a5ea8a9b" sha1="ade6a05bd18657caed66d6f2541791560ff1cc73" />
@@ -5428,31 +5441,37 @@ license:CC0
 		<info name="release" value="2017-01-17"/>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A - Program"/>
 			<dataarea name="flop" size="143360">
 				<rom name="centauri alliance (4am crack) boot.dsk" size="143360" crc="6575734c" sha1="91de6b82846f547963388541a1b9472d81c41219" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B - Roster"/>
 			<dataarea name="flop" size="143360">
 				<rom name="centauri alliance (4am crack) roster.dsk" size="143360" crc="e258fb1e" sha1="daf12471584e5a6c3fc3e501e9334adb35c38ea7" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A - Scenario 1"/>
 			<dataarea name="flop" size="143360">
 				<rom name="centauri alliance (4am crack) scenery 1.dsk" size="143360" crc="4d026cd8" sha1="c9f610fd2a6d08a4ee5bf3fa46f260ed56984121" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B - Scenario 2"/>
 			<dataarea name="flop" size="143360">
 				<rom name="centauri alliance (4am crack) scenery 2.dsk" size="143360" crc="0d976331" sha1="b6830cb95028bce75ca509964eb701ff5b96f7c2" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side A - Scenario 3"/>
 			<dataarea name="flop" size="143360">
 				<rom name="centauri alliance (4am crack) scenery 3.dsk" size="143360" crc="5ed890de" sha1="518301730baaef9fa2cbde4cecf73bd3c35b6353" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side B - Scenario 4"/>
 			<dataarea name="flop" size="143360">
 				<rom name="centauri alliance (4am crack) scenery 4.dsk" size="143360" crc="f0926edf" sha1="8bf06e1dc19fcc9be58e0bf0b5c24819a688b64d" />
 			</dataarea>
@@ -8410,15 +8429,20 @@ license:CC0
 		<year>1985</year>
 		<publisher>The Regents/ALA Company</publisher>
 		<info name="release" value="2017-12-23"/>
-		<info name="usage" value="Disk 1 remains missing." />
-		<!-- Disk 1 has not been dumped at this time and is still missing. -->
+		<!-- Missing: Disk 1 has not been dumped at this time and is still
+		missing. -->
 
 		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="essential idioms (4am crack) disk 1.dsk" size="143360" status="nodump" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="essential idioms (4am crack) disk 2.dsk" size="143360" crc="6beb5b85" sha1="b8af6d4fca50f25cb9908329ebe9b82b26efeb59" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="essential idioms (4am crack) disk 3.dsk" size="143360" crc="4297a46c" sha1="6cce8d619813c5c7a165ef4b4defdcb8954f6ba7" />
 			</dataarea>
@@ -13954,30 +13978,48 @@ license:CC0
 		undumped at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="marty's family reader (4am crack) disk 1.dsk" size="143360" status="nodump" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="marty's family reader (4am crack) disk 2.dsk" size="143360" status="nodump" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="143360">
 				<rom name="marty's family reader (4am crack) disk 3.dsk" size="143360" crc="84ddbc56" sha1="f2c2dc2e6913e0b207634beade98a2efb23f308b" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 4"/>
 			<dataarea name="flop" size="143360">
 				<rom name="marty's family reader (4am crack) disk 4.dsk" size="143360" crc="c392ac2d" sha1="f552c64a1c302185f7855d2eae233f5817efcb3f" />
 			</dataarea>
 		</part>
-		<part name="flop3" interface="floppy_5_25">
+		<part name="flop5" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 5"/>
 			<dataarea name="flop" size="143360">
 				<rom name="marty's family reader (4am crack) disk 5.dsk" size="143360" crc="ae3a906e" sha1="c41597b898fb3d562d70e1883ba6a22f0884d034" />
 			</dataarea>
 		</part>
-		<part name="flop4" interface="floppy_5_25">
+		<part name="flop6" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 6"/>
 			<dataarea name="flop" size="143360">
 				<rom name="marty's family reader (4am crack) disk 6.dsk" size="143360" crc="abc07f2a" sha1="eb1c14c1477828ba4192abff374abc01740d2649" />
 			</dataarea>
 		</part>
-		<part name="flop5" interface="floppy_5_25">
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 7"/>
+			<dataarea name="flop" size="143360">
+				<rom name="marty's family reader (4am crack) disk 7.dsk" size="143360" status="nodump" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 8"/>
 			<dataarea name="flop" size="143360">
 				<rom name="marty's family reader (4am crack) disk 8.dsk" size="143360" crc="18349e56" sha1="3fd1db410bf1858c8e18d74a11db14a30945ba46" />
@@ -14786,6 +14828,11 @@ license:CC0
 		<!-- 4AM only had access to disk 2. Disk 1 is still missing. -->
 
 		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math tutor - subtraction (4am crack) disk 1.dsk" size="143360" status="nodump" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="math tutor - subtraction (4am crack) disk 2.dsk" size="143360" crc="0561257a" sha1="420d9856dcc69993637c51a0685cb250313d71bd" />
 			</dataarea>
@@ -18705,90 +18752,167 @@ license:CC0
 		<year>1988</year>
 		<publisher>Queue</publisher>
 		<info name="release" value="2015-01-21"/>
-		<info name="usage" value="Disks 1-13 remain missing." />
 		<!-- Disks 1-13 are believed to exist and are missing. -->
 		<!-- This crack was updated on 2015-12-21 to fix compatibility with some
 		less-accurate emulators. -->
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="practical grammar (4am crack) disk 1" size="143360" status="nodump" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="practical grammar (4am crack) disk 2" size="143360" status="nodump" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="practical grammar (4am crack) disk 3" size="143360" status="nodump" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="143360">
+				<rom name="practical grammar (4am crack) disk 4" size="143360" status="nodump" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 51"/>
+			<dataarea name="flop" size="143360">
+				<rom name="practical grammar (4am crack) disk 5" size="143360" status="nodump" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 6"/>
+			<dataarea name="flop" size="143360">
+				<rom name="practical grammar (4am crack) disk 6" size="143360" status="nodump" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 7"/>
+			<dataarea name="flop" size="143360">
+				<rom name="practical grammar (4am crack) disk 7" size="143360" status="nodump" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 8"/>
+			<dataarea name="flop" size="143360">
+				<rom name="practical grammar (4am crack) disk 8" size="143360" status="nodump" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 9"/>
+			<dataarea name="flop" size="143360">
+				<rom name="practical grammar (4am crack) disk 9" size="143360" status="nodump" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 10"/>
+			<dataarea name="flop" size="143360">
+				<rom name="practical grammar (4am crack) disk 10" size="143360" status="nodump" />
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 11"/>
+			<dataarea name="flop" size="143360">
+				<rom name="practical grammar (4am crack) disk 11" size="143360" status="nodump" />
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 12"/>
+			<dataarea name="flop" size="143360">
+				<rom name="practical grammar (4am crack) disk 12" size="143360" status="nodump" />
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 13"/>
+			<dataarea name="flop" size="143360">
+				<rom name="practical grammar (4am crack) disk 13" size="143360" status="nodump" />
+			</dataarea>
+		</part>
+		<part name="flop14" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 14 - The tenses of verbs"/>
 			<dataarea name="flop" size="143360">
 				<rom name="practical grammar (4am crack) disk 14 - the tenses of verbs.dsk" size="143360" crc="31525600" sha1="b4110a6c0916ee765c1d4f1f509ecca59bfb2644" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_5_25">
+		<part name="flop15" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 15 - Verbs - voice and mood"/>
 			<dataarea name="flop" size="143360">
 				<rom name="practical grammar (4am crack) disk 15 - verbs - voice and mood.dsk" size="143360" crc="17c6ddc6" sha1="6d135fa59143f72fe4cbc36975394d8c80620433" />
 			</dataarea>
 		</part>
-		<part name="flop3" interface="floppy_5_25">
+		<part name="flop16" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 16 - Agreement of subject and verb"/>
 			<dataarea name="flop" size="143360">
 				<rom name="practical grammar (4am crack) disk 16 - agreement of subject and verb.dsk" size="143360" crc="48f403be" sha1="6a83fbcbfe25fdad120c42534741fad47ea76c3f" />
 			</dataarea>
 		</part>
-		<part name="flop4" interface="floppy_5_25">
+		<part name="flop17" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 17 - Prepositional phrases"/>
 			<dataarea name="flop" size="143360">
 				<rom name="practical grammar (4am crack) disk 17 - prepositional phrases.dsk" size="143360" crc="cc92a930" sha1="45cf447ddd650dd674cfa088844ce7b3a68c6182" />
 			</dataarea>
 		</part>
-		<part name="flop5" interface="floppy_5_25">
+		<part name="flop18" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 18 - Compound sentences"/>
 			<dataarea name="flop" size="143360">
 				<rom name="practical grammar (4am crack) disk 18 - compound sentences.dsk" size="143360" crc="5467b165" sha1="be4dea4d869f35600e3cfdbd5ad853d2bc5b2896" />
 			</dataarea>
 		</part>
-		<part name="flop6" interface="floppy_5_25">
+		<part name="flop19" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 19 - Complex sentences"/>
 			<dataarea name="flop" size="143360">
 				<rom name="practical grammar (4am crack) disk 19 - complex sentences.dsk" size="143360" crc="ed612d39" sha1="82a0c71fc2c028876087107d4ca03c87b6bc4d99" />
 			</dataarea>
 		</part>
-		<part name="flop7" interface="floppy_5_25">
+		<part name="flop20" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 20 - Adverbial clauses"/>
 			<dataarea name="flop" size="143360">
 				<rom name="practical grammar (4am crack) disk 20 - adverbial clauses.dsk" size="143360" crc="a061543d" sha1="cfffd364f5e9c3843e5061bf5ac459f765a39a76" />
 			</dataarea>
 		</part>
-		<part name="flop8" interface="floppy_5_25">
+		<part name="flop21" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 21 - Noun clauses"/>
 			<dataarea name="flop" size="143360">
 				<rom name="practical grammar (4am crack) disk 21 - noun clauses.dsk" size="143360" crc="0b1f9259" sha1="42a25ac245a69925b3410d27a6edc010faa41f46" />
 			</dataarea>
 		</part>
-		<part name="flop9" interface="floppy_5_25">
+		<part name="flop22" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 22 - Participles"/>
 			<dataarea name="flop" size="143360">
 				<rom name="practical grammar (4am crack) disk 22 - participles.dsk" size="143360" crc="00130533" sha1="a529a8e3f57d4933743b11fe5dd07ec7155fc84f" />
 			</dataarea>
 		</part>
-		<part name="flop10" interface="floppy_5_25">
+		<part name="flop23" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 23 - Gerunds"/>
 			<dataarea name="flop" size="143360">
 				<rom name="practical grammar (4am crack) disk 23 - gerunds.dsk" size="143360" crc="4efb4a86" sha1="fe7eed3e19031ee97f5c50ec815228e4033c65bd" />
 			</dataarea>
 		</part>
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop24" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 24 - Infinitives"/>
 			<dataarea name="flop" size="143360">
 				<rom name="practical grammar (4am crack) disk 24 - infinitives.dsk" size="143360" crc="fced1581" sha1="94c395aa9ba4266c7dfde0a454aae5047fece4cf" />
 			</dataarea>
 		</part>
-		<part name="flop12" interface="floppy_5_25">
+		<part name="flop25" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 25 - Problems in the use of infinitives"/>
 			<dataarea name="flop" size="143360">
 				<rom name="practical grammar (4am crack) disk 25 - problems in the use of infinitives.dsk" size="143360" crc="e24a69f8" sha1="d2dbe4d8a90e7b4b047e7b256b28a45440e079e0" />
 			</dataarea>
 		</part>
-		<part name="flop13" interface="floppy_5_25">
+		<part name="flop26" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 26 - Punctuation review"/>
 			<dataarea name="flop" size="143360">
 				<rom name="practical grammar (4am crack) disk 26 - punctuation review.dsk" size="143360" crc="a85a3bb3" sha1="e8b1f14797b0fb8601a8be3ec3a6b2a1e23c1181" />
 			</dataarea>
 		</part>
-		<part name="flop14" interface="floppy_5_25">
+		<part name="flop27" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 27 - Comprehensive grammar review II"/>
 			<dataarea name="flop" size="143360">
 				<rom name="practical grammar (4am crack) disk 27 - comprehensive grammar review ii.dsk" size="143360" crc="d1db2201" sha1="a625471062e454d792b93f7df5c6052b2afc7c12" />
@@ -23602,7 +23726,6 @@ license:CC0
 		<year>1995</year>
 		<publisher>Barnum Software</publisher>
 		<info name="release" value="2015-09-11"/>
-		<info name="usage" value="Disks 1, 4, and 5 remain missing." />
 		<!-- This is version 4.1, published in 1995. (The physical label on each
 		disk claims this is version 4.1, published in 1995. The graphical title
 		screen and the main menu say version 4.0 and 1992. The disk catalog
@@ -23613,27 +23736,63 @@ license:CC0
 		functions independently. -->
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the quarter mile 4.1 (4am crack) disk 1 side a.dsk" size="143360" status="nodump" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the quarter mile 4.1 (4am crack) disk 1 side b.dsk" size="143360" status="nodump" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2 Side A - Addition (Bootable)"/>
 			<dataarea name="flop" size="143360">
 				<rom name="the quarter mile 4.1 (4am crack) disk 2 side a - addition.dsk" size="143360" crc="0683ccf2" sha1="425f91e9b67f3ff5ba217f37118eda6b8e4d14f0" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2 Side B - Subtraction"/>
 			<dataarea name="flop" size="143360">
 				<rom name="the quarter mile 4.1 (4am crack) disk 2 side b - subtraction (no boot).dsk" size="143360" crc="5fd9aeca" sha1="1439d7918150267de98e23d33d5433c654bae047" />
 			</dataarea>
 		</part>
-		<part name="flop3" interface="floppy_5_25">
+		<part name="flop5" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 3 Side A - Multiplication (Bootable)"/>
 			<dataarea name="flop" size="143360">
 				<rom name="the quarter mile 4.1 (4am crack) disk 3 side a - multiplication.dsk" size="143360" crc="23527774" sha1="64830bc1b2f237fc5ed092ec02f3ab02a9fb2a40" />
 			</dataarea>
 		</part>
-		<part name="flop4" interface="floppy_5_25">
+		<part name="flop6" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 3 Side B - Division"/>
 			<dataarea name="flop" size="143360">
 				<rom name="the quarter mile 4.1 (4am crack) disk 3 side b - division (no boot).dsk" size="143360" crc="80a4151d" sha1="cc986ad4c845f9d2cd00e44131c9647ab8157f96" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the quarter mile 4.1 (4am crack) disk 4 side a.dsk" size="143360" status="nodump" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the quarter mile 4.1 (4am crack) disk 4 side b.dsk" size="143360" status="nodump" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5 Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the quarter mile 4.1 (4am crack) disk 5 side a.dsk" size="143360" status="nodump" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5 Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the quarter mile 4.1 (4am crack) disk 5 side b.dsk" size="143360" status="nodump" />
 			</dataarea>
 		</part>
 	</software>
@@ -24521,7 +24680,6 @@ license:CC0
 		<year>1985</year>
 		<publisher>Scholastic</publisher>
 		<info name="release" value="2016-01-27"/>
-		<info name="usage" value="Disks for levels A and B are believed to exist and are missing." />
 		<!-- Story disks level C-F were present, which suggests A and B exist.
 		They were not present and are assumed missing. -->
 
@@ -24532,24 +24690,36 @@ license:CC0
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Story disk level A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="success with reading (4am crack) story disk a.dsk" size="143360" status="nodump" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Story disk level B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="success with reading (4am crack) story disk b.dsk" size="143360" status="nodump" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Story disk level C"/>
 			<dataarea name="flop" size="143360">
 				<rom name="success with reading (4am crack) story disk c.dsk" size="143360" crc="4605523f" sha1="5013c4de4948288866a8abcd4d80c8157733843b" />
 			</dataarea>
 		</part>
-		<part name="flop3" interface="floppy_5_25">
+		<part name="flop5" interface="floppy_5_25">
 			<feature name="part_id" value="Story disk level D"/>
 			<dataarea name="flop" size="143360">
 				<rom name="success with reading (4am crack) story disk d.dsk" size="143360" crc="b0c5b861" sha1="92086206f8fc0ceb6ee37161a7f22fbb585f2ee5" />
 			</dataarea>
 		</part>
-		<part name="flop4" interface="floppy_5_25">
+		<part name="flop6" interface="floppy_5_25">
 			<feature name="part_id" value="Story disk level E"/>
 			<dataarea name="flop" size="143360">
 				<rom name="success with reading (4am crack) story disk e.dsk" size="143360" crc="83ca09d1" sha1="0a4e80ff3be843928597e972d26af7e4225ae0ff" />
 			</dataarea>
 		</part>
-		<part name="flop5" interface="floppy_5_25">
+		<part name="flop7" interface="floppy_5_25">
 			<feature name="part_id" value="Story disk level F"/>
 			<dataarea name="flop" size="143360">
 				<rom name="success with reading (4am crack) story disk f.dsk" size="143360" crc="f55bf4d6" sha1="5eb4107c97e1e6b63615d5b7e69432328aeb2142" />
@@ -24764,7 +24934,6 @@ license:CC0
 		<year>1985</year>
 		<publisher>Intellectual Software</publisher>
 		<info name="release" value="2016-02-23"/>
-		<info name="usage" value="Disk 5 remains missing." />
 		<!-- Disk #5 is missing. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -24789,6 +24958,12 @@ license:CC0
 			<feature name="part_id" value="Disk 4"/>
 			<dataarea name="flop" size="143360">
 				<rom name="sentence diagramming (4am crack) disk 4.dsk" size="143360" crc="e066b500" sha1="e24453611307982f8ac3a9baace9310f084dd9aa" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5"/>
+			<dataarea name="flop" size="143360">
+				<rom name="sentence diagramming (4am crack) disk 5.dsk" size="143360" status="nodump" />
 			</dataarea>
 		</part>
 	</software>
@@ -32102,10 +32277,15 @@ license:CC0
 		<year>1985</year>
 		<publisher>Courses by Computers</publisher>
 		<info name="release" value="2018-07-19"/>
-		<info name="usage" value="Side A remains missing." />
 		<!-- Side A is missing. -->
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="basic fraction concepts (4am crack) side a.dsk" size="143360" status="nodump" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="basic fraction concepts (4am crack) side b.dsk" size="143360" crc="f669f9cf" sha1="83793809db077e98bcafd8462cad2acf92b386f6" />
@@ -36000,6 +36180,7 @@ license:CC0
 		<description>Computer Assisted Problem Solving for Intermediate Algebra (Revision 2) (cleanly cracked)</description>
 		<year>1984</year>
 		<publisher>UNKNOWN</publisher>
+		<info name="author" value="Chris W. Avery, Charles B. Barker" />
 		<info name="release" value="2020-07-16"/>
 		<!-- Publisher is unknown. Authors are Chris W. Avery and Charles B.
 		Barker. -->
@@ -36933,6 +37114,12 @@ license:CC0
 				<rom name="scoring higher- verbal grade level 3 (4am crack) disk 11.dsk" size="143360" crc="061175ba" sha1="c1c4b677bfeaeaf8701b30b63e61d78353d9dc96"/>
 			</dataarea>
 		</part>
+		<part name="flop12" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 12"/>
+			<dataarea name="flop" size="143360">
+				<rom name="scoring higher- verbal grade level 3 (4am crack) disk 12.dsk" size="143360" status="nodump" />
+			</dataarea>
+		</part>
 		<part name="flop13" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 13"/>
 			<dataarea name="flop" size="143360">
@@ -37017,6 +37204,45 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="french achievement iii- grammar (4am crack).dsk" size="143360" crc="b4a902c2" sha1="4749364b8debc5819beedaca26797b064c30f495"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bopabet">
+		<description>Bop-A-Bet (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="release" value="2020-08-30"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="bop-a-bet (4am and san inc crack).dsk" size="143360" crc="7ee2295f" sha1="84c269e55a873422715f7a7f12af6d7f462c2b0d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pwstemp">
+		<description>Playing with Science: Temperature (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2020-08-30"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="playing with science- temperature (4am crack).dsk" size="143360" crc="694d7f51" sha1="c098c1da499e8635bf0acf0274d5be06322a81ea"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lraddsub">
+		<description>Learning to Add and Subtract (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Panda Learning Systems</publisher>
+		<info name="release" value="2020-08-30"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="learning to add and subtract (4am crack).dsk" size="143360" crc="9b336a84" sha1="3534dcacdf79690fd0f88286e79e956dab7038c2"/>
 			</dataarea>
 		</part>
 	</software>

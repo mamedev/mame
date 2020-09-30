@@ -12,7 +12,7 @@
     Important functional blocks:
     — MMU
     — USART (KP51) (unemulated)
-    — 16-bit timer/counters (KP64, KP63) (unemulated)
+    — 16-bit timer/counters (KP64, KP63) (KP64 unemulated)
     — 16-level interrupt controller (KP69)
     — Parallel ports (KP65, KP66) (unemulated)
     — 512-byte high-speed RAM
@@ -22,6 +22,7 @@
 
 #include "emu.h"
 #include "kl5c80a12.h"
+#include "kp63.h"
 
 // device type definition
 DEFINE_DEVICE_TYPE(KL5C80A12, kl5c80a12_device, "kl5c80a12", "Kawasaki Steel KL5C80A12")
@@ -59,6 +60,7 @@ void kl5c80a12_device::internal_ram(address_map &map)
 void kl5c80a12_device::internal_io(address_map &map)
 {
 	map(0x00, 0x07).mirror(0xff00).rw(FUNC(kl5c80a12_device::mmu_r), FUNC(kl5c80a12_device::mmu_w));
+	map(0x20, 0x25).mirror(0xff00).rw("timerb", FUNC(kp63_3channel_device::read), FUNC(kp63_3channel_device::write));
 	map(0x34, 0x34).mirror(0xff00).rw(m_kp69, FUNC(kp69_device::isrl_r), FUNC(kp69_device::lerl_pgrl_w));
 	map(0x35, 0x35).mirror(0xff00).rw(m_kp69, FUNC(kp69_device::isrh_r), FUNC(kp69_device::lerh_pgrh_w));
 	map(0x36, 0x36).mirror(0xff00).rw(m_kp69, FUNC(kp69_device::imrl_r), FUNC(kp69_device::imrl_w));
@@ -97,6 +99,11 @@ void kl5c80a12_device::device_add_mconfig(machine_config &config)
 {
 	KP69(config, m_kp69);
 	m_kp69->int_callback().set_inputline(*this, INPUT_LINE_IRQ0);
+
+	kp63_3channel_device &timerb(KP63_3CHANNEL(config, "timerb", DERIVED_CLOCK(1, 2)));
+	timerb.outs_callback<0>().set(m_kp69, FUNC(kp69_device::ir_w<13>));
+	timerb.outs_callback<1>().set(m_kp69, FUNC(kp69_device::ir_w<14>));
+	timerb.outs_callback<2>().set(m_kp69, FUNC(kp69_device::ir_w<15>));
 }
 
 

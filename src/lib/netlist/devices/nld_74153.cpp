@@ -42,8 +42,7 @@
  *
  */
 
-#include "nld_74153.h"
-#include "netlist/nl_base.h"
+#include "nl_base.h"
 
 namespace netlist
 {
@@ -67,6 +66,7 @@ namespace devices
 		{
 		}
 
+	private:
 		NETLIB_RESETI()
 		{
 			m_chan = 0;
@@ -92,7 +92,6 @@ namespace devices
 			}
 		}
 
-	public:
 		object_array_t<logic_input_t, 4> m_C;
 		logic_input_t m_G;
 

@@ -29,7 +29,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_post_load() override;
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	// Sound stream
 	sound_stream *m_stream;
@@ -55,7 +55,7 @@ private:
 
 	void transfer_pci_audio(chan_info& chan, int type);
 	uint32_t calc_size(const uint8_t &format);
-	void send_audio_out(chan_info& chan, uint32_t intr_mask, stream_sample_t *outL, stream_sample_t *outR, int samples);
+	void send_audio_out(chan_info& chan, uint32_t intr_mask, write_stream_view &outL, write_stream_view &outR);
 
 	uint32_t m_tempCount;
 	emu_timer *m_timer;

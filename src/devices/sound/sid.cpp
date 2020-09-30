@@ -29,34 +29,10 @@ float filterResTable[16];
 
 #define maxLogicalVoices 4
 
-const int mix16monoMiddleIndex = 256*maxLogicalVoices/2;
-uint16_t mix16mono[256*maxLogicalVoices];
-
-uint16_t zero16bit = 0;  /* either signed or unsigned */
-//uint32_t splitBufferLen;
-
-void MixerInit(int threeVoiceAmplify)
+inline stream_buffer::sample_t mix_mono(uint16_t usum)
 {
-	long si;
-	uint16_t ui;
-	long ampDiv = maxLogicalVoices;
-
-	if (threeVoiceAmplify)
-	{
-		ampDiv = (maxLogicalVoices-1);
-	}
-
-	/* Mixing formulas are optimized by sample input value. */
-
-	si = (-128*maxLogicalVoices) * 256;
-	for (ui = 0; ui < sizeof(mix16mono)/sizeof(uint16_t); ui++)
-	{
-		mix16mono[ui] = (uint16_t)(si/ampDiv) + zero16bit;
-		si+=256;
-	}
-
+	return stream_buffer::sample_t(int16_t(usum - maxLogicalVoices*128)) * (1.0 / (256 * maxLogicalVoices));
 }
-
 } // anonymous namespace
 
 
@@ -85,22 +61,22 @@ inline void SID6581_t::syncEm()
 }
 
 
-void SID6581_t::fill_buffer(stream_sample_t *buffer, uint32_t bufferLen)
+void SID6581_t::fill_buffer(write_stream_view &buffer)
 {
 //void* SID6581_t::fill16bitMono(void* buffer, uint32_t numberOfSamples)
 
-	for (; bufferLen > 0; bufferLen--)
+	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
 	{
-		*buffer++ = (int16_t) mix16mono[unsigned(mix16monoMiddleIndex
-								+(*optr[0].outProc)(&optr[0])
+		buffer.put(sampindex, mix_mono(
+								 (*optr[0].outProc)(&optr[0])
 								+(*optr[1].outProc)(&optr[1])
-								+(optr[2].outProc(&optr[2])&optr3_outputmask)
+								+((*optr[2].outProc)(&optr[2])&optr3_outputmask)
 /* hack for digi sounds
    does n't seam to come from a tone operator
    ghostbusters and goldrunner everything except volume zeroed */
 							+(masterVolume<<2)
 //                        +(*sampleEmuRout)()
-		)];
+		));
 		syncEm();
 	}
 }
@@ -226,8 +202,6 @@ void SID6581_t::init()
 	sidInitWaveformTables(type);
 
 	enveEmuInit(PCMfreq, true);
-
-	MixerInit(0);
 
 	reset();
 }

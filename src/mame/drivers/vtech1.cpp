@@ -395,7 +395,7 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static const int16_t speaker_levels[] = {-32768, 0, 32767, 0};
+static const double speaker_levels[] = {-1.0, 0.0, 1.0, 0.0};
 
 void vtech1_state::laser110(machine_config &config)
 {

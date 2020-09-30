@@ -51,6 +51,8 @@ namespace plib
 				::new(&m_v[i]) T();
 		}
 
+		PCOPYASSIGNMOVE(pmatrix2d, delete)
+
 		~pmatrix2d()
 		{
 			if (m_v != nullptr)

@@ -86,7 +86,7 @@ void k007232_device::device_start()
 	for (auto & elem : m_wreg)
 		elem = 0;
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock()/128);
+	m_stream = stream_alloc(0, 2, clock()/128);
 
 	save_item(STRUCT_MEMBER(m_channel, vol));
 	save_item(STRUCT_MEMBER(m_channel, addr));
@@ -209,11 +209,8 @@ void k007232_device::set_bank(int chan_a_bank, int chan_b_bank)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void k007232_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void k007232_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	memset(outputs[0], 0, samples * sizeof(stream_sample_t));
-	memset(outputs[1], 0, samples * sizeof(stream_sample_t));
-
 	if (K007232_LOG_PCM)
 	{
 		for (int i = 0; i < KDAC_A_PCM_MAX; i++)
@@ -239,8 +236,9 @@ void k007232_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		}
 	}
 
-	for (int j = 0; j < samples; j++)
+	for (int j = 0; j < outputs[0].samples(); j++)
 	{
+		s32 lsum = 0, rsum = 0;
 		for (int i = 0; i < KDAC_A_PCM_MAX; i++)
 		{
 			channel_t *channel = &m_channel[i];
@@ -279,9 +277,11 @@ void k007232_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 				int out = (read_sample(i, addr) & 0x7f) - 0x40;
 
-				outputs[0][j] += out * vol_a;
-				outputs[1][j] += out * vol_b;
+				lsum += out * vol_a;
+				rsum += out * vol_b;
 			}
 		}
+		outputs[0].put_int(j, lsum, 32768);
+		outputs[1].put_int(j, rsum, 32768);
 	}
 }

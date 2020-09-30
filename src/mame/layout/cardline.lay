@@ -87,29 +87,29 @@ license:CC0
 		<screen index="0">
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
-		<bezel name="lamp0" element="card1">
+		<element name="lamp0" ref="card1">
 			<bounds x="0.125" y="3.01" width="0.55" height="0.24" />
-		</bezel>
-		<bezel name="lamp1" element="card2">
+		</element>
+		<element name="lamp1" ref="card2">
 			<bounds x="0.925" y="3.01" width="0.55" height="0.24" />
-		</bezel>
-		<bezel name="lamp2" element="card3">
+		</element>
+		<element name="lamp2" ref="card3">
 			<bounds x="1.725" y="3.01" width="0.55" height="0.24" />
-		</bezel>
-		<bezel name="lamp3" element="card4">
+		</element>
+		<element name="lamp3" ref="card4">
 			<bounds x="2.525" y="3.01" width="0.55" height="0.24" />
-		</bezel>
-		<bezel name="lamp4" element="card5">
+		</element>
+		<element name="lamp4" ref="card5">
 			<bounds x="3.325" y="3.01" width="0.55" height="0.24" />
-		</bezel>
-		<bezel name="lamp5" element="collect">
+		</element>
+		<element name="lamp5" ref="collect">
 			<bounds x="0.925" y="3.27" width="0.55" height="0.24" />
-		</bezel>
-		<bezel name="lamp6" element="bet">
+		</element>
+		<element name="lamp6" ref="bet">
 			<bounds x="1.725" y="3.27" width="0.55" height="0.24" />
-		</bezel>
-		<bezel name="lamp7" element="start">
+		</element>
+		<element name="lamp7" ref="start">
 			<bounds x="2.525" y="3.27" width="0.55" height="0.24" />
-		</bezel>
+		</element>
 	</view>
 </mamelayout>

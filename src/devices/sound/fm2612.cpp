@@ -2174,7 +2174,7 @@ static void init_tables(void)
 /*******************************************************************************/
 
 /* Generate samples for one of the YM2612s */
-void ym2612_update_one(void *chip, FMSAMPLE **buffer, int length, u8 output_bits)
+void ym2612_update_one(void *chip, std::vector<write_stream_view> &buffer, u8 output_bits)
 {
 	// TODO : 'ladder' effects for Mega Drive/Genesis
 	const u8 output_shift = (output_bits > 14) ? 0 : (14 - output_bits);
@@ -2183,13 +2183,12 @@ void ym2612_update_one(void *chip, FMSAMPLE **buffer, int length, u8 output_bits
 	fm2612_FM_OPN *OPN   = &F2612->OPN;
 	int32_t *out_fm = OPN->out_fm;
 	int i;
-	FMSAMPLE  *bufL,*bufR;
 	fm2612_FM_CH   *cch[6];
 	int lt,rt;
 
 	/* set bufer */
-	bufL = buffer[0];
-	bufR = buffer[1];
+	auto &bufL = buffer[0];
+	auto &bufR = buffer[1];
 
 	cch[0]   = &F2612->CH[0];
 	cch[1]   = &F2612->CH[1];
@@ -2220,7 +2219,7 @@ void ym2612_update_one(void *chip, FMSAMPLE **buffer, int length, u8 output_bits
 	refresh_fc_eg_chan( OPN, cch[5] );
 
 	/* buffering */
-	for(i=0; i < length ; i++)
+	for(i=0; i < bufL.samples() ; i++)
 	{
 		/* clear outputs */
 		out_fm[0] = 0;
@@ -2302,8 +2301,8 @@ void ym2612_update_one(void *chip, FMSAMPLE **buffer, int length, u8 output_bits
 		#endif
 
 		/* buffering */
-		bufL[i] = lt;
-		bufR[i] = rt;
+		bufL.put_int(i, lt, 32768);
+		bufR.put_int(i, rt, 32768);
 
 		/* CSM mode: if CSM Key ON has occurred, CSM Key OFF need to be sent       */
 		/* only if Timer A does not overflow again (i.e CSM Key ON not set again) */

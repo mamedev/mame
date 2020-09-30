@@ -74,7 +74,7 @@ license:CC0
 	</element>
 
 	<element name="nothing" defstate="0">
-		<text string=" "/>
+		<rect><color alpha="0" /></rect>
 	</element>
 
 	<element name="hlb" defstate="0">
@@ -254,7 +254,7 @@ license:CC0
 	</element>
 
 	<element name="ani_white" defstate="0">
-		<text string=" "><bounds x="0" y="0" width="1" height="100" /></text>
+		<rect><bounds x="0" y="0" width="1" height="100" /><color alpha="0" /></rect>
 		<rect state="1"><bounds x="0" y="0" width="1" height="1" /><color red="1" green="1" blue="1" /></rect>
 		<rect state="2"><bounds x="0" y="0" width="1" height="2" /><color red="1" green="1" blue="1" /></rect>
 		<rect state="3"><bounds x="0" y="0" width="1" height="3" /><color red="1" green="1" blue="1" /></rect>
@@ -358,7 +358,7 @@ license:CC0
 	</element>
 
 	<element name="ani_crate" defstate="0">
-		<text string=" "><bounds x="0" y="0" width="1" height="110" /></text>
+		<rect><bounds x="0" y="0" width="1" height="110" /><color alpha="0" /></rect>
 		<rect state="0"><bounds x="0" y="0" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
 		<rect state="1"><bounds x="0" y="1" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
 		<rect state="2"><bounds x="0" y="2" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>

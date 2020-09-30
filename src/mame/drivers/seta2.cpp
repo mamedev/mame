@@ -55,7 +55,7 @@ TODO:
 - Fix some graphics imperfections (e.g. color depth selection, "tilemap" sprites) [all done? - NS]
 - I added a kludge involving a -0x10 yoffset, this fixes the lifeline in myangel.
   I didn't find a better way to do it without breaking pzlbowl's title screen.
-- 1 rightmost pixel columns are not drawn when zoomed
+- Background color is not verified
 
 gundamex:
 - slowdowns, music tempo is incorrect
@@ -1758,9 +1758,9 @@ static INPUT_PORTS_START( reelquak )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE   )                    // collect
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP   )                    // double up
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH   ) PORT_NAME("Big")   // big
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_POKER_BET     )                    // bet
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_GAMBLE_BET    )                    // bet
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_GAMBLE_LOW    ) PORT_NAME("Small") // small
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL   )                    // start
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_START1        )                    // start
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 
 	PORT_START("TICKET")    // $400003.b

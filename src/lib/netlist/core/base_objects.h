@@ -239,7 +239,7 @@ namespace netlist
 
 			void set_net(net_t *anet) noexcept { m_net = anet; }
 			void clear_net() noexcept { m_net = nullptr; }
-			bool has_net() const noexcept { return (m_net != nullptr); }
+			constexpr bool has_net() const noexcept { return (m_net != nullptr); }
 
 			net_t & net() const noexcept { return *m_net;}
 
@@ -251,8 +251,8 @@ namespace netlist
 			bool is_analog_input() const noexcept;
 			bool is_analog_output() const noexcept;
 
-			bool is_state(state_e astate) const noexcept { return (m_state == astate); }
-			state_e terminal_state() const noexcept { return m_state; }
+			constexpr bool is_state(state_e astate) const noexcept { return (m_state == astate); }
+			constexpr const state_e &terminal_state() const noexcept { return m_state; }
 			void set_state(state_e astate) noexcept { m_state = astate; }
 
 			void reset() noexcept { set_state(is_type(terminal_type::OUTPUT) ? STATE_OUT : STATE_INP_ACTIVE); }
@@ -265,12 +265,12 @@ namespace netlist
 
 			state_var_sig m_Q;
 	#else
-			void set_copied_input(netlist_sig_t val) const noexcept { plib::unused_var(val); } // NOLINT: static means more message elsewhere
+			void set_copied_input(const netlist_sig_t &val) const noexcept { plib::unused_var(val); } // NOLINT: static means more message elsewhere
 	#endif
 
 			void set_delegate(const nldelegate &delegate) noexcept { m_delegate = delegate; }
 			const nldelegate &delegate() const noexcept { return m_delegate; }
-			inline void run_delegate() noexcept { return m_delegate(); }
+			void run_delegate() const noexcept { return m_delegate(); }
 		private:
 			nldelegate m_delegate;
 			net_t * m_net;

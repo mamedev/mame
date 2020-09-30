@@ -120,6 +120,8 @@ DEFINE_DEVICE_TYPE(SST_39VF400A,          sst_39vf400a_device,          "sst_39v
 
 DEFINE_DEVICE_TYPE(ATMEL_49F4096,         atmel_49f4096_device,         "atmel_49f4096",         "Atmel AT49F4096 Flash")
 
+DEFINE_DEVICE_TYPE(CAT28F020,             cat28f020_device,             "cat28f020",             "CSI CAT28F020 Flash")
+
 
 
 //**************************************************************************
@@ -225,6 +227,12 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_size = 0x40000;
 		m_maker_id = MFG_AMD;
 		m_device_id = 0x3b;
+		break;
+	case FLASH_CAT28F020:
+		m_bits = 8;
+		m_size = 0x40000;
+		m_maker_id = MFG_CATALYST;
+		m_device_id = 0xbd;
 		break;
 	case FLASH_INTEL_28F320J3D:
 		m_bits = 16;
@@ -449,6 +457,9 @@ amd_29f800b_16bit_device::amd_29f800b_16bit_device(const machine_config &mconfig
 
 amd_29lv200t_device::amd_29lv200t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh8_device(mconfig, AMD_29LV200T, tag, owner, clock, FLASH_AMD_29LV200T) { }
+
+cat28f020_device::cat28f020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: intelfsh8_device(mconfig, CAT28F020, tag, owner, clock, FLASH_CAT28F020) { }
 
 intel_e28f008sa_device::intel_e28f008sa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh8_device(mconfig, INTEL_E28F008SA, tag, owner, clock, FLASH_INTEL_E28F008SA) { }

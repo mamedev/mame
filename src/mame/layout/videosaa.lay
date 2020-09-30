@@ -27,29 +27,29 @@ Simple layout for games running on Videos A A hardware
 		<text string="START"><color red="0.1" green="0.1" blue="0.1" /></text>
 	</element>
 	<view name="Buttons">
-		<backdrop element="background">
+		<element ref="background">
 			<bounds x="0" y="0" width="640" height="640" />
-		</backdrop>
+		</element>
 		<screen index="0">
 			<bounds left="0" top="0" right="640" bottom="480" />
 		</screen>
-		<cpanel name="lamp0" element="button" inputtag="in1" inputmask="0x01">
+		<element name="lamp0" ref="button" inputtag="in1" inputmask="0x01">
 			<bounds x="80" y="505" width="70" height="35" />
-		</cpanel>
-		<cpanel name="lamp1" element="button" inputtag="in1" inputmask="0x02">
+		</element>
+		<element name="lamp1" ref="button" inputtag="in1" inputmask="0x02">
 			<bounds x="180" y="505" width="70" height="35" />
-		</cpanel>
-		<cpanel name="lamp2" element="button" inputtag="in1" inputmask="0x04">
+		</element>
+		<element name="lamp2" ref="button" inputtag="in1" inputmask="0x04">
 			<bounds x="280" y="505" width="70" height="35" />
-		</cpanel>
-		<cpanel name="lamp3" element="button" inputtag="in1" inputmask="0x08">
+		</element>
+		<element name="lamp3" ref="button" inputtag="in1" inputmask="0x08">
 			<bounds x="380" y="505" width="70" height="35" />
-		</cpanel>
-		<cpanel name="lamp4" element="button" inputtag="in1" inputmask="0x10">
+		</element>
+		<element name="lamp4" ref="button" inputtag="in1" inputmask="0x10">
 			<bounds x="480" y="505" width="70" height="35" />
-		</cpanel>
-		<cpanel name="lamp5" element="start" inputtag="in1" inputmask="0x20">
+		</element>
+		<element name="lamp5" ref="start" inputtag="in1" inputmask="0x20">
 			<bounds x="250" y="565" width="130" height="35" />
-		</cpanel>
+		</element>
 	</view>
 </mamelayout>

@@ -110,28 +110,32 @@ license:CC0
 		<screen index="0">
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
-		<overlay name="overlay" element="overlay">
-			<bounds left="0" top="0" right="4" bottom="3" />
-		</overlay>
 
-		<bezel name="lamp5" element="bet" inputtag="IN44" inputmask="0x10">
-			<bounds x="0.0" y="3.05" width="0.35" height="0.24" />
-		</bezel>
-		<bezel name="lamp0" element="start" inputtag="IN42" inputmask="0x04">
-			<bounds x="0.4" y="3.05" width="0.35" height="0.24" />
-		</bezel>
-		<bezel name="lamp1" element="card" inputtag="IN42" inputmask="0x08">
-			<bounds x="0.8" y="3.05" width="0.35" height="0.24" />
-		</bezel>
-		<bezel name="lamp2" element="stop" inputtag="IN42" inputmask="0x10">
-			<bounds x="1.2" y="3.05" width="0.35" height="0.24" />
-		</bezel>
-		<bezel name="lamp3" element="accept" inputtag="IN44" inputmask="0x40">
-			<bounds x="1.85" y="3.05" width="0.35" height="0.24" />
-		</bezel>
-		<bezel name="lamp4" element="double" inputtag="IN44" inputmask="0x20">
-			<bounds x="2.25" y="3.05" width="0.35" height="0.24" />
-		</bezel>
+		<collection name="Overlay">
+			<element ref="overlay" blend="multiply">
+				<bounds left="0" top="0" right="4" bottom="3" />
+			</element>
+		</collection>
 
+		<collection name="Control Panel">
+			<element name="lamp5" ref="bet" inputtag="IN44" inputmask="0x10">
+				<bounds x="0.0" y="3.05" width="0.35" height="0.24" />
+			</element>
+			<element name="lamp0" ref="start" inputtag="IN42" inputmask="0x04">
+				<bounds x="0.4" y="3.05" width="0.35" height="0.24" />
+			</element>
+			<element name="lamp1" ref="card" inputtag="IN42" inputmask="0x08">
+				<bounds x="0.8" y="3.05" width="0.35" height="0.24" />
+			</element>
+			<element name="lamp2" ref="stop" inputtag="IN42" inputmask="0x10">
+				<bounds x="1.2" y="3.05" width="0.35" height="0.24" />
+			</element>
+			<element name="lamp3" ref="accept" inputtag="IN44" inputmask="0x40">
+				<bounds x="1.85" y="3.05" width="0.35" height="0.24" />
+			</element>
+			<element name="lamp4" ref="double" inputtag="IN44" inputmask="0x20">
+				<bounds x="2.25" y="3.05" width="0.35" height="0.24" />
+			</element>
+		</collection>
 	</view>
 </mamelayout>

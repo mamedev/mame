@@ -105,6 +105,8 @@ private:
 	static constexpr device_timer_id TIMER_T2 = 2;
 	static constexpr device_timer_id TIMER_CA2 = 3;
 	static constexpr device_timer_id TIMER_SHIFT_IRQ = 4;
+	static constexpr device_timer_id TIMER_CB2 = 5;
+
 
 	uint16_t get_counter1_value();
 	void counter2_decrement();
@@ -175,6 +177,7 @@ private:
 	attotime m_time2;
 	uint8_t m_t2_active;
 	emu_timer *m_ca2_timer;
+	emu_timer *m_cb2_timer;
 
 	emu_timer *m_shift_timer;
 	emu_timer *m_shift_irq_timer;

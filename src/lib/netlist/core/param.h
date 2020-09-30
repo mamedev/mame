@@ -8,19 +8,6 @@
 #ifndef NL_CORE_PARAM_H_
 #define NL_CORE_PARAM_H_
 
-#if 0
-#include "../nl_config.h"
-#include "../nl_factory.h"
-#include "../nl_setup.h"
-
-#include "../plib/ppreprocessor.h"
-
-#include <initializer_list>
-#include <stack>
-#include <unordered_map>
-#include <vector>
-#endif
-
 #include "../nltypes.h"
 
 #include "base_objects.h"
@@ -28,10 +15,10 @@
 #include "setup.h"
 
 #include "../plib/palloc.h"
+#include "../plib/pfunction.h"
 #include "../plib/pstream.h"
 #include "../plib/pstring.h"
 #include "../plib/putil.h" // psource_t
-#include "../plib/pfunction.h"
 
 #include <memory>
 
@@ -92,8 +79,8 @@ namespace netlist
 
 		param_num_t(core_device_t &device, const pstring &name, T val) noexcept(false);
 
-		T operator()() const noexcept { return m_param; }
-		operator T() const noexcept { return m_param; }
+		constexpr const T &operator()() const noexcept { return m_param; }
+		constexpr operator const T& () const noexcept { return m_param; }
 
 		void set(const T &param) noexcept { set_and_update_param(m_param, param); }
 
@@ -244,7 +231,7 @@ namespace netlist
 		{
 		}
 
-		plib::psource_t::stream_ptr stream();
+		plib::istream_uptr stream();
 	protected:
 		void changed() noexcept override { }
 	};
@@ -264,7 +251,7 @@ namespace netlist
 	protected:
 		void changed() noexcept override
 		{
-			plib::istream_read(stream().stream(), m_data.data(), 1<<AW);
+			plib::istream_read(*stream(), m_data.data(), 1<<AW);
 		}
 
 	private:
@@ -321,7 +308,7 @@ namespace netlist
 		auto f = this->stream();
 		if (!f.empty())
 		{
-			plib::istream_read(f.stream(), m_data.data(), 1<<AW);
+			plib::istream_read(*f, m_data.data(), 1<<AW);
 			// FIXME: check for failbit if not in validation.
 		}
 		else

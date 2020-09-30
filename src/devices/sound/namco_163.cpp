@@ -11,13 +11,14 @@
 #include "emu.h"
 #include "namco_163.h"
 
+#include <algorithm>
+
 
 DEFINE_DEVICE_TYPE(NAMCO_163, namco_163_sound_device, "namco_163_sound", "Namco 163 (Sound)")
 
 namco_163_sound_device::namco_163_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, NAMCO_163, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, m_ram(nullptr)
 	, m_reg_addr(0x78)
 	, m_addr(0)
 	, m_inc(false)
@@ -33,10 +34,11 @@ namco_163_sound_device::namco_163_sound_device(const machine_config &mconfig, co
 
 void namco_163_sound_device::device_start()
 {
-	m_ram = make_unique_clear<u8[]>(0x80);
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() / 15);
+	std::fill(std::begin(m_ram), std::end(m_ram), 0);
 
-	save_pointer(NAME(m_ram), 0x80);
+	m_stream = stream_alloc(0, 1, clock() / 15);
+
+	save_item(NAME(m_ram));
 	save_item(NAME(m_reg_addr));
 	save_item(NAME(m_addr));
 	save_item(NAME(m_inc));
@@ -143,15 +145,16 @@ u8 namco_163_sound_device::data_r()
 }
 
 
-void namco_163_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void namco_163_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	std::fill_n(&outputs[0][0], samples, 0);
-
 	if (m_disable)
+	{
+		outputs[0].fill(0);
 		return;
+	}
 
 	// Slightly noisy but closer to real hardware behavior
-	for (int s = 0; s < samples; s++)
+	for (int s = 0; s < outputs[0].samples(); s++)
 	{
 		u32 phase = (m_ram[m_reg_addr + 5] << 16) | (m_ram[m_reg_addr + 3] << 8) | m_ram[m_reg_addr + 1];
 		const u32 freq = ((m_ram[m_reg_addr + 4] & 0x3) << 16) | (m_ram[m_reg_addr + 2] << 8) | m_ram[m_reg_addr + 0];
@@ -171,6 +174,6 @@ void namco_163_sound_device::sound_stream_update(sound_stream &stream, stream_sa
 		{
 			m_reg_addr = 0x78 - ((m_ram[0x7f] & 0x70) >> 1);
 		}
-		outputs[0][s] = (output << 8);
+		outputs[0].put_int(s, output, 128);
 	}
 }

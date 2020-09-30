@@ -153,6 +153,7 @@ const double XTAL::known_xtals[] = {
 	  9'000'000, /* 9_MHz_XTAL             Homedata PCBs */
 	  9'216'000, /* 9.216_MHz_XTAL         Univac UTS 20 */
 	  9'600'000, /* 9.6_MHz_XTAL           WD37C65 second clock (for 300 KB/sec rate) */
+	  9'732'000, /* 9.732_MHz_XTAL         CTA Invader */
 	  9'828'000, /* 9.828_MHz_XTAL         Universal PCBs */
 	  9'830'400, /* 9.8304_MHz_XTAL        Epson PX-8 */
 	  9'832'000, /* 9.832_MHz_XTAL         Robotron A7150 */
@@ -288,6 +289,7 @@ const double XTAL::known_xtals[] = {
 	 19'602'000, /* 19.602_MHz_XTAL        Ampex 210+ 80-column display clock */
 	 19'660'800, /* 19.6608_MHz_XTAL       Euro League (bootleg), labeled as "UKI 19.6608 20PF" */
 	 19'661'400, /* 19.6614_MHz_XTAL       Wyse WY-30 */
+	 19'718'400, /* 19.7184_MHz_XTAL       Informer 207/100 */
 	 19'923'000, /* 19.923_MHz_XTAL        Cinematronics vectors */
 	 19'968'000, /* 19.968_MHz_XTAL        Used mostly by some Taito games */
 	 20'000'000, /* 20_MHz_XTAL            - */
@@ -334,6 +336,7 @@ const double XTAL::known_xtals[] = {
 	 25'771'500, /* 25.7715_MHz_XTAL       HP-2622A */
 	 25'920'000, /* 25.92_MHz_XTAL         ADDS Viewpoint 60 */
 	 26'000'000, /* 26_MHz_XTAL            Gaelco PCBs */
+	 26'195'000, /* 26.195_MHz_XTAL        Roland JD-800 */
 	 26'366'000, /* 26.366_MHz_XTAL        DEC VT320 */
 	 26'580'000, /* 26.58_MHz_XTAL         Wyse WY-60 80-column display clock */
 	 26'590'906, /* 26.590906_MHz_XTAL     Atari Jaguar NTSC */
@@ -351,6 +354,7 @@ const double XTAL::known_xtals[] = {
 	 27'720'000, /* 27.72_MHz_XTAL         AT&T 610 132-column display clock */
 	 27'956'000, /* 27.956_MHz_XTAL        CIT-101e 132-column display clock */
 	 28'000'000, /* 28_MHz_XTAL            - */
+	 28'224'000, /* 28.224_MHz_XTAL        Roland JD-800 */
 	 28'322'000, /* 28.322_MHz_XTAL        Saitek RISC 2500, Mephisto Montreux */
 	 28'375'160, /* 28.37516_MHz_XTAL      Amiga PAL systems */
 	 28'475'000, /* 28.475_MHz_XTAL        CoCo 3 PAL */

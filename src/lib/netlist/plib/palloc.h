@@ -288,7 +288,7 @@ namespace plib {
 		void construct(U* p, Args&&... args)
 		{
 			// NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-			::new (static_cast<void *>(p)) U(std::forward<Args>(args)...);
+			::new (void_ptr_cast(p)) U(std::forward<Args>(args)...);
 		}
 
 		template<typename U>

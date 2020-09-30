@@ -56,24 +56,24 @@ DEFINE_DEVICE_TYPE(OKIM6295, okim6295_device, "okim6295", "OKI MSM6295 ADPCM")
 // volume lookup table. The manual lists only 9 steps, ~3dB per step. Given the dB values,
 // that seems to map to a 5-bit volume control. Any volume parameter beyond the 9th index
 // results in silent playback.
-const uint8_t okim6295_device::s_volume_table[16] =
+const stream_buffer::sample_t okim6295_device::s_volume_table[16] =
 {
-	0x20,   //   0 dB
-	0x16,   //  -3.2 dB
-	0x10,   //  -6.0 dB
-	0x0b,   //  -9.2 dB
-	0x08,   // -12.0 dB
-	0x06,   // -14.5 dB
-	0x04,   // -18.0 dB
-	0x03,   // -20.5 dB
-	0x02,   // -24.0 dB
-	0x00,
-	0x00,
-	0x00,
-	0x00,
-	0x00,
-	0x00,
-	0x00,
+	stream_buffer::sample_t(0x20) / stream_buffer::sample_t(0x20),   //   0 dB
+	stream_buffer::sample_t(0x16) / stream_buffer::sample_t(0x20),   //  -3.2 dB
+	stream_buffer::sample_t(0x10) / stream_buffer::sample_t(0x20),   //  -6.0 dB
+	stream_buffer::sample_t(0x0b) / stream_buffer::sample_t(0x20),   //  -9.2 dB
+	stream_buffer::sample_t(0x08) / stream_buffer::sample_t(0x20),   // -12.0 dB
+	stream_buffer::sample_t(0x06) / stream_buffer::sample_t(0x20),   // -14.5 dB
+	stream_buffer::sample_t(0x04) / stream_buffer::sample_t(0x20),   // -18.0 dB
+	stream_buffer::sample_t(0x03) / stream_buffer::sample_t(0x20),   // -20.5 dB
+	stream_buffer::sample_t(0x02) / stream_buffer::sample_t(0x20),   // -24.0 dB
+	stream_buffer::sample_t(0x00) / stream_buffer::sample_t(0x20),
+	stream_buffer::sample_t(0x00) / stream_buffer::sample_t(0x20),
+	stream_buffer::sample_t(0x00) / stream_buffer::sample_t(0x20),
+	stream_buffer::sample_t(0x00) / stream_buffer::sample_t(0x20),
+	stream_buffer::sample_t(0x00) / stream_buffer::sample_t(0x20),
+	stream_buffer::sample_t(0x00) / stream_buffer::sample_t(0x20),
+	stream_buffer::sample_t(0x00) / stream_buffer::sample_t(0x20),
 };
 
 
@@ -118,7 +118,7 @@ void okim6295_device::device_start()
 
 	// create the stream
 	int divisor = m_pin7_state ? 132 : 165;
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() / divisor);
+	m_stream = stream_alloc(0, 1, clock() / divisor);
 
 	save_item(NAME(m_command));
 	save_item(NAME(m_pin7_state));
@@ -171,18 +171,18 @@ void okim6295_device::device_clock_changed()
 
 
 //-------------------------------------------------
-//  stream_generate - handle update requests for
+//  sound_stream_update - handle update requests for
 //  our sound stream
 //-------------------------------------------------
 
-void okim6295_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void okim6295_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	// reset the output stream
-	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
+	outputs[0].fill(0);
 
 	// iterate over voices and accumulate sample data
 	for (auto & elem : m_voice)
-		elem.generate_adpcm(*this, outputs[0], samples);
+		elem.generate_adpcm(*this, outputs[0]);
 }
 
 
@@ -337,21 +337,21 @@ okim6295_device::okim_voice::okim_voice()
 //  add them to an output stream
 //-------------------------------------------------
 
-void okim6295_device::okim_voice::generate_adpcm(device_rom_interface &rom, stream_sample_t *buffer, int samples)
+void okim6295_device::okim_voice::generate_adpcm(device_rom_interface &rom, write_stream_view &buffer)
 {
 	// skip if not active
 	if (!m_playing)
 		return;
 
 	// loop while we still have samples to generate
-	while (samples-- != 0)
+	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
 	{
 		// fetch the next sample byte
 		int nibble = rom.read_byte(m_base_offset + m_sample / 2) >> (((m_sample & 1) << 2) ^ 4);
 
 		// output to the buffer, scaling by the volume
-		// signal in range -2048..2047, volume in range 2..32 => signal * volume / 2 in range -32768..32767
-		*buffer++ += m_adpcm.clock(nibble) * m_volume / 2;
+		// signal in range -2048..2047
+		buffer.add_int(sampindex, m_adpcm.clock(nibble) * m_volume, 2048);
 
 		// next!
 		if (++m_sample >= m_count)

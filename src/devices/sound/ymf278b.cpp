@@ -215,7 +215,7 @@ void ymf278b_device::compute_envelope(YMF278BSlot *slot)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void ymf278b_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void ymf278b_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	int i, j;
 	YMF278BSlot *slot;
@@ -223,14 +223,14 @@ void ymf278b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	int32_t *mixp;
 	int32_t vl, vr;
 
-	ymf262_update_one(m_ymf262, outputs, samples);
-	vl = m_mix_level[m_fm_l];
-	vr = m_mix_level[m_fm_r];
-	for (i = 0; i < samples; i++)
+	ymf262_update_one(m_ymf262, outputs);
+	stream_buffer::sample_t fvl = stream_buffer::sample_t(m_mix_level[m_fm_l]) * (1.0 / 65536.0);
+	stream_buffer::sample_t fvr = stream_buffer::sample_t(m_mix_level[m_fm_r]) * (1.0 / 65536.0);
+	for (i = 0; i < outputs[0].samples(); i++)
 	{
 		// DO2 mixing
-		outputs[0][i] = (outputs[0][i] * vl) >> 16;
-		outputs[1][i] = (outputs[1][i] * vr) >> 16;
+		outputs[0].put(i, outputs[0].get(i) * fvl);
+		outputs[1].put(i, outputs[1].get(i) * fvr);
 	}
 
 	std::fill(m_mix_buffer.begin(), m_mix_buffer.end(), 0);
@@ -243,7 +243,7 @@ void ymf278b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		{
 			mixp = &m_mix_buffer[0];
 
-			for (j = 0; j < samples; j++)
+			for (j = 0; j < outputs[0].samples(); j++)
 			{
 				if (slot->stepptr >= slot->endaddr)
 				{
@@ -316,12 +316,12 @@ void ymf278b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	mixp = &m_mix_buffer[0];
 	vl = m_mix_level[m_pcm_l];
 	vr = m_mix_level[m_pcm_r];
-	for (i = 0; i < samples; i++)
+	for (i = 0; i < outputs[0].samples(); i++)
 	{
-		outputs[0][i] += (*mixp++ * vl) >> 16;
-		outputs[1][i] += (*mixp++ * vr) >> 16;
-		outputs[4][i] = *mixp++;
-		outputs[5][i] = *mixp++;
+		outputs[0].add_int(i, (*mixp++ * vl) >> 16, 32768);
+		outputs[1].add_int(i, (*mixp++ * vr) >> 16, 32768);
+		outputs[4].put_int(i, *mixp++, 32768);
+		outputs[5].put_int(i, *mixp++, 32768);
 	}
 }
 
@@ -1009,7 +1009,7 @@ void ymf278b_device::device_start()
 		m_slots[i].num = i;
 	}
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 6, m_rate);
+	m_stream = stream_alloc(0, 6, m_rate);
 	m_mix_buffer.resize(m_rate*4,0);
 
 	// rate tables

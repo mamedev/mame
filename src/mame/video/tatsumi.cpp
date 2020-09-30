@@ -91,8 +91,8 @@ TILE_GET_INFO_MEMBER(tatsumi_state::get_text_tile_info)
 			0);
 }
 
-template<class _BitmapClass>
-inline void tatsumi_state::roundupt_drawgfxzoomrotate( _BitmapClass &dest_bmp, const rectangle &clip,
+template<class BitmapClass>
+inline void tatsumi_state::roundupt_drawgfxzoomrotate( BitmapClass &dest_bmp, const rectangle &clip,
 		gfx_element *gfx, uint32_t code,uint32_t color,int flipx,int flipy,uint32_t ssx,uint32_t ssy,
 		int scalex, int scaley, int rotate, int write_priority_only )
 {
@@ -260,7 +260,7 @@ inline void tatsumi_state::roundupt_drawgfxzoomrotate( _BitmapClass &dest_bmp, c
 							for( y=sy; y<ey; y++ )
 							{
 								const uint8_t *source = code_base + (y_index>>16) * gfx->rowbytes();
-								typename _BitmapClass::pixel_t *dest = &dest_bmp.pix(y);
+								typename BitmapClass::pixel_t *dest = &dest_bmp.pix(y);
 
 								int x, x_index = x_index_base;
 								for( x=sx; x<ex; x++ )
@@ -354,8 +354,8 @@ static void mycopyrozbitmap_core(bitmap_rgb32 &bitmap,bitmap_rgb32 &srcbitmap,
 	}
 }
 
-template<class _BitmapClass>
-void tatsumi_state::draw_sprites(_BitmapClass &bitmap, const rectangle &cliprect, int write_priority_only, int rambank)
+template<class BitmapClass>
+void tatsumi_state::draw_sprites(BitmapClass &bitmap, const rectangle &cliprect, int write_priority_only, int rambank)
 {
 	int offs, flip_x, flip_y, x, y, color;
 	int w, h, index, lines, scale, rotate;

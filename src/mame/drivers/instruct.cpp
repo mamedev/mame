@@ -2,14 +2,14 @@
 // copyright-holders:Robbbert
 /***************************************************************************
 
-    Signetics Intructor 50
+Signetics Intructor 50
 
-    2010-04-08 Skeleton driver.
-    2012-05-20 Connected digits, system boots. [Robbbert]
-    2012-05-20 Connected keyboard, system mostly usable. [Robbbert]
-    2013-10-15 Fixed various regressions. [Robbbert]
+2010-04-08 Skeleton driver.
+2012-05-20 Connected digits, system boots. [Robbbert]
+2012-05-20 Connected keyboard, system mostly usable. [Robbbert]
+2013-10-15 Fixed various regressions. [Robbbert]
 
-    From looking at a blurry picture of it, this is what I can determine:
+From looking at a blurry picture of it, this is what I can determine:
     - Left side: 8 toggle switches, with a round red led above each one.
     - Below this is the Port Address Switch with choice of 'Non-Extended', 'Extended' or 'Memory'.
     - To the right of this is another toggle switch labelled 'Interrupt', the
@@ -25,14 +25,18 @@
       MIC and EAR cords to a cassette player.
     - At the back is a S100 interface.
 
-    Quick usage:
+Quick usage:
     - Look at memory: Press minus key. Enter an address. Press UP key to see the next.
     - Look at registers: Press R. Press 0. Press UP key to see the next.
     - Set PC register: Press R. Press C. Type in new address, Press UP.
     - Load a tape: Press L, enter file number (1 digit), press UP. On
       completion of a successful load, HELLO will be displayed.
 
-    ToDO:
+Pasting a test program: (page 2-4 of the user manual, modified)
+    - Paste this: QRF0^751120F005000620FA7EF97A84011F0003-0P
+    - You should see the LEDs flashing as they count upwards.
+
+ToDO:
     - Connect round led for Run.
     - Last Address Register
     - Initial Jump Logic

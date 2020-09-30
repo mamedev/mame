@@ -56,7 +56,6 @@ k051649_device::k051649_device(const machine_config &mconfig, const char *tag, d
 	, device_sound_interface(mconfig, *this)
 	, m_stream(nullptr)
 	, m_rate(0)
-	, m_mixer_table(nullptr)
 	, m_mixer_lookup(nullptr)
 	, m_test(0)
 {
@@ -143,7 +142,7 @@ void k051649_device::device_clock_changed()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void k051649_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void k051649_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	// zap the contents of the mixer buffer
 	std::fill(m_mixer_buffer.begin(), m_mixer_buffer.end(), 0);
@@ -159,7 +158,7 @@ void k051649_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			const int step = voice.frequency;
 
 			// add our contribution
-			for (int i = 0; i < samples; i++)
+			for (int i = 0; i < outputs[0].samples(); i++)
 			{
 				c += 32;
 				while (c > step)
@@ -177,9 +176,9 @@ void k051649_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	}
 
 	// mix it down
-	stream_sample_t *buffer = outputs[0];
-	for (int i = 0; i < samples; i++)
-		*buffer++ = m_mixer_lookup[m_mixer_buffer[i]];
+	auto &buffer = outputs[0];
+	for (int i = 0; i < buffer.samples(); i++)
+		buffer.put(i, m_mixer_lookup[m_mixer_buffer[i]]);
 }
 
 
@@ -309,16 +308,17 @@ u8 k051649_device::k051649_test_r()
 void k051649_device::make_mixer_table(int voices)
 {
 	// allocate memory
-	m_mixer_table = std::make_unique<s16[]>(512 * voices);
+	m_mixer_table.resize(512 * voices);
 
 	// find the middle of the table
-	m_mixer_lookup = m_mixer_table.get() + (256 * voices);
+	m_mixer_lookup = &m_mixer_table[256 * voices];
 
 	// fill in the table - 16 bit case
 	for (int i = 0; i < (voices * 256); i++)
 	{
 		const int val = std::min(32767, i * DEF_GAIN * 16 / voices);
-		m_mixer_lookup[ i] = val;
-		m_mixer_lookup[-i] = -val;
+		stream_buffer::sample_t fval = stream_buffer::sample_t(val) / 32768.0;
+		m_mixer_lookup[ i] = fval;
+		m_mixer_lookup[-i] = -fval;
 	}
 }

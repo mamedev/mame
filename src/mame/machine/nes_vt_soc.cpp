@@ -121,6 +121,7 @@ nes_vt_soc_device::nes_vt_soc_device(const machine_config& mconfig, device_type 
 
 	m_default_palette_mode = PAL_MODE_VT0x;
 	m_force_baddma = false;
+	m_use_raster_timing_hack = false;
 }
 
 nes_vt_soc_device::nes_vt_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
@@ -299,8 +300,6 @@ uint32_t nes_vt_soc_device::get_banks(uint8_t bnk)
 // 8000 needs to bank in 60000  ( bank 0x30 )
 void nes_vt_soc_device::update_banks()
 {
-	//uint32_t amod = m_ahigh >> 13;
-
 	uint8_t bank;
 
 	// 8000-9fff
@@ -314,11 +313,11 @@ void nes_vt_soc_device::update_banks()
 	else
 		bank = 0xfe;
 
-	m_bankaddr[0] = ((/*amod |*/ get_banks(bank)) );
+	m_bankaddr[0] = get_banks(bank);
 
 	// a000-bfff
 	bank = m_410x[0x8];
-	m_bankaddr[1] = ((/*amod |*/ get_banks(bank)) );
+	m_bankaddr[1] = get_banks(bank);
 
 	// c000-dfff
 	if ((m_410x[0xb] & 0x40) != 0 || (m_410x[0x5] & 0x40) != 0)
@@ -331,11 +330,11 @@ void nes_vt_soc_device::update_banks()
 	else
 		bank = 0xfe;
 
-	m_bankaddr[2] = ((/*amod |*/ get_banks(bank)) );
+	m_bankaddr[2] = get_banks(bank);
 
 	// e000 - ffff
 	bank = m_initial_e000_bank;
-	m_bankaddr[3] = ((/*amod |*/ get_banks(bank)) );
+	m_bankaddr[3] = get_banks(bank);
 }
 
 uint16_t nes_vt_soc_device::decode_nt_addr(uint16_t addr)
@@ -380,6 +379,12 @@ void nes_vt_soc_device::scrambled_410x_w(uint16_t offset, uint8_t data)
 		// load latched value and start counting
 		m_410x[0x2] = data; // value doesn't matter?
 		m_timer_val = m_410x[0x1];
+
+		// HACK for some one line errors in various games and completely broken rasters in msifrog, TOOD: find real source of issue (bad timing of interrupt or counter changes, or latching of data?)
+		if (m_use_raster_timing_hack)
+			if (m_ppu->in_vblanking())
+				m_timer_val--;
+
 		m_timer_running = 1;
 		break;
 
@@ -755,7 +760,7 @@ int nes_vt_soc_device::calculate_real_video_address(int addr, int extended, int 
 
 		}
 	}
-	return /*m_ahigh |*/ finaladdr;
+	return finaladdr;
 }
 
 /*
@@ -763,16 +768,13 @@ int nes_vt_soc_device::calculate_real_video_address(int addr, int extended, int 
 
      used for MMC3/other mapper compatibility
      some consoles have scrambled registers for crude copy protection
-
-    is this always there with VT based games? it maps where mappers would be on a NES cartridge
-    but then seems to be able to alter internal state of extended PPU registers, which is awkward
 */
 
 void nes_vt_soc_device::scrambled_8000_w(uint16_t offset, uint8_t data)
 {
 	offset &= 0x7fff;
 
-	uint16_t addr = m_real_access_address; // we need the actual write address, not the translated one, to keep bittboy happy
+	uint16_t addr = offset+0x8000;
 	if ((m_411d & 0x01) && (m_411d & 0x03))
 	{
 		//CNROM compat
@@ -985,13 +987,6 @@ void nes_vt_soc_device::do_dma(uint8_t data, bool has_ntsc_bug)
 		length -= 1;
 		src_addr += 1;
 	}
-	//TODO (always false)
-	//else if ((dma_mode == 1) && ((m_ppu->get_vram_dest() & 0xFF00) == 0x3F01) && !(m_ppu->get_201x_reg(0x1) & 0x80))
-	//{
-	//  // Legacy mode for DGUN-2573 compat
-	//  m_ppu->set_vram_dest(0x3F00);
-	//  m_ppu->set_palette_mode(PAL_MODE_VT0x);
-	//}
 
 	for (int i = 0; i < length; i++)
 	{
@@ -1116,17 +1111,22 @@ uint8_t nes_vt_soc_device::external_space_read(offs_t offset)
 	address_space& spc = this->space(AS_PROGRAM);
 	int bank = (offset & 0x6000) >> 13;
 	int address = (m_bankaddr[bank] * 0x2000) + (offset & 0x1fff);
-	m_real_access_address = offset + 0x8000;
 	return spc.read_byte(address);
 }
 
 void nes_vt_soc_device::external_space_write(offs_t offset, uint8_t data)
 {
-	address_space& spc = this->space(AS_PROGRAM);
-	int bank = (offset & 0x6000) >> 13;
-	int address = (m_bankaddr[bank] * 0x2000) + (offset&0x1fff);
-	m_real_access_address = offset + 0x8000;
-	spc.write_byte(address, data);
+	if ((m_410x[0xb] & 0x08))
+	{
+		address_space& spc = this->space(AS_PROGRAM);
+		int bank = (offset & 0x6000) >> 13;
+		int address = (m_bankaddr[bank] * 0x2000) + (offset & 0x1fff);
+		spc.write_byte(address, data);
+	}
+	else
+	{
+		vt03_8000_mapper_w(offset, data);
+	}
 };
 
 void nes_vt_soc_device::nes_vt_map(address_map &map)

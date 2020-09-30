@@ -198,7 +198,7 @@ void rf5c400_device::device_clock_changed()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void rf5c400_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void rf5c400_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	int i, ch;
 	uint64_t end, loop;
@@ -207,14 +207,14 @@ void rf5c400_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	uint8_t env_phase;
 	double env_level, env_step, env_rstep;
 
-	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
-	memset(outputs[1], 0, samples * sizeof(*outputs[1]));
+	outputs[0].fill(0);
+	outputs[1].fill(0);
 
 	for (ch=0; ch < 32; ch++)
 	{
 		rf5c400_channel *channel = &m_channels[ch];
-		stream_sample_t *buf0 = outputs[0];
-		stream_sample_t *buf1 = outputs[1];
+		auto &buf0 = outputs[0];
+		auto &buf1 = outputs[1];
 
 //      start = ((channel->startH & 0xFF00) << 8) | channel->startL;
 		end = ((channel->endHloopH & 0xFF) << 16) | channel->endL;
@@ -230,7 +230,7 @@ void rf5c400_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		env_step = channel->env_step;
 		env_rstep = env_step * channel->env_scale;
 
-		for (i=0; i < samples; i++)
+		for (i=0; i < buf0.samples(); i++)
 		{
 			int16_t tmp;
 			int32_t sample;
@@ -300,8 +300,8 @@ void rf5c400_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 			sample *= volume_table[vol];
 			sample = (sample >> 9) * env_level;
-			*buf0++ += sample * pan_table[lvol];
-			*buf1++ += sample * pan_table[rvol];
+			buf0.add_int(i, sample * pan_table[lvol], 32768);
+			buf1.add_int(i, sample * pan_table[rvol], 32768);
 
 			pos += channel->step;
 			if ((pos>>16) > end)

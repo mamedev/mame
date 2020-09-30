@@ -336,7 +336,6 @@ void news_68k_state::common(machine_config &config)
 
 	DMAC_0266(config, m_dma, 0);
 	m_dma->set_bus(m_cpu, 0);
-	m_dma->out_int_cb().set(*this, FUNC(news_68k_state::irq_w<SCSI>));
 
 	INPUT_MERGER_ANY_HIGH(config, m_irq5);
 	m_irq5->output_handler().set_inputline(m_cpu, INPUT_LINE_IRQ5);
@@ -402,8 +401,9 @@ void news_68k_state::common(machine_config &config)
 		{
 			cxd1180_device &adapter = downcast<cxd1180_device &>(*device);
 
-			adapter.irq_handler().set(m_dma, FUNC(dmac_0266_device::irq_w));
-			adapter.drq_handler().set(m_dma, FUNC(dmac_0266_device::drq_w));
+			adapter.irq_handler().set(*this, FUNC(news_68k_state::irq_w<SCSI>));
+			adapter.irq_handler().append(m_dma, FUNC(dmac_0266_device::eop_w));
+			adapter.drq_handler().set(m_dma, FUNC(dmac_0266_device::req_w));
 
 			subdevice<dmac_0266_device>(":dma")->dma_r_cb().set(adapter, FUNC(cxd1180_device::dma_r));
 			subdevice<dmac_0266_device>(":dma")->dma_w_cb().set(adapter, FUNC(cxd1180_device::dma_w));

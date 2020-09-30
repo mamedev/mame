@@ -214,10 +214,7 @@ void spbactn_state::spbactnp_map(address_map &map)
 	map(0x90124, 0x90125).w(FUNC(spbactn_state::spbatnp_90124_w)); // bg scroll
 	map(0x9012c, 0x9012d).w(FUNC(spbactn_state::spbatnp_9012c_w)); // bg scroll
 
-
-
 	map(0x90000, 0x900ff).r(FUNC(spbactn_state::temp_read_handler_r)); // temp
-
 }
 
 void spbactn_state::spbactn_sound_map(address_map &map)

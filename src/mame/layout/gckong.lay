@@ -6,8 +6,6 @@ license:CC0
 
 <!-- define elements -->
 
-	<element name="white"><rect><color red="0.85" green="0.85" blue="0.85" /></rect></element>
-
 	<element name="ladder">
 		<rect>
 			<bounds x="0" y="0" width="1" height="10" />
@@ -37,10 +35,10 @@ license:CC0
 	<view name="Internal Layout">
 		<screen index="0"><bounds left="0" top="0" right="479" bottom="1080" /></screen>
 
-		<bezel element="ladder"><bounds x="0" y="290" width="55" height="213" /><color alpha="0.85" /></bezel>
-		<bezel element="ladder"><bounds x="424" y="484" width="55" height="213" /><color alpha="0.85" /></bezel>
-		<bezel element="ladder"><bounds x="0" y="680" width="55" height="213" /><color alpha="0.85" /></bezel>
-		<bezel element="ladder"><bounds x="424" y="874" width="55" height="213" /><color alpha="0.85" /></bezel>
+		<element ref="ladder"><bounds x="0" y="290" width="55" height="213" /><color alpha="0.85" /></element>
+		<element ref="ladder"><bounds x="424" y="484" width="55" height="213" /><color alpha="0.85" /></element>
+		<element ref="ladder"><bounds x="0" y="680" width="55" height="213" /><color alpha="0.85" /></element>
+		<element ref="ladder"><bounds x="424" y="874" width="55" height="213" /><color alpha="0.85" /></element>
 
 	</view>
 </mamelayout>

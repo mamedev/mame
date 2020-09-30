@@ -8,15 +8,15 @@
 /// \file nld_matrix_solver.h
 ///
 
-#include "netlist/nl_base.h"
-#include "netlist/nl_errstr.h"
-#include "netlist/plib/mat_cr.h"
-#include "netlist/plib/palloc.h"
-#include "netlist/plib/penum.h"
-#include "netlist/plib/pmatrix2d.h"
-#include "netlist/plib/pmempool.h"
-#include "netlist/plib/putil.h"
-#include "netlist/plib/vector_ops.h"
+#include "nl_base.h"
+#include "nl_errstr.h"
+#include "plib/pmatrix_cr.h"
+#include "plib/palloc.h"
+#include "plib/penum.h"
+#include "plib/pmatrix2d.h"
+#include "plib/pmempool.h"
+#include "plib/putil.h"
+#include "plib/vector_ops.h"
 
 #include <numeric>
 
@@ -74,7 +74,7 @@ namespace solver
 		constexpr nl_fptype          m_vntol() { return nlconst::magic(1e-7); }
 		constexpr nl_fptype          m_accuracy() { return nlconst::magic(1e-7); }
 		constexpr std::size_t        m_nr_loops() { return 250; }
-		constexpr std::size_t        m_gs_loops() { return 9; }
+		constexpr std::size_t        m_gs_loops() { return 50; }
 
 		// general parameters
 		constexpr nl_fptype          m_gmin() { return nlconst::magic(1e-9); }

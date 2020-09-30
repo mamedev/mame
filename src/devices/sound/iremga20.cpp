@@ -129,16 +129,14 @@ void iremga20_device::rom_bank_updated()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void iremga20_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void iremga20_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *outL, *outR;
+	auto &outL = outputs[0];
+	auto &outR = outputs[1];
 
-	outL = outputs[0];
-	outR = outputs[1];
-
-	for (int i = 0; i < samples; i++)
+	for (int i = 0; i < outL.samples(); i++)
 	{
-		stream_sample_t sampleout = 0;
+		s32 sampleout = 0;
 
 		for (auto &ch : m_channel)
 		{
@@ -160,9 +158,8 @@ void iremga20_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 			}
 		}
 
-		sampleout >>= 2;
-		outL[i] = sampleout;
-		outR[i] = sampleout;
+		outL.put_int(i, sampleout, 32768 * 4);
+		outR.put_int(i, sampleout, 32768 * 4);
 	}
 }
 

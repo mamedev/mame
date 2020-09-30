@@ -1171,7 +1171,7 @@ void lua_engine::initialize()
 	item_type.set("read", [this](save_item &item, int offset) -> sol::object {
 			if(!item.base || (offset >= item.count))
 				return sol::make_object(sol(), sol::nil);
-			const void *const data = reinterpret_cast<const uint8_t *>(item.base) + (item.size * item.stride * (offset / item.valcount));
+			const void *const data = reinterpret_cast<const uint8_t *>(item.base) + (item.stride * (offset / item.valcount));
 			uint64_t ret = 0;
 			switch(item.size)
 			{
@@ -1199,7 +1199,6 @@ void lua_engine::initialize()
 			else
 			{
 				const uint32_t blocksize = item.size * item.valcount;
-				const uint32_t bytestride = item.size * item.stride;
 				uint32_t remaining = buff->get_len();
 				uint8_t *dest = reinterpret_cast<uint8_t *>(buff->get_ptr());
 				while(remaining)
@@ -1207,7 +1206,7 @@ void lua_engine::initialize()
 					const uint32_t blockno = offset / blocksize;
 					const uint32_t available = blocksize - (offset % blocksize);
 					const uint32_t chunk = (available < remaining) ? available : remaining;
-					const void *const source = reinterpret_cast<const uint8_t *>(item.base) + (blockno * bytestride) + (offset % blocksize);
+					const void *const source = reinterpret_cast<const uint8_t *>(item.base) + (blockno * item.stride) + (offset % blocksize);
 					std::memcpy(dest, source, chunk);
 					offset += chunk;
 					remaining -= chunk;
@@ -1219,7 +1218,7 @@ void lua_engine::initialize()
 	item_type.set("write", [](save_item &item, int offset, uint64_t value) {
 			if(!item.base || (offset >= item.count))
 				return;
-			void *const data = reinterpret_cast<uint8_t *>(item.base) + (item.size * item.stride * (offset / item.valcount));
+			void *const data = reinterpret_cast<uint8_t *>(item.base) + (item.stride * (offset / item.valcount));
 			switch(item.size)
 			{
 				case 1:
@@ -1949,6 +1948,7 @@ void lua_engine::initialize()
  *
  * ioport:count_players() - get count of player controllers
  * ioport:type_group(type, player)
+ * ioport:type_seq(type, player, seqtype) - get input sequence for ioport type/player
  *
  * ioport.ports[] - ioports table (k=tag, v=ioport_port)
  */
@@ -1965,6 +1965,9 @@ void lua_engine::initialize()
 				port_table[port.second->tag()] = port.second.get();
 			return port_table;
 		}));
+	ioport_manager_type.set("type_seq", [](ioport_manager &m, ioport_type type, int player, input_seq_type seqtype) {
+			return sol::make_user(m.type_seq(type, player, seqtype));
+		});
 	sol().registry().set_usertype("ioport", ioport_manager_type);
 
 
@@ -2495,7 +2498,7 @@ void lua_engine::initialize()
 
 	auto target_type = sol().registry().create_simple_usertype<render_target>("new", sol::no_constructor);
 	target_type.set("view_bounds", [](render_target &rt) {
-			const render_bounds b = rt.current_view()->bounds();
+			const render_bounds b = rt.current_view().bounds();
 			return std::tuple<float, float, float, float>(b.x0, b.x1, b.y0, b.y1);
 		});
 	target_type.set("width", &render_target::width);
@@ -2584,6 +2587,7 @@ void lua_engine::initialize()
  * screen:yscale() - screen y scale factor
  * screen:pixel(x, y) - get pixel at (x, y) as packed RGB in a u32
  * screen:pixels() - get whole screen binary bitmap as string
+ * screen:time_until_pos(vpos, hpos) - get the time until this screen pos is reached
  */
 
 	auto screen_dev_type = sol().registry().create_simple_usertype<screen_device>("new", sol::no_constructor);
@@ -2712,6 +2716,7 @@ void lua_engine::initialize()
 			luaL_pushresultsize(&buff, size);
 			return sol::make_reference(L, sol::stack_reference(L, -1));
 		});
+	screen_dev_type.set("time_until_pos", [](screen_device &sdev, int vpos, int hpos) { return sdev.time_until_pos(vpos, hpos).as_double(); });
 	sol().registry().set_usertype("screen_dev", screen_dev_type);
 
 
@@ -2933,7 +2938,8 @@ void lua_engine::initialize()
  * image:year()
  * image:software_list_name()
  * image:image_type_name() - floppy/cart/cdrom/tape/hdd etc
- * image:load()
+ * image:load(filename)
+ * image:load_software(softlist_name)
  * image:unload()
  * image:create()
  * image:crc()
@@ -2963,6 +2969,7 @@ void lua_engine::initialize()
 		}));
 	image_type.set("image_type_name", &device_image_interface::image_type_name);
 	image_type.set("load", &device_image_interface::load);
+	image_type.set("load_software", static_cast<image_init_result (device_image_interface::*)(const std::string &)>(&device_image_interface::load_software));
 	image_type.set("unload", &device_image_interface::unload);
 	image_type.set("create", [](device_image_interface &di, const std::string &filename) { return di.create(filename); });
 	image_type.set("crc", &device_image_interface::crc);

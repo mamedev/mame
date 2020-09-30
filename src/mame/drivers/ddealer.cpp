@@ -128,13 +128,11 @@ public:
 	ddealer_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_vregs(*this, "vregs"),
-		m_left_fg_vram_top(*this, "left_fg_vratop"),
-		m_right_fg_vram_top(*this, "right_fg_vratop"),
-		m_left_fg_vram_bottom(*this, "left_fg_vrabot"),
-		m_right_fg_vram_bottom(*this, "right_fg_vrabot"),
 		m_back_vram(*this, "back_vram"),
+		m_fg_vram(*this, "fg_vram"),
 		m_work_ram(*this, "work_ram"),
 		m_mcu_shared_ram(*this, "mcu_shared_ram"),
+		m_in0_io(*this, "IN0"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")
@@ -145,14 +143,18 @@ public:
 	void init_ddealer();
 
 private:
-	void flipscreen_w(uint16_t data);
-	void back_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void mcu_shared_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t mcu_r();
+	void flipscreen_w(u16 data);
+	void back_vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void fg_vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void mcu_shared_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 mcu_r();
 
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
-	void draw_video_layer(uint16_t* vreg_base, uint16_t* top, uint16_t* bottom, bitmap_ind16 &bitmap, const rectangle &cliprect, int flipy);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	template<unsigned Offset> TILE_GET_INFO_MEMBER(get_fg_splitted_tile_info);
+	TILEMAP_MAPPER_MEMBER(scan_fg);
+	void draw_video_layer(u16* vreg_base, tilemap_t *tmap, screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_sim);
 
@@ -163,14 +165,12 @@ private:
 	virtual void video_start() override;
 
 	// memory pointers
-	required_shared_ptr<uint16_t> m_vregs;
-	required_shared_ptr<uint16_t> m_left_fg_vram_top;
-	required_shared_ptr<uint16_t> m_right_fg_vram_top;
-	required_shared_ptr<uint16_t> m_left_fg_vram_bottom;
-	required_shared_ptr<uint16_t> m_right_fg_vram_bottom;
-	required_shared_ptr<uint16_t> m_back_vram;
-	required_shared_ptr<uint16_t> m_work_ram;
-	required_shared_ptr<uint16_t> m_mcu_shared_ram;
+	required_shared_ptr<u16> m_vregs;
+	required_shared_ptr<u16> m_back_vram;
+	required_shared_ptr<u16> m_fg_vram;
+	required_shared_ptr<u16> m_work_ram;
+	required_shared_ptr<u16> m_mcu_shared_ram;
+	required_ioport m_in0_io;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -179,119 +179,109 @@ private:
 
 	// video-related
 	tilemap_t  *m_back_tilemap;
+	tilemap_t  *m_fg_tilemap; // overall foreground
+	// splitted foreground area
+	tilemap_t  *m_fg_tilemap_left;
+	tilemap_t  *m_fg_tilemap_right;
 
 	// MCU sim related
-	int      m_respcount;
-	uint8_t    m_input_pressed;
-	uint16_t   m_coin_input;
+	int   m_respcount;
+	u8    m_input_pressed;
+	u16   m_coin_input;
 };
 
 
 
-void ddealer_state::flipscreen_w(uint16_t data)
+void ddealer_state::flipscreen_w(u16 data)
 {
 	flip_screen_set(data & 0x01);
 }
 
+static inline void get_tile_info(u16 src, u32 &code, u32 &color)
+{
+	code = src & 0xfff;
+	color = (src >> 12) & 0xf;
+}
+
 TILE_GET_INFO_MEMBER(ddealer_state::get_back_tile_info)
 {
-	int code = m_back_vram[tile_index];
+	u32 code, color;
+	get_tile_info(m_back_vram[tile_index], code, color);
 	tileinfo.set(0,
-			code & 0xfff,
-			code >> 12,
+			code,
+			color,
 			0);
+}
+
+TILE_GET_INFO_MEMBER(ddealer_state::get_fg_tile_info)
+{
+	u32 code, color;
+	get_tile_info(m_fg_vram[tile_index], code, color);
+	tileinfo.set(1,
+			code,
+			color,
+			0);
+}
+
+template<unsigned Offset>
+TILE_GET_INFO_MEMBER(ddealer_state::get_fg_splitted_tile_info)
+{
+	u32 code, color;
+	get_tile_info(m_fg_vram[Offset + (tile_index & 0x17ff)], code, color);
+	tileinfo.set(1,
+			code,
+			color,
+			0);
+}
+
+TILEMAP_MAPPER_MEMBER(ddealer_state::scan_fg)
+{
+	return (row & 0x0f) | ((col & 0xff) << 4) | ((row & 0x10) << 8);
 }
 
 void ddealer_state::video_start()
 {
 	m_back_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ddealer_state::get_back_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode,
+					tilemap_get_info_delegate(*this, FUNC(ddealer_state::get_fg_tile_info)),
+					tilemap_mapper_delegate(*this, FUNC(ddealer_state::scan_fg)),
+					16, 16, 256, 32);
+	m_fg_tilemap_left = &machine().tilemap().create(*m_gfxdecode,
+					tilemap_get_info_delegate(*this, FUNC(ddealer_state::get_fg_splitted_tile_info<0>)),
+					tilemap_mapper_delegate(*this, FUNC(ddealer_state::scan_fg)),
+					16, 16, 128, 32);
+	m_fg_tilemap_right = &machine().tilemap().create(*m_gfxdecode,
+					tilemap_get_info_delegate(*this, FUNC(ddealer_state::get_fg_splitted_tile_info<0x800>)),
+					tilemap_mapper_delegate(*this, FUNC(ddealer_state::scan_fg)),
+					16, 16, 128, 32);
+
+	m_fg_tilemap->set_transparent_pen(15);
+	m_fg_tilemap_left->set_transparent_pen(15);
+	m_fg_tilemap_right->set_transparent_pen(15);
+
 	m_back_tilemap->set_scrolldx(64,64);
+	m_fg_tilemap->set_scrolldx(64,64);
+	m_fg_tilemap_left->set_scrolldx(64,64);
+	m_fg_tilemap_right->set_scrolldx(64,64);
 }
 
-void ddealer_state::draw_video_layer(uint16_t* vreg_base, uint16_t* top, uint16_t* bottom, bitmap_ind16 &bitmap, const rectangle &cliprect, int flipy)
+void ddealer_state::draw_video_layer(u16* vreg_base, tilemap_t *tmap, screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	gfx_element *gfx = m_gfxdecode->gfx(1);
-
-	int16_t sx, sy;
-	int x,y, count;
-	uint16_t* src;
+	int sx, sy;
 
 	sx =  ((vreg_base[0x4 / 2] & 0xff));
 	sx |= ((vreg_base[0x2 / 2] & 0xff) << 8);
 
-	sx &= 0x7ff;
-	if (sx & 0x400) sx -= 0x800;
-
 	sy =  ((vreg_base[0x8 / 2] & 0xff));
 	sy |= ((vreg_base[0x6 / 2] & 0xff) << 8);
 
-	if (!flipy)
-	{
-		sx -= 64; // video shift
-
-		/* the tilemaps seems to be split into top / bottom pieces */
-		count = 0;
-		src = top;
-		for (x = 0; x < 128; x++)
-		{
-			for (y = 0; y < 16; y++)
-			{
-				uint16_t tile = (src[count] & 0x0fff);
-				uint16_t colr = (src[count] & 0xf000) >> 12;
-				count++;
-					gfx->transpen(bitmap,cliprect, tile, colr, 0, flipy, (x * 16) - sx, (y * 16) - sy, 15);
-			}
-		}
-		count = 0;
-		src = bottom;
-		sy -= 256;
-		for (x = 0; x < 128; x++)
-		{
-			for (y = 0; y < 16; y++)
-			{
-				uint16_t tile = (src[count] & 0x0fff);
-				uint16_t colr = (src[count] & 0xf000) >> 12;
-				count++;
-					gfx->transpen(bitmap,cliprect, tile, colr, 0, flipy, (x * 16) - sx, (y * 16) - sy, 15);
-			}
-		}
-	}
-	else
-	{
-		sx -= 0x6d0;
-		sy -= 16;
-
-		/* the tilemaps seems to be split into top / bottom pieces */
-		count = 0;
-		src = top;
-		for (x = 128; x > 0; x--)
-		{
-			for (y = 16; y > 0; y--)
-			{
-				uint16_t tile = (src[count] & 0x0fff);
-				uint16_t colr = (src[count] & 0xf000) >> 12;
-				count++;
-					gfx->transpen(bitmap,cliprect, tile, colr, flipy, flipy, (x * 16) + sx, (y * 16) + sy, 15);
-			}
-		}
-		count = 0;
-		src = bottom;
-		sy -= 256;
-		for (x = 128; x > 0; x--)
-		{
-			for (y = 16; y > 0; y--)
-			{
-				uint16_t tile = (src[count] & 0x0fff);
-				uint16_t colr = (src[count] & 0xf000) >> 12;
-				count++;
-					gfx->transpen(bitmap,cliprect, tile, colr, flipy, flipy, (x * 16) + sx, (y * 16) + sy, 15);
-			}
-		}
-	}
+	tmap->set_scrollx(sx);
+	tmap->set_scrolly(sy);
+	tmap->draw(screen, bitmap, cliprect, 0, 0);
 }
 
 
-uint32_t ddealer_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 ddealer_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_back_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
@@ -306,26 +296,25 @@ uint32_t ddealer_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	{
 		if (m_vregs[0xcc / 2] & 0x80)
 		{
-			draw_video_layer(&m_vregs[0x1e0 / 2], m_left_fg_vram_top, m_left_fg_vram_bottom, bitmap, cliprect, flip);
-			draw_video_layer(&m_vregs[0xcc / 2], m_right_fg_vram_top, m_right_fg_vram_bottom, bitmap, cliprect, flip);
+			draw_video_layer(&m_vregs[0x1e0 / 2], m_fg_tilemap_left, screen, bitmap, cliprect);
+			draw_video_layer(&m_vregs[0xcc / 2], m_fg_tilemap_right, screen, bitmap, cliprect);
 		}
 		else
 		{
-			draw_video_layer(&m_vregs[0x1e0 / 2], m_left_fg_vram_top, m_left_fg_vram_bottom, bitmap, cliprect, flip);
+			draw_video_layer(&m_vregs[0x1e0 / 2], m_fg_tilemap, screen, bitmap, cliprect);
 		}
 	}
 	else
 	{
 		if (m_vregs[0xcc / 2] & 0x80)
 		{
-			draw_video_layer(&m_vregs[0xcc / 2], m_left_fg_vram_top, m_left_fg_vram_bottom, bitmap, cliprect, flip);
-			draw_video_layer(&m_vregs[0x1e0 / 2], m_right_fg_vram_top, m_right_fg_vram_bottom, bitmap, cliprect, flip);
+			draw_video_layer(&m_vregs[0xcc / 2], m_fg_tilemap_left, screen, bitmap, cliprect);
+			draw_video_layer(&m_vregs[0x1e0 / 2], m_fg_tilemap_right, screen, bitmap, cliprect);
 		}
 		else
 		{
-			draw_video_layer(&m_vregs[0x1e0 / 2], m_left_fg_vram_top, m_left_fg_vram_bottom, bitmap, cliprect, flip);
+			draw_video_layer(&m_vregs[0x1e0 / 2], m_fg_tilemap, screen, bitmap, cliprect);
 		}
-
 	}
 
 	return 0;
@@ -340,7 +329,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ddealer_state::mcu_sim)
 	/*$fe002 is used,might be for multiple coins for one credit settings.*/
 	// TODO: I'm not bothering with coin/credit settings until this actually work properly
 	// (game is currently hardwired to free play)
-	m_coin_input = (~(ioport("IN0")->read()));
+	m_coin_input = (~(m_in0_io->read()));
 
 	if (m_coin_input & 0x01)//coin 1
 	{
@@ -401,10 +390,20 @@ TIMER_DEVICE_CALLBACK_MEMBER(ddealer_state::mcu_sim)
 
 
 
-void ddealer_state::back_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void ddealer_state::back_vram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_back_vram[offset]);
 	m_back_tilemap->mark_tile_dirty(offset);
+}
+
+void ddealer_state::fg_vram_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_fg_vram[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset);
+	if (offset & 0x800)
+		m_fg_tilemap_right->mark_tile_dirty(offset & 0x17ff);
+	else
+		m_fg_tilemap_left->mark_tile_dirty(offset & 0x17ff);
 }
 
 
@@ -429,7 +428,7 @@ Protection handling, identical to Hacha Mecha Fighter / Thunder Dragon with diff
 		m_mcu_shared_ram[_protinput_+1] = (_input_ & 0x0000ffff);\
 	}
 
-void ddealer_state::mcu_shared_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void ddealer_state::mcu_shared_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_mcu_shared_ram[offset]);
 
@@ -499,10 +498,7 @@ void ddealer_state::ddealer_map(address_map &map)
 
 	/* this might actually be 1 tilemap with some funky rowscroll / columnscroll enabled, I'm not sure */
 	// certainly seems derivative of the design used in Urashima Mahjong (jalmah.cpp), not identical tho
-	map(0x090000, 0x090fff).ram().share("left_fg_vratop");
-	map(0x091000, 0x091fff).ram().share("right_fg_vratop");
-	map(0x092000, 0x092fff).ram().share("left_fg_vrabot");
-	map(0x093000, 0x093fff).ram().share("right_fg_vrabot");
+	map(0x090000, 0x093fff).ram().w(FUNC(ddealer_state::fg_vram_w)).share("fg_vram"); // fg tilemap
 //  map(0x094000, 0x094001).noprw(); // Set at POST via clr.w, unused afterwards
 	map(0x098000, 0x098001).w(FUNC(ddealer_state::flipscreen_w));
 	map(0x09c000, 0x09cfff).ram().w(FUNC(ddealer_state::back_vram_w)).share("back_vram"); // bg tilemap
@@ -587,8 +583,8 @@ static INPUT_PORTS_START( ddealer )
 INPUT_PORTS_END
 
 static GFXDECODE_START( gfx_ddealer )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb,               0x000, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x100, 16 )
+	GFXDECODE_ENTRY( "bgrom", 0, gfx_8x8x4_packed_msb,               0x000, 16 )
+	GFXDECODE_ENTRY( "fgrom", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x100, 16 )
 GFXDECODE_END
 
 void ddealer_state::machine_start()
@@ -634,7 +630,7 @@ void ddealer_state::ddealer(machine_config &config)
 
 
 
-uint16_t ddealer_state::mcu_r()
+u16 ddealer_state::mcu_r()
 {
 	static const int resp[] =
 	{
@@ -648,7 +644,10 @@ uint16_t ddealer_state::mcu_r()
 
 	int res;
 
-	res = resp[m_respcount++];
+	res = resp[m_respcount];
+	if (!machine().side_effects_disabled())
+		m_respcount++;
+
 	if (resp[m_respcount] < 0)
 			m_respcount = 0;
 
@@ -668,10 +667,10 @@ ROM_START( ddealer )
 	ROM_REGION( 0x40000, "mcu", 0 ) /* M50747? MCU Code */
 	ROM_LOAD( "mcu", 0x0000, 0x1000, NO_DUMP ) // might be NMK-110 8131 chip
 
-	ROM_REGION( 0x20000, "gfx1", 0 ) /* BG0 */
+	ROM_REGION( 0x20000, "bgrom", 0 ) /* BG */
 	ROM_LOAD( "4.ic65", 0x00000, 0x20000, CRC(4939ff1b) SHA1(af2f2feeef5520d775731a58cbfc8fcc913b7348) )
 
-	ROM_REGION( 0x80000, "gfx2", 0 ) /* BG1 */
+	ROM_REGION( 0x80000, "fgrom", 0 ) /* FG */
 	ROM_LOAD( "3.ic64", 0x00000, 0x80000, CRC(660e367c) SHA1(54827a8998c58c578c594126d5efc18a92363eaa))
 
 	ROM_REGION( 0x200, "user1", 0 ) /* Proms */

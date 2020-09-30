@@ -74,7 +74,7 @@ void sp0256_device::device_start()
 	m_drq_cb(1);
 	m_sby_cb(1);
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() / CLOCK_DIVIDER);
+	m_stream = stream_alloc(0, 1, clock() / CLOCK_DIVIDER);
 
 	/* -------------------------------------------------------------------- */
 	/*  Configure our internal variables.                                   */
@@ -1263,13 +1263,13 @@ TIMER_CALLBACK_MEMBER(sp0256_device::set_lrq_timer_proc)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void sp0256_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void sp0256_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *output = outputs[0];
+	auto &output = outputs[0];
 	int output_index = 0;
 	int length, did_samp/*, old_idx*/;
 
-	while (output_index < samples)
+	while (output_index < output.samples())
 	{
 		/* ---------------------------------------------------------------- */
 		/*  First, drain as much of our scratch buffer as we can into the   */
@@ -1278,20 +1278,20 @@ void sp0256_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 		while (m_sc_tail != m_sc_head)
 		{
-			output[output_index++] = m_scratch[m_sc_tail++ & SCBUF_MASK];
+			output.put_int(output_index++, m_scratch[m_sc_tail++ & SCBUF_MASK], 32768);
 			m_sc_tail &= SCBUF_MASK;
 
-			if (output_index > samples)
+			if (output_index >= output.samples())
 				break;
 		}
 
 		/* ---------------------------------------------------------------- */
 		/*  If output outputs is full, then we're done.                      */
 		/* ---------------------------------------------------------------- */
-		if (output_index > samples)
+		if (output_index > output.samples())
 			break;
 
-		length = samples - output_index;
+		length = output.samples() - output_index;
 
 		/* ---------------------------------------------------------------- */
 		/*  Process the current set of filter coefficients as long as the   */

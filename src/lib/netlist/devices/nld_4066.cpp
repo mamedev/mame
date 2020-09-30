@@ -21,10 +21,8 @@
  *
  */
 
-#include "nld_4066.h"
-
-#include "netlist/analog/nlid_twoterm.h"
-#include "netlist/solver/nld_solver.h"
+#include "analog/nlid_twoterm.h"
+#include "solver/nld_solver.h"
 
 
 namespace netlist
@@ -81,8 +79,6 @@ namespace netlist
 		state_var<bool>            m_last;
 		nld_power_pins             m_supply;
 	};
-
-
 
 	NETLIB_DEVICE_IMPL(CD4066_GATE,         "CD4066_GATE",            "")
 	} //namespace devices

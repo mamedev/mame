@@ -23,8 +23,8 @@ public:
 	{
 	}
 
-	void att3b2(machine_config &config);
-	void att3b26(machine_config &config);
+	void att3b2v2(machine_config &config);
+	void att3b2v3(machine_config &config);
 
 private:
 	void mem_map_300(address_map &map);
@@ -36,30 +36,40 @@ private:
 
 void att3b2_state::mem_map_300(address_map &map)
 {
+	map.global_mask(0x07ffffff); // 27-bit physical addresses
 	map(0x00000000, 0x00007fff).rom().region("bootstrap", 0);
 	map(0x00042000, 0x0004200f).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask32(0x000000ff);
+	//map(0x00042013, 0x00042013).r(FUNC(att3b2_state::clear_csr6_r));
+	//map(0x00043000, 0x00043fff).rw(FUNC(att3b2_state::nvram_nibble_r), FUNC(att3b2_state::nvram_nibble_w)).umask32(0x00ff00ff);
+	//map(0x00044000, 0x0004403f).w(FUNC(att3b2_state::csr_w)).umask32(0x000000ff);
+	//map(0x00044002, 0x00044003).r(FUNC(att3b2_state::csr_r));
+	//map(0x00045003, 0x00045003).w(FUNC(att3b2_state::hard_disk_page_w));
 	map(0x00048000, 0x0004800f).rw("dmac", FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x00049000, 0x0004900f).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write));
 	//map(0x0004a000, 0x0004a001).rw("hdc", FUNC(upd7261_device::read), FUNC(upd7261_device::write));
+	//map(0x0004c003, 0x0004c003).r(FUNC(att3b2_state::dpdram_size_r));
 	map(0x0004d000, 0x0004d003).rw("fdc", FUNC(wd2797_device::read), FUNC(wd2797_device::write));
-	map(0x02000000, 0x02003fff).ram();
+	map(0x02000000, 0x0203ffff).ram();
 }
 
 void att3b2_state::mem_map_600(address_map &map)
 {
 	map(0x00000000, 0x0001ffff).rom().region("bootstrap", 0);
-	map(0x00041000, 0x0004100f).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask32(0x000000ff);
+	//map(0x00040003, 0x00040003).w(FUNC(att3b2_state::floppy_control_w));
+	map(0x00041000, 0x0004100f).rw("pit", FUNC(pit8254_device::read), FUNC(pit8254_device::write)).umask32(0x000000ff);
+	//map(0x00042000, 0x00043fff).rw(FUNC(att3b2_state::nvram_byte_r), FUNC(att3b2_state::nvram_byte_w)).umask32(0x00ff00ff);
+	//map(0x00045002, 0x00045003).w(FUNC(att3b2_state::floppy_page_12bit_w));
 	map(0x00048000, 0x0004800f).rw("dmac", FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x00049000, 0x0004900f).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write));
-	map(0x0004a000, 0x0004a003).rw("fdc", FUNC(wd2797_device::read), FUNC(wd2797_device::write));
-	map(0x02000000, 0x02003fff).mirror(0x1000000).ram();
+	map(0x0004a000, 0x0004a003).rw("fdc", FUNC(fd1793_device::read), FUNC(fd1793_device::write));
+	map(0x02000000, 0x0203ffff).mirror(0x1000000).ram();
 }
 
 
 static INPUT_PORTS_START(att3b2)
 INPUT_PORTS_END
 
-void att3b2_state::att3b2(machine_config &config)
+void att3b2_state::att3b2v2(machine_config &config)
 {
 	WE32100(config, m_maincpu, 10_MHz_XTAL); // special WE32102 XTAL runs at 1x or 2x speed
 	m_maincpu->set_addrmap(AS_PROGRAM, &att3b2_state::mem_map_300);
@@ -77,11 +87,15 @@ void att3b2_state::att3b2(machine_config &config)
 	// TODO: RTC (MM58174AN)
 }
 
-void att3b2_state::att3b26(machine_config &config)
+void att3b2_state::att3b2v3(machine_config &config)
 {
-	att3b2(config);
+	att3b2v2(config);
 	m_maincpu->set_clock(18'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &att3b2_state::mem_map_600);
+
+	PIT8254(config.replace(), "pit"); // Intel 82C54
+
+	FD1793(config.replace(), "fdc", 1'000'000); // FD 1793-02
 }
 
 ROM_START(3b2_300)
@@ -116,7 +130,7 @@ ROM_START(3b2_600)
 	ROM_LOAD32_BYTE("abtrt.bin", 0x0003, 0x8000, CRC(0f075161) SHA1(b67c9c4549dc789df33b5a38e4b35fe26fdfbea6))
 ROM_END
 
-COMP(1985, 3b2_300, 0,       0, att3b2, att3b2, att3b2_state, empty_init, "AT&T", "3B2/300", MACHINE_IS_SKELETON)
-COMP(198?, 3b2_310, 3b2_300, 0, att3b2, att3b2, att3b2_state, empty_init, "AT&T", "3B2/310", MACHINE_IS_SKELETON)
-COMP(198?, 3b2_400, 3b2_300, 0, att3b2, att3b2, att3b2_state, empty_init, "AT&T", "3B2/400", MACHINE_IS_SKELETON)
-COMP(198?, 3b2_600, 0,       0, att3b26, att3b2, att3b2_state, empty_init, "AT&T", "3B2/600", MACHINE_IS_SKELETON)
+COMP(1984, 3b2_300, 0,       0, att3b2v2, att3b2, att3b2_state, empty_init, "AT&T", "3B2/300", MACHINE_IS_SKELETON)
+COMP(1985, 3b2_310, 3b2_300, 0, att3b2v2, att3b2, att3b2_state, empty_init, "AT&T", "3B2/310", MACHINE_IS_SKELETON)
+COMP(1985, 3b2_400, 3b2_300, 0, att3b2v2, att3b2, att3b2_state, empty_init, "AT&T", "3B2/400", MACHINE_IS_SKELETON)
+COMP(1987, 3b2_600, 0,       0, att3b2v3, att3b2, att3b2_state, empty_init, "AT&T", "3B2/600", MACHINE_IS_SKELETON)

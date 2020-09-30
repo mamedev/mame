@@ -13,6 +13,8 @@
       reimplement as a push, not a pull
     - add CMOS devices, 1 new opcode (01 IDL)
     - add special 8022 opcodes (RAD, SEL AN0, SEL AN1, RETI)
+    - according to the user manual, some opcodes(dis/enable timer/interrupt)
+      don't increment the timer, does it affect the prescaler too?
 
 ****************************************************************************
 
@@ -884,9 +886,15 @@ OPHANDLER( sel_rb0 )        { burn_cycles(1); m_psw &= ~B_FLAG; update_regptr();
 OPHANDLER( sel_rb1 )        { burn_cycles(1); m_psw |=  B_FLAG; update_regptr(); }
 
 OPHANDLER( stop_tcnt )      { burn_cycles(1); m_timecount_enabled = 0; }
-
-OPHANDLER( strt_cnt )       { burn_cycles(1); m_timecount_enabled = COUNTER_ENABLED; m_t1_history = test_r(1); }
 OPHANDLER( strt_t )         { burn_cycles(1); m_timecount_enabled = TIMER_ENABLED; m_prescaler = 0; }
+OPHANDLER( strt_cnt )
+{
+	burn_cycles(1);
+	if (!(m_timecount_enabled & COUNTER_ENABLED))
+		m_t1_history = test_r(1);
+
+	m_timecount_enabled = COUNTER_ENABLED;
+}
 
 OPHANDLER( swap_a )         { burn_cycles(1); m_a = (m_a << 4) | (m_a >> 4); }
 

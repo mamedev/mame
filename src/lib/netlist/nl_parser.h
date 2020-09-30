@@ -9,6 +9,7 @@
 #define NL_PARSER_H_
 
 #include "nltypes.h" // for setup_t
+#include "core/setup.h"
 #include "plib/ptokenizer.h"
 
 #include <unordered_map>
@@ -25,12 +26,12 @@ namespace netlist
 
 		parser_t(nlparse_t &setup);
 
-		bool parse(plib::psource_t::stream_ptr &&strm, const pstring &nlname);
+		bool parse(plib::istream_uptr &&strm, const pstring &nlname);
 		bool parse(const token_store &tokstor, const pstring &nlname);
-		void parse_tokens(plib::psource_t::stream_ptr &&strm, token_store &tokstor);
+		void parse_tokens(plib::istream_uptr &&strm, token_store &tokstor);
 
 	protected:
-		void parse_netlist(const pstring &nlname);
+		void parse_netlist();
 		void net_alias();
 		void dippins();
 		void netdev_param();
@@ -45,6 +46,7 @@ namespace netlist
 		void net_include();
 		void net_local_source();
 		void net_external_source();
+		void net_lib_entry(bool is_local);
 		void net_register_dev();
 		void net_truthtable_start(const pstring &nlname);
 
@@ -75,8 +77,10 @@ namespace netlist
 		token_id_t m_tok_EXTERNAL_SOURCE;
 		token_id_t m_tok_LOCAL_SOURCE;
 		token_id_t m_tok_LOCAL_LIB_ENTRY;
+		token_id_t m_tok_EXTERNAL_LIB_ENTRY;
 		token_id_t m_tok_TRUTHTABLE_START;
 		token_id_t m_tok_TRUTHTABLE_END;
+		token_id_t m_tok_TRUTHTABLE_ENTRY;
 		token_id_t m_tok_TT_HEAD;
 		token_id_t m_tok_TT_LINE;
 		token_id_t m_tok_TT_FAMILY;
@@ -86,7 +90,27 @@ namespace netlist
 
 		std::unordered_map<pstring, token_store> m_local;
 		token_store *m_cur_local;
-};
+	};
+
+	class source_token_t : public source_netlist_t
+	{
+	public:
+		source_token_t(const pstring &name, const parser_t::token_store &store)
+		: m_store(store)
+		, m_name(name)
+		{
+		}
+
+		bool parse(nlparse_t &setup, const pstring &name) override;
+
+	protected:
+		plib::istream_uptr stream(const pstring &name) override;
+
+	private:
+		parser_t::token_store m_store;
+		pstring m_name;
+	};
+
 
 } // namespace netlist
 

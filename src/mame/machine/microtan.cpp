@@ -24,73 +24,73 @@
 static const char keyboard[8][9][8] = {
 	{ /* normal */
 		{ 27,'1','2','3','4','5','6','7'},
-		{'8','9','0','-','=','`',127,  9},
+		{'8','9','0',':','-', 12,127,'^'},
 		{'q','w','e','r','t','y','u','i'},
-		{'o','p','[',']', 13,127,  0,  0},
+		{'o','p','[',']', 13,  3,  0,  0},
 		{'a','s','d','f','g','h','j','k'},
-		{'l',';', 39, 92,  0,'z','x','c'},
+		{'l',';','@', 92,  0,'z','x','c'},
 		{'v','b','n','m',',','.','/',  0},
 		{ 10,' ','-',',', 13,'.','0','1'},
 		{'2','3','4','5','6','7','8','9'},
 	},
 	{ /* Shift */
-		{ 27,'!','@','#','$','%','^','&'},
-		{'*','(',')','_','+','~',127,  9},
+		{ 27,'!','"','#','$','%','&', 39},
+		{'(',')','~','*','=', 12,127,'_'},
 		{'Q','W','E','R','T','Y','U','I'},
-		{'O','P','{','}', 13,127,  0,  0},
+		{'O','P','{','}', 13,  3,  0,  0},
 		{'A','S','D','F','G','H','J','K'},
-		{'L',':','"','|',  0,'Z','X','C'},
+		{'L','+','`','|',  0,'Z','X','C'},
 		{'V','B','N','M','<','>','?',  0},
 		{ 10,' ','-',',', 13,'.','0','1'},
 		{'2','3','4','5','6','7','8','9'},
 	},
 	{ /* Control */
 		{ 27,'1','2','3','4','5','6','7'},
-		{'8','9','0','-','=','`',127,  9},
+		{'8','9','0',':','-','`',127, 30},
 		{ 17, 23,  5, 18, 20, 25, 21,  9},
-		{ 15, 16, 27, 29, 13,127,  0,  0},
+		{ 15, 16, 27, 29, 13,  3,  0,  0},
 		{  1, 19,  4,  6,  7,  8, 10, 11},
-		{ 12,';', 39, 28,  0, 26, 24,  3},
+		{ 12,';','@', 28,  0, 26, 24,  3},
 		{ 22,  2, 14, 13,',','.','/',  0},
 		{ 10,' ','-',',', 13,'.','0','1'},
 		{'2','3','4','5','6','7','8','9'},
 	},
 	{ /* Shift+Control */
-		{ 27,'!',  0,'#','$','%', 30,'&'},
-		{'*','(',')', 31,'+','~',127,  9},
+		{ 27,'!','"','#','$','%','&', 39},
+		{'(',')','~','*','=', 12,127, 31},
 		{ 17, 23,  5, 18, 20, 25, 21,  9},
 		{ 15, 16, 27, 29, 13,127,  0,  0},
 		{  1, 19,  4,  6,  7,  8, 10, 11},
-		{ 12,':','"', 28,  0, 26, 24,  3},
+		{ 12,'+','`', 28,  0, 26, 24,  3},
 		{ 22,  2, 14, 13,',','.','/',  0},
 		{ 10,' ','-',',', 13,'.','0','1'},
 		{'2','3','4','5','6','7','8','9'},
 	},
 	{ /* CapsLock */
 		{ 27,'1','2','3','4','5','6','7'},
-		{'8','9','0','-','=','`',127,  9},
+		{'8','9','0',':','-', 12,127,'^'},
 		{'Q','W','E','R','T','Y','U','I'},
-		{'O','P','[',']', 13,127,  0,  0},
+		{'O','P','[',']', 13,  3,  0,  0},
 		{'A','S','D','F','G','H','J','K'},
-		{'L',';', 39, 92,  0,'Z','X','C'},
+		{'L',';','@', 92,  0,'Z','X','C'},
 		{'V','B','N','M',',','.','/',  0},
 		{ 10,' ','-',',', 13,'.','0','1'},
 		{'2','3','4','5','6','7','8','9'},
 	},
 	{ /* Shift+CapsLock */
-		{ 27,'!','@','#','$','%','^','&'},
-		{'*','(',')','_','+','~',127,  9},
-		{'Q','W','E','R','T','Y','U','I'},
-		{'O','P','{','}', 13,127,  0,  0},
-		{'A','S','D','F','G','H','J','K'},
-		{'L',':','"','|',  0,'Z','X','C'},
-		{'V','B','N','M','<','>','?',  0},
+		{ 27,'!','"','#','$','%','&', 39},
+		{'(',')','~','*','=', 12,127,'_'},
+		{'q','w','e','r','t','y','u','i'},
+		{'o','p','{','}', 13,  3,  0,  0},
+		{'a','s','d','f','g','h','j','k'},
+		{'l','+','`','|',  0,'z','x','c'},
+		{'v','b','n','m','<','>','?',  0},
 		{ 10,' ','-',',', 13,'.','0','1'},
 		{'2','3','4','5','6','7','8','9'},
 	},
 	{ /* Control+CapsLock */
 		{ 27,'1','2','3','4','5','6','7'},
-		{'8','9','0','-','=','`',127,  9},
+		{'8','9','0',':','-', 12,127,  9},
 		{ 17, 23,  5, 18, 20, 25, 21,  9},
 		{ 15, 16, 27, 29, 13,127,  0,  0},
 		{  1, 19,  4,  6,  7,  8, 10, 11},
@@ -100,8 +100,8 @@ static const char keyboard[8][9][8] = {
 		{'2','3','4','5','6','7','8','9'},
 	},
 	{ /* Shift+Control+CapsLock */
-		{ 27,'!',  0,'#','$','%', 30,'&'},
-		{'*','(',')', 31,'+','~',127,  9},
+		{ 27,'!','"','#','$','%','&', 39},
+		{'(',')','~','*','=', 12,127,  9},
 		{ 17, 23,  5, 18, 20, 25, 21,  9},
 		{ 15, 16, 27, 29, 13,127,  0,  0},
 		{  1, 19,  4,  6,  7,  8, 10, 11},
@@ -149,11 +149,10 @@ uint8_t microtan_state::bffx_r(offs_t offset)
 			break;
 		case 1: /* Hex Keypad */
 			data = 0x00;
-			for (int i = 0; i < 4; i++)
-			{
-				if (m_keypad_column & (1 << i))
+			for (u8 i = 0; i < 4; i++)
+				if (BIT(m_keypad_column, i))
 					data |= m_io_keypad[i]->read();
-			}
+
 			break;
 		case 2: /* ETI Keypad */
 			data = (m_keypad->read() & 0x1f) | (m_config->read() & 0x60);
@@ -204,7 +203,7 @@ uint8_t mt6809_state::keyboard_r()
 	m_keyboard_ascii = 0x00;
 
 	return data;
-	}
+}
 
 void mt6809_state::store_key(int key)
 {
@@ -220,7 +219,7 @@ void microtan_state::store_key(int key)
 TIMER_DEVICE_CALLBACK_MEMBER(microtan_state::kbd_scan)
 {
 	/* ASCII Keyboard only */
-	if ((m_config->read() & 3) != 0)
+	if (m_config->read() & 3)
 		return;
 
 	int mod, row, col, chg, newvar;
@@ -231,9 +230,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(microtan_state::kbd_scan)
 			m_repeater = 4;
 	}
 	else if( m_repeater )
-	{
 		m_repeat = m_repeater;
-	}
 
 	row = 9;
 	newvar = m_io_keyboard[8]->read();
@@ -296,16 +293,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(microtan_state::kbd_scan)
 			m_keyrows[row] |= newvar;
 		}
 		else
-		{
 			m_keyrows[row] = newvar;
-		}
+
 		m_repeat = m_repeater;
 	}
 	else
 	if ( m_key && (m_keyrows[m_lastrow] & m_mask) && m_repeat == 0 )
-	{
 		store_key(m_key);
-	}
 }
 
 
@@ -340,7 +334,7 @@ void microtan_state::init_gfx2()
 		case 3: dst[ 0] = dst[ 1] = dst[ 2] = dst[ 3] = 0xff; break;
 		}
 		dst += 4;
-		switch ((i >> 2) & 3)
+		switch (BIT(i, 2, 2))
 		{
 		case 0: dst[ 0] = dst[ 1] = dst[ 2] = dst[ 3] = 0x00; break;
 		case 1: dst[ 0] = dst[ 1] = dst[ 2] = dst[ 3] = 0xf0; break;
@@ -348,7 +342,7 @@ void microtan_state::init_gfx2()
 		case 3: dst[ 0] = dst[ 1] = dst[ 2] = dst[ 3] = 0xff; break;
 		}
 		dst += 4;
-		switch ((i >> 4) & 3)
+		switch (BIT(i, 4, 2))
 		{
 		case 0: dst[ 0] = dst[ 1] = dst[ 2] = dst[ 3] = 0x00; break;
 		case 1: dst[ 0] = dst[ 1] = dst[ 2] = dst[ 3] = 0xf0; break;
@@ -356,7 +350,7 @@ void microtan_state::init_gfx2()
 		case 3: dst[ 0] = dst[ 1] = dst[ 2] = dst[ 3] = 0xff; break;
 		}
 		dst += 4;
-		switch ((i >> 6) & 3)
+		switch (BIT(i, 6, 2))
 		{
 		case 0: dst[ 0] = dst[ 1] = dst[ 2] = dst[ 3] = 0x00; break;
 		case 1: dst[ 0] = dst[ 1] = dst[ 2] = dst[ 3] = 0xf0; break;
@@ -391,9 +385,8 @@ void microtan_state::machine_start()
 void microtan_state::machine_reset()
 {
 	for (int i = 1; i < 10;  i++)
-	{
 		m_keyrows[i] = m_io_keyboard[i-1].read_safe(0);
-	}
+
 	m_led = BIT(~m_keyrows[3], 7);
 }
 
@@ -439,26 +432,19 @@ image_init_result microtan_state::parse_intel_hex(uint8_t *snapshot_buff, char *
 					&b[24], &b[25], &b[26], &b[27], &b[28], &b[29], &b[30], &b[31],
 					&cs);
 				if (n == 0)
-				{
 					logerror("parse_intel_hex: malformed line [%s]\n", line);
-				}
-				else if (n == 1)
-				{
+				else
+				if (n == 1)
 					logerror("parse_intel_hex: only size found [%s]\n", line);
-				}
-				else if (n == 2)
-				{
+				else
+				if (n == 2)
 					logerror("parse_intel_hex: only size and addr found [%s]\n", line);
-				}
-				else if (n == 3)
-				{
+				else
+				if (n == 3)
 					logerror("parse_intel_hex: only size, addr and null found [%s]\n", line);
-				}
 				else
 				if (null != 0)
-				{
 					logerror("parse_intel_hex: warning null byte is != 0 [%s]\n", line);
-				}
 				else
 				{
 					int i, sum;
@@ -483,9 +469,8 @@ image_init_result microtan_state::parse_intel_hex(uint8_t *snapshot_buff, char *
 			column = 0;
 		}
 		else
-		{
 			line[column++] = *src;
-		}
+
 		src++;
 	}
 	/* register preset? */
@@ -520,19 +505,14 @@ image_init_result microtan_state::parse_zillion_hex(uint8_t *snapshot_buff, char
 						/*row++;*/
 						n = sscanf(line, "%x %x %x %x %x %x %x %x %x", &addr, &b[0], &b[1], &b[2], &b[3], &b[4], &b[5], &b[6], &b[7]);
 						if (n == 0)
-						{
 							logerror("parse_zillion_hex: malformed line [%s]\n", line);
-						}
-						else if (n == 1)
-						{
+						else
+						if (n == 1)
 							logerror("parse_zillion_hex: only addr found [%s]\n", line);
-						}
 						else
 						{
-							int i;
-
 							logerror("parse_zillion_hex: %04X", addr);
-							for (i = 0; i < n-1; i++)
+							for (int i = 0; i < n-1; i++)
 								snapshot_buff[addr++] = b[i];
 							logerror("-%04X\n", addr-1);
 						}
@@ -540,9 +520,7 @@ image_init_result microtan_state::parse_zillion_hex(uint8_t *snapshot_buff, char
 					column = 0;
 				}
 				else
-				{
 					line[column++] = *src;
-				}
 			}
 		}
 		else
@@ -551,11 +529,11 @@ image_init_result microtan_state::parse_zillion_hex(uint8_t *snapshot_buff, char
 			{
 				if (column)
 				{
-					int addr, n;
+					int addr;
 
 					/*row++;*/
 					line[column] = '\0';
-					n = sscanf(line, "G%x", (unsigned int *) &addr);
+					int n = sscanf(line, "G%x", (unsigned int *) &addr);
 					if (n == 1 && !snapshot_buff[8192+64+0] && !snapshot_buff[8192+64+1])
 					{
 						logerror("microtan_hexfile_init: go addr %04X\n", addr);
@@ -566,9 +544,8 @@ image_init_result microtan_state::parse_zillion_hex(uint8_t *snapshot_buff, char
 				column = 0;
 			}
 			else
-			{
 				line[column++] = *src;
-			}
+
 			if (*src == '{')
 			{
 				parsing = 1;
@@ -614,9 +591,8 @@ void microtan_state::snapshot_copy(uint8_t *snapshot_buff, int snapshot_size)
 		base += 8192;
 		/* 64 bytes of chunky graphics info */
 		for (int i = 0; i < 32*16; i++)
-		{
 			m_chunky_buffer[i] = (snapshot_buff[base+i/8] >> (i&7)) & 1;
-		}
+
 		base += 64;
 		set_cpu_regs(snapshot_buff, base);
 	}
@@ -681,9 +657,8 @@ void microtan_state::snapshot_copy(uint8_t *snapshot_buff, int snapshot_size)
 		}
 
 		for (int i = 0; i < 32*16; i++)
-		{
 			m_chunky_buffer[i] = (snapshot_buff[base+i/8] >> (i&7)) & 1;
-		}
+
 		base += 64;
 
 		set_cpu_regs(snapshot_buff, base);

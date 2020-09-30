@@ -175,6 +175,8 @@ MIG RAM page 2 $CE02 is the speaker/slot bitfield and $CE03 is the paddle/accele
 #include "bus/a2bus/computereyes2.h"
 #include "bus/a2bus/byte8251.h"
 #include "bus/a2bus/a2iwm.h"
+#include "bus/a2bus/uthernet.h"
+#include "bus/a2bus/sider.h"
 #include "bus/a2gameio/gameio.h"
 
 #include "bus/rs232/rs232.h"
@@ -4500,6 +4502,9 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("applesurance", A2BUS_APPLESURANCE);  /* Applesurance Diagnostic Controller */
 	device.option_add("byte8251", A2BUS_BYTE8251); /* BYTE Magazine 8251 serial card */
 	device.option_add("cmsscsi", A2BUS_CMSSCSI);  /* CMS Apple II SCSI Card */
+	device.option_add("uthernet", A2BUS_UTHERNET); /* A2RetroSystems Uthernet card */
+	device.option_add("sider2", A2BUS_SIDER2); /* Advanced Tech Systems / First Class Peripherals Sider 2 SASI card */
+	device.option_add("sider1", A2BUS_SIDER1); /* Advanced Tech Systems / First Class Peripherals Sider 1 SASI card */
 }
 
 static void apple2eaux_cards(device_slot_interface &device)
@@ -4531,7 +4536,7 @@ void apple2e_state::apple2e(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, A2_SPEAKER_TAG).add_route(ALL_OUTPUTS, "mono", 1.00);
+	SPEAKER_SOUND(config, A2_SPEAKER_TAG).add_route(ALL_OUTPUTS, "mono", 0.5);
 
 	/* DS1315 for no-slot clock */
 	DS1315(config, m_ds1315, 0).read_backing().set(FUNC(apple2e_state::nsc_backing_r));

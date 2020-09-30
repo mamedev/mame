@@ -22,7 +22,7 @@ function lfs.env_replace(str)
 end
 
 _G._ = emu.lang_translate
-
+_G.emu.plugin = {} -- table to contain plugin interfaces
 -- substitute environment variables in the plugins path from options
 local dirs = lfs.env_replace(manager:options().entries.pluginspath:value())
 

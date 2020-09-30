@@ -905,6 +905,15 @@ ROM_END
 /*-------------------------------------------------------------------
 / Sahara Love (1984)
 /-------------------------------------------------------------------*/
+ROM_START(sahalove)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("u5_cf.bin", 0x0000, 0x0800, CRC(e0d4b405) SHA1(17aadd79c0dcbb336aadd5d203bc6ca866492345))
+	ROM_LOAD("u4_ce.bin", 0x0800, 0x0800, CRC(4cd312dd) SHA1(31245daa9972ef8652caee69986585bb8239e86e))
+	ROM_LOAD("412.cpu",   0x2000, 0x0400, CRC(84a86b83) SHA1(f331f2ffd7d1b279b4ffbb939aa8649e723f5fac))
+
+	ROM_REGION(0x2000, "audiocpu", 0) // extra Z80 for sound. TODO: emulate
+	ROM_LOAD("sahalove.bin", 0x0000, 0x2000,  CRC(3512840a) SHA1(eb36bb78bbf2f8610bc1d71a6651b937db3a5c69))
+ROM_END
 
 /*-------------------------------------------------------------------
 / Sinbad (05/1978) #412
@@ -1023,4 +1032,5 @@ GAME(1980,  roldisco, gts1s,  gts1, gts1,     gts1_state, empty_init, ROT0, "Got
 GAME(1980,  astannie, gts1s,  gts1, gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Asteroid Annie and the Aliens",        MACHINE_IS_SKELETON_MECHANICAL)
 
 // homebrew
+GAME(1984,  sahalove, sinbad, gts1, gts1,     gts1_state, empty_init, ROT0, "Christian Tabart", "Sahara Love (France)",                 MACHINE_IS_SKELETON_MECHANICAL) // based on sinbad, 150 units produced, not sure it's 'homebrew'
 GAME(1986,  hexagone, gts1s,  gts1, gts1,     gts1_state, empty_init, ROT0, "Christian Tabart", "L'Hexagone (France)",                  MACHINE_IS_SKELETON_MECHANICAL)

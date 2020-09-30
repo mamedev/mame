@@ -11,8 +11,8 @@
 #ifndef NLID_PROXY_H_
 #define NLID_PROXY_H_
 
-#include "netlist/analog/nlid_twoterm.h"
-#include "netlist/nl_base.h"
+#include "analog/nlid_twoterm.h"
+#include "nl_base.h"
 
 namespace netlist
 {
