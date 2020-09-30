@@ -46,6 +46,18 @@
 //
 // ===================================================================================
 //
+// From OPM to OPN:
+//   - FM Channels reduced from 8 to 3
+//   - Stereo removed, Hardware LFO removed, Channel 8 noise removed
+//   - Hardware pitch table removed, coarse detune removed, pitch calculation is different
+//   - 3 square wave channels added (GI AY-3–8910 compatible)
+//   - SSG-EG envelope mode added (lets you do AY style looping envelopes on FM ops)
+//   - Channel 3 can have different frequency for each op
+//   - CSM only applies to channel 3
+//   - Register map is different
+//   - Operator timing is different. Channel 1 and 2 have very different timing.
+//   - OPN’s hardware FM clock divider can be changed from /6 (default) to /2 or /3
+//
 // From OPN to OPNA:
 //   - Channels doubled from 3 to 6
 //   - Added hardware LFO (different from OPM)
@@ -85,19 +97,25 @@
 //
 // ===================================================================================
 //
-// Test Bit Functions (YM2612)
+// OPN Test Bit Functions (YM2612)
 // $21:0: Select which of two unknown signals is read as bit 14 of the test read output.
 // $21:1: Some LFO control, unknown function.
 // $21:2: Timers increment once every internal clock rather than once every sample. (Untested by me)
 // $21:3: Freezes PG. Presumably disables writebacks to the phase register.
 // $21:4: Ugly bit. Inverts MSB of operators.
-// $21:5: Freezes EG. Presumably disables writebacks to the envelope counter register. Unknown whether this affects the other EG state bits.
+// $21:5: Freezes EG. Presumably disables writebacks to the envelope counter register.
+//        Unknown whether this affects the other EG state bits.
 // $21:6: Enable reading test data from OPN2 rather than status flags.
 // $21:7: Select LSB (1) or MSB (0) of read test data. (Yes, it's backwards.)
 // $2C:2 downto 0: Ignored by OPN2, confirmed by die shot.
 // $2C:3: Bit 0 of Channel 6 DAC value
 // $2C:4: Read 9-bit channel output (1) instead of 14-bit operator output (0)
-// $2C:5: Play DAC output over all channels (possibly except for Channel 5--in my testing the DAC is the only thing you hear and it's much louder, you do not get any output from Channel 5; but someone else supposedly found // that the pan flags for Channel 5 don't affect the panning of this sound, which is only possible if it's not being output during that time slot for some reason. I don't have any other reason to believe this is true though).
+// $2C:5: Play DAC output over all channels (possibly except for Channel 5--in my testing
+//        the DAC is the only thing you hear and it's much louder, you do not get any output
+//        from Channel 5; but someone else supposedly found that the pan flags for Channel 5
+//        don't affect the panning of this sound, which is only possible if it's not being
+//        output during that time slot for some reason. I don't have any other reason to
+//        believe this is true though).
 // $2C:6: Select function of TEST pin input--both unknown functions.
 // $2C:7: Set the TEST pin to be an output (1) instead of input (0).
 //
@@ -286,8 +304,9 @@ inline s16 opn_lfo_pm_phase_adjustment(u8 fnum_bits, u8 pm_sensitivity, s8 lfo_r
 
 //-------------------------------------------------
 //  opm_keycode_to_phase_step - converts an
-//  OPM concatenated keycode (4 bits) and key
-//  fraction (6 bits) to a 0.10 phase step
+//  OPM concatenated block (3 bits), keycode
+//  (4 bits) and key fraction (6 bits) to a 0.10
+//  phase step, after applying the given delta
 //-------------------------------------------------
 
 u32 opm_keycode_to_phase_step(u16 block_freq, s16 delta)
@@ -310,57 +329,60 @@ u32 opm_keycode_to_phase_step(u16 block_freq, s16 delta)
 	// 8053920Hz, giving this equation for the fnum:
 	//
 	//    fnum = (double(144) * freq * (1 << 20)) / double(8053920) / 4;
-	///
-	static const u16 s_phase_step[12*64] =
+	//
+	// Unfortunately, the computed table differs in a few spots from the data
+	// verified from an actual chip. The table below comes from David Viens'
+	// analysis, used with his permission.
+	static const u32 s_phase_step[12*64] =
 	{
-		1299,1300,1301,1302,1303,1304,1305,1306,1308,1309,1310,1311,1313,1314,1315,1316,
-		1318,1319,1320,1321,1322,1323,1324,1325,1327,1328,1329,1330,1332,1333,1334,1335,
-		1337,1338,1339,1340,1341,1342,1343,1344,1346,1347,1348,1349,1351,1352,1353,1354,
-		1356,1357,1358,1359,1361,1362,1363,1364,1366,1367,1368,1369,1371,1372,1373,1374,
-		1376,1377,1378,1379,1381,1382,1383,1384,1386,1387,1388,1389,1391,1392,1393,1394,
-		1396,1397,1398,1399,1401,1402,1403,1404,1406,1407,1408,1409,1411,1412,1413,1414,
-		1416,1417,1418,1419,1421,1422,1423,1424,1426,1427,1429,1430,1431,1432,1434,1435,
-		1437,1438,1439,1440,1442,1443,1444,1445,1447,1448,1449,1450,1452,1453,1454,1455,
-		1458,1459,1460,1461,1463,1464,1465,1466,1468,1469,1471,1472,1473,1474,1476,1477,
-		1479,1480,1481,1482,1484,1485,1486,1487,1489,1490,1492,1493,1494,1495,1497,1498,
-		1501,1502,1503,1504,1506,1507,1509,1510,1512,1513,1514,1515,1517,1518,1520,1521,
-		1523,1524,1525,1526,1528,1529,1531,1532,1534,1535,1536,1537,1539,1540,1542,1543,
-		1545,1546,1547,1548,1550,1551,1553,1554,1556,1557,1558,1559,1561,1562,1564,1565,
-		1567,1568,1569,1570,1572,1573,1575,1576,1578,1579,1580,1581,1583,1584,1586,1587,
-		1590,1591,1592,1593,1595,1596,1598,1599,1601,1602,1604,1605,1607,1608,1609,1610,
-		1613,1614,1615,1616,1618,1619,1621,1622,1624,1625,1627,1628,1630,1631,1632,1633,
-		1637,1638,1639,1640,1642,1643,1645,1646,1648,1649,1651,1652,1654,1655,1656,1657,
-		1660,1661,1663,1664,1666,1667,1669,1670,1672,1673,1675,1676,1678,1679,1681,1682,
-		1685,1686,1688,1689,1691,1692,1694,1695,1697,1698,1700,1701,1703,1704,1706,1707,
-		1709,1710,1712,1713,1715,1716,1718,1719,1721,1722,1724,1725,1727,1728,1730,1731,
-		1734,1735,1737,1738,1740,1741,1743,1744,1746,1748,1749,1751,1752,1754,1755,1757,
-		1759,1760,1762,1763,1765,1766,1768,1769,1771,1773,1774,1776,1777,1779,1780,1782,
-		1785,1786,1788,1789,1791,1793,1794,1796,1798,1799,1801,1802,1804,1806,1807,1809,
-		1811,1812,1814,1815,1817,1819,1820,1822,1824,1825,1827,1828,1830,1832,1833,1835,
-		1837,1838,1840,1841,1843,1845,1846,1848,1850,1851,1853,1854,1856,1858,1859,1861,
-		1864,1865,1867,1868,1870,1872,1873,1875,1877,1879,1880,1882,1884,1885,1887,1888,
-		1891,1892,1894,1895,1897,1899,1900,1902,1904,1906,1907,1909,1911,1912,1914,1915,
-		1918,1919,1921,1923,1925,1926,1928,1930,1932,1933,1935,1937,1939,1940,1942,1944,
-		1946,1947,1949,1951,1953,1954,1956,1958,1960,1961,1963,1965,1967,1968,1970,1972,
-		1975,1976,1978,1980,1982,1983,1985,1987,1989,1990,1992,1994,1996,1997,1999,2001,
-		2003,2004,2006,2008,2010,2011,2013,2015,2017,2019,2021,2022,2024,2026,2028,2029,
-		2032,2033,2035,2037,2039,2041,2043,2044,2047,2048,2050,2052,2054,2056,2058,2059,
-		2062,2063,2065,2067,2069,2071,2073,2074,2077,2078,2080,2082,2084,2086,2088,2089,
-		2092,2093,2095,2097,2099,2101,2103,2104,2107,2108,2110,2112,2114,2116,2118,2119,
-		2122,2123,2125,2127,2129,2131,2133,2134,2137,2139,2141,2142,2145,2146,2148,2150,
-		2153,2154,2156,2158,2160,2162,2164,2165,2168,2170,2172,2173,2176,2177,2179,2181,
-		2185,2186,2188,2190,2192,2194,2196,2197,2200,2202,2204,2205,2208,2209,2211,2213,
-		2216,2218,2220,2222,2223,2226,2227,2230,2232,2234,2236,2238,2239,2242,2243,2246,
-		2249,2251,2253,2255,2256,2259,2260,2263,2265,2267,2269,2271,2272,2275,2276,2279,
-		2281,2283,2285,2287,2288,2291,2292,2295,2297,2299,2301,2303,2304,2307,2308,2311,
-		2315,2317,2319,2321,2322,2325,2326,2329,2331,2333,2335,2337,2338,2341,2342,2345,
-		2348,2350,2352,2354,2355,2358,2359,2362,2364,2366,2368,2370,2371,2374,2375,2378,
-		2382,2384,2386,2388,2389,2392,2393,2396,2398,2400,2402,2404,2407,2410,2411,2414,
-		2417,2419,2421,2423,2424,2427,2428,2431,2433,2435,2437,2439,2442,2445,2446,2449,
-		2452,2454,2456,2458,2459,2462,2463,2466,2468,2470,2472,2474,2477,2480,2481,2484,
-		2488,2490,2492,2494,2495,2498,2499,2502,2504,2506,2508,2510,2513,2516,2517,2520,
-		2524,2526,2528,2530,2531,2534,2535,2538,2540,2542,2544,2546,2549,2552,2553,2556,
-		2561,2563,2565,2567,2568,2571,2572,2575,2577,2579,2581,2583,2586,2589,2590,2593
+		41568,41600,41632,41664,41696,41728,41760,41792,41856,41888,41920,41952,42016,42048,42080,42112,
+		42176,42208,42240,42272,42304,42336,42368,42400,42464,42496,42528,42560,42624,42656,42688,42720,
+		42784,42816,42848,42880,42912,42944,42976,43008,43072,43104,43136,43168,43232,43264,43296,43328,
+		43392,43424,43456,43488,43552,43584,43616,43648,43712,43744,43776,43808,43872,43904,43936,43968,
+		44032,44064,44096,44128,44192,44224,44256,44288,44352,44384,44416,44448,44512,44544,44576,44608,
+		44672,44704,44736,44768,44832,44864,44896,44928,44992,45024,45056,45088,45152,45184,45216,45248,
+		45312,45344,45376,45408,45472,45504,45536,45568,45632,45664,45728,45760,45792,45824,45888,45920,
+		45984,46016,46048,46080,46144,46176,46208,46240,46304,46336,46368,46400,46464,46496,46528,46560,
+		46656,46688,46720,46752,46816,46848,46880,46912,46976,47008,47072,47104,47136,47168,47232,47264,
+		47328,47360,47392,47424,47488,47520,47552,47584,47648,47680,47744,47776,47808,47840,47904,47936,
+		48032,48064,48096,48128,48192,48224,48288,48320,48384,48416,48448,48480,48544,48576,48640,48672,
+		48736,48768,48800,48832,48896,48928,48992,49024,49088,49120,49152,49184,49248,49280,49344,49376,
+		49440,49472,49504,49536,49600,49632,49696,49728,49792,49824,49856,49888,49952,49984,50048,50080,
+		50144,50176,50208,50240,50304,50336,50400,50432,50496,50528,50560,50592,50656,50688,50752,50784,
+		50880,50912,50944,50976,51040,51072,51136,51168,51232,51264,51328,51360,51424,51456,51488,51520,
+		51616,51648,51680,51712,51776,51808,51872,51904,51968,52000,52064,52096,52160,52192,52224,52256,
+		52384,52416,52448,52480,52544,52576,52640,52672,52736,52768,52832,52864,52928,52960,52992,53024,
+		53120,53152,53216,53248,53312,53344,53408,53440,53504,53536,53600,53632,53696,53728,53792,53824,
+		53920,53952,54016,54048,54112,54144,54208,54240,54304,54336,54400,54432,54496,54528,54592,54624,
+		54688,54720,54784,54816,54880,54912,54976,55008,55072,55104,55168,55200,55264,55296,55360,55392,
+		55488,55520,55584,55616,55680,55712,55776,55808,55872,55936,55968,56032,56064,56128,56160,56224,
+		56288,56320,56384,56416,56480,56512,56576,56608,56672,56736,56768,56832,56864,56928,56960,57024,
+		57120,57152,57216,57248,57312,57376,57408,57472,57536,57568,57632,57664,57728,57792,57824,57888,
+		57952,57984,58048,58080,58144,58208,58240,58304,58368,58400,58464,58496,58560,58624,58656,58720,
+		58784,58816,58880,58912,58976,59040,59072,59136,59200,59232,59296,59328,59392,59456,59488,59552,
+		59648,59680,59744,59776,59840,59904,59936,60000,60064,60128,60160,60224,60288,60320,60384,60416,
+		60512,60544,60608,60640,60704,60768,60800,60864,60928,60992,61024,61088,61152,61184,61248,61280,
+		61376,61408,61472,61536,61600,61632,61696,61760,61824,61856,61920,61984,62048,62080,62144,62208,
+		62272,62304,62368,62432,62496,62528,62592,62656,62720,62752,62816,62880,62944,62976,63040,63104,
+		63200,63232,63296,63360,63424,63456,63520,63584,63648,63680,63744,63808,63872,63904,63968,64032,
+		64096,64128,64192,64256,64320,64352,64416,64480,64544,64608,64672,64704,64768,64832,64896,64928,
+		65024,65056,65120,65184,65248,65312,65376,65408,65504,65536,65600,65664,65728,65792,65856,65888,
+		65984,66016,66080,66144,66208,66272,66336,66368,66464,66496,66560,66624,66688,66752,66816,66848,
+		66944,66976,67040,67104,67168,67232,67296,67328,67424,67456,67520,67584,67648,67712,67776,67808,
+		67904,67936,68000,68064,68128,68192,68256,68288,68384,68448,68512,68544,68640,68672,68736,68800,
+		68896,68928,68992,69056,69120,69184,69248,69280,69376,69440,69504,69536,69632,69664,69728,69792,
+		69920,69952,70016,70080,70144,70208,70272,70304,70400,70464,70528,70560,70656,70688,70752,70816,
+		70912,70976,71040,71104,71136,71232,71264,71360,71424,71488,71552,71616,71648,71744,71776,71872,
+		71968,72032,72096,72160,72192,72288,72320,72416,72480,72544,72608,72672,72704,72800,72832,72928,
+		72992,73056,73120,73184,73216,73312,73344,73440,73504,73568,73632,73696,73728,73824,73856,73952,
+		74080,74144,74208,74272,74304,74400,74432,74528,74592,74656,74720,74784,74816,74912,74944,75040,
+		75136,75200,75264,75328,75360,75456,75488,75584,75648,75712,75776,75840,75872,75968,76000,76096,
+		76224,76288,76352,76416,76448,76544,76576,76672,76736,76800,76864,76928,77024,77120,77152,77248,
+		77344,77408,77472,77536,77568,77664,77696,77792,77856,77920,77984,78048,78144,78240,78272,78368,
+		78464,78528,78592,78656,78688,78784,78816,78912,78976,79040,79104,79168,79264,79360,79392,79488,
+		79616,79680,79744,79808,79840,79936,79968,80064,80128,80192,80256,80320,80416,80512,80544,80640,
+		80768,80832,80896,80960,80992,81088,81120,81216,81280,81344,81408,81472,81568,81664,81696,81792,
+		81952,82016,82080,82144,82176,82272,82304,82400,82464,82528,82592,82656,82752,82848,82880,82976
 	};
 
 	// extract the block (octave) first
@@ -368,13 +390,17 @@ u32 opm_keycode_to_phase_step(u16 block_freq, s16 delta)
 
 	// the keycode (bits 6-9) is "gappy", mapping 12 values over 16 in each
 	// octave; to correct for this, we multiply the 4-bit value by 3/4 (or
-	// rather subtract 1/4) and then re-insert the 6-bit fractional value
-	s16 eff_freq = ((BIT(block_freq, 6, 4) - BIT(block_freq, 8, 2)) << 6) | BIT(block_freq, 0, 6);
+	// rather subtract 1/4); note that a (invalid) value of 15 will bleed into
+	// the next octave -- this is confirmed
+	u8 adjusted_code = BIT(block_freq, 6, 4) - BIT(block_freq, 8, 2);
 
-	// add in the delta at this point
+	// now re-insert the 6-bit fraction
+	s16 eff_freq = (adjusted_code << 6) | BIT(block_freq, 0, 6);
+
+	// now that the gaps are removed, add the delta
 	eff_freq += delta;
 
-	// handle over/underflow by adjusting the block;
+	// handle over/underflow by adjusting the block:
 	if (u16(eff_freq) >= 768)
 	{
 		// minimum delta is -512 (PM), so we can only underflow by 1 octave
@@ -382,7 +408,7 @@ u32 opm_keycode_to_phase_step(u16 block_freq, s16 delta)
 		{
 			eff_freq += 768;
 			if (block-- == 0)
-				return s_phase_step[0] >> 2;
+				return s_phase_step[0] >> 7;
 		}
 
 		// maximum delta is +512+608 (PM+detune), so we can overflow by up to 2 octaves
@@ -392,12 +418,12 @@ u32 opm_keycode_to_phase_step(u16 block_freq, s16 delta)
 			if (eff_freq >= 768)
 				block++, eff_freq -= 768;
 			if (block++ >= 7)
-				return s_phase_step[767] << 5;
+				return s_phase_step[767];
 		}
 	}
 
 	// look up the phase shift for the key code, then shift by octave
-	return (s_phase_step[eff_freq] << block) >> 2;
+	return s_phase_step[eff_freq] >> (block ^ 7);
 }
 
 
@@ -612,9 +638,11 @@ void ymfm_operator<RegisterType>::start_attack(u8 keycode)
 
 	// log keys
 	if (LOG_KEY_ONS)
-		printf("KeyOn %d.%d: freq=%04X fb=%d alg=%d dt=%d mul=%X tl=%02X ksr=%d ssg=%X adsr=%02X/%02X/%02X/%X sl=%X pan=%d%d am=%d pm=%d\n",
+	{
+		printf("KeyOn %d.%d: freq=%04X dt2=%d fb=%d alg=%d dt=%d mul=%X tl=%02X ksr=%d adsr=%02X/%02X/%02X/%X sl=%X ssg=%X pan=%c%c",
 			m_regs.chnum(), m_regs.opnum(),
 			m_regs.block_freq(),
+			m_regs.detune2(),
 			m_regs.feedback(),
 			m_regs.algorithm(),
 			m_regs.detune(),
@@ -627,10 +655,16 @@ void ymfm_operator<RegisterType>::start_attack(u8 keycode)
 			m_regs.sustain_rate(),
 			m_regs.release_rate(),
 			m_regs.sustain_level(),
-			m_regs.pan_left(),
-			m_regs.pan_right(),
-			(m_regs.lfo_am_enable() && m_regs.lfo_enabled()) ? m_regs.lfo_am_sensitivity() : 0,
-			m_regs.lfo_enabled() ? m_regs.lfo_pm_sensitivity() : 0);
+			m_regs.pan_left() ? 'L' : '-',
+			m_regs.pan_right() ? 'R' : '-');
+		if (m_regs.ssg_eg_enabled())
+			printf(" ssg=%X", m_regs.ssg_eg_mode());
+		if (m_regs.lfo_enabled() && ((m_regs.lfo_am_enabled() && m_regs.lfo_am_sensitivity() != 0) || m_regs.lfo_pm_sensitivity() != 0))
+			printf(" am=%d pm=%d w=%d", m_regs.lfo_am_enabled() ? m_regs.lfo_am_sensitivity() : 0, m_regs.lfo_pm_sensitivity(), m_regs.lfo_waveform());
+		if (m_regs.noise_enabled() && m_regs.opnum() == 3 && m_regs.chnum() == 7)
+			printf(" noise=1");
+		printf("\n");
+	}
 }
 
 
@@ -750,8 +784,7 @@ void ymfm_operator<RegisterType>::clock_envelope(u16 env_counter, u8 keycode)
 	{
 		// 4-bit sustain level, but 15 means 31 so effectively 5 bits
 		u8 target = m_regs.sustain_level();
-		if (target == 15)
-			target = 31;
+		target |= (target + 1) & 0x10;
 
 		// bring current attenuation down to 5 bits and compare
 		if ((m_env_attenuation >> 5) >= target)
@@ -768,11 +801,11 @@ void ymfm_operator<RegisterType>::clock_envelope(u16 env_counter, u8 keycode)
 	env_counter <<= rate_shift;
 
 	// see if the fractional part is 0; if not, it's not time to clock
-	if ((env_counter & 0x7ff) != 0)
+	if (BIT(env_counter, 0, 11) != 0)
 		return;
 
 	// determine the increment based on the non-fractional part of env_counter
-	u8 increment = attenuation_increment(rate, (env_counter >> 11) & 7);
+	u8 increment = attenuation_increment(rate, BIT(env_counter, 11, 3));
 
 	// attack is the only one that increases
 	if (m_env_state == ENV_ATTACK)
@@ -782,7 +815,8 @@ void ymfm_operator<RegisterType>::clock_envelope(u16 env_counter, u8 keycode)
 		// specially)
 
 		// QUESTION: this check affects one of the operators on the gng credit sound
-		//   is it correct? Removing it for now
+		//   is it correct?
+		// QUESTION: does this apply only to YM2612?
 		if (rate < 62)
 			m_env_attenuation += (~m_env_attenuation * increment) >> 4;
 	}
@@ -840,6 +874,8 @@ void ymfm_operator<ymopm_registers>::clock_phase(s8 lfo_raw_pm, u16 block_freq)
 
 	// apply detune based on the keycode
 	phase_step += detune_adjustment(m_regs.detune(), block_freq_to_keycode(block_freq));
+
+	// QUESTION: do we clamp to 17 bits like YM2612?
 
 	// apply frequency multiplier (0 means 0.5, other values are as-is)
 	u8 multiple = m_regs.multiple();
@@ -908,7 +944,7 @@ u16 ymfm_operator<RegisterType>::envelope_attenuation(u8 am_offset) const
 		result = (0x200 - result) & 0x3ff;
 
 	// add in LFO AM modulation
-	if (m_regs.lfo_am_enable())
+	if (m_regs.lfo_am_enabled())
 		result += am_offset;
 
 	// add in total level
@@ -1579,9 +1615,11 @@ TIMER_CALLBACK_MEMBER(ymfm_engine_base<RegisterType>::timer_handler)
 	else if (param == 1 && m_regs.enable_timer_b())
 	 	set_reset_status(STATUS_TIMERB, 0);
 
-	// if timer A fired in CSM mode, signal it
+	// if timer A fired in CSM mode, trigger  CSM on all relevant channels
 	if (param == 0 && m_regs.csm())
-		m_channel[2]->keyon_csm();
+		for (int chnum = 0; chnum < m_channel.size(); chnum++)
+			if (BIT(RegisterType::CSM_TRIGGER_MASK, chnum))
+				m_channel[chnum]->keyon_csm();
 
 	// reset
 	update_timer(param, 1);

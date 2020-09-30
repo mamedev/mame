@@ -131,7 +131,7 @@ public:
 	u8 lfo_am_sensitivity() const /*  2 bits */ { return 0; } // not on OPN
 
 	// per-operator registers that aren't universally supported
-	u8 lfo_am_enable() const      /*  1 bit  */ { return 0; } // not on OPN
+	u8 lfo_am_enabled() const     /*  1 bit  */ { return 0; } // not on OPN
 	u8 detune2() const            /*  2 bits */ { return 0; } // not on OPN,OPN2
 	u8 ssg_eg_enabled() const     /*  1 bit  */ { return 0; } // not on OPM
 	u8 ssg_eg_mode() const        /*  1 bit  */ { return 0; } // not on OPM
@@ -218,6 +218,7 @@ public:
 	// constants
 	static const u8 DEFAULT_PRESCALE = 2;
 	static const u8 CHANNELS = 8;
+	static const u8 CSM_TRIGGER_MASK = 0xff;
 	static const u16 REGISTERS = 0x100;
 	static const u16 REG_MODE = 0x14;
 	static const u16 REG_KEYON = 0x08;
@@ -290,12 +291,15 @@ public:
 	u8 total_level() const        /*  7 bits */ { return opbyte(0x60, 0, 7); }
 	u8 ksr() const                /*  2 bits */ { return opbyte(0x80, 6, 2); }
 	u8 attack_rate() const        /*  5 bits */ { return opbyte(0x80, 0, 5); }
-	u8 lfo_am_enable() const      /*  1 bit  */ { return opbyte(0xa0, 7, 1); }
+	u8 lfo_am_enabled() const     /*  1 bit  */ { return opbyte(0xa0, 7, 1); }
 	u8 decay_rate() const         /*  5 bits */ { return opbyte(0xa0, 0, 5); }
 	u8 detune2() const            /*  2 bits */ { return opbyte(0xc0, 6, 2); }
 	u8 sustain_rate() const       /*  5 bits */ { return opbyte(0xc0, 0, 5); }
 	u8 sustain_level() const      /*  4 bits */ { return opbyte(0xe0, 4, 4); }
 	u8 release_rate() const       /*  4 bits */ { return opbyte(0xe0, 0, 4); }
+
+	// LFO is always enabled
+	u8 lfo_enabled() const { return 1; }
 
 	// special helper for generically getting the attack/decay/statain/release rates
 	u8 adsr_rate(u8 state) const
@@ -373,6 +377,7 @@ public:
 	// constants
 	static const u8 DEFAULT_PRESCALE = 6;
 	static const u8 CHANNELS = 3;
+	static const u8 CSM_TRIGGER_MASK = 1 << 2;
 	static const u16 REGISTERS = 0x100;
 	static const u16 REG_MODE = 0x27;
 	static const u16 REG_KEYON = 0x28;
@@ -580,7 +585,7 @@ public:
 	u8 lfo_pm_sensitivity() const /*  3 bits */ { return chbyte(0xb4, 0, 3); }
 
 	// OPNA-specific per-operator registers
-	u8 lfo_am_enable() const      /*  1 bit  */ { return opbyte(0x60, 7, 1); }
+	u8 lfo_am_enabled() const     /*  1 bit  */ { return opbyte(0x60, 7, 1); }
 
 protected:
 	// convert a channel number into a register offset
