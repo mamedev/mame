@@ -4,9 +4,9 @@
 
     Fujitsu FM Towns SCSI card slot
 
-	This is a dedicated 30-pin slot for the FMT-121 SCSI Card. It is only
-	present on the Model 1 and 2; all later models integrate the SCSI
-	controller directly on the motherboard.
+    This is a dedicated 30-pin slot for the FMT-121 SCSI Card. It is only
+    present on the Model 1 and 2; all later models integrate the SCSI
+    controller directly on the motherboard.
 
 ****************************************************************************/
 

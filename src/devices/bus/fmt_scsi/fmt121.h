@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:r09
 
-#ifndef MAME_BUS_FMT121_H
-#define MAME_BUS_FMT121_H
+#ifndef MAME_BUS_FMT_SCSI_FMT121_H
+#define MAME_BUS_FMT_SCSI_FMT121_H
 
 #pragma once
 
@@ -31,7 +31,7 @@ protected:
 	// pac2_card_interface overrides
 	virtual u8 fmt_scsi_read(offs_t offset) override;
 	virtual void fmt_scsi_write(offs_t offset, u8 data) override;
-	
+
 	virtual u8 fmt_scsi_data_read(void) override;
 	virtual void fmt_scsi_data_write(u8 data) override;
 
@@ -47,4 +47,4 @@ private:
 // device type declaration
 DECLARE_DEVICE_TYPE(FMT121, fmt121_device)
 
-#endif // MAME_BUS_FMT121_H
+#endif // MAME_BUS_FMT_SCSI_FMT121_H

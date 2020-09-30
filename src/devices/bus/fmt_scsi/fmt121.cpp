@@ -2,12 +2,12 @@
 // copyright-holders:r09
 /****************************************************************************
 
-	Fujitsu FMT-121 SCSI Card
-	
-	An expansion card for the dedicated SCSI card slot on the FM Towns
-	Model 1 and 2 computers. It contains a Fujitsu MB673522U SCSI controller
-	and an external 50-pin Centronics connector.
-	
+    Fujitsu FMT-121 SCSI Card
+
+    An expansion card for the dedicated SCSI card slot on the FM Towns
+    Model 1 and 2 computers. It contains a Fujitsu MB673522U SCSI controller
+    and an external 50-pin Centronics connector.
+
                           |||||||||||||||||||||
 +-------------------------|                   |-------------------------+
 |                     CN1 +-------------------+                         |
@@ -32,9 +32,9 @@
 +--------------|                                        |---------------+
                ||||||||||||||||||||||||||||||||||||||||||
 
-	CN1: 30-pin MFC-30LFD DIP connector
-	CN2: 50-pin Centronics connector
-	CN3: solder pads for internal 50-pin connector (not present)
+    CN1: 30-pin MFC-30LFD DIP connector
+    CN2: 50-pin Centronics connector
+    CN3: solder pads for internal 50-pin connector (not present)
 
 ****************************************************************************/
 
@@ -80,7 +80,7 @@ void fmt121_device::device_add_mconfig(machine_config &config)
 	scsi.set_slot_device(3, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_2));
 	scsi.set_slot_device(4, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_3));
 	scsi.set_slot_device(5, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_4));
-	
+
 	FMSCSI(config, m_scsi_ctlr, 0);
 	m_scsi_ctlr->set_scsi_port("scsi");
 	m_scsi_ctlr->irq_handler().set(FUNC(fmt121_device::irq_w));

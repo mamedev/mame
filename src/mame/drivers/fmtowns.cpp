@@ -2973,11 +2973,11 @@ void towns_state::towns(machine_config &config)
 {
 	towns_base(config);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	
+
 	FMT_SCSI_SLOT(config, m_scsi_slot, fmt_scsi_default_devices, nullptr);
 	m_scsi_slot->irq_handler().set(FUNC(towns_state::towns_scsi_irq));
 	m_scsi_slot->drq_handler().set(FUNC(towns_state::towns_scsi_drq));
-	
+
 	m_dma[0]->dma_read_callback<1>().set(FUNC(towns_state::towns_scsi_dma_r));
 	m_dma[0]->dma_write_callback<1>().set(FUNC(towns_state::towns_scsi_dma_w));
 	m_dma[1]->dma_read_callback<1>().set(FUNC(towns_state::towns_scsi_dma_r));
@@ -3046,7 +3046,7 @@ void towns_state::townssj(machine_config &config)
 
 	// 4 MB (SJ2/SJ2A) or 8 MB (SJ26/SJ53) onboard, 2 SIMM slots with 4-32 MB each
 	m_ram->set_default_size("8M").set_extra_options("4M,12M,16M,20M,24M,28M,32M,36M,40M,44M,48M,52M,56M,68M,72M");
-	
+
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 }
 

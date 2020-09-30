@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_FMT_SCSI_H
-#define MAME_BUS_FMT_SCSI_H
+#ifndef MAME_BUS_FMT_SCSI_FMT_SCSI_H
+#define MAME_BUS_FMT_SCSI_FMT_SCSI_H
 
 #pragma once
 
@@ -44,10 +44,10 @@ public:
 
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
-	
+
 	uint8_t data_read(void);
 	void data_write(uint8_t data);
-	
+
 	void irq_w(int state);
 	void drq_w(int state);
 
@@ -58,7 +58,7 @@ protected:
 
 private:
 	fmt_scsi_card_interface *m_card;
-	
+
 	devcb_write_line m_irq_handler;
 	devcb_write_line m_drq_handler;
 };
@@ -80,7 +80,7 @@ protected:
 
 	virtual u8 fmt_scsi_data_read(void) = 0;
 	virtual void fmt_scsi_data_write(u8 data) = 0;
-	
+
 	fmt_scsi_slot_device *m_slot;
 
 private:
@@ -94,4 +94,4 @@ DECLARE_DEVICE_TYPE(FMT_SCSI_SLOT, fmt_scsi_slot_device)
 
 void fmt_scsi_default_devices(device_slot_interface &device);
 
-#endif // MAME_BUS_FMT_SCSI_H
+#endif // MAME_BUS_FMT_SCSI_FMT_SCSI_H
