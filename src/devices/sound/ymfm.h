@@ -230,7 +230,15 @@ public:
 
 	// return channel/operator number
 	u8 chnum() const { return BIT(m_chbase, 0, 3); }
-	u8 opnum() const { return BIT(m_opbase, 3, 2); }
+	u8 opnum() const { return BIT(m_opbase, 4) | (BIT(m_opbase, 3) << 1); }
+
+	// reset state to default values
+	void reset()
+	{
+		// enable output on both channels by default
+		m_regdata[0x20] = m_regdata[0x21] = m_regdata[0x22] = m_regdata[0x23] = 0xc0;
+		m_regdata[0x24] = m_regdata[0x25] = m_regdata[0x26] = m_regdata[0x27] = 0xc0;
+	}
 
 	// write access
 	void write(u16 index, u8 data)
@@ -238,7 +246,7 @@ public:
 		// LFO AM/PM depth are written to the same register (0x19);
 		// redirect the PM depth to an unused neighbor (0x1a)
 		if (index == 0x19)
-			index += BIT(data, 7);
+			m_regdata[index + BIT(data, 7)] = data;
 		else if (index != 0x1a)
 			m_regdata[index] = data;
 	}
@@ -249,7 +257,7 @@ public:
 
 	// system-wide registers
 	u8 test() const               /*  8 bits */ { return sysbyte(0x01, 0, 8); }
-	u8 keyon_states() const       /*  4 bits */ { return sysbyte(0x08, 4, 4); }
+	u8 keyon_states() const       /*  4 bits */ { return sysbyte(0x08, 3, 4); }
 	u8 keyon_channel() const      /*  3 bits */ { return sysbyte(0x08, 0, 3); }
 	u8 noise_frequency() const    /*  5 bits */ { return sysbyte(0x0f, 0, 5); }
 	u8 noise_enabled() const      /*  1 bit  */ { return sysbyte(0x0f, 7, 1); }
@@ -265,6 +273,7 @@ public:
 	u8 lfo_rate() const           /*  8 bits */ { return sysbyte(0x18, 0, 8); }
 	u8 lfo_am_depth() const       /*  7 bits */ { return sysbyte(0x19, 0, 7); }
 	u8 lfo_pm_depth() const       /*  7 bits */ { return sysbyte(0x1a, 0, 7); }
+	u8 lfo_waveform() const       /*  2 bits */ { return sysbyte(0x1b, 0, 2); }
 
 	// per-channel registers
 	u8 pan_right() const          /*  1 bit  */ { return chbyte(0x20, 7, 1); }
@@ -302,10 +311,10 @@ public:
 
 protected:
 	// convert a channel number into a register offset; channel goes into the low 3 bits
-	static u16 channel_offset(u8 chnum) { return BIT(chnum, 0, 3); }
+	static u8 channel_offset(u8 chnum) { return BIT(chnum, 0, 3); }
 
 	// convert an operator number into a register offset; operator goes into bits 3-4
-	static u8 operator_offset(u8 opnum) { return BIT(opnum, 0, 2) << 3; }
+	static u8 operator_offset(u8 opnum) { return (BIT(opnum, 0) << 4) | (BIT(opnum, 1) << 3); }
 };
 
 
@@ -377,6 +386,11 @@ public:
 	// return channel/operator number
 	u8 chnum() const { return BIT(m_chbase, 0, 2); }
 	u8 opnum() const { return BIT(m_opbase, 3) | (BIT(m_opbase, 2) << 1); }
+
+	// reset state to default values
+	void reset()
+	{
+	}
 
 	// write access
 	void write(u16 index, u8 data)
@@ -537,6 +551,14 @@ public:
 	// return channel/operator number
 	u8 chnum() const { return BIT(m_chbase, 0, 2) + 3 * BIT(m_chbase, 8); }
 
+	// reset state to default values
+	void reset()
+	{
+		// enable output on both channels by default
+		m_regdata[0xb4] = m_regdata[0xb5] = m_regdata[0xb6] = 0xc0;
+		m_regdata[0x1b4] = m_regdata[0x1b5] = m_regdata[0x1b6] = 0xc0;
+	}
+
 	// create a new version of ourself with a different channel/operator base
 	ymopna_registers channel_registers(u8 chnum) { return ymopna_registers(m_regdata, channel_offset(chnum)); }
 	ymopna_registers operator_registers(u8 opnum) { return ymopna_registers(m_regdata, m_chbase, m_chbase + operator_offset(opnum)); }
@@ -544,7 +566,12 @@ public:
 	// OPNA-specific system-wide registers
 	u8 lfo_enabled() const        /*  3 bits */ { return sysbyte(0x22, 3, 1); }
 	u8 lfo_rate() const           /*  3 bits */ { return sysbyte(0x22, 0, 3); }
-	u8 keyon_channel() const      /*  3 bits */ { return sysbyte(0x28, 0, 2) + 3 * sysbyte(0x28, 2, 1); }
+	u8 keyon_channel() const      /*  3 bits */
+	{
+		// ensure that both 3 and 7 return out-of-range values
+		u8 temp = sysbyte(0x28, 0, 3);
+		return (temp == 3) ? 6 : temp - BIT(temp, 2);
+	}
 
 	// OPNA-specific per-channel registers
 	u8 pan_left() const           /*  1 bit  */ { return chbyte(0xb4, 7, 1); }
@@ -594,6 +621,9 @@ public:
 
 	// compute operator volume
 	s16 compute_volume(u16 modulation, u16 am_offset) const;
+
+	// compute volume for the OPM noise channel
+	s16 compute_noise_volume(u8 noise_state, u16 am_offset) const;
 
 	// key state control
 	void keyonoff(u8 on) { m_keyon = on; }
@@ -658,7 +688,7 @@ public:
 	void clock(u32 env_counter, s8 lfo_raw_pm, bool is_multi_freq);
 
 	// compute the channel output and add to the left/right output sums
-	void output(u8 lfo_counter, s32 &lsum, s32 &rsum, u8 rshift, s16 clipmax) const;
+	void output(u8 lfo_raw_am, u8 noise_state, s32 &lsum, s32 &rsum, u8 rshift, s16 clipmax) const;
 
 private:
 	// convert a 6/8-bit raw AM value into an amplitude offset based on sensitivity
@@ -726,9 +756,15 @@ public:
 	// configuration helpers
 	auto irq_handler() { return m_irq_handler.bind(); }
 
+	// reset the LFO state
+	void reset_lfo() { m_lfo_counter = 0; }
+
 private:
 	// clock the LFO, updating m_lfo_am and return the signed PM value
 	s8 clock_lfo();
+
+	// clock the noise generator
+	void clock_noise();
 
 	// update the state of the given timer
 	void update_timer(u8 which, u8 enable);
@@ -743,6 +779,8 @@ private:
 	device_t &m_device;              // reference to the owning device
 	u32 m_env_counter;               // envelope counter; low 2 bits are sub-counter
 	u32 m_lfo_counter;               // LFO counter
+	u32 m_noise_lfsr;                // noise LFSR state
+	u8 m_noise_counter;              // noise counter
 	u8 m_lfo_am;                     // current LFO AM value
 	u8 m_status;                     // current status register
 	u8 m_clock_prescale;             // prescale factor (2/3/6)

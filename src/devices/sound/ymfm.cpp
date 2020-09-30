@@ -518,6 +518,27 @@ s16 ymfm_operator<RegisterType>::compute_volume(u16 modulation, u16 am_offset) c
 
 
 //-------------------------------------------------
+//  compute_noise_volume - compute the 14-bit
+//  signed noise volume of this operator, given a
+//  noise input value and an AM offset
+//-------------------------------------------------
+
+template<class RegisterType>
+s16 ymfm_operator<RegisterType>::compute_noise_volume(u8 noise_state, u16 am_offset) const
+{
+	// application manual says the logarithmic transform is not applied here, so we
+	// just use the raw envelope attenuation, inverted (since 0 attenuation should be
+	// maximum), and shift it up from a 10-bit value to an 11-bit value
+	u16 result = (envelope_attenuation(am_offset) ^ 0x3ff) << 1;
+
+	// QUESTION: is AM applied still?
+
+	// negate based on the noise state
+	return BIT(noise_state, 0) ? -result : result;
+}
+
+
+//-------------------------------------------------
 //  block_freq_to_keycode - given a concatenated
 //  block+frequency value, return the 5-bit keycode
 //-------------------------------------------------
@@ -818,15 +839,14 @@ void ymfm_operator<ymopm_registers>::clock_phase(s8 lfo_raw_pm, u16 block_freq)
 	u32 phase_step = opm_keycode_to_phase_step(block_freq, delta);
 
 	// apply detune based on the keycode
-	s8 detune = detune_adjustment(m_regs.detune(), block_freq_to_keycode(block_freq));
+	phase_step += detune_adjustment(m_regs.detune(), block_freq_to_keycode(block_freq));
 
 	// apply frequency multiplier (0 means 0.5, other values are as-is)
 	u8 multiple = m_regs.multiple();
 	if (multiple == 0)
-		detune >>= 1;
+		phase_step >>= 1;
 	else
-		detune *= multiple;
-	phase_step += detune;
+		phase_step *= multiple;
 
 	// finally apply the step to the current phase value
 	m_phase += phase_step;
@@ -1027,7 +1047,7 @@ void ymfm_channel<RegisterType>::clock(u32 env_counter, s8 lfo_raw_pm, bool is_m
 //-------------------------------------------------
 
 template<class RegisterType>
-void ymfm_channel<RegisterType>::output(u8 lfo_raw_am, s32 &lsum, s32 &rsum, u8 rshift, s16 clipmax) const
+void ymfm_channel<RegisterType>::output(u8 lfo_raw_am, u8 noise_state, s32 &lsum, s32 &rsum, u8 rshift, s16 clipmax) const
 {
 	// skip if both pans are clear; no need to do all this work for nothing
 	if (m_regs.pan_left() == 0 && m_regs.pan_right() == 0)
@@ -1094,8 +1114,12 @@ void ymfm_channel<RegisterType>::output(u8 lfo_raw_am, s32 &lsum, s32 &rsum, u8 
 	opout[6] = opout[1] + opout[3];
 	opout[7] = opout[2] + opout[3];
 
-	// compute the 14-bit volume/value of operator 4
-	opout[4] = m_op4.compute_volume(opout[BIT(algorithm_inputs, 4, 3)] >> 1, am_offset);
+	// compute the 14-bit volume/value of operator 4; this could be a noise
+	// value on the OPM
+	if (noise_state != 0)
+		opout[4] = m_op4.compute_noise_volume(noise_state, am_offset);
+	else
+		opout[4] = m_op4.compute_volume(opout[BIT(algorithm_inputs, 4, 3)] >> 1, am_offset);
 
 	// all algorithms consume OP4 output
 	s16 result = opout[4] >> rshift;
@@ -1187,6 +1211,8 @@ ymfm_engine_base<RegisterType>::ymfm_engine_base(device_t &device) :
 	m_device(device),
 	m_env_counter(0),
 	m_lfo_counter(0),
+	m_noise_lfsr(0),
+	m_noise_counter(0),
 	m_lfo_am(0),
 	m_status(0),
 	m_clock_prescale(RegisterType::DEFAULT_PRESCALE),
@@ -1221,6 +1247,8 @@ void ymfm_engine_base<RegisterType>::save(device_t &device)
 	// save our data
 	device.save_item(YMFM_NAME(m_env_counter));
 	device.save_item(YMFM_NAME(m_lfo_counter));
+	device.save_item(YMFM_NAME(m_noise_lfsr));
+	device.save_item(YMFM_NAME(m_noise_counter));
 	device.save_item(YMFM_NAME(m_lfo_am));
 	device.save_item(YMFM_NAME(m_status));
 	device.save_item(YMFM_NAME(m_clock_prescale));
@@ -1252,6 +1280,9 @@ void ymfm_engine_base<RegisterType>::reset()
 	// QUESTION: old cores initialize this to 0x30 -- who is right?
 	write(RegisterType::REG_MODE, 0);
 
+	// register type-specific initialization
+	m_regs.reset();
+
 	// reset the channels
 	for (auto &chan : m_channel)
 		chan->reset();
@@ -1271,6 +1302,9 @@ u32 ymfm_engine_base<RegisterType>::clock(u8 chanmask)
 	m_env_counter++;
 	if (BIT(m_env_counter, 0, 2) == 3)
 		m_env_counter++;
+
+	// clock the noise generator
+	clock_noise();
 
 	// clock the LFO
 	s8 lfo_raw_pm = clock_lfo();
@@ -1296,7 +1330,12 @@ void ymfm_engine_base<RegisterType>::output(s32 &lsum, s32 &rsum, u8 rshift, s16
 	// sum over all the desired channels
 	for (int chnum = 0; chnum < m_channel.size(); chnum++)
 		if (BIT(chanmask, chnum))
-			m_channel[chnum]->output(m_lfo_am, lsum, rsum, rshift, clipmax);
+		{
+			// noise must be non-zero to use noise on OP4, so if it is enabled,
+			// OR with 2 (since only the LSB is actually checked for the noise state)
+			u8 noise = (chnum == 7 && m_regs.noise_enabled()) ? (m_noise_lfsr | 2) : 0;
+			m_channel[chnum]->output(m_lfo_am, noise, lsum, rsum, rshift, clipmax);
+		}
 }
 
 
@@ -1328,7 +1367,8 @@ void ymfm_engine_base<RegisterType>::write(u16 regnum, u8 data)
 	else if (regnum == RegisterType::REG_KEYON)
 	{
 		u8 chnum = m_regs.keyon_channel();
-		m_channel[chnum]->keyonoff(m_regs.keyon_states());
+		if (chnum < m_channel.size())
+			m_channel[chnum]->keyonoff(m_regs.keyon_states());
 	}
 }
 
@@ -1408,8 +1448,11 @@ s8 ymfm_engine_base<ymopm_registers>::clock_lfo()
 
 		// noise:
 		case 3:
-			// QUESTION: what's the noise equation??
-			am = 1;//noise;
+			// QUESTION: totally random guess here; does the LFO counter
+			// play into this? Is there a separate LFSR for the LFO noise?
+			// Do we sample & hold the noise at a certain point based on
+			// the LFO counter?
+			am = BIT(m_noise_lfsr, 0);
 			pm = am ^ 0x80;
 			break;
 	}
@@ -1459,6 +1502,39 @@ s8 ymfm_engine_base<RegisterType>::clock_lfo()
 
 	// PM is negated based on bit 4
 	return BIT(m_lfo_counter, 10+4) ? -pm : pm;
+}
+
+
+//-------------------------------------------------
+//  clock_noise - clock the noise generator
+//-------------------------------------------------
+
+// OPM implementation
+template<>
+void ymfm_engine_base<ymopm_registers>::clock_noise()
+{
+	// base noise frequency is measured at 2x 1/2 FM frequency; this means
+	// each tick counts as two steps against the noise counter
+	m_noise_counter += 2;
+
+	// compare against the frequency
+	u8 freq = m_regs.noise_frequency() + 1;
+	while (m_noise_counter >= freq)
+	{
+		m_noise_counter -= freq;
+
+		// note that the LFSR here contains the output bit in bit 0, with
+		// the current LFSR state in bits 1-17
+		m_noise_lfsr >>= 1;
+		m_noise_lfsr |= (BIT(m_noise_lfsr, 0) ^ BIT(m_noise_lfsr, 3) ^ 1) << 17;
+	}
+}
+
+// OPN/OPNA implementation
+template<class RegisterType>
+void ymfm_engine_base<RegisterType>::clock_noise()
+{
+	// OPN does not have a noise generator
 }
 
 
@@ -1534,4 +1610,3 @@ void ymfm_engine_base<RegisterType>::check_interrupts()
 template class ymfm_engine_base<ymopm_registers>;
 template class ymfm_engine_base<ymopn_registers>;
 template class ymfm_engine_base<ymopna_registers>;
-
