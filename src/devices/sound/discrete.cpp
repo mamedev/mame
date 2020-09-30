@@ -118,7 +118,7 @@ public:
 	inline void unlock() { m_threadid = -1; }
 
 	//const linked_list_entry *list;
-	node_step_list_t        step_list;
+	discrete_device::node_step_list_t        step_list;
 
 	/* list of source nodes */
 	std::vector<input_buffer> source_list;      /* discrete_source_node */
@@ -210,10 +210,10 @@ inline void discrete_task::step_nodes()
 
 void *discrete_task::task_callback(void *param, int threadid)
 {
-	task_list_t *list = (task_list_t *) param;
+	const auto &list = *reinterpret_cast<const discrete_sound_device::task_list_t *>(param);
 	do
 	{
-		for (const auto &task : *list)
+		for (const auto &task : list)
 		{
 			/* try to lock */
 			if (task->lock_threadid(threadid))
@@ -601,7 +601,7 @@ void discrete_device::discrete_sanity_check(const sound_block_list_t &block_list
  *
  *************************************/
 
-static uint64_t list_run_time(const node_list_t &list)
+static uint64_t list_run_time(const discrete_device::node_list_t &list)
 {
 	uint64_t total = 0;
 
@@ -614,7 +614,7 @@ static uint64_t list_run_time(const node_list_t &list)
 	return total;
 }
 
-static uint64_t step_list_run_time(const node_step_list_t &list)
+static uint64_t step_list_run_time(const discrete_device::node_step_list_t &list)
 {
 	uint64_t total = 0;
 

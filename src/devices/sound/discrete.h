@@ -4101,14 +4101,10 @@ enum discrete_node_type
  *************************************/
 
 struct discrete_block;
-class discrete_node_base_factory;
 class discrete_task;
 class discrete_base_node;
 class discrete_dss_input_stream_node;
 class discrete_device;
-typedef std::vector<std::unique_ptr<discrete_base_node> > node_list_t;
-typedef std::vector<discrete_dss_input_stream_node *> istream_node_list_t;
-typedef std::vector<std::unique_ptr<discrete_task> > task_list_t;
 
 
 /*************************************
@@ -4137,7 +4133,6 @@ struct discrete_block
 	const char *    name;                           /* Node Name */
 	const char *    mod_name;                       /* Module / class name */
 };
-typedef std::vector<const discrete_block *> sound_block_list_t;
 
 /*************************************
  *
@@ -4154,7 +4149,6 @@ public:
 	osd_ticks_t         run_time;
 	discrete_base_node *    self;
 };
-typedef std::vector<discrete_step_interface *> node_step_list_t;
 
 class discrete_input_interface
 {
@@ -4177,7 +4171,6 @@ public:
 //**************************************************************************
 
 class discrete_sound_output_interface;
-typedef std::vector<discrete_sound_output_interface *> node_output_list_t;
 
 
 // ======================> discrete_device
@@ -4191,6 +4184,10 @@ protected:
 	discrete_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 public:
+	typedef std::vector<std::unique_ptr<discrete_task> > task_list_t;
+	typedef std::vector<std::unique_ptr<discrete_base_node> > node_list_t;
+	typedef std::vector<discrete_step_interface *> node_step_list_t;
+
 	// inline configuration helpers
 	void set_intf(const discrete_block *intf) { m_intf = intf; }
 
@@ -4231,7 +4228,6 @@ public:
 
 
 protected:
-
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -4253,6 +4249,8 @@ protected:
 	node_list_t             m_node_list;        /* node_description * */
 
 private:
+	typedef std::vector<const discrete_block *> sound_block_list_t;
+
 	void discrete_build_list(const discrete_block *intf, sound_block_list_t &block_list);
 	void discrete_sanity_check(const sound_block_list_t &block_list);
 	void display_profiling();
@@ -4311,6 +4309,9 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
+	typedef std::vector<discrete_dss_input_stream_node *> istream_node_list_t;
+	typedef std::vector<discrete_sound_output_interface *> node_output_list_t;
+
 	/* the output stream */
 	sound_stream        *m_stream;
 
@@ -4403,28 +4404,18 @@ private:
 	discrete_sound_output_interface *       m_output_intf;
 };
 
-class discrete_node_base_factory
+template <class C>
+class discrete_node_factory
 {
 public:
-	virtual std::unique_ptr<discrete_base_node> Create(discrete_device &pdev, const discrete_block &block) = 0;
-	virtual ~discrete_node_base_factory() {}
+	static std::unique_ptr<discrete_base_node> create(discrete_device &pdev, const discrete_block &block)
+	{
+		auto r = make_unique_clear<C>();
+
+		r->init(&pdev, &block);
+		return r;
+	}
 };
-
-template <class C>
-class discrete_node_factory : public discrete_node_base_factory
-{
-public:
-	std::unique_ptr<discrete_base_node> Create(discrete_device &pdev, const discrete_block &block) override;
-};
-
-template <class C>
-std::unique_ptr<discrete_base_node> discrete_node_factory<C>::Create(discrete_device &pdev, const discrete_block &block)
-{
-	auto r = make_unique_clear<C>();
-
-	r->init(&pdev, &block);
-	return r;
-}
 
 /*************************************
  *
@@ -4441,16 +4432,10 @@ std::unique_ptr<discrete_base_node> discrete_node_factory<C>::Create(discrete_de
  *
  *************************************/
 
-template <class C>
-std::unique_ptr<discrete_base_node> discrete_create_node(discrete_device &pdev, const discrete_block &block)
-{
-	return discrete_node_factory<C>().Create(pdev, block);
-}
-
 #define DISCRETE_SOUND_EXTERN(name) extern const discrete_block name[]
 #define DISCRETE_SOUND_START(name) const discrete_block name[] = {
 //#define DSC_SND_ENTRY(_nod, _class, _dss, _num, _iact, _iinit, _custom, _name) { _nod,  new discrete_node_factory< DISCRETE_CLASS_NAME(_class) >, _dss, _num, _iact, _iinit, _custom, _name, # _class }
-#define DSC_SND_ENTRY(_nod, _class, _dss, _num, _iact, _iinit, _custom, _name) { _nod,  &discrete_create_node< DISCRETE_CLASS_NAME(_class) >, _dss, _num, _iact, _iinit, _custom, _name, # _class }
+#define DSC_SND_ENTRY(_nod, _class, _dss, _num, _iact, _iinit, _custom, _name) { _nod,  &discrete_node_factory< DISCRETE_CLASS_NAME(_class) >::create, _dss, _num, _iact, _iinit, _custom, _name, # _class }
 
 
 #define DISCRETE_SOUND_END                                              DSC_SND_ENTRY( NODE_00, special, DSS_NULL     , 0, DSE( NODE_NC ), DSE( 0 ) ,nullptr  ,"DISCRETE_SOUND_END" )  };
