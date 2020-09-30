@@ -591,6 +591,7 @@ u8 ws_wwitch_device::read_ram(offs_t offset)
 			if (m_flash_command == 0x30)
 			{
 				m_flash_status |= 0x80;
+				m_flash_mode = READ_MODE;
 			}
 		}
 		return m_flash_status;
