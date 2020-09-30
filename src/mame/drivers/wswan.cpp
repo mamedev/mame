@@ -23,7 +23,6 @@
   - Perform video DMA at proper timing.
   - Add (real/proper) RTC support.
   - Fix wonderwitch
-    - Wonderwitch does not finish initializing it's filesystem.
     - Make the flash rom changes save.
 
 ***************************************************************************/
