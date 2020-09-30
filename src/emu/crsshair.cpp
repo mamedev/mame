@@ -327,6 +327,7 @@ void render_crosshair::draw(render_container &container, u8 fade)
 crosshair_manager::crosshair_manager(running_machine &machine)
 	: m_machine(machine)
 	, m_usage(false)
+	, m_fade(0)
 	, m_animation_counter(0)
 	, m_auto_time(CROSSHAIR_VISIBILITY_AUTOTIME_DEFAULT)
 {

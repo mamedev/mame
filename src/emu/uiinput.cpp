@@ -37,14 +37,15 @@ ui_input_manager::ui_input_manager(running_machine &machine)
 	: m_machine(machine)
 	, m_presses_enabled(true)
 	, m_current_mouse_target(nullptr)
+	, m_current_mouse_x(-1)
+	, m_current_mouse_y(-1)
 	, m_current_mouse_down(false)
 	, m_current_mouse_field(nullptr)
 	, m_events_start(0)
 	, m_events_end(0)
 {
-	// create the private data
-	m_current_mouse_x = -1;
-	m_current_mouse_y = -1;
+	std::fill(std::begin(m_next_repeat), std::end(m_next_repeat), 0);
+	std::fill(std::begin(m_seqpressed), std::end(m_seqpressed), 0);
 
 	// add a frame callback to poll inputs
 	machine.add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(&ui_input_manager::frame_update, this));

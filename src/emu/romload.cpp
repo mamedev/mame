@@ -1418,6 +1418,17 @@ void rom_load_manager::process_region_list()
 
 rom_load_manager::rom_load_manager(running_machine &machine)
 	: m_machine(machine)
+	, m_warnings(0)
+	, m_knownbad(0)
+	, m_errors(0)
+	, m_romsloaded(0)
+	, m_romstotal(0)
+	, m_romsloadedsize(0)
+	, m_romstotalsize(0)
+	, m_chd_list()
+	, m_region(nullptr)
+	, m_errorstring()
+	, m_softwarningstring()
 {
 	// figure out which BIOS we are using
 	std::map<std::string, std::string> card_bios;
