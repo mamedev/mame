@@ -278,7 +278,9 @@ void discrete_task::prepare_for_queue(int samples)
 
 void discrete_task::check(discrete_task *dest_task)
 {
-	int inputnum;
+	// FIXME: this function takes addresses of elements of a vector that has items added later
+	// 16 is enough for the systems in MAME, but the code should be fixed properly
+	m_buffers.reserve(16);
 
 	/* Determine, which nodes in the task are referenced by nodes in dest_task
 	 * and add them to the list of nodes to be buffered for further processing
@@ -292,7 +294,7 @@ void discrete_task::check(discrete_task *dest_task)
 			discrete_base_node *dest_node = step_entry->self;
 
 			/* loop over all active inputs */
-			for (inputnum = 0; inputnum < dest_node->active_inputs(); inputnum++)
+			for (int inputnum = 0; inputnum < dest_node->active_inputs(); inputnum++)
 			{
 				int inputnode_num = dest_node->input_node(inputnum);
 				if IS_VALUE_A_NODE(inputnode_num)
@@ -301,10 +303,10 @@ void discrete_task::check(discrete_task *dest_task)
 					if (NODE_DEFAULT_NODE(task_node->block_node()) == NODE_DEFAULT_NODE(inputnode_num))
 					{
 						input_buffer source;
-						int i, found = -1;
+						int found = -1;
 						output_buffer *pbuf = nullptr;
 
-						for (i = 0; i < m_buffers.size(); i++)
+						for (int i = 0; i < m_buffers.size(); i++)
 //                          if (m_buffers[i].node->block_node() == inputnode_num)
 							if (m_buffers[i].node_num == inputnode_num)
 							{
