@@ -4410,7 +4410,7 @@ class discrete_node_factory
 public:
 	static std::unique_ptr<discrete_base_node> create(discrete_device &pdev, const discrete_block &block)
 	{
-		auto r = make_unique_clear<C>();
+		std::unique_ptr<discrete_base_node> r = make_unique_clear<C>();
 
 		r->init(&pdev, &block);
 		return r;
