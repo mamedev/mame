@@ -380,12 +380,12 @@ void ws_rom_device::write_io(offs_t offset, u8 data)
 
 u8 ws_rom_sram_device::read_ram(offs_t offset)
 {
-	return m_nvram[m_nvram_base + offset];
+	return m_nvram[(m_nvram_base + offset) & (m_nvram_size - 1)];
 }
 
 void ws_rom_sram_device::write_ram(offs_t offset, u8 data)
 {
-	m_nvram[m_nvram_base + offset] = data;
+	m_nvram[(m_nvram_base + offset) & (m_nvram_size - 1)] = data;
 }
 
 void ws_rom_sram_device::write_io(offs_t offset, u8 data)

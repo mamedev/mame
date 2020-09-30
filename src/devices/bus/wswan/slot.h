@@ -120,6 +120,7 @@ protected:
 	u8 *m_rom;
 	u32 m_rom_size;
 	std::vector<u8> m_nvram;
+	u32 m_nvram_size;
 	int m_bank_mask;
 
 	bool m_has_rtc, m_is_rotated;
