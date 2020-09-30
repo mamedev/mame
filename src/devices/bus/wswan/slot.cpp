@@ -29,6 +29,7 @@ device_ws_cart_interface::device_ws_cart_interface(const machine_config &mconfig
 	device_interface(device, "wswancart"),
 	m_rom(nullptr),
 	m_rom_size(0),
+	m_nvram_size(0),
 	m_bank_mask(0),
 	m_has_rtc(false),
 	m_is_rotated(false)
@@ -65,6 +66,7 @@ void device_ws_cart_interface::rom_alloc(u32 size, const char *tag)
 
 void device_ws_cart_interface::nvram_alloc(u32 size)
 {
+	m_nvram_size = size;
 	m_nvram.resize(size);
 }
 
