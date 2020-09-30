@@ -676,6 +676,8 @@ void pdp1_typewriter_device::device_resolve_objects()
 void pdp1_typewriter_device::device_start()
 {
 	m_tyo_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pdp1_typewriter_device::tyo_callback),this));
+
+	m_color = m_pos = m_case_shift = 0;
 }
 
 
