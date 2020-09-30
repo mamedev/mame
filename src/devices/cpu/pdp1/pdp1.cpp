@@ -386,6 +386,8 @@ pdp1_device::pdp1_device(const machine_config &mconfig, const char *tag, device_
 	, m_program_config("program", ENDIANNESS_BIG, 32, 18, -2) // data is actually 18 bits wide
 	, m_extern_iot(*this)
 	, m_io_sc_callback(*this)
+	, m_program(nullptr)
+	, m_reset_param(nullptr)
 {
 	m_program_config.m_is_octal = true;
 }
