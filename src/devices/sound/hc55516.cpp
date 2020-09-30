@@ -34,14 +34,14 @@
 //#####################################
 //                 COMMON
 //#####################################
-cvsd_device_base::cvsd_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+cvsd_device_base::cvsd_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool active_clock_edge, uint8_t shiftreg_mask)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_clock_state_push_cb(*this)
 	, m_digin_pull_cb(*this)
 	, m_digout_push_cb(*this)
-	, m_active_clock_edge(FALLING)
-	, m_shiftreg_mask(0)
+	, m_active_clock_edge(active_clock_edge)
+	, m_shiftreg_mask(shiftreg_mask)
 	, m_last_clock_state(false)
 	, m_buffered_bit(false)
 	, m_shiftreg(0)
@@ -60,8 +60,6 @@ void cvsd_device_base::device_start()
 	/* create the stream */
 	m_stream = stream_alloc(0, 1, SAMPLE_RATE);
 
-	save_item(NAME(m_active_clock_edge));
-	save_item(NAME(m_shiftreg_mask));
 	save_item(NAME(m_last_clock_state));
 	save_item(NAME(m_buffered_bit));
 	save_item(NAME(m_shiftreg));
@@ -216,7 +214,7 @@ void cvsd_device_base::sound_stream_update(sound_stream &stream, std::vector<rea
 DEFINE_DEVICE_TYPE(HC55516, hc55516_device, "hc55516", "HC-55516")
 
 hc55516_device::hc55516_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cvsd_device_base(mconfig, HC55516, tag, owner, clock)
+	: cvsd_device_base(mconfig, HC55516, tag, owner, clock, RISING, 0x7)
 	, m_agc_push_cb(*this)
 	, m_fzq_pull_cb(*this)
 	, m_sylmask(0xfc0)
@@ -231,14 +229,14 @@ hc55516_device::hc55516_device(const machine_config &mconfig, const char *tag, d
 }
 
 // overridable type for hc55532 etc
-hc55516_device::hc55516_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: cvsd_device_base(mconfig, type, tag, owner, clock)
+hc55516_device::hc55516_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t sylmask, int32_t sylshift, int32_t syladd, int32_t intshift)
+	: cvsd_device_base(mconfig, type, tag, owner, clock, RISING, 0x7)
 	, m_agc_push_cb(*this)
 	, m_fzq_pull_cb(*this)
-	, m_sylmask(0xf80)
-	, m_sylshift(7)
-	, m_syladd(0xfe1)
-	, m_intshift(5)
+	, m_sylmask(sylmask)
+	, m_sylshift(sylshift)
+	, m_syladd(syladd)
+	, m_intshift(intshift)
 	, m_sylfilter(0)
 	, m_intfilter(0)
 	, m_agc(true)
@@ -253,10 +251,6 @@ hc55516_device::hc55516_device(const machine_config &mconfig, device_type type, 
 void hc55516_device::device_start()
 {
 	cvsd_device_base::device_start();
-	save_item(NAME(m_sylmask));
-	save_item(NAME(m_sylshift));
-	save_item(NAME(m_syladd));
-	save_item(NAME(m_intshift));
 	save_item(NAME(m_sylfilter));
 	save_item(NAME(m_intfilter));
 	save_item(NAME(m_agc));
@@ -265,14 +259,6 @@ void hc55516_device::device_start()
 	/* resolve lines */
 	m_agc_push_cb.resolve();
 	m_fzq_pull_cb.resolve();
-
-	/* variant-specific parameters */
-	m_shiftreg_mask = 0x07;
-	m_active_clock_edge = RISING;
-	m_sylmask = 0xfc0;
-	m_sylshift = 6;
-	m_syladd = 0xfc1;
-	m_intshift = 4;
 }
 
 //-------------------------------------------------
@@ -436,36 +422,8 @@ void hc55516_device::sound_stream_update(sound_stream &stream, std::vector<read_
 DEFINE_DEVICE_TYPE(HC55532, hc55532_device, "hc55532", "HC-55532")
 
 hc55532_device::hc55532_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hc55516_device(mconfig, HC55532, tag, owner, clock)
+	: hc55516_device(mconfig, HC55532, tag, owner, clock, 0xf80, 7, 0xfe1, 5)
 {
-}
-
-//-------------------------------------------------
-//  device_start - device-specific start
-//-------------------------------------------------
-
-void hc55532_device::device_start()
-{
-	cvsd_device_base::device_start();
-	save_item(NAME(m_sylmask));
-	save_item(NAME(m_sylshift));
-	save_item(NAME(m_syladd));
-	save_item(NAME(m_sylfilter));
-	save_item(NAME(m_intfilter));
-	save_item(NAME(m_agc));
-	save_item(NAME(m_buffered_fzq));
-
-	/* resolve lines */
-	m_agc_push_cb.resolve();
-	m_fzq_pull_cb.resolve();
-
-	/* variant-specific parameters */
-	m_shiftreg_mask = 0x07;
-	m_active_clock_edge = RISING;
-	m_sylmask = 0xf80;
-	m_sylshift = 7;
-	m_syladd = 0xfe1;
-	m_intshift = 5;
 }
 
 //-------------------------------------------------
@@ -489,23 +447,23 @@ void hc55532_device::device_reset()
 DEFINE_DEVICE_TYPE(MC3417, mc3417_device, "mc3417", "MC3417")
 
 mc3417_device::mc3417_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cvsd_device_base(mconfig, MC3417, tag, owner, clock)
+	: cvsd_device_base(mconfig, MC3417, tag, owner, clock, FALLING, 0x7)
+	, m_charge(pow(exp(-1.0), 1.0 / (FILTER_CHARGE_TC * 16000.0)))
+	, m_decay(pow(exp(-1.0), 1.0 / (FILTER_DECAY_TC * 16000.0)))
+	, m_leak(pow(exp(-1.0), 1.0 / (INTEGRATOR_LEAK_TC * 16000.0)))
 	, m_sylfilter_d(0.0)
 	, m_intfilter_d(0.0)
-	, m_charge(0.0)
-	, m_decay(0.0)
-	, m_leak(0.0)
 {
 }
 
 // overridable type for mc3418 etc
 mc3417_device::mc3417_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: cvsd_device_base(mconfig, type, tag, owner, clock)
+	: cvsd_device_base(mconfig, type, tag, owner, clock, FALLING, 0xf)
+	, m_charge(pow(exp(-1.0), 1.0 / (FILTER_CHARGE_TC * 16000.0)))
+	, m_decay(pow(exp(-1.0), 1.0 / (FILTER_DECAY_TC * 16000.0)))
+	, m_leak(pow(exp(-1.0), 1.0 / (INTEGRATOR_LEAK_TC * 16000.0)))
 	, m_sylfilter_d(0.0)
 	, m_intfilter_d(0.0)
-	, m_charge(0.0)
-	, m_decay(0.0)
-	, m_leak(0.0)
 {
 }
 
@@ -518,18 +476,6 @@ void mc3417_device::device_start()
 	cvsd_device_base::device_start();
 	save_item(NAME(m_sylfilter_d));
 	save_item(NAME(m_intfilter_d));
-	save_item(NAME(m_charge));
-	save_item(NAME(m_decay));
-	save_item(NAME(m_leak));
-
-	/* compute the fixed charge, decay, and leak time constants */
-	m_charge = pow(exp(-1.0), 1.0 / (FILTER_CHARGE_TC * 16000.0));
-	m_decay = pow(exp(-1.0), 1.0 / (FILTER_DECAY_TC * 16000.0));
-	m_leak = pow(exp(-1.0), 1.0 / (INTEGRATOR_LEAK_TC * 16000.0));
-
-	/* variant-specific parameters */
-	m_shiftreg_mask = 0x07;
-	m_active_clock_edge = FALLING;
 }
 
 void mc3417_device::process_bit(bool bit, bool clock_state)
@@ -634,29 +580,6 @@ DEFINE_DEVICE_TYPE(MC3418, mc3418_device, "mc3418", "MC3418")
 mc3418_device::mc3418_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mc3417_device(mconfig, MC3418, tag, owner, clock)
 {
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void mc3418_device::device_start()
-{
-	cvsd_device_base::device_start();
-	save_item(NAME(m_sylfilter_d));
-	save_item(NAME(m_intfilter_d));
-	save_item(NAME(m_charge));
-	save_item(NAME(m_decay));
-	save_item(NAME(m_leak));
-
-	/* compute the fixed charge, decay, and leak time constants */
-	m_charge = pow(exp(-1.0), 1.0 / (FILTER_CHARGE_TC * 16000.0));
-	m_decay = pow(exp(-1.0), 1.0 / (FILTER_DECAY_TC * 16000.0));
-	m_leak = pow(exp(-1.0), 1.0 / (INTEGRATOR_LEAK_TC * 16000.0));
-
-	/* variant-specific parameters */
-	m_shiftreg_mask = 0x0f;
-	m_active_clock_edge = FALLING;
 }
 
 /*

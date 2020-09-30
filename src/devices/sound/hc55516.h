@@ -32,7 +32,7 @@ public:
 
 protected:
 	cvsd_device_base(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	cvsd_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	cvsd_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool active_clock_edge, uint8_t shiftreg_mask);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -47,10 +47,12 @@ protected:
 	devcb_read_line m_digin_pull_cb;
 	devcb_write_line m_digout_push_cb;
 
+	// const state defined by constructor
+	const bool m_active_clock_edge;
+	const uint8_t m_shiftreg_mask;
+
 	// internal state
 	sound_stream *m_stream;
-	bool      m_active_clock_edge;
-	uint8_t   m_shiftreg_mask;
 	bool      m_last_clock_state;
 	bool      m_buffered_bit;
 	uint8_t   m_shiftreg;
@@ -80,18 +82,13 @@ public:
 
 	WRITE_LINE_MEMBER( fzq_w );	// /FZ (partial reset) push
 	READ_LINE_MEMBER( agc_r ); // AGC pull
-
-/* only relevant for encode mode, which isn't done yet!
-	// /APT (silence encoder output) push
-	WRITE_LINE_MEMBER( aptq_w );
-	// DEC/ENC decode/encode select push
-	WRITE_LINE_MEMBER( dec_encq_w );
-
-*/
+	/* TODO: These are only relevant for encode mode, which isn't done yet! */
+	//WRITE_LINE_MEMBER( aptq_w ); // /APT (silence encoder output) push
+	//WRITE_LINE_MEMBER( dec_encq_w ); // DEC/ENC decode/encode select push
 
 protected:
 	// overridable type for subclass
-	hc55516_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	hc55516_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t sylmask, int32_t sylshift, int32_t syladd, int32_t intshift);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -104,11 +101,11 @@ protected:
 	devcb_write_line m_agc_push_cb;
 	devcb_read_line m_fzq_pull_cb;
 
-	// coefficients
-	int32_t m_sylmask;
-	int32_t m_sylshift;
-	int32_t m_syladd;
-	int32_t m_intshift;
+	// const coefficients defined by constructor
+	const uint32_t m_sylmask;
+	const int32_t m_sylshift;
+	const int32_t m_syladd;
+	const int32_t m_intshift;
 
 	// internal state
 	int32_t m_sylfilter;
@@ -127,7 +124,6 @@ public:
 	hc55532_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 protected:
 	// device-level overrides
-	virtual void device_start() override;
 	virtual void device_reset() override;
 };
 
@@ -150,11 +146,14 @@ protected:
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
+	// const coefficients defined by constructor
+	const double m_charge;
+	const double m_decay;
+	const double m_leak;
+
+	// internal state
 	double m_sylfilter_d;
 	double m_intfilter_d;
-	double m_charge;
-	double m_decay;
-	double m_leak;
 
 	// internal handlers
 	virtual void process_bit(bool bit, bool clock_state) override;
@@ -165,9 +164,6 @@ class mc3418_device : public mc3417_device
 {
 public:
 	mc3418_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-protected:
-	// device-level overrides
-	virtual void device_start() override;
 };
 
 
