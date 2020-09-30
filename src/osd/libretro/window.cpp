@@ -412,8 +412,7 @@ int retro_window_info::window_init()
 
 	if(alternate_renderer==false){
 	//test correct aspect
-		render_layer_config temp=m_target->layer_config();
-		retro_aspect =m_target->current_view()->effective_aspect(temp);
+		retro_aspect =m_target->current_view().effective_aspect();
 
 		if(m_target->orientation() & ORIENTATION_SWAP_XY)retro_aspect=1.0/retro_aspect;
 
@@ -520,8 +519,7 @@ void retro_window_info::update()
 		int tempwidth, tempheight;
 
 		if(alternate_renderer==false){
-			render_layer_config temp=m_target->layer_config();
-			view_aspect =m_target->current_view()->effective_aspect(temp);
+			view_aspect =m_target->current_view().effective_aspect();
 			if(m_target->orientation() & ORIENTATION_SWAP_XY)view_aspect=1.0f/view_aspect;
 		}
 
@@ -543,8 +541,7 @@ void retro_window_info::update()
 				{
 				//retro_aspect = (float)tempwidth/(float)tempheight;
 
-				render_layer_config temp=m_target->layer_config();
-				retro_aspect =m_target->current_view()->effective_aspect(temp);
+				retro_aspect =m_target->current_view().effective_aspect();
 				if(m_target->orientation() & ORIENTATION_SWAP_XY)retro_aspect=1.0/retro_aspect;
 				view_aspect =retro_aspect;
 				monitor()->refresh();
