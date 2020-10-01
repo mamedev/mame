@@ -57,7 +57,7 @@ void p2000t_state::p2000t_mem(address_map &map)
 	map(0x1000, 0x4fff).rom();
 	map(0x5000, 0x57ff).ram().share("videoram");
 	map(0x5800, 0xdfff).ram();
-	map(0xe000, 0xffff).bankrw("bank1");
+	map(0xe000, 0xffff).bankrw(m_bank);
 }
 
 void p2000m_state::p2000m_mem(address_map &map)
@@ -66,7 +66,7 @@ void p2000m_state::p2000m_mem(address_map &map)
 	map(0x1000, 0x4fff).rom();
 	map(0x5000, 0x5fff).ram().share("videoram");
 	map(0x6000, 0xdfff).ram();
-	map(0xe000, 0xffff).bankrw("bank1");
+	map(0xe000, 0xffff).bankrw(m_bank);
 }
 
 /* graphics output */
@@ -303,5 +303,5 @@ ROM_START(p2000m)
 ROM_END
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY    FULLNAME          FLAGS
-COMP( 1980, p2000t, 0,      0,      p2000t,  p2000t, p2000t_state, init_p2000, "Philips", "Philips P2000T", 0 )
-COMP( 1980, p2000m, p2000t, 0,      p2000m,  p2000t, p2000m_state, init_p2000, "Philips", "Philips P2000M", 0 )
+COMP( 1980, p2000t, 0,      0,      p2000t,  p2000t, p2000t_state, empty_init, "Philips", "Philips P2000T", 0 )
+COMP( 1980, p2000m, p2000t, 0,      p2000m,  p2000t, p2000m_state, empty_init, "Philips", "Philips P2000M", 0 )
