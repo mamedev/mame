@@ -29,12 +29,13 @@ public:
 		, m_speaker(*this, "speaker")
 		, m_mdcr(*this, "mdcr")
 		, m_ram(*this, RAM_TAG)
+		, m_bank(*this, "bank")
 		, m_keyboard(*this, "KEY.%u", 0)
 	{
 	}
 
 	void p2000t(machine_config &config);
-	void init_p2000();
+	virtual void machine_start() override;
 
 
 protected:
@@ -60,6 +61,7 @@ protected:
 	required_device<speaker_sound_device> m_speaker;
     required_device<mdcr_device> m_mdcr;
 	required_device<ram_device> m_ram;
+	required_memory_bank m_bank;
 
 private:
 	required_ioport_array<10> m_keyboard;
@@ -67,7 +69,6 @@ private:
 	uint8_t m_port_202f;
 	uint8_t m_port_303f;
 	uint8_t m_port_707f;
-	address_space *m_program;
 };
 
 class p2000m_state : public p2000t_state
