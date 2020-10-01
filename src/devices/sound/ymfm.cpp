@@ -639,7 +639,7 @@ void ymfm_operator<RegisterType>::start_attack(u8 keycode)
 	// log keys
 	if (LOG_KEY_ONS)
 	{
-		printf("KeyOn %d.%d: freq=%04X dt2=%d fb=%d alg=%d dt=%d mul=%X tl=%02X ksr=%d adsr=%02X/%02X/%02X/%X sl=%X ssg=%X pan=%c%c",
+		printf("KeyOn %d.%d: freq=%04X dt2=%d fb=%d alg=%d dt=%d mul=%X tl=%02X ksr=%d adsr=%02X/%02X/%02X/%X sl=%X pan=%c%c",
 			m_regs.chnum(), m_regs.opnum(),
 			m_regs.block_freq(),
 			m_regs.detune2(),
@@ -649,7 +649,6 @@ void ymfm_operator<RegisterType>::start_attack(u8 keycode)
 			m_regs.multiple(),
 			m_regs.total_level(),
 			m_regs.ksr(),
-			m_regs.ssg_eg_enabled() * 8 + m_regs.ssg_eg_mode(),
 			m_regs.attack_rate(),
 			m_regs.decay_rate(),
 			m_regs.sustain_rate(),
@@ -1294,7 +1293,7 @@ void ymfm_engine_base<RegisterType>::save(device_t &device)
 	device.save_item(YMFM_NAME(m_regdata));
 
 	// save channel data
-	for (int chnum = 0; chnum < m_channel.size(); chnum++)
+	for (int chnum = 0; chnum < RegisterType::CHANNELS; chnum++)
 		m_channel[chnum]->save(device, chnum);
 }
 
@@ -1346,7 +1345,7 @@ u32 ymfm_engine_base<RegisterType>::clock(u8 chanmask)
 	s8 lfo_raw_pm = clock_lfo();
 
 	// now update the state of all the channels and operators
-	for (int chnum = 0; chnum < m_channel.size(); chnum++)
+	for (int chnum = 0; chnum < RegisterType::CHANNELS; chnum++)
 		if (BIT(chanmask, chnum))
 			m_channel[chnum]->clock(m_env_counter, lfo_raw_pm, chnum == 2 && m_regs.multi_freq());
 
@@ -1364,7 +1363,7 @@ template<class RegisterType>
 void ymfm_engine_base<RegisterType>::output(s32 &lsum, s32 &rsum, u8 rshift, s16 clipmax, u8 chanmask) const
 {
 	// sum over all the desired channels
-	for (int chnum = 0; chnum < m_channel.size(); chnum++)
+	for (int chnum = 0; chnum < RegisterType::CHANNELS; chnum++)
 		if (BIT(chanmask, chnum))
 		{
 			// noise must be non-zero to use noise on OP4, so if it is enabled,
@@ -1403,7 +1402,7 @@ void ymfm_engine_base<RegisterType>::write(u16 regnum, u8 data)
 	else if (regnum == RegisterType::REG_KEYON)
 	{
 		u8 chnum = m_regs.keyon_channel();
-		if (chnum < m_channel.size())
+		if (chnum < RegisterType::CHANNELS)
 			m_channel[chnum]->keyonoff(m_regs.keyon_states());
 	}
 }
@@ -1488,7 +1487,7 @@ s8 ymfm_engine_base<ymopm_registers>::clock_lfo()
 			// play into this? Is there a separate LFSR for the LFO noise?
 			// Do we sample & hold the noise at a certain point based on
 			// the LFO counter?
-			am = BIT(m_noise_lfsr, 0);
+			am = BIT(m_noise_lfsr, 0) ? 0xff : 0;
 			pm = am ^ 0x80;
 			break;
 	}
@@ -1586,7 +1585,7 @@ void ymfm_engine_base<RegisterType>::update_timer(u8 tnum, u8 enable)
 	if (enable && !m_timer[tnum]->enabled())
 	{
 		// each timer clock is n channels * 4 operators * prescale factor (2/3/6)
-		u32 clockscale = m_channel.size() * 4 * m_clock_prescale;
+		u32 clockscale = RegisterType::CHANNELS * 4 * m_clock_prescale;
 
 		// period comes from the registers, and is different for each
 		u32 period = (tnum == 0) ? (1024 - m_regs.timer_a_value()) : 16 * (256 - m_regs.timer_b_value());
@@ -1615,9 +1614,9 @@ TIMER_CALLBACK_MEMBER(ymfm_engine_base<RegisterType>::timer_handler)
 	else if (param == 1 && m_regs.enable_timer_b())
 	 	set_reset_status(STATUS_TIMERB, 0);
 
-	// if timer A fired in CSM mode, trigger  CSM on all relevant channels
+	// if timer A fired in CSM mode, trigger CSM on all relevant channels
 	if (param == 0 && m_regs.csm())
-		for (int chnum = 0; chnum < m_channel.size(); chnum++)
+		for (int chnum = 0; chnum < RegisterType::CHANNELS; chnum++)
 			if (BIT(RegisterType::CSM_TRIGGER_MASK, chnum))
 				m_channel[chnum]->keyon_csm();
 
