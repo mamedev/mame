@@ -72,7 +72,7 @@ Tetris Giant / Tetris Dekaris               834-14970    G  MDA-C0076 CF   ANY  
 Tetris Giant / Tetris Dekaris Ver.2.000     834-14970    G            ROM  ANY    253-5508-0604   AAFE-xxxxxxxxxxx
 Thomas: The Tank Engine                     ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
 UNO the Medal (Medalink)                    ???-?????                 ROM  JP     253-5508-0526J  AAFE-01G00225212, Satellite Medal
-Yataimura Kingyosukui (4-player, China)     ???-?????                 CF   EXP    unknown         AAFE-xxxxxxxxxxx
+Yataimura Kingyosukui (4-player, China)     837-14875                 CF   EXP    253-5508-0563J  AAFE-xxxxxxxxxxx
 Unknown                                     834-14865                      JAP
 
 REV PCB       IC6s      Flash       AU1500
@@ -680,7 +680,7 @@ ROM_START( kingyoch )
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	// no PIC was provided with CF card, brute forced key
-	ROM_LOAD( "317-unknown.ic15", 0, 0x800, BAD_DUMP CRC(8af67833) SHA1(0b79abf9182c249a6d4976d6fd3b90101d66354f) )
+	ROM_LOAD( "317-0563-jpn.ic15", 0, 0x800, BAD_DUMP CRC(8af67833) SHA1(0b79abf9182c249a6d4976d6fd3b90101d66354f) )
 ROM_END
 
 ROM_START( loveber3 )
