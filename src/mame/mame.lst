@@ -19896,9 +19896,11 @@ macpb180                        // 1992 Apple Macintosh PowerBook 180
 macpb180c                       // 1992 Apple Macintosh PowerBook 180c
 macpd210                        // 1992 Apple Macintosh PowerBook Duo 210
 macprtb                         // 1989 Apple Macintosh Portable
-macqd700                        // 1991 Apple Macintosh Quadra 700
 macse30                         // 1989 Apple Macintosh SE/30
 pmac6100                        // 1993 Apple Power Macintosh 6100
+
+@source:macquadra700.cpp
+macqd700                        // 1991 Apple Macintosh Quadra 700
 
 @source:mac128.cpp
 mac128k                         // 1984 Apple Macintosh

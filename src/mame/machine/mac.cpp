@@ -635,20 +635,6 @@ WRITE_LINE_MEMBER(mac_state::mac_scsi_irq)
     }*/
 }
 
-WRITE_LINE_MEMBER(mac_state::irq_539x_1_w)
-{
-	if (state)  // make sure a CB1 transition occurs
-	{
-		m_via2->write_cb2(0);
-		m_via2->write_cb2(1);
-	}
-}
-
-WRITE_LINE_MEMBER(mac_state::drq_539x_1_w)
-{
-	m_dafb_scsi1_drq = state;
-}
-
 /* *************************************************************************
  * SCC
  *
@@ -1493,12 +1479,6 @@ void mac_state::nubus_slot_interrupt(uint8_t slot, uint32_t state)
 {
 	static const uint8_t masks[8] = { 0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80 };
 	uint8_t mask = 0x3f;
-
-	// quadra 700/900/950 use the top 2 bits of the interrupt register for ethernet and video
-	if ((m_model == MODEL_MAC_QUADRA_700) || (m_model == MODEL_MAC_QUADRA_900) || (m_model == MODEL_MAC_QUADRA_950))
-	{
-		mask = 0xff;
-	}
 
 	slot -= 9;
 
