@@ -261,7 +261,6 @@ void ym2610_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 	}
 
 	// iterate over all target samples
-	constexpr stream_buffer::sample_t sample_scale = 1.0 / 32768.0;
 	for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
 	{
 		// clock the OPN
@@ -287,16 +286,8 @@ void ym2610_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 		m_adpcm_b.output(lsum, rsum, 2, 0x01);
 
 		// YM2608 is stereo
-		if (lsum < -32768)
-			lsum = -32768;
-		else if (lsum > 32767)
-			lsum = 32767;
-		if (rsum < -32768)
-			rsum = -32768;
-		else if (rsum > 32767)
-			rsum = 32767;
-		outputs[0].put(sampindex, stream_buffer::sample_t(lsum) * sample_scale);
-		outputs[1].put(sampindex, stream_buffer::sample_t(rsum) * sample_scale);
+		outputs[0].put_int_clamp(sampindex, lsum, 32768);
+		outputs[1].put_int_clamp(sampindex, rsum, 32768);
 	}
 }
 

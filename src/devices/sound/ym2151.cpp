@@ -49,14 +49,9 @@ inline s16 linear_to_fp(s32 value)
 //  clamping
 //-------------------------------------------------
 
-inline stream_buffer::sample_t fp_to_linear(s16 value)
+inline s32 fp_to_linear(s16 value)
 {
-	s32 result = (value >> 3) << BIT(value, 0, 3);
-	if (result < -32768)
-		result = -32768;
-	else if (result > 32767)
-		result = 32767;
-	return stream_buffer::sample_t(result) * (1.0 / 32768.0);
+	return (value >> 3) << BIT(value, 0, 3);
 }
 
 
@@ -218,8 +213,8 @@ void ym2151_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 
 		// convert to 10.3 floating point value for the DAC and back
 		// OPN is mono, so only the left sum matters
-		outputs[0].put(sampindex, fp_to_linear(linear_to_fp(lsum)));
-		outputs[1].put(sampindex, fp_to_linear(linear_to_fp(rsum)));
+		outputs[0].put_int_clamp(sampindex, fp_to_linear(linear_to_fp(lsum)), 32768);
+		outputs[1].put_int_clamp(sampindex, fp_to_linear(linear_to_fp(rsum)), 32768);
 	}
 }
 

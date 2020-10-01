@@ -188,8 +188,7 @@ void ym2612_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 
 void ym2612_device::sound_stream_update_common(write_stream_view &outl, write_stream_view &outr, bool discontinuity)
 {
-	constexpr stream_buffer::sample_t sample_divider = MULTIPLEX_YM2612_YM3438_OUTPUT ? 1.0 : 6.0;
-	stream_buffer::sample_t sample_scale = 1.0 / (sample_divider * (discontinuity ? 260.0 : 256.0));
+	u32 const sample_divider = (discontinuity ? 260 : 256) * (MULTIPLEX_YM2612_YM3438_OUTPUT ? 1 : 6);
 
 	// iterate over all target samples
 	s32 lsum = 0, rsum = 0;
@@ -225,9 +224,10 @@ void ym2612_device::sound_stream_update_common(write_stream_view &outl, write_st
 		// if multiplexing, just scale to 16 bits and output
 		if (MULTIPLEX_YM2612_YM3438_OUTPUT)
 		{
-			outl.put(sampindex, stream_buffer::sample_t(lchan) * sample_scale);
-			outr.put(sampindex, stream_buffer::sample_t(rchan) * sample_scale);
+			outl.put_int(sampindex, lchan, sample_divider);
+			outr.put_int(sampindex, rchan, sample_divider);
 			sampindex++;
+			lsum = rsum = 0;
 		}
 
 		// if not, accumulate the sums
@@ -239,8 +239,8 @@ void ym2612_device::sound_stream_update_common(write_stream_view &outl, write_st
 			// on the last channel, output the average and reset the sums
 			if (m_channel == 5)
 			{
-				outl.put(sampindex, stream_buffer::sample_t(lsum) * sample_scale);
-				outr.put(sampindex, stream_buffer::sample_t(rsum) * sample_scale);
+				outl.put_int(sampindex, lsum, sample_divider);
+				outr.put_int(sampindex, rsum, sample_divider);
 				sampindex++;
 				lsum = rsum = 0;
 			}
@@ -314,7 +314,6 @@ void ymf276_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 	u8 const opn_mask = m_dac_enable ? 0x1f : 0x3f;
 
 	// iterate over all target samples
-	constexpr stream_buffer::sample_t sample_scale = 1.0 / 32768.0;
 	for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
 	{
 		// clock the OPN
@@ -336,16 +335,8 @@ void ymf276_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 		}
 
 		// YMF3438 is stereo
-		if (lsum < -32768)
-			lsum = -32768;
-		else if (lsum > 32767)
-			lsum = 32767;
-		if (rsum < -32768)
-			rsum = -32768;
-		else if (rsum > 32767)
-			rsum = 32767;
-		outputs[0].put(sampindex, stream_buffer::sample_t(lsum) * sample_scale);
-		outputs[1].put(sampindex, stream_buffer::sample_t(rsum) * sample_scale);
+		outputs[0].put_int_clamp(sampindex, lsum, 32768);
+		outputs[1].put_int_clamp(sampindex, rsum, 32768);
 	}
 }
 
