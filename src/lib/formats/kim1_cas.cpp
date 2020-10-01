@@ -1,14 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
-#include <cassert>
-
 #include "kim1_cas.h"
+
+#include <cassert>
 
 #define SMPLO   -32768
 #define SMPHI   32767
 
 
-static int cas_size;
+static int cas_size; // FIXME: global variable prevents multiple instances
 
 
 static inline int kim1_output_signal( int16_t *buffer, int sample_pos, int high )
@@ -159,7 +159,7 @@ static int kim1_kim_to_wav_size(const uint8_t *casdata, int caslen)
 	return kim1_handle_kim( nullptr, casdata );
 }
 
-static const struct CassetteLegacyWaveFiller kim1_kim_legacy_fill_wave =
+static const cassette_image::LegacyWaveFiller kim1_kim_legacy_fill_wave =
 {
 	kim1_kim_fill_wave,                     /* fill_wave */
 	-1,                                     /* chunk_size */
@@ -171,19 +171,19 @@ static const struct CassetteLegacyWaveFiller kim1_kim_legacy_fill_wave =
 };
 
 
-static cassette_image::error kim1_kim_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error kim1_kim_identify(cassette_image *cassette, cassette_image::Options *opts)
 {
-	return cassette_legacy_identify(cassette, opts, &kim1_kim_legacy_fill_wave);
+	return cassette->legacy_identify(opts, &kim1_kim_legacy_fill_wave);
 }
 
 
 static cassette_image::error kim1_kim_load(cassette_image *cassette)
 {
-	return cassette_legacy_construct(cassette, &kim1_kim_legacy_fill_wave);
+	return cassette->legacy_construct(&kim1_kim_legacy_fill_wave);
 }
 
 
-static const struct CassetteFormat kim1_kim_format =
+static const cassette_image::Format kim1_kim_format =
 {
 	"kim,kim1",
 	kim1_kim_identify,

@@ -5,9 +5,9 @@
     Support for VG-5000 .k7 cassette images
 
 ********************************************************************/
-#include <cassert>
-
 #include "vg5k_cas.h"
+
+#include <cassert>
 
 
 #define SMPLO   -32768
@@ -15,7 +15,7 @@
 #define SMPHI   32767
 
 
-static int k7_size;
+static int k7_size; // FIXME: global variable prevents multiple instances
 
 /*******************************************************************
    Generate one high-low cycle of sample data
@@ -200,7 +200,7 @@ static int vg5k_k7_to_wav_size(const uint8_t *casdata, int caslen)
 }
 
 
-static const struct CassetteLegacyWaveFiller vg5k_legacy_fill_wave =
+static const cassette_image::LegacyWaveFiller vg5k_legacy_fill_wave =
 {
 	vg5k_k7_fill_wave,                      /* fill_wave */
 	-1,                                     /* chunk_size */
@@ -211,19 +211,19 @@ static const struct CassetteLegacyWaveFiller vg5k_legacy_fill_wave =
 	0                                       /* trailer_samples */
 };
 
-static cassette_image::error vg5k_k7_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error vg5k_k7_identify(cassette_image *cassette, cassette_image::Options *opts)
 {
-	return cassette_legacy_identify(cassette, opts, &vg5k_legacy_fill_wave);
+	return cassette->legacy_identify(opts, &vg5k_legacy_fill_wave);
 }
 
 
 static cassette_image::error vg5k_k7_load(cassette_image *cassette)
 {
-	return cassette_legacy_construct(cassette, &vg5k_legacy_fill_wave);
+	return cassette->legacy_construct(&vg5k_legacy_fill_wave);
 }
 
 
-static const struct CassetteFormat vg5k_k7_format =
+static const cassette_image::Format vg5k_k7_format =
 {
 	"k7",
 	vg5k_k7_identify,
@@ -234,5 +234,5 @@ static const struct CassetteFormat vg5k_k7_format =
 
 CASSETTE_FORMATLIST_START(vg5k_cassette_formats)
 	CASSETTE_FORMAT(vg5k_k7_format)
-	CASSETTE_FORMAT(wavfile_format)
+	CASSETTE_FORMAT(cassette_image::wavfile_format)
 CASSETTE_FORMATLIST_END

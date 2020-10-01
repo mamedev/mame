@@ -20,15 +20,15 @@
  *   0x00: Sampling rate (4 bytes)
  *
  */
+#include "x1_tap.h"
 
 #include <cassert>
 
-#include "x1_tap.h"
 
 #define WAVE_HIGH        0x5a9e
 #define WAVE_LOW        -0x5a9e
 
-static int cas_size;
+static int cas_size; // FIXME: global variables prevent multiple instances
 static int samplerate;
 static int new_format;
 
@@ -103,7 +103,7 @@ static int x1_cas_fill_wave(int16_t *buffer, int sample_count, uint8_t *bytes)
 	return x1_handle_tap(buffer,bytes);
 }
 
-static const struct CassetteLegacyWaveFiller x1_legacy_fill_wave =
+static const cassette_image::LegacyWaveFiller x1_legacy_fill_wave =
 {
 	x1_cas_fill_wave,                       /* fill_wave */
 	-1,                                     /* chunk_size */
@@ -114,20 +114,20 @@ static const struct CassetteLegacyWaveFiller x1_legacy_fill_wave =
 	0                                       /* trailer_samples */
 };
 
-static cassette_image::error x1_cas_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error x1_cas_identify(cassette_image *cassette, cassette_image::Options *opts)
 {
-	return cassette_legacy_identify(cassette, opts, &x1_legacy_fill_wave);
+	return cassette->legacy_identify(opts, &x1_legacy_fill_wave);
 }
 
 
 
 static cassette_image::error x1_cas_load(cassette_image *cassette)
 {
-	return cassette_legacy_construct(cassette, &x1_legacy_fill_wave);
+	return cassette->legacy_construct(&x1_legacy_fill_wave);
 }
 
 
-static const struct CassetteFormat x1_cassette_format = {
+static const cassette_image::Format x1_cassette_format = {
 	"tap",
 	x1_cas_identify,
 	x1_cas_load,

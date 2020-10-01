@@ -10,9 +10,9 @@ For more information see:
 
 ********************************************************************/
 
-#include <cassert>
-
 #include "ace_tap.h"
+
+#include <cassert>
 
 
 #define SMPLO   -32768
@@ -155,7 +155,7 @@ static int ace_tap_to_wav_size(const uint8_t *casdata, int caslen)
 }
 
 
-static const struct CassetteLegacyWaveFiller ace_legacy_fill_wave =
+static const cassette_image::LegacyWaveFiller ace_legacy_fill_wave =
 {
 	ace_tap_fill_wave,                  /* fill_wave */
 	-1,                                     /* chunk_size */
@@ -167,19 +167,19 @@ static const struct CassetteLegacyWaveFiller ace_legacy_fill_wave =
 };
 
 
-static cassette_image::error ace_tap_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error ace_tap_identify(cassette_image *cassette, cassette_image::Options *opts)
 {
-	return cassette_legacy_identify(cassette, opts, &ace_legacy_fill_wave);
+	return cassette->legacy_identify(opts, &ace_legacy_fill_wave);
 }
 
 
 static cassette_image::error ace_tap_load(cassette_image *cassette)
 {
-	return cassette_legacy_construct(cassette, &ace_legacy_fill_wave);
+	return cassette->legacy_construct(&ace_legacy_fill_wave);
 }
 
 
-static const struct CassetteFormat ace_tap_format =
+static const cassette_image::Format ace_tap_format =
 {
 	"tap",
 	ace_tap_identify,

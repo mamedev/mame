@@ -2,10 +2,9 @@
 // copyright-holders:Krzysztof Strzecha
 /* .PTP Microkey Primo tape images */
 
+#include "primoptp.h"
 
 #include <cassert>
-
-#include "primoptp.h"
 
 
 #define PRIMO_WAVEENTRY_LOW     -32768
@@ -30,9 +29,7 @@ static uint32_t primo_tape_image_length;
 
 static int16_t *primo_emit_level(int16_t *p, int count, int level)
 {
-	int i;
-
-	for (i=0; i<count; i++) *(p++) = level;
+	for (int i=0; i<count; i++) *(p++) = level;
 
 	return p;
 }
@@ -215,7 +212,7 @@ static int primo_cassette_fill_wave(int16_t *buffer, int length, uint8_t *bytes)
 	return p - buffer;
 }
 
-static const struct CassetteLegacyWaveFiller primo_legacy_fill_wave =
+static const cassette_image::LegacyWaveFiller primo_legacy_fill_wave =
 {
 	primo_cassette_fill_wave,           /* fill_wave */
 	-1,                                         /* chunk_size */
@@ -226,17 +223,17 @@ static const struct CassetteLegacyWaveFiller primo_legacy_fill_wave =
 	0                                           /* trailer_samples */
 };
 
-static cassette_image::error primo_ptp_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error primo_ptp_identify(cassette_image *cassette, cassette_image::Options *opts)
 {
-	return cassette_legacy_identify(cassette, opts, &primo_legacy_fill_wave);
+	return cassette->legacy_identify(opts, &primo_legacy_fill_wave);
 }
 
 static cassette_image::error primo_ptp_load(cassette_image *cassette)
 {
-	return cassette_legacy_construct(cassette, &primo_legacy_fill_wave);
+	return cassette->legacy_construct(&primo_legacy_fill_wave);
 }
 
-static const struct CassetteFormat primo_ptp_image_format =
+static const cassette_image::Format primo_ptp_image_format =
 {
 	"ptp",
 	primo_ptp_identify,

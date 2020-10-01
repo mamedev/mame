@@ -31,10 +31,10 @@ medium transfer rate is approx. 307 bps (38 bytes/sec) for files that contain
 
 *****************************************************************************/
 
-#include <cassert>
-
 #include "zx81_p.h"
 #include "tzx_cas.h"
+
+#include <cassert>
 
 
 #define WAVEENTRY_LOW   -32768
@@ -56,7 +56,7 @@ medium transfer rate is approx. 307 bps (38 bytes/sec) for files that contain
 #define ZX81_DATA_LENGTH_OFFSET 0x0b
 #define ZX80_DATA_LENGTH_OFFSET 0x04
 
-static uint8_t zx_file_name[128];
+static uint8_t zx_file_name[128]; // FIXME: global variables prevent multiple instances
 static uint16_t real_data_length = 0;
 static uint8_t zx_file_name_length = 0;
 
@@ -64,9 +64,7 @@ static uint8_t zx_file_name_length = 0;
 
 static int16_t *zx81_emit_level(int16_t *p, int count, int level)
 {
-	int i;
-
-	for (i=0; i<count; i++) *(p++) = level;
+	for (int i=0; i<count; i++) *(p++) = level;
 
 	return p;
 }
@@ -196,7 +194,7 @@ static int zx81_cassette_fill_wave(int16_t *buffer, int length, uint8_t *bytes)
 	return p - buffer;
 }
 
-static const struct CassetteLegacyWaveFiller zx81_legacy_fill_wave =
+static const cassette_image::LegacyWaveFiller zx81_legacy_fill_wave =
 {
 	zx81_cassette_fill_wave,                    /* fill_wave */
 	-1,                                         /* chunk_size */
@@ -207,9 +205,9 @@ static const struct CassetteLegacyWaveFiller zx81_legacy_fill_wave =
 	0                                           /* trailer_samples */
 };
 
-static cassette_image::error zx81_p_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error zx81_p_identify(cassette_image *cassette, cassette_image::Options *opts)
 {
-	return cassette_legacy_identify(cassette, opts, &zx81_legacy_fill_wave);
+	return cassette->legacy_identify(opts, &zx81_legacy_fill_wave);
 }
 
 static cassette_image::error zx81_p_load(cassette_image *cassette)
@@ -219,10 +217,10 @@ static cassette_image::error zx81_p_load(cassette_image *cassette)
 	   Hardcoding this to "cassette".
 	*/
 	zx81_fill_file_name ("cassette" /*image_basename_noext(device_list_find_by_tag( Machine->config->m_devicelist, CASSETTE, "cassette" ))*/ );
-	return cassette_legacy_construct(cassette, &zx81_legacy_fill_wave);
+	return cassette->legacy_construct(&zx81_legacy_fill_wave);
 }
 
-static const struct CassetteFormat zx81_p_image_format =
+static const cassette_image::Format zx81_p_image_format =
 {
 	"p,81",
 	zx81_p_identify,
@@ -269,7 +267,7 @@ static int zx80_cassette_fill_wave(int16_t *buffer, int length, uint8_t *bytes)
 	return p - buffer;
 }
 
-static const struct CassetteLegacyWaveFiller zx80_legacy_fill_wave =
+static const cassette_image::LegacyWaveFiller zx80_legacy_fill_wave =
 {
 	zx80_cassette_fill_wave,                    /* fill_wave */
 	-1,                                         /* chunk_size */
@@ -280,17 +278,17 @@ static const struct CassetteLegacyWaveFiller zx80_legacy_fill_wave =
 	0                                           /* trailer_samples */
 };
 
-static cassette_image::error zx80_o_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error zx80_o_identify(cassette_image *cassette, cassette_image::Options *opts)
 {
-	return cassette_legacy_identify(cassette, opts, &zx80_legacy_fill_wave);
+	return cassette->legacy_identify(opts, &zx80_legacy_fill_wave);
 }
 
 static cassette_image::error zx80_o_load(cassette_image *cassette)
 {
-	return cassette_legacy_construct(cassette, &zx80_legacy_fill_wave);
+	return cassette->legacy_construct(&zx80_legacy_fill_wave);
 }
 
-static const struct CassetteFormat zx80_o_image_format =
+static const cassette_image::Format zx80_o_image_format =
 {
 	"o,80",
 	zx80_o_identify,

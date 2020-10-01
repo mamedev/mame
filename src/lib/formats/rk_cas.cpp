@@ -5,9 +5,9 @@
     Tape support for RK format
 
 */
-#include <cassert>
-
 #include "rk_cas.h"
+
+#include <cassert>
 
 
 #define RK_WAV_FREQUENCY    44000
@@ -20,13 +20,12 @@
 #define RK_SIZE_22 22
 #define RK_SIZE_60 60
 
-static int      data_size;
+static int      data_size; // FIXME: global variable prevents multiple instances
 
 static int16_t *rk_emit_level(int16_t *p, int count, int level)
 {
-	int i;
 
-	for (i=0; i<count; i++)
+	for (int i=0; i<count; i++)
 	{
 		*(p++) = level;
 	}
@@ -141,7 +140,7 @@ static int gam_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes ) {
 	return p - buffer;
 }
 
-static const struct CassetteLegacyWaveFiller rk20_legacy_fill_wave = {
+static const cassette_image::LegacyWaveFiller rk20_legacy_fill_wave = {
 	rk20_cas_fill_wave,         /* fill_wave */
 	-1,                 /* chunk_size */
 	0,                  /* chunk_samples */
@@ -151,15 +150,15 @@ static const struct CassetteLegacyWaveFiller rk20_legacy_fill_wave = {
 	0                   /* trailer_samples */
 };
 
-static cassette_image::error rk20_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) {
-	return cassette_legacy_identify( cassette, opts, &rk20_legacy_fill_wave );
+static cassette_image::error rk20_cassette_identify( cassette_image *cassette, cassette_image::Options *opts ) {
+	return cassette->legacy_identify( opts, &rk20_legacy_fill_wave );
 }
 
 static cassette_image::error rk20_cassette_load( cassette_image *cassette ) {
-	return cassette_legacy_construct( cassette, &rk20_legacy_fill_wave );
+	return cassette->legacy_construct( &rk20_legacy_fill_wave );
 }
 
-static const struct CassetteLegacyWaveFiller rk22_legacy_fill_wave = {
+static const cassette_image::LegacyWaveFiller rk22_legacy_fill_wave = {
 	rk22_cas_fill_wave,         /* fill_wave */
 	-1,                 /* chunk_size */
 	0,                  /* chunk_samples */
@@ -169,15 +168,15 @@ static const struct CassetteLegacyWaveFiller rk22_legacy_fill_wave = {
 	0                   /* trailer_samples */
 };
 
-static cassette_image::error rk22_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) {
-	return cassette_legacy_identify( cassette, opts, &rk22_legacy_fill_wave );
+static cassette_image::error rk22_cassette_identify( cassette_image *cassette, cassette_image::Options *opts ) {
+	return cassette->legacy_identify( opts, &rk22_legacy_fill_wave );
 }
 
 static cassette_image::error rk22_cassette_load( cassette_image *cassette ) {
-	return cassette_legacy_construct( cassette, &rk22_legacy_fill_wave );
+	return cassette->legacy_construct( &rk22_legacy_fill_wave );
 }
 
-static const struct CassetteLegacyWaveFiller gam_legacy_fill_wave = {
+static const cassette_image::LegacyWaveFiller gam_legacy_fill_wave = {
 	gam_cas_fill_wave,          /* fill_wave */
 	-1,                 /* chunk_size */
 	0,                  /* chunk_samples */
@@ -187,15 +186,15 @@ static const struct CassetteLegacyWaveFiller gam_legacy_fill_wave = {
 	0                   /* trailer_samples */
 };
 
-static cassette_image::error gam_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) {
-	return cassette_legacy_identify( cassette, opts, &gam_legacy_fill_wave );
+static cassette_image::error gam_cassette_identify( cassette_image *cassette, cassette_image::Options *opts ) {
+	return cassette->legacy_identify( opts, &gam_legacy_fill_wave );
 }
 
 static cassette_image::error gam_cassette_load( cassette_image *cassette ) {
-	return cassette_legacy_construct( cassette, &gam_legacy_fill_wave );
+	return cassette->legacy_construct( &gam_legacy_fill_wave );
 }
 
-static const struct CassetteLegacyWaveFiller rk60_legacy_fill_wave = {
+static const cassette_image::LegacyWaveFiller rk60_legacy_fill_wave = {
 	rk60_cas_fill_wave,         /* fill_wave */
 	-1,                 /* chunk_size */
 	0,                  /* chunk_samples */
@@ -205,71 +204,71 @@ static const struct CassetteLegacyWaveFiller rk60_legacy_fill_wave = {
 	0                   /* trailer_samples */
 };
 
-static cassette_image::error rk60_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) {
-	return cassette_legacy_identify( cassette, opts, &rk60_legacy_fill_wave );
+static cassette_image::error rk60_cassette_identify( cassette_image *cassette, cassette_image::Options *opts ) {
+	return cassette->legacy_identify( opts, &rk60_legacy_fill_wave );
 }
 
 static cassette_image::error rk60_cassette_load( cassette_image *cassette ) {
-	return cassette_legacy_construct( cassette, &rk60_legacy_fill_wave );
+	return cassette->legacy_construct( &rk60_legacy_fill_wave );
 }
 
-static const struct CassetteFormat rku_cassette_format = {
+static const cassette_image::Format rku_cassette_format = {
 	"rku",
 	rk20_cassette_identify,
 	rk20_cassette_load,
 	nullptr
 };
 
-static const struct CassetteFormat rk8_cassette_format = {
+static const cassette_image::Format rk8_cassette_format = {
 	"rk8",
 	rk60_cassette_identify,
 	rk60_cassette_load,
 	nullptr
 };
 
-static const struct CassetteFormat rks_cassette_format = {
+static const cassette_image::Format rks_cassette_format = {
 	"rks",
 	rk20_cassette_identify,
 	rk20_cassette_load,
 	nullptr
 };
 
-static const struct CassetteFormat rko_cassette_format = {
+static const cassette_image::Format rko_cassette_format = {
 	"rko",
 	rk20_cassette_identify,
 	rk20_cassette_load,
 	nullptr
 };
 
-static const struct CassetteFormat rkr_cassette_format = {
+static const cassette_image::Format rkr_cassette_format = {
 	"rk,rkr",
 	rk20_cassette_identify,
 	rk20_cassette_load,
 	nullptr
 };
 
-static const struct CassetteFormat rka_cassette_format = {
+static const cassette_image::Format rka_cassette_format = {
 	"rka",
 	rk20_cassette_identify,
 	rk20_cassette_load,
 	nullptr
 };
 
-static const struct CassetteFormat rkm_cassette_format = {
+static const cassette_image::Format rkm_cassette_format = {
 	"rkm",
 	rk22_cassette_identify,
 	rk22_cassette_load,
 	nullptr
 };
 
-static const struct CassetteFormat rkp_cassette_format = {
+static const cassette_image::Format rkp_cassette_format = {
 	"rkp",
 	rk20_cassette_identify,
 	rk20_cassette_load,
 	nullptr
 };
 
-static const struct CassetteFormat gam_cassette_format = {
+static const cassette_image::Format gam_cassette_format = {
 	"gam,g16,pki",
 	gam_cassette_identify,
 	gam_cassette_load,
