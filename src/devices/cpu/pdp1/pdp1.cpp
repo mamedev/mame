@@ -829,7 +829,6 @@ void pdp1_device::execute_run()
 
 			case 2:
 				/* read second word as data */
-				MB = 0;
 				/* data will be transferred to IO register in response to RPB */
 				m_extern_iot[2](2, 1, MB, IO, AC);
 				m_rim_step = 3;
