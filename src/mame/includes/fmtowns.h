@@ -97,7 +97,6 @@ class towns_state : public driver_device
 		, m_maincpu(*this, "maincpu")
 		, m_dma(*this, "dma_%u", 1U)
 		, m_scsi(*this, "fmscsi")
-		, m_scsi_slot(*this, "scsislot")
 		, m_flop(*this, "fdc:%u", 0U)
 		, m_speaker(*this, "speaker")
 		, m_pic_master(*this, "pic8259_master")
@@ -114,6 +113,7 @@ class towns_state : public driver_device
 		, m_dma_1(*this, "dma_1")
 		, m_cdrom(*this, "cdrom")
 		, m_cdda(*this, "cdda")
+		, m_scsi_slot(*this, "scsislot")
 		, m_bank_cb000_r(*this, "bank_cb000_r")
 		, m_bank_cb000_w(*this, "bank_cb000_w")
 		, m_bank_f8000_r(*this, "bank_f8000_r")
@@ -166,7 +166,6 @@ protected:
 
 	required_device_array<upd71071_device, 2> m_dma;
 	optional_device<fmscsi_device> m_scsi;
-	optional_device<fmt_scsi_slot_device> m_scsi_slot;
 	required_device_array<floppy_connector, 2> m_flop;
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
@@ -192,6 +191,7 @@ private:
 	required_device<upd71071_device> m_dma_1;
 	required_device<cdrom_image_device> m_cdrom;
 	required_device<cdda_device> m_cdda;
+	optional_device<fmt_scsi_slot_device> m_scsi_slot;
 
 	required_memory_bank m_bank_cb000_r;
 	required_memory_bank m_bank_cb000_w;

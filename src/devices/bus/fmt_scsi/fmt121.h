@@ -28,7 +28,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 
-	// pac2_card_interface overrides
+	// fmt_scsi_card_interface overrides
 	virtual u8 fmt_scsi_read(offs_t offset) override;
 	virtual void fmt_scsi_write(offs_t offset, u8 data) override;
 
