@@ -623,13 +623,13 @@ WRITE_LINE_MEMBER(wicat_state::crtc_irq_clear_w)
 I8275_DRAW_CHARACTER_MEMBER(wicat_state::wicat_display_pixels)
 {
 	uint8_t romdata = vsp ? 0 : m_chargen->base()[(charcode << 4) | linecount];
-	const pen_t *pen = m_palette->pens();
+	pen_t const *const pen = m_palette->pens();
 
 	for (int i = 0; i < 10; i++)
 	{
 		int color = ((romdata & 0xc0) != 0) ^ rvv;
 
-		bitmap.pix32(y, x + i) = pen[color];
+		bitmap.pix(y, x + i) = pen[color];
 		romdata <<= 1;
 	}
 }

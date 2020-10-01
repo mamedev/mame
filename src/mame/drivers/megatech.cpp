@@ -627,8 +627,8 @@ uint32_t mtech_state::screen_update_main(screen_device &screen, bitmap_rgb32 &bi
 		// when launching megatech + both sms and megadrive games, the following would be needed...
 		for (int y = 0; y < 224; y++)
 		{
-			uint32_t* lineptr = &bitmap.pix32(y);
-			uint32_t* srcptr =  &m_vdp->get_bitmap().pix32(y + sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT);
+			uint32_t* lineptr = &bitmap.pix(y);
+			uint32_t* srcptr =  &m_vdp->get_bitmap().pix(y + sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT);
 
 			for (int x = 0; x < sega315_5124_device::WIDTH; x++)
 				lineptr[x] = srcptr[x];

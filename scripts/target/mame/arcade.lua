@@ -823,6 +823,7 @@ BUSES["ZORRO"] = true
 -- specify used file formats
 --------------------------------------------------
 
+FORMATS["APOLLO_DSK"] = true
 FORMATS["GUAB_DSK"] = true
 FORMATS["AMI_DSK"] = true
 FORMATS["SC3000_BIT"] = true
@@ -1939,7 +1940,6 @@ files {
 	MAME_DIR .. "src/mame/audio/exidy.h",
 	MAME_DIR .. "src/mame/video/exidy.cpp",
 	MAME_DIR .. "src/mame/audio/targ.cpp",
-	MAME_DIR .. "src/mame/audio/targ.h",
 	MAME_DIR .. "src/mame/drivers/exidy440.cpp",
 	MAME_DIR .. "src/mame/includes/exidy440.h",
 	MAME_DIR .. "src/mame/audio/exidy440.cpp",

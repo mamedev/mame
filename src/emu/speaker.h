@@ -69,7 +69,7 @@ public:
 	speaker_device &backrest()          { set_position( 0.0, -0.2,  0.1); return *this; }
 
 	// internally for use by the sound system
-	void mix(stream_buffer::sample_t *leftmix, stream_buffer::sample_t *rightmix, u32 &samples_this_update, bool suppress);
+	void mix(stream_buffer::sample_t *leftmix, stream_buffer::sample_t *rightmix, attotime start, attotime end, int expected_samples, bool suppress);
 
 protected:
 	// device-level overrides

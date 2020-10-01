@@ -2107,7 +2107,7 @@ void hd63484_device::draw_graphics_line(bitmap_ind16 &bitmap, const rectangle &c
 			if (!m_display_cb.isnull())
 				m_display_cb(bitmap, cliprect, y, px, data & mask);
 			else if (cliprect.contains(px, y))
-				bitmap.pix16(y, px) = data & mask;
+				bitmap.pix(y, px) = data & mask;
 
 			data >>= bpp;
 		}

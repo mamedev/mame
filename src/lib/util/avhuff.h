@@ -19,6 +19,8 @@
 #include "huffman.h"
 #include "flac.h"
 
+#include <algorithm>
+
 
 //**************************************************************************
 //  CONSTANTS
@@ -49,32 +51,6 @@ enum avhuff_error
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> av_codec_decompress_config
-
-// decompression configuration
-class avhuff_decompress_config
-{
-public:
-	avhuff_decompress_config()
-		: maxsamples(0),
-			actsamples(nullptr),
-			maxmetalength(0),
-			actmetalength(nullptr),
-			metadata(nullptr)
-	{
-		memset(audio, 0, sizeof(audio));
-	}
-
-	bitmap_yuy16 video;                     // pointer to video bitmap
-	uint32_t      maxsamples;                 // maximum number of samples per channel
-	uint32_t *    actsamples;                 // actual number of samples per channel
-	int16_t *     audio[16];                  // pointer to individual audio channels
-	uint32_t      maxmetalength;              // maximum length of metadata
-	uint32_t *    actmetalength;              // actual length of metadata
-	uint8_t *     metadata;                   // pointer to metadata buffer
-};
-
-
 // ======================> avhuff_encoder
 
 // core state for the codec
@@ -98,8 +74,7 @@ private:
 	{
 	public:
 		// construction/destruction
-		deltarle_encoder()
-			: m_rlecount(0) { }
+		deltarle_encoder() { }
 
 		// histogramming
 		uint16_t *rle_and_histo_bitmap(const uint8_t *source, uint32_t items_per_row, uint32_t item_advance, uint32_t row_count);
@@ -111,7 +86,7 @@ private:
 
 	private:
 		// internal state
-		int                         m_rlecount;
+		int                         m_rlecount = 0;
 		huffman_encoder<256 + 16>   m_encoder;
 		std::vector<uint16_t>       m_rlebuffer;
 	};
@@ -143,11 +118,30 @@ private:
 class avhuff_decoder
 {
 public:
+	// decompression configuration
+	class config
+	{
+	public:
+		config()
+		{
+			std::fill(std::begin(audio), std::end(audio), nullptr);
+		}
+
+		bitmap_yuy16 *  video = nullptr;            // pointer to video bitmap
+		uint32_t        maxsamples = 0;             // maximum number of samples per channel
+		uint32_t *      actsamples = nullptr;       // actual number of samples per channel
+		int16_t *       audio[16];                  // pointer to individual audio channels
+		uint32_t        maxmetalength = 0;          // maximum length of metadata
+		uint32_t *      actmetalength = nullptr;    // actual length of metadata
+		uint8_t *       metadata = nullptr;         // pointer to metadata buffer
+	};
+
+
 	// construction/destruction
 	avhuff_decoder();
 
 	// configuration
-	void configure(const avhuff_decompress_config &config);
+	void configure(const config &cfg);
 
 	// encode/decode
 	avhuff_error decode_data(const uint8_t *source, uint32_t complength, uint8_t *dest);
@@ -158,8 +152,7 @@ private:
 	{
 	public:
 		// construction/destruction
-		deltarle_decoder()
-			: m_rlecount(0), m_prevdata(0) { }
+		deltarle_decoder() { }
 
 		// general
 		void reset() { m_rlecount = m_prevdata = 0; }
@@ -171,8 +164,8 @@ private:
 
 	private:
 		// internal state
-		int                         m_rlecount;
-		uint8_t                       m_prevdata;
+		int                         m_rlecount = 0;
+		uint8_t                     m_prevdata = 0;
 		huffman_decoder<256 + 16>   m_decoder;
 	};
 
@@ -183,7 +176,8 @@ private:
 	avhuff_error decode_video_lossless(int width, int height, const uint8_t *source, uint32_t complength, uint8_t *dest, uint32_t dstride, uint32_t dxor);
 
 	// internal state
-	avhuff_decompress_config    m_config;
+	bitmap_yuy16                m_video;
+	config                      m_config;
 
 	// video decoding contexts
 	deltarle_decoder            m_ycontext;

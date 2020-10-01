@@ -661,9 +661,7 @@ uint32_t saa5050_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 				int g = BIT(color, 1) * 0xff;
 				int b = BIT(color, 2) * 0xff;
 
-				rgb_t rgb = rgb_t(r, g, b);
-
-				bitmap.pix32(y, x++) = rgb;
+				bitmap.pix(y, x++) = rgb_t(r, g, b);
 			}
 		}
 	}

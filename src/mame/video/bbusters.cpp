@@ -137,31 +137,30 @@ void bbusters_state_base::draw_block(screen_device &screen, bitmap_ind16 &dest,i
 	gfx_element *gfx = m_gfxdecode->gfx(bank);
 	pen_t pen_base = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
 	uint32_t xinc=(m_scale_line_count * 0x10000 ) / size;
-	uint8_t pixel;
-	int x_index;
 	int dy=y;
-	int sx, ex = m_scale_line_count;
+	int ex = m_scale_line_count;
 
 	while (m_scale_line_count) {
 		if (dy>=16 && dy<240) {
-			uint16_t *destline = &dest.pix16(dy);
-			uint8_t *priorityline = &screen.priority().pix8(dy);
+			uint16_t *const destline = &dest.pix(dy);
+			uint8_t *const priorityline = &screen.priority().pix(dy);
 			uint8_t srcline=*m_scale_table_ptr;
 			const uint8_t *srcptr=nullptr;
 
 			if (!flipy)
 				srcline=size-srcline-1;
 
+			int x_index;
 			if (flipx)
 				x_index=(ex-1)*0x10000;
 			else
 				x_index=0;
 
-			for (sx=0; sx<size; sx++) {
+			for (int sx=0; sx<size; sx++) {
 				if ((sx%16)==0)
 					srcptr=get_source_ptr(gfx,sprite,sx,srcline,block);
 
-				pixel=*srcptr++;
+				uint8_t pixel=*srcptr++;
 				if (pixel!=15 && priority > priorityline[(x+(x_index>>16)) & 0x1ff])
 				{
 					priorityline[(x+(x_index>>16)) & 0x1ff] = priority;

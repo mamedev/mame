@@ -778,8 +778,8 @@ void gp9001vdp_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clip
 								if (cliprect.contains(drawxx, drawyy))
 								{
 									const u8 pix = srcdata[count];
-									u16* dstptr = &bitmap.pix16(drawyy, drawxx);
-									u8* dstpri = &this->custom_priority_bitmap->pix8(drawyy, drawxx);
+									u16 *const dstptr = &bitmap.pix(drawyy, drawxx);
+									u8 *const dstpri = &this->custom_priority_bitmap->pix(drawyy, drawxx);
 
 									if (priority >= dstpri[0])
 									{
@@ -820,9 +820,9 @@ void gp9001vdp_device::draw_custom_tilemap( bitmap_ind16 &bitmap, const rectangl
 	{
 		const int realy = (y + scrolly) & 0x1ff;
 
-		u16* srcptr = &tmb.pix16(realy);
-		u16* dstptr = &bitmap.pix16(y);
-		u8* dstpriptr = &this->custom_priority_bitmap->pix8(y);
+		u16 const *const srcptr = &tmb.pix(realy);
+		u16 *const dstptr = &bitmap.pix(y);
+		u8 *const dstpriptr = &this->custom_priority_bitmap->pix(y);
 
 		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{

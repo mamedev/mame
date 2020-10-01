@@ -664,7 +664,7 @@ void render_font::char_expand(char32_t chnum, glyph &gl)
 		for (int y = 0; y < gl.bmheight; y++)
 		{
 			int desty = y + m_height_cmd + m_yoffs_cmd - gl.yoffs - gl.bmheight;
-			u32 *dest = (desty >= 0 && desty < m_height_cmd) ? &gl.bitmap.pix32(desty, 0) : nullptr;
+			u32 *dest = (desty >= 0 && desty < m_height_cmd) ? &gl.bitmap.pix(desty, 0) : nullptr;
 			{
 				for (int x = 0; x < gl.bmwidth; x++)
 				{
@@ -723,7 +723,7 @@ void render_font::char_expand(char32_t chnum, glyph &gl)
 		for (int y = 0; y < gl.bmheight; ++y)
 		{
 			int const desty(y + m_height + m_yoffs - gl.yoffs - gl.bmheight);
-			u32 *dest(((0 <= desty) && (m_height > desty)) ? &gl.bitmap.pix32(desty) : nullptr);
+			u32 *dest(((0 <= desty) && (m_height > desty)) ? &gl.bitmap.pix(desty) : nullptr);
 
 			if (m_format == format::TEXT)
 			{
@@ -1531,7 +1531,7 @@ bool render_font::save_cached(const char *filename, u64 length, u32 hash)
 					for (int y = 0; y < gl.bmheight; y++)
 					{
 						int desty = y + m_height + m_yoffs - gl.yoffs - gl.bmheight;
-						const u32 *src = (desty >= 0 && desty < m_height) ? &gl.bitmap.pix32(desty) : nullptr;
+						u32 const *const src = (desty >= 0 && desty < m_height) ? &gl.bitmap.pix(desty) : nullptr;
 						for (int x = 0; x < gl.bmwidth; x++)
 						{
 							if (src != nullptr && rgb_t(src[x]).a() != 0)

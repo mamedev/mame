@@ -233,7 +233,7 @@ HD44780_PIXEL_UPDATE( consoemt_state::lcd_pixel_update )
 		return;
 
 	if (line < 2 && pos < 20)
-		bitmap.pix16(1 + y + line*8 + line, 1 + pos*6 + x) = state ? 1 : 2;
+		bitmap.pix(1 + y + line*8 + line, 1 + pos*6 + x) = state ? 1 : 2;
 }
 
 

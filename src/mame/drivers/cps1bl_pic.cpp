@@ -1319,7 +1319,7 @@ ROM_START( jurassic99 )
 	U98G   ATF16V8B-15PC  8   secured, registered
 	U99G   ATF16V8B-15PC  8   secured, registered
 	U134G  ATF16V8B-15PC  8?  secured, registered
-	
+
 	3rd column numbers are what's hand-written on each chip
 	? = hard to read or rubbed off
 	the #8 pals appear to be just 74LS298 equivalents, can be replaced with real 74LS298 (additional 16-pin footprints underneath each chip) or hand-crafted jed

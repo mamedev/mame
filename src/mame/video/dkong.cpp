@@ -796,25 +796,22 @@ void dkong_state::radarscp_step(int line_cnt)
 void dkong_state::radarscp_draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	const uint8_t     *htable = nullptr;
-	int             x,y;
-	uint8_t           draw_ok;
-	uint16_t          *pixel;
 
 	if (m_hardware_type == HARDWARE_TRS01)
 		htable = m_gfx4;
 
-	y = cliprect.min_y;
+	int y = cliprect.min_y;
 	while (y <= cliprect.max_y)
 	{
-		x = cliprect.min_x;
+		int x = cliprect.min_x;
 		while (x <= cliprect.max_x)
 		{
-			pixel = &bitmap.pix16(y, x);
-			draw_ok = !(*pixel & 0x01) && !(*pixel & 0x02);
+			uint16_t *const pixel = &bitmap.pix(y, x);
+			uint8_t draw_ok = !(*pixel & 0x01) && !(*pixel & 0x02);
 			if (m_hardware_type == HARDWARE_TRS01) /*  Check again from schematics */
 				draw_ok = draw_ok  && !((htable[ (!m_rflip_sig<<7) | (x>>2)] >>2) & 0x01);
 			if (draw_ok)
-				*pixel = *(&m_bg_bits.pix16(y, x));
+				*pixel = m_bg_bits.pix(y, x);
 			x++;
 		}
 		y++;
@@ -823,21 +820,19 @@ void dkong_state::radarscp_draw_background(bitmap_ind16 &bitmap, const rectangle
 
 void dkong_state::radarscp_scanline(int scanline)
 {
-	const uint8_t *table = m_gfx3;
+	uint8_t const *const table = m_gfx3;
 	int         table_len = m_gfx3_len;
-	int             x,y,offset;
-	uint16_t          *pixel;
 	const rectangle &visarea = m_screen->visible_area();
 
-	y = scanline;
+	int y = scanline;
 	radarscp_step(y);
 	if (y <= visarea.min_y || y > visarea.max_y)
 		m_counter = 0;
-	offset = (m_flip ^ m_rflip_sig) ? 0x000 : 0x400;
-	x = 0;
+	int offset = (m_flip ^ m_rflip_sig) ? 0x000 : 0x400;
+	int x = 0;
 	while (x < m_screen->width())
 	{
-		pixel = &m_bg_bits.pix16(y, x);
+		uint16_t *const pixel = &m_bg_bits.pix(y, x);
 		if ((m_counter < table_len) && (x == 4 * (table[m_counter|offset] & 0x7f)))
 		{
 			if ( m_star_ff && (table[m_counter|offset] & 0x80) )    /* star */
@@ -852,7 +847,7 @@ void dkong_state::radarscp_scanline(int scanline)
 			*pixel = RADARSCP_BCK_COL_OFFSET + m_blue_level;
 		x++;
 	}
-	while ((m_counter < table_len) && ( x < 4 * (table[m_counter|offset] & 0x7f)))
+	while ((m_counter < table_len) && (x < 4 * (table[m_counter|offset] & 0x7f)))
 		m_counter++;
 }
 

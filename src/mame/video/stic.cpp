@@ -516,21 +516,19 @@ const tiny_rom_entry *stic_device::device_rom_region() const
 
 void stic_device::intv_set_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color)
 {
-	int w, h;
-
 	// output scaling
 	x *= m_x_scale;
 	y *= m_y_scale;
 	color = SET_COLOR(color);
 
-	for (h = 0; h < m_y_scale; h++)
-		for (w = 0; w < m_x_scale; w++)
-			bitmap.pix16(y + h, x + w) = color;
+	for (int h = 0; h < m_y_scale; h++)
+		for (int w = 0; w < m_x_scale; w++)
+			bitmap.pix(y + h, x + w) = color;
 }
 
 uint32_t stic_device::intv_get_pixel(bitmap_ind16 &bitmap, int x, int y)
 {
-	return GET_COLOR(bitmap.pix16(y * m_y_scale, x * m_x_scale));
+	return GET_COLOR(bitmap.pix(y * m_y_scale, x * m_x_scale));
 }
 
 void stic_device::intv_plot_box(bitmap_ind16 &bitmap, int x, int y, int w, int h, int color)

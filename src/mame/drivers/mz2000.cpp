@@ -183,8 +183,8 @@ uint32_t mz2000_state::screen_update_mz2000(screen_device &screen, bitmap_ind16 
 				pen |= ((gvram[count+0xc000] >> (xi)) & 1) ? 4 : 0; //G
 				pen &= m_gvram_mask;
 
-				bitmap.pix16(y*2+0, x+xi) = m_palette->pen(pen);
-				bitmap.pix16(y*2+1, x+xi) = m_palette->pen(pen);
+				bitmap.pix(y*2+0, x+xi) = m_palette->pen(pen);
+				bitmap.pix(y*2+1, x+xi) = m_palette->pen(pen);
 			}
 			count++;
 		}
@@ -224,27 +224,27 @@ uint32_t mz2000_state::screen_update_mz2000(screen_device &screen, bitmap_ind16 
 						{
 							if(m_width80 == 0)
 							{
-								bitmap.pix16(res_y, res_x*2+0) = m_palette->pen(pen);
-								bitmap.pix16(res_y, res_x*2+1) = m_palette->pen(pen);
+								bitmap.pix(res_y, res_x*2+0) = m_palette->pen(pen);
+								bitmap.pix(res_y, res_x*2+1) = m_palette->pen(pen);
 							}
 							else
 							{
-								bitmap.pix16(res_y, res_x) = m_palette->pen(pen);
+								bitmap.pix(res_y, res_x) = m_palette->pen(pen);
 							}
 						}
 						else
 						{
 							if(m_width80 == 0)
 							{
-								bitmap.pix16(res_y*2+0, res_x*2+0) = m_palette->pen(pen);
-								bitmap.pix16(res_y*2+0, res_x*2+1) = m_palette->pen(pen);
-								bitmap.pix16(res_y*2+1, res_x*2+0) = m_palette->pen(pen);
-								bitmap.pix16(res_y*2+1, res_x*2+1) = m_palette->pen(pen);
+								bitmap.pix(res_y*2+0, res_x*2+0) = m_palette->pen(pen);
+								bitmap.pix(res_y*2+0, res_x*2+1) = m_palette->pen(pen);
+								bitmap.pix(res_y*2+1, res_x*2+0) = m_palette->pen(pen);
+								bitmap.pix(res_y*2+1, res_x*2+1) = m_palette->pen(pen);
 							}
 							else
 							{
-								bitmap.pix16(res_y*2+0, res_x) = m_palette->pen(pen);
-								bitmap.pix16(res_y*2+1, res_x) = m_palette->pen(pen);
+								bitmap.pix(res_y*2+0, res_x) = m_palette->pen(pen);
+								bitmap.pix(res_y*2+1, res_x) = m_palette->pen(pen);
 							}
 						}
 					}

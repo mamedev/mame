@@ -1108,12 +1108,13 @@ void ay8910_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 		for (int chan = 0; chan < NUM_CHANNELS; chan++)
 		{
 			tone = &m_tone[chan];
-			tone->count++;
-			if (tone->count >= tone->period)
+			const int period = std::max<int>(1,tone->period);
+			tone->count += is_expanded_mode() ? 16 : 1;
+			while (tone->count >= period)
 			{
 				tone->duty_cycle = (tone->duty_cycle - 1) & 0x1f;
-				tone->output = (m_feature & PSG_HAS_EXPANDED_MODE) ? BIT(duty_cycle[tone_duty(tone)], tone->duty_cycle) : BIT(tone->duty_cycle, 0);
-				tone->count = 0;
+				tone->output = is_expanded_mode() ? BIT(duty_cycle[tone_duty(tone)], tone->duty_cycle) : BIT(tone->duty_cycle, 0);
+				tone->count -= period;
 			}
 		}
 
@@ -1124,8 +1125,9 @@ void ay8910_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 			 * channels.
 			 */
 			m_count_noise = 0;
+			m_prescale_noise ^= 1;
 
-			if (!m_prescale_noise)
+			if (!m_prescale_noise || is_expanded_mode()) // AY8930 noise generator rate is twice compares as compatibility mode
 			{
 				/* The Random Number Generator of the 8910 is a 17-bit shift */
 				/* register. The input to the shift register is bit0 XOR bit3 */
@@ -1134,9 +1136,7 @@ void ay8910_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 				// TODO : get actually algorithm for AY8930
 				m_rng ^= (((m_rng & 1) ^ ((m_rng >> 3) & 1)) << 17);
 				m_rng >>= 1;
-				m_prescale_noise = (m_feature & PSG_HAS_EXPANDED_MODE) ? 16 : 1;
 			}
-			m_prescale_noise--;
 		}
 
 		for (int chan = 0; chan < NUM_CHANNELS; chan++)
@@ -1336,7 +1336,7 @@ void ay8910_device::device_start()
 
 	/* The envelope is pacing twice as fast for the YM2149 as for the AY-3-8910,    */
 	/* This handled by the step parameter. Consequently we use a multipler of 2 here. */
-	m_channel = stream_alloc(0, m_streams, (m_feature & PSG_HAS_EXPANDED_MODE) ? master_clock * 2 : master_clock / 8);
+	m_channel = stream_alloc(0, m_streams, master_clock / 8);
 
 	ay_set_clock(master_clock);
 	ay8910_statesave();
@@ -1389,9 +1389,9 @@ void ay8910_device::ay_set_clock(int clock)
 {
 	// FIXME: this doesn't belong here, it should be an input pin exposed via devcb
 	if (((m_feature & PSG_PIN26_IS_CLKSEL) && (m_flags & YM2149_PIN26_LOW)) || (m_feature & PSG_HAS_INTERNAL_DIVIDER))
-		m_channel->set_sample_rate((m_feature & PSG_HAS_EXPANDED_MODE) ? clock : clock / 16);
+		m_channel->set_sample_rate(clock / 16);
 	else
-		m_channel->set_sample_rate((m_feature & PSG_HAS_EXPANDED_MODE) ? clock * 2 : clock / 8);
+		m_channel->set_sample_rate(clock / 8);
 }
 
 void ay8910_device::device_clock_changed()
@@ -1659,8 +1659,6 @@ void ay8910_device::set_type(psg_type_t psg_type)
 		m_par = &ym2149_param;
 		m_par_env = &ym2149_param_env;
 	}
-	if (m_feature & PSG_HAS_EXPANDED_MODE)
-		m_step *= 16;
 }
 
 DEFINE_DEVICE_TYPE(AY8912, ay8912_device, "ay8912", "AY-3-8912A PSG")

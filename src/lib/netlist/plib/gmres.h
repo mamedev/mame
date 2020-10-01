@@ -8,9 +8,9 @@
 /// \file gmres.h
 ///
 
-#include "mat_cr.h"
 #include "parray.h"
 #include "pconfig.h"
+#include "pmatrix_cr.h"
 #include "vector_ops.h"
 
 #include <algorithm>
@@ -33,11 +33,11 @@ namespace plib
 	template <typename FT, int SIZE>
 	struct mat_precondition_ILU
 	{
-		using mat_type = plib::pmatrix_cr_t<FT, SIZE>;
-		using matLU_type = plib::pLUmatrix_cr_t<mat_type>;
+		using mat_type = plib::pmatrix_cr<FT, SIZE>;
+		using matLU_type = plib::pLUmatrix_cr<mat_type>;
 
 		mat_precondition_ILU(std::size_t size, std::size_t ilu_scale = 4
-			, std::size_t bw = plib::pmatrix_cr_t<FT, SIZE>::FILL_INFINITY)
+			, std::size_t bw = plib::pmatrix_cr<FT, SIZE>::FILL_INFINITY)
 		: m_mat(narrow_cast<typename mat_type::index_type>(size))
 		, m_LU(narrow_cast<typename mat_type::index_type>(size))
 		, m_ILU_scale(narrow_cast<std::size_t>(ilu_scale))
@@ -167,7 +167,7 @@ namespace plib
 				v[i] = v[i] * m_diag[i];
 		}
 
-		plib::pmatrix_cr_t<FT, SIZE> m_mat;
+		plib::pmatrix_cr<FT, SIZE> m_mat;
 		plib::parray<FT, SIZE> m_diag;
 		plib::parray<std::vector<std::size_t>, SIZE > nzcol;
 	};
@@ -203,18 +203,22 @@ namespace plib
 			plib::unused_var(v);
 		}
 
-		plib::pmatrix_cr_t<FT, SIZE> m_mat;
+		plib::pmatrix_cr<FT, SIZE> m_mat;
 	};
 
 	// FIXME: hardcoding RESTART to 20 becomes an issue on very large
 	// systems.
 
-	template <typename FT, int SIZE, int RESTART = 16>
+	template <typename FT, int SIZE, int RESTARTMAX = 16>
 	struct gmres_t
 	{
 	public:
 
 		using float_type = FT;
+
+		//constexpr static int RESTART = RESTARTMAX;
+		constexpr static const int RESTART = (SIZE > 0) ? ((SIZE < RESTARTMAX) ? SIZE : RESTARTMAX)
+			: ((SIZE < 0) ? ((-SIZE < RESTARTMAX) ? -SIZE : RESTARTMAX) : RESTARTMAX);
 
 		explicit gmres_t(std::size_t size)
 			: residual(size)
@@ -226,82 +230,7 @@ namespace plib
 			{
 			}
 
-		void givens_mult( const FT c, const FT s, FT & g0, FT & g1 )
-		{
-			const FT g0_last(g0);
-
-			g0 = c * g0 - s * g1;
-			g1 = s * g0_last + c * g1;
-		}
-
 		std::size_t size() const { return (SIZE<=0) ? m_size : narrow_cast<std::size_t>(SIZE); }
-
-		template <int k, typename OPS, typename VT>
-		bool do_k(OPS &ops, VT &x, std::size_t &itr_used, FT rho_delta, bool dummy)
-		{
-			plib::unused_var(dummy);
-			if (do_k<k-1, OPS>(ops, x, itr_used, rho_delta, do_khelper<k-1>::value))
-				return true;
-
-			const std::size_t kp1 = k + 1;
-			const    std::size_t n = size();
-
-			ops.calc_rhs(m_v[kp1], m_v[k]);
-			ops.solve_inplace(m_v[kp1]);
-
-			for (std::size_t j = 0; j <= k; j++)
-			{
-				m_ht[j][k] = vec_mult<FT>(n, m_v[kp1], m_v[j]);
-				vec_add_mult_scalar(n, m_v[kp1], m_v[j], -m_ht[j][k]);
-			}
-			m_ht[kp1][k] = plib::sqrt(vec_mult2<FT>(n, m_v[kp1]));
-
-			// FIXME: comparison to zero
-			if (m_ht[kp1][k] != plib::constants<FT>::zero())
-				vec_scale(n, m_v[kp1], reciprocal(m_ht[kp1][k]));
-
-			for (std::size_t j = 0; j < k; j++)
-				givens_mult(m_c[j], m_s[j], m_ht[j][k], m_ht[j+1][k]);
-
-			const float_type mu = reciprocal(plib::hypot(m_ht[k][k], m_ht[kp1][k]));
-
-			m_c[k] = m_ht[k][k] * mu;
-			m_s[k] = -m_ht[kp1][k] * mu;
-			m_ht[k][k] = m_c[k] * m_ht[k][k] - m_s[k] * m_ht[kp1][k];
-			m_ht[kp1][k] = plib::constants<FT>::zero();
-
-			givens_mult(m_c[k], m_s[k], m_g[k], m_g[kp1]);
-
-			FT rho = plib::abs(m_g[kp1]);
-
-			// FIXME ..
-			itr_used = itr_used + 1;
-
-			if (rho <= rho_delta || k == RESTART-1)
-			{
-				// Solve the system H * y = g
-				// x += m_v[j] * m_y[j]
-				for (std::size_t i = k + 1; i-- > 0;)
-				{
-					auto tmp(m_g[i]);
-					for (std::size_t j = i + 1; j <= k; j++)
-						tmp -= m_ht[i][j] * m_y[j];
-					m_y[i] = tmp / m_ht[i][i];
-				}
-
-				for (std::size_t i = 0; i <= k; i++)
-					vec_add_mult_scalar(n, x, m_v[i], m_y[i]);
-				return true;
-			}
-			return false;
-		}
-
-		template <int k, typename OPS, typename VT>
-		bool do_k(OPS &ops, VT &x, std::size_t &itr_used, FT rho_delta, float dummy)
-		{
-			plib::unused_var(ops, x, itr_used, rho_delta, dummy);
-			return false;
-		}
 
 		template <typename OPS, typename VT, typename VRHS>
 		std::size_t solve(OPS &ops, VT &x, const VRHS & rhs, const std::size_t itr_max, float_type accuracy)
@@ -348,18 +277,22 @@ namespace plib
 				// differently: The invest doesn't pay off.
 				//
 
-				vec_set_scalar(n, residual, accuracy);
+				vec_set_scalar(residual, accuracy);
 				ops.calc_rhs(Ax, residual);
 
 				ops.solve_inplace(Ax);
 
-				const float_type rho_to_accuracy = plib::sqrt(vec_mult2<FT>(n, Ax)) / accuracy;
+				const float_type rho_to_accuracy = plib::sqrt(vec_mult2<FT>(Ax)) / accuracy;
 
 				rho_delta = accuracy * rho_to_accuracy;
 			}
 			else
+				//rho_delta = accuracy * plib::sqrt(vec_mult2<FT>(n, rhs))
+				//      + 1e-4 * std::sqrt(n);
 				rho_delta = accuracy * plib::sqrt(narrow_cast<FT>(n));
 
+			//
+			// LU x = b; solve for x;
 			//
 			// Using
 			//
@@ -368,9 +301,6 @@ namespace plib
 			//
 			// to get a starting point for x degrades convergence speed compared
 			// to using the last solution for x.
-			//
-			// LU x = b; solve for x;
-			//
 
 			while (itr_used < itr_max)
 			{
@@ -378,11 +308,11 @@ namespace plib
 
 				ops.calc_rhs(Ax, x);
 
-				vec_sub(n, residual, rhs, Ax);
+				vec_sub(residual, rhs, Ax);
 
 				ops.solve_inplace(residual);
 
-				rho = plib::sqrt(vec_mult2<FT>(n, residual));
+				rho = plib::sqrt(vec_mult2<FT>(residual));
 
 				if (rho < rho_delta)
 					return itr_used + 1;
@@ -391,10 +321,10 @@ namespace plib
 				// on some systems / compiler versions. Issue reported by
 				// AJR, no details known yet.
 
-				vec_set_scalar(RESTART+1, m_g, +constants<FT>::zero());
+				vec_set_scalar(m_g, +constants<FT>::zero());
 				m_g[0] = rho;
 
-				vec_mult_scalar(n, m_v[0], residual, reciprocal(rho));
+				vec_mult_scalar(m_v[0], residual, plib::reciprocal(rho));
 
 				if (do_k<RESTART-1>(ops, x, itr_used, rho_delta, true))
 					// converged
@@ -404,6 +334,83 @@ namespace plib
 		}
 
 	private:
+
+		static void givens_mult(FT c, FT s, FT & g0, FT & g1 )
+		{
+			const FT g0_last(g0);
+
+			g0 = c * g0 - s * g1;
+			g1 = s * g0_last + c * g1;
+		}
+
+		template <int k, typename OPS, typename VT>
+		bool do_k(OPS &ops, VT &x, std::size_t &itr_used, FT rho_delta, bool dummy)
+		{
+			plib::unused_var(dummy);
+			if (do_k<k-1, OPS>(ops, x, itr_used, rho_delta, do_khelper<k-1>::value))
+				return true;
+
+			constexpr const std::size_t kp1 = k + 1;
+			//const    std::size_t n = size();
+
+			ops.calc_rhs(m_v[kp1], m_v[k]);
+			ops.solve_inplace(m_v[kp1]);
+
+			for (std::size_t j = 0; j <= k; j++)
+			{
+				m_ht[j][k] = vec_mult<FT>(m_v[kp1], m_v[j]);
+				vec_add_mult_scalar(m_v[kp1], m_v[j], -m_ht[j][k]);
+			}
+			m_ht[kp1][k] = plib::sqrt(vec_mult2<FT>(m_v[kp1]));
+
+			// FIXME: comparison to zero
+			if (m_ht[kp1][k] != plib::constants<FT>::zero())
+				vec_scale(m_v[kp1], reciprocal(m_ht[kp1][k]));
+
+			for (std::size_t j = 0; j < k; j++)
+				givens_mult(m_c[j], m_s[j], m_ht[j][k], m_ht[j+1][k]);
+
+			const float_type mu = reciprocal(plib::hypot(m_ht[k][k], m_ht[kp1][k]));
+
+			m_c[k] = m_ht[k][k] * mu;
+			m_s[k] = -m_ht[kp1][k] * mu;
+			m_ht[k][k] = m_c[k] * m_ht[k][k] - m_s[k] * m_ht[kp1][k];
+			m_ht[kp1][k] = plib::constants<FT>::zero();
+
+			givens_mult(m_c[k], m_s[k], m_g[k], m_g[kp1]);
+
+			const float_type  rho = plib::abs(m_g[kp1]);
+
+			// FIXME ..
+			itr_used = itr_used + 1;
+
+			if (rho <= rho_delta || k == RESTART-1)
+			{
+				// Solve the system H * y = g
+				// x += m_v[j] * m_y[j]
+				for (std::size_t i = k + 1; i-- > 0;)
+				{
+					auto tmp(m_g[i]);
+					const auto htii=plib::reciprocal(m_ht[i][i]);
+					for (std::size_t j = i + 1; j <= k; j++)
+						tmp -= m_ht[i][j] * m_y[j];
+					m_y[i] = tmp * htii;
+					vec_add_mult_scalar(x, m_v[i], m_y[i]);
+				}
+
+				//for (std::size_t i = 0; i <= k; i++)
+				//  vec_add_mult_scalar(n, x, m_v[i], m_y[i]);
+				return true;
+			}
+			return false;
+		}
+
+		template <int k, typename OPS, typename VT>
+		bool do_k(OPS &ops, VT &x, std::size_t &itr_used, FT rho_delta, float dummy)
+		{
+			plib::unused_var(ops, x, itr_used, rho_delta, dummy);
+			return false;
+		}
 
 		plib::parray<float_type, SIZE> residual;
 		plib::parray<float_type, SIZE> Ax;

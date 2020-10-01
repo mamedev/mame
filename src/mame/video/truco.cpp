@@ -42,7 +42,7 @@ uint32_t truco_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 		{
 			int const pixel = (videoram[x >> 1] >> ((x & 1) ? 0 : 4)) & 0x0f;
 
-			bitmap.pix32(y, x) = m_palette->pen(pixel);
+			bitmap.pix(y, x) = m_palette->pen(pixel);
 		}
 
 		videoram += 0x80;

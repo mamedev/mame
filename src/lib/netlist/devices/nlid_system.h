@@ -196,10 +196,10 @@ namespace devices
 	/// Consider the following mixing stage
 	///
 	///                 R1
-	///      S1 >-----1RRRR2---------+
+	///      I1 >-----1RRRR2---------+
 	///                              |
 	///                 R2           |
-	///      S2 >-----1RRRR2---------+----------> Out
+	///      I2 >-----1RRRR2---------+----------> Out
 	///                              |
 	///                              R
 	///                           R3 R
@@ -207,45 +207,37 @@ namespace devices
 	///                              |
 	///                             GND
 	///
-	/// With OPTIMIZE_FRONTIER(R2.2, R3, R2) this becomes:
+	/// With OPTIMIZE_FRONTIER(R2.1, R2, RX) where RX is the impedance of the
+	/// output connected to I2 this becomes:
 	///
 	///                 R1
-	///      S1 >-----1RRRR2--------------------------------+
+	///      I1 >-----1RRRR2--------------------------------+
 	///                                                     |
-	///                       ##########################    |
-	///                 R2    #                    R2  #    |
-	///      S2 >-----1RRRR2-----+-->AnIn AnOut>--RRRR------+----------> Out
-	///                       #  |                     #    |
-	///                       #  R                     #    R
-	///                       #  R R3                  # R3 R
-	///                       #  R                     #    R
-	///                       #  |                     #    |
-	///                       # GND          Frontier  #   GND
-	///                       #                        #
-	///                       ##########################
+	///               ##########################            |
+	///               #                  RX    #     R2     |
+	///      I2 >----->--+-AnIn AnOut>--RRRR--->---1RRRR2---+----------> Out
+	///               #  |                     #            |
+	///               #  R                     #            R
+	///               #  R R2                  #         R3 R
+	///               #  R                     #            R
+	///               #  |                     #            |
+	///               # GND          Frontier  #           GND
+	///               #                        #
+	///               ##########################
 	///
 	/// As a result, provided there are no other connections between the parts
 	/// generating S1 and S2 the "S2 part" will now have a separate solver.
 	///
-	/// The size (aka number of nets) of the solver for S1 will be smaller.
-	/// The size of the solver for S2 and the rest of the circuit will be smaller
+	/// The size (aka number of nets) of the solver for I1 will be smaller.
+	/// The size of the solver for I2 and the rest of the circuit will be smaller
 	/// as well.
-	///
-	///
-	///
-	///
-	///
-	///
-	///
-	///
-	///
 	///
 
 	NETLIB_OBJECT(frontier)
 	{
 		NETLIB_CONSTRUCTOR(frontier)
-		, m_RIN(*this, "m_RIN", NETLIB_DELEGATE(input))
-		, m_ROUT(*this, "m_ROUT", NETLIB_DELEGATE(input))
+		, m_RIN(*this, "m_RIN", NETLIB_DELEGATE(input)) // FIXME: does not look right
+		, m_ROUT(*this, "m_ROUT", NETLIB_DELEGATE(input)) // FIXME: does not look right
 		, m_I(*this, "_I", NETLIB_DELEGATE(input))
 		, m_Q(*this, "_Q")
 		, m_p_RIN(*this, "RIN", nlconst::magic(1.0e6))
@@ -264,6 +256,7 @@ namespace devices
 	private:
 		NETLIB_RESETI()
 		{
+			//printf("%s: in %f out %f\n", name().c_str(), m_p_RIN(), m_p_ROUT());
 			m_RIN.set_G_V_I(plib::reciprocal(m_p_RIN()),0,0);
 			m_ROUT.set_G_V_I(plib::reciprocal(m_p_ROUT()),0,0);
 		}
@@ -566,7 +559,7 @@ namespace devices
 	private:
 		NETLIB_HANDLERI(input)
 		{
-			nl_fptype val = m_dis.var()(m_mt.var());
+			nl_fptype val = m_dis()(m_mt());
 			m_T.change_state([this, val]()
 			{
 				m_T.set_G_V_I(plib::reciprocal(m_RI()), val, nlconst::zero());

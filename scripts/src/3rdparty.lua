@@ -1390,6 +1390,12 @@ end
 		end
 	end
 
+	if _OPTIONS["targetos"]=="freebsd" then
+		buildoptions {
+			backtick(pkgconfigcmd() .. " --cflags gl")
+		}
+	end
+
 	defines {
 		"__STDC_LIMIT_MACROS",
 		"__STDC_FORMAT_MACROS",

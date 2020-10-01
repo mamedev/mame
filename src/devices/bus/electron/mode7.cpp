@@ -195,7 +195,7 @@ void electron_mode7_device::expbus_w(offs_t offset, uint8_t data)
 
 MC6845_UPDATE_ROW(electron_mode7_device::crtc_update_row)
 {
-	uint32_t* p = &bitmap.pix32(y);
+	uint32_t* p = &bitmap.pix(y);
 
 	m_trom->lose_w(1);
 	m_trom->lose_w(0);

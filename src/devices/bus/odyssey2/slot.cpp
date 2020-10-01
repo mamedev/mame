@@ -50,7 +50,7 @@ device_o2_cart_interface::~device_o2_cart_interface()
 //-------------------------------------------------
 //  o2_cart_slot_device - constructor
 //-------------------------------------------------
-o2_cart_slot_device::o2_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+o2_cart_slot_device::o2_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, O2_CART_SLOT, tag, owner, clock)
 	, device_image_interface(mconfig, *this)
 	, device_single_card_slot_interface<device_o2_cart_interface>(mconfig, *this)
@@ -148,7 +148,7 @@ image_init_result o2_cart_slot_device::call_load()
 		}
 		else
 		{
-			uint32_t size = length();
+			u32 size = length();
 			fread(m_cart->m_rom, size);
 
 			m_type = (size == 0x4000) ? O2_RALLY : O2_STD;
@@ -174,7 +174,7 @@ std::string o2_cart_slot_device::get_default_card_software(get_default_card_soft
 	if (hook.image_file())
 	{
 		const char *slot_string;
-		uint32_t size = hook.image_file()->size();
+		u32 size = hook.image_file()->size();
 		int type = (size == 0x4000) ? O2_RALLY : O2_STD;
 		slot_string = o2_get_slot(type);
 
@@ -190,7 +190,7 @@ std::string o2_cart_slot_device::get_default_card_software(get_default_card_soft
  read_rom**
  -------------------------------------------------*/
 
-uint8_t o2_cart_slot_device::read_rom04(offs_t offset)
+u8 o2_cart_slot_device::read_rom04(offs_t offset)
 {
 	if (m_cart)
 		return m_cart->read_rom04(offset);
@@ -198,7 +198,7 @@ uint8_t o2_cart_slot_device::read_rom04(offs_t offset)
 		return 0xff;
 }
 
-uint8_t o2_cart_slot_device::read_rom0c(offs_t offset)
+u8 o2_cart_slot_device::read_rom0c(offs_t offset)
 {
 	if (m_cart)
 		return m_cart->read_rom0c(offset);
@@ -210,13 +210,13 @@ uint8_t o2_cart_slot_device::read_rom0c(offs_t offset)
  io
  -------------------------------------------------*/
 
-void o2_cart_slot_device::io_write(offs_t offset, uint8_t data)
+void o2_cart_slot_device::io_write(offs_t offset, u8 data)
 {
 	if (m_cart)
 		m_cart->io_write(offset, data);
 }
 
-uint8_t o2_cart_slot_device::io_read(offs_t offset)
+u8 o2_cart_slot_device::io_read(offs_t offset)
 {
 	if (m_cart)
 		return m_cart->io_read(offset);

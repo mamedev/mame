@@ -719,36 +719,30 @@ void valtric_state::draw_mosaic(screen_device &screen, bitmap_rgb32 &bitmap, con
 	else
 	{
 		m_bg_tilemap[1]->draw(screen, m_mosaicbitmap, cliprect, 0, 0);
-		{
-			int step=m_mosaic;
-			u32 *dest;
-			int x,y,xx,yy,c=0;
-			int width = screen.width();
-			int height = screen.height();
+		int step=m_mosaic;
+		int c=0;
+		int width = screen.width();
+		int height = screen.height();
 
-			if (m_mosaic<0)step*=-1;
+		if (m_mosaic<0)step*=-1;
 
-			for (y=0;y<width+step;y+=step)
-				for (x=0;x<height+step;x+=step)
-				{
-					if (y < height && x < width)
-						c=m_mosaicbitmap.pix32(y, x);
+		for (int y=0;y<width+step;y+=step)
+			for (int x=0;x<height+step;x+=step)
+			{
+				if (y < height && x < width)
+					c=m_mosaicbitmap.pix(y, x);
 
-					if (m_mosaic<0)
-						if (y+step-1<height && x+step-1< width)
-							c = m_mosaicbitmap.pix32(y+step-1, x+step-1);
+				if (m_mosaic<0)
+					if (y+step-1<height && x+step-1< width)
+						c = m_mosaicbitmap.pix(y+step-1, x+step-1);
 
-					for (yy=0;yy<step;yy++)
-						for (xx=0;xx<step;xx++)
-						{
-							if (xx+x < width && yy+y<height)
-							{
-								dest=&bitmap.pix32(y+yy, x+xx);
-								*dest=c;
-							}
-						}
-				}
-		}
+				for (int yy=0;yy<step;yy++)
+					for (int xx=0;xx<step;xx++)
+					{
+						if (xx+x < width && yy+y<height)
+							bitmap.pix(y+yy, x+xx) = c;
+					}
+			}
 	}
 }
 #else
@@ -761,33 +755,27 @@ void valtric_state::draw_mosaic(screen_device &screen, bitmap_rgb32 &bitmap, con
 	else
 	{
 		m_bg_tilemap[1]->draw(screen, m_mosaicbitmap, cliprect, 0, 0);
-		{
-			u32 *dest;
-			int x,y,xx,yy,c=0;
-			int width = screen.width();
-			int height = screen.height();
+		int c=0;
+		int width = screen.width();
+		int height = screen.height();
 
-			for (y = 0; y < width+step; y += step)
-				for (x = 0; x < height+step; x += step)
-				{
-					if (y < height && x < width)
-						c = m_mosaicbitmap.pix32(y, x);
+		for (int y = 0; y < width+step; y += step)
+			for (int x = 0; x < height+step; x += step)
+			{
+				if (y < height && x < width)
+					c = m_mosaicbitmap.pix(y, x);
 
-					if (m_valtric_mosaic & 0x80)
-						if (y+step-1 < height && x+step-1 < width)
-							c = m_mosaicbitmap.pix32(y+step-1, x+step-1);
+				if (m_valtric_mosaic & 0x80)
+					if (y+step-1 < height && x+step-1 < width)
+						c = m_mosaicbitmap.pix(y+step-1, x+step-1);
 
-					for (yy = 0; yy < step; yy++)
-						for (xx = 0; xx < step; xx++)
-						{
-							if (xx+x < width && yy+y < height)
-							{
-								dest = &bitmap.pix32(y+yy, x+xx);
-								*dest = c;
-							}
-						}
-				}
-		}
+				for (int yy = 0; yy < step; yy++)
+					for (int xx = 0; xx < step; xx++)
+					{
+						if (xx+x < width && yy+y < height)
+							bitmap.pix(y+yy, x+xx) = c;
+					}
+			}
 	}
 }
 #endif

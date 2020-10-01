@@ -1,11 +1,11 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 
-#ifndef MAT_CR_H_
-#define MAT_CR_H_
+#ifndef PMATRIX_CR_H_
+#define PMATRIX_CR_H_
 
 ///
-/// \file mat_cr.h
+/// \file pmatrix_cr.h
 ///
 /// Compressed row format matrices
 ///
@@ -16,9 +16,7 @@
 #include "pmath.h"
 #include "pmatrix2d.h"
 #include "pomp.h"
-#include "pstate.h"
 #include "ptypes.h"
-#include "putil.h"
 
 #include <algorithm>
 #include <array>
@@ -29,7 +27,7 @@ namespace plib
 {
 
 	template<typename T, int N, typename C = uint16_t>
-	struct pmatrix_cr_t
+	struct pmatrix_cr
 	{
 		using index_type = C;
 		using value_type = T;
@@ -37,7 +35,7 @@ namespace plib
 		static constexpr const int NSQ = (N < 0 ? -N * N : N * N);
 		static constexpr const int Np1 = (N == 0) ? 0 : (N < 0 ? N - 1 : N + 1);
 
-		PCOPYASSIGNMOVE(pmatrix_cr_t, default)
+		PCOPYASSIGNMOVE(pmatrix_cr, default)
 
 		enum constants_e
 		{
@@ -56,7 +54,7 @@ namespace plib
 		// NOLINTNEXTLINE
 		std::size_t nz_num;
 
-		explicit pmatrix_cr_t(std::size_t n)
+		explicit pmatrix_cr(std::size_t n)
 		: diag(n)
 		, row_idx(n+1)
 		, col_idx(n*n)
@@ -72,7 +70,7 @@ namespace plib
 			}
 		}
 
-		~pmatrix_cr_t() = default;
+		~pmatrix_cr() = default;
 
 		constexpr std::size_t size() const noexcept { return (N>0) ? narrow_cast<std::size_t>(N) : m_size; }
 
@@ -149,17 +147,10 @@ namespace plib
 
 			for (std::size_t k=0; k < size(); k++)
 			{
-#if 0
-				for (std::size_t j=k + 1; j < size(); j++)
-					if (f[j][k] < FILL_INFINITY)
-						m_nzbd[k].push_back(narrow_cast<C>(j));
-				m_nzbd[k].push_back(0); // end of sequence
-#else
 				for (std::size_t j=k + 1; j < size(); j++)
 					if (f[j][k] < FILL_INFINITY)
 						m_nzbd.set(k, m_nzbd.colcount(k), narrow_cast<C>(j));
 				m_nzbd.set(k, m_nzbd.colcount(k), 0); // end of sequence
-#endif
 			}
 
 		}
@@ -169,17 +160,6 @@ namespace plib
 		{
 
 			// res = A * x
-#if 0
-			//plib::omp::set_num_threads(4);
-			plib::omp::for_static(0, constants<std::size_t>::zero(), m_size, [this, &res, &x](std::size_t row)
-			{
-				T tmp(0.0);
-				const std::size_t e(row_idx[row+1]);
-				for (std::size_t k = row_idx[row]; k < e; k++)
-					tmp += A[k] * x[col_idx[k]];
-				res[row] = tmp;
-			});
-#else
 			// this is a bit faster than the version above
 			std::size_t row = 0;
 			std::size_t k = 0;
@@ -192,7 +172,6 @@ namespace plib
 					tmp += A[k] * x[col_idx[k]];
 				res[row++] = tmp;
 			}
-#endif
 		}
 
 		// throws error if P(source)>P(destination)
@@ -262,19 +241,19 @@ namespace plib
 	};
 
 	template<typename B>
-	struct pGEmatrix_cr_t : public B
+	struct pGEmatrix_cr : public B
 	{
 		using base = B;
 		using index_type = typename base::index_type;
 
-		PCOPYASSIGNMOVE(pGEmatrix_cr_t, default)
+		PCOPYASSIGNMOVE(pGEmatrix_cr, default)
 
-		explicit pGEmatrix_cr_t(std::size_t n)
+		explicit pGEmatrix_cr(std::size_t n)
 		: B(n)
 		{
 		}
 
-		~pGEmatrix_cr_t() = default;
+		~pGEmatrix_cr() = default;
 
 		template <typename M>
 		std::pair<std::size_t, std::size_t> gaussian_extend_fill_mat(M &fill)
@@ -496,21 +475,21 @@ namespace plib
 	};
 
 	template<typename B>
-	struct pLUmatrix_cr_t : public B
+	struct pLUmatrix_cr : public B
 	{
 		using base = B;
 		using index_type = typename base::index_type;
 
-		PCOPYASSIGNMOVE(pLUmatrix_cr_t, default)
+		PCOPYASSIGNMOVE(pLUmatrix_cr, default)
 
-		explicit pLUmatrix_cr_t(std::size_t n)
+		explicit pLUmatrix_cr(std::size_t n)
 		: B(n)
 		, ilu_rows(n+1)
 		, m_ILUp(0)
 		{
 		}
 
-		~pLUmatrix_cr_t() = default;
+		~pLUmatrix_cr() = default;
 
 		template <typename M>
 		void build(M &fill, std::size_t ilup)
@@ -653,4 +632,4 @@ namespace plib
 
 } // namespace plib
 
-#endif // MAT_CR_H_
+#endif // PMATRIX_CR_H_

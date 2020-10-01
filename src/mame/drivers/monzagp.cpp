@@ -247,9 +247,9 @@ uint32_t monzagp_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 			}
 
 			if (cliprect.contains(x * 2, y))
-				bitmap.pix16(y, x * 2) = color;
+				bitmap.pix(y, x * 2) = color;
 			if (cliprect.contains(x * 2 + 1, y))
-				bitmap.pix16(y, x * 2 + 1) = color;
+				bitmap.pix(y, x * 2 + 1) = color;
 
 			// collisions
 			uint8_t coll_prom_addr = bitswap<8>(tile_idx, 7, 6, 5, 4, 2, 0, 1, 3);

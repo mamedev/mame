@@ -599,7 +599,7 @@ uint32_t spinb_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 		for (uint8_t y = 0; y < 32; y++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix(sy++);
 			for (uint16_t x = 0; x < 16; x++)
 			{
 				uint8_t const gfx = m_dmdram[ma+0x200];
@@ -622,7 +622,7 @@ uint32_t spinb_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 		for (uint8_t y = 0; y < 32; y++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix(sy++);
 			for (uint16_t x = 0; x < 16; x++)
 			{
 				uint8_t const gfx = m_dmdram[ma++];

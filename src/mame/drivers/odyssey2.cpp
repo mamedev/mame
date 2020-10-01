@@ -78,8 +78,8 @@ TODO:
 - 4in1 and musician are not supposed to work on g7400, but work fine on MAME,
   caused by bus conflict or because they write to P2?
 - verify odyssey3 cpu/video clocks
-- odyssey3 keyboard layout is not the same as g7400, but there is no software
-  to test the scancodes
+- problems with natural keyboard: videopacp has two enter keys, odyssey3 has
+  alternate inputs for -, =, +
 - partial screen updates aren't shown when using MAME's debugger, this is caused
   by a forced full screen update and a reset_partial_updates in emu/video.cpp.
   For the same reason, collision detection also won't work properly when stepping
@@ -142,9 +142,9 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<o2_cart_slot_device> m_cart;
 
-	uint8_t m_ram[0x80];
-	uint8_t m_p1 = 0xff;
-	uint8_t m_p2 = 0xff;
+	u8 m_ram[0x80];
+	u8 m_p1 = 0xff;
+	u8 m_p2 = 0xff;
 
 	DECLARE_READ_LINE_MEMBER(t1_read);
 
@@ -156,21 +156,21 @@ protected:
 	required_ioport_array<8> m_keyboard;
 	required_ioport_array<2> m_joysticks;
 
-	virtual uint8_t io_read(offs_t offset);
-	virtual void io_write(offs_t offset, uint8_t data);
-	uint8_t bus_read();
-	void p1_write(uint8_t data);
-	uint8_t p2_read();
-	void p2_write(uint8_t data);
+	virtual u8 io_read(offs_t offset);
+	virtual void io_write(offs_t offset, u8 data);
+	u8 bus_read();
+	void p1_write(u8 data);
+	u8 p2_read();
+	void p2_write(u8 data);
 
 private:
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-class videopacp_state : public odyssey2_state
+class vpp_state : public odyssey2_state
 {
 public:
-	videopacp_state(const machine_config &mconfig, device_type type, const char *tag) :
+	vpp_state(const machine_config &mconfig, device_type type, const char *tag) :
 		odyssey2_state(mconfig, type, tag),
 		m_i8243(*this, "i8243"),
 		m_ef934x(*this, "ef934x")
@@ -183,26 +183,26 @@ public:
 protected:
 	virtual void machine_start() override;
 
-	virtual uint8_t io_read(offs_t offset) override;
-	virtual void io_write(offs_t offset, uint8_t data) override;
+	virtual u8 io_read(offs_t offset) override;
+	virtual void io_write(offs_t offset, u8 data) override;
 
 private:
 	required_device<i8243_device> m_i8243;
 	required_device<ef9340_1_device> m_ef934x;
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void p2_write(uint8_t data);
-	uint8_t io_vpp(offs_t offset, uint8_t data);
-	template<int P> void i8243_port_w(uint8_t data);
+	void p2_write(u8 data);
+	u8 io_vpp(offs_t offset, u8 data);
+	template<int P> void i8243_port_w(u8 data);
 
 	inline offs_t ef934x_extram_address(offs_t offset);
-	uint8_t ef934x_extram_r(offs_t offset);
-	void ef934x_extram_w(offs_t offset, uint8_t data);
+	u8 ef934x_extram_r(offs_t offset);
+	void ef934x_extram_w(offs_t offset, u8 data);
 
-	uint8_t m_mix_i8244 = 0xff;
-	uint8_t m_mix_ef934x = 0xff;
-	uint8_t m_ef934x_extram[0x800];
+	u8 m_mix_i8244 = 0xff;
+	u8 m_mix_ef934x = 0xff;
+	u8 m_ef934x_extram[0x800];
 };
 
 void odyssey2_state::machine_start()
@@ -214,7 +214,7 @@ void odyssey2_state::machine_start()
 	save_item(NAME(m_p2));
 }
 
-void videopacp_state::machine_start()
+void vpp_state::machine_start()
 {
 	odyssey2_state::machine_start();
 	memset(m_ef934x_extram, 0, sizeof(m_ef934x_extram));
@@ -259,7 +259,7 @@ void odyssey2_state::odyssey2_palette(palette_device &palette) const
 }
 
 
-uint32_t odyssey2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 odyssey2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_i8244->screen_update(screen, bitmap, cliprect);
 
@@ -268,12 +268,12 @@ uint32_t odyssey2_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	// apply external LUM setting
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
-			bitmap.pix16(y, x) |= lum;
+			bitmap.pix(y, x) |= lum;
 
 	return 0;
 }
 
-uint32_t videopacp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 vpp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	u8 lum = ~m_p1 >> 4 & 0x08;
 	bitmap_ind16 *ef934x_bitmap = m_ef934x->get_bitmap();
@@ -288,8 +288,8 @@ uint32_t videopacp_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 
 		for (int x = clip.min_x; x <= clip.max_x; x++)
 		{
-			uint16_t d = bitmap.pix16(y, x) & 7;
-			uint16_t e = ef934x_bitmap->pix16(y, x);
+			u16 d = bitmap.pix(y, x) & 7;
+			u16 e = ef934x_bitmap->pix(y, x);
 
 			// i8244 decoder enable is masked with cartridge pin B
 			bool en = (e & 8) || !m_cart->b_read();
@@ -302,12 +302,12 @@ uint32_t videopacp_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 			if (en && BIT(m_mix_i8244, d))
 			{
 				// Use i8245 input
-				bitmap.pix16(y, x) |= lum;
+				bitmap.pix(y, x) |= lum;
 			}
 			else
 			{
 				// Use EF934x input
-				bitmap.pix16(y, x) = e | (i2 ? 8 : 0);
+				bitmap.pix(y, x) = e | (i2 ? 8 : 0);
 			}
 		}
 	}
@@ -321,7 +321,7 @@ uint32_t videopacp_state::screen_update(screen_device &screen, bitmap_ind16 &bit
     I/O
 ******************************************************************************/
 
-uint8_t odyssey2_state::io_read(offs_t offset)
+u8 odyssey2_state::io_read(offs_t offset)
 {
 	u8 data = m_cart->io_read(offset);
 	if (!(m_p1 & 0x10) && ~offset & 0x80)
@@ -333,7 +333,7 @@ uint8_t odyssey2_state::io_read(offs_t offset)
 	return data;
 }
 
-void odyssey2_state::io_write(offs_t offset, uint8_t data)
+void odyssey2_state::io_write(offs_t offset, u8 data)
 {
 	if (!(m_p1 & 0x40))
 	{
@@ -349,7 +349,7 @@ void odyssey2_state::io_write(offs_t offset, uint8_t data)
 
 // 8048 ports
 
-void odyssey2_state::p1_write(uint8_t data)
+void odyssey2_state::p1_write(u8 data)
 {
 	// LUM changed
 	if ((m_p1 ^ data) & 0x80)
@@ -359,7 +359,7 @@ void odyssey2_state::p1_write(uint8_t data)
 	m_cart->write_p1(m_p1 & 0x13);
 }
 
-uint8_t odyssey2_state::p2_read()
+u8 odyssey2_state::p2_read()
 {
 	u8 data = 0xff;
 
@@ -374,13 +374,13 @@ uint8_t odyssey2_state::p2_read()
 	return data;
 }
 
-void odyssey2_state::p2_write(uint8_t data)
+void odyssey2_state::p2_write(u8 data)
 {
 	m_p2 = data;
 	m_cart->write_p2(m_p2 & 0x0f);
 }
 
-uint8_t odyssey2_state::bus_read()
+u8 odyssey2_state::bus_read()
 {
 	u8 data = 0xff;
 
@@ -402,40 +402,40 @@ READ_LINE_MEMBER(odyssey2_state::t1_read)
 
 // G7400-specific
 
-uint8_t videopacp_state::io_read(offs_t offset)
+u8 vpp_state::io_read(offs_t offset)
 {
 	u8 data = odyssey2_state::io_read(offset);
 	return io_vpp(offset, data);
 }
 
-void videopacp_state::io_write(offs_t offset, uint8_t data)
+void vpp_state::io_write(offs_t offset, u8 data)
 {
 	odyssey2_state::io_write(offset, data);
 	io_vpp(offset, data);
 }
 
-uint8_t videopacp_state::io_vpp(offs_t offset, uint8_t data)
+u8 vpp_state::io_vpp(offs_t offset, u8 data)
 {
 	if (!(m_p1 & 0x20))
 	{
 		// A2 to R/W pin
 		if (offset & 4)
-			data &= m_ef934x->ef9341_read( offset & 0x02, offset & 0x01 );
+			data &= m_ef934x->ef9341_read(offset & 0x02, offset & 0x01);
 		else
-			m_ef934x->ef9341_write( offset & 0x02, offset & 0x01, data );
+			m_ef934x->ef9341_write(offset & 0x02, offset & 0x01, data);
 	}
 
 	return data;
 }
 
-void videopacp_state::p2_write(uint8_t data)
+void vpp_state::p2_write(u8 data)
 {
 	odyssey2_state::p2_write(data);
 	m_i8243->p2_w(m_p2 & 0x0f);
 }
 
 template<int P>
-void videopacp_state::i8243_port_w(uint8_t data)
+void vpp_state::i8243_port_w(u8 data)
 {
 	// P4,P5: color mix I8244 side (IC674)
 	// P6,P7: color mix EF9340 side (IC678)
@@ -457,7 +457,7 @@ void videopacp_state::i8243_port_w(uint8_t data)
 
 // EF9341 extended RAM
 
-offs_t videopacp_state::ef934x_extram_address(offs_t offset)
+offs_t vpp_state::ef934x_extram_address(offs_t offset)
 {
 	u8 latch = (offset >> 12 & 0x80) | (offset >> 4 & 0x7f);
 	u16 address = (latch & 0x1f) | (offset << 9 & 0x200) | (latch << 3 & 0x400);
@@ -468,12 +468,12 @@ offs_t videopacp_state::ef934x_extram_address(offs_t offset)
 		return address | (offset << 4 & 0x60) | (latch << 2 & 0x180);
 }
 
-uint8_t videopacp_state::ef934x_extram_r(offs_t offset)
+u8 vpp_state::ef934x_extram_r(offs_t offset)
 {
 	return m_ef934x_extram[ef934x_extram_address(offset)];
 }
 
-void videopacp_state::ef934x_extram_w(offs_t offset, uint8_t data)
+void vpp_state::ef934x_extram_w(offs_t offset, u8 data)
 {
 	m_ef934x_extram[ef934x_extram_address(offset)] = data;
 }
@@ -502,7 +502,7 @@ void odyssey2_state::odyssey2_io(address_map &map)
     Input Ports
 ******************************************************************************/
 
-static INPUT_PORTS_START( odyssey2 )
+static INPUT_PORTS_START( o2 )
 	PORT_START("KEY.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CHAR('1')
@@ -589,8 +589,8 @@ static INPUT_PORTS_START( odyssey2 )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, odyssey2_state, reset_button, 0)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( g7400 )
-	PORT_INCLUDE( odyssey2 )
+static INPUT_PORTS_START( vpp )
+	PORT_INCLUDE( o2 )
 
 	PORT_MODIFY("KEY.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0  #") PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR('#')
@@ -648,7 +648,7 @@ static INPUT_PORTS_START( g7400 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Enter  _") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(10) PORT_CHAR('_')
 
 	PORT_MODIFY("KEY.6")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Ret") PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(13)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Ret") PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(13) // clash with KEY.5 0x80
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Lock") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(":  *") PORT_CODE(KEYCODE_COLON) PORT_CHAR(':') PORT_CHAR('*')
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("|  @") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('|') PORT_CHAR('@')
@@ -662,6 +662,42 @@ static INPUT_PORTS_START( g7400 )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_END) PORT_CHAR(UCHAR_MAMEKEY(PAUSE))
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Cntl") PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Esc") PORT_CODE(KEYCODE_ESC) PORT_CHAR(27)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( o3 )
+	PORT_INCLUDE( vpp )
+
+	PORT_MODIFY("KEY.0")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0  )") PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR(')')
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1  !") PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2  @") PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('@')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("3  #") PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("6  ^") PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('^')
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("7  &") PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('&')
+
+	PORT_MODIFY("KEY.1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("8  *") PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9  (") PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("/  ?") PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
+
+	PORT_MODIFY("KEY.4")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(".  >") PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
+
+	PORT_MODIFY("KEY.5")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Clear") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
+
+	PORT_MODIFY("KEY.6")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("]  }") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(",  <") PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(";  :") PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR(':')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("-  _") PORT_CODE(KEYCODE_PGDN) // clash with KEY.5 0x01
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("'  \"") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('\'') PORT_CHAR('\"')
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("[  {") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[') PORT_CHAR('{')
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("=  +") PORT_CODE(KEYCODE_PGUP) // clash with KEY.2 0x01 and KEY.5 0x08
+
+	PORT_MODIFY("KEY.7")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
 INPUT_PORTS_END
 
 
@@ -730,38 +766,38 @@ void odyssey2_state::videopacf(machine_config &config)
 }
 
 
-void videopacp_state::g7400(machine_config &config)
+void vpp_state::g7400(machine_config &config)
 {
 	/* basic machine hardware */
 	I8048(config, m_maincpu, 5.911_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &videopacp_state::odyssey2_mem);
-	m_maincpu->set_addrmap(AS_IO, &videopacp_state::odyssey2_io);
-	m_maincpu->p1_out_cb().set(FUNC(videopacp_state::p1_write));
-	m_maincpu->p2_in_cb().set(FUNC(videopacp_state::p2_read));
-	m_maincpu->p2_out_cb().set(FUNC(videopacp_state::p2_write));
-	m_maincpu->bus_in_cb().set(FUNC(videopacp_state::bus_read));
+	m_maincpu->set_addrmap(AS_PROGRAM, &vpp_state::odyssey2_mem);
+	m_maincpu->set_addrmap(AS_IO, &vpp_state::odyssey2_io);
+	m_maincpu->p1_out_cb().set(FUNC(vpp_state::p1_write));
+	m_maincpu->p2_in_cb().set(FUNC(vpp_state::p2_read));
+	m_maincpu->p2_out_cb().set(FUNC(vpp_state::p2_write));
+	m_maincpu->bus_in_cb().set(FUNC(vpp_state::bus_read));
 	m_maincpu->t0_in_cb().set("cartslot", FUNC(o2_cart_slot_device::t0_read));
-	m_maincpu->t1_in_cb().set(FUNC(videopacp_state::t1_read));
+	m_maincpu->t1_in_cb().set(FUNC(vpp_state::t1_read));
 	m_maincpu->prog_out_cb().set(m_i8243, FUNC(i8243_device::prog_w));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_screen_update(FUNC(videopacp_state::screen_update));
+	m_screen->set_screen_update(FUNC(vpp_state::screen_update));
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", m_i8244, FUNC(i8244_device::i8244_palette), 16);
 
 	I8243(config, m_i8243);
-	m_i8243->p4_out_cb().set(FUNC(videopacp_state::i8243_port_w<0>));
-	m_i8243->p5_out_cb().set(FUNC(videopacp_state::i8243_port_w<1>));
-	m_i8243->p6_out_cb().set(FUNC(videopacp_state::i8243_port_w<2>));
-	m_i8243->p7_out_cb().set(FUNC(videopacp_state::i8243_port_w<3>));
+	m_i8243->p4_out_cb().set(FUNC(vpp_state::i8243_port_w<0>));
+	m_i8243->p5_out_cb().set(FUNC(vpp_state::i8243_port_w<1>));
+	m_i8243->p6_out_cb().set(FUNC(vpp_state::i8243_port_w<2>));
+	m_i8243->p7_out_cb().set(FUNC(vpp_state::i8243_port_w<3>));
 
 	EF9340_1(config, m_ef934x, (8.867_MHz_XTAL * 2) / 5, "screen");
 	m_ef934x->set_offsets(15, 5);
-	m_ef934x->read_exram().set(FUNC(videopacp_state::ef934x_extram_r));
-	m_ef934x->write_exram().set(FUNC(videopacp_state::ef934x_extram_w));
+	m_ef934x->read_exram().set(FUNC(vpp_state::ef934x_extram_r));
+	m_ef934x->write_exram().set(FUNC(vpp_state::ef934x_extram_w));
 
 	I8245(config, m_i8244, (8.867_MHz_XTAL * 2) / 5);
 	m_i8244->set_screen("screen");
@@ -776,7 +812,7 @@ void videopacp_state::g7400(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list").set_original("videopac").set_filter("VPP");
 }
 
-void videopacp_state::jo7400(machine_config &config)
+void vpp_state::jo7400(machine_config &config)
 {
 	g7400(config);
 
@@ -785,7 +821,7 @@ void videopacp_state::jo7400(machine_config &config)
 	m_ef934x->set_clock(3.5625_MHz_XTAL);
 }
 
-void videopacp_state::odyssey3(machine_config &config)
+void vpp_state::odyssey3(machine_config &config)
 {
 	g7400(config);
 
@@ -815,33 +851,33 @@ void videopacp_state::odyssey3(machine_config &config)
 
 ROM_START (videopac)
 	ROM_REGION(0x0400,"maincpu",0)
-	ROM_LOAD ("o2bios.rom", 0x0000, 0x0400, CRC(8016a315) SHA1(b2e1955d957a475de2411770452eff4ea19f4cee))
+	ROM_LOAD("o2bios.rom", 0x0000, 0x0400, CRC(8016a315) SHA1(b2e1955d957a475de2411770452eff4ea19f4cee))
 ROM_END
 
 ROM_START (odyssey2)
 	ROM_REGION(0x0400,"maincpu",0)
-	ROM_LOAD ("o2bios.rom", 0x0000, 0x0400, CRC(8016a315) SHA1(b2e1955d957a475de2411770452eff4ea19f4cee))
+	ROM_LOAD("o2bios.rom", 0x0000, 0x0400, CRC(8016a315) SHA1(b2e1955d957a475de2411770452eff4ea19f4cee))
 ROM_END
 
 ROM_START (videopacf)
 	ROM_REGION(0x0400,"maincpu",0)
-	ROM_LOAD ("c52.rom", 0x0000, 0x0400, CRC(a318e8d6) SHA1(a6120aed50831c9c0d95dbdf707820f601d9452e))
+	ROM_LOAD("c52.rom", 0x0000, 0x0400, CRC(a318e8d6) SHA1(a6120aed50831c9c0d95dbdf707820f601d9452e))
 ROM_END
 
 
 ROM_START (videopacp)
 	ROM_REGION(0x0400,"maincpu",0)
-	ROM_LOAD ("g7400.bin", 0x0000, 0x0400, CRC(e20a9f41) SHA1(5130243429b40b01a14e1304d0394b8459a6fbae))
+	ROM_LOAD("g7400.bin", 0x0000, 0x0400, CRC(e20a9f41) SHA1(5130243429b40b01a14e1304d0394b8459a6fbae))
 ROM_END
 
 ROM_START (jopac)
 	ROM_REGION(0x0400,"maincpu",0)
-	ROM_LOAD ("jopac.bin", 0x0000, 0x0400, CRC(11647ca5) SHA1(54b8d2c1317628de51a85fc1c424423a986775e4))
+	ROM_LOAD("jopac.bin", 0x0000, 0x0400, CRC(11647ca5) SHA1(54b8d2c1317628de51a85fc1c424423a986775e4))
 ROM_END
 
 ROM_START (odyssey3)
 	ROM_REGION(0x0400, "maincpu", 0)
-	ROM_LOAD ("odyssey3.bin", 0x0000, 0x0400, CRC(e2b23324) SHA1(0a38c5f2cea929d2fe0a23e5e1a60de9155815dc))
+	ROM_LOAD("odyssey3.bin", 0x0000, 0x0400, CRC(e2b23324) SHA1(0a38c5f2cea929d2fe0a23e5e1a60de9155815dc))
 ROM_END
 
 } // anonymous namespace
@@ -852,11 +888,11 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME       PARENT    CMP MACHINE    INPUT     STATE            INIT        COMPANY, FULLNAME, FLAGS
-COMP( 1978, videopac,  0,         0, videopac,  odyssey2, odyssey2_state,  empty_init, "Philips", "Videopac G7000 (Europe)", MACHINE_SUPPORTS_SAVE )
-COMP( 1979, videopacf, videopac,  0, videopacf, odyssey2, odyssey2_state,  empty_init, "Philips", "Videopac C52 (France)", MACHINE_SUPPORTS_SAVE )
-COMP( 1979, odyssey2,  videopac,  0, odyssey2,  odyssey2, odyssey2_state,  empty_init, "Magnavox", "Odyssey 2 (US)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT    CMP MACHINE    INPUT  STATE           INIT        COMPANY, FULLNAME, FLAGS
+COMP( 1978, videopac,  0,         0, videopac,  o2,    odyssey2_state, empty_init, "Philips", "Videopac G7000 (Europe)", MACHINE_SUPPORTS_SAVE )
+COMP( 1979, videopacf, videopac,  0, videopacf, o2,    odyssey2_state, empty_init, "Philips", "Videopac C52 (France)", MACHINE_SUPPORTS_SAVE )
+COMP( 1979, odyssey2,  videopac,  0, odyssey2,  o2,    odyssey2_state, empty_init, "Magnavox", "Odyssey 2 (US)", MACHINE_SUPPORTS_SAVE )
 
-COMP( 1983, videopacp, 0,         0, g7400,     g7400,    videopacp_state, empty_init, "Philips", "Videopac+ G7400 (Europe)", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, jopac,     videopacp, 0, jo7400,    g7400,    videopacp_state, empty_init, "Philips (Brandt license)", "Jopac JO7400 (France)", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, odyssey3,  videopacp, 0, odyssey3,  g7400,    videopacp_state, empty_init, "Philips", "Odyssey 3 Command Center (US, prototype)", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, videopacp, 0,         0, g7400,     vpp,   vpp_state,      empty_init, "Philips", "Videopac+ G7400 (Europe)", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, jopac,     videopacp, 0, jo7400,    vpp,   vpp_state,      empty_init, "Philips (Brandt license)", "Jopac JO7400 (France)", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, odyssey3,  videopacp, 0, odyssey3,  o3,    vpp_state,      empty_init, "Philips", "Odyssey 3 Command Center (US, prototype)", MACHINE_SUPPORTS_SAVE )

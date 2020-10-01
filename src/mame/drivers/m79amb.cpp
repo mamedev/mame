@@ -75,20 +75,16 @@ void m79amb_state::ramtek_videoram_w(offs_t offset, uint8_t data)
 
 uint32_t m79amb_state::screen_update_ramtek(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	offs_t offs;
-
-	for (offs = 0; offs < 0x2000; offs++)
+	for (offs_t offs = 0; offs < 0x2000; offs++)
 	{
-		int i;
-
 		uint8_t data = m_videoram[offs];
 		int y = offs >> 5;
 		int x = (offs & 0x1f) << 3;
 
-		for (i = 0; i < 8; i++)
+		for (int i = 0; i < 8; i++)
 		{
 			pen_t pen = (data & 0x80) ? rgb_t::white() : rgb_t::black();
-			bitmap.pix32(y, x) = pen;
+			bitmap.pix(y, x) = pen;
 
 			x++;
 			data <<= 1;

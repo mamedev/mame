@@ -175,7 +175,7 @@ uint32_t flyball_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	for (int y = bally; y < bally + 2; y++)
 		for (int x = ballx; x < ballx + 2; x++)
 			if (cliprect.contains(x, y))
-				bitmap.pix16(y, x) = 1;
+				bitmap.pix(y, x) = 1;
 
 	return 0;
 }

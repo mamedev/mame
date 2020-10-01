@@ -123,7 +123,6 @@ void taitojc_state::taitojc_char_w(offs_t offset, uint32_t data, uint32_t mem_ma
 void taitojc_state::draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t w1, uint32_t w2, uint8_t bank_type)
 {
 	int x, y, width, height, palette;
-	int i, j;
 	int x1, x2, y1, y2;
 	int ix, iy;
 	uint32_t address;
@@ -212,11 +211,11 @@ void taitojc_state::draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect,
 			return;
 		}
 
-		for (j=y1; j < y2; j++)
+		for (int j=y1; j < y2; j++)
 		{
-			uint16_t *d = &bitmap.pix16(j);
+			uint16_t *const d = &bitmap.pix(j);
 
-			for (i=x1; i < x2; i++)
+			for (int i=x1; i < x2; i++)
 			{
 				d[i] = 0x78; //TODO: black
 
@@ -228,12 +227,12 @@ void taitojc_state::draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect,
 	}
 	else if(!color_depth) // Densha de Go 2/2X "credit text", 4bpp
 	{
-		for (j=y1; j < y2; j++)
+		for (int j=y1; j < y2; j++)
 		{
-			uint16_t *d = &bitmap.pix16(j);
+			uint16_t *const d = &bitmap.pix(j);
 			int index = (iy * (width / 2)) + ix;
 
-			for (i=x1; i < x2; i+=2)
+			for (int i=x1; i < x2; i+=2)
 			{
 				uint8_t pen = (v[BYTE4_XOR_BE(index)] & 0xf0) >> 4;
 				if (pen != 0)
@@ -252,12 +251,12 @@ void taitojc_state::draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect,
 	else // 8bpp
 	{
 		{
-			for (j=y1; j < y2; j++)
+			for (int j=y1; j < y2; j++)
 			{
-				uint16_t *d = &bitmap.pix16(j);
+				uint16_t *const d = &bitmap.pix(j);
 				int index = (iy * width) + ix;
 
-				for (i=x1; i < x2; i++)
+				for (int i=x1; i < x2; i++)
 				{
 					uint8_t pen = v[BYTE4_XOR_BE(index)];
 					if (pen != 0)

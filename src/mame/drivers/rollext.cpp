@@ -123,7 +123,7 @@ void rollext_renderer::render_texture_scan(int32_t scanline, const extent_t &ext
 	float du = extent.param[0].dpdx;
 	float dv = extent.param[1].dpdx;
 
-	uint32_t *fb = &m_fb->pix32(scanline);
+	uint32_t *fb = &m_fb->pix(scanline);
 
 	uint32_t texbot = extradata.tex_bottom;
 	uint32_t texleft = extradata.tex_left;
@@ -361,7 +361,7 @@ uint32_t rollext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	int ii=0;
 	for (int j=0; j < 384; j++)
 	{
-		uint32_t *fb = &bitmap.pix32(j);
+		uint32_t *fb = &bitmap.pix(j);
 		for (int i=0; i < 512; i++)
 		{
 			uint8_t p = m_texture[ii++];

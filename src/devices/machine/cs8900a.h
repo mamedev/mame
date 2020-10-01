@@ -3,11 +3,11 @@
 
 /*************************************************************************
 
-	CS8900A ethernet controller implementation
+    CS8900A ethernet controller implementation
 
-	by Rhett Aultman <roadriverrail@gmail.com>
-	ported to MAME from VICE Project (https://sourceforge.net/p/vice-emu/)
-	VICE CS8900 code by Spiro Trikaliotis <Spiro.Trikaliotis@gmx.de>
+    by Rhett Aultman <roadriverrail@gmail.com>
+    ported to MAME from VICE Project (https://sourceforge.net/p/vice-emu/)
+    VICE CS8900 code by Spiro Trikaliotis <Spiro.Trikaliotis@gmx.de>
 
 **************************************************************************/
 
@@ -19,7 +19,7 @@
 #include <queue>
 
 /***************************************************************************
-	TYPE DEFINITIONS
+    TYPE DEFINITIONS
 ***************************************************************************/
 
 class cs8900a_device : public device_t, public device_network_interface {
@@ -57,13 +57,13 @@ private:
 	u16 cs8900_packetpage_ptr;
 
 	/* reveiver setup */
-	u16 cs8900_recv_control;		/* copy of CC_RXCTL (contains all bits below) */
-	bool cs8900_recv_broadcast;		/* broadcast */
-	bool cs8900_recv_mac;			/* individual address (IA) */
-	bool cs8900_recv_multicast;		/* multicast if address passes the hash filter */
-	bool cs8900_recv_correct;		/* accept correct frames */
-	bool cs8900_recv_promiscuous;	/* promiscuous mode */
-	bool cs8900_recv_hashfilter;		/* accept if IA passes the hash filter */
+	u16 cs8900_recv_control;        /* copy of CC_RXCTL (contains all bits below) */
+	bool cs8900_recv_broadcast;     /* broadcast */
+	bool cs8900_recv_mac;           /* individual address (IA) */
+	bool cs8900_recv_multicast;     /* multicast if address passes the hash filter */
+	bool cs8900_recv_correct;       /* accept correct frames */
+	bool cs8900_recv_promiscuous;   /* promiscuous mode */
+	bool cs8900_recv_hashfilter;    /* accept if IA passes the hash filter */
 
 	u16 tx_buffer;
 	u16 rx_buffer;
@@ -90,7 +90,7 @@ private:
 	void cs8900_set_transmitter(int enabled);
 	bool cs8900_should_accept(unsigned char *buffer, int length, bool *phashed, int *phash_index, bool *pcorrect_mac, bool *pbroadcast, bool *pmulticast);
 	u16 cs8900_receive(void);
-	void cs8900_write_tx_buffer(u8	value, int odd_address);
+	void cs8900_write_tx_buffer(u8  value, int odd_address);
 	u8 cs8900_read_rx_buffer(int odd_address);
 	void cs8900_sideeffects_write_pp(u16 ppaddress, int odd_address);
 	void cs8900_sideeffects_read_pp(u16 ppaddress, int odd_address);

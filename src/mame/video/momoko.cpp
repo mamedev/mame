@@ -70,8 +70,6 @@ void momoko_state::flipscreen_w(u8 data)
 
 void momoko_state::draw_bg_pri(bitmap_ind16 &bitmap, int chr, int col, int flipx, int flipy, int x, int y, int pri)
 {
-	int px, py;
-
 	for (int sy = 0; sy < 8; sy++)
 	{
 		const u32 gfxadr = chr * 16 + sy * 2;
@@ -83,16 +81,14 @@ void momoko_state::draw_bg_pri(bitmap_ind16 &bitmap, int chr, int col, int flipx
 			for (int sx = 0; sx < 4; sx++)
 			{
 				const u8 dot = (d0 & 0x08) | ((d0 & 0x80) >> 5) | ((d1 & 0x08) >> 2) | ((d1 & 0x80) >> 7);
-				if (flipx == 0) px = sx + xx * 4 + x;
-					else      px = 7 - sx - xx * 4 + x;
-				if (flipy == 0) py = sy + y;
-					else      py = 7 - sy + y;
+				const int px = (flipx == 0) ? (sx + xx * 4 + x) : (7 - sx - xx * 4 + x);
+				const int py = (flipy == 0) ? (sy + y) : (7 - sy + y);
 
 				if (dot >= pri)
-					bitmap.pix16(py, px) = col * 16 + dot + 256;
+					bitmap.pix(py, px) = col * 16 + dot + 256;
 
-				d0 = d0 << 1;
-				d1 = d1 << 1;
+				d0 <<= 1;
+				d1 <<= 1;
 			}
 		}
 	}

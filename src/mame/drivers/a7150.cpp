@@ -122,18 +122,17 @@ private:
 
 uint32_t a7150_state::screen_update_k7072(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int y, x, b;
 	int addr = 0;
 
-	for (y = 0; y < 400; y++)
+	for (int y = 0; y < 400; y++)
 	{
 		int horpos = 0;
-		for (x = 0; x < 80; x++)
+		for (int x = 0; x < 80; x++)
 		{
 			uint8_t code = m_video_ram[addr++];
-			for (b = 0; b < 8; b++)
+			for (int b = 0; b < 8; b++)
 			{
-				bitmap.pix16(y, horpos++) = ((code >> (7 - b)) & 0x01) ? 1 : 0;
+				bitmap.pix(y, horpos++) = ((code >> (7 - b)) & 0x01) ? 1 : 0;
 			}
 		}
 	}

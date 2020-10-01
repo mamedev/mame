@@ -53,7 +53,7 @@ void bacta_datalogger_device::device_reset()
 	int startbits = 1;
 	int databits = 8;
 	parity_t parity = device_serial_interface::PARITY_ODD;
-	stop_bits_t stopbits = 	device_serial_interface::STOP_BITS_1;
+	stop_bits_t stopbits =  device_serial_interface::STOP_BITS_1;
 
 	set_data_frame(startbits, databits, parity, stopbits);
 

@@ -830,7 +830,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( rainbow_base_state::hgdc_display_pixels )
 		for (int xi = 0; xi < 16; xi++) // blank screen when VT102 output active (..)
 		{
 			if (bitmap.cliprect().contains(x + xi, y))
-				bitmap.pix32(y, x + xi) = 0;
+				bitmap.pix(y, x + xi) = 0;
 		}
 		return; // no output from graphics option
 	}
@@ -864,7 +864,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( rainbow_base_state::hgdc_display_pixels )
 			 (BIT(plane3 ,xi) << 3);
 
 		if (bitmap.cliprect().contains(x + xi, y))
-			bitmap.pix32(y, x + xi) = paletteX[mono ? (pen + 16) : pen];
+			bitmap.pix(y, x + xi) = paletteX[mono ? (pen + 16) : pen];
 	}
 }
 

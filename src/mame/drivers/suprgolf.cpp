@@ -135,40 +135,36 @@ void suprgolf_state::video_start()
 
 uint32_t suprgolf_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x,y,count,color;
+	int count;
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
+	count = 0;
+
+	for(int y=0;y<256;y++)
 	{
-		count = 0;
-
-		for(y=0;y<256;y++)
+		for(int x=0;x<512;x++)
 		{
-			for(x=0;x<512;x++)
-			{
-				color = m_bg_fb[count];
+			int const color = m_bg_fb[count];
 
-				if(x <= cliprect.max_x && y <= cliprect.max_y)
-					bitmap.pix16(y, x) = m_palette->pen((color & 0x7ff));
+			if(x <= cliprect.max_x && y <= cliprect.max_y)
+				bitmap.pix(y, x) = m_palette->pen((color & 0x7ff));
 
-				count++;
-			}
+			count++;
 		}
 	}
 
+	count = 0;
+
+	for(int y=0;y<256;y++)
 	{
-		count = 0;
-
-		for(y=0;y<256;y++)
+		for(int x=0;x<512;x++)
 		{
-			for(x=0;x<512;x++)
-			{
-				color = m_fg_fb[count];
+			int const color = m_fg_fb[count];
 
-				if(((m_fg_fb[count] & 0x0f) != 0x0f) && (x <= cliprect.max_x && y <= cliprect.max_y))
-					bitmap.pix16(y, x) = m_palette->pen((color & 0x7ff));
+			if(((m_fg_fb[count] & 0x0f) != 0x0f) && (x <= cliprect.max_x && y <= cliprect.max_y))
+				bitmap.pix(y, x) = m_palette->pen((color & 0x7ff));
 
-				count++;
-			}
+			count++;
 		}
 	}
 

@@ -362,31 +362,41 @@ NETLIST_START(boxingb)
 	Q_2N3906(Q3)            // PNP
 	Q_2N3906(Q4)            // PNP
 	Q_2N3904(Q5)            // NPN
+#if !(HLE_CHIRPING_VCO)
 	Q_2N3904(Q6)            // NPN
+#endif
 	Q_2N3906(Q7)            // PNP
 	Q_2N3904(Q8)            // NPN
+#if !(HLE_DYING_BUG_VCO)
 	Q_2N3904(Q9)            // NPN
+#endif
 	Q_2N3906(Q10)           // PNP
 	Q_2N3904(Q11)           // NPN
+#if !(HLE_CRACKING_VCO)
 	Q_2N3904(Q12)           // NPN
+#endif
 	Q_2N3906(Q13)           // PNP
 	Q_2N3904(Q14)           // NPN
+#if !(HLE_BEETLE_VCO)
 	Q_2N3904(Q15)           // NPN
+#endif
 	Q_2N3906(Q16)           // PNP
 	Q_2N3904(Q17)           // NPN
 	Q_2N3906(Q18)           // PNP
 	Q_2N3906(Q19)           // PNP
 	Q_2N3906(Q20)           // PNP
 	Q_2N3904(Q21)           // NPN
+#if !(HLE_CANNON_VCO)
 	Q_2N3904(Q22)           // NPN
+#endif
 	Q_2N3906(Q23)           // PNP
 	Q_2N3906(Q24)           // PNP
 	Q_2N3906(Q25)           // PNP
 	Q_2N3906(Q26)           // PNP
 //  Q_2N6292(Q27)           // PNP -- part of final amp (not emulated)
 //  Q_2N6107(Q28)           // NPN -- part of final amp (not emulated)
-	Q_2N5210(Q29)           // NPN
-	Q_2N5210(Q30)           // NPN
+//	Q_2N5210(Q29)           // NPN -- not used
+//	Q_2N5210(Q30)           // NPN -- not used
 	Q_2N3906(Q31)           // PNP
 	Q_2N3906(Q32)           // PNP
 	Q_2N3906(Q33)           // PNP

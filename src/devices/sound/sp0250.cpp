@@ -258,9 +258,8 @@ void sp0250_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 
 	if (!m_pwm_mode)
 	{
-		constexpr stream_buffer::sample_t sample_scale = 1.0 / 128.0;
 		for (int sampindex = 0; sampindex < output.samples(); sampindex++)
-			output.put(sampindex, stream_buffer::sample_t(next()) * sample_scale);
+			output.put_int(sampindex, next(), 128);
 	}
 	else
 	{

@@ -63,21 +63,20 @@ static const uint16_t nvram_unlock_seq[] =
 
 TMS340X0_SCANLINE_RGB32_CB_MEMBER(coolpool_state::amerdart_scanline)
 {
-	uint16_t *vram = &m_vram_base[(params->rowaddr << 8) & 0xff00];
-	uint32_t *dest = &bitmap.pix32(scanline);
+	uint16_t const *const vram = &m_vram_base[(params->rowaddr << 8) & 0xff00];
+	uint32_t *const dest = &bitmap.pix(scanline);
 	rgb_t pens[16];
 	int coladdr = params->coladdr;
-	int x;
 
 	/* update the palette */
 	if (scanline < 256)
-		for (x = 0; x < 16; x++)
+		for (int x = 0; x < 16; x++)
 		{
 			uint16_t pal = m_vram_base[x];
 			pens[x] = rgb_t(pal4bit(pal >> 4), pal4bit(pal >> 8), pal4bit(pal >> 12));
 		}
 
-	for (x = params->heblnk; x < params->hsblnk; x += 4)
+	for (int x = params->heblnk; x < params->hsblnk; x += 4)
 	{
 		uint16_t pixels = vram[coladdr++ & 0xff];
 		dest[x + 0] = pens[(pixels >> 0) & 15];
@@ -90,13 +89,12 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(coolpool_state::amerdart_scanline)
 
 TMS340X0_SCANLINE_RGB32_CB_MEMBER(coolpool_state::coolpool_scanline)
 {
-	uint16_t *vram = &m_vram_base[(params->rowaddr << 8) & 0x1ff00];
-	uint32_t *dest = &bitmap.pix32(scanline);
-	const pen_t *pens = m_tlc34076->pens();
+	uint16_t const *const vram = &m_vram_base[(params->rowaddr << 8) & 0x1ff00];
+	uint32_t *const dest = &bitmap.pix(scanline);
+	pen_t const *const pens = m_tlc34076->pens();
 	int coladdr = params->coladdr;
-	int x;
 
-	for (x = params->heblnk; x < params->hsblnk; x += 2)
+	for (int x = params->heblnk; x < params->hsblnk; x += 2)
 	{
 		uint16_t pixels = vram[coladdr++ & 0xff];
 		dest[x + 0] = pens[pixels & 0xff];

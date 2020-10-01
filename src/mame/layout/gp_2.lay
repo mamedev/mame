@@ -11,7 +11,9 @@ copyright-holders:Robbbert
 		</led7seg>
 	</element>
 	<element name="red_led">
-		<disk><color red="1.0" green="0.0" blue="0.0" /></disk>
+		<disk state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</disk>
 	</element>
 	<element name="P0"><text string="Ball"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="P1"><text string="Credits"><color red="1.0" green="1.0" blue="1.0" /></text></element>
@@ -21,91 +23,44 @@ copyright-holders:Robbbert
 	<element name="P5"><text string="Player 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="P6"><text string="Player 4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 
+	<group name="score">
+		<repeat count="6">
+			<param name="n" start="~s~" increment="-1" />
+			<param name="x" start="0" increment="44" />
+			<element name="digit~n~" ref="digit">
+				<bounds x="~x~" y="0" width="34" height="39" />
+			</element>
+		</repeat>
+	</group>
+
 	<view name="Default Layout">
 		<bounds left="0" top="20" right="274" bottom="394" />
 
 		<!-- LEDs -->
 
 		<!-- Player 1 Score -->
-
-		<element name="digit5" ref="digit">
-			<bounds left="10" top="45" right="44" bottom="84" />
-		</element>
-		<element name="digit4" ref="digit">
-			<bounds left="54" top="45" right="88" bottom="84" />
-		</element>
-		<element name="digit3" ref="digit">
-			<bounds left="98" top="45" right="132" bottom="84" />
-		</element>
-		<element name="digit2" ref="digit">
-			<bounds left="142" top="45" right="176" bottom="84" />
-		</element>
-		<element name="digit1" ref="digit">
-			<bounds left="186" top="45" right="220" bottom="84" />
-		</element>
-		<element name="digit0" ref="digit">
-			<bounds left="230" top="45" right="264" bottom="84" />
-		</element>
+		<param name="s" value="5" />
+		<group ref="score">
+			<bounds left="10" top="45" right="264" bottom="84" />
+		</group>
 
 		<!-- Player 2 Score -->
-		<element name="digit13" ref="digit">
-			<bounds left="10" top="105" right="44" bottom="144" />
-		</element>
-		<element name="digit12" ref="digit">
-			<bounds left="54" top="105" right="88" bottom="144" />
-		</element>
-		<element name="digit11" ref="digit">
-			<bounds left="98" top="105" right="132" bottom="144" />
-		</element>
-		<element name="digit10" ref="digit">
-			<bounds left="142" top="105" right="176" bottom="144" />
-		</element>
-		<element name="digit9" ref="digit">
-			<bounds left="186" top="105" right="220" bottom="144" />
-		</element>
-		<element name="digit8" ref="digit">
-			<bounds left="230" top="105" right="264" bottom="144" />
-		</element>
+		<param name="s" value="13" />
+		<group ref="score">
+			<bounds left="10" top="105" right="264" bottom="144" />
+		</group>
 
 		<!-- Player 3 Score -->
-		<element name="digit21" ref="digit">
-			<bounds left="10" top="165" right="44" bottom="204" />
-		</element>
-		<element name="digit20" ref="digit">
-			<bounds left="54" top="165" right="88" bottom="204" />
-		</element>
-		<element name="digit19" ref="digit">
-			<bounds left="98" top="165" right="132" bottom="204" />
-		</element>
-		<element name="digit18" ref="digit">
-			<bounds left="142" top="165" right="176" bottom="204" />
-		</element>
-		<element name="digit17" ref="digit">
-			<bounds left="186" top="165" right="220" bottom="204" />
-		</element>
-		<element name="digit16" ref="digit">
-			<bounds left="230" top="165" right="264" bottom="204" />
-		</element>
+		<param name="s" value="21" />
+		<group ref="score">
+			<bounds left="10" top="165" right="264" bottom="204" />
+		</group>
 
 		<!-- Player 4 Score -->
-		<element name="digit29" ref="digit">
-			<bounds left="10" top="225" right="44" bottom="264" />
-		</element>
-		<element name="digit28" ref="digit">
-			<bounds left="54" top="225" right="88" bottom="264" />
-		</element>
-		<element name="digit27" ref="digit">
-			<bounds left="98" top="225" right="132" bottom="264" />
-		</element>
-		<element name="digit26" ref="digit">
-			<bounds left="142" top="225" right="176" bottom="264" />
-		</element>
-		<element name="digit25" ref="digit">
-			<bounds left="186" top="225" right="220" bottom="264" />
-		</element>
-		<element name="digit24" ref="digit">
-			<bounds left="230" top="225" right="264" bottom="264" />
-		</element>
+		<param name="s" value="29" />
+		<group ref="score">
+			<bounds left="10" top="225" right="264" bottom="264" />
+		</group>
 
 		<!-- Credits and Balls -->
 		<element name="digit36" ref="digit">

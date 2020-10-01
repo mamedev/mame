@@ -398,19 +398,59 @@ Child elements of the ``element`` element instantiate components, which are
 drawn in reading order from first to last (components draw on top of components
 that come before them).  All components support a few common features:
 
-* Each component may have a ``state`` attribute.  If present, the component will
-  only be drawn when the element’s state matches its value (if absent, the
-  component will always be drawn).  If present, the ``state`` attribute must be
-  a non-negative integer.
+* Components may be conditionally drawn depending on the element’s state by
+  supplying ``state`` and/or ``statemask`` attributes.  If present, these
+  attributes must be non-negative integers.  If only the ``state`` attribute is
+  present, the component will only be drawn when the element’s state matches its
+  value.  If only the ``statemask`` attribute is present, the component will
+  only be drawn when all the bits that are set in its value are set in the
+  element’s state.
+
+  If both the ``state`` and ``statemask`` attributes are present, the component
+  will only be drawn when the bits in the element’s state corresponding to the
+  bits that are set in the ``statemask`` attribute’s value match the value of the
+  corresponding bits in the ``state`` attribute’s value.
+
+  (The component will always be drawn if neither ``state`` nor ``statemask``
+  attributes are present, or if the ``statemask`` attribute’s value is zero.)
 * Each component may have a ``bounds`` child element specifying its position and
   size (see :ref:`layout-concepts-coordinates`).  If no such element is present,
   the bounds default to a unit square (width and height of 1.0) with the top
   left corner at (0,0).
+
+  A component’s position and/or size may be animated according to the element’s
+  state by supplying multiple ``bounds`` child elements with ``state``
+  attributes.  The ``state`` attribute of each ``bounds`` child element must be
+  a non-negative integer.  The ``state`` attributes must not be equal for any
+  two ``bounds`` elements within a component.
+
+  If the element’s state is lower than the ``state`` value of any ``bounds``
+  child element, the position/size specified by the ``bounds`` child element
+  with the lowest ``state`` value will be used.  If the element’s state is
+  higher than the ``state`` value of any ``bounds`` child element, the
+  position/size specified by the ``bounds`` child element with the highest
+  ``state`` value will be used.  If the element’s state is between the ``state``
+  values of two ``bounds`` child elements, the position/size will be
+  interpolated linearly.
 * Each component may have a ``color`` child element specifying an RGBA colour
   (see :ref:`layout-concepts-colours` for details).  This can be used to control
-  the colour of geometric, algorithmically drawn, or textual components.  It is
-  ignored for ``image`` components.  If no such element is present, the colour
-  defaults to opaque white.
+  the colour of geometric, algorithmically drawn, or textual components.  For
+  ``image`` components, the colour of the image pixels is multiplied by the
+  specified colour.  If no such element is present, the colour defaults to
+  opaque white.
+
+  A component’s color may be animated according to the element’s state by
+  supplying multiple ``color`` child elements with ``state`` attributes.  The
+  ``state`` attributes must not be equal for any two ``color`` elements within a
+  component.
+
+  If the element’s state is lower than the ``state`` value of any ``color``
+  child element, the colour specified by the ``color`` child element with the
+  lowest ``state`` value will be used.  If the element’s state is higher than
+  the ``state`` value of any ``color`` child element, the colour specified by
+  the ``color`` child element with the highest ``state`` value will be used.  If
+  the element’s state is between the ``state`` values of two ``color`` child
+  elements, the RGBA colour components will be interpolated linearly.
 
 The following components are supported:
 
@@ -523,7 +563,6 @@ An example element that draws a static left-aligned text string::
         <text string="CPU" align="1"><color red="1.0" green="1.0" blue="1.0" /></text>
     </element>
 
-
 An example element that displays a circular LED where the intensity depends on
 the state of an active-high output::
 
@@ -541,6 +580,51 @@ An example element for a button that gives visual feedback when clicked::
         <rect state="1"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="0.2" green="0.2" blue="0.2" /></rect>
         <rect><bounds x="0.1" y="0.1" width="0.8" height="0.8" /><color red="0.15" green="0.15" blue="0.15" /></rect>
         <text string="RESET"><bounds x="0.1" y="0.4" width="0.8" height="0.2" /><color red="1.0" green="1.0" blue="1.0" /></text>
+    </element>
+
+An example of an element that draws a seven-segment LED display using external
+segment images::
+
+    <element name="digit_a" defstate="0">
+        <image file="a_off.png" />
+        <image file="a_a.png" statemask="0x01" />
+        <image file="a_b.png" statemask="0x02" />
+        <image file="a_c.png" statemask="0x04" />
+        <image file="a_d.png" statemask="0x08" />
+        <image file="a_e.png" statemask="0x10" />
+        <image file="a_f.png" statemask="0x20" />
+        <image file="a_g.png" statemask="0x40" />
+        <image file="a_dp.png" statemask="0x80" />
+    </element>
+
+An example of a bar graph that grows vertically and changes colour from green,
+through yellow, to red as the state increases::
+
+    <element name="pedal">
+        <rect>
+            <bounds state="0x000" left="0.0" top="0.9" right="1.0" bottom="1.0" />
+            <bounds state="0x610" left="0.0" top="0.0" right="1.0" bottom="1.0" />
+            <color state="0x000" red="0.0" green="1.0" blue="0.0" />
+            <color state="0x184" red="1.0" green="1.0" blue="0.0" />
+            <color state="0x610" red="1.0" green="0.0" blue="0.0" />
+        </rect>
+    </element>
+
+An example of a bar graph that grows horizontally to the left or right and
+changes colour from green, through yellow, to red as the state changes from the
+neutral position::
+
+    <element name="wheel">
+        <rect>
+            <bounds state="0x800" left="0.475" top="0.0" right="0.525" bottom="1.0" />
+            <bounds state="0x280" left="0.0" top="0.0" right="0.525" bottom="1.0" />
+            <bounds state="0xd80" left="0.475" top="0.0" right="1.0" bottom="1.0" />
+            <color state="0x800" red="0.0" green="1.0" blue="0.0" />
+            <color state="0x3e0" red="1.0" green="1.0" blue="0.0" />
+            <color state="0x280" red="1.0" green="0.0" blue="0.0" />
+            <color state="0xc20" red="1.0" green="1.0" blue="0.0" />
+            <color state="0xd80" red="1.0" green="0.0" blue="0.0" />
+        </rect>
     </element>
 
 

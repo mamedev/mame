@@ -476,7 +476,7 @@ namespace solver
 			resched = solve_nr_base();
 			// update timestep calculation
 			next_time_step = compute_next_timestep(m_params.m_min_ts_ts(), m_params.m_min_ts_ts(), m_params.m_max_timestep);
-			delta -= netlist_time_ext::from_fp(m_params.m_min_ts_ts());
+			delta -= netlist_time::from_fp(m_params.m_min_ts_ts());
 		}
 		// try remaining time using compute_next_timestep
 		while (delta > netlist_time::zero())
@@ -507,13 +507,13 @@ namespace solver
 
 	netlist_time matrix_solver_t::solve(netlist_time_ext now, const char *source)
 	{
-		netlist_time_ext delta = now - m_last_step();
+		netlist_time delta = static_cast<netlist_time>(now - m_last_step());
 		PFDEBUG(printf("solve %.10f\n", delta.as_double());)
 		plib::unused_var(source);
 
 		// We are already up to date. Avoid oscillations.
 		// FIXME: Make this a parameter!
-		if (delta < netlist_time_ext::quantum())
+		if (delta < netlist_time::quantum())
 		{
 			//printf("solve return %s at %f\n", source, now.as_double());
 			return timestep_device_count() > 0 ? netlist_time::from_fp(m_params.m_min_timestep) : netlist_time::zero();

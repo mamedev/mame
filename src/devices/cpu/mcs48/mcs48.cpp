@@ -889,10 +889,10 @@ OPHANDLER( stop_tcnt )      { burn_cycles(1); m_timecount_enabled = 0; }
 OPHANDLER( strt_t )         { burn_cycles(1); m_timecount_enabled = TIMER_ENABLED; m_prescaler = 0; }
 OPHANDLER( strt_cnt )
 {
+	burn_cycles(1);
 	if (!(m_timecount_enabled & COUNTER_ENABLED))
 		m_t1_history = test_r(1);
 
-	burn_cycles(1);
 	m_timecount_enabled = COUNTER_ENABLED;
 }
 

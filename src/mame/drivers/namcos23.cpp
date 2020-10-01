@@ -2060,16 +2060,16 @@ void namcos23_renderer::render_scanline(int32_t scanline, const extent_t& extent
 	float u = extent.param[1].start;
 	float v = extent.param[2].start;
 	float l = extent.param[3].start;
-	float dw = extent.param[0].dpdx;
-	float du = extent.param[1].dpdx;
-	float dv = extent.param[2].dpdx;
-	float dl = extent.param[3].dpdx;
+	const float dw = extent.param[0].dpdx;
+	const float du = extent.param[1].dpdx;
+	const float dv = extent.param[2].dpdx;
+	const float dl = extent.param[3].dpdx;
 
-	uint32_t *img = &object.bitmap->pix32(scanline, extent.startx);
+	uint32_t *img = &object.bitmap->pix(scanline, extent.startx);
 
 	for(int x = extent.startx; x < extent.stopx; x++) {
-		float z = w ? 1/w : 0;
-		uint32_t pcol = rd.texture_lookup(*rd.machine, rd.pens, u*z, v*z);
+		const float z = w ? 1/w : 0;
+		const uint32_t pcol = rd.texture_lookup(*rd.machine, rd.pens, u*z, v*z);
 		float ll = l*z;
 		*img = (light(pcol >> 16, ll) << 16) | (light(pcol >> 8, ll) << 8) | light(pcol, ll);
 

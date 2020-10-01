@@ -799,7 +799,7 @@ void amstrad_state::amstrad_plus_update_video_sprites()
 	else
 		horiz = m_asic.h_start;
 
-	p = &m_gate_array.bitmap->pix16(m_gate_array.y, horiz );
+	p = &m_gate_array.bitmap->pix(m_gate_array.y, horiz );
 	for ( i = 15 * 8; i >= 0; i -= 8 )
 	{
 		uint8_t   xmag = ( m_asic.ram[ 0x2000 + i + 4 ] >> 2 ) & 0x03;
@@ -852,7 +852,7 @@ WRITE_LINE_MEMBER(amstrad_state::amstrad_hsync_changed)
 		m_gate_array.line_ticks = 0;
 		if ( m_gate_array.y >= 0 && m_gate_array.y < m_gate_array.bitmap->height() )
 		{
-			m_gate_array.draw_p = &m_gate_array.bitmap->pix16(m_gate_array.y);
+			m_gate_array.draw_p = &m_gate_array.bitmap->pix(m_gate_array.y);
 		}
 		else
 		{
@@ -895,7 +895,7 @@ WRITE_LINE_MEMBER(amstrad_state::amstrad_plus_hsync_changed)
 		m_gate_array.line_ticks = 0;
 		if ( m_gate_array.y >= 0 && m_gate_array.y < m_gate_array.bitmap->height() )
 		{
-			m_gate_array.draw_p = &m_gate_array.bitmap->pix16(m_gate_array.y);
+			m_gate_array.draw_p = &m_gate_array.bitmap->pix(m_gate_array.y);
 		}
 		else
 		{

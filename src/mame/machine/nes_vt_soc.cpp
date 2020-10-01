@@ -121,6 +121,7 @@ nes_vt_soc_device::nes_vt_soc_device(const machine_config& mconfig, device_type 
 
 	m_default_palette_mode = PAL_MODE_VT0x;
 	m_force_baddma = false;
+	m_use_raster_timing_hack = false;
 }
 
 nes_vt_soc_device::nes_vt_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
@@ -299,8 +300,6 @@ uint32_t nes_vt_soc_device::get_banks(uint8_t bnk)
 // 8000 needs to bank in 60000  ( bank 0x30 )
 void nes_vt_soc_device::update_banks()
 {
-	//uint32_t amod = m_ahigh >> 13;
-
 	uint8_t bank;
 
 	// 8000-9fff
@@ -314,11 +313,11 @@ void nes_vt_soc_device::update_banks()
 	else
 		bank = 0xfe;
 
-	m_bankaddr[0] = ((/*amod |*/ get_banks(bank)) );
+	m_bankaddr[0] = get_banks(bank);
 
 	// a000-bfff
 	bank = m_410x[0x8];
-	m_bankaddr[1] = ((/*amod |*/ get_banks(bank)) );
+	m_bankaddr[1] = get_banks(bank);
 
 	// c000-dfff
 	if ((m_410x[0xb] & 0x40) != 0 || (m_410x[0x5] & 0x40) != 0)
@@ -331,11 +330,11 @@ void nes_vt_soc_device::update_banks()
 	else
 		bank = 0xfe;
 
-	m_bankaddr[2] = ((/*amod |*/ get_banks(bank)) );
+	m_bankaddr[2] = get_banks(bank);
 
 	// e000 - ffff
 	bank = m_initial_e000_bank;
-	m_bankaddr[3] = ((/*amod |*/ get_banks(bank)) );
+	m_bankaddr[3] = get_banks(bank);
 }
 
 uint16_t nes_vt_soc_device::decode_nt_addr(uint16_t addr)
@@ -380,6 +379,12 @@ void nes_vt_soc_device::scrambled_410x_w(uint16_t offset, uint8_t data)
 		// load latched value and start counting
 		m_410x[0x2] = data; // value doesn't matter?
 		m_timer_val = m_410x[0x1];
+
+		// HACK for some one line errors in various games and completely broken rasters in msifrog, TOOD: find real source of issue (bad timing of interrupt or counter changes, or latching of data?)
+		if (m_use_raster_timing_hack)
+			if (m_ppu->in_vblanking())
+				m_timer_val--;
+
 		m_timer_running = 1;
 		break;
 
@@ -468,7 +473,7 @@ uint8_t nes_vt_soc_device::spr_r(offs_t offset)
 
 uint8_t nes_vt_soc_device::chr_r(offs_t offset)
 {
-	if (m_4242 & 0x1 || m_411d & 0x04)
+	if (m_4242 & 0x1 || m_411d & 0x04) // newer VT platforms only (not VT03/09), split out
 	{
 		return m_chrram[offset];
 	}
@@ -484,10 +489,17 @@ uint8_t nes_vt_soc_device::chr_r(offs_t offset)
 
 void nes_vt_soc_device::chr_w(offs_t offset, uint8_t data)
 {
-	if (m_4242 & 0x1 || m_411d & 0x04)
+	if (m_4242 & 0x1 || m_411d & 0x04) // newer VT platforms only (not VT03/09), split out
 	{
 		logerror("vram write %04x %02x\n", offset, data);
 		m_chrram[offset] = data;
+	}
+	else
+	{
+		int realaddr = calculate_real_video_address(offset, 1, 0);
+
+		address_space& spc = this->space(AS_PROGRAM);
+		return spc.write_byte(realaddr, data);
 	}
 }
 
@@ -755,7 +767,7 @@ int nes_vt_soc_device::calculate_real_video_address(int addr, int extended, int 
 
 		}
 	}
-	return /*m_ahigh |*/ finaladdr;
+	return finaladdr;
 }
 
 /*
@@ -763,17 +775,14 @@ int nes_vt_soc_device::calculate_real_video_address(int addr, int extended, int 
 
      used for MMC3/other mapper compatibility
      some consoles have scrambled registers for crude copy protection
-
-    is this always there with VT based games? it maps where mappers would be on a NES cartridge
-    but then seems to be able to alter internal state of extended PPU registers, which is awkward
 */
 
 void nes_vt_soc_device::scrambled_8000_w(uint16_t offset, uint8_t data)
 {
 	offset &= 0x7fff;
 
-	uint16_t addr = m_real_access_address; // we need the actual write address, not the translated one, to keep bittboy happy
-	if ((m_411d & 0x01) && (m_411d & 0x03))
+	uint16_t addr = offset+0x8000;
+	if ((m_411d & 0x01) && (m_411d & 0x03)) // this condition is nonsense, maybe should be ((m_411d & 0x03) == 0x03) check it!  (newer VT only, not VT03/09, split)
 	{
 		//CNROM compat
 		logerror("%s: vtxx_cnrom_8000_w real address: (%04x) translated address: (%04x) %02x\n", machine().describe_context(), addr, offset + 0x8000, data);
@@ -785,13 +794,13 @@ void nes_vt_soc_device::scrambled_8000_w(uint16_t offset, uint8_t data)
 		m_ppu->set_201x_reg(0x5, data * 8 + 7);
 
 	}
-	else if (m_411d & 0x01)
+	else if (m_411d & 0x01) // (newer VT only, not VT03/09, split)
 	{
 		//MMC1 compat, TODO
 		logerror("%s: vtxx_mmc1_8000_w real address: (%04x) translated address: (%04x) %02x\n", machine().describe_context(), addr, offset + 0x8000, data);
 
 	}
-	else if (m_411d & 0x02)
+	else if (m_411d & 0x02) // (newer VT only, not VT03/09, split)
 	{
 		//UNROM compat
 		logerror("%s: vtxx_unrom_8000_w real address: (%04x) translated address: (%04x) %02x\n", machine().describe_context(), addr, offset + 0x8000, data);
@@ -800,7 +809,7 @@ void nes_vt_soc_device::scrambled_8000_w(uint16_t offset, uint8_t data)
 		m_410x[0x8] = ((data & 0x0F) << 1) + 1;
 		update_banks();
 	}
-	else
+	else // standard mode (VT03/09)
 	{
 		//logerror("%s: vtxx_mmc3_8000_w real address: (%04x) translated address: (%04x) %02x\n",  machine().describe_context(), addr, offset+0x8000, data );
 
@@ -985,13 +994,6 @@ void nes_vt_soc_device::do_dma(uint8_t data, bool has_ntsc_bug)
 		length -= 1;
 		src_addr += 1;
 	}
-	//TODO (always false)
-	//else if ((dma_mode == 1) && ((m_ppu->get_vram_dest() & 0xFF00) == 0x3F01) && !(m_ppu->get_201x_reg(0x1) & 0x80))
-	//{
-	//  // Legacy mode for DGUN-2573 compat
-	//  m_ppu->set_vram_dest(0x3F00);
-	//  m_ppu->set_palette_mode(PAL_MODE_VT0x);
-	//}
 
 	for (int i = 0; i < length; i++)
 	{
@@ -1116,17 +1118,22 @@ uint8_t nes_vt_soc_device::external_space_read(offs_t offset)
 	address_space& spc = this->space(AS_PROGRAM);
 	int bank = (offset & 0x6000) >> 13;
 	int address = (m_bankaddr[bank] * 0x2000) + (offset & 0x1fff);
-	m_real_access_address = offset + 0x8000;
 	return spc.read_byte(address);
 }
 
 void nes_vt_soc_device::external_space_write(offs_t offset, uint8_t data)
 {
-	address_space& spc = this->space(AS_PROGRAM);
-	int bank = (offset & 0x6000) >> 13;
-	int address = (m_bankaddr[bank] * 0x2000) + (offset&0x1fff);
-	m_real_access_address = offset + 0x8000;
-	spc.write_byte(address, data);
+	if ((m_410x[0xb] & 0x08))
+	{
+		address_space& spc = this->space(AS_PROGRAM);
+		int bank = (offset & 0x6000) >> 13;
+		int address = (m_bankaddr[bank] * 0x2000) + (offset & 0x1fff);
+		spc.write_byte(address, data);
+	}
+	else
+	{
+		vt03_8000_mapper_w(offset, data);
+	}
 };
 
 void nes_vt_soc_device::nes_vt_map(address_map &map)
@@ -1214,7 +1221,7 @@ void nes_vt_soc_device::do_pal_timings_and_ppu_replacement(machine_config& confi
 
 void nes_vt_soc_device::device_add_mconfig(machine_config &config)
 {
-	M6502(config, m_maincpu, NTSC_APU_CLOCK);
+	N2A03_CORE(config, m_maincpu, NTSC_APU_CLOCK); // Butterfly Catch in vgpocket confirms N2A03 core type, not 6502
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_soc_device::nes_vt_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1235,11 +1242,7 @@ void nes_vt_soc_device::device_add_mconfig(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	/* this should actually be a custom *almost* doubled up APU, however requires more thought
-	   than just using 2 APUs as registers in the 2nd one affect the PCM channel mode but the
-	   DMA control still comes from the 1st, but in the new mode, sound always outputs via the
-	   2nd.  Probably need to split the APU into interface and sound gen logic. */
-	NES_APU(config, m_apu, NTSC_APU_CLOCK);
+	NES_APU_VT(config, m_apu, NTSC_APU_CLOCK);
 	m_apu->irq().set(FUNC(nes_vt_soc_device::apu_irq));
 	m_apu->mem_read().set(FUNC(nes_vt_soc_device::apu_read_mem));
 	m_apu->add_route(ALL_OUTPUTS, "mono", 0.50);
@@ -1260,7 +1263,7 @@ void nes_vt_soc_scramble_device::device_add_mconfig(machine_config& config)
 {
 	nes_vt_soc_device::device_add_mconfig(config);
 
-	M6502_SWAP_OP_D5_D6(config.replace(), m_maincpu, NTSC_APU_CLOCK);
+	N2A03_CORE_SWAP_OP_D5_D6(config.replace(), m_maincpu, NTSC_APU_CLOCK); // Insect Chase in polmega confirms N2A03 core type, not 6502
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_soc_scramble_device::nes_vt_map);
 }
 
@@ -1461,7 +1464,7 @@ void nes_vt_soc_4kram_fp_device::device_add_mconfig(machine_config& config)
 {
 	nes_vt_soc_device::device_add_mconfig(config);
 
-	M6502_VTSCR(config.replace(), m_maincpu, NTSC_APU_CLOCK);
+	M6502_VTSCR(config.replace(), m_maincpu, NTSC_APU_CLOCK); // are these later chips N2A03 core, or 6502 core derived?
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_soc_4kram_fp_device::nes_vt_fp_map);
 }
 

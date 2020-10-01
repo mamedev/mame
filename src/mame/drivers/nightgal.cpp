@@ -175,14 +175,12 @@ void nightgal_state::video_start()
 
 uint32_t nightgal_state::screen_update_nightgal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x, y;
-
-	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
 		const uint8_t *src = &m_blitter->blit_buffer(y, cliprect.min_x);
-		uint16_t *dst = &m_tmp_bitmap->pix16(y, cliprect.min_x);
+		uint16_t *dst = &m_tmp_bitmap->pix(y, cliprect.min_x);
 
-		for (x = cliprect.min_x; x <= cliprect.max_x; x += 2)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x += 2)
 		{
 			uint32_t srcpix = *src++;
 			*dst++ = m_palette->pen((srcpix & 0xf) | m_pal_bank);

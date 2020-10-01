@@ -41,7 +41,7 @@ namespace netlist
 			}
 
 		private:
-			inline NETLIB_HANDLERI(oe1)
+			NETLIB_HANDLERI(oe1)
 			{
 				m_enable_lo = m_OE1();
 				uint8_t o = m_enable_lo ? m_latched_rom : 0;
@@ -52,7 +52,7 @@ namespace netlist
 				}
 			}
 
-			inline NETLIB_HANDLERI(oe2)
+			NETLIB_HANDLERI(oe2)
 			{
 				m_enable_hi = m_OE2();
 				uint8_t o = m_enable_hi ? m_latched_rom : 0;
@@ -63,7 +63,7 @@ namespace netlist
 				}
 			}
 
-			inline NETLIB_HANDLERI(addr)
+			NETLIB_HANDLERI(addr)
 			{
 				if (!m_ARQ())
 				{
@@ -96,6 +96,72 @@ namespace netlist
 			nld_power_pins m_power_pins;
 		};
 
+		NETLIB_OBJECT(mcm14524_rom)
+		{
+			NETLIB_CONSTRUCTOR_MODEL(mcm14524_rom, "CD4XXX")
+			, m_enabled(*this, "m_enabled", true)
+			, m_latched_rom(*this, "m_latched_rom", 0)
+			, m_A(*this, 1, "A{}", NETLIB_DELEGATE(addr))
+			, m_CLK(*this, "CLK", NETLIB_DELEGATE(addr))
+			, m_clk_old(*this, "m_clk_old", true)
+			, m_EN(*this, "EN", NETLIB_DELEGATE(en))
+			, m_B(*this, 1, "B{}", 0)
+			, m_ROM(*this, "ROM")
+			, m_taccc(*this, "m_taccc", netlist_time::from_nsec(1350))
+			, m_taccen(*this, "m_taccen", netlist_time::from_nsec(245))
+			, m_power_pins(*this, NETLIB_DELEGATE(vdd_vss))
+			{
+			}
+
+		private:
+			NETLIB_HANDLERI(en)
+			{
+				m_enabled = m_EN();
+				uint8_t o = m_enabled ? m_latched_rom : 0; // outputs are forced to 0 by enable going low; this chip does not have tri-state outputs!
+				for (std::size_t i=0; i<4; i++)
+				{
+					m_B[i].push((o >> i) & 1, m_taccen);
+				}
+			}
+
+			NETLIB_HANDLERI(addr)
+			{
+				if (!m_CLK() && m_clk_old) // latch on falling edge
+				{
+					const auto addr = m_A();
+					m_latched_rom = m_ROM[addr];
+				}
+				m_clk_old = m_CLK();
+				uint8_t o = m_enabled ? m_latched_rom : 0; // outputs are forced to 0 by enable going low; this chip does not have tri-state outputs!
+				for (std::size_t i=0; i<4; i++)
+				{
+					m_B[i].push((o >> i) & 1, m_taccc);
+				}
+			}
+
+			NETLIB_HANDLERI(vdd_vss)
+			{
+				auto d = m_power_pins.VCC()() - m_power_pins.GND()();
+				if (d > 0.1) // avoid unrealistic values
+				{
+					m_taccc = netlist_time::from_nsec(gsl::narrow_cast<unsigned>(7615.5 / d - 181));
+					m_taccen = netlist_time::from_nsec(gsl::narrow_cast<unsigned>(1292.5 / d - 14.6));
+				}
+			}
+
+			state_var<bool> m_enabled;
+			state_var<uint8_t> m_latched_rom;
+			object_array_t<logic_input_t, 8> m_A;
+			logic_input_t m_CLK;
+			state_var<bool> m_clk_old;
+			logic_input_t m_EN;
+			object_array_t<tristate_output_t, 4> m_B;
+			param_rom_t<uint8_t, 8, 4> m_ROM;
+			state_var<netlist_time> m_taccc; // propagation time for data vs CLK
+			state_var<netlist_time> m_taccen; // propagation time for data vs /EN
+			nld_power_pins m_power_pins;
+		};
+
 		template <typename D>
 		NETLIB_OBJECT(generic_prom)
 		{
@@ -119,7 +185,7 @@ namespace netlist
 		private:
 
 			template <std::size_t N>
-			inline NETLIB_HANDLERI(ce)
+			NETLIB_HANDLERI(ce)
 			{
 				using cet = typename D::chip_enable_time;
 				m_enabled = (m_CEQ() == D::chip_enable_mask::value);
@@ -148,7 +214,6 @@ namespace netlist
 
 			}
 
-			inline
 			NETLIB_HANDLERI(addr)
 			{
 				if (m_enabled)
@@ -230,12 +295,14 @@ namespace netlist
 	using NETLIB_NAME(74S287)  = NETLIB_NAME(generic_prom)<desc_74S287>; // 1024 bits, 32x32, used as 256x4
 	using NETLIB_NAME(2716)    = NETLIB_NAME(generic_prom)<desc_2716>;   // CE2Q = OE, CE1Q = CE
 	using NETLIB_NAME(MK28000) = NETLIB_NAME(mk28000_prom);              // 16384 bits, either 2048x8 or 4096x4, determined by OE1/OE2 use
+	using NETLIB_NAME(MCM14524) = NETLIB_NAME(mcm14524_rom);             // 1024 bits, 256x4, latched address
 
 	NETLIB_DEVICE_IMPL(82S126,     "PROM_82S126",     "+CE1Q,+CE2Q,+A0,+A1,+A2,+A3,+A4,+A5,+A6,+A7,@VCC,@GND")
 	NETLIB_DEVICE_IMPL(74S287,     "PROM_74S287",     "+CE1Q,+CE2Q,+A0,+A1,+A2,+A3,+A4,+A5,+A6,+A7,@VCC,@GND")
 	NETLIB_DEVICE_IMPL(82S123,     "PROM_82S123",     "+CEQ,+A0,+A1,+A2,+A3,+A4,@VCC,@GND")
 	NETLIB_DEVICE_IMPL(2716,       "EPROM_2716",      "+CE2Q,+CE1Q,+A0,+A1,+A2,+A3,+A4,+A5,+A6,+A7,+A8,+A9,+A10,@VCC,@GND")
 	NETLIB_DEVICE_IMPL(MK28000,    "PROM_MK28000",    "+OE1,+OE2,+ARQ,+A1,+A2,+A3,+A4,+A5,+A6,+A7,+A8,+A9,+A10,+A11,@VCC,@GND")
+	NETLIB_DEVICE_IMPL(MCM14524,   "ROM_MCM14524",    "+EN,+CLK,+A0,+A1,+A2,+A3,+A4,+A5,+A6,+A7,@VCC,@GND")
 
 	} //namespace devices
 } // namespace netlist

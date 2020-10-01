@@ -222,7 +222,7 @@ MC6845_UPDATE_ROW(d64plus_state::crtc_update_row)
 		for (int bit = 0; bit < 8; bit++)
 		{
 			int x = (column * 8) + bit;
-			bitmap.pix32(y, x) = m_palette->pen(BIT(data, 7) && de);
+			bitmap.pix(y, x) = m_palette->pen(BIT(data, 7) && de);
 			data <<= 1;
 		}
 	}

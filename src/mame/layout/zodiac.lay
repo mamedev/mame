@@ -218,7 +218,7 @@ license:CC0
 		<element ref="hl" inputtag="IN.2" inputmask="0x01"><bounds x="93.5" y="106.25" width="7" height="7" /><color alpha="0.2" /></element>
 		<element ref="hl" inputtag="IN.3" inputmask="0x08"><bounds x="86.5" y="123" width="7" height="7" /><color alpha="0.2" /></element>
 
-		<element ref="switch_mode" inputtag="IN.5" inputmask="0x03" inputraw="1"><bounds x="56.5" y="140" width="7" height="7" /></element>
+		<element ref="switch_mode" inputtag="IN.5" inputmask="0x03" inputraw="yes"><bounds x="56.5" y="140" width="7" height="7" /></element>
 		<element ref="text_mode"><bounds x="45" y="148" width="30" height="4" /></element>
 
 	</view>

@@ -322,12 +322,12 @@ void raiden2_state::blend_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 	if (layer == -1)
 		return;
 
-	const pen_t *pens = &m_palette->pen(0);
+	pen_t const *const pens = &m_palette->pen(0);
 	layer <<= 14;
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		const u16 *src = &source.pix16(y, cliprect.min_x);
-		u32 *dst = &bitmap.pix32(y, cliprect.min_x);
+		const u16 *src = &source.pix(y, cliprect.min_x);
+		u32 *dst = &bitmap.pix(y, cliprect.min_x);
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			u16 val = *src++;

@@ -92,24 +92,23 @@ void k8915_state::machine_start()
 
 u32 k8915_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	u8 y,ra,chr,gfx;
-	u16 sy=0,ma=0,x;
+	u16 sy=0,ma=0;
 
 	m_framecnt++;
 
-	for (y = 0; y < 25; y++)
+	for (u8 y = 0; y < 25; y++)
 	{
-		for (ra = 0; ra < 10; ra++)
+		for (u8 ra = 0; ra < 10; ra++)
 		{
-			u16 *p = &bitmap.pix16(sy++);
+			u16 *p = &bitmap.pix(sy++);
 
-			for (x = ma; x < ma + 80; x++)
+			for (u16 x = ma; x < ma + 80; x++)
 			{
-				gfx = 0;
+				u8 gfx = 0;
 
 				if (ra < 9)
 				{
-					chr = m_p_videoram[x];
+					u8 chr = m_p_videoram[x];
 
 					/* Take care of flashing characters */
 					if ((chr & 0x80) && (m_framecnt & 0x08))

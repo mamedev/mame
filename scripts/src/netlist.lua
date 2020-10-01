@@ -32,7 +32,7 @@ project "netlist"
 	}
 
 	includedirs {
-	--	MAME_DIR .. "src/lib",
+	--  MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/netlist",
 	}
 
@@ -81,6 +81,7 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/plib/pmain.cpp",
 		MAME_DIR .. "src/lib/netlist/plib/pmain.h",
 		MAME_DIR .. "src/lib/netlist/plib/pmath.h",
+		MAME_DIR .. "src/lib/netlist/plib/pmatrix_cr.h",
 		MAME_DIR .. "src/lib/netlist/plib/pmempool.h",
 		MAME_DIR .. "src/lib/netlist/plib/pmulti_threading.h",
 		MAME_DIR .. "src/lib/netlist/plib/pomp.h",
@@ -123,7 +124,6 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/solver/nld_ms_sor.h",
 		MAME_DIR .. "src/lib/netlist/solver/nld_ms_sor_mat.h",
 		MAME_DIR .. "src/lib/netlist/solver/nld_ms_gmres.h",
-		MAME_DIR .. "src/lib/netlist/solver/mat_cr.h",
 		MAME_DIR .. "src/lib/netlist/solver/nld_ms_sm.h",
 		MAME_DIR .. "src/lib/netlist/solver/nld_ms_w.h",
 		MAME_DIR .. "src/lib/netlist/solver/nld_ms_direct_lu.h",
@@ -131,14 +131,17 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/devices/net_lib.cpp",
 		MAME_DIR .. "src/lib/netlist/devices/net_lib.h",
 		MAME_DIR .. "src/lib/netlist/devices/nld_9316_base.hxx",
-		MAME_DIR .. "src/lib/netlist/devices/nld_2102A.cpp",
+		MAME_DIR .. "src/lib/netlist/devices/nld_2102a.cpp",
 		MAME_DIR .. "src/lib/netlist/devices/nld_tms4800.cpp",
 		MAME_DIR .. "src/lib/netlist/devices/nld_4006.cpp",
 		MAME_DIR .. "src/lib/netlist/devices/nld_4013.cpp",
 		MAME_DIR .. "src/lib/netlist/devices/nld_4017.cpp",
 		MAME_DIR .. "src/lib/netlist/devices/nld_4020.cpp",
+		MAME_DIR .. "src/lib/netlist/devices/nld_4029.cpp",
+		MAME_DIR .. "src/lib/netlist/devices/nld_4042.cpp",
 		MAME_DIR .. "src/lib/netlist/devices/nld_4053.cpp",
 		MAME_DIR .. "src/lib/netlist/devices/nld_4066.cpp",
+		MAME_DIR .. "src/lib/netlist/devices/nld_4076.cpp",
 		MAME_DIR .. "src/lib/netlist/devices/nld_4316.cpp",
 		MAME_DIR .. "src/lib/netlist/devices/nld_7448.cpp",
 		MAME_DIR .. "src/lib/netlist/devices/nld_7450.cpp",
@@ -170,8 +173,8 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/devices/nld_74393.cpp",
 		MAME_DIR .. "src/lib/netlist/devices/nld_74365.cpp",
 		MAME_DIR .. "src/lib/netlist/devices/nld_74ls629.cpp",
-		MAME_DIR .. "src/lib/netlist/devices/nld_82S16.cpp",
-		MAME_DIR .. "src/lib/netlist/devices/nld_82S115.cpp",
+		MAME_DIR .. "src/lib/netlist/devices/nld_82s16.cpp",
+		MAME_DIR .. "src/lib/netlist/devices/nld_82s115.cpp",
 		MAME_DIR .. "src/lib/netlist/devices/nld_8277.cpp",
 		MAME_DIR .. "src/lib/netlist/devices/nld_9310.cpp",
 		MAME_DIR .. "src/lib/netlist/devices/nld_9316.cpp",
@@ -202,7 +205,9 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/macro/nlm_otheric_lib.cpp",
 		MAME_DIR .. "src/lib/netlist/macro/nlm_roms_lib.cpp",
 
-		MAME_DIR .. "src/lib/netlist/macro/modules/nlmod_RTEST.cpp",
+		MAME_DIR .. "src/lib/netlist/macro/modules/nlmod_rtest.cpp",
+		MAME_DIR .. "src/lib/netlist/macro/modules/nlmod_ne556_dip.cpp",
+		MAME_DIR .. "src/lib/netlist/macro/modules/nlmod_icl8038_dip.cpp",
 
 		MAME_DIR .. "src/lib/netlist/generated/static_solvers.cpp",
 		MAME_DIR .. "src/lib/netlist/generated/nld_devinc.h",

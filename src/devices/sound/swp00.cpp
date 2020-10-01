@@ -21,7 +21,7 @@ void swp00_device::device_add_mconfig(machine_config &config)
 
 void swp00_device::device_start()
 {
-	m_stream = stream_alloc_legacy(0, 2, 44100);
+	m_stream = stream_alloc(0, 2, 44100);
 }
 
 void swp00_device::device_reset()
@@ -97,6 +97,8 @@ void swp00_device::snd_w(offs_t offset, u8 data)
 
 // Synthesis
 
-void swp00_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void swp00_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
+	outputs[0].fill(0);
+	outputs[1].fill(0);
 }

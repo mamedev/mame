@@ -348,7 +348,7 @@ u32 exorterm155_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	u16 sy = 0, ma = 0;
 	u8 disable_fac = m_disable_fac->read() == 0;
 	u8 display_fac = m_display_fac->read() == 0;
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
 	m_framecnt++;
 
@@ -356,7 +356,7 @@ u32 exorterm155_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	{
 		for (u8 ra = 0; ra < 12; ra++)
 		{
-			u32 *p = &bitmap.pix32(sy++);
+			u32 *p = &bitmap.pix(sy++);
 			// FAC codes are cleared on horizontal sync.
 			u8 underline1 = 0;
 			u8 underline2 = 0;

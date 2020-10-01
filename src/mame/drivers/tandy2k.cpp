@@ -502,7 +502,7 @@ uint32_t tandy2k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 				for (int x = 0; x < 8; x++)
 				{
 					int color = BIT(a, x) | (BIT(b, x) << 1) | (BIT(c, x) << 2);
-					bitmap.pix32(y, (sx * 8) + (7 - x)) = cpen[color];
+					bitmap.pix(y, (sx * 8) + (7 - x)) = cpen[color];
 				}
 			}
 			else
@@ -517,7 +517,7 @@ uint32_t tandy2k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 				for (int x = 0; x < 8; x++)
 				{
 					int color = 4 | (BIT(attr, 6) << 1) | BIT(data, 7);
-					bitmap.pix32(y, (sx * 8) + x) = cpen[color];
+					bitmap.pix(y, (sx * 8) + x) = cpen[color];
 					data <<= 1;
 				}
 			}
@@ -624,7 +624,7 @@ CRT9021_DRAW_CHARACTER_MEMBER( tandy2k_state::vac_draw_character )
 	{
 		int color = BIT(video, 7 - i);
 
-		bitmap.pix32(y, x++) = pen[color];
+		bitmap.pix(y, x++) = pen[color];
 	}
 }
 

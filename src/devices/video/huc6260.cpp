@@ -69,7 +69,7 @@ void huc6260_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	int hpos = screen().hpos();
 	int h = m_last_h;
 	int v = m_last_v;
-	uint16_t *bitmap_line = &m_bmp->pix16(v);
+	uint16_t *bitmap_line = &m_bmp->pix(v);
 
 	while ( h != hpos || v != vpos )
 	{
@@ -112,7 +112,7 @@ void huc6260_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			m_hsync_changed_cb( 1 );
 			m_pixel_clock = 0;
 			v = ( v + 1 ) % m_height;
-			bitmap_line = &m_bmp->pix16(v);
+			bitmap_line = &m_bmp->pix(v);
 			break;
 
 		case HUC6260_HSYNC_START + 30:      /* End/Start of VSync */

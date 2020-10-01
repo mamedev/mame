@@ -267,7 +267,7 @@ uint32_t microvision_state::screen_update(screen_device &screen, bitmap_rgb32 &b
 			p = (p > 255) ? 0 : p ^ 255;
 
 			if (cliprect.contains(x, y))
-				bitmap.pix32(y, x) = p << 16 | p << 8 | p;
+				bitmap.pix(y, x) = p << 16 | p << 8 | p;
 		}
 	}
 

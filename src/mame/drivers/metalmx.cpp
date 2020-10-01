@@ -290,7 +290,7 @@ uint32_t metalmx_state::screen_update_metalmx(screen_device &screen, bitmap_ind1
 
 	for (int y = (std::max)(0, cliprect.min_y); y <= (std::min)(383, cliprect.max_y); ++y)
 	{
-		uint16_t *pix = &bitmap.pix16(y);
+		uint16_t *pix = &bitmap.pix(y);
 		for (int x = 0; x < 256; x++)
 		{
 			*pix++ = src_base[256 * y + x] & 0xffff;

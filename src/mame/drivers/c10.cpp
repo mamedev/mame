@@ -98,24 +98,23 @@ void c10_state::machine_reset()
 uint32_t c10_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	//static uint8_t framecnt=0;
-	uint8_t y,ra,chr,gfx;
-	uint16_t sy=0,ma=0,x,xx;
+	uint16_t sy=0,ma=0;
 
 	//framecnt++;
 
-	for (y = 0; y < 25; y++)
+	for (uint8_t y = 0; y < 25; y++)
 	{
-		for (ra = 0; ra < 10; ra++)
+		for (uint8_t ra = 0; ra < 10; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix(sy++);
 
-			xx = ma;
-			for (x = ma; x < ma + 80; x++)
+			uint16_t xx = ma;
+			for (uint16_t x = ma; x < ma + 80; x++)
 			{
-				gfx = 0;
+				uint8_t gfx = 0;
 				if (ra < 9)
 				{
-					chr = m_vram[xx++];
+					uint8_t chr = m_vram[xx++];
 
 				//  /* Take care of flashing characters */
 				//  if ((chr < 0x80) && (framecnt & 0x08))

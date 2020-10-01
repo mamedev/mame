@@ -146,7 +146,7 @@ HRESULT SaveBitmap2(bitmap_argb32 &bitmap, const WCHAR *filename)
 		uint32_t* pRow = pBitmap.get() + (y * bitmap.width());
 		for (int x = 0; x < bitmap.width(); x++)
 		{
-			uint32_t pixel = bitmap.pix32(y, x);
+			uint32_t pixel = bitmap.pix(y, x);
 			pRow[x] = (pixel == 0xFFFFFFFF) ? rgb_t(0xFF, 0x00, 0x00, 0x00) : rgb_t(0xFF, 0xFF, 0xFF, 0xFF);
 		}
 	}
@@ -570,7 +570,7 @@ public:
 			// copy the bits into it
 			for (int y = 0; y < bitmap.height(); y++)
 			{
-				uint32_t *dstrow = &bitmap.pix32(y);
+				uint32_t *dstrow = &bitmap.pix(y);
 				uint8_t *srcrow = &pixels[(y + actbounds.min_y) * bmwidth];
 				for (int x = 0; x < bitmap.width(); x++)
 				{

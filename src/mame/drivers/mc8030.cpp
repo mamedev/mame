@@ -145,27 +145,24 @@ uint8_t mc8030_state::asp_port_b_r()
 
 uint32_t mc8030_state::screen_update_mc8030(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t gfx;
-	uint16_t y=0,ma=0,x;
+	uint16_t ma=0;
 
-	for(y = 0; y < 256; y++ )
+	for(uint16_t y = 0; y < 256; y++ )
 	{
-		uint16_t *p = &bitmap.pix16(y);
+		uint16_t *p = &bitmap.pix(y);
+		for (uint16_t x = ma; x < ma + 64; x++)
 		{
-			for (x = ma; x < ma + 64; x++)
-			{
-				gfx = m_vram[x^0x3fff];
+			uint8_t const gfx = m_vram[x^0x3fff];
 
-				/* Display a scanline of a character */
-				*p++ = BIT(gfx, 7);
-				*p++ = BIT(gfx, 6);
-				*p++ = BIT(gfx, 5);
-				*p++ = BIT(gfx, 4);
-				*p++ = BIT(gfx, 3);
-				*p++ = BIT(gfx, 2);
-				*p++ = BIT(gfx, 1);
-				*p++ = BIT(gfx, 0);
-			}
+			/* Display a scanline of a character */
+			*p++ = BIT(gfx, 7);
+			*p++ = BIT(gfx, 6);
+			*p++ = BIT(gfx, 5);
+			*p++ = BIT(gfx, 4);
+			*p++ = BIT(gfx, 3);
+			*p++ = BIT(gfx, 2);
+			*p++ = BIT(gfx, 1);
+			*p++ = BIT(gfx, 0);
 		}
 		ma+=64;
 	}

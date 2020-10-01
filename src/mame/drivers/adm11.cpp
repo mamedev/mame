@@ -93,7 +93,7 @@ SCN2674_DRAW_CHARACTER_MEMBER(adm11_state::draw_character)
 
 	for (int i = 0; i < 9; i++)
 	{
-		bitmap.pix32(y, x++) = BIT(dots, 8) ? rgb_t::white() : rgb_t::black();
+		bitmap.pix(y, x++) = BIT(dots, 8) ? rgb_t::white() : rgb_t::black();
 		dots <<= 1;
 	}
 }

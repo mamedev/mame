@@ -179,35 +179,33 @@ MC6845_UPDATE_ROW( ecb_grip21_device::crtc_update_row )
 {
 	for (int column = 0; column < x_count; column++)
 	{
-		uint16_t address = (m_page << 12) | (((ma + column) & 0xfff) << 3) | (ra & 0x07);
-		uint8_t data = m_video_ram[address];
+		uint16_t const address = (m_page << 12) | (((ma + column) & 0xfff) << 3) | (ra & 0x07);
+		uint8_t const data = m_video_ram[address];
 
 		for (int bit = 0; bit < 8; bit++)
 		{
-			int x = (column * 8) + bit;
-			int color = (m_flash ? 0 : BIT(data, bit)) && de;
+			int const x = (column * 8) + bit;
+			int const color = (m_flash ? 0 : BIT(data, bit)) && de;
 
-			bitmap.pix32(vbp + y, hbp + x) = m_palette->pen(color);
+			bitmap.pix(vbp + y, hbp + x) = m_palette->pen(color);
 		}
 	}
 }
 /*
 MC6845_UPDATE_ROW( ecb_grip21_device::grip5_update_row )
 {
-    const rgb_t *palette = m_palette->palette()->entry_list_raw();
-    int column, bit;
-
-    for (column = 0; column < x_count; column++)
+    rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+    for (int column = 0; column < x_count; column++)
     {
-        uint16_t address = (m_dpage << 12) | (((ma + column) & 0xfff) << 3) | (ra & 0x07);
-        uint8_t data = m_video_ram[address];
+        uint16_t const address = (m_dpage << 12) | (((ma + column) & 0xfff) << 3) | (ra & 0x07);
+        uint8_t const data = m_video_ram[address];
 
-        for (bit = 0; bit < 8; bit++)
+        for (int bit = 0; bit < 8; bit++)
         {
-            int x = (column * 8) + bit;
-            int color = m_flash ? 0 : BIT(data, bit);
+            int const x = (column * 8) + bit;
+            int const color = m_flash ? 0 : BIT(data, bit);
 
-            bitmap.pix32(y, x) = palette[color];
+            bitmap.pix(y, x) = palette[color];
         }
     }
 }
@@ -217,7 +215,7 @@ MC6845_ON_UPDATE_ADDR_CHANGED( ecb_grip21_device::grip5_addr_changed )
 }
 */
 
-static const int16_t speaker_levels[] = { -32768, 0, 32767, 0 };
+static const double speaker_levels[] = { -1.0, 0.0, 1.0, 0.0 };
 
 //-------------------------------------------------
 //  I8255A interface

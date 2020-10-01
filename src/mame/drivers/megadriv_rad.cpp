@@ -195,7 +195,12 @@ ROM_START( rad_sonic )
 	ROM_LOAD16_WORD_SWAP( "supersonicgold.bin", 0x000000, 0x400000, CRC(853c9140) SHA1(cf70a9cdd3be4d8d1b6195698db3a941f4908791) )
 ROM_END
 
-
+// once byteswapped this matches "outrun 2019 (usa) (beta).bin  megadriv:outr2019up Out Run 2019 (USA, Prototype)"
+// this was dumped from a PAL/UK unit, so maybe that 'beta' is really an alt Euro release, or was simply dumped from one of these Radica units and mislabeled?
+ROM_START( rad_orun )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "outrun.bin", 0x000000, 0x100000, CRC(4fd6d653) SHA1(57f0e4550ff883e4bb7857caef2c893c21f80b42) )
+ROM_END
 
 
 void megadriv_radica_state::init_megadriv_radica_6button_pal()
@@ -224,3 +229,4 @@ CONS( 2004, rad_sf2p, rad_sf2,0, megadriv_radica_6button_pal,  megadriv_radica_6
 
 CONS( 2004, rad_ssoc, 0,      0, megadriv_radica_3button_pal,  megadriv_radica_3button,         megadriv_radica_state, init_megadrie,                    "Radica / Sensible Software / Sega", "Sensible Soccer plus [Cannon Fodder, Mega lo Mania] (Radica, Arcade Legends) (Europe)", 0)  // still branded as Arcade Legends even if none of these were ever arcade games
 
+CONS( 2004, rad_orun, 0,      0, megadriv_radica_3button_pal,  megadriv_radica_3button_1player, megadriv_radica_state, init_megadrie,                    "Radica / Sega",                     "Out Run 2019 (Radica Plug & Play, Europe)", 0)

@@ -56,31 +56,23 @@ void mpu4plasma_state::mpu4plasma_map(address_map &map)
 uint32_t mpu4plasma_state::screen_update_mpu4plasma(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// don't know if this really gets drawn straight from ram..
-	int base = 0x1600 / 2;
+	int const base = 0x1600 / 2;
 
-	uint16_t* rambase = m_plasmaram;
-	uint16_t* dst_bitmap;
+	uint16_t const *const rambase = m_plasmaram;
 
-	int i,y,x,p;
-	i = 0;
+	int i = 0;
 
-	for (y=0;y<40;y++)
+	for (int y=0; y<40; y++)
 	{
-		dst_bitmap = &bitmap.pix16(y);
+		uint16_t *const dst_bitmap = &bitmap.pix(y);
 
-		for (x=0;x<128/16;x++)
+		for (int x=0; x<128/16; x++)
 		{
-			uint16_t pix = rambase[base+i];
-
-			for (p=0;p<16;p++)
-			{
-				uint16_t bit = (pix << p)&0x8000;
-				if (bit) dst_bitmap[x*16 + p] = 1;
-				else dst_bitmap[x*16 + p] = 0;
-			}
+			uint16_t const pix = rambase[base+i];
+			for (int p=0; p<16; p++)
+				dst_bitmap[x*16 + p] = ((pix << p) & 0x8000) ? 1 : 0;
 
 			i++;
-
 		}
 	}
 

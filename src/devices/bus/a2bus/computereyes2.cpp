@@ -196,22 +196,22 @@ void a2bus_computereyes2_device::write_c0nx(uint8_t offset, uint8_t data)
 				m_x = m_y = 0;
 				std::fill_n(m_a2_bitmap, 280*193, 0);
 
-				m_bitmap = &m_picture->get_bitmap();
-				if (m_bitmap)
+				const bitmap_argb32 &bitmap = m_picture->get_bitmap();
+				if (bitmap.valid())
 				{
 					// convert arbitrary sized ARGB32 image to a 188x193 image with 256 levels of grayscale
-					double stepx = (double)m_bitmap->width() / 188.0;
-					double stepy = (double)m_bitmap->height() / 193.0;
+					double stepx = (double)bitmap.width() / 188.0;
+					double stepy = (double)bitmap.height() / 193.0;
 
 					for (int y = 0; y < 193; y++)
 					{
 						for (int x = 0; x < 280; x++)
 						{
-							u32 pixel = m_bitmap->pix((int)((double)y * stepy), (int)((double)x * stepx));
-							double mono = ((0.2126 * (double)(((pixel>>16) & 0xff) / 255.0)) +
-								   (0.7152 * (double)(((pixel>>8) & 0xff) / 255.0)) +
-								   (0.0722 * (double)((pixel& 0xff) / 255.0)));
-							m_a2_bitmap[(y*280)+x] = (u8)(mono * 255.0);
+							u32 pixel = bitmap.pix(int((double)y * stepy), int((double)x * stepx));
+							double mono = ((0.2126 * double(((pixel>>16) & 0xff) / 255.0)) +
+								   (0.7152 * double(((pixel>>8) & 0xff) / 255.0)) +
+								   (0.0722 * double((pixel& 0xff) / 255.0)));
+							m_a2_bitmap[(y*280)+x] = u8(mono * 255.0);
 						}
 					}
 				}

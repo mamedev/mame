@@ -1863,12 +1863,12 @@ void v99x8_device::refresh_32(int line)
 
 	if (m_cont_reg[9] & 0x08)
 	{
-		ln = &m_bitmap.pix32(m_scanline*2+((m_stat_reg[2]>>1)&1));
+		ln = &m_bitmap.pix(m_scanline*2+((m_stat_reg[2]>>1)&1));
 	}
 	else
 	{
-		ln = &m_bitmap.pix32(m_scanline*2);
-		ln2 = &m_bitmap.pix32(m_scanline*2+1);
+		ln = &m_bitmap.pix(m_scanline*2);
+		ln2 = &m_bitmap.pix(m_scanline*2+1);
 		double_lines = true;
 	}
 

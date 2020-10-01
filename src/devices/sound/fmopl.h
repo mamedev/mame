@@ -16,7 +16,7 @@
 /* select output bits size of output : 8 or 16 */
 #define OPL_SAMPLE_BITS 16
 
-typedef stream_sample_t OPLSAMPLE;
+typedef s32 OPLSAMPLE;
 /*
 #if (OPL_SAMPLE_BITS==16)
 typedef int16_t OPLSAMPLE;
@@ -44,7 +44,7 @@ void ym3812_reset_chip(void *chip);
 int  ym3812_write(void *chip, int a, int v);
 unsigned char ym3812_read(void *chip, int a);
 int  ym3812_timer_over(void *chip, int c);
-void ym3812_update_one(void *chip, OPLSAMPLE *buffer, int length);
+void ym3812_update_one(void *chip, write_stream_view &buffer);
 
 void ym3812_set_timer_handler(void *chip, OPL_TIMERHANDLER TimerHandler, device_t *device);
 void ym3812_set_irq_handler(void *chip, OPL_IRQHANDLER IRQHandler, device_t *device);
@@ -77,7 +77,7 @@ int  ym3526_timer_over(void *chip, int c);
 ** '*buffer' is the output buffer pointer
 ** 'length' is the number of samples that should be generated
 */
-void ym3526_update_one(void *chip, OPLSAMPLE *buffer, int length);
+void ym3526_update_one(void *chip, write_stream_view &buffer);
 
 void ym3526_set_timer_handler(void *chip, OPL_TIMERHANDLER TimerHandler, device_t *device);
 void ym3526_set_irq_handler(void *chip, OPL_IRQHANDLER IRQHandler, device_t *device);
@@ -100,7 +100,7 @@ void y8950_reset_chip(void *chip);
 int  y8950_write(void *chip, int a, int v);
 unsigned char y8950_read (void *chip, int a);
 int  y8950_timer_over(void *chip, int c);
-void y8950_update_one(void *chip, OPLSAMPLE *buffer, int length);
+void y8950_update_one(void *chip, write_stream_view &buffer);
 
 void y8950_set_timer_handler(void *chip, OPL_TIMERHANDLER TimerHandler, device_t *device);
 void y8950_set_irq_handler(void *chip, OPL_IRQHANDLER IRQHandler, device_t *device);

@@ -69,22 +69,19 @@ void battlane_state::battlane_spriteram_w(offs_t offset, uint8_t data)
 
 void battlane_state::battlane_bitmap_w(offs_t offset, uint8_t data)
 {
-	int i, orval;
-
-	orval = (~m_video_ctrl >> 1) & 0x07;
-
+	int orval = (~m_video_ctrl >> 1) & 0x07;
 	if (!orval)
 		orval = 7;
 
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		if (data & 1 << i)
 		{
-			m_screen_bitmap.pix8(offset % 0x100, (offset / 0x100) * 8 + i) |= orval;
+			m_screen_bitmap.pix(offset % 0x100, (offset / 0x100) * 8 + i) |= orval;
 		}
 		else
 		{
-			m_screen_bitmap.pix8(offset % 0x100, (offset / 0x100) * 8 + i) &= ~orval;
+			m_screen_bitmap.pix(offset % 0x100, (offset / 0x100) * 8 + i) &= ~orval;
 		}
 	}
 }
@@ -207,20 +204,18 @@ void battlane_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 void battlane_state::draw_fg_bitmap( bitmap_ind16 &bitmap )
 {
-	int x, y, data;
-
-	for (y = 0; y < 32 * 8; y++)
+	for (int y = 0; y < 32 * 8; y++)
 	{
-		for (x = 0; x < 32 * 8; x++)
+		for (int x = 0; x < 32 * 8; x++)
 		{
-			data = m_screen_bitmap.pix8(y, x);
+			int const data = m_screen_bitmap.pix(y, x);
 
 			if (data)
 			{
 				if (flip_screen())
-					bitmap.pix16(255 - y, 255 - x) = data;
+					bitmap.pix(255 - y, 255 - x) = data;
 				else
-					bitmap.pix16(y, x) = data;
+					bitmap.pix(y, x) = data;
 			}
 		}
 	}

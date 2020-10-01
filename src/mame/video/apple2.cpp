@@ -138,6 +138,7 @@ void a2_video_device::device_reset()
 	m_monohgr = false;
 	m_newvideo = 0x01;
 	m_rgbmode = 3;  // default to color DHGR
+	m_monochrome = 0; // TODO: never set, but if left uninitialized could cause the emulation to start in monochrome by accident. Default to color for now
 }
 
 WRITE_LINE_MEMBER(a2_video_device::txt_w)
@@ -195,10 +196,6 @@ WRITE_LINE_MEMBER(a2_video_device::an2_w)
 void a2_video_device::plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code,
 	const uint8_t *textgfx_data, uint32_t textgfx_datalen, int fg, int bg)
 {
-	int x, y, i;
-	const uint8_t *chardata;
-	uint16_t color;
-
 	if (!m_altcharset)
 	{
 		if ((code >= 0x40) && (code <= 0x7f))
@@ -207,9 +204,8 @@ void a2_video_device::plot_text_character(bitmap_ind16 &bitmap, int xpos, int yp
 
 			if (m_flash)
 			{
-				i = fg;
-				fg = bg;
-				bg = i;
+				using std::swap;
+				swap(fg, bg);
 			}
 		}
 	}
@@ -218,24 +214,23 @@ void a2_video_device::plot_text_character(bitmap_ind16 &bitmap, int xpos, int yp
 		if ((code >= 0x60) && (code <= 0x7f))
 		{
 			code |= 0x80;   // map to lowercase normal
-			i = fg;         // and flip the color
-			fg = bg;
-			bg = i;
+			using std::swap;// and flip the color
+			std::swap(fg, bg);
 		}
 	}
 
 	/* look up the character data */
-	chardata = &textgfx_data[(code * 8)];
+	uint8_t const *const chardata = &textgfx_data[(code * 8)];
 
-	for (y = 0; y < 8; y++)
+	for (int y = 0; y < 8; y++)
 	{
-		for (x = 0; x < 7; x++)
+		for (int x = 0; x < 7; x++)
 		{
-			color = (chardata[y] & (1 << x)) ? bg : fg;
+			uint16_t const color = (chardata[y] & (1 << x)) ? bg : fg;
 
-			for (i = 0; i < xscale; i++)
+			for (int i = 0; i < xscale; i++)
 			{
-				bitmap.pix16(ypos + y, xpos + (x * xscale) + i) = color;
+				bitmap.pix(ypos + y, xpos + (x * xscale) + i) = color;
 			}
 		}
 	}
@@ -244,10 +239,6 @@ void a2_video_device::plot_text_character(bitmap_ind16 &bitmap, int xpos, int yp
 void a2_video_device::plot_text_character_dodo(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code,
 	const uint8_t *textgfx_data, uint32_t textgfx_datalen, int fg, int bg)
 {
-	int x, y, i;
-	const uint8_t *chardata;
-	uint16_t color;
-
 	if (!m_altcharset)
 	{
 		if ((code >= 0x40) && (code <= 0x7f))
@@ -256,9 +247,8 @@ void a2_video_device::plot_text_character_dodo(bitmap_ind16 &bitmap, int xpos, i
 
 			if (m_flash)
 			{
-				i = fg;
-				fg = bg;
-				bg = i;
+				using std::swap;
+				swap(fg, bg);
 			}
 		}
 	}
@@ -267,24 +257,23 @@ void a2_video_device::plot_text_character_dodo(bitmap_ind16 &bitmap, int xpos, i
 		if ((code >= 0x60) && (code <= 0x7f))
 		{
 			code |= 0x80;   // map to lowercase normal
-			i = fg;         // and flip the color
-			fg = bg;
-			bg = i;
+			using std::swap;// and flip the color
+			swap(fg, bg);
 		}
 	}
 
 	/* look up the character data */
-	chardata = &textgfx_data[(code * 8)];
+	uint8_t const *const chardata = &textgfx_data[(code * 8)];
 
-	for (y = 0; y < 8; y++)
+	for (int y = 0; y < 8; y++)
 	{
-		for (x = 0; x < 7; x++)
+		for (int x = 0; x < 7; x++)
 		{
-			color = (chardata[y] & (1 << (x+1))) ? fg : bg;
+			uint16_t const color = (chardata[y] & (1 << (x+1))) ? fg : bg;
 
-			for (i = 0; i < xscale; i++)
+			for (int i = 0; i < xscale; i++)
 			{
-				bitmap.pix16(ypos + y, xpos + (x * xscale) + i) = color;
+				bitmap.pix(ypos + y, xpos + (x * xscale) + i) = color;
 			}
 		}
 	}
@@ -293,38 +282,32 @@ void a2_video_device::plot_text_character_dodo(bitmap_ind16 &bitmap, int xpos, i
 void a2_video_device::plot_text_character_orig(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code,
 	const uint8_t *textgfx_data, uint32_t textgfx_datalen, int fg, int bg)
 {
-	int x, y, i;
-	const uint8_t *chardata;
-	uint16_t color;
-
 	if ((code >= 0x40) && (code <= 0x7f))
 	{
 		if (m_flash)
 		{
-			i = fg;
-			fg = bg;
-			bg = i;
+			using std::swap;
+			swap(fg, bg);
 		}
 	}
 	else if (code < 0x40)   // inverse: flip FG and BG
 	{
-			i = fg;
-			fg = bg;
-			bg = i;
+		using std::swap;
+		swap(fg, bg);
 	}
 
 	/* look up the character data */
-	chardata = &textgfx_data[(code * 8)];
+	uint8_t const *const chardata = &textgfx_data[(code * 8)];
 
-	for (y = 0; y < 8; y++)
+	for (int y = 0; y < 8; y++)
 	{
-		for (x = 0; x < 7; x++)
+		for (int x = 0; x < 7; x++)
 		{
-			color = (chardata[y] & (1 << (6-x))) ? fg : bg;
+			uint16_t const color = (chardata[y] & (1 << (6-x))) ? fg : bg;
 
-			for (i = 0; i < xscale; i++)
+			for (int i = 0; i < xscale; i++)
 			{
-				bitmap.pix16(ypos + y, xpos + (x * xscale) + i) = color;
+				bitmap.pix(ypos + y, xpos + (x * xscale) + i) = color;
 			}
 		}
 	}
@@ -333,25 +316,19 @@ void a2_video_device::plot_text_character_orig(bitmap_ind16 &bitmap, int xpos, i
 void a2_video_device::plot_text_character_jplus(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code,
 	const uint8_t *textgfx_data, uint32_t textgfx_datalen, int fg, int bg)
 {
-	int x, y, i;
-	const uint8_t *chardata;
-	uint16_t color;
-
 	if ((code >= 0x40) && (code <= 0x7f))
 	{
 		code &= 0x3f;
 		if (m_flash)
 		{
-			i = fg;
-			fg = bg;
-			bg = i;
+			using std::swap;
+			swap(fg, bg);
 		}
 	}
 	else if (code < 0x40)   // inverse: flip FG and BG
 	{
-			i = fg;
-			fg = bg;
-			bg = i;
+		using std::swap;
+		swap(fg, bg);
 	}
 
 	if (m_an2)
@@ -360,17 +337,17 @@ void a2_video_device::plot_text_character_jplus(bitmap_ind16 &bitmap, int xpos, 
 	}
 
 	/* look up the character data */
-	chardata = &textgfx_data[(code * 8)];
+	uint8_t const *const chardata = &textgfx_data[(code * 8)];
 
-	for (y = 0; y < 8; y++)
+	for (int y = 0; y < 8; y++)
 	{
-		for (x = 0; x < 7; x++)
+		for (int x = 0; x < 7; x++)
 		{
-			color = (chardata[y] & (1 << (6-x))) ? fg : bg;
+			uint16_t const color = (chardata[y] & (1 << (6-x))) ? fg : bg;
 
-			for (i = 0; i < xscale; i++)
+			for (int i = 0; i < xscale; i++)
 			{
-				bitmap.pix16(ypos + y, xpos + (x * xscale) + i) = color;
+				bitmap.pix(ypos + y, xpos + (x * xscale) + i) = color;
 			}
 		}
 	}
@@ -379,32 +356,27 @@ void a2_video_device::plot_text_character_jplus(bitmap_ind16 &bitmap, int xpos, 
 void a2_video_device::plot_text_character_ultr(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code,
 	const uint8_t *textgfx_data, uint32_t textgfx_datalen, int fg, int bg)
 {
-	int x, y, i;
-	const uint8_t *chardata;
-	uint16_t color;
-
 	if ((code >= 0x40) && (code <= 0x7f))
 	{
 		if (m_flash)
 		{
-			i = fg;
-			fg = bg;
-			bg = i;
+			using std::swap;
+			swap(fg, bg);
 		}
 	}
 
 	/* look up the character data */
-	chardata = &textgfx_data[(code * 8)];
+	uint8_t const *const chardata = &textgfx_data[(code * 8)];
 
-	for (y = 0; y < 8; y++)
+	for (int y = 0; y < 8; y++)
 	{
-		for (x = 1; x < 8; x++)
+		for (int x = 1; x < 8; x++)
 		{
-			color = (chardata[y] & (1 << x)) ? fg : bg;
+			uint16_t const color = (chardata[y] & (1 << x)) ? fg : bg;
 
-			for (i = 0; i < xscale; i++)
+			for (int i = 0; i < xscale; i++)
 			{
-				bitmap.pix16(ypos + y, xpos + ((x-1) * xscale) + i) = color;
+				bitmap.pix(ypos + y, xpos + ((x-1) * xscale) + i) = color;
 			}
 		}
 	}
@@ -413,10 +385,6 @@ void a2_video_device::plot_text_character_ultr(bitmap_ind16 &bitmap, int xpos, i
 void a2_video_device::plot_text_characterGS(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code,
 	const uint8_t *textgfx_data, uint32_t textgfx_datalen, int fg, int bg)
 {
-	int x, y, i;
-	const uint8_t *chardata;
-	uint16_t color;
-
 	if (!m_altcharset)
 	{
 		if ((code >= 0x40) && (code <= 0x7f))
@@ -425,9 +393,8 @@ void a2_video_device::plot_text_characterGS(bitmap_ind16 &bitmap, int xpos, int 
 
 			if (m_flash)
 			{
-				i = fg;
-				fg = bg;
-				bg = i;
+				using std::swap;
+				swap(fg, bg);
 			}
 		}
 	}
@@ -437,17 +404,17 @@ void a2_video_device::plot_text_characterGS(bitmap_ind16 &bitmap, int xpos, int 
 	}
 
 	/* look up the character data */
-	chardata = &textgfx_data[(code * 8)];
+	uint8_t const *const chardata = &textgfx_data[(code * 8)];
 
-	for (y = 0; y < 8; y++)
+	for (int y = 0; y < 8; y++)
 	{
-		for (x = 0; x < 7; x++)
+		for (int x = 0; x < 7; x++)
 		{
-			color = (chardata[y] & (1 << x)) ? bg : fg;
+			uint16_t const color = (chardata[y] & (1 << x)) ? bg : fg;
 
-			for (i = 0; i < xscale; i++)
+			for (int i = 0; i < xscale; i++)
 			{
-				bitmap.pix16(ypos + y, xpos + (x * xscale) + i) = color;
+				bitmap.pix(ypos + y, xpos + (x * xscale) + i) = color;
 			}
 		}
 	}
@@ -455,10 +422,7 @@ void a2_video_device::plot_text_characterGS(bitmap_ind16 &bitmap, int xpos, int 
 
 void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
-	int row, col, y, x;
-	uint8_t code;
-	uint32_t start_address = m_page2 ? 0x0800 : 0x0400;
-	uint32_t address;
+	uint32_t const start_address = m_page2 ? 0x0800 : 0x0400;
 	int fg = 0;
 
 	switch (m_sysconfig & 0x03)
@@ -475,34 +439,34 @@ void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, 
 
 	if (!(m_sysconfig & 0x03))
 	{
-		for (row = beginrow; row <= endrow; row += 8)
+		for (int row = beginrow; row <= endrow; row += 8)
 		{
-			for (col = 0; col < 40; col++)
+			for (int col = 0; col < 40; col++)
 			{
 				/* calculate adderss */
-				address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
+				uint32_t const address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
 
 				/* perform the lookup */
-				code = m_ram_ptr[address];
+				uint8_t const code = m_ram_ptr[address];
 
 				/* and now draw */
-				for (y = 0; y < 4; y++)
+				for (int y = 0; y < 4; y++)
 				{
 					if ((row + y) <= endrow)
 					{
-						for (x = 0; x < 14; x++)
+						for (int x = 0; x < 14; x++)
 						{
-							bitmap.pix16(row + y, col * 14 + x) = (code >> 0) & 0x0F;
+							bitmap.pix(row + y, col * 14 + x) = (code >> 0) & 0x0F;
 						}
 					}
 				}
-				for (y = 4; y < 8; y++)
+				for (int y = 4; y < 8; y++)
 				{
 					if ((row + y) <= endrow)
 					{
-						for (x = 0; x < 14; x++)
+						for (int x = 0; x < 14; x++)
 						{
-							bitmap.pix16(row + y, col * 14 + x) = (code >> 4) & 0x0F;
+							bitmap.pix(row + y, col * 14 + x) = (code >> 4) & 0x0F;
 						}
 					}
 				}
@@ -511,58 +475,58 @@ void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	}
 	else
 	{
-		for (row = beginrow; row <= endrow; row += 8)
+		for (int row = beginrow; row <= endrow; row += 8)
 		{
-			for (col = 0; col < 40; col++)
+			for (int col = 0; col < 40; col++)
 			{
 				uint8_t bits;
 
 				/* calculate adderss */
-				address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
+				uint32_t const address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
 
 				/* perform the lookup */
-				code = m_ram_ptr[address];
+				uint8_t const code = m_ram_ptr[address];
 
 				bits = (code >> 0) & 0x0F;
 				/* and now draw */
-				for (y = 0; y < 4; y++)
+				for (int y = 0; y < 4; y++)
 				{
 					if ((row + y) <= endrow)
 					{
-						for (x = 0; x < 14; x++)
+						for (int x = 0; x < 14; x++)
 						{
 							if (col & 1)
 							{
-								bitmap.pix16(row + y, col * 14 + x) = bits & (1 << ((x+2) % 4)) ? fg : 0;
+								bitmap.pix(row + y, col * 14 + x) = bits & (1 << ((x+2) % 4)) ? fg : 0;
 							}
 							else
 							{
-								bitmap.pix16(row + y, col * 14 + x) = bits & (1 << (x % 4)) ? fg : 0;
+								bitmap.pix(row + y, col * 14 + x) = bits & (1 << (x % 4)) ? fg : 0;
 							}
 						}
 					}
 				}
 
 				bits = (code >> 4) & 0x0F;
-				for (y = 4; y < 8; y++)
+				for (int y = 4; y < 8; y++)
 				{
 					if ((row + y) <= endrow)
 					{
-						for (x = 0; x < 14; x++)
+						for (int x = 0; x < 14; x++)
 						{
 							if (col & 1)
 							{
-								bitmap.pix16(row + y, col * 14 + x) = bits & (1 << ((x+2) % 4)) ? fg : 0;
+								bitmap.pix(row + y, col * 14 + x) = bits & (1 << ((x+2) % 4)) ? fg : 0;
 							}
 							else
 							{
-								bitmap.pix16(row + y, col * 14 + x) = bits & (1 << (x % 4)) ? fg : 0;
+								bitmap.pix(row + y, col * 14 + x) = bits & (1 << (x % 4)) ? fg : 0;
 							}
 						}
 					}
 				}
 
-				if (row == 64) printf("\n");
+				//if (row == 64) printf("\n");
 
 			}
 		}
@@ -571,10 +535,7 @@ void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, 
 
 void a2_video_device::dlores_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
-	int row, col, y;
-	uint8_t code, auxcode;
-	uint32_t start_address = m_page2 ? 0x0800 : 0x0400;
-	uint32_t address;
+	uint32_t const start_address = m_page2 ? 0x0800 : 0x0400;
 	static const int aux_colors[16] = { 0, 2, 4, 6, 8, 0xa, 0xc, 0xe, 1, 3, 5, 7, 9, 0xb, 0xd, 0xf };
 	int fg = 0;
 
@@ -592,21 +553,21 @@ void a2_video_device::dlores_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 	if (!(m_sysconfig & 0x03))
 	{
-		for (row = beginrow; row <= endrow; row += 8)
+		for (int row = beginrow; row <= endrow; row += 8)
 		{
-			for (col = 0; col < 40; col++)
+			for (int col = 0; col < 40; col++)
 			{
 				/* calculate adderss */
-				address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
+				uint32_t const address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
 
 				/* perform the lookup */
-				code = m_ram_ptr[address];
-				auxcode = m_aux_ptr[address];
+				uint8_t const code = m_ram_ptr[address];
+				uint8_t const auxcode = m_aux_ptr[address];
 
 				/* and now draw */
-				for (y = 0; y < 4; y++)
+				for (int y = 0; y < 4; y++)
 				{
-					uint16_t *vram = &bitmap.pix16(row + y, (col * 14));
+					uint16_t *vram = &bitmap.pix(row + y, (col * 14));
 
 					*vram++ = aux_colors[(auxcode >> 0) & 0x0F];
 					*vram++ = aux_colors[(auxcode >> 0) & 0x0F];
@@ -623,9 +584,9 @@ void a2_video_device::dlores_update(screen_device &screen, bitmap_ind16 &bitmap,
 					*vram++ = (code >> 0) & 0x0F;
 					*vram++ = (code >> 0) & 0x0F;
 				}
-				for (y = 4; y < 8; y++)
+				for (int y = 4; y < 8; y++)
 				{
-					uint16_t *vram = &bitmap.pix16(row + y, (col * 14));
+					uint16_t *vram = &bitmap.pix(row + y, (col * 14));
 
 					*vram++ = aux_colors[(auxcode >> 4) & 0x0F];
 					*vram++ = aux_colors[(auxcode >> 4) & 0x0F];
@@ -647,26 +608,26 @@ void a2_video_device::dlores_update(screen_device &screen, bitmap_ind16 &bitmap,
 	}
 	else
 	{
-		for (row = beginrow; row <= endrow; row += 8)
+		for (int row = beginrow; row <= endrow; row += 8)
 		{
-			for (col = 0; col < 40; col++)
+			for (int col = 0; col < 40; col++)
 			{
 				uint8_t bits, abits;
 
 				/* calculate adderss */
-				address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
+				uint32_t const address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
 
 				/* perform the lookup */
-				code = m_ram_ptr[address];
-				auxcode = m_aux_ptr[address];
+				uint8_t const code = m_ram_ptr[address];
+				uint8_t const auxcode = m_aux_ptr[address];
 
 				bits = (code >> 0) & 0x0F;
 				abits = (auxcode >> 0) & 0x0F;
 
 				/* and now draw */
-				for (y = 0; y < 4; y++)
+				for (int y = 0; y < 4; y++)
 				{
-					uint16_t *vram = &bitmap.pix16(row + y, (col * 14));
+					uint16_t *vram = &bitmap.pix(row + y, (col * 14));
 
 					if (col & 1)
 					{
@@ -707,9 +668,9 @@ void a2_video_device::dlores_update(screen_device &screen, bitmap_ind16 &bitmap,
 				bits = (code >> 4) & 0x0F;
 				abits = (auxcode >> 4) & 0x0F;
 
-				for (y = 4; y < 8; y++)
+				for (int y = 4; y < 8; y++)
 				{
-					uint16_t *vram = &bitmap.pix16(row + y, (col * 14));
+					uint16_t *vram = &bitmap.pix(row + y, (col * 14));
 
 					if (col & 1)
 					{
@@ -753,30 +714,15 @@ void a2_video_device::dlores_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
-	int row, col;
-	uint32_t start_address;
-	uint32_t address;
-	uint8_t *aux_page = m_ram_ptr;
-	int fg = 0;
-	int bg = 0;
+	uint8_t const *const aux_page = m_aux_ptr ? m_aux_ptr : m_ram_ptr;
 
-	if (m_aux_ptr)
-	{
-		aux_page = m_aux_ptr;
-	}
-
-	if (m_80col)
-	{
-		start_address = 0x400;
-	}
-	else
-	{
-		start_address = m_page2 ? 0x800 : 0x400;
-	}
+	uint32_t const start_address = m_80col ? 0x400 : m_page2 ? 0x800 : 0x400;
 
 	beginrow = (std::max)(beginrow, cliprect.top() - (cliprect.top() % 8));
 	endrow = (std::min)(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
 
+	int fg = 0;
+	int bg = 0;
 	switch (m_sysconfig & 0x03)
 	{
 		case 0: case 4: fg = WHITE; break;
@@ -785,14 +731,14 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 		case 3: fg = ORANGE; break;
 	}
 
-	for (row = beginrow; row <= endrow; row += 8)
+	for (int row = beginrow; row <= endrow; row += 8)
 	{
 		if (m_80col)
 		{
-			for (col = 0; col < 40; col++)
+			for (int col = 0; col < 40; col++)
 			{
 				/* calculate address */
-				address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
+				uint32_t const address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
 
 				plot_text_character(bitmap, col * 14, row, 1, aux_page[address],
 					m_char_ptr, m_char_size, fg, bg);
@@ -802,10 +748,10 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 		}
 		else
 		{
-			for (col = 0; col < 40; col++)
+			for (int col = 0; col < 40; col++)
 			{
 				/* calculate address */
-				address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
+				uint32_t const address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
 				if (((m_sysconfig & 7) == 4) && (m_dhires))
 				{
 					u8 tmp = aux_page[address];
@@ -977,14 +923,6 @@ void a2_video_device::text_update_ultr(screen_device &screen, bitmap_ind16 &bitm
 
 void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
-	const uint8_t *vram;
-	int row, col, b;
-	int offset;
-	uint8_t vram_row[42];
-	uint16_t v;
-	uint16_t *p;
-	uint32_t w;
-	uint16_t *artifact_map_ptr;
 	int mon_type = m_sysconfig & 0x03;
 	int begincol = 0, endcol = 40;
 
@@ -1008,28 +946,30 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 
 	//printf("HGR draw: page %c, rows %d-%d cols %d-%d\n", m_page2 ? '2' : '1', beginrow, endrow, begincol, endcol);
 
-	vram = &m_ram_ptr[(m_page2 ? 0x4000 : 0x2000)];
+	uint8_t const *const vram = &m_ram_ptr[(m_page2 ? 0x4000 : 0x2000)];
 
+	uint8_t vram_row[42];
 	vram_row[0] = 0;
 	vram_row[41] = 0;
 
-	for (row = beginrow; row <= endrow; row++)
+	for (int row = beginrow; row <= endrow; row++)
 	{
-		for (col = begincol; col < endcol; col++)
+		for (int col = begincol; col < endcol; col++)
 		{
-			offset = ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col)) | ((row & 7) << 10);
+			int const offset = ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col)) | ((row & 7) << 10);
 			vram_row[1+col] = vram[offset];
 		}
 
-		p = &bitmap.pix16(row);
+		uint16_t *p = &bitmap.pix(row);
 
-		for (col = 0; col < 40; col++)
+		for (int col = 0; col < 40; col++)
 		{
-			w =     (((uint32_t) vram_row[col+0] & 0x7f) <<  0)
-				|   (((uint32_t) vram_row[col+1] & 0x7f) <<  7)
-				|   (((uint32_t) vram_row[col+2] & 0x7f) << 14);
+			uint32_t w =    (((uint32_t) vram_row[col+0] & 0x7f) <<  0)
+						|   (((uint32_t) vram_row[col+1] & 0x7f) <<  7)
+						|   (((uint32_t) vram_row[col+2] & 0x7f) << 14);
 
 			// verified on h/w: setting dhires w/o 80col emulates a rev. 0 Apple ][ with no orange/blue
+			uint16_t const *artifact_map_ptr;
 			if (m_dhires)
 			{
 				artifact_map_ptr = m_hires_artifact_map.get();
@@ -1054,9 +994,9 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 			switch (mon_type)
 			{
 				case 0:
-					for (b = 0; b < 7; b++)
+					for (int b = 0; b < 7; b++)
 					{
-						v = artifact_map_ptr[((w >> (b + 7-1)) & 0x07) | (((b ^ col) & 0x01) << 3)];
+						uint16_t const v = artifact_map_ptr[((w >> (b + 7-1)) & 0x07) | (((b ^ col) & 0x01) << 3)];
 						*(p++) = v;
 						*(p++) = v;
 					}
@@ -1068,9 +1008,9 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 					{
 						p++;
 					}
-					for (b = 0; b < 7; b++)
+					for (int b = 0; b < 7; b++)
 					{
-						v = (w & 1);
+						uint16_t const v = (w & 1);
 						w >>= 1;
 						*(p++) = v ? WHITE : BLACK;
 						*(p++) = v ? WHITE : BLACK;
@@ -1087,9 +1027,9 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 					{
 						p++;
 					}
-					for (b = 0; b < 7; b++)
+					for (int b = 0; b < 7; b++)
 					{
-						v = (w & 1);
+						uint16_t const v = (w & 1);
 						w >>= 1;
 						*(p++) = v ? GREEN : BLACK;
 						*(p++) = v ? GREEN : BLACK;
@@ -1106,9 +1046,9 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 					{
 						p++;
 					}
-					for (b = 0; b < 7; b++)
+					for (int b = 0; b < 7; b++)
 					{
-						v = (w & 1);
+						uint16_t const v = (w & 1);
 						w >>= 1;
 						*(p++) = v ? ORANGE : BLACK;
 						*(p++) = v ? ORANGE : BLACK;
@@ -1126,15 +1066,7 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 // similar to regular A2 except page 2 is at $A000
 void a2_video_device::hgr_update_tk2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
-	const uint8_t *vram;
-	int row, col, b;
-	int offset;
-	uint8_t vram_row[42];
-	uint16_t v;
-	uint16_t *p;
-	uint32_t w;
-	uint16_t *artifact_map_ptr;
-	int mon_type = m_sysconfig & 0x03;
+	int const mon_type = m_sysconfig & 0x03;
 
 	/* sanity checks */
 	if (beginrow < cliprect.top())
@@ -1144,34 +1076,36 @@ void a2_video_device::hgr_update_tk2000(screen_device &screen, bitmap_ind16 &bit
 	if (endrow < beginrow)
 		return;
 
-	vram = &m_ram_ptr[(m_page2 ? 0xa000 : 0x2000)];
+	uint8_t const *const vram = &m_ram_ptr[(m_page2 ? 0xa000 : 0x2000)];
 
+	uint8_t vram_row[42];
 	vram_row[0] = 0;
 	vram_row[41] = 0;
 
-	for (row = beginrow; row <= endrow; row++)
+	for (int row = beginrow; row <= endrow; row++)
 	{
-		for (col = 0; col < 40; col++)
+		for (int col = 0; col < 40; col++)
 		{
-			offset = ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col)) | ((row & 7) << 10);
+			int const offset = ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col)) | ((row & 7) << 10);
 			vram_row[1+col] = vram[offset];
 		}
 
-		p = &bitmap.pix16(row);
+		uint16_t *p = &bitmap.pix(row);
 
-		for (col = 0; col < 40; col++)
+		for (int col = 0; col < 40; col++)
 		{
-			w =     (((uint32_t) vram_row[col+0] & 0x7f) <<  0)
-				|   (((uint32_t) vram_row[col+1] & 0x7f) <<  7)
-				|   (((uint32_t) vram_row[col+2] & 0x7f) << 14);
+			uint32_t w =    (((uint32_t) vram_row[col+0] & 0x7f) <<  0)
+						|   (((uint32_t) vram_row[col+1] & 0x7f) <<  7)
+						|   (((uint32_t) vram_row[col+2] & 0x7f) << 14);
 
+			uint16_t const *artifact_map_ptr;
 			switch (mon_type)
 			{
 				case 0:
 					artifact_map_ptr = &m_hires_artifact_map[((vram_row[col+1] & 0x80) >> 7) * 16];
-					for (b = 0; b < 7; b++)
+					for (int b = 0; b < 7; b++)
 					{
-						v = artifact_map_ptr[((w >> (b + 7-1)) & 0x07) | (((b ^ col) & 0x01) << 3)];
+						uint16_t const v = artifact_map_ptr[((w >> (b + 7-1)) & 0x07) | (((b ^ col) & 0x01) << 3)];
 						*(p++) = v;
 						*(p++) = v;
 					}
@@ -1183,9 +1117,9 @@ void a2_video_device::hgr_update_tk2000(screen_device &screen, bitmap_ind16 &bit
 					{
 						p--;
 					}
-					for (b = 0; b < 7; b++)
+					for (int b = 0; b < 7; b++)
 					{
-						v = (w & 1);
+						uint16_t const v = (w & 1);
 						w >>= 1;
 						*(p++) = v ? WHITE : BLACK;
 						*(p++) = v ? WHITE : BLACK;
@@ -1202,9 +1136,9 @@ void a2_video_device::hgr_update_tk2000(screen_device &screen, bitmap_ind16 &bit
 					{
 						p--;
 					}
-					for (b = 0; b < 7; b++)
+					for (int b = 0; b < 7; b++)
 					{
-						v = (w & 1);
+						uint16_t const v = (w & 1);
 						w >>= 1;
 						*(p++) = v ? GREEN : BLACK;
 						*(p++) = v ? GREEN : BLACK;
@@ -1221,9 +1155,9 @@ void a2_video_device::hgr_update_tk2000(screen_device &screen, bitmap_ind16 &bit
 					{
 						p--;
 					}
-					for (b = 0; b < 7; b++)
+					for (int b = 0; b < 7; b++)
 					{
-						v = (w & 1);
+						uint16_t const v = (w & 1);
 						w >>= 1;
 						*(p++) = v ? ORANGE : BLACK;
 						*(p++) = v ? ORANGE : BLACK;
@@ -1240,17 +1174,11 @@ void a2_video_device::hgr_update_tk2000(screen_device &screen, bitmap_ind16 &bit
 
 void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
-	const uint8_t *vram, *vaux;
-	int row, col, b;
-	int offset;
-	uint8_t vram_row[82];
 	uint16_t v;
-	uint16_t *p;
-	uint32_t w;
-	int page = m_page2 ? 0x4000 : 0x2000;
+	int const page = m_page2 ? 0x4000 : 0x2000;
 	int mon_type = m_sysconfig & 0x03;
-	bool bIsRGB = ((m_sysconfig & 7) == 4);
-	bool bIsRGBMixed = ((bIsRGB) && (m_rgbmode == 1));
+	bool const bIsRGB = ((m_sysconfig & 7) == 4);
+	bool const bIsRGBMixed = ((bIsRGB) && (m_rgbmode == 1));
 
 	// IIgs force-monochrome-DHR setting
 	if (m_newvideo & 0x20)
@@ -1272,30 +1200,23 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	if (endrow < beginrow)
 		return;
 
-	vram = &m_ram_ptr[page];
-	if (m_aux_ptr)
-	{
-		vaux = m_aux_ptr;
-	}
-	else
-	{
-		vaux = vram;
-	}
-	vaux += page;
+	uint8_t const *const vram = &m_ram_ptr[page];
+	uint8_t const *const vaux = (m_aux_ptr ? m_aux_ptr : vram) + page;
 
+	uint8_t vram_row[82];
 	vram_row[0] = 0;
 	vram_row[81] = 0;
 
-	for (row = beginrow; row <= endrow; row++)
+	for (int row = beginrow; row <= endrow; row++)
 	{
-		for (col = 0; col < 40; col++)
+		for (int col = 0; col < 40; col++)
 		{
-			offset = ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col)) | ((row & 7) << 10);
+			int const offset = ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col)) | ((row & 7) << 10);
 			vram_row[1+(col*2)+0] = vaux[offset];
 			vram_row[1+(col*2)+1] = vram[offset];
 		}
 
-		p = &bitmap.pix16(row);
+		uint16_t *p = &bitmap.pix(row);
 
 		// RGB DHR 160-wide mode
 		if ((bIsRGB) && (m_rgbmode == 2))
@@ -1303,11 +1224,11 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 			mon_type = 4;
 		}
 
-		for (col = 0; col < 80; col++)
+		for (int col = 0; col < 80; col++)
 		{
-			w =     (((uint32_t) vram_row[col+0] & 0x7f) <<  0)
-				|   (((uint32_t) vram_row[col+1] & 0x7f) <<  7)
-				|   (((uint32_t) vram_row[col+2] & 0x7f) << 14);
+			uint32_t w =    (((uint32_t) vram_row[col+0] & 0x7f) <<  0)
+						|   (((uint32_t) vram_row[col+1] & 0x7f) <<  7)
+						|   (((uint32_t) vram_row[col+2] & 0x7f) << 14);
 
 			/*
 			    DHGR pixel layout:
@@ -1333,7 +1254,7 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 						if (!(vram_row[col-1] & 0x80))
 						{
-							for (b = 0; b < 4; b++)
+							for (int b = 0; b < 4; b++)
 							{
 								v = (tw & 1);
 								tw >>= 1;
@@ -1342,7 +1263,7 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 						}
 						else
 						{
-							for (b = 0; b < 4; b++)
+							for (int b = 0; b < 4; b++)
 							{
 								v = m_dhires_artifact_map[((((w >> (b + 7-1)) & 0x0F) * 0x11) >> (((2-(col*7+b))) & 0x03)) & 0x0F];
 								*(p++) = v;
@@ -1351,7 +1272,7 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 						if (!(vram_row[col] & 0x80))
 						{
-							for (b = 4; b < 7; b++)
+							for (int b = 4; b < 7; b++)
 							{
 								v = (tw & 1);
 								tw >>= 1;
@@ -1360,7 +1281,7 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 						}
 						else
 						{
-							for (b = 4; b < 7; b++)
+							for (int b = 4; b < 7; b++)
 							{
 								v = m_dhires_artifact_map[((((w >> (b + 7-1)) & 0x0F) * 0x11) >> (((2-(col*7+b))) & 0x03)) & 0x0F];
 								*(p++) = v;
@@ -1372,7 +1293,7 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 						if ((bIsRGBMixed) && !(vram_row[col] & 0x80))
 						{
 							uint32_t tw = (w >> 6);
-							for (b = 0; b < 7; b++)
+							for (int b = 0; b < 7; b++)
 							{
 								v = (tw & 1);
 								tw >>= 1;
@@ -1381,7 +1302,7 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 						}
 						else
 						{
-							for (b = 0; b < 7; b++)
+							for (int b = 0; b < 7; b++)
 							{
 								v = m_dhires_artifact_map[((((w >> (b + 7-1)) & 0x0F) * 0x11) >> (((2-(col*7+b))) & 0x03)) & 0x0F];
 								*(p++) = v;
@@ -1392,7 +1313,7 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 				case 1:
 					w >>= 6;
-					for (b = 0; b < 7; b++)
+					for (int b = 0; b < 7; b++)
 					{
 						v = (w & 1);
 						w >>= 1;
@@ -1402,7 +1323,7 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 				case 2:
 					w >>= 6;
-					for (b = 0; b < 7; b++)
+					for (int b = 0; b < 7; b++)
 					{
 						v = (w & 1);
 						w >>= 1;
@@ -1412,7 +1333,7 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 				case 3:
 					w >>= 6;
-					for (b = 0; b < 7; b++)
+					for (int b = 0; b < 7; b++)
 					{
 						v = (w & 1);
 						w >>= 1;
@@ -1426,7 +1347,7 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 					{
 						// Center the 480-wide image in the 560-wide display.
 						// Aspect ratio won't be perfect, but it's in range.
-						for (b = 0; b < 40; b++)
+						for (int b = 0; b < 40; b++)
 						{
 							*(p++) = BLACK;
 						}
@@ -1445,7 +1366,7 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 		if (mon_type == 4)
 		{
-			for (b = 0; b < 40; b++)
+			for (int b = 0; b < 40; b++)
 			{
 				*(p++) = BLACK;
 			}
@@ -1490,15 +1411,7 @@ uint32_t a2_video_device::palette_entries() const
 
 uint32_t a2_video_device::screen_update_GS(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const uint8_t *vram;
-	uint32_t *scanline;
-	uint8_t scb, b;
-	int col, palette;
-	uint32_t last_pixel = 0, pixel;
-	int beamy;
-	uint16_t *a2pixel;
-
-	beamy = cliprect.top();
+	int const beamy = cliprect.top();
 
 	if (m_newvideo & 0x80)
 	{
@@ -1511,24 +1424,24 @@ uint32_t a2_video_device::screen_update_GS(screen_device &screen, bitmap_rgb32 &
 				return 0;
 			}
 
-			scanline = &bitmap.pix32(beamy);
-			for (col = 0; col < BORDER_LEFT+BORDER_RIGHT+640; col++)
+			uint32_t *const scanline = &bitmap.pix(beamy);
+			for (int col = 0; col < BORDER_LEFT+BORDER_RIGHT+640; col++)
 			{
 				scanline[col] = m_GSborder_colors[m_GSborder];
 			}
 		}
 		else    // regular screen area
 		{
-			int shrline = beamy - BORDER_TOP;
+			int const shrline = beamy - BORDER_TOP;
 
-			scb = m_aux_ptr[0x9D00 + shrline];
-			palette = ((scb & 0x0f) << 4);
+			uint8_t const scb = m_aux_ptr[0x9D00 + shrline];
+			int const palette = ((scb & 0x0f) << 4);
 
-			vram = &m_aux_ptr[0x2000 + (shrline * 160)];
-			scanline = &bitmap.pix32(beamy);
+			uint8_t const *const vram = &m_aux_ptr[0x2000 + (shrline * 160)];
+			uint32_t *const scanline = &bitmap.pix(beamy);
 
 			// draw left and right borders
-			for (col = 0; col < BORDER_LEFT; col++)
+			for (int col = 0; col < BORDER_LEFT; col++)
 			{
 				scanline[col] = m_GSborder_colors[m_GSborder];
 				scanline[col+BORDER_LEFT+640] = m_GSborder_colors[m_GSborder];
@@ -1536,9 +1449,9 @@ uint32_t a2_video_device::screen_update_GS(screen_device &screen, bitmap_rgb32 &
 
 			if (scb & 0x80) // 640 mode
 			{
-				for (col = 0; col < 160; col++)
+				for (int col = 0; col < 160; col++)
 				{
-					b = vram[col];
+					uint8_t const b = vram[col];
 					scanline[col * 4 + 0 + BORDER_LEFT] = m_shr_palette[palette +  0 + ((b >> 6) & 0x03)];
 					scanline[col * 4 + 1 + BORDER_LEFT] = m_shr_palette[palette +  4 + ((b >> 4) & 0x03)];
 					scanline[col * 4 + 2 + BORDER_LEFT] = m_shr_palette[palette +  8 + ((b >> 2) & 0x03)];
@@ -1555,9 +1468,12 @@ uint32_t a2_video_device::screen_update_GS(screen_device &screen, bitmap_rgb32 &
 					0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
 				};
 
-				last_pixel = fillmode_init[scb & 0x1f];
-				for (col = 0; col < 160; col++)
+				uint32_t last_pixel = fillmode_init[scb & 0x1f];
+				for (int col = 0; col < 160; col++)
 				{
+					uint8_t b;
+					uint32_t pixel;
+
 					b = vram[col];
 					pixel = (b >> 4) & 0x0f;
 
@@ -1588,7 +1504,7 @@ uint32_t a2_video_device::screen_update_GS(screen_device &screen, bitmap_rgb32 &
 		/* call legacy Apple II video rendering at scanline 0 to draw into the off-screen buffer */
 		if (beamy == 0)
 		{
-			rectangle new_cliprect(0, 559, 0, 191);
+			rectangle const new_cliprect(0, 559, 0, 191);
 			screen_update_GS_8bit(screen, *m_8bit_graphics, new_cliprect);
 		}
 
@@ -1599,24 +1515,24 @@ uint32_t a2_video_device::screen_update_GS(screen_device &screen, bitmap_rgb32 &
 				return 0;
 			}
 
-			scanline = &bitmap.pix32(beamy);
-			for (col = 0; col < BORDER_LEFT+BORDER_RIGHT+640; col++)
+			uint32_t *const scanline = &bitmap.pix(beamy);
+			for (int col = 0; col < BORDER_LEFT+BORDER_RIGHT+640; col++)
 			{
 				scanline[col] = m_GSborder_colors[m_GSborder];
 			}
 		}
 		else
 		{
-			scanline = &bitmap.pix32(beamy);
+			uint32_t *const scanline = &bitmap.pix(beamy);
 
 			// draw left and right borders
-			for (col = 0; col < BORDER_LEFT + 40; col++)
+			for (int col = 0; col < BORDER_LEFT + 40; col++)
 			{
 				scanline[col] = m_GSborder_colors[m_GSborder];
 				scanline[col+BORDER_LEFT+600] = m_GSborder_colors[m_GSborder];
 			}
 
-			a2pixel = &m_8bit_graphics->pix16(beamy-(BORDER_TOP+4));
+			uint16_t *a2pixel = &m_8bit_graphics->pix(beamy-(BORDER_TOP+4));
 			for (int x = 0; x < 560; x++)
 			{
 				scanline[40 + BORDER_LEFT + x] = m_GSborder_colors[*a2pixel++];

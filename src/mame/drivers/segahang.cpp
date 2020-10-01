@@ -1148,6 +1148,71 @@ ROM_START( hangon2 )
 ROM_END
 
 //*************************************************************************************************************************
+//  # VF #
+//  Hang On spanish bootleg.
+//  Some customs were replaced with logic components.
+//
+ROM_START( hangonvf )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "9.3n", 0x000000, 0x8000, CRC(20b1c2b0) SHA1(01b4f5105e2bbeb6ec6dbd18bfb728e3a973e0ca) )
+	ROM_LOAD16_BYTE( "11.1n",  0x000001, 0x8000, CRC(7d9db1bf) SHA1(952ee3e7a0d57ec1bb3385e0e6675890b8378d31) )
+	ROM_LOAD16_BYTE( "8.3k", 0x010000, 0x8000, CRC(fea12367) SHA1(9a1ce5863c562160b657ad948812b43f42d7d0cc) )
+	ROM_LOAD16_BYTE( "10.1k",  0x010001, 0x8000, CRC(ac883240) SHA1(f943341ae13e062f3d12c6221180086ce8bdb8c4) )
+
+	ROM_REGION( 0x40000, "subcpu", 0 ) // second 68000 CPU
+	ROM_LOAD16_BYTE( "6.6l", 0x0000, 0x8000, CRC(1c95013e) SHA1(8344ac953477279c2c701f984d98292a21dd2f7d) )
+	ROM_LOAD16_BYTE( "7.5l", 0x0001, 0x8000, CRC(6ca30d69) SHA1(ed933351883ebf6d9ef9428a81d09749b609cd60) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "2.3j", 0x00000, 0x08000, CRC(255a3a58) SHA1(980372ab94949d1476282c83af0a08cc0555f1cd) )
+	ROM_LOAD( "3.2j", 0x08000, 0x08000, CRC(88b9ffd9) SHA1(7ecfab266f05d5f919806f195fb2572f220fdf68) )
+	ROM_LOAD( "4.1j",  0x10000, 0x08000, CRC(18882328) SHA1(737c025701877845fad63af145506a57c775f8e0) )
+
+	ROM_REGION16_BE( 0x80000, "sprites", 0 ) // sprites
+	ROM_LOAD16_BYTE( "19.5b", 0x000001, 0x8000, CRC(469dad07) SHA1(6d01c0b3506e28832928ad74d518577ff5be323b) )
+	ROM_LOAD16_BYTE( "25.6b", 0x000000, 0x8000, CRC(87cbc6de) SHA1(b64652e062e1b88c6f6ae8dd2ffe4533bb27ba45) )
+	ROM_LOAD16_BYTE( "18.5c", 0x010001, 0x8000, CRC(15792969) SHA1(b061dbf24e8b511116446794753c8b0cc49e2149) )
+	ROM_LOAD16_BYTE( "24.6c", 0x010000, 0x8000, CRC(e9718de5) SHA1(30e3a7d5b33504da03c5780b4a946b977e46098a) )
+	ROM_LOAD16_BYTE( "17.5d", 0x020001, 0x8000, CRC(49422691) SHA1(caee2a4a3f4587ae27dec330214edaa1229012af) )
+	ROM_LOAD16_BYTE( "23.6d", 0x020000, 0x8000, CRC(701deaa4) SHA1(053032ef886b85a4cb4753d17b3c27d228695157) )
+	ROM_LOAD16_BYTE( "16.5e", 0x030001, 0x8000, CRC(f003a000) SHA1(da7fc41d3116ebb108effcd9ffa86e873e8ff6e7) )
+	ROM_LOAD16_BYTE( "22.6e", 0x030000, 0x8000, CRC(08b007e2) SHA1(db63d38472c8df13f0bbabb20b6e33c9c6c46664) )
+	ROM_LOAD16_BYTE( "15.5f", 0x040001, 0x8000, CRC(7fa1bfb6) SHA1(a27b54c93613372f59050f0b2182d2984a8d2efe) )
+	ROM_LOAD16_BYTE( "21.6f", 0x040000, 0x8000, CRC(8e880c93) SHA1(8c55deec065daf09a5d1c1c1f3f3f7bc1aeaf563) )
+	ROM_LOAD16_BYTE( "14.5h", 0x050001, 0x8000, CRC(47e63dd1) SHA1(40fb4400e1e8c8193c69154c5c08a9a69a8bca0d) )
+	ROM_LOAD16_BYTE( "20.6h", 0x050000, 0x8000, CRC(33d1aa6e) SHA1(1bd78d442cce2a39f1186b142d8a24bce286ad64) )
+	ROM_LOAD16_BYTE( "12.3f", 0x060001, 0x8000, CRC(22fc088e) SHA1(d84570a802e696b67a587bee154620d97d75a7aa) )
+	ROM_LOAD16_BYTE( "13.4f", 0x060000, 0x8000, CRC(032738ba) SHA1(6b8e7e229d04f852e72acfdfa8721b4b22681208) )
+
+	ROM_REGION( 0x8000, "segaic16road", 0 ) // road gfx
+	ROM_LOAD( "5.9r", 0x0000, 0x8000, CRC(581230e3) SHA1(954eab35059322a12a197bba04bf85f816132f20) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) // sound CPU
+	ROM_LOAD( "28.12h", 0x00000, 0x4000, CRC(3b942f5f) SHA1(4384b5c090954e69de561dde0ef32104aa11399a) )
+
+	ROM_REGION( 0x10000, "pcm", 0 ) // Sega PCM sound data
+	ROM_LOAD( "26.1e", 0x00000, 0x8000, CRC(cfef5481) SHA1(c04b302fee58f0e59a097b2be2b61e5d03df7c91) )
+	ROM_LOAD( "27.1g", 0x08000, 0x8000, CRC(4165aea5) SHA1(be05c6d295807af2f396a1ff72d5a3d2a1e6054d) )
+
+	ROM_REGION( 0x2000, "sprites:zoom", 0 ) // zoom table
+	ROM_LOAD( "1.9d", 0x0000, 0x2000, CRC(e3ec7bd6) SHA1(feec0fe664e16fac0fde61cf64b401b9b0575323) )
+
+	ROM_REGION( 0x1400, "plds", 0 )
+	ROM_LOAD( "a_pal16r4a.9e",     0x0000, 0x0104, NO_DUMP )
+	ROM_LOAD( "b_pls153an.9f",     0x0200, 0x00eb, NO_DUMP )
+	ROM_LOAD( "c_pal16r6a.7m",     0x0400, 0x0104, NO_DUMP )
+	ROM_LOAD( "d_pal16r6a.7r",     0x0600, 0x0104, NO_DUMP )
+	ROM_LOAD( "e_pal16r6a.7s",     0x0800, 0x0104, NO_DUMP )
+	ROM_LOAD( "f_pls153n.6s",      0x0a00, 0x00eb, NO_DUMP )
+	ROM_LOAD( "g_pal16l8a.3r",     0x0c00, 0x0104, NO_DUMP )
+	// no PLD marked 'H'
+	ROM_LOAD( "i_pls153n_snd.6f",  0x0e00, 0x00eb, NO_DUMP )
+	ROM_LOAD( "j_pal16l8a_db.bin", 0x1000, 0x0104, NO_DUMP )
+	ROM_LOAD( "k_pal16r4a_db.bin", 0x1200, 0x0104, NO_DUMP )
+ROM_END
+
+
+//*************************************************************************************************************************
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //  Super Hang-On (Japan Ver.)
@@ -2195,26 +2260,27 @@ void segahang_state::init_endurob2()
 //  GAME DRIVERS
 //**************************************************************************
 
-//    YEAR, NAME,      PARENT,   MACHINE,  INPUT,     INIT,                   MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1985, hangon,     0,        hangon,   hangon,    segahang_state, init_generic,  ROT0, "Sega", "Hang-On (Rev A)", 0 )
-GAME( 1985, hangon1,    hangon,   hangon,   hangon,    segahang_state, init_generic,  ROT0, "Sega", "Hang-On", 0 )
-GAME( 1985, hangon2,    hangon,   hangon,   hangon2,   segahang_state, init_generic,  ROT0, "Sega", "Hang-On (Rev A, ride-on)", 0 )
+//    YEAR, NAME,       PARENT,   MACHINE,  INPUT,     STATE           INIT,          ROT,   COMPANY,          FULLNAME,                                                              FLAGS
+GAME( 1985, hangon,     0,        hangon,   hangon,    segahang_state, init_generic,  ROT0,  "Sega",           "Hang-On (Rev A)",                                                     0 )
+GAME( 1985, hangon1,    hangon,   hangon,   hangon,    segahang_state, init_generic,  ROT0,  "Sega",           "Hang-On",                                                             0 )
+GAME( 1985, hangon2,    hangon,   hangon,   hangon2,   segahang_state, init_generic,  ROT0,  "Sega",           "Hang-On (Rev A, ride-on)",                                            0 )
+GAME( 1985, hangonvf,   hangon,   hangon,   hangon,    segahang_state, init_generic,  ROT0,  "bootleg",        "VF (bootleg of Hang-On)",                                             0 )
 
-GAME( 1987, shangonro,  shangon,  shangonro,shangonro, segahang_state, init_generic,  ROT0, "Sega", "Super Hang-On (Hang-On conversion, ride-on, Japan, FD1094 317-0038)", 0 )
-GAME( 1987, shangonho,  shangon,  shangonro,shangupb,  segahang_state, init_generic,  ROT0, "Sega", "Super Hang-On (Hang-On conversion, Japan, FD1094 317-0039)", 0 )
-GAME( 1992, shangonrb,  shangon,  shangupb, shangupb,  segahang_state, init_generic,  ROT0, "bootleg", "Super Hang-On (Hang-On conversion, bootleg)", 0 )
-GAME( 1987, shangonrb2, shangon,  shangupb, shangupb,  segahang_state, init_generic,  ROT0, "bootleg (Beta)", "Super Hang-On (Hang-On conversion, Beta bootleg)", 0 )
+GAME( 1987, shangonro,  shangon,  shangonro,shangonro, segahang_state, init_generic,  ROT0,  "Sega",           "Super Hang-On (Hang-On conversion, ride-on, Japan, FD1094 317-0038)", 0 )
+GAME( 1987, shangonho,  shangon,  shangonro,shangupb,  segahang_state, init_generic,  ROT0,  "Sega",           "Super Hang-On (Hang-On conversion, Japan, FD1094 317-0039)",          0 )
+GAME( 1992, shangonrb,  shangon,  shangupb, shangupb,  segahang_state, init_generic,  ROT0,  "bootleg",        "Super Hang-On (Hang-On conversion, bootleg)",                         0 )
+GAME( 1987, shangonrb2, shangon,  shangupb, shangupb,  segahang_state, init_generic,  ROT0,  "bootleg (Beta)", "Super Hang-On (Hang-On conversion, Beta bootleg)",                    0 )
 
-GAME( 1985, sharrier,   0,        sharrier, sharrier,  segahang_state, init_sharrier, ROT0, "Sega", "Space Harrier (Rev A, 8751 315-5163A)", 0 )
-GAME( 1985, sharrier1,  sharrier, sharrier, sharrier,  segahang_state, init_sharrier, ROT0, "Sega", "Space Harrier (8751 315-5163)", 0 )
+GAME( 1985, sharrier,   0,        sharrier, sharrier,  segahang_state, init_sharrier, ROT0,  "Sega",           "Space Harrier (Rev A, 8751 315-5163A)",                               0 )
+GAME( 1985, sharrier1,  sharrier, sharrier, sharrier,  segahang_state, init_sharrier, ROT0,  "Sega",           "Space Harrier (8751 315-5163)",                                       0 )
 
-GAME( 1986, enduror,    0,        enduror,  enduror,   segahang_state, init_enduror,  ROT0, "Sega", "Enduro Racer (Rev A, YM2151, FD1089B 317-0013A)", 0 )
-GAME( 1986, endurora,   enduror,  enduror,  enduror,   segahang_state, init_enduror,  ROT0, "Sega", "Enduro Racer (Rev A, YM2151, mask ROM sprites, FD1089B 317-0013A)", 0 )
-GAME( 1986, endurorb,   enduror,  enduror,  enduror,   segahang_state, init_enduror,  ROT0, "Sega", "Enduro Racer (YM2151, FD1089B 317-0013A)", 0 )
-GAME( 1986, enduror1,   enduror,  enduror1, enduror,   segahang_state, init_enduror,  ROT0, "Sega", "Enduro Racer (YM2203, FD1089B 317-0013A)", 0 )
-GAME( 1986, endurobl,   enduror,  endurobl, enduror,   segahang_state, init_endurobl, ROT0, "bootleg", "Enduro Racer (bootleg set 1)", 0 )
-GAME( 1986, endurob2,   enduror,  endurob2, enduror,   segahang_state, init_endurob2, ROT0, "bootleg", "Enduro Racer (bootleg set 2)", MACHINE_NOT_WORKING )
+GAME( 1986, enduror,    0,        enduror,  enduror,   segahang_state, init_enduror,  ROT0,  "Sega",           "Enduro Racer (Rev A, YM2151, FD1089B 317-0013A)",                     0 )
+GAME( 1986, endurora,   enduror,  enduror,  enduror,   segahang_state, init_enduror,  ROT0,  "Sega",           "Enduro Racer (Rev A, YM2151, mask ROM sprites, FD1089B 317-0013A)",   0 )
+GAME( 1986, endurorb,   enduror,  enduror,  enduror,   segahang_state, init_enduror,  ROT0,  "Sega",           "Enduro Racer (YM2151, FD1089B 317-0013A)",                            0 )
+GAME( 1986, enduror1,   enduror,  enduror1, enduror,   segahang_state, init_enduror,  ROT0,  "Sega",           "Enduro Racer (YM2203, FD1089B 317-0013A)",                            0 )
+GAME( 1986, endurobl,   enduror,  endurobl, enduror,   segahang_state, init_endurobl, ROT0,  "bootleg",        "Enduro Racer (bootleg set 1)",                                        0 )
+GAME( 1986, endurob2,   enduror,  endurob2, enduror,   segahang_state, init_endurob2, ROT0,  "bootleg",        "Enduro Racer (bootleg set 2)",                                        MACHINE_NOT_WORKING )
 
 
-GAME( 1986, endurord,   enduror,  endurord,  enduror,  segahang_state, init_enduror,  ROT0, "bootleg", "Enduro Racer (bootleg of Rev A, YM2151, FD1089B 317-0013A set)", 0 )
-GAME( 1986, enduror1d,  enduror,  enduror1d, enduror,  segahang_state, init_enduror,  ROT0, "bootleg", "Enduro Racer (bootleg of YM2203, FD1089B 317-0013A set)", 0 )
+GAME( 1986, endurord,   enduror,  endurord,  enduror,  segahang_state, init_enduror,  ROT0,  "bootleg",        "Enduro Racer (bootleg of Rev A, YM2151, FD1089B 317-0013A set)",      0 )
+GAME( 1986, enduror1d,  enduror,  enduror1d, enduror,  segahang_state, init_enduror,  ROT0,  "bootleg",        "Enduro Racer (bootleg of YM2203, FD1089B 317-0013A set)",             0 )

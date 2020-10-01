@@ -61,6 +61,9 @@ namespace netlist
 		/// @param otherterm pointer to the sibling terminal
 		terminal_t(core_device_t &dev, const pstring &aname, terminal_t *otherterm, nldelegate delegate);
 
+		terminal_t(core_device_t &dev, const pstring &aname, terminal_t *otherterm,
+			const std::array<terminal_t *, 2> &splitterterms, nldelegate delegate);
+
 		/// \brief Returns voltage of connected net
 		///
 		/// @return voltage of net this terminal is connected to

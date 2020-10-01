@@ -205,8 +205,8 @@ void marinedt_state::init_seabitmap()
 			if(blue_pen > 0x5f)
 				blue_pen = 0x5f;
 
-			m_seabitmap[0]->pix16(y, x) = blue_pen;
-			m_seabitmap[1]->pix16(y, x) = blue_pen+0x20;
+			m_seabitmap[0]->pix(y, x) = blue_pen;
+			m_seabitmap[1]->pix(y, x) = blue_pen+0x20;
 		}
 	}
 }
@@ -360,11 +360,11 @@ inline uint32_t marinedt_state::obj_to_obj_collision()
 			resx = m_obj[0].x + x;
 			resy = m_obj[0].y + y;
 
-			if((m_obj[0].bitmap.pix16(resy,resx) & 3) == 0)
+			if((m_obj[0].bitmap.pix(resy,resx) & 3) == 0)
 				continue;
 
 			// return value is never read most likely
-			if(m_obj[1].bitmap.pix16(resy,resx) != 0)
+			if(m_obj[1].bitmap.pix(resy,resx) != 0)
 				return ((resy / 8) * 32) | (((resx / 8) - 1) & 0x1f);
 		}
 	}
@@ -387,14 +387,14 @@ inline uint32_t marinedt_state::obj_to_layer_collision()
 			resx = m_obj[0].x + x;
 			resy = m_obj[0].y + y;
 
-			if((m_obj[0].bitmap.pix16(resy,resx) & 3) == 0)
+			if((m_obj[0].bitmap.pix(resy,resx) & 3) == 0)
 				continue;
 
 			if(!m_screen_flip)
 				resy -= 32;
 
 			// TODO: non screen flip path doesn't work properly
-			if(m_tilemap->pixmap().pix16(resy,resx) != 0)
+			if(m_tilemap->pixmap().pix(resy,resx) != 0)
 			{
 				if(m_screen_flip)
 					return ((resy / 8) * 32) | (((resx / 8) - 1) & 0x1f);

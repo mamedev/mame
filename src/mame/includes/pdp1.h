@@ -184,8 +184,6 @@ public:
 	void iot_rpb(int op2, int nac, int mb, int &io, int ac);
 	void iot_rrb(int op2, int nac, int mb, int &io, int ac);
 
-	void tape_read_binary();
-
 protected:
 	// device-level overrides
 	virtual void device_resolve_objects() override;
@@ -460,7 +458,7 @@ private:
 
 	void iot_cks(int op2, int nac, int mb, int &io, int ac);
 
-	void io_state_clear();
+	void io_start_clear();
 
 	pdp1_reset_param_t m_reset_param;
 	int m_old_lightpen;

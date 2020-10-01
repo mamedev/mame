@@ -546,8 +546,8 @@ u32 deco_mlc_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 
 	for (int i = cliprect.top(); i <= cliprect.bottom(); i++)
 	{
-		u32 *dest = &bitmap.pix32(i);
-		u8 *pri = &screen.priority().pix8(i);
+		u32 *dest = &bitmap.pix(i);
+		u8 *pri = &screen.priority().pix(i);
 
 		/*
 		printf("%d -", i);

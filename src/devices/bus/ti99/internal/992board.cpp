@@ -202,7 +202,7 @@ void video992_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	}
 
 	int vpos = raw_vpos * m_vertical_size / screen().height();
-	uint32_t *p = &m_tmpbmp.pix32(vpos);
+	uint32_t *p = &m_tmpbmp.pix(vpos);
 	bool endofline = false;
 
 	int linelength = 0;

@@ -384,16 +384,13 @@ void bitgraph_state::adlc_w(offs_t offset, uint8_t data)
 
 uint32_t bitgraph_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t gfx = 0;
-	int x, y;
-
-	for (y = 0; y < 768; y++)
+	for (int y = 0; y < 768; y++)
 	{
-		uint16_t *p = &bitmap.pix16(y);
+		uint16_t *p = &bitmap.pix(y);
 
-		for (x = 0; x < 1024 / 8; x += 2)
+		for (int x = 0; x < 1024 / 8; x += 2)
 		{
-			gfx = m_videoram[(x + 1) | (y << 7)];
+			uint8_t gfx = m_videoram[(x + 1) | (y << 7)];
 			for (int i = 7; i >= 0; i--)
 			{
 				*p++ = BIT(gfx, i);

@@ -235,8 +235,10 @@ static int read_chd(void *file, int frame, bitmap_yuy16 &bitmap, int16_t *lsound
 	for (int fieldnum = 0; fieldnum < interlace_factor; fieldnum++)
 	{
 		// make a fake bitmap for this field
-		avhuff_decompress_config avconfig;
-		avconfig.video.wrap(&bitmap.pix16(fieldnum), bitmap.width(), bitmap.height() / interlace_factor, bitmap.rowpixels() * interlace_factor);
+		bitmap_yuy16 video;
+		video.wrap(&bitmap.pix(fieldnum), bitmap.width(), bitmap.height() / interlace_factor, bitmap.rowpixels() * interlace_factor);
+		avhuff_decoder::config avconfig;
+		avconfig.video = &video;
 
 		// configure the codec
 		uint32_t numsamples;
@@ -320,7 +322,7 @@ static void verify_video(video_info &video, int frame, bitmap_yuy16 &bitmap)
 
 		// parse the VBI data
 		vbi_metadata metadata;
-		vbi_parse_all(&bitmap.pix16(fieldnum), bitmap.rowpixels() * 2, bitmap.width(), 8, &metadata);
+		vbi_parse_all(&bitmap.pix(fieldnum), bitmap.rowpixels() * 2, bitmap.width(), 8, &metadata);
 
 		// if we have data in both 17 and 18, it should match
 		if (metadata.line17 != 0 && metadata.line18 != 0 && metadata.line17 != metadata.line18)
@@ -484,11 +486,11 @@ static void verify_video(video_info &video, int frame, bitmap_yuy16 &bitmap)
 		{
 			for (int x = 16; x < 720 - 16; x++)
 			{
-				yhisto[bitmap.pix16(y, x) >> 8]++;
+				yhisto[bitmap.pix(y, x) >> 8]++;
 				if (x % 2 == 0)
-					cbhisto[bitmap.pix16(y, x) & 0xff]++;
+					cbhisto[bitmap.pix(y, x) & 0xff]++;
 				else
-					crhisto[bitmap.pix16(y, x) & 0xff]++;
+					crhisto[bitmap.pix(y, x) & 0xff]++;
 			}
 			pixels += 720 - 16 - 16;
 		}

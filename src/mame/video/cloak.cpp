@@ -178,15 +178,13 @@ void cloak_state::video_start()
 
 void cloak_state::draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x, y;
-
-	for (y = cliprect.top(); y <= cliprect.bottom(); y++)
-		for (x = cliprect.left(); x <= cliprect.right(); x++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
-			pen_t pen = m_current_bitmap_videoram_displayed[(y << 8) | x] & 0x07;
+			pen_t const pen = m_current_bitmap_videoram_displayed[(y << 8) | x] & 0x07;
 
 			if (pen)
-				bitmap.pix16(y, (x - 6) & 0xff) = 0x10 | ((x & 0x80) >> 4) | pen;
+				bitmap.pix(y, (x - 6) & 0xff) = 0x10 | ((x & 0x80) >> 4) | pen;
 		}
 }
 

@@ -184,11 +184,11 @@ uint32_t splashms_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	for (int y = 0; y < 256; y++)
 	{
-		uint16_t* dst = &bitmap.pix16(y);
+		uint16_t *const dst = &bitmap.pix(y);
 
 		for (int x = 0; x < 512; x++)
 		{
-			uint8_t pix = m_bitmapram[(y * 512) + x];
+			uint8_t const pix = m_bitmapram[(y * 512) + x];
 			//if (pix)
 			dst[x] = pix + 0x100;
 		}

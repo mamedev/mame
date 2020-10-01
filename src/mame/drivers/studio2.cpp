@@ -518,7 +518,7 @@ void visicom_state::dma_w(offs_t offset, uint8_t data)
 	for (int x = 0; x < 8; x++)
 	{
 		int color = (BIT(color1, 7) << 1) | BIT(color0, 7);
-		m_vdc->m_bitmap.pix32(y, sx + x) = VISICOM_PALETTE[color];
+		m_vdc->m_bitmap.pix(y, sx + x) = VISICOM_PALETTE[color];
 		color0 <<= 1;
 		color1 <<= 1;
 	}

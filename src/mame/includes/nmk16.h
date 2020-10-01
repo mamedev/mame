@@ -223,6 +223,7 @@ protected:
 	void strahljbl_map(address_map &map);
 	void tdragon2_map(address_map &map);
 	void tdragon3h_map(address_map &map);
+	void tdragon3h_sound_io_map(address_map &map);
 	void tdragon_map(address_map &map);
 	void tdragonb_map(address_map &map);
 	void tharrier_map(address_map &map);

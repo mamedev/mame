@@ -2,16 +2,16 @@
 // copyright-holders:
 /*******************************************************************************
 
-	Skeleton driver for "EuroByte Electronics & Multimedia IASA" PC-based touch
-	games, sold in Spain by Sleic / Petaco.
-	
-	-----+----------------------------+------+----------------------------------
-	Dump | Game                       | Year | Notes
-	-----+----------------------------+------+----------------------------------
-	NO   | Superchip                  | 1999 |
-	NO   | Star Touch                 | 2000 |
-	YES  | Star Touch / EuroPlay 2001 | 2001 | Original Game: http://www.eurobyte.com.gr/gb_europlay.htm
-	
+    Skeleton driver for "EuroByte Electronics & Multimedia IASA" PC-based touch
+    games, sold in Spain by Sleic / Petaco.
+
+    -----+----------------------------+------+----------------------------------
+    Dump | Game                       | Year | Notes
+    -----+----------------------------+------+----------------------------------
+    NO   | Superchip                  | 1999 |
+    NO   | Star Touch                 | 2000 |
+    YES  | Star Touch / EuroPlay 2001 | 2001 | Original Game: http://www.eurobyte.com.gr/gb_europlay.htm
+
     Hardware overview:
     MB Soyo M5EH or similar (e.g. Biostar M5ATD)
     16384 KB RAM

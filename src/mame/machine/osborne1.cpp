@@ -382,7 +382,7 @@ inline void osborne1_state::draw_rows(uint16_t col, bitmap_ind16 &bitmap, const 
 
 		// Draw a line of the display
 		u8 const ra(y % 10);
-		uint16_t *p(&bitmap.pix16(y));
+		uint16_t *p(&bitmap.pix(y));
 		uint16_t const row(((m_scroll_y + (y / 10)) << 7) & 0x0F80);
 
 		for (uint16_t x = 0; Width > x; ++x)
@@ -539,7 +539,7 @@ MC6845_UPDATE_ROW(osborne1nv_state::crtc_update_row)
 {
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	uint16_t const base = (ma >> 1) & 0xF80;
-	uint32_t *p = &bitmap.pix32(y);
+	uint32_t *p = &bitmap.pix(y);
 	for (u8 x = 0; x < x_count; ++x)
 	{
 		uint16_t const offset = base | ((ma + x) & 0x7F);

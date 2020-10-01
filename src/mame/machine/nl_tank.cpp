@@ -9,25 +9,6 @@
 
 #include "netlist/devices/net_lib.h"
 
-static NETLIST_START(NE556_DIP)
-	NE555(A)
-	NE555(B)
-
-	NET_C(A.GND, B.GND)
-	NET_C(A.VCC, B.VCC)
-
-	DIPPINS(      /*        +--------------+        */
-		 A.DISCH, /* 1DISCH |1     ++    14| VCC    */ A.VCC,
-		A.THRESH, /* 1THRES |2           13| 2DISCH */ B.DISCH,
-		  A.CONT, /*  1CONT |3           12| 2THRES */ B.THRESH,
-		 A.RESET, /* 1RESET |4   NE556   11| 2CONT  */ B.CONT,
-		   A.OUT, /*   1OUT |5           10| 2RESET */ B.RESET,
-		  A.TRIG, /*  1TRIG |6            9| 2OUT   */ B.OUT,
-		   A.GND, /*    GND |7            8| 2TRIG  */ B.TRIG
-				  /*        +--------------+        */
-	)
-NETLIST_END()
-
 NETLIST_START(tank)
 
 	SOLVER(Solver, 16000)
@@ -41,8 +22,6 @@ NETLIST_START(tank)
 	//ANALOG_INPUT(VM12, GND)
 	ALIAS(VCC, V5)
 	ALIAS(P, V5)
-
-	LOCAL_SOURCE(NE556_DIP)
 
 	RES(R4, RES_K(3.3))
 	RES(R5, RES_K(3.3))
@@ -251,14 +230,15 @@ NETLIST_START(tank)
 	QBJT_EB(Q4, "2N3643")
 	QBJT_EB(Q6, "2N3644")
 	QBJT_EB(Q7, "2N3644")
-	QBJT_EB(Q27, "2N3643")
-	QBJT_EB(Q28, "2N3644")
-	QBJT_EB(Q29, "2N3643")
-	QBJT_EB(Q30, "2N3644")
-	QBJT_EB(Q31, "2N3643")
-	QBJT_EB(Q32, "2N3644")
-	QBJT_EB(Q33, "2N3643")
-	QBJT_EB(Q34, "2N3644")
+// Currently not used
+//	QBJT_EB(Q27, "2N3643")
+//	QBJT_EB(Q28, "2N3644")
+//	QBJT_EB(Q29, "2N3643")
+//	QBJT_EB(Q30, "2N3644")
+//	QBJT_EB(Q31, "2N3643")
+//	QBJT_EB(Q32, "2N3644")
+//	QBJT_EB(Q33, "2N3643")
+//	QBJT_EB(Q34, "2N3644")
 
 	TTL_7404_DIP(IC_H3)
 	TTL_7400_DIP(IC_B6)

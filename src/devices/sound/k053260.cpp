@@ -115,7 +115,7 @@ void k053260_device::device_start()
 	m_sh1_cb.resolve_safe();
 	m_sh2_cb.resolve_safe();
 
-	m_stream = stream_alloc_legacy( 0, 2, clock() / CLOCKS_PER_SAMPLE );
+	m_stream = stream_alloc( 0, 2, clock() / CLOCKS_PER_SAMPLE );
 
 	/* register with the save state system */
 	save_item(NAME(m_portdata));
@@ -301,25 +301,17 @@ void k053260_device::write(offs_t offset, u8 data)
 	}
 }
 
-static inline int limit(int val, int max, int min)
-{
-	return std::max(min, std::min(max, val));
-}
-
-static constexpr s32 MAXOUT = 0x7fff;
-static constexpr s32 MINOUT = -0x8000;
-
 //-------------------------------------------------
-//  sound_stream_update_legacy - handle a stream update
+//  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void k053260_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void k053260_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	if (m_mode & 2)
 	{
-		for ( int j = 0; j < samples; j++ )
+		for ( int j = 0; j < outputs[0].samples(); j++ )
 		{
-			stream_sample_t buffer[2] = {0, 0};
+			s32 buffer[2] = {0, 0};
 
 			for (auto & voice : m_voice)
 			{
@@ -327,14 +319,14 @@ void k053260_device::sound_stream_update_legacy(sound_stream &stream, stream_sam
 					voice.play(buffer);
 			}
 
-			outputs[0][j] = limit( buffer[0], MAXOUT, MINOUT );
-			outputs[1][j] = limit( buffer[1], MAXOUT, MINOUT );
+			outputs[0].put_int_clamp(j, buffer[0], 32768);
+			outputs[1].put_int_clamp(j, buffer[1], 32768);
 		}
 	}
 	else
 	{
-		std::fill_n(&outputs[0][0], samples, 0);
-		std::fill_n(&outputs[1][0], samples, 0);
+		outputs[0].fill(0);
+		outputs[1].fill(0);
 	}
 }
 
@@ -429,7 +421,7 @@ void k053260_device::KDSC_Voice::update_pan_volume()
 void k053260_device::KDSC_Voice::key_on()
 {
 	m_position = m_kadpcm ? 1 : 0; // for kadpcm low bit is nybble offset, so must start at 1 due to preincrement
-	m_counter = 0x1000 - CLOCKS_PER_SAMPLE; // force update on next sound_stream_update_legacy
+	m_counter = 0x1000 - CLOCKS_PER_SAMPLE; // force update on next sound_stream_update
 	m_output = 0;
 	m_playing = true;
 	if (LOG) m_device.logerror("K053260: start = %06x, length = %06x, pitch = %04x, vol = %02x:%x, loop = %s, %s\n",
@@ -443,7 +435,7 @@ void k053260_device::KDSC_Voice::key_off()
 	m_playing = false;
 }
 
-void k053260_device::KDSC_Voice::play(stream_sample_t *outputs)
+void k053260_device::KDSC_Voice::play(s32 *outputs)
 {
 	m_counter += CLOCKS_PER_SAMPLE;
 

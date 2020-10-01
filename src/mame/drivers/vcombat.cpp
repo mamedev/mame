@@ -173,20 +173,18 @@ uint32_t vcombat_state::update_screen(screen_device &screen, bitmap_rgb32 &bitma
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		int x;
 		int src_addr = 256/2 * y;
 		const uint16_t *m68k_src = &m68k_buf[src_addr];
 		const uint16_t *i860_src = &i860_buf[src_addr];
-		uint32_t *dst = &bitmap.pix32(y, cliprect.min_x);
+		uint32_t *dst = &bitmap.pix(y, cliprect.min_x);
 
-		for (x = cliprect.min_x; x <= cliprect.max_x; x += 2)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x += 2)
 		{
-			int i;
 			uint16_t m68k_pix = *m68k_src++;
 			uint16_t i860_pix = *i860_src++;
 
 			/* Draw two pixels */
-			for (i = 0; i < 2; ++i)
+			for (int i = 0; i < 2; ++i)
 			{
 				/* Vcombat's screen renders 'flopped' - very likely because VR headset displays may reflect off mirrors.
 				Shadfgtr isn't flopped, so it's not a constant feature of the hardware. */

@@ -2108,7 +2108,7 @@ void sega315_5313_device::render_videobuffer_to_screenbuffer(int scanline)
 		if (scanline >= m_render_bitmap->height()) // safety, shouldn't happen now we allocate a fixed amount tho
 			return;
 
-		lineptr = &m_render_bitmap->pix32(scanline);
+		lineptr = &m_render_bitmap->pix(scanline);
 	}
 	else
 		lineptr = m_render_line.get();

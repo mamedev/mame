@@ -440,7 +440,7 @@ void mpu4vid_state::mpu4_vram(address_map &map)
 
 SCN2674_DRAW_CHARACTER_MEMBER(mpu4vid_state::display_pixels)
 {
-	if(!lg)
+	if (!lg)
 	{
 		uint16_t tile = m_vid_mainram[address & 0x7fff];
 		const uint8_t *line = m_gfxdecode->gfx(m_gfx_index+0)->get_data(tile & 0xfff);
@@ -455,30 +455,29 @@ SCN2674_DRAW_CHARACTER_MEMBER(mpu4vid_state::display_pixels)
 			{
 				// TODO: calculate instead?
 				static const uint8_t lookup[256] = {
-					0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-					0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
-					0, 0, 2, 2, 0, 0, 2, 2, 0, 0, 2, 2, 0, 0, 2, 2,
-					0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3,
-					0, 0, 0, 0, 4, 4, 4, 4, 0, 0, 0, 0, 4, 4, 4, 4,
-					0, 1, 0, 1, 4, 5, 4, 5, 0, 1, 0, 1, 4, 5, 4, 5,
-					0, 0, 2, 2, 4, 4, 6, 6, 0, 0, 2, 2, 4, 4, 6, 6,
-					0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7,
-					0, 0, 0, 0, 0, 0, 0, 0, 8, 8, 8, 8, 8, 8, 8, 8,
-					0, 1, 0, 1, 0, 1, 0, 1, 8, 9, 8, 9, 8, 9, 8, 9,
-					0, 0, 2, 2, 0, 0, 2, 2, 8, 8,10,10, 8, 8,10,10,
-					0, 1, 2, 3, 0, 1, 2, 3, 8, 9,10,11, 8, 9,10,11,
-					0, 0, 0, 0, 4, 4, 4, 4, 8, 8, 8, 8,12,12,12,12,
-					0, 1, 0, 1, 4, 5, 4, 5, 8, 9, 8, 9,12,13,12,13,
-					0, 0, 2, 2, 4, 4, 6, 6, 8, 8,10,10,12,12,14,14,
-					0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15
-				};
+						0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+						0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
+						0, 0, 2, 2, 0, 0, 2, 2, 0, 0, 2, 2, 0, 0, 2, 2,
+						0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3,
+						0, 0, 0, 0, 4, 4, 4, 4, 0, 0, 0, 0, 4, 4, 4, 4,
+						0, 1, 0, 1, 4, 5, 4, 5, 0, 1, 0, 1, 4, 5, 4, 5,
+						0, 0, 2, 2, 4, 4, 6, 6, 0, 0, 2, 2, 4, 4, 6, 6,
+						0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7,
+						0, 0, 0, 0, 0, 0, 0, 0, 8, 8, 8, 8, 8, 8, 8, 8,
+						0, 1, 0, 1, 0, 1, 0, 1, 8, 9, 8, 9, 8, 9, 8, 9,
+						0, 0, 2, 2, 0, 0, 2, 2, 8, 8,10,10, 8, 8,10,10,
+						0, 1, 2, 3, 0, 1, 2, 3, 8, 9,10,11, 8, 9,10,11,
+						0, 0, 0, 0, 4, 4, 4, 4, 8, 8, 8, 8,12,12,12,12,
+						0, 1, 0, 1, 4, 5, 4, 5, 8, 9, 8, 9,12,13,12,13,
+						0, 0, 2, 2, 4, 4, 6, 6, 8, 8,10,10,12,12,14,14,
+						0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15
+					};
 
-				bitmap.pix32(y, x + i) = m_palette->pen(lookup[(extra << 4) | (pen & 0xf)]);
+				bitmap.pix(y, x + i) = m_palette->pen(lookup[(extra << 4) | (pen & 0xf)]);
 			}
 			else
 			{
-				bitmap.pix32(y, x + i) = m_palette->pen((extra<<4) | (pen & 0xf));
-
+				bitmap.pix(y, x + i) = m_palette->pen((extra<<4) | (pen & 0xf));
 			}
 		}
 	}
@@ -1161,8 +1160,8 @@ static INPUT_PORTS_START( v4vgpok )
 	PORT_INCLUDE( bwbvid )
 
 	PORT_MODIFY("BLACK1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start / Deal / Draw")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_POKER_BET ) // Stake
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_GAMBLE_DEAL ) PORT_NAME("Start / Deal / Draw")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_GAMBLE_BET ) // Stake
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT ) // Collect
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_GAMBLE_LOW )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_GAMBLE_HIGH )

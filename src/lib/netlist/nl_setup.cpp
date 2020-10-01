@@ -6,6 +6,7 @@
 #include "devices/nlid_proxy.h"
 #include "devices/nlid_truthtable.h"
 #include "nl_base.h"
+#include "nl_errstr.h"
 #include "nl_factory.h"
 #include "nl_parser.h"
 #include "nl_setup.h"
@@ -352,7 +353,7 @@ namespace netlist
 		return false;
 	}
 
-	bool nlparse_t::parse_tokens(const parser_t::token_store &tokens, const pstring &name)
+	bool nlparse_t::parse_tokens(const plib::detail::token_store &tokens, const pstring &name)
 	{
 		parser_t parser(*this);
 		return parser.parse(tokens, name);
@@ -551,10 +552,10 @@ void setup_t::register_term(detail::core_terminal_t &term)
 	}
 }
 
-void setup_t::register_term(terminal_t &term, terminal_t &other_term)
+void setup_t::register_term(terminal_t &term, terminal_t *other_term, const std::array<terminal_t *, 2> &splitter_terms)
 {
 	this->register_term(term);
-	m_connected_terminals.insert({&term, &other_term});
+	m_connected_terminals.insert({&term, {other_term, splitter_terms[0], splitter_terms[1], nullptr}});
 }
 
 void setup_t::register_param_t(param_t &param)
@@ -716,7 +717,7 @@ param_ref_t setup_t::find_param(const pstring &param_in) const
 //NOLINTNEXTLINE(misc-no-recursion)
 devices::nld_base_proxy *setup_t::get_d_a_proxy(const detail::core_terminal_t &out)
 {
-	nl_assert(out.is_logic());
+	gsl_Expects(out.is_logic());
 
 	const auto &out_cast = dynamic_cast<const logic_output_t &>(out);
 	auto iter_proxy(m_proxies.find(&out));
@@ -759,7 +760,7 @@ devices::nld_base_proxy *setup_t::get_d_a_proxy(const detail::core_terminal_t &o
 //NOLINTNEXTLINE(misc-no-recursion)
 devices::nld_base_proxy *setup_t::get_a_d_proxy(detail::core_terminal_t &inp)
 {
-	nl_assert(inp.is_logic());
+	gsl_Expects(inp.is_logic());
 
 	const auto &incast = dynamic_cast<const logic_input_t &>(inp);
 
@@ -1192,6 +1193,7 @@ void setup_t::resolve_inputs()
 				log().warning(MW_TERMINAL_1_WITHOUT_CONNECTIONS(name_da));
 		}
 	}
+
 	log().verbose("checking tristate consistency  ...");
 	for (auto & i : m_terminals)
 	{
@@ -1305,7 +1307,7 @@ void models_t::model_parse(const pstring &model_in, map_t &map)
 	if (!plib::endsWith(remainder, ")"))
 		throw nl_exception(MF_MODEL_ERROR_1(model));
 	// FIMXE: Not optimal
-	remainder = plib::left(remainder, remainder.size() - 1);
+	remainder = plib::left(remainder, remainder.length() - 1);
 
 	const auto pairs(plib::psplit(remainder,' ', true));
 	for (const pstring &pe : pairs)
@@ -1353,7 +1355,7 @@ nl_fptype models_t::model_t::value(const pstring &entity) const
 	pstring tmp = value_str(entity);
 
 	nl_fptype factor = nlconst::one();
-	auto p = std::next(tmp.begin(), plib::narrow_cast<pstring::difference_type>(tmp.size() - 1));
+	auto p = std::next(tmp.begin(), plib::narrow_cast<pstring::difference_type>(tmp.length() - 1));
 	switch (*p)
 	{
 		case 'M': factor = nlconst::magic(1e6); break; // NOLINT
@@ -1370,7 +1372,7 @@ nl_fptype models_t::model_t::value(const pstring &entity) const
 				throw nl_exception(MF_UNKNOWN_NUMBER_FACTOR_IN_2(m_model, entity));
 	}
 	if (factor != nlconst::one())
-		tmp = plib::left(tmp, tmp.size() - 1);
+		tmp = plib::left(tmp, tmp.length() - 1);
 	// FIXME: check for errors
 	bool err(false);
 	auto val = plib::pstonum_ne<nl_fptype>(tmp, err);
@@ -1607,13 +1609,10 @@ void setup_t::prepare_to_run()
 		if (p != m_abstract.m_hints.end())
 		{
 			p->second = true; // mark as used
-			if (use_deactivate)
-				d.second->set_hint_deactivate(false);
-			else
-				d.second->set_hint_deactivate(true);
+			d.second->set_hint_deactivate(false);
 		}
 		else
-			d.second->set_hint_deactivate(true);
+			d.second->set_hint_deactivate(use_deactivate);
 	}
 
 	if (errcnt > 0)
@@ -1734,7 +1733,7 @@ plib::istream_uptr source_file_t::stream(const pstring &name)
 
 plib::istream_uptr source_pattern_t::stream(const pstring &name)
 {
-	pstring filename = plib::pfmt(m_pattern)(name);
+	pstring filename = plib::pfmt(m_pattern)(m_force_lowercase ? plib::lcase(name) : name);
 	auto f = std::make_unique<plib::ifstream>(plib::filesystem::u8path(filename));
 	if (f->is_open())
 	{
@@ -1757,23 +1756,6 @@ bool source_proc_t::parse(nlparse_t &setup, const pstring &name)
 }
 
 plib::istream_uptr source_proc_t::stream(const pstring &name)
-{
-	plib::unused_var(name);
-	return plib::istream_uptr();
-}
-
-bool source_token_t::parse(nlparse_t &setup, const pstring &name)
-{
-	if (name == m_name)
-	{
-		auto ret = setup.parse_tokens(m_store, name);
-		return ret;
-	}
-
-	return false;
-}
-
-plib::istream_uptr source_token_t::stream(const pstring &name)
 {
 	plib::unused_var(name);
 	return plib::istream_uptr();

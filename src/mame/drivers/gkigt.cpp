@@ -162,22 +162,18 @@ void igt_gameking_state::video_start()
 
 uint32_t igt_gameking_state::screen_update_igt_gameking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x,y;
-
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	for(y = 0; y < 480; y++)
+	for(int y = 0; y < 480; y++)
 	{
-		for(x = 0; x < 640; x+=4)
+		for(int x = 0; x < 640; x+=4)
 		{
 			for(int xi=0;xi<4;xi++)
 			{
-				uint32_t color;
-
-				color = (m_vram[(x+y*1024)/4] >> (xi*8)) & 0xff;
+				uint32_t const color = (m_vram[(x+y*1024)/4] >> (xi*8)) & 0xff;
 
 				if(cliprect.contains(x+xi, y))
-					bitmap.pix16(y, x+xi) = m_palette->pen(color);
+					bitmap.pix(y, x+xi) = m_palette->pen(color);
 
 			}
 		}

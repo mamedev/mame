@@ -166,22 +166,21 @@ void jr200_state::video_start()
 
 uint32_t jr200_state::screen_update_jr200(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x,y,xi,yi,pen;
-
 	bitmap.fill(m_border_col, cliprect);
 
-	for (y = 0; y < 24; y++)
+	for (int y = 0; y < 24; y++)
 	{
-		for (x = 0; x < 32; x++)
+		for (int x = 0; x < 32; x++)
 		{
 			uint8_t tile = m_vram[x + y*32];
 			uint8_t attr = m_cram[x + y*32];
 
-			for(yi=0;yi<8;yi++)
+			for(int yi=0;yi<8;yi++)
 			{
-				for(xi=0;xi<8;xi++)
+				for(int xi=0;xi<8;xi++)
 				{
-					uint8_t *gfx_data;
+					const uint8_t *gfx_data;
+					int pen;
 
 					if(attr & 0x80) //bitmap mode
 					{
@@ -209,7 +208,7 @@ uint32_t jr200_state::screen_update_jr200(screen_device &screen, bitmap_ind16 &b
 						pen = (gfx_data[(tile*8)+yi]>>(7-xi) & 1) ? (attr & 0x7) : ((attr & 0x38) >> 3);
 					}
 
-					bitmap.pix16(y*8+yi+16, x*8+xi+16) = m_palette->pen(pen);
+					bitmap.pix(y*8+yi+16, x*8+xi+16) = m_palette->pen(pen);
 				}
 			}
 		}

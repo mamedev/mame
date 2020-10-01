@@ -11,10 +11,7 @@
 */
 
 #include "emu.h"
-#include "emupal.h"
-#include "screen.h"
-#include "softlist.h"
-#include "speaker.h"
+
 #include "bus/cbm2/exp.h"
 #include "bus/cbm2/user.h"
 #include "bus/ieee488/ieee488.h"
@@ -36,6 +33,11 @@
 #include "sound/mos6581.h"
 #include "video/mc6845.h"
 #include "video/mos6566.h"
+
+#include "emupal.h"
+#include "screen.h"
+#include "softlist.h"
+#include "speaker.h"
 
 #define PLA1_TAG        "u78"
 #define PLA2_TAG        "u88"
@@ -1413,7 +1415,7 @@ INPUT_PORTS_END
 
 MC6845_UPDATE_ROW( cbm2_state::crtc_update_row )
 {
-	const pen_t *pen = m_palette->pens();
+	pen_t const *const pen = m_palette->pens();
 
 	int x = 0;
 
@@ -1429,7 +1431,7 @@ MC6845_UPDATE_ROW( cbm2_state::crtc_update_row )
 			if (cursor_x == column) color ^= 1;
 			color &= de;
 
-			bitmap.pix32(vbp + y, hbp + x++) = pen[color];
+			bitmap.pix(vbp + y, hbp + x++) = pen[color];
 
 			if (bit < 8 || !m_graphics) data <<= 1;
 		}

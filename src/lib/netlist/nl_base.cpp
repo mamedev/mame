@@ -16,9 +16,9 @@
 
 #include "nl_errstr.h"
 
-#include "devices/net_lib.h"
-
 #include <limits>
+
+NETLIST_EXTERNAL(base_lib)
 
 namespace netlist
 {
@@ -106,7 +106,6 @@ namespace netlist
 	netlist_state_t::netlist_state_t(const pstring &name,
 		plib::plog_delegate logger)
 	: m_log(logger)
-	, m_extended_validation(false)
 	, m_dummy_version(1)
 	{
 		m_setup = plib::make_unique<setup_t, host_arena>(*this);
@@ -141,9 +140,9 @@ namespace netlist
 		//m_setup->parser().register_source<source_pattern_t>("../macro/nlm_{1}.cpp");
 #else
 #if 1
-		m_setup->parser().register_source<source_pattern_t>("src/lib/netlist/macro/nlm_{1}.cpp");
-		m_setup->parser().register_source<source_pattern_t>("src/lib/netlist/generated/nlm_{1}.cpp");
-		m_setup->parser().register_source<source_pattern_t>("src/lib/netlist/macro/modules/nlmod_{1}.cpp");
+		m_setup->parser().register_source<source_pattern_t>("src/lib/netlist/macro/nlm_{1}.cpp", true);
+		m_setup->parser().register_source<source_pattern_t>("src/lib/netlist/generated/nlm_{1}.cpp", true);
+		m_setup->parser().register_source<source_pattern_t>("src/lib/netlist/macro/modules/nlmod_{1}.cpp", true);
 		m_setup->parser().include("base_lib");
 #else
 		// FIXME: This is very slow - need optimized parsing scanning
@@ -704,13 +703,21 @@ namespace netlist
 	// terminal_t
 	// ----------------------------------------------------------------------------------------
 
-	terminal_t::terminal_t(core_device_t &dev, const pstring &aname, terminal_t *otherterm, nldelegate delegate)
+	terminal_t::terminal_t(core_device_t &dev, const pstring &aname,
+		terminal_t *otherterm, nldelegate delegate)
+	: terminal_t(dev, aname, otherterm, { nullptr, nullptr }, delegate)
+	{
+	}
+
+	terminal_t::terminal_t(core_device_t &dev, const pstring &aname,
+		terminal_t *otherterm, const std::array<terminal_t *, 2> &splitterterms,
+		nldelegate delegate)
 	: analog_t(dev, aname, STATE_BIDIR, delegate)
 	, m_Idr(nullptr)
 	, m_go(nullptr)
 	, m_gt(nullptr)
 	{
-		state().setup().register_term(*this, *otherterm);
+		state().setup().register_term(*this, otherterm, splitterterms);
 	}
 
 	void terminal_t::set_ptrs(nl_fptype *gt, nl_fptype *go, nl_fptype *Idr) noexcept(false)
@@ -1029,12 +1036,14 @@ namespace netlist
 				}
 
 				m_time = top->exec_time();
-				auto *const obj(top->object());
+				detail::net_t *const obj(top->object());
 				m_queue.pop();
-				if (obj != nullptr)
-					obj->template update_devs<KEEP_STATS>();
-				else
+
+				if (!!(obj == nullptr))
 					break;
+
+				obj->template update_devs<KEEP_STATS>();
+
 				if (KEEP_STATS)
 					m_perf_out_processed.inc();
 			} while (true);

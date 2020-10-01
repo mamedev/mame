@@ -70,7 +70,7 @@ uint32_t unkpoker_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	{
 		for (uint8_t ra = 0; ra < 8; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix(sy++);
 
 			for (uint16_t x = 0; x < 32; x++)
 			{
@@ -114,7 +114,7 @@ static INPUT_PORTS_START( unkpoker )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) // does something
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_BET ) PORT_NAME("Ante")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Ante")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )

@@ -288,7 +288,7 @@ uint32_t cocoloco_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 				color |= ((m_videoram[count|0x6000] >> (xi)) & 1) << 3;
 
 				if (cliprect.contains(x + xi, 256 - y))
-					bitmap.pix16(256 - y, x + xi) = m_palette->pen(color & 0x0f);
+					bitmap.pix(256 - y, x + xi) = m_palette->pen(color & 0x0f);
 			}
 
 			count++;

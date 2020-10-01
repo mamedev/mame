@@ -101,7 +101,7 @@ public:
 
 	// rendering
 	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
-	void apply_stain(bitmap_ind16 &bitmap, uint16_t *pf, uint16_t *mo, int x, int y);
+	void apply_stain(bitmap_ind16 &bitmap, uint16_t *pf, uint16_t const *mo, int x, int y);
 
 	// memory access
 	uint16_t &slipram(int offset) { return m_slipram[offset]; }

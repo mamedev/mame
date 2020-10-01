@@ -163,7 +163,9 @@ public:
 
 	// get sector diskaddr of logical unit lun into data_buffer
 	uint32_t get_sector(int32_t diskaddr, uint8_t *data_buffer, uint32_t length, uint8_t lun);
+
 protected:
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 

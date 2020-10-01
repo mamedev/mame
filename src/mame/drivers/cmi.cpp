@@ -490,7 +490,7 @@ uint32_t cmi_state::screen_update_cmi2x(screen_device &screen, bitmap_rgb32 &bit
 	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
 		uint8_t *src = &m_video_ram[(512/8) * ((y + y_scroll) & 0xff)];
-		uint32_t *dest = &bitmap.pix32(y, cliprect.min_x);
+		uint32_t *dest = &bitmap.pix(y, cliprect.min_x);
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x += 8)
 		{
@@ -507,7 +507,7 @@ uint32_t cmi_state::screen_update_cmi2x(screen_device &screen, bitmap_rgb32 &bit
 	if (m_lp_touch_port->read() && BIT(m_q219_pia->b_output(), 1))
 	{
 		/* Invert target pixel */
-		bitmap.pix32(m_lp_y_port->read(), m_lp_x_port->read()) ^= 0x00ffffff;
+		bitmap.pix(m_lp_y_port->read(), m_lp_x_port->read()) ^= 0x00ffffff;
 	}
 
 

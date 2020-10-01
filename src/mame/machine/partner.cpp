@@ -343,9 +343,8 @@ void partner_state::mem_page_w(u8 data)
 
 I8275_DRAW_CHARACTER_MEMBER(partner_state::display_pixels)
 {
-	int i;
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	const u8 *charmap = m_chargen + 0x400 * (gpa * 2 + hlgt);
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	u8 const *const charmap = m_chargen + 0x400 * (gpa * 2 + hlgt);
 	u8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 	if (vsp)
 		pixels = 0;
@@ -356,8 +355,8 @@ I8275_DRAW_CHARACTER_MEMBER(partner_state::display_pixels)
 	if (rvv)
 		pixels ^= 0xff;
 
-	for(i=0;i<6;i++)
-		bitmap.pix32(y, x + i) = palette[(pixels >> (5-i)) & 1];
+	for(int i=0;i<6;i++)
+		bitmap.pix(y, x + i) = palette[(pixels >> (5-i)) & 1];
 }
 
 void partner_state::machine_reset()

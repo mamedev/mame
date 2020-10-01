@@ -1354,7 +1354,7 @@ inline void taito_f3_state::draw_scanlines(
 		yadvp = -yadvp;
 	}
 
-	u8 *dstp0 = &m_pri_alp_bitmap.pix8(ty, x);
+	u8 *dstp0 = &m_pri_alp_bitmap.pix(ty, x);
 
 	m_pdest_2a = m_alpha_level_2ad ? 0x10 : 0;
 	m_pdest_2b = m_alpha_level_2bd ? 0x20 : 0;
@@ -1366,7 +1366,7 @@ inline void taito_f3_state::draw_scanlines(
 	m_tr_3b =(m_alpha_level_3bs == 0 && m_alpha_level_3bd == 255) ? -1 : 1;
 
 	{
-		u32 *dsti0 = &bitmap.pix32(ty, x);
+		u32 *dsti0 = &bitmap.pix(ty, x);
 		while (1)
 		{
 			int cx = 0;
@@ -1909,11 +1909,11 @@ void taito_f3_state::get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos,
 
 			/* set pixmap index */
 			line_t->x_count[y]=x_index_fx & 0xffff; // Fractional part
-			line_t->src_s[y] = src_s = &srcbitmap.pix16(y_index);
+			line_t->src_s[y] = src_s = &srcbitmap.pix(y_index);
 			line_t->src_e[y] = &src_s[m_width_mask + 1];
 			line_t->src[y] = &src_s[x_index_fx >> 16];
 
-			line_t->tsrc_s[y]=tsrc_s = &flagsbitmap.pix8(y_index);
+			line_t->tsrc_s[y]=tsrc_s = &flagsbitmap.pix(y_index);
 			line_t->tsrc[y] = &tsrc_s[x_index_fx >> 16];
 		}
 
@@ -2022,16 +2022,16 @@ void taito_f3_state::get_vram_info(tilemap_t *vram_tilemap, tilemap_t *pixel_til
 			/* set pixmap index */
 			line_t->x_count[y] = 0xffff;
 			if (usePixelLayer)
-				line_t->src_s[y] = src_s = &srcbitmap_pixel.pix16(sy & 0xff);
+				line_t->src_s[y] = src_s = &srcbitmap_pixel.pix(sy & 0xff);
 			else
-				line_t->src_s[y] = src_s = &srcbitmap_vram.pix16(sy & 0x1ff);
+				line_t->src_s[y] = src_s = &srcbitmap_vram.pix(sy & 0x1ff);
 			line_t->src_e[y] = &src_s[vram_width_mask + 1];
 			line_t->src[y] = &src_s[sx];
 
 			if (usePixelLayer)
-				line_t->tsrc_s[y]=tsrc_s = &flagsbitmap_pixel.pix8(sy & 0xff);
+				line_t->tsrc_s[y]=tsrc_s = &flagsbitmap_pixel.pix(sy & 0xff);
 			else
-				line_t->tsrc_s[y]=tsrc_s = &flagsbitmap_vram.pix8(sy & 0x1ff);
+				line_t->tsrc_s[y]=tsrc_s = &flagsbitmap_vram.pix(sy & 0x1ff);
 			line_t->tsrc[y] = &tsrc_s[sx];
 		}
 
@@ -2537,8 +2537,8 @@ inline void taito_f3_state::f3_drawgfx(bitmap_rgb32 &dest_bmp, const rectangle &
 					int y = ey - sy;
 					const int x = (ex - sx - 1) | (m_tile_opaque_sp[code % gfx->elements()] << 4);
 					const u8 *source0 = code_base + y_index * 16 + x_index_base;
-					u32 *dest0 = &dest_bmp.pix32(sy, sx);
-					u8 *pri0 = &m_pri_alp_bitmap.pix8(sy, sx);
+					u32 *dest0 = &dest_bmp.pix(sy, sx);
+					u8 *pri0 = &m_pri_alp_bitmap.pix(sy, sx);
 					const int yadv = dest_bmp.rowpixels();
 					const int yadvp = m_pri_alp_bitmap.rowpixels();
 					dy = dy * 16;
@@ -2686,8 +2686,8 @@ inline void taito_f3_state::f3_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectang
 					for (int y = sy; y < ey; y++)
 					{
 						const u8 *source = code_base + (y_index >> 16) * 16;
-						u32 *dest = &dest_bmp.pix32(y);
-						u8 *pri = &m_pri_alp_bitmap.pix8(y);
+						u32 *dest = &dest_bmp.pix(y);
+						u8 *pri = &m_pri_alp_bitmap.pix(y);
 
 						int x_index = x_index_base;
 						for (int x = sx; x < ex; x++)

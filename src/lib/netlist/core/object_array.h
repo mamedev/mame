@@ -133,7 +133,7 @@ namespace netlist
 
 	private:
 		template <std::size_t P>
-		inline constexpr value_type e() const { return (*this)[P](); }
+		constexpr const value_type &e() const { return (*this)[P](); }
 	};
 
 	template<std::size_t N>
@@ -144,7 +144,7 @@ namespace netlist
 		using base_type::base_type;
 
 		template <typename T>
-		inline void push(const T &v, const netlist_time &t)
+		void push(const T &v, const netlist_time &t)
 		{
 			if (N >= 1) (*this)[0].push((v >> 0) & 1, t);
 			if (N >= 2) (*this)[1].push((v >> 1) & 1, t);
@@ -197,7 +197,7 @@ namespace netlist
 		using base_type::base_type;
 
 		template <typename T>
-		inline void push(const T &v, const netlist_time &t)
+		void push(const T &v, const netlist_time &t)
 		{
 			if (N >= 1) (*this)[0].push((v >> 0) & 1, t);
 			if (N >= 2) (*this)[1].push((v >> 1) & 1, t);

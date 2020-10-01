@@ -187,7 +187,7 @@ uint32_t galaxygame_state::screen_update_galaxygame(screen_device &screen, bitma
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	for (int i = 0; i < m_point_display_list_index; i++ )
 	{
-		bitmap.pix16(m_point_display_list[i].x >> 7, m_point_display_list[i].y >> 7) = 1;
+		bitmap.pix(m_point_display_list[i].x >> 7, m_point_display_list[i].y >> 7) = 1;
 	}
 	return 0;
 }

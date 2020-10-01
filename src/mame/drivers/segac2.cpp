@@ -1513,10 +1513,8 @@ uint32_t segac2_state::screen_update_segac2_new(screen_device &screen, bitmap_rg
 	/* Copy our screen buffer here */
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint32_t* desty = &bitmap.pix32(y, 0);
-		uint16_t* srcy;
-
-		srcy = m_vdp->m_render_line_raw.get();
+		uint32_t *const desty = &bitmap.pix(y, 0);
+		uint16_t const *const srcy = m_vdp->m_render_line_raw.get();
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{

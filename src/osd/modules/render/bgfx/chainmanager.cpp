@@ -405,7 +405,7 @@ void chain_manager::create_selection_slider(uint32_t screen_index)
 		return;
 	}
 
-	std::unique_ptr<slider_state> state = make_unique_clear<slider_state>();
+	std::unique_ptr<slider_state> state = std::make_unique<slider_state>();
 
 	state->minval = 0;
 	state->defval = m_current_chain[screen_index];

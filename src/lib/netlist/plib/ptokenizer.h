@@ -19,22 +19,7 @@
 
 namespace plib {
 
-	class ptokenizer
-	{
-	public:
-		explicit ptokenizer() // NOLINT(misc-forwarding-reference-overload, bugprone-forwarding-reference-overload)
-		: m_strm(nullptr)
-		, m_unget(0)
-		, m_string('"')
-		, m_support_line_markers(true) // FIXME
-		, m_token_queue(nullptr)
-		{
-			clear();
-		}
-
-		PCOPYASSIGNMOVE(ptokenizer, delete)
-
-		virtual ~ptokenizer() = default;
+	namespace detail {
 
 		PENUM(token_type,
 			IDENTIFIER,
@@ -109,7 +94,34 @@ namespace plib {
 			pstring m_token;
 		};
 
-		using token_store = std::vector<token_t>;
+		class token_store : public std::vector<token_t>
+		{
+			using std::vector<token_t>::vector;
+		};
+
+	} // namespace detail
+
+	class ptokenizer
+	{
+	public:
+		explicit ptokenizer() // NOLINT(misc-forwarding-reference-overload, bugprone-forwarding-reference-overload)
+		: m_strm(nullptr)
+		, m_unget(0)
+		, m_string('"')
+		, m_support_line_markers(true) // FIXME
+		, m_token_queue(nullptr)
+		{
+			clear();
+		}
+
+		PCOPYASSIGNMOVE(ptokenizer, delete)
+
+		virtual ~ptokenizer() = default;
+
+		using token_type = detail::token_type;
+		using token_id_t = detail::token_id_t;
+		using token_t = detail::token_t;
+		using token_store = detail::token_store;
 
 		// tokenizer stuff follows ...
 

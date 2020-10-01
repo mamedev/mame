@@ -8,47 +8,47 @@
 
 ****************************************************************************
 
-	In MAME, sound is represented as a graph of sound "streams". Each
-	stream has a fixed number of inputs and outputs, and is responsible
-	for producing sound on demand.
+    In MAME, sound is represented as a graph of sound "streams". Each
+    stream has a fixed number of inputs and outputs, and is responsible
+    for producing sound on demand.
 
-	The graph is driven from the outputs, which are speaker devices.
-	These devices are updated on a regular basis (~50 times per second),
-	and when an update occurs, the graph is walked from the speaker
-	through each input, until all connected streams are up to date.
+    The graph is driven from the outputs, which are speaker devices.
+    These devices are updated on a regular basis (~50 times per second),
+    and when an update occurs, the graph is walked from the speaker
+    through each input, until all connected streams are up to date.
 
-	Individual streams can also be updated manually. This is important
-	for sound chips and CPU-driven devices, who should force any
-	affected streams to update prior to making changes.
+    Individual streams can also be updated manually. This is important
+    for sound chips and CPU-driven devices, who should force any
+    affected streams to update prior to making changes.
 
-	Sound streams are *not* part of the device execution model. This is
-	very important to understand. If the process of producing the ouput
-	stream affects state that might be consumed by an executing device
-	(e.g., a CPU), then care must be taken to ensure that the stream is
-	updated frequently enough
+    Sound streams are *not* part of the device execution model. This is
+    very important to understand. If the process of producing the ouput
+    stream affects state that might be consumed by an executing device
+    (e.g., a CPU), then care must be taken to ensure that the stream is
+    updated frequently enough
 
-	The model for timing sound samples is very important and explained
-	here. Each stream source has a clock (aka sample rate). Each clock
-	edge represents a sample that is held for the duration of one clock
-	period. This model has interesting effects:
+    The model for timing sound samples is very important and explained
+    here. Each stream source has a clock (aka sample rate). Each clock
+    edge represents a sample that is held for the duration of one clock
+    period. This model has interesting effects:
 
-	For example, if you have a 10Hz clock, and call stream.update() at
-	t=0.91, it will compute 10 samples (for clock edges 0.0, 0.1, 0.2,
-	..., 0.7, 0.8, and 0.9). And then if you ask the stream what its
-	current end time is (via stream.sample_time()), it will say t=1.0,
-	which is in the future, because it knows it will hold that last
-	sample until 1.0s.
+    For example, if you have a 10Hz clock, and call stream.update() at
+    t=0.91, it will compute 10 samples (for clock edges 0.0, 0.1, 0.2,
+    ..., 0.7, 0.8, and 0.9). And then if you ask the stream what its
+    current end time is (via stream.sample_time()), it will say t=1.0,
+    which is in the future, because it knows it will hold that last
+    sample until 1.0s.
 
-	Sound generation callbacks are presented with a std::vector of inputs
-	and outputs. The vectors contain objects of read_stream_view and
-	write_stream_view respectively, which wrap access to a circular buffer
-	of samples. Sound generation callbacks are expected to fill all the
-	samples described by the outputs' write_stream_view objects. At the
-	moment, all outputs have the same sample rate, so the number of samples
-	that need to be generated will be consistent across all outputs.
+    Sound generation callbacks are presented with a std::vector of inputs
+    and outputs. The vectors contain objects of read_stream_view and
+    write_stream_view respectively, which wrap access to a circular buffer
+    of samples. Sound generation callbacks are expected to fill all the
+    samples described by the outputs' write_stream_view objects. At the
+    moment, all outputs have the same sample rate, so the number of samples
+    that need to be generated will be consistent across all outputs.
 
-	By default, the inputs will have been resampled to match the output
-	sample rate, unless otherwise specified.
+    By default, the inputs will have been resampled to match the output
+    sample rate, unless otherwise specified.
 
 ***************************************************************************/
 
@@ -81,7 +81,11 @@ constexpr u32 SAMPLE_RATE_MINIMUM = 50;
 //**************************************************************************
 
 // turn this on to enable aggressive assertions and other checks
+#ifdef MAME_DEBUG
 #define SOUND_DEBUG (1)
+#else
+#define SOUND_DEBUG (0)
+#endif
 
 // if SOUND_DEBUG is on, make assertions fire regardless of MAME_DEBUG
 #if (SOUND_DEBUG)
@@ -346,6 +350,7 @@ protected:
 
 class write_stream_view : public read_stream_view
 {
+
 public:
 	// empty constructor so we can live in an array or vector
 	write_stream_view()
@@ -359,12 +364,12 @@ public:
 	}
 
 	// constructor that converts from a read_stream_view
-	write_stream_view(read_stream_view &src) :
+	write_stream_view(read_stream_view const &src) :
 		read_stream_view(src)
 	{
 	}
 
-	// safely write a gain-applied sample to the buffer
+	// safely write a sample to the buffer
 	void put(s32 index, sample_t sample)
 	{
 		sound_assert(u32(index) < samples());
@@ -374,7 +379,33 @@ public:
 		m_buffer->put(index, sample);
 	}
 
-	// safely add a gain-applied sample to the buffer
+	// write a sample to the buffer, clamping to +/- the clamp value
+	void put_clamp(s32 index, sample_t sample, sample_t clamp = 1.0)
+	{
+		if (sample > clamp)
+			sample = clamp;
+		if (sample < -clamp)
+			sample = -clamp;
+		put(index, sample);
+	}
+
+	// write a sample to the buffer, converting from an integer with the given maximum
+	void put_int(s32 index, s32 sample, s32 max)
+	{
+		put(index, sample_t(sample) * (1.0f / sample_t(max)));
+	}
+
+	// write a sample to the buffer, converting from an integer with the given maximum
+	void put_int_clamp(s32 index, s32 sample, s32 maxclamp)
+	{
+		if (sample > maxclamp)
+			sample = maxclamp;
+		else if (sample < -maxclamp)
+			sample = -maxclamp;
+		put_int(index, sample, maxclamp);
+	}
+
+	// safely add a sample to the buffer
 	void add(s32 index, sample_t sample)
 	{
 		sound_assert(u32(index) < samples());
@@ -382,6 +413,12 @@ public:
 		if (index >= m_buffer->size())
 			index -= m_buffer->size();
 		m_buffer->put(index, m_buffer->get(index) + sample);
+	}
+
+	// add a sample to the buffer, converting from an integer with the given maximum
+	void add_int(s32 index, s32 sample, s32 max)
+	{
+		add(index, sample_t(sample) * (1.0f / sample_t(max)));
 	}
 
 	// fill part of the view with the given value
@@ -455,6 +492,7 @@ public:
 	attotime end_time() const { return m_buffer.end_time(); }
 	u32 index() const { return m_index; }
 	stream_buffer::sample_t gain() const { return m_gain; }
+	u32 buffer_sample_rate() const { return m_buffer.sample_rate(); }
 
 	// simple setters
 	void set_gain(float gain) { m_gain = gain; }
@@ -471,12 +509,16 @@ public:
 	// resync the buffer to the given end time
 	void set_end_time(attotime end) { m_buffer.set_end_time(end); }
 
+	// attempt to optimize resamplers by reusing them where possible
+	sound_stream_output &optimize_resampler(sound_stream_output *input_resampler);
+
 private:
 	// internal state
 	sound_stream *m_stream;               // owning stream
 	stream_buffer m_buffer;               // output buffer
 	u32 m_index;                          // output index within the stream
 	stream_buffer::sample_t m_gain;       // gain to apply to the output
+	std::vector<sound_stream_output *> m_resampler_list; // list of resamplers we're connected to
 };
 
 
@@ -534,10 +576,7 @@ private:
 };
 
 
-// ======================> stream_update_legacy_delegate/stream_update_delegate
-
-// old-style callback; eventually should be deprecated
-using stream_update_legacy_delegate = delegate<void (sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)>;
+// ======================> stream_update_delegate
 
 // new-style callback
 using stream_update_delegate = delegate<void (sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)>;
@@ -572,7 +611,6 @@ class sound_stream
 
 public:
 	// construction/destruction
-	sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output_base, u32 sample_rate, stream_update_legacy_delegate callback, sound_stream_flags flags = STREAM_DEFAULT_FLAGS);
 	sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output_base, u32 sample_rate, stream_update_delegate callback, sound_stream_flags flags = STREAM_DEFAULT_FLAGS);
 	virtual ~sound_stream();
 
@@ -580,9 +618,10 @@ public:
 	sound_stream *next() const { return m_next; }
 	device_t &device() const { return m_device; }
 	std::string name() const { return m_name; }
-	bool synchronous() const { return m_synchronous; }
 	bool input_adaptive() const { return m_input_adaptive || m_synchronous; }
 	bool output_adaptive() const { return m_output_adaptive; }
+	bool synchronous() const { return m_synchronous; }
+	bool resampling_disabled() const { return m_resampling_disabled; }
 
 	// input and output getters
 	u32 input_count() const { return m_input.size(); }
@@ -614,7 +653,7 @@ public:
 
 #if (SOUND_DEBUG)
 	// print one level of the sound graph and recursively tell our inputs to do the same
-	void print_graph_recursive(int indent);
+	void print_graph_recursive(int indent, int index);
 #endif
 
 protected:
@@ -637,9 +676,6 @@ private:
 	// timer callback for synchronous streams
 	void sync_update(void *, s32);
 
-	// new callback which wrapps calls through to the old-style callbacks
-	void stream_update_legacy(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs);
-
 	// return a view of 0 data covering the given time period
 	read_stream_view empty_view(attotime start, attotime end);
 
@@ -654,11 +690,11 @@ private:
 	bool m_input_adaptive;                         // adaptive stream that runs at the sample rate of its input
 	bool m_output_adaptive;                        // adaptive stream that runs at the sample rate of its output
 	bool m_synchronous;                            // synchronous stream that runs at the rate of its input
+	bool m_resampling_disabled;                    // is resampling of input streams disabled?
 	emu_timer *m_sync_timer;                       // update timer for synchronous streams
 
 	// input information
 	std::vector<sound_stream_input> m_input;       // list of streams we directly depend upon
-	std::vector<stream_sample_t *> m_input_array;  // array of inputs for passing to the callback
 	std::vector<read_stream_view> m_input_view;    // array of output views for passing to the callback
 	std::vector<std::unique_ptr<sound_stream>> m_resampler_list; // internal list of resamplers
 	stream_buffer m_empty_buffer;                  // empty buffer for invalid inputs
@@ -666,12 +702,10 @@ private:
 	// output information
 	u32 m_output_base;                             // base index of our outputs, relative to our device
 	std::vector<sound_stream_output> m_output;     // list of streams which directly depend upon us
-	std::vector<stream_sample_t *> m_output_array; // array of outputs for passing to the callback
 	std::vector<write_stream_view> m_output_view;  // array of output views for passing to the callback
 
 	// callback information
-	stream_update_legacy_delegate m_callback;             // callback function
-	stream_update_delegate m_callback_ex;       // extended callback function
+	stream_update_delegate m_callback_ex;          // extended callback function
 };
 
 
@@ -729,9 +763,6 @@ public:
 	attotime last_update() const { return m_last_update; }
 	int sample_count() const { return m_samples_this_update; }
 	int unique_id() { return m_unique_id++; }
-
-	// allocate a new stream with the old-style callback
-	sound_stream *stream_alloc_legacy(device_t &device, u32 inputs, u32 outputs, u32 sample_rate, stream_update_legacy_delegate callback);
 
 	// allocate a new stream with a new-style callback
 	sound_stream *stream_alloc(device_t &device, u32 inputs, u32 outputs, u32 sample_rate, stream_update_delegate callback, sound_stream_flags flags);

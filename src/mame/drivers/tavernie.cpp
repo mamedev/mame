@@ -255,19 +255,17 @@ void ivg09_state::ds_w(u8 data)
 // Attributes when high: 0 = alpha rom; 1 = flash; 2 = reverse video; 3 = highlight off
 MC6845_UPDATE_ROW( ivg09_state::crtc_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	u8 gfx,attr;
-	u16 mem,x;
-	u32 *p = &bitmap.pix32(y);
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	u32 *p = &bitmap.pix(y);
 	m_flashcnt++;
 
-	for (x = 0; x < x_count; x++)
+	for (u16 x = 0; x < x_count; x++)
 	{
-		mem = (ma + x) & 0xfff;
-		attr = m_vram[mem] >> 8;
-		u8 inv = ((x == cursor_x) ^ (BIT(attr, 2)) ^ (BIT(attr, 1) && BIT(m_flashcnt, 6))) ? 0xff : 0;
-		gfx = m_p_chargen[((m_vram[mem] & 0x1ff)<<4) | ra] ^ inv;   // takes care of attr bit 0 too
-		u8 pen = BIT(attr, 3) ? 1 : 2;
+		u16 const mem = (ma + x) & 0xfff;
+		u8 const attr = m_vram[mem] >> 8;
+		u8 const inv = ((x == cursor_x) ^ (BIT(attr, 2)) ^ (BIT(attr, 1) && BIT(m_flashcnt, 6))) ? 0xff : 0;
+		u8 const gfx = m_p_chargen[((m_vram[mem] & 0x1ff)<<4) | ra] ^ inv;   // takes care of attr bit 0 too
+		u8 const pen = BIT(attr, 3) ? 1 : 2;
 
 		/* Display a scanline of a character */
 		*p++ = palette[BIT(gfx, 7) ? pen : 0];

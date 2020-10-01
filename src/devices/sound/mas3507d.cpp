@@ -29,7 +29,7 @@ mas3507d_device::mas3507d_device(const machine_config &mconfig, const char *tag,
 void mas3507d_device::device_start()
 {
 	current_rate = 44100;
-	stream = stream_alloc_legacy(0, 2, current_rate);
+	stream = stream_alloc(0, 2, current_rate);
 	cb_sample.resolve();
 }
 
@@ -359,11 +359,8 @@ void mas3507d_device::fill_buffer()
 	}
 }
 
-void mas3507d_device::append_buffer(stream_sample_t * const *outputs, int &pos, int scount)
+void mas3507d_device::append_buffer(std::vector<write_stream_view> &outputs, int &pos, int scount)
 {
-	if(!sample_count)
-		return;
-
 	buffered_frame_count = scount;
 
 	int s1 = scount - pos;
@@ -372,14 +369,13 @@ void mas3507d_device::append_buffer(stream_sample_t * const *outputs, int &pos, 
 
 	if(mp3_info.channels == 1) {
 		for(int i=0; i<s1; i++) {
-			stream_sample_t v = samples[i];
-			outputs[0][i+pos] = v;
-			outputs[1][i+pos] = v;
+			outputs[0].put_int(i+pos, samples[i], 32768);
+			outputs[1].put_int(i+pos, samples[i], 32768);
 		}
 	} else {
 		for(int i=0; i<s1; i++) {
-			outputs[0][i+pos] = samples[i*2];
-			outputs[1][i+pos] = samples[i*2+1];
+			outputs[0].put_int(i+pos, samples[i*2], 32768);
+			outputs[1].put_int(i+pos, samples[i*2+1], 32768);
 		}
 	}
 
@@ -400,8 +396,9 @@ void mas3507d_device::append_buffer(stream_sample_t * const *outputs, int &pos, 
 	total_frame_count += s1;
 }
 
-void mas3507d_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int csamples)
+void mas3507d_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
+	int csamples = outputs[0].samples();
 	int pos = 0;
 
 	append_buffer(outputs, pos, csamples);
@@ -419,10 +416,8 @@ void mas3507d_device::sound_stream_update_legacy(sound_stream &stream, stream_sa
 			total_frame_count = 0;
 			buffered_frame_count = 0;
 
-			for(int i=pos; i != csamples; i++) {
-				outputs[0][i] = 0;
-				outputs[1][i] = 0;
-			}
+			outputs[0].fill(0, pos);
+			outputs[1].fill(0, pos);
 			return;
 		}
 		append_buffer(outputs, pos, csamples);

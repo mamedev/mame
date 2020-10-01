@@ -50,7 +50,7 @@ void ks0164_device::device_start()
 		space().install_rom(0, rend, ((1 << 23) - 1) ^ rmask, m_mem_region->base());
 	}
 
-	m_stream = stream_alloc_legacy(0, 2, clock()/3/2/2/32);
+	m_stream = stream_alloc(0, 2, clock()/3/2/2/32);
 	space().cache(m_mem_cache);
 	m_timer = timer_alloc(0);
 
@@ -368,9 +368,9 @@ u16 ks0164_device::uncomp_8_16(u8 value)
 	return o;
 }
 
-void ks0164_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void ks0164_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	for(int sample = 0; sample != samples; sample++) {
+	for(int sample = 0; sample != outputs[0].samples(); sample++) {
 		s32 suml = 0, sumr = 0;
 		for(int voice = 0; voice < 0x20; voice++) {
 			u16 *regs = m_sregs[voice];
@@ -415,7 +415,7 @@ void ks0164_device::sound_stream_update_legacy(sound_stream &stream, stream_samp
 				sumr += samp;
 			}
 		}
-		outputs[0][sample] = suml >> 5;
-		outputs[1][sample] = sumr >> 5;
+		outputs[0].put_int(sample, suml, 32768 * 32);
+		outputs[1].put_int(sample, sumr, 32768 * 32);
 	}
 }

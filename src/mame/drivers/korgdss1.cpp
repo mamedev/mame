@@ -141,7 +141,7 @@ void korg_dss1_state::machine_reset()
 HD44780_PIXEL_UPDATE(korg_dss1_state::lcd_pixel_update)
 {
 	if (x < 5 && y < 8 && line < 2 && pos < 20)
-		bitmap.pix16(line * 8 + y, pos * 6 + x) = state;
+		bitmap.pix(line * 8 + y, pos * 6 + x) = state;
 }
 
 

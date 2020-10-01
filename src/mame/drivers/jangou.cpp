@@ -193,7 +193,7 @@ uint32_t jangou_state::screen_update_jangou(screen_device &screen, bitmap_ind16 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
 		const uint8_t *src = &m_blitter->blit_buffer(y, cliprect.min_x);
-		uint16_t *dst = &m_tmp_bitmap->pix16(y, cliprect.min_x);
+		uint16_t *dst = &m_tmp_bitmap->pix(y, cliprect.min_x);
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x += 2)
 		{

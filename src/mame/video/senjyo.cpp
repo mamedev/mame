@@ -182,10 +182,10 @@ void senjyo_state::draw_bgbitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect
 		{
 			if (flip)
 				for (int y = 0;y < 256;y++)
-					bitmap.pix32(y, 255 - x) = m_palette->pen_color(384 + pen);
+					bitmap.pix(y, 255 - x) = m_palette->pen_color(384 + pen);
 			else
 				for (int y = 0;y < 256;y++)
-					bitmap.pix32(y, x) = m_palette->pen_color(384 + pen);
+					bitmap.pix(y, x) = m_palette->pen_color(384 + pen);
 
 			count += 0x10;
 			if (count >= strwid)
@@ -215,7 +215,7 @@ void senjyo_state::draw_radar(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				}
 
 				if (cliprect.contains(sx, sy))
-					bitmap.pix32(sy, sx) =  m_radar_palette->pen_color(offs < 0x200 ? 0 : 1);
+					bitmap.pix(sy, sx) =  m_radar_palette->pen_color(offs < 0x200 ? 0 : 1);
 			}
 }
 

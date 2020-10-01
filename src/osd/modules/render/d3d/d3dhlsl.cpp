@@ -115,7 +115,7 @@ public:
 		for (int y = 0; y < m_height; y++)
 		{
 			auto *src = (DWORD *)((BYTE *)rect.pBits + y * rect.Pitch);
-			uint32_t *dst = &m_frame.pix32(y);
+			uint32_t *dst = &m_frame.pix(y);
 
 			for (int x = 0; x < m_width; x++)
 			{
@@ -343,7 +343,7 @@ void shaders::render_snapshot(IDirect3DSurface9 *surface)
 	for (int y = 0; y < height; y++)
 	{
 		auto *src = (DWORD *)((BYTE *)rect.pBits + y * rect.Pitch);
-		uint32_t *dst = &snapshot.pix32(y);
+		uint32_t *dst = &snapshot.pix(y);
 
 		for (int x = 0; x < width; x++)
 		{
@@ -1976,7 +1976,7 @@ static void get_vector(const char *data, int count, float *out, bool report_erro
 
 std::unique_ptr<slider_state> shaders::slider_alloc(int id, const char *title, int32_t minval, int32_t defval, int32_t maxval, int32_t incval, void *arg)
 {
-	auto state = make_unique_clear<slider_state>();
+	auto state = std::make_unique<slider_state>();
 
 	state->minval = minval;
 	state->defval = defval;

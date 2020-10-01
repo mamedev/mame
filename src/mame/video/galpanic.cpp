@@ -28,18 +28,18 @@ void galpanic_state::bgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mas
 	int sy = offset / 256;
 	int sx = offset % 256;
 
-	m_bitmap.pix16(sy, sx) = 1024 + (data >> 1);
+	m_bitmap.pix(sy, sx) = 1024 + (data >> 1);
 }
 
 void galpanic_state::draw_fgbitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (int offs = 0;offs < m_fgvideoram.bytes()/2;offs++)
 	{
-		int sx = offs % 256;
-		int sy = offs / 256;
-		int color = m_fgvideoram[offs];
+		int const sx = offs % 256;
+		int const sy = offs / 256;
+		int const color = m_fgvideoram[offs];
 		if (color)
-			bitmap.pix16(sy, sx) = color;
+			bitmap.pix(sy, sx) = color;
 	}
 }
 

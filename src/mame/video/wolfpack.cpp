@@ -163,31 +163,24 @@ void wolfpack_state::draw_torpedo(bitmap_ind16 &bitmap, const rectangle &cliprec
 {
 	int count = 0;
 
-	int x;
-	int y;
-
-
-		m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
+	m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
 		m_torpedo_pic,
 		0,
 		0, 0,
 		2 * (244 - m_torpedo_h),
 		224 - m_torpedo_v, 0);
 
-	for (y = 16; y < 224 - m_torpedo_v; y++)
+	for (int y = 16; y < 224 - m_torpedo_v; y++)
 	{
-		int x1;
-		int x2;
-
 		if (y % 16 == 1)
 			count = (count - 1) & 7;
 
-		x1 = 248 - m_torpedo_h - count;
-		x2 = 248 - m_torpedo_h + count;
+		int const x1 = 248 - m_torpedo_h - count;
+		int const x2 = 248 - m_torpedo_h + count;
 
-		for (x = 2 * x1; x < 2 * x2; x++)
+		for (int x = 2 * x1; x < 2 * x2; x++)
 			if (m_LFSR[(m_current_index + 0x300 * y + x) % 0x8000])
-				bitmap.pix16(y, x) = 1;
+				bitmap.pix(y, x) = 1;
 	}
 }
 
@@ -220,7 +213,7 @@ void wolfpack_state::draw_water(palette_device &palette, bitmap_ind16 &bitmap, c
 {
 	for (int y = cliprect.top(); y <= (std::min)(cliprect.bottom(), 127); y++)
 	{
-		uint16_t* p = &bitmap.pix16(y);
+		uint16_t *const p = &bitmap.pix(y);
 
 		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 			p[x] = palette.pen_indirect(p[x]) | 0x08;
@@ -286,7 +279,7 @@ WRITE_LINE_MEMBER(wolfpack_state::screen_vblank)
 				if (y < 0 || y >= m_helper.height())
 					continue;
 
-				if (m_helper.pix16(y, x))
+				if (m_helper.pix(y, x))
 					m_collision = 1;
 			}
 		}

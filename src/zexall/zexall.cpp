@@ -31,6 +31,7 @@ public:
 	void output_data_w(uint8_t data);
 
 	void z80_mem(address_map &map);
+	void zexall(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_main_ram;
@@ -41,7 +42,6 @@ private:
 	std::string terminate_string;
 
 	virtual void machine_reset() override;
-	void zexall(machine_config &config);
 };
 
 
@@ -123,9 +123,9 @@ void zexall_state::output_data_w(uint8_t data)
 void zexall_state::z80_mem(address_map &map)
 {
 	map(0x0000, 0xffff).ram().share("main_ram");
-	map(0xfffd, 0xfffd).rw(this, FUNC(zexall_state::output_ack_r), FUNC(zexall_state::output_ack_w));
-	map(0xfffe, 0xfffe).rw(this, FUNC(zexall_state::output_req_r), FUNC(zexall_state::output_req_w));
-	map(0xffff, 0xffff).rw(this, FUNC(zexall_state::output_data_r), FUNC(zexall_state::output_data_w));
+	map(0xfffd, 0xfffd).rw(FUNC(zexall_state::output_ack_r), FUNC(zexall_state::output_ack_w));
+	map(0xfffe, 0xfffe).rw(FUNC(zexall_state::output_req_r), FUNC(zexall_state::output_req_w));
+	map(0xffff, 0xffff).rw(FUNC(zexall_state::output_data_r), FUNC(zexall_state::output_data_w));
 }
 
 
@@ -162,5 +162,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME      PARENT      COMPAT  MACHINE   INPUT   STATE         INIT    COMPANY                         FULLNAME                            FLAGS */
-COMP( 2009, zexall,   0,          0,      zexall,   zexall, zexall_state, 0,      "Frank Cringle / Kevin Horton", "Zexall (FPGA Z80 test interface)", MACHINE_NO_SOUND_HW )
+/*    YEAR  NAME      PARENT      COMPAT  MACHINE   INPUT   STATE         INIT        COMPANY                         FULLNAME                            FLAGS */
+COMP( 2009, zexall,   0,          0,      zexall,   zexall, zexall_state, empty_init, "Frank Cringle / Kevin Horton", "Zexall (FPGA Z80 test interface)", MACHINE_NO_SOUND_HW )

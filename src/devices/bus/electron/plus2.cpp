@@ -53,6 +53,8 @@ void electron_plus2_device::device_add_mconfig(machine_config &config)
 	VIA6522(config, m_via, DERIVED_CLOCK(1, 16));
 	m_via->readpb_handler().set(m_userport, FUNC(bbc_userport_slot_device::pb_r));
 	m_via->writepb_handler().set(m_userport, FUNC(bbc_userport_slot_device::pb_w));
+	m_via->cb1_handler().set(m_userport, FUNC(bbc_userport_slot_device::write_cb1));
+	m_via->cb2_handler().set(m_userport, FUNC(bbc_userport_slot_device::write_cb2));
 	m_via->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<2>));
 
 	/* user port */

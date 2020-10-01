@@ -103,7 +103,7 @@ void gigatron_state::video_start()
 
 void gigatron_state::video_reset()
 {
-	uint32_t *dest = &m_bitmap_render->pix32(0, 0);
+	uint32_t *dest = &m_bitmap_render->pix(0, 0);
 	for(uint32_t i = 0; i < 640*480; i++)
 		*dest++ = 0;
 }
@@ -138,7 +138,7 @@ void gigatron_state::port_out(uint8_t data)
 		uint8_t r = (out << 6) & 0xC0;
 		uint8_t g = (out << 4) & 0xC0;
 		uint8_t b = (out << 2) & 0xC0;
-		uint32_t *dest = &m_bitmap_render->pix32(m_row, m_col);
+		uint32_t *dest = &m_bitmap_render->pix(m_row, m_col);
 		for(uint8_t i = 0; i < 4; i++)
 			*dest++ = b|(g<<8)|(r<<16);
 	}

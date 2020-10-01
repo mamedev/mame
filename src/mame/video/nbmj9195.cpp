@@ -176,7 +176,7 @@ void nbmj9195_state::vramflip(int vram)
 void nbmj9195_state::update_pixel(int vram, int x, int y)
 {
 	uint16_t color = m_videoram[vram][(y * m_screen->width()) + x];
-	m_tmpbitmap[vram].pix16(y, x) = color;
+	m_tmpbitmap[vram].pix(y, x) = color;
 }
 
 void nbmj9195_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)

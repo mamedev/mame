@@ -518,14 +518,14 @@ HD44780_PIXEL_UPDATE(psion_state::lz_pixel_update)
 		};
 
 		uint8_t char_pos = psion_display_layout[line*40 + pos];
-		bitmap.pix16((char_pos / 20) * 9 + y, (char_pos % 20) * 6 + x) = state;
+		bitmap.pix((char_pos / 20) * 9 + y, (char_pos % 20) * 6 + x) = state;
 	}
 }
 
 HD44780_PIXEL_UPDATE(psion1_state::psion1_pixel_update)
 {
 	if (pos < 8 && line < 2)
-		bitmap.pix16(y, (line * 8 + pos) * 6 + x) = state;
+		bitmap.pix(y, (line * 8 + pos) * 6 + x) = state;
 }
 
 void psion_state::psion_palette(palette_device &palette) const

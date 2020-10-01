@@ -19,8 +19,8 @@
 #define LOG_EXTRA 0
 
 
-#define READ_TX0_18BIT(A) ((signed)m_program->read_dword((A)<<2))
-#define WRITE_TX0_18BIT(A,V) (m_program->write_dword((A)<<2,(V)))
+#define READ_TX0_18BIT(A) ((signed)m_program->read_dword(A))
+#define WRITE_TX0_18BIT(A,V) (m_program->write_dword((A),(V)))
 
 
 #define io_handler_rim 3

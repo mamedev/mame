@@ -9,7 +9,7 @@ LEDs for the Ericsson PC keyboard
 	<element name="text_caps"><text string="Caps Lock"><color red="0.7" green="0.7" blue="0.7" /></text></element>
 	<element name="text_num"><text string="Num Lock"><color red="0.7" green="0.7" blue="0.7" /></text></element>
 	<element name="text_scroll"><text string="Scroll Lock"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="led" defstate="0"><disk><color red="0.85" green="0.18" blue="0.16" /></disk></element>
+	<element name="led" defstate="0"><disk state="0"><color red="0.85" green="0.18" blue="0.16" /></disk></element>
 
 	<group name="caps">
 		<element ref="led" name="kbled0"><bounds x="0" y="0" width="100" height="100" /></element>

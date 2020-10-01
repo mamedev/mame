@@ -281,7 +281,7 @@ void unior_state::scroll_w(u8 data)
 
 I8275_DRAW_CHARACTER_MEMBER(unior_state::display_pixels)
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	u8 gfx = m_p_chargen[(linecount & 7) | (charcode << 3)];
 
 	if (vsp)
@@ -294,7 +294,7 @@ I8275_DRAW_CHARACTER_MEMBER(unior_state::display_pixels)
 		gfx ^= 0xff;
 
 	for(u8 i=0;i<6;i++)
-		bitmap.pix32(y, x + i) = palette[BIT(gfx, 5-i) ? (hlgt ? 2 : 1) : 0];
+		bitmap.pix(y, x + i) = palette[BIT(gfx, 5-i) ? (hlgt ? 2 : 1) : 0];
 }
 
 static constexpr rgb_t unior_pens[3] =

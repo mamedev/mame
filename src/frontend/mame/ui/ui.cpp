@@ -216,7 +216,7 @@ void mame_ui_manager::init()
 			config_save_delegate(&mame_ui_manager::config_save, this));
 
 	// create mouse bitmap
-	uint32_t *dst = &m_mouse_bitmap.pix32(0);
+	uint32_t *dst = &m_mouse_bitmap.pix(0);
 	memcpy(dst,mouse_bitmap,32*32*sizeof(uint32_t));
 	m_mouse_arrow_texture = machine().render().texture_alloc();
 	m_mouse_arrow_texture->set_bitmap(m_mouse_bitmap, m_mouse_bitmap.cliprect(), TEXFORMAT_ARGB32);
@@ -1487,7 +1487,7 @@ std::vector<ui::menu_item>& mame_ui_manager::get_slider_list(void)
 
 std::unique_ptr<slider_state> mame_ui_manager::slider_alloc(int id, const char *title, int32_t minval, int32_t defval, int32_t maxval, int32_t incval, void *arg)
 {
-	auto state = make_unique_clear<slider_state>();
+	auto state = std::make_unique<slider_state>();
 
 	state->minval = minval;
 	state->defval = defval;

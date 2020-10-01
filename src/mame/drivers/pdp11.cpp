@@ -372,7 +372,7 @@ void pdp11_state::kbd_put(u8 data)
 void pdp11_state::pdp11(machine_config &config)
 {
 	/* basic machine hardware */
-	T11(config, m_maincpu, XTAL(4'000'000)); // Need proper CPU here
+	T11(config, m_maincpu, 4'000'000); // Need proper CPU here
 	m_maincpu->set_initial_mode(6 << 13);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pdp11_state::pdp11_mem);
 
@@ -398,7 +398,7 @@ void pdp11_state::pdp11ub2(machine_config &config)
 
 void pdp11_state::pdp11qb(machine_config &config)
 {
-	pdp11(config);
+	pdp11(config); // FIXME: MXV11-B requires a F-11 or J-11 CPU
 	MCFG_MACHINE_RESET_OVERRIDE(pdp11_state,pdp11qb)
 
 	m_maincpu->set_initial_mode(0 << 13);
@@ -509,8 +509,8 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT  CLASS        INIT        COMPANY                          FULLNAME                          FLAGS */
-COMP( ????, pdp11ub,  0,       0,      pdp11,    pdp11, pdp11_state, empty_init, "Digital Equipment Corporation", "PDP-11 [Unibus](M9301-YA)",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( ????, pdp11ub2, pdp11ub, 0,      pdp11ub2, pdp11, pdp11_state, empty_init, "Digital Equipment Corporation", "PDP-11 [Unibus](M9312)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( ????, pdp11qb,  pdp11ub, 0,      pdp11qb,  pdp11, pdp11_state, empty_init, "Digital Equipment Corporation", "PDP-11 [Q-BUS] (M7195 - MXV11)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1987, sms1000,  0,       0,      sms1000,  pdp11, pdp11_state, empty_init, "Scientific Micro Systems",      "SMS-1000",                       MACHINE_IS_SKELETON )
+/*    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT  CLASS        INIT        COMPANY                          FULLNAME                            FLAGS */
+COMP( 197?, pdp11ub,  0,       0,      pdp11,    pdp11, pdp11_state, empty_init, "Digital Equipment Corporation", "PDP-11 [Unibus](M9301-YA)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 197?, pdp11ub2, pdp11ub, 0,      pdp11ub2, pdp11, pdp11_state, empty_init, "Digital Equipment Corporation", "PDP-11 [Unibus](M9312)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 198?, pdp11qb,  pdp11ub, 0,      pdp11qb,  pdp11, pdp11_state, empty_init, "Digital Equipment Corporation", "PDP-11 [Q-BUS] (M7195 - MXV11-B)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1987, sms1000,  0,       0,      sms1000,  pdp11, pdp11_state, empty_init, "Scientific Micro Systems",      "SMS-1000",                         MACHINE_IS_SKELETON )

@@ -128,12 +128,10 @@ void gridlee_state::gridlee_palette_select_w(uint8_t data)
 
 uint32_t gridlee_state::screen_update_gridlee(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const pen_t *pens = &m_palette->pen(m_palettebank_vis * 32);
-	uint8_t *gfx;
-	int x, y, i;
+	pen_t const *const pens = &m_palette->pen(m_palettebank_vis * 32);
 
 	/* draw scanlines from the VRAM directly */
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		/* non-flipped: draw directly from the bitmap */
 		if (!m_cocktail_flip)
@@ -144,29 +142,27 @@ uint32_t gridlee_state::screen_update_gridlee(screen_device &screen, bitmap_ind1
 		{
 			int srcy = GRIDLEE_VBSTART - 1 - y;
 			uint8_t temp[256];
-			int xx;
 
-			for (xx = 0; xx < 256; xx++)
+			for (int xx = 0; xx < 256; xx++)
 				temp[xx] = m_local_videoram[srcy * 256 + 255 - xx];
 			draw_scanline8(bitmap, 0, y, 256, temp, pens + 16);
 		}
 	}
 
 	/* draw the sprite images */
-	gfx = memregion("gfx1")->base();
-	for (i = 0; i < 32; i++)
+	uint8_t const *const gfx = memregion("gfx1")->base();
+	for (int i = 0; i < 32; i++)
 	{
-		uint8_t *sprite = m_spriteram + i * 4;
-		uint8_t *src;
+		const uint8_t *sprite = m_spriteram + i * 4;
 		int image = sprite[0];
 		int ypos = sprite[2] + 17 + GRIDLEE_VBEND;
 		int xpos = sprite[3];
 
 		/* get a pointer to the source image */
-		src = &gfx[64 * image];
+		const uint8_t *src = &gfx[64 * image];
 
 		/* loop over y */
-		for (y = 0; y < 16; y++, ypos = (ypos + 1) & 255)
+		for (int y = 0; y < 16; y++, ypos = (ypos + 1) & 255)
 		{
 			int currxor = 0;
 
@@ -182,7 +178,7 @@ uint32_t gridlee_state::screen_update_gridlee(screen_device &screen, bitmap_ind1
 				int currx = xpos;
 
 				/* loop over x */
-				for (x = 0; x < 4; x++)
+				for (int x = 0; x < 4; x++)
 				{
 					int ipixel = *src++;
 					int left = ipixel >> 4;
@@ -190,12 +186,12 @@ uint32_t gridlee_state::screen_update_gridlee(screen_device &screen, bitmap_ind1
 
 					/* left pixel */
 					if (left && currx >= 0 && currx < 256)
-						bitmap.pix16(ypos, currx ^ currxor) = pens[left];
+						bitmap.pix(ypos, currx ^ currxor) = pens[left];
 					currx++;
 
 					/* right pixel */
 					if (right && currx >= 0 && currx < 256)
-						bitmap.pix16(ypos, currx ^ currxor) = pens[right];
+						bitmap.pix(ypos, currx ^ currxor) = pens[right];
 					currx++;
 				}
 			}

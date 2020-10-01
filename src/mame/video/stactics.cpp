@@ -214,17 +214,14 @@ void stactics_state::update_beam()
 
 inline int stactics_state::get_pixel_on_plane(uint8_t *videoram, uint8_t y, uint8_t x, uint8_t y_scroll)
 {
-	uint8_t code;
-	uint8_t gfx;
-
 	/* compute effective row */
 	y = y - y_scroll;
 
 	/* get the character code at the given pixel */
-	code = videoram[((y >> 3) << 5) | (x >> 3)];
+	uint8_t code = videoram[((y >> 3) << 5) | (x >> 3)];
 
 	/* get the gfx byte */
-	gfx = videoram[0x800 | (code << 3) | (y & 0x07)];
+	uint8_t gfx = videoram[0x800 | (code << 3) | (y & 0x07)];
 
 	/* return the appropriate pixel within the byte */
 	return (gfx >> (~x & 0x07)) & 0x01;
@@ -233,17 +230,13 @@ inline int stactics_state::get_pixel_on_plane(uint8_t *videoram, uint8_t y, uint
 
 void stactics_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int y;
-
 	bitmap.fill(0, cliprect);
 
 	/* for every row */
-	for (y = 0; y < 0x100; y++)
+	for (int y = 0; y < 0x100; y++)
 	{
-		int x;
-
 		/* for every pixel on the row */
-		for (x = 0; x < 0x100; x++)
+		for (int x = 0; x < 0x100; x++)
 		{
 			/* get the pixels for the four planes */
 			int pixel_b = get_pixel_on_plane(m_videoram_b, y, x, 0);
@@ -269,7 +262,7 @@ void stactics_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clip
 
 			/* plot if visible */
 			if ((sy >= 0) && (sy < 0x100) && (sx >= 0) && (sx < 0x100))
-				bitmap.pix16(sy, sx) = pen;
+				bitmap.pix(sy, sx) = pen;
 		}
 	}
 }

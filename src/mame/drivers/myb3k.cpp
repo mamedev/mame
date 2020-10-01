@@ -305,7 +305,7 @@ MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
 		{
 			for (int pxl = 0; pxl < 8; pxl++)
 			{
-				bitmap.pix32(y, ( x_pos * 8) + pxl) = rgb_t::black();
+				bitmap.pix(y, ( x_pos * 8) + pxl) = rgb_t::black();
 			}
 		}
 		else
@@ -332,7 +332,7 @@ MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
 						//pind ^= ((cursor_x != -1 && x_pos == cursor_x && ra == 7) ? 7 : 0);
 
 						/* Create the grey scale */
-						bitmap.pix32(y, ( x_pos * 8) + pxl) = (*m_pal)[pind & 0x07];
+						bitmap.pix(y, ( x_pos * 8) + pxl) = (*m_pal)[pind & 0x07];
 					}
 				}
 				break;
@@ -372,7 +372,7 @@ MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
 						pind ^= ((cursor_x != -1 && x_pos == cursor_x && ra == 7) ? 7 : 0);
 
 						/* Pick up the color */
-						bitmap.pix32(y, ( x_pos * 8) + pxl) = (*m_pal)[pind & 0x07];
+						bitmap.pix(y, ( x_pos * 8) + pxl) = (*m_pal)[pind & 0x07];
 					}
 				}
 				break;
@@ -394,11 +394,11 @@ MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
 					{
 						if ((pdat & (0x80 >> pxl)) != 0)
 						{
-							bitmap.pix32(y, ( x_pos * 8) + pxl) = (*m_pal)[0x07];
+							bitmap.pix(y, ( x_pos * 8) + pxl) = (*m_pal)[0x07];
 						}
 						else
 						{
-							bitmap.pix32(y, ( x_pos * 8) + pxl) = rgb_t::black();
+							bitmap.pix(y, ( x_pos * 8) + pxl) = rgb_t::black();
 						}
 					}
 				}

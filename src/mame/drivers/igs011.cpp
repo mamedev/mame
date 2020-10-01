@@ -394,10 +394,10 @@ u32 igs011_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 
 #ifdef MAME_DEBUG
 			if ((layer_enable != -1) && (pri_addr == 0xff))
-				bitmap.pix16(y, x) = m_palette->black_pen();
+				bitmap.pix(y, x) = m_palette->black_pen();
 			else
 #endif
-				bitmap.pix16(y, x) = m_layer[l][scr_addr] | (l << 8);
+				bitmap.pix(y, x) = m_layer[l][scr_addr] | (l << 8);
 		}
 	}
 	return 0;

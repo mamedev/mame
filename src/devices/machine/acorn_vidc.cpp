@@ -492,9 +492,9 @@ void acorn_vidc10_device::draw(bitmap_rgb32 &bitmap, const rectangle &cliprect, 
 				if (is_cursor == true && dot == 0)
 					continue;
 				dot += pen_base;
-				bitmap.pix32(dsty, dstx+xi) = this->pen(dot);
+				bitmap.pix(dsty, dstx+xi) = this->pen(dot);
 				if (m_crtc_interlace)
-					bitmap.pix32(dsty+1, dstx+xi) = this->pen(dot);
+					bitmap.pix(dsty+1, dstx+xi) = this->pen(dot);
 			}
 		}
 	}

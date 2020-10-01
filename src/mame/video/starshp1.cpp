@@ -146,16 +146,13 @@ void starshp1_state::draw_starfield(bitmap_ind16 &bitmap)
 	 * really needed by the game. Not emulated.
 	 */
 
-	int x;
-	int y;
-
-	for (y = 0; y < bitmap.height(); y++)
+	for (int y = 0; y < bitmap.height(); y++)
 	{
-		const uint16_t* p = m_LSFR.get() + (uint16_t) (512 * y);
+		uint16_t const *const p = m_LSFR.get() + (uint16_t) (512 * y);
 
-		uint16_t* pLine = &bitmap.pix16(y);
+		uint16_t *const pLine = &bitmap.pix(y);
 
-		for (x = 0; x < bitmap.width(); x++)
+		for (int x = 0; x < bitmap.width(); x++)
 			if ((p[x] & 0x5b56) == 0x5b44)
 				pLine[x] = (p[x] & 0x0400) ? 0x0e : 0x0f;
 	}
@@ -217,15 +214,13 @@ void starshp1_state::draw_spaceship(bitmap_ind16 &bitmap, const rectangle &clipr
 
 void starshp1_state::draw_phasor(bitmap_ind16 &bitmap)
 {
-	int i;
-
-	for (i = 128; i < 240; i++)
+	for (int i = 128; i < 240; i++)
 		if (i >= get_sprite_vpos(13))
 		{
-			bitmap.pix16(i, 2 * i + 0) = 0x10;
-			bitmap.pix16(i, 2 * i + 1) = 0x10;
-			bitmap.pix16(i, 2 * (255 - i) + 0) = 0x10;
-			bitmap.pix16(i, 2 * (255 - i) + 1) = 0x10;
+			bitmap.pix(i, 2 * i + 0) = 0x10;
+			bitmap.pix(i, 2 * i + 1) = 0x10;
+			bitmap.pix(i, 2 * (255 - i) + 0) = 0x10;
+			bitmap.pix(i, 2 * (255 - i) + 1) = 0x10;
 		}
 }
 
@@ -248,9 +243,9 @@ void starshp1_state::draw_circle_line(bitmap_ind16 &bitmap, int x, int y, int l)
 {
 	if (y >= 0 && y <= bitmap.height() - 1)
 	{
-		const uint16_t* p = m_LSFR.get() + (uint16_t) (512 * y);
+		uint16_t const *const p = m_LSFR.get() + uint16_t(512 * y);
 
-		uint16_t* pLine = &bitmap.pix16(y);
+		uint16_t *const pLine = &bitmap.pix(y);
 
 		int h1 = x - 2 * l;
 		int h2 = x + 2 * l;
@@ -305,7 +300,7 @@ int starshp1_state::spaceship_collision(bitmap_ind16 &bitmap, const rectangle &r
 {
 	for (int y = rect.top(); y <= rect.bottom(); y++)
 	{
-		const uint16_t* pLine = &m_helper.pix16(y);
+		uint16_t const *const pLine = &m_helper.pix(y);
 
 		for (int x = rect.left(); x <= rect.right(); x++)
 			if (pLine[x] != 0)

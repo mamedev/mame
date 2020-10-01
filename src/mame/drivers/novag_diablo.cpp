@@ -142,7 +142,7 @@ HD44780_PIXEL_UPDATE(diablo_state::lcd_pixel_update)
 	if (line < 2 && pos < 8)
 	{
 		// internal: (8+8)*1, external: 1*16
-		bitmap.pix16(1 + y, 1 + line*8*6 + pos*6 + x) = state ? 1 : 2;
+		bitmap.pix(1 + y, 1 + line*8*6 + pos*6 + x) = state ? 1 : 2;
 	}
 }
 

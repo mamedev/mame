@@ -100,29 +100,28 @@ void vta2000_state::machine_reset()
 uint32_t vta2000_state::screen_update_vta2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 /* Cursor is missing. */
 {
-	static uint8_t framecnt=0;
-	uint8_t y,ra,gfx,attr,fg,bg;
-	uint16_t sy=0,ma=0,x,xx=0,chr;
+	static uint8_t framecnt=0; // FIXME: static variable
+	uint16_t sy=0,ma=0;
 
 	framecnt++;
 
-	for (y = 0; y < 25; y++)
+	for (uint8_t y = 0; y < 25; y++)
 	{
-		for (ra = 0; ra < 12; ra++)
+		for (uint8_t ra = 0; ra < 12; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix(sy++);
 
-			xx = ma << 1;
-			for (x = ma; x < ma + 80; x++)
+			uint16_t xx = ma << 1;
+			for (uint16_t x = ma; x < ma + 80; x++)
 			{
-				chr = m_p_videoram[xx++];
-				attr = m_p_videoram[xx++];
+				uint16_t chr = m_p_videoram[xx++];
+				uint8_t const attr = m_p_videoram[xx++];
 
 				if ((chr & 0x60)==0x60)
 					chr+=256;
 
-				gfx = m_p_chargen[(chr<<4) | ra ];
-				bg = 0;
+				uint8_t gfx = m_p_chargen[(chr<<4) | ra ];
+				uint8_t fg, bg = 0;
 
 				/* Process attributes */
 				if (BIT(attr, 4))

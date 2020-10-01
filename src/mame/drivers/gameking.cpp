@@ -153,10 +153,10 @@ uint32_t gameking_state::screen_update_gameking(screen_device &screen, bitmap_in
 		for (int x=0, j=0;j<48/4;x+=4, j++)
 		{
 			uint8_t data=maincpu_ram->read_byte(lssa+j+i*12);
-			bitmap.pix16(y, x+3)=data&3;
-			bitmap.pix16(y, x+2)=(data>>2)&3;
-			bitmap.pix16(y, x+1)=(data>>4)&3;
-			bitmap.pix16(y, x)=(data>>6)&3;
+			bitmap.pix(y, x+3)=data&3;
+			bitmap.pix(y, x+2)=(data>>2)&3;
+			bitmap.pix(y, x+1)=(data>>4)&3;
+			bitmap.pix(y, x)=(data>>6)&3;
 		}
 	}
 	return 0;
@@ -188,24 +188,24 @@ uint32_t gameking_state::screen_update_gameking3(screen_device& screen, bitmap_r
 			switch (i % 3)
 			{
 			case 0:
-				bitmap.pix32(y, x + 3) = rgb_t(0, gameking3_intensities[data&3], 0);
-				bitmap.pix32(y + 1, x + 2) = rgb_t(gameking3_intensities[(data>>2)&3], 0, 0);
-				bitmap.pix32(y, x + 1) = rgb_t(0, gameking3_intensities[(data>>4)&3], 0);
-				bitmap.pix32(y + 1, x) = rgb_t(gameking3_intensities[(data>>6)&3], 0, 0);
+				bitmap.pix(y, x + 3) = rgb_t(0, gameking3_intensities[data&3], 0);
+				bitmap.pix(y + 1, x + 2) = rgb_t(gameking3_intensities[(data>>2)&3], 0, 0);
+				bitmap.pix(y, x + 1) = rgb_t(0, gameking3_intensities[(data>>4)&3], 0);
+				bitmap.pix(y + 1, x) = rgb_t(gameking3_intensities[(data>>6)&3], 0, 0);
 				break;
 
 			case 1:
-				bitmap.pix32(y, x + 3) = rgb_t(0, 0, gameking3_intensities[data&3]);
-				bitmap.pix32(y + 1, x+2) = rgb_t(0, gameking3_intensities[(data>>2)&3], 0);
-				bitmap.pix32(y, x + 1) = rgb_t(0, 0, gameking3_intensities[(data>>4)&3]);
-				bitmap.pix32(y + 1, x) = rgb_t(0, gameking3_intensities[(data>>6)&3], 0);
+				bitmap.pix(y, x + 3) = rgb_t(0, 0, gameking3_intensities[data&3]);
+				bitmap.pix(y + 1, x+2) = rgb_t(0, gameking3_intensities[(data>>2)&3], 0);
+				bitmap.pix(y, x + 1) = rgb_t(0, 0, gameking3_intensities[(data>>4)&3]);
+				bitmap.pix(y + 1, x) = rgb_t(0, gameking3_intensities[(data>>6)&3], 0);
 				break;
 
 			case 2:
-				bitmap.pix32(y, x + 3) = rgb_t(gameking3_intensities[data&3], 0, 0);
-				bitmap.pix32(y + 1, x+2) = rgb_t(0, 0, gameking3_intensities[(data>>2)&3]);
-				bitmap.pix32(y, x + 1) = rgb_t(gameking3_intensities[(data>>4)&3], 0, 0);
-				bitmap.pix32(y + 1, x) = rgb_t(0, 0, gameking3_intensities[(data>>6)&3]);
+				bitmap.pix(y, x + 3) = rgb_t(gameking3_intensities[data&3], 0, 0);
+				bitmap.pix(y + 1, x+2) = rgb_t(0, 0, gameking3_intensities[(data>>2)&3]);
+				bitmap.pix(y, x + 1) = rgb_t(gameking3_intensities[(data>>4)&3], 0, 0);
+				bitmap.pix(y + 1, x) = rgb_t(0, 0, gameking3_intensities[(data>>6)&3]);
 				break;
 			}
 		}
@@ -216,12 +216,12 @@ uint32_t gameking_state::screen_update_gameking3(screen_device& screen, bitmap_r
 	{
 		for (int x = y & 1; x < 160; x += 2)
 		{
-			rgb_t l = rgb_t(x == 0 ? 0 : bitmap.pix32(y, x - 1));
-			rgb_t r = rgb_t(x == 159 ? 0 : bitmap.pix32(y, x + 1));
-			rgb_t u = rgb_t(y == 0 ? 0 : bitmap.pix32(y - 1, x));
-			rgb_t d = rgb_t(y == 159 ? 0 : bitmap.pix32(y + 1, x));
+			rgb_t l = rgb_t(x == 0 ? 0 : bitmap.pix(y, x - 1));
+			rgb_t r = rgb_t(x == 159 ? 0 : bitmap.pix(y, x + 1));
+			rgb_t u = rgb_t(y == 0 ? 0 : bitmap.pix(y - 1, x));
+			rgb_t d = rgb_t(y == 159 ? 0 : bitmap.pix(y + 1, x));
 
-			bitmap.pix32(y, x) = rgb_t(
+			bitmap.pix(y, x) = rgb_t(
 				((u.r() + d.r()) * 2 + l.r() + r.r()) / 3,
 				((u.g() + d.g()) * 2 + l.g() + r.g()) / 3,
 				((u.b() + d.b()) * 2 + l.b() + r.b()) / 3

@@ -317,18 +317,18 @@ void kinst_state::machine_reset()
 
 uint32_t kinst_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const pen_t *pen = m_palette->pens();
+	pen_t const *const pen = m_palette->pens();
 
 	/* loop over rows and copy to the destination */
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint32_t *src = &m_video_base[640/4 * y];
-		uint32_t *dest = &bitmap.pix32(y, cliprect.min_x);
+		uint32_t const *src = &m_video_base[640/4 * y];
+		uint32_t *dest = &bitmap.pix(y, cliprect.min_x);
 
 		/* loop over columns */
 		for (int x = cliprect.min_x; x < cliprect.max_x; x += 2)
 		{
-			uint32_t data = *src++;
+			uint32_t const data = *src++;
 
 			/* store two pixels */
 			*dest++ = pen[(data >>  0) & 0x7fff];

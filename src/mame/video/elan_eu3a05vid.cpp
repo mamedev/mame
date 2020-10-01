@@ -245,11 +245,11 @@ void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 
 			if (flags & 0x08) // guess flipy
 			{
-				row = &bitmap.pix16((y + (sizey - 1 - yy)) & 0xff);
+				row = &bitmap.pix((y + (sizey - 1 - yy)) & 0xff);
 			}
 			else
 			{
-				row = &bitmap.pix16((y + yy) & 0xff);
+				row = &bitmap.pix((y + yy) & 0xff);
 			}
 
 			for (int xx = 0; xx < sizex; xx++)
@@ -457,7 +457,7 @@ void elan_eu3a05vid_device::draw_tilemaps(screen_device& screen, bitmap_ind16& b
 
 					tile += ((m_tile_gfxbase_lo_data | m_tile_gfxbase_hi_data << 8) << 5);
 
-					uint16_t* row = &bitmap.pix16(drawline);
+					uint16_t *const row = &bitmap.pix(drawline);
 
 					if (m_vidctrl & 0x20) // 4bpp
 					{

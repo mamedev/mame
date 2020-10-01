@@ -1215,15 +1215,14 @@ void mcd212_device::draw_scanline(int y)
 	uint8_t plane_a_r[768], plane_a_g[768], plane_a_b[768];
 	uint8_t plane_b_r[768], plane_b_g[768], plane_b_b[768];
 	uint32_t out[768];
-	uint32_t *scanline = &m_bitmap.pix32(y);
-	int x;
 
 	process_vsr(0, plane_a_r, plane_a_g, plane_a_b);
 	process_vsr(1, plane_b_r, plane_b_g, plane_b_b);
 
 	mix_lines(plane_a_r, plane_a_g, plane_a_b, plane_b_r, plane_b_g, plane_b_b, out);
 
-	for(x = 0; x < 384; x++)
+	uint32_t *const scanline = &m_bitmap.pix(y);
+	for(int x = 0; x < 384; x++)
 	{
 		scanline[x] = out[x*2];
 	}

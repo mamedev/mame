@@ -114,7 +114,7 @@ void okim6258_device::device_start()
 
 	m_divider = dividers[m_start_divider];
 
-	m_stream = stream_alloc_legacy(0, 1, clock()/m_divider);
+	m_stream = stream_alloc(0, 1, clock()/m_divider);
 
 	m_signal = -2;
 	m_step = 0;
@@ -138,20 +138,18 @@ void okim6258_device::device_reset()
 
 
 //-------------------------------------------------
-//  sound_stream_update_legacy - handle a stream update
+//  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void okim6258_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void okim6258_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *buffer = outputs[0];
-
-	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
+	auto &buffer = outputs[0];
 
 	if (m_status & STATUS_PLAYING)
 	{
 		int nibble_shift = m_nibble_shift;
 
-		while (samples)
+		for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
 		{
 			/* Compute the new amplitude and update the current step */
 			int nibble = (m_data_in >> nibble_shift) & 0xf;
@@ -161,8 +159,7 @@ void okim6258_device::sound_stream_update_legacy(sound_stream &stream, stream_sa
 
 			nibble_shift ^= 4;
 
-			*buffer++ = sample;
-			samples--;
+			buffer.put_int(sampindex, sample, 32768);
 		}
 
 		/* Update the parameters */
@@ -170,9 +167,7 @@ void okim6258_device::sound_stream_update_legacy(sound_stream &stream, stream_sa
 	}
 	else
 	{
-		/* Fill with 0 */
-		while (samples--)
-			*buffer++ = 0;
+		buffer.fill(0);
 	}
 }
 

@@ -1046,8 +1046,8 @@ uint32_t _3do_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 	for ( int y = 0; y < 120; y++ )
 	{
-		uint32_t  *dest_p0 = &bitmap.pix32(22 + y * 2, 254 );
-		uint32_t  *dest_p1 = &bitmap.pix32(22 + y * 2 + 1, 254 );
+		uint32_t  *dest_p0 = &bitmap.pix(22 + y * 2, 254 );
+		uint32_t  *dest_p1 = &bitmap.pix(22 + y * 2 + 1, 254 );
 
 		for ( int x = 0; x < 320; x++ )
 		{

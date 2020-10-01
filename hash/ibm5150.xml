@@ -97,7 +97,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<description>Adventure in Serenia</description>
 		<year>1982</year>
 		<publisher>IBM</publisher>
-		<info name="developer" value="Sierra" />
+		<info name="developer" value="Sierra On-Line" />
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
@@ -1251,7 +1251,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<description>King's Quest</description>
 		<year>1984</year>
 		<publisher>IBM</publisher>
-		<info name="developer" value="Sierra" />
+		<info name="developer" value="Sierra On-Line" />
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
@@ -1546,7 +1546,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<!-- This is not an original and has been converted from a PCjr cartridge. -->
 		<year>1983</year>
 		<publisher>IBM</publisher>
-		<info name="developer" value="Sierra" />
+		<info name="developer" value="Sierra On-Line" />
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
@@ -8172,7 +8172,7 @@ has been replaced with an all-zero block. -->
 		<description>Cadaver (5.25")</description>
 		<year>1991</year>
 		<publisher>Image Works</publisher>
-		<info name="developer" value="Bitmap Brothers" />
+		<info name="developer" value="The Bitmap Brothers" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="cad1-4.img" size="368640" crc="a6e04e3d" sha1="0b381a62151674d75485ed67e1766b4799d65b36"/>
@@ -8199,7 +8199,7 @@ has been replaced with an all-zero block. -->
 		<description>Cadaver (3.5", Quest &amp; Glory Compilation)</description>
 		<year>1991</year>
 		<publisher>Image Works</publisher>
-		<info name="developer" value="Bitmap Brothers" />
+		<info name="developer" value="The Bitmap Brothers" />
 		<part name="flop1" interface="floppy_3_5">
 			<!-- modified .ini file -->
 			<dataarea name="flop" size = "737280">
@@ -8217,7 +8217,7 @@ has been replaced with an all-zero block. -->
 		<description>Cadaver (3.5")</description>
 		<year>1991</year>
 		<publisher>Image Works</publisher>
-		<info name="developer" value="Bitmap Brothers" />
+		<info name="developer" value="The Bitmap Brothers" />
 		<part name="flop1" interface="floppy_3_5">
 			<!-- disk has gone bad -->
 			<dataarea name="flop" size = "737280">
@@ -8288,7 +8288,7 @@ has been replaced with an all-zero block. -->
 		<description>Caveman Ugh-Lympics</description>
 		<year>1988</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="developer" value="Dynamix, Inc." />
+		<info name="developer" value="Dynamix" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Caveman Ugh-Lympics [1988] [5.25] [1 of 4].img" size="368640" crc="e2b6a566" sha1="92be8b5883718a2df46eee48f30b8db1088ab39c"/>
@@ -9338,6 +9338,19 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="fireforget2">
+		<!-- dumped via KryoFlux, some tracks show up as modified -->
+		<description>Fire &amp; Forget 2</description>
+		<year>1990</year>
+		<publisher>Titus</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="fireforget2.img" size="737280" crc="24ac2704" sha1="737ca587fa78d5f1160557c99a68b0022f1f216c" />
+			</dataarea>
+		</part>
+	</software>
+
+
 	<software name="futurwar">
 		<description>Future Wars - Adventures in Time</description>
 		<year>1990</year>
@@ -9693,7 +9706,7 @@ has been replaced with an all-zero block. -->
 		<description>Indiana Jones and the Last Crusade - The Action Game (Kixx release)</description>
 		<year>1989</year>
 		<publisher>Lucasfilm - U.S. Gold</publisher>
-		<info name="developer" value="LucasFilm Games" />
+		<info name="developer" value="Lucasfilm Games" />
 		<part name="flop1" interface="floppy_3_5">
 			<!-- Copy-protected key disk -->
 			<dataarea name="flop" size = "2157701">
@@ -11058,7 +11071,7 @@ has been replaced with an all-zero block. -->
 		<description>Menace (5.25")</description>
 		<year>1989</year>
 		<publisher>Psygnosis</publisher>
-		<info name="developer" value="DMA Design Limited" />
+		<info name="developer" value="DMA Design" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Menace [Psygnosis] [1989] [5.25DD] [Disk 1 of 2].img" size="368640" crc="7746a156" sha1="cd0d944da7486d141922357b09cc22a2809cfd64"/>
@@ -11075,7 +11088,7 @@ has been replaced with an all-zero block. -->
 		<description>Menace (3.5")</description>
 		<year>1989</year>
 		<publisher>Psygnosis</publisher>
-		<info name="developer" value="DMA Design Limited" />
+		<info name="developer" value="DMA Design" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Menace.img" size="737280" crc="94e7307c" sha1="430573d0d4867a724e6241dbfb0120439aa1d5cc"/>
@@ -12847,48 +12860,94 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
-	<software name="stunts">
-		<description>Stunts (5.25") (USA)</description>
-		<year>1990</year>
+	<software name="4dsdrv">
+		<description>4D Sports Driving (5.25", Euro)</description>
+		<year>1991</year>
+		<publisher>Mindscape</publisher>
+		<info name="developer" value="Distinctive Software" />
+		<info name="version" value="1.1 (Feb 25 1991)" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="4D Sports Driving [Mindscape] [1991] [5.25DD] [Disk A].img" size="368640" crc="eb9b5986" sha1="d7b5f9a82344df5d176566cbfbb52d2181a7ea61"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="4D Sports Driving [Mindscape] [1991] [5.25DD] [Disk B].img" size="368640" crc="bdafb9d5" sha1="06e94ed5e9e8aac425e0e9e3e02cc4e009a8a688"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="4D Sports Driving [Mindscape] [1991] [5.25DD] [Disk C].img" size="368640" crc="69a9849f" sha1="5a7517ce2d16c6106606fb25b0ab2587244b5f34"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="4D Sports Driving [Mindscape] [1991] [5.25DD] [Disk D].img" size="368640" crc="77f15cca" sha1="142a99848dca1c8b41c2a5d5f78362effa8263e0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="4dsdrv35" cloneof="4dsdrv">
+		<description>4D Sports Driving (3.5", Euro)</description>
+		<year>1991</year>
+		<publisher>Mindscape</publisher>
+		<info name="developer" value="Distinctive Software" />
+		<info name="version" value="1.1 (Feb 25 1991)" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="4D Sports Driving [Mindscape] [1991] [3.5DD] [Disk A].img" size="737280" crc="cde096c0" sha1="9e1cf5c5615136023d6eb3503049b638a879accc"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="4D Sports Driving [Mindscape] [1991] [3.5DD] [Disk B].img" size="737280" crc="c87c7d0d" sha1="a7dfed99afa3bfd195b06aadb24d2572d2581c60"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stunts" cloneof="4dsdrv">
+		<description>Stunts (5.25", USA)</description>
+		<year>1991</year>
 		<publisher>Brøderbund Software</publisher>
 		<info name="developer" value="Distinctive Software" />
 		<info name="version" value="1.1 (Feb 12 1991)" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Stunts [Broderbund Software] [1990] [5.25] [Disk A].img" size="368640" crc="ba32d817" sha1="206aec96920e6603c762eda9acb01e24c4c849a0"/>
+				<rom name="Stunts [Broderbund Software] [1991] [5.25DD] [Disk A].img" size="368640" crc="1d308255" sha1="35d5563ac4e15813aef2ad0f0b0dbde3e86d8221"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Stunts [Broderbund Software] [1990] [5.25] [Disk B].img" size="368640" crc="adeb46a6" sha1="996808c253cd2ec413db8e6a5eda22ddf28bd49b"/>
+				<rom name="Stunts [Broderbund Software] [1991] [5.25DD] [Disk B].img" size="368640" crc="a4a37649" sha1="b8f69ed16613fd8672622e9ceffe7624e3efe396"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Stunts [Broderbund Software] [1990] [5.25] [Disk C].img" size="368640" crc="ad24245e" sha1="f8feb9c99b997a06b9dd822febd77706088f4371"/>
+				<rom name="Stunts [Broderbund Software] [1991] [5.25DD] [Disk C].img" size="368640" crc="4ab40d3d" sha1="196092f386c5975a3d6f0b62aaedbc083f142ee9"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Stunts [Broderbund Software] [1990] [5.25] [Disk D].img" size="368640" crc="6fa65143" sha1="24cd4dec00ba7c4e447ffc255df795af5580cd79"/>
+				<rom name="Stunts [Broderbund Software] [1991] [5.25DD] [Disk D].img" size="368640" crc="bc161bcb" sha1="d5dd3ebaa93eb8493afb07ab1039b49d0d3af895"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="stunts35" cloneof="stunts">
-		<description>Stunts (3.5") (USA)</description>
-		<year>1990</year>
+	<software name="stunts35" cloneof="4dsdrv">
+		<description>Stunts (3.5", USA)</description>
+		<year>1991</year>
 		<publisher>Brøderbund Software</publisher>
 		<info name="developer" value="Distinctive Software" />
 		<info name="version" value="1.1 (Feb 12 1991)" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Stunts [Broderbund Software] [1990] [3.5DD] [Disk A].img" size="737280" crc="364a0069" sha1="fe3b35fa91619815e1565066c9404d02812dd17a"/>
+				<rom name="Stunts [Broderbund Software] [1991] [3.5DD] [Disk A].img" size="737280" crc="364a0069" sha1="fe3b35fa91619815e1565066c9404d02812dd17a"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Stunts [Broderbund Software] [1990] [3.5DD] [Disk B].img" size="737280" crc="273c9396" sha1="57f637e6cbfd6f2ae8efd54857d9ee0b4528d182"/>
+				<rom name="Stunts [Broderbund Software] [1991] [3.5DD] [Disk B].img" size="737280" crc="273c9396" sha1="57f637e6cbfd6f2ae8efd54857d9ee0b4528d182"/>
 			</dataarea>
 		</part>
 	</software>

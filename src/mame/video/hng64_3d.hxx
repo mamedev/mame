@@ -1206,7 +1206,7 @@ void hng64_poly_renderer::render_scanline(int32_t scanline, const extent_t& exte
 	const float dt = extent.param[6].dpdx;
 
 	// Pointers to the pixel buffers
-	uint32_t* colorBuffer = &m_colorBuffer3d.pix32(scanline, extent.startx);
+	uint32_t* colorBuffer = &m_colorBuffer3d.pix(scanline, extent.startx);
 	float*  depthBuffer = &m_depthBuffer3d[(scanline * m_state.m_screen->visible_area().width()) + extent.startx];
 
 	const uint8_t *textureOffset = &m_state.m_texturerom[renderData.texIndex * 1024 * 1024];
@@ -1226,7 +1226,7 @@ void hng64_poly_renderer::render_scanline(int32_t scanline, const extent_t& exte
 			if ((renderData.debugColor & 0xff000000) == 0x01000000)
 			{
 				// ST color mode
-				*colorBuffer = rgb_t(255, (uint8_t)(sCorrect*255.0f), (uint8_t)(tCorrect*255.0f), (uint8_t)(0));
+				*colorBuffer = rgb_t(255, uint8_t(sCorrect*255.0f), uint8_t(tCorrect*255.0f), uint8_t(0));
 			}
 			else if ((renderData.debugColor & 0xff000000) == 0x02000000)
 			{

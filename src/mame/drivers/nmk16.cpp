@@ -1291,6 +1291,15 @@ void nmk16_state::macross2_sound_io_map(address_map &map)
 	map(0x90, 0x97).w("nmk112", FUNC(nmk112_device::okibank_w));
 }
 
+void nmk16_state::tdragon3h_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	//map(0x00, 0x01).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write)); // writes here since ROM is the same as the original, but no chip on PCB
+	//map(0x80, 0x80).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // same as above
+	map(0x88, 0x88).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x90, 0x97).w("nmk112", FUNC(nmk112_device::okibank_w));
+}
+
 void nmk16_state::bjtwin_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
@@ -4891,11 +4900,18 @@ void nmk16_state::tdragon2(machine_config &config)
 	nmk112.set_rom1_tag("oki2");
 }
 
-// TODO : Sound system is different
 void nmk16_state::tdragon3h(machine_config &config)
 {
 	tdragon2(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::tdragon3h_map);
+
+	// No YM2203 and only one OKI, the PCB has a space for the YM2203, populated by a 7474 and a 74367.
+	// It's been verified that by removing them and putting the YM2203 in its place, the game can make use of it.
+
+	m_audiocpu->set_addrmap(AS_IO, &nmk16_state::tdragon3h_sound_io_map);
+
+	config.device_remove("ymsnd");
+	config.device_remove("oki1");
 }
 
 
@@ -6918,36 +6934,34 @@ ROM_START( tdragon2 )
 ROM_END
 
 ROM_START( tdragon3h )
-	ROM_REGION( 0x80000, "maincpu", 0 )     /* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "h.27c2001",      0x00000, 0x40000, CRC(0091f4a3) SHA1(025e5f7ff12eaa90c5cfe757c71d58ba7040cba7) )
 	ROM_LOAD16_BYTE( "l.27c020",       0x00001, 0x40000, CRC(4699c313) SHA1(1851a4b5ad9c2bac230126d195e239a5ebe827f9) )
 
-	// Not from this PCB
-	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Z80 code */
-	ROM_LOAD( "1.27c1000",    0x00000, 0x20000, BAD_DUMP CRC(b870be61) SHA1(ea5d45c3a3ab805e55806967f00167cf6366212e) ) /* banked */
+	ROM_REGION( 0x20000, "audiocpu", 0 )     // Z80 code
+	ROM_LOAD( "1.27c1000",    0x00000, 0x20000, CRC(b870be61) SHA1(ea5d45c3a3ab805e55806967f00167cf6366212e) ) // banked
 
 	ROM_REGION( 0x020000, "fgtile", 0 )
-	ROM_LOAD( "12.27c1000",    0x000000, 0x020000, CRC(f809d616) SHA1(c6a4d776fee770ec197204b855b85bcc719469a5) )    /* 8x8 tiles */
+	ROM_LOAD( "12.27c1000",    0x000000, 0x020000, CRC(f809d616) SHA1(c6a4d776fee770ec197204b855b85bcc719469a5) )    // 8x8 tiles
 
-	// all other ROMs are mask parts marked 'CONNY' but weren't dumped from this PCB so content is only assumed to be the same
+	ROM_REGION( 0x200000, "bgtile", 0 ) // identical to tdragon2, only split
+	ROM_LOAD( "conny.3", 0x000000, 0x100000, CRC(5951c031) SHA1(c262aeda0befcf4ac30638d42f2d40ba54c66ea7) )  // 16x16 tiles
+	ROM_LOAD( "conny.4", 0x100000, 0x100000, CRC(a7772524) SHA1(fcf980272c5e4088f492b429cb288bc0c46cf5a2) )
 
-	ROM_REGION( 0x200000, "bgtile", 0 )
-	ROM_LOAD( "ww930914.2", 0x000000, 0x200000, CRC(f968c65d) SHA1(fd6d21bba53f945b1597d7d0735bc62dd44d5498) )  /* 16x16 tiles */
+	ROM_REGION( 0x400000, "sprites", 0 ) // identical to tdragon2, only split
+	ROM_LOAD16_BYTE( "conny.2", 0x000000, 0x100000, CRC(fefe8384) SHA1(a68069691cef0454059bd383f6c85ce19af2c0e7) )  // Sprites
+	ROM_LOAD16_BYTE( "conny.1", 0x000001, 0x100000, CRC(37b32460) SHA1(7b689a7e23a9428c6d36f0791a64e7a9a41e7cfa) )
+	ROM_LOAD16_WORD_SWAP( "conny.5", 0x200000, 0x200000, CRC(baee84b2) SHA1(b325b00e6147266dbdc840e03556004531dc2038) )
 
-	ROM_REGION( 0x400000, "sprites", 0 )
-	ROM_LOAD16_WORD_SWAP( "ww930917.7", 0x000000, 0x200000, CRC(b98873cb) SHA1(cc19200865176e940ff68e12de81f029b51c2084) )  /* Sprites */
-	ROM_LOAD16_WORD_SWAP( "ww930918.8", 0x200000, 0x200000, CRC(baee84b2) SHA1(b325b00e6147266dbdc840e03556004531dc2038) )
+	ROM_REGION( 0x240000, "oki1", ROMREGION_ERASEFF )   // only 1 oki on this PCB
 
-	// Not from this PCB
-	ROM_REGION( 0x240000, "oki1", 0 )   /* OKIM6295 samples */
-	ROM_LOAD( "ww930916.4", 0x040000, 0x200000, BAD_DUMP CRC(07c35fe6) SHA1(33547bd88764704310f2ef8cf3bfe21ceb56d5b7) )  /* all banked */
+	ROM_REGION( 0x240000, "oki2", 0 )   // OKIM6295 samples
+	ROM_LOAD( "conny.6", 0x040000, 0x100000, CRC(564f87ed) SHA1(010dd001fda28d9c15ca09a0d12cac438a46cd54) )  // all banked
+	ROM_LOAD( "conny.7", 0x140000, 0x100000, CRC(2e767f6f) SHA1(34e3f747716eb7a585340791c2cfbfde57681d69) )
 
-	ROM_REGION( 0x240000, "oki2", 0 )   /* OKIM6295 samples */
-	ROM_LOAD( "ww930915.3", 0x040000, 0x200000, BAD_DUMP CRC(82025bab) SHA1(ac6053700326ea730d00ec08193e2c8a2a019f0b) )  /* all banked */
-
-	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "9.bpr",  0x0000, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) )  /* unknown */
-	ROM_LOAD( "10.bpr", 0x0100, 0x0100, CRC(e6ead349) SHA1(6d81b1c0233580aa48f9718bade42d640e5ef3dd) )  /* unknown */
+	ROM_REGION( 0x0200, "proms", 0 ) // not dumped for this set
+	ROM_LOAD( "9.bpr",  0x0000, 0x0100, BAD_DUMP CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) )  // unknown
+	ROM_LOAD( "10.bpr", 0x0100, 0x0100, BAD_DUMP CRC(e6ead349) SHA1(6d81b1c0233580aa48f9718bade42d640e5ef3dd) )  // unknown
 ROM_END
 
 ROM_START( tdragon2a )
@@ -8574,7 +8588,7 @@ GAME( 1993, macross2k,  macross2, macross2,     macross2,     nmk16_state, init_
 GAME( 1993, tdragon2,   0,        tdragon2,     tdragon2,     nmk16_state, init_banked_audiocpu, ROT270, "NMK",                          "Thunder Dragon 2 (9th Nov. 1993)", MACHINE_NO_COCKTAIL )
 GAME( 1993, tdragon2a,  tdragon2, tdragon2,     tdragon2,     nmk16_state, init_banked_audiocpu, ROT270, "NMK",                          "Thunder Dragon 2 (1st Oct. 1993)", MACHINE_NO_COCKTAIL )
 GAME( 1993, bigbang,    tdragon2, tdragon2,     tdragon2,     nmk16_state, init_banked_audiocpu, ROT270, "NMK",                          "Big Bang (9th Nov. 1993)", MACHINE_NO_COCKTAIL )
-GAME( 1996, tdragon3h,  tdragon2, tdragon3h,    tdragon2,     nmk16_state, init_banked_audiocpu, ROT270, "bootleg (Conny Co Ltd.)",      "Thunder Dragon 3 (bootleg of Thunder Dragon 2)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL ) // based on 1st Oct. 1993 set, Sound system isn't hooked up correctly for this set
+GAME( 1996, tdragon3h,  tdragon2, tdragon3h,    tdragon2,     nmk16_state, init_banked_audiocpu, ROT270, "bootleg (Conny Co Ltd.)",      "Thunder Dragon 3 (bootleg of Thunder Dragon 2)", MACHINE_NO_SOUND | MACHINE_NO_COCKTAIL ) // based on 1st Oct. 1993 set, needs emulation of the mechanism used to simulate the missing YM2203' IRQs
 
 GAME( 1994, arcadian,   0,        raphero,      raphero,      nmk16_state, init_banked_audiocpu, ROT270, "NMK",                          "Arcadia (NMK)", 0 ) // 23rd July 1993 in test mode, (c)1994 on title screen
 GAME( 1994, raphero,    arcadian, raphero,      raphero,      nmk16_state, init_banked_audiocpu, ROT270, "NMK",                          "Rapid Hero (NMK)", 0 )           // ^^

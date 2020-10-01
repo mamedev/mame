@@ -265,24 +265,24 @@ INPUT_PORTS_END
 // Official version
 u32 bcs3_state::screen_update_bcs3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	u8 y,ra,chr,gfx,rat;
-	u16 sy=0,ma=0x50,x;
+	u16 sy=0,ma=0x50;
 
-	for (y = 0; y < 12; y++)
+	for (u8 y = 0; y < 12; y++)
 	{
-		for (ra = 0; ra < 10; ra++)
+		for (u8 ra = 0; ra < 10; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
-			rat = (ra + 1) & 7;
+			uint16_t *p = &bitmap.pix(sy++);
+			u8 const rat = (ra + 1) & 7;
 
-			for (x = ma; x < ma + 28; x++)
+			for (u16 x = ma; x < ma + 28; x++)
 			{
+				u8 gfx;
 				if (ra < 8)
 				{
-					chr = m_p_videoram[x] & 0x7f;
+					u8 const chr = m_p_videoram[x] & 0x7f;
 
 					/* get pattern of pixels for that character scanline */
-					gfx = m_p_chargen[(chr<<3) | rat ] ^ 0xff;
+					gfx = m_p_chargen[(chr<<3) | rat] ^ 0xff;
 				}
 				else
 					gfx = 0xff;
@@ -307,27 +307,27 @@ u32 bcs3_state::screen_update_bcs3(screen_device &screen, bitmap_ind16 &bitmap, 
    I'm assuming that it only shows a portion of this, with the cursor always in sight. */
 u32 bcs3_state::screen_update_bcs3a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	u8 y,ra,chr,gfx,rat;
-	u16 sy = 0, ma = s_init, x;
-	u16 cursor = (m_p_videoram[s_curs] | (m_p_videoram[s_curs+1] << 8)) - 0x3c00 - ma;  // get cursor relative position
-	rat = cursor / (s_cols+1);
-	if (rat > (s_rows-1)) ma += (rat-(s_rows-1)) * (s_cols+1);
+	u16 sy = 0, ma = s_init;
+	u16 const cursor = (m_p_videoram[s_curs] | (m_p_videoram[s_curs+1] << 8)) - 0x3c00 - ma;  // get cursor relative position
+	u8 const cw = cursor / (s_cols+1);
+	if (cw > (s_rows-1)) ma += (cw-(s_rows-1)) * (s_cols+1);
 
-	for (y = 0; y < s_rows; y++)
+	for (u8 y = 0; y < s_rows; y++)
 	{
-		for (ra = 0; ra < 10; ra++)
+		for (u8 ra = 0; ra < 10; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
-			rat = (ra + 1) & 7;
+			uint16_t *p = &bitmap.pix(sy++);
+			u8 const rat = (ra + 1) & 7;
 
-			for (x = ma; x < ma + s_cols; x++)
+			for (u16 x = ma; x < ma + s_cols; x++)
 			{
+				u8 gfx;
 				if (ra < 8)
 				{
-					chr = m_p_videoram[x] & 0x7f;
+					u8 const chr = m_p_videoram[x] & 0x7f;
 
 					/* get pattern of pixels for that character scanline */
-					gfx = m_p_chargen[(chr<<3) | rat ] ^ 0xff;
+					gfx = m_p_chargen[(chr<<3) | rat] ^ 0xff;
 				}
 				else
 					gfx = 0xff;

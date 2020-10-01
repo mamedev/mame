@@ -134,7 +134,6 @@ void cirrus_gd5428_device::device_reset()
 
 uint32_t cirrus_gd5428_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int x,y,bit;
 	uint32_t ptr = (vga.svga_intf.vram_size - 0x4000);  // cursor patterns are stored in the last 16kB of VRAM
 	svga_device::screen_update(screen, bitmap, cliprect);
 
@@ -145,11 +144,11 @@ uint32_t cirrus_gd5428_device::screen_update(screen_device &screen, bitmap_rgb32
 		if(m_cursor_attr & 0x04)  // 64x64
 		{
 			ptr += ((m_cursor_addr & 0x3c) * 256);
-			for(y=0;y<64;y++)
+			for(int y=0;y<64;y++)
 			{
-				for(x=0;x<64;x+=8)
+				for(int x=0;x<64;x+=8)
 				{
-					for(bit=0;bit<8;bit++)
+					for(int bit=0;bit<8;bit++)
 					{
 						uint8_t pixel1 = vga.memory[ptr % vga.svga_intf.vram_size] >> (7-bit);
 						uint8_t pixel2 = vga.memory[(ptr+512) % vga.svga_intf.vram_size] >> (7-bit);
@@ -159,13 +158,13 @@ uint32_t cirrus_gd5428_device::screen_update(screen_device &screen, bitmap_rgb32
 						case 0:  // transparent - do nothing
 							break;
 						case 1:  // background
-							bitmap.pix32(m_cursor_y+y,m_cursor_x+x+bit) = (m_ext_palette[0].red << 16) | (m_ext_palette[0].green << 8) | (m_ext_palette[0].blue);
+							bitmap.pix(m_cursor_y+y,m_cursor_x+x+bit) = (m_ext_palette[0].red << 16) | (m_ext_palette[0].green << 8) | (m_ext_palette[0].blue);
 							break;
 						case 2:  // XOR
-							bitmap.pix32(m_cursor_y+y,m_cursor_x+x+bit) = ~bitmap.pix32(m_cursor_y+y,m_cursor_x+x+bit);
+							bitmap.pix(m_cursor_y+y,m_cursor_x+x+bit) = ~bitmap.pix(m_cursor_y+y,m_cursor_x+x+bit);
 							break;
 						case 3:  // foreground
-							bitmap.pix32(m_cursor_y+y,m_cursor_x+x+bit) = (m_ext_palette[15].red << 16) | (m_ext_palette[15].green << 8) | (m_ext_palette[15].blue);
+							bitmap.pix(m_cursor_y+y,m_cursor_x+x+bit) = (m_ext_palette[15].red << 16) | (m_ext_palette[15].green << 8) | (m_ext_palette[15].blue);
 							break;
 						}
 					}
@@ -175,11 +174,11 @@ uint32_t cirrus_gd5428_device::screen_update(screen_device &screen, bitmap_rgb32
 		else
 		{
 			ptr += ((m_cursor_addr & 0x3f) * 256);
-			for(y=0;y<32;y++)
+			for(int y=0;y<32;y++)
 			{
-				for(x=0;x<32;x+=8)
+				for(int x=0;x<32;x+=8)
 				{
-					for(bit=0;bit<8;bit++)
+					for(int bit=0;bit<8;bit++)
 					{
 						uint8_t pixel1 = vga.memory[ptr % vga.svga_intf.vram_size] >> (7-bit);
 						uint8_t pixel2 = vga.memory[(ptr+128) % vga.svga_intf.vram_size] >> (7-bit);
@@ -189,13 +188,13 @@ uint32_t cirrus_gd5428_device::screen_update(screen_device &screen, bitmap_rgb32
 						case 0:  // transparent - do nothing
 							break;
 						case 1:  // background
-							bitmap.pix32(m_cursor_y+y,m_cursor_x+x+bit) = (m_ext_palette[0].red << 18) | (m_ext_palette[0].green << 10) | (m_ext_palette[0].blue << 2);
+							bitmap.pix(m_cursor_y+y,m_cursor_x+x+bit) = (m_ext_palette[0].red << 18) | (m_ext_palette[0].green << 10) | (m_ext_palette[0].blue << 2);
 							break;
 						case 2:  // XOR
-							bitmap.pix32(m_cursor_y+y,m_cursor_x+x+bit) = ~bitmap.pix32(m_cursor_y+y,m_cursor_x+x+bit);
+							bitmap.pix(m_cursor_y+y,m_cursor_x+x+bit) = ~bitmap.pix(m_cursor_y+y,m_cursor_x+x+bit);
 							break;
 						case 3:  // foreground
-							bitmap.pix32(m_cursor_y+y,m_cursor_x+x+bit) = (m_ext_palette[15].red << 18) | (m_ext_palette[15].green << 10) | (m_ext_palette[15].blue << 2);
+							bitmap.pix(m_cursor_y+y,m_cursor_x+x+bit) = (m_ext_palette[15].red << 18) | (m_ext_palette[15].green << 10) | (m_ext_palette[15].blue << 2);
 							break;
 						}
 					}

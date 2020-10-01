@@ -46,7 +46,7 @@ tc8830f_device::tc8830f_device(const machine_config &mconfig, const char *tag, d
 void tc8830f_device::device_start()
 {
 	// create the stream
-	m_stream = stream_alloc_legacy(0, 1, clock() / 0x10);
+	m_stream = stream_alloc(0, 1, clock() / 0x10);
 
 	// register for savestates
 	save_item(NAME(m_playing));
@@ -79,11 +79,11 @@ void tc8830f_device::device_clock_changed()
 
 
 
-void tc8830f_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void tc8830f_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	int32_t mix = 0;
 
-	for (int i = 0; i < samples; i++)
+	for (int i = 0; i < outputs[0].samples(); i++)
 	{
 		if (m_playing)
 		{
@@ -125,7 +125,7 @@ void tc8830f_device::sound_stream_update_legacy(sound_stream &stream, stream_sam
 			mix = m_output;
 		}
 
-		outputs[0][i] = mix;
+		outputs[0].put_int(i, mix, 32768);
 	}
 }
 

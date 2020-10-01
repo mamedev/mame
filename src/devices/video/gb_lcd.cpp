@@ -671,7 +671,7 @@ void cgb_ppu_device::device_reset()
 
 inline void dmg_ppu_device::plot_pixel(int x, int y, uint16_t color)
 {
-	m_bitmap.pix16(y, x) = color;
+	m_bitmap.pix(y, x) = color;
 }
 
 

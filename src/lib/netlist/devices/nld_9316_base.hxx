@@ -14,10 +14,10 @@ namespace netlist
 	{
 
 		template <unsigned N>
-		static constexpr unsigned rollover(unsigned v) { return v <= N ? v : 0; }
+		static constexpr unsigned rollover(unsigned v) noexcept { return v <= N ? v : 0; }
 
 		template <>
-		constexpr unsigned rollover<15>(unsigned v) { return v & 15; }
+		constexpr unsigned rollover<15>(unsigned v) noexcept { return v & 15; }
 
 		template <typename D>
 		NETLIB_OBJECT(9316_base)
@@ -25,11 +25,11 @@ namespace netlist
 			NETLIB_CONSTRUCTOR(9316_base)
 			, m_CLK(*this, "CLK", NETLIB_DELEGATE(clk))
 			, m_ENT(*this, "ENT", NETLIB_DELEGATE(other))
-			, m_RC(*this, "RC")
 			, m_LOADQ(*this, "LOADQ", NETLIB_DELEGATE(other))
 			, m_ENP(*this, "ENP", NETLIB_DELEGATE(other))
 			, m_CLRQ(*this, "CLRQ", NETLIB_DELEGATE(other))
 			, m_ABCD(*this, {"A", "B", "C", "D"}, NETLIB_DELEGATE(abcd))
+			, m_RC(*this, "RC")
 			, m_Q(*this, { "QA", "QB", "QC", "QD" })
 			, m_cnt(*this, "m_cnt", 0)
 			, m_abcd(*this, "m_abcd", 0)
@@ -73,15 +73,15 @@ namespace netlist
 			{
 				if (!D::ASYNC::value && !m_CLRQ())
 				{
+					m_Q.push(0, D::tCLR::value(0));
 					m_cnt = 0;
-					m_Q.push(m_cnt, D::tCLR::value(0));
 				}
 				else
 				{
-					const auto cnt = (m_loadq ? rollover<D::MAXCNT::value>(m_cnt + 1) : m_abcd);
+					const unsigned cnt(m_loadq ? rollover<D::MAXCNT::value>(m_cnt + 1) : m_abcd);
 					m_RC.push(m_ent && (cnt == D::MAXCNT::value), D::tRC::value(0));
 					m_Q.push(cnt, D::tLDCNT::value(0));
-					m_cnt = static_cast<unsigned>(cnt);
+					m_cnt = cnt;
 				}
 			}
 
@@ -93,22 +93,22 @@ namespace netlist
 			logic_input_t m_CLK;
 			logic_input_t m_ENT;
 
-			logic_output_t m_RC;
-
 			logic_input_t m_LOADQ;
 
 			logic_input_t m_ENP;
 			logic_input_t m_CLRQ;
 
 			object_array_t<logic_input_t, 4> m_ABCD;
+
+			logic_output_t m_RC;
 			object_array_t<logic_output_t, 4> m_Q;
 
 			/* counter state */
 			state_var<unsigned> m_cnt;
 			/* cached pins */
 			state_var<unsigned> m_abcd;
-			state_var_sig m_loadq;
-			state_var_sig m_ent;
+			state_var<unsigned> m_loadq;
+			state_var<unsigned> m_ent;
 			nld_power_pins m_power_pins;
 
 		};

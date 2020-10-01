@@ -496,32 +496,28 @@ uint8_t laser3k_state::io2_r(offs_t offset)
 void laser3k_state::plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code,
 	const uint8_t *textgfx_data, uint32_t textgfx_datalen)
 {
-	int x, y, i;
 	int fg = m_fg_color;
 	int bg = m_bg_color;
-	const uint8_t *chardata;
-	uint16_t color;
 
 	/* look up the character data */
-	chardata = &textgfx_data[(code * 8) % textgfx_datalen];
+	uint8_t const *const chardata = &textgfx_data[(code * 8) % textgfx_datalen];
 
 	if (m_flash && (code >= 0x40) && (code <= 0x7f))
 	{
 		/* we're flashing; swap */
-		i = fg;
-		fg = bg;
-		bg = i;
+		using std::swap;
+		swap(fg, bg);
 	}
 
-	for (y = 0; y < 8; y++)
+	for (int y = 0; y < 8; y++)
 	{
-		for (x = 0; x < 7; x++)
+		for (int x = 0; x < 7; x++)
 		{
-			color = (chardata[y] & (1 << (6-x))) ? fg : bg;
+			uint16_t color = (chardata[y] & (1 << (6-x))) ? fg : bg;
 
-			for (i = 0; i < xscale; i++)
+			for (int i = 0; i < xscale; i++)
 			{
-				bitmap.pix16(ypos + y, xpos + (x * xscale) + i) = color;
+				bitmap.pix(ypos + y, xpos + (x * xscale) + i) = color;
 			}
 		}
 	}
@@ -578,15 +574,6 @@ void laser3k_state::text_update(screen_device &screen, bitmap_ind16 &bitmap, con
 
 void laser3k_state::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
-	const uint8_t *vram;
-	int row, col, b;
-	int offset;
-	uint8_t vram_row[42]  ;
-	uint16_t v;
-	uint16_t *p;
-	uint32_t w;
-	uint16_t *artifact_map_ptr;
-
 	/* sanity checks */
 	if (beginrow < cliprect.min_y)
 		beginrow = cliprect.min_y;
@@ -595,31 +582,32 @@ void laser3k_state::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, cons
 	if (endrow < beginrow)
 		return;
 
-	vram = m_ram->pointer() + (m_disp_page ? 0x4000 : 0x2000);
+	uint8_t const *const vram = m_ram->pointer() + (m_disp_page ? 0x4000 : 0x2000);
 
+	uint8_t vram_row[42];
 	vram_row[0] = 0;
 	vram_row[41] = 0;
 
-	for (row = beginrow; row <= endrow; row++)
+	for (int row = beginrow; row <= endrow; row++)
 	{
-		for (col = 0; col < 40; col++)
+		for (int col = 0; col < 40; col++)
 		{
-			offset = ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col)) | ((row & 7) << 10);
+			int offset = ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col)) | ((row & 7) << 10);
 			vram_row[1+col] = vram[offset];
 		}
 
-		p = &bitmap.pix16(row);
+		uint16_t *p = &bitmap.pix(row);
 
-		for (col = 0; col < 40; col++)
+		for (int col = 0; col < 40; col++)
 		{
-			w =     (((uint32_t) vram_row[col+0] & 0x7f) <<  0)
-				|   (((uint32_t) vram_row[col+1] & 0x7f) <<  7)
-				|   (((uint32_t) vram_row[col+2] & 0x7f) << 14);
+			uint32_t w =    (((uint32_t) vram_row[col+0] & 0x7f) <<  0)
+						|   (((uint32_t) vram_row[col+1] & 0x7f) <<  7)
+						|   (((uint32_t) vram_row[col+2] & 0x7f) << 14);
 
-			artifact_map_ptr = &m_hires_artifact_map[((vram_row[col+1] & 0x80) >> 7) * 16];
-			for (b = 0; b < 7; b++)
+			uint16_t const *const artifact_map_ptr = &m_hires_artifact_map[((vram_row[col+1] & 0x80) >> 7) * 16];
+			for (int b = 0; b < 7; b++)
 			{
-				v = artifact_map_ptr[((w >> (b + 7-1)) & 0x07) | (((b ^ col) & 0x01) << 3)];
+				uint16_t v = artifact_map_ptr[((w >> (b + 7-1)) & 0x07) | (((b ^ col) & 0x01) << 3)];
 				*(p++) = v;
 				*(p++) = v;
 			}
@@ -629,14 +617,6 @@ void laser3k_state::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 void laser3k_state::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
-	const uint8_t *vram;
-	int row, col, b;
-	int offset;
-	uint8_t vram_row[82];
-	uint16_t v;
-	uint16_t *p;
-	uint32_t w;
-
 	/* sanity checks */
 	if (beginrow < cliprect.min_y)
 		beginrow = cliprect.min_y;
@@ -645,16 +625,17 @@ void laser3k_state::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, con
 	if (endrow < beginrow)
 		return;
 
-	vram = m_ram->pointer() + (m_disp_page ? 0x8000 : 0x4000);
+	uint8_t const *const vram = m_ram->pointer() + (m_disp_page ? 0x8000 : 0x4000);
 
+	uint8_t vram_row[82];
 	vram_row[0] = 0;
 	vram_row[81] = 0;
 
-	for (row = beginrow; row <= endrow; row++)
+	for (int row = beginrow; row <= endrow; row++)
 	{
-		for (col = 0; col < 40; col++)
+		for (int col = 0; col < 40; col++)
 		{
-			offset = ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col)) | ((row & 7) << 10);
+			int offset = ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col)) | ((row & 7) << 10);
 			if (col < 40)
 			{
 				vram_row[1+(col*2)+0] = vram[offset];
@@ -667,17 +648,17 @@ void laser3k_state::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, con
 			}
 		}
 
-		p = &bitmap.pix16(row);
+		uint16_t *p = &bitmap.pix(row);
 
-		for (col = 0; col < 80; col++)
+		for (int col = 0; col < 80; col++)
 		{
-			w =     (((uint32_t) vram_row[col+0] & 0x7f) <<  0)
-				|   (((uint32_t) vram_row[col+1] & 0x7f) <<  7)
-				|   (((uint32_t) vram_row[col+2] & 0x7f) << 14);
+			uint32_t w =    (((uint32_t) vram_row[col+0] & 0x7f) <<  0)
+						|   (((uint32_t) vram_row[col+1] & 0x7f) <<  7)
+						|   (((uint32_t) vram_row[col+2] & 0x7f) << 14);
 
-			for (b = 0; b < 7; b++)
+			for (int b = 0; b < 7; b++)
 			{
-				v = m_dhires_artifact_map[((((w >> (b + 7-1)) & 0x0F) * 0x11) >> (((2-(col*7+b))) & 0x03)) & 0x0F];
+				uint16_t v = m_dhires_artifact_map[((((w >> (b + 7-1)) & 0x0F) * 0x11) >> (((2-(col*7+b))) & 0x03)) & 0x0F];
 				*(p++) = v;
 			}
 		}
@@ -830,10 +811,10 @@ static INPUT_PORTS_START( laser3k )
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)  PORT_CHAR('3') PORT_CHAR('#')
 	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4)  PORT_CHAR('4') PORT_CHAR('$')
 	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)  PORT_CHAR('5') PORT_CHAR('%')
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)  PORT_CHAR('6') PORT_CHAR('&')
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)  PORT_CHAR('7') PORT_CHAR('\'')
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)  PORT_CHAR('8') PORT_CHAR('(')
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)  PORT_CHAR('9') PORT_CHAR(')')
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)  PORT_CHAR('6') PORT_CHAR('^')
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)  PORT_CHAR('7') PORT_CHAR('&')
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)  PORT_CHAR('8') PORT_CHAR('*')
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)  PORT_CHAR('9') PORT_CHAR('(')
 	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)      PORT_CHAR('0') PORT_CHAR(')')
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)      PORT_CHAR(';') PORT_CHAR(':')
 	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)  PORT_CHAR('-') PORT_CHAR('_')
@@ -859,8 +840,8 @@ static INPUT_PORTS_START( laser3k )
 	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)  PORT_CHAR('K') PORT_CHAR('k')
 	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)  PORT_CHAR('L') PORT_CHAR('l')
 	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('=') PORT_CHAR('+')
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT)      PORT_CODE(KEYCODE_LEFT)
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT)     PORT_CODE(KEYCODE_RIGHT)
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT)      PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT)     PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 
 	PORT_START("X3")
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)  PORT_CHAR('Z') PORT_CHAR('z')
@@ -876,7 +857,7 @@ static INPUT_PORTS_START( laser3k )
 
 	PORT_START("X4")
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)  PORT_CHAR('S') PORT_CHAR('s')
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)  PORT_CHAR('2') PORT_CHAR('\"')
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)  PORT_CHAR('2') PORT_CHAR('@')
 	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)      PORT_CHAR('1') PORT_CHAR('!')
 	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Esc")      PORT_CODE(KEYCODE_ESC)      PORT_CHAR(27)
 	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)          PORT_CHAR('A') PORT_CHAR('a')
@@ -937,7 +918,7 @@ static INPUT_PORTS_START( laser3k )
 	PORT_START("keyb_special")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left Shift")   PORT_CODE(KEYCODE_LSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right Shift")  PORT_CODE(KEYCODE_RSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right Shift")  PORT_CODE(KEYCODE_RSHIFT)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Control")      PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED)

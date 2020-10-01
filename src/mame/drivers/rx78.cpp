@@ -160,7 +160,7 @@ uint32_t rx78_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 				color |= ((pen[2] & 1) << 2);
 
 				if(color)
-					bitmap.pix16(y+bordery, x+i+borderx) = color | 8;
+					bitmap.pix(y+bordery, x+i+borderx) = color | 8;
 
 				/* fg color */
 				pen[0] = (m_pri_mask & 0x01) ? (m_vram[count + 0x0000] >> (i)) : 0x00;
@@ -172,7 +172,7 @@ uint32_t rx78_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 				color |= ((pen[2] & 1) << 2);
 
 				if(color)
-					bitmap.pix16(y+bordery, x+i+borderx) = color;
+					bitmap.pix(y+bordery, x+i+borderx) = color;
 			}
 			count++;
 		}

@@ -70,7 +70,7 @@ void mephisto_display_module2_device::lcd_palette(palette_device &palette) const
 HD44780_PIXEL_UPDATE(mephisto_display_module2_device::lcd_pixel_update)
 {
 	if (x < 5 && y < 8 && line < 2 && pos < 16)
-		bitmap.pix16(line*9 + 1 + y, 1 + pos*6 + x) = state ? 1 : 2;
+		bitmap.pix(line*9 + 1 + y, 1 + pos*6 + x) = state ? 1 : 2;
 }
 
 

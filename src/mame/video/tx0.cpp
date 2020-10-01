@@ -19,7 +19,7 @@
 
 inline void tx0_state::tx0_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color)
 {
-	bitmap.pix16(y, x) = color;
+	bitmap.pix(y, x) = color;
 }
 
 /*
@@ -346,13 +346,12 @@ enum
 void tx0_state::tx0_typewriter_linefeed()
 {
 	uint8_t buf[typewriter_window_width];
-	int y;
 
 	assert(typewriter_window_width <= m_typewriter_bitmap.width());
 	assert(typewriter_window_height <= m_typewriter_bitmap.height());
-	for (y=0; y<typewriter_window_height-typewriter_scroll_step; y++)
+	for (int y=0; y<typewriter_window_height-typewriter_scroll_step; y++)
 	{
-		std::copy_n(&m_typewriter_bitmap.pix16(y+typewriter_scroll_step, 0), typewriter_window_width, buf);
+		std::copy_n(&m_typewriter_bitmap.pix(y+typewriter_scroll_step, 0), typewriter_window_width, buf);
 		draw_scanline8(m_typewriter_bitmap, 0, y, typewriter_window_width, buf, m_palette->pens());
 	}
 

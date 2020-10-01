@@ -168,7 +168,9 @@ NETLIST_START(warrior)
 	Q_2N3906(Q2)            // PNP
 	Q_2N3906(Q3)            // PNP
 	Q_2N3906(Q4)            // PNP
+#if !(HLE_PITFALL_VCO)
 	Q_2N3904(Q5)            // NPN
+#endif
 //  Q_2N5878(Q6)            // NPN -- part of final amp (not emulated)
 //  Q_2N5876(Q7)            // PNP -- part of final amp (not emulated)
 

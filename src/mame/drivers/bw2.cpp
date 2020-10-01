@@ -450,7 +450,7 @@ uint8_t bw2_state::ppi_pc_r()
 
 	*/
 
-	uint8_t data = 0;
+	uint8_t data = m_bank;
 
 	// centronics busy
 	data |= m_centronics_busy << 4;
@@ -459,7 +459,7 @@ uint8_t bw2_state::ppi_pc_r()
 	data |= m_mfdbk << 5;
 
 	// write protect
-	if (m_floppy) data |= m_floppy->wpt_r() << 7;
+	if (m_floppy) data |= !m_floppy->wpt_r() << 7;
 
 	return data;
 }

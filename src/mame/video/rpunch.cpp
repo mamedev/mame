@@ -102,7 +102,7 @@ u8 rpunch_state::pixmap_r(offs_t offset)
 	const int sy = offset >> 8;
 	const int sx = (offset & 0xff) << 1;
 
-	return ((m_pixmap->pix16(sy & 0xff, sx & ~1) & 0xf) << 4) | (m_pixmap->pix16(sy & 0xff, sx |  1) & 0xf);
+	return ((m_pixmap->pix(sy & 0xff, sx & ~1) & 0xf) << 4) | (m_pixmap->pix(sy & 0xff, sx |  1) & 0xf);
 }
 
 void rpunch_state::pixmap_w(offs_t offset, u8 data)
@@ -110,8 +110,8 @@ void rpunch_state::pixmap_w(offs_t offset, u8 data)
 	const int sy = offset >> 8;
 	const int sx = (offset & 0xff) << 1;
 
-	m_pixmap->pix16(sy & 0xff, sx & ~1) = ((data & 0xf0) >> 4);
-	m_pixmap->pix16(sy & 0xff, sx |  1) = (data & 0x0f);
+	m_pixmap->pix(sy & 0xff, sx & ~1) = ((data & 0xf0) >> 4);
+	m_pixmap->pix(sy & 0xff, sx |  1) = (data & 0x0f);
 }
 
 void rpunch_state::videoram_w(offs_t offset, u16 data, u16 mem_mask)
@@ -252,8 +252,8 @@ void rpunch_state::draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		const u16 *src = &m_pixmap->pix16(y & 0xff);
-		u16 *dst = &bitmap.pix16(y);
+		u16 const *const src = &m_pixmap->pix(y & 0xff);
+		u16 *const dst = &bitmap.pix(y);
 		for(int x = cliprect.min_x / 4; x <= cliprect.max_x; x++)
 		{
 			const u16 pix = src[(x + 4) & 0x1ff];

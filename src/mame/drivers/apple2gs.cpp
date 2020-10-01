@@ -109,6 +109,7 @@
 //#include "bus/a2bus/hostram.h"
 //#include "bus/a2bus/ramfast.h"
 #include "bus/a2bus/uthernet.h"
+#include "bus/a2bus/sider.h"
 
 #include "bus/a2gameio/gameio.h"
 
@@ -1232,10 +1233,11 @@ void apple2gs_state::machine_start()
 
 	// setup speaker toggle volumes.  this should be done mathematically probably,
 	// but these ad-hoc values aren't too bad.
-	static const int16_t lvlTable[16] =
+#define LVL(x) (double(x) / 32768.0)
+	static const double lvlTable[16] =
 	{
-		0x0000, 0x03ff, 0x04ff, 0x05ff, 0x06ff, 0x07ff, 0x08ff, 0x09ff,
-		0x0aff, 0x0bff, 0x0cff, 0x0fff, 0x1fff, 0x3fff, 0x5fff, 0x7fff
+		LVL(0x0000), LVL(0x03ff), LVL(0x04ff), LVL(0x05ff), LVL(0x06ff), LVL(0x07ff), LVL(0x08ff), LVL(0x09ff),
+		LVL(0x0aff), LVL(0x0bff), LVL(0x0cff), LVL(0x0fff), LVL(0x1fff), LVL(0x3fff), LVL(0x5fff), LVL(0x7fff)
 	};
 	m_speaker->set_levels(16, lvlTable);
 
@@ -2281,6 +2283,9 @@ uint8_t apple2gs_state::c000_r(offs_t offset)
 		case 0x31:  // DISKREG
 			return m_diskreg;
 
+		case 0x32: // VGCINTCLEAR
+			return 0;
+
 		case 0x33: // CLOCKDATA
 			return m_clkdata;
 
@@ -2508,12 +2513,12 @@ void apple2gs_state::c000_w(offs_t offset, uint8_t data)
 			break;
 
 		case 0x23:  // VGCINT
-			if ((m_vgcint & VGCINT_SECOND) && !(data & VGCINT_SECOND))
+			if ((m_vgcint & VGCINT_SECOND) && !(data & VGCINT_SECONDENABLE))
 			{
 				lower_irq(IRQS_SECOND);
 				m_vgcint &= ~(VGCINT_SECOND);
 			}
-			if ((m_vgcint & VGCINT_SCANLINE) && !(data & VGCINT_SCANLINE))
+			if ((m_vgcint & VGCINT_SCANLINE) && !(data & VGCINT_SCANLINEEN))
 			{
 				lower_irq(IRQS_SCAN);
 				m_vgcint &= ~(VGCINT_SCANLINE);
@@ -2563,14 +2568,14 @@ void apple2gs_state::c000_w(offs_t offset, uint8_t data)
 		case 0x32:  // VGCINTCLEAR
 			//printf("%02x to VGCINTCLEAR\n", data);
 			// one second
-			if ((m_vgcint & VGCINT_SECOND) && !(data & VGCINT_SECOND))
+			if (m_vgcint & VGCINT_SECOND)
 			{
 				lower_irq(IRQS_SECOND);
 				m_vgcint &= ~(VGCINT_SECOND|VGCINT_ANYVGCINT);
 			}
 
 			// scanline
-			if ((m_vgcint & VGCINT_SCANLINE) && !(data & VGCINT_SCANLINE))
+			if (m_vgcint & VGCINT_SCANLINE)
 			{
 				lower_irq(IRQS_SCAN);
 				m_vgcint &= ~(VGCINT_SCANLINE|VGCINT_ANYVGCINT);
@@ -4577,7 +4582,9 @@ static void apple2_cards(device_slot_interface &device)
 //  device.option_add("hostram", A2BUS_HOSTRAM); /* Slot 7 RAM for GS Plus host protocol */
 //  device.option_add("ramfast", A2BUS_RAMFAST); /* C.V. Technologies RAMFast SCSI card */
 	device.option_add("cmsscsi", A2BUS_CMSSCSI);  /* CMS Apple II SCSI Card */
-	device.option_add("uthernet", A2BUS_UTHERNET);  /* CMS Apple II SCSI Card */
+	device.option_add("uthernet", A2BUS_UTHERNET);  /* A2RetroSystems Uthernet card */
+	device.option_add("sider2", A2BUS_SIDER2); /* Advanced Tech Systems / First Class Peripherals Sider 2 SASI card */
+	device.option_add("sider1", A2BUS_SIDER1); /* Advanced Tech Systems / First Class Peripherals Sider 1 SASI card */
 }
 
 void apple2gs_state::apple2gs(machine_config &config)

@@ -62,7 +62,7 @@ namespace devices
 		NETLIB_RESETI()
 		{
 			m_cnt = 0;
-			m_off = netlist_time::from_fp<decltype(m_offset())>(m_offset());
+			m_off = netlist_time::from_fp<param_fp_t::value_type>(m_offset());
 			m_feedback.set_delegate(NETLIB_DELEGATE(first));
 		}
 		//NETLIB_UPDATE_PARAMI();

@@ -248,12 +248,11 @@ void cdp1861_device::dma_w(uint8_t data)
 {
 	int sx = screen().hpos() + 4;
 	int y = screen().vpos();
-	int x;
 
-	for (x = 0; x < 8; x++)
+	for (int x = 0; x < 8; x++)
 	{
 		pen_t color = BIT(data, 7) ? rgb_t::white() : rgb_t::black();
-		m_bitmap.pix32(y, sx + x) = color;
+		m_bitmap.pix(y, sx + x) = color;
 		data <<= 1;
 	}
 }

@@ -304,7 +304,7 @@ MC6845_UPDATE_ROW( victor9k_state::crtc_update_row )
 				color = palette[pen];
 			}
 
-			bitmap.pix32(vbp + y, x++) = color;
+			bitmap.pix(vbp + y, x++) = color;
 		}
 
 		aa += 2;

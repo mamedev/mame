@@ -298,14 +298,14 @@ MC6845_UPDATE_ROW( apricot_state::crtc_update_row )
 			{
 				int color = fill ? 1 : BIT(data, x);
 				color ^= BIT(code, 15); // reverse?
-				bitmap.pix32(y, x + i*10) = pen[color ? 1 + BIT(code, 14) : 0];
+				bitmap.pix(y, x + i*10) = pen[color ? 1 + BIT(code, 14) : 0];
 			}
 		}
 		else
 		{
 			// draw 16 pixels of the cell
 			for (int x = 0; x <= 16; x++)
-				bitmap.pix32(y, x + i*16) = pen[BIT(data, x)];
+				bitmap.pix(y, x + i*16) = pen[BIT(data, x)];
 		}
 	}
 }

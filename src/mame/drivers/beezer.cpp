@@ -257,8 +257,8 @@ uint32_t beezer_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	{
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x += 2)
 		{
-			bitmap.pix16(y, x + 1) = m_videoram[0x80 * x + y] & 0x0f;
-			bitmap.pix16(y, x + 0) = m_videoram[0x80 * x + y] >> 4;
+			bitmap.pix(y, x + 1) = m_videoram[0x80 * x + y] & 0x0f;
+			bitmap.pix(y, x + 0) = m_videoram[0x80 * x + y] >> 4;
 		}
 	}
 
@@ -554,7 +554,7 @@ void beezer_state::beezer(machine_config &config)
 	// schematics show an input labeled VCO to channel 2, but the source is unknown
 
 	mm5837_device &noise(MM5837(config, "noise"));
-	noise.set_vdd_voltage(12);
+	noise.set_vdd(-12);
 	noise.output_callback().set(FUNC(beezer_state::noise_w));
 
 	SPEAKER(config, "speaker").front_center();

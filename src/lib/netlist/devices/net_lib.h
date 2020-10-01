@@ -28,8 +28,6 @@
 #define IND_P(ind) ((ind) * 1e-12)
 #endif
 
-NETLIST_EXTERNAL(base_lib)
-
 #include "../generated/nld_devinc.h"
 
 

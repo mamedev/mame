@@ -863,7 +863,7 @@ SCN2674_DRAW_CHARACTER_MEMBER(octopus_state::display_pixels)
 				data = 0xff;
 		}
 		for (int z=0;z<8;z++)
-			bitmap.pix32(y,x + z) = BIT(data,z) ? fg : bg;
+			bitmap.pix(y,x + z) = BIT(data,z) ? fg : bg;
 	}
 }
 

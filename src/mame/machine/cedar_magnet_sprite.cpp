@@ -309,7 +309,7 @@ u32 cedar_magnet_sprite_device::draw(screen_device &screen, bitmap_ind16 &bitmap
 
 	for (int y = 0; y < 256; y++)
 	{
-		uint16_t *dst = &bitmap.pix16((y) & 0xff);
+		uint16_t *const dst = &bitmap.pix((y) & 0xff);
 
 		for (int x = 0; x < 256; x++)
 		{

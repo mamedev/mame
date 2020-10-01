@@ -136,9 +136,9 @@ MC6845_UPDATE_ROW( cardline_state::crtc_update_row )
 			int fg_col = gfx[fg_tile * 64 + ra * 8 + i];
 
 			if (fg_col == 1)
-				bitmap.pix32(y, x) = palette[bg_pal_ofs + bg_col];
+				bitmap.pix(y, x) = palette[bg_pal_ofs + bg_col];
 			else
-				bitmap.pix32(y, x) = palette[fg_pal_ofs + fg_col];
+				bitmap.pix(y, x) = palette[fg_pal_ofs + fg_col];
 
 			x++;
 		}

@@ -810,14 +810,14 @@ uint32_t hp1ll3_device::screen_update(screen_device &screen, bitmap_ind16 &bitma
 {
 	if (!m_enable_video)
 	{
-		bitmap.fill(rgb_t::black());
+		bitmap.fill(0);
 		return 0;
 	}
 
 	for (int y = 0; y < m_vert_pix_total; y++)
 	{
 		int const offset = m_sad + y*m_conf[CONF_WPL];
-		uint16_t *p = &m_bitmap.pix16(y);
+		uint16_t *p = &m_bitmap.pix(y);
 
 		for (int x = offset; x < offset + m_horiz_pix_total / 16; x++)
 		{

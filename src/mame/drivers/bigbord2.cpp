@@ -554,21 +554,19 @@ u8 bigbord2_state::crt8002(u8 ac_ra, u8 ac_chr, u8 ac_attr, uint16_t ac_cnt, boo
 
 MC6845_UPDATE_ROW( bigbord2_state::crtc_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	u8 chr,gfx,attr;
-	uint16_t mem,x;
-	uint32_t *p = &bitmap.pix32(y);
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint32_t *p = &bitmap.pix(y);
 	ra &= 15;
 	m_cnt++;
 
-	for (x = 0; x < x_count; x++)
+	for (u16 x = 0; x < x_count; x++)
 	{
-		mem = (ma + x) & 0x7ff;
-		attr = m_aram[mem];
-		chr = m_vram[mem];
+		u16 mem = (ma + x) & 0x7ff;
+		u8 attr = m_aram[mem];
+		u8 chr = m_vram[mem];
 
 		/* process attributes */
-		gfx = crt8002(ra, chr, attr, m_cnt, (x==cursor_x));
+		u8 gfx = crt8002(ra, chr, attr, m_cnt, (x==cursor_x));
 
 		/* Display a scanline of a character */
 		*p++ = palette[BIT( gfx, 7 )];

@@ -481,11 +481,9 @@ WRITE_LINE_MEMBER(hp64k_state::hp64k_crtc_vrtc_w)
 
 I8275_DRAW_CHARACTER_MEMBER(hp64k_state::crtc_display_pixels)
 {
-		const rgb_t *palette = m_palette->palette()->entry_list_raw();
+		rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 		uint8_t chargen_byte = m_chargen[ linecount  | ((unsigned)charcode << 4) ];
-		bool lvid , livid;
 		uint16_t pixels_lvid , pixels_livid;
-		unsigned i;
 
 		if (vsp) {
 				pixels_lvid = pixels_livid = ~0;
@@ -504,19 +502,19 @@ I8275_DRAW_CHARACTER_MEMBER(hp64k_state::crtc_display_pixels)
 				pixels_livid = ~0;
 		}
 
-		for (i = 0; i < 9; i++) {
-				lvid = (pixels_lvid & (1U << (8 - i))) != 0;
-				livid = (pixels_livid & (1U << (8 - i))) != 0;
+		for (unsigned i = 0; i < 9; i++) {
+				bool const lvid = (pixels_lvid & (1U << (8 - i))) != 0;
+				bool const livid = (pixels_livid & (1U << (8 - i))) != 0;
 
 				if (!lvid) {
 						// Normal brightness
-						bitmap.pix32(y , x + i) = palette[ 2 ];
+						bitmap.pix(y , x + i) = palette[ 2 ];
 				} else if (livid) {
 						// Black
-						bitmap.pix32(y , x + i) = palette[ 0 ];
+						bitmap.pix(y , x + i) = palette[ 0 ];
 				} else {
 						// Half brightness
-						bitmap.pix32(y , x + i) = palette[ 1 ];
+						bitmap.pix(y , x + i) = palette[ 1 ];
 				}
 		}
 

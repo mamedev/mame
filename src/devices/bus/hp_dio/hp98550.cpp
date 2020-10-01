@@ -218,7 +218,7 @@ uint32_t dio32_98550_device::screen_update(screen_device &screen, bitmap_rgb32 &
 		mask |= ce->plane_enabled();
 
 	for (int y = 0; y < m_v_pix; y++) {
-		uint32_t *scanline = &bitmap.pix32(y);
+		uint32_t *scanline = &bitmap.pix(y);
 
 		for (int x = 0; x < m_h_pix; x++) {
 			const int offset = y * m_fb_width +x;

@@ -23,7 +23,6 @@ k054539_device::k054539_device(const machine_config &mconfig, const char *tag, d
 	, device_sound_interface(mconfig, *this)
 	, device_rom_interface(mconfig, *this)
 	, flags(0)
-	, ram(nullptr)
 	, reverb_pos(0)
 	, cur_ptr(0)
 	, cur_limit(0)
@@ -115,7 +114,7 @@ void k054539_device::sound_stream_update(sound_stream &stream, std::vector<read_
 	};
 
 
-	int16_t *rbase = (int16_t *)ram.get();
+	int16_t *rbase = (int16_t *)&ram[0];
 
 	if(!(regs[0x22f] & 1))
 	{
@@ -124,7 +123,6 @@ void k054539_device::sound_stream_update(sound_stream &stream, std::vector<read_
 		return;
 	}
 
-	constexpr stream_buffer::sample_t sample_scale = 1.0 / 32768.0;
 	for(int sample = 0; sample != outputs[0].samples(); sample++) {
 		double lval, rval;
 		if(!(flags & DISABLE_REVERB))
@@ -303,8 +301,8 @@ void k054539_device::sound_stream_update(sound_stream &stream, std::vector<read_
 				}
 			}
 		reverb_pos = (reverb_pos + 1) & 0x1fff;
-		outputs[0].put(sample, stream_buffer::sample_t(lval) * sample_scale);
-		outputs[1].put(sample, stream_buffer::sample_t(rval) * sample_scale);
+		outputs[0].put_int(sample, lval, 32768);
+		outputs[1].put_int(sample, rval, 32768);
 	}
 }
 
@@ -321,10 +319,11 @@ void k054539_device::init_chip()
 	memset(posreg_latch, 0, sizeof(posreg_latch)); //*
 	flags |= UPDATE_AT_KEYON; //* make it default until proven otherwise
 
-	ram = std::make_unique<uint8_t[]>(0x4000);
+	ram = std::make_unique<uint8_t []>(0x4000);
+
 	reverb_pos = 0;
 	cur_ptr = 0;
-	memset(ram.get(), 0, 0x4000);
+	memset(&ram[0], 0, 0x4000);
 
 	stream = stream_alloc(0, 2, clock() / 384);
 
@@ -553,7 +552,7 @@ void k054539_device::device_reset()
 {
 	regs[0x22c] = 0;
 	regs[0x22f] = 0;
-	memset(ram.get(), 0, 0x4000);
+	memset(&ram[0], 0, 0x4000);
 	m_timer->enable(false);
 }
 

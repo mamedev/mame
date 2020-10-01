@@ -125,9 +125,9 @@ TIMER_CALLBACK_MEMBER( pasopia_state::pio_timer )
 
 MC6845_UPDATE_ROW( pasopia_state::crtc_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	u8 fg=7,bg=0; // colours need to be determined
-	uint32_t *p = &bitmap.pix32(y);
+	uint32_t *p = &bitmap.pix(y);
 
 	for (u16 x = 0; x < x_count; x++)
 	{

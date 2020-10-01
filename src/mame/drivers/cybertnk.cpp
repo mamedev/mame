@@ -379,7 +379,7 @@ void cybertnk_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 
 			if ((yy>=miny) && (yy<=maxy))
 			{
-				dest = &bitmap.pix16(yy, 0);
+				dest = &bitmap.pix(yy, 0);
 
 				int start,end,inc;
 

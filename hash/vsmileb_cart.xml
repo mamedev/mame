@@ -97,7 +97,7 @@ VTech V.Smile Baby cartridges
 			<feature name="u4" value="U4" />
 			<dataarea name="rom" size="8388608">
 				<rom name="099045 - Baby Einstein (BABY) (FR).bin" size="8388608" crc="d0690ae6" sha1="bde281db67b477798974983a505bed7497e25763" />
- 			</dataarea>
+			</dataarea>
 		</part>
 	</software>
 

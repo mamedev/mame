@@ -56,34 +56,25 @@ speaker_device::~speaker_device()
 //  mix - mix in samples from the speaker's stream
 //-------------------------------------------------
 
-void speaker_device::mix(stream_buffer::sample_t *leftmix, stream_buffer::sample_t *rightmix, u32 &samples_this_update, bool suppress)
+void speaker_device::mix(stream_buffer::sample_t *leftmix, stream_buffer::sample_t *rightmix, attotime start, attotime end, int expected_samples, bool suppress)
 {
 	// skip if no stream
 	if (m_mixer_stream == nullptr)
 		return;
 
-	// update the stream, getting the start/end pointers around the operation
-	attotime start = m_mixer_stream->sample_time();
-	attotime end = machine().time();
+	// skip if invalid range
 	if (start > end)
 		return;
+
+	// get a view on the desired range
 	read_stream_view view = m_mixer_stream->update_view(start, end);
-
-	// set or assert that all streams have the same count
-	if (samples_this_update == 0)
-	{
-		samples_this_update = view.samples();
-
-		// reset the mixing streams
-		std::fill_n(leftmix, samples_this_update, 0);
-		std::fill_n(rightmix, samples_this_update, 0);
-	}
+	sound_assert(view.samples() >= expected_samples);
 
 	// track maximum sample value for each 0.1s bucket
 	if (machine().options().speaker_report() != 0)
 	{
 		u32 samples_per_bucket = m_mixer_stream->sample_rate() / BUCKETS_PER_SECOND;
-		for (int sample = 0; sample < samples_this_update; sample++)
+		for (int sample = 0; sample < expected_samples; sample++)
 		{
 			m_current_max = std::max(m_current_max, fabsf(view.get(sample)));
 			if (++m_samples_this_bucket >= samples_per_bucket)
@@ -100,7 +91,7 @@ void speaker_device::mix(stream_buffer::sample_t *leftmix, stream_buffer::sample
 	{
 		// if the speaker is centered, send to both left and right
 		if (m_x == 0)
-			for (int sample = 0; sample < samples_this_update; sample++)
+			for (int sample = 0; sample < expected_samples; sample++)
 			{
 				stream_buffer::sample_t cursample = view.get(sample);
 				leftmix[sample] += cursample;
@@ -109,12 +100,12 @@ void speaker_device::mix(stream_buffer::sample_t *leftmix, stream_buffer::sample
 
 		// if the speaker is to the left, send only to the left
 		else if (m_x < 0)
-			for (int sample = 0; sample < samples_this_update; sample++)
+			for (int sample = 0; sample < expected_samples; sample++)
 				leftmix[sample] += view.get(sample);
 
 		// if the speaker is to the right, send only to the right
 		else
-			for (int sample = 0; sample < samples_this_update; sample++)
+			for (int sample = 0; sample < expected_samples; sample++)
 				rightmix[sample] += view.get(sample);
 	}
 }

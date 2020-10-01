@@ -310,11 +310,11 @@ MC6845_UPDATE_ROW( abc806_state::abc806_update_row )
 			int color = BIT(chargen_data, 7) ? fg_color : bg_color;
 			if (!de) color = 0;
 
-			bitmap.pix32(y, x++) = pen[color];
+			bitmap.pix(y, x++) = pen[color];
 
 			if (e5 || e6)
 			{
-				bitmap.pix32(y, x++) = pen[color];
+				bitmap.pix(y, x++) = pen[color];
 			}
 
 			chargen_data <<= 1;
@@ -407,9 +407,9 @@ void abc806_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 			{
 				int x = HORIZONTAL_PORCH_HACK + (ABC800_CHAR_WIDTH * 4) - 16 + (sx * 4) + pixel;
 
-				if (BIT(dot, 15) || (bitmap.pix32(y, x) == rgb_t::black()))
+				if (BIT(dot, 15) || (bitmap.pix(y, x) == rgb_t::black()))
 				{
-					bitmap.pix32(y, x) = pen[(dot >> 12) & 0x07];
+					bitmap.pix(y, x) = pen[(dot >> 12) & 0x07];
 				}
 
 				dot <<= 4;

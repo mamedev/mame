@@ -742,9 +742,9 @@ void toaplan1_state::draw_sprite_custom(screen_device &screen, bitmap_rgb32 &des
 		{ /* skip if inner loop doesn't draw anything */
 			for (int y = sy; y < ey; y++)
 			{
-				const u8 *source = source_base + (y_index >> 16) * gfx->rowbytes();
-				u32 *dest = &dest_bmp.pix32(y);
-				u8 *pri = &priority_bitmap.pix8(y);
+				u8 const *const source = source_base + (y_index >> 16) * gfx->rowbytes();
+				u32 *const dest = &dest_bmp.pix(y);
+				u8 *const pri = &priority_bitmap.pix(y);
 
 				int x_index = x_index_base;
 				for (int x = sx; x < ex; x++)

@@ -93,7 +93,7 @@ void acorn_vdu40_device::device_reset()
 
 MC6845_UPDATE_ROW(acorn_vdu40_device::crtc_update_row)
 {
-	uint32_t *p = &bitmap.pix32(y);
+	uint32_t *p = &bitmap.pix(y);
 
 	m_trom->lose_w(1);
 	m_trom->lose_w(0);

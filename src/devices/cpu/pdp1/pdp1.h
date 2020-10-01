@@ -33,12 +33,10 @@ struct pdp1_reset_param_t
 #define IOT_NO_COMPLETION_PULSE -1
 
 
-class pdp1_device : public cpu_device
-					, public pdp1_reset_param_t
+class pdp1_device : public cpu_device, public pdp1_reset_param_t
 {
 public:
 	typedef device_delegate<void (int op2, int nac, int mb, int &io, int ac)> iot_delegate;
-	typedef device_delegate<void ()> read_binary_word_delegate;
 	typedef device_delegate<void ()> io_sc_delegate;
 
 	enum opcode
@@ -76,7 +74,6 @@ public:
 	pdp1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <int I, typename... T> void set_iot_callback(T &&... args) { m_extern_iot[I].set(std::forward<T>(args)...); }
-	template <typename... T> void set_read_binary_word(T &&... args) { m_read_binary_word.set(std::forward<T>(args)...); }
 	template <typename... T> void set_io_sc_callback(T &&... args) { m_io_sc_callback.set(std::forward<T>(args)...); }
 	void set_reset_param(const pdp1_reset_param_t *param) { m_reset_param = param; }
 
@@ -162,9 +159,7 @@ private:
 	int m_no_sequence_break;  /* disable sequence break recognition for one cycle */
 
 	/* callbacks for iot instructions (required for any I/O) */
-	std::vector<iot_delegate> m_extern_iot;
-	/* read a word from the perforated tape reader (required for read-in mode) */
-	read_binary_word_delegate m_read_binary_word;
+	iot_delegate::array<64> m_extern_iot;
 	/* callback called when sc is pulsed: IO devices should reset */
 	io_sc_delegate m_io_sc_callback;
 

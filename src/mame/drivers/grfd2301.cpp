@@ -82,21 +82,20 @@ void grfd2301_state::machine_reset()
 
 uint32_t grfd2301_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y,ra,chr,gfx;
-	uint16_t sy=0,ma=0,x;
+	uint16_t sy=0,ma=0;
 
-	for (y = 0; y < 24; y++)
+	for (uint8_t y = 0; y < 24; y++)
 	{
-		for (ra = 0; ra < 10; ra++)
+		for (uint8_t ra = 0; ra < 10; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix(sy++);
 
-			for (x = 0; x < 80; x++)
+			for (uint16_t x = 0; x < 80; x++)
 			{
-				gfx = 0;
+				uint8_t gfx = 0;
 				if (ra < 9)
 				{
-					chr = m_p_videoram[x+ma];
+					uint8_t chr = m_p_videoram[x+ma];
 
 					gfx = m_p_chargen[(chr<<4) | ra ];
 				}

@@ -274,7 +274,6 @@ void twin16_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, co
 		{
 			int xpos = source[1];
 			int ypos = source[2];
-			int x,y;
 
 			int pal_base = ((attributes&0xf)+0x10)*16;
 			int height  = 16<<((attributes>>6)&0x3);
@@ -335,15 +334,15 @@ void twin16_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, co
 			if( ypos>=256 ) ypos -= 65536;
 
 			/* slow slow slow, but it's ok for now */
-			for( y=0; y<height; y++, pen_data += width/4 )
+			for( int y=0; y<height; y++, pen_data += width/4 )
 			{
 				int sy = (flipy)?(ypos+height-1-y):(ypos+y);
 				if( sy>=cliprect.min_y && sy<=cliprect.max_y )
 				{
-					uint16_t *dest = &bitmap.pix16(sy);
-					uint8_t *pdest = &screen.priority().pix8(sy);
+					uint16_t *const dest = &bitmap.pix(sy);
+					uint8_t *const pdest = &screen.priority().pix(sy);
 
-					for( x=0; x<width; x++ )
+					for( int x=0; x<width; x++ )
 					{
 						int sx = (flipx)?(xpos+width-1-x):(xpos+x);
 						if( sx>=cliprect.min_x && sx<=cliprect.max_x )

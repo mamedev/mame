@@ -189,8 +189,8 @@ u32 lbeach_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 	{
 		for (int x = sprite_x; x < (sprite_x + 16) && cliprect.contains(x, y); x++)
 		{
-			m_collision_bg_car |= (bitmap.pix16(y, x) & m_colmap_car.pix16(y, x) & 1);
-			m_collision_fg_car |= (fg_bitmap.pix16(y, x) & m_colmap_car.pix16(y, x) & 1);
+			m_collision_bg_car |= (bitmap.pix(y, x) & m_colmap_car.pix(y, x) & 1);
+			m_collision_fg_car |= (fg_bitmap.pix(y, x) & m_colmap_car.pix(y, x) & 1);
 		}
 	}
 

@@ -247,7 +247,7 @@ public:
 
 	void init_sudelan();
 	void init_sudelan3();
-	
+
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -869,7 +869,7 @@ void elan_eu3a05_pvwwcas_state::pvwwcas(machine_config& config)
 	m_screen->set_refresh_hz(50);
 	m_sys->set_pal(); // TODO: also set PAL clocks
 
-	m_gpio->read_2_callback().set(FUNC(elan_eu3a05_pvwwcas_state::pvwwc_portc_r)); 
+	m_gpio->read_2_callback().set(FUNC(elan_eu3a05_pvwwcas_state::pvwwc_portc_r));
 	m_gpio->write_2_callback().set(FUNC(elan_eu3a05_pvwwcas_state::pvwwc_portc_w));
 }
 

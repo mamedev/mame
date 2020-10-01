@@ -85,15 +85,12 @@ void welltris_state::video_start()
 
 void welltris_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x, y;
-	int pixdata;
+	for (int y = 0; y < 256; y++) {
+		for (int x = 0; x < 512 / 2; x++) {
+			int pixdata = m_pixelram[(x & 0xff) + (y & 0xff) * 256];
 
-	for (y = 0; y < 256; y++) {
-		for (x = 0; x < 512 / 2; x++) {
-			pixdata = m_pixelram[(x & 0xff) + (y & 0xff) * 256];
-
-			bitmap.pix16(y, (x * 2) + 0) = (pixdata >> 8) + (0x100 * m_pixelpalettebank) + 0x400;
-			bitmap.pix16(y, (x * 2) + 1) = (pixdata & 0xff) + (0x100 * m_pixelpalettebank) + 0x400;
+			bitmap.pix(y, (x * 2) + 0) = (pixdata >> 8) + (0x100 * m_pixelpalettebank) + 0x400;
+			bitmap.pix(y, (x * 2) + 1) = (pixdata & 0xff) + (0x100 * m_pixelpalettebank) + 0x400;
 		}
 	}
 }

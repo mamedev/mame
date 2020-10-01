@@ -39,8 +39,7 @@ void trs80m3_state::port_88_w(offs_t offset, uint8_t data)
 /* 8-bit video, 32/64/40/80 characters per line = trs80m3, trs80m4. */
 uint32_t trs80m3_state::screen_update_trs80m3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y,ra,chr,gfx,gfxbit;
-	uint16_t sy=0,ma=0,x;
+	uint16_t sy=0,ma=0;
 	uint8_t skip=1;
 	uint8_t cols = BIT(m_mode, 2) ? 80 : 64;
 	uint8_t rows = BIT(m_mode, 2) ? 24 : 16;
@@ -60,18 +59,19 @@ uint32_t trs80m3_state::screen_update_trs80m3(screen_device &screen, bitmap_ind1
 		screen.set_visible_area(0, s_cols*8-1, 0, rows*lines-1);
 	}
 
-	for (y = 0; y < rows; y++)
+	for (uint8_t y = 0; y < rows; y++)
 	{
-		for (ra = 0; ra < lines; ra++)
+		for (uint8_t ra = 0; ra < lines; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix(sy++);
 
-			for (x = ma; x < ma + cols; x+=skip)
+			for (uint16_t x = ma; x < ma + cols; x+=skip)
 			{
-				chr = m_p_videoram[x+m_start_address];
+				uint8_t chr = m_p_videoram[x+m_start_address];
 
 				if (((chr & 0xc0) == 0xc0) && (~m_mode & 8))
 				{
+					uint8_t gfx;
 					if (ra < 8)
 						gfx = m_p_chargen[((chr&mask)<<3) | ra ];
 					else
@@ -86,10 +86,9 @@ uint32_t trs80m3_state::screen_update_trs80m3(screen_device &screen, bitmap_ind1
 					*p++ = BIT(gfx, 1);
 					*p++ = BIT(gfx, 0);
 				}
-				else
-				if ((chr & 0x80) && (~m_mode & 8))
+				else if ((chr & 0x80) && (~m_mode & 8))
 				{
-					gfxbit = (ra & 0x0c)>>1;
+					uint8_t gfxbit = (ra & 0x0c)>>1;
 					/* Display one line of a lores character */
 					*p++ = BIT(chr, gfxbit);
 					*p++ = BIT(chr, gfxbit);
@@ -104,6 +103,7 @@ uint32_t trs80m3_state::screen_update_trs80m3(screen_device &screen, bitmap_ind1
 				else
 				{
 					/* get pattern of pixels for that character scanline */
+					uint8_t gfx;
 					if (ra < 8)
 						gfx = m_p_chargen[((chr&0x7f)<<3) | ra ];
 					else

@@ -182,7 +182,7 @@ uint32_t imolagp_state::screen_update_imolagp(screen_device &screen, bitmap_ind1
 		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
 			uint8_t const *const source = &m_videoram[layer][(y & 0xff) * 0x40];
-			uint16_t *const dest = &bitmap.pix16(y & 0xff);
+			uint16_t *const dest = &bitmap.pix(y & 0xff);
 			for (int i = 0; i < 0x40; i++)
 			{
 				uint8_t const data = source[i];

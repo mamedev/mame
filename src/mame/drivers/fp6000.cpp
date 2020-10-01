@@ -243,15 +243,15 @@ uint16_t fp6000_state::unk_r()
 
 MC6845_UPDATE_ROW( fp6000_state::crtc_update_row )
 {
-	const pen_t *pen = m_palette->pens();
-	uint8_t *pcg = reinterpret_cast<uint8_t *>(m_pcg.target());
-	uint32_t *vram = reinterpret_cast<uint32_t *>(m_gvram.target());
+	pen_t const *const pen = m_palette->pens();
+	uint8_t const *const pcg = reinterpret_cast<uint8_t *>(m_pcg.target());
+	uint32_t const *const vram = reinterpret_cast<uint32_t *>(m_gvram.target());
 
 	for (int x = 0; x < x_count; x++)
 	{
 		// text mode
-		uint8_t code = (m_vram[ma + x] >> 0) & 0xff;
-		uint8_t color = (m_vram[ma + x] >> 8) & 0x0f;
+		uint8_t const code = (m_vram[ma + x] >> 0) & 0xff;
+		uint8_t const color = (m_vram[ma + x] >> 8) & 0x0f;
 		uint8_t gfx = pcg[(code << 4) | ra];
 
 		// cursor?
@@ -260,20 +260,20 @@ MC6845_UPDATE_ROW( fp6000_state::crtc_update_row )
 
 		// draw 8 pixels of the character
 		for (int i = 0; i < 8; i++)
-			bitmap.pix32(y, x * 8 + i) = BIT(gfx, 7 - i) ? pen[color] : 0;
+			bitmap.pix(y, x * 8 + i) = BIT(gfx, 7 - i) ? pen[color] : 0;
 
 		// graphics
-		uint32_t data = vram[(ma << 3) + (ra * x_count) + x];
+		uint32_t const data = vram[(ma << 3) + (ra * x_count) + x];
 
 		// draw 8 gfx pixels
-		if ((data >> 12) & 0x0f) bitmap.pix32(y, x * 8 + 0) = pen[(data >> 12) & 0x0f];
-		if ((data >>  8) & 0x0f) bitmap.pix32(y, x * 8 + 1) = pen[(data >>  8) & 0x0f];
-		if ((data >>  4) & 0x0f) bitmap.pix32(y, x * 8 + 2) = pen[(data >>  4) & 0x0f];
-		if ((data >>  0) & 0x0f) bitmap.pix32(y, x * 8 + 3) = pen[(data >>  0) & 0x0f];
-		if ((data >> 28) & 0x0f) bitmap.pix32(y, x * 8 + 4) = pen[(data >> 28) & 0x0f];
-		if ((data >> 24) & 0x0f) bitmap.pix32(y, x * 8 + 5) = pen[(data >> 24) & 0x0f];
-		if ((data >> 20) & 0x0f) bitmap.pix32(y, x * 8 + 6) = pen[(data >> 20) & 0x0f];
-		if ((data >> 16) & 0x0f) bitmap.pix32(y, x * 8 + 7) = pen[(data >> 16) & 0x0f];
+		if ((data >> 12) & 0x0f) bitmap.pix(y, x * 8 + 0) = pen[(data >> 12) & 0x0f];
+		if ((data >>  8) & 0x0f) bitmap.pix(y, x * 8 + 1) = pen[(data >>  8) & 0x0f];
+		if ((data >>  4) & 0x0f) bitmap.pix(y, x * 8 + 2) = pen[(data >>  4) & 0x0f];
+		if ((data >>  0) & 0x0f) bitmap.pix(y, x * 8 + 3) = pen[(data >>  0) & 0x0f];
+		if ((data >> 28) & 0x0f) bitmap.pix(y, x * 8 + 4) = pen[(data >> 28) & 0x0f];
+		if ((data >> 24) & 0x0f) bitmap.pix(y, x * 8 + 5) = pen[(data >> 24) & 0x0f];
+		if ((data >> 20) & 0x0f) bitmap.pix(y, x * 8 + 6) = pen[(data >> 20) & 0x0f];
+		if ((data >> 16) & 0x0f) bitmap.pix(y, x * 8 + 7) = pen[(data >> 16) & 0x0f];
 	}
 }
 

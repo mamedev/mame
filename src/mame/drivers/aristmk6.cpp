@@ -173,7 +173,7 @@ uint32_t aristmk6_state::screen_update_aristmk6(screen_device &screen, bitmap_rg
 				b = (b << 3) | (b & 0x7);
 
 				if(cliprect.contains(x, y))
-					bitmap.pix32(y, x) = r | g<<8 | b<<16;
+					bitmap.pix(y, x) = r | g<<8 | b<<16;
 
 				count+=2;
 			}
@@ -184,7 +184,7 @@ uint32_t aristmk6_state::screen_update_aristmk6(screen_device &screen, bitmap_rg
 				color = blit_ram[count];
 
 				if(cliprect.contains(x, y))
-					bitmap.pix32(y, x) = m_palette->pen(color);
+					bitmap.pix(y, x) = m_palette->pen(color);
 
 				count++;
 			}
@@ -205,12 +205,12 @@ uint32_t aristmk6_state::screen_update_aristmk6(screen_device &screen, bitmap_rg
 			pix1 = pix & 0xffffffff;
 			col = 0;
 			if (pix1) col = 1;
-			bitmap.pix32(y, x*2) = m_palette->pen(col);
+			bitmap.pix(y, x*2) = m_palette->pen(col);
 
 			pix1 = pix >> 32;
 			col = 0;
 			if (pix1) col = 1;
-			bitmap.pix32(y, x*2+1) = m_palette->pen(col);
+			bitmap.pix(y, x*2+1) = m_palette->pen(col);
 
 
 			count++;

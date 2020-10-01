@@ -64,13 +64,11 @@ void kc82_device::device_start()
 
 	for (int n = 1; n <= 4; n++)
 	{
-		state_add<u8>(KC82_B1 + n - 1, string_format("B%d", n).c_str(),
-			[this, n]() { return m_mmu_b[n]; },
+		state_add(KC82_B1 + n - 1, string_format("B%d", n).c_str(), m_mmu_b[n],
 			[this, n](u8 data) { m_mmu_b[n] = data; mmu_remap_pages(); }
 		).mask(0x3f);
 		if (n != 4)
-			state_add<u16>(KC82_A1 + n - 1, string_format("A%d", n).c_str(),
-				[this, n]() { return m_mmu_a[n]; },
+			state_add(KC82_A1 + n - 1, string_format("A%d", n).c_str(), m_mmu_a[n],
 				[this, n](u16 data) { m_mmu_a[n] = data; mmu_remap_pages(); }
 			).mask(0x3ff);
 	}

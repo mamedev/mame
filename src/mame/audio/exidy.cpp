@@ -180,7 +180,7 @@ void exidy_sound_device::common_sh_start()
 	m_sh6840_clocks_per_sample = (int)(SH6840_CLOCK.dvalue() / (double)sample_rate * (double)(1 << 24));
 
 	/* allocate the stream */
-	m_stream = stream_alloc_legacy(0, 1, sample_rate);
+	m_stream = stream_alloc(0, 1, sample_rate);
 
 	sh6840_register_state_globals();
 }
@@ -239,23 +239,23 @@ void exidy_sound_device::device_reset()
 }
 
 //-------------------------------------------------
-//  sound_stream_update_legacy - handle a stream update
+//  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void exidy_sound_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void exidy_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	sh6840_timer_channel *sh6840_timer = m_sh6840_timer;
 
 	/* hack to skip the expensive lfsr noise generation unless at least one of the 3 channels actually depends on it being generated */
 	int noisy = ((sh6840_timer[0].cr & sh6840_timer[1].cr & sh6840_timer[2].cr & 0x02) == 0);
-	stream_sample_t *buffer = outputs[0];
+	auto &buffer = outputs[0];
 
 	/* loop over samples */
-	while (samples--)
+	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
 	{
 		sh6840_timer_channel *t;
 		int clocks;
-		stream_sample_t sample = 0;
+		s32 sample = 0;
 
 		/* determine how many 6840 clocks this sample */
 		m_sh6840_clock_count += m_sh6840_clocks_per_sample;
@@ -310,19 +310,19 @@ void exidy_sound_device::sound_stream_update_legacy(sound_stream &stream, stream
 		sample += generate_music_sample();
 
 		/* stash */
-		*buffer++ = sample;
+		buffer.put_int(sampindex, sample, 32768);
 	}
 }
 
-stream_sample_t exidy_sound_device::generate_music_sample()
+s32 exidy_sound_device::generate_music_sample()
 {
 	return 0;
 }
 
-stream_sample_t exidy_sh8253_sound_device::generate_music_sample()
+s32 exidy_sh8253_sound_device::generate_music_sample()
 {
 	sh8253_timer_channel *c;
-	stream_sample_t sample = 0;
+	s32 sample = 0;
 
 	/* music channel 0 */
 	c = &m_sh8253_timer[0];

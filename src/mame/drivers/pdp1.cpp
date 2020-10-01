@@ -614,6 +614,7 @@ pdp1_readtape_image_device::pdp1_readtape_image_device(const machine_config &mco
 	, device_image_interface(mconfig, *this)
 	, m_maincpu(*this, "^maincpu")
 	, m_st_ptr(*this)
+	, m_timer(nullptr)
 {
 }
 
@@ -637,6 +638,7 @@ pdp1_punchtape_image_device::pdp1_punchtape_image_device(const machine_config &m
 	, device_image_interface(mconfig, *this)
 	, m_maincpu(*this, "^maincpu")
 	, m_st_ptp(*this)
+	, m_timer(nullptr)
 {
 }
 
@@ -661,6 +663,7 @@ pdp1_typewriter_device::pdp1_typewriter_device(const machine_config &mconfig, co
 	, m_twr(*this, "^TWR.%u", 0)
 	, m_st_tyo(*this)
 	, m_st_tyi(*this)
+	, m_tyo_timer(nullptr)
 {
 }
 
@@ -673,6 +676,8 @@ void pdp1_typewriter_device::device_resolve_objects()
 void pdp1_typewriter_device::device_start()
 {
 	m_tyo_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pdp1_typewriter_device::tyo_callback),this));
+
+	m_color = m_pos = m_case_shift = 0;
 }
 
 
@@ -818,14 +823,6 @@ TIMER_CALLBACK_MEMBER(pdp1_readtape_image_device::reader_callback)
 }
 
 /*
-    Initiate read of a 18-bit word in binary format from tape (used in read-in mode)
-*/
-void pdp1_readtape_image_device::tape_read_binary()
-{
-	begin_tape_read(1, 1);
-}
-
-/*
     perforated tape reader iot callbacks
 */
 
@@ -888,6 +885,8 @@ void pdp1_readtape_image_device::iot_rpa(int op2, int nac, int mb, int &io, int 
  * to the IO Register, Status Register Bit 1 is set to one.  If bits 5 and 6 are
  * different (730002 or 724002) the 18-bit word read from tape is automatically
  * transferred to the IO Register via the Reader Buffer.
+ *
+ * The rpb command pulse is also asserted for each word transfer in read-in mode.
  */
 void pdp1_readtape_image_device::iot_rpb(int op2, int nac, int mb, int &io, int ac)
 {
@@ -1506,7 +1505,7 @@ WRITE_LINE_MEMBER(pdp1_state::io_status_w)
 
     IO devices should reset
 */
-void pdp1_state::io_state_clear()
+void pdp1_state::io_start_clear()
 {
 	m_tape_reader->m_rcl = m_tape_reader->m_rc = 0;
 	if (m_tape_reader->m_timer)
@@ -1770,7 +1769,7 @@ void pdp1_state::pdp1(machine_config &config)
 	/* external iot handlers.  00, 50 to 56 and 74 are internal to the cpu core. */
 	/* I put a ? when the source is the handbook, since a) I have used the maintenance manual
 	as the primary source (as it goes more into details) b) the handbook and the maintenance
-	manual occasionnally contradict each other. */
+	manual occasionally contradict each other. */
 	/*  (iot)       rpa         rpb         tyo         tyi         ppa         ppb         dpy */
 	/*              spacewar                                                                 */
 	/*                          lag                                             glf?/jsp?   gpl?/gpr?/gcf? */
@@ -1796,8 +1795,7 @@ void pdp1_state::pdp1(machine_config &config)
 	m_maincpu->set_iot_callback<062>(m_parallel_drum, FUNC(pdp1_cylinder_image_device::iot_dba));
 	m_maincpu->set_iot_callback<063>(m_parallel_drum, FUNC(pdp1_cylinder_image_device::iot_dcc));
 	m_maincpu->set_iot_callback<064>(m_parallel_drum, FUNC(pdp1_cylinder_image_device::iot_dra));
-	m_maincpu->set_read_binary_word(m_tape_reader, FUNC(pdp1_readtape_image_device::tape_read_binary));
-	m_maincpu->set_io_sc_callback(FUNC(pdp1_state::io_state_clear));
+	m_maincpu->set_io_sc_callback(FUNC(pdp1_state::io_start_clear));
 
 	/* video hardware (includes the control panel and typewriter output) */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

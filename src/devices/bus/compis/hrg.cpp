@@ -51,11 +51,11 @@ void compis_uhrg_device::uhrg_map(address_map &map)
 
 UPD7220_DISPLAY_PIXELS_MEMBER( compis_hrg_device::display_pixels )
 {
-	uint16_t i,gfx = m_video_ram[(address & 0x7fff) >> 1];
-	const pen_t *pen = m_palette->pens();
+	uint16_t const gfx = m_video_ram[(address & 0x7fff) >> 1];
+	pen_t const *const pen = m_palette->pens();
 
-	for(i=0; i<16; i++)
-		bitmap.pix32(y, x + i) = pen[BIT(gfx, i)];
+	for(uint16_t i=0; i<16; i++)
+		bitmap.pix(y, x + i) = pen[BIT(gfx, i)];
 }
 
 
@@ -65,11 +65,11 @@ UPD7220_DISPLAY_PIXELS_MEMBER( compis_hrg_device::display_pixels )
 
 UPD7220_DISPLAY_PIXELS_MEMBER( compis_uhrg_device::display_pixels )
 {
-	uint16_t i,gfx = m_video_ram[(address & 0x1ffff) >> 1];
-	const pen_t *pen = m_palette->pens();
+	uint16_t const gfx = m_video_ram[(address & 0x1ffff) >> 1];
+	pen_t const *const pen = m_palette->pens();
 
-	for(i=0; i<16; i++)
-		bitmap.pix32(y, x + i) = pen[BIT(gfx, i)];
+	for(uint16_t i=0; i<16; i++)
+		bitmap.pix(y, x + i) = pen[BIT(gfx, i)];
 }
 
 

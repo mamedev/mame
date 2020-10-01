@@ -229,7 +229,7 @@ void qs1000_device::device_start()
 	// The QS1000 operates at 24MHz. Creating a stream at that rate
 	// would be overkill so we opt for a fraction of that rate which
 	// gives reasonable results
-	m_stream = stream_alloc_legacy(0, 2, clock() / 32);
+	m_stream = stream_alloc(0, 2, clock() / 32);
 
 	// Resolve CPU port callbacks
 	m_in_p1_cb.resolve_safe(0);
@@ -466,13 +466,13 @@ void qs1000_device::wave_w(offs_t offset, uint8_t data)
 
 
 //-------------------------------------------------
-//  sound_stream_update_legacy -
+//  sound_stream_update -
 //-------------------------------------------------
-void qs1000_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void qs1000_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	// Rset the output stream
-	memset(outputs[0], 0x0, samples * sizeof(*outputs[0]));
-	memset(outputs[1], 0x0, samples * sizeof(*outputs[1]));
+	outputs[0].fill(0);
+	outputs[1].fill(0);
 
 	// Iterate over voices and accumulate sample data
 	for (auto & chan : m_channels)
@@ -485,7 +485,7 @@ void qs1000_device::sound_stream_update_legacy(sound_stream &stream, stream_samp
 		{
 			if (chan.m_flags & QS1000_ADPCM)
 			{
-				for (int samp = 0; samp < samples; samp++)
+				for (int samp = 0; samp < outputs[0].samples(); samp++)
 				{
 					if (chan.m_addr >= chan.m_loop_end)
 					{
@@ -529,13 +529,13 @@ void qs1000_device::sound_stream_update_legacy(sound_stream &stream, stream_samp
 					chan.m_addr = (chan.m_addr + (chan.m_acc >> 18)) & QS1000_ADDRESS_MASK;
 					chan.m_acc &= ((1 << 18) - 1);
 
-					outputs[0][samp] += (result * 4 * lvol * vol) >> 12;
-					outputs[1][samp] += (result * 4 * rvol * vol) >> 12;
+					outputs[0].add_int(samp, result * 4 * lvol * vol, 32768 << 12);
+					outputs[1].add_int(samp, result * 4 * rvol * vol, 32768 << 12);
 				}
 			}
 			else
 			{
-				for (int samp = 0; samp < samples; samp++)
+				for (int samp = 0; samp < outputs[0].samples(); samp++)
 				{
 					if (chan.m_addr >= chan.m_loop_end)
 					{
@@ -558,8 +558,8 @@ void qs1000_device::sound_stream_update_legacy(sound_stream &stream, stream_samp
 					chan.m_addr = (chan.m_addr + (chan.m_acc >> 18)) & QS1000_ADDRESS_MASK;
 					chan.m_acc &= ((1 << 18) - 1);
 
-					outputs[0][samp] += (result * lvol * vol) >> 12;
-					outputs[1][samp] += (result * rvol * vol) >> 12;
+					outputs[0].add_int(samp, result * lvol * vol, 32768 << 12);
+					outputs[1].add_int(samp, result * rvol * vol, 32768 << 12);
 				}
 			}
 		}

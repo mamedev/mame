@@ -153,7 +153,7 @@ static INPUT_PORTS_START( apogee )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Rus/Lat") PORT_CODE(KEYCODE_LALT) PORT_CODE(KEYCODE_RALT)
 INPUT_PORTS_END
 
-static const int16_t speaker_levels[] = {-32767, -10922, 10922, 32767};
+static const double speaker_levels[] = {-1.0, -0.33333, 0.33333, 1.0};
 
 WRITE_LINE_MEMBER(apogee_state::pit8253_out0_changed)
 {
@@ -216,7 +216,7 @@ I8275_DRAW_CHARACTER_MEMBER(apogee_state::display_pixels)
 		pixels ^= 0xff;
 
 	for(int i=0;i<6;i++)
-		bitmap.pix32(y, x + i) = palette[(pixels >> (5-i)) & 1 ? (hlgt ? 2 : 1) : 0];
+		bitmap.pix(y, x + i) = palette[(pixels >> (5-i)) & 1 ? (hlgt ? 2 : 1) : 0];
 }
 
 /* F4 Character Displayer */

@@ -10,6 +10,7 @@ Driver by David Haywood
 TODO:
  - what is the 'BIOS' ROM for? it appears to be data tables and is very different between games but we don't map it anywhere
  - convert tilemaps to devices?
+ - quizmoon title gfx/sound in attract mode is incorrect? reference: https://youtu.be/925rRv2JG50
 
  68020 interrupts
  lev 1 : 0x64 : 0000 084c - unknown..

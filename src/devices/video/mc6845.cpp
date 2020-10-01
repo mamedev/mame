@@ -1122,7 +1122,7 @@ uint8_t mc6845_device::draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangl
 	// is in units of characters and is relative to the start of the
 	// displayable area, not relative to the screen bitmap origin.
 	int8_t cursor_x = cursor_visible ? (m_cursor_addr - m_current_disp_addr) : -1;
-	int de = (y < m_max_visible_y) ? 1 : 0;
+	int de = (y <= m_max_visible_y) ? 1 : 0;
 	int vbp = m_vert_pix_total - m_vsync_off_pos;
 	if (vbp < 0) vbp = 0;
 	int hbp = m_horiz_pix_total - m_hsync_off_pos;
@@ -1779,7 +1779,7 @@ MC6845_UPDATE_ROW( mos8563_device::vdc_update_row )
 				if (x < 0) x = 0;
 				int color = BIT(code, 7) ? fg : bg;
 
-				bitmap.pix32(vbp + y, hbp + x) = pen(de ? color : 0);
+				bitmap.pix(vbp + y, hbp + x) = pen(de ? color : 0);
 			}
 		}
 		else
@@ -1815,7 +1815,7 @@ MC6845_UPDATE_ROW( mos8563_device::vdc_update_row )
 				if (x < 0) x = 0;
 				int color = BIT(data, 7) ? fg : bg;
 
-				bitmap.pix32(vbp + y, hbp + x) = pen(de ? color : 0);
+				bitmap.pix(vbp + y, hbp + x) = pen(de ? color : 0);
 
 				if ((bit < 8) || !HSS_SEMI) data <<= 1;
 			}

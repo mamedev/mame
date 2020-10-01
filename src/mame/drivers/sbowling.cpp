@@ -116,7 +116,7 @@ static void plot_pixel_sbw(bitmap_ind16 *tmpbitmap, int x, int y, int col, int f
 		x = 255 - x;
 	}
 
-	tmpbitmap->pix16(y, x) = col;
+	tmpbitmap->pix(y, x) = col;
 }
 
 void sbowling_state::videoram_w(offs_t offset, uint8_t data)

@@ -1411,6 +1411,19 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/p2000t_cas.h,FORMATS["P2000T_CAS"] = true
+--------------------------------------------------
+
+if (FORMATS["P2000T_CAS"]~=null  or _OPTIONS["with-tools"]) then
+	files {
+		MAME_DIR.. "src/lib/formats/p2000t_cas.cpp",
+		MAME_DIR.. "src/lib/formats/p2000t_cas.h",
+	}
+end
+
+
+--------------------------------------------------
+--
 --@src/lib/formats/p6001_cas.h,FORMATS["P6001_CAS"] = true
 --------------------------------------------------
 

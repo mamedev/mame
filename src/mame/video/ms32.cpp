@@ -422,28 +422,20 @@ u32 ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitmap, 
 	   the priority ram, probably for per-pixel / pen mixing, or more levels
 	   than are supported here..  I don't know, it will need hw tests I think */
 	{
-		int xx, yy;
 		int width = screen.width();
 		int height = screen.height();
-		const pen_t *paldata = m_palette->pens();
-
-		u16* srcptr_tile;
-		u8* srcptr_tilepri;
-		u16* srcptr_spri;
-		//u8* srcptr_spripri;
-
-		u32* dstptr_bitmap;
+		pen_t const *const paldata = m_palette->pens();
 
 		bitmap.fill(0, cliprect);
 
-		for (yy=0;yy<height;yy++)
+		for (int yy=0;yy<height;yy++)
 		{
-			srcptr_tile =     &m_temp_bitmap_tilemaps.pix16(yy);
-			srcptr_tilepri =  &screen.priority().pix8(yy);
-			srcptr_spri =     &m_temp_bitmap_sprites.pix16(yy);
-			//srcptr_spripri =  &m_temp_bitmap_sprites_pri.pix8(yy);
-			dstptr_bitmap  =  &bitmap.pix32(yy);
-			for (xx=0;xx<width;xx++)
+			u16 const *const srcptr_tile =     &m_temp_bitmap_tilemaps.pix(yy);
+			u8 const *const  srcptr_tilepri =  &screen.priority().pix(yy);
+			u16 const *const srcptr_spri =     &m_temp_bitmap_sprites.pix(yy);
+			//u8 const *const  srcptr_spripri =  &m_temp_bitmap_sprites_pri.pix(yy);
+			u32 *const       dstptr_bitmap  =  &bitmap.pix(yy);
+			for (int xx=0;xx<width;xx++)
 			{
 				u16 src_tile  = srcptr_tile[xx];
 				u8 src_tilepri = srcptr_tilepri[xx];

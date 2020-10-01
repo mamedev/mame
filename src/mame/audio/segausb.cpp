@@ -100,7 +100,7 @@ void usb_sound_device::device_start()
 
 #else
 
-	m_stream = stream_alloc_legacy(0, 1, USB_2MHZ_CLOCK);
+	m_stream = stream_alloc(0, 1, USB_2MHZ_CLOCK);
 
 	m_noise_shift = 0x15555;
 
@@ -451,15 +451,15 @@ void usb_sound_device::env_w(int which, u8 offset, u8 data)
 }
 
 //-------------------------------------------------
-//  sound_stream_update_legacy - handle a stream update
+//  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void usb_sound_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void usb_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *dest = outputs[0];
+	auto &dest = outputs[0];
 
 	// iterate over samples
-	while (samples--)
+	for (int sampindex = 0; sampindex < dest.samples(); sampindex++)
 	{
 		/*----------------
 		    Noise Source
@@ -590,7 +590,7 @@ void usb_sound_device::sound_stream_update_legacy(sound_stream &stream, stream_s
 		  WEIGHT
 
 		*/
-		*dest++ = 3000 * m_final_filter.step_cr(sample);
+		dest.put(sampindex, 0.1 * m_final_filter.step_cr(sample));
 	}
 }
 

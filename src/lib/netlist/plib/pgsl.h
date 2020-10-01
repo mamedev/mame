@@ -25,6 +25,8 @@
 #if defined(__has_builtin) // clang and gcc 10
 	#if __has_builtin(__builtin_unreachable)
 		#define gsl_Expects(e) ((e) ? static_cast<void>(0) : __builtin_unreachable())
+	#else
+		#define gsl_Expects(e) ((e) ? static_cast<void>(0) : static_cast<void>(0))
 	#endif
 #elif defined(__GNUC__) && !(defined( __CUDACC__ ) && defined( __CUDA_ARCH__ ))
 	#define gsl_Expects(e) ((e) ? static_cast<void>(0) : __builtin_unreachable())
@@ -34,8 +36,24 @@
 	#define gsl_Expects(e) ((e) ? static_cast<void>(0) : static_cast<void>(0))
 #endif
 
+#if 1
+// FIXME: __builtin_unreachable contrary to google sources does not seem to be of
+// any use and decreases performance slightly. Convert gsl_Expects to a noop
+// and revisit in the future.
 #undef gsl_Expects
 #define gsl_Expects(e) do {} while (0)
+
+#if 0
+// Alternative and c++ style implementation. Suffers from the same drawbacks
+// like __builtin_unreachable
+static constexpr inline void gsl_Expects(const bool &e)
+{
+	if (!e)
+		__builtin_unreachable();
+}
+#endif
+#endif
+
 #define gsl_Ensures(e) gsl_Expects(e)
 
 namespace plib {
@@ -52,7 +70,7 @@ namespace plib {
 		/// \brief perform a narrowing cast without checks
 		///
 		template <typename T, typename O>
-		inline constexpr T narrow_cast(O && v) noexcept
+		constexpr T narrow_cast(O && v) noexcept
 		{
 			static_assert(plib::is_arithmetic<T>::value && std::is_convertible<std::remove_reference_t<O>, T>::value, "narrow cast expects conversion between arithmetic types");
 			return static_cast<T>(std::forward<O>(v));
@@ -62,7 +80,7 @@ namespace plib {
 		///
 		/// The c++ core guidelines require the narrow function to raise an error
 		/// This will make narrow noexcept(false). This has shown to have a
-		/// measurable impact on performance and thus we deviate we deviate from
+		/// measurable impact on performance and thus we deviate from
 		/// the standard here.
 		///
 		template <typename T, typename O>
@@ -82,14 +100,14 @@ namespace plib {
 
 	} // namespace pgsl
 
-	/// \brief downcast from base tpye to derived type
+	/// \brief downcast from base type to derived type
 	///
 	/// The cpp core guidelines require a very careful use of static cast
 	/// for downcast operations. This template is used to identify these uses
 	/// and later for debug builds use dynamic_cast.
 	///
 	template <typename D, typename B>
-	inline constexpr D downcast(B && b) noexcept
+	constexpr D downcast(B && b) noexcept
 	{
 		static_assert(std::is_pointer<D>::value || std::is_reference<D>::value, "downcast only supports pointers or reference for derived");
 		static_assert(std::is_pointer<B>::value || std::is_reference<B>::value, "downcast only supports pointers or reference for base");
@@ -97,6 +115,15 @@ namespace plib {
 	}
 
 	using pgsl::narrow_cast;
+
+	/// \brief cast to void *
+	///
+	/// The purpose here is to help identifiy casts to void in the code.
+	/// These case usuallyindicate some wizard assumptioms which should be easily
+	/// be easy to identify.
+	template <typename T>
+	constexpr void * void_ptr_cast(T *ptr) noexcept { return static_cast<void *>(ptr); }
+
 } // namespace plib
 
 //FIXME: This is the place to use more complete implementations

@@ -1093,7 +1093,7 @@ void spu_device::init_stream()
 {
 	const unsigned int hz=44100;
 
-	m_stream = stream_alloc_legacy(0, 2, hz);
+	m_stream = stream_alloc(0, 2, hz);
 
 	rev=new reverb(hz);
 
@@ -2761,21 +2761,20 @@ void spu_device::update_timing()
 //
 //
 
-void spu_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void spu_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *outL, *outR;
 	int16_t temp[44100], *src;
 
-	outL = outputs[0];
-	outR = outputs[1];
+	auto &outL = outputs[0];
+	auto &outR = outputs[1];
 
-	generate(temp, samples*4);  // second parameter is bytes, * 2 (size of int16_t) * 2 (stereo)
+	generate(temp, outputs[0].samples()*4);  // second parameter is bytes, * 2 (size of int16_t) * 2 (stereo)
 
 	src = &temp[0];
-	for (int i = 0; i < samples; i++)
+	for (int i = 0; i < outputs[0].samples(); i++)
 	{
-		*outL++ = *src++;
-		*outR++ = *src++;
+		outL.put_int(i, *src++, 32768);
+		outR.put_int(i, *src++, 32768);
 	}
 }
 
@@ -3034,7 +3033,7 @@ bool spu_device::play_cdda(const unsigned int sector, const unsigned char *cdda)
 		flip[i] = flip[i+1];
 		flip[i+1] = temp;
 	}
-	// this should be done in generate but sound_stream_update_legacy may not be called frequently enough
+	// this should be done in generate but sound_stream_update may not be called frequently enough
 	if(((spureg.irq_addr << 3) < 0x800) && (spureg.ctrl & spuctrl_irq_enable))
 		m_irq_handler(1);
 

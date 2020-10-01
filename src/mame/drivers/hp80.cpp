@@ -1107,7 +1107,7 @@ WRITE_LINE_MEMBER(hp85_state::vblank_w)
 					uint8_t pixels = video_mem_r(video_start , GRAPH_MEM_SIZE / 2 - 1);
 					video_start += 2;
 					for (unsigned sub_x = 0; sub_x < 8; sub_x++) {
-						m_bitmap.pix32(y , x + sub_x) = m_palette->pen(BIT(pixels , 7));
+						m_bitmap.pix(y , x + sub_x) = m_palette->pen(BIT(pixels , 7));
 						pixels <<= 1;
 					}
 				}
@@ -1130,7 +1130,7 @@ WRITE_LINE_MEMBER(hp85_state::vblank_w)
 							pixels = 0;
 						}
 						for (unsigned sub_x = 0; sub_x < 8; sub_x++) {
-							m_bitmap.pix32(row + sub_row , col + sub_x) = m_palette->pen(BIT(pixels , 7));
+							m_bitmap.pix(row + sub_row , col + sub_x) = m_palette->pen(BIT(pixels , 7));
 							pixels <<= 1;
 						}
 					}
@@ -1840,14 +1840,14 @@ WRITE_LINE_MEMBER(hp86_state::vblank_w)
 						if (++video_ptr >= limit) {
 							video_ptr = 0;
 						}
-						m_bitmap.pix32(y , x) = m_palette->pen(BIT(pixels , 7));
-						m_bitmap.pix32(y , x + 1) = m_palette->pen(BIT(pixels , 6));
-						m_bitmap.pix32(y , x + 2) = m_palette->pen(BIT(pixels , 5));
-						m_bitmap.pix32(y , x + 3) = m_palette->pen(BIT(pixels , 4));
-						m_bitmap.pix32(y , x + 4) = m_palette->pen(BIT(pixels , 3));
-						m_bitmap.pix32(y , x + 5) = m_palette->pen(BIT(pixels , 2));
-						m_bitmap.pix32(y , x + 6) = m_palette->pen(BIT(pixels , 1));
-						m_bitmap.pix32(y , x + 7) = m_palette->pen(BIT(pixels , 0));
+						m_bitmap.pix(y , x) = m_palette->pen(BIT(pixels , 7));
+						m_bitmap.pix(y , x + 1) = m_palette->pen(BIT(pixels , 6));
+						m_bitmap.pix(y , x + 2) = m_palette->pen(BIT(pixels , 5));
+						m_bitmap.pix(y , x + 3) = m_palette->pen(BIT(pixels , 4));
+						m_bitmap.pix(y , x + 4) = m_palette->pen(BIT(pixels , 3));
+						m_bitmap.pix(y , x + 5) = m_palette->pen(BIT(pixels , 2));
+						m_bitmap.pix(y , x + 6) = m_palette->pen(BIT(pixels , 1));
+						m_bitmap.pix(y , x + 7) = m_palette->pen(BIT(pixels , 0));
 					}
 				}
 			} else {
@@ -1880,14 +1880,14 @@ WRITE_LINE_MEMBER(hp86_state::vblank_w)
 								pixels = ~pixels;
 							}
 							unsigned y = row * lines_per_row + sub_row;
-							m_bitmap.pix32(y , col) = m_palette->pen(BIT(pixels , 7));
-							m_bitmap.pix32(y , col + 1) = m_palette->pen(BIT(pixels , 6));
-							m_bitmap.pix32(y , col + 2) = m_palette->pen(BIT(pixels , 5));
-							m_bitmap.pix32(y , col + 3) = m_palette->pen(BIT(pixels , 4));
-							m_bitmap.pix32(y , col + 4) = m_palette->pen(BIT(pixels , 3));
-							m_bitmap.pix32(y , col + 5) = m_palette->pen(BIT(pixels , 2));
-							m_bitmap.pix32(y , col + 6) = m_palette->pen(BIT(pixels , 1));
-							m_bitmap.pix32(y , col + 7) = m_palette->pen(BIT(pixels , 0));
+							m_bitmap.pix(y , col) = m_palette->pen(BIT(pixels , 7));
+							m_bitmap.pix(y , col + 1) = m_palette->pen(BIT(pixels , 6));
+							m_bitmap.pix(y , col + 2) = m_palette->pen(BIT(pixels , 5));
+							m_bitmap.pix(y , col + 3) = m_palette->pen(BIT(pixels , 4));
+							m_bitmap.pix(y , col + 4) = m_palette->pen(BIT(pixels , 3));
+							m_bitmap.pix(y , col + 5) = m_palette->pen(BIT(pixels , 2));
+							m_bitmap.pix(y , col + 6) = m_palette->pen(BIT(pixels , 1));
+							m_bitmap.pix(y , col + 7) = m_palette->pen(BIT(pixels , 0));
 						}
 					}
 				}

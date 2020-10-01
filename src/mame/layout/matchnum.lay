@@ -150,8 +150,8 @@ license:CC0
 		<element ref="text_2p"><bounds x="1" y="102.1" width="4" height="2" /></element>
 
 		<element ref="static_black2"><bounds x="1" y="95.6" width="4" height="6" /></element>
-		<element ref="switch1" inputtag="IN.2" inputmask="0x08" inputraw="1"><bounds x="0.8" y="95.4" width="4.4" height="3.4" /></element>
-		<element ref="switch2" inputtag="IN.2" inputmask="0x08" inputraw="1"><bounds x="0.8" y="98.4" width="4.4" height="3.4" /></element>
+		<element ref="switch1" inputtag="IN.2" inputmask="0x08" inputraw="yes"><bounds x="0.8" y="95.4" width="4.4" height="3.4" /></element>
+		<element ref="switch2" inputtag="IN.2" inputmask="0x08" inputraw="yes"><bounds x="0.8" y="98.4" width="4.4" height="3.4" /></element>
 		<repeat count="12">
 			<param name="y" start="95.75" increment="0.5" />
 			<element ref="static_black2"><bounds x="1.01" y="~y~" width="3.98" height="0.2" /></element>

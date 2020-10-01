@@ -1344,24 +1344,24 @@ TIMER_CALLBACK_MEMBER( pet_state::sync_tick )
 
 uint32_t pet_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const pen_t *pen = m_palette->pens();
+	pen_t const *const pen = m_palette->pens();
 
 	for (int y = 0; y < 200; y++)
 	{
 		for (int sx = 0; sx < 40; sx++)
 		{
-			int sy = y / 8;
-			offs_t video_addr = (sy * 40) + sx;
-			uint8_t lsd = m_video_ram[video_addr];
+			int const sy = y / 8;
+			offs_t const video_addr = (sy * 40) + sx;
+			uint8_t const lsd = m_video_ram[video_addr];
 
-			int ra = y & 0x07;
-			offs_t char_addr = (m_graphic << 10) | ((lsd & 0x7f) << 3) | ra;
+			int const ra = y & 0x07;
+			offs_t const char_addr = (m_graphic << 10) | ((lsd & 0x7f) << 3) | ra;
 			uint8_t data = m_char_rom->base()[char_addr];
 
 			for (int x = 0; x < 8; x++, data <<= 1)
 			{
-				int color = (BIT(data, 7) ^ BIT(lsd, 7)) && m_blanktv;
-				bitmap.pix32(y, (sx * 8) + x) = pen[color];
+				int const color = (BIT(data, 7) ^ BIT(lsd, 7)) && m_blanktv;
+				bitmap.pix(y, (sx * 8) + x) = pen[color];
 			}
 		}
 	}
@@ -1403,8 +1403,8 @@ MC6845_UPDATE_ROW( pet80_state::pet80_update_row )
 
 		for (int bit = 0; bit < 8; bit++, data <<= 1)
 		{
-			int video = (!((BIT(data, 7) ^ BIT(lsd, 7)) && no_row) ^ invert) && de;
-			bitmap.pix32(vbp + y, hbp + x++) = pen[video];
+			int const video = (!((BIT(data, 7) ^ BIT(lsd, 7)) && no_row) ^ invert) && de;
+			bitmap.pix(vbp + y, hbp + x++) = pen[video];
 		}
 
 		// odd character
@@ -1416,8 +1416,8 @@ MC6845_UPDATE_ROW( pet80_state::pet80_update_row )
 
 		for (int bit = 0; bit < 8; bit++, data <<= 1)
 		{
-			int video = (!((BIT(data, 7) ^ BIT(lsd, 7)) && no_row) ^ invert) && de;
-			bitmap.pix32(vbp + y, hbp + x++) = pen[video];
+			int const video = (!((BIT(data, 7) ^ BIT(lsd, 7)) && no_row) ^ invert) && de;
+			bitmap.pix(vbp + y, hbp + x++) = pen[video];
 		}
 	}
 }
@@ -1449,8 +1449,8 @@ MC6845_UPDATE_ROW( pet_state::pet40_update_row )
 
 		for (int bit = 0; bit < 8; bit++, data <<= 1)
 		{
-			int video = (!((BIT(data, 7) ^ BIT(lsd, 7)) && no_row) ^ invert) && de;
-			bitmap.pix32(vbp + y, hbp + x++) = pen[video];
+			int const video = (!((BIT(data, 7) ^ BIT(lsd, 7)) && no_row) ^ invert) && de;
+			bitmap.pix(vbp + y, hbp + x++) = pen[video];
 		}
 	}
 }
@@ -1485,8 +1485,8 @@ MC6845_UPDATE_ROW( pet80_state::cbm8296_update_row )
 
 		for (int bit = 0; bit < 8; bit++, data <<= 1)
 		{
-			int video = (((BIT(data, 7) ^ BIT(lsd, 7)) && no_row) && de);
-			bitmap.pix32(vbp + y, hbp + x++) = pen[video];
+			int const video = (((BIT(data, 7) ^ BIT(lsd, 7)) && no_row) && de);
+			bitmap.pix(vbp + y, hbp + x++) = pen[video];
 		}
 
 		// odd character
@@ -1498,8 +1498,8 @@ MC6845_UPDATE_ROW( pet80_state::cbm8296_update_row )
 
 		for (int bit = 0; bit < 8; bit++, data <<= 1)
 		{
-			int video = (((BIT(data, 7) ^ BIT(lsd, 7)) && no_row) && de);
-			bitmap.pix32(vbp + y, hbp + x++) = pen[video];
+			int const video = (((BIT(data, 7) ^ BIT(lsd, 7)) && no_row) && de);
+			bitmap.pix(vbp + y, hbp + x++) = pen[video];
 		}
 	}
 }

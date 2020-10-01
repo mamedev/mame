@@ -118,12 +118,12 @@ void crbaloon_state::draw_sprite_and_check_collision(bitmap_ind16 &bitmap)
 			/* draw the current pixel, but check collision first */
 			if (bit)
 			{
-				if (bitmap.pix16(sy, sx) & 0x01)
+				if (bitmap.pix(sy, sx) & 0x01)
 					/* compute the collision address -- the +1 is via observation
 					   of the game code, probably wrong for cocktail mode */
 					m_collision_address = ((((sy ^ 0xff) >> 3) << 5) | ((sx ^ 0xff) >> 3)) + 1;
 
-				bitmap.pix16(sy, sx) = (color << 1) | 1;
+				bitmap.pix(sy, sx) = (color << 1) | 1;
 			}
 
 			sx = sx + 1;

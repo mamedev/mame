@@ -324,7 +324,7 @@ uint8_t snesb_state::wldgunsb_722262_r()
 {
 	// PC 2e2f6
 	return 0x2b;
-} 
+}
 
 uint8_t snesb_state::wldgunsb_723364_r()
 {
@@ -1412,7 +1412,7 @@ void snesb_state::init_wldgunsb()
 
 	static uint8_t address_tab_high[0x20] = {
 		0x0b, 0x1d, 0x05, 0x15, 0x09, 0x19, 0x04, 0x13, 0x02, 0x1f, 0x07, 0x17, 0x0d, 0x11, 0x0a, 0x1a,
-		0x14, 0x0e, 0x18, 0x06, 0x1e, 0x01, 0x10, 0x0c, 0x1b, 0x0f, 0x16, 0x00, 0x12, 0x08, 0x1c, 0x03 
+		0x14, 0x0e, 0x18, 0x06, 0x1e, 0x01, 0x10, 0x0c, 0x1b, 0x0f, 0x16, 0x00, 0x12, 0x08, 0x1c, 0x03
 	};
 
 	static uint8_t address_tab_low[0x40] = {
@@ -1465,7 +1465,7 @@ void snesb_state::init_wldgunsb()
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770071, 0x770071, read8smo_delegate(*this, FUNC(snesb_state::snesb_dsw1_r)));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770072, 0x770072, read8smo_delegate(*this, FUNC(snesb_state::snesb_dsw2_r)));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770079, 0x770079, read8smo_delegate(*this, FUNC(snesb_state::snesb_coin_r)));
-	
+
 	// protection overlays
 	// counter (PC=0x2dfe7 / 0x2dfee)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7bf45b, 0x7bf45b, read8smo_delegate(*this, FUNC(snesb_state::sb2b_75bd37_r)));
@@ -1627,6 +1627,18 @@ ROM_START( endless )
 	ROM_LOAD( "endlessduel.unknownposition4", 0x180000, 0x80000, CRC(9a9493ad) SHA1(82ee4fce9cc2014cb8404fd43eebb7941cdb9ac1) )
 ROM_END
 
+ROM_START( endlessa )
+	ROM_REGION( 0x200000, "user3", ROMREGION_ERASEFF )
+
+	ROM_REGION(0x800,           "user6", ROMREGION_ERASEFF)
+
+	ROM_REGION( 0x200000, "user7", 0 )
+	ROM_LOAD( "gundam wing endless duel.c23", 0x000000, 0x80000, CRC(e49acd29) SHA1(ac137261fe7a7691738ac812bea9591256eb9038) )
+	ROM_LOAD( "gundam wing endless duel.c20", 0x080000, 0x80000, CRC(cf22a554) SHA1(86a31c83a1d28038c334949e82182c07010ccb3c) )
+	ROM_LOAD( "gundam wing endless duel.c22", 0x100000, 0x80000, CRC(30d06d7a) SHA1(17c617d94abb10c3bdf9d51013b116f4ef4debe8) )
+	ROM_LOAD( "gundam wing endless duel.c21", 0x180000, 0x80000, CRC(0cc430c0) SHA1(fb36359e7e3919244c47a6da43f31dc2a79fcba6) )
+ROM_END
+
 ROM_START( rushbets )
 	ROM_REGION( 0x200000, "user3", ROMREGION_ERASEFF )
 
@@ -1667,7 +1679,8 @@ GAME( 1996, iron,         0,       kinstb,         iron,     snesb_state, init_i
 GAME( 1996, denseib,      0,       kinstb,         denseib,  snesb_state, init_denseib,  ROT0, "bootleg",  "Ghost Chaser Densei (SNES bootleg, set 1)",              MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, denseib2,     denseib, kinstb,         denseib,  snesb_state, init_denseib2, ROT0, "bootleg",  "Ghost Chaser Densei (SNES bootleg, set 2)",              MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, sblast2b,     0,       kinstb,         sblast2b, snesb_state, init_sblast2b, ROT0, "bootleg",  "Sonic Blast Man 2 Special Turbo (SNES bootleg)",         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS)
-GAME( 1996, endless,      0,       kinstb,         endless,  snesb_state, init_endless,  ROT0, "bootleg",  "Gundam Wing: Endless Duel (SNES bootleg)",               MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, endless,      0,       kinstb,         endless,  snesb_state, init_endless,  ROT0, "bootleg",  "Gundam Wing: Endless Duel (SNES bootleg, set 1)",        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, endlessa,     endless, kinstb,         endless,  snesb_state, init_endless,  ROT0, "bootleg",  "Gundam Wing: Endless Duel (SNES bootleg, set 2)",        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, legendsb,     0,       kinstb,         kinstb,   snesb_state, init_legendsb, ROT0, "bootleg",  "Legend (SNES bootleg)",                                  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, rushbets,     0,       kinstb,         rushbets, snesb_state, init_rushbets, ROT0, "bootleg",  "Rushing Beat Shura (SNES bootleg)",                      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, venom,        0,       kinstb,         venom,    snesb_state, init_venom,    ROT0, "bootleg",  "Venom & Spider-Man - Separation Anxiety (SNES bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

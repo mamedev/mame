@@ -43,20 +43,20 @@ void socrates_snd_device::device_start()
 	m_DAC_output = 0x00; /* output */
 	m_state[0] = m_state[1] = m_state[2] = 0;
 	m_accum[0] = m_accum[1] = m_accum[2] = 0xFF;
-	m_stream = stream_alloc_legacy(0, 1, clock() ? clock() : machine().sample_rate());
+	m_stream = stream_alloc(0, 1, clock() ? clock() : machine().sample_rate());
 }
 
 
 //-------------------------------------------------
-//  sound_stream_update_legacy - handle a stream update
+//  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void socrates_snd_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void socrates_snd_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	for (int i = 0; i < samples; i++)
+	for (int i = 0; i < outputs[0].samples(); i++)
 	{
 		snd_clock();
-		outputs[0][i] = ((int)m_DAC_output<<4);
+		outputs[0].put_int(i, (int)m_DAC_output, 32768 >> 4);
 	}
 }
 

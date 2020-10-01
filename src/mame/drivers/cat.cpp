@@ -960,10 +960,10 @@ uint32_t cat_state::screen_update_cat(screen_device &screen, bitmap_rgb32 &bitma
 			int horpos = 0;
 			for (int x = 0; x < 42; x++)
 			{
-				uint16_t code = m_p_cat_videoram[addr++];
+				const uint16_t code = m_p_cat_videoram[addr++];
 				for (int b = 15; b >= 0; b--)
 				{
-					bitmap.pix32(y, horpos++) = BIT(code, b) ? on_color : off_color;
+					bitmap.pix(y, horpos++) = BIT(code, b) ? on_color : off_color;
 				}
 			}
 		}

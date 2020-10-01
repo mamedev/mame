@@ -106,8 +106,8 @@ uint32_t xmen_state::screen_update_xmen6p_left(screen_device &screen, bitmap_ind
 {
 	for(int y = 0; y < 32 * 8; y++)
 	{
-		uint16_t* line_dest = &bitmap.pix16(y);
-		uint16_t* line_src = &m_screen_left->pix16(y);
+		uint16_t *const line_dest = &bitmap.pix(y);
+		uint16_t const *const line_src = &m_screen_left->pix(y);
 
 		for (int x = 12 * 8; x < 52 * 8; x++)
 			line_dest[x] = line_src[x];
@@ -120,8 +120,8 @@ uint32_t xmen_state::screen_update_xmen6p_right(screen_device &screen, bitmap_in
 {
 	for(int y = 0; y < 32 * 8; y++)
 	{
-		uint16_t* line_dest = &bitmap.pix16(y);
-		uint16_t* line_src = &m_screen_right->pix16(y);
+		uint16_t *const line_dest = &bitmap.pix(y);
+		uint16_t const *const line_src = &m_screen_right->pix(y);
 
 		for (int x = 12 * 8; x < 52 * 8; x++)
 			line_dest[x] = line_src[x];

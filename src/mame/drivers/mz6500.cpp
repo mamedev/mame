@@ -50,19 +50,14 @@ private:
 
 UPD7220_DISPLAY_PIXELS_MEMBER( mz6500_state::hgdc_display_pixels )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	int gfx[3];
-	u8 i,pen;
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	int const gfx[3] = { m_vram[(address + 0x00000) >> 1], m_vram[(address + 0x10000) >> 1], m_vram[(address + 0x20000) >> 1] };
 
-	gfx[0] = m_vram[(address + 0x00000) >> 1];
-	gfx[1] = m_vram[(address + 0x10000) >> 1];
-	gfx[2] = m_vram[(address + 0x20000) >> 1];
-
-	for(i=0; i<16; i++)
+	for(u8 i=0; i<16; i++)
 	{
-		pen = (BIT(gfx[0], i)) | (BIT(gfx[1], i) << 1) | (BIT(gfx[2], i) << 2);
+		u8 pen = (BIT(gfx[0], i)) | (BIT(gfx[1], i) << 1) | (BIT(gfx[2], i) << 2);
 
-		bitmap.pix32(y, x + i) = palette[pen];
+		bitmap.pix(y, x + i) = palette[pen];
 	}
 }
 

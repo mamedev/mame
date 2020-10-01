@@ -227,12 +227,11 @@ static INPUT_PORTS_START( meritum )
 INPUT_PORTS_END
 
 u32 meritum_state::screen_update_meritum1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-/* lores characters are in the character generator. Each character is 6x12 (basic characters are 6x7 excluding descenders/ascenders). */
 {
-	u8 y,ra,chr,gfx;
-	u16 sy=0,ma=0,x;
-	u8 cols = m_mode ? 32 : 64;
-	u8 skip = m_mode ? 2 : 1;
+	// lores characters are in the character generator. Each character is 6x12 (basic characters are 6x7 excluding descenders/ascenders).
+	u16 sy=0,ma=0;
+	const u8 cols = m_mode ? 32 : 64;
+	const u8 skip = m_mode ? 2 : 1;
 
 	if (m_mode != m_size_store)
 	{
@@ -240,28 +239,28 @@ u32 meritum_state::screen_update_meritum1(screen_device &screen, bitmap_ind16 &b
 		screen.set_visible_area(0, cols*6-1, 0, 16*12-1);
 	}
 
-	for (y = 0; y < 16; y++)
+	for (u8 y = 0; y < 16; y++)
 	{
-		for (ra = 0; ra < 12; ra++)
+		for (u8 ra = 0; ra < 12; ra++)
 		{
-			u16 *p = &bitmap.pix16(sy++);
+			u16 *p = &bitmap.pix(sy++);
 
-			for (x = ma; x < ma + 64; x+=skip)
+			for (u16 x = ma; x < ma + 64; x+=skip)
 			{
-				chr = m_p_videoram[x] & 0xbf;
+				const u8 chr = m_p_videoram[x] & 0xbf;
+				u8 gfx;
 
 				// shift down comma and semicolon
 				// not sure Meritum I got the circuit for this (like TRS80)
 				// but position of ';' suggests most likely yes
 				if ((chr == 0x2c) && (ra >= 2))
 					gfx = m_p_chargen[0x2be + ra];
-				else
-				if ((chr == 0x3b) && (ra >= 1))
+				else if ((chr == 0x3b) && (ra >= 1))
 					gfx = m_p_chargen[0x3af + ra];
 				else
 					gfx = m_p_chargen[(chr<<4) | ra];
 
-				/* Display a scanline of a character (6 pixels) */
+				// Display a scanline of a character (6 pixels)
 				*p++ = BIT(gfx, 5);
 				*p++ = BIT(gfx, 4);
 				*p++ = BIT(gfx, 3);
@@ -277,10 +276,9 @@ u32 meritum_state::screen_update_meritum1(screen_device &screen, bitmap_ind16 &b
 
 u32 meritum_state::screen_update_meritum2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	u8 y,ra,chr,gfx;
-	u16 sy=0,ma=0,x;
-	u8 cols = m_mode ? 32 : 64;
-	u8 skip = m_mode ? 2 : 1;
+	u16 sy=0,ma=0;
+	const u8 cols = m_mode ? 32 : 64;
+	const u8 skip = m_mode ? 2 : 1;
 
 	if (m_mode != m_size_store)
 	{
@@ -288,20 +286,20 @@ u32 meritum_state::screen_update_meritum2(screen_device &screen, bitmap_ind16 &b
 		screen.set_visible_area(0, cols*6-1, 0, 16*12-1);
 	}
 
-	for (y = 0; y < 16; y++)
+	for (u8 y = 0; y < 16; y++)
 	{
-		for (ra = 0; ra < 12; ra++)
+		for (u8 ra = 0; ra < 12; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			u16 *p = &bitmap.pix(sy++);
 
-			for (x = ma; x < ma + 64; x+=skip)
+			for (u16 x = ma; x < ma + 64; x+=skip)
 			{
-				chr = m_p_videoram[x];
+				const u8 chr = m_p_videoram[x];
 
-				/* get pattern of pixels for that character scanline */
-				gfx = m_p_chargen[(chr<<4) | ra];
+				// get pattern of pixels for that character scanline
+				const u8 gfx = m_p_chargen[(chr<<4) | ra];
 
-				/* Display a scanline of a character (6 pixels) */
+				// Display a scanline of a character (6 pixels)
 				*p++ = BIT(gfx, 5);
 				*p++ = BIT(gfx, 4);
 				*p++ = BIT(gfx, 3);
@@ -343,7 +341,7 @@ void meritum_state::port_ff_w(u8 data)
     d1, d0 Cassette output */
 
 	static const double levels[4] = { 0.0, 1.0, -1.0, 0.0 };
-	static bool init = 0;
+	static bool init = 0; // FIXME: static variable, breaks hard reset and multiple runs from system selection menu
 
 	m_cassette->change_state(BIT(data, 2) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
 	m_cassette->output(levels[data & 3]);
@@ -354,7 +352,7 @@ void meritum_state::port_ff_w(u8 data)
 	if (!init)
 	{
 		init = 1;
-		static int16_t speaker_levels[4] = { 0, -32767, 0, 32767 };
+		static double const speaker_levels[4] = { 0.0, -1.0, 0.0, 1.0 };
 		m_speaker->set_levels(4, speaker_levels);
 	}
 }

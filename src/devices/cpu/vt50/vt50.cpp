@@ -284,7 +284,7 @@ void vt5x_cpu_device::draw_char_line()
 	if (xc > screen().visible_area().right() - 8)
 		return;
 
-	u32 *pix = &m_bitmap.pix32(m_current_line, xc);
+	u32 *pix = &m_bitmap.pix(m_current_line, xc);
 	if (m_video_process && m_cursor_ff && m_cursor_active)
 		std::fill_n(pix, 9, rgb_t::white());
 	else if (!m_video_process || m_cursor_ff)

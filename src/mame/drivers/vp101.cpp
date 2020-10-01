@@ -275,7 +275,7 @@ uint32_t vp10x_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 {
 	for (int y = 0; y < 240; y++)
 	{
-		uint32_t *line = &bitmap.pix32(y);
+		uint32_t *line = &bitmap.pix(y);
 		const uint32_t *video_ram = (const uint32_t *) &m_mainram[(m_fb_base/4) + (y * (0x1000/4)) + 4];
 
 		for (int x = 0; x < 320; x++)
@@ -306,7 +306,7 @@ uint32_t vp10x_state::vp50_screen_update(screen_device &screen, bitmap_rgb32 &bi
 
 	for (int y = 0; y < 240; y++)
 	{
-		uint32_t *line = &bitmap.pix32(y);
+		uint32_t *line = &bitmap.pix(y);
 		const uint8_t *video_ram = (const uint8_t *) &m_mainram[(0x10000/4)+(y * 100)];
 
 		for (int x = 0; x < 400; x++)

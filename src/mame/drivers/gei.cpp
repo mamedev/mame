@@ -235,7 +235,7 @@ void gei_state::gei_bitmap_w(offs_t offset, uint8_t data)
 	sy = (sy + m_yadd) & 0xff;
 
 	for (int i = 0; i < 8; i++)
-		m_bitmap.pix16(sy, sx + i) = m_color[8 - i - 1];
+		m_bitmap.pix(sy, sx + i) = m_color[8 - i - 1];
 }
 
 void gei_state::video_start()

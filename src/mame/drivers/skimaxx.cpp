@@ -224,9 +224,9 @@ TMS340X0_SCANLINE_IND16_CB_MEMBER(skimaxx_state::scanline_update)
 	if (params->rowaddr >= 0x220)
 	{
 		u32 const rowaddr = (params->rowaddr - 0x220);
-		u16 *fg = &m_fg_buffer[rowaddr << 8];
-		u32 *bg = &m_bg_buffer_front[rowaddr/2 * 1024/2];
-		u16 *dest = &bitmap.pix16(scanline);
+		u16 const *fg = &m_fg_buffer[rowaddr << 8];
+		u32 const *bg = &m_bg_buffer_front[rowaddr/2 * 1024/2];
+		u16 *dest = &bitmap.pix(scanline);
 		//int coladdr = params->coladdr;
 		//coladdr = 0;
 

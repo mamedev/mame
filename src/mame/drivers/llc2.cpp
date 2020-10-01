@@ -166,30 +166,29 @@ void llc2_state::machine_start()
 
 u32 llc2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	u8 y,ra,chr,gfx,inv, inv1=m_rv ? 0xff : 0;
-	u16 sy=0,ma=0,x;
+	u8 const inv1 = m_rv ? 0xff : 0;
+	u16 sy = 0, ma = 0;
 
-	for (y = 0; y < 32; y++)
+	for (u8 y = 0; y < 32; y++)
 	{
-		for (ra = 0; ra < 8; ra++)
+		for (u8 ra = 0; ra < 8; ra++)
 		{
-			inv = 0;
-			u16 *p = &bitmap.pix16(sy++);
+			u8 inv = 0;
+			u16 *p = &bitmap.pix(sy++);
 
-			for (x = ma; x < ma + 64; x++)
+			for (u16 x = ma; x < ma + 64; x++)
 			{
-				chr = m_vram[x];
+				u8 chr = m_vram[x];
 				if (chr==0x11) // inverse on
 				{
 					inv=0xff;
 					chr=0x0f; // must not show
 				}
-				else
-				if (chr==0x10) // inverse off
+				else if (chr==0x10) // inverse off
 					inv=0;
 
 				/* get pattern of pixels for that character scanline */
-				gfx = m_p_chargen[ (chr << 3) | ra ] ^ inv ^ inv1;
+				u8 const gfx = m_p_chargen[ (chr << 3) | ra ] ^ inv ^ inv1;
 
 				/* Display a scanline of a character (8 pixels) */
 				*p++ = BIT(gfx, 7);

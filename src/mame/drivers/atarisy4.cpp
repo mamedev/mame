@@ -231,7 +231,6 @@ void atarisy4_state::video_reset()
 
 uint32_t atarisy4_state::screen_update_atarisy4(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int y;
 	uint32_t offset = 0;
 
 	if (m_gpu.bcrw & 0x80)
@@ -245,15 +244,14 @@ uint32_t atarisy4_state::screen_update_atarisy4(screen_device &screen, bitmap_rg
 
 	//uint32_t offset = m_gpu.dpr << 5;
 
-	for (y = cliprect.top(); y <= cliprect.bottom(); ++y)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); ++y)
 	{
-		uint16_t *src = &m_screen_ram[(offset + (4096 * y)) / 2];
-		uint32_t *dest = &bitmap.pix32(y, cliprect.left());
-		int x;
+		uint16_t const *src = &m_screen_ram[(offset + (4096 * y)) / 2];
+		uint32_t *dest = &bitmap.pix(y, cliprect.left());
 
-		for (x = cliprect.left(); x < cliprect.right(); x += 2)
+		for (int x = cliprect.left(); x < cliprect.right(); x += 2)
 		{
-			uint16_t data = *src++;
+			uint16_t const data = *src++;
 
 			*dest++ = m_palette->pen(data & 0xff);
 			*dest++ = m_palette->pen(data >> 8);

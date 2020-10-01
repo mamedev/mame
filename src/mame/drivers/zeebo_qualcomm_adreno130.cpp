@@ -22,7 +22,7 @@ System was launched in 2009, but discontinued shortly after.
 
 Games were downloaded to NAND, but once the online store was closed the games could
 no longer be downloaded, leaving no way to get them back onto the system after
-after a factory restore or similar.
+doing a factory restore or similar.
 
 ----
 
@@ -120,7 +120,7 @@ uint32_t zeebo_game_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 
 void zeebo_game_state::zeebo(machine_config &config)
 {
-	ARM11(config, m_maincpu, 528000000); // 528 MHz ARM11 based SoC 
+	ARM11(config, m_maincpu, 528000000); // 528 MHz ARM11 based SoC
 	m_maincpu->set_addrmap(AS_PROGRAM, &zeebo_game_state::zeebo_arm11_map);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

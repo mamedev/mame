@@ -384,16 +384,15 @@ GFXDECODE_END
 
 MC6845_UPDATE_ROW( amust_state::crtc_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	u8 chr,gfx,inv;
-	u16 mem,x;
-	u32 *p = &bitmap.pix32(y);
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	u32 *p = &bitmap.pix(y);
 
-	for (x = 0; x < x_count; x++)
+	for (u16 x = 0; x < x_count; x++)
 	{
-		inv = (x == cursor_x) ? 0xff : 0;
-		mem = (ma + x) & 0x7ff;
-		chr = m_vram[mem];
+		u8 inv = (x == cursor_x) ? 0xff : 0;
+		u16 mem = (ma + x) & 0x7ff;
+		u8 chr = m_vram[mem];
+		u8 gfx;
 		if (ra < 8)
 			gfx = m_p_chargen[(chr<<3) | ra] ^ inv;
 		else

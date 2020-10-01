@@ -448,7 +448,6 @@ void smsmfg_state::video_w(offs_t offset, uint8_t data)
 	m_vid_regs[offset] = data;
 	if ( offset == 5 )
 	{
-		int x,y;
 		int xstart = m_vid_regs[0] + m_vid_regs[1]*256;
 		int width = m_vid_regs[2];
 		int ystart = m_vid_regs[3];
@@ -461,12 +460,12 @@ void smsmfg_state::video_w(offs_t offset, uint8_t data)
 		if ( width == 0 )
 			width = 256;
 
-		for ( y = ystart; y < ystart + height; y++ )
+		for ( int y = ystart; y < ystart + height; y++ )
 		{
-			for ( x = xstart; x < xstart + width; x++ )
+			for ( int x = xstart; x < xstart + width; x++ )
 			{
 				if ( y < 256 )
-				m_bitmap.pix16(y, x) = color;
+				m_bitmap.pix(y, x) = color;
 			}
 		}
 	}

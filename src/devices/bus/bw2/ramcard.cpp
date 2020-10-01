@@ -90,15 +90,17 @@ void bw2_ramcard_device::device_reset()
 
 uint8_t bw2_ramcard_device::bw2_cd_r(offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6)
 {
-	if (!ram2)
+	if (offset < 0x8000)
 	{
-		data = m_rom->base()[offset & 0x3fff];
+		if (!ram2)
+		{
+			data = m_rom->base()[offset & 0x3fff];
+		}
+		else if (m_en && !ram5)
+		{
+			data = m_ram[(m_bank << 15) | offset];
+		}
 	}
-	else if (m_en && !ram5)
-	{
-		data = m_ram[(m_bank << 15) | offset];
-	}
-
 	return data;
 }
 
@@ -109,9 +111,12 @@ uint8_t bw2_ramcard_device::bw2_cd_r(offs_t offset, uint8_t data, int ram2, int 
 
 void bw2_ramcard_device::bw2_cd_w(offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6)
 {
-	if (m_en && !ram5)
+	if (offset < 0x8000)
 	{
-		m_ram[(m_bank << 15) | offset] = data;
+		if (m_en && !ram5)
+		{
+			m_ram[(m_bank << 15) | offset] = data;
+		}
 	}
 }
 

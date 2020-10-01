@@ -54,8 +54,8 @@ protected:
 	void sh6840_register_state_globals();
 
 	// sound stream update overrides
-	virtual void sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples) override;
-	virtual stream_sample_t generate_music_sample();
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual s32 generate_music_sample();
 
 	static inline void sh6840_apply_clock(sh6840_timer_channel *t, int clocks);
 
@@ -102,7 +102,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual stream_sample_t generate_music_sample() override;
+	virtual s32 generate_music_sample() override;
 
 	void r6532_porta_w(uint8_t data);
 	uint8_t r6532_porta_r();

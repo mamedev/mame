@@ -34,33 +34,20 @@
 
     TODO:
 
-    - segment/page RAM addresses are not correctly decoded, "sas/format/format" after abcenix is booted can't find the SASI interface because of this
-        [:mac] ':3f' (08A98) MAC 7e4a2:0004a2 (SEGA 02f SEGD 09 PGA 09c PGD 8000 NONX 1 WP 0)
-            should be
-        [:mac] ':3f' (089A8) MAC 7e4a2:1fe4a2 (SEGA 00f SEGD 0f PGA 0fc PGD 43fc NONX 0 WP 1)
+    - sas/format/format in abcenix tries to access the SASI card using a memory location mapped for task 0, when the process is run as task 1
 
-        [:mac] ':3f' (100082) SEGMENT 80eeb:27 (SEGA 000 SEGD 27)
-        [:mac] ':3f' (100084) PAGE 80ee8:02 (SEGA 000 SEGD 27 PGA 271 PGD 0283)
-        [:mac] ':3f' (100084) PAGE 80ee9:83 (SEGA 000 SEGD 27 PGA 271 PGD 0283)
-        [:mac] ':3f' (100082) SEGMENT 806eb:27 (SEGA 000 SEGD 27)
-        [:mac] ':3f' (100084) PAGE 806e8:02 (SEGA 000 SEGD 27 PGA 270 PGD 0282)
-        [:mac] ':3f' (100084) PAGE 806e9:82 (SEGA 000 SEGD 27 PGA 270 PGD 0282)
-        [:mac] ':3f' (100082) MAC 7feea:1b8eea (SEGA 00f SEGD 36 PGA 36f PGD 0371 NONX 0 WP 0)
-        [:mac] ':3f' (100082): unmapped program memory write to 1B8EEA = 00 & FF
-        [:mac] ':3f' (100082) MAC 7feeb:1b8eeb (SEGA 00f SEGD 36 PGA 36f PGD 0371 NONX 0 WP 0)
-        [:mac] ':3f' (100082): unmapped program memory write to 1B8EEB = 27 & FF
-        [:mac] ':3f' (100084) MAC 7fee8:1b8ee8 (SEGA 00f SEGD 36 PGA 36f PGD 0371 NONX 0 WP 0)
-        [:mac] ':3f' (100084): unmapped program memory write to 1B8EE8 = 02 & FF
-        [:mac] ':3f' (100084) MAC 7fee9:1b8ee9 (SEGA 00f SEGD 36 PGA 36f PGD 0371 NONX 0 WP 0)
-        [:mac] ':3f' (100084): unmapped program memory write to 1B8EE9 = 81 & FF
-        [:mac] ':3f' (100082) MAC 7f6ea:1b86ea (SEGA 00f SEGD 36 PGA 36e PGD 0370 NONX 0 WP 0)
-        [:mac] ':3f' (100082): unmapped program memory write to 1B86EA = 00 & FF
-        [:mac] ':3f' (100082) MAC 7f6eb:1b86eb (SEGA 00f SEGD 36 PGA 36e PGD 0370 NONX 0 WP 0)
-        [:mac] ':3f' (100082): unmapped program memory write to 1B86EB = 27 & FF
-        [:mac] ':3f' (100084) MAC 7f6e8:1b86e8 (SEGA 00f SEGD 36 PGA 36e PGD 0370 NONX 0 WP 0)
-        [:mac] ':3f' (100084): unmapped program memory write to 1B86E8 = 02 & FF
-        [:mac] ':3f' (100084) MAC 7f6e9:1b86e9 (SEGA 00f SEGD 36 PGA 36e PGD 0370 NONX 0 WP 0)
-        [:mac] ':3f' (100084): unmapped program memory write to 1B86E9 = 80 & FF
+        [:mac] ':3f' (0009E) ff800:4f TASK 0 SEGMENT 15 PAGE 15 MEM 7f800-7ffff 1ff800
+        [:mac] ':3f' (0009E) ff801:ff TASK 0 SEGMENT 15 PAGE 15 MEM 7f800-7ffff 1ff800
+        [:mac] ':3f' (0009E) ff000:4f TASK 0 SEGMENT 15 PAGE 14 MEM 7f000-7f7ff 1ff000
+        [:mac] ':3f' (0009E) ff001:fe TASK 0 SEGMENT 15 PAGE 14 MEM 7f000-7f7ff 1ff000
+        [:mac] ':3f' (0009E) fe800:4f TASK 0 SEGMENT 15 PAGE 13 MEM 7e800-7efff 1fe800
+        [:mac] ':3f' (0009E) fe801:fd TASK 0 SEGMENT 15 PAGE 13 MEM 7e800-7efff 1fe800
+        [:mac] ':3f' (0009E) fe000:4f TASK 0 SEGMENT 15 PAGE 12 MEM 7e000-7e7ff 1fe000
+        [:mac] ':3f' (0009E) fe001:fc TASK 0 SEGMENT 15 PAGE 12 MEM 7e000-7e7ff 1fe000
+
+        [:mac] ':3f' (08A98) MAC 7e4a2:0004a2 (SEGA 02f SEGD 09 PGA 09c PGD 8000 NONX 1 WP 0 TASK 1 FC 1)
+        should be
+        [:mac] ':3f' (089A8) MAC 7e4a2:1fe4a2 (SEGA 00f SEGD 0f PGA 0fc PGD 43fc NONX 0 WP 1 TASK 0 FC 5)
 
     - short/long reset (RSTBUT)
     - CIO

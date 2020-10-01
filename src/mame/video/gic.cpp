@@ -118,7 +118,7 @@ void gic_device::device_start()
 	m_vblank_timer->adjust( screen().time_until_pos(1, END_ACTIVE_SCAN + 18 ), 0, screen().scan_period() );
 
 	// allocate the audio stream
-	m_stream = stream_alloc_legacy( 0, 1, clock()/(2*228) );
+	m_stream = stream_alloc( 0, 1, clock()/(2*228) );
 
 	m_ram.resolve_safe(0xff);
 }
@@ -147,7 +147,7 @@ void gic_device::draw_char_left(int startx, int starty, uint8_t code, bitmap_ind
 		uint8_t curry= starty+y;
 		for(uint8_t x=0x20;x!=0;x=x/2){
 			if (current&x)
-				m_bitmap.pix16(curry,startx+nextx) = GIC_WHITE;
+				m_bitmap.pix(curry,startx+nextx) = GIC_WHITE;
 			nextx++;
 		}
 	}
@@ -161,15 +161,15 @@ void gic_device::draw_char_right(int startx, int starty, uint8_t code, bitmap_in
 		uint8_t nextx=0;
 		uint8_t curry= starty+y;
 
-		m_bitmap.pix16(curry,startx+nextx) = bg_col;
+		m_bitmap.pix(curry,startx+nextx) = bg_col;
 		nextx++;
 		for(uint8_t x=0x20;x!=0;x=x/2){
-			m_bitmap.pix16(curry,startx+nextx) = (current&x)?GIC_WHITE:bg_col;
+			m_bitmap.pix(curry,startx+nextx) = (current&x)?GIC_WHITE:bg_col;
 			nextx++;
 		}
-		m_bitmap.pix16(curry,startx+nextx) = bg_col;
+		m_bitmap.pix(curry,startx+nextx) = bg_col;
 		nextx++;
-		m_bitmap.pix16(curry,startx+nextx) = bg_col;
+		m_bitmap.pix(curry,startx+nextx) = bg_col;
 	}
 }
 
@@ -252,9 +252,9 @@ void gic_device::device_timer(emu_timer &timer, device_timer_id id, int param, v
 
 #define GIC_AUDIO_BYTE 0x96
 
-void gic_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void gic_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *buffer = outputs[0];
+	auto &buffer = outputs[0];
 
 	//Audio is basic and badly implemented (doubt that was the intent)
 	//The datasheet lists the 3 different frequencies the GIC can generate: 500,1000 and 2000Hz
@@ -298,8 +298,7 @@ void gic_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_
 	uint8_t audioByte = m_ram(GIC_AUDIO_BYTE)*2;
 
 	if(!audioByte){
-		for(size_t i = 0; i < samples; i++)
-			*buffer++ = 0;
+		buffer.fill(0);
 
 		m_audioval   = 0;
 		m_audiocnt   = 0;
@@ -314,12 +313,12 @@ void gic_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_
 		m_audioreset = 0;
 	}
 
-	for(size_t i=0; i < samples; i++){
+	for(size_t i=0; i < buffer.samples(); i++){
 		m_audiocnt++;
 		if(m_audiocnt >= audioByte){
 			m_audioval = !m_audioval;
 			m_audiocnt=0;
 		}
-		*buffer++ = m_audioval<<13;
+		buffer.put(i, m_audioval ? 1.0 : 0.0);
 	}
 }

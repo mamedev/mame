@@ -483,7 +483,7 @@ void render_texture::get_scaled(u32 dwidth, u32 dheight, render_texinfo &texinfo
 
 		// finally fill out the new info
 		primlist.add_reference(scaled->bitmap);
-		texinfo.base = &scaled->bitmap->pix32(0);
+		texinfo.base = &scaled->bitmap->pix(0);
 		texinfo.rowpixels = scaled->bitmap->rowpixels();
 		texinfo.width = dwidth;
 		texinfo.height = dheight;
@@ -718,8 +718,8 @@ void render_container::overlay_scale(bitmap_argb32 &dest, bitmap_argb32 &source,
 	// simply replicate the source bitmap over the target
 	for (int y = 0; y < dest.height(); y++)
 	{
-		u32 *src = &source.pix32(y % source.height());
-		u32 *dst = &dest.pix32(y);
+		u32 const *const src = &source.pix(y % source.height());
+		u32 *dst = &dest.pix(y);
 		int sx = 0;
 
 		// loop over columns
@@ -2511,15 +2511,13 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 
 void render_target::add_element_primitives(render_primitive_list &list, const object_transform &xform, layout_element &element, int state, int blendmode)
 {
-	// if we're out of range, bail
-	if (state > element.maxstate())
-		return;
+	// limit state range to non-negative values
 	if (state < 0)
 		state = 0;
 
 	// get a pointer to the relevant texture
 	render_texture *texture = element.state_texture(state);
-	if (texture != nullptr)
+	if (texture)
 	{
 		render_primitive *prim = list.alloc(render_primitive::QUAD);
 

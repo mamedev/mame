@@ -52,12 +52,12 @@ void namcos22_renderer::renderscanline_uvi_full(int32_t scanline, const extent_t
 	int penmask = 0xff;
 	int penshift = 0;
 	int prioverchar = extra.prioverchar;
-	u32 *dest = &extra.destbase->pix32(scanline);
-	u8 *primap = &extra.primap->pix8(scanline);
-	u16 *ttmap = m_state.m_texture_tilemap;
-	u8 *ttattr = m_state.m_texture_tileattr.get();
-	u8 *ttdata = m_state.m_texture_tiledata;
-	u8 *tt_ayx_to_pixel = m_state.m_texture_ayx_to_pixel.get();
+	u32 *const dest = &extra.destbase->pix(scanline);
+	u8 *const primap = &extra.primap->pix(scanline);
+	u16 *const ttmap = m_state.m_texture_tilemap;
+	u8 *const ttattr = m_state.m_texture_tileattr.get();
+	u8 *const ttdata = m_state.m_texture_tiledata;
+	u8 *const tt_ayx_to_pixel = m_state.m_texture_ayx_to_pixel.get();
 
 	if (extra.cmode & 4)
 	{
@@ -194,9 +194,9 @@ void namcos22_renderer::renderscanline_sprite(int32_t scanline, const extent_t &
 	int fadefactor = 0xff - extra.fadefactor;
 	rgbaint_t fogcolor(extra.fogcolor);
 	rgbaint_t fadecolor(extra.fadecolor);
-	u8 *source = (u8 *)extra.source + y_index * extra.line_modulo;
-	u32 *dest = &extra.destbase->pix32(scanline);
-	u8 *primap = &extra.primap->pix8(scanline);
+	u8 *const source = (u8 *)extra.source + y_index * extra.line_modulo;
+	u32 *const dest = &extra.destbase->pix(scanline);
+	u8 *const primap = &extra.primap->pix(scanline);
 
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
@@ -1946,9 +1946,9 @@ void namcos22s_state::namcos22s_mix_text_layer(screen_device &screen, bitmap_rgb
 	// mix textlayer with poly/sprites
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		u16 *src = &m_mix_bitmap->pix16(y);
-		u32 *dest = &bitmap.pix32(y);
-		u8 *pri = &screen.priority().pix8(y);
+		u16 const *const src = &m_mix_bitmap->pix(y);
+		u32 *const dest = &bitmap.pix(y);
+		u8 const *const pri = &screen.priority().pix(y);
 		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			// skip if transparent or under poly/sprite
@@ -2019,9 +2019,9 @@ void namcos22_state::namcos22_mix_text_layer(screen_device &screen, bitmap_rgb32
 	// mix textlayer with polys + do final mix
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		u16 *src = &m_mix_bitmap->pix16(y);
-		u32 *dest = &bitmap.pix32(y);
-		u8 *pri = &screen.priority().pix8(y);
+		u16 const *const src = &m_mix_bitmap->pix(y);
+		u32 *const dest = &bitmap.pix(y);
+		u8 const *const pri = &screen.priority().pix(y);
 		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			u32 pixel = dest[x];
@@ -2404,7 +2404,7 @@ u32 namcos22s_state::screen_update_namcos22s(screen_device &screen, bitmap_rgb32
 	const u8 *blut = (const u8 *)&m_mixer[0x300/4];
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		u32 *dest = &bitmap.pix32(y);
+		u32 *const dest = &bitmap.pix(y);
 		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			int rgb = dest[x];

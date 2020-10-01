@@ -24,6 +24,7 @@ acrnsys.cpp
 acrnsys1.cpp
 actions_atj2279b.cpp
 acvirus.cpp
+adacp150.cpp
 adam.cpp
 adm11.cpp
 adm23.cpp
@@ -154,6 +155,7 @@ cd100.cpp
 cd2650.cpp
 cdc721.cpp
 cdsys5.cpp
+ceres.cpp
 cfx9850.cpp
 cgc7900.cpp
 cgenie.cpp
@@ -422,7 +424,7 @@ indigo.cpp
 indy_indigo2.cpp
 informer_207_100.cpp
 informer_207_376.cpp
-informer_213ae.cpp
+informer_213.cpp
 instruct.cpp
 inteladv.cpp
 intellec4.cpp
@@ -803,6 +805,7 @@ rmnimbus.cpp
 roland_cm32p.cpp
 roland_d10.cpp
 roland_d50.cpp
+roland_jd800.cpp
 roland_jv80.cpp
 roland_jx3p.cpp
 roland_jx8p.cpp

@@ -97,14 +97,14 @@ void nexus3d_state::video_start()
 
 uint32_t nexus3d_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint16_t *fbram = reinterpret_cast<uint16_t *>(m_fbram.target());
-	const int width = 640;
+	uint16_t const *const fbram = reinterpret_cast<uint16_t *>(m_fbram.target());
+	int const width = 640;
 
-	uint16_t *visible = fbram + (m_screen->frame_number() & 1) * (0x96000/2);
+	uint16_t const *const visible = fbram + (m_screen->frame_number() & 1) * (0x96000/2);
 
 	uint32_t const dx = cliprect.left();
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
-		std::copy_n(&visible[(y * width) + dx], width, &bitmap.pix16(y, dx));
+		std::copy_n(&visible[(y * width) + dx], width, &bitmap.pix(y, dx));
 
 	return 0;
 }

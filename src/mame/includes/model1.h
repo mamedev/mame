@@ -64,13 +64,13 @@ public:
 
 	struct spoint_t
 	{
-		int32_t x, y;
+		int32_t x = 0, y = 0;
 	};
 
 	struct point_t
 	{
-		float x, y, z;
-		float xx, yy;
+		float x = 0, y = 0, z = 0;
+		float xx = 0, yy = 0;
 		spoint_t s;
 	};
 

@@ -147,21 +147,21 @@ void bmcpokr_state::pixram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pixram[offset]);
 
-	int x = (offset & 0xff) << 2;
-	int y = (offset >> 8);
+	int const x = (offset & 0xff) << 2;
+	int const y = (offset >> 8);
 
-	uint16_t pixpal = (m_pixpal & 0xf) << 4;
+	uint16_t const pixpal = (m_pixpal & 0xf) << 4;
 
 	uint16_t pen;
 	if (ACCESSING_BITS_8_15)
 	{
-		pen = (data >> 12) & 0xf; m_pixbitmap->pix16(y, x + 0) = pen ? pixpal + pen : 0;
-		pen = (data >>  8) & 0xf; m_pixbitmap->pix16(y, x + 1) = pen ? pixpal + pen : 0;
+		pen = (data >> 12) & 0xf; m_pixbitmap->pix(y, x + 0) = pen ? pixpal + pen : 0;
+		pen = (data >>  8) & 0xf; m_pixbitmap->pix(y, x + 1) = pen ? pixpal + pen : 0;
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		pen = (data >>  4) & 0xf; m_pixbitmap->pix16(y, x + 2) = pen ? pixpal + pen : 0;
-		pen = (data >>  0) & 0xf; m_pixbitmap->pix16(y, x + 3) = pen ? pixpal + pen : 0;
+		pen = (data >>  4) & 0xf; m_pixbitmap->pix(y, x + 2) = pen ? pixpal + pen : 0;
+		pen = (data >>  0) & 0xf; m_pixbitmap->pix(y, x + 3) = pen ? pixpal + pen : 0;
 	}
 }
 
@@ -173,12 +173,12 @@ void bmcpokr_state::pixbitmap_redraw()
 	{
 		for (int x = 0; x < 1024; x += 4)
 		{
-			uint16_t data = m_pixram[offset++];
+			uint16_t const data = m_pixram[offset++];
 			uint16_t pen;
-			pen = (data >> 12) & 0xf; m_pixbitmap->pix16(y, x + 0) = pen ? pixpal + pen : 0;
-			pen = (data >>  8) & 0xf; m_pixbitmap->pix16(y, x + 1) = pen ? pixpal + pen : 0;
-			pen = (data >>  4) & 0xf; m_pixbitmap->pix16(y, x + 2) = pen ? pixpal + pen : 0;
-			pen = (data >>  0) & 0xf; m_pixbitmap->pix16(y, x + 3) = pen ? pixpal + pen : 0;
+			pen = (data >> 12) & 0xf; m_pixbitmap->pix(y, x + 0) = pen ? pixpal + pen : 0;
+			pen = (data >>  8) & 0xf; m_pixbitmap->pix(y, x + 1) = pen ? pixpal + pen : 0;
+			pen = (data >>  4) & 0xf; m_pixbitmap->pix(y, x + 2) = pen ? pixpal + pen : 0;
+			pen = (data >>  0) & 0xf; m_pixbitmap->pix(y, x + 3) = pen ? pixpal + pen : 0;
 		}
 	}
 }
@@ -488,7 +488,7 @@ static INPUT_PORTS_START( bmcpokr )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_POKER_HOLD3   ) PORT_CONDITION("DSW4",0x80,EQUALS,0x80) // HOLD 3
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL   ) PORT_CONDITION("DSW4",0x80,EQUALS,0x80) // n.a.            [START, ESC in service mode]
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE   ) PORT_CONDITION("DSW4",0x80,EQUALS,0x80) // SCORE
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_POKER_BET     ) PORT_CONDITION("DSW4",0x80,EQUALS,0x80) // BET             [BET, credit -1]
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_BET    ) PORT_CONDITION("DSW4",0x80,EQUALS,0x80) // BET             [BET, credit -1]
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH,IPT_CUSTOM       ) PORT_READ_LINE_MEMBER(bmcpokr_state, hopper_r)  // HP [HOPPER, credit -100]
 	PORT_SERVICE_NO_TOGGLE( 0x0400, IP_ACTIVE_LOW      ) PORT_CONDITION("DSW4",0x80,EQUALS,0x80) // ACCOUNT         [SERVICE MODE]
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_CONDITION("DSW4",0x80,EQUALS,0x80) // KEY-OUT         [KEY-OUT, no hopper]
@@ -506,7 +506,7 @@ static INPUT_PORTS_START( bmcpokr )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1       ) PORT_PLAYER(1) PORT_CONDITION("DSW4",0x80,EQUALS,0x00) // A1
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL   )                PORT_CONDITION("DSW4",0x80,EQUALS,0x00) // n.a.            [START, ESC in service mode]
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_CONDITION("DSW4",0x80,EQUALS,0x00) // <Left>2 (3rd)
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_POKER_BET     )                PORT_CONDITION("DSW4",0x80,EQUALS,0x00) // <Down>1 (2nd)   [BET, credit -1]
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_BET    )                PORT_CONDITION("DSW4",0x80,EQUALS,0x00) // <Down>1 (2nd)   [BET, credit -1]
 //  PORT_BIT( 0x0200, IP_ACTIVE_HIGH,IPT_CUSTOM       ) PORT_READ_LINE_MEMBER(bmcpokr_state, hopper_r)  // HP [HOPPER, credit -100]
 	PORT_SERVICE_NO_TOGGLE( 0x0400, IP_ACTIVE_LOW      )                PORT_CONDITION("DSW4",0x80,EQUALS,0x00) // A2              [SERVICE MODE]
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )                PORT_CONDITION("DSW4",0x80,EQUALS,0x00) // C2              [KEY-OUT, no hopper]

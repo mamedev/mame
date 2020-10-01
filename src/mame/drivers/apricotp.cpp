@@ -190,7 +190,7 @@ uint32_t fp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 			{
 				int color = BIT(data, 15);
 
-				bitmap.pix16(y, (sx * 16) + x) = color;
+				bitmap.pix(y, (sx * 16) + x) = color;
 
 				data <<= 1;
 			}

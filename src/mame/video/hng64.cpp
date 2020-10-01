@@ -240,11 +240,11 @@ do {                                                                            
 void hng64_state::hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *tmap, const blit_parameters *blit,
 		uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy, int wraparound)
 {
-	const pen_t *clut = &m_palette->pen(blit->tilemap_priority_code >> 16);
+	pen_t const *const clut = &m_palette->pen(blit->tilemap_priority_code >> 16);
 	bitmap_ind8 &priority_bitmap = screen.priority();
 	bitmap_rgb32 &destbitmap = *blit->bitmap;
-	bitmap_ind16 &srcbitmap = tmap->pixmap();
-	bitmap_ind8 &flagsmap = tmap->flagsmap();
+	const bitmap_ind16 &srcbitmap = tmap->pixmap();
+	const bitmap_ind8 &flagsmap = tmap->flagsmap();
 	const int xmask = srcbitmap.width()-1;
 	const int ymask = srcbitmap.height()-1;
 	const int widthshifted = srcbitmap.width() << 16;
@@ -253,27 +253,16 @@ void hng64_state::hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *
 	uint8_t mask = blit->mask;
 	uint8_t value = blit->value;
 	uint8_t alpha = blit->alpha;
-	uint32_t cx;
-	uint32_t cy;
-	int x;
-	int sx;
-	int sy;
-	int ex;
-	int ey;
-	uint32_t *dest;
-	uint8_t *pri;
-	const uint16_t *src;
-	const uint8_t *maskptr;
 
 	/* pre-advance based on the cliprect */
 	startx += blit->cliprect.min_x * incxx + blit->cliprect.min_y * incyx;
 	starty += blit->cliprect.min_x * incxy + blit->cliprect.min_y * incyy;
 
 	/* extract start/end points */
-	sx = blit->cliprect.min_x;
-	sy = blit->cliprect.min_y;
-	ex = blit->cliprect.max_x;
-	ey = blit->cliprect.max_y;
+	int sx = blit->cliprect.min_x;
+	int sy = blit->cliprect.min_y;
+	int ex = blit->cliprect.max_x;
+	int ey = blit->cliprect.max_y;
 
 	/* optimized loop for the not rotated case */
 	if (incxy == 0 && incyx == 0 && !wraparound)
@@ -296,15 +285,15 @@ void hng64_state::hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *
 			if (starty < heightshifted)
 			{
 				/* initialize X counters */
-				x = sx;
-				cx = startx;
-				cy = starty >> 16;
+				int x = sx;
+				uint32_t cx = startx;
+				uint32_t cy = starty >> 16;
 
 				/* get source and priority pointers */
-				pri = &priority_bitmap.pix8(sy, sx);
-				src = &srcbitmap.pix16(cy);
-				maskptr = &flagsmap.pix8(cy);
-				dest = &destbitmap.pix32(sy, sx);
+				uint8_t *pri = &priority_bitmap.pix(sy, sx);
+				uint16_t const *const src = &srcbitmap.pix(cy);
+				uint8_t const *const maskptr = &flagsmap.pix(cy);
+				uint32_t *dest = &destbitmap.pix(sy, sx);
 
 				/* loop over columns */
 				while (x <= ex && cx < widthshifted)
@@ -337,21 +326,21 @@ void hng64_state::hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *
 		while (sy <= ey)
 		{
 			/* initialize X counters */
-			x = sx;
-			cx = startx;
-			cy = starty;
+			int x = sx;
+			uint32_t cx = startx;
+			uint32_t cy = starty;
 
 			/* get dest and priority pointers */
-			dest = &destbitmap.pix32(sy, sx);
-			pri = &priority_bitmap.pix8(sy, sx);
+			uint32_t *dest = &destbitmap.pix(sy, sx);
+			uint8_t *pri = &priority_bitmap.pix(sy, sx);
 
 			/* loop over columns */
 			while (x <= ex)
 			{
 				/* plot if we match the mask */
-				if ((flagsmap.pix8((cy >> 16) & ymask, (cx >> 16) & xmask) & mask) == value)
+				if ((flagsmap.pix((cy >> 16) & ymask, (cx >> 16) & xmask) & mask) == value)
 				{
-					HNG64_ROZ_PLOT_PIXEL(srcbitmap.pix16((cy >> 16) & ymask, (cx >> 16) & xmask));
+					HNG64_ROZ_PLOT_PIXEL(srcbitmap.pix((cy >> 16) & ymask, (cx >> 16) & xmask));
 					*pri = (*pri & (priority >> 8)) | priority;
 				}
 
@@ -377,22 +366,22 @@ void hng64_state::hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *
 		while (sy <= ey)
 		{
 			/* initialize X counters */
-			x = sx;
-			cx = startx;
-			cy = starty;
+			int x = sx;
+			uint32_t cx = startx;
+			uint32_t cy = starty;
 
 			/* get dest and priority pointers */
-			dest = &destbitmap.pix32(sy, sx);
-			pri = &priority_bitmap.pix8(sy, sx);
+			uint32_t *dest = &destbitmap.pix(sy, sx);
+			uint8_t *pri = &priority_bitmap.pix(sy, sx);
 
 			/* loop over columns */
 			while (x <= ex)
 			{
 				/* plot if we're within the bitmap and we match the mask */
 				if (cx < widthshifted && cy < heightshifted)
-					if ((flagsmap.pix8(cy >> 16, cx >> 16) & mask) == value)
+					if ((flagsmap.pix(cy >> 16, cx >> 16) & mask) == value)
 					{
-						HNG64_ROZ_PLOT_PIXEL(srcbitmap.pix16(cy >> 16, cx >> 16));
+						HNG64_ROZ_PLOT_PIXEL(srcbitmap.pix(cy >> 16, cx >> 16));
 						*pri = (*pri & (priority >> 8)) | priority;
 					}
 
@@ -573,11 +562,7 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 	}
 
 	// Set the transmask so our manual copy is correct
-	int transmask = 0x00;
-	if (bppBit)
-		transmask = 0xff;
-	else
-		transmask = 0xf;
+	const int transmask = bppBit ? 0xff : 0xf;
 
 	if (floorModeBit == 0x0000)
 	{
@@ -614,7 +599,7 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 		//if (lineCount < visarea.height())
 		//{
 		//    for (int ii = 0; ii < visarea.width(); ii++)
-		//        bitmap.pix32((visarea.height()-lineCount), ii) = 0xff00ff00;
+		//        bitmap.pix((visarea.height()-lineCount), ii) = 0xff00ff00;
 		//}
 
 		// HACK : Clear RAM - this is "needed" in fatfurwa since it doesn't clear its own ram (buriki does)
@@ -654,12 +639,12 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 //      }
 //      else // 'simple' mode with linescroll, used in some ss64_2 levels (assumed to be correct, but doesn't do much with it.. so could be wrong)
 		{
-			int32_t xtopleft, xmiddle;
-			int32_t ytopleft, ymiddle;
-
 			for (int line=0; line < 448; line++)
 			{
 				clip.min_y = clip.max_y = line;
+
+				int32_t xtopleft, xmiddle;
+				int32_t ytopleft, ymiddle;
 
 				if (global_zoom_disable) // disable all scrolling / zoom (test screen) (maybe)
 				{
@@ -713,10 +698,6 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 
 			*/
 
-			int32_t xtopleft,xmiddle, xalt;
-			int32_t ytopleft,ymiddle, yalt;
-			int xinc, xinc2, yinc, yinc2;
-
 #if HNG64_VIDEO_DEBUG
 			if (0)
 				if (tm==2)
@@ -732,53 +713,44 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 						/*m_videoram[(0x4001c+(scrollbase<<4))/4]);*/ // unused? (dupe value on fatfurwa, 00 on rest)
 #endif
 
+			int32_t xtopleft        = (m_videoram[(0x40000+(scrollbase<<4))/4]);
+			const int32_t xalt      = (m_videoram[(0x40004+(scrollbase<<4))/4]); // middle screen point
+			const int32_t xmiddle   = (m_videoram[(0x40010+(scrollbase<<4))/4]);
 
-			xtopleft  = (m_videoram[(0x40000+(scrollbase<<4))/4]);
-			xalt      = (m_videoram[(0x40004+(scrollbase<<4))/4]); // middle screen point
-			xmiddle   = (m_videoram[(0x40010+(scrollbase<<4))/4]);
+			int32_t ytopleft        = (m_videoram[(0x40008+(scrollbase<<4))/4]);
+			const int32_t yalt      = (m_videoram[(0x40018+(scrollbase<<4))/4]); // middle screen point
+			const int32_t ymiddle   = (m_videoram[(0x4000c+(scrollbase<<4))/4]);
 
-			ytopleft     = (m_videoram[(0x40008+(scrollbase<<4))/4]);
-			yalt         = (m_videoram[(0x40018+(scrollbase<<4))/4]); // middle screen point
-			ymiddle      = (m_videoram[(0x4000c+(scrollbase<<4))/4]);
-
-			xinc = (xmiddle - xtopleft) / 512;
-			yinc = (ymiddle - ytopleft) / 512;
-			xinc2 = (xalt-xtopleft) / 512;
-			yinc2 = (yalt-ytopleft) /512;
-
+			const int xinc = (xmiddle - xtopleft) / 512;
+			const int yinc = (ymiddle - ytopleft) / 512;
+			const int xinc2 = (xalt-xtopleft) / 512;
+			const int yinc2 = (yalt-ytopleft) /512;
 
 			/* manual copy = slooow */
 			if (BLEND_TEST)
 			{
-				bitmap_ind16 &bm = tilemap->pixmap();
-				int bmheight = bm.height();
-				int bmwidth = bm.width();
-				const pen_t *paldata = m_palette->pens();
-				uint32_t* dstptr;
-				uint16_t* srcptr;
-				int xx,yy;
+				const bitmap_ind16 &bm = tilemap->pixmap();
+				const int bmheight = bm.height();
+				const int bmwidth = bm.width();
+				pen_t const *const paldata = m_palette->pens();
 
-
-				int tmp = xtopleft;
-				int tmp2 = ytopleft;
 				//printf("start %08x end %08x start %08x end %08x\n", xtopleft, xmiddle, ytopleft, ymiddle);
 
-				for (yy=0;yy<448;yy++)
+				for (int yy=0; yy<448; yy++)
 				{
-					dstptr = &bitmap.pix32(yy);
+					uint32_t *dstptr = &bitmap.pix(yy);
 
-					tmp = xtopleft;
-					tmp2 = ytopleft;
+					int tmp = xtopleft;
+					int tmp2 = ytopleft;
 
-					for (xx=0;xx<512;xx++)
+					for (int xx=0; xx<512; xx++)
 					{
 						int realsrcx = (xtopleft>>16)&(bmwidth-1);
 						int realsrcy = (ytopleft>>16)&(bmheight-1);
-						uint16_t pen;
 
-						srcptr = &bm.pix16(realsrcy);
+						uint16_t const *const srcptr = &bm.pix(realsrcy);
 
-						pen = srcptr[realsrcx];
+						uint16_t pen = srcptr[realsrcx];
 
 						if (pen&transmask)
 							*dstptr = paldata[pen];
@@ -807,10 +779,6 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 			/* in this mode they can only specify the top left and middle screen points for each tilemap,
 			   this allows simple zooming, but not rotation */
 
-			int32_t xtopleft,xmiddle;
-			int32_t ytopleft,ymiddle;
-			int xinc,yinc;
-
 #if HNG64_VIDEO_DEBUG
 			if (0)
 				if (tm==2)
@@ -820,6 +788,9 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 						m_videoram[(0x40018+(scrollbase<<4))/4],
 						m_videoram[(0x4001c+(scrollbase<<4))/4]);
 #endif
+
+			int32_t xtopleft,xmiddle;
+			int32_t ytopleft,ymiddle;
 
 			if (global_zoom_disable) // disable all scrolling / zoom (test screen) (maybe)
 			{
@@ -842,40 +813,35 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 				ymiddle   = (m_videoram[(0x4000c+(scrollbase<<4))/4]); // middle screen point
 			}
 
-			xinc = (xmiddle - xtopleft) / 512;
-			yinc = (ymiddle - ytopleft) / 512;
+			const int xinc = (xmiddle - xtopleft) / 512;
+			const int yinc = (ymiddle - ytopleft) / 512;
 
 			/* manual copy = slooow */
 			if (BLEND_TEST)
 			{
-				bitmap_ind16 &bm = tilemap->pixmap();
-				int bmheight = bm.height();
-				int bmwidth = bm.width();
-				const pen_t *paldata = m_palette->pens();
-				uint32_t* dstptr;
-				uint16_t* srcptr;
-				int xx,yy;
+				const bitmap_ind16 &bm = tilemap->pixmap();
+				const int bmheight = bm.height();
+				const int bmwidth = bm.width();
+				pen_t const *const paldata = m_palette->pens();
 
 				int tmp = xtopleft;
 
 				//printf("start %08x end %08x start %08x end %08x\n", xtopleft, xmiddle, ytopleft, ymiddle);
 
-				for (yy=0;yy<448;yy++)
+				for (int yy=0; yy<448; yy++)
 				{
 					int realsrcy = (ytopleft>>16)&(bmheight-1);
 
-					dstptr = &bitmap.pix32(yy);
-					srcptr = &bm.pix16(realsrcy);
+					uint32_t *dstptr = &bitmap.pix(yy);
+					uint16_t const *const srcptr = &bm.pix(realsrcy);
 
 					xtopleft = tmp;
 
-					for (xx=0;xx<512;xx++)
+					for (int xx=0; xx<512; xx++)
 					{
 						int realsrcx = (xtopleft>>16)&(bmwidth-1);
 
-						uint16_t pen;
-
-						pen = srcptr[realsrcx];
+						uint16_t pen = srcptr[realsrcx];
 
 						if (pen&transmask)
 							*dstptr = paldata[pen];
@@ -980,15 +946,13 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 	// 3d gets drawn next
 	if(!(m_fbcontrol[0] & 0x01))
 	{
-		int x, y;
-
 		// Blit the color buffer into the primary bitmap
-		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-			uint32_t *src = &m_poly_renderer->colorBuffer3d().pix32(y, cliprect.min_x);
-			uint32_t *dst = &bitmap.pix32(y, cliprect.min_x);
+			const uint32_t *src = &m_poly_renderer->colorBuffer3d().pix(y, cliprect.min_x);
+			uint32_t *dst = &bitmap.pix(y, cliprect.min_x);
 
-			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
 				if(*src & 0xff000000)
 					*dst = *src;
@@ -1139,13 +1103,12 @@ void hng64_state::tcram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 	if(offset == 0x02)
 	{
-		uint16_t min_x, min_y, max_x, max_y;
 		rectangle visarea = m_screen->visible_area();
 
-		min_x = (hng64_tcram[1] & 0xffff0000) >> 16;
-		min_y = (hng64_tcram[1] & 0x0000ffff) >> 0;
-		max_x = (hng64_tcram[2] & 0xffff0000) >> 16;
-		max_y = (hng64_tcram[2] & 0x0000ffff) >> 0;
+		const uint16_t min_x = (hng64_tcram[1] & 0xffff0000) >> 16;
+		const uint16_t min_y = (hng64_tcram[1] & 0x0000ffff) >> 0;
+		const uint16_t max_x = (hng64_tcram[2] & 0xffff0000) >> 16;
+		const uint16_t max_y = (hng64_tcram[2] & 0x0000ffff) >> 0;
 
 		if(max_x == 0 || max_y == 0) // bail out if values are invalid, Fatal Fury WA sets this to disable the screen.
 		{
@@ -1173,8 +1136,6 @@ uint32_t hng64_state::tcram_r(offs_t offset)
 // Very much a work in progress - no hard testing has been done
 void hng64_state::transition_control( bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int i, j;
-
 //  float colorScaleR, colorScaleG, colorScaleB;
 	int32_t finR, finG, finB;
 
@@ -1192,11 +1153,11 @@ void hng64_state::transition_control( bitmap_rgb32 &bitmap, const rectangle &cli
 		brigG = (int32_t)((m_tcram[0x0000000a] >> 8)  & 0xff);
 		brigB = (int32_t)((m_tcram[0x0000000a] >> 16) & 0xff);
 
-		for (i = cliprect.min_x; i < cliprect.max_x; i++)
+		for (int i = cliprect.min_x; i < cliprect.max_x; i++)
 		{
-			for (j = cliprect.min_y; j < cliprect.max_y; j++)
+			for (int j = cliprect.min_y; j < cliprect.max_y; j++)
 			{
-				rgb_t* thePixel = reinterpret_cast<rgb_t *>(&bitmap.pix32(j, i));
+				rgb_t* thePixel = reinterpret_cast<rgb_t *>(&bitmap.pix(j, i));
 
 				finR = (int32_t)thePixel->r();
 				finG = (int32_t)thePixel->g();

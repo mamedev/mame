@@ -137,16 +137,14 @@ void gamecstl_state::video_start()
 
 void gamecstl_state::draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, int ch, int att, int x, int y)
 {
-	int i,j;
-	const uint8_t *dp;
 	int index = 0;
-	dp = gfx->get_data(ch);
+	uint8_t const *const dp = gfx->get_data(ch);
 
-	for (j=y; j < y+8; j++)
+	for (int j=y; j < y+8; j++)
 	{
-		uint16_t *p = &bitmap.pix16(j);
+		uint16_t *const p = &bitmap.pix(j);
 
-		for (i=x; i < x+8; i++)
+		for (int i=x; i < x+8; i++)
 		{
 			uint8_t pen = dp[index++];
 			if (pen)
@@ -159,16 +157,15 @@ void gamecstl_state::draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 
 uint32_t gamecstl_state::screen_update_gamecstl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int i, j;
 	gfx_element *gfx = m_gfxdecode->gfx(0);
-	uint32_t *cga = m_cga_ram;
+	uint32_t const *const cga = m_cga_ram;
 	int index = 0;
 
 	bitmap.fill(0, cliprect);
 
-	for (j=0; j < 25; j++)
+	for (int j=0; j < 25; j++)
 	{
-		for (i=0; i < 80; i+=2)
+		for (int i=0; i < 80; i+=2)
 		{
 			int att0 = (cga[index] >> 8) & 0xff;
 			int ch0 = (cga[index] >> 0) & 0xff;

@@ -180,11 +180,8 @@ uint32_t mach32_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		return 0;
 
 	uint32_t src = (m_cursor_address & 0x000fffff) << 2;
-	uint32_t* dst;  // destination pixel
-	uint8_t x,y,z;
-	uint32_t colour0;
-	uint32_t colour1;
 
+	uint32_t colour0, colour1;
 	if(depth == 8)
 	{
 		colour0 = pen(m_cursor_colour0_b);
@@ -197,18 +194,18 @@ uint32_t mach32_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	}
 
 	// draw hardware pointer (64x64 max)
-	for(y=0;y<64;y++)
+	for(uint8_t y=0;y<64;y++)
 	{
-		dst = &bitmap.pix32(m_cursor_vertical + y, m_cursor_horizontal);
-		for(x=0;x<64;x+=8)
+		uint32_t *dst = &bitmap.pix(m_cursor_vertical + y, m_cursor_horizontal);
+		for(uint8_t x=0;x<64;x+=8)
 		{
-			uint16_t bits = (vga.memory[(src+0) % vga.svga_intf.vram_size] | ((vga.memory[(src+1) % vga.svga_intf.vram_size]) << 8));
+			uint16_t const bits = (vga.memory[(src+0) % vga.svga_intf.vram_size] | ((vga.memory[(src+1) % vga.svga_intf.vram_size]) << 8));
 
-			for(z=0;z<8;z++)
+			for(uint8_t z=0;z<8;z++)
 			{
 				if(((z + x) > (m_cursor_offset_horizontal-1)) && (y < (63 - m_cursor_offset_vertical)))
 				{
-					uint8_t val = (bits >> (z*2)) & 0x03;
+					uint8_t const val = (bits >> (z*2)) & 0x03;
 					switch(val)
 					{
 						case 0:  // cursor colour 0

@@ -46,7 +46,6 @@ private:
 	u8 m_a2_bitmap[280*193];
 	u8 m_threshold;
 	bool m_bActive;
-	bitmap_argb32 *m_bitmap;
 };
 
 // device type definition

@@ -646,43 +646,40 @@ void magicard_state::video_start()
 
 uint32_t magicard_state::screen_update_magicard(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int x, y;
-	uint32_t count;
-
 	bitmap.fill(m_palette->black_pen(), cliprect); //TODO
 
 	if(!(SCC_DE_VREG)) //display enable
 		return 0;
 
-	count = ((SCC_VSR_VREG) / 2);
+	uint32_t count = ((SCC_VSR_VREG) / 2);
 
 	if(SCC_FG_VREG) //4bpp gfx
 	{
-		for(y = 0; y < 300; y++)
+		for(int y = 0; y < 300; y++)
 		{
-			for(x = 0; x < 84; x++)
+			for(int x = 0; x < 84; x++)
 			{
 				uint32_t color;
 
 				color = ((m_magicram[count]) & 0x000f) >> 0;
 
 				if(cliprect.contains((x * 4) + 3, y))
-					bitmap.pix32(y, (x * 4) + 3) = m_palette->pen(color);
+					bitmap.pix(y, (x * 4) + 3) = m_palette->pen(color);
 
 				color = ((m_magicram[count]) & 0x00f0) >> 4;
 
 				if(cliprect.contains((x * 4) + 2, y))
-					bitmap.pix32(y, (x * 4) + 2) = m_palette->pen(color);
+					bitmap.pix(y, (x * 4) + 2) = m_palette->pen(color);
 
 				color = ((m_magicram[count]) & 0x0f00) >> 8;
 
 				if(cliprect.contains((x * 4) + 1, y))
-					bitmap.pix32(y, (x * 4) + 1) = m_palette->pen(color);
+					bitmap.pix(y, (x * 4) + 1) = m_palette->pen(color);
 
 				color = ((m_magicram[count]) & 0xf000) >> 12;
 
 				if(cliprect.contains((x * 4) + 0, y))
-					bitmap.pix32(y, (x * 4) + 0) = m_palette->pen(color);
+					bitmap.pix(y, (x * 4) + 0) = m_palette->pen(color);
 
 				count++;
 			}
@@ -690,21 +687,21 @@ uint32_t magicard_state::screen_update_magicard(screen_device &screen, bitmap_rg
 	}
 	else //8bpp gfx
 	{
-		for(y = 0; y < 300; y++)
+		for(int y = 0; y < 300; y++)
 		{
-			for(x = 0; x < 168; x++)
+			for(int x = 0; x < 168; x++)
 			{
 				uint32_t color;
 
 				color = ((m_magicram[count]) & 0x00ff) >> 0;
 
 				if(cliprect.contains((x * 2) + 1, y))
-					bitmap.pix32(y, (x * 2) + 1) = m_palette->pen(color);
+					bitmap.pix(y, (x * 2) + 1) = m_palette->pen(color);
 
 				color = ((m_magicram[count]) & 0xff00) >> 8;
 
 				if(cliprect.contains((x * 2) + 0, y))
-					bitmap.pix32(y, (x * 2) + 0) = m_palette->pen(color);
+					bitmap.pix(y, (x * 2) + 0) = m_palette->pen(color);
 
 				count++;
 			}

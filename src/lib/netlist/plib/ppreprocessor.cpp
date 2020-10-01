@@ -245,10 +245,10 @@ namespace plib {
 			else
 			{
 				pstring tok=tmp[pi];
-				if (tok.size() >= 2 && pi < tmp.size() - 2 )
+				if (tok.length() >= 2 && pi < tmp.size() - 2 )
 				{
 					auto sc=tok.substr(0,1);
-					auto ec=tok.substr(tok.size()-1, 1);
+					auto ec=tok.substr(tok.length()-1, 1);
 					if ((sc == "." || (sc>="0" && sc<="9")) && (ec=="e" || ec=="E"))
 					{
 						// looks like an incomplete float due splitting by - or +
@@ -496,7 +496,7 @@ namespace plib {
 	{
 		bool line_cont = plib::right(line_in, 1) == "\\";
 
-		pstring line = line_cont ? plib::left(line_in, line_in.size() - 1) : line_in;
+		pstring line = line_cont ? plib::left(line_in, line_in.length() - 1) : line_in;
 
 		if (m_state == LINE_CONTINUATION)
 			m_line += line;

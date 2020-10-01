@@ -66,14 +66,9 @@ device_sound_interface &device_sound_interface::add_route(u32 output, device_t &
 
 
 //-------------------------------------------------
-//  stream_alloc_legacy - allocate a stream implicitly
+//  stream_alloc - allocate a stream implicitly
 //  associated with this device
 //-------------------------------------------------
-
-sound_stream *device_sound_interface::stream_alloc_legacy(int inputs, int outputs, int sample_rate)
-{
-	return device().machine().sound().stream_alloc_legacy(*this, inputs, outputs, sample_rate, stream_update_legacy_delegate(&device_sound_interface::sound_stream_update_legacy, this));
-}
 
 sound_stream *device_sound_interface::stream_alloc(int inputs, int outputs, int sample_rate)
 {
@@ -382,17 +377,6 @@ void device_sound_interface::interface_pre_reset()
 
 
 //-------------------------------------------------
-//  sound_stream_update_legacy - implementation
-//  that should be overridden by legacy devices
-//-------------------------------------------------
-
-void device_sound_interface::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
-{
-	throw emu_fatalerror("sound_stream_update_legacy called but not overridden by owning class");
-}
-
-
-//-------------------------------------------------
 //  sound_stream_update - default implementation
 //  that should be overridden
 //-------------------------------------------------
@@ -497,6 +481,13 @@ void device_mixer_interface::interface_post_load()
 
 void device_mixer_interface::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
+	// special case: single input, single output, same rate
+	if (inputs.size() == 1 && outputs.size() == 1 && inputs[0].sample_rate() == outputs[0].sample_rate())
+	{
+		outputs[0] = inputs[0];
+		return;
+	}
+
 	// reset the clear flags
 	std::fill(std::begin(m_output_clear), std::end(m_output_clear), false);
 

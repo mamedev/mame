@@ -492,30 +492,30 @@ uint32_t berzerk_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 	for (int offs = 0; offs < m_videoram.bytes(); offs++)
 	{
-		int i;
-
 		uint8_t data = m_videoram[offs];
 		uint8_t color = m_colorram[((offs >> 2) & 0x07e0) | (offs & 0x001f)];
 
 		uint8_t y = offs >> 5;
 		uint8_t x = offs << 3;
 
+		int i;
+
 		for (i = 0; i < 4; i++)
 		{
 			rgb_t pen = (data & 0x80) ? pens[color >> 4] : rgb_t::black();
-			bitmap.pix32(y, x) = pen;
+			bitmap.pix(y, x) = pen;
 
-			x = x + 1;
-			data = data << 1;
+			x++;
+			data <<= 1;
 		}
 
 		for (; i < 8; i++)
 		{
 			rgb_t pen = (data & 0x80) ? pens[color & 0x0f] : rgb_t::black();
-			bitmap.pix32(y, x) = pen;
+			bitmap.pix(y, x) = pen;
 
-			x = x + 1;
-			data = data << 1;
+			x++;
+			data <<= 1;
 		}
 	}
 

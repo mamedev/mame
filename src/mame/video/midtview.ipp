@@ -266,7 +266,7 @@ uint32_t midtunit_video_device::debug_screen_update(screen_device &screen, bitma
 	const pen_t *pens = m_debug_palette->pens();
 	for (int y = 0; y <= cliprect.max_y; y++)
 	{
-		uint32_t *dest = &bitmap.pix32(y);
+		uint32_t *dest = &bitmap.pix(y);
 		uint16_t *src = &m_debug_videoram[y * 512];
 		for (int x = 0; x < cliprect.max_x; x++)
 		{

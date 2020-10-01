@@ -134,7 +134,7 @@ void zsg2_device::device_start()
 
 	memset(&m_chan, 0, sizeof(m_chan));
 
-	m_stream = stream_alloc_legacy(0, 4, clock() / 768);
+	m_stream = stream_alloc(0, 4, clock() / 768);
 
 	m_mem_blocks = m_mem_base.length();
 	m_mem_copy = make_unique_clear<uint32_t[]>(m_mem_blocks);
@@ -280,12 +280,12 @@ void zsg2_device::filter_samples(zchan *ch)
 }
 
 //-------------------------------------------------
-//  sound_stream_update_legacy - handle a stream update
+//  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void zsg2_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void zsg2_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	for (int i = 0; i < samples; i++)
+	for (int i = 0; i < outputs[0].samples(); i++)
 	{
 		int32_t mix[4] = {};
 
@@ -355,8 +355,7 @@ void zsg2_device::sound_stream_update_legacy(sound_stream &stream, stream_sample
 		}
 
 		for(int output=0; output<4; output++)
-			outputs[output][i] = std::min<int32_t>(std::max<int32_t>(mix[output], -32768), 32767);
-
+			outputs[output].put_int_clamp(i, mix[output], 32768);
 	}
 	m_sample_count++;
 }

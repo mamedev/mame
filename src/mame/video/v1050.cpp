@@ -57,15 +57,13 @@ void v1050_state::videoram_w(offs_t offset, uint8_t data)
 
 MC6845_UPDATE_ROW( v1050_state::crtc_update_row )
 {
-	int column, bit;
-
-	for (column = 0; column < x_count; column++)
+	for (int column = 0; column < x_count; column++)
 	{
 		uint16_t address = (((ra & 0x03) + 1) << 13) | ((ma & 0x1fff) + column);
 		uint8_t data = m_video_ram[address & V1050_VIDEORAM_MASK];
 		uint8_t attr = (m_attr & 0xfc) | (m_attr_ram[address] & 0x03);
 
-		for (bit = 0; bit < 8; bit++)
+		for (int bit = 0; bit < 8; bit++)
 		{
 			int x = (column * 8) + bit;
 			int color = BIT(data, 7);
@@ -82,7 +80,7 @@ MC6845_UPDATE_ROW( v1050_state::crtc_update_row )
 			/* display blank */
 			if (attr & V1050_ATTR_BLANK) color = 0;
 
-			bitmap.pix32(vbp + y, hbp + x) = m_palette->pen(de ? color : 0);
+			bitmap.pix(vbp + y, hbp + x) = m_palette->pen(de ? color : 0);
 
 			data <<= 1;
 		}

@@ -235,7 +235,7 @@ uint32_t dio16_98543_device::screen_update(screen_device &screen, bitmap_rgb32 &
 	}
 
 	for (int y = 0; y < m_v_pix; y++) {
-		uint32_t *scanline = &bitmap.pix32(y);
+		uint32_t *scanline = &bitmap.pix(y);
 
 		for (int x = 0; x < m_h_pix; x++) {
 			uint8_t tmp = m_vram[y * m_h_pix + x];

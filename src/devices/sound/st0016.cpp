@@ -43,7 +43,7 @@ st0016_device::st0016_device(const machine_config &mconfig, const char *tag, dev
 
 void st0016_device::device_start()
 {
-	m_stream = stream_alloc_legacy(0, 2, 44100);
+	m_stream = stream_alloc(0, 2, 44100);
 	m_ram_read_cb.resolve_safe(0);
 
 	save_item(NAME(m_vpos));
@@ -54,10 +54,10 @@ void st0016_device::device_start()
 
 
 //-------------------------------------------------
-//  sound_stream_update_legacy - handle a stream update
+//  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void st0016_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void st0016_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	int v, i, snum;
 	unsigned char *slot;
@@ -66,7 +66,7 @@ void st0016_device::sound_stream_update_legacy(sound_stream &stream, stream_samp
 	int16_t sample;
 	int sptr, eptr, freq, lsptr, leptr;
 
-	memset(mix, 0, sizeof(mix[0])*samples*2);
+	memset(mix, 0, sizeof(mix[0])*outputs[0].samples()*2);
 
 	for (v = 0; v < 8; v++)
 	{
@@ -82,7 +82,7 @@ void st0016_device::sound_stream_update_legacy(sound_stream &stream, stream_samp
 			lsptr = slot[0x06]<<16 | slot[0x05]<<8 | slot[0x04];
 			leptr = slot[0x0a]<<16 | slot[0x09]<<8 | slot[0x08];
 
-			for (snum = 0; snum < samples; snum++)
+			for (snum = 0; snum < outputs[0].samples(); snum++)
 			{
 				sample = m_ram_read_cb((sptr + m_vpos[v]) & 0x1fffff) << 8;
 
@@ -124,10 +124,10 @@ void st0016_device::sound_stream_update_legacy(sound_stream &stream, stream_samp
 	}
 
 	mixp = &mix[0];
-	for (i = 0; i < samples; i++)
+	for (i = 0; i < outputs[0].samples(); i++)
 	{
-		outputs[0][i] = (*mixp++)>>4;
-		outputs[1][i] = (*mixp++)>>4;
+		outputs[0].put_int(i, *mixp++, 32768<<4);
+		outputs[1].put_int(i, *mixp++, 32768<<4);
 	}
 }
 

@@ -26,14 +26,21 @@
 #include "emupal.h"
 #include "screen.h"
 
+#include <algorithm>
+
+
 class model2_renderer;
-struct raster_state;
-struct geo_state;
-struct triangle;
 
 class model2_state : public driver_device
 {
 public:
+	struct plane;
+	struct texture_parameter;
+	struct triangle;
+	struct quad_m2;
+	struct raster_state;
+	struct geo_state;
+
 	model2_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_textureram0(*this, "textureram0"),
@@ -626,6 +633,8 @@ public:
 	typedef void (model2_renderer::*scanline_render_func)(int32_t scanline, const extent_t& extent, const m2_poly_extra_data& object, int threadid);
 
 public:
+	using triangle = model2_state::triangle;
+
 	model2_renderer(model2_state& state)
 		: poly_manager<float, m2_poly_extra_data, 4, 0x10000>(state.machine())
 		, m_state(state)
@@ -722,37 +731,54 @@ typedef model2_renderer::vertex_t poly_vertex;
  *
  *******************************************/
 
-struct plane
+struct model2_state::plane
 {
-	poly_vertex normal;
-	float       distance;
+	plane() : normal(0, 0)
+	{
+		std::fill(std::begin(normal.p), std::end(normal.p), 0);
+	}
+
+	poly_vertex     normal;
+	float           distance = 0;
 };
 
-struct texture_parameter
+struct model2_state::texture_parameter
 {
-	float   diffuse;
-	float   ambient;
-	u32  specular_control;
-	float   specular_scale;
+	float           diffuse = 0;
+	float           ambient = 0;
+	u32             specular_control = 0;
+	float           specular_scale = 0;
 };
 
-struct triangle
+struct model2_state::triangle
 {
-	void *              next;
-	poly_vertex         v[3];
-	u16              z;
-	u16              texheader[4];
-	u8               luma;
-	int16_t               viewport[4];
-	int16_t               center[2];
+	triangle() : v{ { 0, 0 }, { 0, 0 }, { 0, 0 } }
+	{
+		for (poly_vertex &vertex : v)
+			std::fill(std::begin(vertex.p), std::end(vertex.p), 0);
+	}
+
+	void *          next = nullptr;
+	poly_vertex     v[3];
+	u16             z = 0;
+	u16             texheader[4] = { 0, 0, 0, 0 };
+	u8              luma = 0;
+	int16_t         viewport[4] = { 0, 0, 0, 0 };
+	int16_t         center[2] = { 0, 0 };
 };
 
-struct quad_m2
+struct model2_state::quad_m2
 {
-	poly_vertex         v[4];
-	u16              z;
-	u16              texheader[4];
-	u8               luma;
+	quad_m2() : v{ { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } }
+	{
+		for (poly_vertex &vertex : v)
+			std::fill(std::begin(vertex.p), std::end(vertex.p), 0);
+	}
+
+	poly_vertex     v[4];
+	u16             z = 0;
+	u16             texheader[4] = { 0, 0, 0, 0 };
+	u8              luma = 0;
 };
 
 /*******************************************
@@ -763,28 +789,36 @@ struct quad_m2
 
 #define MAX_TRIANGLES       32768
 
-struct raster_state
+struct model2_state::raster_state
 {
-//  u32 mode;                      /* bit 0 = Test Mode, bit 2 = Switch 60Hz(1)/30Hz(0) operation */
-	u16 *texture_rom;              /* Texture ROM pointer */
-	u32 texture_rom_mask;          /* Texture ROM mask */
-	int16_t viewport[4];                /* View port (startx,starty,endx,endy) */
-	int16_t center[4][2];               /* Centers (eye 0[x,y],1[x,y],2[x,y],3[x,y]) */
-	u16 center_sel;                /* Selected center */
-	u32 reverse;                   /* Left/Right Reverse */
-	float z_adjust;                     /* ZSort Mode */
-	float triangle_z;                   /* Current Triangle z value */
-	u8 master_z_clip;              /* Master Z-Clip value */
-	u32 cur_command;               /* Current command */
-	u32 command_buffer[32];        /* Command buffer */
-	u32 command_index;             /* Command buffer index */
-	triangle tri_list[MAX_TRIANGLES];   /* Triangle list */
-	u32 tri_list_index;            /* Triangle list index */
-	triangle *tri_sorted_list[0x10000]; /* Sorted Triangle list */
-	u16 min_z;                     /* Minimum sortable Z value */
-	u16 max_z;                     /* Maximum sortable Z value */
-	u16 texture_ram[0x10000];      /* Texture RAM pointer */
-	u8 log_ram[0x40000];           /* Log RAM pointer */
+	raster_state()
+	{
+		std::fill(std::begin(command_buffer), std::end(command_buffer), 0);
+		std::fill(std::begin(tri_sorted_list), std::end(tri_sorted_list), nullptr);
+		std::fill(std::begin(texture_ram), std::end(texture_ram), 0);
+		std::fill(std::begin(log_ram), std::end(log_ram), 0);
+	}
+
+//  u32             mode = 0;                       // bit 0 = Test Mode, bit 2 = Switch 60Hz(1)/30Hz(0) operation
+	u16 *           texture_rom = nullptr;          // Texture ROM pointer
+	u32             texture_rom_mask = 0;           // Texture ROM mask
+	int16_t         viewport[4] = { 0, 0, 0, 0 };   // View port (startx,starty,endx,endy)
+	int16_t         center[4][2] = { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } }; // Centers (eye 0[x,y],1[x,y],2[x,y],3[x,y])
+	u16             center_sel = 0;                 // Selected center
+	u32             reverse = 0;                    // Left/Right Reverse
+	float           z_adjust = 0;                   // ZSort Mode
+	float           triangle_z = 0;                 // Current Triangle z value
+	u8              master_z_clip = 0;              // Master Z-Clip value
+	u32             cur_command = 0;                // Current command
+	u32             command_buffer[32];             // Command buffer
+	u32             command_index = 0;              // Command buffer index
+	triangle        tri_list[MAX_TRIANGLES];        // Triangle list
+	u32             tri_list_index = 0;             // Triangle list index
+	triangle *      tri_sorted_list[0x10000];       // Sorted Triangle list
+	u16             min_z = 0;                      // Minimum sortable Z value
+	u16             max_z = 0;                      // Maximum sortable Z value
+	u16             texture_ram[0x10000];           // Texture RAM pointer
+	u8              log_ram[0x40000];               // Log RAM pointer
 };
 
 /*******************************************
@@ -793,21 +827,31 @@ struct raster_state
  *
  *******************************************/
 
-struct geo_state
+struct model2_state::geo_state
 {
-	raster_state *          raster;
-	u32              mode;                   /* bit 0 = Enable Specular, bit 1 = Calculate Normals */
-	u32 *          polygon_rom;            /* Polygon ROM pointer */
-	u32            polygon_rom_mask;       /* Polygon ROM mask */
-	float               matrix[12];             /* Current Transformation Matrix */
-	poly_vertex         focus;                  /* Focus (x,y) */
-	poly_vertex         light;                  /* Light Vector */
-	float               lod;                    /* LOD */
-	float               coef_table[32];         /* Distane Coefficient table */
-	texture_parameter   texture_parameters[32]; /* Texture parameters */
-	u32          polygon_ram0[0x8000];           /* Fast Polygon RAM pointer */
-	u32          polygon_ram1[0x8000];           /* Slow Polygon RAM pointer */
-	model2_state    *state;
+	geo_state() : focus(0, 0), light(0, 0)
+	{
+		std::fill(std::begin(matrix), std::end(matrix), 0);
+		std::fill(std::begin(focus.p), std::end(focus.p), 0);
+		std::fill(std::begin(light.p), std::end(light.p), 0);
+		std::fill(std::begin(coef_table), std::end(coef_table), 0);
+		std::fill(std::begin(polygon_ram0), std::end(polygon_ram0), 0);
+		std::fill(std::begin(polygon_ram1), std::end(polygon_ram1), 0);
+	}
+
+	raster_state *      raster = nullptr;
+	u32                 mode = 0;                   // bit 0 = Enable Specular, bit 1 = Calculate Normals
+	u32 *               polygon_rom = nullptr;      // Polygon ROM pointer
+	u32                 polygon_rom_mask = 0;       // Polygon ROM mask
+	float               matrix[12];                 // Current Transformation Matrix
+	poly_vertex         focus;                      // Focus (x,y)
+	poly_vertex         light;                      // Light Vector
+	float               lod = 0;                    // LOD
+	float               coef_table[32];             // Distane Coefficient table
+	texture_parameter   texture_parameters[32];     // Texture parameters
+	u32                 polygon_ram0[0x8000];       // Fast Polygon RAM pointer
+	u32                 polygon_ram1[0x8000];       // Slow Polygon RAM pointer
+	model2_state *      state = nullptr;
 };
 
 #endif // MAME_INCLUDES_MODEL2_H

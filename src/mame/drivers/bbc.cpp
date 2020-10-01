@@ -1181,6 +1181,8 @@ void bbc_state::bbcb(machine_config &config)
 	m_via6522_1->writepb_handler().set(m_userport, FUNC(bbc_userport_slot_device::pb_w));
 	m_via6522_1->writepb_handler().append(m_internal, FUNC(bbc_internal_slot_device::latch_fe60_w));
 	m_via6522_1->ca2_handler().set("printer", FUNC(centronics_device::write_strobe));
+	m_via6522_1->cb1_handler().set(m_userport, FUNC(bbc_userport_slot_device::write_cb1));
+	m_via6522_1->cb2_handler().set(m_userport, FUNC(bbc_userport_slot_device::write_cb2));
 	m_via6522_1->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<2>));
 
 	/* adc */
@@ -1651,6 +1653,8 @@ void bbcm_state::bbcm(machine_config &config)
 	m_via6522_1->readpb_handler().set(m_userport, FUNC(bbc_userport_slot_device::pb_r));
 	m_via6522_1->writepb_handler().set(m_userport, FUNC(bbc_userport_slot_device::pb_w));
 	m_via6522_1->ca2_handler().set("printer", FUNC(centronics_device::write_strobe));
+	m_via6522_1->cb1_handler().set(m_userport, FUNC(bbc_userport_slot_device::write_cb1));
+	m_via6522_1->cb2_handler().set(m_userport, FUNC(bbc_userport_slot_device::write_cb2));
 	m_via6522_1->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<2>));
 
 	/* fdc */
@@ -1974,6 +1978,8 @@ void bbcm_state::bbcmc(machine_config &config)
 	m_via6522_1->readpb_handler().append(m_exp, FUNC(bbc_exp_slot_device::pb_r)).mask(0xe0);
 	m_via6522_1->writepb_handler().set(m_joyport, FUNC(bbc_joyport_slot_device::pb_w)).mask(0x1f);
 	m_via6522_1->writepb_handler().append(m_exp, FUNC(bbc_exp_slot_device::pb_w)).mask(0xe0);
+	m_via6522_1->cb1_handler().set(m_joyport, FUNC(bbc_joyport_slot_device::write_cb1));
+	m_via6522_1->cb2_handler().set(m_joyport, FUNC(bbc_joyport_slot_device::write_cb2));
 
 	/* cartridge sockets */
 	config.device_remove("cartslot1");
@@ -2930,7 +2936,7 @@ COMP ( 1987, daisy,    bbcm,   0,     daisy,    bbcm,   bbcm_state,  init_bbc,  
 COMP ( 1986, bbcmc,    0,      bbcm,  bbcmc,    bbcm,   bbcm_state,  init_bbc,  "Acorn Computers", "BBC Master Compact",                 MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1986, bbcmc_ar, bbcmc,  0,     bbcmc,    bbcm,   bbcm_state,  init_bbc,  "Acorn Computers", "BBC Master Compact (Arabic)",        MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1987, pro128s,  bbcmc,  0,     pro128s,  bbcm,   bbcm_state,  init_bbc,  "Olivetti",        "Prodest PC 128S",                    MACHINE_IMPERFECT_GRAPHICS)
-COMP ( 1988, autoc15,  bbcmc,  0,     autoc15,  autoc,  bbcm_state,  init_bbc,  "Autocue Ltd.",    "Autocue 1500 Telepromter",           MACHINE_NOT_WORKING)
+COMP ( 1988, autoc15,  bbcmc,  0,     autoc15,  autoc,  bbcm_state,  init_bbc,  "Autocue Ltd.",    "Autocue 1500 Teleprompter",          MACHINE_NOT_WORKING)
 COMP ( 1988, discmon,  bbcm,   0,     discmon,  bbcm,   bbcm_state,  init_bbc,  "Arbiter Leisure", "Arbiter Discmonitor A-01",           MACHINE_NOT_WORKING)
 COMP ( 1988, discmate, bbcm,   0,     discmate, bbcm,   bbcm_state,  init_bbc,  "Arbiter Leisure", "Arbiter Discmate A-02",              MACHINE_NOT_WORKING)
 //COMP ( 1988, discmast, bbcm,   0,     discmast, bbcm,   bbcm_state,  init_bbc, "Arbiter Leisure", "Arbiter Discmaster A-03",            MACHINE_NOT_WORKING)

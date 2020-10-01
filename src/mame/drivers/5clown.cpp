@@ -553,7 +553,7 @@ MC6845_UPDATE_ROW(_5clown_state::update_row)
     x--- ----   Extra color for 7's.
 */
 
-	uint32_t *pix = &bitmap.pix32(y);
+	uint32_t *pix = &bitmap.pix(y);
 	ra &= 0x07;
 
 	for (int x = 0; x < x_count; x++)
@@ -846,7 +846,7 @@ void _5clown_state::fcaudio_map(address_map &map)
 static INPUT_PORTS_START( fclown )
 	/* Multiplexed - 4x5bits */
 	PORT_START("IN0-0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_BET )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )    PORT_NAME("Record")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )    PORT_NAME("Start")

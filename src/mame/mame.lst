@@ -930,6 +930,9 @@ virusrck                        // (c) 2001 Access GmbH
 virusrckxl                      // (c) 2002 Access GmbH
 viruscl                         // (c) 2004 Access GmbH
 
+@source:adacp150.cpp
+adacp150p                       //
+
 @source:adam.cpp
 adam                            // Coleco Adam
 
@@ -2400,6 +2403,7 @@ acombat3                        // bootleg
 acombat4                        // bootleg
 acombato                        // bootleg
 afire                           // Rene Pierre
+asterion                        // Olympia
 astrof                          // (c) [1980?]
 astrof2                         // (c) [1980?]
 astrof3                         // (c) [1980?]
@@ -9930,6 +9934,7 @@ mazinger                        // (c) 1994 Banpresto (country is in EEPROM)
 mazingerj                       // (c) 1994 Banpresto (country is in EEPROM)
 metmqstr                        // (c) 1995 Banpresto / Pandorabox
 nmaster                         // (c) 1995 Banpresto / Pandorabox
+paccarn                         // (c) 1996 Namco
 paceight                        // (c) 1996 Namco
 pacslot                         // (c) 1996 Namco
 plegends                        // (c) 1994 Atlus
@@ -10128,6 +10133,9 @@ milliped                        // 136013           (c) 1982
 millpac                         // Valadon
 multiped                        // hack
 warlords                        // 037153-037159    (c) 1980
+
+@source:ceres.cpp
+ceres1                          // Eidgenössische Technische Hochschule Zürich Ceres-1
 
 @source:cesclass.cpp
 ccclass                         //
@@ -11959,6 +11967,7 @@ cobraa                          //
 rblaster                        // (c) 1985
 
 @source:deco_mlc.cpp
+acchi                           // ??? (c) 1996 Data East Corporation (Japan)
 avengrgs                        // MCG (c) 1995 Data East Corporation (World)
 avengrgsj                       // MCG (c) 1995 Data East Corporation (Japan)
 ddream95                        // MCE (c) 1996 Data East Corporation
@@ -14202,8 +14211,9 @@ luctoday                        // 1980 Sigma
 mandinga                        // bootleg (Artemi)
 mandingaeg                      // bootleg (Electrogame)
 mandingarf                      // bootleg (Recreativos Franco S.A.)
-olmandingo                      // bootleg
 mandingac                       // bootleg (Centromatic)
+olmandingo                      // bootleg
+olmandingc                      // bootleg (Calfesa)
 mltiwars                        // bootleg (Gayton Games)
 monsterz                        // (c) 1982 Nihon (Arcade TV Game List - P.102, Left, 20 from top)
 moonal2                         // [1980] Nichibutsu
@@ -14800,6 +14810,7 @@ rp200
 pcp8718
 pcp8728
 unkunsp
+bkid218
 
 @source:generalplus_gpl16250_mobigo.cpp
 mobigo
@@ -14809,6 +14820,7 @@ mobigo2
 @source:generalplus_gpl16250_nand.cpp
 wlsair60                        // Wireless Air 60
 kiugames
+jak_camp
 jak_car2
 jak_gtg
 jak_sspop
@@ -15524,6 +15536,7 @@ hulk                            //
 jokrpokr                        //
 pinpool                         //
 roldisco                        //
+sahalove                        //
 sinbad                          //
 sinbadn                         //
 solaride                        //
@@ -16726,7 +16739,8 @@ in207100                        // Informer 207/100
 @source:informer_207_376.cpp
 in207376                        // Informer 207/376
 
-@source:informer_213ae.cpp
+@source:informer_213.cpp
+in213                           // Informer 213
 in213ae                         // Informer 213 AE
 
 @source:instantm.cpp
@@ -19000,6 +19014,7 @@ mariorou
 dobouchn
 kattobas
 konslot
+konslot2
 koropens
 kzaurus
 pwrchanc
@@ -19007,6 +19022,7 @@ ymcapsul
 
 @source:quickpick5.cpp
 quickp5
+waijockey
 
 @source:kontest.cpp
 kontest                         // GX800 (c) 198? (Japan)
@@ -19857,7 +19873,6 @@ uccopsu                         // (c) 1992 Irem America (US)
 mac2fdhd                        // 1988 Apple Macintosh II (FDHD)
 maccclas                        // 1993 Apple Macintosh Color Classic
 macclas2                        // 1991 Apple Macintosh Classic II
-macclasc                        // 1990 Apple Macintosh Classic
 macii                           // 1987 Apple Macintosh II
 maciici                         // 1989 Apple Macintosh IIci
 maciicx                         // 1989 Apple Macintosh IIcx
@@ -19882,16 +19897,17 @@ macpb180c                       // 1992 Apple Macintosh PowerBook 180c
 macpd210                        // 1992 Apple Macintosh PowerBook Duo 210
 macprtb                         // 1989 Apple Macintosh Portable
 macqd700                        // 1991 Apple Macintosh Quadra 700
-macse                           // 1987 Apple Macintosh SE
 macse30                         // 1989 Apple Macintosh SE/30
-macsefd                         // 1988 Apple Macintosh SE (FDHD)
 pmac6100                        // 1993 Apple Power Macintosh 6100
 
 @source:mac128.cpp
 mac128k                         // 1984 Apple Macintosh
 mac512k                         // 1985 Apple Macintosh 512k
 mac512ke                        // 1986 Apple Macintosh 512ke
+macclasc                        // 1990 Apple Macintosh Classic
 macplus                         // 1986 Apple Macintosh Plus
+macse                           // 1987 Apple Macintosh SE
+macsefd                         // 1988 Apple Macintosh SE (FDHD)
 unitron                         // 1985 Unitron
 utrn1024                        // 1986 Unitron 1024
 
@@ -22211,6 +22227,7 @@ rad_gen1                        // (c)2004 Radica
 rad_gen2                        // (c)2004 Radica
 rad_ssoc                        // (c)2004 Radica
 rad_sonic
+rad_orun
 
 @source:megaphx.cpp
 megaphx                         // (c) 1991 Dinamic / Inder
@@ -31511,6 +31528,9 @@ shorsem                         // 2000.??    Star Horse (main screens)
 shorsel                         // 2000.12    Star Horse (live and backup)
 shors2k1                        // 2002.01.09 Star Horse 2001 (satellite, Rev B)
 shors2k2                        // 2002.12.09 Star Horse 2002 (sound, Export/Taiwan)
+shors2k2l                       // 2002.07 Star Horse 2002 (live)
+shors2k2m                       // 2002.05 Star Horse 2002 (main screens)
+shors2k2s                       // 2002.07 Star Horse 2002 (sound and backup, Rev A)
 shorsep                         // 2003.12.01 Star Horse Progress (satellite, Rev A)
 shorsepm                        // 2003.??    Star Horse Progress (main screens, Rev B)
 shorseps                        // 2003.12.02 Star Horse Progress (sound & backup, Rev A)
@@ -32183,6 +32203,7 @@ mc_dg101
 mc_aa2
 mc_105te
 mc_sp69
+vsmaxx17
 polmega
 silv35
 lpgm240
@@ -32242,8 +32263,11 @@ zdog
 otrail
 denv150
 techni4
-duetpp
+sporzpp
 sporzbx
+sporztn
+wldsoctv
+solargm
 ablmini
 senwld
 zonefusn
@@ -35393,6 +35417,9 @@ d50                             //
 d50o                            //
 d550                            //
 
+@source:roland_jd800.cpp
+jd800                           //
+
 @source:roland_jv80.cpp
 jv880                           //
 
@@ -36452,6 +36479,7 @@ endurord                        // bootleg
 hangon                          // (c) 1985 (Rev A)
 hangon1                         // (c) 1985
 hangon2                         // (c) 1985
+hangonvf                        // bootleg
 shangonrb                       // (c) 1992 (but bootleg, hangon hw?)
 shangonrb2                      // bootleg (Beta)
 shangonro                       // (c) 1987 (FD1094)
@@ -37749,6 +37777,7 @@ snes4sln
 denseib                         // bootleg
 denseib2                        // bootleg
 endless                         // bootleg
+endlessa                        // bootleg
 ffight2b                        // bootleg
 iron                            // bootleg
 legendsb                        // bootleg
@@ -37846,6 +37875,7 @@ ikari3k                         // A7007 'IK3'(c) 1989
 ikari3u                         // A7007 'IK3'(c) 1989
 ikari3w                         // A7007 'IK3'(c) 1989
 pow                             // A7008 'DG' (c) 1988
+powb                            // bootleg
 powj                            // A7008 'DG' (c) 1988
 searchar                        // A8007 'BH' (c) 1989
 searcharj                       // A8007 'BH' (c) 1989
@@ -38114,6 +38144,7 @@ senspeed
 ordentv
 wfcentro
 tiktokmm
+jouet
 
 @source:spg2xx_digimake.cpp
 rad_digi
@@ -40374,6 +40405,7 @@ kbash2                          // bootleg
 kbashk                          // TP-023 (c) 1993 Toaplan
 kingdmgp                        // (c) 1994 Raizing/8ing
 mahoudai                        // (c) 1993 Raizing + Able license
+nprobowl                        // (c) 1996 Zuck + Able license
 othldrby                        // (c) 1995 Sunwise
 pipibibs                        // TP-025
 pipibibsa                       // TP-025

@@ -1248,7 +1248,7 @@ void floppy_sound_device::device_start()
 	// If we don't have all samples, don't allocate a stream or access sample data.
 	if (m_loaded)
 	{
-		m_sound = stream_alloc_legacy(0, 1, clock()); // per-floppy stream
+		m_sound = stream_alloc(0, 1, clock()); // per-floppy stream
 	}
 	register_for_save_states();
 }
@@ -1369,21 +1369,21 @@ void floppy_sound_device::step(int zone)
 }
 
 //-------------------------------------------------
-//  sound_stream_update_legacy - update the sound stream
+//  sound_stream_update - update the sound stream
 //-------------------------------------------------
 
-void floppy_sound_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void floppy_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	// We are using only one stream, unlike the parent class
 	// Also, there is no need for interpolation, as we only expect
 	// one sample rate of 44100 for all samples
 
 	int16_t out;
-	stream_sample_t *samplebuffer = outputs[0];
+	auto &samplebuffer = outputs[0];
 	int idx = 0;
 	int sampleend = 0;
 
-	while (samples-- > 0)
+	for (int sampindex = 0; sampindex < samplebuffer.samples(); sampindex++)
 	{
 		out = 0;
 
@@ -1477,7 +1477,7 @@ void floppy_sound_device::sound_stream_update_legacy(sound_stream &stream, strea
 		}
 
 		// Write to the stream buffer
-		*(samplebuffer++) = out;
+		samplebuffer.put_int(sampindex, out, 32768);
 	}
 }
 

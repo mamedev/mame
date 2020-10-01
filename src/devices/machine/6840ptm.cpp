@@ -153,6 +153,7 @@ void ptm6840_device::device_reset()
 		m_fired[i]   = 0;
 		m_enabled[i] = 0;
 		m_mode[i] = 0;
+		m_gate[i]  = 0;
 	}
 }
 

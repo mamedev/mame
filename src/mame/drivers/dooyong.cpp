@@ -770,9 +770,9 @@ u32 popbingo_state::screen_update_popbingo(screen_device &screen, bitmap_ind16 &
 
 	for (int y = cliprect.top(); cliprect.bottom() >= y; y++)
 	{
-		const u16 *const bg_src(&m_bg_bitmap[0].pix16(y, 0));
-		const u16 *const bg2_src(&m_bg_bitmap[1].pix16(y, 0));
-		u16 *const dst(&bitmap.pix16(y, 0));
+		const u16 *const bg_src(&m_bg_bitmap[0].pix(y, 0));
+		const u16 *const bg2_src(&m_bg_bitmap[1].pix(y, 0));
+		u16 *const dst(&bitmap.pix(y, 0));
 		for (int x = cliprect.left(); cliprect.right() >= x; x++)
 			dst[x] = 0x100U | (bg_src[x] << 4) | bg2_src[x];
 	}

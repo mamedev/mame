@@ -151,7 +151,7 @@ void splash_state::draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			}
 
 			if (sy >= cliprect.min_y && sy <= cliprect.max_y && sx-9 >= cliprect.min_x && sx-9 <= cliprect.max_x)
-				bitmap.pix16(sy, sx-9) = 0x300+(color^colxor);
+				bitmap.pix(sy, sx-9) = 0x300+(color^colxor);
 		}
 	}
 

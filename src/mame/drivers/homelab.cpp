@@ -622,19 +622,18 @@ u32 homelab_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	if (!m_cols)
 		return 1;
 
-	u8 y,ra,chr,gfx;
-	u16 sy=0,ma=0,x;
+	u16 sy=0,ma=0;
 
-	for(y = 0; y < m_rows; y++ )
+	for (u8 y = 0; y < m_rows; y++)
 	{
-		for (ra = 0; ra < 8; ra++)
+		for (u8 ra = 0; ra < 8; ra++)
 		{
-			u16 *p = &bitmap.pix16(sy++);
+			u16 *p = &bitmap.pix(sy++);
 
-			for (x = ma; x < ma + m_cols; x++)
+			for (u16 x = ma; x < ma + m_cols; x++)
 			{
-				chr = m_vram[x]; // get char in videoram
-				gfx = m_p_chargen[chr | (ra<<8)]; // get dot pattern in chargen
+				u8 const chr = m_vram[x]; // get char in videoram
+				u8 const gfx = m_p_chargen[chr | (ra<<8)]; // get dot pattern in chargen
 
 				/* Display a scanline of a character */
 				*p++ = BIT(gfx, 7);

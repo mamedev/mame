@@ -76,10 +76,10 @@ gaelco_gae1_device::gaelco_gae1_device(const machine_config &mconfig, device_typ
             Writes length bytes to the sound buffer
   ============================================================================*/
 
-void gaelco_gae1_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void gaelco_gae1_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	/* fill all data needed */
-	for (int j = 0; j < samples; j++)
+	for (int j = 0; j < outputs[0].samples(); j++)
 	{
 		int output_l = 0, output_r = 0;
 
@@ -177,12 +177,12 @@ void gaelco_gae1_device::sound_stream_update_legacy(sound_stream &stream, stream
 #endif
 
 		/* now that we have computed all channels, save current data to the output buffer */
-		outputs[0][j] = output_l;
-		outputs[1][j] = output_r;
+		outputs[0].put_int(j, output_l, 32768);
+		outputs[1].put_int(j, output_r, 32768);
 	}
 
-	if (wavraw)
-		wav_add_data_32lr(wavraw, outputs[0], outputs[1], samples, 0);
+//  if (wavraw)
+//      wav_add_data_buffer(wavraw, outputs[0], outputs[1]);
 }
 
 /*============================================================================
@@ -253,7 +253,7 @@ void gaelco_gae1_device::gaelcosnd_w(offs_t offset, uint16_t data, uint16_t mem_
 void gaelco_gae1_device::device_start()
 {
 	u32 rate = clock() / 128;
-	m_stream = stream_alloc_legacy(0, 2, rate);
+	m_stream = stream_alloc(0, 2, rate);
 
 	/* init volume table */
 	for (int vol = 0; vol < VOLUME_LEVELS; vol++)

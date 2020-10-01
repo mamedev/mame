@@ -1178,7 +1178,7 @@ uint32_t tms340x0_device::tms340x0_ind16(screen_device &screen, bitmap_ind16 &bi
 		params.heblnk = params.hsblnk = cliprect.max_x + 1;
 
 	/* blank out the blank regions */
-	uint16_t *dest = &bitmap.pix16(cliprect.min_y);
+	uint16_t *dest = &bitmap.pix(cliprect.min_y);
 	for (x = cliprect.min_x; x < params.heblnk; x++)
 		dest[x] = blackpen;
 	for (x = params.hsblnk; x <= cliprect.max_x; x++)
@@ -1209,7 +1209,7 @@ uint32_t tms340x0_device::tms340x0_rgb32(screen_device &screen, bitmap_rgb32 &bi
 		params.heblnk = params.hsblnk = cliprect.max_x + 1;
 
 	/* blank out the blank regions */
-	uint32_t *dest = &bitmap.pix32(cliprect.min_y);
+	uint32_t *dest = &bitmap.pix(cliprect.min_y);
 	for (x = cliprect.min_x; x < params.heblnk; x++)
 		dest[x] = blackpen;
 	for (x = params.hsblnk; x <= cliprect.max_x; x++)

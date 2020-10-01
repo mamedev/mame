@@ -111,8 +111,8 @@ void namco_c355spr_device::zdrawgfxzoom(
 				{ /* skip if inner loop doesn't draw anything */
 					for (int y = sy; y < ey; y++)
 					{
-						const u8 *source = source_base + (y_index>>16) * gfx->rowbytes();
-						u16 *dest = &dest_bmp.pix16(y);
+						u8 const *const source = source_base + (y_index>>16) * gfx->rowbytes();
+						u16 *const dest = &dest_bmp.pix(y);
 						int x_index = x_index_base;
 						for (int x = sx; x < ex; x++)
 						{
@@ -140,8 +140,8 @@ void namco_c355spr_device::copybitmap(bitmap_ind16 &dest_bmp, const rectangle &c
 	{
 		for (int y = clip.min_y; y <= clip.max_y; y++)
 		{
-			u16 *src = &m_tempbitmap.pix16(y);
-			u16 *dest = &dest_bmp.pix16(y);
+			u16 *const src = &m_tempbitmap.pix(y);
+			u16 *const dest = &dest_bmp.pix(y);
 			for (int x = clip.min_x; x <= clip.max_x; x++)
 			{
 				if (src[x] != 0xffff)
@@ -174,8 +174,8 @@ void namco_c355spr_device::copybitmap(bitmap_ind16 &dest_bmp, const rectangle &c
 	{
 		for (int y = clip.min_y; y <= clip.max_y; y++)
 		{
-			u16 *src = &m_tempbitmap.pix16(y);
-			u16 *dest = &dest_bmp.pix16(y);
+			u16 *const src = &m_tempbitmap.pix(y);
+			u16 *const dest = &dest_bmp.pix(y);
 			for (int x = clip.min_x; x <= clip.max_x; x++)
 			{
 				if (src[x] != 0xffff)
@@ -213,9 +213,9 @@ void namco_c355spr_device::copybitmap(bitmap_rgb32 &dest_bmp, const rectangle &c
 	{
 		for (int y = clip.min_y; y <= clip.max_y; y++)
 		{
-			u16 *src = &m_tempbitmap.pix16(y);
-			u16 *srcrender = &m_screenbitmap.pix16(y);
-			u32 *dest = &dest_bmp.pix32(y);
+			u16 *const src = &m_tempbitmap.pix(y);
+			u16 *const srcrender = &m_screenbitmap.pix(y);
+			u32 *const dest = &dest_bmp.pix(y);
 			for (int x = clip.min_x; x <= clip.max_x; x++)
 			{
 				if (src[x] != 0xffff)
@@ -251,9 +251,9 @@ void namco_c355spr_device::copybitmap(bitmap_rgb32 &dest_bmp, const rectangle &c
 	{
 		for (int y = clip.min_y; y <= clip.max_y; y++)
 		{
-			u16 *src = &m_tempbitmap.pix16(y);
-			u16 *srcrender = &m_screenbitmap.pix16(y);
-			u32 *dest = &dest_bmp.pix32(y);
+			u16 *const src = &m_tempbitmap.pix(y);
+			u16 *const srcrender = &m_screenbitmap.pix(y);
+			u32 *const dest = &dest_bmp.pix(y);
 			for (int x = clip.min_x; x <= clip.max_x; x++)
 			{
 				if (src[x] != 0xffff)

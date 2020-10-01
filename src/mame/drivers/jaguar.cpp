@@ -2126,10 +2126,11 @@ ROM_START( area51 ) /* R3000 based, Area51 Atari Games License - MAIN: Oct 24 19
 	DISK_IMAGE( "area51", 0, SHA1(3b303bc37e206a6d7339352c869f050d04186f11) )
 ROM_END
 
-ROM_START( maxforce ) /* R3000 based, labeled as "Maximum Force 5-23-97 v1.05" */
+
+ROM_START( maxforce ) /* R3000 based, labeled as "Maximum Force 5-23-97 v1.05" - Usually found with "light grey" labels */
 	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for IDT 79R3041 code */
-	ROM_LOAD32_BYTE( "1.05_maximum_force_hh_5-23-97.hh", 0x00000, 0x80000, CRC(ec7f8167) SHA1(0cf057bfb1f30c2c9621d3ed25021e7ba7bdd46e) ) /* Usually found with "light grey" labels */
-	ROM_LOAD32_BYTE( "1.05_maximum_force_hl_5-23-97.hl", 0x00001, 0x80000, CRC(3172611c) SHA1(00f14f871b737c66c20f95743740d964d0be3f24) ) /* Also found labeled as "MAXIMUM FORCE EE FIX PROG" */
+	ROM_LOAD32_BYTE( "1.05_maximum_force_hh_5-23-97.hh", 0x00000, 0x80000, CRC(ec7f8167) SHA1(0cf057bfb1f30c2c9621d3ed25021e7ba7bdd46e) ) /* Also found labeled as "MAXIMUM FORCE EE FIX PROG" */
+	ROM_LOAD32_BYTE( "1.05_maximum_force_hl_5-23-97.hl", 0x00001, 0x80000, CRC(3172611c) SHA1(00f14f871b737c66c20f95743740d964d0be3f24) )
 	ROM_LOAD32_BYTE( "1.05_maximum_force_lh_5-23-97.lh", 0x00002, 0x80000, CRC(84d49423) SHA1(88d9a6724f1118f2bbef5dfa27accc2b65c5ba1d) )
 	ROM_LOAD32_BYTE( "1.05_maximum_force_ll_5-23-97.ll", 0x00003, 0x80000, CRC(16d0768d) SHA1(665a6d7602a7f2f5b1f332b0220b1533143d56b1) )
 
@@ -2140,13 +2141,12 @@ ROM_START( maxforce ) /* R3000 based, labeled as "Maximum Force 5-23-97 v1.05" *
 	DISK_IMAGE( "maxforce", 0, SHA1(d54e7a8f3866bb2a1d28ae637e7c92ffa4dbe558) )
 ROM_END
 
-
-ROM_START( maxf_102 ) /* R3000 based, labeled as "Maximum Force 2-27-97 v1.02" */
+ROM_START( maxf_102 ) /* R3000 based, labeled as "Maximum Force 2-27-97 v1.02" - Usually found with "yellow" labels */
 	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for IDT 79R3041 code */
-	ROM_LOAD32_BYTE( "1.02_maximum_force_hh_2-27-97.hh", 0x00000, 0x80000, CRC(8ff7009d) SHA1(da22eae298a6e0e36f503fa091ac3913423dcd0f) ) /* Usually found with "yellow" labels */
-	ROM_LOAD32_BYTE( "1.02_maximum_force_hl_2-27-97.hl", 0x00001, 0x80000, CRC(96c2cc1d) SHA1(b332b8c042b92c736131c478cefac1c3c2d2673b) )
-	ROM_LOAD32_BYTE( "1.02_maximum_force_lh_2-27-97.lh", 0x00002, 0x80000, CRC(459ffba5) SHA1(adb40db6904e84c17f32ac6518fd2e994da7883f) )
-	ROM_LOAD32_BYTE( "1.02_maximum_force_ll_2-27-97.ll", 0x00003, 0x80000, CRC(e491be7f) SHA1(cbe281c099a4aa87067752d68cf2bb0ab3900531) )
+	ROM_LOAD32_BYTE( "1.02_maximum_force_hh_2-27-97.hh", 0x00000, 0x80000, CRC(8ff7009d) SHA1(da22eae298a6e0e36f503fa091ac3913423dcd0f) ) /* Also found labeled as MAX, FORCE, V. 1.02, PROG, HH, 46FF, 2/27/97 (each item on a seperate line) */
+	ROM_LOAD32_BYTE( "1.02_maximum_force_hl_2-27-97.hl", 0x00001, 0x80000, CRC(96c2cc1d) SHA1(b332b8c042b92c736131c478cefac1c3c2d2673b) ) /* Also found labeled as MAX, FORCE, V. 1.02, PROG, HL, 14FE, 2/27/97 (each item on a seperate line) */
+	ROM_LOAD32_BYTE( "1.02_maximum_force_lh_2-27-97.lh", 0x00002, 0x80000, CRC(459ffba5) SHA1(adb40db6904e84c17f32ac6518fd2e994da7883f) ) /* Also found labeled as MAX, FORCE, V. 1.02, PROG, LH, 15FD, 2/27/97 (each item on a seperate line) */
+	ROM_LOAD32_BYTE( "1.02_maximum_force_ll_2-27-97.ll", 0x00003, 0x80000, CRC(e491be7f) SHA1(cbe281c099a4aa87067752d68cf2bb0ab3900531) ) /* Also found labeled as MAX, FORCE, V. 1.02, PROG, LL, 15FC, 2/27/97 (each item on a seperate line) */
 
 	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
@@ -2154,7 +2154,6 @@ ROM_START( maxf_102 ) /* R3000 based, labeled as "Maximum Force 2-27-97 v1.02" *
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "maxforce", 0, SHA1(d54e7a8f3866bb2a1d28ae637e7c92ffa4dbe558) )
 ROM_END
-
 
 ROM_START( maxf_ng ) /* R3000 based - MAIN: Apr 18 1997 11:08:45 */
 	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for IDT 79R3041 code */
@@ -2188,7 +2187,6 @@ ROM_START( area51mx )   /* 68020 based - MAIN: Apr 22 1998 17:53:57 / GUTS: 2.04
 	DISK_IMAGE( "area51mx", 0, SHA1(5ff10f4e87094d4449eabf3de7549564ca568c7e) )
 ROM_END
 
-
 ROM_START( a51mxr3k ) /* R3000 based - MAIN: Feb 10 1998 11:52:51 / GUTS: 2.07CJ Feb  5 1998 18:52:26 */
 	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for IDT 79R3041 code */
 	ROM_LOAD32_BYTE( "1.0_r3k_max-a51_kit_hh.hh", 0x00000, 0x80000, CRC(a984dab2) SHA1(debb3bc11ff49e87a52e89a69533a1bab7db700e) ) /* Labeled as 1.0 R3K MAX/A51 KIT HH */
@@ -2202,7 +2200,6 @@ ROM_START( a51mxr3k ) /* R3000 based - MAIN: Feb 10 1998 11:52:51 / GUTS: 2.07CJ
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "area51mx", 0, SHA1(5ff10f4e87094d4449eabf3de7549564ca568c7e) )
 ROM_END
-
 
 ROM_START( a51mxr3ka ) /* R3000 based - MAIN: Feb  2 1998 14:10:29 / GUTS: 2.07CJ Jan  9 1998 21:11:55 */
 	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for IDT 79R3041 code */

@@ -72,13 +72,13 @@ void korg_ds8_state::machine_start()
 HD44780_PIXEL_UPDATE(korg_ds8_state::lcd_pixel_update)
 {
 	if (x < 5 && y < 8 && line < 2 && pos < 40)
-		bitmap.pix16(line * 8 + y, pos * 6 + x) = state;
+		bitmap.pix(line * 8 + y, pos * 6 + x) = state;
 }
 
 HD44780_PIXEL_UPDATE(korg_ds8_state::korg707_pixel_update)
 {
 	if (x < 5 && y < 8 && line < 2 && pos < 20)
-		bitmap.pix16(line * 8 + y, pos * 6 + x) = state;
+		bitmap.pix(line * 8 + y, pos * 6 + x) = state;
 }
 
 u8 korg_ds8_state::kbd_sw_r()

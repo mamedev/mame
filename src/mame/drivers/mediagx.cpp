@@ -266,19 +266,17 @@ void mediagx_state::video_start()
 
 void mediagx_state::draw_char(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx, int ch, int att, int x, int y)
 {
-	int i,j;
-	const uint8_t *dp;
 	int index = 0;
-	const pen_t *pens = &m_palette->pen(0);
+	pen_t const *const pens = &m_palette->pen(0);
 
-	dp = gfx->get_data(ch);
+	uint8_t const *const dp = gfx->get_data(ch);
 
-	for (j=y; j < y+8; j++)
+	for (int j=y; j < y+8; j++)
 	{
-		uint32_t *p = &bitmap.pix32(j);
-		for (i=x; i < x+8; i++)
+		uint32_t *const p = &bitmap.pix(j);
+		for (int i=x; i < x+8; i++)
 		{
-			uint8_t pen = dp[index++];
+			uint8_t const pen = dp[index++];
 			if (pen)
 				p[i] = pens[gfx->colorbase() + (att & 0xf)];
 			else
@@ -292,18 +290,16 @@ void mediagx_state::draw_char(bitmap_rgb32 &bitmap, const rectangle &cliprect, g
 
 void mediagx_state::draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int i, j;
-	int width, height;
-	int line_delta = (m_disp_ctrl_reg[DC_LINE_DELTA] & 0x3ff) * 4;
+	int const line_delta = (m_disp_ctrl_reg[DC_LINE_DELTA] & 0x3ff) * 4;
 
-	width = (m_disp_ctrl_reg[DC_H_TIMING_1] & 0x7ff) + 1;
+	int width = (m_disp_ctrl_reg[DC_H_TIMING_1] & 0x7ff) + 1;
 	if (m_disp_ctrl_reg[DC_TIMING_CFG] & 0x8000)     // pixel double
 	{
 		width >>= 1;
 	}
 	width += 4;
 
-	height = (m_disp_ctrl_reg[DC_V_TIMING_1] & 0x7ff) + 1;
+	int height = (m_disp_ctrl_reg[DC_V_TIMING_1] & 0x7ff) + 1;
 
 	if ( (width != m_frame_width || height != m_frame_height) &&
 			(width > 1 && height > 1 && width <= 640 && height <= 480) )
@@ -319,19 +315,19 @@ void mediagx_state::draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &clip
 
 	if (m_disp_ctrl_reg[DC_OUTPUT_CFG] & 0x1)        // 8-bit mode
 	{
-		uint8_t *framebuf = (uint8_t*)&m_vram[m_disp_ctrl_reg[DC_FB_ST_OFFSET]/4];
-		uint8_t *pal = m_pal;
+		uint8_t const *const framebuf = (uint8_t const *)&m_vram[m_disp_ctrl_reg[DC_FB_ST_OFFSET]/4];
+		uint8_t const *const pal = m_pal;
 
-		for (j=0; j < m_frame_height; j++)
+		for (int j=0; j < m_frame_height; j++)
 		{
-			uint32_t *p = &bitmap.pix32(j);
-			uint8_t *si = &framebuf[j * line_delta];
-			for (i=0; i < m_frame_width; i++)
+			uint32_t *const p = &bitmap.pix(j);
+			uint8_t const *si = &framebuf[j * line_delta];
+			for (int i=0; i < m_frame_width; i++)
 			{
-				int c = *si++;
-				int r = pal[(c*3)+0] << 2;
-				int g = pal[(c*3)+1] << 2;
-				int b = pal[(c*3)+2] << 2;
+				int const c = *si++;
+				int const r = pal[(c*3)+0] << 2;
+				int const g = pal[(c*3)+1] << 2;
+				int const b = pal[(c*3)+2] << 2;
 
 				p[i] = r << 16 | g << 8 | b;
 			}
@@ -339,21 +335,21 @@ void mediagx_state::draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &clip
 	}
 	else            // 16-bit
 	{
-		uint16_t *framebuf = (uint16_t*)&m_vram[m_disp_ctrl_reg[DC_FB_ST_OFFSET]/4];
+		uint16_t const *const framebuf = (uint16_t const *)&m_vram[m_disp_ctrl_reg[DC_FB_ST_OFFSET]/4];
 
 		// RGB 5-6-5 mode
 		if ((m_disp_ctrl_reg[DC_OUTPUT_CFG] & 0x2) == 0)
 		{
-			for (j=0; j < m_frame_height; j++)
+			for (int j=0; j < m_frame_height; j++)
 			{
-				uint32_t *p = &bitmap.pix32(j);
-				uint16_t *si = &framebuf[j * (line_delta/2)];
-				for (i=0; i < m_frame_width; i++)
+				uint32_t *const p = &bitmap.pix(j);
+				uint16_t const *si = &framebuf[j * (line_delta/2)];
+				for (int i=0; i < m_frame_width; i++)
 				{
-					uint16_t c = *si++;
-					int r = ((c >> 11) & 0x1f) << 3;
-					int g = ((c >> 5) & 0x3f) << 2;
-					int b = (c & 0x1f) << 3;
+					uint16_t const c = *si++;
+					int const r = ((c >> 11) & 0x1f) << 3;
+					int const g = ((c >> 5) & 0x3f) << 2;
+					int const b = (c & 0x1f) << 3;
 
 					p[i] = r << 16 | g << 8 | b;
 				}
@@ -362,16 +358,16 @@ void mediagx_state::draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &clip
 		// RGB 5-5-5 mode
 		else
 		{
-			for (j=0; j < m_frame_height; j++)
+			for (int j=0; j < m_frame_height; j++)
 			{
-				uint32_t *p = &bitmap.pix32(j);
-				uint16_t *si = &framebuf[j * (line_delta/2)];
-				for (i=0; i < m_frame_width; i++)
+				uint32_t *const p = &bitmap.pix(j);
+				uint16_t const *si = &framebuf[j * (line_delta/2)];
+				for (int i=0; i < m_frame_width; i++)
 				{
-					uint16_t c = *si++;
-					int r = ((c >> 10) & 0x1f) << 3;
-					int g = ((c >> 5) & 0x1f) << 3;
-					int b = (c & 0x1f) << 3;
+					uint16_t const c = *si++;
+					int const r = ((c >> 10) & 0x1f) << 3;
+					int const g = ((c >> 5) & 0x1f) << 3;
+					int const b = (c & 0x1f) << 3;
 
 					p[i] = r << 16 | g << 8 | b;
 				}

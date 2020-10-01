@@ -48,8 +48,8 @@
 //**************************************************************************
 
 // device type definitions
-DEFINE_DEVICE_TYPE(DP8344A, dp8344a_device, "dp8344a", "DP8344A BCP")
-DEFINE_DEVICE_TYPE(DP8344B, dp8344b_device, "dp8344b", "DP8344B BCP")
+DEFINE_DEVICE_TYPE(DP8344A, dp8344a_device, "dp8344a", "National Semiconductor DP8344A BCP")
+DEFINE_DEVICE_TYPE(DP8344B, dp8344b_device, "dp8344b", "National Semiconductor DP8344B BCP")
 
 
 //**************************************************************************
@@ -109,6 +109,7 @@ dp8344_device::dp8344_device(const machine_config &mconfig, device_type type, co
 	, m_tfifo{0, 0, 0}
 	, m_rfifo_head(0)
 	, m_tfifo_head(0)
+	, m_receiver_interrupt(false)
 {
 }
 
@@ -178,7 +179,7 @@ void dp8344_device::device_start()
 	set_icountptr(m_icount);
 
 	// debug state registration
-	state_add<u16>(BCP_PC, "PC", [this]() { return m_pc; }, [this](u16 data) { m_pc = m_ppc = data; prefetch_instruction(); });
+	state_add(BCP_PC, "PC", m_pc, [this](u16 data) { m_pc = m_ppc = data; prefetch_instruction(); });
 	state_add(STATE_GENPC, "GENPC", m_pc).noshow();
 	state_add(STATE_GENPCBASE, "GENPCBASE", m_pc).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_ccr).formatstr("%09s").noshow();
@@ -257,6 +258,7 @@ void dp8344_device::device_start()
 	save_item(NAME(m_tfifo)); // 3-frame Transmit FIFO
 	save_item(NAME(m_rfifo_head));
 	save_item(NAME(m_tfifo_head));
+	save_item(NAME(m_receiver_interrupt));
 }
 
 
@@ -338,7 +340,7 @@ std::unique_ptr<util::disasm_interface> dp8344_device::create_disassembler()
 
 void dp8344_device::set_receiver_interrupt(bool state)
 {
-	// TODO
+	m_receiver_interrupt = state;
 }
 
 
@@ -545,8 +547,8 @@ void dp8344_device::set_device_control(u8 data)
 
 bool dp8344_device::interrupt_active() const
 {
-	// TODO: non-timer interrupts
-	return !BIT(m_icr, 4) && BIT(m_ccr, 7);
+	// TODO: non-receiver, non-timer interrupts
+	return (!BIT(m_icr, 0) && m_receiver_interrupt) || (!BIT(m_icr, 4) && BIT(m_ccr, 7));
 }
 
 
@@ -557,8 +559,11 @@ bool dp8344_device::interrupt_active() const
 
 u8 dp8344_device::get_interrupt_vector() const
 {
-	// TODO: non-timer interrupts
-	return 0x14;
+	// TODO: non-receiver, non-timer interrupts
+	if (!BIT(m_icr, 0) && m_receiver_interrupt)
+		return 0x04;
+	else
+		return 0x14;
 }
 
 
@@ -592,8 +597,8 @@ bool dp8344_device::get_flag(unsigned f) const
 	case 5: // Receiver Error
 		return BIT(m_tsr, 5);
 
-	case 6: // Data Available
-		return BIT(m_tsr, 3); // FIXME: differs from numeric value!
+	case 6: // Data Available (differs from DAV bit in TSR)
+		return m_rfifo_head < 3;
 
 	case 7: // Transmitter FIFO Full (or else Not Full)
 		return BIT(m_tsr, 7);
@@ -808,6 +813,19 @@ u8 dp8344_device::data_stack_pop()
 //  TRANSCEIVER OPERATION
 //**************************************************************************
 
+const char *const dp8344_device::s_protocol_names[8] =
+{
+	"IBM 3270",
+	"IBM 3299 Multiplexer",
+	"IBM 3299 Controller",
+	"IBM 3299 Repeater",
+	"IBM 5250",
+	"IBM 5250 Promiscuous",
+	"8-bit",
+	"8-bit Promiscuous"
+};
+
+
 //-------------------------------------------------
 //  transceiver_reset - reset the receiver and
 //  transmitter
@@ -846,6 +864,30 @@ void dp8344_device::transceiver_reset()
 
 void dp8344_device::transmit_fifo_push(u8 data)
 {
+	// HACK: loopback data
+	if (BIT(m_tmr, 6))
+	{
+		u16 frame = data | u16(m_tcr & 0x07) << 8;
+		if ((m_tmr & 0x07) == 0x00)
+		{
+			// Calculate odd parity on 3270 data frames
+			if (!BIT(m_tcr, 2))
+			{
+				if ((population_count_32(data) & 1) == 0)
+					frame |= 0x100;
+				else
+					frame &= 0x2ff;
+			}
+
+			// Calculate word parity
+			frame &= 0x3ff;
+			if ((population_count_32(frame) & 1) != BIT(m_tcr, 3))
+				frame |= 0x400;
+		}
+		receive_fifo_push(frame);
+		return;
+	}
+
 	// Push OWP, TF10-8 and RTF7-0 onto transmit FIFO
 	m_tfifo[0] = data | u16(m_tcr & 0x0f) << 8;
 
@@ -926,14 +968,43 @@ void dp8344_device::receiver_active()
 
 
 //-------------------------------------------------
-//  receive_fifo_push -
+//  receive_fifo_push - push a data frame onto
+//  the receive FIFO
 //-------------------------------------------------
 
-void dp8344_device::receive_fifo_push(u8 data)
+void dp8344_device::receive_fifo_push(u16 data)
 {
-	// Overflow error if the receive FIFO is already full
-	if (BIT(m_ncf, 6))
+	// Push word onto receive FIFO
+	m_rfifo[0] = data;
+
+	if (m_rfifo_head != 0)
+	{
+		// Asynchronously propagate data through FIFO (actually takes 40 ns)
+		m_rfifo_head--;
+		for (int i = 0; i < m_rfifo_head; i++)
+			m_rfifo[i + 1] = m_rfifo[i];
+
+		// Set data available flag
+		m_tsr |= 0x08;
+		if ((m_icr & 0xc0) == 0x40)
+			set_receiver_interrupt(true);
+
+		// Copy upper bits to TSR
+		m_tsr = (m_tsr & 0xf8) | (data & 0x700) >> 8;
+
+		// Set flag when FIFO is full
+		if (m_rfifo_head == 0)
+		{
+			m_tsr |= 0x40;
+			if ((m_icr & 0xc0) == 0x00)
+				set_receiver_interrupt(true);
+		}
+	}
+	else
+	{
+		// Overflow error if the receive FIFO is already full
 		set_receiver_error(0x10);
+	}
 }
 
 
@@ -943,19 +1014,32 @@ void dp8344_device::receive_fifo_push(u8 data)
 
 u8 dp8344_device::receive_fifo_pop(bool test)
 {
+	u8 data = m_rfifo[m_rfifo_head < 3 ? m_rfifo_head : 2] & 0x0ff;
+
 	if (!test)
 	{
-		// Clear Receive FIFO Full, DEME, Auto-Response and Poll/Acknowledge bits in NCF
-		m_ncf &= 0xb0;
+		if (m_rfifo_head < 3)
+		{
+			// Advance the FIFO
+			m_rfifo_head++;
+
+			// Copy upper bits to TSR
+			if (m_rfifo_head < 3)
+				m_tsr = (m_tsr & 0xf8) | (m_rfifo[m_rfifo_head] & 0x700) >> 8;
+		}
 
 		// Clear Data Available flag in TSR
 		m_tsr &= 0xf7;
-		if ((m_icr & 0xc0) == 0xc0)
+
+		// Clear Receive FIFO Full, DEME, Auto-Response and Poll/Acknowledge bits in NCF
+		m_ncf &= 0xb0;
+
+		// Clear receiver interrupt unless error interrupt exists
+		if (BIT(m_icr, 7) || !BIT(m_tsr, 5))
 			set_receiver_interrupt(false);
 	}
 
-	// TODO
-	return 0;
+	return data;
 }
 
 
@@ -990,11 +1074,18 @@ u8 dp8344_device::get_error_code(bool test)
 {
 	u8 code = m_ecr;
 
+	// Upper bits come from receive FIFO
+	code |= m_rfifo[m_rfifo_head < 3 ? m_rfifo_head : 2] & 0x0e0;
+
 	if (!test)
 	{
 		// Clear Error Code Register and Receiver Error flag in NCF
 		m_ecr = 0x00;
 		m_ncf &= 0xdf;
+
+		// Reassert DAV if FIFO is not empty
+		if (m_rfifo_head < 3)
+			m_tsr |= 0x08;
 
 		// Update interrupt status if RE interrupt selected
 		switch (m_icr & 0xc0)
@@ -1049,40 +1140,8 @@ void dp8344_device::set_transceiver_mode(u8 data)
 	if (!BIT(m_tmr, 6) && BIT(data, 6))
 		m_tx_act_cb(0);
 
-	switch (data & 0x07)
-	{
-	case 0:
-		logerror("%04X: Protocol Select: IBM 3270\n", m_ppc);
-		break;
-
-	case 1:
-		logerror("%04X: Protocol Select: IBM 3299 Multiplexer\n", m_ppc);
-		break;
-
-	case 2:
-		logerror("%04X: Protocol Select: IBM 3299 Controller\n", m_ppc);
-		break;
-
-	case 3:
-		logerror("%04X: Protocol Select: IBM 3299 Repeater\n", m_ppc);
-		break;
-
-	case 4:
-		logerror("%04X: Protocol Select: IBM 5250\n", m_ppc);
-		break;
-
-	case 5:
-		logerror("%04X: Protocol Select: IBM 5250 Promiscuous\n", m_ppc);
-		break;
-
-	case 6:
-		logerror("%04X: Protocol Select: 8-bit\n", m_ppc);
-		break;
-
-	case 7:
-		logerror("%04X: Protocol Select: 8-bit Promiscuous\n", m_ppc);
-		break;
-	}
+	if ((m_tmr & 0x07) != (data & 0x07))
+		logerror("%04X: Protocol Select: %s\n", m_ppc, s_protocol_names[data & 0x07]);
 
 	m_tmr = data;
 }
@@ -2064,6 +2123,10 @@ void dp8344_device::cmd_w(u8 data)
 		BIT(data, 3) ? "latched" : BIT(data, 5) ? "fast buffered" : "slow buffered",
 		BIT(data, 6) ? "single step" : BIT(data, 2) ? "start" : "stop");
 
+	// Make sure not to restart in the middle of an instruction
+	if (!BIT(m_ric, 2) && BIT(data, 2))
+		m_inst_state = T1_START;
+
 	m_ric = data;
 	set_input_line(INPUT_LINE_HALT, BIT(data, 2) ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -2125,7 +2188,6 @@ u8 dp8344_device::remote_read(offs_t offset)
 void dp8344_device::remote_write(offs_t offset, u8 data)
 {
 	// TODO: stop CPU if not accessing DMEM or RIC
-
 	switch (m_ric & 0x03)
 	{
 	case 0x00:

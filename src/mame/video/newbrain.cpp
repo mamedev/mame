@@ -121,10 +121,10 @@ void newbrain_state::do_screen_update(bitmap_rgb32 &bitmap, const rectangle &cli
 				uint8_t sr = gr ? grsr : vsr;
 				int color = BIT(sr, 7) ^ m_rv;
 
-				bitmap.pix32(y, x++) = m_palette->pen(color);
+				bitmap.pix(y, x++) = m_palette->pen(color);
 
 				if (columns == 40) {
-					bitmap.pix32(y, x++) = m_palette->pen(color);
+					bitmap.pix(y, x++) = m_palette->pen(color);
 				}
 
 				grsr <<= 1;

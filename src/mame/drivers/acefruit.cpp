@@ -149,16 +149,14 @@ uint32_t acefruit_state::screen_update_acefruit(screen_device &screen, bitmap_in
 {
 	int startrow = cliprect.min_y / 8;
 	int endrow = cliprect.max_y / 8;
-	int row;
-	int col;
 
-	for( row = startrow; row <= endrow; row++ )
+	for( int row = startrow; row <= endrow; row++ )
 	{
 		int spriterow = 0;
 		int spriteindex = 0;
 		int spriteparameter = 0;
 
-		for( col = 0; col < 32; col++ )
+		for( int col = 0; col < 32; col++ )
 		{
 			int tile_index = ( col * 32 ) + row;
 			int code = m_videoram[ tile_index ];
@@ -170,20 +168,18 @@ uint32_t acefruit_state::screen_update_acefruit(screen_device &screen, bitmap_in
 			}
 			else if( color >= 0x5 && color <= 0x7 )
 			{
-				int y;
-				int x;
 				static const int spriteskip[] = { 1, 2, 4 };
 				int spritesize = spriteskip[ color - 5 ];
 				gfx_element *gfx =  m_gfxdecode->gfx(0);
 
-				for( x = 0; x < 16; x++ )
+				for( int x = 0; x < 16; x++ )
 				{
 					int sprite = ( m_spriteram[ ( spriteindex / 64 ) % 6 ] & 0xf ) ^ 0xf;
 					const uint8_t *gfxdata = gfx->get_data(sprite);
 
-					for( y = 0; y < 8; y++ )
+					for( int y = 0; y < 8; y++ )
 					{
-						uint16_t *dst = &bitmap.pix16(y + ( row * 8 ), x + ( col * 16 ) );
+						uint16_t *dst = &bitmap.pix(y + ( row * 8 ), x + ( col * 16 ) );
 						*( dst ) = *( gfxdata + ( ( spriterow + y ) * gfx->rowbytes() ) + ( ( spriteindex % 64 ) >> 1 ) );
 					}
 
@@ -192,14 +188,11 @@ uint32_t acefruit_state::screen_update_acefruit(screen_device &screen, bitmap_in
 			}
 			else
 			{
-				int y;
-				int x;
-
-				for( x = 0; x < 16; x++ )
+				for( int x = 0; x < 16; x++ )
 				{
-					for( y = 0; y < 8; y++ )
+					for( int y = 0; y < 8; y++ )
 					{
-						uint16_t *dst = &bitmap.pix16(y + ( row * 8 ), x + ( col * 16 ) );
+						uint16_t *dst = &bitmap.pix(y + ( row * 8 ), x + ( col * 16 ) );
 						*( dst ) = 0;
 					}
 				}
