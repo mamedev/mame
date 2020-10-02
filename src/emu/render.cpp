@@ -1082,13 +1082,14 @@ unsigned render_target::configured_view(const char *viewname, int targetindex, i
 			screen_device const &screen = screens[index() % screens.size()];
 			for (unsigned i = 0; !view && (m_views.size() > i); ++i)
 			{
-				for (screen_device const &viewscreen : m_views[i].first.get().screens())
+				for (layout_view::item &viewitem : m_views[i].first.get().items())
 				{
-					if (&viewscreen == &screen)
+					screen_device const *const viewscreen(viewitem.screen());
+					if (viewscreen == &screen)
 					{
 						view = &m_views[i].first.get();
 					}
-					else
+					else if (viewscreen)
 					{
 						view = nullptr;
 						break;
@@ -1103,9 +1104,8 @@ unsigned render_target::configured_view(const char *viewname, int targetindex, i
 			for (unsigned i = 0; !view && (m_views.size() > i); ++i)
 			{
 				layout_view &curview = m_views[i].first;
-				if (curview.screen_count() >= screens.size())
-					if (std::find_if(screens.begin(), screens.end(), [&curview] (screen_device &screen) { return !curview.has_screen(screen); }) == screens.end())
-						view = &curview;
+				if (std::find_if(screens.begin(), screens.end(), [&curview] (screen_device &screen) { return !curview.has_screen(screen); }) == screens.end())
+					view = &curview;
 			}
 		}
 	}
@@ -1467,7 +1467,7 @@ bool render_target::map_point_container(s32 target_x, s32 target_y, render_conta
 			std::swap(target_f.first, target_f.second);
 
 		// try to find the right container
-		auto const &items(current_view().screen_items());
+		auto const &items(current_view().visible_screen_items());
 		auto const found(std::find_if(
 					items.begin(),
 					items.end(),
@@ -1905,20 +1905,17 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 			int viewindex(0);
 			for (layout_view *view = nth_view(viewindex); need_tiles && view; view = nth_view(++viewindex))
 			{
-				if (view->screen_count() >= screens.size())
+				bool screen_missing(false);
+				for (screen_device &screen : iter)
 				{
-					bool screen_missing(false);
-					for (screen_device &screen : iter)
+					if (!view->has_screen(screen))
 					{
-						if (!view->has_screen(screen))
-						{
-							screen_missing = true;
-							break;
-						}
+						screen_missing = true;
+						break;
 					}
-					if (!screen_missing)
-						need_tiles = false;
 				}
+				if (!screen_missing)
+					need_tiles = false;
 			}
 		}
 		if (need_tiles)
@@ -3089,7 +3086,7 @@ bool render_manager::is_live(screen_device &screen) const
 		if (!target.hidden())
 		{
 			layout_view const *view = &target.current_view();
-			if (view->has_screen(screen))
+			if (view->has_visible_screen(screen))
 				return true;
 		}
 	}

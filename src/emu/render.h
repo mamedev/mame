@@ -901,16 +901,17 @@ public:
 
 	// getters
 	item_list &items() { return m_items; }
+	bool has_screen(screen_device &screen);
 	const std::string &name() const { return m_name; }
-	size_t screen_count() const { return m_screens.size(); }
+	size_t visible_screen_count() const { return m_screens.size(); }
 	float effective_aspect() const { return m_effaspect; }
 	const render_bounds &bounds() const { return m_bounds; }
-	bool has_screen(screen_device &screen) const;
-	const item_ref_vector &screen_items() const { return m_screen_items; }
+	bool has_visible_screen(screen_device &screen) const;
+	const item_ref_vector &visible_screen_items() const { return m_screen_items; }
 	const item_ref_vector &interactive_items() const { return m_interactive_items; }
 	const edge_vector &interactive_edges_x() const { return m_interactive_edges_x; }
 	const edge_vector &interactive_edges_y() const { return m_interactive_edges_y; }
-	const screen_ref_vector &screens() const { return m_screens; }
+	const screen_ref_vector &visible_screens() const { return m_screens; }
 	const visibility_toggle_vector &visibility_toggles() const { return m_vistoggles; }
 	u32 default_visibility_mask() const { return m_defvismask; }
 	bool has_art() const { return m_has_art; }

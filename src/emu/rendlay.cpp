@@ -3446,7 +3446,18 @@ layout_view::~layout_view()
 //  the given screen
 //-------------------------------------------------
 
-bool layout_view::has_screen(screen_device &screen) const
+bool layout_view::has_screen(screen_device &screen)
+{
+	return std::find_if(m_items.begin(), m_items.end(), [&screen] (auto &itm) { return itm.screen() == &screen; }) != m_items.end();
+}
+
+
+//-------------------------------------------------
+//  has_visible_screen - return true if this view
+//  has the given screen visble
+//-------------------------------------------------
+
+bool layout_view::has_visible_screen(screen_device &screen) const
 {
 	return std::find_if(m_screens.begin(), m_screens.end(), [&screen] (auto const &scr) { return &scr.get() == &screen; }) != m_screens.end();
 }

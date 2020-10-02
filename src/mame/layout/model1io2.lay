@@ -21,29 +21,22 @@ license:CC0
 	</element>
 
 	<view name="Default">
-		<!-- workaround for MAME selecting a 2-screen view by default -->
-		<screen tag="ioboard:screen"><bounds left="0" top="0" right="1" bottom="1" /></screen>
-
+		<collection name="Diagnostics" visible="no">
+			<element ref="background">
+				<bounds x="0" y="0" width="512" height="419" />
+			</element>
+			<screen tag="ioboard:screen">
+				<bounds left="8" top="392" right="129" bottom="411" />
+			</screen>
+			<element name="led_comm_err" ref="led_red">
+				<bounds x="141" y="399" width="5" height="5" />
+			</element>
+			<element ref="text_comm_err">
+				<bounds x="145" y="398" width="40" height="7" />
+			</element>
+		</collection>
 		<screen tag="screen">
-			<bounds left="0" top="0" right="4" bottom="3" />
+			<bounds left="0" top="0" right="512" bottom="384" />
 		</screen>
-	</view>
-
-	<view name="Diagnostic">
-		<element ref="background">
-			<bounds x="0" y="0" width="496" height="419" />
-		</element>
-		<screen tag="screen">
-			<bounds left="0" top="0" right="496" bottom="384" />
-		</screen>
-		<screen tag="ioboard:screen">
-			<bounds left="8" top="392" right="129" bottom="411" />
-		</screen>
-		<element name="led_comm_err" ref="led_red">
-			<bounds x="141" y="399" width="5" height="5" />
-		</element>
-		<element ref="text_comm_err">
-			<bounds x="145" y="398" width="40" height="7" />
-		</element>
 	</view>
 </mamelayout>
