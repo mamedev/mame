@@ -75,7 +75,6 @@ public:
 		m_nden(1),
 		m_dint(0),
 		m_ddrq(0),
-		m_dreset(1),
 		m_fdc_dsr(0),
 		m_neop(0),
 		m_ack_int_enable(1),
@@ -178,7 +177,6 @@ public:
 	int m_nden;
 	int m_dint;
 	int m_ddrq;
-	int m_dreset;
 	uint8_t m_fdc_dsr;
 	int m_neop;
 

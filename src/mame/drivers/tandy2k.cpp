@@ -157,10 +157,7 @@ void tandy2k_state::enable_w(uint8_t data)
 	m_pit->write_gate2(BIT(data, 4));
 
 	// FDC reset
-	if (!BIT(data, 5))
-	{
-		m_fdc->soft_reset();
-	}
+	m_fdc->reset_w(!BIT(data, 5));
 
 	// timer 0 enable
 	m_maincpu->tmrin0_w(BIT(data, 6));

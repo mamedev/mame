@@ -995,12 +995,7 @@ void pc1512_base_state::drive_select_w(uint8_t data)
 			 img->mon_w((data & 0x03) == n && BIT(data, n + 4) ? 0 : 1);
 	}
 
-	if (m_dreset != BIT(data, 2))
-	{
-		m_dreset = BIT(data, 2);
-		m_fdc->soft_reset();
-	}
-
+	m_fdc->reset_w(!BIT(data, 2));
 	m_nden = BIT(data, 3);
 	update_fdc_int();
 	update_fdc_drq();
@@ -1091,7 +1086,6 @@ void pc1512_base_state::machine_start()
 	save_item(NAME(m_nden));
 	save_item(NAME(m_dint));
 	save_item(NAME(m_ddrq));
-	save_item(NAME(m_dreset));
 	save_item(NAME(m_neop));
 	save_item(NAME(m_ack_int_enable));
 	save_item(NAME(m_centronics_ack));
