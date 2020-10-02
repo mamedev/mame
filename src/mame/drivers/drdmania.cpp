@@ -75,6 +75,8 @@ public:
 
 	void drdmania(machine_config &config);
 
+	void init_drdmania();
+
 protected:
 	virtual void video_start() override;
 
@@ -99,8 +101,7 @@ private:
 
 void drdmania_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rom().region("maincpu", 0x0000);
-	map(0x8000, 0xbfff).rom().region("maindata", 0x0000); // could be banked ROM instead?
+	map(0x0000, 0xbfff).rom().region("maincpu", 0x0000);
 
 	map(0xc000, 0xc7ff).ram(); // stack is here, but also writes ASCII strings as if it were a tilemap, but tile ROMs don't decode as ASCII
 	map(0xd000, 0xd3ff).ram().w(FUNC(drdmania_state::fgram_w)).share("fgram"); // vram? fills with value of blank tile
@@ -190,11 +191,10 @@ void drdmania_state::drdmania(machine_config &config)
 }
 
 ROM_START(drdmania)
-	ROM_REGION(0x08000, "maincpu", 0)
+	ROM_REGION(0x0c000, "maincpu", 0)
 	ROM_LOAD( "dardomania_dmp01_v2.1.ic38", 0x00000, 0x8000, CRC(9f24336f) SHA1(9a82b851d5c67a50118a3669d3bc5793e94219e4) )
-
-	ROM_REGION(0x04000, "maindata", 0)
-	ROM_LOAD( "dardomania_dmp02_v2.1.ic33", 0x00000, 0x4000, CRC(e5dbf948) SHA1(241be0f2969b962bba602548dab3e2bdbf8f0696) ) // 1ST AND 2ND HALF IDENTICAL
+	// seems to have some bad bytes eg rst $08 instructions which should be calls but end up resetting it instead, see init
+	ROM_LOAD( "dardomania_dmp02_v2.1.ic33", 0x00000, 0x4000, BAD_DUMP CRC(e5dbf948) SHA1(241be0f2969b962bba602548dab3e2bdbf8f0696) ) // 1ST AND 2ND HALF IDENTICAL
 	ROM_IGNORE(0x4000)
 
 	ROM_REGION(0xc000, "gfx1", 0)
@@ -209,4 +209,12 @@ ROM_START(drdmania)
 	ROM_LOAD( "n82s123n.ic49", 0x00, 0x20, CRC(dcbd2352) SHA1(ce72e84129ed1b455aaf648e1dfaa4333e7e7628) )
 ROM_END
 
-GAME(1994, drdmania, 0, drdmania, drdmania, drdmania_state, empty_init, ROT0, "Sleic", "Dardomania (v2.1)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+void drdmania_state::init_drdmania()
+{
+	uint8_t *ROM = memregion("maincpu")->base();
+	ROM[0x8de0] = 0xcd; // these are 0xcf in ROM so bit 0x02 got flipped? 3 calls in a row are incorrect in this way, so call addresses are suspect too
+	ROM[0x8de3] = 0xcd;
+	ROM[0x8de6] = 0xcd;
+}
+
+GAME(1994, drdmania, 0, drdmania, drdmania, drdmania_state, init_drdmania, ROT0, "Sleic", "Dardomania (v2.1)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
