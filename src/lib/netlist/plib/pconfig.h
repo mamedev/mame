@@ -75,8 +75,13 @@
 
 #define PALIGN_MIN_SIZE         (16)
 
+#if (PUSE_ALIGNED_OPTIMIZATIONS)
 #define PALIGNAS_CACHELINE()    PALIGNAS(PALIGN_CACHELINE)
 #define PALIGNAS_VECTOROPT()    PALIGNAS(PALIGN_VECTOROPT)
+#else
+#define PALIGNAS_CACHELINE()
+#define PALIGNAS_VECTOROPT()
+#endif
 
 // FIXME: Breaks mame build on windows mingw due to -Wattribute
 //        also triggers -Wattribute on ARM

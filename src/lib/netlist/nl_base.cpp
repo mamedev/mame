@@ -245,6 +245,7 @@ namespace netlist
 
 		ENTRY_EX(sizeof(base_device_t))
 		ENTRY_EX(sizeof(device_t))
+		ENTRY_EX(sizeof(logic_t))
 		ENTRY_EX(sizeof(logic_input_t))
 		ENTRY_EX(sizeof(logic_output_t))
 		ENTRY_EX(sizeof(param_model_t))
@@ -252,6 +253,7 @@ namespace netlist
 		ENTRY_EX(sizeof(state_var<int>))
 		ENTRY_EX(sizeof(pstring))
 		ENTRY_EX(sizeof(core_device_t::stats_t))
+		ENTRY_EX(sizeof(std::vector<detail::core_terminal_t *>))
 		ENTRY_EX(sizeof(plib::plog_level))
 
 		ENTRY_EX(sizeof(nldelegate))
@@ -337,7 +339,7 @@ namespace netlist
 				for (auto &n : m_nets)
 				{
 					n->update_inputs(); // only used if USE_COPY_INSTEAD_OF_REFERENCE == 1
-					for (auto & term : n->core_terms())
+					for (auto & term : core_terms(*n))
 					{
 						if (!plib::container::contains(t, &term->delegate()))
 						{
@@ -618,7 +620,7 @@ namespace netlist
 		// rebuild m_list
 
 		m_list_active.clear();
-		for (auto & term : core_terms())
+		for (auto & term : exec().nlstate().core_terms(*this))
 			if (term->terminal_state() != logic_t::STATE_INP_PASSIVE)
 			{
 				m_list_active.push_back(term);
@@ -643,7 +645,7 @@ namespace netlist
 		// rebuild m_list and reset terminals to active or analog out state
 
 		m_list_active.clear();
-		for (core_terminal_t *ct : core_terms())
+		for (core_terminal_t *ct : exec().nlstate().core_terms(*this))
 		{
 			ct->reset();
 			if (ct->terminal_state() != logic_t::STATE_INP_PASSIVE)

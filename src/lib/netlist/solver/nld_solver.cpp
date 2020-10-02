@@ -278,20 +278,20 @@ namespace devices
 
 	struct net_splitter
 	{
-		void run(netlist_state_t &netlist)
+		void run(netlist_state_t &nlstate)
 		{
-			for (auto & net : netlist.nets())
+			for (auto & net : nlstate.nets())
 			{
-				netlist.log().verbose("processing {1}", net->name());
-				if (!net->is_rail_net() && net->has_connections())
+				nlstate.log().verbose("processing {1}", net->name());
+				if (!net->is_rail_net() && !nlstate.core_terms(*net).empty())
 				{
-					netlist.log().verbose("   ==> not a rail net");
+					nlstate.log().verbose("   ==> not a rail net");
 					// Must be an analog net
 					auto &n = dynamic_cast<analog_net_t &>(*net);
 					if (!already_processed(n))
 					{
 						groupspre.emplace_back(NETLIB_NAME(solver)::net_list_t());
-						process_net(netlist, n);
+						process_net(nlstate, n);
 					}
 				}
 			}
@@ -344,30 +344,30 @@ namespace devices
 		}
 
 		// NOLINTNEXTLINE(misc-no-recursion)
-		void process_net(netlist_state_t &netlist, analog_net_t &n)
+		void process_net(netlist_state_t &nlstate, analog_net_t &n)
 		{
 			// ignore empty nets. FIXME: print a warning message
-			netlist.log().verbose("Net {}", n.name());
-			if (n.has_connections())
+			nlstate.log().verbose("Net {}", n.name());
+			if (!nlstate.core_terms(n).empty())
 			{
 				// add the net
 				groupspre.back().push_back(&n);
 				// process all terminals connected to this net
-				for (auto &term : n.core_terms())
+				for (auto &term : nlstate.core_terms(n))
 				{
-					netlist.log().verbose("Term {} {}", term->name(), static_cast<int>(term->type()));
+					nlstate.log().verbose("Term {} {}", term->name(), static_cast<int>(term->type()));
 					// only process analog terminals
 					if (term->is_type(detail::terminal_type::TERMINAL))
 					{
 						auto &pt = dynamic_cast<terminal_t &>(*term);
 						// check the connected terminal
-						const auto *const connected_terminals = netlist.setup().get_connected_terminals(pt);
+						const auto *const connected_terminals = nlstate.setup().get_connected_terminals(pt);
 						for (const auto *ct = connected_terminals->begin(); *ct != nullptr; ct++)
 						{
 							analog_net_t &connected_net = (*ct)->net();
-							netlist.log().verbose("  Connected net {}", connected_net.name());
+							nlstate.log().verbose("  Connected net {}", connected_net.name());
 							if (!check_if_processed_and_join(connected_net))
-								process_net(netlist, connected_net);
+								process_net(nlstate, connected_net);
 						}
 					}
 				}
@@ -407,7 +407,7 @@ namespace devices
 					state().log().error(ME_SOLVER_CONSISTENCY_RAIL_NET(n->name()));
 					num_errors++;
 				}
-				for (const auto &t : n->core_terms())
+				for (const auto &t : state().core_terms(*n))
 				{
 					if (!t->has_net())
 					{
@@ -472,9 +472,9 @@ namespace devices
 			for (auto &n : grp)
 			{
 				log().verbose("Net {1}", n->name());
-				for (const auto &pcore : n->core_terms())
+				for (const auto &t : state().core_terms(*n))
 				{
-					log().verbose("   {1}", pcore->name());
+					log().verbose("   {1}", t->name());
 				}
 			}
 
