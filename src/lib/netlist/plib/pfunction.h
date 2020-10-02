@@ -62,6 +62,10 @@ namespace plib {
 			{
 				m_param.val = plib::constants<NT>::zero();
 			}
+			rpn_inst(NT v) : m_cmd(PUSH_CONST)
+			{
+				m_param.val = v;
+			}
 			rpn_cmd m_cmd;
 			union
 			{
@@ -138,6 +142,7 @@ namespace plib {
 
 	private:
 
+		void compress();
 		void compile_postfix(const inputs_container &inputs,
 				const std::vector<pstring> &cmds, const pstring &expr);
 

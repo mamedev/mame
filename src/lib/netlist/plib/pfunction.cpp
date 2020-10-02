@@ -157,6 +157,7 @@ namespace plib {
 		}
 		if (stk != 1)
 			throw pexception(plib::pfmt("pfunction: stack count {1} different to one on <{2}>")(stk, expr));
+		compress();
 	}
 
 	static bool is_number(const pstring &n)
@@ -339,25 +340,29 @@ namespace plib {
 		return narrow_cast<NT>(lfsr);
 	}
 #endif
-	#define ST0 stack[ptr+1]
-	#define ST1 stack[ptr]
-	#define ST2 stack[ptr-1]
+	#define ST0 *(ptr+1)
+	#define ST1 *ptr
+	#define ST2 *(ptr-1)
 
 	#define OP(OP, ADJ, EXPR) \
 	case OP: \
 		ptr-= (ADJ); \
-		stack[ptr-1] = (EXPR); \
+		*(ptr-1) = (EXPR); \
+		break;
+
+	#define OP0(OP, EXPR) \
+	case OP: \
+		*(ptr++) = (EXPR); \
 		break;
 
 	template <typename NT>
 	NT pfunction<NT>::evaluate(const values_container &values) noexcept
 	{
-		std::array<value_type, MAX_STACK> stack = { plib::constants<value_type>::zero() };
-		unsigned ptr = 0;
-		constexpr auto zero = plib::constants<value_type>::zero();
-		constexpr auto one = plib::constants<value_type>::one();
-		stack[0] = plib::constants<value_type>::zero();
-		for (auto &rc : m_precompiled)
+		std::array<value_type, MAX_STACK> stack;
+		value_type *ptr = stack.data();
+		constexpr const auto zero = plib::constants<value_type>::zero();
+		constexpr const auto one = plib::constants<value_type>::one();
+		for (const auto &rc : m_precompiled)
 		{
 			switch (rc.m_cmd)
 			{
@@ -379,23 +384,92 @@ namespace plib {
 				OP(COS,  0, plib::cos(ST2))
 				OP(MAX,  1, std::max(ST2, ST1))
 				OP(MIN,  1, std::min(ST2, ST1))
-				OP(TRUNC,  0, plib::trunc(ST2))
-				case RAND:
-					stack[ptr++] = lfsr_random<value_type>(m_lfsr);
-					break;
-				case PUSH_INPUT:
-					stack[ptr++] = values[rc.m_param.index];
-					break;
-				case PUSH_CONST:
-					stack[ptr++] = rc.m_param.val;
-					break;
+				OP(TRUNC, 0, plib::trunc(ST2))
+				OP0(RAND, lfsr_random<value_type>(m_lfsr))
+				OP0(PUSH_INPUT, values[rc.m_param.index])
+				OP0(PUSH_CONST, rc.m_param.val)
 				// please compiler
 				case LP:
 				case RP:
 					break;
 			}
 		}
-		return stack[ptr-1];
+		return *(ptr-1);
+	}
+
+#undef ST0
+#undef ST1
+#undef ST2
+#undef OP
+#undef OP0
+
+#define ST0 m_precompiled[ptr+0].m_param.val
+#define ST1 m_precompiled[ptr-1].m_param.val
+#define ST2 m_precompiled[ptr-2].m_param.val
+
+#define OP(OP, ADJ, EXPR) \
+	case OP: \
+		if (ADJ == 2) {\
+			if (m_precompiled[ptr-3].m_cmd == PUSH_CONST && m_precompiled[ptr-2].m_cmd == PUSH_CONST && m_precompiled[ptr-1].m_cmd == PUSH_CONST) \
+			{	ptr--; m_precompiled[ptr-2] = rpn_inst(EXPR); n -= 3; ptr++; std::copy(m_precompiled.begin()+(ptr+1), m_precompiled.end(), m_precompiled.begin()+(ptr-2)); ptr-=2;} \
+			else { ptr++; } \
+		} else if (ADJ == 1) {\
+			if (m_precompiled[ptr-2].m_cmd == PUSH_CONST && m_precompiled[ptr-1].m_cmd == PUSH_CONST) \
+			{	m_precompiled[ptr-2] = rpn_inst(EXPR); n -= 2; std::copy(m_precompiled.begin()+(ptr+1), m_precompiled.end(), m_precompiled.begin()+(ptr-1)); ptr--;} \
+			else { ptr++; } \
+		} else if (ADJ == 0) {\
+			if (m_precompiled[ptr-1].m_cmd == PUSH_CONST) \
+			{ ptr++; m_precompiled[ptr-2] = rpn_inst(EXPR); n -= 1; ptr--; std::copy(m_precompiled.begin()+(ptr+1), m_precompiled.end(), m_precompiled.begin()+(ptr)); } \
+			else { ptr++; } \
+		} else ptr++; \
+		break;
+
+#define OP0(OP, EXPR) \
+	case OP: \
+		ptr++; \
+		break;
+
+	template <typename NT>
+	void pfunction<NT>::compress()
+	{
+		constexpr const auto zero = plib::constants<value_type>::zero();
+		constexpr const auto one = plib::constants<value_type>::one();
+		unsigned ptr = 0;
+		auto n = m_precompiled.size();
+		for (; ptr < n; )
+		{
+			switch (m_precompiled[ptr].m_cmd)
+			{
+				OP(ADD,  1, ST2 + ST1)
+				OP(MULT, 1, ST2 * ST1)
+				OP(SUB,  1, ST2 - ST1)
+				OP(DIV,  1, ST2 / ST1)
+				OP(EQ,   1, ST2 == ST1 ? one : zero)
+				OP(NE,   1, ST2 != ST1 ? one : zero)
+				OP(GT,   1, ST2 > ST1 ? one : zero)
+				OP(LT,   1, ST2 < ST1 ? one : zero)
+				OP(LE,   1, ST2 <= ST1 ? one : zero)
+				OP(GE,   1, ST2 >= ST1 ? one : zero)
+				OP(IF,   2, (ST2 != zero) ? ST1 : ST0)
+				OP(NEG,  0, -ST2)
+				OP(POW,  1, plib::pow(ST2, ST1))
+				OP(LOG,  0, plib::log(ST2))
+				OP(SIN,  0, plib::sin(ST2))
+				OP(COS,  0, plib::cos(ST2))
+				OP(MAX,  1, std::max(ST2, ST1))
+				OP(MIN,  1, std::min(ST2, ST1))
+				OP(TRUNC,  0, plib::trunc(ST2))
+				OP0(RAND, lfsr_random<value_type>(m_lfsr))
+				OP0(PUSH_INPUT, values[rc.m_param.index])
+				OP0(PUSH_CONST, rc.m_param.val)
+				// please compiler
+				case LP:
+				case RP:
+					break;
+			}
+		}
+		//printf("func %lld %lld\n", m_precompiled.size(), n);
+		m_precompiled.resize(n);
 	}
 
 	template class pfunction<float>;
