@@ -194,7 +194,7 @@ int CLIB_DECL main(int argc, char *argv[])
 					return -1;
 				}
 
-				if (cassette_image::open_choices(f, &stdio_ioprocs, get_extension(argv[3]), selected_formats, CASSETTE_FLAG_READONLY, cassette) != cassette_image::error::SUCCESS)  {
+				if (cassette_image::open_choices(f, &stdio_ioprocs, get_extension(argv[3]), selected_formats, cassette_image::FLAG_READONLY, cassette) != cassette_image::error::SUCCESS)  {
 					fprintf(stderr, "Invalid format of input file.\n");
 					fclose(f);
 					return -1;

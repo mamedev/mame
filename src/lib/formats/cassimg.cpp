@@ -74,35 +74,67 @@ constexpr int16_t interpolate16(int32_t value)
 
 
 
+constexpr size_t my_round(double d)
+{
+	return size_t(d + 0.5);
+}
+
+
+
+/*********************************************************************
+    waveform accesses to/from the raw image
+*********************************************************************/
+
+const int8_t *choose_wave(const cassette_image::Modulation &modulation, size_t &wave_bytes_length)
+{
+	static const int8_t square_wave[] = { -128, 127 };
+	static const int8_t sine_wave[] = { 0, 48, 89, 117, 127, 117, 89, 48, 0, -48, -89, -117, -127, -117, -89, -48 };
+
+	if (modulation.flags & cassette_image::MODULATION_SINEWAVE)
+	{
+		wave_bytes_length = ARRAY_LENGTH(sine_wave);
+		return sine_wave;
+	}
+	else
+	{
+		wave_bytes_length = ARRAY_LENGTH(square_wave);
+		return square_wave;
+	}
+}
+
+} // anonymous namespace
+
+
+
 /*********************************************************************
     initialization and termination
 *********************************************************************/
 
-cassette_image::error try_identify_format(const cassette_image::Format &format, cassette_image *image, const std::string &extension, int flags, cassette_image::Options &opts)
+cassette_image::error cassette_image::try_identify_format(const Format &format, const std::string &extension, int flags, Options &opts)
 {
 	// is this the right extension?
 	if (!extension.empty() && !image_find_extension(format.extensions, extension.c_str()))
-		return cassette_image::error::INVALID_IMAGE;
+		return error::INVALID_IMAGE;
 
 	// invoke format->identify
-	opts = cassette_image::Options();
-	cassette_image::error err = format.identify(image, &opts);
-	if (err != cassette_image::error::SUCCESS)
+	opts = Options();
+	error err = format.identify(this, &opts);
+	if (err != error::SUCCESS)
 		return err;
 
 	// is this a read only format, but the cassette was not opened read only?
-	if (((flags & CASSETTE_FLAG_READONLY) == 0) && (format.save == nullptr))
-		return cassette_image::error::READ_WRITE_UNSUPPORTED;
+	if (((flags & FLAG_READONLY) == 0) && (format.save == nullptr))
+		return error::READ_WRITE_UNSUPPORTED;
 
 	// success!
-	return cassette_image::error::SUCCESS;
+	return error::SUCCESS;
 }
 
 
-cassette_image::error cassette_perform_save(cassette_image *cassette)
+cassette_image::error cassette_image::perform_save()
 {
-	cassette_image::Info info = cassette->get_info();
-	return cassette->format->save(cassette, &info);
+	Info info = get_info();
+	return m_format->save(this, &info);
 }
 
 
@@ -111,7 +143,7 @@ cassette_image::error cassette_perform_save(cassette_image *cassette)
     waveform accesses
 *********************************************************************/
 
-struct manipulation_ranges
+struct cassette_image::manipulation_ranges
 {
 	int channel_first;
 	int channel_last;
@@ -121,95 +153,63 @@ struct manipulation_ranges
 
 
 
-constexpr size_t my_round(double d)
-{
-	return size_t(d + 0.5);
-}
-
-
-
-cassette_image::error compute_manipulation_ranges(cassette_image *cassette, int channel,
-	double time_index, double sample_period, manipulation_ranges *ranges)
+cassette_image::error cassette_image::compute_manipulation_ranges(int channel,
+	double time_index, double sample_period, manipulation_ranges &ranges) const
 {
 	if (channel < 0)
 	{
-		ranges->channel_first = 0;
-		ranges->channel_last = cassette->channels - 1;
+		ranges.channel_first = 0;
+		ranges.channel_last = m_channels - 1;
 	}
 	else
 	{
-		ranges->channel_first = channel;
-		ranges->channel_last = channel;
+		ranges.channel_first = channel;
+		ranges.channel_last = channel;
 	}
 
-	ranges->sample_first = my_round(time_index * cassette->sample_frequency);
-	ranges->sample_last = my_round((time_index + sample_period) * cassette->sample_frequency);
+	ranges.sample_first = my_round(time_index * m_sample_frequency);
+	ranges.sample_last = my_round((time_index + sample_period) * m_sample_frequency);
 
-	if (ranges->sample_last > ranges->sample_first)
-		ranges->sample_last--;
+	if (ranges.sample_last > ranges.sample_first)
+		ranges.sample_last--;
 
-	return cassette_image::error::SUCCESS;
+	return error::SUCCESS;
 }
 
 
 
-cassette_image::error lookup_sample(cassette_image *cassette, int channel, size_t sample, int32_t **ptr)
+cassette_image::error cassette_image::lookup_sample(int channel, size_t sample, int32_t *&ptr)
 {
-	*ptr = nullptr;
-	size_t sample_blocknum = (sample / SAMPLES_PER_BLOCK) * cassette->channels + channel;
+	ptr = nullptr;
+	size_t sample_blocknum = (sample / SAMPLES_PER_BLOCK) * m_channels + channel;
 	size_t sample_index = sample % SAMPLES_PER_BLOCK;
 
-	/* is this block beyond the edge of our waveform? */
-	if (sample_blocknum >= cassette->blocks.size())
-		cassette->blocks.resize(sample_blocknum + 1);
+	// is this block beyond the edge of our waveform?
+	if (sample_blocknum >= m_blocks.size())
+		m_blocks.resize(sample_blocknum + 1);
 
-	if (!cassette->blocks[sample_blocknum])
-		cassette->blocks[sample_blocknum] = make_unique_clear<int32_t []>(SAMPLES_PER_BLOCK);
+	if (!m_blocks[sample_blocknum])
+		m_blocks[sample_blocknum] = make_unique_clear<int32_t []>(SAMPLES_PER_BLOCK);
 
-	*ptr = &cassette->blocks[sample_blocknum][sample_index];
-	return cassette_image::error::SUCCESS;
+	ptr = &m_blocks[sample_blocknum][sample_index];
+	return error::SUCCESS;
 }
-
-
-
-/*********************************************************************
-    waveform accesses to/from the raw image
-*********************************************************************/
-
-const int8_t *choose_wave(const cassette_image::Modulation *modulation, size_t *wave_bytes_length)
-{
-	static const int8_t square_wave[] = { -128, 127 };
-	static const int8_t sine_wave[] = { 0, 48, 89, 117, 127, 117, 89, 48, 0, -48, -89, -117, -127, -117, -89, -48 };
-
-	if (modulation->flags & CASSETTE_MODULATION_SINEWAVE)
-	{
-		*wave_bytes_length = ARRAY_LENGTH(sine_wave);
-		return sine_wave;
-	}
-	else
-	{
-		*wave_bytes_length = ARRAY_LENGTH(square_wave);
-		return square_wave;
-	}
-}
-
-} // anonymous namespace
 
 
 
 cassette_image::cassette_image(const Format *format, void *file, const io_procs *procs, int flags)
 {
-	this->format = format;
-	this->io.file = file;
-	this->io.procs = procs;
-	this->flags = flags;
+	m_format = format;
+	m_io.file = file;
+	m_io.procs = procs;
+	m_flags = flags;
 }
 
 
 
 cassette_image::~cassette_image()
 {
-	if ((flags & CASSETTE_FLAG_DIRTY) && (flags & CASSETTE_FLAG_SAVEONEXIT))
+	if ((m_flags & CASSETTE_FLAG_DIRTY) && (m_flags & FLAG_SAVEONEXIT))
 		save();
 }
 
@@ -242,7 +242,7 @@ cassette_image::error cassette_image::open_choices(void *file, const io_procs *p
 	for (int i = 0; !format && formats[i]; i++)
 	{
 		// try this format
-		error err = try_identify_format(*formats[i], cassette.get(), extension, flags, opts);
+		error err = cassette->try_identify_format(*formats[i], extension, flags, opts);
 		if (err != error::SUCCESS && err != error::INVALID_IMAGE)
 			return err;
 
@@ -254,11 +254,11 @@ cassette_image::error cassette_image::open_choices(void *file, const io_procs *p
 	// have we found a proper format
 	if (!format)
 		return error::INVALID_IMAGE;
-	cassette->format = format;
+	cassette->m_format = format;
 
 	// read the options
-	cassette->channels = opts.channels;
-	cassette->sample_frequency = opts.sample_frequency;
+	cassette->m_channels = opts.channels;
+	cassette->m_sample_frequency = opts.sample_frequency;
 
 	// load the image
 	error err = format->load(cassette.get());
@@ -266,7 +266,7 @@ cassette_image::error cassette_image::open_choices(void *file, const io_procs *p
 		return err;
 
 	/* success */
-	cassette->flags &= ~CASSETTE_FLAG_DIRTY;
+	cassette->m_flags &= ~CASSETTE_FLAG_DIRTY;
 	outcassette = std::move(cassette);
 	return error::SUCCESS;
 }
@@ -279,7 +279,7 @@ cassette_image::error cassette_image::create(void *file, const io_procs *procs, 
 	static const Options default_options = { 1, 16, 44100 };
 
 	// cannot create to a read only image
-	if (flags & CASSETTE_FLAG_READONLY)
+	if (flags & FLAG_READONLY)
 		return error::INVALID_IMAGE;
 
 	// is this a good format?
@@ -296,8 +296,8 @@ cassette_image::error cassette_image::create(void *file, const io_procs *procs, 
 	catch (std::bad_alloc const &) { return error::OUT_OF_MEMORY; }
 
 	// read the options
-	cassette->channels = opts->channels;
-	cassette->sample_frequency = opts->sample_frequency;
+	cassette->m_channels = opts->channels;
+	cassette->m_sample_frequency = opts->sample_frequency;
 
 	outcassette = std::move(cassette);
 	return error::SUCCESS;
@@ -307,14 +307,14 @@ cassette_image::error cassette_image::create(void *file, const io_procs *procs, 
 
 cassette_image::error cassette_image::save()
 {
-	if (!format || !format->save)
+	if (!m_format || !m_format->save)
 		return error::UNSUPPORTED;
 
-	error err = cassette_perform_save(this);
+	error err = perform_save();
 	if (err != error::SUCCESS)
 		return err;
 
-	flags &= ~CASSETTE_FLAG_DIRTY;
+	m_flags &= ~CASSETTE_FLAG_DIRTY;
 	return error::SUCCESS;
 }
 
@@ -323,10 +323,10 @@ cassette_image::error cassette_image::save()
 cassette_image::Info cassette_image::get_info() const
 {
 	Info result;
-	result.channels = channels;
-	result.sample_count = sample_count;
-	result.sample_frequency = sample_frequency;
-	result.bits_per_sample = (int)waveform_bytes_per_sample(flags) * 8;
+	result.channels = m_channels;
+	result.sample_count = m_sample_count;
+	result.sample_frequency = m_sample_frequency;
+	result.bits_per_sample = (int)waveform_bytes_per_sample(m_flags) * 8;
 	return result;
 }
 
@@ -334,12 +334,12 @@ cassette_image::Info cassette_image::get_info() const
 
 void cassette_image::change(void *file, const io_procs *procs, const Format *format, int flags)
 {
-	if ((flags & CASSETTE_FLAG_READONLY) == 0)
+	if ((flags & FLAG_READONLY) == 0)
 		flags |= CASSETTE_FLAG_DIRTY;
-	this->io.file = file;
-	this->io.procs = procs;
-	this->format = format;
-	this->flags = flags;
+	m_io.file = file;
+	m_io.procs = procs;
+	m_format = format;
+	m_flags = flags;
 }
 
 
@@ -350,21 +350,21 @@ void cassette_image::change(void *file, const io_procs *procs, const Format *for
 
 void cassette_image::image_read(void *buffer, uint64_t offset, size_t length)
 {
-	io_generic_read(&io, buffer, offset, length);
+	io_generic_read(&m_io, buffer, offset, length);
 }
 
 
 
 void cassette_image::image_write(const void *buffer, uint64_t offset, size_t length)
 {
-	io_generic_write(&io, buffer, offset, length);
+	io_generic_write(&m_io, buffer, offset, length);
 }
 
 
 
 uint64_t cassette_image::image_size()
 {
-	return io_generic_size(&io);
+	return io_generic_size(&m_io);
 }
 
 
@@ -382,9 +382,9 @@ cassette_image::error cassette_image::get_samples(int channel,
 {
 	error err;
 	manipulation_ranges ranges;
-	const int32_t *source_ptr;
+	int32_t *source_ptr;
 
-	err = compute_manipulation_ranges(this, channel, time_index, sample_period, &ranges);
+	err = compute_manipulation_ranges(channel, time_index, sample_period, ranges);
 	if (err != error::SUCCESS)
 		return err;
 
@@ -397,7 +397,7 @@ cassette_image::error cassette_image::get_samples(int channel,
 			/* find the sample that we are putting */
 			double d = map_double(ranges.sample_last + 1 - ranges.sample_first, 0, sample_count, sample_index) + ranges.sample_first;
 			size_t cassette_sample_index = (size_t) d;
-			err = lookup_sample(this, channel, cassette_sample_index, (int32_t **) &source_ptr);
+			err = lookup_sample(channel, cassette_sample_index, source_ptr);
 			if (err != error::SUCCESS)
 				return err;
 
@@ -412,20 +412,20 @@ cassette_image::error cassette_image::get_samples(int channel,
 		dest_ptr += sample_index * sample_spacing;
 		int16_t word;
 		int32_t dword;
-		switch(waveform_bytes_per_sample(waveform_flags))
+		switch (waveform_bytes_per_sample(waveform_flags))
 		{
 		case 1:
 			*((int8_t *) dest_ptr) = interpolate8(sum);
 			break;
 		case 2:
 			word = interpolate16(sum);
-			if (waveform_flags & CASSETTE_WAVEFORM_ENDIAN_FLIP)
+			if (waveform_flags & WAVEFORM_ENDIAN_FLIP)
 				word = swapendian_int16(word);
 			*((int16_t *) dest_ptr) = word;
 			break;
 		case 4:
 			dword = sum;
-			if (waveform_flags & CASSETTE_WAVEFORM_ENDIAN_FLIP)
+			if (waveform_flags & WAVEFORM_ENDIAN_FLIP)
 				dword = swapendian_int32(dword);
 			*((int32_t *) dest_ptr) = dword;
 			break;
@@ -449,13 +449,13 @@ cassette_image::error cassette_image::put_samples(int channel,
 	if (sample_period == 0)
 		return error::SUCCESS;
 
-	err = compute_manipulation_ranges(this, channel, time_index, sample_period, &ranges);
+	err = compute_manipulation_ranges(channel, time_index, sample_period, ranges);
 	if (err != error::SUCCESS)
 		return err;
 
-	if (this->sample_count < ranges.sample_last+1)
-		this->sample_count = ranges.sample_last + 1;
-	flags |= CASSETTE_FLAG_DIRTY;
+	if (m_sample_count < ranges.sample_last+1)
+		m_sample_count = ranges.sample_last + 1;
+	m_flags |= CASSETTE_FLAG_DIRTY;
 
 	if (LOG_PUT_SAMPLES)
 	{
@@ -477,20 +477,20 @@ cassette_image::error cassette_image::put_samples(int channel,
 		int32_t dword;
 		switch(waveform_bytes_per_sample(waveform_flags)) {
 		case 1:
-			if (waveform_flags & CASSETTE_WAVEFORM_UNSIGNED)
+			if (waveform_flags & WAVEFORM_UNSIGNED)
 				dest_value = extrapolate8((int8_t)(*source_ptr - 128));
 			else
 				dest_value = extrapolate8(*((int8_t *) source_ptr));
 			break;
 		case 2:
 			word = *((int16_t *) source_ptr);
-			if (waveform_flags & CASSETTE_WAVEFORM_ENDIAN_FLIP)
+			if (waveform_flags & WAVEFORM_ENDIAN_FLIP)
 				word = swapendian_int16(word);
 			dest_value = extrapolate16(word);
 			break;
 		case 4:
 			dword = *((int32_t *) source_ptr);
-			if (waveform_flags & CASSETTE_WAVEFORM_ENDIAN_FLIP)
+			if (waveform_flags & WAVEFORM_ENDIAN_FLIP)
 				dword = swapendian_int32(dword);
 			dest_value = dword;
 			break;
@@ -501,7 +501,7 @@ cassette_image::error cassette_image::put_samples(int channel,
 		for (channel = ranges.channel_first; channel <= ranges.channel_last; channel++)
 		{
 			/* find the sample that we are putting */
-			err = lookup_sample(this, channel, sample_index, &dest_ptr);
+			err = lookup_sample(channel, sample_index, dest_ptr);
 			if (err != error::SUCCESS)
 				return err;
 			*dest_ptr = dest_value;
@@ -516,7 +516,7 @@ cassette_image::error cassette_image::get_sample(int channel,
 	double time_index, double sample_period, int32_t *sample)
 {
 	return get_samples(channel, time_index,
-			sample_period, 1, 0, sample, CASSETTE_WAVEFORM_32BIT);
+			sample_period, 1, 0, sample, WAVEFORM_32BIT);
 }
 
 
@@ -525,7 +525,7 @@ cassette_image::error cassette_image::put_sample(int channel,
 	double time_index, double sample_period, int32_t sample)
 {
 	return put_samples(channel, time_index,
-			sample_period, 1, 0, &sample, CASSETTE_WAVEFORM_32BIT);
+			sample_period, 1, 0, &sample, WAVEFORM_32BIT);
 }
 
 
@@ -602,20 +602,20 @@ cassette_image::error cassette_image::write_samples(int channels, double time_in
 
 
 
-cassette_image::error cassette_image::modulation_identify(const Modulation *modulation, Options *opts)
+cassette_image::error cassette_image::modulation_identify(const Modulation &modulation, Options *opts)
 {
 	size_t wave_bytes_length;
-	choose_wave(modulation, &wave_bytes_length);
+	choose_wave(modulation, wave_bytes_length);
 	opts->bits_per_sample = 8;
 	opts->channels = 1;
-	opts->sample_frequency = uint32_t(std::max(modulation->zero_frequency_high, modulation->one_frequency_high) * wave_bytes_length * 2);
+	opts->sample_frequency = uint32_t(std::max(modulation.zero_frequency_high, modulation.one_frequency_high) * wave_bytes_length * 2);
 	return error::SUCCESS;
 }
 
 
 
 cassette_image::error cassette_image::put_modulated_data(int channel, double time_index,
-	const void *data, size_t data_length, const Modulation *modulation,
+	const void *data, size_t data_length, const Modulation &modulation,
 	double *time_displacement)
 {
 	error err;
@@ -623,16 +623,16 @@ cassette_image::error cassette_image::put_modulated_data(int channel, double tim
 	size_t wave_bytes_length;
 	double total_displacement = 0.0;
 
-	const int8_t *wave_bytes = choose_wave(modulation, &wave_bytes_length);
+	const int8_t *wave_bytes = choose_wave(modulation, wave_bytes_length);
 
 	while (data_length--)
 	{
 		uint8_t b = *(data_bytes++);
 		for (int i = 0; i < 8; i++)
 		{
-			double pulse_frequency = (b & (1 << i)) ? modulation->one_frequency_canonical : modulation->zero_frequency_canonical;
+			double pulse_frequency = (b & (1 << i)) ? modulation.one_frequency_canonical : modulation.zero_frequency_canonical;
 			double pulse_period = 1 / pulse_frequency;
-			err = put_samples(0, time_index, pulse_period, wave_bytes_length, 1, wave_bytes, CASSETTE_WAVEFORM_8BIT);
+			err = put_samples(0, time_index, pulse_period, wave_bytes_length, 1, wave_bytes, WAVEFORM_8BIT);
 			if (err != error::SUCCESS)
 				goto done;
 			time_index += pulse_period;
@@ -650,7 +650,7 @@ done:
 
 
 cassette_image::error cassette_image::put_modulated_filler(int channel, double time_index,
-	uint8_t filler, size_t filler_length, const Modulation *modulation,
+	uint8_t filler, size_t filler_length, const Modulation &modulation,
 	double *time_displacement)
 {
 	error err;
@@ -674,7 +674,7 @@ cassette_image::error cassette_image::put_modulated_filler(int channel, double t
 
 
 cassette_image::error cassette_image::read_modulated_data(int channel, double time_index,
-	uint64_t offset, uint64_t length, const Modulation *modulation,
+	uint64_t offset, uint64_t length, const Modulation &modulation,
 	double *time_displacement)
 {
 	uint8_t *buffer;
@@ -717,24 +717,24 @@ cassette_image::error cassette_image::read_modulated_data(int channel, double ti
 
 
 cassette_image::error cassette_image::put_modulated_data_bit(int channel, double time_index,
-	uint8_t data, const Modulation *modulation,
+	uint8_t data, const Modulation &modulation,
 	double *time_displacement)
 {
 	error err;
 	size_t wave_bytes_length;
 	double total_displacement = 0.0;
 
-	const int8_t *wave_bytes = choose_wave(modulation, &wave_bytes_length);
+	const int8_t *wave_bytes = choose_wave(modulation, wave_bytes_length);
 
-	double pulse_frequency = (data) ? modulation->one_frequency_canonical : modulation->zero_frequency_canonical;
+	double pulse_frequency = (data) ? modulation.one_frequency_canonical : modulation.zero_frequency_canonical;
 	double pulse_period = 1 / pulse_frequency;
-	err = put_samples(0, time_index, pulse_period, wave_bytes_length, 1, wave_bytes, CASSETTE_WAVEFORM_8BIT);
-	if (err != cassette_image::error::SUCCESS)
+	err = put_samples(0, time_index, pulse_period, wave_bytes_length, 1, wave_bytes, WAVEFORM_8BIT);
+	if (err != error::SUCCESS)
 		goto done;
 	time_index += pulse_period;
 	total_displacement += pulse_period;
 
-	err = cassette_image::error::SUCCESS;
+	err = error::SUCCESS;
 
 done:
 	if (time_displacement)
@@ -754,7 +754,7 @@ cassette_image::error cassette_image::legacy_identify(Options *opts,
 	opts->channels = 1;
 	opts->bits_per_sample = 16;
 	opts->sample_frequency = legacy_args->sample_frequency;
-	return cassette_image::error::SUCCESS;
+	return error::SUCCESS;
 }
 
 
@@ -864,7 +864,7 @@ cassette_image::error cassette_image::legacy_construct(const LegacyWaveFiller *l
 
 	/* specify the wave */
 	err = put_samples(0, 0.0, ((double) pos) / args.sample_frequency,
-		pos, 2, &samples[0], CASSETTE_WAVEFORM_16BIT);
+		pos, 2, &samples[0], WAVEFORM_16BIT);
 	if (err != error::SUCCESS)
 		goto done;
 
@@ -893,16 +893,16 @@ void cassette_image::dump(const char *filename)
 	if (!f)
 		return;
 
-	io_generic saved_io = io;
-	const Format *saved_format = format;
+	io_generic saved_io = m_io;
+	const Format *saved_format = m_format;
 
-	io.file = f;
-	io.procs = &stdio_ioprocs_noclose;
-	format = &wavfile_format;
-	cassette_perform_save(this);
+	m_io.file = f;
+	m_io.procs = &stdio_ioprocs_noclose;
+	m_format = &wavfile_format;
+	perform_save();
 
-	io = saved_io;
-	format = saved_format;
+	m_io = saved_io;
+	m_format = saved_format;
 
 	fclose(f);
 }

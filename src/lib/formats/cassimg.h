@@ -22,58 +22,13 @@
 #include <vector>
 
 #ifndef LOG_FORMATS
-#define LOG_FORMATS if (0) printf
+#define LOG_FORMATS(...) do { if (0) osd_printf_info(__VA_ARGS__); } while (false)
 #endif
 
 // hack to get around rogues that define this
 #ifdef UNSUPPORTED
 #undef UNSUPPORTED
 #endif
-
-/***************************************************************************
-
-    Constants
-
-***************************************************************************/
-
-enum : int
-{
-	CASSETTE_FLAG_READWRITE         = 0,
-	CASSETTE_FLAG_READONLY          = 1,
-	CASSETTE_FLAG_NOSAVEONEXIT      = 0,
-	CASSETTE_FLAG_SAVEONEXIT        = 2
-};
-
-enum : int
-{
-	CASSETTE_WAVEFORM_8BIT          = 0,
-	CASSETTE_WAVEFORM_16BIT         = 2,
-	CASSETTE_WAVEFORM_16BIT_FLIP    = 3,
-	CASSETTE_WAVEFORM_32BIT         = 4,
-	CASSETTE_WAVEFORM_32BIT_FLIP    = 5,
-	CASSETTE_WAVEFORM_ENDIAN_FLIP   = 1,
-	CASSETTE_WAVEFORM_UNSIGNED      = 8
-};
-
-enum : int
-{
-	CASSETTE_MODULATION_SQUAREWAVE  = 0,
-	CASSETTE_MODULATION_SINEWAVE    = 1
-};
-
-
-#ifdef LSB_FIRST
-#define CASSETTE_WAVEFORM_16BITBE       CASSETTE_WAVEFORM_16BIT_FLIP
-#define CASSETTE_WAVEFORM_16BITLE       CASSETTE_WAVEFORM_16BIT
-#define CASSETTE_WAVEFORM_32BITBE       CASSETTE_WAVEFORM_32BIT_FLIP
-#define CASSETTE_WAVEFORM_32BITLE       CASSETTE_WAVEFORM_32BIT
-#else
-#define CASSETTE_WAVEFORM_16BITBE       CASSETTE_WAVEFORM_16BIT
-#define CASSETTE_WAVEFORM_16BITLE       CASSETTE_WAVEFORM_16BIT_FLIP
-#define CASSETTE_WAVEFORM_32BITBE       CASSETTE_WAVEFORM_32BIT
-#define CASSETTE_WAVEFORM_32BITLE       CASSETTE_WAVEFORM_32BIT_FLIP
-#endif
-
 
 /***************************************************************************
 
@@ -84,6 +39,44 @@ enum : int
 class cassette_image
 {
 public:
+	enum : int
+	{
+		FLAG_READWRITE          = 0,
+		FLAG_READONLY           = 1,
+		FLAG_NOSAVEONEXIT       = 0,
+		FLAG_SAVEONEXIT         = 2
+	};
+
+	enum : int
+	{
+		WAVEFORM_8BIT           = 0,
+		WAVEFORM_16BIT          = 2,
+		WAVEFORM_16BIT_FLIP     = 3,
+		WAVEFORM_32BIT          = 4,
+		WAVEFORM_32BIT_FLIP     = 5,
+		WAVEFORM_ENDIAN_FLIP    = 1,
+		WAVEFORM_UNSIGNED       = 8,
+
+#ifdef LSB_FIRST
+		WAVEFORM_16BITBE        = WAVEFORM_16BIT_FLIP,
+		WAVEFORM_16BITLE        = WAVEFORM_16BIT,
+		WAVEFORM_32BITBE        = WAVEFORM_32BIT_FLIP,
+		WAVEFORM_32BITLE        = WAVEFORM_32BIT
+#else
+		WAVEFORM_16BITBE        = WAVEFORM_16BIT,
+		WAVEFORM_16BITLE        = WAVEFORM_16BIT_FLIP,
+		WAVEFORM_32BITBE        = WAVEFORM_32BIT,
+		WAVEFORM_32BITLE        = WAVEFORM_32BIT_FLIP
+#endif
+	};
+
+	enum : int
+	{
+		MODULATION_SQUAREWAVE   = 0,
+		MODULATION_SINEWAVE     = 1
+	};
+
+
 	enum class error
 	{
 		SUCCESS,                // no error
@@ -167,19 +160,19 @@ public:
 		double sample_period, size_t sample_count, uint64_t offset, int waveform_flags);
 
 	// modulation support
-	error modulation_identify(const Modulation *modulation,
+	error modulation_identify(const Modulation &modulation,
 		Options *opts);
 	error put_modulated_data(int channel, double time_index,
-		const void *data, size_t data_length, const Modulation *modulation,
+		const void *data, size_t data_length, const Modulation &modulation,
 		double *time_displacement);
 	error put_modulated_filler(int channel, double time_index,
-		uint8_t filler, size_t filler_length, const Modulation *modulation,
+		uint8_t filler, size_t filler_length, const Modulation &modulation,
 		double *time_displacement);
 	error read_modulated_data(int channel, double time_index,
-		uint64_t offset, uint64_t length, const Modulation *modulation,
+		uint64_t offset, uint64_t length, const Modulation &modulation,
 		double *time_displacement);
 	error put_modulated_data_bit(int channel, double time_index,
-		uint8_t data, const Modulation *modulation,
+		uint8_t data, const Modulation &modulation,
 		double *time_displacement);
 
 	/* legacy code support */
@@ -202,25 +195,32 @@ public:
 	static error create(void *file, const io_procs *procs, const cassette_image::Format *format,
 		const cassette_image::Options *opts, int flags, ptr &outcassette);
 
-	const Format *format = nullptr;
-	io_generic io;
-
-	int channels = 0;
-	int flags = 0;
-	uint32_t sample_frequency = 0;
-
-	std::vector<std::unique_ptr<int32_t []> > blocks;
-	size_t sample_count = 0;
-
 	// builtin formats
 	static const Format wavfile_format;
 
 private:
+	struct manipulation_ranges;
+
 	cassette_image(const Format *format, void *file, const io_procs *procs, int flags);
 	cassette_image(const cassette_image &) = delete;
 	cassette_image(cassette_image &&) = delete;
 	cassette_image &operator=(const cassette_image &) = delete;
 	cassette_image &operator=(cassette_image &&) = delete;
+
+	error try_identify_format(const Format &format, const std::string &extension, int flags, Options &opts);
+	error perform_save();
+	error compute_manipulation_ranges(int channel, double time_index, double sample_period, manipulation_ranges &ranges) const;
+	error lookup_sample(int channel, size_t sample, int32_t *&ptr);
+
+	const Format *m_format = nullptr;
+	io_generic m_io;
+
+	int m_channels = 0;
+	int m_flags = 0;
+	uint32_t m_sample_frequency = 0;
+
+	std::vector<std::unique_ptr<int32_t []> > m_blocks;
+	size_t m_sample_count = 0;
 };
 
 /* macros for specifying format lists */

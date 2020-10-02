@@ -120,13 +120,13 @@ static cassette_image::error wavfile_process(cassette_image *cassette, cassette_
 			switch(opts->bits_per_sample)
 			{
 				case 8:
-					waveform_flags = CASSETTE_WAVEFORM_8BIT | CASSETTE_WAVEFORM_UNSIGNED;   // 8-bits wav are stored unsigned
+					waveform_flags = cassette_image::WAVEFORM_8BIT | cassette_image::WAVEFORM_UNSIGNED;   // 8-bits wav are stored unsigned
 					break;
 				case 16:
-					waveform_flags = CASSETTE_WAVEFORM_16BITLE;
+					waveform_flags = cassette_image::WAVEFORM_16BITLE;
 					break;
 				case 32:
-					waveform_flags = CASSETTE_WAVEFORM_32BITLE;
+					waveform_flags = cassette_image::WAVEFORM_32BITLE;
 					break;
 				default:
 					return cassette_image::error::INVALID_IMAGE;
@@ -186,7 +186,7 @@ static cassette_image::error wavfile_save(cassette_image *cassette, const casset
 	uint16_t bits_per_sample;
 	uint32_t data_size;
 	size_t bytes_per_sample = 2;
-	int waveform_flags = CASSETTE_WAVEFORM_16BITLE;
+	int waveform_flags = cassette_image::WAVEFORM_16BITLE;
 	uint16_t block_align;
 
 	bits_per_sample = (uint16_t) (bytes_per_sample * 8);
@@ -263,7 +263,7 @@ void wavfile_testload(const char *fname)
 	if (!f)
 		return;
 
-	if (cassette_open(f, &stdio_ioprocs, &wavfile_format, CASSETTE_FLAG_READONLY, &cassette))
+	if (cassette_open(f, &stdio_ioprocs, &wavfile_format, cassette_image::FLAG_READONLY, &cassette))
 	{
 		fclose(f);
 		return;

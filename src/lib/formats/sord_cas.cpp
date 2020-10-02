@@ -20,7 +20,7 @@ static const uint8_t SORDM5_CAS_HEADER[6] = { 'S', 'O', 'R', 'D', 'M', '5'};
 
 static const cassette_image::Modulation sordm5_cas_modulation =
 {
-	CASSETTE_MODULATION_SINEWAVE,
+	cassette_image::MODULATION_SINEWAVE,
 	1575.0 - 300, 1575.0, 1575.0 + 300,
 	3150.0 - 600, 3150.0, 3150.0 + 600
 };
@@ -34,7 +34,7 @@ static uint8_t cassette_image_read_uint8( cassette_image *cassette, uint64_t off
 
 static cassette_image::error sordm5_tap_identify( cassette_image *cassette, cassette_image::Options *opts)
 {
-	return cassette->modulation_identify(&sordm5_cas_modulation, opts);
+	return cassette->modulation_identify(sordm5_cas_modulation, opts);
 }
 
 static cassette_image::error sordm5_tap_load( cassette_image *cassette)
@@ -79,7 +79,7 @@ static cassette_image::error sordm5_tap_load( cassette_image *cassette)
 		}
 		// add sync
 		if (block_type == 'H') filler_length = 2.4 * (3150 / 8); else filler_length = 0.15 * (3150 / 8);
-		err = cassette->put_modulated_filler(0, time_index, 0xFF, filler_length, &sordm5_cas_modulation, &time_displacement);
+		err = cassette->put_modulated_filler(0, time_index, 0xFF, filler_length, sordm5_cas_modulation, &time_displacement);
 		if (err != cassette_image::error::SUCCESS) return err;
 		time_index += time_displacement;
 		// process block
@@ -108,13 +108,13 @@ static cassette_image::error sordm5_tap_load( cassette_image *cassette)
 					bit = (byte >> (j-2)) & 1;
 				}
 				// add bit
-				err = cassette->put_modulated_data_bit(0, time_index, bit, &sordm5_cas_modulation, &time_displacement);
+				err = cassette->put_modulated_data_bit(0, time_index, bit, sordm5_cas_modulation, &time_displacement);
 				if (err != cassette_image::error::SUCCESS) return err;
 				time_index += time_displacement;
 			}
 		}
 		// mark end of block
-		err = cassette->put_modulated_data_bit(0, time_index, 1, &sordm5_cas_modulation, &time_displacement);
+		err = cassette->put_modulated_data_bit(0, time_index, 1, sordm5_cas_modulation, &time_displacement);
 		if (err != cassette_image::error::SUCCESS) return err;
 		time_index += time_displacement;
 		// next block

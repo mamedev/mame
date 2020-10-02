@@ -62,7 +62,7 @@
 
 static const cassette_image::Modulation atom_tap_modulation =
 {
-	CASSETTE_MODULATION_SINEWAVE,
+	cassette_image::MODULATION_SINEWAVE,
 	1200.0 - 300, 1200.0, 1200.0 + 300,
 	2400.0 - 600, 2400.0, 2400.0 + 600
 };
@@ -84,7 +84,7 @@ static uint8_t cassette_image_read_uint8(cassette_image *cassette, uint64_t offs
 
 static cassette_image::error atom_tap_identify(cassette_image *cassette, cassette_image::Options *opts)
 {
-	return cassette->modulation_identify(&atom_tap_modulation, opts);
+	return cassette->modulation_identify(atom_tap_modulation, opts);
 }
 
 /*-------------------------------------------------
@@ -93,7 +93,7 @@ static cassette_image::error atom_tap_identify(cassette_image *cassette, cassett
 
 #define MODULATE(_value) \
 	for (int i = 0; i < (_value ? 8 : 4); i++) { \
-		err = cassette->put_modulated_data_bit(0, time_index, _value, &atom_tap_modulation, &time_displacement);\
+		err = cassette->put_modulated_data_bit(0, time_index, _value, atom_tap_modulation, &time_displacement);\
 		if (err != cassette_image::error::SUCCESS) return err;\
 		time_index += time_displacement;\
 	}

@@ -28,7 +28,7 @@
 
 static const cassette_image::Modulation sc3000_bit_modulation =
 {
-	CASSETTE_MODULATION_SINEWAVE,
+	cassette_image::MODULATION_SINEWAVE,
 	1200.0 - 300, 1200.0, 1200.0 + 300,
 	2400.0 - 600, 2400.0, 2400.0 + 600
 };
@@ -39,7 +39,7 @@ static const cassette_image::Modulation sc3000_bit_modulation =
 
 static cassette_image::error sc3000_bit_identify(cassette_image *cassette, cassette_image::Options *opts)
 {
-	return cassette->modulation_identify(&sc3000_bit_modulation, opts);
+	return cassette->modulation_identify(sc3000_bit_modulation, opts);
 }
 
 /*-------------------------------------------------
@@ -48,7 +48,7 @@ static cassette_image::error sc3000_bit_identify(cassette_image *cassette, casse
 
 #define MODULATE(_value) \
 	for (int i = 0; i < (_value ? 2 : 1); i++) { \
-		err = cassette->put_modulated_data_bit(0, time_index, _value, &sc3000_bit_modulation, &time_displacement);\
+		err = cassette->put_modulated_data_bit(0, time_index, _value, sc3000_bit_modulation, &time_displacement);\
 		if (err != cassette_image::error::SUCCESS) return err;\
 		time_index += time_displacement;\
 	}

@@ -26,8 +26,8 @@ DEFINE_DEVICE_TYPE(CASSETTE, cassette_image_device, "cassette_image", "Cassette"
 //  cassette_image_device - constructor
 //-------------------------------------------------
 
-cassette_image_device::cassette_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, CASSETTE, tag, owner, clock),
+cassette_image_device::cassette_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, CASSETTE, tag, owner, clock),
 	device_image_interface(mconfig, *this),
 	device_sound_interface(mconfig, *this),
 	m_cassette(nullptr),
@@ -256,7 +256,7 @@ image_init_result cassette_image_device::internal_load(bool is_create)
 	if (is_create || (length()==0)) // empty existing images are fine to write over.
 	{
 		// creating an image
-		err = cassette_image::create((void *)image, &image_ioprocs, &cassette_image::wavfile_format, m_create_opts, CASSETTE_FLAG_READWRITE|CASSETTE_FLAG_SAVEONEXIT, m_cassette);
+		err = cassette_image::create((void *)image, &image_ioprocs, &cassette_image::wavfile_format, m_create_opts, cassette_image::FLAG_READWRITE|cassette_image::FLAG_SAVEONEXIT, m_cassette);
 		if (err != cassette_image::error::SUCCESS)
 			goto error;
 	}
@@ -271,8 +271,8 @@ image_init_result cassette_image_device::internal_load(bool is_create)
 
 			// try opening the cassette
 			int cassette_flags = is_readonly()
-				? CASSETTE_FLAG_READONLY
-				: (CASSETTE_FLAG_READWRITE | CASSETTE_FLAG_SAVEONEXIT);
+				? cassette_image::FLAG_READONLY
+				: (cassette_image::FLAG_READWRITE | cassette_image::FLAG_SAVEONEXIT);
 			err = cassette_image::open_choices((void *)image, &image_ioprocs, filetype(), m_formats, cassette_flags, m_cassette);
 
 			// special case - if we failed due to readwrite not being supported, make the image be read only and retry
@@ -416,7 +416,7 @@ void cassette_image_device::sound_stream_update(sound_stream &stream, std::vecto
 
 		for (int ch = 0; ch < outputs.size(); ch++)
 		{
-			cassette->get_samples(0, time_index, duration, outputs[0].samples(), 2, &m_samples[0], CASSETTE_WAVEFORM_16BIT);
+			cassette->get_samples(0, time_index, duration, outputs[0].samples(), 2, &m_samples[0], cassette_image::WAVEFORM_16BIT);
 			for (int sampindex = 0; sampindex < outputs[ch].samples(); sampindex++)
 				outputs[ch].put_int(sampindex, m_samples[sampindex], 32768);
 		}

@@ -87,7 +87,7 @@ static uint8_t* to7_k7_bits;
 
 static const cassette_image::Modulation to7_k7_modulation =
 {
-	CASSETTE_MODULATION_SQUAREWAVE,
+	cassette_image::MODULATION_SQUAREWAVE,
 	4000.0,  4500.0, 5000.0,
 	5500.0,  6300.0, 7500.0
 };
@@ -96,7 +96,7 @@ static const cassette_image::Modulation to7_k7_modulation =
 
 static cassette_image::error to7_k7_identify ( cassette_image *cass, cassette_image::Options *opts )
 {
-	cassette_image::error e = cass->modulation_identify( &to7_k7_modulation, opts );
+	cassette_image::error e = cass->modulation_identify( to7_k7_modulation, opts );
 	return e;
 }
 
@@ -133,7 +133,7 @@ static cassette_image::error to7_k7_load( cassette_image *cass )
 	{                               \
 		cassette_image::error err;                      \
 		err = cass->put_samples( 0, time, (PERIOD), 2, 1, \
-						square_wave, CASSETTE_WAVEFORM_8BIT ); \
+						square_wave, cassette_image::WAVEFORM_8BIT ); \
 		if ( err != cassette_image::error::SUCCESS )                      \
 			return err;                 \
 		time += (PERIOD);                   \
