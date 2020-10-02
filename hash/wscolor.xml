@@ -2,8 +2,7 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0
--->
-<!--
+
 Some titles might exist with other revisions:
 - Battle Spirit - Digimon Frontier - Rev 0
 - Digital Monster Card Game - Ver. WonderSwan Color - Rev 1
@@ -15,6 +14,21 @@ Some titles might exist with other revisions:
 - Super Robot Taisen Compact 3 - Rev 0, 1, 2, 3, 4
 - Rockman EXE - N1 Battle - Rev 0
 - Sorobang - Rev 0
+
+
++======+=====+==========+============+================================================================================================+
+| Dump | ROM |   CRC    |   Serial   |                                    Name                                                        |
++======+=====+==========|============+================================================================================================+
+|  XX  | 001 | a1656bbb | SWJ-BAN010 | GunPey
+|  XX  | 002 | 5a41a7ba | SWJ-BAN004 | Puyo Puyo Tsuu
+
+
+TODO/missing:
+210 SAMPLE EDITION of 209, CRC 23853305
+216 約束の地 リヴィエラ size:8388608 crc:62CB398B
+217 デジタルモンスター ディープロジェクト size:4194304 crc:0E40829C
+222 バトルスピリット デジモンフロンティア size:4194304 crc:A28D3DC5
+226 SDガンダム ジージェネレーション モノアイ ガンダムズ size:4194304 crc:A3ECC9AC
 -->
 <softwarelist name="wscolor" description="Bandai Wonderswan Color cartridges">
 	<software name="anotherh">
@@ -26,9 +40,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20001221"/>
 		<info name="alt_title" value="アナザヘヴン ～memory of those days～"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0100A" />
+			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="4194304">
+				<!-- U2 -->
+				<!-- MH32M16E133B at U3 -->
 				<rom name="swj-ommc03.bin" size="4194304" crc="d7a0ab74" sha1="caf4a8de853ded732b2a72619acf2784eeceafc7" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -45,8 +64,17 @@ Some titles might exist with other revisions:
 		<info name="release" value="20020704"/>
 		<info name="alt_title" value="アークザラッド 機神復活"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0108 or PTS-0133A" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="8388608">
+				<!-- SD64M256S208D / K3N7V136JB-GC12T00 / 223 at U3 -->
+
+				<!-- SD64M256S208D / MR27V6402G-0A2 / 2285BAN at U3 -->
+				<!-- hynix 0222A / HY62KT081ED70C / KOREA at U4 -->
 				<rom name="swj-banc2a.bin" size="8388608" crc="e2317345" sha1="68981c05d8118d4189100eed462ee6639328dc59" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -63,8 +91,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20011025"/>
 		<info name="alt_title" value="マリー&amp;エリー ～ふたりのアトリエ～"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0108" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="4194304">
+				<!-- MH32M256S182C / MR27V3202F-1F / OKI THAI / 1385BAN at U3 -->
 				<rom name="swj-htrc01.bin" size="4194304" crc="b18cdc0d" sha1="99d9d7f951ae589059f34e76aea7489ae4cd79f1" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -81,14 +115,28 @@ Some titles might exist with other revisions:
 		<info name="release" value="20021207"/>
 		<info name="alt_title" value="バトルスピリット デジモンフロンティア"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0133A" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="4194304">
+				<!-- SD32M256S224D / MR27V3202F-NT / 2455M53 at U3 -->
+				<!-- hynix 0225A / HY62KT081ED70C / KOREA at U4 -->
 				<rom name="swj-banc31.bin" size="4194304" crc="8ba49dab" sha1="fffb1aea34e0a96113cd10ba9de515000d27bfe6" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
 			</dataarea>
 		</part>
 	</software>
+
+	<!-- Battle Spirit - Digimon Frontier (rev 0?) -->
+	<!-- CRC A28D3DC5 -->
+	<!-- PCB label PTS-0133A -->
+	<!-- BANDAI / 2003 at U1 -->
+	<!-- GIZA / 2808 at U2 -->
+	<!-- SD32M256S222D / MR27V3202F-NG / 2445M46 at U3 -->
+	<!-- hynix 0224A / HY62KT081ED70C / KOREA at U4 -->
 
 	<software name="bluewing">
 		<!-- WSC -->
@@ -99,8 +147,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20010705"/>
 		<info name="alt_title" value="ブルー ウイング ブリッツ"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0133" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="2097152">
+				<!-- MH16M256S164C at U3 -->
 				<rom name="swj-sqrc05.bin" size="2097152" crc="99027238" sha1="02103fc5fc97c3a38834ced32a3cfe6523832535" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -117,8 +171,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20020810"/>
 		<info name="alt_title" value="激闘! クラッシュギア ターボギアチャンピオンリーグ"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0108" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="4194304">
+				<!-- SD32M256S214D at U3 -->
+				<!-- hynix HY62KT081ED70C at U4 -->
 				<rom name="swj-wizc01.bin" size="4194304" crc="8a8b827c" sha1="1bc1e831b9e2aefc59f2cac5f19f7d22be574fc1" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x2000">
@@ -135,8 +195,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20010315"/>
 		<info name="alt_title" value="バトルゲート ダークアイズ"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0133" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="4194304">
+				<!-- MH32M256S151C at U3 -->
 				<rom name="swj-banc08.bin" size="4194304" crc="12ae932c" sha1="c2188171dc0f78fb6a13bbb55b4e85bdf7b82fd5" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -152,9 +218,16 @@ Some titles might exist with other revisions:
 		<info name="release" value="20040531"/>
 		<info name="alt_title" value="だいしんぐないと・ピリオド"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0101" />
+			<feature name="u1" value="ROM" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="BANDAI 2003" />
 			<feature name="slot" value="ws_sram" />
 			<feature name="rtc" value="yes" />
 			<dataarea name="rom" size="524288">
+				<!-- R27V1602 / DK040428 / 4205M84 at U1 -->
+				<!-- Chipplus B0411 / CS18LV40963DC-70 / CSSG01A07328.S at U4 -->
+				<!-- TODO check size -->
 				<rom name="dicing knight. (japan).bin" size="524288" crc="d28dc930" sha1="79658575c736fcad18e9225aa0e62398b086093b" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x40000">
@@ -171,8 +244,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20001209"/>
 		<info name="alt_title" value="デジモンアドベンチャー02 ディーワンテイマーズ"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0129" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="Epoxy blob ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="4194304">
+				<!-- epoxy at U3 (143) -->
 				<rom name="swj-banc03.bin" size="4194304" crc="62f4e4b4" sha1="6fbb07bfefac7832436ec56e4d95678428b0f7ba" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -189,8 +268,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20001209"/>
 		<info name="alt_title" value="デジモンアドベンチャー02 ディーワンテイマーズ"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0108" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="4194304">
+				<!-- MH32M256S135B at U3 -->
 				<rom name="swj-banc03.bin" size="4194304" crc="4d28637e" sha1="18d3dfe25d82964ab7bb61af363d368fd12f4d4b" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -205,8 +290,14 @@ Some titles might exist with other revisions:
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SWJ-BAN001"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0108" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="4194304">
+				<!-- MH32M256S175C at U3 -->
 				<rom name="swj-ban001digiasia.bin" size="4194304" crc="77689273" sha1="7a6411cf8a4d91e8a4e0532779f11bdd25b92363" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -223,9 +314,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20020316"/>
 		<info name="alt_title" value="デジタルモンスター カードゲーム バージョン ワンダースワンカラー"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0132" />
+			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="4194304">
+				<!-- U2 -->
+				<!-- SD32M16E203D at U3 -->
 				<rom name="swj-banc22.bin" size="4194304" crc="1e760c41" sha1="e31bfa54cbf539a9d28090b372d8e669a93c3e28" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -242,9 +338,17 @@ Some titles might exist with other revisions:
 		<info name="release" value="20020316"/>
 		<info name="alt_title" value="デジタルモンスター カードゲーム バージョン ワンダースワンカラー"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0100 or PTS-0132" />
+			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="4194304">
+				<!-- U2 -->
+				<!-- SD32M16E198D at U3 -->
+				<!-- or -->
+				<!-- U2 -->
+				<!-- SD32M16E198D at U3 -->
 				<rom name="swj-banc22.bin" size="4194304" crc="603cb5e6" sha1="ba16a0770f7a71dd49e2879799fd04a4f04f7e60" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -279,8 +383,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20020803"/>
 		<info name="alt_title" value="デジタルモンスター ディープロジェクト"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0108" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="4194304">
+				<!-- SD32M256S213D at U3 -->
+				<!-- HYNIX / HY62KT081ED70C at U4 -->
 				<rom name="swj-banc2e.bin" size="4194304" crc="faaefbcb" sha1="3e8fffe1f607ea5f855397d9d877cecb285507f7" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -297,8 +407,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20020427"/>
 		<info name="alt_title" value="デジモンテイマーズ バトルスピリット Ver.1.5"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0108" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="8388608">
+				<!-- SD64M256S201D at U3 -->
 				<rom name="swj-banc30.bin" size="8388608" crc="6caad4a2" sha1="3f39ff494a3d8dd9d55a2e7cf86b47f1c8e8a156" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -315,9 +431,17 @@ Some titles might exist with other revisions:
 		<info name="release" value="20011006"/>
 		<info name="alt_title" value="デジモンテイマーズ バトルスピリット"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0133 or PTS-0133A" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC (PTS-0133) or CY62256VLL (PTS-0133A) SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<feature name="rtc" value="yes" />
 			<dataarea name="rom" size="4194304">
+				<!-- MH32M256S179C at U3 -->
+				<!-- or -->
+				<!-- MH32M256S179C at U3 -->
 				<rom name="swj-banc1a.bin" size="4194304" crc="c927bfcb" sha1="757e92177385a14d979227edee1cb544b4c56bd6" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -334,8 +458,13 @@ Some titles might exist with other revisions:
 		<info name="release" value="20011229"/>
 		<info name="alt_title" value="デジモンテイマーズ ブレイブテイマー"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0132" />
+			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="4194304">
+				<!-- U2 -->
+				<!-- MH32M16E191C at U3 -->
 				<rom name="swj-banc1d.bin" size="4194304" crc="f1f4d41f" sha1="31a718cfbcff2dab56ab9606a0b5b2dfccecbbcb" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -352,8 +481,13 @@ Some titles might exist with other revisions:
 		<info name="release" value="20010712"/>
 		<info name="alt_title" value="デジモンテイマーズ デジモンメドレー"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0132" />
+			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="4194304">
+				<!-- U2 -->
+				<!-- MH32M16E173C at U3 -->
 				<rom name="swj-banc14.bin" size="4194304" crc="84a46949" sha1="6c5a2dc7e231ebd278fe22bb7f01b1a7cc3785d6" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -370,8 +504,13 @@ Some titles might exist with other revisions:
 		<info name="release" value="20010712"/>
 		<info name="alt_title" value="デジモンテイマーズ デジモンメドレー"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0100" />
+			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="4194304">
+				<!-- U2 -->
+				<!-- MH32M16E166C at U3 -->
 				<rom name="swj-banc14.bin" size="4194304" crc="fa92418d" sha1="8638737e5a35c6be05a888dc81e504e0d80fd756" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -388,9 +527,17 @@ Some titles might exist with other revisions:
 		<info name="release" value="20001214"/>
 		<info name="alt_title" value="どこでもハムスター3 おでかけサフラン"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0111" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<feature name="rtc" value="yes" />
 			<dataarea name="rom" size="2097152">
+				<!-- MH16M134B at U3 -->
+				<!-- 32K00 at X1 -->
+				<!-- U5 -->
 				<rom name="swj-becc01.bin" size="2097152" crc="93e19f13" sha1="66b4bd15ef67dc324736a1cc78d6aca335f03389" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -407,8 +554,13 @@ Some titles might exist with other revisions:
 		<info name="release" value="20010524"/>
 		<info name="alt_title" value="ポケットの中の ドラえもん"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0100" />
+			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="4194304">
+				<!-- U2 -->
+				<!-- MH32M16E156C at U3 -->
 				<rom name="swj-banc0d.bin" size="4194304" crc="2b61bb2b" sha1="57338999b949589c36ce116a30f433e9618685e4" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -425,8 +577,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20031120"/>
 		<info name="alt_title" value="ドラゴンボール"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0116" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="empty" />
+			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_rom" />
 			<dataarea name="rom" size="2097152">
+				<!-- SD16M0E239D at U3 -->
+				<!-- U4 empty -->
 				<rom name="swj-banc3c.bin" size="2097152" crc="067238d1" sha1="5384f9974c66e5e26129a4709976de0bb1ae1f17" offset="000000" />
 			</dataarea>
 		</part>
@@ -441,8 +599,16 @@ Some titles might exist with other revisions:
 		<info name="release" value="20001209"/>
 		<info name="alt_title" value="ファイナルファンタジー"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0108 or PTS-0129" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="4194304">
+				<!-- MH32M256S128B at U3 -->
+				<!-- or -->
+				<!-- epoxy at U3 -->
 				<rom name="swj-sqrc01.bin" size="4194304" crc="b7243e88" sha1="26628eb76c16880b6faf2e706778d91a60144078" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -459,8 +625,18 @@ Some titles might exist with other revisions:
 		<info name="release" value="20010502"/>
 		<info name="alt_title" value="ファイナルファンタジーII"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0133 or PTS-0116 or PTS-0108" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="4194304">
+				<!-- MH32M256S160C / MR27V3202F-B5 / 1155BA5 at U3 -->
+				<!-- or -->
+				<!-- MH32M256S160C at U3 -->
+				<!-- or -->
+				<!-- MH32M256S160C at U3 -->
 				<rom name="swj-sqrc02.bin" size="4194304" crc="f09e752f" sha1="959321e3b971516e38a4cbf95b0fc3efc0b0a825" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -477,8 +653,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20020328"/>
 		<info name="alt_title" value="ファイナルファンタジーIV"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0133A" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="4194304">
+				<!-- SD32M256S200D at U3 -->
 				<rom name="swj-sqrc09.bin" size="4194304" crc="f699d6d1" sha1="6d707e88c85d1b5ef708631e709668006a9ee244" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -495,8 +677,13 @@ Some titles might exist with other revisions:
 		<info name="release" value="20011115"/>
 		<info name="alt_title" value="ファイナルラップスペシャル"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0100" />
+			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="4194304">
+				<!-- U2 -->
+				<!-- MH32M16E184C at U3 -->
 				<rom name="swj-banc23.bin" size="4194304" crc="b07e6a56" sha1="4c3f092b095bdb0afdaf8d32d4c54b4d6c209c96" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -513,8 +700,13 @@ Some titles might exist with other revisions:
 		<info name="release" value="20001228"/>
 		<info name="alt_title" value="フラッシュ 恋人クン"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0100A" />
+			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="2097152">
+				<!-- U2 -->
+				<!-- MH16M16E140B at U3 -->
 				<rom name="swj-kbsc01.bin" size="2097152" crc="69d8d433" sha1="a3d6717efdb8f243fe86b4c3d869a9734a2e02d3" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -531,8 +723,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20020712"/>
 		<info name="alt_title" value="フロントミッション"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0133A" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="8388608">
+				<!-- SD64M256S211D at U3 -->
 				<rom name="swj-sqrc10.bin" size="8388608" crc="2f9e2560" sha1="3c752694ab651f9a00ccd39c334a2e3ff78f5cb2" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -548,8 +746,13 @@ Some titles might exist with other revisions:
 		<info name="serial" value="SWJ-BANC2B"/>
 		<info name="release" value="20020228"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0100A" />
+			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="4194304">
+				<!-- U2 -->
+				<!-- MH32M1E196C at U3 -->
 				<rom name="swj-banc2b.bin" size="4194304" crc="bc944a98" sha1="87661841ca63e99b04c0f6dc4ba3454c897e0c6d" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x80">
@@ -566,8 +769,13 @@ Some titles might exist with other revisions:
 		<info name="release" value="20010607"/>
 		<info name="alt_title" value="幻想魔伝最遊記 Retribution ～陽のあたる場所で～"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0132" />
+			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="2097152">
+				<!-- U2 -->
+				<!-- MH16M16E162C at U3 -->
 				<rom name="swj-sesc01.bin" size="2097152" crc="446e2581" sha1="adbe6e38a0bc6a2d19da64a444071977b771f14f" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -584,8 +792,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20010125"/>
 		<info name="alt_title" value="ギルティギア プチ"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0108" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="2097152">
+				<!-- MH16M256S144B at U3 -->
 				<rom name="swj-sumc07.bin" size="2097152" crc="9750bc2a" sha1="6d8f8fd330f32374b55cf6b998196a7db2131073" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -602,8 +816,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20010927"/>
 		<info name="alt_title" value="ギルティギア プチ2"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0108" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="4194304">
+				<!-- MH32M256S177C at U3 -->
 				<rom name="swj-sumc08.bin" size="4194304" crc="d7a12bd5" sha1="f7aeab6724154f7ef6a389f9f18b7100045e1064" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -620,8 +840,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20020613"/>
 		<info name="alt_title" value="グランスタ クロニクル"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0133A" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="8388608">
+				<!-- SD64M256S205D at U3 -->
 				<rom name="swj-mgtc01.bin" size="8388608" crc="af24f95c" sha1="3a4c5d1c08b74cf05b4cb64cbfd7c3dd8b1c3789" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -638,8 +864,18 @@ Some titles might exist with other revisions:
 		<info name="release" value="20030315"/>
 		<info name="alt_title" value="機動戦士ガンダム シード"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="WSS-0003 or PTS-0116 or WSS-0004" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="4194304">
+				<!-- SD32M256S229D at U3 -->
+				<!-- or -->
+				<!-- SD32M256S229D at U3 -->
+				<!-- or -->
+				<!-- SD32M256S229D at U4 -->
 				<rom name="swj-banc36.bin" size="4194304" crc="bce15137" sha1="e933ff8eace56a462019ae4654b0bab1b21b1d6c" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -656,8 +892,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20030502"/>
 		<info name="alt_title" value="機動戦士ガンダム ギレンの野望 特別編 蒼き星の覇者"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0133A" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="4194304">
+				<!-- SD32M256S232D at U3 -->
 				<rom name="swj-banc3a.bin" size="4194304" crc="d4061551" sha1="20b671bc14a8ab6373deecc641479d09658ac21f" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -674,8 +916,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20010201"/>
 		<info name="alt_title" value="機動戦士ガンダム Vol.1 サイドセブン"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0129" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="Epoxy blob ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="4194304">
+				<!-- epoxy at U3 (142) -->
 				<rom name="swj-banc07.bin" size="4194304" crc="08c0247b" sha1="29e72e7f96f145a0ff56e447f577310df2ec463b" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -692,8 +940,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20010816"/>
 		<info name="alt_title" value="機動戦士ガンダム Vol.2 ジャブロー"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0108" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="8388608">
+				<!-- MH64M256S171C at U3 -->
 				<rom name="swj-banc17.bin" size="8388608" crc="39a1391a" sha1="df1a794f7e3992b1e1e9de14141b607746202202" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -710,8 +964,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20020525"/>
 		<info name="alt_title" value="機動戦士ガンダム Vol.3 ア・バオア・クー"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0133A" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="8388608">
+				<!-- SD64M256S204D at U3 -->
 				<rom name="swj-banc25.bin" size="8388608" crc="a9f5bf54" sha1="35443e2ef8a20a0ad82da1274b2768c16239dd46" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -728,9 +988,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20001209"/>
 		<info name="alt_title" value="グンペイEX"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0100A" />
+			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="1048576">
+				<!-- U2 -->
+				<!-- MH8M16E131B at U3 -->
 				<rom name="swj-banc02.bin" size="1048576" crc="0c9cb12c" sha1="1eb729aa9ab0a7df6f8a3470a6fede59d7622d4a" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -748,8 +1013,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20020214"/>
 		<info name="alt_title" value="はんじゅくヒーロー半熟英雄 ああ、世界よ半熟なれ...!!"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0133A" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="CY62256VLL SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="4194304">
+				<!-- MH32M256S195C at U3 -->
 				<rom name="swj-sqrc06.bin" size="4194304" crc="31e09bed" sha1="2e3f221d6965f53b29586d2019ee81dec6d1ac30" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -766,8 +1037,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20000921"/>
 		<info name="alt_title" value="はたらくチョコボ"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0108" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="W242580 SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="1048576">
+				<!-- MH8M256S123B at U3 -->
 				<rom name="swj-sqr004.bin" size="1048576" crc="7a29e9a6" sha1="9bd63ed48926b27be70333fbe07da2ceed56328a" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -784,8 +1061,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20030424"/>
 		<info name="alt_title" value="ハンター×ハンター グリードアイランド"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0116" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="8388608">
+				<!-- SD64M256S232D at U3 -->
 				<rom name="swj-banc39.bin" size="8388608" crc="130af567" sha1="e26410d4eee4cc8cec5e2e369604aedf26d69d0c" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -802,8 +1085,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20030424"/>
 		<info name="alt_title" value="ハンター×ハンター グリードアイランド"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0133A" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="8388608">
+				<!-- SD64M256S231D at U3 -->
 				<rom name="swj-banc39.bin" size="8388608" crc="a487b7a8" sha1="f66335b5af87e7cb72ae311eb9b339534722f738" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -820,8 +1109,13 @@ Some titles might exist with other revisions:
 		<info name="release" value="20010823"/>
 		<info name="alt_title" value="ハンター×ハンター 導かれし者"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0100A" />
+			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="4194304">
+				<!-- U2 -->
+				<!-- MH32M16E172C at U3 -->
 				<rom name="swj-banc18.bin" size="4194304" crc="9402bca9" sha1="bc591fc24d3f8e94b70503fd8b6a35fa58151139" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -838,8 +1132,13 @@ Some titles might exist with other revisions:
 		<info name="release" value="20010426"/>
 		<info name="alt_title" value="ハンター×ハンター ～それぞれの決意～"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0100A" />
+			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="4194304">
+				<!-- U2 -->
+				<!-- MH32M16E155C at U3 -->
 				<rom name="swj-banc0f.bin" size="4194304" crc="d0b20c5a" sha1="2da2a9bcff4813abcb5b2c88095258d89a575378" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -856,8 +1155,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20020727"/>
 		<info name="alt_title" value="犬夜叉 風雲絵巻"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0133A" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="4194304">
+				<!-- SD32M256S212D at U3 -->
 				<rom name="swj-banc26.bin" size="4194304" crc="3ff5791f" sha1="99d5bdde193685a1d09ea73bb79a54b4da82625d" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -874,9 +1179,21 @@ Some titles might exist with other revisions:
 		<info name="release" value="20011102"/>
 		<info name="alt_title" value="犬夜叉 かごめの戦国日記"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0111 or PTS-0133A" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="CY62256VLL SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<feature name="rtc" value="yes" />
 			<dataarea name="rom" size="2097152">
+				<!-- MH16M256S183C at U3 -->
+				<!-- U5 -->
+				<!-- 32K0 at X1 -->
+				<!-- or -->
+				<!-- MH16M256S183C at U3 -->
+				<!-- U5 -->
+				<!-- 32K at X1 -->
 				<rom name="swj-banc1b.bin" size="2097152" crc="0c23d551" sha1="b4fbea1a2c50d8566685f72820b360af4b54f82f" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -893,8 +1210,13 @@ Some titles might exist with other revisions:
 		<info name="release" value="20021116"/>
 		<info name="alt_title" value="犬夜叉 かごめの夢日記"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0132" />
+			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="4194304">
+				<!-- U2 -->
+				<!-- SD32M16E221D at U3 -->
 				<rom name="swj-banc32.bin" size="4194304" crc="44453234" sha1="f7c8f8b6b6d036df8fc4bde72fcfac2846dffe35" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -927,10 +1249,15 @@ Some titles might exist with other revisions:
 		<publisher>Qute</publisher>
 		<info name="release" value="20040205"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="no label" />
+			<feature name="uX" value="BANDAI 2003" /><!-- no markings on pcb -->
 			<feature name="slot" value="ws_sram" />
 			<feature name="rtc" value="yes" />
 			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="524288">
+				<!-- Chipplus B0530 / CS18LV40963DCR70 / CTSC035082140S1 -->
+				<!-- JSS2 051125 / 16M 2SP / MANPAKU / 5485BHAJ -->
+				<!-- TODO check size -->
 				<rom name="judgement silversword - rebirth edition (japan) (rev sc21).bin" size="524288" crc="4fce380d" sha1="a1d910123b6be0b941f699ef70c745d16350d029" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x40000">
@@ -947,8 +1274,13 @@ Some titles might exist with other revisions:
 		<info name="release" value="20030130"/>
 		<info name="alt_title" value="キン肉マンII世 超人聖戦史"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0132" />
+			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="4194304">
+				<!-- U2 -->
+				<!-- SD32M16E227D at U3 -->
 				<rom name="swj-banc34.bin" size="4194304" crc="6142fd9d" sha1="efcf8f92357ffc6f6ec0e4aa960cd97a5070836e" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -965,8 +1297,13 @@ Some titles might exist with other revisions:
 		<info name="release" value="20020302"/>
 		<info name="alt_title" value="キン肉マンII世 ドリームタッグマッチ"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0132" />
+			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="2097152">
+				<!-- U2 -->
+				<!-- MH16M1E197C at U3 -->
 				<rom name="swj-banc20.bin" size="2097152" crc="462f9275" sha1="81dd3124cce8a1aafd423bfe0814187fb7c646cb" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x80">
@@ -983,9 +1320,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20010614"/>
 		<info name="alt_title" value="くるパラ!"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0132" />
+			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="2097152">
+				<!-- U2 -->
+				<!-- MH16M16U161C at U3 -->
 				<rom name="swj-tmcc01.bin" size="2097152" crc="274719f5" sha1="9942d1b7d1c00126b9891e560e6a3e264f8fdc2e" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -1002,9 +1344,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20010726"/>
 		<info name="alt_title" value="ラストアライブ"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0132" />
+			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="4194304">
+				<!-- U2 -->
+				<!-- MH32M16E167C at U3 -->
 				<rom name="swj-banc15.bin" size="4194304" crc="da4479bf" sha1="b019f41207e396d9fe3509dccdbe1cc6e7ac46bb" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -1021,8 +1368,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20020320"/>
 		<info name="alt_title" value="魔界塔士 サ・ガ"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0133A" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="CY62256VLL SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="4194304">
+				<!-- SD32M256S199D at U3 -->
 				<rom name="swj-sqrc08.bin" size="4194304" crc="1b6f5f30" sha1="6b7a9b810c932974cbda4de7178cf0ea5a90e628" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -1039,8 +1392,16 @@ Some titles might exist with other revisions:
 		<info name="release" value="20010405"/>
 		<info name="alt_title" value="名探偵コナン ～夕暮れの皇女～"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0133 or PTS-0108" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="4194304">
+				<!-- MH32M256S153C at U3 -->
+				<!-- or -->
+				<!-- MH32M256S153D at U3 -->
 				<rom name="swj-banc0e.bin" size="4194304" crc="9f6e3f8d" sha1="36d8bc2ce7920d940943358d48f056f81055ab34" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -1057,8 +1418,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20010308"/>
 		<info name="alt_title" value="メモリーズオフ フェスタ"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0108" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="2097152">
+				<!-- MH16M256S147B at U3 -->
 				<rom name="swj-kdkc01.bin" size="2097152" crc="8e123373" sha1="f47b4ab9197999bbec351750601baa20fbbd7177" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -1075,9 +1442,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20010426"/>
 		<info name="alt_title" value="サウンドコミック - 三毛猫ホームズ ゴーストパニック"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0132" />
+			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="4194304">
+				<!-- U2 -->
+				<!-- MH32M16E154C at U3 -->
 				<rom name="swj-kbsc02.bin" size="4194304" crc="d75effc2" sha1="2358701531e8a38419859cd70bf2fbbd967b6745" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -1094,8 +1466,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20010405"/>
 		<info name="alt_title" value="ミスタードリラー"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0133" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="2097152">
+				<!-- MH16M256S152C at U3 -->
 				<rom name="swj-nmcc01.bin" size="2097152" crc="5555d95c" sha1="209232f1e91c05140529d466c0ef6b7ad3386de1" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -1112,8 +1490,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20030327"/>
 		<info name="alt_title" value="Naruto ナルト- 木ノ葉忍法帖"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0133A" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="4194304">
+				<!-- SD32M256S230D at U3 -->
 				<rom name="swj-banc38.bin" size="4194304" crc="71556e6a" sha1="dbaa50fd56e69e72fdfe49362ef5fe4437d66667" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -1130,14 +1514,27 @@ Some titles might exist with other revisions:
 		<info name="release" value="20020712"/>
 		<info name="alt_title" value="フロムテレビアニメーション ワンピース グランドバトル スワンコロシアム"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0108" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="8388608">
+				<!-- SD64M256S209D / K3N7V137JB-GC12T00 at U3 -->
 				<rom name="swj-banc29.bin" size="8388608" crc="f8a1dd2b" sha1="01e765bf356cdcb413bfd27c6321f7449465766a" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
 			</dataarea>
 		</part>
 	</software>
+
+	<!-- PCB label PTS-0133A -->
+	<!-- BANDAI / 2003 at U1 -->
+	<!-- GIZA at U2 -->
+	<!-- SD64M256S210D at U3 -->
+	<!-- BSI / BS62LV256TC-70 at U4 -->
+	<!-- CRC 23853305 -->
 
 	<software name="onepchop">
 		<!-- WSC only, Rated "Everyone" -->
@@ -1148,8 +1545,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20031016"/>
 		<info name="alt_title" value="フロムテレビアニメーション ワンピース チョッパーの大冒険"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0133A" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="4194304">
+				<!-- SD32M256S238D at U3 -->
 				<rom name="swj-banc3b.bin" size="4194304" crc="8e120b5a" sha1="221f48e97ec2c6d0046213956e1f36e923c0dec2" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -1166,8 +1569,16 @@ Some titles might exist with other revisions:
 		<info name="release" value="20010913"/>
 		<info name="alt_title" value="フロムテレビアニメーション ワンピース 虹の島伝説"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0133 or PTS-0133A" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC (PTS-0133) or CY62256VLL (PTS-0133A) SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="4194304">
+				<!-- MH32M256S178C at U3 -->
+				<!-- or -->
+				<!-- MH32M256S178C at U3 -->
 				<rom name="swj-banc19.bin" size="4194304" crc="427056c4" sha1="2410690ad46667c52b63402df9e95fc8a75cee62" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -1184,8 +1595,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20020103"/>
 		<info name="alt_title" value="フロムテレビアニメーション ワンピース トレジャーウォーズ"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0133A" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="CY62256VLL SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="4194304">
+				<!-- MH32M256S198C at U3 -->
 				<rom name="swj-banc1e.bin" size="4194304" crc="3df3e34c" sha1="55088795164170c24b243a1b572506f123064c0f" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -1202,8 +1619,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20020103"/>
 		<info name="alt_title" value="フロムテレビアニメーション ワンピース トレジャーウォーズ"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0133A" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="CY62256VLL SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="4194304">
+				<!-- MH32M256S190C at U3 -->
 				<rom name="swj-banc1e.bin" size="4194304" crc="205503c3" sha1="dd1e6e5467b72fcb5848f07a9747aa66bb207d45" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -1220,9 +1643,15 @@ Some titles might exist with other revisions:
 		<info name="release" value="20021220"/>
 		<info name="alt_title" value="フロムテレビアニメーション ワンピース トレジャーウォーズ2 バギーランドへようこそ"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="WSS-0003" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_sram" />
 			<feature name="rtc" value="yes" />
 			<dataarea name="rom" size="8388608">
+				<!-- SD64M256S225D at U3 -->
+				<!-- hynix HY62KT081ED70C at U4 -->
 				<rom name="swj-banc33.bin" size="8388608" crc="0d1048f0" sha1="b7775e8f60fd62dc07f2865f8fad29a11e12dbb5" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -1239,8 +1668,13 @@ Some titles might exist with other revisions:
 		<info name="release" value="20010531"/>
 		<info name="alt_title" value="落雀"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0100A" />
+			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="1048576">
+				<!-- U2 -->
+				<!-- MH8M1E157C at U3 -->
 				<rom name="swj-banc10.bin" size="1048576" crc="fe4ff701" sha1="977d5830e45c78b9020e9d06a63a9ad6bc623745" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x80">
@@ -1257,8 +1691,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20001209"/>
 		<info name="alt_title" value="ライムライダー ケロリカン"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0108" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="4194304">
+				<!-- MH32M256S132B at U3 -->
 				<rom name="swj-banc01.bin" size="4194304" crc="60706555" sha1="5973306a864c3804ee10b209e45067807d39a4de" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -1275,8 +1715,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20020712"/>
 		<info name="alt_title" value="Riviera ～約束の地 リヴィエラ～"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0133A" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="8388608">
+				<!-- SD64M256S207D at U3 -->
 				<rom name="swj-banc27.bin" size="8388608" crc="2460b45a" sha1="a8f8d3efc9b2d5741081e05f517d746ee5437f87" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -1293,8 +1739,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20030717"/>
 		<info name="alt_title" value="スーパーロボット大戦 コンパクト3"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0133A" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="8388608">
+				<!-- SD64M256S234D at U3 -->
 				<rom name="swj-bprc09.bin" size="8388608" crc="6918c824" sha1="b579f204be604ebef4e8238e5883152b70399c4d" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -1311,8 +1763,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20030717"/>
 		<info name="alt_title" value="スーパーロボット大戦 コンパクト3"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0133A" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="8388608">
+				<!-- SD64M256S237D at U3 -->
 				<rom name="swj-bprc09-1.bin" size="8388608" crc="188ca644" sha1="dd6fe0f278cdec2670d3be8552dbb0cf6a3a2841" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -1329,8 +1787,16 @@ Some titles might exist with other revisions:
 		<info name="release" value="20011213"/>
 		<info name="alt_title" value="フォー ワンダースワンカラーコンパクト スーパーロボット大戦"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0133A or PTS-0116" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="CY62256VLL (PTS-0133A) or BS62LV256TC (PTS-0116) SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="4194304">
+				<!-- MH32M256S185C at U3 -->
+				<!-- or -->
+				<!-- MH32M256S185C at U3 -->
 				<rom name="swj-bprc08.bin" size="4194304" crc="16e0d929" sha1="bf212cecbbc51ee32ee2655a072f55e7bf70b9ec" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -1347,8 +1813,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20030208"/>
 		<info name="alt_title" value="ロックマンエグゼ ワンダースワン"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0133A" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="4194304">
+				<!-- SD32M256S228D at U3 -->
 				<rom name="swj-banc35.bin" size="4194304" crc="658c4b98" sha1="b4a3ff3b72639f27d1a6f449b0335074aeb9e603" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -1365,8 +1837,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20030808"/>
 		<info name="alt_title" value="ロックマンエグゼ N1バトル"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0133A" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="4194304">
+				<!-- SD32M256S235D at U3 -->
 				<rom name="swj-cpcc01.bin" size="4194304" crc="1f10ca75" sha1="9b4786adca7b83fe66a9d4b9fd4ffaf32abe7656" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -1383,8 +1861,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20011220"/>
 		<info name="alt_title" value="ロマンシング サ・ガ"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0133A" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="CY62256VLL SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="4194304">
+				<!-- MH32M256S187C at U3 -->
 				<rom name="swj-sqrc07.bin" size="4194304" crc="9c98d97d" sha1="06fcc9aad3ae478db6eed27621af4f56a6488a67" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -1401,8 +1885,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20020207"/>
 		<info name="alt_title" value="ランディム Return To Earth"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0133A" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="CY62256VLL SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="2097152">
+				<!-- MH16M256S193C at U3 -->
 				<rom name="swj-ddjc01.bin" size="2097152" crc="15c4552e" sha1="3a41a3b8fc126da07e2a82c21056a45c15efbc98" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -1419,8 +1909,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20010315"/>
 		<info name="alt_title" value="SDガンダム英雄伝 ～騎士伝説～"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0133" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="4194304">
+				<!-- MH32M256S149C at U3 -->
 				<rom name="swj-banc0a.bin" size="4194304" crc="c60e5162" sha1="ebd4b37ade6df717f7b637747a4d3c45a6cca037" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -1437,8 +1933,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20010315"/>
 		<info name="alt_title" value="SDガンダム英雄伝 ～武者伝説～"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0133" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="4194304">
+				<!-- MH32M256S150C at U3 -->
 				<rom name="swj-banc0b.bin" size="4194304" crc="18ecffb8" sha1="d8097e25431f0ad5183b2479ee0837599677a300" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -1455,8 +1957,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20010614"/>
 		<info name="alt_title" value="SDガンダム Gジェネレーション ギャザービート2"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0109" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="8388608">
+				<!-- MH64M159C at U3 -->
 				<rom name="swj-banc12.bin" size="8388608" crc="4d21a347" sha1="016ff46509cbfe57a7440a1755d3a41ef49c048f" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -1473,8 +1981,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20020926"/>
 		<info name="alt_title" value="SDガンダム ジージェネレーション モノアイガンダムズ"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0108" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="8388608">
+				<!-- SD64M256S218D at U3 -->
+				<!-- hynix HY62KT081ED70C at U4 -->
 				<rom name="swj-banc2f.bin" size="8388608" crc="6aca1f04" sha1="91e087056207fce21e782e25e383c203bc046897" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -1491,8 +2005,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20020216"/>
 		<info name="alt_title" value="SDガンダム オペレーション U.C."/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0108" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="CY62256VLL SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="2097152">
+				<!-- MH16M256S194C at U3 -->
 				<rom name="swj-banc21.bin" size="2097152" crc="f0acda5c" sha1="152c4d63b1b17f2c717a43efc75d718b614f9ddc" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -1509,8 +2029,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20001221"/>
 		<info name="alt_title" value="仙界伝 弐～TVアニメーション仙界伝封神演義より～"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0108" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="4194304">
+				<!-- MH32M256S137B at U3 -->
 				<rom name="swj-banc04.bin" size="4194304" crc="9f35d00f" sha1="df9e831842072d9af613effbee7162229849de58" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -1527,8 +2053,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20020829"/>
 		<info name="alt_title" value="シャーマンキング 未来への意志"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0133A" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="4194304">
+				<!-- SD32M256S219D at U3 -->
+				<!-- hynix HY62KT081ED70C at U4 -->
 				<rom name="swj-banc2d-1.bin" size="4194304" crc="34908cb4" sha1="473195666a633573c777d3be98d7e8f46569c84b" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -1545,8 +2077,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20020829"/>
 		<info name="alt_title" value="シャーマンキング 未来への意志"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0133A" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="4194304">
+				<!-- SD32M256S215D at U3 -->
+				<!-- hynix HY62KT081ED70C at U4 -->
 				<rom name="swj-banc2d.bin" size="4194304" crc="6c029674" sha1="1e735d1e83a7bfa06c5c717c7e8a386d55a8e3f0" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -1563,9 +2101,15 @@ Some titles might exist with other revisions:
 		<info name="release" value="20001209"/>
 		<info name="alt_title" value="そろばんぐ"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0108" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="1048576">
+				<!-- MH8M256S130B / J33 / 0042K7019 at U3 -->
 				<rom name="swj-kgtc09.bin" size="1048576" crc="0e467d97" sha1="983582fe8d18839df30b6d29fb75780a9e32f4ec" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -1582,8 +2126,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20030731"/>
 		<info name="alt_title" value="聖闘士星矢 黄金伝説編 パーフェクトエディション"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0116" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="empty" />
+			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_rom" />
 			<dataarea name="rom" size="2097152">
+				<!-- SD16M0E236D at U3 -->
+				<!-- U4 empty -->
 				<rom name="swj-banc3d.bin" size="2097152" crc="6e8a792d" sha1="8542649963efe0976015759382c180b7c056be9a" offset="000000" />
 			</dataarea>
 		</part>
@@ -1598,8 +2148,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20010827"/>
 		<info name="alt_title" value="スターハーツ ～星と大地の使者～"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0108" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="4194304">
+				<!-- OKI THAI / R27V3202F-B7 at U3 (170) -->
 				<rom name="swj-banc16.bin" size="4194304" crc="138d1018" sha1="2b2c2a0566646156bcdde2a00b728c5b8218aa23" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x2000">
@@ -1613,8 +2169,14 @@ Some titles might exist with other revisions:
 		<year>2001</year>
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0116" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="4194304">
+				<!-- MH32M256S168C at U3 -->
 				<rom name="star hearts - hoshi to daichi no shisha - taikenban (japan).bin" size="4194304" crc="9874e9a2" sha1="44940ae0140df1bd91d742a166c459df1b6c2339" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x2000">
@@ -1631,8 +2193,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20021031"/>
 		<info name="alt_title" value="ナムコスーパーウォーズ"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0116" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="2097152">
+				<!-- SD16M256S220D at U3 -->
+				<!-- hynix HY62KT081ED70C at U4 -->
 				<rom name="swj-banc28.bin" size="2097152" crc="8ce4652f" sha1="c48569fd0a46ab7b7ceafeb5698be90420cd4fbe" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -1649,9 +2217,17 @@ Some titles might exist with other revisions:
 		<info name="release" value="20001221"/>
 		<info name="alt_title" value="テラーズ2"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0130-2" />
+			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="4194304">
+				<!-- U2 -->
+				<!-- epoxy at U3 -->
+				<!-- or -->
+				<!-- U2 -->
+				<!-- MH32M16E128B at U3 -->
 				<rom name="swj-banc05.bin" size="4194304" crc="9bd8f08c" sha1="9532113e14b03c95f034c015168e21273d42eff1" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -1668,9 +2244,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20020418"/>
 		<info name="alt_title" value="テトリス"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0132" />
+			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="1048576">
+				<!-- U2 -->
+				<!-- SD8M1E202D at U3 -->
 				<rom name="swj-vgdc01.bin" size="1048576" crc="7b0caea9" sha1="1a86403d7896d60fcb7a4c09367f5a976c7ea5a5" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x80">
@@ -1687,8 +2268,13 @@ Some titles might exist with other revisions:
 		<info name="release" value="20010628"/>
 		<info name="alt_title" value="東風荘"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0100A" />
+			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="1048576">
+				<!-- U2 -->
+				<!-- MH8M1E165C at U3 -->
 				<rom name="swj-banc13.bin" size="1048576" crc="47659b2c" sha1="fb53c28bd48174d3829467f1ab81d3f87f9a7f5b" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x80">
@@ -1705,8 +2291,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20010208"/>
 		<info name="alt_title" value="宇宙戦艦ヤマト"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0133" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="4194304">
+				<!-- MH32M256S145B at U3 -->
 				<rom name="swj-banc09.bin" size="4194304" crc="5793bdda" sha1="dd1878279a6667fb66dd1ac44a2cdb9a5acbe415" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -1723,8 +2315,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20010621"/>
 		<info name="alt_title" value="ウルトラマン 光の国の使者"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0133" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="2097152">
+				<!-- MH16M256S163C at U3 -->
 				<rom name="swj-banc11.bin" size="2097152" crc="de2208ab" sha1="bd107befe5ce6c5508d2da8be351b9984166ae1d" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -1741,9 +2339,15 @@ Some titles might exist with other revisions:
 		<info name="release" value="20010118"/>
 		<info name="alt_title" value="ナムコワンダークラシック"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0129" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="4194304">
+				<!-- epoxy at U3 -->
 				<rom name="swj-banc06.bin" size="4194304" crc="12f10b27" sha1="55b54944efd6e277fa7140925ed2457a8cfb40b8" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -1760,8 +2364,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20010329"/>
 		<info name="alt_title" value="ワイルドカード"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0131" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="2097152">
+				<!-- epoxy at U3 (146) -->
 				<rom name="swj-sqrc04.bin" size="2097152" crc="d9401f0a" sha1="ea878a485a20abd5251065fd66e82d9d8b8a669d" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -1778,8 +2388,13 @@ Some titles might exist with other revisions:
 		<info name="release" value="20010125"/>
 		<info name="alt_title" value="ウィズ・ユー ～みつめていたい～"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0130" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="4194304">
+				<!-- U2 -->
+				<!-- epoxy at U3 (139) -->
 				<rom name="swj-shlc01.bin" size="4194304" crc="e14e9d36" sha1="6a4f4a03c367ccf00aa7462191c929a2736eb44b" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -1796,8 +2411,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20010301"/>
 		<info name="alt_title" value="ウィザードリィ シナリオ1 狂王の試練場"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0133" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="2097152">
+				<!-- MH16M256S148B at U3 -->
 				<rom name="swj-banc0c.bin" size="2097152" crc="15e55706" sha1="c1ad383d337dba8a63295cfb8c7ca8470c893c67" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -1813,9 +2434,15 @@ Some titles might exist with other revisions:
 		<info name="release" value="20000718"/>
 		<info name="alt_title" value="ワンダーウィッチ"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0101" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="BANDAI 2003" />
 			<feature name="slot" value="wwitch" />
 			<feature name="rtc" value="yes" />
-			<!-- 512KB Flash rom -->
+			<!-- JAPAN / 29DL400TC-90PFTN / 9935 W02S / FRB100 at U1 -->
+			<!-- NEC JAPAN / D442000LGU / B85X-9JH / 0006P0004 at U4 -->
+			<!-- 17P8 / S3511A at U5 -->
+			<!-- 512KB Flash rom 29DL400TC -->
 			<!-- The last, 8th,  64KB page is protected and contains the main rom -->
 			<!-- The 7th page contains the Freya OS and fonts -->
 			<!-- The remaining 384KB is available for storing code -->
@@ -1858,8 +2485,13 @@ Some titles might exist with other revisions:
 		<info name="release" value="200206??"/>
 		<info name="alt_title" value="エックス カード オブ フェイト"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0132" />
+			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="4194304">
+				<!-- U2 -->
+				<!-- SD32M16E206D at U3 -->
 				<rom name="swj-banc2c.bin" size="4194304" crc="66b617d5" sha1="c1ab4e24f261615ca59f937b866fcf7047b67796" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -1876,8 +2508,14 @@ Some titles might exist with other revisions:
 		<info name="release" value="20011220"/>
 		<info name="alt_title" value="サイ リトル"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0108" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="CY62256VLL SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="2097152">
+				<!-- MH256S186C at U3 -->
 				<rom name="swj-banc1f.bin" size="2097152" crc="25e2ba75" sha1="97c29917a78918a6905fd61a1466971cfd2a33c6" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
