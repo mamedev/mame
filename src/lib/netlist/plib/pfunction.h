@@ -58,14 +58,32 @@ namespace plib {
 	{
 		struct rpn_inst
 		{
-			rpn_inst() : m_cmd(ADD)
+			constexpr rpn_inst() : m_cmd(ADD)
 			{
 				m_param.val = plib::constants<NT>::zero();
 			}
-			rpn_inst(NT v) : m_cmd(PUSH_CONST)
+			constexpr rpn_inst(rpn_cmd cmd, std::size_t index = 0)
+			: m_cmd(cmd)
+			{
+				m_param.index = index;
+			}
+			constexpr rpn_inst(NT v) : m_cmd(PUSH_CONST)
 			{
 				m_param.val = v;
 			}
+			constexpr const rpn_cmd &cmd() const noexcept
+			{
+				return m_cmd;
+			}
+			constexpr const NT &value() const noexcept
+			{
+				return m_param.val; // NOLINT
+			}
+			constexpr const std::size_t &index() const noexcept
+			{
+				return m_param.index; // NOLINT
+			}
+		private:
 			rpn_cmd m_cmd;
 			union
 			{

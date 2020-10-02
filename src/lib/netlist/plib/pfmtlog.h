@@ -451,7 +451,7 @@ namespace plib {
 			fatal(logger)
 		{}
 
-		PCOPYASSIGNMOVE(plog_base, default)
+		PCOPYASSIGNMOVE(plog_base, delete)
 		virtual ~plog_base() noexcept = default;
 
 		plog_channel<plog_level::DEBUG, debug_enabled> debug;

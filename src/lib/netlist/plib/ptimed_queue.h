@@ -38,7 +38,10 @@ namespace plib {
 		constexpr pqentry_t() noexcept : m_exec_time(), m_object(nullptr) { }
 		constexpr pqentry_t(const Time &t, const Element &o) noexcept : m_exec_time(t), m_object(o) { }
 
-		PCOPYASSIGNMOVE(pqentry_t, default)
+		pqentry_t(const pqentry_t &) = default;
+		pqentry_t &operator=(const pqentry_t &) = default;
+		pqentry_t(pqentry_t &&) noexcept = default;
+		pqentry_t &operator=(pqentry_t &&) noexcept = default;
 
 		~pqentry_t() = default;
 

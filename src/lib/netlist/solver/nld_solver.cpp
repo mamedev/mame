@@ -361,8 +361,8 @@ namespace devices
 					{
 						auto &pt = dynamic_cast<terminal_t &>(*term);
 						// check the connected terminal
-						auto connected_terminals = netlist.setup().get_connected_terminals(pt);
-						for (auto ct = connected_terminals->begin(); *ct != nullptr; ct++)
+						const auto *const connected_terminals = netlist.setup().get_connected_terminals(pt);
+						for (const auto *ct = connected_terminals->begin(); *ct != nullptr; ct++)
 						{
 							analog_net_t &connected_net = (*ct)->net();
 							netlist.log().verbose("  Connected net {}", connected_net.name());

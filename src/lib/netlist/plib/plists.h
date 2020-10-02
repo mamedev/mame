@@ -187,7 +187,10 @@ namespace plib {
 			constexpr element_t() : m_next(nullptr), m_prev(nullptr) {}
 			~element_t() noexcept = default;
 
-			PCOPYASSIGNMOVE(element_t, default)
+			element_t(const element_t &) = default; \
+			element_t &operator=(const element_t &) = default;
+			element_t(element_t &&) noexcept = default;
+			element_t &operator=(element_t &&) noexcept = default;
 
 			constexpr LC * &next() noexcept { return m_next; }
 			constexpr LC * &prev() noexcept { return m_prev; }

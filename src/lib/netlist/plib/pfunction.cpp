@@ -118,7 +118,7 @@ namespace plib {
 			auto p = pcmds().find(cmd);
 			if (p != pcmds().end())
 			{
-				rc.m_cmd = p->second.cmd;
+				rc = rpn_inst(p->second.cmd);
 				stk -= p->second.adj;
 			}
 			else
@@ -127,23 +127,20 @@ namespace plib {
 				{
 					if (inputs[i] == cmd)
 					{
-						rc.m_cmd = PUSH_INPUT;
-						rc.m_param.index = i;
+						rc = rpn_inst(PUSH_INPUT, i);
 						stk += 1;
 						break;
 					}
 				}
-				if (rc.m_cmd != PUSH_INPUT)
+				if (rc.cmd() != PUSH_INPUT)
 				{
-					using fl_t = decltype(rc.m_param.val);
-					rc.m_cmd = PUSH_CONST;
 					bool err(false);
 					auto rs(plib::right(cmd,1));
-					auto r=units_si<fl_t>().find(rs);
-					if (r == units_si<fl_t>().end())
-						rc.m_param.val = plib::pstonum_ne<fl_t>(cmd, err);
+					auto r=units_si<NT>().find(rs);
+					if (r == units_si<NT>().end())
+						rc = rpn_inst(plib::pstonum_ne<NT>(cmd, err));
 					else
-						rc.m_param.val = plib::pstonum_ne<fl_t>(plib::left(cmd, cmd.length()-1), err) * r->second;
+						rc = rpn_inst(plib::pstonum_ne<NT>(plib::left(cmd, cmd.length()-1), err) * r->second);
 					if (err)
 						throw pexception(plib::pfmt("pfunction: unknown/misformatted token <{1}> in <{2}>")(cmd)(expr));
 					stk += 1;
@@ -358,13 +355,13 @@ namespace plib {
 	template <typename NT>
 	NT pfunction<NT>::evaluate(const values_container &values) noexcept
 	{
-		std::array<value_type, MAX_STACK> stack;
+		std::array<value_type, MAX_STACK> stack; // NOLINT
 		value_type *ptr = stack.data();
 		constexpr const auto zero = plib::constants<value_type>::zero();
 		constexpr const auto one = plib::constants<value_type>::one();
 		for (const auto &rc : m_precompiled)
 		{
-			switch (rc.m_cmd)
+			switch (rc.cmd())
 			{
 				OP(ADD,  1, ST2 + ST1)
 				OP(MULT, 1, ST2 * ST1)
@@ -386,8 +383,8 @@ namespace plib {
 				OP(MIN,  1, std::min(ST2, ST1))
 				OP(TRUNC, 0, plib::trunc(ST2))
 				OP0(RAND, lfsr_random<value_type>(m_lfsr))
-				OP0(PUSH_INPUT, values[rc.m_param.index])
-				OP0(PUSH_CONST, rc.m_param.val)
+				OP0(PUSH_INPUT, values[rc.index()])
+				OP0(PUSH_CONST, rc.value())
 				// please compiler
 				case LP:
 				case RP:
@@ -403,22 +400,22 @@ namespace plib {
 #undef OP
 #undef OP0
 
-#define ST0 m_precompiled[ptr+0].m_param.val
-#define ST1 m_precompiled[ptr-1].m_param.val
-#define ST2 m_precompiled[ptr-2].m_param.val
+#define ST0 m_precompiled[ptr+0].value()
+#define ST1 m_precompiled[ptr-1].value()
+#define ST2 m_precompiled[ptr-2].value()
 
 #define OP(OP, ADJ, EXPR) \
 	case OP: \
 		if (ADJ == 2) {\
-			if (m_precompiled[ptr-3].m_cmd == PUSH_CONST && m_precompiled[ptr-2].m_cmd == PUSH_CONST && m_precompiled[ptr-1].m_cmd == PUSH_CONST) \
+			if (m_precompiled[ptr-3].cmd() == PUSH_CONST && m_precompiled[ptr-2].cmd() == PUSH_CONST && m_precompiled[ptr-1].cmd() == PUSH_CONST) \
 			{	ptr--; m_precompiled[ptr-2] = rpn_inst(EXPR); n -= 3; ptr++; std::copy(m_precompiled.begin()+(ptr+1), m_precompiled.end(), m_precompiled.begin()+(ptr-2)); ptr-=2;} \
 			else { ptr++; } \
 		} else if (ADJ == 1) {\
-			if (m_precompiled[ptr-2].m_cmd == PUSH_CONST && m_precompiled[ptr-1].m_cmd == PUSH_CONST) \
+			if (m_precompiled[ptr-2].cmd() == PUSH_CONST && m_precompiled[ptr-1].cmd() == PUSH_CONST) \
 			{	m_precompiled[ptr-2] = rpn_inst(EXPR); n -= 2; std::copy(m_precompiled.begin()+(ptr+1), m_precompiled.end(), m_precompiled.begin()+(ptr-1)); ptr--;} \
 			else { ptr++; } \
 		} else if (ADJ == 0) {\
-			if (m_precompiled[ptr-1].m_cmd == PUSH_CONST) \
+			if (m_precompiled[ptr-1].cmd() == PUSH_CONST) \
 			{ ptr++; m_precompiled[ptr-2] = rpn_inst(EXPR); n -= 1; ptr--; std::copy(m_precompiled.begin()+(ptr+1), m_precompiled.end(), m_precompiled.begin()+(ptr)); } \
 			else { ptr++; } \
 		} else ptr++; \
@@ -438,7 +435,7 @@ namespace plib {
 		auto n = m_precompiled.size();
 		for (; ptr < n; )
 		{
-			switch (m_precompiled[ptr].m_cmd)
+			switch (m_precompiled[ptr].cmd())
 			{
 				OP(ADD,  1, ST2 + ST1)
 				OP(MULT, 1, ST2 * ST1)
@@ -460,8 +457,8 @@ namespace plib {
 				OP(MIN,  1, std::min(ST2, ST1))
 				OP(TRUNC,  0, plib::trunc(ST2))
 				OP0(RAND, lfsr_random<value_type>(m_lfsr))
-				OP0(PUSH_INPUT, values[rc.m_param.index])
-				OP0(PUSH_CONST, rc.m_param.val)
+				OP0(PUSH_INPUT, values[rc.index()])
+				OP0(PUSH_CONST, rc.value())
 				// please compiler
 				case LP:
 				case RP:

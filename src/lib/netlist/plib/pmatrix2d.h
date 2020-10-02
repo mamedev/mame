@@ -157,7 +157,11 @@ namespace plib
 			m_v.resize(N); //FIXME
 		}
 
-		PCOPYASSIGNMOVE(pmatrix2d_vrl, default)
+		pmatrix2d_vrl(const pmatrix2d_vrl &) = default;
+		pmatrix2d_vrl &operator=(const pmatrix2d_vrl &) = default;
+		pmatrix2d_vrl(pmatrix2d_vrl &&) noexcept = default;
+		pmatrix2d_vrl &operator=(pmatrix2d_vrl &&) noexcept = default;
+
 		~pmatrix2d_vrl() = default;
 
 		void resize(size_type N, size_type M)

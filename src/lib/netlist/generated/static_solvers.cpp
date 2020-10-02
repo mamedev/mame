@@ -72340,399 +72340,399 @@ const plib::dynlib_static_sym nl_static_solver_syms[] = {
 #if !defined(__EMSCRIPTEN__)
 
 // elim
-	{"nl_gcr_11c2ae166b240b6e_10_double_double", reinterpret_cast<void *>(&nl_gcr_11c2ae166b240b6e_10_double_double)},
+	{"nl_gcr_11c2ae166b240b6e_10_double_double", reinterpret_cast<void *>(&nl_gcr_11c2ae166b240b6e_10_double_double)}, // NOLINT
 // tankbatt
-	{"nl_gcr_124f7aa10f044582_16_double_double", reinterpret_cast<void *>(&nl_gcr_124f7aa10f044582_16_double_double)},
+	{"nl_gcr_124f7aa10f044582_16_double_double", reinterpret_cast<void *>(&nl_gcr_124f7aa10f044582_16_double_double)}, // NOLINT
 // armora
-	{"nl_gcr_1250f340dea396ae_22_double_double", reinterpret_cast<void *>(&nl_gcr_1250f340dea396ae_22_double_double)},
+	{"nl_gcr_1250f340dea396ae_22_double_double", reinterpret_cast<void *>(&nl_gcr_1250f340dea396ae_22_double_double)}, // NOLINT
 // astrob
-	{"nl_gcr_13833bf8c127deaa_154_double_double", reinterpret_cast<void *>(&nl_gcr_13833bf8c127deaa_154_double_double)},
+	{"nl_gcr_13833bf8c127deaa_154_double_double", reinterpret_cast<void *>(&nl_gcr_13833bf8c127deaa_154_double_double)}, // NOLINT
 // pongf
-	{"nl_gcr_13e7b5ac1a260dbf_10_double_double", reinterpret_cast<void *>(&nl_gcr_13e7b5ac1a260dbf_10_double_double)},
+	{"nl_gcr_13e7b5ac1a260dbf_10_double_double", reinterpret_cast<void *>(&nl_gcr_13e7b5ac1a260dbf_10_double_double)}, // NOLINT
 // tailg
-	{"nl_gcr_144ed14e6bafdb_119_double_double", reinterpret_cast<void *>(&nl_gcr_144ed14e6bafdb_119_double_double)},
+	{"nl_gcr_144ed14e6bafdb_119_double_double", reinterpret_cast<void *>(&nl_gcr_144ed14e6bafdb_119_double_double)}, // NOLINT
 // spacewar
-	{"nl_gcr_15e8f6fb021de0f9_28_double_double", reinterpret_cast<void *>(&nl_gcr_15e8f6fb021de0f9_28_double_double)},
+	{"nl_gcr_15e8f6fb021de0f9_28_double_double", reinterpret_cast<void *>(&nl_gcr_15e8f6fb021de0f9_28_double_double)}, // NOLINT
 // dpatrol
-	{"nl_gcr_18f4d9160b51d613_20_double_double", reinterpret_cast<void *>(&nl_gcr_18f4d9160b51d613_20_double_double)},
+	{"nl_gcr_18f4d9160b51d613_20_double_double", reinterpret_cast<void *>(&nl_gcr_18f4d9160b51d613_20_double_double)}, // NOLINT
 // starhawk
-	{"nl_gcr_1f1086787c94f97c_40_double_double", reinterpret_cast<void *>(&nl_gcr_1f1086787c94f97c_40_double_double)},
+	{"nl_gcr_1f1086787c94f97c_40_double_double", reinterpret_cast<void *>(&nl_gcr_1f1086787c94f97c_40_double_double)}, // NOLINT
 // zac1b11142
-	{"nl_gcr_1fad5cda2646cf42_30_double_double", reinterpret_cast<void *>(&nl_gcr_1fad5cda2646cf42_30_double_double)},
+	{"nl_gcr_1fad5cda2646cf42_30_double_double", reinterpret_cast<void *>(&nl_gcr_1fad5cda2646cf42_30_double_double)}, // NOLINT
 // sspeedr
-	{"nl_gcr_2294220d3c91e762_176_double_double", reinterpret_cast<void *>(&nl_gcr_2294220d3c91e762_176_double_double)},
+	{"nl_gcr_2294220d3c91e762_176_double_double", reinterpret_cast<void *>(&nl_gcr_2294220d3c91e762_176_double_double)}, // NOLINT
 // 280zzzap
-	{"nl_gcr_24643c159711f292_95_double_double", reinterpret_cast<void *>(&nl_gcr_24643c159711f292_95_double_double)},
+	{"nl_gcr_24643c159711f292_95_double_double", reinterpret_cast<void *>(&nl_gcr_24643c159711f292_95_double_double)}, // NOLINT
 // zac1b11142
-	{"nl_gcr_287a160e7c36b5b0_96_double_double", reinterpret_cast<void *>(&nl_gcr_287a160e7c36b5b0_96_double_double)},
+	{"nl_gcr_287a160e7c36b5b0_96_double_double", reinterpret_cast<void *>(&nl_gcr_287a160e7c36b5b0_96_double_double)}, // NOLINT
 // elim
-	{"nl_gcr_28b736fe552777a9_45_double_double", reinterpret_cast<void *>(&nl_gcr_28b736fe552777a9_45_double_double)},
+	{"nl_gcr_28b736fe552777a9_45_double_double", reinterpret_cast<void *>(&nl_gcr_28b736fe552777a9_45_double_double)}, // NOLINT
 // kidniki
-	{"nl_gcr_294dde1e0ecca6d0_37_double_double", reinterpret_cast<void *>(&nl_gcr_294dde1e0ecca6d0_37_double_double)},
+	{"nl_gcr_294dde1e0ecca6d0_37_double_double", reinterpret_cast<void *>(&nl_gcr_294dde1e0ecca6d0_37_double_double)}, // NOLINT
 // ripoff
-	{"nl_gcr_295cf2e2f3d489bf_12_double_double", reinterpret_cast<void *>(&nl_gcr_295cf2e2f3d489bf_12_double_double)},
+	{"nl_gcr_295cf2e2f3d489bf_12_double_double", reinterpret_cast<void *>(&nl_gcr_295cf2e2f3d489bf_12_double_double)}, // NOLINT
 // spacfury
-	{"nl_gcr_2a153513d3e8e2cc_53_double_double", reinterpret_cast<void *>(&nl_gcr_2a153513d3e8e2cc_53_double_double)},
+	{"nl_gcr_2a153513d3e8e2cc_53_double_double", reinterpret_cast<void *>(&nl_gcr_2a153513d3e8e2cc_53_double_double)}, // NOLINT
 // boxingb
-	{"nl_gcr_2f84bc98d737730b_22_double_double", reinterpret_cast<void *>(&nl_gcr_2f84bc98d737730b_22_double_double)},
+	{"nl_gcr_2f84bc98d737730b_22_double_double", reinterpret_cast<void *>(&nl_gcr_2f84bc98d737730b_22_double_double)}, // NOLINT
 // tankbatt
-	{"nl_gcr_328d886b444b586b_137_double_double", reinterpret_cast<void *>(&nl_gcr_328d886b444b586b_137_double_double)},
+	{"nl_gcr_328d886b444b586b_137_double_double", reinterpret_cast<void *>(&nl_gcr_328d886b444b586b_137_double_double)}, // NOLINT
 // astrob
-	{"nl_gcr_339c6b457f339538_159_double_double", reinterpret_cast<void *>(&nl_gcr_339c6b457f339538_159_double_double)},
+	{"nl_gcr_339c6b457f339538_159_double_double", reinterpret_cast<void *>(&nl_gcr_339c6b457f339538_159_double_double)}, // NOLINT
 // solarq
-	{"nl_gcr_34e910fc1896999f_76_double_double", reinterpret_cast<void *>(&nl_gcr_34e910fc1896999f_76_double_double)},
+	{"nl_gcr_34e910fc1896999f_76_double_double", reinterpret_cast<void *>(&nl_gcr_34e910fc1896999f_76_double_double)}, // NOLINT
 // sspeedr
-	{"nl_gcr_3e833834e5ce5aee_13_double_double", reinterpret_cast<void *>(&nl_gcr_3e833834e5ce5aee_13_double_double)},
+	{"nl_gcr_3e833834e5ce5aee_13_double_double", reinterpret_cast<void *>(&nl_gcr_3e833834e5ce5aee_13_double_double)}, // NOLINT
 // astrob
-	{"nl_gcr_41c6441d98369158_20_double_double", reinterpret_cast<void *>(&nl_gcr_41c6441d98369158_20_double_double)},
+	{"nl_gcr_41c6441d98369158_20_double_double", reinterpret_cast<void *>(&nl_gcr_41c6441d98369158_20_double_double)}, // NOLINT
 // warrior
-	{"nl_gcr_42a31ce5c187b308_12_double_double", reinterpret_cast<void *>(&nl_gcr_42a31ce5c187b308_12_double_double)},
+	{"nl_gcr_42a31ce5c187b308_12_double_double", reinterpret_cast<void *>(&nl_gcr_42a31ce5c187b308_12_double_double)}, // NOLINT
 // 280zzzap
-	{"nl_gcr_42c57d523cac30d0_122_double_double", reinterpret_cast<void *>(&nl_gcr_42c57d523cac30d0_122_double_double)},
+	{"nl_gcr_42c57d523cac30d0_122_double_double", reinterpret_cast<void *>(&nl_gcr_42c57d523cac30d0_122_double_double)}, // NOLINT
 // ripoff
-	{"nl_gcr_43188bf576854ae0_10_double_double", reinterpret_cast<void *>(&nl_gcr_43188bf576854ae0_10_double_double)},
+	{"nl_gcr_43188bf576854ae0_10_double_double", reinterpret_cast<void *>(&nl_gcr_43188bf576854ae0_10_double_double)}, // NOLINT
 // destroyr
-	{"nl_gcr_4334c95878d1be92_399_double_double", reinterpret_cast<void *>(&nl_gcr_4334c95878d1be92_399_double_double)},
+	{"nl_gcr_4334c95878d1be92_399_double_double", reinterpret_cast<void *>(&nl_gcr_4334c95878d1be92_399_double_double)}, // NOLINT
 // kidniki
-	{"nl_gcr_43f7ff9bc651cc7a_198_double_double", reinterpret_cast<void *>(&nl_gcr_43f7ff9bc651cc7a_198_double_double)},
+	{"nl_gcr_43f7ff9bc651cc7a_198_double_double", reinterpret_cast<void *>(&nl_gcr_43f7ff9bc651cc7a_198_double_double)}, // NOLINT
 // gamemachine
-	{"nl_gcr_491f95430bfdfd05_19_double_double", reinterpret_cast<void *>(&nl_gcr_491f95430bfdfd05_19_double_double)},
+	{"nl_gcr_491f95430bfdfd05_19_double_double", reinterpret_cast<void *>(&nl_gcr_491f95430bfdfd05_19_double_double)}, // NOLINT
 // sspeedr
-	{"nl_gcr_4a8e2b707bbac8a6_95_double_double", reinterpret_cast<void *>(&nl_gcr_4a8e2b707bbac8a6_95_double_double)},
+	{"nl_gcr_4a8e2b707bbac8a6_95_double_double", reinterpret_cast<void *>(&nl_gcr_4a8e2b707bbac8a6_95_double_double)}, // NOLINT
 // ripoff
-	{"nl_gcr_4b5ecfbb8f9fa97b_29_double_double", reinterpret_cast<void *>(&nl_gcr_4b5ecfbb8f9fa97b_29_double_double)},
+	{"nl_gcr_4b5ecfbb8f9fa97b_29_double_double", reinterpret_cast<void *>(&nl_gcr_4b5ecfbb8f9fa97b_29_double_double)}, // NOLINT
 // gtrak10
-	{"nl_gcr_4c46fdf7c0037727_43_double_double", reinterpret_cast<void *>(&nl_gcr_4c46fdf7c0037727_43_double_double)},
+	{"nl_gcr_4c46fdf7c0037727_43_double_double", reinterpret_cast<void *>(&nl_gcr_4c46fdf7c0037727_43_double_double)}, // NOLINT
 // solarq
-	{"nl_gcr_4cb524006206eb1a_25_double_double", reinterpret_cast<void *>(&nl_gcr_4cb524006206eb1a_25_double_double)},
+	{"nl_gcr_4cb524006206eb1a_25_double_double", reinterpret_cast<void *>(&nl_gcr_4cb524006206eb1a_25_double_double)}, // NOLINT
 // spacfury
-	{"nl_gcr_4dbd0f2aec7ef707_110_double_double", reinterpret_cast<void *>(&nl_gcr_4dbd0f2aec7ef707_110_double_double)},
+	{"nl_gcr_4dbd0f2aec7ef707_110_double_double", reinterpret_cast<void *>(&nl_gcr_4dbd0f2aec7ef707_110_double_double)}, // NOLINT
 // solarq
-	{"nl_gcr_4e4931ccbfb7a3c_70_double_double", reinterpret_cast<void *>(&nl_gcr_4e4931ccbfb7a3c_70_double_double)},
+	{"nl_gcr_4e4931ccbfb7a3c_70_double_double", reinterpret_cast<void *>(&nl_gcr_4e4931ccbfb7a3c_70_double_double)}, // NOLINT
 // fireone
-	{"nl_gcr_4f2b2f3cdc384f75_41_double_double", reinterpret_cast<void *>(&nl_gcr_4f2b2f3cdc384f75_41_double_double)},
+	{"nl_gcr_4f2b2f3cdc384f75_41_double_double", reinterpret_cast<void *>(&nl_gcr_4f2b2f3cdc384f75_41_double_double)}, // NOLINT
 // boxingb
-	{"nl_gcr_50f5194a994d56ec_16_double_double", reinterpret_cast<void *>(&nl_gcr_50f5194a994d56ec_16_double_double)},
+	{"nl_gcr_50f5194a994d56ec_16_double_double", reinterpret_cast<void *>(&nl_gcr_50f5194a994d56ec_16_double_double)}, // NOLINT
 // starhawk
-	{"nl_gcr_528a27fe9ed07d67_45_double_double", reinterpret_cast<void *>(&nl_gcr_528a27fe9ed07d67_45_double_double)},
+	{"nl_gcr_528a27fe9ed07d67_45_double_double", reinterpret_cast<void *>(&nl_gcr_528a27fe9ed07d67_45_double_double)}, // NOLINT
 // astrob
-	{"nl_gcr_536c3652eb3bc075_46_double_double", reinterpret_cast<void *>(&nl_gcr_536c3652eb3bc075_46_double_double)},
+	{"nl_gcr_536c3652eb3bc075_46_double_double", reinterpret_cast<void *>(&nl_gcr_536c3652eb3bc075_46_double_double)}, // NOLINT
 // boxingb
-	{"nl_gcr_53e1117fdb16f546_23_double_double", reinterpret_cast<void *>(&nl_gcr_53e1117fdb16f546_23_double_double)},
+	{"nl_gcr_53e1117fdb16f546_23_double_double", reinterpret_cast<void *>(&nl_gcr_53e1117fdb16f546_23_double_double)}, // NOLINT
 // cheekyms
-	{"nl_gcr_546396f65ce48700_12_double_double", reinterpret_cast<void *>(&nl_gcr_546396f65ce48700_12_double_double)},
+	{"nl_gcr_546396f65ce48700_12_double_double", reinterpret_cast<void *>(&nl_gcr_546396f65ce48700_12_double_double)}, // NOLINT
 // dpatrol
-	{"nl_gcr_59cb6bf7cb9d17dc_7_double_double", reinterpret_cast<void *>(&nl_gcr_59cb6bf7cb9d17dc_7_double_double)},
+	{"nl_gcr_59cb6bf7cb9d17dc_7_double_double", reinterpret_cast<void *>(&nl_gcr_59cb6bf7cb9d17dc_7_double_double)}, // NOLINT
 // breakout
-	{"nl_gcr_5a3419e2809520de_13_double_double", reinterpret_cast<void *>(&nl_gcr_5a3419e2809520de_13_double_double)},
+	{"nl_gcr_5a3419e2809520de_13_double_double", reinterpret_cast<void *>(&nl_gcr_5a3419e2809520de_13_double_double)}, // NOLINT
 // segausb
-	{"nl_gcr_5b73834d5f313d38_12_double_double", reinterpret_cast<void *>(&nl_gcr_5b73834d5f313d38_12_double_double)},
+	{"nl_gcr_5b73834d5f313d38_12_double_double", reinterpret_cast<void *>(&nl_gcr_5b73834d5f313d38_12_double_double)}, // NOLINT
 // tailg
-	{"nl_gcr_5ccf7da1202da2e5_31_double_double", reinterpret_cast<void *>(&nl_gcr_5ccf7da1202da2e5_31_double_double)},
+	{"nl_gcr_5ccf7da1202da2e5_31_double_double", reinterpret_cast<void *>(&nl_gcr_5ccf7da1202da2e5_31_double_double)}, // NOLINT
 // starcas
-	{"nl_gcr_5d550fc7441617a2_109_double_double", reinterpret_cast<void *>(&nl_gcr_5d550fc7441617a2_109_double_double)},
+	{"nl_gcr_5d550fc7441617a2_109_double_double", reinterpret_cast<void *>(&nl_gcr_5d550fc7441617a2_109_double_double)}, // NOLINT
 // zac1b11142
-	{"nl_gcr_6041272373b8603c_178_double_double", reinterpret_cast<void *>(&nl_gcr_6041272373b8603c_178_double_double)},
+	{"nl_gcr_6041272373b8603c_178_double_double", reinterpret_cast<void *>(&nl_gcr_6041272373b8603c_178_double_double)}, // NOLINT
 // astrob
-	{"nl_gcr_62464664b1c5aa1e_27_double_double", reinterpret_cast<void *>(&nl_gcr_62464664b1c5aa1e_27_double_double)},
+	{"nl_gcr_62464664b1c5aa1e_27_double_double", reinterpret_cast<void *>(&nl_gcr_62464664b1c5aa1e_27_double_double)}, // NOLINT
 // solarq
-	{"nl_gcr_62612f71055b8fd4_303_double_double", reinterpret_cast<void *>(&nl_gcr_62612f71055b8fd4_303_double_double)},
+	{"nl_gcr_62612f71055b8fd4_303_double_double", reinterpret_cast<void *>(&nl_gcr_62612f71055b8fd4_303_double_double)}, // NOLINT
 // konami1x
-	{"nl_gcr_62b99b9904a8c804_49_double_double", reinterpret_cast<void *>(&nl_gcr_62b99b9904a8c804_49_double_double)},
+	{"nl_gcr_62b99b9904a8c804_49_double_double", reinterpret_cast<void *>(&nl_gcr_62b99b9904a8c804_49_double_double)}, // NOLINT
 // fireone
-	{"nl_gcr_643133e86b2b1628_73_double_double", reinterpret_cast<void *>(&nl_gcr_643133e86b2b1628_73_double_double)},
+	{"nl_gcr_643133e86b2b1628_73_double_double", reinterpret_cast<void *>(&nl_gcr_643133e86b2b1628_73_double_double)}, // NOLINT
 // starfire
-	{"nl_gcr_649ebca7fa6793ed_27_double_double", reinterpret_cast<void *>(&nl_gcr_649ebca7fa6793ed_27_double_double)},
+	{"nl_gcr_649ebca7fa6793ed_27_double_double", reinterpret_cast<void *>(&nl_gcr_649ebca7fa6793ed_27_double_double)}, // NOLINT
 // armora
-	{"nl_gcr_64e460d8f716cd89_58_double_double", reinterpret_cast<void *>(&nl_gcr_64e460d8f716cd89_58_double_double)},
+	{"nl_gcr_64e460d8f716cd89_58_double_double", reinterpret_cast<void *>(&nl_gcr_64e460d8f716cd89_58_double_double)}, // NOLINT
 // flyball
-	{"nl_gcr_6622b53554e3776_291_double_double", reinterpret_cast<void *>(&nl_gcr_6622b53554e3776_291_double_double)},
+	{"nl_gcr_6622b53554e3776_291_double_double", reinterpret_cast<void *>(&nl_gcr_6622b53554e3776_291_double_double)}, // NOLINT
 // solarq
-	{"nl_gcr_66496d6073aca98e_20_double_double", reinterpret_cast<void *>(&nl_gcr_66496d6073aca98e_20_double_double)},
+	{"nl_gcr_66496d6073aca98e_20_double_double", reinterpret_cast<void *>(&nl_gcr_66496d6073aca98e_20_double_double)}, // NOLINT
 // starhawk
-	{"nl_gcr_67838e11f714c455_12_double_double", reinterpret_cast<void *>(&nl_gcr_67838e11f714c455_12_double_double)},
+	{"nl_gcr_67838e11f714c455_12_double_double", reinterpret_cast<void *>(&nl_gcr_67838e11f714c455_12_double_double)}, // NOLINT
 // ripoff
-	{"nl_gcr_698d5dd47fb16d5_16_double_double", reinterpret_cast<void *>(&nl_gcr_698d5dd47fb16d5_16_double_double)},
+	{"nl_gcr_698d5dd47fb16d5_16_double_double", reinterpret_cast<void *>(&nl_gcr_698d5dd47fb16d5_16_double_double)}, // NOLINT
 // astrob
-	{"nl_gcr_6c24726f30e8dc34_15_double_double", reinterpret_cast<void *>(&nl_gcr_6c24726f30e8dc34_15_double_double)},
+	{"nl_gcr_6c24726f30e8dc34_15_double_double", reinterpret_cast<void *>(&nl_gcr_6c24726f30e8dc34_15_double_double)}, // NOLINT
 // spacfury
-	{"nl_gcr_6eae7b15cd376318_43_double_double", reinterpret_cast<void *>(&nl_gcr_6eae7b15cd376318_43_double_double)},
+	{"nl_gcr_6eae7b15cd376318_43_double_double", reinterpret_cast<void *>(&nl_gcr_6eae7b15cd376318_43_double_double)}, // NOLINT
 // barrier
-	{"nl_gcr_6ef39a62161d596c_47_double_double", reinterpret_cast<void *>(&nl_gcr_6ef39a62161d596c_47_double_double)},
+	{"nl_gcr_6ef39a62161d596c_47_double_double", reinterpret_cast<void *>(&nl_gcr_6ef39a62161d596c_47_double_double)}, // NOLINT
 // starhawk
-	{"nl_gcr_723fa454468a93d_7_double_double", reinterpret_cast<void *>(&nl_gcr_723fa454468a93d_7_double_double)},
+	{"nl_gcr_723fa454468a93d_7_double_double", reinterpret_cast<void *>(&nl_gcr_723fa454468a93d_7_double_double)}, // NOLINT
 // cheekyms
-	{"nl_gcr_733c72a820fdbd1f_7_double_double", reinterpret_cast<void *>(&nl_gcr_733c72a820fdbd1f_7_double_double)},
+	{"nl_gcr_733c72a820fdbd1f_7_double_double", reinterpret_cast<void *>(&nl_gcr_733c72a820fdbd1f_7_double_double)}, // NOLINT
 // tailg
-	{"nl_gcr_7388106355fb27c3_12_double_double", reinterpret_cast<void *>(&nl_gcr_7388106355fb27c3_12_double_double)},
+	{"nl_gcr_7388106355fb27c3_12_double_double", reinterpret_cast<void *>(&nl_gcr_7388106355fb27c3_12_double_double)}, // NOLINT
 // tp1985
-	{"nl_gcr_73f2ba8ad4a45b26_10_double_double", reinterpret_cast<void *>(&nl_gcr_73f2ba8ad4a45b26_10_double_double)},
+	{"nl_gcr_73f2ba8ad4a45b26_10_double_double", reinterpret_cast<void *>(&nl_gcr_73f2ba8ad4a45b26_10_double_double)}, // NOLINT
 // zac1b11142
-	{"nl_gcr_7425594cec8024ad_30_double_double", reinterpret_cast<void *>(&nl_gcr_7425594cec8024ad_30_double_double)},
+	{"nl_gcr_7425594cec8024ad_30_double_double", reinterpret_cast<void *>(&nl_gcr_7425594cec8024ad_30_double_double)}, // NOLINT
 // tp1985
-	{"nl_gcr_74349e9889a2630b_7_double_double", reinterpret_cast<void *>(&nl_gcr_74349e9889a2630b_7_double_double)},
+	{"nl_gcr_74349e9889a2630b_7_double_double", reinterpret_cast<void *>(&nl_gcr_74349e9889a2630b_7_double_double)}, // NOLINT
 // gunfight
-	{"nl_gcr_743595e64cee0a5e_112_double_double", reinterpret_cast<void *>(&nl_gcr_743595e64cee0a5e_112_double_double)},
+	{"nl_gcr_743595e64cee0a5e_112_double_double", reinterpret_cast<void *>(&nl_gcr_743595e64cee0a5e_112_double_double)}, // NOLINT
 // ripoff
-	{"nl_gcr_76c9e236353caed1_35_double_double", reinterpret_cast<void *>(&nl_gcr_76c9e236353caed1_35_double_double)},
+	{"nl_gcr_76c9e236353caed1_35_double_double", reinterpret_cast<void *>(&nl_gcr_76c9e236353caed1_35_double_double)}, // NOLINT
 // gamemachine
-	{"nl_gcr_782d79b5cbe953b1_7_double_double", reinterpret_cast<void *>(&nl_gcr_782d79b5cbe953b1_7_double_double)},
+	{"nl_gcr_782d79b5cbe953b1_7_double_double", reinterpret_cast<void *>(&nl_gcr_782d79b5cbe953b1_7_double_double)}, // NOLINT
 // barrier
-	{"nl_gcr_79e756c5892cf87d_31_double_double", reinterpret_cast<void *>(&nl_gcr_79e756c5892cf87d_31_double_double)},
+	{"nl_gcr_79e756c5892cf87d_31_double_double", reinterpret_cast<void *>(&nl_gcr_79e756c5892cf87d_31_double_double)}, // NOLINT
 // breakout
-	{"nl_gcr_7a42b97d838ca073_7_double_double", reinterpret_cast<void *>(&nl_gcr_7a42b97d838ca073_7_double_double)},
+	{"nl_gcr_7a42b97d838ca073_7_double_double", reinterpret_cast<void *>(&nl_gcr_7a42b97d838ca073_7_double_double)}, // NOLINT
 // fireone
-	{"nl_gcr_7aee4423e3fdbfda_128_double_double", reinterpret_cast<void *>(&nl_gcr_7aee4423e3fdbfda_128_double_double)},
+	{"nl_gcr_7aee4423e3fdbfda_128_double_double", reinterpret_cast<void *>(&nl_gcr_7aee4423e3fdbfda_128_double_double)}, // NOLINT
 // astrob
-	{"nl_gcr_7c86a9bc1c6aef4c_7_double_double", reinterpret_cast<void *>(&nl_gcr_7c86a9bc1c6aef4c_7_double_double)},
+	{"nl_gcr_7c86a9bc1c6aef4c_7_double_double", reinterpret_cast<void *>(&nl_gcr_7c86a9bc1c6aef4c_7_double_double)}, // NOLINT
 // solarq
-	{"nl_gcr_7caaa135bff3d9f3_15_double_double", reinterpret_cast<void *>(&nl_gcr_7caaa135bff3d9f3_15_double_double)},
+	{"nl_gcr_7caaa135bff3d9f3_15_double_double", reinterpret_cast<void *>(&nl_gcr_7caaa135bff3d9f3_15_double_double)}, // NOLINT
 // warrior
-	{"nl_gcr_8003d4625273fa4d_10_double_double", reinterpret_cast<void *>(&nl_gcr_8003d4625273fa4d_10_double_double)},
+	{"nl_gcr_8003d4625273fa4d_10_double_double", reinterpret_cast<void *>(&nl_gcr_8003d4625273fa4d_10_double_double)}, // NOLINT
 // kidniki
-	{"nl_gcr_8046625a0fe0959_21_double_double", reinterpret_cast<void *>(&nl_gcr_8046625a0fe0959_21_double_double)},
+	{"nl_gcr_8046625a0fe0959_21_double_double", reinterpret_cast<void *>(&nl_gcr_8046625a0fe0959_21_double_double)}, // NOLINT
 // mario
-	{"nl_gcr_80b4b1e5cc58d303_29_double_double", reinterpret_cast<void *>(&nl_gcr_80b4b1e5cc58d303_29_double_double)},
+	{"nl_gcr_80b4b1e5cc58d303_29_double_double", reinterpret_cast<void *>(&nl_gcr_80b4b1e5cc58d303_29_double_double)}, // NOLINT
 // elim
-	{"nl_gcr_81f40a54af2ca202_10_double_double", reinterpret_cast<void *>(&nl_gcr_81f40a54af2ca202_10_double_double)},
+	{"nl_gcr_81f40a54af2ca202_10_double_double", reinterpret_cast<void *>(&nl_gcr_81f40a54af2ca202_10_double_double)}, // NOLINT
 // sundance
-	{"nl_gcr_8446e63d7842f6a6_70_double_double", reinterpret_cast<void *>(&nl_gcr_8446e63d7842f6a6_70_double_double)},
+	{"nl_gcr_8446e63d7842f6a6_70_double_double", reinterpret_cast<void *>(&nl_gcr_8446e63d7842f6a6_70_double_double)}, // NOLINT
 // dpatrol
-	{"nl_gcr_85652d3e3ada285a_10_double_double", reinterpret_cast<void *>(&nl_gcr_85652d3e3ada285a_10_double_double)},
+	{"nl_gcr_85652d3e3ada285a_10_double_double", reinterpret_cast<void *>(&nl_gcr_85652d3e3ada285a_10_double_double)}, // NOLINT
 // zac1b11142
-	{"nl_gcr_861d39f81d29d51_12_double_double", reinterpret_cast<void *>(&nl_gcr_861d39f81d29d51_12_double_double)},
+	{"nl_gcr_861d39f81d29d51_12_double_double", reinterpret_cast<void *>(&nl_gcr_861d39f81d29d51_12_double_double)}, // NOLINT
 // 280zzzap
-	{"nl_gcr_864a61c57bac9c38_123_double_double", reinterpret_cast<void *>(&nl_gcr_864a61c57bac9c38_123_double_double)},
+	{"nl_gcr_864a61c57bac9c38_123_double_double", reinterpret_cast<void *>(&nl_gcr_864a61c57bac9c38_123_double_double)}, // NOLINT
 // zac1b11142
-	{"nl_gcr_87cb2c78a2628efd_7_double_double", reinterpret_cast<void *>(&nl_gcr_87cb2c78a2628efd_7_double_double)},
+	{"nl_gcr_87cb2c78a2628efd_7_double_double", reinterpret_cast<void *>(&nl_gcr_87cb2c78a2628efd_7_double_double)}, // NOLINT
 // starcas
-	{"nl_gcr_88a8ef5f6bd43d48_12_double_double", reinterpret_cast<void *>(&nl_gcr_88a8ef5f6bd43d48_12_double_double)},
+	{"nl_gcr_88a8ef5f6bd43d48_12_double_double", reinterpret_cast<void *>(&nl_gcr_88a8ef5f6bd43d48_12_double_double)}, // NOLINT
 // breakout
-	{"nl_gcr_8a1565d1413f42f7_31_double_double", reinterpret_cast<void *>(&nl_gcr_8a1565d1413f42f7_31_double_double)},
+	{"nl_gcr_8a1565d1413f42f7_31_double_double", reinterpret_cast<void *>(&nl_gcr_8a1565d1413f42f7_31_double_double)}, // NOLINT
 // starhawk
-	{"nl_gcr_8b1ac1e181eec3fc_40_double_double", reinterpret_cast<void *>(&nl_gcr_8b1ac1e181eec3fc_40_double_double)},
+	{"nl_gcr_8b1ac1e181eec3fc_40_double_double", reinterpret_cast<void *>(&nl_gcr_8b1ac1e181eec3fc_40_double_double)}, // NOLINT
 // rebound
-	{"nl_gcr_8bec817b324dcc3_28_double_double", reinterpret_cast<void *>(&nl_gcr_8bec817b324dcc3_28_double_double)},
+	{"nl_gcr_8bec817b324dcc3_28_double_double", reinterpret_cast<void *>(&nl_gcr_8bec817b324dcc3_28_double_double)}, // NOLINT
 // cocoloco
-	{"nl_gcr_8c0f7f2284333de5_16_double_double", reinterpret_cast<void *>(&nl_gcr_8c0f7f2284333de5_16_double_double)},
+	{"nl_gcr_8c0f7f2284333de5_16_double_double", reinterpret_cast<void *>(&nl_gcr_8c0f7f2284333de5_16_double_double)}, // NOLINT
 // spacfury
-	{"nl_gcr_8c1dd4afcf0f8ea2_15_double_double", reinterpret_cast<void *>(&nl_gcr_8c1dd4afcf0f8ea2_15_double_double)},
+	{"nl_gcr_8c1dd4afcf0f8ea2_15_double_double", reinterpret_cast<void *>(&nl_gcr_8c1dd4afcf0f8ea2_15_double_double)}, // NOLINT
 // fireone
-	{"nl_gcr_8c512fd6a6dabc50_35_double_double", reinterpret_cast<void *>(&nl_gcr_8c512fd6a6dabc50_35_double_double)},
+	{"nl_gcr_8c512fd6a6dabc50_35_double_double", reinterpret_cast<void *>(&nl_gcr_8c512fd6a6dabc50_35_double_double)}, // NOLINT
 // segausb
-	{"nl_gcr_8cc4eb213eaeef9b_30_double_double", reinterpret_cast<void *>(&nl_gcr_8cc4eb213eaeef9b_30_double_double)},
+	{"nl_gcr_8cc4eb213eaeef9b_30_double_double", reinterpret_cast<void *>(&nl_gcr_8cc4eb213eaeef9b_30_double_double)}, // NOLINT
 // starcrus
-	{"nl_gcr_8d7bddf33d942482_129_double_double", reinterpret_cast<void *>(&nl_gcr_8d7bddf33d942482_129_double_double)},
+	{"nl_gcr_8d7bddf33d942482_129_double_double", reinterpret_cast<void *>(&nl_gcr_8d7bddf33d942482_129_double_double)}, // NOLINT
 // tank
-	{"nl_gcr_930b64361c2cdba8_328_double_double", reinterpret_cast<void *>(&nl_gcr_930b64361c2cdba8_328_double_double)},
+	{"nl_gcr_930b64361c2cdba8_328_double_double", reinterpret_cast<void *>(&nl_gcr_930b64361c2cdba8_328_double_double)}, // NOLINT
 // gamemachine
-	{"nl_gcr_934712b55bb3b2b2_10_double_double", reinterpret_cast<void *>(&nl_gcr_934712b55bb3b2b2_10_double_double)},
+	{"nl_gcr_934712b55bb3b2b2_10_double_double", reinterpret_cast<void *>(&nl_gcr_934712b55bb3b2b2_10_double_double)}, // NOLINT
 // kidniki
-	{"nl_gcr_9a5874c8e2da79d2_37_double_double", reinterpret_cast<void *>(&nl_gcr_9a5874c8e2da79d2_37_double_double)},
+	{"nl_gcr_9a5874c8e2da79d2_37_double_double", reinterpret_cast<void *>(&nl_gcr_9a5874c8e2da79d2_37_double_double)}, // NOLINT
 // fireone
-	{"nl_gcr_9aa159329f86ca8b_70_double_double", reinterpret_cast<void *>(&nl_gcr_9aa159329f86ca8b_70_double_double)},
+	{"nl_gcr_9aa159329f86ca8b_70_double_double", reinterpret_cast<void *>(&nl_gcr_9aa159329f86ca8b_70_double_double)}, // NOLINT
 // warrior
-	{"nl_gcr_9c975530a1a529d6_7_double_double", reinterpret_cast<void *>(&nl_gcr_9c975530a1a529d6_7_double_double)},
+	{"nl_gcr_9c975530a1a529d6_7_double_double", reinterpret_cast<void *>(&nl_gcr_9c975530a1a529d6_7_double_double)}, // NOLINT
 // kidniki
-	{"nl_gcr_9f141889c2091efc_24_double_double", reinterpret_cast<void *>(&nl_gcr_9f141889c2091efc_24_double_double)},
+	{"nl_gcr_9f141889c2091efc_24_double_double", reinterpret_cast<void *>(&nl_gcr_9f141889c2091efc_24_double_double)}, // NOLINT
 // segas16b_audio
-	{"nl_gcr_9f7104c5e25c87dd_111_double_double", reinterpret_cast<void *>(&nl_gcr_9f7104c5e25c87dd_111_double_double)},
+	{"nl_gcr_9f7104c5e25c87dd_111_double_double", reinterpret_cast<void *>(&nl_gcr_9f7104c5e25c87dd_111_double_double)}, // NOLINT
 // boxingb
-	{"nl_gcr_a0bf548977306172_25_double_double", reinterpret_cast<void *>(&nl_gcr_a0bf548977306172_25_double_double)},
+	{"nl_gcr_a0bf548977306172_25_double_double", reinterpret_cast<void *>(&nl_gcr_a0bf548977306172_25_double_double)}, // NOLINT
 // boxingb
-	{"nl_gcr_a1132c8737d5d463_96_double_double", reinterpret_cast<void *>(&nl_gcr_a1132c8737d5d463_96_double_double)},
+	{"nl_gcr_a1132c8737d5d463_96_double_double", reinterpret_cast<void *>(&nl_gcr_a1132c8737d5d463_96_double_double)}, // NOLINT
 // astrob
-	{"nl_gcr_a41a44bd5c424f88_13_double_double", reinterpret_cast<void *>(&nl_gcr_a41a44bd5c424f88_13_double_double)},
+	{"nl_gcr_a41a44bd5c424f88_13_double_double", reinterpret_cast<void *>(&nl_gcr_a41a44bd5c424f88_13_double_double)}, // NOLINT
 // tp1985
-	{"nl_gcr_a4540ffea06b4346_26_double_double", reinterpret_cast<void *>(&nl_gcr_a4540ffea06b4346_26_double_double)},
+	{"nl_gcr_a4540ffea06b4346_26_double_double", reinterpret_cast<void *>(&nl_gcr_a4540ffea06b4346_26_double_double)}, // NOLINT
 // tailg
-	{"nl_gcr_a46301cd3479b8db_15_double_double", reinterpret_cast<void *>(&nl_gcr_a46301cd3479b8db_15_double_double)},
+	{"nl_gcr_a46301cd3479b8db_15_double_double", reinterpret_cast<void *>(&nl_gcr_a46301cd3479b8db_15_double_double)}, // NOLINT
 // barrier
-	{"nl_gcr_a50a4b733e95414a_10_double_double", reinterpret_cast<void *>(&nl_gcr_a50a4b733e95414a_10_double_double)},
+	{"nl_gcr_a50a4b733e95414a_10_double_double", reinterpret_cast<void *>(&nl_gcr_a50a4b733e95414a_10_double_double)}, // NOLINT
 // starcas
-	{"nl_gcr_a582a424cb61c678_62_double_double", reinterpret_cast<void *>(&nl_gcr_a582a424cb61c678_62_double_double)},
+	{"nl_gcr_a582a424cb61c678_62_double_double", reinterpret_cast<void *>(&nl_gcr_a582a424cb61c678_62_double_double)}, // NOLINT
 // tank
-	{"nl_gcr_a63d1344e34bef4b_36_double_double", reinterpret_cast<void *>(&nl_gcr_a63d1344e34bef4b_36_double_double)},
+	{"nl_gcr_a63d1344e34bef4b_36_double_double", reinterpret_cast<void *>(&nl_gcr_a63d1344e34bef4b_36_double_double)}, // NOLINT
 // boxingb
-	{"nl_gcr_a6b734322b3ea924_22_double_double", reinterpret_cast<void *>(&nl_gcr_a6b734322b3ea924_22_double_double)},
+	{"nl_gcr_a6b734322b3ea924_22_double_double", reinterpret_cast<void *>(&nl_gcr_a6b734322b3ea924_22_double_double)}, // NOLINT
 // armora
-	{"nl_gcr_a6cfda6668b153c2_22_double_double", reinterpret_cast<void *>(&nl_gcr_a6cfda6668b153c2_22_double_double)},
+	{"nl_gcr_a6cfda6668b153c2_22_double_double", reinterpret_cast<void *>(&nl_gcr_a6cfda6668b153c2_22_double_double)}, // NOLINT
 // boxingb
-	{"nl_gcr_a6f74be7f61e6db2_29_double_double", reinterpret_cast<void *>(&nl_gcr_a6f74be7f61e6db2_29_double_double)},
+	{"nl_gcr_a6f74be7f61e6db2_29_double_double", reinterpret_cast<void *>(&nl_gcr_a6f74be7f61e6db2_29_double_double)}, // NOLINT
 // carpolo
-	{"nl_gcr_a8f1d076330f06b7_34_double_double", reinterpret_cast<void *>(&nl_gcr_a8f1d076330f06b7_34_double_double)},
+	{"nl_gcr_a8f1d076330f06b7_34_double_double", reinterpret_cast<void *>(&nl_gcr_a8f1d076330f06b7_34_double_double)}, // NOLINT
 // breakout
-	{"nl_gcr_a971eeb2ef76f75f_13_double_double", reinterpret_cast<void *>(&nl_gcr_a971eeb2ef76f75f_13_double_double)},
+	{"nl_gcr_a971eeb2ef76f75f_13_double_double", reinterpret_cast<void *>(&nl_gcr_a971eeb2ef76f75f_13_double_double)}, // NOLINT
 // ripoff
-	{"nl_gcr_aa07266ef5d420d1_11_double_double", reinterpret_cast<void *>(&nl_gcr_aa07266ef5d420d1_11_double_double)},
+	{"nl_gcr_aa07266ef5d420d1_11_double_double", reinterpret_cast<void *>(&nl_gcr_aa07266ef5d420d1_11_double_double)}, // NOLINT
 // 280zzzap
-	{"nl_gcr_ab9144d965a37e4_113_double_double", reinterpret_cast<void *>(&nl_gcr_ab9144d965a37e4_113_double_double)},
+	{"nl_gcr_ab9144d965a37e4_113_double_double", reinterpret_cast<void *>(&nl_gcr_ab9144d965a37e4_113_double_double)}, // NOLINT
 // sspeedr
-	{"nl_gcr_ac1e401ddf971e15_10_double_double", reinterpret_cast<void *>(&nl_gcr_ac1e401ddf971e15_10_double_double)},
+	{"nl_gcr_ac1e401ddf971e15_10_double_double", reinterpret_cast<void *>(&nl_gcr_ac1e401ddf971e15_10_double_double)}, // NOLINT
 // starfire
-	{"nl_gcr_aceb6035dfb557c9_12_double_double", reinterpret_cast<void *>(&nl_gcr_aceb6035dfb557c9_12_double_double)},
+	{"nl_gcr_aceb6035dfb557c9_12_double_double", reinterpret_cast<void *>(&nl_gcr_aceb6035dfb557c9_12_double_double)}, // NOLINT
 // sundance
-	{"nl_gcr_ad6dba01ff2425c3_12_double_double", reinterpret_cast<void *>(&nl_gcr_ad6dba01ff2425c3_12_double_double)},
+	{"nl_gcr_ad6dba01ff2425c3_12_double_double", reinterpret_cast<void *>(&nl_gcr_ad6dba01ff2425c3_12_double_double)}, // NOLINT
 // rebound
-	{"nl_gcr_ae15f7f8a55fc96_7_double_double", reinterpret_cast<void *>(&nl_gcr_ae15f7f8a55fc96_7_double_double)},
+	{"nl_gcr_ae15f7f8a55fc96_7_double_double", reinterpret_cast<void *>(&nl_gcr_ae15f7f8a55fc96_7_double_double)}, // NOLINT
 // armora
-	{"nl_gcr_afcde432efdafb81_56_double_double", reinterpret_cast<void *>(&nl_gcr_afcde432efdafb81_56_double_double)},
+	{"nl_gcr_afcde432efdafb81_56_double_double", reinterpret_cast<void *>(&nl_gcr_afcde432efdafb81_56_double_double)}, // NOLINT
 // mario
-	{"nl_gcr_afce66fb47d3c5f3_62_double_double", reinterpret_cast<void *>(&nl_gcr_afce66fb47d3c5f3_62_double_double)},
+	{"nl_gcr_afce66fb47d3c5f3_62_double_double", reinterpret_cast<void *>(&nl_gcr_afce66fb47d3c5f3_62_double_double)}, // NOLINT
 // spacewar
-	{"nl_gcr_b09deef9a25aecaf_24_double_double", reinterpret_cast<void *>(&nl_gcr_b09deef9a25aecaf_24_double_double)},
+	{"nl_gcr_b09deef9a25aecaf_24_double_double", reinterpret_cast<void *>(&nl_gcr_b09deef9a25aecaf_24_double_double)}, // NOLINT
 // spacfury
-	{"nl_gcr_b1db23287df1da54_175_double_double", reinterpret_cast<void *>(&nl_gcr_b1db23287df1da54_175_double_double)},
+	{"nl_gcr_b1db23287df1da54_175_double_double", reinterpret_cast<void *>(&nl_gcr_b1db23287df1da54_175_double_double)}, // NOLINT
 // segaspeech
-	{"nl_gcr_b22769fbf3159a8d_21_double_double", reinterpret_cast<void *>(&nl_gcr_b22769fbf3159a8d_21_double_double)},
+	{"nl_gcr_b22769fbf3159a8d_21_double_double", reinterpret_cast<void *>(&nl_gcr_b22769fbf3159a8d_21_double_double)}, // NOLINT
 // breakout
-	{"nl_gcr_b66ff415b228d5f8_10_double_double", reinterpret_cast<void *>(&nl_gcr_b66ff415b228d5f8_10_double_double)},
+	{"nl_gcr_b66ff415b228d5f8_10_double_double", reinterpret_cast<void *>(&nl_gcr_b66ff415b228d5f8_10_double_double)}, // NOLINT
 // starcas
-	{"nl_gcr_b7344e05aac90017_65_double_double", reinterpret_cast<void *>(&nl_gcr_b7344e05aac90017_65_double_double)},
+	{"nl_gcr_b7344e05aac90017_65_double_double", reinterpret_cast<void *>(&nl_gcr_b7344e05aac90017_65_double_double)}, // NOLINT
 // starfire
-	{"nl_gcr_b75e0baeb501e907_23_double_double", reinterpret_cast<void *>(&nl_gcr_b75e0baeb501e907_23_double_double)},
+	{"nl_gcr_b75e0baeb501e907_23_double_double", reinterpret_cast<void *>(&nl_gcr_b75e0baeb501e907_23_double_double)}, // NOLINT
 // spacfury
-	{"nl_gcr_b7b209d222c0a9a6_91_double_double", reinterpret_cast<void *>(&nl_gcr_b7b209d222c0a9a6_91_double_double)},
+	{"nl_gcr_b7b209d222c0a9a6_91_double_double", reinterpret_cast<void *>(&nl_gcr_b7b209d222c0a9a6_91_double_double)}, // NOLINT
 // boxingb
-	{"nl_gcr_b8d6d148a50bdb8f_55_double_double", reinterpret_cast<void *>(&nl_gcr_b8d6d148a50bdb8f_55_double_double)},
+	{"nl_gcr_b8d6d148a50bdb8f_55_double_double", reinterpret_cast<void *>(&nl_gcr_b8d6d148a50bdb8f_55_double_double)}, // NOLINT
 // 280zzzap
-	{"nl_gcr_bb501e6a23177009_57_double_double", reinterpret_cast<void *>(&nl_gcr_bb501e6a23177009_57_double_double)},
+	{"nl_gcr_bb501e6a23177009_57_double_double", reinterpret_cast<void *>(&nl_gcr_bb501e6a23177009_57_double_double)}, // NOLINT
 // elim
-	{"nl_gcr_bb56fa5325163fc3_15_double_double", reinterpret_cast<void *>(&nl_gcr_bb56fa5325163fc3_15_double_double)},
+	{"nl_gcr_bb56fa5325163fc3_15_double_double", reinterpret_cast<void *>(&nl_gcr_bb56fa5325163fc3_15_double_double)}, // NOLINT
 // starfire
-	{"nl_gcr_bd1514d7defd4062_9_double_double", reinterpret_cast<void *>(&nl_gcr_bd1514d7defd4062_9_double_double)},
+	{"nl_gcr_bd1514d7defd4062_9_double_double", reinterpret_cast<void *>(&nl_gcr_bd1514d7defd4062_9_double_double)}, // NOLINT
 // ripoff
-	{"nl_gcr_be7c805100c522fd_59_double_double", reinterpret_cast<void *>(&nl_gcr_be7c805100c522fd_59_double_double)},
+	{"nl_gcr_be7c805100c522fd_59_double_double", reinterpret_cast<void *>(&nl_gcr_be7c805100c522fd_59_double_double)}, // NOLINT
 // elim
-	{"nl_gcr_be831e5faa508573_150_double_double", reinterpret_cast<void *>(&nl_gcr_be831e5faa508573_150_double_double)},
+	{"nl_gcr_be831e5faa508573_150_double_double", reinterpret_cast<void *>(&nl_gcr_be831e5faa508573_150_double_double)}, // NOLINT
 // warrior
-	{"nl_gcr_bff07f8d339f7cc4_89_double_double", reinterpret_cast<void *>(&nl_gcr_bff07f8d339f7cc4_89_double_double)},
+	{"nl_gcr_bff07f8d339f7cc4_89_double_double", reinterpret_cast<void *>(&nl_gcr_bff07f8d339f7cc4_89_double_double)}, // NOLINT
 // fireone
-	{"nl_gcr_c1d22fe6e895255d_79_double_double", reinterpret_cast<void *>(&nl_gcr_c1d22fe6e895255d_79_double_double)},
+	{"nl_gcr_c1d22fe6e895255d_79_double_double", reinterpret_cast<void *>(&nl_gcr_c1d22fe6e895255d_79_double_double)}, // NOLINT
 // starcrus
-	{"nl_gcr_c2e616f3de30f15b_31_double_double", reinterpret_cast<void *>(&nl_gcr_c2e616f3de30f15b_31_double_double)},
+	{"nl_gcr_c2e616f3de30f15b_31_double_double", reinterpret_cast<void *>(&nl_gcr_c2e616f3de30f15b_31_double_double)}, // NOLINT
 // tailg
-	{"nl_gcr_c4cec7aed23b7b94_23_double_double", reinterpret_cast<void *>(&nl_gcr_c4cec7aed23b7b94_23_double_double)},
+	{"nl_gcr_c4cec7aed23b7b94_23_double_double", reinterpret_cast<void *>(&nl_gcr_c4cec7aed23b7b94_23_double_double)}, // NOLINT
 // segausb
-	{"nl_gcr_c61e08cf5e35918_84_double_double", reinterpret_cast<void *>(&nl_gcr_c61e08cf5e35918_84_double_double)},
+	{"nl_gcr_c61e08cf5e35918_84_double_double", reinterpret_cast<void *>(&nl_gcr_c61e08cf5e35918_84_double_double)}, // NOLINT
 // popeye
-	{"nl_gcr_c6f25bb06e161d1c_50_double_double", reinterpret_cast<void *>(&nl_gcr_c6f25bb06e161d1c_50_double_double)},
+	{"nl_gcr_c6f25bb06e161d1c_50_double_double", reinterpret_cast<void *>(&nl_gcr_c6f25bb06e161d1c_50_double_double)}, // NOLINT
 // flyball
-	{"nl_gcr_c74b1a65978d7121_7_double_double", reinterpret_cast<void *>(&nl_gcr_c74b1a65978d7121_7_double_double)},
+	{"nl_gcr_c74b1a65978d7121_7_double_double", reinterpret_cast<void *>(&nl_gcr_c74b1a65978d7121_7_double_double)}, // NOLINT
 // stuntcyc
-	{"nl_gcr_c924fe5960b1479e_20_double_double", reinterpret_cast<void *>(&nl_gcr_c924fe5960b1479e_20_double_double)},
+	{"nl_gcr_c924fe5960b1479e_20_double_double", reinterpret_cast<void *>(&nl_gcr_c924fe5960b1479e_20_double_double)}, // NOLINT
 // dpatrol
-	{"nl_gcr_ca68d70bd8f2f62e_22_double_double", reinterpret_cast<void *>(&nl_gcr_ca68d70bd8f2f62e_22_double_double)},
+	{"nl_gcr_ca68d70bd8f2f62e_22_double_double", reinterpret_cast<void *>(&nl_gcr_ca68d70bd8f2f62e_22_double_double)}, // NOLINT
 // breakout
-	{"nl_gcr_cb2aae3366e0ac1c_7_double_double", reinterpret_cast<void *>(&nl_gcr_cb2aae3366e0ac1c_7_double_double)},
+	{"nl_gcr_cb2aae3366e0ac1c_7_double_double", reinterpret_cast<void *>(&nl_gcr_cb2aae3366e0ac1c_7_double_double)}, // NOLINT
 // barrier
-	{"nl_gcr_cc913f9c3f9293e7_19_double_double", reinterpret_cast<void *>(&nl_gcr_cc913f9c3f9293e7_19_double_double)},
+	{"nl_gcr_cc913f9c3f9293e7_19_double_double", reinterpret_cast<void *>(&nl_gcr_cc913f9c3f9293e7_19_double_double)}, // NOLINT
 // fireone
-	{"nl_gcr_cca3d1a4219e2ec0_153_double_double", reinterpret_cast<void *>(&nl_gcr_cca3d1a4219e2ec0_153_double_double)},
+	{"nl_gcr_cca3d1a4219e2ec0_153_double_double", reinterpret_cast<void *>(&nl_gcr_cca3d1a4219e2ec0_153_double_double)}, // NOLINT
 // 1942
-	{"nl_gcr_ce766957cb26ff3e_90_double_double", reinterpret_cast<void *>(&nl_gcr_ce766957cb26ff3e_90_double_double)},
+	{"nl_gcr_ce766957cb26ff3e_90_double_double", reinterpret_cast<void *>(&nl_gcr_ce766957cb26ff3e_90_double_double)}, // NOLINT
 // astrob
-	{"nl_gcr_cf1018e7ed626623_43_double_double", reinterpret_cast<void *>(&nl_gcr_cf1018e7ed626623_43_double_double)},
+	{"nl_gcr_cf1018e7ed626623_43_double_double", reinterpret_cast<void *>(&nl_gcr_cf1018e7ed626623_43_double_double)}, // NOLINT
 // zac1b11142
-	{"nl_gcr_cfd3bbf5fbba4765_71_double_double", reinterpret_cast<void *>(&nl_gcr_cfd3bbf5fbba4765_71_double_double)},
+	{"nl_gcr_cfd3bbf5fbba4765_71_double_double", reinterpret_cast<void *>(&nl_gcr_cfd3bbf5fbba4765_71_double_double)}, // NOLINT
 // gunfight
-	{"nl_gcr_d05b3dbe370c7904_14_double_double", reinterpret_cast<void *>(&nl_gcr_d05b3dbe370c7904_14_double_double)},
+	{"nl_gcr_d05b3dbe370c7904_14_double_double", reinterpret_cast<void *>(&nl_gcr_d05b3dbe370c7904_14_double_double)}, // NOLINT
 // barrier
-	{"nl_gcr_d06bd7ddbfd17b5e_15_double_double", reinterpret_cast<void *>(&nl_gcr_d06bd7ddbfd17b5e_15_double_double)},
+	{"nl_gcr_d06bd7ddbfd17b5e_15_double_double", reinterpret_cast<void *>(&nl_gcr_d06bd7ddbfd17b5e_15_double_double)}, // NOLINT
 // elim
-	{"nl_gcr_d13f9c6838af6aeb_13_double_double", reinterpret_cast<void *>(&nl_gcr_d13f9c6838af6aeb_13_double_double)},
+	{"nl_gcr_d13f9c6838af6aeb_13_double_double", reinterpret_cast<void *>(&nl_gcr_d13f9c6838af6aeb_13_double_double)}, // NOLINT
 // elim
-	{"nl_gcr_d190a0e3b8e1f4a7_7_double_double", reinterpret_cast<void *>(&nl_gcr_d190a0e3b8e1f4a7_7_double_double)},
+	{"nl_gcr_d190a0e3b8e1f4a7_7_double_double", reinterpret_cast<void *>(&nl_gcr_d190a0e3b8e1f4a7_7_double_double)}, // NOLINT
 // elim
-	{"nl_gcr_d224211d1af6811d_12_double_double", reinterpret_cast<void *>(&nl_gcr_d224211d1af6811d_12_double_double)},
+	{"nl_gcr_d224211d1af6811d_12_double_double", reinterpret_cast<void *>(&nl_gcr_d224211d1af6811d_12_double_double)}, // NOLINT
 // armora
-	{"nl_gcr_d27a39bc93616187_45_double_double", reinterpret_cast<void *>(&nl_gcr_d27a39bc93616187_45_double_double)},
+	{"nl_gcr_d27a39bc93616187_45_double_double", reinterpret_cast<void *>(&nl_gcr_d27a39bc93616187_45_double_double)}, // NOLINT
 // elim
-	{"nl_gcr_d2ea3f267b959e8b_20_double_double", reinterpret_cast<void *>(&nl_gcr_d2ea3f267b959e8b_20_double_double)},
+	{"nl_gcr_d2ea3f267b959e8b_20_double_double", reinterpret_cast<void *>(&nl_gcr_d2ea3f267b959e8b_20_double_double)}, // NOLINT
 // starfire
-	{"nl_gcr_d32effa2b0ea54a1_438_double_double", reinterpret_cast<void *>(&nl_gcr_d32effa2b0ea54a1_438_double_double)},
+	{"nl_gcr_d32effa2b0ea54a1_438_double_double", reinterpret_cast<void *>(&nl_gcr_d32effa2b0ea54a1_438_double_double)}, // NOLINT
 // spacfury
-	{"nl_gcr_d4c34516ff6aa139_46_double_double", reinterpret_cast<void *>(&nl_gcr_d4c34516ff6aa139_46_double_double)},
+	{"nl_gcr_d4c34516ff6aa139_46_double_double", reinterpret_cast<void *>(&nl_gcr_d4c34516ff6aa139_46_double_double)}, // NOLINT
 // boxingb
-	{"nl_gcr_d7d45dc58b08cab9_10_double_double", reinterpret_cast<void *>(&nl_gcr_d7d45dc58b08cab9_10_double_double)},
+	{"nl_gcr_d7d45dc58b08cab9_10_double_double", reinterpret_cast<void *>(&nl_gcr_d7d45dc58b08cab9_10_double_double)}, // NOLINT
 // kidniki
-	{"nl_gcr_d8c511d38cef5f6f_34_double_double", reinterpret_cast<void *>(&nl_gcr_d8c511d38cef5f6f_34_double_double)},
+	{"nl_gcr_d8c511d38cef5f6f_34_double_double", reinterpret_cast<void *>(&nl_gcr_d8c511d38cef5f6f_34_double_double)}, // NOLINT
 // warrior
-	{"nl_gcr_da598f43329e823_27_double_double", reinterpret_cast<void *>(&nl_gcr_da598f43329e823_27_double_double)},
+	{"nl_gcr_da598f43329e823_27_double_double", reinterpret_cast<void *>(&nl_gcr_da598f43329e823_27_double_double)}, // NOLINT
 // pongf
-	{"nl_gcr_dbafc5ddaf7a08f8_35_double_double", reinterpret_cast<void *>(&nl_gcr_dbafc5ddaf7a08f8_35_double_double)},
+	{"nl_gcr_dbafc5ddaf7a08f8_35_double_double", reinterpret_cast<void *>(&nl_gcr_dbafc5ddaf7a08f8_35_double_double)}, // NOLINT
 // fireone
-	{"nl_gcr_dcbecbc127c5868f_36_double_double", reinterpret_cast<void *>(&nl_gcr_dcbecbc127c5868f_36_double_double)},
+	{"nl_gcr_dcbecbc127c5868f_36_double_double", reinterpret_cast<void *>(&nl_gcr_dcbecbc127c5868f_36_double_double)}, // NOLINT
 // sundance
-	{"nl_gcr_e02a162cb515a958_100_double_double", reinterpret_cast<void *>(&nl_gcr_e02a162cb515a958_100_double_double)},
+	{"nl_gcr_e02a162cb515a958_100_double_double", reinterpret_cast<void *>(&nl_gcr_e02a162cb515a958_100_double_double)}, // NOLINT
 // speedfrk
-	{"nl_gcr_e07b5b086812756c_7_double_double", reinterpret_cast<void *>(&nl_gcr_e07b5b086812756c_7_double_double)},
+	{"nl_gcr_e07b5b086812756c_7_double_double", reinterpret_cast<void *>(&nl_gcr_e07b5b086812756c_7_double_double)}, // NOLINT
 // solarq
-	{"nl_gcr_e081f90c2e0313f6_45_double_double", reinterpret_cast<void *>(&nl_gcr_e081f90c2e0313f6_45_double_double)},
+	{"nl_gcr_e081f90c2e0313f6_45_double_double", reinterpret_cast<void *>(&nl_gcr_e081f90c2e0313f6_45_double_double)}, // NOLINT
 // spacewar
-	{"nl_gcr_e0b492db40bba291_20_double_double", reinterpret_cast<void *>(&nl_gcr_e0b492db40bba291_20_double_double)},
+	{"nl_gcr_e0b492db40bba291_20_double_double", reinterpret_cast<void *>(&nl_gcr_e0b492db40bba291_20_double_double)}, // NOLINT
 // flyball
-	{"nl_gcr_e15d9316d59cdad9_7_double_double", reinterpret_cast<void *>(&nl_gcr_e15d9316d59cdad9_7_double_double)},
+	{"nl_gcr_e15d9316d59cdad9_7_double_double", reinterpret_cast<void *>(&nl_gcr_e15d9316d59cdad9_7_double_double)}, // NOLINT
 // speedfrk
-	{"nl_gcr_e4f2ffbf201a3d0c_37_double_double", reinterpret_cast<void *>(&nl_gcr_e4f2ffbf201a3d0c_37_double_double)},
+	{"nl_gcr_e4f2ffbf201a3d0c_37_double_double", reinterpret_cast<void *>(&nl_gcr_e4f2ffbf201a3d0c_37_double_double)}, // NOLINT
 // pongf
-	{"nl_gcr_e51b463cd890ef6d_7_double_double", reinterpret_cast<void *>(&nl_gcr_e51b463cd890ef6d_7_double_double)},
+	{"nl_gcr_e51b463cd890ef6d_7_double_double", reinterpret_cast<void *>(&nl_gcr_e51b463cd890ef6d_7_double_double)}, // NOLINT
 // sundance
-	{"nl_gcr_e5b7711fac1ea80c_8_double_double", reinterpret_cast<void *>(&nl_gcr_e5b7711fac1ea80c_8_double_double)},
+	{"nl_gcr_e5b7711fac1ea80c_8_double_double", reinterpret_cast<void *>(&nl_gcr_e5b7711fac1ea80c_8_double_double)}, // NOLINT
 // ripoff
-	{"nl_gcr_e60314070a75e121_20_double_double", reinterpret_cast<void *>(&nl_gcr_e60314070a75e121_20_double_double)},
+	{"nl_gcr_e60314070a75e121_20_double_double", reinterpret_cast<void *>(&nl_gcr_e60314070a75e121_20_double_double)}, // NOLINT
 // cheekyms
-	{"nl_gcr_e75302e17c866419_150_double_double", reinterpret_cast<void *>(&nl_gcr_e75302e17c866419_150_double_double)},
+	{"nl_gcr_e75302e17c866419_150_double_double", reinterpret_cast<void *>(&nl_gcr_e75302e17c866419_150_double_double)}, // NOLINT
 // elim
-	{"nl_gcr_e76692c10e79997e_36_double_double", reinterpret_cast<void *>(&nl_gcr_e76692c10e79997e_36_double_double)},
+	{"nl_gcr_e76692c10e79997e_36_double_double", reinterpret_cast<void *>(&nl_gcr_e76692c10e79997e_36_double_double)}, // NOLINT
 // fireone
-	{"nl_gcr_e7fb484f621b3ab9_7_double_double", reinterpret_cast<void *>(&nl_gcr_e7fb484f621b3ab9_7_double_double)},
+	{"nl_gcr_e7fb484f621b3ab9_7_double_double", reinterpret_cast<void *>(&nl_gcr_e7fb484f621b3ab9_7_double_double)}, // NOLINT
 // elim
-	{"nl_gcr_e8aeb165b69427ec_18_double_double", reinterpret_cast<void *>(&nl_gcr_e8aeb165b69427ec_18_double_double)},
+	{"nl_gcr_e8aeb165b69427ec_18_double_double", reinterpret_cast<void *>(&nl_gcr_e8aeb165b69427ec_18_double_double)}, // NOLINT
 // spacewar
-	{"nl_gcr_e9e8211f43d8f4b3_22_double_double", reinterpret_cast<void *>(&nl_gcr_e9e8211f43d8f4b3_22_double_double)},
+	{"nl_gcr_e9e8211f43d8f4b3_22_double_double", reinterpret_cast<void *>(&nl_gcr_e9e8211f43d8f4b3_22_double_double)}, // NOLINT
 // boxingb
-	{"nl_gcr_ea2b6e3a05e6ef0b_23_double_double", reinterpret_cast<void *>(&nl_gcr_ea2b6e3a05e6ef0b_23_double_double)},
+	{"nl_gcr_ea2b6e3a05e6ef0b_23_double_double", reinterpret_cast<void *>(&nl_gcr_ea2b6e3a05e6ef0b_23_double_double)}, // NOLINT
 // starcas
-	{"nl_gcr_ec4f6d2dad5961b9_64_double_double", reinterpret_cast<void *>(&nl_gcr_ec4f6d2dad5961b9_64_double_double)},
+	{"nl_gcr_ec4f6d2dad5961b9_64_double_double", reinterpret_cast<void *>(&nl_gcr_ec4f6d2dad5961b9_64_double_double)}, // NOLINT
 // barrier
-	{"nl_gcr_ecf17036ce1c07cf_10_double_double", reinterpret_cast<void *>(&nl_gcr_ecf17036ce1c07cf_10_double_double)},
+	{"nl_gcr_ecf17036ce1c07cf_10_double_double", reinterpret_cast<void *>(&nl_gcr_ecf17036ce1c07cf_10_double_double)}, // NOLINT
 // armora
-	{"nl_gcr_ee2cacaa15d32491_67_double_double", reinterpret_cast<void *>(&nl_gcr_ee2cacaa15d32491_67_double_double)},
+	{"nl_gcr_ee2cacaa15d32491_67_double_double", reinterpret_cast<void *>(&nl_gcr_ee2cacaa15d32491_67_double_double)}, // NOLINT
 // astrob
-	{"nl_gcr_ee61dcaa355fc625_285_double_double", reinterpret_cast<void *>(&nl_gcr_ee61dcaa355fc625_285_double_double)},
+	{"nl_gcr_ee61dcaa355fc625_285_double_double", reinterpret_cast<void *>(&nl_gcr_ee61dcaa355fc625_285_double_double)}, // NOLINT
 // starcrus
-	{"nl_gcr_ef2f49641f433a74_94_double_double", reinterpret_cast<void *>(&nl_gcr_ef2f49641f433a74_94_double_double)},
+	{"nl_gcr_ef2f49641f433a74_94_double_double", reinterpret_cast<void *>(&nl_gcr_ef2f49641f433a74_94_double_double)}, // NOLINT
 // spacfury
-	{"nl_gcr_f365c3863b050e35_45_double_double", reinterpret_cast<void *>(&nl_gcr_f365c3863b050e35_45_double_double)},
+	{"nl_gcr_f365c3863b050e35_45_double_double", reinterpret_cast<void *>(&nl_gcr_f365c3863b050e35_45_double_double)}, // NOLINT
 // spacfury
-	{"nl_gcr_f3c9a6d53371d709_227_double_double", reinterpret_cast<void *>(&nl_gcr_f3c9a6d53371d709_227_double_double)},
+	{"nl_gcr_f3c9a6d53371d709_227_double_double", reinterpret_cast<void *>(&nl_gcr_f3c9a6d53371d709_227_double_double)}, // NOLINT
 // barrier
-	{"nl_gcr_f425d4008ae1d2c6_13_double_double", reinterpret_cast<void *>(&nl_gcr_f425d4008ae1d2c6_13_double_double)},
+	{"nl_gcr_f425d4008ae1d2c6_13_double_double", reinterpret_cast<void *>(&nl_gcr_f425d4008ae1d2c6_13_double_double)}, // NOLINT
 // boxingb
-	{"nl_gcr_f43cf2a28a5a5561_23_double_double", reinterpret_cast<void *>(&nl_gcr_f43cf2a28a5a5561_23_double_double)},
+	{"nl_gcr_f43cf2a28a5a5561_23_double_double", reinterpret_cast<void *>(&nl_gcr_f43cf2a28a5a5561_23_double_double)}, // NOLINT
 // spacfury
-	{"nl_gcr_f4da1503eabe16cf_16_double_double", reinterpret_cast<void *>(&nl_gcr_f4da1503eabe16cf_16_double_double)},
+	{"nl_gcr_f4da1503eabe16cf_16_double_double", reinterpret_cast<void *>(&nl_gcr_f4da1503eabe16cf_16_double_double)}, // NOLINT
 // elim
-	{"nl_gcr_f4f4e2ee05cb584e_13_double_double", reinterpret_cast<void *>(&nl_gcr_f4f4e2ee05cb584e_13_double_double)},
+	{"nl_gcr_f4f4e2ee05cb584e_13_double_double", reinterpret_cast<void *>(&nl_gcr_f4f4e2ee05cb584e_13_double_double)}, // NOLINT
 // konami2x
-	{"nl_gcr_f6900d3f36a91049_85_double_double", reinterpret_cast<void *>(&nl_gcr_f6900d3f36a91049_85_double_double)},
+	{"nl_gcr_f6900d3f36a91049_85_double_double", reinterpret_cast<void *>(&nl_gcr_f6900d3f36a91049_85_double_double)}, // NOLINT
 // breakout
-	{"nl_gcr_f7dc4f87b5a8ba93_7_double_double", reinterpret_cast<void *>(&nl_gcr_f7dc4f87b5a8ba93_7_double_double)},
+	{"nl_gcr_f7dc4f87b5a8ba93_7_double_double", reinterpret_cast<void *>(&nl_gcr_f7dc4f87b5a8ba93_7_double_double)}, // NOLINT
 // fireone
-	{"nl_gcr_f8f6a951fd1af6bc_7_double_double", reinterpret_cast<void *>(&nl_gcr_f8f6a951fd1af6bc_7_double_double)},
+	{"nl_gcr_f8f6a951fd1af6bc_7_double_double", reinterpret_cast<void *>(&nl_gcr_f8f6a951fd1af6bc_7_double_double)}, // NOLINT
 // zektor
-	{"nl_gcr_fbff020f5f5d5a5_144_double_double", reinterpret_cast<void *>(&nl_gcr_fbff020f5f5d5a5_144_double_double)},
+	{"nl_gcr_fbff020f5f5d5a5_144_double_double", reinterpret_cast<void *>(&nl_gcr_fbff020f5f5d5a5_144_double_double)}, // NOLINT
 // kidniki
-	{"nl_gcr_fc02559fdbfb0e10_67_double_double", reinterpret_cast<void *>(&nl_gcr_fc02559fdbfb0e10_67_double_double)},
+	{"nl_gcr_fc02559fdbfb0e10_67_double_double", reinterpret_cast<void *>(&nl_gcr_fc02559fdbfb0e10_67_double_double)}, // NOLINT
 // 280zzzap
-	{"nl_gcr_fc9971724787b82b_149_double_double", reinterpret_cast<void *>(&nl_gcr_fc9971724787b82b_149_double_double)},
+	{"nl_gcr_fc9971724787b82b_149_double_double", reinterpret_cast<void *>(&nl_gcr_fc9971724787b82b_149_double_double)}, // NOLINT
 // elim
-	{"nl_gcr_fcce97532ad2f49d_18_double_double", reinterpret_cast<void *>(&nl_gcr_fcce97532ad2f49d_18_double_double)},
+	{"nl_gcr_fcce97532ad2f49d_18_double_double", reinterpret_cast<void *>(&nl_gcr_fcce97532ad2f49d_18_double_double)}, // NOLINT
 // fireone
-	{"nl_gcr_fd2796828f1ebd00_36_double_double", reinterpret_cast<void *>(&nl_gcr_fd2796828f1ebd00_36_double_double)},
+	{"nl_gcr_fd2796828f1ebd00_36_double_double", reinterpret_cast<void *>(&nl_gcr_fd2796828f1ebd00_36_double_double)}, // NOLINT
 // starfire
-	{"nl_gcr_feae15b80dd73620_7_double_double", reinterpret_cast<void *>(&nl_gcr_feae15b80dd73620_7_double_double)},
+	{"nl_gcr_feae15b80dd73620_7_double_double", reinterpret_cast<void *>(&nl_gcr_feae15b80dd73620_7_double_double)}, // NOLINT
 #endif
 
 {"", nullptr}
