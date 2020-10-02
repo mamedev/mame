@@ -14807,9 +14807,11 @@ suprpokrb                       // (c) 1986 Grayhound Electronics
 rp200
 
 @source:generalplus_gpl_unknown.cpp
+unkunsp
+
+@source:generalplus_gpl162xx_lcdtype.cpp
 pcp8718
 pcp8728
-unkunsp
 bkid218
 
 @source:generalplus_gpl16250_mobigo.cpp
