@@ -107,14 +107,13 @@ TMS340X0_FROM_SHIFTREG_CB_MEMBER(jpmimpct_state::from_shiftreg)
 
 TMS340X0_SCANLINE_RGB32_CB_MEMBER(jpmimpct_state::scanline_update)
 {
-	uint16_t *vram = &m_vram[(params->rowaddr << 8) & 0x3ff00];
-	uint32_t *dest = &bitmap.pix32(scanline);
+	uint16_t const *const vram = &m_vram[(params->rowaddr << 8) & 0x3ff00];
+	uint32_t *const dest = &bitmap.pix(scanline);
 	int coladdr = params->coladdr;
-	int x;
 
-	for (x = params->heblnk; x < params->hsblnk; x += 2)
+	for (int x = params->heblnk; x < params->hsblnk; x += 2)
 	{
-		uint16_t pixels = vram[coladdr++ & 0xff];
+		uint16_t const pixels = vram[coladdr++ & 0xff];
 		dest[x + 0] = m_palette->pen(pixels & 0xff);
 		dest[x + 1] = m_palette->pen(pixels >> 8);
 	}

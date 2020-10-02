@@ -36,7 +36,7 @@ namespace plib {
 	struct pqentry_t final
 	{
 		constexpr pqentry_t() noexcept : m_exec_time(), m_object(nullptr) { }
-		constexpr pqentry_t(Time t, Element o) noexcept : m_exec_time(t), m_object(o) { }
+		constexpr pqentry_t(const Time &t, const Element &o) noexcept : m_exec_time(t), m_object(o) { }
 
 		PCOPYASSIGNMOVE(pqentry_t, default)
 
@@ -64,8 +64,8 @@ namespace plib {
 
 		static constexpr pqentry_t never() noexcept { return pqentry_t(Time::never(), nullptr); }
 
-		constexpr Time exec_time() const noexcept { return m_exec_time; }
-		constexpr Element object() const noexcept { return m_object; }
+		constexpr const Time &exec_time() const noexcept { return m_exec_time; }
+		constexpr const Element &object() const noexcept { return m_object; }
 	private:
 		Time m_exec_time;
 		Element m_object;
@@ -165,6 +165,7 @@ namespace plib {
 					return;
 				}
 			}
+			//printf("Element not found in delete %s\n", elem->name().c_str());
 		}
 
 		template <bool KEEPSTAT, class R>
@@ -340,3 +341,4 @@ namespace plib {
 } // namespace plib
 
 #endif // PTIMED_QUEUE_H_
+#include <cstdlib>

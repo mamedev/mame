@@ -185,10 +185,10 @@ TIMER_CALLBACK_MEMBER(m79152pc_state::hsync_off)
 
 void m79152pc_state::screen_draw_line(bitmap_ind16 &bitmap, unsigned y)
 {
-	u16 ma = u16(m_line_base) << 4;
-	u8 ra = m_line_count & 0xf;
+	const u16 ma = u16(m_line_base) << 4;
+	const u8 ra = m_line_count & 0xf;
 
-	u16 *p = &bitmap.pix16(y++);
+	u16 *p = &bitmap.pix(y++);
 
 	for (u16 x = ma; x < ma + 80; x++)
 	{

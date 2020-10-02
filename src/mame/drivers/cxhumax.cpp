@@ -897,17 +897,14 @@ static inline uint32_t ycc_to_rgb(uint32_t ycc)
 
 uint32_t cxhumax_state::screen_update_cxhumax(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int i, j;
-
-
 	uint32_t osd_pointer = m_drm1_regs[DRM_OSD_PTR_REG];
 
 	if(osd_pointer)
 	{
-		uint32_t *ram = m_ram;
-		uint32_t *osd_header = &ram[osd_pointer/4];
-		uint8_t  *vbuf = (uint8_t*)(&ram[osd_header[3]/4]);
-		uint32_t *palette = &ram[osd_header[7]/4];
+		uint32_t const *ram = m_ram;
+		uint32_t const *osd_header = &ram[osd_pointer/4];
+		uint8_t  const *vbuf = (uint8_t*)(&ram[osd_header[3]/4]);
+		uint32_t const *palette = &ram[osd_header[7]/4];
 
 		uint32_t x_disp_start_and_width = osd_header[1];
 		uint32_t xdisp_width = (x_disp_start_and_width >> 16) & 0x1fff;
@@ -927,14 +924,14 @@ uint32_t cxhumax_state::screen_update_cxhumax(screen_device &screen, bitmap_rgb3
 	    uint32_t first_y = m_drm0_regs[DRM_ACTIVE_Y_REG] & 0xfff;
 	    uint32_t last_y = (m_drm0_regs[DRM_ACTIVE_Y_REG] >> 16) & 0xfff;*/
 
-		for (j=ydisp_start; j <= ydisp_last; j++)
+		for (int j=ydisp_start; j <= ydisp_last; j++)
 		{
-			uint32_t *bmp = &bitmap.pix32(j);
+			uint32_t *const bmp = &bitmap.pix(j);
 
-			for (i=xdisp_start; i <= (xdisp_start + xdisp_width); i++)
+			for (int i=xdisp_start; i <= (xdisp_start + xdisp_width); i++)
 			{
 				if ((i <= (xdisp_start + ximg_width)) && (j <= (ydisp_start + yimg_height))) {
-					bmp[i] = palette[vbuf[i+((j-ydisp_start)*ximg_width)]];
+					bmp[i] = palette[vbuf[i+((j-ydisp_start)*ximg_width)]]; // FIXME: need BYTE4_XOR_?E for endianness
 				} else {
 					bmp[i] = ycc_to_rgb(m_drm1_regs[DRM_BCKGND_REG]);
 				}

@@ -30,10 +30,10 @@ protected:
 	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
-	void get_audio_data(stream_sample_t *bufL, stream_sample_t *bufR, uint32_t samples_wanted);
+	void get_audio_data(write_stream_view &bufL, write_stream_view &bufR);
 
 	cdrom_file *        m_disc;
 

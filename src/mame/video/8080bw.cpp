@@ -56,9 +56,9 @@ inline void _8080bw_state::set_pixel( bitmap_rgb32 &bitmap, uint8_t y, uint8_t x
 	if (y >= MW8080BW_VCOUNTER_START_NO_VBLANK)
 	{
 		if (m_flip_screen)
-			bitmap.pix32(MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), MW8080BW_HPIXCOUNT - 1 - x) = m_palette->pen_color(color);
+			bitmap.pix(MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), MW8080BW_HPIXCOUNT - 1 - x) = m_palette->pen_color(color);
 		else
-			bitmap.pix32(y - MW8080BW_VCOUNTER_START_NO_VBLANK, x) = m_palette->pen_color(color);
+			bitmap.pix(y - MW8080BW_VCOUNTER_START_NO_VBLANK, x) = m_palette->pen_color(color);
 	}
 }
 
@@ -80,18 +80,16 @@ inline void _8080bw_state::set_8_pixels( bitmap_rgb32 &bitmap, uint8_t y, uint8_
 /* this is needed as this driver doesn't emulate the shift register like mw8080bw does */
 void _8080bw_state::clear_extra_columns( bitmap_rgb32 &bitmap, int color )
 {
-	uint8_t x;
-
-	for (x = 0; x < 4; x++)
+	for (uint8_t x = 0; x < 4; x++)
 	{
 		uint8_t y;
 
 		for (y = MW8080BW_VCOUNTER_START_NO_VBLANK; y != 0; y++)
 		{
 			if (m_flip_screen)
-				bitmap.pix32(MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), MW8080BW_HPIXCOUNT - 1 - (256 + x)) =  m_palette->pen_color(color);
+				bitmap.pix(MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), MW8080BW_HPIXCOUNT - 1 - (256 + x)) =  m_palette->pen_color(color);
 			else
-				bitmap.pix32(y - MW8080BW_VCOUNTER_START_NO_VBLANK, 256 + x) =  m_palette->pen_color(color);
+				bitmap.pix(y - MW8080BW_VCOUNTER_START_NO_VBLANK, 256 + x) =  m_palette->pen_color(color);
 		}
 	}
 }
@@ -379,9 +377,9 @@ uint32_t _8080bw_state::screen_update_shuttlei(screen_device &screen, bitmap_rgb
 		for (int i = 0; i < 8; i++)
 		{
 			if (m_flip_screen)
-				bitmap.pix32(191-y, 255-(x|i)) = m_palette->pen_color(BIT(data, 7));
+				bitmap.pix(191-y, 255-(x|i)) = m_palette->pen_color(BIT(data, 7));
 			else
-				bitmap.pix32(y, x|i) = m_palette->pen_color(BIT(data, 7));
+				bitmap.pix(y, x|i) = m_palette->pen_color(BIT(data, 7));
 			data <<= 1;
 		}
 	}
@@ -402,7 +400,7 @@ uint32_t _8080bw_state::screen_update_spacecom(screen_device &screen, bitmap_rgb
 
 		for (int i = 0; i < 8; i++)
 		{
-			bitmap.pix32(y, x | (i^flipx)) = m_palette->pen_color(BIT(data, 0));
+			bitmap.pix(y, x | (i^flipx)) = m_palette->pen_color(BIT(data, 0));
 			data >>= 1;
 		}
 	}

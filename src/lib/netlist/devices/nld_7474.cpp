@@ -40,7 +40,6 @@
  *  FIXME: Check that (*) is emulated properly
  */
 
-#include "nld_7474.h"
 #include "nl_base.h"
 
 #include <array>

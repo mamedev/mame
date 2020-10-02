@@ -192,7 +192,7 @@ void nick_device::device_timer(emu_timer &timer, device_timer_id id, int param, 
 	if (scanline < ENTERPRISE_SCREEN_HEIGHT)
 	{
 		/* set write address for line */
-		m_dest = &m_bitmap.pix32(scanline);
+		m_dest = &m_bitmap.pix(scanline);
 		m_dest_pos = 0;
 		m_dest_max_pos = m_bitmap.width();
 

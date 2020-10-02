@@ -224,18 +224,16 @@ void progolf_state::video_start()
 
 uint32_t progolf_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int count,color,x,y,xi,yi;
-
 	{
-		int scroll = (m_scrollx_lo | ((m_scrollx_hi & 0x03) << 8));
+		int const scroll = (m_scrollx_lo | ((m_scrollx_hi & 0x03) << 8));
 
-		count = 0;
+		int count = 0;
 
-		for(x=0;x<128;x++)
+		for(int x=0;x<128;x++)
 		{
-			for(y=0;y<32;y++)
+			for(int y=0;y<32;y++)
 			{
-				int tile = m_videoram[count];
+				int const tile = m_videoram[count];
 
 				m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,tile,1,0,0,(256-x*8)+scroll,y*8);
 				/* wrap-around */
@@ -248,20 +246,20 @@ uint32_t progolf_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 	// framebuffer is 8x8 chars arranged like a bitmap + a register that controls the pen handling.
 	{
-		count = 0;
+		int count = 0;
 
-		for(y=0;y<256;y+=8)
+		for(int y=0;y<256;y+=8)
 		{
-			for(x=0;x<256;x+=8)
+			for(int x=0;x<256;x+=8)
 			{
-				for (yi=0;yi<8;yi++)
+				for (int yi=0;yi<8;yi++)
 				{
-					for (xi=0;xi<8;xi++)
+					for (int xi=0;xi<8;xi++)
 					{
-						color = m_fg_fb[(xi+yi*8)+count*0x40];
+						int const color = m_fg_fb[(xi+yi*8)+count*0x40];
 
 						if(color != 0 && cliprect.contains(x+yi, 256-y+xi))
-							bitmap.pix32(x+yi, 256-y+xi) = m_palette->pen((color & 0x7));
+							bitmap.pix(x+yi, 256-y+xi) = m_palette->pen((color & 0x7));
 					}
 				}
 

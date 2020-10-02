@@ -434,7 +434,7 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_tpal()
 	uint32_t color = s3c24xx_get_color_tpal();
 	for (int y = m_lcd.vpos_min; y <= m_lcd.vpos_max; y++)
 	{
-		uint32_t *scanline = &bitmap.pix32(y, m_lcd.hpos_min);
+		uint32_t *scanline = &bitmap.pix(y, m_lcd.hpos_min);
 		for (int x = m_lcd.hpos_min; x <= m_lcd.hpos_max; x++)
 		{
 			*scanline++ = color;
@@ -445,7 +445,7 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_tpal()
 void S3C24_CLASS_NAME::s3c24xx_lcd_render_stn_01()
 {
 	bitmap_rgb32 &bitmap = *m_lcd.bitmap[0];
-	uint32_t *scanline = &bitmap.pix32(m_lcd.vpos, m_lcd.hpos);
+	uint32_t *scanline = &bitmap.pix(m_lcd.vpos, m_lcd.hpos);
 	for (int i = 0; i < 4; i++)
 	{
 		uint32_t data = s3c24xx_lcd_dma_read();
@@ -467,7 +467,7 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_stn_01()
 				m_lcd.vpos++;
 				if (m_lcd.vpos > m_lcd.vpos_max) m_lcd.vpos = m_lcd.vpos_min;
 				m_lcd.hpos = m_lcd.hpos_min;
-				scanline = &bitmap.pix32(m_lcd.vpos, m_lcd.hpos);
+				scanline = &bitmap.pix(m_lcd.vpos, m_lcd.hpos);
 			}
 		}
 	}
@@ -476,7 +476,7 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_stn_01()
 void S3C24_CLASS_NAME::s3c24xx_lcd_render_stn_02()
 {
 	bitmap_rgb32 &bitmap = *m_lcd.bitmap[0];
-	uint32_t *scanline = &bitmap.pix32(m_lcd.vpos, m_lcd.hpos);
+	uint32_t *scanline = &bitmap.pix(m_lcd.vpos, m_lcd.hpos);
 	for (int i = 0; i < 4; i++)
 	{
 		uint32_t data = s3c24xx_lcd_dma_read();
@@ -490,7 +490,7 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_stn_02()
 				m_lcd.vpos++;
 				if (m_lcd.vpos > m_lcd.vpos_max) m_lcd.vpos = m_lcd.vpos_min;
 				m_lcd.hpos = m_lcd.hpos_min;
-				scanline = &bitmap.pix32(m_lcd.vpos, m_lcd.hpos);
+				scanline = &bitmap.pix(m_lcd.vpos, m_lcd.hpos);
 			}
 		}
 	}
@@ -499,7 +499,7 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_stn_02()
 void S3C24_CLASS_NAME::s3c24xx_lcd_render_stn_04()
 {
 	bitmap_rgb32 &bitmap = *m_lcd.bitmap[0];
-	uint32_t *scanline = &bitmap.pix32(m_lcd.vpos, m_lcd.hpos);
+	uint32_t *scanline = &bitmap.pix(m_lcd.vpos, m_lcd.hpos);
 	for (int i = 0; i < 4; i++)
 	{
 		uint32_t data = s3c24xx_lcd_dma_read();
@@ -513,7 +513,7 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_stn_04()
 				m_lcd.vpos++;
 				if (m_lcd.vpos > m_lcd.vpos_max) m_lcd.vpos = m_lcd.vpos_min;
 				m_lcd.hpos = m_lcd.hpos_min;
-				scanline = &bitmap.pix32(m_lcd.vpos, m_lcd.hpos);
+				scanline = &bitmap.pix(m_lcd.vpos, m_lcd.hpos);
 			}
 		}
 	}
@@ -522,7 +522,7 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_stn_04()
 void S3C24_CLASS_NAME::s3c24xx_lcd_render_stn_08()
 {
 	bitmap_rgb32 &bitmap = *m_lcd.bitmap[0];
-	uint32_t *scanline = &bitmap.pix32(m_lcd.vpos, m_lcd.hpos);
+	uint32_t *scanline = &bitmap.pix(m_lcd.vpos, m_lcd.hpos);
 	for (int i = 0; i < 4; i++)
 	{
 		uint32_t data = s3c24xx_lcd_dma_read();
@@ -536,7 +536,7 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_stn_08()
 				m_lcd.vpos++;
 				if (m_lcd.vpos > m_lcd.vpos_max) m_lcd.vpos = m_lcd.vpos_min;
 				m_lcd.hpos = m_lcd.hpos_min;
-				scanline = &bitmap.pix32(m_lcd.vpos, m_lcd.hpos);
+				scanline = &bitmap.pix(m_lcd.vpos, m_lcd.hpos);
 			}
 		}
 	}
@@ -545,7 +545,7 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_stn_08()
 void S3C24_CLASS_NAME::s3c24xx_lcd_render_stn_12_p()
 {
 	bitmap_rgb32 &bitmap = *m_lcd.bitmap[0];
-	uint32_t *scanline = &bitmap.pix32(m_lcd.vpos, m_lcd.hpos);
+	uint32_t *scanline = &bitmap.pix(m_lcd.vpos, m_lcd.hpos);
 	for (int i = 0; i < 16; i++)
 	{
 		*scanline++ = s3c24xx_get_color_stn_12(s3c24xx_lcd_dma_read_bits(12));
@@ -555,7 +555,7 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_stn_12_p()
 			m_lcd.vpos++;
 			if (m_lcd.vpos > m_lcd.vpos_max) m_lcd.vpos = m_lcd.vpos_min;
 			m_lcd.hpos = m_lcd.hpos_min;
-			scanline = &bitmap.pix32(m_lcd.vpos, m_lcd.hpos);
+			scanline = &bitmap.pix(m_lcd.vpos, m_lcd.hpos);
 		}
 	}
 }
@@ -563,7 +563,7 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_stn_12_p()
 void S3C24_CLASS_NAME::s3c24xx_lcd_render_stn_12_u() // not tested
 {
 	bitmap_rgb32 &bitmap = *m_lcd.bitmap[0];
-	uint32_t *scanline = &bitmap.pix32(m_lcd.vpos, m_lcd.hpos);
+	uint32_t *scanline = &bitmap.pix(m_lcd.vpos, m_lcd.hpos);
 	for (int i = 0; i < 4; i++)
 	{
 		uint32_t data = s3c24xx_lcd_dma_read();
@@ -577,7 +577,7 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_stn_12_u() // not tested
 				m_lcd.vpos++;
 				if (m_lcd.vpos > m_lcd.vpos_max) m_lcd.vpos = m_lcd.vpos_min;
 				m_lcd.hpos = m_lcd.hpos_min;
-				scanline = &bitmap.pix32(m_lcd.vpos, m_lcd.hpos);
+				scanline = &bitmap.pix(m_lcd.vpos, m_lcd.hpos);
 			}
 		}
 	}
@@ -586,7 +586,7 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_stn_12_u() // not tested
 void S3C24_CLASS_NAME::s3c24xx_lcd_render_tft_01()
 {
 	bitmap_rgb32 &bitmap = *m_lcd.bitmap[0];
-	uint32_t *scanline = &bitmap.pix32(m_lcd.vpos, m_lcd.hpos);
+	uint32_t *scanline = &bitmap.pix(m_lcd.vpos, m_lcd.hpos);
 	for (int i = 0; i < 4; i++)
 	{
 		uint32_t data = s3c24xx_lcd_dma_read();
@@ -600,7 +600,7 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_tft_01()
 				m_lcd.vpos++;
 				if (m_lcd.vpos > m_lcd.vpos_max) m_lcd.vpos = m_lcd.vpos_min;
 				m_lcd.hpos = m_lcd.hpos_min;
-				scanline = &bitmap.pix32(m_lcd.vpos, m_lcd.hpos);
+				scanline = &bitmap.pix(m_lcd.vpos, m_lcd.hpos);
 			}
 		}
 	}
@@ -609,7 +609,7 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_tft_01()
 void S3C24_CLASS_NAME::s3c24xx_lcd_render_tft_02()
 {
 	bitmap_rgb32 &bitmap = *m_lcd.bitmap[0];
-	uint32_t *scanline = &bitmap.pix32(m_lcd.vpos, m_lcd.hpos);
+	uint32_t *scanline = &bitmap.pix(m_lcd.vpos, m_lcd.hpos);
 	for (int i = 0; i < 4; i++)
 	{
 		uint32_t data = s3c24xx_lcd_dma_read();
@@ -623,7 +623,7 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_tft_02()
 				m_lcd.vpos++;
 				if (m_lcd.vpos > m_lcd.vpos_max) m_lcd.vpos = m_lcd.vpos_min;
 				m_lcd.hpos = m_lcd.hpos_min;
-				scanline = &bitmap.pix32(m_lcd.vpos, m_lcd.hpos);
+				scanline = &bitmap.pix(m_lcd.vpos, m_lcd.hpos);
 			}
 		}
 	}
@@ -632,7 +632,7 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_tft_02()
 void S3C24_CLASS_NAME::s3c24xx_lcd_render_tft_04()
 {
 	bitmap_rgb32 &bitmap = *m_lcd.bitmap[0];
-	uint32_t *scanline = &bitmap.pix32(m_lcd.vpos, m_lcd.hpos);
+	uint32_t *scanline = &bitmap.pix(m_lcd.vpos, m_lcd.hpos);
 	for (int i = 0; i < 4; i++)
 	{
 		uint32_t data = s3c24xx_lcd_dma_read();
@@ -646,7 +646,7 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_tft_04()
 				m_lcd.vpos++;
 				if (m_lcd.vpos > m_lcd.vpos_max) m_lcd.vpos = m_lcd.vpos_min;
 				m_lcd.hpos = m_lcd.hpos_min;
-				scanline = &bitmap.pix32(m_lcd.vpos, m_lcd.hpos);
+				scanline = &bitmap.pix(m_lcd.vpos, m_lcd.hpos);
 			}
 		}
 	}
@@ -655,7 +655,7 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_tft_04()
 void S3C24_CLASS_NAME::s3c24xx_lcd_render_tft_08()
 {
 	bitmap_rgb32 &bitmap = *m_lcd.bitmap[0];
-	uint32_t *scanline = &bitmap.pix32(m_lcd.vpos, m_lcd.hpos);
+	uint32_t *scanline = &bitmap.pix(m_lcd.vpos, m_lcd.hpos);
 	for (int i = 0; i < 4; i++)
 	{
 		uint32_t data = s3c24xx_lcd_dma_read();
@@ -669,7 +669,7 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_tft_08()
 				m_lcd.vpos++;
 				if (m_lcd.vpos > m_lcd.vpos_max) m_lcd.vpos = m_lcd.vpos_min;
 				m_lcd.hpos = m_lcd.hpos_min;
-				scanline = &bitmap.pix32(m_lcd.vpos, m_lcd.hpos);
+				scanline = &bitmap.pix(m_lcd.vpos, m_lcd.hpos);
 			}
 		}
 	}
@@ -678,7 +678,7 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_tft_08()
 void S3C24_CLASS_NAME::s3c24xx_lcd_render_tft_16()
 {
 	bitmap_rgb32 &bitmap = *m_lcd.bitmap[0];
-	uint32_t *scanline = &bitmap.pix32(m_lcd.vpos, m_lcd.hpos);
+	uint32_t *scanline = &bitmap.pix(m_lcd.vpos, m_lcd.hpos);
 	for (int i = 0; i < 4; i++)
 	{
 		uint32_t data = s3c24xx_lcd_dma_read();
@@ -692,7 +692,7 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_tft_16()
 				m_lcd.vpos++;
 				if (m_lcd.vpos > m_lcd.vpos_max) m_lcd.vpos = m_lcd.vpos_min;
 				m_lcd.hpos = m_lcd.hpos_min;
-				scanline = &bitmap.pix32(m_lcd.vpos, m_lcd.hpos);
+				scanline = &bitmap.pix(m_lcd.vpos, m_lcd.hpos);
 			}
 		}
 	}
@@ -751,9 +751,9 @@ void S3C24_CLASS_NAME::bitmap_blend( bitmap_rgb32 &bitmap_dst, bitmap_rgb32 &bit
 {
 	for (int y = 0; y < bitmap_dst.height(); y++)
 	{
-		uint32_t *line0 = &bitmap_src_1.pix32(y);
-		uint32_t *line1 = &bitmap_src_2.pix32(y);
-		uint32_t *line2 = &bitmap_dst.pix32(y);
+		uint32_t const *const line0 = &bitmap_src_1.pix(y);
+		uint32_t const *const line1 = &bitmap_src_2.pix(y);
+		uint32_t *const line2 = &bitmap_dst.pix(y);
 		for (int x = 0; x < bitmap_dst.width(); x++)
 		{
 			uint32_t color0 = line0[x];
@@ -764,9 +764,9 @@ void S3C24_CLASS_NAME::bitmap_blend( bitmap_rgb32 &bitmap_dst, bitmap_rgb32 &bit
 			uint16_t r1 = (color1 >> 16) & 0x000000ff;
 			uint16_t g1 = (color1 >>  8) & 0x000000ff;
 			uint16_t b1 = (color1 >>  0) & 0x000000ff;
-			uint8_t r = (uint8_t)((r0 + r1) >> 1);
-			uint8_t g = (uint8_t)((g0 + g1) >> 1);
-			uint8_t b = (uint8_t)((b0 + b1) >> 1);
+			uint8_t r = uint8_t((r0 + r1) >> 1);
+			uint8_t g = uint8_t((g0 + g1) >> 1);
+			uint8_t b = uint8_t((b0 + b1) >> 1);
 			line2[x] = (r << 16) | (g << 8) | b;
 		}
 	}

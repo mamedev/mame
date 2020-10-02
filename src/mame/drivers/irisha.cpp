@@ -207,17 +207,15 @@ INPUT_PORTS_END
 
 uint32_t irisha_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t gfx;
-	uint16_t y,ma=0,x;
-	uint16_t *p;
+	uint16_t ma=0;
 
-	for (y = 0; y < 200; y++)
+	for (uint16_t y = 0; y < 200; y++)
 	{
-		p = &bitmap.pix16(y);
+		uint16_t *p = &bitmap.pix(y);
 
-		for (x = ma; x < ma+40; x++)
+		for (uint16_t x = ma; x < ma+40; x++)
 		{
-			gfx = m_p_videoram[x];
+			uint8_t const gfx = m_p_videoram[x];
 
 			/* Display a scanline of a character */
 			*p++ = BIT(gfx, 7);

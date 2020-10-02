@@ -163,48 +163,46 @@ WRITE_LINE_MEMBER(photon2_state::screen_vblank_spectrum)
 
 static inline void spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color)
 {
-	bitmap.pix16(y, x) = (uint16_t)color;
+	bitmap.pix(y, x) = (uint16_t)color;
 }
 
 uint32_t photon2_state::screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* for now do a full-refresh */
-	int x, y, b, scrx, scry;
-	unsigned short ink, pap;
-	unsigned char *attr, *scr;
 //  int full_refresh = 1;
 
-	scr=m_spectrum_video_ram;
+	unsigned char const *scr=m_spectrum_video_ram;
 
 	bitmap.fill(m_spectrum_port_fe & 0x07, cliprect);
 
-	for (y=0; y<192; y++)
+	for (int y=0; y<192; y++)
 	{
-		scrx=SPEC_LEFT_BORDER;
-		scry=((y&7) * 8) + ((y&0x38)>>3) + (y&0xC0);
-		attr=m_spectrum_video_ram + ((scry>>3)*32) + 0x1800;
+		int scrx=SPEC_LEFT_BORDER;
+		int scry=((y&7) * 8) + ((y&0x38)>>3) + (y&0xC0);
+		unsigned char const *attr=m_spectrum_video_ram + ((scry>>3)*32) + 0x1800;
 
-		for (x=0;x<32;x++)
+		for (int x=0;x<32;x++)
 		{
-				/* Get ink and paper colour with bright */
-				if (m_spectrum_flash_invert && (*attr & 0x80))
-				{
-						ink=((*attr)>>3) & 0x0f;
-						pap=((*attr) & 0x07) + (((*attr)>>3) & 0x08);
-				}
-				else
-				{
-						ink=((*attr) & 0x07) + (((*attr)>>3) & 0x08);
-						pap=((*attr)>>3) & 0x0f;
-				}
+			/* Get ink and paper colour with bright */
+			unsigned short ink, pap;
+			if (m_spectrum_flash_invert && (*attr & 0x80))
+			{
+				ink=((*attr)>>3) & 0x0f;
+				pap=((*attr) & 0x07) + (((*attr)>>3) & 0x08);
+			}
+			else
+			{
+				ink=((*attr) & 0x07) + (((*attr)>>3) & 0x08);
+				pap=((*attr)>>3) & 0x0f;
+			}
 
-				for (b=0x80;b!=0;b>>=1)
-				{
-						if (*scr&b)
-								spectrum_plot_pixel(bitmap,scrx++,SPEC_TOP_BORDER+scry,ink);
-						else
-								spectrum_plot_pixel(bitmap,scrx++,SPEC_TOP_BORDER+scry,pap);
-				}
+			for (int b=0x80;b!=0;b>>=1)
+			{
+				if (*scr&b)
+					spectrum_plot_pixel(bitmap,scrx++,SPEC_TOP_BORDER+scry,ink);
+				else
+					spectrum_plot_pixel(bitmap,scrx++,SPEC_TOP_BORDER+scry,pap);
+			}
 			scr++;
 			attr++;
 		}

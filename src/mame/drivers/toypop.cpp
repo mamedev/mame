@@ -180,14 +180,14 @@ void namcos16_state::toypop_palette(palette_device &palette) const
 
 void namcos16_state::legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect,bool flip)
 {
-	const uint16_t pal_base = 0x300 + (m_pal_bank << 4);
-	const uint32_t src_base = 0x200/2;
-	const uint16_t src_pitch = 288 / 2;
+	uint16_t const pal_base = 0x300 + (m_pal_bank << 4);
+	uint32_t const src_base = 0x200/2;
+	uint16_t const src_pitch = 288 / 2;
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		uint16_t *src = &m_bgvram[y * src_pitch + cliprect.min_x + src_base];
-		uint16_t *dst = &bitmap.pix16(flip ? (cliprect.max_y - y) : y, flip ? cliprect.max_x : cliprect.min_x);
+		uint16_t const *src = &m_bgvram[y * src_pitch + cliprect.min_x + src_base];
+		uint16_t *dst = &bitmap.pix(flip ? (cliprect.max_y - y) : y, flip ? cliprect.max_x : cliprect.min_x);
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x += 2)
 		{

@@ -2,51 +2,51 @@
 // copyright-holders:Robbbert
 /***************************************************************************
 
-        Dolphin / Dauphin
+Dolphin / Dauphin
 
-        2010-04-08 Skeleton driver.
-        2012-05-20 Fixed keyboard, added notes & speaker [Robbbert]
-        2013-11-03 Added cassette [Robbbert]
+2010-04-08 Skeleton driver.
+2012-05-20 Fixed keyboard, added notes & speaker [Robbbert]
+2013-11-03 Added cassette [Robbbert]
 
-    Minimal Setup:
-        0000-00FF ROM "MO" (74S471)
-        0100-01FF ROM "MONI" (74S471)
-        0200-02FF RAM (2x 2112)
-        18 pushbuttons for programming (0-F, ADR, NXT).
-        4-digit LED display.
+Minimal Setup:
+    0000-00FF ROM "MO" (74S471)
+    0100-01FF ROM "MONI" (74S471)
+    0200-02FF RAM (2x 2112)
+    18 pushbuttons for programming (0-F, ADR, NXT).
+    4-digit LED display.
 
-    Other options:
-        0400-07FF Expansion RAM (8x 2112)
-        0800-08FF Pulse for operation of an optional EPROM programmer
-        0C00-0FFF ROM "MONA" (2708)
-        LEDs connected to all Address and Data Lines
-        LEDs connected to WAIT and FLAG lines.
-        Speaker with a LED wired across it.
-        PAUSE switch.
-        RUN/STOP switch.
-        STEP switch.
-        CLOCK switch.
+Other options:
+    0400-07FF Expansion RAM (8x 2112)
+    0800-08FF Pulse for operation of an optional EPROM programmer
+    0C00-0FFF ROM "MONA" (2708)
+    LEDs connected to all Address and Data Lines
+    LEDs connected to WAIT and FLAG lines.
+    Speaker with a LED wired across it.
+    PAUSE switch.
+    RUN/STOP switch.
+    STEP switch.
+    CLOCK switch.
 
-        Cassette player connected to SENSE and FLAG lines.
+Cassette player connected to SENSE and FLAG lines.
 
-        Keyboard encoder: AY-5-2376 (57 keys)
+Keyboard encoder: AY-5-2376 (57 keys)
 
-        CRT interface: (512 characters on a separate bus)
-        2114 video ram (one half holds the lower 4 data bits, other half the upper bits)
-        74LS175 holds the upper bits for the 74LS472
-        74LS472 Character Generator
+CRT interface: (512 characters on a separate bus)
+    2114 video ram (one half holds the lower 4 data bits, other half the upper bits)
+    74LS175 holds the upper bits for the 74LS472
+    74LS472 Character Generator
 
-        NOTE: a rom is missing, when the ADR button (- key) is pressed,
-        it causes a freeze in nodebug mode, and a crash in debug mode.
-        To see it, start in debug mode. g 6c. In the emulation, press the
-        minus key. The debugger will stop and you can see an instruction
-        referencing location 0100, which is in the missing rom.
+NOTE: a rom is missing, when the ADR button (- key) is pressed,
+      it causes a freeze in nodebug mode, and a crash in debug mode.
+      To see it, start in debug mode. g 6c. In the emulation, press the
+      minus key. The debugger will stop and you can see an instruction
+      referencing location 0100, which is in the missing rom.
 
-        Keys:
-        0-9,A-F hexadecimal numbers
-        UP - (NXT) to enter data and advance to the next address
-        MINUS - (ADR) to change the address to what is shown in the data side
-        Special keys:
+Keys:
+    0-9,A-F hexadecimal numbers
+    UP - (NXT) to enter data and advance to the next address
+    MINUS - (ADR) to change the address to what is shown in the data side
+    Special keys:
         Hold UP, hold 0, release UP, release 0 - execute program at the current address (i.e. 2xx)
         Hold UP, hold 1, release UP, release 1 - execute program at address 0C00 (rom MONA)
         Hold UP, hold 2, release UP, release 2 - play a tune with the keys
@@ -54,28 +54,32 @@
         Hold MINUS, hold any hex key, release MINUS, release other key - execute program
           at the current address-0x100 (i.e. 1xx).
 
-        If you want to scan through other areas of memory (e.g. the roms), alter the
-        data at address 2F9 (high byte) and 2FA (low byte).
+If you want to scan through other areas of memory (e.g. the roms), alter the
+data at address 2F9 (high byte) and 2FA (low byte).
 
-        How to Use:
-        The red digits are the address, and the orange digits are the data.
-        The address range is 200-2FF (the 2 isn't displayed). To select an address,
-        either press the UP key until you get there, or type the address and press
-        minus. The orange digits show the current data at that address. To alter
-        data, just type it in and press UP.
+How to Use:
+    The red digits are the address, and the orange digits are the data.
+    The address range is 200-2FF (the 2 isn't displayed). To select an address,
+    either press the UP key until you get there, or type the address and press
+    minus. The orange digits show the current data at that address. To alter
+    data, just type it in and press UP.
 
-        To play the reflexes game, hold UP, press 1, release UP, release 1.
-        The display will show A--0 (or some random number in the last position).
-        Press any odd-numbered key (B is convenient), and read off the reaction time.
-        After a short delay it will show '--' again, this is the signal to react.
-        It doesn't seem to reset the counters each time around.
+To play the reflexes game, hold UP, press 1, release UP, release 1.
+    The display will show A--0 (or some random number in the last position).
+    Press any odd-numbered key (B is convenient), and read off the reaction time.
+    After a short delay it will show '--' again, this is the signal to react.
+    It doesn't seem to reset the counters each time around.
 
-        TODO:
-        - Find missing roms
-        - Add optional hardware listed above
-        - Cassette is added, but no idea how to operate it.
+Test Paste:
+    Paste this: 11^22^33^44^55^66^77^88^99^00-
+    Now press up-arrow to review the data that was entered.
 
-        Thanks to Amigan site for various documents.
+TODO:
+    - Find missing roms
+    - Add optional hardware listed above
+    - Cassette is added, but no idea how to operate it.
+
+Thanks to Amigan site for various documents.
 
 
 ****************************************************************************/

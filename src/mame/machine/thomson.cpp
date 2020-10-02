@@ -96,7 +96,7 @@ int thomson_state::to7_get_cassette()
 			/* we simply count sign changes... */
 			int k, chg;
 			int8_t data[40];
-			cassette_get_samples( cass, 0, pos, TO7_BIT_LENGTH * 15. / 14., 40, 1, data, 0 );
+			cass->get_samples( 0, pos, TO7_BIT_LENGTH * 15. / 14., 40, 1, data, 0 );
 
 			for ( k = 1, chg = 0; k < 40; k++ )
 			{
@@ -177,7 +177,7 @@ int thomson_state::mo5_get_cassette()
 		if ( (state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED )
 			return 1;
 
-		cassette_get_sample( cass, 0, pos, 0, &hbit );
+		cass->get_sample( 0, pos, 0, &hbit );
 		hbit = hbit >= 0;
 
 		VLOG (( "$%04x %f mo5_get_cassette: state=$%X pos=%f hbitpos=%i hbit=%i\n",

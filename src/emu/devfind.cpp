@@ -9,88 +9,9 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "romload.h"
-
-
-//**************************************************************************
-//  EXPLICIT TEMPLATE INSTANTIATIONS
-//**************************************************************************
-
-template class object_finder_base<memory_region, false>;
-template class object_finder_base<memory_region, true>;
-template class object_finder_base<memory_bank, false>;
-template class object_finder_base<memory_bank, true>;
-template class object_finder_base<ioport_port, false>;
-template class object_finder_base<ioport_port, true>;
-template class object_finder_base<address_space, false>;
-template class object_finder_base<address_space, true>;
-
-template class object_finder_base<u8, false>;
-template class object_finder_base<u8, true>;
-template class object_finder_base<u16, false>;
-template class object_finder_base<u16, true>;
-template class object_finder_base<u32, false>;
-template class object_finder_base<u32, true>;
-template class object_finder_base<u64, false>;
-template class object_finder_base<u64, true>;
-
-template class object_finder_base<s8, false>;
-template class object_finder_base<s8, true>;
-template class object_finder_base<s16, false>;
-template class object_finder_base<s16, true>;
-template class object_finder_base<s32, false>;
-template class object_finder_base<s32, true>;
-template class object_finder_base<s64, false>;
-template class object_finder_base<s64, true>;
-
-template class memory_region_finder<false>;
-template class memory_region_finder<true>;
-
-template class memory_bank_finder<false>;
-template class memory_bank_finder<true>;
-
-template class ioport_finder<false>;
-template class ioport_finder<true>;
-
-template class address_space_finder<false>;
-template class address_space_finder<true>;
-
-template class region_ptr_finder<u8, false>;
-template class region_ptr_finder<u8, true>;
-template class region_ptr_finder<u16, false>;
-template class region_ptr_finder<u16, true>;
-template class region_ptr_finder<u32, false>;
-template class region_ptr_finder<u32, true>;
-template class region_ptr_finder<u64, false>;
-template class region_ptr_finder<u64, true>;
-
-template class region_ptr_finder<s8, false>;
-template class region_ptr_finder<s8, true>;
-template class region_ptr_finder<s16, false>;
-template class region_ptr_finder<s16, true>;
-template class region_ptr_finder<s32, false>;
-template class region_ptr_finder<s32, true>;
-template class region_ptr_finder<s64, false>;
-template class region_ptr_finder<s64, true>;
-
-template class shared_ptr_finder<u8, false>;
-template class shared_ptr_finder<u8, true>;
-template class shared_ptr_finder<u16, false>;
-template class shared_ptr_finder<u16, true>;
-template class shared_ptr_finder<u32, false>;
-template class shared_ptr_finder<u32, true>;
-template class shared_ptr_finder<u64, false>;
-template class shared_ptr_finder<u64, true>;
-
-template class shared_ptr_finder<s8, false>;
-template class shared_ptr_finder<s8, true>;
-template class shared_ptr_finder<s16, false>;
-template class shared_ptr_finder<s16, true>;
-template class shared_ptr_finder<s32, false>;
-template class shared_ptr_finder<s32, true>;
-template class shared_ptr_finder<s64, false>;
-template class shared_ptr_finder<s64, true>;
-
+#include "validity.h"
 
 
 //**************************************************************************
@@ -162,7 +83,7 @@ void *finder_base::find_memregion(u8 width, size_t &length, bool required) const
 	if (length != 0 && length != length_found)
 	{
 		if (required)
-			osd_printf_warning("Region '%s' found but has %d bytes, not %ld as requested\n", m_tag, region->bytes(), long(length*width));
+			osd_printf_warning("Region '%s' found but has %d bytes, not %d as requested\n", m_tag, region->bytes(), length * width);
 		length = 0;
 		return nullptr;
 	}
@@ -201,7 +122,7 @@ bool finder_base::validate_memregion(size_t bytes, bool required) const
 	// check the length and warn if other than specified
 	if ((bytes_found != 0) && (bytes != 0) && (bytes != bytes_found))
 	{
-		osd_printf_warning("Region '%s' found but has %ld bytes, not %ld as requested\n", m_tag, long(bytes_found), long(bytes));
+		osd_printf_warning("Region '%s' found but has %d bytes, not %d as requested\n", m_tag, bytes_found, bytes);
 		bytes_found = 0;
 	}
 
@@ -337,14 +258,184 @@ bool finder_base::report_missing(bool found, const char *objname, bool required)
 }
 
 
-void finder_base::printf_warning(const char *format, ...)
-{
-	va_list argptr;
-	char buffer[1024];
 
-	// do the output
-	va_start(argptr, format);
-	vsnprintf(buffer, 1024, format, argptr);
-	osd_printf_warning("%s", buffer);
-	va_end(argptr);
+//**************************************************************************
+//  MEMORY REGION FINDER
+//**************************************************************************
+
+template <bool Required>
+memory_region_finder<Required>::memory_region_finder(device_t &base, char const *tag)
+	: object_finder_base<memory_region, Required>(base, tag)
+{
 }
+
+
+template <bool Required>
+bool memory_region_finder<Required>::findit(validity_checker *valid)
+{
+	if (valid)
+		return this->validate_memregion(0, Required);
+
+	assert(!this->m_resolved);
+	this->m_resolved = true;
+	this->m_target = this->m_base.get().memregion(this->m_tag);
+	return this->report_missing("memory region");
+}
+
+
+
+//**************************************************************************
+//  MEMORY BANK FINDER
+//**************************************************************************
+
+template <bool Required>
+memory_bank_finder<Required>::memory_bank_finder(device_t &base, char const *tag)
+	: object_finder_base<memory_bank, Required>(base, tag)
+{
+}
+
+
+template <bool Required>
+bool memory_bank_finder<Required>::findit(validity_checker *valid)
+{
+	if (valid)
+		return true;
+
+	assert(!this->m_resolved);
+	this->m_resolved = true;
+	this->m_target = this->m_base.get().membank(this->m_tag);
+	return this->report_missing("memory bank");
+}
+
+
+
+//**************************************************************************
+//  I/O PORT FINDER
+//**************************************************************************
+
+template <bool Required>
+ioport_finder<Required>::ioport_finder(device_t &base, char const *tag)
+	: object_finder_base<ioport_port, Required>(base, tag)
+{
+}
+
+
+template <bool Required>
+bool ioport_finder<Required>::findit(validity_checker *valid)
+{
+	if (valid)
+		return finder_base::report_missing(!valid->ioport_missing(this->m_base.get().subtag(this->m_tag).c_str()), "I/O port", Required);
+
+	assert(!this->m_resolved);
+	this->m_resolved = true;
+	this->m_target = this->m_base.get().ioport(this->m_tag);
+	return this->report_missing("I/O port");
+}
+
+
+
+//**************************************************************************
+//  ADDRESS SPACE FINDER
+//**************************************************************************
+
+template <bool Required>
+address_space_finder<Required>::address_space_finder(device_t &base, char const *tag, int spacenum, u8 width)
+	: object_finder_base<address_space, Required>(base, tag)
+	, m_spacenum(spacenum)
+	, m_data_width(width)
+{
+}
+
+
+template <bool Required>
+bool address_space_finder<Required>::findit(validity_checker *valid)
+{
+	if (valid)
+		return this->validate_addrspace(this->m_spacenum, this->m_data_width, Required);
+
+	assert(!this->m_resolved);
+	this->m_resolved = true;
+	this->m_target = this->find_addrspace(this->m_spacenum, this->m_data_width, Required);
+	return this->report_missing("address space");
+}
+
+
+
+//**************************************************************************
+//  EXPLICIT TEMPLATE INSTANTIATIONS
+//**************************************************************************
+
+template class object_finder_base<memory_region, false>;
+template class object_finder_base<memory_region, true>;
+template class object_finder_base<memory_bank, false>;
+template class object_finder_base<memory_bank, true>;
+template class object_finder_base<ioport_port, false>;
+template class object_finder_base<ioport_port, true>;
+template class object_finder_base<address_space, false>;
+template class object_finder_base<address_space, true>;
+
+template class object_finder_base<u8, false>;
+template class object_finder_base<u8, true>;
+template class object_finder_base<u16, false>;
+template class object_finder_base<u16, true>;
+template class object_finder_base<u32, false>;
+template class object_finder_base<u32, true>;
+template class object_finder_base<u64, false>;
+template class object_finder_base<u64, true>;
+
+template class object_finder_base<s8, false>;
+template class object_finder_base<s8, true>;
+template class object_finder_base<s16, false>;
+template class object_finder_base<s16, true>;
+template class object_finder_base<s32, false>;
+template class object_finder_base<s32, true>;
+template class object_finder_base<s64, false>;
+template class object_finder_base<s64, true>;
+
+template class memory_region_finder<false>;
+template class memory_region_finder<true>;
+
+template class memory_bank_finder<false>;
+template class memory_bank_finder<true>;
+
+template class ioport_finder<false>;
+template class ioport_finder<true>;
+
+template class address_space_finder<false>;
+template class address_space_finder<true>;
+
+template class region_ptr_finder<u8, false>;
+template class region_ptr_finder<u8, true>;
+template class region_ptr_finder<u16, false>;
+template class region_ptr_finder<u16, true>;
+template class region_ptr_finder<u32, false>;
+template class region_ptr_finder<u32, true>;
+template class region_ptr_finder<u64, false>;
+template class region_ptr_finder<u64, true>;
+
+template class region_ptr_finder<s8, false>;
+template class region_ptr_finder<s8, true>;
+template class region_ptr_finder<s16, false>;
+template class region_ptr_finder<s16, true>;
+template class region_ptr_finder<s32, false>;
+template class region_ptr_finder<s32, true>;
+template class region_ptr_finder<s64, false>;
+template class region_ptr_finder<s64, true>;
+
+template class shared_ptr_finder<u8, false>;
+template class shared_ptr_finder<u8, true>;
+template class shared_ptr_finder<u16, false>;
+template class shared_ptr_finder<u16, true>;
+template class shared_ptr_finder<u32, false>;
+template class shared_ptr_finder<u32, true>;
+template class shared_ptr_finder<u64, false>;
+template class shared_ptr_finder<u64, true>;
+
+template class shared_ptr_finder<s8, false>;
+template class shared_ptr_finder<s8, true>;
+template class shared_ptr_finder<s16, false>;
+template class shared_ptr_finder<s16, true>;
+template class shared_ptr_finder<s32, false>;
+template class shared_ptr_finder<s32, true>;
+template class shared_ptr_finder<s64, false>;
+template class shared_ptr_finder<s64, true>;

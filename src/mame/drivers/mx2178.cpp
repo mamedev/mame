@@ -84,18 +84,16 @@ INPUT_PORTS_END
 
 MC6845_UPDATE_ROW( mx2178_state::crtc_update_row )
 {
-	const rgb_t *pens = m_palette->palette()->entry_list_raw();
-	uint8_t chr,gfx;
-	uint16_t mem,x;
-	uint32_t *p = &bitmap.pix32(y);
+	rgb_t const *const pens = m_palette->palette()->entry_list_raw();
+	uint32_t *p = &bitmap.pix(y);
 
-	for (x = 0; x < x_count; x++)
+	for (uint16_t x = 0; x < x_count; x++)
 	{
-		mem = (ma + x) & 0x7ff;
-		chr = m_p_videoram[mem];
+		uint16_t mem = (ma + x) & 0x7ff;
+		uint8_t chr = m_p_videoram[mem];
 
 		/* get pattern of pixels for that character scanline */
-		gfx = m_p_chargen[(chr<<4) | ra] ^ ((x == cursor_x) ? 0xff : 0);
+		uint8_t gfx = m_p_chargen[(chr<<4) | ra] ^ ((x == cursor_x) ? 0xff : 0);
 
 		/* Display a scanline of a character (8 pixels) */
 		*p++ = pens[BIT(gfx, 7)];

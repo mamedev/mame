@@ -760,7 +760,7 @@ void pgm2_state::pgm2(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh(HZ_TO_ATTOSECONDS(60));
+	m_screen->set_refresh(HZ_TO_ATTOSECONDS(59.08)); // 59.08Hz, 264 total lines @ 15.59KHz
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(0, 448-1, 0, 224-1);
@@ -793,6 +793,7 @@ void pgm2_state::pgm2(machine_config &config)
 void pgm2_state::pgm2_lores(machine_config &config)
 {
 	pgm2(config);
+	m_screen->set_refresh(HZ_TO_ATTOSECONDS(15625.0/264.0)); // not verified
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
 }
 

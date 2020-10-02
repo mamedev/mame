@@ -55,11 +55,11 @@ void cps3_sound_device::device_start()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void cps3_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void cps3_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	/* Clear the buffers */
-	memset(outputs[0], 0, samples*sizeof(*outputs[0]));
-	memset(outputs[1], 0, samples*sizeof(*outputs[1]));
+	outputs[0].fill(0);
+	outputs[1].fill(0);
 
 	for (int i = 0; i < 16; i ++)
 	{
@@ -103,7 +103,7 @@ void cps3_sound_device::sound_stream_update(sound_stream &stream, stream_sample_
 			loop -= 0x400000;
 
 			/* Go through the buffer and add voice contributions */
-			for (int j = 0; j < samples; j++)
+			for (int j = 0; j < outputs[0].samples(); j++)
 			{
 				int32_t sample;
 
@@ -127,8 +127,8 @@ void cps3_sound_device::sound_stream_update(sound_stream &stream, stream_sample_
 				sample = m_base[BYTE4_XOR_LE(start + pos)];
 				frac += step;
 
-				outputs[0][j] += ((sample * vol_l) >> 8);
-				outputs[1][j] += ((sample * vol_r) >> 8);
+				outputs[0].add_int(j, sample * vol_l, 32768 << 8);
+				outputs[1].add_int(j, sample * vol_r, 32768 << 8);
 			}
 
 			vptr->pos = pos;

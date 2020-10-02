@@ -734,7 +734,7 @@ uint32_t prestige_state::screen_update(int bpp, screen_device &screen, bitmap_in
 					pix |= BIT(data, 7 - b) << b;
 
 				if (cliprect.contains(sx * 8 / bpp + x, y))
-					bitmap.pix16(y, sx * 8 / bpp + x) = pix;
+					bitmap.pix(y, sx * 8 / bpp + x) = pix;
 
 				data <<= bpp;
 			}

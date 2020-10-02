@@ -36,7 +36,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( isa8_number_9_rev_device::hgdc_display_pixels )
 			color.set_r(pal->entry_color(m_ram[addr] | ((overlay & 0xf) << 8)).r());
 			color.set_g(pal->entry_color(m_ram[addr + 0x40000] | ((overlay & 0xf0) << 4)).g());
 			color.set_b(pal->entry_color(m_ram[addr + 0x80000] | (overlay & 0xf00)).b());
-			bitmap.pix32(y, x + i) = color;
+			bitmap.pix(y, x + i) = color;
 		}
 	}
 	else
@@ -44,7 +44,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( isa8_number_9_rev_device::hgdc_display_pixels )
 		if(((address << 3) + 16) > (1024*1024))
 			return;
 		for(int i = 0; i < 16; i++)
-			bitmap.pix32(y, x + i) = pal->entry_color(m_ram[(address << 4) + i]);
+			bitmap.pix(y, x + i) = pal->entry_color(m_ram[(address << 4) + i]);
 	}
 }
 

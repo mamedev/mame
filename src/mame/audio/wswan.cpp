@@ -167,11 +167,13 @@ int wswan_sound_device::fetch_sample(int channel, int offset)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void wswan_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void wswan_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t sample, left, right;
+	s32 sample, left, right;
 
-	while( samples-- > 0 )
+	auto &outputl = outputs[0];
+	auto &outputr = outputs[1];
+	for (int sampindex = 0; sampindex < outputl.samples(); sampindex++)
 	{
 		left = right = 0;
 
@@ -266,11 +268,8 @@ void wswan_sound_device::sound_stream_update(sound_stream &stream, stream_sample
 			right += m_audio4.vol_right * sample;
 		}
 
-		left <<= 5;
-		right <<= 5;
-
-		*(outputs[0]++) = left;
-		*(outputs[1]++) = right;
+		outputl.put_int(sampindex, left, 32768 >> 5);
+		outputr.put_int(sampindex, right, 32768 >> 5);
 	}
 }
 

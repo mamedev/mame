@@ -8,7 +8,7 @@ LEDs for the Motorola EXORterm 155
 <mamelayout version="2">
 
 	<element name="red_led">
-		<disk>
+		<disk state="0">
 			<color red="1.0" green="0.0" blue="0.0" />
 		</disk>
 	</element>
@@ -35,46 +35,43 @@ LEDs for the Motorola EXORterm 155
 	</element>
 	<element name="background">
 		<rect>
-			<bounds left="0" top="0" right="1" bottom="1" />
 			<color red="0.0" green="0.0" blue="0.0" />
 		</rect>
 	</element>
 
 	<view name="Keyboard LEDs">
-		<bezel name="auto_lf_txt" element="AUTO_LF">
-			<bounds left="0" right="70" top="520" bottom="528" />
-		</bezel>
-		<bezel name="auto_lf_led" element="red_led">
-			<bounds left="31" right="39" top="532" bottom="540" />
-		</bezel>
+		<bounds left="0" top="0" right="720" bottom="544" />
 
-		<bezel name="online_txt" element="ON_LINE">
-			<bounds left="70" right="140" top="520" bottom="528" />
-		</bezel>
-		<bezel name="online_led" element="red_led">
-			<bounds left="101" right="109" top="532" bottom="540" />
-		</bezel>
-
-		<bezel name="page_mode_txt" element="PAGE_MODE">
-			<bounds left="140" right="210" top="520" bottom="528" />
-		</bezel>
-		<bezel name="page_mode_led" element="red_led">
-			<bounds left="171" right="179" top="532" bottom="540" />
-		</bezel>
-
-		<bezel name="insert_char_txt" element="INS_CHAR">
-			<bounds left="281" right="351" top="520" bottom="528" />
-		</bezel>
-		<bezel name="insert_char_led" element="red_led">
-			<bounds left="312" right="320" top="532" bottom="540" />
-		</bezel>
-
-		<bezel element="background">
-			<bounds left="0" top="540" right="720" bottom="544" />
-		</bezel>
 		<screen index="0">
 			<bounds x="0" y="0" width="720" height="512" />
 		</screen>
+		<element name="auto_lf_txt" ref="AUTO_LF">
+			<bounds left="0" right="70" top="520" bottom="528" />
+		</element>
+		<element name="auto_lf_led" ref="red_led">
+			<bounds left="31" right="39" top="532" bottom="540" />
+		</element>
+
+		<element name="online_txt" ref="ON_LINE">
+			<bounds left="70" right="140" top="520" bottom="528" />
+		</element>
+		<element name="online_led" ref="red_led">
+			<bounds left="101" right="109" top="532" bottom="540" />
+		</element>
+
+		<element name="page_mode_txt" ref="PAGE_MODE">
+			<bounds left="140" right="210" top="520" bottom="528" />
+		</element>
+		<element name="page_mode_led" ref="red_led">
+			<bounds left="171" right="179" top="532" bottom="540" />
+		</element>
+
+		<element name="insert_char_txt" ref="INS_CHAR">
+			<bounds left="281" right="351" top="520" bottom="528" />
+		</element>
+		<element name="insert_char_led" ref="red_led">
+			<bounds left="312" right="320" top="532" bottom="540" />
+		</element>
 	</view>
 
 </mamelayout>

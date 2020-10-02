@@ -244,7 +244,7 @@ void nbmj8688_state::vramflip()
 void nbmj8688_state::update_pixel(int x, int y)
 {
 	int color = m_videoram[(y * 512) + x];
-	m_tmpbitmap->pix16(y, x) = color;
+	m_tmpbitmap->pix(y, x) = color;
 }
 
 void nbmj8688_state::writeram_low(int x, int y, int color)

@@ -73,13 +73,13 @@ namespace {
 		INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, MAHJONG_CHI,         "P1 Mahjong Chi",         input_seq(KEYCODE_SPACE) ) \
 		INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, MAHJONG_REACH,       "P1 Mahjong Reach",       input_seq(KEYCODE_LSHIFT) ) \
 		INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, MAHJONG_RON,         "P1 Mahjong Ron",         input_seq(KEYCODE_Z) ) \
-		INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, MAHJONG_BET,         "P1 Mahjong Bet",         input_seq(KEYCODE_3) ) \
-		INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, MAHJONG_LAST_CHANCE, "P1 Mahjong Last Chance", input_seq(KEYCODE_RALT) ) \
-		INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, MAHJONG_SCORE,       "P1 Mahjong Score",       input_seq(KEYCODE_RCONTROL) ) \
-		INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, MAHJONG_DOUBLE_UP,   "P1 Mahjong Double Up",   input_seq(KEYCODE_RSHIFT) ) \
 		INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, MAHJONG_FLIP_FLOP,   "P1 Mahjong Flip Flop",   input_seq(KEYCODE_Y) ) \
+		INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, MAHJONG_BET,         "P1 Mahjong Bet",         input_seq(KEYCODE_3) ) \
+		INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, MAHJONG_SCORE,       "P1 Mahjong Take Score",  input_seq(KEYCODE_RCONTROL) ) \
+		INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, MAHJONG_DOUBLE_UP,   "P1 Mahjong Double Up",   input_seq(KEYCODE_RSHIFT) ) \
 		INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, MAHJONG_BIG,         "P1 Mahjong Big",         input_seq(KEYCODE_ENTER) ) \
 		INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, MAHJONG_SMALL,       "P1 Mahjong Small",       input_seq(KEYCODE_BACKSPACE) ) \
+		INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, MAHJONG_LAST_CHANCE, "P1 Mahjong Last Chance", input_seq(KEYCODE_RALT) ) \
 		CORE_INPUT_TYPES_END()
 
 #define CORE_INPUT_TYPES_P1_HANAFUDA \
@@ -98,20 +98,20 @@ namespace {
 
 #define CORE_INPUT_TYPES_GAMBLE \
 		CORE_INPUT_TYPES_BEGIN(gamble) \
-		INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, GAMBLE_HIGH,         "High",                   input_seq(KEYCODE_A) ) \
-		INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, GAMBLE_LOW,          "Low",                    input_seq(KEYCODE_S) ) \
-		INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, GAMBLE_HALF,         "Half Gamble",            input_seq(KEYCODE_D) ) \
-		INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, GAMBLE_DEAL,         "Deal",                   input_seq(KEYCODE_2) ) \
-		INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, GAMBLE_D_UP,         "Double Up",              input_seq(KEYCODE_3) ) \
-		INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, GAMBLE_TAKE,         "Take",                   input_seq(KEYCODE_4) ) \
-		INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, GAMBLE_STAND,        "Stand",                  input_seq(KEYCODE_L) ) \
-		INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, GAMBLE_BET,          "Bet",                    input_seq(KEYCODE_M) ) \
 		INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, GAMBLE_KEYIN,        "Key In",                 input_seq(KEYCODE_Q) ) \
 		INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, GAMBLE_KEYOUT,       "Key Out",                input_seq(KEYCODE_W) ) \
-		INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, GAMBLE_PAYOUT,       "Payout",                 input_seq(KEYCODE_I) ) \
-		INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, GAMBLE_DOOR,         "Door",                   input_seq(KEYCODE_O) ) \
 		INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, GAMBLE_SERVICE,      "Service",                input_seq(KEYCODE_9) ) \
 		INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, GAMBLE_BOOK,         "Book-Keeping",           input_seq(KEYCODE_0) ) \
+		INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, GAMBLE_DOOR,         "Door",                   input_seq(KEYCODE_O) ) \
+		INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, GAMBLE_PAYOUT,       "Payout",                 input_seq(KEYCODE_I) ) \
+		INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, GAMBLE_BET,          "Bet",                    input_seq(KEYCODE_M) ) \
+		INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, GAMBLE_DEAL,         "Deal",                   input_seq(KEYCODE_2) ) \
+		INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, GAMBLE_STAND,        "Stand",                  input_seq(KEYCODE_L) ) \
+		INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, GAMBLE_TAKE,         "Take Score",             input_seq(KEYCODE_4) ) \
+		INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, GAMBLE_D_UP,         "Double Up",              input_seq(KEYCODE_3) ) \
+		INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, GAMBLE_HALF,         "Half Gamble",            input_seq(KEYCODE_D) ) \
+		INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, GAMBLE_HIGH,         "High",                   input_seq(KEYCODE_A) ) \
+		INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, GAMBLE_LOW,          "Low",                    input_seq(KEYCODE_S) ) \
 		CORE_INPUT_TYPES_END()
 
 #define CORE_INPUT_TYPES_POKER \
@@ -122,7 +122,6 @@ namespace {
 		INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, POKER_HOLD4,         "Hold 4",                 input_seq(KEYCODE_V) ) \
 		INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, POKER_HOLD5,         "Hold 5",                 input_seq(KEYCODE_B) ) \
 		INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, POKER_CANCEL,        "Cancel",                 input_seq(KEYCODE_N) ) \
-		INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, POKER_BET,           "Bet",                    input_seq(KEYCODE_1) ) \
 		CORE_INPUT_TYPES_END()
 
 #define CORE_INPUT_TYPES_SLOT \
@@ -194,7 +193,7 @@ namespace {
 		INPUT_PORT_DIGITAL_TYPE( 2, PLAYER2, MAHJONG_RON,         "P2 Mahjong Ron",         input_seq() ) \
 		INPUT_PORT_DIGITAL_TYPE( 2, PLAYER2, MAHJONG_BET,         "P2 Mahjong Bet",         input_seq() ) \
 		INPUT_PORT_DIGITAL_TYPE( 2, PLAYER2, MAHJONG_LAST_CHANCE, "P2 Mahjong Last Chance", input_seq() ) \
-		INPUT_PORT_DIGITAL_TYPE( 2, PLAYER2, MAHJONG_SCORE,       "P2 Mahjong Score",       input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE( 2, PLAYER2, MAHJONG_SCORE,       "P2 Mahjong Take Score",  input_seq() ) \
 		INPUT_PORT_DIGITAL_TYPE( 2, PLAYER2, MAHJONG_DOUBLE_UP,   "P2 Mahjong Double Up",   input_seq() ) \
 		INPUT_PORT_DIGITAL_TYPE( 2, PLAYER2, MAHJONG_FLIP_FLOP,   "P2 Mahjong Flip Flop",   input_seq() ) \
 		INPUT_PORT_DIGITAL_TYPE( 2, PLAYER2, MAHJONG_BIG,         "P2 Mahjong Big",         input_seq() ) \

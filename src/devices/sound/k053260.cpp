@@ -301,25 +301,17 @@ void k053260_device::write(offs_t offset, u8 data)
 	}
 }
 
-static inline int limit(int val, int max, int min)
-{
-	return std::max(min, std::min(max, val));
-}
-
-static constexpr s32 MAXOUT = 0x7fff;
-static constexpr s32 MINOUT = -0x8000;
-
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void k053260_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void k053260_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	if (m_mode & 2)
 	{
-		for ( int j = 0; j < samples; j++ )
+		for ( int j = 0; j < outputs[0].samples(); j++ )
 		{
-			stream_sample_t buffer[2] = {0, 0};
+			s32 buffer[2] = {0, 0};
 
 			for (auto & voice : m_voice)
 			{
@@ -327,14 +319,14 @@ void k053260_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 					voice.play(buffer);
 			}
 
-			outputs[0][j] = limit( buffer[0], MAXOUT, MINOUT );
-			outputs[1][j] = limit( buffer[1], MAXOUT, MINOUT );
+			outputs[0].put_int_clamp(j, buffer[0], 32768);
+			outputs[1].put_int_clamp(j, buffer[1], 32768);
 		}
 	}
 	else
 	{
-		std::fill_n(&outputs[0][0], samples, 0);
-		std::fill_n(&outputs[1][0], samples, 0);
+		outputs[0].fill(0);
+		outputs[1].fill(0);
 	}
 }
 
@@ -443,7 +435,7 @@ void k053260_device::KDSC_Voice::key_off()
 	m_playing = false;
 }
 
-void k053260_device::KDSC_Voice::play(stream_sample_t *outputs)
+void k053260_device::KDSC_Voice::play(s32 *outputs)
 {
 	m_counter += CLOCKS_PER_SAMPLE;
 

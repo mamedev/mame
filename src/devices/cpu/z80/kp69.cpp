@@ -107,12 +107,12 @@ void kp69_device::device_start()
 
 void kp69_base_device::add_to_state(device_state_interface &state, int index)
 {
-	state.state_add<u16>(index, "IRR", [this]() { return m_irr; }, [this](u16 data) { set_irr(data); });
-	state.state_add<u16>(index + 1, "ISR", [this]() { return m_isr; }, [this](u16 data) { set_isr(data); });
+	state.state_add(index, "IRR", m_irr, [this](u16 data) { set_irr(data); });
+	state.state_add(index + 1, "ISR", m_isr, [this](u16 data) { set_isr(data); });
 	state.state_add(index + 2, "IVR", m_ivr).mask(0xe0);
-	state.state_add<u16>(index + 3, "LER", [this]() { return m_ler; }, [this](u16 data) { set_ler(data); });
-	state.state_add<u16>(index + 4, "PGR", [this]() { return m_pgr; }, [this](u16 data) { set_pgr(data); });
-	state.state_add<u16>(index + 5, "IMR", [this]() { return m_imr; }, [this](u16 data) { set_imr(data); });
+	state.state_add(index + 3, "LER", m_ler, [this](u16 data) { set_ler(data); });
+	state.state_add(index + 4, "PGR", m_pgr, [this](u16 data) { set_pgr(data); });
+	state.state_add(index + 5, "IMR", m_imr, [this](u16 data) { set_imr(data); });
 }
 
 

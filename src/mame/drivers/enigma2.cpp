@@ -282,7 +282,7 @@ uint32_t enigma2_state::screen_update_enigma2(screen_device &screen, bitmap_rgb3
 			/* stars only appear at certain positions */
 			color = ((x & y & 0x0f) == 0x0f) ? star_color : 0;
 
-		bitmap.pix32(bitmap_y, x) = m_palette->pen_color(color);
+		bitmap.pix(bitmap_y, x) = m_palette->pen_color(color);
 
 		/* next pixel */
 		x = x + 1;
@@ -344,7 +344,7 @@ uint32_t enigma2_state::screen_update_enigma2a(screen_device &screen, bitmap_rgb
 		}
 
 		pen = bit ? rgb_t::white() : rgb_t::black();
-		bitmap.pix32(bitmap_y, x) = pen;
+		bitmap.pix(bitmap_y, x) = pen;
 
 		/* next pixel */
 		x = x + 1;

@@ -113,22 +113,18 @@ private:
 #if !TAITOWLF_ENABLE_VGA
 uint32_t taitowlf_state::screen_update_taitowlf(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int x,y,count;
-
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	count = (0);
+	int count = 0;
 
-	for(y=0;y<256;y++)
+	for(int y=0;y<256;y++)
 	{
-		for(x=0;x<512;x++)
+		for(int x=0;x<512;x++)
 		{
-			uint32_t color;
-
-			color = (m_bootscreen_rom[count] & 0xff);
+			uint32_t color = m_bootscreen_rom[count] & 0xff;
 
 			if(cliprect.contains(x+0, y))
-				bitmap.pix32(y, x+0) = m_palette->pen(color);
+				bitmap.pix(y, x+0) = m_palette->pen(color);
 
 			count++;
 		}

@@ -101,10 +101,8 @@ void thief_state::video_start(){
 }
 
 uint32_t thief_state::screen_update_thief(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){
-	uint8_t *videoram = m_videoram.get();
-	uint32_t offs;
 	int flipscreen = m_video_control&1;
-	const uint8_t *source = videoram;
+	const uint8_t *source = m_videoram.get();
 
 	if (m_tms->screen_reset())
 	{
@@ -115,17 +113,16 @@ uint32_t thief_state::screen_update_thief(screen_device &screen, bitmap_ind16 &b
 	if( m_video_control&4 ) /* visible page */
 		source += 0x2000*4;
 
-	for( offs=0; offs<0x2000; offs++ ){
+	for( uint32_t offs=0; offs<0x2000; offs++ ){
 		int ypos = offs/32;
 		int xpos = (offs%32)*8;
 		int plane0 = source[0x2000*0+offs];
 		int plane1 = source[0x2000*1+offs];
 		int plane2 = source[0x2000*2+offs];
 		int plane3 = source[0x2000*3+offs];
-		int bit;
 		if( flipscreen ){
-			for( bit=0; bit<8; bit++ ){
-				bitmap.pix16(0xff - ypos, 0xff - (xpos+bit)) =
+			for( int bit=0; bit<8; bit++ ){
+				bitmap.pix(0xff - ypos, 0xff - (xpos+bit)) =
 						(((plane0<<bit)&0x80)>>7) |
 						(((plane1<<bit)&0x80)>>6) |
 						(((plane2<<bit)&0x80)>>5) |
@@ -133,8 +130,8 @@ uint32_t thief_state::screen_update_thief(screen_device &screen, bitmap_ind16 &b
 			}
 		}
 		else {
-			for( bit=0; bit<8; bit++ ){
-				bitmap.pix16(ypos, xpos+bit) =
+			for( int bit=0; bit<8; bit++ ){
+				bitmap.pix(ypos, xpos+bit) =
 						(((plane0<<bit)&0x80)>>7) |
 						(((plane1<<bit)&0x80)>>6) |
 						(((plane2<<bit)&0x80)>>5) |

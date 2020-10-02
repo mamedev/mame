@@ -1177,26 +1177,24 @@ uint32_t px4_state::screen_update_px4(screen_device &screen, bitmap_ind16 &bitma
 	// display enabled?
 	if (BIT(m_yoff, 7))
 	{
-		int y, x;
-
 		// get vram start address
-		uint8_t *vram = &m_ram->pointer()[(m_vadr & 0xf8) << 8];
+		uint8_t const *vram = &m_ram->pointer()[(m_vadr & 0xf8) << 8];
 
-		for (y = 0; y < 64; y++)
+		for (int y = 0; y < 64; y++)
 		{
 			// adjust against y-offset
 			uint8_t row = (y - (m_yoff & 0x3f)) & 0x3f;
 
-			for (x = 0; x < 240/8; x++)
+			for (int x = 0; x < 240/8; x++)
 			{
-				bitmap.pix16(row, x * 8 + 0) = BIT(*vram, 7);
-				bitmap.pix16(row, x * 8 + 1) = BIT(*vram, 6);
-				bitmap.pix16(row, x * 8 + 2) = BIT(*vram, 5);
-				bitmap.pix16(row, x * 8 + 3) = BIT(*vram, 4);
-				bitmap.pix16(row, x * 8 + 4) = BIT(*vram, 3);
-				bitmap.pix16(row, x * 8 + 5) = BIT(*vram, 2);
-				bitmap.pix16(row, x * 8 + 6) = BIT(*vram, 1);
-				bitmap.pix16(row, x * 8 + 7) = BIT(*vram, 0);
+				bitmap.pix(row, x * 8 + 0) = BIT(*vram, 7);
+				bitmap.pix(row, x * 8 + 1) = BIT(*vram, 6);
+				bitmap.pix(row, x * 8 + 2) = BIT(*vram, 5);
+				bitmap.pix(row, x * 8 + 3) = BIT(*vram, 4);
+				bitmap.pix(row, x * 8 + 4) = BIT(*vram, 3);
+				bitmap.pix(row, x * 8 + 5) = BIT(*vram, 2);
+				bitmap.pix(row, x * 8 + 6) = BIT(*vram, 1);
+				bitmap.pix(row, x * 8 + 7) = BIT(*vram, 0);
 
 				vram++;
 			}

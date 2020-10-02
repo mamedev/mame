@@ -138,7 +138,7 @@ void gpworld_state::draw_pixel(bitmap_rgb32 &bitmap,const rectangle &cliprect,in
 	}
 
 	if (cliprect.contains(x, y))
-		bitmap.pix32(y, x) = m_palette->pen(color);
+		bitmap.pix(y, x) = m_palette->pen(color);
 }
 
 void gpworld_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)

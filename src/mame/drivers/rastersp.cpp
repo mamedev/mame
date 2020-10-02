@@ -244,7 +244,7 @@ void rastersp_state::dpylist_w(uint32_t data)
 
 	int y = 0;
 	int x = 0;
-	uint16_t *bmpptr = &m_update_bitmap.pix16(0, 0);
+	uint16_t *bmpptr = &m_update_bitmap.pix(0, 0);
 
 	while (y < 240)
 	{

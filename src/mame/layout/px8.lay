@@ -3,8 +3,6 @@
 license:CC0
 -->
 <mamelayout version="2">
-	<element name="background">
-	</element>
 	<element name="led" defstate="0">
 		<rect state="0">
 			<color red="0" green="0.2" blue="0" />
@@ -14,20 +12,18 @@ license:CC0
 		</rect>
 	</element>
 	<view name="LCD with square pixels">
-		<bezel element="background">
-			<bounds x="0" y="0" width="128" height="16" />
-		</bezel>
+		<bounds x="0" y="0" width="128" height="16" />
 		<screen index="0">
 			<bounds left="0" top="0" right="120" bottom="16" />
 		</screen>
-		<bezel name="led_0" element="led">
+		<element name="led_0" ref="led">
 			<bounds x="122" y="1" width="4" height="1" />
-		</bezel>
-		<bezel name="led_1" element="led">
+		</element>
+		<element name="led_1" ref="led">
 			<bounds x="122" y="3" width="4" height="1" />
-		</bezel>
-		<bezel name="led_2" element="led">
+		</element>
+		<element name="led_2" ref="led">
 			<bounds x="122" y="5" width="4" height="1" />
-		</bezel>
+		</element>
 	</view>
 </mamelayout>

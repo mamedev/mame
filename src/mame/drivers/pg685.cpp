@@ -339,13 +339,12 @@ void pg685_state::video_start()
 MC6845_UPDATE_ROW( pg685_state::crtc_update_row )
 {
 	static const uint32_t palette[2] = { 0x00d000, 0 };
-	uint32_t  *p = &bitmap.pix32(y);
+	uint32_t  *p = &bitmap.pix(y);
 	uint16_t  chr_base = ra;
-	int i;
-	uint8_t *vram = (uint8_t *)m_vram.target();
-	uint8_t *fontram = (uint8_t *)m_fontram.target();
+	uint8_t const *const vram = (uint8_t *)m_vram.target();
+	uint8_t const *const fontram = (uint8_t *)m_fontram.target();
 
-	for ( i = 0; i < x_count; i++ )
+	for ( int i = 0; i < x_count; i++ )
 	{
 		uint16_t offset = ( ma + i ) & 0x7ff;
 		uint8_t chr = vram[ offset ];
@@ -353,27 +352,26 @@ MC6845_UPDATE_ROW( pg685_state::crtc_update_row )
 		uint8_t fg = 1;
 		uint8_t bg = 0;
 
-		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x40 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x20 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x10 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x08 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x04 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x02 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x01 ) ? fg : bg]; p++;
+		*p++ = palette[( data & 0x80 ) ? fg : bg];
+		*p++ = palette[( data & 0x40 ) ? fg : bg];
+		*p++ = palette[( data & 0x20 ) ? fg : bg];
+		*p++ = palette[( data & 0x10 ) ? fg : bg];
+		*p++ = palette[( data & 0x08 ) ? fg : bg];
+		*p++ = palette[( data & 0x04 ) ? fg : bg];
+		*p++ = palette[( data & 0x02 ) ? fg : bg];
+		*p++ = palette[( data & 0x01 ) ? fg : bg];
 	}
 }
 
 MC6845_UPDATE_ROW( pg685_state::crtc_update_row_oua12 )
 {
 	static const uint32_t palette[2] = { 0x00d000, 0 };
-	uint32_t  *p = &bitmap.pix32(y);
+	uint32_t  *p = &bitmap.pix(y);
 	uint16_t  chr_base = ra;
-	int i;
-	uint16_t *vram = (uint16_t *)m_vram16.target();
-	uint8_t *fontram = (uint8_t *)memregion("chargen")->base();
+	uint16_t const *const vram = (uint16_t *)m_vram16.target();
+	uint8_t const *const fontram = (uint8_t *)memregion("chargen")->base();
 
-	for ( i = 0; i < x_count; i++ )
+	for ( int i = 0; i < x_count; i++ )
 	{
 		uint16_t offset = ( ma + i ) & 0x7ff;
 		uint16_t chr = vram[ offset ] & 0xff;
@@ -381,14 +379,14 @@ MC6845_UPDATE_ROW( pg685_state::crtc_update_row_oua12 )
 		uint8_t fg = 1;
 		uint8_t bg = 0;
 
-		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x40 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x20 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x10 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x08 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x04 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x02 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x01 ) ? fg : bg]; p++;
+		*p++ = palette[( data & 0x80 ) ? fg : bg];
+		*p++ = palette[( data & 0x40 ) ? fg : bg];
+		*p++ = palette[( data & 0x20 ) ? fg : bg];
+		*p++ = palette[( data & 0x10 ) ? fg : bg];
+		*p++ = palette[( data & 0x08 ) ? fg : bg];
+		*p++ = palette[( data & 0x04 ) ? fg : bg];
+		*p++ = palette[( data & 0x02 ) ? fg : bg];
+		*p++ = palette[( data & 0x01 ) ? fg : bg];
 	}
 }
 

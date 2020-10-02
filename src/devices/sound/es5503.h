@@ -36,7 +36,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr) override;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	// device_rom_interface overrides
 	virtual void rom_bank_updated() override;
@@ -83,6 +83,8 @@ private:
 	uint32_t output_rate;
 
 	emu_timer *m_timer;
+
+	std::vector<int32_t> m_mix_buffer;
 
 	void halt_osc(int onum, int type, uint32_t *accumulator, int resshift);
 };

@@ -589,7 +589,7 @@ static inline void K053936GP_copyroz32clip( running_machine &machine,
 
 	// adjust entry points and other loop constants
 	dst_pitch = dst_bitmap.rowpixels();
-	dst_base = &dst_bitmap.pix32(0);
+	dst_base = &dst_bitmap.pix(0);
 	dst_base2 = sy * dst_pitch + sx + tx;
 	ecx = tx = -tx;
 
@@ -598,7 +598,7 @@ static inline void K053936GP_copyroz32clip( running_machine &machine,
 	cmask = colormask[tilebpp];
 
 	src_pitch = src_bitmap.rowpixels();
-	src_base = &src_bitmap.pix16(0);
+	src_base = &src_bitmap.pix(0);
 	src_size = src_bitmap.width() * src_bitmap.height();
 	dst_size = dst_bitmap.width() * dst_bitmap.height();
 	dst_ptr = 0;//dst_base;

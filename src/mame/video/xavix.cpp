@@ -754,7 +754,7 @@ void xavix_state::draw_tile_line(screen_device &screen, bitmap_rgb32 &bitmap, co
 
 			if ((col >= cliprect.min_x && col <= cliprect.max_x))
 			{
-				uint16_t* zyposptr = &m_zbuffer.pix16(ypos);
+				uint16_t *const zyposptr = &m_zbuffer.pix(ypos);
 
 				if (zval >= zyposptr[col])
 				{
@@ -762,7 +762,7 @@ void xavix_state::draw_tile_line(screen_device &screen, bitmap_rgb32 &bitmap, co
 
 					if ((m_palram_sh[pen] & 0x1f) < 24) // hue values 24-31 are transparent
 					{
-						uint32_t* yposptr = &bitmap.pix32(ypos);
+						uint32_t *const yposptr = &bitmap.pix(ypos);
 						yposptr[col] = paldata[pen];
 
 						zyposptr[col] = zval;
@@ -867,8 +867,8 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 					for (int x = 0; x < width; x++)
 					{
-						uint32_t* yposptr = &bitmap.pix32(y);
-						uint16_t* zyposptr = &m_zbuffer.pix16(y);
+						uint32_t *const yposptr = &bitmap.pix(y);
+						uint16_t *const zyposptr = &m_zbuffer.pix(y);
 
 						uint8_t dat = 0;
 						for (int i = 0; i < bpp; i++)

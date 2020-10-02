@@ -79,32 +79,33 @@ public:
 	float poly_base_color[4], poly_offs_color[4],
 		poly_last_mode_2_base_color[4];
 
-	struct texinfo  {
-		uint32_t address, vqbase;
+	struct texinfo
+	{
+		uint32_t address = 0, vqbase = 0;
 
-		uint32_t tsinstruction;
+		uint32_t tsinstruction = 0;
 
-		int textured, sizex, sizey, stride, sizes, pf, palette, mode, mipmapped, blend_mode, filter_mode;
-		int coltype;
+		int textured = 0, sizex = 0, sizey = 0, stride = 0, sizes = 0, pf = 0, palette = 0, mode = 0, mipmapped = 0, blend_mode = 0, filter_mode = 0;
+		int coltype = 0;
 
-		uint32_t (powervr2_device::*r)(struct texinfo *t, float x, float y);
-		uint32_t (*blend)(uint32_t s, uint32_t d);
-		int (*u_func)(float uv, int size);
-		int (*v_func)(float uv, int size);
-		int palbase, cd;
+		uint32_t (powervr2_device::*r)(texinfo *t, float x, float y) = nullptr;
+		uint32_t (*blend)(uint32_t s, uint32_t d) = nullptr;
+		int (*u_func)(float uv, int size) = nullptr;
+		int (*v_func)(float uv, int size) = nullptr;
+		int palbase = 0, cd = 0;
 	};
 
-	typedef struct
+	struct vert
 	{
-		float x, y, w, u, v;
+		float x = 0, y = 0, w = 0, u = 0, v = 0;
 
 		// base and offset colors
-		float b[4], o[4];
-	} vert;
+		float b[4] = { 0, 0, 0, 0 }, o[4] = { 0, 0, 0, 0 };
+	};
 
 	struct strip
 	{
-		int svert, evert;
+		int svert = 0, evert = 0;
 		texinfo ti;
 	};
 
@@ -138,18 +139,18 @@ public:
 
 	struct poly_group {
 		strip strips[MAX_STRIPS];
-		int strips_size;
+		int strips_size = 0;
 	};
 
 	struct receiveddata {
 		vert verts[MAX_VERTS];
 		struct poly_group groups[DISPLAY_LIST_COUNT];
-		uint32_t ispbase;
-		uint32_t fbwsof1;
-		uint32_t fbwsof2;
-		int busy;
-		int valid;
-		int verts_size;
+		uint32_t ispbase = 0;
+		uint32_t fbwsof1 = 0;
+		uint32_t fbwsof2 = 0;
+		int busy = 0;
+		int valid = 0;
+		int verts_size = 0;
 	};
 
 	enum {

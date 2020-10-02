@@ -33,7 +33,7 @@ public:
 
 protected:
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	void audio_beat_tick();
 	void audio_rampdown_tick(const uint32_t channel);

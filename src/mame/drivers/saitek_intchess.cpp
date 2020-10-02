@@ -136,7 +136,7 @@ u32 intchess_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	// draw chessboard background
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 		for (int x = cliprect.left(); x <= cliprect.right(); x++)
-			bitmap.pix16(y, x) = ((x / 20) ^ (y / 16)) << 1 & 2;
+			bitmap.pix(y, x) = ((x / 20) ^ (y / 16)) << 1 & 2;
 
 	// draw the sprites
 	for (int i = 0; i < 64; i++)

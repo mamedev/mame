@@ -119,7 +119,7 @@ void x1_010_device::device_start()
 	LOG_SOUND("masterclock = %d rate = %d\n", clock(), m_rate);
 
 	/* get stream channels */
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, m_rate);
+	m_stream = stream_alloc(0, 2, m_rate);
 
 	m_reg = make_unique_clear<u8[]>(0x2000);
 	m_HI_WORD_BUF = make_unique_clear<u8[]>(0x2000);
@@ -207,11 +207,11 @@ void x1_010_device::word_w(offs_t offset, u16 data)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void x1_010_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void x1_010_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	// mixer buffer zero clear
-	memset(outputs[0], 0, samples*sizeof(*outputs[0]));
-	memset(outputs[1], 0, samples*sizeof(*outputs[1]));
+	outputs[0].fill(0);
+	outputs[1].fill(0);
 
 //  if (m_sound_enable == 0) return;
 
@@ -220,8 +220,8 @@ void x1_010_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 		X1_010_CHANNEL *reg = (X1_010_CHANNEL *)&(m_reg[ch*sizeof(X1_010_CHANNEL)]);
 		if ((reg->status & 1) != 0)                            // Key On
 		{
-			stream_sample_t *bufL = outputs[0];
-			stream_sample_t *bufR = outputs[1];
+			auto &bufL = outputs[0];
+			auto &bufR = outputs[1];
 			const int div = (reg->status & 0x80) ? 1 : 0;
 			if ((reg->status & 2) == 0)                        // PCM sampling
 			{
@@ -240,7 +240,7 @@ void x1_010_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 					LOG_SOUND("Play sample %p - %p, channel %X volume %d:%d freq %X step %X offset %X\n",
 						start, end, ch, volL, volR, freq, smp_step, smp_offs);
 				}
-				for (int i = 0; i < samples; i++)
+				for (int i = 0; i < bufL.samples(); i++)
 				{
 					const u32 delta = smp_offs >> 4;
 					// sample ended?
@@ -250,8 +250,8 @@ void x1_010_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 						break;
 					}
 					const s8 data = (s8)(read_byte(start+delta));
-					*bufL++ += (data * volL / 256);
-					*bufR++ += (data * volR / 256);
+					bufL.add_int(i, data * volL, 32768 * 256);
+					bufR.add_int(i, data * volR, 32768 * 256);
 					smp_offs += smp_step;
 				}
 				m_smp_offset[ch] = smp_offs;
@@ -272,7 +272,7 @@ void x1_010_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 					LOG_SOUND("Play waveform %X, channel %X volume %X freq %4X step %X offset %X\n",
 						reg->volume, ch, reg->end, freq, smp_step, smp_offs);
 				}
-				for (int i = 0; i < samples; i++)
+				for (int i = 0; i < bufL.samples(); i++)
 				{
 					const u32 delta = env_offs >> 10;
 					// Envelope one shot mode
@@ -285,8 +285,8 @@ void x1_010_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 					const int volL = ((vol >> 4) & 0xf) * VOL_BASE;
 					const int volR = ((vol >> 0) & 0xf) * VOL_BASE;
 					const s8 data  = (s8)(m_reg[start + ((smp_offs >> 10) & 0x7f)]);
-					*bufL++ += (data * volL / 256);
-					*bufR++ += (data * volR / 256);
+					bufL.add_int(i, data * volL, 32768 * 256);
+					bufR.add_int(i, data * volR, 32768 * 256);
 					smp_offs += smp_step;
 					env_offs += env_step;
 				}

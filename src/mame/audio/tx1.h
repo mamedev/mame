@@ -73,7 +73,7 @@ protected:
 	virtual void device_reset() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	void tx1_sound_io(address_map &map);
 	void tx1_sound_prg(address_map &map);
@@ -104,9 +104,9 @@ protected:
 	uint8_t m_ppi_latch_b = 0;
 	uint32_t m_ts = 0;
 
-	stream_sample_t m_pit0 = 0;
-	stream_sample_t m_pit1 = 0;
-	stream_sample_t m_pit2 = 0;
+	s32 m_pit0 = 0;
+	s32 m_pit1 = 0;
+	s32 m_pit2 = 0;
 
 	double m_weights0[4] = { 0, 0, 0, 0 };
 	double m_weights1[3] = { 0, 0, 0 };
@@ -155,7 +155,7 @@ protected:
 	virtual void device_reset() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	void ym1_a_w(uint8_t data);
 

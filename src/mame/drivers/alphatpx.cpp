@@ -595,7 +595,7 @@ PORT_START("COL.3")
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("4")           PORT_CODE(KEYCODE_4)        PORT_CHAR('4')      PORT_CHAR('$')
 
 PORT_START("COL.4")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Z")           PORT_CODE(KEYCODE_Z)        PORT_CHAR('z')      PORT_CHAR('Z')
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Z")           PORT_CODE(KEYCODE_Y)        PORT_CHAR('z')      PORT_CHAR('Z')
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("H")           PORT_CODE(KEYCODE_H)        PORT_CHAR('h')      PORT_CHAR('H')
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("N")           PORT_CODE(KEYCODE_N)        PORT_CHAR('n')      PORT_CHAR('N')
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN)
@@ -607,7 +607,7 @@ PORT_START("COL.5")
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("J")           PORT_CODE(KEYCODE_J)        PORT_CHAR('j')      PORT_CHAR('J')
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("M")           PORT_CODE(KEYCODE_M)        PORT_CHAR('m')      PORT_CHAR('M')
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("UP")          PORT_CODE(KEYCODE_UP)       PORT_CHAR(UCHAR_MAMEKEY(UP))        // 0x89
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Y")           PORT_CODE(KEYCODE_Y)        PORT_CHAR('y')      PORT_CHAR('Y')
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Y")           PORT_CODE(KEYCODE_Z)        PORT_CHAR('y')      PORT_CHAR('Y')
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("6")           PORT_CODE(KEYCODE_6)        PORT_CHAR('6')      PORT_CHAR('&')
 
 PORT_START("COL.6")
@@ -628,27 +628,27 @@ PORT_START("COL.7")
 
 PORT_START("COL.8")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P")           PORT_CODE(KEYCODE_P)        PORT_CHAR('p')      PORT_CHAR('P')
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ö Ö")         PORT_CODE(KEYCODE_COLON)    PORT_CHAR(0x00f6)   PORT_CHAR(0x00d6)
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"ö Ö")       PORT_CODE(KEYCODE_COLON)    PORT_CHAR(0x00f6)   PORT_CHAR(0x00d6)
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("- _")         PORT_CODE(KEYCODE_SLASH)    PORT_CHAR('-')      PORT_CHAR('_')
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("R_CTRL")      PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))  // 44h ->84h clear ?
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ENTER Pad")   PORT_CODE(KEYCODE_ENTER_PAD)PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9")           PORT_CODE(KEYCODE_9)        PORT_CHAR('9')      PORT_CHAR(')')
 
 PORT_START("COL.9")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ü Ü")         PORT_CODE(KEYCODE_OPENBRACE)PORT_CHAR(0x00fc)   PORT_CHAR(0x00dc)
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ä Ä")         PORT_CODE(KEYCODE_QUOTE)    PORT_CHAR(0x00e4)   PORT_CHAR(0x00c4)
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"ü Ü")       PORT_CODE(KEYCODE_OPENBRACE)PORT_CHAR(0x00fc)   PORT_CHAR(0x00dc)
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"ä Ä")       PORT_CODE(KEYCODE_QUOTE)    PORT_CHAR(0x00e4)   PORT_CHAR(0x00c4)
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("R_SHIFT")     PORT_CODE(KEYCODE_RSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0 Pad")       PORT_CODE(KEYCODE_0_PAD)    PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN)
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0")           PORT_CODE(KEYCODE_0)        PORT_CHAR('0')      PORT_CHAR('=')
 
 PORT_START("COL.10")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("+ *")        PORT_CODE(KEYCODE_CLOSEBRACE)PORT_CHAR('+')     PORT_CHAR('*')
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("+ *")         PORT_CODE(KEYCODE_CLOSEBRACE)PORT_CHAR('+')     PORT_CHAR('*')
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("# ^")         PORT_CODE(KEYCODE_BACKSLASH)PORT_CHAR('#')      PORT_CHAR('^')
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("[][]/ESC")    PORT_CODE(KEYCODE_ESC)      PORT_CHAR(UCHAR_MAMEKEY(ESC))           // Esc test this work ?!
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("DEL Pad")     PORT_CODE(KEYCODE_DEL_PAD)  PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN)
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ß ?")         PORT_CODE(KEYCODE_MINUS)    PORT_CHAR(0x00df)   PORT_CHAR('?')      // ß and ?
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"ß ?")       PORT_CODE(KEYCODE_MINUS)    PORT_CHAR(0x00df)   PORT_CHAR('?')      // ß and ?
 
 PORT_START("COL.11")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("TAB")         PORT_CODE(KEYCODE_TAB)      PORT_CHAR('\t')                         // TAB key
@@ -656,7 +656,7 @@ PORT_START("COL.11")
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1 Pad")       PORT_CODE(KEYCODE_1_PAD)    PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("+ Pad")       PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD))
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN)
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("´ `")         PORT_CODE(KEYCODE_EQUALS)   PORT_CHAR(0x00b4)   PORT_CHAR(0x0060)
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"´ `")       PORT_CODE(KEYCODE_EQUALS)   PORT_CHAR(0x00b4,'\'') PORT_CHAR(0x0060)
 
 PORT_START("COL.12")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("7 Pad")       PORT_CODE(KEYCODE_7_PAD)    PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
@@ -769,7 +769,7 @@ PORT_START("COL.3")
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("4")           PORT_CODE(KEYCODE_4)        PORT_CHAR('4')      PORT_CHAR('$')
 
 PORT_START("COL.4")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Z")           PORT_CODE(KEYCODE_Z)        PORT_CHAR('z')      PORT_CHAR('Z')
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Z")           PORT_CODE(KEYCODE_Y)        PORT_CHAR('z')      PORT_CHAR('Z')
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("H")           PORT_CODE(KEYCODE_H)        PORT_CHAR('h')      PORT_CHAR('H')
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("N")           PORT_CODE(KEYCODE_N)        PORT_CHAR('n')      PORT_CHAR('N')
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN)
@@ -781,7 +781,7 @@ PORT_START("COL.5")
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("J")           PORT_CODE(KEYCODE_J)        PORT_CHAR('j')      PORT_CHAR('J')
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("M")           PORT_CODE(KEYCODE_M)        PORT_CHAR('m')      PORT_CHAR('M')
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("UP")          PORT_CODE(KEYCODE_UP)       PORT_CHAR(UCHAR_MAMEKEY(UP))        // 0x89
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Y")           PORT_CODE(KEYCODE_Y)        PORT_CHAR('y')      PORT_CHAR('Y')
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Y")           PORT_CODE(KEYCODE_Z)        PORT_CHAR('y')      PORT_CHAR('Y')
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("6")           PORT_CODE(KEYCODE_6)        PORT_CHAR('6')      PORT_CHAR('&')
 
 PORT_START("COL.6")
@@ -802,27 +802,27 @@ PORT_START("COL.7")
 
 PORT_START("COL.8")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P")           PORT_CODE(KEYCODE_P)        PORT_CHAR('p')      PORT_CHAR('P')
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ö Ö")         PORT_CODE(KEYCODE_COLON)    PORT_CHAR(0x00f6)   PORT_CHAR(0x00d6)
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"ö Ö")       PORT_CODE(KEYCODE_COLON)    PORT_CHAR(0x00f6)   PORT_CHAR(0x00d6)
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("- _")         PORT_CODE(KEYCODE_SLASH)    PORT_CHAR('-')      PORT_CHAR('_')
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("R_CTRL")      PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))  // 44h ->84h clear ?
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ENTER Pad")   PORT_CODE(KEYCODE_ENTER_PAD)PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9")           PORT_CODE(KEYCODE_9)        PORT_CHAR('9')      PORT_CHAR(')')
 
 PORT_START("COL.9")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ü Ü")         PORT_CODE(KEYCODE_OPENBRACE)PORT_CHAR(0x00fc)   PORT_CHAR(0x00dc)
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ä Ä")         PORT_CODE(KEYCODE_QUOTE)    PORT_CHAR(0x00e4)   PORT_CHAR(0x00c4)
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"ü Ü")       PORT_CODE(KEYCODE_OPENBRACE)PORT_CHAR(0x00fc)   PORT_CHAR(0x00dc)
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"ä Ä")       PORT_CODE(KEYCODE_QUOTE)    PORT_CHAR(0x00e4)   PORT_CHAR(0x00c4)
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("R_SHIFT")     PORT_CODE(KEYCODE_RSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0 Pad")       PORT_CODE(KEYCODE_0_PAD)    PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN)
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0")           PORT_CODE(KEYCODE_0)        PORT_CHAR('0')      PORT_CHAR('=')
 
 PORT_START("COL.10")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("+ *")        PORT_CODE(KEYCODE_CLOSEBRACE)PORT_CHAR('+')     PORT_CHAR('*')
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("+ *")         PORT_CODE(KEYCODE_CLOSEBRACE)PORT_CHAR('+')     PORT_CHAR('*')
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("# ^")         PORT_CODE(KEYCODE_BACKSLASH)PORT_CHAR('#')      PORT_CHAR('^')
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("[][]/ESC")    PORT_CODE(KEYCODE_ESC)      PORT_CHAR(UCHAR_MAMEKEY(ESC))           // Esc test this work ?!
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("DEL Pad")     PORT_CODE(KEYCODE_DEL_PAD)  PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN)
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ß ?")         PORT_CODE(KEYCODE_MINUS)    PORT_CHAR(0x00df)   PORT_CHAR('?')      // ß and ?
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"ß ?")       PORT_CODE(KEYCODE_MINUS)    PORT_CHAR(0x00df)   PORT_CHAR('?')      // ß and ?
 
 PORT_START("COL.11")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("TAB")         PORT_CODE(KEYCODE_TAB)      PORT_CHAR('\t')                         // TAB key
@@ -830,7 +830,7 @@ PORT_START("COL.11")
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1 Pad")       PORT_CODE(KEYCODE_1_PAD)    PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("+ Pad")       PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD))
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN)
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("´ `")         PORT_CODE(KEYCODE_EQUALS)   PORT_CHAR(0x00b4)   PORT_CHAR(0x0060)
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"´ `")       PORT_CODE(KEYCODE_EQUALS)   PORT_CHAR(0x00b4,'\'') PORT_CHAR(0x0060)
 
 PORT_START("COL.12")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("7 Pad")       PORT_CODE(KEYCODE_7_PAD)    PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
@@ -903,31 +903,31 @@ static const gfx_layout extcharlayout =
 
 u32 alphatp_12_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const pen_t *pen = m_palette->pens();
-	int start = m_crtc->upscroll_offset();
+	pen_t const *const pen = m_palette->pens();
+	int const start = m_crtc->upscroll_offset();
 	rectangle cursor;
 	m_crtc->cursor_bounds(cursor);
 	for (int y = 0; y < 24; y++)
 	{
-		int vramy = (start + y) % 24;
+		int const vramy = (start + y) % 24;
 		for (int x = 0; x < 80; x++)
 		{
 			u8 code = m_vram[(vramy * 128) + x];   // helwie44 must be 128d is 080h physical display-ram step line
 			// draw 12 lines of the character
-			bool cursoren = cursor.contains(x * 8, y * 12);
+			bool const cursoren = cursor.contains(x * 8, y * 12);
 			for (int line = 0; line < 12; line++)
 			{
 				u8 data = m_gfx[((code & 0x7f) * 16) + line];
 				if (cursoren)
 					data ^= 0xff;
-				bitmap.pix32(y * 12 + line, x * 8 + 0) = pen[BIT(data, 0) ^ BIT(code, 7)];
-				bitmap.pix32(y * 12 + line, x * 8 + 1) = pen[BIT(data, 1) ^ BIT(code, 7)];
-				bitmap.pix32(y * 12 + line, x * 8 + 2) = pen[BIT(data, 2) ^ BIT(code, 7)];
-				bitmap.pix32(y * 12 + line, x * 8 + 3) = pen[BIT(data, 3) ^ BIT(code, 7)];
-				bitmap.pix32(y * 12 + line, x * 8 + 4) = pen[BIT(data, 4) ^ BIT(code, 7)];
-				bitmap.pix32(y * 12 + line, x * 8 + 5) = pen[BIT(data, 5) ^ BIT(code, 7)];
-				bitmap.pix32(y * 12 + line, x * 8 + 6) = pen[BIT(data, 6) ^ BIT(code, 7)];
-				bitmap.pix32(y * 12 + line, x * 8 + 7) = pen[BIT(data, 7) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 0) = pen[BIT(data, 0) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 1) = pen[BIT(data, 1) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 2) = pen[BIT(data, 2) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 3) = pen[BIT(data, 3) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 4) = pen[BIT(data, 4) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 5) = pen[BIT(data, 5) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 6) = pen[BIT(data, 6) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 7) = pen[BIT(data, 7) ^ BIT(code, 7)];
 			}
 		}
 	}
@@ -945,23 +945,23 @@ GFXDECODE_END
 
 u32 alphatp_34_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const pen_t *pen = m_palette->pens();
-	int start = m_crtc->upscroll_offset();
+	pen_t const *const pen = m_palette->pens();
+	int const start = m_crtc->upscroll_offset();
 	rectangle cursor;
 	m_crtc->cursor_bounds(cursor);
-	bool scrext = m_scncfg->read() ? true : false;
+	bool const scrext = m_scncfg->read() ? true : false;
 	for (int y = 0; y < 24; y++)
 	{
-		int vramy = (start + y) % 24;
+		int const vramy = (start + y) % 24;
 		for (int x = 0; x < 80; x++)
 		{
 			u8 code = m_vram[(vramy * 128) + x];   // helwie44 must be 128d is 080h physical display-ram step line
 			// draw 12 lines of the character
-			bool cursoren = cursor.contains(x * 8, y * 12);
+			bool const cursoren = cursor.contains(x * 8, y * 12);
 			for (int line = 0; line < 12; line++)
 			{
 				u8 data = 0;
-				if(scrext)
+				if (scrext)
 				{
 					offs_t offset = (((vramy * 12) + line) * 80) + x;
 					if(offset < (371 * 80))
@@ -974,14 +974,14 @@ u32 alphatp_34_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 					if (cursoren)
 						data ^= 0xff;
 				}
-				bitmap.pix32(y * 12 + line, x * 8 + 0) = pen[BIT(data, 0) ^ BIT(code, 7)];
-				bitmap.pix32(y * 12 + line, x * 8 + 1) = pen[BIT(data, 1) ^ BIT(code, 7)];
-				bitmap.pix32(y * 12 + line, x * 8 + 2) = pen[BIT(data, 2) ^ BIT(code, 7)];
-				bitmap.pix32(y * 12 + line, x * 8 + 3) = pen[BIT(data, 3) ^ BIT(code, 7)];
-				bitmap.pix32(y * 12 + line, x * 8 + 4) = pen[BIT(data, 4) ^ BIT(code, 7)];
-				bitmap.pix32(y * 12 + line, x * 8 + 5) = pen[BIT(data, 5) ^ BIT(code, 7)];
-				bitmap.pix32(y * 12 + line, x * 8 + 6) = pen[BIT(data, 6) ^ BIT(code, 7)];
-				bitmap.pix32(y * 12 + line, x * 8 + 7) = pen[BIT(data, 7) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 0) = pen[BIT(data, 0) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 1) = pen[BIT(data, 1) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 2) = pen[BIT(data, 2) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 3) = pen[BIT(data, 3) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 4) = pen[BIT(data, 4) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 5) = pen[BIT(data, 5) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 6) = pen[BIT(data, 6) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 7) = pen[BIT(data, 7) ^ BIT(code, 7)];
 			}
 		}
 	}

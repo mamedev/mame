@@ -285,8 +285,8 @@ void stfight_video_device::mix_txlayer(screen_device &screen, bitmap_ind16 &bitm
 {
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint16_t *dest = &bitmap.pix16(y);
-		uint16_t *src = &bitmap2.pix16(y);
+		uint16_t *const dest = &bitmap.pix(y);
+		uint16_t const *const src = &bitmap2.pix(y);
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			if (src[x] == -1)

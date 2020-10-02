@@ -116,9 +116,9 @@ void dogfgt_state::internal_bitmapram_w(offs_t offset, uint8_t data)
 			color |= ((m_bitmapram[offset + BITMAPRAM_SIZE / 3 * i] >> subx) & 1) << i;
 
 		if (flip_screen())
-			m_pixbitmap.pix16(y ^ 0xff, (x + subx) ^ 0xff) = PIXMAP_COLOR_BASE + 8 * m_pixcolor + color;
+			m_pixbitmap.pix(y ^ 0xff, (x + subx) ^ 0xff) = PIXMAP_COLOR_BASE + 8 * m_pixcolor + color;
 		else
-			m_pixbitmap.pix16(y, x + subx) = PIXMAP_COLOR_BASE + 8 * m_pixcolor + color;
+			m_pixbitmap.pix(y, x + subx) = PIXMAP_COLOR_BASE + 8 * m_pixcolor + color;
 	}
 }
 

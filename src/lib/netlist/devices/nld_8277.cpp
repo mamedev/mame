@@ -18,7 +18,6 @@
  *
  */
 
-#include "nld_8277.h"
 #include "nl_base.h"
 
 namespace netlist

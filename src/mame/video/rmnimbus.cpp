@@ -105,9 +105,9 @@ uint8_t rmnimbus_state::get_pixel(uint16_t x, uint16_t y)
 	if((x<640) && (y<250))
 	{
 		if(IS_80COL)
-			result=m_video_mem.pix16(y, x) >> 2;
+			result=m_video_mem.pix(y, x) >> 2;
 		else
-			result=m_video_mem.pix16(y, x*2);
+			result=m_video_mem.pix(y, x*2);
 	}
 
 	return result;
@@ -295,9 +295,9 @@ void rmnimbus_state::set_pixel(uint16_t x, uint16_t y, uint8_t colour)
 	if((x<640) && (y<250))
 	{
 		if(IS_XOR)
-			m_video_mem.pix16(y, x)^=colour;
+			m_video_mem.pix(y, x)^=colour;
 		else
-			m_video_mem.pix16(y, x)=colour;
+			m_video_mem.pix(y, x)=colour;
 	}
 }
 
@@ -344,7 +344,7 @@ void rmnimbus_state::move_pixel_line(uint16_t x, uint16_t y, uint8_t pixels)
 	{
 		if(DEBUG_SET(DEBUG_TEXT | DEBUG_PIXEL))
 			logerror("x=%d\n",x + i);
-		m_video_mem.pix16(m_yline, x + i) = m_video_mem.pix16(y, x + i);
+		m_video_mem.pix(m_yline, x + i) = m_video_mem.pix(y, x + i);
 	}
 }
 

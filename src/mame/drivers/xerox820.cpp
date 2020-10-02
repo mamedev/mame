@@ -480,25 +480,25 @@ WRITE_LINE_MEMBER( xerox820_state::fdc_drq_w )
 
 uint32_t xerox820_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y,ra,chr,gfx;
-	uint16_t sy=0,ma=(m_scroll + 1) * 0x80,x;
-	const pen_t *pen=m_palette->pens();
+	uint16_t sy=0,ma=(m_scroll + 1) * 0x80;
+	pen_t const *const pen=m_palette->pens();
 
 	m_framecnt++;
 
-	for (y = 0; y < 24; y++)
+	for (uint8_t y = 0; y < 24; y++)
 	{
 		if (ma > 0xb80) ma = 0;
 
-		for (ra = 0; ra < 10; ra++)
+		for (uint8_t ra = 0; ra < 10; ra++)
 		{
-			uint32_t *p = &bitmap.pix32(sy++);
+			uint32_t *p = &bitmap.pix(sy++);
 
-			for (x = ma; x < ma + 80; x++)
+			for (uint16_t x = ma; x < ma + 80; x++)
 			{
+				uint8_t gfx;
 				if (ra < 8)
 				{
-					chr = m_video_ram[x & XEROX820_VIDEORAM_MASK] ^ 0x80;
+					uint8_t chr = m_video_ram[x & XEROX820_VIDEORAM_MASK] ^ 0x80;
 
 					/* Take care of flashing characters */
 					if ((chr < 0x80) && (m_framecnt & 0x08))
@@ -510,14 +510,14 @@ uint32_t xerox820_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 				else
 					gfx = 0xff;
 
-			/* Display a scanline of a character (7 pixels) */
-			*p++ = pen[0];
-			*p++ = pen[BIT(gfx, 4) ^ 1];
-			*p++ = pen[BIT(gfx, 3) ^ 1];
-			*p++ = pen[BIT(gfx, 2) ^ 1];
-			*p++ = pen[BIT(gfx, 1) ^ 1];
-			*p++ = pen[BIT(gfx, 0) ^ 1];
-			*p++ = pen[0];
+				/* Display a scanline of a character (7 pixels) */
+				*p++ = pen[0];
+				*p++ = pen[BIT(gfx, 4) ^ 1];
+				*p++ = pen[BIT(gfx, 3) ^ 1];
+				*p++ = pen[BIT(gfx, 2) ^ 1];
+				*p++ = pen[BIT(gfx, 1) ^ 1];
+				*p++ = pen[BIT(gfx, 0) ^ 1];
+				*p++ = pen[0];
 			}
 		}
 		ma+=128;

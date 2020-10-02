@@ -210,7 +210,7 @@ upd7756_device::upd7756_device(const machine_config &mconfig, device_type type, 
 void upd775x_device::device_start()
 {
 	// allocate a stream channel
-	m_channel = machine().sound().stream_alloc(*this, 0, 1, clock()/4);
+	m_channel = stream_alloc(0, 1, clock()/4);
 
 	// compute the stepping rate based on the chip's clock speed
 	m_step = 4 * FRAC_ONE;
@@ -264,7 +264,7 @@ void upd7759_device::device_start()
 	// chip configuration
 	m_sample_offset_shift = 1;
 
-	m_timer = timer_alloc(TIMER_SLAVE_UPDATE);
+	m_timer = timer_alloc(TID_SLAVE_UPDATE);
 
 	m_drqcallback.resolve_safe();
 
@@ -599,24 +599,35 @@ void upd7759_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 	switch (id)
 	{
-		case TIMER_SLAVE_UPDATE:
+		case TID_PORT_WRITE:
+			m_fifo_in = param;
+			break;
 
-		/* update the stream */
-		m_channel->update();
+		case TID_RESET_WRITE:
+			internal_reset_w(param);
+			break;
 
-		/* advance the state */
-		advance_state();
+		case TID_START_WRITE:
+			internal_start_w(param);
+			break;
 
-		/* if the DRQ changed, update it */
-		if (DEBUG_STATES)
-			logerror("upd7759_slave_update: DRQ %d->%d\n", olddrq, m_drq);
-		if (olddrq != m_drq)
-			m_drqcallback(m_drq);
+		case TID_SLAVE_UPDATE:
+			/* update the stream */
+			m_channel->update();
 
-		/* set a timer to go off when that is done */
-		if (m_state != STATE_IDLE)
-			m_timer->adjust(m_clock_period * m_clocks_left);
-		break;
+			/* advance the state */
+			advance_state();
+
+			/* if the DRQ changed, update it */
+			if (DEBUG_STATES)
+				logerror("upd7759_slave_update: DRQ %d->%d\n", olddrq, m_drq);
+			if (olddrq != m_drq)
+				m_drqcallback(m_drq);
+
+			/* set a timer to go off when that is done */
+			if (m_state != STATE_IDLE)
+				m_timer->adjust(m_clock_period * m_clocks_left);
+			break;
 
 		default:
 			throw emu_fatalerror("Unknown id in upd7759_device::device_timer");
@@ -631,6 +642,11 @@ void upd7759_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 WRITE_LINE_MEMBER( upd775x_device::reset_w )
 {
+	synchronize(TID_RESET_WRITE, state);
+}
+
+void upd775x_device::internal_reset_w(int state)
+{
 	/* update the reset value */
 	uint8_t oldreset = m_reset;
 	m_reset = (state != 0);
@@ -643,12 +659,12 @@ WRITE_LINE_MEMBER( upd775x_device::reset_w )
 		device_reset();
 }
 
-WRITE_LINE_MEMBER(upd7759_device::md_w)
+WRITE_LINE_MEMBER( upd775x_device::start_w )
 {
-	m_md = state;
+	synchronize(TID_START_WRITE, state);
 }
 
-WRITE_LINE_MEMBER( upd7759_device::start_w )
+void upd7759_device::internal_start_w(int state)
 {
 	/* update the start value */
 	uint8_t oldstart = m_start;
@@ -671,8 +687,9 @@ WRITE_LINE_MEMBER( upd7759_device::start_w )
 	}
 }
 
-WRITE_LINE_MEMBER( upd7756_device::start_w )
+void upd7756_device::internal_start_w(int state)
 {
+
 	/* update the start value */
 	uint8_t oldstart = m_start;
 	m_start = (state != 0);
@@ -694,7 +711,7 @@ WRITE_LINE_MEMBER( upd7756_device::start_w )
 void upd775x_device::port_w(u8 data)
 {
 	/* update the FIFO value */
-	m_fifo_in = data;
+	synchronize(TID_PORT_WRITE, data);
 }
 
 
@@ -712,21 +729,21 @@ READ_LINE_MEMBER( upd775x_device::busy_r )
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void upd775x_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void upd775x_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
+	constexpr stream_buffer::sample_t sample_scale = 128.0 / 32768.0;
+	stream_buffer::sample_t sample = stream_buffer::sample_t(m_sample) * sample_scale;
 	int32_t clocks_left = m_clocks_left;
-	int16_t sample = m_sample;
 	uint32_t step = m_step;
 	uint32_t pos = m_pos;
-	stream_sample_t *buffer = outputs[0];
 
 	/* loop until done */
+	u32 index = 0;
 	if (m_state != STATE_IDLE)
-		while (samples != 0)
+		for ( ; index < outputs[0].samples(); index++)
 		{
 			/* store the current sample */
-			*buffer++ = sample << 7;
-			samples--;
+			outputs[0].put(index, sample);
 
 			/* advance by the number of clocks/output sample */
 			pos += step;
@@ -752,14 +769,14 @@ void upd775x_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 					/* reimport the variables that we cached */
 					clocks_left = m_clocks_left;
-					sample = m_sample;
+					sample = stream_buffer::sample_t(m_sample) * sample_scale;
 				}
 			}
 		}
 
 	/* if we got out early, just zap the rest of the buffer */
-	if (samples != 0)
-		memset(buffer, 0, samples * sizeof(*buffer));
+	for (; index < outputs[0].samples(); index++)
+		outputs[0].put(index, 0);
 
 	/* flush the state back */
 	m_clocks_left = clocks_left;

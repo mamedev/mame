@@ -119,7 +119,7 @@ uint32_t risc2500_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			uint8_t gfx = bitswap<8>(m_vram[c*5 + x], 6,5,0,1,2,3,4,7);
 
 			for(int y=0; y<7; y++)
-				bitmap.pix16(y + 1, 71 - (c*6 + x)) = (gfx >> (y + 1)) & 1;
+				bitmap.pix(y + 1, 71 - (c*6 + x)) = (gfx >> (y + 1)) & 1;
 		}
 
 		// LCD digits and symbols

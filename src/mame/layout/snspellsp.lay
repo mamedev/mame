@@ -29,32 +29,32 @@ license:CC0
 
 		<!-- 8 digits with accent mark and dp -->
 
-		<bezel name="digit0" element="digit"><bounds x="0" y="4" width="10" height="15" /></bezel>
-		<bezel name="digit1" element="digit"><bounds x="11" y="4" width="10" height="15" /></bezel>
-		<bezel name="digit2" element="digit"><bounds x="22" y="4" width="10" height="15" /></bezel>
-		<bezel name="digit3" element="digit"><bounds x="33" y="4" width="10" height="15" /></bezel>
-		<bezel name="digit4" element="digit"><bounds x="44" y="4" width="10" height="15" /></bezel>
-		<bezel name="digit5" element="digit"><bounds x="55" y="4" width="10" height="15" /></bezel>
-		<bezel name="digit6" element="digit"><bounds x="66" y="4" width="10" height="15" /></bezel>
-		<bezel name="digit7" element="digit"><bounds x="77" y="4" width="10" height="15" /></bezel>
+		<element name="digit0" ref="digit"><bounds x="0" y="4" width="10" height="15" /></element>
+		<element name="digit1" ref="digit"><bounds x="11" y="4" width="10" height="15" /></element>
+		<element name="digit2" ref="digit"><bounds x="22" y="4" width="10" height="15" /></element>
+		<element name="digit3" ref="digit"><bounds x="33" y="4" width="10" height="15" /></element>
+		<element name="digit4" ref="digit"><bounds x="44" y="4" width="10" height="15" /></element>
+		<element name="digit5" ref="digit"><bounds x="55" y="4" width="10" height="15" /></element>
+		<element name="digit6" ref="digit"><bounds x="66" y="4" width="10" height="15" /></element>
+		<element name="digit7" ref="digit"><bounds x="77" y="4" width="10" height="15" /></element>
 
-		<bezel name="0.14" element="triangle_mark"><bounds x="4" y="0" width="4" height="3" /></bezel>
-		<bezel name="1.14" element="triangle_mark"><bounds x="15" y="0" width="4" height="3" /></bezel>
-		<bezel name="2.14" element="triangle_mark"><bounds x="26" y="0" width="4" height="3" /></bezel>
-		<bezel name="3.14" element="triangle_mark"><bounds x="37" y="0" width="4" height="3" /></bezel>
-		<bezel name="4.14" element="triangle_mark"><bounds x="48" y="0" width="4" height="3" /></bezel>
-		<bezel name="5.14" element="triangle_mark"><bounds x="59" y="0" width="4" height="3" /></bezel>
-		<bezel name="6.14" element="triangle_mark"><bounds x="70" y="0" width="4" height="3" /></bezel>
-		<bezel name="7.14" element="triangle_mark"><bounds x="81" y="0" width="4" height="3" /></bezel>
+		<element name="0.14" ref="triangle_mark"><bounds x="4" y="0" width="4" height="3" /></element>
+		<element name="1.14" ref="triangle_mark"><bounds x="15" y="0" width="4" height="3" /></element>
+		<element name="2.14" ref="triangle_mark"><bounds x="26" y="0" width="4" height="3" /></element>
+		<element name="3.14" ref="triangle_mark"><bounds x="37" y="0" width="4" height="3" /></element>
+		<element name="4.14" ref="triangle_mark"><bounds x="48" y="0" width="4" height="3" /></element>
+		<element name="5.14" ref="triangle_mark"><bounds x="59" y="0" width="4" height="3" /></element>
+		<element name="6.14" ref="triangle_mark"><bounds x="70" y="0" width="4" height="3" /></element>
+		<element name="7.14" ref="triangle_mark"><bounds x="81" y="0" width="4" height="3" /></element>
 
-		<bezel name="0.15" element="lamp_dp"><bounds x="9" y="17.5" width="1.5" height="1.5" /></bezel>
-		<bezel name="1.15" element="lamp_dp"><bounds x="20" y="17.5" width="1.5" height="1.5" /></bezel>
-		<bezel name="2.15" element="lamp_dp"><bounds x="31" y="17.5" width="1.5" height="1.5" /></bezel>
-		<bezel name="3.15" element="lamp_dp"><bounds x="42" y="17.5" width="1.5" height="1.5" /></bezel>
-		<bezel name="4.15" element="lamp_dp"><bounds x="53" y="17.5" width="1.5" height="1.5" /></bezel>
-		<bezel name="5.15" element="lamp_dp"><bounds x="64" y="17.5" width="1.5" height="1.5" /></bezel>
-		<bezel name="6.15" element="lamp_dp"><bounds x="75" y="17.5" width="1.5" height="1.5" /></bezel>
-		<bezel name="7.15" element="lamp_dp"><bounds x="86" y="17.5" width="1.5" height="1.5" /></bezel>
+		<element name="0.15" ref="lamp_dp"><bounds x="9" y="17.5" width="1.5" height="1.5" /></element>
+		<element name="1.15" ref="lamp_dp"><bounds x="20" y="17.5" width="1.5" height="1.5" /></element>
+		<element name="2.15" ref="lamp_dp"><bounds x="31" y="17.5" width="1.5" height="1.5" /></element>
+		<element name="3.15" ref="lamp_dp"><bounds x="42" y="17.5" width="1.5" height="1.5" /></element>
+		<element name="4.15" ref="lamp_dp"><bounds x="53" y="17.5" width="1.5" height="1.5" /></element>
+		<element name="5.15" ref="lamp_dp"><bounds x="64" y="17.5" width="1.5" height="1.5" /></element>
+		<element name="6.15" ref="lamp_dp"><bounds x="75" y="17.5" width="1.5" height="1.5" /></element>
+		<element name="7.15" ref="lamp_dp"><bounds x="86" y="17.5" width="1.5" height="1.5" /></element>
 
 	</view>
 </mamelayout>

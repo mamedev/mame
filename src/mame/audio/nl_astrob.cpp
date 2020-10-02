@@ -30,7 +30,8 @@
 
 #define HLE_LASER_1_VCO (1)
 #define HLE_LASER_2_VCO (1)
-#define SIMPLIFY_SONAR (1)
+#define SIMPLIFY_SONAR (0)                  // only use one oscillator
+#define ENABLE_SONAR_ALT (1)                // use frontiers to separate oscillators, modify UGF
 #define ENABLE_FRONTIERS (1)
 #define UNDERCLOCK_NOISE_GEN (1)
 
@@ -44,13 +45,10 @@
 
 
 
-// not really found anywhere, just took the 5239 and changed the
-// breakdown voltage to 5.1 according to the datasheet
-#define D_1N5231(name) ZDIODE(name, "D(BV=5.1 IBV=0.020 NBV=1)")
+#define D_1N5231(name) ZDIODE(name, "1N5231")
 #define D_1N914(name) DIODE(name, "1N914")
 
-// SPICE model taken from https://www.onsemi.com/support/design-resources/models?rpn=2N4403
-#define Q_2N4403(name) QBJT_EB(name, "PNP(Is=650.6E-18 Xti=3 Eg=1.11 Vaf=115.7 Bf=216.2 Ne=1.829 Ise=58.72f Ikf=1.079 Xtb=1.5 Br=3.578 Nc=2 Isc=0 Ikr=0 Rc=.715 Cjc=14.76p Mjc=.5383 Vjc=.75 Fc=.5 Cje=19.82p Mje=.3357 Vje=.75 Tr=111.6n Tf=603.7p Itf=.65 Vtf=5 Xtf=1.7 Rb=10)")
+#define Q_2N4403(name) QBJT_EB(name, "2N4403")
 
 // JFET transistors not supported, but this should do the trick
 #define Q_2N4093(name) MOSFET(name, "NMOS(VTO=-1 CAPMOD=0)")
@@ -61,7 +59,28 @@
 #define TTL_74LS00_DIP TTL_7400_DIP
 #define TTL_74LS04_DIP TTL_7404_DIP
 
+// Define some random factors (5%)
 
+#define FRND1   1.023
+#define FRND2   1.017
+#define FRND3   1.005
+#define FRND4   1.014
+#define FRND5   1.049
+#define FRND6   1.044
+#define FRND7   1.016
+#define FRND8   1.037
+#define FRND9   1.030
+#define FRND10  1.001
+#define FRND11  1.034
+#define FRND12  1.043
+#define FRND13  1.011
+#define FRND14  1.016
+#define FRND15  1.011
+#define FRND16  1.006
+#define FRND17  1.009
+#define FRND18  1.007
+#define FRND19  1.035
+#define FRND20  1.004
 
 //
 // Main netlist
@@ -74,9 +93,11 @@ NETLIST_START(astrob)
 	PARAM(Solver.DYNAMIC_TS, 1)
 	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 4e-5)
 #if (SIMPLIFY_SONAR)
-	PARAM(Solver.Solver_54.DYNAMIC_MIN_TIMESTEP, 7e-6)  // gets rid of NR loops failure
+	PARAM(Solver.Solver_54.DYNAMIC_MIN_TIMESTEP, 4e-6)  // gets rid of NR loops failure
 #else
-	PARAM(Solver.Solver_40.DYNAMIC_MIN_TIMESTEP, 7e-6)  // gets rid of NR loops failure
+#if !(ENABLE_SONAR_ALT)
+	PARAM(Solver.Solver_41.DYNAMIC_MIN_TIMESTEP, 6e-6)  // gets rid of NR loops failure
+#endif
 #endif
 #else
 	SOLVER(Solver, 48000)
@@ -148,15 +169,15 @@ NETLIST_START(astrob)
 	ANALOG_INPUT(I_V12, 12)
 	ANALOG_INPUT(I_VM12, -12)
 
-	RES(R1, RES_K(100))
-	RES(R2, RES_K(1.5))
-	RES(R3, RES_K(330))
-	RES(R4, RES_K(10))
+	RES(R1, RES_K(100) * FRND1)  // part of SONAR circuit that relies on subtle part differences
+	RES(R2, RES_K(1.5) * FRND2)  // part of SONAR circuit that relies on subtle part differences
+	RES(R3, RES_K(330) * FRND3)  // part of SONAR circuit that relies on subtle part differences
+	RES(R4, RES_K(10)  * FRND4)  // part of SONAR circuit that relies on subtle part differences
 #if (SIMPLIFY_SONAR)
 	// use less resistance to account for only emulating 1/4 identical circuits
-	RES(R5, RES_K(17))
+	RES(R5, RES_K(17))  // part of SONAR circuit that relies on subtle part differences
 #else
-	RES(R5, RES_K(68))
+	RES(R5, RES_K(68)  * FRND5)  // part of SONAR circuit that relies on subtle part differences
 #endif
 	RES(R6, RES_K(68))
 	RES(R7, RES_K(22))
@@ -188,11 +209,11 @@ NETLIST_START(astrob)
 	RES(R33, RES_K(39))
 	RES(R34, RES_K(4.7))
 	RES(R35, RES_K(4.7))
-	RES(R36, RES_K(100.1))  // part of SONAR circuit that relies on subtle part differences
-	RES(R37, RES_K(1.51))   // part of SONAR circuit that relies on subtle part differences
-	RES(R38, RES_K(330.1))  // part of SONAR circuit that relies on subtle part differences
-	RES(R39, RES_K(10.1))   // part of SONAR circuit that relies on subtle part differences
-	RES(R40, RES_K(68.1))   // part of SONAR circuit that relies on subtle part differences
+	RES(R36, RES_K(100) * FRND6)   // part of SONAR circuit that relies on subtle part differences
+	RES(R37, RES_K(1.5) * FRND7)   // part of SONAR circuit that relies on subtle part differences
+	RES(R38, RES_K(330) * FRND8)   // part of SONAR circuit that relies on subtle part differences
+	RES(R39, RES_K(10)  * FRND9)   // part of SONAR circuit that relies on subtle part differences
+	RES(R40, RES_K(68)  * FRND10)  // part of SONAR circuit that relies on subtle part differences
 	RES(R41, RES_K(10))
 	RES(R42, RES_K(100))
 	RES(R43, RES_K(470))
@@ -214,11 +235,11 @@ NETLIST_START(astrob)
 	RES(R59, RES_K(100))
 	RES(R60, RES_K(10))
 	RES(R61, RES_K(100))
-	RES(R62, RES_K(99.9))   // part of SONAR circuit that relies on subtle part differences
-	RES(R63, RES_K(1.49))   // part of SONAR circuit that relies on subtle part differences
-	RES(R64, RES_K(329.9))  // part of SONAR circuit that relies on subtle part differences
-	RES(R65, RES_K(9.9))    // part of SONAR circuit that relies on subtle part differences
-	RES(R66, RES_K(67.9))   // part of SONAR circuit that relies on subtle part differences
+	RES(R62, RES_K(100) * FRND11)   // part of SONAR circuit that relies on subtle part differences
+	RES(R63, RES_K(1.5) * FRND12)   // part of SONAR circuit that relies on subtle part differences
+	RES(R64, RES_K(330) * FRND13)   // part of SONAR circuit that relies on subtle part differences
+	RES(R65, RES_K(10)  * FRND14)   // part of SONAR circuit that relies on subtle part differences
+	RES(R66, RES_K(68)  * FRND15)   // part of SONAR circuit that relies on subtle part differences
 	RES(R67, RES_K(10))
 	RES(R68, RES_K(82))
 	RES(R69, RES_K(470))
@@ -243,11 +264,11 @@ NETLIST_START(astrob)
 	RES(R88, RES_K(100))
 	RES(R89, RES_K(10))
 	RES(R90, RES_K(100))
-	RES(R91, RES_K(100.2))  // part of SONAR circuit that relies on subtle part differences
-	RES(R92, RES_K(1.52))   // part of SONAR circuit that relies on subtle part differences
-	RES(R93, RES_K(330.2))  // part of SONAR circuit that relies on subtle part differences
-	RES(R94, RES_K(10.2))   // part of SONAR circuit that relies on subtle part differences
-	RES(R95, RES_K(68.2))   // part of SONAR circuit that relies on subtle part differences
+	RES(R91, RES_K(100) * FRND16)  // part of SONAR circuit that relies on subtle part differences
+	RES(R92, RES_K(1.5) * FRND17)   // part of SONAR circuit that relies on subtle part differences
+	RES(R93, RES_K(330) * FRND18)  // part of SONAR circuit that relies on subtle part differences
+	RES(R94, RES_K(10)  * FRND19)   // part of SONAR circuit that relies on subtle part differences
+	RES(R95, RES_K(68)  * FRND20)   // part of SONAR circuit that relies on subtle part differences
 	RES(R96, RES_K(10))
 	RES(R97, RES_K(4.7))
 	RES(R98, RES_M(1))
@@ -458,7 +479,7 @@ NETLIST_START(astrob)
 	Q_2N4403(Q1)
 	Q_2N4403(Q2)
 	Q_2N4403(Q3)
-	Q_2N4093(Q4)
+	//Q_2N4093(Q4)  // avoid singular matrix being created
 	Q_2N4093(Q5)
 	Q_2N4093(Q6)
 	Q_2N4403(Q7)
@@ -473,6 +494,18 @@ NETLIST_START(astrob)
 	TL084_DIP(U2)           // Op. Amp.
 	NET_C(U2.4, I_V12)
 	NET_C(U2.11, I_VM12)
+
+#if (ENABLE_SONAR_ALT)
+	// Oscillators are of order 1kHz. No need to to have UGF in MHz range
+	PARAM(U1.A.MODEL, "TL084(TYPE=3 UGF=10k)")
+	PARAM(U1.B.MODEL, "TL084(TYPE=3 UGF=10k)")
+	PARAM(U1.C.MODEL, "TL084(TYPE=3 UGF=10k)")
+	PARAM(U1.D.MODEL, "TL084(TYPE=3 UGF=10k)")
+	PARAM(U2.A.MODEL, "TL084(TYPE=3 UGF=10k)")
+	PARAM(U2.B.MODEL, "TL084(TYPE=3 UGF=10k)")
+	PARAM(U2.C.MODEL, "TL084(TYPE=3 UGF=10k)")
+	PARAM(U2.D.MODEL, "TL084(TYPE=3 UGF=10k)")
+#endif
 
 	CD4017_DIP(U3)          // Decade Counter/Divider
 	NET_C(U3.8, GND)
@@ -643,7 +676,7 @@ NETLIST_START(astrob)
 
 	NET_C(U2.3, GND)
 	NET_C(U2.2, D6.A, R65.1)
-	NET_C(U2.14, D6.K, R62.1)
+	NET_C(U2.1, D6.K, R62.1)
 	NET_C(R62.2, R63.2, C24.1, C25.1)
 	NET_C(R63.1, GND)
 	NET_C(R65.2, R64.2, U2.7, C25.2, R66.2)
@@ -660,6 +693,29 @@ NETLIST_START(astrob)
 	NET_C(U2.10, GND)
 
 	NET_C(R5.1, R40.1, R114.1, Q3.B, R95.1, R66.1)
+
+#if (ENABLE_SONAR_ALT)
+	// The oscillators need a small offset voltage to start oscillating.
+	// Without frontiers I assume the offset voltage is created due to the
+	// slight differences in resistor values in the four (now connected)
+	// oscillators.
+
+	ANALOG_INPUT(I_VOFF, 0.1)
+	RES(RDUM1, RES_M(1))
+	RES(RDUM2, RES_M(1))
+	RES(RDUM3, RES_M(1))
+	RES(RDUM4, RES_M(1))
+	NET_C(R5.2, RDUM1.1)
+	NET_C(R40.2, RDUM2.1)
+	NET_C(R95.2, RDUM3.1)
+	NET_C(R66.2, RDUM4.1)
+	NET_C(I_VOFF, RDUM1.2, RDUM2.2, RDUM3.2, RDUM4.2)
+
+	OPTIMIZE_FRONTIER(R5.2, RES_K(68), 192)
+	OPTIMIZE_FRONTIER(R40.2, RES_K(68), 192)
+	OPTIMIZE_FRONTIER(R95.2, RES_K(68), 192)
+	OPTIMIZE_FRONTIER(R66.2, RES_K(68), 192)
+#endif
 #endif
 
 	NET_C(R114.2, GND)

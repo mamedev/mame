@@ -30,7 +30,7 @@ Addons (w/ yellow Smartridges)
 +========+===================+============================================================================+
 | Dumped |      Serial       |                                    Name                                    |
 +========+===================+============================================================================+
-|        | 80-091440(US)     | V.Smile Smart Keyboard                                                     |
+|   XX   | 80-091440(US)     | V.Smile Smart Keyboard                                                     |
 |        | 80-091443(UK)     | V.Smile Smart Keyboard                                                     |
 |   XX   | 80-091444(GE)     | Schreibspaß (52-091444 on back label)                                      |
 |   XX   | 80-091445(FR)     | V.Smile Clavier Tip Tap                                                    |
@@ -4473,7 +4473,23 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 	</software>
 
 	<!-- No inputs, uses a keyboard controller -->
-	<software name="smartkbg" supported="no"> <!-- Will be clone of "smartkb" once found and dumped. -->
+	<software name="smartkb" supported="no">
+		<description>V.Smile Smart Keyboard (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-091444(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="yellow" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="[52-091440(US)] VSmile Smart Keyboard (USA).bin" size="0x800000" crc="4e8ca1bb" sha1="ef8aa08a01bdbbbf01c481efd3a0def6326aa6ac" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- No inputs, uses a keyboard controller -->
+	<software name="smartkbg" cloneof="smartkb" supported="no">
 		<description>V.Smile Schreibspaß (Germany)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -4491,7 +4507,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 	</software>
 
 	<!-- No inputs, uses a keyboard controller -->
-	<software name="smartkbf" supported="no"> <!-- Will be clone of "smartkb" once found and dumped. -->
+	<software name="smartkbf" cloneof="smartkb" supported="no">
 		<description>V.Smile Clavier Tip Tap (France)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>

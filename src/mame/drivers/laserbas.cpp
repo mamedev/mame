@@ -150,8 +150,8 @@ MC6845_UPDATE_ROW( laserbas_state::crtc_update_row )
 	}
 
 	int pixaddr = y << 8;
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint32_t *b = &bitmap.pix32(y);
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint32_t *const b = &bitmap.pix(y);
 
 	while (x != x_max)
 	{

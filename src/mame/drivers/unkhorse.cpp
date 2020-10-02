@@ -86,7 +86,7 @@ uint32_t horse_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 			uint8_t color = m_colorram[(y << 1 & 0x1e0) | x] >> 4;
 
 			for (int i = 0; i < 8; i++)
-				bitmap.pix16(y, x << 3 | i) = (data >> i & 1) ? color : 0;
+				bitmap.pix(y, x << 3 | i) = (data >> i & 1) ? color : 0;
 		}
 	}
 

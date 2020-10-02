@@ -261,12 +261,12 @@ namespace plib {
 		return nullptr;
 	}
 
-	option *getopt_short(const pstring &arg) const;
-	option *getopt_long(const pstring &arg) const;
+		option *getopt_short(const pstring &arg) const;
+		option *getopt_long(const pstring &arg) const;
 
-	std::vector<option_base *> m_opts;
-	pstring m_app;
-	option_args * m_other_args;
+		std::vector<option_base *> m_opts;
+		pstring m_app;
+		option_args * m_other_args;
 };
 
 } // namespace plib

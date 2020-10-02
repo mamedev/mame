@@ -303,6 +303,7 @@
 
 #pragma once
 
+#include "memarray.h"
 #include <type_traits>
 #include <utility>
 #include <vector>

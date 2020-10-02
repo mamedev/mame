@@ -6,9 +6,9 @@ Atari 2600 SuperCharger support
 
 */
 
-#include <cassert>
-
 #include "formats/a26_cas.h"
+
+#include <cassert>
 
 
 #define A26_CAS_SIZE            8448
@@ -132,7 +132,7 @@ static int a26_cas_to_wav_size( const uint8_t *casdata, int caslen ) {
 	return a26_cas_do_work( nullptr, casdata );
 }
 
-static const struct CassetteLegacyWaveFiller a26_legacy_fill_wave = {
+static const cassette_image::LegacyWaveFiller a26_legacy_fill_wave = {
 	a26_cas_fill_wave,
 	-1,
 	0,
@@ -142,21 +142,21 @@ static const struct CassetteLegacyWaveFiller a26_legacy_fill_wave = {
 	0
 };
 
-static cassette_image::error a26_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) {
+static cassette_image::error a26_cassette_identify( cassette_image *cassette, cassette_image::Options *opts ) {
 	uint64_t size;
 
-	size = cassette_image_size( cassette );
+	size = cassette->image_size( );
 	if ( size == A26_CAS_SIZE ) {
-		return cassette_legacy_identify( cassette, opts, &a26_legacy_fill_wave );
+		return cassette->legacy_identify( opts, &a26_legacy_fill_wave );
 	}
 	return cassette_image::error::INVALID_IMAGE;
 }
 
 static cassette_image::error a26_cassette_load( cassette_image *cassette ) {
-	return cassette_legacy_construct( cassette, &a26_legacy_fill_wave );
+	return cassette->legacy_construct( &a26_legacy_fill_wave );
 }
 
-static const struct CassetteFormat a26_cassette_format = {
+static const cassette_image::Format a26_cassette_format = {
 	"a26",
 	a26_cassette_identify,
 	a26_cassette_load,

@@ -137,15 +137,13 @@ TILE_GET_INFO_MEMBER(paradise_state::get_tile_info_2)
 
 void paradise_state::pixmap_w(offs_t offset, uint8_t data)
 {
-	int x, y;
-
 	m_videoram[offset] = data;
 
-	x = (offset & 0x7f) << 1;
-	y = (offset >> 7);
+	int x = (offset & 0x7f) << 1;
+	int y = (offset >> 7);
 
-	m_tmpbitmap.pix16(y, x + 0) = 0x80f - (data >> 4);
-	m_tmpbitmap.pix16(y, x + 1) = 0x80f - (data & 0x0f);
+	m_tmpbitmap.pix(y, x + 0) = 0x80f - (data >> 4);
+	m_tmpbitmap.pix(y, x + 1) = 0x80f - (data & 0x0f);
 }
 
 

@@ -1926,6 +1926,8 @@ public:
 
 protected:
 	virtual void machine_start() override;
+
+	std::vector<double> m_speaker_levels;
 };
 
 void cdkong_state::machine_start()
@@ -2027,10 +2029,10 @@ void cdkong_state::cdkong(machine_config &config)
 	TIMER(config, "speaker_decay").configure_periodic(FUNC(cdkong_state::speaker_decay_sim), attotime::from_msec(1));
 
 	// set volume levels (set_output_gain is too slow for sub-frame intervals)
-	static s16 speaker_levels[0x8000];
+	m_speaker_levels.resize(0x8000);
 	for (int i = 0; i < 0x8000; i++)
-		speaker_levels[i] = i;
-	m_speaker->set_levels(0x8000, speaker_levels);
+		m_speaker_levels[i] = double(i) / 32768.0;
+	m_speaker->set_levels(0x8000, &m_speaker_levels[0]);
 }
 
 // roms
@@ -3668,7 +3670,7 @@ void mwcbaseb_state::mwcbaseb(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
-	static const s16 speaker_levels[] = { 0, 0x3fff, -0x4000, 0, -0x4000, 0, -0x8000, -0x4000 };
+	static const double speaker_levels[] = { 0.0, 0.5, -0.5, 0.0, -0.5, 0.0, -1.0, -0.5 };
 	m_speaker->set_levels(8, speaker_levels);
 }
 

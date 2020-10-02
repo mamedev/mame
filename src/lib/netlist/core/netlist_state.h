@@ -36,7 +36,8 @@ namespace netlist
 
 		// need to preserve order of device creation ...
 		using devices_collection_type = std::vector<std::pair<pstring, device_arena::owned_ptr<core_device_t>>>;
-		netlist_state_t(const pstring &name, host_arena::unique_ptr<callbacks_t> &&callbacks);
+
+		netlist_state_t(const pstring &name, plib::plog_delegate logger);
 
 		PCOPYASSIGNMOVE(netlist_state_t, delete)
 
@@ -75,7 +76,7 @@ namespace netlist
 		/// \return vector with pointers to devices
 
 		template<class C>
-		inline std::vector<C *> get_device_list() const
+		std::vector<C *> get_device_list() const
 		{
 			std::vector<C *> tmp;
 			for (const auto &d : m_devices)
@@ -92,7 +93,15 @@ namespace netlist
 		log_type & log() noexcept { return m_log; }
 		const log_type &log() const noexcept { return m_log; }
 
-		plib::dynlib_base &lib() const noexcept { return *m_lib; }
+		plib::dynlib_base &static_solver_lib() const noexcept { return *m_lib; }
+
+		/// \brief provide library with static solver implementations.
+		///
+		/// By default no static solvers are provided since these are
+		/// determined by the specific use case. You can pass such a collection
+		/// of symbols with this method.
+		///
+		void set_static_solver_lib(std::unique_ptr<plib::dynlib_base> &&lib);
 
 		netlist_t &exec() noexcept { return *m_netlist; }
 		const netlist_t &exec() const noexcept { return *m_netlist; }
@@ -103,13 +112,13 @@ namespace netlist
 		template<typename O, typename C>
 		void save(O &owner, C &state, const pstring &module, const pstring &stname)
 		{
-			this->run_state_manager().save_item(static_cast<void *>(&owner), state, module + "." + stname);
+			this->run_state_manager().save_item(plib::void_ptr_cast(&owner), state, module + "." + stname);
 		}
 
 		template<typename O, typename C>
 		void save(O &owner, C *state, const pstring &module, const pstring &stname, const std::size_t count)
 		{
-			this->run_state_manager().save_state_ptr(static_cast<void *>(&owner), module + "." + stname, plib::state_manager_t::dtype<C>(), count, state);
+			this->run_state_manager().save_state_ptr(plib::void_ptr_cast(&owner), module + "." + stname, plib::state_manager_t::dtype<C>(), count, state);
 		}
 
 		// FIXME: only used by queue_t save state
@@ -208,24 +217,6 @@ namespace netlist
 		device_arena &pool() noexcept { return m_pool; }
 		const device_arena &pool() const noexcept { return m_pool; }
 
-		/// \brief set extended validation mode.
-		///
-		/// The extended validation mode is not intended for running.
-		/// The intention is to identify power pins which are not properly
-		/// connected. The downside is that this mode creates a netlist which
-		/// is different (and not able to run).
-		///
-		/// Extended validation is supported by nltool validate option.
-		///
-		/// \param val Boolean value enabling/disabling extended validation mode
-		void set_extended_validation(bool val) { m_extended_validation = val; }
-
-		/// \brief State of extended validation mode.
-		///
-		/// \returns boolean value indicating if extended validation mode is
-		/// turned on.
-		bool is_extended_validation() const { return m_extended_validation; }
-
 		struct stats_info
 		{
 			const detail::queue_t               &m_queue;// performance
@@ -252,10 +243,9 @@ namespace netlist
 		device_arena::unique_ptr<netlist_t>        m_netlist;
 		std::unique_ptr<plib::dynlib_base>         m_lib;
 		plib::state_manager_t                      m_state;
-		host_arena::unique_ptr<callbacks_t>        m_callbacks;
 		log_type                                   m_log;
 
-		// FIXME: should only be available during device construcion
+		// FIXME: should only be available during device construction
 		host_arena::unique_ptr<setup_t>            m_setup;
 
 		nets_collection_type                       m_nets;
@@ -263,8 +253,6 @@ namespace netlist
 		devices_collection_type                    m_devices;
 		// sole use is to manage lifetime of family objects
 		family_collection_type                     m_family_cache;
-		bool                                       m_extended_validation;
-
 		// dummy version
 		int                                        m_dummy_version;
 	};

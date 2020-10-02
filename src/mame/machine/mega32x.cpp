@@ -935,13 +935,10 @@ void sega_32x_device::m68k_pwm_w(offs_t offset, uint16_t data)
 		pwm_w(offset,data);
 }
 
-void sega_32x_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void sega_32x_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	for (int s = 0; s < samples; s++)
-	{
-		outputs[0][s] = inputs[0][s];
-		outputs[1][s] = inputs[1][s];
-	}
+	outputs[0] = inputs[0];
+	outputs[1] = inputs[1];
 }
 
 /**********************************************************************************************/

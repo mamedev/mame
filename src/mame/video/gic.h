@@ -74,7 +74,7 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	/* timers */
 	static const device_timer_id TIMER_VBLANK = 0;

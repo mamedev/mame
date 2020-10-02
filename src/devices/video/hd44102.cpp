@@ -268,7 +268,7 @@ uint32_t hd44102_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			{
 				int color = (m_status & STATUS_DISPLAY_OFF) ? 0 : BIT(data, z % 8);
 
-				bitmap.pix16(sy, sx) = color;
+				bitmap.pix(sy, sx) = color;
 			}
 
 			z++;

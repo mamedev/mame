@@ -635,18 +635,17 @@ void tvc64p_state::machine_reset()
 
 MC6845_UPDATE_ROW( tvc_state::crtc_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint32_t  *p = &bitmap.pix32(y);
-	uint8_t *vram = &m_vram_base[(m_vram_bank & 0x30)<<10];
-	uint16_t offset = ((ma*4 + ra*0x40) & 0x3fff);
-	int i;
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint32_t *p = &bitmap.pix(y);
+	uint8_t const *const vram = &m_vram_base[(m_vram_bank & 0x30)<<10];
+	uint16_t const offset = ((ma*4 + ra*0x40) & 0x3fff);
 
 	switch(m_video_mode) {
 		case 0 :
 				//  2 colors mode
-				for ( i = 0; i < x_count; i++ )
+				for ( int i = 0; i < x_count; i++ )
 				{
-					uint8_t data = vram[offset + i];
+					uint8_t const data = vram[offset + i];
 					*p++ = palette[m_col[BIT(data,7)]];
 					*p++ = palette[m_col[BIT(data,6)]];
 					*p++ = palette[m_col[BIT(data,5)]];
@@ -660,9 +659,9 @@ MC6845_UPDATE_ROW( tvc_state::crtc_update_row )
 		case 1 :
 				// 4 colors mode
 				// a0 b0 c0 d0 a1 b1 c1 d1
-				for ( i = 0; i < x_count; i++ )
+				for ( int i = 0; i < x_count; i++ )
 				{
-					uint8_t data = vram[offset + i];
+					uint8_t const data = vram[offset + i];
 					*p++ = palette[m_col[BIT(data,3)*2 + BIT(data,7)]];
 					*p++ = palette[m_col[BIT(data,3)*2 + BIT(data,7)]];
 					*p++ = palette[m_col[BIT(data,2)*2 + BIT(data,6)]];
@@ -676,11 +675,11 @@ MC6845_UPDATE_ROW( tvc_state::crtc_update_row )
 		default:
 				// 16 colors mode
 				// IIGG RRBB
-				for ( i = 0; i < x_count; i++ )
+				for ( int i = 0; i < x_count; i++ )
 				{
-					uint8_t data = vram[offset + i];
-					uint8_t col0 = ((data & 0x80)>>4) | ((data & 0x20)>>3) | ((data & 0x08)>>2) | ((data & 0x02)>>1);
-					uint8_t col1 = ((data & 0x40)>>3) | ((data & 0x10)>>2) | ((data & 0x04)>>1) | (data & 0x01);
+					uint8_t const data = vram[offset + i];
+					uint8_t const col0 = ((data & 0x80)>>4) | ((data & 0x20)>>3) | ((data & 0x08)>>2) | ((data & 0x02)>>1);
+					uint8_t const col1 = ((data & 0x40)>>3) | ((data & 0x10)>>2) | ((data & 0x04)>>1) | (data & 0x01);
 					*p++ = palette[col0];
 					*p++ = palette[col0];
 					*p++ = palette[col0];

@@ -45,6 +45,8 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	void arm_map(address_map &map);
+
 	required_device<cpu_device> m_maincpu;
 
 	required_device<screen_device> m_screen;
@@ -52,9 +54,48 @@ private:
 	uint32_t screen_update_gpl32612(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void nand_init(int blocksize, int blocksize_stripped);
+	void copy_block(int i, int blocksize, int blocksize_stripped, uint8_t* nandrom, int dest);
+	void bootstrap();
 
 	std::vector<uint8_t> m_strippedrom;
+
+	uint32_t unk_d000003c_r(offs_t offset, uint32_t mem_mask);
+	uint32_t unk_d0800018_r(offs_t offset, uint32_t mem_mask);
+	uint32_t unk_d0900140_r(offs_t offset, uint32_t mem_mask);
+	uint32_t unk_d0900153_r(offs_t offset, uint32_t mem_mask);
 };
+
+uint32_t generalplus_gpl32612_game_state::unk_d000003c_r(offs_t offset, uint32_t mem_mask)
+{
+	return machine().rand();
+}
+
+uint32_t generalplus_gpl32612_game_state::unk_d0800018_r(offs_t offset, uint32_t mem_mask)
+{
+	return machine().rand();
+}
+
+uint32_t generalplus_gpl32612_game_state::unk_d0900140_r(offs_t offset, uint32_t mem_mask)
+{
+	return machine().rand();
+}
+
+uint32_t generalplus_gpl32612_game_state::unk_d0900153_r(offs_t offset, uint32_t mem_mask)
+{
+	return machine().rand();
+}
+
+void generalplus_gpl32612_game_state::arm_map(address_map &map)
+{
+	map(0x00000000, 0x03ffffff).ram();
+
+	map(0xd000003c, 0xd000003f).r(FUNC(generalplus_gpl32612_game_state::unk_d000003c_r));
+
+	map(0xd0800018, 0xd080001b).r(FUNC(generalplus_gpl32612_game_state::unk_d0800018_r));
+
+	map(0xd0900140, 0xd0900143).r(FUNC(generalplus_gpl32612_game_state::unk_d0900140_r));
+	map(0xd0900150, 0xd0900153).r(FUNC(generalplus_gpl32612_game_state::unk_d0900153_r));
+}
 
 uint32_t generalplus_gpl32612_game_state::screen_update_gpl32612(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -72,10 +113,39 @@ void generalplus_gpl32612_game_state::machine_reset()
 static INPUT_PORTS_START( gpl32612 )
 INPUT_PORTS_END
 
+void generalplus_gpl32612_game_state::copy_block(int i, int blocksize, int blocksize_stripped, uint8_t* nandrom, int dest)
+{
+	const int base = i * blocksize;
+	address_space& mem = m_maincpu->space(AS_PROGRAM);
+
+	for (int j = 0; j < blocksize_stripped; j++)
+	{
+		uint8_t data = nandrom[base + j];
+		//printf("writing to %08x : %02x", dest + j, data);
+		mem.write_byte(dest+j, data);
+	}
+}
+
+void generalplus_gpl32612_game_state::bootstrap()
+{
+	uint8_t* rom = memregion("nand")->base();
+
+	//int startblock = 0xe0000 / 0x800;
+	int startblock = 0xa0000 / 0x800;
+	int endblock = 0x1f0000 / 0x800;
+
+	int j = 0;
+	for (int i = startblock; i < endblock; i++) // how much is copied, and where from? as with the unSP NAND ones there appear to be several stages of bootloader, this is not the 1st one
+	{
+		copy_block(i, 0x840, 0x800, rom, j * 0x800);
+		j++;
+	}
+}
 
 void generalplus_gpl32612_game_state::gpl32612(machine_config &config)
 {
 	ARM9(config, m_maincpu, 240000000); // unknown core / frequency, but ARM based
+	m_maincpu->set_addrmap(AS_PROGRAM, &generalplus_gpl32612_game_state::arm_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -90,35 +160,35 @@ void generalplus_gpl32612_game_state::gpl32612(machine_config &config)
 // NAND dumps, so there will be a bootloader / boot strap at least
 
 ROM_START( jak_swbstrik )
-	ROM_REGION( 0x8400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x8400000, "nand", ROMREGION_ERASEFF )
 	ROM_LOAD( "starwarsblaster.bin", 0x000000, 0x8400000, CRC(02c3c4d6) SHA1(a6ae05a7d7b2015023113f6baad25458f3c01102) )
 ROM_END
 
 ROM_START( jak_tmnthp )
-	ROM_REGION( 0x8400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x8400000, "nand", ROMREGION_ERASEFF )
 	ROM_LOAD( "tmntheroportal.bin", 0x000000, 0x8400000, CRC(75ec7127) SHA1(cd05f55a1f5a7fd3d1b0658ad6805b8777857a7e) )
 ROM_END
 
 ROM_START( jak_ddhp )
-	ROM_REGION( 0x8400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x8400000, "nand", ROMREGION_ERASEFF )
 	ROM_LOAD( "dragonsheroesportal_mx30lf1g08aa_c2f1.bin", 0x000000, 0x8400000, CRC(825cce7b) SHA1(2185137138f2a20e5cfe9c167eeb67a146953b65) )
 ROM_END
 
 ROM_START( jak_dchp )
-	ROM_REGION( 0x8400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x8400000, "nand", ROMREGION_ERASEFF )
 	ROM_LOAD( "dcheroportal_mx30lf1g08aa_c2f1.bin", 0x000000, 0x8400000, CRC(576a3005) SHA1(6cd9edc4def707aede3f82a21c87269d2a6bc870) )
 ROM_END
 
 ROM_START( jak_prhp )
-	ROM_REGION( 0x8400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x8400000, "nand", ROMREGION_ERASEFF )
 	ROM_LOAD( "mx30lf1g08aa.u2", 0x000000, 0x8400000, CRC(4ccd7e53) SHA1(decbd424f088d180776a817c80b147d6a887e5c1) )
 ROM_END
 
 
 void generalplus_gpl32612_game_state::nand_init(int blocksize, int blocksize_stripped)
 {
-	uint8_t* rom = memregion("maincpu")->base();
-	int size = memregion("maincpu")->bytes();
+	uint8_t* rom = memregion("nand")->base();
+	int size = memregion("nand")->bytes();
 
 	int numblocks = size / blocksize;
 
@@ -153,6 +223,7 @@ void generalplus_gpl32612_game_state::nand_init(int blocksize, int blocksize_str
 void generalplus_gpl32612_game_state::nand_init840()
 {
 	nand_init(0x840, 0x800);
+	bootstrap();
 }
 
 

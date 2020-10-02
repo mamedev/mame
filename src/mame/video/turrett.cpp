@@ -44,7 +44,7 @@ uint32_t turrett_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
 		const uint16_t *src = &vram[y * X_VISIBLE + cliprect.min_x];
-		uint16_t *dest = &bitmap.pix16(y, cliprect.min_x);
+		uint16_t *dest = &bitmap.pix(y, cliprect.min_x);
 
 		if (m_video_fade != 0)
 		{

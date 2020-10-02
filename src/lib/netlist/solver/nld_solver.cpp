@@ -4,6 +4,7 @@
 
 #include "nl_factory.h"
 #include "core/setup.h"
+#include "nl_errstr.h"
 #include "nl_setup.h" // FIXME: only needed for splitter code
 #include "nld_matrix_solver.h"
 #include "nld_ms_direct.h"
@@ -55,14 +56,14 @@ namespace devices
 		const netlist_time_ext now(exec().time());
 		const std::size_t nthreads = m_params.m_parallel() < 2 ? 1 : std::min(static_cast<std::size_t>(m_params.m_parallel()), plib::omp::get_max_threads());
 		const netlist_time_ext sched(now + (nthreads <= 1 ? netlist_time_ext::zero() : netlist_time_ext::from_nsec(100)));
-		plib::uninitialised_array<solver::matrix_solver_t *, config::MAX_SOLVER_QUEUE_SIZE::value> tmp;
-		plib::uninitialised_array<netlist_time, config::MAX_SOLVER_QUEUE_SIZE::value> nt;
+		plib::uninitialised_array<solver::matrix_solver_t *, config::MAX_SOLVER_QUEUE_SIZE::value> tmp; //NOLINT
+		plib::uninitialised_array<netlist_time, config::MAX_SOLVER_QUEUE_SIZE::value> nt; //NOLINT
 		std::size_t p=0;
 
-		while (m_queue.size() > 0)
+		while (!m_queue.empty())
 		{
-			auto t = m_queue.top().exec_time();
-			auto o = m_queue.top().object();
+			const auto t = m_queue.top().exec_time();
+			auto *o = m_queue.top().object();
 			if (t != now)
 				if (t > sched)
 					break;
@@ -72,7 +73,7 @@ namespace devices
 
 		// FIXME: Disabled for now since parallel processing will decrease performance
 		//        for tested applications. More testing required here
-		if (1 || nthreads < 2)
+		if (true || nthreads < 2)
 		{
 			if (!KEEP_STATS)
 			{
@@ -112,8 +113,8 @@ namespace devices
 				tmp[i]->update_inputs();
 			}
 		}
-		if (m_queue.size() > 0)
-			m_Q_step.net().toggle_and_push_to_queue(m_queue.top().exec_time() - now);
+		if (!m_queue.empty())
+			m_Q_step.net().toggle_and_push_to_queue(static_cast<netlist_time>(m_queue.top().exec_time() - now));
 	}
 
 	void NETLIB_NAME(solver) :: reschedule(solver::matrix_solver_t *solv, netlist_time ts)
@@ -227,6 +228,7 @@ namespace devices
 		std::size_t net_count = nets.size();
 		switch (net_count)
 		{
+#if !defined(__EMSCRIPTEN__)
 			case 1:
 				return plib::make_unique<solver::matrix_solver_direct1_t<FT>, device_arena>(*this, sname, nets, params);
 			case 2:
@@ -243,6 +245,7 @@ namespace devices
 				return create_solver<FT, 7>(7, sname, params, nets);
 			case 8:
 				return create_solver<FT, 8>(8, sname, params, nets);
+#endif
 			default:
 				log().info(MI_NO_SPECIFIC_SOLVER(net_count));
 				if (net_count <= 16)
@@ -358,10 +361,14 @@ namespace devices
 					{
 						auto &pt = dynamic_cast<terminal_t &>(*term);
 						// check the connected terminal
-						analog_net_t &connected_net = netlist.setup().get_connected_terminal(pt)->net();
-						netlist.log().verbose("  Connected net {}", connected_net.name());
-						if (!check_if_processed_and_join(connected_net))
-							process_net(netlist, connected_net);
+						auto connected_terminals = netlist.setup().get_connected_terminals(pt);
+						for (auto ct = connected_terminals->begin(); *ct != nullptr; ct++)
+						{
+							analog_net_t &connected_net = (*ct)->net();
+							netlist.log().verbose("  Connected net {}", connected_net.name());
+							if (!check_if_processed_and_join(connected_net))
+								process_net(netlist, connected_net);
+						}
 					}
 				}
 			}
@@ -378,9 +385,55 @@ namespace devices
 		net_splitter splitter;
 
 		splitter.run(state());
+		log().verbose("Found {1} net groups in {2} nets\n", splitter.groups.size(), state().nets().size());
+
+		int num_errors = 0;
+
+		log().verbose("checking net consistency  ...");
+		for (const auto &grp : splitter.groups)
+		{
+			int railterms = 0;
+			pstring nets_in_grp;
+			for (const auto &n : grp)
+			{
+				nets_in_grp += (n->name() + " ");
+				if (!n->is_analog())
+				{
+					state().log().error(ME_SOLVER_CONSISTENCY_NOT_ANALOG_NET(n->name()));
+					num_errors++;
+				}
+				if (n->is_rail_net())
+				{
+					state().log().error(ME_SOLVER_CONSISTENCY_RAIL_NET(n->name()));
+					num_errors++;
+				}
+				for (const auto &t : n->core_terms())
+				{
+					if (!t->has_net())
+					{
+						state().log().error(ME_SOLVER_TERMINAL_NO_NET(t->name()));
+						num_errors++;
+					}
+					else
+					{
+						auto *otherterm = dynamic_cast<terminal_t *>(t);
+						if (otherterm != nullptr)
+							if (state().setup().get_connected_terminal(*otherterm)->net().is_rail_net())
+								railterms++;
+					}
+				}
+			}
+			if (railterms == 0)
+			{
+				state().log().error(ME_SOLVER_NO_RAIL_TERMINAL(nets_in_grp));
+				num_errors++;
+			}
+		}
+		if (num_errors > 0)
+			throw nl_exception(MF_SOLVER_CONSISTENCY_ERRORS(num_errors));
+
 
 		// setup the solvers
-		log().verbose("Found {1} net groups in {2} nets\n", splitter.groups.size(), state().nets().size());
 		for (auto & grp : splitter.groups)
 		{
 			solver_ptr ms;

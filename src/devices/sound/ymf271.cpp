@@ -566,7 +566,7 @@ void ymf271_device::set_feedback(int slotnum, int64_t inp)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void ymf271_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	int i, j;
 	int op;
@@ -599,7 +599,7 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 				if (m_slots[slot1].active)
 				{
-					for (i = 0; i < samples; i++)
+					for (i = 0; i < outputs[0].samples(); i++)
 					{
 						int64_t output1 = 0, output2 = 0, output3 = 0, output4 = 0;
 						int64_t phase_mod1, phase_mod2, phase_mod3;
@@ -833,7 +833,7 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 					mixp = &m_mix_buffer[0];
 					if (m_slots[slot1].active)
 					{
-						for (i = 0; i < samples; i++)
+						for (i = 0; i < outputs[0].samples(); i++)
 						{
 							int64_t output1 = 0, output3 = 0;
 							int64_t phase_mod1, phase_mod3;
@@ -900,7 +900,7 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 				if (m_slots[slot1].active)
 				{
-					for (i = 0; i < samples; i++)
+					for (i = 0; i < outputs[0].samples(); i++)
 					{
 						int64_t output1 = 0, output2 = 0, output3 = 0;
 						int64_t phase_mod1, phase_mod3;
@@ -1006,29 +1006,29 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 				}
 
 				mixp = &m_mix_buffer[0];
-				update_pcm(j + (3*12), mixp, samples);
+				update_pcm(j + (3*12), mixp, outputs[0].samples());
 				break;
 			}
 
 			// PCM
 			case 3:
 			{
-				update_pcm(j + (0*12), mixp, samples);
-				update_pcm(j + (1*12), mixp, samples);
-				update_pcm(j + (2*12), mixp, samples);
-				update_pcm(j + (3*12), mixp, samples);
+				update_pcm(j + (0*12), mixp, outputs[0].samples());
+				update_pcm(j + (1*12), mixp, outputs[0].samples());
+				update_pcm(j + (2*12), mixp, outputs[0].samples());
+				update_pcm(j + (3*12), mixp, outputs[0].samples());
 				break;
 			}
 		}
 	}
 
 	mixp = &m_mix_buffer[0];
-	for (i = 0; i < samples; i++)
+	for (i = 0; i < outputs[0].samples(); i++)
 	{
-		outputs[0][i] = (*mixp++)>>2;
-		outputs[1][i] = (*mixp++)>>2;
-		outputs[2][i] = (*mixp++)>>2;
-		outputs[3][i] = (*mixp++)>>2;
+		outputs[0].put_int(i, *mixp++, 32768 << 2);
+		outputs[1].put_int(i, *mixp++, 32768 << 2);
+		outputs[2].put_int(i, *mixp++, 32768 << 2);
+		outputs[3].put_int(i, *mixp++, 32768 << 2);
 	}
 }
 
@@ -1520,8 +1520,11 @@ u8 ymf271_device::read(offs_t offset)
 				return 0xff;
 
 			uint8_t ret = m_ext_readlatch;
-			m_ext_address = (m_ext_address + 1) & 0x7fffff;
-			m_ext_readlatch = read_byte(m_ext_address);
+			if (!machine().side_effects_disabled())
+			{
+				m_ext_address = (m_ext_address + 1) & 0x7fffff;
+				m_ext_readlatch = read_byte(m_ext_address);
+			}
 			return ret;
 		}
 
@@ -1660,64 +1663,56 @@ void ymf271_device::calculate_clock_correction()
 
 void ymf271_device::init_state()
 {
-	int i;
+	save_item(STRUCT_MEMBER(m_slots, ext_en));
+	save_item(STRUCT_MEMBER(m_slots, ext_out));
+	save_item(STRUCT_MEMBER(m_slots, lfoFreq));
+	save_item(STRUCT_MEMBER(m_slots, pms));
+	save_item(STRUCT_MEMBER(m_slots, ams));
+	save_item(STRUCT_MEMBER(m_slots, detune));
+	save_item(STRUCT_MEMBER(m_slots, multiple));
+	save_item(STRUCT_MEMBER(m_slots, tl));
+	save_item(STRUCT_MEMBER(m_slots, keyscale));
+	save_item(STRUCT_MEMBER(m_slots, ar));
+	save_item(STRUCT_MEMBER(m_slots, decay1rate));
+	save_item(STRUCT_MEMBER(m_slots, decay2rate));
+	save_item(STRUCT_MEMBER(m_slots, decay1lvl));
+	save_item(STRUCT_MEMBER(m_slots, relrate));
+	save_item(STRUCT_MEMBER(m_slots, block));
+	save_item(STRUCT_MEMBER(m_slots, fns_hi));
+	save_item(STRUCT_MEMBER(m_slots, fns));
+	save_item(STRUCT_MEMBER(m_slots, feedback));
+	save_item(STRUCT_MEMBER(m_slots, waveform));
+	save_item(STRUCT_MEMBER(m_slots, accon));
+	save_item(STRUCT_MEMBER(m_slots, algorithm));
+	save_item(STRUCT_MEMBER(m_slots, ch0_level));
+	save_item(STRUCT_MEMBER(m_slots, ch1_level));
+	save_item(STRUCT_MEMBER(m_slots, ch2_level));
+	save_item(STRUCT_MEMBER(m_slots, ch3_level));
+	save_item(STRUCT_MEMBER(m_slots, startaddr));
+	save_item(STRUCT_MEMBER(m_slots, loopaddr));
+	save_item(STRUCT_MEMBER(m_slots, endaddr));
+	save_item(STRUCT_MEMBER(m_slots, altloop));
+	save_item(STRUCT_MEMBER(m_slots, fs));
+	save_item(STRUCT_MEMBER(m_slots, srcnote));
+	save_item(STRUCT_MEMBER(m_slots, srcb));
+	save_item(STRUCT_MEMBER(m_slots, step));
+	save_item(STRUCT_MEMBER(m_slots, stepptr));
+	save_item(STRUCT_MEMBER(m_slots, active));
+	save_item(STRUCT_MEMBER(m_slots, bits));
+	save_item(STRUCT_MEMBER(m_slots, volume));
+	save_item(STRUCT_MEMBER(m_slots, env_state));
+	save_item(STRUCT_MEMBER(m_slots, env_attack_step));
+	save_item(STRUCT_MEMBER(m_slots, env_decay1_step));
+	save_item(STRUCT_MEMBER(m_slots, env_decay2_step));
+	save_item(STRUCT_MEMBER(m_slots, env_release_step));
+	save_item(STRUCT_MEMBER(m_slots, feedback_modulation0));
+	save_item(STRUCT_MEMBER(m_slots, feedback_modulation1));
+	save_item(STRUCT_MEMBER(m_slots, lfo_phase));
+	save_item(STRUCT_MEMBER(m_slots, lfo_step));
+	save_item(STRUCT_MEMBER(m_slots, lfo_amplitude));
 
-	for (i = 0; i < ARRAY_LENGTH(m_slots); i++)
-	{
-		save_item(NAME(m_slots[i].ext_en), i);
-		save_item(NAME(m_slots[i].ext_out), i);
-		save_item(NAME(m_slots[i].lfoFreq), i);
-		save_item(NAME(m_slots[i].pms), i);
-		save_item(NAME(m_slots[i].ams), i);
-		save_item(NAME(m_slots[i].detune), i);
-		save_item(NAME(m_slots[i].multiple), i);
-		save_item(NAME(m_slots[i].tl), i);
-		save_item(NAME(m_slots[i].keyscale), i);
-		save_item(NAME(m_slots[i].ar), i);
-		save_item(NAME(m_slots[i].decay1rate), i);
-		save_item(NAME(m_slots[i].decay2rate), i);
-		save_item(NAME(m_slots[i].decay1lvl), i);
-		save_item(NAME(m_slots[i].relrate), i);
-		save_item(NAME(m_slots[i].block), i);
-		save_item(NAME(m_slots[i].fns_hi), i);
-		save_item(NAME(m_slots[i].fns), i);
-		save_item(NAME(m_slots[i].feedback), i);
-		save_item(NAME(m_slots[i].waveform), i);
-		save_item(NAME(m_slots[i].accon), i);
-		save_item(NAME(m_slots[i].algorithm), i);
-		save_item(NAME(m_slots[i].ch0_level), i);
-		save_item(NAME(m_slots[i].ch1_level), i);
-		save_item(NAME(m_slots[i].ch2_level), i);
-		save_item(NAME(m_slots[i].ch3_level), i);
-		save_item(NAME(m_slots[i].startaddr), i);
-		save_item(NAME(m_slots[i].loopaddr), i);
-		save_item(NAME(m_slots[i].endaddr), i);
-		save_item(NAME(m_slots[i].altloop), i);
-		save_item(NAME(m_slots[i].fs), i);
-		save_item(NAME(m_slots[i].srcnote), i);
-		save_item(NAME(m_slots[i].srcb), i);
-		save_item(NAME(m_slots[i].step), i);
-		save_item(NAME(m_slots[i].stepptr), i);
-		save_item(NAME(m_slots[i].active), i);
-		save_item(NAME(m_slots[i].bits), i);
-		save_item(NAME(m_slots[i].volume), i);
-		save_item(NAME(m_slots[i].env_state), i);
-		save_item(NAME(m_slots[i].env_attack_step), i);
-		save_item(NAME(m_slots[i].env_decay1_step), i);
-		save_item(NAME(m_slots[i].env_decay2_step), i);
-		save_item(NAME(m_slots[i].env_release_step), i);
-		save_item(NAME(m_slots[i].feedback_modulation0), i);
-		save_item(NAME(m_slots[i].feedback_modulation1), i);
-		save_item(NAME(m_slots[i].lfo_phase), i);
-		save_item(NAME(m_slots[i].lfo_step), i);
-		save_item(NAME(m_slots[i].lfo_amplitude), i);
-	}
-
-	for (i = 0; i < ARRAY_LENGTH(m_groups); i++)
-	{
-		save_item(NAME(m_groups[i].sync), i);
-		save_item(NAME(m_groups[i].pfm), i);
-	}
+	save_item(STRUCT_MEMBER(m_groups, sync));
+	save_item(STRUCT_MEMBER(m_groups, pfm));
 
 	save_item(NAME(m_regs_main));
 	save_item(NAME(m_timerA));
@@ -1748,7 +1743,7 @@ void ymf271_device::device_start()
 	init_state();
 
 	m_mix_buffer.resize(m_master_clock/(384/4));
-	m_stream = machine().sound().stream_alloc(*this, 0, 4, m_master_clock/384);
+	m_stream = stream_alloc(0, 4, m_master_clock/384);
 }
 
 //-------------------------------------------------

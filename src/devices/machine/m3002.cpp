@@ -351,13 +351,13 @@ void m3002_device::irq_update()
 	{
 		LOG("IRQ occurred\n");
 		m_irq_active = true;
-		m_irq_callback(ASSERT_LINE);
+		m_irq_callback(0);
 	}
 	else if (m_irq_active && (m_ram[0xf] & 0x0c) == 0)
 	{
 		LOG("IRQ cleared\n");
 		m_irq_active = false;
-		m_irq_callback(CLEAR_LINE);
+		m_irq_callback(1);
 	}
 }
 

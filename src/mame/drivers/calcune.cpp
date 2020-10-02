@@ -149,7 +149,7 @@ uint32_t calcune_state::screen_update_calcune(screen_device &screen, bitmap_rgb3
 	{
 		const unsigned palette_per_scanline = 64 * y;
 
-		uint32_t *dst = &bitmap.pix32(y);
+		uint32_t *const dst = &bitmap.pix(y);
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			int pix;

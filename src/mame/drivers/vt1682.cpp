@@ -4295,11 +4295,11 @@ void vt_vt1682_state::draw_tile_pixline(int segment, int tile, int tileline, int
 		else
 			currentaddress = startaddress + ((tilesize_high - 1) - tileline) * linebytes;
 
-		uint8_t* pri2ptr = &m_pal2_priority_bitmap.pix8(y);
-		uint8_t* pri1ptr = &m_pal1_priority_bitmap.pix8(y);
+		uint8_t *const pri2ptr = &m_pal2_priority_bitmap.pix(y);
+		uint8_t *const pri1ptr = &m_pal1_priority_bitmap.pix(y);
 
-		uint8_t* pix2ptr = &m_pal2_pix_bitmap.pix8(y);
-		uint8_t* pix1ptr = &m_pal1_pix_bitmap.pix8(y);
+		uint8_t *const pix2ptr = &m_pal2_pix_bitmap.pix(y);
+		uint8_t *const pix1ptr = &m_pal1_pix_bitmap.pix(y);
 
 
 		int shift_amount, mask, bytes_in;
@@ -5042,12 +5042,12 @@ uint32_t vt_vt1682_state::screen_update(screen_device& screen, bitmap_rgb32& bit
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		const pen_t* paldata = m_palette->pens();
-		uint8_t* pri2ptr = &m_pal2_priority_bitmap.pix8(y);
-		uint8_t* pri1ptr = &m_pal1_priority_bitmap.pix8(y);
-		uint8_t* pix2ptr = &m_pal2_pix_bitmap.pix8(y);
-		uint8_t* pix1ptr = &m_pal1_pix_bitmap.pix8(y);
-		uint32_t* dstptr = &bitmap.pix32(y);
+		pen_t const *const paldata = m_palette->pens();
+		uint8_t const *const pri2ptr = &m_pal2_priority_bitmap.pix(y);
+		uint8_t const *const pri1ptr = &m_pal1_priority_bitmap.pix(y);
+		uint8_t const *const pix2ptr = &m_pal2_pix_bitmap.pix(y);
+		uint8_t const *const pix1ptr = &m_pal1_pix_bitmap.pix(y);
+		uint32_t *const dstptr = &bitmap.pix(y);
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
@@ -6236,12 +6236,12 @@ CONS( 200?, dance555,  0,  0,  vt1682_exsportp,   dance555, vt1682_exsport_state
 
 // manual explicitly states it has NTSC output only (unit can be connected to a TV) and both Ranning Horse + Explosion (Bomberman) are the NTSC versions
 // has 21.477 Mhz XTAL
-CONS( 200?, njp60in1,  0,  0,   vt1682_lxts3, njp60in1, vt1682_lxts3_state, njp60in1_init, "<unknown>", "NJ Pocket 60-in-1 handheld 'X zero' (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND) // needs high colour line mode for main menu
+CONS( 200?, njp60in1,  0,  0,   vt1682_lxts3, njp60in1, vt1682_lxts3_state, njp60in1_init, "<unknown>", "NJ Pocket 60-in-1 handheld 'X zero' (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND) // RNG + linescroll issues
 
 // this appears to be related to the NJ Pocket, claims 101-in-1 but has some duplicates.
 // Like the 'Wow Wireless gaming' it incorrectly mixes the PAL version of 'Ranning Horse' with the NTSC version of 'Bomberman', it has no TV output.
 // has 26.6017 Mhz (6xPAL) XTAL
-CONS( 200?, unk1682,  0,  0,   vt1682_unk1682, lxts3, vt1682_lxts3_state, unk1682_init, "<unknown>", "unknown VT1682-based 101-in-1 handheld (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND) // needs high colour line mode for main menu
+CONS( 200?, unk1682,  0,  0,   vt1682_unk1682, lxts3, vt1682_lxts3_state, unk1682_init, "<unknown>", "unknown VT1682-based 101-in-1 handheld (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND) // RNG + linescroll issues
 
-CONS( 2010, lxts3,    0,  0,   vt1682_lxts3, lxts3, vt1682_lxts3_state, regular_init,  "Lexibook", "Toy Story 3 (Lexibook)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // random number generation issues on 2 games, linescroll on racing games
+CONS( 2010, lxts3,    0,  0,   vt1682_lxts3, lxts3, vt1682_lxts3_state, regular_init,  "Lexibook", "Toy Story 3 (Lexibook)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // RNG + linescroll issues
 

@@ -26,9 +26,6 @@
 //  CONSTANTS
 //**************************************************************************
 
-// invalid memory value for axis polling
-const s32 INVALID_AXIS_VALUE      = 0x7fffffff;
-
 // additional expanded input codes for sequences
 constexpr input_code input_seq::end_code;
 constexpr input_code input_seq::default_code;
@@ -738,6 +735,11 @@ input_code input_manager::poll_switches()
 {
 	// iterate over device classes and devices
 	for (input_device_class devclass = DEVICE_CLASS_FIRST_VALID; devclass <= DEVICE_CLASS_LAST_VALID; ++devclass)
+	{
+		// skip device class if disabled
+		if (!m_class[devclass]->enabled())
+			continue;
+
 		for (int devnum = 0; devnum <= m_class[devclass]->maxindex(); devnum++)
 		{
 			// fetch the device; ignore if nullptr
@@ -763,7 +765,7 @@ input_code input_manager::poll_switches()
 					}
 
 					// skip if there is not enough axis movement
-					if (!code_check_axis(*item, code))
+					if (!item->check_axis(code.item_modifier()))
 						continue;
 
 					// otherwise, poll axes digitally
@@ -804,6 +806,7 @@ input_code input_manager::poll_switches()
 				}
 			}
 		}
+	}
 
 	// if nothing, return an invalid code
 	return INPUT_CODE_INVALID;
@@ -845,47 +848,6 @@ input_code input_manager::poll_keyboard_switches()
 
 
 //-------------------------------------------------
-//  code_check_axis - see if axis has moved far
-//  enough to trigger a read when polling
-//-------------------------------------------------
-
-bool input_manager::code_check_axis(input_device_item &item, input_code code)
-{
-	// if we've already reported this one, don't bother
-	if (item.memory() == INVALID_AXIS_VALUE)
-		return false;
-
-	// ignore min/max for lightguns
-	// so the selection will not be affected by a gun going out of range
-	s32 curval = code_value(code);
-	if (code.device_class() == DEVICE_CLASS_LIGHTGUN &&
-		(code.item_id() == ITEM_ID_XAXIS || code.item_id() == ITEM_ID_YAXIS) &&
-		(curval == INPUT_ABSOLUTE_MAX || curval == INPUT_ABSOLUTE_MIN))
-		return false;
-
-	// compute the diff against memory
-	s32 diff = curval - item.memory();
-	if (diff < 0)
-		diff = -diff;
-
-	// for absolute axes, look for 25% of maximum
-	if (item.itemclass() == ITEM_CLASS_ABSOLUTE && diff > (INPUT_ABSOLUTE_MAX - INPUT_ABSOLUTE_MIN) / 4)
-	{
-		item.set_memory(INVALID_AXIS_VALUE);
-		return true;
-	}
-
-	// for relative axes, look for ~20 pixels movement
-	if (item.itemclass() == ITEM_CLASS_RELATIVE && diff > 20 * INPUT_RELATIVE_PER_PIXEL)
-	{
-		item.set_memory(INVALID_AXIS_VALUE);
-		return true;
-	}
-	return false;
-}
-
-
-//-------------------------------------------------
 //  poll_axes - poll for any input
 //-------------------------------------------------
 
@@ -893,6 +855,11 @@ input_code input_manager::poll_axes()
 {
 	// iterate over device classes and devices
 	for (input_device_class devclass = DEVICE_CLASS_FIRST_VALID; devclass <= DEVICE_CLASS_LAST_VALID; ++devclass)
+	{
+		// skip device class if disabled
+		if (!m_class[devclass]->enabled())
+			continue;
+
 		for (int devnum = 0; devnum <= m_class[devclass]->maxindex(); devnum++)
 		{
 			// fetch the device; ignore if nullptr
@@ -907,11 +874,12 @@ input_code input_manager::poll_axes()
 				if (item != nullptr && item->itemclass() != ITEM_CLASS_SWITCH)
 				{
 					input_code code = item->code();
-					if (code_check_axis(*item, code))
+					if (item->check_axis(code.item_modifier()))
 						return code;
 				}
 			}
 		}
+	}
 
 	// if nothing, return an invalid code
 	return INPUT_CODE_INVALID;

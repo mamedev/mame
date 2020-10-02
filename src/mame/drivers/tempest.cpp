@@ -311,7 +311,7 @@ public:
 		m_knob_p2(*this, TEMPEST_KNOB_P2_TAG),
 		m_buttons_p1(*this, TEMPEST_BUTTONS_P1_TAG),
 		m_buttons_p2(*this, TEMPEST_BUTTONS_P2_TAG),
-		m_in1(*this, "IN1/DSW0"),
+		m_in1(*this, "IN1_DSW0"),
 		m_in2(*this, "IN2"),
 		m_leds(*this, "led%u", 0U)
 	{ }
@@ -529,7 +529,7 @@ static INPUT_PORTS_START( tempest )
 	/* bit 7 is tied to a 3kHz (?) clock */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(tempest_state, clock_r)
 
-	PORT_START("IN1/DSW0")
+	PORT_START("IN1_DSW0")
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(tempest_state, tempest_knob_r)
 	/* The next one is reponsible for cocktail mode.
 	 * According to the documentation, this is not a switch, although

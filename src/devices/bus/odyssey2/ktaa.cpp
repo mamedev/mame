@@ -18,7 +18,7 @@ DEFINE_DEVICE_TYPE(O2_ROM_KTAA, o2_ktaa_device, "o2_ktaa", "Odyssey 2 Homebrew K
 //  o2_ktaa_device - constructor
 //-------------------------------------------------
 
-o2_ktaa_device::o2_ktaa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+o2_ktaa_device::o2_ktaa_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, O2_ROM_KTAA, tag, owner, clock),
 	device_o2_cart_interface(mconfig, *this)
 { }
@@ -30,10 +30,11 @@ void o2_ktaa_device::device_start()
 
 void o2_ktaa_device::cart_init()
 {
-	if (m_rom_size != 0xc00 && m_rom_size != 0xc00*2 && m_rom_size != 0xc00*4)
+	u32 size = m_rom.bytes();
+	if (size != 0xc00 && size != 0xc00*2 && size != 0xc00*4)
 		fatalerror("o2_ktaa_device: ROM size must be multiple of 3KB\n");
 
-	m_bank_mask = (m_rom_size / 0xc00) - 1;
+	m_bank_mask = (size / 0xc00) - 1;
 }
 
 

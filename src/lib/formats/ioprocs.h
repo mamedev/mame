@@ -25,20 +25,20 @@
 
 struct io_procs
 {
-	void (*closeproc)(void *file);
-	int (*seekproc)(void *file, int64_t offset, int whence);
-	size_t (*readproc)(void *file, void *buffer, size_t length);
-	size_t (*writeproc)(void *file, const void *buffer, size_t length);
-	uint64_t (*filesizeproc)(void *file);
+	void (*closeproc)(void *file) = nullptr;
+	int (*seekproc)(void *file, int64_t offset, int whence) = nullptr;
+	size_t (*readproc)(void *file, void *buffer, size_t length) = nullptr;
+	size_t (*writeproc)(void *file, const void *buffer, size_t length) = nullptr;
+	uint64_t (*filesizeproc)(void *file) = nullptr;
 };
 
 
 
 struct io_generic
 {
-	const struct io_procs *procs;
-	void *file;
-	uint8_t filler;
+	const struct io_procs *procs = nullptr;
+	void *file = nullptr;
+	uint8_t filler = 0;
 };
 
 
@@ -48,10 +48,10 @@ struct io_generic
 
 ***************************************************************************/
 
-extern const struct io_procs stdio_ioprocs;
-extern const struct io_procs stdio_ioprocs_noclose;
-extern const struct io_procs corefile_ioprocs;
-extern const struct io_procs corefile_ioprocs_noclose;
+extern const io_procs stdio_ioprocs;
+extern const io_procs stdio_ioprocs_noclose;
+extern const io_procs corefile_ioprocs;
+extern const io_procs corefile_ioprocs_noclose;
 
 
 

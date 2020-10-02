@@ -4054,2637 +4054,2637 @@
 	</element>
 
 	<view name="AWP Simulated Video">
-		<backdrop element="backdrop_colour">
+		<element ref="backdrop_colour">
 			<bounds x="0" y="0" width="732" height="651"/>
-		</backdrop>
-		<backdrop element="reel_background">
+		</element>
+		<element ref="reel_background">
 			<bounds x="224" y="468" width="80" height="140"/>
-		</backdrop>
-		<backdrop name="sreel1" element="reel0" state="0">
+		</element>
+		<element name="sreel1" ref="reel0" state="0">
 			<bounds x="224" y="468" width="80" height="140"/>
-		</backdrop>
-		<backdrop element="reel_background">
+		</element>
+		<element ref="reel_background">
 			<bounds x="310" y="468" width="80" height="140"/>
-		</backdrop>
-		<backdrop name="sreel2" element="reel1" state="0">
+		</element>
+		<element name="sreel2" ref="reel1" state="0">
 			<bounds x="310" y="468" width="80" height="140"/>
-		</backdrop>
-		<backdrop element="reel_background">
+		</element>
+		<element ref="reel_background">
 			<bounds x="396" y="468" width="80" height="140"/>
-		</backdrop>
-		<backdrop name="sreel3" element="reel2" state="0">
+		</element>
+		<element name="sreel3" ref="reel2" state="0">
 			<bounds x="396" y="468" width="80" height="140"/>
-		</backdrop>
-		<backdrop name="lamp19" element="lamp_19_1_border" state="0">
+		</element>
+		<element name="lamp19" ref="lamp_19_1_border" state="0">
 			<bounds x="9" y="2" width="122" height="52"/>
-		</backdrop>
-		<backdrop name="lamp19" element="lamp_19_1" state="0">
+		</element>
+		<element name="lamp19" ref="lamp_19_1" state="0">
 			<bounds x="11" y="4" width="118" height="48"/>
-		</backdrop>
-		<backdrop name="lamp27" element="lamp_27_1_border" state="0">
+		</element>
+		<element name="lamp27" ref="lamp_27_1_border" state="0">
 			<bounds x="133" y="2" width="122" height="52"/>
-		</backdrop>
-		<backdrop name="lamp27" element="lamp_27_1" state="0">
+		</element>
+		<element name="lamp27" ref="lamp_27_1" state="0">
 			<bounds x="135" y="4" width="118" height="48"/>
-		</backdrop>
-		<backdrop name="lamp17" element="lamp_17_1_border" state="0">
+		</element>
+		<element name="lamp17" ref="lamp_17_1_border" state="0">
 			<bounds x="9" y="106" width="122" height="52"/>
-		</backdrop>
-		<backdrop name="lamp17" element="lamp_17_1" state="0">
+		</element>
+		<element name="lamp17" ref="lamp_17_1" state="0">
 			<bounds x="11" y="108" width="118" height="48"/>
-		</backdrop>
-		<backdrop name="lamp58" element="lamp_58_1_border" state="0">
+		</element>
+		<element name="lamp58" ref="lamp_58_1_border" state="0">
 			<bounds x="9" y="366" width="122" height="60"/>
-		</backdrop>
-		<backdrop name="lamp58" element="lamp_58_1" state="0">
+		</element>
+		<element name="lamp58" ref="lamp_58_1" state="0">
 			<bounds x="11" y="368" width="118" height="56"/>
-		</backdrop>
-		<backdrop name="lamp12" element="lamp_12_1_border" state="0">
+		</element>
+		<element name="lamp12" ref="lamp_12_1_border" state="0">
 			<bounds x="9" y="158" width="122" height="52"/>
-		</backdrop>
-		<backdrop name="lamp12" element="lamp_12_1" state="0">
+		</element>
+		<element name="lamp12" ref="lamp_12_1" state="0">
 			<bounds x="11" y="160" width="118" height="48"/>
-		</backdrop>
-		<backdrop name="lamp18" element="lamp_18_1_border" state="0">
+		</element>
+		<element name="lamp18" ref="lamp_18_1_border" state="0">
 			<bounds x="9" y="54" width="122" height="52"/>
-		</backdrop>
-		<backdrop name="lamp18" element="lamp_18_1" state="0">
+		</element>
+		<element name="lamp18" ref="lamp_18_1" state="0">
 			<bounds x="11" y="56" width="118" height="48"/>
-		</backdrop>
-		<backdrop name="lamp28" element="lamp_28_1_border" state="0">
+		</element>
+		<element name="lamp28" ref="lamp_28_1_border" state="0">
 			<bounds x="257" y="2" width="122" height="52"/>
-		</backdrop>
-		<backdrop name="lamp28" element="lamp_28_1" state="0">
+		</element>
+		<element name="lamp28" ref="lamp_28_1" state="0">
 			<bounds x="259" y="4" width="118" height="48"/>
-		</backdrop>
-		<backdrop name="lamp34" element="lamp_34_1_border" state="0">
+		</element>
+		<element name="lamp34" ref="lamp_34_1_border" state="0">
 			<bounds x="381" y="2" width="122" height="52"/>
-		</backdrop>
-		<backdrop name="lamp34" element="lamp_34_1" state="0">
+		</element>
+		<element name="lamp34" ref="lamp_34_1" state="0">
 			<bounds x="383" y="4" width="118" height="48"/>
-		</backdrop>
-		<backdrop name="lamp10" element="lamp_10_1_border" state="0">
+		</element>
+		<element name="lamp10" ref="lamp_10_1_border" state="0">
 			<bounds x="9" y="210" width="122" height="52"/>
-		</backdrop>
-		<backdrop name="lamp10" element="lamp_10_1" state="0">
+		</element>
+		<element name="lamp10" ref="lamp_10_1" state="0">
 			<bounds x="11" y="212" width="118" height="48"/>
-		</backdrop>
-		<backdrop name="lamp4" element="lamp_4_1_border" state="0">
+		</element>
+		<element name="lamp4" ref="lamp_4_1_border" state="0">
 			<bounds x="9" y="314" width="122" height="52"/>
-		</backdrop>
-		<backdrop name="lamp4" element="lamp_4_1" state="0">
+		</element>
+		<element name="lamp4" ref="lamp_4_1" state="0">
 			<bounds x="11" y="316" width="118" height="48"/>
-		</backdrop>
-		<backdrop name="lamp9" element="lamp_9_1_border" state="0">
+		</element>
+		<element name="lamp9" ref="lamp_9_1_border" state="0">
 			<bounds x="9" y="262" width="122" height="52"/>
-		</backdrop>
-		<backdrop name="lamp9" element="lamp_9_1" state="0">
+		</element>
+		<element name="lamp9" ref="lamp_9_1" state="0">
 			<bounds x="11" y="264" width="118" height="48"/>
-		</backdrop>
-		<backdrop name="lamp90" element="lamp_90_1_border" state="0">
+		</element>
+		<element name="lamp90" ref="lamp_90_1_border" state="0">
 			<bounds x="135" y="259" width="62" height="32"/>
-		</backdrop>
-		<backdrop name="lamp90" element="lamp_90_1" state="0">
+		</element>
+		<element name="lamp90" ref="lamp_90_1" state="0">
 			<bounds x="137" y="261" width="58" height="28"/>
-		</backdrop>
-		<backdrop name="lamp89" element="lamp_89_1_border" state="0">
+		</element>
+		<element name="lamp89" ref="lamp_89_1_border" state="0">
 			<bounds x="200" y="266" width="62" height="32"/>
-		</backdrop>
-		<backdrop name="lamp89" element="lamp_89_1" state="0">
+		</element>
+		<element name="lamp89" ref="lamp_89_1" state="0">
 			<bounds x="202" y="268" width="58" height="28"/>
-		</backdrop>
-		<backdrop name="lamp87" element="lamp_87_1_border" state="0">
+		</element>
+		<element name="lamp87" ref="lamp_87_1_border" state="0">
 			<bounds x="265" y="270" width="62" height="32"/>
-		</backdrop>
-		<backdrop name="lamp87" element="lamp_87_1" state="0">
+		</element>
+		<element name="lamp87" ref="lamp_87_1" state="0">
 			<bounds x="267" y="272" width="58" height="28"/>
-		</backdrop>
-		<backdrop name="lamp88" element="lamp_88_1_border" state="0">
+		</element>
+		<element name="lamp88" ref="lamp_88_1_border" state="0">
 			<bounds x="330" y="274" width="62" height="32"/>
-		</backdrop>
-		<backdrop name="lamp88" element="lamp_88_1" state="0">
+		</element>
+		<element name="lamp88" ref="lamp_88_1" state="0">
 			<bounds x="332" y="276" width="58" height="28"/>
-		</backdrop>
-		<backdrop name="lamp92" element="lamp_92_1_border" state="0">
+		</element>
+		<element name="lamp92" ref="lamp_92_1_border" state="0">
 			<bounds x="396" y="270" width="62" height="32"/>
-		</backdrop>
-		<backdrop name="lamp92" element="lamp_92_1" state="0">
+		</element>
+		<element name="lamp92" ref="lamp_92_1" state="0">
 			<bounds x="398" y="272" width="58" height="28"/>
-		</backdrop>
-		<backdrop name="lamp93" element="lamp_93_1_border" state="0">
+		</element>
+		<element name="lamp93" ref="lamp_93_1_border" state="0">
 			<bounds x="461" y="267" width="62" height="32"/>
-		</backdrop>
-		<backdrop name="lamp93" element="lamp_93_1" state="0">
+		</element>
+		<element name="lamp93" ref="lamp_93_1" state="0">
 			<bounds x="463" y="269" width="58" height="28"/>
-		</backdrop>
-		<backdrop name="lamp91" element="lamp_91_1_border" state="0">
+		</element>
+		<element name="lamp91" ref="lamp_91_1_border" state="0">
 			<bounds x="526" y="261" width="62" height="32"/>
-		</backdrop>
-		<backdrop name="lamp91" element="lamp_91_1" state="0">
+		</element>
+		<element name="lamp91" ref="lamp_91_1" state="0">
 			<bounds x="528" y="263" width="58" height="28"/>
-		</backdrop>
-		<backdrop name="lamp80" element="lamp_80_1_border" state="0">
+		</element>
+		<element name="lamp80" ref="lamp_80_1_border" state="0">
 			<bounds x="554" y="551" width="47" height="27"/>
-		</backdrop>
-		<backdrop name="lamp80" element="lamp_80_1" state="0">
+		</element>
+		<element name="lamp80" ref="lamp_80_1" state="0">
 			<bounds x="556" y="553" width="43" height="23"/>
-		</backdrop>
-		<backdrop name="lamp42" element="lamp_42_1_border" state="0">
+		</element>
+		<element name="lamp42" ref="lamp_42_1_border" state="0">
 			<bounds x="602" y="468" width="122" height="52"/>
-		</backdrop>
-		<backdrop name="lamp42" element="lamp_42_1" state="0">
+		</element>
+		<element name="lamp42" ref="lamp_42_1" state="0">
 			<bounds x="604" y="470" width="118" height="48"/>
-		</backdrop>
-		<backdrop name="lamp43" element="lamp_43_1_border" state="0">
+		</element>
+		<element name="lamp43" ref="lamp_43_1_border" state="0">
 			<bounds x="602" y="416" width="122" height="52"/>
-		</backdrop>
-		<backdrop name="lamp43" element="lamp_43_1" state="0">
+		</element>
+		<element name="lamp43" ref="lamp_43_1" state="0">
 			<bounds x="604" y="418" width="118" height="48"/>
-		</backdrop>
-		<backdrop name="lamp49" element="lamp_49_1_border" state="0">
+		</element>
+		<element name="lamp49" ref="lamp_49_1_border" state="0">
 			<bounds x="602" y="364" width="122" height="52"/>
-		</backdrop>
-		<backdrop name="lamp49" element="lamp_49_1" state="0">
+		</element>
+		<element name="lamp49" ref="lamp_49_1" state="0">
 			<bounds x="604" y="366" width="118" height="48"/>
-		</backdrop>
-		<backdrop name="lamp52" element="lamp_52_1_border" state="0">
+		</element>
+		<element name="lamp52" ref="lamp_52_1_border" state="0">
 			<bounds x="602" y="312" width="122" height="52"/>
-		</backdrop>
-		<backdrop name="lamp52" element="lamp_52_1" state="0">
+		</element>
+		<element name="lamp52" ref="lamp_52_1" state="0">
 			<bounds x="604" y="314" width="118" height="48"/>
-		</backdrop>
-		<backdrop name="lamp55" element="lamp_55_1_border" state="0">
+		</element>
+		<element name="lamp55" ref="lamp_55_1_border" state="0">
 			<bounds x="602" y="260" width="122" height="52"/>
-		</backdrop>
-		<backdrop name="lamp55" element="lamp_55_1" state="0">
+		</element>
+		<element name="lamp55" ref="lamp_55_1" state="0">
 			<bounds x="604" y="262" width="118" height="48"/>
-		</backdrop>
-		<backdrop name="lamp60" element="lamp_60_1_border" state="0">
+		</element>
+		<element name="lamp60" ref="lamp_60_1_border" state="0">
 			<bounds x="602" y="208" width="122" height="52"/>
-		</backdrop>
-		<backdrop name="lamp60" element="lamp_60_1" state="0">
+		</element>
+		<element name="lamp60" ref="lamp_60_1" state="0">
 			<bounds x="604" y="210" width="118" height="48"/>
-		</backdrop>
-		<backdrop name="lamp65" element="lamp_65_1_border" state="0">
+		</element>
+		<element name="lamp65" ref="lamp_65_1_border" state="0">
 			<bounds x="602" y="156" width="122" height="52"/>
-		</backdrop>
-		<backdrop name="lamp65" element="lamp_65_1" state="0">
+		</element>
+		<element name="lamp65" ref="lamp_65_1" state="0">
 			<bounds x="604" y="158" width="118" height="48"/>
-		</backdrop>
-		<backdrop name="lamp66" element="lamp_66_1_border" state="0">
+		</element>
+		<element name="lamp66" ref="lamp_66_1_border" state="0">
 			<bounds x="602" y="104" width="122" height="52"/>
-		</backdrop>
-		<backdrop name="lamp66" element="lamp_66_1" state="0">
+		</element>
+		<element name="lamp66" ref="lamp_66_1" state="0">
 			<bounds x="604" y="106" width="118" height="48"/>
-		</backdrop>
-		<backdrop name="lamp67" element="lamp_67_1_border" state="0">
+		</element>
+		<element name="lamp67" ref="lamp_67_1_border" state="0">
 			<bounds x="602" y="52" width="122" height="52"/>
-		</backdrop>
-		<backdrop name="lamp67" element="lamp_67_1" state="0">
+		</element>
+		<element name="lamp67" ref="lamp_67_1" state="0">
 			<bounds x="604" y="54" width="118" height="48"/>
-		</backdrop>
-		<backdrop name="lamp81" element="lamp_81_1_border" state="0">
+		</element>
+		<element name="lamp81" ref="lamp_81_1_border" state="0">
 			<bounds x="484" y="456" width="72" height="37"/>
-		</backdrop>
-		<backdrop name="lamp81" element="lamp_81_1" state="0">
+		</element>
+		<element name="lamp81" ref="lamp_81_1" state="0">
 			<bounds x="486" y="458" width="68" height="33"/>
-		</backdrop>
-		<backdrop name="lamp61" element="lamp_61_1_border" state="0">
+		</element>
+		<element name="lamp61" ref="lamp_61_1_border" state="0">
 			<bounds x="175" y="152" width="52" height="27"/>
-		</backdrop>
-		<backdrop name="lamp61" element="lamp_61_1" state="0">
+		</element>
+		<element name="lamp61" ref="lamp_61_1" state="0">
 			<bounds x="177" y="154" width="48" height="23"/>
-		</backdrop>
-		<backdrop name="lamp29" element="lamp_29_1_border" state="0">
+		</element>
+		<element name="lamp29" ref="lamp_29_1_border" state="0">
 			<bounds x="175" y="204" width="52" height="27"/>
-		</backdrop>
-		<backdrop name="lamp29" element="lamp_29_1" state="0">
+		</element>
+		<element name="lamp29" ref="lamp_29_1" state="0">
 			<bounds x="177" y="206" width="48" height="23"/>
-		</backdrop>
-		<backdrop name="lamp37" element="lamp_37_1_border" state="0">
+		</element>
+		<element name="lamp37" ref="lamp_37_1_border" state="0">
 			<bounds x="175" y="178" width="52" height="27"/>
-		</backdrop>
-		<backdrop name="lamp37" element="lamp_37_1" state="0">
+		</element>
+		<element name="lamp37" ref="lamp_37_1" state="0">
 			<bounds x="177" y="180" width="48" height="23"/>
-		</backdrop>
-		<backdrop name="lamp5" element="lamp_5_1_border" state="0">
+		</element>
+		<element name="lamp5" ref="lamp_5_1_border" state="0">
 			<bounds x="175" y="230" width="52" height="27"/>
-		</backdrop>
-		<backdrop name="lamp5" element="lamp_5_1" state="0">
+		</element>
+		<element name="lamp5" ref="lamp_5_1" state="0">
 			<bounds x="177" y="232" width="48" height="23"/>
-		</backdrop>
-		<backdrop name="lamp69" element="lamp_69_1_border" state="0">
+		</element>
+		<element name="lamp69" ref="lamp_69_1_border" state="0">
 			<bounds x="175" y="126" width="52" height="27"/>
-		</backdrop>
-		<backdrop name="lamp69" element="lamp_69_1" state="0">
+		</element>
+		<element name="lamp69" ref="lamp_69_1" state="0">
 			<bounds x="177" y="128" width="48" height="23"/>
-		</backdrop>
-		<backdrop name="lamp45" element="lamp_45_1_border" state="0">
+		</element>
+		<element name="lamp45" ref="lamp_45_1_border" state="0">
 			<bounds x="234" y="178" width="52" height="27"/>
-		</backdrop>
-		<backdrop name="lamp45" element="lamp_45_1" state="0">
+		</element>
+		<element name="lamp45" ref="lamp_45_1" state="0">
 			<bounds x="236" y="180" width="48" height="23"/>
-		</backdrop>
-		<backdrop name="lamp13" element="lamp_13_1_border" state="0">
+		</element>
+		<element name="lamp13" ref="lamp_13_1_border" state="0">
 			<bounds x="234" y="230" width="52" height="27"/>
-		</backdrop>
-		<backdrop name="lamp13" element="lamp_13_1" state="0">
+		</element>
+		<element name="lamp13" ref="lamp_13_1" state="0">
 			<bounds x="236" y="232" width="48" height="23"/>
-		</backdrop>
-		<backdrop name="lamp53" element="lamp_53_1_border" state="0">
+		</element>
+		<element name="lamp53" ref="lamp_53_1_border" state="0">
 			<bounds x="234" y="152" width="52" height="27"/>
-		</backdrop>
-		<backdrop name="lamp53" element="lamp_53_1" state="0">
+		</element>
+		<element name="lamp53" ref="lamp_53_1" state="0">
 			<bounds x="236" y="154" width="48" height="23"/>
-		</backdrop>
-		<backdrop name="lamp21" element="lamp_21_1_border" state="0">
+		</element>
+		<element name="lamp21" ref="lamp_21_1_border" state="0">
 			<bounds x="234" y="204" width="52" height="27"/>
-		</backdrop>
-		<backdrop name="lamp21" element="lamp_21_1" state="0">
+		</element>
+		<element name="lamp21" ref="lamp_21_1" state="0">
 			<bounds x="236" y="206" width="48" height="23"/>
-		</backdrop>
-		<backdrop name="lamp77" element="lamp_77_1_border" state="0">
+		</element>
+		<element name="lamp77" ref="lamp_77_1_border" state="0">
 			<bounds x="234" y="126" width="52" height="27"/>
-		</backdrop>
-		<backdrop name="lamp77" element="lamp_77_1" state="0">
+		</element>
+		<element name="lamp77" ref="lamp_77_1" state="0">
 			<bounds x="236" y="128" width="48" height="23"/>
-		</backdrop>
-		<backdrop name="lamp83" element="lamp_83_1_border" state="0">
+		</element>
+		<element name="lamp83" ref="lamp_83_1_border" state="0">
 			<bounds x="168" y="62" width="122" height="62"/>
-		</backdrop>
-		<backdrop name="lamp83" element="lamp_83_1" state="0">
+		</element>
+		<element name="lamp83" ref="lamp_83_1" state="0">
 			<bounds x="170" y="64" width="118" height="58"/>
-		</backdrop>
-		<backdrop name="lamp41" element="lamp_41_1_border" state="0">
+		</element>
+		<element name="lamp41" ref="lamp_41_1_border" state="0">
 			<bounds x="679" y="567" width="38" height="38"/>
-		</backdrop>
-		<backdrop name="lamp41" element="lamp_41_1" state="0">
+		</element>
+		<element name="lamp41" ref="lamp_41_1" state="0">
 			<bounds x="681" y="569" width="34" height="34"/>
-		</backdrop>
-		<backdrop name="lamp35" element="lamp_35_1_border" state="0">
+		</element>
+		<element name="lamp35" ref="lamp_35_1_border" state="0">
 			<bounds x="612" y="567" width="38" height="38"/>
-		</backdrop>
-		<backdrop name="lamp35" element="lamp_35_1" state="0">
+		</element>
+		<element name="lamp35" ref="lamp_35_1" state="0">
 			<bounds x="614" y="569" width="34" height="34"/>
-		</backdrop>
-		<backdrop name="lamp36" element="lamp_36_1_border" state="0">
+		</element>
+		<element name="lamp36" ref="lamp_36_1_border" state="0">
 			<bounds x="611" y="524" width="38" height="38"/>
-		</backdrop>
-		<backdrop name="lamp36" element="lamp_36_1" state="0">
+		</element>
+		<element name="lamp36" ref="lamp_36_1" state="0">
 			<bounds x="613" y="526" width="34" height="34"/>
-		</backdrop>
-		<backdrop name="lamp44" element="lamp_44_1_border" state="0">
+		</element>
+		<element name="lamp44" ref="lamp_44_1_border" state="0">
 			<bounds x="678" y="524" width="38" height="38"/>
-		</backdrop>
-		<backdrop name="lamp44" element="lamp_44_1" state="0">
+		</element>
+		<element name="lamp44" ref="lamp_44_1" state="0">
 			<bounds x="680" y="526" width="34" height="34"/>
-		</backdrop>
-		<backdrop name="lamp26" element="lamp_26_1_border" state="0">
+		</element>
+		<element name="lamp26" ref="lamp_26_1_border" state="0">
 			<bounds x="125" y="535" width="82" height="32"/>
-		</backdrop>
-		<backdrop name="lamp26" element="lamp_26_1" state="0">
+		</element>
+		<element name="lamp26" ref="lamp_26_1" state="0">
 			<bounds x="127" y="537" width="78" height="28"/>
-		</backdrop>
-		<backdrop name="lamp2" element="lamp_2_1_border" state="0">
+		</element>
+		<element name="lamp2" ref="lamp_2_1_border" state="0">
 			<bounds x="125" y="504" width="82" height="32"/>
-		</backdrop>
-		<backdrop name="lamp2" element="lamp_2_1" state="0">
+		</element>
+		<element name="lamp2" ref="lamp_2_1" state="0">
 			<bounds x="127" y="506" width="78" height="28"/>
-		</backdrop>
-		<backdrop name="lamp84" element="lamp_84_1_border" state="0">
+		</element>
+		<element name="lamp84" ref="lamp_84_1_border" state="0">
 			<bounds x="505" y="29" width="87" height="22"/>
-		</backdrop>
-		<backdrop name="lamp84" element="lamp_84_1" state="0">
+		</element>
+		<element name="lamp84" ref="lamp_84_1" state="0">
 			<bounds x="507" y="31" width="83" height="18"/>
-		</backdrop>
-		<backdrop name="lamp85" element="lamp_85_1_border" state="0">
+		</element>
+		<element name="lamp85" ref="lamp_85_1_border" state="0">
 			<bounds x="505" y="7" width="87" height="22"/>
-		</backdrop>
-		<backdrop name="lamp85" element="lamp_85_1" state="0">
+		</element>
+		<element name="lamp85" ref="lamp_85_1" state="0">
 			<bounds x="507" y="9" width="83" height="18"/>
-		</backdrop>
-		<backdrop name="lamp82" element="lamp_82_1_border" state="0">
+		</element>
+		<element name="lamp82" ref="lamp_82_1_border" state="0">
 			<bounds x="438" y="62" width="122" height="62"/>
-		</backdrop>
-		<backdrop name="lamp82" element="lamp_82_1" state="0">
+		</element>
+		<element name="lamp82" ref="lamp_82_1" state="0">
 			<bounds x="440" y="64" width="118" height="58"/>
-		</backdrop>
-		<backdrop name="lamp75" element="lamp_75_1_border" state="0">
+		</element>
+		<element name="lamp75" ref="lamp_75_1_border" state="0">
 			<bounds x="507" y="130" width="27" height="27"/>
-		</backdrop>
-		<backdrop name="lamp75" element="lamp_75_1" state="0">
+		</element>
+		<element name="lamp75" ref="lamp_75_1" state="0">
 			<bounds x="509" y="132" width="23" height="23"/>
-		</backdrop>
-		<backdrop name="lamp74" element="lamp_74_1_border" state="0">
+		</element>
+		<element name="lamp74" ref="lamp_74_1_border" state="0">
 			<bounds x="507" y="156" width="27" height="27"/>
-		</backdrop>
-		<backdrop name="lamp74" element="lamp_74_1" state="0">
+		</element>
+		<element name="lamp74" ref="lamp_74_1" state="0">
 			<bounds x="509" y="158" width="23" height="23"/>
-		</backdrop>
-		<backdrop name="lamp73" element="lamp_73_1_border" state="0">
+		</element>
+		<element name="lamp73" ref="lamp_73_1_border" state="0">
 			<bounds x="507" y="182" width="27" height="27"/>
-		</backdrop>
-		<backdrop name="lamp73" element="lamp_73_1" state="0">
+		</element>
+		<element name="lamp73" ref="lamp_73_1" state="0">
 			<bounds x="509" y="184" width="23" height="23"/>
-		</backdrop>
-		<backdrop name="lamp72" element="lamp_72_1_border" state="0">
+		</element>
+		<element name="lamp72" ref="lamp_72_1_border" state="0">
 			<bounds x="481" y="130" width="27" height="27"/>
-		</backdrop>
-		<backdrop name="lamp72" element="lamp_72_1" state="0">
+		</element>
+		<element name="lamp72" ref="lamp_72_1" state="0">
 			<bounds x="483" y="132" width="23" height="23"/>
-		</backdrop>
-		<backdrop name="lamp56" element="lamp_56_1_border" state="0">
+		</element>
+		<element name="lamp56" ref="lamp_56_1_border" state="0">
 			<bounds x="481" y="182" width="27" height="27"/>
-		</backdrop>
-		<backdrop name="lamp56" element="lamp_56_1" state="0">
+		</element>
+		<element name="lamp56" ref="lamp_56_1" state="0">
 			<bounds x="483" y="184" width="23" height="23"/>
-		</backdrop>
-		<backdrop name="lamp40" element="lamp_40_1_border" state="0">
+		</element>
+		<element name="lamp40" ref="lamp_40_1_border" state="0">
 			<bounds x="481" y="234" width="27" height="27"/>
-		</backdrop>
-		<backdrop name="lamp40" element="lamp_40_1" state="0">
+		</element>
+		<element name="lamp40" ref="lamp_40_1" state="0">
 			<bounds x="483" y="236" width="23" height="23"/>
-		</backdrop>
-		<backdrop name="lamp24" element="lamp_24_1_border" state="0">
+		</element>
+		<element name="lamp24" ref="lamp_24_1_border" state="0">
 			<bounds x="455" y="156" width="27" height="27"/>
-		</backdrop>
-		<backdrop name="lamp24" element="lamp_24_1" state="0">
+		</element>
+		<element name="lamp24" ref="lamp_24_1" state="0">
 			<bounds x="457" y="158" width="23" height="23"/>
-		</backdrop>
-		<backdrop name="lamp64" element="lamp_64_1_border" state="0">
+		</element>
+		<element name="lamp64" ref="lamp_64_1_border" state="0">
 			<bounds x="481" y="156" width="27" height="27"/>
-		</backdrop>
-		<backdrop name="lamp64" element="lamp_64_1" state="0">
+		</element>
+		<element name="lamp64" ref="lamp_64_1" state="0">
 			<bounds x="483" y="158" width="23" height="23"/>
-		</backdrop>
-		<backdrop name="lamp48" element="lamp_48_1_border" state="0">
+		</element>
+		<element name="lamp48" ref="lamp_48_1_border" state="0">
 			<bounds x="481" y="208" width="27" height="27"/>
-		</backdrop>
-		<backdrop name="lamp48" element="lamp_48_1" state="0">
+		</element>
+		<element name="lamp48" ref="lamp_48_1" state="0">
 			<bounds x="483" y="210" width="23" height="23"/>
-		</backdrop>
-		<backdrop name="lamp32" element="lamp_32_1_border" state="0">
+		</element>
+		<element name="lamp32" ref="lamp_32_1_border" state="0">
 			<bounds x="455" y="130" width="27" height="27"/>
-		</backdrop>
-		<backdrop name="lamp32" element="lamp_32_1" state="0">
+		</element>
+		<element name="lamp32" ref="lamp_32_1" state="0">
 			<bounds x="457" y="132" width="23" height="23"/>
-		</backdrop>
-		<backdrop name="lamp33" element="lamp_33_1_border" state="0">
+		</element>
+		<element name="lamp33" ref="lamp_33_1_border" state="0">
 			<bounds x="507" y="234" width="27" height="27"/>
-		</backdrop>
-		<backdrop name="lamp33" element="lamp_33_1" state="0">
+		</element>
+		<element name="lamp33" ref="lamp_33_1" state="0">
 			<bounds x="509" y="236" width="23" height="23"/>
-		</backdrop>
-		<backdrop name="lamp68" element="lamp_68_1_border" state="0">
+		</element>
+		<element name="lamp68" ref="lamp_68_1_border" state="0">
 			<bounds x="507" y="208" width="27" height="27"/>
-		</backdrop>
-		<backdrop name="lamp68" element="lamp_68_1" state="0">
+		</element>
+		<element name="lamp68" ref="lamp_68_1" state="0">
 			<bounds x="509" y="210" width="23" height="23"/>
-		</backdrop>
-		<backdrop name="lamp0" element="lamp_0_1_border" state="0">
+		</element>
+		<element name="lamp0" ref="lamp_0_1_border" state="0">
 			<bounds x="455" y="234" width="27" height="27"/>
-		</backdrop>
-		<backdrop name="lamp0" element="lamp_0_1" state="0">
+		</element>
+		<element name="lamp0" ref="lamp_0_1" state="0">
 			<bounds x="457" y="236" width="23" height="23"/>
-		</backdrop>
-		<backdrop name="lamp16" element="lamp_16_1_border" state="0">
+		</element>
+		<element name="lamp16" ref="lamp_16_1_border" state="0">
 			<bounds x="455" y="182" width="27" height="27"/>
-		</backdrop>
-		<backdrop name="lamp16" element="lamp_16_1" state="0">
+		</element>
+		<element name="lamp16" ref="lamp_16_1" state="0">
 			<bounds x="457" y="184" width="23" height="23"/>
-		</backdrop>
-		<backdrop name="lamp8" element="lamp_8_1_border" state="0">
+		</element>
+		<element name="lamp8" ref="lamp_8_1_border" state="0">
 			<bounds x="455" y="208" width="27" height="27"/>
-		</backdrop>
-		<backdrop name="lamp8" element="lamp_8_1" state="0">
+		</element>
+		<element name="lamp8" ref="lamp_8_1" state="0">
 			<bounds x="457" y="210" width="23" height="23"/>
-		</backdrop>
-		<backdrop name="lamp76" element="lamp_76_1_border" state="0">
+		</element>
+		<element name="lamp76" ref="lamp_76_1_border" state="0">
 			<bounds x="302" y="73" width="122" height="47"/>
-		</backdrop>
-		<backdrop name="lamp76" element="lamp_76_1" state="0">
+		</element>
+		<element name="lamp76" ref="lamp_76_1" state="0">
 			<bounds x="304" y="75" width="118" height="43"/>
-		</backdrop>
-		<backdrop name="lamp86" element="lamp_86_1_border" state="0">
+		</element>
+		<element name="lamp86" ref="lamp_86_1_border" state="0">
 			<bounds x="394" y="413" width="52" height="32"/>
-		</backdrop>
-		<backdrop name="lamp86" element="lamp_86_1" state="0">
+		</element>
+		<element name="lamp86" ref="lamp_86_1" state="0">
 			<bounds x="396" y="415" width="48" height="28"/>
-		</backdrop>
-		<backdrop name="lamp86" element="lamp_86_2_border" state="0">
+		</element>
+		<element name="lamp86" ref="lamp_86_2_border" state="0">
 			<bounds x="254" y="413" width="52" height="32"/>
-		</backdrop>
-		<backdrop name="lamp86" element="lamp_86_2" state="0">
+		</element>
+		<element name="lamp86" ref="lamp_86_2" state="0">
 			<bounds x="256" y="415" width="48" height="28"/>
-		</backdrop>
-		<backdrop name="lamp6" element="lamp_6_1_border" state="0">
+		</element>
+		<element name="lamp6" ref="lamp_6_1_border" state="0">
 			<bounds x="185" y="340" width="37" height="37"/>
-		</backdrop>
-		<backdrop name="lamp6" element="lamp_6_1" state="0">
+		</element>
+		<element name="lamp6" ref="lamp_6_1" state="0">
 			<bounds x="187" y="342" width="33" height="33"/>
-		</backdrop>
-		<backdrop name="lamp14" element="lamp_14_1_border" state="0">
+		</element>
+		<element name="lamp14" ref="lamp_14_1_border" state="0">
 			<bounds x="222" y="340" width="37" height="37"/>
-		</backdrop>
-		<backdrop name="lamp14" element="lamp_14_1" state="0">
+		</element>
+		<element name="lamp14" ref="lamp_14_1" state="0">
 			<bounds x="224" y="342" width="33" height="33"/>
-		</backdrop>
-		<backdrop name="lamp22" element="lamp_22_1_border" state="0">
+		</element>
+		<element name="lamp22" ref="lamp_22_1_border" state="0">
 			<bounds x="259" y="340" width="37" height="37"/>
-		</backdrop>
-		<backdrop name="lamp22" element="lamp_22_1" state="0">
+		</element>
+		<element name="lamp22" ref="lamp_22_1" state="0">
 			<bounds x="261" y="342" width="33" height="33"/>
-		</backdrop>
-		<backdrop name="lamp30" element="lamp_30_1_border" state="0">
+		</element>
+		<element name="lamp30" ref="lamp_30_1_border" state="0">
 			<bounds x="296" y="340" width="37" height="37"/>
-		</backdrop>
-		<backdrop name="lamp30" element="lamp_30_1" state="0">
+		</element>
+		<element name="lamp30" ref="lamp_30_1" state="0">
 			<bounds x="298" y="342" width="33" height="33"/>
-		</backdrop>
-		<backdrop name="lamp38" element="lamp_38_1_border" state="0">
+		</element>
+		<element name="lamp38" ref="lamp_38_1_border" state="0">
 			<bounds x="333" y="340" width="37" height="37"/>
-		</backdrop>
-		<backdrop name="lamp38" element="lamp_38_1" state="0">
+		</element>
+		<element name="lamp38" ref="lamp_38_1" state="0">
 			<bounds x="335" y="342" width="33" height="33"/>
-		</backdrop>
-		<backdrop name="lamp46" element="lamp_46_1_border" state="0">
+		</element>
+		<element name="lamp46" ref="lamp_46_1_border" state="0">
 			<bounds x="370" y="340" width="37" height="37"/>
-		</backdrop>
-		<backdrop name="lamp46" element="lamp_46_1" state="0">
+		</element>
+		<element name="lamp46" ref="lamp_46_1" state="0">
 			<bounds x="372" y="342" width="33" height="33"/>
-		</backdrop>
-		<backdrop name="lamp54" element="lamp_54_1_border" state="0">
+		</element>
+		<element name="lamp54" ref="lamp_54_1_border" state="0">
 			<bounds x="407" y="340" width="37" height="37"/>
-		</backdrop>
-		<backdrop name="lamp54" element="lamp_54_1" state="0">
+		</element>
+		<element name="lamp54" ref="lamp_54_1" state="0">
 			<bounds x="409" y="342" width="33" height="33"/>
-		</backdrop>
-		<backdrop name="lamp62" element="lamp_62_1_border" state="0">
+		</element>
+		<element name="lamp62" ref="lamp_62_1_border" state="0">
 			<bounds x="444" y="340" width="37" height="37"/>
-		</backdrop>
-		<backdrop name="lamp62" element="lamp_62_1" state="0">
+		</element>
+		<element name="lamp62" ref="lamp_62_1" state="0">
 			<bounds x="446" y="342" width="33" height="33"/>
-		</backdrop>
-		<backdrop name="lamp70" element="lamp_70_1_border" state="0">
+		</element>
+		<element name="lamp70" ref="lamp_70_1_border" state="0">
 			<bounds x="482" y="340" width="37" height="37"/>
-		</backdrop>
-		<backdrop name="lamp70" element="lamp_70_1" state="0">
+		</element>
+		<element name="lamp70" ref="lamp_70_1" state="0">
 			<bounds x="484" y="342" width="33" height="33"/>
-		</backdrop>
-		<backdrop name="lamp94" element="lamp_94_1_border" state="0">
+		</element>
+		<element name="lamp94" ref="lamp_94_1_border" state="0">
 			<bounds x="381" y="307" width="34" height="22"/>
-		</backdrop>
-		<backdrop name="lamp94" element="lamp_94_1" state="0">
+		</element>
+		<element name="lamp94" ref="lamp_94_1" state="0">
 			<bounds x="383" y="309" width="30" height="18"/>
-		</backdrop>
-		<backdrop name="lamp57" element="lamp_57_1_border" state="0">
+		</element>
+		<element name="lamp57" ref="lamp_57_1_border" state="0">
 			<bounds x="320" y="307" width="62" height="22"/>
-		</backdrop>
-		<backdrop name="lamp57" element="lamp_57_1" state="0">
+		</element>
+		<element name="lamp57" ref="lamp_57_1" state="0">
 			<bounds x="322" y="309" width="58" height="18"/>
-		</backdrop>
-		<backdrop name="lamp95" element="lamp_95_1_border" state="0">
+		</element>
+		<element name="lamp95" ref="lamp_95_1_border" state="0">
 			<bounds x="287" y="307" width="34" height="22"/>
-		</backdrop>
-		<backdrop name="lamp95" element="lamp_95_1" state="0">
+		</element>
+		<element name="lamp95" ref="lamp_95_1" state="0">
 			<bounds x="289" y="309" width="30" height="18"/>
-		</backdrop>
-		<backdrop name="lamp78" element="lamp_78_1_border" state="0">
+		</element>
+		<element name="lamp78" ref="lamp_78_1_border" state="0">
 			<bounds x="169" y="307" width="112" height="22"/>
-		</backdrop>
-		<backdrop name="lamp78" element="lamp_78_1" state="0">
+		</element>
+		<element name="lamp78" ref="lamp_78_1" state="0">
 			<bounds x="171" y="309" width="108" height="18"/>
-		</backdrop>
-		<backdrop name="lamp59" element="lamp_59_1_border" state="0">
+		</element>
+		<element name="lamp59" ref="lamp_59_1_border" state="0">
 			<bounds x="422" y="307" width="112" height="22"/>
-		</backdrop>
-		<backdrop name="lamp59" element="lamp_59_1" state="0">
+		</element>
+		<element name="lamp59" ref="lamp_59_1" state="0">
 			<bounds x="424" y="309" width="108" height="18"/>
-		</backdrop>
-		<backdrop name="lamp71" element="colour_button_126_border" state="0" inputtag="TODO" inputmask="0x08">
+		</element>
+		<element name="lamp71" ref="colour_button_126_border" state="0" inputtag="TODO" inputmask="0x08">
 			<bounds x="629" y="611" width="75" height="37"/>
-		</backdrop>
-		<backdrop name="lamp71" element="colour_button_126" state="0" inputtag="TODO" inputmask="0x08">
+		</element>
+		<element name="lamp71" ref="colour_button_126" state="0" inputtag="TODO" inputmask="0x08">
 			<bounds x="631" y="613" width="71" height="33"/>
-		</backdrop>
-		<backdrop name="lamp7" element="colour_button_127_border" state="0" inputtag="TODO" inputmask="0x01">
+		</element>
+		<element name="lamp7" ref="colour_button_127_border" state="0" inputtag="TODO" inputmask="0x01">
 			<bounds x="93" y="611" width="75" height="37"/>
-		</backdrop>
-		<backdrop name="lamp7" element="colour_button_127" state="0" inputtag="TODO" inputmask="0x01">
+		</element>
+		<element name="lamp7" ref="colour_button_127" state="0" inputtag="TODO" inputmask="0x01">
 			<bounds x="95" y="613" width="71" height="33"/>
-		</backdrop>
-		<backdrop name="lamp39" element="colour_button_128_border" state="0" inputtag="TODO" inputmask="0x04">
+		</element>
+		<element name="lamp39" ref="colour_button_128_border" state="0" inputtag="TODO" inputmask="0x04">
 			<bounds x="399" y="611" width="75" height="37"/>
-		</backdrop>
-		<backdrop name="lamp39" element="colour_button_128" state="0" inputtag="TODO" inputmask="0x04">
+		</element>
+		<element name="lamp39" ref="colour_button_128" state="0" inputtag="TODO" inputmask="0x04">
 			<bounds x="401" y="613" width="71" height="33"/>
-		</backdrop>
-		<backdrop name="lamp47" element="colour_button_129_border" state="0" inputtag="TODO" inputmask="0x08">
+		</element>
+		<element name="lamp47" ref="colour_button_129_border" state="0" inputtag="TODO" inputmask="0x08">
 			<bounds x="491" y="611" width="75" height="37"/>
-		</backdrop>
-		<backdrop name="lamp47" element="colour_button_129" state="0" inputtag="TODO" inputmask="0x08">
+		</element>
+		<element name="lamp47" ref="colour_button_129" state="0" inputtag="TODO" inputmask="0x08">
 			<bounds x="493" y="613" width="71" height="33"/>
-		</backdrop>
-		<backdrop name="lamp31" element="colour_button_130_border" state="0" inputtag="TODO" inputmask="0x02">
+		</element>
+		<element name="lamp31" ref="colour_button_130_border" state="0" inputtag="TODO" inputmask="0x02">
 			<bounds x="313" y="611" width="75" height="37"/>
-		</backdrop>
-		<backdrop name="lamp31" element="colour_button_130" state="0" inputtag="TODO" inputmask="0x02">
+		</element>
+		<element name="lamp31" ref="colour_button_130" state="0" inputtag="TODO" inputmask="0x02">
 			<bounds x="315" y="613" width="71" height="33"/>
-		</backdrop>
-		<backdrop name="lamp23" element="colour_button_131_border" state="0" inputtag="TODO" inputmask="0x01">
+		</element>
+		<element name="lamp23" ref="colour_button_131_border" state="0" inputtag="TODO" inputmask="0x01">
 			<bounds x="227" y="611" width="75" height="37"/>
-		</backdrop>
-		<backdrop name="lamp23" element="colour_button_131" state="0" inputtag="TODO" inputmask="0x01">
+		</element>
+		<element name="lamp23" ref="colour_button_131" state="0" inputtag="TODO" inputmask="0x01">
 			<bounds x="229" y="613" width="71" height="33"/>
-		</backdrop>
-		<backdrop name="lamp-1" element="colour_button_134_border" state="0" inputtag="TODO" inputmask="0x08">
+		</element>
+		<element name="lamp-1" ref="colour_button_134_border" state="0" inputtag="TODO" inputmask="0x08">
 			<bounds x="684" y="7" width="44" height="40"/>
-		</backdrop>
-		<backdrop name="lamp-1" element="colour_button_134" state="0" inputtag="TODO" inputmask="0x08">
+		</element>
+		<element name="lamp-1" ref="colour_button_134" state="0" inputtag="TODO" inputmask="0x08">
 			<bounds x="686" y="9" width="40" height="36"/>
-		</backdrop>
-		<backdrop element="led_digit_rect_black">
+		</element>
+		<element ref="led_digit_rect_black">
 			<bounds x="497" y="513" width="24" height="32"/>
-		</backdrop>
-		<backdrop name="digit8" element="led_digit_red">
+		</element>
+		<element name="digit8" ref="led_digit_red">
 			<bounds x="497" y="513" width="24" height="32"/>
-		</backdrop>
-		<backdrop element="led_digit_rect_red">
+		</element>
+		<element ref="led_digit_rect_red">
 			<bounds x="497" y="513" width="24" height="32"/>
 			<color alpha="0.1"/>
-		</backdrop>
-		<backdrop element="led_digit_rect_black">
+		</element>
+		<element ref="led_digit_rect_black">
 			<bounds x="521" y="513" width="24" height="32"/>
-		</backdrop>
-		<backdrop name="digit7" element="led_digit_red">
+		</element>
+		<element name="digit7" ref="led_digit_red">
 			<bounds x="521" y="513" width="24" height="32"/>
-		</backdrop>
-		<backdrop element="led_digit_rect_red">
+		</element>
+		<element ref="led_digit_rect_red">
 			<bounds x="521" y="513" width="24" height="32"/>
 			<color alpha="0.1"/>
-		</backdrop>
-		<backdrop element="led_digit_rect_black">
+		</element>
+		<element ref="led_digit_rect_black">
 			<bounds x="615" y="5" width="32" height="45"/>
-		</backdrop>
-		<backdrop name="digit2" element="led_digit_red">
+		</element>
+		<element name="digit2" ref="led_digit_red">
 			<bounds x="615" y="5" width="32" height="45"/>
-		</backdrop>
-		<backdrop element="led_digit_rect_red">
+		</element>
+		<element ref="led_digit_rect_red">
 			<bounds x="615" y="5" width="32" height="45"/>
 			<color alpha="0.1"/>
-		</backdrop>
-		<backdrop element="led_digit_rect_black">
+		</element>
+		<element ref="led_digit_rect_black">
 			<bounds x="647" y="5" width="32" height="45"/>
-		</backdrop>
-		<backdrop name="digit1" element="led_digit_red">
+		</element>
+		<element name="digit1" ref="led_digit_red">
 			<bounds x="647" y="5" width="32" height="45"/>
-		</backdrop>
-		<backdrop element="led_digit_rect_red">
+		</element>
+		<element ref="led_digit_rect_red">
 			<bounds x="647" y="5" width="32" height="45"/>
 			<color alpha="0.1"/>
-		</backdrop>
-		<backdrop name="label34" element="label_34">
+		</element>
+		<element name="label34" ref="label_34">
 			<bounds x="37" y="443" width="18" height="19"/>
-		</backdrop>
-		<backdrop name="label43" element="label_43">
+		</element>
+		<element name="label43" ref="label_43">
 			<bounds x="62" y="462" width="27" height="112"/>
-		</backdrop>
-		<backdrop name="label56" element="label_56">
+		</element>
+		<element name="label56" ref="label_56">
 			<bounds x="496" y="499" width="45" height="14"/>
-		</backdrop>
-		<backdrop name="label60" element="label_60">
+		</element>
+		<element name="label60" ref="label_60">
 			<bounds x="646" y="549" width="30" height="28"/>
-		</backdrop>
-		<backdrop name="label67" element="label_67">
+		</element>
+		<element name="label67" ref="label_67">
 			<bounds x="119" y="448" width="88" height="48"/>
-		</backdrop>
-		<backdrop name="label68" element="label_68">
+		</element>
+		<element name="label68" ref="label_68">
 			<bounds x="345" y="374" width="11" height="22"/>
-		</backdrop>
-		<backdrop name="label94" element="label_94">
+		</element>
+		<element name="label94" ref="label_94">
 			<bounds x="591" y="6" width="21" height="44"/>
-		</backdrop>
-		<backdrop name="label97" element="label_97">
+		</element>
+		<element name="label97" ref="label_97">
 			<bounds x="289" y="384" width="93" height="15"/>
-		</backdrop>
-		<backdrop name="label108" element="label_108">
+		</element>
+		<element name="label108" ref="label_108">
 			<bounds x="253" y="444" width="51" height="14"/>
-		</backdrop>
-		<backdrop name="label109" element="label_109">
+		</element>
+		<element name="label109" ref="label_109">
 			<bounds x="400" y="444" width="35" height="14"/>
-		</backdrop>
-		<backdrop name="label111" element="label_111">
+		</element>
+		<element name="label111" ref="label_111">
 			<bounds x="180" y="327" width="41" height="16"/>
-		</backdrop>
+		</element>
 	</view>
 
 	<view name="MFME2MAME Debug">
-		<backdrop element="debug_backdrop_colour">
+		<element ref="debug_backdrop_colour">
 			<bounds x="0" y="0" width="1920" height="1080"/>
-		</backdrop>
-		<backdrop name="lamp0" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp0" ref="debug_lamp_standard" state="0">
 			<bounds x="32" y="32" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_0" element="debug_lamp_label_0">
+		</element>
+		<element name="debug_lamp_label_0" ref="debug_lamp_label_0">
 			<bounds x="47" y="47" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp1" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp1" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="96" y="32" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_1" element="debug_lamp_label_1">
+		</element>
+		<element name="debug_lamp_label_1" ref="debug_lamp_label_1">
 			<bounds x="111" y="47" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp2" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp2" ref="debug_lamp_standard" state="0">
 			<bounds x="160" y="32" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_2" element="debug_lamp_label_2">
+		</element>
+		<element name="debug_lamp_label_2" ref="debug_lamp_label_2">
 			<bounds x="175" y="47" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp3" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp3" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="224" y="32" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_3" element="debug_lamp_label_3">
+		</element>
+		<element name="debug_lamp_label_3" ref="debug_lamp_label_3">
 			<bounds x="239" y="47" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp4" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp4" ref="debug_lamp_standard" state="0">
 			<bounds x="288" y="32" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_4" element="debug_lamp_label_4">
+		</element>
+		<element name="debug_lamp_label_4" ref="debug_lamp_label_4">
 			<bounds x="303" y="47" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp5" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp5" ref="debug_lamp_standard" state="0">
 			<bounds x="352" y="32" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_5" element="debug_lamp_label_5">
+		</element>
+		<element name="debug_lamp_label_5" ref="debug_lamp_label_5">
 			<bounds x="367" y="47" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp6" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp6" ref="debug_lamp_standard" state="0">
 			<bounds x="416" y="32" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_6" element="debug_lamp_label_6">
+		</element>
+		<element name="debug_lamp_label_6" ref="debug_lamp_label_6">
 			<bounds x="431" y="47" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp7" element="debug_lamp_button" state="0">
+		</element>
+		<element name="lamp7" ref="debug_lamp_button" state="0">
 			<bounds x="480" y="32" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_7" element="debug_lamp_label_7">
+		</element>
+		<element name="debug_lamp_label_7" ref="debug_lamp_label_7">
 			<bounds x="495" y="47" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp8" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp8" ref="debug_lamp_standard" state="0">
 			<bounds x="544" y="32" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_8" element="debug_lamp_label_8">
+		</element>
+		<element name="debug_lamp_label_8" ref="debug_lamp_label_8">
 			<bounds x="559" y="47" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp9" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp9" ref="debug_lamp_standard" state="0">
 			<bounds x="608" y="32" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_9" element="debug_lamp_label_9">
+		</element>
+		<element name="debug_lamp_label_9" ref="debug_lamp_label_9">
 			<bounds x="623" y="47" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp10" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp10" ref="debug_lamp_standard" state="0">
 			<bounds x="672" y="32" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_10" element="debug_lamp_label_10">
+		</element>
+		<element name="debug_lamp_label_10" ref="debug_lamp_label_10">
 			<bounds x="687" y="47" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp11" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp11" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="736" y="32" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_11" element="debug_lamp_label_11">
+		</element>
+		<element name="debug_lamp_label_11" ref="debug_lamp_label_11">
 			<bounds x="751" y="47" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp12" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp12" ref="debug_lamp_standard" state="0">
 			<bounds x="800" y="32" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_12" element="debug_lamp_label_12">
+		</element>
+		<element name="debug_lamp_label_12" ref="debug_lamp_label_12">
 			<bounds x="815" y="47" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp13" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp13" ref="debug_lamp_standard" state="0">
 			<bounds x="864" y="32" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_13" element="debug_lamp_label_13">
+		</element>
+		<element name="debug_lamp_label_13" ref="debug_lamp_label_13">
 			<bounds x="879" y="47" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp14" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp14" ref="debug_lamp_standard" state="0">
 			<bounds x="928" y="32" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_14" element="debug_lamp_label_14">
+		</element>
+		<element name="debug_lamp_label_14" ref="debug_lamp_label_14">
 			<bounds x="943" y="47" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp15" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp15" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="992" y="32" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_15" element="debug_lamp_label_15">
+		</element>
+		<element name="debug_lamp_label_15" ref="debug_lamp_label_15">
 			<bounds x="1007" y="47" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp16" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp16" ref="debug_lamp_standard" state="0">
 			<bounds x="32" y="96" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_16" element="debug_lamp_label_16">
+		</element>
+		<element name="debug_lamp_label_16" ref="debug_lamp_label_16">
 			<bounds x="47" y="111" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp17" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp17" ref="debug_lamp_standard" state="0">
 			<bounds x="96" y="96" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_17" element="debug_lamp_label_17">
+		</element>
+		<element name="debug_lamp_label_17" ref="debug_lamp_label_17">
 			<bounds x="111" y="111" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp18" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp18" ref="debug_lamp_standard" state="0">
 			<bounds x="160" y="96" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_18" element="debug_lamp_label_18">
+		</element>
+		<element name="debug_lamp_label_18" ref="debug_lamp_label_18">
 			<bounds x="175" y="111" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp19" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp19" ref="debug_lamp_standard" state="0">
 			<bounds x="224" y="96" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_19" element="debug_lamp_label_19">
+		</element>
+		<element name="debug_lamp_label_19" ref="debug_lamp_label_19">
 			<bounds x="239" y="111" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp20" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp20" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="288" y="96" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_20" element="debug_lamp_label_20">
+		</element>
+		<element name="debug_lamp_label_20" ref="debug_lamp_label_20">
 			<bounds x="303" y="111" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp21" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp21" ref="debug_lamp_standard" state="0">
 			<bounds x="352" y="96" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_21" element="debug_lamp_label_21">
+		</element>
+		<element name="debug_lamp_label_21" ref="debug_lamp_label_21">
 			<bounds x="367" y="111" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp22" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp22" ref="debug_lamp_standard" state="0">
 			<bounds x="416" y="96" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_22" element="debug_lamp_label_22">
+		</element>
+		<element name="debug_lamp_label_22" ref="debug_lamp_label_22">
 			<bounds x="431" y="111" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp23" element="debug_lamp_button" state="0">
+		</element>
+		<element name="lamp23" ref="debug_lamp_button" state="0">
 			<bounds x="480" y="96" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_23" element="debug_lamp_label_23">
+		</element>
+		<element name="debug_lamp_label_23" ref="debug_lamp_label_23">
 			<bounds x="495" y="111" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp24" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp24" ref="debug_lamp_standard" state="0">
 			<bounds x="544" y="96" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_24" element="debug_lamp_label_24">
+		</element>
+		<element name="debug_lamp_label_24" ref="debug_lamp_label_24">
 			<bounds x="559" y="111" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp25" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp25" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="608" y="96" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_25" element="debug_lamp_label_25">
+		</element>
+		<element name="debug_lamp_label_25" ref="debug_lamp_label_25">
 			<bounds x="623" y="111" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp26" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp26" ref="debug_lamp_standard" state="0">
 			<bounds x="672" y="96" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_26" element="debug_lamp_label_26">
+		</element>
+		<element name="debug_lamp_label_26" ref="debug_lamp_label_26">
 			<bounds x="687" y="111" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp27" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp27" ref="debug_lamp_standard" state="0">
 			<bounds x="736" y="96" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_27" element="debug_lamp_label_27">
+		</element>
+		<element name="debug_lamp_label_27" ref="debug_lamp_label_27">
 			<bounds x="751" y="111" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp28" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp28" ref="debug_lamp_standard" state="0">
 			<bounds x="800" y="96" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_28" element="debug_lamp_label_28">
+		</element>
+		<element name="debug_lamp_label_28" ref="debug_lamp_label_28">
 			<bounds x="815" y="111" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp29" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp29" ref="debug_lamp_standard" state="0">
 			<bounds x="864" y="96" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_29" element="debug_lamp_label_29">
+		</element>
+		<element name="debug_lamp_label_29" ref="debug_lamp_label_29">
 			<bounds x="879" y="111" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp30" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp30" ref="debug_lamp_standard" state="0">
 			<bounds x="928" y="96" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_30" element="debug_lamp_label_30">
+		</element>
+		<element name="debug_lamp_label_30" ref="debug_lamp_label_30">
 			<bounds x="943" y="111" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp31" element="debug_lamp_button" state="0">
+		</element>
+		<element name="lamp31" ref="debug_lamp_button" state="0">
 			<bounds x="992" y="96" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_31" element="debug_lamp_label_31">
+		</element>
+		<element name="debug_lamp_label_31" ref="debug_lamp_label_31">
 			<bounds x="1007" y="111" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp32" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp32" ref="debug_lamp_standard" state="0">
 			<bounds x="32" y="160" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_32" element="debug_lamp_label_32">
+		</element>
+		<element name="debug_lamp_label_32" ref="debug_lamp_label_32">
 			<bounds x="47" y="175" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp33" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp33" ref="debug_lamp_standard" state="0">
 			<bounds x="96" y="160" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_33" element="debug_lamp_label_33">
+		</element>
+		<element name="debug_lamp_label_33" ref="debug_lamp_label_33">
 			<bounds x="111" y="175" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp34" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp34" ref="debug_lamp_standard" state="0">
 			<bounds x="160" y="160" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_34" element="debug_lamp_label_34">
+		</element>
+		<element name="debug_lamp_label_34" ref="debug_lamp_label_34">
 			<bounds x="175" y="175" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp35" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp35" ref="debug_lamp_standard" state="0">
 			<bounds x="224" y="160" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_35" element="debug_lamp_label_35">
+		</element>
+		<element name="debug_lamp_label_35" ref="debug_lamp_label_35">
 			<bounds x="239" y="175" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp36" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp36" ref="debug_lamp_standard" state="0">
 			<bounds x="288" y="160" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_36" element="debug_lamp_label_36">
+		</element>
+		<element name="debug_lamp_label_36" ref="debug_lamp_label_36">
 			<bounds x="303" y="175" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp37" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp37" ref="debug_lamp_standard" state="0">
 			<bounds x="352" y="160" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_37" element="debug_lamp_label_37">
+		</element>
+		<element name="debug_lamp_label_37" ref="debug_lamp_label_37">
 			<bounds x="367" y="175" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp38" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp38" ref="debug_lamp_standard" state="0">
 			<bounds x="416" y="160" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_38" element="debug_lamp_label_38">
+		</element>
+		<element name="debug_lamp_label_38" ref="debug_lamp_label_38">
 			<bounds x="431" y="175" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp39" element="debug_lamp_button" state="0">
+		</element>
+		<element name="lamp39" ref="debug_lamp_button" state="0">
 			<bounds x="480" y="160" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_39" element="debug_lamp_label_39">
+		</element>
+		<element name="debug_lamp_label_39" ref="debug_lamp_label_39">
 			<bounds x="495" y="175" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp40" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp40" ref="debug_lamp_standard" state="0">
 			<bounds x="544" y="160" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_40" element="debug_lamp_label_40">
+		</element>
+		<element name="debug_lamp_label_40" ref="debug_lamp_label_40">
 			<bounds x="559" y="175" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp41" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp41" ref="debug_lamp_standard" state="0">
 			<bounds x="608" y="160" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_41" element="debug_lamp_label_41">
+		</element>
+		<element name="debug_lamp_label_41" ref="debug_lamp_label_41">
 			<bounds x="623" y="175" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp42" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp42" ref="debug_lamp_standard" state="0">
 			<bounds x="672" y="160" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_42" element="debug_lamp_label_42">
+		</element>
+		<element name="debug_lamp_label_42" ref="debug_lamp_label_42">
 			<bounds x="687" y="175" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp43" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp43" ref="debug_lamp_standard" state="0">
 			<bounds x="736" y="160" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_43" element="debug_lamp_label_43">
+		</element>
+		<element name="debug_lamp_label_43" ref="debug_lamp_label_43">
 			<bounds x="751" y="175" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp44" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp44" ref="debug_lamp_standard" state="0">
 			<bounds x="800" y="160" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_44" element="debug_lamp_label_44">
+		</element>
+		<element name="debug_lamp_label_44" ref="debug_lamp_label_44">
 			<bounds x="815" y="175" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp45" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp45" ref="debug_lamp_standard" state="0">
 			<bounds x="864" y="160" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_45" element="debug_lamp_label_45">
+		</element>
+		<element name="debug_lamp_label_45" ref="debug_lamp_label_45">
 			<bounds x="879" y="175" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp46" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp46" ref="debug_lamp_standard" state="0">
 			<bounds x="928" y="160" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_46" element="debug_lamp_label_46">
+		</element>
+		<element name="debug_lamp_label_46" ref="debug_lamp_label_46">
 			<bounds x="943" y="175" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp47" element="debug_lamp_button" state="0">
+		</element>
+		<element name="lamp47" ref="debug_lamp_button" state="0">
 			<bounds x="992" y="160" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_47" element="debug_lamp_label_47">
+		</element>
+		<element name="debug_lamp_label_47" ref="debug_lamp_label_47">
 			<bounds x="1007" y="175" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp48" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp48" ref="debug_lamp_standard" state="0">
 			<bounds x="32" y="224" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_48" element="debug_lamp_label_48">
+		</element>
+		<element name="debug_lamp_label_48" ref="debug_lamp_label_48">
 			<bounds x="47" y="239" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp49" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp49" ref="debug_lamp_standard" state="0">
 			<bounds x="96" y="224" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_49" element="debug_lamp_label_49">
+		</element>
+		<element name="debug_lamp_label_49" ref="debug_lamp_label_49">
 			<bounds x="111" y="239" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp50" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp50" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="160" y="224" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_50" element="debug_lamp_label_50">
+		</element>
+		<element name="debug_lamp_label_50" ref="debug_lamp_label_50">
 			<bounds x="175" y="239" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp51" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp51" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="224" y="224" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_51" element="debug_lamp_label_51">
+		</element>
+		<element name="debug_lamp_label_51" ref="debug_lamp_label_51">
 			<bounds x="239" y="239" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp52" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp52" ref="debug_lamp_standard" state="0">
 			<bounds x="288" y="224" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_52" element="debug_lamp_label_52">
+		</element>
+		<element name="debug_lamp_label_52" ref="debug_lamp_label_52">
 			<bounds x="303" y="239" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp53" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp53" ref="debug_lamp_standard" state="0">
 			<bounds x="352" y="224" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_53" element="debug_lamp_label_53">
+		</element>
+		<element name="debug_lamp_label_53" ref="debug_lamp_label_53">
 			<bounds x="367" y="239" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp54" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp54" ref="debug_lamp_standard" state="0">
 			<bounds x="416" y="224" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_54" element="debug_lamp_label_54">
+		</element>
+		<element name="debug_lamp_label_54" ref="debug_lamp_label_54">
 			<bounds x="431" y="239" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp55" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp55" ref="debug_lamp_standard" state="0">
 			<bounds x="480" y="224" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_55" element="debug_lamp_label_55">
+		</element>
+		<element name="debug_lamp_label_55" ref="debug_lamp_label_55">
 			<bounds x="495" y="239" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp56" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp56" ref="debug_lamp_standard" state="0">
 			<bounds x="544" y="224" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_56" element="debug_lamp_label_56">
+		</element>
+		<element name="debug_lamp_label_56" ref="debug_lamp_label_56">
 			<bounds x="559" y="239" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp57" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp57" ref="debug_lamp_standard" state="0">
 			<bounds x="608" y="224" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_57" element="debug_lamp_label_57">
+		</element>
+		<element name="debug_lamp_label_57" ref="debug_lamp_label_57">
 			<bounds x="623" y="239" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp58" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp58" ref="debug_lamp_standard" state="0">
 			<bounds x="672" y="224" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_58" element="debug_lamp_label_58">
+		</element>
+		<element name="debug_lamp_label_58" ref="debug_lamp_label_58">
 			<bounds x="687" y="239" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp59" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp59" ref="debug_lamp_standard" state="0">
 			<bounds x="736" y="224" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_59" element="debug_lamp_label_59">
+		</element>
+		<element name="debug_lamp_label_59" ref="debug_lamp_label_59">
 			<bounds x="751" y="239" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp60" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp60" ref="debug_lamp_standard" state="0">
 			<bounds x="800" y="224" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_60" element="debug_lamp_label_60">
+		</element>
+		<element name="debug_lamp_label_60" ref="debug_lamp_label_60">
 			<bounds x="815" y="239" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp61" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp61" ref="debug_lamp_standard" state="0">
 			<bounds x="864" y="224" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_61" element="debug_lamp_label_61">
+		</element>
+		<element name="debug_lamp_label_61" ref="debug_lamp_label_61">
 			<bounds x="879" y="239" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp62" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp62" ref="debug_lamp_standard" state="0">
 			<bounds x="928" y="224" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_62" element="debug_lamp_label_62">
+		</element>
+		<element name="debug_lamp_label_62" ref="debug_lamp_label_62">
 			<bounds x="943" y="239" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp63" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp63" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="992" y="224" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_63" element="debug_lamp_label_63">
+		</element>
+		<element name="debug_lamp_label_63" ref="debug_lamp_label_63">
 			<bounds x="1007" y="239" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp64" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp64" ref="debug_lamp_standard" state="0">
 			<bounds x="32" y="288" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_64" element="debug_lamp_label_64">
+		</element>
+		<element name="debug_lamp_label_64" ref="debug_lamp_label_64">
 			<bounds x="47" y="303" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp65" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp65" ref="debug_lamp_standard" state="0">
 			<bounds x="96" y="288" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_65" element="debug_lamp_label_65">
+		</element>
+		<element name="debug_lamp_label_65" ref="debug_lamp_label_65">
 			<bounds x="111" y="303" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp66" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp66" ref="debug_lamp_standard" state="0">
 			<bounds x="160" y="288" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_66" element="debug_lamp_label_66">
+		</element>
+		<element name="debug_lamp_label_66" ref="debug_lamp_label_66">
 			<bounds x="175" y="303" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp67" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp67" ref="debug_lamp_standard" state="0">
 			<bounds x="224" y="288" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_67" element="debug_lamp_label_67">
+		</element>
+		<element name="debug_lamp_label_67" ref="debug_lamp_label_67">
 			<bounds x="239" y="303" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp68" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp68" ref="debug_lamp_standard" state="0">
 			<bounds x="288" y="288" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_68" element="debug_lamp_label_68">
+		</element>
+		<element name="debug_lamp_label_68" ref="debug_lamp_label_68">
 			<bounds x="303" y="303" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp69" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp69" ref="debug_lamp_standard" state="0">
 			<bounds x="352" y="288" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_69" element="debug_lamp_label_69">
+		</element>
+		<element name="debug_lamp_label_69" ref="debug_lamp_label_69">
 			<bounds x="367" y="303" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp70" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp70" ref="debug_lamp_standard" state="0">
 			<bounds x="416" y="288" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_70" element="debug_lamp_label_70">
+		</element>
+		<element name="debug_lamp_label_70" ref="debug_lamp_label_70">
 			<bounds x="431" y="303" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp71" element="debug_lamp_button" state="0">
+		</element>
+		<element name="lamp71" ref="debug_lamp_button" state="0">
 			<bounds x="480" y="288" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_71" element="debug_lamp_label_71">
+		</element>
+		<element name="debug_lamp_label_71" ref="debug_lamp_label_71">
 			<bounds x="495" y="303" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp72" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp72" ref="debug_lamp_standard" state="0">
 			<bounds x="544" y="288" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_72" element="debug_lamp_label_72">
+		</element>
+		<element name="debug_lamp_label_72" ref="debug_lamp_label_72">
 			<bounds x="559" y="303" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp73" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp73" ref="debug_lamp_standard" state="0">
 			<bounds x="608" y="288" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_73" element="debug_lamp_label_73">
+		</element>
+		<element name="debug_lamp_label_73" ref="debug_lamp_label_73">
 			<bounds x="623" y="303" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp74" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp74" ref="debug_lamp_standard" state="0">
 			<bounds x="672" y="288" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_74" element="debug_lamp_label_74">
+		</element>
+		<element name="debug_lamp_label_74" ref="debug_lamp_label_74">
 			<bounds x="687" y="303" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp75" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp75" ref="debug_lamp_standard" state="0">
 			<bounds x="736" y="288" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_75" element="debug_lamp_label_75">
+		</element>
+		<element name="debug_lamp_label_75" ref="debug_lamp_label_75">
 			<bounds x="751" y="303" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp76" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp76" ref="debug_lamp_standard" state="0">
 			<bounds x="800" y="288" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_76" element="debug_lamp_label_76">
+		</element>
+		<element name="debug_lamp_label_76" ref="debug_lamp_label_76">
 			<bounds x="815" y="303" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp77" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp77" ref="debug_lamp_standard" state="0">
 			<bounds x="864" y="288" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_77" element="debug_lamp_label_77">
+		</element>
+		<element name="debug_lamp_label_77" ref="debug_lamp_label_77">
 			<bounds x="879" y="303" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp78" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp78" ref="debug_lamp_standard" state="0">
 			<bounds x="928" y="288" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_78" element="debug_lamp_label_78">
+		</element>
+		<element name="debug_lamp_label_78" ref="debug_lamp_label_78">
 			<bounds x="943" y="303" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp79" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp79" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="992" y="288" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_79" element="debug_lamp_label_79">
+		</element>
+		<element name="debug_lamp_label_79" ref="debug_lamp_label_79">
 			<bounds x="1007" y="303" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp80" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp80" ref="debug_lamp_standard" state="0">
 			<bounds x="32" y="352" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_80" element="debug_lamp_label_80">
+		</element>
+		<element name="debug_lamp_label_80" ref="debug_lamp_label_80">
 			<bounds x="47" y="367" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp81" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp81" ref="debug_lamp_standard" state="0">
 			<bounds x="96" y="352" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_81" element="debug_lamp_label_81">
+		</element>
+		<element name="debug_lamp_label_81" ref="debug_lamp_label_81">
 			<bounds x="111" y="367" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp82" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp82" ref="debug_lamp_standard" state="0">
 			<bounds x="160" y="352" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_82" element="debug_lamp_label_82">
+		</element>
+		<element name="debug_lamp_label_82" ref="debug_lamp_label_82">
 			<bounds x="175" y="367" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp83" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp83" ref="debug_lamp_standard" state="0">
 			<bounds x="224" y="352" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_83" element="debug_lamp_label_83">
+		</element>
+		<element name="debug_lamp_label_83" ref="debug_lamp_label_83">
 			<bounds x="239" y="367" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp84" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp84" ref="debug_lamp_standard" state="0">
 			<bounds x="288" y="352" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_84" element="debug_lamp_label_84">
+		</element>
+		<element name="debug_lamp_label_84" ref="debug_lamp_label_84">
 			<bounds x="303" y="367" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp85" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp85" ref="debug_lamp_standard" state="0">
 			<bounds x="352" y="352" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_85" element="debug_lamp_label_85">
+		</element>
+		<element name="debug_lamp_label_85" ref="debug_lamp_label_85">
 			<bounds x="367" y="367" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp86" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp86" ref="debug_lamp_standard" state="0">
 			<bounds x="416" y="352" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_86" element="debug_lamp_label_86">
+		</element>
+		<element name="debug_lamp_label_86" ref="debug_lamp_label_86">
 			<bounds x="431" y="367" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp87" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp87" ref="debug_lamp_standard" state="0">
 			<bounds x="480" y="352" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_87" element="debug_lamp_label_87">
+		</element>
+		<element name="debug_lamp_label_87" ref="debug_lamp_label_87">
 			<bounds x="495" y="367" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp88" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp88" ref="debug_lamp_standard" state="0">
 			<bounds x="544" y="352" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_88" element="debug_lamp_label_88">
+		</element>
+		<element name="debug_lamp_label_88" ref="debug_lamp_label_88">
 			<bounds x="559" y="367" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp89" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp89" ref="debug_lamp_standard" state="0">
 			<bounds x="608" y="352" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_89" element="debug_lamp_label_89">
+		</element>
+		<element name="debug_lamp_label_89" ref="debug_lamp_label_89">
 			<bounds x="623" y="367" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp90" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp90" ref="debug_lamp_standard" state="0">
 			<bounds x="672" y="352" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_90" element="debug_lamp_label_90">
+		</element>
+		<element name="debug_lamp_label_90" ref="debug_lamp_label_90">
 			<bounds x="687" y="367" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp91" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp91" ref="debug_lamp_standard" state="0">
 			<bounds x="736" y="352" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_91" element="debug_lamp_label_91">
+		</element>
+		<element name="debug_lamp_label_91" ref="debug_lamp_label_91">
 			<bounds x="751" y="367" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp92" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp92" ref="debug_lamp_standard" state="0">
 			<bounds x="800" y="352" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_92" element="debug_lamp_label_92">
+		</element>
+		<element name="debug_lamp_label_92" ref="debug_lamp_label_92">
 			<bounds x="815" y="367" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp93" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp93" ref="debug_lamp_standard" state="0">
 			<bounds x="864" y="352" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_93" element="debug_lamp_label_93">
+		</element>
+		<element name="debug_lamp_label_93" ref="debug_lamp_label_93">
 			<bounds x="879" y="367" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp94" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp94" ref="debug_lamp_standard" state="0">
 			<bounds x="928" y="352" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_94" element="debug_lamp_label_94">
+		</element>
+		<element name="debug_lamp_label_94" ref="debug_lamp_label_94">
 			<bounds x="943" y="367" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp95" element="debug_lamp_standard" state="0">
+		</element>
+		<element name="lamp95" ref="debug_lamp_standard" state="0">
 			<bounds x="992" y="352" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_95" element="debug_lamp_label_95">
+		</element>
+		<element name="debug_lamp_label_95" ref="debug_lamp_label_95">
 			<bounds x="1007" y="367" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp96" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp96" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="32" y="416" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_96" element="debug_lamp_label_96">
+		</element>
+		<element name="debug_lamp_label_96" ref="debug_lamp_label_96">
 			<bounds x="47" y="431" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp97" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp97" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="96" y="416" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_97" element="debug_lamp_label_97">
+		</element>
+		<element name="debug_lamp_label_97" ref="debug_lamp_label_97">
 			<bounds x="111" y="431" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp98" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp98" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="160" y="416" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_98" element="debug_lamp_label_98">
+		</element>
+		<element name="debug_lamp_label_98" ref="debug_lamp_label_98">
 			<bounds x="175" y="431" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp99" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp99" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="224" y="416" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_99" element="debug_lamp_label_99">
+		</element>
+		<element name="debug_lamp_label_99" ref="debug_lamp_label_99">
 			<bounds x="239" y="431" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp100" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp100" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="288" y="416" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_100" element="debug_lamp_label_100">
+		</element>
+		<element name="debug_lamp_label_100" ref="debug_lamp_label_100">
 			<bounds x="303" y="431" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp101" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp101" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="352" y="416" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_101" element="debug_lamp_label_101">
+		</element>
+		<element name="debug_lamp_label_101" ref="debug_lamp_label_101">
 			<bounds x="367" y="431" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp102" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp102" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="416" y="416" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_102" element="debug_lamp_label_102">
+		</element>
+		<element name="debug_lamp_label_102" ref="debug_lamp_label_102">
 			<bounds x="431" y="431" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp103" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp103" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="480" y="416" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_103" element="debug_lamp_label_103">
+		</element>
+		<element name="debug_lamp_label_103" ref="debug_lamp_label_103">
 			<bounds x="495" y="431" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp104" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp104" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="544" y="416" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_104" element="debug_lamp_label_104">
+		</element>
+		<element name="debug_lamp_label_104" ref="debug_lamp_label_104">
 			<bounds x="559" y="431" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp105" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp105" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="608" y="416" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_105" element="debug_lamp_label_105">
+		</element>
+		<element name="debug_lamp_label_105" ref="debug_lamp_label_105">
 			<bounds x="623" y="431" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp106" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp106" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="672" y="416" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_106" element="debug_lamp_label_106">
+		</element>
+		<element name="debug_lamp_label_106" ref="debug_lamp_label_106">
 			<bounds x="687" y="431" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp107" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp107" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="736" y="416" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_107" element="debug_lamp_label_107">
+		</element>
+		<element name="debug_lamp_label_107" ref="debug_lamp_label_107">
 			<bounds x="751" y="431" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp108" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp108" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="800" y="416" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_108" element="debug_lamp_label_108">
+		</element>
+		<element name="debug_lamp_label_108" ref="debug_lamp_label_108">
 			<bounds x="815" y="431" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp109" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp109" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="864" y="416" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_109" element="debug_lamp_label_109">
+		</element>
+		<element name="debug_lamp_label_109" ref="debug_lamp_label_109">
 			<bounds x="879" y="431" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp110" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp110" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="928" y="416" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_110" element="debug_lamp_label_110">
+		</element>
+		<element name="debug_lamp_label_110" ref="debug_lamp_label_110">
 			<bounds x="943" y="431" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp111" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp111" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="992" y="416" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_111" element="debug_lamp_label_111">
+		</element>
+		<element name="debug_lamp_label_111" ref="debug_lamp_label_111">
 			<bounds x="1007" y="431" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp112" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp112" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="32" y="480" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_112" element="debug_lamp_label_112">
+		</element>
+		<element name="debug_lamp_label_112" ref="debug_lamp_label_112">
 			<bounds x="47" y="495" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp113" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp113" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="96" y="480" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_113" element="debug_lamp_label_113">
+		</element>
+		<element name="debug_lamp_label_113" ref="debug_lamp_label_113">
 			<bounds x="111" y="495" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp114" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp114" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="160" y="480" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_114" element="debug_lamp_label_114">
+		</element>
+		<element name="debug_lamp_label_114" ref="debug_lamp_label_114">
 			<bounds x="175" y="495" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp115" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp115" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="224" y="480" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_115" element="debug_lamp_label_115">
+		</element>
+		<element name="debug_lamp_label_115" ref="debug_lamp_label_115">
 			<bounds x="239" y="495" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp116" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp116" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="288" y="480" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_116" element="debug_lamp_label_116">
+		</element>
+		<element name="debug_lamp_label_116" ref="debug_lamp_label_116">
 			<bounds x="303" y="495" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp117" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp117" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="352" y="480" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_117" element="debug_lamp_label_117">
+		</element>
+		<element name="debug_lamp_label_117" ref="debug_lamp_label_117">
 			<bounds x="367" y="495" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp118" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp118" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="416" y="480" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_118" element="debug_lamp_label_118">
+		</element>
+		<element name="debug_lamp_label_118" ref="debug_lamp_label_118">
 			<bounds x="431" y="495" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp119" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp119" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="480" y="480" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_119" element="debug_lamp_label_119">
+		</element>
+		<element name="debug_lamp_label_119" ref="debug_lamp_label_119">
 			<bounds x="495" y="495" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp120" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp120" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="544" y="480" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_120" element="debug_lamp_label_120">
+		</element>
+		<element name="debug_lamp_label_120" ref="debug_lamp_label_120">
 			<bounds x="559" y="495" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp121" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp121" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="608" y="480" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_121" element="debug_lamp_label_121">
+		</element>
+		<element name="debug_lamp_label_121" ref="debug_lamp_label_121">
 			<bounds x="623" y="495" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp122" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp122" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="672" y="480" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_122" element="debug_lamp_label_122">
+		</element>
+		<element name="debug_lamp_label_122" ref="debug_lamp_label_122">
 			<bounds x="687" y="495" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp123" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp123" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="736" y="480" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_123" element="debug_lamp_label_123">
+		</element>
+		<element name="debug_lamp_label_123" ref="debug_lamp_label_123">
 			<bounds x="751" y="495" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp124" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp124" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="800" y="480" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_124" element="debug_lamp_label_124">
+		</element>
+		<element name="debug_lamp_label_124" ref="debug_lamp_label_124">
 			<bounds x="815" y="495" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp125" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp125" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="864" y="480" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_125" element="debug_lamp_label_125">
+		</element>
+		<element name="debug_lamp_label_125" ref="debug_lamp_label_125">
 			<bounds x="879" y="495" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp126" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp126" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="928" y="480" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_126" element="debug_lamp_label_126">
+		</element>
+		<element name="debug_lamp_label_126" ref="debug_lamp_label_126">
 			<bounds x="943" y="495" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp127" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp127" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="992" y="480" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_127" element="debug_lamp_label_127">
+		</element>
+		<element name="debug_lamp_label_127" ref="debug_lamp_label_127">
 			<bounds x="1007" y="495" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp128" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp128" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="32" y="544" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_128" element="debug_lamp_label_128">
+		</element>
+		<element name="debug_lamp_label_128" ref="debug_lamp_label_128">
 			<bounds x="47" y="559" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp129" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp129" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="96" y="544" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_129" element="debug_lamp_label_129">
+		</element>
+		<element name="debug_lamp_label_129" ref="debug_lamp_label_129">
 			<bounds x="111" y="559" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp130" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp130" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="160" y="544" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_130" element="debug_lamp_label_130">
+		</element>
+		<element name="debug_lamp_label_130" ref="debug_lamp_label_130">
 			<bounds x="175" y="559" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp131" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp131" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="224" y="544" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_131" element="debug_lamp_label_131">
+		</element>
+		<element name="debug_lamp_label_131" ref="debug_lamp_label_131">
 			<bounds x="239" y="559" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp132" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp132" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="288" y="544" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_132" element="debug_lamp_label_132">
+		</element>
+		<element name="debug_lamp_label_132" ref="debug_lamp_label_132">
 			<bounds x="303" y="559" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp133" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp133" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="352" y="544" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_133" element="debug_lamp_label_133">
+		</element>
+		<element name="debug_lamp_label_133" ref="debug_lamp_label_133">
 			<bounds x="367" y="559" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp134" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp134" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="416" y="544" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_134" element="debug_lamp_label_134">
+		</element>
+		<element name="debug_lamp_label_134" ref="debug_lamp_label_134">
 			<bounds x="431" y="559" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp135" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp135" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="480" y="544" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_135" element="debug_lamp_label_135">
+		</element>
+		<element name="debug_lamp_label_135" ref="debug_lamp_label_135">
 			<bounds x="495" y="559" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp136" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp136" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="544" y="544" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_136" element="debug_lamp_label_136">
+		</element>
+		<element name="debug_lamp_label_136" ref="debug_lamp_label_136">
 			<bounds x="559" y="559" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp137" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp137" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="608" y="544" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_137" element="debug_lamp_label_137">
+		</element>
+		<element name="debug_lamp_label_137" ref="debug_lamp_label_137">
 			<bounds x="623" y="559" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp138" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp138" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="672" y="544" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_138" element="debug_lamp_label_138">
+		</element>
+		<element name="debug_lamp_label_138" ref="debug_lamp_label_138">
 			<bounds x="687" y="559" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp139" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp139" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="736" y="544" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_139" element="debug_lamp_label_139">
+		</element>
+		<element name="debug_lamp_label_139" ref="debug_lamp_label_139">
 			<bounds x="751" y="559" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp140" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp140" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="800" y="544" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_140" element="debug_lamp_label_140">
+		</element>
+		<element name="debug_lamp_label_140" ref="debug_lamp_label_140">
 			<bounds x="815" y="559" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp141" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp141" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="864" y="544" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_141" element="debug_lamp_label_141">
+		</element>
+		<element name="debug_lamp_label_141" ref="debug_lamp_label_141">
 			<bounds x="879" y="559" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp142" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp142" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="928" y="544" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_142" element="debug_lamp_label_142">
+		</element>
+		<element name="debug_lamp_label_142" ref="debug_lamp_label_142">
 			<bounds x="943" y="559" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp143" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp143" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="992" y="544" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_143" element="debug_lamp_label_143">
+		</element>
+		<element name="debug_lamp_label_143" ref="debug_lamp_label_143">
 			<bounds x="1007" y="559" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp144" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp144" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="32" y="608" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_144" element="debug_lamp_label_144">
+		</element>
+		<element name="debug_lamp_label_144" ref="debug_lamp_label_144">
 			<bounds x="47" y="623" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp145" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp145" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="96" y="608" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_145" element="debug_lamp_label_145">
+		</element>
+		<element name="debug_lamp_label_145" ref="debug_lamp_label_145">
 			<bounds x="111" y="623" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp146" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp146" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="160" y="608" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_146" element="debug_lamp_label_146">
+		</element>
+		<element name="debug_lamp_label_146" ref="debug_lamp_label_146">
 			<bounds x="175" y="623" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp147" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp147" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="224" y="608" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_147" element="debug_lamp_label_147">
+		</element>
+		<element name="debug_lamp_label_147" ref="debug_lamp_label_147">
 			<bounds x="239" y="623" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp148" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp148" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="288" y="608" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_148" element="debug_lamp_label_148">
+		</element>
+		<element name="debug_lamp_label_148" ref="debug_lamp_label_148">
 			<bounds x="303" y="623" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp149" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp149" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="352" y="608" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_149" element="debug_lamp_label_149">
+		</element>
+		<element name="debug_lamp_label_149" ref="debug_lamp_label_149">
 			<bounds x="367" y="623" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp150" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp150" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="416" y="608" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_150" element="debug_lamp_label_150">
+		</element>
+		<element name="debug_lamp_label_150" ref="debug_lamp_label_150">
 			<bounds x="431" y="623" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp151" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp151" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="480" y="608" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_151" element="debug_lamp_label_151">
+		</element>
+		<element name="debug_lamp_label_151" ref="debug_lamp_label_151">
 			<bounds x="495" y="623" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp152" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp152" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="544" y="608" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_152" element="debug_lamp_label_152">
+		</element>
+		<element name="debug_lamp_label_152" ref="debug_lamp_label_152">
 			<bounds x="559" y="623" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp153" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp153" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="608" y="608" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_153" element="debug_lamp_label_153">
+		</element>
+		<element name="debug_lamp_label_153" ref="debug_lamp_label_153">
 			<bounds x="623" y="623" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp154" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp154" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="672" y="608" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_154" element="debug_lamp_label_154">
+		</element>
+		<element name="debug_lamp_label_154" ref="debug_lamp_label_154">
 			<bounds x="687" y="623" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp155" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp155" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="736" y="608" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_155" element="debug_lamp_label_155">
+		</element>
+		<element name="debug_lamp_label_155" ref="debug_lamp_label_155">
 			<bounds x="751" y="623" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp156" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp156" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="800" y="608" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_156" element="debug_lamp_label_156">
+		</element>
+		<element name="debug_lamp_label_156" ref="debug_lamp_label_156">
 			<bounds x="815" y="623" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp157" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp157" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="864" y="608" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_157" element="debug_lamp_label_157">
+		</element>
+		<element name="debug_lamp_label_157" ref="debug_lamp_label_157">
 			<bounds x="879" y="623" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp158" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp158" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="928" y="608" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_158" element="debug_lamp_label_158">
+		</element>
+		<element name="debug_lamp_label_158" ref="debug_lamp_label_158">
 			<bounds x="943" y="623" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp159" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp159" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="992" y="608" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_159" element="debug_lamp_label_159">
+		</element>
+		<element name="debug_lamp_label_159" ref="debug_lamp_label_159">
 			<bounds x="1007" y="623" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp160" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp160" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="32" y="672" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_160" element="debug_lamp_label_160">
+		</element>
+		<element name="debug_lamp_label_160" ref="debug_lamp_label_160">
 			<bounds x="47" y="687" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp161" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp161" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="96" y="672" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_161" element="debug_lamp_label_161">
+		</element>
+		<element name="debug_lamp_label_161" ref="debug_lamp_label_161">
 			<bounds x="111" y="687" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp162" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp162" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="160" y="672" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_162" element="debug_lamp_label_162">
+		</element>
+		<element name="debug_lamp_label_162" ref="debug_lamp_label_162">
 			<bounds x="175" y="687" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp163" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp163" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="224" y="672" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_163" element="debug_lamp_label_163">
+		</element>
+		<element name="debug_lamp_label_163" ref="debug_lamp_label_163">
 			<bounds x="239" y="687" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp164" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp164" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="288" y="672" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_164" element="debug_lamp_label_164">
+		</element>
+		<element name="debug_lamp_label_164" ref="debug_lamp_label_164">
 			<bounds x="303" y="687" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp165" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp165" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="352" y="672" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_165" element="debug_lamp_label_165">
+		</element>
+		<element name="debug_lamp_label_165" ref="debug_lamp_label_165">
 			<bounds x="367" y="687" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp166" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp166" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="416" y="672" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_166" element="debug_lamp_label_166">
+		</element>
+		<element name="debug_lamp_label_166" ref="debug_lamp_label_166">
 			<bounds x="431" y="687" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp167" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp167" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="480" y="672" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_167" element="debug_lamp_label_167">
+		</element>
+		<element name="debug_lamp_label_167" ref="debug_lamp_label_167">
 			<bounds x="495" y="687" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp168" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp168" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="544" y="672" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_168" element="debug_lamp_label_168">
+		</element>
+		<element name="debug_lamp_label_168" ref="debug_lamp_label_168">
 			<bounds x="559" y="687" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp169" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp169" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="608" y="672" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_169" element="debug_lamp_label_169">
+		</element>
+		<element name="debug_lamp_label_169" ref="debug_lamp_label_169">
 			<bounds x="623" y="687" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp170" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp170" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="672" y="672" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_170" element="debug_lamp_label_170">
+		</element>
+		<element name="debug_lamp_label_170" ref="debug_lamp_label_170">
 			<bounds x="687" y="687" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp171" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp171" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="736" y="672" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_171" element="debug_lamp_label_171">
+		</element>
+		<element name="debug_lamp_label_171" ref="debug_lamp_label_171">
 			<bounds x="751" y="687" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp172" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp172" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="800" y="672" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_172" element="debug_lamp_label_172">
+		</element>
+		<element name="debug_lamp_label_172" ref="debug_lamp_label_172">
 			<bounds x="815" y="687" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp173" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp173" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="864" y="672" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_173" element="debug_lamp_label_173">
+		</element>
+		<element name="debug_lamp_label_173" ref="debug_lamp_label_173">
 			<bounds x="879" y="687" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp174" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp174" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="928" y="672" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_174" element="debug_lamp_label_174">
+		</element>
+		<element name="debug_lamp_label_174" ref="debug_lamp_label_174">
 			<bounds x="943" y="687" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp175" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp175" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="992" y="672" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_175" element="debug_lamp_label_175">
+		</element>
+		<element name="debug_lamp_label_175" ref="debug_lamp_label_175">
 			<bounds x="1007" y="687" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp176" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp176" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="32" y="736" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_176" element="debug_lamp_label_176">
+		</element>
+		<element name="debug_lamp_label_176" ref="debug_lamp_label_176">
 			<bounds x="47" y="751" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp177" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp177" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="96" y="736" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_177" element="debug_lamp_label_177">
+		</element>
+		<element name="debug_lamp_label_177" ref="debug_lamp_label_177">
 			<bounds x="111" y="751" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp178" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp178" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="160" y="736" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_178" element="debug_lamp_label_178">
+		</element>
+		<element name="debug_lamp_label_178" ref="debug_lamp_label_178">
 			<bounds x="175" y="751" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp179" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp179" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="224" y="736" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_179" element="debug_lamp_label_179">
+		</element>
+		<element name="debug_lamp_label_179" ref="debug_lamp_label_179">
 			<bounds x="239" y="751" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp180" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp180" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="288" y="736" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_180" element="debug_lamp_label_180">
+		</element>
+		<element name="debug_lamp_label_180" ref="debug_lamp_label_180">
 			<bounds x="303" y="751" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp181" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp181" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="352" y="736" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_181" element="debug_lamp_label_181">
+		</element>
+		<element name="debug_lamp_label_181" ref="debug_lamp_label_181">
 			<bounds x="367" y="751" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp182" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp182" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="416" y="736" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_182" element="debug_lamp_label_182">
+		</element>
+		<element name="debug_lamp_label_182" ref="debug_lamp_label_182">
 			<bounds x="431" y="751" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp183" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp183" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="480" y="736" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_183" element="debug_lamp_label_183">
+		</element>
+		<element name="debug_lamp_label_183" ref="debug_lamp_label_183">
 			<bounds x="495" y="751" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp184" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp184" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="544" y="736" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_184" element="debug_lamp_label_184">
+		</element>
+		<element name="debug_lamp_label_184" ref="debug_lamp_label_184">
 			<bounds x="559" y="751" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp185" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp185" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="608" y="736" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_185" element="debug_lamp_label_185">
+		</element>
+		<element name="debug_lamp_label_185" ref="debug_lamp_label_185">
 			<bounds x="623" y="751" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp186" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp186" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="672" y="736" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_186" element="debug_lamp_label_186">
+		</element>
+		<element name="debug_lamp_label_186" ref="debug_lamp_label_186">
 			<bounds x="687" y="751" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp187" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp187" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="736" y="736" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_187" element="debug_lamp_label_187">
+		</element>
+		<element name="debug_lamp_label_187" ref="debug_lamp_label_187">
 			<bounds x="751" y="751" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp188" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp188" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="800" y="736" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_188" element="debug_lamp_label_188">
+		</element>
+		<element name="debug_lamp_label_188" ref="debug_lamp_label_188">
 			<bounds x="815" y="751" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp189" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp189" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="864" y="736" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_189" element="debug_lamp_label_189">
+		</element>
+		<element name="debug_lamp_label_189" ref="debug_lamp_label_189">
 			<bounds x="879" y="751" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp190" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp190" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="928" y="736" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_190" element="debug_lamp_label_190">
+		</element>
+		<element name="debug_lamp_label_190" ref="debug_lamp_label_190">
 			<bounds x="943" y="751" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp191" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp191" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="992" y="736" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_191" element="debug_lamp_label_191">
+		</element>
+		<element name="debug_lamp_label_191" ref="debug_lamp_label_191">
 			<bounds x="1007" y="751" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp192" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp192" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="32" y="800" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_192" element="debug_lamp_label_192">
+		</element>
+		<element name="debug_lamp_label_192" ref="debug_lamp_label_192">
 			<bounds x="47" y="815" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp193" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp193" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="96" y="800" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_193" element="debug_lamp_label_193">
+		</element>
+		<element name="debug_lamp_label_193" ref="debug_lamp_label_193">
 			<bounds x="111" y="815" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp194" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp194" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="160" y="800" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_194" element="debug_lamp_label_194">
+		</element>
+		<element name="debug_lamp_label_194" ref="debug_lamp_label_194">
 			<bounds x="175" y="815" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp195" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp195" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="224" y="800" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_195" element="debug_lamp_label_195">
+		</element>
+		<element name="debug_lamp_label_195" ref="debug_lamp_label_195">
 			<bounds x="239" y="815" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp196" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp196" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="288" y="800" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_196" element="debug_lamp_label_196">
+		</element>
+		<element name="debug_lamp_label_196" ref="debug_lamp_label_196">
 			<bounds x="303" y="815" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp197" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp197" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="352" y="800" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_197" element="debug_lamp_label_197">
+		</element>
+		<element name="debug_lamp_label_197" ref="debug_lamp_label_197">
 			<bounds x="367" y="815" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp198" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp198" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="416" y="800" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_198" element="debug_lamp_label_198">
+		</element>
+		<element name="debug_lamp_label_198" ref="debug_lamp_label_198">
 			<bounds x="431" y="815" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp199" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp199" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="480" y="800" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_199" element="debug_lamp_label_199">
+		</element>
+		<element name="debug_lamp_label_199" ref="debug_lamp_label_199">
 			<bounds x="495" y="815" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp200" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp200" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="544" y="800" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_200" element="debug_lamp_label_200">
+		</element>
+		<element name="debug_lamp_label_200" ref="debug_lamp_label_200">
 			<bounds x="559" y="815" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp201" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp201" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="608" y="800" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_201" element="debug_lamp_label_201">
+		</element>
+		<element name="debug_lamp_label_201" ref="debug_lamp_label_201">
 			<bounds x="623" y="815" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp202" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp202" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="672" y="800" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_202" element="debug_lamp_label_202">
+		</element>
+		<element name="debug_lamp_label_202" ref="debug_lamp_label_202">
 			<bounds x="687" y="815" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp203" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp203" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="736" y="800" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_203" element="debug_lamp_label_203">
+		</element>
+		<element name="debug_lamp_label_203" ref="debug_lamp_label_203">
 			<bounds x="751" y="815" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp204" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp204" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="800" y="800" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_204" element="debug_lamp_label_204">
+		</element>
+		<element name="debug_lamp_label_204" ref="debug_lamp_label_204">
 			<bounds x="815" y="815" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp205" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp205" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="864" y="800" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_205" element="debug_lamp_label_205">
+		</element>
+		<element name="debug_lamp_label_205" ref="debug_lamp_label_205">
 			<bounds x="879" y="815" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp206" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp206" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="928" y="800" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_206" element="debug_lamp_label_206">
+		</element>
+		<element name="debug_lamp_label_206" ref="debug_lamp_label_206">
 			<bounds x="943" y="815" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp207" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp207" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="992" y="800" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_207" element="debug_lamp_label_207">
+		</element>
+		<element name="debug_lamp_label_207" ref="debug_lamp_label_207">
 			<bounds x="1007" y="815" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp208" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp208" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="32" y="864" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_208" element="debug_lamp_label_208">
+		</element>
+		<element name="debug_lamp_label_208" ref="debug_lamp_label_208">
 			<bounds x="47" y="879" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp209" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp209" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="96" y="864" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_209" element="debug_lamp_label_209">
+		</element>
+		<element name="debug_lamp_label_209" ref="debug_lamp_label_209">
 			<bounds x="111" y="879" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp210" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp210" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="160" y="864" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_210" element="debug_lamp_label_210">
+		</element>
+		<element name="debug_lamp_label_210" ref="debug_lamp_label_210">
 			<bounds x="175" y="879" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp211" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp211" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="224" y="864" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_211" element="debug_lamp_label_211">
+		</element>
+		<element name="debug_lamp_label_211" ref="debug_lamp_label_211">
 			<bounds x="239" y="879" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp212" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp212" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="288" y="864" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_212" element="debug_lamp_label_212">
+		</element>
+		<element name="debug_lamp_label_212" ref="debug_lamp_label_212">
 			<bounds x="303" y="879" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp213" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp213" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="352" y="864" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_213" element="debug_lamp_label_213">
+		</element>
+		<element name="debug_lamp_label_213" ref="debug_lamp_label_213">
 			<bounds x="367" y="879" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp214" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp214" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="416" y="864" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_214" element="debug_lamp_label_214">
+		</element>
+		<element name="debug_lamp_label_214" ref="debug_lamp_label_214">
 			<bounds x="431" y="879" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp215" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp215" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="480" y="864" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_215" element="debug_lamp_label_215">
+		</element>
+		<element name="debug_lamp_label_215" ref="debug_lamp_label_215">
 			<bounds x="495" y="879" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp216" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp216" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="544" y="864" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_216" element="debug_lamp_label_216">
+		</element>
+		<element name="debug_lamp_label_216" ref="debug_lamp_label_216">
 			<bounds x="559" y="879" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp217" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp217" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="608" y="864" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_217" element="debug_lamp_label_217">
+		</element>
+		<element name="debug_lamp_label_217" ref="debug_lamp_label_217">
 			<bounds x="623" y="879" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp218" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp218" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="672" y="864" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_218" element="debug_lamp_label_218">
+		</element>
+		<element name="debug_lamp_label_218" ref="debug_lamp_label_218">
 			<bounds x="687" y="879" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp219" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp219" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="736" y="864" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_219" element="debug_lamp_label_219">
+		</element>
+		<element name="debug_lamp_label_219" ref="debug_lamp_label_219">
 			<bounds x="751" y="879" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp220" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp220" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="800" y="864" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_220" element="debug_lamp_label_220">
+		</element>
+		<element name="debug_lamp_label_220" ref="debug_lamp_label_220">
 			<bounds x="815" y="879" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp221" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp221" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="864" y="864" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_221" element="debug_lamp_label_221">
+		</element>
+		<element name="debug_lamp_label_221" ref="debug_lamp_label_221">
 			<bounds x="879" y="879" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp222" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp222" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="928" y="864" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_222" element="debug_lamp_label_222">
+		</element>
+		<element name="debug_lamp_label_222" ref="debug_lamp_label_222">
 			<bounds x="943" y="879" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp223" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp223" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="992" y="864" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_223" element="debug_lamp_label_223">
+		</element>
+		<element name="debug_lamp_label_223" ref="debug_lamp_label_223">
 			<bounds x="1007" y="879" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp224" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp224" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="32" y="928" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_224" element="debug_lamp_label_224">
+		</element>
+		<element name="debug_lamp_label_224" ref="debug_lamp_label_224">
 			<bounds x="47" y="943" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp225" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp225" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="96" y="928" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_225" element="debug_lamp_label_225">
+		</element>
+		<element name="debug_lamp_label_225" ref="debug_lamp_label_225">
 			<bounds x="111" y="943" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp226" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp226" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="160" y="928" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_226" element="debug_lamp_label_226">
+		</element>
+		<element name="debug_lamp_label_226" ref="debug_lamp_label_226">
 			<bounds x="175" y="943" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp227" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp227" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="224" y="928" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_227" element="debug_lamp_label_227">
+		</element>
+		<element name="debug_lamp_label_227" ref="debug_lamp_label_227">
 			<bounds x="239" y="943" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp228" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp228" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="288" y="928" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_228" element="debug_lamp_label_228">
+		</element>
+		<element name="debug_lamp_label_228" ref="debug_lamp_label_228">
 			<bounds x="303" y="943" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp229" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp229" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="352" y="928" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_229" element="debug_lamp_label_229">
+		</element>
+		<element name="debug_lamp_label_229" ref="debug_lamp_label_229">
 			<bounds x="367" y="943" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp230" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp230" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="416" y="928" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_230" element="debug_lamp_label_230">
+		</element>
+		<element name="debug_lamp_label_230" ref="debug_lamp_label_230">
 			<bounds x="431" y="943" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp231" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp231" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="480" y="928" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_231" element="debug_lamp_label_231">
+		</element>
+		<element name="debug_lamp_label_231" ref="debug_lamp_label_231">
 			<bounds x="495" y="943" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp232" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp232" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="544" y="928" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_232" element="debug_lamp_label_232">
+		</element>
+		<element name="debug_lamp_label_232" ref="debug_lamp_label_232">
 			<bounds x="559" y="943" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp233" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp233" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="608" y="928" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_233" element="debug_lamp_label_233">
+		</element>
+		<element name="debug_lamp_label_233" ref="debug_lamp_label_233">
 			<bounds x="623" y="943" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp234" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp234" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="672" y="928" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_234" element="debug_lamp_label_234">
+		</element>
+		<element name="debug_lamp_label_234" ref="debug_lamp_label_234">
 			<bounds x="687" y="943" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp235" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp235" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="736" y="928" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_235" element="debug_lamp_label_235">
+		</element>
+		<element name="debug_lamp_label_235" ref="debug_lamp_label_235">
 			<bounds x="751" y="943" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp236" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp236" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="800" y="928" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_236" element="debug_lamp_label_236">
+		</element>
+		<element name="debug_lamp_label_236" ref="debug_lamp_label_236">
 			<bounds x="815" y="943" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp237" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp237" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="864" y="928" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_237" element="debug_lamp_label_237">
+		</element>
+		<element name="debug_lamp_label_237" ref="debug_lamp_label_237">
 			<bounds x="879" y="943" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp238" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp238" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="928" y="928" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_238" element="debug_lamp_label_238">
+		</element>
+		<element name="debug_lamp_label_238" ref="debug_lamp_label_238">
 			<bounds x="943" y="943" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp239" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp239" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="992" y="928" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_239" element="debug_lamp_label_239">
+		</element>
+		<element name="debug_lamp_label_239" ref="debug_lamp_label_239">
 			<bounds x="1007" y="943" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp240" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp240" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="32" y="992" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_240" element="debug_lamp_label_240">
+		</element>
+		<element name="debug_lamp_label_240" ref="debug_lamp_label_240">
 			<bounds x="47" y="1007" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp241" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp241" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="96" y="992" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_241" element="debug_lamp_label_241">
+		</element>
+		<element name="debug_lamp_label_241" ref="debug_lamp_label_241">
 			<bounds x="111" y="1007" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp242" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp242" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="160" y="992" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_242" element="debug_lamp_label_242">
+		</element>
+		<element name="debug_lamp_label_242" ref="debug_lamp_label_242">
 			<bounds x="175" y="1007" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp243" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp243" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="224" y="992" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_243" element="debug_lamp_label_243">
+		</element>
+		<element name="debug_lamp_label_243" ref="debug_lamp_label_243">
 			<bounds x="239" y="1007" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp244" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp244" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="288" y="992" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_244" element="debug_lamp_label_244">
+		</element>
+		<element name="debug_lamp_label_244" ref="debug_lamp_label_244">
 			<bounds x="303" y="1007" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp245" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp245" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="352" y="992" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_245" element="debug_lamp_label_245">
+		</element>
+		<element name="debug_lamp_label_245" ref="debug_lamp_label_245">
 			<bounds x="367" y="1007" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp246" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp246" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="416" y="992" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_246" element="debug_lamp_label_246">
+		</element>
+		<element name="debug_lamp_label_246" ref="debug_lamp_label_246">
 			<bounds x="431" y="1007" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp247" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp247" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="480" y="992" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_247" element="debug_lamp_label_247">
+		</element>
+		<element name="debug_lamp_label_247" ref="debug_lamp_label_247">
 			<bounds x="495" y="1007" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp248" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp248" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="544" y="992" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_248" element="debug_lamp_label_248">
+		</element>
+		<element name="debug_lamp_label_248" ref="debug_lamp_label_248">
 			<bounds x="559" y="1007" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp249" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp249" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="608" y="992" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_249" element="debug_lamp_label_249">
+		</element>
+		<element name="debug_lamp_label_249" ref="debug_lamp_label_249">
 			<bounds x="623" y="1007" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp250" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp250" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="672" y="992" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_250" element="debug_lamp_label_250">
+		</element>
+		<element name="debug_lamp_label_250" ref="debug_lamp_label_250">
 			<bounds x="687" y="1007" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp251" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp251" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="736" y="992" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_251" element="debug_lamp_label_251">
+		</element>
+		<element name="debug_lamp_label_251" ref="debug_lamp_label_251">
 			<bounds x="751" y="1007" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp252" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp252" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="800" y="992" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_252" element="debug_lamp_label_252">
+		</element>
+		<element name="debug_lamp_label_252" ref="debug_lamp_label_252">
 			<bounds x="815" y="1007" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp253" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp253" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="864" y="992" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_253" element="debug_lamp_label_253">
+		</element>
+		<element name="debug_lamp_label_253" ref="debug_lamp_label_253">
 			<bounds x="879" y="1007" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp254" element="debug_lamp_unreferenced" state="0">
+		</element>
+		<element name="lamp254" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="928" y="992" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_254" element="debug_lamp_label_254">
+		</element>
+		<element name="debug_lamp_label_254" ref="debug_lamp_label_254">
 			<bounds x="943" y="1007" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="lamp255" element="debug_lamp_segment" state="0">
+		</element>
+		<element name="lamp255" ref="debug_lamp_segment" state="0">
 			<bounds x="992" y="992" width="60" height="60"/>
-		</backdrop>
-		<backdrop name="debug_lamp_label_255" element="debug_lamp_label_255">
+		</element>
+		<element name="debug_lamp_label_255" ref="debug_lamp_label_255">
 			<bounds x="1007" y="1007" width="30" height="30"/>
-		</backdrop>
-		<backdrop name="debug_button_0" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x01">
+		</element>
+		<element name="debug_button_0" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x01">
 			<bounds x="1100" y="660" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_0" element="debug_button_label_0">
+		</element>
+		<element name="debug_button_label_0" ref="debug_button_label_0">
 			<bounds x="1120" y="671" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_1" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x02">
+		</element>
+		<element name="debug_button_1" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x02">
 			<bounds x="1184" y="660" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_1" element="debug_button_label_1">
+		</element>
+		<element name="debug_button_label_1" ref="debug_button_label_1">
 			<bounds x="1204" y="671" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_2" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x04">
+		</element>
+		<element name="debug_button_2" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x04">
 			<bounds x="1268" y="660" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_2" element="debug_button_label_2">
+		</element>
+		<element name="debug_button_label_2" ref="debug_button_label_2">
 			<bounds x="1288" y="671" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_3" element="debug_button_standard" state="0" inputtag="TODO" inputmask="0x08">
+		</element>
+		<element name="debug_button_3" ref="debug_button_standard" state="0" inputtag="TODO" inputmask="0x08">
 			<bounds x="1352" y="660" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_3" element="debug_button_label_3">
+		</element>
+		<element name="debug_button_label_3" ref="debug_button_label_3">
 			<bounds x="1372" y="671" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_4" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x10">
+		</element>
+		<element name="debug_button_4" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x10">
 			<bounds x="1436" y="660" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_4" element="debug_button_label_4">
+		</element>
+		<element name="debug_button_label_4" ref="debug_button_label_4">
 			<bounds x="1456" y="671" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_5" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x20">
+		</element>
+		<element name="debug_button_5" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x20">
 			<bounds x="1520" y="660" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_5" element="debug_button_label_5">
+		</element>
+		<element name="debug_button_label_5" ref="debug_button_label_5">
 			<bounds x="1540" y="671" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_6" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x40">
+		</element>
+		<element name="debug_button_6" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x40">
 			<bounds x="1604" y="660" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_6" element="debug_button_label_6">
+		</element>
+		<element name="debug_button_label_6" ref="debug_button_label_6">
 			<bounds x="1624" y="671" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_7" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x80">
+		</element>
+		<element name="debug_button_7" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x80">
 			<bounds x="1688" y="660" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_7" element="debug_button_label_7">
+		</element>
+		<element name="debug_button_label_7" ref="debug_button_label_7">
 			<bounds x="1708" y="671" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="lamp23" element="debug_button_standard" state="0" inputtag="TODO" inputmask="0x01">
+		</element>
+		<element name="lamp23" ref="debug_button_standard" state="0" inputtag="TODO" inputmask="0x01">
 			<bounds x="1100" y="708" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_8" element="debug_button_label_8">
+		</element>
+		<element name="debug_button_label_8" ref="debug_button_label_8">
 			<bounds x="1120" y="719" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="lamp31" element="debug_button_standard" state="0" inputtag="TODO" inputmask="0x02">
+		</element>
+		<element name="lamp31" ref="debug_button_standard" state="0" inputtag="TODO" inputmask="0x02">
 			<bounds x="1184" y="708" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_9" element="debug_button_label_9">
+		</element>
+		<element name="debug_button_label_9" ref="debug_button_label_9">
 			<bounds x="1204" y="719" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="lamp39" element="debug_button_standard" state="0" inputtag="TODO" inputmask="0x04">
+		</element>
+		<element name="lamp39" ref="debug_button_standard" state="0" inputtag="TODO" inputmask="0x04">
 			<bounds x="1268" y="708" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_10" element="debug_button_label_10">
+		</element>
+		<element name="debug_button_label_10" ref="debug_button_label_10">
 			<bounds x="1288" y="719" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="lamp47" element="debug_button_standard" state="0" inputtag="TODO" inputmask="0x08">
+		</element>
+		<element name="lamp47" ref="debug_button_standard" state="0" inputtag="TODO" inputmask="0x08">
 			<bounds x="1352" y="708" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_11" element="debug_button_label_11">
+		</element>
+		<element name="debug_button_label_11" ref="debug_button_label_11">
 			<bounds x="1372" y="719" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_12" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x10">
+		</element>
+		<element name="debug_button_12" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x10">
 			<bounds x="1436" y="708" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_12" element="debug_button_label_12">
+		</element>
+		<element name="debug_button_label_12" ref="debug_button_label_12">
 			<bounds x="1456" y="719" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_13" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x20">
+		</element>
+		<element name="debug_button_13" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x20">
 			<bounds x="1520" y="708" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_13" element="debug_button_label_13">
+		</element>
+		<element name="debug_button_label_13" ref="debug_button_label_13">
 			<bounds x="1540" y="719" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_14" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x40">
+		</element>
+		<element name="debug_button_14" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x40">
 			<bounds x="1604" y="708" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_14" element="debug_button_label_14">
+		</element>
+		<element name="debug_button_label_14" ref="debug_button_label_14">
 			<bounds x="1624" y="719" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_15" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x80">
+		</element>
+		<element name="debug_button_15" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x80">
 			<bounds x="1688" y="708" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_15" element="debug_button_label_15">
+		</element>
+		<element name="debug_button_label_15" ref="debug_button_label_15">
 			<bounds x="1708" y="719" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_16" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x01">
+		</element>
+		<element name="debug_button_16" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x01">
 			<bounds x="1100" y="756" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_16" element="debug_button_label_16">
+		</element>
+		<element name="debug_button_label_16" ref="debug_button_label_16">
 			<bounds x="1120" y="767" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_17" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x02">
+		</element>
+		<element name="debug_button_17" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x02">
 			<bounds x="1184" y="756" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_17" element="debug_button_label_17">
+		</element>
+		<element name="debug_button_label_17" ref="debug_button_label_17">
 			<bounds x="1204" y="767" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_18" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x04">
+		</element>
+		<element name="debug_button_18" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x04">
 			<bounds x="1268" y="756" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_18" element="debug_button_label_18">
+		</element>
+		<element name="debug_button_label_18" ref="debug_button_label_18">
 			<bounds x="1288" y="767" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="lamp71" element="debug_button_standard" state="0" inputtag="TODO" inputmask="0x08">
+		</element>
+		<element name="lamp71" ref="debug_button_standard" state="0" inputtag="TODO" inputmask="0x08">
 			<bounds x="1352" y="756" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_19" element="debug_button_label_19">
+		</element>
+		<element name="debug_button_label_19" ref="debug_button_label_19">
 			<bounds x="1372" y="767" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_20" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x10">
+		</element>
+		<element name="debug_button_20" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x10">
 			<bounds x="1436" y="756" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_20" element="debug_button_label_20">
+		</element>
+		<element name="debug_button_label_20" ref="debug_button_label_20">
 			<bounds x="1456" y="767" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_21" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x20">
+		</element>
+		<element name="debug_button_21" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x20">
 			<bounds x="1520" y="756" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_21" element="debug_button_label_21">
+		</element>
+		<element name="debug_button_label_21" ref="debug_button_label_21">
 			<bounds x="1540" y="767" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_22" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x40">
+		</element>
+		<element name="debug_button_22" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x40">
 			<bounds x="1604" y="756" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_22" element="debug_button_label_22">
+		</element>
+		<element name="debug_button_label_22" ref="debug_button_label_22">
 			<bounds x="1624" y="767" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_23" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x80">
+		</element>
+		<element name="debug_button_23" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x80">
 			<bounds x="1688" y="756" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_23" element="debug_button_label_23">
+		</element>
+		<element name="debug_button_label_23" ref="debug_button_label_23">
 			<bounds x="1708" y="767" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="lamp7" element="debug_button_standard" state="0" inputtag="TODO" inputmask="0x01">
+		</element>
+		<element name="lamp7" ref="debug_button_standard" state="0" inputtag="TODO" inputmask="0x01">
 			<bounds x="1100" y="804" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_24" element="debug_button_label_24">
+		</element>
+		<element name="debug_button_label_24" ref="debug_button_label_24">
 			<bounds x="1120" y="815" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_25" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x02">
+		</element>
+		<element name="debug_button_25" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x02">
 			<bounds x="1184" y="804" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_25" element="debug_button_label_25">
+		</element>
+		<element name="debug_button_label_25" ref="debug_button_label_25">
 			<bounds x="1204" y="815" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_26" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x04">
+		</element>
+		<element name="debug_button_26" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x04">
 			<bounds x="1268" y="804" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_26" element="debug_button_label_26">
+		</element>
+		<element name="debug_button_label_26" ref="debug_button_label_26">
 			<bounds x="1288" y="815" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_27" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x08">
+		</element>
+		<element name="debug_button_27" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x08">
 			<bounds x="1352" y="804" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_27" element="debug_button_label_27">
+		</element>
+		<element name="debug_button_label_27" ref="debug_button_label_27">
 			<bounds x="1372" y="815" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_28" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x10">
+		</element>
+		<element name="debug_button_28" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x10">
 			<bounds x="1436" y="804" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_28" element="debug_button_label_28">
+		</element>
+		<element name="debug_button_label_28" ref="debug_button_label_28">
 			<bounds x="1456" y="815" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_29" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x20">
+		</element>
+		<element name="debug_button_29" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x20">
 			<bounds x="1520" y="804" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_29" element="debug_button_label_29">
+		</element>
+		<element name="debug_button_label_29" ref="debug_button_label_29">
 			<bounds x="1540" y="815" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_30" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x40">
+		</element>
+		<element name="debug_button_30" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x40">
 			<bounds x="1604" y="804" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_30" element="debug_button_label_30">
+		</element>
+		<element name="debug_button_label_30" ref="debug_button_label_30">
 			<bounds x="1624" y="815" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_31" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x80">
+		</element>
+		<element name="debug_button_31" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x80">
 			<bounds x="1688" y="804" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_31" element="debug_button_label_31">
+		</element>
+		<element name="debug_button_label_31" ref="debug_button_label_31">
 			<bounds x="1708" y="815" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_32" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x01">
+		</element>
+		<element name="debug_button_32" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x01">
 			<bounds x="1100" y="852" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_32" element="debug_button_label_32">
+		</element>
+		<element name="debug_button_label_32" ref="debug_button_label_32">
 			<bounds x="1120" y="863" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_33" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x02">
+		</element>
+		<element name="debug_button_33" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x02">
 			<bounds x="1184" y="852" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_33" element="debug_button_label_33">
+		</element>
+		<element name="debug_button_label_33" ref="debug_button_label_33">
 			<bounds x="1204" y="863" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_34" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x04">
+		</element>
+		<element name="debug_button_34" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x04">
 			<bounds x="1268" y="852" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_34" element="debug_button_label_34">
+		</element>
+		<element name="debug_button_label_34" ref="debug_button_label_34">
 			<bounds x="1288" y="863" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_35" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x08">
+		</element>
+		<element name="debug_button_35" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x08">
 			<bounds x="1352" y="852" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_35" element="debug_button_label_35">
+		</element>
+		<element name="debug_button_label_35" ref="debug_button_label_35">
 			<bounds x="1372" y="863" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_36" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x10">
+		</element>
+		<element name="debug_button_36" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x10">
 			<bounds x="1436" y="852" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_36" element="debug_button_label_36">
+		</element>
+		<element name="debug_button_label_36" ref="debug_button_label_36">
 			<bounds x="1456" y="863" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_37" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x20">
+		</element>
+		<element name="debug_button_37" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x20">
 			<bounds x="1520" y="852" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_37" element="debug_button_label_37">
+		</element>
+		<element name="debug_button_label_37" ref="debug_button_label_37">
 			<bounds x="1540" y="863" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_38" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x40">
+		</element>
+		<element name="debug_button_38" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x40">
 			<bounds x="1604" y="852" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_38" element="debug_button_label_38">
+		</element>
+		<element name="debug_button_label_38" ref="debug_button_label_38">
 			<bounds x="1624" y="863" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_39" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x80">
+		</element>
+		<element name="debug_button_39" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x80">
 			<bounds x="1688" y="852" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_39" element="debug_button_label_39">
+		</element>
+		<element name="debug_button_label_39" ref="debug_button_label_39">
 			<bounds x="1708" y="863" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_40" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x01">
+		</element>
+		<element name="debug_button_40" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x01">
 			<bounds x="1100" y="900" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_40" element="debug_button_label_40">
+		</element>
+		<element name="debug_button_label_40" ref="debug_button_label_40">
 			<bounds x="1120" y="911" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_41" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x02">
+		</element>
+		<element name="debug_button_41" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x02">
 			<bounds x="1184" y="900" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_41" element="debug_button_label_41">
+		</element>
+		<element name="debug_button_label_41" ref="debug_button_label_41">
 			<bounds x="1204" y="911" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_42" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x04">
+		</element>
+		<element name="debug_button_42" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x04">
 			<bounds x="1268" y="900" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_42" element="debug_button_label_42">
+		</element>
+		<element name="debug_button_label_42" ref="debug_button_label_42">
 			<bounds x="1288" y="911" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_43" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x08">
+		</element>
+		<element name="debug_button_43" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x08">
 			<bounds x="1352" y="900" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_43" element="debug_button_label_43">
+		</element>
+		<element name="debug_button_label_43" ref="debug_button_label_43">
 			<bounds x="1372" y="911" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_44" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x10">
+		</element>
+		<element name="debug_button_44" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x10">
 			<bounds x="1436" y="900" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_44" element="debug_button_label_44">
+		</element>
+		<element name="debug_button_label_44" ref="debug_button_label_44">
 			<bounds x="1456" y="911" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_45" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x20">
+		</element>
+		<element name="debug_button_45" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x20">
 			<bounds x="1520" y="900" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_45" element="debug_button_label_45">
+		</element>
+		<element name="debug_button_label_45" ref="debug_button_label_45">
 			<bounds x="1540" y="911" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_46" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x40">
+		</element>
+		<element name="debug_button_46" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x40">
 			<bounds x="1604" y="900" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_46" element="debug_button_label_46">
+		</element>
+		<element name="debug_button_label_46" ref="debug_button_label_46">
 			<bounds x="1624" y="911" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_47" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x80">
+		</element>
+		<element name="debug_button_47" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x80">
 			<bounds x="1688" y="900" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_47" element="debug_button_label_47">
+		</element>
+		<element name="debug_button_label_47" ref="debug_button_label_47">
 			<bounds x="1708" y="911" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_48" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x01">
+		</element>
+		<element name="debug_button_48" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x01">
 			<bounds x="1100" y="948" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_48" element="debug_button_label_48">
+		</element>
+		<element name="debug_button_label_48" ref="debug_button_label_48">
 			<bounds x="1120" y="959" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_49" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x02">
+		</element>
+		<element name="debug_button_49" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x02">
 			<bounds x="1184" y="948" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_49" element="debug_button_label_49">
+		</element>
+		<element name="debug_button_label_49" ref="debug_button_label_49">
 			<bounds x="1204" y="959" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_50" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x04">
+		</element>
+		<element name="debug_button_50" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x04">
 			<bounds x="1268" y="948" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_50" element="debug_button_label_50">
+		</element>
+		<element name="debug_button_label_50" ref="debug_button_label_50">
 			<bounds x="1288" y="959" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_51" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x08">
+		</element>
+		<element name="debug_button_51" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x08">
 			<bounds x="1352" y="948" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_51" element="debug_button_label_51">
+		</element>
+		<element name="debug_button_label_51" ref="debug_button_label_51">
 			<bounds x="1372" y="959" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_52" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x10">
+		</element>
+		<element name="debug_button_52" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x10">
 			<bounds x="1436" y="948" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_52" element="debug_button_label_52">
+		</element>
+		<element name="debug_button_label_52" ref="debug_button_label_52">
 			<bounds x="1456" y="959" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_53" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x20">
+		</element>
+		<element name="debug_button_53" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x20">
 			<bounds x="1520" y="948" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_53" element="debug_button_label_53">
+		</element>
+		<element name="debug_button_label_53" ref="debug_button_label_53">
 			<bounds x="1540" y="959" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_54" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x40">
+		</element>
+		<element name="debug_button_54" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x40">
 			<bounds x="1604" y="948" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_54" element="debug_button_label_54">
+		</element>
+		<element name="debug_button_label_54" ref="debug_button_label_54">
 			<bounds x="1624" y="959" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_55" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x80">
+		</element>
+		<element name="debug_button_55" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x80">
 			<bounds x="1688" y="948" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_55" element="debug_button_label_55">
+		</element>
+		<element name="debug_button_label_55" ref="debug_button_label_55">
 			<bounds x="1708" y="959" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_56" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x01">
+		</element>
+		<element name="debug_button_56" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x01">
 			<bounds x="1100" y="996" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_56" element="debug_button_label_56">
+		</element>
+		<element name="debug_button_label_56" ref="debug_button_label_56">
 			<bounds x="1120" y="1007" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_57" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x02">
+		</element>
+		<element name="debug_button_57" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x02">
 			<bounds x="1184" y="996" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_57" element="debug_button_label_57">
+		</element>
+		<element name="debug_button_label_57" ref="debug_button_label_57">
 			<bounds x="1204" y="1007" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_58" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x04">
+		</element>
+		<element name="debug_button_58" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x04">
 			<bounds x="1268" y="996" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_58" element="debug_button_label_58">
+		</element>
+		<element name="debug_button_label_58" ref="debug_button_label_58">
 			<bounds x="1288" y="1007" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_59" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x08">
+		</element>
+		<element name="debug_button_59" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x08">
 			<bounds x="1352" y="996" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_59" element="debug_button_label_59">
+		</element>
+		<element name="debug_button_label_59" ref="debug_button_label_59">
 			<bounds x="1372" y="1007" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_60" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x10">
+		</element>
+		<element name="debug_button_60" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x10">
 			<bounds x="1436" y="996" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_60" element="debug_button_label_60">
+		</element>
+		<element name="debug_button_label_60" ref="debug_button_label_60">
 			<bounds x="1456" y="1007" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_61" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x20">
+		</element>
+		<element name="debug_button_61" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x20">
 			<bounds x="1520" y="996" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_61" element="debug_button_label_61">
+		</element>
+		<element name="debug_button_label_61" ref="debug_button_label_61">
 			<bounds x="1540" y="1007" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_62" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x40">
+		</element>
+		<element name="debug_button_62" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x40">
 			<bounds x="1604" y="996" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_62" element="debug_button_label_62">
+		</element>
+		<element name="debug_button_label_62" ref="debug_button_label_62">
 			<bounds x="1624" y="1007" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="debug_button_63" element="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x80">
+		</element>
+		<element name="debug_button_63" ref="debug_button_unreferenced" state="0" inputtag="TODO" inputmask="0x80">
 			<bounds x="1688" y="996" width="80" height="44"/>
-		</backdrop>
-		<backdrop name="debug_button_label_63" element="debug_button_label_63">
+		</element>
+		<element name="debug_button_label_63" ref="debug_button_label_63">
 			<bounds x="1708" y="1007" width="40" height="22"/>
-		</backdrop>
-		<backdrop name="vfd0" element="debug_vfd" state="0">
+		</element>
+		<element name="vfd0" ref="debug_vfd" state="0">
 			<bounds x="1150" y="600" width="32" height="48"/>
-		</backdrop>
-		<backdrop name="vfd1" element="debug_vfd" state="0">
+		</element>
+		<element name="vfd1" ref="debug_vfd" state="0">
 			<bounds x="1182" y="600" width="32" height="48"/>
-		</backdrop>
-		<backdrop name="vfd2" element="debug_vfd" state="0">
+		</element>
+		<element name="vfd2" ref="debug_vfd" state="0">
 			<bounds x="1214" y="600" width="32" height="48"/>
-		</backdrop>
-		<backdrop name="vfd3" element="debug_vfd" state="0">
+		</element>
+		<element name="vfd3" ref="debug_vfd" state="0">
 			<bounds x="1246" y="600" width="32" height="48"/>
-		</backdrop>
-		<backdrop name="vfd4" element="debug_vfd" state="0">
+		</element>
+		<element name="vfd4" ref="debug_vfd" state="0">
 			<bounds x="1278" y="600" width="32" height="48"/>
-		</backdrop>
-		<backdrop name="vfd5" element="debug_vfd" state="0">
+		</element>
+		<element name="vfd5" ref="debug_vfd" state="0">
 			<bounds x="1310" y="600" width="32" height="48"/>
-		</backdrop>
-		<backdrop name="vfd6" element="debug_vfd" state="0">
+		</element>
+		<element name="vfd6" ref="debug_vfd" state="0">
 			<bounds x="1342" y="600" width="32" height="48"/>
-		</backdrop>
-		<backdrop name="vfd7" element="debug_vfd" state="0">
+		</element>
+		<element name="vfd7" ref="debug_vfd" state="0">
 			<bounds x="1374" y="600" width="32" height="48"/>
-		</backdrop>
-		<backdrop name="vfd8" element="debug_vfd" state="0">
+		</element>
+		<element name="vfd8" ref="debug_vfd" state="0">
 			<bounds x="1406" y="600" width="32" height="48"/>
-		</backdrop>
-		<backdrop name="vfd9" element="debug_vfd" state="0">
+		</element>
+		<element name="vfd9" ref="debug_vfd" state="0">
 			<bounds x="1438" y="600" width="32" height="48"/>
-		</backdrop>
-		<backdrop name="vfd10" element="debug_vfd" state="0">
+		</element>
+		<element name="vfd10" ref="debug_vfd" state="0">
 			<bounds x="1470" y="600" width="32" height="48"/>
-		</backdrop>
-		<backdrop name="vfd11" element="debug_vfd" state="0">
+		</element>
+		<element name="vfd11" ref="debug_vfd" state="0">
 			<bounds x="1502" y="600" width="32" height="48"/>
-		</backdrop>
-		<backdrop name="vfd12" element="debug_vfd" state="0">
+		</element>
+		<element name="vfd12" ref="debug_vfd" state="0">
 			<bounds x="1534" y="600" width="32" height="48"/>
-		</backdrop>
-		<backdrop name="vfd13" element="debug_vfd" state="0">
+		</element>
+		<element name="vfd13" ref="debug_vfd" state="0">
 			<bounds x="1566" y="600" width="32" height="48"/>
-		</backdrop>
-		<backdrop name="vfd14" element="debug_vfd" state="0">
+		</element>
+		<element name="vfd14" ref="debug_vfd" state="0">
 			<bounds x="1598" y="600" width="32" height="48"/>
-		</backdrop>
-		<backdrop name="vfd15" element="debug_vfd" state="0">
+		</element>
+		<element name="vfd15" ref="debug_vfd" state="0">
 			<bounds x="1630" y="600" width="32" height="48"/>
-		</backdrop>
-		<backdrop element="reel_background">
+		</element>
+		<element ref="reel_background">
 			<bounds x="1100" y="32" width="120" height="240"/>
-		</backdrop>
-		<backdrop name="sreel1" element="reel0" state="0">
+		</element>
+		<element name="sreel1" ref="reel0" state="0">
 			<bounds x="1100" y="32" width="120" height="240"/>
-		</backdrop>
-		<backdrop element="reel_background">
+		</element>
+		<element ref="reel_background">
 			<bounds x="1240" y="32" width="120" height="240"/>
-		</backdrop>
-		<backdrop name="sreel2" element="reel1" state="0">
+		</element>
+		<element name="sreel2" ref="reel1" state="0">
 			<bounds x="1240" y="32" width="120" height="240"/>
-		</backdrop>
-		<backdrop element="reel_background">
+		</element>
+		<element ref="reel_background">
 			<bounds x="1380" y="32" width="120" height="240"/>
-		</backdrop>
-		<backdrop name="sreel3" element="reel2" state="0">
+		</element>
+		<element name="sreel3" ref="reel2" state="0">
 			<bounds x="1380" y="32" width="120" height="240"/>
-		</backdrop>
-		<backdrop name="reel1" element="debug_stepper_value">
+		</element>
+		<element name="reel1" ref="debug_stepper_value">
 			<bounds x="1100" y="272" width="50" height="30"/>
-		</backdrop>
-		<backdrop name="reel2" element="debug_stepper_value">
+		</element>
+		<element name="reel2" ref="debug_stepper_value">
 			<bounds x="1240" y="272" width="50" height="30"/>
-		</backdrop>
-		<backdrop name="reel3" element="debug_stepper_value">
+		</element>
+		<element name="reel3" ref="debug_stepper_value">
 			<bounds x="1380" y="272" width="50" height="30"/>
-		</backdrop>
-		<backdrop name="debug_reel_symbol_count" element="debug_reel_symbol_count_0">
+		</element>
+		<element name="debug_reel_symbol_count" ref="debug_reel_symbol_count_0">
 			<bounds x="1180" y="272" width="50" height="30"/>
-		</backdrop>
-		<backdrop name="debug_reel_symbol_count" element="debug_reel_symbol_count_1">
+		</element>
+		<element name="debug_reel_symbol_count" ref="debug_reel_symbol_count_1">
 			<bounds x="1320" y="272" width="50" height="30"/>
-		</backdrop>
-		<backdrop name="debug_reel_symbol_count" element="debug_reel_symbol_count_2">
+		</element>
+		<element name="debug_reel_symbol_count" ref="debug_reel_symbol_count_2">
 			<bounds x="1460" y="272" width="50" height="30"/>
-		</backdrop>
+		</element>
 	</view>
 </mamelayout>

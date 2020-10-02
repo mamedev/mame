@@ -8,7 +8,7 @@
 #include "sound/vlm5030.h"
 #include "cpu/m6800/m6800.h"
 
-class trackfld_audio_device : public device_t, public device_sound_interface
+class trackfld_audio_device : public device_t
 {
 public:
 	template <typename T, typename U>
@@ -32,9 +32,6 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-
-	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
 	optional_device<cpu_device> m_audiocpu;

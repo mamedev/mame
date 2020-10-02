@@ -267,7 +267,7 @@ inline void gba_lcd_device::update_mask(uint8_t* mask, int y)
 
 void gba_lcd_device::draw_scanline(int y)
 {
-	uint16_t *scanline = &m_bitmap.pix16(y);
+	uint16_t *const scanline = &m_bitmap.pix(y);
 
 	if (is_set(dispcnt::forced_blank))
 	{

@@ -99,9 +99,8 @@ INTERRUPT_GEN_MEMBER(sm1800_state::vblank_interrupt)
 
 I8275_DRAW_CHARACTER_MEMBER( sm1800_state::crtc_display_pixels )
 {
-	int i;
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint8_t *charmap = memregion("chargen")->base();
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint8_t const *const charmap = memregion("chargen")->base();
 	uint8_t pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 	if (vsp)
 		pixels = 0;
@@ -112,8 +111,8 @@ I8275_DRAW_CHARACTER_MEMBER( sm1800_state::crtc_display_pixels )
 	if (rvv)
 		pixels ^= 0xff;
 
-	for(i=0;i<8;i++)
-		bitmap.pix32(y, x + i) = palette[(pixels >> (7-i)) & 1 ? (hlgt ? 2 : 1) : 0];
+	for(int i=0;i<8;i++)
+		bitmap.pix(y, x + i) = palette[(pixels >> (7-i)) & 1 ? (hlgt ? 2 : 1) : 0];
 }
 
 void sm1800_state::portb_w(uint8_t data)

@@ -15,10 +15,12 @@
 
 #include <functional>
 #include <iterator>
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
 #include <utility>
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -236,11 +238,12 @@ public:
 	/// Should return false if the object is required but not found, or
 	/// true otherwise (the report_missing member function can assist
 	/// in implementing this behaviour).
-	/// \param [in] isvalidation Pass true if this is a dry run (i.e. no
-	///   intention to actually start the device), or false otherwise.
+	/// \param [in] valid Pass a pointer to the validity checker if this
+	///   is a dry run (i.e. no intention to actually start the device),
+	///   or nullptr otherwise.
 	/// \return False if the object is required but not found, or true
 	///   otherwise.
-	virtual bool findit(bool isvalidation = false) = 0;
+	virtual bool findit(validity_checker *valid) = 0;
 
 	/// \brief Clear temporary binding from configuration
 	///
@@ -417,14 +420,6 @@ protected:
 	/// \return True if found or not required, false otherwise.
 	bool report_missing(bool found, char const *objname, bool required) const;
 
-	/// \brief Print a message at warning level
-	///
-	/// Prints a message if logging is enabled at warning level or more
-	/// detailed.  Uses printf semantics of the C runtime library.
-	/// \param [in] format Format string as used by printf function in
-	///   runtime library
-	void printf_warning(char const *format, ...) ATTR_PRINTF(2,3);
-
 
 	/// \brief Pointer to next registered discovery helper
 	///
@@ -598,13 +593,14 @@ private:
 	/// with the requested tag is found but the type is incorrect, a
 	/// warning message will be printed.  This method is called by the
 	/// base device at resolution time.
-	/// \param [in] isvalidation True if this is a dry run (not
-	///   intending to run the machine, just checking for errors).
+	/// \param [in] valid Pass a pointer to the validity checker if this
+	///   is a dry run (i.e. no intention to actually start the device),
+	///   or nullptr otherwise.
 	/// \return True if the device is optional or if a matching device
 	///   is found, false otherwise.
-	virtual bool findit(bool isvalidation) override
+	virtual bool findit(validity_checker *valid) override
 	{
-		if (!isvalidation)
+		if (!valid)
 		{
 			assert(!this->m_resolved);
 			this->m_resolved = true;
@@ -613,7 +609,7 @@ private:
 		device_t *const device = this->m_base.get().subdevice(this->m_tag);
 		this->m_target = dynamic_cast<DeviceClass *>(device);
 		if (device && !this->m_target)
-			this->printf_warning("Device '%s' found but is of incorrect type (actual type is %s)\n", this->m_tag, device->name());
+			osd_printf_warning("Device '%s' found but is of incorrect type (actual type is %s)\n", this->m_tag, device->name());
 
 		return this->report_missing("device");
 	}
@@ -661,7 +657,7 @@ public:
 	/// \param [in] tag Memory region tag to search for.  This is not
 	///   copied, it is the caller's responsibility to ensure this
 	///   pointer remains valid until resolution time.
-	memory_region_finder(device_t &base, char const *tag) : object_finder_base<memory_region, Required>(base, tag) { }
+	memory_region_finder(device_t &base, char const *tag);
 
 private:
 	/// \brief Find memory region
@@ -669,20 +665,12 @@ private:
 	/// Find memory region with requested tag.  For a dry run, the
 	/// target object pointer will not be set.  This method is called by
 	/// the base device at resolution time.
-	/// \param [in] isvalidation True if this is a dry run (not
-	///   intending to run the machine, just checking for errors).
+	/// \param [in] valid Pass a pointer to the validity checker if this
+	///   is a dry run (i.e. no intention to actually start the device),
+	///   or nullptr otherwise.
 	/// \return True if the memory region is optional or if a matching
 	///   memory region is found, false otherwise.
-	virtual bool findit(bool isvalidation) override
-	{
-		if (isvalidation)
-			return this->validate_memregion(0, Required);
-
-		assert(!this->m_resolved);
-		this->m_resolved = true;
-		this->m_target = this->m_base.get().memregion(this->m_tag);
-		return this->report_missing("memory region");
-	}
+	virtual bool findit(validity_checker *valid) override;
 };
 
 /// \brief Optional memory region finder
@@ -726,27 +714,19 @@ public:
 	/// \param [in] tag Memory bank tag to search for.  This is not
 	///   copied, it is the caller's responsibility to ensure this
 	///   pointer remains valid until resolution time.
-	memory_bank_finder(device_t &base, char const *tag) : object_finder_base<memory_bank, Required>(base, tag) { }
+	memory_bank_finder(device_t &base, char const *tag);
 
 	/// \brief Find memory bank
 	///
 	/// Find memory bank with requested tag.  Just returns true for a
 	/// dry run.  This method is called by the base device at resolution
 	/// time.
-	/// \param [in] isvalidation True if this is a dry run (not
-	///   intending to run the machine, just checking for errors).
+	/// \param [in] valid Pass a pointer to the validity checker if this
+	///   is a dry run (i.e. no intention to actually start the device),
+	///   or nullptr otherwise.
 	/// \return True if the memory bank is optional, a matching memory
 	///   bank is found or this is a dry run, false otherwise.
-	virtual bool findit(bool isvalidation) override
-	{
-		if (isvalidation)
-			return true;
-
-		assert(!this->m_resolved);
-		this->m_resolved = true;
-		this->m_target = this->m_base.get().membank(this->m_tag);
-		return this->report_missing("memory bank");
-	}
+	virtual bool findit(validity_checker *valid) override;
 };
 
 /// \brief Optional memory bank finder
@@ -790,7 +770,7 @@ public:
 	/// \param [in] tag I/O port tag to search for.  This is not copied,
 	///   it is the caller's responsibility to ensure this pointer
 	///   remains valid until resolution time.
-	ioport_finder(device_t &base, char const *tag) : object_finder_base<ioport_port, Required>(base, tag) { }
+	ioport_finder(device_t &base, char const *tag);
 
 	/// \brief Read I/O port if found or return default value
 	///
@@ -808,20 +788,12 @@ private:
 	/// Find I/O port with requested tag.  Just returns true for a dry
 	/// run.  This method is called by the base device at resolution
 	/// time.
-	/// \param [in] isvalidation True if this is a dry run (not
-	///   intending to run the machine, just checking for errors).
+	/// \param [in] valid Pass a pointer to the validity checker if this
+	///   is a dry run (i.e. no intention to actually start the device),
+	///   or nullptr otherwise.
 	/// \return True if the I/O port is optional, a matching I/O port is
 	///   is found or this is a dry run, false otherwise.
-	virtual bool findit(bool isvalidation) override
-	{
-		if (isvalidation)
-			return true;
-
-		assert(!this->m_resolved);
-		this->m_resolved = true;
-		this->m_target = this->m_base.get().ioport(this->m_tag);
-		return this->report_missing("I/O port");
-	}
+	virtual bool findit(validity_checker *valid) override;
 };
 
 /// \brief Optional I/O port finder
@@ -864,7 +836,7 @@ public:
 	///   remains valid until resolution time.
 	/// \param [in] spacenum Address space number.
 	/// \param [in] width Specific data width (optional).
-	address_space_finder(device_t &base, char const *tag, int spacenum, u8 width = 0) : object_finder_base<address_space, Required>(base, tag), m_spacenum(spacenum), m_data_width(width) { }
+	address_space_finder(device_t &base, char const *tag, int spacenum, u8 width = 0);
 
 	/// \brief Set search tag and space number
 	///
@@ -919,20 +891,12 @@ private:
 	/// Find address space with requested tag.  For a dry run, the
 	/// target object pointer will not be set.  This method is called by
 	/// the base device at resolution time.
-	/// \param [in] isvalidation True if this is a dry run (not
-	///   intending to run the machine, just checking for errors).
+	/// \param [in] valid Pass a pointer to the validity checker if this
+	///   is a dry run (i.e. no intention to actually start the device),
+	///   or nullptr otherwise.
 	/// \return True if the address space is optional, a matching address space is
 	///   is found or this is a dry run, false otherwise.
-	virtual bool findit(bool isvalidation) override
-	{
-		if (isvalidation)
-			return this->validate_addrspace(this->m_spacenum, this->m_data_width, Required);
-
-		assert(!this->m_resolved);
-		this->m_resolved = true;
-		this->m_target = this->find_addrspace(this->m_spacenum, this->m_data_width, Required);
-		return this->report_missing("address space");
-	}
+	virtual bool findit(validity_checker *valid) override;
 
 	int m_spacenum;
 	u8 m_data_width;
@@ -1018,13 +982,14 @@ private:
 	/// checked - the width is not checked and the target pointer is not
 	/// set.  This method is called by the base device at resolution
 	/// time.
-	/// \param [in] isvalidation True if this is a dry run (not
-	///   intending to run the machine, just checking for errors).
+	/// \param [in] valid Pass a pointer to the validity checker if this
+	///   is a dry run (i.e. no intention to actually start the device),
+	///   or nullptr otherwise.
 	/// \return True if the memory region is optional or a matching
 	///   memory region is found, or false otherwise.
-	virtual bool findit(bool isvalidation) override
+	virtual bool findit(validity_checker *valid) override
 	{
-		if (isvalidation)
+		if (valid)
 			return this->validate_memregion(sizeof(PointerType) * m_desired_length, Required);
 
 		assert(!this->m_resolved);
@@ -1099,18 +1064,18 @@ public:
 	// dynamic allocation of a shared pointer
 	void allocate(u32 entries)
 	{
-		assert(m_allocated.empty());
-		m_allocated.resize(entries);
-		this->m_target = &m_allocated[0];
+		assert(!m_allocated);
+		m_allocated = std::make_unique<PointerType []>(entries);
+		this->m_target = m_allocated.get();
 		m_bytes = entries * sizeof(PointerType);
-		this->m_base.get().save_item(m_allocated, this->m_tag);
+		this->m_base.get().save_pointer(m_allocated, this->m_tag, entries);
 	}
 
 private:
 	// finder
-	virtual bool findit(bool isvalidation) override
+	virtual bool findit(validity_checker *valid) override
 	{
-		if (isvalidation)
+		if (valid)
 			return true;
 
 		assert(!this->m_resolved);
@@ -1122,7 +1087,7 @@ private:
 	// internal state
 	u8 const m_width;
 	size_t m_bytes;
-	std::vector<PointerType> m_allocated;
+	std::unique_ptr<PointerType []> m_allocated;
 };
 
 template <typename PointerType> using optional_shared_ptr = shared_ptr_finder<PointerType, false>;
@@ -1170,6 +1135,9 @@ extern template class memory_bank_finder<true>;
 
 extern template class ioport_finder<false>;
 extern template class ioport_finder<true>;
+
+extern template class address_space_finder<false>;
+extern template class address_space_finder<true>;
 
 extern template class region_ptr_finder<u8, false>;
 extern template class region_ptr_finder<u8, true>;

@@ -127,27 +127,25 @@ void balsente_state::draw_one_sprite(bitmap_ind16 &bitmap, const rectangle &clip
 	int image = sprite[1] | ((flags & 7) << 8);
 	int ypos = sprite[2] + 17 + BALSENTE_VBEND;
 	int xpos = sprite[3];
-	uint8_t *src;
-	int x, y;
 
 	/* get a pointer to the source image */
-	src = &m_sprite_data[(64 * image) & m_sprite_mask];
+	uint8_t const *src = &m_sprite_data[(64 * image) & m_sprite_mask];
 	if (flags & 0x80) src += 4 * 15;
 
 	/* loop over y */
-	for (y = 0; y < 16; y++, ypos = (ypos + 1) & 255)
+	for (int y = 0; y < 16; y++, ypos = (ypos + 1) & 255)
 	{
 		if (ypos >= (16 + BALSENTE_VBEND) && ypos >= cliprect.min_y && ypos <= cliprect.max_y)
 		{
-			const pen_t *pens = &m_palette->pen(m_palettebank_vis * 256);
-			uint8_t *old = &m_expanded_videoram[(ypos - BALSENTE_VBEND) * 256 + xpos];
+			pen_t const *const pens = &m_palette->pen(m_palettebank_vis * 256);
+			const uint8_t *old = &m_expanded_videoram[(ypos - BALSENTE_VBEND) * 256 + xpos];
 			int currx = xpos;
 
 			/* standard case */
 			if (!(flags & 0x40))
 			{
 				/* loop over x */
-				for (x = 0; x < 4; x++, old += 2)
+				for (int x = 0; x < 4; x++, old += 2)
 				{
 					int ipixel = *src++;
 					int left = ipixel & 0xf0;
@@ -155,12 +153,12 @@ void balsente_state::draw_one_sprite(bitmap_ind16 &bitmap, const rectangle &clip
 
 					/* left pixel, combine with the background */
 					if (left && currx >= 0 && currx < 256)
-						bitmap.pix16(ypos, currx) = pens[left | old[0]];
+						bitmap.pix(ypos, currx) = pens[left | old[0]];
 					currx++;
 
 					/* right pixel, combine with the background */
 					if (right && currx >= 0 && currx < 256)
-						bitmap.pix16(ypos, currx) = pens[right | old[1]];
+						bitmap.pix(ypos, currx) = pens[right | old[1]];
 					currx++;
 				}
 			}
@@ -171,7 +169,7 @@ void balsente_state::draw_one_sprite(bitmap_ind16 &bitmap, const rectangle &clip
 				src += 4;
 
 				/* loop over x */
-				for (x = 0; x < 4; x++, old += 2)
+				for (int x = 0; x < 4; x++, old += 2)
 				{
 					int ipixel = *--src;
 					int left = (ipixel << 4) & 0xf0;
@@ -179,12 +177,12 @@ void balsente_state::draw_one_sprite(bitmap_ind16 &bitmap, const rectangle &clip
 
 					/* left pixel, combine with the background */
 					if (left && currx >= 0 && currx < 256)
-						bitmap.pix16(ypos, currx) = pens[left | old[0]];
+						bitmap.pix(ypos, currx) = pens[left | old[0]];
 					currx++;
 
 					/* right pixel, combine with the background */
 					if (right && currx >= 0 && currx < 256)
-						bitmap.pix16(ypos, currx) = pens[right | old[1]];
+						bitmap.pix(ypos, currx) = pens[right | old[1]];
 					currx++;
 				}
 				src += 4;

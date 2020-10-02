@@ -441,7 +441,7 @@ uint32_t royalmah_state::screen_update_royalmah(screen_device &screen, bitmap_rg
 		{
 			uint8_t pen = ((data2 >> 1) & 0x08) | ((data2 << 2) & 0x04) | ((data1 >> 3) & 0x02) | ((data1 >> 0) & 0x01);
 
-			bitmap.pix32(y, x) = m_palette->pen((m_palette_base << 4) | pen);
+			bitmap.pix(y, x) = m_palette->pen((m_palette_base << 4) | pen);
 
 			x = (m_flip_screen) ? x - 1 : x + 1;
 			data1 = data1 >> 1;

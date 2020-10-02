@@ -121,7 +121,7 @@ void gomoku_state::video_start()
 			if (bgdata & 0x01) color = 0x21;    // board (brown)
 			if (bgdata & 0x02) color = 0x20;    // frame line (while)
 
-			m_bg_bitmap.pix16((255 - y - 1) & 0xff, (255 - x + 7) & 0xff) = color;
+			m_bg_bitmap.pix((255 - y - 1) & 0xff, (255 - x + 7) & 0xff) = color;
 		}
 	}
 
@@ -170,7 +170,7 @@ uint32_t gomoku_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 				}
 				else continue;
 
-				bitmap.pix16((255 - y - 1) & 0xff, (255 - x + 7) & 0xff) = color;
+				bitmap.pix((255 - y - 1) & 0xff, (255 - x + 7) & 0xff) = color;
 			}
 		}
 
@@ -198,7 +198,7 @@ uint32_t gomoku_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 				}
 				else continue;
 
-				bitmap.pix16((255 - y - 1) & 0xff, (255 - x + 7) & 0xff) = color;
+				bitmap.pix((255 - y - 1) & 0xff, (255 - x + 7) & 0xff) = color;
 			}
 		}
 	}

@@ -52,8 +52,8 @@ void tc0780fpa_renderer::render_solid_scan(int32_t scanline, const extent_t &ext
 	float z = extent.param[0].start;
 	int color = extent.param[1].start;
 	float dz = extent.param[0].dpdx;
-	uint16_t *fb = &m_fb[m_current_fb]->pix16(scanline);
-	uint16_t *zb = &m_zb->pix16(scanline);
+	uint16_t *const fb = &m_fb[m_current_fb]->pix(scanline);
+	uint16_t *const zb = &m_zb->pix(scanline);
 
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
@@ -75,8 +75,8 @@ void tc0780fpa_renderer::render_shade_scan(int32_t scanline, const extent_t &ext
 	float color = extent.param[1].start;
 	float dz = extent.param[0].dpdx;
 	float dcolor = extent.param[1].dpdx;
-	uint16_t *fb = &m_fb[m_current_fb]->pix16(scanline);
-	uint16_t *zb = &m_zb->pix16(scanline);
+	uint16_t *const fb = &m_fb[m_current_fb]->pix(scanline);
+	uint16_t *const zb = &m_zb->pix(scanline);
 
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
@@ -104,8 +104,8 @@ void tc0780fpa_renderer::render_texture_scan(int32_t scanline, const extent_t &e
 	float du = extent.param[1].dpdx;
 	float dv = extent.param[2].dpdx;
 	float dcolor = extent.param[3].dpdx;
-	uint16_t *fb = &m_fb[m_current_fb]->pix16(scanline);
-	uint16_t *zb = &m_zb->pix16(scanline);
+	uint16_t *const fb = &m_fb[m_current_fb]->pix(scanline);
+	uint16_t *const zb = &m_zb->pix(scanline);
 	int tex_wrap_x = extradata.tex_wrap_x;
 	int tex_wrap_y = extradata.tex_wrap_y;
 	int tex_base_x = extradata.tex_base_x;

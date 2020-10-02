@@ -76,21 +76,21 @@ license:CC0
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
 
-		<bezel name="lamp10" element="stop3">
+		<element name="lamp10" ref="stop3">
 			<bounds x="1.5" y="3.05" width="0.40" height="0.24" />
-		</bezel>
-		<bezel name="lamp11" element="stop2">
+		</element>
+		<element name="lamp11" ref="stop2">
 			<bounds x="1.0" y="3.05" width="0.40" height="0.24" />
-		</bezel>
-		<bezel name="lamp12" element="stop1">
+		</element>
+		<element name="lamp12" ref="stop1">
 			<bounds x="0.5" y="3.05" width="0.40" height="0.24" />
-		</bezel>
-		<bezel name="lamp9" element="start">
+		</element>
+		<element name="lamp9" ref="start">
 			<bounds x="3.1" y="3.05" width="0.40" height="0.24" />
-		</bezel>
-		<bezel name="lamp8" element="bet">
+		</element>
+		<element name="lamp8" ref="bet">
 			<bounds x="2.6" y="3.05" width="0.40" height="0.24" />
-		</bezel>
+		</element>
 
 	</view>
 </mamelayout>

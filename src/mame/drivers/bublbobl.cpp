@@ -265,11 +265,6 @@ TODO:
   accesses done by the sound CPU to the YM2203 I/O ports. At the very least, there
   could be some filters.
 
- There are also Bubble Bobble bootlegs with a P8749H MCU, however the MCU
- is protected against reading and the main code only differs by 1 byte from
- Bubble Bobble.  If the MCU were to be dumped that would also make for
- interesting comparisons.
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -1082,6 +1077,16 @@ void bub68705_state::bub68705(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(bub68705_state, bub68705)
 }
 
+void bub8749_state::bub8749(machine_config &config)
+{
+	bublbobl_nomcu(config);
+
+	// basic machine hardware
+	I8749(config, m_mcu, 3.579545_MHz_XTAL); // TODO: hook this up
+
+	MCFG_MACHINE_START_OVERRIDE(bub8749_state, common) // for now
+	MCFG_MACHINE_RESET_OVERRIDE(bub8749_state, common)
+}
 
 
 /*************************************
@@ -1854,6 +1859,48 @@ ROM_START( bub68705 )
 	ROM_LOAD( "a71-25.41",    0x0000, 0x0100, CRC(2d0f8545) SHA1(089c31e2f614145ef2743164f7b52ae35bc06808) )    /* video timing */
 ROM_END
 
+ROM_START( bub8749 ) // All ROMs match bublbobl1 but for the MCU, which is different. 2-PCB set probably comes from Italy
+	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_LOAD( "6-27256.bin",    0x00000, 0x08000, CRC(32c8305b) SHA1(6bf69b3edfbefd33cd670a762b4bf0b39629a220) )
+	// ROMs banked at 8000-bfff
+	ROM_LOAD( "5-27512.bin",    0x10000, 0x10000, CRC(53f4bc6e) SHA1(15a2e6d83438d4136b154b3d90dd2cf9f1ce572c) )
+	// 20000-2ffff empty
+
+	ROM_REGION( 0x10000, "subcpu", 0 )
+	ROM_LOAD( "8-27256.bin",    0x0000, 0x08000, CRC(ae11a07b) SHA1(af7a335c8da637103103cc274e077f123908ebb7) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "7-27256.bin",    0x0000, 0x08000, CRC(4f9a26e8) SHA1(3105b34b88a7134493c2b3f584729f8b0407a011) )
+
+	ROM_REGION( 0x800, "mcu", 0 ) // P8749H, on a small riser board
+	ROM_LOAD( "p8749h.bin",     0x000, 0x800, CRC(4912c847) SHA1(9296a5c5c4cb478571a92b4e6224ce5e2048cd07) )
+
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT )
+	ROM_LOAD( "9-27256.bin",    0x00000, 0x8000, CRC(20358c22) SHA1(2297af6c53d5807bf90a8e081075b8c72a994fc5) )    // 1st plane
+	ROM_LOAD( "10-27256.bin",   0x08000, 0x8000, CRC(930168a9) SHA1(fd358c3c3b424bca285f67a1589eb98a345ff670) )
+	ROM_LOAD( "11-27256.bin",   0x10000, 0x8000, CRC(9773e512) SHA1(33c1687ee575d66bf0e98add45d06da827813765) )
+	ROM_LOAD( "12-27256.bin",   0x18000, 0x8000, CRC(d045549b) SHA1(0c12077d3ddc2ce6aa45a0224ad5540f3f218446) )
+	ROM_LOAD( "13-27256.bin",   0x20000, 0x8000, CRC(d0af35c5) SHA1(c5a89f4d73acc0db86654540b3abfd77b3757db5) )
+	ROM_LOAD( "14-27256.bin",   0x28000, 0x8000, CRC(7b5369a8) SHA1(1307b26d80e6f36ebe6c442bebec41d20066eaf9) )
+	// 0x30000-0x3ffff empty
+	ROM_LOAD( "15-27256.bin",   0x40000, 0x8000, CRC(6b61a413) SHA1(44eddf12fb46fceca2addbe6da929aaea7636b13) )    // 2nd plane
+	ROM_LOAD( "16-27256.bin",   0x48000, 0x8000, CRC(b5492d97) SHA1(d5b045e3ebaa44809757a4220cefb3c6815470da) )
+	ROM_LOAD( "17-27256.bin",   0x50000, 0x8000, CRC(d69762d5) SHA1(3326fef4e0bd86681a3047dc11886bb171ecb609) )
+	ROM_LOAD( "18-27256.bin",   0x58000, 0x8000, CRC(9f243b68) SHA1(32dce8d311a4be003693182a999e4053baa6bb0a) )
+	ROM_LOAD( "19-27256.bin",   0x60000, 0x8000, CRC(66e9438c) SHA1(b94e62b6fbe7f4e08086d0365afc5cff6e0ccafd) )
+	ROM_LOAD( "20-27256.bin",   0x68000, 0x8000, CRC(9ef863ad) SHA1(29f91b5a3765e4d6e6c3382db1d8d8297b6e56c8) )
+	// 0x70000-0x7ffff empty
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "6301-in",        0x00000, 0x0100, CRC(2d0f8545) SHA1(089c31e2f614145ef2743164f7b52ae35bc06808) ) // Video timing
+
+	// Located on CPU/Sound Board
+	ROM_REGION( 0x0003, "plds", 0 )
+	ROM_LOAD( "pal16l6nc.bin",  0x0000, 0x0001, NO_DUMP ) // Located at PAL1
+	ROM_LOAD( "pal--.bin",      0x0000, 0x0001, NO_DUMP ) // Located at PAL2, type not readable
+	ROM_LOAD( "pal16r4cn.bin",  0x0000, 0x0001, NO_DUMP ) // Located at PAL3
+ROM_END
+
 
 ROM_START( dland )
 	ROM_REGION( 0x30000, "maincpu", 0 )
@@ -2106,14 +2153,15 @@ GAME( 1986, bublboblr,  bublbobl, bublbobl,  bublbobl,   bublbobl_state, init_co
 GAME( 1986, bublboblr1, bublbobl, bublbobl,  bublbobl,   bublbobl_state, init_common, ROT0,  "Taito America Corporation (Romstar license)", "Bubble Bobble (US, Ver 1.0)",    MACHINE_SUPPORTS_SAVE )
 
 GAME( 1986, boblbobl,   bublbobl, boblbobl,  boblbobl,   bublbobl_state, init_common, ROT0,  "bootleg",         "Bobble Bobble (bootleg of Bubble Bobble)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sboblbobl,  bublbobl, boblbobl,  sboblbobl,  bublbobl_state, init_common, ROT0,  "bootleg (Datsu)", "Super Bobble Bobble (bootleg, set 1)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sboblbobla, bublbobl, boblbobl,  boblbobl,   bublbobl_state, init_common, ROT0,  "bootleg",         "Super Bobble Bobble (bootleg, set 2)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sboblboblb, bublbobl, boblbobl,  sboblboblb, bublbobl_state, init_common, ROT0,  "bootleg",         "Super Bobble Bobble (bootleg, set 3)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sboblbobld, bublbobl, boblbobl,  sboblboblb, bublbobl_state, init_common, ROT0,  "bootleg",         "Super Bobble Bobble (bootleg, set 4)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sboblboble, bublbobl, boblbobl,  sboblboblb, bublbobl_state, init_common, ROT0,  "bootleg",         "Super Bobble Bobble (bootleg, set 5)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sboblboblf, bublbobl, boblbobl,  sboblboblb, bublbobl_state, init_common, ROT0,  "bootleg",         "Super Bobble Bobble (bootleg, set 6)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sboblboblc, bublbobl, boblbobl,  sboblboblb, bublbobl_state, init_common, ROT0,  "bootleg",         "Super Bubble Bobble (bootleg)",            MACHINE_SUPPORTS_SAVE ) // the title screen on this one isn't hacked
-GAME( 1986, bub68705,   bublbobl, bub68705,  bublbobl,   bub68705_state, init_common, ROT0,  "bootleg",         "Bubble Bobble (bootleg with 68705)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sboblbobl,  bublbobl, boblbobl,  sboblbobl,  bublbobl_state, init_common, ROT0,  "bootleg (Datsu)", "Super Bobble Bobble (bootleg, set 1)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sboblbobla, bublbobl, boblbobl,  boblbobl,   bublbobl_state, init_common, ROT0,  "bootleg",         "Super Bobble Bobble (bootleg, set 2)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sboblboblb, bublbobl, boblbobl,  sboblboblb, bublbobl_state, init_common, ROT0,  "bootleg",         "Super Bobble Bobble (bootleg, set 3)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sboblbobld, bublbobl, boblbobl,  sboblboblb, bublbobl_state, init_common, ROT0,  "bootleg",         "Super Bobble Bobble (bootleg, set 4)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sboblboble, bublbobl, boblbobl,  sboblboblb, bublbobl_state, init_common, ROT0,  "bootleg",         "Super Bobble Bobble (bootleg, set 5)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sboblboblf, bublbobl, boblbobl,  sboblboblb, bublbobl_state, init_common, ROT0,  "bootleg",         "Super Bobble Bobble (bootleg, set 6)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sboblboblc, bublbobl, boblbobl,  sboblboblb, bublbobl_state, init_common, ROT0,  "bootleg",         "Super Bubble Bobble (bootleg)",                       MACHINE_SUPPORTS_SAVE ) // the title screen on this one isn't hacked
+GAME( 1986, bub68705,   bublbobl, bub68705,  bublbobl,   bub68705_state, init_common, ROT0,  "bootleg",         "Bubble Bobble (bootleg with 68705)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bub8749,    bublbobl, bub8749,   bublbobl,   bub8749_state,  init_common, ROT0,  "bootleg",         "Bubble Bobble (bootleg of Japan Ver 0.0 with 8749)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // MCU not hooked up
 
 GAME( 1987, dland,      bublbobl, boblbobl,  dland,      bublbobl_state, init_dland,  ROT0,  "bootleg", "Dream Land / Super Dream Land (bootleg of Bubble Bobble)", MACHINE_SUPPORTS_SAVE )
 

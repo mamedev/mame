@@ -132,9 +132,9 @@ private:
 
 MC6845_UPDATE_ROW( othello_state::crtc_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
-	const uint8_t *gfx = memregion("gfx")->base();
+	uint8_t const *const gfx = memregion("gfx")->base();
 
 	for(int cx = 0; cx < x_count; ++cx)
 	{
@@ -143,7 +143,7 @@ MC6845_UPDATE_ROW( othello_state::crtc_update_row )
 
 		for(int x = 0; x < TILE_WIDTH; ++x)
 		{
-			bitmap.pix32(y, (cx * TILE_WIDTH + x) ^ 1) = palette[tmp & 0x0f];
+			bitmap.pix(y, (cx * TILE_WIDTH + x) ^ 1) = palette[tmp & 0x0f];
 			tmp >>= 4;
 		}
 	}

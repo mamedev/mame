@@ -286,7 +286,7 @@ uint32_t pastelg_common_state::screen_update(screen_device &screen, bitmap_ind16
 
 		for (int y = 0; y < height; y++)
 			for (int x = 0; x < width; x++)
-				bitmap.pix16(y, x) = m_videoram[(y * width) + x];
+				bitmap.pix(y, x) = m_videoram[(y * width) + x];
 	}
 	else
 		bitmap.fill(0, cliprect);

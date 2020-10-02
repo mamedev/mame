@@ -328,9 +328,7 @@ void msm6255_device::draw_scanline(bitmap_ind16 &bitmap, const rectangle &clipre
 	uint8_t cpd = m_cpr & CPR_CPD_MASK;
 	uint16_t car = (m_cur << 8) | m_clr;
 
-	int sx, x;
-
-	for (sx = 0; sx < hn; sx++)
+	for (int sx = 0; sx < hn; sx++)
 	{
 		uint8_t data = read_byte(ma, ra);
 
@@ -345,9 +343,9 @@ void msm6255_device::draw_scanline(bitmap_ind16 &bitmap, const rectangle &clipre
 			}
 		}
 
-		for (x = 0; x < hp; x++)
+		for (int x = 0; x < hp; x++)
 		{
-			bitmap.pix16(y, (sx * hp) + x) = BIT(data, 7);
+			bitmap.pix(y, (sx * hp) + x) = BIT(data, 7);
 
 			data <<= 1;
 		}

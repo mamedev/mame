@@ -253,7 +253,7 @@ void joystand_state::bg2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 void joystand_state::bg15_0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t val = COMBINE_DATA(&m_bg15_0_ram[offset]);
-	m_bg15_bitmap[0].pix32(offset >> 9, offset & 0x1ff) = (val & 0x8000) ? BG15_TRANSPARENT : m_bg15_palette->pen_color(val & 0x7fff);
+	m_bg15_bitmap[0].pix(offset >> 9, offset & 0x1ff) = (val & 0x8000) ? BG15_TRANSPARENT : m_bg15_palette->pen_color(val & 0x7fff);
 }
 
 // tile-based
@@ -268,7 +268,7 @@ void joystand_state::draw_bg15_tile(address_space &space, int x, int y, uint16_t
 		for (int tx = 0; tx < 16; ++tx)
 		{
 			uint16_t val = space.read_word(srcaddr + ty * 16 * 2 + tx * 2);
-			m_bg15_bitmap[1].pix32(y + ty , x + tx) = (val & 0x8000) ? BG15_TRANSPARENT : m_bg15_palette->pen_color(val & 0x7fff);
+			m_bg15_bitmap[1].pix(y + ty , x + tx) = (val & 0x8000) ? BG15_TRANSPARENT : m_bg15_palette->pen_color(val & 0x7fff);
 		}
 	}
 }

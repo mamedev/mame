@@ -27,7 +27,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 	devcb_read16 cb_sample;
@@ -63,7 +63,7 @@ private:
 	void reg_write(uint32_t adr, uint32_t val);
 
 	void fill_buffer();
-	void append_buffer(stream_sample_t **outputs, int &pos, int samples);
+	void append_buffer(std::vector<write_stream_view> &outputs, int &pos, int samples);
 };
 
 

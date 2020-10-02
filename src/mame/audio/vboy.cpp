@@ -209,7 +209,7 @@ void vboysnd_device::device_start()
 {
 	uint32_t rate = clock() / 120;
 	// create the stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, rate);
+	m_stream = stream_alloc(0, 2, rate);
 
 	m_timer = timer_alloc(0, nullptr);
 	m_timer->adjust(attotime::zero, 0, rate ? attotime::from_hz(rate / 4) : attotime::never);
@@ -269,15 +269,14 @@ void vboysnd_device::device_timer(emu_timer &timer, device_timer_id tid, int par
 //  our sound stream
 //-------------------------------------------------
 
-void vboysnd_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void vboysnd_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *outL, *outR;
 	int len, i, j, channel;
 
-	outL = outputs[0];
-	outR = outputs[1];
+	auto &outL = outputs[0];
+	auto &outR = outputs[1];
 
-	len = samples;
+	len = outL.samples();
 
 //  if (mgetb(m_aram+SST0P) & 0x1)  // Sound Stop Reg
 //      goto end;
@@ -384,13 +383,9 @@ void vboysnd_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		// scale to 16 bits
 		note_left = (note_left << 5) | ((note_left >> 6) & 0x1f);
 		note_right = (note_right << 5) | ((note_right >> 6) & 0x1f);
-		if (note_left  < -32767) note_left  = -32767;
-		if (note_left  > 32767) note_left  = 32767;
-		if (note_right < -32767) note_right = -32767;
-		if (note_right > 32767) note_right = 32767;
 
-		*(outL++) = ((int16_t)note_left);
-		*(outR++) = ((int16_t)note_right);
+		outL.put_int_clamp(j, (int16_t)note_left, 32768);
+		outR.put_int_clamp(j, (int16_t)note_right, 32768);
 	}
 }
 

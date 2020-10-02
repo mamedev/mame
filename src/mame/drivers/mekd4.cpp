@@ -239,28 +239,32 @@ FS 0 to F
 ******************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6809/m6809.h"
-#include "machine/input_merger.h"
-#include "machine/bankdev.h"
-#include "machine/6821pia.h"
-#include "machine/6850acia.h"
-#include "machine/mc14411.h"
-#include "machine/clock.h"
-#include "machine/timer.h"
-#include "sound/wave.h"
-#include "speaker.h"
+
 #include "bus/rs232/rs232.h"
-#include "mekd4.lh"
+#include "cpu/m6809/m6809.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
+#include "machine/6821pia.h"
+#include "machine/6850acia.h"
+#include "machine/bankdev.h"
+#include "machine/clock.h"
+#include "machine/input_merger.h"
+#include "machine/mc14411.h"
+#include "machine/timer.h"
+#include "sound/wave.h"
 #include "video/pwm.h"
 
 // MEK68R2
 #include "machine/terminal.h"
 #include "video/mc6845.h"
+
 #include "emupal.h"
-#include "screen.h"
 #include "render.h"
+#include "screen.h"
+#include "speaker.h"
+
+#include "mekd4.lh"
+
 
 class mekd4_state : public driver_device
 {
@@ -870,29 +874,29 @@ MC6845_UPDATE_ROW(mekd4_state::update_row)
 		int dcursor = (column == cursor_x);
 
 		if (BIT(code, 7)) {
-		  /* Lores 6 pixel character.
-		       -----------
-		       | D1 | D0 |
-		       | D3 | D2 |
-		       | D5 | D4 |
-		       -----------
-		       D6 - 1 Grey tone, 0 brightness.
-		  */
-		  int pixel = ((ra & 0x0c) >> 1) + 1;
-		  int dout = BIT(code, pixel);
-		  int grey = BIT(code, 6);
-		  int color = ((dcursor ^ dout) && de) << (grey ^ 1);
-		  bitmap.pix32(y, x++) = pen[color];
-		  bitmap.pix32(y, x++) = pen[color];
-		  bitmap.pix32(y, x++) = pen[color];
-		  bitmap.pix32(y, x++) = pen[color];
-		  pixel--;
-		  dout = BIT(code, pixel);
-		  color = ((dcursor ^ dout) && de) << (grey ^ 1);
-		  bitmap.pix32(y, x++) = pen[color];
-		  bitmap.pix32(y, x++) = pen[color];
-		  bitmap.pix32(y, x++) = pen[color];
-		  bitmap.pix32(y, x++) = pen[color];
+			/* Lores 6 pixel character.
+			     -----------
+			     | D1 | D0 |
+			     | D3 | D2 |
+			     | D5 | D4 |
+			     -----------
+			     D6 - 1 Grey tone, 0 brightness.
+			*/
+			int pixel = ((ra & 0x0c) >> 1) + 1;
+			int dout = BIT(code, pixel);
+			int grey = BIT(code, 6);
+			int color = ((dcursor ^ dout) && de) << (grey ^ 1);
+			bitmap.pix(y, x++) = pen[color];
+			bitmap.pix(y, x++) = pen[color];
+			bitmap.pix(y, x++) = pen[color];
+			bitmap.pix(y, x++) = pen[color];
+			pixel--;
+			dout = BIT(code, pixel);
+			color = ((dcursor ^ dout) && de) << (grey ^ 1);
+			bitmap.pix(y, x++) = pen[color];
+			bitmap.pix(y, x++) = pen[color];
+			bitmap.pix(y, x++) = pen[color];
+			bitmap.pix(y, x++) = pen[color];
 		} else {
 			offs_t address = ra < 8 ? ((code & 0x7f) << 3) | (ra & 0x07) : 0;
 			uint8_t data = m_p_chargen[address];
@@ -902,7 +906,7 @@ MC6845_UPDATE_ROW(mekd4_state::update_row)
 				int dout = BIT(data, 7);
 				int color = ((dcursor ^ dout) && de) << 1;
 
-				bitmap.pix32(y, x++) = pen[color];
+				bitmap.pix(y, x++) = pen[color];
 
 				data <<= 1;
 			}

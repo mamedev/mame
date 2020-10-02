@@ -18,10 +18,10 @@ NOTE: There exist multiples type of .cas files for Colour Genie
 We now support these three types below...
 
 ********************************************************************/
+#include "formats/cgen_cas.h"
 
 #include <cassert>
 
-#include "formats/cgen_cas.h"
 
 #define TAPE_HEADER "Colour Genie - Virtual Tape File"
 
@@ -124,7 +124,7 @@ static int cgenie_cas_to_wav_size(const uint8_t *casdata, int caslen)
 	return cgenie_handle_cas(nullptr, casdata);
 }
 
-static const struct CassetteLegacyWaveFiller cgenie_cas_legacy_fill_wave =
+static const cassette_image::LegacyWaveFiller cgenie_cas_legacy_fill_wave =
 {
 	cgenie_cas_fill_wave,                   /* fill_wave */
 	-1,                                     /* chunk_size */
@@ -136,19 +136,19 @@ static const struct CassetteLegacyWaveFiller cgenie_cas_legacy_fill_wave =
 };
 
 
-static cassette_image::error cgenie_cas_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error cgenie_cas_identify(cassette_image *cassette, cassette_image::Options *opts)
 {
-	return cassette_legacy_identify(cassette, opts, &cgenie_cas_legacy_fill_wave);
+	return cassette->legacy_identify(opts, &cgenie_cas_legacy_fill_wave);
 }
 
 
 static cassette_image::error cgenie_cas_load(cassette_image *cassette)
 {
-	return cassette_legacy_construct(cassette, &cgenie_cas_legacy_fill_wave);
+	return cassette->legacy_construct(&cgenie_cas_legacy_fill_wave);
 }
 
 
-static const struct CassetteFormat cgenie_cas_format =
+static const cassette_image::Format cgenie_cas_format =
 {
 	"cas",
 	cgenie_cas_identify,

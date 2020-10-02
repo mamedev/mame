@@ -58,7 +58,7 @@ void paula_8364_device::device_start()
 	}
 
 	// create the stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 4, clock() / CLOCK_DIVIDER);
+	m_stream = stream_alloc(0, 4, clock() / CLOCK_DIVIDER);
 }
 
 //-------------------------------------------------
@@ -162,7 +162,7 @@ void paula_8364_device::dma_reload(audio_channel *chan)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void paula_8364_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void paula_8364_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	int channum, sampoffs = 0;
 
@@ -176,11 +176,11 @@ void paula_8364_device::sound_stream_update(sound_stream &stream, stream_sample_
 
 		// clear the sample data to 0
 		for (channum = 0; channum < 4; channum++)
-			memset(outputs[channum], 0, sizeof(stream_sample_t) * samples);
+			outputs[channum].fill(0);
 		return;
 	}
 
-	samples *= CLOCK_DIVIDER;
+	int samples = outputs[0].samples() * CLOCK_DIVIDER;
 
 	// update the DMA states on each channel and reload if fresh
 	for (channum = 0; channum < 4; channum++)
@@ -215,7 +215,7 @@ void paula_8364_device::sound_stream_update(sound_stream &stream, stream_sample_
 			audio_channel *chan = &m_channel[channum];
 			int volume = (nextvol == -1) ? chan->vol : nextvol;
 			int period = (nextper == -1) ? chan->per : nextper;
-			stream_sample_t sample;
+			s32 sample;
 			int i;
 
 			// normalize the volume value
@@ -247,7 +247,7 @@ void paula_8364_device::sound_stream_update(sound_stream &stream, stream_sample_
 
 			// fill the buffer with the sample
 			for (i = 0; i < ticks; i += CLOCK_DIVIDER)
-				outputs[channum][(sampoffs + i) / CLOCK_DIVIDER] = sample;
+				outputs[channum].put_int((sampoffs + i) / CLOCK_DIVIDER, sample, 32768);
 
 			// account for the ticks; if we hit 0, advance
 			chan->curticks -= ticks;

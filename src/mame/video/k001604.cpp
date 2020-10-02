@@ -256,7 +256,7 @@ void k001604_device::draw_back_layer( bitmap_rgb32 &bitmap, const rectangle &cli
 		// loop over columns
 		while (x <= ex)
 		{
-			*dest = clut[pixmap.pix16(((cy >> 16) & window_ymask) + window_y, ((cx >> 16) & window_xmask) + window_x)];
+			*dest = clut[pixmap.pix(((cy >> 16) & window_ymask) + window_y, ((cx >> 16) & window_xmask) + window_x)];
 
 			// advance in X
 			cx += incxx;
@@ -322,7 +322,7 @@ void k001604_device::draw_front_layer( screen_device &screen, bitmap_rgb32 &bitm
 		// loop over columns
 		while (x <= ex)
 		{
-			uint16_t pix = pixmap.pix16(((cy >> 16) & window_ymask) + window_y, ((cx >> 16) & window_xmask) + window_x);
+			uint16_t pix = pixmap.pix(((cy >> 16) & window_ymask) + window_y, ((cx >> 16) & window_xmask) + window_x);
 			if ((pix & 0xff) != 0)
 			{
 				*dest = clut[pix];

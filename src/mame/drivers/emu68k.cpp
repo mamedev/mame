@@ -54,7 +54,7 @@ void emu68k_state::machine_start()
 HD44780_PIXEL_UPDATE(emu68k_state::lcd_pixel_update)
 {
 	if (x < 5 && y < 8 && line < 2 && pos < 16)
-		bitmap.pix16(line * 8 + y, pos * 6 + x) = state;
+		bitmap.pix(line * 8 + y, pos * 6 + x) = state;
 }
 
 

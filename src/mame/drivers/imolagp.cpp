@@ -182,7 +182,7 @@ uint32_t imolagp_state::screen_update_imolagp(screen_device &screen, bitmap_ind1
 		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
 			uint8_t const *const source = &m_videoram[layer][(y & 0xff) * 0x40];
-			uint16_t *const dest = &bitmap.pix16(y & 0xff);
+			uint16_t *const dest = &bitmap.pix(y & 0xff);
 			for (int i = 0; i < 0x40; i++)
 			{
 				uint8_t const data = source[i];
@@ -534,6 +534,8 @@ void imolagp_state::imolagp(machine_config &config)
 	ppi.in_pc_callback().set_ioport("IN1");
 
 	/* video hardware */
+	// Part of the screen is obscured by the cabinet - this is handled by the visible area and physical aspect ratio here
+	// It would be better to move this into the layout so that the video output can be used with a restored cabinet.
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -543,6 +545,7 @@ void imolagp_state::imolagp(machine_config &config)
 	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
 	screen.set_palette("palette");
 	screen.screen_vblank().set(FUNC(imolagp_state::vblank_irq));
+	screen.set_physical_aspect(13, 12);
 
 	PALETTE(config, "palette", FUNC(imolagp_state::imolagp_palette), 0x20);
 

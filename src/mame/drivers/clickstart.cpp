@@ -9,7 +9,7 @@
          mouse optical sensor is a N2163, probably from Agilent.
 
     ClickStart cartridges pinout:
-	
+
          1 N/C          2 GND
          3 GND          4 VCC
          5 GND          6 VCC

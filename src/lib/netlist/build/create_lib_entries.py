@@ -45,7 +45,7 @@ def process_file(srcfile):
 if __name__ == '__main__':
     if (len(sys.argv) == 0):
         print('Usage:')
-        print('  extract files ...')
+        print('  create_lib_entries.py files...')
         sys.exit(0)
 
     for argno in range(1, len(sys.argv)):

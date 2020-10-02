@@ -411,7 +411,7 @@ HD44780_PIXEL_UPDATE(alesis_state::sr16_pixel_update)
 	if (line == 1 && pos >= 6 && pos < 8)  // last 2 characters of the second line are used to control the LCD symbols
 		update_lcd_symbols(bitmap, pos, y, x, state);
 	else if (pos < 8)
-		bitmap.pix16(line*9 + y, pos*6 + x) = state;
+		bitmap.pix(line*9 + y, pos*6 + x) = state;
 }
 
 void alesis_state::hr16(machine_config &config)

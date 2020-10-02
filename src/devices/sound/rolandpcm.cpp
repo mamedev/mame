@@ -61,7 +61,7 @@ void mb87419_mb87420_device::device_start()
 	m_clock = clock() / 2;
 	m_rate = m_clock / 512; // usually 32 KHz
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, m_rate);
+	m_stream = stream_alloc(0, 2, m_rate);
 
 	logerror("Roland PCM: Clock %u, Rate %u\n", m_clock, m_rate);
 }
@@ -269,26 +269,26 @@ void mb87419_mb87420_device::write(offs_t offset, u8 data)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void mb87419_mb87420_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void mb87419_mb87420_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	memset(outputs[0], 0, samples * sizeof(stream_sample_t));
-	memset(outputs[1], 0, samples * sizeof(stream_sample_t));
+	outputs[0].fill(0);
+	outputs[1].fill(0);
 
 	for (auto& chn : m_chns)
 	{
 		if (! chn.enable || chn.play_dir == 0)
 			continue;
 
-		for (int smpl = 0; smpl < samples; smpl ++)
+		for (int smpl = 0; smpl < outputs[0].samples(); smpl ++)
 		{
-			stream_sample_t smp_data;
+			s32 smp_data;
 			if (chn.play_dir > 0)
 				smp_data = sample_interpolate(chn.smpl_cur, chn.smpl_nxt, chn.addr & 0x3FFF);
 			else
 				smp_data = sample_interpolate(chn.smpl_nxt, chn.smpl_cur, chn.addr & 0x3FFF);
-			smp_data = (smp_data * chn.volume) >> 14;   // >>14 results in a good overall volume
-			outputs[0][smpl] += smp_data;
-			outputs[1][smpl] += smp_data;
+			smp_data = smp_data * chn.volume;
+			outputs[0].add_int(smpl, smp_data, 32768 << 14); // >>14 results in a good overall volume
+			outputs[1].add_int(smpl, smp_data, 32768 << 14);
 
 			uint32_t old_addr = chn.addr;
 			if (chn.play_dir > 0)

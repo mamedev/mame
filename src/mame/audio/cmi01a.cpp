@@ -132,7 +132,7 @@ void cmi01a_device::device_add_mconfig(machine_config &config)
 }
 
 
-void cmi01a_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void cmi01a_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	if (m_run)
 	{
@@ -140,23 +140,21 @@ void cmi01a_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 		int addr = m_segment_cnt;
 
 		uint8_t *wave_ptr = &m_wave_ram[m_segment_cnt & 0x3fff];
-		stream_sample_t *buf = outputs[0];
+		auto &buf = outputs[0];
 
-		while (samples--)
+		for (int sampindex = 0; sampindex < buf.samples(); sampindex++)
 		{
 			const uint8_t sample8 = wave_ptr[addr++ & 0x3fff];
-			int32_t sample = (int32_t)(int8_t)(sample8 ^ 0x80) * m_env * m_vol_latch;
+			s32 sample = (int32_t)(int8_t)(sample8 ^ 0x80) * m_env * m_vol_latch;
 			if (m_channel == 5) printf("%08x:%02x:%02x:%02x", (uint32_t)sample, sample8, m_env, m_vol_latch);
-			*buf++ = (int16_t)(sample >> 8);
+			buf.put_int(sampindex, (int16_t)(sample >> 8), 32768);
 		}
 		if (m_channel == 5) printf("\n");
 
 		m_segment_cnt = (m_segment_cnt & ~mask) | addr;
 	}
 	else
-	{
-		memset(outputs[0], 0, samples * sizeof(stream_sample_t));
-	}
+		outputs[0].fill(0);
 }
 
 void cmi01a_device::device_resolve_objects()

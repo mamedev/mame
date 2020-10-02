@@ -530,20 +530,19 @@ void excali64_state::excali64_palette(palette_device &palette)
 
 MC6845_UPDATE_ROW( excali64_state::update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	u8 chr,gfx,col,bg,fg;
-	u16 mem,x;
-	u8 col_base = BIT(m_sys_status, 3) ? 16 : 0;
-	u32 *p = &bitmap.pix32(y);
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	u8 const col_base = BIT(m_sys_status, 3) ? 16 : 0;
+	u32 *p = &bitmap.pix(y);
 
-	for (x = 0; x < x_count; x++)
+	for (u16 x = 0; x < x_count; x++)
 	{
-		mem = (ma + x) & 0x7ff;
-		chr = m_vram[mem];
-		col = m_vram[mem+0x800];
-		fg = col_base + (col >> 4);
-		bg = 32 + ((col >> 1) & 7);
+		u16 const mem = (ma + x) & 0x7ff;
+		u8 const chr = m_vram[mem];
+		u8 const col = m_vram[mem+0x800];
+		u8 const fg = col_base + (col >> 4);
+		u8 const bg = 32 + ((col >> 1) & 7);
 
+		u8 gfx;
 		if (BIT(col, 0))
 		{
 			u8 h = m_vram[mem+0x1000] - 4;

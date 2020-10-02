@@ -21,7 +21,7 @@ DEFINE_DEVICE_TYPE(O2_ROM_CHESS, o2_chess_device, "o2_chess", "Odyssey 2 Videopa
 //  o2_chess_device - constructor
 //-------------------------------------------------
 
-o2_chess_device::o2_chess_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+o2_chess_device::o2_chess_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, O2_ROM_CHESS, tag, owner, clock),
 	device_o2_cart_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu"),
@@ -35,7 +35,7 @@ void o2_chess_device::device_start()
 
 void o2_chess_device::cart_init()
 {
-	if (m_rom_size != 0x2800)
+	if (m_rom.bytes() != 0x800 || !m_exrom || m_exrom.bytes() != 0x2000)
 		fatalerror("o2_chess_device: Wrong ROM region size\n");
 }
 

@@ -30,7 +30,7 @@ DEFINE_DEVICE_TYPE(O2_ROM_HOMECOMP, o2_homecomp_device, "o2_homecomp", "Odyssey 
 //  o2_homecomp_device - constructor
 //-------------------------------------------------
 
-o2_homecomp_device::o2_homecomp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+o2_homecomp_device::o2_homecomp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, O2_ROM_HOMECOMP, tag, owner, clock),
 	device_o2_cart_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu"),
@@ -45,7 +45,7 @@ void o2_homecomp_device::device_start()
 
 void o2_homecomp_device::cart_init()
 {
-	if (m_rom_size != 0x4800)
+	if (m_rom.bytes() != 0x800 || !m_exrom || m_exrom.bytes() != 0x4000)
 		fatalerror("o2_homecomp_device: Wrong ROM region size\n");
 }
 

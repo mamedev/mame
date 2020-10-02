@@ -210,7 +210,7 @@ protected:
 	virtual void device_start() override;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 	struct filter {
@@ -340,7 +340,7 @@ void esq1_filters::device_start()
 		recalc_filter(elem);
 }
 
-void esq1_filters::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void esq1_filters::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 /*  if(0) {
         for(int i=0; i<8; i++)
@@ -352,11 +352,11 @@ void esq1_filters::sound_stream_update(sound_stream &stream, stream_sample_t **i
         fprintf(stderr, "\n");
     }*/
 
-	for(int i=0; i<samples; i++) {
+	for(int i=0; i<outputs[0].samples(); i++) {
 		double l=0, r=0;
 		for(int j=0; j<8; j++) {
 			filter &f = filters[j];
-			double x = inputs[j][i];
+			double x = inputs[j].get(i);
 			double y = (x*f.a[0]
 						+ f.x[0]*f.a[1] + f.x[1]*f.a[2] + f.x[2]*f.a[3] + f.x[3]*f.a[4]
 						- f.y[0]*f.b[1] - f.y[1]*f.b[2] - f.y[2]*f.b[3] - f.y[3]*f.b[4]) / f.b[0];
@@ -378,8 +378,8 @@ void esq1_filters::sound_stream_update(sound_stream &stream, stream_sample_t **i
 //      r *= 6553;
 		l *= 2;
 		r *= 2;
-		outputs[0][i] = l < -32768 ? -32768 : l > 32767 ? 32767 : int(l);
-		outputs[1][i] = r < -32768 ? -32768 : r > 32767 ? 32767 : int(r);
+		outputs[0].put_clamp(i, l, 1.0);
+		outputs[1].put_clamp(i, r, 1.0);
 	}
 }
 

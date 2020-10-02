@@ -107,11 +107,11 @@ void tiamc1_sound_device::device_start()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void tiamc1_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void tiamc1_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	int count, o0, o1, o2, len, orval = 0;
 
-	len = samples * CLOCK_DIVIDER;
+	len = outputs[0].samples() * CLOCK_DIVIDER;
 
 	for (count = 0; count < len; count++)
 	{
@@ -140,7 +140,7 @@ void tiamc1_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 
 		if ((count + 1) % CLOCK_DIVIDER == 0)
 		{
-			outputs[0][count / CLOCK_DIVIDER] = orval ? 0x2828 : 0;
+			outputs[0].put(count / CLOCK_DIVIDER, orval ? 0.3 : 0.0);
 			orval = 0;
 		}
 	}

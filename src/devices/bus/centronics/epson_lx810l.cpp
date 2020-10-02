@@ -575,9 +575,9 @@ WRITE_LINE_MEMBER( epson_lx810l_device::co0_w )
 		 */
 		if (m_real_cr_pos < m_bitmap.width()) {
 			for (int i = 0; i < 9; i++) {
-				unsigned int y = bitmap_line(i);
+				unsigned int const y = bitmap_line(i);
 				if ((m_printhead & (1<<(8-i))) != 0)
-					m_bitmap.pix32(y, m_real_cr_pos + CR_OFFSET) = 0x000000;
+					m_bitmap.pix(y, m_real_cr_pos + CR_OFFSET) = 0x000000;
 			}
 		}
 	}

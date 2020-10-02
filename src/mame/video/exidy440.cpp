@@ -306,7 +306,6 @@ void exidy440_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 		int image = (~sprite[3] & 0x3f);
 		int xoffs = (~((sprite[1] << 8) | sprite[2]) & 0x1ff);
 		int yoffs = (~sprite[0] & 0xff) + 1;
-		int x, y, sy;
 		uint8_t *src;
 
 		/* skip if out of range */
@@ -321,8 +320,8 @@ void exidy440_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 			xoffs -= 0x1ff;
 
 		/* loop over y */
-		sy = yoffs + scroll_offset;
-		for (y = 0; y < 16; y++, yoffs--, sy--)
+		int sy = yoffs + scroll_offset;
+		for (int y = 0; y < 16; y++, yoffs--, sy--)
 		{
 			/* wrap at the top and bottom of the screen */
 			if (sy >= VBSTART)
@@ -341,7 +340,7 @@ void exidy440_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 				int currx = xoffs;
 
 				/* loop over x */
-				for (x = 0; x < 8; x++, old += 2)
+				for (int x = 0; x < 8; x++, old += 2)
 				{
 					int ipixel = *src++;
 					int left = ipixel & 0xf0;
@@ -353,7 +352,7 @@ void exidy440_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 					{
 						/* combine with the background */
 						pen = left | old[0];
-						bitmap.pix16(yoffs, currx) = pen;
+						bitmap.pix(yoffs, currx) = pen;
 
 						/* check the collisions bit */
 						if (check_collision && (palette[2 * pen] & 0x80) && (count++ < 128))
@@ -366,7 +365,7 @@ void exidy440_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 					{
 						/* combine with the background */
 						pen = right | old[1];
-						bitmap.pix16(yoffs, currx) = pen;
+						bitmap.pix(yoffs, currx) = pen;
 
 						/* check the collisions bit */
 						if (check_collision && (palette[2 * pen] & 0x80) && (count++ < 128))

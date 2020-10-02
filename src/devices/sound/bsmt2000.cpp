@@ -175,14 +175,12 @@ void bsmt2000_device::device_timer(emu_timer &timer, device_timer_id id, int par
 //  for our sound stream
 //-------------------------------------------------
 
-void bsmt2000_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void bsmt2000_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	// just fill with current left/right values
-	for (int samp = 0; samp < samples; samp++)
-	{
-		outputs[0][samp] = m_left_data;
-		outputs[1][samp] = m_right_data;
-	}
+	constexpr stream_buffer::sample_t sample_scale = 1.0 / 32768.0;
+	outputs[0].fill(stream_buffer::sample_t(m_left_data) * sample_scale);
+	outputs[1].fill(stream_buffer::sample_t(m_right_data) * sample_scale);
 }
 
 

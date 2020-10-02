@@ -491,7 +491,7 @@ MC6845_UPDATE_ROW( qvt102_state::crtc_update_row )
 			p = !(p & !((BIT(attr, 3) & (ra == 11)))); // underline
 			p = p ^ (BIT(attr, 2) ^ ((x == cursor_x) | BIT(m_latch, 2))); // reverse
 
-			bitmap.pix32(y, x*9 + (8-i)) = palette[p ? 2 - half : 0];
+			bitmap.pix(y, x*9 + (8-i)) = palette[p ? 2 - half : 0];
 		}
 
 	}

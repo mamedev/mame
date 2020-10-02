@@ -27,7 +27,7 @@ uint32_t pp01_state::screen_update_pp01(screen_device &screen, bitmap_ind16 &bit
 			for (int b = 0; b < 8; b++)
 			{
 				uint8_t const col = (BIT(code_r, b) << 2) | (BIT(code_g, b) << 1) | (BIT(code_b, b) << 0);
-				bitmap.pix16(y, x*8+(7-b)) = col;
+				bitmap.pix(y, x*8+(7-b)) = col;
 			}
 		}
 	}

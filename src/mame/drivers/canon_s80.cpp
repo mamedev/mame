@@ -41,7 +41,7 @@ private:
 HD44780_PIXEL_UPDATE(canons80_state::pixel_update)
 {
 	if (pos < 16)
-		bitmap.pix16(line * 8 + y, pos * 6 + x) = state;
+		bitmap.pix(line * 8 + y, pos * 6 + x) = state;
 }
 
 void canons80_state::canons80_map(address_map &map)

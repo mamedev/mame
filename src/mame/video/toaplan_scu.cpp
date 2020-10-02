@@ -93,12 +93,12 @@ void toaplan_scu_device::draw_sprites_to_tempbitmap(const rectangle &cliprect, u
 
 void toaplan_scu_device::copy_sprites_from_tempbitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, int priority)
 {
-	const pen_t *pens = &palette().pen(gfx(0)->colorbase());
+	pen_t const *const pens = &palette().pen(gfx(0)->colorbase());
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		u16 *srcline = &m_temp_spritebitmap.pix16(y);
-		u32 *dstline = &bitmap.pix32(y);
+		u16 const *const srcline = &m_temp_spritebitmap.pix(y);
+		u32 *const dstline = &bitmap.pix(y);
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{

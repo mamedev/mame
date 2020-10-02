@@ -274,13 +274,13 @@ VIDEO_START_MEMBER(blitz68k_state,blitz68k_addr_factor1)
 
 uint32_t blitz68k_state::screen_update_blitz68k(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *src = m_blit_buffer.get();
+	const uint8_t *src = m_blit_buffer.get();
 
 	for(int y = 0; y < 256; y++)
 	{
 		for(int x = 0; x < 512; x++)
 		{
-			bitmap.pix32(y, x) = m_palette->pen(*src++);
+			bitmap.pix(y, x) = m_palette->pen(*src++);
 		}
 	}
 
@@ -292,17 +292,17 @@ uint32_t blitz68k_state::screen_update_blitz68k(screen_device &screen, bitmap_rg
 
 uint32_t blitz68k_state::screen_update_blitz68k_noblit(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint16_t *src = m_frame_buffer;
+	const uint16_t *src = m_frame_buffer;
 
 	for(int y = 0; y < 256; y++)
 	{
 		for(int x = 0; x < 512; )
 		{
-			uint16_t pen = *src++;
-			bitmap.pix32(y, x++) = m_palette->pen((pen >>  8) & 0xf);
-			bitmap.pix32(y, x++) = m_palette->pen((pen >> 12) & 0xf);
-			bitmap.pix32(y, x++) = m_palette->pen((pen >>  0) & 0xf);
-			bitmap.pix32(y, x++) = m_palette->pen((pen >>  4) & 0xf);
+			const uint16_t pen = *src++;
+			bitmap.pix(y, x++) = m_palette->pen((pen >>  8) & 0xf);
+			bitmap.pix(y, x++) = m_palette->pen((pen >> 12) & 0xf);
+			bitmap.pix(y, x++) = m_palette->pen((pen >>  0) & 0xf);
+			bitmap.pix(y, x++) = m_palette->pen((pen >>  4) & 0xf);
 		}
 	}
 

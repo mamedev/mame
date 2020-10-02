@@ -96,16 +96,15 @@ void gameplan_state::leprechn_get_pens( pen_t *pens )
 uint32_t gameplan_state::screen_update_gameplan(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	pen_t pens[GAMEPLAN_NUM_PENS];
-	offs_t offs;
 
 	gameplan_get_pens(pens);
 
-	for (offs = 0; offs < m_videoram_size; offs++)
+	for (offs_t offs = 0; offs < m_videoram_size; offs++)
 	{
 		uint8_t y = offs >> 8;
 		uint8_t x = offs & 0xff;
 
-		bitmap.pix32(y, x) = pens[m_videoram[offs] & 0x07];
+		bitmap.pix(y, x) = pens[m_videoram[offs] & 0x07];
 	}
 
 	return 0;
@@ -115,16 +114,15 @@ uint32_t gameplan_state::screen_update_gameplan(screen_device &screen, bitmap_rg
 uint32_t gameplan_state::screen_update_leprechn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	pen_t pens[LEPRECHN_NUM_PENS];
-	offs_t offs;
 
 	leprechn_get_pens(pens);
 
-	for (offs = 0; offs < m_videoram_size; offs++)
+	for (offs_t offs = 0; offs < m_videoram_size; offs++)
 	{
 		uint8_t y = offs >> 8;
 		uint8_t x = offs & 0xff;
 
-		bitmap.pix32(y, x) = pens[m_videoram[offs] & (LEPRECHN_NUM_PENS-1)];
+		bitmap.pix(y, x) = pens[m_videoram[offs] & (LEPRECHN_NUM_PENS-1)];
 	}
 
 	return 0;

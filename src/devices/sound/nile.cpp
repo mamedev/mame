@@ -82,19 +82,20 @@ void nile_device::device_start()
 //  for our sound stream
 //-------------------------------------------------
 
-void nile_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void nile_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	uint8_t *sound_ram = &m_sound_ram[0];
 	int v, i, snum;
 	uint16_t *slot;
-	int32_t mix[48000*2];
+	int32_t mix[4800*2];
 	int32_t *mixp;
 	int16_t sample;
 	int sptr, eptr, freq, lsptr, leptr;
 
 	lsptr=leptr=0;
 
-	memset(mix, 0, sizeof(mix[0])*samples*2);
+	sound_assert(outputs[0].samples() * 2 < ARRAY_LENGTH(mix));
+	std::fill_n(&mix[0], outputs[0].samples()*2, 0);
 
 	for (v = 0; v < NILE_VOICES; v++)
 	{
@@ -111,7 +112,7 @@ void nile_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 			lsptr = slot[NILE_REG_LSPTR_HI]<<16 | slot[NILE_REG_LSPTR_LO];
 			leptr = slot[NILE_REG_LEPTR_HI]<<16 | slot[NILE_REG_LEPTR_LO];
 
-			for (snum = 0; snum < samples; snum++)
+			for (snum = 0; snum < outputs[0].samples(); snum++)
 			{
 				sample = sound_ram[sptr + m_vpos[v]]<<8;
 
@@ -159,10 +160,10 @@ void nile_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 		}
 	}
 	mixp = &mix[0];
-	for (i = 0; i < samples; i++)
+	for (i = 0; i < outputs[0].samples(); i++)
 	{
-		outputs[0][i] = (*mixp++)>>4;
-		outputs[1][i] = (*mixp++)>>4;
+		outputs[0].put_int(i, *mixp++, 32768 * 16);
+		outputs[1].put_int(i, *mixp++, 32768 * 16);
 	}
 }
 

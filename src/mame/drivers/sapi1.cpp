@@ -383,24 +383,20 @@ INPUT_PORTS_END
 
 uint32_t sapi_state::screen_update_sapi1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bool val;
-	uint16_t addr,xpos;
-	uint8_t chr,attr,ra,x,y,b;
-
-	for(y = 0; y < 24; y++ )
+	for(uint8_t y = 0; y < 24; y++ )
 	{
-		addr = y*64;
-		xpos = 0;
-		for(x = 0; x < 40; x++ )
+		uint16_t addr = y*64;
+		uint16_t xpos = 0;
+		for(uint8_t x = 0; x < 40; x++ )
 		{
-			chr = m_p_videoram[addr + x];
-			attr = (chr >> 6) & 3;
+			uint8_t chr = m_p_videoram[addr + x];
+			uint8_t attr = (chr >> 6) & 3;
 			chr &= 0x3f;
-			for(ra = 0; ra < 9; ra++ )
+			for(uint8_t ra = 0; ra < 9; ra++ )
 			{
-				for(b = 0; b < 6; b++ )
+				for(uint8_t b = 0; b < 6; b++ )
 				{
-					val = 0;
+					bool val = 0;
 
 					if (ra==8)
 					{
@@ -416,12 +412,12 @@ uint32_t sapi_state::screen_update_sapi1(screen_device &screen, bitmap_ind16 &bi
 
 					if(attr==3)
 					{
-						bitmap.pix16(y*9+ra, xpos+2*b   ) = val;
-						bitmap.pix16(y*9+ra, xpos+2*b+1 ) = val;
+						bitmap.pix(y*9+ra, xpos+2*b   ) = val;
+						bitmap.pix(y*9+ra, xpos+2*b+1 ) = val;
 					}
 					else
 					{
-						bitmap.pix16(y*9+ra, xpos+b ) = val;
+						bitmap.pix(y*9+ra, xpos+b ) = val;
 					}
 				}
 			}
@@ -436,26 +432,22 @@ uint32_t sapi_state::screen_update_sapi1(screen_device &screen, bitmap_ind16 &bi
 // The attributes seem to be different on this one, they need to be understood, so disabled for now
 uint32_t sapi_state::screen_update_sapi3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bool val;
-	uint16_t addr,xpos;
-	uint8_t chr,attr,ra,x,y,b;
-
-	for(y = 0; y < 20; y++ )
+	for(uint8_t y = 0; y < 20; y++ )
 	{
-		addr = y*64;
-		xpos = 0;
-		for(x = 0; x < 40; x++ )
+		uint16_t addr = y*64;
+		uint16_t xpos = 0;
+		for(uint8_t x = 0; x < 40; x++ )
 		{
-			chr = m_p_videoram[addr + x];
-			attr = 0;//(chr >> 6) & 3;
+			uint8_t chr = m_p_videoram[addr + x];
+			uint8_t attr = 0;//(chr >> 6) & 3;
 			if (chr > 0x3f)
 				chr &= 0x1f;
 
-			for(ra = 0; ra < 9; ra++ )
+			for(uint8_t ra = 0; ra < 9; ra++ )
 			{
-				for(b = 0; b < 6; b++ )
+				for(uint8_t b = 0; b < 6; b++ )
 				{
-					val = 0;
+					bool val = 0;
 
 					if (ra==8)
 					{
@@ -471,12 +463,12 @@ uint32_t sapi_state::screen_update_sapi3(screen_device &screen, bitmap_ind16 &bi
 
 					if(attr==3)
 					{
-						bitmap.pix16(y*9+ra, xpos+2*b   ) = val;
-						bitmap.pix16(y*9+ra, xpos+2*b+1 ) = val;
+						bitmap.pix(y*9+ra, xpos+2*b   ) = val;
+						bitmap.pix(y*9+ra, xpos+2*b+1 ) = val;
 					}
 					else
 					{
-						bitmap.pix16(y*9+ra, xpos+b ) = val;
+						bitmap.pix(y*9+ra, xpos+b ) = val;
 					}
 				}
 			}
@@ -490,17 +482,15 @@ uint32_t sapi_state::screen_update_sapi3(screen_device &screen, bitmap_ind16 &bi
 
 MC6845_UPDATE_ROW( sapi_state::crtc_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint8_t chr,gfx,inv;
-	uint16_t mem,x;
-	uint32_t *p = &bitmap.pix32(y);
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint32_t *p = &bitmap.pix(y);
 
-	for (x = 0; x < x_count; x++)
+	for (uint16_t x = 0; x < x_count; x++)
 	{
-		inv = gfx = 0;
+		uint8_t inv = 0, gfx = 0;
 		if (x == cursor_x) inv ^= 0xff;
-		mem = (2*(ma + x)) & 0xfff;
-		chr = m_p_videoram[mem] & 0x3f;
+		uint16_t mem = (2*(ma + x)) & 0xfff;
+		uint8_t chr = m_p_videoram[mem] & 0x3f;
 
 		if (ra < 8)
 			gfx = MHB2501[(chr<<3) | ra] ^ inv;

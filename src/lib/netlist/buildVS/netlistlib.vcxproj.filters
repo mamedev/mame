@@ -87,9 +87,6 @@
     <ClCompile Include="..\devices\nld_7483.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\devices\nld_82S115.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\devices\nld_4013.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -127,9 +124,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\devices\nld_74153.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\devices\nld_82S16.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\devices\nld_74123.cpp">
@@ -187,9 +181,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\devices\nld_74174.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\devices\nld_2102A.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\devices\nld_4316.cpp">
@@ -286,6 +277,36 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\devices\nld_9321.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\generated\nlm_modules_lib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\devices\nld_4042.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\devices\nld_4076.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\devices\nld_4029.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\devices\nld_2102a.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\devices\nld_82s16.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\devices\nld_82s115.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\macro\modules\nlmod_icl8038_dip.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\macro\modules\nlmod_ne556_dip.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\macro\modules\nlmod_rtest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -428,184 +449,34 @@
     <ClInclude Include="..\tools\nl_convert.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\macro\nlm_ttl74xx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\macro\nlm_opamp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\macro\nlm_other.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\macro\nlm_base.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\macro\nlm_cd4xxx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\documentation\structure.dox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\documentation\primer_1.dox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\devices\nld_2102A.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\devices\nlid_system.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_r2r_dac.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_74193.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\devices\nlid_proxy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\devices\nld_log.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_2716.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_tms4800.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_am2847.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_74174.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_7448.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_74192.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_9310.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_4066.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\devices\nlid_cmos.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_4020.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_7474.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_74194.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_dm9314.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_dm9334.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\devices\nld_tristate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\devices\nld_7450.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\devices\net_lib.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_7473.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_74113.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_74161.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_82S115.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\devices\nlid_truthtable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\devices\nld_9316.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_7485.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_74166.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\devices\nld_devinc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\devices\nld_74165.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_82S126.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\devices\nld_system.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_74ls629.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_74365.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_7475.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_7483.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_74123.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_mm5837.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_4316.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_82S123.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_74153.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_7493.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_legacy.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_74107.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_ne555.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_9322.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_7490.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_82S16.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_74175.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_74164.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\plib\gmres.h">
@@ -655,12 +526,6 @@
     </ClInclude>
     <ClInclude Include="..\analog\nld_mosfet.h">
       <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_7442.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_74393.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

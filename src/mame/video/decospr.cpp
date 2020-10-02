@@ -563,26 +563,22 @@ void decospr_device::inefficient_copy_sprite_bitmap(bitmap_rgb32 &bitmap, const 
 	if (!m_sprite_bitmap.valid())
 		fatalerror("decospr_device::inefficient_copy_sprite_bitmap with no m_sprite_bitmap\n");
 
-	int y, x;
-	const pen_t *paldata = m_gfxdecode->palette().pens();
+	pen_t const *const paldata = m_gfxdecode->palette().pens();
 
-	uint16_t* srcline;
-	uint32_t* dstline;
-
-	for (y=cliprect.top();y<=cliprect.bottom();y++)
+	for (int y=cliprect.top();y<=cliprect.bottom();y++)
 	{
-		srcline= &m_sprite_bitmap.pix16(y);
-		dstline= &bitmap.pix32(y);
+		uint16_t const *const srcline= &m_sprite_bitmap.pix(y);
+		uint32_t *const dstline= &bitmap.pix(y);
 
 		if (alpha==0xff)
 		{
-			for (x=cliprect.left();x<=cliprect.right();x++)
+			for (int x=cliprect.left();x<=cliprect.right();x++)
 			{
-				uint16_t pix = srcline[x];
+				uint16_t const pix = srcline[x];
 
 				if (pix&0xf)
 				{
-					if ((pix & priority_mask) ==pri )
+					if ((pix & priority_mask) == pri)
 					{
 						dstline[x] = paldata[(pix&palmask) + colbase];
 					}
@@ -591,16 +587,16 @@ void decospr_device::inefficient_copy_sprite_bitmap(bitmap_rgb32 &bitmap, const 
 		}
 		else
 		{
-			for (x=cliprect.left();x<=cliprect.right();x++)
+			for (int x=cliprect.left();x<=cliprect.right();x++)
 			{
-				uint16_t pix = srcline[x];
+				uint16_t const pix = srcline[x];
 
 				if (pix&m_pixmask)
 				{
-					if ((pix & priority_mask) ==pri )
+					if ((pix & priority_mask) == pri)
 					{
-						uint32_t pal1 = paldata[(pix&palmask) + colbase];
-						uint32_t pal2 = dstline[x];
+						uint32_t const pal1 = paldata[(pix&palmask) + colbase];
+						uint32_t const pal2 = dstline[x];
 						dstline[x] = alpha_blend_r32(pal2, pal1, alpha);
 					}
 				}

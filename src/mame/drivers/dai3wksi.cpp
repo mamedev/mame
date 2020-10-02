@@ -179,9 +179,9 @@ uint32_t dai3wksi_state::screen_update_dai3wksi(screen_device &screen, bitmap_rg
 			rgb_t pen = (data & (1 << i)) ? m_palette->pen_color(color) : rgb_t::black();
 
 			if (m_dai3wksi_flipscreen)
-				bitmap.pix32(255-y, 255-x) = pen;
+				bitmap.pix(255-y, 255-x) = pen;
 			else
-				bitmap.pix32(y, x) = pen;
+				bitmap.pix(y, x) = pen;
 
 			x++;
 		}

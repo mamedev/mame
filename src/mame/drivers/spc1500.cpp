@@ -523,36 +523,29 @@ MC6845_RECONFIGURE(spc1500_state::crtc_reconfig)
 
 MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 {
-	uint8_t han2;
-	uint8_t *pf;
+	uint8_t const *pf;
 	uint16_t hfnt;
-	int i;
-	int j;
-	int h1, h2, h3;
-	uint32_t  *p = &bitmap.pix32(y);
+	uint32_t *p = &bitmap.pix(y);
 
 	unsigned char cho[] ={1,1,1,1,1,1,1,1,0,0,1,1,1,3,5,5,0,0,5,3,3,5,5,5,0,0,3,3,5,1};
 	unsigned char jong[]={0,0,0,1,1,1,1,1,0,0,1,1,1,2,2,2,0,0,2,2,2,2,2,2,0,0,2,2,1,1};
-	bool inv = false;
 	char hs = (m_crtc_vreg[0x9] < 15 ? 3 : 4);
 	int n = y & (m_crtc_vreg[0x9]);
 	bool ln400 = (hs == 4 && m_crtc_vreg[0x4] > 20);
-	uint8_t *vram = &m_p_videoram[0] + (m_crtc_vreg[12] << 8) + m_crtc_vreg[13];
-	for (i = 0; i < x_count; i++)
+	uint8_t const *const vram = &m_p_videoram[0] + (m_crtc_vreg[12] << 8) + m_crtc_vreg[13];
+	for (int i = 0; i < x_count; i++)
 	{
-		uint8_t *pp = &vram[0x2000+((y>>hs)*x_count+(((y)&7)<<11))+i+(((hs==4)&&(y&8))?0x400:0)];
-		uint8_t *pv = &vram[(y>>hs)*x_count + i];
+		uint8_t const *const pp = &vram[0x2000+((y>>hs)*x_count+(((y)&7)<<11))+i+(((hs==4)&&(y&8))?0x400:0)];
+		uint8_t const *const pv = &vram[(y>>hs)*x_count + i];
 		uint8_t ascii = *(pv+0x1000);
 		uint8_t attr = *pv;
-		inv = (attr & 0x8 ? true : false);
+		bool inv = (attr & 0x8 ? true : false);
 		uint8_t color = attr & 0x7;
 		uint8_t pixelb = *(pp+0);
 		uint8_t pixelr = *(pp+0x4000);
 		uint8_t pixelg = *(pp+0x8000);
 		bool nopalet = ((m_palet[0] | m_palet[1] | m_palet[2])==0 || ln400);
 		uint8_t pen = (nopalet ? color : m_paltbl[color]);
-		uint8_t pixelpen = 0;
-		uint8_t pixel = 0;
 		if (hs == 4 && (ascii & 0x80))
 		{
 			uint16_t wpixelb = (pixelb << 8) + (*(pp+1));
@@ -560,10 +553,10 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 			uint16_t wpixelg = (pixelg << 8) + (*(pp+0x8001));
 			if (ascii != 0xfa)
 			{
-				han2 = *(pv+0x1001);
-				h1 = (ascii>>2)&0x1f;
-				h2 = ((ascii<<3)|(han2>>5))&0x1f;
-				h3 = (han2)&0x1f;
+				uint8_t han2 = *(pv+0x1001);
+				int h1 = (ascii>>2)&0x1f;
+				int h2 = ((ascii<<3)|(han2>>5))&0x1f;
+				int h3 = (han2)&0x1f;
 				pf = &m_font[0x2000+(h1 * 32) + (cho[h2] + (h3 != 0) -1) * 16 * 2 * 32 + n];
 				hfnt = (*pf << 8) | (*(pf+16));
 				pf = &m_font[0x4000+(h2 * 32) + (h3 == 0 ? 0 : 1) * 16 * 2 * 32 + n];
@@ -578,26 +571,26 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 				hfnt = (*pf << 8) | (*(pf+16));
 			}
 			hfnt = (inv ? 0xffff - hfnt : hfnt);
-			for (j = 0x8000; j > 0; j>>=1)
+			for (int j = 0x8000; j > 0; j>>=1)
 			{
-				pixel = ((wpixelg&j ? 4:0 )|(wpixelr&j? 2:0)|(wpixelb&j ? 1:0));
-				pixelpen = (nopalet ? pixel : m_paltbl[pixel]);
+				uint8_t pixel = ((wpixelg&j ? 4:0 )|(wpixelr&j? 2:0)|(wpixelb&j ? 1:0));
+				uint8_t pixelpen = (nopalet ? pixel : m_paltbl[pixel]);
 				*p++ = m_palette->pen(((hfnt & j) || (m_priority & (1<<pixel))) ? pixelpen : pen);
 			}
 			i++;
 		}
 		else if (attr & 0x20)
 		{
-			uint8_t *pa = &m_pcgram[(ascii*(m_crtc_vreg[0x9]+1))+n];
+			uint8_t const *pa = &m_pcgram[(ascii*(m_crtc_vreg[0x9]+1))+n];
 			uint8_t b = *pa;
 			uint8_t r = *(pa+0x800);
 			uint8_t g = *(pa+0x1000);
-			for (j = 0x80; j > 0; j>>=1)
+			for (int j = 0x80; j > 0; j>>=1)
 			{
-				pixel = ((g & j)?4:0)|((r & j)?2:0)|((b & j)?1:0);
+				uint8_t pixel = ((g & j)?4:0)|((r & j)?2:0)|((b & j)?1:0);
 				pen = (pixel == 7 ? color : pixel);
 				pixel = (pixelg&j ? 4 : 0)|(pixelr&j ? 2:0)|(pixelb&j ? 1:0 );
-				pixelpen = (nopalet ? pixel : m_paltbl[pixel]);
+				uint8_t pixelpen = (nopalet ? pixel : m_paltbl[pixel]);
 				*p++ = m_palette->pen((m_priority & (1<<pixel)) ? pixelpen : pen);
 			}
 		}
@@ -609,10 +602,10 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 				fnt = 0xff;
 			}
 			fnt = (inv ? 0xff - fnt : fnt);
-			for (j = 0x80; j > 0; j>>=1)
+			for (int j = 0x80; j > 0; j>>=1)
 			{
-				pixel = ((pixelg&j) ? 4 : 0)|(pixelr&j ? 2:0)|(pixelb&j ? 1:0 );
-				pixelpen = (nopalet ? pixel : m_paltbl[pixel]);
+				uint8_t pixel = ((pixelg&j) ? 4 : 0)|(pixelr&j ? 2:0)|(pixelb&j ? 1:0 );
+				uint8_t pixelpen = (nopalet ? pixel : m_paltbl[pixel]);
 				if (ascii == 0 && attr == 0 && !inv)
 					*p++ = m_palette->pen(pixelpen);
 				else
@@ -713,7 +706,7 @@ static INPUT_PORTS_START( spc1500 )
 
 	PORT_START("LINE.1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("= +") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_CHAR('+')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Return") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C') PORT_CHAR(0x03)
@@ -723,7 +716,7 @@ static INPUT_PORTS_START( spc1500 )
 
 	PORT_START("LINE.2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Caps") PORT_CODE(KEYCODE_CAPSLOCK)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z') PORT_CHAR(0x1a)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("] }") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}') PORT_CHAR(0x1d)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("V") PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V') PORT_CHAR(0x16)
@@ -732,8 +725,8 @@ static INPUT_PORTS_START( spc1500 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2 @") PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('@')
 
 	PORT_START("LINE.3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Backspace") PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_INSERT) PORT_CHAR(UCHAR_MAMEKEY(INSERT))
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_UP)  PORT_CODE(KEYCODE_UP)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Backspace") PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_INSERT) PORT_CHAR(8) PORT_CHAR(UCHAR_MAMEKEY(INSERT))
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_UP)  PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ESC") PORT_CODE(KEYCODE_ESC) PORT_CHAR(0x1b)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("` ~") PORT_CODE(KEYCODE_TILDE) PORT_CHAR('`') PORT_CHAR('~')
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B') PORT_CHAR(0x02)
@@ -743,7 +736,7 @@ static INPUT_PORTS_START( spc1500 )
 
 	PORT_START("LINE.4")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Del Ins") PORT_CODE(KEYCODE_DEL_PAD) PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD)) PORT_CHAR(8)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Tab") PORT_CODE(KEYCODE_TAB) PORT_CHAR('\t')
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Home") PORT_CODE(KEYCODE_HOME)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("N") PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N') PORT_CHAR(0x0e)

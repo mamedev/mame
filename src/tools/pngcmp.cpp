@@ -76,8 +76,6 @@ static int generate_png_diff(const std::string& imgfile1, const std::string& img
 	osd_file::error filerr;
 	png_error pngerr;
 	int error = 100;
-	bool bitmaps_differ;
-	int x, y;
 
 	/* open the source image */
 	filerr = util::core_file::open(imgfile1, OPEN_FLAG_READ, file);
@@ -114,15 +112,17 @@ static int generate_png_diff(const std::string& imgfile1, const std::string& img
 	}
 
 	/* if the sizes are different, we differ; otherwise start off assuming we are the same */
+	bool bitmaps_differ;
 	bitmaps_differ = (bitmap2.width() != bitmap1.width() || bitmap2.height() != bitmap1.height());
 
 	/* compare scanline by scanline */
-	for (y = 0; y < bitmap2.height() && !bitmaps_differ; y++)
+	for (int y = 0; y < bitmap2.height() && !bitmaps_differ; y++)
 	{
-		uint32_t *base = &bitmap1.pix32(y);
-		uint32_t *curr = &bitmap2.pix32(y);
+		uint32_t const *base = &bitmap1.pix(y);
+		uint32_t const *curr = &bitmap2.pix(y);
 
 		/* scan the scanline */
+		int x;
 		for (x = 0; x < bitmap2.width(); x++)
 			if (*base++ != *curr++)
 				break;
@@ -148,16 +148,16 @@ static int generate_png_diff(const std::string& imgfile1, const std::string& img
 		/* now copy and compare each set of bitmaps */
 		int curheight = std::max(bitmap1.height(), bitmap2.height());
 		/* iterate over rows in these bitmaps */
-		for (y = 0; y < curheight; y++)
+		for (int y = 0; y < curheight; y++)
 		{
-			uint32_t *src1 = (y < bitmap1.height()) ? &bitmap1.pix32(y) : nullptr;
-			uint32_t *src2 = (y < bitmap2.height()) ? &bitmap2.pix32(y) : nullptr;
-			uint32_t *dst1 = &finalbitmap.pix32(y);
-			uint32_t *dst2 = &finalbitmap.pix32(y, bitmap1.width() + BITMAP_SPACE);
-			uint32_t *dstdiff = &finalbitmap.pix32(y, bitmap1.width() + BITMAP_SPACE + maxwidth + BITMAP_SPACE);
+			uint32_t const *src1 = (y < bitmap1.height()) ? &bitmap1.pix(y) : nullptr;
+			uint32_t const *src2 = (y < bitmap2.height()) ? &bitmap2.pix(y) : nullptr;
+			uint32_t *dst1 = &finalbitmap.pix(y);
+			uint32_t *dst2 = &finalbitmap.pix(y, bitmap1.width() + BITMAP_SPACE);
+			uint32_t *dstdiff = &finalbitmap.pix(y, bitmap1.width() + BITMAP_SPACE + maxwidth + BITMAP_SPACE);
 
 			/* now iterate over columns */
-			for (x = 0; x < maxwidth; x++)
+			for (int x = 0; x < maxwidth; x++)
 			{
 				int pix1 = -1, pix2 = -2;
 

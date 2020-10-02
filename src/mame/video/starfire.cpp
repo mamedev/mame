@@ -242,14 +242,14 @@ TIMER_CALLBACK_MEMBER(starfire_base_state::scanline_callback)
 		int data = pix[0];
 		int color = col[0];
 
-		m_screen_bitmap.pix32(y, x + 0) = pens[color | ((data >> 2) & 0x20)];
-		m_screen_bitmap.pix32(y, x + 1) = pens[color | ((data >> 1) & 0x20)];
-		m_screen_bitmap.pix32(y, x + 2) = pens[color | ((data >> 0) & 0x20)];
-		m_screen_bitmap.pix32(y, x + 3) = pens[color | ((data << 1) & 0x20)];
-		m_screen_bitmap.pix32(y, x + 4) = pens[color | ((data << 2) & 0x20)];
-		m_screen_bitmap.pix32(y, x + 5) = pens[color | ((data << 3) & 0x20)];
-		m_screen_bitmap.pix32(y, x + 6) = pens[color | ((data << 4) & 0x20)];
-		m_screen_bitmap.pix32(y, x + 7) = pens[color | ((data << 5) & 0x20)];
+		m_screen_bitmap.pix(y, x + 0) = pens[color | ((data >> 2) & 0x20)];
+		m_screen_bitmap.pix(y, x + 1) = pens[color | ((data >> 1) & 0x20)];
+		m_screen_bitmap.pix(y, x + 2) = pens[color | ((data >> 0) & 0x20)];
+		m_screen_bitmap.pix(y, x + 3) = pens[color | ((data << 1) & 0x20)];
+		m_screen_bitmap.pix(y, x + 4) = pens[color | ((data << 2) & 0x20)];
+		m_screen_bitmap.pix(y, x + 5) = pens[color | ((data << 3) & 0x20)];
+		m_screen_bitmap.pix(y, x + 6) = pens[color | ((data << 4) & 0x20)];
+		m_screen_bitmap.pix(y, x + 7) = pens[color | ((data << 5) & 0x20)];
 
 		pix += 256;
 		col += 256;

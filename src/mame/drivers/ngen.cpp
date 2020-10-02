@@ -77,6 +77,7 @@
 #include "machine/wd_fdc.h"
 #include "machine/z80sio.h"
 #include "video/mc6845.h"
+#include "memarray.h"
 #include "screen.h"
 
 
@@ -767,9 +768,9 @@ MC6845_UPDATE_ROW( ngen_state::crtc_update_row )
 		for(int z=0;z<9;z++)
 		{
 			if(BIT(m_fontram.read16(ch*16+ra),8-z))
-				bitmap.pix32(y,x+z) = rgb_t(0,0xff,0);
+				bitmap.pix(y,x+z) = rgb_t(0,0xff,0);
 			else
-				bitmap.pix32(y,x+z) = rgb_t(0,0,0);
+				bitmap.pix(y,x+z) = rgb_t(0,0,0);
 		}
 	}
 }

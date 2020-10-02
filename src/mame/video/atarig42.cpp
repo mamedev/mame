@@ -174,23 +174,22 @@ uint32_t atarig42_state::screen_update_atarig42(screen_device &screen, bitmap_in
 	/* copy the motion objects on top */
 	{
 		bitmap_ind16 &mo_bitmap = m_rle->vram(0);
-		int left    = cliprect.left();
-		int top     = cliprect.top();
-		int right   = cliprect.right() + 1;
-		int bottom  = cliprect.bottom() + 1;
-		int x, y;
+		int const left    = cliprect.left();
+		int const top     = cliprect.top();
+		int const right   = cliprect.right() + 1;
+		int const bottom  = cliprect.bottom() + 1;
 
 		/* now blend with the playfield */
-		for (y = top; y < bottom; y++)
+		for (int y = top; y < bottom; y++)
 		{
-			uint16_t *pf = &bitmap.pix16(y);
-			uint16_t *mo = &mo_bitmap.pix16(y);
-			uint8_t *pri = &priority_bitmap.pix8(y);
-			for (x = left; x < right; x++)
+			uint16_t *const pf = &bitmap.pix(y);
+			uint16_t const *const mo = &mo_bitmap.pix(y);
+			uint8_t const *const pri = &priority_bitmap.pix(y);
+			for (int x = left; x < right; x++)
 				if (mo[x])
 				{
-					int pfpri = pri[x];
-					int mopri = mo[x] >> ATARIRLE_PRIORITY_SHIFT;
+					int const pfpri = pri[x];
+					int const mopri = mo[x] >> ATARIRLE_PRIORITY_SHIFT;
 					if (mopri >= pfpri)
 						pf[x] = mo[x] & ATARIRLE_DATA_MASK;
 				}

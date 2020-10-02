@@ -1473,7 +1473,7 @@ inline uint8_t sega_segacd_device::read_pixel_from_stampmap(bitmap_ind16* srcbit
     if (x >= srcbitmap->width) return 0;
     if (y >= srcbitmap->height) return 0;
 
-    uint16_t* cacheptr = &srcbitmap->pix16(y, x);
+    uint16_t* cacheptr = &srcbitmap->pix(y, x);
 
     return cacheptr[0] & 0xf;
 */

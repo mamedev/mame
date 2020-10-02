@@ -47,7 +47,7 @@ void sega005_sound_device::device_start()
 	segag80r_state *state = machine().driver_data<segag80r_state>();
 
 	/* create the stream */
-	m_sega005_stream = machine().sound().stream_alloc(*this, 0, 1, SEGA005_COUNTER_FREQ);
+	m_sega005_stream = stream_alloc(0, 1, SEGA005_COUNTER_FREQ);
 
 	/* create a timer for the 555 */
 	m_sega005_sound_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sega005_sound_device::sega005_auto_timer), this));
@@ -61,14 +61,14 @@ void sega005_sound_device::device_start()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void sega005_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void sega005_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	segag80r_state *state = machine().driver_data<segag80r_state>();
 	const uint8_t *sound_prom = state->memregion("proms")->base();
 	int i;
 
 	/* no implementation yet */
-	for (i = 0; i < samples; i++)
+	for (i = 0; i < outputs[0].samples(); i++)
 	{
 		if (!(state->m_sound_state[1] & 0x10) && (++state->m_square_count & 0xff) == 0)
 		{
@@ -79,7 +79,7 @@ void sega005_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 				state->m_square_state += 2;
 		}
 
-		outputs[0][i] = (state->m_square_state & 2) ? 0x7fff : 0x0000;
+		outputs[0].put(i, (state->m_square_state & 2) ? 1.0 : 0.0);
 	}
 }
 

@@ -10,7 +10,7 @@
 #include "sound/ay8910.h"
 #include "sound/flt_rc.h"
 
-class timeplt_audio_device : public device_t, public device_sound_interface
+class timeplt_audio_device : public device_t
 {
 public:
 	timeplt_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 14'318'181);
@@ -25,9 +25,6 @@ protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
-
-	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 	void filter_w(offs_t offset, uint8_t data);
 	uint8_t portB_r();

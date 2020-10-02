@@ -34,11 +34,11 @@
 ///
 //
 
-#include "nl_base.h"
 #include "../nl_setup.h"
+#include "nl_base.h"
+#include "nld_generic_models.h"
 #include "plib/pfunction.h"
 #include "solver/nld_solver.h"
-#include "nld_generic_models.h"
 
 // -----------------------------------------------------------------------------
 // Implementation
@@ -54,7 +54,7 @@ namespace analog
 	// -----------------------------------------------------------------------------
 
 	template <class C>
-	inline core_device_t &bselect(bool b, C &d1, core_device_t &d2)
+	static inline core_device_t &bselect(bool b, C &d1, core_device_t &d2)
 	{
 		auto *h = dynamic_cast<core_device_t *>(&d1);
 		return b ? *h : d2;

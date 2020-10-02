@@ -106,7 +106,7 @@ u32 monty_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, cons
 	// letters with width 5 with space in between them
 	for (int y = 0; y < 32; y++)
 		for (int x = 0; x < 40; x++)
-			bitmap.pix32(y + 1, x + x/5 + 1) = BIT(m_lcd_data[y], x) ? 0 : 0xffffff;
+			bitmap.pix(y + 1, x + x/5 + 1) = BIT(m_lcd_data[y], x) ? 0 : 0xffffff;
 
 	return 0;
 }

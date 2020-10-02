@@ -233,7 +233,7 @@ uint32_t smotor_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 		m_bg_tilemap->set_scrolly((m_videoreg[3] + (m_videoreg[5] << 8)));
 		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	} else {
-		bitmap.fill(rgb_t::black(), cliprect);
+		bitmap.fill(0, cliprect);
 	}
 
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);

@@ -18,7 +18,6 @@
 TIMER_CALLBACK_MEMBER(galaxy_state::gal_video)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	int y, x;
 	if (m_interrupts_enabled == true)
 	{
 		uint8_t dat = BIT(m_latch_value, 2, 4);
@@ -43,17 +42,17 @@ TIMER_CALLBACK_MEMBER(galaxy_state::gal_video)
 					m_code = m_p_chargen[(m_code & 0x7f) +(dat << 7 )] ^ 0xff;
 					m_first = 0;
 				}
-				y = m_gal_cnt / 48 - 2;
-				x = (m_gal_cnt % 48) * 8;
+				int y = m_gal_cnt / 48 - 2;
+				int x = (m_gal_cnt % 48) * 8;
 
-				m_bitmap.pix16(y, x++ ) = BIT(m_code, 0);
-				m_bitmap.pix16(y, x++ ) = BIT(m_code, 1);
-				m_bitmap.pix16(y, x++ ) = BIT(m_code, 2);
-				m_bitmap.pix16(y, x++ ) = BIT(m_code, 3);
-				m_bitmap.pix16(y, x++ ) = BIT(m_code, 4);
-				m_bitmap.pix16(y, x++ ) = BIT(m_code, 5);
-				m_bitmap.pix16(y, x++ ) = BIT(m_code, 6);
-				m_bitmap.pix16(y, x   ) = BIT(m_code, 7);
+				m_bitmap.pix(y, x++ ) = BIT(m_code, 0);
+				m_bitmap.pix(y, x++ ) = BIT(m_code, 1);
+				m_bitmap.pix(y, x++ ) = BIT(m_code, 2);
+				m_bitmap.pix(y, x++ ) = BIT(m_code, 3);
+				m_bitmap.pix(y, x++ ) = BIT(m_code, 4);
+				m_bitmap.pix(y, x++ ) = BIT(m_code, 5);
+				m_bitmap.pix(y, x++ ) = BIT(m_code, 6);
+				m_bitmap.pix(y, x   ) = BIT(m_code, 7);
 			}
 			else
 			{ // Graphics mode
@@ -70,8 +69,8 @@ TIMER_CALLBACK_MEMBER(galaxy_state::gal_video)
 					m_code = space.read_byte(addr) ^ 0xff;
 					m_first = 0;
 				}
-				y = m_gal_cnt / 48 - 2;
-				x = (m_gal_cnt % 48) * 8;
+				int y = m_gal_cnt / 48 - 2;
+				int x = (m_gal_cnt % 48) * 8;
 
 				/* hack - until calc of R is fixed in Z80 */
 				if (x == 11 * 8 && y == 0)
@@ -83,14 +82,14 @@ TIMER_CALLBACK_MEMBER(galaxy_state::gal_video)
 					m_code = 0x00;
 				/* end of hack */
 
-				m_bitmap.pix16(y, x++ ) = BIT(m_code, 0);
-				m_bitmap.pix16(y, x++ ) = BIT(m_code, 1);
-				m_bitmap.pix16(y, x++ ) = BIT(m_code, 2);
-				m_bitmap.pix16(y, x++ ) = BIT(m_code, 3);
-				m_bitmap.pix16(y, x++ ) = BIT(m_code, 4);
-				m_bitmap.pix16(y, x++ ) = BIT(m_code, 5);
-				m_bitmap.pix16(y, x++ ) = BIT(m_code, 6);
-				m_bitmap.pix16(y, x   ) = BIT(m_code, 7);
+				m_bitmap.pix(y, x++ ) = BIT(m_code, 0);
+				m_bitmap.pix(y, x++ ) = BIT(m_code, 1);
+				m_bitmap.pix(y, x++ ) = BIT(m_code, 2);
+				m_bitmap.pix(y, x++ ) = BIT(m_code, 3);
+				m_bitmap.pix(y, x++ ) = BIT(m_code, 4);
+				m_bitmap.pix(y, x++ ) = BIT(m_code, 5);
+				m_bitmap.pix(y, x++ ) = BIT(m_code, 6);
+				m_bitmap.pix(y, x   ) = BIT(m_code, 7);
 			}
 		}
 		m_gal_cnt++;

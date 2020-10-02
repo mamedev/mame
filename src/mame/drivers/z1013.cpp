@@ -240,21 +240,20 @@ INPUT_PORTS_END
 
 uint32_t z1013_state::screen_update_z1013(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y,ra,chr,gfx;
-	uint16_t sy=0,ma=0,x;
+	uint16_t sy=0,ma=0;
 
-	for (y = 0; y < 32; y++)
+	for (uint8_t y = 0; y < 32; y++)
 	{
-		for (ra = 0; ra < 8; ra++)
+		for (uint8_t ra = 0; ra < 8; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix(sy++);
 
-			for (x = ma; x < ma+32; x++)
+			for (uint16_t x = ma; x < ma+32; x++)
 			{
-				chr = m_p_videoram[x];
+				uint8_t chr = m_p_videoram[x];
 
 				/* get pattern of pixels for that character scanline */
-				gfx = m_p_chargen[(chr<<3) | ra];
+				uint8_t gfx = m_p_chargen[(chr<<3) | ra];
 
 				/* Display a scanline of a character */
 				*p++ = BIT(gfx, 7);

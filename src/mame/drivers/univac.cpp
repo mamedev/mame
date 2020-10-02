@@ -502,7 +502,7 @@ uint32_t univac_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	{
 		for (u8 ra = 0; ra < 14; ra++)
 		{
-			uint32_t *p = &bitmap.pix32(sy++);
+			uint32_t *p = &bitmap.pix(sy++);
 
 			for (uint16_t x = ma; x < ma + 80; x++)
 			{

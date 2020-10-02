@@ -189,26 +189,25 @@ u32 cd2650_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
     Further, the letters have bit 6 set low, thus the range is 01 to 1A.
     When the bottom of the screen is reached, it does not scroll, it just wraps around. */
 
-	u8 y,ra,chr,gfx;
-	u16 offset=0,sy=0,x,mem;
+	u16 offset=0,sy=0;
 
-	for (y = 0; y < 16; y++)
+	for (u8 y = 0; y < 16; y++)
 	{
-		for (ra = 0; ra < CHARACTER_LINES; ra++)
+		for (u8 ra = 0; ra < CHARACTER_LINES; ra++)
 		{
-			u16 *p = &bitmap.pix16(sy++);
+			u16 *p = &bitmap.pix(sy++);
 
-			for (x = 0; x < 80; x++)
+			for (u16 x = 0; x < 80; x++)
 			{
-				gfx = 0;
+				u8 gfx = 0;
 				if (ra < CHARACTER_HEIGHT)
 				{
-					mem = offset + y + (x<<4);
+					u16 mem = offset + y + (x<<4);
 
 					if (mem > 0x4ff)
 						mem -= 0x500;
 
-					chr = m_p_videoram[mem] & 0x3f;
+					u8 chr = m_p_videoram[mem] & 0x3f;
 
 					gfx = m_p_chargen[(bitswap<8>(chr,7,6,2,1,0,3,4,5)<<3) | ra];
 				}

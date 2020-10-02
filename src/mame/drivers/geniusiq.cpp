@@ -275,7 +275,7 @@ uint32_t geniusiq_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 			for(int b=0; b<4; b++)
 			{
-				bitmap.pix16(y, x*2 + b) = (data>>12) & 0x0f;
+				bitmap.pix(y, x*2 + b) = (data>>12) & 0x0f;
 				data <<= 4;
 			}
 		}
@@ -292,7 +292,7 @@ uint32_t geniusiq_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 				// I assume color 0 is transparent
 				if(pen != 0 && screen.visible_area().contains(m_mouse_gfx_posx + x*4 + b, m_mouse_gfx_posy + y))
-					bitmap.pix16(m_mouse_gfx_posy + y, m_mouse_gfx_posx + x*4 + b) = pen;
+					bitmap.pix(m_mouse_gfx_posy + y, m_mouse_gfx_posx + x*4 + b) = pen;
 				data <<= 2;
 			}
 		}
@@ -487,7 +487,7 @@ static INPUT_PORTS_START( geniusiq )
 	PORT_START( "IN2" )
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_0 )         PORT_CHAR(0x00e0)   PORT_CHAR('0')  PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x20 )
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Return") PORT_CODE( KEYCODE_ENTER )     PORT_CHAR(13)   PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x21 )
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Backspace") PORT_CODE( KEYCODE_BACKSPACE ) PORT_CHAR(UCHAR_MAMEKEY(BACKSPACE))  PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x22 )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Backspace") PORT_CODE( KEYCODE_BACKSPACE ) PORT_CHAR(8)  PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x22 )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_L )         PORT_CHAR('l')  PORT_CHAR('L')  PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x23 )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_O )         PORT_CHAR('o')  PORT_CHAR('O')  PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x24 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_9 )         PORT_CHAR(0x00e7)   PORT_CHAR('9')  PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x25 )
@@ -610,7 +610,7 @@ static INPUT_PORTS_START( geniusiq_de )
 	PORT_MODIFY( "IN1" )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_QUOTE )     PORT_CHAR('^')  PORT_CHAR(0x00b0)   PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x17 )
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_BACKSLASH ) PORT_CHAR('+')  PORT_CHAR('*')      PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x18 )
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_EQUALS )    PORT_CHAR('{')  PORT_CHAR('}')  PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x19 )
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_EQUALS )    PORT_CHAR('}')  PORT_CHAR('{')  PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x19 )
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_CLOSEBRACE ) PORT_CHAR(0x00b0)  PORT_CHAR('?')  PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x1a )
 	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_OPENBRACE )  PORT_CHAR(0x00e4)  PORT_CHAR(0x00c4)   PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x1b )
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_SLASH )     PORT_CHAR(0x00fc)   PORT_CHAR(0x00dc)   PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x1c )

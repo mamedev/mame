@@ -701,9 +701,6 @@ void tia_video_device::setup_pXgfx(void)
 
 void tia_video_device::update_bitmap(int next_x, int next_y)
 {
-	int x;
-	int y;
-
 	uint8_t linePF[160];
 	uint8_t lineP0[160];
 	uint8_t lineP1[160];
@@ -753,16 +750,14 @@ void tia_video_device::update_bitmap(int next_x, int next_y)
 		}
 	}
 
-	for (y = prev_y; y <= next_y; y++)
+	for (int y = prev_y; y <= next_y; y++)
 	{
-		uint16_t* p;
-
 		int x1 = prev_x;
 		int x2 = next_x;
 		int colx1;
 
 		/* Check if we have crossed a line boundary */
-		if ( y !=  prev_y ) {
+		if (y !=  prev_y ) {
 			int redraw_line = 0;
 
 			HMOVE_started_previous = HMOVE_INACTIVE;
@@ -952,19 +947,18 @@ void tia_video_device::update_bitmap(int next_x, int next_y)
 		if (collision_check(lineM0, lineM1, colx1, x2))
 			CXPPMM |= 0x40;
 
-		p = &helper[current_bitmap].pix16(y % screen_height, 34);
+		uint16_t *p = &helper[current_bitmap].pix(y % screen_height, 34);
 
-		for (x = x1; x < x2; x++)
+		for (int x = x1; x < x2; x++)
 		{
 			p[x] = temp[x];
 		}
 
 		if ( x2 == 160 && y % screen_height == (screen_height - 1) ) {
-			int t_y;
-			for ( t_y = 0; t_y < buffer.height(); t_y++ ) {
-				uint16_t* l0 = &helper[current_bitmap].pix16(t_y);
-				uint16_t* l1 = &helper[1 - current_bitmap].pix16(t_y);
-				uint32_t* l2 = &buffer.pix32(t_y);
+			for ( int t_y = 0; t_y < buffer.height(); t_y++ ) {
+				uint16_t* l0 = &helper[current_bitmap].pix(t_y);
+				uint16_t* l1 = &helper[1 - current_bitmap].pix(t_y);
+				uint32_t* l2 = &buffer.pix(t_y);
 				int t_x;
 				for( t_x = 0; t_x < buffer.width(); t_x++ ) {
 					if ( l0[t_x] != l1[t_x] ) {
@@ -1321,7 +1315,7 @@ void tia_video_device::HMOVE_w(uint8_t data)
 		}
 		if (curr_y < screen_height)
 		{
-			memset(&helper[current_bitmap].pix16(curr_y, 34), 0, 16);
+			memset(&helper[current_bitmap].pix(curr_y, 34), 0, 16);
 		}
 
 		prev_x = 8;

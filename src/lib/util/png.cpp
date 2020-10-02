@@ -519,7 +519,7 @@ public:
 						accumalpha &= alpha;
 						std::uint16_t const paloffs(std::uint16_t(*src) * 3);
 						rgb_t const pix(alpha, pnginfo.palette[paloffs], pnginfo.palette[paloffs + 1], pnginfo.palette[paloffs + 2]);
-						bitmap.pix32((y << y_shift) + y_offs, (x << x_shift) + x_offs) = pix;
+						bitmap.pix((y << y_shift) + y_offs, (x << x_shift) + x_offs) = pix;
 					}
 				}
 			}
@@ -537,7 +537,7 @@ public:
 						std::uint8_t const a_val((pnginfo.trans && (transpen == i_val)) ? 0x00 : 0xff);
 						i_val >>= samp_shift;
 						accumalpha &= a_val;
-						bitmap.pix32((y << y_shift) + y_offs, (x << x_shift) + x_offs) = rgb_t(a_val, i_val, i_val, i_val);
+						bitmap.pix((y << y_shift) + y_offs, (x << x_shift) + x_offs) = rgb_t(a_val, i_val, i_val, i_val);
 					}
 				}
 			}
@@ -552,7 +552,7 @@ public:
 					{
 						accumalpha &= src[a];
 						rgb_t const pix(src[a], src[i], src[i], src[i]);
-						bitmap.pix32((y << y_shift) + y_offs, (x << x_shift) + x_offs) = pix;
+						bitmap.pix((y << y_shift) + y_offs, (x << x_shift) + x_offs) = pix;
 					}
 				}
 			}
@@ -578,7 +578,7 @@ public:
 						g_val >>= samp_shift;
 						b_val >>= samp_shift;
 						accumalpha &= a_val;
-						bitmap.pix32((y << y_shift) + y_offs, (x << x_shift) + x_offs) = rgb_t(a_val, r_val, g_val, b_val);
+						bitmap.pix((y << y_shift) + y_offs, (x << x_shift) + x_offs) = rgb_t(a_val, r_val, g_val, b_val);
 					}
 				}
 			}
@@ -595,7 +595,7 @@ public:
 					{
 						accumalpha &= src[a];
 						rgb_t const pix(src[a], src[r], src[g], src[b]);
-						bitmap.pix32((y << y_shift) + y_offs, (x << x_shift) + x_offs) = pix;
+						bitmap.pix((y << y_shift) + y_offs, (x << x_shift) + x_offs) = pix;
 					}
 				}
 			}
@@ -1042,7 +1042,7 @@ static png_error convert_bitmap_to_image_palette(png_info &pnginfo, const bitmap
 	/* copy in the pixels, specifying a nullptr filter */
 	for (y = 0; y < pnginfo.height; y++)
 	{
-		auto *src = reinterpret_cast<uint16_t *>(bitmap.raw_pixptr(y));
+		uint16_t const *src = reinterpret_cast<uint16_t const *>(bitmap.raw_pixptr(y));
 		uint8_t *dst = &pnginfo.image[y * (rowbytes + 1)];
 
 		/* store the filter byte, then copy the data */
@@ -1088,7 +1088,7 @@ static png_error convert_bitmap_to_image_rgb(png_info &pnginfo, const bitmap_t &
 		/* 16bpp palettized format */
 		if (bitmap.format() == BITMAP_FORMAT_IND16)
 		{
-			auto *src16 = reinterpret_cast<uint16_t *>(bitmap.raw_pixptr(y));
+			uint16_t const *src16 = reinterpret_cast<uint16_t const *>(bitmap.raw_pixptr(y));
 			for (x = 0; x < pnginfo.width; x++)
 			{
 				rgb_t color = palette[*src16++];
@@ -1101,7 +1101,7 @@ static png_error convert_bitmap_to_image_rgb(png_info &pnginfo, const bitmap_t &
 		/* 32-bit RGB direct */
 		else if (bitmap.format() == BITMAP_FORMAT_RGB32)
 		{
-			auto *src32 = reinterpret_cast<uint32_t *>(bitmap.raw_pixptr(y));
+			uint32_t const *src32 = reinterpret_cast<uint32_t const *>(bitmap.raw_pixptr(y));
 			for (x = 0; x < pnginfo.width; x++)
 			{
 				rgb_t raw = *src32++;
@@ -1114,7 +1114,7 @@ static png_error convert_bitmap_to_image_rgb(png_info &pnginfo, const bitmap_t &
 		/* 32-bit ARGB direct */
 		else if (bitmap.format() == BITMAP_FORMAT_ARGB32)
 		{
-			auto *src32 = reinterpret_cast<uint32_t *>(bitmap.raw_pixptr(y));
+			uint32_t const *src32 = reinterpret_cast<uint32_t const *>(bitmap.raw_pixptr(y));
 			for (x = 0; x < pnginfo.width; x++)
 			{
 				rgb_t raw = *src32++;

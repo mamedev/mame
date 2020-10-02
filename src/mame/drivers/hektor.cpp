@@ -215,14 +215,14 @@ MC6845_UPDATE_ROW(hektor3_state::crtc_update_row)
 		uint8_t data = m_ram->pointer()[~offset & 0xffff];
 		if (x == cursor_x) data ^= 0xff;
 
-		bitmap.pix32(y, x * 8 + 0) = pen[BIT(data, 7)];
-		bitmap.pix32(y, x * 8 + 1) = pen[BIT(data, 6)];
-		bitmap.pix32(y, x * 8 + 2) = pen[BIT(data, 5)];
-		bitmap.pix32(y, x * 8 + 3) = pen[BIT(data, 4)];
-		bitmap.pix32(y, x * 8 + 4) = pen[BIT(data, 3)];
-		bitmap.pix32(y, x * 8 + 5) = pen[BIT(data, 2)];
-		bitmap.pix32(y, x * 8 + 6) = pen[BIT(data, 1)];
-		bitmap.pix32(y, x * 8 + 7) = pen[BIT(data, 0)];
+		bitmap.pix(y, x * 8 + 0) = pen[BIT(data, 7)];
+		bitmap.pix(y, x * 8 + 1) = pen[BIT(data, 6)];
+		bitmap.pix(y, x * 8 + 2) = pen[BIT(data, 5)];
+		bitmap.pix(y, x * 8 + 3) = pen[BIT(data, 4)];
+		bitmap.pix(y, x * 8 + 4) = pen[BIT(data, 3)];
+		bitmap.pix(y, x * 8 + 5) = pen[BIT(data, 2)];
+		bitmap.pix(y, x * 8 + 6) = pen[BIT(data, 1)];
+		bitmap.pix(y, x * 8 + 7) = pen[BIT(data, 0)];
 	}
 }
 

@@ -39,28 +39,26 @@ void dg640_device::device_start()
 uint32_t dg640_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 // attributes bit 0 = flash, bit 1 = lores. Also bit 7 of the character = reverse-video (text only).
-	uint8_t y,ra,chr,gfx,attr,inv,gfxbit;
-	uint16_t sy=0,ma=0,x;
-	bool flash;
+	uint16_t sy=0,ma=0;
 	m_framecnt++;
 
-	for (y = 0; y < 16; y++)
+	for (uint8_t y = 0; y < 16; y++)
 	{
-		for (ra = 0; ra < 16; ra++)
+		for (uint8_t ra = 0; ra < 16; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix(sy++);
 
-			for (x = ma; x < ma + 64; x++)
+			for (uint16_t x = ma; x < ma + 64; x++)
 			{
-				attr = m_p_attribram[x];
-				chr = m_p_videoram[x];
-				flash = BIT(m_framecnt, 4) & BIT(attr, 0);
+				uint8_t attr = m_p_attribram[x];
+				uint8_t chr = m_p_videoram[x];
+				bool flash = BIT(m_framecnt, 4) & BIT(attr, 0);
 
 				if (BIT(attr, 1)) // lores gfx - can flash
 				{
 					if (flash) chr = 0; // blank part of flashing
 
-					gfxbit = (ra & 0x0c)>>1;
+					uint8_t gfxbit = (ra & 0x0c) >> 1;
 					/* Display one line of a lores character (8 pixels) */
 					*p++ = BIT(chr, gfxbit);
 					*p++ = BIT(chr, gfxbit);
@@ -74,11 +72,11 @@ uint32_t dg640_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 				}
 				else
 				{
-					gfx = 0;
+					uint8_t gfx = 0;
 
 					if (!flash)
 					{
-						inv = BIT(chr, 7) ? 0xff : 0; // text with bit 7 high is reversed
+						uint8_t inv = BIT(chr, 7) ? 0xff : 0; // text with bit 7 high is reversed
 						chr &= 0x7f;
 						gfx = inv;
 

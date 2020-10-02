@@ -485,13 +485,11 @@ void tceptor_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 	/* if SPR_MASK_COLOR pen is used, restore pixels from previous bitmap */
 	if (need_mask)
 	{
-		int x, y;
-
-		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
-			for (y = cliprect.min_y; y <= cliprect.max_y; y++)
-				if (m_palette->pen_indirect(bitmap.pix16(y, x)) == SPR_MASK_COLOR)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+			for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+				if (m_palette->pen_indirect(bitmap.pix(y, x)) == SPR_MASK_COLOR)
 					// restore pixel
-					bitmap.pix16(y, x) = m_temp_bitmap.pix16(y, x);
+					bitmap.pix(y, x) = m_temp_bitmap.pix(y, x);
 	}
 }
 

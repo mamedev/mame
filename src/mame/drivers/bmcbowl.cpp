@@ -167,41 +167,42 @@ uint32_t bmcbowl_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
         missing scroll and priorities   (maybe fixed ones)
 */
 
-	int x,y,z,pixdat;
 	bitmap.fill(rgb_t::black(), cliprect);
 
-	z=0;
-	for (y=0;y<230;y++)
+	int z=0;
+	for (int y=0; y<230; y++)
 	{
-		for (x=0;x<280;x+=2)
+		for (int x=0; x<280; x+=2)
 		{
+			int pixdat;
+
 			pixdat = m_vid2[0x8000+z];
 
 			if(pixdat&0xff)
-				bitmap.pix32(y, x+1) = m_palette->pen(pixdat&0xff);
+				bitmap.pix(y, x+1) = m_palette->pen(pixdat&0xff);
 			if(pixdat>>8)
-				bitmap.pix32(y, x) = m_palette->pen(pixdat>>8);
+				bitmap.pix(y, x) = m_palette->pen(pixdat>>8);
 
 			pixdat = m_vid2[z];
 
 			if(pixdat&0xff)
-				bitmap.pix32(y, x+1) = m_palette->pen(pixdat&0xff);
+				bitmap.pix(y, x+1) = m_palette->pen(pixdat&0xff);
 			if(pixdat>>8)
-				bitmap.pix32(y, x) = m_palette->pen(pixdat>>8);
+				bitmap.pix(y, x) = m_palette->pen(pixdat>>8);
 
 			pixdat = m_vid1[0x8000+z];
 
 			if(pixdat&0xff)
-				bitmap.pix32(y, x+1) = m_palette->pen(pixdat&0xff);
+				bitmap.pix(y, x+1) = m_palette->pen(pixdat&0xff);
 			if(pixdat>>8)
-				bitmap.pix32(y, x) = m_palette->pen(pixdat>>8);
+				bitmap.pix(y, x) = m_palette->pen(pixdat>>8);
 
 			pixdat = m_vid1[z];
 
 			if(pixdat&0xff)
-				bitmap.pix32(y, x+1) = m_palette->pen(pixdat&0xff);
+				bitmap.pix(y, x+1) = m_palette->pen(pixdat&0xff);
 			if(pixdat>>8)
-				bitmap.pix32(y, x) = m_palette->pen(pixdat>>8);
+				bitmap.pix(y, x) = m_palette->pen(pixdat>>8);
 
 			z++;
 		}

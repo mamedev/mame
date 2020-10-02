@@ -2,16 +2,17 @@
 // copyright-holders:Couriersud
 
 #include "plib/palloc.h"
-#include "analog/nld_twoterm.h"
 #include "core/setup.h"
 #include "devices/nlid_proxy.h"
 #include "devices/nlid_truthtable.h"
 #include "nl_base.h"
+#include "nl_errstr.h"
 #include "nl_factory.h"
 #include "nl_parser.h"
 #include "nl_setup.h"
 #include "plib/penum.h"
 #include "plib/pstonum.h"
+#include "plib/pstrutil.h"
 #include "plib/putil.h"
 
 #include "solver/nld_solver.h"
@@ -39,7 +40,7 @@ namespace netlist
 
 	void nlparse_t::register_dip_alias_arr(const pstring &terms)
 	{
-		std::vector<pstring> list(plib::psplit(terms,", "));
+		const auto list(plib::psplit(terms,pstring(", ")));
 		if (list.empty() || (list.size() % 2) == 1)
 		{
 			log().fatal(MF_DIP_PINS_MUST_BE_AN_EQUAL_NUMBER_OF_PINS_1(build_fqn("")));
@@ -93,7 +94,7 @@ namespace netlist
 
 		m_abstract.m_device_factory.insert(m_abstract.m_device_factory.end(), {key, f});
 
-		auto paramlist = plib::psplit(f->param_desc(), ",");
+		auto paramlist = plib::psplit(f->param_desc(), ',');
 
 		if (!params_and_connections.empty())
 		{
@@ -169,7 +170,7 @@ namespace netlist
 
 	void nlparse_t::register_link_arr(const pstring &terms)
 	{
-		std::vector<pstring> list(plib::psplit(terms,", "));
+		const auto list(plib::psplit(terms,pstring(", ")));
 		if (list.size() < 2)
 		{
 			log().fatal(MF_NET_C_NEEDS_AT_LEAST_2_TERMINAL());
@@ -206,7 +207,7 @@ namespace netlist
 		m_namespace_stack.pop();
 	}
 
-	void nlparse_t::register_param(const pstring &param, const nl_fptype value)
+	void nlparse_t::register_param_fp(const pstring &param, const nl_fptype value)
 	{
 		if (plib::abs(value - plib::floor(value)) > nlconst::magic(1e-30)
 			|| plib::abs(value) > nlconst::magic(1e9))
@@ -247,7 +248,7 @@ namespace netlist
 		}
 	}
 
-	void nlparse_t::defparam(const pstring &name, const pstring &def)
+	void nlparse_t::register_defparam(const pstring &name, const pstring &def)
 	{
 		// strip " from stringified strings
 		pstring val(def);
@@ -352,13 +353,13 @@ namespace netlist
 		return false;
 	}
 
-	bool nlparse_t::parse_tokens(const parser_t::token_store &tokens, const pstring &name)
+	bool nlparse_t::parse_tokens(const plib::detail::token_store &tokens, const pstring &name)
 	{
 		parser_t parser(*this);
 		return parser.parse(tokens, name);
 	}
 
-	bool nlparse_t::parse_stream(plib::psource_t::stream_ptr &&istrm, const pstring &name)
+	bool nlparse_t::parse_stream(plib::istream_uptr &&istrm, const pstring &name)
 	{
 #if 0
 		auto key = istrm.filename();
@@ -369,28 +370,22 @@ namespace netlist
 		}
 		else
 		{
-			//printf("searching %s\n", name.c_str());
-			plib::ppreprocessor y(m_includes, &m_defines);
-			y.process(std::move(istrm), istrm.filename());
-
-			auto abc = std::make_unique<std::stringstream>();
-			plib::copystream(*abc, y);
+			auto preprocessed = std::make_unique<std::stringstream>(
+					plib::ppreprocessor(m_includes, &m_defines).process(std::move(istrm), istrm.filename()));
 
 			parser_t::token_store &st = m_source_cache[key];
 			parser_t parser(*this);
-			parser.parse_tokens(plib::psource_t::stream_ptr(std::move(abc), key), st);
+			parser.parse_tokens(plib::istream_uptr(std::move(preprocessed), key), st);
 			return parser.parse(st, name);
 		}
 #else
-		plib::ppreprocessor y(m_includes, &m_defines);
-		y.process(std::move(istrm), istrm.filename());
-
-		auto abc = std::make_unique<std::stringstream>();
-		plib::copystream(*abc, y);
+		const auto filename = istrm.filename();
+		auto preprocessed = std::make_unique<std::stringstream>(putf8string(
+				plib::ppreprocessor(m_includes, &m_defines).process(std::move(istrm), filename)));
 
 		parser_t::token_store st;
 		parser_t parser(*this);
-		parser.parse_tokens(plib::psource_t::stream_ptr(std::move(abc), istrm.filename()), st);
+		parser.parse_tokens(plib::istream_uptr(std::move(preprocessed), filename), st);
 		return parser.parse(st, name);
 #endif
 	}
@@ -461,13 +456,13 @@ namespace netlist
 	// Sources
 	// ----------------------------------------------------------------------------------------
 
-	plib::psource_t::stream_ptr nlparse_t::get_data_stream(const pstring &name)
+	plib::istream_uptr nlparse_t::get_data_stream(const pstring &name)
 	{
 		auto strm = m_sources.get_stream<source_data_t>(name);
 		if (!strm.empty())
 			return strm;
 		log().warning(MW_DATA_1_NOT_FOUND(name));
-		return plib::psource_t::stream_ptr();
+		return plib::istream_uptr();
 	}
 
 	// ----------------------------------------------------------------------------------------
@@ -557,10 +552,10 @@ void setup_t::register_term(detail::core_terminal_t &term)
 	}
 }
 
-void setup_t::register_term(terminal_t &term, terminal_t &other_term)
+void setup_t::register_term(terminal_t &term, terminal_t *other_term, const std::array<terminal_t *, 2> &splitter_terms)
 {
 	this->register_term(term);
-	m_connected_terminals.insert({&term, &other_term});
+	m_connected_terminals.insert({&term, {other_term, splitter_terms[0], splitter_terms[1], nullptr}});
 }
 
 void setup_t::register_param_t(param_t &param)
@@ -722,7 +717,7 @@ param_ref_t setup_t::find_param(const pstring &param_in) const
 //NOLINTNEXTLINE(misc-no-recursion)
 devices::nld_base_proxy *setup_t::get_d_a_proxy(const detail::core_terminal_t &out)
 {
-	nl_assert(out.is_logic());
+	gsl_Expects(out.is_logic());
 
 	const auto &out_cast = dynamic_cast<const logic_output_t &>(out);
 	auto iter_proxy(m_proxies.find(&out));
@@ -765,7 +760,7 @@ devices::nld_base_proxy *setup_t::get_d_a_proxy(const detail::core_terminal_t &o
 //NOLINTNEXTLINE(misc-no-recursion)
 devices::nld_base_proxy *setup_t::get_a_d_proxy(detail::core_terminal_t &inp)
 {
-	nl_assert(inp.is_logic());
+	gsl_Expects(inp.is_logic());
 
 	const auto &incast = dynamic_cast<const logic_input_t &>(inp);
 
@@ -1198,6 +1193,7 @@ void setup_t::resolve_inputs()
 				log().warning(MW_TERMINAL_1_WITHOUT_CONNECTIONS(name_da));
 		}
 	}
+
 	log().verbose("checking tristate consistency  ...");
 	for (auto & i : m_terminals)
 	{
@@ -1288,7 +1284,10 @@ void models_t::model_parse(const pstring &model_in, map_t &map)
 		key = plib::ucase(model);
 		auto i = m_models.find(key);
 		if (i == m_models.end())
-			throw nl_exception(MF_MODEL_NOT_FOUND("xx" + model));
+		{
+			throw nl_exception(MF_MODEL_NOT_FOUND(pstring("xx") + model));
+		}
+
 		model = i->second;
 	}
 	pstring xmodel = plib::left(model, pos);
@@ -1308,9 +1307,9 @@ void models_t::model_parse(const pstring &model_in, map_t &map)
 	if (!plib::endsWith(remainder, ")"))
 		throw nl_exception(MF_MODEL_ERROR_1(model));
 	// FIMXE: Not optimal
-	remainder = plib::left(remainder, remainder.size() - 1);
+	remainder = plib::left(remainder, remainder.length() - 1);
 
-	std::vector<pstring> pairs(plib::psplit(remainder," ", true));
+	const auto pairs(plib::psplit(remainder,' ', true));
 	for (const pstring &pe : pairs)
 	{
 		auto pose = pe.find('=');
@@ -1356,7 +1355,7 @@ nl_fptype models_t::model_t::value(const pstring &entity) const
 	pstring tmp = value_str(entity);
 
 	nl_fptype factor = nlconst::one();
-	auto p = std::next(tmp.begin(), plib::narrow_cast<pstring::difference_type>(tmp.size() - 1));
+	auto p = std::next(tmp.begin(), plib::narrow_cast<pstring::difference_type>(tmp.length() - 1));
 	switch (*p)
 	{
 		case 'M': factor = nlconst::magic(1e6); break; // NOLINT
@@ -1373,7 +1372,7 @@ nl_fptype models_t::model_t::value(const pstring &entity) const
 				throw nl_exception(MF_UNKNOWN_NUMBER_FACTOR_IN_2(m_model, entity));
 	}
 	if (factor != nlconst::one())
-		tmp = plib::left(tmp, tmp.size() - 1);
+		tmp = plib::left(tmp, tmp.length() - 1);
 	// FIXME: check for errors
 	bool err(false);
 	auto val = plib::pstonum_ne<nl_fptype>(tmp, err);
@@ -1552,7 +1551,7 @@ void setup_t::prepare_to_run()
 
 	if (!envlog.empty())
 	{
-		std::vector<pstring> loglist(plib::psplit(envlog, ":"));
+		const auto loglist(plib::psplit(envlog, ':'));
 		m_parser.register_dynamic_log_devices(loglist);
 	}
 
@@ -1610,13 +1609,10 @@ void setup_t::prepare_to_run()
 		if (p != m_abstract.m_hints.end())
 		{
 			p->second = true; // mark as used
-			if (use_deactivate)
-				d.second->set_hint_deactivate(false);
-			else
-				d.second->set_hint_deactivate(true);
+			d.second->set_hint_deactivate(false);
 		}
 		else
-			d.second->set_hint_deactivate(true);
+			d.second->set_hint_deactivate(use_deactivate);
 	}
 
 	if (errcnt > 0)
@@ -1628,7 +1624,6 @@ void setup_t::prepare_to_run()
 	// resolve inputs
 	resolve_inputs();
 
-#if 0
 	log().verbose("looking for two terms connected to rail nets ...");
 	for (auto & t : m_nlstate.get_device_list<analog::NETLIB_NAME(twoterm)>())
 	{
@@ -1644,7 +1639,6 @@ void setup_t::prepare_to_run()
 #endif
 		}
 	}
-#endif
 
 	log().verbose("looking for unused hints ...");
 	for (auto &h : m_abstract.m_hints)
@@ -1709,44 +1703,44 @@ bool source_netlist_t::parse(nlparse_t &setup, const pstring &name)
 	return (!strm.empty()) ? setup.parse_stream(std::move(strm), name) : false;
 }
 
-source_string_t::stream_ptr source_string_t::stream(const pstring &name)
+plib::istream_uptr source_string_t::stream(const pstring &name)
 {
 	plib::unused_var(name);
-	source_string_t::stream_ptr ret(std::make_unique<std::istringstream>(m_str), name);
-	ret.stream().imbue(std::locale::classic());
+	plib::istream_uptr ret(std::make_unique<std::istringstream>(putf8string(m_str)), name);
+	ret->imbue(std::locale::classic());
 	return ret;
 }
 
-source_mem_t::stream_ptr source_mem_t::stream(const pstring &name)
+plib::istream_uptr source_mem_t::stream(const pstring &name)
 {
 	plib::unused_var(name);
-	source_mem_t::stream_ptr ret(std::make_unique<std::istringstream>(m_str, std::ios_base::binary), name);
-	ret.stream().imbue(std::locale::classic());
+	plib::istream_uptr ret(std::make_unique<std::istringstream>(m_str, std::ios_base::binary), name);
+	ret->imbue(std::locale::classic());
 	return ret;
 }
 
-source_file_t::stream_ptr source_file_t::stream(const pstring &name)
+plib::istream_uptr source_file_t::stream(const pstring &name)
 {
 	plib::unused_var(name);
 	auto f = std::make_unique<plib::ifstream>(plib::filesystem::u8path(m_filename));
 	if (f->is_open())
 	{
-		return stream_ptr(std::move(f), m_filename);
+		return plib::istream_uptr(std::move(f), m_filename);
 	}
-	else
-		return stream_ptr();
+
+	return plib::istream_uptr();
 }
 
-source_file_t::stream_ptr source_pattern_t::stream(const pstring &name)
+plib::istream_uptr source_pattern_t::stream(const pstring &name)
 {
-	pstring filename = plib::pfmt(m_pattern)(name);
+	pstring filename = plib::pfmt(m_pattern)(m_force_lowercase ? plib::lcase(name) : name);
 	auto f = std::make_unique<plib::ifstream>(plib::filesystem::u8path(filename));
 	if (f->is_open())
 	{
-		return stream_ptr(std::move(f), filename);
+		return plib::istream_uptr(std::move(f), filename);
 	}
-	else
-		return stream_ptr();
+
+	return plib::istream_uptr();
 }
 
 
@@ -1761,27 +1755,10 @@ bool source_proc_t::parse(nlparse_t &setup, const pstring &name)
 	return false;
 }
 
-source_proc_t::stream_ptr source_proc_t::stream(const pstring &name)
+plib::istream_uptr source_proc_t::stream(const pstring &name)
 {
 	plib::unused_var(name);
-	return stream_ptr();
-}
-
-bool source_token_t::parse(nlparse_t &setup, const pstring &name)
-{
-	if (name == m_name)
-	{
-		auto ret = setup.parse_tokens(m_store, name);
-		return ret;
-	}
-
-	return false;
-}
-
-source_proc_t::stream_ptr source_token_t::stream(const pstring &name)
-{
-	plib::unused_var(name);
-	return stream_ptr();
+	return plib::istream_uptr();
 }
 
 } // namespace netlist

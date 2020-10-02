@@ -1424,8 +1424,6 @@ uint32_t fm7_state::screen_update_fm7(screen_device &screen, bitmap_rgb32 &bitma
 	uint8_t code_r2 = 0,code_g2 = 0,code_b2 = 0;
 	uint8_t code_r3 = 0,code_g3 = 0,code_b3 = 0;
 	uint8_t code_r4 = 0,code_g4 = 0,code_b4 = 0;
-	uint16_t col;
-	int y, x, b;
 	uint16_t page = 0x0000;
 
 	if(m_video.display_video_page != 0)
@@ -1436,9 +1434,9 @@ uint32_t fm7_state::screen_update_fm7(screen_device &screen, bitmap_rgb32 &bitma
 
 	if(m_video.modestatus & 0x40)  // 320x200 mode
 	{
-		for (y = 0; y < 200; y++)
+		for (int y = 0; y < 200; y++)
 		{
-			for (x = 0; x < 40; x++)
+			for (int x = 0; x < 40; x++)
 			{
 				if(!(m_video.multi_page & 0x40))
 				{
@@ -1461,21 +1459,22 @@ uint32_t fm7_state::screen_update_fm7(screen_device &screen, bitmap_rgb32 &bitma
 					code_b3 = m_video_ram[0xc000 + ((y*40 + x + m_video.vram_offset2) & 0x1fff)];
 					code_b4 = m_video_ram[0xe000 + ((y*40 + x + m_video.vram_offset2) & 0x1fff)];
 				}
-				for (b = 0; b < 8; b++)
+				for (int b = 0; b < 8; b++)
 				{
+					uint16_t col;
 					col = (((code_b >> b) & 0x01) ? 8 : 0) | (((code_b2 >> b) & 0x01) ? 4 : 0) | (((code_b3 >> b) & 0x01) ? 2 : 0) | (((code_b4 >> b) & 0x01) ? 1 : 0);
 					col |= (((code_g >> b) & 0x01) ? 128 : 0) | (((code_g2 >> b) & 0x01) ? 64 : 0) | (((code_g3 >> b) & 0x01) ? 32 : 0) | (((code_g4 >> b) & 0x01) ? 16 : 0);
 					col |= (((code_r >> b) & 0x01) ? 2048 : 0) | (((code_r2 >> b) & 0x01) ? 1024 : 0) | (((code_r3 >> b) & 0x01) ? 512 : 0) | (((code_r4 >> b) & 0x01) ? 256 : 0);
-					bitmap.pix32(y, x*8+(7-b)) = m_av_palette->pen_color(col);
+					bitmap.pix(y, x*8+(7-b)) = m_av_palette->pen_color(col);
 				}
 			}
 		}
 	}
 	else
 	{
-		for (y = 0; y < 200; y++)
+		for (int y = 0; y < 200; y++)
 		{
-			for (x = 0; x < 80; x++)
+			for (int x = 0; x < 80; x++)
 			{
 				if(!(m_video.multi_page & 0x40))
 					code_r = m_video_ram[page + 0x8000 + ((y*80 + x + m_video.vram_offset) & 0x3fff)];
@@ -1483,10 +1482,10 @@ uint32_t fm7_state::screen_update_fm7(screen_device &screen, bitmap_rgb32 &bitma
 					code_g = m_video_ram[page + 0x4000 + ((y*80 + x + m_video.vram_offset) & 0x3fff)];
 				if(!(m_video.multi_page & 0x10))
 					code_b = m_video_ram[page + 0x0000 + ((y*80 + x + m_video.vram_offset) & 0x3fff)];
-				for (b = 0; b < 8; b++)
+				for (int b = 0; b < 8; b++)
 				{
-					col = (((code_r >> b) & 0x01) ? 4 : 0) + (((code_g >> b) & 0x01) ? 2 : 0) + (((code_b >> b) & 0x01) ? 1 : 0);
-					bitmap.pix32(y, x*8+(7-b)) = m_palette->pen_color(col);
+					uint16_t col = (((code_r >> b) & 0x01) ? 4 : 0) + (((code_g >> b) & 0x01) ? 2 : 0) + (((code_b >> b) & 0x01) ? 1 : 0);
+					bitmap.pix(y, x*8+(7-b)) = m_palette->pen_color(col);
 				}
 			}
 		}

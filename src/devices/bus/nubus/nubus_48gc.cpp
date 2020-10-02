@@ -12,6 +12,9 @@
 #include "nubus_48gc.h"
 #include "screen.h"
 
+#include <algorithm>
+
+
 #define VRAM_SIZE  (0x200000)  // 2 megs, maxed out
 
 #define GC48_SCREEN_NAME    "48gc_screen"
@@ -152,10 +155,7 @@ void jmfb_device::device_timer(emu_timer &timer, device_timer_id tid, int param,
 
 uint32_t jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint32_t *scanline, *base;
-	int x, y;
-	uint8_t *vram8 = &m_vram[0];
-	uint8_t pixels;
+	uint8_t const *const vram8 = &m_vram[0xa00];
 
 	// first time?  kick off the VBL timer
 	if (!m_screen)
@@ -164,37 +164,35 @@ uint32_t jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 		m_timer->adjust(m_screen->time_until_pos(479, 0), 0);
 	}
 
-	vram8 += 0xa00;
-
 	switch (m_mode)
 	{
 		case 0: // 1bpp
-			for (y = 0; y < m_yres; y++)
+			for (int y = 0; y < m_yres; y++)
 			{
-				scanline = &bitmap.pix32(y);
-				for (x = 0; x < m_xres/8; x++)
+				uint32_t *scanline = &bitmap.pix(y);
+				for (int x = 0; x < m_xres/8; x++)
 				{
-					pixels = vram8[(y * m_stride) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram8[(y * m_stride) + (BYTE4_XOR_BE(x))];
 
-					*scanline++ = m_palette[(pixels>>7)&1];
-					*scanline++ = m_palette[(pixels>>6)&1];
-					*scanline++ = m_palette[(pixels>>5)&1];
-					*scanline++ = m_palette[(pixels>>4)&1];
-					*scanline++ = m_palette[(pixels>>3)&1];
-					*scanline++ = m_palette[(pixels>>2)&1];
-					*scanline++ = m_palette[(pixels>>1)&1];
-					*scanline++ = m_palette[pixels&1];
+					*scanline++ = m_palette[BIT(pixels, 7)];
+					*scanline++ = m_palette[BIT(pixels, 6)];
+					*scanline++ = m_palette[BIT(pixels, 5)];
+					*scanline++ = m_palette[BIT(pixels, 4)];
+					*scanline++ = m_palette[BIT(pixels, 3)];
+					*scanline++ = m_palette[BIT(pixels, 2)];
+					*scanline++ = m_palette[BIT(pixels, 1)];
+					*scanline++ = m_palette[BIT(pixels, 0)];
 				}
 			}
 			break;
 
 		case 1: // 2bpp
-			for (y = 0; y < m_yres; y++)
+			for (int y = 0; y < m_yres; y++)
 			{
-				scanline = &bitmap.pix32(y);
-				for (x = 0; x < m_xres/4; x++)
+				uint32_t *scanline = &bitmap.pix(y);
+				for (int x = 0; x < m_xres/4; x++)
 				{
-					pixels = vram8[(y * m_stride) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram8[(y * m_stride) + (BYTE4_XOR_BE(x))];
 
 					*scanline++ = m_palette[(pixels>>6)&0x3];
 					*scanline++ = m_palette[(pixels>>4)&0x3];
@@ -205,13 +203,12 @@ uint32_t jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 			break;
 
 		case 2: // 4 bpp
-			for (y = 0; y < m_yres; y++)
+			for (int y = 0; y < m_yres; y++)
 			{
-				scanline = &bitmap.pix32(y);
-
-				for (x = 0; x < m_xres/2; x++)
+				uint32_t *scanline = &bitmap.pix(y);
+				for (int x = 0; x < m_xres/2; x++)
 				{
-					pixels = vram8[(y * m_stride) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram8[(y * m_stride) + (BYTE4_XOR_BE(x))];
 
 					*scanline++ = m_palette[(pixels>>4)&0xf];
 					*scanline++ = m_palette[pixels&0xf];
@@ -220,27 +217,22 @@ uint32_t jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 			break;
 
 		case 3: // 8 bpp
-			for (y = 0; y < m_yres; y++)
+			for (int y = 0; y < m_yres; y++)
 			{
-				scanline = &bitmap.pix32(y);
-
-				for (x = 0; x < m_xres; x++)
+				uint32_t *scanline = &bitmap.pix(y);
+				for (int x = 0; x < m_xres; x++)
 				{
-					pixels = vram8[(y * m_stride) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram8[(y * m_stride) + (BYTE4_XOR_BE(x))];
 					*scanline++ = m_palette[pixels];
 				}
 			}
 			break;
 
 		case 4: // 24 bpp
-			for (y = 0; y < m_yres; y++)
+			for (int y = 0; y < m_yres; y++)
 			{
-				scanline = &bitmap.pix32(y);
-				base = (uint32_t *)&m_vram[y * m_stride];
-				for (x = 0; x < m_xres; x++)
-				{
-					*scanline++ = *base++;
-				}
+				uint32_t const *base = (uint32_t *)&m_vram[y * m_stride];
+				std::copy_n(base, m_xres, &bitmap.pix(y));
 			}
 			break;
 	}

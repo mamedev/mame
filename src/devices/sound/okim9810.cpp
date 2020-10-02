@@ -112,7 +112,7 @@ okim9810_device::okim9810_device(const machine_config &mconfig, const char *tag,
 void okim9810_device::device_start()
 {
 	// create the stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock());
+	m_stream = stream_alloc(0, 2, clock());
 
 	// save state stuff
 	save_item(NAME(m_TMP_register));
@@ -214,15 +214,15 @@ void okim9810_device::rom_bank_updated()
 //  our sound stream
 //-------------------------------------------------
 
-void okim9810_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void okim9810_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	// reset the output streams
-	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
-	memset(outputs[1], 0, samples * sizeof(*outputs[1]));
+	outputs[0].fill(0);
+	outputs[1].fill(0);
 
 	// iterate over voices and accumulate sample data
 	for (auto & elem : m_voice)
-		elem.generate_audio(*this, outputs, samples, m_global_volume, m_filter_type);
+		elem.generate_audio(*this, outputs, m_global_volume, m_filter_type);
 }
 
 
@@ -613,8 +613,7 @@ okim9810_device::okim_voice::okim_voice()
 //-------------------------------------------------
 
 void okim9810_device::okim_voice::generate_audio(device_rom_interface &rom,
-													stream_sample_t **buffers,
-													int samples,
+													std::vector<write_stream_view> &outputs,
 													const uint8_t global_volume,
 													const uint8_t filter_type)
 {
@@ -623,8 +622,8 @@ void okim9810_device::okim_voice::generate_audio(device_rom_interface &rom,
 		return;
 
 	// separate out left and right channels
-	stream_sample_t *outL = buffers[0];
-	stream_sample_t *outR = buffers[1];
+	auto &outL = outputs[0];
+	auto &outR = outputs[1];
 
 	// get left and right volumes
 	uint8_t volume_scale_left = volume_scale(global_volume, m_channel_volume, m_pan_volume_left);
@@ -636,7 +635,7 @@ void okim9810_device::okim_voice::generate_audio(device_rom_interface &rom,
 		return;
 
 	// loop while we still have samples to generate
-	while (samples-- != 0)
+	for (int sampindex = 0; sampindex < outL.samples(); sampindex++)
 	{
 		// If interpSampleNum == 0, we are at the beginning of a new interp chunk, gather data
 		if (m_interpSampleNum == 0)
@@ -747,11 +746,11 @@ void okim9810_device::okim_voice::generate_audio(device_rom_interface &rom,
 
 		// output to the stereo buffers, scaling by the volume
 		// signal in range -2048..2047, volume in range 2..128 => signal * volume / 8 in range -32768..32767
-		int32_t interpValueL = (interpValue * (int32_t)volume_scale_left) / 8;
-		*outL++ += interpValueL;
+		int32_t interpValueL = (interpValue * (int32_t)volume_scale_left);
+		outL.add_int(sampindex, interpValueL, 32768 * 8);
 
-		int32_t interpValueR = (interpValue * (int32_t)volume_scale_right) / 8;
-		*outR++ += interpValueR;
+		int32_t interpValueR = (interpValue * (int32_t)volume_scale_right);
+		outR.add_int(sampindex, interpValueR, 32768 * 8);
 
 		// if the interpsample has reached its end, move on to the next sample
 		m_interpSampleNum++;

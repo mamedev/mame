@@ -233,13 +233,12 @@ uint32_t cyberbal_base_state::update_one_screen(screen_device &screen, bitmap_in
 	for (const sparse_dirty_rect *rect = curmob.first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->top(); y <= rect->bottom(); y++)
 		{
-			uint16_t *mo = &mobitmap.pix16(y);
-			uint16_t *pf = &bitmap.pix16(y);
+			uint16_t const *const mo = &mobitmap.pix(y);
+			uint16_t *const pf = &bitmap.pix(y);
 			for (int x = rect->left(); x <= rect->right(); x++)
 				if (mo[x] != 0xffff)
 				{
-					/* not verified: logic is all controlled in a PAL
-					*/
+					// not verified: logic is all controlled in a PAL
 					pf[x] = mo[x];
 				}
 		}

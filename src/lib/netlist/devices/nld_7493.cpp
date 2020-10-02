@@ -54,7 +54,6 @@
  *
  */
 
-#include "nld_7493.h"
 #include "nl_base.h"
 
 
@@ -63,22 +62,19 @@ namespace netlist
 	namespace devices
 	{
 
-	static constexpr const netlist_time out_delay = NLTIME_FROM_NS(18);
-	static constexpr const netlist_time out_delay2 = NLTIME_FROM_NS(36);
-	static constexpr const netlist_time out_delay3 = NLTIME_FROM_NS(54);
+	static constexpr std::array<netlist_time, 3> out_delay { NLTIME_FROM_NS(18), NLTIME_FROM_NS(36), NLTIME_FROM_NS(54) };
 
 	NETLIB_OBJECT(7493)
 	{
 		NETLIB_CONSTRUCTOR(7493)
-		, m_R1(*this, "R1", NETLIB_DELEGATE(inputs))
-		, m_R2(*this, "R2", NETLIB_DELEGATE(inputs))
-		, m_a(*this, "_m_a", 0)
-		, m_bcd(*this, "_m_b", 0)
-		, m_r(*this, "_m_r", 0)
 		, m_CLKA(*this, "CLKA", NETLIB_DELEGATE(updA))
 		, m_CLKB(*this, "CLKB", NETLIB_DELEGATE(updB))
 		, m_QA(*this, "QA")
 		, m_QB(*this, {"QB", "QC", "QD"})
+		, m_a(*this, "m_a", 0)
+		, m_bcd(*this, "m_b", 0)
+		, m_R1(*this, "R1", NETLIB_DELEGATE(inputs))
+		, m_R2(*this, "R2", NETLIB_DELEGATE(inputs))
 		, m_power_pins(*this)
 		{
 		}
@@ -111,30 +107,27 @@ namespace netlist
 		NETLIB_HANDLERI(updA)
 		{
 			m_a ^= 1;
-			m_QA.push(m_a, out_delay);
+			m_QA.push(m_a, out_delay[0]);
 		}
 
 		NETLIB_HANDLERI(updB)
 		{
 			const auto cnt(++m_bcd &= 0x07);
-
-			m_QB[2].push((cnt >> 2) & 1, out_delay3);
-			m_QB[1].push((cnt >> 1) & 1, out_delay2);
-			m_QB[0].push(cnt & 1, out_delay);
+			m_QB.push(cnt, out_delay);
 		}
-
-		logic_input_t m_R1;
-		logic_input_t m_R2;
-
-		state_var_sig m_a;
-		state_var_sig m_bcd;
-		state_var_sig m_r;
 
 		logic_input_t m_CLKA;
 		logic_input_t m_CLKB;
 
 		logic_output_t m_QA;
 		object_array_t<logic_output_t, 3> m_QB;
+
+		state_var<unsigned> m_a;
+		state_var<unsigned> m_bcd;
+
+		logic_input_t m_R1;
+		logic_input_t m_R2;
+
 		nld_power_pins m_power_pins;
 	};
 

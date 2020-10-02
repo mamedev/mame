@@ -281,8 +281,8 @@ MC6845_BEGIN_UPDATE( qix_state::crtc_begin_update )
 
 MC6845_UPDATE_ROW( qix_state::crtc_update_row )
 {
-	uint32_t *dest = &bitmap.pix32(y);
-	pen_t *pens = &m_pens[m_palette_bank << 8];
+	uint32_t *const dest = &bitmap.pix(y);
+	pen_t const *const pens = &m_pens[m_palette_bank << 8];
 
 	/* the memory is hooked up to the MA, RA lines this way */
 	offs_t offs = ((ma << 6) & 0xf800) | ((ra << 8) & 0x0700);

@@ -98,18 +98,10 @@ void jongkyo_state::video_start()
 
 uint32_t jongkyo_state::screen_update_jongkyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int y;
-
-	for (y = 0; y < 256; ++y)
+	for (int y = 0; y < 256; ++y)
 	{
-		int x;
-
-		for (x = 0; x < 256; x += 4)
+		for (int x = 0; x < 256; x += 4)
 		{
-			int b;
-			int res_x,res_y;
-			uint8_t data1;
-			uint8_t data2;
 			uint8_t data3;
 
 	//      data3 = m_videoram2[x/4 + y*64]; // wrong
@@ -120,15 +112,14 @@ uint32_t jongkyo_state::screen_update_jongkyo(screen_device &screen, bitmap_ind1
 	//  data3 = 0x00; // we're missing 2 bits.. there must be another piece of video ram somewhere or we can't use all the colours (6bpp).. banked somehow?
 
 
+			uint8_t data1 = m_videoram[0x4000 + x / 4 + y * 64];
+			uint8_t data2 = m_videoram[x / 4 + y * 64];
 
-			data1 = m_videoram[0x4000 + x / 4 + y * 64];
-			data2 = m_videoram[x / 4 + y * 64];
-
-			for (b = 0; b < 4; ++b)
+			for (int b = 0; b < 4; ++b)
 			{
-				res_x = m_flip_screen ? 255 - (x + b) : (x + b);
-				res_y = m_flip_screen ? 255 - y : y;
-				bitmap.pix16(res_y, res_x) = ((data2 & 0x01)) + ((data2 & 0x10) >> 3) +
+				int const res_x = m_flip_screen ? 255 - (x + b) : (x + b);
+				int const res_y = m_flip_screen ? 255 - y : y;
+				bitmap.pix(res_y, res_x) = ((data2 & 0x01)) + ((data2 & 0x10) >> 3) +
 															((data1 & 0x01) << 2) + ((data1 & 0x10) >> 1) +
 															((data3 & 0x01) << 4) + ((data3 & 0x10) << 1);
 				data1 >>= 1;

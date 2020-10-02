@@ -623,7 +623,7 @@ void oz750_state::machine_reset()
 
 uint32_t rex6000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint16_t lcd_bank = MAKE_BANK(m_lcd_base[0], m_lcd_base[1]);
+	uint16_t const lcd_bank = MAKE_BANK(m_lcd_base[0], m_lcd_base[1]);
 
 	if (m_lcd_enabled)
 	{
@@ -634,7 +634,7 @@ uint32_t rex6000_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 				for (int b=0; b<8; b++)
 				{
-					bitmap.pix16(y, (x * 8) + b) = BIT(data, 7);
+					bitmap.pix(y, (x * 8) + b) = BIT(data, 7);
 					data <<= 1;
 				}
 			}
@@ -649,7 +649,7 @@ uint32_t rex6000_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 uint32_t oz750_state::screen_update_oz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint16_t lcd_bank = MAKE_BANK(m_lcd_base[0], m_lcd_base[1]);
+	uint16_t const lcd_bank = MAKE_BANK(m_lcd_base[0], m_lcd_base[1]);
 
 	if (m_lcd_enabled && m_power_on)
 	{
@@ -660,7 +660,7 @@ uint32_t oz750_state::screen_update_oz(screen_device &screen, bitmap_ind16 &bitm
 
 				for (int b=0; b<8; b++)
 				{
-					bitmap.pix16(y, (x * 8) + b) = BIT(data, 0);
+					bitmap.pix(y, (x * 8) + b) = BIT(data, 0);
 					data >>= 1;
 				}
 			}

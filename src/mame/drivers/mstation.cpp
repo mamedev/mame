@@ -155,7 +155,7 @@ uint32_t mstation_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 				// columns are inverted (right to left)
 				int col = ((x < 20) ? 19 : 59) - x;
 
-				bitmap.pix16(y, col*8 + b)= BIT(data, 0);
+				bitmap.pix(y, col*8 + b)= BIT(data, 0);
 				data >>= 1;
 			}
 		}
@@ -164,7 +164,7 @@ uint32_t mstation_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 //***************************************************************************
 //  Bankswitch
-//***************************************************************************/
+//***************************************************************************
 
 uint8_t mstation_state::bank1_r(offs_t offset)
 {
@@ -330,7 +330,7 @@ static INPUT_PORTS_START( mstation )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE( KEYCODE_0 )      PORT_CHAR('0')      PORT_CHAR(')')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE( KEYCODE_MINUS )  PORT_CHAR('-')      PORT_CHAR('_')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE( KEYCODE_EQUALS ) PORT_CHAR('=')      PORT_CHAR('+')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_NAME("Backspace")      PORT_CODE( KEYCODE_BACKSPACE )      PORT_CHAR(UCHAR_MAMEKEY(BACKSPACE))
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_NAME("Backspace")      PORT_CODE( KEYCODE_BACKSPACE )      PORT_CHAR(8)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE( KEYCODE_BACKSLASH )  PORT_CHAR('\\')     PORT_CHAR('|')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_NAME("PG Down")        PORT_CODE( KEYCODE_PGDN )       PORT_CHAR(UCHAR_MAMEKEY(PGDN))
 
@@ -352,7 +352,7 @@ static INPUT_PORTS_START( mstation )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE( KEYCODE_CLOSEBRACE ) PORT_CHAR(']')      PORT_CHAR('}')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE( KEYCODE_COLON )      PORT_CHAR(';')      PORT_CHAR(':')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE( KEYCODE_QUOTE )      PORT_CHAR('\'')     PORT_CHAR('\"')
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_NAME("Enter")      PORT_CODE( KEYCODE_ENTER )  PORT_CHAR(UCHAR_MAMEKEY(ENTER))
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_NAME("Enter")      PORT_CODE( KEYCODE_ENTER )  PORT_CHAR(13)
 
 	PORT_START( "LINE.6" )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_NAME("CapsLock")       PORT_CODE( KEYCODE_CAPSLOCK )       PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))

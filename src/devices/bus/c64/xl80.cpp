@@ -85,12 +85,12 @@ const tiny_rom_entry *c64_xl80_device::device_rom_region() const
 
 MC6845_UPDATE_ROW( c64_xl80_device::crtc_update_row )
 {
-	const pen_t *pen = m_palette->pens();
+	pen_t const *const pen = m_palette->pens();
 
 	for (int column = 0; column < x_count; column++)
 	{
-		uint8_t code = m_ram[((ma + column) & 0x7ff)];
-		uint16_t addr = (code << 3) | (ra & 0x07);
+		uint8_t const code = m_ram[((ma + column) & 0x7ff)];
+		uint16_t const addr = (code << 3) | (ra & 0x07);
 		uint8_t data = m_char_rom->base()[addr & 0x7ff];
 
 		if (column == cursor_x)
@@ -100,10 +100,10 @@ MC6845_UPDATE_ROW( c64_xl80_device::crtc_update_row )
 
 		for (int bit = 0; bit < 8; bit++)
 		{
-			int x = (column * 8) + bit;
-			int color = BIT(data, 7) && de;
+			int const x = (column * 8) + bit;
+			int const color = BIT(data, 7) && de;
 
-			bitmap.pix32(vbp + y, hbp + x) = pen[color];
+			bitmap.pix(vbp + y, hbp + x) = pen[color];
 
 			data <<= 1;
 		}

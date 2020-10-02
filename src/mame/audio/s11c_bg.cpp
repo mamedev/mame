@@ -7,6 +7,8 @@
  * Used by Williams System 11A (F-14), all System 11B (except Jokerz) and all System 11C pinballs
  * Used by Midway Y-Unit Arcade Hardware (for Smash TV, Trog, and Strike Force; see below
  * for [Super] High Impact Football)
+ * Used by Midway MCR68 Arcade Hardware (for Pigskin, Arch Rivals, and Tri-Sport)
+ * The older D-11298 version is used by Williams Joust 2 Arcade hardware, see below
  *
  * The interface connector for this board is a 20 pin header J4 with the following pinout:
  *
@@ -46,15 +48,16 @@
  * The mixing resistors before the MC1458 differ between the D-11581,
  * D-11581-20xx (System 11C), and D-1129x board schematics:
  * (All resistors are 5% unless otherwise noted)
- * newstyle P/N                              A-13971-43313 (and A-13971-500xx)
- * oldstyle P/N    D-1129x    D-11581        D-11581-20xx or D-11581-400xx
- * CPU_SOUND       R32 2.2k   R12 2.2k       R12 4.7k
- * YM2151 CH1      R33 10k    R14 10k        R14 20k
- * YM2151 CH2      R34 10k    R15 10k        R15 20k
- * MC1408 DAC      R35 10k    R16 6.3k       R16 13k
- * CVSD           [R30 10k]  [R13 4.99k 1%]  R13 4.99k 1%
- * MC1458 Feedback R38 10k    R17 10k        R17 10k
- * MC1458 +-to-gnd R36 4.7k   R11 4.7k       R11 4.7k
+ * schematic P/N   Unknown    16-8999 Rev -  16-8999 Rev E      16-9138
+ * newstyle P/N                              A-13971-43313      A-13971-500xx
+ * oldstyle P/N    D-1129x    D-11581        D-11581-20xx/400xx
+ * CPU_SOUND       R32 2.2k   R12 2.2k       R12 4.7k           R12 4.7k
+ * YM2151 CH1      R33 10k    R14 10k        R14 20k            R14 20k
+ * YM2151 CH2      R34 10k    R15 10k        R15 20k            R15 20k
+ * MC1408 DAC      R35 10k    R16 6.3k       R16 13k            R16 13k
+ * CVSD           [R30 10k]  [R13 4.99k 1%]  R13 4.99k 1%       R13 4.99k 1%
+ * MC1458 Feedback R38 10k    R17 10k        R17 10k            R17 10k
+ * MC1458 +-to-gnd R36 4.7k   R11 4.7k       R11 4.7k           R11 4.7k
  * [] - if CVSD section present
 
  * Note that some D-11581 boards have the D-11297/8 mixing resistors in place,
@@ -305,7 +308,7 @@ TIMER_CALLBACK_MEMBER(s11c_bg_device::deferred_cb2_w)
 	if (!m_cb2_cb.isnull())
 		m_cb2_cb(param);
 	else
-		logerror("S11C_BG CB2 writeback called, but callback is not registered!\n");
+		logerror("S11C_BG CB2 writeback called with state %x, but callback is not registered!\n", param);
 }
 
 TIMER_CALLBACK_MEMBER(s11c_bg_device::deferred_pb_w)
@@ -313,7 +316,7 @@ TIMER_CALLBACK_MEMBER(s11c_bg_device::deferred_pb_w)
 	if (!m_pb_cb.isnull())
 		m_pb_cb(param);
 	else
-		logerror("S11C_BG PB writeback called, but callback is not registered!\n");
+		logerror("S11C_BG PB writeback called with state 0x%2X, but callback is not registered!\n", param);
 }
 
 

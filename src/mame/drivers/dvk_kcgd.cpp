@@ -307,19 +307,19 @@ void kcgd_state::draw_scanline(uint16_t *p, uint16_t offset)
 
 TIMER_DEVICE_CALLBACK_MEMBER(kcgd_state::scanline_callback)
 {
-	uint16_t y = m_screen->vpos(), offset;
+	uint16_t y = m_screen->vpos();
 
 	if (y < KCGD_VERT_START) return;
 	y -= KCGD_VERT_START;
 	if (y >= KCGD_DISP_VERT) return;
 
-	offset = BIT(m_video.status, KCGD_STATUS_PAGE) ? (KCGD_PAGE_1 >> 1) : (KCGD_PAGE_0 >> 1);
+	uint16_t const offset = BIT(m_video.status, KCGD_STATUS_PAGE) ? (KCGD_PAGE_1 >> 1) : (KCGD_PAGE_0 >> 1);
 
 	DBG_LOG(2,"scanline_cb", ("frame %d y %.3d page %d offset %04X *offset %04X\n",
 		m_screen->frame_number(), BIT(m_video.status, KCGD_STATUS_PAGE),
 		y, offset + y, m_videoram[offset + y]));
 
-	draw_scanline(&m_tmpbmp.pix16(y), m_videoram[offset + (KCGD_DISP_VERT-1) - y]);
+	draw_scanline(&m_tmpbmp.pix(y), m_videoram[offset + (KCGD_DISP_VERT-1) - y]);
 }
 
 uint32_t kcgd_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

@@ -74,8 +74,9 @@ protected:
 
 	struct layer_info
 	{
-		bitmap_ind16 *bitmap = nullptr;
-		uint8_t* transparent = nullptr;
+		bitmap_ind16 bitmap;
+		std::unique_ptr<uint8_t[]> transparent;
+		int num;
 	};
 
 	struct extents_list
@@ -87,8 +88,8 @@ protected:
 
 	struct cache_entry
 	{
-		struct cache_entry *    next = nullptr;
-		tilemap_t *             tmap = nullptr;
+		cache_entry *             next = nullptr;
+		tilemap_t *               tmap = nullptr;
 		uint8_t                   page = 0;
 		uint8_t                   bank = 0;
 	};
@@ -144,7 +145,7 @@ protected:
 	uint8_t update_tilemaps(screen_device &screen, const rectangle &cliprect);
 	void sprite_erase_buffer();
 	void sprite_swap_buffers();
-	int draw_one_sprite(uint16_t *data, int xoffs, int yoffs, const rectangle &clipin, const rectangle &clipout);
+	int draw_one_sprite(uint16_t const *data, int xoffs, int yoffs, const rectangle &clipin, const rectangle &clipout);
 	void sprite_render_list();
 	inline uint8_t compute_color_offsets(int which, int layerbit, int layerflag);
 	inline uint16_t compute_sprite_blend(uint8_t encoding);
@@ -172,13 +173,13 @@ protected:
 	void titlef_sw2_output( int which, uint16_t data );
 	void scross_sw1_output( int which, uint16_t data );
 	void scross_sw2_output( int which, uint16_t data );
-	int compute_clipping_extents(screen_device &screen, int enable, int clipout, int clipmask, const rectangle &cliprect, struct extents_list *list);
+	int compute_clipping_extents(screen_device &screen, int enable, int clipout, int clipmask, const rectangle &cliprect, extents_list *list);
 	void compute_tilemap_flips(int bgnum, int &flipx, int &flipy);
-	void update_tilemap_zoom(screen_device &screen, struct layer_info *layer, const rectangle &cliprect, int bgnum);
-	void update_tilemap_rowscroll(screen_device &screen, struct layer_info *layer, const rectangle &cliprect, int bgnum);
-	void update_tilemap_text(screen_device &screen, struct layer_info *layer, const rectangle &cliprect);
-	void update_bitmap(screen_device &screen, struct layer_info *layer, const rectangle &cliprect);
-	void update_background(struct layer_info *layer, const rectangle &cliprect);
+	void update_tilemap_zoom(screen_device &screen, layer_info &layer, const rectangle &cliprect, int bgnum);
+	void update_tilemap_rowscroll(screen_device &screen, layer_info &layer, const rectangle &cliprect, int bgnum);
+	void update_tilemap_text(screen_device &screen, layer_info &layer, const rectangle &cliprect);
+	void update_bitmap(screen_device &screen, layer_info &layer, const rectangle &cliprect);
+	void update_background(layer_info &layer, const rectangle &cliprect);
 
 	void signal_sound_irq(int which);
 	void clear_sound_irq(int which);
@@ -245,8 +246,9 @@ protected:
 	uint16_t m_system32_displayenable[2];
 	uint16_t m_system32_tilebank_external;
 	uint16_t m_arescue_dsp_io[6];
-	struct cache_entry *m_cache_head;
-	struct layer_info m_layer_data[11];
+	std::unique_ptr<cache_entry[]> m_tmap_cache;
+	cache_entry *m_cache_head;
+	layer_info m_layer_data[11];
 	uint16_t m_mixer_control[2][0x40];
 	std::unique_ptr<uint16_t[]> m_solid_0000;
 	std::unique_ptr<uint16_t[]> m_solid_ffff;

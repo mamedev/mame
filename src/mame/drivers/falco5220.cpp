@@ -96,7 +96,7 @@ u32 falco5220_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 					gfx = 0xff;
 
 				for (int x = 0; x < 8; x++)
-					bitmap.pix32(col*16 + y, row*8 + x) = BIT(gfx, x) ? rgb_t::white() : rgb_t::black();
+					bitmap.pix(col*16 + y, row*8 + x) = BIT(gfx, x) ? rgb_t::white() : rgb_t::black();
 			}
 		}
 	}

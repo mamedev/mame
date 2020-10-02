@@ -116,22 +116,19 @@ void krokha_state::machine_reset()
 
 uint32_t krokha_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y, ra, gfx;
-	uint16_t chr, ma = 0, x = 0;
-
-	for (y = 0; y < 32; y++)
+	for (uint8_t y = 0; y < 32; y++)
 	{
-		ma = 0xe0 + y;
-		for (ra = 0; ra < 8; ra++)
+		uint16_t ma = 0xe0 + y;
+		for (uint8_t ra = 0; ra < 8; ra++)
 		{
-			for (x = ma; x < ma + 64*32; x += 32)
+			for (uint16_t x = ma; x < ma + 64*32; x += 32)
 			{
-				chr = m_p_videoram[x] << 3;
-				gfx = m_p_chargen[chr | ra];
+				uint16_t chr = m_p_videoram[x] << 3;
+				uint8_t gfx = m_p_chargen[chr | ra];
 
 				for (int i = 0; i < 8; i++)
 				{
-					bitmap.pix16(y * 8 + ra, (x - ma) / 4 + i) = BIT(gfx, 7 - i);
+					bitmap.pix(y * 8 + ra, (x - ma) / 4 + i) = BIT(gfx, 7 - i);
 				}
 			}
 		}

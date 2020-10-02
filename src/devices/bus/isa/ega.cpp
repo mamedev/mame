@@ -783,7 +783,7 @@ WRITE_LINE_MEMBER( isa8_ega_device::vblank_changed )
 
 CRTC_EGA_ROW_UPDATE( isa8_ega_device::pc_ega_graphics )
 {
-	uint16_t  *p = &bitmap.pix16(y);
+	uint16_t  *p = &bitmap.pix(y);
 
 	LOG("%s: y = %d, x_count = %d, ma = %d, ra = %d\n", FUNCNAME, y, x_count, ma, ra );
 
@@ -844,12 +844,11 @@ CRTC_EGA_ROW_UPDATE( isa8_ega_device::pc_ega_graphics )
 
 CRTC_EGA_ROW_UPDATE( isa8_ega_device::pc_ega_text )
 {
-	uint16_t  *p = &bitmap.pix16(y);
-	int i;
+	uint16_t  *p = &bitmap.pix(y);
 
 	LOG("%s: y = %d, x_count = %d, ma = %d, ra = %d\n", FUNCNAME, y, x_count, ma, ra );
 
-	for ( i = 0; i < x_count; i++ )
+	for ( int i = 0; i < x_count; i++ )
 	{
 		uint16_t  offset = ma + i;
 		uint8_t   chr = m_plane[0][ offset ];
@@ -901,8 +900,6 @@ CRTC_EGA_ROW_UPDATE( isa8_ega_device::pc_ega_text )
 
 void isa8_ega_device::change_mode()
 {
-	int clock, pixels;
-
 	m_video_mode = 0;
 
 	/* Check for graphics mode */
@@ -938,8 +935,8 @@ void isa8_ega_device::change_mode()
 	}
 
 	/* Check for changes to the crtc input clock and number of pixels per clock */
-	clock = ( ( m_misc_output & 0x0c ) ? 16257000 : 14318181 );
-	pixels = ( ( m_sequencer.data[0x01] & 0x01 ) ? 8 : 9 );
+	int clock = ( ( m_misc_output & 0x0c ) ? 16257000 : 14318181 );
+	int pixels = ( ( m_sequencer.data[0x01] & 0x01 ) ? 8 : 9 );
 
 	if ( m_sequencer.data[0x01] & 0x08 )
 	{

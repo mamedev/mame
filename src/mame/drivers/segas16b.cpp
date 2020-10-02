@@ -3991,13 +3991,13 @@ void segas16b_state::system16b(machine_config &config)
 	// please refer to the netlist code for details about
 	// the multipliers and offsets.
 	NETLIST_STREAM_INPUT(config, "netlist:cin0", 0, "CH1.IN")
-		.set_mult_offset(0.5/32768.0, 2.5);
+		.set_mult_offset(0.5, 2.5);
 	NETLIST_STREAM_INPUT(config, "netlist:cin1", 1, "CH2.IN")
-		.set_mult_offset(0.5/32768.0, 2.5);
+		.set_mult_offset(0.5, 2.5);
 	NETLIST_STREAM_INPUT(config, "netlist:cin2", 2, "SPEECH.I")
-		.set_mult_offset(0.001020/32768.0/2.0, 0.001020/2.0);
+		.set_mult_offset(0.001020/2.0, 0.001020/2.0);
 
-	NETLIST_STREAM_OUTPUT(config, "netlist:cout0", 0, "OUT").set_mult_offset(30000.0 / 0.2, 0.0);
+	NETLIST_STREAM_OUTPUT(config, "netlist:cout0", 0, "OUT").set_mult_offset(1.0 / 0.2, 0.0);
 #else
 	YM2151(config, m_ym2151, MASTER_CLOCK_8MHz/2).add_route(ALL_OUTPUTS, "mono", 0.43);
 

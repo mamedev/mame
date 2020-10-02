@@ -12,85 +12,50 @@ copyright-holders:Robbbert
 		</led7seg>
 	</element>
 
-	<element name="background">
-		<rect>
-			<bounds left="0" top="0" right="1" bottom="1" />
-			<color red="0.0" green="0.0" blue="0.0" />
-		</rect>
-	</element>
+	<group name="leds">
+		<element name="digit0" ref="digit">
+			<bounds x="0" y="0" width="34" height="38" />
+		</element>
+		<element name="digit1" ref="digit">
+			<bounds x="44" y="0" width="34" height="38" />
+		</element>
+		<element name="digit2" ref="digit">
+			<bounds x="88" y="0" width="34" height="38" />
+		</element>
+		<element name="digit3" ref="digit">
+			<bounds x="132" y="0" width="34" height="38" />
+		</element>
+		<element name="digit4" ref="digit">
+			<bounds x="176" y="0" width="34" height="38" />
+		</element>
+		<element name="digit5" ref="digit">
+			<bounds x="220" y="0" width="34" height="38" />
+		</element>
+		<element name="digit6" ref="digit">
+			<bounds x="264" y="0" width="34" height="38" />
+		</element>
+		<element name="digit7" ref="digit">
+			<bounds x="308" y="0" width="34" height="38" />
+		</element>
+	</group>
 
 	<view name="Default Layout">
+		<bounds left="0" top="0" right="362" bottom="310" />
 
-		<!-- Background -->
 		<screen index="0">
 			<bounds x="0" y="0" width="362" height="262" />
 		</screen>
-		<backdrop element="background">
-			<bounds left="0" top="0" right="362" bottom="310" />
-		</backdrop>
 
-		<!-- LEDs -->
-		<bezel name="digit0" element="digit">
-			<bounds left="10" top="267" right="44" bottom="305" />
-		</bezel>
-		<bezel name="digit1" element="digit">
-			<bounds left="54" top="267" right="88" bottom="305" />
-		</bezel>
-		<bezel name="digit2" element="digit">
-			<bounds left="98" top="267" right="132" bottom="305" />
-		</bezel>
-		<bezel name="digit3" element="digit">
-			<bounds left="142" top="267" right="176" bottom="305" />
-		</bezel>
-		<bezel name="digit4" element="digit">
-			<bounds left="186" top="267" right="220" bottom="305" />
-		</bezel>
-		<bezel name="digit5" element="digit">
-			<bounds left="230" top="267" right="264" bottom="305" />
-		</bezel>
-		<bezel name="digit6" element="digit">
-			<bounds left="274" top="267" right="308" bottom="305" />
-		</bezel>
-		<bezel name="digit7" element="digit">
-			<bounds left="318" top="267" right="352" bottom="305" />
-		</bezel>
+		<group ref="leds">
+			<bounds left="10" top="267" right="352" bottom="305" />
+		</group>
 	</view>
 	<view name="LEDs Only">
+		<bounds left="0" top="0" right="362" bottom="69" />
 
-		<!-- Background -->
-		<backdrop element="background">
-			<bounds left="0" top="0" right="362" bottom="69" />
-		</backdrop>
+		<group ref="leds">
+			<bounds left="10" top="10" right="352" bottom="59" />
+		</group>
+	</view>
 
-		<!-- LEDs -->
-		<bezel name="digit0" element="digit">
-			<bounds left="10" top="10" right="44" bottom="59" />
-		</bezel>
-		<bezel name="digit1" element="digit">
-			<bounds left="54" top="10" right="88" bottom="59" />
-		</bezel>
-		<bezel name="digit2" element="digit">
-			<bounds left="98" top="10" right="132" bottom="59" />
-		</bezel>
-		<bezel name="digit3" element="digit">
-			<bounds left="142" top="10" right="176" bottom="59" />
-		</bezel>
-		<bezel name="digit4" element="digit">
-			<bounds left="186" top="10" right="220" bottom="59" />
-		</bezel>
-		<bezel name="digit5" element="digit">
-			<bounds left="230" top="10" right="264" bottom="59" />
-		</bezel>
-		<bezel name="digit6" element="digit">
-			<bounds left="274" top="10" right="308" bottom="59" />
-		</bezel>
-		<bezel name="digit7" element="digit">
-			<bounds left="318" top="10" right="352" bottom="59" />
-		</bezel>
-	</view>
-	<view name="Screen Only">
-		<screen index="0">
-			<bounds x="0" y="0" width="342" height="262" />
-		</screen>
-	</view>
 </mamelayout>

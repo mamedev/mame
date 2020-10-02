@@ -56,7 +56,7 @@ void rp2c33_sound_device::device_start()
 	for (int i = 0; i < 4; i++)
 		m_mvol_table[i] = int((65536.0 / (32.0 * 64.0)) * 2.0 / double(i + 2));
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock());
+	m_stream = stream_alloc(0, 1, clock());
 
 	// save states
 	save_item(NAME(m_regs));
@@ -221,9 +221,9 @@ void rp2c33_sound_device::write(offs_t offset, u8 data)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void rp2c33_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void rp2c33_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	for (int i = 0; i < samples; i++)
+	for (int i = 0; i < outputs[0].samples(); i++)
 	{
 		m_output = 0;
 		if (!m_env_halt && !m_wave_halt)
@@ -234,7 +234,7 @@ void rp2c33_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 		exec_mod();
 		exec_wave();
 		/* Update the buffers */
-		outputs[0][i] = m_output * m_mvol_table[m_mvol];
+		outputs[0].put_int(i, m_output * m_mvol_table[m_mvol], 32768);
 	}
 }
 

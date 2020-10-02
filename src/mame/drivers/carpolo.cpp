@@ -304,7 +304,7 @@ void carpolo_state::carpolo(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, "sound_nl:player_crash4", "PL4_CRASH.IN", 0);
 
 	// Temporarily just tied to an arbitrary value to preserve lack of audio.
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "PL1_CRASH.GND").set_mult_offset(10000.0, 0.0);
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "PL1_CRASH.GND").set_mult_offset(10000.0 / 32768.0, 0.0);
 }
 
 

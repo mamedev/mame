@@ -234,20 +234,20 @@ void dim68k_state::machine_reset()
 // Text-only; graphics isn't emulated yet. Need to find out if hardware cursor is used.
 MC6845_UPDATE_ROW( dim68k_state::crtc_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	u8 chr,gfx,x,xx,inv;
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	uint16_t chr16=0x2020; // set to spaces if screen is off
-	uint32_t *p = &bitmap.pix32(y);
+	uint32_t *p = &bitmap.pix(y);
 	u8 screen_on = ~m_video_control & 4;
 	u8 dot8 = ~m_video_control & 40;
 
 	// need to divide everything in half to cater for 16-bit reads
 	x_count /= 2;
 	ma /= 2;
-	xx = 0;
+	u8 xx = 0;
 
-	for (x = 0; x < x_count; x++)
+	for (u8 x = 0; x < x_count; x++)
 	{
+		u8 inv, chr, gfx;
 		if (screen_on)
 			chr16 = m_ram[ma+x]; // reads 2 characters
 

@@ -365,7 +365,7 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	int raw_vpos = screen().vpos();
 	int vpos = raw_vpos * m_vertical_size / screen().height();
 	uint16_t BackColour = m_Regs[7] & 15;
-	uint32_t *p = &m_tmpbmp.pix32(vpos);
+	uint32_t *p = &m_tmpbmp.pix(vpos);
 
 	int y = vpos - m_top_border;
 

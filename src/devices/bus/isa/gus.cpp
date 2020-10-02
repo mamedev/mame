@@ -243,29 +243,26 @@ void gf1_device::device_timer(emu_timer &timer, device_timer_id id, int param, v
 	}
 }
 
-void gf1_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void gf1_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	int x,y;
+	int x;
 	//uint32_t count;
 
-	stream_sample_t* outputl = outputs[0];
-	stream_sample_t* outputr = outputs[1];
-	memset( outputl, 0x00, samples * sizeof(*outputl) );
-	memset( outputr, 0x00, samples * sizeof(*outputr) );
+	auto &outputl = outputs[0];
+	auto &outputr = outputs[1];
+
+	outputl.fill(0);
+	outputr.fill(0);
 
 	for(x=0;x<32;x++)  // for each voice
 	{
-		stream_sample_t* left = outputl;
-		stream_sample_t* right = outputr;
 		uint16_t vol = (m_volume_table[(m_voice[x].current_vol & 0xfff0) >> 4]);
-		for(y=samples-1; y>=0; y--)
+		for (int sampindex = 0; sampindex < outputl.samples(); sampindex++)
 		{
 			uint32_t current = m_voice[x].current_addr >> 9;
 			// TODO: implement proper panning
-			(*left) += ((m_voice[x].sample) * (vol/8192.0));
-			(*right) += ((m_voice[x].sample) * (vol/8192.0));
-			left++;
-			right++;
+			outputl.add_int(sampindex, m_voice[x].sample * vol, 32768 * 8192);
+			outputr.add_int(sampindex, m_voice[x].sample * vol, 32768 * 8192);
 			if((!(m_voice[x].voice_ctrl & 0x40)) && (m_voice[x].current_addr >= m_voice[x].end_addr) && !m_voice[x].rollover && !(m_voice[x].voice_ctrl & 0x01))
 			{
 				if(m_voice[x].vol_ramp_ctrl & 0x04)

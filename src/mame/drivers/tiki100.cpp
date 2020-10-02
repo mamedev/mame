@@ -493,13 +493,13 @@ uint32_t tiki100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	//
 	//
 
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
 	for (int vaddr = cliprect.min_y; vaddr <= cliprect.max_y; vaddr++)
 	{
 		// This is at the start of a line
 		int haddr = (cliprect.min_x>>4);
-		int haddr_end = (cliprect.max_x>>4);
+		int const haddr_end = (cliprect.max_x>>4);
 		for (; haddr <= haddr_end; haddr++)
 		{
 			// This is at the start of a 16-dot cluster. Changes in m_scroll and m_video_ram come into effect here.
@@ -521,7 +521,7 @@ uint32_t tiki100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 					//
 					m_current_pixel = data&0x0F;
 				}
-				bitmap.pix32(vaddr, (haddr<<4) + dot) = palette[m_current_pixel&0x0F];
+				bitmap.pix(vaddr, (haddr<<4) + dot) = palette[m_current_pixel&0x0F];
 
 				// This will run the dot-shifter and add the TEST-pattern to the upper bits (usually hidden by palette).
 				data = (data>>1)|((haddr&0x02)<<14);

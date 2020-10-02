@@ -189,6 +189,16 @@ uint8_t apple3_state::apple3_c0xx_r(offs_t offset)
 			result = (m_joybuttons->read() & 8) ? 0x80 : 0x00;
 			break;
 
+		case 0x64: // slot 2 IRQ status (negative logic)
+		case 0x6c:
+			result = (m_a2bus->get_a2bus_irq_mask() & (1<<2)) ? 0 : 0x80;
+			break;
+
+		case 0x65: // slot 1 IRQ status (negative logic)
+		case 0x6d:
+			result = (m_a2bus->get_a2bus_irq_mask() & (1<<1)) ? 0 : 0x80;
+			break;
+
 		case 0x66:  // paddle A/D conversion done (bit 7 = 1 while counting, 0 when done)
 		case 0x6e:
 			result = m_ramp_active ? 0x80 : 0x00;
@@ -646,6 +656,7 @@ void apple3_state::machine_reset()
 	m_analog_sel = 0;
 	m_ramp_active = false;
 	m_charwrt = false;
+	m_inh_state = false;
 
 	m_fdc->set_floppies_4(floppy0, floppy1, floppy2, floppy3);
 
@@ -653,7 +664,10 @@ void apple3_state::machine_reset()
 	m_scanend->adjust(attotime::never);
 }
 
-
+WRITE_LINE_MEMBER(apple3_state::a2bus_inh_w)
+{
+	m_inh_state = state;
+}
 
 uint8_t *apple3_state::apple3_get_indexed_addr(offs_t offset)
 {
@@ -666,7 +680,7 @@ uint8_t *apple3_state::apple3_get_indexed_addr(offs_t offset)
 		if ((offset >= 0xFFD0) && (offset <= 0xFFEF))
 			result = apple3_bankaddr(~0, offset & 0x7FFF);
 		else if (offset < 0x2000)
-			result = apple3_bankaddr(~0, offset - 0x2000);
+			result = apple3_bankaddr(~0, offset);
 		else if (offset > 0x9FFF)
 			result = apple3_bankaddr(~0, offset - 0x8000);
 		else
@@ -691,6 +705,7 @@ void apple3_state::init_apple3()
 	m_vb = 0;
 	m_vc = 0;
 	m_smoothscr = 0;
+	m_inh_state = false;
 
 	// kludge round +12v pull up resistors, which after conversion will bring this low when nothing is plugged in. issue also affects dcd/dsr but those don't affect booting.
 	m_acia->write_cts(0);
@@ -743,6 +758,7 @@ void apple3_state::init_apple3()
 	save_item(NAME(m_vc));
 	save_item(NAME(m_smoothscr));
 	save_item(NAME(m_charwrt));
+	save_item(NAME(m_inh_state));
 }
 
 void apple3_state::device_post_load()
@@ -753,6 +769,24 @@ void apple3_state::device_post_load()
 uint8_t apple3_state::apple3_memory_r(offs_t offset)
 {
 	uint8_t rv = 0xff;
+
+	if (m_inh_state)
+	{
+		for (int slot = 1; slot < 4; slot++)
+		{
+			device_a2bus_card_interface *slotdevice = m_a2bus->get_a2bus_card(slot);
+			if (slotdevice != nullptr)
+			{
+				if ((slotdevice->inh_type() & INH_READ) == INH_READ)
+				{
+					if ((offset >= slotdevice->inh_start()) && (offset <= slotdevice->inh_end()))
+					{
+						return slotdevice->read_inh_rom(offset);
+					}
+				}
+			}
+		}
+	}
 
 	// (zp), y or (zp,x) read
 	if (!machine().side_effects_disabled())
@@ -891,6 +925,25 @@ uint8_t apple3_state::apple3_memory_r(offs_t offset)
 
 void apple3_state::apple3_memory_w(offs_t offset, uint8_t data)
 {
+	if (m_inh_state)
+	{
+		for (int slot = 1; slot < 4; slot++)
+		{
+			device_a2bus_card_interface *slotdevice = m_a2bus->get_a2bus_card(slot);
+			if (slotdevice != nullptr)
+			{
+				if ((slotdevice->inh_type() & INH_WRITE) == INH_WRITE)
+				{
+					if ((offset >= slotdevice->inh_start()) && (offset <= slotdevice->inh_end()))
+					{
+						slotdevice->write_inh_rom(offset, data);
+						return;
+					}
+				}
+			}
+		}
+	}
+
 	if ((m_indir_bank & 0x80) && (offset >= 0x100))
 	{
 		uint8_t *test;
@@ -1314,25 +1367,24 @@ WRITE_LINE_MEMBER(apple3_state::a2bus_irq_w)
 {
 	uint8_t irq_mask = m_a2bus->get_a2bus_irq_mask();
 
-	m_via[1]->write_ca1(state);
-	m_via[1]->write_pa7(state);
+	m_via[0]->write_ca1(!state);
 
 	if (irq_mask & (1<<4))
 	{
-		m_via[1]->write_pa4(ASSERT_LINE);
+		m_via[1]->write_pa4(CLEAR_LINE);
 	}
 	else
 	{
-		m_via[1]->write_pa4(CLEAR_LINE);
+		m_via[1]->write_pa4(ASSERT_LINE);
 	}
 
 	if (irq_mask & (1<<3))
 	{
-		m_via[1]->write_pa5(ASSERT_LINE);
+		m_via[1]->write_pa5(CLEAR_LINE);
 	}
 	else
 	{
-		m_via[1]->write_pa5(CLEAR_LINE);
+		m_via[1]->write_pa5(ASSERT_LINE);
 	}
 }
 

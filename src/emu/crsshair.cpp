@@ -168,7 +168,6 @@ void render_crosshair::set_default_bitmap()
 
 void render_crosshair::create_bitmap()
 {
-	int x, y;
 	rgb_t color = m_player < ARRAY_LENGTH(crosshair_colors) ? crosshair_colors[m_player] : rgb_t::white();
 
 	// if we have a bitmap and texture for this player, kill it
@@ -204,14 +203,14 @@ void render_crosshair::create_bitmap()
 		m_bitmap->fill(rgb_t(0x00,0xff,0xff,0xff));
 
 		/* extract the raw source data to it */
-		for (y = 0; y < CROSSHAIR_RAW_SIZE / 2; y++)
+		for (int y = 0; y < CROSSHAIR_RAW_SIZE / 2; y++)
 		{
 			/* assume it is mirrored vertically */
-			u32 *dest0 = &m_bitmap->pix32(y);
-			u32 *dest1 = &m_bitmap->pix32(CROSSHAIR_RAW_SIZE - 1 - y);
+			u32 *const dest0 = &m_bitmap->pix(y);
+			u32 *const dest1 = &m_bitmap->pix(CROSSHAIR_RAW_SIZE - 1 - y);
 
 			/* extract to two rows simultaneously */
-			for (x = 0; x < CROSSHAIR_RAW_SIZE; x++)
+			for (int x = 0; x < CROSSHAIR_RAW_SIZE; x++)
 				if ((crosshair_raw_top[y * CROSSHAIR_RAW_ROWBYTES + x / 8] << (x % 8)) & 0x80)
 					dest0[x] = dest1[x] = rgb_t(0xff,0x00,0x00,0x00) | color;
 		}
@@ -223,6 +222,50 @@ void render_crosshair::create_bitmap()
 
 
 //-------------------------------------------------
+//  update_position - update the crosshair values
+//  for the given player
+//-------------------------------------------------
+
+void render_crosshair::update_position()
+{
+	// read all the lightgun values
+	bool gotx = false, goty = false;
+	for (auto &port : m_machine.ioport().ports())
+		for (ioport_field &field : port.second->fields())
+			if (field.player() == m_player && field.crosshair_axis() != CROSSHAIR_AXIS_NONE && field.enabled())
+			{
+				// handle X axis
+				if (field.crosshair_axis() == CROSSHAIR_AXIS_X)
+				{
+					m_x = field.crosshair_read();
+					gotx = true;
+					if (field.crosshair_altaxis() != 0)
+					{
+						m_y = field.crosshair_altaxis();
+						goty = true;
+					}
+				}
+
+				// handle Y axis
+				else
+				{
+					m_y = field.crosshair_read();
+					goty = true;
+					if (field.crosshair_altaxis() != 0)
+					{
+						m_x = field.crosshair_altaxis();
+						gotx = true;
+					}
+				}
+
+				// if we got both, stop
+				if (gotx && goty)
+					return;
+			}
+}
+
+
+//-------------------------------------------------
 //  animate - update the crosshair state
 //-------------------------------------------------
 
@@ -230,7 +273,7 @@ void render_crosshair::animate(u16 auto_time)
 {
 	// read all the port values
 	if (m_used)
-		m_machine.ioport().crosshair_position(m_player, m_x, m_y);
+		update_position();
 
 	// auto visibility
 	if (m_mode == CROSSHAIR_VISIBILITY_AUTO)
@@ -284,6 +327,7 @@ void render_crosshair::draw(render_container &container, u8 fade)
 crosshair_manager::crosshair_manager(running_machine &machine)
 	: m_machine(machine)
 	, m_usage(false)
+	, m_fade(0)
 	, m_animation_counter(0)
 	, m_auto_time(CROSSHAIR_VISIBILITY_AUTOTIME_DEFAULT)
 {

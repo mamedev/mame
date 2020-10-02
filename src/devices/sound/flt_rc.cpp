@@ -23,6 +23,7 @@ filter_rc_device::filter_rc_device(const machine_config &mconfig, const char *ta
 		m_k(0),
 		m_memory(0),
 		m_type(LOWPASS),
+		m_last_sample_rate(0),
 		m_R1(1),
 		m_R2(1),
 		m_R3(1),
@@ -37,8 +38,8 @@ filter_rc_device::filter_rc_device(const machine_config &mconfig, const char *ta
 
 void filter_rc_device::device_start()
 {
-	m_stream = stream_alloc(1, 1, machine().sample_rate());
-	recalc();
+	m_stream = stream_alloc(1, 1, SAMPLE_RATE_OUTPUT_ADAPTIVE);
+	m_last_sample_rate = 0;
 
 	save_item(NAME(m_k));
 	save_item(NAME(m_memory));
@@ -54,28 +55,34 @@ void filter_rc_device::device_start()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void filter_rc_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void filter_rc_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *src = inputs[0];
-	stream_sample_t *dst = outputs[0];
-	int memory = m_memory;
+	auto &src = inputs[0];
+	auto &dst = outputs[0];
+	stream_buffer::sample_t memory = m_memory;
+
+	if (m_last_sample_rate != m_stream->sample_rate())
+	{
+		recalc();
+		m_last_sample_rate = m_stream->sample_rate();
+	}
 
 	switch (m_type)
 	{
 		case LOWPASS:
 		case LOWPASS_2C:
-			while (samples--)
+			for (int sampindex = 0; sampindex < dst.samples(); sampindex++)
 			{
-				memory += ((*src++ - memory) * m_k) / 0x10000;
-				*dst++ = memory;
+				memory += (src.get(sampindex) - memory) * m_k;
+				dst.put(sampindex, memory);
 			}
 			break;
 		case HIGHPASS:
 		case AC:
-			while (samples--)
+			for (int sampindex = 0; sampindex < dst.samples(); sampindex++)
 			{
-				*dst++ = *src - memory;
-				memory += ((*src++ - memory) * m_k) / 0x10000;
+				dst.put(sampindex, src.get(sampindex) - memory);
+				memory += (src.get(sampindex) - memory) * m_k;
 			}
 			break;
 	}
@@ -93,8 +100,8 @@ void filter_rc_device::recalc()
 			if (m_C == 0.0)
 			{
 				/* filter disabled */
-				m_k = 0x10000;
-				m_memory = 0x0;
+				m_k = 1.0;
+				m_memory = 0;
 				return;
 			}
 			Req = (m_R1 * (m_R2 + m_R3)) / (m_R1 + m_R2 + m_R3);
@@ -103,8 +110,8 @@ void filter_rc_device::recalc()
 			if (m_C == 0.0)
 			{
 				/* filter disabled */
-				m_k = 0x10000;
-				m_memory = 0x0;
+				m_k = 1.0;
+				m_memory = 0;
 				return;
 			}
 			Req = m_R1;
@@ -114,8 +121,8 @@ void filter_rc_device::recalc()
 			if (m_C == 0.0)
 			{
 				/* filter disabled */
-				m_k = 0x0;
-				m_memory = 0x0;
+				m_k = 0;
+				m_memory = 0;
 				return;
 			}
 			Req = m_R1;
@@ -126,5 +133,5 @@ void filter_rc_device::recalc()
 
 	/* Cut Frequency = 1/(2*Pi*Req*C) */
 	/* k = (1-(EXP(-TIMEDELTA/RC)))    */
-	m_k = 0x10000 - 0x10000 * (exp(-1 / (Req * m_C) / machine().sample_rate()));
+	m_k = 1.0 - exp(-1 / (Req * m_C) / m_stream->sample_rate());
 }

@@ -384,34 +384,33 @@ static void ms0515_floppies(device_slot_interface &device)
 
 uint32_t ms0515_state::screen_update_ms0515(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int y, x, b;
 	int addr = 0;
 
 	if (BIT(m_sysregc, 3))
 	{
 		uint8_t fg = m_sysregc & 7;
 		uint8_t bg = fg ^ 7;
-		for (y = 0; y < 200; y++)
+		for (int y = 0; y < 200; y++)
 		{
 			int horpos = 0;
-			for (x = 0; x < 40; x++)
+			for (int x = 0; x < 40; x++)
 			{
 				uint16_t code = (m_video_ram[addr++] << 8);
-				code += m_video_ram[addr++];
-				for (b = 0; b < 16; b++)
+				code |= m_video_ram[addr++];
+				for (int b = 0; b < 16; b++)
 				{
 					// In lower res mode we will just double pixels
-					bitmap.pix16(y, horpos++) = ((code >> (15 - b)) & 0x01) ? bg : fg;
+					bitmap.pix(y, horpos++) = ((code >> (15 - b)) & 0x01) ? bg : fg;
 				}
 			}
 		}
 	}
 	else
 	{
-		for (y = 0; y < 200; y++)
+		for (int y = 0; y < 200; y++)
 		{
 			int horpos = 0;
-			for (x = 0; x < 40; x++)
+			for (int x = 0; x < 40; x++)
 			{
 				uint8_t code = m_video_ram[addr++];
 				uint8_t attr = m_video_ram[addr++];
@@ -424,11 +423,11 @@ uint32_t ms0515_state::screen_update_ms0515(screen_device &screen, bitmap_ind16 
 					bg = tmp;
 					m_blink = -1;
 				}
-				for (b = 0; b < 8; b++)
+				for (int b = 0; b < 8; b++)
 				{
 					// In lower res mode we will just double pixels
-					bitmap.pix16(y, horpos++) = ((code >> (7 - b)) & 0x01) ? fg : bg;
-					bitmap.pix16(y, horpos++) = ((code >> (7 - b)) & 0x01) ? fg : bg;
+					bitmap.pix(y, horpos++) = ((code >> (7 - b)) & 0x01) ? fg : bg;
+					bitmap.pix(y, horpos++) = ((code >> (7 - b)) & 0x01) ? fg : bg;
 				}
 			}
 		}

@@ -669,16 +669,14 @@ QUICKLOAD_LOAD_MEMBER(jtc_state::quickload_cb)
 
 u32 jtc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	u8 i, y, sx;
-
-	for (y = 0; y < 64; y++)
+	for (u8 y = 0; y < 64; y++)
 	{
-		for (sx = 0; sx < 8; sx++)
+		for (u8 sx = 0; sx < 8; sx++)
 		{
-			u8 data = m_video_ram[(y * 8) + sx];
+			u8 const data = m_video_ram[(y * 8) + sx];
 
-			for (i = 0; i < 8; i++)
-				bitmap.pix16(y, (sx * 8) + i) = BIT(data, 7-i);
+			for (u8 i = 0; i < 8; i++)
+				bitmap.pix(y, (sx * 8) + i) = BIT(data, 7-i);
 		}
 	}
 
@@ -687,16 +685,14 @@ u32 jtc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const 
 
 u32 jtces23_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	u8 i, y, sx;
-
-	for (y = 0; y < 128; y++)
+	for (u8 y = 0; y < 128; y++)
 	{
-		for (sx = 0; sx < 16; sx++)
+		for (u8 sx = 0; sx < 16; sx++)
 		{
-			u8 data = m_video_ram[(y * 16) + sx];
+			u8 const data = m_video_ram[(y * 16) + sx];
 
-			for (i = 0; i < 8; i++)
-				bitmap.pix16(y, (sx * 8) + i) = BIT(data, 7-i);
+			for (u8 i = 0; i < 8; i++)
+				bitmap.pix(y, (sx * 8) + i) = BIT(data, 7-i);
 		}
 	}
 
@@ -742,7 +738,7 @@ u32 jtces40_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 				u8 const b = ~m_color_ram_b[ma + x];
 
 				for (int i = 0; i < 8; i++)
-					bitmap.pix16(y*3+z, (x * 8) + 7 - i) = (BIT(r, i) << 0) | (BIT(g, i) << 1) | (BIT(b, i) << 2) | (BIT(data, i) << 3);
+					bitmap.pix(y*3+z, (x * 8) + 7 - i) = (BIT(r, i) << 0) | (BIT(g, i) << 1) | (BIT(b, i) << 2) | (BIT(data, i) << 3);
 			}
 			ma+=40;
 		}

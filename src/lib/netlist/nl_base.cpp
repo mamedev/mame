@@ -1,7 +1,6 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 
-#include "macro/nlm_base_lib.h"
 #include "solver/nld_matrix_solver.h"
 #include "solver/nld_solver.h"
 
@@ -19,17 +18,14 @@
 
 #include <limits>
 
+NETLIST_EXTERNAL(base_lib)
+
 namespace netlist
 {
 
 	// ----------------------------------------------------------------------------------------
 	// callbacks_t
 	// ----------------------------------------------------------------------------------------
-
-	std::unique_ptr<plib::dynlib_base> callbacks_t:: static_solver_lib() const
-	{
-		return std::make_unique<plib::dynlib_static>(nullptr);
-	}
 
 	// ----------------------------------------------------------------------------------------
 	// queue_t
@@ -108,14 +104,10 @@ namespace netlist
 	// ----------------------------------------------------------------------------------------
 
 	netlist_state_t::netlist_state_t(const pstring &name,
-		host_arena::unique_ptr<callbacks_t> &&callbacks)
-	: m_callbacks(std::move(callbacks)) // Order is important here
-	, m_log(*m_callbacks)
-	, m_extended_validation(false)
+		plib::plog_delegate logger)
+	: m_log(logger)
 	, m_dummy_version(1)
 	{
-		m_lib = m_callbacks->static_solver_lib();
-
 		m_setup = plib::make_unique<setup_t, host_arena>(*this);
 		// create the run interface
 		m_netlist = plib::make_unique<netlist_t>(m_pool, *this, name);
@@ -144,9 +136,13 @@ namespace netlist
 		m_setup->parser().add_include<plib::psource_str_t>("devices/net_lib.h", content);
 #if 1
 		NETLIST_NAME(base_lib)(m_setup->parser());
+		//m_setup->parser().register_source<source_pattern_t>("../macro/modules/nlmod_{1}.cpp");
+		//m_setup->parser().register_source<source_pattern_t>("../macro/nlm_{1}.cpp");
 #else
 #if 1
-		m_setup->parser().register_source<source_pattern_t>("src/lib/netlist/macro/nlm_{1}.cpp");
+		m_setup->parser().register_source<source_pattern_t>("src/lib/netlist/macro/nlm_{1}.cpp", true);
+		m_setup->parser().register_source<source_pattern_t>("src/lib/netlist/generated/nlm_{1}.cpp", true);
+		m_setup->parser().register_source<source_pattern_t>("src/lib/netlist/macro/modules/nlmod_{1}.cpp", true);
 		m_setup->parser().include("base_lib");
 #else
 		// FIXME: This is very slow - need optimized parsing scanning
@@ -161,6 +157,11 @@ namespace netlist
 		m_setup->parser().include("base_lib");
 #endif
 #endif
+	}
+
+	void netlist_state_t::set_static_solver_lib(std::unique_ptr<plib::dynlib_base> &&lib)
+	{
+		m_lib = std::move(lib);
 	}
 
 
@@ -212,7 +213,6 @@ namespace netlist
 		ENTRY(NL_USE_MEMPOOL)
 		ENTRY(NL_USE_QUEUE_STATS)
 		ENTRY(NL_USE_COPY_INSTEAD_OF_REFERENCE)
-		ENTRY(NL_AUTO_DEVICES)
 		ENTRY(NL_USE_FLOAT128)
 		ENTRY(NL_USE_FLOAT_MATRIX)
 		ENTRY(NL_USE_LONG_DOUBLE_MATRIX)
@@ -703,13 +703,21 @@ namespace netlist
 	// terminal_t
 	// ----------------------------------------------------------------------------------------
 
-	terminal_t::terminal_t(core_device_t &dev, const pstring &aname, terminal_t *otherterm, nldelegate delegate)
+	terminal_t::terminal_t(core_device_t &dev, const pstring &aname,
+		terminal_t *otherterm, nldelegate delegate)
+	: terminal_t(dev, aname, otherterm, { nullptr, nullptr }, delegate)
+	{
+	}
+
+	terminal_t::terminal_t(core_device_t &dev, const pstring &aname,
+		terminal_t *otherterm, const std::array<terminal_t *, 2> &splitterterms,
+		nldelegate delegate)
 	: analog_t(dev, aname, STATE_BIDIR, delegate)
 	, m_Idr(nullptr)
 	, m_go(nullptr)
 	, m_gt(nullptr)
 	{
-		state().setup().register_term(*this, *otherterm);
+		state().setup().register_term(*this, otherterm, splitterterms);
 	}
 
 	void terminal_t::set_ptrs(nl_fptype *gt, nl_fptype *go, nl_fptype *Idr) noexcept(false)
@@ -908,7 +916,7 @@ namespace netlist
 	}
 
 
-	plib::psource_t::stream_ptr param_data_t::stream()
+	plib::istream_uptr param_data_t::stream()
 	{
 		return device().state().parser().get_data_stream(str());
 	}
@@ -1028,12 +1036,14 @@ namespace netlist
 				}
 
 				m_time = top->exec_time();
-				auto *const obj(top->object());
+				detail::net_t *const obj(top->object());
 				m_queue.pop();
-				if (obj != nullptr)
-					obj->template update_devs<KEEP_STATS>();
-				else
+
+				if (!!(obj == nullptr))
 					break;
+
+				obj->template update_devs<KEEP_STATS>();
+
 				if (KEEP_STATS)
 					m_perf_out_processed.inc();
 			} while (true);

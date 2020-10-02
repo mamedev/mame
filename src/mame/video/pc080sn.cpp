@@ -362,16 +362,13 @@ static u16 topspeed_get_road_pixel_color( u16 pixel, u16 color )
 
 void pc080sn_device::topspeed_custom_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, u8 priority, u16 *color_ctrl_ram, u8 pmask)
 {
-	u16 *dst16, *src16;
-	u8 *tsrc;
 	u16 scanline[1024];  /* won't be called by a wide-screen game, but just in case... */
 
-	bitmap_ind16 &srcbitmap = m_tilemap[layer]->pixmap();
-	bitmap_ind8 &flagsbitmap = m_tilemap[layer]->flagsmap();
+	bitmap_ind16 const &srcbitmap = m_tilemap[layer]->pixmap();
+	bitmap_ind8 const &flagsbitmap = m_tilemap[layer]->flagsmap();
 
-	u16 a, color;
-	int sx, x_index;
-	int y_index, src_y_index, row_index;
+	int sx;
+	int y_index;
 
 	int flip = 0;
 
@@ -395,21 +392,21 @@ void pc080sn_device::topspeed_custom_draw(screen_device &screen, bitmap_ind16 &b
 
 	for (int y = min_y; y <= max_y; y++)
 	{
-		src_y_index = y_index & 0x1ff;  /* tilemaps are 512 px up/down */
-		row_index = (src_y_index - m_bgscrolly[layer]) & 0x1ff;
-		color = color_ctrl_ram[(row_index + m_y_offset - 2) & 0xff];
+		int src_y_index = y_index & 0x1ff;  /* tilemaps are 512 px up/down */
+		int row_index = (src_y_index - m_bgscrolly[layer]) & 0x1ff;
+		u16 color = color_ctrl_ram[(row_index + m_y_offset - 2) & 0xff];
 
-		x_index = sx - (m_bgscroll_ram[layer][row_index]);
+		int x_index = sx - (m_bgscroll_ram[layer][row_index]);
 
-		src16 = &srcbitmap.pix16(src_y_index);
-		tsrc  = &flagsbitmap.pix8(src_y_index);
-		dst16 = scanline;
+		u16 const *const src16 = &srcbitmap.pix(src_y_index);
+		u8 const *const tsrc = &flagsbitmap.pix(src_y_index);
+		u16 *dst16 = scanline;
 
 		if (flags & TILEMAP_DRAW_OPAQUE)
 		{
 			for (int i = 0; i < screen_width; i++)
 			{
-				a = src16[x_index & width_mask];
+				u16 a = src16[x_index & width_mask];
 #ifdef TOPSPEED_ROAD_COLORS
 				a = topspeed_get_road_pixel_color(a, color);
 #endif
@@ -423,7 +420,7 @@ void pc080sn_device::topspeed_custom_draw(screen_device &screen, bitmap_ind16 &b
 			{
 				if (tsrc[x_index & width_mask])
 				{
-					a = src16[x_index & width_mask];
+					u16 a = src16[x_index & width_mask];
 #ifdef TOPSPEED_ROAD_COLORS
 					a = topspeed_get_road_pixel_color(a,color);
 #endif

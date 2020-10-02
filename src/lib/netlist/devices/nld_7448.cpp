@@ -54,7 +54,7 @@ namespace netlist
 	private:
 		void update_outputs(unsigned v) noexcept
 		{
-			nl_assert(v<16);
+			gsl_Expects(v<16);
 			if (v != m_state)
 			{
 				// max transfer time is 100 NS */

@@ -26,8 +26,8 @@ DEFINE_DEVICE_TYPE(CASSETTE, cassette_image_device, "cassette_image", "Cassette"
 //  cassette_image_device - constructor
 //-------------------------------------------------
 
-cassette_image_device::cassette_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, CASSETTE, tag, owner, clock),
+cassette_image_device::cassette_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, CASSETTE, tag, owner, clock),
 	device_image_interface(mconfig, *this),
 	device_sound_interface(mconfig, *this),
 	m_cassette(nullptr),
@@ -83,13 +83,13 @@ void cassette_image_device::update()
 		switch (int(m_state & CASSETTE_MASK_UISTATE)) // cast to int to suppress unhandled enum value warning
 		{
 		case CASSETTE_RECORD:
-			cassette_put_sample(m_cassette, m_channel, m_position, new_position - m_position, m_value);
+			m_cassette->put_sample(m_channel, m_position, new_position - m_position, m_value);
 			break;
 
 		case CASSETTE_PLAY:
 			if (m_cassette)
 			{
-				cassette_get_sample(m_cassette, m_channel, new_position, 0.0, &m_value);
+				m_cassette->get_sample(m_channel, new_position, 0.0, &m_value);
 				// See if reached end of tape
 				double length = get_length();
 				if (new_position > length)
@@ -167,9 +167,7 @@ double cassette_image_device::get_position()
 
 double cassette_image_device::get_length()
 {
-	struct CassetteInfo info;
-
-	cassette_get_info(m_cassette, &info);
+	cassette_image::Info info = m_cassette->get_info();
 	return ((double) info.sample_count) / info.sample_frequency;
 }
 
@@ -236,7 +234,7 @@ void cassette_image_device::device_start()
 	m_state = m_default_state;
 	m_value = 0;
 
-	machine().sound().stream_alloc(*this, 0, (m_stereo? 2:1), machine().sample_rate());
+	stream_alloc(0, m_stereo? 2:1, machine().sample_rate());
 }
 
 image_init_result cassette_image_device::call_create(int format_type, util::option_resolution *format_options)
@@ -258,7 +256,7 @@ image_init_result cassette_image_device::internal_load(bool is_create)
 	if (is_create || (length()==0)) // empty existing images are fine to write over.
 	{
 		// creating an image
-		err = cassette_create((void *)image, &image_ioprocs, &wavfile_format, m_create_opts, CASSETTE_FLAG_READWRITE|CASSETTE_FLAG_SAVEONEXIT, &m_cassette);
+		err = cassette_image::create((void *)image, &image_ioprocs, &cassette_image::wavfile_format, m_create_opts, cassette_image::FLAG_READWRITE|cassette_image::FLAG_SAVEONEXIT, m_cassette);
 		if (err != cassette_image::error::SUCCESS)
 			goto error;
 	}
@@ -273,9 +271,9 @@ image_init_result cassette_image_device::internal_load(bool is_create)
 
 			// try opening the cassette
 			int cassette_flags = is_readonly()
-				? CASSETTE_FLAG_READONLY
-				: (CASSETTE_FLAG_READWRITE | CASSETTE_FLAG_SAVEONEXIT);
-			err = cassette_open_choices((void *)image, &image_ioprocs, filetype(), m_formats, cassette_flags, &m_cassette);
+				? cassette_image::FLAG_READONLY
+				: (cassette_image::FLAG_READWRITE | cassette_image::FLAG_SAVEONEXIT);
+			err = cassette_image::open_choices((void *)image, &image_ioprocs, filetype(), m_formats, cassette_flags, m_cassette);
 
 			// special case - if we failed due to readwrite not being supported, make the image be read only and retry
 			if (err == cassette_image::error::READ_WRITE_UNSUPPORTED)
@@ -337,8 +335,7 @@ void cassette_image_device::call_unload()
 		update();
 
 	/* close out the cassette */
-	cassette_close(m_cassette);
-	m_cassette = nullptr;
+	m_cassette.reset();
 
 	/* set to default state, but only change the UI state */
 	change_state(CASSETTE_STOPPED, CASSETTE_MASK_UISTATE);
@@ -404,37 +401,29 @@ std::string cassette_image_device::call_display()
 //  Cassette sound
 //-------------------------------------------------
 
-void cassette_image_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void cassette_image_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *left_buffer = outputs[0];
-	stream_sample_t *right_buffer = nullptr;
-
-	if (m_stereo)
-		right_buffer = outputs[1];
-
 	cassette_state state = get_state() & (CASSETTE_MASK_UISTATE | CASSETTE_MASK_MOTOR | CASSETTE_MASK_SPEAKER);
 
 	if (exists() && (state == (CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)))
 	{
 		cassette_image *cassette = get_image();
 		double time_index = get_position();
-		double duration = ((double) samples) / machine().sample_rate();
+		double duration = ((double) outputs[0].samples()) / outputs[0].sample_rate();
 
-		cassette_get_samples(cassette, 0, time_index, duration, samples, 2, left_buffer, CASSETTE_WAVEFORM_16BIT);
-		if (m_stereo)
-			cassette_get_samples(cassette, 1, time_index, duration, samples, 2, right_buffer, CASSETTE_WAVEFORM_16BIT);
+		if (m_samples.size() < outputs[0].samples())
+			m_samples.resize(outputs[0].samples());
 
-		for (int i = samples - 1; i >= 0; i--)
+		for (int ch = 0; ch < outputs.size(); ch++)
 		{
-			left_buffer[i] = ((int16_t *) left_buffer)[i];
-			if (m_stereo)
-				right_buffer[i] = ((int16_t *) right_buffer)[i];
+			cassette->get_samples(0, time_index, duration, outputs[0].samples(), 2, &m_samples[0], cassette_image::WAVEFORM_16BIT);
+			for (int sampindex = 0; sampindex < outputs[ch].samples(); sampindex++)
+				outputs[ch].put_int(sampindex, m_samples[sampindex], 32768);
 		}
 	}
 	else
 	{
-		memset(left_buffer, 0, sizeof(*left_buffer) * samples);
-		if (m_stereo)
-			memset(right_buffer, 0, sizeof(*right_buffer) * samples);
+		for (int ch = 0; ch < outputs.size(); ch++)
+			outputs[ch].fill(0);
 	}
 }

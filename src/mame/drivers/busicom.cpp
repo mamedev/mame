@@ -13,11 +13,13 @@
 
 #include "screen.h"
 
+#include <algorithm>
 
-uint8_t busicom_state::get_bit_selected(uint32_t val,int num)
+
+uint8_t busicom_state::get_bit_selected(uint32_t val, int num)
 {
-	for(int i=0;i<num;i++)
-		if (BIT(val,i)==0)
+	for (int i = 0; i < num; i++)
+		if (!BIT(val, i))
 			return i;
 
 	return 0;
@@ -31,9 +33,9 @@ uint8_t busicom_state::keyboard_r()
 uint8_t busicom_state::printer_r()
 {
 	uint8_t retVal = 0;
-	if (m_drum_index==0)
+	if (m_drum_index == 0)
 		retVal |= 1;
-	retVal |= ioport("PAPERADV")->read() & 1 ? 8 : 0;
+	retVal |= (ioport("PAPERADV")->read() & 1) ? 8 : 0;
 	return retVal;
 }
 
@@ -41,66 +43,59 @@ uint8_t busicom_state::printer_r()
 void busicom_state::shifter_w(uint8_t data)
 {
 	// FIXME: detect edges, maybe make 4003 shifter a device
-	if (BIT(data,0))
+	if (BIT(data, 0))
 	{
 		m_keyboard_shifter <<= 1;
-		m_keyboard_shifter |= BIT(data,1);
+		m_keyboard_shifter |= BIT(data, 1);
 	}
 
-	if (BIT(data,2))
+	if (BIT(data, 2))
 	{
 		m_printer_shifter <<= 1;
-		m_printer_shifter |= BIT(data,1);
+		m_printer_shifter |= BIT(data, 1);
 	}
 }
 
 void busicom_state::printer_w(uint8_t data)
 {
-	u8 i,j;
-	if (BIT(data,0))
+	if (BIT(data, 0))
 	{
-		logerror("color : %02x %02x %d\n",BIT(data,0),data,m_drum_index);
+		logerror("color : %02x %02x %d\n", BIT(data, 0), data, m_drum_index);
 		m_printer_line_color[10] = 1;
 	}
 
-	if (BIT(data,1))
+	if (BIT(data, 1))
 	{
-		for(i=3;i<18;i++)
-			if(BIT(m_printer_shifter,i))
-				m_printer_line[10][i-3] = m_drum_index + 1;
+		for (u8 i = 3; i < 18; i++)
+			if (BIT(m_printer_shifter, i))
+				m_printer_line[10][i - 3] = m_drum_index + 1;
 
-		if(BIT(m_printer_shifter,0))
+		if (BIT(m_printer_shifter, 0))
 			m_printer_line[10][15] = m_drum_index + 13 + 1;
 
-		if(BIT(m_printer_shifter,1))
+		if (BIT(m_printer_shifter, 1))
 			m_printer_line[10][16] = m_drum_index + 26 + 1;
 	}
 
-	if (BIT(data,3))
+	if (BIT(data, 3))
 	{
-		for(j=0;j<10;j++)
-		{
-			for(i=0;i<17;i++)
-			{
-				m_printer_line[j][i] = m_printer_line[j+1][i];
-				m_printer_line_color[j] = m_printer_line_color[j+1];
-			}
-		}
+		for (u8 j = 0; j < (ARRAY_LENGTH(m_printer_line) - 1); j++)
+			std::copy(std::begin(m_printer_line[j + 1]), std::end(m_printer_line[j + 1]), std::begin(m_printer_line[j]));
+		std::copy_n(&m_printer_line_color[1], ARRAY_LENGTH(m_printer_line_color) - 1, &m_printer_line_color[0]);
 
-		for(i=0;i<17;i++)
-			m_printer_line[10][i] = 0;
-
+		std::fill(std::begin(m_printer_line[10]), std::end(m_printer_line[10]), 0);
 		m_printer_line_color[10] = 0;
 	}
 }
+
 void busicom_state::status_w(uint8_t data)
 {
 #if 0
-	uint8_t mem_lamp = BIT(data,0);
-	uint8_t over_lamp = BIT(data,1);
-	uint8_t minus_lamp = BIT(data,2);
+	uint8_t mem_lamp = BIT(data, 0);
+	uint8_t over_lamp = BIT(data, 1);
+	uint8_t minus_lamp = BIT(data, 2);
 #endif
-	//logerror("status %c %c %c\n",mem_lamp ? 'M':'x',over_lamp ? 'O':'x',minus_lamp ? '-':'x');
+	//logerror("status %c %c %c\n", mem_lamp ? 'M':'x', over_lamp ? 'O':'x', minus_lamp ? '-':'x');
 }
 
 void busicom_state::printer_ctrl_w(uint8_t data)
@@ -224,20 +219,13 @@ void busicom_state::machine_start()
 
 void busicom_state::machine_reset()
 {
-	int i,j;
-	m_drum_index =0;
+	m_drum_index = 0;
 	m_keyboard_shifter = 0;
 	m_printer_shifter = 0;
 
-	for(i=0;i<17;i++)
-	{
-		for(j=0;j<11;j++)
-		{
-			m_printer_line[j][i] = 0;
-			m_printer_line_color[j] = 0;
-		}
-	}
-
+	for (int i = 0; i < ARRAY_LENGTH(m_printer_line); i++)
+		std::fill(std::begin(m_printer_line[i]), std::end(m_printer_line[i]), 0);
+	std::fill(std::begin(m_printer_line_color), std::end(m_printer_line_color), 0);
 }
 
 void busicom_state::busicom(machine_config &config)

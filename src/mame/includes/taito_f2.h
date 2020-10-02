@@ -105,11 +105,11 @@ protected:
 
 	struct f2_tempsprite
 	{
-		u32 code, color;
-		bool flipx, flipy;
-		int x, y;
-		int zoomx, zoomy;
-		u64 primask;
+		u32 code = 0, color = 0;
+		bool flipx = false, flipy = false;
+		int x = 0, y = 0;
+		int zoomx = 0, zoomy = 0;
+		u64 primask = 0;
 	};
 	/* memory pointers */
 	optional_shared_ptr<u16> m_sprite_extension;
@@ -118,7 +118,7 @@ protected:
 	std::unique_ptr<u16[]>   m_spriteram_delayed;
 
 	/* video-related */
-	std::unique_ptr<struct f2_tempsprite[]> m_spritelist;
+	std::unique_ptr<f2_tempsprite[]> m_spritelist;
 	int           m_sprite_type;
 
 	u16           m_spritebank[8];

@@ -66,21 +66,18 @@ void micro3d_state::video_reset()
 
 TMS340X0_SCANLINE_IND16_CB_MEMBER(micro3d_state::scanline_update)
 {
-	uint16_t *src = &m_sprite_vram[(params->rowaddr << 8) & 0x7fe00];
-	uint16_t *dest = &bitmap.pix16(scanline);
+	uint16_t const *const src = &m_sprite_vram[(params->rowaddr << 8) & 0x7fe00];
+	uint16_t *dest = &bitmap.pix(scanline);
 	int coladdr = params->coladdr;
 	int sd_11_7 = (m_creg & 0x1f) << 7;
-	int x;
-
-	uint16_t *frame_src;
 
 	scanline = std::max((scanline - params->veblnk), 0);
-	frame_src = m_frame_buffers[m_display_buffer].get() + (scanline << 10);
+	uint16_t const *frame_src = m_frame_buffers[m_display_buffer].get() + (scanline << 10);
 
 	/* TODO: XFER3DK - X/Y offsets for 3D */
 
 	/* Copy the non-blanked portions of this scanline */
-	for (x = params->heblnk; x < params->hsblnk; x += 2)
+	for (int x = params->heblnk; x < params->hsblnk; x += 2)
 	{
 		uint16_t pix = src[coladdr++ & 0x1ff];
 

@@ -85,7 +85,7 @@ void vector_device::device_start()
 	m_vector_index = 0;
 
 	/* allocate memory for tables */
-	m_vector_list = make_unique_clear<point[]>(MAX_POINTS);
+	m_vector_list = std::make_unique<point[]>(MAX_POINTS);
 }
 
 /*

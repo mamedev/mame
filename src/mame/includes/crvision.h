@@ -29,21 +29,23 @@ class crvision_state : public driver_device
 {
 public:
 	crvision_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, M6502_TAG),
-		m_pia(*this, PIA6821_TAG),
-		m_psg(*this, SN76489_TAG),
-		m_cassette(*this, "cassette"),
-		m_cart(*this, "cartslot"),
-		m_centronics(*this, CENTRONICS_TAG),
-		m_cent_data_out(*this, "cent_data_out"),
-		m_ram(*this, RAM_TAG),
-		m_inp_pa0(*this, "PA0.%u", 0),
-		m_inp_pa1(*this, "PA1.%u", 0),
-		m_inp_pa2(*this, "PA2.%u", 0),
-		m_inp_pa3(*this, "PA3.%u", 0)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, M6502_TAG)
+		, m_pia(*this, PIA6821_TAG)
+		, m_psg(*this, SN76489_TAG)
+		, m_cassette(*this, "cassette")
+		, m_cart(*this, "cartslot")
+		, m_centronics(*this, CENTRONICS_TAG)
+		, m_cent_data_out(*this, "cent_data_out")
+		, m_ram(*this, RAM_TAG)
+		, m_io_keypad{{*this, "PA0.%u", 0U},{*this, "PA1.%u", 0U},{*this, "PA2.%u", 0U},{*this, "PA3.%u", 0U}}
 	{ }
 
+	void creativision(machine_config &config);
+	void ntsc(machine_config &config);
+	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
+
+protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia;
 	required_device<sn76496_base_device> m_psg;
@@ -52,24 +54,18 @@ public:
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;
 	required_device<ram_device> m_ram;
-	optional_ioport_array<8> m_inp_pa0;
-	optional_ioport_array<8> m_inp_pa1;
-	optional_ioport_array<8> m_inp_pa2;
-	optional_ioport_array<8> m_inp_pa3;
+	optional_ioport_array<8> m_io_keypad[4];
 
+	virtual void machine_start() override;
 	uint8_t m_keylatch;
-	uint8_t read_keyboard(int pa);
+
+private:
+	void crvision_map(address_map &map);
+	uint8_t read_keyboard(u8 pa);
 
 	void pia_pa_w(uint8_t data);
 	uint8_t pia_pa_r();
 	uint8_t pia_pb_r();
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
-
-	void creativision(machine_config &config);
-	void ntsc(machine_config &config);
-	void crvision_map(address_map &map);
-protected:
-	virtual void machine_start() override;
 };
 
 class crvision_pal_state : public crvision_state
@@ -87,10 +83,13 @@ public:
 	laser2001_state(const machine_config &mconfig, device_type type, const char *tag)
 		: crvision_state(mconfig, type, tag)
 		, m_centronics(*this, CENTRONICS_TAG)
-		, m_inp_y(*this, "Y.%u", 0)
-		, m_inp_joy(*this, "JOY.%u", 0)
+		, m_inp_y(*this, "Y.%u", 0U)
+		, m_inp_joy(*this, "JOY.%u", 0U)
 	{ }
 
+	void lasr2001(machine_config &config);
+
+private:
 	required_device<centronics_device> m_centronics;
 	required_ioport_array<8> m_inp_y;
 	required_ioport_array<4> m_inp_joy;
@@ -110,9 +109,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( pia_cb1_r );
 	DECLARE_WRITE_LINE_MEMBER( pia_cb2_w );
 
-	void lasr2001(machine_config &config);
 	void lasr2001_map(address_map &map);
-protected:
 	virtual void machine_start() override;
 };
 

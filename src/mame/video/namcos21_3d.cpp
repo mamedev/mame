@@ -59,14 +59,12 @@ void namcos21_3d_device::swap_and_clear_poly_framebuffer()
 void namcos21_3d_device::copy_visible_poly_framebuffer(bitmap_ind16 &bitmap, const rectangle &clip, int zlo, int zhi)
 {
 	/* blit the visible framebuffer */
-	int sy;
-	for (sy = clip.top(); sy <= clip.bottom(); sy++)
+	for (int sy = clip.top(); sy <= clip.bottom(); sy++)
 	{
-		uint16_t *dest = &bitmap.pix16(sy);
-		const uint16_t *pPen = m_mpPolyFrameBufferPens2.get() + m_poly_frame_width * sy;
-		const uint16_t *pZ = m_mpPolyFrameBufferZ2.get() + m_poly_frame_width * sy;
-		int sx;
-		for (sx = clip.left(); sx <= clip.right(); sx++)
+		uint16_t *const dest = &bitmap.pix(sy);
+		uint16_t const *const pPen = m_mpPolyFrameBufferPens2.get() + m_poly_frame_width * sy;
+		uint16_t const *const pZ = m_mpPolyFrameBufferZ2.get() + m_poly_frame_width * sy;
+		for (int sx = clip.left(); sx <= clip.right(); sx++)
 		{
 			int z = pZ[sx];
 			//if( pZ[sx]!=0x7fff )

@@ -2,7 +2,7 @@
 // copyright-holders:AJR
 /***************************************************************************
 
-    Hitachi H8/534
+    Hitachi H8/534 & H8/536
 
 ***************************************************************************/
 
@@ -10,9 +10,15 @@
 #include "h8534.h"
 
 DEFINE_DEVICE_TYPE(HD6475348, hd6475348_device, "hd6475348", "Hitachi HD6475348 (H8/534)")
+DEFINE_DEVICE_TYPE(HD6435368, hd6435368_device, "hd6435368", "Hitachi HD6435368 (H8/536)")
+
+h8534_device::h8534_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor map)
+	: h8500_device(mconfig, type, tag, owner, clock, 20, 8, 11, map)
+{
+}
 
 h8534_device::h8534_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: h8500_device(mconfig, type, tag, owner, clock, 20, 8, 11, address_map_constructor(FUNC(h8534_device::internal_map), this))
+	: h8534_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(h8534_device::internal_map), this))
 {
 }
 
@@ -21,9 +27,31 @@ hd6475348_device::hd6475348_device(const machine_config &mconfig, const char *ta
 {
 }
 
+h8536_device::h8536_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: h8534_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(h8536_device::internal_map), this))
+{
+}
+
+hd6435368_device::hd6435368_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: h8536_device(mconfig, HD6435368, tag, owner, clock)
+{
+}
+
 void h8534_device::internal_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region(DEVICE_SELF, 0); // modes 2, 4, 7
+	register_field_map(map);
+}
+
+void h8536_device::internal_map(address_map &map)
+{
+	//map(0x0000, 0xee7f).rom().region(DEVICE_SELF, 0); // mode 2?
+	//map(0x0000, 0xf67f).rom().region(DEVICE_SELF, 0); // modes 4, 7
+	register_field_map(map);
+}
+
+void h8534_device::register_field_map(address_map &map)
+{
 #if 0
 	map(0xfe80, 0xfe80).w(FUNC(h8534_device::p1ddr_w));
 	map(0xfe81, 0xfe81).w(FUNC(h8534_device::p2ddr_w));

@@ -21,7 +21,7 @@ namespace netlist
 	// nld_base_proxy
 	// -----------------------------------------------------------------------------
 
-	static const std::array<std::pair<const char *, const char *>, 3> power_syms = {{ {"VCC", "VEE"}, {"VCC", "GND"}, {"VDD", "VSS"}}};
+	static constexpr std::array<std::pair<const char *, const char *>, 3> power_syms = {{ {"VCC", "VEE"}, {"VCC", "GND"}, {"VDD", "VSS"}}};
 
 	nld_base_proxy::nld_base_proxy(netlist_state_t &anetlist, const pstring &name,
 		const logic_t *inout_proxied)
@@ -124,19 +124,9 @@ namespace netlist
 	{
 		register_subalias("Q", "RN.1");
 
-		log().verbose("D/A Proxy: Found power terminals on device {1}", out_proxied->device().name());
-		if (anetlist.is_extended_validation())
-		{
-			// During validation, don't connect to terminals found
-			// This will cause terminals not connected to a rail net to
-			// fail connection stage.
-			connect(m_RN.N(), m_RP.P());
-		}
-		else
-		{
-			connect(m_RN.N(), *m_tn);
-			connect(m_RP.P(), *m_tp);
-		}
+		connect(m_RN.N(), *m_tn);
+		connect(m_RP.P(), *m_tp);
+
 		connect(m_RN.P(), m_RP.N());
 	}
 

@@ -421,17 +421,14 @@ void okean240_state::machine_reset()
 
 u32 okean240_state::screen_update_okean240(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	u8 gfx,ma; // ma must be 8bit
-	u16 x,y;
-
-	for (y = 0; y < 256; y++)
+	for (u16 y = 0; y < 256; y++)
 	{
-		ma = y + m_scroll;
-		u16 *p = &bitmap.pix16(y);
+		u8 const ma = y + m_scroll; // ma must be 8-bit
+		u16 *p = &bitmap.pix(y);
 
-		for (x = 0; x < 0x4000; x+=0x200)
+		for (u16 x = 0; x < 0x4000; x+=0x200)
 		{
-			gfx = m_p_videoram[x|ma] | m_p_videoram[x|ma|0x100];
+			u8 const gfx = m_p_videoram[x|ma] | m_p_videoram[x|ma|0x100];
 
 			/* Display a scanline of a character */
 			*p++ = BIT(gfx, 0);

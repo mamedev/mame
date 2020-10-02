@@ -40,12 +40,12 @@ device_bbc_joyport_interface::device_bbc_joyport_interface(const machine_config 
 //  bbcmc_joyport_slot_device - constructor
 //-------------------------------------------------
 
-bbc_joyport_slot_device::bbc_joyport_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, BBC_JOYPORT_SLOT, tag, owner, clock),
-	device_single_card_slot_interface(mconfig, *this),
-	m_device(nullptr),
-	m_cb1_handler(*this),
-	m_cb2_handler(*this)
+bbc_joyport_slot_device::bbc_joyport_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, BBC_JOYPORT_SLOT, tag, owner, clock)
+	, device_single_card_slot_interface(mconfig, *this)
+	, m_device(nullptr)
+	, m_cb1_handler(*this)
+	, m_cb2_handler(*this)
 {
 }
 
@@ -70,7 +70,6 @@ void bbc_joyport_slot_device::device_start()
 
 uint8_t bbc_joyport_slot_device::pb_r()
 {
-	// TODO: Joyport connected to PB0-PB4 only. PB5-PB7 are expansion port.
 	if (m_device)
 		return 0xe0 | m_device->pb_r();
 	else
@@ -86,6 +85,28 @@ void bbc_joyport_slot_device::pb_w(uint8_t data)
 {
 	if (m_device)
 		m_device->pb_w(data);
+}
+
+
+//-------------------------------------------------
+//  write_cb1
+//-------------------------------------------------
+
+void bbc_joyport_slot_device::write_cb1(int state)
+{
+	if (m_device)
+		m_device->write_cb1(state);
+}
+
+
+//-------------------------------------------------
+//  write_cb2
+//-------------------------------------------------
+
+void bbc_joyport_slot_device::write_cb2(int state)
+{
+	if (m_device)
+		m_device->write_cb2(state);
 }
 
 

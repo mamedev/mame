@@ -111,10 +111,10 @@ void redbaron_sound_device::device_start()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void redbaron_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void redbaron_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *buffer = outputs[0];
-	while( samples-- )
+	auto &buffer = outputs[0];
+	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
 	{
 		int sum = 0;
 
@@ -214,7 +214,7 @@ void redbaron_sound_device::sound_stream_update(sound_stream &stream, stream_sam
 		if( m_squeal_out )
 			sum += 32767 * 40 / 100;
 
-		*buffer++ = sum;
+		buffer.put_int(sampindex, sum, 32768);
 	}
 }
 

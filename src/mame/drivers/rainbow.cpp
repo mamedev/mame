@@ -458,14 +458,14 @@ public:
 		m_inp2(*this, "W14"),
 		m_inp3(*this, "W15"),
 		m_inp4(*this, "W18"),
-		m_inp5(*this, "DEC HARD DISK"), // DO NOT CHANGE ORDER
-		m_inp6(*this, "CORVUS HARD DISKS"), // DO NOT CHANGE ORDER
-		m_inp7(*this, "GRAPHICS OPTION"),   // DO NOT CHANGE ORDER
-		m_inp9(*this, "MONO MONITOR TYPE"),
+		m_inp5(*this, "DEC_HARD_DISK"), // DO NOT CHANGE ORDER
+		m_inp6(*this, "CORVUS_HARD_DISKS"), // DO NOT CHANGE ORDER
+		m_inp7(*this, "GRAPHICS_OPTION"),   // DO NOT CHANGE ORDER
+		m_inp9(*this, "MONO_MONITOR_TYPE"),
 		m_inp10(*this, "J17"),
 		m_inp11(*this, "CLIKCLOK"),
 		m_inp12(*this, "WATCHDOG"),
-		m_inp13(*this, "MONITOR CONFIGURATION"),
+		m_inp13(*this, "MONITOR_CONFIGURATION"),
 
 		m_crtc(*this, "vt100_video"),
 
@@ -830,7 +830,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( rainbow_base_state::hgdc_display_pixels )
 		for (int xi = 0; xi < 16; xi++) // blank screen when VT102 output active (..)
 		{
 			if (bitmap.cliprect().contains(x + xi, y))
-				bitmap.pix32(y, x + xi) = 0;
+				bitmap.pix(y, x + xi) = 0;
 		}
 		return; // no output from graphics option
 	}
@@ -864,7 +864,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( rainbow_base_state::hgdc_display_pixels )
 			 (BIT(plane3 ,xi) << 3);
 
 		if (bitmap.cliprect().contains(x + xi, y))
-			bitmap.pix32(y, x + xi) = paletteX[mono ? (pen + 16) : pen];
+			bitmap.pix(y, x + xi) = paletteX[mono ? (pen + 16) : pen];
 	}
 }
 
@@ -1093,7 +1093,7 @@ void rainbow_base_state::rainbowz80_io(address_map &map)
 /* DIP switches */
 static INPUT_PORTS_START(rainbow100b_in)
 
-	PORT_START("MONO MONITOR TYPE")
+	PORT_START("MONO_MONITOR_TYPE")
 	PORT_DIPNAME(0x03, 0x03, "MONO MONITOR TYPE")
 	PORT_DIPSETTING(0x01, "WHITE (VR201-A)")
 	PORT_DIPSETTING(0x02, "GREEN (VR201-B)")
@@ -1102,12 +1102,12 @@ static INPUT_PORTS_START(rainbow100b_in)
 	// FLOPPY, BUNDLE, GRAPHICS affect 'system_parameter_r':
 
 	// EXT.COMM.card -or- RD51 HD. controller (marketed later).
-	PORT_START("DEC HARD DISK") // BUNDLE_OPTION
+	PORT_START("DEC_HARD_DISK") // BUNDLE_OPTION
 	PORT_DIPNAME(0x01, 0x00, "DEC HARD DISK (#1)") PORT_TOGGLE
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x01, DEF_STR(On))
 
-	PORT_START("CORVUS HARD DISKS")
+	PORT_START("CORVUS_HARD_DISKS")
 	PORT_DIPNAME(0x01, 0x00, "CORVUS HARD DISKS (#2 to #5)") PORT_TOGGLE
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x01, DEF_STR(On))
@@ -1117,7 +1117,7 @@ static INPUT_PORTS_START(rainbow100b_in)
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x01, DEF_STR(On))
 
-	PORT_START("GRAPHICS OPTION") // GDC
+	PORT_START("GRAPHICS_OPTION") // GDC
 	PORT_DIPNAME(0x01, 0x00, "GRAPHICS OPTION") PORT_TOGGLE
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x01, DEF_STR(On))
@@ -1154,7 +1154,7 @@ static INPUT_PORTS_START(rainbow100b_in)
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x01, DEF_STR(On))
 
-	PORT_START("MONITOR CONFIGURATION") // GDC
+	PORT_START("MONITOR_CONFIGURATION") // GDC
 	PORT_DIPNAME(0x0F, 0x04, "MONITOR CONFIGURATION")
 	PORT_DIPSETTING(0x04, "AUTODETECT")
 	PORT_DIPSETTING(0x01, "MONO ONLY / 4 to 16 monochrome shades (single VR-201)")

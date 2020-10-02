@@ -44,8 +44,7 @@ private:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	required_device<wd1770_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 };
 
 

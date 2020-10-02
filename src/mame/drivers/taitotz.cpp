@@ -845,12 +845,12 @@ static inline uint32_t generate_texel_address(int iu, int iv)
 
 void taitotz_renderer::draw_scanline_noz(int32_t scanline, const extent_t &extent, const taitotz_polydata &extradata, int threadid)
 {
-	uint32_t *fb = &m_fb->pix32(scanline);
+	uint32_t *const fb = &m_fb->pix(scanline);
 
 	float u = extent.param[POLY_U].start;
 	float v = extent.param[POLY_V].start;
-	float du = extent.param[POLY_U].dpdx;
-	float dv = extent.param[POLY_V].dpdx;
+	float const du = extent.param[POLY_U].dpdx;
+	float const dv = extent.param[POLY_V].dpdx;
 
 	uint32_t *texram = &m_texture[extradata.texture * 0x1000];
 
@@ -879,24 +879,24 @@ void taitotz_renderer::draw_scanline_noz(int32_t scanline, const extent_t &exten
 
 void taitotz_renderer::draw_scanline(int32_t scanline, const extent_t &extent, const taitotz_polydata &extradata, int threadid)
 {
-	uint32_t *fb = &m_fb->pix32(scanline);
-	float *zb = (float*)&m_zbuffer->pix32(scanline);
+	uint32_t *const fb = &m_fb->pix(scanline);
+	float *const zb = (float*)&m_zbuffer->pix(scanline);
 
 	float ooz = extent.param[POLY_Z].start;
 	float uoz = extent.param[POLY_U].start;
 	float voz = extent.param[POLY_V].start;
-	float dooz = extent.param[POLY_Z].dpdx;
-	float duoz = extent.param[POLY_U].dpdx;
-	float dvoz = extent.param[POLY_V].dpdx;
+	const float dooz = extent.param[POLY_Z].dpdx;
+	const float duoz = extent.param[POLY_U].dpdx;
+	const float dvoz = extent.param[POLY_V].dpdx;
 
 	float nx= extent.param[POLY_NX].start;
 	float dnx = extent.param[POLY_NX].dpdx;
 	float ny = extent.param[POLY_NY].start;
-	float dny = extent.param[POLY_NY].dpdx;
+	const float dny = extent.param[POLY_NY].dpdx;
 	float nz = extent.param[POLY_NZ].start;
-	float dnz = extent.param[POLY_NZ].dpdx;
+	const float dnz = extent.param[POLY_NZ].dpdx;
 
-	uint32_t *texram = &m_texture[extradata.texture * 0x1000];
+	uint32_t *const texram = &m_texture[extradata.texture * 0x1000];
 	uint32_t alpha = extradata.alpha & 0x1f;
 	uint32_t alpha_enable = extradata.alpha & 0x80;
 
@@ -1435,11 +1435,11 @@ uint32_t taitotz_state::screen_update_taitotz(screen_device &screen, bitmap_rgb3
 {
 	m_renderer->draw(bitmap, cliprect);
 
-	uint16_t *screen_src = (uint16_t*)&m_screen_ram[m_scr_base];
+	uint16_t const *screen_src = (uint16_t*)&m_screen_ram[m_scr_base];
 
 	for (int j=0; j < 384; j++)
 	{
-		uint32_t *fb = &bitmap.pix32(j);
+		uint32_t *const fb = &bitmap.pix(j);
 		for (int i=0; i < 512; i++)
 		{
 			uint16_t p = *screen_src++;

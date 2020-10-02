@@ -40,51 +40,36 @@ wave_device::wave_device(const machine_config &mconfig, const char *tag, device_
 
 void wave_device::device_start()
 {
-	speaker_device_iterator spkiter(*owner());
-	int speakers = spkiter.count();
-	if (speakers > 1)
-		machine().sound().stream_alloc(*this, 0, 2, machine().sample_rate());
-	else
-		machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
+	stream_alloc(0, 2, machine().sample_rate());
 }
 
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void wave_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void wave_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *left_buffer = outputs[0];
-	stream_sample_t *right_buffer = nullptr;
-
-	speaker_device_iterator spkiter(*owner());
-	int speakers = spkiter.count();
-	if (speakers > 1)
-		right_buffer = outputs[1];
-
 	cassette_state state = m_cass->get_state() & (CASSETTE_MASK_UISTATE | CASSETTE_MASK_MOTOR | CASSETTE_MASK_SPEAKER);
 
 	if (m_cass->exists() && (ALWAYS_PLAY_SOUND || (state == (CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED))))
 	{
 		cassette_image *cassette = m_cass->get_image();
 		double time_index = m_cass->get_position();
-		double duration = double(samples) / m_cass->machine().sample_rate();
+		double duration = double(outputs[0].samples()) / outputs[0].sample_rate();
 
-		cassette_get_samples(cassette, 0, time_index, duration, samples, 2, left_buffer, CASSETTE_WAVEFORM_16BIT);
-		if (speakers > 1)
-			cassette_get_samples(cassette, 1, time_index, duration, samples, 2, right_buffer, CASSETTE_WAVEFORM_16BIT);
+		if (m_sample_buf.size() < outputs[0].samples())
+			m_sample_buf.resize(outputs[0].samples());
 
-		for (int i = samples - 1; i >= 0; i--)
+		for (int ch = 0; ch < 2; ch++)
 		{
-			left_buffer[i] = ((int16_t *) left_buffer)[i];
-			if (speakers > 1)
-				right_buffer[i] = ((int16_t *) right_buffer)[i];
+			cassette->get_samples(ch, time_index, duration, outputs[ch].samples(), 2, &m_sample_buf[0], cassette_image::WAVEFORM_16BIT);
+			for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
+				outputs[ch].put_int(sampindex, m_sample_buf[sampindex], 32768);
 		}
 	}
 	else
 	{
-		memset(left_buffer, 0, sizeof(*left_buffer) * samples);
-		if (speakers > 1)
-			memset(right_buffer, 0, sizeof(*right_buffer) * samples);
+		outputs[0].fill(0);
+		outputs[1].fill(0);
 	}
 }

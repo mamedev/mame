@@ -236,6 +236,7 @@ protected:
 	int                 m_grom_size;
 	int                 m_rom_size;
 	int                 m_ram_size;
+	int                 m_bank_mask;
 
 	uint8_t*              m_rom_ptr;
 	uint8_t*              m_ram_ptr;

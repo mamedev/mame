@@ -17,7 +17,7 @@ protected:
 	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 	/* 8 voices max */
@@ -48,10 +48,7 @@ private:
 	sound_stream *m_stream;
 
 	/* mixer tables and internal buffers */
-	std::unique_ptr<int16_t[]> m_mixer_table;
-	int16_t *m_mixer_lookup;
-	std::unique_ptr<short[]> m_mixer_buffer;
-	std::unique_ptr<short[]> m_mixer_buffer_2;
+	std::vector<short> m_mixer_buffer;
 
 	uint8_t m_soundregs[0x4000];
 

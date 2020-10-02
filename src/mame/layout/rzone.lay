@@ -6,9 +6,8 @@ license:CC0
 
 	<!-- define elements -->
 
-	<element name="static_red"><rect><color red="1.0" green="0.2" blue="0.23" /></rect></element>
-
-	<element name="dark" defstate="0">
+	<element name="backlight" defstate="0">
+		<rect state="1"><color red="1.0" green="0.2" blue="0.23" /></rect>
 		<rect state="0"><color red="0" green="0" blue="0" /></rect>
 	</element>
 
@@ -17,8 +16,6 @@ license:CC0
 
 	<view name="Internal Layout">
 		<screen index="0"><bounds left="0" top="0" right="~scr0width~" bottom="~scr0height~" /></screen>
-		<overlay element="static_red"><bounds left="0" top="0" right="~scr0width~" bottom="~scr0height~" /></overlay>
-		<bezel name="led" element="dark"><bounds left="0" top="0" right="~scr0width~" bottom="~scr0height~" /></bezel>
-
+		<element name="led" ref="backlight" blend="multiply"><bounds left="0" top="0" right="~scr0width~" bottom="~scr0height~" /></element>
 	</view>
 </mamelayout>

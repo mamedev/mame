@@ -414,27 +414,26 @@ void pyl601_state::machine_start()
 
 MC6845_UPDATE_ROW( pyl601_state::pyl601_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint8_t *charrom = memregion("chargen")->base();
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint8_t const *const charrom = memregion("chargen")->base();
 
-	int column, bit, i;
-	uint8_t data;
 	if (BIT(m_video_mode, 5) == 0)
 	{
-		for (column = 0; column < x_count; column++)
+		for (int column = 0; column < x_count; column++)
 		{
 			uint8_t code = m_ram->pointer()[(((ma + column) & 0x0fff) + 0xf000)];
 			code = ((code << 1) | (code >> 7)) & 0xff;
+			uint8_t data;
 			if (column == cursor_x-2)
 				data = 0xff;
 			else
 				data = charrom[((code << 3) | (ra & 0x07)) & 0x7ff];
 
-			for (bit = 0; bit < 8; bit++)
+			for (int bit = 0; bit < 8; bit++)
 			{
 				int x = (column * 8) + bit;
 
-				bitmap.pix32(y, x) = palette[BIT(data, 7)];
+				bitmap.pix(y, x) = palette[BIT(data, 7)];
 
 				data <<= 1;
 			}
@@ -442,12 +441,12 @@ MC6845_UPDATE_ROW( pyl601_state::pyl601_update_row )
 	}
 	else
 	{
-		for (i = 0; i < x_count; i++)
+		for (int i = 0; i < x_count; i++)
 		{
-			data = m_ram->pointer()[(((ma + i) << 3) | (ra & 0x07)) & 0xffff];
-			for (bit = 0; bit < 8; bit++)
+			uint8_t data = m_ram->pointer()[(((ma + i) << 3) | (ra & 0x07)) & 0xffff];
+			for (int bit = 0; bit < 8; bit++)
 			{
-				bitmap.pix32(y, (i * 8) + bit) = palette[BIT(data, 7)];
+				bitmap.pix(y, (i * 8) + bit) = palette[BIT(data, 7)];
 				data <<= 1;
 			}
 		}
@@ -456,25 +455,23 @@ MC6845_UPDATE_ROW( pyl601_state::pyl601_update_row )
 
 MC6845_UPDATE_ROW( pyl601_state::pyl601a_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint8_t *charrom = memregion("chargen")->base();
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint8_t const *const charrom = memregion("chargen")->base();
 
-	int column, bit, i;
-	uint8_t data;
 	if (BIT(m_video_mode, 5) == 0)
 	{
-		for (column = 0; column < x_count; column++)
+		for (int column = 0; column < x_count; column++)
 		{
-			uint8_t code = m_ram->pointer()[(((ma + column) & 0x0fff) + 0xf000)];
-			data = charrom[((code << 4) | (ra & 0x07)) & 0xfff];
+			uint8_t const code = m_ram->pointer()[(((ma + column) & 0x0fff) + 0xf000)];
+			uint8_t data = charrom[((code << 4) | (ra & 0x07)) & 0xfff];
 			if (column == cursor_x)
 				data = 0xff;
 
-			for (bit = 0; bit < 8; bit++)
+			for (int bit = 0; bit < 8; bit++)
 			{
-				int x = (column * 8) + bit;
+				int const x = (column * 8) + bit;
 
-				bitmap.pix32(y, x) = palette[BIT(data, 7)];
+				bitmap.pix(y, x) = palette[BIT(data, 7)];
 
 				data <<= 1;
 			}
@@ -482,12 +479,12 @@ MC6845_UPDATE_ROW( pyl601_state::pyl601a_update_row )
 	}
 	else
 	{
-		for (i = 0; i < x_count; i++)
+		for (int i = 0; i < x_count; i++)
 		{
-			data = m_ram->pointer()[(((ma + i) << 3) | (ra & 0x07)) & 0xffff];
-			for (bit = 0; bit < 8; bit++)
+			uint8_t data = m_ram->pointer()[(((ma + i) << 3) | (ra & 0x07)) & 0xffff];
+			for (int bit = 0; bit < 8; bit++)
 			{
-				bitmap.pix32(y, (i * 8) + bit) = palette[BIT(data, 7)];
+				bitmap.pix(y, (i * 8) + bit) = palette[BIT(data, 7)];
 				data <<= 1;
 			}
 		}

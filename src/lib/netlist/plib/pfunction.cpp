@@ -101,7 +101,7 @@ namespace plib {
 	template <typename NT>
 	void pfunction<NT>::compile_postfix(const pstring &expr, const inputs_container &inputs) noexcept(false)
 	{
-		std::vector<pstring> cmds(plib::psplit(expr, " "));
+		std::vector<pstring> cmds(plib::psplit(expr, ' '));
 		compile_postfix(inputs, cmds, expr);
 	}
 
@@ -143,7 +143,7 @@ namespace plib {
 					if (r == units_si<fl_t>().end())
 						rc.m_param.val = plib::pstonum_ne<fl_t>(cmd, err);
 					else
-						rc.m_param.val = plib::pstonum_ne<fl_t>(plib::left(cmd, cmd.size()-1), err) * r->second;
+						rc.m_param.val = plib::pstonum_ne<fl_t>(plib::left(cmd, cmd.length()-1), err) * r->second;
 					if (err)
 						throw pexception(plib::pfmt("pfunction: unknown/misformatted token <{1}> in <{2}>")(cmd)(expr));
 					stk += 1;

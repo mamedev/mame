@@ -22,7 +22,7 @@ protected:
 	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 public:
 	DECLARE_WRITE_LINE_MEMBER(set_state);   // enable/disable sound output
@@ -33,7 +33,7 @@ private:
 	int m_enable;             /* enable beep */
 	int m_frequency;          /* set frequency - this can be changed using the appropriate function */
 	int m_incr;               /* initial wave state */
-	int16_t m_signal;           /* current signal */
+	stream_buffer::sample_t m_signal; /* current signal */
 };
 
 DECLARE_DEVICE_TYPE(BEEP, beep_device)

@@ -257,7 +257,7 @@ int configuration_manager::save_xml(emu_file &file, config_type which_type)
 		type.save(which_type, curnode);
 
 		/* if nothing was added, just nuke the node */
-		if (!curnode->get_value() && !curnode->get_first_child())
+		if (!curnode->get_value() && !curnode->get_first_child() && !curnode->count_attributes())
 			curnode->delete_node();
 	}
 

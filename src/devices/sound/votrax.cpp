@@ -131,13 +131,13 @@ void votrax_sc01_device::inflection_w(uint8_t data)
 //  for our sound stream
 //-------------------------------------------------
 
-void votrax_sc01_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void votrax_sc01_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	for(int i=0; i<samples; i++) {
+	for(int i=0; i<outputs[0].samples(); i++) {
 		m_sample_count++;
 		if(m_sample_count & 1)
 			chip_update();
-		outputs[0][i] = analog_calc();
+		outputs[0].put(i, analog_calc());
 	}
 }
 
@@ -489,7 +489,7 @@ void votrax_sc01_device::chip_update()
 	m_noise = ((m_noise << 1) & 0x7ffe) | inp;
 	m_cur_noise = !(((m_noise >> 14) ^ (m_noise >> 13)) & 1);
 
-	//	logerror("%s tick %02x.%03x 625=%d 208=%d pitch=%02x.%x ns=%04x ni=%d noise=%d cl=%x.%x clf=%d/%d\n", machine().time().to_string(), m_ticks, m_phonetick, tick_625, tick_208, m_pitch >> 3, m_pitch & 7, m_noise, inp, m_cur_noise, m_closure >> 2, m_closure & 3, m_rom_closure, m_cur_closure);
+	//  logerror("%s tick %02x.%03x 625=%d 208=%d pitch=%02x.%x ns=%04x ni=%d noise=%d cl=%x.%x clf=%d/%d\n", machine().time().to_string(), m_ticks, m_phonetick, tick_625, tick_208, m_pitch >> 3, m_pitch & 7, m_noise, inp, m_cur_noise, m_closure >> 2, m_closure & 3, m_rom_closure, m_cur_closure);
 }
 
 void votrax_sc01_device::filters_commit(bool force)
@@ -568,7 +568,7 @@ void votrax_sc01_device::filters_commit(bool force)
 					 m_filt_fa, m_filt_va, m_filt_fc, m_filt_f1, m_filt_f2, m_filt_f2q, m_filt_f3);
 }
 
-stream_sample_t votrax_sc01_device::analog_calc()
+stream_buffer::sample_t votrax_sc01_device::analog_calc()
 {
 	// Voice-only path.
 	// 1. Pick up the pitch wave
@@ -632,7 +632,7 @@ stream_sample_t votrax_sc01_device::analog_calc()
 	vn = apply_filter(m_vn_5, m_vn_6, m_fx_a, m_fx_b);
 	shift_hist(vn, m_vn_6);
 
-	return int(vn*50000);
+	return vn*1.5;
 }
 
 /*
@@ -877,8 +877,11 @@ void votrax_sc01_device::build_lowpass_filter(double *a, double *b,
 											  double c1t, // Unswitched cap, over amp-op, top
 											  double c1b) // Switched cap, over amp-op, bottom
 {
+	// The caps values puts the cutoff at around 150Hz, put that's no good.
+	// Recordings shows we want it around 4K, so fuzz it.
+
 	// Compute the only coefficient we care about
-	double k = c1b / (m_cclock * c1t);
+	double k = c1b / (m_cclock * c1t) * (150.0/4000.0);
 
 	// Compute the filter cutoff frequency
 	double fpeak = 1/(2*M_PI*k);
@@ -1001,7 +1004,7 @@ void votrax_sc01_device::build_injection_filter(double *a, double *b,
 	b[1] = k1 + m;
 
 	// That ends up in a numerically unstable filter.  Neutralize it for now.
-	a[0] = 1;
+	a[0] = 0;
 	a[1] = 0;
 	b[0] = 1;
 	b[1] = 0;

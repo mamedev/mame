@@ -64,22 +64,33 @@ TIDY_FLAGS = -p $(OBJ) -checks=llvm-include-order,llvm-namespace-comment,moderni
 #TIDY_FLAGS = -checks=modernize-use-override -fix
 #TIDY_FLAGS = -checks=modernize-use-using -fix
 
-ifeq ($(subst Windows_NT,windows,$(OS)),windows)
+ifeq ($(subst Windows_NT,Windows,$(OS)),Windows)
+    HOSTARCH := Windows
+else
+    HOSTARCH := $(shell uname -s)
+endif
+
+ifeq ($(HOSTARCH),Windows)
 OBJ = obj/mingw
 EXESUFFIX = .exe
 DOXYGEN = doxygen.exe
-HOSTARCH = WINDOWS
 CEXTRAFLAGS = -DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0501 -DWIN32_LEAN_AND_MEAN
 LDEXTRAFLAGS = -Wl,--subsystem,console -municode
 LIBS = $(EXTRALIBS)
 MD = @mkdir.exe
 RM = @rm.exe
 SHELL = sh.exe
+else ifeq ($(HOSTARCH),Darwin)
+OBJ = obj/darwin
+EXESUFFIX :=
+DOXYGEN = @doxygen
+LIBS = -lpthread -ldl $(EXTRALIBS)
+MD = @mkdir
+RM = @rm
 else
 OBJ = obj/nix
 EXESUFFIX :=
 DOXYGEN = @./doxygen
-HOSTARCH = NIX
 LIBS = -lpthread -ldl $(EXTRALIBS)
 MD = @mkdir
 RM = @rm
@@ -105,7 +116,7 @@ DEPENDCC=$(CC)
 
 
 ifndef FAST
-FAST=0
+FAST=1
 endif
 
 ifeq ($(FAST),1)
@@ -127,15 +138,18 @@ OBJDIRS = $(OBJ) \
 			$(OBJ)/plib \
 			$(OBJ)/devices \
 			$(OBJ)/macro \
+			$(OBJ)/macro/modules \
 			$(OBJ)/tests \
 			$(OBJ)/tools \
 			$(OBJ)/prg \
 			$(OBJ)/generated \
 
+MODULESOURCES += $(wildcard $(SRC)/macro/modules/*.cpp)
 DEVSOURCES =  $(SRC)/solver/nld_solver.cpp
 DEVSOURCES += $(wildcard $(SRC)/devices/*.cpp)
 DEVSOURCES += $(wildcard $(SRC)/analog/*.cpp)
 DEVSOURCES += $(wildcard $(SRC)/macro/*.cpp)
+DEVSOURCES += $(MODULESOURCES)
 
 TESTSOURCES = $(wildcard $(SRC)/tests/*.cpp)
 
@@ -147,6 +161,7 @@ CORESOURCES := \
 	$(SRC)/nl_factory.cpp \
 	$(SRC)/tools/nl_convert.cpp \
 	$(SRC)/generated/static_solvers.cpp \
+	$(SRC)/generated/nlm_modules_lib.cpp \
 
 MAINSOURCES = $(SRC)/prg/nltool.cpp $(SRC)/prg/nlwav.cpp
 
@@ -276,7 +291,8 @@ clang-libc:
 		-Wmissing-variable-declarations -Wno-float-equal -Wconversion \
 		-Wno-c++98-compat -Wno-c++98-compat-pedantic -Wformat-nonliteral \
 		-Wno-exit-time-destructors -Winconsistent-missing-destructor-override \
-		-Wno-return-std-move-in-c++11 -Wno-unreachable-code" \
+		-Wno-return-std-move-in-c++11 -Wno-unreachable-code \
+		-Wno-missing-prototypes" \
 		LDEXTRAFLAGS=-stdlib=libc++
 
 clang-5:
@@ -349,8 +365,12 @@ $(SRC)/generated/nld_devinc.h: $(DEVSOURCES)
 	@echo creating $@
 	$(PYTHON) create_devinc.py $^ > $@
 
+$(SRC)/generated/nlm_modules_lib.cpp: $(MODULESOURCES)
+	@echo creating $@
+	$(PYTHON) create_modules.py $^ > $@
+
 .PHONY: generated
-generated: ../generated/lib_entries.hxx ../generated/nld_devinc.h
+generated: $(SRC)/generated/lib_entries.hxx $(SRC)/generated/nld_devinc.h $(SRC)/generated/nlm_modules_lib.cpp
 
 #-------------------------------------------------
 # clang tidy

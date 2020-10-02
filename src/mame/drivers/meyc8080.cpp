@@ -113,12 +113,8 @@ private:
 
 uint32_t meyc8080_state::screen_update_meyc8080(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	offs_t offs;
-
-	for (offs = 0; offs < m_videoram_0.bytes(); offs++)
+	for (offs_t offs = 0; offs < m_videoram_0.bytes(); offs++)
 	{
-		int i;
-
 		uint8_t y = offs >> 5;
 		uint8_t x = offs << 3;
 
@@ -132,15 +128,15 @@ uint32_t meyc8080_state::screen_update_meyc8080(screen_device &screen, bitmap_rg
 		uint8_t data_g = (data2 & ~data0) | (data2 & data1) | (~data2 & ~data1 & data0);
 		uint8_t data_b = data0 ^ data1;
 
-		for (i = 0; i < 8; i++)
+		for (int i = 0; i < 8; i++)
 		{
-			bitmap.pix32(y, x) = rgb_t(pal1bit(data_r >> 7), pal1bit(data_g >> 7), pal1bit(data_b >> 7));
+			bitmap.pix(y, x) = rgb_t(pal1bit(data_r >> 7), pal1bit(data_g >> 7), pal1bit(data_b >> 7));
 
-			data_r = data_r << 1;
-			data_g = data_g << 1;
-			data_b = data_b << 1;
+			data_r <<= 1;
+			data_g <<= 1;
+			data_b <<= 1;
 
-			x = x + 1;
+			x++;
 		}
 	}
 

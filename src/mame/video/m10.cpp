@@ -86,12 +86,12 @@ void m10_state::m15_chargen_w(offs_t offset, uint8_t data)
 }
 
 
-inline void m10_state::plot_pixel_m10( bitmap_ind16 &bm, int x, int y, int col )
+inline void m10_state::plot_pixel_m10(bitmap_ind16 &bm, int x, int y, int col)
 {
 	if (!m_flip)
-		bm.pix16(y, x) = col;
+		bm.pix(y, x) = col;
 	else
-		bm.pix16((IREMM10_VBSTART - 1) - (y - IREMM10_VBEND),
+		bm.pix((IREMM10_VBSTART - 1) - (y - IREMM10_VBEND),
 				(IREMM10_HBSTART - 1) - (x - IREMM10_HBEND)) = col; // only when flip_screen(?)
 }
 

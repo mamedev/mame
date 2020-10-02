@@ -837,31 +837,34 @@ MC6845_UPDATE_ROW(mekd3_state::update_row)
 		uint8_t code = m_video_ram[(ma + column) & 0xfff];
 		int dcursor = (column == cursor_x);
 
-		if (BIT(code, 7)) {
-		  /* Lores 6 pixel character.
-		       -----------
-		       | D1 | D0 |
-		       | D3 | D2 |
-		       | D5 | D4 |
-		       -----------
-		       D6 - 1 Grey tone, 0 brightness.
-		  */
-		  int pixel = ((ra & 0x0c) >> 1) + 1;
-		  int dout = BIT(code, pixel);
-		  int grey = BIT(code, 6);
-		  int color = ((dcursor ^ dout) && de) << (grey ^ 1);
-		  bitmap.pix32(y, x++) = pen[color];
-		  bitmap.pix32(y, x++) = pen[color];
-		  bitmap.pix32(y, x++) = pen[color];
-		  bitmap.pix32(y, x++) = pen[color];
-		  pixel--;
-		  dout = BIT(code, pixel);
-		  color = ((dcursor ^ dout) && de) << (grey ^ 1);
-		  bitmap.pix32(y, x++) = pen[color];
-		  bitmap.pix32(y, x++) = pen[color];
-		  bitmap.pix32(y, x++) = pen[color];
-		  bitmap.pix32(y, x++) = pen[color];
-		} else {
+		if (BIT(code, 7))
+		{
+			/* Lores 6 pixel character.
+			     -----------
+			     | D1 | D0 |
+			     | D3 | D2 |
+			     | D5 | D4 |
+			     -----------
+			     D6 - 1 Grey tone, 0 brightness.
+			*/
+			int pixel = ((ra & 0x0c) >> 1) + 1;
+			int dout = BIT(code, pixel);
+			int grey = BIT(code, 6);
+			int color = ((dcursor ^ dout) && de) << (grey ^ 1);
+			bitmap.pix(y, x++) = pen[color];
+			bitmap.pix(y, x++) = pen[color];
+			bitmap.pix(y, x++) = pen[color];
+			bitmap.pix(y, x++) = pen[color];
+			pixel--;
+			dout = BIT(code, pixel);
+			color = ((dcursor ^ dout) && de) << (grey ^ 1);
+			bitmap.pix(y, x++) = pen[color];
+			bitmap.pix(y, x++) = pen[color];
+			bitmap.pix(y, x++) = pen[color];
+			bitmap.pix(y, x++) = pen[color];
+		}
+		else
+		{
 			offs_t address = ra < 8 ? ((code & 0x7f) << 3) | (ra & 0x07) : 0;
 			uint8_t data = m_p_chargen[address];
 
@@ -870,7 +873,7 @@ MC6845_UPDATE_ROW(mekd3_state::update_row)
 				int dout = BIT(data, 7);
 				int color = ((dcursor ^ dout) && de) << 1;
 
-				bitmap.pix32(y, x++) = pen[color];
+				bitmap.pix(y, x++) = pen[color];
 
 				data <<= 1;
 			}

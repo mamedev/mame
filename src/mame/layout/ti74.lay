@@ -159,68 +159,68 @@ license:CC0
 
 <!-- draw background around lcd screen matrix part -->
 
-		<bezel element="static_bg">
+		<element ref="static_bg">
 			<bounds left="0" top="0" right="188" bottom="9.25" />
-		</bezel>
-		<bezel element="static_bg">
+		</element>
+		<element ref="static_bg">
 			<bounds left="0" top="0" right="1.25" bottom="29" />
-		</bezel>
-		<bezel element="static_bg">
+		</element>
+		<element ref="static_bg">
 			<bounds left="187.75" top="0" right="189" bottom="29" />
-		</bezel>
-		<bezel element="static_bg">
+		</element>
+		<element ref="static_bg">
 			<bounds left="0" top="19.75" right="188" bottom="29" />
-		</bezel>
+		</element>
 
 <!-- draw top row of lcd indicators -->
 
-		<bezel name="lamp10" element="ind_left">
+		<element name="lamp10" ref="ind_left">
 			<bounds x="1.5" y="0.5" width="20" height="5.5" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp4" element="ind_right">
+		<element name="lamp4" ref="ind_right">
 			<bounds x="167.5" y="0.5" width="20" height="5.5" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp11" element="ind_shift">
+		<element name="lamp11" ref="ind_shift">
 			<bounds x="16" y="1" width="20" height="5" />
-		</bezel>
-		<bezel name="lamp12" element="ind_ctl">
+		</element>
+		<element name="lamp12" ref="ind_ctl">
 			<bounds x="43" y="1" width="20" height="5" />
-		</bezel>
-		<bezel name="lamp13" element="ind_fn">
+		</element>
+		<element name="lamp13" ref="ind_fn">
 			<bounds x="70" y="1" width="20" height="5" />
-		</bezel>
-		<bezel name="lamp14" element="ind_io">
+		</element>
+		<element name="lamp14" ref="ind_io">
 			<bounds x="97" y="1" width="20" height="5" />
-		</bezel>
-		<bezel name="lamp2" element="ind_ucl">
+		</element>
+		<element name="lamp2" ref="ind_ucl">
 			<bounds x="124" y="1" width="20" height="5" />
-		</bezel>
-		<bezel name="lamp3" element="ind_low">
+		</element>
+		<element name="lamp3" ref="ind_low">
 			<bounds x="154" y="1" width="12" height="5" />
-		</bezel>
+		</element>
 
 <!-- draw bottom row of lcd indicators -->
 
-		<bezel name="lamp63" element="ind_basic">
+		<element name="lamp63" ref="ind_basic">
 			<bounds x="16" y="23" width="20" height="5" />
-		</bezel>
-		<bezel name="lamp64" element="ind_calc">
+		</element>
+		<element name="lamp64" ref="ind_calc">
 			<bounds x="43" y="23" width="20" height="5" />
-		</bezel>
-		<bezel name="lamp1" element="ind_deg">
+		</element>
+		<element name="lamp1" ref="ind_deg">
 			<bounds x="70" y="23" width="20" height="5" />
-		</bezel>
-		<bezel name="lamp62" element="ind_rad">
+		</element>
+		<element name="lamp62" ref="ind_rad">
 			<bounds x="97" y="23" width="20" height="5" />
-		</bezel>
-		<bezel name="lamp53" element="ind_grad">
+		</element>
+		<element name="lamp53" ref="ind_grad">
 			<bounds x="124" y="23" width="20" height="5" />
-		</bezel>
-		<bezel name="lamp54" element="ind_stat">
+		</element>
+		<element name="lamp54" ref="ind_stat">
 			<bounds x="151" y="23" width="20" height="5" />
-		</bezel>
+		</element>
 
 	</view>
 </mamelayout>

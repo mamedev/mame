@@ -22,12 +22,13 @@ Offset  Value   Type    Description
 
 */
 
-#include <cstring>
+#include "csw_cas.h"
+#include "uef_cas.h"
 
 #include <zlib.h>
+
 #include <cassert>
-#include "uef_cas.h"
-#include "csw_cas.h"
+#include <cstring>
 
 
 #define CSW_WAV_FREQUENCY   44100
@@ -262,7 +263,7 @@ cleanup:
 }
 
 
-static const struct CassetteLegacyWaveFiller csw_legacy_fill_wave = {
+static const cassette_image::LegacyWaveFiller csw_legacy_fill_wave = {
 	csw_cas_fill_wave,      /* fill_wave */
 	-1,                     /* chunk_size */
 	0,                      /* chunk_samples */
@@ -272,23 +273,23 @@ static const struct CassetteLegacyWaveFiller csw_legacy_fill_wave = {
 	0                       /* trailer_samples */
 };
 
-static cassette_image::error csw_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts )
+static cassette_image::error csw_cassette_identify( cassette_image *cassette, cassette_image::Options *opts )
 {
 	uint8_t header[22];
 
-	cassette_image_read(cassette, header, 0, sizeof(header));
+	cassette->image_read(header, 0, sizeof(header));
 	if (memcmp(&header[0], CSW_HEADER, sizeof(CSW_HEADER) - 1)) {
 		return cassette_image::error::INVALID_IMAGE;
 	}
-	return cassette_legacy_identify( cassette, opts, &csw_legacy_fill_wave );
+	return cassette->legacy_identify( opts, &csw_legacy_fill_wave );
 }
 
 static cassette_image::error csw_cassette_load( cassette_image *cassette )
 {
-	return cassette_legacy_construct( cassette, &csw_legacy_fill_wave );
+	return cassette->legacy_construct( &csw_legacy_fill_wave );
 }
 
-const struct CassetteFormat csw_cassette_format = {
+const cassette_image::Format csw_cassette_format = {
 	"csw",
 	csw_cassette_identify,
 	csw_cassette_load,

@@ -281,11 +281,15 @@ NETLIST_START(wotw)
 	D_1N914B(D9)
 	D_1N914B(D10)
 
+#if !(HLE_BACKGROUND_VCO)
 	Q_2N3904(Q1)            // NPN
+#endif
 	Q_2N3904(Q2)            // NPN
 	Q_2N3906(Q3)            // PNP
 	Q_2N3904(Q4)            // NPN
+#if !(HLE_LASER_VCO)
 	Q_2N3904(Q5)            // NPN
+#endif
 	Q_2N3906(Q6)            // PNP
 	Q_2N3906(Q7)            // PNP
 	Q_2N3906(Q8)            // PNP

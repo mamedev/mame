@@ -411,8 +411,8 @@ void rallyx_state::plot_star( bitmap_ind16 &bitmap, const rectangle &cliprect, i
 	if (flip_screen_y())
 		y = 255 - y;
 
-	if (m_palette->pen_indirect(bitmap.pix16(y, x) % 0x144) == 0)
-		bitmap.pix16(y, x) = STARS_COLOR_BASE + color;
+	if (m_palette->pen_indirect(bitmap.pix(y, x) % 0x144) == 0)
+		bitmap.pix(y, x) = STARS_COLOR_BASE + color;
 }
 
 void rallyx_state::draw_stars( bitmap_ind16 &bitmap, const rectangle &cliprect )

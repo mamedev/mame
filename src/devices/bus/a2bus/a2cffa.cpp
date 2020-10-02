@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont
 /*********************************************************************
 
-    a2cffa.c
+    a2cffa.cpp
 
     Implementation of Rich Dreher's IDE/CompactFlash card
     for the Apple II.
@@ -16,18 +16,12 @@
 #include "imagedev/harddriv.h"
 #include "softlist.h"
 
-/***************************************************************************
-    PARAMETERS
-***************************************************************************/
-
-#define LOG_A2CFFA  1
-
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(A2BUS_CFFA2,      a2bus_cffa2_device,      "a2cffa2",  "CFFA2000 Compact Flash (65C02 firmware, www.dreher.net)")
-DEFINE_DEVICE_TYPE(A2BUS_CFFA2_6502, a2bus_cffa2_6502_device, "a2cffa02", "CFFA2000 Compact Flash (6502 firmware, www.dreher.net)")
+DEFINE_DEVICE_TYPE(A2BUS_CFFA2,      a2bus_cffa2_device,      "a2cffa2",  "CFFA 2.0 Compact Flash (65C02 firmware, www.dreher.net)")
+DEFINE_DEVICE_TYPE(A2BUS_CFFA2_6502, a2bus_cffa2_6502_device, "a2cffa02", "CFFA 2.0 Compact Flash (6502 firmware, www.dreher.net)")
 
 #define CFFA2_ROM_REGION  "cffa2_rom"
 #define CFFA2_ATA_TAG     "cffa2_ata"

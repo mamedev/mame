@@ -77,12 +77,6 @@ DEFINE_DEVICE_TYPE(C219, c219_device, "c219", "Namco C219")
 //  LIVE DEVICE
 //**************************************************************************
 
-static inline int limit(s32 in)
-{
-	return std::max(-0x7fff, std::min(0x8000, in));
-}
-
-
 //-------------------------------------------------
 //  c140_device - constructor
 //-------------------------------------------------
@@ -220,7 +214,7 @@ void c140_device::rom_bank_updated()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void c140_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	s32   dt;
 
@@ -228,6 +222,7 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 
 	s16   *lmix, *rmix;
 
+	int samples = outputs[0].samples();
 	if (samples > m_sample_rate) samples = m_sample_rate;
 
 	/* zap the contents of the mixer buffer */
@@ -323,21 +318,17 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 	lmix = m_mixer_buffer_left.get();
 	rmix = m_mixer_buffer_right.get();
 	{
-		stream_sample_t *dest1 = outputs[0];
-		stream_sample_t *dest2 = outputs[1];
+		auto &dest1 = outputs[0];
+		auto &dest2 = outputs[1];
 		for (int i = 0; i < samples; i++)
 		{
-			s32 val;
-
-			val = 8 * (*lmix++);
-			*dest1++ = limit(val);
-			val = 8 * (*rmix++);
-			*dest2++ = limit(val);
+			dest1.put_int_clamp(i, *lmix++, 32768 / 8);
+			dest2.put_int_clamp(i, *rmix++, 32768 / 8);
 		}
 	}
 }
 
-void c219_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void c219_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	s32   dt;
 
@@ -345,6 +336,7 @@ void c219_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 
 	s16   *lmix, *rmix;
 
+	int samples = outputs[0].samples();
 	if (samples > m_sample_rate) samples = m_sample_rate;
 
 	/* zap the contents of the mixer buffer */
@@ -460,16 +452,12 @@ void c219_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 	lmix = m_mixer_buffer_left.get();
 	rmix = m_mixer_buffer_right.get();
 	{
-		stream_sample_t *dest1 = outputs[0];
-		stream_sample_t *dest2 = outputs[1];
+		auto &dest1 = outputs[0];
+		auto &dest2 = outputs[1];
 		for (int i = 0; i < samples; i++)
 		{
-			s32 val;
-
-			val = 8 * (*lmix++);
-			*dest1++ = limit(val);
-			val = 8 * (*rmix++);
-			*dest2++ = limit(val);
+			dest1.put_int_clamp(i, *lmix++, 32768 / 8);
+			dest2.put_int_clamp(i, *rmix++, 32768 / 8);
 		}
 	}
 }

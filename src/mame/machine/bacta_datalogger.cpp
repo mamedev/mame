@@ -16,7 +16,7 @@
   BACTA Datalogger emulation
   The British Amusement and Catering Trade Association created a standard for the tracking of statistics
   and other features on British AWPs across hardware manufacturers.
-  The specification is very simple, a 1200 baud null modem connection  via RS232, with the logger sending an
+  The specification is very simple, a 1200 Baud null modem connection via RS232, with the logger sending an
   ACK command (0x06) on receipt of a valid character, and NAK (0x15) on error.
   In this emulation, the simplest possible device is simulated here, derived from the RS232 null_modem.
   We only handle the feedback for acknowledgment, and limited logging.
@@ -29,13 +29,13 @@ DEFINE_DEVICE_TYPE(BACTA_DATALOGGER, bacta_datalogger_device, "bacta_datalogger"
 //  bacta_datalogger_device - constructor
 //-------------------------------------------------
 
-bacta_datalogger_device::bacta_datalogger_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: bacta_datalogger_device(mconfig, BACTA_DATALOGGER, tag, owner, clock)
+bacta_datalogger_device::bacta_datalogger_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	bacta_datalogger_device(mconfig, BACTA_DATALOGGER, tag, owner, clock)
 {
 }
 
-bacta_datalogger_device::bacta_datalogger_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BACTA_DATALOGGER, tag, owner, clock),
+bacta_datalogger_device::bacta_datalogger_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, BACTA_DATALOGGER, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
 	m_rxd_handler(*this),
 	m_last_input(-1),
@@ -101,13 +101,12 @@ void bacta_datalogger_device::rcv_complete()
 		if (data > 0x80)
 		{
 			data &= ~0x80;
-			LOGDATA("Retransmission of %x\n",data);
 			if ( data == m_last_input)
 			{
-				return;
+				LOGDATA("Retransmission of %x\n",data);
 			}
+			m_last_input = data;
 		}
-		m_last_input = data;
 		switch (data)
 		{
 			case 0x01:

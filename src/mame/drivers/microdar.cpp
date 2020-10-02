@@ -70,6 +70,7 @@ ________________________________________________________________________________
 |  YES  | Far West    | Compumatic       | Standard Microdar SPD with Philips REF34VA                          | Electromechanical shooting |
 |  YES  | Unknown     | Compumatic       | Compumatic ProSPDP-V3 PCB (Philips REF34VA + REF0096 + REF8032)     | Darts                      |
 |  YES  | Diana Olakoa| Compumatic/Olaoka| Compumatic Microdard-V5 PCB (REF0034 + REF0032 + REF0096)           | Darts                      |
+|  NO   | Champion    | Unknown          | ProSPDP PCB. https://www.recreativas.org/champion-6137-compumatic   | Darts                      |
 |_______|_____________|__________________|_____________________________________________________________________|____________________________|
 
 There's a later revision of the Compumatic Microdar, smaller, with a standard Atmel AT89S51 instead of the REF34 CPU.

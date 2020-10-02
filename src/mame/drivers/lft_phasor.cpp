@@ -186,7 +186,7 @@ uint32_t lft_phasor_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 	const pen_t *pens = m_palette->pens();
 	for(int y = 0; y < 313; y++)
 	{
-		uint32_t *dst = &bitmap.pix32(y);
+		uint32_t *dst = &bitmap.pix(y);
 		uint8_t *src = &m_samples[y * 1135];
 		for(int x = 0; x < 1135; x++)
 		{

@@ -13,7 +13,7 @@
 #include "../nl_setup.h"
 #include "../nltypes.h"
 
-#include "../plib/ppreprocessor.h"
+//#include "../plib/ppreprocessor.h"
 #include "../plib/pstream.h"
 #include "../plib/pstring.h"
 
@@ -60,6 +60,14 @@ namespace netlist
 		{}
 
 		model_t get_model(const pstring &model);
+
+		std::vector<pstring> known_models() const
+		{
+			std::vector<pstring> ret;
+			for (const auto &e : m_models)
+				ret.push_back(e.first);
+			return ret;
+		}
 
 	private:
 
@@ -136,13 +144,21 @@ namespace netlist
 		pstring get_initial_param_val(const pstring &name, const pstring &def) const;
 
 		void register_term(detail::core_terminal_t &term);
-		void register_term(terminal_t &term, terminal_t &other_term);
+		void register_term(terminal_t &term, terminal_t *other_term, const std::array<terminal_t *, 2> &splitter_terms);
 
-		// called from net_splitter
+		// called from matrix_solver_t::get_connected_net
+		// returns the terminal being part of a two terminal device.
 		terminal_t *get_connected_terminal(const terminal_t &term) const noexcept
 		{
 			auto ret(m_connected_terminals.find(&term));
-			return (ret != m_connected_terminals.end()) ? ret->second : nullptr;
+			return (ret != m_connected_terminals.end()) ? ret->second[0] : nullptr;
+		}
+
+		// called from net_splitter
+		const std::array<terminal_t *, 4> *get_connected_terminals(const terminal_t &term) const noexcept
+		{
+			auto ret(m_connected_terminals.find(&term));
+			return (ret != m_connected_terminals.end()) ? &ret->second : nullptr;
 		}
 
 		// get family -> truthtable
@@ -215,7 +231,9 @@ namespace netlist
 
 		// FIXME: can be cleared before run
 		std::unordered_map<pstring, detail::core_terminal_t *> m_terminals;
-		std::unordered_map<const terminal_t *, terminal_t *>   m_connected_terminals;
+		// FIXME: Limited to 3 additional terminals
+		std::unordered_map<const terminal_t *,
+			std::array<terminal_t *, 4>>   m_connected_terminals;
 		std::unordered_map<pstring, param_ref_t>               m_params;
 		std::unordered_map<const detail::core_terminal_t *,
 			devices::nld_base_proxy *>                         m_proxies;
@@ -260,7 +278,7 @@ namespace netlist
 		}
 
 	protected:
-		stream_ptr stream(const pstring &name) override;
+		plib::istream_uptr stream(const pstring &name) override;
 
 	private:
 		pstring m_str;
@@ -276,7 +294,7 @@ namespace netlist
 		}
 
 	protected:
-		stream_ptr stream(const pstring &name) override;
+		plib::istream_uptr stream(const pstring &name) override;
 
 	private:
 		pstring m_filename;
@@ -286,16 +304,18 @@ namespace netlist
 	{
 	public:
 
-		explicit source_pattern_t(const pstring &pat)
+		explicit source_pattern_t(const pstring &pat, bool force_lowercase)
 		: m_pattern(pat)
+		, m_force_lowercase(force_lowercase)
 		{
 		}
 
 	protected:
-		stream_ptr stream(const pstring &name) override;
+		plib::istream_uptr stream(const pstring &name) override;
 
 	private:
 		pstring m_pattern;
+		bool m_force_lowercase;
 	};
 
 	class source_mem_t : public source_netlist_t
@@ -307,10 +327,10 @@ namespace netlist
 		}
 
 	protected:
-		stream_ptr stream(const pstring &name) override;
+		plib::istream_uptr stream(const pstring &name) override;
 
 	private:
-		pstring m_str;
+		std::string m_str;
 	};
 
 	class source_proc_t : public source_netlist_t
@@ -325,30 +345,11 @@ namespace netlist
 		bool parse(nlparse_t &setup, const pstring &name) override;
 
 	protected:
-		stream_ptr stream(const pstring &name) override;
+		plib::istream_uptr stream(const pstring &name) override;
 
 	private:
 		nlsetup_func m_setup_func;
 		pstring m_setup_func_name;
-	};
-
-	class source_token_t : public source_netlist_t
-	{
-	public:
-		source_token_t(const pstring &name, const parser_t::token_store &store)
-		: m_store(store)
-		, m_name(name)
-		{
-		}
-
-		bool parse(nlparse_t &setup, const pstring &name) override;
-
-	protected:
-		stream_ptr stream(const pstring &name) override;
-
-	private:
-		parser_t::token_store m_store;
-		pstring m_name;
 	};
 
 } // namespace netlist

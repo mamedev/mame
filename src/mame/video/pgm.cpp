@@ -229,8 +229,8 @@ void pgm_state::draw_sprite_new_zoomed(int wide, int high, int xpos, int ypos, i
 
 			if ((ydrawpos >= cliprect.min_y) && (ydrawpos <= cliprect.max_y))
 			{
-				u16 *dest = &bitmap.pix16(ydrawpos);
-				u8 *destpri = &priority_bitmap.pix8(ydrawpos);
+				u16 *dest = &bitmap.pix(ydrawpos);
+				u8 *destpri = &priority_bitmap.pix(ydrawpos);
 				draw_sprite_line(wide, dest, destpri, cliprect, xzoom, xgrow, flip, xpos, pri, realxsize, palt, true);
 			}
 			else
@@ -252,8 +252,8 @@ void pgm_state::draw_sprite_new_zoomed(int wide, int high, int xpos, int ypos, i
 
 			if ((ydrawpos >= cliprect.min_y) && (ydrawpos <= cliprect.max_y))
 			{
-				u16 *dest = &bitmap.pix16(ydrawpos);
-				u8 *destpri = &priority_bitmap.pix8(ydrawpos);
+				u16 *dest = &bitmap.pix(ydrawpos);
+				u8 *destpri = &priority_bitmap.pix(ydrawpos);
 				draw_sprite_line(wide, dest, destpri, cliprect, xzoom, xgrow, flip, xpos, pri, realxsize, palt, true);
 			}
 			else
@@ -289,8 +289,8 @@ void pgm_state::draw_sprite_new_zoomed(int wide, int high, int xpos, int ypos, i
 
 			if ((ydrawpos >= cliprect.min_y) && (ydrawpos <= cliprect.max_y))
 			{
-				u16 *dest = &bitmap.pix16(ydrawpos);
-				u8 *destpri = &priority_bitmap.pix8(ydrawpos);
+				u16 *dest = &bitmap.pix(ydrawpos);
+				u8 *destpri = &priority_bitmap.pix(ydrawpos);
 				draw_sprite_line(wide, dest, destpri, cliprect, xzoom, xgrow, flip, xpos, pri, realxsize, palt, true);
 			}
 			else
@@ -435,8 +435,8 @@ void pgm_state::draw_sprite_new_basic(int wide, int high, int xpos, int ypos, in
 
 		if ((ydrawpos >= cliprect.min_y) && (ydrawpos <= cliprect.max_y))
 		{
-			u16 *dest = &bitmap.pix16(ydrawpos);
-			u8 *destpri = &priority_bitmap.pix8(ydrawpos);
+			u16 *dest = &bitmap.pix(ydrawpos);
+			u8 *destpri = &priority_bitmap.pix(ydrawpos);
 			draw_sprite_line_basic(wide, dest, destpri, cliprect, flip, xpos, pri, realxsize, palt, true);
 		}
 		else

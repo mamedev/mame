@@ -178,7 +178,7 @@ uint32_t c65_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, 
 			if (attr & 0x10) enable_dot = 0;
 
 			//if(cliprect.contains(x, y))
-			bitmap.pix16(y, x) = m_palette->pen(highlight_color + ((enable_dot) ? foreground_color : background_color));
+			bitmap.pix(y, x) = m_palette->pen(highlight_color + ((enable_dot) ? foreground_color : background_color));
 
 
 			//gfx->opaque(bitmap,cliprect,tile,0,0,0,x*8,y*8);

@@ -354,9 +354,9 @@ inline void spg290_ppu_device::argb1555(bitmap_rgb32 &bitmap, const rectangle &c
 	{
 		rgb_t color = rgb_t(pal5bit(argb >> 10), pal5bit(argb >> 5), pal5bit(argb >> 0));
 		if (blend)
-			color = blend_colors(bitmap.pix32(posy, posx), color, blend);
+			color = blend_colors(bitmap.pix(posy, posx), color, blend);
 
-		bitmap.pix32(posy, posx) = color;
+		bitmap.pix(posy, posx) = color;
 	}
 }
 
@@ -366,9 +366,9 @@ inline void spg290_ppu_device::rgb565(bitmap_rgb32 &bitmap, const rectangle &cli
 	{
 		rgb_t color = rgb_t(pal5bit(rgb >> 11), pal6bit(rgb >> 5), pal5bit(rgb >> 0));
 		if (blend)
-			color = blend_colors(bitmap.pix32(posy, posx), color, blend);
+			color = blend_colors(bitmap.pix(posy, posx), color, blend);
 
-		bitmap.pix32(posy, posx) = color;
+		bitmap.pix(posy, posx) = color;
 	}
 }
 

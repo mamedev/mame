@@ -249,35 +249,29 @@ void liberatr_state::get_pens(pen_t *pens)
 
 void liberatr_state::draw_planet(bitmap_rgb32 &bitmap, pen_t *pens)
 {
-	uint8_t latitude;
-
-	uint8_t *buffer = m_planets[m_planet_select].frames[*m_planet_frame];
+	uint8_t const *buffer = m_planets[m_planet_select].frames[*m_planet_frame];
 
 	/* for each latitude */
-	for (latitude = 0; latitude < 0x80; latitude++)
+	for (uint8_t latitude = 0; latitude < 0x80; latitude++)
 	{
-		uint8_t segment;
-
 		/* grab the color value for the base (if any) at this latitude */
-		uint8_t base_color = m_base_ram[latitude >> 3] ^ 0x0f;
+		uint8_t const base_color = m_base_ram[latitude >> 3] ^ 0x0f;
 
-		uint8_t segment_count = *buffer++;
+		uint8_t const segment_count = *buffer++;
 		uint8_t x = *buffer++;
-		uint8_t y = 64 + latitude;
+		uint8_t const y = 64 + latitude;
 
 		/* run through the segments, drawing its color until its x_array value comes up. */
-		for (segment = 0; segment < segment_count; segment++)
+		for (uint8_t segment = 0; segment < segment_count; segment++)
 		{
-			uint8_t i;
-
 			uint8_t color = *buffer++;
 			uint8_t segment_length = *buffer++;
 
 			if ((color & 0x0c) == 0x0c)
 				color = base_color;
 
-			for (i = 0; i < segment_length; i++, x++)
-				bitmap.pix32(y, x) = pens[color];
+			for (uint8_t i = 0; i < segment_length; i++, x++)
+				bitmap.pix(y, x) = pens[color];
 		}
 	}
 }
@@ -285,17 +279,15 @@ void liberatr_state::draw_planet(bitmap_rgb32 &bitmap, pen_t *pens)
 
 void liberatr_state::draw_bitmap(bitmap_rgb32 &bitmap, pen_t *pens)
 {
-	offs_t offs;
-
-	for (offs = 0; offs < 0x10000; offs++)
+	for (offs_t offs = 0; offs < 0x10000; offs++)
 	{
-		uint8_t data = m_videoram[offs];
+		uint8_t const data = m_videoram[offs];
 
-		uint8_t y = offs >> 8;
-		uint8_t x = offs & 0xff;
+		uint8_t const y = offs >> 8;
+		uint8_t const x = offs & 0xff;
 
 		if (data)
-			bitmap.pix32(y, x) = pens[(data >> 5) | 0x10];
+			bitmap.pix(y, x) = pens[(data >> 5) | 0x10];
 	}
 }
 

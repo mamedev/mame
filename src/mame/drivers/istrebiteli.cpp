@@ -45,7 +45,7 @@ protected:
 	virtual void device_start() override;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 	// internal state
@@ -85,11 +85,11 @@ void istrebiteli_sound_device::device_start()
 	m_rom = machine().root_device().memregion("soundrom")->base();
 }
 
-void istrebiteli_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void istrebiteli_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *sample = outputs[0];
+	auto &buffer = outputs[0];
 
-	while (samples-- > 0)
+	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
 	{
 		int smpl = 0;
 		if (m_rom_out_en)
@@ -100,7 +100,7 @@ void istrebiteli_sound_device::sound_stream_update(sound_stream &stream, stream_
 			smpl &= machine().rand() & 1;
 		smpl *= (m_prev_data & 0x80) ? 1000 : 4000; // b7 volume ?
 
-		*sample++ = smpl;
+		buffer.put_int(sampindex, smpl, 32768);
 		m_rom_cnt = (m_rom_cnt + m_rom_incr) & 0x1ff;
 	}
 }

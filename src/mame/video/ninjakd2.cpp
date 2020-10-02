@@ -352,7 +352,7 @@ void ninjakd2_state::erase_sprites( bitmap_ind16 &bitmap)
 		{
 			for (int x = 0; x < m_sprites_bitmap.width(); ++x)
 			{
-				uint16_t* const ptr = &m_sprites_bitmap.pix16(y, x);
+				uint16_t *const ptr = &m_sprites_bitmap.pix(y, x);
 				if ( (*m_stencil_compare_function)(*ptr) ) *ptr = 0xf;
 			}
 		}

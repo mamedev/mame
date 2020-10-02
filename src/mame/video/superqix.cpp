@@ -99,8 +99,8 @@ void superqix_state_base::superqix_bitmapram_w(offs_t offset, uint8_t data)
 
 		m_bitmapram[offset] = data;
 
-		m_fg_bitmap[0]->pix16(y, x)     = data >> 4;
-		m_fg_bitmap[0]->pix16(y, x + 1) = data & 0x0f;
+		m_fg_bitmap[0]->pix(y, x)     = data >> 4;
+		m_fg_bitmap[0]->pix(y, x + 1) = data & 0x0f;
 	}
 }
 
@@ -113,8 +113,8 @@ void superqix_state_base::superqix_bitmapram2_w(offs_t offset, uint8_t data)
 
 		m_bitmapram2[offset] = data;
 
-		m_fg_bitmap[1]->pix16(y, x)     = data >> 4;
-		m_fg_bitmap[1]->pix16(y, x + 1) = data & 0x0f;
+		m_fg_bitmap[1]->pix(y, x)     = data >> 4;
+		m_fg_bitmap[1]->pix(y, x + 1) = data & 0x0f;
 	}
 }
 

@@ -940,7 +940,7 @@ uint32_t pockstat_state::screen_update_pockstat(screen_device &screen, bitmap_rg
 {
 	for (int y = 0; y < 32; y++)
 	{
-		uint32_t *scanline = &bitmap.pix32(y);
+		uint32_t *const scanline = &bitmap.pix(y);
 		for (int x = 0; x < 32; x++)
 		{
 			if (m_lcd_control != 0) // Hack

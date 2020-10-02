@@ -1229,17 +1229,11 @@ s32 aica_device::UpdateSlot(AICA_SLOT *slot)
 	return sample;
 }
 
-void aica_device::DoMasterSamples(int nsamples)
+void aica_device::DoMasterSamples(std::vector<read_stream_view> const &inputs, write_stream_view &bufl, write_stream_view &bufr)
 {
-	stream_sample_t *exts[2];
 	int i;
 
-	stream_sample_t *bufr = m_bufferr;
-	stream_sample_t *bufl = m_bufferl;
-	exts[0] = m_exts0;
-	exts[1] = m_exts1;
-
-	for (int s = 0; s < nsamples; ++s)
+	for (int s = 0; s < bufl.samples(); ++s)
 	{
 		s32 smpl = 0, smpr = 0;
 
@@ -1280,7 +1274,7 @@ void aica_device::DoMasterSamples(int nsamples)
 		{
 			if (EFSDL(i + 16)) // 16,17 for EXTS
 			{
-				m_DSP.EXTS[i] = exts[i][s];
+				m_DSP.EXTS[i] = s16(inputs[i].get(s) * 32767.0);
 				u32 Enc = ((EFPAN(i + 16)) << 0x8) | ((EFSDL(i + 16)) << 0xd);
 				smpl += (m_DSP.EXTS[i] * m_LPANTABLE[Enc]) >> SHIFT;
 				smpr += (m_DSP.EXTS[i] * m_RPANTABLE[Enc]) >> SHIFT;
@@ -1298,8 +1292,8 @@ void aica_device::DoMasterSamples(int nsamples)
 			smpr = clip16(smpr >> 3);
 		}
 
-		*bufl++ = (smpl * m_LPANTABLE[MVOL() << 0xd]) >> SHIFT;
-		*bufr++ = (smpr * m_LPANTABLE[MVOL() << 0xd]) >> SHIFT;
+		bufl.put_int(s, smpl * m_LPANTABLE[MVOL() << 0xd], 32768 << SHIFT);
+		bufr.put_int(s, smpr * m_LPANTABLE[MVOL() << 0xd], 32768 << SHIFT);
 	}
 }
 
@@ -1393,13 +1387,9 @@ int aica_device::IRQCB(void *param)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void aica_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void aica_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	m_bufferl = outputs[0];
-	m_bufferr = outputs[1];
-	m_exts0 = inputs[0];
-	m_exts1 = inputs[1];
-	DoMasterSamples(samples);
+	DoMasterSamples(inputs, outputs[0], outputs[1]);
 }
 
 //-------------------------------------------------
@@ -1418,7 +1408,7 @@ void aica_device::device_start()
 	m_irq_cb.resolve_safe();
 	m_main_irq_cb.resolve_safe();
 
-	m_stream = machine().sound().stream_alloc(*this, 2, 2, (int)m_rate);
+	m_stream = stream_alloc(2, 2, (int)m_rate);
 
 	// save state
 	save_item(NAME(m_udata.data));
@@ -1568,10 +1558,6 @@ aica_device::aica_device(const machine_config &mconfig, const char *tag, device_
 	, m_MidiR(0)
 	, m_mcieb(0)
 	, m_mcipd(0)
-	, m_bufferl(nullptr)
-	, m_bufferr(nullptr)
-	, m_exts0(nullptr)
-	, m_exts1(nullptr)
 
 {
 	memset(&m_udata.data, 0, sizeof(m_udata.data));

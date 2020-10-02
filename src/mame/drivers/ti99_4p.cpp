@@ -302,7 +302,6 @@ void ti99_4p_state::memmap_setaddress(address_map &map)
 void ti99_4p_state::crumap(address_map &map)
 {
 	map(0x0000, 0x1fff).rw(FUNC(ti99_4p_state::cruread), FUNC(ti99_4p_state::cruwrite));
-	map(0x0000, 0x03ff).rw(m_tms9901, FUNC(tms9901_device::read), FUNC(tms9901_device::write));
 }
 
 /*
@@ -692,6 +691,12 @@ WRITE_LINE_MEMBER( ti99_4p_state::datamux_clock_in )
 */
 void ti99_4p_state::cruwrite(offs_t offset, uint8_t data)
 {
+	// Internal 9901
+	// We cannot use the map because device in the Peribox may want to see the
+	// CRU address on the bus (see sidmaster)
+	if ((offset & 0xfc00)==0)
+		m_tms9901->write(offset & 0x3f, data);
+
 	int addroff = offset<<1;
 
 	if ((addroff & 0xff00)==MAP_CRU_BASE)
@@ -717,6 +722,13 @@ void ti99_4p_state::cruwrite(offs_t offset, uint8_t data)
 uint8_t ti99_4p_state::cruread(offs_t offset)
 {
 	uint8_t value = 0;
+
+	// Internal 9901
+	// We cannot use the map because devices in the Peribox may want to see the
+	// CRU address on the bus (see sidmaster)
+	if ((offset & 0xfc00)==0)
+		value = m_tms9901->read(offset & 0x3f);
+
 	m_peribox->crureadz(offset<<1, &value);
 	return value;
 }

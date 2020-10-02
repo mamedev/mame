@@ -87,7 +87,7 @@ void cuda_device::cuda_map(address_map &map)
 
 void cuda_device::device_add_mconfig(machine_config &config)
 {
-	M68HC05EG(config, m_maincpu, XTAL(32'768)*192);   // 32.768 kHz input clock, can be PLL'ed to x128 = 4.1 MHz under s/w control
+	M68HC05EG(config, m_maincpu, XTAL(32'768)*128);   // Intended to run 4.1 MHz, the ADB timings in uS are twice as long as spec at 2.1
 	m_maincpu->set_addrmap(AS_PROGRAM, &cuda_device::cuda_map);
 }
 

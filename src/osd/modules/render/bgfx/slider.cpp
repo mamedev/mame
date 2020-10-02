@@ -54,7 +54,7 @@ void bgfx_slider::import(float val)
 
 std::unique_ptr<slider_state> bgfx_slider::create_core_slider()
 {
-	auto state = make_unique_clear<slider_state>();
+	auto state = std::make_unique<slider_state>();
 
 	state->minval = int32_t(floor(m_min / m_step + 0.5f));
 	state->defval = int32_t(floor(m_default / m_step + 0.5f));

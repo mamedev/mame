@@ -68,9 +68,9 @@ void micro3d_sound_device::lp_filter::init(double fsval)
 	proto_coef[1].b1 = 1.847759;
 	proto_coef[1].b2 = 1.0;
 
-	coef = make_unique_clear<float[]>(4 * 2 + 1);
+	std::fill(std::begin(coef), std::end(coef), 0);
 	fs = fsval;
-	history = make_unique_clear<float[]>(2 * 2);
+	std::fill(std::begin(history), std::end(history), 0);
 }
 
 static void prewarp(double *a0, double *a1, double *a2,double fc, double fs)
@@ -104,7 +104,7 @@ static void bilinear(double a0, double a1, double a2,
 
 void micro3d_sound_device::lp_filter::recompute(double k, double q, double fc)
 {
-	float *c = coef.get() + 1;
+	float *c = &coef[1];
 
 	for (int nInd = 0; nInd < 2; nInd++)
 	{
@@ -182,7 +182,7 @@ micro3d_sound_device::micro3d_sound_device(const machine_config &mconfig, const 
 void micro3d_sound_device::device_start()
 {
 	/* Allocate the stream */
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, machine().sample_rate());
+	m_stream = stream_alloc(0, 2, machine().sample_rate());
 	m_filter.init(machine().sample_rate());
 
 	m_noise_filters[0].configure(2.7e3 + 2.7e3, 1.0e-6);
@@ -209,17 +209,17 @@ void micro3d_sound_device::device_reset()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void micro3d_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void micro3d_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	lp_filter *iir = &m_filter;
 	float pan_l, pan_r;
 
-	stream_sample_t *fl = &outputs[0][0];
-	stream_sample_t *fr = &outputs[1][0];
+	auto &fl = outputs[0];
+	auto &fr = outputs[1];
 
 	/* Clear the buffers */
-	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
-	memset(outputs[1], 0, samples * sizeof(*outputs[1]));
+	fl.fill(0);
+	fr.fill(0);
 
 	if (m_gain == 0)
 		return;
@@ -227,7 +227,7 @@ void micro3d_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 	pan_l = (float)(255 - m_dac[PAN]) / 255.0f;
 	pan_r = (float)(m_dac[PAN]) / 255.0f;
 
-	while (samples--)
+	for (int sampindex = 0; sampindex < fl.samples(); sampindex++)
 	{
 		unsigned int i;
 		float *hist1_ptr,*hist2_ptr,*coef_ptr;
@@ -255,9 +255,9 @@ void micro3d_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 		input += white;
 		input *= 200.0f;
 
-		coef_ptr = iir->coef.get();
+		coef_ptr = &iir->coef[0];
 
-		hist1_ptr = iir->history.get();
+		hist1_ptr = &iir->history[0];
 		hist2_ptr = hist1_ptr + 1;
 
 		/* 1st number of coefficients array is overall input scale factor, * or filter gain */
@@ -279,15 +279,9 @@ void micro3d_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 			hist1_ptr++;
 			hist2_ptr++;
 		}
-		output *= 3.5f;
+		output *= 3.5f / 32768.f;
 
-		/* Clip */
-		if (output > 32767)
-			output = 32767;
-		else if (output < -32768)
-			output  = -32768;
-
-		*fl++ = output * pan_l;
-		*fr++ = output * pan_r;
+		fl.put_clamp(sampindex, output * pan_l, 1.0);
+		fr.put_clamp(sampindex, output * pan_r, 1.0);
 	}
 }

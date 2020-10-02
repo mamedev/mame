@@ -89,12 +89,11 @@ static rgb_t gf4500_get_color_16( uint16_t data )
 
 uint32_t gf4500_device::screen_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint16_t *vram = (uint16_t *)(m_data.get() + GF4500_FRAMEBUF_OFFSET / 4);
-	int x, y;
-	for (y = 0; y < 240; y++)
+	uint16_t const *vram = (uint16_t *)(m_data.get() + GF4500_FRAMEBUF_OFFSET / 4);
+	for (int y = 0; y < 240; y++)
 	{
-		uint32_t *scanline = &bitmap.pix32(y);
-		for (x = 0; x < 320; x++)
+		uint32_t *scanline = &bitmap.pix(y);
+		for (int x = 0; x < 320; x++)
 		{
 			*scanline++ = gf4500_get_color_16(*vram++);
 		}

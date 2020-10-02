@@ -16,7 +16,6 @@
  */
 
 #include "nl_base.h"
-#include "nld_log.h"
 #include "plib/pfmtlog.h"
 #include "plib/pmulti_threading.h"
 #include "plib/pstream.h"
@@ -117,8 +116,8 @@ namespace netlist
 			netlist_time_ext t;
 			nl_fptype v;
 		};
-		static const std::size_t BUF_SIZE=16384;
-		static const std::size_t BUFFERS=4;
+		static constexpr std::size_t BUF_SIZE=16384;
+		static constexpr std::size_t BUFFERS=4;
 		analog_input_t m_I;
 		plib::ofstream m_strm;
 		plib::putf8_writer m_writer;

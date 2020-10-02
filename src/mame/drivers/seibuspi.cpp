@@ -1778,6 +1778,12 @@ MACHINE_RESET_MEMBER(seibuspi_state,spi)
 	m_z80_bank->set_entry(0);
 	m_z80_lastbank = 0;
 	m_z80_prg_transfer_pos = 0;
+
+	// fix the magic ID byte so users can't "brick" the machine
+	if (m_soundflash1 && m_soundflash1_region)
+	{
+		m_soundflash1->write_raw(0, m_soundflash1_region[0]);
+	}
 }
 
 void seibuspi_state::spi(machine_config &config)

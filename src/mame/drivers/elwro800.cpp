@@ -48,7 +48,7 @@ public:
 		m_bank2(*this, "bank2"),
 		m_io_ports(*this, {"LINE7", "LINE6", "LINE5", "LINE4", "LINE3", "LINE2", "LINE1", "LINE0", "LINE8"}),
 		m_io_line9(*this, "LINE9"),
-		m_io_network_id(*this, "NETWORK ID")
+		m_io_network_id(*this, "NETWORK_ID")
 	{
 	}
 
@@ -499,7 +499,7 @@ static INPUT_PORTS_START( elwro800 )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P1 Joystick Up") PORT_CODE(JOYCODE_Y_UP_SWITCH)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P1 Joystick Fire") PORT_CODE(JOYCODE_BUTTON1)
 
-	PORT_START("NETWORK ID")
+	PORT_START("NETWORK_ID")
 	PORT_DIPNAME( 0x3f, 0x01, "Computer network ID" )
 	PORT_DIPSETTING( 0x01, "1" )
 	PORT_DIPSETTING( 0x10, "16" )

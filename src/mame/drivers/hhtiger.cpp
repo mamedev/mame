@@ -184,18 +184,18 @@ GFXDECODE_END
 UPD7220_DISPLAY_PIXELS_MEMBER(hhtiger_state::display_pixels)
 {
 	/* 96KB video RAM (32KB green + 32KB red + 32KB blue) */
-	uint16_t green = m_video_ram[(0x00000 + (address & 0x7fff)) >> 1];
-	uint16_t red   = m_video_ram[(0x08000 + (address & 0x7fff)) >> 1];
-	uint16_t blue  = m_video_ram[(0x10000 + (address & 0x7fff)) >> 1];
+	uint16_t const green = m_video_ram[(0x00000 + (address & 0x7fff)) >> 1];
+	uint16_t const red   = m_video_ram[(0x08000 + (address & 0x7fff)) >> 1];
+	uint16_t const blue  = m_video_ram[(0x10000 + (address & 0x7fff)) >> 1];
 
 	for (int xi = 0; xi<16; xi++)
 	{
-		int r = ((red   >> xi) & 1) ? 255 : 0;
-		int g = ((green >> xi) & 1) ? 255 : 0;
-		int b = ((blue  >> xi) & 1) ? 255 : 0;
+		int const r = BIT(red,   xi) ? 255 : 0;
+		int const g = BIT(green, xi) ? 255 : 0;
+		int const b = BIT(blue,  xi) ? 255 : 0;
 
 		if (bitmap.cliprect().contains(x + xi, y))
-			bitmap.pix32(y, x + xi) = rgb_t(r, g, b);
+			bitmap.pix(y, x + xi) = rgb_t(r, g, b);
 	}
 }
 
@@ -226,7 +226,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER(hhtiger_state::draw_text)
 					pen = 0;
 
 				if (!m_screen->visible_area().contains(res_x, res_y))
-					bitmap.pix32(res_y, res_x) = palette[pen];
+					bitmap.pix(res_y, res_x) = palette[pen];
 			}
 		}
 	}

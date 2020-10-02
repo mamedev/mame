@@ -151,18 +151,17 @@ void esripsys_state::video_start()
 
 uint32_t esripsys_state::screen_update_esripsys(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	struct line_buffer_t *line_buffer = m_line_buffer;
-	int x, y;
+	struct line_buffer_t *const line_buffer = m_line_buffer;
 
-	uint8_t *colour_buf = line_buffer[m_12sel ? 0 : 1].colour_buf.get();
-	uint8_t *intensity_buf = line_buffer[m_12sel ? 0 : 1].intensity_buf.get();
-	uint8_t *priority_buf = line_buffer[m_12sel ? 0 : 1].priority_buf.get();
+	uint8_t *const colour_buf = line_buffer[m_12sel ? 0 : 1].colour_buf.get();
+	uint8_t *const intensity_buf = line_buffer[m_12sel ? 0 : 1].intensity_buf.get();
+	uint8_t *const priority_buf = line_buffer[m_12sel ? 0 : 1].priority_buf.get();
 
-	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		uint32_t *dest = &bitmap.pix32(y, cliprect.min_x);
+		uint32_t *dest = &bitmap.pix(y, cliprect.min_x);
 
-		for (x = 0; x < 512; ++x)
+		for (int x = 0; x < 512; ++x)
 		{
 			int idx = colour_buf[x];
 			int r = (m_pal_ram[idx] & 0xf);

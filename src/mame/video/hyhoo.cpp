@@ -67,18 +67,11 @@ void hyhoo_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 
 void hyhoo_state::hyhoo_gfxdraw()
 {
-	uint8_t *GFX = memregion("gfx1")->base();
+	uint8_t const *const GFX = memregion("gfx1")->base();
 
-	int x, y;
-	int dx1, dx2, dy;
 	int startx, starty;
 	int sizex, sizey;
 	int skipx, skipy;
-	int ctrx, ctry;
-	int gfxaddr, gfxlen;
-	uint8_t color, color1, color2;
-	int r, g, b;
-	pen_t pen;
 
 	m_nb1413m3->m_busyctr = 0;
 
@@ -109,12 +102,12 @@ void hyhoo_state::hyhoo_gfxdraw()
 		skipy = -1;
 	}
 
-	gfxlen = memregion("gfx1")->bytes();
-	gfxaddr = (m_gfxrom << 17) + (m_blitter_src_addr << 1);
+	int const gfxlen = memregion("gfx1")->bytes();
+	int gfxaddr = (m_gfxrom << 17) + (m_blitter_src_addr << 1);
 
-	for (y = starty, ctry = sizey; ctry >= 0; y += skipy, ctry--)
+	for (int y = starty, ctry = sizey; ctry >= 0; y += skipy, ctry--)
 	{
-		for (x = startx, ctrx = sizex; ctrx >= 0; x += skipx, ctrx--)
+		for (int x = startx, ctrx = sizex; ctrx >= 0; x += skipx, ctrx--)
 		{
 			if ((gfxaddr > (gfxlen - 1)))
 			{
@@ -124,11 +117,11 @@ void hyhoo_state::hyhoo_gfxdraw()
 				gfxaddr = 0;
 			}
 
-			color = GFX[gfxaddr++];
+			uint8_t color = GFX[gfxaddr++];
 
-			dx1 = (2 * x + 0) & 0x1ff;
-			dx2 = (2 * x + 1) & 0x1ff;
-			dy = y & 0xff;
+			int dx1 = (2 * x + 0) & 0x1ff;
+			int dx2 = (2 * x + 1) & 0x1ff;
+			int dy = y & 0xff;
 
 			if (m_highcolorflag & 0x04)
 			{
@@ -143,14 +136,14 @@ void hyhoo_state::hyhoo_gfxdraw()
 						// src xxxxxxxx_bbbggrrr
 						// dst xxbbbxxx_ggxxxrrr
 
-						r = ((color & 0x07) >> 0) & 0x07;
-						g = ((color & 0x18) >> 3) & 0x03;
-						b = ((color & 0xe0) >> 5) & 0x07;
+						int r = ((color & 0x07) >> 0) & 0x07;
+						int g = ((color & 0x18) >> 3) & 0x03;
+						int b = ((color & 0xe0) >> 5) & 0x07;
 
-						pen = rgb_t(pal6bit(r), pal5bit(g), pal5bit(b));
+						pen_t pen = rgb_t(pal6bit(r), pal5bit(g), pal5bit(b));
 
-						m_tmpbitmap.pix32(dy, dx1) = m_tmpbitmap.pix32(dy, dx1) | pen;
-						m_tmpbitmap.pix32(dy, dx2) = m_tmpbitmap.pix32(dy, dx2) | pen;
+						m_tmpbitmap.pix(dy, dx1) |= pen;
+						m_tmpbitmap.pix(dy, dx2) |= pen;
 					}
 					else
 					{
@@ -159,20 +152,21 @@ void hyhoo_state::hyhoo_gfxdraw()
 						// src xxxxxxxx_bbgggrrr
 						// dst bbxxxggg_xxrrrxxx
 
-						r = ((color & 0x07) >> 0) & 0x07;
-						g = ((color & 0x38) >> 3) & 0x07;
-						b = ((color & 0xc0) >> 6) & 0x03;
+						int r = ((color & 0x07) >> 0) & 0x07;
+						int g = ((color & 0x38) >> 3) & 0x07;
+						int b = ((color & 0xc0) >> 6) & 0x03;
 
-						pen = rgb_t(pal6bit(r << 3), pal5bit(g << 2), pal5bit(b << 3));
+						pen_t pen = rgb_t(pal6bit(r << 3), pal5bit(g << 2), pal5bit(b << 3));
 
-						m_tmpbitmap.pix32(dy, dx1) = pen;
-						m_tmpbitmap.pix32(dy, dx2) = pen;
+						m_tmpbitmap.pix(dy, dx1) = pen;
+						m_tmpbitmap.pix(dy, dx2) = pen;
 					}
 				}
 			}
 			else
 			{
 				// lookup table mode
+				uint8_t color1, color2;
 
 				if (m_blitter_direction_x)
 				{
@@ -192,13 +186,13 @@ void hyhoo_state::hyhoo_gfxdraw()
 					// src xxxxxxxx_bbgggrrr
 					// dst bbxxxggg_xxrrrxxx
 
-					r = ((~m_clut[color1] & 0x07) >> 0) & 0x07;
-					g = ((~m_clut[color1] & 0x38) >> 3) & 0x07;
-					b = ((~m_clut[color1] & 0xc0) >> 6) & 0x03;
+					int r = ((~m_clut[color1] & 0x07) >> 0) & 0x07;
+					int g = ((~m_clut[color1] & 0x38) >> 3) & 0x07;
+					int b = ((~m_clut[color1] & 0xc0) >> 6) & 0x03;
 
-					pen = rgb_t(pal6bit(r << 3), pal5bit(g << 2), pal5bit(b << 3));
+					pen_t pen = rgb_t(pal6bit(r << 3), pal5bit(g << 2), pal5bit(b << 3));
 
-					m_tmpbitmap.pix32(dy, dx1) = pen;
+					m_tmpbitmap.pix(dy, dx1) = pen;
 				}
 
 				if (m_clut[color2])
@@ -206,13 +200,13 @@ void hyhoo_state::hyhoo_gfxdraw()
 					// src xxxxxxxx_bbgggrrr
 					// dst bbxxxggg_xxrrrxxx
 
-					r = ((~m_clut[color2] & 0x07) >> 0) & 0x07;
-					g = ((~m_clut[color2] & 0x38) >> 3) & 0x07;
-					b = ((~m_clut[color2] & 0xc0) >> 6) & 0x03;
+					int r = ((~m_clut[color2] & 0x07) >> 0) & 0x07;
+					int g = ((~m_clut[color2] & 0x38) >> 3) & 0x07;
+					int b = ((~m_clut[color2] & 0xc0) >> 6) & 0x03;
 
-					pen = rgb_t(pal6bit(r << 3), pal5bit(g << 2), pal5bit(b << 3));
+					pen_t pen = rgb_t(pal6bit(r << 3), pal5bit(g << 2), pal5bit(b << 3));
 
-					m_tmpbitmap.pix32(dy, dx2) = pen;
+					m_tmpbitmap.pix(dy, dx2) = pen;
 				}
 			}
 

@@ -27,18 +27,18 @@ license:CC0
 		<screen index="0">
 			<bounds x="61" y="0" width="1024" height="768" />
 		</screen>
-		<bezel name="drive0_led" element="driveled">
+		<element name="drive0_led" ref="driveled">
 			<bounds x="15" y="3" width="10" height="10" />
-		</bezel>
-		<bezel name="drive1_led" element="driveled">
+		</element>
+		<element name="drive1_led" ref="driveled">
 			<bounds x="15" y="18" width="10" height="10" />
-		</bezel>
-			<bezel name="label20" element="DRIVE0">
+		</element>
+			<element name="label20" ref="DRIVE0">
 			<bounds x="0" y="0" width="15" height="16" />
-		</bezel>
-		<bezel name="label21" element="DRIVE1">
+		</element>
+		<element name="label21" ref="DRIVE1">
 			<bounds x="0" y="14" width="15" height="16" />
-		</bezel>
+		</element>
 
 	</view>
 </mamelayout>

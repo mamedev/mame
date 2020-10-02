@@ -1310,7 +1310,7 @@ void halleys_state::copy_scroll_op(bitmap_ind16 &bitmap, uint16_t *source, int s
 
 	// draw top split
 	for (int y=0; y != bch; y++) {
-		uint16_t *dest = &bitmap.pix16(VIS_MINY + y, VIS_MINX);
+		uint16_t *dest = &bitmap.pix(VIS_MINY + y, VIS_MINX);
 		memcpy(dest, src+sx, 2*rcw);
 		memcpy(dest + rcw, src, 2*(CLIP_W - rcw));
 		src += SCREEN_WIDTH;
@@ -1320,7 +1320,7 @@ void halleys_state::copy_scroll_op(bitmap_ind16 &bitmap, uint16_t *source, int s
 
 	// draw bottom split
 	for (int y = bch; y != CLIP_H; y++) {
-		uint16_t *dest = &bitmap.pix16(VIS_MINY + y, VIS_MINX);
+		uint16_t *dest = &bitmap.pix(VIS_MINY + y, VIS_MINX);
 		memcpy(dest, src+sx, 2*rcw);
 		memcpy(dest + rcw, src, 2*(CLIP_W - rcw));
 		src += SCREEN_WIDTH;
@@ -1345,7 +1345,7 @@ void halleys_state::copy_scroll_xp(bitmap_ind16 &bitmap, uint16_t *source, int s
 
 	// draw top split
 	for (int y=0; y != bch; y++)  {
-		uint16_t *dest = &bitmap.pix16(VIS_MINY + y, VIS_MINX);
+		uint16_t *dest = &bitmap.pix(VIS_MINY + y, VIS_MINX);
 		const uint16_t *src = src_base + sx;
 		for(int x=0; x != rcw; x++) {
 			uint16_t pixel = *src++;
@@ -1370,7 +1370,7 @@ void halleys_state::copy_scroll_xp(bitmap_ind16 &bitmap, uint16_t *source, int s
 
 	// draw bottom split
 	for (int y = bch; y != CLIP_H; y++) {
-		uint16_t *dest = &bitmap.pix16(VIS_MINY + y, VIS_MINX);
+		uint16_t *dest = &bitmap.pix(VIS_MINY + y, VIS_MINX);
 		const uint16_t *src = src_base + sx;
 		for(int x=0; x != rcw; x++) {
 			uint16_t pixel = *src++;
@@ -1398,7 +1398,7 @@ void halleys_state::copy_fixed_xp(bitmap_ind16 &bitmap, uint16_t *source)
 {
 	uint16_t *src = source + CLIP_SKIP;
 	for(int y=0; y != CLIP_H; y++) {
-		uint16_t *dest = &bitmap.pix16(VIS_MINY + y, VIS_MINX);
+		uint16_t *dest = &bitmap.pix(VIS_MINY + y, VIS_MINX);
 		for(int x=0; x != CLIP_W; x++) {
 			uint16_t pixel = src[x];
 
@@ -1414,7 +1414,7 @@ void halleys_state::copy_fixed_2b(bitmap_ind16 &bitmap, uint16_t *source)
 {
 	uint16_t *src = source + CLIP_SKIP;
 	for(int y=0; y != CLIP_H; y++) {
-		uint16_t *dest = &bitmap.pix16(VIS_MINY + y, VIS_MINX);
+		uint16_t *dest = &bitmap.pix(VIS_MINY + y, VIS_MINX);
 		for(int x=0; x != CLIP_W; x++) {
 			uint16_t pixel = src[x];
 
@@ -1436,7 +1436,7 @@ void halleys_state::filter_bitmap(bitmap_ind16 &bitmap, int mask)
 
 	pal_ptr = m_internal_palette.get();
 	esi = mask | 0xffffff00;
-	edi = (uint32_t*)&bitmap.pix16(VIS_MINY, VIS_MINX + CLIP_W);
+	edi = (uint32_t*)&bitmap.pix(VIS_MINY, VIS_MINX + CLIP_W);
 	dst_pitch = bitmap.rowpixels() >> 1;
 	ecx = -(CLIP_W>>1);
 	edx = CLIP_H;

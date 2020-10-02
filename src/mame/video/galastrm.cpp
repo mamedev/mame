@@ -209,7 +209,7 @@ void galastrm_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 
 void galastrm_renderer::tc0610_draw_scanline(s32 scanline, const extent_t& extent, const gs_poly_data& object, int threadid)
 {
-	u16 *framebuffer = &m_screenbits.pix16(scanline);
+	u16 *const framebuffer = &m_screenbits.pix(scanline);
 	const s32 dudx = extent.param[0].dpdx;
 	const s32 dvdx = extent.param[1].dpdx;
 
@@ -217,7 +217,7 @@ void galastrm_renderer::tc0610_draw_scanline(s32 scanline, const extent_t& exten
 	s32 v = extent.param[1].start;
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
-		framebuffer[x] = object.texbase->pix16(v >> 16, u >> 16);
+		framebuffer[x] = object.texbase->pix(v >> 16, u >> 16);
 		u += dudx;
 		v += dvdx;
 	}
@@ -466,8 +466,8 @@ u32 galastrm_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 		{
 			for (int x = 0; x < priority_bitmap.width; x++)
 			{
-				u8 *pri = &priority_bitmap.pix8(y, x);
-				if (!(*pri & 0x02) && m_tmpbitmaps.pix16(y, x))
+				u8 *pri = &priority_bitmap.pix(y, x);
+				if (!(*pri & 0x02) && m_tmpbitmaps.pix(y, x))
 						*pri |= 0x04;
 			}
 		}
@@ -510,8 +510,8 @@ u32 galastrm_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 		{
 			for (int x=0; x < priority_bitmap.width(); x++)
 			{
-				u8 *pri = &priority_bitmap.pix8(y, x);
-				if (!(*pri & 0x02) && m_tmpbitmaps.pix16(y, x))
+				u8 *pri = &priority_bitmap.pix(y, x);
+				if (!(*pri & 0x02) && m_tmpbitmaps.pix(y, x))
 					*pri |= 0x04;
 			}
 		}

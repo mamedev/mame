@@ -717,23 +717,24 @@ INPUT_PORTS_END
 
 uint32_t ibm6580_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y,ra,gfx,fg,bg,chr,attr;
-	uint16_t sy=0,ma=25,x,ca;
+	uint16_t sy=0,ma=25;
 
-	fg = 1; bg = 0;
+	uint8_t fg = 1, bg = 0;
 
-	for (y = 0; y < 25; y++)
+	for (uint8_t y = 0; y < 25; y++)
 	{
-		for (ra = 0; ra < 16; ra++)
+		for (uint8_t ra = 0; ra < 16; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix(sy++);
 
-			// graphics mode
-			if (m_p_videoram[ma] & 0x100) {
-				for (x = ma; x < ma + 80; x++)
+			if (m_p_videoram[ma] & 0x100)
+			{
+				// graphics mode
+				for (uint16_t x = ma; x < ma + 80; x++)
 				{
-					chr = m_p_videoram[x];
-					attr = m_p_videoram[x] >> 8;
+					uint8_t const chr = m_p_videoram[x];
+					uint8_t const attr = m_p_videoram[x] >> 8;
+					uint8_t gfx;
 
 					switch (ra >> 1)
 					{
@@ -764,13 +765,16 @@ uint32_t ibm6580_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 						*p++ = BIT(gfx, i) ? fg : bg;
 					}
 				}
-			} else {
-			// text mode
-				for (x = ma; x < ma + 80; x++)
+			}
+			else
+			{
+				// text mode
+				for (uint16_t x = ma; x < ma + 80; x++)
 				{
-					chr = m_p_videoram[x];
-					attr = m_p_videoram[x] >> 8;
-					ca = (chr<<4);
+					uint8_t const chr = m_p_videoram[x];
+					uint8_t const attr = m_p_videoram[x] >> 8;
+					uint16_t ca = (chr<<4);
+					uint8_t gfx;
 
 					// font 2
 					if (attr & 0x02)

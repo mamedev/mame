@@ -209,8 +209,8 @@ void madalien_state::draw_headlight(bitmap_ind16 &bitmap, const rectangle &clipr
 				if ((hx < cliprect.left()) || (hx > cliprect.right()))
 					continue;
 
-				if (m_headlight_bitmap->pix16(y, x) != 0)
-					bitmap.pix16(hy, hx) |= 8;
+				if (m_headlight_bitmap->pix(y, x) != 0)
+					bitmap.pix(hy, hx) |= 8;
 			}
 		}
 	}
@@ -277,7 +277,7 @@ uint32_t madalien_state::screen_update_madalien(screen_device &screen, bitmap_in
 		for (y = cliprect.top(); y <= cliprect.bottom(); y++)
 			for (x = min_x; x <= max_x; x++)
 				if ((x >= cliprect.left()) && (x <= cliprect.right()))
-					bitmap.pix16(y, x) |= 8;
+					bitmap.pix(y, x) |= 8;
 	}
 
 	draw_headlight(bitmap, cliprect, flip);

@@ -312,7 +312,7 @@ void laserdisc_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 //  laserdiscs
 //-------------------------------------------------
 
-void laserdisc_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void laserdisc_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	// compute AND values based on the squelch
 	int16_t leftand = (m_audiosquelch & 1) ? 0x0000 : 0xffff;
@@ -324,12 +324,12 @@ void laserdisc_device::sound_stream_update(sound_stream &stream, stream_sample_t
 		samples_avail += m_audiobufsize;
 
 	// if no attached ld, just clear the buffers
-	stream_sample_t *dst0 = outputs[0];
-	stream_sample_t *dst1 = outputs[1];
-	if (samples_avail < samples)
+	auto &dst0 = outputs[0];
+	auto &dst1 = outputs[1];
+	if (samples_avail < outputs[0].samples())
 	{
-		memset(dst0, 0, samples * sizeof(dst0[0]));
-		memset(dst1, 0, samples * sizeof(dst1[0]));
+		dst0.fill(0);
+		dst1.fill(0);
 	}
 
 	// otherwise, stream from our buffer
@@ -340,10 +340,11 @@ void laserdisc_device::sound_stream_update(sound_stream &stream, stream_sample_t
 		int sampout = m_audiobufout;
 
 		// copy samples, clearing behind us as we go
-		while (sampout != m_audiobufin && samples-- > 0)
+		int sampindex;
+		for (sampindex = 0; sampout != m_audiobufin && sampindex < outputs[0].samples(); sampindex++)
 		{
-			*dst0++ = buffer0[sampout] & leftand;
-			*dst1++ = buffer1[sampout] & rightand;
+			dst0.put_int(sampindex, buffer0[sampout] & leftand, 32768);
+			dst1.put_int(sampindex, buffer1[sampout] & rightand, 32768);
 			buffer0[sampout] = 0;
 			buffer1[sampout] = 0;
 			sampout++;
@@ -353,16 +354,16 @@ void laserdisc_device::sound_stream_update(sound_stream &stream, stream_sample_t
 		m_audiobufout = sampout;
 
 		// clear out the rest of the buffer
-		if (samples > 0)
+		if (sampindex < outputs[0].samples())
 		{
 			sampout = (m_audiobufout == 0) ? m_audiobufsize - 1 : m_audiobufout - 1;
-			stream_sample_t fill0 = buffer0[sampout] & leftand;
-			stream_sample_t fill1 = buffer1[sampout] & rightand;
+			s32 fill0 = buffer0[sampout] & leftand;
+			s32 fill1 = buffer1[sampout] & rightand;
 
-			while (samples-- > 0)
+			for ( ; sampindex < outputs[0].samples(); sampindex++)
 			{
-				*dst0++ = fill0;
-				*dst1++ = fill1;
+				dst0.put_int(sampindex, fill0, 32768);
+				dst1.put_int(sampindex, fill1, 32768);
 			}
 		}
 	}
@@ -712,10 +713,10 @@ void laserdisc_device::init_video()
 		fillbitmap_yuy16(frame.m_bitmap, 40, 109, 240);
 
 		// make a copy of the bitmap that clips out the VBI and horizontal blanking areas
-		frame.m_visbitmap.wrap(&frame.m_bitmap.pix16(44, frame.m_bitmap.width() * 8 / 720),
-								frame.m_bitmap.width() - 2 * frame.m_bitmap.width() * 8 / 720,
-								frame.m_bitmap.height() - 44,
-								frame.m_bitmap.rowpixels());
+		frame.m_visbitmap.wrap(&frame.m_bitmap.pix(
+					44, frame.m_bitmap.width() * 8 / 720),
+					frame.m_bitmap.width() - 2 * frame.m_bitmap.width() * 8 / 720, frame.m_bitmap.height() - 44,
+					frame.m_bitmap.rowpixels());
 		frame.m_visbitmap.set_palette(m_videopalette);
 	}
 
@@ -789,7 +790,7 @@ void laserdisc_device::fillbitmap_yuy16(bitmap_yuy16 &bitmap, uint8_t yval, uint
 	// write 32 bits of color (2 pixels at a time)
 	for (int y = 0; y < bitmap.height(); y++)
 	{
-		uint16_t *dest = &bitmap.pix16(y);
+		uint16_t *dest = &bitmap.pix(y);
 		for (int x = 0; x < bitmap.width() / 2; x++)
 		{
 			*dest++ = color0;
@@ -918,7 +919,8 @@ void laserdisc_device::read_track_data()
 	frame->m_lastfield = m_curtrack * 2 + m_fieldnum;
 
 	// set the video target information
-	m_avhuff_config.video.wrap(&frame->m_bitmap.pix16(m_fieldnum), frame->m_bitmap.width(), frame->m_bitmap.height() / 2, frame->m_bitmap.rowpixels() * 2);
+	m_avhuff_video.wrap(&frame->m_bitmap.pix(m_fieldnum), frame->m_bitmap.width(), frame->m_bitmap.height() / 2, frame->m_bitmap.rowpixels() * 2);
+	m_avhuff_config.video = &m_avhuff_video;
 
 	// set the audio target information
 	if (m_audiobufin + m_audiomaxsamples <= m_audiobufsize)
@@ -995,13 +997,13 @@ void laserdisc_device::process_track_data()
 
 	// remove the video if we had an error
 	if (m_readresult != CHDERR_NONE)
-		m_avhuff_config.video.reset();
+		m_avhuff_video.reset();
 
 	// count the field as read if we are successful
-	if (m_avhuff_config.video.valid())
+	if (m_avhuff_video.valid())
 	{
 		m_frame[m_videoindex].m_numfields++;
-		player_overlay(m_avhuff_config.video);
+		player_overlay(m_avhuff_video);
 	}
 
 	// pass the audio to the callback

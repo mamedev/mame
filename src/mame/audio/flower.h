@@ -39,7 +39,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual space_config_vector memory_space_config() const override;
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	address_space *m_iospace;
 private:
@@ -50,9 +50,9 @@ private:
 	static constexpr unsigned MAX_VOICES = 8;
 	static constexpr int defgain = 48;
 
-	std::unique_ptr<int16_t[]> m_mixer_table;
+	std::vector<int16_t> m_mixer_table;
 	int16_t *m_mixer_lookup;
-	std::unique_ptr<short[]> m_mixer_buffer;
+	std::vector<short> m_mixer_buffer;
 
 	struct fl_sound_channel
 	{

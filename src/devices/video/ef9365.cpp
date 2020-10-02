@@ -51,10 +51,6 @@
         for this chip. So i add the interrupt line support, but
         bug(s) is possible.
 
-    The needed charset file charset_ef9365.rom (CRC 8d3053be) is available
-    there : http://hxc2001.free.fr/Squale/rom/charset_ef9365.zip
-    This ROM charset is into the EF9365/EF9366.
-
     To see how to use this driver, have a look to the Squale machine
     driver (squale.cpp).
     If you have any question, don't hesitate to contact me at the email
@@ -1160,18 +1156,15 @@ void ef9365_device::ef9365_exec(uint8_t cmd)
 
 uint32_t ef9365_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int i,j,ptr,p;
-	unsigned char color_index;
-
-	for(j=0;j<bitplane_yres;j++)
+	for(int j=0;j<bitplane_yres;j++)
 	{
-		for(i=0;i<bitplane_xres;i++)
+		for(int i=0;i<bitplane_xres;i++)
 		{
-			color_index = 0x00;
+			unsigned char color_index = 0x00;
 
-			ptr = ( bitplane_xres * j ) + i;
+			int ptr = ( bitplane_xres * j ) + i;
 
-			for( p = 0; p < nb_of_bitplanes; p++)
+			for(int p = 0; p < nb_of_bitplanes; p++)
 			{
 				if( m_videoram->read_byte( (BITPLANE_MAX_SIZE*p) + (ptr>>3)) & (0x80>>(ptr&7)))
 				{
@@ -1179,7 +1172,7 @@ uint32_t ef9365_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 				}
 			}
 
-			m_screen_out.pix32(j, i) = m_palette->pen( color_index );
+			m_screen_out.pix(j, i) = m_palette->pen( color_index );
 		}
 	}
 

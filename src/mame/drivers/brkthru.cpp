@@ -208,7 +208,7 @@ void brkthru_state::brkthru_map(address_map &map)
 	map(0x1800, 0x1800).portr("P1");
 	map(0x1801, 0x1801).portr("P2");
 	map(0x1802, 0x1802).portr("DSW1");
-	map(0x1803, 0x1803).portr("DSW2/COIN");
+	map(0x1803, 0x1803).portr("DSW2_COIN");
 	map(0x1800, 0x1801).w(FUNC(brkthru_state::brkthru_1800_w));   /* bg scroll and color, ROM bank selection, flip screen */
 	map(0x1802, 0x1802).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x1803, 0x1803).w(FUNC(brkthru_state::brkthru_1803_w));   /* NMI enable, + ? */
@@ -227,7 +227,7 @@ void brkthru_state::darwin_map(address_map &map)
 	map(0x0800, 0x0800).portr("P1");
 	map(0x0801, 0x0801).portr("P2");
 	map(0x0802, 0x0802).portr("DSW1");
-	map(0x0803, 0x0803).portr("DSW2/COIN");
+	map(0x0803, 0x0803).portr("DSW2_COIN");
 	map(0x0800, 0x0801).w(FUNC(brkthru_state::brkthru_1800_w));     /* bg scroll and color, ROM bank selection, flip screen */
 	map(0x0802, 0x0802).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x0803, 0x0803).w(FUNC(brkthru_state::darwin_0803_w));     /* NMI enable, + ? */
@@ -297,7 +297,7 @@ static INPUT_PORTS_START( brkthru )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
-	PORT_START("DSW2/COIN")
+	PORT_START("DSW2_COIN")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x02, "2" )
 	PORT_DIPSETTING(    0x03, "3" )
@@ -324,7 +324,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( brkthruj )
 	PORT_INCLUDE( brkthru )
 
-	PORT_MODIFY("DSW2/COIN")
+	PORT_MODIFY("DSW2_COIN")
 	PORT_SERVICE_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW2:5" )
 INPUT_PORTS_END
 
@@ -341,7 +341,7 @@ static INPUT_PORTS_START( darwin )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW1:8" )   /* Manual says must be OFF */
 
-	PORT_MODIFY("DSW2/COIN")    /* modified by Shingo Suzuki 1999/11/02 */
+	PORT_MODIFY("DSW2_COIN")    /* modified by Shingo Suzuki 1999/11/02 */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
