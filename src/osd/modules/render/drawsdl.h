@@ -10,10 +10,10 @@
 //
 //============================================================
 
-#pragma once
+#ifndef MAME_OSD_MODULES_RENDER_DRAWSDL_H
+#define MAME_OSD_MODULES_RENDER_DRAWSDL_H
 
-#ifndef __DRAWSDL1__
-#define __DRAWSDL1__
+#pragma once
 
 #include <SDL2/SDL.h>
 
@@ -26,8 +26,8 @@ public:
 		: osd_renderer(w,  FLAG_NEEDS_OPENGL | extra_flags)
 		, m_sdl_renderer(nullptr)
 		, m_texture_id(nullptr)
-		, m_yuv_lookup(nullptr)
-		, m_yuv_bitmap(nullptr)
+		, m_yuv_lookup()
+		, m_yuv_bitmap()
 		//, m_hw_scale_width(0)
 		//, m_hw_scale_height(0)
 		, m_last_hofs(0)
@@ -61,8 +61,8 @@ private:
 	SDL_Texture         *m_texture_id;
 
 	// YUV overlay
-	uint32_t              *m_yuv_lookup;
-	uint16_t              *m_yuv_bitmap;
+	std::unique_ptr<uint32_t []> m_yuv_lookup;
+	std::unique_ptr<uint16_t []> m_yuv_bitmap;
 
 	// if we leave scaling to SDL and the underlying driver, this
 	// is the render_target_width/height to use
@@ -85,4 +85,4 @@ struct sdl_scale_mode
 	void            (*yuv_blit)(const uint16_t *bitmap, uint8_t *ptr, const int pitch, const uint32_t *lookup, const int width, const int height);
 };
 
-#endif // __DRAWSDL1__
+#endif // MAME_OSD_MODULES_RENDER_DRAWSDL_H

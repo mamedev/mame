@@ -202,7 +202,7 @@ public:
 				if (m_tail == &toreplace)
 					m_tail = &object;
 				object.m_next = toreplace.m_next;
-				global_free(&toreplace);
+				delete &toreplace;
 				return object;
 			}
 		return append(object);
@@ -253,7 +253,7 @@ public:
 	// remove the given object and free its memory
 	void remove(ElementType &object) noexcept
 	{
-		global_free(&detach(object));
+		delete &detach(object);
 	}
 
 	// find an object by index in the list
@@ -305,7 +305,7 @@ public:
 	{
 		ItemType *result = m_freelist.detach_head();
 		if (result == nullptr)
-			result = global_alloc(ItemType);
+			result = new ItemType;
 		return result;
 	}
 

@@ -337,7 +337,7 @@ int netdev_tap::recv_dev(uint8_t **buf)
 
 static CREATE_NETDEV(create_tap)
 {
-	auto *dev = global_alloc(netdev_tap(ifname, ifdev, rate));
+	auto *dev = new netdev_tap(ifname, ifdev, rate);
 	return dynamic_cast<osd_netdev *>(dev);
 }
 

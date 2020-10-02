@@ -411,8 +411,8 @@ private:
 	// a scaled_texture contains a single scaled entry for a texture
 	struct scaled_texture
 	{
-		bitmap_argb32 *     bitmap;                 // final bitmap
-		u32                 seqid;                  // sequence number
+		std::unique_ptr<bitmap_argb32>  bitmap;     // final bitmap
+		u32                             seqid;      // sequence number
 	};
 
 	// internal state
@@ -1192,8 +1192,7 @@ public:
 	void texture_free(render_texture *texture);
 
 	// fonts
-	render_font *font_alloc(const char *filename = nullptr);
-	void font_free(render_font *font);
+	std::unique_ptr<render_font> font_alloc(const char *filename = nullptr);
 
 	// reference tracking
 	void invalidate_all(void *refptr);

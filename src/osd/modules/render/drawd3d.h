@@ -5,11 +5,11 @@
 //  drawd3d.h - Win32 Direct3D header
 //
 //============================================================
+#ifndef MAME_OSD_MODULES_RENDER_DRAWD3D_H
+#define MAME_OSD_MODULES_RENDER_DRAWD3D_H
 
 #pragma once
 
-#ifndef __WIN_DRAWD3D__
-#define __WIN_DRAWD3D__
 
 #ifdef OSD_WINDOWS
 
@@ -127,7 +127,7 @@ public:
 
 	uint32_t                  get_last_texture_flags() const { return m_last_texture_flags; }
 
-	d3d_texture_manager *   get_texture_manager() const { return m_texture_manager; }
+	d3d_texture_manager *   get_texture_manager() const { return m_texture_manager.get(); }
 	texture_info *          get_default_texture();
 
 	shaders *               get_shaders() const { return m_shaders; }
@@ -171,9 +171,9 @@ private:
 
 	shaders *               m_shaders;                  // HLSL interface
 
-	d3d_texture_manager *   m_texture_manager;          // texture manager
+	std::unique_ptr<d3d_texture_manager> m_texture_manager;          // texture manager
 };
 
 #endif // OSD_WINDOWS
 
-#endif // __WIN_DRAWD3D__
+#endif // MAME_OSD_MODULES_RENDER_DRAWD3D_H

@@ -1587,9 +1587,8 @@ protected:
 	// overrides
 	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
-		render_font *font = machine.render().font_alloc("default");
+		auto font = machine.render().font_alloc("default");
 		draw_text(*font, dest, bounds, m_string.c_str(), m_textalign, color(state));
-		machine.render().font_free(font);
 	}
 
 private:
@@ -2278,9 +2277,8 @@ protected:
 
 	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
-		render_font *const font = machine.render().font_alloc("default");
+		auto font = machine.render().font_alloc("default");
 		draw_text(*font, dest, bounds, string_format("%0*d", m_digits, state).c_str(), m_textalign, color(state));
-		machine.render().font_free(font);
 	}
 
 private:
@@ -2375,7 +2373,7 @@ protected:
 		u32 const a = c.a * 255.0f;
 
 		// get the width of the string
-		render_font *font = machine.render().font_alloc("default");
+		auto font = machine.render().font_alloc("default");
 		float aspect = 1.0f;
 		s32 width;
 
@@ -2517,7 +2515,6 @@ protected:
 		}
 
 		// free the temporary bitmap and font
-		machine.render().font_free(font);
 	}
 
 private:
@@ -2537,7 +2534,7 @@ private:
 		u32 const a = c.a * 255.0f;
 
 		// get the width of the string
-		render_font *font = machine.render().font_alloc("default");
+		auto font = machine.render().font_alloc("default");
 		float aspect = 1.0f;
 		s32 width;
 		int currx = 0;
@@ -2678,7 +2675,6 @@ private:
 		}
 
 		// free the temporary bitmap and font
-		machine.render().font_free(font);
 	}
 
 	void load_reel_bitmap(int number)

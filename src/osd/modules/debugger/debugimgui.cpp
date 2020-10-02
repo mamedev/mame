@@ -225,11 +225,7 @@ static void view_list_remove(debug_area* item)
 
 static debug_area *dview_alloc(running_machine &machine, debug_view_type type)
 {
-	debug_area *dv;
-
-	dv = global_alloc(debug_area(machine, type));
-
-	return dv;
+	return new debug_area(machine, type);
 }
 
 static inline void map_attr_to_fg_bg(unsigned char attr, rgb_t *fg, rgb_t *bg)
@@ -1406,7 +1402,7 @@ void debug_imgui::update()
 	if(to_delete != nullptr)
 	{
 		view_list_remove(to_delete);
-		global_free(to_delete);
+		delete to_delete;
 	}
 
 	ImGui::PopStyleColor(12);

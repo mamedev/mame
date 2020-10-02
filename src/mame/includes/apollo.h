@@ -438,7 +438,7 @@ public:
 protected:
 	required_device<screen_device> m_screen;
 
-	apollo_graphics_15i(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type);
+	apollo_graphics_15i(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -544,8 +544,8 @@ protected:
 
 	uint32_t m_color_lookup_table[16];
 
-	lut_fifo *m_lut_fifo;
-	bt458 *m_bt458;
+	std::unique_ptr<lut_fifo> m_lut_fifo;
+	std::unique_ptr<bt458> m_bt458;
 };
 
 

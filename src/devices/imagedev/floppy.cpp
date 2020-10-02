@@ -178,7 +178,7 @@ floppy_image_device::floppy_image_device(const machine_config &mconfig, device_t
 		device_image_interface(mconfig, *this),
 		input_format(nullptr),
 		output_format(nullptr),
-		image(nullptr),
+		image(),
 		fif_list(nullptr),
 		index_timer(nullptr),
 		tracks(0),
@@ -307,7 +307,7 @@ void floppy_image_device::commit_image()
 	if (err != osd_file::error::NONE)
 		popmessage("Error, unable to truncate image: %d", int(err));
 
-	output_format->save(&io, image);
+	output_format->save(&io, image.get());
 }
 
 //-------------------------------------------------
@@ -473,12 +473,11 @@ image_init_result floppy_image_device::call_load()
 		return image_init_result::FAIL;
 	}
 
-	image = global_alloc(floppy_image(tracks, sides, form_factor));
-	if (!best_format->load(&io, form_factor, image))
+	image = std::make_unique<floppy_image>(tracks, sides, form_factor);
+	if (!best_format->load(&io, form_factor, image.get()))
 	{
 		seterror(IMAGE_ERROR_UNSUPPORTED, "Incompatible image format or corrupted data");
-		global_free(image);
-		image = nullptr;
+		image.reset();
 		return image_init_result::FAIL;
 	}
 	output_format = is_readonly() ? nullptr : best_format;
@@ -501,8 +500,7 @@ void floppy_image_device::call_unload()
 	if (image) {
 		if(image_dirty)
 			commit_image();
-		global_free(image);
-		image = nullptr;
+		image.reset();
 	}
 
 	wpt = 1; // disk sleeve is covering the sensor
@@ -526,7 +524,7 @@ void floppy_image_device::call_unload()
 
 image_init_result floppy_image_device::call_create(int format_type, util::option_resolution *format_options)
 {
-	image = global_alloc(floppy_image(tracks, sides, form_factor));
+	image = std::make_unique<floppy_image>(tracks, sides, form_factor);
 	output_format = nullptr;
 
 	// search for a suitable format based on the extension

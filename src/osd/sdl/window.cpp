@@ -1137,12 +1137,11 @@ sdl_window_info::sdl_window_info(
 	m_prescale = video_config.prescale;
 
 	m_windowed_dim = osd_dim(config->width, config->height);
-	m_original_mode = global_alloc(SDL_DM_Wrapper);
+	m_original_mode = std::make_unique<SDL_DM_Wrapper>();
 }
 
 sdl_window_info::~sdl_window_info()
 {
-	global_free(m_original_mode);
 }
 
 

@@ -307,7 +307,7 @@ renderer_ogl::~renderer_ogl()
 	// free the memory in the window
 	destroy_all_textures();
 
-	global_free(m_gl_context);
+	delete m_gl_context;
 	m_gl_context = nullptr;
 }
 
@@ -366,7 +366,7 @@ static void loadgl_functions(osd_gl_context *context)
 //============================================================
 
 #ifdef USE_DISPATCH_GL
-osd_gl_dispatch *gl_dispatch;
+osd_gl_dispatch *gl_dispatch = nullptr;
 #endif
 
 void renderer_ogl::load_gl_lib(running_machine &machine)
@@ -394,7 +394,7 @@ void renderer_ogl::load_gl_lib(running_machine &machine)
 #endif
 #endif
 #ifdef USE_DISPATCH_GL
-		gl_dispatch = global_alloc(osd_gl_dispatch);
+		gl_dispatch = new osd_gl_dispatch;
 #endif
 		s_dll_loaded = true;
 	}
@@ -566,12 +566,12 @@ int renderer_ogl::create()
 
 	// create renderer
 #if defined(OSD_WINDOWS)
-	m_gl_context = global_alloc(win_gl_context(std::static_pointer_cast<win_window_info>(win)->platform_window()));
+	m_gl_context = new win_gl_context(std::static_pointer_cast<win_window_info>(win)->platform_window());
 #elif defined(OSD_MAC)
 // TODO
-//  m_gl_context = global_alloc(mac_gl_context(std::static_pointer_cast<mac_window_info>(win)->platform_window()));
+//  m_gl_context = new mac_gl_context(std::static_pointer_cast<mac_window_info>(win)->platform_window());
 #else
-	m_gl_context = global_alloc(sdl_gl_context(std::static_pointer_cast<sdl_window_info>(win)->platform_window()));
+	m_gl_context = new sdl_gl_context(std::static_pointer_cast<sdl_window_info>(win)->platform_window());
 #endif
 	if  (m_gl_context->LastErrorMsg() != nullptr)
 	{
@@ -696,7 +696,7 @@ void renderer_ogl::destroy_all_textures()
 				texture->data=nullptr;
 				texture->data_own=false;
 			}
-			global_free(texture);
+			delete texture;
 		}
 		i++;
 	}
@@ -1907,7 +1907,7 @@ ogl_texture_info *renderer_ogl::texture_create(const render_texinfo *texsource, 
 	ogl_texture_info *texture;
 
 	// allocate a new texture
-	texture = global_alloc(ogl_texture_info);
+	texture = new ogl_texture_info;
 
 	// fill in the core data
 	texture->hash = texture_compute_hash(texsource, flags);
@@ -1979,7 +1979,7 @@ ogl_texture_info *renderer_ogl::texture_create(const render_texinfo *texsource, 
 	{
 		if ( texture_shader_create(texsource, texture, flags) )
 		{
-			global_free(texture);
+			delete texture;
 			return nullptr;
 		}
 	}

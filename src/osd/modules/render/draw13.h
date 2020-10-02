@@ -8,10 +8,10 @@
 //
 //============================================================
 
-#pragma once
+#ifndef MAME_OSD_MODULES_RENDER_DRAW13_H
+#define MAME_OSD_MODULES_RENDER_DRAW13_H
 
-#ifndef __DRAW20__
-#define __DRAW20__
+#pragma once
 
 // OSD headers
 #ifndef OSD_WINDOWS
@@ -210,4 +210,4 @@ private:
 	static const copy_info_t s_blit_info_default[];
 };
 
-#endif // __DRAW20__
+#endif // MAME_OSD_MODULES_RENDER_DRAW13_H

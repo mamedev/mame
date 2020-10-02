@@ -337,11 +337,10 @@ void render_texture::reset(render_manager &manager, texture_scaler_func scaler, 
 void render_texture::release()
 {
 	// free all scaled versions
-	for (auto & elem : m_scaled)
+	for (auto &elem : m_scaled)
 	{
-		m_manager->invalidate_all(elem.bitmap);
-		global_free(elem.bitmap);
-		elem.bitmap = nullptr;
+		m_manager->invalidate_all(elem.bitmap.get());
+		elem.bitmap.reset();
 		elem.seqid = 0;
 	}
 
@@ -378,12 +377,9 @@ void render_texture::set_bitmap(bitmap_t &bitmap, const rectangle &sbounds, text
 	// invalidate all scaled versions
 	for (auto & elem : m_scaled)
 	{
-		if (elem.bitmap != nullptr)
-		{
-			m_manager->invalidate_all(elem.bitmap);
-			global_free(elem.bitmap);
-		}
-		elem.bitmap = nullptr;
+		if (elem.bitmap)
+			m_manager->invalidate_all(elem.bitmap.get());
+		elem.bitmap.reset();
 		elem.seqid = 0;
 	}
 }
@@ -460,21 +456,21 @@ void render_texture::get_scaled(u32 dwidth, u32 dheight, render_texinfo &texinfo
 
 			// didn't find one -- take the entry with the lowest seqnum
 			for (scalenum = 0; scalenum < ARRAY_LENGTH(m_scaled); scalenum++)
-				if ((lowest == -1 || m_scaled[scalenum].seqid < m_scaled[lowest].seqid) && !primlist.has_reference(m_scaled[scalenum].bitmap))
+				if ((lowest == -1 || m_scaled[scalenum].seqid < m_scaled[lowest].seqid) && !primlist.has_reference(m_scaled[scalenum].bitmap.get()))
 					lowest = scalenum;
 			if (-1 == lowest)
 				throw emu_fatalerror("render_texture::get_scaled: Too many live texture instances!");
 
 			// throw out any existing entries
 			scaled = &m_scaled[lowest];
-			if (scaled->bitmap != nullptr)
+			if (scaled->bitmap)
 			{
-				m_manager->invalidate_all(scaled->bitmap);
-				global_free(scaled->bitmap);
+				m_manager->invalidate_all(scaled->bitmap.get());
+				scaled->bitmap.reset();
 			}
 
 			// allocate a new bitmap
-			scaled->bitmap = global_alloc(bitmap_argb32(dwidth, dheight));
+			scaled->bitmap = std::make_unique<bitmap_argb32>(dwidth, dheight);
 			scaled->seqid = ++m_curseq;
 
 			// let the scaler do the work
@@ -482,7 +478,7 @@ void render_texture::get_scaled(u32 dwidth, u32 dheight, render_texinfo &texinfo
 		}
 
 		// finally fill out the new info
-		primlist.add_reference(scaled->bitmap);
+		primlist.add_reference(scaled->bitmap.get());
 		texinfo.base = &scaled->bitmap->pix(0);
 		texinfo.rowpixels = scaled->bitmap->rowpixels();
 		texinfo.width = dwidth;
@@ -3051,11 +3047,11 @@ done:
 //-------------------------------------------------
 
 render_manager::render_manager(running_machine &machine)
-	: m_machine(machine),
-		m_ui_target(nullptr),
-		m_live_textures(0),
-		m_texture_id(0),
-		m_ui_container(global_alloc(render_container(*this)))
+	: m_machine(machine)
+	, m_ui_target(nullptr)
+	, m_live_textures(0)
+	, m_texture_id(0)
+	, m_ui_container(new render_container(*this))
 {
 	// register callbacks
 	machine.configuration().config_register("video", config_load_delegate(&render_manager::config_load, this), config_save_delegate(&render_manager::config_save, this));
@@ -3129,12 +3125,12 @@ float render_manager::max_update_rate() const
 
 render_target *render_manager::target_alloc(const internal_layout *layoutfile, u32 flags)
 {
-	return &m_targetlist.append(*global_alloc(render_target(*this, layoutfile, flags)));
+	return &m_targetlist.append(*new render_target(*this, layoutfile, flags));
 }
 
 render_target *render_manager::target_alloc(util::xml::data_node const &layout, u32 flags)
 {
-	return &m_targetlist.append(*global_alloc(render_target(*this, layout, flags)));
+	return &m_targetlist.append(*new render_target(*this, layout, flags));
 }
 
 
@@ -3251,19 +3247,9 @@ void render_manager::texture_free(render_texture *texture)
 //  font_alloc - allocate a new font instance
 //-------------------------------------------------
 
-render_font *render_manager::font_alloc(const char *filename)
+std::unique_ptr<render_font> render_manager::font_alloc(const char *filename)
 {
-	return global_alloc(render_font(*this, filename));
-}
-
-
-//-------------------------------------------------
-//  font_free - release a font instance
-//-------------------------------------------------
-
-void render_manager::font_free(render_font *font)
-{
-	global_free(font);
+	return std::unique_ptr<render_font>(new render_font(*this, filename));
 }
 
 
@@ -3301,7 +3287,7 @@ void render_manager::resolve_tags()
 
 render_container *render_manager::container_alloc(screen_device *screen)
 {
-	auto container = global_alloc(render_container(*this, screen));
+	auto container = new render_container(*this, screen);
 	if (screen != nullptr)
 		m_screen_container_list.append(*container);
 	return container;

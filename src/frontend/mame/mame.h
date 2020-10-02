@@ -35,7 +35,7 @@ public:
 	~mame_machine_manager();
 
 	plugin_options &plugins() const { return *m_plugins; }
-	lua_engine *lua() { return m_lua; }
+	lua_engine *lua() { return m_lua.get(); }
 
 	virtual void update_machine() override;
 
@@ -72,12 +72,12 @@ private:
 	mame_machine_manager &operator=(mame_machine_manager &&) = delete;
 
 	std::unique_ptr<plugin_options> m_plugins;              // pointer to plugin options
-	lua_engine *            m_lua;
+	std::unique_ptr<lua_engine> m_lua;
 
 	const game_driver *     m_new_driver_pending;   // pointer to the next pending driver
 	bool                    m_firstrun;
 
-	static mame_machine_manager* m_manager;
+	static mame_machine_manager *s_manager;
 	emu_timer               *m_autoboot_timer;      // autoboot timer
 	std::unique_ptr<mame_ui_manager> m_ui;                  // internal data from ui.cpp
 	std::unique_ptr<cheat_manager> m_cheat;            // internal data from cheat.cpp

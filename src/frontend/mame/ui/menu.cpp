@@ -1234,7 +1234,7 @@ uint32_t menu::ui_handler(render_container &container, mame_ui_manager &mui)
 
 	// if we have no menus stacked up, start with the main menu
 	if (!state->topmost_menu<menu>())
-		state->stack_push(std::unique_ptr<menu>(global_alloc_clear<menu_main>(mui, container)));
+		state->stack_push(std::unique_ptr<menu>(make_unique_clear<menu_main>(mui, container)));
 
 	// update the menu state
 	if (state->topmost_menu<menu>())

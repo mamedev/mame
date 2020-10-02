@@ -27,7 +27,7 @@ public:
 	bool    dirty;
 	int     cylinder;
 	int     head;
-	uint16_t* encdata;            // MFM encoding per byte
+	std::unique_ptr<uint16_t []> encdata;            // MFM encoding per byte
 	mfmhd_trackimage* next;
 };
 
@@ -152,7 +152,7 @@ private:
 	attotime    m_settle_time;
 	attotime    m_step_time;
 
-	mfmhd_trackimage_cache* m_cache;
+	std::unique_ptr<mfmhd_trackimage_cache> m_cache;
 	mfmhd_image_format_t*   m_format;
 
 	void        head_move();
