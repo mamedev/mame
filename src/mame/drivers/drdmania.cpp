@@ -109,7 +109,7 @@ void drdmania_state::mem_map(address_map &map)
 
 uint8_t drdmania_state::unk_port00_r()
 {
-	return 0xff;
+	return machine().rand();
 }
 
 
@@ -219,6 +219,8 @@ void drdmania_state::init_drdmania()
 
 	ROM[0x8de6] ^= 0x02; // call opcode
 	ROM[0x8de7] ^= 0x02; // call address
+
+	ROM[0x8e00] ^= 0x02; // wrong, different bit flipped?
 }
 
 GAME(1994, drdmania, 0, drdmania, drdmania, drdmania_state, init_drdmania, ROT0, "Sleic", "Dardomania (v2.1)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
