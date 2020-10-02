@@ -12,8 +12,9 @@ To Use:
 - Press MINUS to enter data input mode
 - Press UP or DOWN to cycle through addresses
 
-At the moment Paste cannot be tested, but if it worked, you could
-paste this in:  -0F0011^22^33^44^55^66^77^88^99^
+Paste test:
+paste this in:  -0F0011^22^33^44^55^66^77^88^99^N-0F00
+Now press UP to verify the data that was entered.
 
 It seems the only way to exit each mode is to press NRST.
 
@@ -190,7 +191,7 @@ static INPUT_PORTS_START( elekscmp )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Run") PORT_CODE(KEYCODE_ENTER) PORT_CHAR('X')
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NRST") PORT_CODE(KEYCODE_LALT) PORT_CHANGED_MEMBER(DEVICE_SELF, elekscmp_state, reset_button, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NRST") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, elekscmp_state, reset_button, 0) PORT_CHAR('N')
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(elekscmp_state::reset_button)
