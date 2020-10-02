@@ -53,8 +53,8 @@ namespace plib
 
 		pmatrix2d(const pmatrix2d &) = delete;
 		pmatrix2d &operator=(const pmatrix2d &) = delete;
-		pmatrix2d(pmatrix2d &&) noexcept = delete;
-		pmatrix2d &operator=(pmatrix2d &&) noexcept = delete;
+		pmatrix2d(pmatrix2d &&) = delete;
+		pmatrix2d &operator=(pmatrix2d &&) = delete;
 
 		~pmatrix2d()
 		{
@@ -162,8 +162,8 @@ namespace plib
 
 		pmatrix2d_vrl(const pmatrix2d_vrl &) = default;
 		pmatrix2d_vrl &operator=(const pmatrix2d_vrl &) = default;
-		pmatrix2d_vrl(pmatrix2d_vrl &&) noexcept = default;
-		pmatrix2d_vrl &operator=(pmatrix2d_vrl &&) noexcept = default;
+		pmatrix2d_vrl(pmatrix2d_vrl &&) = default;
+		pmatrix2d_vrl &operator=(pmatrix2d_vrl &&) = default;
 
 		~pmatrix2d_vrl() = default;
 
