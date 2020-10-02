@@ -106,4 +106,4 @@ ROM_START( unkunsp )
 ROM_END
 
 // different hardware, first 0x2000 bytes in ROM are blank, maps fully in RAM at 200000
-CONS( 2017, unkunsp,      0,       0,      generalplus_gpl_unknown,   generalplus_gpl_unknown, generalplus_gpl_unknown_state, empty_init, "Super Imulse", "Pac-Man (Micro Arcade)", MACHINE_IS_SKELETON )
+CONS( 2017, unkunsp,      0,       0,      generalplus_gpl_unknown,   generalplus_gpl_unknown, generalplus_gpl_unknown_state, empty_init, "Super Impulse", "Pac-Man (Micro Arcade)", MACHINE_IS_SKELETON )
