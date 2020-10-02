@@ -51,7 +51,10 @@ namespace plib
 				::new(&m_v[i]) T();
 		}
 
-		PCOPYASSIGNMOVE(pmatrix2d, delete)
+		pmatrix2d(const pmatrix2d &) = delete;
+		pmatrix2d &operator=(const pmatrix2d &) = delete;
+		pmatrix2d(pmatrix2d &&) noexcept = delete;
+		pmatrix2d &operator=(pmatrix2d &&) noexcept = delete;
 
 		~pmatrix2d()
 		{

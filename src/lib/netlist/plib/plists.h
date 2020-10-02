@@ -42,7 +42,11 @@ namespace plib {
 		//uninitialised_array_t() noexcept = default;
 		uninitialised_array() noexcept = default;
 
-		PCOPYASSIGNMOVE(uninitialised_array, delete)
+		uninitialised_array(const uninitialised_array &) = default;
+		uninitialised_array &operator=(const uninitialised_array &) = default;
+		uninitialised_array(uninitialised_array &&) noexcept = default;
+		uninitialised_array &operator=(uninitialised_array &&) noexcept = default;
+
 		~uninitialised_array() noexcept = default;
 
 		constexpr size_t size() const noexcept { return N; }
@@ -111,7 +115,11 @@ namespace plib {
 		{
 		}
 
-		PCOPYASSIGNMOVE(static_vector, delete)
+		static_vector(const static_vector &) = default;
+		static_vector &operator=(const static_vector &) = default;
+		static_vector(static_vector &&) noexcept = default;
+		static_vector &operator=(static_vector &&) noexcept = default;
+
 		~static_vector() noexcept
 		{
 			clear();

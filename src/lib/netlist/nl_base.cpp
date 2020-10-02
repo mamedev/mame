@@ -86,14 +86,14 @@ namespace netlist
 	// ----------------------------------------------------------------------------------------
 
 	netlist_t::netlist_t(netlist_state_t &state, const pstring &aname)
-		: m_state(state)
-		, m_solver(nullptr)
-		, m_time(netlist_time_ext::zero())
-		, m_mainclock(nullptr)
-		, m_queue(config::MAX_QUEUE_SIZE::value,
-			detail::queue_t::id_delegate(&netlist_state_t :: find_net_id, &state),
-			detail::queue_t::obj_delegate(&netlist_state_t :: net_by_id, &state))
-		, m_use_stats(false)
+	: m_state(state)
+	, m_solver(nullptr)
+	, m_time(netlist_time_ext::zero())
+	, m_mainclock(nullptr)
+	, m_use_stats(false)
+	, m_queue(config::MAX_QUEUE_SIZE::value,
+		detail::queue_t::id_delegate(&netlist_state_t :: find_net_id, &state),
+		detail::queue_t::obj_delegate(&netlist_state_t :: net_by_id, &state))
 	{
 		state.save(*this, static_cast<plib::state_manager_t::callback_t &>(m_queue), aname, "m_queue");
 		state.save(*this, m_time, aname, "m_time");
@@ -433,7 +433,6 @@ namespace netlist
 			log().verbose("Queue Pushes   {1:15}", si.m_queue.m_prof_call());
 			log().verbose("Queue Moves    {1:15}", si.m_queue.m_prof_sortmove());
 			log().verbose("Queue Removes  {1:15}", si.m_queue.m_prof_remove());
-			log().verbose("Queue Retimes  {1:15}", si.m_queue.m_prof_retime());
 			log().verbose("");
 
 			log().verbose("Take the next lines with a grain of salt. They depend on the measurement implementation.");

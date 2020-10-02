@@ -34,7 +34,7 @@ namespace devices
 
 	NETLIB_RESET(solver)
 	{
-		if (exec().use_stats())
+		if (exec().stats_enabled())
 			m_fb_step.set_delegate(NETLIB_DELEGATE(fb_step<true>));
 		for (auto &s : m_mat_solvers)
 			s->reset();
