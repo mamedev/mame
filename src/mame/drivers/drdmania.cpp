@@ -212,9 +212,13 @@ ROM_END
 void drdmania_state::init_drdmania()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
-	ROM[0x8de0] = 0xcd; // these are 0xcf in ROM so bit 0x02 got flipped? 3 calls in a row are incorrect in this way, so call addresses are suspect too
-	ROM[0x8de3] = 0xcd;
-	ROM[0x8de6] = 0xcd;
+	ROM[0x8de0] ^= 0x02; // these are 0xcf in ROM so bit 0x02 got flipped? 3 calls in a row are incorrect in this way, so call addresses are suspect too
+	ROM[0x8de1] ^= 0x02; // call address
+
+	ROM[0x8de3] ^= 0x02; // call opcode
+
+	ROM[0x8de6] ^= 0x02; // call opcode
+	ROM[0x8de7] ^= 0x02; // call address
 }
 
 GAME(1994, drdmania, 0, drdmania, drdmania, drdmania_state, init_drdmania, ROT0, "Sleic", "Dardomania (v2.1)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
