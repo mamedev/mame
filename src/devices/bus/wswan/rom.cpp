@@ -631,7 +631,7 @@ void ws_wwitch_device::write_ram(offs_t offset, u8 data)
 				// TODO
 			}
 			break;
-		case 0x20:  // Unlock bypass
+		case 0x20:  // Set to fast mode
 			m_flash_command = data;
 			m_flash_mode = COMMAND_MODE;
 			break;
@@ -683,15 +683,15 @@ void ws_wwitch_device::write_ram(offs_t offset, u8 data)
 					m_flash_mode = READ_MODE;
 				}
 				break;
-			case 0xF0:
+			case 0xF0:    // Reset from fast mode #2
 				m_write_flash = false;
 				m_write_resetting = false;
 				m_flash_mode = READ_MODE;
 				break;
-			case 0x90:
+			case 0x90:    // Reset from fast mode #1
 				m_write_resetting = true;
 				break;
-			case 0xA0:
+			case 0xA0:    // Fast program
 				if (m_flash_command == 0x20)
 				{
 					m_write_flash = true;
