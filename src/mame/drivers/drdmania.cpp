@@ -194,7 +194,7 @@ ROM_START(drdmania)
 	ROM_REGION(0x0c000, "maincpu", 0)
 	ROM_LOAD( "dardomania_dmp01_v2.1.ic38", 0x00000, 0x8000, CRC(9f24336f) SHA1(9a82b851d5c67a50118a3669d3bc5793e94219e4) )
 	// seems to have some bad bytes eg rst $08 instructions which should be calls but end up resetting it instead, see init
-	ROM_LOAD( "dardomania_dmp02_v2.1.ic33", 0x00000, 0x4000, BAD_DUMP CRC(e5dbf948) SHA1(241be0f2969b962bba602548dab3e2bdbf8f0696) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "dardomania_dmp02_v2.1.ic33", 0x08000, 0x4000, BAD_DUMP CRC(e5dbf948) SHA1(241be0f2969b962bba602548dab3e2bdbf8f0696) ) // 1ST AND 2ND HALF IDENTICAL
 	ROM_IGNORE(0x4000)
 
 	ROM_REGION(0xc000, "gfx1", 0)
