@@ -233,6 +233,9 @@ ROM_START( rltennis )
 
 	ROM_REGION( 0x080000, "samples2", 0 )
 	ROM_LOAD( "tennis_3.u52", 0x00000, 0x80000, CRC(517dcd0e) SHA1(b2703e185ee8cf7e115ea07151e7bee8be34948b) )
+
+	ROM_REGION( 0x2e5, "plds", 0 )
+	ROM_LOAD( "realitytennis_gal22v10.u20", 0x000, 0x2e5, BAD_DUMP CRC(13be6cec) SHA1(5a07ed3ac6a1993196e0e76b852d0ba132f5ddb9) ) // Bruteforced but verified
 ROM_END
 
 // PCB marked as "TCH-MAVIR.001
