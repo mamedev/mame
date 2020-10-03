@@ -72,10 +72,11 @@ media_auditor::summary media_auditor::audit_media(const char *validation)
 
 				char const *const name(ROM_GETNAME(rom));
 				util::hash_collection const hashes(ROM_GETHASHDATA(rom));
-				device_t *const shared_device(find_shared_device(device, name, hashes, ROM_GETLENGTH(rom)));
+				bool const dumped = !hashes.flag(util::hash_collection::FLAG_NO_DUMP);
+				std::add_pointer_t<device_type> const shared_device(find_shared_device(device, name, hashes, rom_file_size(rom)));
 
 				// count the number of files with hashes
-				if (!hashes.flag(util::hash_collection::FLAG_NO_DUMP) && !ROM_ISOPTIONAL(rom))
+				if (dumped && !ROM_ISOPTIONAL(rom))
 				{
 					required++;
 					if (shared_device)
@@ -340,7 +341,7 @@ media_auditor::summary media_auditor::summarize(const char *name, std::ostream *
 		case audit_substatus::NOT_FOUND:
 			if (output)
 			{
-				device_t *const shared_device = record.shared_device();
+				std::add_pointer_t<device_type> const shared_device = record.shared_device();
 				if (shared_device)
 					util::stream_format(*output, "NOT FOUND (%s)\n", shared_device->shortname());
 				else
@@ -503,35 +504,14 @@ void media_auditor::compute_status(audit_record &record, const rom_entry *rom, b
 //  shares a media entry with the same hashes
 //-------------------------------------------------
 
-device_t *media_auditor::find_shared_device(device_t &device, const char *name, const util::hash_collection &romhashes, uint64_t romlength)
+std::add_pointer_t<device_type> media_auditor::find_shared_device(device_t &device, const char *name, const util::hash_collection &romhashes, uint64_t romlength)
 {
 	bool const dumped = !romhashes.flag(util::hash_collection::FLAG_NO_DUMP);
-
-	// special case for non-root devices
 	device_t *highest_device = nullptr;
-	if (device.owner())
-	{
-		for (const rom_entry *region = rom_first_region(device); region; region = rom_next_region(region))
-		{
-			for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
+	auto const scan =
+			[dumped, name, &romhashes, romlength, &highest_device] (device_t &curdev)
 			{
-				if (rom_file_size(rom) == romlength)
-				{
-					util::hash_collection hashes(ROM_GETHASHDATA(rom));
-					if ((dumped && hashes == romhashes) || (!dumped && ROM_GETNAME(rom) == name))
-						highest_device = &device;
-				}
-			}
-		}
-	}
-	else
-	{
-		// iterate up the parent chain
-		for (auto drvindex = m_enumerator.find(m_enumerator.driver().parent); drvindex >= 0; drvindex = m_enumerator.find(m_enumerator.driver(drvindex).parent))
-		{
-			for (device_t &scandevice : device_iterator(m_enumerator.config(drvindex)->root_device()))
-			{
-				for (const rom_entry *region = rom_first_region(scandevice); region; region = rom_next_region(region))
+				for (const rom_entry *region = rom_first_region(curdev); region; region = rom_next_region(region))
 				{
 					for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 					{
@@ -539,15 +519,28 @@ device_t *media_auditor::find_shared_device(device_t &device, const char *name, 
 						{
 							util::hash_collection hashes(ROM_GETHASHDATA(rom));
 							if ((dumped && hashes == romhashes) || (!dumped && ROM_GETNAME(rom) == name))
-								highest_device = &scandevice;
+								highest_device = &curdev;
 						}
 					}
 				}
-			}
+			};
+
+	if (device.owner())
+	{
+		// special case for non-root devices
+		scan(device);
+	}
+	else
+	{
+		// iterate up the parent chain
+		for (auto drvindex = m_enumerator.find(m_enumerator.driver().parent); drvindex >= 0; drvindex = m_enumerator.find(m_enumerator.driver(drvindex).parent))
+		{
+			for (device_t &scandevice : device_iterator(m_enumerator.config(drvindex)->root_device()))
+				scan(scandevice);
 		}
 	}
 
-	return highest_device;
+	return highest_device ? &highest_device->type() : nullptr;
 }
 
 
