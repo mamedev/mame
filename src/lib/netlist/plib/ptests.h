@@ -83,8 +83,8 @@ namespace testing
 
 		Test(const Test &) = delete;
 		Test &operator=(const Test &) = delete;
-		Test(Test &&) noexcept = delete;
-		Test &operator=(Test &&) noexcept = delete;
+		Test(Test &&) = delete;
+		Test &operator=(Test &&) = delete;
 
 		virtual void run() {}
 		virtual void SetUp() {}
@@ -102,8 +102,8 @@ namespace testing
 
 		reg_entry_base(const reg_entry_base &) = delete;
 		reg_entry_base &operator=(const reg_entry_base &) = delete;
-		reg_entry_base(reg_entry_base &&) noexcept = delete;
-		reg_entry_base &operator=(reg_entry_base &&) noexcept = delete;
+		reg_entry_base(reg_entry_base &&) = delete;
+		reg_entry_base &operator=(reg_entry_base &&) = delete;
 
 		virtual ~reg_entry_base() = default;
 
