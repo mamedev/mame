@@ -38,7 +38,7 @@ namespace plib
 		pmatrix_cr(const pmatrix_cr &) = default;
 		pmatrix_cr &operator=(const pmatrix_cr &) = default;
 		pmatrix_cr(pmatrix_cr &&) noexcept(std::is_nothrow_move_constructible<parray<value_type, NSQ>>::value) = default;
-		pmatrix_cr &operator=(pmatrix_cr &&) noexcept(std::is_nothrow_move_assignable<parray<value_type, NSQ>>::value) = default;
+		pmatrix_cr &operator=(pmatrix_cr &&) noexcept(std::is_nothrow_move_assignable<parray<value_type, NSQ>>::value && std::is_nothrow_move_assignable<pmatrix2d_vrl<index_type>>::value) = default;
 
 		enum constants_e
 		{
