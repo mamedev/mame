@@ -15,7 +15,7 @@ i8751 protection simulation and other fixes by Bryan McPhail, 15/10/00.
 
 
 ToDo:
-- sidepcktj: Intermission screen's background for player 2 is completely screwed (Maybe wrong/missing I8751 simulation for "cocktail mode" ?)
+- sidepcktj: Intermission screen's background for player 2 is completely screwed (Cause is currently unknown)
 
 
 Stephh's notes (based on the games M6809 code and some tests) :
@@ -415,54 +415,54 @@ void sidepckt_state::sidepcktb(machine_config &config)
 
 ***************************************************************************/
 
-ROM_START( sidepckt ) /* DE-0245-2 */
+ROM_START( sidepckt ) // DE-0245-2
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dh00-e.3c", 0x00000, 0x10000, CRC(251b316e) SHA1(c777d87621b8fefe0e33156be03da8aed733db9a) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "dh04.3h", 0x08000, 0x8000, CRC(d076e62e) SHA1(720ff1a6a58697b4a9c7c4f31c24a2cf8a04900a) )
+	ROM_LOAD( "dh04.3h", 0x08000, 0x8000, CRC(d076e62e) SHA1(720ff1a6a58697b4a9c7c4f31c24a2cf8a04900a) ) // is this really DH-04-E??
 
 	ROM_REGION( 0x1000, "mcu", 0 ) // i8751 MCU (BAD_DUMP because it was created from the Japanese version)
 	ROM_LOAD( "dh-e.6d", 0x0000, 0x1000, BAD_DUMP CRC(00654574) SHA1(7d775e7b7cbb548c50b9b838a525a12bf7a32f8e) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
-	ROM_LOAD( "dh07-e.13k", 0x00000, 0x8000, CRC(9d6f7969) SHA1(583852be0861a89c63ce09eb39146ec379b9e12d) ) /* characters */
+	ROM_LOAD( "dh07-e.13k", 0x00000, 0x8000, CRC(9d6f7969) SHA1(583852be0861a89c63ce09eb39146ec379b9e12d) ) // characters
 	ROM_LOAD( "dh06-e.13j", 0x08000, 0x8000, CRC(580e4e43) SHA1(de152a5d4fbc52d80e3eb9af17835ecb6258d45e) )
 	ROM_LOAD( "dh05-e.13h", 0x10000, 0x8000, CRC(05ab71d2) SHA1(6f06d1d1440a5fb05c01f712457d0bb167e93099) )
 
 	ROM_REGION( 0x18000, "gfx2", 0 )
-	ROM_LOAD( "dh01.14a", 0x00000, 0x8000, CRC(a2cdfbea) SHA1(0721e538e3306d616f11008f784cf21e679f330d) ) /* sprites */
+	ROM_LOAD( "dh01.14a", 0x00000, 0x8000, CRC(a2cdfbea) SHA1(0721e538e3306d616f11008f784cf21e679f330d) ) // sprites
 	ROM_LOAD( "dh02.15a", 0x08000, 0x8000, CRC(eeb5c3e7) SHA1(57eda1cc29124e04fe5025a904634d8ca52c0f12) )
 	ROM_LOAD( "dh03.17a", 0x10000, 0x8000, CRC(8e18d21d) SHA1(74f0ddf1fcbed386332eba882b4136295b4f096d) )
 
-	ROM_REGION( 0x0200, "proms", 0 )    /* color PROMs */
-	ROM_LOAD( "dh-09.16l", 0x0000, 0x0100, CRC(ce049b4f) SHA1(e4918cef7b319dd40cf1722eb8bf5e79be04fd6c) )
-	ROM_LOAD( "dh-08.15l", 0x0100, 0x0100, CRC(cdf2180f) SHA1(123215d096f88b66396d40d7a579380d0b5b2b89) )
+	ROM_REGION( 0x0200, "proms", 0 ) // color PROMs
+	ROM_LOAD( "dh-09.16l", 0x0000, 0x0100, CRC(ce049b4f) SHA1(e4918cef7b319dd40cf1722eb8bf5e79be04fd6c) ) // MMI 6309-1N BPROM
+	ROM_LOAD( "dh-08.15l", 0x0100, 0x0100, CRC(cdf2180f) SHA1(123215d096f88b66396d40d7a579380d0b5b2b89) ) // MMI 6303-1N BPROM
 ROM_END
 
-ROM_START( sidepcktj )
+ROM_START( sidepcktj ) // DE-0245-1
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dh00.3c", 0x00000, 0x10000, CRC(a66bc28d) SHA1(cd62ce1dce6fe42d9745eec50d11e86b076d28e1) )
+	ROM_LOAD( "dh00-1.3c", 0x00000, 0x10000, CRC(a66bc28d) SHA1(cd62ce1dce6fe42d9745eec50d11e86b076d28e1) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "dh04.3h", 0x08000, 0x8000, CRC(d076e62e) SHA1(720ff1a6a58697b4a9c7c4f31c24a2cf8a04900a) )
+	ROM_LOAD( "dh04_6-19.3h", 0x08000, 0x8000, CRC(053ff83a) SHA1(e6e3ce15a86172bdc6094b4999e52d1aafc0ae10) ) // handwritten 6-19 on label
 
-	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
+	ROM_REGION( 0x1000, "mcu", 0 ) // i8751 MCU
 	ROM_LOAD( "dh.6d", 0x0000, 0x1000, CRC(f7e099b6) SHA1(8e718384489a589acebc19ca361e0aa8a4c6b63b) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
-	ROM_LOAD( "dh07.13k", 0x00000, 0x8000, CRC(7d0ce858) SHA1(3a158f218a762e6841d2611f41ace67a1afefb35) ) /* characters */
+	ROM_LOAD( "dh07.13k", 0x00000, 0x8000, CRC(7d0ce858) SHA1(3a158f218a762e6841d2611f41ace67a1afefb35) ) // characters
 	ROM_LOAD( "dh06.13j", 0x08000, 0x8000, CRC(b86ddf72) SHA1(7596dd1b646971d8df1bc4fd157ccf161a712d59) )
 	ROM_LOAD( "dh05.13h", 0x10000, 0x8000, CRC(df6f94f2) SHA1(605796191f37cb76d496aa459243655070bb90c0) )
 
 	ROM_REGION( 0x18000, "gfx2", 0 )
-	ROM_LOAD( "dh01.14a", 0x00000, 0x8000, CRC(a2cdfbea) SHA1(0721e538e3306d616f11008f784cf21e679f330d) ) /* sprites */
+	ROM_LOAD( "dh01.14a", 0x00000, 0x8000, CRC(a2cdfbea) SHA1(0721e538e3306d616f11008f784cf21e679f330d) ) // sprites
 	ROM_LOAD( "dh02.15a", 0x08000, 0x8000, CRC(eeb5c3e7) SHA1(57eda1cc29124e04fe5025a904634d8ca52c0f12) )
 	ROM_LOAD( "dh03.17a", 0x10000, 0x8000, CRC(8e18d21d) SHA1(74f0ddf1fcbed386332eba882b4136295b4f096d) )
 
-	ROM_REGION( 0x0200, "proms", 0 )    /* color PROMs */
-	ROM_LOAD( "dh-09.16l", 0x0000, 0x0100, CRC(ce049b4f) SHA1(e4918cef7b319dd40cf1722eb8bf5e79be04fd6c) )
-	ROM_LOAD( "dh-08.15l", 0x0100, 0x0100, CRC(cdf2180f) SHA1(123215d096f88b66396d40d7a579380d0b5b2b89) )
+	ROM_REGION( 0x0200, "proms", 0 ) // color PROMs
+	ROM_LOAD( "dh-09.16l", 0x0000, 0x0100, CRC(ce049b4f) SHA1(e4918cef7b319dd40cf1722eb8bf5e79be04fd6c) ) // MMI 6309-1N BPROM
+	ROM_LOAD( "dh-08.15l", 0x0100, 0x0100, CRC(cdf2180f) SHA1(123215d096f88b66396d40d7a579380d0b5b2b89) ) // MMI 6303-1N BPROM
 ROM_END
 
 ROM_START( sidepcktb )
@@ -474,16 +474,16 @@ ROM_START( sidepcktb )
 	ROM_LOAD( "dh04.3h", 0x08000, 0x8000, CRC(d076e62e) SHA1(720ff1a6a58697b4a9c7c4f31c24a2cf8a04900a) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
-	ROM_LOAD( "dh07-e.13k", 0x00000, 0x8000, CRC(9d6f7969) SHA1(583852be0861a89c63ce09eb39146ec379b9e12d) ) /* characters */
+	ROM_LOAD( "dh07-e.13k", 0x00000, 0x8000, CRC(9d6f7969) SHA1(583852be0861a89c63ce09eb39146ec379b9e12d) ) // characters
 	ROM_LOAD( "dh06-e.13j", 0x08000, 0x8000, CRC(580e4e43) SHA1(de152a5d4fbc52d80e3eb9af17835ecb6258d45e) )
 	ROM_LOAD( "dh05-e.13h", 0x10000, 0x8000, CRC(05ab71d2) SHA1(6f06d1d1440a5fb05c01f712457d0bb167e93099) )
 
 	ROM_REGION( 0x18000, "gfx2", 0 )
-	ROM_LOAD( "dh01.14a", 0x00000, 0x8000, CRC(a2cdfbea) SHA1(0721e538e3306d616f11008f784cf21e679f330d) ) /* sprites */
+	ROM_LOAD( "dh01.14a", 0x00000, 0x8000, CRC(a2cdfbea) SHA1(0721e538e3306d616f11008f784cf21e679f330d) ) // sprites
 	ROM_LOAD( "dh02.15a", 0x08000, 0x8000, CRC(eeb5c3e7) SHA1(57eda1cc29124e04fe5025a904634d8ca52c0f12) )
 	ROM_LOAD( "dh03.17a", 0x10000, 0x8000, CRC(8e18d21d) SHA1(74f0ddf1fcbed386332eba882b4136295b4f096d) )
 
-	ROM_REGION( 0x0200, "proms", 0 )    /* color PROMs */
+	ROM_REGION( 0x0200, "proms", 0 ) // color PROMs
 	ROM_LOAD( "dh-09.16l", 0x0000, 0x0100, CRC(ce049b4f) SHA1(e4918cef7b319dd40cf1722eb8bf5e79be04fd6c) )
 	ROM_LOAD( "dh-08.15l", 0x0100, 0x0100, CRC(cdf2180f) SHA1(123215d096f88b66396d40d7a579380d0b5b2b89) )
 ROM_END
@@ -495,6 +495,6 @@ void sidepckt_state::init_sidepckt()
 }
 
 
-GAME( 1986, sidepckt,  0,        sidepckt,  sidepckt,  sidepckt_state, init_sidepckt, ROT0, "Data East Corporation", "Side Pocket (World)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sidepcktj, sidepckt, sidepckt,  sidepcktj, sidepckt_state, init_sidepckt, ROT0, "Data East Corporation", "Side Pocket (Japan)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sidepcktb, sidepckt, sidepcktb, sidepcktb, sidepckt_state, empty_init,    ROT0, "bootleg",               "Side Pocket (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sidepckt,  0,        sidepckt,  sidepckt,  sidepckt_state, init_sidepckt, ROT0, "Data East Corporation", "Side Pocket (World)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sidepcktj, sidepckt, sidepckt,  sidepcktj, sidepckt_state, init_sidepckt, ROT0, "Data East Corporation", "Side Pocket (Japan, Cocktail)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sidepcktb, sidepckt, sidepcktb, sidepcktb, sidepckt_state, empty_init,    ROT0, "bootleg",               "Side Pocket (bootleg)",         MACHINE_SUPPORTS_SAVE )
