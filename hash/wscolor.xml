@@ -118,13 +118,29 @@ TODO/missing:
 		</part>
 	</software>
 
-	<!-- Battle Spirit - Digimon Frontier (rev 0?) -->
-	<!-- CRC A28D3DC5 -->
-	<!-- PCB label PTS-0133A -->
-	<!-- BANDAI / 2003 at U1 -->
-	<!-- GIZA / 2808 at U2 -->
-	<!-- SD32M256S222D / MR27V3202F-NG / 2445M46 at U3 -->
-	<!-- hynix 0224A / HY62KT081ED70C / KOREA at U4 -->
+<!--
+	<software name="battlespa" cloneof="battlesp">
+		<description>Battle Spirit - Digimon Frontier (Rev 0)</description>
+		<year>2002</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="SWJ-BANC31"/>
+		<info name="release" value="20021207"/>
+		<info name="alt_title" value="バトルスピリット デジモンフロンティア"/>
+		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0133A" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="HY62KT081ED70C SRAM" />
+			<feature name="slot" value="ws_sram" />
+			<dataarea name="rom" size="4194304">
+				<rom name="sd32m256s222d.u3" size="4194304" crc="a28d3dc5" sha1="" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="0x8000">
+			</dataarea>
+		</part>
+	</software>
+-->
 
 	<software name="bluewing">
 		<!-- WSC -->
@@ -207,13 +223,11 @@ TODO/missing:
 			<feature name="u1" value="ROM" />
 			<feature name="u2" value="GIZA" />
 			<feature name="u3" value="BANDAI 2003" />
+			<feature name="u4" value="CS18LV40963DC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<feature name="rtc" value="yes" />
-			<dataarea name="rom" size="524288">
-				<!-- R27V1602 / DK040428 / 4205M84 at U1 -->
-				<!-- Chipplus B0411 / CS18LV40963DC-70 / CSSG01A07328.S at U4 -->
-				<!-- TODO check size -->
-				<rom name="dicing knight. (japan).u1" size="524288" crc="d28dc930" sha1="79658575c736fcad18e9225aa0e62398b086093b" offset="000000" />
+			<dataarea name="rom" size="2097152">
+				<rom name="dk040428.u1" size="2097152" crc="1887389c" sha1="1e4d8e8b3d16083968055cc76b604da91fa0a132" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x40000">
 			</dataarea>
@@ -334,6 +348,30 @@ TODO/missing:
 			</dataarea>
 		</part>
 	</software>
+
+<!--
+	<software name="digimdp">
+		<description>Digital Monster - D-Project (Rev 2)</description>
+		<year>2002</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="SWJ-BANC2E"/>
+		<info name="release" value="20020803"/>
+		<info name="alt_title" value="デジタルモンスター ディープロジェクト"/>
+		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0133A" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="HY62KT081ED70C SRAM" />
+			<feature name="slot" value="ws_sram" />
+			<dataarea name="rom" size="4194304">
+				<rom name="sd32m256s217d.u3" size="4194304" crc="0e40829c" sha1="" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="0x8000">
+			</dataarea>
+		</part>
+	</software>
+-->
 
 	<software name="digimdp">
 		<!-- WSC only -->
@@ -576,7 +614,7 @@ TODO/missing:
 			<dataarea name="rom" size="4194304">
 				<!-- or -->
 				<!-- epoxy at U3 -->
-				<rom name="mh32m256s128b.u3" size="4194304" crc="b7243e88" sha1="26628eb76c16880b6faf2e706778d91a60144078" offset="000000" />
+				<rom name="mh32m256s129b.u3" size="4194304" crc="b7243e88" sha1="26628eb76c16880b6faf2e706778d91a60144078" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
 			</dataarea>
@@ -1009,7 +1047,7 @@ TODO/missing:
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="8388608">
-				<rom name="sd64m256s232d.u3" size="8388608" crc="130af567" sha1="e26410d4eee4cc8cec5e2e369604aedf26d69d0c" offset="000000" />
+				<rom name="sd64m256s233d.u3" size="8388608" crc="130af567" sha1="e26410d4eee4cc8cec5e2e369604aedf26d69d0c" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
 			</dataarea>
@@ -1184,14 +1222,12 @@ TODO/missing:
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="no label" />
 			<feature name="uX" value="BANDAI 2003" /><!-- no markings on pcb -->
+			<feature name="uX" value="CS18LV40963DCR70 SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<feature name="rtc" value="yes" />
 			<feature name="rotated" value="yes" />
-			<dataarea name="rom" size="524288">
-				<!-- Chipplus B0530 / CS18LV40963DCR70 / CTSC035082140S1 -->
-				<!-- JSS2 051125 / 16M 2SP / MANPAKU / 5485BHAJ -->
-				<!-- TODO check size -->
-				<rom name="judgement silversword - rebirth edition (japan) (rev sc21).bin" size="524288" crc="4fce380d" sha1="a1d910123b6be0b941f699ef70c745d16350d029" offset="000000" />
+			<dataarea name="rom" size="2097152">
+				<rom name="jss2_051125.bin" size="2097152" crc="85c4c9a1" sha1="58c691cb31f96eea5689693fd23768d02e8b133f" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x40000">
 			</dataarea>
@@ -1284,6 +1320,31 @@ TODO/missing:
 				<rom name="mh32m16e167c.u3" size="4194304" crc="da4479bf" sha1="b019f41207e396d9fe3509dccdbe1cc6e7ac46bb" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mamamit" supported="no">
+		<!-- WSC only -->
+		<description>mama Mitte'</description>
+		<year>2002</year>
+		<publisher>Tanita</publisher>
+		<info name="serial" value="MM-280"/>
+		<info name="release" value="20021103"/>
+		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="WSS-0001-T" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="?" />
+			<feature name="u3" value="29LV800TA Flash" />
+			<feature name="u4" value="?" />
+			<feature name="x1" value="32K" />
+			<feature name="led1" value="led1" />
+			<feature name="slot" value="ws_sram" />
+			<feature name="rtc" value="yes" />
+			<dataarea name="rom" size="1048576">
+				<rom name="29lv800ta.u3" size="1048576" crc="f366172e" sha1="196190b24297008ab4e48b418ff29b2f8d4bc610" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="0x8000">
 			</dataarea>
 		</part>
 	</software>
@@ -1449,12 +1510,29 @@ TODO/missing:
 		</part>
 	</software>
 
-	<!-- PCB label PTS-0133A -->
-	<!-- BANDAI / 2003 at U1 -->
-	<!-- GIZA at U2 -->
-	<!-- SD64M256S210D at U3 -->
-	<!-- BSI / BS62LV256TC-70 at U4 -->
-	<!-- CRC 23853305 -->
+<!--
+	<software name="onepbatla" cloneof="onepbatl">
+		<description>From TV Animation One Piece - Grand Battle Swan Colosseum Sample Edition</description>
+		<year>2002</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="SWC-BANC29"/>
+		<info name="release" value="20020712"/>
+		<info name="alt_title" value="フロムテレビアニメーション ワンピース グランドバトル スワンコロシアム"/>
+		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0133A" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
+			<feature name="slot" value="ws_sram" />
+			<dataarea name="rom" size="8388608">
+				<rom name="sd64m256s210d.u3" size="8388608" crc="23853305" sha1="" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="0x8000">
+			</dataarea>
+		</part>
+	</software>
+-->
 
 	<software name="onepchop">
 		<!-- WSC only, Rated "Everyone" -->
@@ -1709,6 +1787,29 @@ TODO/missing:
 		</part>
 	</software>
 
+  <!-- not checked yet -->
+	<software name="riviera" supported="no">
+		<!-- WSC only -->
+		<description>Riviera</description>
+		<year>2002</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="SWJ-BANC27"/>
+		<info name="release" value="20020712"/>
+		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0133A" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="HY62KT081ED70C SRAM" />
+			<feature name="slot" value="ws_sram" />
+			<dataarea name="rom" size="4194304">
+				<rom name="sd64m256s216d.u3" size="8388608" crc="2460b45a" sha1="a8f8d3efc9b2d5741081e05f517d746ee5437f87" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="0x8000">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rockmnex">
 		<!-- WSC only -->
 		<description>Rockman EXE WS</description>
@@ -1869,6 +1970,30 @@ TODO/missing:
 			</dataarea>
 		</part>
 	</software>
+
+<!--
+	<software name="sdgundg2">
+		<description>SD Gundam G-Generation - Mono-Eye Gundams (Rev 2)</description>
+		<year>2002</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="SWJ-BANC2F"/>
+		<info name="release" value="20020926"/>
+		<info name="alt_title" value="SDガンダム ジージェネレーション モノアイガンダムズ"/>
+		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTS-0133A" />
+			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="HY62KT081ED70C SRAM" />
+			<feature name="slot" value="ws_sram" />
+			<dataarea name="rom" size="8388608">
+				<rom name="sd64m256s226d.u3" size="8388608" crc="a3ecc9ac" sha1="" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="0x8000">
+			</dataarea>
+		</part>
+	</software>
+-->
 
 	<software name="sdgundg2">
 		<!-- WSC only -->
