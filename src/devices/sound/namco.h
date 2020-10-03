@@ -52,7 +52,6 @@ protected:
 	/* data about the sound system */
 	sound_channel m_channel_list[MAX_VOICES];
 	sound_channel *m_last_channel;
-	uint8_t *m_soundregs;
 	uint8_t *m_wavedata;
 
 	/* global sound parameters */
@@ -85,7 +84,13 @@ public:
 	void polepos_sound_w(offs_t offset, uint8_t data);
 
 protected:
+	// device-level overrides
+	virtual void device_start() override;
+
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+
+private:
+	std::unique_ptr<uint8_t[]> m_soundregs;
 };
 
 
@@ -99,7 +104,13 @@ public:
 	void sharedram_w(offs_t offset, uint8_t data);
 
 protected:
+	// device-level overrides
+	virtual void device_start() override;
+
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+
+private:
+	std::unique_ptr<uint8_t[]> m_soundregs;
 };
 
 

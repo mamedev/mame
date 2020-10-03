@@ -52,7 +52,6 @@ namco_audio_device::namco_audio_device(const machine_config &mconfig, device_typ
 	, device_sound_interface(mconfig, *this)
 	, m_wave_ptr(*this, DEVICE_SELF)
 	, m_last_channel(nullptr)
-	, m_soundregs(nullptr)
 	, m_wavedata(nullptr)
 	, m_wave_size(0)
 	, m_sound_enable(false)
@@ -67,11 +66,13 @@ namco_audio_device::namco_audio_device(const machine_config &mconfig, device_typ
 
 namco_device::namco_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: namco_audio_device(mconfig, NAMCO, tag, owner, clock)
+	, m_soundregs(nullptr)
 {
 }
 
 namco_15xx_device::namco_15xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	:namco_audio_device(mconfig, NAMCO_15XX, tag, owner, clock)
+	, m_soundregs(nullptr)
 {
 }
 
@@ -90,8 +91,6 @@ void namco_audio_device::device_start()
 	/* extract globals from the interface */
 	m_last_channel = m_channel_list + m_voices;
 
-	m_soundregs = auto_alloc_array_clear(machine(), uint8_t, 0x400);
-
 	/* build the waveform table */
 	build_decoded_waveform(m_wave_ptr);
 
@@ -105,8 +104,6 @@ void namco_audio_device::device_start()
 	m_sound_enable = true;
 
 	/* register with the save state system */
-	save_pointer(NAME(m_soundregs), 0x400);
-
 	if (m_wave_ptr == nullptr)
 		save_pointer(NAME(m_wavedata), 0x400);
 
@@ -139,6 +136,24 @@ void namco_audio_device::device_start()
 	save_pointer(STRUCT_MEMBER(m_channel_list, noise_hold), m_voices);
 	save_pointer(STRUCT_MEMBER(m_channel_list, noise_counter), m_voices);
 	save_pointer(STRUCT_MEMBER(m_channel_list, waveform_select), m_voices);
+}
+
+
+void namco_device::device_start()
+{
+	namco_audio_device::device_start();
+
+	m_soundregs = make_unique_clear<uint8_t[]>(0x400);
+	save_pointer(NAME(m_soundregs), 0x400);
+}
+
+
+void namco_15xx_device::device_start()
+{
+	namco_audio_device::device_start();
+
+	m_soundregs = make_unique_clear<uint8_t[]>(0x400);
+	save_pointer(NAME(m_soundregs), 0x400);
 }
 
 
@@ -317,15 +332,17 @@ void namco_cus30_device::pacman_sound_w(offs_t offset, uint8_t data)
 	sound_channel *voice;
 	int ch;
 
+	uint8_t *soundregs = &m_wavedata[0x100];
+
 	data &= 0x0f;
-	if (m_soundregs[offset] == data)
+	if (soundregs[offset] == data)
 		return;
 
 	/* update the streams */
 	m_stream->update();
 
 	/* set the register */
-	m_soundregs[offset] = data;
+	soundregs[offset] = data;
 
 	if (offset < 0x10)
 		ch = (offset - 5) / 5;
@@ -352,11 +369,11 @@ void namco_cus30_device::pacman_sound_w(offs_t offset, uint8_t data)
 	case 0x14:
 		/* the frequency has 20 bits */
 		/* the first voice has extra frequency bits */
-		voice->frequency = (ch == 0) ? m_soundregs[0x10] : 0;
-		voice->frequency += (m_soundregs[ch * 5 + 0x11] << 4);
-		voice->frequency += (m_soundregs[ch * 5 + 0x12] << 8);
-		voice->frequency += (m_soundregs[ch * 5 + 0x13] << 12);
-		voice->frequency += (m_soundregs[ch * 5 + 0x14] << 16); /* always 0 */
+		voice->frequency = (ch == 0) ? soundregs[0x10] : 0;
+		voice->frequency += (soundregs[ch * 5 + 0x11] << 4);
+		voice->frequency += (soundregs[ch * 5 + 0x12] << 8);
+		voice->frequency += (soundregs[ch * 5 + 0x13] << 12);
+		voice->frequency += (soundregs[ch * 5 + 0x14] << 16); /* always 0 */
 		break;
 
 	case 0x15:
@@ -556,16 +573,16 @@ void namco_cus30_device::namcos1_sound_w(offs_t offset, uint8_t data)
 		return;
 	}
 
-	m_soundregs = m_wavedata + 0x100;
+	uint8_t *soundregs = &m_wavedata[0x100];
 
-	if (m_soundregs[offset] == data)
+	if (soundregs[offset] == data)
 		return;
 
 	/* update the streams */
 	m_stream->update();
 
 	/* set the register */
-	m_soundregs[offset] = data;
+	soundregs[offset] = data;
 
 	ch = offset / 8;
 	if (ch >= m_voices)
@@ -584,9 +601,9 @@ void namco_cus30_device::namcos1_sound_w(offs_t offset, uint8_t data)
 	case 0x02:
 	case 0x03:
 		/* the frequency has 20 bits */
-		voice->frequency = (m_soundregs[ch * 8 + 0x01] & 15) << 16; /* high bits are from here */
-		voice->frequency += m_soundregs[ch * 8 + 0x02] << 8;
-		voice->frequency += m_soundregs[ch * 8 + 0x03];
+		voice->frequency = (soundregs[ch * 8 + 0x01] & 15) << 16; /* high bits are from here */
+		voice->frequency += soundregs[ch * 8 + 0x02] << 8;
+		voice->frequency += soundregs[ch * 8 + 0x03];
 		break;
 
 	case 0x04:
