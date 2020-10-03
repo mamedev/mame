@@ -3,13 +3,276 @@
 <!--
 license:CC0
 
-+======+=====+=============+================================================================================================+
-| Dump | ROM |      Serial       |                                    Name                                                        |
-+======+=====+=============+================================================================================================+
-| X    | 
+This is a full list of known WonderSwan and WonderSwan Color games.
++===+=====+==========+============+=====+================================================================================================+
+| D | ROM |   CRC    |   Serial   | Rev |                                    Name                                                        |
++===+=====+==========|============+=====+================================================================================================+
+| X | 001 | a1656bbb | SWJ-BAN010 |  0  | GunPey / グンペイ
+| X | 002 | 5a41a7ba | SWJ-BAN004 |  0  | Puyo Puyo Tsuu / ぷよぷよ通
+| X | 003 | c2ed122e | SWJ-SUM001 |  1  | Mahjong Touryuumon / 麻雀 登龍門
+| X | 004 | 04531734 | SWL-KEX001 |  0  | Nobunaga no Yabou for WonderSwan / 信長の野望 for ワンダースワン
+| X | 005 | b62e5dd0 | SWJ-TAT001 |  1  | Densha de Go! / 電車でGO!
+| X | 006 | ab59de2e | SWJ-BAN005 |  1  | Digital Monster - Ver. WonderSwan / デジタルモンスター バージョン ワンダースワン
+| X | 007 | 5b76f901 | SWJ-TMY001 |  1  | Shin Nihon Pro Wrestling Toukon Retsuden / 新日本プロレスリング 闘魂烈伝
+| X | 008 | 23bc0309 | SWJ-BAN003 |  0  | Wonder Stadium / ワンダースタジアム
+| X | 009 | a607a350 | SWJ-BAN002 |  1  | Chocobo no Fushigi na Dungeon for WonderSwan / チョコボの不思議なダンジョン for ワンダースワン
+| X | 010 | e385ee88 | SWJ-KEX002 |  0  | Sangokushi for WonderSwan / 三国志 for ワンダースワン
+| X | 011 | 86b56511 | SWJ-CCJ001 |  0  | Umizuri ni Ikou! / 海釣りに行こう!
+| X | 012 | a193458c | SWJ-JLC001 |  0  | Ganso Jajamaru-kun / 元祖じゃじゃ丸くん
+| X | 013 | 1c489351 | SWJ-SUN001 |  0  | Shanghai Pocket / 上海 ポケット
+| X | 014 | 00137e86 | SWJ-PAW001 |  2  | Goraku Ou Tango! / 語楽王 タンゴ !
+| X | 015 | b5dbcf12 | SWJ-SUM002 |  1  | Nice On / ナイスオン
+| X | 016 | 324622c9 | SWJ-KNM001 |  0  | Beatmania for WonderSwan / ビートマニア for ワンダースワン
+| X | 017 | ccaa4853 | SWJ-BAN002 |  2  | Chocobo no Fushigi na Dungeon for WonderSwan / チョコボの不思議なダンジョン for ワンダースワン
+|   | 018 |          |            |     | likely SD Gundam - Emotional Jam (Rev 2), no proof yet
+| X | 019 | 4c48624c | SWJ-BAN007 |  0  | Kosodate Quiz Dokodemo - My Angel / 子育てクイズ どこでもマイエンジェル
+| X | 020 | 12fb8b28 | SWJ-MGA001 |  0  | Medarot Perfect Edition - Kabuto Version / メダロット パーフェクトエディション - カブトバージョン
+| X | 021 | 2b40745d | SWJ-MGA002 |  0  | Medarot Perfect Edition - Kuwagata Version / メダロット パーフェクトエディション - クワガタバージョン
+| X | 022 | 8d83014f | SWJ-SUN002 |  0  | Space Invaders / スペースインベーダー
+| X | 023 | 8a8c5aa8 | SWJ-BPR001 |  0  | Super Robot Taisen Compact / スーパーロボット大戦 コンパクト
+| X | 024 | 80c6ef12 | SWJ-BAN008 |  0  | Kaze no Klonoa - Moonlight Museum / 風のクロノアムーンライトミュージアム
+| X | 025 | cccaf8a1 | SWJ-BAN009 |  0  | Last Stand / ラストスタンド
+| X | 026 | ae83f873 | SWJ-BAN006 |  3  | SD Gundam - Emotional Jam / SDガンダム エモーショナルジャム
+| X | 027 | aa53971d | SWJ-BAN002 |  3  | Chocobo no Fushigi na Dungeon for WonderSwan / チョコボの不思議なダンジョン for ワンダースワン
+| X | 028 | e7e7fd4c | SWJ-SUM001 |  3  | Mahjong Touryuumon / 麻雀 登龍門
+| X | 029 | 7572e478 | SWJ-BPR001 |  1  | Super Robot Taisen Compact / スーパーロボット大戦 コンパクト
+| X | 030 | e7c608e5 | SWJ-BAN00D |  0  | Tekken Card Challenge / 鉄拳カードチャレンジ
+| X | 031 | 27b3cc18 | SWJ-BAN00B |  0  | Chaos Gear - Michibikareshi Mono / カオスギア 導かれし者
+| X | 032 | c283ec5f | SWJ-BTM001 |  1  | Trump Collection - Bottom-Up Teki Trump Seikatsu / トランプコレクション2 ボトムアップ的世界一周の旅
+| X | 033 | 425eb893 | SWJ-SUM004 |  0  | Anchorz Field / アンカーズ・フィールド
+| X | 034 | 302499b9 | SWJ-SUN003 |  0  | Puzzle Bobble / パズルボブル
+| X | 035 | 8fc9e145 | SWJ-BAN00C |  1  | Vaitz Blade / ヴァイツブレイド
+| X | 036 | 44b3e67c | SWJ-KGT001 |  2  | Nihon Pro Mahjong Renmei Kounin Tetsuman / 日本プロ麻雀連盟公認 徹萬
+| X | 037 | 7021d54f | SWJ-BPR001 |  2  | Super Robot Taisen Compact / スーパーロボット大戦 コンパクト
+| X | 038 | 0cb57376 | SWJ-NHB001 |  0  | Crazy Climber / クレイジー・クライマー
+| X | 039 | 00b31fbb | SWJ-BAN011 |  0  | Makaimura for WonderSwan / 魔界村 for ワンダースワン
+| X | 040 | bf8d9212 | SWJ-BAN00E |  0  | Neon Genesis Evangelion - Shito Ikusei / 新世紀エヴァンゲリオン シト育成
+| X | 041 | 53b9fef8 | SWJ-BAN015 |  0  | Kidou Senshi Gundam MSVS / 機動戦士ガンダム エムエスバーサス
+| X | 042 | ef5b6b82 | SWJ-BAN014 |  0  | Terrors / テラーズ
+| X | 043 | 92fbf7fb | SWJ-BAN012 |  0  | Meitantei Conan - Majutsushi no Chousenjou! / 名探偵コナン 魔術師の挑戦状!
+| X | 044 | 1263da65 | SWJ-CCJ002 |  0  | Soccer Yarou! - Challenge the World / サッカーやろう! チャレンジ・ザ・ワールド
+| X | 045 | 517f962e | SWJ-MDE001 |  0  | Keiba Yosou Shien Soft - Yosou Shinkaron / 競馬予想支援ソフト 予想進化論
+| X | 046 | 4d103236 | SWJ-BPR002 |  0  | Kakutou Ryouri Densetsu Bistro Recipe - Wonder Battle Hen / 格闘料理伝説 ビストロレシピ ワンダーバトル編
+| X | 047 | 90f7e6d6 | SWJ-ATN001 |  1  | Pro Mahjong Kiwame for WonderSwan / プロ麻雀 極 フォー ワンダースワン
+| X | 048 | af9d8f42 | SWJ-CFT001 |  0  | Densha de Go! 2 / 電車でGO ! 2
+| X | 049 | 4e467626 | SWJ-NAP001 |  0  | Engacho! for WonderSwan / えんがちょ! for ワンダースワン
+| X | 050 | e252919d | SWJ-BAN019 |  0  | Wonder Stadium '99 / ワンダースタジアム'99
+| X | 051 | 637ada93 | SWJ-DTE002 |  0  | Magical Drop for WonderSwan / マジカルドロップ for ワンダースワン
+| X | 052 | aa525c04 | SWJ-SRV001 |  0  | Harobots / ハロボッツ
+| X | 053 | 3ad194eb | SWJ-SUM005 |  0  | Shougi Touryuumon / 将棋 登龍門
+| X | 054 | 9baac7bb | SWJ-HAL002 |  1  | Mingle Magnet / ミングルマグネット
+| X | 055 | cd206a9e | SWJ-BAN013 |  0  | Rockman & Forte - Mirai Kara no Chousensha / ロックマン&フォルテ 未来からの挑戦者
+| X | 056 | 0d5171f0 | SWJ-BAN017 |  0  | Turntablist - DJ Battle / タ→ンテ→ブリスト DJバトル
+| X | 057 | ecfbcb1d | SWJ-BEC001 |  1  | Kyousouba Ikusei Simulation - Keiba / 競走馬育成シミュレーション ケイバ
+| X | 058 | 3b4c60c6 | SWJ-KDX001 |  2  | Kiss Yori... - Seaside Serenade / キスより... ～シーサイドセレナーデ～
+| X | 059 | 4ed8820c | SWJ-BVL001 |  0  | Nazo Ou Pocket / 謎王 Pocket
+| X | 060 | 04366d92 | SWJ-SUM003 |  0  | Armored Unit / アーマードユニット
+| X | 061 | 7f3a14c0 | SWJ-BAN01A |  0  | Cardcaptor Sakura - Sakura to Fushigi na Clow Card / カードキャプターさくら ～さくらとふしぎなクロウカード～
+| X | 062 | b25a0635 | SWJ-BAN01B |  0  | Buffers Evolution / バッファーズエボリューション
+| X | 063 | 8655269e | SWJ-DTE001 |  0  | Side Pocket for WonderSwan / サイドポケット for ワンダースワン
+| X | 064 | 56e2c069 | SWJ-KBS002 |  3  | Chou Denki Card Game - Youfu Makai - Kikuchi Shuukou / 超伝奇カードバトル 妖符魔界 菊地秀行
+| X | 065 | 4e8909d1 | SWJ-KGT002 |  1  | Clock Tower for WonderSwan / クロックタワー フォー ワンダースワン
+| X | 066 | fc6946f0 | SWJ-BAN01C |  0  | Digimon Adventure - Anode Tamer / デジモンアドベンチャー アノードテイマー
+| X | 067 | 42ad238b | SWJ-BAN01D |  0  | Digimon Adventure - Cathode Tamer / デジモンアドベンチャー カソードテイマー
+| X | 068 | a5643aa3 | SWJ-BAN01F |  0  | Tare Panda no GunPey / たれぱんだのぐんぺい
+| X | 069 | 8922dd0b | SWJ-BEC002 |  0  | Fever - Sankyo Koushiki Pachinko Simulation for WonderSwan / フィーバー サンキョー 公式パチンコシミュレーション フォー ワンダースワン
+| X | 070 | d675c265 | SWJ-YKE001 |  0  | Morita Shougi for WonderSwan / 森田将棋 フォー ワンダースワン
+| X | 071 | f016dfe1 | SWJ-BVL002 |  1  | Sotsugyou for WonderSwan / 卒業 フォー ワンダースワン
+| X | 072 | 6f304dca | SWJ-MGH001 |  0  | Tetsujin 28 Gou / 鉄人28号
+| X | 073 | b1caec06 | SWJ-BAN01E |  0  | Tane o Maku Tori / たねをまく鳥 / boxart: D'sGarage21公募ゲーム たねをまく鳥
+| X | 074 | 631bd97a | SWJ-SUN004 |  0  | O-chan no Oekaki Logic / おーちゃんのお絵かきロジック
+| X | 075 | 89e7d950 | SWJ-BEC003 |  0  | Dokodemo Hamster / どこでもハムスター
+| X | 076 | 392dd813 | SWJ-KGT003 |  0  | Bakusou Dekotora Densetsu for WonderSwan / 爆走デコトラ伝説 フォー ワンダースワン
+| X | 077 | 21eb4c59 | SWJ-BAN020 |  0  | SD Gundam Gashapon Senki - Episode 1 / SD ガンダム ガシャポン戦記 -エピソード1-
+| X | 078 | 21eb4c59 | SWJ-BAN020 |  0  | SD Gundam Gashapon Senki - Episode 1 / SD ガンダム ガシャポン戦記 -エピソード1-
+| X | 079 | f75ce82c | SWJ-SRV001 |  1  | Harobots / ハロボッツ
+| X | 080 | a9f11523 | SWJ-SUM006 |  0  | Gomoku Narabe & Reversi - Touryuumon / 五目並べ&リバーシ 登龍門
+| X | 081 | 4b22270d | SWJ-KGT005 |  0  | Hanafuda Shiyouyo / 花札しようよ
+| X | 082 | 812020ef | SWJ-OMM001 |  4  | Uzumaki - Denshi Kaiki Hen / うずまき ～電視怪奇篇～
+| X | 083 | 7fff2520 | SWJ-BAN023 |  4  | Chou Aniki - Otoko no Tamafuda / 超兄貴 男の魂札
+| X | 084 | 50b7a742 | SWJ-KGT004 |  0  | Taikyoku Igo - Heisei Kiin / 対局囲碁 平成棋院
+| X | 085 | 8b74f59a | SWJ-BVL003 |  1  | Tanjou Debut for WonderSwan / 誕生 デビュー フォー ワンダースワン
+| X | 086 | a1fb16fc | SWJ-BEC004 |  0  | Fishing Freaks - Bass Rise for WonderSwan / フィッシングフリークス バスライズ フォー ワンダースワン
+| X | 087 | 07a3dd46 | SWJ-BAN022 |  0  | Senkaiden - TV Animation Senkaiden Houshin Engi Yori / 仙界伝 ～TVアニメーション仙界伝封神演義より～
+| X | 088 | 9e0854e2 | SWJ-BAN024 |  1  | Langrisser Millennium WS - The Last Century / ラングリッサーミレニアム WS ～The LastCentury～
+| X | 089 | a3ead689 | SWJ-KGT006 |  0  | Metakomi Theraphy - Nee Kiite! / メタコミセラピー ねぇ聞いて!
+| X | 090 | ca3f0b00 | SWJ-OMM002 |  0  | Itou Junji Uzumaki - Noroi Simulation / うずまき 呪いシミュレーション
+|   | 091 |          |            |     |
+| X | 092 | 301436ac | SWJ-BAN025 |  0  | Sennou Millennium / 線脳 ミレニアム
+| X | 093 | 62d419cd | SWJ-LAY001 |  0  | Macross - True Love Song / 超時空要塞マクロス トゥルーラブソング
+| X | 094 | ce2f1a1d | SWJ-BAN026 |  0  | Final Lap 2000 / ファイナルラップ2000
+| X | 095 | eb995e86 | SWJ-JLC002 |  0  | Moero!! Pro Yakyuu Rookies / 燃えろ!!プロ野球 ルーキーズ
+| X | 096 | 440b2630 | SWJ-KEX004 |  0  | Sangokushi II for WonderSwan / 三国志II フォー ワンダースワン
+| X | 097 | 6e9dd148 | SWJ-BAN01C |  1  | Digimon Adventure - Anode Tamer / デジモンアドベンチャー アノードテイマー
+| X | 098 | 782877bc | SWJ-BPR003 |  0  | Super Robot Taisen Compact 2 - Dai-1-bu - Chijou Gekidou Hen / スーパーロボット大戦 コンパクト2 第1部:地上激闘篇
+| X | 099 | 21279e82 | SWJ-BPR004 |  0  | Lode Runner for WonderSwan / ロードランナー フォー ワンダースワン
+| X | 100 | 1860b655 | SWJ-BAN028 |  0  | Wasabi Produce - Street Dancer / ワサビ プロデュース ストリートダンサー
+| X | 101 | 35361250 | SWJ-BAN00A |  0  | Pocket Fighter / ポケットファイター
+| X | 102 | 352a570d | SWJ-BAN029 |  0  | Slither Link / スリザーリンク
+| X | 103 | 7da6acb9 | SWJ-BPR005 |  0  | Time Bokan Series - Bokan Densetsu - Butamo Odaterya Doronbou / タイム ボカン シリーズ ボカン伝説 ブタもおだてりゃドロンボー
+| X | 104 | 64aaf392 | SWJ-BTM002 |  1  | Trump Collection 2 - Bottom-Up Teki Sekaiisshuu no Tabi / トランプコレクション ボトムアップ的トランプ生活
+| X | 105 | bd6fc68a | SWJ-BAN02A |  1  | Hunter X Hunter - Ishi o Tsugu Mono / ハンター×ハンター 意志を継ぐ者
+|   | 106 |          |            |     |
+| X | 107 | b5e675ae | SWJ-BAN02C |  0  | Digital Partner / デジモンアドベンチャー02 デジタルパートナー
+|   |     |          | SWJ-BAN02F |     | /
+| X | 108 | 4aed3911 | SWJ-KGT008 |  0  | Glocal Hexcite / グローカルヘキサイト
+| X | 109 | 80de367d | SWJ-SCC001 |  1  | MobileWonderGate
+| X | 110 | 8f8608ad | SWJ-MGH003 \  0  | Rainbow Islands - Putty's Party / レインボーアイランド パティーズ☆パーティ!
+| X | 111 | e4eb3ab1 | SWJ-BAN030 |  0  | SD Gundam G-Generation - Gather Beat / SDガンダム Gジェネレーション ギャザービート
+| X | 112 | f2e362b8 | SWJ-BAN02B |  0  | From TV Animation One Piece - Mezase Kaizoku Ou! / フロムテレビアニメーション ワンピース めざせ海賊王!
+| X | 113 | e226863b | SWJ-BAN027 |  0  | Meitantei Conan - Nishi no Meitantei Saidai no Kiki! / 名探偵コナン 西の名探偵 最大の危機!?
+|   | 114 |          | SWJ-KDK001 |  0  | Ring Infinity / リング インフィニティ
+|   | 115 |          | SWJ-KDK001 |     | / (cartridge contains 2 roms, combined contents same as 119)
+| X | 116 | 70aa800e | SWJ-BAN02A |  2  | Hunter X Hunter - Ishi o Tsugu Mono / ハンター×ハンター 意志を継ぐ者
+| X | 117 | 56ce1bc5 | SWJ-BAN032 |  0  | Digimon Adventure 02 - Tag Tamers / デジモンアドベンチャー02 タッグテイマーズ
+| X | 118 | 6adf0e32 | SWJ-BAN033 |  0  | Wonder Borg Robot Works / ワンダーボーグ 完
+| X | 119 | 14adbd4b | SWJ-KDK001 |  0  | Ring Infinity / リング インフィニティ
+| X | 120 | f246a68e | SWJ-KGT007 |  5  | Fire Pro Wrestling for WonderSwan / ファイヤープロレスリング フォー ワンダースワン
+|   | 121 |          |            |     |
+|   | 122 |          |            |     |
+| X | 123 | 7a29e9a6 | SWJ-SQR004 |  0  | Hataraku Chocobo / はたらくチョコボ
+| X | 124 | ecbb46de | SWJ-BPR006 |  4  | Super Robot Taisen Compact 2 - Dai-2-bu - Uchuu Gekishin Hen / スーパーロボット大戦 コンパクト2 第2部:宇宙激震篇
+| X | 125 | 91117d1b | SWJ-AAE001 |  0  | Tokyo Majin Gakuen - Fuju Houroku / 東京魔人学園 符咒封録
+| X | 126 | 6ededaf8 | SWJ-BAN032 |  1  | Digimon Adventure 02 - Tag Tamers / デジモンアドベンチャー02 タッグテイマーズ
+| X | 127 | be6be690 | SWJ-BAN033 |  1  | Robot Works (Asia) / ワンダーボーグ 完
+| X | 128 | 9bd8f08c | SWJ-BANC05 |  0  | Terrors 2 / テラーズ2
+| X | 129 | b7243e88 | SWJ-SQRC01 |  0  | Final Fantasy / ファイナルファンタジー
+| X | 130 | 0e467d97 | SWJ-KGTC09 |  1  | Sorobang / そろばんぐ
+| X | 131 | 0c9cb12c | SWJ-BANC02 |  0  | GunPey EX / グンペイEX
+| X | 132 | 60706555 | SWJ-BANC01 |  0  | Rhyme Rider Kerorican / ライムライダー ケロリカン
+| X | 133 | d7a0ab74 | SWJ-OMMC03 |  0  | Another Heaven - Memory of those Days / アナザヘヴン ～memory of those days～
+| X | 134 | 93e19f13 | SWJ-BECC01 |  2  | Dokodemo Hamster 3 - Odekake Saffron / どこでもハムスター3 おでかけサフラン
+| X | 135 | 4d28637e | SWJ-BANC03 |  0  | Digimon Adventure 02 - D1 Tamers / デジモンアドベンチャー02 ディーワンテイマーズ
+| X | 136 | 12f10b27 | SWJ-BANC06 |  0  | Wonder Classic / ナムコワンダークラシック
+| X | 137 | 9f35d00f | SWJ-BANC04 |  0  | Senkaiden Ni - TV Animation Senkaiden Houshin Engi Yori / 仙界伝 弐～TVアニメーション仙界伝封神演義より～
+| X | 138 | 0b0f8981 | SWJ-BPR007 |  2  | Super Robot Taisen Compact 2 - Dai-3-bu - Ginga Kessen Hen / スーパーロボット大戦 コンパクト2 第3部:銀河決戦篇
+| X | 139 | e14e9d36 | SWJ-SHLC01 |  0  | With You - Mitsumete Itai / ウィズ・ユー ～みつめていたい～
+| X | 140 | 69d8d433 | SWJ-KBSC01 |  0  | Flash Koibito-kun / フラッシュ 恋人クン
+| X | 141 | 94ea6ffc | SWJ-BAN001 |  0  | Digimon - Ver. WonderSwan (Asia)
+| X | 142 | 08c0247b \ SWJ-BANC07 |  0  | Kidou Senshi Gundam Vol. 1 - Side 7 / 機動戦士ガンダム Vol.1 サイドセブン
+| X | 143 | 62f4e4b4 | SWJ-BANC03 |  1  | Digimon Adventure 02 - D1 Tamers / デジモンアドベンチャー02 ディーワンテイマーズ
+| X | 144 | 9750bc2a | SWJ-SUMC07 |  0  | Guilty Gear Petit / ギルティギア プチ
+| X | 145 | 5793bdda | SWJ-BANC09 |  0  | Uchuu Senkan Yamato / 宇宙戦艦ヤマト
+| X | 146 | d9401f0a | SWJ-SQRC04 |  0  | Wild Card / ワイルドカード
+| X | 147 | 8e123373 | SWJ-KDKC01 |  0  | Memories Off - Festa / メモリーズオフ フェスタ
+| X | 148 | 15e55706 | SWJ-BANC0C |  0  | Wizardry Scenario 1 - Proving Grounds of the Mad Overlord / ウィザードリィ シナリオ1 狂王の試練場
+| X | 149 | c60e5162 | SWJ-BANC0A |  0  | SD Gundam Eiyuu Den - Kishi Densetsu / SDガンダム英雄伝 ～騎士伝説～
+| X | 150 | 18ecffb8 | SWJ-BANC0B |  0  | SD Gundam Eiyuu Den - Musha Densetsu / SDガンダム英雄伝 ～武者伝説～
+| X | 151 | 12ae932c | SWJ-BANC08 |  0  | Dark Eyes - Battle Gate / バトルゲート ダークアイズ
+| X | 152 | 5555d95c | SWJ-NMCC01 |  0  | Mr. Driller / ミスタードリラー
+| X | 153 | 9f6e3f8d | SWJ-BANC0E |  0  | Meitantei Conan - Yuugure no Koujo / 名探偵コナン ～夕暮れの皇女～
+| X | 154 | d75effc2 \ SWJ-KBSC02 |  0  | Mikeneko Holmes - Ghost Panic / サウンドコミック - 三毛猫ホームズ ゴーストパニック
+| X | 155 | d0b20c5a | SWJ-BANC0F |  0  | Hunter X Hunter - Sorezore no Ketsui / ハンター×ハンター ～それぞれの決意～
+| X | 156 | 2b61bb2b | SWJ-BANC0D |  0  | Pocket no Naka no Doraemon / ポケットの中の ドラえもん
+| X | 157 | fe4ff701 | SWJ-BANC10 |  0  | Raku Jongg / 落雀
+|   | 158 |          |            |     |
+| X | 159 | 4d21a347 | SWJ-BANC12 |  0  | SD Gundam G-Generation - Gather Beat 2 / SDガンダム Gジェネレーション ギャザービート2
+| X | 160 | f09e752f | SWJ-SQRC02 |  0  | Final Fantasy II / ファイナルファンタジーII
+| X | 161 | 274719f5 | SWJ-TMCC01 |  1  | Kurupara! / くるパラ!
+| X | 162 | 446e2581 | SWJ-SESC01 |  2  | Gensou Maden Saiyuuki Retribution - Hi no Ataru Basho de / 幻想魔伝最遊記 Retribution ～陽のあたる場所で～
+| X | 163 | de2208ab | SWJ-BANC11 |  0  | Ultraman - Hikari no Kuni no Shisha / ウルトラマン 光の国の使者
+| X | 164 | 99027238 | SWJ-SQRC05 |  0  | Blue Wing Blitz / ブルー ウイング ブリッツ
+| X | 165 | 47659b2c | SWJ-BANC13 |  0  | Tonpuusou / 東風荘
+| X | 166 | fa92418d | SWJ-BANC14 |  0  | Digimon Tamers - Digimon Medley / デジモンテイマーズ デジモンメドレー
+| X | 167 | da4479bf | SWJ-BANC15 |  0  | Last Alive / ラストアライブ
+| X | 168 | 9874e9a2 |            |  0  | Star Hearts - Hoshi to Daichi no Shisha - Taikenban / スターハーツ ～星と大地の使者～
+|   | 169 |          |            |     |
+| X | 170 | 138d1018 | SWJ-BANC16 |  0  | Star Hearts - Hoshi to Daichi no Shisha / スターハーツ ～星と大地の使者～
+| X | 171 | 39a1391a | SWJ-BANC17 |  0  | Kidou Senshi Gundam Vol. 2 - Jaburo / 機動戦士ガンダム Vol.2 ジャブロー
+| X | 172 | 9402bca9 | SWJ-BANC18 |  0  | Hunter X Hunter - Michibikareshi Mono / ハンター×ハンター 導かれし者
+| X | 173 | 84a46949 | SWJ-BANC14 |  0  | Digimon Tamers - Digimon Medley / デジモンテイマーズ デジモンメドレー
+|   | 174 |          |            |     |
+| X | 175 | 77689273 \ SWJ-BAN001 |  0  | Digimon - Anode Tamer &amp; Cathode Tamer
+|   | 176 |          |            |     |
+| X | 177 | d7a12bd5 | SWJ-SUMC08 |  0  | Guilty Gear Petit 2 / ギルティギア プチ2
+| X | 178 | 427056c4 | SWJ-BANC19 |  0  | From TV Animation One Piece - Niji no Shima Densetsu / フロムテレビアニメーション ワンピース 虹の島伝説
+| X | 179 | c927bfcb | SWJ-BANC1A |  0  | Digimon Tamers - Battle Spirit / デジモンテイマーズ バトルスピリット
+|   |     |          | SWJ-BANC24 |     | /
+|   | 180 |          |            |     | Digimon Tamers - Battle Spirit / デジモンテイマーズ バトルスピリット prototype?
+|   | 181 |          |            |     |
+| X | 182 | b18cdc0d | SWJ-HTRC01 |  0  | Alchemist Marie & Elie - Futari no Atelier / マリー&エリー ～ふたりのアトリエ～
+| X | 183 | 0c23d551 | SWJ-BANC1B |  0  | Inuyasha - Kagome no Sengoku Nikki / 犬夜叉 かごめの戦国日記
+| X | 184 | b07e6a56 | SWJ-BANC23 |  0  | Final Lap Special - GT & Formula Machine / ファイナルラップスペシャル
+| X | 185 | 16e0d929 | SWJ-BPRC08 |  0  | Super Robot Taisen Compact for WonderSwan Color / フォー ワンダースワンカラーコンパクト スーパーロボット大戦
+| X | 186 | 25e2ba75 | SWJ-BANC1F |  0  | XI[sai] Little / サイ リトル
+| X | 187 | 9c98d97d | SWJ-SQRC07 |  0  | Romancing Sa-Ga / ロマンシング サ・ガ
+|   | 188 |          |            |     |
+|   | 189 |          |            |     |
+| X | 190 | 205503c3 | SWJ-BANC1E |  0  | From TV Animation One Piece - Treasure Wars / フロムテレビアニメーション ワンピース トレジャーウォーズ
+| X | 191 | f1f4d41f | SWJ-BANC1D |  1  | Digimon Tamers - Brave Tamer / デジモンテイマーズ ブレイブテイマー
+|   | 192 |          |            |     |
+| X | 193 | 15c4552e | SWJ-DDJC01 |  0  | RUN=DIM - Return to Earth / ランディム Return To Earth
+| X | 194 | f0acda5c | SWJ-BANC21 |  0  | SD Gundam - Operation U.C. / SDガンダム オペレーション U.C.
+| X | 195 | 31e09bed | SWJ-SQRC06 |  1  | Hanjuku Hero - Ah, Sekai yo Hanjuku Nare...!! / はんじゅくヒーロー半熟英雄 ああ、世界よ半熟なれ...!!
+| X | 196 | bc944a98 | SWJ-BANC2B |  0  | Golden Axe
+| X | 197 | 462f9275 | SWJ-BANC20 |  0  | Kinnikuman IIsei - Dream Tag Match / キン肉マンII世 ドリームタッグマッチ
+| X | 198 | 3df3e34c | SWJ-BANC1E |  1  | From TV Animation One Piece - Treasure Wars / From TV Animation One Piece - Treasure Wars
+| X | 199 | 1b6f5f30 | SWJ-SQRC08 |  0  | Makai Toushi Sa-Ga / 魔界塔士 サ・ガ
+| X | 200 | f699d6d1 | SWJ-SQRC09 |  0  | Final Fantasy IV / ファイナルファンタジーIV
+| X | 201 | 6caad4a2 | SWJ-BANC30 |  0  | Digimon Tamers - Battle Spirit Ver. 1.5 / デジモンテイマーズ バトルスピリット Ver.1.5
+| X | 202 | 7b0caea9 | SWJ-VGDC01 |  0  | Tetris / テトリス
+| X | 203 | 1e760c41 | SWJ-BANC22 |  2  | Digital Monster Card Game - Ver. WonderSwan Color / デジタルモンスター カードゲーム バージョン ワンダースワンカラー
+| X | 204 | a9f5bf54 | SWJ-BANC25 |  0  | Kidou Senshi Gundam Vol. 3 - A Baoa Qu / 機動戦士ガンダム Vol.3 ア・バオア・クー
+| X | 205 | af24f95c | SWJ-MGTC01 |  0  | Gransta Chronicle / グランスタ クロニクル
+| X | 206 | 66b617d5 | SWJ-BANC2C |  0  | X - Card of Fate / エックス カード オブ フェイト
+| X | 207 | 2460b45a | SWJ-BANC27 |  0  | Riviera - Yakusoku no Chi Riviera / Riviera ～約束の地 リヴィエラ～
+| X | 208 | e2317345 | SWJ-BANC2A |  0  | Arc the Lad - Kishin Fukkatsu / アークザラッド 機神復活
+| X | 209 | f8a1dd2b | SWJ-BANC29 |  0  | From TV Animation One Piece - Grand Battle Swan Colosseum / フロムテレビアニメーション ワンピース グランドバトル スワンコロシアム
+|   | 210 | 23853305 | SWC-BANC29 |  0  | Sample edition for From TV Animation One Piece - Grand Battle Swan Colosseum / フロムテレビアニメーション ワンピース グランドバトル スワンコロシアム
+| X | 211 | 2f9e2560 \ SWJ-SQRC10 |  0  | Front Mission / フロントミッション
+| X | 212 | 3ff5791f | SWJ-BANC26 |  0  | Inuyasha - Fuuun Emaki / 犬夜叉 風雲絵巻
+| X | 213 | faaefbcb | SWJ-BANC2E |  0  | Digital Monster - D-Project / デジタルモンスター ディープロジェクト
+| X | 214 | 8a8b827c | SWJ-WIZC01 |  0  | Gekitou! Crash Gear Turbo - Gear Champion League / 激闘! クラッシュギア ターボギアチャンピオンリーグ
+| X | 215 | 6c029674 | SWJ-BANC2D |  0  | Shaman King - Asu e no Ishi / シャーマンキング 未来への意志
+| X | 216 | 2460b45a?| SWJ-BANC27 |  1  | Riviera - Yakusoku no Chi Riviera
+|   | 216 | 62CB398B?| SWJ-BANC27 |  1  | Riviera - Yakusoku no Chi Riviera
+|   | 217 | 0E40829C | SWJ-BANC2E |  2  | Digital Monster - D-Project / デジタルモンスター ディープロジェクト
+| X | 218 | 6aca1f04 | SWJ-BANC2F |  0  | SD Gundam G-Generation - Mono-Eye Gundams / SDガンダム ジージェネレーション モノアイガンダムズ
+| X | 219 | 34908cb4 | SWJ-BANC2D |  1  | Shaman King - Asu e no Ishi / シャーマンキング 未来への意志
+| X | 220 | 8ce4652f | SWJ-BANC28 |  0  | Namco Super Wars / ナムコスーパーウォーズ
+| X | 221 | 44453234 | SWJ-BANC32 |  0  | Inuyasha - Kagome no Yume Nikki / 犬夜叉 かごめの夢日記
+|   | 222 | A28D3DC5 | SWJ-BANC31 |  0  | Battle Spirit - Digimon Frontier / バトルスピリット デジモンフロンティア
+|   | 223 |          |            |     |
+| X | 224 | 8ba49dab | SWJ-BANC31 |  1  | Battle Spirit - Digimon Frontier / バトルスピリット デジモンフロンティア
+| X | 225 | 0d1048f0 | SWJ-BANC33 |  0  | From TV Animation One Piece - Treasure Wars 2 - Buggy Land e Youkoso / フロムテレビアニメーション ワンピース トレジャーウォーズ2 バギーランドへようこそ
+|   | 226 | A3ECC9AC | SWJ-BANC2F |  2  | SD Gundam G-Generation - Mono-Eye Gundams / SDガンダム ジージェネレーション モノアイガンダムズ
+| X | 227 | 6142fd9d | SWJ-BANC34 |  0  | Kinnikuman IIsei - Choujin Seisenshi / キン肉マンII世 超人聖戦史
+| X | 228 | 658c4b98 | SWJ-BANC35 |  0  | Rockman EXE WS / ロックマンエグゼ ワンダースワン
+| X | 229 | bce15137 | SWJ-BANC36 |  0  | Kidou Senshi Gundam Seed / 機動戦士ガンダム シード
+| X | 230 | 71556e6a | SWJ-BANC38 |  0  | Naruto - Konoha Ninpouchou / Naruto ナルト- 木ノ葉忍法帖
+| X | 231 | a487b7a8 | SWJ-BANC39 |  0  | Hunter X Hunter - Greed Island / ハンター×ハンター グリードアイランド
+| X | 232 | d4061551 | SWJ-BANC3A |  0  | Kidou Senshi Gundam - Giren no Yabou - Tokubetsu Hen - Aoki Hoshi no Hasha / 機動戦士ガンダム ギレンの野望 特別編 蒼き星の覇者
+| X | 233 | 130af567 | SWJ-BANC39 |  1  | Hunter X Hunter - Greed Island / ハンター×ハンター グリードアイランド
+| X | 234 | 6918c824 | SWJ-BPRC09 |  5  | Super Robot Taisen Compact 3 / スーパーロボット大戦 コンパクト3
+| X | 235 | 1f10ca75 | SWJ-CPCC01 |  1  | Rockman EXE - N1 Battle / ロックマンエグゼ N1バトル
+| X | 236 | 6e8a792d | SWJ-BANC3D |  0  | Saint Seiya - Ougon Densetsu Hen - Perfect Edition / 聖闘士星矢 黄金伝説編 パーフェクトエディション
+| X | 237 | 188ca644 | SWJ-BPRC09 |  6  | Super Robot Taisen Compact 3 / スーパーロボット大戦 コンパクト3
+| X | 238 | 8e120b5a | SWJ-BANC3B |  0  | From TV Animation One Piece - Chopper no Daibouken / フロムテレビアニメーション ワンピース チョッパーの大冒険
+| X | 239 | 067238d1 | SWJ-BANC3C |  0  | Dragon Ball / ドラゴンボール
+| X | n/a | 2ab9852d | SWJ-BAN00F |  1  | Keitai Gyogun Tanchiki - WonderSwan Handy Sonar / 携帯魚群探知機 ワンダースワン ハンディーソナー
+| X | n/a | d4188811 | SWJ-BAN00F |  2  | Keitai Gyogun Tanchiki - WonderSwan Handy Sonar / 携帯魚群探知機 ワンダースワン ハンディーソナー
+| X | ??? | bd83b82d | SWJ-BANC2E |  1  | Digital Monster - D-Project / デジタルモンスター ディープロジェクト
+| X | n/a | 1887389c | WWGP2002B  | 80  | Dicing Knight. / だいしんぐないと・ピリオド
+| X | n/a | 85c4c9a1 | WWGP2001A3 | 80  | Judgement Silversword - Rebirth Edition (Rev. SC21)
+| X | m/a | 60191872 |            | 80  | Judgement Silversword - Rebirth Edition (Rev. 4321)
+|   | n/a | 7e03e8da |            |  1  | Digimon Adventure Campaign Limited Version / デジモンアドベンチャー キャンペーン限定バージョン
+|   |     | f366172e | MM-280     |  0  | mama Mitte'
 
+Other missing:
+2001/08/03 TENORI-ON
+2003/07/19 Dicing knight
+2004/02/05 Judgement Silversword - Rebirth Edition = rev 4321?
+2004/04/26 Judgement Silversword - Rebirth Edition = rev 4321?
+
+
+Notes:
+
+mama Mitte' saves data on the flash rom so this can cause each dump to be different.
+After manually clearing the save area the CRC becomes the one listed in here. The
+game will boot up and start to initialize the save area.
 
 The GIZA chip used on a lot of cartridges is a sram voltage switch.
+
 -->
 
 <softwarelist name="wswan" description="Bandai Wonderswan cartridges">
@@ -468,6 +731,28 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 		</part>
 	</software>
 
+	<!--
+	<software name="digiadvc">
+		<description>Digimon Adventure Campaign Limited Version</description>
+		<year>2000</year>
+		<publisher>Bandai</publisher>
+		<info name="alt_title" value="デジモンアドベンチャー キャンペーン限定バージョン"/>
+		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="PTE-0022A" />
+			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="GIZA" />
+			<feature name="u3" value="ROM" />
+			<feature name="u4" value="BS62LV256TC SRAM" />
+			<feature name="slot" value="ws_sram" />
+			<dataarea name="rom" size="2097152">
+				<rom name="m5m29ft160avp.u3" size="2097152" crc="7e03e8da" sha1="" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="0x8000">
+			</dataarea>
+		</part>
+	</software>
+	-->
+
 	<software name="digimon">
 		<description>Digital Monster - Ver. WonderSwan (Rev 1)</description>
 		<year>1999</year>
@@ -781,7 +1066,7 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="1048576">
 				<!-- 52943 / OAO7Y / CDD at U2 -->
-				<rom name="mh8m8e0141a.u3" size="1048576" crc="00137e86" sha1="af3fe9da3f5ee0f5a7b06b0440223db88fcb3bf2" offset="000000" />
+				<rom name="mh8m8e014a.u3" size="1048576" crc="00137e86" sha1="af3fe9da3f5ee0f5a7b06b0440223db88fcb3bf2" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x400">
 			</dataarea>
@@ -1823,7 +2108,7 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="CY62256VLL SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="4194304" />
+			<dataarea name="rom" size="4194304">
 				<rom name="mh32m256s124b.u3" size="4194304" crc="ecbb46de" sha1="6014ac0b8978e710f26c9cc41180cdf788584743" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -2399,18 +2684,6 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			</dataarea>
 		</part>
 	</software>
-
-	<!-- is this an overdump?!?
-	<software name="taikyigo">
-	    <description>Taikyoku Igo - Heisei Kiin</description>
-	    <year>2000</year>
-	    <publisher>Kaga Tech</publisher>
-	    <part name="cart" interface="wswan_cart">
-	        <dataarea name="rom" size="1048576">
-	            <rom name="swj-kgt004.bin" size="1048576" crc="50b7a742" sha1="be4559d6f48d7cb9550c8776f877c5c9cda0efa1" offset="000000" />
-	        </dataarea>
-	    </part>
-	</software-->
 
 	<software name="tanjodeb">
 		<description>Tanjou Debut for WonderSwan (Rev 1)</description>

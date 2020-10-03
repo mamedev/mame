@@ -3,26 +3,8 @@
 <!--
 license:CC0
 
-Some titles might exist with other revisions:
-- Battle Spirit - Digimon Frontier - Rev 0
-- Digital Monster Card Game - Ver. WonderSwan Color - Rev 1
-- Digimon Tamers - Brave Tamer - Rev 0
-- Dokodemo Hamster 3 - Odekake Saffron - Rev 0, 1
-- Gensou Maden Saiyuuki Retribution - Hi no Ataru Basho de - Rev 0, 1
-- Hanjuku Hero - Ah, Sekai yo Hanjuku Nare...!! - Rev 0
-- Kurupara! - Rev 0
-- Super Robot Taisen Compact 3 - Rev 0, 1, 2, 3, 4
-- Rockman EXE - N1 Battle - Rev 0
-- Sorobang - Rev 0
+See the wswan software list for the full game list.
 
-
-
-TODO/missing:
-210 SAMPLE EDITION of 209, CRC 23853305
-216 約束の地 リヴィエラ size:8388608 crc:62CB398B
-217 デジタルモンスター ディープロジェクト size:4194304 crc:0E40829C
-222 バトルスピリット デジモンフロンティア size:4194304 crc:A28D3DC5
-226 SDガンダム ジージェネレーション モノアイ ガンダムズ size:4194304 crc:A3ECC9AC
 -->
 <softwarelist name="wscolor" description="Bandai Wonderswan Color cartridges">
 	<software name="anotherh">
@@ -1695,7 +1677,9 @@ TODO/missing:
 		</part>
 	</software>
 
-	<software name="riviera">
+  <!-- off by 1 during intro scroll? -->
+	<!-- hangs after sequence after starting a game -->
+	<software name="riviera" supported="no">
 		<!-- WSC only -->
 		<description>Riviera - Yakusoku no Chi Riviera</description>
 		<year>2002</year>
