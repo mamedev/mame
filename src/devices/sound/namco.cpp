@@ -87,8 +87,6 @@ namco_cus30_device::namco_cus30_device(const machine_config &mconfig, const char
 
 void namco_audio_device::device_start()
 {
-	sound_channel *voice;
-
 	/* extract globals from the interface */
 	m_last_channel = m_channel_list + m_voices;
 
@@ -114,13 +112,12 @@ void namco_audio_device::device_start()
 
 	save_item(NAME(m_voices));
 	save_item(NAME(m_sound_enable));
-	save_pointer(NAME(m_waveform[0]), MAX_VOLUME * 32 * 8 * (1+m_wave_size));
+	for (int v = 0; v < MAX_VOLUME; v++)
+		save_pointer(NAME(m_waveform[v]), 32 * 8 * (1+m_wave_size), v);
 
 	/* reset all the voices */
-	for (voice = m_channel_list; voice < m_last_channel; voice++)
+	for (sound_channel *voice = m_channel_list; voice < m_last_channel; voice++)
 	{
-		int voicenum = voice - m_channel_list;
-
 		voice->frequency = 0;
 		voice->volume[0] = voice->volume[1] = 0;
 		voice->waveform_select = 0;
@@ -130,18 +127,18 @@ void namco_audio_device::device_start()
 		voice->noise_seed = 1;
 		voice->noise_counter = 0;
 		voice->noise_hold = 0;
-
-		/* register with the save state system */
-		save_item(NAME(voice->frequency), voicenum);
-		save_item(NAME(voice->counter), voicenum);
-		save_item(NAME(voice->volume), voicenum);
-		save_item(NAME(voice->noise_sw), voicenum);
-		save_item(NAME(voice->noise_state), voicenum);
-		save_item(NAME(voice->noise_seed), voicenum);
-		save_item(NAME(voice->noise_hold), voicenum);
-		save_item(NAME(voice->noise_counter), voicenum);
-		save_item(NAME(voice->waveform_select), voicenum);
 	}
+
+	/* register with the save state system */
+	save_pointer(STRUCT_MEMBER(m_channel_list, frequency), m_voices);
+	save_pointer(STRUCT_MEMBER(m_channel_list, counter), m_voices);
+	save_pointer(STRUCT_MEMBER(m_channel_list, volume), m_voices);
+	save_pointer(STRUCT_MEMBER(m_channel_list, noise_sw), m_voices);
+	save_pointer(STRUCT_MEMBER(m_channel_list, noise_state), m_voices);
+	save_pointer(STRUCT_MEMBER(m_channel_list, noise_seed), m_voices);
+	save_pointer(STRUCT_MEMBER(m_channel_list, noise_hold), m_voices);
+	save_pointer(STRUCT_MEMBER(m_channel_list, noise_counter), m_voices);
+	save_pointer(STRUCT_MEMBER(m_channel_list, waveform_select), m_voices);
 }
 
 
@@ -196,14 +193,16 @@ void namco_audio_device::update_namco_waveform(int offset, uint8_t data)
 /* build the decoded waveform table */
 void namco_audio_device::build_decoded_waveform(uint8_t *rgnbase)
 {
-	int16_t *p;
-	int size;
-	int offset;
-	int v;
-
-	m_wavedata = (rgnbase != nullptr) ? rgnbase : auto_alloc_array_clear(machine(), uint8_t, 0x400);
+	if (rgnbase != nullptr)
+		m_wavedata = rgnbase;
+	else
+	{
+		m_waveram_alloc = make_unique_clear<uint8_t[]>(0x400);
+		m_wavedata = m_waveram_alloc.get();
+	}
 
 	/* 20pacgal has waves in RAM but old sound system */
+	int size;
 	if (rgnbase == nullptr && m_voices != 3)
 	{
 		m_wave_size = 1;
@@ -215,20 +214,11 @@ void namco_audio_device::build_decoded_waveform(uint8_t *rgnbase)
 		size = 32 * 8;      /* 32 samples, 8 waveforms */
 	}
 
-	p = auto_alloc_array(machine(), int16_t, size * MAX_VOLUME);
+	for (int v = 0; v < MAX_VOLUME; v++)
+		m_waveform[v] = std::make_unique<int16_t[]>(size);
 
-	for (v = 0; v < MAX_VOLUME; v++)
-	{
-		m_waveform[v] = p;
-		p += size;
-	}
-
-	/* We need waveform data. It fails if region is not specified. */
-	if (m_wavedata)
-	{
-		for (offset = 0; offset < 256; offset++)
-			update_namco_waveform(offset, m_wavedata[offset]);
-	}
+	for (int offset = 0; offset < 256; offset++)
+		update_namco_waveform(offset, m_wavedata[offset]);
 }
 
 
