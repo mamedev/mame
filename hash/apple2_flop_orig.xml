@@ -14975,4 +14975,19 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="puffair">
+		<description>A Puff of Air: The Respiratory System</description>
+		<year>1983</year>
+		<publisher>MarshWare</publisher>
+		<info name="release" value="2020-10-02"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241489">
+				<rom name="a puff of air- the respiratory system.woz" size="241489" crc="c004c5c4" sha1="01c836d53b0f2c2f8319400c5f85c7462b97bce4"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

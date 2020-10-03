@@ -37273,4 +37273,16 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="mathtwst">
+		<description>The Math Twister (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>The Ellen Nelson Learning Library</publisher>
+		<info name="release" value="2020-09-29"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math 3- advanced word problems- the math twister (4am crack).dsk" size="143360" crc="322cd089" sha1="18c4dc9ce12dc7f4ecd3d9ffdbef0e56f1b62e59"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
