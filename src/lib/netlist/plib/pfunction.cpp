@@ -150,6 +150,8 @@ namespace plib {
 				throw pexception(plib::pfmt("pfunction: stack underflow on token <{1}> in <{2}>")(cmd)(expr));
 			if (stk >= narrow_cast<int>(MAX_STACK))
 				throw pexception(plib::pfmt("pfunction: stack overflow on token <{1}> in <{2}>")(cmd)(expr));
+			if (rc.cmd() == LP || rc.cmd() == RP)
+				throw pexception(plib::pfmt("pfunction: parenthesis inequality on token <{1}> in <{2}>")(cmd)(expr));
 			m_precompiled.push_back(rc);
 		}
 		if (stk != 1)
