@@ -115,6 +115,14 @@ Quick Instructions:
   - EP1390: requires a floppy to boot from. Disks marked as NE-DOS 1.5 should work.
   - EP2390: uses ports 8x, not emulated, not working. For NE-DOS G.1
 
+Natural Keyboard and Paste:
+    - The hexpad keys conflict with the keyboard keys, therefore Natural Keyboard is not
+      supported. Paste is meant for Z80NE only.
+
+    - Test Paste:
+      N1000=11=22=33=44=55=66=77=88=99=N1000=
+      Press Ctrl+0 to review the data.
+
 
 *********************************************************************************************************/
 
@@ -247,7 +255,7 @@ static INPUT_PORTS_START( z80ne )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("RST")           /* RESET key */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 Reset")  PORT_CODE(KEYCODE_F3) PORT_CHANGED_MEMBER(DEVICE_SELF, z80ne_state, z80ne_reset, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 Reset")  PORT_CODE(KEYCODE_F3) PORT_CHANGED_MEMBER(DEVICE_SELF, z80ne_state, z80ne_reset, 0) PORT_CHAR('N')
 
 	/* Settings - need to reboot after altering these */
 	PORT_START("LX.385")
