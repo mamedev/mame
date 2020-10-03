@@ -194,8 +194,8 @@ namespace plib {
 			struct guard_t
 			{
 				guard_t() = delete;
-				explicit constexpr guard_t(timer &m) noexcept : m_m(m) { m_m.m_time -= T::start(); }
-				~guard_t() noexcept { m_m.m_time += T::stop(); ++m_m.m_count; }
+				explicit constexpr guard_t(timer &m) noexcept : m_m(&m) { m_m->m_time -= T::start(); }
+				~guard_t() noexcept { m_m->m_time += T::stop(); ++m_m->m_count; }
 
 				constexpr guard_t(const guard_t &) = default;
 				constexpr guard_t &operator=(const guard_t &) = default;
@@ -203,7 +203,7 @@ namespace plib {
 				constexpr guard_t &operator=(guard_t &&) noexcept = default;
 
 			private:
-				timer &m_m;
+				timer *m_m;
 			};
 
 			constexpr timer() : m_time(0), m_count(0) { }
