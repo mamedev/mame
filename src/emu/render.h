@@ -581,7 +581,26 @@ public:
 	int default_state() const { return m_defstate; }
 	render_texture *state_texture(int state);
 
+	// operations
+	void preload();
+
 private:
+	struct bounds_step
+	{
+		int             state;
+		render_bounds   bounds;
+		render_bounds   delta;
+	};
+	using bounds_vector = std::vector<bounds_step>;
+
+	struct color_step
+	{
+		int             state;
+		render_color    color;
+		render_color    delta;
+	};
+	using color_vector = std::vector<color_step>;
+
 	/// \brief An image, rectangle, or disk in an element
 	///
 	/// Each layout_element contains one or more components. Each
@@ -610,11 +629,12 @@ private:
 		render_color color(int state) const;
 
 		// operations
+		virtual void preload(running_machine &machine);
 		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) = 0;
 
 	protected:
 		// helper
-		virtual int maxstate() const { return -1; }
+		virtual int maxstate() const;
 
 		// drawing helpers
 		void draw_text(render_font &font, bitmap_argb32 &dest, const rectangle &bounds, const char *str, int align, const render_color &color);
@@ -629,22 +649,6 @@ private:
 		void apply_skew(bitmap_argb32 &dest, int skewwidth);
 
 	private:
-		struct bounds_step
-		{
-			int             state;
-			render_bounds   bounds;
-			render_bounds   delta;
-		};
-		using bounds_vector = std::vector<bounds_step>;
-
-		struct color_step
-		{
-			int             state;
-			render_color    color;
-			render_color    delta;
-		};
-		using color_vector = std::vector<color_step>;
-
 		// internal state
 		int const           m_statemask;                // bits of state used to control visibility
 		int const           m_stateval;                 // masked state value to make component visible
@@ -907,6 +911,7 @@ public:
 	float effective_aspect() const { return m_effaspect; }
 	const render_bounds &bounds() const { return m_bounds; }
 	bool has_visible_screen(screen_device &screen) const;
+	const item_ref_vector &visible_items() const { return m_visible_items; }
 	const item_ref_vector &visible_screen_items() const { return m_screen_items; }
 	const item_ref_vector &interactive_items() const { return m_interactive_items; }
 	const edge_vector &interactive_edges_x() const { return m_interactive_edges_x; }
@@ -918,6 +923,7 @@ public:
 
 	// operations
 	void recompute(u32 visibility_mask, bool zoom_to_screens);
+	void preload();
 
 	// resolve tags, if any
 	void resolve_tags();
@@ -946,6 +952,7 @@ private:
 	float                       m_effaspect;        // X/Y of the layout in current configuration
 	render_bounds               m_bounds;           // computed bounds of the view in current configuration
 	item_list                   m_items;            // list of layout items
+	item_ref_vector             m_visible_items;    // all visible items
 	item_ref_vector             m_screen_items;     // visible items that represent screens to draw
 	item_ref_vector             m_interactive_items;// visible items that can accept pointer input
 	edge_vector                 m_interactive_edges_x;

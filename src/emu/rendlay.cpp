@@ -36,8 +36,9 @@
 
 #define LOG_GROUP_BOUNDS_RESOLUTION (1U << 1)
 #define LOG_INTERACTIVE_ITEMS       (1U << 2)
+#define LOG_IMAGE_LOAD              (1U << 3)
 
-//#define VERBOSE (LOG_GROUP_BOUNDS_RESOLUTION | LOG_INTERACTIVE_ITEMS)
+//#define VERBOSE (LOG_GROUP_BOUNDS_RESOLUTION | LOG_INTERACTIVE_ITEMS | LOG_IMAGE_LOAD)
 #define LOG_OUTPUT_FUNC osd_printf_verbose
 #include "logmacro.h"
 
@@ -1302,6 +1303,18 @@ render_texture *layout_element::state_texture(int state)
 
 
 //-------------------------------------------------
+//  preload - perform expensive loading upfront
+//  for all components
+//-------------------------------------------------
+
+void layout_element::preload()
+{
+	for (component::ptr const &curcomp : m_complist)
+		curcomp->preload(machine());
+}
+
+
+//-------------------------------------------------
 //  element_scale - scale an element by rendering
 //  all the components at the appropriate
 //  resolution
@@ -1345,8 +1358,13 @@ public:
 	{
 	}
 
-protected:
 	// overrides
+	virtual void preload(running_machine &machine) override
+	{
+		if (!m_bitmap.valid())
+			load_bitmap(machine);
+	}
+
 	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
 		if (!m_bitmap.valid())
@@ -1401,28 +1419,37 @@ private:
 	// internal helpers
 	void load_bitmap(running_machine &machine)
 	{
+		LOGMASKED(LOG_IMAGE_LOAD, "Image component attempt to load image file '%s/%s'\n", m_dirname, m_imagefile);
 		emu_file file(machine.options().art_path(), OPEN_FLAG_READ);
 
 		ru_imgformat const format = render_detect_image(file, m_dirname.c_str(), m_imagefile.c_str());
 		switch (format)
 		{
 		case RENDUTIL_IMGFORMAT_ERROR:
+			LOGMASKED(LOG_IMAGE_LOAD, "Image component error detecting image file format\n");
 			break;
 
 		case RENDUTIL_IMGFORMAT_PNG:
 			// load the basic bitmap
+			LOGMASKED(LOG_IMAGE_LOAD, "Image component detected PNG file format\n");
 			m_hasalpha = render_load_png(m_bitmap, file, m_dirname.c_str(), m_imagefile.c_str());
 			break;
 
 		default:
 			// try JPG
+			LOGMASKED(LOG_IMAGE_LOAD, "Image component failed to detect image file format, trying JPEG\n");
 			render_load_jpeg(m_bitmap, file, m_dirname.c_str(), m_imagefile.c_str());
 			break;
 		}
 
 		// load the alpha bitmap if specified
 		if (m_bitmap.valid() && !m_alphafile.empty())
-			render_load_png(m_bitmap, file, m_dirname.c_str(), m_alphafile.c_str(), true);
+		{
+			// TODO: no way to detect corner case where we had alpha from the image but the alpha PNG makes it entirely opaque
+			LOGMASKED(LOG_IMAGE_LOAD, "Image component attempt to load alpha channel from file '%s/%s'\n", m_dirname, m_alphafile);
+			if (render_load_png(m_bitmap, file, m_dirname.c_str(), m_alphafile.c_str(), true))
+				m_hasalpha = true;
+		}
 
 		// if we can't load the bitmap, allocate a dummy one and report an error
 		if (!m_bitmap.valid())
@@ -2884,6 +2911,36 @@ layout_element::component::component(environment &env, util::xml::data_node cons
 
 
 //-------------------------------------------------
+//  normalize_bounds - normalize component bounds
+//-------------------------------------------------
+
+void layout_element::component::normalize_bounds(float xoffs, float yoffs, float xscale, float yscale)
+{
+	auto i(m_bounds.begin());
+	i->bounds.x0 = (i->bounds.x0 - xoffs) * xscale;
+	i->bounds.x1 = (i->bounds.x1 - xoffs) * xscale;
+	i->bounds.y0 = (i->bounds.y0 - yoffs) * yscale;
+	i->bounds.y1 = (i->bounds.y1 - yoffs) * yscale;
+
+	auto j(i);
+	while (m_bounds.end() != ++j)
+	{
+		j->bounds.x0 = (j->bounds.x0 - xoffs) * xscale;
+		j->bounds.x1 = (j->bounds.x1 - xoffs) * xscale;
+		j->bounds.y0 = (j->bounds.y0 - yoffs) * yscale;
+		j->bounds.y1 = (j->bounds.y1 - yoffs) * yscale;
+
+		i->delta.x0 = (j->bounds.x0 - i->bounds.x0) / (j->state - i->state);
+		i->delta.x1 = (j->bounds.x1 - i->bounds.x1) / (j->state - i->state);
+		i->delta.y0 = (j->bounds.y0 - i->bounds.y0) / (j->state - i->state);
+		i->delta.y1 = (j->bounds.y1 - i->bounds.y1) / (j->state - i->state);
+
+		i = j;
+	}
+}
+
+
+//-------------------------------------------------
 //  statewrap - get state wraparound requirements
 //-------------------------------------------------
 
@@ -2999,32 +3056,20 @@ render_color layout_element::component::color(int state) const
 
 
 //-------------------------------------------------
-//  normalize_bounds - normalize component bounds
+//  preload - perform expensive operations upfront
 //-------------------------------------------------
 
-void layout_element::component::normalize_bounds(float xoffs, float yoffs, float xscale, float yscale)
+void layout_element::component::preload(running_machine &machine)
 {
-	auto i(m_bounds.begin());
-	i->bounds.x0 = (i->bounds.x0 - xoffs) * xscale;
-	i->bounds.x1 = (i->bounds.x1 - xoffs) * xscale;
-	i->bounds.y0 = (i->bounds.y0 - yoffs) * yscale;
-	i->bounds.y1 = (i->bounds.y1 - yoffs) * yscale;
+}
 
-	auto j(i);
-	while (m_bounds.end() != ++j)
-	{
-		j->bounds.x0 = (j->bounds.x0 - xoffs) * xscale;
-		j->bounds.x1 = (j->bounds.x1 - xoffs) * xscale;
-		j->bounds.y0 = (j->bounds.y0 - yoffs) * yscale;
-		j->bounds.y1 = (j->bounds.y1 - yoffs) * yscale;
+//-------------------------------------------------
+//  maxstate - maximum state drawn differently
+//-------------------------------------------------
 
-		i->delta.x0 = (j->bounds.x0 - i->bounds.x0) / (j->state - i->state);
-		i->delta.x1 = (j->bounds.x1 - i->bounds.x1) / (j->state - i->state);
-		i->delta.y0 = (j->bounds.y0 - i->bounds.y0) / (j->state - i->state);
-		i->delta.y1 = (j->bounds.y1 - i->bounds.y1) / (j->state - i->state);
-
-		i = j;
-	}
+int layout_element::component::maxstate() const
+{
+	return -1;
 }
 
 
@@ -3473,6 +3518,7 @@ void layout_view::recompute(u32 visibility_mask, bool zoom_to_screen)
 	// reset the bounds and collected active items
 	render_bounds scrbounds{ 0.0f, 0.0f, 0.0f, 0.0f };
 	m_bounds = scrbounds;
+	m_visible_items.clear();
 	m_screen_items.clear();
 	m_interactive_items.clear();
 	m_interactive_edges_x.clear();
@@ -3487,6 +3533,7 @@ void layout_view::recompute(u32 visibility_mask, bool zoom_to_screen)
 		if ((visibility_mask & curitem.visibility_mask()) == curitem.visibility_mask())
 		{
 			// accumulate bounds
+			m_visible_items.emplace_back(curitem);
 			if (first)
 				m_bounds = curitem.m_rawbounds;
 			else
@@ -3574,6 +3621,20 @@ void layout_view::recompute(u32 visibility_mask, bool zoom_to_screen)
 			LOGMASKED(LOG_INTERACTIVE_ITEMS, "x=%s %c%u\n", e.position(), e.trailing() ? ']' : '[', e.index());
 		for (edge const &e : m_interactive_edges_y)
 			LOGMASKED(LOG_INTERACTIVE_ITEMS, "y=%s %c%u\n", e.position(), e.trailing() ? ']' : '[', e.index());
+	}
+}
+
+//-------------------------------------------------
+//  preload - perform expensive loading upfront
+//  for visible elements
+//-------------------------------------------------
+
+void layout_view::preload()
+{
+	for (item &curitem : m_visible_items)
+	{
+		if (curitem.element())
+			curitem.element()->preload();
 	}
 }
 

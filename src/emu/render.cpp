@@ -1018,6 +1018,7 @@ void render_target::set_view(unsigned viewindex)
 	{
 		m_curview = viewindex;
 		current_view().recompute(visibility_mask(), m_layerconfig.zoom_to_screen());
+		current_view().preload();
 	}
 }
 
@@ -1047,6 +1048,7 @@ void render_target::set_visibility_toggle(unsigned index, bool enable)
 	else
 		m_views[m_curview].second &= ~(u32(1) << index);
 	current_view().recompute(visibility_mask(), m_layerconfig.zoom_to_screen());
+	current_view().preload();
 }
 
 
@@ -1341,34 +1343,31 @@ render_primitive_list &render_target::get_primitives()
 	if (m_manager.machine().phase() >= machine_phase::RESET)
 	{
 		// we're running - iterate over items in the view
-		for (layout_view::item &curitem : current_view().items())
+		for (layout_view::item &curitem : current_view().visible_items())
 		{
-			if ((visibility_mask() & curitem.visibility_mask()) == curitem.visibility_mask())
-			{
-				// first apply orientation to the bounds
-				render_bounds bounds = curitem.bounds();
-				apply_orientation(bounds, root_xform.orientation);
-				normalize_bounds(bounds);
+			// first apply orientation to the bounds
+			render_bounds bounds = curitem.bounds();
+			apply_orientation(bounds, root_xform.orientation);
+			normalize_bounds(bounds);
 
-				// apply the transform to the item
-				object_transform item_xform;
-				item_xform.xoffs = root_xform.xoffs + bounds.x0 * root_xform.xscale;
-				item_xform.yoffs = root_xform.yoffs + bounds.y0 * root_xform.yscale;
-				item_xform.xscale = (bounds.x1 - bounds.x0) * root_xform.xscale;
-				item_xform.yscale = (bounds.y1 - bounds.y0) * root_xform.yscale;
-				item_xform.color.r = curitem.color().r * root_xform.color.r;
-				item_xform.color.g = curitem.color().g * root_xform.color.g;
-				item_xform.color.b = curitem.color().b * root_xform.color.b;
-				item_xform.color.a = curitem.color().a * root_xform.color.a;
-				item_xform.orientation = orientation_add(curitem.orientation(), root_xform.orientation);
-				item_xform.no_center = false;
+			// apply the transform to the item
+			object_transform item_xform;
+			item_xform.xoffs = root_xform.xoffs + bounds.x0 * root_xform.xscale;
+			item_xform.yoffs = root_xform.yoffs + bounds.y0 * root_xform.yscale;
+			item_xform.xscale = (bounds.x1 - bounds.x0) * root_xform.xscale;
+			item_xform.yscale = (bounds.y1 - bounds.y0) * root_xform.yscale;
+			item_xform.color.r = curitem.color().r * root_xform.color.r;
+			item_xform.color.g = curitem.color().g * root_xform.color.g;
+			item_xform.color.b = curitem.color().b * root_xform.color.b;
+			item_xform.color.a = curitem.color().a * root_xform.color.a;
+			item_xform.orientation = orientation_add(curitem.orientation(), root_xform.orientation);
+			item_xform.no_center = false;
 
-				// if there is no associated element, it must be a screen element
-				if (curitem.screen())
-					add_container_primitives(list, root_xform, item_xform, curitem.screen()->container(), curitem.blend_mode());
-				else
-					add_element_primitives(list, item_xform, *curitem.element(), curitem.state(), curitem.blend_mode());
-			}
+			// if there is no associated element, it must be a screen element
+			if (curitem.screen())
+				add_container_primitives(list, root_xform, item_xform, curitem.screen()->container(), curitem.blend_mode());
+			else
+				add_element_primitives(list, item_xform, *curitem.element(), curitem.state(), curitem.blend_mode());
 		}
 	}
 	else
@@ -1619,7 +1618,10 @@ void render_target::resolve_tags()
 		{
 			view.resolve_tags();
 			if (&current_view() == &view)
+			{
 				view.recompute(visibility_mask(), m_layerconfig.zoom_to_screen());
+				view.preload();
+			}
 		}
 	}
 }
@@ -2687,7 +2689,10 @@ void render_target::config_load(util::xml::data_node const &targetnode)
 		}
 
 		if (&current_view() == &view->first.get())
+		{
 			current_view().recompute(visibility_mask(), m_layerconfig.zoom_to_screen());
+			current_view().preload();
+		}
 	}
 }
 
