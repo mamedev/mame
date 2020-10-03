@@ -437,9 +437,12 @@ void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	beginrow = (std::max)(beginrow, cliprect.top());
 	endrow = (std::min)(endrow, cliprect.bottom());
 
-	if (!(m_sysconfig & 0x03))
+	const int startrow = (beginrow / 8) * 8;
+	const int stoprow = ((endrow / 8) + 1) * 8;
+
+	if (!(m_sysconfig & 0x03))  // color
 	{
-		for (int row = beginrow; row <= endrow; row += 8)
+		for (int row = startrow; row <= stoprow; row += 8)
 		{
 			for (int col = 0; col < 40; col++)
 			{
@@ -452,7 +455,7 @@ void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, 
 				/* and now draw */
 				for (int y = 0; y < 4; y++)
 				{
-					if ((row + y) <= endrow)
+					if (((row + y) >= beginrow) && ((row + y) <= endrow))
 					{
 						for (int x = 0; x < 14; x++)
 						{
@@ -462,7 +465,7 @@ void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, 
 				}
 				for (int y = 4; y < 8; y++)
 				{
-					if ((row + y) <= endrow)
+					if (((row + y) >= beginrow) && ((row + y) <= endrow))
 					{
 						for (int x = 0; x < 14; x++)
 						{
@@ -475,7 +478,7 @@ void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	}
 	else
 	{
-		for (int row = beginrow; row <= endrow; row += 8)
+		for (int row = startrow; row <= stoprow; row += 8)
 		{
 			for (int col = 0; col < 40; col++)
 			{
@@ -491,7 +494,7 @@ void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, 
 				/* and now draw */
 				for (int y = 0; y < 4; y++)
 				{
-					if ((row + y) <= endrow)
+					if (((row + y) >= beginrow) && ((row + y) <= endrow))
 					{
 						for (int x = 0; x < 14; x++)
 						{
@@ -510,7 +513,7 @@ void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, 
 				bits = (code >> 4) & 0x0F;
 				for (int y = 4; y < 8; y++)
 				{
-					if ((row + y) <= endrow)
+					if (((row + y) >= beginrow) && ((row + y) <= endrow))
 					{
 						for (int x = 0; x < 14; x++)
 						{
@@ -525,9 +528,6 @@ void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, 
 						}
 					}
 				}
-
-				//if (row == 64) printf("\n");
-
 			}
 		}
 	}
@@ -551,9 +551,12 @@ void a2_video_device::dlores_update(screen_device &screen, bitmap_ind16 &bitmap,
 	beginrow = (std::max)(beginrow, cliprect.top() - (cliprect.top() % 8));
 	endrow = (std::min)(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
 
+	const int startrow = (beginrow / 8) * 8;
+	const int stoprow = ((endrow / 8) + 1) * 8;
+
 	if (!(m_sysconfig & 0x03))
 	{
-		for (int row = beginrow; row <= endrow; row += 8)
+		for (int row = startrow; row <= stoprow; row += 8)
 		{
 			for (int col = 0; col < 40; col++)
 			{
@@ -567,48 +570,54 @@ void a2_video_device::dlores_update(screen_device &screen, bitmap_ind16 &bitmap,
 				/* and now draw */
 				for (int y = 0; y < 4; y++)
 				{
-					uint16_t *vram = &bitmap.pix(row + y, (col * 14));
+					if (((row + y) >= beginrow) && ((row + y) <= endrow))
+					{
+						uint16_t *vram = &bitmap.pix(row + y, (col * 14));
 
-					*vram++ = aux_colors[(auxcode >> 0) & 0x0F];
-					*vram++ = aux_colors[(auxcode >> 0) & 0x0F];
-					*vram++ = aux_colors[(auxcode >> 0) & 0x0F];
-					*vram++ = aux_colors[(auxcode >> 0) & 0x0F];
-					*vram++ = aux_colors[(auxcode >> 0) & 0x0F];
-					*vram++ = aux_colors[(auxcode >> 0) & 0x0F];
-					*vram++ = aux_colors[(auxcode >> 0) & 0x0F];
-					*vram++ = (code >> 0) & 0x0F;
-					*vram++ = (code >> 0) & 0x0F;
-					*vram++ = (code >> 0) & 0x0F;
-					*vram++ = (code >> 0) & 0x0F;
-					*vram++ = (code >> 0) & 0x0F;
-					*vram++ = (code >> 0) & 0x0F;
-					*vram++ = (code >> 0) & 0x0F;
+						*vram++ = aux_colors[(auxcode >> 0) & 0x0F];
+						*vram++ = aux_colors[(auxcode >> 0) & 0x0F];
+						*vram++ = aux_colors[(auxcode >> 0) & 0x0F];
+						*vram++ = aux_colors[(auxcode >> 0) & 0x0F];
+						*vram++ = aux_colors[(auxcode >> 0) & 0x0F];
+						*vram++ = aux_colors[(auxcode >> 0) & 0x0F];
+						*vram++ = aux_colors[(auxcode >> 0) & 0x0F];
+						*vram++ = (code >> 0) & 0x0F;
+						*vram++ = (code >> 0) & 0x0F;
+						*vram++ = (code >> 0) & 0x0F;
+						*vram++ = (code >> 0) & 0x0F;
+						*vram++ = (code >> 0) & 0x0F;
+						*vram++ = (code >> 0) & 0x0F;
+						*vram++ = (code >> 0) & 0x0F;
+					}
 				}
 				for (int y = 4; y < 8; y++)
 				{
-					uint16_t *vram = &bitmap.pix(row + y, (col * 14));
+					if (((row + y) >= beginrow) && ((row + y) <= endrow))
+					{
+						uint16_t *vram = &bitmap.pix(row + y, (col * 14));
 
-					*vram++ = aux_colors[(auxcode >> 4) & 0x0F];
-					*vram++ = aux_colors[(auxcode >> 4) & 0x0F];
-					*vram++ = aux_colors[(auxcode >> 4) & 0x0F];
-					*vram++ = aux_colors[(auxcode >> 4) & 0x0F];
-					*vram++ = aux_colors[(auxcode >> 4) & 0x0F];
-					*vram++ = aux_colors[(auxcode >> 4) & 0x0F];
-					*vram++ = aux_colors[(auxcode >> 4) & 0x0F];
-					*vram++ = (code >> 4) & 0x0F;
-					*vram++ = (code >> 4) & 0x0F;
-					*vram++ = (code >> 4) & 0x0F;
-					*vram++ = (code >> 4) & 0x0F;
-					*vram++ = (code >> 4) & 0x0F;
-					*vram++ = (code >> 4) & 0x0F;
-					*vram++ = (code >> 4) & 0x0F;
+						*vram++ = aux_colors[(auxcode >> 4) & 0x0F];
+						*vram++ = aux_colors[(auxcode >> 4) & 0x0F];
+						*vram++ = aux_colors[(auxcode >> 4) & 0x0F];
+						*vram++ = aux_colors[(auxcode >> 4) & 0x0F];
+						*vram++ = aux_colors[(auxcode >> 4) & 0x0F];
+						*vram++ = aux_colors[(auxcode >> 4) & 0x0F];
+						*vram++ = aux_colors[(auxcode >> 4) & 0x0F];
+						*vram++ = (code >> 4) & 0x0F;
+						*vram++ = (code >> 4) & 0x0F;
+						*vram++ = (code >> 4) & 0x0F;
+						*vram++ = (code >> 4) & 0x0F;
+						*vram++ = (code >> 4) & 0x0F;
+						*vram++ = (code >> 4) & 0x0F;
+						*vram++ = (code >> 4) & 0x0F;
+					}
 				}
 			}
 		}
 	}
 	else
 	{
-		for (int row = beginrow; row <= endrow; row += 8)
+		for (int row = startrow; row <= stoprow; row += 8)
 		{
 			for (int col = 0; col < 40; col++)
 			{
@@ -627,41 +636,44 @@ void a2_video_device::dlores_update(screen_device &screen, bitmap_ind16 &bitmap,
 				/* and now draw */
 				for (int y = 0; y < 4; y++)
 				{
-					uint16_t *vram = &bitmap.pix(row + y, (col * 14));
+					if (((row + y) >= beginrow) && ((row + y) <= endrow))
+					{
+						uint16_t *vram = &bitmap.pix(row + y, (col * 14));
 
-					if (col & 1)
-					{
-						*vram++ = abits & (1 << 2) ? fg : 0;
-						*vram++ = abits & (1 << 3) ? fg : 0;
-						*vram++ = abits & (1 << 0) ? fg : 0;
-						*vram++ = abits & (1 << 1) ? fg : 0;
-						*vram++ = abits & (1 << 2) ? fg : 0;
-						*vram++ = abits & (1 << 3) ? fg : 0;
-						*vram++ = abits & (1 << 0) ? fg : 0;
-						*vram++ = bits & (1 << 1) ? fg : 0;
-						*vram++ = bits & (1 << 2) ? fg : 0;
-						*vram++ = bits & (1 << 3) ? fg : 0;
-						*vram++ = bits & (1 << 0) ? fg : 0;
-						*vram++ = bits & (1 << 1) ? fg : 0;
-						*vram++ = bits & (1 << 2) ? fg : 0;
-						*vram++ = bits & (1 << 3) ? fg : 0;
-					}
-					else
-					{
-						*vram++ = abits & (1 << 0) ? fg : 0;
-						*vram++ = abits & (1 << 1) ? fg : 0;
-						*vram++ = abits & (1 << 2) ? fg : 0;
-						*vram++ = abits & (1 << 3) ? fg : 0;
-						*vram++ = abits & (1 << 0) ? fg : 0;
-						*vram++ = abits & (1 << 1) ? fg : 0;
-						*vram++ = abits & (1 << 2) ? fg : 0;
-						*vram++ = bits & (1 << 0) ? fg : 0;
-						*vram++ = bits & (1 << 1) ? fg : 0;
-						*vram++ = bits & (1 << 2) ? fg : 0;
-						*vram++ = bits & (1 << 3) ? fg : 0;
-						*vram++ = bits & (1 << 0) ? fg : 0;
-						*vram++ = bits & (1 << 1) ? fg : 0;
-						*vram++ = bits & (1 << 2) ? fg : 0;
+						if (col & 1)
+						{
+							*vram++ = abits & (1 << 2) ? fg : 0;
+							*vram++ = abits & (1 << 3) ? fg : 0;
+							*vram++ = abits & (1 << 0) ? fg : 0;
+							*vram++ = abits & (1 << 1) ? fg : 0;
+							*vram++ = abits & (1 << 2) ? fg : 0;
+							*vram++ = abits & (1 << 3) ? fg : 0;
+							*vram++ = abits & (1 << 0) ? fg : 0;
+							*vram++ = bits & (1 << 1) ? fg : 0;
+							*vram++ = bits & (1 << 2) ? fg : 0;
+							*vram++ = bits & (1 << 3) ? fg : 0;
+							*vram++ = bits & (1 << 0) ? fg : 0;
+							*vram++ = bits & (1 << 1) ? fg : 0;
+							*vram++ = bits & (1 << 2) ? fg : 0;
+							*vram++ = bits & (1 << 3) ? fg : 0;
+						}
+						else
+						{
+							*vram++ = abits & (1 << 0) ? fg : 0;
+							*vram++ = abits & (1 << 1) ? fg : 0;
+							*vram++ = abits & (1 << 2) ? fg : 0;
+							*vram++ = abits & (1 << 3) ? fg : 0;
+							*vram++ = abits & (1 << 0) ? fg : 0;
+							*vram++ = abits & (1 << 1) ? fg : 0;
+							*vram++ = abits & (1 << 2) ? fg : 0;
+							*vram++ = bits & (1 << 0) ? fg : 0;
+							*vram++ = bits & (1 << 1) ? fg : 0;
+							*vram++ = bits & (1 << 2) ? fg : 0;
+							*vram++ = bits & (1 << 3) ? fg : 0;
+							*vram++ = bits & (1 << 0) ? fg : 0;
+							*vram++ = bits & (1 << 1) ? fg : 0;
+							*vram++ = bits & (1 << 2) ? fg : 0;
+						}
 					}
 				}
 
@@ -670,41 +682,44 @@ void a2_video_device::dlores_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 				for (int y = 4; y < 8; y++)
 				{
-					uint16_t *vram = &bitmap.pix(row + y, (col * 14));
+					if (((row + y) >= beginrow) && ((row + y) <= endrow))
+					{
+						uint16_t *vram = &bitmap.pix(row + y, (col * 14));
 
-					if (col & 1)
-					{
-						*vram++ = abits & (1 << 2) ? fg : 0;
-						*vram++ = abits & (1 << 3) ? fg : 0;
-						*vram++ = abits & (1 << 0) ? fg : 0;
-						*vram++ = abits & (1 << 1) ? fg : 0;
-						*vram++ = abits & (1 << 2) ? fg : 0;
-						*vram++ = abits & (1 << 3) ? fg : 0;
-						*vram++ = abits & (1 << 0) ? fg : 0;
-						*vram++ = bits & (1 << 1) ? fg : 0;
-						*vram++ = bits & (1 << 2) ? fg : 0;
-						*vram++ = bits & (1 << 3) ? fg : 0;
-						*vram++ = bits & (1 << 0) ? fg : 0;
-						*vram++ = bits & (1 << 1) ? fg : 0;
-						*vram++ = bits & (1 << 2) ? fg : 0;
-						*vram++ = bits & (1 << 3) ? fg : 0;
-					}
-					else
-					{
-						*vram++ = abits & (1 << 0) ? fg : 0;
-						*vram++ = abits & (1 << 1) ? fg : 0;
-						*vram++ = abits & (1 << 2) ? fg : 0;
-						*vram++ = abits & (1 << 3) ? fg : 0;
-						*vram++ = abits & (1 << 0) ? fg : 0;
-						*vram++ = abits & (1 << 1) ? fg : 0;
-						*vram++ = abits & (1 << 2) ? fg : 0;
-						*vram++ = bits & (1 << 0) ? fg : 0;
-						*vram++ = bits & (1 << 1) ? fg : 0;
-						*vram++ = bits & (1 << 2) ? fg : 0;
-						*vram++ = bits & (1 << 3) ? fg : 0;
-						*vram++ = bits & (1 << 0) ? fg : 0;
-						*vram++ = bits & (1 << 1) ? fg : 0;
-						*vram++ = bits & (1 << 2) ? fg : 0;
+						if (col & 1)
+						{
+							*vram++ = abits & (1 << 2) ? fg : 0;
+							*vram++ = abits & (1 << 3) ? fg : 0;
+							*vram++ = abits & (1 << 0) ? fg : 0;
+							*vram++ = abits & (1 << 1) ? fg : 0;
+							*vram++ = abits & (1 << 2) ? fg : 0;
+							*vram++ = abits & (1 << 3) ? fg : 0;
+							*vram++ = abits & (1 << 0) ? fg : 0;
+							*vram++ = bits & (1 << 1) ? fg : 0;
+							*vram++ = bits & (1 << 2) ? fg : 0;
+							*vram++ = bits & (1 << 3) ? fg : 0;
+							*vram++ = bits & (1 << 0) ? fg : 0;
+							*vram++ = bits & (1 << 1) ? fg : 0;
+							*vram++ = bits & (1 << 2) ? fg : 0;
+							*vram++ = bits & (1 << 3) ? fg : 0;
+						}
+						else
+						{
+							*vram++ = abits & (1 << 0) ? fg : 0;
+							*vram++ = abits & (1 << 1) ? fg : 0;
+							*vram++ = abits & (1 << 2) ? fg : 0;
+							*vram++ = abits & (1 << 3) ? fg : 0;
+							*vram++ = abits & (1 << 0) ? fg : 0;
+							*vram++ = abits & (1 << 1) ? fg : 0;
+							*vram++ = abits & (1 << 2) ? fg : 0;
+							*vram++ = bits & (1 << 0) ? fg : 0;
+							*vram++ = bits & (1 << 1) ? fg : 0;
+							*vram++ = bits & (1 << 2) ? fg : 0;
+							*vram++ = bits & (1 << 3) ? fg : 0;
+							*vram++ = bits & (1 << 0) ? fg : 0;
+							*vram++ = bits & (1 << 1) ? fg : 0;
+							*vram++ = bits & (1 << 2) ? fg : 0;
+						}
 					}
 				}
 			}
@@ -721,6 +736,9 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	beginrow = (std::max)(beginrow, cliprect.top() - (cliprect.top() % 8));
 	endrow = (std::min)(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
 
+	const int startrow = (beginrow / 8) * 8;
+	const int stoprow = ((endrow / 8) + 1) * 8;
+
 	int fg = 0;
 	int bg = 0;
 	switch (m_sysconfig & 0x03)
@@ -731,7 +749,7 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 		case 3: fg = ORANGE; break;
 	}
 
-	for (int row = beginrow; row <= endrow; row += 8)
+	for (int row = startrow; row <= stoprow; row += 8)
 	{
 		if (m_80col)
 		{
@@ -777,6 +795,9 @@ void a2_video_device::text_update_orig(screen_device &screen, bitmap_ind16 &bitm
 	beginrow = (std::max)(beginrow, cliprect.top() - (cliprect.top() % 8));
 	endrow = (std::min)(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
 
+	const int startrow = (beginrow / 8) * 8;
+	const int stoprow = ((endrow / 8) + 1) * 8;
+
 	switch (m_sysconfig & 0x03)
 	{
 		case 0: case 4: fg = WHITE; break;
@@ -785,7 +806,7 @@ void a2_video_device::text_update_orig(screen_device &screen, bitmap_ind16 &bitm
 		case 3: fg = ORANGE; break;
 	}
 
-	for (row = beginrow; row <= endrow; row += 8)
+	for (row = startrow; row <= stoprow; row += 8)
 	{
 		for (col = 0; col < 40; col++)
 		{
@@ -808,6 +829,9 @@ void a2_video_device::text_update_spectrum(screen_device &screen, bitmap_ind16 &
 	beginrow = (std::max)(beginrow, cliprect.top() - (cliprect.top() % 8));
 	endrow = (std::min)(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
 
+	const int startrow = (beginrow / 8) * 8;
+	const int stoprow = ((endrow / 8) + 1) * 8;
+
 	switch (m_sysconfig & 0x03)
 	{
 		case 0: fg = WHITE; break;
@@ -816,7 +840,7 @@ void a2_video_device::text_update_spectrum(screen_device &screen, bitmap_ind16 &
 		case 3: fg = ORANGE; break;
 	}
 
-	for (row = beginrow; row <= endrow; row += 8)
+	for (row = startrow; row <= stoprow; row += 8)
 	{
 		for (col = 0; col < 40; col++)
 		{
@@ -839,6 +863,9 @@ void a2_video_device::text_update_dodo(screen_device &screen, bitmap_ind16 &bitm
 	beginrow = (std::max)(beginrow, cliprect.top() - (cliprect.top() % 8));
 	endrow = (std::min)(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
 
+	const int startrow = (beginrow / 8) * 8;
+	const int stoprow = ((endrow / 8) + 1) * 8;
+
 	switch (m_sysconfig & 0x03)
 	{
 		case 0: fg = WHITE; break;
@@ -847,7 +874,7 @@ void a2_video_device::text_update_dodo(screen_device &screen, bitmap_ind16 &bitm
 		case 3: fg = ORANGE; break;
 	}
 
-	for (row = beginrow; row <= endrow; row += 8)
+	for (row = startrow; row <= stoprow; row += 8)
 	{
 		for (col = 0; col < 40; col++)
 		{
@@ -870,6 +897,9 @@ void a2_video_device::text_update_jplus(screen_device &screen, bitmap_ind16 &bit
 	beginrow = (std::max)(beginrow, cliprect.top() - (cliprect.top() % 8));
 	endrow = (std::min)(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
 
+	const int startrow = (beginrow / 8) * 8;
+	const int stoprow = ((endrow / 8) + 1) * 8;
+
 	switch (m_sysconfig & 0x03)
 	{
 		case 0: fg = WHITE; break;
@@ -878,7 +908,7 @@ void a2_video_device::text_update_jplus(screen_device &screen, bitmap_ind16 &bit
 		case 3: fg = ORANGE; break;
 	}
 
-	for (row = beginrow; row <= endrow; row += 8)
+	for (row = startrow; row <= stoprow; row += 8)
 	{
 		for (col = 0; col < 40; col++)
 		{
@@ -901,6 +931,9 @@ void a2_video_device::text_update_ultr(screen_device &screen, bitmap_ind16 &bitm
 	beginrow = (std::max)(beginrow, cliprect.top() - (cliprect.top() % 8));
 	endrow = (std::min)(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
 
+	const int startrow = (beginrow / 8) * 8;
+	const int stoprow = ((endrow / 8) + 1) * 8;
+
 	switch (m_sysconfig & 0x03)
 	{
 		case 0: fg = WHITE; break;
@@ -909,7 +942,7 @@ void a2_video_device::text_update_ultr(screen_device &screen, bitmap_ind16 &bitm
 		case 3: fg = ORANGE; break;
 	}
 
-	for (row = beginrow; row <= endrow; row += 8)
+	for (row = startrow; row <= stoprow; row += 8)
 	{
 		for (col = 0; col < 40; col++)
 		{
