@@ -555,7 +555,6 @@ public:
 	void write_l(u8 data);
 	u8 read_l();
 
-	DECLARE_INPUT_CHANGED_MEMBER(position_changed) { update_display(); }
 	void unkeinv(machine_config &config);
 };
 
@@ -563,17 +562,12 @@ public:
 
 void unkeinv_state::update_display()
 {
-	m_display->matrix(m_l, m_g << 4 | m_d, false);
-
-	// positional led row is on L6,L7
-	u16 wand = m_display->read_row(7) << 8 | m_display->read_row(6);
-	m_display->write_row(8 + m_inputs[1]->read(), wand);
-	m_display->update();
+	m_display->matrix(m_g << 4 | m_d, m_l);
 }
 
 void unkeinv_state::write_g(u8 data)
 {
-	// G0-G3: led select part
+	// G0,G1: led select part
 	// G2,G3: input mux
 	m_g = ~data & 0xf;
 	update_display();
@@ -619,7 +613,7 @@ static INPUT_PORTS_START( unkeinv )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 
 	PORT_START("IN.1")
-	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_CHANGED_MEMBER(DEVICE_SELF, unkeinv_state, position_changed, 0)
+	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CENTERDELTA(0)
 INPUT_PORTS_END
 
 void unkeinv_state::unkeinv(machine_config &config)
@@ -635,7 +629,7 @@ void unkeinv_state::unkeinv(machine_config &config)
 	m_maincpu->write_so().set(m_speaker, FUNC(speaker_sound_device::level_w));
 
 	/* video hardware */
-	PWM_DISPLAY(config, m_display).set_size(8+12, 8+8);
+	PWM_DISPLAY(config, m_display).set_size(6, 8);
 	config.set_default_layout(layout_unkeinv);
 
 	/* sound hardware */

@@ -6,6 +6,24 @@ license:CC0
 
 <!-- define elements -->
 
+	<element name="black"><rect><color red="0" green="0" blue="0" /></rect></element>
+
+	<element name="wandl">
+		<rect>
+			<bounds x="0" y="0" width="18" height="1" />
+			<color red="0" green="0" blue="0" />
+		</rect>
+		<disk>
+			<bounds state="0" x="0" y="0" width="1" height="1" />
+			<bounds state="11" x="16.5" y="0" width="1" height="1" />
+			<color red="1.0" green="0.2" blue="0.23" />
+		</disk>
+	</element>
+	<element name="wandm" defstate="0">
+		<rect state="0"><color red="0.1" green="0.1" blue="0.1" /></rect>
+		<rect state="1"><color red="1.0" green="1.0" blue="1.0" /></rect>
+	</element>
+
 	<element name="ledy" defstate="0">
 		<disk state="0"><color red="0.07" green="0.06" blue="0.02" /></disk>
 		<disk state="1"><color red="1.0" green="0.95" blue="0.2" /></disk>
@@ -14,10 +32,6 @@ license:CC0
 		<disk state="0"><color red="0.023" green="0.1" blue="0.02" /></disk>
 		<disk state="1"><color red="0.23" green="1.0" blue="0.2" /></disk>
 	</element>
-	<element name="ledr" defstate="0">
-		<disk state="0"><color red="0.1" green="0.02" blue="0.023" /></disk>
-		<disk state="1"><color red="1.0" green="0.2" blue="0.23" /></disk>
-	</element>
 
 
 <!-- build screen -->
@@ -25,174 +39,70 @@ license:CC0
 	<view name="Internal Layout">
 		<bounds left="-0.5" right="18" top="-0.5" bottom="26.5" />
 
+	<!-- wand -->
+
+		<repeat count="9">
+			<param name="y" start="1" increment="3" />
+			<element ref="black" inputtag="IN.1" inputmask="0x00" inputraw="yes"><bounds x="0" y="~y~" width="18" height="1" /></element>
+			<element ref="wandl" inputtag="IN.1" inputmask="0x0f" inputraw="yes"><bounds x="0" y="~y~" width="18" height="1" /></element>
+		</repeat>
+
+		<element name="0.7" ref="wandm" blend="multiply"><bounds x="-0.5" y="0.5" width="19" height="2" /></element>
+		<element name="1.7" ref="wandm" blend="multiply"><bounds x="-0.5" y="3.5" width="19" height="2" /></element>
+		<element name="2.7" ref="wandm" blend="multiply"><bounds x="-0.5" y="6.5" width="19" height="2" /></element>
+		<element name="3.7" ref="wandm" blend="multiply"><bounds x="-0.5" y="9.5" width="19" height="2" /></element>
+		<element name="0.6" ref="wandm" blend="multiply"><bounds x="-0.5" y="12.5" width="19" height="2" /></element>
+		<element name="1.6" ref="wandm" blend="multiply"><bounds x="-0.5" y="15.5" width="19" height="2" /></element>
+		<element name="2.6" ref="wandm" blend="multiply"><bounds x="-0.5" y="18.5" width="19" height="2" /></element>
+		<element name="3.6" ref="wandm" blend="multiply"><bounds x="-0.5" y="21.5" width="19" height="2" /></element>
+		<element name="4.6" ref="wandm" blend="multiply"><bounds x="-0.5" y="24.5" width="19" height="2" /></element>
+
 	<!-- invaders -->
 
 		<element name="0.0" ref="ledy"><bounds x="0" y="0" width="1" height="1" /></element>
-		<element name="0.1" ref="ledy"><bounds x="0" y="3" width="1" height="1" /></element>
-		<element name="0.2" ref="ledy"><bounds x="0" y="6" width="1" height="1" /></element>
-		<element name="0.3" ref="ledy"><bounds x="0" y="9" width="1" height="1" /></element>
-		<element name="0.4" ref="ledy"><bounds x="0" y="12" width="1" height="1" /></element>
+		<element name="1.0" ref="ledy"><bounds x="0" y="3" width="1" height="1" /></element>
+		<element name="2.0" ref="ledy"><bounds x="0" y="6" width="1" height="1" /></element>
+		<element name="3.0" ref="ledy"><bounds x="0" y="9" width="1" height="1" /></element>
+		<element name="4.0" ref="ledy"><bounds x="0" y="12" width="1" height="1" /></element>
 
-		<element name="1.0" ref="ledy"><bounds x="3" y="0" width="1" height="1" /></element>
+		<element name="0.1" ref="ledy"><bounds x="3" y="0" width="1" height="1" /></element>
 		<element name="1.1" ref="ledy"><bounds x="3" y="3" width="1" height="1" /></element>
-		<element name="1.2" ref="ledy"><bounds x="3" y="6" width="1" height="1" /></element>
-		<element name="1.3" ref="ledy"><bounds x="3" y="9" width="1" height="1" /></element>
-		<element name="1.4" ref="ledy"><bounds x="3" y="12" width="1" height="1" /></element>
+		<element name="2.1" ref="ledy"><bounds x="3" y="6" width="1" height="1" /></element>
+		<element name="3.1" ref="ledy"><bounds x="3" y="9" width="1" height="1" /></element>
+		<element name="4.1" ref="ledy"><bounds x="3" y="12" width="1" height="1" /></element>
 
-		<element name="2.0" ref="ledy"><bounds x="6" y="0" width="1" height="1" /></element>
-		<element name="2.1" ref="ledy"><bounds x="6" y="3" width="1" height="1" /></element>
+		<element name="0.2" ref="ledy"><bounds x="6" y="0" width="1" height="1" /></element>
+		<element name="1.2" ref="ledy"><bounds x="6" y="3" width="1" height="1" /></element>
 		<element name="2.2" ref="ledy"><bounds x="6" y="6" width="1" height="1" /></element>
-		<element name="2.3" ref="ledy"><bounds x="6" y="9" width="1" height="1" /></element>
-		<element name="2.4" ref="ledy"><bounds x="6" y="12" width="1" height="1" /></element>
+		<element name="3.2" ref="ledy"><bounds x="6" y="9" width="1" height="1" /></element>
+		<element name="4.2" ref="ledy"><bounds x="6" y="12" width="1" height="1" /></element>
 
-		<element name="3.0" ref="ledy"><bounds x="9" y="0" width="1" height="1" /></element>
-		<element name="3.1" ref="ledy"><bounds x="9" y="3" width="1" height="1" /></element>
-		<element name="3.2" ref="ledy"><bounds x="9" y="6" width="1" height="1" /></element>
+		<element name="0.3" ref="ledy"><bounds x="9" y="0" width="1" height="1" /></element>
+		<element name="1.3" ref="ledy"><bounds x="9" y="3" width="1" height="1" /></element>
+		<element name="2.3" ref="ledy"><bounds x="9" y="6" width="1" height="1" /></element>
 		<element name="3.3" ref="ledy"><bounds x="9" y="9" width="1" height="1" /></element>
-		<element name="3.4" ref="ledy"><bounds x="9" y="12" width="1" height="1" /></element>
+		<element name="4.3" ref="ledy"><bounds x="9" y="12" width="1" height="1" /></element>
 
-		<element name="4.0" ref="ledy"><bounds x="12" y="0" width="1" height="1" /></element>
-		<element name="4.1" ref="ledy"><bounds x="12" y="3" width="1" height="1" /></element>
-		<element name="4.2" ref="ledy"><bounds x="12" y="6" width="1" height="1" /></element>
-		<element name="4.3" ref="ledy"><bounds x="12" y="9" width="1" height="1" /></element>
+		<element name="0.4" ref="ledy"><bounds x="12" y="0" width="1" height="1" /></element>
+		<element name="1.4" ref="ledy"><bounds x="12" y="3" width="1" height="1" /></element>
+		<element name="2.4" ref="ledy"><bounds x="12" y="6" width="1" height="1" /></element>
+		<element name="3.4" ref="ledy"><bounds x="12" y="9" width="1" height="1" /></element>
 		<element name="4.4" ref="ledy"><bounds x="12" y="12" width="1" height="1" /></element>
 
-		<element name="5.0" ref="ledy"><bounds x="15" y="0" width="1" height="1" /></element>
-		<element name="5.1" ref="ledy"><bounds x="15" y="3" width="1" height="1" /></element>
-		<element name="5.2" ref="ledy"><bounds x="15" y="6" width="1" height="1" /></element>
-		<element name="5.3" ref="ledy"><bounds x="15" y="9" width="1" height="1" /></element>
-		<element name="5.4" ref="ledy"><bounds x="15" y="12" width="1" height="1" /></element>
+		<element name="0.5" ref="ledy"><bounds x="15" y="0" width="1" height="1" /></element>
+		<element name="1.5" ref="ledy"><bounds x="15" y="3" width="1" height="1" /></element>
+		<element name="2.5" ref="ledy"><bounds x="15" y="6" width="1" height="1" /></element>
+		<element name="3.5" ref="ledy"><bounds x="15" y="9" width="1" height="1" /></element>
+		<element name="4.5" ref="ledy"><bounds x="15" y="12" width="1" height="1" /></element>
 
 	<!-- barriers -->
 
-		<element name="0.5" ref="ledg"><bounds x="1.5" y="18" width="1" height="1" /></element>
-		<element name="1.5" ref="ledg"><bounds x="4.5" y="18" width="1" height="1" /></element>
-		<element name="2.5" ref="ledg"><bounds x="7.5" y="18" width="1" height="1" /></element>
-		<element name="3.5" ref="ledg"><bounds x="10.5" y="18" width="1" height="1" /></element>
-		<element name="4.5" ref="ledg"><bounds x="13.5" y="18" width="1" height="1" /></element>
+		<element name="5.0" ref="ledg"><bounds x="1.5" y="18" width="1" height="1" /></element>
+		<element name="5.1" ref="ledg"><bounds x="4.5" y="18" width="1" height="1" /></element>
+		<element name="5.2" ref="ledg"><bounds x="7.5" y="18" width="1" height="1" /></element>
+		<element name="5.3" ref="ledg"><bounds x="10.5" y="18" width="1" height="1" /></element>
+		<element name="5.4" ref="ledg"><bounds x="13.5" y="18" width="1" height="1" /></element>
 		<element name="5.5" ref="ledg"><bounds x="16.5" y="18" width="1" height="1" /></element>
-
-	<!-- wand -->
-
-		<element name="8.8" ref="ledr"><bounds x="0" y="1" width="1" height="1" /></element>
-		<element name="8.9" ref="ledr"><bounds x="0" y="4" width="1" height="1" /></element>
-		<element name="8.10" ref="ledr"><bounds x="0" y="7" width="1" height="1" /></element>
-		<element name="8.11" ref="ledr"><bounds x="0" y="10" width="1" height="1" /></element>
-		<element name="8.0" ref="ledr"><bounds x="0" y="13" width="1" height="1" /></element>
-		<element name="8.1" ref="ledr"><bounds x="0" y="16" width="1" height="1" /></element>
-		<element name="8.2" ref="ledr"><bounds x="0" y="19" width="1" height="1" /></element>
-		<element name="8.3" ref="ledr"><bounds x="0" y="22" width="1" height="1" /></element>
-		<element name="8.4" ref="ledr"><bounds x="0" y="25" width="1" height="1" /></element>
-
-		<element name="9.8" ref="ledr"><bounds x="1.5" y="1" width="1" height="1" /></element>
-		<element name="9.9" ref="ledr"><bounds x="1.5" y="4" width="1" height="1" /></element>
-		<element name="9.10" ref="ledr"><bounds x="1.5" y="7" width="1" height="1" /></element>
-		<element name="9.11" ref="ledr"><bounds x="1.5" y="10" width="1" height="1" /></element>
-		<element name="9.0" ref="ledr"><bounds x="1.5" y="13" width="1" height="1" /></element>
-		<element name="9.1" ref="ledr"><bounds x="1.5" y="16" width="1" height="1" /></element>
-		<element name="9.2" ref="ledr"><bounds x="1.5" y="19" width="1" height="1" /></element>
-		<element name="9.3" ref="ledr"><bounds x="1.5" y="22" width="1" height="1" /></element>
-		<element name="9.4" ref="ledr"><bounds x="1.5" y="25" width="1" height="1" /></element>
-
-		<element name="10.8" ref="ledr"><bounds x="3" y="1" width="1" height="1" /></element>
-		<element name="10.9" ref="ledr"><bounds x="3" y="4" width="1" height="1" /></element>
-		<element name="10.10" ref="ledr"><bounds x="3" y="7" width="1" height="1" /></element>
-		<element name="10.11" ref="ledr"><bounds x="3" y="10" width="1" height="1" /></element>
-		<element name="10.0" ref="ledr"><bounds x="3" y="13" width="1" height="1" /></element>
-		<element name="10.1" ref="ledr"><bounds x="3" y="16" width="1" height="1" /></element>
-		<element name="10.2" ref="ledr"><bounds x="3" y="19" width="1" height="1" /></element>
-		<element name="10.3" ref="ledr"><bounds x="3" y="22" width="1" height="1" /></element>
-		<element name="10.4" ref="ledr"><bounds x="3" y="25" width="1" height="1" /></element>
-
-		<element name="11.8" ref="ledr"><bounds x="4.5" y="1" width="1" height="1" /></element>
-		<element name="11.9" ref="ledr"><bounds x="4.5" y="4" width="1" height="1" /></element>
-		<element name="11.10" ref="ledr"><bounds x="4.5" y="7" width="1" height="1" /></element>
-		<element name="11.11" ref="ledr"><bounds x="4.5" y="10" width="1" height="1" /></element>
-		<element name="11.0" ref="ledr"><bounds x="4.5" y="13" width="1" height="1" /></element>
-		<element name="11.1" ref="ledr"><bounds x="4.5" y="16" width="1" height="1" /></element>
-		<element name="11.2" ref="ledr"><bounds x="4.5" y="19" width="1" height="1" /></element>
-		<element name="11.3" ref="ledr"><bounds x="4.5" y="22" width="1" height="1" /></element>
-		<element name="11.4" ref="ledr"><bounds x="4.5" y="25" width="1" height="1" /></element>
-
-		<element name="12.8" ref="ledr"><bounds x="6" y="1" width="1" height="1" /></element>
-		<element name="12.9" ref="ledr"><bounds x="6" y="4" width="1" height="1" /></element>
-		<element name="12.10" ref="ledr"><bounds x="6" y="7" width="1" height="1" /></element>
-		<element name="12.11" ref="ledr"><bounds x="6" y="10" width="1" height="1" /></element>
-		<element name="12.0" ref="ledr"><bounds x="6" y="13" width="1" height="1" /></element>
-		<element name="12.1" ref="ledr"><bounds x="6" y="16" width="1" height="1" /></element>
-		<element name="12.2" ref="ledr"><bounds x="6" y="19" width="1" height="1" /></element>
-		<element name="12.3" ref="ledr"><bounds x="6" y="22" width="1" height="1" /></element>
-		<element name="12.4" ref="ledr"><bounds x="6" y="25" width="1" height="1" /></element>
-
-		<element name="13.8" ref="ledr"><bounds x="7.5" y="1" width="1" height="1" /></element>
-		<element name="13.9" ref="ledr"><bounds x="7.5" y="4" width="1" height="1" /></element>
-		<element name="13.10" ref="ledr"><bounds x="7.5" y="7" width="1" height="1" /></element>
-		<element name="13.11" ref="ledr"><bounds x="7.5" y="10" width="1" height="1" /></element>
-		<element name="13.0" ref="ledr"><bounds x="7.5" y="13" width="1" height="1" /></element>
-		<element name="13.1" ref="ledr"><bounds x="7.5" y="16" width="1" height="1" /></element>
-		<element name="13.2" ref="ledr"><bounds x="7.5" y="19" width="1" height="1" /></element>
-		<element name="13.3" ref="ledr"><bounds x="7.5" y="22" width="1" height="1" /></element>
-		<element name="13.4" ref="ledr"><bounds x="7.5" y="25" width="1" height="1" /></element>
-
-		<element name="14.8" ref="ledr"><bounds x="9" y="1" width="1" height="1" /></element>
-		<element name="14.9" ref="ledr"><bounds x="9" y="4" width="1" height="1" /></element>
-		<element name="14.10" ref="ledr"><bounds x="9" y="7" width="1" height="1" /></element>
-		<element name="14.11" ref="ledr"><bounds x="9" y="10" width="1" height="1" /></element>
-		<element name="14.0" ref="ledr"><bounds x="9" y="13" width="1" height="1" /></element>
-		<element name="14.1" ref="ledr"><bounds x="9" y="16" width="1" height="1" /></element>
-		<element name="14.2" ref="ledr"><bounds x="9" y="19" width="1" height="1" /></element>
-		<element name="14.3" ref="ledr"><bounds x="9" y="22" width="1" height="1" /></element>
-		<element name="14.4" ref="ledr"><bounds x="9" y="25" width="1" height="1" /></element>
-
-		<element name="15.8" ref="ledr"><bounds x="10.5" y="1" width="1" height="1" /></element>
-		<element name="15.9" ref="ledr"><bounds x="10.5" y="4" width="1" height="1" /></element>
-		<element name="15.10" ref="ledr"><bounds x="10.5" y="7" width="1" height="1" /></element>
-		<element name="15.11" ref="ledr"><bounds x="10.5" y="10" width="1" height="1" /></element>
-		<element name="15.0" ref="ledr"><bounds x="10.5" y="13" width="1" height="1" /></element>
-		<element name="15.1" ref="ledr"><bounds x="10.5" y="16" width="1" height="1" /></element>
-		<element name="15.2" ref="ledr"><bounds x="10.5" y="19" width="1" height="1" /></element>
-		<element name="15.3" ref="ledr"><bounds x="10.5" y="22" width="1" height="1" /></element>
-		<element name="15.4" ref="ledr"><bounds x="10.5" y="25" width="1" height="1" /></element>
-
-		<element name="16.8" ref="ledr"><bounds x="12" y="1" width="1" height="1" /></element>
-		<element name="16.9" ref="ledr"><bounds x="12" y="4" width="1" height="1" /></element>
-		<element name="16.10" ref="ledr"><bounds x="12" y="7" width="1" height="1" /></element>
-		<element name="16.11" ref="ledr"><bounds x="12" y="10" width="1" height="1" /></element>
-		<element name="16.0" ref="ledr"><bounds x="12" y="13" width="1" height="1" /></element>
-		<element name="16.1" ref="ledr"><bounds x="12" y="16" width="1" height="1" /></element>
-		<element name="16.2" ref="ledr"><bounds x="12" y="19" width="1" height="1" /></element>
-		<element name="16.3" ref="ledr"><bounds x="12" y="22" width="1" height="1" /></element>
-		<element name="16.4" ref="ledr"><bounds x="12" y="25" width="1" height="1" /></element>
-
-		<element name="17.8" ref="ledr"><bounds x="13.5" y="1" width="1" height="1" /></element>
-		<element name="17.9" ref="ledr"><bounds x="13.5" y="4" width="1" height="1" /></element>
-		<element name="17.10" ref="ledr"><bounds x="13.5" y="7" width="1" height="1" /></element>
-		<element name="17.11" ref="ledr"><bounds x="13.5" y="10" width="1" height="1" /></element>
-		<element name="17.0" ref="ledr"><bounds x="13.5" y="13" width="1" height="1" /></element>
-		<element name="17.1" ref="ledr"><bounds x="13.5" y="16" width="1" height="1" /></element>
-		<element name="17.2" ref="ledr"><bounds x="13.5" y="19" width="1" height="1" /></element>
-		<element name="17.3" ref="ledr"><bounds x="13.5" y="22" width="1" height="1" /></element>
-		<element name="17.4" ref="ledr"><bounds x="13.5" y="25" width="1" height="1" /></element>
-
-		<element name="18.8" ref="ledr"><bounds x="15" y="1" width="1" height="1" /></element>
-		<element name="18.9" ref="ledr"><bounds x="15" y="4" width="1" height="1" /></element>
-		<element name="18.10" ref="ledr"><bounds x="15" y="7" width="1" height="1" /></element>
-		<element name="18.11" ref="ledr"><bounds x="15" y="10" width="1" height="1" /></element>
-		<element name="18.0" ref="ledr"><bounds x="15" y="13" width="1" height="1" /></element>
-		<element name="18.1" ref="ledr"><bounds x="15" y="16" width="1" height="1" /></element>
-		<element name="18.2" ref="ledr"><bounds x="15" y="19" width="1" height="1" /></element>
-		<element name="18.3" ref="ledr"><bounds x="15" y="22" width="1" height="1" /></element>
-		<element name="18.4" ref="ledr"><bounds x="15" y="25" width="1" height="1" /></element>
-
-		<element name="19.8" ref="ledr"><bounds x="16.5" y="1" width="1" height="1" /></element>
-		<element name="19.9" ref="ledr"><bounds x="16.5" y="4" width="1" height="1" /></element>
-		<element name="19.10" ref="ledr"><bounds x="16.5" y="7" width="1" height="1" /></element>
-		<element name="19.11" ref="ledr"><bounds x="16.5" y="10" width="1" height="1" /></element>
-		<element name="19.0" ref="ledr"><bounds x="16.5" y="13" width="1" height="1" /></element>
-		<element name="19.1" ref="ledr"><bounds x="16.5" y="16" width="1" height="1" /></element>
-		<element name="19.2" ref="ledr"><bounds x="16.5" y="19" width="1" height="1" /></element>
-		<element name="19.3" ref="ledr"><bounds x="16.5" y="22" width="1" height="1" /></element>
-		<element name="19.4" ref="ledr"><bounds x="16.5" y="25" width="1" height="1" /></element>
 
 	</view>
 </mamelayout>
