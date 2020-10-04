@@ -2263,7 +2263,7 @@ CONS( 200?, dgun2500,  0,  0,  nes_vt_dg_baddma_16mb, nes_vt, nes_vt_dg_state, e
 
 // this is VT09 based
 CONS( 2009, cybar120,  0,  0,  nes_vt_vg_16mb,nes_vt, nes_vt_hh_state, empty_init, "Defender", "Defender M2500P 120-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 2004, vsmaxtx2,  0,  0,  nes_vt_vg_4mb, nes_vt, nes_vt_hh_state, empty_init, "Senario", "Vs. Maxx TX-2 50-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2004, vsmaxtx2,  0,  0,  nes_vt_vg_4mb, nes_vt, nes_vt_hh_state, empty_init, "Senario", "Vs Maxx TX-2 50-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 2005, vgpocket,  0,  0,  nes_vt_vg_4mb, nes_vt, nes_vt_hh_state, empty_init, "Performance Designed Products", "VG Pocket (VG-2000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 200?, vgpmini,   0,  0,  nes_vt_vg_4mb, nes_vt, nes_vt_hh_state, empty_init, "Performance Designed Products", "VG Pocket Mini (VG-1500)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // VG Pocket Max (VG-2500) (blue case, 75 games)
@@ -2272,13 +2272,13 @@ CONS( 200?, vgpmini,   0,  0,  nes_vt_vg_4mb, nes_vt, nes_vt_hh_state, empty_ini
 
 // CPU die is marked 'VH2009' There's also a 62256 RAM chip on the PCB, some scrambled opcodes
 CONS( 2004, polmega,   0,  0,  nes_vt_vh2009_4mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Polaroid", "TV MegaMax active power game system 30-in-1 (MegaMax GPD001SDG)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 2004, vsmaxx17,  0,  0,  nes_vt_vh2009_2mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Senario", "Vs. Maxx 17-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // from a Green unit, '17 Classic & Racing Game'
+CONS( 2004, vsmaxx17,  0,  0,  nes_vt_vh2009_2mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Senario", "Vs Maxx 17-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // from a Green unit, '17 Classic & Racing Game'
 CONS( 200?, silv35,    0,  0,  nes_vt_vh2009_4mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "SilverLit", "35 in 1 Super Twins", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // die is marked as VH2009, as above, but no scrambled opcodes here
 CONS( 201?, techni4,   0,  0,  nes_vt_pal_2mb,      nes_vt, nes_vt_state,        empty_init, "Technigame", "Technigame Super 4-in-1 Sports (PAL)", MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2004, vsmaxxvd,  0,  0,  nes_vt_vh2009_8mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Senario", "Vs. Maxx Video Extreme 50-in-1 (with Speed Racer and Snood)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 2004, vsmaxx77,  0,  0,  nes_vt_vh2009_8mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Senario", "Vs. Maxx Wireless 77-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2004, vsmaxxvd,  0,  0,  nes_vt_vh2009_8mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Senario", "Vs Maxx Video Extreme 50-in-1 (with Speed Racer and Snood)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2004, vsmaxx77,  0,  0,  nes_vt_vh2009_8mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Senario", "Vs Maxx Wireless 77-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 
  // seems to use PCM for all sound, some garbage at bottom of screen, needs correct inputs (seems to respond to start, and any direction input for 'hit' - check if they're power related)
