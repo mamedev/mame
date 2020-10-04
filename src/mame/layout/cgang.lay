@@ -328,7 +328,7 @@ license:CC0
 			<param name="x" start="12.6" increment="9" />
 			<param name="i" start="0" increment="1" />
 
-			<element ref="gray2"><bounds x="~x~" y="17" width="0.8" height="38.5" /></element>
+			<element ref="gray2"><bounds x="~x~" y="15.5" width="0.8" height="40" /></element>
 		</repeat>
 
 		<repeat count="5">
