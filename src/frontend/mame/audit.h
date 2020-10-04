@@ -166,7 +166,6 @@ private:
 	audit_record &audit_one_rom(const std::vector<std::string> &searchpath, const rom_entry *rom);
 	template <typename... T> audit_record &audit_one_disk(const rom_entry *rom, T &&... args);
 	void compute_status(audit_record &record, const rom_entry *rom, bool found);
-	std::add_pointer_t<device_type> find_shared_device(device_t &device, const char *name, const util::hash_collection &romhashes, uint64_t romlength);
 
 	// internal state
 	record_list                 m_record_list;
