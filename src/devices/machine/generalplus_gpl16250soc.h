@@ -319,6 +319,8 @@ private:
 
 	void unkarea_78b8_w(uint16_t data);
 
+	uint16_t unkarea_78c0_r();
+
 	uint16_t unkarea_78d0_r();
 	uint16_t unkarea_78d8_r();
 

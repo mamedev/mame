@@ -97,13 +97,27 @@ void generalplus_gpl_unknown_state::generalplus_gpl_unknown(machine_config &conf
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x8000);
 }
 
-ROM_START( unkunsp )
+ROM_START( mapacman )
 	//ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x000000, 0x2000, NO_DUMP ) // exact size unknown
 
-	ROM_REGION( 0x800000, "spi", ROMREGION_ERASEFF ) // this simply maps at 200000, and contains jumps to lower areas that suggest even the ROM/internal RAM mapping is very different
+	ROM_REGION( 0x800000, "spi", ROMREGION_ERASEFF )
 	ROM_LOAD( "fm25q16a.bin", 0x000000, 0x200000, CRC(aeb472ac) SHA1(500c24b725f6d3308ef8cbdf4259f5be556c7c92) )
 ROM_END
 
-// different hardware, first 0x2000 bytes in ROM are blank, maps fully in RAM at 200000
-CONS( 2017, unkunsp,      0,       0,      generalplus_gpl_unknown,   generalplus_gpl_unknown, generalplus_gpl_unknown_state, empty_init, "Super Impulse", "Pac-Man (Micro Arcade)", MACHINE_IS_SKELETON )
+ROM_START( taspinv )
+	//ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x000000, 0x2000, NO_DUMP ) // exact size unknown
+
+	ROM_REGION( 0x800000, "spi", ROMREGION_ERASEFF )
+	ROM_LOAD( "tinyarcade_spaceinvaders.bin", 0x000000, 0x200000, CRC(11ac4c77) SHA1(398d5eff83a4e94487ed810819085a0e44582908) )
+ROM_END
+
+
+// first 0x2000 bytes in ROM are blank, ROM data maps fully in RAM at 200000, but there are calls to lower regions
+// is it possible the SunPlus here is only handling sound / graphics, not gameplay?
+
+CONS( 2017, mapacman,      0,       0,      generalplus_gpl_unknown,   generalplus_gpl_unknown, generalplus_gpl_unknown_state, empty_init, "Super Impulse", "Pac-Man (Micro Arcade)", MACHINE_IS_SKELETON )
+
+// multiple different units appear to share the same ROM with a jumper to select game, it should be verified in each case that the external ROM was not changed.
+CONS( 2017, taspinv,       0,       0,      generalplus_gpl_unknown,   generalplus_gpl_unknown, generalplus_gpl_unknown_state, empty_init, "Super Impulse", "Space Invaders (Tiny Arcade)", MACHINE_IS_SKELETON )
