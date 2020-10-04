@@ -61,14 +61,6 @@
 #include <vector>
 
 
-namespace emu { namespace render { namespace detail {
-
-class layout_environment;
-class view_environment;
-
-} } } // namespace emu::render::detail
-
-
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
@@ -196,6 +188,20 @@ struct render_color
 	float               r;                  // red component (0.0 = none, 1.0 = max)
 	float               g;                  // green component (0.0 = none, 1.0 = max)
 	float               b;                  // blue component (0.0 = none, 1.0 = max)
+
+	constexpr render_color operator*(render_color const &c) const
+	{
+		return render_color{ a * c.a, r * c.r, g * c.g, b * c.b };
+	}
+
+	render_color &operator*=(render_color const &c)
+	{
+		a *= c.a;
+		r *= c.r;
+		g *= c.g;
+		b *= c.b;
+		return *this;
+	}
 };
 
 
@@ -230,6 +236,31 @@ struct render_texinfo
 	const rgb_t *       palette;            // palette for PALETTE16 textures, bcg lookup table for RGB32/YUY16
 	u32                 palette_length;
 };
+
+
+namespace emu { namespace render { namespace detail {
+
+struct bounds_step
+{
+	int             state;
+	render_bounds   bounds;
+	render_bounds   delta;
+};
+using bounds_vector = std::vector<bounds_step>;
+
+struct color_step
+{
+	int             state;
+	render_color    color;
+	render_color    delta;
+};
+using color_vector = std::vector<color_step>;
+
+
+class layout_environment;
+class view_environment;
+
+} } } // namespace emu::render::detail
 
 
 // ======================> render_layer_config
@@ -585,22 +616,6 @@ public:
 	void preload();
 
 private:
-	struct bounds_step
-	{
-		int             state;
-		render_bounds   bounds;
-		render_bounds   delta;
-	};
-	using bounds_vector = std::vector<bounds_step>;
-
-	struct color_step
-	{
-		int             state;
-		render_color    color;
-		render_color    delta;
-	};
-	using color_vector = std::vector<color_step>;
-
 	/// \brief An image, rectangle, or disk in an element
 	///
 	/// Each layout_element contains one or more components. Each
@@ -649,6 +664,9 @@ private:
 		void apply_skew(bitmap_argb32 &dest, int skewwidth);
 
 	private:
+		using bounds_vector = emu::render::detail::bounds_vector;
+		using color_vector = emu::render::detail::color_vector;
+
 		// internal state
 		int const           m_statemask;                // bits of state used to control visibility
 		int const           m_stateval;                 // masked state value to make component visible
@@ -791,12 +809,12 @@ public:
 		// getters
 		layout_element *element() const { return m_element; }
 		screen_device *screen() { return m_screen; }
-		const render_bounds &bounds() const { return m_bounds; }
-		const render_color &color() const { return m_color; }
+		render_bounds bounds() const;
+		render_color color() const;
 		int blend_mode() const { return m_blend_mode; }
 		u32 visibility_mask() const { return m_visibility_mask; }
 		int orientation() const { return m_orientation; }
-		render_container *screen_container(running_machine &machine) const;
+		render_container *screen_container() const { return m_screen ? &m_screen->container() : nullptr; }
 
 		// interactivity
 		bool has_input() const { return bool(m_input_port); }
@@ -810,8 +828,13 @@ public:
 		void resolve_tags();
 
 	private:
+		using bounds_vector = emu::render::detail::bounds_vector;
+		using color_vector = emu::render::detail::color_vector;
+
 		static layout_element *find_element(view_environment &env, util::xml::data_node const &itemnode, element_map &elemmap);
-		static render_bounds make_bounds(view_environment &env, util::xml::data_node const &itemnode, layout_group::transform const &trans);
+		static bounds_vector make_bounds(view_environment &env, util::xml::data_node const &itemnode, layout_group::transform const &trans);
+		static color_vector make_color(view_environment &env, util::xml::data_node const &itemnode, render_color const &mult);
+		static std::string make_animoutput_tag(view_environment &env, util::xml::data_node const &itemnode);
 		static std::string make_input_tag(view_environment &env, util::xml::data_node const &itemnode);
 		static int get_blend_mode(view_environment &env, util::xml::data_node const &itemnode);
 		static unsigned get_input_shift(ioport_value mask);
@@ -819,7 +842,9 @@ public:
 		// internal state
 		layout_element *const   m_element;          // pointer to the associated element (non-screens only)
 		output_finder<>         m_output;           // associated output
+		output_finder<>         m_animoutput;       // associated output for animation if different
 		bool const              m_have_output;      // whether we actually have an output
+		bool const              m_have_animoutput;  // whether we actually have an output for animation
 		ioport_port *           m_input_port;       // input port of this item
 		ioport_field const *    m_input_field;      // input port field of this item
 		ioport_value const      m_input_mask;       // input mask of this item
@@ -828,14 +853,14 @@ public:
 		bool                    m_clickthrough;     // should click pass through to lower elements
 		screen_device *         m_screen;           // pointer to screen
 		int                     m_orientation;      // orientation of this item
-		render_bounds           m_bounds;           // bounds of the item
-		render_color            m_color;            // color of the item
+		bounds_vector           m_bounds;           // bounds of the item
+		color_vector const      m_color;            // color of the item
 		int                     m_blend_mode;       // blending mode to use when drawing
 		u32                     m_visibility_mask;  // combined mask of parent visibility groups
 
 		// cold items
 		std::string const       m_input_tag;        // input tag of this item
-		render_bounds const     m_rawbounds;        // raw (original) bounds of the item
+		bounds_vector const     m_rawbounds;        // raw (original) bounds of the item
 		bool const              m_has_clickthrough; // whether clickthrough was explicitly configured
 	};
 	using item_list = std::list<item>;

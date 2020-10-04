@@ -1356,10 +1356,7 @@ render_primitive_list &render_target::get_primitives()
 			item_xform.yoffs = root_xform.yoffs + bounds.y0 * root_xform.yscale;
 			item_xform.xscale = (bounds.x1 - bounds.x0) * root_xform.xscale;
 			item_xform.yscale = (bounds.y1 - bounds.y0) * root_xform.yscale;
-			item_xform.color.r = curitem.color().r * root_xform.color.r;
-			item_xform.color.g = curitem.color().g * root_xform.color.g;
-			item_xform.color.b = curitem.color().b * root_xform.color.b;
-			item_xform.color.a = curitem.color().a * root_xform.color.a;
+			item_xform.color = curitem.color() * root_xform.color;
 			item_xform.orientation = orientation_add(curitem.orientation(), root_xform.orientation);
 			item_xform.no_center = false;
 
@@ -1474,11 +1471,12 @@ bool render_target::map_point_container(s32 target_x, s32 target_y, render_conta
 		if (items.end() != found)
 		{
 			layout_view::item &item(*found);
-			if (item.bounds().includes(target_f.first, target_f.second))
+			render_bounds const bounds(item.bounds());
+			if (bounds.includes(target_f.first, target_f.second))
 			{
 				// point successfully mapped
-				container_x = (target_f.first - item.bounds().x0) / item.bounds().width();
-				container_y = (target_f.second - item.bounds().y0) / item.bounds().height();
+				container_x = (target_f.first - bounds.x0) / bounds.width();
+				container_y = (target_f.second - bounds.y0) / bounds.height();
 				return true;
 			}
 		}
@@ -1531,17 +1529,21 @@ bool render_target::map_point_input(s32 target_x, s32 target_y, ioport_port *&in
 		if (m_hit_test[i] && m_hit_test[items.size() + i])
 		{
 			layout_view::item &item(items[i]);
-			if (item.has_input())
+			render_bounds const bounds(item.bounds());
+			if (bounds.includes(target_f.first, target_f.second))
 			{
-				// point successfully mapped
-				input_port = item.input_tag_and_mask(input_mask);
-				input_x = (target_f.first - item.bounds().x0) / item.bounds().width();
-				input_y = (target_f.second - item.bounds().y0) / item.bounds().height();
-				return true;
-			}
-			else
-			{
-				break;
+				if (item.has_input())
+				{
+					// point successfully mapped
+					input_port = item.input_tag_and_mask(input_mask);
+					input_x = (target_f.first - bounds.x0) / bounds.width();
+					input_y = (target_f.second - bounds.y0) / bounds.height();
+					return true;
+				}
+				else
+				{
+					break;
+				}
 			}
 		}
 	}

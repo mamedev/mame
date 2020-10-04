@@ -291,11 +291,11 @@ class LayoutChecker(Minifyer):
         self.have_bounds.append({ })
         self.have_color.append({ })
 
-    def startObject(self):
+    def startObject(self, name):
         self.handlers.append((self.objectStartHandler, self.objectEndHandler))
-        self.have_bounds.append(None)
+        self.have_bounds.append(None if 'group' == name else { })
         self.have_orientation.append(False)
-        self.have_color.append(None)
+        self.have_color.append(None if 'group' == name else { })
 
     def rootStartHandler(self, name, attrs):
         if 'mamelayout' != name:
@@ -499,7 +499,7 @@ class LayoutChecker(Minifyer):
             if (inputmask is not None) and (0 == inputmask):
                 if (inputraw is None) or (0 == inputraw):
                     self.handleError('Element %s attribute inputmask "%s" is zero' % (name, attrs['inputmask']))
-            self.startObject();
+            self.startObject(name)
         elif 'screen' == name:
             if 'index' in attrs:
                 index = self.checkIntAttribute(name, attrs, 'index', None)
@@ -512,7 +512,7 @@ class LayoutChecker(Minifyer):
                 self.checkTag(tag, name, 'tag')
                 if self.BADTAGPATTERN.search(tag):
                     self.handleError('Element screen attribute tag "%s" contains invalid characters' % (tag, ))
-            self.startObject();
+            self.startObject(name)
         elif 'group' == name:
             if 'ref' not in attrs:
                 self.handleError('Element group missing attribute ref')
@@ -525,7 +525,7 @@ class LayoutChecker(Minifyer):
                             self.current_collections[n] = l
                         else:
                             self.handleError('Element group instantiates collection with duplicate name "%s" from %s (previous %s)' % (n, l, self.current_collections[n]))
-            self.startObject();
+            self.startObject(name)
         elif 'repeat' == name:
             if 'count' not in attrs:
                 self.handleError('Element repeat missing attribute count')
@@ -579,18 +579,36 @@ class LayoutChecker(Minifyer):
 
     def objectStartHandler(self, name, attrs):
         if 'bounds' == name:
-            if self.have_bounds[-1] is not None:
-                self.handleError('Duplicate element bounds (previous %s)' % (self.have_bounds[-1], ))
-            else:
+            if self.have_bounds[-1] is None:
                 self.have_bounds[-1] = self.formatLocation()
+            elif isinstance(self.have_bounds[-1], dict):
+                state = self.checkIntAttribute(name, attrs, 'state', 0)
+                if state is not None:
+                    if 0 > state:
+                        self.handleError('Element bounds attribute state "%s" is negative' % (attrs['state'], ))
+                    if state in self.have_bounds[-1]:
+                        self.handleError('Duplicate bounds for state %d (previous %s)' % (state, self.have_bounds[-1][state]))
+                    else:
+                        self.have_bounds[-1][state] = self.formatLocation()
+            else:
+                self.handleError('Duplicate element bounds (previous %s)' % (self.have_bounds[-1], ))
             self.checkBounds(attrs)
         elif 'orientation' == name:
             self.checkOrientation(attrs)
         if 'color' == name:
-            if self.have_color[-1] is not None:
-                self.handleError('Duplicate element color (previous %s)' % (self.have_color[-1], ))
-            else:
+            if self.have_color[-1] is None:
                 self.have_color[-1] = self.formatLocation()
+            elif isinstance(self.have_color[-1], dict):
+                state = self.checkIntAttribute(name, attrs, 'state', 0)
+                if state is not None:
+                    if 0 > state:
+                        self.handleError('Element color attribute state "%s" is negative' % (attrs['state'], ))
+                    if state in self.have_color[-1]:
+                        self.handleError('Duplicate color for state %d (previous %s)' % (state, self.have_color[-1][state]))
+                    else:
+                        self.have_color[-1][state] = self.formatLocation()
+            else:
+                self.handleError('Duplicate element color (previous %s)' % (self.have_color[-1], ))
             self.checkColor(attrs)
         self.ignored_depth = 1
 

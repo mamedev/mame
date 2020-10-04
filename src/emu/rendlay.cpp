@@ -78,8 +78,6 @@ enum
 	LINE_CAP_END = 2
 };
 
-std::locale const f_portable_locale("C");
-
 constexpr layout_group::transform identity_transform{{ {{ 1.0F, 0.0F, 0.0F }}, {{ 0.0F, 1.0F, 0.0F }}, {{ 0.0F, 0.0F, 1.0F }} }};
 
 
@@ -95,11 +93,6 @@ inline void render_bounds_transform(render_bounds &bounds, layout_group::transfo
 			(bounds.x0 * trans[1][0]) + (bounds.y0 * trans[1][1]) + trans[1][2],
 			(bounds.x1 * trans[0][0]) + (bounds.y1 * trans[0][1]) + trans[0][2],
 			(bounds.x1 * trans[1][0]) + (bounds.y1 * trans[1][1]) + trans[1][2] };
-}
-
-constexpr render_color render_color_multiply(render_color const &x, render_color const &y)
-{
-	return render_color{ x.a * y.a, x.r * y.r, x.g * y.g, x.b * y.b };
 }
 
 
@@ -214,7 +207,7 @@ private:
 					if (m_text_valid && !m_float_valid)
 					{
 						std::istringstream stream(m_text);
-						stream.imbue(f_portable_locale);
+						stream.imbue(std::locale::classic());
 						if (m_text[0] == '$')
 						{
 							stream.get();
@@ -250,7 +243,7 @@ private:
 					if (m_text_valid && !m_int_valid && !m_float_valid)
 					{
 						std::istringstream stream(m_text);
-						stream.imbue(f_portable_locale);
+						stream.imbue(std::locale::classic());
 						if (m_text[0] == '$')
 						{
 							stream.get();
@@ -309,7 +302,7 @@ private:
 					if (m_text_valid && !m_int_valid)
 					{
 						std::istringstream stream(m_text);
-						stream.imbue(f_portable_locale);
+						stream.imbue(std::locale::classic());
 						if (m_text[0] == '$')
 						{
 							stream.get();
@@ -531,7 +524,7 @@ private:
 	int parse_int(char const *begin, char const *end, int defvalue)
 	{
 		std::istringstream stream;
-		stream.imbue(f_portable_locale);
+		stream.imbue(std::locale::classic());
 		int result;
 		if (begin[0] == '$')
 		{
@@ -661,7 +654,7 @@ public:
 				unsigned const decprefix((expanded.first[0] == '#') ? 1U : 0U);
 				bool const floatchars(std::find_if(expanded.first, expanded.second, [] (char ch) { return ('.' == ch) || ('e' == ch) || ('E' == ch); }) != expanded.second);
 				std::istringstream stream(std::string(expanded.first + hexprefix + decprefix, expanded.second));
-				stream.imbue(f_portable_locale);
+				stream.imbue(std::locale::classic());
 				if (!hexprefix && !decprefix && floatchars)
 				{
 					stream >> floatincrement;
@@ -768,7 +761,7 @@ public:
 		// similar to what XML nodes do
 		std::pair<char const *, char const *> const expanded(expand(attrib));
 		std::istringstream stream(std::string(expanded.first, expanded.second));
-		stream.imbue(f_portable_locale);
+		stream.imbue(std::locale::classic());
 		float result;
 		return (stream >> result) ? result : defvalue;
 	}
@@ -910,6 +903,175 @@ public:
 };
 
 } } } // namespace emu::render::detail
+
+
+namespace {
+
+bool add_bounds_step(emu::render::detail::layout_environment &env, emu::render::detail::bounds_vector &steps, util::xml::data_node const &node)
+{
+	int const state(env.get_attribute_int(node, "state", 0));
+	auto const pos(
+			std::lower_bound(
+				steps.begin(),
+				steps.end(),
+				state,
+				[] (emu::render::detail::bounds_step const &lhs, int rhs) { return lhs.state < rhs; }));
+	if ((steps.end() != pos) && (state == pos->state))
+		return false;
+
+	auto &ins(*steps.emplace(pos, emu::render::detail::bounds_step{ state, { 0.0F, 0.0F, 0.0F, 0.0F }, { 0.0F, 0.0F, 0.0F, 0.0F } }));
+	env.parse_bounds(&node, ins.bounds);
+	return true;
+}
+
+void set_bounds_deltas(emu::render::detail::bounds_vector &steps)
+{
+	if (steps.empty())
+	{
+		steps.emplace_back(emu::render::detail::bounds_step{ 0, { 0.0F, 0.0F, 1.0F, 1.0F }, { 0.0F, 0.0F, 0.0F, 0.0F } });
+	}
+	else
+	{
+		auto i(steps.begin());
+		auto j(i);
+		while (steps.end() != ++j)
+		{
+			assert(j->state > i->state);
+
+			i->delta.x0 = (j->bounds.x0 - i->bounds.x0) / (j->state - i->state);
+			i->delta.x1 = (j->bounds.x1 - i->bounds.x1) / (j->state - i->state);
+			i->delta.y0 = (j->bounds.y0 - i->bounds.y0) / (j->state - i->state);
+			i->delta.y1 = (j->bounds.y1 - i->bounds.y1) / (j->state - i->state);
+
+			i = j;
+		}
+	}
+}
+
+void normalize_bounds(emu::render::detail::bounds_vector &steps, float x0, float y0, float xoffs, float yoffs, float xscale, float yscale)
+{
+	auto i(steps.begin());
+	i->bounds.x0 = x0 + (i->bounds.x0 - xoffs) * xscale;
+	i->bounds.x1 = x0 + (i->bounds.x1 - xoffs) * xscale;
+	i->bounds.y0 = y0 + (i->bounds.y0 - yoffs) * yscale;
+	i->bounds.y1 = y0 + (i->bounds.y1 - yoffs) * yscale;
+
+	auto j(i);
+	while (steps.end() != ++j)
+	{
+		j->bounds.x0 = x0 + (j->bounds.x0 - xoffs) * xscale;
+		j->bounds.x1 = x0 + (j->bounds.x1 - xoffs) * xscale;
+		j->bounds.y0 = y0 + (j->bounds.y0 - yoffs) * yscale;
+		j->bounds.y1 = y0 + (j->bounds.y1 - yoffs) * yscale;
+
+		i->delta.x0 = (j->bounds.x0 - i->bounds.x0) / (j->state - i->state);
+		i->delta.x1 = (j->bounds.x1 - i->bounds.x1) / (j->state - i->state);
+		i->delta.y0 = (j->bounds.y0 - i->bounds.y0) / (j->state - i->state);
+		i->delta.y1 = (j->bounds.y1 - i->bounds.y1) / (j->state - i->state);
+
+		i = j;
+	}
+}
+
+render_bounds accumulate_bounds(emu::render::detail::bounds_vector const &steps)
+{
+	auto i(steps.begin());
+	render_bounds result(i->bounds);
+	while (steps.end() != ++i)
+		union_render_bounds(result, i->bounds);
+	return result;
+}
+
+inline render_bounds interpolate_bounds(emu::render::detail::bounds_vector const &steps, int state)
+{
+	auto pos(
+			std::lower_bound(
+				steps.begin(),
+				steps.end(),
+				state,
+				[] (emu::render::detail::bounds_step const &lhs, int rhs) { return lhs.state < rhs; }));
+	if (steps.begin() == pos)
+	{
+		return pos->bounds;
+	}
+	else
+	{
+		--pos;
+		render_bounds result(pos->bounds);
+		result.x0 += pos->delta.x0 * (state - pos->state);
+		result.x1 += pos->delta.x1 * (state - pos->state);
+		result.y0 += pos->delta.y0 * (state - pos->state);
+		result.y1 += pos->delta.y1 * (state - pos->state);
+		return result;
+	}
+}
+
+
+bool add_color_step(emu::render::detail::layout_environment &env, emu::render::detail::color_vector &steps, util::xml::data_node const &node)
+{
+	int const state(env.get_attribute_int(node, "state", 0));
+	auto const pos(
+			std::lower_bound(
+				steps.begin(),
+				steps.end(),
+				state,
+				[] (emu::render::detail::color_step const &lhs, int rhs) { return lhs.state < rhs; }));
+	if ((steps.end() != pos) && (state == pos->state))
+		return false;
+
+	steps.emplace(pos, emu::render::detail::color_step{ state, env.parse_color(&node), { 0.0F, 0.0F, 0.0F, 0.0F } });
+	return true;
+}
+
+void set_color_deltas(emu::render::detail::color_vector &steps)
+{
+	if (steps.empty())
+	{
+		steps.emplace_back(emu::render::detail::color_step{ 0, { 1.0F, 1.0F, 1.0F, 1.0F }, { 0.0F, 0.0F, 0.0F, 0.0F } });
+	}
+	else
+	{
+		auto i(steps.begin());
+		auto j(i);
+		while (steps.end() != ++j)
+		{
+			assert(j->state > i->state);
+
+			i->delta.a = (j->color.a - i->color.a) / (j->state - i->state);
+			i->delta.r = (j->color.r - i->color.r) / (j->state - i->state);
+			i->delta.g = (j->color.g - i->color.g) / (j->state - i->state);
+			i->delta.b = (j->color.b - i->color.b) / (j->state - i->state);
+
+			i = j;
+		}
+	}
+}
+
+inline render_color interpolate_color(emu::render::detail::color_vector const &steps, int state)
+{
+	auto pos(
+			std::lower_bound(
+				steps.begin(),
+				steps.end(),
+				state,
+				[] (emu::render::detail::color_step const &lhs, int rhs) { return lhs.state < rhs; }));
+	if (steps.begin() == pos)
+	{
+		return pos->color;
+	}
+	else
+	{
+		--pos;
+		render_color result(pos->color);
+		result.a += pos->delta.a * (state - pos->state);
+		result.r += pos->delta.r * (state - pos->state);
+		result.g += pos->delta.g * (state - pos->state);
+		result.b += pos->delta.b * (state - pos->state);
+		return result;
+	}
+}
+
+} // anonymous namespace
 
 
 
@@ -1178,7 +1340,18 @@ void layout_group::resolve_bounds(
 				!strcmp(itemnode->get_name(), "marquee"))
 		{
 			render_bounds itembounds;
-			env.parse_bounds(itemnode->get_child("bounds"), itembounds);
+			util::xml::data_node const *boundsnode = itemnode->get_child("bounds");
+			env.parse_bounds(boundsnode, itembounds);
+			while (boundsnode)
+			{
+				boundsnode = boundsnode->get_next_sibling("bounds");
+				if (boundsnode)
+				{
+					render_bounds b;
+					env.parse_bounds(boundsnode, b);
+					union_render_bounds(itembounds, b);
+				}
+			}
 			if (empty)
 				m_bounds = itembounds;
 			else
@@ -2829,84 +3002,27 @@ layout_element::component::component(environment &env, util::xml::data_node cons
 	{
 		if (!strcmp(child->get_name(), "bounds"))
 		{
-			int const state(env.get_attribute_int(*child, "state", 0));
-			auto const pos(
-					std::lower_bound(
-						m_bounds.begin(),
-						m_bounds.end(),
-						state,
-						[] (bounds_step const &lhs, int rhs) { return lhs.state < rhs; }));
-			if ((m_bounds.end() != pos) && (state == pos->state))
+			if (!add_bounds_step(env, m_bounds, *child))
 			{
 				throw layout_syntax_error(
 						util::string_format(
-							"%s component has duplicate bounds for state %d",
-							compnode.get_name(),
-							state));
+							"%s component has duplicate bounds for state",
+							compnode.get_name()));
 			}
-			bounds_step &ins(*m_bounds.emplace(pos, bounds_step{ state, { 0.0F, 0.0F, 0.0F, 0.0F }, { 0.0F, 0.0F, 0.0F, 0.0F } }));
-			env.parse_bounds(child, ins.bounds);
 		}
 		else if (!strcmp(child->get_name(), "color"))
 		{
-			int const state(env.get_attribute_int(*child, "state", 0));
-			auto const pos(
-					std::lower_bound(
-						m_color.begin(),
-						m_color.end(),
-						state,
-						[] (color_step const &lhs, int rhs) { return lhs.state < rhs; }));
-			if ((m_color.end() != pos) && (state == pos->state))
+			if (!add_color_step(env, m_color, *child))
 			{
 				throw layout_syntax_error(
 						util::string_format(
-							"%s component has duplicate color for state %d",
-							compnode.get_name(),
-							state));
+							"%s component has duplicate color for state",
+							compnode.get_name()));
 			}
-			m_color.emplace(pos, color_step{ state, env.parse_color(child), { 0.0F, 0.0F, 0.0F, 0.0F } });
 		}
 	}
-	if (m_bounds.empty())
-	{
-		m_bounds.emplace_back(bounds_step{ 0, { 0.0F, 0.0F, 1.0F, 1.0F }, { 0.0F, 0.0F, 0.0F, 0.0F } });
-	}
-	else
-	{
-		auto i(m_bounds.begin());
-		auto j(i);
-		while (m_bounds.end() != ++j)
-		{
-			assert(j->state > i->state);
-
-			i->delta.x0 = (j->bounds.x0 - i->bounds.x0) / (j->state - i->state);
-			i->delta.x1 = (j->bounds.x1 - i->bounds.x1) / (j->state - i->state);
-			i->delta.y0 = (j->bounds.y0 - i->bounds.y0) / (j->state - i->state);
-			i->delta.y1 = (j->bounds.y1 - i->bounds.y1) / (j->state - i->state);
-
-			i = j;
-		}
-	}
-	if (m_color.empty())
-	{
-		m_color.emplace_back(color_step{ 0, { 1.0F, 1.0F, 1.0F, 1.0F }, { 0.0F, 0.0F, 0.0F, 0.0F } });
-	}
-	else
-	{
-		auto i(m_color.begin());
-		auto j(i);
-		while (m_color.end() != ++j)
-		{
-			assert(j->state > i->state);
-
-			i->delta.a = (j->color.a - i->color.a) / (j->state - i->state);
-			i->delta.r = (j->color.r - i->color.r) / (j->state - i->state);
-			i->delta.g = (j->color.g - i->color.g) / (j->state - i->state);
-			i->delta.b = (j->color.b - i->color.b) / (j->state - i->state);
-
-			i = j;
-		}
-	}
+	set_bounds_deltas(m_bounds);
+	set_color_deltas(m_color);
 }
 
 
@@ -2916,27 +3032,7 @@ layout_element::component::component(environment &env, util::xml::data_node cons
 
 void layout_element::component::normalize_bounds(float xoffs, float yoffs, float xscale, float yscale)
 {
-	auto i(m_bounds.begin());
-	i->bounds.x0 = (i->bounds.x0 - xoffs) * xscale;
-	i->bounds.x1 = (i->bounds.x1 - xoffs) * xscale;
-	i->bounds.y0 = (i->bounds.y0 - yoffs) * yscale;
-	i->bounds.y1 = (i->bounds.y1 - yoffs) * yscale;
-
-	auto j(i);
-	while (m_bounds.end() != ++j)
-	{
-		j->bounds.x0 = (j->bounds.x0 - xoffs) * xscale;
-		j->bounds.x1 = (j->bounds.x1 - xoffs) * xscale;
-		j->bounds.y0 = (j->bounds.y0 - yoffs) * yscale;
-		j->bounds.y1 = (j->bounds.y1 - yoffs) * yscale;
-
-		i->delta.x0 = (j->bounds.x0 - i->bounds.x0) / (j->state - i->state);
-		i->delta.x1 = (j->bounds.x1 - i->bounds.x1) / (j->state - i->state);
-		i->delta.y0 = (j->bounds.y0 - i->bounds.y0) / (j->state - i->state);
-		i->delta.y1 = (j->bounds.y1 - i->bounds.y1) / (j->state - i->state);
-
-		i = j;
-	}
+	::normalize_bounds(m_bounds, 0.0F, 0.0F, xoffs, yoffs, xscale, yscale);
 }
 
 
@@ -2989,11 +3085,7 @@ std::pair<int, bool> layout_element::component::statewrap() const
 
 render_bounds layout_element::component::overall_bounds() const
 {
-	auto i(m_bounds.begin());
-	render_bounds result(i->bounds);
-	while (m_bounds.end() != ++i)
-		union_render_bounds(result, i->bounds);
-	return result;
+	return accumulate_bounds(m_bounds);
 }
 
 
@@ -3003,26 +3095,7 @@ render_bounds layout_element::component::overall_bounds() const
 
 render_bounds layout_element::component::bounds(int state) const
 {
-	auto pos(
-			std::lower_bound(
-				m_bounds.begin(),
-				m_bounds.end(),
-				state,
-				[] (bounds_step const &lhs, int rhs) { return lhs.state < rhs; }));
-	if (m_bounds.begin() == pos)
-	{
-		return pos->bounds;
-	}
-	else
-	{
-		--pos;
-		render_bounds result(pos->bounds);
-		result.x0 += pos->delta.x0 * (state - pos->state);
-		result.x1 += pos->delta.x1 * (state - pos->state);
-		result.y0 += pos->delta.y0 * (state - pos->state);
-		result.y1 += pos->delta.y1 * (state - pos->state);
-		return result;
-	}
+	return interpolate_bounds(m_bounds, state);
 }
 
 
@@ -3032,26 +3105,7 @@ render_bounds layout_element::component::bounds(int state) const
 
 render_color layout_element::component::color(int state) const
 {
-	auto pos(
-			std::lower_bound(
-				m_color.begin(),
-				m_color.end(),
-				state,
-				[] (color_step const &lhs, int rhs) { return lhs.state < rhs; }));
-	if (m_color.begin() == pos)
-	{
-		return pos->color;
-	}
-	else
-	{
-		--pos;
-		render_color result(pos->color);
-		result.a += pos->delta.a * (state - pos->state);
-		result.r += pos->delta.r * (state - pos->state);
-		result.g += pos->delta.g * (state - pos->state);
-		result.b += pos->delta.b * (state - pos->state);
-		return result;
-	}
+	return interpolate_color(m_color, state);
 }
 
 
@@ -3532,21 +3586,23 @@ void layout_view::recompute(u32 visibility_mask, bool zoom_to_screen)
 	{
 		if ((visibility_mask & curitem.visibility_mask()) == curitem.visibility_mask())
 		{
+			render_bounds const rawbounds = accumulate_bounds(curitem.m_rawbounds);
+
 			// accumulate bounds
 			m_visible_items.emplace_back(curitem);
 			if (first)
-				m_bounds = curitem.m_rawbounds;
+				m_bounds = rawbounds;
 			else
-				union_render_bounds(m_bounds, curitem.m_rawbounds);
+				union_render_bounds(m_bounds, rawbounds);
 			first = false;
 
 			// accumulate visible screens and their bounds bounds
 			if (curitem.screen())
 			{
 				if (scrfirst)
-					scrbounds = curitem.m_rawbounds;
+					scrbounds = rawbounds;
 				else
-					union_render_bounds(scrbounds, curitem.m_rawbounds);
+					union_render_bounds(scrbounds, rawbounds);
 				scrfirst = false;
 
 				// accumulate active screens
@@ -3591,10 +3647,8 @@ void layout_view::recompute(u32 visibility_mask, bool zoom_to_screen)
 	// normalize all the item bounds
 	for (item &curitem : items())
 	{
-		curitem.m_bounds.x0 = target_bounds.x0 + (curitem.m_rawbounds.x0 - xoffs) * xscale;
-		curitem.m_bounds.x1 = target_bounds.x0 + (curitem.m_rawbounds.x1 - xoffs) * xscale;
-		curitem.m_bounds.y0 = target_bounds.y0 + (curitem.m_rawbounds.y0 - yoffs) * yscale;
-		curitem.m_bounds.y1 = target_bounds.y0 + (curitem.m_rawbounds.y1 - yoffs) * yscale;
+		curitem.m_bounds = curitem.m_rawbounds;
+		normalize_bounds(curitem.m_bounds, target_bounds.x0, target_bounds.y0, xoffs, yoffs, xscale, yscale);
 	}
 
 	// sort edges of interactive items
@@ -3605,12 +3659,13 @@ void layout_view::recompute(u32 visibility_mask, bool zoom_to_screen)
 	for (unsigned i = 0; m_interactive_items.size() > i; ++i)
 	{
 		item &curitem(m_interactive_items[i]);
+		render_bounds const curbounds(accumulate_bounds(curitem.m_bounds));
 		LOGMASKED(LOG_INTERACTIVE_ITEMS, "%u: (%s %s %s %s) hasinput=%s clickthrough=%s\n",
-				i, curitem.bounds().x0, curitem.bounds().y0, curitem.bounds().x1, curitem.bounds().y1, curitem.has_input(), curitem.clickthrough());
-		m_interactive_edges_x.emplace_back(i, curitem.bounds().x0, false);
-		m_interactive_edges_x.emplace_back(i, curitem.bounds().x1, true);
-		m_interactive_edges_y.emplace_back(i, curitem.bounds().y0, false);
-		m_interactive_edges_y.emplace_back(i, curitem.bounds().y1, true);
+				i, curbounds.x0, curbounds.y0, curbounds.x1, curbounds.y1, curitem.has_input(), curitem.clickthrough());
+		m_interactive_edges_x.emplace_back(i, curbounds.x0, false);
+		m_interactive_edges_x.emplace_back(i, curbounds.x1, true);
+		m_interactive_edges_y.emplace_back(i, curbounds.y0, false);
+		m_interactive_edges_y.emplace_back(i, curbounds.y1, true);
 	}
 	std::sort(m_interactive_edges_x.begin(), m_interactive_edges_x.end());
 	std::sort(m_interactive_edges_y.begin(), m_interactive_edges_y.end());
@@ -3771,7 +3826,7 @@ void layout_view::add_items(
 					groupmap,
 					orientation_add(grouporient, orientation),
 					grouptrans,
-					render_color_multiply(env.parse_color(itemnode->get_child("color")), color),
+					env.parse_color(itemnode->get_child("color")) * color,
 					false,
 					false,
 					true);
@@ -3854,7 +3909,9 @@ layout_view::item::item(
 		render_color const &color)
 	: m_element(find_element(env, itemnode, elemmap))
 	, m_output(env.device(), env.get_attribute_string(itemnode, "name", ""))
+	, m_animoutput(env.device(), make_animoutput_tag(env, itemnode))
 	, m_have_output(env.get_attribute_string(itemnode, "name", "")[0])
+	, m_have_animoutput(!make_animoutput_tag(env, itemnode).empty())
 	, m_input_port(nullptr)
 	, m_input_field(nullptr)
 	, m_input_mask(env.get_attribute_int(itemnode, "inputmask", 0))
@@ -3863,7 +3920,7 @@ layout_view::item::item(
 	, m_clickthrough(env.get_attribute_bool(itemnode, "clickthrough", "yes"))
 	, m_screen(nullptr)
 	, m_orientation(orientation_add(env.parse_orientation(itemnode.get_child("orientation")), orientation))
-	, m_color(render_color_multiply(env.parse_color(itemnode.get_child("color")), color))
+	, m_color(make_color(env, itemnode, color))
 	, m_blend_mode(get_blend_mode(env, itemnode))
 	, m_visibility_mask(env.visibility_mask())
 	, m_input_tag(make_input_tag(env, itemnode))
@@ -3907,13 +3964,28 @@ layout_view::item::~item()
 
 
 //-------------------------------------------------
-//  screen_container - retrieve screen container
+//  bounds - get bounds for current state
 //-------------------------------------------------
 
-
-render_container *layout_view::item::screen_container(running_machine &machine) const
+render_bounds layout_view::item::bounds() const
 {
-	return (m_screen != nullptr) ? &m_screen->container() : nullptr;
+	if (m_bounds.size() == 1U)
+		return m_bounds.front().bounds;
+	else
+		return interpolate_bounds(m_bounds, m_have_animoutput ? s32(m_animoutput) : state());
+}
+
+
+//-------------------------------------------------
+//  color - get color for current state
+//-------------------------------------------------
+
+render_color layout_view::item::color() const
+{
+	if (m_color.size() == 1U)
+		return m_color.front().color;
+	else
+		return interpolate_color(m_color, m_have_animoutput ? s32(m_animoutput) : state());
 }
 
 
@@ -3963,6 +4035,9 @@ void layout_view::item::resolve_tags()
 			m_output = m_element->default_state();
 	}
 
+	if (m_have_animoutput)
+		m_animoutput.resolve();
+
 	if (!m_input_tag.empty())
 	{
 		m_input_port = m_element->machine().root_device().ioport(m_input_tag);
@@ -4010,19 +4085,74 @@ layout_element *layout_view::item::find_element(view_environment &env, util::xml
 //  make_bounds - get transformed bounds
 //---------------------------------------------
 
-render_bounds layout_view::item::make_bounds(
+layout_view::item::bounds_vector layout_view::item::make_bounds(
 		view_environment &env,
 		util::xml::data_node const &itemnode,
 		layout_group::transform const &trans)
 {
-	render_bounds bounds;
-	env.parse_bounds(itemnode.get_child("bounds"), bounds);
-	render_bounds_transform(bounds, trans);
-	if (bounds.x0 > bounds.x1)
-		std::swap(bounds.x0, bounds.x1);
-	if (bounds.y0 > bounds.y1)
-		std::swap(bounds.y0, bounds.y1);
-	return bounds;
+	bounds_vector result;
+	for (util::xml::data_node const *bounds = itemnode.get_child("bounds"); bounds; bounds = bounds->get_next_sibling("bounds"))
+	{
+		if (!add_bounds_step(env, result, *bounds))
+		{
+			throw layout_syntax_error(
+					util::string_format(
+						"%s item has duplicate bounds for state",
+						itemnode.get_name()));
+		}
+	}
+	for (emu::render::detail::bounds_step &step : result)
+	{
+		render_bounds_transform(step.bounds, trans);
+		if (step.bounds.x0 > step.bounds.x1)
+			std::swap(step.bounds.x0, step.bounds.x1);
+		if (step.bounds.y0 > step.bounds.y1)
+			std::swap(step.bounds.y0, step.bounds.y1);
+	}
+	set_bounds_deltas(result);
+	return result;
+}
+
+
+//---------------------------------------------
+//  make_color - get color inflection points
+//---------------------------------------------
+
+layout_view::item::color_vector layout_view::item::make_color(
+		view_environment &env,
+		util::xml::data_node const &itemnode,
+		render_color const &mult)
+{
+	color_vector result;
+	for (util::xml::data_node const *color = itemnode.get_child("color"); color; color = color->get_next_sibling("color"))
+	{
+		if (!add_color_step(env, result, *color))
+		{
+			throw layout_syntax_error(
+					util::string_format(
+						"%s item has duplicate color for state",
+						itemnode.get_name()));
+		}
+	}
+	for (emu::render::detail::color_step &step : result)
+		step.color *= mult;
+	set_color_deltas(result);
+	return result;
+}
+
+
+//---------------------------------------------
+//  make_animoutput_tag - get animation output
+//  tag
+//---------------------------------------------
+
+std::string layout_view::item::make_animoutput_tag(view_environment &env, util::xml::data_node const &itemnode)
+{
+	util::xml::data_node const *const animate(itemnode.get_child("animate"));
+	if (animate)
+		return env.get_attribute_string(*animate, "name", "");
+	else
+		return std::string();
 }
 
 
