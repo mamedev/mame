@@ -239,5 +239,5 @@ CONS( 200?, jak_ddhp,        0,       0,      gpl32612, gpl32612, generalplus_gp
 CONS( 200?, jak_prhp,        0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific Inc", "Power Rangers Super Megaforce Hero Portal", MACHINE_IS_SKELETON ) // from a PAL unit (probably not region specific)
 CONS( 200?, jak_dchp,        0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific Inc", "DC Super Heroes The Watchtower Hero Portal", MACHINE_IS_SKELETON )
 
-// Might not belong here, probably needs different bootstrap, does contain ARM code and GPNAND strings at least.  Uncertain if base system is region-coded.
+// Might not belong here, SoC is marked GPL32300A instead, but is still ARM based, and has GPNAND strings
 CONS( 201?, zippity,         0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "LeapFrog",         "Zippity (US)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
