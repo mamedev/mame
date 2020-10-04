@@ -52,7 +52,7 @@ void vsmile_rom_device::device_start()
 	save_item(NAME(m_bank_offset));
 }
 
-void vsmile_rom_device::device_reset()
+void vsmile_rom_device::device_resolve_objects()
 {
 	m_bank_offset = 0;
 }
