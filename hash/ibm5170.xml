@@ -8572,30 +8572,29 @@ license:CC0
 	</software>
 
 <!-- Game Disks -->
-
-	<software name="1830rail" supported="no">
+	<software name="1830rail">
 		<description>1830 - Railroads &amp; Robber Barons</description>
 		<year>1995</year>
 		<publisher>Avalon Hill</publisher>
 		<info name="developer" value="Simtex" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="1830 Railroads &amp; Robber Barons (USA, Europe) (Disk 1).img" size="1474560" crc="c91a1322" sha1="91120df39f996d8713840dccf0ee322aa07a07e2"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="1830 Railroads &amp; Robber Barons [Avalon Hill] [1995] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="38edb2bc" sha1="cda6c8de61645496cea395e2344a987783e3bd46"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="1830 Railroads &amp; Robber Barons (USA, Europe) (Disk 2).img" size="1474560" crc="f00758ba" sha1="0588634cee114f697d9e97254e188f4223627993"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="1830 Railroads &amp; Robber Barons [Avalon Hill] [1995] [3.5HD] [Disk 2 of 4].img" size="1474560" crc="d8bad151" sha1="c6a2a27bf5d3c929b90da1cba59ef6755c0b5054"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="1830 Railroads &amp; Robber Barons (USA, Europe) (Disk 3).img" size="1474560" crc="d6d9a334" sha1="4d644adc76af7e04213237a3047fe6de761cbd5b"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="1830 Railroads &amp; Robber Barons [Avalon Hill] [1995] [3.5HD] [Disk 3 of 4].img" size="1474560" crc="8b9cfa8d" sha1="0842b9d404bfb3edc8aa0cffb8a46bf9bf32144a"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="1830 Railroads &amp; Robber Barons (USA, Europe) (Disk 4).img" size="1474560" crc="2d61f1b1" sha1="728b2d863c985a250fbd41024ed289704836cc9f"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="1830 Railroads &amp; Robber Barons [Avalon Hill] [1995] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="01d9a5b5" sha1="7d03243a41e098e9c682637599024c4818186a8f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10366,14 +10365,14 @@ license:CC0
 			<feature name="part_number" value="0863-1"/>
 			<feature name="part_id" value="Disk 1 of 2"/>
 			<dataarea name="flop" size="1474560">
-				<rom name="Doom_BBS_1.img" size="1474560" crc="e9b64e07" sha1="2f2a7ddc19b1c68696deaa06296684a6b0f4c538"/>
+				<rom name="Doom_BBS_1.img" size="1474560" crc="e9b64e07" sha1="2f2a7ddc19b1c68696deaa06296684a6b0f4c538" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_number" value="0863-2"/>
 			<feature name="part_id" value="Disk 2 of 2"/>
 			<dataarea name="flop" size="1474560">
-				<rom name="Doom_BBS_2.img" size="1474560" crc="154abef0" sha1="d34df477cd0e8f403a250a4c98ec1c7d06fb4042"/>
+				<rom name="Doom_BBS_2.img" size="1474560" crc="154abef0" sha1="d34df477cd0e8f403a250a4c98ec1c7d06fb4042" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
