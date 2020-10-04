@@ -20,6 +20,7 @@
 #include "ui/starimg.ipp"
 #include "ui/toolbar.ipp"
 
+#include "audit.h"
 #include "cheat.h"
 #include "mame.h"
 #include "mameopts.h"
@@ -2505,6 +2506,20 @@ void menu_select_launch::draw_snapx(float origx1, float origy1, float origx2, fl
 		// apply texture
 		container().add_quad(x1, y1, x2, y2, rgb_t::white(), m_cache->snapx_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 	}
+}
+
+
+std::string menu_select_launch::make_audit_fail_text(bool found, media_auditor const &auditor)
+{
+	std::ostringstream str;
+	str << _("The selected machine is missing one or more required ROM or CHD images. Please select a different machine.\n\n");
+	if (found)
+	{
+		auditor.summarize(nullptr, &str);
+		str << "\n";
+	}
+	str << _("Press any key to continue.");
+	return str.str();
 }
 
 
