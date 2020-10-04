@@ -35,7 +35,10 @@ public:
 	void sidepckt(machine_config &config);
 
 	void init_sidepckt();
-	void init_sidepcktj();
+
+protected:
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -50,7 +53,6 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 
 	tilemap_t *m_bg_tilemap;
-	const uint8_t* m_prot_table[3];
 	
 	uint8_t m_mcu_p1;
 	uint8_t m_mcu_p2;
@@ -72,8 +74,6 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	void sidepckt_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

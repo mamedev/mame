@@ -491,7 +491,9 @@ ROM_END
 
 void sidepckt_state::init_sidepckt()
 {
-	save_item(NAME(m_scroll_y));
+	save_item(NAME(m_mcu_p1));
+	save_item(NAME(m_mcu_p2));
+	save_item(NAME(m_mcu_p3));
 }
 
 
