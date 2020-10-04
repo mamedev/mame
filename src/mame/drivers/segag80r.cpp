@@ -1728,7 +1728,7 @@ GAME( 1981, astrob2a,  astrob,   astrob,   astrob2,  segag80r_state, init_astrob
 GAME( 1981, astrob2b,  astrob,   astrob,   astrob2,  segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 2b)", 0 )
 GAME( 1981, astrob1,   astrob,   astrob,   astrob,   segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 1)", 0 | MACHINE_NOT_WORKING ) // instant death if you start game with 1 credit, protection?, bad dump?
 GAME( 1981, astrobg,   astrob,   astrob,   astrob,   segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (German)", 0 )
-GAME( 1981, 005,       0,        sega005,  005,      segag80r_state, init_005,      ROT270, "Sega", "005", MACHINE_IMPERFECT_SOUND )
+GAME( 1981, 005,       0,        sega005,  005,      segag80r_state, init_005,      ROT270, "Sega", "005", 0 )
 
 
 /* basic G-80 system with individual background boards */

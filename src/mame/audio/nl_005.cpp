@@ -20,6 +20,8 @@
 //
 
 #define ENABLE_FRONTIERS (0)
+#define HLE_MELODY_CLOCK (1)
+#define UNDERCLOCK_NOISE_GEN (1)
 
 
 
@@ -48,6 +50,7 @@
 #define PROM_6331_DIP PROM_82S123_DIP
 
 // Totally faking this, no clue
+#if 0
 static NETLIST_START(_MB4391)
 	RES(RIN1, RES_K(70))
 	RES(RIN2, RES_K(70))
@@ -63,10 +66,60 @@ static NETLIST_START(_MB4391)
 	NET_C(IN, FUNC.A0)
 	ALIAS(CON, FUNC.A1)
 	NET_C(GND, FUNC.A2)
-	ALIAS(R0, FUNC.A3)
+	ALIAS(RO, FUNC.A3)
 	NET_C(VSS, FUNC.A4)
 	NET_C(FUNC.Q, ROUT.1)
 NETLIST_END()
+#else
+static NETLIST_START(_MB4391)
+    // MB4391 (fake implementation)
+    // 2020 by beta-tester (https://github.com/beta-tester)
+    //
+    // values by guesses
+    // for brdrline schematics only
+    //
+    // Vmix  = -(Vcon - 4.759384) / (4.759384 - 2.839579)
+    // Vmix2 = pow(Vmix, 2)
+    // Vout  = Vin * Vmix2
+    //
+    // Vcon(max) = 4.759384
+    // Vcon(min) = 2.839584...2.839579 (@3.002360417e+01)(@3.152360417e+01)
+    //AFUNC(fx, 5, "(A1)")
+    //
+    //AFUNC(fx, 5, "min(1, max(0, -(A1 - 4.759384) / (4.759384 - 2.839579)))")
+    //AFUNC(fx, 5, "min(1, max(0, -(A1 - (A2-0.24)) / ((A2-0.24) - (A2/2+0.34))))")
+    //
+    // Vin(offset)=2.5 (VCC/2)
+    //AFUNC(fx, 5, "(A0)")
+    //AFUNC(fx, 5, "(A0-2.5)")
+    //AFUNC(fx, 5, "(A0-(A2/2))")
+    //
+    // vin * mix
+    AFUNC(fx, 5, "(A0-(A2/2)) * (min(1, max(0, -(A1 - 4.759384) / (4.759384 - 2.839579))))")
+    //
+    // vin * pow(mix, 2)
+    //AFUNC(fx, 5, "(A0-(A2/2)) * pow((min(1, max(0, -(A1 - 4.759384) / (4.759384 - 2.839579))), 2))")
+
+    RES(R1, RES_K(10))
+    RES(R2, RES_K(10))
+    NET_C(VSS, R1.1)
+    NET_C(IN,  R1.2, R2.1)
+    NET_C(R2.2, GND)
+
+    RES(Rout, RES_K(1))
+    NET_C(fx.Q, Rout.1) // fx(IN, CON, VCC, GND, RO) = OUT
+
+    // INPUT
+    ALIAS(IN,  fx.A0) // IN
+    ALIAS(CON, fx.A1) // CON
+    ALIAS(VSS, fx.A2) // VSS
+    ALIAS(GND, fx.A3) // GND
+    ALIAS(RO,  fx.A4) // RO
+
+    // OUTPUT
+    ALIAS(OUT, Rout.2)  // OUT
+NETLIST_END()
+#endif
 
 static NETLIST_START(_MB4391_DIP)
 	SUBMODEL(_MB4391, A)
@@ -75,11 +128,11 @@ static NETLIST_START(_MB4391_DIP)
 	DIPPINS(   /*       +--------------+      */
 		 A.IN, /*   1IN |1     ++    16| 1VSS */ A.VSS,
 		A.CON, /*  1CON |2           15| 1OUT */ A.OUT,
-		A.GND, /*  1GND |3           14| 1R0  */ A.R0,
+		A.GND, /*  1GND |3           14| 1R0  */ A.RO,
 		 NC.I, /*    NC |4   MB4391  13| NC   */ NC.I,
 		 B.IN, /*   2IN |5           12| 2VSS */ B.VSS,
 		B.CON, /*  2CON |6           11| 2OUT */ B.OUT,
-		B.GND, /*  2GND |7           10| 2R0  */ B.R0,
+		B.GND, /*  2GND |7           10| 2R0  */ B.RO,
 		 NC.I, /*    NC |8            9| NC   */ NC.I
 			   /*       +--------------+      */
 	)
@@ -96,9 +149,15 @@ NETLIST_END()
 
 NETLIST_START(sega005)
 
+#if 1
 	SOLVER(Solver, 1000)
 	PARAM(Solver.DYNAMIC_TS, 1)
-	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 2e-5)
+	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 4e-5)
+	PARAM(Solver.Solver_60.DYNAMIC_MIN_TIMESTEP, 9e-7) // bomb drop
+	PARAM(Solver.Solver_62.DYNAMIC_MIN_TIMESTEP, 8e-6) // whistle
+#else
+	SOLVER(Solver, 4800000)
+#endif
 
 	LOCAL_SOURCE(_MB4391)
 	LOCAL_SOURCE(_MB4391_DIP)
@@ -135,7 +194,6 @@ NETLIST_START(sega005)
 	ANALOG_INPUT(I_V5, 5)
 	ANALOG_INPUT(I_V6, 6)
 	ANALOG_INPUT(I_V12, 12)
-	ANALOG_INPUT(I_VM12, -12)
 
 	POT(VR1, RES_K(50))
 	POT(VR2, RES_K(50))
@@ -221,7 +279,7 @@ NETLIST_START(sega005)
 	RES(R72, RES_K(51))
 	RES(R73, RES_K(51))
 	RES(R74, RES_K(10))
-	RES(R75, RES_K(15))
+	RES(R75, RES_K(51))	// parts sheet says 15K
 	RES(R76, RES_K(100))
 	RES(R77, RES_K(100))
 	RES(R78, RES_K(10))
@@ -297,7 +355,7 @@ NETLIST_START(sega005)
 	CAP(C6, CAP_U(470))
 //	CAP(C7, CAP_U(0.1))
 //	CAP(C8, CAP_U(2.2))
-	CAP(C9, CAP_U(0.047))
+	CAP(C9, CAP_P(4700))	// parts list says 0.047
 //	CAP(C10, CAP_U(0.1))
 	CAP(C11, CAP_U(0.01))
 //	CAP(C12, CAP_U(0.1))
@@ -321,9 +379,9 @@ NETLIST_START(sega005)
 //	CAP(C30, CAP_U(0.1))
 //	CAP(C31, CAP_U(0.1))
 //	CAP(C32, CAP_U(0.1))
-	CAP(C33, CAP_U(0.001))
+	CAP(C33, CAP_U(0.1))	// parts list says 0.001, but ruins envelope on melody
 	CAP(C34, CAP_U(0.01))
-	CAP(C35, CAP_U(0.1))
+	CAP(C35, CAP_P(1000))	// parts list says 0.1, but melody doesn't clock with that
 	CAP(C36, CAP_U(1))
 //	CAP(C37, CAP_U(0.1))
 //	CAP(C38, CAP_U(0.1))
@@ -340,15 +398,15 @@ NETLIST_START(sega005)
 //	CAP(C49, CAP_U(0.1))
 	CAP(C50, CAP_U(4.7))
 	CAP(C51, CAP_U(4.7))
-	CAP(C52, CAP_U(0.0047))
-	CAP(C53, CAP_U(0.0047))
+	CAP(C52, CAP_U(0.047))	// parts list says 0.0047? 0.047? explosions
+	CAP(C53, CAP_U(0.047))	// parts list says 0.0047? 0.047? explosions
 //	CAP(C54, CAP_U(0.1))
 	CAP(C55, CAP_U(0.022))
 	CAP(C56, CAP_U(0.022))
 	CAP(C57, CAP_U(1))
 //	CAP(C58, CAP_U(0.1))
-	CAP(C59, CAP_U(0.047))
-	CAP(C60, CAP_U(0.1))
+	CAP(C59, CAP_P(4700))	// parts list says 0.047u (bomb drop)
+	CAP(C60, CAP_U(1))		// parts list says 0.1u (pistol shoot)
 //	CAP(C61, CAP_U(1))
 	CAP(C62, CAP_U(1))
 	CAP(C63, CAP_U(0.1))
@@ -396,7 +454,7 @@ NETLIST_START(sega005)
 	CAP(C105, CAP_U(10))
 	CAP(C106, CAP_U(4.7))
 	CAP(C107, CAP_P(680))
-	CAP(C108, CAP_U(1))
+	CAP(C108, CAP_U(2.2))	// parts list says 1.0
 //	CAP(C109, CAP_P(680))
 	CAP(C110, CAP_U(1))
 //	CAP(C111, CAP_U(0.1))
@@ -437,6 +495,7 @@ NETLIST_START(sega005)
 	NET_C(U2.16, I_V5)
 
 	NE555_DIP(U3)			// Timer
+	NET_C(U3.1, GND)
 	NET_C(U3.8, I_V5)
 
 	TTL_74LS14_DIP(U4)		// Dual Gate/Hex Inverter
@@ -449,13 +508,17 @@ NETLIST_START(sega005)
 	NET_C(U6.7, GND)
 	NET_C(U6.14, I_V5)
 
+#if (!HLE_MELODY_CLOCK)
 	TTL_74LS161_DIP(U7)		// 4-Bit Binary Counter
 	NET_C(U7.8, GND)
 	NET_C(U7.16, I_V5)
+#endif
 
 	PROM_6331_DIP(U8)		// Bioplar PROM
 	PARAM(U8.A.ROM, "6331_sound_u8")
+#if (!HLE_MELODY_CLOCK)
 	PARAM(U8.FORCE_TRISTATE_LOGIC, 1)
+#endif
 	NET_C(U8.8, GND)
 	NET_C(U8.16, I_V5)
 
@@ -473,17 +536,24 @@ NETLIST_START(sega005)
 
 	LM324_DIP(U12)			// Op. Amp.
 	NET_C(U12.4, I_V12)
-	NET_C(U12.11, I_VM12)
+	NET_C(U12.11, GND)
 
 	MM5837_DIP(U13)			// Noise generator
+#if (UNDERCLOCK_NOISE_GEN)
+	// officially runs at 48-112kHz, but little noticeable difference
+	// in exchange for a big performance boost
+	PARAM(U13.FREQ, 12000)
+#endif
 
 	TTL_74LS293_DIP(U14)	// 4-Bit Binary Counter
 	NET_C(U14.7, GND)
 	NET_C(U14.14, I_V5)
 
+#if (!HLE_MELODY_CLOCK)
 	TTL_74LS161_DIP(U15)	// 4-Bit Binary Counter
 	NET_C(U15.8, GND)
 	NET_C(U15.16, I_V5)
+#endif
 
 	EPROM_2716_DIP(U16)		// EPROM
 	PARAM(U16.A.ROM, "epr_1286_sound_16")
@@ -499,7 +569,7 @@ NETLIST_START(sega005)
 
 	LM324_DIP(U18)			// Op. Amp.
 	NET_C(U18.4, I_V12)
-	NET_C(U18.11, I_VM12)
+	NET_C(U18.11, GND)
 
 	TTL_7417_DIP(U19)		// Hex Buffers with Open-Collector High-Voltage Outputs
 	NET_C(U19.7, GND)
@@ -510,14 +580,16 @@ NETLIST_START(sega005)
 	NET_C(U20.16, I_V5)
 
 	NE555_DIP(U21)			// Timer
+	NET_C(U21.1, GND)
 	NET_C(U21.8, I_V5)
 
 	NE555_DIP(U22)			// Timer
+	NET_C(U22.1, GND)
 	NET_C(U22.8, I_V5)
 
 	LM324_DIP(U23)			// Op. Amp.
 	NET_C(U23.4, I_V12)
-	NET_C(U23.11, I_VM12)
+	NET_C(U23.11, GND)
 
 	LM324_DIP(U24)			// Op. Amp.
 	NET_C(U24.4, I_V12)
@@ -526,18 +598,20 @@ NETLIST_START(sega005)
 
 	LM324_DIP(U25)			// Op. Amp.
 	NET_C(U25.4, I_V12)
-	NET_C(U25.11, I_VM12)
+	NET_C(U25.11, GND)
 
 	LM324_DIP(U26)			// Op. Amp.
 	NET_C(U26.4, I_V12)
-	NET_C(U26.11, I_VM12)
+	NET_C(U26.11, GND)
 
 	NE555_DIP(U27)			// Timer
+	NET_C(U27.1, GND)
 	NET_C(U27.8, I_V5)
 
 	MB4391_DIP(U28)			// Sega custom
 	NET_C(U28.3, U28.7, GND)
-	NET_C(U28.12, U28.16, I_V12) // guess
+	NET_C(U28.12, I_V12)
+	NET_C(U28.16, I_V5) 	// guess
 
 	CD4016_DIP(U29)			// Quad Bilateral Switch
 	NET_C(U29.7, GND)
@@ -545,15 +619,15 @@ NETLIST_START(sega005)
 
 	MB4391_DIP(U30)			// Sega custom
 	NET_C(U30.3, U30.7, GND)
-	NET_C(U30.12, U30.16, I_V12) // guess
+	NET_C(U30.12, U30.16, I_V5) // guess
 
 	MB4391_DIP(U31)			// Sega custom
 	NET_C(U31.3, U31.7, GND)
-	NET_C(U31.12, U31.16, I_V12) // guess
+	NET_C(U31.12, U31.16, I_V5) // guess
 
 	MB4391_DIP(U32)			// Sega custom
 	NET_C(U32.3, U32.7, GND)
-	NET_C(U32.12, U32.16, I_V12) // guess
+	NET_C(U32.12, U32.16, I_V5) // guess
 
 	//
 	// Sheet 1, bottom-left
@@ -598,6 +672,32 @@ NETLIST_START(sega005)
 	NET_C(U16.9, R32.1, U8.10)
 	NET_C(R27.2, R28.2, R29.2, R30.2, R31.2, R32.2, I_V5)
 
+	// Oscillator clock, with VR to control
+	NET_C(U8.15, GND)
+#if (HLE_MELODY_CLOCK)
+	// decode the PROM output into a number
+	AFUNC(DECODER, 8, "if(A0>2.5,1,0)+if(A1>2.5,2,0)+if(A2>2.5,4,0)+if(A3>2.5,8,0)+if(A4>2.5,16,0)+if(A5>2.5,32,0)+if(A6>2.5,64,0)+if(A7>2.5,128,0)")
+	NET_C(DECODER.A0, U8.1)
+	NET_C(DECODER.A1, U8.2)
+	NET_C(DECODER.A2, U8.3)
+	NET_C(DECODER.A3, U8.4)
+	NET_C(DECODER.A4, U8.5)
+	NET_C(DECODER.A5, U8.6)
+	NET_C(DECODER.A6, U8.7)
+	NET_C(DECODER.A7, U8.9)
+	// U7/U15 count up from the PROM output to 256 and then reload
+	VARCLOCK(MELODY_CLK, 1, "if(A0<255,0.000001*(256-A0),0.001)")
+	NET_C(MELODY_CLK.GND, GND)
+	NET_C(MELODY_CLK.VCC, I_V5)
+	NET_C(MELODY_CLK.A0, DECODER.Q)
+	// special case: FF from the PROM will effectively suppress the clock
+	AFUNC(MELODY_SUPPRESS, 2, "if(A0<255,A1,0)")
+	NET_C(MELODY_SUPPRESS.A0, DECODER.Q)
+	NET_C(MELODY_SUPPRESS.A1, MELODY_CLK.Q)
+	NET_C(MELODY_SUPPRESS.Q, U4.13, C35.2, U14.11)
+	NET_C(R134.1, R134.2, C9.1, C9.2, U4.3, U4.4, U4.5, U4.6, GND)
+	NET_C(U4.12, GND)
+#else
 	NET_C(U8.1, U7.3)
 	NET_C(U8.2, U7.4)
 	NET_C(U8.3, U7.5)
@@ -606,10 +706,7 @@ NETLIST_START(sega005)
 	NET_C(U8.6, U15.4)
 	NET_C(U8.7, U15.5)
 	NET_C(U8.9, U15.6)
-	NET_C(U8.15, GND)
-
-	// Osciallator clock, with VR to control
-	CLOCK(OSC1, 212595) // 1/1.39*4700e-12*(220+500)
+	CLOCK(OSC1, 350000) // 1/1.39*4700e-12*(220+500) = 212595
 	NET_C(OSC1.GND, GND)
 	NET_C(OSC1.VCC, I_V5)
 	NET_C(R134.1, R134.2, C9.1, C9.2, U4.3, U4.4, U4.5, U4.6, GND)
@@ -619,6 +716,7 @@ NETLIST_START(sega005)
 	NET_C(U7.9, U15.9, U4.12)
 	NET_C(U15.1, I_V5)
 	NET_C(U15.15, U4.13, C35.2, U14.11)
+#endif
 	NET_C(C35.1, GND)
 	NET_C(U14.5, R34.2)
 	NET_C(U14.8, R50.2)
@@ -673,7 +771,7 @@ NETLIST_START(sega005)
 	NET_C(R97.2, I_V5)
 	NET_C(U22.4, I_V5)
 	RES(RU22_DUMMY, RES_K(1))
-	NET_C(U22.3, RU22_DUMMY.1)
+	NET_C(U22.3, RU22_DUMMY.1)	// OUTPUT (3) not connected
 	NET_C(RU22_DUMMY.2, GND)
 
 	NET_C(C71.1, R92.1, U23.9)
@@ -714,9 +812,9 @@ NETLIST_START(sega005)
 	NET_C(R120.1, U26.13, C95.1, U26.3)
 	NET_C(C95.2, GND)
 	NET_C(U26.2, U26.1, U27.5)
+	NET_C(U27.3, R112.2)
 
 	NET_C(U27.4, I_V5)
-	NET_C(U27.3, R112.2)
 	NET_C(R112.1, C93.2, R111.2)
 	NET_C(R111.1, GND)
 	NET_C(C93.1, R116.1)
@@ -738,7 +836,7 @@ NETLIST_START(sega005)
 	ALIAS(WHISTLE_SOUND, C83.2)
 
 	//
-	// Sheet 2, middle (EXPLOSIONS
+	// Sheet 2, middle (EXPLOSIONS)
 	//
 
 	NET_C(LARGE_EXPL_SOUND_TRIG, U2.9, R3.1)
@@ -747,8 +845,8 @@ NETLIST_START(sega005)
 	NET_C(U2.6, C13.2)
 	NET_C(C13.1, R6.1, U2.7)
 	NET_C(R6.2, I_V5)
-	NET_C(U2.12, R17.1)
-	NET_C(R17.2, I_V5, D3.K)
+	NET_C(U2.12, R17.1, D3.K)
+	NET_C(R17.2, I_V5)
 	NET_C(D3.A, R16.1)
 	NET_C(R16.2, C25.1, R15.1)
 	NET_C(C25.2, GND)
@@ -1012,7 +1110,14 @@ NETLIST_START(sega005)
 #if (ENABLE_FRONTIERS)
 
 #define RXX 192
-//	OPTIMIZE_FRONTIER(INVADER_1, RES_M(1), RXX)
+	OPTIMIZE_FRONTIER(BOMB_DROP_SOUND, RES_M(1), RXX)
+	OPTIMIZE_FRONTIER(SMALL_EXPLOSION_SOUND, RES_M(1), RXX)
+	OPTIMIZE_FRONTIER(LARGE_EXPLOSION_SOUND, RES_M(1), RXX)
+	OPTIMIZE_FRONTIER(PISTOL_SHOOT_SOUND, RES_M(1), RXX)
+	OPTIMIZE_FRONTIER(MISSILE_SOUND, RES_M(1), RXX)
+	OPTIMIZE_FRONTIER(HELICOPTER_SOUND, RES_M(1), RXX)
+	OPTIMIZE_FRONTIER(WHISTLE_SOUND, RES_M(1), RXX)
+	OPTIMIZE_FRONTIER(MELODY, RES_M(1), RXX)
 #endif
 
 NETLIST_END()

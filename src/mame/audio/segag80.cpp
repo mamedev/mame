@@ -189,7 +189,7 @@ astrob_audio_device::astrob_audio_device(const machine_config &mconfig, const ch
 DEFINE_DEVICE_TYPE(SPACE_ODYSSEY_AUDIO, spaceod_audio_device, "astrob_audio", "Space Odyssey Sound Board")
 
 spaceod_audio_device::spaceod_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	segag80_audio_device_base(mconfig, SPACE_ODYSSEY_AUDIO, tag, owner, clock, 0xf5, 0xcb, false, NETLIST_NAME(spaceod), 25000.0)
+	segag80_audio_device_base(mconfig, SPACE_ODYSSEY_AUDIO, tag, owner, clock, 0xf5, 0xcb, false, NETLIST_NAME(spaceod), 0.7)
 {
 }
 
@@ -229,7 +229,6 @@ void sega005_audio_device::device_add_mconfig(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, m_a_input[4], "I_A4.IN", 0);
 	NETLIST_LOGIC_INPUT(config, m_a_input[5], "I_A5.IN", 0);
 	NETLIST_LOGIC_INPUT(config, m_a_input[6], "I_A6.IN", 0);
-	NETLIST_LOGIC_INPUT(config, m_a_input[7], "I_A7.IN", 0);
 
 	NETLIST_LOGIC_INPUT(config, m_b_input[0], "I_B0.IN", 0);
 	NETLIST_LOGIC_INPUT(config, m_b_input[1], "I_B1.IN", 0);
@@ -239,7 +238,7 @@ void sega005_audio_device::device_add_mconfig(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, m_b_input[5], "I_B5.IN", 0);
 	NETLIST_LOGIC_INPUT(config, m_b_input[6], "I_B6.IN", 0);
 
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(15000.0, 0.0);
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(5.0, 0.0);
 
 	i8255_device &ppi(I8255A(config, "ppi8255"));
 	ppi.out_pa_callback().set(FUNC(sega005_audio_device::sound_a_w));
@@ -249,13 +248,13 @@ void sega005_audio_device::device_add_mconfig(machine_config &config)
 void sega005_audio_device::sound_a_w(u8 data)
 {
 	for (int bit = 0; bit < 8; bit++)
-		if (m_a_input[0])
+		if (m_a_input[bit])
 			m_a_input[bit]->write_line(BIT(data, bit));
 }
 
 void sega005_audio_device::sound_b_w(u8 data)
 {
 	for (int bit = 0; bit < 8; bit++)
-		if (m_b_input[0])
+		if (m_b_input[bit])
 			m_b_input[bit]->write_line(BIT(data, bit));
 }
