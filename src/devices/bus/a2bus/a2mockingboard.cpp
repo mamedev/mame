@@ -89,10 +89,9 @@ void a2bus_phasor_device::device_add_mconfig(machine_config &config)
 
 	SPEAKER(config, "lspeaker2").front_left();
 	SPEAKER(config, "rspeaker2").front_right();
-	m_ay1->set_clock(1022727*2);
-	AY8913(config, m_ay2, 1022727*2);
-	AY8913(config, m_ay3, 1022727*2);
-	AY8913(config, m_ay4, 1022727*2);
+	AY8913(config, m_ay2, 1022727);
+	AY8913(config, m_ay3, 1022727);
+	AY8913(config, m_ay4, 1022727);
 	m_ay2->add_route(ALL_OUTPUTS, "lspeaker2", 0.5);
 	m_ay3->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 	m_ay4->add_route(ALL_OUTPUTS, "rspeaker2", 0.5);
@@ -415,16 +414,35 @@ void a2bus_phasor_device::via2_out_b(uint8_t data)
 	}
 }
 
+void a2bus_phasor_device::set_clocks()
+{
+	if (m_native)
+	{
+		m_ay1->set_clock(1022727*2);
+		m_ay2->set_clock(1022727*2);
+		m_ay3->set_clock(1022727*2);
+		m_ay4->set_clock(1022727*2);
+	}
+	else
+	{
+		m_ay1->set_clock(1022727);
+		m_ay2->set_clock(1022727);
+		m_ay3->set_clock(1022727);
+		m_ay4->set_clock(1022727);
+	}
+}
 
 uint8_t a2bus_phasor_device::read_c0nx(uint8_t offset)
 {
 	m_native = BIT(offset, 0);
+	set_clocks();
 	return 0xff;
 }
 
 void a2bus_phasor_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	m_native = BIT(offset, 0);
+	set_clocks();
 }
 
 uint8_t a2bus_echoplus_device::read_c0nx(uint8_t offset)
