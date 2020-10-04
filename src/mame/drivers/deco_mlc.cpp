@@ -99,6 +99,7 @@
         blending, raster effect features aren't fully emulated, verified currently
         Not verified : Can sprites affect 8bpp and shadowing simultaneously?
         Not verified what palette highest bits actually do
+        Zoom algorithm is incorrect/unverified, reference: https://www.youtube.com/watch?v=eCwAVt0GbhQ
 
     Driver by Bryan McPhail, bmcphail@tendril.co.uk, thank you to Avedis and The Guru.
 
