@@ -256,11 +256,11 @@ void unsp_device::device_start()
 	state_add(UNSP_FIQ_EN, "FIQE", m_core->m_enable_fiq).formatstr("%1u");
 	state_add(UNSP_FIR_MOV_EN, "FIR_MOV", m_core->m_fir_move).formatstr("%1u");
 	state_add(UNSP_SB,     "SB", m_core->m_sb).formatstr("%1X");
-	state_add(UNSP_AQ,     "AQ", m_core->m_sb).formatstr("%1u");
-	state_add(UNSP_FRA,    "FRA", m_core->m_sb).formatstr("%1u");
-	state_add(UNSP_BNK,    "BNK", m_core->m_sb).formatstr("%1u");
-	state_add(UNSP_INE,    "INE", m_core->m_sb).formatstr("%1u");
-	state_add(UNSP_PRI,    "PRI", m_core->m_sb).formatstr("%1u");
+	state_add(UNSP_AQ,     "AQ", m_core->m_aq).formatstr("%1u");
+	state_add(UNSP_FRA,    "FRA", m_core->m_fra).formatstr("%1u");
+	state_add(UNSP_BNK,    "BNK", m_core->m_bnk).formatstr("%1u");
+	state_add(UNSP_INE,    "INE", m_core->m_ine).formatstr("%1u");
+	state_add(UNSP_PRI,    "PRI", m_core->m_pri).formatstr("%1u");
 #if UNSP_LOG_OPCODES || UNSP_LOG_REGS
 	state_add(UNSP_LOG_OPS,"LOG", m_log_ops).formatstr("%1u");
 #endif
