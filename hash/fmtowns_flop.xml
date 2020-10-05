@@ -84,7 +84,6 @@ Geitassha Towns (Data Shuu)                                   Shoubi Gakuen     
 Gokanshi                                                      Tensui Software                   1995/7     FD
 Gorby no Pipeline Daisakusen                                  Compile                           1991/4     FD
 Grapharmony V1.0                                              Fujitsu                           1992/3     FD
-Gyakutama Ou                                                  Grocer                            1995/1     FD×05
 Hametaoshi Tool                                               Nikkonren Kikaku                  1995/12    FD×02
 Hana yori Dango                                               Active                            1992/4     FD×03
 Healthy Life 2 Ryouri Data                                    Top Business System               1993/7     FD
@@ -243,7 +242,6 @@ Towns Jouhou Kiso Select-F                                    Tokyo Shoseki     
 TownsGEAR de Obenkyou Dai-1-kan: Seigo Mondai                 Kyouiku Soft Kenkyuusho           1992/3     FD×02
 TownsGEAR de Obenkyou Dai-2-kan: Sentaku Mondai               Kyouiku Soft Kenkyuusho           1992/3     FD×02
 TownsGEAR de Obenkyou Dai-3-kan: Suuchi Mondai                Kyouiku Soft Kenkyuusho           1992/3     FD×02
-Traffic Confusion                                             Masterpiece                       1992/6     FD×02
 Type Master Oshitaoshi                                        Nikkonren Kikaku                  1992/7     FD
 Video Library V1.1                                            Fujitsu                           1991/10    FD
 Video Library V2.1                                            Fujitsu                           1992/12    FD
@@ -540,6 +538,36 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="brandish (disk 3).hdm" size="1261568" crc="711d5e6d" sha1="0315531f8f7aec540163e4dda7d4cab0fe4894fe"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	Compatible with FM Towns, FM-R50 and FM-16 Beta.
+	All the text is misplaced in MAME, confirmed to not happen on real hardware.
+	-->
+	<software name="bunkun" supported="no">
+		<description>Bun-kun Series - Youji Kiso Nouryoku Training Soft Set</description>
+		<year>1989?</year>
+		<publisher>日本教育情報センター (JEIC)</publisher>
+		<info name="alt_title" value="文君シリーズ　幼児　基礎能力トレーニングソフト・セット" />
+		<info name="usage" value="Prepare a bootable MS-DOS 3.1 disk and insert it on drive B. Insert one of the 3 original disks on drive A and run SETTW.BAT to install the program to the bootable disk." />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="方向と迷路 / Houkou to Meiro" />
+			<dataarea name="flop" size="1261568">
+				<rom name="bun-kun - houkou to meiro.hdm" size="1261568" crc="c65dbb07" sha1="20837c3f5d6c1f92d668eadb3106ae5ba048c415"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="相似と順列 / Souji to Junretsu" />
+			<dataarea name="flop" size="1261568">
+				<rom name="bun-kun - souji to junretsu.hdm" size="1261568" crc="9866bb7b" sha1="a2eb5b5bf1d4575457ee8f62a1c8fa49d1bb12b8"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="選択と記憶 / Sentaku to Kioku" />
+			<dataarea name="flop" size="1261568">
+				<rom name="bun-kun - sentaku to kioku.hdm" size="1261568" crc="fa4ca205" sha1="3d52402adc2a37be62293488746821bf43687ad1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1969,6 +1997,26 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
+	<software name="trafconf">
+		<description>Traffic Confusion</description>
+		<year>1992</year>
+		<publisher>マスターピース (Masterpiece)</publisher>
+		<info name="alt_title" value="トラフィックコンフュージョン" />
+		<info name="release" value="199206xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="System Disk" />
+			<dataarea name="flop" size="1261568">
+				<rom name="traffic confusion (system disk).hdm" size="1261568" crc="5b02ec79" sha1="e9223c67b18e53ce906ca65f29cf2807604fc124"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="User Disk" />
+			<dataarea name="flop" size="1261568">
+				<rom name="traffic confusion (user disk).hdm" size="1261568" crc="a639e9b5" sha1="df1566fbbbd512e89aac75ca26664cceda3b0272"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ushinawa">
 		<description>Ushinawareta Rakuen</description>
 		<year>1995</year>
@@ -2139,6 +2187,50 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 			<feature name="part_id" value="Disk E" />
 			<dataarea name="flop" size="1261568">
 				<rom name="wrestle angels 2 (disk e).hdm" size="1261568" crc="ab3474d9" sha1="ea36d0bd3bbfdf057e9487be6a2ed761c3b66e9e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wedderra">
+		<description>Wedding Errantry - Gyakutama Ou</description>
+		<year>1995</year>
+		<publisher>グローサー (Grocer)</publisher>
+		<info name="alt_title" value="ウエディング・エラントリー 逆玉王" />
+		<info name="release" value="199501xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="1261568">
+				<rom name="wedding errantry - gyakutama ou (disk a).hdm" size="1261568" crc="aaaafda4" sha1="0f11a09a075384d9a796cdfc67a9170a17b0b3c6"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1261568">
+				<rom name="wedding errantry - gyakutama ou (disk b).hdm" size="1261568" crc="edaad3bd" sha1="87cec9967eaef39ac639825e9e9677fdba4ac02b"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size="1261568">
+				<rom name="wedding errantry - gyakutama ou (disk c).hdm" size="1261568" crc="c4c805f0" sha1="72c5a1f0ceb0aa977f007de32204149a800913ac"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk D" />
+			<dataarea name="flop" size="1261568">
+				<rom name="wedding errantry - gyakutama ou (disk d).hdm" size="1261568" crc="ebeae4bf" sha1="34d7a971381b12f3340a6991e376faeccfeadd13"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk E" />
+			<dataarea name="flop" size="1261568">
+				<rom name="wedding errantry - gyakutama ou (disk e).hdm" size="1261568" crc="62317ff3" sha1="3505721f2f256f80bd8463e1dd90662cc60e95e6"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk F" />
+			<dataarea name="flop" size="1261568">
+				<rom name="wedding errantry - gyakutama ou (disk f).hdm" size="1261568" crc="ec99238a" sha1="70eb057a67ffab0072473e37ed3fa39f81492917"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2469,6 +2561,31 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="kiss - kisekae set system.hdm" size="1261568" crc="642554e6" sha1="a462109795fa23e677cc7bdb6c5885a52cc92303"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	Runs too fast and has some slight graphical glitches in the score display.
+	Most of the visual artifacts (missing sprites in the water and explosions, for example) aren't emulation bugs, they also happen on real hardware.
+	-->
+	<software name="metalbld" supported="partial">
+		<description>Metal Blade</description>
+		<year>1991</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Laizaps" />
+		<info name="alt_title" value="メタルブレード" />
+		<info name="usage" value="Boot TownsOS V1.1, then run the icon on drive A: with both floppy disks mounted" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="System Disk" />
+			<dataarea name="flop" size = "1261568">
+				<rom name="metal blade a.hdm" size="1261568" crc="f1eee349" sha1="8125d8d11477887a958ef8d10b63872ccb26917f"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Data Disk" />
+			<dataarea name="flop" size = "1261568">
+				<rom name="metal blade b.hdm" size="1261568" crc="aa170a51" sha1="4f29e03d230db84c62347cdb9024e1853ba654dd"/>
 			</dataarea>
 		</part>
 	</software>
