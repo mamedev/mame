@@ -94,19 +94,10 @@ private:
 
 screen_device::svg_renderer::svg_renderer(memory_region *region)
 {
-	// nanosvg makes assumptions about the global locale
-	{
-		const std::unique_ptr<char []> s(new char[region->bytes() + 1]);
-		memcpy(s.get(), region->base(), region->bytes());
-		s[region->bytes()] = 0;
-		const std::string lcctype(std::setlocale(LC_CTYPE, nullptr));
-		const std::string lcnumeric(std::setlocale(LC_NUMERIC, nullptr));
-		std::setlocale(LC_CTYPE, "C");
-		std::setlocale(LC_NUMERIC, "C");
-		m_image = nsvgParse(s.get(), "px", 72);
-		std::setlocale(LC_CTYPE, lcctype.c_str());
-		std::setlocale(LC_NUMERIC, lcnumeric.c_str());
-	}
+	const std::unique_ptr<char []> s(new char[region->bytes() + 1]);
+	memcpy(s.get(), region->base(), region->bytes());
+	s[region->bytes()] = 0;
+	m_image = nsvgParse(s.get(), "px", 72);
 	m_rasterizer = nsvgCreateRasterizer();
 
 	m_key_count = 0;

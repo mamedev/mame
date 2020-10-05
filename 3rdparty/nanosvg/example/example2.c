@@ -32,7 +32,7 @@ int main()
 	NSVGrasterizer *rast = NULL;
 	unsigned char* img = NULL;
 	int w, h;
-	const char* filename = "../example/_test.svg";
+	const char* filename = "../example/23.svg";
 
 	printf("parsing %s\n", filename);
 	image = nsvgParseFromFile(filename, "px", 96.0f);
