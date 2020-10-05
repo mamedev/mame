@@ -78,7 +78,7 @@ player - when there's nothing to play - first, empty 2k of ROMs are selected.
 
 uint16_t rltennis_state::io_r()
 {
-	return (ioport("P1" )->read()&0x1fff) | (m_unk_counter<<13); // Top 3 bits controls sample address update
+	return (ioport("P1" )->read()&0x1fff) | (m_unk_counter<<13); // Top 3 bits control sample address update
 }
 
 void rltennis_state::snd1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
