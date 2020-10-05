@@ -267,6 +267,7 @@ void hc55516_device::device_start()
 
 void hc55516_device::device_reset()
 {
+	cvsd_device_base::device_reset();
 	// simulate /FZ having been held for a while
 	m_sylfilter = 0x3f;
 	m_intfilter = 0;
@@ -432,6 +433,7 @@ hc55532_device::hc55532_device(const machine_config &mconfig, const char *tag, d
 
 void hc55532_device::device_reset()
 {
+	cvsd_device_base::device_reset();
 	// simulate /FZ having been held for a while
 	m_sylfilter = 0x7f;
 	m_intfilter = 0;
@@ -581,15 +583,3 @@ mc3418_device::mc3418_device(const machine_config &mconfig, const char *tag, dev
 	: mc3417_device(mconfig, MC3418, tag, owner, clock)
 {
 }
-
-/*
-void mc3417_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
-{
-	cvsd_device_base::sound_stream_update_legacy(stream, inputs, outputs, samples);
-}
-
-void mc3418_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
-{
-	cvsd_device_base::sound_stream_update_legacy(stream, inputs, outputs, samples);
-}
-*/

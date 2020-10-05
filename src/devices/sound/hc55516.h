@@ -14,10 +14,9 @@ public:
 		RISING=true,
 		FALLING=false
 	};
-	// this base device implements common things across all the CVSD chips
 
 	auto clock_state_cb() { return m_clock_state_push_cb.bind(); } // A clock state change callback. Using this is a bad idea due to lack of synchronization to other devices. TODO: remove this.
-	auto digin_cb() { return m_digin_pull_cb.bind(); } // Digital in pull callback function, for use if a clock is specified and we need to pull in the digital pin state, otherwise unused. TODO: this is not hooked up yet, and should be.
+	auto digin_cb() { return m_digin_pull_cb.bind(); } // Digital in pull callback function, for use if a clock is specified and we need to pull in the digital in pin state, otherwise unused. TODO: this is not hooked up yet, and should be.
 	auto digout_cb() { return m_digout_push_cb.bind(); } // Digital out push callback function. TODO: this is not hooked up or implemented yet, although it is only really relevant for devices which use the CVSD chips in encode mode.
 
 	READ_LINE_MEMBER( clock_r ); // Clock pull, really only relevant of something manually polls the clock (and clock is specified), which is a very bad design pattern and will cause synchronization/missed clock transition issues. This function WILL ASSERT if it is called and the clock hz is NOT specified! TODO: remove all use of this, and remove it.
@@ -31,7 +30,6 @@ public:
 	virtual int clock_state_r(); /* returns whether the clock is currently LO or HI, common to all chips. TODO: get rid of all use of this, then get rid of it. */
 
 protected:
-	cvsd_device_base(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	cvsd_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool active_clock_edge, uint8_t shiftreg_mask);
 
 	// device-level overrides
