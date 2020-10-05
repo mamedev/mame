@@ -243,12 +243,25 @@ void ms32_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, con
 
 void ms32_state::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect,int priority)
 {
-	/* TODO: registers 0x40/4 / 0x44/4 and 0x50/4 / 0x54/4 are used, meaning unknown */
-
+	// TODO: registers 0x40 / 0x44 and 0x50 / 0x54 are used, unknown meaning
+    // Given how this works out it is most likely that 0x*0 controls X axis while 0x*4 Y, 
+    // nothing is known to diverge between settings so far (i.e. bbbxing sets 0xffff to 0x4* and 0x0000 to 0x5*).
+    //             0x4*   0x5*  ROZ should wrap?
+    // bbbxing:  0xffff 0x0000  0 (match presentation)
+    // gratia:   0x0000 0x0000  1 (sky in stage 2)
+    // p47aces:  0xffff 0x0651  0 (title screen)
+    // desertwr: 0xffff 0x0651  1 (any stage)
+    // f1superb: 0xffff 0x0000  ?
+    // suchie2:  0x0000 0x0000  0?
+    // bnstars:  0x0000 0x0000  ?
+    // hayaosi3: 0x0000 0x0000  ?
+    // Maybe wrapping is done by limit boundaries rather than individual bits, so that bbbxing and p47aces abuses of this behaviour?
+    // Are we missing a ROZ plane size as well?
+    
 	if (m_roz_ctrl[0x5c/4] & 1)  /* "super" mode */
 	{
 		rectangle my_clip;
-		int y,maxy;
+		int y, maxy;
 
 		my_clip.min_x = cliprect.min_x;
 		my_clip.max_x = cliprect.max_x;
