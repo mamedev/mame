@@ -78,7 +78,7 @@ player - when there's nothing to play - first, empty 2k of ROMs are selected.
 
 uint16_t rltennis_state::io_r()
 {
-	return (ioport("P1" )->read()&0x1fff) | (m_unk_counter<<13); // Top 3 bits controls smaple address update
+	return (ioport("P1" )->read()&0x1fff) | (m_unk_counter<<13); // Top 3 bits controls sample address update
 }
 
 void rltennis_state::snd1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -183,7 +183,7 @@ void rltennis_state::ramdac_map(address_map &map)
 
 void rltennis_state::rltennis(machine_config &config)
 {
-	M68000(config, m_maincpu, RLT_XTAL/8); // MC68000P8
+	M68000(config, m_maincpu, RLT_XTAL/8); // MC68000P8, divider is a guess
 	m_maincpu->set_addrmap(AS_PROGRAM, &rltennis_state::rltennis_main);
 	m_maincpu->set_vblank_int("screen", FUNC(rltennis_state::interrupt));
 
