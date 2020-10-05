@@ -4,24 +4,26 @@
 license:CC0
 
   To investigate:
-	- Check for duplicates in lot check folders and cross-check with official spreadsheets, to look for additional regional releases with shared ROM contents.
-	- Was Gargoyle's Quest (Rev 1) released in the USA?
+	- Gargoyle's Quest - Ghosts'n Goblins (Rev 1)	<-	Unreleased in the USA?
+	- World Cup Striker (Europe, En / Fra / Ger)	<-	Unreleased?
 
   Known dumps not yet verified against retail cartridge:
 	- The Adventures of Rocky and Bullwinkle (USA)
 	- Fastest Lap (USA)
+	- Gargoyle's Quest - Ghosts'n Goblins (Rev 1)
 	- GI King! - Sanbiki no Yosouya (Japan)
 	- Hyper Lode Runner (Japan?)
 	- The Jetsons - Robot Panic (USA, Rev 1)
 	- Jungle Strike (USA)
 	- Kaseki Sousei Reborn (Japan, Rev 1)
+	- Kirby's Dream Land 2 (USA)
 	- Disney's Mulan (USA)
 	- Pac-In-Time (Europe, Rev 1)
 	- Pac-Man (Japan)
 	- Pang (UK)
 	- Suzuki Aguri no F-1 Super Driving (Japan)
 	- Teenage Mutant Hero Turtles III - Radical Rescue (Europe, Rev 1)
-	- World Cup Striker (Europe, En / Fra / Ger)	<-	Unreleased?
+	- World Cup Striker (Europe, En / Fra / Ger)
 
   Undumped pirate carts:
 	- GOWIN carts (see below the list of known games)
@@ -273,7 +275,6 @@ license:CC0
 	</software>
 
 	<software name="rockybw">
-		<!--	In lot check as "dmgrye-0.647"	-->
 		<!--	Retail cartridge not yet secured	-->
 		<description>The Adventures of Rocky and Bullwinkle (USA)</description>
 		<year>1992</year>
@@ -284,7 +285,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="dmgrye-0.647" size="131072" crc="362c841c" sha1="0ce98889e5d9d6167338e91119394537318810da"/>
+				<rom name="dmg-rye-0.u1" size="131072" crc="362c841c" sha1="0ce98889e5d9d6167338e91119394537318810da"/>
 			</dataarea>
 		</part>
 	</software>
@@ -608,7 +609,7 @@ license:CC0
 	</software>
 
 	<software name="asbase99">
-		<!--	In lot check as "Dmgab9e0.e21", "KENSA\Dmgab9p0.1"	-->
+		<!--	Planned for release in Europe as "dmg-ab9p-0"	-->
 		<description>All-Star Baseball '99 (USA)</description>
 		<year>1998</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -617,7 +618,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="all-star baseball '99 (usa).bin" size="524288" crc="d51ee6d3" sha1="49d13eef514d26cee37b10ff602e21a92b87b69d" />
+				<rom name="dmg-ab9e-0.u1" size="524288" crc="d51ee6d3" sha1="49d13eef514d26cee37b10ff602e21a92b87b69d" />
 			</dataarea>
 		</part>
 	</software>
@@ -778,7 +779,6 @@ license:CC0
 	</software>
 
 	<software name="amoudan2a">
-		<!--	In lot check as "dmgauj-1.434"	-->
 		<description>America Oudan Ultra Quiz Part 2 (Japan, Rev 1)</description>
 		<year>1991</year>
 		<publisher>Tomy</publisher>
@@ -788,7 +788,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="dmgauj-1.434" size="262144" crc="739c26fc" sha1="cb3ed70f4d095405df2c322c528cab2a00d56557"/>
+				<rom name="dmg-auj-1.u1" size="262144" crc="739c26fc" sha1="cb3ed70f4d095405df2c322c528cab2a00d56557"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2486,7 +2486,7 @@ license:CC0
 	</software>
 
 	<software name="bokujomnp" cloneof="harvmoon">
-		<!--	In lot check as "KENSA\dmgbywj0.0"	-->
+		<!--	Planned for physical release?	-->
 		<description>Bokujou Monogatari GB (Japan, NP)</description>
 		<year>1997</year>
 		<publisher>Victor Interactive Software</publisher>
@@ -2497,7 +2497,7 @@ license:CC0
 			<feature name="slot" value="rom_mbc3" />
 			<feature name="rtc" value="yes" />
 			<dataarea name="rom" size="524288">
-				<rom name="dmgbywj0.0" size="524288" crc="0424df85" sha1="551df2021d0e433e7f07cf881c7b1d534f54f6ad"/>
+				<rom name="dmg-bywj-0.u1" size="524288" crc="0424df85" sha1="551df2021d0e433e7f07cf881c7b1d534f54f6ad"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -2782,7 +2782,6 @@ license:CC0
 	</software>
 
 	<software name="boxxle" cloneof="boxxlea">
-		<!--	In lot check as "dmgsoe-0.020"	-->
 		<description>Boxxle (USA)</description>
 		<year>1990</year>
 		<publisher>FCI</publisher>
@@ -2791,7 +2790,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="32768">
-				<rom name="dmgsoe-0.020" size="32768" crc="24843867" sha1="3e169f1db16cc1c3ffbc8645aa7ce28194033d26"/>
+				<rom name="dmg-soe-0.u1" size="32768" crc="24843867" sha1="3e169f1db16cc1c3ffbc8645aa7ce28194033d26"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3212,7 +3211,7 @@ license:CC0
 	</software>
 
 	<software name="bam3dx">
-		<!--	In lot check as "Dmga3vp0.e84", "KENSA\DMGA3VE0.0"	-->
+		<!--	Planned for release in USA as "dmg-a3ve-0"	-->
 		<description>Bust-A-Move 3 DX (Europe)</description>
 		<year>1998</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -3220,7 +3219,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="bust-a-move 3 dx (europe).bin" size="131072" crc="e555c612" sha1="e89dc67087205c4113a4d152347eba38204e270b" />
+				<rom name="dmg-a3vp-0.u1" size="131072" crc="e555c612" sha1="e89dc67087205c4113a4d152347eba38204e270b" />
 			</dataarea>
 		</part>
 	</software>
@@ -6271,7 +6270,6 @@ license:CC0
 	</software>
 
 	<software name="fastlapu">
-		<!--	In lot check as "dmgf2e-0.411"	-->
 		<!--	Retail cartridge not yet secured	-->
 		<description>Fastest Lap (USA)</description>
 		<year>1991</year>
@@ -6281,7 +6279,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="dmgf2e-0.411" size="131072" crc="a9ba7875" sha1="25bf89b112c9b134b2e4d07354d1a762ab0d4e92"/>
+				<rom name="dmg-f2e-0.u1" size="131072" crc="a9ba7875" sha1="25bf89b112c9b134b2e4d07354d1a762ab0d4e92"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -6413,7 +6411,7 @@ license:CC0
 	</software>
 
 	<software name="fifa98a" cloneof="fifa98">
-		<!--	In lot check as "DMGA8SP0.D75", "KENSA\DMGA8SE0.4"	-->
+		<!--	Planned for release in USA as "dmg-a8se-0"	-->
 		<description>FIFA Road to the World Cup '98 (Europe)</description>
 		<year>1997</year>
 		<publisher>THQ</publisher>
@@ -7322,7 +7320,6 @@ license:CC0
 	</software>
 
 	<software name="gargoylea">
-		<!--	In lot check as "dmgrae-1.108"	-->
 		<!--	European release is a relabeled USA version	-->
 		<!--	Unreleased in USA?	-->
 		<description>Gargoyle's Quest - Ghosts'n Goblins (Europe, Rev 1)</description>
@@ -7334,7 +7331,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="dmgrae-1.108" size="131072" crc="b86ef7a5" sha1="21fbe39014ffed80d0de2092517522d3cb9b03f9"/>
+				<rom name="dmg-rae-1.u1" size="131072" crc="b86ef7a5" sha1="21fbe39014ffed80d0de2092517522d3cb9b03f9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7677,7 +7674,6 @@ license:CC0
 	</software>
 
 	<software name="giking">
-		<!--	In lot check as "dmggij-0.777"	-->
 		<!--	Retail cartridge not yet secured	-->
 		<description>GI King! - Sanbiki no Yosouya (Japan)</description>
 		<year>1993</year>
@@ -7695,7 +7691,7 @@ license:CC0
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="dmggij-0.777" size="131072" crc="f0dff737" sha1="65265b1c28173a6df0fede8c025cce56e752b1fd"/>
+				<rom name="dmg-gij-0.u1" size="131072" crc="f0dff737" sha1="65265b1c28173a6df0fede8c025cce56e752b1fd"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -8023,7 +8019,6 @@ license:CC0
 	</software>
 
 	<software name="gbskjtatie">
-		<!--	In lot check as "dmgbq2j0.k33"	-->
 		<description>Goukaku Boy GOLD - Shikakui Atama o Maruku Suru - Kanji no Tatsujin (Japan, Alt)</description>
 		<year>2003</year>
 		<publisher>IE Institute</publisher>
@@ -8033,7 +8028,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="dmgbq2j0.k33" size="1048576" crc="180d54a7" sha1="7dce0adcbac61f0caae33646847fd06ced8c8b67"/>
+				<rom name="dmg-bq2j-0.u1" size="1048576" crc="180d54a7" sha1="7dce0adcbac61f0caae33646847fd06ced8c8b67"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -8065,7 +8060,6 @@ license:CC0
 	</software>
 
 	<software name="gbskstatie">
-		<!--	In lot check as "dmgbc6j0.k32"	-->
 		<description>Goukaku Boy GOLD - Shikakui Atama o Maruku Suru - Keisan no Tatsujin (Japan, Alt)</description>
 		<year>2003</year>
 		<publisher>IE Institute</publisher>
@@ -8075,7 +8069,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="dmgbc6j0.k32" size="1048576" crc="04214f92" sha1="6b8726c69a31e674a4c5ab02631de073d42e7d52"/>
+				<rom name="dmg-bc6j-0.u1" size="1048576" crc="04214f92" sha1="6b8726c69a31e674a4c5ab02631de073d42e7d52"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -9462,7 +9456,6 @@ license:CC0
 	</software>
 
 	<software name="hyperloda">
-		<!--	In lot check as "dmghla-1.011"	-->
 		<!--	Region code "A"	-->
 		<description>Hyper Lode Runner (World, Rev 1)</description>
 		<year>1989</year>
@@ -9480,7 +9473,6 @@ license:CC0
 	</software>
 
 	<software name="hyperlod" cloneof="hyperloda">
-		<!--	In lot check as "dmghla-0.011"	-->
 		<!--	Retail cartridge not yet secured	-->
 		<!--	Region code "A"	-->
 		<description>Hyper Lode Runner (Japan?)</description>
@@ -9492,7 +9484,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="32768">
-				<rom name="dmghla-0.011" size="32768" crc="3fc21b74" sha1="37d0f2cbac0f95af8b22dea0c882612681ec5cc8"/>
+				<rom name="dmg-hla-0.u1" size="32768" crc="3fc21b74" sha1="37d0f2cbac0f95af8b22dea0c882612681ec5cc8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10097,7 +10089,7 @@ license:CC0
 	</software>
 
 	<software name="jellyboy">
-		<!--	In lot check as "DMGAJBP0.A52", "POOL\DMGAJBE0"	-->
+		<!--	Planned for release in USA as "dmg-ajbe-0"	-->
 		<description>Jelly Boy (Europe)</description>
 		<year>1991</year>
 		<publisher>Ocean</publisher>
@@ -10105,7 +10097,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="jelly boy (europe).bin" size="262144" crc="7e6598bb" sha1="579579d660cdc84af2428ccd1b30b40a2fb592fa" />
+				<rom name="dmg-ajbp-0.u1" size="262144" crc="7e6598bb" sha1="579579d660cdc84af2428ccd1b30b40a2fb592fa" />
 			</dataarea>
 		</part>
 	</software>
@@ -10124,7 +10116,7 @@ license:CC0
 	</software>
 
 	<software name="jeopardp">
-		<!--	In lot check as "DMGAJPE0.C68", "POOL\DMGAJPP0"	-->
+		<!--	Planned for release in Europe as "dmg-ajpp-0"	-->
 		<description>Jeopardy! - Platinum Edition (USA)</description>
 		<year>1996</year>
 		<publisher>GameTek</publisher>
@@ -10133,7 +10125,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="jeopardy - platinum edition (usa).bin" size="131072" crc="5206fd09" sha1="35934633a9b301d734a6fced7c56d55eba0385aa" />
+				<rom name="dmg-ajpe-0.u1" size="131072" crc="5206fd09" sha1="35934633a9b301d734a6fced7c56d55eba0385aa" />
 			</dataarea>
 		</part>
 	</software>
@@ -10152,7 +10144,7 @@ license:CC0
 	</software>
 
 	<software name="jeopardt">
-		<!--	In lot check as "DMGAJQE0.C69", "POOL\DMGAJQP0"	-->
+		<!--	Planned for release in Europe as "dmg-ajqp-0"	-->
 		<description>Jeopardy! - Teen Tournament (USA)</description>
 		<year>1996</year>
 		<publisher>GameTek</publisher>
@@ -10161,13 +10153,12 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="jeopardy - teen tournament (usa).bin" size="131072" crc="cd3df0c1" sha1="20c71f434ef093fac9361fa1db9c2282c938dd71" />
+				<rom name="dmg-ajqe-0.u1" size="131072" crc="cd3df0c1" sha1="20c71f434ef093fac9361fa1db9c2282c938dd71" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="jetsonsa">
-		<!--	In lot check as "dmgjse-1.588"	-->
 		<!--	Retail cartridge not yet secured	-->
 		<description>The Jetsons - Robot Panic (USA, Rev 1)</description>
 		<year>1992</year>
@@ -10177,7 +10168,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="dmgjse-1.588" size="131072" crc="cc38cf0d" sha1="38b5ec2c74316696b7731cd88e56be4519084168"/>
+				<rom name="dmg-jse-1.u1" size="131072" crc="cc38cf0d" sha1="38b5ec2c74316696b7731cd88e56be4519084168"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10443,7 +10434,6 @@ license:CC0
 	</software>
 
 	<software name="jstrikeu" cloneof="jstrike">
-		<!--	In lot check as "dmgajge0.a85"	-->
 		<!--	Retail cartridge not yet secured	-->
 		<description>Jungle Strike (USA)</description>
 		<year>1995</year>
@@ -10453,7 +10443,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="dmgajge0.a85" size="262144" crc="7a8cdbe8" sha1="ea8b7a5d8d16b4448a3d758fff1f91f27db60292"/>
+				<rom name="dmg-ajge-0.u1" size="262144" crc="7a8cdbe8" sha1="ea8b7a5d8d16b4448a3d758fff1f91f27db60292"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10713,7 +10703,6 @@ license:CC0
 	</software>
 
 	<software name="kasekia">
-		<!--	In lot check as "dmgakrj1.e41"	-->
 		<!--	Retail cartridge not yet secured	-->
 		<description>Kaseki Sousei Reborn (Japan, Rev 1)</description>
 		<year>1998</year>
@@ -10725,7 +10714,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="dmgakrj1.e41" size="524288" crc="7c94197c" sha1="5759394e2e8bfd68ccf5519362572daaba003573"/>
+				<rom name="dmg-akrj-1.u1" size="524288" crc="7c94197c" sha1="5759394e2e8bfd68ccf5519362572daaba003573"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -11104,7 +11093,6 @@ license:CC0
 	</software>
 
 	<software name="kininkoa">
-		<!--	In lot check as "dmgonj-1.153"	-->
 		<description>Kinin Koumaroku Oni (Japan, Rev 1)</description>
 		<year>1990</year>
 		<publisher>Banpresto</publisher>
@@ -11114,7 +11102,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc2" />
 			<dataarea name="rom" size = "131072">
-				<rom name="dmgonj-1.153.gb" size="131072" crc="aaf6366c" sha1="298965bc2b99e49339618914114abfd0962560c1" offset="0"/>
+				<rom name="dmg-onj-1.u1" size="131072" crc="aaf6366c" sha1="298965bc2b99e49339618914114abfd0962560c1" offset="0"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -11260,7 +11248,8 @@ license:CC0
 	</software>
 
 	<software name="kirby2">
-		<!--	In lot check as "DMGAKBE0.A66", "DMGAKBP0.A74", "POOL\DMGAKBP0"	-->
+		<!--	USA version released as "dmg-akbe-0"	-->
+		<!--	Retail cartridge of USA version not yet secured	-->
 		<description>Kirby's Dream Land 2 (Australia, Europe, USA)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
@@ -11889,7 +11878,7 @@ license:CC0
 	</software>
 
 	<software name="rivkingu" cloneof="rivking">
-		<!--	In lot check as "Dmgafhe0.e42", "KENSA\Dmgafhp0.2"	-->
+		<!--	Planned for release in Europe as "dmg-afhp-0"	-->
 		<description>Legend of the River King GB (USA)</description>
 		<year>1999</year>
 		<publisher>Natsume</publisher>
@@ -11898,7 +11887,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="legend of the river king gb (usa).bin" size="524288" crc="a6e685dc" sha1="d2e8a9aceec8639b528f712532a38fe0c2b0edef" />
+				<rom name="dmg-afhe-0.u1" size="524288" crc="a6e685dc" sha1="d2e8a9aceec8639b528f712532a38fe0c2b0edef" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -11906,7 +11895,6 @@ license:CC0
 	</software>
 
 	<software name="zeldalnk">
-		<!--	In lot check as "DMGZLE-2.858"	-->
 		<!--	Region code "E" (USA)	-->
 		<description>The Legend of Zelda - Link's Awakening (Europe, USA, Rev 2)</description>
 		<year>1993</year>
@@ -11924,7 +11912,6 @@ license:CC0
 	</software>
 
 	<software name="zeldalnka" cloneof="zeldalnk">
-		<!--	In lot check as "DMGZLE-1.858"	-->
 		<!--	Region code "E" (USA)	-->
 		<description>The Legend of Zelda - Link's Awakening (Canada, Europe, USA, Rev 1)</description>
 		<year>1993</year>
@@ -11942,7 +11929,6 @@ license:CC0
 	</software>
 
 	<software name="zeldalnkb" cloneof="zeldalnk">
-		<!--	In lot check as "DMGZLE-0.858"	-->
 		<!--	Region code "E" (USA)	-->
 		<description>The Legend of Zelda - Link's Awakening (Canada, Europe, USA)</description>
 		<year>1993</year>
@@ -11966,7 +11952,6 @@ license:CC0
 	</software>
 
 	<software name="zeldalnkc" cloneof="zeldalnk">
-		<!--	In lot check as "DMGZCF-0.888"	-->
 		<description>The Legend of Zelda - Link's Awakening (Canada, French)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
@@ -11989,7 +11974,6 @@ license:CC0
 	</software>
 
 	<software name="zeldalnkf" cloneof="zeldalnk">
-		<!--	In lot check as "DMGZLF-0.872"	-->
 		<description>The Legend of Zelda - Link's Awakening (France)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
@@ -12012,7 +11996,6 @@ license:CC0
 	</software>
 
 	<software name="zeldalnkg" cloneof="zeldalnk">
-		<!--	In lot check as "DMGZLD-0.873"	-->
 		<description>The Legend of Zelda - Link's Awakening (Germany)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
@@ -12092,7 +12075,7 @@ license:CC0
 	</software>
 
 	<software name="lemming2">
-		<!--	In lot check as "DMGAL2P0.@93", "POOL\DMGAL2E0"	-->
+		<!--	Planned for release in USA as "dmg-al2e-0"	-->
 		<description>Lemmings 2 - The Tribes (Europe)</description>
 		<year>1994</year>
 		<publisher>Psygnosis</publisher>
@@ -12100,7 +12083,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="lemmings 2 - the tribes (europe).bin" size="524288" crc="9800bd49" sha1="76ccf9ac82faebc7f9c4a4c8b5cd47ddea46c486" />
+				<rom name="dmg-al2p-0.u1" size="524288" crc="9800bd49" sha1="76ccf9ac82faebc7f9c4a4c8b5cd47ddea46c486" />
 			</dataarea>
 		</part>
 	</software>
@@ -12481,7 +12464,7 @@ license:CC0
 	</software>
 
 	<software name="madden97">
-		<!--	In lot check as "DMGA7ME0.C47", "POOL\DMGA7MP0"	-->
+		<!--	Planned for release in Europe as "dmg-a7mp-0"	-->
 		<description>Madden '97 (USA)</description>
 		<year>1995</year>
 		<publisher>Black Pearl</publisher>
@@ -12490,7 +12473,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="madden '97 (usa).bin" size="524288" crc="88a837a2" sha1="e1d92b6afdd7dc2254c895ad8a9a066262fb214b" />
+				<rom name="dmg-a7me-0.u1" size="524288" crc="88a837a2" sha1="e1d92b6afdd7dc2254c895ad8a9a066262fb214b" />
 			</dataarea>
 		</part>
 	</software>
@@ -12934,7 +12917,7 @@ license:CC0
 	</software>
 
 	<software name="mauimall">
-		<!--	In lot check as "Dmgamie0.e45", "KENSA\Dmgamip0.1"	-->
+		<!--	Planned for release in Europe as "dmg-amip-0"	-->
 		<description>Maui Mallard (USA)</description>
 		<year>1998</year>
 		<publisher>Sunsoft</publisher>
@@ -12944,7 +12927,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="maui mallard (usa).bin" size="262144" crc="6f30a43a" sha1="eb401c5ddff1488013ff032918ed365e82104ae0" />
+				<rom name="dmg-amie-0.u1" size="262144" crc="6f30a43a" sha1="eb401c5ddff1488013ff032918ed365e82104ae0" />
 			</dataarea>
 		</part>
 	</software>
@@ -13518,7 +13501,6 @@ license:CC0
 	</software>
 
 	<software name="mickey5" cloneof="mickeymw">
-		<!--	In lot check as "dmgi5j-0.933"	-->
 		<description>Mickey Mouse V (Japan)</description>
 		<year>1993</year>
 		<publisher>Kemco</publisher>
@@ -13535,7 +13517,6 @@ license:CC0
 	</software>
 
 	<software name="mickey5a" cloneof="mickeymw">
-		<!--	In lot check as "dmgi5j-1.933"	-->
 		<description>Mickey Mouse V (Japan, Rev 1)</description>
 		<year>1993</year>
 		<publisher>Kemco</publisher>
@@ -13545,7 +13526,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="dmgi5j-1.933" size="131072" crc="464eaa5d" sha1="095285ec078124e3a4cbbfa3ac0d7680ee491e2b"/>
+				<rom name="dmg-i5j-1.u1" size="131072" crc="464eaa5d" sha1="095285ec078124e3a4cbbfa3ac0d7680ee491e2b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14581,7 +14562,7 @@ license:CC0
 	</software>
 
 	<software name="mrnutz">
-		<!--	In lot check as "DMGAN8P0.A12", "POOL\DMGAN8E0"	-->
+		<!--	Planned for release in USA as "dmg-an8e-0"	-->
 		<description>Mr Nutz (Europe)</description>
 		<year>1994</year>
 		<publisher>Ocean</publisher>
@@ -14589,7 +14570,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="mr nutz (europe).bin" size="262144" crc="03b64a35" sha1="c3dc8fa1aebc92b07eacd6c78aece7c6dd33429d" />
+				<rom name="dmg-an8p-0.u1" size="262144" crc="03b64a35" sha1="c3dc8fa1aebc92b07eacd6c78aece7c6dd33429d" />
 			</dataarea>
 		</part>
 	</software>
@@ -14715,7 +14696,6 @@ license:CC0
 	</software>
 
 	<software name="mulanu" cloneof="mulan">
-		<!--	In lot check as "dmgamle0.e74"	-->
 		<!--	Retail cartridge not yet secured	-->
 		<description>Disney's Mulan (USA)</description>
 		<year>1998</year>
@@ -14726,7 +14706,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="dmgamle0.e74" size="524288" crc="bfcf71a1" sha1="7832fcc373ff752e757550079519b39583665c82"/>
+				<rom name="dmg-amle-0.u1" size="524288" crc="bfcf71a1" sha1="7832fcc373ff752e757550079519b39583665c82"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15517,7 +15497,6 @@ license:CC0
 	</software>
 
 	<software name="wh2ja" cloneof="wh2">
-		<!--	In lot check as "dmgawjj1.a40"	-->
 		<description>Nettou World Heroes 2 Jet (Japan, Rev 1)</description>
 		<year>1995</year>
 		<publisher>Takara</publisher>
@@ -15528,7 +15507,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="dmgawjj1.a40" size="524288" crc="7c5ffe52" sha1="14bc507f479e814b0131febfab19f2ef30eb23a5"/>
+				<rom name="dmg-awjj-1.u1" size="524288" crc="7c5ffe52" sha1="14bc507f479e814b0131febfab19f2ef30eb23a5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16376,7 +16355,6 @@ license:CC0
 	</software>
 
 	<software name="pacintima">
-		<!--	In lot check as "dmgaptp1.a96"	-->
 		<!--	Retail cartridge not yet secured	-->
 		<description>Pac-In-Time (Europe, Rev 1)</description>
 		<year>1995</year>
@@ -16387,7 +16365,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="dmgaptp1.a96" size="262144" crc="7ff79df9" sha1="f30108b8e422c4b9776c90c884710194508545ea"/>
+				<rom name="dmg-aptp-1.u1" size="262144" crc="7ff79df9" sha1="f30108b8e422c4b9776c90c884710194508545ea"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16446,7 +16424,6 @@ license:CC0
 	</software>
 
 	<software name="pacman">
-		<!--	In lot check as "DMGPCX-0.412"	-->
 		<description>Pac-Man (Europe)</description>
 		<year>1991</year>
 		<publisher>Namco</publisher>
@@ -16464,8 +16441,6 @@ license:CC0
 	</software>
 
 	<software name="pacmanj" cloneof="pacman">
-		<!--	In lot check as "dmgpca-0.159"	-->
-		<!--	Lot check ROM is padded with FFs to twice its size, but correct size is 512kb (64KB) according to the official release spreadsheet	-->
 		<!--	Retail cartridge not yet secured	-->
 		<!--	Region code "A"	-->
 		<!-- Also released via the Nintendo Power service in 2000-03 -->
@@ -16484,7 +16459,6 @@ license:CC0
 	</software>
 
 	<software name="pacmanu" cloneof="pacman">
-		<!--	In lot check as "DMGPCE-0.264"	-->
 		<description>Pac-Man (USA)</description>
 		<year>1991</year>
 		<publisher>Namco</publisher>
@@ -16887,7 +16861,6 @@ license:CC0
 	</software>
 
 	<software name="pang">
-		<!--	In lot check as "dmgagx-0.897"	-->
 		<!--	Retail cartridge not yet secured	-->
 		<description>Pang (UK)</description>
 		<year>1993</year>
@@ -17468,7 +17441,7 @@ license:CC0
 	</software>
 
 	<software name="pockbman">
-		<!--	In lot check as "DMGAKOP0.D90", "KENSA\DMGAKOE0.0"	-->
+		<!--	Planned for release in USA as "dmg-akoe-0"	-->
 		<description>Pocket Bomberman (Europe)</description>
 		<year>1998</year>
 		<publisher>Hudson Soft</publisher>
@@ -17477,7 +17450,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="pocket bomberman (europe).bin" size="524288" crc="0fd1ae54" sha1="34f377a6de2961fe16bfb854e0cebc7fdba7cf4b" />
+				<rom name="dmg-akop-0.u1" size="524288" crc="0fd1ae54" sha1="34f377a6de2961fe16bfb854e0cebc7fdba7cf4b" />
 			</dataarea>
 		</part>
 	</software>
@@ -17884,8 +17857,8 @@ license:CC0
 	</software>
 
 	<software name="poktpuyoa">
-		<!--	In lot check as "KENSA\dmgapyj1.0"	-->
 		<!-- NP only -->
+		<!--	Planned for physical release?	-->
 		<description>Pocket Puyo Puyo Tsuu (Japan, Rev 1, NP)</description>
 		<year>1996</year>
 		<publisher>Compile</publisher>
@@ -17896,7 +17869,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="dmgapyj1.0" size="262144" crc="cae8a317" sha1="36b677b76af12287cdbdec9ae06ca3f9dbfc1e67"/>
+				<rom name="dmg-apyj-1.u1" size="262144" crc="cae8a317" sha1="36b677b76af12287cdbdec9ae06ca3f9dbfc1e67"/>
 			</dataarea>
 		</part>
 	</software>
@@ -18383,7 +18356,6 @@ license:CC0
 	</software>
 
 	<software name="popeye2ja" cloneof="popeye2">
-		<!--	In lot check as "dmgpgj-1.403"	-->
 		<description>Popeye 2 (Japan, Rev 1)</description>
 		<year>1991</year>
 		<publisher>Sigma</publisher>
@@ -18393,7 +18365,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="dmgpgj-1.403" size="131072" crc="8cd93719" sha1="7c4ac88e7a9f034da08ee84f299d9093e40213fd"/>
+				<rom name="dmg-pgj-1.u1" size="131072" crc="8cd93719" sha1="7c4ac88e7a9f034da08ee84f299d9093e40213fd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -18814,8 +18786,8 @@ license:CC0
 	</software>
 
 	<software name="purikuraa">
-		<!--	In lot check as "KENSA\dmgappj1.0"	-->
 		<!-- NP only -->
+		<!--	Planned for physical release?	-->
 		<description>Purikura Pocket - Fukanzen Joshikousei Manual (Japan, Rev 1, NP)</description>
 		<year>1997</year>
 		<publisher>Atlus</publisher>
@@ -18825,7 +18797,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="dmgappj1.0" size="524288" crc="57e9c17d" sha1="90929296b16d89130969041271327bcaa2b6a73e"/>
+				<rom name="dmg-appj-1.u1" size="524288" crc="57e9c17d" sha1="90929296b16d89130969041271327bcaa2b6a73e"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -19989,7 +19961,6 @@ license:CC0
 	</software>
 
 	<software name="mvpbba">
-		<!--	In lot check as "dmgvme-1.640"	-->
 		<description>Roger Clemens' MVP Baseball (USA, Rev 1)</description>
 		<year>1992</year>
 		<publisher>LJN</publisher>
@@ -19999,7 +19970,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="dmgvme-1.640" size="262144" crc="fa955b39" sha1="678ea6ec765c467862be861d2c61fbb3a582c1f2"/>
+				<rom name="dmg-vme-1.u1" size="262144" crc="fa955b39" sha1="678ea6ec765c467862be861d2c61fbb3a582c1f2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -23109,7 +23080,6 @@ license:CC0
 	</software>
 
 	<software name="suzukif1">
-		<!--	In lot check as "dmgfqj-0.803", "POOL\dmgfqj-0"	-->
 		<!--	Retail cartridge not yet secured	-->
 		<description>Suzuki Aguri no F-1 Super Driving (Japan)</description>
 		<year>1993</year>
@@ -23121,7 +23091,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="dmgfqj-0.803" size="262144" crc="7fe42a7f" sha1="40f1280c87918307ebc2a3f2ec1ce9b66ff9a67b"/>
+				<rom name="dmg-fqj-0.u1" size="262144" crc="7fe42a7f" sha1="40f1280c87918307ebc2a3f2ec1ce9b66ff9a67b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -23215,7 +23185,7 @@ license:CC0
 	</software>
 
 	<software name="swordho2">
-		<!--	In lot check as "DMGSIE0.C34", "POOL\DMGSIE-0.3", "POOL\DMGSIX-0.0"	-->
+		<!--	Planned for release in UK as "dmg-six-0"	-->
 		<description>The Sword of Hope II (USA)</description>
 		<year>1996</year>
 		<publisher>Kemco</publisher>
@@ -23223,7 +23193,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="sword of hope ii, the (usa).bin" size="262144" crc="5b7ff38c" sha1="3ccb37fd8e6e39a9e8421ee6f1ae199b4586afc1" />
+				<rom name="dmg-sie-0.u1" size="262144" crc="5b7ff38c" sha1="3ccb37fd8e6e39a9e8421ee6f1ae199b4586afc1" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -23549,7 +23519,7 @@ license:CC0
 	</software>
 
 	<software name="tazmani2u" cloneof="tazmania">
-		<!--	In lot check as "DMGATZE0.C83", "POOL\DMGATZP0"	-->
+		<!--	Planned for release in Europe as "dmg-atzp-0"	-->
 		<description>Taz-Mania 2 (USA, THQ)</description>
 		<year>1997</year>
 		<publisher>THQ</publisher>
@@ -23557,7 +23527,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="taz-mania 2 (usa).bin" size="131072" crc="4ccb65e0" sha1="60116a304e85f04209dc7eb64d9649dc41c963f6" />
+				<rom name="dmg-atze-0.u1" size="131072" crc="4ccb65e0" sha1="60116a304e85f04209dc7eb64d9649dc41c963f6" />
 			</dataarea>
 		</part>
 	</software>
@@ -23637,7 +23607,6 @@ license:CC0
 	</software>
 
 	<software name="tmnt3a" cloneof="tmnt3">
-		<!--	In lot check as "dmgk8x-1.918"	-->
 		<!--	Retail cartridge not yet secured	-->
 		<description>Teenage Mutant Hero Turtles III - Radical Rescue (Europe, Rev 1)</description>
 		<year>1993</year>
@@ -23647,7 +23616,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="dmgk8x-1.918" size="131072" crc="5b7c9a54" sha1="5f01016c06c7d52bb434540b9ca327abe5039936"/>
+				<rom name="dmg-k8x-1.u1" size="131072" crc="5b7c9a54" sha1="5f01016c06c7d52bb434540b9ca327abe5039936"/>
 			</dataarea>
 		</part>
 	</software>
@@ -23914,7 +23883,6 @@ license:CC0
 	</software>
 
 	<software name="tetris2a">
-		<!--	In lot check as "dmgehx-1.@08"	-->
 		<description>Tetris 2 (Europe, Rev 1)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
@@ -23923,13 +23891,12 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="dmgehx-1.@08" size="131072" crc="25c3100a" sha1="51bdceed8fc384b593444a5306b6a46a4672c96b"/>
+				<rom name="dmg-ehx-1.u1" size="131072" crc="25c3100a" sha1="51bdceed8fc384b593444a5306b6a46a4672c96b"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="tetris2" cloneof="tetris2a">
-		<!--	In lot check as "dmgehx-0.@08"	-->
 		<!--	USA rerelease is a relabeled European cartridge?	-->
 		<description>Tetris 2 (Europe, USA)</description>
 		<year>1994</year>
@@ -23949,7 +23916,6 @@ license:CC0
 	</software>
 
 	<software name="tetris2u" cloneof="tetris2a">
-		<!--	In lot check as "dmgehe-0.926"	-->
 		<!--	Original USA-only release	-->
 		<description>Tetris 2 (USA)</description>
 		<year>1994</year>
@@ -24078,7 +24044,6 @@ license:CC0
 	</software>
 
 	<software name="tintinx">
-		<!--	In lot check as "dmgat6x0.c13"	-->
 		<description>Tintin in Tibet (Europe, En / Es / It / Sv)</description>
 		<year>1994</year>
 		<publisher>Infogrames</publisher>
@@ -24088,7 +24053,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="dmgat6x0.c13" size="262144" crc="7a7d820f" sha1="a69bee8c26a520b648a780c67e4a73d54e1bf812"/>
+				<rom name="dmg-at6x-0.u1" size="262144" crc="7a7d820f" sha1="a69bee8c26a520b648a780c67e4a73d54e1bf812"/>
 			</dataarea>
 		</part>
 	</software>
@@ -25479,7 +25444,7 @@ license:CC0
 	</software>
 
 	<software name="waterwrl">
-		<!--	In lot check as "DMGAWEP0.B72", "POOL\DMGAWEE0.1"	-->
+		<!--	Planned for release in USA as "dmg-awee-0"	-->
 		<description>Water World (Europe)</description>
 		<year>1995</year>
 		<publisher>Ocean</publisher>
@@ -25487,7 +25452,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="water world (europe).bin" size="262144" crc="4786fd6e" sha1="e669d47b124a1e12d73f4ac80d8b4c0f917cb058" />
+				<rom name="dmg-awep-0.u1" size="262144" crc="4786fd6e" sha1="e669d47b124a1e12d73f4ac80d8b4c0f917cb058" />
 			</dataarea>
 		</part>
 	</software>
@@ -25870,7 +25835,6 @@ license:CC0
 	</software>
 
 	<software name="wcstrikrx" cloneof="soccer">
-		<!--	In lot check as "dmgykx-0.999"	-->
 		<!--	Retail cartridge not yet secured, might be unreleased	-->
 		<description>World Cup Striker (Europe, En / Fra / Ger)</description>
 		<year>1994</year>
@@ -25880,7 +25844,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="dmgykx-0.999" size="131072" crc="40418964" sha1="4c976fc98a85089cfae7e7af7de6baef31e39f92"/>
+				<rom name="dmg-ykx-0.u1" size="131072" crc="40418964" sha1="4c976fc98a85089cfae7e7af7de6baef31e39f92"/>
 			</dataarea>
 		</part>
 	</software>
@@ -25982,7 +25946,7 @@ license:CC0
 	</software>
 
 	<software name="worms">
-		<!--	In lot check as "DmGaw3P0.B96", "POOL\DMGAW3E0.0"	-->
+		<!--	Planned for release in USA as "dmg-aw3e-0"	-->
 		<description>Worms (Europe)</description>
 		<year>1995</year>
 		<publisher>Ocean</publisher>
@@ -25990,7 +25954,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="worms (europe).bin" size="262144" crc="2ebc40c2" sha1="26137ca97b840c63a462bcf85677a5f3db67fadf" />
+				<rom name="dmg-aw3p-0.u1" size="262144" crc="2ebc40c2" sha1="26137ca97b840c63a462bcf85677a5f3db67fadf" />
 			</dataarea>
 		</part>
 	</software>
@@ -26475,7 +26439,6 @@ license:CC0
 	</software>
 
 	<software name="zeldalnkj" cloneof="zeldalnk">
-		<!--	In lot check as "DMGZLJ-1.836"	-->
 		<description>Zelda no Densetsu - Yume o Miru Shima (China, Japan, Rev 1)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
@@ -26493,7 +26456,6 @@ license:CC0
 	</software>
 
 	<software name="zeldalnkja" cloneof="zeldalnk">
-		<!--	In lot check as "DMGZLJ-0.836"	-->
 		<description>Zelda no Densetsu - Yume o Miru Shima (Japan)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
