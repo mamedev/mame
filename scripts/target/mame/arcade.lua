@@ -3608,6 +3608,8 @@ files {
 	MAME_DIR .. "src/mame/includes/vicdual.h",
 	MAME_DIR .. "src/mame/audio/vicdual.cpp",
 	MAME_DIR .. "src/mame/audio/vicdual.h",
+	MAME_DIR .. "src/mame/audio/nl_brdrline.cpp",
+	MAME_DIR .. "src/mame/audio/nl_brdrline.h",
 	MAME_DIR .. "src/mame/audio/vicdual-97271p.cpp",
 	MAME_DIR .. "src/mame/audio/vicdual-97271p.h",
 	MAME_DIR .. "src/mame/video/vicdual.cpp",

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Derrick Renaud, Couriersud
+// copyright-holders:Derrick Renaud, Couriersud, Aaron Giles
 /*************************************************************************
 
     VIC Dual Game board
@@ -8,6 +8,8 @@
 
 #include "emu.h"
 #include "includes/vicdual.h"
+
+#include "audio/nl_brdrline.h"
 
 
 /************************************************************************
@@ -479,104 +481,7 @@ void vicdual_state::invho2_audio_w(uint8_t data)
 
 }
 
-/************************************************************************
- * brdrline Sound System Analog emulation
- * May 2006, Derrick Renaud
- ************************************************************************/
-#if 0
-
-
-/* Discrete Sound Input Nodes */
-#define BRDRLINE_GUN_TRG_EN         NODE_01
-#define BRDRLINE_JEEP_ON_EN         NODE_02
-#define BRDRLINE_POINT_TRG_EN       NODE_03
-#define BRDRLINE_HIT_TRG_EN         NODE_04
-#define BRDRLINE_ANIMAL_TRG_EN      NODE_05
-#define BRDRLINE_EMAR_TRG_EN        NODE_06
-#define BRDRLINE_WALK_TRG_EN        NODE_07
-#define BRDRLINE_CRY_TRG_EN         NODE_08
-
-/* Nodes - Sounds */
-#define BRDRLINE_GUN_TRG_SND        NODE_91
-#define BRDRLINE_JEEP_ON_SND        NODE_92
-#define BRDRLINE_POINT_TRG_SND      NODE_93
-#define BRDRLINE_HIT_TRG_SND        NODE_94
-#define BRDRLINE_ANIMAL_TRG_SND     NODE_95
-#define BRDRLINE_EMAR_TRG_SND       NODE_96
-#define BRDRLINE_WALK_TRG_SND       NODE_97
-#define BRDRLINE_CRY_TRG_SND        NODE_98
-
-DISCRETE_SOUND_START(brdrline_discrete)
-	/************************************************
-	 * Input register mapping
-	 ************************************************/
-	DISCRETE_INPUT_LOGIC(BRDRLINE_GUN_TRG_EN)
-	DISCRETE_INPUT_LOGIC(BRDRLINE_JEEP_ON_EN)
-	DISCRETE_INPUT_LOGIC(BRDRLINE_POINT_TRG_EN)
-	DISCRETE_INPUT_LOGIC(BRDRLINE_HIT_TRG_EN)
-	DISCRETE_INPUT_LOGIC(BRDRLINE_ANIMAL_TRG_EN)
-	DISCRETE_INPUT_LOGIC(BRDRLINE_EMAR_TRG_EN)
-	DISCRETE_INPUT_LOGIC(BRDRLINE_WALK_TRG_EN)
-	DISCRETE_INPUT_LOGIC(BRDRLINE_CRY_TRG_EN)
-
-	/************************************************
-	 * GUN TRG
-	 ************************************************/
-	DISCRETE_LFSR_NOISE(NODE_10, 1, 1,CLK,AMPL,FEED,BIAS,LFSRTB)
-	DISCRETE_MIXER2(NODE_11, 1, NODE_10,IN1,INFO)
-	DISCRETE_FILTER2(NODE_12, 1, NODE_11,FREQ,DAMP,TYPE)
-	DISCRETE_ONESHOT(NODE_13, BRDRLINE_GUN_TRG_EN, DEFAULT_TTL_V_LOGIC_1,
-		TIME_OF_74LS123(RES_K(47), CAP_U(1)),   // R155, C73
-		DISC_ONESHOT_FEDGE | DISC_ONESHOT_RETRIG | DISC_OUT_ACTIVE_LOW)
-	DISCRETE_RCDISC4(NODE_14, 1, NODE_13,RVAL0,RVAL1,RVAL2,CVAL,VP,TYPE)
-	DISCRETE_VCA(BRDRLINE_GUN_TRG_SND, 1, NODE_12, NODE_14,TYPE)
-
-	/************************************************
-	 * JEEP ON
-	 ************************************************/
-	DISCRETE_555_ASTABLE(NODE_20, BRDRLINE_JEEP_ON_EN,
-		RES_K(1),   // R150
-		RES_K(33),  // R153
-		CAP_U(.1),  // C72
-		OPTIONS)
-	DISCRETE_COUNTER(NODE_21, 1, 1, NODE_20,MIN,MAX,DIR,INIT0, DISC_CLK_BY_COUNT)
-	DISCRETE_COUNTER(NODE_22, 1, 1, NODE_20,MIN,MAX,DIR,INIT0, DISC_CLK_BY_COUNT)
-	DISCRETE_TRANSFORM3(NODE,INP0,INP1,INP2,FUNCT)
-	DISCRETE_DAC_R1(NODE,DATA,VDATA,LADDER)
-
-	/************************************************
-	 * POINT TRG
-	 ************************************************/
-
-	/************************************************
-	 * HIT TRG
-	 ************************************************/
-
-	/************************************************
-	 * ANIMAL TRG
-	 ************************************************/
-
-	/************************************************
-	 * EMAR TRG
-	 ************************************************/
-
-	/************************************************
-	 * WALK TRG
-	 ************************************************/
-
-	/************************************************
-	 * CRY TRG
-	 ************************************************/
-
-	/************************************************
-	 * Mixer
-	 ************************************************/
-
-	DISCRETE_OUTPUT(NODE_90, 1)
-
-DISCRETE_SOUND_END
-#endif
-
+/*
 static const char *const brdrline_sample_names[] =
 {
 	"*brdrline",
@@ -630,3 +535,55 @@ void vicdual_state::brdrline_audio_aux_w(uint8_t data)
 	else // boot sample
 		m_samples->start(0, 0);
 }
+*/
+
+
+
+/*************************************
+ *
+ *  Borderline
+ *
+ *************************************/
+
+borderline_audio_device::borderline_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, BORDERLINE_AUDIO, tag, owner, clock),
+	device_mixer_interface(mconfig, *this),
+	m_input_line(*this, "sound_nl:in_%u", 0)
+{
+}
+
+void borderline_audio_device::device_add_mconfig(machine_config &config)
+{
+	NETLIST_SOUND(config, "sound_nl", 48000)
+		.set_source(NETLIST_NAME(brdrline))
+		.add_route(ALL_OUTPUTS, *this, 1.0);
+
+	NETLIST_LOGIC_INPUT(config, m_input_line[7], "GUN_TRG.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_input_line[6], "JEEP_ON.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_input_line[5], "POINT_TRG.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_input_line[4], "HIT_TRG.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_input_line[3], "WALK_TRG.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_input_line[2], "EMAR_TRG.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_input_line[1], "CRY_TRG.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_input_line[0], "ANIMAL_TRG.IN", 0);
+
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(1.0, 0.0);
+}
+
+void borderline_audio_device::device_start()
+{
+	save_item(NAME(m_input_state));
+}
+
+void borderline_audio_device::write(u8 value)
+{
+	if (value != m_input_state)
+	{
+		m_input_state = value;
+		for (int index = 0; index < 8; index++)
+			if (m_input_line[index] != nullptr)
+				m_input_line[index]->write_line(BIT(m_input_state, index));
+	}
+}
+
+DEFINE_DEVICE_TYPE(BORDERLINE_AUDIO, borderline_audio_device, "borderline_audio", "Borderline Sound Board")
