@@ -4557,3 +4557,14 @@ if (MACHINES["BL_HANDHELDS_MENUCONTROL"]~=null) then
 		MAME_DIR .. "src/devices/machine/bl_handhelds_menucontrol.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/ns32081.h,MACHINES["NS32081"] = true
+---------------------------------------------------
+if (MACHINES["NS32081"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/ns32081.cpp",
+		MAME_DIR .. "src/devices/machine/ns32081.h",
+	}
+end
