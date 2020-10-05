@@ -743,7 +743,7 @@ ROM_START( tetgiano )
 ROM_END
 
 
-#define GAME_FLAGS (MACHINE_NO_SOUND|MACHINE_NOT_WORKING)
+#define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND)
 
 GAME( 2004, segasp,  0,          segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Sega System SP (Spider) BIOS", GAME_FLAGS | MACHINE_IS_BIOS_ROOT )
 // These use ROMs
