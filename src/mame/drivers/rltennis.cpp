@@ -268,5 +268,5 @@ ROM_START( rltennisa )
 	ROM_LOAD( "gal22v10.ic2", 0x117, 0x2e5, CRC(b5a7cb92) SHA1(05d6e8c8208ac486e849de3322f049bcd38561e1) )
 ROM_END
 
-GAME( 1993, rltennis,  0, rltennis, rltennis, rltennis_state, empty_init, ROT0, "TCH", "Reality Tennis (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, rltennisa, 0, rltennis, rltennis, rltennis_state, empty_init, ROT0, "TCH", "Reality Tennis (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, rltennis,         0, rltennis, rltennis, rltennis_state, empty_init, ROT0, "TCH", "Reality Tennis (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, rltennisa, rltennis, rltennis, rltennis, rltennis_state, empty_init, ROT0, "TCH", "Reality Tennis (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
