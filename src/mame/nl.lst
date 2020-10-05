@@ -369,6 +369,7 @@ brdrlinb                        // Karateco bootleg
 brdrline                        // (c) 1980 Sega
 brdrlinet                       // (c) 1981 Sega
 brdrlins                        // Sidam bootleg
+starrkr                         // (c) 1981 Sega
 
 @source:zaxxon.cpp
 congo                           // 605-5167 (c) 1983 (2 board stack)

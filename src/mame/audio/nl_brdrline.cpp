@@ -1437,7 +1437,13 @@ NETLIST_END()
 
 NETLIST_START(brdrline)
 
+#if 1
+	SOLVER(Solver, 1000)
+	PARAM(Solver.DYNAMIC_TS, 1)
+	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 2e-5)
+#else
     SOLVER(solver, 48000)
+#endif
 
     LOCAL_SOURCE(_MB4391)
     LOCAL_SOURCE(_MB4391_DIP)
