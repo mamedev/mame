@@ -1334,7 +1334,7 @@ license:CC0
 		<info name="serial" value="DMG-AUEJ-JPN"/>
 		<info name="gold" value="19991104"/>
 		<info name="release" value="19991224"/>
-		<info name="alt_title" value="爆走戦記 メタルウォーカーＧＢ ～鋼鉄の友情～"/>
+		<info name="alt_title" value="爆走戦記 メタルウォーカーGB 鋼鉄の友情"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -6454,7 +6454,7 @@ license:CC0
 		<info name="serial" value="DMG-BZOJ-JPN"/>
 		<info name="gold" value="20020510"/>
 		<info name="release" value="20020628"/>
-		<info name="alt_title" value="From TV animation ＯＮＥ ＰＩＥＣＥ　幻のグランドライン冒険記！"/>
+		<info name="alt_title" value="From TV Animation One Piece 幻のグランドライン冒険記！"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-A03-10" />
@@ -6479,7 +6479,7 @@ license:CC0
 		<info name="serial" value="DMG-BLUJ-JPN"/>
 		<info name="gold" value="20010615"/>
 		<info name="release" value="20010427"/>
-		<info name="alt_title" value="FROM TV ANIMATION　ＯＮＥ ＰＩＥＣＥ　夢のルフィ海賊団誕生！"/>
+		<info name="alt_title" value="From TV Animation One Piece 夢のルフィ海賊団誕生！"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-A08-10" />
@@ -6504,7 +6504,7 @@ license:CC0
 		<info name="serial" value="DMG-BLUJ-JPN"/>
 		<info name="gold" value="20010307"/>
 		<info name="release" value="20010427"/>
-		<info name="alt_title" value="FROM TV ANIMATION　ＯＮＥ ＰＩＥＣＥ　夢のルフィ海賊団誕生！"/>
+		<info name="alt_title" value="From TV Animation One Piece 夢のルフィ海賊団誕生！"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-A08-10" />
@@ -22545,7 +22545,7 @@ license:CC0
 		<info name="serial" value="DMG-AF2J-JPN"/>
 		<info name="gold" value="19990624"/>
 		<info name="release" value="19990723"/>
-		<info name="alt_title" value="昆虫博士 ２"/>
+		<info name="alt_title" value="昆虫博士2"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="enhancement" value="sgb" />
 			<!-- PCB documentation incomplete, based on bad pics or written docs -->
@@ -22566,7 +22566,7 @@ license:CC0
 		<publisher>J-Wing</publisher>
 		<info name="serial" value="DMG-AF2J-JPN?"/>
 		<info name="gold" value="19990908"/>
-		<info name="alt_title" value="昆虫博士 ２"/>
+		<info name="alt_title" value="昆虫博士2"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
