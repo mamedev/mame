@@ -35364,6 +35364,7 @@ sarpc_j233                      //
 
 @source:rltennis.cpp
 rltennis                        // (c) 1993 TCH
+rltennisa                       // (c) 1993 TCH
 
 @source:rm380z.cpp
 rm380z                          //
