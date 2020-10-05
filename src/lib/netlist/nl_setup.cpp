@@ -165,7 +165,7 @@ namespace netlist
 
 	void nlparse_t::register_link(const pstring &sin, const pstring &sout)
 	{
-		register_link_fqn(build_fqn(sin), build_fqn(sout));
+		register_link_fqn(build_fqn(plib::trim(sin)), build_fqn(plib::trim(sout)));
 	}
 
 	void nlparse_t::register_link_arr(const pstring &terms)
