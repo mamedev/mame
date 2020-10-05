@@ -4,7 +4,8 @@
 license:CC0
 
   To investigate:
-	- Check for duplicates in lot check folders and cross-check with official spreadsheets, to look for additional regional releases with shared ROM contents.
+	- Fushigi no Dungeon - Fuurai no Shiren GB2 - Sabaku no Majou (Japan, Alt)	<- What is this version?
+	- Super Mario Bros. Deluxe (USA, Rev 2)	<- Was it released?
 
   Undumped:
 	- San Francisco Rush 2049 (Europe, fr/de/nl) [small pic]
@@ -12,17 +13,20 @@ license:CC0
   Known dumps not yet verified against retail cartridge:
 	- Alice in Wonderland (Europe)
 	- AMF Bowling (USA)
+	- Cruis'n Exotica (USA)
 	- Donkey Kong Country (USA, Not for resale)
-	- Fushigi no Dungeon - Fuurai no Shiren GB2 - Sabaku no Majou (Japan, Alt)	<- What is this version?
+	- Fushigi no Dungeon - Fuurai no Shiren GB2 - Sabaku no Majou (Japan, Alt)
 	- Gakkyuu Ou Yamazaki (Japan)
 	- Jissen ni Yakudatsu Tsumego (Japan)
 	- Laura (Europe)
 	- Mission Impossible (Europe, Rev 1)
+	- Merlin (Europe)
 	- Monster Traveler (Japan)
+	- Moomin's Tale (Europe)
 	- NBA In the Zone (USA)
 	- Pro Pool (USA)
 	- Sei Hai Densetsu (Japan)
-	- Super Mario Bros. Deluxe (USA, Rev 2)	<- Was it released?
+	- Super Mario Bros. Deluxe (USA, Rev 2)
 	- Tsuri Sensei 2 (Japan, Rev 1)
 	- Turok - Rage Wars (Australia)
 	- VR Sports Powerboat Racing (USA)
@@ -547,7 +551,6 @@ license:CC0
 
 	<software name="amfbowli">
 		<!-- Notes: GBC only -->
-		<!--	In lot check as "cgbafpe0.339"	-->
 		<!--	Retail cartridge not yet secured, might be unreleased	-->
 		<description>AMF Bowling (USA)</description>
 		<year>2000</year>
@@ -558,7 +561,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="cgbafpe0.339" size="1048576" crc="392559ee" sha1="1dd7d94f320d119682fd4df80297c8df1b28141b"/>
+				<rom name="cgb-afpe-0.u1" size="1048576" crc="392559ee" sha1="1dd7d94f320d119682fd4df80297c8df1b28141b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1594,7 +1597,6 @@ license:CC0
 	</software>
 
 	<software name="barcodea" cloneof="barcode">
-		<!--	In lot check as "dmgabej1.f26"	-->
 		<description>Barcode Taisen Bardigun (Japan, Rev 1)</description>
 		<year>1998</year>
 		<publisher>Tamsoft</publisher>
@@ -1606,7 +1608,7 @@ license:CC0
 			<feature name="slot" value="rom_mbc3" />
 			<feature name="rtc" value="yes" />
 			<dataarea name="rom" size="1048576">
-				<rom name="dmgabej1.f26" size="1048576" crc="f6d291a9" sha1="21e386f60fcd3694c4a308de9e178762c5175b6c"/>
+				<rom name="dmg-abej-1.u1" size="1048576" crc="f6d291a9" sha1="21e386f60fcd3694c4a308de9e178762c5175b6c"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -2245,7 +2247,6 @@ license:CC0
 
 	<software name="bokujom3a" cloneof="harvmon3">
 		<!-- Notes: GBC only -->
-		<!--	In lot check as "cgbbwaj1.350"	-->
 		<description>Bokujou Monogatari GB3 - Boy Meets Girl (Japan, Rev 1)</description>
 		<year>2000</year>
 		<publisher>Victor Interactive Software</publisher>
@@ -2255,7 +2256,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
-				<rom name="cgbbwaj1.350" size="2097152" crc="75af0e84" sha1="acb2e549fb7d107d20507af88c36f40234f74958"/>
+				<rom name="cgb-bwaj-1.u1" size="2097152" crc="75af0e84" sha1="acb2e549fb7d107d20507af88c36f40234f74958"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -3561,7 +3562,8 @@ license:CC0
 
 	<software name="crusnexo">
 		<!-- Notes: GBC only -->
-		<!--	In lot check as "CGBBXOE0.382", "KENSA\CGBBXOP0.0"	-->
+		<!--	Retail cartridge not yet secured	-->
+		<!--	Planned for release in Europe as "cgb-bxop-0"	-->
 		<description>Cruis'n Exotica (USA)</description>
 		<year>2000</year>
 		<publisher>Midway</publisher>
@@ -3569,7 +3571,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
-				<rom name="cruis'n exotica (usa).bin" size="2097152" crc="9562e7e8" sha1="e3f7bab776d76048a6cf1745fb4d8ecaf2d44f46"/>
+				<rom name="cgb-bxoe-0.u1" size="2097152" crc="9562e7e8" sha1="e3f7bab776d76048a6cf1745fb4d8ecaf2d44f46"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4134,7 +4136,6 @@ license:CC0
 
 	<software name="dendego2">
 		<!-- Notes: GBC only -->
-		<!--	In lot check as "cgbb82j0.538"	-->
 		<description>Densha de Go! 2 (Japan)</description>
 		<year>2000</year>
 		<publisher>CyberFront</publisher>
@@ -4263,7 +4264,7 @@ license:CC0
 
 	<software name="dinosrus">
 		<!-- Notes: GBC only -->
-		<!--	In lot check as "CGBBDSP0.602", "KENSA\CGBBDSE0.0"	-->
+		<!--	Planned for release in USA as "cgb-bdse-0"	-->
 		<description>Dinosaur'us (Europe)</description>
 		<year>2001</year>
 		<publisher>L.S.P. ~ Electronic Arts</publisher>
@@ -4539,7 +4540,6 @@ license:CC0
 
 	<software name="dkongcd" cloneof="dkongc">
 		<!-- Notes: GBC only -->
-		<!--	In lot check as "cgbbdye0.326"	-->
 		<!--	Retail cartridge not yet secured	-->
 		<description>Donkey Kong Country (USA, Not for resale)</description>
 		<year>2000</year>
@@ -4550,7 +4550,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="4194304">
-				<rom name="cgbbdye0.326" size="4194304" crc="080605a3" sha1="38fedd71736d258e31d3062864d28449e7c3f1c5"/>
+				<rom name="cgb-bdye-0.u1" size="4194304" crc="080605a3" sha1="38fedd71736d258e31d3062864d28449e7c3f1c5"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -5186,7 +5186,6 @@ license:CC0
 	</software>
 
 	<software name="dqm2ra" cloneof="dwm2c">
-		<!--	In lot check as "dmgbqlj1.j93"	-->
 		<description>Dragon Quest Monsters 2 - Maruta no Fushigi na Kagi - Ruka no Tabidachi (Japan, Rev 1)</description>
 		<year>2001</year>
 		<publisher>Enix</publisher>
@@ -5198,7 +5197,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="4194304">
-				<rom name="dmgbqlj1.j93" size="4194304" crc="649e8d97" sha1="217faaf8e7d60545bd07f818a3b3373843e6318d"/>
+				<rom name="dmg-bqlj-1.u1" size="4194304" crc="649e8d97" sha1="217faaf8e7d60545bd07f818a3b3373843e6318d"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -5806,7 +5805,6 @@ license:CC0
 
 	<software name="emperor">
 		<!-- Notes: GBC only -->
-		<!--	In lot check as "cgbbenp0.641"	-->
 		<description>The Emperor's New Groove (Europe)</description>
 		<year>2001</year>
 		<publisher>Ubi Soft</publisher>
@@ -5815,7 +5813,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
-				<rom name="cgbbenp0.641" size="2097152" crc="eb29c584" sha1="2f53318aa7f1c82df95bf3da6b29701a2c563d13"/>
+				<rom name="cgb-benp-0.u1" size="2097152" crc="eb29c584" sha1="2f53318aa7f1c82df95bf3da6b29701a2c563d13"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -5975,7 +5973,7 @@ license:CC0
 
 	<software name="f1wgp">
 		<!-- Notes: GBC only -->
-		<!--	In lot check as "cgbafip0.028", "KENSA\cgbafie0.0"	-->
+		<!--	Planned for release in USA as "cgb-afie-0"	-->
 		<description>F-1 World Grand Prix (Europe)</description>
 		<year>2000</year>
 		<publisher>Video System</publisher>
@@ -5984,7 +5982,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
-				<rom name="f-1 world grand prix (europe) (en,fr,de,es).bin" size="2097152" crc="8d9a9182" sha1="16aa2e02e9b7f236f12a49c3224ca4cc89cdf98c"/>
+				<rom name="cgb-afip-0.u1" size="2097152" crc="8d9a9182" sha1="16aa2e02e9b7f236f12a49c3224ca4cc89cdf98c"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -6040,7 +6038,6 @@ license:CC0
 
 	<software name="f1chmp2kb" cloneof="f1chmp2k">
 		<!-- Notes: GBC only -->
-		<!--	In lot check as "cgbbfib0.579"	-->
 		<description>F1 Championship Season 2000 (Brazil)</description>
 		<year>2000</year>
 		<publisher>Electronic Arts</publisher>
@@ -6049,14 +6046,13 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
-				<rom name="cgbbfib0.579" size="2097152" crc="f4f5ed18" sha1="4731a7442bbff31c6d470b84938a3f148a4f1f6c"/>
+				<rom name="cgb-bfib-0.u1" size="2097152" crc="f4f5ed18" sha1="4731a7442bbff31c6d470b84938a3f148a4f1f6c"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="f1racing">
 		<!-- Notes: GBC only -->
-		<!--	In lot check as "cgbaeqp0.381"	-->
 		<description>F1 Racing Championship (Europe)</description>
 		<year>2000</year>
 		<publisher>Ubi Soft</publisher>
@@ -6065,7 +6061,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="4194304">
-				<rom name="cgbaeqp0.381" size="4194304" crc="93a9789f" sha1="ea844051c0b5c6f9a6a8c472f4f67ee6b9b3d8e7"/>
+				<rom name="cgb-aeqp-0.u1" size="4194304" crc="93a9789f" sha1="ea844051c0b5c6f9a6a8c472f4f67ee6b9b3d8e7"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -6436,7 +6432,6 @@ license:CC0
 
 	<software name="frogger2a" cloneof="frogger2">
 		<!-- Notes: GBC only -->
-		<!--	In lot check as "cgbbh2e1.351"	-->
 		<description>Frogger 2 (USA, Rev 1)</description>
 		<year>2000</year>
 		<publisher>Majesco</publisher>
@@ -6445,7 +6440,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="cgbbh2e1.351" size="1048576" crc="e3227b7d" sha1="0d5028ca6fcc10df46d11cd4b56e5add1dc5e63e"/>
+				<rom name="cgb-bh2e-1.u1" size="1048576" crc="e3227b7d" sha1="0d5028ca6fcc10df46d11cd4b56e5add1dc5e63e"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -6582,9 +6577,8 @@ license:CC0
 
 	<software name="furaish2a" cloneof="furaish2">
 		<!-- Notes: GBC only -->
-		<!--	In lot check as "cgbbfwj0.814"	-->
 		<!--	Retail cartridge not yet secured, might be unreleased	-->
-		<!--	Alternate version with a different serial code, purpose unknown (limited edition seems to feature the common retail release)	-->
+		<!--	Alternate version with a different serial code, purpose unknown (limited edition seems to include the common retail release)	-->
 		<description>Fushigi no Dungeon - Fuurai no Shiren GB2 - Sabaku no Majou (Japan, Alt)</description>
 		<year>2001</year>
 		<publisher>ChinSoft</publisher>
@@ -6594,7 +6588,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="4194304">
-				<rom name="cgbbfwj0.814" size="4194304" crc="f3c20fbe" sha1="d9c490af97c08ac7053bbb9f7ae06d3501035127"/>
+				<rom name="cgb-bfwj-0.u1" size="4194304" crc="f3c20fbe" sha1="d9c490af97c08ac7053bbb9f7ae06d3501035127"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -6644,7 +6638,6 @@ license:CC0
 	</software>
 
 	<software name="gakkyama" cloneof="gakkyamaa">
-		<!--	In lot check as "dmgaymj0.g22"	-->
 		<!--	Retail cartridge not yet secured	-->
 		<description>Gakkyuu Ou Yamazaki (Japan)</description>
 		<year>1999</year>
@@ -6656,7 +6649,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="dmgaymj0.g22" size="1048576" crc="b8147b5c" sha1="132b872391565d418ccc9d0e1c643510d778c066"/>
+				<rom name="dmg-aymj-0.u1" size="1048576" crc="b8147b5c" sha1="132b872391565d418ccc9d0e1c643510d778c066"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -6698,17 +6691,16 @@ license:CC0
 
 	<software name="gamblerta" cloneof="gamblert">
 		<!-- Notes: GBC only -->
-		<!--	In lot check as "cgbbgyj1.607"	-->
 		<description>Gambler Densetsu Tetsuya - Shinjuku Tenun Hen (Japan, Rev 1)</description>
 		<year>2001</year>
 		<publisher>Athena</publisher>
-		<info name="serial" value="CGB-BGYJ-JPN?"/>
+		<info name="serial" value="CGB-BGYJ-JPN"/>
 		<info name="gold" value="20010307"/>
 		<info name="alt_title" value="勝負師伝説 哲也 新宿天運編"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="cgbbgyj1.607" size="1048576" crc="91739def" sha1="b62f8e56b995874c0e1a2533df5a37f6996df12e"/>
+				<rom name="cgb-bgyj-1.u1" size="1048576" crc="91739def" sha1="b62f8e56b995874c0e1a2533df5a37f6996df12e"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -8722,7 +8714,6 @@ license:CC0
 
 	<software name="hypeb" cloneof="hype">
 		<!-- Notes: GBC only -->
-		<!--	In lot check as "cgbbpfe0.737"	-->
 		<description>Hype - The Time Quest (Brazil)</description>
 		<year>2000</year>
 		<publisher>Ubi Soft</publisher>
@@ -8731,7 +8722,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="cgbbpfe0.737" size="1048576" crc="cafb8035" sha1="7c7dca7c48dc478d0278c273ba37723b9e9dce5b"/>
+				<rom name="cgb-bpfe-0.u1" size="1048576" crc="cafb8035" sha1="7c7dca7c48dc478d0278c273ba37723b9e9dce5b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9259,7 +9250,6 @@ license:CC0
 
 	<software name="jissen" cloneof="jissena">
 		<!-- Notes: GBC only -->
-		<!--	In lot check as "cgbbjtj0.313"	-->
 		<!--	Retail cartridge not yet secured	-->
 		<description>Jissen ni Yakudatsu Tsumego (Japan)</description>
 		<year>2000</year>
@@ -9270,7 +9260,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="262144">
-				<rom name="cgbbjtj0.313" size="262144" crc="69c6dbef" sha1="f7ed6cdce7637a11d7fa7f5cb59b8f8ce131f9d1"/>
+				<rom name="cgb-bjtj-0.u1" size="262144" crc="69c6dbef" sha1="f7ed6cdce7637a11d7fa7f5cb59b8f8ce131f9d1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9690,7 +9680,6 @@ license:CC0
 	</software>
 
 	<software name="kawaipt2a">
-		<!--	In lot check as "dmgbmnj1.j90"	-->
 		<description>Kawaii Pet Shop Monogatari 2 (Japan, Rev 1)</description>
 		<year>2000</year>
 		<publisher>Taito</publisher>
@@ -9700,7 +9689,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
-				<rom name="dmgbmnj1.j90" size="2097152" crc="6fce1ad0" sha1="58ea410ebbee5edc18644c0467fe9ea03d179b1c"/>
+				<rom name="dmg-bmnj-1.u1" size="2097152" crc="6fce1ad0" sha1="58ea410ebbee5edc18644c0467fe9ea03d179b1c"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -9960,7 +9949,7 @@ license:CC0
 
 	<software name="kirbytlt" supported="no">
 		<!-- Notes: GBC only -->
-		<!--	In lot check as "CGBKTNE0.638", "KENSA\CGBKTNP0.0"	-->
+		<!--	Planned for release in Europe as "cgb-ktnp-0"	-->
 		<!--	The game cart includes a motion-sensor (U4) for controlling the game by moving and shaking the console.	-->
 		<description>Kirby Tilt 'n' Tumble (USA)</description>
 		<year>2001</year>
@@ -9974,7 +9963,7 @@ license:CC0
 			<feature name="u4" value="U4 ADXL202" />
 			<feature name="slot" value="rom_mbc7" />
 			<dataarea name="rom" size="1048576">
-				<rom name="kirby tilt 'n' tumble (usa).bin" size="1048576" crc="e541acf1" sha1="6ab8d666e2bebbb3fee7796c8968aab2ea21b8f9"/>
+				<rom name="cgb-ktne-0.u1" size="1048576" crc="e541acf1" sha1="6ab8d666e2bebbb3fee7796c8968aab2ea21b8f9"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -10352,7 +10341,6 @@ license:CC0
 
 	<software name="laura">
 		<!-- Notes: GBC only -->
-		<!--	In lot check as "cgbbldp0.420"	-->
 		<!--	Retail cartridge not yet secured	-->
 		<description>Laura (Europe)</description>
 		<year>2000</year>
@@ -10363,7 +10351,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="cgbbldp0.420" size="1048576" crc="a58c8282" sha1="47e5c4c7fa447efc8a0abf019e8d2cd227c5e0e3"/>
+				<rom name="cgb-bldp-0.u1" size="1048576" crc="a58c8282" sha1="47e5c4c7fa447efc8a0abf019e8d2cd227c5e0e3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10908,7 +10896,6 @@ license:CC0
 
 	<software name="lionkingfa" cloneof="lionking">
 		<!-- Notes: GBC only -->
-		<!--	In lot check as "cgbblkf1.573"	-->
 		<description>Les Roi Lion - Les Adventures de Simba (France, Rev 1)</description>
 		<year>2000</year>
 		<publisher>Activision</publisher>
@@ -10918,7 +10905,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="cgbblkf1.573" size="1048576" crc="c7aae1b3" sha1="b8cc2f1d3a8d40c7588d5c535f28e2f80446a793"/>
+				<rom name="cgb-blkf-1.u1" size="1048576" crc="c7aae1b3" sha1="b8cc2f1d3a8d40c7588d5c535f28e2f80446a793"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11527,7 +11514,6 @@ license:CC0
 
 	<software name="lovehinaa" cloneof="lovehina">
 		<!-- Notes: GBC only -->
-		<!--	In lot check as "cgbbphj1.290"	-->
 		<description>Love Hina Pocket (Japan, Rev 1)</description>
 		<year>2000</year>
 		<publisher>Marvelous Entertainment</publisher>
@@ -11537,7 +11523,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="4194304">
-				<rom name="cgbbphj1.290" size="4194304" crc="55dd0ba6" sha1="b29abee319ccb223e5d1a4f88982fb53e538d527"/>
+				<rom name="cgb-bphj-1.u1" size="4194304" crc="55dd0ba6" sha1="b29abee319ccb223e5d1a4f88982fb53e538d527"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -12753,7 +12739,8 @@ license:CC0
 
 	<software name="merlin">
 		<!-- Notes: GBC only -->
-		<!--	In lot check as "CGBBMBP0.603", "KENSA\CGBBMBE0.0"	-->
+		<!--	Planned for release in USA as "cgb-bmbe-0"	-->
+		<!--	Retail cartridge not yet secured	-->
 		<description>Merlin (Europe)</description>
 		<year>2001</year>
 		<publisher>L.S.P. ~ Electronic Arts</publisher>
@@ -12761,7 +12748,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="merlin (europe) (en,fr,de,es,it,nl).bin" size="1048576" crc="c5290cee" sha1="96ee6a40abf4bcbb90f3ea7c232fb3866333a202"/>
+				<rom name="cgb-bmbp-0.u1" size="1048576" crc="c5290cee" sha1="96ee6a40abf4bcbb90f3ea7c232fb3866333a202"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13109,7 +13096,6 @@ license:CC0
 	</software>
 
 	<software name="minnashga" cloneof="minnashg">
-		<!--	In lot check as "dmga7yj1.i18"	-->
 		<description>Minna no Shougi - Shokyuu Hen (Japan, Rev 1)</description>
 		<year>1999</year>
 		<publisher>MTO</publisher>
@@ -13120,7 +13106,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="dmga7yj1.i18" size="1048576" crc="f766015a" sha1="948d2015c29342fdb6052940a5d65e771b0a81d0"/>
+				<rom name="dmg-a7yj-1.u1" size="1048576" crc="f766015a" sha1="948d2015c29342fdb6052940a5d65e771b0a81d0"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -13206,7 +13192,6 @@ license:CC0
 
 	<software name="missimpa" cloneof="missimp">
 		<!-- Notes: GBC only -->
-		<!--	In lot check as "cgbaimp1.076"	-->
 		<!--	Retail cartridge not yet secured	-->
 		<description>Mission Impossible (Europe, Rev 1)</description>
 		<year>2000</year>
@@ -13216,7 +13201,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="cgbaimp1.076" size="1048576" crc="9c51f4c7" sha1="f822bda01d881f34d1e17664465faf6a3ff64356"/>
+				<rom name="cgb-aimp-1.u1" size="1048576" crc="9c51f4c7" sha1="f822bda01d881f34d1e17664465faf6a3ff64356"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -13476,7 +13461,6 @@ license:CC0
 
 	<software name="monstrvl" cloneof="monstrvla">
 		<!-- Notes: GBC only -->
-		<!--	In lot check as "cgbbfvj0.949"	-->
 		<!--	Retail cartridge not yet secured	-->
 		<description>Monster Traveler (Japan)</description>
 		<year>2002</year>
@@ -13487,7 +13471,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="4194304">
-				<rom name="cgbbfvj0.949" size="4194304" crc="5d596cf6" sha1="5195f55ad6aaa302c0a0e11c0ec6ecad4efe0e27"/>
+				<rom name="cgb-bfvj-0.u1" size="4194304" crc="5d596cf6" sha1="5195f55ad6aaa302c0a0e11c0ec6ecad4efe0e27"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -13622,7 +13606,8 @@ license:CC0
 
 	<software name="moomin">
 		<!-- Notes: GBC only -->
-		<!--	In lot check as "CGBAM9P0.471", "KENSA\CGBAM9E0.0"	-->
+		<!--	Planned for release in USA as "cgb-am9e-0"	-->
+		<!--	Retail cartridge not yet secured	-->
 		<description>Moomin's Tale (Europe)</description>
 		<year>2000</year>
 		<publisher>Sunsoft</publisher>
@@ -13630,7 +13615,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="moomin's tale (europe) (en,fr,de).bin" size="1048576" crc="45543ba2" sha1="06e57b38b7f9ec71809f309aa7d220af48ca96b6"/>
+				<rom name="cgb-am9p-0.u1" size="1048576" crc="45543ba2" sha1="06e57b38b7f9ec71809f309aa7d220af48ca96b6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13795,7 +13780,7 @@ license:CC0
 	<software name="mrdrillrjnp" cloneof="mrdrillr">
 		<!-- Notes: GBC only -->
 		<!-- NP only -->
-		<!--	In lot check as "KENSA\cgbbv3j0.0"	-->
+		<!--	Planned for physical release?	-->
 		<description>Mr. Driller (Japan, NP)</description>
 		<year>2000</year>
 		<publisher>Namco</publisher>
@@ -13805,7 +13790,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="524288">
-				<rom name="cgbbv3j0.0" size="524288" crc="35fd440d" sha1="fb64fa7da6a0fec3e358bb3357e66d68473ada67"/>
+				<rom name="cgb-bv3j-0.u1" size="524288" crc="35fd440d" sha1="fb64fa7da6a0fec3e358bb3357e66d68473ada67"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -14393,7 +14378,6 @@ license:CC0
 	</software>
 
 	<software name="nbazone" cloneof="nbapro99">
-		<!--	In lot check as "dmganze0.g29"	-->
 		<!--	Retail cartridge not yet secured	-->
 		<description>NBA In the Zone (USA)</description>
 		<year>1999</year>
@@ -14404,7 +14388,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="dmganze0.g29" size="1048576" crc="f6bae9a0" sha1="7f0d5a37956ae58077656a42b26629784c203038"/>
+				<rom name="dmg-anze-0.u1" size="1048576" crc="f6bae9a0" sha1="7f0d5a37956ae58077656a42b26629784c203038"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -15937,7 +15921,6 @@ license:CC0
 
 	<software name="poktpuyna" cloneof="poktpuyn">
 		<!-- Notes: GBC only -->
-		<!--	In lot check as "cgbbpyj1.327"	-->
 		<description>Pocket Puyo Puyo-n (Japan, Rev 1)</description>
 		<year>2000</year>
 		<publisher>Compile</publisher>
@@ -15947,7 +15930,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="cgbbpyj1.327" size="1048576" crc="c884037a" sha1="3d52805f712e6d1ce22b88dfebfcac2a31743ff3"/>
+				<rom name="cgb-bpyj-1.u1" size="1048576" crc="c884037a" sha1="3d52805f712e6d1ce22b88dfebfcac2a31743ff3"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -15956,7 +15939,6 @@ license:CC0
 
 	<software name="poktpuynb" cloneof="poktpuyn">
 		<!-- Notes: GBC only -->
-		<!--	In lot check as "cgbbpyj2.327"	-->
 		<description>Pocket Puyo Puyo-n (Japan, Rev 2)</description>
 		<year>2000</year>
 		<publisher>Compile</publisher>
@@ -15966,7 +15948,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="cgbbpyj2.327" size="1048576" crc="573613d7" sha1="09b217161ac326da63887693281b60751ca2dfcf"/>
+				<rom name="cgb-bpyj-2.u1" size="1048576" crc="573613d7" sha1="09b217161ac326da63887693281b60751ca2dfcf"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -15991,7 +15973,7 @@ license:CC0
 
 	<software name="pocksocr">
 		<!-- Notes: GBC only -->
-		<!--	In lot check as "CGBBPSP0.618", "KENSA\CGBBPSE0.0"	-->
+		<!--	Planned for release in USA as "cgb-bpse-0"	-->
 		<description>Pocket Soccer (Europe)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
@@ -15999,7 +15981,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
-				<rom name="pocket soccer (europe) (en,fr,de,es,it,pt).bin" size="2097152" crc="e8f5824f" sha1="4d06ea937a02a8f458186a9382994b09a97481a4"/>
+				<rom name="cgb-bpsp-0.u1" size="2097152" crc="e8f5824f" sha1="4d06ea937a02a8f458186a9382994b09a97481a4"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -16008,7 +15990,7 @@ license:CC0
 
 	<software name="pokecrys">
 		<!-- Notes: GBC only -->
-		<!--	European version 0 never released (marked as "生産中止" in lot check)	-->
+		<!--	European version 0 does not exist	-->
 		<description>Pokémon - Crystal Version (Europe, USA, Rev 1)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
@@ -16129,7 +16111,6 @@ license:CC0
 
 	<software name="pokecrysaus" cloneof="pokecrys">
 		<!-- Notes: GBC only -->
-		<!--	In lot check as "cgbbytu0.834"	-->
 		<description>Pokémon - Crystal Version (Australia)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
@@ -16140,7 +16121,7 @@ license:CC0
 			<feature name="slot" value="rom_mbc3" />
 			<feature name="rtc" value="yes" />
 			<dataarea name="rom" size="2097152">
-				<rom name="cgbbytu0.834" size="2097152" crc="bb6dd80c" sha1="a0fc810f1d4e124434f7be2c989ab5b5892ddf36"/>
+				<rom name="cgb-bytu-0.u1" size="2097152" crc="bb6dd80c" sha1="a0fc810f1d4e124434f7be2c989ab5b5892ddf36"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -16481,7 +16462,6 @@ license:CC0
 	</software>
 
 	<software name="pokecard">
-		<!--	In lot check as "dmgaxqx1.j85"	-->
 		<description>Pokémon Trading Card Game (Europe, English / Spanish / Italian, Rev 1)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
@@ -16491,7 +16471,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
-				<rom name="dmgaxqx1.j85" size="2097152" crc="3f1d7e58" sha1="c54b81e638b0c45d3569f9f5f0345df9e95ce975"/>
+				<rom name="dmg-axqx-1.u1" size="2097152" crc="3f1d7e58" sha1="c54b81e638b0c45d3569f9f5f0345df9e95ce975"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -16539,7 +16519,6 @@ license:CC0
 	</software>
 
 	<software name="pokecardaa" cloneof="pokecard">
-		<!--	In lot check as "dmgaxqp1.j84"	-->
 		<description>Pokémon Trading Card Game (Europe, English / French / German, Rev 1)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
@@ -16549,7 +16528,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
-				<rom name="dmgaxqp1.j84" size="2097152" crc="942d0b7f" sha1="dffc15f3063a4c2df84c6361406b41aec1696d3e"/>
+				<rom name="dmg-axqp-1.u1" size="2097152" crc="942d0b7f" sha1="dffc15f3063a4c2df84c6361406b41aec1696d3e"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -17376,7 +17355,6 @@ license:CC0
 
 	<software name="propoolu" cloneof="propool">
 		<!-- Notes: GBC only -->
-		<!--	In lot check as "cgbbple0.298"	-->
 		<!--	Retail cartridge not yet secured	-->
 		<description>Pro Pool (USA)</description>
 		<year>2000?</year>
@@ -17386,7 +17364,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="cgbbple0.298" size="1048576" crc="2611fa3d" sha1="c85e514c24c82071907c6495243dae448b46c2b2"/>
+				<rom name="cgb-bple-0.u1" size="1048576" crc="2611fa3d" sha1="c85e514c24c82071907c6495243dae448b46c2b2"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -19089,7 +19067,6 @@ license:CC0
 	</software>
 
 	<software name="sanriotka" cloneof="sanriotk">
-		<!--	In lot check as "dmgatpj1.f14"	-->
 		<description>Sanrio Timenet - Kako Hen (Japan, Rev 1)</description>
 		<year>1998</year>
 		<publisher>Imagineer</publisher>
@@ -19101,7 +19078,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="dmgatpj1.f14" size="1048576" crc="6555b740" sha1="b3b80b4a48faec9cc71d80a6b08b12b3541b4c1b"/>
+				<rom name="dmg-atpj-1.u1" size="1048576" crc="6555b740" sha1="b3b80b4a48faec9cc71d80a6b08b12b3541b4c1b"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -19129,7 +19106,6 @@ license:CC0
 	</software>
 
 	<software name="sanriotma" cloneof="sanriotm">
-		<!--	In lot check as "dmgatfj1.f15"	-->
 		<description>Sanrio Timenet - Mirai Hen (Japan, Rev 1)</description>
 		<year>1998</year>
 		<publisher>Imagineer</publisher>
@@ -19141,7 +19117,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="dmgatfj1.f15" size="1048576" crc="179da7f3" sha1="5ccaf8450862dab90b45b06ab2df291d72ea6033"/>
+				<rom name="dmg-atfj-1.u1" size="1048576" crc="179da7f3" sha1="5ccaf8450862dab90b45b06ab2df291d72ea6033"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -19235,7 +19211,6 @@ license:CC0
 	</software>
 
 	<software name="seihai">
-		<!--	In lot check as "dmgaeoj0.j01"	-->
 		<!--	Retail cartridge not yet secured	-->
 		<description>Sei Hai Densetsu (Japan)</description>
 		<year>2000</year>
@@ -19248,7 +19223,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="dmgaeoj0.j01" size="1048576" crc="8804f856" sha1="0840846bd0a3956fc49b5c7aec598ade93e3ff77"/>
+				<rom name="dmg-aeoj-0.u1" size="1048576" crc="8804f856" sha1="0840846bd0a3956fc49b5c7aec598ade93e3ff77"/>
 			</dataarea>
 		</part>
 	</software>
@@ -19506,7 +19481,6 @@ license:CC0
 	</software>
 
 	<software name="shanghaiu" cloneof="shanghai">
-		<!--	In lot check as "dmgahpe0.f55"	-->
 		<description>Shanghai Pocket (USA)</description>
 		<year>1998</year>
 		<publisher>Sunsoft</publisher>
@@ -19516,7 +19490,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="shanghai pocket (usa).bin" size="1048576" crc="a5e3ece9" sha1="2058964274d8bd596bb81bc24e9cfe306411c803"/>
+				<rom name="dmg-ahpe-0.u1" size="1048576" crc="a5e3ece9" sha1="2058964274d8bd596bb81bc24e9cfe306411c803"/>
 			</dataarea>
 		</part>
 	</software>
@@ -19552,7 +19526,6 @@ license:CC0
 	</software>
 
 	<software name="shinmtaa">
-		<!--	In lot check as "dmgbhnj1.j70"	-->
 		<description>Shin Megami Tensei Devil Children - Aka no Sho (Japan, Rev 1)</description>
 		<year>2000</year>
 		<publisher>Atlus</publisher>
@@ -19564,7 +19537,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
-				<rom name="dmgbhnj1.j70" size="2097152" crc="c1e27556" sha1="e9a3edd28503ee94db8ec4ea48832dc2ba0264d9"/>
+				<rom name="dmg-bhnj-1.u1" size="2097152" crc="c1e27556" sha1="e9a3edd28503ee94db8ec4ea48832dc2ba0264d9"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -19597,7 +19570,6 @@ license:CC0
 	</software>
 
 	<software name="shinmtka">
-		<!--	In lot check as "dmgbhej1.j69"	-->
 		<description>Shin Megami Tensei Devil Children - Kuro no Sho (Japan, Rev 1)</description>
 		<year>2000</year>
 		<publisher>Atlus</publisher>
@@ -19609,7 +19581,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
-				<rom name="dmgbhej1.j69" size="2097152" crc="3d4ae536" sha1="421d20bf556e28d07801d808ecfef45daf86a974"/>
+				<rom name="dmg-bhej-1.u1" size="2097152" crc="3d4ae536" sha1="421d20bf556e28d07801d808ecfef45daf86a974"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -19810,7 +19782,6 @@ license:CC0
 	</software>
 
 	<software name="sewingose" cloneof="sewingos">
-		<!--	In lot check as "dmgbraz0.k25"	-->
 		<!-- Notes: For use with Jaguar Sewing Machine (Nuotto Expansion) -->
 		<description>Sewing Machine Operation Software (Europe)</description>
 		<year>2000</year>
@@ -19821,7 +19792,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="dmgbraz0.k25" size="1048576" crc="d8433dee" sha1="4b12589fb14932381afa8433130d684120c5e3cd"/>
+				<rom name="dmg-braz-0.u1" size="1048576" crc="d8433dee" sha1="4b12589fb14932381afa8433130d684120c5e3cd"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -20322,14 +20293,14 @@ license:CC0
 	<software name="spyvsspyjanp" cloneof="spyvsspy">
 		<!-- Notes: GBC only -->
 		<!-- NP only -->
-		<!--	In lot check as "KENSA\cgbas6j1.0"	-->
+		<!--	Planned for physical release?	-->
 		<description>Spy vs. Spy (Japan, Rev 1, NP)</description>
 		<year>1999</year>
 		<publisher>Kemco</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="cgbas6j1.0" size="1048576" crc="eb47d63b" sha1="9e203f04857cd84ec49b0e6c6d4917b1a5cc199e"/>
+				<rom name="cgb-as6j-1.u1" size="1048576" crc="eb47d63b" sha1="9e203f04857cd84ec49b0e6c6d4917b1a5cc199e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -20682,7 +20653,7 @@ license:CC0
 	<software name="smbdxj" cloneof="smbdx">
 		<!-- Notes: GBC only -->
 		<!-- NP only -->
-		<!--	In lot check as "POOL\cgbahyj0.0"	-->
+		<!--	Planned for physical release?	-->
 		<description>Super Mario Bros. Deluxe (Japan, NP)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
@@ -20692,7 +20663,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="super mario bros. deluxe (japan) (np).bin" size="1048576" crc="866b1212" sha1="94466f48d8b4f811608ce8641de5f82315cd60b5"/>
+				<rom name="cgb-ahyj-0.u1" size="1048576" crc="866b1212" sha1="94466f48d8b4f811608ce8641de5f82315cd60b5"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -20702,7 +20673,7 @@ license:CC0
 	<software name="smbdxja" cloneof="smbdx">
 		<!-- Notes: GBC only -->
 		<!-- NP only -->
-		<!--	In lot check as "KENSA\cgbahyj1.0"	-->
+		<!--	Planned for physical release?	-->
 		<description>Super Mario Bros. Deluxe (Japan, NP, Rev 1)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
@@ -20712,7 +20683,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="cgbahyj1.0" size="1048576" crc="f4e91f63" sha1="e61d564e1ff19eb4b7c62a6cd96214f2bca4b01d"/>
+				<rom name="cgb-ahyj-1.u1" size="1048576" crc="f4e91f63" sha1="e61d564e1ff19eb4b7c62a6cd96214f2bca4b01d"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -20721,7 +20692,7 @@ license:CC0
 
 	<software name="smbdx">
 		<!-- Notes: GBC only -->
-		<!--	In lot check as "cgbahyp2.013", "KENSA\cgbahye2.0"	-->
+		<!--	Planned for release in USA as "cgb-ahye-2"	-->
 		<!--	Retail cartridge of USA version not yet secured, might be unreleased	-->
 		<description>Super Mario Bros. Deluxe (Europe, USA, Rev 2)</description>
 		<year>1999</year>
@@ -20730,7 +20701,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="super mario bros. deluxe (usa, europe) (rev 2).bin" size="1048576" crc="62bbae83" sha1="254f2254e9d54e2501e3e4ebe09491e03573a6a4"/>
+				<rom name="cgb-ahyp-2.u1" size="1048576" crc="62bbae83" sha1="254f2254e9d54e2501e3e4ebe09491e03573a6a4"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -20890,7 +20861,6 @@ license:CC0
 
 	<software name="survkidsj" cloneof="stranded">
 		<!-- Also released by NP in 2001-02 -->
-		<!--	In lot check as "dmgavkj0.g64"	-->
 		<description>Survival Kids - Kotou no Boukensha (Japan)</description>
 		<year>1999</year>
 		<publisher>Konami</publisher>
@@ -20902,7 +20872,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="dmgavkj0.g64" size="1048576" crc="61fa675c" sha1="f80abbeaa2cf0631c1cdf812c13f13f1fea41f18"/>
+				<rom name="dmg-avkj-0.u1" size="1048576" crc="61fa675c" sha1="f80abbeaa2cf0631c1cdf812c13f13f1fea41f18"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -21466,7 +21436,6 @@ license:CC0
 
 	<software name="tetrisada" cloneof="mtetrisc">
 		<!-- Notes: GBC only -->
-		<!--	In lot check as "cgbat7j1.070"	-->
 		<description>Tetris Adventure - Susume Mickey to Nakama-tachi (Japan, Rev 1)</description>
 		<year>1999</year>
 		<publisher>Capcom</publisher>
@@ -21476,7 +21445,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="cgbat7j1.070" size="1048576" crc="b7c0831f" sha1="a8842e85f2c6de4db40b47c9640dad59ae9d1c51"/>
+				<rom name="cgb-at7j-1.u1" size="1048576" crc="b7c0831f" sha1="a8842e85f2c6de4db40b47c9640dad59ae9d1c51"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -21822,7 +21791,6 @@ license:CC0
 
 	<software name="tomjermha" cloneof="tomjermh">
 		<!-- Notes: GBC only -->
-		<!--	In lot check as "cgbbtjp1.487"	-->
 		<description>Tom and Jerry - Mousehunt (Europe, Rev 1)</description>
 		<year>2001</year>
 		<publisher>Conspiracy Entertainment</publisher>
@@ -21831,7 +21799,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="cgbbtjp1.487" size="1048576" crc="4b4553e0" sha1="bf5faf4c5c2aabe9636f8f5afbbf526aba59e21d"/>
+				<rom name="cgb-btjp-1.u1" size="1048576" crc="4b4553e0" sha1="bf5faf4c5c2aabe9636f8f5afbbf526aba59e21d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21852,7 +21820,6 @@ license:CC0
 
 	<software name="tomjermhua" cloneof="tomjermh">
 		<!-- Notes: GBC only -->
-		<!--	In lot check as "cgbbtqe1.541"	-->
 		<description>Tom and Jerry - Mousehunt (USA, Rev 1)</description>
 		<year>2001</year>
 		<publisher>Conspiracy Entertainment</publisher>
@@ -21861,7 +21828,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
-				<rom name="cgbbtqe1.541" size="2097152" crc="ce4ca7b1" sha1="89374d81045a3bedf24e42b58ce403b0a5fbcddb"/>
+				<rom name="cgb-btqe-1.u1" size="2097152" crc="ce4ca7b1" sha1="89374d81045a3bedf24e42b58ce403b0a5fbcddb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -22454,7 +22421,7 @@ license:CC0
 
 	<software name="tradebata">
 		<!--	Only released on the 3DS Virtual Console?	-->
-		<!--	In lot check as "KENSA\dmgahhj1.1"	-->
+		<!--	Planned for physical release?	-->
 		<description>Trade &amp; Battle Card Hero (Japan, Rev 1)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
@@ -22465,7 +22432,7 @@ license:CC0
 			<feature name="slot" value="rom_mbc3" />
 			<feature name="rtc" value="yes" />
 			<dataarea name="rom" size="2097152">
-				<rom name="dmgahhj1.1" size="2097152" crc="d98a877d" sha1="c6c1e0365166b53d25a1f84bc380948a9661df30"/>
+				<rom name="dmg-ahhj-1.u1" size="2097152" crc="d98a877d" sha1="c6c1e0365166b53d25a1f84bc380948a9661df30"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -22593,7 +22560,6 @@ license:CC0
 	</software>
 	
 	<software name="tsurisn2a" cloneof="tsurisn2">
-		<!--	In lot check as "dmga2kj1.g93"	-->
 		<!--	Retail cartridge not yet secured	-->
 		<description>Tsuri Sensei 2 (Japan, Rev 1)</description>
 		<year>1999</year>
@@ -22605,7 +22571,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
-				<rom name="dmga2kj1.g93" size="2097152" crc="d390430e" sha1="59fa1707247f12b0c48eeb2e8fec274b9231d968"/>
+				<rom name="dmg-a2kj-1.u1" size="2097152" crc="d390430e" sha1="59fa1707247f12b0c48eeb2e8fec274b9231d968"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -23113,7 +23079,6 @@ license:CC0
 
 	<software name="vrspower">
 		<!-- Notes: GBC only -->
-		<!--	In lot check as "cgbbpbe0.340"	-->
 		<!--	Retail cartridge not yet secured, might be unreleased	-->
 		<description>VR Sports Powerboat Racing (USA)</description>
 		<year>2000</year>
@@ -23123,7 +23088,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="cgbbpbe0.340" size="1048576" crc="cff671f1" sha1="1c77f032cdd373bfa108ea82c463f8f9f6874c71"/>
+				<rom name="cgb-bpbe-0.u1" size="1048576" crc="cff671f1" sha1="1c77f032cdd373bfa108ea82c463f8f9f6874c71"/>
 			</dataarea>
 		</part>
 	</software>
@@ -24045,7 +24010,6 @@ license:CC0
 
 	<software name="yakouchu">
 		<!-- Notes: GBC only -->
-		<!--	In lot check as "cgbaytj0.066"	-->
 		<!--	Retail cartridge not yet secured	-->
 		<description>Yakouchuu GB (Japan)</description>
 		<year>1999</year>
@@ -24057,7 +24021,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
-				<rom name="cgbaytj0.066" size="2097152" crc="e0a06018" sha1="a7efd41d0ad17892132788bd90cdfb9df6806a78"/>
+				<rom name="cgb-aytj-0.u1" size="2097152" crc="e0a06018" sha1="a7efd41d0ad17892132788bd90cdfb9df6806a78"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
