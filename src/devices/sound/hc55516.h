@@ -49,7 +49,7 @@ protected:
 
 	// const state defined by constructor
 	const bool m_active_clock_edge;
-	const uint8_t m_shiftreg_mask;
+	const uint8_t m_shiftreg_mask; // it may be desirable to allow this to be changed by the user under some circumstances
 
 	// internal state
 	sound_stream *m_stream;
@@ -146,7 +146,7 @@ protected:
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
-	// const coefficients defined by constructor
+	// const coefficients defined by constructor; should these be adjustable by the user or externally defined, as they are implemented using a set of two small lowpass filters outside the chip?
 	const double m_charge;
 	const double m_decay;
 	const double m_leak;
