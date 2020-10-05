@@ -1,5 +1,24 @@
 // license:BSD-3-Clause
 // copyright-holders:K.Wilkins,Couriersud,Derrick Renaud,Frank Palazzolo,Jonathan Gevaryahu
+/*
+    This is an implementation of a Direct-form II digital biquad filter,
+    intended for use in audio paths for filtering audio to or from other
+    stream devices.
+
+    It has a number of constructor-helpers for automatically generating
+    a biquad filter equivalent to the filter response of a few standard
+    analog second order filter topographies.
+
+    This biquad filter implementation is based on one written by Frank
+    Palazzolo, K. Wilkins, Couriersud, and Derrick Renaud, with some changes:
+    * It uses the Q factor directly in the filter definitions, rather than the damping factor (1/Q)
+    * It implements every common type of digital biquad filter which I could find documentation for.
+    * The filter is Direct-form II instead of Direct-form I, which results in shorter compiled code.
+
+    Possibly useful features which aren't implemented because nothing uses them yet:
+    * More Sallen-Key filter variations (band-pass, high-pass)
+    * Direct control of the 5 normalized biquad parameters for a custom/raw parameter filter.
+*/
 #include "emu.h"
 #include "flt_biquad.h"
 
@@ -14,6 +33,8 @@
 // device type definition
 DEFINE_DEVICE_TYPE(FILTER_BIQUAD, filter_biquad_device, "filter_biquad", "Biquad Filter")
 
+// allow the enum class for the biquad filter type to be saved by the savestate system
+ALLOW_SAVE_TYPE(filter_biquad_device::biquad_type);
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -28,7 +49,7 @@ filter_biquad_device::filter_biquad_device(const machine_config &mconfig, const 
 	: device_t(mconfig, FILTER_BIQUAD, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),
-		m_type(HIGHPASS),
+		m_type(biquad_type::HIGHPASS),
 		m_last_sample_rate(0),
 		m_fc(16.0),
 		m_q(M_SQRT2/2.0),
@@ -47,7 +68,7 @@ filter_biquad_device::filter_biquad_device(const machine_config &mconfig, const 
 }
 
 // set up the filter with the specified parameters and return a pointer to the new device
-filter_biquad_device& filter_biquad_device::setup(int type, double fc, double q, double gain)
+filter_biquad_device& filter_biquad_device::setup(biquad_type type, double fc, double q, double gain)
 {
 	m_type = type;
 	m_fc = fc;
@@ -57,7 +78,7 @@ filter_biquad_device& filter_biquad_device::setup(int type, double fc, double q,
 }
 
 // update an existing instance with new filter parameters
-void filter_biquad_device::update_params(int type, double fc, double q, double gain)
+void filter_biquad_device::update_params(biquad_type type, double fc, double q, double gain)
 {
 	m_stream->update();
 	m_type = type;
@@ -112,7 +133,7 @@ filter_biquad_device& filter_biquad_device::opamp_sk_lowpass_setup(double r1, do
 #ifdef FLT_BIQUAD_DEBUG_SETUP
 		logerror("filter_biquad_device::opamp_sk_lowpass_setup() yields: fc = %f, Q = %f, gain = %f\n", fc, q, gain);
 #endif
-		return setup(LOWPASS, fc, q, gain);
+		return setup(biquad_type::LOWPASS, fc, q, gain);
 }
 
 // Multiple-Feedback filters
@@ -152,7 +173,7 @@ filter_biquad_device& filter_biquad_device::opamp_mfb_lowpass_setup(double r1, d
 #ifdef FLT_BIQUAD_DEBUG_SETUP
 		logerror("filter_biquad_device::opamp_mfb_lowpass_setup() in degraded mode yields: fc = %f, Q = %f(ignored), gain = %f\n", fc, q, gain);
 #endif
-		return setup(LOWPASS1P, fc, q, gain);
+		return setup(biquad_type::LOWPASS1P, fc, q, gain);
 	}
 	else
 	{
@@ -161,7 +182,7 @@ filter_biquad_device& filter_biquad_device::opamp_mfb_lowpass_setup(double r1, d
 #ifdef FLT_BIQUAD_DEBUG_SETUP
 		logerror("filter_biquad_device::opamp_mfb_lowpass_setup() yields: fc = %f, Q = %f, gain = %f\n", fc, q, gain);
 #endif
-		return setup(LOWPASS, fc, q, gain);
+		return setup(biquad_type::LOWPASS, fc, q, gain);
 	}
 }
 
@@ -211,7 +232,7 @@ filter_biquad_device& filter_biquad_device::opamp_mfb_bandpass_setup(double r1, 
 #ifdef FLT_BIQUAD_DEBUG_SETUP
 	logerror("filter_biquad_device::opamp_mfb_bandpass_setup() yields: fc = %f, Q = %f, gain = %f\n", fc, q, gain);
 #endif
-	return setup(BANDPASS, fc, q, gain);
+	return setup(biquad_type::BANDPASS, fc, q, gain);
 }
 
 /* Setup a biquad filter structure based on a single op-amp Multiple-Feedback high-pass filter circuit.
@@ -247,7 +268,7 @@ filter_biquad_device& filter_biquad_device::opamp_mfb_highpass_setup(double r1, 
 #ifdef FLT_BIQUAD_DEBUG_SETUP
 	logerror("filter_biquad_device::opamp_mfb_highpass_setup() yields: fc = %f, Q = %f, gain = %f\n", fc, q, gain);
 #endif
-	return setup(HIGHPASS, fc, q, gain);
+	return setup(biquad_type::HIGHPASS, fc, q, gain);
 }
 
 
@@ -324,47 +345,47 @@ void filter_biquad_device::recalc()
 
 	switch (m_type)
 	{
-		case LOWPASS1P:
+		case biquad_type::LOWPASS1P:
 			m_a1 = exp(-2.0 * M_PI * (m_fc / m_stream->sample_rate()));
 			m_b0 = 1.0 - m_a1;
 			m_a1 = -m_a1;
 			m_b1 = m_b2 = m_a2 = 0.0;
 			break;
-		case HIGHPASS1P:
+		case biquad_type::HIGHPASS1P:
 			m_a1 = -exp(-2.0 * M_PI * (0.5 - m_fc / m_stream->sample_rate()));
 			m_b0 = 1.0 + m_a1;
 			m_a1 = -m_a1;
 			m_b1 = m_b2 = m_a2 = 0.0;
 			break;
-		case LOWPASS:
+		case biquad_type::LOWPASS:
 			m_b0 = Ksquared * normal;
 			m_b1 = 2.0 * m_b0;
 			m_b2 = 1.0 * m_b0;
 			m_a1 = 2.0 * (Ksquared - 1.0) * normal;
 			m_a2 = (1.0 - KoverQ + Ksquared) * normal;
 			break;
-		case HIGHPASS:
+		case biquad_type::HIGHPASS:
 			m_b0 = 1.0 * normal;
 			m_b1 = -2.0 * m_b0;
 			m_b2 = 1.0 * m_b0;
 			m_a1 = 2.0 * (Ksquared - 1.0) * normal;
 			m_a2 = (1.0 - KoverQ + Ksquared) * normal;
 			break;
-		case BANDPASS:
+		case biquad_type::BANDPASS:
 			m_b0 = KoverQ * normal;
 			m_b1 = 0.0;
 			m_b2 = -1.0 * m_b0;
 			m_a1 = 2.0 * (Ksquared - 1.0) * normal;
 			m_a2 = (1.0 - KoverQ + Ksquared) * normal;
 			break;
-		case NOTCH:
+		case biquad_type::NOTCH:
 			m_b0 = (1.0 + Ksquared) * normal;
 			m_b1 = 2.0 * (Ksquared - 1.0) * normal;
 			m_b2 = 1.0 * m_b0;
 			m_a1 = 1.0 * m_b1;
 			m_a2 = (1.0 - KoverQ + Ksquared) * normal;
 			break;
-		case PEAK:
+		case biquad_type::PEAK:
 			if (DBGain >= 0.0)
 			{
 				m_b0 = (1.0 + (AMGain * KoverQ) + Ksquared) * normal;
@@ -383,7 +404,7 @@ void filter_biquad_device::recalc()
 				m_a2 = (1.0 - (AMGain * KoverQ) + Ksquared) * normal;
 			}
 			break;
-		case LOWSHELF:
+		case biquad_type::LOWSHELF:
 			if (DBGain >= 0.0)
 			{
 				normal = 1.0 / (1.0 + M_SQRT2 * K + Ksquared);
@@ -403,7 +424,7 @@ void filter_biquad_device::recalc()
 				m_a2 = (1.0 - sqrt(2.0 * AMGain) * K + AMGain * Ksquared) * normal;
 			}
 			break;
-		case HIGHSHELF:
+		case biquad_type::HIGHSHELF:
 			if (DBGain >= 0.0)
 			{
 				normal = 1.0 / (1.0 + M_SQRT2 * K + Ksquared);
@@ -441,9 +462,9 @@ void filter_biquad_device::recalc()
 	// peak and shelf filters do not use gain for the entire signal, only for the peak/shelf portions
 	// side note: the first order lowpass and highpass filter analogues technically don't have gain either,
 	// but this can be 'faked' by adjusting the bx factors, so we support that anyway, even if it isn't realistic.
-	if ( (m_type != PEAK)
-		&& (m_type != LOWSHELF)
-		&& (m_type != HIGHSHELF) )
+	if ( (m_type != biquad_type::PEAK)
+		&& (m_type != biquad_type::LOWSHELF)
+		&& (m_type != biquad_type::HIGHSHELF) )
 	{
 		m_b0 *= m_gain;
 		m_b1 *= m_gain;

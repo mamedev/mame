@@ -14,7 +14,7 @@
 class filter_biquad_device : public device_t, public device_sound_interface
 {
 public:
-	enum
+	enum class biquad_type : int
 	{
 		LOWPASS1P = 0,
 		HIGHPASS1P,
@@ -30,9 +30,9 @@ public:
 	filter_biquad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// set up the filter with the specified filter parameters and return a pointer to the new device
-	filter_biquad_device& setup(int type, double fc, double q, double gain);
+	filter_biquad_device& setup(biquad_type type, double fc, double q, double gain);
 	// update an existing instance with new filter parameters
-	void update_params(int type, double fc, double q, double gain);
+	void update_params(biquad_type type, double fc, double q, double gain);
 
 	// helper setup functions to create common filters representable by biquad filters
 	// Sallen-Key low-pass
@@ -62,7 +62,7 @@ private:
 	void step();
 
 	sound_stream*  m_stream;
-	int            m_type;
+	biquad_type    m_type;
 	int            m_last_sample_rate;
 	double         m_fc;
 	double         m_q;
