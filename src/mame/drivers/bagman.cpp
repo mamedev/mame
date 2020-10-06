@@ -784,7 +784,7 @@ ROM_END
 Stern Bagman ROM labels follow this format:
 
 BAGMAN      (c)
-A5      9F
+A5      9F       <-- Revision level and PCB location
 1983      STERN
 */
 ROM_START( bagmans )
@@ -793,7 +793,7 @@ ROM_START( bagmans )
 	ROM_LOAD( "bagman_a5_9f.9f", 0x1000, 0x1000, CRC(2ddf6bb9) SHA1(151068dddc55163bb6f925f68e5d04e347ded6a5) )
 	ROM_LOAD( "bagman_a4_9j.9j", 0x2000, 0x1000, CRC(b2da8b77) SHA1(ea36cd6be42c5548a9a91054aeebb4b985ba15c9) )
 	ROM_LOAD( "bagman_a5_9k.9k", 0x3000, 0x1000, CRC(f91d617b) SHA1(a3323b51277e08747701cc4e2d3a9c466e96d4c1) )
-	ROM_LOAD( "bagman_a4_9m.9m", 0x4000, 0x1000, CRC(b8e75eb6) SHA1(433fd736512f10bc0879b15821eb55cc41d58d33) )
+	ROM_LOAD( "bagman_a4_9m.9m", 0x4000, 0x1000, CRC(b8e75eb6) SHA1(433fd736512f10bc0879b15821eb55cc41d58d33) ) // == bagman_a2_9m.9m
 	ROM_LOAD( "bagman_a5_9n.9n", 0x5000, 0x1000, CRC(68e4b64d) SHA1(55950d7c07c621cafa001d5d3bfec6bbc02712e2) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
@@ -806,7 +806,7 @@ ROM_START( bagmans )
 
 	// according to MT #02508 Stern/Seeburg logos should have different colors.
 	ROM_REGION( 0x0040, "proms", 0 )
-	ROM_LOAD( "3p.bin", 0x0000, 0x0020, BAD_DUMP CRC(2a855523) SHA1(91e032233fee397c90b7c1662934aca9e0671482) )
+	ROM_LOAD( "3p.bin", 0x0000, 0x0020, BAD_DUMP CRC(2a855523) SHA1(91e032233fee397c90b7c1662934aca9e0671482) ) // pictures of the PCB shows "BAGMAN COLOR 3PA2" - not dumped / verified
 	ROM_LOAD( "3r.bin", 0x0020, 0x0020, BAD_DUMP CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) )
 
 	ROM_REGION( 0x0020, "5110ctrl", 0)
@@ -836,7 +836,7 @@ ROM_START( bagmans4 )
 
 	// according to MT #02508 Stern/Seeburg logos should have different colors.
 	ROM_REGION( 0x0040, "proms", 0 )
-	ROM_LOAD( "3p.bin", 0x0000, 0x0020, BAD_DUMP CRC(2a855523) SHA1(91e032233fee397c90b7c1662934aca9e0671482) )
+	ROM_LOAD( "3p.bin", 0x0000, 0x0020, BAD_DUMP CRC(2a855523) SHA1(91e032233fee397c90b7c1662934aca9e0671482) ) // pictures of the PCB shows "BAGMAN COLOR 3PA2" - not dumped / verified
 	ROM_LOAD( "3r.bin", 0x0020, 0x0020, BAD_DUMP CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) )
 
 	ROM_REGION( 0x0020, "5110ctrl", 0)
@@ -1226,7 +1226,7 @@ GAME( 1983, bagnardi,  bagman,  bagman,   bagman,    bagman_state,   empty_init,
 GAME( 1982, bagnardio, bagman,  bagman,   bagman,    bagman_state,   empty_init, ROT90,  "Valadon Automation (Itisa license)",             "Le Bagnard (Itisa, Spain, older)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1982, bagmans,   bagman,  bagman,   bagmans,   bagman_state,   empty_init, ROT270, "Valadon Automation (Stern Electronics license)", "Bagman (Stern Electronics, revision A5)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, bagmans4,  bagman,  bagman,   bagman,    bagman_state,   empty_init, ROT270, "Valadon Automation (Stern Electronics license)", "Bagman (Stern Electronics, revision A4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bagmans3,  bagman,  bagman,   bagman,    bagman_state,   empty_init, ROT270, "Valadon Automation (Stern Electronics license)", "Bagman (Stern Electronics, revision A3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bagmans3,  bagman,  bagman,   bagman,    bagman_state,   empty_init, ROT270, "Valadon Automation (Stern Electronics license)", "Bagman (Stern Electronics, revision A3)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1982, bagmanj,   bagman,  bagman,   bagman,    bagman_state,   empty_init, ROT270, "Valadon Automation (Taito license)",             "Bagman (Taito)",                          MACHINE_SUPPORTS_SAVE ) // Title screen actually doesn't mention Valadon, only Stern and Taito
 
 GAME( 1984, sbagman,   0,       sbagman,  sbagman,   bagman_state,   empty_init, ROT270, "Valadon Automation",                             "Super Bagman (version 5)",                MACHINE_SUPPORTS_SAVE )
