@@ -1001,7 +1001,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 					{
 						u32 const src = gen_read(mode[0]);
 
-						if (size == 0)
+						if (size == SIZE_B)
 							m_psr = (m_psr & 0xff00) | u8(src);
 						else
 							m_psr = src;
@@ -1057,16 +1057,20 @@ template <int Width> void ns32000_device<Width>::execute_run()
 					mode[0].read_i(size);
 					decode(mode, bytes);
 
-					if (size == 0 || !(m_psr & PSR_U))
+					if (size < SIZE_D)
 					{
-						// FIXME: read.D?
-						u16 const src = gen_read(mode[0]);
+						if (size == SIZE_B || !(m_psr & PSR_U))
+						{
+							u16 const src = gen_read(mode[0]);
 
-						m_psr &= ~src;
-						m_pc += bytes;
+							m_psr &= ~src;
+							m_pc += bytes;
+						}
+						else
+							interrupt(ILL, m_pc);
 					}
 					else
-						interrupt(ILL, m_pc);
+						interrupt(UND, m_pc);
 					break;
 				case 0x4:
 					// JUMP dst
@@ -1085,17 +1089,20 @@ template <int Width> void ns32000_device<Width>::execute_run()
 					mode[0].read_i(size);
 					decode(mode, bytes);
 
-					if (size == 0 || !(m_psr & PSR_U))
+					if (size < SIZE_D)
 					{
-						// FIXME: read.D?
+						if (size == SIZE_B || !(m_psr & PSR_U))
+						{
+							u16 const src = gen_read(mode[0]);
 
-						u16 const src = gen_read(mode[0]);
-
-						m_psr |= src;
-						m_pc += bytes;
+							m_psr |= src;
+							m_pc += bytes;
+						}
+						else
+							interrupt(ILL, m_pc);
 					}
 					else
-						interrupt(ILL, m_pc);
+						interrupt(UND, m_pc);
 					break;
 				case 0xa:
 					// ADJSPi src
@@ -2558,7 +2565,9 @@ template <int Width> void ns32000_device<Width>::execute_run()
 					break;
 				case 0x3:
 					// Trap(SLAVE)
-					// FIXME: operand access classes?
+					// operands from ns32532 datasheet
+					mode[0].read_f(size_f);
+					mode[1].read_f(size_f);
 					decode(mode, bytes);
 
 					if (!slave(mode[0], mode[1]))
@@ -2607,7 +2616,9 @@ template <int Width> void ns32000_device<Width>::execute_run()
 					break;
 				case 0x9:
 					// Trap(SLAVE)
-					// FIXME: operand access classes?
+					// operands from ns32532 datasheet
+					mode[0].read_f(size_f);
+					mode[1].write_f(size_f);
 					decode(mode, bytes);
 
 					if (!slave(mode[0], mode[1]))
