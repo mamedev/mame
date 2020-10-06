@@ -402,16 +402,16 @@ void bnstars_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 
 	u16      *source = sprram_top;
 	const u16    *finish = sprram_top + (sprram_size - 0x10) / 2;
+	const bool reverseorder = (m_sprite_ctrl[0x10/4] & 0x8000) == 0x0000;
 
-
-	if (m_reverse_sprite_order == 1)
+	if (reverseorder == true)
 	{
 		source  = sprram_top + (sprram_size - 0x10) / 2;
 		finish  = sprram_top;
 	}
 
 
-	for (;m_reverse_sprite_order ? (source>=finish) : (source<finish); m_reverse_sprite_order ? (source-=8) : (source+=8))
+	for (;reverseorder ? (source>=finish) : (source<finish); reverseorder ? (source-=8) : (source+=8))
 	{
 		bool disable;
 		u8 pri;
@@ -731,7 +731,7 @@ void bnstars_state::bnstars_map(address_map &map)
 	map(0xfcc00010, 0xfcc00013).portr("DSW");
 
 	map(0xfce00038, 0xfce0003b).w(FUNC(bnstars_state::sound_reset_w));
-
+	map(0xfce00200, 0xfce0027f).ram().share("sprite_ctrl");
 	map(0xfce00400, 0xfce0045f).writeonly().share("roz_ctrl.0");
 	map(0xfce00700, 0xfce0075f).writeonly().share("roz_ctrl.1"); // guess
 	map(0xfce00a00, 0xfce00a17).writeonly().share("tx0_scroll");
@@ -742,6 +742,7 @@ void bnstars_state::bnstars_map(address_map &map)
 	map(0xfce00e00, 0xfce00e03).w(FUNC(bnstars_state::bnstars1_mahjong_select_w)); // ?
 
 	map(0xfd000000, 0xfd000003).r(FUNC(bnstars_state::sound_result_r));
+
 
 	/* wrote together */
 	map(0xfd040000, 0xfd047fff).ram(); // priority ram

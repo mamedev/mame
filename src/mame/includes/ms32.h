@@ -23,6 +23,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_sprite(*this, "sprite"),
 		m_soundlatch(*this, "soundlatch"),
+		m_sprite_ctrl(*this, "sprite_ctrl"),
 		m_screen(*this, "screen"),
 		m_mainram(*this, "mainram"),
 		m_roz_ctrl(*this, "roz_ctrl"),
@@ -71,7 +72,6 @@ protected:
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	int m_reverse_sprite_order;
 	int m_flipscreen;
 	u8 m_dotclock;
 	struct {
@@ -84,6 +84,7 @@ protected:
 	required_device<cpu_device> m_audiocpu;
 	required_device<ms32_sprite_device> m_sprite;
 	optional_device<generic_latch_8_device> m_soundlatch;
+	optional_shared_ptr<u32> m_sprite_ctrl;
 
 private:
 	optional_device<screen_device> m_screen;
@@ -158,7 +159,7 @@ private:
 	void irq_init();
 	void irq_raise(int level);
 	void update_color(int color);
-	void draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, const rectangle &cliprect, u16 *sprram_top, size_t sprram_size, int reverseorder);
+	void draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, const rectangle &cliprect, u16 *sprram_top, size_t sprram_size);
 	void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect,int priority);
 	void f1superb_map(address_map &map);
 	void ms32_map(address_map &map);

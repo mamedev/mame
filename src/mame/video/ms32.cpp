@@ -88,17 +88,6 @@ void ms32_state::video_start()
 	m_bg_tilemap_alt->set_transparent_pen(0);
 	m_roz_tilemap->set_transparent_pen(0);
 
-	m_reverse_sprite_order = 1;
-
-	/* i hate per game patches...how should priority really work? tetrisp2.c ? i can't follow it */
-	if (!strcmp(machine().system().name,"kirarast"))    m_reverse_sprite_order = 0;
-	if (!strcmp(machine().system().name,"tp2m32"))  m_reverse_sprite_order = 0;
-	if (!strcmp(machine().system().name,"suchie2"))  m_reverse_sprite_order = 0;
-	if (!strcmp(machine().system().name,"suchie2o")) m_reverse_sprite_order = 0;
-	if (!strcmp(machine().system().name,"hayaosi3"))    m_reverse_sprite_order = 0;
-	if (!strcmp(machine().system().name,"bnstars")) m_reverse_sprite_order = 0;
-	if (!strcmp(machine().system().name,"wpksocv2"))    m_reverse_sprite_order = 0;
-
 	// tp2m32 doesn't set the brightness registers so we need sensible defaults
 	m_brt[0] = m_brt[1] = 0xffff;
 
@@ -108,7 +97,6 @@ void ms32_state::video_start()
 	save_item(NAME(m_temp_bitmap_sprites));
 	save_item(NAME(m_temp_bitmap_sprites_pri));
 	save_item(NAME(m_tilemaplayoutcontrol));
-	save_item(NAME(m_reverse_sprite_order));
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_brt));
 	save_item(NAME(m_brt_r));
@@ -211,7 +199,7 @@ void ms32_state::crtc_w(offs_t offset, u32 data, u32 mem_mask)
 			if (ACCESSING_BITS_0_7)
 			{
 			/* 
-			 * ---- x--- used by several games (1->0 in p47aces), unknown
+			 * ---- x--- programmable irq timer enable (1->0 in P47 Aces)
 			 * ---- -x-- used by f1superb, unknown
 			 * ---- --x- flip screen
 			 * ---- ---x dotclock select (1) 8 MHz (0) 6 MHz
@@ -245,12 +233,14 @@ void ms32_state::crtc_w(offs_t offset, u32 data, u32 mem_mask)
 
 
 /* SPRITES based on tetrisp2 for now, readd priority bits later */
-void ms32_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, const rectangle &cliprect, u16 *sprram_top, size_t sprram_size, int reverseorder)
+void ms32_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, const rectangle &cliprect, u16 *sprram_top, size_t sprram_size)
 {
 	u16  *source =   sprram_top;
 	u16  *finish =   sprram_top + (sprram_size - 0x10) / 2;
+	const bool reverseorder = (m_sprite_ctrl[0x10/4] & 0x8000) == 0x0000;
+//	popmessage("%08x %d",m_sprite_ctrl[0x10/4], reverseorder);
 
-	if (reverseorder == 1)
+	if (reverseorder == true)
 	{
 		source  = sprram_top + (sprram_size - 0x10) / 2;
 		finish  = sprram_top;
@@ -299,6 +289,7 @@ void ms32_state::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rec
     // suchie2:  0x0000 0x0000  0?
     // bnstars:  0x0000 0x0000  ?
     // hayaosi3: 0x0000 0x0000  ?
+	// akiss:    0xffff 0x0000  0 (gal riichi, cfr. attract mode)
     // Maybe wrapping is done by limit boundaries rather than individual bits, so that bbbxing and p47aces abuses of this behaviour?
     // Are we missing a ROZ plane size as well?
     
@@ -387,6 +378,29 @@ u32 ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitmap, 
 	int scr_pri;
 	int rot_pri;
 
+	/*
+		sprite control regs
+			    0x1c 0x20 0x40 <prihack>
+		akiss      0    0    0     0  
+		bbbxing    0    0    0     0  
+		bnstars    1    0    0     1
+		bnstars1   ?    ?    ?     1
+		desertwr   1    0    0     0
+		f1superb   0    0    0     0
+		gametngk   0 0140    0     0
+		gratia     0    0    0     0
+		hayaosi2   0    0    0     0
+		hayaosi3   0 0140    0     1
+		kirarast   0    0    0     1
+		p47aces    1    0    0     0
+		suchie2    0    0    0     1
+		tetrisp    0    0    0     0
+		tp2m32     0 0140    0     1
+		wpksocv2   0 0140    0     1
+	*/
+//	popmessage("%04x %04x %04x",m_sprite_ctrl[0x1c/4], m_sprite_ctrl[0x20/4], m_sprite_ctrl[0x40/4]);
+//	popmessage("%04x %04x %04x %04x|%04x %04x %04x",m_sprite_ctrl[0x00/4],m_sprite_ctrl[0x04/4],m_sprite_ctrl[0x08/4],m_sprite_ctrl[0x0c/4]
+//					 ,m_sprite_ctrl[0x10/4],m_sprite_ctrl[0x14/4],m_sprite_ctrl[0x18/4]);
 	/* TODO: registers 0x04/4 and 0x10/4 are used too; the most interesting case
 	   is gametngk, where they are *usually*, but not always, copies of 0x00/4
 	   and 0x0c/4 (used for scrolling).
@@ -412,7 +426,6 @@ u32 ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitmap, 
 	m_bg_tilemap_alt->set_scrollx(0, scrollx);
 	m_bg_tilemap_alt->set_scrolly(0, scrolly);
 
-
 	screen.priority().fill(0, cliprect);
 
 	/* TODO: 0 is correct for gametngk, but break f1superb scrolling grid (text at
@@ -423,7 +436,8 @@ u32 ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitmap, 
 	m_temp_bitmap_sprites.fill(0, cliprect);
 	m_temp_bitmap_sprites_pri.fill(0, cliprect);
 
-	draw_sprites(m_temp_bitmap_sprites, m_temp_bitmap_sprites_pri, cliprect, m_sprram_buffer.get(), 0x20000, m_reverse_sprite_order);
+	// TODO: sprite control 0x10 also controls sprite start? akiss uses it for double buffer animations, flips between 0 and 0x800 (and is ugly for latter)
+	draw_sprites(m_temp_bitmap_sprites, m_temp_bitmap_sprites_pri, cliprect, m_sprram_buffer.get(), 0x20000);
 
 
 	// TODO: actually understand this (per-scanline priority and alpha-blend over every layer?)

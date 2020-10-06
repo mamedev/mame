@@ -706,6 +706,7 @@ void ms32_state::ms32_map(address_map &map)
 //	map(0xfce00048, 0xfce0004f)													// sound comms bidirectional acks?
 	map(0xfce00050, 0xfce00053).nopw();											// watchdog
 //	map(0xfce00058, 0xfce0005f)													// irq control?
+	map(0xfce00200, 0xfce0027f).ram().share("sprite_ctrl");
 	map(0xfce00280, 0xfce0028f).w(FUNC(ms32_state::ms32_brightness_w)); 		// global brightness control
 //	map(0xfce00400, 0xfce0045f)													// ROZ0 control registers
 /**/map(0xfce00600, 0xfce0065f).ram().share("roz_ctrl");        				// ROZ1 control registers
