@@ -34,7 +34,7 @@ public:
 
 protected:
 	// device_interface overrides
-	virtual void interface_pre_start() override
+	virtual void interface_post_start() override
 	{
 		m_out_scb.resolve_safe();
 	}

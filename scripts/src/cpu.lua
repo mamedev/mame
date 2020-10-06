@@ -3014,6 +3014,7 @@ if (CPUS["NS32000"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/cpu/ns32000/ns32000.cpp",
 		MAME_DIR .. "src/devices/cpu/ns32000/ns32000.h",
+		MAME_DIR .. "src/devices/cpu/ns32000/slave.h",
 	}
 end
 
