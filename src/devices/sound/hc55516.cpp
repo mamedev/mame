@@ -203,8 +203,7 @@ void cvsd_device_base::sound_stream_update(sound_stream &stream, std::vector<rea
 	m_samples_generated += buffer.samples();
 	if (m_samples_generated >= SAMPLE_RATE)
 		m_samples_generated -= SAMPLE_RATE;
-	for (int i = 0; i < buffer.samples(); i++)
-		buffer.put(i, stream_buffer::sample_t(0.0));
+	buffer.fill(0);
 }
 
 
@@ -383,7 +382,7 @@ void hc55516_device::sound_stream_update(sound_stream &stream, std::vector<read_
 		/* external oscillator */
 		for (int i = 0; i < buffer.samples(); i++)
 		{
-			buffer.put(i, stream_buffer::sample_t(m_next_sample/32768.0));
+			buffer.put_int(i, m_next_sample, 32768);
 
 			m_samples_generated++;
 
@@ -402,7 +401,7 @@ void hc55516_device::sound_stream_update(sound_stream &stream, std::vector<read_
 	/* software driven clock */
 	else
 		for (int i = 0; i < buffer.samples(); i++)
-			buffer.put(i, stream_buffer::sample_t(m_next_sample/32768.0));
+			buffer.put_int(i, m_next_sample, 32768);
 }
 
 
@@ -502,11 +501,6 @@ void mc3417_device::process_bit(bool bit, bool clock_state)
 
 		/* compute the sample as a 32-bit word */
 		m_next_sample = m_intfilter_d * SAMPLE_GAIN;
-		/* compress the sample range to fit better in a 16-bit word */
-		/*if (temp < 0)
-			m_next_sample = (int)(temp / (-temp * (1.0 / 32768.0) + 1.0));
-		else
-			m_next_sample = (int)(temp / (temp * (1.0 / 32768.0) + 1.0));*/
 	}
 }
 
@@ -535,7 +529,7 @@ void mc3417_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 		/* external oscillator */
 		for (int i = 0; i < buffer.samples(); i++, sample += slope)
 		{
-			buffer.put(i, stream_buffer::sample_t(sample));
+			buffer.put(i, sample);
 
 			m_samples_generated++;
 
@@ -554,7 +548,7 @@ void mc3417_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 	/* software driven clock */
 	else
 		for (int i = 0; i < buffer.samples(); i++, sample += slope)
-			buffer.put(i, stream_buffer::sample_t(sample));
+			buffer.put(i, sample);
 }
 
 
