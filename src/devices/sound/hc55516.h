@@ -136,7 +136,7 @@ public:
 
 protected:
 	// overridable type for subclass
-	mc3417_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	mc3417_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t shiftreg_mask);
 
 	// device-level overrides
 	virtual void device_start() override;

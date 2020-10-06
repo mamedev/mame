@@ -214,17 +214,7 @@ void cvsd_device_base::sound_stream_update(sound_stream &stream, std::vector<rea
 DEFINE_DEVICE_TYPE(HC55516, hc55516_device, "hc55516", "HC-55516")
 
 hc55516_device::hc55516_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cvsd_device_base(mconfig, HC55516, tag, owner, clock, RISING, 0x7)
-	, m_agc_push_cb(*this)
-	, m_fzq_pull_cb(*this)
-	, m_sylmask(0xfc0)
-	, m_sylshift(6)
-	, m_syladd(0xfc1)
-	, m_intshift(4)
-	, m_sylfilter(0)
-	, m_intfilter(0)
-	, m_agc(true)
-	, m_buffered_fzq(true)
+	: hc55516_device(mconfig, HC55516, tag, owner, clock, 0xfc0, 6, 0xfc1, 4)
 {
 }
 
@@ -449,18 +439,13 @@ void hc55532_device::device_reset()
 DEFINE_DEVICE_TYPE(MC3417, mc3417_device, "mc3417", "MC3417")
 
 mc3417_device::mc3417_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cvsd_device_base(mconfig, MC3417, tag, owner, clock, FALLING, 0x7)
-	, m_charge(pow(exp(-1.0), 1.0 / (FILTER_CHARGE_TC * 16000.0)))
-	, m_decay(pow(exp(-1.0), 1.0 / (FILTER_DECAY_TC * 16000.0)))
-	, m_leak(pow(exp(-1.0), 1.0 / (INTEGRATOR_LEAK_TC * 16000.0)))
-	, m_sylfilter_d(0.0)
-	, m_intfilter_d(0.0)
+	: mc3417_device(mconfig, MC3417, tag, owner, clock, 0x7)
 {
 }
 
 // overridable type for mc3418 etc
-mc3417_device::mc3417_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: cvsd_device_base(mconfig, type, tag, owner, clock, FALLING, 0xf)
+mc3417_device::mc3417_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t shiftreg_mask)
+	: cvsd_device_base(mconfig, type, tag, owner, clock, FALLING, shiftreg_mask)
 	, m_charge(pow(exp(-1.0), 1.0 / (FILTER_CHARGE_TC * 16000.0)))
 	, m_decay(pow(exp(-1.0), 1.0 / (FILTER_DECAY_TC * 16000.0)))
 	, m_leak(pow(exp(-1.0), 1.0 / (INTEGRATOR_LEAK_TC * 16000.0)))
@@ -580,6 +565,6 @@ void mc3417_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 DEFINE_DEVICE_TYPE(MC3418, mc3418_device, "mc3418", "MC3418")
 
 mc3418_device::mc3418_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc3417_device(mconfig, MC3418, tag, owner, clock)
+	: mc3417_device(mconfig, MC3418, tag, owner, clock, 0xf)
 {
 }
