@@ -558,14 +558,14 @@ void borderline_audio_device::device_add_mconfig(machine_config &config)
 		.set_source(NETLIST_NAME(brdrline))
 		.add_route(ALL_OUTPUTS, *this, 1.0);
 
-	NETLIST_LOGIC_INPUT(config, m_input_line[7], "GUN_TRG.IN", 0);
-	NETLIST_LOGIC_INPUT(config, m_input_line[6], "JEEP_ON.IN", 0);
-	NETLIST_LOGIC_INPUT(config, m_input_line[5], "POINT_TRG.IN", 0);
-	NETLIST_LOGIC_INPUT(config, m_input_line[4], "HIT_TRG.IN", 0);
-	NETLIST_LOGIC_INPUT(config, m_input_line[3], "WALK_TRG.IN", 0);
-	NETLIST_LOGIC_INPUT(config, m_input_line[2], "EMAR_TRG.IN", 0);
-	NETLIST_LOGIC_INPUT(config, m_input_line[1], "CRY_TRG.IN", 0);
-	NETLIST_LOGIC_INPUT(config, m_input_line[0], "ANIMAL_TRG.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_input_line[0], "I_SOUND_0.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_input_line[1], "I_SOUND_1.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_input_line[2], "I_SOUND_2.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_input_line[3], "I_SOUND_3.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_input_line[4], "I_SOUND_4.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_input_line[5], "I_SOUND_5.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_input_line[6], "I_SOUND_6.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_input_line[7], "I_SOUND_7.IN", 0);
 
 	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(1.0, 0.0);
 }

@@ -10,9 +10,17 @@
 //
 // Known problems/issues:
 //
-//    * all transistors in schematics of sound genertors were drawn
-//       in a wrong orientation.
-//       base and collectors were swaped
+//  * all transistors in schematics of sound genertors were drawn
+//      in a wrong orientation.
+//      base and collectors were swaped
+//
+//  * MB4391 is missing. a fake substitution is used
+//
+//  * it takes up to 30seconds to charge C24 to its working point
+//      in ANIMAL_SOUND
+//
+//  * noise generation with MM5837_DIP eats a lot of CPU power 
+//
 
 
 // ---------------------------------------------------------------------------
@@ -24,6 +32,7 @@
 // Page 26
 // Sound Board Assembly
 // Drawing No. 834-0055, Rev. A, Sheet 6 of 7
+// () = location in schematics
 // ...........................................................................
 // GUN_TRG (C8);    GUN_SOUND (D6);   (C8,D8,C7,D7,C6,D6)
 // JEEP_ON (C8);    JEEP_SOUND (C6);  (C8,B8,C7,B7,C6,B6)
@@ -35,6 +44,7 @@
 // Page 27
 // Sound Board Assembly
 // Drawing No. 834-0055, Rev. A, Sheet 7 of 7
+// () = location in schematics
 // ...........................................................................
 // ANIMAL_TRG (D8); ANIMAL_SOUND (C6); (D8,C8,B8,A8,D7,C7,B7,A8,D6,C6,D5,C5)
 // EMAR_TRG (A8);   EMAR_SOUND (C5);   (A8,A7,B7,C6,B6,B5,C5,B4,C4,D4,D3)
@@ -45,11 +55,10 @@
 
 
 // dry run:
-// X=TEST_POINT; ./nltool -q -c run --progress -t 45 -n brdrline -l $X -i ../nl_brdrline.csv ../nl_brdrline.cpp && ./nlwav -f tab -i 0.001 -s 0.0 -n -1 log_$X.log | gnuplot -p -e "reset; plot '-' using 1 with lines"
-// X=TEST_POINT; ./nltool -v -s -c run --progress -t 45 -n brdrline -l $X -i ../nl_brdrline.csv ../nl_brdrline.cpp | tee ../nl_brdrline.txt && ./nlwav -f tab -i 0.001 -s 0.0 -n -1 log_$X.log | gnuplot -p -e "reset; plot '-' using 1 with lines"
+// X=SOUND_OUT; ./nltool -q -c run --progress -t 50 -n brdrline -l $X -i ./src/mame/audio/nl_brdrline.csv ./src/mame/audio/nl_brdrline.cpp && ./nlwav -f tab -i 0.001 -s 1 -n -1 log_$X.log | gnuplot -p -e "reset; plot '-' using 1 with lines"
+// X=SOUND_OUT; ./nltool -v -s -c run --progress -t 50 -n brdrline -l $X -i ./src/mame/audio/nl_brdrline.csv ./src/mame/audio/nl_brdrline.cpp | tee ./nl_brdrline.txt && ./nlwav -f tab -i 0.001 -s 1 -n -1 log_$X.log | gnuplot -p -e "reset; plot '-' using 1 with lines"
 //
-// X=TEST_POINT; ./nlwav -f wav32f -a 0.5 -o ../$X.wav log_$X.log
-//
+// X=SOUND_OUT; ./nlwav -f wav32f -a 0.5 -o ../$X.wav log_$X.log
 
 
 #include "netlist/devices/net_lib.h"
@@ -59,20 +68,20 @@
  *  Library section content START
  * ---------------------------------------------------------------------------*/
 #if 0
-//*
-//* WARNING: fake implementation for MB4391 based on guesses only
-//* MB4391_DIP
-//* MB4391(A)
-//*            +--------------+
-//*  .1/*IN1*/ |1     ++    16| .16/*VCC1*/
-//* .2/*CON1*/ |2           15| .15/*OUT1*/
-//* .3/*GND1*/ |3           14| .14/*RO1*/
-//*            |4   MB4391  13|
-//*  .5/*IN2*/ |5           12| .12/*VCC2*/
-//* .6/*CON2*/ |6           11| .11/*OUT2*/
-//* .7/*GND2*/ |7           10| .10/*RO2*/
-//*            |8            9|
-//*            +--------------+
+//
+// WARNING: fake implementation for MB4391 based on guesses only
+// MB4391_DIP
+// MB4391(A)
+//            +--------------+
+//  .1/*IN1*/ |1     ++    16| .16/*VCC1*/
+// .2/*CON1*/ |2           15| .15/*OUT1*/
+// .3/*GND1*/ |3           14| .14/*RO1*/
+//            |4   MB4391  13|
+//  .5/*IN2*/ |5           12| .12/*VCC2*/
+// .6/*CON2*/ |6           11| .11/*OUT2*/
+// .7/*GND2*/ |7           10| .10/*RO2*/
+//            |8            9|
+//            +--------------+
 /*
  * VCC -----+-----------+-------------- VCC
  *          |           |
@@ -120,10 +129,10 @@ static NETLIST_START(_MB4391)
     //AFUNC(fx, 5, "(A0-(A2/2))")
     //
     // vin * mix
-    AFUNC(fx, 5, "(A0-(A2/2)) * (min(1, max(0, -(A1 - 4.759384) / (4.759384 - 2.839579))))")
+    //AFUNC(fx, 5, "(A0-(A2/2)) * (min(1, max(0, -(A1 - 4.759384) / (4.759384 - 2.839579))))")
     //
     // vin * pow(mix, 2)
-    //AFUNC(fx, 5, "(A0-(A2/2)) * pow((min(1, max(0, -(A1 - 4.759384) / (4.759384 - 2.839579))), 2))")
+    AFUNC(fx, 5, "(A0-(A2/2)) * pow((min(1, max(0, -(A1 - 4.759384) / (4.759384 - 2.839579))), 2))")
 
     RES(R1, RES_K(10))
     RES(R2, RES_K(10))
@@ -227,22 +236,24 @@ NETLIST_END()
 // Page 26
 // Sound Board Assembly
 // Drawing No. 834-0055, Rev. A, Sheet 6 of 7
+// () = location in schematics
 // ...........................................................................
-// (C8) GUN_TRG;    (D6) GUN_SOUND;   (C8,D8,C7,D7,C6,D6)
-// (C8) JEEP_ON;    (C6) JEEP_SOUND;  (C8,B8,C7,B7,C6,B6)
-// (A8) POINT_TRG;  (B3) POINT_SOUND; (A8,B8,A7,B7,A6,B6,A5,B5,C5,D5,A4,B4,C5,
+// GUN_TRG (C8);    GUN_SOUND (D6);   (C8,D8,C7,D7,C6,D6)
+// JEEP_ON (C8);    JEEP_SOUND (C6);  (C8,B8,C7,B7,C6,B6)
+// POINT_TRG (A8);  POINT_SOUND (B3); (A8,B8,A7,B7,A6,B6,A5,B5,C5,D5,A4,B4,C5,
 //                                        D4,B3)
-// (A8) HIT_TRG;    (A4) HIT_SOUND;   (A8,A7,A6,A5,A4,B4,C4,D4,A3,B4,C3,D3)
+// HIT_TRG (A8);    HIT_SOUND (A4);   (A8,A7,A6,A5,A4,B4,C4,D4,A3,B4,C3,D3)
 //
 // ...........................................................................
 // Page 27
 // Sound Board Assembly
 // Drawing No. 834-0055, Rev. A, Sheet 7 of 7
+// () = location in schematics
 // ...........................................................................
-// (D8) ANIMAL_TRG; (C6) ANIMAL_SOUND; (D8,C8,B8,A8,D7,C7,B7,A8,D6,C6,D5,C5)
-// (A8) EMAR_TRG;   (C5) EMAR_SOUND;   (A8,A7,B7,C6,B6,B5,C5,B4,C4,D4,D3)
-// (A8) WALK_TRG;   (B5) WALK_SOUND;   (A8,A7,A6,B6,B5)
-// (A8) CRY_TRG;    (C1) CRY_SOUND;    (A8,A7,A6,A5,A4,A3,B3,C3,A2,B2,C2,A1,
+// ANIMAL_TRG (D8); ANIMAL_SOUND (C6); (D8,C8,B8,A8,D7,C7,B7,A8,D6,C6,D5,C5)
+// EMAR_TRG (A8);   EMAR_SOUND (C5);   (A8,A7,B7,C6,B6,B5,C5,B4,C4,D4,D3)
+// WALK_TRG (A8);   WALK_SOUND (B5);   (A8,A7,A6,B6,B5)
+// CRY_TRG (A8);    CRY_SOUND (C1);    (A8,A7,A6,A5,A4,A3,B3,C3,A2,B2,C2,A1,
 //                                         B1,C1)
 // ---------------------------------------------------------------------------
 static NETLIST_START(brdrline_schematics)
@@ -266,8 +277,8 @@ static NETLIST_START(brdrline_schematics)
     CAP(C78, CAP_U(47))
 
     TTL_74123_DIP(IC37) // shared by GUN_SOUND, RST
-    NET_C(GND, IC37.8)
-    NET_C(V5,  IC37.16)
+    NET_C(GND, IC37.8/*GND*/)
+    NET_C(V5,  IC37.16/*VCC*/)
 
     NET_C(GND, IC37.9/*A2*/)
     NET_C(V5,  IC37.10/*B2*/, IC37.11/*CLRQ2*/, R171.1)
@@ -287,7 +298,7 @@ static NETLIST_START(brdrline_schematics)
      *  GUN_SOUND
      * -----------------------------------------------------------------------*/
     // INPUT
-    NET_C(GUN_TRG.Q, R156.2)
+    NET_C(GUN_TRG, R156.2)
 
     // --------------------------------
     // TRG -> CON
@@ -324,6 +335,7 @@ static NETLIST_START(brdrline_schematics)
     CAP(C48, CAP_U(0.01))
 
     MM5837(IC26)
+    PARAM(IC26.FREQ, 24000)
     NET_C(GND, IC26.VDD/*1*/, IC26.VGG/*2*/)
     NET_C(V12, IC26.VSS/*4*/) // left out decoupling caps (0.1uF & 22uF parallel to GND)
 
@@ -372,7 +384,7 @@ static NETLIST_START(brdrline_schematics)
      *  JEEP_SOUND
      * -----------------------------------------------------------------------*/
     // INPUT
-    NET_C(JEEP_ON.Q, R151.2)
+    NET_C(JEEP_ON, R151.2)
 
     // --------------------------------
     TTL_7408_DIP(IC29)    // shared by _, JEEP_SOUND, _, _
@@ -470,7 +482,7 @@ static NETLIST_START(brdrline_schematics)
      *  POINT_SOUND
      * -----------------------------------------------------------------------*/
     // INPUT
-    NET_C(POINT_TRG.Q, R148.2)
+    NET_C(POINT_TRG, R148.2)
 
     // --------------------------------
     // TRG -> CON
@@ -624,7 +636,7 @@ static NETLIST_START(brdrline_schematics)
      *  HIT_SOUND
      * -----------------------------------------------------------------------*/
     // INPUT
-    NET_C(HIT_TRG.Q, R147.1)
+    NET_C(HIT_TRG, R147.1)
 
     // --------------------------------
     // TRG -> CON
@@ -763,7 +775,7 @@ static NETLIST_START(brdrline_schematics)
      *  ANIMAL_SOUND
      * -----------------------------------------------------------------------*/
     // INPUT
-    NET_C(ANIMAL_TRG.Q, R145.2)
+    NET_C(ANIMAL_TRG, R145.2)
 
     // --------------------------------
     // TGG -> TRG2 -> CON
@@ -971,7 +983,7 @@ static NETLIST_START(brdrline_schematics)
      *  EMAR_SOUND
      * -----------------------------------------------------------------------*/
     // INPUT
-    NET_C(EMAR_TRG.Q, R142.2)
+    NET_C(EMAR_TRG, R142.2)
 
     // --------------------------------
     // TRG -> CON
@@ -1136,14 +1148,14 @@ static NETLIST_START(brdrline_schematics)
      *  WALK_SOUND
      * -----------------------------------------------------------------------*/
     // INPUT
-    NET_C(WALK_TRG.Q, R140.2)
+    NET_C(WALK_TRG, R140.2)
 
     // --------------------------------
     NE555(IC28)
     NET_C(GND, IC28.GND/*1*/)
     NET_C(V5, IC28.VCC/*8*/)
 
-    LM324_DIP(IC21) // shared by GRY_SOUND, WALK_SOUND, CRY_SOUND, CRY_SOUND
+    LM324_DIP(IC21) // shared by CRY_SOUND, WALK_SOUND, CRY_SOUND, CRY_SOUND
     NET_C(GND, IC21.11/*GND*/)
     NET_C(V12, IC21.4/*VCC*/)
 
@@ -1183,7 +1195,7 @@ static NETLIST_START(brdrline_schematics)
      *  CRY_SOUND
      * -----------------------------------------------------------------------*/
     // INPUT
-    NET_C(CRY_TRG.Q, R139.2)
+    NET_C(CRY_TRG, R139.2)
 
     // --------------------------------
     // TRG -> CON
@@ -1361,14 +1373,15 @@ static NETLIST_START(brdrline_sound_out)
     POT(VR4, RES_K(200))
     POT(VR3, RES_K(200))
     POT(VR2, RES_K(200))
+
+    PARAM(VR1.DIAL, 0.350) // GUN_SOUND
     PARAM(VR8.DIAL, 0.000) // JEEP_SOUND
-    PARAM(VR1.DIAL, 0.400) // GUN_SOUND
-    PARAM(VR6.DIAL, 1.000) // POINT_SOUND
-    PARAM(VR7.DIAL, 0.800) // HIT_SOUND
-    PARAM(VR5.DIAL, 0.990) // ANIMAL_SOUND
-    PARAM(VR4.DIAL, 0.975) // EMAR_SOUND
+    PARAM(VR6.DIAL, 0.985) // POINT_SOUND
+    PARAM(VR7.DIAL, 0.640) // HIT_SOUND
+    PARAM(VR5.DIAL, 0.960) // ANIMAL_SOUND
+    PARAM(VR4.DIAL, 0.900) // EMAR_SOUND
     PARAM(VR3.DIAL, 0.000) // WALK_SOUND
-    PARAM(VR2.DIAL, 1.000) // CRY_SOUND
+    PARAM(VR2.DIAL, 0.900) // CRY_SOUND
 
     RES(R8, RES_K(22))
     RES(R1, RES_K(22))
@@ -1424,6 +1437,7 @@ static NETLIST_START(brdrline_sound_out)
     NET_C(C76.2, Rsound.1)
     NET_C(GND, Rsound.2)
 #if 0
+    // for test only
     AFUNC(CLIPPING, 1, "max(-0.11,min(0.11, A0))")
     NET_C(C76.2, CLIPPING.A0)
 #else
@@ -1455,57 +1469,94 @@ NETLIST_START(brdrline)
     // VOLTAGE SOURCES
     ANALOG_INPUT(V12, 12)
     ANALOG_INPUT(V5, 5)
-#if 1
     ANALOG_INPUT(V6, 6)
-#else
-    RES(R135, RES_K(1))
-    RES(R136, RES_K(1))
-    NET_C(R135.1, V12)
-    NET_C(R136.2, GND)
-    NET_C(R135.2, R136.1)
-    CAP(CP135, CAP_U(100))
-    CAP(CP136, CAP_U(100))
-    NET_C(CP135.1, V12)
-    NET_C(CP136.2, GND)
-    NET_C(CP135.2, CP136.1)
 
-    ALIAS(V6, R135.2)
-#endif
     // --------------------------------
     INCLUDE(brdrline_schematics)
 
     // --------------------------------
-    TTL_INPUT(GUN_TRG, 1) // active low
-    NET_C(GND, GUN_TRG.GND)
-    NET_C(V5,  GUN_TRG.VCC)
+    TTL_INPUT(I_SOUND_0, 1) // active low
+    NET_C(GND, I_SOUND_0.GND)
+    NET_C(V5,  I_SOUND_0.VCC)
 
-    TTL_INPUT(JEEP_ON, 1) // active low
-    NET_C(GND, JEEP_ON.GND)
-    NET_C(V5,  JEEP_ON.VCC)
+    TTL_INPUT(I_SOUND_1, 1) // active low
+    NET_C(GND, I_SOUND_1.GND)
+    NET_C(V5,  I_SOUND_1.VCC)
 
-    TTL_INPUT(POINT_TRG, 1) // active low
-    NET_C(GND, POINT_TRG.GND)
-    NET_C(V5,  POINT_TRG.VCC)
+    TTL_INPUT(I_SOUND_2, 1) // active low
+    NET_C(GND, I_SOUND_2.GND)
+    NET_C(V5,  I_SOUND_2.VCC)
 
-    TTL_INPUT(HIT_TRG, 1) // active low
-    NET_C(GND, HIT_TRG.GND)
-    NET_C(V5,  HIT_TRG.VCC)
+    TTL_INPUT(I_SOUND_3, 1) // active low
+    NET_C(GND, I_SOUND_3.GND)
+    NET_C(V5,  I_SOUND_3.VCC)
 
-    TTL_INPUT(ANIMAL_TRG, 1) // active low
-    NET_C(GND, ANIMAL_TRG.GND)
-    NET_C(V5,  ANIMAL_TRG.VCC)
+    TTL_INPUT(I_SOUND_4, 1) // active low
+    NET_C(GND, I_SOUND_4.GND)
+    NET_C(V5,  I_SOUND_4.VCC)
 
-    TTL_INPUT(EMAR_TRG, 1) // active low
-    NET_C(GND, EMAR_TRG.GND)
-    NET_C(V5,  EMAR_TRG.VCC)
+    TTL_INPUT(I_SOUND_5, 1) // active low
+    NET_C(GND, I_SOUND_5.GND)
+    NET_C(V5,  I_SOUND_5.VCC)
 
-    TTL_INPUT(WALK_TRG, 1) // active low
-    NET_C(GND, WALK_TRG.GND)
-    NET_C(V5,  WALK_TRG.VCC)
+    TTL_INPUT(I_SOUND_6, 1) // active low
+    NET_C(GND, I_SOUND_6.GND)
+    NET_C(V5,  I_SOUND_6.VCC)
 
-    TTL_INPUT(CRY_TRG, 1) // active low
-    NET_C(GND, CRY_TRG.GND)
-    NET_C(V5,  CRY_TRG.VCC)
+    TTL_INPUT(I_SOUND_7, 1) // active low
+    NET_C(GND, I_SOUND_7.GND)
+    NET_C(V5,  I_SOUND_7.VCC)
+
+
+#if 1
+    // {---(A5)Logic Board---}{-(C1/2)Top-}{-Sound Board-}
+    // D0 -> LS374( 3- 2) -> 40 -> PNK ->  9 -> ANIMAL_TRG
+    // D1 -> LS374(18-19) -> 35 -> BRN -> 12 -> CRY_TRG
+    // D2 -> LS374( 4- 5) -> 33 -> ORN -> 11 -> WALK_TRG
+    // D3 -> LS374(17-16) -> 34 -> YEL -> 10 -> EMAR_TRG
+    // D4 -> LS374( 7- 6) -> 32 -> BLU ->  8 -> HIT_TRG
+    // D5 -> LS374(14-15) -> 31 -> GRY ->  7 -> POINT_TRG
+    // D6 -> LS374( 8- 9) -> 30 -> WHT ->  6 -> JEEP_ON
+    // D7 -> LS374(13-12) -> 29 -> GRN ->  5 -> GUN_TRG
+    ALIAS(GUN_TRG,    I_SOUND_7.Q)
+    ALIAS(JEEP_ON,    I_SOUND_6.Q)
+    ALIAS(POINT_TRG,  I_SOUND_5.Q)
+    ALIAS(HIT_TRG,    I_SOUND_4.Q)
+    ALIAS(ANIMAL_TRG, I_SOUND_0.Q)
+    ALIAS(EMAR_TRG,   I_SOUND_3.Q)
+    ALIAS(WALK_TRG,   I_SOUND_2.Q)
+    ALIAS(CRY_TRG,    I_SOUND_1.Q)
+#else
+    /*
+     *   2020-10-06 by 'beta-tester'
+     *      |                         |                  ||personal     |personal     |
+     *      |                         |                  ||assignment   |assignment   |
+     *      |brdrline                 |starrkr           ||NL SOUND     |plausibility |note
+     *   ---+-------------------------+------------------++-------------+-------------+----
+     *   D0 |                         |fire, jeep_field  ||POINT_TRG.IN |             |
+     *   D1 |next_sector, hit_rocket2 |hit_animal        ||HIT_TRG.IN   |+            |
+     *   D2 |                         |fire, next_sector ||WALK_TRG.IN  |             |
+     *   D3 |                         |fire              ||CRY_TRG.IN   |             |
+     *   D4 |jeep_field               |                  ||ANIMAL_TRG.IN|+++          |see note 1
+     *   D5 |fire                     |                  ||GUN_TRG.IN   |++           |
+     *   D6 |jeep_path                |jeep_path?        ||JEEP_ON.IN   |++           |
+     *   D7 |hit_animal               |                  ||EMAR_TRG.IN  |+            |
+     *
+     *   note 1: as far as i remember (from the early 1980'th) it was triggered more often while crawling through the field at sector2 & 3,
+     *    issue in schematic/netlist?
+     *          or trigger?
+     *          or were the acrade what i played in the past a modified bootleg?
+     *          or is it only in my head?
+     */
+    ALIAS(GUN_TRG,    I_SOUND_5.Q)
+    ALIAS(JEEP_ON,    I_SOUND_6.Q)
+    ALIAS(POINT_TRG,  I_SOUND_0.Q)
+    ALIAS(HIT_TRG,    I_SOUND_1.Q)
+    ALIAS(ANIMAL_TRG, I_SOUND_4.Q)
+    ALIAS(EMAR_TRG,   I_SOUND_7.Q)
+    ALIAS(WALK_TRG,   I_SOUND_2.Q)
+    ALIAS(CRY_TRG,    I_SOUND_3.Q)
+#endif
 
     // --------------------------------
     INCLUDE(brdrline_sound_out)
@@ -1514,122 +1565,10 @@ NETLIST_START(brdrline)
     // --------------------------------
     ALIAS(OUTPUT, SOUND_OUT)
 
-    // --------------------------------
-    // TEST POINTS
-/**/
-    ALIAS(GUN_TP0, HIT_TRG.Q)
-    ALIAS(GUN_TP1, D1.K)
-    ALIAS(GUN_TP2, IC20.2)
-    ALIAS(GUN_TP3, C29.2)
-    ALIAS(GUN_TP4, C62.1)
-    ALIAS(GUN_TP5, C46.1)
-
-    ALIAS(JEEP_TP0, JEEP_ON.Q)
-    ALIAS(JEEP_TP1, R152.2)
-    ALIAS(JEEP_TP2, R154.2)
-    ALIAS(JEEP_TP3, IC32.6)
-    ALIAS(JEEP_TP4, IC30.6)
-    ALIAS(JEEP_TP5, IC32.8)
-    ALIAS(JEEP_TP6, IC30.8)
-    ALIAS(JEEP_TP7, C59.2)
-
-    ALIAS(POINT_TP0, POINT_TRG.Q)
-    ALIAS(POINT_TP1, D5.K)
-    ALIAS(POINT_TP2, IC5.2)
-    ALIAS(POINT_TP3, IC5.2)
-    ALIAS(POINT_TP4, C15.2)
-    ALIAS(POINT_TP5, R130.1)
-    ALIAS(POINT_TP6, TR13.B)
-    ALIAS(POINT_TP7, IC18.TRIG)
-    ALIAS(POINT_TP8, TR14.B)
-    ALIAS(POINT_TP9, IC19.TRIG)
-    ALIAS(POINT_TP10, TR4.B)
-    ALIAS(POINT_TP11, IC13.TRIG)
-    ALIAS(POINT_TP12, C13.1)
-
-    ALIAS(HIT_TP0, HIT_TRG.Q)
-    ALIAS(HIT_TP1, D6.K)
-    ALIAS(HIT_TP2, IC5.6)
-    ALIAS(HIT_TP3, C17.2)
-    ALIAS(HIT_TP4, TR12.B)
-    ALIAS(HIT_TP5, R122.1)
-    ALIAS(HIT_TP6, TR11.B)
-    ALIAS(HIT_TP7, R70.1)
-    ALIAS(HIT_TP8, C14.1)
-
-    ALIAS(RST_TP1, RST)
-
-    ALIAS(ANI_TP0, ANIMAL_TRG.Q)
-    ALIAS(ANI_TP1, R110.1)
-    ALIAS(ANI_TP2, D4.K)
-    ALIAS(ANI_TP3, IC4.6)
-    ALIAS(ANI_TP4, C11.2)
-    ALIAS(ANI_TP5, TR15.B)
-    ALIAS(ANI_TP6, R44.2)
-    ALIAS(ANI_TP7, TR1.B)
-    ALIAS(ANI_TP8, IC1.TRIG)
-    ALIAS(ANI_TP9, R11.1)
-    ALIAS(ANI_TP10, TR8.B)
-    ALIAS(ANI_TP11, IC13.TRIG)
-    ALIAS(ANI_TP12, TR3.B)
-    ALIAS(ANI_TP13, IC7.TRIG)
-
-    ALIAS(EMAR_TP0, EMAR_TRG.Q)
-    ALIAS(EMAR_TP1, D3.K)
-    ALIAS(EMAR_TP2, IC4.2)
-    ALIAS(EMAR_TP3, C9.2)
-    ALIAS(EMAR_TP4, TR2.B)
-    ALIAS(EMAR_TP5, R113.1)
-    ALIAS(EMAR_TP6, R63.1)
-    ALIAS(EMAR_TP7, TR10.B)
-    ALIAS(EMAR_TP8, IC15.TRIG)
-    ALIAS(EMAR_TP9, IC15.OUT)
-    ALIAS(EMAR_TP10, TR9.B)
-    ALIAS(EMAR_TP11, R24.1)
-
-    ALIAS(WALK_TP0, WALK_TRG.Q)
-    ALIAS(WALK_TP1, R137.2)
-    ALIAS(WALK_TP2, C3.2)
-
-    ALIAS(CRY_TP0, CRY_TRG.Q)
-    ALIAS(CRY_TP1, D2.K)
-    ALIAS(CRY_TP2, IC20.6)
-    ALIAS(CRY_TP3, C27.2)
-    ALIAS(CRY_TP4, TR7.B)
-    ALIAS(CRY_TP5, R100.1)
-    ALIAS(CRY_TP6, R46.1)
-    ALIAS(CRY_TP7, TR6.B)
-    ALIAS(CRY_TP8, IC11.TRIG)
-    ALIAS(CRY_TP9, TR5.B)
-    ALIAS(CRY_TP10, IC10.TRIG)
-
-    ALIAS(TEST_POINT, SOUND_OUT)
-/**/
 NETLIST_END()
 
 
 
-
-#if 0
-RES(R, RES_K())
-RES(R, RES_K())
-RES(R, RES_K())
-RES(R, RES_K())
-
-CAP(C, CAP_U())
-CAP(C, CAP_U())
-CAP(C, CAP_U())
-CAP(C, CAP_U())
-
-NET_C(, )
-NET_C(, )
-NET_C(, )
-NET_C(, )
-NET_C(, )
-
-C458(TR)
-MA150(D)
-#endif
 
 #if 0
 ~/mame/src/lib/netlist/devices/nld_ne555.cpp
@@ -1640,16 +1579,6 @@ NE555()
  *       .OUT/*3*/ |3            6| .THRESH/*6*/
  *     .RESET/*4*/ |4   NE555    5| .CONT/*5*/
  *                 +--------------+
-NE555(IC)
-NET_C(GND, IC.GND/*1*/)
-NET_C(V5,  IC.VCC/*8*/)
-
-TMP_(IC.TRIG/*2*/)
-TMP_(IC.OUT/*3*/)
-TMP_(IC.RESET/*4*/)
-TMP_(IC.CONT/*5*/)
-TMP_(IC.THRESH/*6*/)
-TMP_(IC.DISCH/*7*/)
 #endif
 
 #if 0
@@ -1665,25 +1594,6 @@ TTL_74123_DIP()
  *   .7/*RC2*/ |7           10| .10/*B2*/
  *   .8/*GND*/ |8            9| .9/*A2*/
  *             +--------------+
-TTL_74123_DIP(IC) // shared by _, _
-NET_C(GND, IC.8/*GND*/)
-NET_C(V5,  IC.16/*VCC*/)
-
-NC_(IC.1/*A1*/)
-TMP_(IC.2/*B1*/)
-TMP_(IC.3/*CLRQ1*/)
-NC_(IC.4/*QQ1*/)
-TMP_(IC.13/*Q1*/)
-TMP_(IC.14/*C1*/)
-TMP_(IC.15/*RC1*/)
-
-NC_(IC.5/*Q2*/)
-TMP_(IC.6/*C2*/)
-TMP_(IC.7/*RC2*/)
-TMP_(IC.9/*A2*/)
-TMP_(IC.10/*B2*/)
-TMP_(IC.11/*CLRQ2*/)
-NC_(IC.12/*QQ2*/)
 #endif
 
 #if 0
@@ -1699,25 +1609,6 @@ OPAMP(A, "LM324")
  * .6/*MINUS2*/ |6            9| .9/*MINUS3*/
  *   .7/*OUT2*/ |7   LM324    8| .8/*OUT3*/
  *              +--------------+
-LM324_DIP(IC) // shared by _, _, _, _
-NET_C(GND, IC.11/*GND*/)
-NET_C(V12, IC.4/*VCC*/)
-
-NC_(IC.1/*OUT1*/)
-TMP_(IC.3/*PLUS1*/)
-TMP_(IC.2/*MINUS1*/)
-
-NC_(IC.7/*OUT2*/ )
-TMP_(IC.5/*PLUS2*/)
-TMP_(IC.6/*MINUS2*/)
-
-NC_(IC.8/*OUT3*/)
-TMP_(IC.10/*PLUS3*/)
-TMP_(IC.9/*MINUS3*/)
-
-NC_(IC.14/*OUT4*/)
-TMP_(IC.12/*PLUS4*/)
-TMP_(IC.13/*MINUS4*/)
 #endif
 
 #if 0
@@ -1734,19 +1625,6 @@ MB4391(A)
  * .7/*GND2*/ |7           10| .10/*RO2*/
  *            |8            9|
  *            +--------------+
-MB4391_DIP(IC) // shared by _, _
-NET_C(GND, IC.3/*GND1*/, IC.7/*GND2*/)
-NET_C(V5, IC.16/*VCC1*/, IC.12/*VCC2*/)
-
-TMP_(IC.1/*IN1*/)
-TMP_(IC.2/*CON1*/)
-TMP_(IC.14/*RO1*/)
-TMP_(IC.15/*OUT1*/)
-
-TMP_(IC.5/*IN2*/)
-TMP_(IC.6/*CON2*/)
-TMP_(IC.10/*RO2*/)
-TMP_(IC.11/*OUT2*/)
 #endif
 
 #if 0
