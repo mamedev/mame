@@ -398,6 +398,12 @@ files{
 	MAME_DIR .. "src/mame/includes/starcrus.h",
 	MAME_DIR .. "src/mame/video/starcrus.cpp",
 
+	MAME_DIR .. "src/mame/drivers/dribling.cpp",
+	MAME_DIR .. "src/mame/includes/dribling.h",
+	MAME_DIR .. "src/mame/audio/nl_dribling.cpp",
+	MAME_DIR .. "src/mame/audio/nl_dribling.h",
+	MAME_DIR .. "src/mame/video/dribling.cpp",
+
 	-- Skeletons ...
 	MAME_DIR .. "src/mame/drivers/a1supply.cpp",
 	MAME_DIR .. "src/mame/drivers/aleisttl.cpp",

@@ -4837,6 +4837,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/dreamwld.cpp",
 	MAME_DIR .. "src/mame/drivers/dribling.cpp",
 	MAME_DIR .. "src/mame/includes/dribling.h",
+	MAME_DIR .. "src/mame/audio/nl_dribling.cpp",
+	MAME_DIR .. "src/mame/audio/nl_dribling.h",
 	MAME_DIR .. "src/mame/video/dribling.cpp",
 	MAME_DIR .. "src/mame/drivers/dwarfd.cpp",
 	MAME_DIR .. "src/mame/drivers/dynadice.cpp",
