@@ -8032,18 +8032,77 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
-	<software name="batlches">
-		<description>Battle Chess</description>
+	<software name="btlchess">
+		<description>Battle Chess (5.25", VGA version)</description>
+		<year>1990</year>
+		<publisher>Interplay</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Battle Chess [Interplay] [1990] [5.25DD] [Disk 1 of 3].img" size="368640" crc="22fe945a" sha1="de0951b1921246251e02722e3273373df578d2b9"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Battle Chess [Interplay] [1990] [5.25DD] [Disk 2 of 3].img" size="368640" crc="53a53054" sha1="397c7603e24b38a028bdb6bee399ac1d74effd68"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Battle Chess [Interplay] [1990] [5.25DD] [Disk 3 of 3].img" size="368640" crc="501307ad" sha1="1705209f3ea9c98b34bf3ca97bce57092698d5f2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="btlchessa" cloneof="btlchess">
+		<description>Battle Chess (5.25", EGA version)</description>
 		<year>1988</year>
+		<publisher>Interplay</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Battle Chess (EGA) [Interplay] [1988] [5.25DD] [Startup Disk].img" size="368640" crc="2d245433" sha1="1dfe4065fe66147994cdf331e3b34ae214ef721e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Battle Chess (EGA) [Interplay] [1988] [5.25DD] [Animation Disk].img" size="368640" crc="73c9096f" sha1="4cf27086a92a742e0a53b478a771bbc539d65374"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="btlchess35" cloneof="btlchess">
+		<description>Battle Chess (3.5", VGA version)</description>
+		<year>1990</year>
 		<publisher>Interplay</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Battle Chess (1988)(Interplay)(Disk 1 of 2)[cp codebook].dsk" size="737280" crc="21763440" sha1="680ebdcd55b52910df9bd92792f12df5e80d9412"/>
+				<rom name="Battle Chess [Interplay] [1990] [3.5DD] [Disk 1 of 2].img" size="737280" crc="21763440" sha1="680ebdcd55b52910df9bd92792f12df5e80d9412"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Battle Chess (1988)(Interplay)(Disk 2 of 2)[cp codebook].dsk" size="737280" crc="8c0a720f" sha1="9a0b9b8adda97a65da4b2a1490c31f605dfef4a8"/>
+				<rom name="Battle Chess [Interplay] [1990] [3.5DD] [Disk 2 of 2].img" size="737280" crc="8c0a720f" sha1="9a0b9b8adda97a65da4b2a1490c31f605dfef4a8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="btlchess35a" cloneof="btlchess">
+		<description>Battle Chess (3.5", EGA version - first release)</description>
+		<year>1988</year>
+		<publisher>Interplay</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Battle Chess (EGA version - 1st release) [Interplay] [1988] [3.5DD] [Disk 1 of 1].img" size="737280" crc="7933e954" sha1="4746834847333c5785a0094c71dec03f7a53d8c4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="btlchess35b" cloneof="btlchess">
+		<description>Battle Chess (3.5", EGA version - second release)</description>
+		<year>1988</year>
+		<publisher>Interplay</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Battle Chess (EGA version - 2nd release) [Interplay] [1988] [3.5DD] [Disk 1 of 1].img" size="737280" crc="040ff059" sha1="b21954c1c0ae2e44e78f8d4d5cb955ba6f4967a6"/>
 			</dataarea>
 		</part>
 	</software>
