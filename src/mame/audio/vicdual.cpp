@@ -554,18 +554,42 @@ borderline_audio_device::borderline_audio_device(const machine_config &mconfig, 
 
 void borderline_audio_device::device_add_mconfig(machine_config &config)
 {
+#if 0
 	NETLIST_SOUND(config, "sound_nl", 48000)
+#else
+	NETLIST_SOUND(config, "sound_nl", 22050)
+#endif
 		.set_source(NETLIST_NAME(brdrline))
 		.add_route(ALL_OUTPUTS, *this, 1.0);
 
-	NETLIST_LOGIC_INPUT(config, m_input_line[7], "GUN_TRG.IN", 0);
+#if 0
+2020-10-05 by 'beta-tester'
+  |                         |                  ||assignment   |assignment   |
+  |brdrline                 |starrkr           ||NL SOUND     |plausibility |note
+--+-------------------------+------------------++-------------+-------------+----
+0 |                         |fire, jeep_field  ||POINT_TRG.IN |             |
+1 |next_sector, hit_rocket2 |hit_animal        ||HIT_TRG.IN   |+            |
+2 |                         |fire, next_sector ||WALK_TRG.IN  |             |
+3 |                         |fire              ||CRY_TRG.IN   |             |
+4 |jeep_field               |                  ||ANIMAL_TRG.IN|+++          |see note 1
+5 |fire                     |                  ||GUN_TRG.IN   |++           |
+6 |jeep_path                |jeep_path?        ||JEEP_ON.IN   |++           |
+7 |hit_animal               |                  ||EMAR_TRG.IN  |+            |
+
+note 1: as far as i remember it was triggered more often while crawling through the field at sector2 & 3,
+ issue in schematic/netlist?
+       or trigger?
+       or were the acrade what i played in the past a bootleg
+       or is it only in my head?
+#endif
+	NETLIST_LOGIC_INPUT(config, m_input_line[5], "GUN_TRG.IN", 0);
 	NETLIST_LOGIC_INPUT(config, m_input_line[6], "JEEP_ON.IN", 0);
-	NETLIST_LOGIC_INPUT(config, m_input_line[5], "POINT_TRG.IN", 0);
-	NETLIST_LOGIC_INPUT(config, m_input_line[4], "HIT_TRG.IN", 0);
-	NETLIST_LOGIC_INPUT(config, m_input_line[3], "WALK_TRG.IN", 0);
-	NETLIST_LOGIC_INPUT(config, m_input_line[2], "EMAR_TRG.IN", 0);
-	NETLIST_LOGIC_INPUT(config, m_input_line[1], "CRY_TRG.IN", 0);
-	NETLIST_LOGIC_INPUT(config, m_input_line[0], "ANIMAL_TRG.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_input_line[0], "POINT_TRG.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_input_line[1], "HIT_TRG.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_input_line[4], "ANIMAL_TRG.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_input_line[7], "EMAR_TRG.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_input_line[2], "WALK_TRG.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_input_line[3], "CRY_TRG.IN", 0);
 
 	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(1.0, 0.0);
 }
