@@ -371,8 +371,6 @@ u32 ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 	screen.priority().fill(0, cliprect);
 
-
-
 	/* TODO: 0 is correct for gametngk, but break f1superb scrolling grid (text at
 	   top and bottom of the screen becomes black on black) */
 	m_temp_bitmap_tilemaps.fill(0, cliprect);   /* bg color */

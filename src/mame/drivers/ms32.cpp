@@ -521,7 +521,7 @@ u32 ms32_state::ms32_read_inputs3()
 }
 
 
-void ms32_state::ms32_sound_w(u32 data)
+void ms32_state::sound_command_w(u32 data)
 {
 	m_soundlatch->write(data & 0xff);
 
@@ -529,12 +529,12 @@ void ms32_state::ms32_sound_w(u32 data)
 	m_maincpu->spin_until_time(attotime::from_usec(40));
 }
 
-u32 ms32_state::ms32_sound_r()
+u32 ms32_state::sound_result_r()
 {
 	return m_to_main^0xff;
 }
 
-void ms32_state::reset_sub_w(u32 data)
+void ms32_state::sound_reset_w(u32 data)
 {
 	if(data) m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero); // 0 too ?
 }
@@ -629,7 +629,7 @@ void ms32_state::ms32_bgram_w16(offs_t offset, u16 data, u16 mem_mask)
 	m_bg_tilemap_alt->mark_tile_dirty(offset/2);
 }
 
-void ms32_state::pip_w(u32 data)
+void ms32_state::bgmode_w(u32 data)
 {
 	m_tilemaplayoutcontrol = data;
 
@@ -648,41 +648,78 @@ void ms32_state::coin_counter_w(u32 data)
 void ms32_state::ms32_map(address_map &map)
 {
 	/* RAM areas verified by testing on real hw - usually accessed at the 0xfc000000 + mirror */
-	map(0xc0000000, 0xc0007fff).rw(FUNC(ms32_state::ms32_nvram_r8), FUNC(ms32_state::ms32_nvram_w8)).umask32(0x000000ff).mirror(0x3c1f8000);  // nvram is 8-bit wide, 0x2000 in size */
-/*  map(0xc0008000, 0xc01fffff) // mirrors of nvramram, handled above */
-	map(0xc1180000, 0xc1187fff).rw(FUNC(ms32_state::ms32_priram_r8), FUNC(ms32_state::ms32_priram_w8)).umask32(0x000000ff).mirror(0x3c038000).share("priram"); /* priram is 8-bit wide, 0x2000 in size */
-/*  map(0xc1188000, 0xc11bffff) // mirrors of priram, handled above */
-	map(0xc1400000, 0xc143ffff).rw(FUNC(ms32_state::ms32_palram_r16), FUNC(ms32_state::ms32_palram_w16)).umask32(0x0000ffff).mirror(0x3c1c0000).share("palram"); /* palram is 16-bit wide, 0x20000 in size */
-/*  map(0xc1440000, 0xc145ffff) // mirrors of palram, handled above */
-	map(0xc2000000, 0xc201ffff).rw(FUNC(ms32_state::ms32_rozram_r16), FUNC(ms32_state::ms32_rozram_w16)).umask32(0x0000ffff).mirror(0x3c1e0000).share("rozram"); /* rozram is 16-bit wide, 0x10000 in size */
-/*  map(0xc2020000, 0xc21fffff) // mirrors of rozram, handled above */
-	map(0xc2200000, 0xc2201fff).rw(FUNC(ms32_state::ms32_lineram_r16), FUNC(ms32_state::ms32_lineram_w16)).umask32(0x0000ffff).mirror(0x3c1fe000).share("lineram"); /* lineram is 16-bit wide, 0x1000 in size */
-/*  map(0xc2202000, 0xc23fffff) // mirrors of lineram, handled above */
-	map(0xc2800000, 0xc283ffff).rw(FUNC(ms32_state::ms32_sprram_r16), FUNC(ms32_state::ms32_sprram_w16)).umask32(0x0000ffff).mirror(0x3c1c0000).share("sprram"); /* spriteram is 16-bit wide, 0x20000 in size */
-/*  map(0xc2840000, 0xc29fffff) // mirrors of sprram, handled above */
-	map(0xc2c00000, 0xc2c07fff).rw(FUNC(ms32_state::ms32_txram_r16), FUNC(ms32_state::ms32_txram_w16)).umask32(0x0000ffff).mirror(0x3c1f0000).share("txram"); /* txram is 16-bit wide, 0x4000 in size */
-	map(0xc2c08000, 0xc2c0ffff).rw(FUNC(ms32_state::ms32_bgram_r16), FUNC(ms32_state::ms32_bgram_w16)).umask32(0x0000ffff).mirror(0x3c1f0000).share("bgram"); /* bgram is 16-bit wide, 0x4000 in size */
-/*  map(0xc2c10000, 0xc2dfffff) // mirrors of txram / bg, handled above */
-	map(0xc2e00000, 0xc2e1ffff).ram().share("mainram").mirror(0x3c0e0000); /* mainram is 32-bit wide, 0x20000 in size */
-	map(0xc3e00000, 0xc3ffffff).rom().region("maincpu", 0).mirror(0x3c000000); // ROM is 32-bit wide, 0x200000 in size */
+//	0xfc000000 NVRAM (8-bits wide, 0x2000 in size)
+	map(0xc0000000, 0xc0007fff).rw(FUNC(ms32_state::ms32_nvram_r8), FUNC(ms32_state::ms32_nvram_w8)).umask32(0x000000ff).mirror(0x3c1f8000);
+//  map(0xc0008000, 0xc01fffff) // mirrors of nvramram, handled above
 
-	/* todo: clean up the mapping of these */
-	map(0xfc800000, 0xfc800003).nopr(); /* sound? */
-	map(0xfc800000, 0xfc800003).w(FUNC(ms32_state::ms32_sound_w)); /* sound? */
+//	0xfd180000 Priority RAM (8-bits wide, 0x2000 in size)
+	map(0xc1180000, 0xc1187fff).rw(FUNC(ms32_state::ms32_priram_r8), FUNC(ms32_state::ms32_priram_w8)).umask32(0x000000ff).mirror(0x3c038000).share("priram");
+//  map(0xc1188000, 0xc11bffff) // mirrors of priram, handled above
+
+//	0xfd200000 ???
+//	0xfd400000 paletteram (16-bits wide, 0x20000 in size)
+//	0xfd400000 object palette
+//	0xfd408000 Background palette
+//	0xfd410000 ROZ1 palette
+//	0xfd420000 ROZ0 palette?
+//	0xfd430000 ASCII palette
+	map(0xc1400000, 0xc143ffff).rw(FUNC(ms32_state::ms32_palram_r16), FUNC(ms32_state::ms32_palram_w16)).umask32(0x0000ffff).mirror(0x3c1c0000).share("palram");
+//  map(0xc1440000, 0xc145ffff) // mirrors of palram, handled above
+
+//	0xfe000000 ROZ1 VRAM (16-bits wide, 0x10000 in size)
+	map(0xc2000000, 0xc201ffff).rw(FUNC(ms32_state::ms32_rozram_r16), FUNC(ms32_state::ms32_rozram_w16)).umask32(0x0000ffff).mirror(0x3c1e0000).share("rozram");
+//  map(0xc2020000, 0xc21fffff) // mirrors of rozram, handled above 
+
+//	0xfe200000 ROZ1 line RAM (16-bits wide, 0x1000 in size)
+	map(0xc2200000, 0xc2201fff).rw(FUNC(ms32_state::ms32_lineram_r16), FUNC(ms32_state::ms32_lineram_w16)).umask32(0x0000ffff).mirror(0x3c1fe000).share("lineram");
+//  map(0xc2202000, 0xc23fffff) // mirrors of lineram, handled above
+
+//	0xfe400000 ROZ0 VRAM?
+//	0xfe600000 ROZ0 line RAM?
+//	0xfe800000 object layer VRAM (16-bits wide, 0x20000 in size)
+	map(0xc2800000, 0xc283ffff).rw(FUNC(ms32_state::ms32_sprram_r16), FUNC(ms32_state::ms32_sprram_w16)).umask32(0x0000ffff).mirror(0x3c1c0000).share("sprram");
+//  map(0xc2840000, 0xc29fffff) // mirrors of sprram, handled above
+
+//	0xfec00000 ASCII layer VRAM (16-bits wide, 0x4000 in size)
+	map(0xc2c00000, 0xc2c07fff).rw(FUNC(ms32_state::ms32_txram_r16), FUNC(ms32_state::ms32_txram_w16)).umask32(0x0000ffff).mirror(0x3c1f0000).share("txram");
+
+//	0xfec08000 Background layer VRAM (16-bits wide, 0x4000 in size)
+	map(0xc2c08000, 0xc2c0ffff).rw(FUNC(ms32_state::ms32_bgram_r16), FUNC(ms32_state::ms32_bgram_w16)).umask32(0x0000ffff).mirror(0x3c1f0000).share("bgram");
+//  map(0xc2c10000, 0xc2dfffff) // mirrors of txram / bg, handled above
+
+//	0xfee00000 Scratch RAM
+	map(0xc2e00000, 0xc2e1ffff).ram().share("mainram").mirror(0x3c0e0000); 		// mainram is 32-bit wide, 0x20000 in size
+//	0xffc00000 ROM
+	map(0xc3e00000, 0xc3ffffff).rom().region("maincpu", 0).mirror(0x3c000000); 	// ROM is 32-bit wide, 0x200000 in size
+
+	// I/O section
+	// TODO: mirrors like above?
+	map(0xfc800000, 0xfc800003).nopr().w(FUNC(ms32_state::sound_command_w));	// open bus on read?
+//	map(0xfcc00000, 0xfcc0001f) 												// input
 	map(0xfcc00004, 0xfcc00007).portr("INPUTS");
 	map(0xfcc00010, 0xfcc00013).portr("DSW");
-	map(0xfce00034, 0xfce00037).nopw(); // irq ack?
-	map(0xfce00038, 0xfce0003b).w(FUNC(ms32_state::reset_sub_w));
-	map(0xfce00050, 0xfce0005f).nopw();    // watchdog? I haven't investigated
-//  map(0xfce00000, 0xfce0007f).writeonly().share("ms32_fce00000"); /* registers not ram? */
-	map(0xfce00000, 0xfce00003).w(FUNC(ms32_state::ms32_gfxctrl_w));   /* flip screen + other unknown bits */
-	map(0xfce00280, 0xfce0028f).w(FUNC(ms32_state::ms32_brightness_w));    // global brightness control
-/**/map(0xfce00600, 0xfce0065f).ram().share("roz_ctrl");        /* roz control registers */
-/**/map(0xfce00a00, 0xfce00a17).ram().share("tx_scroll");   /* tx layer scroll */
-/**/map(0xfce00a20, 0xfce00a37).ram().share("bg_scroll");   /* bg layer scroll */
-	map(0xfce00a7c, 0xfce00a7f).w(FUNC(ms32_state::pip_w));    // ??? layer related? seems to be always 0
-	map(0xfce00e00, 0xfce00e03).w(FUNC(ms32_state::coin_counter_w)); //   coin counters + something else
-	map(0xfd000000, 0xfd000003).r(FUNC(ms32_state::ms32_sound_r));
+//	map(0xfce00000, 0xfce0002f)													// CRTC
+	map(0xfce00000, 0xfce00003).w(FUNC(ms32_state::ms32_gfxctrl_w));   			// flip screen + other unknown bits
+//	map(0xfce00030, 0xfce00033) 												// timer irq control
+//	map(0xfce00034, 0xfce00037).nopw(); 										// timer irq trigger
+	map(0xfce00038, 0xfce0003b).w(FUNC(ms32_state::sound_reset_w));
+//	map(0xfce0003c, 0xfce0003f) 												// ???
+//	map(0xfce00048, 0xfce0004f)													// sound comms bidirectional acks?
+	map(0xfce00050, 0xfce00053).nopw();											// watchdog
+//	map(0xfce00058, 0xfce0005f)													// irq control?
+	map(0xfce00280, 0xfce0028f).w(FUNC(ms32_state::ms32_brightness_w)); 		// global brightness control
+//	map(0xfce00400, 0xfce0045f)													// ROZ0 control registers
+/**/map(0xfce00600, 0xfce0065f).ram().share("roz_ctrl");        				// ROZ1 control registers
+/**/map(0xfce00a00, 0xfce00a17).ram().share("tx_scroll");   					// ASCII layer scroll
+/**/map(0xfce00a20, 0xfce00a37).ram().share("bg_scroll");   					// Background layer scroll
+	map(0xfce00a7c, 0xfce00a7f).w(FUNC(ms32_state::bgmode_w));
+//	map(0xfce00c00, 0xfce00c1f)													// ???
+	map(0xfce00e00, 0xfce00e03).w(FUNC(ms32_state::coin_counter_w)); 			// coin counters + something else
+	map(0xfd000000, 0xfd000003).r(FUNC(ms32_state::sound_result_r));
+	//	Extended I/O
+//	map(0xfd040000, 0xfd040003)
+//	map(0xfd080000, 0xfd080003)
+//	map(0xfd0c0000, 0xfd0c0003)
 	map(0xfd1c0000, 0xfd1c0003).writeonly().share("mahjong_select");
 }
 
@@ -718,18 +755,18 @@ void ms32_state::f1superb_map(address_map &map)
 	map(0xfd0d0000, 0xfd0d0003).portr("DSW2"); // MB-93159
 	map(0xfd0e0000, 0xfd0e0003).r(FUNC(ms32_state::ms32_read_inputs3)).nopw(); // writes 7-led seg at very least
 
-	map(0xfce00004, 0xfce00023).ram(); // regs?
-	map(0xfce00200, 0xfce0021f).ram(); // regs?
-	map(0xfce00800, 0xfce0085f).ram(); // regs?
+	map(0xfce00800, 0xfce0085f).ram(); // ROZ0 control register (mirrored from 0x400?)
 
 	/* these two are almost certainly wrong, they just let you see what
 	   happens if you generate the FPU ints without breaking other games */
 	map(0xfce00e00, 0xfce00e03).w(FUNC(ms32_state::ms32_irq5_guess_w));
 	map(0xfd0f0000, 0xfd0f0003).w(FUNC(ms32_state::ms32_irq2_guess_w));
 
+	// COPRO 1
 	map(0xfd100000, 0xfd103fff).ram(); // used when you start enabling fpu ints
 	map(0xfd104000, 0xfd105fff).ram(); // uploads data here
 
+	// COPRO 2
 	map(0xfd140000, 0xfd143fff).ram(); // used when you start enabling fpu ints
 	map(0xfd144000, 0xfd145fff).ram(); // same data here
 

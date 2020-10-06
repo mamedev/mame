@@ -64,9 +64,9 @@ protected:
 
 	u8 latch_r();
 	void to_main_w(u8 data);
-	u32 ms32_sound_r();
-	void ms32_sound_w(u32 data);
-	void reset_sub_w(u32 data);
+	u32 sound_result_r();
+	void sound_command_w(u32 data);
+	void sound_reset_w(u32 data);
 
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -130,7 +130,7 @@ private:
 	void ms32_txram_w16(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 ms32_bgram_r16(offs_t offset);
 	void ms32_bgram_w16(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void pip_w(u32 data);
+	void bgmode_w(u32 data);
 	void ms32_extra_w16(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 ms32_extra_r16(offs_t offset);
 	void ms32_irq2_guess_w(u32 data);

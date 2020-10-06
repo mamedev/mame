@@ -721,21 +721,16 @@ void bnstars_state::bnstars1_mahjong_select_w(u32 data)
 
 void bnstars_state::bnstars_map(address_map &map)
 {
+	// TODO: derive from base memory map
 	map(0x00000000, 0x001fffff).rom();
 
-	map(0xfc800000, 0xfc800003).w(FUNC(bnstars_state::ms32_sound_w));
+	map(0xfc800000, 0xfc800003).w(FUNC(bnstars_state::sound_command_w));
 
 	map(0xfcc00004, 0xfcc00007).portr("P1");
 	map(0xfcc00008, 0xfcc0000b).portr("P2");
 	map(0xfcc00010, 0xfcc00013).portr("DSW");
 
-	map(0xfce00034, 0xfce00037).nopw();
-	map(0xfce00038, 0xfce0003b).w(FUNC(bnstars_state::reset_sub_w));
-
-	map(0xfce00050, 0xfce00053).nopw();
-	map(0xfce00058, 0xfce0005b).nopw();
-	map(0xfce0005c, 0xfce0005f).nopw();
-	map(0xfce00300, 0xfce00303).nopw();
+	map(0xfce00038, 0xfce0003b).w(FUNC(bnstars_state::sound_reset_w));
 
 	map(0xfce00400, 0xfce0045f).writeonly().share("roz_ctrl.0");
 	map(0xfce00700, 0xfce0075f).writeonly().share("roz_ctrl.1"); // guess
@@ -746,7 +741,7 @@ void bnstars_state::bnstars_map(address_map &map)
 
 	map(0xfce00e00, 0xfce00e03).w(FUNC(bnstars_state::bnstars1_mahjong_select_w)); // ?
 
-	map(0xfd000000, 0xfd000003).r(FUNC(bnstars_state::ms32_sound_r));
+	map(0xfd000000, 0xfd000003).r(FUNC(bnstars_state::sound_result_r));
 
 	/* wrote together */
 	map(0xfd040000, 0xfd047fff).ram(); // priority ram
