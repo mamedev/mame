@@ -554,11 +554,7 @@ borderline_audio_device::borderline_audio_device(const machine_config &mconfig, 
 
 void borderline_audio_device::device_add_mconfig(machine_config &config)
 {
-#if 0
 	NETLIST_SOUND(config, "sound_nl", 48000)
-#else
-	NETLIST_SOUND(config, "sound_nl", 22050)
-#endif
 		.set_source(NETLIST_NAME(brdrline))
 		.add_route(ALL_OUTPUTS, *this, 1.0);
 
