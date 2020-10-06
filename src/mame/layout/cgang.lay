@@ -339,13 +339,13 @@ license:CC0
 			<element name="cg_sol~i~" ref="cosmo">
 				<animate name="cg_count~i~" />
 				<bounds state="0" x="~x~" y="10" width="6" height="7" />
-				<bounds state="100" x="~x~" y="48.5" width="6" height="7" />
+				<bounds state="255" x="~x~" y="48.5" width="6" height="7" />
 			</element>
 
 			<element ref="nothing" inputtag="FAKE1" inputmask="~mask~">
 				<animate name="cg_count~i~" />
 				<bounds state="0" x="~x~" y="10" width="6" height="7" />
-				<bounds state="100" x="~x~" y="48.5" width="6" height="7" />
+				<bounds state="255" x="~x~" y="48.5" width="6" height="7" />
 			</element>
 		</repeat>
 
@@ -356,14 +356,14 @@ license:CC0
 			<element ref="crate">
 				<animate name="en_count~i~" />
 				<bounds state="0" x="~x~" y="13.5" width="3.6" height="3.5" />
-				<bounds state="100" x="~x~" y="52" width="3.6" height="3.5" />
+				<bounds state="255" x="~x~" y="52" width="3.6" height="3.5" />
 			</element>
 		</repeat>
 
 		<element ref="door">
 			<animate name="door_count" />
 			<bounds state="0" x="8.5" y="8" width="45" height="0" />
-			<bounds state="100" x="8.5" y="8" width="45" height="9" />
+			<bounds state="255" x="8.5" y="8" width="45" height="9" />
 			<color alpha="0.6" />
 		</element>
 	</group>
