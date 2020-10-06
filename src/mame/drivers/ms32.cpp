@@ -698,10 +698,9 @@ void ms32_state::ms32_map(address_map &map)
 //	map(0xfcc00000, 0xfcc0001f) 												// input
 	map(0xfcc00004, 0xfcc00007).portr("INPUTS");
 	map(0xfcc00010, 0xfcc00013).portr("DSW");
-//	map(0xfce00000, 0xfce0002f)													// CRTC
-	map(0xfce00000, 0xfce00003).w(FUNC(ms32_state::ms32_gfxctrl_w));   			// flip screen + other unknown bits
+	map(0xfce00000, 0xfce0002f).w(FUNC(ms32_state::crtc_w));   					// flip screen + CRTC setup
 //	map(0xfce00030, 0xfce00033) 												// timer irq control
-//	map(0xfce00034, 0xfce00037).nopw(); 										// timer irq trigger
+	map(0xfce00034, 0xfce00037).nopw(); 										// timer irq trigger (ack?)
 	map(0xfce00038, 0xfce0003b).w(FUNC(ms32_state::sound_reset_w));
 //	map(0xfce0003c, 0xfce0003f) 												// ???
 //	map(0xfce00048, 0xfce0004f)													// sound comms bidirectional acks?
@@ -1760,10 +1759,7 @@ void ms32_state::ms32(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(40*8, 28*8);
-	m_screen->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
+	m_screen->set_raw(XTAL(6'000'000), 384, 0, 320, 263, 0, 224); // default setup
 	m_screen->set_screen_update(FUNC(ms32_state::screen_update_ms32));
 	m_screen->screen_vblank().set(FUNC(ms32_state::screen_vblank_ms32));
 

@@ -114,6 +114,17 @@ void ms32_state::video_start()
 	save_item(NAME(m_brt_r));
 	save_item(NAME(m_brt_g));
 	save_item(NAME(m_brt_b));
+	
+	m_dotclock = 0;
+	m_crtc.horz_blank = 64;
+	m_crtc.horz_display = 320;
+	m_crtc.vert_blank = 39;
+	m_crtc.vert_display = 224;
+	save_item(NAME(m_dotclock));
+	save_item(NAME(m_crtc.horz_blank));
+	save_item(NAME(m_crtc.horz_display));
+	save_item(NAME(m_crtc.vert_blank));
+	save_item(NAME(m_crtc.vert_display));
 }
 
 VIDEO_START_MEMBER(ms32_state,f1superb)
@@ -175,27 +186,60 @@ void ms32_state::ms32_brightness_w(offs_t offset, u32 data, u32 mem_mask)
 //popmessage("%04x %04x %04x %04x",m_brt[0],m_brt[1],m_brt[2],m_brt[3]);
 }
 
-
-
-
-
-
-void ms32_state::ms32_gfxctrl_w(offs_t offset, u32 data, u32 mem_mask)
+inline u16 ms32_state::crtc_write_reg(u16 raw_data)
 {
-	if (ACCESSING_BITS_0_7)
+	return 0x1000 - (raw_data & 0xfff);
+}
+
+inline void ms32_state::crtc_refresh_screen_params()
+{
+	rectangle visarea = m_screen->visible_area();
+	const u16 htotal = m_crtc.horz_blank + m_crtc.horz_display;
+	const u16 vtotal = m_crtc.vert_blank + m_crtc.vert_display;
+	visarea.set(0, m_crtc.horz_display - 1, 0, m_crtc.vert_display - 1);
+	m_screen->configure(htotal, vtotal, visarea, HZ_TO_ATTOSECONDS(m_dotclock & 1 ? 8000000 : 6000000) * htotal * vtotal );
+}
+
+// TODO: translate to device
+// tetrisp2.cpp: mapped at $ba0000 (Note: ndmnseal sets 0x1000 as vertical blanking then sets it up properly afterwards, safeguard?)
+// bnstars1: which presumably sets second screen via a master/slave config?
+void ms32_state::crtc_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	switch(offset)
 	{
-		/* bit 1 = flip screen */
-		m_flipscreen = data & 0x02;
-		m_tx_tilemap->set_flip(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-		m_bg_tilemap->set_flip(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-		m_bg_tilemap_alt->set_flip(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-
-		/* bit 2 used by f1superb, unknown */
-
-		/* bit 3 used by several games, unknown */
-
-//popmessage("%08x",data);
+		case 0x00/4:
+			if (ACCESSING_BITS_0_7)
+			{
+			/* 
+			 * ---- x--- used by several games (1->0 in p47aces), unknown
+			 * ---- -x-- used by f1superb, unknown
+			 * ---- --x- flip screen
+			 * ---- ---x dotclock select (1) 8 MHz (0) 6 MHz
+			 */
+				if ((data & 1) != m_dotclock)
+				{
+					m_dotclock = data & 0x01;
+					crtc_refresh_screen_params();
+				}
+				m_flipscreen = data & 0x02;
+				m_tx_tilemap->set_flip(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+				m_bg_tilemap->set_flip(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+				m_bg_tilemap_alt->set_flip(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);				
+			}
+			break;
+		case 0x04/4: m_crtc.horz_blank = crtc_write_reg(data);	    crtc_refresh_screen_params(); break;
+		case 0x08/4: m_crtc.horz_display = crtc_write_reg(data);	crtc_refresh_screen_params(); break;
+		case 0x0c/4: logerror("CRTC: HSYNC back porch %d\n", 0x1000 - data);  break;
+		case 0x10/4: logerror("CRTC: HSYNC front porch %d\n", 0x1000 - data); break;
+		case 0x14/4: m_crtc.vert_blank = crtc_write_reg(data);      crtc_refresh_screen_params(); break;
+		case 0x18/4: m_crtc.vert_display = crtc_write_reg(data);    crtc_refresh_screen_params(); break;
+		case 0x1c/4: logerror("CRTC: VSYNC back porch %d\n", 0x1000 - data);    break;
+		case 0x20/4: logerror("CRTC: VSYNC front porch %d\n", 0x1000 - data);   break;
+		default:
+			logerror("CRTC: <unknown> register set %04x %04x\n",offset*4, data);
+			break;
 	}
+	
 }
 
 

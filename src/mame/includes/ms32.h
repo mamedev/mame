@@ -73,6 +73,12 @@ protected:
 
 	int m_reverse_sprite_order;
 	int m_flipscreen;
+	u8 m_dotclock;
+	struct {
+		u16 horz_blank, horz_display, vert_blank, vert_display;
+	}m_crtc;
+	inline u16 crtc_write_reg(u16 raw_data);
+	inline void crtc_refresh_screen_params();
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -136,7 +142,7 @@ private:
 	void ms32_irq2_guess_w(u32 data);
 	void ms32_irq5_guess_w(u32 data);
 	void ms32_brightness_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	void ms32_gfxctrl_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void crtc_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void coin_counter_w(u32 data);
 	void init_ms32_common();
 
