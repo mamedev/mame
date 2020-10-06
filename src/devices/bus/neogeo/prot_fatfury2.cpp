@@ -56,7 +56,7 @@ void fatfury2_prot_device::protection_w(offs_t offset, uint16_t data)
 
 	// C16-31 = A4-A19, C0-C15 = D0-D15
 	/*
-		Address/Data pin mapping in PRO-CT0
+		Address/Data pin mapping into PRO-CT0
 		C0  C1  C2  C3  C4  C5  C6  C7  C8  C9  C10 C11 C12 C13 C14 C15 C16 C17 C18 C19 C20 C21 C22 C23 C24 C25 C26 C27 C28 C29 C30 C31 LOAD EVEN H
 		D0  D4  D1  D5  D2  D6  D3  D7  D8  D12 D9  D13 D10 D14 D11 D15 A4  A8  A5  A9  A6  A10 A7  A11 A12 A16 A13 A17 A14 A18 A15 A19 A1   A2   A3
 	*/
