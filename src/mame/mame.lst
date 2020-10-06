@@ -14808,7 +14808,8 @@ suprpokrb                       // (c) 1986 Grayhound Electronics
 rp200
 
 @source:generalplus_gpl_unknown.cpp
-unkunsp
+mapacman
+taspinv
 
 @source:generalplus_gpl162xx_lcdtype.cpp
 pcp8718
@@ -14847,6 +14848,7 @@ gormiti
 tkmag220                        //
 myac220
 imgame
+beijuehh
 
 @source:generalplus_gpl16250_romram.cpp
 paccon
@@ -14869,6 +14871,7 @@ jak_tmnthp
 jak_dchp
 jak_ddhp
 jak_prhp
+zippity
 
 @source:geneve.cpp
 geneve                          // 1987 Myarc Geneve 9640
@@ -32171,6 +32174,8 @@ ablwikid
 maxx5in1
 maxx6in1
 max10in1
+vsmaxx25
+vsmaxx15
 
 @source:nes_vt.cpp
 vdogdeme
@@ -32204,11 +32209,15 @@ rtvgc300
 rtvgc300fz
 red5mam
 cybar120
+sen101
 mc_dg101
 mc_aa2
 mc_105te
 mc_sp69
 vsmaxx17
+vsmaxtx2
+vsmaxx77
+vsmaxxvd
 polmega
 silv35
 lpgm240
@@ -38204,6 +38213,7 @@ lexizeus                        // Lexibook
 lexiseal                        //
 discpal
 vgcaplet
+vgcap35
 vsplus
 
 @source:spg2xx_mysprtch.cpp
