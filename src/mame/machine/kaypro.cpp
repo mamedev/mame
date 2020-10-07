@@ -176,36 +176,30 @@ void kaypro_state::kaypro484_system_port_w(u8 data)
 
 *************************************************************************************/
 
-void kaypro_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_DEVICE_CALLBACK_MEMBER(kaypro_state::floppy_timer)
 {
 	bool halt;
-	switch (id)
+	halt = (bool)m_maincpu->state_int(Z80_HALT);
+	if (m_is_motor_off)
 	{
-	case TIMER_FLOPPY:
-		halt = (bool)m_maincpu->state_int(Z80_HALT);
-		if (m_is_motor_off)
-		{
-			timer_set(attotime::from_hz(10), TIMER_FLOPPY);
-			break;
-		}
-		if ((halt) && (m_fdc_rq & 3) && (m_fdc_rq < 0x80))
-		{
-			m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-			m_fdc_rq |= 0x80;
-		}
-		else
-		if ((m_fdc_rq == 0x80) || ((!halt) && BIT(m_fdc_rq, 7)))
-		{
-			m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-			m_fdc_rq &= 0x7f;
-		}
-		timer_set(attotime::from_hz(1e5), TIMER_FLOPPY);
-
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in kaypro_state::device_timer");
+		m_floppy_timer->adjust(attotime::from_hz(10));
+		return;
 	}
+
+	if ((halt) && (m_fdc_rq & 3) && (m_fdc_rq < 0x80))
+	{
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		m_fdc_rq |= 0x80;
+	}
+	else
+	if ((m_fdc_rq == 0x80) || ((!halt) && BIT(m_fdc_rq, 7)))
+	{
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+		m_fdc_rq &= 0x7f;
+	}
+	m_floppy_timer->adjust(attotime::from_hz(1e5));
 }
+
 
 WRITE_LINE_MEMBER( kaypro_state::fdc_intrq_w )
 {
@@ -249,7 +243,7 @@ void kaypro_state::machine_reset()
 	m_system_port = 0x80;
 	m_fdc_rq = 0;
 	m_maincpu->reset();
-	timer_set(attotime::from_hz(1), TIMER_FLOPPY);   /* kick-start the nmi timer */
+	m_floppy_timer->adjust(attotime::from_hz(1));   /* kick-start the nmi timer */
 }
 
 
