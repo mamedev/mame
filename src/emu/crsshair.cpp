@@ -9,11 +9,15 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "emuopts.h"
-#include "rendutil.h"
-#include "config.h"
-#include "xmlfile.h"
 #include "crsshair.h"
+
+#include "config.h"
+#include "emuopts.h"
+#include "render.h"
+#include "rendutil.h"
+#include "screen.h"
+
+#include "xmlfile.h"
 
 
 
@@ -171,28 +175,42 @@ void render_crosshair::create_bitmap()
 	rgb_t color = m_player < ARRAY_LENGTH(crosshair_colors) ? crosshair_colors[m_player] : rgb_t::white();
 
 	// if we have a bitmap and texture for this player, kill it
-	if (m_bitmap == nullptr)
+	if (!m_bitmap)
 	{
 		m_bitmap = std::make_unique<bitmap_argb32>();
 		m_texture = m_machine.render().texture_alloc(render_texture::hq_scale);
+	}
+	else
+	{
+		m_bitmap->reset();
 	}
 
 	emu_file crossfile(m_machine.options().crosshair_path(), OPEN_FLAG_READ);
 	if (!m_name.empty())
 	{
 		// look for user specified file
-		std::string filename = m_name + ".png";
-		render_load_png(*m_bitmap, crossfile, nullptr, filename.c_str());
+		if (crossfile.open(m_name + ".png") == osd_file::error::NONE)
+		{
+			render_load_png(*m_bitmap, crossfile);
+			crossfile.close();
+		}
 	}
 	else
 	{
 		// look for default cross?.png in crsshair/game dir
-		std::string filename = string_format("cross%d.png", m_player + 1);
-		render_load_png(*m_bitmap, crossfile, m_machine.system().name, filename.c_str());
+		std::string const filename = string_format("cross%d.png", m_player + 1);
+		if (crossfile.open(m_machine.system().name + (PATH_SEPARATOR + filename)) == osd_file::error::NONE)
+		{
+			render_load_png(*m_bitmap, crossfile);
+			crossfile.close();
+		}
 
 		// look for default cross?.png in crsshair dir
-		if (!m_bitmap->valid())
-			render_load_png(*m_bitmap, crossfile, nullptr, filename.c_str());
+		if (!m_bitmap->valid() && (crossfile.open(filename) == osd_file::error::NONE))
+		{
+			render_load_png(*m_bitmap, crossfile);
+			crossfile.close();
+		}
 	}
 
 	/* if that didn't work, use the built-in one */

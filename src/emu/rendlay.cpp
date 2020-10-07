@@ -17,6 +17,7 @@
 #include "rendutil.h"
 #include "video/rgbutil.h"
 
+#include "nanosvg.h"
 #include "vecstream.h"
 #include "xmlfile.h"
 
@@ -27,6 +28,7 @@
 #include <cstdio>
 #include <cstring>
 #include <iomanip>
+#include <limits>
 #include <locale>
 #include <sstream>
 #include <stdexcept>
@@ -578,25 +580,29 @@ private:
 
 	entry_vector m_entries;
 	util::ovectorstream m_buffer;
+	std::shared_ptr<NSVGrasterizer> const m_svg_rasterizer;
 	device_t &m_device;
 	layout_environment *const m_next = nullptr;
 	bool m_cached = false;
 
 public:
 	explicit layout_environment(device_t &device)
-		: m_device(device)
+		: m_svg_rasterizer(nsvgCreateRasterizer(), util::nsvg_deleter())
+		, m_device(device)
 	{
 	}
 	explicit layout_environment(layout_environment &next)
-		: m_device(next.m_device)
+		: m_svg_rasterizer(next.m_svg_rasterizer)
+		, m_device(next.m_device)
 		, m_next(&next)
 	{
 	}
 	layout_environment(layout_environment const &) = delete;
 
-	device_t &device() { return m_device; }
-	running_machine &machine() { return device().machine(); }
-	bool is_root_device() { return &device() == &machine().root_device(); }
+	device_t &device() const { return m_device; }
+	running_machine &machine() const { return device().machine(); }
+	bool is_root_device() const { return &device() == &machine().root_device(); }
+	std::shared_ptr<NSVGrasterizer> const &svg_rasterizer() const { return m_svg_rasterizer; }
 
 	void set_parameter(std::string &&name, std::string &&value)
 	{
@@ -785,34 +791,44 @@ public:
 
 	void parse_bounds(util::xml::data_node const *node, render_bounds &result)
 	{
-		// default to unit rectangle
 		if (!node)
 		{
+			// default to unit rectangle
 			result.x0 = result.y0 = 0.0F;
 			result.x1 = result.y1 = 1.0F;
 		}
 		else
 		{
-			// parse attributes
+			// horizontal position/size
 			if (node->has_attribute("left"))
 			{
-				// left/right/top/bottom format
 				result.x0 = get_attribute_float(*node, "left", 0.0F);
 				result.x1 = get_attribute_float(*node, "right", 1.0F);
-				result.y0 = get_attribute_float(*node, "top", 0.0F);
-				result.y1 = get_attribute_float(*node, "bottom", 1.0F);
-			}
-			else if (node->has_attribute("x"))
-			{
-				// x/y/width/height format
-				result.x0 = get_attribute_float(*node, "x", 0.0F);
-				result.x1 = result.x0 + get_attribute_float(*node, "width", 1.0F);
-				result.y0 = get_attribute_float(*node, "y", 0.0F);
-				result.y1 = result.y0 + get_attribute_float(*node, "height", 1.0F);
 			}
 			else
 			{
-				throw layout_syntax_error("bounds element requires either left or x attribute");
+				float const width = get_attribute_float(*node, "width", 1.0F);
+				if (node->has_attribute("xc"))
+					result.x0 = get_attribute_float(*node, "xc", 0.0F) - (width / 2.0F);
+				else
+					result.x0 = get_attribute_float(*node, "x", 0.0F);
+				result.x1 = result.x0 + width;
+			}
+
+			// vertical position/size
+			if (node->has_attribute("top"))
+			{
+				result.y0 = get_attribute_float(*node, "top", 0.0F);
+				result.y1 = get_attribute_float(*node, "bottom", 1.0F);
+			}
+			else
+			{
+				float const height = get_attribute_float(*node, "height", 1.0F);
+				if (node->has_attribute("yc"))
+					result.y0 = get_attribute_float(*node, "yc", 0.0F) - (height / 2.0F);
+				else
+					result.y0 = get_attribute_float(*node, "y", 0.0F);
+				result.y1 = result.y0 + height;
 			}
 
 			// check for errors
@@ -978,7 +994,7 @@ render_bounds accumulate_bounds(emu::render::detail::bounds_vector const &steps)
 	auto i(steps.begin());
 	render_bounds result(i->bounds);
 	while (steps.end() != ++i)
-		union_render_bounds(result, i->bounds);
+		result |= i->bounds;
 	return result;
 }
 
@@ -1123,7 +1139,7 @@ layout_element::layout_element(environment &env, util::xml::data_node const &ele
 		if (first)
 			bounds = newcomp.overall_bounds();
 		else
-			union_render_bounds(bounds, newcomp.overall_bounds());
+			bounds |= newcomp.overall_bounds();
 		first = false;
 
 		// determine the maximum state
@@ -1286,7 +1302,7 @@ void layout_group::resolve_bounds(environment &env, group_map &groupmap, std::ve
 	seen.push_back(this);
 	if (!m_bounds_resolved)
 	{
-		set_render_bounds_xy(m_bounds, 0.0F, 0.0F, 1.0F, 1.0F);
+		m_bounds.set_xy(0.0F, 0.0F, 1.0F, 1.0F);
 		environment local(env);
 		bool empty(true);
 		resolve_bounds(local, m_groupnode, groupmap, seen, empty, false, false, true);
@@ -1349,13 +1365,13 @@ void layout_group::resolve_bounds(
 				{
 					render_bounds b;
 					env.parse_bounds(boundsnode, b);
-					union_render_bounds(itembounds, b);
+					itembounds |= b;
 				}
 			}
 			if (empty)
 				m_bounds = itembounds;
 			else
-				union_render_bounds(m_bounds, itembounds);
+				m_bounds |= itembounds;
 			empty = false;
 			LOGMASKED(LOG_GROUP_BOUNDS_RESOLUTION, "Accumulate item bounds (%s %s %s %s) -> (%s %s %s %s)\n",
 					itembounds.x0, itembounds.y0, itembounds.x1, itembounds.y1,
@@ -1371,7 +1387,7 @@ void layout_group::resolve_bounds(
 				if (empty)
 					m_bounds = itembounds;
 				else
-					union_render_bounds(m_bounds, itembounds);
+					m_bounds |= itembounds;
 				empty = false;
 				LOGMASKED(LOG_GROUP_BOUNDS_RESOLUTION, "Accumulate group '%s' reference explicit bounds (%s %s %s %s) -> (%s %s %s %s)\n",
 						itemnode->get_attribute_string("ref", ""),
@@ -1399,7 +1415,7 @@ void layout_group::resolve_bounds(
 				if (empty)
 					m_bounds = itembounds;
 				else
-					union_render_bounds(m_bounds, itembounds);
+					m_bounds |= itembounds;
 				empty = false;
 				unresolved = false;
 				LOGMASKED(LOG_GROUP_BOUNDS_RESOLUTION, "Accumulate group '%s' reference computed bounds (%s %s %s %s) -> (%s %s %s %s)\n",
@@ -1523,11 +1539,13 @@ class layout_element::image_component : public component
 {
 public:
 	// construction/destruction
-	image_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
+	image_component(environment &env, util::xml::data_node const &compnode, char const *dirname)
 		: component(env, compnode, dirname)
+		, m_rasterizer(env.svg_rasterizer())
 		, m_dirname(dirname ? dirname : "")
 		, m_imagefile(env.get_attribute_string(compnode, "file", ""))
 		, m_alphafile(env.get_attribute_string(compnode, "alphafile", ""))
+		, m_data(get_data(compnode))
 	{
 	}
 
@@ -1535,51 +1553,30 @@ public:
 	virtual void preload(running_machine &machine) override
 	{
 		if (!m_bitmap.valid())
-			load_bitmap(machine);
+			load_image(machine);
 	}
 
-	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
+	virtual void draw(running_machine &machine, bitmap_argb32 &dest, rectangle const &bounds, int state) override
 	{
-		if (!m_bitmap.valid())
-			load_bitmap(machine);
+		if (!m_bitmap.valid() && !m_svg)
+			load_image(machine);
 
+		if (m_bitmap.valid())
+			draw_bitmap(dest, bounds, state);
+		else if (m_svg)
+			draw_svg(dest, bounds, state);
+	}
+
+private:
+	// internal helpers
+	void draw_bitmap(bitmap_argb32 &dest, rectangle const &bounds, int state)
+	{
 		render_color const c(color(state));
 		if (m_hasalpha || (1.0F > c.a))
 		{
 			bitmap_argb32 tempbitmap(dest.width(), dest.height());
 			render_resample_argb_bitmap_hq(tempbitmap, m_bitmap, c);
-			for (s32 y0 = 0, y1 = bounds.top(); bounds.bottom() >= y1; ++y0, ++y1)
-			{
-				u32 const *src(&tempbitmap.pix(y0, 0));
-				u32 *dst(&dest.pix(y1, bounds.left()));
-				for (s32 x1 = bounds.left(); bounds.right() >= x1; ++x1, ++src, ++dst)
-				{
-					rgb_t const a(*src);
-					u32 const aa(a.a());
-					if (255 == aa)
-					{
-						*dst = *src;
-					}
-					else if (aa)
-					{
-						rgb_t const b(*dst);
-						u32 const ba(b.a());
-						if (ba)
-						{
-							u32 const ca((aa * 255) + (ba * (255 - aa)));
-							*dst = rgb_t(
-									u8(ca / 255),
-									u8(((a.r() * aa * 255) + (b.r() * ba * (255 - aa))) / ca),
-									u8(((a.g() * aa * 255) + (b.g() * ba * (255 - aa))) / ca),
-									u8(((a.b() * aa * 255) + (b.b() * ba * (255 - aa))) / ca));
-						}
-						else
-						{
-							*dst = *src;
-						}
-					}
-				}
-			}
+			alpha_blend(tempbitmap, dest, bounds);
 		}
 		else
 		{
@@ -1588,44 +1585,172 @@ public:
 		}
 	}
 
-private:
-	// internal helpers
-	void load_bitmap(running_machine &machine)
+	void draw_svg(bitmap_argb32 &dest, rectangle const &bounds, int state)
 	{
-		LOGMASKED(LOG_IMAGE_LOAD, "Image component attempt to load image file '%s/%s'\n", m_dirname, m_imagefile);
-		emu_file file(machine.options().art_path(), OPEN_FLAG_READ);
+		// rasterise into a temporary bitmap
+		float const xscale(bounds.width() / m_svg->width);
+		float const yscale(bounds.height() / m_svg->height);
+		float const drawscale((std::max)(xscale, yscale));
+		bitmap_argb32 tempbitmap(int(m_svg->width * drawscale), int(m_svg->height * drawscale));
+		nsvgRasterize(
+				m_rasterizer.get(),
+				m_svg.get(),
+				0, 0, drawscale,
+				reinterpret_cast<unsigned char *>(&tempbitmap.pix(0)),
+				tempbitmap.width(), tempbitmap.height(),
+				tempbitmap.rowbytes());
 
-		ru_imgformat const format = render_detect_image(file, m_dirname.c_str(), m_imagefile.c_str());
-		switch (format)
+		// correct colour format and multiply by state colour
+		bool havealpha(false);
+		render_color const c(color(state));
+		for (s32 y = 0; tempbitmap.height() > y; ++y)
 		{
-		case RENDUTIL_IMGFORMAT_ERROR:
-			LOGMASKED(LOG_IMAGE_LOAD, "Image component error detecting image file format\n");
-			break;
+			u32 *dst(&tempbitmap.pix(y));
+			for (s32 x = 0; tempbitmap.width() > x; ++x, ++dst)
+			{
+				u8 const *const src(reinterpret_cast<u8 const *>(dst));
+				rgb_t const d(
+						u8((float(src[3]) * c.a) + 0.5),
+						u8((float(src[0]) * c.r) + 0.5),
+						u8((float(src[1]) * c.g) + 0.5),
+						u8((float(src[2]) * c.b) + 0.5));
+				*dst = d;
+				havealpha = havealpha || (d.a() < 255U);
+			}
+		}
 
-		case RENDUTIL_IMGFORMAT_PNG:
-			// load the basic bitmap
-			LOGMASKED(LOG_IMAGE_LOAD, "Image component detected PNG file format\n");
-			m_hasalpha = render_load_png(m_bitmap, file, m_dirname.c_str(), m_imagefile.c_str());
-			break;
+		// find most efficient way to insert it in the target bitmap
+		if (!havealpha)
+		{
+			if ((tempbitmap.width() == bounds.width()) && (tempbitmap.height() == bounds.height()))
+			{
+				for (s32 y = 0; tempbitmap.height() > y; ++y)
+					std::copy_n(&tempbitmap.pix(y), bounds.width(), &dest.pix(y + bounds.top(), bounds.left()));
+			}
+			else
+			{
+				bitmap_argb32 destsub(dest, bounds);
+				render_resample_argb_bitmap_hq(destsub, tempbitmap, render_color{ 1.0F, 1.0F, 1.0F, 1.0F });
+			}
+		}
+		else if ((tempbitmap.width() == bounds.width()) && (tempbitmap.height() == bounds.height()))
+		{
+			alpha_blend(tempbitmap, dest, bounds);
+		}
+		else
+		{
+			bitmap_argb32 scaled(bounds.width(), bounds.height());
+			render_resample_argb_bitmap_hq(scaled, tempbitmap, render_color{ 1.0F, 1.0F, 1.0F, 1.0F });
+			tempbitmap.reset();
+			alpha_blend(scaled, dest, bounds);
+		}
+	}
 
-		default:
-			// try JPG
-			LOGMASKED(LOG_IMAGE_LOAD, "Image component failed to detect image file format, trying JPEG\n");
-			render_load_jpeg(m_bitmap, file, m_dirname.c_str(), m_imagefile.c_str());
-			break;
+	void alpha_blend(bitmap_argb32 const &srcbitmap, bitmap_argb32 &dstbitmap, rectangle const &bounds)
+	{
+		for (s32 y0 = 0, y1 = bounds.top(); bounds.bottom() >= y1; ++y0, ++y1)
+		{
+			u32 const *src(&srcbitmap.pix(y0, 0));
+			u32 *dst(&dstbitmap.pix(y1, bounds.left()));
+			for (s32 x1 = bounds.left(); bounds.right() >= x1; ++x1, ++src, ++dst)
+			{
+				rgb_t const a(*src);
+				u32 const aa(a.a());
+				if (255 == aa)
+				{
+					*dst = *src;
+				}
+				else if (aa)
+				{
+					rgb_t const b(*dst);
+					u32 const ba(b.a());
+					if (ba)
+					{
+						u32 const ca((aa * 255) + (ba * (255 - aa)));
+						*dst = rgb_t(
+								u8(ca / 255),
+								u8(((a.r() * aa * 255) + (b.r() * ba * (255 - aa))) / ca),
+								u8(((a.g() * aa * 255) + (b.g() * ba * (255 - aa))) / ca),
+								u8(((a.b() * aa * 255) + (b.b() * ba * (255 - aa))) / ca));
+					}
+					else
+					{
+						*dst = *src;
+					}
+				}
+			}
+		}
+	}
+
+	void load_image(running_machine &machine)
+	{
+		// attempt to open the file
+		LOGMASKED(LOG_IMAGE_LOAD, "Image component attempt to load image file '%s%s%s'\n", m_dirname, PATH_SEPARATOR, m_imagefile);
+		emu_file file(machine.options().art_path(), OPEN_FLAG_READ);
+		osd_file::error const imgerr = file.open(m_dirname.empty() ? m_imagefile : (m_dirname + PATH_SEPARATOR + m_imagefile));
+		if (osd_file::error::NONE == imgerr)
+		{
+			ru_imgformat const format = render_detect_image(file);
+			switch (format)
+			{
+			case RENDUTIL_IMGFORMAT_ERROR:
+				LOGMASKED(LOG_IMAGE_LOAD, "Image component error detecting image file format\n");
+				break;
+
+			case RENDUTIL_IMGFORMAT_PNG:
+				LOGMASKED(LOG_IMAGE_LOAD, "Image component detected PNG file format\n");
+				m_hasalpha = render_load_png(m_bitmap, file);
+				break;
+
+			case RENDUTIL_IMGFORMAT_JPEG:
+				LOGMASKED(LOG_IMAGE_LOAD, "Image component detected JPEG file format\n");
+				render_load_jpeg(m_bitmap, file);
+				break;
+
+			case RENDUTIL_IMGFORMAT_MSDIB:
+				LOGMASKED(LOG_IMAGE_LOAD, "Image component detected Microsoft DIB file format\n");
+				render_load_msdib(m_bitmap, file);
+				break;
+
+			default:
+				LOGMASKED(LOG_IMAGE_LOAD, "Image component failed to detect image file format, trying SVG\n");
+				load_svg(file);
+				break;
+			}
+			file.close();
+		}
+		else
+		{
+			LOGMASKED(LOG_IMAGE_LOAD, "Image component unable to open image file '%s%s%s'\n", m_dirname, PATH_SEPARATOR, m_imagefile);
 		}
 
 		// load the alpha bitmap if specified
-		if (m_bitmap.valid() && !m_alphafile.empty())
+		if (!m_alphafile.empty())
 		{
-			// TODO: no way to detect corner case where we had alpha from the image but the alpha PNG makes it entirely opaque
-			LOGMASKED(LOG_IMAGE_LOAD, "Image component attempt to load alpha channel from file '%s/%s'\n", m_dirname, m_alphafile);
-			if (render_load_png(m_bitmap, file, m_dirname.c_str(), m_alphafile.c_str(), true))
-				m_hasalpha = true;
+			if (m_bitmap.valid())
+			{
+				LOGMASKED(LOG_IMAGE_LOAD, "Image component attempt to load alpha channel from file '%s%s%s'\n", m_dirname, PATH_SEPARATOR, m_alphafile);
+				osd_file::error const alferr = file.open(m_dirname.empty() ? m_alphafile : (m_dirname + PATH_SEPARATOR + m_alphafile));
+				if (osd_file::error::NONE == alferr)
+				{
+					// TODO: no way to detect corner case where we had alpha from the image but the alpha PNG makes it entirely opaque
+					if (render_load_png(m_bitmap, file, true))
+						m_hasalpha = true;
+					file.close();
+				}
+				else
+				{
+					LOGMASKED(LOG_IMAGE_LOAD, "Image component unable to open alpha channel file '%s%s%s'\n", m_dirname, PATH_SEPARATOR, m_alphafile);
+				}
+			}
+			else if (m_svg)
+			{
+				osd_printf_warning("Component alpha channel file '%s' ignored for SVG image '%s'\n", m_alphafile, m_imagefile);
+			}
 		}
 
-		// if we can't load the bitmap, allocate a dummy one and report an error
-		if (!m_bitmap.valid())
+		// if we can't load an image, allocate a dummy one and report an error
+		if (!m_bitmap.valid() && !m_svg)
 		{
 			// draw some stripes in the bitmap
 			m_bitmap.allocate(100, 100);
@@ -1636,18 +1761,87 @@ private:
 
 			// log an error
 			if (m_alphafile.empty())
-				osd_printf_warning("Unable to load component bitmap '%s'\n", m_imagefile);
+				osd_printf_warning("Unable to load component image '%s'\n", m_imagefile);
 			else
-				osd_printf_warning("Unable to load component bitmap '%s'/'%s'\n", m_imagefile, m_alphafile);
+				osd_printf_warning("Unable to load component image '%s'/'%s'\n", m_imagefile, m_alphafile);
+		}
+
+		// clear out this stuff in case it's large
+		if (!m_svg)
+			m_rasterizer.reset();
+		m_dirname.clear();
+		m_imagefile.clear();
+		m_alphafile.clear();
+		m_data.clear();
+	}
+
+	void load_svg(util::core_file &file)
+	{
+		if (!m_rasterizer)
+		{
+			osd_printf_warning("No SVG rasteriser available, won't attempt to parse component image '%s' as SVG\n", m_imagefile);
+			return;
+		}
+		u64 len(file.size());
+		if ((std::numeric_limits<size_t>::max() - 1) < len)
+		{
+			osd_printf_warning("Component image '%s' is too large to read into memory\n", m_imagefile);
+			return;
+		}
+		std::unique_ptr<char []> svgbuf(new (std::nothrow) char [size_t(len) + 1]);
+		if (!svgbuf)
+		{
+			osd_printf_warning("Error allocating memory to read component image '%s'\n", m_imagefile);
+			return;
+		}
+		svgbuf[len] = '\0';
+		for (char *ptr = svgbuf.get(); len; )
+		{
+			u32 const block(u32(std::min<u64>(std::numeric_limits<u32>::max(), len)));
+			u32 const read(file.read(ptr, block));
+			if (!read)
+			{
+				osd_printf_warning("Error reading component image '%s'\n", m_imagefile);
+				return;
+			}
+			ptr += read;
+			len -= read;
+		}
+		m_svg.reset(nsvgParse(svgbuf.get(), "px", 72));
+		svgbuf.reset();
+		if (!m_svg)
+		{
+			osd_printf_warning("Failed to parse component image '%s' as SVG\n", m_imagefile);
+			return;
+		}
+		if ((0.0F >= m_svg->width) || (0.0F >= m_svg->height))
+		{
+			osd_printf_warning("Parsing component image '%s' as SVG produced empty image\n", m_imagefile);
+			m_svg.reset();
+			return;
 		}
 	}
 
+	static std::string get_data(util::xml::data_node const &compnode)
+	{
+		util::xml::data_node const *datanode(compnode.get_child("data"));
+		if (datanode && datanode->get_value())
+			return datanode->get_value();
+		else
+			return "";
+	}
+
 	// internal state
-	bitmap_argb32       m_bitmap;                   // source bitmap for images
-	std::string const   m_dirname;                  // directory name of image file (for lazy loading)
-	std::string const   m_imagefile;                // name of the image file (for lazy loading)
-	std::string const   m_alphafile;                // name of the alpha file (for lazy loading)
-	bool                m_hasalpha = false;         // is there any alpha component present?
+	util::nsvg_image_ptr            m_svg;              // parsed SVG image
+	std::shared_ptr<NSVGrasterizer> m_rasterizer;       // SVG rasteriser
+	bitmap_argb32                   m_bitmap;           // source bitmap for images
+	bool                            m_hasalpha = false; // is there any alpha component present?
+
+	// cold state
+	std::string                     m_dirname;          // directory name of image file (for lazy loading)
+	std::string                     m_imagefile;        // name of the image file (for lazy loading)
+	std::string                     m_alphafile;        // name of the alpha file (for lazy loading)
+	std::string                     m_data;             // embedded image data
 };
 
 
@@ -2881,7 +3075,11 @@ private:
 	{
 		// load the basic bitmap
 		assert(m_file != nullptr);
-		/*m_hasalpha[number] = */ render_load_png(m_bitmap[number], *m_file[number], m_dirname.c_str(), m_imagefile[number].c_str());
+		if (m_file[number]->open(m_dirname + PATH_SEPARATOR + m_imagefile[number]) == osd_file::error::NONE)
+		{
+			/*m_hasalpha[number] = */ render_load_png(m_bitmap[number], *m_file[number]);
+			m_file[number]->close();
+		}
 
 		// load the alpha bitmap if specified
 		//if (m_bitmap[number].valid() && m_alphafile[number])
@@ -3593,7 +3791,7 @@ void layout_view::recompute(u32 visibility_mask, bool zoom_to_screen)
 			if (first)
 				m_bounds = rawbounds;
 			else
-				union_render_bounds(m_bounds, rawbounds);
+				m_bounds |= rawbounds;
 			first = false;
 
 			// accumulate visible screens and their bounds bounds
@@ -3602,7 +3800,7 @@ void layout_view::recompute(u32 visibility_mask, bool zoom_to_screen)
 				if (scrfirst)
 					scrbounds = rawbounds;
 				else
-					union_render_bounds(scrbounds, rawbounds);
+					scrbounds |= rawbounds;
 				scrfirst = false;
 
 				// accumulate active screens
@@ -3912,10 +4110,13 @@ layout_view::item::item(
 	, m_animoutput(env.device(), make_animoutput_tag(env, itemnode))
 	, m_have_output(env.get_attribute_string(itemnode, "name", "")[0])
 	, m_have_animoutput(!make_animoutput_tag(env, itemnode).empty())
+	, m_animinput_port(nullptr)
+	, m_animmask(make_animmask(env, itemnode))
+	, m_animshift(get_state_shift(m_animmask))
 	, m_input_port(nullptr)
 	, m_input_field(nullptr)
 	, m_input_mask(env.get_attribute_int(itemnode, "inputmask", 0))
-	, m_input_shift(get_input_shift(m_input_mask))
+	, m_input_shift(get_state_shift(m_input_mask))
 	, m_input_raw(env.get_attribute_bool(itemnode, "inputraw", 0))
 	, m_clickthrough(env.get_attribute_bool(itemnode, "clickthrough", "yes"))
 	, m_screen(nullptr)
@@ -3924,6 +4125,7 @@ layout_view::item::item(
 	, m_blend_mode(get_blend_mode(env, itemnode))
 	, m_visibility_mask(env.visibility_mask())
 	, m_input_tag(make_input_tag(env, itemnode))
+	, m_animinput_tag(make_animinput_tag(env, itemnode))
 	, m_rawbounds(make_bounds(env, itemnode, trans))
 	, m_has_clickthrough(env.get_attribute_string(itemnode, "clickthrough", "")[0])
 {
@@ -3972,7 +4174,7 @@ render_bounds layout_view::item::bounds() const
 	if (m_bounds.size() == 1U)
 		return m_bounds.front().bounds;
 	else
-		return interpolate_bounds(m_bounds, m_have_animoutput ? s32(m_animoutput) : state());
+		return interpolate_bounds(m_bounds, animation_state());
 }
 
 
@@ -3985,7 +4187,7 @@ render_color layout_view::item::color() const
 	if (m_color.size() == 1U)
 		return m_color.front().color;
 	else
-		return interpolate_color(m_color, m_have_animoutput ? s32(m_animoutput) : state());
+		return interpolate_color(m_color, animation_state());
 }
 
 
@@ -4038,6 +4240,9 @@ void layout_view::item::resolve_tags()
 	if (m_have_animoutput)
 		m_animoutput.resolve();
 
+	if (!m_animinput_tag.empty())
+		m_animinput_port = m_element->machine().root_device().ioport(m_animinput_tag);
+
 	if (!m_input_tag.empty())
 	{
 		m_input_port = m_element->machine().root_device().ioport(m_input_tag);
@@ -4059,6 +4264,21 @@ void layout_view::item::resolve_tags()
 				m_clickthrough = false;
 		}
 	}
+}
+
+
+//---------------------------------------------
+//  find_element - find element definition
+//---------------------------------------------
+
+inline int layout_view::item::animation_state() const
+{
+	if (m_have_animoutput)
+		return (s32(m_animoutput) & m_animmask) >> m_animshift;
+	else if (m_animinput_port)
+		return (m_animinput_port->read() & m_animmask) >> m_animshift;
+	else
+		return state();
 }
 
 
@@ -4157,6 +4377,30 @@ std::string layout_view::item::make_animoutput_tag(view_environment &env, util::
 
 
 //---------------------------------------------
+//  make_animmask - get animation state mask
+//---------------------------------------------
+
+ioport_value layout_view::item::make_animmask(view_environment &env, util::xml::data_node const &itemnode)
+{
+	util::xml::data_node const *const animate(itemnode.get_child("animate"));
+	return animate ? env.get_attribute_int(*animate, "mask", ~ioport_value(0)) : ~ioport_value(0);
+}
+
+
+//---------------------------------------------
+//  make_animinput_tag - get absolute tag for
+//  animation input
+//---------------------------------------------
+
+std::string layout_view::item::make_animinput_tag(view_environment &env, util::xml::data_node const &itemnode)
+{
+	util::xml::data_node const *const animate(itemnode.get_child("animate"));
+	char const *tag(animate ? env.get_attribute_string(*animate, "inputtag", nullptr) : nullptr);
+	return tag ? env.device().subtag(tag) : std::string();
+}
+
+
+//---------------------------------------------
 //  make_input_tag - get absolute input tag
 //---------------------------------------------
 
@@ -4200,10 +4444,10 @@ int layout_view::item::get_blend_mode(view_environment &env, util::xml::data_nod
 
 
 //---------------------------------------------
-//  get_input_shift - shift to right-align LSB
+//  get_state_shift - shift to right-align LSB
 //---------------------------------------------
 
-unsigned layout_view::item::get_input_shift(ioport_value mask)
+unsigned layout_view::item::get_state_shift(ioport_value mask)
 {
 	unsigned result(0U);
 	while (mask && !BIT(mask, 0))

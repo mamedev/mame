@@ -359,14 +359,14 @@ void shaders::render_snapshot(IDirect3DSurface9 *surface)
 	// add two text entries describing the image
 	std::string text1 = std::string(emulator_info::get_appname()).append(" ").append(emulator_info::get_build_version());
 	std::string text2 = std::string(machine->system().manufacturer).append(" ").append(machine->system().type.fullname());
-	png_info pnginfo;
+	util::png_info pnginfo;
 	pnginfo.add_text("Software", text1.c_str());
 	pnginfo.add_text("System", text2.c_str());
 
 	// now do the actual work
-	png_error error = png_write_bitmap(file, &pnginfo, snapshot, 1 << 24, nullptr);
-	if (error != PNGERR_NONE)
-		osd_printf_error("Error generating PNG for HLSL snapshot: png_error = %d\n", error);
+	util::png_error error = util::png_write_bitmap(file, &pnginfo, snapshot, 1 << 24, nullptr);
+	if (error != util::png_error::NONE)
+		osd_printf_error("Error generating PNG for HLSL snapshot: png_error = %d\n", std::underlying_type_t<util::png_error>(error));
 
 	result = snap_copy_target->UnlockRect();
 	if (FAILED(result))
@@ -721,7 +721,11 @@ int shaders::create_resources()
 		osd_printf_verbose("Direct3D: Error %08lX during device SetRenderTarget call\n", result);
 
 	emu_file file(machine->options().art_path(), OPEN_FLAG_READ);
-	render_load_png(shadow_bitmap, file, nullptr, options->shadow_mask_texture);
+	if (file.open(options->shadow_mask_texture) == osd_file::error::NONE)
+	{
+		render_load_png(shadow_bitmap, file);
+		file.close();
+	}
 
 	// experimental: if we have a shadow bitmap, create a texture for it
 	if (shadow_bitmap.valid())
@@ -742,7 +746,11 @@ int shaders::create_resources()
 		d3d->get_texture_manager()->m_texture_list.push_back(std::move(tex));
 	}
 
-	render_load_png(lut_bitmap, file, nullptr, options->lut_texture);
+	if (file.open(options->lut_texture) == osd_file::error::NONE)
+	{
+		render_load_png(lut_bitmap, file);
+		file.close();
+	}
 	if (lut_bitmap.valid())
 	{
 		render_texinfo texture;
@@ -761,7 +769,11 @@ int shaders::create_resources()
 		d3d->get_texture_manager()->m_texture_list.push_back(std::move(tex));
 	}
 
-	render_load_png(ui_lut_bitmap, file, nullptr, options->ui_lut_texture);
+	if (file.open(options->ui_lut_texture) == osd_file::error::NONE)
+	{
+		render_load_png(ui_lut_bitmap, file);
+		file.close();
+	}
 	if (ui_lut_bitmap.valid())
 	{
 		render_texinfo texture;

@@ -309,8 +309,6 @@ files{
 	MAME_DIR .. "src/mame/audio/invinco.h",
 	MAME_DIR .. "src/mame/audio/pulsar.cpp",
 	MAME_DIR .. "src/mame/audio/pulsar.h",
-	MAME_DIR .. "src/mame/audio/tranqgun.cpp",
-	MAME_DIR .. "src/mame/audio/tranqgun.h",
 
 	MAME_DIR .. "src/mame/machine/segacrpt_device.cpp",
 	MAME_DIR .. "src/mame/machine/segacrpt_device.h",

@@ -14,17 +14,13 @@
 #include "sound/beep.h"
 #include "video/mc6845.h"
 #include "machine/wd_fdc.h"
+#include "machine/timer.h"
 #include "emupal.h"
 #include "screen.h"
 
 class kaypro_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_FLOPPY
-	};
-
 	kaypro_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_palette(*this, "palette")
@@ -42,6 +38,7 @@ public:
 		, m_bankr(*this, "bankr")
 		, m_bankw(*this, "bankw")
 		, m_bank3(*this, "bank3")
+		, m_floppy_timer(*this, "floppy_timer")
 		{}
 
 	void omni2(machine_config &config);
@@ -60,6 +57,7 @@ private:
 	void kayproii_io(address_map &map);
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	TIMER_DEVICE_CALLBACK_MEMBER(floppy_timer);
 	u8 kaypro484_87_r();
 	u8 kaypro484_system_port_r();
 	u8 kaypro484_status_r();
@@ -85,7 +83,6 @@ private:
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	void mc6845_screen_configure();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	u8 m_mc6845_reg[32];
 	u8 m_mc6845_ind;
@@ -115,6 +112,7 @@ private:
 	required_memory_bank m_bankr;
 	required_memory_bank m_bankw;
 	required_memory_bank m_bank3;
+	required_device<timer_device> m_floppy_timer;
 };
 
 #endif // MAME_INCLUDES_KAYPRO_H

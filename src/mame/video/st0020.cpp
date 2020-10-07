@@ -16,7 +16,9 @@
 
 #include "emu.h"
 #include "st0020.h"
-#include "render.h"
+
+#include "screen.h"
+
 
 DEFINE_DEVICE_TYPE(ST0020_SPRITES, st0020_device, "st0020", "Seta ST0020 Sprites")
 

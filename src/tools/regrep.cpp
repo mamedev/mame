@@ -748,7 +748,7 @@ static int compare_screenshots(summary_file *curfile)
 			/* if that worked, load the file */
 			if (filerr == osd_file::error::NONE)
 			{
-				png_read_bitmap(*file, bitmaps[listnum]);
+				util::png_read_bitmap(*file, bitmaps[listnum]);
 				file.reset();
 			}
 		}
@@ -835,7 +835,7 @@ static int generate_png_diff(const summary_file *curfile, std::string &destdir, 
 	int bitmapcount = 0;
 	util::core_file::ptr file;
 	osd_file::error filerr;
-	png_error pngerr;
+	util::png_error pngerr;
 	int error = -1;
 	int starty;
 
@@ -855,9 +855,9 @@ static int generate_png_diff(const summary_file *curfile, std::string &destdir, 
 				goto error;
 
 			/* load the source image */
-			pngerr = png_read_bitmap(*file, bitmaps[bitmapcount++]);
+			pngerr = util::png_read_bitmap(*file, bitmaps[bitmapcount++]);
 			file.reset();
-			if (pngerr != PNGERR_NONE)
+			if (pngerr != util::png_error::NONE)
 				goto error;
 		}
 
@@ -924,9 +924,9 @@ static int generate_png_diff(const summary_file *curfile, std::string &destdir, 
 	filerr = util::core_file::open(dstfilename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, file);
 	if (filerr != osd_file::error::NONE)
 		goto error;
-	pngerr = png_write_bitmap(*file, nullptr, finalbitmap, 0, nullptr);
+	pngerr = util::png_write_bitmap(*file, nullptr, finalbitmap, 0, nullptr);
 	file.reset();
-	if (pngerr != PNGERR_NONE)
+	if (pngerr != util::png_error::NONE)
 		goto error;
 
 	/* if we get here, we are error free */

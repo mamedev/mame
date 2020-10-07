@@ -46,6 +46,7 @@
 #ifndef MAME_EMU_RENDER_H
 #define MAME_EMU_RENDER_H
 
+#include "rendertypes.h"
 #include "screen.h"
 
 #include <array>
@@ -64,17 +65,6 @@
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
-
-// blending modes
-enum
-{
-	BLENDMODE_NONE = 0,                                 // no blending
-	BLENDMODE_ALPHA,                                    // standard alpha blend
-	BLENDMODE_RGB_MULTIPLY,                             // apply source alpha to source pix, then multiply RGB values
-	BLENDMODE_ADD,                                      // apply source alpha to source pix, then add to destination
-
-	BLENDMODE_COUNT
-};
 
 
 // render creation flags
@@ -165,62 +155,6 @@ constexpr u32 PRIMFLAG_GET_VECTORBUF(u32 x) { return (x & PRIMFLAG_VECTORBUF_MAS
 
 // texture scaling callback
 typedef void (*texture_scaler_func)(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param);
-
-// render_bounds - floating point bounding rectangle
-struct render_bounds
-{
-	float               x0;                 // leftmost X coordinate
-	float               y0;                 // topmost Y coordinate
-	float               x1;                 // rightmost X coordinate
-	float               y1;                 // bottommost Y coordinate
-
-	constexpr float width() const { return x1 - x0; }
-	constexpr float height() const { return y1 - y0; }
-	constexpr float aspect() const { return width() / height(); }
-	constexpr bool includes(float x, float y) const { return (x >= x0) && (x <= x1) && (y >= y0) && (y <= y1); }
-};
-
-
-// render_color - floating point set of ARGB values
-struct render_color
-{
-	float               a;                  // alpha component (0.0 = transparent, 1.0 = opaque)
-	float               r;                  // red component (0.0 = none, 1.0 = max)
-	float               g;                  // green component (0.0 = none, 1.0 = max)
-	float               b;                  // blue component (0.0 = none, 1.0 = max)
-
-	constexpr render_color operator*(render_color const &c) const
-	{
-		return render_color{ a * c.a, r * c.r, g * c.g, b * c.b };
-	}
-
-	render_color &operator*=(render_color const &c)
-	{
-		a *= c.a;
-		r *= c.r;
-		g *= c.g;
-		b *= c.b;
-		return *this;
-	}
-};
-
-
-// render_texuv - floating point set of UV texture coordinates
-struct render_texuv
-{
-	float               u;                  // U coordinate (0.0-1.0)
-	float               v;                  // V coordinate (0.0-1.0)
-};
-
-
-// render_quad_texuv - floating point set of UV texture coordinates
-struct render_quad_texuv
-{
-	render_texuv        tl;                 // top-left UV coordinate
-	render_texuv        tr;                 // top-right UV coordinate
-	render_texuv        bl;                 // bottom-left UV coordinate
-	render_texuv        br;                 // bottom-right UV coordinate
-};
 
 
 // render_texinfo - texture information
@@ -818,7 +752,7 @@ public:
 
 		// interactivity
 		bool has_input() const { return bool(m_input_port); }
-		ioport_port *input_tag_and_mask(ioport_value &mask) const { mask = m_input_mask; return m_input_port; };
+		std::pair<ioport_port *, ioport_value> input_tag_and_mask() const { return std::make_pair(m_input_port, m_input_mask); };
 		bool clickthrough() const { return m_clickthrough; }
 
 		// fetch state based on configured source
@@ -831,13 +765,17 @@ public:
 		using bounds_vector = emu::render::detail::bounds_vector;
 		using color_vector = emu::render::detail::color_vector;
 
+		int animation_state() const;
+
 		static layout_element *find_element(view_environment &env, util::xml::data_node const &itemnode, element_map &elemmap);
 		static bounds_vector make_bounds(view_environment &env, util::xml::data_node const &itemnode, layout_group::transform const &trans);
 		static color_vector make_color(view_environment &env, util::xml::data_node const &itemnode, render_color const &mult);
 		static std::string make_animoutput_tag(view_environment &env, util::xml::data_node const &itemnode);
+		static std::string make_animinput_tag(view_environment &env, util::xml::data_node const &itemnode);
+		static ioport_value make_animmask(view_environment &env, util::xml::data_node const &itemnode);
 		static std::string make_input_tag(view_environment &env, util::xml::data_node const &itemnode);
 		static int get_blend_mode(view_environment &env, util::xml::data_node const &itemnode);
-		static unsigned get_input_shift(ioport_value mask);
+		static unsigned get_state_shift(ioport_value mask);
 
 		// internal state
 		layout_element *const   m_element;          // pointer to the associated element (non-screens only)
@@ -845,6 +783,9 @@ public:
 		output_finder<>         m_animoutput;       // associated output for animation if different
 		bool const              m_have_output;      // whether we actually have an output
 		bool const              m_have_animoutput;  // whether we actually have an output for animation
+		ioport_port *           m_animinput_port;   // input port used for animation
+		ioport_value const      m_animmask;         // mask for animation state
+		u8 const                m_animshift;        // shift for animation state
 		ioport_port *           m_input_port;       // input port of this item
 		ioport_field const *    m_input_field;      // input port field of this item
 		ioport_value const      m_input_mask;       // input mask of this item
@@ -860,6 +801,7 @@ public:
 
 		// cold items
 		std::string const       m_input_tag;        // input tag of this item
+		std::string const       m_animinput_tag;    // tag of input port for animation state
 		bounds_vector const     m_rawbounds;        // raw (original) bounds of the item
 		bool const              m_has_clickthrough; // whether clickthrough was explicitly configured
 	};

@@ -248,7 +248,7 @@ mng_movie_recording::mng_movie_recording(screen_device *screen, std::map<std::st
 mng_movie_recording::~mng_movie_recording()
 {
 	if (m_mng_file)
-		mng_capture_stop(*m_mng_file);
+		util::mng_capture_stop(*m_mng_file);
 }
 
 
@@ -264,10 +264,10 @@ bool mng_movie_recording::initialize(std::unique_ptr<emu_file> &&file, bitmap_t 
 	set_frame_period(attotime::from_hz(rate));
 
 	m_mng_file = std::move(file);
-	png_error pngerr = mng_capture_start(*m_mng_file, snap_bitmap, rate);
-	if (pngerr != PNGERR_NONE)
-		osd_printf_error("Error capturing MNG, png_error=%d\n", pngerr);
-	return pngerr == PNGERR_NONE;
+	util::png_error pngerr = util::mng_capture_start(*m_mng_file, snap_bitmap, rate);
+	if (pngerr != util::png_error::NONE)
+		osd_printf_error("Error capturing MNG, png_error=%d\n", std::underlying_type_t<util::png_error>(pngerr));
+	return pngerr == util::png_error::NONE;
 }
 
 
@@ -278,15 +278,15 @@ bool mng_movie_recording::initialize(std::unique_ptr<emu_file> &&file, bitmap_t 
 bool mng_movie_recording::append_single_video_frame(bitmap_rgb32 &bitmap, const rgb_t *palette, int palette_entries)
 {
 	// set up the text fields in the movie info
-	png_info pnginfo;
+	util::png_info pnginfo;
 	if (current_frame() == 0)
 	{
 		for (auto &ent : m_info_fields)
 			pnginfo.add_text(ent.first.c_str(), ent.second.c_str());
 	}
 
-	png_error error = mng_capture_frame(*m_mng_file, pnginfo, bitmap, palette_entries, palette);
-	return error == png_error::PNGERR_NONE;
+	util::png_error error = util::mng_capture_frame(*m_mng_file, pnginfo, bitmap, palette_entries, palette);
+	return error == util::png_error::NONE;
 }
 
 
