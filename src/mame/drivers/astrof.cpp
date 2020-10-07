@@ -1044,7 +1044,7 @@ ROM_START( astrof3 )
 	ROM_LOAD( "astrf.clr",    0x0000, 0x0020, CRC(61329fd1) SHA1(15782d8757d4dda5a8b97815e94c90218f0e08dd) )
 ROM_END
 
-
+// Famaresa "500" PCB set (500-001, 500-002, 500-003 and 500-004).
 ROM_START( astroff )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "b.4a",        0xd000, 0x0400, CRC(18bdc2d9) SHA1(1fc93de1212f04f04acc224d91c2308758f5d5ca) )
@@ -1064,7 +1064,7 @@ ROM_START( astroff )
 	ROM_LOAD( "im5610-82s123.2f", 0x0000, 0x0020, CRC(61329fd1) SHA1(15782d8757d4dda5a8b97815e94c90218f0e08dd) )
 ROM_END
 
-
+// Famaresa "500" PCB set (500-001, 500-002, 500-003 and 500-004). Tested, shows a black background.
 ROM_START( astroff2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "b.4a",        0xd000, 0x0400, CRC(18bdc2d9) SHA1(1fc93de1212f04f04acc224d91c2308758f5d5ca) )
