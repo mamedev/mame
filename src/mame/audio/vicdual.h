@@ -50,6 +50,7 @@ protected:
 
 protected:
 	void (*const m_netlist)(netlist::nlparse_t &);
+	u8 m_dummy;
 };
 #endif
 

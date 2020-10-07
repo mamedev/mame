@@ -386,12 +386,12 @@ DEFINE_DEVICE_TYPE(FROGS_AUDIO, frogs_audio_device, "frogs_audio", "Frogs Sound 
 frogs_audio_device::frogs_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 #if (FROGS_TEST_INDEPENDENT_NETLISTS)
 	vicdual_audio_device_base(mconfig, FROGS_AUDIO, tag, owner, clock, 0xff, NETLIST_NAME(frogs_mixer), 1.0),
-	m_jump(*this, "frogs_jump:input"),
-	m_tongue(*this, "frogs_tongue:input"),
-	m_hop(*this, "frogs_hop:input"),
-	m_capture(*this, "frogs_capture:input"),
-	m_splash(*this, "frogs_splash:input"),
-	m_fly(*this, "frogs_fly:input")
+	m_jump(*this, "frogs_jump:component:input"),
+	m_tongue(*this, "frogs_tongue:component:input"),
+	m_hop(*this, "frogs_hop:component:input"),
+	m_capture(*this, "frogs_capture:component:input"),
+	m_splash(*this, "frogs_splash:component:input"),
+	m_fly(*this, "frogs_fly:component:input")
 #else
 	vicdual_audio_device_base(mconfig, FROGS_AUDIO, tag, owner, clock, 0xff, NETLIST_NAME(frogs), 1.0)
 #endif
@@ -409,15 +409,16 @@ frogs_audio_component_device::frogs_audio_component_device(const machine_config 
 
 void frogs_audio_component_device::device_start()
 {
+	save_item(NAME(m_dummy));
 }
 
 void frogs_audio_component_device::device_add_mconfig(machine_config &config)
 {
-	NETLIST_SOUND(config, "frogs_component", 48000)
+	NETLIST_SOUND(config, "component", 48000)
 		.set_source(m_netlist)
 		.add_route(ALL_OUTPUTS, *this, 1.0);
-	NETLIST_LOGIC_INPUT(config, "input", "I_INPUT.IN", 0);
-	NETLIST_STREAM_OUTPUT(config, "frogs_component:cout0", 0, "OUTPUT").set_mult_offset(1.0, 0.0);
+	NETLIST_LOGIC_INPUT(config, "component:input", "I_INPUT.IN", 0);
+	NETLIST_STREAM_OUTPUT(config, "component:cout0", 0, "OUTPUT").set_mult_offset(1.0, 0.0);
 }
 
 DEFINE_DEVICE_TYPE(FROGS_AUDIO_COMPONENT, frogs_audio_component_device, "frogs_audio_component_device", "Frogs Sound Component")
@@ -432,7 +433,7 @@ void frogs_audio_device::device_add_mconfig(machine_config &config)
 	NETLIST_STREAM_INPUT(config, "sound_nl:cin2", 2, "HOP.IN");
 	NETLIST_STREAM_INPUT(config, "sound_nl:cin3", 3, "CROAK.IN");
 	NETLIST_STREAM_INPUT(config, "sound_nl:cin4", 4, "SPLASH.IN");
-	NETLIST_STREAM_INPUT(config, "sound_nl:cin5", 5, "FLY.IN");
+	NETLIST_STREAM_INPUT(config, "sound_nl:cin5", 5, "BUZZZ.IN");
 	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(1.0, 0.0);
 
 	FROGS_AUDIO_COMPONENT(config, "frogs_jump", 48000, NETLIST_NAME(frogs_jump))
