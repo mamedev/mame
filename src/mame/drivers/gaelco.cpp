@@ -152,40 +152,40 @@ void gaelco_state::maniacsq_map(address_map &map)
 
 void gaelco_state::squash_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom();                                                         /* ROM */
-	map(0x100000, 0x101fff).ram().w(FUNC(gaelco_state::vram_encrypted_w)).share("videoram");         /* Video RAM */
-	map(0x102000, 0x103fff).ram().w(FUNC(gaelco_state::encrypted_w)).share("screenram");                /* Screen RAM */
-	map(0x108000, 0x108007).writeonly().share("vregs");                         /* Video Registers */
-//  map(0x10800c, 0x10800d).w("watchdog", FUNC(watchdog_timer_device::reset16_w)); /* INT 6 ACK/Watchdog timer */
-	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    /* Palette */
-	map(0x440000, 0x440fff).ram().share("spriteram");                               /* Sprite RAM */
+	map(0x000000, 0x0fffff).rom();                                                               // ROM
+	map(0x100000, 0x101fff).ram().w(FUNC(gaelco_state::vram_encrypted_w)).share("videoram");     // Video RAM
+	map(0x102000, 0x103fff).ram().w(FUNC(gaelco_state::encrypted_w)).share("screenram");         // Screen RAM
+	map(0x108000, 0x108007).writeonly().share("vregs");                                          // Video Registers
+//  map(0x10800c, 0x10800d).w("watchdog", FUNC(watchdog_timer_device::reset16_w));                   // INT 6 ACK/Watchdog timer
+	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");  // Palette
+	map(0x440000, 0x440fff).ram().share("spriteram");                                            // Sprite RAM
 	map(0x700000, 0x700001).portr("DSW2");
 	map(0x700002, 0x700003).portr("DSW1");
 	map(0x700004, 0x700005).portr("P1");
 	map(0x700006, 0x700007).portr("P2");
 	map(0x70000b, 0x70000b).select(0x000070).lw8(NAME([this] (offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 4, data); }));
 	map(0x70000d, 0x70000d).w(FUNC(gaelco_state::oki_bankswitch_w));
-	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));                      /* OKI6295 status register */
-	map(0xff0000, 0xffffff).ram();                                                         /* Work RAM */
+	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // OKI6295 status register
+	map(0xff0000, 0xffffff).ram();                                                                // Work RAM
 }
 
 void gaelco_state::thoop_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom();                                                         /* ROM */
-	map(0x100000, 0x101fff).ram().w(FUNC(gaelco_state::thoop_vram_encrypted_w)).share("videoram");          /* Video RAM */
-	map(0x102000, 0x103fff).ram().w(FUNC(gaelco_state::thoop_encrypted_w)).share("screenram");             /* Screen RAM */
-	map(0x108000, 0x108007).writeonly().share("vregs");                         /* Video Registers */
-//  map(0x10800c, 0x10800d).w("watchdog", FUNC(watchdog_timer_device::reset16_w));  /* INT 6 ACK/Watchdog timer */
-	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");        /* Palette */
-	map(0x440000, 0x440fff).ram().share("spriteram");                               /* Sprite RAM */
+	map(0x000000, 0x0fffff).rom();                                                                 // ROM
+	map(0x100000, 0x101fff).ram().w(FUNC(gaelco_state::thoop_vram_encrypted_w)).share("videoram"); // Video RAM
+	map(0x102000, 0x103fff).ram().w(FUNC(gaelco_state::thoop_encrypted_w)).share("screenram");     // Screen RAM
+	map(0x108000, 0x108007).writeonly().share("vregs");                                            // Video Registers
+//  map(0x10800c, 0x10800d).w("watchdog", FUNC(watchdog_timer_device::reset16_w));                     // INT 6 ACK/Watchdog timer
+	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
+	map(0x440000, 0x440fff).ram().share("spriteram");                                              // Sprite RAM
 	map(0x700000, 0x700001).portr("DSW2");
 	map(0x700002, 0x700003).portr("DSW1");
 	map(0x700004, 0x700005).portr("P1");
 	map(0x700006, 0x700007).portr("P2");
 	map(0x70000b, 0x70000b).select(0x000070).lw8(NAME([this] (offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 4, data); }));
 	map(0x70000d, 0x70000d).w(FUNC(gaelco_state::oki_bankswitch_w));
-	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));                      /* OKI6295 status register */
-	map(0xff0000, 0xffffff).ram();                                                         /* Work RAM */
+	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // OKI6295 status register
+	map(0xff0000, 0xffffff).ram();                                                                 // Work RAM
 }
 
 
@@ -1109,10 +1109,10 @@ ROM_START( squash ) // PCB - REF.922804/1
 	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
 
 	ROM_REGION( 0x4dc, "plds", 0)
-        ROM_LOAD ( "squashv1_gal16v8.f2",  0x000, 0x117, CRC(d5ed5985) SHA1(a4e9c8e3a7774e2a02fbca3ddf8175cf251825ba) ) // Unprotected
-        ROM_LOAD ( "squashv1_gal16v8.j16", 0x117, 0x117, CRC(fe78b903) SHA1(c806e63ce56a77f631043c184a42bf77ebda8a09) ) // Unprotected
-        ROM_LOAD ( "squashv1_gal20v8.d21", 0x22e, 0x157, CRC(a715e392) SHA1(31ebc78b084d49cc2f6479cbd42738e6bfbfb46a) ) // Unprotected
-        ROM_LOAD ( "squashv1_gal20v8.h11", 0x385, 0x157, CRC(51e34bc2) SHA1(381a898b3afb709e7d8e0f87df106f23aec2ccbe) ) // Unprotected
+	ROM_LOAD ( "squashv1_gal16v8.f2",  0x000, 0x117, CRC(d5ed5985) SHA1(a4e9c8e3a7774e2a02fbca3ddf8175cf251825ba) ) // Unprotected
+	ROM_LOAD ( "squashv1_gal16v8.j16", 0x117, 0x117, CRC(fe78b903) SHA1(c806e63ce56a77f631043c184a42bf77ebda8a09) ) // Unprotected
+	ROM_LOAD ( "squashv1_gal20v8.d21", 0x22e, 0x157, CRC(a715e392) SHA1(31ebc78b084d49cc2f6479cbd42738e6bfbfb46a) ) // Unprotected
+	ROM_LOAD ( "squashv1_gal20v8.h11", 0x385, 0x157, CRC(51e34bc2) SHA1(381a898b3afb709e7d8e0f87df106f23aec2ccbe) ) // Unprotected
 ROM_END
 
 
@@ -1144,10 +1144,10 @@ ROM_START( thoop ) // PCB - REF.922804/1
 	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
 
 	ROM_REGION( 0x4dc, "plds", 0)
-        ROM_LOAD ( "thunderhoop_gal16v8.f2",  0x000, 0x117, BAD_DUMP CRC(d5ed5985) SHA1(a4e9c8e3a7774e2a02fbca3ddf8175cf251825ba) ) // Bruteforced but verified
-        ROM_LOAD ( "thunderhoop_gal16v8.j16", 0x117, 0x117, BAD_DUMP CRC(fe78b903) SHA1(c806e63ce56a77f631043c184a42bf77ebda8a09) ) // Bruteforced but verified
-        ROM_LOAD ( "thunderhoop_gal20v8.d21", 0x22e, 0x157, BAD_DUMP CRC(a715e392) SHA1(31ebc78b084d49cc2f6479cbd42738e6bfbfb46a) ) // Bruteforced but verified
-        ROM_LOAD ( "thunderhoop_gal20v8.h11", 0x385, 0x157, BAD_DUMP CRC(51e34bc2) SHA1(381a898b3afb709e7d8e0f87df106f23aec2ccbe) ) // Bruteforced but verified
+	ROM_LOAD ( "thunderhoop_gal16v8.f2",  0x000, 0x117, BAD_DUMP CRC(d5ed5985) SHA1(a4e9c8e3a7774e2a02fbca3ddf8175cf251825ba) ) // Bruteforced but verified
+	ROM_LOAD ( "thunderhoop_gal16v8.j16", 0x117, 0x117, BAD_DUMP CRC(fe78b903) SHA1(c806e63ce56a77f631043c184a42bf77ebda8a09) ) // Bruteforced but verified
+	ROM_LOAD ( "thunderhoop_gal20v8.d21", 0x22e, 0x157, BAD_DUMP CRC(a715e392) SHA1(31ebc78b084d49cc2f6479cbd42738e6bfbfb46a) ) // Bruteforced but verified
+	ROM_LOAD ( "thunderhoop_gal20v8.h11", 0x385, 0x157, BAD_DUMP CRC(51e34bc2) SHA1(381a898b3afb709e7d8e0f87df106f23aec2ccbe) ) // Bruteforced but verified
 ROM_END
 
 
