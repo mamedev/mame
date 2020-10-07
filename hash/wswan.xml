@@ -375,10 +375,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTE-0032B" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="4194304">
-				<!-- U2 -->
 				<rom name="mh32m16e062a.u3" size="4194304" crc="b25a0635" sha1="35eea568f756bacf533bb9aaad7e3239ba00e411" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -538,7 +538,7 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 		</part>
 	</software>
 
-	<software name="youfumak"> <!-- needs initialized SRAM? -->
+	<software name="youfumak">
 		<description>Chou Denki Card Game - Youfu Makai - Kikuchi Shuukou (Rev 3)</description>
 		<year>1999</year>
 		<publisher>Kobunsha</publisher>
@@ -560,8 +560,7 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 		</part>
 	</software>
 
-	<!-- graphics bugs in main sprites during the game -->
-	<software name="clocktow" supported="partial">
+	<software name="clocktow">
 		<description>Clock Tower for WonderSwan (Rev 1)</description>
 		<year>1999</year>
 		<publisher>Kaga Tech</publisher>
@@ -850,11 +849,11 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTE-0037" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="1048576">
-				<!-- U2 -->
 				<rom name="mh8m1e073a.u3" size="1048576" crc="b1caec06" sha1="83e190af2e25fbb3e93b1d5835c52fe6f1d279ce" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x80">
@@ -872,10 +871,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTE-0012A" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="1048576">
-				<!-- U2 -->
 				<rom name="mh8m1e049a.u3" size="1048576" crc="4e467626" sha1="f79451034b6d844f0e10c825306bbc26f26a5466" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x80">
@@ -915,10 +914,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTE-0032B" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="2097152">
-				<!-- U2 -->
 				<rom name="mh16m1e069a.u3" size="2097152" crc="8922dd0b" sha1="f26b0215c49e04cb8ef6f031b627dff6a49d2015" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x80">
@@ -959,10 +958,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTE-0012A" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="1048576">
-				<!-- U2 -->
 				<rom name="mh8m16e094b.u3" size="1048576" crc="ce2f1a1d" sha1="cfcb14be6d2f1dbffdfcefb8c8d83b4f39bc102b" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -1062,10 +1061,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTE-0012A" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="1048576">
-				<!-- 52943 / OAO7Y / CDD at U2 -->
 				<rom name="mh8m8e014a.u3" size="1048576" crc="00137e86" sha1="af3fe9da3f5ee0f5a7b06b0440223db88fcb3bf2" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x400">
@@ -1231,10 +1230,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTS-0100" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="4194304">
-				<!-- U2 -->
 				<rom name="mh32m16e116b.u3" size="4194304" crc="70aa800e" sha1="57b4278fc5812f52413ca65f45225922d4f2ec3d" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -1252,12 +1251,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTS-0100 or PTE-0012A" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="4194304">
-				<!-- U2 -->
-				<!-- or -->
-				<!-- U2 -->
 				<rom name="mh32m16e105b.u3" size="4194304" crc="bd6fc68a" sha1="43d985b31848e1ae58d07231da80ee7aa8d3f686" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -1275,10 +1272,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTE-0012A" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="2097152">
-				<!-- U2 -->
 				<rom name="mh16m16e090a.u3" size="2097152" crc="ca3f0b00" sha1="38f708a4c0c4fcec0cf4d6ce051d1ff76466d617" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -1473,10 +1470,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTE-0012A" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="1048576">
-				<!-- U2 -->
 				<rom name="mh8m16e099b.u3" size="1048576" crc="21279e82" sha1="847f51592f181aa68061900700149b86cdba651b" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -1840,10 +1837,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTE-0032B" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="1048576">
-				<!-- U2 -->
 				<rom name="mh8m16e059a.u3" size="1048576" crc="4ed8820c" sha1="b358c65bae818c4b3de6bf668d16c311534036c2" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -1861,10 +1858,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTE-0012A" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="1048576">
-				<!-- U2 -->
 				<rom name="mh8m16e015a.u3" size="1048576" crc="b5dbcf12" sha1="6a479ee45e69cd3d6cc6cdda5a60eff3077953b0" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -1904,10 +1901,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTE-0032B" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="524288">
-				<!-- U2 -->
 				<rom name="mh4m16e074a.u3" size="524288" crc="631bd97a" sha1="0f73d3112b1184f74e728cf1252ffbee6a146fa6" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -1925,10 +1922,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTS-0100" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="1048576">
-				<!-- U2 -->
 				<rom name="mh8m16e112b.u3" size="1048576" crc="f2e362b8" sha1="99c831c27c478064e3d3fa8f9f089cc28f0e946f" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -1946,11 +1943,11 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTE-0032" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="524288">
-				<!-- U2 -->
 				<rom name="mh8m1e034a.u3" size="524288" crc="302499b9" sha1="5e7dabb66b0ca580481aa79ee8b8a5b0c6ce6592" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x80">
@@ -2032,13 +2029,11 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTS-0100 or PTE-0032B" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="4194304">
-				<!-- U2 -->
-				<!-- or -->
-				<!-- U2 -->
 				<rom name="mh32m16e119b.u3" size="4194304" crc="14adbd4b" sha1="9896d93c97381dc06b6f044de6c9bd112ca0c94b" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -2056,14 +2051,13 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTS-0120" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u4" value="ROM (on PTS-0120)" />
 			<feature name="u5" value="ROM (on PTS-0120)" />
 			<feature name="slot" value="ws_eeprom" />
 			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="4194304">
-				<!-- U2 -->
-				<!-- U3 -->
-				<!-- roms are a simple split from mh32m16e119b.u3. Needs to be verified -->
+				<!-- these roms are a simple split of mh32m16e119b.u3. Need to be verified -->
 				<rom name="mh16m16e114b.u4" size="2097152" crc="1bed45b0" sha1="46eff2164d8fccac161b0fd1cde8098e3bc08fd6" offset="000000" status="baddump" />
 				<rom name="mh16m16e115b.u5" size="2097152" crc="baeb4a36" sha1="d5d8220dadc41e5dbaa13ac188d642dacbed68c3" offset="2097152" status="baddump" />
 			</dataarea>
@@ -2463,11 +2457,11 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTE-0032B" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="1048576">
-				<!-- U2 -->
 				<rom name="mh8m1e092a.u3" size="1048576" crc="301436ac" sha1="708288e70b3186f6c0ef07acaef1b50fe6b7ab22" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x80">
@@ -2507,10 +2501,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTE-0012A" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="1048576">
-				<!-- U2 -->
 				<rom name="mh8m1e007a.u3" size="1048576" crc="5b76f901" sha1="7324c5939b8b64858c96bd9726f5b5c483a11e22" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x80">
@@ -2569,11 +2563,11 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTE-0012A" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="1048576">
-				<!-- U2 -->
 				<rom name="mh8m1e102b.u3" size="1048576" crc="352a570d" sha1="9a087b0e6031e7e5e6d133ac82fecb8faa30816a" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x80">
@@ -2762,10 +2756,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTE-0032B" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="4194304">
-				<!-- U2 -->
 				<rom name="mh32m1e072a.u3" size="4194304" crc="6f304dca" sha1="65c4c6aaa36328bba5d56419af59af5d3420ed78" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x80">
@@ -2828,11 +2822,11 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTE-0032B" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="1048576">
-				<!-- U2 -->
 				<rom name="mh8m16e068a.u3" size="1048576" crc="a5643aa3" sha1="9622c65c939f05a9dfae288919ec5bd15c348f14" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -2888,10 +2882,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTE-0032B" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="4194304">
-				<!-- U2 -->
 				<rom name="mh32m16e056a.u3" size="4194304" crc="0d5171f0" sha1="858f1f57b5522a1701cc8a0abae43cec948e26a6" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -2928,11 +2922,11 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTE-0032B" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="2097152">
-				<!-- U2 -->
 				<rom name="mh16m1e082a.u3" size="2097152" crc="812020ef" sha1="4c8166e0632bdb8c098d586a7b1522ed7b63b5f7" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x80">
