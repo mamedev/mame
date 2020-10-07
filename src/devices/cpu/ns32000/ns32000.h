@@ -142,6 +142,7 @@ private:
 	bool m_nmi_line;
 	bool m_int_line;
 	bool m_wait;
+	bool m_sequential;
 };
 
 class ns32008_device : public ns32000_device<0>

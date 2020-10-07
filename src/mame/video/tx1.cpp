@@ -7,10 +7,10 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "render.h"
+#include "includes/tx1.h"
+
 #include "video/resnet.h"
 #include "cpu/i86/i86.h"
-#include "includes/tx1.h"
 
 
 #define OBJ_FRAC    16

@@ -95,6 +95,62 @@ char const *const hover_msg[] = {
 	__("Show DATs view"),
 };
 
+
+void load_image(bitmap_argb32 &bitmap, emu_file &file, std::string const &base)
+{
+	if (file.open(base + ".png") == osd_file::error::NONE)
+	{
+		render_load_png(bitmap, file);
+		file.close();
+	}
+
+	if (!bitmap.valid() && (file.open(base + ".jpg") == osd_file::error::NONE))
+	{
+		render_load_jpeg(bitmap, file);
+		file.close();
+	}
+
+	if (!bitmap.valid() && (file.open(base + ".bmp") == osd_file::error::NONE))
+	{
+		render_load_msdib(bitmap, file);
+		file.close();
+	}
+}
+
+
+void load_driver_image(bitmap_argb32 &bitmap, emu_file &file, game_driver const &driver)
+{
+	// try to load snapshot first from saved "0000.png" file
+	std::string fullname = driver.name;
+	load_image(bitmap, file, fullname + PATH_SEPARATOR + "0000");
+
+	// if fail, attempt to load from standard file
+	if (!bitmap.valid())
+		load_image(bitmap, file, fullname);
+
+	// if fail again, attempt to load from parent file
+	if (!bitmap.valid())
+	{
+		// ignore BIOS sets
+		bool isclone = strcmp(driver.parent, "0") != 0;
+		if (isclone)
+		{
+			int const cx = driver_list::find(driver.parent);
+			if ((0 <= cx) && (driver_list::driver(cx).flags & machine_flags::IS_BIOS_ROOT))
+				isclone = false;
+		}
+
+		if (isclone)
+		{
+			fullname = driver.parent;
+			load_image(bitmap, file, fullname + PATH_SEPARATOR + "0000");
+
+			if (!bitmap.valid())
+				load_image(bitmap, file, fullname);
+		}
+	}
+}
+
 } // anonymous namespace
 
 constexpr std::size_t menu_select_launch::MAX_VISIBLE_SEARCH; // stupid non-inline semantics
@@ -2226,41 +2282,16 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 			if (software->startempty == 1)
 			{
 				// Load driver snapshot
-				std::string fullname = std::string(software->driver->name) + ".png";
-				render_load_png(tmp_bitmap, snapfile, nullptr, fullname.c_str());
-
-				if (!tmp_bitmap.valid())
-				{
-					fullname.assign(software->driver->name).append(".jpg");
-					render_load_jpeg(tmp_bitmap, snapfile, nullptr, fullname.c_str());
-				}
+				load_driver_image(tmp_bitmap, snapfile, *software->driver);
 			}
 			else
 			{
 				// First attempt from name list
-				std::string pathname = software->listname;
-				std::string fullname = software->shortname + ".png";
-				render_load_png(tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
+				load_image(tmp_bitmap, snapfile, software->listname + PATH_SEPARATOR + software->shortname);
 
+				// Second attempt from driver name + part name
 				if (!tmp_bitmap.valid())
-				{
-					fullname.assign(software->shortname).append(".jpg");
-					render_load_jpeg(tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
-				}
-
-				if (!tmp_bitmap.valid())
-				{
-					// Second attempt from driver name + part name
-					pathname.assign(software->driver->name).append(software->part);
-					fullname.assign(software->shortname).append(".png");
-					render_load_png(tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
-
-					if (!tmp_bitmap.valid())
-					{
-						fullname.assign(software->shortname).append(".jpg");
-						render_load_jpeg(tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
-					}
-				}
+					load_image(tmp_bitmap, snapfile, software->driver->name + software->part + PATH_SEPARATOR + software->shortname);
 			}
 
 			m_cache->set_snapx_software(software);
@@ -2285,51 +2316,7 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 		{
 			emu_file snapfile(searchstr, OPEN_FLAG_READ);
 			bitmap_argb32 tmp_bitmap;
-
-			// try to load snapshot first from saved "0000.png" file
-			std::string fullname(driver->name);
-			render_load_png(tmp_bitmap, snapfile, fullname.c_str(), "0000.png");
-
-			if (!tmp_bitmap.valid())
-				render_load_jpeg(tmp_bitmap, snapfile, fullname.c_str(), "0000.jpg");
-
-			// if fail, attemp to load from standard file
-			if (!tmp_bitmap.valid())
-			{
-				fullname.assign(driver->name).append(".png");
-				render_load_png(tmp_bitmap, snapfile, nullptr, fullname.c_str());
-
-				if (!tmp_bitmap.valid())
-				{
-					fullname.assign(driver->name).append(".jpg");
-					render_load_jpeg(tmp_bitmap, snapfile, nullptr, fullname.c_str());
-				}
-			}
-
-			// if fail again, attemp to load from parent file
-			if (!tmp_bitmap.valid())
-			{
-				// set clone status
-				bool cloneof = strcmp(driver->parent, "0");
-				if (cloneof)
-				{
-					int cx = driver_list::find(driver->parent);
-					if ((cx >= 0) && (driver_list::driver(cx).flags & machine_flags::IS_BIOS_ROOT))
-						cloneof = false;
-				}
-
-				if (cloneof)
-				{
-					fullname.assign(driver->parent).append(".png");
-					render_load_png(tmp_bitmap, snapfile, nullptr, fullname.c_str());
-
-					if (!tmp_bitmap.valid())
-					{
-						fullname.assign(driver->parent).append(".jpg");
-						render_load_jpeg(tmp_bitmap, snapfile, nullptr, fullname.c_str());
-					}
-				}
-			}
+			load_driver_image(tmp_bitmap, snapfile, *driver);
 
 			m_cache->set_snapx_driver(driver);
 			m_switch_image = false;
