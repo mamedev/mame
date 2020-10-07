@@ -477,7 +477,7 @@ uint8_t vicdual_state::frogs_io_r(offs_t offset)
 void vicdual_state::frogs_io_w(offs_t offset, uint8_t data)
 {
 	if (offset & 0x01)  assert_coin_status();
-	if (offset & 0x02)  frogs_audio_w(data);
+	if (offset & 0x02)  m_vicdual_sound->write(data);
 }
 
 
@@ -557,14 +557,12 @@ void vicdual_state::frogs(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &vicdual_state::frogs_map);
 	m_maincpu->set_addrmap(AS_IO, &vicdual_state::frogs_io_map);
 
-	MCFG_MACHINE_START_OVERRIDE(vicdual_state,frogs_audio)
-
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(vicdual_state::screen_update_bw));
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
-	frogs_audio(config);
+	FROGS_AUDIO(config, m_vicdual_sound, 0).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
@@ -1168,12 +1166,8 @@ void carnival_state::carnival_io_w(offs_t offset, uint8_t data)
 
 void vicdual_state::brdrline_io_w(offs_t offset, uint8_t data)
 {
-	if (offset & 0x01)  m_borderline_sound->write(data);
-	if (offset & 0x02)
-	{
-		palette_bank_w(data);
-//		brdrline_audio_aux_w(data);
-	}
+	if (offset & 0x01)  m_vicdual_sound->write(data);
+	if (offset & 0x02)  palette_bank_w(data);
 	if (offset & 0x08)  assert_coin_status();
 }
 
@@ -2279,7 +2273,7 @@ void vicdual_state::brdrline(machine_config &config)
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
-	BORDERLINE_AUDIO(config, "borderline_sound", 0).add_route(ALL_OUTPUTS, "mono", 1.0);
+	BORDERLINE_AUDIO(config, m_vicdual_sound, 0).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 

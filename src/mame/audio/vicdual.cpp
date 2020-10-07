@@ -10,188 +10,7 @@
 #include "includes/vicdual.h"
 
 #include "audio/nl_brdrline.h"
-
-
-/************************************************************************
- * frogs Sound System Analog emulation
- * Oct 2004, Derrick Renaud
- ************************************************************************/
-
-
-/* Discrete Sound Input Nodes */
-#define FROGS_FLY_EN        NODE_01
-#define FROGS_JUMP_EN       NODE_03
-#define FROGS_HOP_EN        NODE_04
-#define FROGS_TONGUE_EN     NODE_05
-#define FROGS_CAPTURE_EN    NODE_06
-#define FROGS_SPLASH_EN     NODE_08
-
-/* Nodes - Sounds */
-#define FROGS_BUZZZ_SND     NODE_11
-#define FROGS_BOING_SND     NODE_13
-#define FROGS_HOP_SND       NODE_14
-#define FROGS_ZIP_SND       NODE_15
-#define FROGS_CROAK_SND     NODE_16
-#define FROGS_SPLASH_SND    NODE_18
-/* VRs */
-#define FROGS_R93           NODE_25
-
-static const discrete_555_desc frogsZip555m =
-{
-	DISC_555_OUT_CAP | DISC_555_OUT_DC | DISC_555_TRIGGER_IS_LOGIC,
-	12,     // B+ voltage of 555
-	DEFAULT_555_VALUES
-};
-
-static const discrete_555_cc_desc frogsZip555cc =
-{
-	DISC_555_OUT_CAP | DISC_555_OUT_DC,
-	12,     // B+ voltage of 555
-	DEFAULT_555_VALUES,
-	0.6     // Q13 Vbe
-};
-
-static const discrete_mixer_desc frogsMixer =
-{
-	DISC_MIXER_IS_OP_AMP,
-	{RES_K(1), RES_K(5)},
-	{FROGS_R93, 0},
-	{CAP_U(0.01), CAP_U(0.01)},
-	0, RES_K(56), 0, CAP_U(0.1), 0, 10000
-};
-
-static DISCRETE_SOUND_START(frogs_discrete)
-	/************************************************
-	 * Input register mapping for frogs
-	 *
-	 * All inputs are inverted by initial transistor.
-	 ************************************************/
-	DISCRETE_INPUT_LOGIC(FROGS_FLY_EN)
-	DISCRETE_INPUT_NOT(FROGS_JUMP_EN)
-	DISCRETE_INPUT_NOT(FROGS_HOP_EN)
-	DISCRETE_INPUT_NOT(FROGS_TONGUE_EN)
-	DISCRETE_INPUT_NOT(FROGS_CAPTURE_EN)
-	DISCRETE_INPUT_NOT(FROGS_SPLASH_EN)
-
-	DISCRETE_ADJUSTMENT(FROGS_R93, RES_M(1), RES_K(10), DISC_LOGADJ, "R93")
-
-	DISCRETE_555_MSTABLE(NODE_30, 1, FROGS_TONGUE_EN, RES_K(100), CAP_U(1), &frogsZip555m)
-
-	/* Q11 & Q12 transform the voltage from the oneshot U4, to what is
-	 * needed by the 555CC circuit.  Vin to R29 must be > 1V for things
-	 * to change.  <=1 then The Vout of this circuit is 12V.
-	 * The Current through R28 equals current through R51. iR28 = iR51
-	 * So when Vin>.5, iR51 = (Vin-.5)/39k.  =0 when Vin<=.5
-	 * So the voltage drop across R28 is vR28 = iR51 * 22k.
-	 * Finally the Vout = 12 - vR28.
-	 * Note this formula only works when Vin < 39/(22+39)*12V+1.
-	 * Which it always is, due to the 555 clamping to 12V*2/3.
-	 * The Zip effect is hard to emulate 100% due to loading effects
-	 * of the output stage on the charge stage.  So I added some values
-	 * to get a similar waveshape to the breadboarded circuit.
-	 */
-	DISCRETE_TRANSFORM5(NODE_31, 12, NODE_30, .5, RES_K(22)/RES_K(39), 0, "012-P4>*3*-")
-
-	DISCRETE_555_CC(NODE_32, 1, NODE_31, RES_K(1.1), CAP_U(0.14), 0, RES_K(100), 500, &frogsZip555cc)
-
-	DISCRETE_MIXER2(NODE_90, 1, NODE_32, 0, &frogsMixer)
-
-	DISCRETE_OUTPUT(NODE_90, 1)
-
-DISCRETE_SOUND_END
-
-static const char *const frogs_sample_names[] =
-{
-	"*frogs",
-	"boing",
-	"buzzz",
-	"croak",
-	"hop",
-	"splash",
-	"zip",
-	nullptr
-};
-
-
-void vicdual_state::frogs_audio(machine_config &config)
-{
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(5);
-	m_samples->set_samples_names(frogs_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "mono", 0.35);
-
-	DISCRETE(config, m_discrete, frogs_discrete);
-	m_discrete->add_route(ALL_OUTPUTS, "mono", 1.0);
-}
-
-
-TIMER_CALLBACK_MEMBER( vicdual_state::frogs_croak_callback )
-{
-	m_samples->stop(2);
-}
-
-
-MACHINE_START_MEMBER(vicdual_state,frogs_audio)
-{
-	m_frogs_croak_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vicdual_state::frogs_croak_callback), this));
-
-	machine_start();
-}
-
-
-void vicdual_state::frogs_audio_w(uint8_t data)
-{
-	static int last_croak = 0;
-	static int last_buzzz = 0;
-	int new_croak = data & 0x08;
-	int new_buzzz = data & 0x10;
-
-//  m_discrete->write(FROGS_HOP_EN, data & 0x01);
-//  m_discrete->write(FROGS_JUMP_EN, data & 0x02);
-	m_discrete->write(FROGS_TONGUE_EN, data & 0x04);
-//  m_discrete->write(FROGS_CAPTURE_EN, data & 0x08);
-//  m_discrete->write(FROGS_FLY_EN, data & 0x10);
-//  m_discrete->write(FROGS_SPLASH_EN, data & 0x80);
-
-	if (data & 0x01)
-		m_samples->start(3, 3);   // Hop
-	if (data & 0x02)
-		m_samples->start(0, 0);   // Boing
-	if (new_croak)
-		m_samples->start(2, 2);   // Croak
-	else
-	{
-		if (last_croak)
-		{
-			/* The croak will keep playing until .429s after being disabled */
-			m_frogs_croak_timer->adjust(attotime::from_double(1.1 * RES_K(390) * CAP_U(1)));
-		}
-	}
-	if (new_buzzz)
-	{
-		/* The Buzzz sound starts off a little louder in volume then
-		 * settles down to a steady buzzz.  Whenever the trigger goes
-		 * low, the sound is disabled.  If it then goes high, the buzzz
-		 * then starts off louder again.  The games does this every time
-		 * the fly moves.
-		 * So I made the sample start with the louder effect and then play
-		 * for 12 seconds.  A fly should move before this.  If not the
-		 * sample loops, adding the loud part as if the fly moved.
-		 * This is obviously incorrect, but a fly never stands still for
-		 * 12 seconds.
-		 */
-		if (!last_buzzz)
-			m_samples->start(1, 1, true); // Buzzz
-	}
-	else
-		m_samples->stop(1);
-	if (data & 0x80)
-		m_samples->start(4, 4);   // Splash
-
-	last_croak = new_croak;
-	last_buzzz = new_buzzz;
-}
-
+#include "audio/nl_frogs.h"
 
 
 /************************************************************************
@@ -481,101 +300,55 @@ void vicdual_state::invho2_audio_w(uint8_t data)
 
 }
 
-/*
-static const char *const brdrline_sample_names[] =
-{
-	"*brdrline",
-	"boot_and_start",
-	"coin",
-	"crashes",
-	"end_level",
-	"engine_noise",
-	"field",
-	"fire",
-	nullptr
-};
-
-
-void vicdual_state::brdrline_audio(machine_config &config)
-{
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(7);
-	m_samples->set_samples_names(brdrline_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "mono", 0.35);
-}
-
-void vicdual_state::brdrline_audio_w(uint8_t data)
-{
-	uint8_t res = data ^ 0xff;
-
-//  if(res & 2) // low fuel, MISSING
-
-	if(res & 8) // end level
-		m_samples->start(3, 3);
-
-	if(res & 0x10)  // moving in the brush
-		m_samples->start(5, 5);
-
-	if(res & 0x20) // fire
-		m_samples->start(6, 6);
-
-	if(res & 0x40)  // car engine noise
-		m_samples->start(4, 4);
-
-	if(res & 0x80)  // crashes
-		m_samples->start(2, 2);
-
-	//printf("%02x\n",res);
-}
-
-void vicdual_state::brdrline_audio_aux_w(uint8_t data)
-{
-	if(data & 0xfc) // coin, unknown which is the trigger
-		m_samples->start(1, 1);
-	else // boot sample
-		m_samples->start(0, 0);
-}
-*/
-
-
 
 /*************************************
  *
- *  Borderline
+ *  Netlist-based Vic Dual Audio
  *
  *************************************/
 
-borderline_audio_device::borderline_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	device_t(mconfig, BORDERLINE_AUDIO, tag, owner, clock),
+vicdual_audio_device_base::vicdual_audio_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 inputs_mask, void (*netlist)(netlist::nlparse_t &), double output_scale) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_mixer_interface(mconfig, *this),
-	m_input_line(*this, "sound_nl:in_%u", 0)
+	m_input_line(*this, "sound_nl:in_%u", 0),
+	m_inputs_mask(inputs_mask),
+	m_netlist(netlist),
+	m_output_scale(output_scale)
 {
 }
 
-void borderline_audio_device::device_add_mconfig(machine_config &config)
+void vicdual_audio_device_base::device_add_mconfig(machine_config &config)
 {
 	NETLIST_SOUND(config, "sound_nl", 48000)
-		.set_source(NETLIST_NAME(brdrline))
+		.set_source(m_netlist)
 		.add_route(ALL_OUTPUTS, *this, 1.0);
 
-	NETLIST_LOGIC_INPUT(config, m_input_line[0], "I_SOUND_0.IN", 0);
-	NETLIST_LOGIC_INPUT(config, m_input_line[1], "I_SOUND_1.IN", 0);
-	NETLIST_LOGIC_INPUT(config, m_input_line[2], "I_SOUND_2.IN", 0);
-	NETLIST_LOGIC_INPUT(config, m_input_line[3], "I_SOUND_3.IN", 0);
-	NETLIST_LOGIC_INPUT(config, m_input_line[4], "I_SOUND_4.IN", 0);
-	NETLIST_LOGIC_INPUT(config, m_input_line[5], "I_SOUND_5.IN", 0);
-	NETLIST_LOGIC_INPUT(config, m_input_line[6], "I_SOUND_6.IN", 0);
-	NETLIST_LOGIC_INPUT(config, m_input_line[7], "I_SOUND_7.IN", 0);
+	if (BIT(m_inputs_mask, 0))
+		NETLIST_LOGIC_INPUT(config, m_input_line[0], "I_SOUND_0.IN", 0);
+	if (BIT(m_inputs_mask, 1))
+		NETLIST_LOGIC_INPUT(config, m_input_line[1], "I_SOUND_1.IN", 0);
+	if (BIT(m_inputs_mask, 2))
+		NETLIST_LOGIC_INPUT(config, m_input_line[2], "I_SOUND_2.IN", 0);
+	if (BIT(m_inputs_mask, 3))
+		NETLIST_LOGIC_INPUT(config, m_input_line[3], "I_SOUND_3.IN", 0);
+	if (BIT(m_inputs_mask, 4))
+		NETLIST_LOGIC_INPUT(config, m_input_line[4], "I_SOUND_4.IN", 0);
+	if (BIT(m_inputs_mask, 5))
+		NETLIST_LOGIC_INPUT(config, m_input_line[5], "I_SOUND_5.IN", 0);
+	if (BIT(m_inputs_mask, 6))
+		NETLIST_LOGIC_INPUT(config, m_input_line[6], "I_SOUND_6.IN", 0);
+	if (BIT(m_inputs_mask, 7))
+		NETLIST_LOGIC_INPUT(config, m_input_line[7], "I_SOUND_7.IN", 0);
 
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(1.0, 0.0);
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(m_output_scale, 0.0);
 }
 
-void borderline_audio_device::device_start()
+void vicdual_audio_device_base::device_start()
 {
 	save_item(NAME(m_input_state));
 }
 
-void borderline_audio_device::write(u8 value)
+void vicdual_audio_device_base::write(u8 value)
 {
 	if (value != m_input_state)
 	{
@@ -586,4 +359,31 @@ void borderline_audio_device::write(u8 value)
 	}
 }
 
+
+/*************************************
+ *
+ *  Borderline/Tranquilizer Gun
+ *
+ *************************************/
+
 DEFINE_DEVICE_TYPE(BORDERLINE_AUDIO, borderline_audio_device, "borderline_audio", "Borderline Sound Board")
+
+borderline_audio_device::borderline_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	vicdual_audio_device_base(mconfig, BORDERLINE_AUDIO, tag, owner, clock, 0xff, NETLIST_NAME(brdrline), 1.0)
+{
+}
+
+
+
+/*************************************
+ *
+ *  Frogs
+ *
+ *************************************/
+
+DEFINE_DEVICE_TYPE(FROGS_AUDIO, frogs_audio_device, "frogs_audio", "Frogs Sound Board")
+
+frogs_audio_device::frogs_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	vicdual_audio_device_base(mconfig, FROGS_AUDIO, tag, owner, clock, 0xff, NETLIST_NAME(frogs), 1.0)
+{
+}
