@@ -14,9 +14,10 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "ui/uimain.h"
-#include "rendutil.h"
 #include "fixfreq.h"
+
+#include "render.h"
+#include "ui/uimain.h"
 
 // for quick and dirty debugging
 #define VERBOSE 0

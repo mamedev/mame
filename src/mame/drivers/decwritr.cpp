@@ -19,7 +19,7 @@
 #include "machine/i8251.h"
 #include "machine/input_merger.h"
 #include "sound/beep.h"
-#include "render.h"
+#include "screen.h"
 #include "speaker.h"
 
 

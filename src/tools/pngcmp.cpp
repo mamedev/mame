@@ -74,7 +74,7 @@ static int generate_png_diff(const std::string& imgfile1, const std::string& img
 	int width, height, maxwidth;
 	util::core_file::ptr file;
 	osd_file::error filerr;
-	png_error pngerr;
+	util::png_error pngerr;
 	int error = 100;
 
 	/* open the source image */
@@ -86,11 +86,11 @@ static int generate_png_diff(const std::string& imgfile1, const std::string& img
 	}
 
 	/* load the source image */
-	pngerr = png_read_bitmap(*file, bitmap1);
+	pngerr = util::png_read_bitmap(*file, bitmap1);
 	file.reset();
-	if (pngerr != PNGERR_NONE)
+	if (pngerr != util::png_error::NONE)
 	{
-		printf("Could not read %s (%d)\n", imgfile1.c_str(), pngerr);
+		printf("Could not read %s (%d)\n", imgfile1.c_str(), int(pngerr));
 		goto error;
 	}
 
@@ -103,11 +103,11 @@ static int generate_png_diff(const std::string& imgfile1, const std::string& img
 	}
 
 	/* load the source image */
-	pngerr = png_read_bitmap(*file, bitmap2);
+	pngerr = util::png_read_bitmap(*file, bitmap2);
 	file.reset();
-	if (pngerr != PNGERR_NONE)
+	if (pngerr != util::png_error::NONE)
 	{
-		printf("Could not read %s (%d)\n", imgfile2.c_str(), pngerr);
+		printf("Could not read %s (%d)\n", imgfile2.c_str(), int(pngerr));
 		goto error;
 	}
 
@@ -176,11 +176,11 @@ static int generate_png_diff(const std::string& imgfile1, const std::string& img
 			printf("Could not open %s (%d)\n", outfilename.c_str(), int(filerr));
 			goto error;
 		}
-		pngerr = png_write_bitmap(*file, nullptr, finalbitmap, 0, nullptr);
+		pngerr = util::png_write_bitmap(*file, nullptr, finalbitmap, 0, nullptr);
 		file.reset();
-		if (pngerr != PNGERR_NONE)
+		if (pngerr != util::png_error::NONE)
 		{
-			printf("Could not write %s (%d)\n", outfilename.c_str(), pngerr);
+			printf("Could not write %s (%d)\n", outfilename.c_str(), int(pngerr));
 			goto error;
 		}
 	}
