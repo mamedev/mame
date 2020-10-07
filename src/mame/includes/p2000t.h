@@ -15,6 +15,7 @@
 #include "sound/spkrdev.h"
 #include "video/saa5050.h"
 #include "machine/p2000t_mdcr.h"
+#include "machine/ram.h"
 #include "emupal.h"
 
 
@@ -22,12 +23,14 @@ class p2000t_state : public driver_device
 {
 public:
 	p2000t_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_videoram(*this, "videoram")
-		, m_maincpu(*this, "maincpu")
-		, m_speaker(*this, "speaker")
-		, m_mdcr(*this, "mdcr")
-		, m_keyboard(*this, "KEY.%u", 0)
+	: driver_device(mconfig, type, tag)
+	, m_videoram(*this, "videoram")
+	, m_maincpu(*this, "maincpu")
+	, m_speaker(*this, "speaker")
+	, m_mdcr(*this, "mdcr")
+	, m_ram(*this, RAM_TAG)
+	, m_bank(*this, "bank")
+	, m_keyboard(*this, "KEY.%u", 0)
 	{
 	}
 
@@ -35,8 +38,8 @@ public:
 
 protected:
 	uint8_t p2000t_port_000f_r(offs_t offset);
-	uint8_t p2000t_port_202f_r();
-	void p2000t_port_101f_w(uint8_t data);
+	virtual uint8_t p2000t_port_202f_r();
+	virtual void p2000t_port_101f_w(uint8_t data);
 	void p2000t_port_303f_w(uint8_t data);
 	void p2000t_port_505f_w(uint8_t data);
 	void p2000t_port_707f_w(uint8_t data);
@@ -44,6 +47,7 @@ protected:
 	void p2000t_port_8c90_w(uint8_t data);
 	void p2000t_port_9494_w(uint8_t data);
 	uint8_t videoram_r(offs_t offset);
+	virtual void machine_start() override;
 
 	INTERRUPT_GEN_MEMBER(p2000_interrupt);
 
@@ -55,6 +59,8 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<mdcr_device> m_mdcr;
+	required_device<ram_device> m_ram;
+	required_memory_bank m_bank;
 
 private:
 	required_ioport_array<10> m_keyboard;
@@ -68,9 +74,9 @@ class p2000m_state : public p2000t_state
 {
 public:
 	p2000m_state(const machine_config &mconfig, device_type type, const char *tag)
-		: p2000t_state(mconfig, type, tag)
-		, m_gfxdecode(*this, "gfxdecode")
-		, m_palette(*this, "palette")
+	: p2000t_state(mconfig, type, tag)
+	, m_gfxdecode(*this, "gfxdecode")
+	, m_palette(*this, "palette")
 	{
 	}
 

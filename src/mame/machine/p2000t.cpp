@@ -154,4 +154,32 @@ void p2000t_state::p2000t_port_707f_w(uint8_t data) { m_port_707f = data; }
 
 void p2000t_state::p2000t_port_888b_w(uint8_t data) {}
 void p2000t_state::p2000t_port_8c90_w(uint8_t data) {}
-void p2000t_state::p2000t_port_9494_w(uint8_t data) {}
+
+
+void p2000t_state::p2000t_port_9494_w(uint8_t data) {
+	//  The memory region E000-FFFF (8k) is bank switched
+	int available_banks = (m_ram->size() - 0xe000) / 0x2000;
+	if (data < available_banks)
+		m_bank->set_entry(data);
+}
+
+void p2000t_state::machine_start()
+{
+		auto program = &m_maincpu->space(AS_PROGRAM);
+		auto ramsize = m_ram->size();
+		switch(ramsize) {
+			case 0x4000: // 16kb
+				program->unmap_readwrite(0xa000, 0xffff);
+				break;
+			case 0x8000: // 32kb
+				program->unmap_readwrite(0xe000, 0xffff);
+				break;
+			default: // more.. (48kb, 64kb, 102kb)
+				// In this case we have a set of 8kb memory banks.
+				uint8_t *ram = m_ram->pointer();
+				auto available_banks = (ramsize - 0xe000) / 0x2000;
+				for(int i = 0; i < available_banks; i++)
+					m_bank->configure_entry(i, ram + (i * 0x2000));
+				break;
+		}
+}
