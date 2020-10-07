@@ -7,6 +7,7 @@
 
 #include "machine/6532riot.h"
 #include "machine/6821pia.h"
+#include "machine/timer.h"
 #include "sound/flt_biquad.h"
 #include "sound/hc55516.h"
 #include "sound/tms5220.h"
@@ -182,14 +183,12 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
-	static const device_timer_id TIMER_CVSD = 0;
-private:
-	// overrides
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
+private:
+	required_device<timer_device> m_cvsd_timer;
+	TIMER_DEVICE_CALLBACK_MEMBER(cvsd_timer);
 	void voiceio_w(offs_t offset, uint8_t data);
 	uint8_t voiceio_r(offs_t offset);
-	emu_timer* m_cvsd_timer;
 	bool m_cvsd_clk;
 
 	void cvsd_map(address_map &map);

@@ -790,6 +790,7 @@ DEFINE_DEVICE_TYPE(EXIDY_MTRAP, mtrap_sound_device, "mtrap_sound", "Exidy SFX+PS
 
 mtrap_sound_device::mtrap_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: venture_sound_device(mconfig, EXIDY_MTRAP, tag, owner, clock)
+	, m_cvsd_timer(*this,"cvsd_timer")
 	, m_cvsd_clk(false)
 {
 }
@@ -806,23 +807,14 @@ void mtrap_sound_device::device_start()
 	m_freq_to_step = (1 << 24) / SH8253_CLOCK;
 
 	sh8253_register_state_globals();
-	/* timer */
-	m_cvsd_timer = timer_alloc(TIMER_CVSD);
-	m_cvsd_timer->adjust(attotime::from_hz(CVSD_CLOCK*2.0));
 
 	save_item(NAME(m_cvsd_clk));
 }
 
-void mtrap_sound_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_DEVICE_CALLBACK_MEMBER(mtrap_sound_device::cvsd_timer)
 {
-	switch(id)
-	{
-		case TIMER_CVSD:
-			m_cvsd_clk = !m_cvsd_clk;
-			m_cvsd->clock_w(m_cvsd_clk);
-			m_cvsd_timer->adjust(attotime::from_hz(CVSD_CLOCK*2.0));
-		break;
-	}
+	m_cvsd_clk = !m_cvsd_clk;
+	m_cvsd->clock_w(m_cvsd_clk);
 }
 
 void mtrap_sound_device::voiceio_w(offs_t offset, uint8_t data)
@@ -879,6 +871,8 @@ void mtrap_sound_device::device_add_mconfig(machine_config &config)
 	Z80(config, m_cvsdcpu, CVSD_Z80_CLOCK);
 	m_cvsdcpu->set_addrmap(AS_PROGRAM, &mtrap_sound_device::cvsd_map);
 	m_cvsdcpu->set_addrmap(AS_IO, &mtrap_sound_device::cvsd_iomap);
+
+	TIMER(config, m_cvsd_timer).configure_periodic(FUNC(mtrap_sound_device::cvsd_timer), attotime::from_hz(CVSD_CLOCK*2.0)); // this is a 555 timer with 53% duty cycle, within margin of error of 50% duty cycle; the handler clocks on both clock edges, hence * 2.0
 
 	/* audio hardware */
 	FILTER_BIQUAD(config, m_cvsd_filter2).opamp_mfb_lowpass_setup(RES_K(10), RES_K(3.9), RES_K(18), CAP_N(20), CAP_N(2.2));
