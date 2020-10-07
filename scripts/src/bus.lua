@@ -1117,6 +1117,20 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/fmt_scsi/fmt_scsi.h,BUSES["FMT_SCSI"] = true
+---------------------------------------------------
+
+if (BUSES["FMT_SCSI"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/fmt_scsi/fmt_scsi.cpp",
+		MAME_DIR .. "src/devices/bus/fmt_scsi/fmt_scsi.h",
+		MAME_DIR .. "src/devices/bus/fmt_scsi/fmt121.cpp",
+		MAME_DIR .. "src/devices/bus/fmt_scsi/fmt121.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/gamate/slot.h,BUSES["GAMATE"] = true
 ---------------------------------------------------
 
