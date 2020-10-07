@@ -1146,11 +1146,11 @@ ROM_START( asterion )
 	ROM_LOAD( "asterion eprom 3.bin",  0xf800, 0x0400, CRC(b206deda) SHA1(9ab52920c06ed6beb38bc7f97ffd00e8ad46c17d) )
 	ROM_LOAD( "asterion eprom 1.bin",  0xfc00, 0x0400, CRC(99008e90) SHA1(bfa1c3a66992f432fad37203f052f820b098e05f) )
 
-	ROM_REGION( 0x0100, "proms", 0 ) // not dumped yet, using the one from abattle for now
-	ROM_LOAD( "8f-clr.bin",   0x0000, 0x0100, BAD_DUMP CRC(3bf3ccb0) SHA1(d61d19d38045f42a9adecf295e479fee239bed48) )
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "sn74s470.bin",   0x0000, 0x0100, CRC(3bf3ccb0) SHA1(d61d19d38045f42a9adecf295e479fee239bed48) )
 
-	ROM_REGION( 0x0100, "user1", 0 ) // not dumped yet, using the one from abattle for now, decryption is correct so this dump should too
-	ROM_LOAD( "2h-prot.bin",  0x0000, 0x0100, BAD_DUMP CRC(a6bdd18c) SHA1(438bfc543730afdb531204585f17a68ddc03ded0) )
+	ROM_REGION( 0x0200, "user1", 0 ) // data relevant for the decryption is the same as the one for abattle, but it's on a larger PROM
+	ROM_LOAD( "sn74s472.bin",   0x0000, 0x0200, CRC(d437a9d8) SHA1(32e3513ab2ce1cde5196d80c53f5aa98b339929f) )
 ROM_END
 
 
@@ -1416,6 +1416,23 @@ void astrof_state::init_acombat3()
 }
 
 
+void astrof_state::init_asterion()
+{
+	// use the protection PROM to decrypt the ROMs
+	uint8_t *rom = memregion("maincpu")->base();
+	uint8_t *prom = memregion("user1")->base();
+
+	for (int i = 0xd000; i < 0x10000; i++)
+	{
+		rom[i] = prom[(rom[i] & 0x1f) + ((rom[i] & 0xe0) << 1)];
+	}
+
+	// set up protection handlers
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa003, 0xa003, read8smo_delegate(*this, FUNC(astrof_state::shoot_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa004, 0xa004, read8smo_delegate(*this, FUNC(astrof_state::abattle_coin_prot_r)));
+}
+
+
 /*************************************
  *
  *  Game drivers
@@ -1429,7 +1446,7 @@ GAME( 1979, astroff,   astrof,   astrof,   astrof,    astrof_state, empty_init, 
 GAME( 1979, abattle,   astrof,   abattle,  abattle,   astrof_state, init_abattle,  ROT90, "bootleg? (Sidam)",      "Astro Battle (set 1)",          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, abattle2,  astrof,   abattle,  abattle,   astrof_state, init_abattle,  ROT90, "bootleg? (Sidam)",      "Astro Battle (set 2)",          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, afire,     astrof,   abattle,  abattle,   astrof_state, init_afire,    ROT90, "bootleg (Rene Pierre)", "Astro Fire",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, asterion,  astrof,   abattle,  abattle,   astrof_state, init_abattle,  ROT90, "bootleg? (Olympia)",    "Asterion",                      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, asterion,  astrof,   abattle,  abattle,   astrof_state, init_asterion, ROT90, "bootleg? (Olympia)",    "Asterion",                      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, acombat,   astrof,   abattle,  abattle,   astrof_state, init_afire,    ROT90, "bootleg",               "Astro Combat (newer, CB)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, acombato,  astrof,   abattle,  abattle,   astrof_state, init_afire,    ROT90, "bootleg",               "Astro Combat (older, PZ)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, acombat3,  astrof,   abattle,  abattle,   astrof_state, init_acombat3, ROT90, "bootleg (Proel)",       "Astro Combat (unencrypted)",    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
