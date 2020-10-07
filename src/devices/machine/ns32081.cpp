@@ -206,7 +206,7 @@ void ns32081_device::write_op(u16 data)
 			switch ((m_opword >> 3) & 7)
 			{
 			case 0: // movif
-				m_op[0].expected = size + 1;
+				m_op[0].expected = (size == SIZE_B) ? 2 : (size + 1);
 				m_op[2].expected = f_length;
 				break;
 			case 1: // lfsr
@@ -327,12 +327,19 @@ void ns32081_device::execute()
 				// MOVif src,dest
 				//       gen,gen
 				//       read.i,write.f
-				if (single)
-					m_op[2].value = i32_to_f32(m_op[0].value).v;
-				else
-					m_op[2].value = i32_to_f64(m_op[0].value).v;
-				m_op[2].expected = f_length;
-				m_tcy = 53;
+				{
+					s32 const src =
+						(size == SIZE_D) ? s32(m_op[0].value) :
+						(size == SIZE_W) ? s16(m_op[0].value) :
+						s8(m_op[0].value);
+
+					if (single)
+						m_op[2].value = i32_to_f32(src).v;
+					else
+						m_op[2].value = i32_to_f64(src).v;
+					m_op[2].expected = f_length;
+					m_tcy = 53;
+				}
 				break;
 			case 1:
 				// LFSR src
