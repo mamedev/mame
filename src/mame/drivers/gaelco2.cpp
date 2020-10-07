@@ -1221,7 +1221,7 @@ ROM_START( bang )
 	ROM_FILL(                0x0900000, 0x0100000, 0x00 )            // Empty
 
 	ROM_REGION( 0x400, "plds", 0)
-    ROM_LOAD ( "bang_gal16v8.ic56", 0x000, 0x117, BAD_DUMP CRC(226923ac) SHA1(b1cac5208673183f401702ba844e1016d5fa4ea0) ) // Bruteforced but verified
+	ROM_LOAD ( "bang_gal16v8.ic56", 0x000, 0x117, BAD_DUMP CRC(226923ac) SHA1(b1cac5208673183f401702ba844e1016d5fa4ea0) ) // Bruteforced but verified
 ROM_END
 
 ROM_START( bangj )
@@ -1230,28 +1230,28 @@ ROM_START( bangj )
 	ROM_LOAD16_BYTE( "bang-a.ic55", 0x000001, 0x080000, CRC(b90223ab) SHA1(7c097754a710169f41c574c3cc1a6346824853c4) )
 
 	ROM_REGION( 0x0a00000, "gfx1", 0 ) // GFX + Sound
-	ROM_LOAD( "bang-a.ic16", 0x0000000, 0x0080000, CRC(3b63acfc) SHA1(48f5598cdbc70f342d6b75909166571271920a8f) )   /* GFX only */
-	ROM_LOAD( "bang-a.ic17", 0x0080000, 0x0080000, CRC(72865b80) SHA1(ec7753ea7961015149b9e6386fdeb9bd59aa962a) )   /* GFX only */
-	ROM_LOAD( "bang18.ic18", 0x0100000, 0x0080000, CRC(2056b1ad) SHA1(b796f92eef4bbb0efa12c53580e429b8a0aa394c) )   /* Sound only */
+	ROM_LOAD( "bang-a.ic16", 0x0000000, 0x0080000, CRC(3b63acfc) SHA1(48f5598cdbc70f342d6b75909166571271920a8f) )   // GFX only
+	ROM_LOAD( "bang-a.ic17", 0x0080000, 0x0080000, CRC(72865b80) SHA1(ec7753ea7961015149b9e6386fdeb9bd59aa962a) )   // GFX only
+	ROM_LOAD( "bang18.ic18", 0x0100000, 0x0080000, CRC(2056b1ad) SHA1(b796f92eef4bbb0efa12c53580e429b8a0aa394c) )   // Sound only
 	ROM_FILL(                0x0180000, 0x0080000, 0x00 )            // Empty
-	ROM_LOAD( "bang-a.ic9",  0x0200000, 0x0080000, CRC(3cb86360) SHA1(c803b3add253a552a1554714218740bdfca91764) )   /* GFX only */
-	ROM_LOAD( "bang-a.ic10", 0x0280000, 0x0080000, CRC(03fdd777) SHA1(9eec194239f93d961ee9902a585c872dcdc7728f) )   /* GFX only */
-	ROM_LOAD( "bang11.ic11", 0x0300000, 0x0080000, CRC(2088d15c) SHA1(0c043ab9fd33836fa4b7ad60fd8e7cb96ffb6121) )   /* Sound only */
+	ROM_LOAD( "bang-a.ic9",  0x0200000, 0x0080000, CRC(3cb86360) SHA1(c803b3add253a552a1554714218740bdfca91764) )   // GFX only
+	ROM_LOAD( "bang-a.ic10", 0x0280000, 0x0080000, CRC(03fdd777) SHA1(9eec194239f93d961ee9902a585c872dcdc7728f) )   // GFX only
+	ROM_LOAD( "bang11.ic11", 0x0300000, 0x0080000, CRC(2088d15c) SHA1(0c043ab9fd33836fa4b7ad60fd8e7cb96ffb6121) )   // Sound only
 	ROM_FILL(                0x0380000, 0x0080000, 0x00 )            // Empty
-	ROM_LOAD( "bang-a.ic1",  0x0400000, 0x0080000, CRC(965d0ad9) SHA1(eff521735129b7dd9366855c6312ed568950233c) )   /* GFX only */
-	ROM_LOAD( "bang-a.ic2",  0x0480000, 0x0080000, CRC(8ea261a7) SHA1(50b59cf058ca03c0b8c888f6ddb40c720a210ece) )   /* GFX only */
-	ROM_LOAD( "bang3.ic3",   0x0500000, 0x0080000, CRC(d3da5d4f) SHA1(b9bea0b4d20ab0bfda3fac2bb1fab974c007aaf0) )   /* Sound only */
+	ROM_LOAD( "bang-a.ic1",  0x0400000, 0x0080000, CRC(965d0ad9) SHA1(eff521735129b7dd9366855c6312ed568950233c) )   // GFX only
+	ROM_LOAD( "bang-a.ic2",  0x0480000, 0x0080000, CRC(8ea261a7) SHA1(50b59cf058ca03c0b8c888f6ddb40c720a210ece) )   // GFX only
+	ROM_LOAD( "bang3.ic3",   0x0500000, 0x0080000, CRC(d3da5d4f) SHA1(b9bea0b4d20ab0bfda3fac2bb1fab974c007aaf0) )   // Sound only
 	ROM_FILL(                0x0580000, 0x0080000, 0x00 )            // Empty
-	ROM_LOAD( "bang-a.ic20", 0x0600000, 0x0080000, CRC(4b828f3c) SHA1(5227a89c05c659a85d33f092c6778ce9d57a0236) )   /* GFX only */
-	ROM_LOAD( "bang-a.ic13", 0x0680000, 0x0080000, CRC(d1146b92) SHA1(2b28d49fbffea6c038160fdab177bc0045195ca8) )   /* GFX only */
-	ROM_LOAD( "bang5.ic5",   0x0700000, 0x0080000, CRC(9bee444c) SHA1(aebaa3306e7e5aada99ed469da9bf64507808cff) )   /* Sound only */
+	ROM_LOAD( "bang-a.ic20", 0x0600000, 0x0080000, CRC(4b828f3c) SHA1(5227a89c05c659a85d33f092c6778ce9d57a0236) )   // GFX only
+	ROM_LOAD( "bang-a.ic13", 0x0680000, 0x0080000, CRC(d1146b92) SHA1(2b28d49fbffea6c038160fdab177bc0045195ca8) )   // GFX only
+	ROM_LOAD( "bang5.ic5",   0x0700000, 0x0080000, CRC(9bee444c) SHA1(aebaa3306e7e5aada99ed469da9bf64507808cff) )   // Sound only
 	ROM_FILL(                0x0780000, 0x0080000, 0x00 )            // Empty
-	ROM_LOAD( "bang-a.ic21", 0x0800000, 0x0080000, CRC(531ce3b6) SHA1(196bb720591acc082f815b609a7cf1609510c8c1) )   /* GFX only */
-	ROM_LOAD( "bang-a.ic14", 0x0880000, 0x0080000, CRC(f8e1cf84) SHA1(559c08584094e605635c5ef3a25534ea0bcfa199) )   /* GFX only */
+	ROM_LOAD( "bang-a.ic21", 0x0800000, 0x0080000, CRC(531ce3b6) SHA1(196bb720591acc082f815b609a7cf1609510c8c1) )   // GFX only
+	ROM_LOAD( "bang-a.ic14", 0x0880000, 0x0080000, CRC(f8e1cf84) SHA1(559c08584094e605635c5ef3a25534ea0bcfa199) )   // GFX only
 	ROM_FILL(                0x0900000, 0x0100000, 0x00 )            // Empty
 
 	ROM_REGION( 0x117, "plds", 0)
-    ROM_LOAD ( "bang_gal16v8.ic56", 0x000, 0x117, BAD_DUMP CRC(226923ac) SHA1(b1cac5208673183f401702ba844e1016d5fa4ea0) ) // Bruteforced but verified
+	ROM_LOAD ( "bang_gal16v8.ic56", 0x000, 0x117, BAD_DUMP CRC(226923ac) SHA1(b1cac5208673183f401702ba844e1016d5fa4ea0) ) // Bruteforced but verified
 ROM_END
 
 
