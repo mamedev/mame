@@ -42,7 +42,7 @@ public:
 	auto irq_handler() { return m_irq_handler.bind(); }
 	auto drq_handler() { return m_drq_handler.bind(); }
 
-	u8 read(offs_t offset);
+	u8 read(address_space &space, offs_t offset);
 	void write(offs_t offset, u8 data);
 
 	uint8_t data_read(void);
@@ -61,6 +61,7 @@ private:
 
 	devcb_write_line m_irq_handler;
 	devcb_write_line m_drq_handler;
+
 };
 
 

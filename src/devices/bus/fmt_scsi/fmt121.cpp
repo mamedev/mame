@@ -117,7 +117,6 @@ u8 fmt121_device::fmt_scsi_read(offs_t offset)
 void fmt121_device::fmt_scsi_write(offs_t offset, u8 data)
 {
 	m_scsi_ctlr->fmscsi_w(offset, data);
-
 }
 
 //-------------------------------------------------
@@ -136,7 +135,6 @@ u8 fmt121_device::fmt_scsi_data_read()
 void fmt121_device::fmt_scsi_data_write(u8 data)
 {
 	m_scsi_ctlr->fmscsi_data_w(data);
-
 }
 
 

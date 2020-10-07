@@ -2012,22 +2012,6 @@ WRITE_LINE_MEMBER(towns_state::rtc_busy_w)
 }
 
 // SCSI controller - I/O ports 0xc30 and 0xc32
-uint16_t towns_state::towns_scsi_dma_r()
-{
-	if (m_scsi_slot)
-		return m_scsi_slot->data_read();
-	else
-		return m_scsi->fmscsi_data_r();
-}
-
-void towns_state::towns_scsi_dma_w(uint16_t data)
-{
-	if (m_scsi_slot)
-		m_scsi_slot->data_write(data & 0xff);
-	else
-		m_scsi->fmscsi_data_w(data & 0xff);
-}
-
 WRITE_LINE_MEMBER(towns_state::towns_scsi_irq)
 {
 	m_pic_slave->ir0_w(state);
@@ -2978,10 +2962,10 @@ void towns_state::towns(machine_config &config)
 	m_scsi_slot->irq_handler().set(FUNC(towns_state::towns_scsi_irq));
 	m_scsi_slot->drq_handler().set(FUNC(towns_state::towns_scsi_drq));
 
-	m_dma[0]->dma_read_callback<1>().set(FUNC(towns_state::towns_scsi_dma_r));
-	m_dma[0]->dma_write_callback<1>().set(FUNC(towns_state::towns_scsi_dma_w));
-	m_dma[1]->dma_read_callback<1>().set(FUNC(towns_state::towns_scsi_dma_r));
-	m_dma[1]->dma_write_callback<1>().set(FUNC(towns_state::towns_scsi_dma_w));
+	m_dma[0]->dma_read_callback<1>().set(m_scsi_slot, FUNC(fmt_scsi_slot_device::data_read));
+	m_dma[0]->dma_write_callback<1>().set(m_scsi_slot, FUNC(fmt_scsi_slot_device::data_write));
+	m_dma[1]->dma_read_callback<1>().set(m_scsi_slot, FUNC(fmt_scsi_slot_device::data_read));
+	m_dma[1]->dma_write_callback<1>().set(m_scsi_slot, FUNC(fmt_scsi_slot_device::data_write));
 }
 
 void towns16_state::townsux(machine_config &config)
@@ -3006,10 +2990,10 @@ void towns16_state::townsux(machine_config &config)
 	m_scsi->irq_handler().set(FUNC(towns16_state::towns_scsi_irq));
 	m_scsi->drq_handler().set(FUNC(towns16_state::towns_scsi_drq));
 
-	m_dma[0]->dma_read_callback<1>().set(FUNC(towns16_state::towns_scsi_dma_r));
-	m_dma[0]->dma_write_callback<1>().set(FUNC(towns16_state::towns_scsi_dma_w));
-	m_dma[1]->dma_read_callback<1>().set(FUNC(towns16_state::towns_scsi_dma_r));
-	m_dma[1]->dma_write_callback<1>().set(FUNC(towns16_state::towns_scsi_dma_w));
+	m_dma[0]->dma_read_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_r));
+	m_dma[0]->dma_write_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_w));
+	m_dma[1]->dma_read_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_r));
+	m_dma[1]->dma_write_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_w));
 
 	// 2 MB onboard, one SIMM slot with 2-8 MB
 	m_ram->set_default_size("2M").set_extra_options("4M,6M,10M");
@@ -3039,10 +3023,10 @@ void towns_state::townssj(machine_config &config)
 	m_scsi->irq_handler().set(FUNC(towns_state::towns_scsi_irq));
 	m_scsi->drq_handler().set(FUNC(towns_state::towns_scsi_drq));
 
-	m_dma[0]->dma_read_callback<1>().set(FUNC(towns_state::towns_scsi_dma_r));
-	m_dma[0]->dma_write_callback<1>().set(FUNC(towns_state::towns_scsi_dma_w));
-	m_dma[1]->dma_read_callback<1>().set(FUNC(towns_state::towns_scsi_dma_r));
-	m_dma[1]->dma_write_callback<1>().set(FUNC(towns_state::towns_scsi_dma_w));
+	m_dma[0]->dma_read_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_r));
+	m_dma[0]->dma_write_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_w));
+	m_dma[1]->dma_read_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_r));
+	m_dma[1]->dma_write_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_w));
 
 	// 4 MB (SJ2/SJ2A) or 8 MB (SJ26/SJ53) onboard, 2 SIMM slots with 4-32 MB each
 	m_ram->set_default_size("8M").set_extra_options("4M,12M,16M,20M,24M,28M,32M,36M,40M,44M,48M,52M,56M,68M,72M");

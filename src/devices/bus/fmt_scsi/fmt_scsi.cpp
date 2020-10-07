@@ -69,12 +69,12 @@ void fmt_scsi_slot_device::device_start()
 //  read - I/O read access
 //-------------------------------------------------
 
-u8 fmt_scsi_slot_device::read(offs_t offset)
+u8 fmt_scsi_slot_device::read(address_space &space, offs_t offset)
 {
 	if (m_card)
 		return m_card->fmt_scsi_read(offset);
 	else
-		return 0;
+		return space.unmap();
 }
 
 
