@@ -18,11 +18,11 @@ See the wswan software list for the full game list.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTS-0100A" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="4194304">
-				<!-- U2 -->
 				<rom name="mh32m16e133b.u3" size="4194304" crc="d7a0ab74" sha1="caf4a8de853ded732b2a72619acf2784eeceafc7" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -294,11 +294,11 @@ See the wswan software list for the full game list.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTS-0132" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="4194304">
-				<!-- U2 -->
 				<rom name="sd32m16e203d.u3" size="4194304" crc="1e760c41" sha1="e31bfa54cbf539a9d28090b372d8e669a93c3e28" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -317,13 +317,11 @@ See the wswan software list for the full game list.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTS-0100 or PTS-0132" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="4194304">
-				<!-- U2 -->
-				<!-- or -->
-				<!-- U2 -->
 				<rom name="sd32m16e198d.u3" size="4194304" crc="603cb5e6" sha1="ba16a0770f7a71dd49e2879799fd04a4f04f7e60" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -454,10 +452,10 @@ See the wswan software list for the full game list.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTS-0132" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="4194304">
-				<!-- U2 -->
 				<rom name="mh32m16e191c.u3" size="4194304" crc="f1f4d41f" sha1="31a718cfbcff2dab56ab9606a0b5b2dfccecbbcb" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -476,10 +474,10 @@ See the wswan software list for the full game list.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTS-0132" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="4194304">
-				<!-- U2 -->
 				<rom name="mh32m16e173c.u3" size="4194304" crc="84a46949" sha1="6c5a2dc7e231ebd278fe22bb7f01b1a7cc3785d6" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -498,10 +496,10 @@ See the wswan software list for the full game list.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTS-0100" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="4194304">
-				<!-- U2 -->
 				<rom name="mh32m16e166c.u3" size="4194304" crc="fa92418d" sha1="8638737e5a35c6be05a888dc81e504e0d80fd756" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -546,10 +544,10 @@ See the wswan software list for the full game list.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTS-0100" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="4194304">
-				<!-- U2 -->
 				<rom name="mh32m16e156c.u3" size="4194304" crc="2b61bb2b" sha1="57338999b949589c36ce116a30f433e9618685e4" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -660,10 +658,10 @@ See the wswan software list for the full game list.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTS-0100" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="4194304">
-				<!-- U2 -->
 				<rom name="mh32m16e184c.u3" size="4194304" crc="b07e6a56" sha1="4c3f092b095bdb0afdaf8d32d4c54b4d6c209c96" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -682,10 +680,10 @@ See the wswan software list for the full game list.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTS-0100A" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="2097152">
-				<!-- U2 -->
 				<rom name="mh16m16e140b.u3" size="2097152" crc="69d8d433" sha1="a3d6717efdb8f243fe86b4c3d869a9734a2e02d3" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -726,10 +724,10 @@ See the wswan software list for the full game list.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTS-0100A" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="4194304">
-				<!-- U2 -->
 				<rom name="mh32m1e196c.u3" size="4194304" crc="bc944a98" sha1="87661841ca63e99b04c0f6dc4ba3454c897e0c6d" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x80">
@@ -748,10 +746,10 @@ See the wswan software list for the full game list.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTS-0132" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="2097152">
-				<!-- U2 -->
 				<rom name="mh16m16e162c.u3" size="2097152" crc="446e2581" sha1="adbe6e38a0bc6a2d19da64a444071977b771f14f" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -954,11 +952,11 @@ See the wswan software list for the full game list.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTS-0100A" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="1048576">
-				<!-- U2 -->
 				<rom name="mh8m16e131b.u3" size="1048576" crc="0c9cb12c" sha1="1eb729aa9ab0a7df6f8a3470a6fede59d7622d4a" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -1070,10 +1068,10 @@ See the wswan software list for the full game list.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTS-0100A" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="4194304">
-				<!-- U2 -->
 				<rom name="mh32m16e172c.u3" size="4194304" crc="9402bca9" sha1="bc591fc24d3f8e94b70503fd8b6a35fa58151139" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -1092,10 +1090,10 @@ See the wswan software list for the full game list.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTS-0100A" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="4194304">
-				<!-- U2 -->
 				<rom name="mh32m16e155c.u3" size="4194304" crc="d0b20c5a" sha1="2da2a9bcff4813abcb5b2c88095258d89a575378" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -1166,10 +1164,10 @@ See the wswan software list for the full game list.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTS-0132" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="4194304">
-				<!-- U2 -->
 				<rom name="sd32m16e221d.u3" size="4194304" crc="44453234" sha1="f7c8f8b6b6d036df8fc4bde72fcfac2846dffe35" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -1227,10 +1225,10 @@ See the wswan software list for the full game list.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTS-0132" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="4194304">
-				<!-- U2 -->
 				<rom name="sd32m16e227d.u3" size="4194304" crc="6142fd9d" sha1="efcf8f92357ffc6f6ec0e4aa960cd97a5070836e" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -1249,10 +1247,10 @@ See the wswan software list for the full game list.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTS-0132" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="2097152">
-				<!-- U2 -->
 				<rom name="mh16m1e197c.u3" size="2097152" crc="462f9275" sha1="81dd3124cce8a1aafd423bfe0814187fb7c646cb" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x80">
@@ -1271,11 +1269,11 @@ See the wswan software list for the full game list.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTS-0132" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="2097152">
-				<!-- U2 -->
 				<rom name="mh16m16u161c.u3" size="2097152" crc="274719f5" sha1="9942d1b7d1c00126b9891e560e6a3e264f8fdc2e" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -1294,11 +1292,11 @@ See the wswan software list for the full game list.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTS-0132" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="4194304">
-				<!-- U2 -->
 				<rom name="mh32m16e167c.u3" size="4194304" crc="da4479bf" sha1="b019f41207e396d9fe3509dccdbe1cc6e7ac46bb" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -1411,11 +1409,11 @@ See the wswan software list for the full game list.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTS-0132" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="4194304">
-				<!-- U2 -->
 				<rom name="mh32m16e154c.u3" size="4194304" crc="d75effc2" sha1="2358701531e8a38419859cd70bf2fbbd967b6745" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -1643,10 +1641,10 @@ See the wswan software list for the full game list.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTS-0100A" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="1048576">
-				<!-- U2 -->
 				<rom name="mh8m1e157c.u3" size="1048576" crc="fe4ff701" sha1="977d5830e45c78b9020e9d06a63a9ad6bc623745" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x80">
@@ -1765,29 +1763,6 @@ See the wswan software list for the full game list.
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="4194304">
 				<rom name="mh32m256s185c.u3" size="4194304" crc="16e0d929" sha1="bf212cecbbc51ee32ee2655a072f55e7bf70b9ec" offset="000000" />
-			</dataarea>
-			<dataarea name="sram" size="0x8000">
-			</dataarea>
-		</part>
-	</software>
-
-  <!-- not checked yet -->
-	<software name="riviera" supported="no">
-		<!-- WSC only -->
-		<description>Riviera</description>
-		<year>2002</year>
-		<publisher>Bandai</publisher>
-		<info name="serial" value="SWJ-BANC27"/>
-		<info name="release" value="20020712"/>
-		<part name="cart" interface="wswan_cart">
-			<feature name="pcb" value="PTS-0133A" />
-			<feature name="u1" value="BANDAI 2003" />
-			<feature name="u2" value="GIZA" />
-			<feature name="u3" value="ROM" />
-			<feature name="u4" value="HY62KT081ED70C SRAM" />
-			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="4194304">
-				<rom name="sd64m256s216d.u3" size="8388608" crc="2460b45a" sha1="a8f8d3efc9b2d5741081e05f517d746ee5437f87" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
 			</dataarea>
@@ -2216,13 +2191,11 @@ See the wswan software list for the full game list.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTS-0130-2" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="4194304">
-				<!-- U2 -->
-				<!-- or -->
-				<!-- U2 -->
 				<rom name="mh32m16e128b.u3" size="4194304" crc="9bd8f08c" sha1="9532113e14b03c95f034c015168e21273d42eff1" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -2241,11 +2214,11 @@ See the wswan software list for the full game list.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTS-0132" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="1048576">
-				<!-- U2 -->
 				<rom name="sd8m1e202d.u3" size="1048576" crc="7b0caea9" sha1="1a86403d7896d60fcb7a4c09367f5a976c7ea5a5" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x80">
@@ -2264,10 +2237,10 @@ See the wswan software list for the full game list.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTS-0100A" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="1048576">
-				<!-- U2 -->
 				<rom name="mh8m1e165c.u3" size="1048576" crc="47659b2c" sha1="fb53c28bd48174d3829467f1ab81d3f87f9a7f5b" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x80">
@@ -2379,10 +2352,10 @@ See the wswan software list for the full game list.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTS-0130" />
 			<feature name="u1" value="BANDAI 2003" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM (epoxy blob)" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="4194304">
-				<!-- U2 -->
 				<rom name="139.u3" size="4194304" crc="e14e9d36" sha1="6a4f4a03c367ccf00aa7462191c929a2736eb44b" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -2475,10 +2448,10 @@ See the wswan software list for the full game list.
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTS-0132" />
 			<feature name="u1" value="BANDAI 2001" />
+			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="4194304">
-				<!-- U2 -->
 				<rom name="sd32m16e206d.u3" size="4194304" crc="66b617d5" sha1="c1ab4e24f261615ca59f937b866fcf7047b67796" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
