@@ -37,8 +37,11 @@
         not data address).
 
     Todo!
-        Double check cycle timing is 100%.
-        Fix memory interface (should be 16 bit).
+      - Double check cycle timing is 100%.
+      - Fix memory interface (should be 16 bit) and related timing penalties.
+			- Add PFP (prefetch pointer) and prefetching (max 8 words); prefetching
+				is also done on branch targets regardless of whether the branch will
+				be taken.
 
 ****************************************************************************/
 
@@ -2530,7 +2533,7 @@ void v30mz_cpu_device::execute_run()
 			case 0x83: // i_83pre
 				m_modrm = fetch();
 				m_dst = GetRMWord();
-				m_src = ((int16_t)((int8_t)fetch()));
+				m_src = ((int16_t)((int8_t)fetch())) & 0xffff;
 				if ( m_modrm >= 0xc0)              { CLK(1); }
 				else if ((m_modrm & 0x38) == 0x38) { CLK(2); }
 				else                               { CLK(3); }
@@ -2543,7 +2546,7 @@ void v30mz_cpu_device::execute_run()
 				case 0x20:                      ANDW(); PutbackRMWord(m_dst); break;
 				case 0x28:                      SUBW(); PutbackRMWord(m_dst); break;
 				case 0x30:                      XORW(); PutbackRMWord(m_dst); break;
-				case 0x38:                      SUBW();                       break; /* CMP */
+				case 0x38:                      SUBW();	                      break; /* CMP */
 				}
 				break;
 
