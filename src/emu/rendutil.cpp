@@ -726,7 +726,7 @@ void render_load_jpeg(bitmap_argb32 &bitmap, util::core_file &file)
 		// finish decompression and frees the memory
 		jpeg_finish_decompress(&cinfo);
 	}
-	catch (jpeg_error_mgr *err)
+	catch (jpeg_error_mgr *)
 	{
 		char msg[1024];
 		(cinfo.err->format_message)(reinterpret_cast<j_common_ptr>(&cinfo), msg);
@@ -937,7 +937,7 @@ ru_imgformat render_detect_image(util::core_file &file)
 		file.seek(0, SEEK_SET);
 		return RENDUTIL_IMGFORMAT_JPEG;
 	}
-	catch (jpeg_error_mgr *err)
+	catch (jpeg_error_mgr *)
 	{
 		jpeg_destroy_decompress(&cinfo);
 		file.seek(0, SEEK_SET);
