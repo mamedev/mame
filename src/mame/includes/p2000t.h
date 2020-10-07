@@ -35,8 +35,6 @@ public:
 	}
 
 	void p2000t(machine_config &config);
-	virtual void machine_start() override;
-
 
 protected:
 	uint8_t p2000t_port_000f_r(offs_t offset);
@@ -49,6 +47,7 @@ protected:
 	void p2000t_port_8c90_w(uint8_t data);
 	void p2000t_port_9494_w(uint8_t data);
 	uint8_t videoram_r(offs_t offset);
+	virtual void machine_start() override;
 
 	INTERRUPT_GEN_MEMBER(p2000_interrupt);
 
