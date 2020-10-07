@@ -23,14 +23,14 @@ class p2000t_state : public driver_device
 {
 public:
 	p2000t_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig, type, tag)
-	, m_videoram(*this, "videoram")
-	, m_maincpu(*this, "maincpu")
-	, m_speaker(*this, "speaker")
-	, m_mdcr(*this, "mdcr")
-	, m_ram(*this, RAM_TAG)
-	, m_bank(*this, "bank")
-	, m_keyboard(*this, "KEY.%u", 0)
+		: driver_device(mconfig, type, tag)
+		, m_videoram(*this, "videoram")
+		, m_maincpu(*this, "maincpu")
+		, m_speaker(*this, "speaker")
+		, m_mdcr(*this, "mdcr")
+		, m_ram(*this, RAM_TAG)
+		, m_bank(*this, "bank")
+		, m_keyboard(*this, "KEY.%u", 0)
 	{
 	}
 
@@ -38,8 +38,8 @@ public:
 
 protected:
 	uint8_t p2000t_port_000f_r(offs_t offset);
-	virtual uint8_t p2000t_port_202f_r();
-	virtual void p2000t_port_101f_w(uint8_t data);
+	uint8_t p2000t_port_202f_r();
+	void p2000t_port_101f_w(uint8_t data);
 	void p2000t_port_303f_w(uint8_t data);
 	void p2000t_port_505f_w(uint8_t data);
 	void p2000t_port_707f_w(uint8_t data);
@@ -74,9 +74,9 @@ class p2000m_state : public p2000t_state
 {
 public:
 	p2000m_state(const machine_config &mconfig, device_type type, const char *tag)
-	: p2000t_state(mconfig, type, tag)
-	, m_gfxdecode(*this, "gfxdecode")
-	, m_palette(*this, "palette")
+		: p2000t_state(mconfig, type, tag)
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
 	{
 	}
 
