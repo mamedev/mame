@@ -278,6 +278,7 @@ void kaypro_state::kayproiv(machine_config &config)
 	config.device_remove("fdc:1");
 	FLOPPY_CONNECTOR(config, "fdc:0", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	SOFTWARE_LIST(config.replace(), "flop_list").set_original("kaypro483");
 }
 
 void kaypro_state::omni2(machine_config &config)
@@ -374,12 +375,14 @@ void kaypro_state::kaypro10(machine_config &config)
 	kaypro484(config);
 	config.device_remove("fdc:1");  // only has 1 floppy drive
 	// need to add hard drive & controller
+	SOFTWARE_LIST(config.replace(), "flop_list").set_original("kaypro10");
 }
 
 void kaypro_state::kaypronew2(machine_config &config)
 {
 	kaypro484(config);
 	config.device_remove("fdc:1");  // only has 1 floppy drive
+	SOFTWARE_LIST(config.replace(), "flop_list").set_original("kaypronew2");
 }
 
 void kaypro_state::kaypro284(machine_config &config)
@@ -389,7 +392,7 @@ void kaypro_state::kaypro284(machine_config &config)
 	config.device_remove("fdc:1");
 	FLOPPY_CONNECTOR(config, "fdc:0", kaypro_floppies, "525ssdd", floppy_image_device::default_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", kaypro_floppies, "525ssdd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	SOFTWARE_LIST(config.replace(), "flop_list").set_original("kayproii");
+	SOFTWARE_LIST(config.replace(), "flop_list").set_original("kaypro284");
 }
 
 void kaypro_state::init_kaypro()
