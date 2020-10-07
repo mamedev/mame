@@ -70,7 +70,6 @@ public:
 	void carhntds(machine_config &config);
 	void alphaho(machine_config &config);
 	void tranqgun(machine_config &config);
-	void tranqgun_audio(machine_config &config);
 
 	DECLARE_READ_LINE_MEMBER(coin_status_r);
 	DECLARE_READ_LINE_MEMBER(get_64v);
@@ -159,9 +158,6 @@ protected:
 	/*----------- defined in audio/pulsar.cpp -----------*/
 	void pulsar_audio_1_w(uint8_t data);
 	void pulsar_audio_2_w(uint8_t data);
-
-	/*----------- defined in audio/tranqgun.cpp -----------*/
-	void tranqgun_audio_w(uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(clear_coin_status);
 
