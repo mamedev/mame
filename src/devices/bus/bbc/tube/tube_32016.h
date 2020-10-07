@@ -18,6 +18,7 @@
 
 #include "tube.h"
 #include "cpu/ns32000/ns32000.h"
+#include "machine/ns32081.h"
 #include "machine/ram.h"
 #include "machine/tube.h"
 
@@ -51,16 +52,14 @@ protected:
 	virtual void host_w(offs_t offset, uint8_t data) override;
 
 	required_device<ns32016_device> m_maincpu;
+	required_device<ns32081_device> m_ns32081;
 	required_device<tube_device> m_ula;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
 
-	uint8_t read(offs_t offset);
-	void write(offs_t offset, uint8_t data);
+	memory_passthrough_handler *m_rom_shadow_tap;
 
 	void tube_32016_mem(address_map &map);
-
-	bool m_rom_enabled;
 };
 
 
