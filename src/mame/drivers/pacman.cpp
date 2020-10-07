@@ -341,6 +341,7 @@ Boards:
 
 #include "cpu/s2650/s2650.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/sn76496.h"
@@ -1104,11 +1105,11 @@ void pacman_state::clubpacm_map(address_map &map)
 	map(0x5040, 0x505f).mirror(0xaf00).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
 	map(0x5060, 0x506f).mirror(0xaf00).writeonly().share("spriteram2");
 	map(0x5070, 0x507f).mirror(0xaf00).nopw();
-	map(0x5080, 0x5080).mirror(0xaf3f).nopw();
+	map(0x5080, 0x5080).mirror(0xaf3f).w("sublatch", FUNC(generic_latch_8_device::write));
 	map(0x50c0, 0x50c0).mirror(0xaf3f).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 	map(0x5000, 0x507f).mirror(0xaf00).r(FUNC(pacman_state::clubpacm_input_r));
 	map(0x5080, 0x5080).mirror(0xaf3f).portr("DSW1");
-	map(0x50c0, 0x50c0).mirror(0xaf3f).portr("DSW2");
+	map(0x50c0, 0x50c0).mirror(0xaf3f).r("sublatch", FUNC(generic_latch_8_device::read));
 	map(0x8000, 0xbfff).rom();
 }
 
@@ -1743,15 +1744,15 @@ INPUT_PORTS_END
 	- different service mode inputs (bit 3 of DSW1 enables the test screen, bit 4 of IN1 just resets the game)
 	- different bonus life values and only two lives options
 	- difficulty switch is read, but has no effect. instead, higher difficulty is enabled in double command mode
-	- free play mode is bugged; game is supposed to set up a pointer to the watchdog address in RAM for later,
+	- free play mode is bugged; game is supposed to set up pointers to $5080/50c0 in RAM for later,
 	  but this only happens during the attract mode, which is skipped over if free play is enabled
 */
 static INPUT_PORTS_START( clubpacm )
 	PORT_START("IN0")
-	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1)
+	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1793,9 +1794,29 @@ static INPUT_PORTS_START( clubpacm )
 	PORT_DIPSETTING(    0x20, "80000" )
 	PORT_DIPSETTING(    0x30, DEF_STR( None ) )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
 
-	PORT_START("DSW2")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+/* Same as clubpacm, but Double Command mode is removed and normal inputs are used */
+static INPUT_PORTS_START( clubpacma )
+	PORT_INCLUDE( clubpacm )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -3730,6 +3751,8 @@ void pacman_state::clubpacm(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &pacman_state::clubpacm_map);
+
+	GENERIC_LATCH_8(config, "sublatch");
 }
 
 
@@ -7835,8 +7858,8 @@ GAME( 198?, pacmansp,   puckman, pacman,  pacmansp, pacman_state,  empty_init,  
 
 
 GAME( 1989, clubpacm,  0,        clubpacm,clubpacm, pacman_state,  empty_init,    ROT90,  "Miky SRL", "Pacman Club / Club Lambada (Argentina)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, clubpacma, clubpacm, clubpacm,clubpacm, pacman_state,  init_clubpacma,ROT90,  "Miky SRL", "Pacman Club (set 1, Argentina)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // resets during at title screen
-GAME( 1990, clubpacmb, clubpacm, clubpacm,clubpacm, pacman_state,  empty_init,    ROT90,  "Miky SRL", "Pacman Club (set 2, Argentina)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // encrypted
+GAME( 1990, clubpacma, clubpacm, clubpacm,clubpacma,pacman_state,  init_clubpacma,ROT90,  "Miky SRL", "Pacman Club (set 1, Argentina)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, clubpacmb, clubpacm, clubpacm,clubpacma,pacman_state,  empty_init,    ROT90,  "Miky SRL", "Pacman Club (set 2, Argentina)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // encrypted
 
 GAME( 1985, jumpshot, 0,        pacman,   jumpshot, pacman_state,  init_jumpshot, ROT90,  "Bally Midway", "Jump Shot", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, jumpshotp,jumpshot, pacman,   jumpshotp,pacman_state,  init_jumpshot, ROT90,  "Bally Midway", "Jump Shot Engineering Sample", MACHINE_SUPPORTS_SAVE )
