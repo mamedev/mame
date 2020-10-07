@@ -171,8 +171,6 @@ protected:
 
 	DECLARE_WRITE_LINE_MEMBER(towns_scsi_irq);
 	DECLARE_WRITE_LINE_MEMBER(towns_scsi_drq);
-	uint16_t towns_scsi_dma_r();
-	void towns_scsi_dma_w(uint16_t data);
 
 private:
 	/* devices */
