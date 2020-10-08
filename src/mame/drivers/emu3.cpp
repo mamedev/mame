@@ -64,6 +64,7 @@ public:
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	void emu3_map(address_map &map);
@@ -133,6 +134,13 @@ void emu3_state::machine_start()
 	m_irq_state = false;
 }
 
+void emu3_state::machine_reset()
+{
+	m_fdc->reset();
+	m_fdc->set_floppy(m_fdd);
+	m_fdc->dden_w(0);
+}
+
 void emu3_state::emu3_map(address_map &map)
 {
 	map(0x000000, 0x007fff).rom().region("bootprom", 0);
@@ -147,7 +155,7 @@ void emu3_state::emu3_map(address_map &map)
 	map(0xd70000, 0xd70000).lw8(
 		[this](u8 data)
 		{
-			m_fdd->ss_w(BIT(data, MISC_SIDE));
+			m_fdd->ss_w(!BIT(data, MISC_SIDE));
 			m_fdd->mon_w(BIT(data, MISC_MTR));
 			m_led[16] = BIT(data, MISC_LED);
 		}, "misc_w");
@@ -209,10 +217,8 @@ void emu3_state::emu3(machine_config &config)
 	WD1772(config, m_fdc, 16_MHz_XTAL / 2);
 	m_fdc->intrq_wr_callback().set(*this, FUNC(emu3_state::irq_w<FDCINT>));
 	m_fdc->set_disable_motor_control(true);
-	//m_fdc->sso_wr_callback().set([this](int state) {});
-	m_fdc->dden_w(0);
 
-	FLOPPY_CONNECTOR(config, "fdc:0", emu3_floppies, "35dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", emu3_floppies, "35dd", floppy_image_device::default_floppy_formats).enable_sound(true);
 
 	PIT8254(config, m_pit); // 8254-2
 	m_pit->set_clk<0>(20_MHz_XTAL / 2);
