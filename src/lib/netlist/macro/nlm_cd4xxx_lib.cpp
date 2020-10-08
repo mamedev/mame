@@ -642,6 +642,35 @@ static NETLIST_START(CD4070_DIP)
 	)
 NETLIST_END()
 
+//- Identifier: CD4071_DIP
+//- Title: CD4071BC Quad 2-Input OR Buffered B Series Gate
+//- Pinalias: A,B,J,K,C,D,VSS,E,F,L,M,G,H,VDD
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-    pdf.datasheetcatalog.com/datasheets/185/109289_DS.pdf
+//-
+static NETLIST_START(CD4071_DIP)
+	CD4071_GATE(A)
+	CD4071_GATE(B)
+	CD4071_GATE(C)
+	CD4071_GATE(D)
+
+	NET_C(A.VDD, B.VDD, C.VDD, D.VDD)
+	NET_C(A.VSS, B.VSS, C.VSS, D.VSS)
+
+	DIPPINS(   /*     +--------------+     */
+		  A.A, /*   A |1     ++    14| VDD */ A.VDD,
+		  A.B, /*   B |2           13| H   */ D.B,
+		  A.Q, /*   J |3           12| G   */ D.A,
+		  B.Q, /*   K |4    4071   11| M   */ D.Q,
+		  B.A, /*   C |5           10| L   */ C.Q,
+		  B.B, /*   D |6            9| F   */ C.B,
+		A.VSS, /* VSS |7            8| E   */ C.A
+			   /*     +--------------+     */
+	)
+NETLIST_END()
+
 //- Identifier: CD4076_DIP
 //- Title: CD4076BM/CD4076BC TRI-STATE(R) Quad D Flip-Flop
 //- Pinalias: OD1,OD2,OA,OB,OC,OD,CLK,VSS,ID1,ID2,ID,IC,IB,IA,CLR,VDD
@@ -689,6 +718,35 @@ static NETLIST_START(CD4076_DIP)
 		  A.CLK, /* CLK |7           10| ID2 */ A.ID2,
 		  A.VSS, /* VSS |8            9| ID1 */ A.ID1
 				 /*     +--------------+     */
+	)
+NETLIST_END()
+
+//- Identifier: CD4081_DIP
+//- Title: CD4081BC Quad 2-Input AND Buffered B Series Gate
+//- Pinalias: A,B,J,K,C,D,VSS,E,F,L,M,G,H,VDD
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-    pdf.datasheetcatalog.com/datasheets/185/109289_DS.pdf
+//-
+static NETLIST_START(CD4081_DIP)
+	CD4081_GATE(A)
+	CD4081_GATE(B)
+	CD4081_GATE(C)
+	CD4081_GATE(D)
+
+	NET_C(A.VDD, B.VDD, C.VDD, D.VDD)
+	NET_C(A.VSS, B.VSS, C.VSS, D.VSS)
+
+	DIPPINS(   /*     +--------------+     */
+		  A.A, /*   A |1     ++    14| VDD */ A.VDD,
+		  A.B, /*   B |2           13| H   */ D.B,
+		  A.Q, /*   J |3           12| G   */ D.A,
+		  B.Q, /*   K |4    4081   11| M   */ D.Q,
+		  B.A, /*   C |5           10| L   */ C.Q,
+		  B.B, /*   D |6            9| F   */ C.B,
+		A.VSS, /* VSS |7            8| E   */ C.A
+			   /*     +--------------+     */
 	)
 NETLIST_END()
 
@@ -797,7 +855,7 @@ static TRUTHTABLE_START(CD4011_GATE, 2, 1, "")
 TRUTHTABLE_END()
 
 static TRUTHTABLE_START(CD4030_GATE, 2, 1, "")
-	TT_HEAD("A , B | Q ")
+	TT_HEAD("A,B|Q ")
 	TT_LINE("0,0|0|100")
 	TT_LINE("0,1|1|100")
 	TT_LINE("1,0|1|100")
@@ -828,6 +886,24 @@ static TRUTHTABLE_START(CD4070_GATE, 2, 1, "")
 	TT_FAMILY("CD4XXX")
 TRUTHTABLE_END()
 
+static TRUTHTABLE_START(CD4071_GATE, 2, 1, "")
+	TT_HEAD("A,B|Q ")
+	TT_LINE("0,0|0|200")
+	TT_LINE("0,1|1|200")
+	TT_LINE("1,0|1|200")
+	TT_LINE("1,1|1|200")
+	TT_FAMILY("CD4XXX")
+TRUTHTABLE_END()
+
+static TRUTHTABLE_START(CD4081_GATE, 2, 1, "")
+	TT_HEAD("A,B|Q ")
+	TT_LINE("0,0|0|200")
+	TT_LINE("0,1|0|200")
+	TT_LINE("1,0|0|200")
+	TT_LINE("1,1|1|200")
+	TT_FAMILY("CD4XXX")
+TRUTHTABLE_END()
+
 NETLIST_START(cd4xxx_lib)
 
 	TRUTHTABLE_ENTRY(CD4001_GATE)
@@ -836,6 +912,8 @@ NETLIST_START(cd4xxx_lib)
 	TRUTHTABLE_ENTRY(CD4049_GATE)
 	TRUTHTABLE_ENTRY(CD4069_GATE)
 	TRUTHTABLE_ENTRY(CD4070_GATE)
+	TRUTHTABLE_ENTRY(CD4071_GATE)
+	TRUTHTABLE_ENTRY(CD4081_GATE)
 
 	LOCAL_LIB_ENTRY(CD4001_DIP)
 	LOCAL_LIB_ENTRY(CD4011_DIP)
@@ -843,6 +921,8 @@ NETLIST_START(cd4xxx_lib)
 	LOCAL_LIB_ENTRY(CD4049_DIP)
 	LOCAL_LIB_ENTRY(CD4069_DIP)
 	LOCAL_LIB_ENTRY(CD4070_DIP)
+	LOCAL_LIB_ENTRY(CD4071_DIP)
+	LOCAL_LIB_ENTRY(CD4081_DIP)
 
 	/* DIP ONLY */
 	LOCAL_LIB_ENTRY(CD4006_DIP)
