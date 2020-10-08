@@ -1521,14 +1521,14 @@ void layout_element::element_scale(bitmap_argb32 &dest, bitmap_argb32 &source, c
 			// get the local scaled bounds
 			render_bounds const compbounds(curcomp->bounds(elemtex.m_state));
 			rectangle bounds(
-					render_round_nearest(compbounds.x0 * dest.width()),
-					render_round_nearest(compbounds.x1 * dest.width()),
-					render_round_nearest(compbounds.y0 * dest.height()),
-					render_round_nearest(compbounds.y1 * dest.height()));
-			bounds &= dest.cliprect();
+					s32(compbounds.x0 * float(dest.width()) + 0.5F),
+					s32(floorf(compbounds.x1 * float(dest.width()) - 0.5F)),
+					s32(compbounds.y0 * float(dest.height()) + 0.5F),
+					s32(floorf(compbounds.y1 * float(dest.height()) - 0.5F)));
 
 			// based on the component type, add to the texture
-			curcomp->draw(elemtex.m_element->machine(), dest, bounds, elemtex.m_state);
+			if (!bounds.empty())
+				curcomp->draw(elemtex.m_element->machine(), dest, bounds, elemtex.m_state);
 		}
 	}
 }
@@ -1684,44 +1684,29 @@ private:
 
 	void load_image(running_machine &machine)
 	{
-		// attempt to open the file
-		LOGMASKED(LOG_IMAGE_LOAD, "Image component attempt to load image file '%s%s%s'\n", m_dirname, PATH_SEPARATOR, m_imagefile);
+		// if we have a filename, go with that
 		emu_file file(machine.options().art_path(), OPEN_FLAG_READ);
-		osd_file::error const imgerr = file.open(m_dirname.empty() ? m_imagefile : (m_dirname + PATH_SEPARATOR + m_imagefile));
-		if (osd_file::error::NONE == imgerr)
+		if (!m_imagefile.empty())
 		{
-			ru_imgformat const format = render_detect_image(file);
-			switch (format)
+			LOGMASKED(LOG_IMAGE_LOAD, "Image component attempt to load image file '%s%s%s'\n", m_dirname, PATH_SEPARATOR, m_imagefile);
+			osd_file::error const imgerr = file.open(m_dirname.empty() ? m_imagefile : (m_dirname + PATH_SEPARATOR + m_imagefile));
+			if (osd_file::error::NONE == imgerr)
 			{
-			case RENDUTIL_IMGFORMAT_ERROR:
-				LOGMASKED(LOG_IMAGE_LOAD, "Image component error detecting image file format\n");
-				break;
-
-			case RENDUTIL_IMGFORMAT_PNG:
-				LOGMASKED(LOG_IMAGE_LOAD, "Image component detected PNG file format\n");
-				m_hasalpha = render_load_png(m_bitmap, file);
-				break;
-
-			case RENDUTIL_IMGFORMAT_JPEG:
-				LOGMASKED(LOG_IMAGE_LOAD, "Image component detected JPEG file format\n");
-				render_load_jpeg(m_bitmap, file);
-				break;
-
-			case RENDUTIL_IMGFORMAT_MSDIB:
-				LOGMASKED(LOG_IMAGE_LOAD, "Image component detected Microsoft DIB file format\n");
-				render_load_msdib(m_bitmap, file);
-				break;
-
-			default:
-				LOGMASKED(LOG_IMAGE_LOAD, "Image component failed to detect image file format, trying SVG\n");
-				load_svg(file);
-				break;
+				if (!load_bitmap(file))
+				{
+					LOGMASKED(LOG_IMAGE_LOAD, "Image component will attempt to parse file as SVG\n");
+					load_svg(file);
+				}
+				file.close();
 			}
-			file.close();
+			else
+			{
+				LOGMASKED(LOG_IMAGE_LOAD, "Image component unable to open image file '%s%s%s'\n", m_dirname, PATH_SEPARATOR, m_imagefile);
+			}
 		}
 		else
 		{
-			LOGMASKED(LOG_IMAGE_LOAD, "Image component unable to open image file '%s%s%s'\n", m_dirname, PATH_SEPARATOR, m_imagefile);
+			load_image_data();
 		}
 
 		// load the alpha bitmap if specified
@@ -1775,13 +1760,104 @@ private:
 		m_data.clear();
 	}
 
+	void load_image_data()
+	{
+		// in-place Base64 decode
+		static constexpr char base64chars[] =
+				"\t\n\v\f\r +/0123456789"
+				"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+				"abcdefghijklmnopqrstuvwxyz";
+		static constexpr char base64tail[] =
+				"\t\n\v\f\r =";
+		std::string::size_type const tail(m_data.find_first_not_of(base64chars));
+		std::string::size_type const end(m_data.find_first_not_of(base64tail, tail));
+		if (std::string::npos == end)
+		{
+			LOGMASKED(LOG_IMAGE_LOAD, "Image component decoding Base64 image m_data\n");
+			char *dst(&m_data[0]);
+			unsigned trailing(0U);
+			for (std::string::size_type i = 0U; (m_data.size() > i) && ('=' != m_data[i]); ++i)
+			{
+				u8 sym;
+				if (('A' <= m_data[i]) && ('Z' >= m_data[i]))
+					sym = m_data[i] - 'A';
+				else if (('a' <= m_data[i]) && ('z' >= m_data[i]))
+					sym = m_data[i] - 'a' + 26;
+				else if (('0' <= m_data[i]) && ('9' >= m_data[i]))
+					sym = m_data[i] - '0' + 52;
+				else if ('+' == m_data[i])
+					sym = 62;
+				else if ('/' == m_data[i])
+					sym = 63;
+				else
+					continue;
+				if (trailing)
+					*dst |= (sym << 2) >> trailing;
+				else
+					*dst = sym << 2;
+				if (trailing >= 2U)
+					++dst;
+				trailing = (trailing + 6U) & 7U;
+				if (trailing)
+					*dst = sym << (8U - trailing);
+			}
+			m_data.resize(dst - &m_data[0]);
+		}
+
+		// make a file wrapper for the data and see if it looks like a bitmap
+		util::core_file::ptr file;
+		osd_file::error const filerr(util::core_file::open_ram(m_data.c_str(), m_data.size(), OPEN_FLAG_READ, file));
+		bool const bitmapdata((osd_file::error::NONE == filerr) && file && load_bitmap(*file));
+		file.reset();
+
+		// if it didn't look like a bitmap, see if it looks like it might be XML and hence SVG
+		if (!bitmapdata)
+		{
+			bool const utf16be((0xfe == u8(m_data[0])) && (0xff == u8(m_data[1])));
+			bool const utf16le((0xff == u8(m_data[0])) && (0xfe == u8(m_data[1])));
+			bool const utf8((0xef == u8(m_data[0])) && (0xbb == u8(m_data[1])) && (0xbf == u8(m_data[2])));
+			std::string::size_type const found(m_data.find_first_not_of("\t\n\v\f\r "));
+			bool const xmltag((std::string::npos != found) && ('<' == m_data[found]));
+			if (utf16be || utf16le || utf8 || xmltag)
+			{
+				LOGMASKED(LOG_IMAGE_LOAD, "Image component will attempt to parse data as SVG\n");
+				parse_svg(&m_data[0]);
+			}
+		}
+	}
+
+	bool load_bitmap(util::core_file &file)
+	{
+		ru_imgformat const format = render_detect_image(file);
+		switch (format)
+		{
+		case RENDUTIL_IMGFORMAT_ERROR:
+			LOGMASKED(LOG_IMAGE_LOAD, "Image component error detecting image file format\n");
+			return false;
+
+		case RENDUTIL_IMGFORMAT_PNG:
+			LOGMASKED(LOG_IMAGE_LOAD, "Image component detected PNG file format\n");
+			m_hasalpha = render_load_png(m_bitmap, file);
+			return true;
+
+		case RENDUTIL_IMGFORMAT_JPEG:
+			LOGMASKED(LOG_IMAGE_LOAD, "Image component detected JPEG file format\n");
+			render_load_jpeg(m_bitmap, file);
+			return true;
+
+		case RENDUTIL_IMGFORMAT_MSDIB:
+			LOGMASKED(LOG_IMAGE_LOAD, "Image component detected Microsoft DIB file format\n");
+			render_load_msdib(m_bitmap, file);
+			return true;
+
+		default:
+			LOGMASKED(LOG_IMAGE_LOAD, "Image component failed to detect bitmap file format\n");
+			return false;
+		}
+	}
+
 	void load_svg(util::core_file &file)
 	{
-		if (!m_rasterizer)
-		{
-			osd_printf_warning("No SVG rasteriser available, won't attempt to parse component image '%s' as SVG\n", m_imagefile);
-			return;
-		}
 		u64 len(file.size());
 		if ((std::numeric_limits<size_t>::max() - 1) < len)
 		{
@@ -1807,8 +1883,17 @@ private:
 			ptr += read;
 			len -= read;
 		}
-		m_svg.reset(nsvgParse(svgbuf.get(), "px", 72));
-		svgbuf.reset();
+		parse_svg(svgbuf.get());
+	}
+
+	void parse_svg(char *svgdata)
+	{
+		if (!m_rasterizer)
+		{
+			osd_printf_warning("No SVG rasteriser available, won't attempt to parse component image '%s' as SVG\n", m_imagefile);
+			return;
+		}
+		m_svg.reset(nsvgParse(svgdata, "px", 72));
 		if (!m_svg)
 		{
 			osd_printf_warning("Failed to parse component image '%s' as SVG\n", m_imagefile);
@@ -1922,8 +2007,8 @@ protected:
 		u32 const inva(255 - a);
 
 		// find the center
-		float const xcenter = float(bounds.xcenter());
-		float const ycenter = float(bounds.ycenter());
+		float const xcenter = float(bounds.left() + bounds.right()) * 0.5F;
+		float const ycenter = float(bounds.top() + bounds.bottom()) * 0.5F;
 		float const xradius = float(bounds.width()) * 0.5F;
 		float const yradius = float(bounds.height()) * 0.5F;
 		float const ooyradius2 = 1.0F / (yradius * yradius);
@@ -1932,22 +2017,21 @@ protected:
 		for (u32 y = bounds.top(); y <= bounds.bottom(); ++y)
 		{
 			// compute left/right coordinates
-			float const ycoord = ycenter - (float(y) + 0.5F);
+			float const ycoord = ycenter - float(y);
 			float const xval = xradius * sqrtf(1.0F - (ycoord * ycoord) * ooyradius2);
-
 			s32 const left = s32(xcenter - xval + 0.5F);
-			s32 const right = s32(xcenter + xval + 0.5F);
+			s32 const right = bounds.right() - left + bounds.left();
 
 			// draw this scanline
 			if (255 <= a)
 			{
 				// optimise opaque pixels
-				std::fill_n(&dest.pix(y, left), right - left, f);
+				std::fill_n(&dest.pix(y, left), right - left + 1, f);
 			}
 			else if (a)
 			{
-				u32 *dst(&dest.pix(y, bounds.left()));
-				for (u32 x = left; x < right; ++x, ++dst)
+				u32 *dst(&dest.pix(y, left));
+				for (s32 x = left; x <= right; ++x, ++dst)
 				{
 					// we're translucent, add in the destination pixel contribution
 					rgb_t const dpix(*dst);
@@ -4354,9 +4438,16 @@ layout_view::item::color_vector layout_view::item::make_color(
 						itemnode.get_name()));
 		}
 	}
-	for (emu::render::detail::color_step &step : result)
-		step.color *= mult;
-	set_color_deltas(result);
+	if (result.empty())
+	{
+		result.emplace_back(emu::render::detail::color_step{ 0, mult, { 0.0F, 0.0F, 0.0F, 0.0F } });
+	}
+	else
+	{
+		for (emu::render::detail::color_step &step : result)
+			step.color *= mult;
+		set_color_deltas(result);
+	}
 	return result;
 }
 

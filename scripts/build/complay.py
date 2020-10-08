@@ -96,7 +96,7 @@ class LayoutChecker(Minifyer):
     BADTAGPATTERN = re.compile('[^abcdefghijklmnopqrstuvwxyz0123456789_.:^$]')
     VARPATTERN = re.compile('^.*~[0-9A-Za-z_]+~.*$')
     FLOATCHARS = re.compile('^.*[.eE].*$')
-    SHAPES = frozenset(('disk', 'dotmatrix', 'dotmatrix5dot', 'dotmatrixdot', 'led14seg', 'led14segsc', 'led16seg', 'led16segsc', 'led7seg', 'led8seg_gts1', 'rect'))
+    SHAPES = frozenset(('disk', 'led14seg', 'led14segsc', 'led16seg', 'led16segsc', 'led7seg', 'led8seg_gts1', 'rect'))
     ORIENTATIONS = frozenset((0, 90, 180, 270))
     YESNO = frozenset(('yes', 'no'))
     BLENDMODES = frozenset(('none', 'alpha', 'multiply', 'add'))
@@ -291,7 +291,10 @@ class LayoutChecker(Minifyer):
                 self.handleError('Element %s attribute state "%s" is negative' % (name, attrs['state']))
             if (statemask is not None) and (stateval & ~statemask):
                 self.handleError('Element %s attribute state "%s" has bits set that are clear in attribute statemask "%s"' % (name, attrs['state'], attrs['statemask']))
-        self.handlers.append((self.componentStartHandler, self.componentEndHandler))
+        if 'image' == name:
+            self.handlers.append((self.imageComponentStartHandler, self.imageComponentEndHandler))
+        else:
+            self.handlers.append((self.componentStartHandler, self.componentEndHandler))
         self.have_bounds.append({ })
         self.have_color.append({ })
 
@@ -448,8 +451,8 @@ class LayoutChecker(Minifyer):
                 self.handleError('Element simplecounter attribute align "%s" not in valid range 0-2' % (attrs['align'], ))
             self.checkComponent(name, attrs)
         elif 'image' == name:
-            if 'file' not in attrs:
-                self.handleError('Element image missing attribute file')
+            self.have_file = 'file' in attrs
+            self.have_data = None
             self.checkComponent(name, attrs)
         elif 'reel' == name:
             # TODO: validate symbollist and improve validation of other attributes
@@ -498,6 +501,25 @@ class LayoutChecker(Minifyer):
         self.have_bounds.pop()
         self.have_color.pop()
         self.handlers.pop()
+
+    def imageComponentStartHandler(self, name, attrs):
+        if 'data' == name:
+            if self.have_data is not None:
+                self.handleError('Element image has multiple data child elements (previous %s)' % (self.have_data))
+            else:
+                self.have_data = self.formatLocation()
+                if self.have_file:
+                    self.handleError('Element image has attribute file and child element data')
+            self.ignored_depth = 1
+        else:
+            self.componentStartHandler(name, attrs)
+
+    def imageComponentEndHandler(self, name):
+        if (not self.have_file) and (self.have_data is None):
+            self.handleError('Element image missing attribute file or child element data')
+        del self.have_file
+        del self.have_data
+        self.componentEndHandler(name)
 
     def groupViewStartHandler(self, name, attrs):
         if 'element' == name:
