@@ -341,7 +341,6 @@ Boards:
 
 #include "cpu/s2650/s2650.h"
 #include "cpu/z80/z80.h"
-#include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/sn76496.h"
@@ -1093,23 +1092,24 @@ void pacman_state::woodpek_map(address_map &map)
 }
 
 
-void pacman_state::clubpacm_map(address_map &map)
+void clubpacm_state::clubpacm_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x43ff).mirror(0xa000).ram().w(FUNC(pacman_state::pacman_videoram_w)).share("videoram");
-	map(0x4400, 0x47ff).mirror(0xa000).ram().w(FUNC(pacman_state::pacman_colorram_w)).share("colorram");
-	map(0x4800, 0x4bff).mirror(0xa000).r(FUNC(pacman_state::pacman_read_nop)).nopw();
+	map(0x4000, 0x43ff).mirror(0xa000).ram().w(FUNC(clubpacm_state::pacman_videoram_w)).share("videoram");
+	map(0x4400, 0x47ff).mirror(0xa000).ram().w(FUNC(clubpacm_state::pacman_colorram_w)).share("colorram");
+	map(0x4800, 0x4bff).mirror(0xa000).r(FUNC(clubpacm_state::pacman_read_nop)).nopw();
 	map(0x4c00, 0x4fef).mirror(0xa000).ram();
 	map(0x4ff0, 0x4fff).mirror(0xa000).ram().share("spriteram");
 	map(0x5000, 0x5007).mirror(0xaf38).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0x5040, 0x505f).mirror(0xaf00).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
 	map(0x5060, 0x506f).mirror(0xaf00).writeonly().share("spriteram2");
 	map(0x5070, 0x507f).mirror(0xaf00).nopw();
-	map(0x5080, 0x5080).mirror(0xaf3f).w("sublatch", FUNC(generic_latch_8_device::write));
+	map(0x5080, 0x5080).mirror(0xaf3f).w(m_sublatch, FUNC(generic_latch_8_device::write));
 	map(0x50c0, 0x50c0).mirror(0xaf3f).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	map(0x5000, 0x507f).mirror(0xaf00).r(FUNC(pacman_state::clubpacm_input_r));
+	map(0x5000, 0x5000).mirror(0xaf3f).portr("IN0");
+	map(0x5040, 0x5040).mirror(0xaf3f).portr("IN1");
 	map(0x5080, 0x5080).mirror(0xaf3f).portr("DSW1");
-	map(0x50c0, 0x50c0).mirror(0xaf3f).r("sublatch", FUNC(generic_latch_8_device::read));
+	map(0x50c0, 0x50c0).mirror(0xaf3f).r(m_sublatch, FUNC(generic_latch_8_device::read));
 	map(0x8000, 0xbfff).rom();
 }
 
@@ -1749,13 +1749,14 @@ INPUT_PORTS_END
 */
 static INPUT_PORTS_START( clubpacm )
 	PORT_START("IN0")
-	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(clubpacm_state, clubpacm_input_r)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(clubpacm_state, clubpacm_input_r)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
@@ -1769,14 +1770,12 @@ static INPUT_PORTS_START( clubpacm )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Coinage ) )
@@ -3745,14 +3744,14 @@ void pacman_state::woodpek(machine_config &config)
 }
 
 
-void pacman_state::clubpacm(machine_config &config)
+void clubpacm_state::clubpacm(machine_config &config)
 {
 	mspacman(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &pacman_state::clubpacm_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &clubpacm_state::clubpacm_map);
 
-	GENERIC_LATCH_8(config, "sublatch");
+	GENERIC_LATCH_8(config, m_sublatch);
 }
 
 
@@ -7761,19 +7760,19 @@ void pacman_state::init_pengomc1()
 		romdata[i] = buf[i^0xff];
 }
 
-uint8_t pacman_state::clubpacm_input_r(offs_t offset)
+CUSTOM_INPUT_MEMBER(clubpacm_state::clubpacm_input_r)
 {
-	uint8_t data = ioport((offset & 0x40) ? "IN1" : "IN0")->read();
+	ioport_value data = 0x0f;
 
 	if (!m_mainlatch->q5_r())
-		data &= ioport("P1")->read();
+		data &= m_players[0]->read();
 	if (!m_mainlatch->q4_r())
-		data &= ioport("P2")->read();
+		data &= m_players[1]->read();
 
-	return data;
+	return data ^ 0x0f;
 }
 
-void pacman_state::init_clubpacma()
+void clubpacm_state::init_clubpacma()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -7857,9 +7856,9 @@ GAME( 198?, pacmansp,   puckman, pacman,  pacmansp, pacman_state,  empty_init,  
 
 
 
-GAME( 1989, clubpacm,  0,        clubpacm,clubpacm, pacman_state,  empty_init,    ROT90,  "Miky SRL", "Pacman Club / Club Lambada (Argentina)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, clubpacma, clubpacm, clubpacm,clubpacma,pacman_state,  init_clubpacma,ROT90,  "Miky SRL", "Pacman Club (set 1, Argentina)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, clubpacmb, clubpacm, clubpacm,clubpacma,pacman_state,  empty_init,    ROT90,  "Miky SRL", "Pacman Club (set 2, Argentina)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // encrypted
+GAME( 1989, clubpacm,  0,        clubpacm,clubpacm, clubpacm_state,empty_init,    ROT90,  "Miky SRL", "Pacman Club / Club Lambada (Argentina)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, clubpacma, clubpacm, clubpacm,clubpacma,clubpacm_state,init_clubpacma,ROT90,  "Miky SRL", "Pacman Club (set 1, Argentina)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, clubpacmb, clubpacm, clubpacm,clubpacma,clubpacm_state,empty_init,    ROT90,  "Miky SRL", "Pacman Club (set 2, Argentina)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // encrypted
 
 GAME( 1985, jumpshot, 0,        pacman,   jumpshot, pacman_state,  init_jumpshot, ROT90,  "Bally Midway", "Jump Shot", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, jumpshotp,jumpshot, pacman,   jumpshotp,pacman_state,  init_jumpshot, ROT90,  "Bally Midway", "Jump Shot Engineering Sample", MACHINE_SUPPORTS_SAVE )

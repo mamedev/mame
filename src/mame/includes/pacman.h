@@ -6,6 +6,7 @@
 #pragma once
 
 #include "machine/74259.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/namco.h"
 #include "emupal.h"
@@ -43,7 +44,6 @@ protected:
 	void bigbucks_map(address_map &map);
 	void bigbucks_portmap(address_map &map);
 	void birdiy_map(address_map &map);
-	void clubpacm_map(address_map &map);
 	void crushs_map(address_map &map);
 	void crushs_portmap(address_map &map);
 	void dremshpr_map(address_map &map);
@@ -140,7 +140,6 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
 	uint8_t mspacii_protection_r(offs_t offset);
 	uint8_t cannonbp_protection_r(offs_t offset);
-	uint8_t clubpacm_input_r(offs_t offset);
 	void pacman_videoram_w(offs_t offset, uint8_t data);
 	void pacman_colorram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
@@ -177,7 +176,6 @@ public:
 	void init_mschamp();
 	void init_mbrush();
 	void init_pengomc1();
-	void init_clubpacma();
 
 protected:
 	TILEMAP_MAPPER_MEMBER(pacman_scan_rows);
@@ -218,7 +216,6 @@ public:
 	void vanvan(machine_config &config);
 	void s2650games(machine_config &config);
 	void woodpek(machine_config &config);
-	void clubpacm(machine_config &config);
 	void crushs(machine_config &config);
 	void superabc(machine_config &config);
 	void numcrash(machine_config &config);
@@ -265,6 +262,28 @@ protected:
 
 	void epos_map(address_map &map);
 	void epos_portmap(address_map &map);
+};
+
+class clubpacm_state : public pacman_state
+{
+public:
+	clubpacm_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pacman_state(mconfig, type, tag)
+		, m_sublatch(*this, "sublatch")
+		, m_players(*this, "P%u", 1)
+	{ }
+
+	void clubpacm(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(clubpacm_input_r);
+
+	void init_clubpacma();
+
+protected:
+	void clubpacm_map(address_map &map);
+
+	required_device<generic_latch_8_device> m_sublatch;
+	required_ioport_array<2> m_players;
 };
 
 #endif // MAME_INCLUDES_PACMAN_H
