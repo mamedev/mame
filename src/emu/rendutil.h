@@ -60,7 +60,7 @@ ru_imgformat render_detect_image(util::core_file &file);
 
 static inline float render_round_nearest(float f)
 {
-	return floor(f + 0.5f);
+	return floorf(f + 0.5f);
 }
 
 
