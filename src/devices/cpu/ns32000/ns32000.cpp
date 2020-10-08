@@ -530,6 +530,9 @@ template <int Width> void ns32000_device<Width>::interrupt(unsigned const vector
 
 	// TODO: flush queue
 	m_sequential = false;
+
+	if (trap && (machine().debug_flags & DEBUG_FLAG_ENABLED))
+		debug()->exception_hook(vector);
 }
 
 template <int Width> void ns32000_device<Width>::execute_run()
@@ -1647,7 +1650,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 							else
 								m_psr &= ~PSR_F;
 
-							m_r[mode[1].gen] |= ~(1U << (offset & 31));
+							m_r[mode[1].gen] |= (1U << (offset & 31));
 						}
 						else
 						{
