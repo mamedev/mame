@@ -19,7 +19,7 @@
 //  * it takes up to 30seconds to charge C24 to its working point
 //      in ANIMAL_SOUND
 //
-//  * noise generation with MM5837_DIP eats a lot of CPU power 
+//  * noise generation with MM5837_DIP eats a lot of CPU power
 //
 
 
@@ -62,6 +62,8 @@
 
 
 #include "netlist/devices/net_lib.h"
+
+#define ENABLE_FRONTIERS (1)
 
 
 /* ----------------------------------------------------------------------------
@@ -1422,6 +1424,41 @@ static NETLIST_START(brdrline_sound_out)
 
     // --------------------------------
     // INPUT
+#if (ENABLE_FRONTIERS)
+	// using AFUNCs here tends to remove the DC bias, so add
+	// it back in manually
+	AFUNC(JEEP_F, 1, "5+A0")
+	ALIAS(JEEP_SOUND, JEEP_F.A0)
+	NET_C(JEEP_F.Q, VR8.1)
+
+	AFUNC(GUN_F, 1, "6+A0")
+	ALIAS(GUN_SOUND, GUN_F.A0)
+	NET_C(GUN_F.Q, VR1.1)
+
+	AFUNC(POINT_F, 1, "6+A0")
+	ALIAS(POINT_SOUND, POINT_F.A0)
+	NET_C(POINT_F.Q, VR6.1)
+
+	AFUNC(HIT_F, 1, "6+A0")
+	ALIAS(HIT_SOUND, HIT_F.A0)
+	NET_C(HIT_F.Q, VR7.1)
+
+	AFUNC(ANIMAL_F, 1, "6+A0")
+	ALIAS(ANIMAL_SOUND, ANIMAL_F.A0)
+	NET_C(ANIMAL_F.Q, VR5.1)
+
+	AFUNC(EMAR_F, 1, "6+A0")
+	ALIAS(EMAR_SOUND, EMAR_F.A0)
+	NET_C(EMAR_F.Q, VR4.1)
+
+	AFUNC(WALK_F, 1, "A0")
+	ALIAS(WALK_SOUND, WALK_F.A0)
+	NET_C(WALK_F.Q, VR3.1)
+
+	AFUNC(CRY_F, 1, "6+A0")
+	ALIAS(CRY_SOUND, CRY_F.A0)
+	NET_C(CRY_F.Q, VR2.1)
+#else
     ALIAS(JEEP_SOUND, VR8.1)
     ALIAS(GUN_SOUND, VR1.1)
     ALIAS(POINT_SOUND, VR6.1)
@@ -1430,6 +1467,7 @@ static NETLIST_START(brdrline_sound_out)
     ALIAS(EMAR_SOUND, VR4.1)
     ALIAS(WALK_SOUND, VR3.1)
     ALIAS(CRY_SOUND, VR2.1)
+#endif
 
     // --------------------------------
     // OUTPUT
@@ -1454,7 +1492,7 @@ NETLIST_START(brdrline)
 #if 1
 	SOLVER(Solver, 1000)
 	PARAM(Solver.DYNAMIC_TS, 1)
-	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 2e-5)
+	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 4e-5)
 #else
     SOLVER(solver, 48000)
 #endif
