@@ -136,7 +136,6 @@ void emu3_state::machine_start()
 
 void emu3_state::machine_reset()
 {
-	m_fdc->reset();
 	m_fdc->set_floppy(m_fdd);
 	m_fdc->dden_w(0);
 }
