@@ -91,7 +91,7 @@ public:
 	virtual bool execute_command(const char *command) = 0;
 
 	// midi interface
-	virtual osd_midi_device *create_midi_device() = 0;
+	virtual std::unique_ptr<osd_midi_device> create_midi_device() = 0;
 
 protected:
 	virtual ~osd_interface() { }

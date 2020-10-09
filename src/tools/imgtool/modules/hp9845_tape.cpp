@@ -985,7 +985,7 @@ static tape_state_t& get_tape_state(imgtool::image &img)
 static tape_image_t& get_tape_image(tape_state_t& ts)
 {
 	if (ts.img == nullptr) {
-		ts.img = global_alloc(tape_image_t);
+		ts.img = new tape_image_t;
 	}
 
 	return *(ts.img);
@@ -1034,7 +1034,7 @@ static void hp9845_tape_close(imgtool::image &image)
 	delete state.stream;
 
 	// Free tape_image
-	global_free(&tape_image);
+	delete &tape_image;
 }
 
 static imgtoolerr_t hp9845_tape_begin_enum (imgtool::directory &enumeration, const char *path)

@@ -15,6 +15,7 @@
 #include "sound/samples.h"
 #include "sound/volt_reg.h"
 #include "screen.h"
+#include "audio/vicdual.h"
 #include "audio/vicdual-97271p.h"
 #include "video/vicdual-97269pb.h"
 
@@ -29,6 +30,7 @@ public:
 		m_coinstate_timer(*this, "coinstate"),
 		m_nsub_coinage_timer(*this, "nsub_coin"),
 		m_screen(*this, "screen"),
+		m_vicdual_sound(*this, "vicdual_sound"),
 		m_proms(*this, "proms"),
 		m_videoram(*this, "videoram"),
 		m_characterram(*this, "characterram"),
@@ -49,7 +51,6 @@ public:
 	void headonn(machine_config &config);
 	void invho2(machine_config &config);
 	void frogs(machine_config &config);
-	void frogs_audio(machine_config &config);
 	void headons(machine_config &config);
 	void invinco(machine_config &config);
 	void invinco_audio(machine_config &config);
@@ -61,7 +62,6 @@ public:
 	void headon2bw(machine_config &config);
 	void safari(machine_config &config);
 	void brdrline(machine_config &config);
-	void brdrline_audio(machine_config &config);
 	void samurai(machine_config &config);
 	void sspaceat(machine_config &config);
 	void digger(machine_config &config);
@@ -70,7 +70,6 @@ public:
 	void carhntds(machine_config &config);
 	void alphaho(machine_config &config);
 	void tranqgun(machine_config &config);
-	void tranqgun_audio(machine_config &config);
 
 	DECLARE_READ_LINE_MEMBER(coin_status_r);
 	DECLARE_READ_LINE_MEMBER(get_64v);
@@ -88,6 +87,7 @@ protected:
 	required_device<timer_device> m_coinstate_timer;
 	optional_device<timer_device> m_nsub_coinage_timer;
 	required_device<screen_device> m_screen;
+	optional_device<vicdual_audio_device_base> m_vicdual_sound;
 	optional_memory_region m_proms;
 
 	required_shared_ptr<uint8_t> m_videoram;
@@ -146,12 +146,8 @@ protected:
 	void invinco_io_w(offs_t offset, uint8_t data);
 
 	/*----------- defined in audio/vicdual.cpp -----------*/
-	void frogs_audio_w(uint8_t data);
 	void headon_audio_w(uint8_t data);
 	void invho2_audio_w(uint8_t data);
-	void brdrline_audio_w(uint8_t data);
-	void brdrline_audio_aux_w(uint8_t data);
-	TIMER_CALLBACK_MEMBER( frogs_croak_callback );
 
 	/*----------- defined in audio/depthch.cpp -----------*/
 	void depthch_audio_w(uint8_t data);
@@ -163,13 +159,9 @@ protected:
 	void pulsar_audio_1_w(uint8_t data);
 	void pulsar_audio_2_w(uint8_t data);
 
-	/*----------- defined in audio/tranqgun.cpp -----------*/
-	void tranqgun_audio_w(uint8_t data);
-
 	TIMER_DEVICE_CALLBACK_MEMBER(clear_coin_status);
 
 	DECLARE_MACHINE_START(samurai);
-	DECLARE_MACHINE_START(frogs_audio);
 
 	virtual void machine_start() override;
 

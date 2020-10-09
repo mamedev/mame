@@ -187,8 +187,8 @@ bool mfi_format::save(io_generic *io, floppy_image *image)
 
 	int pos = sizeof(header) + (tracks << resolution)*heads*sizeof(entry);
 	int epos = 0;
-	auto precomp = global_alloc_array(uint32_t, max_track_size);
-	auto postcomp = global_alloc_array(uint8_t, max_track_size*4 + 1000);
+	auto precomp = std::make_unique<uint32_t []>(max_track_size);
+	auto postcomp = std::make_unique<uint8_t []>(max_track_size*4 + 1000);
 
 	for(int track=0; track <= (tracks-1) << 2; track += 4 >> resolution)
 		for(int head=0; head<heads; head++) {
@@ -199,7 +199,7 @@ bool mfi_format::save(io_generic *io, floppy_image *image)
 				continue;
 			}
 
-			memcpy(precomp, &buffer[0], tsize*4);
+			memcpy(&precomp[0], &buffer[0], tsize*4);
 			for(int j=0; j<tsize-1; j++)
 				precomp[j] = (precomp[j] & floppy_image::MG_MASK) |
 					((precomp[j+1] & floppy_image::TIME_MASK) -
@@ -208,11 +208,8 @@ bool mfi_format::save(io_generic *io, floppy_image *image)
 				(200000000 - (precomp[tsize-1] & floppy_image::TIME_MASK));
 
 			uLongf csize = max_track_size*4 + 1000;
-			if(compress(postcomp, &csize, (const Bytef *)precomp, tsize*4) != Z_OK) {
-				global_free_array(precomp);
-				global_free_array(postcomp);
+			if(compress(postcomp.get(), &csize, (const Bytef *)precomp.get(), tsize*4) != Z_OK)
 				return false;
-			}
 
 			entries[epos].offset = pos;
 			entries[epos].uncompressed_size = tsize*4;
@@ -220,13 +217,11 @@ bool mfi_format::save(io_generic *io, floppy_image *image)
 			entries[epos].write_splice = image->get_write_splice_position(track >> 2, head, track & 3);
 			epos++;
 
-			io_generic_write(io, postcomp, pos, csize);
+			io_generic_write(io, postcomp.get(), pos, csize);
 			pos += csize;
 		}
 
 	io_generic_write(io, entries, sizeof(header), (tracks << resolution)*heads*sizeof(entry));
-	global_free_array(precomp);
-	global_free_array(postcomp);
 	return true;
 }
 

@@ -22,6 +22,111 @@
 
 #include <algorithm>
 
+//#define VERBOSE 1
+#define LOG_OUTPUT_FUNC osd_printf_verbose
+#include "logmacro.h"
+
+
+namespace {
+
+struct parent_rom
+{
+	parent_rom(device_type t, rom_entry const *r) : type(t), name(ROM_GETNAME(r)), hashes(ROM_GETHASHDATA(r)), length(rom_file_size(r)) { }
+
+	std::reference_wrapper<std::remove_reference_t<device_type> >   type;
+	std::string                                                     name;
+	util::hash_collection                                           hashes;
+	uint64_t                                                        length;
+};
+
+
+class parent_rom_vector : public std::vector<parent_rom>
+{
+public:
+	using std::vector<parent_rom>::vector;
+
+	std::add_pointer_t<device_type> find_shared_device(device_t &current, char const *name, util::hash_collection const &hashes, uint64_t length) const
+	{
+		// if we're examining a child device, it will always have a perfect match
+		if (current.owner())
+			return &current.type();
+
+		// scan backwards through parents for a matching definition
+		bool const dumped(!hashes.flag(util::hash_collection::FLAG_NO_DUMP));
+		std::add_pointer_t<device_type> best(nullptr);
+		for (const_reverse_iterator it = crbegin(); crend() != it; ++it)
+		{
+			if (it->length == length)
+			{
+				if (dumped)
+				{
+					if (it->hashes == hashes)
+						return &it->type.get();
+				}
+				else if (it->name == name)
+				{
+					if (it->hashes.flag(util::hash_collection::FLAG_NO_DUMP))
+						return &it->type.get();
+					else if (!best)
+						best = &it->type.get();
+				}
+			}
+		}
+		return best;
+	}
+
+	std::pair<std::add_pointer_t<device_type>, bool> actual_matches_shared(device_t &current, media_auditor::audit_record const &record)
+	{
+		// no result if no matching file was found
+		if ((record.status() != media_auditor::audit_status::GOOD) && (record.status() != media_auditor::audit_status::FOUND_INVALID))
+			return std::make_pair(nullptr, false);
+
+		// if we're examining a child device, scan it first
+		bool matches_device_undumped(false);
+		if (current.owner())
+		{
+			for (const rom_entry *region = rom_first_region(current); region; region = rom_next_region(region))
+			{
+				for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
+				{
+					if (rom_file_size(rom) == record.actual_length())
+					{
+						util::hash_collection const hashes(ROM_GETHASHDATA(rom));
+						if (hashes == record.actual_hashes())
+							return std::make_pair(&current.type(), empty());
+						else if (hashes.flag(util::hash_collection::FLAG_NO_DUMP) && (rom->name() == record.name()))
+							matches_device_undumped = true;
+					}
+				}
+			}
+		}
+
+		// look for a matching parent ROM
+		std::add_pointer_t<device_type> closest_bad(nullptr);
+		for (const_reverse_iterator it = crbegin(); crend() != it; ++it)
+		{
+			if (it->length == record.actual_length())
+			{
+				if (it->hashes == record.actual_hashes())
+					return std::make_pair(&it->type.get(), it->type.get() == front().type.get());
+				else if (it->hashes.flag(util::hash_collection::FLAG_NO_DUMP) && (it->name == record.name()))
+					closest_bad = &it->type.get();
+			}
+		}
+
+		// fall back to the nearest bad dump
+		if (closest_bad)
+			return std::make_pair(closest_bad, front().type.get() == *closest_bad);
+		else if (matches_device_undumped)
+			return std::make_pair(&current.type(), empty());
+		else
+			return std::make_pair(nullptr, false);
+	}
+};
+
+} // anonymous namespace
+
+
 
 //**************************************************************************
 //  CORE FUNCTIONS
@@ -51,10 +156,29 @@ media_auditor::summary media_auditor::audit_media(const char *validation)
 	// store validation for later
 	m_validation = validation;
 
-	std::size_t found = 0;
-	std::size_t required = 0;
-	std::size_t shared_found = 0;
-	std::size_t shared_required = 0;
+	// first walk the parent chain for required ROMs
+	parent_rom_vector parentroms;
+	for (auto drvindex = m_enumerator.find(m_enumerator.driver().parent); 0 <= drvindex; drvindex = m_enumerator.find(m_enumerator.driver(drvindex).parent))
+	{
+		game_driver const &parent(m_enumerator.driver(drvindex));
+		LOG("Checking parent %s for ROM files\n", parent.type.shortname());
+		std::vector<rom_entry> const roms(rom_build_entries(parent.rom));
+		for (rom_entry const *region = rom_first_region(&roms.front()); region; region = rom_next_region(region))
+		{
+			for (rom_entry const *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
+			{
+				LOG("Adding parent ROM %s\n", rom->name());
+				parentroms.emplace_back(parent.type, rom);
+			}
+		}
+	}
+
+	// count ROMs required/found
+	std::size_t found(0);
+	std::size_t required(0);
+	std::size_t shared_found(0);
+	std::size_t shared_required(0);
+	std::size_t parent_found(0);
 
 	// iterate over devices and regions
 	std::vector<std::string> searchpath;
@@ -68,21 +192,30 @@ media_auditor::summary media_auditor::audit_media(const char *validation)
 			for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 			{
 				if (searchpath.empty())
+				{
+					LOG("Audit media for device %s(%s)\n", device.shortname(), device.tag());
 					searchpath = device.searchpath();
+				}
 
+				// look for a matching parent or device ROM
 				char const *const name(ROM_GETNAME(rom));
 				util::hash_collection const hashes(ROM_GETHASHDATA(rom));
-				device_t *const shared_device(find_shared_device(device, name, hashes, ROM_GETLENGTH(rom)));
+				bool const dumped(!hashes.flag(util::hash_collection::FLAG_NO_DUMP));
+				std::add_pointer_t<device_type> const shared_device(parentroms.find_shared_device(device, name, hashes, rom_file_size(rom)));
+				if (shared_device)
+					LOG("File '%s' %s%sdumped shared with %s\n", name, ROM_ISOPTIONAL(rom) ? "optional " : "", dumped ? "" : "un", shared_device->shortname());
+				else
+					LOG("File '%s' %s%sdumped\n", name, ROM_ISOPTIONAL(rom) ? "optional " : "", dumped ? "" : "un");
 
 				// count the number of files with hashes
-				if (!hashes.flag(util::hash_collection::FLAG_NO_DUMP) && !ROM_ISOPTIONAL(rom))
+				if (dumped && !ROM_ISOPTIONAL(rom))
 				{
 					required++;
 					if (shared_device)
 						shared_required++;
 				}
 
-				audit_record *record = nullptr;
+				audit_record *record(nullptr);
 				if (ROMREGION_ISROMDATA(region))
 					record = &audit_one_rom(searchpath, rom);
 				else if (ROMREGION_ISDISKDATA(region))
@@ -90,22 +223,32 @@ media_auditor::summary media_auditor::audit_media(const char *validation)
 
 				if (record)
 				{
+					// see if the actual content found belongs to a parent
+					auto const matchesshared(parentroms.actual_matches_shared(device, *record));
+					if (matchesshared.first)
+						LOG("Actual ROM file shared with %sparent %s\n", matchesshared.second ? "immediate " : "", matchesshared.first->shortname());
+
 					// count the number of files that are found.
-					if ((record->status() == audit_status::GOOD) || ((record->status() == audit_status::FOUND_INVALID) && !find_shared_device(device, name, record->actual_hashes(), record->actual_length())))
+					if ((record->status() == audit_status::GOOD) || ((record->status() == audit_status::FOUND_INVALID) && !matchesshared.first))
 					{
 						found++;
 						if (shared_device)
 							shared_found++;
+						if (matchesshared.second)
+							parent_found++;
 					}
 
 					record->set_shared_device(shared_device);
 				}
 			}
 		}
+
+		if (!searchpath.empty())
+			LOG("Total required=%u (shared=%u) found=%u (shared=%u parent=%u)\n", required, shared_required, found, shared_found, parent_found);
 	}
 
 	// if we only find files that are in the parent & either the set has no unique files or the parent is not found, then assume we don't have the set at all
-	if ((found == shared_found) && (required > 0) && ((required != shared_required) || (shared_found == 0)))
+	if ((found == shared_found) && required && ((required != shared_required) || !parent_found))
 	{
 		m_record_list.clear();
 		return NOTFOUND;
@@ -340,7 +483,7 @@ media_auditor::summary media_auditor::summarize(const char *name, std::ostream *
 		case audit_substatus::NOT_FOUND:
 			if (output)
 			{
-				device_t *const shared_device = record.shared_device();
+				std::add_pointer_t<device_type> const shared_device = record.shared_device();
 				if (shared_device)
 					util::stream_format(*output, "NOT FOUND (%s)\n", shared_device->shortname());
 				else
@@ -495,59 +638,6 @@ void media_auditor::compute_status(audit_record &record, const rom_entry *rom, b
 		else
 			record.set_status(audit_status::GOOD, audit_substatus::GOOD);
 	}
-}
-
-
-//-------------------------------------------------
-//  find_shared_device - return the source that
-//  shares a media entry with the same hashes
-//-------------------------------------------------
-
-device_t *media_auditor::find_shared_device(device_t &device, const char *name, const util::hash_collection &romhashes, uint64_t romlength)
-{
-	bool const dumped = !romhashes.flag(util::hash_collection::FLAG_NO_DUMP);
-
-	// special case for non-root devices
-	device_t *highest_device = nullptr;
-	if (device.owner())
-	{
-		for (const rom_entry *region = rom_first_region(device); region; region = rom_next_region(region))
-		{
-			for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
-			{
-				if (rom_file_size(rom) == romlength)
-				{
-					util::hash_collection hashes(ROM_GETHASHDATA(rom));
-					if ((dumped && hashes == romhashes) || (!dumped && ROM_GETNAME(rom) == name))
-						highest_device = &device;
-				}
-			}
-		}
-	}
-	else
-	{
-		// iterate up the parent chain
-		for (auto drvindex = m_enumerator.find(m_enumerator.driver().parent); drvindex >= 0; drvindex = m_enumerator.find(m_enumerator.driver(drvindex).parent))
-		{
-			for (device_t &scandevice : device_iterator(m_enumerator.config(drvindex)->root_device()))
-			{
-				for (const rom_entry *region = rom_first_region(scandevice); region; region = rom_next_region(region))
-				{
-					for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
-					{
-						if (rom_file_size(rom) == romlength)
-						{
-							util::hash_collection hashes(ROM_GETHASHDATA(rom));
-							if ((dumped && hashes == romhashes) || (!dumped && ROM_GETNAME(rom) == name))
-								highest_device = &scandevice;
-						}
-					}
-				}
-			}
-		}
-	}
-
-	return highest_device;
 }
 
 

@@ -1282,7 +1282,7 @@ void ioport_field::expand_diplocation(const char *location, std::string &errorbu
 			errorbuf.append(string_format("Switch location '%s' has invalid format!\n", location));
 
 		// allocate a new entry
-		m_diploclist.append(*global_alloc(ioport_diplocation(name.c_str(), swnum, invert)));
+		m_diploclist.append(*new ioport_diplocation(name.c_str(), swnum, invert));
 		entries++;
 
 		// advance to the next item
@@ -1618,15 +1618,15 @@ ioport_port_live::ioport_port_live(ioport_port &port)
 		// allocate analog state if it's analog
 		analog_field *analog = nullptr;
 		if (field.is_analog())
-			analog = &analoglist.append(*global_alloc(analog_field(field)));
+			analog = &analoglist.append(*new analog_field(field));
 
 		// allocate a dynamic field for reading
 		if (field.has_dynamic_read())
-			readlist.append(*global_alloc(dynamic_field(field)));
+			readlist.append(*new dynamic_field(field));
 
 		// allocate a dynamic field for writing
 		if (field.has_dynamic_write())
-			writelist.append(*global_alloc(dynamic_field(field)));
+			writelist.append(*new dynamic_field(field));
 
 		// let the field initialize its live state
 		field.init_live_state(analog);
@@ -1956,7 +1956,7 @@ digital_joystick &ioport_manager::digjoystick(int player, int number)
 			return joystick;
 
 	// create a new one
-	return m_joystick_list.append(*global_alloc(digital_joystick(player, number)));
+	return m_joystick_list.append(*new digital_joystick(player, number));
 }
 
 
@@ -3011,7 +3011,7 @@ ioport_configurer& ioport_configurer::field_alloc(ioport_type type, ioport_value
 	// append the field
 	if (type != IPT_UNKNOWN && type != IPT_UNUSED)
 		m_curport->m_active |= mask;
-	m_curfield = &m_curport->m_fieldlist.append(*global_alloc(ioport_field(*m_curport, type, defval, mask, string_from_token(name))));
+	m_curfield = &m_curport->m_fieldlist.append(*new ioport_field(*m_curport, type, defval, mask, string_from_token(name)));
 
 	// reset the current setting
 	m_cursetting = nullptr;
@@ -3068,7 +3068,7 @@ ioport_configurer& ioport_configurer::setting_alloc(ioport_value value, const ch
 	if (m_curfield == nullptr)
 		throw emu_fatalerror("alloc_setting called with no active field (value=%X name=%s)\n", value, name);
 
-	m_cursetting = global_alloc(ioport_setting(*m_curfield, value & m_curfield->mask(), string_from_token(name)));
+	m_cursetting = new ioport_setting(*m_curfield, value & m_curfield->mask(), string_from_token(name));
 	// append a new setting
 	m_curfield->m_settinglist.append(*m_cursetting);
 	return *this;

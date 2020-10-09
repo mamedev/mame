@@ -154,7 +154,7 @@ WRITE_LINE_MEMBER( mm1_state::recall_w )
 {
 	LOG("RECALL %u\n", state);
 	m_recall = state;
-	if (state) m_fdc->soft_reset();
+	m_fdc->reset_w(state);
 }
 
 

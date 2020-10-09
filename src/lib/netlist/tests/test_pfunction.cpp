@@ -50,6 +50,11 @@ PTEST(pfunction, unary_minus)
 	PFUNCEXPECT("3*-trunc(3.2)", -9.0);
 	PFUNCEXPECT("3*-(3*2)", -18.0);
 	PFUNCEXPECT("3*-(2*1)^2", -12.0);
+	PEXPECT_NO_THROW(plib::pfunction<double>("(-3)")()); // fail
+}
+PTEST(pfunction, expect_throw)
+{
 	PEXPECT_THROW(plib::pfunction<double>("(3, 4)")(), plib::pexception);
-	PEXPECT_NO_THROW(plib::pfunction<double>("(3)")()); // fail
+	PEXPECT_THROW(plib::pfunction<double>("((3)")(), plib::pexception);
+	PEXPECT_THROW(plib::pfunction<double>("(3))")(), plib::pexception);
 }

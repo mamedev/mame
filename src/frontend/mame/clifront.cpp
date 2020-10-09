@@ -343,7 +343,7 @@ int cli_frontend::execute(std::vector<std::string> &args)
 	}
 
 	util::archive_file::cache_clear();
-	global_free(manager);
+	delete manager;
 
 	return m_result;
 }

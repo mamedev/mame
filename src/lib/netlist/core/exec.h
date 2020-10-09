@@ -38,10 +38,8 @@ namespace netlist
 		void process_queue(netlist_time_ext delta) noexcept;
 		void abort_current_queue_slice() noexcept
 		{
-			if (!NL_USE_QUEUE_STATS || !m_use_stats)
-				m_queue.retime<false>(detail::queue_t::entry_t(m_time, nullptr));
-			else
-				m_queue.retime<true>(detail::queue_t::entry_t(m_time, nullptr));
+			qremove(nullptr);
+			qpush(m_time, nullptr);
 		}
 
 		const detail::queue_t &queue() const noexcept { return m_queue; }
@@ -95,9 +93,8 @@ namespace netlist
 		const log_type &log() const noexcept { return m_state.log(); }
 
 		void print_stats() const;
-		bool use_stats() const { return m_use_stats; }
 
-		bool stats_enabled() const noexcept { return m_use_stats; }
+		constexpr bool stats_enabled() const noexcept { return m_use_stats; }
 		void enable_stats(bool val) noexcept { m_use_stats = val; }
 
 	private:
@@ -115,8 +112,8 @@ namespace netlist
 
 		//PALIGNAS_CACHELINE()
 		//PALIGNAS(16)
-		detail::queue_t                     m_queue;
 		bool                                m_use_stats;
+		detail::queue_t                     m_queue;
 		// performance
 		plib::pperftime_t<true>             m_stat_mainloop;
 		plib::pperfcount_t<true>            m_perf_out_processed;

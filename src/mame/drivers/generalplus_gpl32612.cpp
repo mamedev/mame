@@ -184,6 +184,11 @@ ROM_START( jak_prhp )
 	ROM_LOAD( "mx30lf1g08aa.u2", 0x000000, 0x8400000, CRC(4ccd7e53) SHA1(decbd424f088d180776a817c80b147d6a887e5c1) )
 ROM_END
 
+// uncertain hardware type, ARM based, has GPNAND strings
+ROM_START( zippity )
+	ROM_REGION( 0x10800000, "nandrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "zippity_mt29f2g08aacwp_2cda8015.bin", 0x0000, 0x10800000, CRC(16248b63) SHA1(3607337588a68052ef5c495b496aa3e0449d3eb6) )
+ROM_END
 
 void generalplus_gpl32612_game_state::nand_init(int blocksize, int blocksize_stripped)
 {
@@ -233,3 +238,6 @@ CONS( 200?, jak_tmnthp,      0,       0,      gpl32612, gpl32612, generalplus_gp
 CONS( 200?, jak_ddhp,        0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific Inc", "DreamWorks Dragons Hero Portal", MACHINE_IS_SKELETON )
 CONS( 200?, jak_prhp,        0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific Inc", "Power Rangers Super Megaforce Hero Portal", MACHINE_IS_SKELETON ) // from a PAL unit (probably not region specific)
 CONS( 200?, jak_dchp,        0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific Inc", "DC Super Heroes The Watchtower Hero Portal", MACHINE_IS_SKELETON )
+
+// Might not belong here, SoC is marked GPL32300A instead, but is still ARM based, and has GPNAND strings
+CONS( 201?, zippity,         0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "LeapFrog",         "Zippity (US)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

@@ -86,7 +86,7 @@ license:CC0
 		<element name="digit0" ref="digit"><bounds x="5.15" y="5.6" width="1" height="1.5" /></element>
 		<element name="digit1" ref="digit"><bounds x="6.15" y="5.6" width="1" height="1.5" /></element>
 
-	<!-- element (also allow clicking it) -->
+	<!-- bezel (also allow clicking it) -->
 
 		<element ref="static_gray"><bounds x="1.4" y="7.7" width="9.5" height="12.4" /></element>
 		<element ref="static_black"><bounds x="1.7" y="9.7" width="8.9" height="8.9" /></element>

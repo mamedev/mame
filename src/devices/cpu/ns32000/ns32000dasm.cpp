@@ -354,6 +354,10 @@ const char *const ns32000_disassembler::PR[] =
 {
 	"UPSR", "DCR", "BPC", "DSR", "CAR", "", "", "", "FP", "SP", "SB", "USP", "CFG", "PSR", "INTBASE", "MOD"
 };
+const char *const ns32000_disassembler::FP[] =
+{
+	"F0", "F1", "F2", "F3", "F4", "F5", "F6", "F7"
+};
 
 int8_t ns32000_disassembler::short2int(uint8_t val)
 {
@@ -508,7 +512,7 @@ inline std::string ns32000_disassembler::get_reg_list(offs_t &pc, const data_buf
 	return reg_list;
 }
 
-void ns32000_disassembler::stream_gen(std::ostream &stream, u8 gen_addr, u8 op_len, operand_class op_class, offs_t &pc, const data_buffer &opcodes)
+void ns32000_disassembler::stream_gen(std::ostream &stream, u8 gen_addr, u8 op_len, operand_class op_class, offs_t &pc, const data_buffer &opcodes, bool fpreg)
 {
 	uint8_t index_byte;
 	int32_t disp1, disp2;
@@ -518,7 +522,7 @@ void ns32000_disassembler::stream_gen(std::ostream &stream, u8 gen_addr, u8 op_l
 	case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06: case 0x07:
 		/* Register */
 		if (op_class != operand_class::ADDRESS)
-			util::stream_format(stream, "%s", R[gen_addr & 0x07]);
+			util::stream_format(stream, "%s", fpreg ? FP[gen_addr & 0x07] : R[gen_addr & 0x07]);
 		else
 			util::stream_format(stream, "(invalid)");
 		break;
@@ -541,20 +545,25 @@ void ns32000_disassembler::stream_gen(std::ostream &stream, u8 gen_addr, u8 op_l
 		/* Immediate */
 		if (op_class == operand_class::SOURCE || op_class == operand_class::BITPOS)
 		{
+			int64_t imm;
 			if (op_len == 0)
-				disp1 = int8_t(opcodes.r8(pc));
+				imm = int8_t(opcodes.r8(pc));
 			else if (op_len == 1)
-				disp1 = int16_t(swapendian_int16(opcodes.r16(pc)));
+				imm = int16_t(swapendian_int16(opcodes.r16(pc)));
+			else if (op_len == 3)
+				imm = int32_t(swapendian_int32(opcodes.r32(pc)));
 			else
-				disp1 = swapendian_int32(opcodes.r32(pc));
+				imm = int64_t(swapendian_int64(opcodes.r64(pc)));
 			if (op_class == operand_class::BITPOS)
-				util::stream_format(stream, "$%d", disp1);
+				util::stream_format(stream, "$%d", imm);
 			else if (op_len == 0)
-				util::stream_format(stream, "$0x%02X", uint8_t(disp1));
+				util::stream_format(stream, "$0x%02X", uint8_t(imm));
 			else if (op_len == 1)
-				util::stream_format(stream, "$0x%04X", uint16_t(disp1));
-			else
-				util::stream_format(stream, "$0x%08X", disp1);
+				util::stream_format(stream, "$0x%04X", uint16_t(imm));
+			else if (op_len == 3)
+				util::stream_format(stream, "$0x%08X", uint32_t(imm));
+			else if (op_len == 7)
+				util::stream_format(stream, "$0x%016X", imm);
 			pc += op_len + 1;
 		}
 		else
@@ -850,9 +859,21 @@ offs_t ns32000_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		mnemonic = mnemonic_index(Format9[Format9op(opcode)], iType[Format9i(opcode)], fType[Format9f(opcode)]);
 		switch (Format9op(opcode))
 		{
-		case 0x00: case 0x02: case 0x03: case 0x04: case 0x05: case 0x07:
+		case 0x00:
 			util::stream_format(stream, "%-8s ", mnemonic);
 			stream_gen(stream, Format9gen1(opcode), Format9i(opcode), operand_class::SOURCE, pc, opcodes);
+			util::stream_format(stream, ", ");
+			stream_gen(stream, Format9gen2(opcode), Format9i(opcode), operand_class::DESTINATION, pc, opcodes, true);
+			break;
+		case 0x02: case 0x03:
+			util::stream_format(stream, "%-8s ", mnemonic);
+			stream_gen(stream, Format9gen1(opcode), Format9f(opcode) ? 7 : 3, operand_class::SOURCE, pc, opcodes, true);
+			util::stream_format(stream, ", ");
+			stream_gen(stream, Format9gen2(opcode), Format9f(opcode) ? 3 : 7, operand_class::DESTINATION, pc, opcodes, true);
+			break;
+		case 0x04: case 0x05: case 0x07:
+			util::stream_format(stream, "%-8s ", mnemonic);
+			stream_gen(stream, Format9gen1(opcode), Format9f(opcode) ? 3 : 7, operand_class::SOURCE, pc, opcodes, true);
 			util::stream_format(stream, ", ");
 			stream_gen(stream, Format9gen2(opcode), Format9i(opcode), operand_class::DESTINATION, pc, opcodes);
 			break;
@@ -873,9 +894,9 @@ offs_t ns32000_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		{
 		case 0x00: case 0x01: case 0x02: case 0x04: case 0x05 : case 0x08: case 0x0c : case 0x0d:
 			util::stream_format(stream, "%-8s ", mnemonic);
-			stream_gen(stream, Format11gen1(opcode), Format11f(opcode), operand_class::SOURCE, pc, opcodes);
+			stream_gen(stream, Format11gen1(opcode), Format11f(opcode) ? 3 : 7, operand_class::SOURCE, pc, opcodes, true);
 			util::stream_format(stream, ",");
-			stream_gen(stream, Format11gen2(opcode), Format11f(opcode), operand_class::DESTINATION, pc, opcodes);
+			stream_gen(stream, Format11gen2(opcode), Format11f(opcode) ? 3 : 7, operand_class::DESTINATION, pc, opcodes, true);
 			break;
 		default: /* Trap */
 			util::stream_format(stream, "%-8s ", mnemonic);

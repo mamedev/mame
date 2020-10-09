@@ -45,16 +45,17 @@
  *
  *************************************/
 
-cinemat_audio_device_base::cinemat_audio_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 inputs_mask, void (*netlist)(netlist::nlparse_t &), double output_scale)
-	: device_t(mconfig, type, tag, owner, clock)
-	, m_out_input(*this, "sound_nl:out_%u", 0)
-	, m_inputs_mask(inputs_mask)
-	, m_netlist(netlist)
-	, m_output_scale(output_scale)
+cinemat_audio_device_base::cinemat_audio_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 inputs_mask, void (*netlist)(netlist::nlparse_t &), double output_scale) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_mixer_interface(mconfig, *this),
+	m_out_input(*this, "sound_nl:out_%u", 0),
+	m_inputs_mask(inputs_mask),
+	m_netlist(netlist),
+	m_output_scale(output_scale)
 {
 }
 
-void cinemat_audio_device_base::configure_latch_inputs(ls259_device &latch, u8 mask)
+cinemat_audio_device_base &cinemat_audio_device_base::configure_latch_inputs(ls259_device &latch, u8 mask)
 {
 	if (mask == 0)
 		mask = m_inputs_mask;
@@ -70,48 +71,34 @@ void cinemat_audio_device_base::configure_latch_inputs(ls259_device &latch, u8 m
 		latch.q_out_cb<4>().set(write_line_delegate(*this, FUNC(cinemat_audio_device_base::sound_w<4>)));
 	if (BIT(mask, 7))
 		latch.q_out_cb<7>().set(write_line_delegate(*this, FUNC(cinemat_audio_device_base::sound_w<7>)));
+	return *this;
 }
 
 void cinemat_audio_device_base::device_add_mconfig(machine_config &config)
 {
-	SPEAKER(config, "mono").front_center();
+	NETLIST_SOUND(config, "sound_nl", 48000)
+		.set_source(m_netlist)
+		.add_route(ALL_OUTPUTS, *this, 1.0);
 
-	if (m_netlist != nullptr)
-	{
-		NETLIST_SOUND(config, "sound_nl", 48000)
-			.set_source(m_netlist)
-			.add_route(ALL_OUTPUTS, "mono", 1.0);
+	if ((m_inputs_mask & 0x01) != 0)
+		NETLIST_LOGIC_INPUT(config, m_out_input[0], "I_OUT_0.IN", 0);
+	if ((m_inputs_mask & 0x02) != 0)
+		NETLIST_LOGIC_INPUT(config, m_out_input[1], "I_OUT_1.IN", 0);
+	if ((m_inputs_mask & 0x04) != 0)
+		NETLIST_LOGIC_INPUT(config, m_out_input[2], "I_OUT_2.IN", 0);
+	if ((m_inputs_mask & 0x08) != 0)
+		NETLIST_LOGIC_INPUT(config, m_out_input[3], "I_OUT_3.IN", 0);
+	if ((m_inputs_mask & 0x10) != 0)
+		NETLIST_LOGIC_INPUT(config, m_out_input[4], "I_OUT_4.IN", 0);
+	if ((m_inputs_mask & 0x80) != 0)
+		NETLIST_LOGIC_INPUT(config, m_out_input[7], "I_OUT_7.IN", 0);
 
-		if ((m_inputs_mask & 0x01) != 0)
-			NETLIST_LOGIC_INPUT(config, m_out_input[0], "I_OUT_0.IN", 0);
-		if ((m_inputs_mask & 0x02) != 0)
-			NETLIST_LOGIC_INPUT(config, m_out_input[1], "I_OUT_1.IN", 0);
-		if ((m_inputs_mask & 0x04) != 0)
-			NETLIST_LOGIC_INPUT(config, m_out_input[2], "I_OUT_2.IN", 0);
-		if ((m_inputs_mask & 0x08) != 0)
-			NETLIST_LOGIC_INPUT(config, m_out_input[3], "I_OUT_3.IN", 0);
-		if ((m_inputs_mask & 0x10) != 0)
-			NETLIST_LOGIC_INPUT(config, m_out_input[4], "I_OUT_4.IN", 0);
-		if ((m_inputs_mask & 0x80) != 0)
-			NETLIST_LOGIC_INPUT(config, m_out_input[7], "I_OUT_7.IN", 0);
-
-		NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(m_output_scale, 0.0);
-	}
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(m_output_scale, 0.0);
 }
 
 void cinemat_audio_device_base::device_start()
 {
-#if ENABLE_NETLIST_LOGGING
-	m_logfile = fopen("cinemat.csv", "w");
-#endif
-}
-
-void cinemat_audio_device_base::device_stop()
-{
-#if ENABLE_NETLIST_LOGGING
-	if (m_logfile != nullptr)
-		fclose(m_logfile);
-#endif
+	save_item(NAME(m_inputs));
 }
 
 void cinemat_audio_device_base::input_set(int bit, int state)
@@ -119,18 +106,9 @@ void cinemat_audio_device_base::input_set(int bit, int state)
 	u8 oldvals = m_inputs;
 	m_inputs = (m_inputs & ~(1 << bit)) | ((state & 1) << bit);
 	if (oldvals != m_inputs)
-	{
-#if ENABLE_NETLIST_LOGGING
-		attotime time = machine().scheduler().time();
-		for (int bit = 0; bit < 8; bit++)
-			if (((m_inputs_mask >> bit) & 1) != 0)
-				if ((((m_inputs ^ oldvals) >> bit) & 1) != 0)
-					fprintf(m_logfile, "%s,I_OUT_%u.IN,%d\n", time.as_string(), bit, (m_inputs >> bit) & 1);
-#endif
 		for (int index = 0; index < 8; index++)
 			if (m_out_input[index] != nullptr)
 				m_out_input[index]->write_line(BIT(m_inputs, index));
-	}
 }
 
 

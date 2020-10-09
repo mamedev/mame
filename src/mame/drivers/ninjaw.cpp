@@ -373,6 +373,7 @@ void ninjaw_state::pancontrol_w(offs_t offset, u8 data)
 {
 	filter_volume_device *flt = nullptr;
 	offset &= 3;
+	offset ^= 1;
 
 	switch (offset)
 	{

@@ -192,7 +192,11 @@ chd_error do_open_disk(const emu_options &options, std::initializer_list<std::re
 
 const rom_entry *rom_first_region(const device_t &device)
 {
-	const rom_entry *romp = &device.rom_region_vector().front();
+	return rom_first_region(&device.rom_region_vector().front());
+}
+
+const rom_entry *rom_first_region(const rom_entry *romp)
+{
 	while (ROMENTRY_ISPARAMETER(romp) || ROMENTRY_ISSYSTEM_BIOS(romp) || ROMENTRY_ISDEFAULT_BIOS(romp))
 		romp++;
 	return !ROMENTRY_ISEND(romp) ? romp : nullptr;

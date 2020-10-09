@@ -1400,6 +1400,45 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="dev_toolbox_42">
+		<description>Developer Toolbox 4.2</description>
+		<year>1994</year> <!-- 08/94 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: nixzone.nl -->
+			<diskarea name="cdrom">
+				<disk name="devtoolbox42" sha1="9b85e8d9d35635794408a8ce7d168af96e14bc47" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dev_toolbox_61">
+		<description>Developer Toolbox 6.1</description>
+		<year>1996</year> <!-- 09/96 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="Developer Toolbox 6.1 (CD 0)" />
+			<!-- Origin: nixzone.nl -->
+			<diskarea name="cdrom">
+				<disk name="devtoolbox61-0" sha1="191db2ed342be4f514e9be29e8793fbc5718bf77" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="Developer Toolbox 6.1 (CD 1)" />
+			<!-- Origin: nixzone.nl -->
+			<diskarea name="cdrom">
+				<disk name="devtoolbox61-1" sha1="c978ecf1333446424d952646d95ce52b2c20496e" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_id" value="Developer Toolbox 6.1 (CD 2)" />
+			<!-- Origin: nixzone.nl -->
+			<diskarea name="cdrom">
+				<disk name="devtoolbox61-2" sha1="928cfe53e856de90a554fe1b82594b119b7b255c" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="dmdo_1_1">
 		<description>Digital Media Dev Option 1.1</description>
 		<year>1993</year> <!-- 03/93 -->

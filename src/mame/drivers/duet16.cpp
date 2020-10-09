@@ -111,8 +111,7 @@ void duet16_state::fdcctrl_w(u8 data)
 
 	m_fd[0]->get_device()->mon_w(!BIT(data, 0));
 	m_fd[1]->get_device()->mon_w(!BIT(data, 0));
-	if(!BIT(data, 1))
-		m_fdc->soft_reset();
+	m_fdc->reset_w(!BIT(data, 1));
 
 	// TODO: bit 3 = LSPD
 }

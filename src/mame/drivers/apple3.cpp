@@ -139,6 +139,7 @@ void apple3_state::apple3(machine_config &config)
 
 	/* rtc */
 	MM58167(config, m_rtc, 32.768_kHz_XTAL);
+	m_rtc->irq().set(m_via[1], FUNC(via6522_device::write_ca1));
 
 	/* via */
 	VIA6522(config, m_via[0], 14.318181_MHz_XTAL / 14);

@@ -366,7 +366,7 @@ void mfm_harddisk_device::device_start()
 	m_current_cylinder = m_landing_zone; // Park position
 	m_spinup_timer->adjust(attotime::from_msec(m_spinupms));
 
-	m_cache = global_alloc(mfmhd_trackimage_cache(machine()));
+	m_cache = std::make_unique<mfmhd_trackimage_cache>(machine());
 
 	// In 5 second periods, check whether the cache has dirty lines
 	m_cache_timer->adjust(attotime::from_msec(5000), 0, attotime::from_msec(5000));
@@ -411,7 +411,7 @@ void mfm_harddisk_device::device_reset()
 
 void mfm_harddisk_device::device_stop()
 {
-	if (m_cache!=nullptr) global_free(m_cache);
+	m_cache.reset();
 }
 
 /*
@@ -1010,9 +1010,8 @@ mfmhd_trackimage_cache::~mfmhd_trackimage_cache()
 
 	while (current != nullptr)
 	{
-		global_free_array(current->encdata);
 		mfmhd_trackimage* currenttmp = current->next;
-		global_free(current);
+		delete current;
 		current = currenttmp;
 	}
 }
@@ -1025,7 +1024,7 @@ void mfmhd_trackimage_cache::write_back_one()
 	{
 		if (current->dirty)
 		{
-			m_mfmhd->write_track(current->encdata, current->cylinder, current->head);
+			m_mfmhd->write_track(current->encdata.get(), current->cylinder, current->head);
 			current->dirty = false;
 			break;
 		}
@@ -1045,7 +1044,7 @@ void mfmhd_trackimage_cache::cleanup()
 		if (TRACE_CACHE) m_machine.logerror("[%s:cache] MFM HD cache: evict line cylinder=%d head=%d\n", m_mfmhd->tag(), current->cylinder, current->head);
 		if (current->dirty)
 		{
-			m_mfmhd->write_track(current->encdata, current->cylinder, current->head);
+			m_mfmhd->write_track(current->encdata.get(), current->cylinder, current->head);
 			current->dirty = false;
 		}
 		mfmhd_trackimage* currenttmp = current->next;
@@ -1087,11 +1086,11 @@ void mfmhd_trackimage_cache::init(mfm_harddisk_device* mfmhd, int tracksize, int
 	{
 		if (TRACE_DETAIL) m_machine.logerror("[%s:cache] MFM HD allocate cache slot\n", mfmhd->tag());
 		previous = current;
-		current = global_alloc(mfmhd_trackimage);
-		current->encdata = global_alloc_array(uint16_t, tracksize);
+		current = new mfmhd_trackimage;
+		current->encdata = std::make_unique<uint16_t []>(tracksize);
 
 		// Load the first tracks into the slots
-		state = m_mfmhd->load_track(current->encdata, cylinder, head);
+		state = m_mfmhd->load_track(current->encdata.get(), cylinder, head);
 		if (state != CHDERR_NONE) throw emu_fatalerror("Cannot load (c=%d,h=%d) from hard disk", cylinder, head);
 
 		current->dirty = false;
@@ -1148,7 +1147,7 @@ uint16_t* mfmhd_trackimage_cache::get_trackimage(int cylinder, int head)
 					current->next = m_tracks;  // put the previous head into the next field
 					m_tracks = current;        // set this line as new head
 				}
-				return current->encdata;
+				return current->encdata.get();
 			}
 			else
 			{
@@ -1168,11 +1167,11 @@ uint16_t* mfmhd_trackimage_cache::get_trackimage(int cylinder, int head)
 
 		if (current->dirty)
 		{
-			m_mfmhd->write_track(current->encdata, current->cylinder, current->head);
+			m_mfmhd->write_track(current->encdata.get(), current->cylinder, current->head);
 			current->dirty = false;
 		}
 
-		state = m_mfmhd->load_track(current->encdata, cylinder, head);
+		state = m_mfmhd->load_track(current->encdata.get(), cylinder, head);
 
 		current->dirty = false;
 		current->cylinder = cylinder;

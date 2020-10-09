@@ -107,7 +107,7 @@ public:
 		uint64_t actual_length() const { return m_length; }
 		const util::hash_collection &expected_hashes() const { return m_exphashes; }
 		const util::hash_collection &actual_hashes() const { return m_hashes; }
-		device_t *shared_device() const { return m_shared_device; }
+		std::add_pointer_t<device_type> shared_device() const { return m_shared_device; }
 
 		// setters
 		void set_status(audit_status status, audit_substatus substatus)
@@ -128,22 +128,22 @@ public:
 			m_length = length;
 		}
 
-		void set_shared_device(device_t *shared_device)
+		void set_shared_device(std::add_pointer_t<device_type> shared_device)
 		{
 			m_shared_device = shared_device;
 		}
 
 	private:
 		// internal state
-		media_type              m_type;                 // type of item that was audited
-		audit_status            m_status;               // status of audit on this item
-		audit_substatus         m_substatus;            // finer-detail status
-		const char *            m_name;                 // name of item
-		uint64_t                m_explength;            // expected length of item
-		uint64_t                m_length;               // actual length of item
-		util::hash_collection   m_exphashes;            // expected hash data
-		util::hash_collection   m_hashes;               // actual hash information
-		device_t *              m_shared_device;        // device that shares the rom
+		media_type                      m_type;             // type of item that was audited
+		audit_status                    m_status;           // status of audit on this item
+		audit_substatus                 m_substatus;        // finer-detail status
+		const char *                    m_name;             // name of item
+		uint64_t                        m_explength;        // expected length of item
+		uint64_t                        m_length;           // actual length of item
+		util::hash_collection           m_exphashes;        // expected hash data
+		util::hash_collection           m_hashes;           // actual hash information
+		std::add_pointer_t<device_type> m_shared_device;    // device that shares the ROM
 	};
 	using record_list = std::list<audit_record>;
 
@@ -166,7 +166,6 @@ private:
 	audit_record &audit_one_rom(const std::vector<std::string> &searchpath, const rom_entry *rom);
 	template <typename... T> audit_record &audit_one_disk(const rom_entry *rom, T &&... args);
 	void compute_status(audit_record &record, const rom_entry *rom, bool found);
-	device_t *find_shared_device(device_t &device, const char *name, const util::hash_collection &romhashes, uint64_t romlength);
 
 	// internal state
 	record_list                 m_record_list;

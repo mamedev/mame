@@ -9,14 +9,12 @@ It is an electromechanical arcade lightgun game. There is no screen, feedback
 is with motorized elements, lamps and 7segs, and of course sounds and music.
 
 To shoot the targets in MAME, either enable -mouse and click on one of the
-cosmogang lanes(left mouse button doubles as gun trigger by default).
+pink aliens(left mouse button doubles as gun trigger by default).
 Or, configure the gun aim inputs and share them with the trigger. For example
 use Z,X,C,V,B for the gun aims, and "Z or X or C or V or B" for the trigger.
 
 TODO:
 - dump/add Japanese version
-- game can't be played properly within MAME's constraints (mechanical stuff,
-  and the lightguns linked to it)
 - shot target is sometimes ignored, maybe a BTANB? since it's easy to dismiss
   on the real thing as a missed aim. It turns on the lightgun lamp but then
   doesn't read the lightsensor.
@@ -346,14 +344,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(cgang_state::door_motor_tick)
 
 void cgang_state::refresh_motor_output()
 {
-	// output motor positions in range 0-100
+	// output motor positions in range 0-255
 	for (int i = 0; i < 5; i++)
 	{
-		m_cg_count[i] = int((m_cg_motor_pos[i] / float(CG_MOTOR_LIMIT)) * 100.0 + 0.5);
-		m_en_count[i] = int((m_en_pos[i] / float(CG_MOTOR_LIMIT)) * 100.0 + 0.5);
+		m_cg_count[i] = int((m_cg_motor_pos[i] / float(CG_MOTOR_LIMIT)) * 255.0 + 0.5);
+		m_en_count[i] = int((m_en_pos[i] / float(CG_MOTOR_LIMIT)) * 255.0 + 0.5);
 	}
 
-	m_door_count = (m_conf->read() & 1) ? int((m_door_motor_pos / float(DOOR_MOTOR_LIMIT)) * 100.0 + 0.5) : 0;
+	m_door_count = (m_conf->read() & 1) ? int((m_door_motor_pos / float(DOOR_MOTOR_LIMIT)) * 255.0 + 0.5) : 0;
 }
 
 

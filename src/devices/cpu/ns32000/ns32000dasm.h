@@ -109,6 +109,7 @@ private:
 	static char const *const R[];
 	static char const *const M[];
 	static char const *const PR[];
+	static char const *const FP[];
 
 	std::string mnemonic_index(std::string form, const std::string &itype, const std::string &ftype);
 	uint8_t opcode_format(uint8_t byte);
@@ -119,7 +120,7 @@ private:
 	static inline std::string get_options(uint8_t opts);
 	static inline std::string get_reg_list(offs_t &pc, const data_buffer &opcodes, bool reverse);
 
-	void stream_gen(std::ostream &stream, u8 gen_addr, u8 op_len, operand_class op_class, offs_t &pc, const data_buffer &opcodes);
+	void stream_gen(std::ostream &stream, u8 gen_addr, u8 op_len, operand_class op_class, offs_t &pc, const data_buffer &opcodes, bool fpreg = false);
 
 	u32 m_base_pc;
 };

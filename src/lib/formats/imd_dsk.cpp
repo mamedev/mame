@@ -158,18 +158,18 @@ static floperr_t imd_expand_file(floppy_image_legacy *floppy , uint64_t offset ,
 		return FLOPPY_ERROR_SUCCESS;
 	}
 
-	auto buffer = global_alloc_array(uint8_t , size_after_off);
+	auto buffer = std::make_unique<uint8_t []>(size_after_off);
 
 	// Read the part of file after offset
-	floppy_image_read(floppy , buffer , offset , size_after_off);
+	floppy_image_read(floppy, buffer.get(), offset, size_after_off);
 
 	// Add zeroes
-	floppy_image_write_filler(floppy , 0 , offset , amount);
+	floppy_image_write_filler(floppy, 0, offset, amount);
 
 	// Write back the part of file after offset
-	floppy_image_write(floppy, buffer, offset + amount, size_after_off);
+	floppy_image_write(floppy, buffer.get(), offset + amount, size_after_off);
 
-	global_free_array(buffer);
+	buffer.reset();
 
 	// Update track offsets
 	struct imddsk_tag *tag = get_tag(floppy);
@@ -528,7 +528,7 @@ bool imd_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 				sects[i].bad_crc = stype == 5 || stype == 6 || stype == 7 || stype == 8;
 
 				if(stype == 2 || stype == 4 || stype == 6 || stype == 8) {
-					sects[i].data = global_alloc_array(uint8_t, actual_size);
+					sects[i].data = new uint8_t [actual_size];
 					memset(sects[i].data, img[pos++], actual_size);
 				} else {
 					sects[i].data = &img[pos];
@@ -547,7 +547,7 @@ bool imd_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 
 		for(int i=0; i< m_sector_count.back(); i++)
 			if(sects[i].data && (sects[i].data < &img[0] || sects[i].data >= (&img[0] + size)))
-				global_free_array(sects[i].data);
+				delete [] sects[i].data;
 	}
 
 	return true;

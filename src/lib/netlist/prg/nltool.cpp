@@ -703,7 +703,7 @@ void tool_app_t::static_compile()
 		for (auto &e : map)
 		{
 			sout << "// " << putf8string(e.second.m_module) << "\n";
-			sout << "\t{\"" << putf8string(e.first) << "\", reinterpret_cast<void *>(&" << putf8string(e.first) << ")},\n";
+			sout << "\t{\"" << putf8string(e.first) << "\", reinterpret_cast<void *>(&" << putf8string(e.first) << ")}, // NOLINT\n";
 		}
 		sout << "#endif\n\n";
 		sout << "{\"\", nullptr}\n";
@@ -1174,7 +1174,7 @@ void tool_app_t::listmodels()
 	{
 		auto model = nt.setup().models().get_model(e);
 
-		elems.push_back({model.type(), e});
+		elems.emplace_back(model.type(), e);
 	}
 
 	std::sort(elems.begin(), elems.end(), comp);

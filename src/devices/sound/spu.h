@@ -49,7 +49,7 @@ protected:
 	// internal state
 	devcb_write_line m_irq_handler;
 
-	unsigned char *spu_ram;
+	std::unique_ptr<unsigned char []> spu_ram;
 	reverb *rev;
 	unsigned int taddr;
 	unsigned int sample_t;
@@ -73,13 +73,13 @@ protected:
 	bool status_enabled, xa_playing, cdda_playing;
 	int xa_voll, xa_volr, changed_xa_vol;
 	voiceinfo *voice;
-	sample_cache **cache;
+	std::unique_ptr<sample_cache * []> cache;
 	float samples_per_frame;
 	float samples_per_cycle;
 
 	static float freq_multiplier;
 
-	unsigned char *output_buf[4];
+	std::unique_ptr<unsigned char []> output_buf[4];
 	unsigned int output_head;
 	unsigned int output_tail;
 	unsigned int output_size;

@@ -871,7 +871,7 @@ uint8_t apple2_state::read_floatingbus()
 
 	// calculate vertical scanning state
 	//
-	v_line  = (i / kHClocks) + 188; // which vertical scanning line
+	v_line  = (i / kHClocks) + 192; // which vertical scanning line
 	v_state = kVLine0State + v_line; // V state bits
 	if ((v_line >= kVPresetLine)) // check for previous vertical state preset
 	{

@@ -3141,7 +3141,8 @@ badlandsb2                      // bootleg set 2
 bagman                          // (c) 1982
 bagmanj                         // (c) 1982
 bagmans                         // (c) 1982 + Stern license
-bagmans2                        // (c) 1982 + Stern license
+bagmans3                        // (c) 1982 + Stern license
+bagmans4                        // (c) 1982 + Stern license
 bagnard                         // (c) 1982
 bagnarda                        // (c) 1982
 bagnardi                        // (c) 1983 + Itisa license
@@ -3277,7 +3278,8 @@ bbcmc                           // 1986 BBC Master Compact
 bbcmc_ar                        // 1986 BBC Master Compact (Arabic)
 bbcmet                          // 1986 BBC Master ET
 bbcmt                           // 1986 BBC Master Turbo
-cfa3000                         // 1989 Henson CFA 3000
+cfa3000bp                       // 1989 Henson CFA 3000 (B+)
+cfa3000                         // 1989 Henson CFA 3000 (Master)
 daisy                           // 1987 Comus Daisy
 discmon                         // 1988 Arbiter Discmonitor
 discmate                        // 1988 Arbiter Discmate
@@ -9305,6 +9307,7 @@ ilpag                           // (c) 199? unknown
 maxidbl                         // (c) 1992 Blitz Systems Inc.
 megadble                        // (c) 1990 Blitz Systems Inc.
 megadblj                        // (c) 1990 Blitz Systems Inc.
+megastrp                        // (c) 1992 Blitz Systems Inc.
 poker52                         // (c) 1993 Blitz Systems Inc. ?
 steaser                         // (c) 1993 unknown
 texasrls                        // (c) 1998 Cadillac Jack
@@ -14807,9 +14810,12 @@ suprpokrb                       // (c) 1986 Grayhound Electronics
 rp200
 
 @source:generalplus_gpl_unknown.cpp
+mapacman
+taspinv
+
+@source:generalplus_gpl162xx_lcdtype.cpp
 pcp8718
 pcp8728
-unkunsp
 bkid218
 
 @source:generalplus_gpl16250_mobigo.cpp
@@ -14844,6 +14850,7 @@ gormiti
 tkmag220                        //
 myac220
 imgame
+beijuehh
 
 @source:generalplus_gpl16250_romram.cpp
 paccon
@@ -14866,6 +14873,7 @@ jak_tmnthp
 jak_dchp
 jak_ddhp
 jak_prhp
+zippity
 
 @source:geneve.cpp
 geneve                          // 1987 Myarc Geneve 9640
@@ -32168,6 +32176,8 @@ ablwikid
 maxx5in1
 maxx6in1
 max10in1
+vsmaxx25
+vsmaxx15
 
 @source:nes_vt.cpp
 vdogdeme
@@ -32201,11 +32211,15 @@ rtvgc300
 rtvgc300fz
 red5mam
 cybar120
+sen101
 mc_dg101
 mc_aa2
 mc_105te
 mc_sp69
 vsmaxx17
+vsmaxtx2
+vsmaxx77
+vsmaxxvd
 polmega
 silv35
 lpgm240
@@ -35361,6 +35375,7 @@ sarpc_j233                      //
 
 @source:rltennis.cpp
 rltennis                        // (c) 1993 TCH
+rltennisa                       // (c) 1993 TCH
 
 @source:rm380z.cpp
 rm380z                          //
@@ -38200,6 +38215,7 @@ lexizeus                        // Lexibook
 lexiseal                        //
 discpal
 vgcaplet
+vgcap35
 vsplus
 
 @source:spg2xx_mysprtch.cpp

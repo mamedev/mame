@@ -1611,14 +1611,14 @@ tilemap_manager::~tilemap_manager()
 tilemap_t &tilemap_manager::create(device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, u16 tilewidth, u16 tileheight, u32 cols, u32 rows, tilemap_t *allocated)
 {
 	if (!allocated)
-		allocated = global_alloc(tilemap_t)(machine().root_device());
+		allocated = new tilemap_t(machine().root_device());
 	return m_tilemap_list.append(allocated->init(*this, decoder, tile_get_info, mapper, tilewidth, tileheight, cols, rows));
 }
 
 tilemap_t &tilemap_manager::create(device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_standard_mapper mapper, u16 tilewidth, u16 tileheight, u32 cols, u32 rows, tilemap_t *allocated)
 {
 	if (!allocated)
-		allocated = global_alloc(tilemap_t)(machine().root_device());
+		allocated = new tilemap_t(machine().root_device());
 	return m_tilemap_list.append(allocated->init(*this, decoder, tile_get_info, mapper, tilewidth, tileheight, cols, rows));
 }
 

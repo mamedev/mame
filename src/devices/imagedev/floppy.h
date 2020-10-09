@@ -154,7 +154,7 @@ protected:
 
 	floppy_image_format_t *input_format;
 	floppy_image_format_t *output_format;
-	floppy_image          *image;
+	std::unique_ptr<floppy_image> image;
 	char                  extension_list[256];
 	floppy_image_format_t *fif_list;
 	emu_timer             *index_timer;

@@ -1,12 +1,27 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#include <cassert>
 #include "ipf_dsk.h"
+
+#include <cassert>
+
 
 const floppy_format_type FLOPPY_IPF_FORMAT = &floppy_image_format_creator<ipf_format>;
 
-ipf_format::ipf_format(): tinfos(nullptr), tcount(0), type(0), release(0), revision(0), encoder_type(0),
-encoder_revision(0), origin(0), min_cylinder(0), max_cylinder(0), min_head(0), max_head(0), credit_day(0), credit_time(0)
+ipf_format::ipf_format() :
+	tinfos(),
+	tcount(0),
+	type(0),
+	release(0),
+	revision(0),
+	encoder_type(0),
+	encoder_revision(0),
+	origin(0),
+	min_cylinder(0),
+	max_cylinder(0),
+	min_head(0),
+	max_head(0),
+	credit_day(0),
+	credit_time(0)
 {
 }
 
@@ -84,12 +99,11 @@ bool ipf_format::parse(std::vector<uint8_t> &data, floppy_image *image)
 {
 	image->set_variant(floppy_image::DSDD); // Not handling anything else yet
 	tcount = 84*2+1; // Usual max
-	tinfos = global_alloc_array_clear<track_info>(tcount);
+	tinfos.resize(tcount);
 	bool res = scan_all_tags(data);
 	if(res)
 		res = generate_tracks(image);
-	global_free_array(tinfos);
-	tinfos = nullptr;
+	tinfos.clear();
 	return res;
 }
 
@@ -121,14 +135,11 @@ ipf_format::track_info *ipf_format::get_index(uint32_t idx)
 	if(idx > 1000)
 		return nullptr;
 	if(idx >= tcount) {
-		auto ti1 = global_alloc_array_clear<track_info>(idx+1);
-		memcpy(ti1, tinfos, tcount*sizeof(tinfos));
-		global_free_array(tinfos);
+		tinfos.resize(idx+1);
 		tcount = idx+1;
-		tinfos = ti1;
 	}
 
-	return tinfos+idx;
+	return &tinfos[idx];
 }
 
 bool ipf_format::parse_imge(const uint8_t *imge)
@@ -246,7 +257,7 @@ bool ipf_format::scan_all_tags(std::vector<uint8_t> &data)
 bool ipf_format::generate_tracks(floppy_image *image)
 {
 	for(uint32_t i = 0; i != tcount; i++) {
-		track_info *t = tinfos + i;
+		track_info *t = &tinfos[i];
 		if(t->info_set && t->data) {
 			if(!generate_track(t, image))
 				return false;

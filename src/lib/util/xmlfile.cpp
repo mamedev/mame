@@ -31,7 +31,6 @@ namespace {
 ***************************************************************************/
 
 constexpr unsigned TEMP_BUFFER_SIZE(4096U);
-std::locale const f_portable_locale("C");
 
 
 /***************************************************************************
@@ -629,7 +628,7 @@ long long data_node::get_attribute_int(const char *attribute, long long defvalue
 		return defvalue;
 
 	std::istringstream stream;
-	stream.imbue(f_portable_locale);
+	stream.imbue(std::locale::classic());
 	long long result;
 	if (string[0] == '$')
 	{
@@ -694,7 +693,7 @@ float data_node::get_attribute_float(const char *attribute, float defvalue) cons
 		return defvalue;
 
 	std::istringstream stream(string);
-	stream.imbue(f_portable_locale);
+	stream.imbue(std::locale::classic());
 	float result;
 	return (stream >> result) ? result : defvalue;
 }
@@ -732,7 +731,7 @@ void data_node::set_attribute(const char *name, const char *value)
 
 void data_node::set_attribute_int(const char *name, long long value)
 {
-	set_attribute(name, string_format(f_portable_locale, "%d", value).c_str());
+	set_attribute(name, string_format(std::locale::classic(), "%d", value).c_str());
 }
 
 
@@ -743,7 +742,7 @@ void data_node::set_attribute_int(const char *name, long long value)
 
 void data_node::set_attribute_float(const char *name, float value)
 {
-	set_attribute(name, string_format(f_portable_locale, "%f", value).c_str());
+	set_attribute(name, string_format(std::locale::classic(), "%f", value).c_str());
 }
 
 

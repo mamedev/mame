@@ -333,6 +333,7 @@ gb.cpp
 gba.cpp
 gem_rp.cpp
 generalplus_gpl_unknown.cpp
+generalplus_gpl162xx_lcdtype.cpp
 generalplus_gpl16250_mobigo.cpp
 generalplus_gpl16250_nand.cpp
 generalplus_gpl16250_rom.cpp

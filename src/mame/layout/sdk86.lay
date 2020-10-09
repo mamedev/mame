@@ -30,16 +30,4 @@ copyright-holders:Robbbert
 		</group>
 	</view>
 
-	<view name="LED Displays with Terminal">
-		<bounds left="0" top="0" right="362" bottom="340.5" />
-
-		<screen index="0">
-			<bounds left="0" top="69" right="362" bottom="340.5" />
-		</screen>
-
-		<group ref="leds">
-			<bounds left="10" top="10" right="352" bottom="59" />
-		</group>
-	</view>
-
 </mamelayout>

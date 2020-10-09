@@ -103,7 +103,7 @@
 	NET_REGISTER_DEVEXT(CS, __VA_ARGS__)
 
 // ---------------------------------------------------------------------
-// Source: ../devices/nld_2102A.cpp
+// Source: ../devices/nld_2102a.cpp
 // ---------------------------------------------------------------------
 
 // usage       : RAM_2102A(name, CEQ, A0, A1, A2, A3, A4, A5, A6, A7, A8, A9, RWQ, DI)
@@ -520,7 +520,7 @@
 	NET_REGISTER_DEVEXT(TTL_8277, __VA_ARGS__)
 
 // ---------------------------------------------------------------------
-// Source: ../devices/nld_82S115.cpp
+// Source: ../devices/nld_82s115.cpp
 // ---------------------------------------------------------------------
 
 // usage       : PROM_82S115(name, CE1Q, CE2, A0, A1, A2, A3, A4, A5, A6, A7, A8, STROBE)
@@ -529,7 +529,7 @@
 	NET_REGISTER_DEVEXT(PROM_82S115, __VA_ARGS__)
 
 // ---------------------------------------------------------------------
-// Source: ../devices/nld_82S16.cpp
+// Source: ../devices/nld_82s16.cpp
 // ---------------------------------------------------------------------
 
 // usage       : TTL_82S16(name, )
@@ -817,6 +817,14 @@
 #define CD4070_GATE(...)                                                   \
 	NET_REGISTER_DEVEXT(CD4070_GATE, __VA_ARGS__)
 
+// usage       : CD4071_GATE(name, )
+#define CD4071_GATE(...)                                                   \
+	NET_REGISTER_DEVEXT(CD4071_GATE, __VA_ARGS__)
+
+// usage       : CD4081_GATE(name, )
+#define CD4081_GATE(...)                                                   \
+	NET_REGISTER_DEVEXT(CD4081_GATE, __VA_ARGS__)
+
 // usage       : CD4001_DIP(name, )
 #define CD4001_DIP(...)                                                   \
 	NET_REGISTER_DEVEXT(CD4001_DIP, __VA_ARGS__)
@@ -840,6 +848,14 @@
 // usage       : CD4070_DIP(name, )
 #define CD4070_DIP(...)                                                   \
 	NET_REGISTER_DEVEXT(CD4070_DIP, __VA_ARGS__)
+
+// usage       : CD4071_DIP(name, )
+#define CD4071_DIP(...)                                                   \
+	NET_REGISTER_DEVEXT(CD4071_DIP, __VA_ARGS__)
+
+// usage       : CD4081_DIP(name, )
+#define CD4081_DIP(...)                                                   \
+	NET_REGISTER_DEVEXT(CD4081_DIP, __VA_ARGS__)
 
 // usage       : CD4006_DIP(name, )
 #define CD4006_DIP(...)                                                   \
@@ -952,6 +968,10 @@
 // usage       : LM324_DIP(name, )
 #define LM324_DIP(...)                                                   \
 	NET_REGISTER_DEVEXT(LM324_DIP, __VA_ARGS__)
+
+// usage       : LM348_DIP(name, )
+#define LM348_DIP(...)                                                   \
+	NET_REGISTER_DEVEXT(LM348_DIP, __VA_ARGS__)
 
 // usage       : LM358_DIP(name, )
 #define LM358_DIP(...)                                                   \

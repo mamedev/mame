@@ -27,9 +27,10 @@ class render_font
 
 	// construction/destruction
 	render_font(render_manager &manager, const char *filename);
-	virtual ~render_font();
 
 public:
+	virtual ~render_font();
+
 	// getters
 	render_manager &manager() const { return m_manager; }
 

@@ -53,7 +53,7 @@ protected:
 	virtual void rcv_complete() override;    // Rx completed receiving byte
 
 private:
-	osd_midi_device *m_midi;
+	std::unique_ptr<osd_midi_device> m_midi;
 };
 
 // device type definition

@@ -121,7 +121,9 @@ void hx5102_device::memmap(address_map &map)
 */
 void hx5102_device::crumap(address_map &map)
 {
-	map(0x17e0, 0x17ff).rw(FUNC(hx5102_device::cruread), FUNC(hx5102_device::cruwrite));
+	map(0x17e0, 0x17ff).r(FUNC(hx5102_device::cruread));
+	map(0x17e0, 0x17ef).w(m_crulatch[0], FUNC(ls259_device::write_d0));
+	map(0x17f0, 0x17ff).w(m_crulatch[1], FUNC(ls259_device::write_d0));
 }
 
 hx5102_device::hx5102_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
@@ -140,6 +142,7 @@ hx5102_device::hx5102_device(const machine_config &mconfig, const char *tag, dev
 	m_floppy_select_last(UNDEF),
 	m_hexbus_ctrl(*this, IBC_TAG),
 	m_floppy_ctrl(*this, FDC_TAG),
+	m_crulatch(*this, "crulatch%u", 0U),
 	m_motormf(*this, MTRD_TAG),
 	m_speedmf(*this, MTSPD_TAG),
 	m_readyff(*this, READYFF_TAG),
@@ -480,92 +483,81 @@ uint8_t hx5102_device::cruread(offs_t offset)
 /*
     CRU write access.
 */
-void hx5102_device::cruwrite(offs_t offset, uint8_t data)
+WRITE_LINE_MEMBER(hx5102_device::nocomp_w)
 {
-	// LOG("Writing CRU address %04x: %x\n", 0x17e0 + (offset<<1), data);
-	switch (offset)
-	{
-	case 0:
-		// unused right now
-		LOGMASKED(LOG_CRU, "Set precompensation = %d\n", data);
-		break;
-	case 1:
-		if (data==1)
-		{
-			LOGMASKED(LOG_CRU, "Trigger motor monoflop\n");
-		}
-		m_motormf->b_w(data);
-		break;
-	case 2:
-		LOGMASKED(LOG_CRU, "Set undefined CRU bit 2 to %d\n", data);
-		break;
-	case 3:
-		LOGMASKED(LOG_CRU, "Set step direction = %d\n", data);
-		if (m_current_floppy != nullptr) m_current_floppy->dir_w((data==0)? 1 : 0);
-		break;
-	case 4:
-		if (data==1)
-		{
-			LOGMASKED(LOG_CRU, "Assert DACK*\n");
-			m_dacken = (data != 0);
-		}
-		break;
-	case 5:
-		if (data==1)
-		{
-			LOGMASKED(LOG_CRU, "Step pulse\n");
-		}
-		if (m_current_floppy != nullptr) m_current_floppy->stp_w((data==0)? 1 : 0);
-		break;
-	case 6:
-		if (data==1)
-		{
-			LOGMASKED(LOG_CRU, "Start watchdog\n");
-		}
-		m_speedmf->b_w(data);
-		break;
-	case 7:
-		if (data==0)
-		{
-			LOGMASKED(LOG_CRU, "Reset i8272A controller\n");
-			m_floppy_ctrl->soft_reset();
-		}
-		break;
-	case 8:
-		LOGMASKED(LOG_CRU, "Set drive select 0 to %d\n", data);
-		if (data == 1) m_floppy_select |= 1;
-		else m_floppy_select &= ~1;
-		break;
-	case 9:
-		LOGMASKED(LOG_CRU, "Set drive select 1 to %d\n", data);
-		if (data == 1) m_floppy_select |= 2;
-		else m_floppy_select &= ~2;
-		break;
-	case 10:
-		// External drive; not implemented
-		LOGMASKED(LOG_CRU, "Set drive select 2 to %d\n", data);
-		break;
-	case 11:
-		// External drive; not implemented
-		LOGMASKED(LOG_CRU, "Set drive select 3 to %d\n", data);
-		break;
-	case 12:
-		// External drive; not implemented
-		LOGMASKED(LOG_CRU, "Set auxiliary motor line to %d\n", data);
-		break;
-	case 13:
-		LOGMASKED(LOG_CRU, "Set CRU bit 13 to %d (unused)\n", data);
-		break;
-	case 14:
-		m_wait = (data!=0);
-		LOGMASKED(LOG_CRU, "READY circuit %s\n", m_wait? "active" : "inactive" );
-		update_readyff_input();
-		break;
-	case 15:
-		LOGMASKED(LOG_CRU, "Set CRU bit 15 to %d (unused)\n", data);
-		break;
-	}
+	// unused right now
+	LOGMASKED(LOG_CRU, "Set precompensation = %d\n", state);
+}
 
+WRITE_LINE_MEMBER(hx5102_device::diren_w)
+{
+	LOGMASKED(LOG_CRU, "Set step direction = %d\n", state);
+	if (m_current_floppy != nullptr)
+		m_current_floppy->dir_w((state==0)? 1 : 0);
+}
+
+WRITE_LINE_MEMBER(hx5102_device::dacken_w)
+{
+	if (state==1)
+		LOGMASKED(LOG_CRU, "Assert DACK*\n");
+	m_dacken = (state != 0);
+}
+
+WRITE_LINE_MEMBER(hx5102_device::stepen_w)
+{
+	if (state==1)
+		LOGMASKED(LOG_CRU, "Step pulse\n");
+	if (m_current_floppy != nullptr)
+		m_current_floppy->stp_w((state==0)? 1 : 0);
+}
+
+WRITE_LINE_MEMBER(hx5102_device::ds1_w)
+{
+	LOGMASKED(LOG_CRU, "Set drive select 0 to %d\n", state);
+	if (state == 1)
+		m_floppy_select |= 1;
+	else
+		m_floppy_select &= ~1;
+	update_drive_select();
+}
+
+WRITE_LINE_MEMBER(hx5102_device::ds2_w)
+{
+	LOGMASKED(LOG_CRU, "Set drive select 1 to %d\n", state);
+	if (state == 1)
+		m_floppy_select |= 2;
+	else
+		m_floppy_select &= ~2;
+	update_drive_select();
+}
+
+WRITE_LINE_MEMBER(hx5102_device::ds3_w)
+{
+	// External drive; not implemented
+	LOGMASKED(LOG_CRU, "Set drive select 2 to %d\n", state);
+}
+
+WRITE_LINE_MEMBER(hx5102_device::ds4_w)
+{
+	// External drive; not implemented
+	LOGMASKED(LOG_CRU, "Set drive select 3 to %d\n", state);
+}
+
+WRITE_LINE_MEMBER(hx5102_device::aux_motor_w)
+{
+	// External drive; not implemented
+	LOGMASKED(LOG_CRU, "Set auxiliary motor line to %d\n", state);
+}
+
+WRITE_LINE_MEMBER(hx5102_device::wait_w)
+{
+	m_wait = (state!=0);
+	LOGMASKED(LOG_CRU, "READY circuit %s\n", m_wait? "active" : "inactive" );
+	update_readyff_input();
+}
+
+void hx5102_device::update_drive_select()
+{
 	if (m_floppy_select != m_floppy_select_last)
 	{
 		if (m_floppy_select == 1)
@@ -677,7 +669,7 @@ void hx5102_device::device_add_mconfig(machine_config& config)
 	HEXBUS(config, "hexbus", 0, hexbus_options, nullptr);
 
 	// TMS9995 CPU @ 12.0 MHz
-	TMS9995(config, m_flopcpu, XTAL(12'000'000));
+	TMS9995(config, m_flopcpu, 12_MHz_XTAL);
 	m_flopcpu->set_addrmap(AS_PROGRAM, &hx5102_device::memmap);
 	m_flopcpu->set_addrmap(AS_IO, &hx5102_device::crumap);
 	m_flopcpu->extop_cb().set(FUNC(hx5102_device::external_operation));
@@ -687,27 +679,41 @@ void hx5102_device::device_add_mconfig(machine_config& config)
 	// Not connected: Select lines (DS0, DS1), Head load (HDL), VCO
 	// Tied to 1: READY
 	// Tied to 0: TC
-	I8272A(config, m_floppy_ctrl, 8'000'000, false);
+	I8272A(config, m_floppy_ctrl, 8_MHz_XTAL / 2, false);
 	m_floppy_ctrl->intrq_wr_callback().set(FUNC(hx5102_device::fdc_irq_w));
 	m_floppy_ctrl->drq_wr_callback().set(FUNC(hx5102_device::fdc_drq_w));
 
 	FLOPPY_CONNECTOR(config, "d0", hx5102_drive, "525dd", hx5102_device::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "d1", hx5102_drive, nullptr, hx5102_device::floppy_formats).enable_sound(true);
 
+	// Addressable latches
+	LS259(config, m_crulatch[0]); // U18
+	m_crulatch[0]->q_out_cb<0>().set(FUNC(hx5102_device::nocomp_w));
+	m_crulatch[0]->q_out_cb<1>().set(m_motormf, FUNC(ttl74123_device::b_w));
+	m_crulatch[0]->q_out_cb<3>().set(FUNC(hx5102_device::diren_w));
+	m_crulatch[0]->q_out_cb<4>().set(FUNC(hx5102_device::dacken_w));
+	m_crulatch[0]->q_out_cb<5>().set(FUNC(hx5102_device::stepen_w));
+	m_crulatch[0]->q_out_cb<6>().set(m_speedmf, FUNC(ttl74123_device::b_w));
+	m_crulatch[0]->q_out_cb<7>().set(m_floppy_ctrl, FUNC(i8272a_device::reset_w)).invert();
+
+	LS259(config, m_crulatch[1]); // U10
+	m_crulatch[1]->q_out_cb<0>().set(FUNC(hx5102_device::ds1_w));
+	m_crulatch[1]->q_out_cb<1>().set(FUNC(hx5102_device::ds2_w));
+	m_crulatch[1]->q_out_cb<2>().set(FUNC(hx5102_device::ds3_w));
+	m_crulatch[1]->q_out_cb<3>().set(FUNC(hx5102_device::ds4_w));
+	m_crulatch[1]->q_out_cb<4>().set(FUNC(hx5102_device::aux_motor_w));
+	m_crulatch[1]->q_out_cb<6>().set(FUNC(hx5102_device::wait_w));
+
 	// Monoflops
-	TTL74123(config, m_motormf, 0);
+	TTL74123(config, m_motormf, RES_K(200), CAP_U(47));
 	m_motormf->set_connection_type(TTL74123_GROUNDED);
-	m_motormf->set_resistor_value(RES_K(200));
-	m_motormf->set_capacitor_value(CAP_U(47));
 	m_motormf->set_a_pin_value(0);
 	m_motormf->set_b_pin_value(1);
 	m_motormf->set_clear_pin_value(1);
 	m_motormf->out_cb().set(FUNC(hx5102_device::motor_w));
 
-	TTL74123(config, m_speedmf, 0);
+	TTL74123(config, m_speedmf, RES_K(200), CAP_U(10));
 	m_speedmf->set_connection_type(TTL74123_GROUNDED);
-	m_speedmf->set_resistor_value(RES_K(200));
-	m_speedmf->set_capacitor_value(CAP_U(10));
 	m_speedmf->set_a_pin_value(0);
 	m_speedmf->set_b_pin_value(1);
 	m_speedmf->set_clear_pin_value(1);

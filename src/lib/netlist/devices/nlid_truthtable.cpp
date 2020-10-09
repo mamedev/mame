@@ -75,7 +75,7 @@ namespace devices
 #endif
 			}
 			for (auto &q : m_Q)
-				if (q.has_net() && q.net().has_connections())
+				if (q.has_net() && !exec().nlstate().core_terms(q.net()).empty())
 					active_outputs++;
 			set_active_outputs(active_outputs);
 		}

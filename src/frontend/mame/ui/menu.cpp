@@ -92,10 +92,17 @@ menu::global_state::global_state(running_machine &machine, ui_options const &opt
 	{
 		m_bgrnd_bitmap = std::make_unique<bitmap_argb32>(0, 0);
 		emu_file backgroundfile(".", OPEN_FLAG_READ);
-		render_load_jpeg(*m_bgrnd_bitmap, backgroundfile, nullptr, "background.jpg");
+		if (backgroundfile.open("background.jpg") == osd_file::error::NONE)
+		{
+			render_load_jpeg(*m_bgrnd_bitmap, backgroundfile);
+			backgroundfile.close();
+		}
 
-		if (!m_bgrnd_bitmap->valid())
-			render_load_png(*m_bgrnd_bitmap, backgroundfile, nullptr, "background.png");
+		if (!m_bgrnd_bitmap->valid() && (backgroundfile.open("background.png") == osd_file::error::NONE))
+		{
+			render_load_png(*m_bgrnd_bitmap, backgroundfile);
+			backgroundfile.close();
+		}
 
 		if (m_bgrnd_bitmap->valid())
 			m_bgrnd_texture->set_bitmap(*m_bgrnd_bitmap, m_bgrnd_bitmap->cliprect(), TEXFORMAT_ARGB32);
@@ -1234,7 +1241,7 @@ uint32_t menu::ui_handler(render_container &container, mame_ui_manager &mui)
 
 	// if we have no menus stacked up, start with the main menu
 	if (!state->topmost_menu<menu>())
-		state->stack_push(std::unique_ptr<menu>(global_alloc_clear<menu_main>(mui, container)));
+		state->stack_push(std::unique_ptr<menu>(make_unique_clear<menu_main>(mui, container)));
 
 	// update the menu state
 	if (state->topmost_menu<menu>())

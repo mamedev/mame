@@ -1725,25 +1725,18 @@ void apollo_graphics_15i::device_add_mconfig(machine_config &config)
 DEFINE_DEVICE_TYPE(APOLLO_GRAPHICS, apollo_graphics_15i, "apollo_graphics_15i", "Apollo Screen")
 
 apollo_graphics_15i::apollo_graphics_15i(const machine_config &mconfig,const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, APOLLO_GRAPHICS, tag, owner, clock),
-	m_screen(*this, VIDEO_SCREEN_TAG),
-	m_lut_fifo(nullptr),
-	m_bt458(nullptr)
+	apollo_graphics_15i(mconfig, APOLLO_GRAPHICS, tag, owner, clock)
 {
 }
 
-apollo_graphics_15i::apollo_graphics_15i(const machine_config &mconfig,const char *tag, device_t *owner, uint32_t clock, device_type type) :
+apollo_graphics_15i::apollo_graphics_15i(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	m_screen(*this, VIDEO_SCREEN_TAG),
-	m_lut_fifo(nullptr),
-	m_bt458(nullptr)
+	m_screen(*this, VIDEO_SCREEN_TAG)
 {
 }
 
 apollo_graphics_15i::~apollo_graphics_15i()
 {
-	if (m_lut_fifo) global_free(m_lut_fifo);
-	if (m_bt458) global_free(m_bt458);
 }
 
 //-------------------------------------------------
@@ -1798,8 +1791,8 @@ void apollo_graphics_15i::device_start()
 
 	memset(m_color_lookup_table, 0, sizeof(m_color_lookup_table));
 
-	m_lut_fifo = nullptr;
-	m_bt458 = nullptr;
+	m_lut_fifo.reset();
+	m_bt458.reset();
 }
 
 //-------------------------------------------------
@@ -1852,12 +1845,9 @@ void apollo_graphics_15i::device_reset()
 			m_buffer_width = 1024;
 			m_buffer_height = 1024;
 
-			if (m_lut_fifo) global_free(m_lut_fifo);
-			if (m_bt458) global_free(m_bt458);
+			m_lut_fifo = std::make_unique<lut_fifo>();
 
-			m_lut_fifo = global_alloc(lut_fifo);
-
-			m_bt458 = global_alloc(bt458(machine()));
+			m_bt458 = std::make_unique<bt458>(machine());
 			m_bt458->start();
 			m_bt458->reset();
 		}
@@ -1899,7 +1889,7 @@ void apollo_graphics_19i::device_add_mconfig(machine_config &config)
 DEFINE_DEVICE_TYPE(APOLLO_MONO19I, apollo_graphics_19i, "apollo_graphics_19i", "Apollo 19\" Monochrome Screen")
 
 apollo_graphics_19i::apollo_graphics_19i(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	apollo_graphics_15i(mconfig, tag, owner, clock, APOLLO_MONO19I)
+	apollo_graphics_15i(mconfig, APOLLO_MONO19I, tag, owner, clock)
 {
 }
 

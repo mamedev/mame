@@ -49,6 +49,7 @@ public:
 	void ready_w(bool val);
 
 	DECLARE_WRITE_LINE_MEMBER(tc_line_w) { tc_w(state == ASSERT_LINE); }
+	DECLARE_WRITE_LINE_MEMBER(reset_w);
 
 	void set_rate(int rate); // rate in bps, to be used when the fdc is externally frequency-controlled
 
@@ -231,7 +232,7 @@ protected:
 
 	static constexpr int rates[4] = { 500000, 300000, 250000, 1000000 };
 
-	bool ready_connected, ready_polled, select_connected, select_multiplexed;
+	bool ready_connected, ready_polled, select_connected, select_multiplexed, has_dor;
 
 	bool external_ready;
 
@@ -250,7 +251,7 @@ protected:
 	bool fifo_write;
 	uint8_t dor, dsr, msr, fifo[16], command[16], result[16];
 	uint8_t st1, st2, st3;
-	uint8_t fifocfg, dor_reset;
+	uint8_t fifocfg;
 	uint8_t precomp;
 	uint16_t spec;
 	int sector_size;
@@ -259,7 +260,6 @@ protected:
 
 	emu_timer *poll_timer;
 
-	static std::string tts(attotime t);
 	std::string results() const;
 	std::string ttsn() const;
 
@@ -287,6 +287,8 @@ protected:
 		C_INVALID,
 		C_INCOMPLETE
 	};
+
+	void end_reset();
 
 	void delay_cycles(emu_timer *tm, int cycles);
 	void check_irq();

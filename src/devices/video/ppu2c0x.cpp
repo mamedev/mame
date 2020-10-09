@@ -622,11 +622,6 @@ void ppu2c0x_device::draw_background(uint8_t* line_priority)
 {
 	bitmap_rgb32& bitmap = *m_bitmap;
 
-	uint16_t palval = m_back_color;
-
-	/* cache the background pen */
-	uint32_t back_pen = palval;
-
 	/* determine where in the nametable to start drawing from */
 	/* based on the current scanline and scroll regs */
 	uint8_t  scroll_x_coarse = m_refresh_data & 0x001f;
@@ -680,7 +675,7 @@ void ppu2c0x_device::draw_background(uint8_t* line_priority)
 			// plus something that accounts for y
 			address += scroll_y_fine;
 
-			draw_tile(line_priority, color_byte, color_bits, address, start_x, back_pen, dest);
+			draw_tile(line_priority, color_byte, color_bits, address, start_x, m_back_color, dest);
 
 			start_x += 8;
 
@@ -701,7 +696,7 @@ void ppu2c0x_device::draw_background(uint8_t* line_priority)
 		dest = &bitmap.pix(m_scanline);
 		for (int i = 0; i < 8; i++)
 		{
-			draw_back_pen(dest, back_pen);
+			draw_back_pen(dest, m_back_color);
 			dest++;
 
 			line_priority[i] ^= 0x02;
@@ -720,14 +715,10 @@ void ppu2c0x_device::draw_background_pen()
 
 	/* setup the color mask and colortable to use */
 	uint8_t color_mask = (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO) ? 0x30 : 0x3f;
-	uint16_t palval = m_back_color & color_mask;
-
-	/* cache the background pen */
-	uint32_t back_pen = palval;
 
 	// Fill this scanline with the background pen.
 	for (int i = 0; i < bitmap.width(); i++)
-		draw_back_pen(&bitmap.pix(m_scanline, i), back_pen);
+		draw_back_pen(&bitmap.pix(m_scanline, i), m_back_color & color_mask);
 }
 
 void ppu2c0x_device::read_sprite_plane_data(int address)

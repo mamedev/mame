@@ -2012,16 +2012,6 @@ WRITE_LINE_MEMBER(towns_state::rtc_busy_w)
 }
 
 // SCSI controller - I/O ports 0xc30 and 0xc32
-uint16_t towns_state::towns_scsi_dma_r()
-{
-	return m_scsi->fmscsi_data_r();
-}
-
-void towns_state::towns_scsi_dma_w(uint16_t data)
-{
-	m_scsi->fmscsi_data_w(data & 0xff);
-}
-
 WRITE_LINE_MEMBER(towns_state::towns_scsi_irq)
 {
 	m_pic_slave->ir0_w(state);
@@ -2372,6 +2362,13 @@ void towns_state::towns_io(address_map &map)
 	// CRTC / Video (again)
 	map(0xfd90, 0xfda3).rw(FUNC(towns_state::towns_video_fd90_r), FUNC(towns_state::towns_video_fd90_w));
 	map(0xff80, 0xffff).rw(FUNC(towns_state::towns_video_cff80_r), FUNC(towns_state::towns_video_cff80_w));
+}
+
+void towns_state::towns_1g_io(address_map &map)
+{
+	// For the first generation FM Towns with a SCSI card slot
+	towns_io(map);
+	map(0x0c30, 0x0c37).rw(m_scsi_slot, FUNC(fmt_scsi_slot_device::read), FUNC(fmt_scsi_slot_device::write)).umask32(0x00ff00ff);
 }
 
 void towns_state::towns2_io(address_map &map)
@@ -2831,7 +2828,7 @@ void towns_state::towns_base(machine_config &config)
 	/* basic machine hardware */
 	I386(config, m_maincpu, 16000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &towns_state::towns_mem);
-	m_maincpu->set_addrmap(AS_IO, &towns_state::towns_io);
+	m_maincpu->set_addrmap(AS_IO, &towns_state::towns_1g_io);
 	m_maincpu->set_vblank_int("screen", FUNC(towns_state::towns_vsync_irq));
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 	//MCFG_MACHINE_RESET_OVERRIDE(towns_state,towns)
@@ -2960,6 +2957,15 @@ void towns_state::towns(machine_config &config)
 {
 	towns_base(config);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	FMT_SCSI_SLOT(config, m_scsi_slot, fmt_scsi_default_devices, nullptr);
+	m_scsi_slot->irq_handler().set(FUNC(towns_state::towns_scsi_irq));
+	m_scsi_slot->drq_handler().set(FUNC(towns_state::towns_scsi_drq));
+
+	m_dma[0]->dma_read_callback<1>().set(m_scsi_slot, FUNC(fmt_scsi_slot_device::data_read));
+	m_dma[0]->dma_write_callback<1>().set(m_scsi_slot, FUNC(fmt_scsi_slot_device::data_write));
+	m_dma[1]->dma_read_callback<1>().set(m_scsi_slot, FUNC(fmt_scsi_slot_device::data_read));
+	m_dma[1]->dma_write_callback<1>().set(m_scsi_slot, FUNC(fmt_scsi_slot_device::data_write));
 }
 
 void towns16_state::townsux(machine_config &config)
@@ -2984,10 +2990,10 @@ void towns16_state::townsux(machine_config &config)
 	m_scsi->irq_handler().set(FUNC(towns16_state::towns_scsi_irq));
 	m_scsi->drq_handler().set(FUNC(towns16_state::towns_scsi_drq));
 
-	m_dma[0]->dma_read_callback<1>().set(FUNC(towns16_state::towns_scsi_dma_r));
-	m_dma[0]->dma_write_callback<1>().set(FUNC(towns16_state::towns_scsi_dma_w));
-	m_dma[1]->dma_read_callback<1>().set(FUNC(towns16_state::towns_scsi_dma_r));
-	m_dma[1]->dma_write_callback<1>().set(FUNC(towns16_state::towns_scsi_dma_w));
+	m_dma[0]->dma_read_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_r));
+	m_dma[0]->dma_write_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_w));
+	m_dma[1]->dma_read_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_r));
+	m_dma[1]->dma_write_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_w));
 
 	// 2 MB onboard, one SIMM slot with 2-8 MB
 	m_ram->set_default_size("2M").set_extra_options("4M,6M,10M");
@@ -2997,7 +3003,7 @@ void towns16_state::townsux(machine_config &config)
 
 void towns_state::townssj(machine_config &config)
 {
-	towns(config);
+	towns_base(config);
 
 	I486(config.replace(), m_maincpu, 66000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &towns_state::towns_mem);
@@ -3017,13 +3023,15 @@ void towns_state::townssj(machine_config &config)
 	m_scsi->irq_handler().set(FUNC(towns_state::towns_scsi_irq));
 	m_scsi->drq_handler().set(FUNC(towns_state::towns_scsi_drq));
 
-	m_dma[0]->dma_read_callback<1>().set(FUNC(towns_state::towns_scsi_dma_r));
-	m_dma[0]->dma_write_callback<1>().set(FUNC(towns_state::towns_scsi_dma_w));
-	m_dma[1]->dma_read_callback<1>().set(FUNC(towns_state::towns_scsi_dma_r));
-	m_dma[1]->dma_write_callback<1>().set(FUNC(towns_state::towns_scsi_dma_w));
+	m_dma[0]->dma_read_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_r));
+	m_dma[0]->dma_write_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_w));
+	m_dma[1]->dma_read_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_r));
+	m_dma[1]->dma_write_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_w));
 
 	// 4 MB (SJ2/SJ2A) or 8 MB (SJ26/SJ53) onboard, 2 SIMM slots with 4-32 MB each
 	m_ram->set_default_size("8M").set_extra_options("4M,12M,16M,20M,24M,28M,32M,36M,40M,44M,48M,52M,56M,68M,72M");
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 }
 
 void towns_state::townshr(machine_config &config)

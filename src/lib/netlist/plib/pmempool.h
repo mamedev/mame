@@ -168,8 +168,11 @@ namespace plib {
 		struct info
 		{
 			info(block *b, size_type p) : m_block(b), m_pos(p) { }
+			info(const info &) = default;
+			info &operator=(const info &) = default;
+			info(info &&) noexcept = default;
+			info &operator=(info &&) noexcept = default;
 			~info() = default;
-			PCOPYASSIGNMOVE(info, default)
 
 			block * m_block;
 			size_type m_pos;

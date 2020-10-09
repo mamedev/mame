@@ -404,6 +404,7 @@ public:
 	void abc110(machine_config &config);
 	void acw443(machine_config &config);
 	void abc310(machine_config &config);
+	void cfa3000bp(machine_config &config);
 	void econx25(machine_config &config);
 	void reutapm(machine_config &config);
 

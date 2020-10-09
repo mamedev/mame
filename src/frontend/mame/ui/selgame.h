@@ -18,8 +18,6 @@
 #include <functional>
 
 
-class media_auditor;
-
 namespace ui {
 
 class menu_select_game : public menu_select_launch
@@ -85,8 +83,6 @@ private:
 	void populate_search();
 	bool load_available_machines();
 	void load_custom_filters();
-
-	static std::string make_error_text(bool summary, media_auditor const &auditor);
 
 	// General info
 	virtual void general_info(const game_driver *driver, std::string &buffer) override;

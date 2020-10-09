@@ -30,7 +30,6 @@
 #include "machine/ldp1450.h"
 #include "machine/nvram.h"
 #include "machine/amigafdc.h"
-#include "render.h"
 #include "speaker.h"
 
 
