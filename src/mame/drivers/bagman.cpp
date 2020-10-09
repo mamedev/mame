@@ -804,13 +804,12 @@ ROM_START( bagmans )
 	ROM_LOAD( "bagman_a2_1c.1c", 0x0000, 0x1000, CRC(f3e11bd7) SHA1(43ee00ff777008c89f619eb183e7c5e63f6c7694) )
 	ROM_LOAD( "bagman_a2_1f.1f", 0x1000, 0x1000, CRC(d0f7105b) SHA1(fb382703850a4ded567706e02ebb7f3e22531b7c) )
 
-	// according to MT #02508 Stern/Seeburg logos should have different colors.
 	ROM_REGION( 0x0040, "proms", 0 )
-	ROM_LOAD( "3p.bin", 0x0000, 0x0020, BAD_DUMP CRC(2a855523) SHA1(91e032233fee397c90b7c1662934aca9e0671482) ) // pictures of the PCB shows "BAGMAN COLOR 3PA2" - not dumped / verified
-	ROM_LOAD( "3r.bin", 0x0020, 0x0020, BAD_DUMP CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) )
+	ROM_LOAD( "bagman_color_3pa2.3p", 0x0000, 0x0020, CRC(47504204) SHA1(7524ed766cc6d9a158327717d2cf53346ace2392) ) // MMI 6331 BPROM
+	ROM_LOAD( "bagman_color_3ra1.3p", 0x0020, 0x0020, CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) ) // MMI 6331 BPROM
 
 	ROM_REGION( 0x0020, "5110ctrl", 0)
-	ROM_LOAD( "6r.bin", 0x0000, 0x0020, CRC(c58a4f6a) SHA1(35ef244b3e94032df2610aa594ea5670b91e1449) ) // State machine driving TMS5110
+	ROM_LOAD( "bagman_sound_6ra2.6r", 0x0000, 0x0020, CRC(c58a4f6a) SHA1(35ef244b3e94032df2610aa594ea5670b91e1449) ) // State machine driving TMS5110 - MMI 6331 BPROM
 
 	ROM_REGION( 0x2000, "tmsprom", 0 ) // Data for the TMS5110 speech chip
 	ROM_LOAD( "bagman_a1_9r.9r", 0x0000, 0x1000, CRC(2e0057ff) SHA1(33e3ffa6418f86864eb81e5e9bda4bf540c143a6) )
@@ -834,20 +833,19 @@ ROM_START( bagmans4 )
 	ROM_LOAD( "bagman_a2_1c.1c", 0x0000, 0x1000, CRC(f3e11bd7) SHA1(43ee00ff777008c89f619eb183e7c5e63f6c7694) )
 	ROM_LOAD( "bagman_a2_1f.1f", 0x1000, 0x1000, CRC(d0f7105b) SHA1(fb382703850a4ded567706e02ebb7f3e22531b7c) )
 
-	// according to MT #02508 Stern/Seeburg logos should have different colors.
 	ROM_REGION( 0x0040, "proms", 0 )
-	ROM_LOAD( "3p.bin", 0x0000, 0x0020, BAD_DUMP CRC(2a855523) SHA1(91e032233fee397c90b7c1662934aca9e0671482) ) // pictures of the PCB shows "BAGMAN COLOR 3PA2" - not dumped / verified
-	ROM_LOAD( "3r.bin", 0x0020, 0x0020, BAD_DUMP CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) )
+	ROM_LOAD( "bagman_color_3pa2.3p", 0x0000, 0x0020, CRC(47504204) SHA1(7524ed766cc6d9a158327717d2cf53346ace2392) ) // MMI 6331 BPROM
+	ROM_LOAD( "bagman_color_3ra1.3p", 0x0020, 0x0020, CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) ) // MMI 6331 BPROM
 
 	ROM_REGION( 0x0020, "5110ctrl", 0)
-	ROM_LOAD( "6r.bin", 0x0000, 0x0020, CRC(c58a4f6a) SHA1(35ef244b3e94032df2610aa594ea5670b91e1449) ) // State machine driving TMS5110
+	ROM_LOAD( "bagman_sound_6ra2.6r", 0x0000, 0x0020, CRC(c58a4f6a) SHA1(35ef244b3e94032df2610aa594ea5670b91e1449) ) // State machine driving TMS5110 - MMI 6331 BPROM
 
 	ROM_REGION( 0x2000, "tmsprom", 0 ) // Data for the TMS5110 speech chip
 	ROM_LOAD( "bagman_a1_9r.9r", 0x0000, 0x1000, CRC(2e0057ff) SHA1(33e3ffa6418f86864eb81e5e9bda4bf540c143a6) )
 	ROM_LOAD( "bagman_a1_9t.9t", 0x1000, 0x1000, CRC(b2120edd) SHA1(52b89dbcc749b084331fa82b13d0876e911fce52) )
 ROM_END
 
-ROM_START( bagmans3 )
+ROM_START( bagmans3 ) // not compatible with the PAL16R6 emulator in ../mame/machine/bagman.cpp??
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "bagman_a2_9e.9e", 0x0000, 0x1000, CRC(5f04d805) SHA1(84bcdfd25634879438429d2b41c491e092388add) )
 	ROM_LOAD( "bagman_a3_9f.9f", 0x1000, 0x1000, CRC(136a78aa) SHA1(14e6a556e00b6ebe718f2fe119b372dc7bfa78d9) )
@@ -864,46 +862,45 @@ ROM_START( bagmans3 )
 	ROM_LOAD( "bagman_a2_1c.1c", 0x0000, 0x1000, CRC(f3e11bd7) SHA1(43ee00ff777008c89f619eb183e7c5e63f6c7694) )
 	ROM_LOAD( "bagman_a2_1f.1f", 0x1000, 0x1000, CRC(d0f7105b) SHA1(fb382703850a4ded567706e02ebb7f3e22531b7c) )
 
-	// according to MT #02508 Stern/Seeburg logos should have different colors.
 	ROM_REGION( 0x0040, "proms", 0 )
-	ROM_LOAD( "3p.bin", 0x0000, 0x0020, BAD_DUMP CRC(2a855523) SHA1(91e032233fee397c90b7c1662934aca9e0671482) ) // PCB shows "BAGMAN COLOR 3PA2" - not dumped / verified
-	ROM_LOAD( "3r.bin", 0x0020, 0x0020, BAD_DUMP CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) ) // PCB shows "BAGMAN COLOR 3RA1" - not dumped / verified
+	ROM_LOAD( "bagman_color_3pa2.3p", 0x0000, 0x0020, CRC(47504204) SHA1(7524ed766cc6d9a158327717d2cf53346ace2392) ) // MMI 6331 BPROM
+	ROM_LOAD( "bagman_color_3ra1.3p", 0x0020, 0x0020, CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) ) // MMI 6331 BPROM
 
 	ROM_REGION( 0x0020, "5110ctrl", 0)
-	ROM_LOAD( "6r.bin", 0x0000, 0x0020, CRC(c58a4f6a) SHA1(35ef244b3e94032df2610aa594ea5670b91e1449) ) // State machine driving TMS5110 - PCB shows "BAGMAN SOUND 6RA2" - not dumped / verified
+	ROM_LOAD( "bagman_sound_6ra2.6r", 0x0000, 0x0020, CRC(c58a4f6a) SHA1(35ef244b3e94032df2610aa594ea5670b91e1449) ) // State machine driving TMS5110 - MMI 6331 BPROM
 
 	ROM_REGION( 0x2000, "tmsprom", 0 ) // Data for the TMS5110 speech chip
 	ROM_LOAD( "bagman_a1_9r.9r", 0x0000, 0x1000, CRC(2e0057ff) SHA1(33e3ffa6418f86864eb81e5e9bda4bf540c143a6) )
 	ROM_LOAD( "bagman_a1_9t.9t", 0x1000, 0x1000, CRC(b2120edd) SHA1(52b89dbcc749b084331fa82b13d0876e911fce52) )
 ROM_END
 
-ROM_START( bagmanj )
+ROM_START( bagmanj ) // based on Stern's Bagman revision A4 set (bagmans4)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "bf8_06.e9",    0x0000, 0x1000, CRC(5fb0a1a3) SHA1(849cd60b58de9585a78a1c4c1747f666a4a4fcc3) ) // 2732
-	ROM_LOAD( "bf8_07.f9",    0x1000, 0x1000, CRC(7871206e) SHA1(14d9b7a0779d59a870e0d4b911797dff5435a16c) ) // 2732
-	ROM_LOAD( "bf8_08.j9",    0x2000, 0x1000, CRC(ae037d0a) SHA1(57d287b3968a4e7fdee2a98014dbdf4fae93d157) ) // 2732
-	ROM_LOAD( "bf8_09.k9",    0x3000, 0x1000, CRC(36b6a944) SHA1(270dd2566b36129366adcbdd5a8db396bec7631f) ) // 2732
-	ROM_LOAD( "bf8_10.m9",    0x4000, 0x1000, CRC(b8e75eb6) SHA1(433fd736512f10bc0879b15821eb55cc41d58d33) ) // 2732
-	ROM_LOAD( "bf8_11.n9",    0x5000, 0x1000, CRC(83fccb1c) SHA1(7225d738b64a2cdaaec8860017de4229f2852ed2) ) // 2732
+	ROM_LOAD( "bf8_06.e9", 0x0000, 0x1000, CRC(5fb0a1a3) SHA1(849cd60b58de9585a78a1c4c1747f666a4a4fcc3) ) // 2732  == bagman_a4_9e.9e
+	ROM_LOAD( "bf8_07.f9", 0x1000, 0x1000, CRC(7871206e) SHA1(14d9b7a0779d59a870e0d4b911797dff5435a16c) ) // 2732  == bagman_a4_9f.9f
+	ROM_LOAD( "bf8_08.j9", 0x2000, 0x1000, CRC(ae037d0a) SHA1(57d287b3968a4e7fdee2a98014dbdf4fae93d157) ) // 2732
+	ROM_LOAD( "bf8_09.k9", 0x3000, 0x1000, CRC(36b6a944) SHA1(270dd2566b36129366adcbdd5a8db396bec7631f) ) // 2732  == bagman_a4_9k.9k
+	ROM_LOAD( "bf8_10.m9", 0x4000, 0x1000, CRC(b8e75eb6) SHA1(433fd736512f10bc0879b15821eb55cc41d58d33) ) // 2732  == bagman_a2_9m.9m
+	ROM_LOAD( "bf8_11.n9", 0x5000, 0x1000, CRC(83fccb1c) SHA1(7225d738b64a2cdaaec8860017de4229f2852ed2) ) // 2732  == bagman_a4_9n.9n
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "bf8_03.e1",    0x0000, 0x1000, CRC(f217ac09) SHA1(a9716674401dff27344a01df8121b6b648688680) ) // 2732
-	ROM_LOAD( "bf8_05.j1",    0x1000, 0x1000, CRC(c680ef04) SHA1(79406bc786374abfcd9f548268c445b5c8d8858d) ) // 2732
+	ROM_LOAD( "bf8_03.e1", 0x0000, 0x1000, CRC(f217ac09) SHA1(a9716674401dff27344a01df8121b6b648688680) ) // 2732  == bagman_a2_1e.1e
+	ROM_LOAD( "bf8_05.j1", 0x1000, 0x1000, CRC(c680ef04) SHA1(79406bc786374abfcd9f548268c445b5c8d8858d) ) // 2732  == bagman_a2_1j.1j
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
 	ROM_LOAD( "bf8_02.c1",    0x0000, 0x1000, CRC(404283ed) SHA1(18613670cf23181089812c02429e222db0340a60) ) // 2732
 	ROM_LOAD( "bf8_04-1.f1",  0x1000, 0x1000, CRC(3f5c991e) SHA1(853c629ba0b4739dcb1af669fd600a3d83fb2072) ) // 2732
 
 	ROM_REGION( 0x0040, "proms", 0 ) // not dumped for this set
-	ROM_LOAD( "p3.bin",       0x0000, 0x0020, BAD_DUMP CRC(2a855523) SHA1(91e032233fee397c90b7c1662934aca9e0671482) )
-	ROM_LOAD( "r3.bin",       0x0020, 0x0020, BAD_DUMP CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) )
+	ROM_LOAD( "bagman_color_3pa2.3p", 0x0000, 0x0020, BAD_DUMP CRC(2a855523) SHA1(91e032233fee397c90b7c1662934aca9e0671482) )
+	ROM_LOAD( "bagman_color_3ra1.3p", 0x0020, 0x0020, BAD_DUMP CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) )
 
 	ROM_REGION( 0x0020, "5110ctrl", 0) // not dumped for this set
-	ROM_LOAD( "r6.bin",       0x0000, 0x0020, BAD_DUMP CRC(c58a4f6a) SHA1(35ef244b3e94032df2610aa594ea5670b91e1449) ) // State machine driving TMS5110
+	ROM_LOAD( "bagman_sound_6ra2.6r", 0x0000, 0x0020, BAD_DUMP CRC(c58a4f6a) SHA1(35ef244b3e94032df2610aa594ea5670b91e1449) ) // State machine driving TMS5110
 
 	ROM_REGION( 0x2000, "tmsprom", 0 ) // Data for the TMS5110 speech chip
-	ROM_LOAD( "bf8_12.r9",    0x0000, 0x1000, CRC(2e0057ff) SHA1(33e3ffa6418f86864eb81e5e9bda4bf540c143a6) ) // 2732
-	ROM_LOAD( "bf8_13.t9",    0x1000, 0x1000, CRC(b2120edd) SHA1(52b89dbcc749b084331fa82b13d0876e911fce52) ) // 2732
+	ROM_LOAD( "bf8_12.r9", 0x0000, 0x1000, CRC(2e0057ff) SHA1(33e3ffa6418f86864eb81e5e9bda4bf540c143a6) ) // 2732  == bagman_a1_9r.9r
+	ROM_LOAD( "bf8_13.t9", 0x1000, 0x1000, CRC(b2120edd) SHA1(52b89dbcc749b084331fa82b13d0876e911fce52) ) // 2732  == bagman_a1_9t.9t
 ROM_END
 
 ROM_START( botanic2 ) // PCB has Valadon logo with 'bajo licencia Itisa (Palamos)'.
@@ -958,23 +955,23 @@ ROM_START( sbagman )
 	ROM_CONTINUE(             0xce00, 0x0200 )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "sb2v3.1e",     0x0000, 0x1000, CRC(f4d3d4e6) SHA1(167ad0259578966fe86384df844e69cf2cc77443) )
-	ROM_LOAD( "sb4v3.1j",     0x1000, 0x1000, CRC(2c6a510d) SHA1(304064f11e80f4ec471174823b8aaf59844061ac) )
+	ROM_LOAD( "sb2v3.1e", 0x0000, 0x1000, CRC(f4d3d4e6) SHA1(167ad0259578966fe86384df844e69cf2cc77443) )
+	ROM_LOAD( "sb4v3.1j", 0x1000, 0x1000, CRC(2c6a510d) SHA1(304064f11e80f4ec471174823b8aaf59844061ac) )
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
-	ROM_LOAD( "sb1v3.1c",     0x0000, 0x1000, CRC(a046ff44) SHA1(af319cfb74e5efe435c26e971de13bd390f4b378) )
-	ROM_LOAD( "sb3v3.1f",     0x1000, 0x1000, CRC(a4422da4) SHA1(3aa55ca8c99566c1c9eb097b6d645c4216e09dfb) )
+	ROM_LOAD( "sb1v3.1c", 0x0000, 0x1000, CRC(a046ff44) SHA1(af319cfb74e5efe435c26e971de13bd390f4b378) )
+	ROM_LOAD( "sb3v3.1f", 0x1000, 0x1000, CRC(a4422da4) SHA1(3aa55ca8c99566c1c9eb097b6d645c4216e09dfb) )
 
 	ROM_REGION( 0x0040, "proms", 0 ) // not dumped for this set
-	ROM_LOAD( "p3.bin",       0x0000, 0x0020, BAD_DUMP CRC(2a855523) SHA1(91e032233fee397c90b7c1662934aca9e0671482) )
-	ROM_LOAD( "r3.bin",       0x0020, 0x0020, BAD_DUMP CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) )
+	ROM_LOAD( "p3.bin", 0x0000, 0x0020, BAD_DUMP CRC(2a855523) SHA1(91e032233fee397c90b7c1662934aca9e0671482) )
+	ROM_LOAD( "r3.bin", 0x0020, 0x0020, BAD_DUMP CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) )
 
 	ROM_REGION( 0x0020, "5110ctrl", 0) // not dumped for this set
-	ROM_LOAD( "r6.bin",       0x0000, 0x0020, BAD_DUMP CRC(c58a4f6a) SHA1(35ef244b3e94032df2610aa594ea5670b91e1449) ) // State machine driving TMS5110
+	ROM_LOAD( "r6.bin", 0x0000, 0x0020, BAD_DUMP CRC(c58a4f6a) SHA1(35ef244b3e94032df2610aa594ea5670b91e1449) ) // State machine driving TMS5110
 
 	ROM_REGION( 0x2000, "tmsprom", 0 ) // Data for the TMS5110 speech chip
-	ROM_LOAD( "b11v3.9r",     0x0000, 0x1000, CRC(2e0057ff) SHA1(33e3ffa6418f86864eb81e5e9bda4bf540c143a6) )
-	ROM_LOAD( "b12v3.9t",     0x1000, 0x1000, CRC(b2120edd) SHA1(52b89dbcc749b084331fa82b13d0876e911fce52) )
+	ROM_LOAD( "b11v3.9r", 0x0000, 0x1000, CRC(2e0057ff) SHA1(33e3ffa6418f86864eb81e5e9bda4bf540c143a6) )
+	ROM_LOAD( "b12v3.9t", 0x1000, 0x1000, CRC(b2120edd) SHA1(52b89dbcc749b084331fa82b13d0876e911fce52) )
 ROM_END
 
 ROM_START( sbagman2 )
@@ -982,41 +979,51 @@ ROM_START( sbagman2 )
 	ROM_LOAD( "5.9e",         0x0000, 0x1000, CRC(1b1d6b0a) SHA1(549161f6adc88fa16339815e05af33ca57815660) )
 	ROM_LOAD( "6.9f",         0x1000, 0x1000, CRC(ac49cb82) SHA1(5affa0c03bedf2c9d5368c7f075818e1760c12ae) )
 	ROM_LOAD( "7.9j",         0x2000, 0x1000, CRC(9a1c778d) SHA1(a655e25dc9efdf60cc5b34e42c93c4acaa4a7922) )
-	ROM_LOAD( "8.9k",         0x3000, 0x1000, CRC(b94fbb73) SHA1(5d676c5d1d864d70d98f0137c4072062a781b3a0) )
-	ROM_LOAD( "9.9m",         0x4000, 0x1000, CRC(601f34ba) SHA1(1b7ee61a341b9a87abe4fe10b0c647a9b0b97d38) )
-	ROM_LOAD( "10.9n",        0x5000, 0x1000, CRC(5f750918) SHA1(3dc44f259e88999dbb95b4d4376281cc81c1ab87) )
+	ROM_LOAD( "sb8v3.9k",     0x3000, 0x1000, CRC(b94fbb73) SHA1(5d676c5d1d864d70d98f0137c4072062a781b3a0) )
+	ROM_LOAD( "sb9v3.9m",     0x4000, 0x1000, CRC(601f34ba) SHA1(1b7ee61a341b9a87abe4fe10b0c647a9b0b97d38) )
+	ROM_LOAD( "sb10v3.9n",    0x5000, 0x1000, CRC(5f750918) SHA1(3dc44f259e88999dbb95b4d4376281cc81c1ab87) )
 	ROM_LOAD( "13.8d",        0xc000, 0x0e00, CRC(944a4453) SHA1(cd64d9267d2c5cea39464ba9308752c690e7fd24) )
 	ROM_CONTINUE(             0xfe00, 0x0200 )
-	ROM_LOAD( "14.8f",        0xd000, 0x0400, CRC(83b10139) SHA1(8a1880c6ab8a345676fe30465351d69cc1b416b2) )
+	ROM_LOAD( "sb14v3.8f",    0xd000, 0x0400, CRC(83b10139) SHA1(8a1880c6ab8a345676fe30465351d69cc1b416b2) )
 	ROM_CONTINUE(             0xe400, 0x0200 )
 	ROM_CONTINUE(             0xd600, 0x0a00 )
-	ROM_LOAD( "15.8j",        0xe000, 0x0400, CRC(fe924879) SHA1(b80cbf9cba91e553f7685aef348854c02f0619c7) )
+	ROM_LOAD( "sb15v3.8j",    0xe000, 0x0400, CRC(fe924879) SHA1(b80cbf9cba91e553f7685aef348854c02f0619c7) )
 	ROM_CONTINUE(             0xd400, 0x0200 )
 	ROM_CONTINUE(             0xe600, 0x0a00 )
-	ROM_LOAD( "16.8k",        0xf000, 0x0e00, CRC(b77eb1f5) SHA1(ef94c1b449e3fa230491052fc3bd4db3f1239263) )
+	ROM_LOAD( "sb16v3.8k",    0xf000, 0x0e00, CRC(b77eb1f5) SHA1(ef94c1b449e3fa230491052fc3bd4db3f1239263) )
 	ROM_CONTINUE(             0xce00, 0x0200 )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "2.1e",         0x0000, 0x1000, CRC(f4d3d4e6) SHA1(167ad0259578966fe86384df844e69cf2cc77443) )
-	ROM_LOAD( "4.1j",         0x1000, 0x1000, CRC(2c6a510d) SHA1(304064f11e80f4ec471174823b8aaf59844061ac) )
+	ROM_LOAD( "sb2v3.1e", 0x0000, 0x1000, CRC(f4d3d4e6) SHA1(167ad0259578966fe86384df844e69cf2cc77443) )
+	ROM_LOAD( "sb4v3.1j", 0x1000, 0x1000, CRC(2c6a510d) SHA1(304064f11e80f4ec471174823b8aaf59844061ac) )
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
-	ROM_LOAD( "1.1c",         0x0000, 0x1000, CRC(a046ff44) SHA1(af319cfb74e5efe435c26e971de13bd390f4b378) )
-	ROM_LOAD( "3.1f",         0x1000, 0x1000, CRC(a4422da4) SHA1(3aa55ca8c99566c1c9eb097b6d645c4216e09dfb) )
+	ROM_LOAD( "sb1v3.1c", 0x0000, 0x1000, CRC(a046ff44) SHA1(af319cfb74e5efe435c26e971de13bd390f4b378) )
+	ROM_LOAD( "sb3v3.1f", 0x1000, 0x1000, CRC(a4422da4) SHA1(3aa55ca8c99566c1c9eb097b6d645c4216e09dfb) )
 
 	ROM_REGION( 0x0040, "proms", 0 )
-	ROM_LOAD( "p3.bin",       0x0000, 0x0020, CRC(2a855523) SHA1(91e032233fee397c90b7c1662934aca9e0671482) )
-	ROM_LOAD( "r3.bin",       0x0020, 0x0020, CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) )
+	ROM_LOAD( "p3.bin", 0x0000, 0x0020, CRC(2a855523) SHA1(91e032233fee397c90b7c1662934aca9e0671482) )
+	ROM_LOAD( "r3.bin", 0x0020, 0x0020, CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) )
 
 	ROM_REGION( 0x0020, "5110ctrl", 0)
-	ROM_LOAD( "r6.bin",       0x0000, 0x0020, CRC(c58a4f6a) SHA1(35ef244b3e94032df2610aa594ea5670b91e1449) ) // State machine driving TMS5110
+	ROM_LOAD( "r6.bin", 0x0000, 0x0020, CRC(c58a4f6a) SHA1(35ef244b3e94032df2610aa594ea5670b91e1449) ) // State machine driving TMS5110
 
 	ROM_REGION( 0x2000, "tmsprom", 0 ) // Data for the TMS5110 speech chip
-	ROM_LOAD( "11.9r",        0x0000, 0x1000, CRC(2e0057ff) SHA1(33e3ffa6418f86864eb81e5e9bda4bf540c143a6) )
-	ROM_LOAD( "12.9t",        0x1000, 0x1000, CRC(b2120edd) SHA1(52b89dbcc749b084331fa82b13d0876e911fce52) )
+	ROM_LOAD( "b11v3.9r", 0x0000, 0x1000, CRC(2e0057ff) SHA1(33e3ffa6418f86864eb81e5e9bda4bf540c143a6) )
+	ROM_LOAD( "b12v3.9t", 0x1000, 0x1000, CRC(b2120edd) SHA1(52b89dbcc749b084331fa82b13d0876e911fce52) )
 ROM_END
 
-ROM_START( sbagmans )
+/*
+Stern Super Bagman ROM labels follow this format:
+
+S. BAGMAN   (c)
+A1      1F       <-- Revision level and PCB location
+1984      STERN
+
+Most examples/photos of the PCB show several hand written labels.
+
+*/
+ROM_START( sbagmans ) // known to come in the form of a Bagman to Super Bagman conversion kit
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sbag_9e.bin",  0x0000, 0x1000, CRC(c19696f2) SHA1(3a40202a97201a123033358f7afcb06f8ac15063) )
 	ROM_LOAD( "6.9f",         0x1000, 0x1000, CRC(ac49cb82) SHA1(5affa0c03bedf2c9d5368c7f075818e1760c12ae) )
@@ -1036,23 +1043,23 @@ ROM_START( sbagmans )
 	ROM_CONTINUE(             0xce00, 0x0200 )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "2.1e",         0x0000, 0x1000, CRC(f4d3d4e6) SHA1(167ad0259578966fe86384df844e69cf2cc77443) )
-	ROM_LOAD( "4.1j",         0x1000, 0x1000, CRC(2c6a510d) SHA1(304064f11e80f4ec471174823b8aaf59844061ac) )
+	ROM_LOAD( "sb2v3.1e", 0x0000, 0x1000, CRC(f4d3d4e6) SHA1(167ad0259578966fe86384df844e69cf2cc77443) ) // hand written:  SB #3  Ver3
+	ROM_LOAD( "sb4v3.1j", 0x1000, 0x1000, CRC(2c6a510d) SHA1(304064f11e80f4ec471174823b8aaf59844061ac) ) // hand written:  SB #4  Ver3
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
-	ROM_LOAD( "sbag_1c.bin",  0x0000, 0x1000, CRC(262f870a) SHA1(90877b869a7e927cfa4f9729ec3d6eac3a95dc8f) )
-	ROM_LOAD( "sbag_1f.bin",  0x1000, 0x1000, CRC(350ed0fb) SHA1(c7804e9618ebc88a1e3684a92a98d9a181441a1f) )
+	ROM_LOAD( "s._bagman_a1_1c.1c", 0x0000, 0x1000, CRC(262f870a) SHA1(90877b869a7e927cfa4f9729ec3d6eac3a95dc8f) )
+	ROM_LOAD( "s._bagman_a1_1f.1f", 0x1000, 0x1000, CRC(350ed0fb) SHA1(c7804e9618ebc88a1e3684a92a98d9a181441a1f) )
 
 	ROM_REGION( 0x0040, "proms", 0 )
-	ROM_LOAD( "p3.bin",       0x0000, 0x0020, CRC(2a855523) SHA1(91e032233fee397c90b7c1662934aca9e0671482) )
-	ROM_LOAD( "r3.bin",       0x0020, 0x0020, CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) )
+	ROM_LOAD( "bagman_color_3pa2.3p", 0x0000, 0x0020, CRC(47504204) SHA1(7524ed766cc6d9a158327717d2cf53346ace2392) ) // MMI 6331 BPROM
+	ROM_LOAD( "bagman_color_3ra1.3p", 0x0020, 0x0020, CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) ) // MMI 6331 BPROM
 
 	ROM_REGION( 0x0020, "5110ctrl", 0)
-	ROM_LOAD( "r6.bin",       0x0000, 0x0020, CRC(c58a4f6a) SHA1(35ef244b3e94032df2610aa594ea5670b91e1449) ) // State machine driving TMS5110
+	ROM_LOAD( "bagman_sound_6ra2.6r", 0x0000, 0x0020, CRC(c58a4f6a) SHA1(35ef244b3e94032df2610aa594ea5670b91e1449) ) // State machine driving TMS5110 - MMI 6331 BPROM
 
 	ROM_REGION( 0x2000, "tmsprom", 0 ) // Data for the TMS5110 speech chip
-	ROM_LOAD( "11.9r",        0x0000, 0x1000, CRC(2e0057ff) SHA1(33e3ffa6418f86864eb81e5e9bda4bf540c143a6) )
-	ROM_LOAD( "12.9t",        0x1000, 0x1000, CRC(b2120edd) SHA1(52b89dbcc749b084331fa82b13d0876e911fce52) )
+	ROM_LOAD( "bagman_a1_9r.9r", 0x0000, 0x1000, CRC(2e0057ff) SHA1(33e3ffa6418f86864eb81e5e9bda4bf540c143a6) )
+	ROM_LOAD( "bagman_a1_9t.9t", 0x1000, 0x1000, CRC(b2120edd) SHA1(52b89dbcc749b084331fa82b13d0876e911fce52) )
 ROM_END
 
 /*
