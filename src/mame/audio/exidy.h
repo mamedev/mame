@@ -7,6 +7,8 @@
 
 #include "machine/6532riot.h"
 #include "machine/6821pia.h"
+#include "machine/timer.h"
+#include "sound/flt_biquad.h"
 #include "sound/hc55516.h"
 #include "sound/tms5220.h"
 
@@ -120,7 +122,9 @@ protected:
 	required_device<riot6532_device> m_riot;
 
 	/* 5220/CVSD variables */
-	optional_device<hc55516_device> m_cvsd;
+	optional_device<mc3417_device> m_cvsd;
+	optional_device<filter_biquad_device> m_cvsd_filter;
+	optional_device<filter_biquad_device> m_cvsd_filter2;
 	optional_device<cpu_device> m_cvsdcpu;
 	optional_device<tms5220_device> m_tms;
 	required_device<pia6821_device> m_pia;
@@ -177,11 +181,15 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
+	required_device<timer_device> m_cvsd_timer;
+	TIMER_DEVICE_CALLBACK_MEMBER(cvsd_timer);
 	void voiceio_w(offs_t offset, uint8_t data);
 	uint8_t voiceio_r(offs_t offset);
+	bool m_cvsd_clk;
 
 	void cvsd_map(address_map &map);
 	void cvsd_iomap(address_map &map);

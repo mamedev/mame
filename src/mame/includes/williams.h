@@ -11,6 +11,7 @@
 #pragma once
 
 #include "audio/williams.h"
+#include "audio/s11c_bg.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
@@ -479,7 +480,7 @@ public:
 	joust2_state(const machine_config &mconfig, device_type type, const char *tag) :
 		williams_d000_rom_state(mconfig, type, tag),
 		m_mux(*this, "mux"),
-		m_cvsd_sound(*this, "cvsd")
+		m_bg(*this, "bg")
 	{ }
 
 	void joust2(machine_config &config);
@@ -489,7 +490,7 @@ private:
 	virtual void driver_init() override;
 
 	required_device<ls157_device> m_mux;
-	required_device<williams_cvsd_sound_device> m_cvsd_sound;
+	required_device<s11_obg_device> m_bg;
 	uint16_t m_current_sound_data;
 
 	virtual TILE_GET_INFO_MEMBER(get_tile_info) override;
@@ -497,7 +498,7 @@ private:
 
 	TIMER_CALLBACK_MEMBER(deferred_snd_cmd_w);
 	void snd_cmd_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(pia_3_cb1_w);
+	DECLARE_WRITE_LINE_MEMBER(pia_s11_bg_strobe_w);
 };
 
 /*----------- defined in video/williams.cpp -----------*/
