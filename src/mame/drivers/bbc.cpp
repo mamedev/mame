@@ -2928,7 +2928,7 @@ ROM_START(cfa3000bp)
 	ROM_REGION(0x4000, "mos", 0)
 	ROM_COPY("swr", 0x40000, 0, 0x4000)
 
-	ROM_REGION(0x4000, "tms6100", 0) /* system speech PHROM */
+	ROM_REGION(0x4000, "vsm", 0) /* system speech PHROM */
 	ROM_LOAD("phroma.bin", 0x0000, 0x4000, CRC(98e1bf9e) SHA1(b369809275cb67dfd8a749265e91adb2d2558ae6))
 ROM_END
 
