@@ -137,10 +137,10 @@ void bagman_state::main_map(address_map &map)
 	map(0x9c00, 0x9fff).nopw();    // Written to, but unused
 	map(0xa000, 0xa000).r(FUNC(bagman_state::pal16r6_r));
 	map(0xa000, 0xa007).w("mainlatch", FUNC(ls259_device::write_d0));
-	map(0xc000, 0xffff).rom(); // Super Bagman only
 	map(0xa800, 0xa807).w(FUNC(bagman_state::ls259_w)); // TMS5110 driving state machine
 	map(0xb000, 0xb000).portr("DSW");
 	map(0xb800, 0xb800).nopr(); // Looks like watchdog from schematics
+	map(0xc000, 0xffff).rom(); // Super Bagman only
 
 #if 0
 	map(0xb000, 0xb000).nopw(); // ????
@@ -1226,25 +1226,31 @@ ROM_START( squaitsa )
 ROM_END
 
 
-GAME( 1982, bagman,    0,       bagman,   bagman,    bagman_state,   empty_init, ROT270, "Valadon Automation",                             "Bagman",                                  MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bagnard,   bagman,  bagman,   bagman,    bagman_state,   empty_init, ROT270, "Valadon Automation",                             "Le Bagnard (set 1)",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bagnarda,  bagman,  bagman,   bagman,    bagman_state,   empty_init, ROT270, "Valadon Automation",                             "Le Bagnard (set 2)",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1983, bagnardi,  bagman,  bagman,   bagman,    bagman_state,   empty_init, ROT90,  "Valadon Automation (Itisa license)",             "Le Bagnard (Itisa, Spain)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bagnardio, bagman,  bagman,   bagman,    bagman_state,   empty_init, ROT90,  "Valadon Automation (Itisa license)",             "Le Bagnard (Itisa, Spain, older)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bagmans,   bagman,  bagman,   bagmans,   bagman_state,   empty_init, ROT270, "Valadon Automation (Stern Electronics license)", "Bagman (Stern Electronics, revision A5)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bagmans4,  bagman,  bagman,   bagman,    bagman_state,   empty_init, ROT270, "Valadon Automation (Stern Electronics license)", "Bagman (Stern Electronics, revision A4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bagmans3,  bagman,  bagman,   bagman,    bagman_state,   empty_init, ROT270, "Valadon Automation (Stern Electronics license)", "Bagman (Stern Electronics, revision A3)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1982, bagmanj,   bagman,  bagman,   bagman,    bagman_state,   empty_init, ROT270, "Valadon Automation (Taito license)",             "Bagman (Taito)",                          MACHINE_SUPPORTS_SAVE ) // Title screen actually doesn't mention Valadon, only Stern and Taito
+void bagman_state::init_bagmans3()
+{
+	// this earlier version has extra code at 0x5f98 - 0x5fa5 that reads a value from $ed01. Returning 0x01 allows starting a game and gives correct musing tempo. TODO: What happens here? Fix this workaround
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xed01, 0xed01, read8smo_delegate(*this, []() {return 0x01; }, "hack_r"));
+}
 
-GAME( 1984, sbagman,   0,       sbagman,  sbagman,   bagman_state,   empty_init, ROT270, "Valadon Automation",                             "Super Bagman (version 5)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1984, sbagman2,  sbagman, sbagman,  sbagman,   bagman_state,   empty_init, ROT270, "Valadon Automation",                             "Super Bagman (version 3?)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1984, sbagmani,  sbagman, sbagmani, sbagman,   bagman_state,   empty_init, ROT90,  "Valadon Automation (Itisa license)",             "Super Bagman (Itisa, Spain)",             MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // Different color PROMs, needs correct decoding
-GAME( 1984, sbagmans,  sbagman, sbagman,  sbagman,   bagman_state,   empty_init, ROT270, "Valadon Automation (Stern Electronics license)", "Super Bagman (Stern Electronics)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bagman,    0,       bagman,   bagman,    bagman_state,   empty_init,    ROT270, "Valadon Automation",                             "Bagman",                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bagnard,   bagman,  bagman,   bagman,    bagman_state,   empty_init,    ROT270, "Valadon Automation",                             "Le Bagnard (set 1)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bagnarda,  bagman,  bagman,   bagman,    bagman_state,   empty_init,    ROT270, "Valadon Automation",                             "Le Bagnard (set 2)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1983, bagnardi,  bagman,  bagman,   bagman,    bagman_state,   empty_init,    ROT90,  "Valadon Automation (Itisa license)",             "Le Bagnard (Itisa, Spain)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bagnardio, bagman,  bagman,   bagman,    bagman_state,   empty_init,    ROT90,  "Valadon Automation (Itisa license)",             "Le Bagnard (Itisa, Spain, older)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bagmans,   bagman,  bagman,   bagmans,   bagman_state,   empty_init,    ROT270, "Valadon Automation (Stern Electronics license)", "Bagman (Stern Electronics, revision A5)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bagmans4,  bagman,  bagman,   bagman,    bagman_state,   empty_init,    ROT270, "Valadon Automation (Stern Electronics license)", "Bagman (Stern Electronics, revision A4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bagmans3,  bagman,  bagman,   bagman,    bagman_state,   init_bagmans3, ROT270, "Valadon Automation (Stern Electronics license)", "Bagman (Stern Electronics, revision A3)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // see init_bagmans3(). Not sure it's actually protection
+GAME( 1982, bagmanj,   bagman,  bagman,   bagman,    bagman_state,   empty_init,    ROT270, "Valadon Automation (Taito license)",             "Bagman (Taito)",                          MACHINE_SUPPORTS_SAVE ) // Title screen actually doesn't mention Valadon, only Stern and Taito
 
-GAME( 1983, pickin,    0,       pickin,   pickin,    bagman_state,   empty_init, ROT270, "Valadon Automation",                             "Pickin'",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sbagman,   0,       sbagman,  sbagman,   bagman_state,   empty_init,    ROT270, "Valadon Automation",                             "Super Bagman (version 5)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sbagman2,  sbagman, sbagman,  sbagman,   bagman_state,   empty_init,    ROT270, "Valadon Automation",                             "Super Bagman (version 3?)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sbagmani,  sbagman, sbagmani, sbagman,   bagman_state,   empty_init,    ROT90,  "Valadon Automation (Itisa license)",             "Super Bagman (Itisa, Spain)",             MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // Different color PROMs, needs correct decoding
+GAME( 1984, sbagmans,  sbagman, sbagman,  sbagman,   bagman_state,   empty_init,    ROT270, "Valadon Automation (Stern Electronics license)", "Super Bagman (Stern Electronics)",        MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, botanic,   0,       botanic,  botanici,  bagman_state,   empty_init, ROT90,  "Itisa",                                          "Botanic (English / Spanish, set 1)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1983, botanic2,  botanic, bagman,   botanici2, bagman_state,   empty_init, ROT90,  "Itisa",                                          "Botanic (English / Spanish, set 2)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // At the title screen, Botanic in corrupted in the first loop, OK from the second on. Colors likely wrong, too. Has a leftover 5110.
-GAME( 1984, botanicf,  botanic, botanic,  botanicf,  bagman_state,   empty_init, ROT270, "Itisa (Valadon Automation license)",             "Botanic (French)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1983, pickin,    0,       pickin,   pickin,    bagman_state,   empty_init,    ROT270,    "Valadon Automation",                             "Pickin'",                                 MACHINE_SUPPORTS_SAVE )
 
-GAME( 1984, squaitsa,  0,       botanic,  squaitsa,  squaitsa_state, empty_init, ROT0,   "Itisa",                                          "Squash (Itisa)",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1983, botanic,   0,       botanic,  botanici,  bagman_state,   empty_init,    ROT90,     "Itisa",                                          "Botanic (English / Spanish, set 1)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1983, botanic2,  botanic, bagman,   botanici2, bagman_state,   empty_init,    ROT90,     "Itisa",                                          "Botanic (English / Spanish, set 2)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // At the title screen, Botanic in corrupted in the first loop, OK from the second on. Colors likely wrong, too. Has a leftover 5110.
+GAME( 1984, botanicf,  botanic, botanic,  botanicf,  bagman_state,   empty_init,    ROT270,    "Itisa (Valadon Automation license)",             "Botanic (French)",                        MACHINE_SUPPORTS_SAVE )
+
+GAME( 1984, squaitsa,  0,       botanic,  squaitsa,  squaitsa_state, empty_init,    ROT0,      "Itisa",                                          "Squash (Itisa)",                          MACHINE_SUPPORTS_SAVE )

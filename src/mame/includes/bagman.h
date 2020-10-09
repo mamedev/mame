@@ -32,6 +32,8 @@ public:
 	void pickin(machine_config &config);
 	void sbagmani(machine_config &config);
 
+	void init_bagmans3();
+
 protected:
 	// common
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
