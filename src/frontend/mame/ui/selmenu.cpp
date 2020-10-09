@@ -1661,7 +1661,7 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 		switch (local_menu_event.event_type)
 		{
 		// if we are hovering over a valid item, select it with a single click
-		case ui_event::MOUSE_DOWN:
+		case ui_event::type::MOUSE_DOWN:
 			if (m_ui_error)
 			{
 				ev.iptkey = IPT_OTHER;
@@ -1761,7 +1761,7 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 			break;
 
 		// if we are hovering over a valid item, fake a UI_SELECT with a double-click
-		case ui_event::MOUSE_DOUBLE_CLICK:
+		case ui_event::type::MOUSE_DOUBLE_CLICK:
 			if (hover() >= 0 && hover() < item_count())
 			{
 				set_selected_index(hover());
@@ -1777,7 +1777,7 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 			break;
 
 		// caught scroll event
-		case ui_event::MOUSE_WHEEL:
+		case ui_event::type::MOUSE_WHEEL:
 			if (hover() >= 0 && hover() < item_count() - skip_main_items - 1)
 			{
 				if (local_menu_event.zdelta > 0)
@@ -1807,7 +1807,7 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 			break;
 
 		// translate CHAR events into specials
-		case ui_event::IME_CHAR:
+		case ui_event::type::IME_CHAR:
 			if (exclusive_input_pressed(ev.iptkey, IPT_UI_FOCUS_NEXT, 0) || exclusive_input_pressed(ev.iptkey, IPT_UI_FOCUS_PREV, 0))
 			{
 				stop = true;
@@ -1824,7 +1824,7 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 			}
 			break;
 
-		case ui_event::MOUSE_RDOWN:
+		case ui_event::type::MOUSE_RDOWN:
 			if (hover() >= 0 && hover() < item_count() - skip_main_items - 1)
 			{
 				set_selected_index(hover());
@@ -1847,18 +1847,18 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 		{
 			switch (machine().ui_input().peek_event_type())
 			{
-			case ui_event::MOUSE_DOWN:
-			case ui_event::MOUSE_RDOWN:
-			case ui_event::MOUSE_DOUBLE_CLICK:
-			case ui_event::MOUSE_WHEEL:
+			case ui_event::type::MOUSE_DOWN:
+			case ui_event::type::MOUSE_RDOWN:
+			case ui_event::type::MOUSE_DOUBLE_CLICK:
+			case ui_event::type::MOUSE_WHEEL:
 				stop = true;
 				break;
-			case ui_event::NONE:
-			case ui_event::MOUSE_MOVE:
-			case ui_event::MOUSE_LEAVE:
-			case ui_event::MOUSE_UP:
-			case ui_event::MOUSE_RUP:
-			case ui_event::IME_CHAR:
+			case ui_event::type::NONE:
+			case ui_event::type::MOUSE_MOVE:
+			case ui_event::type::MOUSE_LEAVE:
+			case ui_event::type::MOUSE_UP:
+			case ui_event::type::MOUSE_RUP:
+			case ui_event::type::IME_CHAR:
 				break;
 			}
 		}
