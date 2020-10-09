@@ -229,7 +229,7 @@ static INPUT_PORTS_START( xerox820 )
 	// inputs defined in machine/keyboard.c
 INPUT_PORTS_END
 
-TIMER_CALLBACK_MEMBER( bigboard_state::bigboard_beepoff )
+TIMER_DEVICE_CALLBACK_MEMBER(bigboard_state::beep_timer)
 {
 	m_beeper->set_state(0);
 }
@@ -322,7 +322,7 @@ void bigboard_state::kbpio_pa_w(uint8_t data)
 	/* beeper on bigboard */
 	if (BIT(data, 5) & (!m_bit5))
 	{
-		machine().scheduler().timer_set(attotime::from_msec(40), timer_expired_delegate(FUNC(bigboard_state::bigboard_beepoff),this));
+		m_beep_timer->adjust(attotime::from_msec(40));
 		m_beeper->set_state(1);
 	}
 	m_bit5 = BIT(data, 5);
@@ -696,6 +696,7 @@ void bigboard_state::bigboard(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 950).add_route(ALL_OUTPUTS, "mono", 1.00); /* bigboard only */
+	TIMER(config, m_beep_timer).configure_generic(FUNC(bigboard_state::beep_timer));
 }
 
 void xerox820ii_state::xerox820ii(machine_config &config)
