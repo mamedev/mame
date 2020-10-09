@@ -5,6 +5,6 @@
 
 #pragma once
 
-NETLIST_EXTERNAL(sega005)
+NETLIST_EXTERNAL(005)
 
 #endif // MAME_AUDIO_NL_005_H

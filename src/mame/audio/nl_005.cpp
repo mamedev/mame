@@ -12,7 +12,7 @@
 //
 
 #include "netlist/devices/net_lib.h"
-#include "nl_astrob.h"
+#include "nl_005.h"
 
 
 //
@@ -95,7 +95,7 @@ static NETLIST_START(_MB4391)
     //AFUNC(fx, 5, "(A0-(A2/2))")
     //
     // vin * mix
-    AFUNC(fx, 5, "(A0-(A2/2)) * (min(1, max(0, -(A1 - 4.759384) / (4.759384 - 2.839579))))")
+    AFUNC(fx, 5, "(A0-(A2/2)) * ((A2-A3)/5)*(min(1, max(0, -(A1 - 4.759384) / (4.759384 - 2.839579))))")
     //
     // vin * pow(mix, 2)
     //AFUNC(fx, 5, "(A0-(A2/2)) * pow((min(1, max(0, -(A1 - 4.759384) / (4.759384 - 2.839579))), 2))")
@@ -147,7 +147,7 @@ NETLIST_END()
 // Main netlist
 //
 
-NETLIST_START(sega005)
+NETLIST_START(005)
 
 #if 1
 	SOLVER(Solver, 1000)
@@ -303,7 +303,7 @@ NETLIST_START(sega005)
 	RES(R96, 820)
 	RES(R97, RES_K(10))
 	RES(R98, RES_K(150))
-	RES(R99, RES_K(1))
+//	RES(R99, RES_K(1))
 	RES(R100, RES_K(10))
 	RES(R101, RES_K(10))
 	RES(R102, RES_K(10))
@@ -328,7 +328,7 @@ NETLIST_START(sega005)
 	RES(R121, RES_K(100))
 	RES(R122, RES_K(3.3))
 	RES(R123, RES_K(1))
-	RES(R124, RES_K(1))
+//	RES(R124, RES_K(1))
 	RES(R125, RES_K(51))
 	RES(R126, RES_K(51))
 	RES(R127, RES_K(51))
@@ -338,7 +338,7 @@ NETLIST_START(sega005)
 	RES(R131, RES_K(51))
 	RES(R132, RES_K(51))
 	// R133?
-	RES(R134, 220)
+//	RES(R134, 220)			// part of melody oscillator - not used
 	RES(R135, RES_K(10))
 	RES(R136, RES_K(100))
 	RES(R137, RES_K(100))
@@ -347,15 +347,15 @@ NETLIST_START(sega005)
 	// R140?
 	RES(R141, RES_K(4.7))
 
-	CAP(C1, CAP_U(470))
-	CAP(C2, CAP_U(470))
-	CAP(C3, CAP_U(470))
-	CAP(C4, CAP_U(470))
-	CAP(C5, CAP_U(470))
-	CAP(C6, CAP_U(470))
+//	CAP(C1, CAP_U(470))
+//	CAP(C2, CAP_U(470))
+//	CAP(C3, CAP_U(470))
+//	CAP(C4, CAP_U(470))
+//	CAP(C5, CAP_U(470))
+//	CAP(C6, CAP_U(470))
 //	CAP(C7, CAP_U(0.1))
 //	CAP(C8, CAP_U(2.2))
-	CAP(C9, CAP_P(4700))	// parts list says 0.047
+//	CAP(C9, CAP_P(4700))	// part of melody oscillator - not used (parts list says 0.047)
 //	CAP(C10, CAP_U(0.1))
 	CAP(C11, CAP_U(0.01))
 //	CAP(C12, CAP_U(0.1))
@@ -695,7 +695,7 @@ NETLIST_START(sega005)
 	NET_C(MELODY_SUPPRESS.A0, DECODER.Q)
 	NET_C(MELODY_SUPPRESS.A1, MELODY_CLK.Q)
 	NET_C(MELODY_SUPPRESS.Q, U4.13, C35.2, U14.11)
-	NET_C(R134.1, R134.2, C9.1, C9.2, U4.3, U4.4, U4.5, U4.6, GND)
+	NET_C(U4.3, U4.4, U4.5, U4.6, GND)
 	NET_C(U4.12, GND)
 #else
 	NET_C(U8.1, U7.3)
@@ -709,7 +709,7 @@ NETLIST_START(sega005)
 	CLOCK(OSC1, 350000) // 1/1.39*4700e-12*(220+500) = 212595
 	NET_C(OSC1.GND, GND)
 	NET_C(OSC1.VCC, I_V5)
-	NET_C(R134.1, R134.2, C9.1, C9.2, U4.3, U4.4, U4.5, U4.6, GND)
+	NET_C(U4.3, U4.4, U4.5, U4.6, GND)
 	NET_C(OSC1.Q, U7.2, U15.2)
 	NET_C(U7.10, U7.7, U7.1, I_V5)
 	NET_C(U7.15, U15.7, U15.10)
@@ -1093,8 +1093,6 @@ NETLIST_START(sega005)
 	// Unconnected inputs
 	//
 
-	NET_C(GND, R99.1, R99.2, R124.1, R124.2)
-	NET_C(GND, C1.1, C1.2, C2.1, C2.2, C3.1, C3.2, C4.1, C4.2, C5.1, C5.2, C6.1, C6.2)
 	NET_C(GND, U4.2)
 	NET_C(GND, U6.12, U6.13)
 	NET_C(GND, U14.10)

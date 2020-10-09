@@ -219,7 +219,7 @@ void sega005_audio_device::device_start()
 void sega005_audio_device::device_add_mconfig(machine_config &config)
 {
 	NETLIST_SOUND(config, "sound_nl", 48000)
-		.set_source(NETLIST_NAME(sega005))
+		.set_source(NETLIST_NAME(005))
 		.add_route(ALL_OUTPUTS, *this, 1.0);
 
 	NETLIST_LOGIC_INPUT(config, m_a_input[0], "I_A0.IN", 0);
