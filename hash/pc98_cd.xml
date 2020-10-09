@@ -4741,7 +4741,7 @@ license:CC0
 		<info name="release" value="19951208" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="toushin toshi ii - soshite, sorekara..." sha1="10ae6ad7d25f19f4af5dc51953c733496b14b5b2" />
+				<disk name="toushin toshi ii - soshite, sorekara" sha1="10ae6ad7d25f19f4af5dc51953c733496b14b5b2" />
 			</diskarea>
 		</part>
 	</software>
