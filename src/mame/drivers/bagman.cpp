@@ -806,7 +806,7 @@ ROM_START( bagmans )
 
 	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "bagman_color_3pa2.3p", 0x0000, 0x0020, CRC(47504204) SHA1(7524ed766cc6d9a158327717d2cf53346ace2392) ) // MMI 6331 BPROM
-	ROM_LOAD( "bagman_color_3ra1.3p", 0x0020, 0x0020, CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) ) // MMI 6331 BPROM
+	ROM_LOAD( "bagman_color_3ra1.3r", 0x0020, 0x0020, CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) ) // MMI 6331 BPROM
 
 	ROM_REGION( 0x0020, "5110ctrl", 0)
 	ROM_LOAD( "bagman_sound_6ra2.6r", 0x0000, 0x0020, CRC(c58a4f6a) SHA1(35ef244b3e94032df2610aa594ea5670b91e1449) ) // State machine driving TMS5110 - MMI 6331 BPROM
@@ -835,7 +835,7 @@ ROM_START( bagmans4 )
 
 	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "bagman_color_3pa2.3p", 0x0000, 0x0020, CRC(47504204) SHA1(7524ed766cc6d9a158327717d2cf53346ace2392) ) // MMI 6331 BPROM
-	ROM_LOAD( "bagman_color_3ra1.3p", 0x0020, 0x0020, CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) ) // MMI 6331 BPROM
+	ROM_LOAD( "bagman_color_3ra1.3r", 0x0020, 0x0020, CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) ) // MMI 6331 BPROM
 
 	ROM_REGION( 0x0020, "5110ctrl", 0)
 	ROM_LOAD( "bagman_sound_6ra2.6r", 0x0000, 0x0020, CRC(c58a4f6a) SHA1(35ef244b3e94032df2610aa594ea5670b91e1449) ) // State machine driving TMS5110 - MMI 6331 BPROM
@@ -864,7 +864,7 @@ ROM_START( bagmans3 ) // not compatible with the PAL16R6 emulator in ../mame/mac
 
 	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "bagman_color_3pa2.3p", 0x0000, 0x0020, CRC(47504204) SHA1(7524ed766cc6d9a158327717d2cf53346ace2392) ) // MMI 6331 BPROM
-	ROM_LOAD( "bagman_color_3ra1.3p", 0x0020, 0x0020, CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) ) // MMI 6331 BPROM
+	ROM_LOAD( "bagman_color_3ra1.3r", 0x0020, 0x0020, CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) ) // MMI 6331 BPROM
 
 	ROM_REGION( 0x0020, "5110ctrl", 0)
 	ROM_LOAD( "bagman_sound_6ra2.6r", 0x0000, 0x0020, CRC(c58a4f6a) SHA1(35ef244b3e94032df2610aa594ea5670b91e1449) ) // State machine driving TMS5110 - MMI 6331 BPROM
@@ -893,7 +893,7 @@ ROM_START( bagmanj ) // based on Stern's Bagman revision A4 set (bagmans4)
 
 	ROM_REGION( 0x0040, "proms", 0 ) // not dumped for this set
 	ROM_LOAD( "bagman_color_3pa2.3p", 0x0000, 0x0020, BAD_DUMP CRC(2a855523) SHA1(91e032233fee397c90b7c1662934aca9e0671482) )
-	ROM_LOAD( "bagman_color_3ra1.3p", 0x0020, 0x0020, BAD_DUMP CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) )
+	ROM_LOAD( "bagman_color_3ra1.3r", 0x0020, 0x0020, BAD_DUMP CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) )
 
 	ROM_REGION( 0x0020, "5110ctrl", 0) // not dumped for this set
 	ROM_LOAD( "bagman_sound_6ra2.6r", 0x0000, 0x0020, BAD_DUMP CRC(c58a4f6a) SHA1(35ef244b3e94032df2610aa594ea5670b91e1449) ) // State machine driving TMS5110
@@ -1052,7 +1052,7 @@ ROM_START( sbagmans ) // known to come in the form of a Bagman to Super Bagman c
 
 	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "bagman_color_3pa2.3p", 0x0000, 0x0020, CRC(47504204) SHA1(7524ed766cc6d9a158327717d2cf53346ace2392) ) // MMI 6331 BPROM
-	ROM_LOAD( "bagman_color_3ra1.3p", 0x0020, 0x0020, CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) ) // MMI 6331 BPROM
+	ROM_LOAD( "bagman_color_3ra1.3r", 0x0020, 0x0020, CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) ) // MMI 6331 BPROM
 
 	ROM_REGION( 0x0020, "5110ctrl", 0)
 	ROM_LOAD( "bagman_sound_6ra2.6r", 0x0000, 0x0020, CRC(c58a4f6a) SHA1(35ef244b3e94032df2610aa594ea5670b91e1449) ) // State machine driving TMS5110 - MMI 6331 BPROM
