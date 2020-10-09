@@ -1982,8 +1982,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs, uses a dance mat controller -->
-	<software name="jamgymg" supported="no"> <!-- Will be clone of "jamgym" once found and dumped. -->
+	<software name="jamgymg" supported="yes"> <!-- Will be clone of "jamgym" once found and dumped. -->
 		<description>V.Smile Tanz Mit Center (Germany)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -2000,8 +1999,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs, uses a dance mat controller -->
-	<software name="jamgymf" cloneof="jamgymg" supported="no"> <!-- Will be clone of "jamgym" once found and dumped. -->
+	<software name="jamgymf" cloneof="jamgymg" supported="yes"> <!-- Will be clone of "jamgym" once found and dumped. -->
 		<description>V.Smile Défi Gym (France)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -2016,8 +2014,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs, uses a dance mat controller -->
-	<software name="jamgyms" cloneof="jamgymg" supported="no">
+	<software name="jamgyms" cloneof="jamgymg" supported="yes">
 		<description>Gimnasio Interactivo V.Smile (Spain)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
