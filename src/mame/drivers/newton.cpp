@@ -47,13 +47,26 @@ public:
 protected:
 	void mem_map(address_map &map);
 
+	uint32_t tick_count_r();
+
 	required_device<arm7_cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
+
+	uint32_t m_ram_size;
 };
+
+uint32_t newton_state::tick_count_r()
+{
+	return (uint32_t)m_maincpu->total_cycles();
+}
 
 void newton_state::mem_map(address_map &map)
 {
-	map(0x00000000, 0x007fffff).rom().region("maincpu", 0);
+	map(0x00000000, 0x007fffff).mirror(0x00800000).rom().region("maincpu", 0);
+	map(0x02000000, 0x023fffff).ram(); // Actually Flash
+	map(0x04000000, 0x04ffffff).rw(m_ram, FUNC(ram_device::read), FUNC(ram_device::write));
+	map(0x0f181800, 0x0f181803).r(FUNC(newton_state::tick_count_r));
+	map(0x0f001800, 0x0f001803).lrw32(NAME([this](){ return m_ram_size; }), NAME([this](uint32_t data) { m_ram_size = data; }));
 }
 
 static INPUT_PORTS_START( newton )
