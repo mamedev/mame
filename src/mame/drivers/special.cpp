@@ -14,6 +14,7 @@ Notes:
 - Special, specialp, lik, erik: At the first prompt, press Enter for the Monitor. All other keys just beep.
 
 - Specimx: Press Enter to go into a ramdisk File Manager. Press F3 to load a tape (which errors).
+           If you had loaded a disk, press F6 to boot it.
 - Specimx -bios 1 and 2 don't set a colour, so a default has been chosen instead of a black screen.
 - Specimx -bios 1 lists a number of programs on the ramdisk, but most of them don't work.
 
@@ -564,6 +565,7 @@ void special_state::specimx(machine_config &config)
 	m_pit->out_handler<1>().set("custom", FUNC(specimx_sound_device::set_input_ch1));
 	m_pit->set_clk<2>(2000000);
 	m_pit->out_handler<2>().set("custom", FUNC(specimx_sound_device::set_input_ch2));
+	TIMER(config, m_pit_timer).configure_generic(FUNC(special_state::pit_timer));
 
 	m_ppi->in_pb_callback().set(FUNC(special_state::specimx_portb_r));
 	m_ppi->out_pc_callback().set(FUNC(special_state::specimx_portc_w));
