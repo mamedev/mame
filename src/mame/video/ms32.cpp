@@ -233,10 +233,11 @@ void ms32_state::crtc_w(offs_t offset, u32 data, u32 mem_mask)
 
 
 /* SPRITES based on tetrisp2 for now, readd priority bits later */
-void ms32_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, const rectangle &cliprect, u16 *sprram_top, size_t sprram_size)
+void ms32_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, const rectangle &cliprect, u16 *sprram_top)
 {
+	const u32 sprite_size = 0x10000;
 	u16  *source =   sprram_top;
-	u16  *finish =   sprram_top + (sprram_size - 0x10) / 2;
+	u16  *finish =   sprram_top + (sprite_size - 0x10);
 	// TODO: sprite control 0x10 also uses bits 0-11 for sprite start address? 
 	// akiss uses it for double buffer animations, flips between 0 and 0x800 (and is ugly for latter)
 	const bool reverseorder = (m_sprite_ctrl[0x10/4] & 0x8000) == 0x0000;
@@ -244,7 +245,7 @@ void ms32_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, con
 
 	if (reverseorder == true)
 	{
-		source  = sprram_top + (sprram_size - 0x10) / 2;
+		source  = sprram_top + (sprite_size - 0x10);
 		finish  = sprram_top;
 	}
 
@@ -438,8 +439,7 @@ u32 ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitmap, 
 	m_temp_bitmap_sprites.fill(0, cliprect);
 	m_temp_bitmap_sprites_pri.fill(0, cliprect);
 
-	draw_sprites(m_temp_bitmap_sprites, m_temp_bitmap_sprites_pri, cliprect, m_sprram_buffer.get(), 0x20000);
-
+	draw_sprites(m_temp_bitmap_sprites, m_temp_bitmap_sprites_pri, cliprect, m_sprram_buffer.get());
 
 	// TODO: actually understand this (per-scanline priority and alpha-blend over every layer?)
 	asc_pri = scr_pri = rot_pri = 0;

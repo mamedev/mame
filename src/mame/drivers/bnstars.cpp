@@ -113,7 +113,8 @@ public:
 		, m_ms32_roz0_ram(*this, "roz0_ram", 32)
 		, m_ms32_roz1_ram(*this, "roz1_ram", 32)
 		, m_ms32_roz_ctrl(*this, "roz_ctrl.%u", 0)
-		, m_ms32_spram(*this, "spram", 32)
+		, m_objectram_left(*this, "objram_left", 32)
+		, m_objectram_right(*this, "objram_right", 32)
 		, m_ms32_tx0_scroll(*this, "tx0_scroll")
 		, m_ms32_bg0_scroll(*this, "bg0_scroll")
 		, m_ms32_tx1_scroll(*this, "tx1_scroll")
@@ -140,7 +141,8 @@ private:
 	required_shared_ptr<u16> m_ms32_roz0_ram;
 	required_shared_ptr<u16> m_ms32_roz1_ram;
 	required_shared_ptr_array<u32, 2> m_ms32_roz_ctrl;
-	required_shared_ptr<u16> m_ms32_spram;
+	required_shared_ptr<u16> m_objectram_left;
+	required_shared_ptr<u16> m_objectram_right;
 	required_shared_ptr<u32> m_ms32_tx0_scroll;
 	required_shared_ptr<u32> m_ms32_bg0_scroll;
 	required_shared_ptr<u32> m_ms32_tx1_scroll;
@@ -167,7 +169,7 @@ private:
 	u32 screen_update_bnstars_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_bnstars_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, int chip);
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u16 *sprram_top, size_t sprram_size);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u16 *sprram_top);
 	void bnstars_map(address_map &map);
 	void bnstars_sound_map(address_map &map);
 };
@@ -361,7 +363,7 @@ void bnstars_state::ms32_roz1_ram_w(offs_t offset, u16 data, u16 mem_mask)
 
 
 /* SPRITES based on tetrisp2 for now, readd priority bits later */
-void bnstars_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u16 *sprram_top, size_t sprram_size)
+void bnstars_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u16 *sprram_top)
 {
 /***************************************************************************
 
@@ -399,14 +401,14 @@ void bnstars_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 (*) 1 pixel granularity
 
 ***************************************************************************/
-
-	u16      *source = sprram_top;
-	const u16    *finish = sprram_top + (sprram_size - 0x10) / 2;
+	const u32 sprite_size = 0x10000;
+	u16 *source = sprram_top;
+	u16 *finish = sprram_top + (sprite_size - 0x10);
 	const bool reverseorder = (m_sprite_ctrl[0x10/4] & 0x8000) == 0x0000;
 
 	if (reverseorder == true)
 	{
-		source  = sprram_top + (sprram_size - 0x10) / 2;
+		source  = sprram_top + (sprite_size - 0x10);
 		finish  = sprram_top;
 	}
 
@@ -489,7 +491,6 @@ u32 bnstars_state::screen_update_bnstars_left(screen_device &screen, bitmap_ind1
 
 	bitmap.fill(0, cliprect);   /* bg color */
 
-
 	m_ms32_bg_tilemap[0]->set_scrollx(0, m_ms32_bg0_scroll[0x00/4] + m_ms32_bg0_scroll[0x08/4] + 0x10 );
 	m_ms32_bg_tilemap[0]->set_scrolly(0, m_ms32_bg0_scroll[0x0c/4] + m_ms32_bg0_scroll[0x14/4] );
 	m_ms32_bg_tilemap[0]->draw(screen, bitmap, cliprect, 0,1);
@@ -500,8 +501,7 @@ u32 bnstars_state::screen_update_bnstars_left(screen_device &screen, bitmap_ind1
 	m_ms32_tx_tilemap[0]->set_scrolly(0, m_ms32_tx0_scroll[0x0c/4] + m_ms32_tx0_scroll[0x14/4]);
 	m_ms32_tx_tilemap[0]->draw(screen, bitmap, cliprect, 0,4);
 
-
-	draw_sprites(screen,bitmap,cliprect, m_ms32_spram, 0x20000/2);
+	draw_sprites(screen, bitmap, cliprect, m_objectram_left);
 
 	return 0;
 }
@@ -511,7 +511,6 @@ u32 bnstars_state::screen_update_bnstars_right(screen_device &screen, bitmap_ind
 	screen.priority().fill(0, cliprect);
 
 	bitmap.fill(0, cliprect);    /* bg color */
-
 
 	m_ms32_bg_tilemap[1]->set_scrollx(0, m_ms32_bg1_scroll[0x00/4] + m_ms32_bg1_scroll[0x08/4] + 0x10 );
 	m_ms32_bg_tilemap[1]->set_scrolly(0, m_ms32_bg1_scroll[0x0c/4] + m_ms32_bg1_scroll[0x14/4] );
@@ -523,7 +522,7 @@ u32 bnstars_state::screen_update_bnstars_right(screen_device &screen, bitmap_ind
 	m_ms32_tx_tilemap[1]->set_scrolly(0, m_ms32_tx1_scroll[0x0c/4] + m_ms32_tx1_scroll[0x14/4]);
 	m_ms32_tx_tilemap[1]->draw(screen, bitmap, cliprect, 0,4);
 
-	draw_sprites(screen,bitmap,cliprect, m_ms32_spram+(0x20000/4), 0x20000/2);
+	draw_sprites(screen, bitmap, cliprect, m_objectram_right);
 
 	return 0;
 }
@@ -753,9 +752,13 @@ void bnstars_state::bnstars_map(address_map &map)
 		NAME([this] (offs_t offset) -> u16 { return m_ms32_roz1_ram[offset]; })).w(FUNC(bnstars_state::ms32_roz1_ram_w)).umask32(0x0000ffff).share("roz1_ram");
 	map(0xfe400000, 0xfe41ffff).lr16(
 		NAME([this] (offs_t offset) -> u16 { return m_ms32_roz0_ram[offset]; })).w(FUNC(bnstars_state::ms32_roz0_ram_w)).umask32(0x0000ffff).share("roz0_ram");
-	map(0xfe800000, 0xfe83ffff).lrw16(
-		NAME([this] (offs_t offset) -> u16 { return m_ms32_spram[offset]; }),
-		NAME([this] (offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_ms32_spram[offset]); })).umask32(0x0000ffff).share("spram");
+	// TODO: sprite chip interfaces should be internalized, also NOP to $ffffxxxx
+	map(0xfe800000, 0xfe81ffff).lrw16(
+		NAME([this] (offs_t offset) -> u16 { return m_objectram_left[offset]; }),
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_objectram_left[offset]); })).umask32(0x0000ffff).share("objram_left");
+	map(0xfe820000, 0xfe83ffff).lrw16(
+		NAME([this] (offs_t offset) -> u16 { return m_objectram_right[offset]; }),
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_objectram_right[offset]); })).umask32(0x0000ffff).share("objram_right");
 	map(0xfea00000, 0xfea07fff).lr16(
 		NAME([this] (offs_t offset) -> u16 { return m_ms32_tx1_ram[offset]; })).w(FUNC(bnstars_state::ms32_tx1_ram_w)).umask32(0x0000ffff).share("tx1_ram");
 	map(0xfea08000, 0xfea0ffff).lr16(

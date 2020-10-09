@@ -677,8 +677,8 @@ void ms32_state::ms32_map(address_map &map)
 //	0xfe400000 ROZ0 VRAM?
 //	0xfe600000 ROZ0 line RAM?
 //	0xfe800000 object layer VRAM (16-bits wide, 0x20000 in size)
-	map(0xc2800000, 0xc283ffff).rw(FUNC(ms32_state::ms32_sprram_r16), FUNC(ms32_state::ms32_sprram_w16)).umask32(0x0000ffff).mirror(0x3c1c0000).share("sprram");
-//  map(0xc2840000, 0xc29fffff) // mirrors of sprram, handled above
+	map(0xc2800000, 0xc281ffff).rw(FUNC(ms32_state::ms32_sprram_r16), FUNC(ms32_state::ms32_sprram_w16)).umask32(0x0000ffff).mirror(0x3c1e0000).share("sprram");
+//  map(0xc2820000, 0xc29fffff) // mirrors of sprram, handled above
 
 //	0xfec00000 ASCII layer VRAM (16-bits wide, 0x4000 in size)
 	map(0xc2c00000, 0xc2c07fff).rw(FUNC(ms32_state::ms32_txram_r16), FUNC(ms32_state::ms32_txram_w16)).umask32(0x0000ffff).mirror(0x3c1f0000).share("txram");

@@ -159,7 +159,7 @@ private:
 	void irq_init();
 	void irq_raise(int level);
 	void update_color(int color);
-	void draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, const rectangle &cliprect, u16 *sprram_top, size_t sprram_size);
+	void draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, const rectangle &cliprect, u16 *sprram_top);
 	void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect,int priority);
 	void f1superb_map(address_map &map);
 	void ms32_map(address_map &map);
