@@ -15,6 +15,7 @@
 #include "machine/pit8253.h"
 #include "machine/tms5501.h"
 #include "imagedev/cassette.h"
+#include "machine/timer.h"
 #include "emupal.h"
 
 
@@ -32,16 +33,12 @@ public:
 		, m_ram(*this, "mainram")
 		, m_palette(*this, "palette")
 		, m_io_keyboard(*this, "IN%u", 0U)
+		, m_tms_timer(*this, "tms_timer")
 	{ }
 
 	void dai(machine_config &config);
 
 private:
-	enum
-	{
-		TIMER_TMS5501
-	};
-
 	u8 m_paddle_select;
 	u8 m_paddle_enable;
 	u8 m_cassette_motor[2];
@@ -59,6 +56,7 @@ private:
 	void dai_palette(palette_device &palette) const;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	IRQ_CALLBACK_MEMBER(int_ack);
+	TIMER_DEVICE_CALLBACK_MEMBER(tms_timer);
 
 	void mem_map(address_map &map);
 
@@ -66,7 +64,6 @@ private:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	memory_passthrough_handler *m_rom_shadow_tap;
 	required_device<cpu_device> m_maincpu;
@@ -78,6 +75,7 @@ private:
 	required_shared_ptr<u8> m_ram;
 	required_device<palette_device> m_palette;
 	required_ioport_array<9> m_io_keyboard;
+	required_device<timer_device> m_tms_timer;
 };
 
 
