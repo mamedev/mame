@@ -108,6 +108,7 @@ mc6845_device::mc6845_device(const machine_config &mconfig, device_type type, co
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this, false)
 	, m_show_border_area(true)
+	, m_noninterlace_adjust(0)
 	, m_interlace_adjust(0)
 	, m_clk_scale(1)
 	, m_visarea_adjust_min_x(0)
@@ -1250,6 +1251,7 @@ void mc6845_device::device_start()
 	m_horiz_char_total = 0xff;
 	m_max_ras_addr = 0x1f;
 	m_vert_char_total = 0x7f;
+	m_mode_control = 0x00;
 
 	m_supports_disp_start_addr_r = false;  // MC6845 can not read Display Start (double checked on datasheet)
 	m_supports_vert_sync_width = false;
