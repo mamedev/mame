@@ -827,6 +827,7 @@ void c1p_state::c1p(machine_config &config)
 	m_discrete->set_intf(osi600c_discrete_interface);
 	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.50);
 	BEEP(config, "beeper", 300).add_route(ALL_OUTPUTS, "mono", 0.50);
+	TIMER(config, m_beep_timer).configure_generic(FUNC(c1p_state::beep_timer));
 
 	PIA6821(config, "pia_1", 0);
 	PIA6821(config, "pia_2", 0);
@@ -922,22 +923,15 @@ ROM_END
 
 /* Driver Initialization */
 
-void c1p_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_DEVICE_CALLBACK_MEMBER(c1p_state::beep_timer)
 {
-	switch (id)
-	{
-	case TIMER_SETUP_BEEP:
-		m_beeper->set_state(0);
-		m_beeper->set_clock(300);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in c1p_state::device_timer");
-	}
+	m_beeper->set_state(0);
+	m_beeper->set_clock(300);
 }
 
 void c1p_state::init_c1p()
 {
-	timer_set(attotime::zero, TIMER_SETUP_BEEP);
+	m_beep_timer->adjust(attotime::zero);
 }
 
 
