@@ -820,6 +820,7 @@ void mbee_state::mbee256(machine_config &config)
 	config.device_remove("fdc:1");
 	FLOPPY_CONNECTOR(config, m_floppy0, mbee_floppies, "35dd", floppy_image_device::default_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy1, mbee_floppies, "35dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	TIMER(config, "newkb_timer").configure_periodic(FUNC(mbee_state::newkb_timer), attotime::from_hz(50));
 }
 
 void mbee_state::mbeett(machine_config &config)
@@ -829,6 +830,7 @@ void mbee_state::mbeett(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &mbee_state::mbeett_io);
 	config.device_remove("quickload");
 	config.device_remove("quickload2");
+	TIMER(config, "newkb_timer").configure_periodic(FUNC(mbee_state::newkb_timer), attotime::from_hz(50));
 	SCC8530(config, "scc", 4000000); // clock unknown
 }
 
