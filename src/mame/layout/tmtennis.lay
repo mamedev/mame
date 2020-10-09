@@ -9,22 +9,19 @@ license:CC0
 	<element name="court">
 		<image><data><![CDATA[
 			<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="700" height="249" viewBox="0 0 700 249" version="1.1" id="svg1">
-				<path id="path1" d="m 1.5,247.5 h 697 l -95,-208 h -507 z"
-					style="fill:none;stroke:#00ff00;stroke-width:3;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1" />
-				<path id="path2" d="M 88,58.5 H 612"
-					style="fill:none;stroke:#00ff00;stroke-width:3;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1" />
-				<path id="path3" d="M 12,224.5 H 688"
-					style="fill:none;stroke:#00ff00;stroke-width:3;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1" />
-				<path id="path4" d="m 138.5,224.5 47,-166"
-					style="fill:none;stroke:#00ff00;stroke-width:3;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1" />
-				<path id="path5" d="m 561.5,224.5 -47,-166"
-					style="fill:none;stroke:#00ff00;stroke-width:3;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1" />
-				<path id="path6" d="M 163,136.5 H 537"
-					style="fill:none;stroke:#00ff00;stroke-width:3;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1" />
-				<path id="path7" d="M 350,247.5 V 38.5"
-					style="fill:none;stroke:#00ff00;stroke-width:3;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1" />
-				<rect id="rect1" width="12" height="39" x="344" y="0" style="opacity:1;fill:#00ff00;fill-opacity:1;stroke:none" />
-				<rect id="rect2" width="12" height="42" x="344" y="206" style="opacity:1;fill:#00ff00;fill-opacity:1;stroke:none" />
+				<g fill="none" stroke="#00ff00" stroke-width="3" stroke-linecap="butt" stroke-linejoin="round" stroke-opacity="1">
+					<path d="m 1.5,247.5 h 697 l -95,-208 h -507 z" />
+					<path d="M 88,58.5 H 612" />
+					<path d="M 12,224.5 H 688" />
+					<path d="m 138.5,224.5 47,-166" />
+					<path d="m 561.5,224.5 -47,-166" />
+					<path d="M 163,136.5 H 537" />
+					<path d="M 350,247.5 V 38.5"
+				</g>
+				<g fill="#00ff00">
+					<rect width="12" height="39" x="344" y="0" />
+					<rect width="12" height="42" x="344" y="206" />
+				</g>
 			</svg>
 		]]></data></image>
 	</element>
