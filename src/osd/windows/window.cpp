@@ -1344,7 +1344,7 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 
 		// close: cause MAME to exit
 		case WM_CLOSE:
-			window->machine().schedule_exit();
+			window->machine().ui().request_quit();
 			break;
 
 		// destroy: clean up all attached rendering bits and nullptr out our hwnd

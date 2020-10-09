@@ -58,6 +58,9 @@ void sdl_event_manager::process_events(running_machine &machine)
 	SDL_Event sdlevent;
 	while (SDL_PollEvent(&sdlevent))
 	{
+		if (sdlevent.type == SDL_QUIT)
+			machine.ui().request_quit();
+
 		// process window events if they come in
 		if (sdlevent.type == SDL_WINDOWEVENT)
 			process_window_event(machine, sdlevent);
@@ -91,7 +94,7 @@ void sdl_event_manager::process_window_event(running_machine &machine, SDL_Event
 		break;
 
 	case SDL_WINDOWEVENT_CLOSE:
-		machine.schedule_exit();
+		machine.ui().request_quit();
 		break;
 
 	case SDL_WINDOWEVENT_LEAVE:
