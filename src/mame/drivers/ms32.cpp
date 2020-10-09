@@ -698,6 +698,7 @@ void ms32_state::ms32_map(address_map &map)
 //	map(0xfcc00000, 0xfcc0001f) 												// input
 	map(0xfcc00004, 0xfcc00007).portr("INPUTS");
 	map(0xfcc00010, 0xfcc00013).portr("DSW");
+	// System Registers
 	map(0xfce00000, 0xfce0002f).w(FUNC(ms32_state::crtc_w));   					// flip screen + CRTC setup
 //	map(0xfce00030, 0xfce00033) 												// timer irq control
 	map(0xfce00034, 0xfce00037).nopw(); 										// timer irq trigger (ack?)
@@ -1760,14 +1761,15 @@ void ms32_state::ms32(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(XTAL(6'000'000), 384, 0, 320, 263, 0, 224); // default setup
+	// dot clock is 48/8 MHz, settable with /6 thru system register [0]
+	m_screen->set_raw(XTAL(48'000'000)/8, 384, 0, 320, 263, 0, 224); // default CRTC setup
 	m_screen->set_screen_update(FUNC(ms32_state::screen_update_ms32));
 	m_screen->screen_vblank().set(FUNC(ms32_state::screen_vblank_ms32));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ms32);
 	PALETTE(config, m_palette).set_entries(0x10000);
 
-	JALECO_MEGASYSTEM32_SPRITE(config, m_sprite, XTAL(48'000'000)); // 48MHz for video?
+	JALECO_MEGASYSTEM32_SPRITE(config, m_sprite, XTAL(48'000'000)/8);
 	m_sprite->set_palette(m_palette);
 	m_sprite->set_color_base(0);
 	m_sprite->set_color_entries(16);

@@ -820,12 +820,12 @@ void bnstars_state::bnstars(machine_config &config)
 	config.set_default_layout(layout_dualhsxs);
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
-	lscreen.set_raw(XTAL(6'000'000), 384, 0, 320, 263, 0, 224); // default setup 
+	lscreen.set_raw(XTAL(48'000'000)/8, 384, 0, 320, 263, 0, 224); // default CRTC setup
 	lscreen.set_screen_update(FUNC(bnstars_state::screen_update_bnstars_left));
 	lscreen.set_palette("palette");
 
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
-	rscreen.set_raw(XTAL(6'000'000), 384, 0, 320, 263, 0, 224); // default setup 
+	rscreen.set_raw(XTAL(48'000'000)/8, 384, 0, 320, 263, 0, 224); // default CRTC setup
 	rscreen.set_screen_update(FUNC(bnstars_state::screen_update_bnstars_right));
 	rscreen.set_palette("palette2");
 

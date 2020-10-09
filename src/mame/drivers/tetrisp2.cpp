@@ -1687,10 +1687,7 @@ void tetrisp2_state::tetrisp2(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(0x140, 0xe0);
-	screen.set_visarea(0, 0x140-1, 0, 0xe0-1);
+	screen.set_raw(XTAL(48'000'000)/8, 384, 0, 320, 263, 0, 224); // default CRTC setup
 	screen.set_screen_update(FUNC(tetrisp2_state::screen_update_tetrisp2));
 	screen.set_palette(m_palette);
 
@@ -1727,17 +1724,16 @@ void tetrisp2_state::nndmseal(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(0x180, 0xf0);
-	screen.set_visarea(0, 0x180-1, 0, 0xf0-1);
+	// the only game effectively using the faster dot clock divider
+	// Note that they replaced the dot clock to a OSC1(42.9545MHz) for video
+    screen.set_raw(XTAL(42'954'545)/6, 455, 0, 384, 262, 0, 240);
 	screen.set_screen_update(FUNC(tetrisp2_state::screen_update_tetrisp2));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tetrisp2);
 	PALETTE(config, m_palette).set_entries(0x8000);
 
-	JALECO_MEGASYSTEM32_SPRITE(config, m_sprite, 42954500); // OSC1(42.9545MHz) for video?
+	JALECO_MEGASYSTEM32_SPRITE(config, m_sprite, XTAL(42'954'545)/6);
 	m_sprite->set_palette(m_palette);
 	m_sprite->set_color_base(0);
 	m_sprite->set_color_entries(16);
@@ -1764,17 +1760,14 @@ void tetrisp2_state::rockn(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(0x140, 0xe0);
-	screen.set_visarea(0, 0x140-1, 0, 0xe0-1);
+    screen.set_raw(XTAL(48'000'000)/8, 384, 0, 320, 263, 0, 224);
 	screen.set_screen_update(FUNC(tetrisp2_state::screen_update_rockntread));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tetrisp2);
 	PALETTE(config, m_palette).set_entries(0x8000);
 
-	JALECO_MEGASYSTEM32_SPRITE(config, m_sprite, XTAL(48'000'000)); // 48MHz for video?
+	JALECO_MEGASYSTEM32_SPRITE(config, m_sprite, XTAL(48'000'000/8)); // 48MHz for video?
 	m_sprite->set_palette(m_palette);
 	m_sprite->set_color_base(0);
 	m_sprite->set_color_entries(16);
@@ -1804,17 +1797,15 @@ void tetrisp2_state::rockn2(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(0x140, 0xe0);
-	screen.set_visarea(0, 0x140-1, 0, 0xe0-1);
+	// TODO: during POST it sets up a vertical size of 487, is there an interlace bit?
+    screen.set_raw(XTAL(48'000'000)/8, 384, 0, 320, 263, 0, 224);
 	screen.set_screen_update(FUNC(tetrisp2_state::screen_update_rockntread));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tetrisp2);
 	PALETTE(config, m_palette).set_entries(0x8000);
 
-	JALECO_MEGASYSTEM32_SPRITE(config, m_sprite, XTAL(48'000'000)); // 48MHz for video?
+	JALECO_MEGASYSTEM32_SPRITE(config, m_sprite, XTAL(48'000'000)/8); // 48MHz for video?
 	m_sprite->set_palette(m_palette);
 	m_sprite->set_color_base(0);
 	m_sprite->set_color_entries(16);
@@ -1868,18 +1859,12 @@ void tetrisp2_state::rocknms(machine_config &config)
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	lscreen.set_orientation(ROT0);
-	lscreen.set_refresh_hz(60);
-	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	lscreen.set_size(0x140, 0xe0);
-	lscreen.set_visarea(0, 0x140-1, 0, 0xe0-1);
+	lscreen.set_raw(XTAL(48'000'000)/8, 384, 0, 320, 263, 0, 224);
 	lscreen.set_screen_update(FUNC(tetrisp2_state::screen_update_rocknms_left));
 
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
 	rscreen.set_orientation(ROT270);
-	rscreen.set_refresh_hz(60);
-	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	rscreen.set_size(0x140, 0xe0);
-	rscreen.set_visarea(0, 0x140-1, 0, 0xe0-1);
+	rscreen.set_raw(XTAL(48'000'000)/8, 384, 0, 320, 263, 0, 224);
 	rscreen.set_screen_update(FUNC(tetrisp2_state::screen_update_rocknms_right));
 
 	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,rocknms)
@@ -1902,6 +1887,7 @@ void stepstag_state::stepstag(machine_config &config)
 
 	M68000(config, m_subcpu, 16000000); //??
 	m_subcpu->set_addrmap(AS_PROGRAM, &stepstag_state::stepstag_sub_map);
+	// TODO: this is more likely a 30 Hz signal given the screen hacks below
 	m_subcpu->set_vblank_int("lscreen", FUNC(tetrisp2_state::irq4_line_hold)); // lev 6 triggered by main CPU
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -1909,6 +1895,10 @@ void stepstag_state::stepstag(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
+
+	// this screen arrangement is weird:
+	// it writes a regular 320x224 screen setup to the CRTC but none of these matches a 352 width, 
+	// we are either missing a bit from the config regs or those writes are null and they are driven by something else ...
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	lscreen.set_orientation(ROT270);
 //  lscreen.set_raw(12288000*2, 768, 0, 496, 264*2,0,480);
@@ -1997,10 +1987,7 @@ void stepstag_state::vjdash(machine_config &config)    // 4 Screens
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(0x160, 0xf0);
-	screen.set_visarea(0, 0x140-1, 0, 0xe0-1);
+    screen.set_raw(XTAL(48'000'000)/8, 384, 0, 320, 263, 0, 224);
 	screen.set_screen_update(FUNC(stepstag_state::screen_update_stepstag_main));
 //  screen.set_screen_update(FUNC(tetrisp2_state::screen_update_rockntread));
 	screen.set_palette(m_palette);
