@@ -65,7 +65,8 @@ public:
 
 		opt_grp3(*this,     "Options for static command",   "These options apply to static command."),
 		opt_dir(*this,      "d", "dir",        "",          "output directory for the generated files."),
-		opt_out(*this,      "o", "output",     "",          "single output file for the generated code.\nEither --dir or --output can be specificied"),
+		opt_out(*this,      "o", "output",     "",          "single output file for the generated code.\nEither --dir or --output can be specified"),
+		opt_split(*this,    "s", "split",                   "split the generated output into files by source"),
 
 		opt_grp4(*this,     "Options for run command",      "These options are only used by the run command."),
 		opt_ttr (*this,     "t", "time_to_run", 1,          "time to run the emulation (seconds)"),
@@ -137,6 +138,7 @@ private:
 	plib::option_group  opt_grp3;
 	plib::option_str    opt_dir;
 	plib::option_str    opt_out;
+	plib::option_bool   opt_split;
 
 	plib::option_group  opt_grp4;
 	plib::option_num<netlist::nl_fptype> opt_ttr;
@@ -164,10 +166,11 @@ private:
 
 	struct compile_map_entry
 	{
-		compile_map_entry(const pstring &mod, const pstring &code)
-		: m_module(mod), m_code(code) { }
+		compile_map_entry(const pstring &mod, const pstring &code, const pstring &hash)
+		: m_module(mod), m_code(code), m_hash(hash) { }
 		pstring m_module;
 		pstring m_code;
+		pstring m_hash;
 	};
 
 	using compile_map = std::map<pstring, compile_map_entry>;
@@ -596,7 +599,7 @@ void tool_app_t::compile_one_and_add_to_map(const pstring &file,
 		{
 			auto it = map.find(e.first);
 			if (it == map.end())
-				map.insert({e.first, compile_map_entry(name, e.second)});
+				map.insert({e.first, compile_map_entry(name, e.second, e.first)});
 			else
 			{
 				if (it->second.m_code != e.second)
@@ -685,25 +688,77 @@ void tool_app_t::static_compile()
 				compile_one_and_add_to_map(f, name, target, map);
 			}
 		}
+
+		std::vector<compile_map_entry *> sorted;
+		for (auto &e : map)
+			sorted.push_back(&e.second);
+
+		std::sort(sorted.begin(), sorted.end(),
+		    [](compile_map_entry *a, compile_map_entry *b) -> bool
+			{
+				return (a->m_module < b->m_module) || (a->m_module == b->m_module && a->m_hash < b->m_hash);
+			});
+
+		std::vector<pstring> split_include_list;
+		if (opt_split())
+		{
+			// I'm sure the filename manipulation can be made better
+			char dirsep = (opt_out().find('\\') != pstring::npos) ? '\\' : '/';
+			std::vector<pstring> dirparts = plib::psplit(opt_out(), dirsep);
+			pstring basedir;
+			for (int i = 0; i < dirparts.size() - 1; i++)
+				basedir += dirparts[i] + dirsep;
+
+			std::vector<pstring> nameparts = plib::psplit(dirparts[dirparts.size() - 1], '.');
+			pstring basename = nameparts[0];
+
+			plib::ofstream *curout = nullptr;
+			pstring prev_module;
+			for (auto e : sorted)
+			{
+				if (e->m_module != prev_module)
+				{
+					delete curout;
+					pstring filename = basename + "_" + e->m_module + ".hpp";
+					split_include_list.push_back(filename);
+					curout = new plib::ofstream(basedir + filename);
+					if (curout->fail())
+						throw netlist::nl_exception(netlist::MF_FILE_OPEN_ERROR(basedir + filename));
+					prev_module = e->m_module;
+				}
+				*curout << putf8string(e->m_code);
+			}
+			delete curout;
+		}
+
 		plib::ofstream sout(opt_out());
 		if (sout.fail())
 			throw netlist::nl_exception(netlist::MF_FILE_OPEN_ERROR(opt_out()));
 
 		sout << "#include \"plib/pdynlib.h\"\n\n";
 		sout << "#if !defined(__EMSCRIPTEN__)\n\n";
-		for (auto &e : map)
+		pstring prev_module;
+		if (opt_split())
 		{
-			sout << "// " << putf8string(e.second.m_module) << "\n";
-			sout << putf8string(e.second.m_code);
+			for (auto &e : split_include_list)
+				sout << "#include \"" << e << "\"\n";
+		}
+		else
+		{
+			for (auto e : sorted)
+			{
+				sout << "// " << putf8string(e->m_module) << "\n";
+				sout << putf8string(e->m_code);
+			}
 		}
 		sout << "#endif\n\n";
 		sout << "extern const plib::dynlib_static_sym nl_static_solver_syms[];\n";
 		sout << "const plib::dynlib_static_sym nl_static_solver_syms[] = {\n";
 		sout << "#if !defined(__EMSCRIPTEN__)\n\n";
-		for (auto &e : map)
+		for (auto e : sorted)
 		{
-			sout << "// " << putf8string(e.second.m_module) << "\n";
-			sout << "\t{\"" << putf8string(e.first) << "\", reinterpret_cast<void *>(&" << putf8string(e.first) << ")}, // NOLINT\n";
+			sout << "// " << putf8string(e->m_module) << "\n";
+			sout << "\t{\"" << putf8string(e->m_hash) << "\", reinterpret_cast<void *>(&" << putf8string(e->m_hash) << ")}, // NOLINT\n";
 		}
 		sout << "#endif\n\n";
 		sout << "{\"\", nullptr}\n";
