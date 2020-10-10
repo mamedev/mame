@@ -1024,6 +1024,8 @@ void apple2e_state::machine_reset()
 	m_slotc3rom = false;
 	m_romswitch = false;
 	m_irqmask = 0;
+	m_strobe = 0;
+	m_transchar = 0;
 	m_anykeydown = false;
 	m_repeatdelay = 10;
 	m_xy = false;
@@ -1775,7 +1777,7 @@ void apple2e_state::do_io(int offset, bool is_iic)
 uint8_t apple2e_state::c000_r(offs_t offset)
 {
 	if(machine().side_effects_disabled()) return read_floatingbus();
-	u8 uFloatingBus7 = read_floatingbus() & 0x7f;
+	const u8 uFloatingBus7 = read_floatingbus() & 0x7f;
 
 	if ((offset & 0xf0) == 0x00) // keyboard latch, $C000 is really 00-0F
 	{
@@ -2168,7 +2170,7 @@ uint8_t apple2e_state::c000_iic_r(offs_t offset)
 			return m_y0edge ? 0x80 : 0x00;
 
 		case 0x60: // 40/80 column switch (IIc only)
-			return ((m_sysconfig->read() & 0x04) ? 0x80 : 0) | uFloatingBus7;
+			return ((m_sysconfig->read() & 0x40) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x61:  // button 0 or Open Apple or mouse button 1
 		case 0x69:
@@ -3290,6 +3292,14 @@ WRITE_LINE_MEMBER(apple2e_state::ay3600_data_ready_w)
 		uint8_t *decode = m_kbdrom->base();
 		uint16_t trans;
 
+		// if the user presses a valid key to start the driver from the info screen,
+		// we will see that key.  ignore keys in the first 25,000 cycles (in my tests,
+		// the unwanted key shows up at 17030 cycles)
+		if (m_maincpu->total_cycles() < 25000)
+		{
+			return;
+		}
+
 		m_lastchar = m_ay3600->b_r();
 
 		trans = m_lastchar & ~(0x1c0);  // clear the 3600's control/shift stuff
@@ -3309,7 +3319,7 @@ WRITE_LINE_MEMBER(apple2e_state::ay3600_data_ready_w)
 
 		if (m_isiic)
 		{
-			if (m_sysconfig->read() & 0x08)
+			if (m_sysconfig->read() & 0x80)
 			{
 				trans += 0x400; // go to DVORAK half of the ROM
 			}
@@ -3381,17 +3391,18 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( apple2c_sysconfig )
 	PORT_START("a2_config")
-	PORT_CONFNAME(0x03, 0x00, "Composite monitor type")
+	PORT_CONFNAME(0x07, 0x00, "Composite monitor type")
 	PORT_CONFSETTING(0x00, "Color")
 	PORT_CONFSETTING(0x01, "B&W")
 	PORT_CONFSETTING(0x02, "Green")
 	PORT_CONFSETTING(0x03, "Amber")
-	PORT_CONFNAME(0x04, 0x04, "40/80 Columns")
+
+	PORT_CONFNAME(0x40, 0x40, "40/80 Columns")
 	PORT_CONFSETTING(0x00, "80 columns")
-	PORT_CONFSETTING(0x04, "40 columns")
-	PORT_CONFNAME(0x08, 0x00, "QWERTY/DVORAK")
+	PORT_CONFSETTING(0x40, "40 columns")
+	PORT_CONFNAME(0x80, 0x00, "QWERTY/DVORAK")
 	PORT_CONFSETTING(0x00, "QWERTY")
-	PORT_CONFSETTING(0x08, "DVORAK")
+	PORT_CONFSETTING(0x80, "DVORAK")
 
 	PORT_CONFNAME(0x10, 0x00, "CPU type")
 	PORT_CONFSETTING(0x00, "Standard")
