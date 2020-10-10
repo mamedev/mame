@@ -48,6 +48,8 @@ public:
 	void kaypro484(machine_config &config);
 	void kaypro10(machine_config &config);
 	void kaypro284(machine_config &config);
+	void kaypro4x(machine_config &config);
+	void kaypro1(machine_config &config);
 
 	void init_kaypro();
 
