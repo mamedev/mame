@@ -503,6 +503,7 @@ public:
 	void init_lhzb2a();
 	void init_mgdha();
 	void init_happyskl();
+	void init_unkigs();
 
 protected:
 	virtual void video_start() override;
@@ -1046,8 +1047,33 @@ void igs017_state::init_happyskl()
 		rom[i] = x;
 	}
 
-	tarzan_decrypt_tiles(); // seems ok
+	tarzan_decrypt_tiles(); // enough for chars
 }
+
+
+void igs017_state::init_unkigs()
+{
+	u8 *rom = memregion("maincpu")->base();
+
+	for (int i = 0; i < 0x40000; i++)
+	{
+		u8 x = rom[i];
+
+		if ((i & 0x00011) == 0x00011) x ^= 0x01;
+		if ((i & 0x02180) == 0x00000) x ^= 0x01;
+		if ((i & 0x001a0) != 0x00020) x ^= 0x20;
+		if ((i & 0x00260) != 0x00020) x ^= 0x40;
+		if ((i & 0x00020) == 0x00020) x ^= 0x80;
+		if ((i & 0x00260) == 0x00240) x ^= 0x80;
+
+		// this hasn't got split data / opcodes encryption like happyskl, but let's keep the same machine_config for easier testing
+		m_decrypted_opcodes[i] = x;
+		rom[i] = x;
+	}
+
+	tarzan_decrypt_tiles(); // enough for chars
+}
+
 
 // sdmg2
 
@@ -4657,13 +4683,36 @@ ROM_START( happyskl )
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD( "happyskill_text.u11", 0x00000, 0x80000, CRC(c6f51041) SHA1(81a9a03e92c1c67f299113dec9e05ba77395ea31) )
 
-	ROM_REGION( 0x80000, "oki", ROMREGION_ERASE )
+	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "igs_s2702_sp_v100.u8", 0x00000, 0x80000, CRC(0ec9b1b5) SHA1(b8c7e068ddf6777a184339e6796be33e442a3df4) )
 
 	ROM_REGION( 0x2dd * 2, "plds", 0 )
 	ROM_LOAD( "atf22v10c.u10",   0x000, 0x2dd, NO_DUMP )
 	ROM_LOAD( "peel22cv10a.u20", 0x2dd, 0x2dd, NO_DUMP )
 ROM_END
+
+
+// PCB was heavily corroded and not working
+ROM_START( unkigs )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "u9.bin", 0x00000, 0x40000, CRC(8d79eb4d) SHA1(9cad09013f83335ec78c3ff78715bc5d9a989eb7) )
+
+	ROM_REGION( 0x480000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "u2",                   0x00000, 0x080000, NO_DUMP ) // not populated. Never there or removed (more probable)?
+	// the following ROM wasn't readable on this PCB, but it's the same as the one in happyskl. Assuming same contents for now
+	ROM_LOAD( "igs_a2701_cg_v100.u3", 0x80000, 0x400000, BAD_DUMP CRC(f3756a51) SHA1(8dd4677584f309cec4b068be9f9370a7a172a031) ) // FIXED BITS (xxxxxxx0xxxxxxxx) - 1xxxxxxxxxxxxxxxxxxxxx = 0x00
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "u11.bin", 0x00000, 0x80000, CRC(34475c83) SHA1(376ff68d89c25471483b074dcf7542f42f954e67) ) // 1xxxxxxxxxxxxxxxxxx = 0x00
+
+	ROM_REGION( 0x80000, "oki", 0 ) // same as happyskl
+	ROM_LOAD( "u8.bin", 0x00000, 0x80000, CRC(0ec9b1b5) SHA1(b8c7e068ddf6777a184339e6796be33e442a3df4) )
+
+	ROM_REGION( 0x2dd * 2, "plds", 0 )
+	ROM_LOAD( "peel22cv10h.u10", 0x000, 0x2dd, NO_DUMP )
+	ROM_LOAD( "peel22cv10h.u20", 0x2dd, 0x2dd, NO_DUMP )
+ROM_END
+
 
 /***************************************************************************
 
@@ -4714,6 +4763,7 @@ GAME( 1999,  tarzan,   tarzanc,  starzan,  iqblocka, igs017_state, init_tarzan, 
 GAME( 1999,  tarzana,  tarzanc,  starzan,  iqblocka, igs017_state, init_tarzana,  ROT0, "IGS",                      "Tarzan (V107)",                               MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // IGS029 needs to be emulated, sprites' decryption missing
 GAME( 2000?, starzan,  0,        starzan,  iqblocka, igs017_state, init_starzan,  ROT0, "IGS (G.F. Gioca license)", "Super Tarzan (Italy, V100I)",                 MACHINE_NOT_WORKING )
 GAME( 2001?, happyskl, 0,        starzan,  iqblocka, igs017_state, init_happyskl, ROT0, "IGS",                      "Happy Skill (Italy, V611IT)",                 MACHINE_NOT_WORKING ) // IGS031 protection's game specific parameters not emulated yet, sprites' decryption missing
+GAME( 2001?, unkigs,   happyskl, starzan,  iqblocka, igs017_state, init_unkigs,   ROT0, "IGS",                      "unknown IGS game (V100A)",                    MACHINE_NOT_WORKING ) // possibly titled 'Champion 2', definitely derived from Happy Skill or vice versa, missing ROM, IGS031 protection's game specific parameters not emulated yet, sprites' decryption missing
 
 // Parent spk306us in driver spoker.cpp. Move this set to that driver?
 GAME( ????,  spkrform, spk306us, spkrform, spkrform, igs017_state, init_spkrform, ROT0, "IGS",                      "Super Poker (v100xD03) / Formosa",            MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
