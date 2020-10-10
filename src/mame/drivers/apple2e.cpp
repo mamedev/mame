@@ -188,7 +188,6 @@ MIG RAM page 2 $CE02 is the speaker/slot bitfield and $CE03 is the paddle/accele
 #include "formats/ap2_dsk.h"
 #include "formats/ap_dsk35.h"
 
-
 #define A2_CPU_TAG "maincpu"
 #define A2_KBDC_TAG "ay3600"
 #define A2_BUS_TAG "a2bus"
@@ -2949,7 +2948,7 @@ uint8_t apple2e_state::read_floatingbus()
 
 	// calculate horizontal scanning state
 	//
-	h_clock = (i + kHPEClock) % kHClocks; // which horizontal scanning clock
+	h_clock = i % kHClocks; // which horizontal scanning clock
 	h_state = kHClock0State + h_clock; // H state bits
 	if (h_clock >= kHPresetClock) // check for horizontal preset
 	{
@@ -4536,7 +4535,7 @@ void apple2e_state::apple2e(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, A2_SPEAKER_TAG).add_route(ALL_OUTPUTS, "mono", 0.5);
+	SPEAKER_SOUND(config, A2_SPEAKER_TAG).add_route(ALL_OUTPUTS, "mono", 0.4);
 
 	/* DS1315 for no-slot clock */
 	DS1315(config, m_ds1315, 0).read_backing().set(FUNC(apple2e_state::nsc_backing_r));

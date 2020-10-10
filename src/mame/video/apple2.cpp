@@ -436,15 +436,18 @@ void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	/* perform adjustments */
 	beginrow = (std::max)(beginrow, cliprect.top());
 	endrow = (std::min)(endrow, cliprect.bottom());
-
 	const int startrow = (beginrow / 8) * 8;
 	const int stoprow = ((endrow / 8) + 1) * 8;
+	const int startcol = (cliprect.left() / 14);
+	const int stopcol = ((cliprect.right() / 14) + 1);
+
+	//printf("GR: row %d startcol %d stopcol %d left %d right %d\n", beginrow, startcol, stopcol, cliprect.left(), cliprect.right());
 
 	if (!(m_sysconfig & 0x03))  // color
 	{
 		for (int row = startrow; row <= stoprow; row += 8)
 		{
-			for (int col = 0; col < 40; col++)
+			for (int col = startcol; col < stopcol; col++)
 			{
 				/* calculate adderss */
 				uint32_t const address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
@@ -480,7 +483,7 @@ void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	{
 		for (int row = startrow; row <= stoprow; row += 8)
 		{
-			for (int col = 0; col < 40; col++)
+			for (int col = startcol; col < stopcol; col++)
 			{
 				uint8_t bits;
 
@@ -553,12 +556,14 @@ void a2_video_device::dlores_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 	const int startrow = (beginrow / 8) * 8;
 	const int stoprow = ((endrow / 8) + 1) * 8;
+	const int startcol = (cliprect.left() / 14);
+	const int stopcol = ((cliprect.right() / 14) + 1);
 
 	if (!(m_sysconfig & 0x03))
 	{
 		for (int row = startrow; row <= stoprow; row += 8)
 		{
-			for (int col = 0; col < 40; col++)
+			for (int col = startcol; col < stopcol; col++)
 			{
 				/* calculate adderss */
 				uint32_t const address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
@@ -617,7 +622,7 @@ void a2_video_device::dlores_update(screen_device &screen, bitmap_ind16 &bitmap,
 	}
 	else
 	{
-		for (int row = startrow; row <= stoprow; row += 8)
+		for (int row = startrow; row < stoprow; row += 8)
 		{
 			for (int col = 0; col < 40; col++)
 			{
@@ -738,6 +743,10 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 	const int startrow = (beginrow / 8) * 8;
 	const int stoprow = ((endrow / 8) + 1) * 8;
+	const int startcol = (cliprect.left() / 14);
+	const int stopcol = ((cliprect.right() / 14) + 1);
+
+	//printf("TXT: row %d startcol %d stopcol %d left %d right %d\n", beginrow, startcol, stopcol, cliprect.left(), cliprect.right());
 
 	int fg = 0;
 	int bg = 0;
@@ -749,11 +758,11 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 		case 3: fg = ORANGE; break;
 	}
 
-	for (int row = startrow; row <= stoprow; row += 8)
+	for (int row = startrow; row < stoprow; row += 8)
 	{
 		if (m_80col)
 		{
-			for (int col = 0; col < 40; col++)
+			for (int col = startcol; col < stopcol; col++)
 			{
 				/* calculate address */
 				uint32_t const address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
@@ -766,7 +775,7 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 		}
 		else
 		{
-			for (int col = 0; col < 40; col++)
+			for (int col = startcol; col < stopcol; col++)
 			{
 				/* calculate address */
 				uint32_t const address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
@@ -797,6 +806,8 @@ void a2_video_device::text_update_orig(screen_device &screen, bitmap_ind16 &bitm
 
 	const int startrow = (beginrow / 8) * 8;
 	const int stoprow = ((endrow / 8) + 1) * 8;
+	const int startcol = (cliprect.left() / 14);
+	const int stopcol = ((cliprect.right() / 14) + 1);
 
 	switch (m_sysconfig & 0x03)
 	{
@@ -808,7 +819,7 @@ void a2_video_device::text_update_orig(screen_device &screen, bitmap_ind16 &bitm
 
 	for (row = startrow; row <= stoprow; row += 8)
 	{
-		for (col = 0; col < 40; col++)
+		for (col = startcol; col < stopcol; col++)
 		{
 			/* calculate address */
 			address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
@@ -957,7 +968,6 @@ void a2_video_device::text_update_ultr(screen_device &screen, bitmap_ind16 &bitm
 void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
 	int mon_type = m_sysconfig & 0x03;
-	int begincol = 0, endcol = 40;
 
 	/* sanity checks */
 	if (beginrow < cliprect.top())
@@ -967,27 +977,14 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	if (endrow < beginrow)
 		return;
 
-	// we generate 2 pixels per "column" so adjust
-	if (begincol < (cliprect.left()/14))
-		begincol = (cliprect.left()/14);
-	if (endcol > (cliprect.right()/14))
-		endcol = (cliprect.right()/14);
-	if (cliprect.right() > 39*14)
-		endcol = 40;
-	if (endcol < begincol)
-		return;
-
-	//printf("HGR draw: page %c, rows %d-%d cols %d-%d\n", m_page2 ? '2' : '1', beginrow, endrow, begincol, endcol);
-
 	uint8_t const *const vram = &m_ram_ptr[(m_page2 ? 0x4000 : 0x2000)];
-
 	uint8_t vram_row[42];
 	vram_row[0] = 0;
 	vram_row[41] = 0;
 
 	for (int row = beginrow; row <= endrow; row++)
 	{
-		for (int col = begincol; col < endcol; col++)
+		for (int col = 0; col < 40; col++)
 		{
 			int const offset = ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col)) | ((row & 7) << 10);
 			vram_row[1+col] = vram[offset];
@@ -1029,9 +1026,17 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 				case 0:
 					for (int b = 0; b < 7; b++)
 					{
-						uint16_t const v = artifact_map_ptr[((w >> (b + 7-1)) & 0x07) | (((b ^ col) & 0x01) << 3)];
-						*(p++) = v;
-						*(p++) = v;
+						if ((((col*14) + b) >= cliprect.left()) && (((col*14) + b) < cliprect.right()))
+						{
+							uint16_t const v = artifact_map_ptr[((w >> (b + 7-1)) & 0x07) | (((b ^ col) & 0x01) << 3)];
+							*(p++) = v;
+							*(p++) = v;
+						}
+						else
+						{
+							p++;
+							p++;
+						}
 					}
 					break;
 
@@ -1045,8 +1050,16 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 					{
 						uint16_t const v = (w & 1);
 						w >>= 1;
-						*(p++) = v ? WHITE : BLACK;
-						*(p++) = v ? WHITE : BLACK;
+						if ((((col*14) + b) >= cliprect.left()) && (((col*14) + b) < cliprect.right()))
+						{
+							*(p++) = v ? WHITE : BLACK;
+							*(p++) = v ? WHITE : BLACK;
+						}
+						else
+						{
+							p++;
+							p++;
+						}
 					}
 					if (vram_row[col+1] & 0x80)
 					{
@@ -1064,8 +1077,16 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 					{
 						uint16_t const v = (w & 1);
 						w >>= 1;
-						*(p++) = v ? GREEN : BLACK;
-						*(p++) = v ? GREEN : BLACK;
+						if ((((col*14) + b) >= cliprect.left()) && (((col*14) + b) < cliprect.right()))
+						{
+							*(p++) = v ? GREEN : BLACK;
+							*(p++) = v ? GREEN : BLACK;
+						}
+						else
+						{
+							p++;
+							p++;
+						}
 					}
 					if (vram_row[col+1] & 0x80)
 					{
@@ -1083,14 +1104,23 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 					{
 						uint16_t const v = (w & 1);
 						w >>= 1;
-						*(p++) = v ? ORANGE : BLACK;
-						*(p++) = v ? ORANGE : BLACK;
+						if ((((col*14) + b) >= cliprect.left()) && (((col*14) + b) < cliprect.right()))
+						{
+							*(p++) = v ? ORANGE : BLACK;
+							*(p++) = v ? ORANGE : BLACK;
+						}
+						else
+						{
+							p++;
+							p++;
+						}
 					}
 					if (vram_row[col+1] & 0x80)
 					{
 						p--;
 					}
 					break;
+
 			}
 		}
 	}
