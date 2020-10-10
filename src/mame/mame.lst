@@ -10674,6 +10674,10 @@ panich                          // 8015 (c) 1980
 @source:cosmicos.cpp
 cosmicos                        //
 
+@source:cowtipping.cpp
+cowtipp                         //
+cowtippa                        //
+
 @source:cp1.cpp
 cp1                             //
 
