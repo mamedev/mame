@@ -206,7 +206,7 @@ void ns32081_device::write_op(u16 data)
 			switch ((m_opword >> 3) & 7)
 			{
 			case 0: // movif
-				m_op[0].expected = (size == SIZE_B) ? 2 : (size + 1);
+				m_op[0].expected = size + 1;
 				m_op[2].expected = f_length;
 				break;
 			case 1: // lfsr
@@ -300,7 +300,7 @@ void ns32081_device::write_op(u16 data)
 	}
 
 	// start execution when all operands are available
-	if (m_state == OPERAND && m_op[0].issued == m_op[0].expected && m_op[1].issued == m_op[1].expected)
+	if (m_state == OPERAND && m_op[0].issued >= m_op[0].expected && m_op[1].issued >= m_op[1].expected)
 		execute();
 }
 
