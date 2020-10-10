@@ -23,7 +23,6 @@
 #include "mameopts.h"
 #include "pluginopts.h"
 #include "drivenum.h"
-#include "natkeyboard.h"
 #include "romload.h"
 
 #include "uiinput.h"
@@ -39,42 +38,6 @@ namespace ui {
 /***************************************************************************
     MENU HANDLERS
 ***************************************************************************/
-
-/*-------------------------------------------------
-    menu_keyboard_mode - menu that
--------------------------------------------------*/
-
-menu_keyboard_mode::menu_keyboard_mode(mame_ui_manager &mui, render_container &container) : menu(mui, container)
-{
-}
-
-void menu_keyboard_mode::populate(float &customtop, float &custombottom)
-{
-	bool natural = machine().ioport().natkeyboard().in_use();
-	item_append(_("Keyboard Mode:"), natural ? _("Natural") : _("Emulated"), natural ? FLAG_LEFT_ARROW : FLAG_RIGHT_ARROW, nullptr);
-}
-
-menu_keyboard_mode::~menu_keyboard_mode()
-{
-}
-
-void menu_keyboard_mode::handle()
-{
-	bool natural = machine().ioport().natkeyboard().in_use();
-
-	/* process the menu */
-	const event *menu_event = process(0);
-
-	if (menu_event != nullptr)
-	{
-		if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
-		{
-			machine().ioport().natkeyboard().set_in_use(!natural);
-			reset(reset_options::REMEMBER_REF);
-		}
-	}
-}
-
 
 /*-------------------------------------------------
     menu_bios_selection - populates the main

@@ -1694,9 +1694,10 @@ time_t ioport_manager::initialize()
 			if (&port.second->device() == &device)
 			{
 				for (ioport_field &field : port.second->fields())
-					if (field.type_class()==INPUT_CLASS_CONTROLLER)
+					if (field.type_class() == INPUT_CLASS_CONTROLLER)
 					{
-						if (players < field.player() + 1) players = field.player() + 1;
+						if (players < field.player() + 1)
+							players = field.player() + 1;
 						field.set_player(field.player() + player_offset);
 					}
 			}
@@ -2120,6 +2121,29 @@ void ioport_manager::load_config(config_type cfg_type, util::xml::data_node cons
 		for (input_type_entry &entry : m_typelist)
 			for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 				entry.defseq(seqtype) = entry.seq(seqtype);
+
+	// load keyboard enable/disable state
+	if (cfg_type == config_type::GAME)
+	{
+		for (util::xml::data_node const *kbdnode = parentnode->get_child("keyboard"); kbdnode; kbdnode = kbdnode->get_next_sibling("keyboard"))
+		{
+			char const *const tag = kbdnode->get_attribute_string("tag", nullptr);
+			int const enabled = kbdnode->get_attribute_int("enabled", -1);
+			if (tag && (0 <= enabled))
+			{
+				for (size_t i = 0; natkeyboard().keyboard_count() > i; ++i)
+				{
+					if (!strcmp(natkeyboard().keyboard_device(i).tag(), tag))
+					{
+						if (enabled)
+							natkeyboard().enable_keyboard(i);
+						else
+							natkeyboard().disable_keyboard(i);
+					}
+				}
+			}
+		}
+	}
 }
 
 
@@ -2358,6 +2382,14 @@ void ioport_manager::save_default_inputs(util::xml::data_node &parentnode)
 
 void ioport_manager::save_game_inputs(util::xml::data_node &parentnode)
 {
+	// save keyboard enable/disable state
+	for (size_t i = 0; natkeyboard().keyboard_count() > i; ++i)
+	{
+		util::xml::data_node *const kbdnode = parentnode.add_child("keyboard", nullptr);
+		kbdnode->set_attribute("tag", natkeyboard().keyboard_device(i).tag());
+		kbdnode->set_attribute_int("enabled", natkeyboard().keyboard_enabled(i));
+	}
+
 	// iterate over ports
 	for (auto &port : m_portlist)
 		for (ioport_field &field : port.second->fields())

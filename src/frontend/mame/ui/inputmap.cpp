@@ -93,7 +93,7 @@ void menu_input_general::populate(float &customtop, float &custombottom)
 					item.type = ioport_manager::type_is_analog(entry.type()) ? (INPUT_TYPE_ANALOG + seqtype) : INPUT_TYPE_DIGITAL;
 					item.is_optional = false;
 					item.name = entry.name();
-					item.owner_name = nullptr;
+					item.owner = nullptr;
 
 					// stop after one, unless we're analog
 					if (item.type == INPUT_TYPE_DIGITAL)
@@ -164,7 +164,7 @@ void menu_input_specific::populate(float &customtop, float &custombottom)
 						item.type = field.is_analog() ? (INPUT_TYPE_ANALOG + seqtype) : INPUT_TYPE_DIGITAL;
 						item.is_optional = field.optional();
 						item.name = field.name();
-						item.owner_name = field.device().tag();
+						item.owner = &field.device();
 
 						// stop after one, unless we're analog
 						if (item.type == INPUT_TYPE_DIGITAL)
@@ -180,7 +180,7 @@ void menu_input_specific::populate(float &customtop, float &custombottom)
 				data.end(),
 				[] (const input_item_data &i1, const input_item_data &i2)
 				{
-					int cmp = strcmp(i1.owner_name, i2.owner_name);
+					int cmp = strcmp(i1.owner->tag(), i2.owner->tag());
 					if (cmp < 0)
 						return true;
 					if (cmp > 0)
@@ -431,21 +431,24 @@ void menu_input::populate_sorted(float &customtop, float &custombottom)
 
 	// build the menu
 	std::string text, subtext;
-	std::string prev_owner;
+	const device_t *prev_owner = nullptr;
 	bool first_entry = true;
 	for (input_item_data &item : data)
 	{
 		// generate the name of the item itself, based off the base name and the type
 		assert(nameformat[item.type] != nullptr);
 
-		if (item.owner_name && strcmp(item.owner_name, prev_owner.c_str()) != 0)
+		if (item.owner && (item.owner != prev_owner))
 		{
 			if (first_entry)
 				first_entry = false;
 			else
 				item_append(menu_item_type::SEPARATOR);
-			item_append(string_format("[root%s]", item.owner_name), "", 0, nullptr);
-			prev_owner.assign(item.owner_name);
+			if (item.owner->owner())
+				item_append(string_format(_("%1$s [root%2$s]"), item.owner->type().fullname(), item.owner->tag()), "", 0, nullptr);
+			else
+				item_append(string_format(_("[root%1$s]"), item.owner->tag()), "", 0, nullptr);
+			prev_owner = item.owner;
 		}
 
 		text = string_format(nameformat[item.type], item.name);
