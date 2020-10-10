@@ -803,14 +803,11 @@ void apple2_state::inh_w(offs_t offset, uint8_t data)
 	}
 }
 
-// floating bus code from old machine/apple2: needs to be reworked based on real beam position to enable e.g. Bob Bishop's screen splitter
+// floating bus code from old machine/apple2: now works reasonably well with French Touch and Deater "vapor lock" stuff
 uint8_t apple2_state::read_floatingbus()
 {
 	enum
 	{
-		// scanner types
-		kScannerNone = 0, kScannerApple2, kScannerApple2e,
-
 		// scanner constants
 		kHBurstClock      =    53, // clock when Color Burst starts
 		kHBurstClocks     =     4, // clocks per Color Burst duration
@@ -855,8 +852,7 @@ uint8_t apple2_state::read_floatingbus()
 	// ScanCycles = ScanLines * kHClocks;
 
 	// calculate horizontal scanning state
-	//
-	h_clock = i % kHClocks; // which horizontal scanning clock
+	h_clock = (i + 63) % kHClocks; // which horizontal scanning clock
 	h_state = kHClock0State + h_clock; // H state bits
 	if (h_clock >= kHPresetClock) // check for horizontal preset
 	{
@@ -922,15 +918,14 @@ uint8_t apple2_state::read_floatingbus()
 	{
 		// N: text, so no higher address bits unless Apple ][, not Apple //e
 		//
-		if ((1) && // Apple ][? // FIX: check for Apple ][? (FB is most useful in old games)
-			(kHPEClock <= h_clock) && // Y: HBL?
+		if ((kHPEClock <= h_clock) && // Y: HBL?
 			(h_clock <= (kHClocks - 1)))
 		{
 			address |= 1 << 12; // Y: a12 (add $1000 to address!)
 		}
 	}
 
-	return m_ram_ptr[address % m_ram_size]; // FIX: this seems to work, but is it right!?
+	return m_ram_ptr[address % m_ram_size];
 }
 
 /***************************************************************************

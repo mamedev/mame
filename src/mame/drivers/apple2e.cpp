@@ -271,6 +271,13 @@ public:
 		m_ds1315(*this, "nsc")
 	{
 		m_accel_laser = false;
+		m_isiic = false;
+		m_isiicplus = false;
+		m_iscec = false;
+		m_iscecm = false;
+		m_iscec2000 = false;
+		m_spectrum_text = false;
+		m_pal = false;
 	}
 
 	required_device<cpu_device> m_maincpu;
@@ -402,10 +409,12 @@ public:
 	void cec(machine_config &config);
 	void mprof3(machine_config &config);
 	void apple2e(machine_config &config);
+	void apple2epal(machine_config &config);
 	void apple2ep(machine_config &config);
 	void apple2c(machine_config &config);
 	void tk3000(machine_config &config);
 	void apple2ee(machine_config &config);
+	void apple2eepal(machine_config &config);
 	void apple2c_map(address_map &map);
 	void apple2c_memexp_map(address_map &map);
 	void apple2e_map(address_map &map);
@@ -425,6 +434,7 @@ public:
 	void spectred_keyb_map(address_map &map);
 	void init_128ex();
 	void init_spect();
+	void init_pal();
 
 	bool m_35sel, m_hdsel, m_intdrive;
 
@@ -466,7 +476,7 @@ private:
 	bool m_mockingboard4c;
 	bool m_intc8rom;
 
-	bool m_isiic, m_isiicplus, m_iscec, m_iscecm, m_iscec2000, m_spectrum_text;
+	bool m_isiic, m_isiicplus, m_iscec, m_iscecm, m_iscec2000, m_spectrum_text, m_pal;
 	uint8_t m_migram[0x800];
 	uint16_t m_migpage;
 
@@ -1103,6 +1113,11 @@ void apple2e_state::init_128ex()
 void apple2e_state::init_spect()
 {
 	m_spectrum_text = true;
+}
+
+void apple2e_state::init_pal()
+{
+	m_pal = true;
 }
 
 void apple2e_state::raise_irq(int irq)
@@ -2362,7 +2377,7 @@ void apple2e_state::update_iic_mouse()
 {
 	int new_mx, new_my;
 
-	// read the axes
+	// read the axes and check for changes
 	new_mx = m_mousex->read();
 	new_my = m_mousey->read();
 
@@ -2372,10 +2387,10 @@ void apple2e_state::update_iic_mouse()
 		int diff = new_mx - last_mx;
 
 		/* check for wrap */
-		if (diff > 0x80)
-			diff = 0x100-diff;
-		if  (diff < -0x80)
-			diff = -0x100-diff;
+        if (diff > 0x80)
+                diff -= 0x100;
+        else if (diff < -0x80)
+                diff += 0x100;
 
 		count_x += diff;
 		last_mx = new_mx;
@@ -2895,14 +2910,11 @@ void apple2e_state::lc_w(offs_t offset, uint8_t data)
 	}
 }
 
-// floating bus code from old machine/apple2: needs to be reworked based on real beam position to enable e.g. Bob Bishop's screen splitter
+// floating bus code from old machine/apple2: now works reasonably well with French Touch and Deater "vapor lock" stuff
 uint8_t apple2e_state::read_floatingbus()
 {
 	enum
 	{
-		// scanner types
-		kScannerNone = 0, kScannerApple2, kScannerApple2e,
-
 		// scanner constants
 		kHBurstClock      =    53, // clock when Color Burst starts
 		kHBurstClocks     =     4, // clocks per Color Burst duration
@@ -2919,8 +2931,9 @@ uint8_t apple2e_state::read_floatingbus()
 		kVLine0State      = 0x100, // V[543210CBA] = 100000000
 		kVPresetLine      =   256, // line when V state presets
 		kVSyncLines       =     4, // lines per VSync duration
-		kClocksPerVSync   = kHClocks * kNTSCScanLines // FIX: NTSC only?
 	};
+
+	const int kClocksPerVSync = kHClocks * (m_pal ? kPALScanLines : kNTSCScanLines);
 
 	// vars
 	//
@@ -2941,14 +2954,11 @@ uint8_t apple2e_state::read_floatingbus()
 	_80Store = m_80store ? 1 : 0;
 
 	// calculate video parameters according to display standard
-	//
-	ScanLines  = 1 ? kNTSCScanLines : kPALScanLines; // FIX: NTSC only?
-	// VSyncLine  = 1 ? kNTSCVSyncLine : kPALVSyncLine; // FIX: NTSC only?
-	// ScanCycles = ScanLines * kHClocks;
+	// we call this "PAL", but it's also for SECAM
+	ScanLines  = m_pal ? kPALScanLines : kNTSCScanLines;
 
 	// calculate horizontal scanning state
-	//
-	h_clock = i % kHClocks; // which horizontal scanning clock
+	h_clock = (i + 63) % kHClocks; // which horizontal scanning clock
 	h_state = kHClock0State + h_clock; // H state bits
 	if (h_clock >= kHPresetClock) // check for horizontal preset
 	{
@@ -3010,19 +3020,8 @@ uint8_t apple2e_state::read_floatingbus()
 		address |= (1 ^ (Page2 & (1 ^ _80Store))) << 13; // a13
 		address |= (Page2 & (1 ^ _80Store)) << 14; // a14
 	}
-	else
-	{
-		// N: text, so no higher address bits unless Apple ][, not Apple //e
-		//
-		if ((1) && // Apple ][? // FIX: check for Apple ][? (FB is most useful in old games)
-			(kHPEClock <= h_clock) && // Y: HBL?
-			(h_clock <= (kHClocks - 1)))
-		{
-			address |= 1 << 12; // Y: a12 (add $1000 to address!)
-		}
-	}
 
-	return m_ram_ptr[address % m_ram_size]; // FIX: this seems to work, but is it right!?
+	return m_ram_ptr[address % m_ram_size];
 }
 
 /***************************************************************************
@@ -4633,6 +4632,12 @@ void apple2e_state::apple2e(machine_config &config)
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
+void apple2e_state::apple2epal(machine_config &config)
+{
+	apple2e(config);
+	m_screen->set_raw(1021800*14, (65*7)*2, 0, (40*7)*2, 312, 0, 192);
+}
+
 void apple2e_state::mprof3(machine_config &config)
 {
 	apple2e(config);
@@ -4648,6 +4653,12 @@ void apple2e_state::apple2ee(machine_config &config)
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2e_map);
 	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
+}
+
+void apple2e_state::apple2eepal(machine_config &config)
+{
+	apple2ee(config);
+	m_screen->set_raw(1021800*14, (65*7)*2, 0, (40*7)*2, 312, 0, 192);
 }
 
 void apple2e_state::spectred(machine_config &config)
@@ -5344,12 +5355,12 @@ ROM_END
 
 /*    YEAR  NAME        PARENT   COMPAT  MACHINE      INPUT      CLASS          INIT        COMPANY             FULLNAME */
 COMP( 1983, apple2e,    0,       apple2, apple2e,     apple2e,   apple2e_state, empty_init, "Apple Computer",   "Apple //e", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, apple2euk,  apple2e, 0,      apple2e,     apple2euk, apple2e_state, empty_init, "Apple Computer",   "Apple //e (UK)", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, apple2ees,  apple2e, 0,      apple2e,     apple2ees, apple2e_state, empty_init, "Apple Computer",   "Apple //e (Spain)", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, apple2euk,  apple2e, 0,      apple2epal,  apple2euk, apple2e_state, init_pal,   "Apple Computer",   "Apple //e (UK)", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, apple2ees,  apple2e, 0,      apple2epal,  apple2ees, apple2e_state, init_pal,   "Apple Computer",   "Apple //e (Spain)", MACHINE_SUPPORTS_SAVE )
 COMP( 1983, mprof3,     apple2e, 0,      mprof3,      apple2e,   apple2e_state, empty_init, "Multitech",        "Microprofessor III", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1985, apple2ee,   apple2e, 0,      apple2ee,    apple2e,   apple2e_state, empty_init, "Apple Computer",   "Apple //e (enhanced)", MACHINE_SUPPORTS_SAVE )
-COMP( 1985, apple2eeuk, apple2e, 0,      apple2ee,    apple2euk, apple2e_state, empty_init, "Apple Computer",   "Apple //e (enhanced, UK)", MACHINE_SUPPORTS_SAVE )
-COMP( 1985, apple2eefr, apple2e, 0,      apple2ee,    apple2efr, apple2e_state, empty_init, "Apple Computer",   "Apple //e (enhanced, France)", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, apple2eeuk, apple2e, 0,      apple2eepal, apple2euk, apple2e_state, init_pal,   "Apple Computer",   "Apple //e (enhanced, UK)", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, apple2eefr, apple2e, 0,      apple2eepal, apple2efr, apple2e_state, init_pal,   "Apple Computer",   "Apple //e (enhanced, France)", MACHINE_SUPPORTS_SAVE )
 COMP( 1987, apple2ep,   apple2e, 0,      apple2ep,    apple2ep,  apple2e_state, empty_init, "Apple Computer",   "Apple //e (Platinum)", MACHINE_SUPPORTS_SAVE )
 COMP( 1984, apple2c,    0,       apple2, apple2c,     apple2c,   apple2e_state, empty_init, "Apple Computer",   "Apple //c" , MACHINE_SUPPORTS_SAVE )
 COMP( 1985?,spectred,   apple2e, 0,      spectred,    apple2e,   apple2e_state, init_spect, "Scopus/Spectrum",  "Spectrum ED" , MACHINE_SUPPORTS_SAVE )
