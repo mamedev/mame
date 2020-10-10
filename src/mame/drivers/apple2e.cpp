@@ -3327,7 +3327,7 @@ WRITE_LINE_MEMBER(apple2e_state::ay3600_data_ready_w)
 		m_transchar = decode[trans];
 		m_strobe = 0x80;
 
-		printf("new char = %04x (%02x)\n", m_lastchar, m_transchar);
+		//printf("new char = %04x (%02x)\n", m_lastchar, m_transchar);
 	}
 }
 
