@@ -2387,10 +2387,11 @@ void apple2e_state::update_iic_mouse()
 		int diff = new_mx - last_mx;
 
 		/* check for wrap */
-        if (diff > 0x80)
-                diff -= 0x100;
-        else if (diff < -0x80)
-                diff += 0x100;
+		if (diff > 0x80)
+			diff -= 0x100;
+		else
+		if (diff < -0x80)
+			diff += 0x100;
 
 		count_x += diff;
 		last_mx = new_mx;
@@ -2404,7 +2405,7 @@ void apple2e_state::update_iic_mouse()
 		/* check for wrap */
 		if (diff > 0x80)
 			diff = 0x100-diff;
-		if  (diff < -0x80)
+		if (diff < -0x80)
 			diff = -0x100-diff;
 
 		count_y += diff;
