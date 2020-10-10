@@ -1724,8 +1724,8 @@ void tetrisp2_state::nndmseal(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	// the only game effectively using the faster dot clock divider
-	// Note that they replaced the dot clock to a OSC1(42.9545MHz) for video
+	// An odd one: it uses the faster dot clock divider setting
+	// but they replaced the xtal to a OSC1(42.9545MHz) (so with these settings it reaches ~60 Hz)
     screen.set_raw(XTAL(42'954'545)/6, 455, 0, 384, 262, 0, 240);
 	screen.set_screen_update(FUNC(tetrisp2_state::screen_update_tetrisp2));
 	screen.set_palette(m_palette);
@@ -1797,7 +1797,7 @@ void tetrisp2_state::rockn2(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	// TODO: during POST it sets up a vertical size of 487, is there an interlace bit?
+	// TODO: during POST it sets up a vertical size of 487, is it trying to setup an interlace setting?
     screen.set_raw(XTAL(48'000'000)/8, 384, 0, 320, 263, 0, 224);
 	screen.set_screen_update(FUNC(tetrisp2_state::screen_update_rockntread));
 	screen.set_palette(m_palette);
@@ -1845,12 +1845,12 @@ void tetrisp2_state::rocknms(machine_config &config)
 	GFXDECODE(config, m_sub_gfxdecode, m_sub_palette, gfx_rocknms_sub);
 	PALETTE(config, m_sub_palette).set_entries(0x8000);
 
-	JALECO_MEGASYSTEM32_SPRITE(config, m_sprite, XTAL(48'000'000)); // 48MHz for video?
+	JALECO_MEGASYSTEM32_SPRITE(config, m_sprite, XTAL(48'000'000)/8); // 48MHz for video?
 	m_sprite->set_palette(m_palette);
 	m_sprite->set_color_base(0);
 	m_sprite->set_color_entries(16);
 
-	JALECO_MEGASYSTEM32_SPRITE(config, m_rocknms_sub_sprite, XTAL(48'000'000)); // 48MHz for video?
+	JALECO_MEGASYSTEM32_SPRITE(config, m_rocknms_sub_sprite, XTAL(48'000'000)/8); // 48MHz for video?
 	m_rocknms_sub_sprite->set_palette(m_sub_palette);
 	m_rocknms_sub_sprite->set_color_base(0);
 	m_rocknms_sub_sprite->set_color_entries(16);
@@ -1898,7 +1898,8 @@ void stepstag_state::stepstag(machine_config &config)
 
 	// this screen arrangement is weird:
 	// it writes a regular 320x224 screen setup to the CRTC but none of these matches a 352 width, 
-	// we are either missing a bit from the config regs or those writes are null and they are driven by something else ...
+	// we are either missing a bit from the config regs or those writes are null and 
+	// these screens are driven by something else ...
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	lscreen.set_orientation(ROT270);
 //  lscreen.set_raw(12288000*2, 768, 0, 496, 264*2,0,480);
@@ -1935,25 +1936,25 @@ void stepstag_state::stepstag(machine_config &config)
 	PALETTE(config, m_vj_palette_m).set_entries(0x8000);
 	PALETTE(config, m_vj_palette_r).set_entries(0x8000);
 
-	JALECO_MEGASYSTEM32_SPRITE(config, m_sprite, 48000000); // unknown
+	JALECO_MEGASYSTEM32_SPRITE(config, m_sprite, XTAL(48'000'000)/8); // unknown
 	m_sprite->set_palette(m_palette);
 	m_sprite->set_color_base(0);
 	m_sprite->set_color_entries(16);
 
 	// (left screen, vertical in stepping stage)
-	JALECO_MEGASYSTEM32_SPRITE(config, m_vj_sprite_l, 48000000); // unknown
+	JALECO_MEGASYSTEM32_SPRITE(config, m_vj_sprite_l, XTAL(48'000'000)/8); // unknown
 	m_vj_sprite_l->set_palette(m_vj_palette_l);
 	m_vj_sprite_l->set_color_base(0);
 	m_vj_sprite_l->set_color_entries(0x80);
 
 	// (mid screen, horizontal)
-	JALECO_MEGASYSTEM32_SPRITE(config, m_vj_sprite_m, 48000000); // unknown
+	JALECO_MEGASYSTEM32_SPRITE(config, m_vj_sprite_m, XTAL(48'000'000)/8); // unknown
 	m_vj_sprite_m->set_palette(m_vj_palette_m);
 	m_vj_sprite_m->set_color_base(0);
 	m_vj_sprite_m->set_color_entries(0x80);
 
 	// (right screens, vertical in stepping stage)
-	JALECO_MEGASYSTEM32_SPRITE(config, m_vj_sprite_r, 48000000); // unknown
+	JALECO_MEGASYSTEM32_SPRITE(config, m_vj_sprite_r, XTAL(48'000'000)/8); // unknown
 	m_vj_sprite_r->set_palette(m_vj_palette_r);
 	m_vj_sprite_r->set_color_base(0);
 	m_vj_sprite_r->set_color_entries(0x80);
@@ -1986,6 +1987,7 @@ void stepstag_state::vjdash(machine_config &config)    // 4 Screens
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
+	// same as stepstag, we assume that this screen is effectively connected to the system CRTC
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
     screen.set_raw(XTAL(48'000'000)/8, 384, 0, 320, 263, 0, 224);
 	screen.set_screen_update(FUNC(stepstag_state::screen_update_stepstag_main));
@@ -2024,25 +2026,25 @@ void stepstag_state::vjdash(machine_config &config)    // 4 Screens
 	PALETTE(config, m_vj_palette_m).set_entries(0x8000);
 	PALETTE(config, m_vj_palette_r).set_entries(0x8000);
 
-	JALECO_MEGASYSTEM32_SPRITE(config, m_sprite, 48000000); // unknown
+	JALECO_MEGASYSTEM32_SPRITE(config, m_sprite, XTAL(48'000'000)/8); // unknown
 	m_sprite->set_palette(m_palette);
 	m_sprite->set_color_base(0);
 	m_sprite->set_color_entries(16);
 
 	// (left screen, vertical in stepping stage)
-	JALECO_MEGASYSTEM32_SPRITE(config, m_vj_sprite_l, 48000000); // unknown
+	JALECO_MEGASYSTEM32_SPRITE(config, m_vj_sprite_l, XTAL(48'000'000)/8); // unknown
 	m_vj_sprite_l->set_palette(m_vj_palette_l);
 	m_vj_sprite_l->set_color_base(0);
 	m_vj_sprite_l->set_color_entries(0x80);
 
 	// (mid screen, horizontal)
-	JALECO_MEGASYSTEM32_SPRITE(config, m_vj_sprite_m, 48000000); // unknown
+	JALECO_MEGASYSTEM32_SPRITE(config, m_vj_sprite_m, XTAL(48'000'000)/8); // unknown
 	m_vj_sprite_m->set_palette(m_vj_palette_m);
 	m_vj_sprite_m->set_color_base(0);
 	m_vj_sprite_m->set_color_entries(0x80);
 
 	// (right screens, vertical in stepping stage)
-	JALECO_MEGASYSTEM32_SPRITE(config, m_vj_sprite_r, 48000000); // unknown
+	JALECO_MEGASYSTEM32_SPRITE(config, m_vj_sprite_r, XTAL(48'000'000)/8); // unknown
 	m_vj_sprite_r->set_palette(m_vj_palette_r);
 	m_vj_sprite_r->set_color_base(0);
 	m_vj_sprite_r->set_color_entries(0x80);
