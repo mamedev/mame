@@ -78,7 +78,8 @@ void kaypro_state::kayproiv_pio_system_w(u8 data)
 	kayproii_pio_system_w(data);
 
 	/* side select */
-	m_floppy->ss_w(BIT(data, 2));
+	if (m_floppy)
+		m_floppy->ss_w(BIT(data, 2));
 }
 
 /***********************************************************
