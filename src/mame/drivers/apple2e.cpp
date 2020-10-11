@@ -2390,10 +2390,16 @@ void apple2e_state::update_iic_mouse()
 
 		/* check for wrap */
 		if (diff > 0x80)
+		{
 			diff -= 0x100;
+		}
 		else
-		if (diff < -0x80)
-			diff += 0x100;
+		{
+			if (diff < -0x80)
+			{
+				diff += 0x100;
+			}
+		}
 
 		count_x += diff;
 		last_mx = new_mx;
@@ -2406,9 +2412,16 @@ void apple2e_state::update_iic_mouse()
 
 		/* check for wrap */
 		if (diff > 0x80)
-			diff = 0x100-diff;
-		if (diff < -0x80)
-			diff = -0x100-diff;
+		{
+			diff -= 0x100;
+		}
+		else
+		{
+			if (diff < -0x80)
+			{
+				diff += 0x100;
+			}
+		}
 
 		count_y += diff;
 		last_my = new_my;
