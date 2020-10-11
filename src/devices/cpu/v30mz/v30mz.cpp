@@ -38,6 +38,9 @@
 
     Todo!
       - Double check cycle timing is 100%.
+			- Verify S and Z flags on ROL/ROR instructions. The v20 datasheet does
+			  not mention them as being changed, but according to the description of
+				the flags in the v30mz datasheet the flags are changed.
       - Fix memory interface (should be 16 bit) and related timing penalties.
 			- Add PFP (prefetch pointer) and prefetching (max 8 words); prefetching
 				is also done on branch targets regardless of whether the branch will
@@ -109,6 +112,7 @@ v30mz_cpu_device::v30mz_cpu_device(const machine_config &mconfig, const char *ta
 	, m_TF(0)
 	, m_int_vector(0)
 	, m_pc(0)
+	, m_vector_func(*this)
 {
 	static const BREGS reg_name[8]={ AL, CL, DL, BL, AH, CH, DH, BH };
 
@@ -153,6 +157,8 @@ void v30mz_cpu_device::device_start()
 	space(AS_PROGRAM).specific(m_program);
 	space(AS_IO).specific(m_io);
 
+	m_vector_func.resolve_safe(0);
+
 	save_item(NAME(m_regs.w));
 	save_item(NAME(m_sregs));
 	save_item(NAME(m_ip));
@@ -184,10 +190,10 @@ void v30mz_cpu_device::device_start()
 	state_add(NEC_BP, "BP", m_regs.w[BP]).callimport().callexport().formatstr("%04X");
 	state_add(NEC_IX, "IX", m_regs.w[IX]).callimport().callexport().formatstr("%04X");
 	state_add(NEC_IY, "IY", m_regs.w[IY]).callimport().callexport().formatstr("%04X");
-	state_add(NEC_ES, "ES", m_sregs[ES]).callimport().callexport().formatstr("%04X");
+	state_add(NEC_ES, "DS1", m_sregs[ES]).callimport().callexport().formatstr("%04X");
 	state_add(NEC_CS, "CS", m_sregs[CS]).callimport().callexport().formatstr("%04X");
 	state_add(NEC_SS, "SS", m_sregs[SS]).callimport().callexport().formatstr("%04X");
-	state_add(NEC_DS, "DS", m_sregs[DS]).callimport().callexport().formatstr("%04X");
+	state_add(NEC_DS, "DS0", m_sregs[DS]).callimport().callexport().formatstr("%04X");
 	state_add(NEC_VECTOR, "V", m_int_vector).callimport().callexport().formatstr("%02X");
 
 	state_add(STATE_GENPC, "GENPC", m_pc).callexport().formatstr("%05X");
@@ -276,7 +282,7 @@ void v30mz_cpu_device::device_reset()
 }
 
 
-inline uint32_t v30mz_cpu_device::pc()
+uint32_t v30mz_cpu_device::pc()
 {
 	m_pc = (m_sregs[CS] << 4) + m_ip;
 	return m_pc;
@@ -744,7 +750,7 @@ inline void v30mz_cpu_device::set_CFW(uint32_t x)
 	m_CarryVal = x & 0x10000;
 }
 
-inline void v30mz_cpu_device::set_AF(uint32_t x,uint32_t y,uint32_t z)
+inline void v30mz_cpu_device::set_AF(uint32_t x, uint32_t y, uint32_t z)
 {
 	m_AuxVal = (x ^ (y ^ z)) & 0x10;
 }
@@ -774,22 +780,22 @@ inline void v30mz_cpu_device::set_SZPF_Word(uint32_t x)
 	m_SignVal = m_ZeroVal = m_ParityVal = (int16_t)x;
 }
 
-inline void v30mz_cpu_device::set_OFW_Add(uint32_t x,uint32_t y,uint32_t z)
+inline void v30mz_cpu_device::set_OFW_Add(uint32_t x, uint32_t y, uint32_t z)
 {
 	m_OverVal = (x ^ y) & (x ^ z) & 0x8000;
 }
 
-inline void v30mz_cpu_device::set_OFB_Add(uint32_t x,uint32_t y,uint32_t z)
+inline void v30mz_cpu_device::set_OFB_Add(uint32_t x, uint32_t y, uint32_t z)
 {
 	m_OverVal = (x ^ y) & (x ^ z) & 0x80;
 }
 
-inline void v30mz_cpu_device::set_OFW_Sub(uint32_t x,uint32_t y,uint32_t z)
+inline void v30mz_cpu_device::set_OFW_Sub(uint32_t x, uint32_t y, uint32_t z)
 {
 	m_OverVal = (z ^ y) & (z ^ x) & 0x8000;
 }
 
-inline void v30mz_cpu_device::set_OFB_Sub(uint32_t x,uint32_t y,uint32_t z)
+inline void v30mz_cpu_device::set_OFB_Sub(uint32_t x, uint32_t y, uint32_t z)
 {
 	m_OverVal = (z ^ y) & (z ^ x) & 0x80;
 }
@@ -797,7 +803,8 @@ inline void v30mz_cpu_device::set_OFB_Sub(uint32_t x,uint32_t y,uint32_t z)
 
 inline uint16_t v30mz_cpu_device::CompressFlags() const
 {
-	return (CF ? 1 : 0)
+	return 0x72
+	  | (CF ? 1 : 0)
 		| (PF ? 4 : 0)
 		| (AF ? 0x10 : 0)
 		| (ZF ? 0x40 : 0)
@@ -953,7 +960,7 @@ inline void v30mz_cpu_device::i_popf()
 
 inline void v30mz_cpu_device::ADDB()
 {
-	uint32_t res = m_dst + m_src;
+	uint32_t res = (m_dst & 0xff) + (m_src & 0xff);
 
 	set_CFB(res);
 	set_OFB_Add(res,m_src,m_dst);
@@ -965,7 +972,7 @@ inline void v30mz_cpu_device::ADDB()
 
 inline void v30mz_cpu_device::ADDW()
 {
-	uint32_t res = m_dst + m_src;
+	uint32_t res = (m_dst & 0xffff) + (m_src & 0xffff);
 
 	set_CFW(res);
 	set_OFW_Add(res,m_src,m_dst);
@@ -977,7 +984,7 @@ inline void v30mz_cpu_device::ADDW()
 
 inline void v30mz_cpu_device::SUBB()
 {
-	uint32_t res = m_dst - m_src;
+	uint32_t res = (m_dst & 0xff) - (m_src & 0xff);
 
 	set_CFB(res);
 	set_OFB_Sub(res,m_src,m_dst);
@@ -989,7 +996,7 @@ inline void v30mz_cpu_device::SUBB()
 
 inline void v30mz_cpu_device::SUBW()
 {
-	uint32_t res = m_dst - m_src;
+	uint32_t res = (m_dst & 0xffff) - (m_src & 0xffff);
 
 	set_CFW(res);
 	set_OFW_Sub(res,m_src,m_dst);
@@ -1218,7 +1225,7 @@ inline void v30mz_cpu_device::JMP(bool cond)
 }
 
 
-inline void v30mz_cpu_device::ADJ4(int8_t param1,int8_t param2)
+inline void v30mz_cpu_device::ADJ4(int8_t param1, int8_t param2)
 {
 	if (AF || ((m_regs.b[AL] & 0xf) > 9))
 	{
@@ -1243,8 +1250,8 @@ inline void v30mz_cpu_device::ADJB(int8_t param1, int8_t param2)
 	{
 		m_regs.b[AL] += param1;
 		m_regs.b[AH] += param2;
+		m_CarryVal = m_AuxVal;
 		m_AuxVal = 1;
-		m_CarryVal = 1;
 	}
 	else
 	{
@@ -1263,7 +1270,8 @@ void v30mz_cpu_device::interrupt(int int_num)
 
 	if (int_num == -1)
 	{
-		int_num = standard_irq_callback(0);
+		standard_irq_callback(0);
+		int_num = m_vector_func();
 
 		m_irq_state = CLEAR_LINE;
 		m_pending_irq &= ~INT_IRQ;
@@ -1738,7 +1746,7 @@ void v30mz_cpu_device::execute_run()
 					case 0xff:
 						m_modrm = fetch();
 						m_modrm = 0;
-						logerror("%s: %06x: unimplemented BRKEM (break to 8080 emulation mode)\n", tag(), pc());
+						fatalerror("%s: %06x: unimplemented BRKEM (break to 8080 emulation mode)\n", tag(), pc());
 						break;
 					default:
 						logerror("%s: %06x: Unknown V20 instruction\n", tag(), pc());
@@ -2533,7 +2541,7 @@ void v30mz_cpu_device::execute_run()
 			case 0x83: // i_83pre
 				m_modrm = fetch();
 				m_dst = GetRMWord();
-				m_src = ((int16_t)((int8_t)fetch())) & 0xffff;
+				m_src = (int8_t)fetch();
 				if ( m_modrm >= 0xc0)              { CLK(1); }
 				else if ((m_modrm & 0x38) == 0x38) { CLK(2); }
 				else                               { CLK(3); }
@@ -3434,7 +3442,7 @@ void v30mz_cpu_device::execute_run()
 				break;
 
 			case 0xf5: // i_cmc
-				m_CarryVal ^= 1;
+				m_CarryVal = (CF ? 0 : 1);
 				CLK(4);
 				break;
 
@@ -3461,7 +3469,7 @@ void v30mz_cpu_device::execute_run()
 						PutbackRMByte(~tmp);
 						CLKM(1,3);
 						break;
-					case 0x18:  /* NEG */
+					case 0x18:  /* NEG, AF? */
 						m_CarryVal = (tmp != 0) ? 1 : 0;
 						tmp = (~tmp) + 1;
 						set_SZPF_Byte(tmp);

@@ -102,7 +102,7 @@ protected:
 		u8   enable = 0; // Enabled
 	};
 
-	required_device<cpu_device> m_maincpu;
+	required_device<v30mz_cpu_device> m_maincpu;
 	required_device<wswan_video_device> m_vdp;
 	required_device<wswan_sound_device> m_sound;
 	required_device<ws_cart_slot_device> m_cart;
@@ -115,6 +115,7 @@ protected:
 	u8 m_rotate;
 	u8 m_delayed_portC0_data;
 	emu_timer *m_portC0_timer;
+	u32 m_vector;
 
 	required_memory_region m_region_maincpu;
 	required_ioport m_cursx;
@@ -141,6 +142,7 @@ protected:
 	void handle_irqs();
 	void clear_irq_line(int irq);
 	virtual u16 get_internal_eeprom_address();
+	u32 get_vector() { return m_vector; }
 };
 
 class wscolor_state : public wswan_state
@@ -264,6 +266,7 @@ void wswan_state::wswan(machine_config &config)
 	V30MZ(config, m_maincpu, 3.072_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &wswan_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &wswan_state::io_map);
+	m_maincpu->vector_cb().set(FUNC(wswan_state::get_vector));
 
 	WSWAN_VIDEO(config, m_vdp, 0);
 	m_vdp->set_screen("screen");
@@ -272,11 +275,7 @@ void wswan_state::wswan(machine_config &config)
 	m_vdp->set_dmasnd_callback(FUNC(wswan_state::dma_sound_cb));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
-//  screen.set_refresh_rate(75);
-//  screen.set_vblank_time(0);
 	screen.set_screen_update("vdp", FUNC(wswan_video_device::screen_update));
-//  screen.set_size(WSWAN_X_PIXELS, WSWAN_Y_PIXELS);
-//  screen.set_visarea(0*8, WSWAN_X_PIXELS - 1, 0, WSWAN_Y_PIXELS - 1);
 	screen.set_raw(3.072_MHz_XTAL, 256, 0, wswan_video_device::WSWAN_X_PIXELS, 159, 0, wswan_video_device::WSWAN_Y_PIXELS);
 	screen.set_palette("palette");
 
@@ -331,35 +330,43 @@ void wswan_state::handle_irqs()
 {
 	if (m_ws_portram[0xb2] & m_ws_portram[0xb6] & WSWAN_IFLAG_HBLTMR)
 	{
-		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, m_ws_portram[0xb0] + WSWAN_INT_HBLTMR); // V30MZ
+		m_vector = m_ws_portram[0xb0] + WSWAN_INT_HBLTMR;
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 	}
 	else if (m_ws_portram[0xb2] & m_ws_portram[0xb6] & WSWAN_IFLAG_VBL)
 	{
-		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, m_ws_portram[0xb0] + WSWAN_INT_VBL); // V30MZ
+		m_vector = m_ws_portram[0xb0] + WSWAN_INT_VBL;
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 	}
 	else if (m_ws_portram[0xb2] & m_ws_portram[0xb6] & WSWAN_IFLAG_VBLTMR)
 	{
-		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, m_ws_portram[0xb0] + WSWAN_INT_VBLTMR); // V30MZ
+		m_vector = m_ws_portram[0xb0] + WSWAN_INT_VBLTMR;
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 	}
 	else if (m_ws_portram[0xb2] & m_ws_portram[0xb6] & WSWAN_IFLAG_LCMP)
 	{
-		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, m_ws_portram[0xb0] + WSWAN_INT_LCMP); // V30MZ
+		m_vector = m_ws_portram[0xb0] + WSWAN_INT_LCMP;
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 	}
 	else if (m_ws_portram[0xb2] & m_ws_portram[0xb6] & WSWAN_IFLAG_SRX)
 	{
-		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, m_ws_portram[0xb0] + WSWAN_INT_SRX); // V30MZ
+		m_vector = m_ws_portram[0xb0] + WSWAN_INT_SRX;
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 	}
 	else if (m_ws_portram[0xb2] & m_ws_portram[0xb6] & WSWAN_IFLAG_RTC)
 	{
-		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, m_ws_portram[0xb0] + WSWAN_INT_RTC); // V30MZ
+		m_vector = m_ws_portram[0xb0] + WSWAN_INT_RTC;
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 	}
 	else if (m_ws_portram[0xb2] & m_ws_portram[0xb6] & WSWAN_IFLAG_KEY)
 	{
-		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, m_ws_portram[0xb0] + WSWAN_INT_KEY); // V30MZ
+		m_vector = m_ws_portram[0xb0] + WSWAN_INT_KEY;
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 	}
 	else if (m_ws_portram[0xb2] & m_ws_portram[0xb6] & WSWAN_IFLAG_STX)
 	{
-		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, m_ws_portram[0xb0] + WSWAN_INT_STX); // V30MZ
+		m_vector = m_ws_portram[0xb0] + WSWAN_INT_STX;
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 	}
 	else
 	{
@@ -413,6 +420,7 @@ void wswan_state::register_save()
 	save_item(NAME(m_sound_dma.source));
 	save_item(NAME(m_sound_dma.size));
 	save_item(NAME(m_sound_dma.enable));
+	save_item(NAME(m_vector));
 
 	if (m_cart->exists())
 		m_cart->save_nvram();
@@ -424,6 +432,7 @@ void wswan_state::common_start()
 	register_save();
 
 	m_portC0_timer = timer_alloc(TIMER_PORTC0);
+	m_vector = 0;
 
 	if (m_cart->exists())
 	{
