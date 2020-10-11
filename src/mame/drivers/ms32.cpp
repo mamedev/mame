@@ -699,7 +699,8 @@ void ms32_state::ms32_map(address_map &map)
 	map(0xfcc00004, 0xfcc00007).portr("INPUTS");
 	map(0xfcc00010, 0xfcc00013).portr("DSW");
 	// System Registers
-	map(0xfce00000, 0xfce0002f).w(FUNC(ms32_state::crtc_w));   					// flip screen + CRTC setup
+	map(0xfce00000, 0xfce0002f).rw(m_sysctrl, FUNC(jaleco_ms32_sysctrl_device::read), FUNC(jaleco_ms32_sysctrl_device::write)).umask32(0x0000ffff);
+//	map(0xfce00000, 0xfce0002f).w(FUNC(ms32_state::crtc_w));   					// flip screen + CRTC setup
 //	map(0xfce00030, 0xfce00033) 												// timer irq control
 	map(0xfce00034, 0xfce00037).nopw(); 										// timer irq trigger (ack?)
 	map(0xfce00038, 0xfce0003b).w(FUNC(ms32_state::sound_reset_w));
@@ -1667,7 +1668,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ms32_state::ms32_interrupt)
 	if( scanline == 8) irq_raise(9);
 	/* hayaosi1 needs at least 12 IRQ 0 per frame to work (see code at FFE02289)
 	   kirarast needs it too, at least 8 per frame, but waits for a variable amount
-	   47pi2 needs ?? per frame (otherwise it hangs when you lose)
+	   suchie2 needs ?? per frame (otherwise it hangs when you lose)
 	   in different points. Could this be a raster interrupt?
 	   Other games using it but not needing it to work:
 	   desertwr
@@ -1758,6 +1759,8 @@ void ms32_state::ms32(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ms32_state::ms32_sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(60000));
+
+	JALECO_MS32_SYSCTRL(config, m_sysctrl, XTAL(48'000'000));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

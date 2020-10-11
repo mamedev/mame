@@ -1,13 +1,13 @@
-// license:BSD-3-Clause
+// license:<license_opt>
 // copyright-holders:<author_name>
 /***************************************************************************
 
-Template for skeleton device
+<device_longname>
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_XXX_H
-#define MAME_MACHINE_XXX_H
+#ifndef MAME_MACHINE_<device_typename>_H
+#define MAME_MACHINE_<device_typename>_H
 
 #pragma once
 
@@ -23,13 +23,13 @@ Template for skeleton device
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> xxx_device
+// ======================> <device_classname>_device
 
-class xxx_device : public device_t
+class <device_classname>_device : public device_t
 {
 public:
 	// construction/destruction
-	xxx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	<device_classname>_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
@@ -45,7 +45,7 @@ protected:
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(XXX, xxx_device)
+DECLARE_DEVICE_TYPE(<device_typename>, <device_classname>_device)
 
 
 
@@ -54,4 +54,4 @@ DECLARE_DEVICE_TYPE(XXX, xxx_device)
 //**************************************************************************
 
 
-#endif // MAME_MACHINE_XXX_H
+#endif // MAME_MACHINE_<device_typename>_H

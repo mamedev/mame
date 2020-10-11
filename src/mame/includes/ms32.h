@@ -7,6 +7,7 @@
 
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
+#include "machine/jaleco_ms32_sysctrl.h"
 #include "video/ms32_sprite.h"
 #include "emupal.h"
 #include "screen.h"
@@ -21,6 +22,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_sysctrl(*this, "sysctrl"),
 		m_sprite(*this, "sprite"),
 		m_soundlatch(*this, "soundlatch"),
 		m_sprite_ctrl(*this, "sprite_ctrl"),
@@ -72,16 +74,9 @@ protected:
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	int m_flipscreen;
-	u8 m_dotclock;
-	struct {
-		u16 horz_blank, horz_display, vert_blank, vert_display;
-	}m_crtc;
-	inline u16 crtc_write_reg(u16 raw_data);
-	inline void crtc_refresh_screen_params();
-
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	optional_device<jaleco_ms32_sysctrl_device> m_sysctrl;
 	required_device<ms32_sprite_device> m_sprite;
 	optional_device<generic_latch_8_device> m_soundlatch;
 	optional_shared_ptr<u32> m_sprite_ctrl;
@@ -143,7 +138,6 @@ private:
 	void ms32_irq2_guess_w(u32 data);
 	void ms32_irq5_guess_w(u32 data);
 	void ms32_brightness_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	void crtc_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void coin_counter_w(u32 data);
 	void init_ms32_common();
 

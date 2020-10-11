@@ -172,6 +172,8 @@ private:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u16 *sprram_top);
 	void bnstars_map(address_map &map);
 	void bnstars_sound_map(address_map &map);
+	// temp, to be removed
+	u8 m_flipscreen;
 };
 
 
