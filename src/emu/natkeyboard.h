@@ -53,8 +53,9 @@ public:
 	void configure(ioport_queue_chars_delegate queue_chars, ioport_accept_char_delegate accept_char, ioport_charqueue_empty_delegate charqueue_empty);
 	void set_in_use(bool usage);
 	size_t keyboard_count() const { return m_keyboards.size(); }
-	device_t &keyboard_device(size_t n) { return m_keyboards[n].device; }
-	bool keyboard_enabled(size_t n) { return m_keyboards[n].enabled; }
+	device_t &keyboard_device(size_t n) const { return m_keyboards[n].device; }
+	bool keyboard_is_keypad(size_t n) const { return !m_keyboards[n].keyboard; }
+	bool keyboard_enabled(size_t n) const { return m_keyboards[n].enabled; }
 	void enable_keyboard(size_t n) { set_keyboard_enabled(n, true); }
 	void disable_keyboard(size_t n) { set_keyboard_enabled(n, false); }
 

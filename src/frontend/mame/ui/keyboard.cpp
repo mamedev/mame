@@ -50,7 +50,7 @@ void menu_keyboard_mode::populate(float &customtop, float &custombottom)
 		bool const enabled(natkbd.keyboard_enabled(i));
 		item_append(
 				util::string_format(
-					kbddev.owner() ? _("%1$s [root%2$s]") : _("[root%2$s"),
+					kbddev.owner() ? _("%1$s [root%2$s]") : _("[root%2$s]"),
 					kbddev.type().fullname(),
 					kbddev.tag()),
 				enabled ? _("Enabled") : _("Disabled"),

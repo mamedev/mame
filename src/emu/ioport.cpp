@@ -2125,20 +2125,58 @@ void ioport_manager::load_config(config_type cfg_type, util::xml::data_node cons
 	// load keyboard enable/disable state
 	if (cfg_type == config_type::GAME)
 	{
+		std::vector<bool> kbd_enable_set;
+		bool keyboard_enabled = false, missing_enabled = false;
 		for (util::xml::data_node const *kbdnode = parentnode->get_child("keyboard"); kbdnode; kbdnode = kbdnode->get_next_sibling("keyboard"))
 		{
 			char const *const tag = kbdnode->get_attribute_string("tag", nullptr);
 			int const enabled = kbdnode->get_attribute_int("enabled", -1);
 			if (tag && (0 <= enabled))
 			{
-				for (size_t i = 0; natkeyboard().keyboard_count() > i; ++i)
+				size_t i;
+				for (i = 0; natkeyboard().keyboard_count() > i; ++i)
 				{
 					if (!strcmp(natkeyboard().keyboard_device(i).tag(), tag))
 					{
+						if (kbd_enable_set.empty())
+							kbd_enable_set.resize(natkeyboard().keyboard_count(), false);
+						kbd_enable_set[i] = true;
 						if (enabled)
+						{
+							if (!natkeyboard().keyboard_is_keypad(i))
+								keyboard_enabled = true;
 							natkeyboard().enable_keyboard(i);
+						}
 						else
+						{
 							natkeyboard().disable_keyboard(i);
+						}
+						break;
+					}
+				}
+				missing_enabled = missing_enabled || (enabled && (natkeyboard().keyboard_count() <= i));
+			}
+		}
+
+		// if keyboard enable configuration was loaded, patch it up for principle of least surprise
+		if (!kbd_enable_set.empty())
+		{
+			for (size_t i = 0; natkeyboard().keyboard_count() > i; ++i)
+			{
+				if (!natkeyboard().keyboard_is_keypad(i))
+				{
+					if (!keyboard_enabled && missing_enabled)
+					{
+						natkeyboard().enable_keyboard(i);
+						keyboard_enabled = true;
+					}
+					else if (!kbd_enable_set[i])
+					{
+						if (keyboard_enabled)
+							natkeyboard().disable_keyboard(i);
+						else
+							natkeyboard().enable_keyboard(i);
+						keyboard_enabled = true;
 					}
 				}
 			}
