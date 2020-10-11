@@ -115,7 +115,8 @@ READ_LINE_MEMBER(psikyo_state::mcu_status_r)
 	if (m_mcu_status)
 		ret = 0x01;
 
-	m_mcu_status = !m_mcu_status;   /* hack */
+	if (!machine().side_effects_disabled())
+		m_mcu_status = !m_mcu_status;   /* hack */
 
 	return ret;
 }
@@ -207,12 +208,14 @@ u32 psikyo_state::s1945_mcu_data_r()
 	if (m_s1945_mcu_control & 16)
 	{
 		res = m_s1945_mcu_latching & 4 ? 0x0000ff00 : m_s1945_mcu_latch1 << 8;
-		m_s1945_mcu_latching |= 4;
+		if (!machine().side_effects_disabled())
+			m_s1945_mcu_latching |= 4;
 	}
 	else
 	{
 		res = m_s1945_mcu_latching & 1 ? 0x0000ff00 : m_s1945_mcu_latch2 << 8;
-		m_s1945_mcu_latching |= 1;
+		if (!machine().side_effects_disabled())
+			m_s1945_mcu_latching |= 1;
 	}
 	res |= m_s1945_mcu_bctrl & 0xf0;
 	return res;
@@ -442,7 +445,8 @@ READ_LINE_MEMBER(psikyo_state::z80_nmi_r)
 
 		/* main CPU might be waiting for sound CPU to finish NMI,
 		   so set a timer to give sound CPU a chance to run */
-		machine().scheduler().synchronize();
+		if (!machine().side_effects_disabled())
+			machine().scheduler().synchronize();
 //      logerror("%s - Read coin port during Z80 NMI\n", machine().describe_context());
 	}
 
