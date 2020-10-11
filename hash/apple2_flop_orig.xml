@@ -15236,4 +15236,87 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="trpdmp33">
+		<description>Triple-Dump (DOS 3.3)</description>
+		<year>1984</year>
+		<publisher>Beagle Bros.</publisher>
+		<info name="release" value="2020-10-11"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!-- This is the DOS 3.3 version. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="241477">
+				<rom name="triple-dump side a.woz" size="241477" crc="aeae3e95" sha1="1aaa376a7896286c25f5b605ffec5993664122f5"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234821">
+				<rom name="triple-dump side b.woz" size="234821" crc="a95efa38" sha1="9b6fbc125aef5f68f456185fd1a41e62d6ea25d6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fntmch33">
+		<description>Font Mechanic (DOS 3.3)</description>
+		<year>1985</year>
+		<publisher>Beagle Bros.</publisher>
+		<info name="release" value="2020-10-11"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!-- This is the DOS 3.3 version. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="241479">
+				<rom name="font mechanic side a.woz" size="241479" crc="63124d43" sha1="699a3c9f1c6c49bd1c94d221ac7c76e764e9317b"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234823">
+				<rom name="font mechanic side b.woz" size="234823" crc="fe0ae908" sha1="36f362dbf4397e2e8ea4fa2ec80386d824aed225"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dtke2133">
+		<description>Double-Take (Version 2.1) (DOS 3.3)</description>
+		<year>1983</year>
+		<publisher>Beagle Bros.</publisher>
+		<info name="release" value="2020-10-11"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- The 48K DOS 3.3 version is on side A; the 64K ProDOS version is on side B.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - 48K DOS 3.3 version"/>
+			<dataarea name="flop" size="234816">
+				<rom name="double-take v2.1 side a.woz" size="234816" crc="a48ac0b7" sha1="012f2632bfcbe6feb89686ea12839d477b4661e3"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - 64K ProDOS version"/>
+			<dataarea name="flop" size="234815">
+				<rom name="double-take v2.1 side b.woz" size="234815" crc="6e3560eb" sha1="29b3af6837fa8cdf5245f58fe81f95ec5fbb5353"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diskquik">
+		<description>DiskQuik</description>
+		<year>1983</year>
+		<publisher>Beagle Bros.</publisher>
+		<info name="release" value="2020-10-11"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241445">
+				<rom name="diskquik.woz" size="241445" crc="8ceb180b" sha1="6c62d39948c6113abfcfba44ef1bb1f7f251e703"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
