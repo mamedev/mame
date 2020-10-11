@@ -252,15 +252,19 @@ u32 mbee_state::screen_update_mbee(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 MC6845_ON_UPDATE_ADDR_CHANGED( mbee_state::crtc_update_addr )
 {
-// parameters passed are device, address, strobe(always 0)
+// parameters passed are address, strobe
 // not used on 256TC
 
-	oldkb_matrix_r(address);
+	if (strobe)
+		oldkb_matrix_r(address);
 }
 
 
 MC6845_UPDATE_ROW( mbee_state::crtc_update_row )
 {
+	if (!de)
+		return;
+
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 
 	// colours
