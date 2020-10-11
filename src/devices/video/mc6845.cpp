@@ -189,7 +189,7 @@ void mc6845_device::transparent_update()
 		{
 			m_update_addr++;
 			m_update_addr &= 0x3fff;
-			call_on_update_address(0);
+			call_on_update_address(MODE_UPDATE_STROBE);
 		}
 		else
 		{
@@ -268,7 +268,7 @@ void mc6845_device::register_w(uint8_t data)
 			{
 				m_update_addr = ((data & 0x3f) << 8) | (m_update_addr & 0x00ff);
 				if(MODE_TRANSPARENT_PHI2)
-					call_on_update_address(0);
+					call_on_update_address(MODE_UPDATE_STROBE);
 			}
 			break;
 		case 0x13:
@@ -276,7 +276,7 @@ void mc6845_device::register_w(uint8_t data)
 			{
 				m_update_addr = ((data & 0xff) << 0) | (m_update_addr & 0xff00);
 				if(MODE_TRANSPARENT_PHI2)
-					call_on_update_address(0);
+					call_on_update_address(MODE_UPDATE_STROBE);
 			}
 			break;
 		case 0x1f:  transparent_update(); break;
@@ -994,7 +994,7 @@ void mc6845_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 	case TIMER_UPD_ADR:
 		/* fire a update address strobe */
-		call_on_update_address(0);
+		call_on_update_address(MODE_UPDATE_STROBE);
 		break;
 
 	case TIMER_UPD_TRANS:
