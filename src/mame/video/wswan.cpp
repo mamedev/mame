@@ -518,7 +518,7 @@ void wswan_video_device::draw_foreground_2()
 			else
 				x_offset = 7 - x + (column << 3) - (m_layer_fg_scroll_x & 0x07);
 
-			if (x_offset >= 0 && x_offset >= m_window_fg_left && x_offset < m_window_fg_right && x_offset < WSWAN_X_PIXELS)
+			if (x_offset >= 0 && x_offset >= m_window_fg_left && x_offset <= m_window_fg_right && x_offset < WSWAN_X_PIXELS)
 			{
 				if (m_colors_16)
 				{
@@ -625,7 +625,7 @@ void wswan_video_device::draw_foreground_3()
 			else
 				x_offset = 7 - x + (column << 3) - (m_layer_fg_scroll_x & 0x07);
 
-			if ((x_offset >= 0 && x_offset < m_window_fg_left) || (x_offset >= m_window_fg_right && x_offset < WSWAN_X_PIXELS))
+			if ((x_offset >= 0 && x_offset < m_window_fg_left) || (x_offset > m_window_fg_right && x_offset < WSWAN_X_PIXELS))
 			{
 				if (m_colors_16)
 				{
