@@ -258,7 +258,7 @@ protected:
 	void execute_addc(uint8_t dat);
 	void execute_jmp(uint16_t address);
 	void execute_call(uint16_t address);
-	void execute_jcc(uint8_t result);
+	void execute_jcc(bool result);
 	uint8_t p2_mask();
 	void expander_operation(expander_op operation, uint8_t port);
 	void check_irqs();

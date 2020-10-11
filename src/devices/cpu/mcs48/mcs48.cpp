@@ -518,7 +518,7 @@ void mcs48_cpu_device::execute_call(uint16_t address)
     conditional jump instruction
 -------------------------------------------------*/
 
-void mcs48_cpu_device::execute_jcc(uint8_t result)
+void mcs48_cpu_device::execute_jcc(bool result)
 {
 	uint16_t pch = m_pc & 0xf00;
 	uint8_t offset = argument_fetch();
@@ -1247,7 +1247,7 @@ void mcs48_cpu_device::check_irqs()
 		if (m_irq_polled)
 		{
 			m_pc = ((m_prevpc + 1) & 0x7ff) | (m_prevpc & 0x800);
-			execute_jcc(1);
+			execute_jcc(true);
 		}
 
 		/* transfer to location 0x03 */
