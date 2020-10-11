@@ -706,6 +706,7 @@ Melty Blood Actress Again Version A (Rev A)         841-0061C    24455        6 
 /Mushiking The King Of Beetles
 \Mushiking IV / V / VI (World)                      840-0180C    not present  2 (512Mb)   present  317-0437-COM  present  IC2# is labeled "VER.1", IC4# is marked "8A", requires 610-0669 barcode reader, 838-14245-92 "MAPLE/232C CONVERT BD" (MIE-based), 838-14243 "RFID CHIP R/W BD" and RFID chip
 Mushiking The King Of Beetles 2006 First (Japan)    840-0167C    not present  2 (512Mb)   present  317-0444-JPN  present  IC4# is marked "18", require 610-0669 barcode reader
+Mushiking The King Of Beetles 2006 Second (Japan)   840-0171C    not present  2 (512Mb)   present  317-0444-JPN  present  IC4# is marked "18", require 610-0669 barcode reader
 Pokasuka Ghost!                                     840-0170C    not present  5 (512Mb)   present  317-0461-COM  present  requires 837-14672 sensor board (SH4 based)
 Radirgy Noa                                         841-0062C    not present  4 (512Mb)   present  317-5138-JPN  present  IC2# is labeled "VER.2" - IC4# is marked "8A"
 Rhythm Tengoku                                      841-0177C    not present  4 (512Mb)   present  317-0503-JPN  present  IC2# is labeled "VER.2" - IC4# is marked "8A"
@@ -5053,6 +5054,20 @@ ROM_START( mushi2k5 )
 	ROM_LOAD( "mpr-24282.ic7",  0x6800000, 0x1000000, CRC(9aa4ad5a) SHA1(2d81f99a579477c5db725f71c51f18afc15abce7) )
 
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1") // 315-5881 not populated
+ROM_END
+
+ROM_START( mushi2k62 )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x8000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "fpr-24360.ic8", 0x0000000, 0x4000000, CRC(6e6c6633) SHA1(e5fd1ff643899067db7ebda6641852bd45c36b86) )
+	ROM_LOAD( "fpr-24361.ic9", 0x4000000, 0x4000000, CRC(ce2a9720) SHA1(0a55d1c8a67288dbad374ab812d4720cdf78ded7) )
+
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-0444-jpn.ic3", 0, 0x800, CRC(6ded35a2) SHA1(0bb12bf6b090b865abd04d26d65f28c661464514) )
+
+	ROM_PARAMETER( ":rom_board:id", "5502" )
 ROM_END
 
 ROM_START( crackndj )
@@ -11566,7 +11581,7 @@ ROM_END
 // 0167 Mushiking 2K6 1ST (Japan)
 /* 0170-01 */ GAME( 2007, manicpnc,  naomi,    naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Manic Panic Ghosts! (USA, Export)", GAME_FLAGS )
 /* 0170    */ GAME( 2007, pokasuka,  manicpnc, naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Pokasuka Ghost! (Japan)", GAME_FLAGS )
-// 0171 Mushiking 2K6 2ND (Japan) note: starting from ver 2K6 was moved to SystemSP platform and later to PC-based hardware
+/* 0171    */ GAME( 2006, mushi2k62, naomi,    naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetles 2006 Second (Japan)", GAME_FLAGS )
 /* 0175    */ GAME( 2007, asndynmt,  naomi,    naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Asian Dynamite / Dynamite Deka EX", GAME_FLAGS )
 /* 0175    */ GAME( 2007, asndynmto, asndynmt, naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Asian Dynamite / Dynamite Deka EX (older)", GAME_FLAGS ) // no revision stickers, presumably older revision but might be release for Asian market
 /* 0177    */ GAME( 2007, rhytngk,   naomi,    naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega / Nintendo - J.P ROOM", "Rhythm Tengoku (Japan)", GAME_FLAGS )
