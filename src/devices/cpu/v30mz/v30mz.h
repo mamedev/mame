@@ -29,6 +29,9 @@ public:
 	// construction/destruction
 	v30mz_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	auto vector_cb() { return m_vector_func.bind(); }
+	uint32_t pc();
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -54,7 +57,6 @@ protected:
 
 	void interrupt(int int_num);
 
-	inline uint32_t pc();
 	// Accessing memory and io
 	inline uint8_t read_byte(uint32_t addr);
 	inline uint16_t read_word(uint32_t addr);
@@ -220,6 +222,8 @@ protected:
 			int b[256];
 		} RM;
 	} m_Mod_RM;
+
+	devcb_read32 m_vector_func;
 };
 
 #endif // MAME_CPU_V32MZ_V30MZ_H
