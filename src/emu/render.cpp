@@ -1665,7 +1665,7 @@ void render_target::load_layout_files(util::xml::data_node const &rootnode, bool
 
 	// if there's an explicit file, load that first
 	const std::string &basename = m_manager.machine().basename();
-	have_artwork |= load_layout_file(m_manager.machine().root_device(), basename.c_str(), rootnode);
+	have_artwork |= load_layout_file(m_manager.machine().root_device(), rootnode, m_manager.machine().options().art_path(), basename.c_str());
 
 	// if we're only loading this file, we know our final result
 	if (!singlefile)
@@ -2084,7 +2084,7 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 		}
 
 		// try to parse it
-		if (!load_layout_file(m_manager.machine().root_device(), nullptr, *root))
+		if (!load_layout_file(m_manager.machine().root_device(), *root, m_manager.machine().options().art_path(), nullptr))
 			throw emu_fatalerror("Couldn't parse generated layout??");
 	}
 }
@@ -2111,7 +2111,7 @@ bool render_target::load_layout_file(const char *dirname, const internal_layout 
 	zerr = inflateInit(&stream);
 	if (zerr != Z_OK)
 	{
-		fatalerror("could not inflateInit");
+		osd_printf_error("render_target::load_layout_file: zlib initialization error\n");
 		return false;
 	}
 
@@ -2127,23 +2127,21 @@ bool render_target::load_layout_file(const char *dirname, const internal_layout 
 	}
 	else if (zerr != Z_OK)
 	{
-		fatalerror("decompression error\n");
+		osd_printf_error("render_target::load_layout_file: zlib decompression error\n");
+		inflateEnd(&stream);
 		return false;
 	}
 
 	// clean up
 	zerr = inflateEnd(&stream);
 	if (zerr != Z_OK)
-	{
-		fatalerror("inflateEnd error\n");
-		return false;
-	}
+		osd_printf_error("render_target::load_layout_file: zlib cleanup error\n");
 
 	util::xml::file::ptr rootnode(util::xml::file::string_read(reinterpret_cast<char const *>(tempout.get()), nullptr));
 	tempout.reset();
 
 	// if we didn't get a properly-formatted XML file, record a warning and exit
-	if (!load_layout_file(device ? *device : m_manager.machine().root_device(), dirname, *rootnode))
+	if (!load_layout_file(device ? *device : m_manager.machine().root_device(), *rootnode, m_manager.machine().options().art_path(), dirname))
 	{
 		osd_printf_warning("Improperly formatted XML string, ignoring\n");
 		return false;
@@ -2157,28 +2155,39 @@ bool render_target::load_layout_file(const char *dirname, const internal_layout 
 bool render_target::load_layout_file(const char *dirname, const char *filename)
 {
 	// build the path and optionally prepend the directory
-	std::string fname = std::string(filename).append(".lay");
+	std::string fname;
 	if (dirname)
-		fname.insert(0, PATH_SEPARATOR).insert(0, dirname);
+		fname.append(dirname).append(PATH_SEPARATOR);
+	fname.append(filename).append(".lay");
 
-	// attempt to open the file; bail if we can't
-	emu_file layoutfile(m_manager.machine().options().art_path(), OPEN_FLAG_READ);
-	layoutfile.set_restrict_to_mediapath(1);
-	osd_file::error const filerr(layoutfile.open(fname));
-	if (filerr != osd_file::error::NONE)
-		return false;
-
-	// read the file
+	// attempt to open matching files
 	util::xml::parse_options parseopt;
 	util::xml::parse_error parseerr;
 	parseopt.error = &parseerr;
-	util::xml::file::ptr rootnode(util::xml::file::read(layoutfile, &parseopt));
-	if (!rootnode)
+	emu_file layoutfile(m_manager.machine().options().art_path(), OPEN_FLAG_READ);
+	layoutfile.set_restrict_to_mediapath(1);
+	bool result(false);
+	for (osd_file::error filerr = layoutfile.open(fname); osd_file::error::NONE == filerr; filerr = layoutfile.open_next())
 	{
-		if (parseerr.error_message)
+		// read the file and parse as XML
+		util::xml::file::ptr const rootnode(util::xml::file::read(layoutfile, &parseopt));
+		if (rootnode)
+		{
+			// extract directory name from location of layout file
+			std::string artdir(layoutfile.fullpath());
+			auto const dirsep(std::find_if(artdir.rbegin(), artdir.rend(), &util::is_directory_separator));
+			artdir.erase(dirsep.base(), artdir.end());
+
+			// record a warning if we didn't get a properly-formatted XML file
+			if (!load_layout_file(m_manager.machine().root_device(), *rootnode, nullptr, artdir.c_str()))
+				osd_printf_warning("Improperly formatted XML layout file '%s', ignoring\n", filename);
+			else
+				result = true;
+		}
+		else if (parseerr.error_message)
 		{
 			osd_printf_warning(
-					"Error parsing XML file '%s' at line %d column %d: %s, ignoring\n",
+					"Error parsing XML layout file '%s' at line %d column %d: %s, ignoring\n",
 					filename,
 					parseerr.error_line,
 					parseerr.error_column,
@@ -2186,29 +2195,18 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 		}
 		else
 		{
-			osd_printf_warning("Error parsing XML file '%s', ignorning\n", filename);
+			osd_printf_warning("Error parsing XML layout file '%s', ignorning\n", filename);
 		}
-		return false;
 	}
-
-	// if we didn't get a properly-formatted XML file, record a warning and exit
-	if (!load_layout_file(m_manager.machine().root_device(), dirname, *rootnode))
-	{
-		osd_printf_warning("Improperly formatted XML file '%s', ignoring\n", filename);
-		return false;
-	}
-	else
-	{
-		return true;
-	}
+	return result;
 }
 
-bool render_target::load_layout_file(device_t &device, const char *dirname, util::xml::data_node const &rootnode)
+bool render_target::load_layout_file(device_t &device, util::xml::data_node const &rootnode, const char *searchpath, const char *dirname)
 {
 	// parse and catch any errors
 	try
 	{
-		m_filelist.emplace_back(device, rootnode, dirname);
+		m_filelist.emplace_back(device, rootnode, searchpath, dirname);
 	}
 	catch (emu_fatalerror &)
 	{

@@ -41,33 +41,37 @@ constexpr u32 CMDFLAG_CUSTOM_HELP           = 0x0002;
 ***************************************************************************/
 
 // CMDERR is an error code for command evaluation
-struct CMDERR
+class CMDERR
 {
+public:
 	// values for the error code in a command error
-	static constexpr u32 NONE               = 0;
-	static constexpr u32 UNKNOWN_COMMAND    = 1;
-	static constexpr u32 AMBIGUOUS_COMMAND  = 2;
-	static constexpr u32 UNBALANCED_PARENS  = 3;
-	static constexpr u32 UNBALANCED_QUOTES  = 4;
-	static constexpr u32 NOT_ENOUGH_PARAMS  = 5;
-	static constexpr u32 TOO_MANY_PARAMS    = 6;
-	static constexpr u32 EXPRESSION_ERROR   = 7;
-
-	u32 val;
+	static constexpr u16 NONE               = 0;
+	static constexpr u16 UNKNOWN_COMMAND    = 1;
+	static constexpr u16 AMBIGUOUS_COMMAND  = 2;
+	static constexpr u16 UNBALANCED_PARENS  = 3;
+	static constexpr u16 UNBALANCED_QUOTES  = 4;
+	static constexpr u16 NOT_ENOUGH_PARAMS  = 5;
+	static constexpr u16 TOO_MANY_PARAMS    = 6;
+	static constexpr u16 EXPRESSION_ERROR   = 7;
 
 	// command error assembly/disassembly
-	constexpr CMDERR(u32 a, u32 b) : val((a << 16) | (b & 0xffff)) { }
-	constexpr u32 ERROR_CLASS() const { return val >> 16; }
-	constexpr u32 ERROR_OFFSET() const { return val & 0xffff; }
+	constexpr CMDERR(u16 c, u16 o) : m_error_class(c), m_error_offset(o) { }
+	constexpr u16 error_class() const { return m_error_class; }
+	constexpr u16 error_offset() const { return m_error_offset; }
 
 	// assemble specific error conditions
-	static constexpr CMDERR MAKE_UNKNOWN_COMMAND(u32 x)    { return CMDERR(UNKNOWN_COMMAND, x); }
-	static constexpr CMDERR MAKE_AMBIGUOUS_COMMAND(u32 x)  { return CMDERR(AMBIGUOUS_COMMAND, x); }
-	static constexpr CMDERR MAKE_UNBALANCED_PARENS(u32 x)  { return CMDERR(UNBALANCED_PARENS, x); }
-	static constexpr CMDERR MAKE_UNBALANCED_QUOTES(u32 x)  { return CMDERR(UNBALANCED_QUOTES, x); }
-	static constexpr CMDERR MAKE_NOT_ENOUGH_PARAMS(u32 x)  { return CMDERR(NOT_ENOUGH_PARAMS, x); }
-	static constexpr CMDERR MAKE_TOO_MANY_PARAMS(u32 x)    { return CMDERR(TOO_MANY_PARAMS, x); }
-	static constexpr CMDERR MAKE_EXPRESSION_ERROR(u32 x)   { return CMDERR(EXPRESSION_ERROR, x); }
+	static constexpr CMDERR none()                      { return CMDERR(NONE, 0); }
+	static constexpr CMDERR unknown_command(u16 x)      { return CMDERR(UNKNOWN_COMMAND, x); }
+	static constexpr CMDERR ambiguous_command(u16 x)    { return CMDERR(AMBIGUOUS_COMMAND, x); }
+	static constexpr CMDERR unbalanced_parens(u16 x)    { return CMDERR(UNBALANCED_PARENS, x); }
+	static constexpr CMDERR unbalanced_quotes(u16 x)    { return CMDERR(UNBALANCED_QUOTES, x); }
+	static constexpr CMDERR not_enough_params(u16 x)    { return CMDERR(NOT_ENOUGH_PARAMS, x); }
+	static constexpr CMDERR too_many_params(u16 x)      { return CMDERR(TOO_MANY_PARAMS, x); }
+	static constexpr CMDERR expression_error(u16 x)     { return CMDERR(EXPRESSION_ERROR, x); }
+
+private:
+	u16 m_error_class, m_error_offset;
+
 };
 
 

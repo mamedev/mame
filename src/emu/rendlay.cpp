@@ -582,18 +582,24 @@ private:
 	util::ovectorstream m_buffer;
 	std::shared_ptr<NSVGrasterizer> const m_svg_rasterizer;
 	device_t &m_device;
+	char const *const m_search_path;
+	char const *const m_directory_name;
 	layout_environment *const m_next = nullptr;
 	bool m_cached = false;
 
 public:
-	explicit layout_environment(device_t &device)
+	layout_environment(device_t &device, char const *searchpath, char const *dirname)
 		: m_svg_rasterizer(nsvgCreateRasterizer(), util::nsvg_deleter())
 		, m_device(device)
+		, m_search_path(searchpath)
+		, m_directory_name(dirname)
 	{
 	}
 	explicit layout_environment(layout_environment &next)
 		: m_svg_rasterizer(next.m_svg_rasterizer)
 		, m_device(next.m_device)
+		, m_search_path(next.m_search_path)
+		, m_directory_name(next.m_directory_name)
 		, m_next(&next)
 	{
 	}
@@ -602,6 +608,8 @@ public:
 	device_t &device() const { return m_device; }
 	running_machine &machine() const { return device().machine(); }
 	bool is_root_device() const { return &device() == &machine().root_device(); }
+	char const *search_path() const { return m_search_path; }
+	char const *directory_name() const { return m_directory_name; }
 	std::shared_ptr<NSVGrasterizer> const &svg_rasterizer() const { return m_svg_rasterizer; }
 
 	void set_parameter(std::string &&name, std::string &&value)
@@ -1117,7 +1125,7 @@ layout_element::make_component_map const layout_element::s_make_component{
 //  layout_element - constructor
 //-------------------------------------------------
 
-layout_element::layout_element(environment &env, util::xml::data_node const &elemnode, const char *dirname)
+layout_element::layout_element(environment &env, util::xml::data_node const &elemnode)
 	: m_machine(env.machine())
 	, m_defstate(env.get_attribute_int(elemnode, "defstate", -1))
 	, m_statemask(0)
@@ -1133,7 +1141,7 @@ layout_element::layout_element(environment &env, util::xml::data_node const &ele
 			throw layout_syntax_error(util::string_format("unknown element component %s", compnode->get_name()));
 
 		// insert the new component into the list
-		component const &newcomp(**m_complist.emplace(m_complist.end(), make_func->second(env, *compnode, dirname)));
+		component const &newcomp(**m_complist.emplace(m_complist.end(), make_func->second(env, *compnode)));
 
 		// accumulate bounds
 		if (first)
@@ -1539,10 +1547,11 @@ class layout_element::image_component : public component
 {
 public:
 	// construction/destruction
-	image_component(environment &env, util::xml::data_node const &compnode, char const *dirname)
-		: component(env, compnode, dirname)
+	image_component(environment &env, util::xml::data_node const &compnode)
+		: component(env, compnode)
 		, m_rasterizer(env.svg_rasterizer())
-		, m_dirname(dirname ? dirname : "")
+		, m_searchpath(env.search_path() ? env.search_path() : "")
+		, m_dirname(env.directory_name() ? env.directory_name() : "")
 		, m_imagefile(env.get_attribute_string(compnode, "file", ""))
 		, m_alphafile(env.get_attribute_string(compnode, "alphafile", ""))
 		, m_data(get_data(compnode))
@@ -1552,7 +1561,7 @@ public:
 	// overrides
 	virtual void preload(running_machine &machine) override
 	{
-		if (!m_bitmap.valid())
+		if (!m_bitmap.valid() && !m_svg)
 			load_image(machine);
 	}
 
@@ -1685,11 +1694,17 @@ private:
 	void load_image(running_machine &machine)
 	{
 		// if we have a filename, go with that
-		emu_file file(machine.options().art_path(), OPEN_FLAG_READ);
+		emu_file file(m_searchpath.empty() ? m_dirname : m_searchpath, OPEN_FLAG_READ);
 		if (!m_imagefile.empty())
 		{
-			LOGMASKED(LOG_IMAGE_LOAD, "Image component attempt to load image file '%s%s%s'\n", m_dirname, PATH_SEPARATOR, m_imagefile);
-			osd_file::error const imgerr = file.open(m_dirname.empty() ? m_imagefile : (m_dirname + PATH_SEPARATOR + m_imagefile));
+			std::string filename;
+			if (!m_searchpath.empty())
+				filename = m_dirname;
+			if (!filename.empty() && !util::is_directory_separator(filename[filename.size() - 1]))
+				filename.append(PATH_SEPARATOR);
+			filename.append(m_imagefile);
+			LOGMASKED(LOG_IMAGE_LOAD, "Image component attempt to load image file '%s'\n", filename);
+			osd_file::error const imgerr = file.open(filename);
 			if (osd_file::error::NONE == imgerr)
 			{
 				if (!load_bitmap(file))
@@ -1701,10 +1716,10 @@ private:
 			}
 			else
 			{
-				LOGMASKED(LOG_IMAGE_LOAD, "Image component unable to open image file '%s%s%s'\n", m_dirname, PATH_SEPARATOR, m_imagefile);
+				LOGMASKED(LOG_IMAGE_LOAD, "Image component unable to open image file '%s'\n", filename);
 			}
 		}
-		else
+		else if (!m_data.empty())
 		{
 			load_image_data();
 		}
@@ -1714,8 +1729,14 @@ private:
 		{
 			if (m_bitmap.valid())
 			{
-				LOGMASKED(LOG_IMAGE_LOAD, "Image component attempt to load alpha channel from file '%s%s%s'\n", m_dirname, PATH_SEPARATOR, m_alphafile);
-				osd_file::error const alferr = file.open(m_dirname.empty() ? m_alphafile : (m_dirname + PATH_SEPARATOR + m_alphafile));
+				std::string filename;
+				if (!m_searchpath.empty())
+					filename = m_dirname;
+				if (!filename.empty() && !util::is_directory_separator(filename[filename.size() - 1]))
+					filename.append(PATH_SEPARATOR);
+				filename.append(m_alphafile);
+				LOGMASKED(LOG_IMAGE_LOAD, "Image component attempt to load alpha channel from file '%s'\n", filename);
+				osd_file::error const alferr = file.open(filename);
 				if (osd_file::error::NONE == alferr)
 				{
 					// TODO: no way to detect corner case where we had alpha from the image but the alpha PNG makes it entirely opaque
@@ -1725,7 +1746,7 @@ private:
 				}
 				else
 				{
-					LOGMASKED(LOG_IMAGE_LOAD, "Image component unable to open alpha channel file '%s%s%s'\n", m_dirname, PATH_SEPARATOR, m_alphafile);
+					LOGMASKED(LOG_IMAGE_LOAD, "Image component unable to open alpha channel file '%s'\n", filename);
 				}
 			}
 			else if (m_svg)
@@ -1754,6 +1775,7 @@ private:
 		// clear out this stuff in case it's large
 		if (!m_svg)
 			m_rasterizer.reset();
+		m_searchpath.clear();
 		m_dirname.clear();
 		m_imagefile.clear();
 		m_alphafile.clear();
@@ -1773,7 +1795,7 @@ private:
 		std::string::size_type const end(m_data.find_first_not_of(base64tail, tail));
 		if (std::string::npos == end)
 		{
-			LOGMASKED(LOG_IMAGE_LOAD, "Image component decoding Base64 image m_data\n");
+			LOGMASKED(LOG_IMAGE_LOAD, "Image component decoding Base64 image data\n");
 			char *dst(&m_data[0]);
 			unsigned trailing(0U);
 			for (std::string::size_type i = 0U; (m_data.size() > i) && ('=' != m_data[i]); ++i)
@@ -1923,6 +1945,7 @@ private:
 	bool                            m_hasalpha = false; // is there any alpha component present?
 
 	// cold state
+	std::string                     m_searchpath;       // asset search path (for lazy loading)
 	std::string                     m_dirname;          // directory name of image file (for lazy loading)
 	std::string                     m_imagefile;        // name of the image file (for lazy loading)
 	std::string                     m_alphafile;        // name of the alpha file (for lazy loading)
@@ -1935,8 +1958,8 @@ class layout_element::rect_component : public component
 {
 public:
 	// construction/destruction
-	rect_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
-		: component(env, compnode, dirname)
+	rect_component(environment &env, util::xml::data_node const &compnode)
+		: component(env, compnode)
 	{
 	}
 
@@ -1988,8 +2011,8 @@ class layout_element::disk_component : public component
 {
 public:
 	// construction/destruction
-	disk_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
-		: component(env, compnode, dirname)
+	disk_component(environment &env, util::xml::data_node const &compnode)
+		: component(env, compnode)
 	{
 	}
 
@@ -2054,8 +2077,8 @@ class layout_element::text_component : public component
 {
 public:
 	// construction/destruction
-	text_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
-		: component(env, compnode, dirname)
+	text_component(environment &env, util::xml::data_node const &compnode)
+		: component(env, compnode)
 	{
 		m_string = env.get_attribute_string(compnode, "string", "");
 		m_textalign = env.get_attribute_int(compnode, "align", 0);
@@ -2081,8 +2104,8 @@ class layout_element::led7seg_component : public component
 {
 public:
 	// construction/destruction
-	led7seg_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
-		: component(env, compnode, dirname)
+	led7seg_component(environment &env, util::xml::data_node const &compnode)
+		: component(env, compnode)
 	{
 	}
 
@@ -2143,8 +2166,8 @@ class layout_element::led8seg_gts1_component : public component
 {
 public:
 	// construction/destruction
-	led8seg_gts1_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
-		: component(env, compnode, dirname)
+	led8seg_gts1_component(environment &env, util::xml::data_node const &compnode)
+		: component(env, compnode)
 	{
 	}
 
@@ -2211,8 +2234,8 @@ class layout_element::led14seg_component : public component
 {
 public:
 	// construction/destruction
-	led14seg_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
-		: component(env, compnode, dirname)
+	led14seg_component(environment &env, util::xml::data_node const &compnode)
+		: component(env, compnode)
 	{
 	}
 
@@ -2323,8 +2346,8 @@ class layout_element::led16seg_component : public component
 {
 public:
 	// construction/destruction
-	led16seg_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
-		: component(env, compnode, dirname)
+	led16seg_component(environment &env, util::xml::data_node const &compnode)
+		: component(env, compnode)
 	{
 	}
 
@@ -2445,8 +2468,8 @@ class layout_element::led14segsc_component : public component
 {
 public:
 	// construction/destruction
-	led14segsc_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
-		: component(env, compnode, dirname)
+	led14segsc_component(environment &env, util::xml::data_node const &compnode)
+		: component(env, compnode)
 	{
 	}
 
@@ -2568,8 +2591,8 @@ class layout_element::led16segsc_component : public component
 {
 public:
 	// construction/destruction
-	led16segsc_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
-		: component(env, compnode, dirname)
+	led16segsc_component(environment &env, util::xml::data_node const &compnode)
+		: component(env, compnode)
 	{
 	}
 
@@ -2700,8 +2723,8 @@ class layout_element::dotmatrix_component : public component
 {
 public:
 	// construction/destruction
-	dotmatrix_component(int dots, environment &env, util::xml::data_node const &compnode, const char *dirname)
-		: component(env, compnode, dirname)
+	dotmatrix_component(int dots, environment &env, util::xml::data_node const &compnode)
+		: component(env, compnode)
 		, m_dots(dots)
 	{
 	}
@@ -2741,8 +2764,8 @@ class layout_element::simplecounter_component : public component
 {
 public:
 	// construction/destruction
-	simplecounter_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
-		: component(env, compnode, dirname)
+	simplecounter_component(environment &env, util::xml::data_node const &compnode)
+		: component(env, compnode)
 		, m_digits(env.get_attribute_int(compnode, "digits", 2))
 		, m_textalign(env.get_attribute_int(compnode, "align", 0))
 		, m_maxstate(env.get_attribute_int(compnode, "maxstate", 999))
@@ -2774,49 +2797,30 @@ class layout_element::reel_component : public component
 
 public:
 	// construction/destruction
-	reel_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
-		: component(env, compnode, dirname)
+	reel_component(environment &env, util::xml::data_node const &compnode)
+		: component(env, compnode)
+		, m_searchpath(env.search_path() ? env.search_path() : "")
+		, m_dirname(env.directory_name() ? env.directory_name() : "")
 	{
-		for (auto & elem : m_hasalpha)
-			elem = false;
-
 		std::string symbollist = env.get_attribute_string(compnode, "symbollist", "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15");
 
 		// split out position names from string and figure out our number of symbols
-		int location;
 		m_numstops = 0;
-		location=symbollist.find(',');
-		while (location!=-1)
+		for (std::string::size_type location = symbollist.find(','); std::string::npos != location; location = symbollist.find(','))
 		{
-			m_stopnames[m_numstops] = symbollist;
-			m_stopnames[m_numstops] = m_stopnames[m_numstops].substr(0, location);
-			symbollist = symbollist.substr(location+1, symbollist.length()-(location-1));
+			m_stopnames[m_numstops] = symbollist.substr(0, location);
+			symbollist.erase(0, location + 1);
 			m_numstops++;
-			location=symbollist.find(',');
 		}
 		m_stopnames[m_numstops++] = symbollist;
 
-		// careful, dirname is nullptr if we're coming from internal layout, and our string assignment doesn't like that
-		if (dirname != nullptr)
-			m_dirname = dirname;
-
-		for (int i=0;i<m_numstops;i++)
+		for (int i = 0; i < m_numstops; i++)
 		{
-			location=m_stopnames[i].find(':');
-			if (location!=-1)
+			std::string::size_type const location = m_stopnames[i].find(':');
+			if (location != std::string::npos)
 			{
-				m_imagefile[i] = m_stopnames[i];
-				m_stopnames[i] = m_stopnames[i].substr(0, location);
-				m_imagefile[i] = m_imagefile[i].substr(location+1, m_imagefile[i].length()-(location-1));
-
-				//m_alphafile[i] =
-				m_file[i] = std::make_unique<emu_file>(env.machine().options().art_path(), OPEN_FLAG_READ);
-			}
-			else
-			{
-				//m_imagefile[i] = 0;
-				//m_alphafile[i] = 0;
-				m_file[i].reset();
+				m_imagefile[i] = m_stopnames[i].substr(location + 1);
+				m_stopnames[i].erase(location);
 			}
 		}
 
@@ -2829,6 +2833,17 @@ public:
 protected:
 	// overrides
 	virtual int maxstate() const override { return 65535; }
+
+	virtual void preload(running_machine &machine) override
+	{
+		for (int i = 0; i < m_numstops; i++)
+		{
+			if (!m_imagefile[i].empty() && !m_bitmap[i].valid())
+				load_reel_bitmap(i);
+		}
+
+	}
+
 	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
 		if (m_beltreel)
@@ -2850,16 +2865,12 @@ protected:
 		u32 const b = c.b * 255.0f;
 		u32 const a = c.a * 255.0f;
 
-		// get the width of the string
-		auto font = machine.render().font_alloc("default");
-		float aspect = 1.0f;
-		s32 width;
-
 		int curry = 0;
 		int num_shown = m_numsymbolsvisible;
 
 		int ourheight = bounds.height();
 
+		auto font = machine.render().font_alloc("default");
 		for (int fruit = 0;fruit<m_numstops;fruit++)
 		{
 			int basey;
@@ -2884,47 +2895,31 @@ protected:
 			// only render the symbol / text if it's actually in view because the code is SLOW
 			if ((endpos >= bounds.top()) && (basey <= bounds.bottom()))
 			{
-				while (1)
-				{
-					width = font->string_width(ourheight / num_shown, aspect, m_stopnames[fruit].c_str());
-					if (width < bounds.width())
-						break;
-					aspect *= 0.9f;
-				}
+				if (!m_imagefile[fruit].empty() && !m_bitmap[fruit].valid())
+					load_reel_bitmap(fruit);
 
-				s32 curx;
-				curx = bounds.left() + (bounds.width() - width) / 2;
-
-				if (m_file[fruit])
-					if (!m_bitmap[fruit].valid())
-						load_reel_bitmap(fruit);
-
-				if (m_file[fruit]) // render gfx
+				if (m_bitmap[fruit].valid()) // render gfx
 				{
 					bitmap_argb32 tempbitmap2(dest.width(), ourheight/num_shown);
+					render_resample_argb_bitmap_hq(tempbitmap2, m_bitmap[fruit], c);
 
-					if (m_bitmap[fruit].valid())
+					for (int y = 0; y < ourheight/num_shown; y++)
 					{
-						render_resample_argb_bitmap_hq(tempbitmap2, m_bitmap[fruit], c);
+						int effy = basey + y;
 
-						for (int y = 0; y < ourheight/num_shown; y++)
+						if (effy >= bounds.top() && effy <= bounds.bottom())
 						{
-							int effy = basey + y;
-
-							if (effy >= bounds.top() && effy <= bounds.bottom())
+							u32 const *const src = &tempbitmap2.pix(y);
+							u32 *const d = &dest.pix(effy);
+							for (int x = 0; x < dest.width(); x++)
 							{
-								u32 const *const src = &tempbitmap2.pix(y);
-								u32 *const d = &dest.pix(effy);
-								for (int x = 0; x < dest.width(); x++)
+								int effx = x;
+								if (effx >= bounds.left() && effx <= bounds.right())
 								{
-									int effx = x;
-									if (effx >= bounds.left() && effx <= bounds.right())
+									u32 spix = rgb_t(src[x]).a();
+									if (spix != 0)
 									{
-										u32 spix = rgb_t(src[x]).a();
-										if (spix != 0)
-										{
-											d[effx] = src[x];
-										}
+										d[effx] = src[x];
 									}
 								}
 							}
@@ -2940,6 +2935,20 @@ protected:
 					const char *ends = origs + strlen(origs);
 					const char *s = origs;
 					char32_t schar;
+
+					// get the width of the string
+					float aspect = 1.0f;
+					s32 width;
+
+					while (1)
+					{
+						width = font->string_width(ourheight / num_shown, aspect, m_stopnames[fruit].c_str());
+						if (width < bounds.width())
+							break;
+						aspect *= 0.9f;
+					}
+
+					s32 curx = bounds.left() + (bounds.width() - width) / 2;
 
 					// loop over characters
 					while (*s != 0)
@@ -3011,15 +3020,12 @@ private:
 		u32 const b = c.b * 255.0f;
 		u32 const a = c.a * 255.0f;
 
-		// get the width of the string
-		auto font = machine.render().font_alloc("default");
-		float aspect = 1.0f;
-		s32 width;
 		int currx = 0;
 		int num_shown = m_numsymbolsvisible;
 
 		int ourwidth = bounds.width();
 
+		auto font = machine.render().font_alloc("default");
 		for (int fruit = 0;fruit<m_numstops;fruit++)
 		{
 			int basex;
@@ -3043,56 +3049,53 @@ private:
 			// only render the symbol / text if it's actually in view because the code is SLOW
 			if ((endpos >= bounds.left()) && (basex <= bounds.right()))
 			{
-				while (1)
-				{
-					width = font->string_width(dest.height(), aspect, m_stopnames[fruit].c_str());
-					if (width < bounds.width())
-						break;
-					aspect *= 0.9f;
-				}
+				if (!m_imagefile[fruit].empty() && !m_bitmap[fruit].valid())
+					load_reel_bitmap(fruit);
 
-				s32 curx;
-				curx = bounds.left();
-
-				if (m_file[fruit])
-					if (!m_bitmap[fruit].valid())
-						load_reel_bitmap(fruit);
-
-				if (m_file[fruit]) // render gfx
+				if (m_bitmap[fruit].valid()) // render gfx
 				{
 					bitmap_argb32 tempbitmap2(ourwidth/num_shown, dest.height());
+					render_resample_argb_bitmap_hq(tempbitmap2, m_bitmap[fruit], c);
 
-					if (m_bitmap[fruit].valid())
+					for (int y = 0; y < dest.height(); y++)
 					{
-						render_resample_argb_bitmap_hq(tempbitmap2, m_bitmap[fruit], c);
+						int effy = y;
 
-						for (int y = 0; y < dest.height(); y++)
+						if (effy >= bounds.top() && effy <= bounds.bottom())
 						{
-							int effy = y;
-
-							if (effy >= bounds.top() && effy <= bounds.bottom())
+							u32 const *const src = &tempbitmap2.pix(y);
+							u32 *const d = &dest.pix(effy);
+							for (int x = 0; x < ourwidth/num_shown; x++)
 							{
-								u32 const *const src = &tempbitmap2.pix(y);
-								u32 *const d = &dest.pix(effy);
-								for (int x = 0; x < ourwidth/num_shown; x++)
+								int effx = basex + x;
+								if (effx >= bounds.left() && effx <= bounds.right())
 								{
-									int effx = basex + x;
-									if (effx >= bounds.left() && effx <= bounds.right())
+									u32 spix = rgb_t(src[x]).a();
+									if (spix != 0)
 									{
-										u32 spix = rgb_t(src[x]).a();
-										if (spix != 0)
-										{
-											d[effx] = src[x];
-										}
+										d[effx] = src[x];
 									}
 								}
 							}
-
 						}
+
 					}
 				}
 				else // render text (fallback)
 				{
+					// get the width of the string
+					float aspect = 1.0f;
+					s32 width;
+					while (1)
+					{
+						width = font->string_width(dest.height(), aspect, m_stopnames[fruit].c_str());
+						if (width < bounds.width())
+							break;
+						aspect *= 0.9f;
+					}
+
+					s32 curx = bounds.left();
+
 					// allocate a temporary bitmap
 					bitmap_argb32 tempbitmap(dest.width(), dest.height());
 
@@ -3157,34 +3160,29 @@ private:
 
 	void load_reel_bitmap(int number)
 	{
-		// load the basic bitmap
-		assert(m_file != nullptr);
-		if (m_file[number]->open(m_dirname + PATH_SEPARATOR + m_imagefile[number]) == osd_file::error::NONE)
-		{
-			/*m_hasalpha[number] = */ render_load_png(m_bitmap[number], *m_file[number]);
-			m_file[number]->close();
-		}
+		emu_file file(m_searchpath.empty() ? m_dirname : m_searchpath, OPEN_FLAG_READ);
+		std::string filename;
+		if (!m_searchpath.empty())
+			filename = m_dirname;
+		if (!filename.empty() && !util::is_directory_separator(filename[filename.size() - 1]))
+			filename.append(PATH_SEPARATOR);
+		filename.append(m_imagefile[number]);
 
-		// load the alpha bitmap if specified
-		//if (m_bitmap[number].valid() && m_alphafile[number])
-		//  render_load_png(m_bitmap[number], *m_file[number], m_dirname, m_alphafile[number], true);
+		// load the basic bitmap
+		if (file.open(filename) == osd_file::error::NONE)
+			render_load_png(m_bitmap[number], file);
 
 		// if we can't load the bitmap just use text rendering
 		if (!m_bitmap[number].valid())
-		{
-			// fallback to text rendering
-			m_file[number].reset();
-		}
+			m_imagefile[number].clear();
 
 	}
 
 	// internal state
 	bitmap_argb32       m_bitmap[MAX_BITMAPS];      // source bitmap for images
+	std::string         m_searchpath;               // asset search path (for lazy loading)
 	std::string         m_dirname;                  // directory name of image file (for lazy loading)
-	std::unique_ptr<emu_file> m_file[MAX_BITMAPS];        // file object for reading image/alpha files
 	std::string         m_imagefile[MAX_BITMAPS];   // name of the image file (for lazy loading)
-	std::string         m_alphafile[MAX_BITMAPS];   // name of the alpha file (for lazy loading)
-	bool                m_hasalpha[MAX_BITMAPS];    // is there any alpha component present?
 
 	// basically made up of multiple text strings / gfx
 	int                 m_numstops;
@@ -3201,9 +3199,9 @@ private:
 //-------------------------------------------------
 
 template <typename T>
-layout_element::component::ptr layout_element::make_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
+layout_element::component::ptr layout_element::make_component(environment &env, util::xml::data_node const &compnode)
 {
-	return std::make_unique<T>(env, compnode, dirname);
+	return std::make_unique<T>(env, compnode);
 }
 
 
@@ -3213,9 +3211,9 @@ layout_element::component::ptr layout_element::make_component(environment &env, 
 //-------------------------------------------------
 
 template <int D>
-layout_element::component::ptr layout_element::make_dotmatrix_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
+layout_element::component::ptr layout_element::make_dotmatrix_component(environment &env, util::xml::data_node const &compnode)
 {
-	return std::make_unique<dotmatrix_component>(D, env, compnode, dirname);
+	return std::make_unique<dotmatrix_component>(D, env, compnode);
 }
 
 
@@ -3276,7 +3274,7 @@ layout_element::texture &layout_element::texture::operator=(texture &&that)
 //  component - constructor
 //-------------------------------------------------
 
-layout_element::component::component(environment &env, util::xml::data_node const &compnode, const char *dirname)
+layout_element::component::component(environment &env, util::xml::data_node const &compnode)
 	: m_statemask(env.get_attribute_int(compnode, "statemask", env.get_attribute_string(compnode, "state", "")[0] ? ~0 : 0))
 	, m_stateval(env.get_attribute_int(compnode, "state", m_statemask) & m_statemask)
 {
@@ -4576,13 +4574,17 @@ layout_view::visibility_toggle::visibility_toggle(std::string &&name, u32 mask)
 //  layout_file - constructor
 //-------------------------------------------------
 
-layout_file::layout_file(device_t &device, util::xml::data_node const &rootnode, char const *dirname)
+layout_file::layout_file(
+		device_t &device,
+		util::xml::data_node const &rootnode,
+		char const *searchpath,
+		char const *dirname)
 	: m_elemmap()
 	, m_viewlist()
 {
 	try
 	{
-		environment env(device);
+		environment env(device, searchpath, dirname);
 
 		// find the layout node
 		util::xml::data_node const *const mamelayoutnode = rootnode.get_child("mamelayout");
@@ -4596,7 +4598,7 @@ layout_file::layout_file(device_t &device, util::xml::data_node const &rootnode,
 
 		// parse all the parameters, elements and groups
 		group_map groupmap;
-		add_elements(dirname, env, *mamelayoutnode, groupmap, false, true);
+		add_elements(env, *mamelayoutnode, groupmap, false, true);
 
 		// parse all the views
 		for (util::xml::data_node const *viewnode = mamelayoutnode->get_child("view"); viewnode != nullptr; viewnode = viewnode->get_next_sibling("view"))
@@ -4633,7 +4635,6 @@ layout_file::~layout_file()
 
 
 void layout_file::add_elements(
-		char const *dirname,
 		environment &env,
 		util::xml::data_node const &parentnode,
 		group_map &groupmap,
@@ -4654,7 +4655,7 @@ void layout_file::add_elements(
 			char const *const name(env.get_attribute_string(*childnode, "name", nullptr));
 			if (!name)
 				throw layout_syntax_error("element lacks name attribute");
-			if (!m_elemmap.emplace(std::piecewise_construct, std::forward_as_tuple(name), std::forward_as_tuple(env, *childnode, dirname)).second)
+			if (!m_elemmap.emplace(std::piecewise_construct, std::forward_as_tuple(name), std::forward_as_tuple(env, *childnode)).second)
 				throw layout_syntax_error(util::string_format("duplicate element name %s", name));
 		}
 		else if (!strcmp(childnode->get_name(), "group"))
@@ -4673,7 +4674,7 @@ void layout_file::add_elements(
 			environment local(env);
 			for (int i = 0; count > i; ++i)
 			{
-				add_elements(dirname, local, *childnode, groupmap, true, !i);
+				add_elements(local, *childnode, groupmap, true, !i);
 				local.increment_parameters();
 			}
 		}

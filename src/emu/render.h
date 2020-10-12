@@ -538,7 +538,7 @@ public:
 	using environment = emu::render::detail::layout_environment;
 
 	// construction/destruction
-	layout_element(environment &env, util::xml::data_node const &elemnode, const char *dirname);
+	layout_element(environment &env, util::xml::data_node const &elemnode);
 	virtual ~layout_element();
 
 	// getters
@@ -563,7 +563,7 @@ private:
 		typedef std::unique_ptr<component> ptr;
 
 		// construction/destruction
-		component(environment &env, util::xml::data_node const &compnode, const char *dirname);
+		component(environment &env, util::xml::data_node const &compnode);
 		virtual ~component() = default;
 
 		// setup
@@ -641,13 +641,13 @@ private:
 		int                 m_state;        // associated state number
 	};
 
-	typedef component::ptr (*make_component_func)(environment &env, util::xml::data_node const &compnode, const char *dirname);
+	typedef component::ptr (*make_component_func)(environment &env, util::xml::data_node const &compnode);
 	typedef std::map<std::string, make_component_func> make_component_map;
 
 	// internal helpers
 	static void element_scale(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param);
-	template <typename T> static component::ptr make_component(environment &env, util::xml::data_node const &compnode, const char *dirname);
-	template <int D> static component::ptr make_dotmatrix_component(environment &env, util::xml::data_node const &compnode, const char *dirname);
+	template <typename T> static component::ptr make_component(environment &env, util::xml::data_node const &compnode);
+	template <int D> static component::ptr make_dotmatrix_component(environment &env, util::xml::data_node const &compnode);
 
 	static make_component_map const s_make_component; // maps component XML names to creator functions
 
@@ -946,7 +946,7 @@ public:
 	using view_list = std::list<layout_view>;
 
 	// construction/destruction
-	layout_file(device_t &device, util::xml::data_node const &rootnode, char const *dirname);
+	layout_file(device_t &device, util::xml::data_node const &rootnode, char const *searchpath, char const *dirname);
 	~layout_file();
 
 	// getters
@@ -959,7 +959,6 @@ private:
 
 	// add elements and parameters
 	void add_elements(
-			char const *dirname,
 			environment &env,
 			util::xml::data_node const &parentnode,
 			group_map &groupmap,
@@ -1068,7 +1067,7 @@ private:
 	void load_additional_layout_files(const char *basename, bool have_artwork);
 	bool load_layout_file(const char *dirname, const char *filename);
 	bool load_layout_file(const char *dirname, const internal_layout &layout_data, device_t *device = nullptr);
-	bool load_layout_file(device_t &device, const char *dirname, util::xml::data_node const &rootnode);
+	bool load_layout_file(device_t &device, util::xml::data_node const &rootnode, const char *searchpath, const char *dirname);
 	void add_container_primitives(render_primitive_list &list, const object_transform &root_xform, const object_transform &xform, render_container &container, int blendmode);
 	void add_element_primitives(render_primitive_list &list, const object_transform &xform, layout_element &element, int state, int blendmode);
 	std::pair<float, float> map_point_internal(s32 target_x, s32 target_y);
