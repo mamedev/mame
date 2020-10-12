@@ -5788,7 +5788,8 @@ license:CC0
 
 	<software name="emperorunk" cloneof="emperor">
 		<!-- Notes: GBC only -->
-		<!-- Old dump of unknown origin -->
+		<!--	Old dump of unknown origin	-->
+		<!--	Two different bytes in header, ends padding areas with FF	-->
 		<description>The Emperor's New Groove (Europe, bad dump?)</description>
 		<year>2001</year>
 		<publisher>Ubi Soft</publisher>
@@ -6085,7 +6086,8 @@ license:CC0
 
 	<software name="f1racingunk" cloneof="f1racing">
 		<!-- Notes: GBC only -->
-		<!-- Old dump of unknown origin -->
+		<!--	Old dump of unknown origin	-->
+		<!--	One different byte in header, two different bytes in rest of the ROM	-->
 		<description>F1 Racing Championship (Europe, bad dump?)</description>
 		<year>2000</year>
 		<publisher>Ubi Soft</publisher>
@@ -6271,10 +6273,11 @@ license:CC0
 		</part>
 	</software>
 
-<!-- The header is wrong, can it be a bad dump? a beta? investigations are needed on this older dump -->
 	<software name="flintbba" cloneof="flintbb">
 		<!-- Notes: GBC only -->
-		<description>The Flintstones - Burgertime in Bedrock (Europe, Alt?)</description>
+		<!--	Old dump of unknown origin	-->
+		<!--	Possible prototype?	-->
+		<description>The Flintstones - Burgertime in Bedrock (Europe, Prototype?)</description>
 		<year>2001</year>
 		<publisher>Swing! Entertainment Media</publisher>
 		<info name="serial" value="CGB-BFSP-EUR"/>
@@ -10358,8 +10361,8 @@ license:CC0
 
 	<software name="lauraunk" cloneof="laura">
 		<!-- Notes: GBC only -->
-		<!-- Old dump of unknown origin -->
-		<description>Laura (Europe, bad dump?)</description>
+		<!--	Old dump of unknown origin	-->
+		<description>Laura (Europe, Prototype?)</description>
 		<year>2000</year>
 		<publisher>Ubi Soft</publisher>
 		<info name="serial" value="CGB-BLDP-EUR"/>
@@ -17373,8 +17376,8 @@ license:CC0
 
 	<software name="propooluunk" cloneof="propool">
 		<!-- Notes: GBC only -->
-		<!-- Old dump of unknown origin -->
-		<description>Pro Pool (USA, bad dump?)</description>
+		<!--	Old dump of unknown origin	-->
+		<description>Pro Pool (USA, Prototype?)</description>
 		<year>2002</year>
 		<publisher>Codemasters</publisher>
 		<info name="serial" value="CGB-BPLE-USA"/>
@@ -19229,7 +19232,8 @@ license:CC0
 	</software>
 
 	<software name="seihaiunk" cloneof="seihai">
-		<!-- Old dump of unknown origin -->
+		<!--	Old dump of unknown origin	-->
+		<!--	Four different bytes in header	-->
 		<description>Sei Hai Densetsu (Japan, bad dump?)</description>
 		<year>2000</year>
 		<publisher>Gaps</publisher>
@@ -19445,23 +19449,6 @@ license:CC0
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="shanghai pocket (europe) (rev 1).bin" size="1048576" crc="d8fac36c" sha1="adbf1a18dea69e46c3dbccec03e09668912f12a7"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="shanghaij" cloneof="shanghai">
-		<description>Shanghai Pocket (Japan)</description>
-		<year>1998</year>
-		<publisher>Sunsoft</publisher>
-		<info name="serial" value="DMG-ASEJ-JPN?"/>
-		<info name="gold" value="19980701"/>
-		<info name="release" value="19980806"/>
-		<info name="alt_title" value="上海 ポケット"/>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="enhancement" value="sgb" />
-			<feature name="slot" value="rom_mbc5" />
-			<dataarea name="rom" size="1048576">
-				<rom name="shanghai pocket (japan).bin" size="1048576" crc="a5e3ece9" sha1="2058964274d8bd596bb81bc24e9cfe306411c803"/>
 			</dataarea>
 		</part>
 	</software>
@@ -20881,7 +20868,8 @@ license:CC0
 
 	<software name="survkidsjunk" cloneof="stranded">
 		<!-- Also released by NP in 2001-02 -->
-		<!-- Old dump of unknown origin -->
+		<!--	Old dump of unknown origin	-->
+		<!--	Four different bytes in header	-->
 		<description>Survival Kids - Kotou no Boukensha (Japan, bad dump?)</description>
 		<year>1999</year>
 		<publisher>Konami</publisher>
@@ -24030,7 +24018,8 @@ license:CC0
 
 	<software name="yakouchuunk" cloneof="yakouchu">
 		<!-- Notes: GBC only -->
-		<!-- Old dump of unknown origin -->
+		<!--	Old dump of unknown origin	-->
+		<!--	Four different bytes in header	-->
 		<description>Yakouchuu GB (Japan, bad dump?)</description>
 		<year>1999</year>
 		<publisher>Athena</publisher>
