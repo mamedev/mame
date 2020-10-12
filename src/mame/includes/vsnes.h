@@ -44,6 +44,7 @@ public:
 	void init_platoon();
 	void init_rbibb();
 	void init_vsdual();
+	void init_bootleg();
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -104,10 +105,10 @@ private:
 	void mapper4_set_chr(  );
 	void mapper4_irq( int scanline, int vblank, int blanked );
 
-	uint8_t vsnes_bootleg_z80_latch_r();
 	void bootleg_sound_write(offs_t offset, uint8_t data);
 	uint8_t vsnes_bootleg_z80_data_r();
-	uint8_t vsnes_bootleg_z80_address_r();
+	uint8_t vsnes_bootleg_z80_address_r(offs_t offset);
+	void vsnes_bootleg_scanline(int scanline, int vblank, int blanked);
 
 	void vsnes_bootleg_z80_map(address_map &map);
 	void vsnes_cpu1_bootleg_map(address_map &map);
@@ -146,4 +147,5 @@ private:
 
 	uint8_t m_bootleg_sound_offset;
 	uint8_t m_bootleg_sound_data;
+	int m_bootleg_latched_scanline;
 };

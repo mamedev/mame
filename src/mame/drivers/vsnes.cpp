@@ -221,16 +221,17 @@ void vsnes_state::vsnes_cpu2_map(address_map &map)
 
 
 
-uint8_t vsnes_state::vsnes_bootleg_z80_address_r()
+uint8_t vsnes_state::vsnes_bootleg_z80_address_r(offs_t offset)
 {
 	// NMI routine uses the value read here as the low part of an offset from 0x2000 to store a value read at 0x4000
 	// before reading 0x6000 and returning
+	if (!(offset & 1))
+	{
+		m_subcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+	}
 
-	// can't really see how to get sound this way tho, maybe the unused rom is acting as lookup table to convert
-	// PSG write offsets to addresses to offsets for use here?
-	//printf("Z80 read offs %x\n", m_bootleg_sound_offset);
-	m_subcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	return m_bootleg_sound_offset;
+	return 0xf0 | m_bootleg_sound_offset;
 }
 
 void vsnes_state::bootleg_sound_write(offs_t offset, uint8_t data)
@@ -238,12 +239,15 @@ void vsnes_state::bootleg_sound_write(offs_t offset, uint8_t data)
 	m_bootleg_sound_offset = offset & 0xf;
 	m_bootleg_sound_data = data;
 	m_subcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 uint8_t vsnes_state::vsnes_bootleg_z80_data_r()
 {
 	//printf("Z80 read data %02x\n", m_bootleg_sound_data);
+	m_bootleg_latched_scanline = m_ppu1->get_current_scanline();
 	m_subcpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+
 	return m_bootleg_sound_data;
 }
 
@@ -271,18 +275,13 @@ void vsnes_state::vsnes_cpu1_bootleg_map(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x1800).ram().share("work_ram");
 	map(0x2000, 0x3fff).rw(m_ppu1, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
-	map(0x4000, 0x4017).w(FUNC(vsnes_state::bootleg_sound_write));
+	map(0x4000, 0x400f).w(FUNC(vsnes_state::bootleg_sound_write));
 	map(0x4014, 0x4014).w(FUNC(vsnes_state::sprite_dma_0_w));
 	map(0x4016, 0x4016).rw(FUNC(vsnes_state::vsnes_in0_r), FUNC(vsnes_state::vsnes_in0_w));
 	map(0x4017, 0x4017).r(FUNC(vsnes_state::vsnes_in1_r)); /* IN1 - input port 2 / PSG second control register */
 	map(0x4020, 0x4020).rw(FUNC(vsnes_state::vsnes_coin_counter_r), FUNC(vsnes_state::vsnes_coin_counter_w));
 	map(0x6000, 0x7fff).bankrw("extra1");
 	map(0x8000, 0xffff).rom();
-}
-
-uint8_t vsnes_state::vsnes_bootleg_z80_latch_r()
-{
-	return 0x00;
 }
 
 // from kevtris' schematics, 2 74LS139s do the Z80 address decoding.
@@ -1846,20 +1845,19 @@ void vsnes_state::vsdual_pi(machine_config &config)
 void vsnes_state::vsnes_bootleg(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, XTAL(16'000'000)/4); // 4mhz? seems too high but flickers badly otherwise, issue elsewhere?
+	M6502(config, m_maincpu, XTAL(16'000'000)/8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vsnes_state::vsnes_cpu1_bootleg_map);
 	/* some carts also trigger IRQs */
 	MCFG_MACHINE_RESET_OVERRIDE(vsnes_state,vsnes)
 	MCFG_MACHINE_START_OVERRIDE(vsnes_state,vsnes)
 
-	Z80(config, m_subcpu, XTAL(16'000'000)/4); /* ? MHz */ // Z8400APS-Z80CPU
+	Z80(config, m_subcpu, XTAL(16'000'000)/8); // Z8400APS-Z80CPU
 	m_subcpu->set_addrmap(AS_PROGRAM, &vsnes_state::vsnes_bootleg_z80_map);
-	m_subcpu->set_vblank_int("screen1", FUNC(vsnes_state::irq0_line_assert));
 
 	/* video hardware */
 	screen_device &screen1(SCREEN(config, "screen1", SCREEN_TYPE_RASTER));
-	screen1.set_refresh_hz(60);
-	screen1.set_size(32*8, 262);
+	screen1.set_refresh_hz(56.69);
+	screen1.set_size(32*8, 280);
 	screen1.set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
 	screen1.set_screen_update("ppu1", FUNC(ppu2c0x_device::screen_update));
 
@@ -1868,14 +1866,13 @@ void vsnes_state::vsnes_bootleg(machine_config &config)
 	m_ppu1->set_screen("screen1");
 	m_ppu1->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_ppu1->use_sprite_write_limitation_disable(); // bootleg seems to need this - code to set the sprite address is replaced with complete copy loops??
+	m_ppu1->set_scanlines_per_frame(screen1.height());
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	// PCB has 2, code accesses 3? which 2 really exist?
-	SN76489(config, "sn1", XTAL(16'000'000)/4).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SN76489(config, "sn1", XTAL(16'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.50); // one runs at 2 MHz, other runs at 4 MHz
 	SN76489(config, "sn2", XTAL(16'000'000)/4).add_route(ALL_OUTPUTS, "mono", 0.50);
-	SN76489(config, "sn3", XTAL(16'000'000)/4).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 /******************************************************************************/
@@ -2880,9 +2877,9 @@ GAME( 1986, rbibb,    0,         vsnes,         rbibb,    vsnes_state, init_rbib
 GAME( 1986, rbibba,   rbibb,     vsnes,         rbibb,    vsnes_state, init_rbibb,    ROT0, "Namco",                  "Vs. Atari R.B.I. Baseball (set 2)", 0 )
 GAME( 1986, suprmrio, 0,         vsnes,         suprmrio, vsnes_state, init_vsnormal, ROT0, "Nintendo",               "Vs. Super Mario Bros. (set SM4-4 E)", 0 )
 GAME( 1986, suprmrioa,suprmrio,  vsnes,         suprmrio, vsnes_state, init_vsnormal, ROT0, "Nintendo",               "Vs. Super Mario Bros. (set ?, harder)", 0 )
-GAME( 1986, suprmriobl,suprmrio, vsnes_bootleg, suprmrio, vsnes_state, init_vsnormal, ROT0, "bootleg",                "Vs. Super Mario Bros. (bootleg with Z80, set 1)", MACHINE_NOT_WORKING ) // timer starts at 200(!)
-GAME( 1986, suprmriobl2,suprmrio,vsnes_bootleg, suprmrio, vsnes_state, init_vsnormal, ROT0, "bootleg",                "Vs. Super Mario Bros. (bootleg with Z80, set 2)", MACHINE_NOT_WORKING ) // timer starts at 300
-GAME( 1986, suprmriobl3,suprmrio,vsnes_bootleg, suprmrio, vsnes_state, init_vsnormal, ROT0, "bootleg",                "Vs. Super Mario Bros. (bootleg with Z80, set 3)", MACHINE_NOT_WORKING ) // timer starts at 300
+GAME( 1986, suprmriobl,suprmrio, vsnes_bootleg, suprmrio, vsnes_state, init_bootleg,  ROT0, "bootleg",                "Vs. Super Mario Bros. (bootleg with Z80, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS) // timer starts at 200(!)
+GAME( 1986, suprmriobl2,suprmrio,vsnes_bootleg, suprmrio, vsnes_state, init_bootleg,  ROT0, "bootleg",                "Vs. Super Mario Bros. (bootleg with Z80, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS) // timer starts at 300
+GAME( 1986, suprmriobl3,suprmrio,vsnes_bootleg, suprmrio, vsnes_state, init_bootleg,  ROT0, "bootleg",                "Vs. Super Mario Bros. (bootleg with Z80, set 3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING ) // timer starts at 300
 GAME( 1988, skatekds, suprmrio,  vsnes,         suprmrio, vsnes_state, init_vsnormal, ROT0, "hack (Two-Bit Score)",   "Vs. Skate Kids. (Graphic hack of Super Mario Bros.)", 0 )
 GAME( 1985, vsskykid, 0,         vsnes,         vsskykid, vsnes_state, init_MMC3,     ROT0, "Namco",                  "Vs. Super SkyKid", 0 )
 GAME( 1987, tkoboxng, 0,         vsnes,         tkoboxng, vsnes_state, init_tkoboxng, ROT0, "Namco / Data East USA",  "Vs. T.K.O. Boxing", 0 )

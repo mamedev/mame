@@ -1050,3 +1050,29 @@ void vsnes_state::init_vsdual()
 	m_maincpu->space(AS_PROGRAM).install_ram(0x6000, 0x7fff, &prg[0x6000]);
 	m_subcpu->space(AS_PROGRAM).install_ram(0x6000, 0x7fff, &prg[0x6000]);
 }
+
+/**********************************************************************************/
+/* Vs. Super Mario Bros (Bootleg) */
+
+void vsnes_state::vsnes_bootleg_scanline(int scanline, int vblank, int blanked)
+{
+	// Z80 IRQ is controlled by two factors:
+	// - bit 6 of current (next) scanline number
+	// - bit 6 of latched scanline number from Z80 reading $4000
+	if (!(m_bootleg_latched_scanline & 0x40))
+	{
+		m_subcpu->set_input_line(INPUT_LINE_IRQ0, ((scanline + 1) & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	}
+}
+
+void vsnes_state::init_bootleg()
+{
+	m_bootleg_sound_offset = 0;
+	m_bootleg_sound_data = 0;
+	m_bootleg_latched_scanline = 0;
+
+	m_ppu1->set_scanline_callback(*this, FUNC(vsnes_state::vsnes_bootleg_scanline));
+
+	/* normal banking */
+	init_vsnormal();
+}
