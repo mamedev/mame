@@ -4,7 +4,7 @@
 license:CC0
 
   To investigate:
-	- Gargoyle's Quest - Ghosts'n Goblins (Rev 1)	<-	Unreleased in the USA?
+	- Gargoyle's Quest - Ghosts'n Goblins (Rev 1)	<-	Unreleased in USA?
 	- World Cup Striker (Europe, En / Fra / Ger)	<-	Unreleased?
 
   Known dumps not yet verified against retail cartridge:
@@ -24,6 +24,8 @@ license:CC0
 	- Suzuki Aguri no F-1 Super Driving (Japan)
 	- Teenage Mutant Hero Turtles III - Radical Rescue (Europe, Rev 1)
 	- World Cup Striker (Europe, En / Fra / Ger)
+	- Robot Ponkottsu Taikenban
+	- From TV Animation Slam Dunk - Shueisha Limited Version
 
   Undumped pirate carts:
 	- GOWIN carts (see below the list of known games)
@@ -291,7 +293,8 @@ license:CC0
 	</software>
 
 	<software name="rockybwunk" cloneof="rockybw">
-		<!-- Old dump of unknown origin -->
+		<!--	Old dump of unknown origin	-->
+		<!--	Three different bytes in the header	-->
 		<description>The Adventures of Rocky and Bullwinkle (USA, bad dump?)</description>
 		<year>1992</year>
 		<publisher>T*HQ</publisher>
@@ -5969,6 +5972,7 @@ license:CC0
 		<info name="serial" value="DMG-YK-USA" />
 		<info name="gold" value="19940617" />
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="elite soccer (usa).bin" size="131072" crc="f54158a6" sha1="4576881ea25e29ebba91c49c89f8e70e105fbc60" />
@@ -7680,30 +7684,6 @@ license:CC0
 		<publisher>Vic Tokai</publisher>
 		<info name="serial" value="DMG-GIJ" />
 		<info name="gold" value="19930204" />
-		<info name="release" value="19930326" />
-		<info name="alt_title" value="GIキング! 三匹の予想屋" />
-		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-DECN-02" />
-			<feature name="u1" value="U1 PRG" />
-			<feature name="u2" value="U2 MBC1/1A/1B" />
-			<feature name="u3" value="U3 RAM" />
-			<feature name="u4" value="U4 26A" />
-			<feature name="batt" value="Batt CR1616" />
-			<feature name="slot" value="rom_mbc1" />
-			<dataarea name="rom" size="131072">
-				<rom name="dmg-gij-0.u1" size="131072" crc="f0dff737" sha1="65265b1c28173a6df0fede8c025cce56e752b1fd"/>
-			</dataarea>
-			<dataarea name="nvram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="gikingunk" cloneof="giking">
-		<!-- Old dump of unknown origin -->
-		<description>GI King! - Sanbiki no Yosouya (Japan, bad dump?)</description>
-		<year>1993</year>
-		<publisher>Vic Tokai</publisher>
-		<info name="serial" value="DMG-GIJ" />
 		<info name="release" value="19930326" />
 		<info name="alt_title" value="GIキング! 三匹の予想屋" />
 		<part name="cart" interface="gameboy_cart">
@@ -16879,7 +16859,8 @@ license:CC0
 	</software>
 
 	<software name="pangunk" cloneof="pang">
-		<!-- Old dump of unknown origin -->
+		<!--	Old dump of unknown origin	-->
+		<!--	One different byte in the header, different padding at the end -->
 		<description>Pang (UK, bad dump?)</description>
 		<year>1993</year>
 		<publisher>Hudson Soft</publisher>
@@ -20728,8 +20709,9 @@ license:CC0
 		<description>Shanghai Pocket (Japan)</description>
 		<year>1998</year>
 		<publisher>Sunsoft</publisher>
-		<info name="serial" value="DMG-ASEJ?" />
-		<info name="release" value="19980806?" />
+		<info name="serial" value="DMG-ASEJ-JPN?"/>
+		<info name="gold" value="19980701"/>
+		<info name="release" value="19980806"/>
 		<info name="alt_title" value="上海 ポケット" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="enhancement" value="sgb" />
@@ -23097,8 +23079,9 @@ license:CC0
 	</software>
 
 	<software name="suzukif1unk" cloneof="suzukif1">
-		<!-- Old dump of unknown origin -->
-		<description>Suzuki Aguri no F-1 Super Driving (Japan, bad dump?)</description>
+		<!--	Old dump of unknown origin	-->
+		<!--	Possible prototype?	-->
+		<description>Suzuki Aguri no F-1 Super Driving (Japan, prototype?)</description>
 		<year>1993</year>
 		<publisher>Logic</publisher>
 		<info name="alt_title" value="鈴木亜久里のF-1スーパードライビング" />
