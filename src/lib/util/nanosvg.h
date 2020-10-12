@@ -20,8 +20,8 @@ namespace util {
 
 struct nsvg_deleter
 {
-	void operator()(NSVGimage *ptr) { nsvgDelete(ptr); }
-	void operator()(NSVGrasterizer *ptr) { nsvgDeleteRasterizer(ptr); }
+	void operator()(NSVGimage *ptr) const { nsvgDelete(ptr); }
+	void operator()(NSVGrasterizer *ptr) const { nsvgDeleteRasterizer(ptr); }
 };
 
 

@@ -25,20 +25,10 @@
 #define MAX_COMMAND_LENGTH                  4096
 #define MAX_COMMAND_PARAMS                  128
 
-/* flags for command parsing */
-#define CMDFLAG_NONE                        (0x0000)
-#define CMDFLAG_KEEP_QUOTES                 (0x0001)
-#define CMDFLAG_CUSTOM_HELP                 (0x0002)
-
-/* values for the error code in a command error */
-#define CMDERR_NONE                         (0)
-#define CMDERR_UNKNOWN_COMMAND              (1)
-#define CMDERR_AMBIGUOUS_COMMAND            (2)
-#define CMDERR_UNBALANCED_PARENS            (3)
-#define CMDERR_UNBALANCED_QUOTES            (4)
-#define CMDERR_NOT_ENOUGH_PARAMS            (5)
-#define CMDERR_TOO_MANY_PARAMS              (6)
-#define CMDERR_EXPRESSION_ERROR             (7)
+// flags for command parsing
+constexpr u32 CMDFLAG_NONE                  = 0x0000;
+constexpr u32 CMDFLAG_KEEP_QUOTES           = 0x0001;
+constexpr u32 CMDFLAG_CUSTOM_HELP           = 0x0002;
 
 /* parameter separator macros */
 #define CMDPARAM_SEPARATOR                  "\0"
@@ -47,53 +37,62 @@
 
 
 /***************************************************************************
-    MACROS
-***************************************************************************/
-
-/* command error assembly/disassembly macros */
-#define CMDERR_ERROR_CLASS(x)               ((x) >> 16)
-#define CMDERR_ERROR_OFFSET(x)              ((x) & 0xffff)
-#define MAKE_CMDERR(a,b)                    (((a) << 16) | ((b) & 0xffff))
-
-/* macros to assemble specific error conditions */
-#define MAKE_CMDERR_UNKNOWN_COMMAND(x)      MAKE_CMDERR(CMDERR_UNKNOWN_COMMAND, (x))
-#define MAKE_CMDERR_AMBIGUOUS_COMMAND(x)    MAKE_CMDERR(CMDERR_AMBIGUOUS_COMMAND, (x))
-#define MAKE_CMDERR_UNBALANCED_PARENS(x)    MAKE_CMDERR(CMDERR_UNBALANCED_PARENS, (x))
-#define MAKE_CMDERR_UNBALANCED_QUOTES(x)    MAKE_CMDERR(CMDERR_UNBALANCED_QUOTES, (x))
-#define MAKE_CMDERR_NOT_ENOUGH_PARAMS(x)    MAKE_CMDERR(CMDERR_NOT_ENOUGH_PARAMS, (x))
-#define MAKE_CMDERR_TOO_MANY_PARAMS(x)      MAKE_CMDERR(CMDERR_TOO_MANY_PARAMS, (x))
-#define MAKE_CMDERR_EXPRESSION_ERROR(x)     MAKE_CMDERR(CMDERR_EXPRESSION_ERROR, (x))
-
-
-/***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
-/* CMDERR is an error code for command evaluation */
-typedef u32 CMDERR;
+// CMDERR is an error code for command evaluation
+struct CMDERR
+{
+	// values for the error code in a command error
+	static constexpr u32 NONE               = 0;
+	static constexpr u32 UNKNOWN_COMMAND    = 1;
+	static constexpr u32 AMBIGUOUS_COMMAND  = 2;
+	static constexpr u32 UNBALANCED_PARENS  = 3;
+	static constexpr u32 UNBALANCED_QUOTES  = 4;
+	static constexpr u32 NOT_ENOUGH_PARAMS  = 5;
+	static constexpr u32 TOO_MANY_PARAMS    = 6;
+	static constexpr u32 EXPRESSION_ERROR   = 7;
+
+	u32 val;
+
+	// command error assembly/disassembly
+	constexpr CMDERR(u32 a, u32 b) : val((a << 16) | (b & 0xffff)) { }
+	constexpr u32 ERROR_CLASS() const { return val >> 16; }
+	constexpr u32 ERROR_OFFSET() const { return val & 0xffff; }
+
+	// assemble specific error conditions
+	static constexpr CMDERR MAKE_UNKNOWN_COMMAND(u32 x)    { return CMDERR(UNKNOWN_COMMAND, x); }
+	static constexpr CMDERR MAKE_AMBIGUOUS_COMMAND(u32 x)  { return CMDERR(AMBIGUOUS_COMMAND, x); }
+	static constexpr CMDERR MAKE_UNBALANCED_PARENS(u32 x)  { return CMDERR(UNBALANCED_PARENS, x); }
+	static constexpr CMDERR MAKE_UNBALANCED_QUOTES(u32 x)  { return CMDERR(UNBALANCED_QUOTES, x); }
+	static constexpr CMDERR MAKE_NOT_ENOUGH_PARAMS(u32 x)  { return CMDERR(NOT_ENOUGH_PARAMS, x); }
+	static constexpr CMDERR MAKE_TOO_MANY_PARAMS(u32 x)    { return CMDERR(TOO_MANY_PARAMS, x); }
+	static constexpr CMDERR MAKE_EXPRESSION_ERROR(u32 x)   { return CMDERR(EXPRESSION_ERROR, x); }
+};
+
 
 class debugger_console
 {
 public:
 	debugger_console(running_machine &machine);
 
-	/* command handling */
+	// command handling
 	CMDERR          execute_command(const std::string &command, bool echo);
 	CMDERR          validate_command(const char *command);
 	void            register_command(const char *command, u32 flags, int ref, int minparams, int maxparams, std::function<void(int, const std::vector<std::string> &)> handler);
 	void            source_script(const char *file);
 	void            process_source_file();
 
-	/* console management */
-	void            vprintf(util::format_argument_pack<std::ostream> const &args);
-	void            vprintf(util::format_argument_pack<std::ostream> &&args);
-	void            vprintf_wrap(int wrapcol, util::format_argument_pack<std::ostream> const &args);
-	void            vprintf_wrap(int wrapcol, util::format_argument_pack<std::ostream> &&args);
-	text_buffer *   get_console_textbuf() const { return m_console_textbuf; }
+	// console management
+	void vprintf(util::format_argument_pack<std::ostream> const &args);
+	void vprintf(util::format_argument_pack<std::ostream> &&args);
+	void vprintf_wrap(int wrapcol, util::format_argument_pack<std::ostream> const &args);
+	void vprintf_wrap(int wrapcol, util::format_argument_pack<std::ostream> &&args);
+	text_buffer &get_console_textbuf() const { return *m_console_textbuf; }
 
 	/* errorlog management */
-	void            errorlog_write_line(const char *line);
-	text_buffer *   get_errorlog_textbuf() const { return m_errorlog_textbuf; }
+	void errorlog_write_line(const char *line);
+	text_buffer &get_errorlog_textbuf() const { return *m_errorlog_textbuf; }
 
 	/* convenience templates */
 	template <typename Format, typename... Params>
@@ -143,10 +142,10 @@ private:
 	running_machine &m_machine;
 
 	// visible CPU device (the one that commands should apply to)
-	device_t        *m_visiblecpu;
+	device_t *m_visiblecpu;
 
-	text_buffer     *m_console_textbuf;
-	text_buffer     *m_errorlog_textbuf;
+	text_buffer_ptr m_console_textbuf;
+	text_buffer_ptr m_errorlog_textbuf;
 
 	std::forward_list<debug_command> m_commandlist;
 
