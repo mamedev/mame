@@ -1969,9 +1969,9 @@ protected:
 		{
 			// compute premultiplied colors
 			u32 const a(c.a * 255.0F);
-			u32 const r(c.r * c.a * (255.0F * 255.0F * 255.0F));
-			u32 const g(c.g * c.a * (255.0F * 255.0F * 255.0F));
-			u32 const b(c.b * c.a * (255.0F * 255.0F * 255.0F));
+			u32 const r(u32(c.r * (255.0F * 255.0F)) * a);
+			u32 const g(u32(c.g * (255.0F * 255.0F)) * a);
+			u32 const b(u32(c.b * (255.0F * 255.0F)) * a);
 			u32 const inva(255 - a);
 
 			// we're translucent, add in the destination pixel contribution
@@ -1981,10 +1981,11 @@ protected:
 				for (u32 x = bounds.left(); x <= bounds.right(); ++x, ++dst)
 				{
 					rgb_t const dpix(*dst);
-					u32 const finala((a * 255) + (dpix.a() * inva));
-					u32 const finalr(r + (dpix.r() * dpix.a() * inva));
-					u32 const finalg(g + (dpix.g() * dpix.a() * inva));
-					u32 const finalb(b + (dpix.b() * dpix.a() * inva));
+					u32 const da(dpix.a());
+					u32 const finala((a * 255) + (da * inva));
+					u32 const finalr(r + (u32(dpix.r()) * da * inva));
+					u32 const finalg(g + (u32(dpix.g()) * da * inva));
+					u32 const finalb(b + (u32(dpix.b()) * da * inva));
 
 					// store the target pixel, dividing the RGBA values by the overall scale factor
 					*dst = rgb_t(finala / 255, finalr / finala, finalg / finala, finalb / finala);
@@ -2260,9 +2261,9 @@ private:
 		u32 const a(c.a * fill * 255.0F);
 		if (a)
 		{
-			u32 const r(c.r * c.a * fill * (255.0F * 255.0F * 255.0F));
-			u32 const g(c.g * c.a * fill * (255.0F * 255.0F * 255.0F));
-			u32 const b(c.b * c.a * fill * (255.0F * 255.0F * 255.0F));
+			u32 const r(u32(c.r * (255.0F * 255.0F)) * a);
+			u32 const g(u32(c.g * (255.0F * 255.0F)) * a);
+			u32 const b(u32(c.b * (255.0F * 255.0F)) * a);
 			alpha_blend(dest, a, r, g, b, 255 - a);
 		}
 	}
@@ -2270,10 +2271,11 @@ private:
 	void alpha_blend(u32 &dest, u32 a, u32 r, u32 g, u32 b, u32 inva)
 	{
 		rgb_t const dpix(dest);
-		u32 const finala((a * 255) + (dpix.a() * inva));
-		u32 const finalr(r + (dpix.r() * dpix.a() * inva));
-		u32 const finalg(g + (dpix.g() * dpix.a() * inva));
-		u32 const finalb(b + (dpix.b() * dpix.a() * inva));
+		u32 const da(dpix.a());
+		u32 const finala((a * 255) + (da * inva));
+		u32 const finalr(r + (u32(dpix.r()) * da * inva));
+		u32 const finalg(g + (u32(dpix.g()) * da * inva));
+		u32 const finalb(b + (u32(dpix.b()) * da * inva));
 		dest = rgb_t(finala / 255, finalr / finala, finalg / finala, finalb / finala);
 	}
 
