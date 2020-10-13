@@ -138,7 +138,7 @@ private:
 	emu_timer *m_write_timer;
 
 	int m_intrq;
-	int m_bdrq;
+	//int m_bdrq;
 	int m_brdy;
 	uint8_t m_stepping_rate;
 	uint8_t  m_command;
