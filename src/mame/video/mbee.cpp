@@ -102,8 +102,7 @@ void mbee_state::video_high_w(offs_t offset, u8 data)
 
 void mbee_state::port0b_w(u8 data)
 {
-	if (BIT(m_features, 0))
-		m_0b = data & 1;
+	m_0b = BIT(data, 0);
 }
 
 u8 mbee_state::port08_r()
