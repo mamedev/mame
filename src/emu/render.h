@@ -579,11 +579,12 @@ private:
 
 		// operations
 		virtual void preload(running_machine &machine);
-		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) = 0;
+		virtual void draw(running_machine &machine, bitmap_argb32 &dest, int state);
 
 	protected:
-		// helper
+		// helpers
 		virtual int maxstate() const;
+		virtual void draw_aligned(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state);
 
 		// drawing helpers
 		void draw_text(render_font &font, bitmap_argb32 &dest, const rectangle &bounds, const char *str, int align, const render_color &color);

@@ -1521,23 +1521,11 @@ void layout_element::element_scale(bitmap_argb32 &dest, bitmap_argb32 &source, c
 {
 	texture const &elemtex(*reinterpret_cast<texture const *>(param));
 
-	// iterate over components that are part of the current state
+	// draw components that are visible in the current state
 	for (auto const &curcomp : elemtex.m_element->m_complist)
 	{
 		if ((elemtex.m_state & curcomp->statemask()) == curcomp->stateval())
-		{
-			// get the local scaled bounds
-			render_bounds const compbounds(curcomp->bounds(elemtex.m_state));
-			rectangle bounds(
-					s32(compbounds.x0 * float(dest.width()) + 0.5F),
-					s32(floorf(compbounds.x1 * float(dest.width()) - 0.5F)),
-					s32(compbounds.y0 * float(dest.height()) + 0.5F),
-					s32(floorf(compbounds.y1 * float(dest.height()) - 0.5F)));
-
-			// based on the component type, add to the texture
-			if (!bounds.empty())
-				curcomp->draw(elemtex.m_element->machine(), dest, bounds, elemtex.m_state);
-		}
+			curcomp->draw(elemtex.m_element->machine(), dest, elemtex.m_state);
 	}
 }
 
@@ -1565,7 +1553,8 @@ public:
 			load_image(machine);
 	}
 
-	virtual void draw(running_machine &machine, bitmap_argb32 &dest, rectangle const &bounds, int state) override
+protected:
+	virtual void draw_aligned(running_machine &machine, bitmap_argb32 &dest, rectangle const &bounds, int state) override
 	{
 		if (!m_bitmap.valid() && !m_svg)
 			load_image(machine);
@@ -1965,7 +1954,7 @@ public:
 
 protected:
 	// overrides
-	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
+	virtual void draw_aligned(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
 		render_color const c(color(state));
 		if (1.0f <= c.a)
@@ -1980,9 +1969,9 @@ protected:
 		{
 			// compute premultiplied colors
 			u32 const a(c.a * 255.0F);
-			u32 const r(c.r * c.a * (255.0F * 255.0F));
-			u32 const g(c.g * c.a * (255.0F * 255.0F));
-			u32 const b(c.b * c.a * (255.0F * 255.0F));
+			u32 const r(c.r * c.a * (255.0F * 255.0F * 255.0F));
+			u32 const g(c.g * c.a * (255.0F * 255.0F * 255.0F));
+			u32 const b(c.b * c.a * (255.0F * 255.0F * 255.0F));
 			u32 const inva(255 - a);
 
 			// we're translucent, add in the destination pixel contribution
@@ -1993,9 +1982,9 @@ protected:
 				{
 					rgb_t const dpix(*dst);
 					u32 const finala((a * 255) + (dpix.a() * inva));
-					u32 const finalr(r + (dpix.r() * inva));
-					u32 const finalg(g + (dpix.g() * inva));
-					u32 const finalb(b + (dpix.b() * inva));
+					u32 const finalr(r + (dpix.r() * dpix.a() * inva));
+					u32 const finalg(g + (dpix.g() * dpix.a() * inva));
+					u32 const finalb(b + (dpix.b() * dpix.a() * inva));
 
 					// store the target pixel, dividing the RGBA values by the overall scale factor
 					*dst = rgb_t(finala / 255, finalr / finala, finalg / finala, finalb / finala);
@@ -2016,59 +2005,283 @@ public:
 	{
 	}
 
-protected:
 	// overrides
-	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
+	virtual void draw(running_machine &machine, bitmap_argb32 &dest, int state) override
 	{
-		// compute premultiplied colors
+		// compute premultiplied color
 		render_color const c(color(state));
 		u32 const f(rgb_t(u8(c.r * 255), u8(c.g * 255), u8(c.b * 255)));
 		u32 const a(c.a * 255.0F);
-		u32 const r(c.r * c.a * (255.0F * 255.0F));
-		u32 const g(c.g * c.a * (255.0F * 255.0F));
-		u32 const b(c.b * c.a * (255.0F * 255.0F));
+		u32 const r(c.r * c.a * (255.0F * 255.0F * 255.0F));
+		u32 const g(c.g * c.a * (255.0F * 255.0F * 255.0F));
+		u32 const b(c.b * c.a * (255.0F * 255.0F * 255.0F));
 		u32 const inva(255 - a);
 
-		// find the center
-		float const xcenter = float(bounds.left() + bounds.right()) * 0.5F;
-		float const ycenter = float(bounds.top() + bounds.bottom()) * 0.5F;
-		float const xradius = float(bounds.width()) * 0.5F;
-		float const yradius = float(bounds.height()) * 0.5F;
-		float const ooyradius2 = 1.0F / (yradius * yradius);
+		// calculate the position and size
+		render_bounds const curbounds = bounds(state);
+		float const xcenter = (curbounds.x0 + curbounds.x1) * float(dest.width()) * 0.5F;
+		float const ycenter = (curbounds.y0 + curbounds.y1) * float(dest.height()) * 0.5F;
+		float const xradius = curbounds.width() * float(dest.width()) * 0.5F;
+		float const yradius = curbounds.height() * float(dest.height()) * 0.5F;
+		s32 const miny = s32(curbounds.y0 * float(dest.height()));
+		s32 const maxy = s32(std::ceil(curbounds.y1 * float(dest.height()))) - 1;
 
-		// iterate over y
-		for (u32 y = bounds.top(); y <= bounds.bottom(); ++y)
+		if (miny == maxy)
 		{
-			// compute left/right coordinates
-			float const ycoord = ycenter - float(y);
-			float const xval = xradius * sqrtf(1.0F - (ycoord * ycoord) * ooyradius2);
-			s32 const left = s32(xcenter - xval + 0.5F);
-			s32 const right = bounds.right() - left + bounds.left();
-
-			// draw this scanline
-			if (255 <= a)
+			// fits in a single row of pixels - integrate entire area of ellipse
+			s32 const minx = s32(curbounds.x0 * float(dest.width()));
+			s32 const maxx = s32(std::ceil(curbounds.x1 * float(dest.width()))) - 1;
+			float x1 = (xcenter - float(minx)) / xradius;
+			u32 *dst = &dest.pix(miny, minx);
+			for (s32 x = minx; maxx >= x; ++x, ++dst)
 			{
-				// optimise opaque pixels
-				std::fill_n(&dest.pix(y, left), right - left + 1, f);
-			}
-			else if (a)
-			{
-				u32 *dst(&dest.pix(y, left));
-				for (s32 x = left; x <= right; ++x, ++dst)
-				{
-					// we're translucent, add in the destination pixel contribution
-					rgb_t const dpix(*dst);
-					u32 const finala((a * 255) + (dpix.a() * inva));
-					u32 const finalr(r + (dpix.r() * inva));
-					u32 const finalg(g + (dpix.g() * inva));
-					u32 const finalb(b + (dpix.b() * inva));
-
-					// store the target pixel, dividing the RGBA values by the overall scale factor
-					*dst = rgb_t(finala / 255, finalr / finala, finalg / finala, finalb / finala);
-				}
+				float const x0 = x1;
+				x1 = (xcenter - float(x + 1)) / xradius;
+				float val = 0.0F;
+				if (float(x) < xcenter)
+					val += integral((std::min)(x0, 1.0F)) - integral((std::max)(x1, 0.0F));
+				if (float(x + 1) > xcenter)
+					val += integral((std::min)(-x1, 1.0F)) - integral((std::max)(-x0, 0.0F));
+				val *= xradius * yradius * 0.5F;
+				alpha_blend(*dst, c, val);
 			}
 		}
+		else
+		{
+			float const ooyradius2 = 1.0F / (yradius * yradius);
+			auto const draw_edge_row =
+					[this, &dest, &c, &curbounds, xcenter, ycenter, xradius, yradius, ooyradius2] (s32 row, float ycoord, bool cross_axis)
+					{
+						float const xval = xradius * std::sqrt(1.0F - (ycoord * ycoord) * ooyradius2);
+						float const l = xcenter - xval;
+						float const r = xcenter + xval;
+						if (!cross_axis)
+						{
+							s32 minx = s32(l);
+							s32 maxx = s32(std::ceil(r)) - 1;
+							float x1 = xcenter - float(minx);
+							u32 *dst = &dest.pix(row, minx);
+							for (s32 x = minx; maxx >= x; ++x, ++dst)
+							{
+								float const x0 = x1;
+								x1 = xcenter - float(x + 1);
+								float val = 0.0F;
+								if (float(x) < xcenter)
+									val += integral((std::min)(x0, xval) / xradius) - integral((std::max)(x1, 0.0F) / xradius);
+								if (float(x + 1) > xcenter)
+									val += integral((std::min)(-x1, xval) / xradius) - integral((std::max)(-x0, 0.0F) / xradius);
+								val *= xradius * yradius * 0.25F;
+								val -= ((std::min)(float(x + 1), r) - (std::max)(float(x), l)) * ycoord;
+								alpha_blend(*dst, c, val);
+							}
+						}
+						else
+						{
+							s32 const minx = s32(curbounds.x0 * float(dest.width()));
+							s32 const maxx = s32(std::ceil(curbounds.x1 * float(dest.width()))) - 1;
+							float x1 = (xcenter - float(minx)) / xradius;
+							u32 *dst = &dest.pix(row, minx);
+							for (s32 x = minx; maxx >= x; ++x, ++dst)
+							{
+								float const x0 = x1;
+								x1 = (xcenter - float(x + 1)) / xradius;
+								float val = 0.0F;
+								if (float(x) < xcenter)
+									val += integral((std::min)(x0, 1.0F)) - integral((std::max)(x1, 0.0F));
+								if (float(x + 1) > xcenter)
+									val += integral((std::min)(-x1, 1.0F)) - integral((std::max)(-x0, 0.0F));
+								if (float(x + 1) <= l)
+									val += integral((std::min)(x0, 1.0F)) - integral(x1);
+								else if (float(x) <= l)
+									val += integral((std::min)(x0, 1.0F)) - integral(xval / xradius);
+								if (float(x) >= r)
+									val += integral((std::min)(-x1, 1.0F)) - integral(-x0);
+								else if (float(x + 1) >= r)
+									val += integral((std::min)(-x1, 1.0F)) - integral(xval / xradius);
+								val *= xradius * yradius * 0.25F;
+								val -= (std::max)(((std::min)(float(x + 1), r) - (std::max)(float(x), l)), 0.0F) * ycoord;
+								alpha_blend(*dst, c, val);
+							}
+						}
+					};
+
+			// draw the top row - in a thin ellipse it may extend below the axis
+			draw_edge_row(miny, ycenter - float(miny + 1), float(miny + 1) > ycenter);
+
+			// draw rows above the axis
+			s32 y = miny + 1;
+			float ycoord1 = ycenter - float(y);
+			float xval1 = xradius * std::sqrt(1.0F - (ycoord1 * ycoord1) * ooyradius2);
+			float l1 = xcenter - xval1;
+			float r1 = xcenter + xval1;
+			for ( ; (maxy > y) && (float(y + 1) <= ycenter); ++y)
+			{
+				float const l0 = l1;
+				float const r0 = r1;
+				ycoord1 = ycenter - float(y + 1);
+				xval1 = xradius * std::sqrt(1.0F - (ycoord1 * ycoord1) * ooyradius2);
+				l1 = xcenter - xval1;
+				r1 = xcenter + xval1;
+				s32 minx = int(l1);
+				s32 maxx = int(std::ceil(r1)) - 1;
+				u32 *dst = &dest.pix(y, minx);
+				for (s32 x = minx; maxx >= x; ++x, ++dst)
+				{
+					if ((float(x) >= l0) && (float(x + 1) <= r0))
+					{
+						if (255 <= a)
+							*dst = f;
+						else
+							alpha_blend(*dst, a, r, g, b, inva);
+					}
+					else
+					{
+						float val = 0.0F;
+						if (float(x + 1) <= l0)
+							val += integral((xcenter - (std::max)(float(x), l1)) / xradius) - integral((xcenter - float(x + 1)) / xradius);
+						else if (float(x) <= l0)
+							val += integral((xcenter - (std::max)(float(x), l1)) / xradius) - integral((xcenter - l0) / xradius);
+						else if (float(x) >= r0)
+							val += integral(((std::min)(float(x + 1), r1) - xcenter) / xradius) - integral((float(x) - xcenter) / xradius);
+						else if (float(x + 1) >= r0)
+							val += integral(((std::min)(float(x + 1), r1) - xcenter) / xradius) - integral((r0 - xcenter) / xradius);
+						val *= xradius * yradius * 0.25F;
+						if (float(x) <= l0)
+							val -= ((std::min)(float(x + 1), l0) - (std::max)(float(x), l1)) * ycoord1;
+						else if (float(x + 1) >= r0)
+							val -= ((std::min)(float(x + 1), r1) - (std::max)(float(x), r0)) * ycoord1;
+						val += (std::max)((std::min)(float(x + 1), r0) - (std::max)(float(x), l0), 0.0F);
+						alpha_blend(*dst, c, val);
+					}
+				}
+			}
+
+			// row spanning the axis
+			if ((maxy > y) && (float(y) < ycenter))
+			{
+				float const l0 = l1;
+				float const r0 = r1;
+				ycoord1 = float(y + 1) - ycenter;
+				xval1 = xradius * std::sqrt(1.0F - (ycoord1 * ycoord1) * ooyradius2);
+				l1 = xcenter - xval1;
+				r1 = xcenter + xval1;
+				s32 const minx = int(curbounds.x0 * float(dest.width()));
+				s32 const maxx = int(std::ceil(curbounds.x1 * float(dest.width()))) - 1;
+				u32 *dst = &dest.pix(y, minx);
+				for (s32 x = minx; maxx >= x; ++x, ++dst)
+				{
+					if ((float(x) >= (std::max)(l0, l1)) && (float(x + 1) <= (std::min)(r0, r1)))
+					{
+						if (255 <= a)
+							*dst = f;
+						else
+							alpha_blend(*dst, a, r, g, b, inva);
+					}
+					else
+					{
+						float val = 0.0F;
+						if (float(x + 1) <= l0)
+							val += integral((std::min)((xcenter - float(x)) / xradius, 1.0F)) - integral((xcenter - float(x + 1)) / xradius);
+						else if (float(x) <= l0)
+							val += integral((std::min)((xcenter - float(x)) / xradius, 1.0F)) - integral((xcenter - l0) / xradius);
+						else if (float(x) >= r0)
+							val += integral((std::min)((float(x + 1) - xcenter) / xradius, 1.0F)) - integral((float(x) - xcenter) / xradius);
+						else if (float(x + 1) >= r0)
+							val += integral((std::min)((float(x + 1) - xcenter) / xradius, 1.0F)) - integral((r0 - xcenter) / xradius);
+						if (float(x + 1) <= l1)
+							val += integral((std::min)((xcenter - float(x)) / xradius, 1.0F)) - integral((xcenter - float(x + 1)) / xradius);
+						else if (float(x) <= l1)
+							val += integral((std::min)((xcenter - float(x)) / xradius, 1.0F)) - integral((xcenter - l1) / xradius);
+						else if (float(x) >= r1)
+							val += integral((std::min)((float(x + 1) - xcenter) / xradius, 1.0F)) - integral((float(x) - xcenter) / xradius);
+						else if (float(x + 1) >= r1)
+							val += integral((std::min)((float(x + 1) - xcenter) / xradius, 1.0F)) - integral((r1 - xcenter) / xradius);
+						val *= xradius * yradius * 0.25F;
+						val += (std::max)(((std::min)(float(x + 1), r0) - (std::max)(float(x), l0)), 0.0F) * (ycenter - float(y));
+						val += (std::max)(((std::min)(float(x + 1), r1) - (std::max)(float(x), l1)), 0.0F) * (float(y + 1) - ycenter);
+						alpha_blend(*dst, c, val);
+					}
+				}
+				++y;
+			}
+
+			// draw rows below the axis
+			for ( ; maxy > y; ++y)
+			{
+				float const ycoord0 = ycoord1;
+				float const l0 = l1;
+				float const r0 = r1;
+				ycoord1 = float(y + 1) - ycenter;
+				xval1 = xradius * std::sqrt(1.0F - (ycoord1 * ycoord1) * ooyradius2);
+				l1 = xcenter - xval1;
+				r1 = xcenter + xval1;
+				s32 minx = int(l0);
+				s32 maxx = int(std::ceil(r0)) - 1;
+				u32 *dst = &dest.pix(y, minx);
+				for (s32 x = minx; maxx >= x; ++x, ++dst)
+				{
+					if ((float(x) >= l1) && (float(x + 1) <= r1))
+					{
+						if (255 <= a)
+							*dst = f;
+						else
+							alpha_blend(*dst, a, r, g, b, inva);
+					}
+					else
+					{
+						float val = 0.0F;
+						if (float(x + 1) <= l1)
+							val += integral((xcenter - (std::max)(float(x), l0)) / xradius) - integral((xcenter - float(x + 1)) / xradius);
+						else if (float(x) <= l1)
+							val += integral((xcenter - (std::max)(float(x), l0)) / xradius) - integral((xcenter - l1) / xradius);
+						else if (float(x) >= r1)
+							val += integral(((std::min)(float(x + 1), r0) - xcenter) / xradius) - integral((float(x) - xcenter) / xradius);
+						else if (float(x + 1) >= r1)
+							val += integral(((std::min)(float(x + 1), r0) - xcenter) / xradius) - integral((r1 - xcenter) / xradius);
+						val *= xradius * yradius * 0.25F;
+						if (float(x) <= l1)
+							val -= ((std::min)(float(x + 1), l1) - (std::max)(float(x), l0)) * ycoord0;
+						else if (float(x + 1) >= r1)
+							val -= ((std::min)(float(x + 1), r0) - (std::max)(float(x), r1)) * ycoord0;
+						val += (std::max)((std::min)(float(x + 1), r1) - (std::max)(float(x), l1), 0.0F);
+						alpha_blend(*dst, c, val);
+					}
+				}
+			}
+
+			// last row is an inversion of the first
+			draw_edge_row(maxy, float(maxy) - ycenter, float(maxy) < ycenter);
+		}
 	}
+
+private:
+	void alpha_blend(u32 &dest, render_color const &c, float fill)
+	{
+		u32 const a(c.a * fill * 255.0F);
+		if (a)
+		{
+			u32 const r(c.r * c.a * fill * (255.0F * 255.0F * 255.0F));
+			u32 const g(c.g * c.a * fill * (255.0F * 255.0F * 255.0F));
+			u32 const b(c.b * c.a * fill * (255.0F * 255.0F * 255.0F));
+			alpha_blend(dest, a, r, g, b, 255 - a);
+		}
+	}
+
+	void alpha_blend(u32 &dest, u32 a, u32 r, u32 g, u32 b, u32 inva)
+	{
+		rgb_t const dpix(dest);
+		u32 const finala((a * 255) + (dpix.a() * inva));
+		u32 const finalr(r + (dpix.r() * dpix.a() * inva));
+		u32 const finalg(g + (dpix.g() * dpix.a() * inva));
+		u32 const finalb(b + (dpix.b() * dpix.a() * inva));
+		dest = rgb_t(finala / 255, finalr / finala, finalg / finala, finalb / finala);
+	}
+
+	static float integral(float x)
+	{
+		float const u(2.0F * std::asin(x));
+		return u + std::sin(u);
+	};
 };
 
 
@@ -2086,7 +2299,7 @@ public:
 
 protected:
 	// overrides
-	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
+	virtual void draw_aligned(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
 		auto font = machine.render().font_alloc("default");
 		draw_text(*font, dest, bounds, m_string.c_str(), m_textalign, color(state));
@@ -2113,7 +2326,7 @@ protected:
 	// overrides
 	virtual int maxstate() const override { return 255; }
 
-	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
+	virtual void draw_aligned(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
 		rgb_t const onpen = rgb_t(0xff, 0xff, 0xff, 0xff);
 		rgb_t const offpen = rgb_t(0x20, 0xff, 0xff, 0xff);
@@ -2175,7 +2388,7 @@ protected:
 	// overrides
 	virtual int maxstate() const override { return 255; }
 
-	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
+	virtual void draw_aligned(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
 		rgb_t const onpen = rgb_t(0xff, 0xff, 0xff, 0xff);
 		rgb_t const offpen = rgb_t(0x20, 0xff, 0xff, 0xff);
@@ -2243,7 +2456,7 @@ protected:
 	// overrides
 	virtual int maxstate() const override { return 16383; }
 
-	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
+	virtual void draw_aligned(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
 		rgb_t const onpen = rgb_t(0xff, 0xff, 0xff, 0xff);
 		rgb_t const offpen = rgb_t(0x20, 0xff, 0xff, 0xff);
@@ -2355,7 +2568,7 @@ protected:
 	// overrides
 	virtual int maxstate() const override { return 65535; }
 
-	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
+	virtual void draw_aligned(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
 		const rgb_t onpen = rgb_t(0xff, 0xff, 0xff, 0xff);
 		const rgb_t offpen = rgb_t(0x20, 0xff, 0xff, 0xff);
@@ -2477,7 +2690,7 @@ protected:
 	// overrides
 	virtual int maxstate() const override { return 65535; }
 
-	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
+	virtual void draw_aligned(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
 		rgb_t const onpen = rgb_t(0xff, 0xff, 0xff, 0xff);
 		rgb_t const offpen = rgb_t(0x20, 0xff, 0xff, 0xff);
@@ -2600,7 +2813,7 @@ protected:
 	// overrides
 	virtual int maxstate() const override { return 262143; }
 
-	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
+	virtual void draw_aligned(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
 		rgb_t const onpen = rgb_t(0xff, 0xff, 0xff, 0xff);
 		rgb_t const offpen = rgb_t(0x20, 0xff, 0xff, 0xff);
@@ -2733,7 +2946,7 @@ protected:
 	// overrides
 	virtual int maxstate() const override { return (1 << m_dots) - 1; }
 
-	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
+	virtual void draw_aligned(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
 		const rgb_t onpen = rgb_t(0xff, 0xff, 0xff, 0xff);
 		const rgb_t offpen = rgb_t(0xff, 0x20, 0x20, 0x20);
@@ -2776,7 +2989,7 @@ protected:
 	// overrides
 	virtual int maxstate() const override { return m_maxstate; }
 
-	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
+	virtual void draw_aligned(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
 		auto font = machine.render().font_alloc("default");
 		draw_text(*font, dest, bounds, string_format("%0*d", m_digits, state).c_str(), m_textalign, color(state));
@@ -2830,10 +3043,7 @@ public:
 		m_beltreel = env.get_attribute_int(compnode, "beltreel", 0);
 	}
 
-protected:
 	// overrides
-	virtual int maxstate() const override { return 65535; }
-
 	virtual void preload(running_machine &machine) override
 	{
 		for (int i = 0; i < m_numstops; i++)
@@ -2844,7 +3054,10 @@ protected:
 
 	}
 
-	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
+protected:
+	virtual int maxstate() const override { return 65535; }
+
+	virtual void draw_aligned(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
 		if (m_beltreel)
 		{
@@ -3396,6 +3609,35 @@ render_color layout_element::component::color(int state) const
 void layout_element::component::preload(running_machine &machine)
 {
 }
+
+
+//-------------------------------------------------
+//  draw - draw element to texture for a given
+//  state
+//-------------------------------------------------
+
+void layout_element::component::draw(running_machine &machine, bitmap_argb32 &dest, int state)
+{
+	// get the local scaled bounds
+	render_bounds const curbounds(bounds(state));
+	rectangle pixelbounds(
+			s32(curbounds.x0 * float(dest.width()) + 0.5F),
+			s32(floorf(curbounds.x1 * float(dest.width()) - 0.5F)),
+			s32(curbounds.y0 * float(dest.height()) + 0.5F),
+			s32(floorf(curbounds.y1 * float(dest.height()) - 0.5F)));
+
+	// based on the component type, add to the texture
+	if (!pixelbounds.empty())
+		draw_aligned(machine, dest, pixelbounds, state);
+}
+
+
+void layout_element::component::draw_aligned(running_machine &machine, bitmap_argb32 &dest, rectangle const &bounds, int state)
+{
+	// derived classes must override one form or other
+	throw false;
+}
+
 
 //-------------------------------------------------
 //  maxstate - maximum state drawn differently
