@@ -320,6 +320,7 @@ const char_info charinfo[] =
 
 natural_keyboard::natural_keyboard(running_machine &machine)
 	: m_machine(machine)
+	, m_have_charkeys(false)
 	, m_in_use(false)
 	, m_bufbegin(0)
 	, m_bufend(0)
