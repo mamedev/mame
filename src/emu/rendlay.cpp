@@ -2051,7 +2051,7 @@ public:
 		{
 			float const ooyradius2 = 1.0F / (yradius * yradius);
 			auto const draw_edge_row =
-					[this, &dest, &c, &curbounds, xcenter, ycenter, xradius, yradius, ooyradius2] (s32 row, float ycoord, bool cross_axis)
+					[this, &dest, &c, &curbounds, xcenter, xradius, yradius, ooyradius2] (s32 row, float ycoord, bool cross_axis)
 					{
 						float const xval = xradius * std::sqrt(1.0F - (ycoord * ycoord) * ooyradius2);
 						float const l = xcenter - xval;
