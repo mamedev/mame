@@ -922,6 +922,7 @@ void laser2001_state::lasr2001(machine_config &config)
 	// software list
 	SOFTWARE_LIST(config, "cart_list").set_original("crvision");
 	SOFTWARE_LIST(config, "cart_list2").set_original("laser2001_cart");
+	SOFTWARE_LIST(config, "flop_list").set_original("laser2001_flop");
 }
 
 /***************************************************************************
