@@ -13,7 +13,7 @@ PCB sputnik rev. 1.1
 - TDA8771AH DAC
 - PIC12C508 Microcontroller
 
-Two identical looking PCBs were dumped. The dumps are different (even taking into account a suspected bad dump, but it
+Two identical looking PCBs were dumped. The dumps are different (even taking into account a suspected bad dump), but it
 isn't currently known if it's because they're different sets or because of the saved scores and settings.
 
 The PIC is undumped, but on PCB the game seems to run without it, hanging when checking the ticket dispenser.

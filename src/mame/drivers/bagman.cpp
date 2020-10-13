@@ -1228,8 +1228,8 @@ ROM_END
 
 void bagman_state::init_bagmans3()
 {
-	// this earlier version has extra code at 0x5f98 - 0x5fa5 that reads a value from $ed01. Returning 0x01 allows starting a game and gives correct musing tempo. TODO: What happens here? Fix this workaround
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xed01, 0xed01, read8smo_delegate(*this, []() {return 0x01; }, "hack_r"));
+	// this earlier version has extra code at 0x5f98 - 0x5fa5 that reads a value from $ed01. Returning 0x01 allows starting a game and gives correct music tempo. TODO: What happens here? Fix this workaround
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xed01, 0xed01, read8smo_delegate(*this, []() { return 0x01; }, "hack_r"));
 }
 
 GAME( 1982, bagman,    0,       bagman,   bagman,    bagman_state,   empty_init,    ROT270, "Valadon Automation",                             "Bagman",                                  MACHINE_SUPPORTS_SAVE )
