@@ -112,6 +112,7 @@ bebox.cpp
 bert.cpp
 besta.cpp
 beta.cpp
+betacam.cpp
 bigbord2.cpp
 binbug.cpp
 bitel.cpp
@@ -217,6 +218,7 @@ debut.cpp
 decstation.cpp
 dectalk.cpp
 decwritr.cpp
+dfs500.cpp
 dg680.cpp
 dgn_beta.cpp
 diablo1300.cpp
@@ -1035,6 +1037,7 @@ tx0.cpp
 uchroma68.cpp
 uknc.cpp
 ultim809.cpp
+umatic.cpp
 unichamp.cpp
 unior.cpp
 unistar.cpp
