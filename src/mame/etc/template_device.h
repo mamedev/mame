@@ -6,24 +6,14 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_<device_typename>_H
-#define MAME_MACHINE_<device_typename>_H
+#ifndef MAME_MACHINE_<device_header>_H
+#define MAME_MACHINE_<device_header>_H
 
 #pragma once
-
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-// ======================> <device_classname>_device
 
 class <device_classname>_device : public device_t
 {
@@ -47,11 +37,4 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(<device_typename>, <device_classname>_device)
 
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-
-#endif // MAME_MACHINE_<device_typename>_H
+#endif // MAME_MACHINE_<device_header>_H
