@@ -19,8 +19,8 @@ license:CC0
 			<bounds left="0.10" top="0.3" right="0.90" bottom="0.7" />
 		</text>
 
-		<rect state="1000">
-			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+		<rect>
+			<color alpha="0" />
 			<bounds x="0" y="0" width="1" height="1" />
 		</rect>
 	</element>
@@ -40,8 +40,8 @@ license:CC0
 			<bounds left="0.15" top="0.3" right="0.85" bottom="0.7" />
 		</text>
 
-		<rect state="1000">
-			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+		<rect>
+			<color alpha="0" />
 			<bounds x="0" y="0" width="1" height="1" />
 		</rect>
 	</element>
@@ -116,8 +116,8 @@ license:CC0
 			<bounds left="0.47" top="0.645" right="0.53" bottom="0.675" />
 		</disk>
 
-		<rect state="1000">
-			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+		<rect>
+			<color alpha="0" />
 			<bounds x="0" y="0" width="1" height="1" />
 		</rect>
 	</element>
@@ -133,8 +133,8 @@ license:CC0
 			<bounds left="0.10" top="0.425" right="0.45" bottom="0.485" />
 		</rect>
 
-		<rect state="1000">
-			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+		<rect>
+			<color alpha="0" />
 			<bounds x="0" y="0" width="1" height="1" />
 		</rect>
 	</element>
@@ -150,8 +150,8 @@ license:CC0
 			<bounds left="0.55" top="0.425" right="0.90" bottom="0.485" />
 		</rect>
 
-		<rect state="1000">
-			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+		<rect>
+			<color alpha="0" />
 			<bounds x="0" y="0" width="1" height="1" />
 		</rect>
 	</element>
@@ -167,8 +167,8 @@ license:CC0
 			<bounds left="0.10" top="0.495" right="0.45" bottom="0.555" />
 		</rect>
 
-		<rect state="1000">
-			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+		<rect>
+			<color alpha="0" />
 			<bounds x="0" y="0" width="1" height="1" />
 		</rect>
 	</element>
@@ -183,8 +183,8 @@ license:CC0
 			<color red="0.6" green="0.6" blue="0.6" />
 			<bounds left="0.55" top="0.495" right="0.90" bottom="0.555" />
 		</rect>
-		<rect state="1000">
-			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+		<rect>
+			<color alpha="0" />
 			<bounds x="0" y="0" width="1" height="1" />
 		</rect>
 	</element>
@@ -200,8 +200,8 @@ license:CC0
 			<bounds left="0.10" top="0.565" right="0.45" bottom="0.625" />
 		</rect>
 
-		<rect state="1000">
-			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+		<rect>
+			<color alpha="0" />
 			<bounds x="0" y="0" width="1" height="1" />
 		</rect>
 	</element>
@@ -217,8 +217,8 @@ license:CC0
 			<bounds left="0.55" top="0.565" right="0.90" bottom="0.625" />
 		</rect>
 
-		<rect state="1000">
-			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+		<rect>
+			<color alpha="0" />
 			<bounds x="0" y="0" width="1" height="1" />
 		</rect>
 	</element>
@@ -229,8 +229,8 @@ license:CC0
 			<bounds left="0.10" top="0.425" right="0.45" bottom="0.485" />
 		</text>
 
-		<rect state="1000">
-			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+		<rect>
+			<color alpha="0" />
 			<bounds x="0" y="0" width="1" height="1" />
 		</rect>
 	</element>
@@ -241,8 +241,8 @@ license:CC0
 			<bounds left="0.55" top="0.425" right="0.90" bottom="0.485" />
 		</text>
 
-		<rect state="1000">
-			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+		<rect>
+			<color alpha="0" />
 			<bounds x="0" y="0" width="1" height="1" />
 		</rect>
 	</element>
@@ -253,8 +253,8 @@ license:CC0
 			<bounds left="0.10" top="0.495" right="0.45" bottom="0.555" />
 		</text>
 
-		<rect state="1000">
-			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+		<rect>
+			<color alpha="0" />
 			<bounds x="0" y="0" width="1" height="1" />
 		</rect>
 	</element>
@@ -265,8 +265,8 @@ license:CC0
 			<bounds left="0.55" top="0.495" right="0.90" bottom="0.555" />
 		</text>
 
-		<rect state="1000">
-			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+		<rect>
+			<color alpha="0" />
 			<bounds x="0" y="0" width="1" height="1" />
 		</rect>
 	</element>
@@ -277,8 +277,8 @@ license:CC0
 			<bounds left="0.10" top="0.565" right="0.45" bottom="0.625" />
 		</text>
 
-		<rect state="1000">
-			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+		<rect>
+			<color alpha="0" />
 			<bounds x="0" y="0" width="1" height="1" />
 		</rect>
 	</element>
@@ -289,8 +289,8 @@ license:CC0
 			<bounds left="0.55" top="0.565" right="0.90" bottom="0.625" />
 		</text>
 
-		<rect state="1000">
-			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+		<rect>
+			<color alpha="0" />
 			<bounds x="0" y="0" width="1" height="1" />
 		</rect>
 	</element>
@@ -354,8 +354,8 @@ license:CC0
 			<bounds left="0.09" top="0.045" right="0.46" bottom="0.25" />
 		</text>
 
-		<rect state="1000">
-			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+		<rect>
+			<color alpha="0" />
 			<bounds x="0" y="0" width="1" height="1" />
 		</rect>
 	</element>
@@ -383,8 +383,8 @@ license:CC0
 			<bounds left="0.255" top="0.295" right="0.44" bottom="0.40" />
 		</text>
 
-		<rect state="1000">
-			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+		<rect>
+			<color alpha="0" />
 			<bounds x="0" y="0" width="1" height="1" />
 		</rect>
 	</element>
@@ -448,8 +448,8 @@ license:CC0
 			<bounds left="0.54" top="0.045" right="0.91" bottom="0.25" />
 		</text>
 
-		<rect state="1000">
-			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+		<rect>
+			<color alpha="0" />
 			<bounds x="0" y="0" width="1" height="1" />
 		</rect>
 	</element>
@@ -477,8 +477,8 @@ license:CC0
 			<bounds left="0.695" top="0.295" right="0.91" bottom="0.40" />
 		</text>
 
-		<rect state="1000">
-			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+		<rect>
+			<color alpha="0" />
 			<bounds x="0" y="0" width="1" height="1" />
 		</rect>
 	</element>
