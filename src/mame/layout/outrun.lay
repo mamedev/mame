@@ -73,7 +73,7 @@ license:CC0
 		<screen index="0">
 			<bounds x="0" y="0" width="640" height="480" />
 		</screen>
-		<element ref="shifter" inputtag="IN0" inputmask="0x02">
+		<element ref="shifter" inputtag="SERVICE" inputmask="0x10">
 			<bounds x="648" y="414" width="32" height="64" />
 		</element>
 	</view>
@@ -81,7 +81,7 @@ license:CC0
 		<screen index="0">
 			<bounds x="0" y="0" width="640" height="480" />
 		</screen>
-		<element ref="shifter" inputtag="IN0" inputmask="0x02">
+		<element ref="shifter" inputtag="SERVICE" inputmask="0x10">
 			<bounds x="-40" y="414" width="32" height="64" />
 		</element>
 	</view>
