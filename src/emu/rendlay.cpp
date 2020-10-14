@@ -2063,7 +2063,7 @@ public:
 			float const scale = xradius * yradius * 0.25F;
 			float const ooyradius2 = 1.0F / (yradius * yradius);
 			auto const draw_edge_row =
-					[this, &dest, &c, &curbounds, xcenter, xradius, scale, ooyradius2] (s32 row, float ycoord, bool cross_axis)
+					[&dest, &c, &curbounds, xcenter, xradius, scale, ooyradius2] (s32 row, float ycoord, bool cross_axis)
 					{
 						float const xval = xradius * std::sqrt((std::max)(1.0F - (ycoord * ycoord) * ooyradius2, 0.0F));
 						float const l = xcenter - xval;

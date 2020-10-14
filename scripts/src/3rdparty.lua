@@ -19,18 +19,21 @@ project "expat"
 	kind "StaticLib"
 
 	-- fake out the enough of expat_config.h to get by
+	-- could possibly add more defines here for specific targets
 	defines {
 		"HAVE_MEMMOVE",
 		"HAVE_STDINT_H",
 		"HAVE_STDLIB_H",
 		"HAVE_STRING_H",
+		"PACKAGE=\"expat\"",
 		"PACKAGE_BUGREPORT=\"expat-bugs@libexpat.org\"",
 		"PACKAGE_NAME=\"expat\"",
-		"PACKAGE_STRING=\"expat 2.1.1\"",
+		"PACKAGE_STRING=\"expat 2.2.10\"",
 		"PACKAGE_TARNAME=\"expat\"",
 		"PACKAGE_URL=\"\"",
-		"PACKAGE_VERSION=\"2.1.1\"",
+		"PACKAGE_VERSION=\"2.2.10\"",
 		"STDC_HEADERS",
+		"VERSION=\"2.2.10\"",
 		"XML_CONTEXT_BYTES=1024",
 		"XML_DTD",
 		"XML_NS",
@@ -43,6 +46,22 @@ if _OPTIONS["BIGENDIAN"]=="1" then
 else
 	defines {
 		"BYTEORDER=1234",
+	}
+end
+if _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="freebsd" then
+	defines {
+		"HAVE_ARC4RANDOM",
+	}
+end
+if BASE_TARGETOS=="unix" then
+	defines {
+		"HAVE_DLFCN_H",
+		"HAVE_FCNTL_H",
+		"HAVE_MMAP",
+		"HAVE_SYS_STAT_H",
+		"HAVE_SYS_TYPES_H",
+		"HAVE_UNISTD_H",
+		"XML_DEV_URANDOM",
 	}
 end
 
