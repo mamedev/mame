@@ -7,7 +7,7 @@ Hewlett-Packard 9825 Layout
 <mamelayout version="2">
 	<element name="dotmatrix5dot">
 		<rect>
-			<bounds x="-0.1" width="5.6" y="-0.1" height="1.2" />
+			<bounds x="-0.05" width="5.55" y="-0.05" height="1.1" />
 			<color red="0.0" green="0.0" blue="0.0" />
 		</rect>
 		<disk state="0" statemask="0x01">

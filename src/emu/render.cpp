@@ -2527,20 +2527,14 @@ void render_target::add_element_primitives(render_primitive_list &list, const ob
 		prim->full_bounds = prim->bounds;
 		if (xform.orientation & ORIENTATION_SWAP_XY)
 			std::swap(width, height);
-		width = std::min(width, m_maxtexwidth);
-		height = std::min(height, m_maxtexheight);
+		width = (std::min)(width, m_maxtexwidth);
+		height = (std::min)(height, m_maxtexheight);
 
 		// get the scaled texture and append it
-
 		texture->get_scaled(width, height, prim->texture, list, prim->flags);
 
 		// compute the clip rect
-		render_bounds cliprect;
-		cliprect.x0 = render_round_nearest(xform.xoffs);
-		cliprect.y0 = render_round_nearest(xform.yoffs);
-		cliprect.x1 = render_round_nearest(xform.xoffs + xform.xscale);
-		cliprect.y1 = render_round_nearest(xform.yoffs + xform.yscale);
-		cliprect &= m_bounds;
+		render_bounds cliprect = prim->bounds & m_bounds;
 
 		// determine UV coordinates and apply clipping
 		prim->texcoords = oriented_texcoords[xform.orientation];

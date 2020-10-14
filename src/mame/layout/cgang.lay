@@ -7,7 +7,6 @@ license:CC0
 <!-- define elements -->
 
 	<element name="black"><rect><color red="0" green="0" blue="0" /></rect></element>
-	<element name="blackd"><disk><color red="0" green="0" blue="0" /></disk></element>
 	<element name="white"><rect><color red="0.9" green="0.9" blue="0.92" /></rect></element>
 	<element name="gray2"><rect><color red="0.12" green="0.12" blue="0.12" /></rect></element>
 	<element name="yellow"><rect><color red="0.9" green="0.9" blue="0.15" /></rect></element>
@@ -113,6 +112,10 @@ license:CC0
 	</element>
 
 	<element name="ledg" defstate="0">
+		<disk>
+			<bounds left="-0.5" top="-0.5" right="1.5" bottom="1.5" />
+			<color red="0" green="0" blue="0" />
+		</disk>
 		<disk state="0"><color red="0.2" green="0.4" blue="0.17" /></disk>
 		<disk state="1"><color red="0.5" green="1.0" blue="0.4" /></disk>
 	</element>
@@ -423,13 +426,11 @@ license:CC0
 		<element name="misc_lamp10" ref="led2p"><bounds x="4.5" y="0.5" width="2" height="2" /></element>
 
 		<element ref="text_start1"><bounds x="9" y="0.55" width="5" height="1.9" /></element>
-		<element ref="blackd"><bounds x="14.5" y="0" width="3" height="3" /></element>
-		<element name="misc_lamp0" ref="ledg"><bounds x="15" y="0.5" width="2" height="2" /></element>
+		<element name="misc_lamp0" ref="ledg"><bounds x="14.5" y="0" width="3" height="3" /></element>
 		<element ref="hlb" inputtag="IN1" inputmask="0x10"><bounds x="14.5" y="0" width="3" height="3" /><color alpha="0.2" /></element>
 
 		<element ref="text_start2"><bounds x="18.5" y="0.55" width="5" height="1.9" /></element>
-		<element ref="blackd"><bounds x="24.0" y="0" width="3" height="3" /></element>
-		<element name="misc_lamp1" ref="ledg"><bounds x="24.5" y="0.5" width="2" height="2" /></element>
+		<element name="misc_lamp1" ref="ledg"><bounds x="24" y="0" width="3" height="3" /></element>
 		<element ref="hlb" inputtag="IN1" inputmask="0x08"><bounds x="24.0" y="0" width="3" height="3" /><color alpha="0.2" /></element>
 	</group>
 

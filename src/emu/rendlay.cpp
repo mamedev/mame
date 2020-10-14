@@ -97,6 +97,29 @@ inline void render_bounds_transform(render_bounds &bounds, layout_group::transfo
 			(bounds.x1 * trans[1][0]) + (bounds.y1 * trans[1][1]) + trans[1][2] };
 }
 
+inline void alpha_blend(u32 &dest, u32 a, u32 r, u32 g, u32 b, u32 inva)
+{
+	rgb_t const dpix(dest);
+	u32 const da(dpix.a());
+	u32 const finala((a * 255) + (da * inva));
+	u32 const finalr(r + (u32(dpix.r()) * da * inva));
+	u32 const finalg(g + (u32(dpix.g()) * da * inva));
+	u32 const finalb(b + (u32(dpix.b()) * da * inva));
+	dest = rgb_t(finala / 255, finalr / finala, finalg / finala, finalb / finala);
+}
+
+inline void alpha_blend(u32 &dest, render_color const &c, float fill)
+{
+	u32 const a(c.a * fill * 255.0F);
+	if (a)
+	{
+		u32 const r(u32(c.r * (255.0F * 255.0F)) * a);
+		u32 const g(u32(c.g * (255.0F * 255.0F)) * a);
+		u32 const b(u32(c.b * (255.0F * 255.0F)) * a);
+		alpha_blend(dest, a, r, g, b, 255 - a);
+	}
+}
+
 
 
 //**************************************************************************
@@ -1979,17 +2002,7 @@ protected:
 			{
 				u32 *dst(&dest.pix(y, bounds.left()));
 				for (u32 x = bounds.left(); x <= bounds.right(); ++x, ++dst)
-				{
-					rgb_t const dpix(*dst);
-					u32 const da(dpix.a());
-					u32 const finala((a * 255) + (da * inva));
-					u32 const finalr(r + (u32(dpix.r()) * da * inva));
-					u32 const finalg(g + (u32(dpix.g()) * da * inva));
-					u32 const finalb(b + (u32(dpix.b()) * da * inva));
-
-					// store the target pixel, dividing the RGBA values by the overall scale factor
-					*dst = rgb_t(finala / 255, finalr / finala, finalg / finala, finalb / finala);
-				}
+					alpha_blend(*dst, a, r, g, b, inva);
 			}
 		}
 	}
@@ -2017,6 +2030,8 @@ public:
 		u32 const g(c.g * c.a * (255.0F * 255.0F * 255.0F));
 		u32 const b(c.b * c.a * (255.0F * 255.0F * 255.0F));
 		u32 const inva(255 - a);
+		if (!a)
+			return;
 
 		// calculate the position and size
 		render_bounds const curbounds = bounds(state);
@@ -2030,28 +2045,25 @@ public:
 		if (miny == maxy)
 		{
 			// fits in a single row of pixels - integrate entire area of ellipse
+			float const scale = xradius * yradius * 0.5F;
 			s32 const minx = s32(curbounds.x0 * float(dest.width()));
 			s32 const maxx = s32(std::ceil(curbounds.x1 * float(dest.width()))) - 1;
-			float x1 = (xcenter - float(minx)) / xradius;
+			float x1 = (float(minx) - xcenter) / xradius;
 			u32 *dst = &dest.pix(miny, minx);
 			for (s32 x = minx; maxx >= x; ++x, ++dst)
 			{
 				float const x0 = x1;
-				x1 = (xcenter - float(x + 1)) / xradius;
-				float val = 0.0F;
-				if (float(x) < xcenter)
-					val += integral((std::min)(x0, 1.0F)) - integral((std::max)(x1, 0.0F));
-				if (float(x + 1) > xcenter)
-					val += integral((std::min)(-x1, 1.0F)) - integral((std::max)(-x0, 0.0F));
-				val *= xradius * yradius * 0.5F;
+				x1 = (float(x + 1) - xcenter) / xradius;
+				float const val = integral((std::max)(x0, -1.0F), (std::min)(x1, 1.0F)) * scale;
 				alpha_blend(*dst, c, val);
 			}
 		}
 		else
 		{
+			float const scale = xradius * yradius * 0.25F;
 			float const ooyradius2 = 1.0F / (yradius * yradius);
 			auto const draw_edge_row =
-					[this, &dest, &c, &curbounds, xcenter, xradius, yradius, ooyradius2] (s32 row, float ycoord, bool cross_axis)
+					[this, &dest, &c, &curbounds, xcenter, xradius, scale, ooyradius2] (s32 row, float ycoord, bool cross_axis)
 					{
 						float const xval = xradius * std::sqrt(1.0F - (ycoord * ycoord) * ooyradius2);
 						float const l = xcenter - xval;
@@ -2060,18 +2072,13 @@ public:
 						{
 							s32 minx = s32(l);
 							s32 maxx = s32(std::ceil(r)) - 1;
-							float x1 = xcenter - float(minx);
+							float x1 = float(minx) - xcenter;
 							u32 *dst = &dest.pix(row, minx);
 							for (s32 x = minx; maxx >= x; ++x, ++dst)
 							{
 								float const x0 = x1;
-								x1 = xcenter - float(x + 1);
-								float val = 0.0F;
-								if (float(x) < xcenter)
-									val += integral((std::min)(x0, xval) / xradius) - integral((std::max)(x1, 0.0F) / xradius);
-								if (float(x + 1) > xcenter)
-									val += integral((std::min)(-x1, xval) / xradius) - integral((std::max)(-x0, 0.0F) / xradius);
-								val *= xradius * yradius * 0.25F;
+								x1 = float(x + 1) - xcenter;
+								float val = integral((std::max)(x0, -xval) / xradius, (std::min)(x1, xval) / xradius) * scale;
 								val -= ((std::min)(float(x + 1), r) - (std::max)(float(x), l)) * ycoord;
 								alpha_blend(*dst, c, val);
 							}
@@ -2080,26 +2087,22 @@ public:
 						{
 							s32 const minx = s32(curbounds.x0 * float(dest.width()));
 							s32 const maxx = s32(std::ceil(curbounds.x1 * float(dest.width()))) - 1;
-							float x1 = (xcenter - float(minx)) / xradius;
+							float x1 = (float(minx) - xcenter) / xradius;
 							u32 *dst = &dest.pix(row, minx);
 							for (s32 x = minx; maxx >= x; ++x, ++dst)
 							{
 								float const x0 = x1;
-								x1 = (xcenter - float(x + 1)) / xradius;
-								float val = 0.0F;
-								if (float(x) < xcenter)
-									val += integral((std::min)(x0, 1.0F)) - integral((std::max)(x1, 0.0F));
-								if (float(x + 1) > xcenter)
-									val += integral((std::min)(-x1, 1.0F)) - integral((std::max)(-x0, 0.0F));
+								x1 = (float(x + 1) - xcenter) / xradius;
+								float val = integral((std::max)(x0, -1.0F), (std::min)(x1, 1.0F));
 								if (float(x + 1) <= l)
-									val += integral((std::min)(x0, 1.0F)) - integral(x1);
+									val += integral((std::max)(x0, -1.0F), x1);
 								else if (float(x) <= l)
-									val += integral((std::min)(x0, 1.0F)) - integral(xval / xradius);
+									val += integral((std::max)(x0, -1.0F), -xval / xradius);
 								if (float(x) >= r)
-									val += integral((std::min)(-x1, 1.0F)) - integral(-x0);
+									val += integral(x0, (std::min)(x1, 1.0F));
 								else if (float(x + 1) >= r)
-									val += integral((std::min)(-x1, 1.0F)) - integral(xval / xradius);
-								val *= xradius * yradius * 0.25F;
+									val += integral(xval / xradius, (std::min)(x1, 1.0F));
+								val *= scale;
 								val -= (std::max)(((std::min)(float(x + 1), r) - (std::max)(float(x), l)), 0.0F) * ycoord;
 								alpha_blend(*dst, c, val);
 							}
@@ -2139,14 +2142,14 @@ public:
 					{
 						float val = 0.0F;
 						if (float(x + 1) <= l0)
-							val += integral((xcenter - (std::max)(float(x), l1)) / xradius) - integral((xcenter - float(x + 1)) / xradius);
+							val += integral((xcenter - float(x + 1)) / xradius, (xcenter - (std::max)(float(x), l1)) / xradius);
 						else if (float(x) <= l0)
-							val += integral((xcenter - (std::max)(float(x), l1)) / xradius) - integral((xcenter - l0) / xradius);
+							val += integral((xcenter - l0) / xradius, (xcenter - (std::max)(float(x), l1)) / xradius);
 						else if (float(x) >= r0)
-							val += integral(((std::min)(float(x + 1), r1) - xcenter) / xradius) - integral((float(x) - xcenter) / xradius);
+							val += integral((float(x) - xcenter) / xradius, ((std::min)(float(x + 1), r1) - xcenter) / xradius);
 						else if (float(x + 1) >= r0)
-							val += integral(((std::min)(float(x + 1), r1) - xcenter) / xradius) - integral((r0 - xcenter) / xradius);
-						val *= xradius * yradius * 0.25F;
+							val += integral((r0 - xcenter) / xradius, ((std::min)(float(x + 1), r1) - xcenter) / xradius);
+						val *= scale;
 						if (float(x) <= l0)
 							val -= ((std::min)(float(x + 1), l0) - (std::max)(float(x), l1)) * ycoord1;
 						else if (float(x + 1) >= r0)
@@ -2182,22 +2185,22 @@ public:
 					{
 						float val = 0.0F;
 						if (float(x + 1) <= l0)
-							val += integral((std::min)((xcenter - float(x)) / xradius, 1.0F)) - integral((xcenter - float(x + 1)) / xradius);
+							val += integral((xcenter - float(x + 1)) / xradius, (std::min)((xcenter - float(x)) / xradius, 1.0F));
 						else if (float(x) <= l0)
-							val += integral((std::min)((xcenter - float(x)) / xradius, 1.0F)) - integral((xcenter - l0) / xradius);
+							val += integral((xcenter - l0) / xradius, (std::min)((xcenter - float(x)) / xradius, 1.0F));
 						else if (float(x) >= r0)
-							val += integral((std::min)((float(x + 1) - xcenter) / xradius, 1.0F)) - integral((float(x) - xcenter) / xradius);
+							val += integral((float(x) - xcenter) / xradius, (std::min)((float(x + 1) - xcenter) / xradius, 1.0F));
 						else if (float(x + 1) >= r0)
-							val += integral((std::min)((float(x + 1) - xcenter) / xradius, 1.0F)) - integral((r0 - xcenter) / xradius);
+							val += integral((r0 - xcenter) / xradius, (std::min)((float(x + 1) - xcenter) / xradius, 1.0F));
 						if (float(x + 1) <= l1)
-							val += integral((std::min)((xcenter - float(x)) / xradius, 1.0F)) - integral((xcenter - float(x + 1)) / xradius);
+							val += integral((xcenter - float(x + 1)) / xradius, (std::min)((xcenter - float(x)) / xradius, 1.0F));
 						else if (float(x) <= l1)
-							val += integral((std::min)((xcenter - float(x)) / xradius, 1.0F)) - integral((xcenter - l1) / xradius);
+							val += integral((xcenter - l1) / xradius, (std::min)((xcenter - float(x)) / xradius, 1.0F));
 						else if (float(x) >= r1)
-							val += integral((std::min)((float(x + 1) - xcenter) / xradius, 1.0F)) - integral((float(x) - xcenter) / xradius);
+							val += integral((float(x) - xcenter) / xradius, (std::min)((float(x + 1) - xcenter) / xradius, 1.0F));
 						else if (float(x + 1) >= r1)
-							val += integral((std::min)((float(x + 1) - xcenter) / xradius, 1.0F)) - integral((r1 - xcenter) / xradius);
-						val *= xradius * yradius * 0.25F;
+							val += integral((r1 - xcenter) / xradius, (std::min)((float(x + 1) - xcenter) / xradius, 1.0F));
+						val *= scale;
 						val += (std::max)(((std::min)(float(x + 1), r0) - (std::max)(float(x), l0)), 0.0F) * (ycenter - float(y));
 						val += (std::max)(((std::min)(float(x + 1), r1) - (std::max)(float(x), l1)), 0.0F) * (float(y + 1) - ycenter);
 						alpha_blend(*dst, c, val);
@@ -2232,14 +2235,14 @@ public:
 					{
 						float val = 0.0F;
 						if (float(x + 1) <= l1)
-							val += integral((xcenter - (std::max)(float(x), l0)) / xradius) - integral((xcenter - float(x + 1)) / xradius);
+							val += integral((xcenter - float(x + 1)) / xradius, (xcenter - (std::max)(float(x), l0)) / xradius);
 						else if (float(x) <= l1)
-							val += integral((xcenter - (std::max)(float(x), l0)) / xradius) - integral((xcenter - l1) / xradius);
+							val += integral((xcenter - l1) / xradius, (xcenter - (std::max)(float(x), l0)) / xradius);
 						else if (float(x) >= r1)
-							val += integral(((std::min)(float(x + 1), r0) - xcenter) / xradius) - integral((float(x) - xcenter) / xradius);
+							val += integral((float(x) - xcenter) / xradius, ((std::min)(float(x + 1), r0) - xcenter) / xradius);
 						else if (float(x + 1) >= r1)
-							val += integral(((std::min)(float(x + 1), r0) - xcenter) / xradius) - integral((r1 - xcenter) / xradius);
-						val *= xradius * yradius * 0.25F;
+							val += integral((r1 - xcenter) / xradius, ((std::min)(float(x + 1), r0) - xcenter) / xradius);
+						val *= scale;
 						if (float(x) <= l1)
 							val -= ((std::min)(float(x + 1), l1) - (std::max)(float(x), l0)) * ycoord0;
 						else if (float(x + 1) >= r1)
@@ -2256,27 +2259,9 @@ public:
 	}
 
 private:
-	void alpha_blend(u32 &dest, render_color const &c, float fill)
+	static float integral(float x0, float x1)
 	{
-		u32 const a(c.a * fill * 255.0F);
-		if (a)
-		{
-			u32 const r(u32(c.r * (255.0F * 255.0F)) * a);
-			u32 const g(u32(c.g * (255.0F * 255.0F)) * a);
-			u32 const b(u32(c.b * (255.0F * 255.0F)) * a);
-			alpha_blend(dest, a, r, g, b, 255 - a);
-		}
-	}
-
-	void alpha_blend(u32 &dest, u32 a, u32 r, u32 g, u32 b, u32 inva)
-	{
-		rgb_t const dpix(dest);
-		u32 const da(dpix.a());
-		u32 const finala((a * 255) + (da * inva));
-		u32 const finalr(r + (u32(dpix.r()) * da * inva));
-		u32 const finalg(g + (u32(dpix.g()) * da * inva));
-		u32 const finalb(b + (u32(dpix.b()) * da * inva));
-		dest = rgb_t(finala / 255, finalr / finala, finalg / finala, finalb / finala);
+		return integral(x1) - integral(x0);
 	}
 
 	static float integral(float x)

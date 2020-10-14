@@ -9,7 +9,7 @@
 	<element name="dotmatrixdot">
 		<rect>
 			<color red="0" green="0" blue="0" />
-			<bounds left="-0.1" top="-0.1" right="1.1" bottom="1.1" />
+			<bounds left="-0.05" top="-0.05" right="1.05" bottom="1.05" />
 		</rect>
 		<disk>
 			<color state="1" red="1.0" green="1.0" blue="1.0" />
