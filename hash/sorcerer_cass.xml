@@ -133,7 +133,7 @@ Compiled by Robbbert
 		<info name="usage" value="In Basic, BYE then LOG" />
 		<part name="cass" interface="sorcerer_cass">
 			<dataarea name="cass" size="12103836">
-				<rom name="salvo.wav" size="12103836" crc="07925abd" sha1="cde6fa8c9da41eee8db6c7c936f9bb61c5591ae6" />
+				<rom name="milen.wav" size="12103836" crc="07925abd" sha1="cde6fa8c9da41eee8db6c7c936f9bb61c5591ae6" />
 			</dataarea>
 		</part>
 	</software>
@@ -1396,6 +1396,41 @@ Compiled by Robbbert
 		<part name="cass" interface="sorcerer_cass">
 			<dataarea name="cass" size="0xd7442c">
 				<rom name="robot.wav" size="0xd7442c" crc="2edd199f" sha1="3916a5a96c57766bcee9aa56a08abe5c2ba8ee57" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="apatrol">
+		<description>Armored Patrol</description>
+		<year>1981</year>
+		<publisher>Adventure International</publisher>
+		<info name="developer" value="Wayne Westmoreland and Terry Gilman"/>
+		<info name="usage" value="Boot to Monitor, LOG. Z=left .=right, space=fire" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="0xd0742c">
+				<rom name="tank.wav" size="0xd0742c" crc="db36467d" sha1="3b590f470de8f0cc7d604f0b07ddf2bd8290aed8" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="mmind">
+		<description>Mastermind</description>
+		<year>1979</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="M. S. Warden"/>
+		<info name="usage" value="In Basic, CLOAD then RUN" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="0xa11572">
+				<rom name="mastermind.wav" size="0xa11572" crc="53bc223b" sha1="0b248697fd362de954cb282307e7293c2f5a3d0a" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="dterm">
+		<description>The Sorcerer Dumb Terminal</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Boot to Monitor, LOG" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="0x215dd6">
+				<rom name="dterm.wav" size="0x215dd6" crc="9d2cc9eb" sha1="e04df986039b804ae1589376fb89ca62d1684e90" />
 			</dataarea>
 		</part>
 	</software>
