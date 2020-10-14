@@ -685,7 +685,7 @@ void mbee_state::mbee(machine_config &config)
 	QUICKLOAD(config, "quickload", "mwb,com,bee", attotime::from_seconds(3)).set_load_callback(FUNC(mbee_state::quickload_bee));
 	QUICKLOAD(config, "quickload2", "bin", attotime::from_seconds(3)).set_load_callback(FUNC(mbee_state::quickload_bin));
 
-	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	CENTRONICS(config, m_centronics, centronics_devices, nullptr);
 	m_centronics->ack_handler().set(m_pio, FUNC(z80pio_device::strobe_a));
 
 	OUTPUT_LATCH(config, m_cent_data_out);
@@ -1120,7 +1120,7 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR  NAME       PARENT  COMPAT  MACHINE   INPUT    CLASS       INIT           COMPANY               FULLNAME
-COMP( 1982, mbee,      0,      0,      mbee,     mbee,    mbee_state, init_mbee,     "Applied Technology", "Microbee 16 Standard", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1982, mbee,      0,      0,      mbee,     mbee,    mbee_state, init_mbee,     "Applied Technology", "Microbee 16 Standard", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, mbeeic,    mbee,   0,      mbeeic,   mbee,    mbee_state, init_mbeeic,   "Applied Technology", "Microbee 32 IC", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, mbeepc,    mbee,   0,      mbeepc,   mbee,    mbee_state, init_mbeeic,   "Applied Technology", "Microbee Personal Communicator", MACHINE_SUPPORTS_SAVE )
 COMP( 1985, mbeepc85,  mbee,   0,      mbeepc,   mbee,    mbee_state, init_mbeeic,   "Applied Technology", "Microbee PC85", MACHINE_SUPPORTS_SAVE )
