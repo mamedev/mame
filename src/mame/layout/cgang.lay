@@ -113,11 +113,11 @@ license:CC0
 
 	<element name="ledg" defstate="0">
 		<disk>
-			<bounds left="-0.5" top="-0.5" right="1.5" bottom="1.5" />
+			<bounds left="-0.5" top="-0.5" right="2.5" bottom="2.5" />
 			<color red="0" green="0" blue="0" />
 		</disk>
-		<disk state="0"><color red="0.2" green="0.4" blue="0.17" /></disk>
-		<disk state="1"><color red="0.5" green="1.0" blue="0.4" /></disk>
+		<disk state="0"><bounds width="2" height="2" /><color red="0.2" green="0.4" blue="0.17" /></disk>
+		<disk state="1"><bounds width="2" height="2" /><color red="0.5" green="1.0" blue="0.4" /></disk>
 	</element>
 
 	<element name="ledr" defstate="0">
