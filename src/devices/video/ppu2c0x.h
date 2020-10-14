@@ -300,17 +300,30 @@ public:
 	ppu2c05_04_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
+class ppu2c04_clone_device : public ppu2c0x_device {
+public:
+	ppu2c04_clone_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	virtual void draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_rgb32 &bitmap) override;
+
+protected:
+	virtual void init_palette_tables() override;
+
+private:
+	required_region_ptr<uint8_t> m_palette_data;
+};
 
 // device type definition
 //extern const device_type PPU_2C0X;
-DECLARE_DEVICE_TYPE(PPU_2C02,    ppu2c02_device)    // NTSC NES
-DECLARE_DEVICE_TYPE(PPU_2C03B,   ppu2c03b_device)   // Playchoice 10
-DECLARE_DEVICE_TYPE(PPU_2C04,    ppu2c04_device)    // Vs. Unisystem
-DECLARE_DEVICE_TYPE(PPU_2C07,    ppu2c07_device)    // PAL NES
-DECLARE_DEVICE_TYPE(PPU_PALC,    ppupalc_device)    // PAL Clones
-DECLARE_DEVICE_TYPE(PPU_2C05_01, ppu2c05_01_device) // Vs. Unisystem (Ninja Jajamaru Kun)
-DECLARE_DEVICE_TYPE(PPU_2C05_02, ppu2c05_02_device) // Vs. Unisystem (Mighty Bomb Jack)
-DECLARE_DEVICE_TYPE(PPU_2C05_03, ppu2c05_03_device) // Vs. Unisystem (Gumshoe)
-DECLARE_DEVICE_TYPE(PPU_2C05_04, ppu2c05_04_device) // Vs. Unisystem (Top Gun)
+DECLARE_DEVICE_TYPE(PPU_2C02,    ppu2c02_device)       // NTSC NES
+DECLARE_DEVICE_TYPE(PPU_2C03B,   ppu2c03b_device)      // Playchoice 10
+DECLARE_DEVICE_TYPE(PPU_2C04,    ppu2c04_device)       // Vs. Unisystem
+DECLARE_DEVICE_TYPE(PPU_2C07,    ppu2c07_device)       // PAL NES
+DECLARE_DEVICE_TYPE(PPU_PALC,    ppupalc_device)       // PAL Clones
+DECLARE_DEVICE_TYPE(PPU_2C05_01, ppu2c05_01_device)    // Vs. Unisystem (Ninja Jajamaru Kun)
+DECLARE_DEVICE_TYPE(PPU_2C05_02, ppu2c05_02_device)    // Vs. Unisystem (Mighty Bomb Jack)
+DECLARE_DEVICE_TYPE(PPU_2C05_03, ppu2c05_03_device)    // Vs. Unisystem (Gumshoe)
+DECLARE_DEVICE_TYPE(PPU_2C05_04, ppu2c05_04_device)    // Vs. Unisystem (Top Gun)
+DECLARE_DEVICE_TYPE(PPU_2C04C,   ppu2c04_clone_device) // Vs. Unisystem (Super Mario Bros. bootlegs)
 
 #endif // MAME_VIDEO_PPU2C0X_H

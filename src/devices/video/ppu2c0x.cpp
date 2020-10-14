@@ -35,15 +35,16 @@
 //**************************************************************************
 
 // devices
-DEFINE_DEVICE_TYPE(PPU_2C02,    ppu2c02_device,    "ppu2c02",    "2C02 PPU")
-DEFINE_DEVICE_TYPE(PPU_2C03B,   ppu2c03b_device,   "ppu2c03b",   "2C03B PPC")
-DEFINE_DEVICE_TYPE(PPU_2C04,    ppu2c04_device,    "ppu2c04",    "2C04 PPU")
-DEFINE_DEVICE_TYPE(PPU_2C07,    ppu2c07_device,    "ppu2c07",    "2C07 PPU")
-DEFINE_DEVICE_TYPE(PPU_PALC,    ppupalc_device,    "ppupalc",    "Generic PAL Clone PPU")
-DEFINE_DEVICE_TYPE(PPU_2C05_01, ppu2c05_01_device, "ppu2c05_01", "2C05_01 PPU")
-DEFINE_DEVICE_TYPE(PPU_2C05_02, ppu2c05_02_device, "ppu2c05_02", "2C05_02 PPU")
-DEFINE_DEVICE_TYPE(PPU_2C05_03, ppu2c05_03_device, "ppu2c05_03", "2C05_03 PPU")
-DEFINE_DEVICE_TYPE(PPU_2C05_04, ppu2c05_04_device, "ppu2c05_04", "2C05_04 PPU")
+DEFINE_DEVICE_TYPE(PPU_2C02,    ppu2c02_device,       "ppu2c02",    "2C02 PPU")
+DEFINE_DEVICE_TYPE(PPU_2C03B,   ppu2c03b_device,      "ppu2c03b",   "2C03B PPC")
+DEFINE_DEVICE_TYPE(PPU_2C04,    ppu2c04_device,       "ppu2c04",    "2C04 PPU")
+DEFINE_DEVICE_TYPE(PPU_2C07,    ppu2c07_device,       "ppu2c07",    "2C07 PPU")
+DEFINE_DEVICE_TYPE(PPU_PALC,    ppupalc_device,       "ppupalc",    "Generic PAL Clone PPU")
+DEFINE_DEVICE_TYPE(PPU_2C05_01, ppu2c05_01_device,    "ppu2c05_01", "2C05_01 PPU")
+DEFINE_DEVICE_TYPE(PPU_2C05_02, ppu2c05_02_device,    "ppu2c05_02", "2C05_02 PPU")
+DEFINE_DEVICE_TYPE(PPU_2C05_03, ppu2c05_03_device,    "ppu2c05_03", "2C05_03 PPU")
+DEFINE_DEVICE_TYPE(PPU_2C05_04, ppu2c05_04_device,    "ppu2c05_04", "2C05_04 PPU")
+DEFINE_DEVICE_TYPE(PPU_2C04C,   ppu2c04_clone_device, "ppu2c04c",   "2C04 Clone PPU")
 
 
 // default address map
@@ -197,6 +198,12 @@ ppu2c05_04_device::ppu2c05_04_device(const machine_config& mconfig, const char* 
 	m_security_value = 0x1b;
 }
 
+// Vs. Unisystem (Super Mario Bros. bootlegs)
+ppu2c04_clone_device::ppu2c04_clone_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+	ppu2c0x_device(mconfig, PPU_2C04C, tag, owner, clock),
+	m_palette_data(*this, "palette", 0x100)
+{
+}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -442,6 +449,24 @@ void ppu2c0x_rgb_device::init_palette_tables()
 			//set_pen_color(entry++, pal3bit(R), pal3bit(G), pal3bit(B));
 			entry++;
 		}
+	}
+}
+
+void ppu2c04_clone_device::init_palette_tables()
+{
+	/* clone HW doesn't use color emphasis bits.
+	   however, it does have two separate palettes: colors 0-63 for background, and 64-127 for sprites
+	   (although the tile and sprite colors are identical in the Vs. SMB bootleg ROMs)
+	*/
+	for (int color_num = 0; color_num < 64*2; color_num++)
+	{
+		/* A7 line on palette ROMs is always high, color bits are in reverse order */
+		u8 color = m_palette_data[color_num | 0x80];
+		int R = bitswap<3>(color,      0, 1, 2);
+		int G = bitswap<3>(color >> 3, 0, 1, 2);
+		int B = bitswap<2>(color >> 6, 0, 1);
+
+		m_nespens[color_num] = (pal3bit(R) << 16) | (pal3bit(G) << 8) | pal2bit(B);
 	}
 }
 
@@ -754,6 +779,17 @@ void ppu2c0x_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, ui
 	palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 1);
 
 	uint32_t pix = m_nespens[palval];
+	bitmap.pix(m_scanline, sprite_xpos + pixel) = pix;
+}
+
+void ppu2c04_clone_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_rgb32 &bitmap)
+{
+	/* clone PPU clips sprites at the screen edges */
+	if ((sprite_xpos + pixel < 8) || (sprite_xpos + pixel) >= (VISIBLE_SCREEN_WIDTH - 8))
+		return;
+
+	uint16_t palval = m_palette_ram[((4 * color) | pixel_data) & 0x1f];
+	uint32_t pix = m_nespens[palval | 0x40];
 	bitmap.pix(m_scanline, sprite_xpos + pixel) = pix;
 }
 
