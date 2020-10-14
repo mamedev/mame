@@ -2065,7 +2065,7 @@ public:
 			auto const draw_edge_row =
 					[this, &dest, &c, &curbounds, xcenter, xradius, scale, ooyradius2] (s32 row, float ycoord, bool cross_axis)
 					{
-						float const xval = xradius * std::sqrt(1.0F - (ycoord * ycoord) * ooyradius2);
+						float const xval = xradius * std::sqrt((std::max)(1.0F - (ycoord * ycoord) * ooyradius2, 0.0F));
 						float const l = xcenter - xval;
 						float const r = xcenter + xval;
 						if (!cross_axis)
@@ -2115,7 +2115,7 @@ public:
 			// draw rows above the axis
 			s32 y = miny + 1;
 			float ycoord1 = ycenter - float(y);
-			float xval1 = xradius * std::sqrt(1.0F - (ycoord1 * ycoord1) * ooyradius2);
+			float xval1 = xradius * std::sqrt((std::max)(1.0F - (ycoord1 * ycoord1) * ooyradius2, 0.0F));
 			float l1 = xcenter - xval1;
 			float r1 = xcenter + xval1;
 			for ( ; (maxy > y) && (float(y + 1) <= ycenter); ++y)
@@ -2123,7 +2123,7 @@ public:
 				float const l0 = l1;
 				float const r0 = r1;
 				ycoord1 = ycenter - float(y + 1);
-				xval1 = xradius * std::sqrt(1.0F - (ycoord1 * ycoord1) * ooyradius2);
+				xval1 = xradius * std::sqrt((std::max)(1.0F - (ycoord1 * ycoord1) * ooyradius2, 0.0F));
 				l1 = xcenter - xval1;
 				r1 = xcenter + xval1;
 				s32 minx = int(l1);
@@ -2166,7 +2166,7 @@ public:
 				float const l0 = l1;
 				float const r0 = r1;
 				ycoord1 = float(y + 1) - ycenter;
-				xval1 = xradius * std::sqrt(1.0F - (ycoord1 * ycoord1) * ooyradius2);
+				xval1 = xradius * std::sqrt((std::max)(1.0F - (ycoord1 * ycoord1) * ooyradius2, 0.0F));
 				l1 = xcenter - xval1;
 				r1 = xcenter + xval1;
 				s32 const minx = int(curbounds.x0 * float(dest.width()));
@@ -2216,7 +2216,7 @@ public:
 				float const l0 = l1;
 				float const r0 = r1;
 				ycoord1 = float(y + 1) - ycenter;
-				xval1 = xradius * std::sqrt(1.0F - (ycoord1 * ycoord1) * ooyradius2);
+				xval1 = xradius * std::sqrt((std::max)(1.0F - (ycoord1 * ycoord1) * ooyradius2, 0.0F));
 				l1 = xcenter - xval1;
 				r1 = xcenter + xval1;
 				s32 minx = int(l0);
