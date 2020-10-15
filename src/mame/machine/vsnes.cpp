@@ -179,7 +179,7 @@ void vsnes_state::v_set_videorom_bank(  int start, int count, int vrom_start_ban
 	/* count determines the size of the area mapped */
 	for (i = 0; i < count; i++)
 	{
-		membank(chr_banknames[i + start])->set_entry(vrom_start_bank + i);
+		m_bank_vrom[i + start]->set_entry(vrom_start_bank + i);
 	}
 }
 
@@ -219,7 +219,8 @@ MACHINE_START_MEMBER(vsnes_state,vsnes)
 		for (i = 0; i < 8; i++)
 		{
 			ppu1_space.install_read_bank(0x0400 * i, 0x0400 * i + 0x03ff, chr_banknames[i]);
-			membank(chr_banknames[i])->configure_entries(0, m_vrom_banks, m_vrom[0], 0x400);
+			m_bank_vrom[i] = membank(chr_banknames[i]);
+			m_bank_vrom[i]->configure_entries(0, m_vrom_banks, m_vrom[0], 0x400);
 		}
 		v_set_videorom_bank(0, 8, 0);
 	}
@@ -255,10 +256,12 @@ MACHINE_START_MEMBER(vsnes_state,vsdual)
 	m_ppu1->space(AS_PROGRAM).install_read_bank(0x0000, 0x1fff, "bank2");
 	// read only!
 	m_ppu2->space(AS_PROGRAM).install_read_bank(0x0000, 0x1fff, "bank3");
-	membank("bank2")->configure_entries(0, m_vrom_size[0] / 0x2000, m_vrom[0], 0x2000);
-	membank("bank3")->configure_entries(0, m_vrom_size[1] / 0x2000, m_vrom[1], 0x2000);
-	membank("bank2")->set_entry(0);
-	membank("bank3")->set_entry(0);
+	m_bank_vrom[0] = membank("bank2");
+	m_bank_vrom[1] = membank("bank3");
+	m_bank_vrom[0]->configure_entries(0, m_vrom_size[0] / 0x2000, m_vrom[0], 0x2000);
+	m_bank_vrom[1]->configure_entries(0, m_vrom_size[1] / 0x2000, m_vrom[1], 0x2000);
+	m_bank_vrom[0]->set_entry(0);
+	m_bank_vrom[1]->set_entry(0);
 }
 
 MACHINE_START_MEMBER(vsnes_state, bootleg)
@@ -278,8 +281,9 @@ MACHINE_START_MEMBER(vsnes_state, bootleg)
 
 	/* establish chr banks */
 	m_ppu1->space(AS_PROGRAM).install_read_bank(0x0000, 0x1fff, "bank2");
-	membank("bank2")->configure_entries(0, m_vrom_banks, m_vrom[0], 0x2000);
-	membank("bank2")->set_entry(0);
+	m_bank_vrom[0] = membank("bank2");
+	m_bank_vrom[0]->configure_entries(0, m_vrom_banks, m_vrom[0], 0x2000);
+	m_bank_vrom[0]->set_entry(0);
 }
 
 /*************************************
@@ -1038,7 +1042,7 @@ void vsnes_state::init_bnglngby()
 void vsnes_state::vsdual_vrom_banking_main(uint8_t data)
 {
 	/* switch vrom */
-	membank("bank2")->set_entry(BIT(data, 2));
+	m_bank_vrom[0]->set_entry(BIT(data, 2));
 
 	/* bit 1 ( data & 2 ) triggers irq on the other cpu */
 	m_subcpu->set_input_line(0, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
@@ -1050,7 +1054,7 @@ void vsnes_state::vsdual_vrom_banking_main(uint8_t data)
 void vsnes_state::vsdual_vrom_banking_sub(uint8_t data)
 {
 	/* switch vrom */
-	membank("bank3")->set_entry(BIT(data, 2));
+	m_bank_vrom[1]->set_entry(BIT(data, 2));
 
 	/* bit 1 ( data & 2 ) triggers irq on the other cpu */
 	m_maincpu->set_input_line(0, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
@@ -1089,11 +1093,9 @@ void vsnes_state::vsnes_bootleg_scanline(int scanline, int vblank, int blanked)
 uint8_t vsnes_state::vsnes_bootleg_ppudata()
 {
 	// CPU always reads higher CHR ROM banks from $2007, PPU always reads lower ones
-	memory_bank *vrom = membank("bank2");
-
-	vrom->set_entry(1);
+	m_bank_vrom[0]->set_entry(1);
 	uint8_t data = m_ppu1->read(0x2007);
-	vrom->set_entry(0);
+	m_bank_vrom[0]->set_entry(0);
 
 	return data;
 }

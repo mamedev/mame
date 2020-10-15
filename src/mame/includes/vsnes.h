@@ -125,6 +125,7 @@ private:
 	std::unique_ptr<uint8_t[]> m_vram;
 	uint8_t* m_vrom[2];
 	std::unique_ptr<uint8_t[]> m_nt_ram[2];
+	memory_bank* m_bank_vrom[8];
 	uint8_t* m_nt_page[2][4];
 	uint32_t m_vrom_size[2];
 	int m_vrom_banks;
