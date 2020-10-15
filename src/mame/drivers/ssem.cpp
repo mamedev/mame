@@ -537,19 +537,33 @@ void ssem_state::strlower(char *buf)
 QUICKLOAD_LOAD_MEMBER(ssem_state::quickload_cb)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	char image_line[100] = { 0 };
+	char* image_line;
 	char token_buf[100] = { 0 };
 	int num_lines = 0;
+	u32 length = image.length()+1;
+	char quick_data[length];
+	image.fread( quick_data, length);
 
-	image.fgets(image_line, 99);
+	image_line = strtok(quick_data, "\n");
+	if (!image_line)
+	{
+		image.message("No data in line 1");
+		return image_init_result::FAIL;
+	}
+
 	sscanf(image_line, "%d", &num_lines);
 
 	if (num_lines)
 	{
 		for (int i = 0; i < num_lines; i++)
 		{
-			uint32_t line = 0;
-			image.fgets(image_line, 99);
+			u32 line = 0, word = 0;
+			image_line = strtok(NULL, "\n");
+			if (!image_line)
+			{
+				image.message("No data in line %d",i+2);
+				return image_init_result::FAIL;
+			}
 
 			// Isolate and convert 4-digit decimal address
 			memcpy(token_buf, image_line, 4);
@@ -558,26 +572,30 @@ QUICKLOAD_LOAD_MEMBER(ssem_state::quickload_cb)
 
 			if (image.is_filetype("snp"))
 			{
-				uint32_t word = 0;
-
-				// Parse a line such as: 0000:00000110101001000100000100000100
-				for (int b = 0; b < 32; b++)
+				if (strlen(image_line) < 38)
 				{
-					if (image_line[5 + b] == '1')
-						word |= 1 << (31 - b);
+					image.message("Bad data in line %d",i+2);
+					return image_init_result::FAIL;
 				}
 
-				space.write_byte((line << 2) + 0, (word >> 24) & 0x000000ff);
-				space.write_byte((line << 2) + 1, (word >> 16) & 0x000000ff);
-				space.write_byte((line << 2) + 2, (word >>  8) & 0x000000ff);
-				space.write_byte((line << 2) + 3, (word >>  0) & 0x000000ff);
+				// Parse a line such as: 0000:00000110101001000100000100000100
+				for (u8 b = 0; b < 32; b++)
+					if (image_line[5 + b] == '1')
+						word |= 1 << (31 - b);
 			}
-			else if (image.is_filetype("asm"))
+			else
+			if (image.is_filetype("asm"))
 			{
+				length = strlen(image_line);
+				if (length < 9)
+				{
+					image.message("Bad data in line %d",i+2);
+					return image_init_result::FAIL;
+				}
+
 				char op_buf[4] = { 0 };
 				int32_t value = 0;
 				uint32_t unsigned_value = 0;
-				uint32_t word = 0;
 
 				// Isolate the opcode and convert to lower-case
 				memcpy(op_buf, image_line + 5, 3);
@@ -585,31 +603,41 @@ QUICKLOAD_LOAD_MEMBER(ssem_state::quickload_cb)
 				strlower(op_buf);
 
 				// Isolate the value
-				sscanf(image_line + 9, "%d", &value);
-				unsigned_value = reverse((uint32_t)value);
+				if (length > 8)
+				{
+					sscanf(image_line + 9, "%d", &value);
+					unsigned_value = reverse((uint32_t)value);
+				}
 
 				if (!core_stricmp(op_buf, "num"))
 					word = unsigned_value;
-				else if (!core_stricmp(op_buf, "jmp"))
+				else
+				if (!core_stricmp(op_buf, "jmp"))
 					word = 0x00000000 | unsigned_value ;
-				else if (!core_stricmp(op_buf, "jrp"))
+				else
+				if (!core_stricmp(op_buf, "jrp"))
 					word = 0x00040000 | unsigned_value;
-				else if (!core_stricmp(op_buf, "ldn"))
+				else
+				if (!core_stricmp(op_buf, "ldn"))
 					word = 0x00020000 | unsigned_value;
-				else if (!core_stricmp(op_buf, "sto"))
+				else
+				if (!core_stricmp(op_buf, "sto"))
 					word = 0x00060000 | unsigned_value;
-				else if (!core_stricmp(op_buf, "sub"))
+				else
+				if (!core_stricmp(op_buf, "sub"))
 					word = 0x00010000 | unsigned_value;
-				else if (!core_stricmp(op_buf, "cmp"))
+				else
+				if (!core_stricmp(op_buf, "cmp"))
 					word = 0x00030000 | unsigned_value;
-				else if (!core_stricmp(op_buf, "stp"))
+				else
+				if (!core_stricmp(op_buf, "stp"))
 					word = 0x00070000 | unsigned_value;
-
-				space.write_byte((line << 2) + 0, (word >> 24) & 0x000000ff);
-				space.write_byte((line << 2) + 1, (word >> 16) & 0x000000ff);
-				space.write_byte((line << 2) + 2, (word >>  8) & 0x000000ff);
-				space.write_byte((line << 2) + 3, (word >>  0) & 0x000000ff);
 			}
+
+			space.write_byte((line << 2) + 0, BIT(word, 24, 8));
+			space.write_byte((line << 2) + 1, BIT(word, 16, 8));
+			space.write_byte((line << 2) + 2, BIT(word, 8,  8));
+			space.write_byte((line << 2) + 3, BIT(word, 0,  8));
 		}
 	}
 
