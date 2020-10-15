@@ -324,7 +324,6 @@ void tv990_state::tv990_mem(address_map &map)
 
 /* Input ports */
 static INPUT_PORTS_START( tv990 )
-	PORT_INCLUDE( at_keyboard )
 	PORT_START("Screen")
 	PORT_CONFNAME( 0x30, 0x00, "Color") PORT_CHANGED_MEMBER(DEVICE_SELF, tv990_state, color, 0)
 	PORT_CONFSETTING(    0x00, "Green")

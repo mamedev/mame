@@ -37,6 +37,7 @@ public:
 protected:
 	pc_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
+	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -89,6 +90,7 @@ public:
 	void set_type(KEYBOARD_TYPE type, int default_set) { m_scan_code_set = default_set; m_type = type; }
 
 protected:
+	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_reset() override;
 	virtual void device_start() override;
 
@@ -114,7 +116,6 @@ private:
 };
 
 INPUT_PORTS_EXTERN( pc_keyboard );
-INPUT_PORTS_EXTERN( at_keyboard );
 
 DECLARE_DEVICE_TYPE(PC_KEYB, pc_keyboard_device)
 DECLARE_DEVICE_TYPE(AT_KEYB, at_keyboard_device)

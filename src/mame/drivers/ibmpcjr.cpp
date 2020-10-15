@@ -119,8 +119,6 @@ private:
 };
 
 static INPUT_PORTS_START( ibmpcjr )
-	PORT_INCLUDE(pc_keyboard)
-
 	PORT_START("IN0") /* IN0 */
 	PORT_BIT ( 0xf0, 0xf0,   IPT_UNUSED )
 	PORT_BIT ( 0x08, 0x08,   IPT_CUSTOM ) PORT_VBLANK("pcvideo_pcjr:screen")

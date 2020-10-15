@@ -1241,7 +1241,6 @@ ROM_START(nforcepc)
 ROM_END
 
 static INPUT_PORTS_START(nforcepc)
-	PORT_INCLUDE(at_keyboard)
 INPUT_PORTS_END
 
 COMP(2002, nforcepc, 0, 0, nforcepc, nforcepc, nforcepc_state, empty_init, "Nvidia", "Nvidia nForce PC (CRUSH11/12)", MACHINE_IS_SKELETON)

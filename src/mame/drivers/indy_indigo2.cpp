@@ -310,7 +310,6 @@ void ip24_state::machine_reset()
 }
 
 static INPUT_PORTS_START( ip24 )
-	PORT_INCLUDE( at_keyboard )
 INPUT_PORTS_END
 
 void ip24_state::wd33c93(device_t *device)
