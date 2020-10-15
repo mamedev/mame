@@ -276,10 +276,9 @@ void vsnes_state::vsnes_cpu1_bootleg_map(address_map &map)
 	map(0x0000, 0x07ff).mirror(0x1800).ram().share("work_ram");
 	map(0x2000, 0x3fff).rw(m_ppu1, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
 	map(0x4000, 0x400f).w(FUNC(vsnes_state::bootleg_sound_write));
-	map(0x4014, 0x4014).w(FUNC(vsnes_state::sprite_dma_0_w));
 	map(0x4016, 0x4016).rw(FUNC(vsnes_state::vsnes_in0_r), FUNC(vsnes_state::vsnes_in0_w));
 	map(0x4017, 0x4017).r(FUNC(vsnes_state::vsnes_in1_r)); /* IN1 - input port 2 / PSG second control register */
-	map(0x4020, 0x4020).rw(FUNC(vsnes_state::vsnes_coin_counter_r), FUNC(vsnes_state::vsnes_coin_counter_w));
+	map(0x4020, 0x4020).w(FUNC(vsnes_state::vsnes_coin_counter_w));
 	map(0x6000, 0x7fff).bankrw("extra1");
 	map(0x8000, 0xffff).rom();
 }
@@ -1849,7 +1848,7 @@ void vsnes_state::vsnes_bootleg(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &vsnes_state::vsnes_cpu1_bootleg_map);
 	/* some carts also trigger IRQs */
 	MCFG_MACHINE_RESET_OVERRIDE(vsnes_state,vsnes)
-	MCFG_MACHINE_START_OVERRIDE(vsnes_state,vsnes)
+	MCFG_MACHINE_START_OVERRIDE(vsnes_state,bootleg)
 
 	Z80(config, m_subcpu, XTAL(16'000'000)/8); // Z8400APS-Z80CPU
 	m_subcpu->set_addrmap(AS_PROGRAM, &vsnes_state::vsnes_bootleg_z80_map);
@@ -1865,8 +1864,6 @@ void vsnes_state::vsnes_bootleg(machine_config &config)
 	m_ppu1->set_cpu_tag(m_maincpu);
 	m_ppu1->set_screen("screen1");
 	m_ppu1->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	m_ppu1->use_sprite_write_limitation_disable(); // bootleg seems to need this - code to set the sprite address is replaced with complete copy loops??
-	m_ppu1->set_scanlines_per_frame(screen1.height());
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

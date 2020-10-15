@@ -261,6 +261,27 @@ MACHINE_START_MEMBER(vsnes_state,vsdual)
 	membank("bank3")->set_entry(0);
 }
 
+MACHINE_START_MEMBER(vsnes_state, bootleg)
+{
+	address_space &ppu1_space = m_ppu1->space(AS_PROGRAM);
+
+	/* establish nametable ram */
+	m_nt_ram[0] = std::make_unique<uint8_t[]>(0x1000);
+	/* set mirroring */
+	v_set_mirroring(0, PPU_MIRROR_VERT);
+
+	ppu1_space.install_readwrite_handler(0x2000, 0x3eff, read8sm_delegate(*this, FUNC(vsnes_state::vsnes_nt0_r)), write8sm_delegate(*this, FUNC(vsnes_state::vsnes_nt0_w)));
+
+	m_vrom[0] = m_gfx1_rom->base();
+	m_vrom_size[0] = m_gfx1_rom->bytes();
+	m_vrom_banks = m_vrom_size[0] / 0x2000;
+
+	/* establish chr banks */
+	m_ppu1->space(AS_PROGRAM).install_read_bank(0x0000, 0x1fff, "bank2");
+	membank("bank2")->configure_entries(0, m_vrom_banks, m_vrom[0], 0x2000);
+	membank("bank2")->set_entry(0);
+}
+
 /*************************************
  *
  *  External mappings for PPU bus
@@ -1065,6 +1086,18 @@ void vsnes_state::vsnes_bootleg_scanline(int scanline, int vblank, int blanked)
 	}
 }
 
+uint8_t vsnes_state::vsnes_bootleg_ppudata()
+{
+	// CPU always reads higher CHR ROM banks from $2007, PPU always reads lower ones
+	memory_bank *vrom = membank("bank2");
+
+	vrom->set_entry(1);
+	uint8_t data = m_ppu1->read(0x2007);
+	vrom->set_entry(0);
+
+	return data;
+}
+
 void vsnes_state::init_bootleg()
 {
 	m_bootleg_sound_offset = 0;
@@ -1073,6 +1106,5 @@ void vsnes_state::init_bootleg()
 
 	m_ppu1->set_scanline_callback(*this, FUNC(vsnes_state::vsnes_bootleg_scanline));
 
-	/* normal banking */
-	init_vsnormal();
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2007, 0x2007, read8smo_delegate(*this, FUNC(vsnes_state::vsnes_bootleg_ppudata)));
 }

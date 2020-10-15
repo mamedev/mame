@@ -100,6 +100,7 @@ private:
 	DECLARE_MACHINE_RESET(vsnes);
 	DECLARE_MACHINE_START(vsdual);
 	DECLARE_MACHINE_RESET(vsdual);
+	DECLARE_MACHINE_START(bootleg);
 	void v_set_videorom_bank(  int start, int count, int vrom_start_bank );
 	void mapper4_set_prg(  );
 	void mapper4_set_chr(  );
@@ -109,6 +110,7 @@ private:
 	uint8_t vsnes_bootleg_z80_data_r();
 	uint8_t vsnes_bootleg_z80_address_r(offs_t offset);
 	void vsnes_bootleg_scanline(int scanline, int vblank, int blanked);
+	uint8_t vsnes_bootleg_ppudata();
 
 	void vsnes_bootleg_z80_map(address_map &map);
 	void vsnes_cpu1_bootleg_map(address_map &map);

@@ -53,14 +53,17 @@ public:
 
 	enum
 	{
-		NTSC_SCANLINES_PER_FRAME   = 262,
-		PAL_SCANLINES_PER_FRAME    = 312,
+		NTSC_SCANLINES_PER_FRAME     = 262,
+		PAL_SCANLINES_PER_FRAME      = 312,
+		VS_CLONE_SCANLINES_PER_FRAME = 280,
 
-		BOTTOM_VISIBLE_SCANLINE    = 239,
-		VBLANK_FIRST_SCANLINE      = 241,
-		VBLANK_FIRST_SCANLINE_PALC = 291,
-		VBLANK_LAST_SCANLINE_NTSC  = 260,
-		VBLANK_LAST_SCANLINE_PAL   = 310
+		BOTTOM_VISIBLE_SCANLINE        = 239,
+		VBLANK_FIRST_SCANLINE          = 241,
+		VBLANK_FIRST_SCANLINE_PALC     = 291,
+		VBLANK_FIRST_SCANLINE_VS_CLONE = 240,
+		VBLANK_LAST_SCANLINE_NTSC      = 260,
+		VBLANK_LAST_SCANLINE_PAL       = 310,
+		VBLANK_LAST_SCANLINE_VS_CLONE  = 279
 
 		// Both the scanline immediately before and immediately after VBLANK
 		// are non-rendering and non-vblank.
@@ -207,6 +210,7 @@ protected:
 	int                         m_back_color;           /* background color */
 	int                         m_refresh_data;         /* refresh-related */
 	int                         m_x_fine;               /* refresh-related */
+	int                         m_toggle;               /* used to latch hi-lo scroll */
 	int                         m_tilecount;            /* MMC5 can change attributes to subsets of the 34 visible tiles */
 	latch_delegate              m_latch;
 
@@ -228,7 +232,6 @@ private:
 	devcb_write_line            m_int_callback;         /* nmi access callback from interface */
 
 	int                         m_refresh_latch;        /* refresh-related */
-	int                         m_toggle;               /* used to latch hi-lo scroll */
 	int                         m_add;              /* vram increment amount */
 	int                         m_videomem_addr;        /* videomem address pointer */
 	int                         m_data_latch;           /* latched videomem data */
@@ -304,9 +307,12 @@ class ppu2c04_clone_device : public ppu2c0x_device {
 public:
 	ppu2c04_clone_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
+
+	virtual void draw_background(uint8_t *line_priority) override;
 	virtual void draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_rgb32 &bitmap) override;
 
-protected:
 	virtual void init_palette_tables() override;
 
 private:
