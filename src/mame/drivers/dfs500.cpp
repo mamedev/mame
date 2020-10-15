@@ -194,7 +194,7 @@ void dfs500_state::machine_reset()
 
 uint32_t dfs500_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect)
 {
-	bitmap_argb32 *input_bitmap = &m_input[m_input_sel_A & 3]->get_bitmap();
+	bitmap_argb32 const *input_bitmap = &m_input[m_input_sel_A & 3]->get_bitmap();
 
 	if (input_bitmap)
 	{
