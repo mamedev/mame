@@ -336,7 +336,7 @@ natural_keyboard::natural_keyboard(running_machine &machine)
 {
 	// try building a list of keycodes; if none are available, don't bother
 	build_codes();
-	if (m_have_charkeys)
+	if (!m_keyboards.empty())
 	{
 		m_buffer.resize(KEY_BUFFER_SIZE);
 		m_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(natural_keyboard::timer), this));
@@ -355,6 +355,7 @@ natural_keyboard::natural_keyboard(running_machine &machine)
 void natural_keyboard::configure(ioport_queue_chars_delegate queue_chars, ioport_accept_char_delegate accept_char, ioport_charqueue_empty_delegate charqueue_empty)
 {
 	// set the callbacks
+	assert(m_timer != nullptr);
 	m_queue_chars = std::move(queue_chars);
 	m_accept_char = std::move(accept_char);
 	m_charqueue_empty = std::move(charqueue_empty);
@@ -657,6 +658,9 @@ void natural_keyboard::build_codes()
 	bool have_keyboard(false);
 	for (kbd_dev_info &devinfo : m_keyboards)
 	{
+		if (LOG_NATURAL_KEYBOARD)
+			machine().logerror("natural_keyboard: building codes for %s... (%u fields)\n", devinfo.device.get().tag(), devinfo.keyfields.size());
+
 		// enable all pure keypads and the first keyboard
 		if (!devinfo.keyboard || !have_keyboard)
 			devinfo.enabled = true;
@@ -676,6 +680,8 @@ void natural_keyboard::build_codes()
 					{
 						mask |= 1U << (code - UCHAR_SHIFT_BEGIN);
 						shift[code - UCHAR_SHIFT_BEGIN] = &field;
+						if (LOG_NATURAL_KEYBOARD)
+							machine().logerror("natural_keyboard: UCHAR_SHIFT_%d found\n", code - UCHAR_SHIFT_BEGIN + 1);
 					}
 				}
 			}
