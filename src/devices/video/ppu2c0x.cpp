@@ -206,8 +206,6 @@ ppu2c04_clone_device::ppu2c04_clone_device(const machine_config& mconfig, const 
 	m_scanlines_per_frame = VS_CLONE_SCANLINES_PER_FRAME;
 	m_vblank_first_scanline = VBLANK_FIRST_SCANLINE_VS_CLONE;
 
-	use_sprite_write_limitation_disable(); // bootleg seems to need this - code to set the sprite address is replaced with complete copy loops??
-
 	// background and sprites are always enabled; monochrome and color emphasis aren't supported
 	m_regs[PPU_CONTROL1] = ~(PPU_CONTROL1_COLOR_EMPHASIS | PPU_CONTROL1_DISPLAY_MONO);
 }
@@ -271,6 +269,20 @@ void ppu2c0x_device::device_start()
 		m_palette_ram[i] = 0x00;
 
 	save_item(NAME(m_palette_ram));
+}
+
+void ppu2c04_clone_device::device_start()
+{
+	ppu2c0x_device::device_start();
+
+	/* this PPU clone draws sprites into a frame buffer before displaying them,
+	causing sprite rendering to be one frame behind tile/background rendering
+	(mainly noticeable during scrolling)
+	to simulate that, we can just have a secondary OAM buffer and swap them
+	at the end of each frame
+	*/
+	m_spritebuf = make_unique_clear<uint8_t[]>(SPRITERAM_SIZE);
+	save_pointer(NAME(m_spritebuf), SPRITERAM_SIZE);
 }
 
 //**************************************************************************
@@ -1005,6 +1017,19 @@ void ppu2c0x_device::draw_sprites(uint8_t* line_priority)
 	}
 }
 
+void ppu2c04_clone_device::draw_sprites(uint8_t *line_priority)
+{
+	ppu2c0x_device::draw_sprites(line_priority);
+
+	if (m_scanline == BOTTOM_VISIBLE_SCANLINE)
+	{
+		/* this frame's sprite buffer is cleared after being displayed
+		and the other one that was filled this frame will be displayed next frame */
+		m_spriteram.swap(m_spritebuf);
+		memset(m_spritebuf.get(), 0, SPRITERAM_SIZE);
+	}
+}
+
 /*************************************
  *
  *  Scanline Rendering and Update
@@ -1247,6 +1272,9 @@ uint8_t ppu2c04_clone_device::read(offs_t offset)
 		if (m_scanline < 31 || m_scanline >= (m_vblank_first_scanline - 1))
 			return ~PPU_STATUS_SPRITE0_HIT;
 		return 0xff;
+
+	case PPU_SPRITE_DATA: /* 4 */
+		return m_spritebuf[m_regs[PPU_SPRITE_ADDRESS]];
 	}
 
 	return ppu2c0x_device::read(offset);
@@ -1402,6 +1430,11 @@ void ppu2c04_clone_device::write(offs_t offset, uint8_t data)
 	case PPU_CONTROL1: /* 1 */
 	case PPU_SPRITE_ADDRESS: /* 3 */
 		return; /* $2001 and $2003 do nothing on this clone */
+
+	case PPU_SPRITE_DATA: /* 4 */
+		m_spritebuf[m_regs[PPU_SPRITE_ADDRESS]] = data;
+		m_regs[PPU_SPRITE_ADDRESS] = (m_regs[PPU_SPRITE_ADDRESS] + 1) & 0xff;
+		return;
 
 	case PPU_SCROLL: /* 5 */
 		if (m_toggle)

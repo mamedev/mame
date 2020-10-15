@@ -312,11 +312,17 @@ public:
 
 	virtual void draw_background(uint8_t *line_priority) override;
 	virtual void draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_rgb32 &bitmap) override;
+	virtual void draw_sprites(uint8_t *line_priority) override;
 
 	virtual void init_palette_tables() override;
 
+protected:
+	virtual void device_start() override;
+
 private:
 	required_region_ptr<uint8_t> m_palette_data;
+
+	std::unique_ptr<uint8_t[]>   m_spritebuf; /* buffered sprite ram for next frame */
 };
 
 // device type definition
