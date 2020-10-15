@@ -913,7 +913,7 @@ void nwktr_state::nwktr(machine_config &config)
 	m_voodoo[0]->set_cpu_tag(m_dsp);
 	m_voodoo[0]->vblank_callback().set(FUNC(nwktr_state::voodoo_vblank_0));
 
-	VOODOO_1(config, m_voodoo[0], XTAL(50'000'000));
+	VOODOO_1(config, m_voodoo[1], XTAL(50'000'000));
 	m_voodoo[1]->set_fbmem(2);
 	m_voodoo[1]->set_tmumem(2,2);
 	m_voodoo[1]->set_screen_tag("rscreen");
