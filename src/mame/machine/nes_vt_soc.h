@@ -1,8 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-
-#ifndef MAME_MACHINE_NES_VT_H
-#define MAME_MACHINE_NES_VT_H
+#ifndef MAME_MACHINE_NES_VT_SOC_H
+#define MAME_MACHINE_NES_VT_SOC_H
 
 #pragma once
 
@@ -341,4 +340,4 @@ DECLARE_DEVICE_TYPE(NES_VT_SOC_4KRAM_FP_PAL, nes_vt_soc_4kram_fp_pal_device)
 DECLARE_DEVICE_TYPE(NES_VT_SOC_8KRAM_DG, nes_vt_soc_8kram_dg_device)
 DECLARE_DEVICE_TYPE(NES_VT_SOC_8KRAM_FA, nes_vt_soc_8kram_fa_device)
 
-#endif // MAME_MACHINE_NES_VT_H
+#endif // MAME_MACHINE_NES_VT_SOC_H
