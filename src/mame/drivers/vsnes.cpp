@@ -1955,7 +1955,7 @@ ROM_START( suprmriobl )
 	ROM_REGION( 0x10000, "sub", 0 ) /* Z80 memory */
 	ROM_LOAD( "1.bin",  0x0000, 0x2000, CRC(9e3557f2) SHA1(11a0de2c0154f7ac120d9774cb5d1051e0156822) )
 
-	ROM_REGION( 0x10000, "unk", 0 ) /* first half is some sort of table */
+	ROM_REGION( 0x10000, "unk", 0 ) /* Table used by clone PPU for sprite flipping, etc. */
 	ROM_LOAD( "3.bin",  0x0000, 0x8000, CRC(67a467f9) SHA1(61cd1db7cd52faa31153b89f6b98c9b78bf4ca4f) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 ) /* PPU memory */
@@ -1984,7 +1984,7 @@ ROM_START( suprmriobl2 )
 	ROM_REGION( 0x10000, "sub", 0 ) /* Z80 memory */
 	ROM_LOAD( "1-2764.bin",  0x0000, 0x2000, CRC(95856e07) SHA1(c681cfdb656e687bc59080df56c9c38e13be4bb8) )
 
-	ROM_REGION( 0x10000, "unk", 0 ) /* first half is some sort of table */
+	ROM_REGION( 0x10000, "unk", 0 ) /* Table used by clone PPU for sprite flipping, etc. */
 	ROM_LOAD( "3-27256.bin",  0x0000, 0x8000, CRC(67a467f9) SHA1(61cd1db7cd52faa31153b89f6b98c9b78bf4ca4f) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 ) /* PPU memory */
@@ -2000,10 +2000,10 @@ ROM_START( suprmriobl3 )
 	ROM_REGION( 0x10000, "maincpu", 0 ) // 6502 memory
 	ROM_LOAD( "sm_4.bin",  0x8000, 0x8000, CRC(663b1753) SHA1(b0d2057c4545f2d6534cafb16086826c8ba49f5a) )
 
-	ROM_REGION( 0x10000, "sub", 0 ) // Z80 memory
-	ROM_LOAD( "sm_1.bin",  0x0000, 0x2000, CRC(7f6dda4a) SHA1(0e92a1255ce13ae1215b531f268cd4874e20d611) )
+	ROM_REGION( 0x10000, "sub", 0 ) // Z80 memory (NMI and IRQ return instructions are corrupted)
+	ROM_LOAD( "sm_1.bin",  0x0000, 0x2000, BAD_DUMP CRC(7f6dda4a) SHA1(0e92a1255ce13ae1215b531f268cd4874e20d611) )
 
-	ROM_REGION( 0x10000, "unk", 0 ) // First half is some sort of table
+	ROM_REGION( 0x10000, "unk", 0 ) // Table used by clone PPU for sprite flipping, etc.
 	ROM_LOAD( "sm_3.bin",  0x0000, 0x8000, CRC(67a467f9) SHA1(61cd1db7cd52faa31153b89f6b98c9b78bf4ca4f) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 ) // PPU memory
