@@ -229,11 +229,31 @@ void microdar_state::microdv5(machine_config &config)
 	ROM_FILL(0x0e6a, 1, 0x22)
 
 ROM_START(dibifuca)
+	PHILIPS_REF34VA
+
+	ROM_REGION(0x20000, "program", 0)
+	ROM_LOAD("compumatic_925.ic3", 0x00000, 0x20000, CRC(0d49be4b) SHA1(685a35b6040ca2ca1a92068e890d4a5abbcbab0a)) // TMS27C010A
+
+	ROM_REGION(0x800, "eeprom", 0)
+	ROM_LOAD("24lc16b.ic8", 0x000, 0x800, NO_DUMP)
+ROM_END
+
+ROM_START(dibif743)
+	PHILIPS_REF34VA
+
+	ROM_REGION(0x20000, "program", 0)
+	ROM_LOAD("compumatic_743.ic3", 0x00000, 0x20000, CRC(ece15715) SHA1(f6cbc420e5d77ff753ceb1e9d3e6119e9a3f83d9)) // W29C011A
+
+	ROM_REGION(0x800, "eeprom", 0)
+	ROM_LOAD("24lc16b.ic8", 0x000, 0x800, NO_DUMP)
+ROM_END
+
+ROM_START(dibif727)
 	// Philips REF34VA K7V5534 9818h
 	PHILIPS_REF34VA
 
 	ROM_REGION(0x20000, "program", 0)
-	ROM_LOAD("compumatic_727.ic3", 0x00000, 0x20000, CRC(ccf973b6) SHA1(ab67e466849b3bbd8f24be041c979c3f833a32a8))
+	ROM_LOAD("compumatic_727.ic3", 0x00000, 0x20000, CRC(ccf973b6) SHA1(ab67e466849b3bbd8f24be041c979c3f833a32a8)) // W29C011A
 
 	ROM_REGION(0x800, "eeprom", 0)
 	ROM_LOAD("24lc16b.ic8", 0x000, 0x800, CRC(1cae70db) SHA1(575d4c787fd65950417e85fdb34d2961fc327c74))
@@ -248,6 +268,7 @@ ROM_START(cfarwest)
 
 	// No EEPROM on this PCB
 ROM_END
+
 
 /* Compumatic ProSPDP-V3 PCB
   ____________________________________________________________________________________________________
@@ -308,6 +329,7 @@ ROM_START(prospdp)
 	ROM_LOAD("atf16v8b.ic7", 0x000, 0x117, CRC(85e98105) SHA1(9b3389eedd62b3e599559a03e9664ed1e374d60b))
 ROM_END
 
+
 /* Compumatic Microdard-V5 PCB
    _______________________________________________________________________________
   | ______    _____________________________  _________  TEST  ___  _______     __|
@@ -342,7 +364,10 @@ ROM_START(diolakoa)
 	ROM_LOAD("palce16v8h.ic8", 0x000, 0x117, NO_DUMP)
 ROM_END
 
-GAME(199?, dibifuca, 0, microdar, microdar, microdar_state, empty_init, ROT0, "Compumatic / Bifuca", "Diana Bifuca",                                   MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1997, cfarwest, 0, microdar, microdar, microdar_state, empty_init, ROT0, "Compumatic",          "Far West (Compumatic)",                          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1997, prospdp,  0, prospdp,  microdar, microdar_state, empty_init, ROT0, "Compumatic",          "Unknown Compumatic ProSPDP based darts machine", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1997, diolakoa, 0, microdv5, microdar, microdar_state, empty_init, ROT0, "Compumatic / Olakoa", "Diana Olakoa",                                   MACHINE_IS_SKELETON_MECHANICAL)
+
+GAME(199?, dibifuca, 0,        microdar, microdar, microdar_state, empty_init, ROT0, "Compumatic / Bifuca", "Diana Bifuca (v9.25)",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(199?, dibif743, dibifuca, microdar, microdar, microdar_state, empty_init, ROT0, "Compumatic / Bifuca", "Diana Bifuca (v7.43)",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(199?, dibif727, dibifuca, microdar, microdar, microdar_state, empty_init, ROT0, "Compumatic / Bifuca", "Diana Bifuca (v7.27)",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1997, cfarwest, 0,        microdar, microdar, microdar_state, empty_init, ROT0, "Compumatic",          "Far West (Compumatic)",                          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1997, prospdp,  0,        prospdp,  microdar, microdar_state, empty_init, ROT0, "Compumatic",          "Unknown Compumatic ProSPDP based darts machine", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1997, diolakoa, 0,        microdv5, microdar, microdar_state, empty_init, ROT0, "Compumatic / Olakoa", "Diana Olakoa",                                   MACHINE_IS_SKELETON_MECHANICAL)
