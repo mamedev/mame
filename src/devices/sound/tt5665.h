@@ -74,7 +74,7 @@ private:
 	{
 	public:
 		tt5665_voice();
-		void generate_adpcm(device_rom_interface &rom, stream_buffer::sample_t *buffer);
+		void generate_adpcm(device_rom_interface &rom, s32 *buffer);
 
 		oki_adpcm_state m_adpcm;          // current ADPCM state
 		bool            m_playing;
@@ -94,7 +94,7 @@ private:
 	tt5665_voice    m_voice[TT5665_VOICES * 2]; // separated voice for left and right output
 	s32             m_command;
 	sound_stream*   m_stream;
-	stream_buffer::sample_t m_daol_output;
+	s32             m_daol_output;
 	int             m_daol_timing;
 
 	inline int freq_divider() const { return m_ss_state ? 136 : 170; }
