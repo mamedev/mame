@@ -1,20 +1,22 @@
 // license:BSD-3-Clause
 // copyright-holders:
 /*
-	Funworld Photo Play Spirit Xtreme
+Funworld Photo Play Spirit Xtreme
 
-	CPU: Intel CELERON 2 GHz / 128 / 400 (SL6VR)
-	RAM: 256MB DDR 333
-	PCB: Intel 865G + Intel Extreme Graphics 2 + Intel FW82801FR
-	I/O: Cypress AN2131SC (12.000 MHz xtal) + Winbond W83627HF + Realtek RTL8101L
-	BIOS: 03/11/2009-I865G-6A79AD4EC-00 (Pm49FL004T-33JC)
-	Dongle: USB
-	Sound: C-Media CMI9761A
+CPU: Intel CELERON 2 GHz / 128 / 400 (SL6VR)
+RAM: 256MB DDR 333
+PCB: Intel 865G + Intel Extreme Graphics 2 + Intel FW82801FR
+I/O: Cypress AN2131SC (12.000 MHz xtal) + Winbond W83627HF + Realtek RTL8101L
+BIOS: 03/11/2009-I865G-6A79AD4EC-00 (Pm49FL004T-33JC)
+Dongle: USB
+Sound: C-Media CMI9761A
 */
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
 #include "screen.h"
+
+namespace {
 
 class photoplaysx_state : public driver_device
 {
@@ -26,12 +28,14 @@ public:
 
 	void photoplaysx(machine_config &config);
 
-private:
-	required_device<cpu_device> m_maincpu;
-
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void photoplaysx_map(address_map &map);
 };
@@ -83,7 +87,7 @@ void photoplaysx_state::photoplaysx(machine_config &config)
 ***************************************************************************/
 
 ROM_START( photopsxsp )
-	ROM_REGION(0x80000, "bios", 0) \
+	ROM_REGION(0x80000, "bios", 0)
 	ROM_LOAD("photoplay_bios_pm49fl004t.bin", 0x00000, 0x80000, CRC(50bf84fe) SHA1(d0afe83b57f822d4fdb96dc1e0c6eedeccbfce7b) ) // 03/11/2009-I865G-6A79AD4EC-00
 
 	DISK_REGION( "ide:0:hdd:image" ) // ExcelStor Callisto 40GB J840
@@ -91,12 +95,14 @@ ROM_START( photopsxsp )
 ROM_END
 
 ROM_START( photopsxusp )
-	ROM_REGION(0x80000, "bios", 0) \
+	ROM_REGION(0x80000, "bios", 0)
 	ROM_LOAD("photoplay_bios_pm49fl004t.bin", 0x00000, 0x80000, CRC(50bf84fe) SHA1(d0afe83b57f822d4fdb96dc1e0c6eedeccbfce7b) ) // 03/11/2009-I865G-6A79AD4EC-00
 
 	DISK_REGION( "ide:0:hdd:image" ) // Seagate ST3160815A 160GB
 	DISK_IMAGE( "photoply_sprt_xt_2004_sp_u", 0, BAD_DUMP SHA1(dac230cae6efaa24362260101d39b421d5fccd45) ) // May contain operator data / configuration
 ROM_END
+
+} // Anonymous namespace
 
 
 GAME( 2004,  photopsxsp,  0,          photoplaysx, photoplaysx, photoplaysx_state, empty_init, ROT0, "Funworld", "Photo Play Spirit Xtreme (Spanish)",         MACHINE_IS_SKELETON )
