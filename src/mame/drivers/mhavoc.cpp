@@ -35,7 +35,9 @@
             or
     A Tempest-like spinner on upgrades
 
-    All PCB pics point to this game using the 136002-125 PROM. However MAME had it using the 036408-01 PROM.
+    All PCB pics point to this game using the 136002-125 PROM.
+    Page 4-30 of the operation manual states 6c is 136002-125, too.
+    However MAME had it using the 036408-01 PROM.
     They have identical contents, anyway.
 
     Memory Map for Major Havoc
