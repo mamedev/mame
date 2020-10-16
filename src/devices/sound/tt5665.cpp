@@ -226,9 +226,9 @@ void tt5665_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 		if (m_daol_timing <= 0)
 		{
 			update_daol = true;
-			m_daol_output = 0.0;
+			m_daol_output = 0;
 		}
-		stream_buffer::sample_t daor_output = 0.0;
+		s32 daor_output = 0;
 
 		for (int b = 0; b < TT5665_VOICES; b++)
 		{
@@ -239,8 +239,8 @@ void tt5665_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 			// refresh DAOR output
 			m_voice[b + 4].generate_adpcm(*this, &daor_output);
 		}
-		outputs[0].put(s, m_daol_output);
-		outputs[1].put(s, daor_output);
+		outputs[0].put_int(s, m_daol_output, 2048);
+		outputs[1].put_int(s, daor_output, 2048);
 		if (update_daol)
 		{
 			update_daol = false;
@@ -414,19 +414,18 @@ tt5665_device::tt5665_voice::tt5665_voice()
 //  add them to an output stream
 //-------------------------------------------------
 
-void tt5665_device::tt5665_voice::generate_adpcm(device_rom_interface &rom, stream_buffer::sample_t *buffer)
+void tt5665_device::tt5665_voice::generate_adpcm(device_rom_interface &rom, s32 *buffer)
 {
 	// skip if not active
 	if (!m_playing)
 		return;
 
 	// fetch the next sample byte
-	constexpr stream_buffer::sample_t sample_scale = 1.0 / 2048.0;
 	int nibble = rom.read_byte(m_base_offset + m_sample / 2) >> (((m_sample & 1) << 2) ^ 4);
 
 	// output to the buffer, scaling by the volume
-	// signal in range -2048..2047, volume in range 2..32 => signal * volume / 2 in range -32768..32767
-	*buffer += m_adpcm.clock(nibble) * sample_scale * m_volume;
+	// signal in range -2048..2047; 12 bit built-in DAC
+	*buffer += m_adpcm.clock(nibble) * m_volume;
 
 	// next!
 	if (++m_sample >= m_count)
