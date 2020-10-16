@@ -1,15 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:
 /*
-    Funworld Photo Play Spirit Xtreme
+	Funworld Photo Play Spirit Xtreme
 
-    CPU: Intel CELERON 2 GHz / 128 / 400 (SL6VR)
-    RAM: 256MB DDR 333
-    PCB: Intel 865G + Intel Extreme Graphics 2 + Intel FW82801FR
-    I/O: Cypress AN2131SC (12.000 MHz xtal) + Winbond W83627HF + Realtek RTL8101L
-    BIOS: 03/11/2009-I865G-6A79AD4EC-00 (Pm49FL004T-33JC)
-    Dongle: USB
-    Sound: C-Media CMI9761A
+	CPU: Intel CELERON 2 GHz / 128 / 400 (SL6VR)
+	RAM: 256MB DDR 333
+	PCB: Intel 865G + Intel Extreme Graphics 2 + Intel FW82801FR
+	I/O: Cypress AN2131SC (12.000 MHz xtal) + Winbond W83627HF + Realtek RTL8101L
+	BIOS: 03/11/2009-I865G-6A79AD4EC-00 (Pm49FL004T-33JC)
+	Dongle: USB
+	Sound: C-Media CMI9761A
 */
 
 #include "emu.h"
