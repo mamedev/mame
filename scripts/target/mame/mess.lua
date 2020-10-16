@@ -2173,7 +2173,6 @@ files {
 	MAME_DIR .. "src/mame/machine/dc305.cpp",
 	MAME_DIR .. "src/mame/machine/dc305.h",
 	MAME_DIR .. "src/mame/drivers/jensen.cpp",
-	MAME_DIR .. "src/mame/includes/jensen.h",
 	MAME_DIR .. "src/mame/drivers/pdp11.cpp",
 	MAME_DIR .. "src/mame/drivers/vax11.cpp",
 	MAME_DIR .. "src/mame/drivers/rainbow.cpp",
@@ -2657,7 +2656,6 @@ files {
 createMESSProjects(_target, _subtarget, "interpro")
 files {
 	MAME_DIR .. "src/mame/drivers/interpro.cpp",
-	MAME_DIR .. "src/mame/includes/interpro.h",
 	MAME_DIR .. "src/mame/machine/cammu.h",
 	MAME_DIR .. "src/mame/machine/cammu.cpp",
 	MAME_DIR .. "src/mame/machine/interpro_ioga.h",
@@ -2697,7 +2695,6 @@ files {
 createMESSProjects(_target, _subtarget, "jazz")
 files {
 	MAME_DIR .. "src/mame/drivers/jazz.cpp",
-	MAME_DIR .. "src/mame/includes/jazz.h",
 	MAME_DIR .. "src/mame/machine/mct_adr.cpp",
 	MAME_DIR .. "src/mame/machine/mct_adr.h",
 }
@@ -2879,7 +2876,6 @@ files {
 createMESSProjects(_target, _subtarget, "mips")
 files {
 	MAME_DIR .. "src/mame/drivers/mips.cpp",
-	MAME_DIR .. "src/mame/includes/mips.h",
 	MAME_DIR .. "src/mame/machine/mips_rambo.h",
 	MAME_DIR .. "src/mame/machine/mips_rambo.cpp",
 }
