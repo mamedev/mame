@@ -84,7 +84,7 @@ msgstr "Yazılım Ortamı"
 
 #: src/frontend/mame/ui/dirmenu.cpp:37
 msgid "UI"
-msgstr "UI"
+msgstr "Arayüz"
 
 #: src/frontend/mame/ui/dirmenu.cpp:38 src/frontend/mame/ui/custui.cpp:157
 msgid "Language"
@@ -487,7 +487,7 @@ msgstr "Filtre"
 
 #: src/frontend/mame/ui/optsmenu.cpp:212
 msgid "Customize UI"
-msgstr "UI'yi Özelleştir"
+msgstr "Arayüzü Özelleştir"
 
 #: src/frontend/mame/ui/optsmenu.cpp:213
 msgid "Configure Directories"
@@ -513,6 +513,10 @@ msgid ""
 "If this is your first time using %2$s, please see the config.txt file in the "
 "docs directory for information on configuring %2$s."
 msgstr ""
+"Makine bulunamadı. Lütfen %1$s.ini dosyasında belirtilen rom dizinini kontrol edin.\n"
+"\n"
+"Eğer %2$s ilk kez kullanıyorsanız, %2$s ayarlama bilgileri için "
+"docs dizinindeki config.txt dosyasına bakın."
 
 #: src/frontend/mame/ui/simpleselgame.cpp:277
 #: src/frontend/mame/ui/selgame.cpp:606
@@ -526,7 +530,7 @@ msgstr "İsim girin veya seçin: %1$s_"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:300
 msgid "Type name or select: (random)"
-msgstr ""
+msgstr "İsim girin veya seçin: (rastgele)"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:314
 #: src/frontend/mame/ui/selsoft.cpp:652 src/frontend/mame/ui/selsoft.cpp:659
@@ -543,7 +547,7 @@ msgstr ""
 #: src/frontend/mame/ui/simpleselgame.cpp:320
 #, c-format
 msgid "Driver: %1$-.100s"
-msgstr ""
+msgstr "Sürücü: %1$-.100s"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:336
 #: src/frontend/mame/ui/selmenu.cpp:667
@@ -678,62 +682,62 @@ msgstr ""
 #: src/frontend/mame/ui/ui.cpp:1437
 #, c-format
 msgid "%1$s Refresh Rate"
-msgstr ""
+msgstr "%1$s Yenileme Oranı"
 
 #: src/frontend/mame/ui/ui.cpp:1442
 #, c-format
 msgid "%1$s Brightness"
-msgstr ""
+msgstr "%1$s Parlaklık"
 
 #: src/frontend/mame/ui/ui.cpp:1444
 #, c-format
 msgid "%1$s Contrast"
-msgstr ""
+msgstr "%1$s Karşıtlık"
 
 #: src/frontend/mame/ui/ui.cpp:1446
 #, c-format
 msgid "%1$s Gamma"
-msgstr ""
+msgstr "%1$s Gama"
 
 #: src/frontend/mame/ui/ui.cpp:1450
 #, c-format
 msgid "%1$s Horiz Stretch"
-msgstr ""
+msgstr "%1$s Yatay Uzatma"
 
 #: src/frontend/mame/ui/ui.cpp:1452
 #, c-format
 msgid "%1$s Horiz Position"
-msgstr ""
+msgstr "%1$s Yatay Konum"
 
 #: src/frontend/mame/ui/ui.cpp:1454
 #, c-format
 msgid "%1$s Vert Stretch"
-msgstr ""
+msgstr "%1$s Dikey Uzatma"
 
 #: src/frontend/mame/ui/ui.cpp:1456
 #, c-format
 msgid "%1$s Vert Position"
-msgstr ""
+msgstr "%1$s Dikey Konum"
 
 #: src/frontend/mame/ui/ui.cpp:1475
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Stretch"
-msgstr ""
+msgstr "Lazerdisk '%1$s' Yatay Uzatma"
 
 #: src/frontend/mame/ui/ui.cpp:1477
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Position"
-msgstr ""
+msgstr "Lazerdisk '%1$s' Yatay Konum"
 
 #: src/frontend/mame/ui/ui.cpp:1479
 #, c-format
 msgid "Laserdisc '%1$s' Vert Stretch"
-msgstr ""
+msgstr "Lazerdisk '%1$s' Dikey Uzatma"
 
 #: src/frontend/mame/ui/ui.cpp:1481
 #, c-format
 msgid "Laserdisc '%1$s' Vert Position"
-msgstr ""
+msgstr "Lazerdisk '%1$s' Dikey Konum"
 
 #: src/frontend/mame/ui/ui.cpp:1493
 msgid "Vector Flicker"
