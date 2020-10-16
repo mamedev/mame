@@ -1756,9 +1756,8 @@ void c128_state::ntsc(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list_c64").set_original("c64_cart").set_filter("NTSC");
 	SOFTWARE_LIST(config, "cass_list_c64").set_original("c64_cass").set_filter("NTSC");
 	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10").set_filter("NTSC");
-	// disk softlist split into originals, cleanly cracked, and misc (homebrew and defaced cracks)
+	// disk softlist split into originals and misc (homebrew and cracks)
 	SOFTWARE_LIST(config, "flop525_orig").set_original("c64_flop_orig").set_filter("NTSC");
-	SOFTWARE_LIST(config, "flop525_clean").set_compatible("c64_flop_clcracked").set_filter("NTSC");
 	SOFTWARE_LIST(config, "flop525_misc").set_compatible("c64_flop_misc").set_filter("NTSC");
 
 	// function ROM
