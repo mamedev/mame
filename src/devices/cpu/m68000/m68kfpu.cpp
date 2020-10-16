@@ -1,6 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Karl Stenerud
 
+#include "emu.h"
+#include "m68000.h"
+
 static constexpr int FPCC_N          = 0x08000000;
 static constexpr int FPCC_Z          = 0x04000000;
 static constexpr int FPCC_I          = 0x02000000;
@@ -9,12 +12,14 @@ static constexpr int FPCC_NAN        = 0x01000000;
 static constexpr int FPES_OE         = 0x00002000;
 static constexpr int FPAE_IOP        = 0x00000080;
 
+#ifdef UNUSED_DEFINITION
 static constexpr u64 DOUBLE_INFINITY                 = 0x7ff0000000000000U;
 static constexpr u64 DOUBLE_EXPONENT                 = 0x7ff0000000000000U;
 static constexpr u64 DOUBLE_MANTISSA                 = 0x000fffffffffffffU;
+#endif
 
 // masks for packed dwords, positive k-factor
-const u32 pkmask2[18] =
+const u32 m68000_base_device::pkmask2[18] =
 {
 	0xffffffff, 0, 0xf0000000, 0xff000000, 0xfff00000, 0xffff0000,
 	0xfffff000, 0xffffff00, 0xfffffff0, 0xffffffff,
@@ -22,35 +27,14 @@ const u32 pkmask2[18] =
 	0xffffffff, 0xffffffff, 0xffffffff
 };
 
-const u32 pkmask3[18] =
+const u32 m68000_base_device::pkmask3[18] =
 {
 	0xffffffff, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0xf0000000, 0xff000000, 0xfff00000, 0xffff0000,
 	0xfffff000, 0xffffff00, 0xfffffff0, 0xffffffff,
 };
 
-static inline double fx80_to_double(floatx80 fx)
-{
-	u64 d;
-	double *foo;
-
-	foo = (double *)&d;
-
-	d = floatx80_to_float64(fx);
-
-	return *foo;
-}
-
-static inline floatx80 double_to_fx80(double in)
-{
-	u64 *d;
-
-	d = (u64 *)&in;
-
-	return float64_to_floatx80(*d);
-}
-
-inline floatx80 load_extended_float80(u32 ea)
+inline floatx80 m68000_base_device::load_extended_float80(u32 ea)
 {
 	u32 d1,d2;
 	u16 d3;
@@ -66,7 +50,7 @@ inline floatx80 load_extended_float80(u32 ea)
 	return fp;
 }
 
-inline void store_extended_float80(u32 ea, floatx80 fpr)
+inline void m68000_base_device::store_extended_float80(u32 ea, floatx80 fpr)
 {
 	m68ki_write_16(ea+0, fpr.high);
 	m68ki_write_16(ea+2, 0);
@@ -74,7 +58,7 @@ inline void store_extended_float80(u32 ea, floatx80 fpr)
 	m68ki_write_32(ea+8, fpr.low&0xffffffff);
 }
 
-inline floatx80 load_pack_float80(u32 ea)
+inline floatx80 m68000_base_device::load_pack_float80(u32 ea)
 {
 	u32 dw1, dw2, dw3;
 	floatx80 result;
@@ -125,7 +109,7 @@ inline floatx80 load_pack_float80(u32 ea)
 	return result;
 }
 
-inline void store_pack_float80(u32 ea, int k, floatx80 fpr)
+inline void m68000_base_device::store_pack_float80(u32 ea, int k, floatx80 fpr)
 {
 	u32 dw1, dw2, dw3;
 	char str[128], *ch;
@@ -257,7 +241,7 @@ inline void store_pack_float80(u32 ea, int k, floatx80 fpr)
 	m68ki_write_32(ea+8, dw3);
 }
 
-inline void SET_CONDITION_CODES(floatx80 reg)
+inline void m68000_base_device::SET_CONDITION_CODES(floatx80 reg)
 {
 //  u64 *regi;
 
@@ -290,7 +274,7 @@ inline void SET_CONDITION_CODES(floatx80 reg)
 	}
 }
 
-inline int TEST_CONDITION(int condition)
+inline int m68000_base_device::TEST_CONDITION(int condition)
 {
 	int n = (m_fpsr & FPCC_N) != 0;
 	int z = (m_fpsr & FPCC_Z) != 0;
@@ -352,7 +336,7 @@ inline int TEST_CONDITION(int condition)
 	return r;
 }
 
-u8 READ_EA_8(int ea)
+u8 m68000_base_device::READ_EA_8(int ea)
 {
 	int mode = (ea >> 3) & 0x7;
 	int reg = (ea & 0x7);
@@ -428,7 +412,7 @@ u8 READ_EA_8(int ea)
 	return 0;
 }
 
-u16 READ_EA_16(int ea)
+u16 m68000_base_device::READ_EA_16(int ea)
 {
 	int mode = (ea >> 3) & 0x7;
 	int reg = (ea & 0x7);
@@ -505,7 +489,7 @@ u16 READ_EA_16(int ea)
 	return 0;
 }
 
-u32 READ_EA_32(int ea)
+u32 m68000_base_device::READ_EA_32(int ea)
 {
 	int mode = (ea >> 3) & 0x7;
 	int reg = (ea & 0x7);
@@ -580,7 +564,7 @@ u32 READ_EA_32(int ea)
 	return 0;
 }
 
-u64 READ_EA_64(int ea)
+u64 m68000_base_device::READ_EA_64(int ea)
 {
 	int mode = (ea >> 3) & 0x7;
 	int reg = (ea & 0x7);
@@ -667,7 +651,7 @@ u64 READ_EA_64(int ea)
 }
 
 
-floatx80 READ_EA_FPE(int ea)
+floatx80 m68000_base_device::READ_EA_FPE(int ea)
 {
 	floatx80 fpr;
 	int mode = (ea >> 3) & 0x7;
@@ -751,7 +735,7 @@ floatx80 READ_EA_FPE(int ea)
 	return fpr;
 }
 
-floatx80 READ_EA_PACK(int ea)
+floatx80 m68000_base_device::READ_EA_PACK(int ea)
 {
 	floatx80 fpr;
 	int mode = (ea >> 3) & 0x7;
@@ -798,7 +782,7 @@ floatx80 READ_EA_PACK(int ea)
 	return fpr;
 }
 
-void WRITE_EA_8(int ea, u8 data)
+void m68000_base_device::WRITE_EA_8(int ea, u8 data)
 {
 	int mode = (ea >> 3) & 0x7;
 	int reg = (ea & 0x7);
@@ -866,7 +850,7 @@ void WRITE_EA_8(int ea, u8 data)
 	}
 }
 
-void WRITE_EA_16(int ea, u16 data)
+void m68000_base_device::WRITE_EA_16(int ea, u16 data)
 {
 	int mode = (ea >> 3) & 0x7;
 	int reg = (ea & 0x7);
@@ -934,7 +918,7 @@ void WRITE_EA_16(int ea, u16 data)
 	}
 }
 
-void WRITE_EA_32(int ea, u32 data)
+void m68000_base_device::WRITE_EA_32(int ea, u32 data)
 {
 	int mode = (ea >> 3) & 0x7;
 	int reg = (ea & 0x7);
@@ -1013,7 +997,7 @@ void WRITE_EA_32(int ea, u32 data)
 	}
 }
 
-void WRITE_EA_64(int ea, u64 data)
+void m68000_base_device::WRITE_EA_64(int ea, u64 data)
 {
 	int mode = (ea >> 3) & 0x7;
 	int reg = (ea & 0x7);
@@ -1086,7 +1070,7 @@ void WRITE_EA_64(int ea, u64 data)
 	}
 }
 
-void WRITE_EA_FPE(int ea, floatx80 fpr)
+void m68000_base_device::WRITE_EA_FPE(int ea, floatx80 fpr)
 {
 	int mode = (ea >> 3) & 0x7;
 	int reg = (ea & 0x7);
@@ -1137,7 +1121,7 @@ void WRITE_EA_FPE(int ea, floatx80 fpr)
 	}
 }
 
-void WRITE_EA_PACK(int ea, int k, floatx80 fpr)
+void m68000_base_device::WRITE_EA_PACK(int ea, int k, floatx80 fpr)
 {
 	int mode = (ea >> 3) & 0x7;
 	int reg = (ea & 0x7);
@@ -1181,7 +1165,7 @@ void WRITE_EA_PACK(int ea, int k, floatx80 fpr)
 	}
 }
 
-void fpgen_rm_reg(u16 w2)
+void m68000_base_device::fpgen_rm_reg(u16 w2)
 {
 	int ea = m_ir & 0x3f;
 	int rm = (w2 >> 14) & 0x1;
@@ -1566,7 +1550,7 @@ void fpgen_rm_reg(u16 w2)
 	}
 }
 
-void fmove_reg_mem(u16 w2)
+void m68000_base_device::fmove_reg_mem(u16 w2)
 {
 	int ea = m_ir & 0x3f;
 	int src = (w2 >>  7) & 0x7;
@@ -1638,7 +1622,7 @@ void fmove_reg_mem(u16 w2)
 	m_icount -= 12;
 }
 
-void fmove_fpcr(u16 w2)
+void m68000_base_device::fmove_fpcr(u16 w2)
 {
 	int ea = m_ir & 0x3f;
 	int dir = (w2 >> 13) & 0x1;
@@ -1738,7 +1722,7 @@ void fmove_fpcr(u16 w2)
 	m_icount -= 10;
 }
 
-void fmovem(u16 w2)
+void m68000_base_device::fmovem(u16 w2)
 {
 	int i;
 	int ea = m_ir & 0x3f;
@@ -1852,7 +1836,7 @@ void fmovem(u16 w2)
 	}
 }
 
-void fscc()
+void m68000_base_device::fscc()
 {
 	int ea = m_ir & 0x3f;
 	int condition = (s16)(OPER_I_16());
@@ -1861,7 +1845,7 @@ void fscc()
 	m_icount -= 7; // ???
 }
 
-void fbcc16()
+void m68000_base_device::fbcc16()
 {
 	s32 offset;
 	int condition = m_ir & 0x3f;
@@ -1878,7 +1862,7 @@ void fbcc16()
 	m_icount -= 7;
 }
 
-void fbcc32()
+void m68000_base_device::fbcc32()
 {
 	s32 offset;
 	int condition = m_ir & 0x3f;
@@ -1896,7 +1880,7 @@ void fbcc32()
 }
 
 
-void m68040_fpu_op0()
+void m68000_base_device::m68040_fpu_op0()
 {
 	m_fpu_just_reset = 0;
 
@@ -1967,7 +1951,7 @@ void m68040_fpu_op0()
 	}
 }
 
-int perform_fsave(u32 addr, int inc)
+int m68000_base_device::perform_fsave(u32 addr, int inc)
 {
 	if(m_cpu_type & CPU_TYPE_040)
 	{
@@ -2009,7 +1993,7 @@ int perform_fsave(u32 addr, int inc)
 }
 
 // FRESTORE on a nullptr frame reboots the FPU - all registers to NaN, the 3 status regs to 0
-void do_frestore_null()
+void m68000_base_device::do_frestore_null()
 {
 	int i;
 
@@ -2027,7 +2011,7 @@ void do_frestore_null()
 	m_fpu_just_reset = 1;
 }
 
-void m68040_do_fsave(u32 addr, int reg, int inc)
+void m68000_base_device::m68040_do_fsave(u32 addr, int reg, int inc)
 {
 	if (m_fpu_just_reset)
 	{
@@ -2042,7 +2026,7 @@ void m68040_do_fsave(u32 addr, int reg, int inc)
 	}
 }
 
-void m68040_do_frestore(u32 addr, int reg)
+void m68000_base_device::m68040_do_frestore(u32 addr, int reg)
 {
 	bool m40 = m_cpu_type & CPU_TYPE_040;
 	u32 temp = m68ki_read_32(addr);
@@ -2080,7 +2064,7 @@ void m68040_do_frestore(u32 addr, int reg)
 	}
 }
 
-void m68040_fpu_op1()
+void m68000_base_device::m68040_fpu_op1()
 {
 	int ea = m_ir & 0x3f;
 	int mode = (ea >> 3) & 0x7;
@@ -2192,7 +2176,7 @@ void m68040_fpu_op1()
 	}
 }
 
-void m68881_ftrap()
+void m68000_base_device::m68881_ftrap()
 {
 	u16 w2  = OPER_I_16();
 
