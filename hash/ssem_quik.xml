@@ -134,6 +134,7 @@ Software for the SSEM (Baby).
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="developer" value="Achut Reddy"/>
+		<info name="usage" value="Press down-arrow to put cursor on line 22, then press E to feed your virtual pet."/>
 		<part name="quik" interface="ssemquik">
 			<dataarea name="quik" size="0x1ba">
 				<rom name="virpet.asm" size="0x1ba" crc="8547e875" sha1="b5de4c496073542675a63625860813eb98ac1590" />
