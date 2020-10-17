@@ -234,7 +234,7 @@ void kpython_state::kpython(machine_config &config)
 #define KPYTHON_BIOS  \
 		ROM_REGION32_LE(0x200000, "bios", 0) \
 		ROM_LOAD( "b22a01.u42", 0x000000, 0x080000, CRC(98de405e) SHA1(4bc268a996825c1bdf6ae277d331fe7bdc0cc00c) ) \
-		ROM_REGION32_LE(0x8000, "io_mcu", 0) \
+		ROM_REGION(0x8000, "io_mcu", 0) \
 		ROM_LOAD( "hd64f3664", 0x0000, 0x8000, NO_DUMP ) // Internal ROM not dumped
 
 ROM_START( kpython )
