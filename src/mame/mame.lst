@@ -35039,10 +35039,11 @@ px8                             //
 pyl601                          //
 pyl601a                         //
 
-@source:pyson.cpp
-pyson                           // Konami Pyson Bios
+@source:kpython.cpp
+kpython                         // Konami Python Bios
 wswe                            // World Soccer Winning Eleven
 wswe2k3                         // World Soccer Winning Eleven 2003
+popn9                           // 2003
 
 @source:pzletime.cpp
 pzletime                        //
@@ -41312,7 +41313,6 @@ p911ea                          // 2001
 p911j                           // 2001
 p911kc                          // 2001
 p911uc                          // 2001
-popn9                           // 2003
 ppp2nd                          // 2001
 sogeki                          // 2001
 sscopefh                        // 2002
