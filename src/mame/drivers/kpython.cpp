@@ -2,7 +2,7 @@
 // copyright-holders:Guru, Scott Stone
 /***************************************************************************
 
-Konami Pyson Hardware Overview
+Konami Python/2 Hardware Overview
 Konami 2001-2005
 
 This system uses a standard GH-006 PS2 main board (the older Playstation 2 square type) with a
@@ -32,6 +32,7 @@ Game Title                                             Label       Label        
 *Paintball Mania
 *Perfect Pool
 *Pool Pocket Fortunes
+Pop'n Music 9
 *R.P.M. Red
 World Soccer Winning Eleven Arcade Game Style          C18JAA03    DIN5 dongle GCC27JA    KN00002
 World Soccer Winning Eleven Arcade Game Style 2003     C27JAA03    not used               KN00002
@@ -91,7 +92,7 @@ Notes:
       48LC2M32B2 - Micron 48LC2M32B2 512k x32-bit x4-banks (64MBit) SDRAM (TSOP86)
       XC9536     - Xilinx XC9536XL CPLD stamped 'QB22A1' (PLCC44)
       B22A01.U42 - Fujitsu MBM29F400 512k x8-bit flash ROM stamped 'B22A01' (TSOP48). This is probably
-                   the common-to-all-games Pyson BIOS for the TMPR3927
+                   the common-to-all-games Python BIOS for the TMPR3927
       XCS10XL    - Xilinx Spartan XCS10XL FPGA (TQFP144)
       M48T58Y    - ST Microelectronics M48T58Y 8k Timekeeper/NVRAM (DIP28). As well as being used for protection
                    with the Konami game code/year etc (the usual first 16 bytes) it also seems to contain code
@@ -147,25 +148,34 @@ Notes:
      8PIN_JVS  - Common JVS Power Connectors (on other side of the PCB)
      6PIN_JVS  /
 
+	TODO:
+		More undumped games for Python/2?
+		Python 2 is based on consumer PS2, can be derived with ps2sony.cpp?
+		Everything
+
 ***************************************************************************/
 
 
 #include "emu.h"
 #include "cpu/mips/mips3.h"
 #include "cpu/mips/mips1.h"
+//#include "cpu/h8/h83664.h"
+//#include "machine/ds2430.h"
+#include "machine/timekpr.h"
 #include "emupal.h"
 #include "screen.h"
 
 
-class pyson_state : public driver_device
+class kpython_state : public driver_device
 {
 public:
-	pyson_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+	kpython_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_m48t58(*this, "m48t58")
 	{ }
 
-	void pyson(machine_config &config);
+	void kpython(machine_config &config);
 
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -174,89 +184,122 @@ private:
 
 	// devices
 	required_device<mips3_device> m_maincpu;
+	required_device<m48t58_device> m_m48t58;
 
 	// driver_device overrides
 	virtual void video_start() override;
 };
 
 
-void pyson_state::video_start()
+void kpython_state::video_start()
 {
 }
 
-uint32_t pyson_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t kpython_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
 
-void pyson_state::ps2_map(address_map &map)
+void kpython_state::ps2_map(address_map &map)
 {
 	map(0x00000000, 0x01ffffff).ram(); // 32 MB RAM in consumer PS2s, do these have more?
 	map(0x1fc00000, 0x1fdfffff).rom().region("bios", 0);
 }
 
-static INPUT_PORTS_START( pyson )
+static INPUT_PORTS_START( kpython )
 INPUT_PORTS_END
 
-void pyson_state::pyson(machine_config &config)
+void kpython_state::kpython(machine_config &config)
 {
 	R5000LE(config, m_maincpu, 294000000); // imported from namcops2.c driver
 	m_maincpu->set_icache_size(16384);
 	m_maincpu->set_dcache_size(16384);
-	m_maincpu->set_addrmap(AS_PROGRAM, &pyson_state::ps2_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &kpython_state::ps2_map);
+
+	//H83664(config, m_io_mcu, 14000000); // from filter board
+
+	//DS2430(config, m_ds2430);
+	M48T58(config, m_m48t58);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_screen_update(FUNC(pyson_state::screen_update));
+	screen.set_screen_update(FUNC(kpython_state::screen_update));
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 639, 0, 479);
 
 	PALETTE(config, "palette").set_entries(65536);
 }
 
-#define PYSON_BIOS  \
-		ROM_LOAD( "b22a01.u42", 0x000000, 0x080000, CRC(98de405e) SHA1(4bc268a996825c1bdf6ae277d331fe7bdc0cc00c) )
+#define KPYTHON_BIOS  \
+		ROM_REGION32_LE(0x200000, "bios", 0) \
+		ROM_LOAD( "b22a01.u42", 0x000000, 0x080000, CRC(98de405e) SHA1(4bc268a996825c1bdf6ae277d331fe7bdc0cc00c) ) \
+		ROM_REGION(0x8000, "io_mcu", 0) \
+		ROM_LOAD( "hd64f3664", 0x0000, 0x8000, NO_DUMP ) // Internal ROM not dumped
 
-ROM_START( pyson )
-	ROM_REGION32_LE(0x200000, "bios", 0)
-	PYSON_BIOS
+ROM_START( kpython )
+	KPYTHON_BIOS
 
 	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)
 	DISK_REGION( "ide:0:hdd:image" )
 ROM_END
 
 ROM_START( wswe )
-	ROM_REGION32_LE(0x200000, "bios", 0)
-	PYSON_BIOS
+	KPYTHON_BIOS
 
 	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
-		ROM_LOAD( "kn00002.ic002",     0x000000, 0x800000, CRC(bd1770aa) SHA1(be217d6d7648e529953ea25caad904394919644c) )
-		ROM_LOAD( "kn00002_spr.ic002", 0x800000, 0x040000, CRC(296c8436) SHA1(c0da440b50dba4ca8eb2b1ee7b6de681769fcf65) )
+	ROM_LOAD( "kn00002.ic002",     0x000000, 0x800000, CRC(bd1770aa) SHA1(be217d6d7648e529953ea25caad904394919644c) )
+	ROM_LOAD( "kn00002_spr.ic002", 0x800000, 0x040000, CRC(296c8436) SHA1(c0da440b50dba4ca8eb2b1ee7b6de681769fcf65) )
 
-	ROM_REGION(0x2000, "timekeeper", ROMREGION_ERASE00)
-		ROM_LOAD( "m48t58y.u48",       0x000000, 0x002000, CRC(d4181cb5) SHA1(c5560d1ac043bfe2527fac3fb1989fa8fc53cf8a) )
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)
+	// Not dumped
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)
+	ROM_LOAD( "m48t58y.u48",       0x000000, 0x002000, CRC(d4181cb5) SHA1(c5560d1ac043bfe2527fac3fb1989fa8fc53cf8a) )
 
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE_READONLY( "c18jaa03", 0, SHA1(b47190aa38f1f3a499b817758e3f29fac54391bd) )
 ROM_END
 
 ROM_START( wswe2k3 )
-	ROM_REGION32_LE(0x200000, "bios", 0)
-	PYSON_BIOS
+	KPYTHON_BIOS
 
 	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
-		ROM_LOAD( "kn00002.ic002",     0x000000, 0x800000, CRC(6f5b7309) SHA1(5e9d75497c3a3a92af41b20e41991c9c5837d50a) )
-		ROM_LOAD( "kn00002_spr.ic002", 0x800000, 0x040000, CRC(433f7ad9) SHA1(4fd05124d59cdbedd781580e49ff940c5df67d94) )
+	ROM_LOAD( "kn00002.ic002",     0x000000, 0x800000, CRC(6f5b7309) SHA1(5e9d75497c3a3a92af41b20e41991c9c5837d50a) )
+	ROM_LOAD( "kn00002_spr.ic002", 0x800000, 0x040000, CRC(433f7ad9) SHA1(4fd05124d59cdbedd781580e49ff940c5df67d94) )
 
-	ROM_REGION(0x2000, "timekeeper", ROMREGION_ERASE00)
-		ROM_LOAD( "m48t58y.u48",       0x000000, 0x002000, CRC(76068de0) SHA1(5f75b88ad04871fb3799fe904658c87524bad94f) )
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)
+	// Not dumped
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)
+	ROM_LOAD( "m48t58y.u48",       0x000000, 0x002000, CRC(76068de0) SHA1(5f75b88ad04871fb3799fe904658c87524bad94f) )
 
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE_READONLY( "c27jaa03", 0, SHA1(9b2aa900711d88cf5effb3ba6be18726ea006ac4) )
 ROM_END
 
+ROM_START( popn9 )
+	KPYTHON_BIOS
 
-GAME(2002, pyson,          0,   pyson,   pyson, pyson_state, empty_init, ROT0, "Konami", "Konami Pyson BIOS", MACHINE_IS_SKELETON|MACHINE_IS_BIOS_ROOT)
-GAME(2002, wswe,       pyson,   pyson,   pyson, pyson_state, empty_init, ROT0, "Konami", "World Soccer Winning Eleven Arcade Game Style", MACHINE_IS_SKELETON)
-GAME(2003, wswe2k3,    pyson,   pyson,   pyson, pyson_state, empty_init, ROT0, "Konami", "World Soccer Winning Eleven Arcade Game 2003", MACHINE_IS_SKELETON)
+	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
+	// Not dumped
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105)) // Placeholder, Not dumped or needs verification from this hardware
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD( "m48t58y.u48",       0x000000, 0x2000, NO_DUMP )
+
+	DISK_REGION( "ide:0:hdd:image" )
+	DISK_IMAGE_READONLY( "c00jab", 0, BAD_DUMP SHA1(3763aaded9b45388a664edd84a3f7f8ff4101be4) )
+ROM_END
+
+
+GAME(2002, kpython,          0,   kpython,   kpython, kpython_state, empty_init, ROT0, "Konami", "Konami Python BIOS", MACHINE_IS_SKELETON|MACHINE_IS_BIOS_ROOT)
+GAME(2002, wswe,       kpython,   kpython,   kpython, kpython_state, empty_init, ROT0, "Konami", "World Soccer Winning Eleven Arcade Game Style", MACHINE_IS_SKELETON)
+GAME(2003, wswe2k3,    kpython,   kpython,   kpython, kpython_state, empty_init, ROT0, "Konami", "World Soccer Winning Eleven Arcade Game 2003", MACHINE_IS_SKELETON)
+GAME(2003, popn9,      kpython,   kpython,   kpython, kpython_state, empty_init, ROT0, "Konami", "Pop'n Music 9 (ver JAB)", MACHINE_IS_SKELETON)
+
+// Konami Python 2 (Customized? PS2 SCPH-50000)

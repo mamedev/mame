@@ -644,6 +644,7 @@ konmedal.cpp
 konmedal68k.cpp
 kontest.cpp
 kopunch.cpp
+kpython.cpp
 ksayakyu.cpp
 ksys573.cpp
 kungfur.cpp
@@ -990,7 +991,6 @@ pturn.cpp
 pubtimed.cpp
 puckpkmn.cpp
 punchout.cpp
-pyson.cpp
 pzletime.cpp
 qdrmfgp.cpp
 qix.cpp
