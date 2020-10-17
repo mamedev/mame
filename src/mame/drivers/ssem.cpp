@@ -675,7 +675,10 @@ void ssem_state::ssem(machine_config &config)
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* quickload */
-	QUICKLOAD(config, "quickload", "snp,asm").set_load_callback(FUNC(ssem_state::quickload_cb));
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "snp,asm", attotime::from_seconds(1)));
+	quickload.set_load_callback(FUNC(ssem_state::quickload_cb));
+	quickload.set_interface("ssemquik");
+	SOFTWARE_LIST(config, "quik_list").set_original("ssem_quik");
 }
 
 
