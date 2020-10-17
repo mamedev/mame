@@ -287,7 +287,7 @@ ROM_START( popn9 )
 	// Not dumped
 
 	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)
-	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105)) // Placeholder, Not dumped from this hardware
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105)) // Placeholder, Not dumped or needs verification from this hardware
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD( "m48t58y.u48",       0x000000, 0x2000, NO_DUMP )
