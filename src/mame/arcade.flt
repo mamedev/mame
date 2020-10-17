@@ -1027,6 +1027,7 @@ relief.cpp
 renegade.cpp
 retofinv.cpp
 rfslots8085.cpp
+rfslotspcpent.cpp
 rgum.cpp
 rltennis.cpp
 rmhaihai.cpp

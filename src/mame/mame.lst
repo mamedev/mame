@@ -35379,6 +35379,9 @@ rex6000                         //
 @source:rfslots8085.cpp
 unkrfslt                        //
 
+@source:rfslotspcpent.cpp
+rfsantafeg                      // (c) 2014 Recreativos Franco
+
 @source:rgum.cpp
 rgum                            //
 
