@@ -1074,8 +1074,8 @@ void bbc_state::bbca(machine_config &config)
 	LS259(config, m_latch);
 	m_latch->q_out_cb<0>().set(FUNC(bbc_state::snd_enable_w));
 	m_latch->q_out_cb<3>().set(FUNC(bbc_state::kbd_enable_w));
-	m_latch->q_out_cb<6>().set(FUNC(bbc_state::capslock_led_w));
-	m_latch->q_out_cb<7>().set(FUNC(bbc_state::shiftlock_led_w));
+	m_latch->q_out_cb<6>().set_output("capslock_led");
+	m_latch->q_out_cb<7>().set_output("shiftlock_led");
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("16K").set_extra_options("32K").set_default_value(0xff);
@@ -1590,8 +1590,8 @@ void bbcm_state::bbcm(machine_config &config)
 	LS259(config, m_latch);
 	m_latch->q_out_cb<0>().set(FUNC(bbc_state::snd_enable_w));
 	m_latch->q_out_cb<3>().set(FUNC(bbc_state::kbd_enable_w));
-	m_latch->q_out_cb<6>().set(FUNC(bbc_state::capslock_led_w));
-	m_latch->q_out_cb<7>().set(FUNC(bbc_state::shiftlock_led_w));
+	m_latch->q_out_cb<6>().set_output("capslock_led");
+	m_latch->q_out_cb<7>().set_output("shiftlock_led");
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("128K").set_default_value(0xff);
