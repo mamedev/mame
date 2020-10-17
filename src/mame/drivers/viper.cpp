@@ -532,7 +532,7 @@ private:
 	void mpc8240_epic_init();
 	void mpc8240_epic_reset(void);
 
-	// DS2430, to be device-ified, used at least by pyson.cpp, too
+	// DS2430, to be device-ified, used at least by kpython.cpp, too
 	enum
 	{
 		DS2430_STATE_ROM_COMMAND = 1,
