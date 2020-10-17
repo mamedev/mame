@@ -496,7 +496,6 @@ Reference videos: https://www.youtube.com/watch?v=R5OeC6Wc_yI
 #include "machine/input_merger.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 
@@ -1561,10 +1560,7 @@ void williams_state::williams_base(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
-	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // mc1408.ic6
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+	MC1408(config, "dac", 0).set_constant_vref(-1.0, 1.0).add_route(ALL_OUTPUTS, "speaker", 0.25); // mc1408.ic6
 
 	// pia
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
@@ -1769,15 +1765,11 @@ void blaster_state::blaster(machine_config &config)
 	// sound hardware
 	config.device_remove("speaker");
 	config.device_remove("dac");
-	config.device_remove("vref");
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MC1408(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.25); // unknown DAC
-	MC1408(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
+	MC1408(config, "ldac", 0).set_constant_vref(-1.0, 1.0).add_route(ALL_OUTPUTS, "lspeaker", 0.25); // unknown DAC
+	MC1408(config, "rdac", 0).set_constant_vref(-1.0, 1.0).add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
 }
 
 
@@ -1812,10 +1804,7 @@ void williams2_state::williams2_base(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
-	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+	MC1408(config, "dac", 0).set_constant_vref(-1.0, 1.0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 	INPUT_MERGER_ANY_HIGH(config, "soundirq").output_handler().set_inputline(m_soundcpu, M6808_IRQ_LINE);

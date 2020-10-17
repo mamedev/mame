@@ -744,6 +744,7 @@ read_stream_view sound_stream::update_view(attotime start, attotime end, u32 out
 					m_input_view[inputnum] = m_input[inputnum].update(update_start, end);
 				else
 					m_input_view[inputnum] = empty_view(update_start, end);
+				sound_assert(m_input_view[inputnum].samples() > 0);
 				sound_assert(m_resampling_disabled || m_input_view[inputnum].sample_rate() == m_sample_rate);
 			}
 
