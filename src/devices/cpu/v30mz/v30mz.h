@@ -10,7 +10,7 @@ enum
 	NEC_PC=0,
 	NEC_IP, NEC_AW, NEC_CW, NEC_DW, NEC_BW, NEC_SP, NEC_BP, NEC_IX, NEC_IY,
 	NEC_FLAGS, NEC_DS1, NEC_PS, NEC_SS, NEC_DS0,
-	NEC_VECTOR, NEC_PENDING
+	NEC_VECTOR, NEC_PENDING, NEC_PFP
 };
 
 
@@ -61,6 +61,8 @@ protected:
 	inline void write_port(uint16_t port, uint8_t data);
 
 	// Executing instructions
+	void read_prefetch();
+	void init_prefetch();
 	inline uint8_t fetch_op();
 	inline uint8_t fetch();
 	inline uint16_t fetch_word();
@@ -176,7 +178,12 @@ protected:
 
 	uint16_t  m_ip;
 	uint16_t  m_pfp;   // prefetch pointer
-	uint8_t   m_prefetch_queue[16];
+	static const size_t PREFETCH_MAX_SIZE = 16;
+	static const size_t PREFETCH_QUEUE_SIZE = 8;
+	uint8_t   m_prefetch_queue[PREFETCH_MAX_SIZE];
+	int       m_prefetch_queue_head;
+	int       m_prefetch_queue_tail;
+	bool      m_prefetch_fill_needed;
 
 	int32_t   m_SignVal;
 	uint32_t  m_AuxVal, m_OverVal, m_ZeroVal, m_CarryVal, m_ParityVal; // 0 or non-0 valued flags

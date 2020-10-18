@@ -17,6 +17,12 @@
     Flag settings are also correct for the NEC processors rather than the
     I86 versions.
 
+    The internal details of the prefetch operation are not exactly known. We
+    keep a prefetch queue for 8 bytes even though the documentation mentions
+    a prefetch queue of 8 words/16 bytes. Using 8 bytes keeps the amount of
+    fetches limited on tight loops and is more than enough for the longest
+    instruction.
+
     Changelist:
 
     22/02/2003:
@@ -42,7 +48,6 @@
 			  not mention them as being changed, but according to the description of
 				the flags in the v30mz datasheet the flags are changed.
       - Fix memory interface (should be 16 bit) and related timing penalties.
-			- Add PFP (prefetch pointer) and prefetching (max 8 words).
 
 ****************************************************************************/
 
@@ -178,6 +183,10 @@ void v30mz_cpu_device::device_start()
 	save_item(NAME(m_ParityVal));
 	save_item(NAME(m_seg_prefix));
 	save_item(NAME(m_seg_prefix_next));
+	save_item(NAME(m_pfp));
+	save_item(NAME(m_prefetch_queue));
+	save_item(NAME(m_prefetch_queue_head));
+	save_item(NAME(m_prefetch_queue_tail));
 
 	// Register state for debugger
 	state_add(NEC_IP, "IP", m_ip).callimport().callexport().formatstr("%04X");
@@ -194,6 +203,7 @@ void v30mz_cpu_device::device_start()
 	state_add(NEC_DS0, "DS0", m_sregs[DS0]).callimport().callexport().formatstr("%04X");
 	state_add(NEC_DS1, "DS1", m_sregs[DS1]).callimport().callexport().formatstr("%04X");
 	state_add(NEC_VECTOR, "V", m_int_vector).callimport().callexport().formatstr("%02X");
+	state_add(NEC_PFP, "PFP", m_pfp).callimport().callexport().formatstr("%04X");
 
 	state_add(STATE_GENPC, "GENPC", m_pc).callexport().formatstr("%05X");
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).callexport().formatstr("%05X");
@@ -278,6 +288,7 @@ void v30mz_cpu_device::device_reset()
 	m_modrm = 0;
 	m_dst = 0;
 	m_src = 0;
+	init_prefetch();
 }
 
 
@@ -285,6 +296,24 @@ uint32_t v30mz_cpu_device::pc()
 {
 	m_pc = (m_sregs[PS] << 4) + m_ip;
 	return m_pc;
+}
+
+
+void v30mz_cpu_device::read_prefetch()
+{
+	uint8_t data = m_cache.read_byte((m_sregs[PS] << 4) + m_pfp);
+	m_prefetch_queue[m_prefetch_queue_head] = data;
+	m_prefetch_queue_head = (m_prefetch_queue_head + 1) % PREFETCH_MAX_SIZE;
+	m_pfp++;
+}
+
+
+void v30mz_cpu_device::init_prefetch()
+{
+	m_pfp = m_ip;
+	m_prefetch_queue_tail = 0;
+	m_prefetch_queue_head = 0;
+	m_prefetch_fill_needed = true;
 }
 
 
@@ -328,7 +357,9 @@ inline void v30mz_cpu_device::write_port(uint16_t port, uint8_t data)
 
 inline uint8_t v30mz_cpu_device::fetch_op()
 {
-	uint8_t data = m_cache.read_byte(pc());
+	uint8_t data = m_prefetch_queue[m_prefetch_queue_tail];
+	m_prefetch_queue_tail = (m_prefetch_queue_tail + 1) % PREFETCH_MAX_SIZE;
+	read_prefetch();
 	m_ip++;
 	return data;
 }
@@ -336,7 +367,9 @@ inline uint8_t v30mz_cpu_device::fetch_op()
 
 inline uint8_t v30mz_cpu_device::fetch()
 {
-	uint8_t data = m_cache.read_byte(pc());
+	uint8_t data = m_prefetch_queue[m_prefetch_queue_tail];
+	m_prefetch_queue_tail = (m_prefetch_queue_tail + 1) % PREFETCH_MAX_SIZE;
+	read_prefetch();
 	m_ip++;
 	return data;
 }
@@ -1251,6 +1284,7 @@ inline void v30mz_cpu_device::jmp(bool cond)
 	if (cond)
 	{
 		m_ip += rel;
+		init_prefetch();
 		clk(9);
 	}
 	clk(1);
@@ -1316,6 +1350,7 @@ void v30mz_cpu_device::interrupt(int int_num)
 	push(m_ip);
 	m_ip = dest_off;
 	m_sregs[PS] = dest_seg;
+	init_prefetch();
 }
 
 
@@ -1402,6 +1437,13 @@ void v30mz_cpu_device::execute_run()
 					m_fire_trap++;
 				}
 			}
+		}
+
+		if (m_prefetch_fill_needed) {
+			for (int i = 0; i < PREFETCH_QUEUE_SIZE; i++) {
+				read_prefetch();
+			}
+			m_prefetch_fill_needed = false;
 		}
 
 		debugger_instruction_hook(pc());
@@ -2381,6 +2423,15 @@ void v30mz_cpu_device::execute_run()
 						logerror("%s: %06x: REPNC invalid\n", tag(), pc());
 						// Decrement IP so the normal instruction will be executed next
 						m_ip--;
+						m_pfp--;
+						if (m_prefetch_queue_tail == 0)
+							m_prefetch_queue_tail = PREFETCH_QUEUE_SIZE - 1;
+						else
+							m_prefetch_queue_tail--;
+						if (m_prefetch_queue_head == 0)
+							m_prefetch_queue_head = PREFETCH_QUEUE_SIZE - 1;
+						else
+							m_prefetch_queue_head--;
 						break;
 					}
 				}
@@ -2413,6 +2464,15 @@ void v30mz_cpu_device::execute_run()
 						logerror("%s: %06x: REPC invalid\n", tag(), pc());
 						// Decrement IP so the normal instruction will be executed next
 						m_ip--;
+						m_pfp--;
+						if (m_prefetch_queue_tail == 0)
+							m_prefetch_queue_tail = PREFETCH_QUEUE_SIZE - 1;
+						else
+							m_prefetch_queue_tail--;
+						if (m_prefetch_queue_head == 0)
+							m_prefetch_queue_head = PREFETCH_QUEUE_SIZE - 1;
+						else
+							m_prefetch_queue_head--;
 						break;
 					}
 				}
@@ -2775,6 +2835,7 @@ void v30mz_cpu_device::execute_run()
 					push(m_ip);
 					m_ip = tmp;
 					m_sregs[PS] = tmp2;
+					init_prefetch();
 					clk(10);
 				}
 				break;
@@ -3040,12 +3101,14 @@ void v30mz_cpu_device::execute_run()
 					uint32_t count = fetch_word();
 					m_ip = pop();
 					m_regs.w[SP] += count;
+					init_prefetch();
 					clk(6);
 				}
 				break;
 
 			case 0xc3: // i_ret
 				m_ip = pop();
+				init_prefetch();
 				clk(6);
 				break;
 
@@ -3112,6 +3175,7 @@ void v30mz_cpu_device::execute_run()
 					m_ip = pop();
 					m_sregs[PS] = pop();
 					m_regs.w[SP] += count;
+					init_prefetch();
 					clk(9);
 				}
 				break;
@@ -3119,6 +3183,7 @@ void v30mz_cpu_device::execute_run()
 			case 0xcb: // i_retf
 				m_ip = pop();
 				m_sregs[PS] = pop();
+				init_prefetch();
 				clk(8);
 				break;
 
@@ -3145,6 +3210,7 @@ void v30mz_cpu_device::execute_run()
 				m_ip = pop();
 				m_sregs[PS] = pop();
 				i_popf();
+				init_prefetch();
 				clk(10);
 				break;
 
@@ -3279,6 +3345,7 @@ void v30mz_cpu_device::execute_run()
 					if (!ZF && m_regs.w[CW])
 					{
 						m_ip = m_ip + disp;
+						init_prefetch();
 						clk(3);
 					}
 					clk(3);
@@ -3293,6 +3360,7 @@ void v30mz_cpu_device::execute_run()
 					if (ZF && m_regs.w[CW])
 					{
 						m_ip = m_ip + disp;
+						init_prefetch();
 						clk(3);
 					}
 					clk(3);
@@ -3307,6 +3375,7 @@ void v30mz_cpu_device::execute_run()
 					if (m_regs.w[CW])
 					{
 						m_ip = m_ip + disp;
+						init_prefetch();
 						clk(3);
 					}
 					clk(2);
@@ -3320,6 +3389,7 @@ void v30mz_cpu_device::execute_run()
 					if (m_regs.w[CW] == 0)
 					{
 						m_ip = m_ip + disp;
+						init_prefetch();
 						clk(3);
 					}
 					clk(1);
@@ -3363,6 +3433,7 @@ void v30mz_cpu_device::execute_run()
 
 					push(m_ip);
 					m_ip = m_ip + tmp;
+					init_prefetch();
 					clk(5);
 				}
 				break;
@@ -3371,6 +3442,7 @@ void v30mz_cpu_device::execute_run()
 				{
 					int16_t offset = (int16_t)fetch_word();
 					m_ip += offset;
+					init_prefetch();
 					clk(4);
 				}
 				break;
@@ -3382,6 +3454,7 @@ void v30mz_cpu_device::execute_run()
 
 					m_sregs[PS] = tmp1;
 					m_ip = tmp;
+					init_prefetch();
 					clk(7);
 				}
 				break;
@@ -3396,6 +3469,7 @@ void v30mz_cpu_device::execute_run()
 						m_icount %= 12; // cycle skip
 					}
 					m_ip = (uint16_t)(m_ip + tmp);
+					init_prefetch();
 				}
 				break;
 
@@ -3461,6 +3535,15 @@ void v30mz_cpu_device::execute_run()
 						logerror("%s: %06x: REPNE invalid\n", tag(), pc());
 						// Decrement IP so the normal instruction will be executed next
 						m_ip--;
+						m_pfp--;
+						if (m_prefetch_queue_tail == 0)
+							m_prefetch_queue_tail = PREFETCH_QUEUE_SIZE - 1;
+						else
+							m_prefetch_queue_tail--;
+						if (m_prefetch_queue_head == 0)
+							m_prefetch_queue_head = PREFETCH_QUEUE_SIZE - 1;
+						else
+							m_prefetch_queue_head--;
 						break;
 					}
 				}
@@ -3491,6 +3574,15 @@ void v30mz_cpu_device::execute_run()
 						logerror("%s: %06x: REPE invalid\n", tag(), pc());
 						// Decrement IP so the normal instruction will be executed next
 						m_ip--;
+						m_pfp--;
+						if (m_prefetch_queue_tail == 0)
+							m_prefetch_queue_tail = PREFETCH_QUEUE_SIZE - 1;
+						else
+							m_prefetch_queue_tail--;
+						if (m_prefetch_queue_head == 0)
+							m_prefetch_queue_head = PREFETCH_QUEUE_SIZE - 1;
+						else
+							m_prefetch_queue_head--;
 						break;
 					}
 				}
@@ -3773,6 +3865,7 @@ void v30mz_cpu_device::execute_run()
 					case 0x10:  // CALL
 						push(m_ip);
 						m_ip = tmp;
+						init_prefetch();
 						clkm(5,6);
 						break;
 					case 0x18:  // CALL FAR
@@ -3781,15 +3874,18 @@ void v30mz_cpu_device::execute_run()
 						push(tmp1);
 						push(m_ip);
 						m_ip = tmp;
+						init_prefetch();
 						clkm(5,12);
 						break;
 					case 0x20:  // jmp
 						m_ip = tmp;
+						init_prefetch();
 						clkm(4,5);
 						break;
 					case 0x28:  // jmp FAR
 						m_ip = tmp;
 						m_sregs[PS] = get_next_rm_word();
+						init_prefetch();
 						clk(10);
 						break;
 					case 0x30:

@@ -90,9 +90,6 @@ protected:
 
 	enum enum_system { TYPE_WSWAN=0, TYPE_WSC };
 
-	// timer IDs
-	static const device_timer_id TIMER_PORTC0 = 0;
-
 	struct sound_dma_t
 	{
 		sound_dma_t() { }
@@ -113,8 +110,6 @@ protected:
 	sound_dma_t m_sound_dma;
 	u8 m_bios_disabled;
 	u8 m_rotate;
-	u8 m_delayed_portC0_data;
-	emu_timer *m_portC0_timer;
 	u32 m_vector;
 
 	required_memory_region m_region_maincpu;
@@ -131,7 +126,6 @@ protected:
 	void common_start();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void palette(palette_device &palette) const;
 
 	void io_map(address_map &map);
@@ -415,7 +409,6 @@ void wswan_state::register_save()
 	save_item(NAME(m_internal_eeprom));
 	save_item(NAME(m_bios_disabled));
 	save_item(NAME(m_rotate));
-	save_item(NAME(m_delayed_portC0_data));
 
 	save_item(NAME(m_sound_dma.source));
 	save_item(NAME(m_sound_dma.size));
@@ -431,7 +424,6 @@ void wswan_state::common_start()
 {
 	register_save();
 
-	m_portC0_timer = timer_alloc(TIMER_PORTC0);
 	m_vector = 0;
 
 	if (m_cart->exists())
@@ -846,16 +838,6 @@ void wswan_state::port_w(offs_t offset, u8 data)
 			}
 			break;
 		case 0xc0:  // ROM bank $40000-$fffff
-			// Some kind of pipeline/delay support (needed by wonderswan Meitantei
-			// Conan - Nishi no Meitantei Saidai no Kiki!)
-			//   mov al,0Eh
-			//   out C0h, al
-			//   br 2000:0h
-			//
-			// This is a hack until pipelining is supported in the v30mz cpu core.
-			m_delayed_portC0_data = data;
-			m_portC0_timer->adjust(attotime::from_ticks(10, 3072000));
-			break;
 		case 0xc1:  // SRAM bank
 		case 0xc2:  // ROM bank $20000-$2ffff
 		case 0xc3:  // ROM bank $30000-$3ffff
@@ -880,17 +862,6 @@ void wswan_state::port_w(offs_t offset, u8 data)
 
 	// Update the port value
 	m_ws_portram[offset] = data;
-}
-
-
-void wswan_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch (id)
-	{
-		case TIMER_PORTC0:
-			m_cart->write_io(0xc0 & 0x0f, m_delayed_portC0_data);
-			break;
-	}
 }
 
 
