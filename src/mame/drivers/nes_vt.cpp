@@ -2468,7 +2468,6 @@ CONS( 2017, rtvgc300fz,0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_stat
 /* The following are also confirmed to be NES/VT derived units, most having a standard set of games with a handful of lazy graphic mods thrown in to fit the unit theme
 
     (handheld units, use standard AAA batteries)
-    Lexibook Compact Cyber Arcade - Cars
     Lexibook Compact Cyber Arcade - Barbie
     Lexibook Compact Cyber Arcade - Finding Dory
     Lexibook Compact Cyber Arcade - PJ Masks
