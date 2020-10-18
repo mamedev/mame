@@ -24,8 +24,6 @@
 #include "emu.h"
 #include "jaleco_ms32_sysctrl.h"
 
-
-
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -47,6 +45,7 @@ jaleco_ms32_sysctrl_device::jaleco_ms32_sysctrl_device(const machine_config &mco
 //	, device_memory_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
 //	, m_space_config("regs", ENDIANNESS_NATIVE, 16, 6, -1, address_map_constructor(FUNC(jaleco_ms32_sysctrl_device::io_map), this))
+	, m_flip_screen_cb(*this)
 {
 }
 
@@ -98,11 +97,14 @@ void jaleco_ms32_sysctrl_device::device_add_mconfig(machine_config &config)
 
 void jaleco_ms32_sysctrl_device::device_start()
 {
+	m_flip_screen_cb.resolve();
+
 	save_item(NAME(m_dotclock));
 	save_item(NAME(m_crtc.horz_blank));
 	save_item(NAME(m_crtc.horz_display));
 	save_item(NAME(m_crtc.vert_blank));
 	save_item(NAME(m_crtc.vert_display));
+	save_item(NAME(m_flip_screen_state));
 }
 
 
@@ -165,10 +167,15 @@ void jaleco_ms32_sysctrl_device::control_w(u16 data)
 	 * ---- --x- flip screen
 	 * ---- ---x dotclock select (1) 8 MHz (0) 6 MHz
 	 */
-	if ((data & 1) != m_dotclock)
+	if (BIT(data, 0) != m_dotclock)
 	{
-		m_dotclock = data & 0x01;
+		m_dotclock = BIT(data, 0);
 		crtc_refresh_screen_params();
+	}
+	if (BIT(data, 1) != m_flip_screen_state)
+	{
+		m_flip_screen_state = BIT(data, 1);
+		m_flip_screen_cb(m_flip_screen_state ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 

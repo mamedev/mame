@@ -148,8 +148,9 @@ private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_VIDEO_START(f1superb);
-	u32 screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_ms32);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	void irq_init();
 	void irq_raise(int level);
 	void update_color(int color);

@@ -1758,13 +1758,14 @@ void ms32_state::ms32(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(60000));
 
 	JALECO_MS32_SYSCTRL(config, m_sysctrl, XTAL(48'000'000));
+	m_sysctrl->flip_screen_cb().set(FUNC(ms32_state::flipscreen_w));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// dot clock is 48/8 MHz, settable with /6 thru system register [0]
 	m_screen->set_raw(XTAL(48'000'000)/8, 384, 0, 320, 263, 0, 224); // default CRTC setup
-	m_screen->set_screen_update(FUNC(ms32_state::screen_update_ms32));
-	m_screen->screen_vblank().set(FUNC(ms32_state::screen_vblank_ms32));
+	m_screen->set_screen_update(FUNC(ms32_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(ms32_state::screen_vblank));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ms32);
 	PALETTE(config, m_palette).set_entries(0x10000);

@@ -305,7 +305,7 @@ void ms32_state::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rec
 
 
 
-u32 ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 ms32_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int scrollx,scrolly;
 	int asc_pri;
@@ -691,10 +691,18 @@ u32 ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitmap, 
 	return 0;
 }
 
-WRITE_LINE_MEMBER(ms32_state::screen_vblank_ms32)
+WRITE_LINE_MEMBER(ms32_state::screen_vblank)
 {
 	if (state)
 	{
 		std::copy_n(&m_sprram[0], m_sprram.bytes() / 4, &m_sprram_buffer[0]);
 	}
+}
+
+WRITE_LINE_MEMBER(ms32_state::flipscreen_w)
+{
+	m_tx_tilemap->set_flip(state ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_bg_tilemap->set_flip(state ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_bg_tilemap_alt->set_flip(state ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	// TODO: sprite device
 }

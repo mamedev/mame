@@ -38,6 +38,7 @@ public:
 //	void write(offs_t offset, u16 data, u16 mem_mask = ~0);
 //	u16 read(offs_t offset, u16 mem_mask = ~0);
 	void amap(address_map &map);
+	auto flip_screen_cb() { return m_flip_screen_cb.bind(); }
 
 
 protected:
@@ -62,7 +63,8 @@ private:
 	void vbp_w(u16 data);
 	void vfp_w(u16 data);
 
-	int m_flipscreen;
+	devcb_write_line m_flip_screen_cb;
+	int m_flip_screen_state;
 	u8 m_dotclock;
 	struct {
 		u16 horz_blank, horz_display, vert_blank, vert_display;
