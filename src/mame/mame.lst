@@ -19075,6 +19075,12 @@ korgwssr                        //
 @source:korgz3.cpp
 korgz3                          //
 
+@source:kpython.cpp
+kpython                         // Konami Python Bios
+wswe                            // World Soccer Winning Eleven
+wswe2k3                         // World Soccer Winning Eleven 2003
+popn9                           // 2003
+
 @source:kramermc.cpp
 kramermc                        // 1987 Kramer MC
 
@@ -35038,12 +35044,6 @@ px8                             //
 @source:pyl601.cpp
 pyl601                          //
 pyl601a                         //
-
-@source:kpython.cpp
-kpython                         // Konami Python Bios
-wswe                            // World Soccer Winning Eleven
-wswe2k3                         // World Soccer Winning Eleven 2003
-popn9                           // 2003
 
 @source:pzletime.cpp
 pzletime                        //
