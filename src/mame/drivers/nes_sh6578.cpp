@@ -726,25 +726,25 @@ ROM_END
 
 
 
-CONS( 200?, maxx5in1,  0, 0,  nes_sh6578, nes_sh6578, nes_sh6578_state,  init_nes_sh6578, "Senario", "Vs Maxx 5-in-1 Casino / Senario Card & Casino Games", 0 ) // advertised on box as 'With Solitaire" (was there an even older version without it?)
+CONS( 200?, maxx5in1,  0, 0,  nes_sh6578, nes_sh6578, nes_sh6578_state,  init_nes_sh6578, "Senario / JungleTac", "Vs Maxx 5-in-1 Casino / Senario Card & Casino Games", 0 ) // advertised on box as 'With Solitaire" (was there an even older version without it?)
 
-CONS( 200?, maxx6in1,  0, 0,  nes_sh6578, nes_sh6578, nes_sh6578_state,  init_nes_sh6578, "Senario", "Vs Maxx 6-in-1 Casino / Senario Card & Casino Games", 0 ) // advertised on box as "With Texas Hold 'Em" (which is the added game since the 5-in-1)
+CONS( 200?, maxx6in1,  0, 0,  nes_sh6578, nes_sh6578, nes_sh6578_state,  init_nes_sh6578, "Senario / JungleTac", "Vs Maxx 6-in-1 Casino / Senario Card & Casino Games", 0 ) // advertised on box as "With Texas Hold 'Em" (which is the added game since the 5-in-1)
 
-CONS( 200?, max10in1,  0, 0,  nes_sh6578, nes_sh6578, nes_sh6578_max10in1_state,  init_nes_sh6578, "Senario", "Vs Maxx 10-in-1 Casino / Senario Card & Casino Games", 0 )
+CONS( 200?, max10in1,  0, 0,  nes_sh6578, nes_sh6578, nes_sh6578_max10in1_state,  init_nes_sh6578, "Senario / JungleTac", "Vs Maxx 10-in-1 Casino / Senario Card & Casino Games", 0 )
 
 // titles below have various issues (DMA, split interrupt timing etc.)
 
- // aka Wik!d Joystick, sometimes also called Air Blaster like the real Air Blaster game.  Wik!d seems a rebranding (a 'gift' company) so did ABL reuse the Air Blaster name here instead?
-CONS( 200?, ablwikid,    0,  0,  nes_sh6578_pal, nes_sh6578, nes_sh6578_abl_wikid_state, init_nes_sh6578, "Advance Bright Ltd.", "Wikid Joystick 14-in-1", MACHINE_NOT_WORKING )
+// aka Wik!d Joystick, sometimes also called Air Blaster like the real Air Blaster game.  Wik!d seems a rebranding (a 'gift' company) so did ABL reuse the Air Blaster name here instead?
+CONS( 200?, ablwikid,    0,  0,  nes_sh6578_pal, nes_sh6578, nes_sh6578_abl_wikid_state, init_nes_sh6578, "Advance Bright Ltd. / JungleTac", "Wikid Joystick 14-in-1", MACHINE_NOT_WORKING )
 
-CONS( 2001?, ts_handy11,  0,  0,  nes_sh6578,     nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Techno Source", "Handy Boy 11-in-1 (TV Play Power)", MACHINE_NOT_WORKING ) // possibly newer than 2001
+CONS( 2001?, ts_handy11,  0,  0,  nes_sh6578,     nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Techno Source / JungleTac", "Handy Boy 11-in-1 (TV Play Power)", MACHINE_NOT_WORKING ) // possibly newer than 2001
 
 // from a blue coloured unit, a yellow one exists, is it the same?
-CONS( 2004?, vsmaxx15,    0,  0,  nes_sh6578, nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Senario", "Vs Maxx 15-in-1", MACHINE_NOT_WORKING ) 
+CONS( 2004?, vsmaxx15,    0,  0,  nes_sh6578, nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Senario / JungleTac", "Vs Maxx 15-in-1", MACHINE_NOT_WORKING ) 
 
 // This is from the blue coloured unit with the 1p/2p slider (does it do anything / get read anywhere?)
 // A version of the 25-in-1 on VT hardware also exists, with the downgraded version of Big Racing & removed copyrights etc. (probably the purple tinted version without the 1p/2p slider)
-CONS( 2004?, vsmaxx25,    0,  0,  nes_sh6578, nes_sh6578, nes_sh6578_max10in1_state, init_nes_sh6578, "Senario", "Vs Maxx 25-in-1", MACHINE_NOT_WORKING )
+CONS( 2004?, vsmaxx25,    0,  0,  nes_sh6578, nes_sh6578, nes_sh6578_max10in1_state, init_nes_sh6578, "Senario / JungleTac", "Vs Maxx 25-in-1", MACHINE_NOT_WORKING )
 
 // titles below need inputs mapping to go further
 

@@ -180,6 +180,11 @@ ROM_START( rad_gen1 )
 	ROM_LOAD16_WORD_SWAP( "radicav1.bin", 0x000000, 0x400000,  CRC(3b4c8438) SHA1(5ed9c053f9ebc8d4bf571d57e562cf347585d158) )
 ROM_END
 
+ROM_START( rad_md1 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "radica.bin", 0x000000, 0x400000, CRC(85867db1) SHA1(ddc596e2e68dc872bc0679a2de7a295b4c6d6b8e) )
+ROM_END
+
 ROM_START( rad_gen2 )
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "genesisred.bin", 0x000000, 0x400000, CRC(7c1a0f0e) SHA1(a6441f75a4cd48f1563aeafdfbdde00202d4067c) )
@@ -220,13 +225,18 @@ void megadriv_radica_state::init_megadriv_radica_6button_ntsc()
 }
 
 
-CONS( 2004, rad_gen1,  0,     0, megadriv_radica_3button_ntsc, megadriv_radica_3button_1player, megadriv_radica_state, init_megadriv,                    "Radica / Sega",                     "Genesis Collection Volume 1 (Radica, Arcade Legends) (USA)", 0)
-CONS( 2004, rad_gen2,  0,     0, megadriv_radica_3button_ntsc, megadriv_radica_3button_1player, megadriv_radica_state, init_megadriv,                    "Radica / Sega",                     "Genesis Collection Volume 2 (Radica, Arcade Legends) (USA)", 0)
-CONS( 2004, rad_sonic, 0,     0, megadriv_radica_3button_ntsc, megadriv_radica_3button_1player, megadriv_radica_state, init_megadriv,                    "Radica / Sega",                     "Super Sonic Gold (Radica Plug & Play) (USA)", 0) // box calls this Volume 3
+CONS( 2004, rad_gen1,  0,        0, megadriv_radica_3button_ntsc, megadriv_radica_3button_1player, megadriv_radica_state, init_megadriv,                    "Radica / Sega",                     "Genesis Collection Volume 1 (Radica, Arcade Legends) (USA)", 0)
+CONS( 2004, rad_md1,   rad_gen1, 0, megadriv_radica_3button_pal,  megadriv_radica_3button_1player, megadriv_radica_state, init_megadrie,                    "Radica / Sega",                     "Mega Drive Collection Volume 1 (Radica, Arcade Legends) (Europe)", 0)
 
-CONS( 2004, rad_sf2,   0,     0, megadriv_radica_6button_ntsc, megadriv_radica_6button,         megadriv_radica_state, init_megadriv_radica_6button_ntsc,"Radica / Capcom / Sega",            "Street Fighter II: Special Champion Edition [Ghouls'n Ghosts] (Radica, Arcade Legends) (USA)", 0)
-CONS( 2004, rad_sf2p, rad_sf2,0, megadriv_radica_6button_pal,  megadriv_radica_6button,         megadriv_radica_state, init_megadriv_radica_6button_pal, "Radica / Capcom / Sega",            "Street Fighter II: Special Champion Edition [Ghouls'n Ghosts] (Radica, Arcade Legends) (Europe)", 0)
+CONS( 2004, rad_gen2,  0,        0, megadriv_radica_3button_ntsc, megadriv_radica_3button_1player, megadriv_radica_state, init_megadriv,                    "Radica / Sega",                     "Genesis Collection Volume 2 (Radica, Arcade Legends) (USA)", 0)
 
-CONS( 2004, rad_ssoc, 0,      0, megadriv_radica_3button_pal,  megadriv_radica_3button,         megadriv_radica_state, init_megadrie,                    "Radica / Sensible Software / Sega", "Sensible Soccer plus [Cannon Fodder, Mega lo Mania] (Radica, Arcade Legends) (Europe)", 0)  // still branded as Arcade Legends even if none of these were ever arcade games
+// box calls this Volume 3
+CONS( 2004, rad_sonic, 0,        0, megadriv_radica_3button_ntsc, megadriv_radica_3button_1player, megadriv_radica_state, init_megadriv,                    "Radica / Sega",                     "Super Sonic Gold (Radica Plug & Play) (USA)", 0)
 
-CONS( 2004, rad_orun, 0,      0, megadriv_radica_3button_pal,  megadriv_radica_3button_1player, megadriv_radica_state, init_megadrie,                    "Radica / Sega",                     "Out Run 2019 (Radica Plug & Play, Europe)", 0)
+CONS( 2004, rad_sf2,   0,        0, megadriv_radica_6button_ntsc, megadriv_radica_6button,         megadriv_radica_state, init_megadriv_radica_6button_ntsc,"Radica / Capcom / Sega",            "Street Fighter II: Special Champion Edition [Ghouls'n Ghosts] (Radica, Arcade Legends) (USA)", 0)
+CONS( 2004, rad_sf2p,  rad_sf2,  0, megadriv_radica_6button_pal,  megadriv_radica_6button,         megadriv_radica_state, init_megadriv_radica_6button_pal, "Radica / Capcom / Sega",            "Street Fighter II: Special Champion Edition [Ghouls'n Ghosts] (Radica, Arcade Legends) (Europe)", 0)
+
+// still branded as Arcade Legends even if none of these were ever arcade games, European exclusive
+CONS( 2004, rad_ssoc,  0,        0, megadriv_radica_3button_pal,  megadriv_radica_3button,         megadriv_radica_state, init_megadrie,                    "Radica / Sensible Software / Sega", "Sensible Soccer plus [Cannon Fodder, Mega lo Mania] (Radica, Arcade Legends) (Europe)", 0)
+
+CONS( 2004, rad_orun,  0,        0, megadriv_radica_3button_pal,  megadriv_radica_3button_1player, megadriv_radica_state, init_megadrie,                    "Radica / Sega",                     "Out Run 2019 (Radica Plug & Play, Europe)", 0)

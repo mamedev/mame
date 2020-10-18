@@ -413,17 +413,17 @@ ROM_END
 
 // these all have the same ROM scrambling
 
-CONS( 200?, lexizeus,    0,     0,        lexizeus,     lexizeus, spg2xx_lexizeus_game_state, init_zeus, "Lexibook", "Zeus IG900 20-in-1 (US?)",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // bad sound and some corrupt bg tilemap entries in Tiger Rescue, verify ROM data (same game runs in Zone 60 without issue)
+CONS( 200?, lexizeus,    0,     0,        lexizeus,     lexizeus, spg2xx_lexizeus_game_state, init_zeus, "Lexibook / JungleTac", "Zeus IG900 20-in-1 (US?)",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // bad sound and some corrupt bg tilemap entries in Tiger Rescue, verify ROM data (same game runs in Zone 60 without issue)
 
-CONS( 200?, vsplus,      0,     0,        vsplus,     vsplus, spg2xx_vsplus_game_state, init_vsplus, "<unknown>", "Vs Power Plus 30-in-1",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, vsplus,      0,     0,        vsplus,     vsplus, spg2xx_vsplus_game_state, init_vsplus, "<unknown> / JungleTac", "Vs Power Plus 30-in-1",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 
-CONS( 200?, lexiseal,    0,     0,        lexiseal,     lexiseal, spg2xx_lexiseal_game_state, init_zeus, "Lexibook / Sit Up Limited", "Seal 50-in-1",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // also has bad sound in Tiger Rescue, but no corrupt tilemap
+CONS( 200?, lexiseal,    0,     0,        lexiseal,     lexiseal, spg2xx_lexiseal_game_state, init_zeus, "Lexibook / Sit Up Limited / JungleTac", "Seal 50-in-1",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // also has bad sound in Tiger Rescue, but no corrupt tilemap
 // There are versions of the Seal 50-in-1 that actually show Lexibook on the boot screen rather than it just being on the unit.  The Seal name was also used for some VT systems
 
 CONS( 200?, discpal,     0,     0,        lexizeus,     lexiseal, spg2xx_lexizeus_game_state, init_zeus, "Performance Designed Products / Disney / Jungle Soft", "Disney Game It! Classic Pals",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 // There was also a Game It! Princess Pals
 
-CONS( 2006, vgcaplet,    0,     0,        lexiseal,     lexiseal, spg2xx_lexiseal_game_state, init_zeus, "Performance Designed Products (licensed by Taito / Data East)", "VG Pocket Caplet Fast Acting 50-in-1",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, vgcaplet,    0,     0,        lexiseal,     lexiseal, spg2xx_lexiseal_game_state, init_zeus, "Performance Designed Products (licensed by Taito / Data East) / JungleTac", "VG Pocket Caplet Fast Acting 50-in-1",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2006, vgcap35,     0,     0,        lexiseal,     lexiseal, spg2xx_lexiseal_game_state, init_zeus, "Performance Designed Products (licensed by Taito / Data East)", "VG Pocket Caplet Fast Acting 35-in-1",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, vgcap35,     0,     0,        lexiseal,     lexiseal, spg2xx_lexiseal_game_state, init_zeus, "Performance Designed Products (licensed by Taito / Data East) / JungleTac", "VG Pocket Caplet Fast Acting 35-in-1",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
