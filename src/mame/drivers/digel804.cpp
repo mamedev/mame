@@ -79,7 +79,10 @@ public:
 		m_vfd(*this, "vfd"),
 		m_kb(*this, "74c923"),
 		m_rambank(*this, "bankedram"),
-		m_func_leds(*this, "func_led%u", 0U)
+		m_func_leds(*this, "func_led%u", 0U),
+		m_input_led(*this, "input_led"),
+		m_busy_led(*this, "busy_led"),
+		m_error_led(*this, "error_led")
 	{
 	}
 
@@ -129,6 +132,9 @@ private:
 	required_memory_bank m_rambank;
 
 	output_finder<16> m_func_leds;
+	output_finder<> m_input_led;
+	output_finder<> m_busy_led;
+	output_finder<> m_error_led;
 
 	// current speaker state for port 45
 	uint8_t m_speaker_state;
@@ -169,6 +175,9 @@ enum { MODE_OFF, MODE_KEY, MODE_REM, MODE_SIM };
 void digel804_state::machine_start()
 {
 	m_func_leds.resolve();
+	m_input_led.resolve();
+	m_busy_led.resolve();
+	m_error_led.resolve();
 
 	save_item(NAME(m_speaker_state));
 	save_item(NAME(m_ram_bank));
@@ -377,9 +386,9 @@ void digel804_state::op46(uint8_t data)
 		//popmessage("LEDS: %s %s %s Func: %s%d\n", (data&0x80)?"INPUT":"-----", (data&0x40)?"BUSY":"----", (data&0x20)?"ERROR":"-----", (data&0x10)?"None":"", (data&0x10)?-1:(~data&0xF));
 		//fprintf("LEDS: %s %s %s Func: %s%d\n", (data&0x80)?"INPUT":"-----", (data&0x40)?"BUSY":"----", (data&0x20)?"ERROR":"-----", (data&0x10)?"None":"", (data&0x10)?-1:(~data&0xF));
 
-	output().set_value("input_led", BIT(data,7));
-	output().set_value("busy_led",  BIT(data,6));
-	output().set_value("error_led", BIT(data,5));
+	m_input_led = BIT(data,7);
+	m_busy_led  = BIT(data,6);
+	m_error_led = BIT(data,5);
 
 	for (int i = 0; i < 16; i++)
 		m_func_leds[i] = (!(data & 0x10) && ((~data & 0x0f) == i)) ? 1 : 0;

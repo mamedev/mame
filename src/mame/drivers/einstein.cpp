@@ -90,6 +90,7 @@ public:
 		m_porta_joy(*this, "PORTA_JOY"),
 		m_portb_joy(*this, "PORTB_JOY"),
 		m_dips(*this, "DIPS"),
+		m_alpha_lock_led(*this, "alpha_lock_led"),
 		m_rom_enabled(0),
 		m_keyboard_line(0), m_keyboard_data(0xff),
 		m_centronics_ack(0), m_centronics_busy(0), m_centronics_perror(0), m_centronics_fault(0), m_strobe(-1),
@@ -102,6 +103,10 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(joystick_button);
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_timer_callback);
@@ -140,9 +145,6 @@ private:
 	void einstein_mem(address_map &map);
 	void einst256_io(address_map &map);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
 	void einstein_scan_keyboard();
 
 	required_device<z80_device> m_maincpu;
@@ -168,6 +170,7 @@ private:
 	optional_ioport m_porta_joy;
 	optional_ioport m_portb_joy;
 	optional_ioport m_dips;
+	output_finder<> m_alpha_lock_led;
 
 	int m_rom_enabled;
 
@@ -181,7 +184,7 @@ private:
 	int m_centronics_perror;
 	int m_centronics_fault;
 	int m_strobe;
-	int m_alpha_lock_led;
+	int m_alpha_lock;
 
 	int m_int;
 };
@@ -453,6 +456,8 @@ void einstein_state::reset_w(uint8_t data)
 
 void einstein_state::machine_start()
 {
+	m_alpha_lock_led.resolve();
+
 	// initialize memory mapping
 	m_bank1->configure_entry(0, m_ram->pointer());
 	m_bank1->configure_entry(1, m_bios->base());
@@ -477,6 +482,7 @@ void einstein_state::machine_reset()
 	m_strobe = -1;
 
 	// enable Alpha Lock LED
+	m_alpha_lock = 1;
 	m_alpha_lock_led = 1;
 }
 
@@ -588,15 +594,18 @@ void einstein_state::pseudo_adc_w(uint8_t data)
 
 uint8_t einstein_state::alpha_lock_r()
 {
-	m_alpha_lock_led ^= 1;
-	output().set_value("alpha_lock_led", m_alpha_lock_led);
+	if (!machine().side_effects_disabled())
+	{
+		m_alpha_lock ^= 1;
+		m_alpha_lock_led = m_alpha_lock;
+	}
 	return 0xff;
 }
 
 void einstein_state::alpha_lock_w(uint8_t data)
 {
-	m_alpha_lock_led ^= 1;
-	output().set_value("alpha_lock_led", m_alpha_lock_led);
+	m_alpha_lock ^= 1;
+	m_alpha_lock_led = m_alpha_lock;
 }
 
 

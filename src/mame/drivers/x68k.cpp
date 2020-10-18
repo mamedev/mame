@@ -1501,13 +1501,6 @@ void x68k_state::machine_reset()
 	//m_mfpdev->i7_w(1); // h-sync
 
 	// reset output values
-	output().set_value("key_led_kana",1);
-	output().set_value("key_led_romaji",1);
-	output().set_value("key_led_code",1);
-	output().set_value("key_led_caps",1);
-	output().set_value("key_led_insert",1);
-	output().set_value("key_led_hiragana",1);
-	output().set_value("key_led_fullsize",1);
 	std::fill(std::begin(m_eject_drv_out), std::end(m_eject_drv_out), 1);
 	std::fill(std::begin(m_ctrl_drv_out), std::end(m_ctrl_drv_out), 1);
 	std::fill(std::begin(m_access_drv_out), std::end(m_access_drv_out), 1);

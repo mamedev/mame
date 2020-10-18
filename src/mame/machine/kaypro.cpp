@@ -65,8 +65,8 @@ void kaypro_state::kayproii_pio_system_w(u8 data)
 		m_floppy->ss_w(!BIT(data, 2)); // signal exists even though drives are single sided
 	}
 
-	output().set_value("ledA", BIT(data, 0));     /* LEDs in artwork */
-	output().set_value("ledB", BIT(data, 1));
+	m_leds[0] = BIT(data, 0);     // LEDs in artwork
+	m_leds[1] = BIT(data, 1);
 
 	m_centronics->write_strobe(BIT(data, 4));
 
@@ -128,8 +128,8 @@ void kaypro_state::kaypro484_system_port_w(u8 data)
 		m_floppy->ss_w(!BIT(data, 2));
 	}
 
-	output().set_value("ledA", BIT(data, 0));     /* LEDs in artwork */
-	output().set_value("ledB", BIT(data, 1));
+	m_leds[0] = BIT(data, 0);     // LEDs in artwork
+	m_leds[1] = BIT(data, 1);
 
 	m_centronics->write_strobe(BIT(data, 3));
 
@@ -222,6 +222,8 @@ void kaypro_state::machine_start()
 {
 	if (m_pio_s)
 		m_pio_s->strobe_a(0);
+
+	m_leds.resolve();
 
 	save_pointer(NAME(m_vram), 0x1000);
 	save_pointer(NAME(m_ram),  0x4000);

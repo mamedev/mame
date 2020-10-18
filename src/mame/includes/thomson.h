@@ -150,7 +150,8 @@ public:
 		m_to7qdd(*this, "to7qdd"),
 		m_thmfc(*this, "thmfc"),
 		m_floppy_led(*this, "floppy"),
-		m_floppy_image(*this, "floppy%u", 0U)
+		m_floppy_image(*this, "floppy%u", 0U),
+		m_caps_led(*this, "led0")
 	{
 	}
 
@@ -434,6 +435,8 @@ private:
 	output_finder<> m_floppy_led;
 	required_device_array<legacy_floppy_image_device, 4> m_floppy_image;
 
+	output_finder<> m_caps_led;
+
 	/* bank logging and optimisations */
 	int m_old_cart_bank;
 	int m_old_cart_bank_was_read_only;
@@ -555,7 +558,6 @@ private:
 	int mo5_get_cassette();
 	void mo5_set_cassette( int data );
 	void thom_irq_reset();
-	void thom_set_caps_led( int led );
 	void to7_update_cart_bank();
 	void to7_set_init( int init );
 	void to7_modem_reset();

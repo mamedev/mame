@@ -200,8 +200,8 @@ constexpr unsigned LP_XOFFSET = 5;  // x-offset of LP (due to delay in hit recog
 class hp9845_state : public driver_device
 {
 public:
-	hp9845_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag)
+	hp9845_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
 	{ }
 
 	void hp9845a(machine_config &config);
@@ -428,6 +428,9 @@ hp9845_base_state::hp9845_base_state(const machine_config &mconfig, device_type 
 	m_io_slot(*this, "slot%u", 0U),
 	m_ram(*this, RAM_TAG),
 	m_softkeys(*this, "Softkey%u", 0U),
+	m_shift_lock_led(*this, "shift_lock_led"),
+	m_prt_all_led(*this, "prt_all_led"),
+	m_auto_st_led(*this, "auto_st_led"),
 	m_chargen(*this, "chargen")
 {
 }
@@ -442,6 +445,10 @@ void hp9845_base_state::setup_ram_block(unsigned block , unsigned offset)
 void hp9845_base_state::machine_start()
 {
 	m_softkeys.resolve();
+	m_shift_lock_led.resolve();
+	m_prt_all_led.resolve();
+	m_auto_st_led.resolve();
+
 	m_screen->register_screen_bitmap(m_bitmap);
 
 	// setup RAM dynamically for -ramsize
@@ -719,21 +726,21 @@ INPUT_CHANGED_MEMBER(hp9845_base_state::togglekey_changed)
 		{
 			bool state = m_io_shiftlock->read();
 			popmessage("SHIFT LOCK %s", state ? "ON" : "OFF");
-			output().set_value("shift_lock_led" , state);
+			m_shift_lock_led = state;
 		}
 		break;
 	case 1: // Prt all
 		{
 			bool state = BIT(m_io_key[0]->read(), 1);
 			popmessage("PRT ALL %s", state ? "ON" : "OFF");
-			output().set_value("prt_all_led" , state);
+			m_prt_all_led = state;
 		}
 		break;
 	case 2: // Auto st
 		{
 			bool state = BIT(m_io_key[0]->read(), 17);
 			popmessage("AUTO ST %s", state ? "ON" : "OFF");
-			output().set_value("auto_st_led" , state);
+			m_auto_st_led = state;
 		}
 		break;
 	}

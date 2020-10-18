@@ -44,7 +44,7 @@ class lk201_device : public device_t, public device_serial_interface
 {
 public:
 	// construction/destruction
-	lk201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	lk201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	uint8_t ddr_r(offs_t offset);
 	void ddr_w(offs_t offset, uint8_t data);
@@ -109,24 +109,12 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<beep_device> m_speaker;
 
-	required_ioport m_kbd0;
-	required_ioport m_kbd1;
-	required_ioport m_kbd2;
-	required_ioport m_kbd3;
-	required_ioport m_kbd4;
-	required_ioport m_kbd5;
-	required_ioport m_kbd6;
-	required_ioport m_kbd7;
-	required_ioport m_kbd8;
-	required_ioport m_kbd9;
-	required_ioport m_kbd10;
-	required_ioport m_kbd11;
-	required_ioport m_kbd12;
-	required_ioport m_kbd13;
-	required_ioport m_kbd14;
-	required_ioport m_kbd15;
-	required_ioport m_kbd16;
-	required_ioport m_kbd17;
+	required_ioport_array<18> m_kbd;
+
+	output_finder<> m_led_wait;
+	output_finder<> m_led_compose;
+	output_finder<> m_led_lock;
+	output_finder<> m_led_hold;
 
 	void send_port(uint8_t offset, uint8_t data);
 	void update_interrupts();

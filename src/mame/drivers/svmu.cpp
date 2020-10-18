@@ -37,11 +37,17 @@ public:
 		, m_flash(*this, "flash")
 		, m_speaker(*this, "speaker")
 		, m_bios(*this, "bios")
+		, m_battery(*this, "BATTERY")
+		, m_file_icon(*this, "file_icon")
+		, m_game_icon(*this, "game_icon")
+		, m_clock_icon(*this, "clock_icon")
+		, m_flash_icon(*this, "flash_icon")
 	{ }
 
 	void svmu(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 private:
@@ -62,6 +68,11 @@ private:
 	required_device<intelfsh8_device> m_flash;
 	required_device<speaker_sound_device> m_speaker;
 	required_region_ptr<uint8_t> m_bios;
+	required_ioport m_battery;
+	output_finder<> m_file_icon;
+	output_finder<> m_game_icon;
+	output_finder<> m_clock_icon;
+	output_finder<> m_flash_icon;
 
 	uint8_t       m_page;
 };
@@ -126,7 +137,7 @@ void svmu_state::p1_w(uint8_t data)
 
 uint8_t svmu_state::p7_r()
 {
-	return (ioport("BATTERY")->read()<<1);
+	return (m_battery->read()<<1);
 }
 
 
@@ -159,6 +170,14 @@ static INPUT_PORTS_START( svmu )
 	PORT_CONFSETTING( 0x00, "Poor" )
 INPUT_PORTS_END
 
+void svmu_state::machine_start()
+{
+	m_file_icon.resolve();
+	m_game_icon.resolve();
+	m_clock_icon.resolve();
+	m_flash_icon.resolve();
+}
+
 void svmu_state::machine_reset()
 {
 	m_page = 0;
@@ -188,10 +207,10 @@ LC8670_LCD_UPDATE(svmu_state::svmu_lcd_update)
 		bitmap.fill(0, cliprect);
 	}
 
-	machine().output().set_value("file_icon" , lcd_enabled ? BIT(vram[0xc1],6) : 0);
-	machine().output().set_value("game_icon" , lcd_enabled ? BIT(vram[0xc2],4) : 0);
-	machine().output().set_value("clock_icon", lcd_enabled ? BIT(vram[0xc3],2) : 0);
-	machine().output().set_value("flash_icon", lcd_enabled ? BIT(vram[0xc4],0) : 0);
+	m_file_icon  = lcd_enabled ? BIT(vram[0xc1],6) : 0;
+	m_game_icon  = lcd_enabled ? BIT(vram[0xc2],4) : 0;
+	m_clock_icon = lcd_enabled ? BIT(vram[0xc3],2) : 0;
+	m_flash_icon = lcd_enabled ? BIT(vram[0xc4],0) : 0;
 
 	return 0;
 }

@@ -42,6 +42,12 @@ public:
 		, m_palette(*this, "palette")
 		, m_screen(*this, "screen")
 		, m_port(*this, "port%u", 1U)
+		, m_lshift0(*this, "lshift0")
+		, m_rshift0(*this, "rshift0")
+		, m_alpha0(*this, "alpha0")
+		, m_alert0(*this, "alert0")
+		, m_busy0(*this, "busy0")
+		, m_transmit0(*this, "transmit0")
 	{
 	}
 
@@ -149,6 +155,13 @@ private:
 	   port2: SX:32/128KB, GX:128/512/4096 KB
 	*/
 	optional_device_array<hp48_port_image_device, 2> m_port;
+
+	output_finder<> m_lshift0;
+	output_finder<> m_rshift0;
+	output_finder<> m_alpha0;
+	output_finder<> m_alert0;
+	output_finder<> m_busy0;
+	output_finder<> m_transmit0;
 
 	uint32_t m_bank_switch;
 	uint32_t m_io_addr;

@@ -43,7 +43,9 @@ public:
 		m_extra(*this, "EXTRA"),
 		m_buttons(*this, "BUTTONS"),
 		m_digits(*this, "digit%u", 0U),
-		m_leds(*this, "led_%c%u", unsigned('a'), 1U)
+		m_leds(*this, "led_%c%u", unsigned('a'), 1U),
+		m_monitor_led(*this, "monitor_led"),
+		m_playmode_led(*this, "playmode_led")
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
@@ -82,6 +84,8 @@ private:
 	required_ioport m_buttons;
 	output_finder<4> m_digits;
 	output_finder<10, 8> m_leds;
+	output_finder<> m_monitor_led;
+	output_finder<> m_playmode_led;
 
 	uint16_t m_matrix;
 	uint16_t m_led_sel;
@@ -182,6 +186,8 @@ void chessmst_state::machine_start()
 {
 	m_digits.resolve();
 	m_leds.resolve();
+	m_monitor_led.resolve();
+	m_playmode_led.resolve();
 
 	save_item(NAME(m_matrix));
 	save_item(NAME(m_led_sel));
@@ -248,8 +254,8 @@ void chessmst_state::pio1_port_b_dm_w(uint8_t data)
 
 	m_beeper->set_state(BIT(data, 3));
 
-	output().set_value("monitor_led", !BIT(data, 5));
-	output().set_value("playmode_led", !BIT(data, 6));
+	m_monitor_led = !BIT(data, 5);
+	m_playmode_led = !BIT(data, 6);
 }
 
 uint8_t chessmst_state::pio2_port_a_r()
