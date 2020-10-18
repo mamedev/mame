@@ -91,7 +91,7 @@ dac_device_base::dac_device_base(const machine_config &mconfig, device_type type
 	m_bits(bits),
 	m_mapper(mapper),
 	m_gain(gain),
-	m_range_min(-1.0),
+	m_range_min((bits == 1) ? 0.0 : -1.0),
 	m_range_max(1.0)
 {
 }
