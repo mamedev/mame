@@ -173,17 +173,18 @@ protected:
 	address_space_config m_io_config;
 
 	union
-	{                   /* eight general registers */
-		uint16_t w[8];    /* viewed as 16 bits registers */
-		uint8_t  b[16];   /* or as 8 bit registers */
+	{                   // eight general registers
+		uint16_t w[8];    // viewed as 16 bits registers
+		uint8_t  b[16];   // or as 8 bit registers
 	} m_regs;
 	uint16_t  m_sregs[4];
 
 	uint16_t  m_ip;
+	uint16_t  m_pfp;   // prefetch pointer
 
 	int32_t   m_SignVal;
-	uint32_t  m_AuxVal, m_OverVal, m_ZeroVal, m_CarryVal, m_ParityVal; /* 0 or non-0 valued flags */
-	uint8_t   m_TF, m_IF, m_DF, m_MF;     /* 0 or 1 valued flags */   /* OB[19.07.99] added Mode Flag V30 */
+	uint32_t  m_AuxVal, m_OverVal, m_ZeroVal, m_CarryVal, m_ParityVal; // 0 or non-0 valued flags
+	uint8_t   m_TF, m_IF, m_DF, m_MF;     // 0 or 1 valued flags. OB[19.07.99] added Mode Flag V30
 	uint32_t  m_int_vector;
 	uint32_t  m_pending_irq;
 	uint32_t  m_nmi_state;
@@ -196,9 +197,9 @@ protected:
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
 	int m_icount;
 
-	uint32_t m_prefix_base;   /* base address of the latest prefix segment */
-	bool m_seg_prefix;      /* prefix segment indicator */
-	bool m_seg_prefix_next; /* prefix segment for next instruction */
+	uint32_t m_prefix_base; // base address of the latest prefix segment
+	bool m_seg_prefix;      // prefix segment indicator
+	bool m_seg_prefix_next; // prefix segment for next instruction
 
 	uint16_t m_eo;
 	uint32_t m_ea_seg;

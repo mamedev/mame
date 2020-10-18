@@ -752,6 +752,7 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 	</software>
 	-->
 
+  <!-- how to play? -->
 	<software name="digimon">
 		<description>Digital Monster - Ver. WonderSwan (Rev 1)</description>
 		<year>1999</year>
