@@ -117,26 +117,6 @@ uint32_t mac_state::screen_update_macse30(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-uint32_t mac_state::screen_update_macprtb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	uint16_t const *const video_ram = (const uint16_t *) m_vram16.target();
-
-	for (int y = 0; y < 400; y++)
-	{
-		uint16_t *const line = &bitmap.pix(y);
-
-		for (int x = 0; x < 640; x += 16)
-		{
-			uint16_t const word = video_ram[((y * 640)/16) + ((x/16))];
-			for (int b = 0; b < 16; b++)
-			{
-				line[x + b] = (word >> (15 - b)) & 0x0001;
-			}
-		}
-	}
-	return 0;
-}
-
 uint32_t mac_state::screen_update_macpb140(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint16_t const *const video_ram = (const uint16_t *) m_vram.target();

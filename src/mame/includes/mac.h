@@ -105,7 +105,6 @@ public:
 	void maclc3(machine_config &config, bool egret = true);
 	void macpd210(machine_config &config);
 	void maciici(machine_config &config);
-	void macprtb(machine_config &config);
 	void maciix(machine_config &config, bool nubus_bank1 = true, bool nubus_bank2 = true);
 	void maclc520(machine_config &config);
 	void pwrmac(machine_config &config);
@@ -129,7 +128,6 @@ public:
 	void init_maclc2();
 	void init_maciifdhd();
 	void init_macse30();
-	void init_macprtb();
 	void init_maciivx();
 	void init_maciivi();
 	void init_macpd210();
@@ -361,9 +359,6 @@ private:
 	uint8_t mac_gsc_r(offs_t offset);
 	void mac_gsc_w(uint8_t data);
 
-	uint8_t mac_5396_r(offs_t offset);
-	void mac_5396_w(offs_t offset, uint8_t data);
-
 	uint32_t macwd_r(offs_t offset, uint32_t mem_mask = ~0);
 	void macwd_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
@@ -393,7 +388,6 @@ private:
 	void macpb165c_map(address_map &map);
 	void macpd210_map(address_map &map);
 	void macplus_map(address_map &map);
-	void macprtb_map(address_map &map);
 	void macse30_map(address_map &map);
 	void macse_map(address_map &map);
 	void pwrmac_map(address_map &map);
@@ -426,7 +420,6 @@ private:
 	void macgsc_palette(palette_device &palette) const;
 
 	DECLARE_VIDEO_START(mac);
-	DECLARE_VIDEO_START(macprtb);
 	DECLARE_VIDEO_START(macsonora);
 	DECLARE_VIDEO_RESET(macrbv);
 	DECLARE_VIDEO_START(macv8);
@@ -434,7 +427,6 @@ private:
 	DECLARE_VIDEO_RESET(maceagle);
 	DECLARE_VIDEO_START(macrbv);
 	uint32_t screen_update_mac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_macprtb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_macse30(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_macpb140(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_macpb160(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

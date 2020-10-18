@@ -422,11 +422,6 @@ void mac_state::mac_rbv_w(offs_t offset, uint8_t data)
 	}
 }
 
-// Portable/PB100 video
-VIDEO_START_MEMBER(mac_state,macprtb)
-{
-}
-
 uint16_t mac_state::mac_config_r()
 {
 	return 0xffff;  // returns nonzero if no PDS RAM expansion, 0 if present
@@ -548,49 +543,9 @@ void mac_state::mac_gsc_w(uint8_t data)
 {
 }
 
-uint8_t mac_state::mac_5396_r(offs_t offset)
-{
-	if (offset < 0x100)
-	{
-		return m_539x_1->read(offset>>4);
-	}
-	else    // pseudo-DMA: read from the FIFO
-	{
-		return m_539x_1->read(2);
-	}
-
-	// never executed
-	//return 0;
-}
-
-void mac_state::mac_5396_w(offs_t offset, uint8_t data)
-{
-	if (offset < 0x100)
-	{
-		m_539x_1->write(offset>>4, data);
-	}
-	else    // pseudo-DMA: write to the FIFO
-	{
-		m_539x_1->write(2, data);
-	}
-}
-
 /***************************************************************************
     ADDRESS MAPS
 ***************************************************************************/
-
-void mac_state::macprtb_map(address_map &map)
-{
-	map(0x900000, 0x93ffff).rom().region("bootrom", 0).mirror(0x0c0000);
-	map(0xf60000, 0xf6ffff).rw(FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w));
-	map(0xf70000, 0xf7ffff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w));
-	map(0xf90000, 0xf9ffff).rw(FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macplus_scsi_w));
-	map(0xfa8000, 0xfaffff).ram().share("vram16");  // VRAM
-	map(0xfb0000, 0xfbffff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write));
-	map(0xfc0000, 0xfcffff).r(FUNC(mac_state::mac_config_r));
-	map(0xfd0000, 0xfdffff).rw(FUNC(mac_state::mac_scc_r), FUNC(mac_state::mac_scc_2_w));
-	map(0xfffff0, 0xffffff).rw(FUNC(mac_state::mac_autovector_r), FUNC(mac_state::mac_autovector_w));
-}
 
 void mac_state::maclc_map(address_map &map)
 {
@@ -1019,43 +974,6 @@ template <typename T> void mac_state::add_nubus_pds(machine_config &config, cons
 	NUBUS_SLOT(config, slot_tag, "pds", std::forward<T>(opts), nullptr);
 }
 
-void mac_state::macprtb(machine_config &config)
-{
-	/* basic machine hardware */
-	M68000(config, m_maincpu, C15M);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::macprtb_map);
-	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
-
-	config.set_maximum_quantum(attotime::from_hz(60));
-
-	add_pb1xx_screen(config);
-	m_screen->set_screen_update(FUNC(mac_state::screen_update_macprtb));
-
-	PALETTE(config, m_palette, palette_device::MONOCHROME_INVERTED);
-
-	MCFG_VIDEO_START_OVERRIDE(mac_state,macprtb)
-
-	/* devices */
-	add_base_devices(config);
-	add_scsi(config);
-	add_asc(config, asc_device::asc_type::ASC);
-
-	MACADB(config, m_macadb, C15M);
-	m_macadb->set_pmu_mode(true);
-	m_macadb->set_pmu_is_via1(true);
-
-	VIA6522(config, m_via1, 783360);
-	m_via1->readpa_handler().set(FUNC(mac_state::mac_via_in_a_pmu));
-	m_via1->readpb_handler().set(FUNC(mac_state::mac_via_in_b_pmu));
-	m_via1->writepa_handler().set(FUNC(mac_state::mac_via_out_a_pmu));
-	m_via1->writepb_handler().set(FUNC(mac_state::mac_via_out_b_pmu));
-	m_via1->irq_handler().set(FUNC(mac_state::mac_via_irq));
-
-	RAM(config, m_ram);
-	m_ram->set_default_size("1M");
-	m_ram->set_extra_options("1M,3M,5M,7M,9M");
-}
-
 void mac_state::macii(machine_config &config, bool cpu, asc_device::asc_type asc_type, bool nubus, bool nubus_bank1, bool nubus_bank2)
 {
 	if (cpu)
@@ -1312,8 +1230,6 @@ void mac_state::macpb140(machine_config &config)
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME_INVERTED);
 
-	MCFG_VIDEO_START_OVERRIDE(mac_state,macprtb)
-
 	add_asc(config, asc_device::asc_type::ASC);
 	add_scsi(config);
 	add_base_devices(config, false, true);
@@ -1359,8 +1275,6 @@ void mac_state::macpb160(machine_config &config)
 	m_screen->set_screen_update(FUNC(mac_state::screen_update_macpb160));
 
 	PALETTE(config, m_palette, FUNC(mac_state::macgsc_palette), 16);
-
-	MCFG_VIDEO_START_OVERRIDE(mac_state,macprtb)
 
 	add_asc(config, asc_device::asc_type::ASC);
 	add_scsi(config);
@@ -1638,22 +1552,6 @@ ROM_START( pmac6100 )
 	ROM_LOAD( "9feb69b3.rom", 0x000000, 0x400000, CRC(a43fadbc) SHA1(6fac1c4e920a077c077b03902fef9199d5e8f2c3) )
 ROM_END
 
-ROM_START( macprtb )
-	ROM_REGION16_BE(0x40000, "bootrom", 0)
-	ROM_LOAD16_WORD( "93ca3846.rom", 0x000000, 0x040000, CRC(497348f8) SHA1(79b468b33fc53f11e87e2e4b195aac981bf0c0a6) )
-
-	ROM_REGION(0x1800, "pmu", 0)
-	ROM_LOAD( "pmuv1.bin", 0x000000, 0x001800, CRC(01dae148) SHA1(29d2fca7426c31f2b9334832ed3d257974a61bb1) )
-ROM_END
-
-ROM_START( macpb100 )
-	ROM_REGION16_BE(0x40000, "bootrom", 0)
-	ROM_LOAD16_WORD( "96645f9c.rom", 0x000000, 0x040000, CRC(29ac7ee9) SHA1(7f3acf40b1f63612de2314a2e9fcfeafca0711fc) )
-
-	ROM_REGION(0x1800, "pmu", 0)
-	ROM_LOAD( "pmuv1.bin", 0x000000, 0x001800, CRC(01dae148) SHA1(29d2fca7426c31f2b9334832ed3d257974a61bb1) )
-ROM_END
-
 ROM_START( macpb140 )
 	ROM_REGION32_BE(0x100000, "bootrom", 0)
 	ROM_LOAD( "420dbff3.rom", 0x000000, 0x100000, CRC(88ea2081) SHA1(7a8ee468d16e64f2ad10cb8d1a45e6f07cc9e212) )
@@ -1733,14 +1631,12 @@ COMP( 1987, macii,     0,        0,      macii,    macadb,  mac_state, init_maci
 COMP( 1987, maciihmu,  macii,    0,      maciihmu, macadb,  mac_state, init_macii,         "Apple Computer", "Macintosh II (w/o 68851 MMU)", MACHINE_NOT_WORKING )
 COMP( 1988, mac2fdhd,  0,        0,      macii,    macadb,  mac_state, init_maciifdhd,     "Apple Computer", "Macintosh II (FDHD)",  MACHINE_NOT_WORKING )
 COMP( 1988, maciix,    mac2fdhd, 0,      maciix,   macadb,  mac_state, init_maciix,        "Apple Computer", "Macintosh IIx",  MACHINE_NOT_WORKING )
-COMP( 1989, macprtb,   0,        0,      macprtb,  macadb,  mac_state, init_macprtb,       "Apple Computer", "Macintosh Portable", MACHINE_NOT_WORKING )
 COMP( 1989, macse30,   mac2fdhd, 0,      macse30,  macadb,  mac_state, init_macse30,       "Apple Computer", "Macintosh SE/30",  MACHINE_NOT_WORKING )
 COMP( 1989, maciicx,   mac2fdhd, 0,      maciicx,  macadb,  mac_state, init_maciicx,       "Apple Computer", "Macintosh IIcx",  MACHINE_NOT_WORKING )
 COMP( 1989, maciici,   0,        0,      maciici,  maciici, mac_state, init_maciici,       "Apple Computer", "Macintosh IIci", MACHINE_NOT_WORKING )
 COMP( 1990, maciifx,   0,        0,      maciifx,  macadb,  mac_state, init_maciifx,       "Apple Computer", "Macintosh IIfx",  MACHINE_NOT_WORKING )
 COMP( 1990, maclc,     0,        0,      maclc,    maciici, mac_state, init_maclc,         "Apple Computer", "Macintosh LC", MACHINE_IMPERFECT_SOUND )
 COMP( 1990, maciisi,   0,        0,      maciisi,  maciici, mac_state, init_maciisi,       "Apple Computer", "Macintosh IIsi", MACHINE_NOT_WORKING )
-COMP( 1991, macpb100,  0,        0,      macprtb,  macadb,  mac_state, init_macprtb,       "Apple Computer", "Macintosh PowerBook 100", MACHINE_NOT_WORKING )
 COMP( 1991, macpb140,  0,        0,      macpb140, macadb,  mac_state, init_macpb140,      "Apple Computer", "Macintosh PowerBook 140", MACHINE_NOT_WORKING )
 COMP( 1991, macpb170,  macpb140, 0,      macpb170, macadb,  mac_state, init_macpb140,      "Apple Computer", "Macintosh PowerBook 170", MACHINE_NOT_WORKING )
 COMP( 1991, macclas2,  0,        0,      macclas2, macadb,  mac_state, init_macclassic2,   "Apple Computer", "Macintosh Classic II", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )
