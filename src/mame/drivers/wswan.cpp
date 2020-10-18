@@ -851,12 +851,8 @@ void wswan_state::port_w(offs_t offset, u8 data)
 			//   mov al,0Eh
 			//   out C0h, al
 			//   br 2000:0h
-			// This delay should not be done on the cartridge. The cartcidge connector
-			// only has a 384KHz CLK signal which would be too slow.
 			//
-			// It is unknown if this is done in hardware by logic external to the
-			// v30mz cpu core in the SoC or whether it's supported by some pipelining
-			// inside the v30mz cpu core.
+			// This is a hack until pipelining is supported in the v30mz cpu core.
 			m_delayed_portC0_data = data;
 			m_portC0_timer->adjust(attotime::from_ticks(10, 3072000));
 			break;

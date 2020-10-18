@@ -262,6 +262,7 @@ void v30mz_cpu_device::device_reset()
 	m_sregs[SS] = 0;
 	m_sregs[DS0] = 0;
 	m_ip = 0;
+	m_pfp = 0;
 	m_SignVal = 0;
 	m_AuxVal = 0;
 	m_OverVal = 0;
@@ -523,8 +524,6 @@ inline void v30mz_cpu_device::get_ea()
 		m_ea_seg = default_base(DS0);
 		break;
 	}
-
-if (m_eo == 0xffff) printf("%06x: m_eo set to 0xffff\n", pc());
 }
 
 
@@ -803,7 +802,7 @@ inline void v30mz_cpu_device::set_OFB_Sub(uint32_t x, uint32_t y, uint32_t z)
 
 inline uint16_t v30mz_cpu_device::CompressFlags() const
 {
-	return 0x72
+	return 0x7002
 	  | (CF ? 1 : 0)
 		| (PF ? 4 : 0)
 		| (AF ? 0x10 : 0)

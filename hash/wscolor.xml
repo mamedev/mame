@@ -1676,8 +1676,8 @@ See the wswan software list for the full game list.
 	</software>
 
   <!-- off by 1 during intro scroll? -->
-	<!-- hangs after sequence after starting a game -->
-	<software name="riviera" supported="no">
+	<!-- code flow breaks down during 2nd battle, lots of gfx problems -->
+	<software name="riviera" supported="partial">
 		<!-- WSC only -->
 		<description>Riviera - Yakusoku no Chi Riviera</description>
 		<year>2002</year>
@@ -2226,7 +2226,8 @@ See the wswan software list for the full game list.
 		</part>
 	</software>
 
-	<software name="tonpuuso" supported="no">   <!-- it freezes -->
+  <!-- Freezes at game selection -->
+	<software name="tonpuuso" supported="no">
 		<!-- WSC -->
 		<description>Tonpuusou</description>
 		<year>2001</year>
