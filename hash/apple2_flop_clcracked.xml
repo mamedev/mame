@@ -37285,4 +37285,102 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="cavrncrt">
+		<description>Cavern Creatures (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Datamost</publisher>
+		<info name="release" value="2020-10-17"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="cavern creatures (4am crack).dsk" size="143360" crc="71701a4c" sha1="90e8f120d4c5e85a69f99f45cb0a008a417133f3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grndhous">
+		<description>Grandma's House (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Spinnaker</publisher>
+		<info name="release" value="2020-10-17"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="grandma's house (4am crack).dsk" size="143360" crc="ce2d4423" sha1="94ca7fe043b24504e8e8806de97fa360d149b3e0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gesltnv1">
+		<description>Latin Vocabulary I (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Gessler Educational Software</publisher>
+		<info name="release" value="2020-10-17"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="latin vocabulary i (4am crack).dsk" size="143360" crc="c959ceac" sha1="dfa58b32c952a05e636216eb95b869f3e6a5d4ae"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ootopss">
+		<description>Oo-Topos (Sentient Software) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Sentient Software</publisher>
+		<info name="release" value="2020-10-17"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="oo-topos (sentient software) (4am crack).dsk" size="143360" crc="b637fa9e" sha1="232865a6f3539df681128076b6333f053604a2d0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sargon3">
+		<description>Sargon III (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Hayden Software</publisher>
+		<info name="release" value="2020-10-17"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Program disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="sargon iii (hayden) (4am crack) side a - program.dsk" size="143360" crc="73ff040a" sha1="2400bc73ee4f7752f07bc871b5d67bddd84bb781"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Great games"/>
+			<dataarea name="flop" size="143360">
+				<rom name="sargon iii (hayden) (4am crack) side b - great games.dsk" size="143360" crc="a28d8935" sha1="2a4dca4e13608380d8c13f530dc435558a103cf8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fathom40">
+		<description>Fathoms 40 (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Datasoft</publisher>
+
+		<info name="release" value="2020-10-17"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="fathoms 40 (4am crack).dsk" size="143360" crc="5f23866e" sha1="a4ea1b01fc84c822dc82b6e84ccccfec8da7aa2c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="canclmbr">
+		<description>Canyon Climber (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Datasoft</publisher>
+		<info name="release" value="2020-10-17"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="canyon climber (4am crack).dsk" size="143360" crc="9fc4be6c" sha1="bae5f73448c16e70c7936e913ff7d581a1449f1c"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
