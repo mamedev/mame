@@ -189,6 +189,7 @@ void ms32_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, con
 		s32 sx, sy;
 		u16 xzoom, yzoom;
 		
+		// TODO: causes a meaningless stack trace crash on this call with -debug???
 		m_sprite->extract_parameters(true, false, source, disable, pri, flipx, flipy, code, color, tx, ty, xsize, ysize, sx, sy, xzoom, yzoom);
 
 		if (disable || !xzoom || !yzoom)
