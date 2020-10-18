@@ -27,7 +27,7 @@ Jaleco MS32 System Control Unit
 // ======================> jaleco_ms32_sysctrl_device
 
 class jaleco_ms32_sysctrl_device : public device_t,
-								   public device_memory_interface,
+								   //public device_memory_interface,
 								   public device_video_interface
 {
 public:
@@ -35,8 +35,9 @@ public:
 	jaleco_ms32_sysctrl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
-	void write(offs_t offset, u16 data, u16 mem_mask = ~0);
-	u16 read(offs_t offset, u16 mem_mask = ~0);
+//	void write(offs_t offset, u16 data, u16 mem_mask = ~0);
+//	u16 read(offs_t offset, u16 mem_mask = ~0);
+	void amap(address_map &map);
 
 
 protected:
@@ -45,10 +46,10 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual space_config_vector memory_space_config() const override;
+//	virtual space_config_vector memory_space_config() const override;
 
-	const address_space_config m_space_config;
-	void io_map(address_map &map);
+//	const address_space_config m_space_config;
+//	void io_map(address_map &map);
 	
 private:
 	void control_w(u16 data);

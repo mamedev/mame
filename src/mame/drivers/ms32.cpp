@@ -699,7 +699,7 @@ void ms32_state::ms32_map(address_map &map)
 	map(0xfcc00004, 0xfcc00007).portr("INPUTS");
 	map(0xfcc00010, 0xfcc00013).portr("DSW");
 	// System Registers
-	map(0xfce00000, 0xfce0002f).rw(m_sysctrl, FUNC(jaleco_ms32_sysctrl_device::read), FUNC(jaleco_ms32_sysctrl_device::write)).umask32(0x0000ffff);
+	map(0xfce00000, 0xfce0002f).m(m_sysctrl, FUNC(jaleco_ms32_sysctrl_device::amap)).umask32(0x0000ffff);
 //	map(0xfce00000, 0xfce0002f).w(FUNC(ms32_state::crtc_w));   					// flip screen + CRTC setup
 //	map(0xfce00030, 0xfce00033) 												// timer irq control
 	map(0xfce00034, 0xfce00037).nopw(); 										// timer irq trigger (ack?)
@@ -1399,7 +1399,7 @@ static INPUT_PORTS_START( hayaosi3 )
 	PORT_DIPUNKNOWN_DIPLOC( 0x00000004, 0x00000004, "SW2:6" )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( kirarast )    // player 1 inputs done? others?
+static INPUT_PORTS_START( kirarast )
 	PORT_INCLUDE( ms32_mahjong )
 
 	PORT_MODIFY("DSW")
@@ -1422,7 +1422,7 @@ static INPUT_PORTS_START( kirarast )    // player 1 inputs done? others?
 	PORT_DIPNAME( 0x00000004, 0x00000004, "Campaign Mode" ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000004, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000008, 0x00000008, "Tumo Pinfu" ) PORT_DIPLOCATION("SW2:5")
+	PORT_DIPNAME( 0x00000008, 0x00000008, "Tsumo Pinfu" ) PORT_DIPLOCATION("SW2:5") // "Tumo Pinfu" (sic)
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000008, DEF_STR( On ) )
 	PORT_DIPNAME( 0x00000010, 0x00000010, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:4")
@@ -1439,17 +1439,17 @@ static INPUT_PORTS_START( kirarast )    // player 1 inputs done? others?
 	PORT_DIPSETTING(          0x00000020, DEF_STR( Hardest ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( suchie2 )  // player 1 inputs done? others?
+static INPUT_PORTS_START( suchie2 )
 	PORT_INCLUDE( kirarast )
 
 	PORT_MODIFY("INPUTS")
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNUSED )    /* coin 2 is unused */
 
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x00000400, 0x00000400, "Campaign Mode" ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x00000400, 0x00000400, "Campaign Mode" ) PORT_DIPLOCATION("SW1:6") // "Campain Mode" (sic)
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000400, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000800, 0x00000800, "Tumo Pinfu" ) PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x00000800, 0x00000800, "Tsumo Pinfu" ) PORT_DIPLOCATION("SW1:5") // "Tumo Pinfu" (sic)
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000800, DEF_STR( On ) )
 	PORT_DIPNAME( 0x00001000, 0x00001000, DEF_STR( Demo_Sounds) ) PORT_DIPLOCATION("SW1:4")
@@ -1469,12 +1469,11 @@ static INPUT_PORTS_START( suchie2 )  // player 1 inputs done? others?
 	PORT_DIPSETTING(          0x00000080, DEF_STR( Hardest ) )
 INPUT_PORTS_END
 
-
 static INPUT_PORTS_START( wpksocv2 )
 	PORT_INCLUDE( ms32 )
 
 	PORT_MODIFY("INPUTS")
-	/* Still missing the correct input for begin the left right movement */
+	// TODO: Still missing the correct input for begin the left right movement
 	PORT_BIT( 0x0000000f, 0x00000000, IPT_PEDAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(7) PORT_PLAYER(1)
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1515,11 +1514,10 @@ static INPUT_PORTS_START( wpksocv2 )
 	PORT_DIPSETTING(          0x00200000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x00c00000, 0x00000000, DEF_STR( Region ) ) PORT_DIPLOCATION("SW3:2,1")
 	PORT_DIPSETTING(          0x00400000, DEF_STR( USA ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( World ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( Asia ) )
 //  PORT_DIPSETTING(          0x00800000, "?" )
 	PORT_DIPSETTING(          0x00c00000, DEF_STR( Japan ) )
 INPUT_PORTS_END
-
 
 static INPUT_PORTS_START( f1superb )
 	PORT_INCLUDE( ms32 )
@@ -1603,7 +1601,6 @@ static INPUT_PORTS_START( f1superb )
 	PORT_DIPSETTING(    0x0c, "7" )
 	PORT_DIPSETTING(    0x0e, "8" )
 	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNUSED )
-
 INPUT_PORTS_END
 
 /********** GFX DECODE **********/
@@ -2688,9 +2685,11 @@ void ms32_state::init_suchie2()
 
 void ms32_state::init_f1superb()
 {
-#if 0 // we shouldn't need this hack, something else is wrong, and the x offsets are never copied either, v70 problems??
+#if 0
+	// hack for ?, game needs FPUs emulated anyway, eventually remove me
 	u32 *pROM = (u32 *)memregion("maincpu")->base();
 	pROM[0x19d04/4]=0x167a021a; // bne->br  : sprite Y offset table is always copied to RAM
+	// the x offsets are never copied either ...
 #endif
 	init_ss92046_01();
 }
@@ -2703,25 +2702,25 @@ void ms32_state::init_bnstars()
 /********** GAME DRIVERS **********/
 
 
-
+// TODO: inputs in akiss, bnstars (former has no dip display in service mode)
 GAME( 1994, hayaosi2,  0,        ms32, hayaosi2, ms32_state, init_ss92046_01, ROT0,   "Jaleco",        "Hayaoshi Quiz Grand Champion Taikai", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, hayaosi3,  0,        ms32, hayaosi3, ms32_state, init_ss92046_01, ROT0,   "Jaleco",        "Hayaoshi Quiz Nettou Namahousou (ver 1.5)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, hayaosi3a, hayaosi3, ms32, hayaosi3, ms32_state, init_ss92046_01, ROT0,   "Jaleco",        "Hayaoshi Quiz Nettou Namahousou (ver 1.2)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, bbbxing,   0,        ms32, bbbxing,  ms32_state, init_ss92046_01, ROT0,   "Jaleco",        "Best Bout Boxing (ver 1.3)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, bbbxing,   0,        ms32, bbbxing,  ms32_state, init_ss92046_01, ROT0,   "Jaleco",        "Best Bout Boxing (ver 1.3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
 GAME( 1994, suchie2,   0,        ms32, suchie2,  ms32_state, init_suchie2,    ROT0,   "Jaleco",        "Idol Janshi Suchie-Pai II (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1994, suchie2o,  suchie2,  ms32, suchie2,  ms32_state, init_suchie2,    ROT0,   "Jaleco",        "Idol Janshi Suchie-Pai II (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, desertwr,  0,        ms32, desertwr, ms32_state, init_ss91022_10, ROT270, "Jaleco",        "Desert War / Wangan Sensou (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, gametngk,  0,        ms32, gametngk, ms32_state, init_ss91022_10, ROT270, "Jaleco",        "The Game Paradise - Master of Shooting! / Game Tengoku - The Game Paradise (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, tetrisp,   0,        ms32, tetrisp,  ms32_state, init_ss92046_01, ROT0,   "Jaleco / BPS",  "Tetris Plus (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, p47aces,   0,        ms32, p47aces,  ms32_state, init_ss92048_01, ROT0,   "Jaleco",         "P-47 Aces (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, p47acesa,  p47aces,  ms32, p47aces,  ms32_state, init_ss92048_01, ROT0,   "Jaleco",         "P-47 Aces (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, akiss,     0,        ms32, suchie2,  ms32_state, init_kirarast,   ROT0,   "Jaleco",         "Mahjong Angel Kiss (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, gratia,    0,        ms32, gratia,   ms32_state, init_ss92047_01, ROT0,   "Jaleco",         "Gratia - Second Earth (ver 1.0, 92047-01 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, gratiaa,   gratia,   ms32, gratia,   ms32_state, init_ss91022_10, ROT0,   "Jaleco",         "Gratia - Second Earth (ver 1.0, 91022-10 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, kirarast,  0,        ms32, kirarast, ms32_state, init_kirarast,   ROT0,   "Jaleco",         "Ryuusei Janshi Kirara Star", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, tp2m32,    tetrisp2, ms32, tp2m32,   ms32_state, init_ss91022_10, ROT0,   "Jaleco",         "Tetris Plus 2 (ver 1.0, MegaSystem 32 Version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, bnstars,   bnstars1, ms32, suchie2,  ms32_state, init_bnstars,    ROT0,   "Jaleco",         "Vs. Janshi Brandnew Stars (Ver 1.1, MegaSystem32 Version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, wpksocv2,  0,        ms32, wpksocv2, ms32_state, init_ss92046_01, ROT0,   "Jaleco",         "World PK Soccer V2 (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, desertwr,  0,        ms32, desertwr, ms32_state, init_ss91022_10, ROT270, "Jaleco",        "Desert War / Wangan Sensou (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, gametngk,  0,        ms32, gametngk, ms32_state, init_ss91022_10, ROT270, "Jaleco",        "The Game Paradise - Master of Shooting! / Game Tengoku - The Game Paradise (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, tetrisp,   0,        ms32, tetrisp,  ms32_state, init_ss92046_01, ROT0,   "Jaleco / BPS",  "Tetris Plus (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, p47aces,   0,        ms32, p47aces,  ms32_state, init_ss92048_01, ROT0,   "Jaleco",        "P-47 Aces (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, p47acesa,  p47aces,  ms32, p47aces,  ms32_state, init_ss92048_01, ROT0,   "Jaleco",        "P-47 Aces (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, akiss,     0,        ms32, suchie2,  ms32_state, init_kirarast,   ROT0,   "Jaleco",        "Mahjong Angel Kiss (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, gratia,    0,        ms32, gratia,   ms32_state, init_ss92047_01, ROT0,   "Jaleco",        "Gratia - Second Earth (ver 1.0, 92047-01 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, gratiaa,   gratia,   ms32, gratia,   ms32_state, init_ss91022_10, ROT0,   "Jaleco",        "Gratia - Second Earth (ver 1.0, 91022-10 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, kirarast,  0,        ms32, kirarast, ms32_state, init_kirarast,   ROT0,   "Jaleco",        "Ryuusei Janshi Kirara Star", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, tp2m32,    tetrisp2, ms32, tp2m32,   ms32_state, init_ss91022_10, ROT0,   "Jaleco",        "Tetris Plus 2 (ver 1.0, MegaSystem 32 Version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, bnstars,   bnstars1, ms32, suchie2,  ms32_state, init_bnstars,    ROT0,   "Jaleco",        "Vs. Janshi Brandnew Stars (Ver 1.1, MegaSystem32 Version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, wpksocv2,  0,        ms32, wpksocv2, ms32_state, init_ss92046_01, ROT0,   "Jaleco",        "World PK Soccer V2 (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 /* these boot and show something */
-GAME( 1994, f1superb, 0,        f1superb, f1superb, ms32_state, init_f1superb, ROT0,   "Jaleco",        "F-1 Super Battle", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, f1superb, 0,        f1superb, f1superb, ms32_state, init_f1superb, ROT0,   "Jaleco",       "F-1 Super Battle", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )

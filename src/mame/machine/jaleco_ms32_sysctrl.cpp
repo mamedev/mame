@@ -44,31 +44,40 @@ DEFINE_DEVICE_TYPE(JALECO_MS32_SYSCTRL, jaleco_ms32_sysctrl_device, "jaleco_ms32
 
 jaleco_ms32_sysctrl_device::jaleco_ms32_sysctrl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, JALECO_MS32_SYSCTRL, tag, owner, clock)
-	, device_memory_interface(mconfig, *this)
+//	, device_memory_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
-	, m_space_config("regs", ENDIANNESS_NATIVE, 16, 6, -1, address_map_constructor(FUNC(jaleco_ms32_sysctrl_device::io_map), this))
+//	, m_space_config("regs", ENDIANNESS_NATIVE, 16, 6, -1, address_map_constructor(FUNC(jaleco_ms32_sysctrl_device::io_map), this))
 {
 }
 
+/*
 device_memory_interface::space_config_vector jaleco_ms32_sysctrl_device::memory_space_config() const
 {
 	return space_config_vector {
 		std::make_pair(AS_IO, &m_space_config)
 	};
-}
+}*/
 
-void jaleco_ms32_sysctrl_device::io_map(address_map& map)
+void jaleco_ms32_sysctrl_device::amap(address_map& map)
 {
-//	0xfce00000 in MS32, 0xba0000 in 68k (add * 2 for actual addresses) 
-	map(0x00, 0x00).w(FUNC(jaleco_ms32_sysctrl_device::control_w));
-	map(0x01, 0x01).w(FUNC(jaleco_ms32_sysctrl_device::hblank_w));
-	map(0x02, 0x02).w(FUNC(jaleco_ms32_sysctrl_device::hdisplay_w));
-	map(0x03, 0x03).w(FUNC(jaleco_ms32_sysctrl_device::hbp_w));
-	map(0x04, 0x04).w(FUNC(jaleco_ms32_sysctrl_device::hfp_w));
-	map(0x05, 0x05).w(FUNC(jaleco_ms32_sysctrl_device::vblank_w));
-	map(0x06, 0x06).w(FUNC(jaleco_ms32_sysctrl_device::vdisplay_w));
-	map(0x07, 0x07).w(FUNC(jaleco_ms32_sysctrl_device::vbp_w));
-	map(0x08, 0x08).w(FUNC(jaleco_ms32_sysctrl_device::vfp_w));
+//	0xba0000 in 68k, 0xfce00000 in MS32 mapped at lower 16-bits mask
+	map(0x00, 0x01).w(FUNC(jaleco_ms32_sysctrl_device::control_w));
+	map(0x02, 0x03).w(FUNC(jaleco_ms32_sysctrl_device::hblank_w));
+	map(0x04, 0x05).w(FUNC(jaleco_ms32_sysctrl_device::hdisplay_w));
+	map(0x06, 0x07).w(FUNC(jaleco_ms32_sysctrl_device::hbp_w));
+	map(0x08, 0x09).w(FUNC(jaleco_ms32_sysctrl_device::hfp_w));
+	map(0x0a, 0x0b).w(FUNC(jaleco_ms32_sysctrl_device::vblank_w));
+	map(0x0c, 0x0d).w(FUNC(jaleco_ms32_sysctrl_device::vdisplay_w));
+	map(0x0e, 0x0f).w(FUNC(jaleco_ms32_sysctrl_device::vbp_w));
+	map(0x10, 0x11).w(FUNC(jaleco_ms32_sysctrl_device::vfp_w));
+//  map(0x18, 0x19).w(FUNC(jaleco_ms32_sysctrl_device::timer_interval_w));
+//	map(0x1a, 0x1b).w(FUNC(jaleco_ms32_sysctrl_device::timer_go_w));
+//	map(0x1c, 0x1d).w(FUNC(jaleco_ms32_sysctrl_device::sound_reset_w));
+//	map(0x1e, 0x1f).w // ???
+//	map(0x24, 0x27).w // sound comms bidirectional acks?
+	map(0x28, 0x29).nopw(); // watchdog
+//	map(0x2c, 0x2d).w // irq ack
+//	map(0x2e, 0x2f).w // ^
 }
 
 //-------------------------------------------------
@@ -79,6 +88,7 @@ void jaleco_ms32_sysctrl_device::io_map(address_map& map)
 void jaleco_ms32_sysctrl_device::device_add_mconfig(machine_config &config)
 {
 	//DEVICE(config, ...);
+	// TODO: at least watchdog
 }
 
 
@@ -115,7 +125,7 @@ void jaleco_ms32_sysctrl_device::device_reset()
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-u16 jaleco_ms32_sysctrl_device::read(offs_t offset, u16 mem_mask)
+/*u16 jaleco_ms32_sysctrl_device::read(offs_t offset, u16 mem_mask)
 {
 	return this->space(AS_IO).read_word(offset, mem_mask);
 }
@@ -123,7 +133,7 @@ u16 jaleco_ms32_sysctrl_device::read(offs_t offset, u16 mem_mask)
 void jaleco_ms32_sysctrl_device::write(offs_t offset, u16 data, u16 mem_mask)
 {
 	this->space(AS_IO).write_word(offset, data, mem_mask);
-}
+}*/
 
 // =================
 // CRTC
