@@ -1417,17 +1417,6 @@ if (SOUNDS["PCD3311"]~=null) then
 end
 
 ---------------------------------------------------
--- Voltage Regulator
---@src/devices/sound/volt_reg.h,SOUNDS["VOLT_REG"] = true
----------------------------------------------------
-if (SOUNDS["VOLT_REG"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/sound/volt_reg.cpp",
-		MAME_DIR .. "src/devices/sound/volt_reg.h",
-	}
-end
-
----------------------------------------------------
 -- DAC-76 COMDAC
 --@src/devices/sound/dac76.h,SOUNDS["DAC76"] = true
 ---------------------------------------------------

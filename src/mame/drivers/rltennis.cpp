@@ -66,7 +66,6 @@ player - when there's nothing to play - first, empty 2k of ROMs are selected.
 
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprompar.h"
-#include "sound/volt_reg.h"
 #include "video/ramdac.h"
 #include "screen.h"
 #include "speaker.h"
@@ -206,9 +205,6 @@ void rltennis_state::rltennis(machine_config &config)
 
 	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // Unknown DAC
 	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // Unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 ROM_START( rltennis )

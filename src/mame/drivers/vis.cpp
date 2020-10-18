@@ -8,7 +8,6 @@
 #include "machine/at.h"
 #include "sound/262intf.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/pc_vga.h"
 #include "speaker.h"
 
@@ -141,12 +140,6 @@ void vis_audio_device::device_add_mconfig(machine_config &config)
 	DAC_16BIT_R2R(config, m_rdac, 0);
 	m_ldac->add_route(ALL_OUTPUTS, "lspeaker", 1.0); // sanyo lc7883k
 	m_rdac->add_route(ALL_OUTPUTS, "rspeaker", 1.0); // sanyo lc7883k
-
-	voltage_regulator_device &vreg(VOLTAGE_REGULATOR(config, "vref"));
-	vreg.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
-	vreg.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
-	vreg.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
-	vreg.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 uint8_t vis_audio_device::pcm_r(offs_t offset)

@@ -45,7 +45,6 @@
 #include "includes/s11b.h"
 
 #include "cpu/m6809/m6809.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 #include "s11b.lh"
@@ -301,8 +300,6 @@ void s11b_state::s11b_base(machine_config &config)
 	INPUT_MERGER_ANY_HIGH(config, m_audioirq).output_handler().set_inputline(m_audiocpu, M6802_IRQ_LINE);
 
 	MC1408(config, m_dac, 0);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, m_dac, 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, m_dac, -1.0, DAC_VREF_NEG_INPUT);
 
 	// this CVSD filter differs from the one on system 11 and 11a, possibly simplified so it uses more of the same components, or so it has a different
 	// shape/cutoff than the filter on the bg music/speech board, on purpose.

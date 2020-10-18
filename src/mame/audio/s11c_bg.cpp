@@ -216,7 +216,6 @@
 
 #include "emu.h"
 #include "s11c_bg.h"
-#include "sound/volt_reg.h"
 
 
 DEFINE_DEVICE_TYPE(S11C_BG, s11c_bg_device, "s11c_bg", "Williams System 11C Background Audio Board") // D-11581-20xx or D-11581-400xx or A-13971-50003
@@ -369,9 +368,6 @@ void s11c_bg_device::s11_bg_base(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(50));
 
 	MC1408(config, m_dac, 0);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	PIA6821(config, m_pia40, 0);
 	m_pia40->writepa_handler().set("dac", FUNC(dac_byte_interface::data_w));

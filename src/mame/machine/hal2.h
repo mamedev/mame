@@ -12,7 +12,6 @@
 #pragma once
 
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 class hal2_device : public device_t

@@ -164,7 +164,6 @@
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/hd63484.h"
 #include "video/ramdac.h"
 #include "emupal.h"
@@ -537,9 +536,6 @@ void wildpkr_state::tabpkr(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	AD557(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.50);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 

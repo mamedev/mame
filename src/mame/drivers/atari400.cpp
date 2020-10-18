@@ -50,7 +50,6 @@
 #include "machine/atarifdc.h"
 #include "sound/dac.h"
 #include "sound/pokey.h"
-#include "sound/volt_reg.h"
 
 #include "bus/a800/a800_slot.h"
 #include "bus/a800/a800_carts.h"
@@ -2165,7 +2164,6 @@ void a400_state::atari_common(machine_config &config)
 	atari_common_nodac(config);
 
 	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.03);
-	VOLTAGE_REGULATOR(config, "vref", 0).add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("48K");

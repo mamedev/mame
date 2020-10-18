@@ -19,7 +19,6 @@
 #include "cpu/mcs51/mcs51.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 

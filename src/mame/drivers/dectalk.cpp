@@ -245,7 +245,6 @@ dgc (dg(no!spam)cx@mac.com)
 #include "machine/mc68681.h"
 #include "machine/x2212.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 
@@ -905,9 +904,6 @@ void dectalk_state::dectalk(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	AD7541(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.9); // ad7541.e107 (E88 10KHz OSC, handled by timer)
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	/* Y2 is a 3.579545 MHz xtal for the dtmf decoder chip */
 

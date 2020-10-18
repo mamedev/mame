@@ -57,7 +57,6 @@ Games by Nihon Game/Culture Brain:
 #include "machine/74259.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -421,9 +420,6 @@ void shangkid_state::chinhero(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	AY8910(config, m_aysnd, XTAL(18'432'000)/12); /* verified on pcb */
 	m_aysnd->port_a_write_callback().set(FUNC(shangkid_state::chinhero_ay8910_porta_w));

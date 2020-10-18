@@ -39,7 +39,6 @@
 #include "sound/okim6295.h"
 #include "sound/hc55516.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 
 
 #define NARC_MASTER_CLOCK       XTAL(8'000'000)
@@ -195,9 +194,6 @@ void williams_cvsd_sound_device::device_add_mconfig(machine_config &config)
 	m_ym2151->add_route(ALL_OUTPUTS, *this, 0.10);
 
 	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.25);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	HC55516(config, m_hc55516, 0);
 	m_hc55516->add_route(ALL_OUTPUTS, *this, 0.60);
@@ -516,9 +512,6 @@ void williams_narc_sound_device::device_add_mconfig(machine_config &config)
 
 	AD7224(config, "dac1", 0).add_route(ALL_OUTPUTS, *this, 0.25);
 	AD7224(config, "dac2", 0).add_route(ALL_OUTPUTS, *this, 0.25);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
 
 	HC55516(config, m_hc55516, 0).add_route(ALL_OUTPUTS, *this, 0.60);
 }
@@ -769,9 +762,6 @@ void williams_adpcm_sound_device::device_add_mconfig(machine_config &config)
 	ym2151.add_route(ALL_OUTPUTS, *this, 0.10);
 
 	AD7524(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.10);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	okim6295_device &oki(OKIM6295(config, "oki", ADPCM_MASTER_CLOCK/8, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
 	oki.set_addrmap(0, &williams_adpcm_sound_device::williams_adpcm_oki_map);

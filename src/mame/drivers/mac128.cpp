@@ -103,7 +103,6 @@ c0   8 data bits, Rx disabled
 #include "machine/z80scc.h"
 #include "machine/macadb.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "bus/macpds/pds_tpdfpd.h"
 
 #include "formats/ap_dsk35.h"
@@ -932,9 +931,6 @@ void mac128_state::mac512ke(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_8BIT_PWM(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // 2 x ls161
-	voltage_regulator_device &vreg(VOLTAGE_REGULATOR(config, "vref"));
-	vreg.add_route(0, DAC_TAG, 1.0, DAC_VREF_POS_INPUT);
-	vreg.add_route(0, DAC_TAG, -1.0, DAC_VREF_NEG_INPUT);
 
 	/* devices */
 	RTC3430042(config, m_rtc, 32.768_kHz_XTAL);

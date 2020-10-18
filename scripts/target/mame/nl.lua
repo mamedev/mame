@@ -54,7 +54,6 @@ SOUNDS["UPD7759"] = true
 SOUNDS["YM2151"] = true
 SOUNDS["YM2413"] = true
 SOUNDS["BEEP"] = true
-SOUNDS["VOLT_REG"] = true
 SOUNDS["SPEAKER"] = true
 SOUNDS["DIGITALKER"] = true
 SOUNDS["SN76477"] = true

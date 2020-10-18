@@ -55,7 +55,6 @@
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/ef9345.h"
 
 #include "screen.h"
@@ -421,8 +420,6 @@ void vg5k_state::vg5k(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.125);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	/* cassette */
 	CASSETTE(config, m_cassette);

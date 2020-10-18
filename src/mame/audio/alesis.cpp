@@ -13,7 +13,6 @@
 
 #include "emu.h"
 #include "includes/alesis.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 #define LOG 1
@@ -48,9 +47,6 @@ void alesis_dm3ag_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "lspeaker2").front_left();
 	SPEAKER(config, "rspeaker2").front_right();
 	PCM54HP(config, m_dac, 0).add_route(ALL_OUTPUTS, "lspeaker1", 1.0).add_route(ALL_OUTPUTS, "rspeaker1", 1.0); // PCM54HP DAC + R63/R73-75 + Sample and hold
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 //-------------------------------------------------

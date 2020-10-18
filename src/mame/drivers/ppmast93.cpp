@@ -135,7 +135,6 @@ Dip locations added based on the notes above.
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "sound/ym2413.h"
 #include "emupal.h"
 #include "screen.h"
@@ -408,9 +407,6 @@ void ppmast93_state::ppmast93(machine_config &config)
 	YM2413(config, "ymsnd", 5000000/2).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.3); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 ROM_START( ppmast93 )

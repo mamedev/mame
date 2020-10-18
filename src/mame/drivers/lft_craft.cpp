@@ -9,7 +9,6 @@
 #include "emu.h"
 #include "cpu/avr8/avr8.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
 #include "emupal.h"
 #include "speaker.h"
@@ -228,9 +227,6 @@ void lft_craft_state::craft(machine_config &config)
 	m_screen->set_screen_update(FUNC(lft_craft_state::screen_update));
 
 	SPEAKER(config, "avr8").front_center();
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, m_dac, 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, m_dac, -1.0, DAC_VREF_NEG_INPUT);
 
 	DAC_6BIT_R2R(config, m_dac, 0).add_route(0, "avr8", 0.25); // pd1/pd2/pd4/pd5/pd6/pd7 + 2k(x7) + 1k(x5)
 }

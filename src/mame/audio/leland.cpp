@@ -83,7 +83,6 @@
 #include "audio/leland.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 #define LOG_COMM 0

@@ -17,7 +17,6 @@
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "sound/gb.h"
-#include "sound/volt_reg.h"
 #include "softlist.h"
 #include "speaker.h"
 
@@ -1452,11 +1451,6 @@ void gba_state::gbadv(machine_config &config)
 	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_rdaca, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
 	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_ldacb, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // unknown DAC
 	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_rdacb, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "ldaca", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldaca", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdaca", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdaca", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "ldacb", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldacb", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdacb", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdacb", -1.0, DAC_VREF_NEG_INPUT);
 
 	GBA_CART_SLOT(config, m_cart, gba_cart, nullptr);
 	SOFTWARE_LIST(config, "cart_list").set_original("gba");

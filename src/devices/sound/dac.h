@@ -27,9 +27,6 @@
 #define DAC_INPUT_RANGE_HI (0)
 #define DAC_INPUT_RANGE_LO (1)
 
-#define DAC_VREF_POS_INPUT (DAC_INPUT_RANGE_HI)
-#define DAC_VREF_NEG_INPUT (DAC_INPUT_RANGE_LO)
-
 
 
 //**************************************************************************
@@ -102,7 +99,8 @@ protected:
 	}
 
 public:
-	// configuration
+	// configuration: default output range is -1..1 for all cases except
+	// for 1-bit DACs, which default to 0..1
 	dac_device_base &set_output_range(stream_buffer::sample_t range_min, stream_buffer::sample_t range_max)
 	{
 		m_range_min = range_min;

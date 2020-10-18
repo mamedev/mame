@@ -64,7 +64,6 @@
 
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 
@@ -1015,9 +1014,6 @@ void leland_state::leland(machine_config &config)
 
 	DAC_8BIT_BINARY_WEIGHTED(config, m_dac[0], 0).add_route(ALL_OUTPUTS, "speaker", 0.0625); // ls374.u79 + r17-r23 (24k,12k,6.2k,3k,1.5k,750,390,180)
 	DAC_8BIT_BINARY_WEIGHTED(config, m_dac[1], 0).add_route(ALL_OUTPUTS, "speaker", 0.0625); // ls374.u88 + r27-r34 (24k,12k,6.2k,3k,1.5k,750,390,180)
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac0", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac0", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 

@@ -67,7 +67,6 @@
 #include "machine/vt1682_timer.h"
 #include "machine/bankdev.h"
 #include "machine/timer.h"
-#include "sound/volt_reg.h"
 #include "sound/dac.h"
 #include "emupal.h"
 #include "screen.h"
@@ -5532,14 +5531,7 @@ void vt_vt1682_state::vt_vt1682_common(machine_config& config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	DAC_12BIT_R2R(config, m_leftdac, 0).add_route(0, "lspeaker", 0.5); // unknown 12-bit DAC
-	voltage_regulator_device &leftvref(VOLTAGE_REGULATOR(config, "leftvref", 0));
-	leftvref.add_route(0, "leftdac", 1.0, DAC_VREF_POS_INPUT);
-	leftvref.add_route(0, "leftdac", -1.0, DAC_VREF_NEG_INPUT);
-
 	DAC_12BIT_R2R(config, m_rightdac, 0).add_route(0, "rspeaker", 0.5); // unknown 12-bit DAC
-	voltage_regulator_device &rightvref(VOLTAGE_REGULATOR(config, "rightvref", 0));
-	rightvref.add_route(0, "rightdac", 1.0, DAC_VREF_POS_INPUT);
-	rightvref.add_route(0, "rightdac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 
