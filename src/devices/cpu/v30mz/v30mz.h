@@ -58,7 +58,9 @@ protected:
 	inline void write_byte(uint32_t segment, uint16_t addr, uint8_t data);
 	inline void write_word(uint32_t segment, uint16_t addr, uint16_t data);
 	inline uint8_t read_port(uint16_t port);
+	inline uint16_t read_port_word(uint16_t port);
 	inline void write_port(uint16_t port, uint8_t data);
+	inline void write_port_word(uint16_t port, uint16_t data);
 
 	// Executing instructions
 	void read_prefetch();
@@ -195,9 +197,9 @@ protected:
 	uint8_t   m_no_interrupt;
 	uint8_t   m_fire_trap;
 
-	memory_access<20, 0, 0, ENDIANNESS_LITTLE>::cache m_cache;
-	memory_access<20, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
-	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
+	memory_access<20, 1, 0, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<20, 1, 0, ENDIANNESS_LITTLE>::specific m_program;
+	memory_access<16, 1, 0, ENDIANNESS_LITTLE>::specific m_io;
 	int m_icount;
 
 	uint32_t m_prefix_base; // base address of the latest prefix segment

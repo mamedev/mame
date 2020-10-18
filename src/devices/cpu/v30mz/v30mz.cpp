@@ -2,20 +2,7 @@
 // copyright-holders:Wilbert Pol,Bryan McPhail
 /****************************************************************************
 
-    NEC V20/V30/V33 emulator modified to a v30mz emulator
-
-    (Re)Written June-September 2000 by Bryan McPhail (mish@tendril.co.uk) based
-    on code by Oliver Bergmann (Raul_Bloodworth@hotmail.com) who based code
-    on the i286 emulator by Fabrice Frances which had initial work based on
-    David Hedley's pcemu(!).
-
-    This new core features 99% accurate cycle counts for each processor,
-    there are still some complex situations where cycle counts are wrong,
-    typically where a few instructions have differing counts for odd/even
-    source and odd/even destination memory operands.
-
-    Flag settings are also correct for the NEC processors rather than the
-    I86 versions.
+    v30mz emulator based on NEC V20/V30/V33 emulator.
 
     The internal details of the prefetch operation are not exactly known. We
     keep a prefetch queue for 8 bytes even though the documentation mentions
@@ -23,31 +10,13 @@
     fetches limited on tight loops and is more than enough for the longest
     instruction.
 
-    Changelist:
-
-    22/02/2003:
-        Removed cycle counts from memory accesses - they are certainly wrong,
-        and there is already a memory access cycle penalty in the opcodes
-        using them.
-
-        Fixed save states.
-
-        Fixed ADJBA/ADJBS/ADJ4A/ADJ4S flags/return values for all situations.
-        (Fixes bugs in Geostorm and Thunderblaster)
-
-        Fixed carry flag on NEG (I thought this had been fixed circa Mame 0.58,
-        but it seems I never actually submitted the fix).
-
-        Fixed many cycle counts in instructions and bug in cycle count
-        macros (odd word cases were testing for odd instruction word address
-        not data address).
-
     Todo!
       - Double check cycle timing is 100%.
 			- Verify S and Z flags on ROL/ROR instructions. The v20 datasheet does
 			  not mention them as being changed, but according to the description of
 				the flags in the v30mz datasheet the flags are changed.
-      - Fix memory interface (should be 16 bit) and related timing penalties.
+			- Add penalties when BW, BP, SP, IX, IY etc are changed in the immediately
+			  preceding instruction.
 
 ****************************************************************************/
 
@@ -110,8 +79,8 @@ DEFINE_DEVICE_TYPE(V30MZ, v30mz_cpu_device, "v30mz", "NEC V30MZ")
 
 v30mz_cpu_device::v30mz_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, V30MZ, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0)
-	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
+	, m_program_config("program", ENDIANNESS_LITTLE, 16, 20, 0)
+	, m_io_config("io", ENDIANNESS_LITTLE, 16, 16, 0)
 	, m_ip(0)
 	, m_TF(0)
 	, m_int_vector(0)
@@ -139,7 +108,7 @@ v30mz_cpu_device::v30mz_cpu_device(const machine_config &mconfig, const char *ta
 
 	for (uint16_t i = 0xc0; i < 0x100; i++)
 	{
-		m_Mod_RM.RM.w[i] = (WREGS)( i & 7 );
+		m_Mod_RM.RM.w[i] = (WREGS)(i & 7);
 		m_Mod_RM.RM.b[i] = (BREGS)reg_name[i & 7];
 	}
 
@@ -314,6 +283,8 @@ void v30mz_cpu_device::init_prefetch()
 	m_prefetch_queue_tail = 0;
 	m_prefetch_queue_head = 0;
 	m_prefetch_fill_needed = true;
+	if (m_ip & 1)
+		clk(1);
 }
 
 
@@ -325,8 +296,14 @@ inline uint8_t v30mz_cpu_device::read_byte(uint32_t segment, uint16_t addr)
 
 inline uint16_t v30mz_cpu_device::read_word(uint32_t segment, uint16_t addr)
 {
-	return m_program.read_byte(segment + addr) |
-	 (m_program.read_byte(segment + ((addr + 1) & 0xffff)) << 8);
+	if (addr & 1) {
+		// penalty cycle when reading from an unaligned address
+		clk(1);
+		return m_program.read_byte(segment + addr) |
+			(m_program.read_byte(segment + ((addr + 1) & 0xffff)) << 8);
+	} else {
+		return m_program.read_word(segment + addr);
+	}
 }
 
 
@@ -338,8 +315,14 @@ inline void v30mz_cpu_device::write_byte(uint32_t segment, uint16_t addr, uint8_
 
 inline void v30mz_cpu_device::write_word(uint32_t segment, uint16_t addr, uint16_t data)
 {
-	m_program.write_byte(segment + addr, data & 0xff);
-	m_program.write_byte(segment + ((addr + 1) & 0xffff), data >> 8);
+	if (addr & 1) {
+		m_program.write_byte(segment + addr, data);
+		m_program.write_byte(segment + ((addr + 1) & 0xffff), data >> 8);
+		// penalty cycle when writing to an unaligned address
+		clk(1);
+	} else {
+		m_program.write_word(segment + addr, data);
+	}
 }
 
 
@@ -349,9 +332,27 @@ inline uint8_t v30mz_cpu_device::read_port(uint16_t port)
 }
 
 
+inline uint16_t v30mz_cpu_device::read_port_word(uint16_t port)
+{
+	if (port & 1)
+		// penalty cycle when reading from an unaligned address
+		clk(1);
+	return m_io.read_word_unaligned(port);
+}
+
+
 inline void v30mz_cpu_device::write_port(uint16_t port, uint8_t data)
 {
 	m_io.write_byte(port, data);
+}
+
+
+inline void v30mz_cpu_device::write_port_word(uint16_t port, uint16_t data)
+{
+	if (port & 1)
+		// penalty cycle when writing to an unaligned address
+		clk(1);
+	m_io.write_word_unaligned(port, data);
 }
 
 
@@ -454,18 +455,22 @@ inline void v30mz_cpu_device::get_ea()
 	case 0x00:
 		m_eo = m_regs.w[BW] + m_regs.w[IX];
 		m_ea_seg = default_base(DS0);
+		clk(1);
 		break;
 	case 0x01:
 		m_eo = m_regs.w[BW] + m_regs.w[IY];
 		m_ea_seg = default_base(DS0);
+		clk(1);
 		break;
 	case 0x02:
 		m_eo = m_regs.w[BP] + m_regs.w[IX];
 		m_ea_seg = default_base(SS);
+		clk(1);
 		break;
 	case 0x03:
 		m_eo = m_regs.w[BP] + m_regs.w[IY];
 		m_ea_seg = default_base(SS);
+		clk(1);
 		break;
 	case 0x04:
 		m_eo = m_regs.w[IX];
@@ -487,18 +492,22 @@ inline void v30mz_cpu_device::get_ea()
 	case 0x40:
 		m_eo = m_regs.w[BW] + m_regs.w[IX] + (int8_t)fetch();
 		m_ea_seg = default_base(DS0);
+		clk(1);
 		break;
 	case 0x41:
 		m_eo = m_regs.w[BW] + m_regs.w[IY] + (int8_t)fetch();
 		m_ea_seg = default_base(DS0);
+		clk(1);
 		break;
 	case 0x42:
 		m_eo = m_regs.w[BP] + m_regs.w[IX] + (int8_t)fetch();
 		m_ea_seg = default_base(SS);
+		clk(1);
 		break;
 	case 0x43:
 		m_eo = m_regs.w[BP] + m_regs.w[IY] + (int8_t)fetch();
 		m_ea_seg = default_base(SS);
+		clk(1);
 		break;
 	case 0x44:
 		m_eo = m_regs.w[IX] + (int8_t)fetch();
@@ -520,18 +529,22 @@ inline void v30mz_cpu_device::get_ea()
 	case 0x80:
 		m_eo = m_regs.w[BW] + m_regs.w[IX] + (int16_t)fetch_word();
 		m_ea_seg = default_base(DS0);
+		clk(1);
 		break;
 	case 0x81:
 		m_eo = m_regs.w[BW] + m_regs.w[IY] + (int16_t)fetch_word();
 		m_ea_seg = default_base(DS0);
+		clk(1);
 		break;
 	case 0x82:
 		m_eo = m_regs.w[BP] + m_regs.w[IX] + (int16_t)fetch_word();
 		m_ea_seg = default_base(SS);
+		clk(1);
 		break;
 	case 0x83:
 		m_eo = m_regs.w[BP] + m_regs.w[IY] + (int16_t)fetch_word();
 		m_ea_seg = default_base(SS);
+		clk(1);
 		break;
 	case 0x84:
 		m_eo = m_regs.w[IX] + (int16_t)fetch_word();
@@ -879,8 +892,7 @@ inline void v30mz_cpu_device::i_insb()
 
 inline void v30mz_cpu_device::i_insw()
 {
-	put_mem_byte(DS1, m_regs.w[IY], read_port(m_regs.w[DW]));
-	put_mem_byte(DS1, (m_regs.w[IY] + 1) & 0xffff, read_port((m_regs.w[DW]+1) & 0xffff));
+	put_mem_word(DS1, m_regs.w[IY], read_port_word(m_regs.w[DW]));
 	m_regs.w[IY] += -4 * m_DF + 2;
 	clk(6);
 }
@@ -896,8 +908,7 @@ inline void v30mz_cpu_device::i_outsb()
 
 inline void v30mz_cpu_device::i_outsw()
 {
-	write_port(m_regs.w[DW], get_mem_byte(DS0, m_regs.w[IX]));
-	write_port((m_regs.w[DW]+1) & 0xffff, get_mem_byte(DS0, (m_regs.w[IX]+1) & 0xffff));
+	write_port_word(m_regs.w[DW], get_mem_word(DS0, m_regs.w[IX]));
 	m_regs.w[IX] += -4 * m_DF + 2;
 	clk(7);
 }
@@ -3402,13 +3413,8 @@ void v30mz_cpu_device::execute_run()
 				break;
 
 			case 0xe5: // i_inax
-				{
-					uint8_t port = fetch();
-
-					m_regs.b[AL] = read_port(port);
-					m_regs.b[AH] = read_port(port+1);
-					clk(6);
-				}
+				m_regs.w[AW] = read_port_word(fetch());
+				clk(6);
 				break;
 
 			case 0xe6: // i_outal
@@ -3417,13 +3423,8 @@ void v30mz_cpu_device::execute_run()
 				break;
 
 			case 0xe7: // i_outax
-				{
-					uint8_t port = fetch();
-
-					write_port(port, m_regs.b[AL]);
-					write_port(port + 1, m_regs.b[AH]);
-					clk(6);
-				}
+				write_port_word(fetch(), m_regs.w[AW]);
+				clk(6);
 				break;
 
 
@@ -3479,13 +3480,8 @@ void v30mz_cpu_device::execute_run()
 				break;
 
 			case 0xed: // i_inaxdx
-				{
-					uint32_t port = m_regs.w[DW];
-
-					m_regs.b[AL] = read_port(port);
-					m_regs.b[AH] = read_port(port+1);
-					clk(6);
-				}
+				m_regs.w[AW] = read_port_word(m_regs.w[DW]);
+				clk(6);
 				break;
 
 			case 0xee: // i_outdxal
@@ -3494,13 +3490,8 @@ void v30mz_cpu_device::execute_run()
 				break;
 
 			case 0xef: // i_outdxax
-				{
-					uint32_t port = m_regs.w[DW];
-
-					write_port(port, m_regs.b[AL]);
-					write_port(port+1, m_regs.b[AH]);
-					clk(6);
-				}
+				write_port_word(m_regs.w[DW], m_regs.w[AW]);
+				clk(6);
 				break;
 
 
