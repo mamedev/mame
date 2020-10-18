@@ -69,7 +69,7 @@ void jaleco_ms32_sysctrl_device::amap(address_map& map)
 	map(0x0c, 0x0d).w(FUNC(jaleco_ms32_sysctrl_device::vdisplay_w));
 	map(0x0e, 0x0f).w(FUNC(jaleco_ms32_sysctrl_device::vbp_w));
 	map(0x10, 0x11).w(FUNC(jaleco_ms32_sysctrl_device::vfp_w));
-//  map(0x18, 0x19).w(FUNC(jaleco_ms32_sysctrl_device::timer_interval_w));
+	map(0x18, 0x19).w(FUNC(jaleco_ms32_sysctrl_device::timer_interval_w));
 //	map(0x1a, 0x1b).w(FUNC(jaleco_ms32_sysctrl_device::timer_go_w));
 //	map(0x1c, 0x1d).w(FUNC(jaleco_ms32_sysctrl_device::sound_reset_w));
 //	map(0x1e, 0x1f).w // ???
@@ -87,7 +87,7 @@ void jaleco_ms32_sysctrl_device::amap(address_map& map)
 void jaleco_ms32_sysctrl_device::device_add_mconfig(machine_config &config)
 {
 	//DEVICE(config, ...);
-	// TODO: at least watchdog
+	// TODO: at least watchdog sub
 }
 
 
@@ -105,6 +105,7 @@ void jaleco_ms32_sysctrl_device::device_start()
 	save_item(NAME(m_crtc.vert_blank));
 	save_item(NAME(m_crtc.vert_display));
 	save_item(NAME(m_flip_screen_state));
+	save_item(NAME(m_timer.irq_enable));
 }
 
 
@@ -119,7 +120,7 @@ void jaleco_ms32_sysctrl_device::device_reset()
 	m_crtc.horz_display = 320;
 	m_crtc.vert_blank = 39;
 	m_crtc.vert_display = 224;
-
+	m_timer.irq_enable = false;
 }
 
 
@@ -141,10 +142,10 @@ void jaleco_ms32_sysctrl_device::write(offs_t offset, u16 data, u16 mem_mask)
 // CRTC
 // =================
 
-inline u16 jaleco_ms32_sysctrl_device::crtc_write_reg(u16 raw_data)
+inline u16 jaleco_ms32_sysctrl_device::clamp_to_12bits_neg(u16 raw_data)
 {
-	// each write has a 12 bit resolution, with 
-	// TODO: nndmseal sets up bit 12, used as safeguard?
+	// each write has a 12 bit resolution, for both CRTC and timer interval
+	// TODO: nndmseal sets up bit 12, reason?
 	return 0x1000 - (raw_data & 0xfff);
 }
 
@@ -172,22 +173,27 @@ void jaleco_ms32_sysctrl_device::control_w(u16 data)
 		m_dotclock = BIT(data, 0);
 		crtc_refresh_screen_params();
 	}
-	if (BIT(data, 1) != m_flip_screen_state)
+	
+	const bool current_flip = bool(BIT(data, 1));
+	if (current_flip != m_flip_screen_state)
 	{
-		m_flip_screen_state = BIT(data, 1);
+		m_flip_screen_state = current_flip;
 		m_flip_screen_cb(m_flip_screen_state ? ASSERT_LINE : CLEAR_LINE);
 	}
+	m_timer.irq_enable = bool(BIT(data, 3));
+//	if (m_timer_irq_enable)
+//		printf("%d\n",m_timer_irq_enable);
 }
 
 void jaleco_ms32_sysctrl_device::hblank_w(u16 data)
 {
-	m_crtc.horz_blank = crtc_write_reg(data);	    
+	m_crtc.horz_blank = clamp_to_12bits_neg(data);
 	crtc_refresh_screen_params();
 }
 
 void jaleco_ms32_sysctrl_device::hdisplay_w(u16 data)
 {
-	m_crtc.horz_display = crtc_write_reg(data);	
+	m_crtc.horz_display = clamp_to_12bits_neg(data);
 	crtc_refresh_screen_params();
 }
 
@@ -203,24 +209,32 @@ void jaleco_ms32_sysctrl_device::hfp_w(u16 data)
 
 void jaleco_ms32_sysctrl_device::vblank_w(u16 data)
 {
-	m_crtc.vert_blank = crtc_write_reg(data);	    
+	m_crtc.vert_blank = clamp_to_12bits_neg(data);
 	crtc_refresh_screen_params();
 }
 
 void jaleco_ms32_sysctrl_device::vdisplay_w(u16 data)
 {
-	m_crtc.vert_display = crtc_write_reg(data);	
+	m_crtc.vert_display = clamp_to_12bits_neg(data);
 	crtc_refresh_screen_params();
 }
 
 void jaleco_ms32_sysctrl_device::vbp_w(u16 data)
 {
-	logerror("%s: VSYNC back porch %d\n", this->tag(), 0x1000 - data); 
+	logerror("%s: VSYNC back porch %d\n", this->tag(), clamp_to_12bits_neg(data));
 }
 
 void jaleco_ms32_sysctrl_device::vfp_w(u16 data)
 {
-	logerror("%s: VSYNC front porch %d\n", this->tag(), 0x1000 - data); 
+	logerror("%s: VSYNC front porch %d\n", this->tag(), clamp_to_12bits_neg(data));
 }
 
+// =================
+// Timer
+// =================
 
+void jaleco_ms32_sysctrl_device::timer_interval_w(u16 data)
+{
+	m_timer.interval = clamp_to_12bits_neg(data);
+	//printf("%d\n", m_timer.interval);
+}

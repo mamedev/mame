@@ -699,10 +699,10 @@ void ms32_state::ms32_map(address_map &map)
 	map(0xfcc00004, 0xfcc00007).portr("INPUTS");
 	map(0xfcc00010, 0xfcc00013).portr("DSW");
 	// System Registers
-	map(0xfce00000, 0xfce0002f).m(m_sysctrl, FUNC(jaleco_ms32_sysctrl_device::amap)).umask32(0x0000ffff);
+	map(0xfce00000, 0xfce00037).m(m_sysctrl, FUNC(jaleco_ms32_sysctrl_device::amap)).umask32(0x0000ffff);
 //	map(0xfce00000, 0xfce0002f).w(FUNC(ms32_state::crtc_w));   					// flip screen + CRTC setup
 //	map(0xfce00030, 0xfce00033) 												// timer irq control
-	map(0xfce00034, 0xfce00037).nopw(); 										// timer irq trigger (ack?)
+//	map(0xfce00034, 0xfce00037).nopw(); 										// timer irq trigger (ack?)
 	map(0xfce00038, 0xfce0003b).w(FUNC(ms32_state::sound_reset_w));
 //	map(0xfce0003c, 0xfce0003f) 												// ???
 //	map(0xfce00048, 0xfce0004f)													// sound comms bidirectional acks?
@@ -1661,9 +1661,14 @@ void ms32_state::irq_raise(int level)
 TIMER_DEVICE_CALLBACK_MEMBER(ms32_state::ms32_interrupt)
 {
 	int scanline = param;
-	if( scanline == 0) irq_raise(10);
-	if( scanline == 8) irq_raise(9);
-	/* hayaosi1 needs at least 12 IRQ 0 per frame to work (see code at FFE02289)
+	// vblank irq
+	// TODO: this causes an exception in sprite device if it's 240???
+	if(scanline == 224)
+		irq_raise(10);
+	// TODO: really a 120Hz interrupt
+	if(scanline == 0)
+		irq_raise(9);
+	/* hayaosi1 needs at least 12 IRQ 0 per frame to work (see code at FFE02289) <- hayaosi1 is a megasys1 game ... -AS
 	   kirarast needs it too, at least 8 per frame, but waits for a variable amount
 	   suchie2 needs ?? per frame (otherwise it hangs when you lose)
 	   in different points. Could this be a raster interrupt?

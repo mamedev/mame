@@ -18,8 +18,6 @@ priority should be given to
 #include "includes/ms32.h"
 
 
-// kirarast, tp2m32, and suchie2 require the sprites in a different order
-
 /********** Tilemaps **********/
 
 TILE_GET_INFO_MEMBER(ms32_state::get_ms32_tx_tile_info)
@@ -190,7 +188,7 @@ void ms32_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, con
 		u16 xsize, ysize;
 		s32 sx, sy;
 		u16 xzoom, yzoom;
-
+		
 		m_sprite->extract_parameters(true, false, source, disable, pri, flipx, flipy, code, color, tx, ty, xsize, ysize, sx, sy, xzoom, yzoom);
 
 		if (disable || !xzoom || !yzoom)
@@ -419,24 +417,22 @@ u32 ms32_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 	}
 
 	// tile-sprite mixing
-	/* this mixing isn't 100% accurate, it should be using ALL the data in
+	/* this mixing is nowhere near as accurate, it should be using ALL the data in
 	   the priority ram, probably for per-pixel / pen mixing, or more levels
 	   than are supported here..  I don't know, it will need hw tests I think */
 	{
-		int width = screen.width();
-		int height = screen.height();
 		pen_t const *const paldata = m_palette->pens();
-
 		bitmap.fill(0, cliprect);
-
-		for (int yy=0;yy<height;yy++)
+		
+		for (int yy = cliprect.min_y; yy <= cliprect.max_y; yy++)
 		{
 			u16 const *const srcptr_tile =     &m_temp_bitmap_tilemaps.pix(yy);
 			u8 const *const  srcptr_tilepri =  &screen.priority().pix(yy);
 			u16 const *const srcptr_spri =     &m_temp_bitmap_sprites.pix(yy);
 			//u8 const *const  srcptr_spripri =  &m_temp_bitmap_sprites_pri.pix(yy);
 			u32 *const       dstptr_bitmap  =  &bitmap.pix(yy);
-			for (int xx=0;xx<width;xx++)
+			
+			for (int xx = cliprect.min_x; xx <= cliprect.max_x; xx++)
 			{
 				u16 src_tile  = srcptr_tile[xx];
 				u8 src_tilepri = srcptr_tilepri[xx];
@@ -679,13 +675,8 @@ u32 ms32_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 					dstptr_bitmap[xx] = 0;
 					popmessage("unhandled priority type %02x, contact MAMEdev",primask);
 				}
-
-
-
 			}
-
 		}
-
 	}
 
 	return 0;

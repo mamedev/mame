@@ -62,15 +62,20 @@ private:
 	void vdisplay_w(u16 data);
 	void vbp_w(u16 data);
 	void vfp_w(u16 data);
+	void timer_interval_w(u16 data);
 
 	devcb_write_line m_flip_screen_cb;
-	int m_flip_screen_state;
 	u8 m_dotclock;
+	bool m_flip_screen_state;
+	inline u16 clamp_to_12bits_neg(u16 raw_data);
 	struct {
 		u16 horz_blank, horz_display, vert_blank, vert_display;
 	}m_crtc;
-	inline u16 crtc_write_reg(u16 raw_data);
 	inline void crtc_refresh_screen_params();
+	struct {
+		bool irq_enable;
+		u16 interval;
+	}m_timer;
 };
 
 
