@@ -130,16 +130,12 @@ public:
 	void init_macse30();
 	void init_maciivx();
 	void init_maciivi();
-	void init_macpd210();
 	void init_macii();
 	void init_macclassic();
-	void init_macquadra700();
 	void init_macclassic2();
 	void init_maciifx();
 	void init_maclc();
-	void init_macpb160();
 	void init_macse();
-	void init_macpb140();
 	void init_macpm6100();
 	void init_maclc520();
 	void init_maciici();
@@ -151,7 +147,6 @@ public:
 	void init_maclc3plus();
 	void init_macpm7100();
 	void init_macpm8100();
-	void init_macpb100();
 
 	/* tells which model is being emulated (set by macxxx_init) */
 	enum model_t
@@ -356,12 +351,6 @@ private:
 	void amic_dma_w(offs_t offset, uint8_t data);
 	uint8_t pmac_diag_r(offs_t offset);
 
-	uint8_t mac_gsc_r(offs_t offset);
-	void mac_gsc_w(uint8_t data);
-
-	uint32_t macwd_r(offs_t offset, uint32_t mem_mask = ~0);
-	void macwd_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-
 	DECLARE_WRITE_LINE_MEMBER(nubus_irq_9_w);
 	DECLARE_WRITE_LINE_MEMBER(nubus_irq_a_w);
 	DECLARE_WRITE_LINE_MEMBER(nubus_irq_b_w);
@@ -417,8 +406,6 @@ private:
 
 	uint8_t m_pm_req, m_pm_state, m_pm_dptr, m_pm_cmd;
 
-	void macgsc_palette(palette_device &palette) const;
-
 	DECLARE_VIDEO_START(mac);
 	DECLARE_VIDEO_START(macsonora);
 	DECLARE_VIDEO_RESET(macrbv);
@@ -428,8 +415,6 @@ private:
 	DECLARE_VIDEO_START(macrbv);
 	uint32_t screen_update_mac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_macse30(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_macpb140(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_macpb160(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_macrbv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_macrbvvram(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_macv8(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

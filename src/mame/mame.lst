@@ -19906,7 +19906,17 @@ maclc                           // 1990 Apple Macintosh LC
 maclc2                          // 1991 Apple Macintosh LC II
 maclc3                          // 1993 Apple Macintosh LC III
 maclc520                        // 1993 Apple Macintosh LC 520
+macse30                         // 1989 Apple Macintosh SE/30
+pmac6100                        // 1993 Apple Power Macintosh 6100
+
+@source:macquadra700.cpp
+macqd700                        // 1991 Apple Macintosh Quadra 700
+
+@source:macprtb.cpp
+macprtb                         // 1989 Apple Macintosh Portable
 macpb100                        // 1991 Apple Macintosh PowerBook 100
+
+@source:macpwrbk030.cpp
 macpb140                        // 1991 Apple Macintosh PowerBook 140
 macpb145                        // 1992 Apple Macintosh PowerBook 145
 macpb145b                       // 1993 Apple Macintosh PowerBook 145B
@@ -19915,12 +19925,6 @@ macpb170                        // 1991 Apple Macintosh PowerBook 170
 macpb180                        // 1992 Apple Macintosh PowerBook 180
 macpb180c                       // 1992 Apple Macintosh PowerBook 180c
 macpd210                        // 1992 Apple Macintosh PowerBook Duo 210
-macprtb                         // 1989 Apple Macintosh Portable
-macse30                         // 1989 Apple Macintosh SE/30
-pmac6100                        // 1993 Apple Power Macintosh 6100
-
-@source:macquadra700.cpp
-macqd700                        // 1991 Apple Macintosh Quadra 700
 
 @source:mac128.cpp
 mac128k                         // 1984 Apple Macintosh
