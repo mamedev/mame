@@ -344,7 +344,7 @@ license:CC0
 				<param name="xl" start="15" increment="20" />
 				<param name="xi" start="0" increment="1" />
 				<element ref="cblack"><bounds x="~x~" y="~y~" width="10" height="10" /></element>
-				<element ref="text_e~yi~~xi~"><bounds x="~xl~" y="~yl~" width="4.9" height="2.48" /></element>
+				<element ref="text_e~yi~~xi~"><bounds x="~xl~" y="~yl~" width="4.8" height="2.35" /></element>
 			</repeat>
 		</repeat>
 		<repeat count="5">
@@ -356,7 +356,7 @@ license:CC0
 				<param name="xl" start="5" increment="20" />
 				<param name="xi" start="0" increment="1" />
 				<element ref="cblack"><bounds x="~x~" y="~y~" width="10" height="10" /></element>
-				<element ref="text_o~yi~~xi~"><bounds x="~xl~" y="~yl~" width="4.9" height="2.48" /></element>
+				<element ref="text_o~yi~~xi~"><bounds x="~xl~" y="~yl~" width="4.8" height="2.35" /></element>
 			</repeat>
 		</repeat>
 
