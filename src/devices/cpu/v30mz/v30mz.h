@@ -60,6 +60,7 @@ protected:
 	// Accessing memory and io
 	inline uint8_t read_byte(uint32_t addr);
 	inline uint16_t read_word(uint32_t addr);
+	inline uint16_t read_word(uint32_t segmet, uint16_t addr);
 	inline void write_byte(uint32_t addr, uint8_t data);
 	inline void write_word(uint32_t addr, uint16_t data);
 	inline uint8_t read_port(uint16_t port);
@@ -72,14 +73,14 @@ protected:
 	inline uint8_t repx_op();
 
 	// Cycles passed while executing instructions
-	inline void CLK(uint32_t cycles);
-	inline void CLKM(uint32_t cycles_reg, uint32_t cycles_mem);
+	inline void clk(uint32_t cycles);
+	inline void clkm(uint32_t cycles_reg, uint32_t cycles_mem);
 
 	// Memory handling while executing instructions
 	inline uint32_t default_base(int seg);
 	inline uint32_t get_ea();
-	inline void PutbackRMByte(uint8_t data);
-	inline void PutbackRMWord(uint16_t data);
+	inline void store_ea_rm_byte(uint8_t data);
+	inline void store_ea_rm_word(uint16_t data);
 	inline void RegByte(uint8_t data);
 	inline void RegWord(uint16_t data);
 	inline uint8_t RegByte();
@@ -87,10 +88,10 @@ protected:
 	inline uint16_t GetRMWord();
 	inline uint16_t GetnextRMWord();
 	inline uint8_t GetRMByte();
-	inline void PutMemB(int seg, uint16_t offset, uint8_t data);
-	inline void PutMemW(int seg, uint16_t offset, uint16_t data);
-	inline uint8_t GetMemB(int seg, uint16_t offset);
-	inline uint16_t GetMemW(int seg, uint16_t offset);
+	inline void put_mem_byte(int seg, uint16_t offset, uint8_t data);
+	inline void put_mem_word(int seg, uint16_t offset, uint16_t data);
+	inline uint8_t get_mem_byte(int seg, uint16_t offset);
+	inline uint16_t get_mem_word(int seg, uint16_t offset);
 	inline void PutImmRMWord();
 	inline void PutRMWord(uint16_t val);
 	inline void PutRMByte(uint8_t val);
@@ -103,18 +104,18 @@ protected:
 	inline void DEF_axd16();
 
 	// Flags
-	inline void set_CFB(uint32_t x);
-	inline void set_CFW(uint32_t x);
-	inline void set_AF(uint32_t x,uint32_t y,uint32_t z);
+	inline void set_CF_byte(uint32_t x);
+	inline void set_CF_word(uint32_t x);
+	inline void set_AF(uint32_t x, uint32_t y, uint32_t z);
 	inline void set_SF(uint32_t x);
 	inline void set_ZF(uint32_t x);
 	inline void set_PF(uint32_t x);
 	inline void set_SZPF_Byte(uint32_t x);
 	inline void set_SZPF_Word(uint32_t x);
-	inline void set_OFW_Add(uint32_t x,uint32_t y,uint32_t z);
-	inline void set_OFB_Add(uint32_t x,uint32_t y,uint32_t z);
-	inline void set_OFW_Sub(uint32_t x,uint32_t y,uint32_t z);
-	inline void set_OFB_Sub(uint32_t x,uint32_t y,uint32_t z);
+	inline void set_OFW_Add(uint32_t x, uint32_t y, uint32_t z);
+	inline void set_OFB_Add(uint32_t x, uint32_t y, uint32_t z);
+	inline void set_OFW_Sub(uint32_t x, uint32_t y, uint32_t z);
+	inline void set_OFB_Sub(uint32_t x, uint32_t y, uint32_t z);
 	inline uint16_t CompressFlags() const;
 	inline void ExpandFlags(uint16_t f);
 
@@ -136,38 +137,38 @@ protected:
 	inline void i_popf();
 
 	// sub implementations
-	inline void ADDB();
-	inline void ADDW();
-	inline void SUBB();
-	inline void SUBW();
-	inline void ORB();
-	inline void ORW();
-	inline void ANDB();
-	inline void ANDW();
-	inline void XORB();
-	inline void XORW();
-	inline void ROL_BYTE();
-	inline void ROL_WORD();
-	inline void ROR_BYTE();
-	inline void ROR_WORD();
-	inline void ROLC_BYTE();
-	inline void ROLC_WORD();
-	inline void RORC_BYTE();
-	inline void RORC_WORD();
-	inline void SHL_BYTE(uint8_t c);
-	inline void SHL_WORD(uint8_t c);
-	inline void SHR_BYTE(uint8_t c);
-	inline void SHR_WORD(uint8_t c);
-	inline void SHRA_BYTE(uint8_t c);
-	inline void SHRA_WORD(uint8_t c);
+	inline void add_byte();
+	inline void add_word();
+	inline void sub_byte();
+	inline void sub_word();
+	inline void or_byte();
+	inline void or_word();
+	inline void and_byte();
+	inline void and_word();
+	inline void xor_byte();
+	inline void xor_word();
+	inline void rol_byte();
+	inline void rol_word();
+	inline void ror_byte();
+	inline void ror_word();
+	inline void rolc_byte();
+	inline void rolc_word();
+	inline void rorc_byte();
+	inline void rorc_word();
+	inline void shl_byte(uint8_t c);
+	inline void shl_word(uint8_t c);
+	inline void shr_byte(uint8_t c);
+	inline void shr_word(uint8_t c);
+	inline void shra_byte(uint8_t c);
+	inline void shra_word(uint8_t c);
 	inline void XchgAWReg(uint8_t reg);
 	inline void IncWordReg(uint8_t reg);
 	inline void DecWordReg(uint8_t reg);
-	inline void PUSH(uint16_t data);
-	inline uint16_t POP();
-	inline void JMP(bool cond);
-	inline void ADJ4(int8_t param1, int8_t param2);
-	inline void ADJB(int8_t param1, int8_t param2);
+	inline void push(uint16_t data);
+	inline uint16_t pop();
+	inline void jmp(bool cond);
+	inline void adj4(int8_t param1, int8_t param2);
+	inline void adjb(int8_t param1, int8_t param2);
 
 	address_space_config m_program_config;
 	address_space_config m_io_config;
@@ -202,7 +203,7 @@ protected:
 
 	uint32_t m_ea;
 	uint16_t m_eo;
-	uint16_t m_e16;
+	uint32_t m_ea_seg;
 
 	// Used during execution of instructions
 	uint8_t   m_modrm;
