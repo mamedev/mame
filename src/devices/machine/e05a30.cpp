@@ -56,6 +56,7 @@ void e05a30_device::device_start()
 	save_item(NAME(m_printhead));
 	save_item(NAME(m_pf_stepper));
 	save_item(NAME(m_cr_stepper));
+	save_item(NAME(m_c000_shift_register));
 }
 
 //-------------------------------------------------
@@ -167,6 +168,13 @@ void e05a30_device::write(offs_t offset, uint8_t data)
 	LOG("%s: e05a30_w([0xC0%02x]): %02x\n", machine().describe_context(), offset, data);
 
 	switch (offset) {
+	case 0x0:
+	case 0x1:
+	case 0x2:
+	case 0x3:
+		m_c000_shift_register &= ~(0xff << ((3-offset)*8));
+		m_c000_shift_register |= (data << ((3-offset)*8));
+		break;
 	case 0x04:
 		m_centronics_nack = BIT(data,5);
 		m_centronics_busy = BIT(data,0);
@@ -197,6 +205,10 @@ uint8_t e05a30_device::read(offs_t offset)
 	LOG("%s: e05a30_r([0xC0%02x]): ", machine().describe_context(), offset);
 
 	switch (offset) {
+	case 0x0:
+		m_c000_shift_register <<= 1;
+		result = (m_c000_shift_register & 0x1000000) ? 0x80 : 0x0;
+		break;
 	case 0x02:
 		result = m_centronics_data_latched << 7;
 		break;
