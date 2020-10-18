@@ -12853,6 +12853,92 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="mmagic">
+		<description>Master of Magic (v1.1)</description>
+		<year>1994</year>
+		<publisher>MicroProse</publisher>
+		<info name="developer" value="SimTex" />
+		<info name="version" value="v1.1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Master of Magic (v1.1) [MicroProse] [1994] [3.5HD] [Disk 1 of 7].img" size="1474560" crc="5a5f656d" sha1="0244a0ee5e3695aa0a4acff771939928d4cc1169" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Master of Magic (v1.1) [MicroProse] [1994] [3.5HD] [Disk 2 of 7].img" size="1474560" crc="ec6b43bd" sha1="0ca1e773de672d619af3dd592935c713f373fe67" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Master of Magic (v1.1) [MicroProse] [1994] [3.5HD] [Disk 3 of 7].img" size="1474560" crc="aec3a1a7" sha1="75cf93521d9a2a6b349e2ca4ce1894acb923a6d3" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Master of Magic (v1.1) [MicroProse] [1994] [3.5HD] [Disk 4 of 7].img" size="1474560" crc="042ea60d" sha1="8d64348242da472b07ea8ffb555c491586be32ad" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Master of Magic (v1.1) [MicroProse] [1994] [3.5HD] [Disk 5 of 7].img" size="1474560" crc="2a0215d6" sha1="b8c3eca13679a081ac507e835e65ec01ce9e1db4" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Master of Magic (v1.1) [MicroProse] [1994] [3.5HD] [Disk 6 of 7].img" size="1474560" crc="dc9888fe" sha1="3ea5a5febea4356d393dabe4b21c776fddfba167" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Master of Magic (v1.1) [MicroProse] [1994] [3.5HD] [Disk 7 of 7].img" size="1474560" crc="83a626b5" sha1="62c1d7717be4f5ac536fb9c8586283e92f7ea81b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mmagica" cloneof="mmagic">
+		<description>Master of Magic (v1.0)</description>
+		<year>1994</year>
+		<publisher>MicroProse</publisher>
+		<info name="developer" value="SimTex" />
+		<info name="version" value="v1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Master of Magic [MicroProse] [1994] [3.5HD] [Disk 1 of 7].img" size="1474560" crc="183161bf" sha1="7c8ff4474a0f4714a2b597b61ab11238d6e19526" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Master of Magic [MicroProse] [1994] [3.5HD] [Disk 2 of 7].img" size="1474560" crc="a0295102" sha1="fe3a01c31065b31d5ed21706431979354934378b" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Master of Magic [MicroProse] [1994] [3.5HD] [Disk 3 of 7].img" size="1474560" crc="4c44bd1f" sha1="e3c00c246cb9377c6237bdebc86a638bfe9dd35b" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Master of Magic [MicroProse] [1994] [3.5HD] [Disk 4 of 7].img" size="1474560" crc="4b9be538" sha1="5b6dd84e9b22aebec0cadd23d7f67d27621b6096" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Master of Magic [MicroProse] [1994] [3.5HD] [Disk 5 of 7].img" size="1474560" crc="9736e01c" sha1="2c68324ee278026f5103f98ebb82ab7ba186bd29" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Master of Magic [MicroProse] [1994] [3.5HD] [Disk 6 of 7].img" size="1474560" crc="00e54856" sha1="cd384739f59ae99aa859c00d64d6470596e80988" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Master of Magic [MicroProse] [1994] [3.5HD] [Disk 7 of 7].img" size="1474560" crc="783b8434" sha1="a5722583bb690dd23983886b594ee63abf1a75e3" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="moo">
 		<description>Master of Orion</description>
 		<year>1993</year>
@@ -14764,6 +14850,7 @@ license:CC0
 		<description>UFO - Enemy Unknown (Euro)</description>
 		<year>1994</year>
 		<publisher>MicroProse</publisher>
+		<info name="version" value="v1" />
 		<part name="flop1" interface="floppy_3_5">
 			<!-- mpscopy.exe file version: MicroProse Software Unpacker - by Brian Reynolds - Version 1.07 - Lib 4.02 -->
 			<dataarea name="flop" size = "1474560">
@@ -14786,6 +14873,7 @@ license:CC0
 		<description>UFO - Enemy Unknown (Euro) (alt)</description>
 		<year>1994</year>
 		<publisher>MicroProse</publisher>
+		<info name="version" value="v1" />
 		<part name="flop1" interface="floppy_3_5">
 			<!-- mpscopy.exe file version: MicroProse Software Unpacker - F-15 Strike Eagle 3 - Version 1.08 - Lib 4.02 -->
 			<dataarea name="flop" size = "1474560">
@@ -14808,6 +14896,7 @@ license:CC0
 		<description>UFO - Enemy Unknown (Italy)</description>
 		<year>1994</year>
 		<publisher>MicroProse</publisher>
+		<info name="version" value="v1.2" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Ufo Enemy Unknown (Italy) [Microprose] [1994] [3.5HD] [Disk 1 of 3].img" size="1474560" crc="e6cac594" sha1="ff9e23147c99fa8bf101c556a6727a6261542893"/>
@@ -14829,6 +14918,7 @@ license:CC0
 		<description>X-COM - UFO Defense (USA)</description>
 		<year>1994</year>
 		<publisher>MicroProse</publisher>
+		<info name="version" value="v1.2" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Xcom Ufo Defense (USA) [Microprose] [1994] [3.5HD] [Disk 1 of 3].img" size="1474560" crc="286b3afa" sha1="937264378c4766dcb8c6fc0ccbc607a8fe334f39"/>
