@@ -671,7 +671,7 @@ void ns32202_device::cctl_w(u8 data)
 		m_counter[1]->enable(false);
 
 	if (!(data & CCTL_CRUNH) && (data & CCTL_CDCRH))
-		; // TODO: decrement h-counter
+		{} // TODO: decrement h-counter
 
 	// start/stop l-counter
 	if (!(data & CCTL_CCON))
@@ -682,7 +682,7 @@ void ns32202_device::cctl_w(u8 data)
 			m_counter[0]->enable(false);
 
 		if (!(data & CCTL_CRUNL) && (data & CCTL_CDCRL))
-			; // TODO: decrement l-counter
+			{} // TODO: decrement l-counter
 	}
 
 	m_cctl = data & ~(CCTL_CRUNH | CCTL_CRUNL);
