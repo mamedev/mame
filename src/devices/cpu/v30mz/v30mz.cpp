@@ -279,7 +279,6 @@ void v30mz_cpu_device::device_reset()
 	m_prefix_base = 0;
 	m_seg_prefix = false;
 	m_seg_prefix_next = false;
-	m_ea = 0;
 	m_ea_seg = 0;
 	m_eo = 0;
 	m_modrm = 0;
@@ -295,35 +294,29 @@ uint32_t v30mz_cpu_device::pc()
 }
 
 
-inline uint8_t v30mz_cpu_device::read_byte(uint32_t addr)
+inline uint8_t v30mz_cpu_device::read_byte(uint32_t segment, uint16_t addr)
 {
-	return m_program.read_byte(addr);
-}
-
-
-inline uint16_t v30mz_cpu_device::read_word(uint32_t addr)
-{
-	return m_program.read_byte(addr) | ( m_program.read_byte(addr+1) << 8 );
+	return m_program.read_byte(segment + addr);
 }
 
 
 inline uint16_t v30mz_cpu_device::read_word(uint32_t segment, uint16_t addr)
 {
-	return m_program.read_byte(segment | addr) |
-	 (m_program.read_byte(segment | ((addr + 1) & 0xffff)) << 8);
+	return m_program.read_byte(segment + addr) |
+	 (m_program.read_byte(segment + ((addr + 1) & 0xffff)) << 8);
 }
 
 
-inline void v30mz_cpu_device::write_byte(uint32_t addr, uint8_t data)
+inline void v30mz_cpu_device::write_byte(uint32_t segment, uint16_t addr, uint8_t data)
 {
-	m_program.write_byte(addr, data);
+	m_program.write_byte(segment + addr, data);
 }
 
 
-inline void v30mz_cpu_device::write_word(uint32_t addr, uint16_t data)
+inline void v30mz_cpu_device::write_word(uint32_t segment, uint16_t addr, uint16_t data)
 {
-	m_program.write_byte(addr, data & 0xff);
-	m_program.write_byte(addr + 1, data >> 8);
+	m_program.write_byte(segment + addr, data & 0xff);
+	m_program.write_byte(segment + ((addr + 1) & 0xffff), data >> 8);
 }
 
 
@@ -427,136 +420,111 @@ inline uint32_t v30mz_cpu_device::default_base(int seg)
 }
 
 
-inline uint32_t v30mz_cpu_device::get_ea()
+inline void v30mz_cpu_device::get_ea()
 {
 	switch (m_modrm & 0xc7)
 	{
 	case 0x00:
 		m_eo = m_regs.w[BW] + m_regs.w[IX];
 		m_ea_seg = default_base(DS);
-		m_ea = default_base(DS) + m_eo;
 		break;
 	case 0x01:
 		m_eo = m_regs.w[BW] + m_regs.w[IY];
 		m_ea_seg = default_base(DS);
-		m_ea = default_base(DS) + m_eo;
 		break;
 	case 0x02:
 		m_eo = m_regs.w[BP] + m_regs.w[IX];
 		m_ea_seg = default_base(SS);
-		m_ea = default_base(SS) + m_eo;
 		break;
 	case 0x03:
 		m_eo = m_regs.w[BP] + m_regs.w[IY];
 		m_ea_seg = default_base(SS);
-		m_ea = default_base(SS) + m_eo;
 		break;
 	case 0x04:
 		m_eo = m_regs.w[IX];
 		m_ea_seg = default_base(DS);
-		m_ea = default_base(DS) + m_eo;
 		break;
 	case 0x05:
 		m_eo = m_regs.w[IY];
 		m_ea_seg = default_base(DS);
-		m_ea = default_base(DS) + m_eo;
 		break;
 	case 0x06:
 		m_eo = fetch_word();
 		m_ea_seg = default_base(DS);
-		m_ea = default_base(DS) + m_eo;
 		break;
 	case 0x07:
 		m_eo = m_regs.w[BW];
 		m_ea_seg = default_base(DS);
-		m_ea = default_base(DS) + m_eo;
 		break;
 
 	case 0x40:
 		m_eo = m_regs.w[BW] + m_regs.w[IX] + (int8_t)fetch();
 		m_ea_seg = default_base(DS);
-		m_ea = default_base(DS) + m_eo;
 		break;
 	case 0x41:
 		m_eo = m_regs.w[BW] + m_regs.w[IY] + (int8_t)fetch();
 		m_ea_seg = default_base(DS);
-		m_ea = default_base(DS) + m_eo;
 		break;
 	case 0x42:
 		m_eo = m_regs.w[BP] + m_regs.w[IX] + (int8_t)fetch();
 		m_ea_seg = default_base(SS);
-		m_ea = default_base(SS) + m_eo;
 		break;
 	case 0x43:
 		m_eo = m_regs.w[BP] + m_regs.w[IY] + (int8_t)fetch();
 		m_ea_seg = default_base(SS);
-		m_ea = default_base(SS) + m_eo;
 		break;
 	case 0x44:
 		m_eo = m_regs.w[IX] + (int8_t)fetch();
 		m_ea_seg = default_base(DS);
-		m_ea = default_base(DS) + m_eo;
 		break;
 	case 0x45:
 		m_eo = m_regs.w[IY] + (int8_t)fetch();
 		m_ea_seg = default_base(DS);
-		m_ea = default_base(DS) + m_eo;
 		break;
 	case 0x46:
 		m_eo = m_regs.w[BP] + (int8_t)fetch();
 		m_ea_seg = default_base(SS);
-		m_ea = default_base(SS) + m_eo;
 		break;
 	case 0x47:
 		m_eo = m_regs.w[BW] + (int8_t)fetch();
 		m_ea_seg = default_base(DS);
-		m_ea = default_base(DS) + m_eo;
 		break;
 
 	case 0x80:
 		m_eo = m_regs.w[BW] + m_regs.w[IX] + (int16_t)fetch_word();
 		m_ea_seg = default_base(DS);
-		m_ea = default_base(DS) + m_eo;
 		break;
 	case 0x81:
 		m_eo = m_regs.w[BW] + m_regs.w[IY] + (int16_t)fetch_word();
 		m_ea_seg = default_base(DS);
-		m_ea = default_base(DS) + m_eo;
 		break;
 	case 0x82:
 		m_eo = m_regs.w[BP] + m_regs.w[IX] + (int16_t)fetch_word();
 		m_ea_seg = default_base(SS);
-		m_ea = default_base(SS) + m_eo;
 		break;
 	case 0x83:
 		m_eo = m_regs.w[BP] + m_regs.w[IY] + (int16_t)fetch_word();
 		m_ea_seg = default_base(SS);
-		m_ea = default_base(SS) + m_eo;
 		break;
 	case 0x84:
 		m_eo = m_regs.w[IX] + (int16_t)fetch_word();
 		m_ea_seg = default_base(DS);
-		m_ea = default_base(DS) + m_eo;
 		break;
 	case 0x85:
 		m_eo = m_regs.w[IY] + (int16_t)fetch_word();
 		m_ea_seg = default_base(DS);
-		m_ea = default_base(DS) + m_eo;
 		break;
 	case 0x86:
 		m_eo = m_regs.w[BP] + (int16_t)fetch_word();
 		m_ea_seg = default_base(SS);
-		m_ea = default_base(SS) + m_eo;
 		break;
 	case 0x87:
 		m_eo = m_regs.w[BW] + (int16_t)fetch_word();
 		m_ea_seg = default_base(DS);
-		m_ea = default_base(DS) + m_eo;
 		break;
 	}
 
 if (m_eo == 0xffff) printf("%06x: m_eo set to 0xffff\n", pc());
-	return m_ea;
 }
 
 
@@ -568,7 +536,7 @@ inline void v30mz_cpu_device::store_ea_rm_byte(uint8_t data)
 	}
 	else
 	{
-		write_byte(m_ea, data);
+		write_byte(m_ea_seg, m_eo, data);
 	}
 }
 
@@ -581,7 +549,7 @@ inline void v30mz_cpu_device::store_ea_rm_word(uint16_t data)
 	}
 	else
 	{
-		write_word(m_ea, data);
+		write_word(m_ea_seg, m_eo, data);
 	}
 }
 
@@ -593,8 +561,8 @@ inline void v30mz_cpu_device::PutImmRMWord()
 	}
 	else
 	{
-		uint32_t addr = get_ea();
-		write_word(addr, fetch_word());
+		get_ea();
+		write_word(m_ea_seg, m_eo, fetch_word());
 	}
 }
 
@@ -606,8 +574,8 @@ inline void v30mz_cpu_device::PutRMWord(uint16_t val)
 	}
 	else
 	{
-		uint32_t addr = get_ea();
-		write_word(addr, val);
+		get_ea();
+		write_word(m_ea_seg, m_eo, val);
 	}
 }
 
@@ -620,8 +588,8 @@ inline void v30mz_cpu_device::PutRMByte(uint8_t val)
 	}
 	else
 	{
-		uint32_t addr = get_ea();
-		write_byte(addr, val);
+		get_ea();
+		write_byte(m_ea_seg, m_eo, val);
 	}
 }
 
@@ -634,8 +602,8 @@ inline void v30mz_cpu_device::PutImmRMByte()
 	}
 	else
 	{
-		uint32_t addr = get_ea();
-		write_byte(addr, fetch());
+		get_ea();
+		write_byte(m_ea_seg, m_eo, fetch());
 	}
 }
 
@@ -719,17 +687,15 @@ inline uint16_t v30mz_cpu_device::GetRMWord()
 	}
 	else
 	{
-		uint32_t addr = get_ea();
-		return read_word(addr);
+		get_ea();
+		return read_word(m_ea_seg, m_eo);
 	}
 }
 
 
 inline uint16_t v30mz_cpu_device::GetnextRMWord()
 {
-	uint32_t addr = (m_ea & 0xf0000) | ((m_ea + 2) & 0xffff);
-
-	return read_word(addr);
+	return read_word(m_ea_seg, m_eo + 2);
 }
 
 
@@ -741,15 +707,15 @@ inline uint8_t v30mz_cpu_device::GetRMByte()
 	}
 	else
 	{
-		uint32_t addr = get_ea();
-		return read_byte(addr);
+		get_ea();
+		return read_byte(m_ea_seg, m_eo);
 	}
 }
 
 
 inline void v30mz_cpu_device::put_mem_byte(int seg, uint16_t offset, uint8_t data)
 {
-	write_byte(default_base(seg) + offset, data);
+	write_byte(default_base(seg), offset, data);
 }
 
 
@@ -762,7 +728,7 @@ inline void v30mz_cpu_device::put_mem_word(int seg, uint16_t offset, uint16_t da
 
 inline uint8_t v30mz_cpu_device::get_mem_byte(int seg, uint16_t offset)
 {
-	return read_byte(default_base(seg) + offset);
+	return read_byte(default_base(seg), offset);
 }
 
 
@@ -1233,13 +1199,13 @@ inline void v30mz_cpu_device::DecWordReg(uint8_t reg)
 inline void v30mz_cpu_device::push(uint16_t data)
 {
 	m_regs.w[SP] -= 2;
-	write_word((m_sregs[SS] << 4) + m_regs.w[SP], data);
+	write_word(m_sregs[SS] << 4, m_regs.w[SP], data);
 }
 
 
 inline uint16_t v30mz_cpu_device::pop()
 {
-	uint16_t data = read_word((m_sregs[SS] << 4) + m_regs.w[SP]);
+	uint16_t data = read_word(m_sregs[SS] << 4, m_regs.w[SP]);
 
 	m_regs.w[SP] += 2;
 	return data;
@@ -1311,8 +1277,8 @@ void v30mz_cpu_device::interrupt(int int_num)
 		m_pending_irq &= ~INT_IRQ;
 	}
 
-	uint16_t dest_off = read_word(int_num * 4 + 0);
-	uint16_t dest_seg = read_word(int_num * 4 + 2);
+	uint16_t dest_off = read_word(0, int_num * 4 + 0);
+	uint16_t dest_seg = read_word(0, int_num * 4 + 2);
 
 	push(m_sregs[CS]);
 	push(m_ip);
