@@ -481,9 +481,9 @@ void ppu2c04_clone_device::init_palette_tables()
 	{
 		/* A7 line on palette ROMs is always high, color bits are in reverse order */
 		u8 color = m_palette_data[color_num | 0x80];
-		int R = bitswap<3>(color,      0, 1, 2);
-		int G = bitswap<3>(color >> 3, 0, 1, 2);
-		int B = bitswap<2>(color >> 6, 0, 1);
+		int R = bitswap<3>(color, 0, 1, 2);
+		int G = bitswap<3>(color, 3, 4, 5);
+		int B = bitswap<2>(color, 6, 7);
 
 		m_nespens[color_num] = (pal3bit(R) << 16) | (pal3bit(G) << 8) | pal2bit(B);
 	}
