@@ -22,8 +22,13 @@
 #include "machine/z80scc.h"
 #include "machine/macadb.h"
 #include "machine/dp83932c.h"
+#include "machine/nscsi_bus.h"
+#include "machine/ncr5390.h"
 #include "sound/asc.h"
 #include "formats/ap_dsk35.h"
+
+#include "bus/nscsi/cd.h"
+#include "bus/nscsi/hd.h"
 
 #include "bus/nubus/nubus.h"
 #include "bus/nubus/nubus_48gc.h"
@@ -62,6 +67,8 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_iwm(*this, "fdc"),
 		m_rtc(*this,"rtc"),
+		m_scsibus1(*this, "scsi1"),
+		m_ncr1(*this, "scsi1:7:ncr5394"),
 		m_sonic(*this, "sonic"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
@@ -83,6 +90,8 @@ private:
 	required_device<ram_device> m_ram;
 	required_device<applefdc_base_device> m_iwm;
 	required_device<rtc3430042_device> m_rtc;
+	required_device<nscsi_bus_device> m_scsibus1;
+	required_device<ncr53cf94_device> m_ncr1;
 	required_device<dp83932c_device> m_sonic;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -153,7 +162,7 @@ private:
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
 	WRITE_LINE_MEMBER(via_cb2_w) { m_macadb->adb_data_w(state); }
 	int m_via_cycles, m_via_interrupt, m_via2_interrupt, m_scc_interrupt, m_last_taken_interrupt;
-	int m_irq_count, m_ca1_data, m_ca2_data;
+	int m_irq_count, m_ca2_data;
 
 	uint32_t rom_switch_r(offs_t offset);
 	bool m_overlay;
@@ -177,6 +186,9 @@ private:
 		else
 			m_iwm->write((offset >> 8), data>>8);
 	}
+
+	uint8_t mac_5396_r(offs_t offset);
+	void mac_5396_w(offs_t offset, uint8_t data);
 };
 
 void macquadra_state::field_interrupts()
@@ -219,7 +231,7 @@ void macquadra_state::machine_start()
 	m_via_cycles = -50;
 	m_via_interrupt = m_via2_interrupt = m_scc_interrupt = 0;
 	m_last_taken_interrupt = -1;
-	m_irq_count = m_ca1_data = m_ca2_data = 0;
+	m_irq_count = m_ca2_data = 0;
 
 	m_6015_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(macquadra_state::mac_6015_tick),this));
 	m_6015_timer->adjust(attotime::never);
@@ -234,7 +246,7 @@ void macquadra_state::machine_reset()
 	m_overlay = true;
 	m_via_interrupt = m_via2_interrupt = m_scc_interrupt = 0;
 	m_last_taken_interrupt = -1;
-	m_irq_count = m_ca1_data = m_ca2_data = 0;
+	m_irq_count = m_ca2_data = 0;
 
 	// put ROM mirror at 0
 	address_space& space = m_maincpu->space(AS_PROGRAM);
@@ -472,7 +484,6 @@ void macquadra_state::dafb_dac_w(offs_t offset, uint32_t data, uint32_t mem_mask
 			break;
 
 		case 0x20:
-			printf("%x to DAFB mode\n", data);
 			switch (data & 0x9f)
 			{
 				case 0x80:
@@ -705,15 +716,8 @@ uint32_t macquadra_state::rom_switch_r(offs_t offset)
 
 TIMER_CALLBACK_MEMBER(macquadra_state::mac_6015_tick)
 {
-	m_via1->write_ca1(0);
-	m_via1->write_ca1(1);
-
 	/* handle ADB keyboard/mouse */
 	m_macadb->adb_vblank();
-
-	/* signal VBlank on CA1 input on the VIA */
-	m_ca1_data ^= 1;
-	m_via1->write_ca1(m_ca1_data);
 
 	if (++m_irq_count == 60)
 	{
@@ -722,6 +726,33 @@ TIMER_CALLBACK_MEMBER(macquadra_state::mac_6015_tick)
 		m_ca2_data ^= 1;
 		/* signal 1 Hz irq on CA2 input on the VIA */
 		m_via1->write_ca2(m_ca2_data);
+	}
+}
+
+uint8_t macquadra_state::mac_5396_r(offs_t offset)
+{
+	if (offset < 0x100)
+	{
+		return m_ncr1->read(offset>>4);
+	}
+	else    // pseudo-DMA: read from the FIFO
+	{
+//      return m_539x_1->read(2);
+	}
+
+	// never executed
+	return 0;
+}
+
+void macquadra_state::mac_5396_w(offs_t offset, uint8_t data)
+{
+	if (offset < 0x100)
+	{
+		m_ncr1->write(offset>>4, data);
+	}
+	else    // pseudo-DMA: write to the FIFO
+	{
+//      m_539x_1->write(2, data);
 	}
 }
 
@@ -737,7 +768,7 @@ void macquadra_state::quadra700_map(address_map &map)
 // 50008000 = Ethernet MAC ID PROM
 // 5000a000 = Sonic (DP83932) ethernet
 // 5000f000 = SCSI cf96, 5000f402 = SCSI #2 cf96
-//  map(0x5000f000, 0x5000f3ff).rw(FUNC(macquadra_state::mac_5396_r), FUNC(macquadra_state::mac_5396_w)).mirror(0x00fc0000);
+	map(0x5000f000, 0x5000f3ff).rw(FUNC(macquadra_state::mac_5396_r), FUNC(macquadra_state::mac_5396_w)).mirror(0x00fc0000);
 	map(0x5000c000, 0x5000dfff).rw(FUNC(macquadra_state::mac_scc_r), FUNC(macquadra_state::mac_scc_2_w)).mirror(0x00fc0000);
 	map(0x50014000, 0x50015fff).rw(m_easc, FUNC(asc_device::read), FUNC(asc_device::write)).mirror(0x00fc0000);
 	map(0x5001e000, 0x5001ffff).rw(FUNC(macquadra_state::mac_iwm_r), FUNC(macquadra_state::mac_iwm_w)).mirror(0x00fc0000);
@@ -853,6 +884,12 @@ static void mac_nubus_cards(device_slot_interface &device)
 	device.option_add("laserview", NUBUS_LASERVIEW);  /* Sigma Designs LaserView monochrome video card */
 }
 
+static void mac_scsi_devices(device_slot_interface &device)
+{
+	device.option_add("harddisk", NSCSI_HARDDISK);
+	device.option_add("cdrom", NSCSI_CDROM);
+}
+
 void macquadra_state::macqd700(machine_config &config)
 {
 	/* basic machine hardware */
@@ -878,6 +915,25 @@ void macquadra_state::macqd700(machine_config &config)
 
 	SCC85C30(config, m_scc, C7M);
 //  m_scc->intrq_callback().set(FUNC(macquadra_state::set_scc_interrupt));
+
+	// SCSI bus and devices
+	NSCSI_BUS(config, m_scsibus1);
+	NSCSI_CONNECTOR(config, "scsi1:0", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi1:1", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi1:2", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi1:3", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi1:4", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi1:5", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi1:6", mac_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsi1:7").option_set("ncr5394", NCR53CF94).clock(24_MHz_XTAL).machine_config(
+		[this] (device_t *device)
+		{
+			ncr53cf94_device &adapter = downcast<ncr53cf94_device &>(*device);
+
+			adapter.set_busmd(ncr53cf94_device::BUSMD_0);
+			adapter.irq_handler_cb().set(*this, FUNC(macquadra_state::irq_539x_1_w));
+			adapter.drq_handler_cb().set(*this, FUNC(macquadra_state::drq_539x_1_w));
+		});
 
 	DP83932C(config, m_sonic, 20_MHz_XTAL);
 	m_sonic->set_bus(m_maincpu, 0);
