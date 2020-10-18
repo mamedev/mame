@@ -5,16 +5,11 @@
 
 #include "cpu/nec/necdasm.h"
 
-struct nec_config
-{
-	const uint8_t*    v25v35_decryptiontable; // internal decryption table
-};
-
 enum
 {
 	NEC_PC=0,
 	NEC_IP, NEC_AW, NEC_CW, NEC_DW, NEC_BW, NEC_SP, NEC_BP, NEC_IX, NEC_IY,
-	NEC_FLAGS, NEC_DS1, NEC_CS, NEC_SS, NEC_DS0,
+	NEC_FLAGS, NEC_DS1, NEC_PS, NEC_SS, NEC_DS0,
 	NEC_VECTOR, NEC_PENDING
 };
 
@@ -80,27 +75,27 @@ protected:
 	inline void get_ea();
 	inline void store_ea_rm_byte(uint8_t data);
 	inline void store_ea_rm_word(uint16_t data);
-	inline void RegByte(uint8_t data);
-	inline void RegWord(uint16_t data);
-	inline uint8_t RegByte();
-	inline uint16_t RegWord();
-	inline uint16_t GetRMWord();
-	inline uint16_t GetnextRMWord();
-	inline uint8_t GetRMByte();
+	inline void reg_byte(uint8_t data);
+	inline void reg_word(uint16_t data);
+	inline uint8_t reg_byte();
+	inline uint16_t reg_word();
+	inline uint16_t get_rm_word();
+	inline uint16_t get_next_rm_word();
+	inline uint8_t get_rm_byte();
 	inline void put_mem_byte(int seg, uint16_t offset, uint8_t data);
 	inline void put_mem_word(int seg, uint16_t offset, uint16_t data);
 	inline uint8_t get_mem_byte(int seg, uint16_t offset);
 	inline uint16_t get_mem_word(int seg, uint16_t offset);
-	inline void PutImmRMWord();
-	inline void PutRMWord(uint16_t val);
-	inline void PutRMByte(uint8_t val);
-	inline void PutImmRMByte();
-	inline void DEF_br8();
-	inline void DEF_wr16();
-	inline void DEF_r8b();
-	inline void DEF_r16w();
-	inline void DEF_ald8();
-	inline void DEF_axd16();
+	inline void put_imm_rm_word();
+	inline void put_rm_word(uint16_t val);
+	inline void put_rm_byte(uint8_t val);
+	inline void put_imm_rm_byte();
+	inline void def_br8();
+	inline void def_wr16();
+	inline void def_r8b();
+	inline void def_r16w();
+	inline void def_ald8();
+	inline void def_awd16();
 
 	// Flags
 	inline void set_CF_byte(uint32_t x);
@@ -109,14 +104,14 @@ protected:
 	inline void set_SF(uint32_t x);
 	inline void set_ZF(uint32_t x);
 	inline void set_PF(uint32_t x);
-	inline void set_SZPF_Byte(uint32_t x);
-	inline void set_SZPF_Word(uint32_t x);
-	inline void set_OFW_Add(uint32_t x, uint32_t y, uint32_t z);
-	inline void set_OFB_Add(uint32_t x, uint32_t y, uint32_t z);
-	inline void set_OFW_Sub(uint32_t x, uint32_t y, uint32_t z);
-	inline void set_OFB_Sub(uint32_t x, uint32_t y, uint32_t z);
-	inline uint16_t CompressFlags() const;
-	inline void ExpandFlags(uint16_t f);
+	inline void set_SZPF_byte(uint32_t x);
+	inline void set_SZPF_word(uint32_t x);
+	inline void set_OF_word_add(uint32_t x, uint32_t y, uint32_t z);
+	inline void set_OF_byte_add(uint32_t x, uint32_t y, uint32_t z);
+	inline void set_OF_word_sub(uint32_t x, uint32_t y, uint32_t z);
+	inline void set_OF_byte_sub(uint32_t x, uint32_t y, uint32_t z);
+	inline uint16_t compress_flags() const;
+	inline void expand_flags(uint16_t f);
 
 	// rep instructions
 	inline void i_insb();
@@ -160,9 +155,9 @@ protected:
 	inline void shr_word(uint8_t c);
 	inline void shra_byte(uint8_t c);
 	inline void shra_word(uint8_t c);
-	inline void XchgAWReg(uint8_t reg);
-	inline void IncWordReg(uint8_t reg);
-	inline void DecWordReg(uint8_t reg);
+	inline void xchg_AW_reg(uint8_t reg);
+	inline void inc_word_reg(uint8_t reg);
+	inline void dec_word_reg(uint8_t reg);
 	inline void push(uint16_t data);
 	inline uint16_t pop();
 	inline void jmp(bool cond);
@@ -181,6 +176,7 @@ protected:
 
 	uint16_t  m_ip;
 	uint16_t  m_pfp;   // prefetch pointer
+	uint8_t   m_prefetch_queue[16];
 
 	int32_t   m_SignVal;
 	uint32_t  m_AuxVal, m_OverVal, m_ZeroVal, m_CarryVal, m_ParityVal; // 0 or non-0 valued flags
