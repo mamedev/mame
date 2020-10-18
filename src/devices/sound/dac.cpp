@@ -91,8 +91,8 @@ dac_device_base::dac_device_base(const machine_config &mconfig, device_type type
 	m_bits(bits),
 	m_mapper(mapper),
 	m_gain(gain),
-	m_vref_base(0),
-	m_vref_range(0)
+	m_range_min(-1.0),
+	m_range_max(1.0)
 {
 }
 
@@ -108,12 +108,10 @@ void dac_device_base::device_start()
 		m_value_map[code] = m_mapper(code, m_bits) * m_gain;
 
 	// determine the number of inputs
-	int inputs = 0;
-	if (m_vref_range == 0)
-		inputs += 2;
+	int inputs = (m_specified_inputs_mask == 0) ? 0 : 2;
 
 	// create the stream
-	m_stream = stream_alloc(inputs, 1, 48000 * 4, STREAM_DISABLE_INPUT_RESAMPLING);
+	m_stream = stream_alloc(inputs, 1, 48000 * 4);
 
 	// save data
 	save_item(NAME(m_curval));
@@ -131,25 +129,31 @@ void dac_device_base::sound_stream_update(sound_stream &stream, std::vector<read
 	// rails are constant
 	if (inputs.size() == 0)
 	{
-		out.fill(m_vref_base + m_curval * m_vref_range);
+		out.fill(m_range_min + m_curval * (m_range_max - m_range_min));
 		return;
 	}
 
-	auto &pos = inputs[DAC_VREF_POS_INPUT];
-	auto &neg = inputs[DAC_VREF_NEG_INPUT];
+	auto &hi = inputs[DAC_INPUT_RANGE_HI];
+	auto &lo = inputs[DAC_INPUT_RANGE_LO];
 
-	// rails are streams but effectively constant
-	if (pos.sample_rate() == SAMPLE_RATE_MINIMUM && neg.sample_rate() == SAMPLE_RATE_MINIMUM)
-		out.fill(neg.get(0) + m_curval * (pos.get(0) - neg.get(0)));
-
-	// rails are streams matching our output rate
-	else if (pos.sample_rate() == out.sample_rate() && neg.sample_rate() == out.sample_rate())
+	// constant lo, streaming hi
+	if (!BIT(m_specified_inputs_mask, DAC_INPUT_RANGE_LO))
 	{
 		for (int sampindex = 0; sampindex < out.samples(); sampindex++)
-			out.put(sampindex, neg.get(sampindex) + m_curval * (pos.get(sampindex) - neg.get(sampindex)));
+			out.put(sampindex, m_range_min + m_curval * (hi.get(sampindex) - m_range_min));
 	}
 
-	// other cases not supported for now
+	// constant hi, streaming lo
+	else if (!BIT(m_specified_inputs_mask, DAC_INPUT_RANGE_HI))
+	{
+		for (int sampindex = 0; sampindex < out.samples(); sampindex++)
+			out.put(sampindex, lo.get(sampindex) + m_curval * (m_range_max - lo.get(sampindex)));
+	}
+
+	// both streams provided
 	else
-		throw emu_fatalerror("Unsupported case: DAC input rate does not match DAC output rate");
+	{
+		for (int sampindex = 0; sampindex < out.samples(); sampindex++)
+			out.put(sampindex, lo.get(sampindex) + m_curval * (hi.get(sampindex) - lo.get(sampindex)));
+	}
 }

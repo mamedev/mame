@@ -24,8 +24,11 @@
 //  CONSTANTS
 //**************************************************************************
 
-#define DAC_VREF_POS_INPUT (0)
-#define DAC_VREF_NEG_INPUT (1)
+#define DAC_INPUT_RANGE_HI (0)
+#define DAC_INPUT_RANGE_LO (1)
+
+#define DAC_VREF_POS_INPUT (DAC_INPUT_RANGE_HI)
+#define DAC_VREF_NEG_INPUT (DAC_INPUT_RANGE_LO)
 
 
 
@@ -100,14 +103,13 @@ protected:
 
 public:
 	// configuration
-	dac_device_base &set_constant_vref(stream_buffer::sample_t vref1, stream_buffer::sample_t vref2)
+	dac_device_base &set_output_range(stream_buffer::sample_t range_min, stream_buffer::sample_t range_max)
 	{
-		if (vref1 > vref2)
-			std::swap(vref1, vref2);
-		m_vref_base = vref1;
-		m_vref_range = vref2 - vref1;
+		m_range_min = range_min;
+		m_range_max = range_max;
 		return *this;
 	}
+	dac_device_base &set_output_range(stream_buffer::sample_t vref) { return set_output_range(-vref, vref); }
 
 private:
 	// internal state
@@ -119,8 +121,8 @@ private:
 	u8 const m_bits;
 	dac_mapper_callback const m_mapper;
 	stream_buffer::sample_t const m_gain;
-	stream_buffer::sample_t m_vref_base;
-	stream_buffer::sample_t m_vref_range;
+	stream_buffer::sample_t m_range_min;
+	stream_buffer::sample_t m_range_max;
 };
 
 
@@ -128,11 +130,13 @@ private:
 
 class dac_bit_device_base : public dac_device_base, public dac_bit_interface
 {
-public:
+protected:
 	dac_bit_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 bits, dac_mapper_callback mapper, stream_buffer::sample_t gain) :
 		dac_device_base(mconfig, type, tag, owner, clock, bits, mapper, gain)
 	{
 	}
+
+public:
 	virtual WRITE_LINE_MEMBER(write) override { this->set_value(state); }
 	virtual void data_w(u8 data) override { this->set_value(data); }
 };
@@ -142,11 +146,13 @@ public:
 
 class dac_byte_device_base : public dac_device_base, public dac_byte_interface
 {
-public:
+protected:
 	dac_byte_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 bits, dac_mapper_callback mapper, stream_buffer::sample_t gain) :
 		dac_device_base(mconfig, type, tag, owner, clock, bits, mapper, gain)
 	{
 	}
+
+public:
 	virtual void write(u8 data) override { this->set_value(data); }
 	virtual void data_w(u8 data) override { this->set_value(data); }
 };
@@ -156,11 +162,13 @@ public:
 
 class dac_word_device_base : public dac_device_base, public dac_word_interface
 {
-public:
+protected:
 	dac_word_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 bits, dac_mapper_callback mapper, stream_buffer::sample_t gain) :
 		dac_device_base(mconfig, type, tag, owner, clock, bits, mapper, gain)
 	{
 	}
+
+public:
 	virtual void write(u16 data) override { this->set_value(data); }
 	virtual void data_w(u16 data) override { this->set_value(data); }
 };
