@@ -54,7 +54,7 @@
 #include "debugger.h"
 
 
-enum SREGS { ES=0, CS, SS, DS };
+enum SREGS { DS1=0, CS, SS, DS0 };
 enum WREGS { AW=0, CW, DW, BW, SP, BP, IX, IY };
 
 enum BREGS {
@@ -191,15 +191,15 @@ void v30mz_cpu_device::device_start()
 	state_add(NEC_SP, "SP", m_regs.w[SP]).callimport().callexport().formatstr("%04X");
 	state_add(NEC_AW, "AW", m_regs.w[AW]).callimport().callexport().formatstr("%04X");
 	state_add(NEC_BW, "BW", m_regs.w[BW]).callimport().callexport().formatstr("%04X");
-	state_add(NEC_CW, "CW", m_regs.w[CS]).callimport().callexport().formatstr("%04X");
+	state_add(NEC_CW, "CW", m_regs.w[CW]).callimport().callexport().formatstr("%04X");
 	state_add(NEC_DW, "DW", m_regs.w[DW]).callimport().callexport().formatstr("%04X");
 	state_add(NEC_BP, "BP", m_regs.w[BP]).callimport().callexport().formatstr("%04X");
 	state_add(NEC_IX, "IX", m_regs.w[IX]).callimport().callexport().formatstr("%04X");
 	state_add(NEC_IY, "IY", m_regs.w[IY]).callimport().callexport().formatstr("%04X");
 	state_add(NEC_CS, "CS", m_sregs[CS]).callimport().callexport().formatstr("%04X");
 	state_add(NEC_SS, "SS", m_sregs[SS]).callimport().callexport().formatstr("%04X");
-	state_add(NEC_DS, "DS0", m_sregs[DS]).callimport().callexport().formatstr("%04X");
-	state_add(NEC_ES, "DS1", m_sregs[ES]).callimport().callexport().formatstr("%04X");
+	state_add(NEC_DS0, "DS0", m_sregs[DS0]).callimport().callexport().formatstr("%04X");
+	state_add(NEC_DS1, "DS1", m_sregs[DS1]).callimport().callexport().formatstr("%04X");
 	state_add(NEC_VECTOR, "V", m_int_vector).callimport().callexport().formatstr("%02X");
 
 	state_add(STATE_GENPC, "GENPC", m_pc).callexport().formatstr("%05X");
@@ -257,10 +257,10 @@ void v30mz_cpu_device::device_reset()
 	m_regs.w[BP] = 0;
 	m_regs.w[IX] = 0;
 	m_regs.w[IY] = 0;
-	m_sregs[ES] = 0;
+	m_sregs[DS1] = 0;
 	m_sregs[CS] = 0xffff;
 	m_sregs[SS] = 0;
-	m_sregs[DS] = 0;
+	m_sregs[DS0] = 0;
 	m_ip = 0;
 	m_SignVal = 0;
 	m_AuxVal = 0;
@@ -366,7 +366,7 @@ inline uint8_t v30mz_cpu_device::repx_op()
 	{
 	case 0x26:
 		seg_prefix = true;
-		seg = ES;
+		seg = DS1;
 		break;
 	case 0x2e:
 		seg_prefix = true;
@@ -378,7 +378,7 @@ inline uint8_t v30mz_cpu_device::repx_op()
 		break;
 	case 0x3e:
 		seg_prefix = true;
-		seg = DS;
+		seg = DS0;
 		break;
 	}
 
@@ -409,7 +409,7 @@ inline void v30mz_cpu_device::clkm(uint32_t cycles_reg, uint32_t cycles_mem)
 
 inline uint32_t v30mz_cpu_device::default_base(int seg)
 {
-	if (m_seg_prefix && (seg==DS || seg==SS))
+	if (m_seg_prefix && (seg==DS0 || seg==SS))
 	{
 		return m_prefix_base;
 	}
@@ -426,11 +426,11 @@ inline void v30mz_cpu_device::get_ea()
 	{
 	case 0x00:
 		m_eo = m_regs.w[BW] + m_regs.w[IX];
-		m_ea_seg = default_base(DS);
+		m_ea_seg = default_base(DS0);
 		break;
 	case 0x01:
 		m_eo = m_regs.w[BW] + m_regs.w[IY];
-		m_ea_seg = default_base(DS);
+		m_ea_seg = default_base(DS0);
 		break;
 	case 0x02:
 		m_eo = m_regs.w[BP] + m_regs.w[IX];
@@ -442,28 +442,28 @@ inline void v30mz_cpu_device::get_ea()
 		break;
 	case 0x04:
 		m_eo = m_regs.w[IX];
-		m_ea_seg = default_base(DS);
+		m_ea_seg = default_base(DS0);
 		break;
 	case 0x05:
 		m_eo = m_regs.w[IY];
-		m_ea_seg = default_base(DS);
+		m_ea_seg = default_base(DS0);
 		break;
 	case 0x06:
 		m_eo = fetch_word();
-		m_ea_seg = default_base(DS);
+		m_ea_seg = default_base(DS0);
 		break;
 	case 0x07:
 		m_eo = m_regs.w[BW];
-		m_ea_seg = default_base(DS);
+		m_ea_seg = default_base(DS0);
 		break;
 
 	case 0x40:
 		m_eo = m_regs.w[BW] + m_regs.w[IX] + (int8_t)fetch();
-		m_ea_seg = default_base(DS);
+		m_ea_seg = default_base(DS0);
 		break;
 	case 0x41:
 		m_eo = m_regs.w[BW] + m_regs.w[IY] + (int8_t)fetch();
-		m_ea_seg = default_base(DS);
+		m_ea_seg = default_base(DS0);
 		break;
 	case 0x42:
 		m_eo = m_regs.w[BP] + m_regs.w[IX] + (int8_t)fetch();
@@ -475,11 +475,11 @@ inline void v30mz_cpu_device::get_ea()
 		break;
 	case 0x44:
 		m_eo = m_regs.w[IX] + (int8_t)fetch();
-		m_ea_seg = default_base(DS);
+		m_ea_seg = default_base(DS0);
 		break;
 	case 0x45:
 		m_eo = m_regs.w[IY] + (int8_t)fetch();
-		m_ea_seg = default_base(DS);
+		m_ea_seg = default_base(DS0);
 		break;
 	case 0x46:
 		m_eo = m_regs.w[BP] + (int8_t)fetch();
@@ -487,16 +487,16 @@ inline void v30mz_cpu_device::get_ea()
 		break;
 	case 0x47:
 		m_eo = m_regs.w[BW] + (int8_t)fetch();
-		m_ea_seg = default_base(DS);
+		m_ea_seg = default_base(DS0);
 		break;
 
 	case 0x80:
 		m_eo = m_regs.w[BW] + m_regs.w[IX] + (int16_t)fetch_word();
-		m_ea_seg = default_base(DS);
+		m_ea_seg = default_base(DS0);
 		break;
 	case 0x81:
 		m_eo = m_regs.w[BW] + m_regs.w[IY] + (int16_t)fetch_word();
-		m_ea_seg = default_base(DS);
+		m_ea_seg = default_base(DS0);
 		break;
 	case 0x82:
 		m_eo = m_regs.w[BP] + m_regs.w[IX] + (int16_t)fetch_word();
@@ -508,11 +508,11 @@ inline void v30mz_cpu_device::get_ea()
 		break;
 	case 0x84:
 		m_eo = m_regs.w[IX] + (int16_t)fetch_word();
-		m_ea_seg = default_base(DS);
+		m_ea_seg = default_base(DS0);
 		break;
 	case 0x85:
 		m_eo = m_regs.w[IY] + (int16_t)fetch_word();
-		m_ea_seg = default_base(DS);
+		m_ea_seg = default_base(DS0);
 		break;
 	case 0x86:
 		m_eo = m_regs.w[BP] + (int16_t)fetch_word();
@@ -520,7 +520,7 @@ inline void v30mz_cpu_device::get_ea()
 		break;
 	case 0x87:
 		m_eo = m_regs.w[BW] + (int16_t)fetch_word();
-		m_ea_seg = default_base(DS);
+		m_ea_seg = default_base(DS0);
 		break;
 	}
 
@@ -832,38 +832,38 @@ inline void v30mz_cpu_device::ExpandFlags(uint16_t f)
 
 inline void v30mz_cpu_device::i_insb()
 {
-	put_mem_byte(ES, m_regs.w[IY], read_port(m_regs.w[DW]));
+	put_mem_byte(DS1, m_regs.w[IY], read_port(m_regs.w[DW]));
 	m_regs.w[IY] += -2 * m_DF + 1;
 	clk(6);
 }
 
 inline void v30mz_cpu_device::i_insw()
 {
-	put_mem_byte(ES, m_regs.w[IY], read_port(m_regs.w[DW]));
-	put_mem_byte(ES, (m_regs.w[IY] + 1) & 0xffff, read_port((m_regs.w[DW]+1) & 0xffff));
+	put_mem_byte(DS1, m_regs.w[IY], read_port(m_regs.w[DW]));
+	put_mem_byte(DS1, (m_regs.w[IY] + 1) & 0xffff, read_port((m_regs.w[DW]+1) & 0xffff));
 	m_regs.w[IY] += -4 * m_DF + 2;
 	clk(6);
 }
 
 inline void v30mz_cpu_device::i_outsb()
 {
-	write_port(m_regs.w[DW], get_mem_byte(DS, m_regs.w[IX]));
+	write_port(m_regs.w[DW], get_mem_byte(DS0, m_regs.w[IX]));
 	m_regs.w[IX] += -2 * m_DF + 1;
 	clk(7);
 }
 
 inline void v30mz_cpu_device::i_outsw()
 {
-	write_port(m_regs.w[DW], get_mem_byte(DS, m_regs.w[IX]));
-	write_port((m_regs.w[DW]+1) & 0xffff, get_mem_byte(DS, (m_regs.w[IX]+1) & 0xffff));
+	write_port(m_regs.w[DW], get_mem_byte(DS0, m_regs.w[IX]));
+	write_port((m_regs.w[DW]+1) & 0xffff, get_mem_byte(DS0, (m_regs.w[IX]+1) & 0xffff));
 	m_regs.w[IX] += -4 * m_DF + 2;
 	clk(7);
 }
 
 inline void v30mz_cpu_device::i_movsb()
 {
-	uint8_t tmp = get_mem_byte(DS, m_regs.w[IX]);
-	put_mem_byte(ES, m_regs.w[IY], tmp);
+	uint8_t tmp = get_mem_byte(DS0, m_regs.w[IX]);
+	put_mem_byte(DS1, m_regs.w[IY], tmp);
 	m_regs.w[IY] += -2 * m_DF + 1;
 	m_regs.w[IX] += -2 * m_DF + 1;
 	clk(5);
@@ -871,8 +871,8 @@ inline void v30mz_cpu_device::i_movsb()
 
 inline void v30mz_cpu_device::i_movsw()
 {
-	uint16_t tmp = get_mem_word(DS, m_regs.w[IX]);
-	put_mem_word(ES, m_regs.w[IY], tmp);
+	uint16_t tmp = get_mem_word(DS0, m_regs.w[IX]);
+	put_mem_word(DS1, m_regs.w[IY], tmp);
 	m_regs.w[IY] += -4 * m_DF + 2;
 	m_regs.w[IX] += -4 * m_DF + 2;
 	clk(5);
@@ -880,8 +880,8 @@ inline void v30mz_cpu_device::i_movsw()
 
 inline void v30mz_cpu_device::i_cmpsb()
 {
-	m_src = get_mem_byte(ES, m_regs.w[IY]);
-	m_dst = get_mem_byte(DS, m_regs.w[IX]);
+	m_src = get_mem_byte(DS1, m_regs.w[IY]);
+	m_dst = get_mem_byte(DS0, m_regs.w[IX]);
 	sub_byte();
 	m_regs.w[IY] += -2 * m_DF + 1;
 	m_regs.w[IX] += -2 * m_DF + 1;
@@ -890,8 +890,8 @@ inline void v30mz_cpu_device::i_cmpsb()
 
 inline void v30mz_cpu_device::i_cmpsw()
 {
-	m_src = get_mem_word(ES, m_regs.w[IY]);
-	m_dst = get_mem_word(DS, m_regs.w[IX]);
+	m_src = get_mem_word(DS1, m_regs.w[IY]);
+	m_dst = get_mem_word(DS0, m_regs.w[IX]);
 	sub_word();
 	m_regs.w[IY] += -4 * m_DF + 2;
 	m_regs.w[IX] += -4 * m_DF + 2;
@@ -900,35 +900,35 @@ inline void v30mz_cpu_device::i_cmpsw()
 
 inline void v30mz_cpu_device::i_stosb()
 {
-	put_mem_byte(ES, m_regs.w[IY], m_regs.b[AL]);
+	put_mem_byte(DS1, m_regs.w[IY], m_regs.b[AL]);
 	m_regs.w[IY] += -2 * m_DF + 1;
 	clk(3);
 }
 
 inline void v30mz_cpu_device::i_stosw()
 {
-	put_mem_word(ES, m_regs.w[IY], m_regs.w[AW]);
+	put_mem_word(DS1, m_regs.w[IY], m_regs.w[AW]);
 	m_regs.w[IY] += -4 * m_DF + 2;
 	clk(3);
 }
 
 inline void v30mz_cpu_device::i_lodsb()
 {
-	m_regs.b[AL] = get_mem_byte(DS, m_regs.w[IX]);
+	m_regs.b[AL] = get_mem_byte(DS0, m_regs.w[IX]);
 	m_regs.w[IX] += -2 * m_DF + 1;
 	clk(3);
 }
 
 inline void v30mz_cpu_device::i_lodsw()
 {
-	m_regs.w[AW] = get_mem_word(DS, m_regs.w[IX]);
+	m_regs.w[AW] = get_mem_word(DS0, m_regs.w[IX]);
 	m_regs.w[IX] += -4 * m_DF + 2;
 	clk(3);
 }
 
 inline void v30mz_cpu_device::i_scasb()
 {
-	m_src = get_mem_byte(ES, m_regs.w[IY]);
+	m_src = get_mem_byte(DS1, m_regs.w[IY]);
 	m_dst = m_regs.b[AL];
 	sub_byte();
 	m_regs.w[IY] += -2 * m_DF + 1;
@@ -937,7 +937,7 @@ inline void v30mz_cpu_device::i_scasb()
 
 inline void v30mz_cpu_device::i_scasw()
 {
-	m_src = get_mem_word(ES, m_regs.w[IY]);
+	m_src = get_mem_word(DS1, m_regs.w[IY]);
 	m_dst = m_regs.w[AW];
 	sub_word();
 	m_regs.w[IY] += -4 * m_DF + 2;
@@ -1421,12 +1421,12 @@ void v30mz_cpu_device::execute_run()
 				break;
 
 			case 0x06: // i_push_es
-				push(m_sregs[ES]);
+				push(m_sregs[DS1]);
 				clk(2);
 				break;
 
 			case 0x07: // i_pop_es
-				m_sregs[ES] = pop();
+				m_sregs[DS1] = pop();
 				clk(3);
 				break;
 
@@ -1610,15 +1610,15 @@ void v30mz_cpu_device::execute_run()
 							for (int i=0; i<count; i++)
 							{
 								clk(19);
-								tmp = get_mem_byte(DS, si);
-								tmp2 = get_mem_byte(ES, di);
+								tmp = get_mem_byte(DS0, si);
+								tmp2 = get_mem_byte(DS1, di);
 								int v1 = (tmp>>4)*10 + (tmp&0xf);
 								int v2 = (tmp2>>4)*10 + (tmp2&0xf);
 								int result = v1 + v2 + m_CarryVal;
 								m_CarryVal = result > 99 ? 1 : 0;
 								result = result % 100;
 								v1 = ((result/10)<<4) | (result % 10);
-								put_mem_byte(ES, di,v1);
+								put_mem_byte(DS1, di,v1);
 								if (v1)
 								{
 									m_ZeroVal = 1;
@@ -1642,8 +1642,8 @@ void v30mz_cpu_device::execute_run()
 							{
 								int result;
 								clk(19);
-								tmp = get_mem_byte(ES, di);
-								tmp2 = get_mem_byte(DS, si);
+								tmp = get_mem_byte(DS1, di);
+								tmp2 = get_mem_byte(DS0, si);
 								int v1 = (tmp >> 4) * 10 + (tmp & 0xf);
 								int v2 = (tmp2 >> 4) * 10 + (tmp2 & 0xf);
 								if (v1 < (v2 + m_CarryVal))
@@ -1658,7 +1658,7 @@ void v30mz_cpu_device::execute_run()
 									m_CarryVal = 0;
 								}
 								v1 = ((result / 10) << 4) | (result % 10);
-								put_mem_byte(ES, di,v1);
+								put_mem_byte(DS1, di,v1);
 								if (v1)
 								{
 									m_ZeroVal = 1;
@@ -1682,8 +1682,8 @@ void v30mz_cpu_device::execute_run()
 							{
 								int result;
 								clk(19);
-								tmp = get_mem_byte(ES, di);
-								tmp2 = get_mem_byte(DS, si);
+								tmp = get_mem_byte(DS1, di);
+								tmp2 = get_mem_byte(DS0, si);
 								int v1 = (tmp >> 4) * 10 + (tmp & 0xf);
 								int v2 = (tmp2 >> 4) * 10 + (tmp2 & 0xf);
 								if (v1 < (v2 + m_CarryVal))
@@ -1865,12 +1865,12 @@ void v30mz_cpu_device::execute_run()
 				break;
 
 			case 0x1e: // i_push_ds
-				push(m_sregs[DS]);
+				push(m_sregs[DS0]);
 				clk(2);
 				break;
 
 			case 0x1f: // i_pop_ds
-				m_sregs[DS] = pop();
+				m_sregs[DS0] = pop();
 				clk(3);
 				break;
 
@@ -1919,7 +1919,7 @@ void v30mz_cpu_device::execute_run()
 
 			case 0x26: // i_es
 				m_seg_prefix_next = true;
-				m_prefix_base = m_sregs[ES] << 4;
+				m_prefix_base = m_sregs[DS1] << 4;
 				clk(1);
 				break;
 
@@ -2075,7 +2075,7 @@ void v30mz_cpu_device::execute_run()
 
 			case 0x3e: // i_ds
 				m_seg_prefix_next = true;
-				m_prefix_base = m_sregs[DS] << 4;
+				m_prefix_base = m_sregs[DS0] << 4;
 				clk(1);
 				break;
 
@@ -2634,7 +2634,7 @@ void v30mz_cpu_device::execute_run()
 				switch (m_modrm & 0x38)
 				{
 				case 0x00:  /* mov es,ew */
-					m_sregs[ES] = m_src;
+					m_sregs[DS1] = m_src;
 					break;
 				case 0x08:  /* mov cs,ew */
 					m_sregs[CS] = m_src;
@@ -2643,7 +2643,7 @@ void v30mz_cpu_device::execute_run()
 					m_sregs[SS] = m_src;
 					break;
 				case 0x18:  /* mov ds,ew */
-					m_sregs[DS] = m_src;
+					m_sregs[DS0] = m_src;
 					break;
 				default:
 					logerror("%s: %06x: Mov Sreg - Invalid register\n", tag(), pc());
@@ -2749,7 +2749,7 @@ void v30mz_cpu_device::execute_run()
 			case 0xa0: // i_mov_aldisp
 				{
 					uint32_t addr = fetch_word();
-					m_regs.b[AL] = get_mem_byte(DS, addr);
+					m_regs.b[AL] = get_mem_byte(DS0, addr);
 					clk(1);
 				}
 				break;
@@ -2757,8 +2757,8 @@ void v30mz_cpu_device::execute_run()
 			case 0xa1: // i_mov_axdisp
 				{
 					uint32_t addr = fetch_word();
-					m_regs.b[AL] = get_mem_byte(DS, addr);
-					m_regs.b[AH] = get_mem_byte(DS, addr+1);
+					m_regs.b[AL] = get_mem_byte(DS0, addr);
+					m_regs.b[AH] = get_mem_byte(DS0, addr+1);
 					clk(1);
 				}
 				break;
@@ -2766,7 +2766,7 @@ void v30mz_cpu_device::execute_run()
 			case 0xa2: // i_mov_dispal
 				{
 					uint32_t addr = fetch_word();
-					put_mem_byte(DS, addr, m_regs.b[AL]);
+					put_mem_byte(DS0, addr, m_regs.b[AL]);
 					clk(1);
 				}
 				break;
@@ -2774,8 +2774,8 @@ void v30mz_cpu_device::execute_run()
 			case 0xa3: // i_mov_dispax
 				{
 					uint32_t addr = fetch_word();
-					put_mem_byte(DS, addr, m_regs.b[AL]);
-					put_mem_byte(DS, addr+1, m_regs.b[AH]);
+					put_mem_byte(DS0, addr, m_regs.b[AL]);
+					put_mem_byte(DS0, addr+1, m_regs.b[AH]);
 					clk(1);
 				}
 				break;
@@ -2992,14 +2992,14 @@ void v30mz_cpu_device::execute_run()
 			case 0xc4: // i_les_dw
 				m_modrm = fetch();
 				RegWord(GetRMWord());
-				m_sregs[ES] = GetnextRMWord();
+				m_sregs[DS1] = GetnextRMWord();
 				clk(6);
 				break;
 
 			case 0xc5: // i_lds_dw
 				m_modrm = fetch();
 				RegWord(GetRMWord());
-				m_sregs[DS] = GetnextRMWord();
+				m_sregs[DS0] = GetnextRMWord();
 				clk(6);
 				break;
 
@@ -3200,7 +3200,7 @@ void v30mz_cpu_device::execute_run()
 				break;
 
 			case 0xd7: // i_trans
-				m_regs.b[AL] = get_mem_byte(DS, m_regs.w[BW] + m_regs.b[AL]);
+				m_regs.b[AL] = get_mem_byte(DS0, m_regs.w[BW] + m_regs.b[AL]);
 				clk(5);
 				break;
 
