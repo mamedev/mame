@@ -1975,6 +1975,9 @@ ROM_START( suprmriobl )
 	ROM_LOAD( "pal16r6.5",  0x000, 0x104, CRC(ceff7c7c) SHA1(52fd344c591478469369cd0862d1facfe23e12fb) )
 	ROM_LOAD( "pal16r8.6",  0x000, 0x104, CRC(bd76fb53) SHA1(2d0634e8edb3289a103719466465e9777606086e) )
 	ROM_LOAD( "pal16r8a.7", 0x000, 0x104, CRC(bd76fb53) SHA1(2d0634e8edb3289a103719466465e9777606086e) )
+
+	ROM_REGION(0x0100, "epld", 0)
+	ROM_LOAD("ep1200.bin", 0x000, 0x100, NO_DUMP) // Not dumped
 ROM_END
 
 ROM_START( suprmriobl2 )
@@ -1994,38 +1997,18 @@ ROM_START( suprmriobl2 )
 	ROM_REGION(0x100, "ppu1:palette", 0)
 	ROM_LOAD_NIB_HIGH( "prom6301.1", 0x000, 0x100, BAD_DUMP CRC(a31dc330) SHA1(b652003f7e252bac3bdb19412839c2f03af7f8b8) ) // Not from this PCB
 	ROM_LOAD_NIB_LOW ( "prom6301.2", 0x000, 0x100, BAD_DUMP CRC(019c6141) SHA1(fdeda4dea6506807a3324fa941f0684208aa3b4b) ) // Not from this PCB
-ROM_END
 
-ROM_START( suprmriobl3 )
-	ROM_REGION( 0x10000, "maincpu", 0 ) // 6502 memory
-	ROM_LOAD( "sm_4.bin",  0x8000, 0x8000, CRC(663b1753) SHA1(b0d2057c4545f2d6534cafb16086826c8ba49f5a) )
+	ROM_REGION(0x4000, "pals", 0)
+	ROM_LOAD("pal16l8.1", 0x000, 0x104, BAD_DUMP CRC(bd76fb53) SHA1(2d0634e8edb3289a103719466465e9777606086e)) // Not from this PCB
+	ROM_LOAD("pal16r6a.2", 0x000, 0x104, NO_DUMP)
+	ROM_LOAD("pal16r8.3", 0x000, 0x104, BAD_DUMP CRC(bd76fb53) SHA1(2d0634e8edb3289a103719466465e9777606086e)) // Not from this PCB
+	ROM_LOAD("pal16l8.4", 0x000, 0x104, BAD_DUMP CRC(6f6de82d) SHA1(3d59b222d25457b2f89b559409721db37d6a81d8)) // Not from this PCB
+	ROM_LOAD("pal16r6.5", 0x000, 0x104, BAD_DUMP CRC(ceff7c7c) SHA1(52fd344c591478469369cd0862d1facfe23e12fb)) // Not from this PCB
+	ROM_LOAD("pal16r8.6", 0x000, 0x104, BAD_DUMP CRC(bd76fb53) SHA1(2d0634e8edb3289a103719466465e9777606086e)) // Not from this PCB
+	ROM_LOAD("pal16r8a.7", 0x000, 0x104, BAD_DUMP CRC(bd76fb53) SHA1(2d0634e8edb3289a103719466465e9777606086e)) // Not from this PCB
 
-	ROM_REGION( 0x10000, "sub", 0 ) // Z80 memory (NMI and IRQ return instructions are corrupted)
-	ROM_LOAD( "sm_1.bin",  0x0000, 0x2000, BAD_DUMP CRC(7f6dda4a) SHA1(0e92a1255ce13ae1215b531f268cd4874e20d611) )
-
-	ROM_REGION( 0x10000, "unk", 0 ) // Table used by clone PPU for sprite flipping, etc.
-	ROM_LOAD( "sm_3.bin",  0x0000, 0x8000, CRC(67a467f9) SHA1(61cd1db7cd52faa31153b89f6b98c9b78bf4ca4f) )
-
-	ROM_REGION( 0x4000, "gfx1", 0 ) // PPU memory
-	ROM_LOAD( "sm_2.bin",  0x0000, 0x2000, CRC(a5f771d1) SHA1(b3f916700035d5556cca009ab83300fb662a868f) )
-	ROM_LOAD( "sm_5.bin",  0x2000, 0x2000, CRC(a08903ca) SHA1(7ecec519ac973168a84505ddede4f248b554fd85) )
-
-	/* this set has some extra files compared to "suprmriobl2", they probably exist on that pcb too though */
-	ROM_REGION(0x100, "ppu1:palette", 0)
-	ROM_LOAD_NIB_HIGH( "prom6301.1", 0x000, 0x100, BAD_DUMP CRC(a31dc330) SHA1(b652003f7e252bac3bdb19412839c2f03af7f8b8) ) // Not from this PCB
-	ROM_LOAD_NIB_LOW ( "prom6301.2", 0x000, 0x100, BAD_DUMP CRC(019c6141) SHA1(fdeda4dea6506807a3324fa941f0684208aa3b4b) ) // Not from this PCB
-
-	ROM_REGION( 0x4000, "pals", 0 )
-	ROM_LOAD( "pal16l8.1",  0x000, 0x104, BAD_DUMP CRC(bd76fb53) SHA1(2d0634e8edb3289a103719466465e9777606086e) ) // Not from this PCB
-	ROM_LOAD( "pal16r6a.2", 0x000, 0x104, NO_DUMP )
-	ROM_LOAD( "pal16r8.3",  0x000, 0x104, BAD_DUMP CRC(bd76fb53) SHA1(2d0634e8edb3289a103719466465e9777606086e) ) // Not from this PCB
-	ROM_LOAD( "pal16l8.4",  0x000, 0x104, BAD_DUMP CRC(6f6de82d) SHA1(3d59b222d25457b2f89b559409721db37d6a81d8) ) // Not from this PCB
-	ROM_LOAD( "pal16r6.5",  0x000, 0x104, BAD_DUMP CRC(ceff7c7c) SHA1(52fd344c591478469369cd0862d1facfe23e12fb) ) // Not from this PCB
-	ROM_LOAD( "pal16r8.6",  0x000, 0x104, BAD_DUMP CRC(bd76fb53) SHA1(2d0634e8edb3289a103719466465e9777606086e) ) // Not from this PCB
-	ROM_LOAD( "pal16r8a.7", 0x000, 0x104, BAD_DUMP CRC(bd76fb53) SHA1(2d0634e8edb3289a103719466465e9777606086e) ) // Not from this PCB
-
-	ROM_REGION( 0x0100, "epld", 0 )
-	ROM_LOAD( "ep1200.bin",  0x000, 0x100, NO_DUMP ) // Not dumped
+	ROM_REGION(0x0100, "epld", 0)
+	ROM_LOAD("ep1200.bin", 0x000, 0x100, NO_DUMP) // Not dumped
 ROM_END
 
 ROM_START( skatekds )
@@ -2874,7 +2857,6 @@ GAME( 1986, suprmrio, 0,         vsnes,         suprmrio, vsnes_state, init_vsno
 GAME( 1986, suprmrioa,suprmrio,  vsnes,         suprmrio, vsnes_state, init_vsnormal, ROT0, "Nintendo",               "Vs. Super Mario Bros. (set ?, harder)", 0 )
 GAME( 1986, suprmriobl,suprmrio, vsnes_bootleg, suprmrio, vsnes_state, init_bootleg,  ROT0, "bootleg",                "Vs. Super Mario Bros. (bootleg with Z80, set 1)", 0) // timer starts at 200(!)
 GAME( 1986, suprmriobl2,suprmrio,vsnes_bootleg, suprmrio, vsnes_state, init_bootleg,  ROT0, "bootleg",                "Vs. Super Mario Bros. (bootleg with Z80, set 2)", 0) // timer starts at 300
-GAME( 1986, suprmriobl3,suprmrio,vsnes_bootleg, suprmrio, vsnes_state, init_bootleg,  ROT0, "bootleg",                "Vs. Super Mario Bros. (bootleg with Z80, set 3)", MACHINE_NOT_WORKING ) // timer starts at 300
 GAME( 1988, skatekds, suprmrio,  vsnes,         suprmrio, vsnes_state, init_vsnormal, ROT0, "hack (Two-Bit Score)",   "Vs. Skate Kids. (Graphic hack of Super Mario Bros.)", 0 )
 GAME( 1985, vsskykid, 0,         vsnes,         vsskykid, vsnes_state, init_MMC3,     ROT0, "Namco",                  "Vs. Super SkyKid", 0 )
 GAME( 1987, tkoboxng, 0,         vsnes,         tkoboxng, vsnes_state, init_tkoboxng, ROT0, "Namco / Data East USA",  "Vs. T.K.O. Boxing", 0 )
