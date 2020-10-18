@@ -58,11 +58,10 @@ protected:
 	void interrupt(int int_num);
 
 	// Accessing memory and io
-	inline uint8_t read_byte(uint32_t addr);
-	inline uint16_t read_word(uint32_t addr);
-	inline uint16_t read_word(uint32_t segmet, uint16_t addr);
-	inline void write_byte(uint32_t addr, uint8_t data);
-	inline void write_word(uint32_t addr, uint16_t data);
+	inline uint8_t read_byte(uint32_t segment, uint16_t addr);
+	inline uint16_t read_word(uint32_t segment, uint16_t addr);
+	inline void write_byte(uint32_t segment, uint16_t addr, uint8_t data);
+	inline void write_word(uint32_t segment, uint16_t addr, uint16_t data);
 	inline uint8_t read_port(uint16_t port);
 	inline void write_port(uint16_t port, uint8_t data);
 
@@ -78,7 +77,7 @@ protected:
 
 	// Memory handling while executing instructions
 	inline uint32_t default_base(int seg);
-	inline uint32_t get_ea();
+	inline void get_ea();
 	inline void store_ea_rm_byte(uint8_t data);
 	inline void store_ea_rm_word(uint16_t data);
 	inline void RegByte(uint8_t data);
@@ -201,7 +200,6 @@ protected:
 	bool m_seg_prefix;      /* prefix segment indicator */
 	bool m_seg_prefix_next; /* prefix segment for next instruction */
 
-	uint32_t m_ea;
 	uint16_t m_eo;
 	uint32_t m_ea_seg;
 
