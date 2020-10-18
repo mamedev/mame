@@ -27,6 +27,7 @@
 
 #include "machine/macrtc.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/m6502/m5074x.h"
 #include "machine/6522via.h"
 #include "machine/applefdc.h"
 #include "machine/ram.h"
@@ -415,6 +416,10 @@ void macportable_state::macprtb(machine_config &config)
 	M68000(config, m_maincpu, C15M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &macportable_state::macprtb_map);
 
+	M50753(config, "pmu", 3.93216_MHz_XTAL);
+
+	M50740(config, "kybd", 3.93216_MHz_XTAL).set_disable();
+
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60.15);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1260));
@@ -451,7 +456,7 @@ void macportable_state::macprtb(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 	ASC(config, m_asc, C15M, asc_device::asc_type::ASC);
-  m_asc->irqf_callback().set(FUNC(macportable_state::asc_irq_w));
+	m_asc->irqf_callback().set(FUNC(macportable_state::asc_irq_w));
 	m_asc->add_route(0, "lspeaker", 1.0);
 	m_asc->add_route(1, "rspeaker", 1.0);
 
@@ -469,6 +474,9 @@ ROM_START(macprtb)
 
 	ROM_REGION(0x1800, "pmu", 0)
 	ROM_LOAD("pmuv1.bin", 0x000000, 0x001800, CRC(01dae148) SHA1(29d2fca7426c31f2b9334832ed3d257974a61bb1))
+
+	ROM_REGION(0xc00, "kybd", 0)
+	ROM_LOAD("342s0740-2.12l", 0x000, 0xc00, NO_DUMP)
 ROM_END
 
 ROM_START(macpb100)
@@ -477,6 +485,9 @@ ROM_START(macpb100)
 
 	ROM_REGION(0x1800, "pmu", 0)
 	ROM_LOAD("pmuv1.bin", 0x000000, 0x001800, CRC(01dae148) SHA1(29d2fca7426c31f2b9334832ed3d257974a61bb1))
+
+	ROM_REGION(0xc00, "kybd", 0)
+	ROM_LOAD("342s0743-1.u29", 0x000, 0xc00, NO_DUMP)
 ROM_END
 
 COMP(1989, macprtb,  0, 0, macprtb, macadb, macportable_state, init_macprtb, "Apple Computer", "Macintosh Portable", MACHINE_NOT_WORKING)
