@@ -519,8 +519,9 @@ public:
 	void init_unkigs();
 
 protected:
-	virtual void video_start() override;
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	int m_remap_addr;
@@ -642,6 +643,24 @@ private:
 	void tjsb_io(address_map &map);
 	void tjsb_map(address_map &map);
 };
+
+void igs017_state::machine_start()
+{
+	save_item(NAME(m_remap_addr));
+	save_item(NAME(m_input_select));
+	save_item(NAME(m_hopper));
+	save_item(NAME(m_igs_magic));
+	save_item(NAME(m_scramble_data));
+	save_item(NAME(m_dsw_select));
+	save_item(NAME(m_i8255_portc_mux));
+	save_item(NAME(m_igs029_send_data));
+	save_item(NAME(m_igs029_recv_data));
+	save_item(NAME(m_igs029_send_buf));
+	save_item(NAME(m_igs029_recv_buf));
+	save_item(NAME(m_igs029_send_len));
+	save_item(NAME(m_igs029_recv_len));
+	save_item(NAME(m_igs029_mgcs_long));
+}
 
 void igs017_state::machine_reset()
 {
@@ -1024,7 +1043,7 @@ void igs017_state::starzan_decrypt_program_rom()
 void igs017_state::init_starzan()
 {
 	starzan_decrypt_program_rom();
-	//  starzan_decrypt_tiles();    // to do when dumped
+	tarzan_decrypt_tiles();
 	mgcs_flip_sprites(); // ?
 }
 
@@ -4929,15 +4948,15 @@ ROM_START( starzan )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "v100i.u9", 0x00000, 0x40000, CRC(64180bff) SHA1(b08dbe8a17ca33024442ebee41f111c8f98a2109) )
 
-	ROM_REGION( 0x100000, "igs017_igs031:sprites", 0 )
-	ROM_LOAD( "cg.u2",             0x00000, 0x80000, CRC(884f95f5) SHA1(2e526aa966e90dc696a8b392a5a99e14f03c4bd4) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
-	ROM_LOAD( "t2105_cg_v110.u11", 0x80000, 0x80000, NO_DUMP )
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", ROMREGION_ERASEFF )
+	ROM_LOAD( "c0057209.u3", 0x00000, 0x400000, NO_DUMP ) // this is also probably the same as tarzanc. Current theory is the 0x400000 mask ROM at u3 is the same for all games of the same type, with EPROM at u2 providing an overlay for game specific sprites
+	ROM_LOAD( "cg.u2",       0x00000, 0x080000, CRC(884f95f5) SHA1(2e526aa966e90dc696a8b392a5a99e14f03c4bd4) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
-	ROM_LOAD( "c0057209.u3", 0x00000, 0x80000, NO_DUMP )
+	ROM_LOAD( "t2105_cg_v110.u11", 0x00000, 0x80000, BAD_DUMP CRC(1d4be260) SHA1(6374c61735144b3ff54d5e490f26adac4a10b14d) ) // not dumped for this board, but same label as the one from tarzanc, assuming same contents for now
 
-	ROM_REGION( 0x80000, "oki", ROMREGION_ERASE )
-	ROM_LOAD( "s2102_sp_v102.u8", 0x00000, 0x80000, NO_DUMP )
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "s2102_sp_v102.u8", 0x00000, 0x80000, BAD_DUMP CRC(90dda82d) SHA1(67fbc1e8d76b85e124136e2f1df09c8b6c5a8f97) ) // not dumped for this board, but same label as the one from tarzanc, assuming same contents for now
 
 	ROM_REGION( 0x2dd * 2, "plds", 0 )
 	ROM_LOAD( "palce22v10h_tar97_u10-1.u10", 0x000, 0x2dd, NO_DUMP )
@@ -4955,9 +4974,9 @@ ROM_START( happyskl )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "v611.u8", 0x00000, 0x40000, CRC(1fb3da98) SHA1(60674af9f5c53298b8ef856f1986c905b9bd7b96) )
 
-	ROM_REGION( 0x480000, "igs017_igs031:sprites", 0 )
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "igs_a2701_cg_v100.u3", 0x00000, 0x400000, CRC(f3756a51) SHA1(8dd4677584f309cec4b068be9f9370a7a172a031) ) // FIXED BITS (xxxxxxx0xxxxxxxx) - 1xxxxxxxxxxxxxxxxxxxxx = 0x00
 	ROM_LOAD( "happyskill_cg.u2",     0x00000, 0x080000, CRC(297a1893) SHA1(9be9e2cdaba1615ea376f3fb7087bf990e68b3b4) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
-	ROM_LOAD( "igs_a2701_cg_v100.u3", 0x80000, 0x400000, CRC(f3756a51) SHA1(8dd4677584f309cec4b068be9f9370a7a172a031) ) // FIXED BITS (xxxxxxx0xxxxxxxx) - 1xxxxxxxxxxxxxxxxxxxxx = 0x00
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD( "happyskill_text.u11", 0x00000, 0x80000, CRC(c6f51041) SHA1(81a9a03e92c1c67f299113dec9e05ba77395ea31) )
@@ -4976,12 +4995,12 @@ ROM_START( unkigs )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "u9.bin", 0x00000, 0x40000, CRC(8d79eb4d) SHA1(9cad09013f83335ec78c3ff78715bc5d9a989eb7) )
 
-	ROM_REGION( 0x480000, "igs017_igs031:sprites", ROMREGION_ERASE )
-	ROM_LOAD( "u2",                   0x00000, 0x080000, NO_DUMP ) // not populated. Never there or removed (more probable)?
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
 	// the following ROM wasn't readable on this PCB, but it's the same as the one in happyskl. Assuming same contents for now
-	ROM_LOAD( "igs_a2701_cg_v100.u3", 0x80000, 0x400000, BAD_DUMP CRC(f3756a51) SHA1(8dd4677584f309cec4b068be9f9370a7a172a031) ) // FIXED BITS (xxxxxxx0xxxxxxxx) - 1xxxxxxxxxxxxxxxxxxxxx = 0x00
+	ROM_LOAD( "igs_a2701_cg_v100.u3", 0x00000, 0x400000, BAD_DUMP CRC(f3756a51) SHA1(8dd4677584f309cec4b068be9f9370a7a172a031) ) // FIXED BITS (xxxxxxx0xxxxxxxx) - 1xxxxxxxxxxxxxxxxxxxxx = 0x00
+	//ROM_LOAD( "u2",                   0x00000, 0x080000, NO_DUMP ) // not populated. Never there or removed? Possibly never there,  current theory is the 0x400000 mask ROM at u3 is the same for all games of the same type, with EPROM at u2 providing an overlay for game specific sprites
 
-	ROM_REGION( 0x40000, "igs017_igs031:tilemaps", ROMREGION_ERASEFF )
+	ROM_REGION( 0x40000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD( "u11.bin", 0x00000, 0x40000, CRC(34475c83) SHA1(376ff68d89c25471483b074dcf7542f42f954e67) )
 	ROM_IGNORE(0x040000) // 1xxxxxxxxxxxxxxxxxx = 0x00
 
