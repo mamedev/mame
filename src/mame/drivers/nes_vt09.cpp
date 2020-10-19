@@ -149,10 +149,6 @@ public:
 		nes_vt09new_state(mconfig, type, tag)
 	{ }
 
-	void nes_vt09new_dg(machine_config& config);
-	void nes_vt09new_dg_baddma_16mb(machine_config& config);
-	void nes_vt09new_dg_1mb(machine_config& config);
-
 	void nes_vt09new_fa(machine_config& config);
 	void nes_vt09new_fa_4x16mb(machine_config& config);
 
@@ -161,10 +157,6 @@ protected:
 private:
 	uint8_t vt_rom_banked_r(offs_t offset);
 	void vt_external_space_map_fapocket_4x16mbyte(address_map& map);
-
-	void nes_vt09new_dg_map(address_map& map);
-	void nes_vt09new_dg_baddma_map(address_map& map);
-	void nes_vt09new_fa_map(address_map& map);
 
 	uint8_t fapocket_412c_r();
 	void fapocket_412c_w(uint8_t data);
@@ -508,45 +500,20 @@ void nes_vt09new_cy_state::nes_vt09new_bt_2x16mb(machine_config& config)
 	dynamic_cast<nes_vt_soc_4kram_device&>(*m_soc).upper_write_412c_callback().set(FUNC(nes_vt09new_cy_state::bittboy_412c_w));
 }
 
-void nes_vt09new_dg_state::nes_vt09new_dg(machine_config &config)
+
+void nes_vt09new09_state::nes_vt09new09(machine_config &config)
 {
 	nes_vt09new_4k_ram(config);
 
 	NES_VT_SOC_8KRAM_DG(config.replace(), m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
-
-	/*
-	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt09new_dg_state::nes_vt09new_dg_map);
-
-	m_screen->set_refresh_hz(50.0070);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((106.53/(PAL_APU_CLOCK.dvalue()/1000000)) *
-	                         (ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)));
-	m_screen->set_size(32*8, 312);
-	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
-	*/
-}
-
-void nes_vt09new_dg_state::nes_vt09new_dg_1mb(machine_config& config)
-{
-	nes_vt09new_dg(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new_dg_state::vt_external_space_map_1mbyte);
-}
-
-void nes_vt09new_dg_state::nes_vt09new_dg_baddma_16mb(machine_config& config)
-{
-	nes_vt09new_dg(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new_dg_state::vt_external_space_map_16mbyte);
-
-}
-
-void nes_vt09new09_state::nes_vt09new09(machine_config &config)
-{
-	nes_vt09new_dg(config);
-
-	NES_VT_SOC_8KRAM_DG(config.replace(), m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
-
 	m_soc->force_bad_dma();
+}
+
+void nes_vt09new09_state::nes_vt09new09_16mb(machine_config& config)
+{
+	nes_vt09new09(config);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new09_state::vt_external_space_map_16mbyte);
 }
 
 void nes_vt09new09_state::nes_vt09new09_8mb(machine_config& config)
@@ -580,11 +547,6 @@ void nes_vt09new09_state::nes_vt09new09_4mb_rasterhack(machine_config& config)
 }
 
 
-void nes_vt09new09_state::nes_vt09new09_16mb(machine_config& config)
-{
-	nes_vt09new09(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new09_state::vt_external_space_map_16mbyte);
-}
 
 
 // New mystery handheld architecture, VTxx derived
@@ -597,16 +559,6 @@ void nes_vt09new09_state::nes_vt09new_hh(machine_config &config)
 
 	m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB);
 	m_soc->force_bad_dma();
-
-	/*
-	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt09new09_state::nes_vt09new_hh_map);
-
-	m_screen->set_refresh_hz(50.0070);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((106.53/(PAL_APU_CLOCK.dvalue()/1000000)) *
-	                         (ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)));
-	m_screen->set_size(32*8, 312);
-	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
-	*/
 }
 
 void nes_vt09new09_state::nes_vt09new_hh_8mb(machine_config& config)
@@ -852,12 +804,6 @@ ROM_START( msifrog )
 	ROM_LOAD( "frogger_39vf3201_00bf235b.bin", 0x00000, 0x400000, CRC(c46c29c0) SHA1(b8f26445c2086b97db8ee98bf36dff9d63ca414b) )
 ROM_END
 
-ROM_START( dgun2500 )
-	ROM_REGION( 0x1000000, "mainrom", 0 )
-	ROM_LOAD( "dgun2500.bin", 0x00000, 0x1000000, CRC(a2f963f3) SHA1(e29ed20ccdcf25b5640a607b3d2c9e6a4944e172) ) // 1ST AND 2ND HALF IDENTICAL
-	ROM_IGNORE(0x1000000)
-ROM_END
-
 ROM_START( dgun2561 )
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	ROM_LOAD( "dgun2561.bin", 0x00000, 0x4000000, CRC(a6e627b4) SHA1(2667d2feb02de349387f9dcfa5418e7ed3afeef6) )
@@ -1097,11 +1043,6 @@ void nes_vt09new_state::init_lxcmcypp()
 }
 
 
-// Runs fine, non-sport 121 in 1 games perfect, but minor graphical issues in
-// sport games, also no sound in menu or sport games due to missing PCM
-// emulation
-CONS( 200?, dgun2500,  0,  0,  nes_vt09new_dg_baddma_16mb, nes_vt09new, nes_vt09new_dg_state, empty_init, "dreamGEAR", "dreamGEAR Wireless Motion Control with 130 games (DGUN-2500)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
-
 // all software in this runs in the VT03 enhanced mode, it also includes an actual licensed VT03 port of Frogger.
 // all games work OK except Frogger which has serious graphical issues
 CONS( 2006, vgtablet,  0, 0,  nes_vt09new09_4mb_rasterhack,  nes_vt09new, nes_vt09new09_state, empty_init, "Performance Designed Products (licensed by Konami) / JungleTac", "VG Pocket Tablet (VG-4000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // raster timing for Frogger needs a hack
@@ -1249,6 +1190,6 @@ CONS( 201?, denv150,   0,  0,  nes_vt09new_cy_bigger, nes_vt09new, nes_vt09new_c
 // same encryption as above, but seems like newer hardware (or the above aren't using most of the features)
 CONS( 200?, lpgm240,    0,  0,  nes_vt09new_vh2009_8mb,        nes_vt09new, nes_vt09new_swap_op_d5_d6_state, empty_init, "<unknown>", "Let's Play! Game Machine 240 in 1", MACHINE_NOT_WORKING ) // mini 'retro-arcade' style cabinet
 
-CONS( 2017, otrail,     0,        0,  nes_vt09new_dg_1mb, nes_vt09new, nes_vt09new_dg_state, empty_init, "Basic Fun", "The Oregon Trail", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2017, otrail,     0,        0,  nes_vt09new09_1mb, nes_vt09new, nes_vt09new09_state, empty_init, "Basic Fun", "The Oregon Trail", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 200?, zonefusn,  0,         0,  nes_vt09new_fp_16mb,     nes_vt09new, nes_vt09new09_state, empty_init, "Ultimate Products / Jungle's Soft", "Zone Fusion",  MACHINE_NOT_WORKING )
