@@ -178,8 +178,6 @@ protected:
 };
 
 
-
-
 class nes_vt32new09_state : public nes_vt32new_dg_state
 {
 public:
@@ -193,10 +191,6 @@ public:
 
 	void nes_vt32new09(machine_config& config);
 	void nes_vt32new09_1mb(machine_config& config);
-	void nes_vt32new09_2mb(machine_config& config);
-	void nes_vt32new09_4mb(machine_config& config);
-	void nes_vt32new09_4mb_rasterhack(machine_config& config);
-	void nes_vt32new09_8mb(machine_config& config);
 	void nes_vt32new09_16mb(machine_config& config);
 
 	void nes_vt32new_fp(machine_config& config);
@@ -363,8 +357,6 @@ uint8_t nes_vt32new_base_state::in1_r()
 void nes_vt32new_base_state::in0_w(uint8_t data)
 {
 	//logerror("%s: in0_w %02x\n", machine().describe_context(), data);
-
-	// need to check this or some games (eg cybar120 Aero Engine) won't have working inputs as they repeatedly write a pattern of 02 / 00 here between fetches which resets the latch
 	if ((data & 0x01) != (m_previous_port0 & 0x01))
 	{
 		if (data & 0x01)
@@ -427,8 +419,6 @@ void nes_vt32new_base_state::configure_soc(nes_vt_soc_device* soc)
 	soc->extra_read_3_callback().set(FUNC(nes_vt32new_base_state::extrain_3_r));
 }
 
-
-
 uint8_t nes_vt32new_base_state::upper_412c_r()
 {
 	logerror("%s: upper_412c_r\n", machine().describe_context());
@@ -446,7 +436,6 @@ void nes_vt32new_base_state::upper_412c_w(uint8_t data)
 	logerror("%s: upper_412c_w %02x\n", machine().describe_context(), data);
 }
 
-
 void nes_vt32new_state::nes_vt32new_4k_ram(machine_config &config)
 {
 	/* basic machine hardware */
@@ -463,7 +452,6 @@ void nes_vt32new_state::nes_vt32new_4k_ram_16mb(machine_config &config)
 	nes_vt32new_4k_ram(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt32new_state::vt_external_space_map_16mbyte);
 }
-
 
 void nes_vt32new_cy_state::nes_vt32new_cy(machine_config &config)
 {
@@ -487,7 +475,6 @@ void nes_vt32new_cy_state::nes_vt32new_bt(machine_config &config)
 	configure_soc(m_soc);
 }
 
-
 void nes_vt32new_cy_state::bittboy_412c_w(uint8_t data)
 {
 	//bittboy (ok), mc_pg150 (not working)
@@ -502,7 +489,6 @@ void nes_vt32new_cy_state::nes_vt32new_bt_2x16mb(machine_config& config)
 
 	dynamic_cast<nes_vt_soc_4kram_device&>(*m_soc).upper_write_412c_callback().set(FUNC(nes_vt32new_cy_state::bittboy_412c_w));
 }
-
 
 void nes_vt32new09_state::nes_vt32new09(machine_config &config)
 {
@@ -519,38 +505,11 @@ void nes_vt32new09_state::nes_vt32new09_16mb(machine_config& config)
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt32new09_state::vt_external_space_map_16mbyte);
 }
 
-void nes_vt32new09_state::nes_vt32new09_8mb(machine_config& config)
-{
-	nes_vt32new09(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt32new09_state::vt_external_space_map_8mbyte);
-}
-
 void nes_vt32new09_state::nes_vt32new09_1mb(machine_config& config)
 {
 	nes_vt32new09(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt32new09_state::vt_external_space_map_1mbyte);
 }
-
-void nes_vt32new09_state::nes_vt32new09_2mb(machine_config& config)
-{
-	nes_vt32new09(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt32new09_state::vt_external_space_map_2mbyte);
-}
-
-void nes_vt32new09_state::nes_vt32new09_4mb(machine_config& config)
-{
-	nes_vt32new09(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt32new09_state::vt_external_space_map_4mbyte);
-}
-
-void nes_vt32new09_state::nes_vt32new09_4mb_rasterhack(machine_config& config)
-{
-	nes_vt32new09_4mb(config);
-	m_soc->force_raster_timing_hack();
-}
-
-
-
 
 // New mystery handheld architecture, VTxx derived
 void nes_vt32new09_state::nes_vt32new_hh(machine_config &config)
@@ -947,7 +906,7 @@ CONS( 201?, dvnimbus,   0,        0,  nes_vt32new09_16mb, nes_vt32new, nes_vt32n
  // probably another Thumbs Up product? cursor doesn't work unless nes_vt32new_hh machine is used? possibly newer than VT02 as it runs from an SPI ROM, might just not use enhanced features.  Some minor game name changes to above (eg Smackdown just becomes Wrestling)
 CONS( 201?, unkra200,   mc_tv200, 0,  nes_vt32new_hh_8mb, nes_vt32new, nes_vt32new09_state, empty_init, "<unknown>", "200 in 1 Retro Arcade", MACHINE_IMPERFECT_GRAPHICS )
 
-// Probably vt32 or similar
+// is this vt09 or vt32?
 // Use DIP switch to select console or cartridge, as cartridge is fake and just toggles a ROM high address bit
 // (which can also be overriden by GPIO)
 CONS( 2017, fapocket,   0,        0,  nes_vt32new_fa_4x16mb, nes_vt32new_fa, nes_vt32new_dg_fapocket_state, empty_init, "<unknown>",   "Family Pocket 638 in 1", MACHINE_IMPERFECT_GRAPHICS ) // has external banking (4x 16mbyte banks)

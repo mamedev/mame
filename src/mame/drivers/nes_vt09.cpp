@@ -23,7 +23,6 @@ public:
 		driver_device(mconfig, type, tag),
 		m_io0(*this, "IO0"),
 		m_io1(*this, "IO1"),
-		m_cartsel(*this, "CARTSEL"),
 		m_exin0(*this, "EXTRAIN0"),
 		m_exin1(*this, "EXTRAIN1"),
 		m_exin2(*this, "EXTRAIN2"),
@@ -48,17 +47,10 @@ protected:
 	uint8_t m_latch1;
 	uint8_t m_previous_port0;
 
-	optional_ioport m_cartsel;
 	optional_ioport m_exin0;
 	optional_ioport m_exin1;
 	optional_ioport m_exin2;
 	optional_ioport m_exin3;
-
-	/* Misc */
-	uint32_t m_ahigh; // external banking bits
-	uint8_t m_4242;
-	uint8_t m_411c;
-	uint8_t m_411d;
 
 	required_region_ptr<uint8_t> m_prgrom;
 
@@ -89,9 +81,6 @@ public:
 		m_soc(*this, "soc")
 	{ }
 
-	void nes_vt09new_4k_ram(machine_config& config);
-	void nes_vt09new_4k_ram_16mb(machine_config& config);
-
 	void vt_external_space_map_32mbyte(address_map& map);
 	void vt_external_space_map_16mbyte(address_map& map);
 	void vt_external_space_map_8mbyte(address_map& map);
@@ -100,93 +89,17 @@ public:
 	void vt_external_space_map_1mbyte(address_map& map);
 	void vt_external_space_map_512kbyte(address_map& map);
 
-	void init_lxcmcypp();
 
 protected:
 	required_device<nes_vt_soc_device> m_soc;
 };
 
-
-class nes_vt09new_swap_op_d5_d6_state : public nes_vt09new_state
-{
-public:
-	nes_vt09new_swap_op_d5_d6_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt09new_state(mconfig, type, tag)
-	{ }
-
-	void nes_vt09new_vh2009_8mb(machine_config& config);
-protected:
-};
-
-
-class nes_vt09new_cy_state : public nes_vt09new_state
-{
-public:
-	nes_vt09new_cy_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt09new_state(mconfig, type, tag)
-	{ }
-
-	void nes_vt09new_cy(machine_config& config);
-	void nes_vt09new_cy_bigger(machine_config& config);
-	void nes_vt09new_bt(machine_config& config);
-	void nes_vt09new_bt_2x16mb(machine_config& config);
-
-	void vt_external_space_map_bitboy_2x16mbyte(address_map& map);
-
-private:
-	void nes_vt09new_cy_map(address_map& map);
-	void nes_vt09new_bt_map(address_map& map);
-
-	void bittboy_412c_w(uint8_t data);
-
-	uint8_t vt_rom_banked_r(offs_t offset);
-};
-
-class nes_vt09new_dg_state : public nes_vt09new_state
-{
-public:
-	nes_vt09new_dg_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt09new_state(mconfig, type, tag)
-	{ }
-
-	void nes_vt09new_fa(machine_config& config);
-	void nes_vt09new_fa_4x16mb(machine_config& config);
-
-protected:
-
-private:
-	uint8_t vt_rom_banked_r(offs_t offset);
-	void vt_external_space_map_fapocket_4x16mbyte(address_map& map);
-
-	uint8_t fapocket_412c_r();
-	void fapocket_412c_w(uint8_t data);
-
-};
-
-class nes_vt09new_dg_fapocket_state : public nes_vt09new_dg_state
-{
-public:
-	nes_vt09new_dg_fapocket_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt09new_dg_state(mconfig, type, tag)
-	{ }
-
-protected:
-	virtual void machine_reset() override;
-};
-
-
-
-
-class nes_vt09new09_state : public nes_vt09new_dg_state
+class nes_vt09new09_state : public nes_vt09new_state
 {
 public:
 	nes_vt09new09_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt09new_dg_state(mconfig, type, tag)
+		nes_vt09new_state(mconfig, type, tag)
 	{ }
-
-	void nes_vt09new_hh(machine_config& config);
-	void nes_vt09new_hh_4mb(machine_config& config);
-	void nes_vt09new_hh_8mb(machine_config& config);
 
 	void nes_vt09new09(machine_config& config);
 	void nes_vt09new09_1mb(machine_config& config);
@@ -196,23 +109,7 @@ public:
 	void nes_vt09new09_8mb(machine_config& config);
 	void nes_vt09new09_16mb(machine_config& config);
 
-	void nes_vt09new_fp(machine_config& config);
-	void nes_vt09new_fp_16mb(machine_config& config);
-	void nes_vt09new_fp_32mb(machine_config& config);
-	void nes_vt09new_fp_bigger(machine_config& config);
-	void nes_vt09new_fp_4x16mb(machine_config& config);
-
-	void nes_vt09new_fp_pal(machine_config& config);
-	void nes_vt09new_fp_pal_32mb(machine_config& config);
-
 private:
-	uint8_t vt_rom_banked_r(offs_t offset);
-	void vt_external_space_map_fp_2x32mbyte(address_map& map);
-
-	void nes_vt09new_fp_map(address_map& map);
-
-	uint8_t fcpocket_412d_r();
-	void fcpocket_412c_w(uint8_t data);
 };
 
 uint8_t nes_vt09new_base_state::vt_rom_r(offs_t offset)
@@ -261,37 +158,6 @@ void nes_vt09new_state::vt_external_space_map_512kbyte(address_map &map)
 	map(0x0000000, 0x007ffff).mirror(0x1f80000).r(FUNC(nes_vt09new_state::vt_rom_r));
 }
 
-// bitboy is 2 16Mbyte banks
-uint8_t nes_vt09new_cy_state::vt_rom_banked_r(offs_t offset)
-{
-	return m_prgrom[m_ahigh | offset];
-}
-
-void nes_vt09new_cy_state::vt_external_space_map_bitboy_2x16mbyte(address_map &map)
-{
-	map(0x0000000, 0x0ffffff).mirror(0x1000000).r(FUNC(nes_vt09new_cy_state::vt_rom_banked_r));
-}
-
-// fapocket is 4 16Mbyte banks
-uint8_t nes_vt09new_dg_state::vt_rom_banked_r(offs_t offset)
-{
-	return m_prgrom[m_ahigh | offset];
-}
-
-void nes_vt09new_dg_state::vt_external_space_map_fapocket_4x16mbyte(address_map &map)
-{
-	map(0x0000000, 0x0ffffff).mirror(0x1000000).r(FUNC(nes_vt09new_dg_state::vt_rom_banked_r));
-}
-
-uint8_t nes_vt09new09_state::vt_rom_banked_r(offs_t offset)
-{
-	return m_prgrom[m_ahigh | offset];
-}
-
-void nes_vt09new09_state::vt_external_space_map_fp_2x32mbyte(address_map &map)
-{
-	map(0x0000000, 0x1ffffff).r(FUNC(nes_vt09new09_state::vt_rom_banked_r));
-}
 
 uint8_t nes_vt09new_base_state::extrain_0_r()
 {
@@ -360,8 +226,6 @@ uint8_t nes_vt09new_base_state::in1_r()
 void nes_vt09new_base_state::in0_w(uint8_t data)
 {
 	//logerror("%s: in0_w %02x\n", machine().describe_context(), data);
-
-	// need to check this or some games (eg cybar120 Aero Engine) won't have working inputs as they repeatedly write a pattern of 02 / 00 here between fetches which resets the latch
 	if ((data & 0x01) != (m_previous_port0 & 0x01))
 	{
 		if (data & 0x01)
@@ -381,36 +245,15 @@ void nes_vt09new_base_state::machine_start()
 	m_latch1 = 0;
 	m_previous_port0 = 0;
 
-	m_ahigh = 0;
-	m_4242 = 0;
-	m_411c = 0;
-	m_411d = 0;
-
 	save_item(NAME(m_latch0));
 	save_item(NAME(m_latch1));
 	save_item(NAME(m_previous_port0));
-
-	save_item(NAME(m_ahigh));
-	save_item(NAME(m_4242));
-	save_item(NAME(m_411c));
-	save_item(NAME(m_411d));
 }
 
 void nes_vt09new_base_state::machine_reset()
 {
-
 }
 
-void nes_vt09new_dg_fapocket_state::machine_reset()
-{
-	nes_vt09new_base_state::machine_reset();
-
-	// fapocket needs this, fcpocket instead reads the switch in software?
-	if (m_cartsel)
-		m_ahigh = (m_cartsel->read() == 0x01) ? (1 << 25) : 0x0;
-	else
-		m_ahigh = 0;
-}
 void nes_vt09new_base_state::configure_soc(nes_vt_soc_device* soc)
 {
 	soc->set_addrmap(AS_PROGRAM, &nes_vt09new_state::vt_external_space_map_32mbyte);
@@ -423,7 +266,6 @@ void nes_vt09new_base_state::configure_soc(nes_vt_soc_device* soc)
 	soc->extra_read_2_callback().set(FUNC(nes_vt09new_base_state::extrain_2_r));
 	soc->extra_read_3_callback().set(FUNC(nes_vt09new_base_state::extrain_3_r));
 }
-
 
 
 uint8_t nes_vt09new_base_state::upper_412c_r()
@@ -444,69 +286,17 @@ void nes_vt09new_base_state::upper_412c_w(uint8_t data)
 }
 
 
-void nes_vt09new_state::nes_vt09new_4k_ram(machine_config &config)
+
+void nes_vt09new09_state::nes_vt09new09(machine_config &config)
 {
 	/* basic machine hardware */
 	NES_VT_SOC_4KRAM(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 
-	dynamic_cast<nes_vt_soc_4kram_device&>(*m_soc).upper_read_412c_callback().set(FUNC(nes_vt09new_state::upper_412c_r));
-	dynamic_cast<nes_vt_soc_4kram_device&>(*m_soc).upper_read_412d_callback().set(FUNC(nes_vt09new_state::upper_412d_r));
-	dynamic_cast<nes_vt_soc_4kram_device&>(*m_soc).upper_write_412c_callback().set(FUNC(nes_vt09new_state::upper_412c_w));
-}
+	dynamic_cast<nes_vt_soc_4kram_device&>(*m_soc).upper_read_412c_callback().set(FUNC(nes_vt09new09_state::upper_412c_r));
+	dynamic_cast<nes_vt_soc_4kram_device&>(*m_soc).upper_read_412d_callback().set(FUNC(nes_vt09new09_state::upper_412d_r));
+	dynamic_cast<nes_vt_soc_4kram_device&>(*m_soc).upper_write_412c_callback().set(FUNC(nes_vt09new09_state::upper_412c_w));
 
-void nes_vt09new_state::nes_vt09new_4k_ram_16mb(machine_config &config)
-{
-	nes_vt09new_4k_ram(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new_state::vt_external_space_map_16mbyte);
-}
-
-
-void nes_vt09new_cy_state::nes_vt09new_cy(machine_config &config)
-{
-	nes_vt09new_4k_ram(config);
-
-	NES_VT_SOC_4KRAM_CY(config.replace(), m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
-}
-
-void nes_vt09new_cy_state::nes_vt09new_cy_bigger(machine_config &config)
-{
-	nes_vt09new_cy(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new_cy_state::vt_external_space_map_32mbyte); // must be some banking of this kind of VT can address over 32mb
-}
-
-void nes_vt09new_cy_state::nes_vt09new_bt(machine_config &config)
-{
-	nes_vt09new_4k_ram(config);
-
-	NES_VT_SOC_4KRAM_BT(config.replace(), m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
-}
-
-
-void nes_vt09new_cy_state::bittboy_412c_w(uint8_t data)
-{
-	//bittboy (ok), mc_pg150 (not working)
-	logerror("%s: vt03_412c_extbank_w %02x\n", machine().describe_context(),  data);
-	m_ahigh = (data & 0x04) ? (1 << 24) : 0x0;
-}
-
-void nes_vt09new_cy_state::nes_vt09new_bt_2x16mb(machine_config& config)
-{
-	nes_vt09new_bt(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new_cy_state::vt_external_space_map_bitboy_2x16mbyte);
-
-	dynamic_cast<nes_vt_soc_4kram_device&>(*m_soc).upper_write_412c_callback().set(FUNC(nes_vt09new_cy_state::bittboy_412c_w));
-}
-
-
-void nes_vt09new09_state::nes_vt09new09(machine_config &config)
-{
-	nes_vt09new_4k_ram(config);
-
-	NES_VT_SOC_8KRAM_DG(config.replace(), m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
 	m_soc->force_bad_dma();
 }
 
@@ -548,32 +338,6 @@ void nes_vt09new09_state::nes_vt09new09_4mb_rasterhack(machine_config& config)
 
 
 
-
-// New mystery handheld architecture, VTxx derived
-void nes_vt09new09_state::nes_vt09new_hh(machine_config &config)
-{
-	nes_vt09new_4k_ram(config);
-
-	NES_VT_SOC_4KRAM_HH(config.replace(), m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
-
-	m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB);
-	m_soc->force_bad_dma();
-}
-
-void nes_vt09new09_state::nes_vt09new_hh_8mb(machine_config& config)
-{
-	nes_vt09new_hh(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new09_state::vt_external_space_map_8mbyte);
-}
-
-void nes_vt09new09_state::nes_vt09new_hh_4mb(machine_config& config)
-{
-	nes_vt09new_hh(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new09_state::vt_external_space_map_4mbyte);
-}
-
-
 static INPUT_PORTS_START( nes_vt09new )
 	PORT_START("IO0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("A")
@@ -600,7 +364,7 @@ static INPUT_PORTS_START( nes_vt09new_msi )
 	PORT_START("IO0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("A")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("B")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_PLAYER(1) // doesn't exist?
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_PLAYER(1)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_8WAY
@@ -615,7 +379,7 @@ static INPUT_PORTS_START( nes_vt09new_msi_mm2 )
 	PORT_START("IO0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("A")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("B")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_PLAYER(1) // doesn't exist?
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_PLAYER(1)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_8WAY
@@ -625,130 +389,6 @@ static INPUT_PORTS_START( nes_vt09new_msi_mm2 )
 	PORT_START("IO1")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
-
-uint8_t nes_vt09new09_state::fcpocket_412d_r()
-{
-	if (m_cartsel)
-		return m_cartsel->read();
-	else
-		return 0;
-}
-
-void nes_vt09new09_state::fcpocket_412c_w(uint8_t data)
-{
-	// fcpocket
-	logerror("%s: vtfp_412c_extbank_w %02x\n", machine().describe_context(), data);
-	m_ahigh = (data & 0x01) ? (1 << 25) : 0x0;
-}
-
-void nes_vt09new09_state::nes_vt09new_fp(machine_config &config)
-{
-	nes_vt09new_4k_ram(config);
-
-	NES_VT_SOC_4KRAM_FP(config.replace(), m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
-
-	m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB12);
-	m_soc->force_bad_dma();
-}
-
-
-
-void nes_vt09new09_state::nes_vt09new_fp_4x16mb(machine_config& config)
-{
-	nes_vt09new_fp(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new09_state::vt_external_space_map_fp_2x32mbyte);
-
-	dynamic_cast<nes_vt_soc_4kram_device&>(*m_soc).upper_write_412c_callback().set(FUNC(nes_vt09new09_state::fcpocket_412c_w));
-	dynamic_cast<nes_vt_soc_4kram_device&>(*m_soc).upper_read_412d_callback().set(FUNC(nes_vt09new09_state::fcpocket_412d_r));
-}
-
-void nes_vt09new09_state::nes_vt09new_fp_32mb(machine_config& config)
-{
-	nes_vt09new_fp(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new09_state::vt_external_space_map_32mbyte);
-}
-
-void nes_vt09new09_state::nes_vt09new_fp_bigger(machine_config& config)
-{
-	nes_vt09new_fp(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new09_state::vt_external_space_map_32mbyte); // must be some kind of banking, or this VT can address > 32Mbyte
-}
-
-void nes_vt09new09_state::nes_vt09new_fp_16mb(machine_config& config)
-{
-	nes_vt09new_fp(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new09_state::vt_external_space_map_16mbyte);
-}
-
-void nes_vt09new09_state::nes_vt09new_fp_pal(machine_config &config)
-{
-	nes_vt09new_fp(config);
-
-	// set to PAL
-}
-
-void nes_vt09new09_state::nes_vt09new_fp_pal_32mb(machine_config& config)
-{
-	nes_vt09new_4k_ram(config);
-
-	NES_VT_SOC_4KRAM_FP_PAL(config.replace(), m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
-
-	m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB12);
-	m_soc->force_bad_dma();
-
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new09_state::vt_external_space_map_32mbyte);
-}
-
-
-void nes_vt09new_dg_state::nes_vt09new_fa(machine_config& config)
-{
-	nes_vt09new_4k_ram(config);
-
-	NES_VT_SOC_8KRAM_FA(config.replace(), m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
-}
-
-
-uint8_t nes_vt09new_dg_state::fapocket_412c_r()
-{
-	if (m_cartsel)
-		return m_cartsel->read();
-	else
-		return 0;
-}
-
-void nes_vt09new_dg_state::fapocket_412c_w(uint8_t data)
-{
-	// fapocket (ok?) (also uses bank from config switch for fake cartridge slot)
-	logerror("%s: vtfa_412c_extbank_w %02x\n", machine().describe_context(), data);
-	m_ahigh = 0;
-	m_ahigh |= (data & 0x01) ? (1 << 25) : 0x0;
-	m_ahigh |= (data & 0x02) ? (1 << 24) : 0x0;
-}
-
-void nes_vt09new_dg_state::nes_vt09new_fa_4x16mb(machine_config& config) // fapocket
-{
-	nes_vt09new_fa(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new_dg_state::vt_external_space_map_fapocket_4x16mbyte);
-
-	dynamic_cast<nes_vt_soc_4kram_device&>(*m_soc).upper_read_412c_callback().set(FUNC(nes_vt09new_dg_state::fapocket_412c_r));
-	dynamic_cast<nes_vt_soc_4kram_device&>(*m_soc).upper_write_412c_callback().set(FUNC(nes_vt09new_dg_state::fapocket_412c_w));
-}
-
-
-void nes_vt09new_swap_op_d5_d6_state::nes_vt09new_vh2009_8mb(machine_config& config)
-{
-	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
-
-	NES_VT_SOC_SCRAMBLE(config.replace(), m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
-
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new_swap_op_d5_d6_state::vt_external_space_map_8mbyte);
-}
-
 
 
 ROM_START( msiwwe )
@@ -834,22 +474,6 @@ ROM_START( vgpmini )
 ROM_END
 
 
-void nes_vt09new_state::init_lxcmcypp()
-{
-	int size = memregion("mainrom")->bytes()/2;
-	uint16_t* ROM = (uint16_t*)memregion("mainrom")->base();
-
-	for (int i = 0; i < size; i++)
-	{
-		ROM[i] = bitswap<16>(ROM[i], 4, 5, 6, 7, 0, 1, 2, 3, 12, 13, 14, 15, 8, 9, 10, 11);
-	}
-}
-
-
-// all software in this runs in the VT03 enhanced mode, it also includes an actual licensed VT03 port of Frogger.
-// all games work OK except Frogger which has serious graphical issues
-CONS( 2006, vgtablet,  0, 0,  nes_vt09new09_4mb_rasterhack,  nes_vt09new, nes_vt09new09_state, empty_init, "Performance Designed Products (licensed by Konami) / JungleTac", "VG Pocket Tablet (VG-4000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // raster timing for Frogger needs a hack
-// There is a 2004 Majesco Frogger "TV game" that appears to contain the same version of Frogger as above but with no other games, so probably fits here.
 
 // MSI Entertainment games (MSI previously operated as Majesco Entertainment)
 
@@ -884,5 +508,6 @@ CONS( 2005, vgpocket,  0,  0,  nes_vt09new09_4mb, nes_vt09new, nes_vt09new09_sta
 CONS( 200?, vgpmini,   0,  0,  nes_vt09new09_4mb, nes_vt09new, nes_vt09new09_state, empty_init, "Performance Designed Products / JungleTac", "VG Pocket Mini (VG-1500)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // VG Pocket Max (VG-2500) (blue case, 75 games)
 // VG Pocket Max (VG-3000) (white case, 75 games) (does the game selection differ, or only the case?)
+CONS( 2006, vgtablet,  0, 0,  nes_vt09new09_4mb_rasterhack,  nes_vt09new, nes_vt09new09_state, empty_init, "Performance Designed Products (licensed by Konami) / JungleTac", "VG Pocket Tablet (VG-4000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // raster timing for Frogger needs a hack
 // VG Pocket Caplet is SunPlus hardware instead, see spg2xx_lexibook.cpp
 

@@ -22,7 +22,6 @@ public:
 		driver_device(mconfig, type, tag),
 		m_io0(*this, "IO0"),
 		m_io1(*this, "IO1"),
-		m_cartsel(*this, "CARTSEL"),
 		m_exin0(*this, "EXTRAIN0"),
 		m_exin1(*this, "EXTRAIN1"),
 		m_exin2(*this, "EXTRAIN2"),
@@ -47,17 +46,10 @@ protected:
 	uint8_t m_latch1;
 	uint8_t m_previous_port0;
 
-	optional_ioport m_cartsel;
 	optional_ioport m_exin0;
 	optional_ioport m_exin1;
 	optional_ioport m_exin2;
 	optional_ioport m_exin3;
-
-	/* Misc */
-	uint32_t m_ahigh; // external banking bits
-	uint8_t m_4242;
-	uint8_t m_411c;
-	uint8_t m_411d;
 
 	required_region_ptr<uint8_t> m_prgrom;
 
@@ -440,19 +432,9 @@ void nes_vt_base_state::machine_start()
 	m_latch1 = 0;
 	m_previous_port0 = 0;
 
-	m_ahigh = 0;
-	m_4242 = 0;
-	m_411c = 0;
-	m_411d = 0;
-
 	save_item(NAME(m_latch0));
 	save_item(NAME(m_latch1));
 	save_item(NAME(m_previous_port0));
-
-	save_item(NAME(m_ahigh));
-	save_item(NAME(m_4242));
-	save_item(NAME(m_411c));
-	save_item(NAME(m_411d));
 }
 
 void nes_vt_base_state::machine_reset()
