@@ -13,10 +13,10 @@
 #include "screen.h"
 #include "speaker.h"
 
-class nes_vt_soc_device : public device_t, public device_memory_interface
+class nes_vt02_vt03_soc_device : public device_t, public device_memory_interface
 {
 public:
-	nes_vt_soc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_vt02_vt03_soc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void program_map(address_map &map);
 
@@ -56,7 +56,7 @@ public:
 	void set_default_palette_mode(vtxx_pal_mode pmode) { m_default_palette_mode = pmode; }
 
 protected:
-	nes_vt_soc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	nes_vt02_vt03_soc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -163,28 +163,28 @@ private:
 	bool m_use_raster_timing_hack;
 };
 
-class nes_vt_soc_pal_device : public nes_vt_soc_device
+class nes_vt02_vt03_soc_pal_device : public nes_vt02_vt03_soc_device
 {
 public:
-	nes_vt_soc_pal_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	nes_vt02_vt03_soc_pal_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config& config) override;
 };
 
-class nes_vt_soc_scramble_device : public nes_vt_soc_device
+class nes_vt02_vt03_soc_scramble_device : public nes_vt02_vt03_soc_device
 {
 public:
-	nes_vt_soc_scramble_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	nes_vt02_vt03_soc_scramble_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config& config) override;
 };
 
-class nes_vt_soc_4kram_device : public nes_vt_soc_device
+class nes_vt09_soc_device : public nes_vt02_vt03_soc_device
 {
 public:
-	nes_vt_soc_4kram_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	nes_vt09_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 
 	auto upper_read_412c_callback() { return m_upper_read_412c_callback.bind(); }
 	auto upper_read_412d_callback() { return m_upper_read_412d_callback.bind(); }
@@ -193,7 +193,7 @@ public:
 
 
 protected:
-	nes_vt_soc_4kram_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock);
+	nes_vt09_soc_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock);
 	void device_start() override;
 
 	virtual void device_add_mconfig(machine_config& config) override;
@@ -206,10 +206,10 @@ protected:
 	devcb_read8 m_upper_read_412d_callback;
 };
 
-class nes_vt_soc_4kram_cy_device : public nes_vt_soc_4kram_device
+class nes_vt09_soc_cy_device : public nes_vt09_soc_device
 {
 public:
-	nes_vt_soc_4kram_cy_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	nes_vt09_soc_cy_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config& config) override;
@@ -233,10 +233,10 @@ protected:
 	uint8_t m_413x[8]; // CY only?
 };
 
-class nes_vt_soc_4kram_bt_device : public nes_vt_soc_4kram_device
+class nes_vt09_soc_bt_device : public nes_vt09_soc_device
 {
 public:
-	nes_vt_soc_4kram_bt_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	nes_vt09_soc_bt_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config& config) override;
@@ -246,13 +246,13 @@ protected:
 	void vt03_412c_extbank_w(uint8_t data);
 };
 
-class nes_vt_soc_4kram_hh_device : public nes_vt_soc_4kram_device
+class nes_vt369_soc_device : public nes_vt09_soc_device
 {
 public:
-	nes_vt_soc_4kram_hh_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	nes_vt369_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 
 protected:
-	nes_vt_soc_4kram_hh_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock);
+	nes_vt369_soc_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock);
 
 	virtual void device_add_mconfig(machine_config& config) override;
 
@@ -263,13 +263,13 @@ protected:
 
 };
 
-class nes_vt_soc_4kram_fp_device : public nes_vt_soc_4kram_hh_device
+class nes_vt32_soc_device : public nes_vt369_soc_device
 {
 public:
-	nes_vt_soc_4kram_fp_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	nes_vt32_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 
 protected:
-	nes_vt_soc_4kram_fp_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock);
+	nes_vt32_soc_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock);
 
 	virtual void device_add_mconfig(machine_config& config) override;
 
@@ -283,23 +283,23 @@ protected:
 	void vtfp_4a00_w(uint8_t data);
 };
 
-class nes_vt_soc_4kram_fp_pal_device : public nes_vt_soc_4kram_fp_device
+class nes_vt32_soc_pal_device : public nes_vt32_soc_device
 {
 public:
-	nes_vt_soc_4kram_fp_pal_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	nes_vt32_soc_pal_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config& config) override;
 };
 
 
-class nes_vt_soc_8kram_dg_device : public nes_vt_soc_4kram_device
+class nes_vt3x_soc_dg_device : public nes_vt09_soc_device
 {
 public:
-	nes_vt_soc_8kram_dg_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	nes_vt3x_soc_dg_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 
 protected:
-	nes_vt_soc_8kram_dg_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock);
+	nes_vt3x_soc_dg_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock);
 
 	virtual void device_add_mconfig(machine_config& config) override;
 
@@ -308,10 +308,10 @@ protected:
 	void vt03_411c_w(uint8_t data);
 };
 
-class nes_vt_soc_8kram_fa_device : public nes_vt_soc_8kram_dg_device
+class nes_vt3x_soc_fa_device : public nes_vt3x_soc_dg_device
 {
 public:
-	nes_vt_soc_8kram_fa_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	nes_vt3x_soc_fa_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 
 protected:
 
@@ -325,19 +325,19 @@ protected:
 };
 
 
-DECLARE_DEVICE_TYPE(NES_VT_SOC, nes_vt_soc_device)
-DECLARE_DEVICE_TYPE(NES_VT_SOC_PAL, nes_vt_soc_pal_device)
+DECLARE_DEVICE_TYPE(NES_VT02_VT03_SOC, nes_vt02_vt03_soc_device)
+DECLARE_DEVICE_TYPE(NES_VT02_VT03_SOC_PAL, nes_vt02_vt03_soc_pal_device)
 
-DECLARE_DEVICE_TYPE(NES_VT_SOC_SCRAMBLE, nes_vt_soc_scramble_device)
-DECLARE_DEVICE_TYPE(NES_VT_SOC_4KRAM, nes_vt_soc_4kram_device)
-DECLARE_DEVICE_TYPE(NES_VT_SOC_4KRAM_CY, nes_vt_soc_4kram_cy_device)
-DECLARE_DEVICE_TYPE(NES_VT_SOC_4KRAM_BT, nes_vt_soc_4kram_bt_device)
-DECLARE_DEVICE_TYPE(NES_VT_SOC_4KRAM_HH, nes_vt_soc_4kram_hh_device)
+DECLARE_DEVICE_TYPE(NES_VT02_VT03_SOC_SCRAMBLE, nes_vt02_vt03_soc_scramble_device)
+DECLARE_DEVICE_TYPE(NES_VT09_SOC, nes_vt09_soc_device)
+DECLARE_DEVICE_TYPE(NES_VT09_SOC_CY, nes_vt09_soc_cy_device)
+DECLARE_DEVICE_TYPE(NES_VT09_SOC_BT, nes_vt09_soc_bt_device)
+DECLARE_DEVICE_TYPE(NES_VT369_SOC, nes_vt369_soc_device)
 
-DECLARE_DEVICE_TYPE(NES_VT_SOC_4KRAM_FP, nes_vt_soc_4kram_fp_device)
-DECLARE_DEVICE_TYPE(NES_VT_SOC_4KRAM_FP_PAL, nes_vt_soc_4kram_fp_pal_device)
+DECLARE_DEVICE_TYPE(NES_VT32_SOC, nes_vt32_soc_device)
+DECLARE_DEVICE_TYPE(NES_VT32_SOC_PAL, nes_vt32_soc_pal_device)
 
-DECLARE_DEVICE_TYPE(NES_VT_SOC_8KRAM_DG, nes_vt_soc_8kram_dg_device)
-DECLARE_DEVICE_TYPE(NES_VT_SOC_8KRAM_FA, nes_vt_soc_8kram_fa_device)
+DECLARE_DEVICE_TYPE(NES_VT3X_SOC_DG, nes_vt3x_soc_dg_device)
+DECLARE_DEVICE_TYPE(NES_VT3X_SOC_FA, nes_vt3x_soc_fa_device)
 
 #endif // MAME_MACHINE_NES_VT_SOC_H
