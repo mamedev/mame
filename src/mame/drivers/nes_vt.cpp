@@ -4,15 +4,6 @@
 
   nes_vt.cpp
 
-  TODO
-
-  Add more Famiclone roms here, there should be plenty more dumps of VTxx
-  based systems floating about.
-
-  Make sure that none of the unenhanced sets were actually sold as cartridges
-  instead, there is a lack of information for some of the older dumps and
-  still some dumps in nes.xml that might belong here.
-
   NON-bugs (same happens on real hardware)
 
   Pause screen has corrupt GFX on enhanced version of Octopus
@@ -351,47 +342,6 @@ protected:
 	virtual void machine_reset() override;
 };
 
-
-
-
-class nes_vt09_state : public nes_vt_dg_state
-{
-public:
-	nes_vt09_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt_dg_state(mconfig, type, tag)
-	{ }
-
-	void nes_vt_hh(machine_config& config);
-	void nes_vt_hh_4mb(machine_config& config);
-	void nes_vt_hh_8mb(machine_config& config);
-
-	void nes_vt09(machine_config& config);
-	void nes_vt09_1mb(machine_config& config);
-	void nes_vt09_2mb(machine_config& config);
-	void nes_vt09_4mb(machine_config& config);
-	void nes_vt09_4mb_rasterhack(machine_config& config);
-	void nes_vt09_8mb(machine_config& config);
-	void nes_vt09_16mb(machine_config& config);
-
-	void nes_vt_fp(machine_config& config);
-	void nes_vt_fp_16mb(machine_config& config);
-	void nes_vt_fp_32mb(machine_config& config);
-	void nes_vt_fp_bigger(machine_config& config);
-	void nes_vt_fp_4x16mb(machine_config& config);
-
-	void nes_vt_fp_pal(machine_config& config);
-	void nes_vt_fp_pal_32mb(machine_config& config);
-
-private:
-	uint8_t vt_rom_banked_r(offs_t offset);
-	void vt_external_space_map_fp_2x32mbyte(address_map& map);
-
-	void nes_vt_fp_map(address_map& map);
-
-	uint8_t fcpocket_412d_r();
-	void fcpocket_412c_w(uint8_t data);
-};
-
 class nes_vt_ablpinb_state : public nes_vt_state
 {
 public:
@@ -503,15 +453,6 @@ void nes_vt_dg_state::vt_external_space_map_fapocket_4x16mbyte(address_map &map)
 	map(0x0000000, 0x0ffffff).mirror(0x1000000).r(FUNC(nes_vt_dg_state::vt_rom_banked_r));
 }
 
-uint8_t nes_vt09_state::vt_rom_banked_r(offs_t offset)
-{
-	return m_prgrom[m_ahigh | offset];
-}
-
-void nes_vt09_state::vt_external_space_map_fp_2x32mbyte(address_map &map)
-{
-	map(0x0000000, 0x1ffffff).r(FUNC(nes_vt09_state::vt_rom_banked_r));
-}
 
 uint8_t nes_vt_base_state::extrain_0_r()
 {
@@ -1075,89 +1016,6 @@ void nes_vt_dg_state::nes_vt_dg_baddma_16mb(machine_config& config)
 
 }
 
-void nes_vt09_state::nes_vt09(machine_config &config)
-{
-	nes_vt_dg(config);
-
-	NES_VT_SOC_8KRAM_DG(config.replace(), m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
-
-	m_soc->force_bad_dma();
-}
-
-void nes_vt09_state::nes_vt09_8mb(machine_config& config)
-{
-	nes_vt09(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09_state::vt_external_space_map_8mbyte);
-}
-
-void nes_vt09_state::nes_vt09_1mb(machine_config& config)
-{
-	nes_vt09(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09_state::vt_external_space_map_1mbyte);
-}
-
-void nes_vt09_state::nes_vt09_2mb(machine_config& config)
-{
-	nes_vt09(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09_state::vt_external_space_map_2mbyte);
-}
-
-void nes_vt09_state::nes_vt09_4mb(machine_config& config)
-{
-	nes_vt09(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09_state::vt_external_space_map_4mbyte);
-}
-
-void nes_vt09_state::nes_vt09_4mb_rasterhack(machine_config& config)
-{
-	nes_vt09_4mb(config);
-	m_soc->force_raster_timing_hack();
-}
-
-
-void nes_vt09_state::nes_vt09_16mb(machine_config& config)
-{
-	nes_vt09(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09_state::vt_external_space_map_16mbyte);
-}
-
-
-// New mystery handheld architecture, VTxx derived
-void nes_vt09_state::nes_vt_hh(machine_config &config)
-{
-	nes_vt_4k_ram(config);
-
-	NES_VT_SOC_4KRAM_HH(config.replace(), m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
-
-	m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB);
-	m_soc->force_bad_dma();
-
-	/*
-	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt09_state::nes_vt_hh_map);
-
-	m_screen->set_refresh_hz(50.0070);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((106.53/(PAL_APU_CLOCK.dvalue()/1000000)) *
-	                         (ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)));
-	m_screen->set_size(32*8, 312);
-	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
-	*/
-}
-
-void nes_vt09_state::nes_vt_hh_8mb(machine_config& config)
-{
-	nes_vt_hh(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09_state::vt_external_space_map_8mbyte);
-}
-
-void nes_vt09_state::nes_vt_hh_4mb(machine_config& config)
-{
-	nes_vt_hh(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09_state::vt_external_space_map_4mbyte);
-}
-
-
 void nes_vt_state::nes_vt_1mb_majkon(machine_config& config)
 {
 	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
@@ -1187,36 +1045,6 @@ static INPUT_PORTS_START( nes_vt )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2) PORT_8WAY
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_8WAY
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( nes_vt_msi )
-	PORT_START("IO0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("A")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("B")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY
-
-	PORT_START("IO1")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( nes_vt_msi_mm2 )
-	PORT_START("IO0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("A")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("B")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_8WAY
-
-	PORT_START("IO1")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( nes_vt_ddr )
@@ -1256,83 +1084,6 @@ static INPUT_PORTS_START( dbdancem )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_NAME("P2 Left Arrow") PORT_16WAY
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_NAME("P2 Right Arrow") PORT_16WAY
 INPUT_PORTS_END
-
-
-uint8_t nes_vt09_state::fcpocket_412d_r()
-{
-	if (m_cartsel)
-		return m_cartsel->read();
-	else
-		return 0;
-}
-
-void nes_vt09_state::fcpocket_412c_w(uint8_t data)
-{
-	// fcpocket
-	logerror("%s: vtfp_412c_extbank_w %02x\n", machine().describe_context(), data);
-	m_ahigh = (data & 0x01) ? (1 << 25) : 0x0;
-}
-
-void nes_vt09_state::nes_vt_fp(machine_config &config)
-{
-	nes_vt_4k_ram(config);
-
-	NES_VT_SOC_4KRAM_FP(config.replace(), m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
-
-	m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB12);
-	m_soc->force_bad_dma();
-}
-
-
-
-void nes_vt09_state::nes_vt_fp_4x16mb(machine_config& config)
-{
-	nes_vt_fp(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09_state::vt_external_space_map_fp_2x32mbyte);
-
-	dynamic_cast<nes_vt_soc_4kram_device&>(*m_soc).upper_write_412c_callback().set(FUNC(nes_vt09_state::fcpocket_412c_w));
-	dynamic_cast<nes_vt_soc_4kram_device&>(*m_soc).upper_read_412d_callback().set(FUNC(nes_vt09_state::fcpocket_412d_r));
-}
-
-void nes_vt09_state::nes_vt_fp_32mb(machine_config& config)
-{
-	nes_vt_fp(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09_state::vt_external_space_map_32mbyte);
-}
-
-void nes_vt09_state::nes_vt_fp_bigger(machine_config& config)
-{
-	nes_vt_fp(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09_state::vt_external_space_map_32mbyte); // must be some kind of banking, or this VT can address > 32Mbyte
-}
-
-void nes_vt09_state::nes_vt_fp_16mb(machine_config& config)
-{
-	nes_vt_fp(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09_state::vt_external_space_map_16mbyte);
-}
-
-void nes_vt09_state::nes_vt_fp_pal(machine_config &config)
-{
-	nes_vt_fp(config);
-
-	// set to PAL
-}
-
-void nes_vt09_state::nes_vt_fp_pal_32mb(machine_config& config)
-{
-	nes_vt_4k_ram(config);
-
-	NES_VT_SOC_4KRAM_FP_PAL(config.replace(), m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
-
-	m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB12);
-	m_soc->force_bad_dma();
-
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09_state::vt_external_space_map_32mbyte);
-}
-
 
 void nes_vt_dg_state::nes_vt_fa(machine_config& config)
 {
@@ -1409,23 +1160,7 @@ void nes_vt_swap_op_d5_d6_state::nes_vt_senwld_512kb(machine_config &config)
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_swap_op_d5_d6_state::vt_external_space_map_senwld_512kbyte);
 }
 
-static INPUT_PORTS_START( nes_vt_fp )
-	PORT_INCLUDE(nes_vt)
 
-	PORT_START("CARTSEL")
-	PORT_DIPNAME( 0x06, 0x00, "Cartridge Select" ) PORT_CODE(KEYCODE_3) PORT_TOGGLE
-	PORT_DIPSETTING(    0x00, "472-in-1" )
-	PORT_DIPSETTING(    0x06, "128-in-1" )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( nes_vt_fa )
-	PORT_INCLUDE(nes_vt)
-
-	PORT_START("CARTSEL")
-	PORT_DIPNAME( 0x01, 0x00, "Cartridge Select" ) PORT_CODE(KEYCODE_3) PORT_TOGGLE
-	PORT_DIPSETTING(    0x00, "508-in-1" )
-	PORT_DIPSETTING(    0x01, "130-in-1" )
-INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( ablpinb )
@@ -1607,41 +1342,6 @@ ROM_START( vtboxing )
 	ROM_LOAD( "rom.bin", 0x00000, 0x80000, CRC(c115b1af) SHA1(82106e1c11c3279c5d8731c112f713fa3f290125) )
 ROM_END
 
-ROM_START( msiwwe )
-	ROM_REGION( 0x200000, "mainrom", 0 ) // the first half of this ROM is unused code from the Ms. Pac-Man game!
-	ROM_LOAD( "wrestlemania_es29lv160fb_004a2249.bin", 0x00000, 0x200000, CRC(f524382d) SHA1(0c8d1c29c76e3e3c58018354f1eca9445c9ab945) )
-ROM_END
-
-ROM_START( msiwwea )
-	ROM_REGION( 0x100000, "mainrom", 0 )
-	ROM_LOAD( "wrestlemania_en29lv800bb_007f225b.bin", 0x00000, 0x100000, CRC(52102de3) SHA1(f858ad18e05d3de24dfab4c98798efb4d30e2987) )
-ROM_END
-
-ROM_START( msidd )
-	ROM_REGION( 0x200000, "mainrom", 0 )
-	ROM_LOAD( "doubledragon_m29w160eb_00202249.bin", 0x00000, 0x200000, CRC(44df5bb6) SHA1(a984aa1644d2d313d4263afdfed1cd64009f1137) )
-ROM_END
-
-ROM_START( msimm2 )
-	ROM_REGION( 0x400000, "mainrom", 0 )
-	ROM_LOAD( "megaman2_s99jl032hbt1_001227e_readas_s29jl032h.bin", 0x00000, 0x400000, CRC(f537a053) SHA1(bd9353df34c0c0ee7d0e5e9808fc36f1a5eecc22) )
-ROM_END
-
-ROM_START( msimpac )
-	ROM_REGION( 0x100000, "mainrom", 0 )
-	ROM_LOAD( "mspacman_29dl800ba_000422cb.bin", 0x00000, 0x100000, CRC(c66300e3) SHA1(3fc0bdfbf449d884151f1b581e848243cd2df3a5) )
-ROM_END
-
-ROM_START( msisinv )
-	ROM_REGION( 0x100000, "mainrom", 0 )
-	ROM_LOAD( "spaceinvaders_en29lv800bb_007f225b.bin", 0x00000, 0x100000, CRC(e444d129) SHA1(33742bc3a6250337cc42b73812e797023818282a) )
-ROM_END
-
-ROM_START( msifrog )
-	ROM_REGION( 0x400000, "mainrom", 0 )
-	ROM_LOAD( "frogger_39vf3201_00bf235b.bin", 0x00000, 0x400000, CRC(c46c29c0) SHA1(b8f26445c2086b97db8ee98bf36dff9d63ca414b) )
-ROM_END
-
 ROM_START( sudopptv )
 	ROM_REGION( 0x80000, "mainrom", ROMREGION_ERASEFF )
 	ROM_LOAD( "sudokupnptvgame_29lv400tc_000422b9.bin", 0x00000, 0x80000, CRC(722cc36d) SHA1(1f6d1f57478cf175a36722b39c52eded4b669f81) )
@@ -1652,109 +1352,10 @@ ROM_START( mc_dgear )
 	ROM_LOAD( "dreamgear 75-in-1.prg", 0x00000, 0x400000, CRC(9aabcb8f) SHA1(aa9446b7777fa64503871225fcaf2a17aafd9af1) )
 ROM_END
 
-ROM_START( dgun2500 )
-	ROM_REGION( 0x1000000, "mainrom", 0 )
-	ROM_LOAD( "dgun2500.bin", 0x00000, 0x1000000, CRC(a2f963f3) SHA1(e29ed20ccdcf25b5640a607b3d2c9e6a4944e172) ) // 1ST AND 2ND HALF IDENTICAL
-	ROM_IGNORE(0x1000000)
-ROM_END
-
-ROM_START( dgun2561 )
-	ROM_REGION( 0x4000000, "mainrom", 0 )
-	ROM_LOAD( "dgun2561.bin", 0x00000, 0x4000000, CRC(a6e627b4) SHA1(2667d2feb02de349387f9dcfa5418e7ed3afeef6) )
-ROM_END
-
-ROM_START( dgun2593 )
-	ROM_REGION( 0x8000000, "mainrom", 0 )
-	ROM_LOAD( "dreamgear300.bin", 0x00000, 0x8000000, CRC(4fe0ed02) SHA1(a55590557bacca65ed9a17c5bcf0a4e5cb223126) )
-ROM_END
-
-ROM_START( rtvgc300 )
-	ROM_REGION( 0x8000000, "mainrom", 0 )
-	// some of the higher address lines might be swapped
-	ROM_LOAD( "lexibook300.bin", 0x00000, 0x4000000, CRC(015c4067) SHA1(a12986c4a366a23c4c7ca7b3d33e421a8dfdffc0) )
-ROM_END
-
-ROM_START( rtvgc300fz )
-	ROM_REGION( 0x8000000, "mainrom", 0 )
-	// some of the higher address lines might be swapped
-	ROM_LOAD( "jg7800fz.bin", 0x00000, 0x4000000, CRC(c9d319d2) SHA1(9d0d1435b802f63ce11b94ce54d11f4065b324cc) )
-ROM_END
-
-// The maximum address space a VT chip can see is 32MB, so these 64MB roms are actually 2 programs (there are vectors in the first half and the 2nd half)
-// there must be a bankswitch bit that switches the whole 32MB space.  Loading the 2nd half in Star Wars does actually boot straight to a game.
-ROM_START( lxcmcy )
-	ROM_REGION( 0x4000000, "mainrom", 0 )
-	ROM_LOAD( "lxcmcy.bin", 0x00000, 0x4000000, CRC(3f3af72c) SHA1(76127054291568fcce1431d21af71f775cfb05a6) )
-ROM_END
-
-ROM_START( lxcmcysw )
-	ROM_REGION( 0x4000000, "mainrom", 0 )
-	ROM_LOAD( "jl2365swr-1.u2", 0x2000000, 0x2000000, CRC(60ece391) SHA1(655de6b36ba596d873de2839522b948ccf45e006) )
-	ROM_CONTINUE(0x0000000, 0x2000000)
-ROM_END
-
-ROM_START( lxcmcyfz )
-	ROM_REGION( 0x4000000, "mainrom", 0 )
-	// sub-board was marked for 2GB capacity (A0-A26 address lines), but only address lines A0-A24 are connected to the chip
-	ROM_LOAD( "jl2365_frozen.u1", 0x00000, 0x4000000, CRC(64d4c708) SHA1(1bc2d161326ce3039ab9ba46ad62695060cfb2e1) )
-ROM_END
-
-ROM_START( lxcmcydp )
-	ROM_REGION( 0x4000000, "mainrom", 0 )
-	// sub-board was marked for 2GB capacity (A0-A26 address lines), but only address lines A0-A24 are connected to the chip
-	ROM_LOAD( "cyberarcade-disneyprincess.bin", 0x00000, 0x4000000, CRC(05946f81) SHA1(33eea2b70f5427e7613c836b8a08148731fac231) )
-ROM_END
-
-ROM_START( lxcmcysp )
-	ROM_REGION( 0x4000000, "mainrom", 0 )
-	// sub-board was marked for 2GB capacity (A0-A26 address lines), but only address lines A0-A24 are connected to the chip
-	ROM_LOAD( "lexibookspiderman.bin", 0x00000, 0x4000000, CRC(ef6e8847) SHA1(0012df193c52fd48595d85886fd431619c5d5e3e) )
-ROM_END
-
-ROM_START( lxcmcycr )
-	ROM_REGION( 0x4000000, "mainrom", 0 )
-	ROM_LOAD( "lexibook cars.bin", 0x00000, 0x4000000, CRC(198fe11b) SHA1(5e35caa3fc319ec69812c187a3ec89f01749f749) )
-ROM_END
-
-ROM_START( lxcmcypp )
-	ROM_REGION( 0x4000000, "mainrom", 0 )
-	// marked 512mbit, possible A22 / A23 are swapped as they were marked on the board in a different way.
-	ROM_LOAD( "pawpatrol_compact.bin", 0x00000, 0x4000000, CRC(bf536762) SHA1(80dde8426a636bae33a82d779e564fa743eb3776) )
-ROM_END
-
-ROM_START( lxcmc250 )
-	ROM_REGION( 0x4000000, "mainrom", 0 )
-	// sub-board was marked for 2GB capacity (A0-A26 address lines), but only address lines A0-A24 are connected to the chip
-	ROM_LOAD( "cca250in1.u1", 0x00000, 0x4000000, CRC(6ccd6ad6) SHA1(fafed339097c3d1538faa306021a8373c1b799b3) )
-ROM_END
-
-ROM_START( lxccminn )
-	ROM_REGION( 0x4000000, "mainrom", 0 ) // sub-board was hardwired to only be able to address the lower 64MByte, was rewired to also dump upper half when dumping, upper half contains only garbage, hence ROM_IGNORE
-	ROM_LOAD( "minnie_lexibook.bin", 0x00000, 0x4000000, CRC(3f8e5a69) SHA1(c9f11f3e5f9b73832a191f4d1620a85c1b70f79e) )
-	ROM_IGNORE(0x4000000)
-ROM_END
-
-ROM_START( lxccplan )
-	ROM_REGION( 0x4000000, "mainrom", 0 ) // sub-board was hardwired to only be able to address the lower 64MByte, was rewired to also dump upper half when dumping, upper half contains only garbage, hence ROM_IGNORE
-	ROM_LOAD( "planes_lexibook.bin", 0x00000, 0x4000000, CRC(76e1a962) SHA1(83b801c0e0e941ceb1c93e565e833b07c09412c3))
-	ROM_IGNORE(0x4000000)
-ROM_END
-
-ROM_START( red5mam )
-	ROM_REGION( 0x8000000, "mainrom", 0 )
-	ROM_LOAD( "mam.u3", 0x00000, 0x8000000, CRC(0c0a0ecd) SHA1(2dfd8437de17fc9975698f1933dd81fbac78466d) )
-ROM_END
-
-ROM_START( cybar120 )
-	ROM_REGION( 0x1000000, "mainrom", 0 )
-	ROM_LOAD( "m2500p-vt09-epson,20091222ver05,_30r-sx1067-01_pcb,_12r0cob128m_12001-3d05_fw.bin", 0x00000, 0x1000000, CRC(f7138980) SHA1(de31264ee3a5a5c77a86733b2e2d6845fee91ea5) )
-ROM_END
-
 ROM_START( sen101 )
 	ROM_REGION( 0x400000, "mainrom", 0 )
 	ROM_LOAD( "101n1.bin", 0x00000, 0x400000, CRC(b03e1824) SHA1(c9ac4e16220414c1aa679133191140ced9986e9c) )
 ROM_END
-
 
 ROM_START( mc_dg101 )
 	ROM_REGION( 0x400000, "mainrom", 0 )
@@ -1776,27 +1377,15 @@ ROM_START( mc_sp69 )
 	ROM_LOAD( "sports game 69-in-1.prg", 0x00000, 0x400000, CRC(1242da7f) SHA1(bb8f99b1f4a4783b3f7e54d74f1f2a6a628da154) )
 ROM_END
 
-ROM_START( vsmaxtx2 )
-	ROM_REGION( 0x400000, "mainrom", 0 )
-	ROM_LOAD( "tx2.bin", 0x00000, 0x400000, CRC(eddf0ca8) SHA1(b87c5c3e945d1efdcb953325425d4ddb0fded00a) )
-ROM_END
-
 ROM_START( vsmaxx17 )
 	ROM_REGION( 0x200000, "mainrom", 0 )
 	ROM_LOAD( "vsmaxx17.bin", 0x00000, 0x200000, CRC(f3fccbb9) SHA1(8b70b10d28f03e72f6b35199001955033a65fd5d) )  // M6MG3D641RB
 ROM_END
 
-ROM_START( senario25 )
-	ROM_REGION( 0x200000, "mainrom", 0 )
-	ROM_LOAD( "senario25.bin", 0x00000, 0x200000, CRC(270c4517) SHA1(c099096d1c86f55f2b0826484cd3d3f68c90c794) )
-ROM_END
-
-
 ROM_START( dgun851 )
 	ROM_REGION( 0x400000, "mainrom", 0 )
 	ROM_LOAD( "dgun851.bin", 0x00000, 0x400000, CRC(9d51c9fc) SHA1(6f49ea3343eb6e90938aabc9660783f1fc7f6084) )
 ROM_END
-
 
 ROM_START( vsmaxx77 )
 	ROM_REGION( 0x800000, "mainrom", 0 )
@@ -1808,16 +1397,6 @@ ROM_START( vsmaxxvd )
 	ROM_LOAD( "vsmaxxvideo.bin", 0x00000, 0x800000, CRC(af365a77) SHA1(8119fcef3e1a2ade93d36740d5df451919f0e541) )
 ROM_END
 
-ROM_START( dturbogt )
-	ROM_REGION( 0x800000, "mainrom", 0 )
-	ROM_LOAD( "dgturbogt.bin", 0x00000, 0x800000, CRC(9532fb78) SHA1(cd188672f9b8e9c12069612ad0d0b70d3dd6c1b1) )
-ROM_END
-
-ROM_START( rcapnp )
-	ROM_REGION( 0x200000, "mainrom", 0 )
-	ROM_LOAD( "rcapnp_mx29lv160ab_00c22249.bin", 0x00000, 0x200000, CRC(8cc30a47) SHA1(815bfc26360b01ed3fa077016222939d2184408c) )
-ROM_END
-
 ROM_START( polmega )
 	ROM_REGION( 0x400000, "mainrom", 0 )
 	ROM_LOAD( "megamax.bin", 0x00000, 0x400000, CRC(ef3aade3) SHA1(0c130080ace000cbe43e70a805d4301e05840294) )
@@ -1826,11 +1405,6 @@ ROM_END
 ROM_START( silv35 )
 	ROM_REGION( 0x400000, "mainrom", 0 )
 	ROM_LOAD( "silverlit35.bin", 0x00000, 0x400000, CRC(7540e350) SHA1(a0cb456136560fa4d8a365dd44d815ec0e9fc2e7) )
-ROM_END
-
-ROM_START( ventur25 )
-	ROM_REGION( 0x400000, "mainrom", 0 )
-	ROM_LOAD( "25games_m5m29gt320vp_001c0020.bin", 0x00000, 0x400000, CRC(3f78a45a) SHA1(3e97333c13e09c580e66518dd2e1e031371d399c) )
 ROM_END
 
 ROM_START( sporzpp )
@@ -1856,11 +1430,6 @@ ROM_END
 ROM_START( solargm )
 	ROM_REGION( 0x800000, "mainrom", 0 )
 	ROM_LOAD( "solargames.bin", 0x00000, 0x800000, CRC(b49f0985) SHA1(68231614b333911c25168c533f1ae9bc79c36c38) )
-ROM_END
-
-ROM_START( lpgm240 )
-	ROM_REGION( 0x800000, "mainrom", 0 )
-	ROM_LOAD( "w25q64jv.u1", 0x00000, 0x800000, CRC(b973e65b) SHA1(36ff137068ea56b4679c2db386ac0067de0a9eaf) )
 ROM_END
 
 ROM_START( pjoyn50 )
@@ -1942,11 +1511,6 @@ ROM_START( mc_dcat8a )
 	ROM_LOAD( "s29gl064.u6", 0x00000, 0x800000, CRC(e28b1ef8) SHA1(4a6f107d2189cbe1bb0b86b3738d0af58e24e0f7) )
 ROM_END
 
-ROM_START( vgtablet )
-	ROM_REGION( 0x400000, "mainrom", 0 )
-	ROM_LOAD( "vgtablet.bin", 0x00000, 0x400000, CRC(99ef3978) SHA1(0074445708d66a04ab02b4993069ce1ae0514c2f) )
-ROM_END
-
 ROM_START( gprnrs1 )
 	ROM_REGION( 0x800000, "mainrom", 0 )
 	ROM_LOAD( "gprnrs1.bin", 0x00000, 0x800000, CRC(c3ffcec8) SHA1(313a790fb51d0b155257f9de84726ed67da43a8f) )
@@ -1955,28 +1519,6 @@ ROM_END
 ROM_START( gprnrs16 )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
 	ROM_LOAD( "gprnrs16.bin", 0x00000, 0x2000000, CRC(bdffa40a) SHA1(3d01907211f18e8415171dfc6c1d23cf5952e7bb) )
-ROM_END
-
-ROM_START( vgpocket )
-	ROM_REGION( 0x400000, "mainrom", 0 )
-	ROM_LOAD( "vgpocket.bin", 0x00000, 0x400000, CRC(843634c6) SHA1(c59dab0e43d364f59eb3a138abb585bc54e5d674) )
-	// there was a dump of a 'secure' area with this, but it was just the top 0x10000 bytes of the existing rom.
-ROM_END
-
-ROM_START( vgpmini )
-	ROM_REGION( 0x400000, "mainrom", 0 )
-	ROM_LOAD( "vgpmini.bin", 0x00000, 0x400000, CRC(a1121843) SHA1(c96013ae6cf2f8173e65a167d45685cb61536d36) )
-	// there was a dump of a 'secure' area with this, but it was just the bottom 0x10000 bytes of the existing rom.
-ROM_END
-
-ROM_START( sy889 )
-	ROM_REGION( 0x800000, "mainrom", 0 )
-	ROM_LOAD( "sy889_w25q64.bin", 0x00000, 0x800000, CRC(fcdaa6fc) SHA1(0493747facf2172b8af22010851668bb18cbb3e4) )
-ROM_END
-
-ROM_START( sy888b )
-	ROM_REGION( 0x400000, "mainrom", 0 )
-	ROM_LOAD( "sy888b_f25q32.bin", 0x00000, 0x400000, CRC(a8298c33) SHA1(7112dd13d5fb5f9f9d496816758defd22773ec6e) )
 ROM_END
 
 ROM_START( ddrdismx )
@@ -1988,7 +1530,6 @@ ROM_START( dbdancem )
 	ROM_REGION( 0x200000, "mainrom", 0 )
 	ROM_LOAD( "dancemania_29lv160bt_00c222a7.bin", 0x00000, 0x200000, CRC(7250a837) SHA1(7205936215df84e3642c34a8b5991e8125da1785) )
 ROM_END
-
 
 ROM_START( megapad )
 	ROM_REGION( 0x200000, "mainrom", 0 )
@@ -2020,7 +1561,6 @@ ROM_START( majgnc )
 	ROM_LOAD( "majescogoldennuggetcasino_st29w800at_002000d7.bin", 0x00000, 0x100000, CRC(1a156a9d) SHA1(08be4079dd68c9cf05bb92e11a3da4f092d7cfea) )
 ROM_END
 
-
 ROM_START( zudugo )
 	ROM_REGION( 0x400000, "mainrom", ROMREGION_ERASEFF )
 	ROM_LOAD( "zudugo.bin", 0x00000, 0x400000, CRC(0fa9d9ad) SHA1(7533eaf51785d8fcced900ea0498281b0cf49dbf) )
@@ -2031,47 +1571,9 @@ ROM_START( ablping )
 	ROM_LOAD( "abl_pingpong.bin", 0x00000, 0x200000, CRC(b31de1fb) SHA1(94e8afb2315ba1fa0892191c8e1832391e401c70) )
 ROM_END
 
-
-
-
-ROM_START( dgun2573 ) // this one lacked a DreamGear logo but was otherwise physically identical, is it a clone product or did DreamGear drop the logo in favor of just using the 'My Arcade' brand?
-	ROM_REGION( 0x2000000, "mainrom", 0 )
-	ROM_LOAD( "myarcadegamerportable_s29gl256p10tfi01_0001227e.bin", 0x00000, 0x2000000, CRC(8f8c8da7) SHA1(76a18458922e39abe1982f05f184babb5e65acf2) )
-ROM_END
-
-ROM_START( dgun2573a )
-	ROM_REGION( 0x2000000, "mainrom", 0 )
-	ROM_LOAD( "myarcadegamerportabledreamgear_s29gl256p10tfi01_0001227e.bin", 0x00000, 0x2000000, CRC(928c41ad) SHA1(c0119a13a47a5b784d0b834d1451973ff0b4a84f) )
-ROM_END
-
-ROM_START( bittboy )
-	ROM_REGION( 0x2000000, "mainrom", 0 )
-	ROM_LOAD( "bittboy_flash_read_s29gl256n-tf-v2.bin", 0x00000, 0x2000000, CRC(24c802d7) SHA1(c1300ff799b93b9b53060b94d3985db4389c5d3a) )
-ROM_END
-
 ROM_START( mc_89in1 )
 	ROM_REGION( 0x400000, "mainrom", 0 )
 	ROM_LOAD( "89in1.bin", 0x00000, 0x400000, CRC(b97f8ce5) SHA1(1a8e67f2b58a671ceec2b0ed18ec5954a71ae63a) )
-ROM_END
-
-ROM_START( mc_cb280 )
-	ROM_REGION( 0x400000, "mainrom", 0 )
-	ROM_LOAD( "w25q32.u5", 0x00000, 0x400000, CRC(c9541bdf) SHA1(f0ce46f18658ca5dbed881e5a80460e59820bbd0) )
-ROM_END
-
-ROM_START( mc_pg150 )
-	ROM_REGION( 0x2000000, "mainrom", 0 )
-	ROM_LOAD( "pocketgames150-in1.bin", 0x00000, 0x2000000, CRC(32f1176b) SHA1(2cfd9b61ebdfc328f020ae9bd5e5e2219321e828) )
-ROM_END
-
-ROM_START( mc_hh210 )
-	ROM_REGION( 0x1000000, "mainrom", 0 )
-	ROM_LOAD( "msp55lv128t.u4", 0x00000, 0x1000000, CRC(9ba520d4) SHA1(627f811b24314197e289a2ade668ff4115421bed) )
-ROM_END
-
-ROM_START( dvnimbus )
-	ROM_REGION( 0x1000000, "mainrom", 0 )
-	ROM_LOAD( "2012-7-4-v1.bin", 0x00000, 0x1000000, CRC(a91d7aa6) SHA1(9421b70b281bb630752bc352c3715258044c0bbe) )
 ROM_END
 
 ROM_START( cbrs8 )
@@ -2104,48 +1606,14 @@ ROM_START( techni4 )
 	ROM_LOAD( "technigame.bin", 0x00000, 0x200000, CRC(3c96b1b1) SHA1(1acc81b26e740327bd6d9faa5a96ab027a48dd77) )
 ROM_END
 
-
 ROM_START( protpp )
 	ROM_REGION( 0x100000, "mainrom", 0 )
 	ROM_LOAD( "vpingpong_s29al008d70tfi02_0001225b.bin", 0x00000, 0x100000, CRC(8cf46272) SHA1(298a6341d26712ec1f282e7514e995a7af5ac012) )
 ROM_END
 
-ROM_START( unkra200 ) // "Winbond 25Q64FVSIG 1324" SPI ROM
-	ROM_REGION( 0x800000, "mainrom", 0 )
-	ROM_LOAD( "retro_machine_rom", 0x00000, 0x800000, CRC(0e824aa7) SHA1(957e98868559ecc22b3fa42c76692417b76bf132) )
-ROM_END
-
-ROM_START( rminitv )
-	ROM_REGION( 0x2000000, "mainrom", 0 )
-	ROM_LOAD( "29gl256.bin", 0x00000, 0x2000000, CRC(cb4048d4) SHA1(9877ce5716d13f8498abfc1cbfaefa9426205d3e) )
-ROM_END
-
-ROM_START( denv150 )
-	ROM_REGION( 0x1000000, "mainrom", 0 )
-	ROM_LOAD( "denver150in1.bin", 0x00000, 0x1000000, CRC(6b3819d7) SHA1(b0039945ce44a52ea224ab736d5f3c6980409b5d) ) // 2nd half is blank
-ROM_END
-
-
 ROM_START( ppgc200g )
 	ROM_REGION( 0x800000, "mainrom", 0 )
 	ROM_LOAD( "m29dw641.u2", 0x00000, 0x800000, CRC(b16dc677) SHA1(c1984fde4caf9345d41d127db946d1c21ec43ae0) )
-ROM_END
-
-
-
-ROM_START( mog_m320 )
-	ROM_REGION( 0x800000, "mainrom", 0 )
-	ROM_LOAD( "w25q64fv.bin", 0x00000, 0x800000, CRC(3c5e1b36) SHA1(4bcbf35ebf2b1714ccde5de758a89a6a39528f89) )
-ROM_END
-
-ROM_START( fcpocket )
-	ROM_REGION( 0x8000000, "mainrom", 0 )
-	ROM_LOAD( "s29gl01gp.bin", 0x00000, 0x8000000, CRC(8703b18a) SHA1(07943443294e80ca93f83181c8bdbf950b87c52f) ) // 2nd half = 0x00 (so 64MByte of content)
-ROM_END
-
-ROM_START( fapocket )
-	ROM_REGION( 0x4000000, "mainrom", 0 )
-	ROM_LOAD( "s29gl512n.bin", 0x00000, 0x4000000, CRC(37d0fb06) SHA1(0146a2fae32e23b65d4032c508f0d12cedd399c3) )
 ROM_END
 
 ROM_START( zdog )
@@ -2153,18 +1621,8 @@ ROM_START( zdog )
 	ROM_LOAD( "zdog.bin", 0x00000, 0x400000, CRC(5ed3485b) SHA1(5ab0e9370d4ed1535205deb0456878c4e400dd81) )
 ROM_END
 
-ROM_START( otrail )
-	ROM_REGION( 0x100000, "mainrom", 0 )
-	ROM_LOAD( "g25q80cw.bin", 0x00000, 0x100000, CRC(b20a03ba) SHA1(c4ca8e590b07baaebed747537bc8f92e44bdd219) ) // dumped as QD25Q80C
 
-	ROM_REGION( 0x200, "seeprom", 0 )
-	ROM_LOAD( "t24c04a.bin", 0x000, 0x200, CRC(ce1fad6f) SHA1(82878996765739edba42042b6336460d5c8f8096) )
-ROM_END
 
-ROM_START( zonefusn )
-	ROM_REGION( 0x1000000, "mainrom", 0 )
-	ROM_LOAD( "fusion.bin", 0x00000, 0x1000000, CRC(240bf970) SHA1(1b82d95a252c08e52fb8da6320276574a30b60db) )
-ROM_END
 
 void nes_vt_cy_lexibook_state::init_lxcmcypp()
 {
@@ -2340,160 +1798,3 @@ CONS( 201?, mc_tv200,   0,        0,  nes_vt_8mb,    nes_vt, nes_vt_state, empty
 // available in a number of colours, with various brands, but likely all the same.
 // This was a red coloured pad, contains various unlicensed bootleg reskinned NES game eg Blob Buster is a hack of Dig Dug 2 and there are also hacks of Xevious, Donkey Kong Jr, Donkey Kong 3 and many others.
 CONS( 201?, ppgc200g,   0,         0,  nes_vt_8mb, nes_vt, nes_vt_state, empty_init, "<unknown>", "Plug & Play Game Controller with 200 Games (Supreme 200)", MACHINE_IMPERFECT_GRAPHICS )
-
-
-// Runs fine, non-sport 121 in 1 games perfect, but minor graphical issues in
-// sport games, also no sound in menu or sport games due to missing PCM
-// emulation
-CONS( 200?, dgun2500,  0,  0,  nes_vt_dg_baddma_16mb, nes_vt, nes_vt_dg_state, empty_init, "dreamGEAR", "dreamGEAR Wireless Motion Control with 130 games (DGUN-2500)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
-
-// all software in this runs in the VT03 enhanced mode, it also includes an actual licensed VT03 port of Frogger.
-// all games work OK except Frogger which has serious graphical issues
-CONS( 2006, vgtablet,  0, 0,  nes_vt09_4mb_rasterhack,  nes_vt, nes_vt09_state, empty_init, "Performance Designed Products (licensed by Konami) / JungleTac", "VG Pocket Tablet (VG-4000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // raster timing for Frogger needs a hack
-// There is a 2004 Majesco Frogger "TV game" that appears to contain the same version of Frogger as above but with no other games, so probably fits here.
-
-// MSI Entertainment games (MSI previously operated as Majesco Entertainment)
-
-// There are meant to be multiple revisions of this software, some with theme tunes for the new wrestlers, some without. This one appears to lack them.
-// 2 box variations exist, one with Randy Savage in purple attire and another with green, this was dumped from a unit with purple on the box.
-CONS( 2017, msiwwe,     0,      0,  nes_vt09_2mb, nes_vt_msi, nes_vt09_state, empty_init, "MSI", "WWE Wrestlemania Steel Cage Challenge (Plug & Play) (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-// this one was dumped from the version with Randy Savage in green, the box was much larger than the other one.  This one also has new theme music for the adjusted roster.
-CONS( 2017, msiwwea,    msiwwe, 0,  nes_vt09_1mb, nes_vt_msi, nes_vt09_state, empty_init, "MSI", "WWE Wrestlemania Steel Cage Challenge (Plug & Play) (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-
-CONS( 2017, msidd,      0,  0,  nes_vt09_2mb, nes_vt_msi, nes_vt09_state, empty_init, "MSI / Arc System Works", "Double Dragon - 30 Years Anniversary (Plug & Play)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-
-CONS( 2016, msimpac,    0,  0,  nes_vt09_1mb, nes_vt_msi, nes_vt09_state, empty_init, "MSI / Bandai Namco", "Ms. Pac-Man (MSI Plug & Play)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-
-CONS( 2017, msimm2,     0,  0,  nes_vt09_4mb, nes_vt_msi_mm2, nes_vt09_state, empty_init, "MSI / Capcom", "Mega Man 2 (MSI Plug & Play)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // various issues (glitched Metal Man stage boss, missing 'ready' text) happen on real unit
-
-CONS( 2016, msisinv,    0,  0,  nes_vt09_1mb, nes_vt_msi, nes_vt09_state, empty_init, "MSI / Taito", "Space Invaders (MSI Plug & Play)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-
-// This is from the version with the same case type as the above MSI units.
-// MSI also issued a version in the original Majesco shell but with the updated case logos and boot logos in the software, the software on that revision might match this one.
-CONS( 2016, msifrog,    0,  0,  nes_vt09_4mb_rasterhack, nes_vt_msi, nes_vt09_state, empty_init, "MSI / Konami", "Frogger (MSI Plug & Play, white joystick)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) //  raster timing for need a hack
-
-// MSI Midway (Joust+Gauntlet 2 + Defender 2) has 2x Globs, rather than Glob + Flash ROM
-
-// this is VT09 based
-CONS( 2009, cybar120,  0,  0,  nes_vt09_16mb,nes_vt, nes_vt09_state, empty_init, "Defender / JungleTac",                      "Defender M2500P 120-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 200?, vsmaxtx2,  0,  0,  nes_vt09_4mb, nes_vt, nes_vt09_state, empty_init, "Senario / JungleTac",                       "Vs Maxx TX-2 50-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 200?, senario25, 0,  0,  nes_vt09_2mb, nes_vt, nes_vt09_state, empty_init, "Senario / JungleTac",                       "25 Video Games - All in 1 Video System (Senario)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // no Vs Maxx branding, newer style packaging
-CONS( 200?, rcapnp,    0,  0,  nes_vt09_2mb, nes_vt, nes_vt09_state, empty_init, "RCA / JungleTac",                           "RCA NS-500 30-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 200?, dturbogt,  0,  0,  nes_vt09_8mb, nes_vt, nes_vt09_state, empty_init, "dreamGEAR / JungleTac",                     "Turbo GT 50-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 200?, ventur25,  0,  0,  nes_vt09_4mb, nes_vt, nes_vt09_state, empty_init, "<unknown> / JungleTac",                     "Venturer '25 Games' 25-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 2005, vgpocket,  0,  0,  nes_vt09_4mb, nes_vt, nes_vt09_state, empty_init, "Performance Designed Products / JungleTac", "VG Pocket (VG-2000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 200?, vgpmini,   0,  0,  nes_vt09_4mb, nes_vt, nes_vt09_state, empty_init, "Performance Designed Products / JungleTac", "VG Pocket Mini (VG-1500)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-// VG Pocket Max (VG-2500) (blue case, 75 games)
-// VG Pocket Max (VG-3000) (white case, 75 games) (does the game selection differ, or only the case?)
-// VG Pocket Caplet is SunPlus hardware instead, see spg2xx_lexibook.cpp
-
-
-// Runs well, only issues in SMB3 which crashes
-CONS( 2017, bittboy,    0,        0,  nes_vt_bt_2x16mb, nes_vt, nes_vt_cy_state, empty_init, "BittBoy",   "BittBoy Mini FC 300 in 1", MACHINE_IMPERFECT_GRAPHICS ) // has external banking (2x 16mbyte banks)
-// Broken GFX, investigate, is this really a system? research indicates it's a multicart for a regular NES?
-CONS( 201?, mc_pg150,   0,        0,  nes_vt_bt_2x16mb, nes_vt, nes_vt_cy_state, empty_init, "<unknown>", "Pocket Games 150 in 1", MACHINE_NOT_WORKING ) // has external banking
-// No title screen, but press start and menu and games run fine. Makes odd
-// memory accesses which probably explain broken title screen
-CONS( 201?, mc_hh210,   0,        0,  nes_vt_4k_ram_16mb, nes_vt, nes_vt_state, empty_init, "<unknown>", "Handheld 210 in 1", MACHINE_NOT_WORKING )
-// First half of games don't work, probably bad dump
-CONS( 201?, dvnimbus,   0,        0,  nes_vt09_16mb, nes_vt, nes_vt09_state, empty_init, "<unknown>", "DVTech Nimbus 176 in 1", MACHINE_NOT_WORKING )
- // probably another Thumbs Up product? cursor doesn't work unless nes_vt_hh machine is used? possibly newer than VT02 as it runs from an SPI ROM, might just not use enhanced features.  Some minor game name changes to above (eg Smackdown just becomes Wrestling)
-CONS( 201?, unkra200,   mc_tv200, 0,  nes_vt_hh_8mb, nes_vt, nes_vt09_state, empty_init, "<unknown>", "200 in 1 Retro Arcade", MACHINE_IMPERFECT_GRAPHICS )
-
-// Probably VT09 or similar
-// Use DIP switch to select console or cartridge, as cartridge is fake and just toggles a ROM high address bit
-// (which can also be overriden by GPIO)
-CONS( 2017, fapocket,   0,        0,  nes_vt_fa_4x16mb, nes_vt_fa, nes_vt_dg_fapocket_state, empty_init, "<unknown>",   "Family Pocket 638 in 1", MACHINE_IMPERFECT_GRAPHICS ) // has external banking (4x 16mbyte banks)
-
-
-// Runs well, minor GFX issues in intro
-CONS( 2017, sy889,      0,        0,  nes_vt_hh_8mb, nes_vt, nes_vt09_state, empty_init, "SY Corp",   "SY-889 300 in 1 Handheld", MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2016, sy888b,     0,        0,  nes_vt_hh_4mb, nes_vt, nes_vt09_state, empty_init, "SY Corp",   "SY-888B 288 in 1 Handheld", MACHINE_IMPERFECT_GRAPHICS )
-
-// Same hardware as SY-889
-CONS( 201?, mc_cb280,   0,        0,  nes_vt_hh_4mb, nes_vt, nes_vt09_state, empty_init, "CoolBoy",   "Coolboy RS-18 (280 in 1)", MACHINE_IMPERFECT_GRAPHICS )
-
-// Plays intro music but then crashes. same hardware as SY-88x but uses more features
-CONS( 2016, mog_m320,   0,        0,  nes_vt_hh_8mb, nes_vt, nes_vt09_state, empty_init, "MOGIS",    "MOGIS M320 246 in 1 Handheld", MACHINE_NOT_WORKING )
-
-// similar menus to above, but with opcode scrambling
-CONS( 2015, dgun2573,  0,         0,  nes_vt_fp_32mb,     nes_vt, nes_vt09_state, empty_init, "dreamGEAR", "My Arcade Gamer V Portable Gaming System (DGUN-2573) (set 1, newer)",  MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 2015, dgun2573a, dgun2573,  0,  nes_vt_fp_32mb,     nes_vt, nes_vt09_state, empty_init, "dreamGEAR", "My Arcade Gamer V Portable Gaming System (DGUN-2573) (set 2, older)",  MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // some menu graphics haven't been updated to reflect 'Panda' theme to the sports games
-
-CONS( 2015, rminitv,   0,  0,  nes_vt_fp_pal_32mb, nes_vt, nes_vt09_state, empty_init, "Orb Gaming", "Retro 'Mini TV' Console 300-in-1", MACHINE_IMPERFECT_GRAPHICS ) // single 32Mbyte bank!
-// New platform with scrambled opcodes, same as DGUN-2561. Runs fine with minor GFX and sound issues in menu
-// Use DIP switch to select console or cartridge, as cartridge is fake and just toggles a GPIO
-CONS( 2016, fcpocket,  0,  0,  nes_vt_fp_4x16mb,   nes_vt_fp, nes_vt09_state, empty_init, "<unknown>",   "FC Pocket 600 in 1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )  // has external banking (2x 32mbyte banks)
-
-
-/****************************************************************************************************************
-
-    Things below seem on heavily enhanced hardware of unknown VT type
-
-    It's possible some of these are the same as some of the ones above (sy889, rminitv, dgun2573 etc.) but with
-    more features used.
-
-    In some cases these might be almost entirely different, and it is likely a number don't belong in this
-    driver at all.
-
-****************************************************************************************************************/
-
-// don't even get to menu. very enhanced chipset, VT368/9?
-CONS( 2012, dgun2561,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "dreamGEAR", "My Arcade Portable Gaming System with 140 Games (DGUN-2561)", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
-CONS( 2016, dgun2593,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "dreamGEAR", "My Arcade Retro Arcade Machine - 300 Handheld Video Games (DGUN-2593)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
-
-CONS( 200?, lxcmcy,    0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init,    "Lexibook", "Lexibook Compact Cyber Arcade", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
-CONS( 200?, lxcmc250,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init,    "Lexibook", "Lexibook Compact Cyber Arcade - 250-in-1 (JL2375)", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
-CONS( 200?, lxcmcysw,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init,    "Lexibook", "Lexibook Compact Cyber Arcade - Star Wars Rebels", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
-CONS( 200?, lxcmcyfz,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init,    "Lexibook", "Lexibook Compact Cyber Arcade - Frozen", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
-CONS( 200?, lxcmcydp,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init,    "Lexibook", "Lexibook Compact Cyber Arcade - Disney Princess", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
-CONS( 200?, lxcmcysp,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init,    "Lexibook", "Lexibook Compact Cyber Arcade - Marvel Ultimate Spider-Man", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
-CONS( 200?, lxcmcycr,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init,    "Lexibook", "Lexibook Compact Cyber Arcade - Cars", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
-// the data order is swapped for this one, maybe other internal differences?
-CONS( 200?, lxcmcypp,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, init_lxcmcypp, "Lexibook", "Lexibook Compact Cyber Arcade - Paw Patrol", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
-
-
-CONS( 200?, lxccminn,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init,    "Lexibook", "Lexibook Console Colour - Minnie Mouse", MACHINE_NOT_WORKING ) // 64Mbyte (used) ROM, must be externally banked, or different addressing scheme
-CONS( 200?, lxccplan,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init,    "Lexibook", "Lexibook Console Colour - Disney's Planes", MACHINE_NOT_WORKING ) // 64Mbyte (used) ROM, must be externally banked, or different addressing scheme
-
-
-// GB-NO13-Main-VT389-2 on PCBs
-CONS( 2016, rtvgc300,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init,    "Lexibook", "Lexibook Retro TV Game Console - 300 Games", MACHINE_NOT_WORKING )  // 64Mbyte ROM, must be externally banked, or different addressing scheme
-CONS( 2017, rtvgc300fz,0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init,    "Lexibook", "Lexibook Retro TV Game Console - Frozen - 300 Games", MACHINE_NOT_WORKING )  // 64Mbyte ROM, must be externally banked, or different addressing scheme
-
-
-/* The following are also confirmed to be NES/VT derived units, most having a standard set of games with a handful of lazy graphic mods thrown in to fit the unit theme
-
-    (handheld units, use standard AAA batteries)
-    Lexibook Compact Cyber Arcade - Barbie
-    Lexibook Compact Cyber Arcade - Finding Dory
-    Lexibook Compact Cyber Arcade - PJ Masks
-
-    (Handheld units, but different form factor to Compact Cyber Arcade, charged via USB)
-    Lexibook Console Colour - Barbie
-
-    (units for use with TV)
-    Lexibook Retro TV Game Console (300 Games) - Cars
-    Lexibook Retro TV Game Console (300 Games) - PJ Masks
-
-    (more?)
-
-    There are also updated 'Compact Cyber Arcade' branded units with a large + D-pad and internal battery / USB charger for
-    Spiderman
-    Frozen
-    (generic)
-    it isn't verified if these use the same ROMs as the original Compact Cyber Arcade releases, or if the software has been updated
-
-*/
-
-// intial code isn't valid? scrambled?
-CONS( 201?, red5mam,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Red5", "Mini Arcade Machine (Red5)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
-
-CONS( 201?, denv150,   0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Denver", "Denver Game Console GMP-240C 150-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-
-// same encryption as above, but seems like newer hardware (or the above aren't using most of the features)
-CONS( 200?, lpgm240,    0,  0,  nes_vt_vh2009_8mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "<unknown>", "Let's Play! Game Machine 240 in 1", MACHINE_NOT_WORKING ) // mini 'retro-arcade' style cabinet
-
-CONS( 2017, otrail,     0,        0,  nes_vt_dg_1mb, nes_vt, nes_vt_dg_state, empty_init, "Basic Fun", "The Oregon Trail", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-
-CONS( 200?, zonefusn,  0,         0,  nes_vt_fp_16mb,     nes_vt, nes_vt09_state, empty_init, "Ultimate Products / Jungle's Soft", "Zone Fusion",  MACHINE_NOT_WORKING )
