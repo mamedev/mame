@@ -699,8 +699,8 @@ element
     Adds an element to the view (see :ref:`layout-parts-elements`).  The name of
     the element to add is specified using the required ``ref`` attribute.  It is
     an error if no element with this name is defined in the layout file.  Within
-    a layer, elements are drawn in the order they appear in the layout file,
-    from front to back.  See below for more details.
+    a view, elements are drawn in the order they appear in the layout file, from
+    front to back.  See below for more details.
 
     May optionally be connected to an emulated I/O port using ``inputtag`` and
     ``inputmask`` attributes, and/or an emulated output using a ``name``

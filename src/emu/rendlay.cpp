@@ -41,7 +41,7 @@
 #define LOG_DISK_DRAW               (1U << 3)
 #define LOG_IMAGE_LOAD              (1U << 4)
 
-//#define VERBOSE (LOG_GROUP_BOUNDS_RESOLUTION | LOG_INTERACTIVE_ITEMS | LOG_IMAGE_LOAD)
+//#define VERBOSE (LOG_GROUP_BOUNDS_RESOLUTION | LOG_INTERACTIVE_ITEMS | LOG_DISK_DRAW | LOG_IMAGE_LOAD)
 #define LOG_OUTPUT_FUNC osd_printf_verbose
 #include "logmacro.h"
 
@@ -2167,6 +2167,7 @@ public:
 			// row spanning the axis
 			if ((maxy > y) && (float(y) < ycenter))
 			{
+				float const xval0 = xval1;
 				float const l0 = l1;
 				float const r0 = r1;
 				ycoord1 = float(y + 1) - ycenter;
@@ -2191,19 +2192,19 @@ public:
 						if (float(x + 1) <= l0)
 							val += integral((xcenter - float(x + 1)) / xradius, (std::min)((xcenter - float(x)) / xradius, 1.0F));
 						else if (float(x) <= l0)
-							val += integral((xcenter - l0) / xradius, (std::min)((xcenter - float(x)) / xradius, 1.0F));
+							val += integral(xval0, (std::min)((xcenter - float(x)) / xradius, 1.0F));
 						else if (float(x) >= r0)
 							val += integral((float(x) - xcenter) / xradius, (std::min)((float(x + 1) - xcenter) / xradius, 1.0F));
 						else if (float(x + 1) >= r0)
-							val += integral((r0 - xcenter) / xradius, (std::min)((float(x + 1) - xcenter) / xradius, 1.0F));
+							val += integral(xval0, (std::min)((float(x + 1) - xcenter) / xradius, 1.0F));
 						if (float(x + 1) <= l1)
 							val += integral((xcenter - float(x + 1)) / xradius, (std::min)((xcenter - float(x)) / xradius, 1.0F));
 						else if (float(x) <= l1)
-							val += integral((xcenter - l1) / xradius, (std::min)((xcenter - float(x)) / xradius, 1.0F));
+							val += integral(xval1, (std::min)((xcenter - float(x)) / xradius, 1.0F));
 						else if (float(x) >= r1)
 							val += integral((float(x) - xcenter) / xradius, (std::min)((float(x + 1) - xcenter) / xradius, 1.0F));
 						else if (float(x + 1) >= r1)
-							val += integral((r1 - xcenter) / xradius, (std::min)((float(x + 1) - xcenter) / xradius, 1.0F));
+							val += integral(xval1, (std::min)((float(x + 1) - xcenter) / xradius, 1.0F));
 						val *= scale;
 						val += (std::max)(((std::min)(float(x + 1), r0) - (std::max)(float(x), l0)), 0.0F) * (ycenter - float(y));
 						val += (std::max)(((std::min)(float(x + 1), r1) - (std::max)(float(x), l1)), 0.0F) * (float(y + 1) - ycenter);
