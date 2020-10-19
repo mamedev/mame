@@ -114,7 +114,7 @@ jmp_zpi
 	prefetch();
 
 jsr_zpi
-	TMP2 = read_pc();
+	TMP2 = read_pc_noinc();
 	read(SP);
 	write(SP, PC>>8);
 	dec_SP();
