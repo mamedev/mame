@@ -4,6 +4,8 @@
 
   nes_vt.cpp
 
+  VT02/VT03 systems go in here
+
   NON-bugs (same happens on real hardware)
 
   Pause screen has corrupt GFX on enhanced version of Octopus

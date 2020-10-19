@@ -4,6 +4,8 @@
 
   nes_vt09.cpp
 
+  VT09 and higher go in here
+
   NON-bugs (same happens on real hardware)
 
   msisinv: Taito screen has bad palette, it's encoded as VT03 but hardware is VT09
@@ -116,11 +118,6 @@ public:
 	void vt_external_space_map_1mbyte(address_map& map);
 	void vt_external_space_map_512kbyte(address_map& map);
 
-	void nes_vt09new_1mb_majkon(machine_config& config);
-	void vt_external_space_map_1mbyte_majkon(address_map& map);
-
-	void init_protpp();
-
 protected:
 	required_device<nes_vt_soc_device> m_soc;
 };
@@ -133,127 +130,10 @@ public:
 		nes_vt09new_state(mconfig, type, tag)
 	{ }
 
-	void nes_vt09new_vh2009(machine_config& config);
-	void nes_vt09new_vh2009_1mb(machine_config& config);
-	void nes_vt09new_vh2009_2mb(machine_config& config);
-	void nes_vt09new_vh2009_4mb(machine_config& config);
 	void nes_vt09new_vh2009_8mb(machine_config& config);
-
-	void nes_vt09new_senwld_512kb(machine_config& config);
-
 protected:
-	void vt_external_space_map_senwld_512kbyte(address_map& map);
 };
 
-class nes_vt09new_pjoy_state : public nes_vt09new_state
-{
-public:
-	nes_vt09new_pjoy_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt09new_state(mconfig, type, tag)
-	{ }
-
-	void nes_vt09new_pjoy_4mb(machine_config& config);
-};
-
-class nes_vt09new_waixing_state : public nes_vt09new_state
-{
-public:
-	nes_vt09new_waixing_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt09new_state(mconfig, type, tag)
-	{ }
-
-	void nes_vt09new_waixing_512kb(machine_config& config);
-	void nes_vt09new_waixing_512kb_rasterhack(machine_config& config);
-	void nes_vt09new_waixing_2mb(machine_config& config);
-};
-
-class nes_vt09new_waixing_alt_state : public nes_vt09new_waixing_state
-{
-public:
-	nes_vt09new_waixing_alt_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt09new_waixing_state(mconfig, type, tag)
-	{ }
-
-	void nes_vt09new_waixing_alt_4mb(machine_config& config);
-	void nes_vt09new_waixing_alt_pal_8mb(machine_config& config);
-};
-
-class nes_vt09new_waixing_alt_sporzpp_state : public nes_vt09new_waixing_alt_state
-{
-public:
-	nes_vt09new_waixing_alt_sporzpp_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt09new_waixing_alt_state(mconfig, type, tag)
-	{ }
-
-	void nes_vt09new_waixing_alt_4mb_sporzpp(machine_config& config);
-
-private:
-	uint8_t in1_r() override
-	{
-		uint8_t i = machine().rand() & 0x18;
-		uint8_t ret = m_io1->read() & ~0x18;
-		return i | ret;
-	}
-};
-
-class nes_vt09new_wldsoctv_state : public nes_vt09new_state
-{
-public:
-	nes_vt09new_wldsoctv_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt09new_state(mconfig, type, tag)
-	{ }
-
-private:
-	uint8_t in1_r() override
-	{
-		uint8_t i = machine().rand() & 0x18;
-		uint8_t ret = m_io1->read() & ~0x18;
-		return i | ret;
-	}
-};
-
-class nes_vt09new_timetp36_state : public nes_vt09new_state
-{
-public:
-	nes_vt09new_timetp36_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt09new_state(mconfig, type, tag)
-	{ }
-};
-
-class nes_vt09new_hum_state : public nes_vt09new_state
-{
-public:
-	nes_vt09new_hum_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt09new_state(mconfig, type, tag)
-	{ }
-
-	void nes_vt09new_hummer_2mb(machine_config& config);
-	void nes_vt09new_hummer_4mb(machine_config& config);
-};
-
-class nes_vt09new_sp69_state : public nes_vt09new_state
-{
-public:
-	nes_vt09new_sp69_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt09new_state(mconfig, type, tag)
-	{ }
-
-	void nes_vt09new_4mb_sp69(machine_config& config);
-};
-
-class nes_vt09new_ablping_state : public nes_vt09new_state
-{
-public:
-	nes_vt09new_ablping_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt09new_state(mconfig, type, tag)
-	{ }
-
-	void nes_vt09new_2mb_ablping(machine_config& config);
-
-private:
-	uint8_t ablping_extraio_r();
-	void ablping_extraio_w(uint8_t data);
-};
 
 class nes_vt09new_cy_state : public nes_vt09new_state
 {
@@ -285,21 +165,14 @@ class nes_vt09new_cy_lexibook_state : public nes_vt09new_cy_state
 {
 public:
 	nes_vt09new_cy_lexibook_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt09new_cy_state(mconfig, type, tag),
-		m_latch0_bit(0),
-		m_latch1_bit(0)
+		nes_vt09new_cy_state(mconfig, type, tag)
 	{ }
 
 	void init_lxcmcypp();
 
 protected:
-	virtual uint8_t in0_r() override;
-	virtual uint8_t in1_r() override;
-	virtual void in0_w(uint8_t data) override;
-
 private:
-	uint8_t m_latch0_bit;
-	uint8_t m_latch1_bit;
+
 };
 
 
@@ -384,35 +257,6 @@ private:
 	void fcpocket_412c_w(uint8_t data);
 };
 
-class nes_vt09new_ablpinb_state : public nes_vt09new_state
-{
-public:
-	nes_vt09new_ablpinb_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt09new_state(mconfig, type, tag),
-		m_ablpinb_in0_val(0),
-		m_plunger(*this, "PLUNGER")
-	{ }
-
-	void nes_vt09new_waixing_alt_4mb_sporzpp(machine_config& config);
-
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-private:
-	virtual uint8_t in0_r() override;
-	virtual uint8_t in1_r() override;
-	virtual void in0_w(uint8_t data) override;
-
-	uint8_t m_ablpinb_in0_val;
-
-	int m_plunger_off;
-	int m_plunger_state_count;
-
-	required_ioport m_plunger;
-};
-
-
 uint8_t nes_vt09new_base_state::vt_rom_r(offs_t offset)
 {
 	return m_prgrom[offset];
@@ -457,20 +301,6 @@ void nes_vt09new_state::vt_external_space_map_1mbyte(address_map &map)
 void nes_vt09new_state::vt_external_space_map_512kbyte(address_map &map)
 {
 	map(0x0000000, 0x007ffff).mirror(0x1f80000).r(FUNC(nes_vt09new_state::vt_rom_r));
-}
-
-// Win Lose Draw has RAM as well as ROM
-void nes_vt09new_swap_op_d5_d6_state::vt_external_space_map_senwld_512kbyte(address_map &map)
-{
-	map(0x0000000, 0x007ffff).r(FUNC(nes_vt09new_swap_op_d5_d6_state::vt_rom_r));
-	map(0x0100000, 0x010ffff).ram();
-	map(0x0180000, 0x01fffff).r(FUNC(nes_vt09new_swap_op_d5_d6_state::vt_rom_r));
-}
-
-void nes_vt09new_state::vt_external_space_map_1mbyte_majkon(address_map &map)
-{
-	map(0x0000000, 0x00fffff).mirror(0x1f00000).r(FUNC(nes_vt09new_state::vt_rom_r));
-	map(0x1400000, 0x1401fff).ram(); // rush'n attack writes to chr space, after setting the program and character outer bank to a mirror, is the correct way to handle it?	
 }
 
 // bitboy is 2 16Mbyte banks
@@ -586,57 +416,6 @@ void nes_vt09new_base_state::in0_w(uint8_t data)
 	m_previous_port0 = data;
 }
 
-/* Lexibook I/O handlers */
-
-uint8_t nes_vt09new_cy_lexibook_state::in0_r()
-{
-	//logerror("%s: in0_r\n", machine().describe_context());
-	uint8_t ret = m_latch0_bit;
-	return ret;
-}
-
-uint8_t nes_vt09new_cy_lexibook_state::in1_r()
-{
-	//logerror("%s: in1_r\n", machine().describe_context());
-	uint8_t ret = m_latch1_bit;
-	return ret;
-}
-
-void nes_vt09new_cy_lexibook_state::in0_w(uint8_t data)
-{
-	//logerror("%s: in0_w %02x\n", machine().describe_context(), data);
-	if ((!(data & 0x01)) && (m_previous_port0 & 0x01)) // 0x03 -> 0x02 transition
-	{
-		m_latch0 = m_io0->read();
-		m_latch1 = m_io1->read();
-	}
-
-	if ((!(data & 0x02)) && (m_previous_port0 & 0x02)) // 0x02 -> 0x00 transition
-	{
-		m_latch0_bit = m_latch0 & 0x01;
-		m_latch0 >>= 1;
-		m_latch1_bit = m_latch1 & 0x01;
-		m_latch1 >>= 1;
-	}
-
-	m_previous_port0 = data;
-}
-
-
-
-// ablping polls this (also writes here) what is it? 4-bit DAC? PCM? (inputs only start responding once it finishes writing data on startup but takes longer than a sample should)
-// (this is the extended IO port on VT)
-uint8_t nes_vt09new_ablping_state::ablping_extraio_r()
-{
-	// needs to change at least
-	return machine().rand()&0xf;
-};
-
-void nes_vt09new_ablping_state::ablping_extraio_w(uint8_t data)
-{
-	popmessage("ablping_extraio_w %02x", data);
-};
-
 
 void nes_vt09new_base_state::machine_start()
 {
@@ -674,79 +453,6 @@ void nes_vt09new_dg_fapocket_state::machine_reset()
 	else
 		m_ahigh = 0;
 }
-
-void nes_vt09new_ablpinb_state::machine_start()
-{
-	nes_vt09new_base_state::machine_start();
-
-	save_item(NAME(m_plunger_off));
-	save_item(NAME(m_plunger_state_count));
-	save_item(NAME(m_ablpinb_in0_val));
-
-}
-
-void nes_vt09new_ablpinb_state::machine_reset()
-{
-	nes_vt09new_base_state::machine_reset();
-
-	m_plunger_off = 0;
-	m_plunger_state_count = 0;
-	m_ablpinb_in0_val = 0;
-}
-
-
-uint8_t nes_vt09new_ablpinb_state::in0_r()
-{
-	if (m_plunger_off)
-	{
-		m_plunger_state_count++;
-
-		if (m_plunger_state_count == 5) // make sure it's high for enough reads to keep the code flowing
-		{
-			m_plunger_off = 0;
-			m_plunger_state_count = 0;
-		}
-	}
-	else
-	{
-		m_plunger_state_count++;
-
-		if ((m_plunger_state_count >= m_plunger->read()) || (m_plunger_state_count >= 0x80)) // if it stays low for too many frames the gfx corrupt,
-		{
-			m_plunger_off = 1;
-			m_plunger_state_count = 0;
-		}
-	}
-
-	uint8_t ret = m_io0->read() & ~0x01;
-
-	return m_plunger_off | ret;
-}
-
-
-uint8_t nes_vt09new_ablpinb_state::in1_r()
-{
-	uint8_t i = machine().rand() & 0x10;
-
-	// maybe this transition takes some time in reality?
-	i |= (m_ablpinb_in0_val & 0x04) ? 0x00 : 0x08;
-
-	uint8_t ret = m_io1->read() & ~0x18;
-
-	return i | ret;
-}
-
-void nes_vt09new_ablpinb_state::in0_w(uint8_t data)
-{
-	// write 0x04 to 0x4016 sets bit 0x08 in 0x4017
-	// write 0x00 to 0x4016 clears bit 0x08 in 0x4017
-	// could be related to vibration motor?
-
-	m_ablpinb_in0_val = data;
-	logerror("in0_w %02x\n", data);
-}
-
-
 void nes_vt09new_base_state::configure_soc(nes_vt_soc_device* soc)
 {
 	soc->set_addrmap(AS_PROGRAM, &nes_vt09new_state::vt_external_space_map_32mbyte);
@@ -854,108 +560,6 @@ void nes_vt09new_state::nes_vt09new_pal_8mb(machine_config& config)
 	NES_VT_SOC_PAL(config, m_soc, PAL_APU_CLOCK);
 	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new_state::vt_external_space_map_8mbyte);
-}
-
-void nes_vt09new_waixing_state::nes_vt09new_waixing_512kb(machine_config &config)
-{
-	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new_waixing_state::vt_external_space_map_512kbyte);
-	m_soc->set_201x_descramble(0x3, 0x2, 0x7, 0x6, 0x5, 0x4);
-}
-
-void nes_vt09new_waixing_state::nes_vt09new_waixing_512kb_rasterhack(machine_config &config)
-{
-	nes_vt09new_waixing_512kb(config);
-	m_soc->force_raster_timing_hack();
-}
-
-
-void nes_vt09new_waixing_state::nes_vt09new_waixing_2mb(machine_config &config)
-{
-	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new_waixing_state::vt_external_space_map_2mbyte);
-	m_soc->set_201x_descramble(0x3, 0x2, 0x7, 0x6, 0x5, 0x4);
-}
-
-void nes_vt09new_waixing_alt_state::nes_vt09new_waixing_alt_4mb(machine_config &config)
-{
-	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new_waixing_state::vt_external_space_map_4mbyte);
-	m_soc->set_201x_descramble(0x3, 0x2, 0x7, 0x6, 0x5, 0x4);
-	m_soc->set_8000_scramble(0x5, 0x4, 0x3, 0x2, 0x7, 0x6, 0x7, 0x8);
-}
-
-void nes_vt09new_waixing_alt_state::nes_vt09new_waixing_alt_pal_8mb(machine_config &config)
-{
-	NES_VT_SOC_PAL(config, m_soc, PAL_APU_CLOCK);
-	configure_soc(m_soc);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new_waixing_alt_state::vt_external_space_map_8mbyte);
-	m_soc->set_201x_descramble(0x3, 0x2, 0x7, 0x6, 0x5, 0x4);
-	m_soc->set_8000_scramble(0x5, 0x4, 0x3, 0x2, 0x7, 0x6, 0x7, 0x8);
-}
-
-void nes_vt09new_waixing_alt_sporzpp_state::nes_vt09new_waixing_alt_4mb_sporzpp(machine_config& config)
-{
-	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
-
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new_ablping_state::vt_external_space_map_4mbyte);
-	m_soc->set_201x_descramble(0x3, 0x2, 0x7, 0x6, 0x5, 0x4);
-	m_soc->set_8000_scramble(0x5, 0x4, 0x3, 0x2, 0x7, 0x6, 0x7, 0x8);
-}
-
-
-void nes_vt09new_hum_state::nes_vt09new_hummer_2mb(machine_config& config)
-{
-	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new_sp69_state::vt_external_space_map_2mbyte);
-	m_soc->set_201x_descramble(0x7, 0x6, 0x5, 0x4, 0x2, 0x3);
-	m_soc->set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8);
-}
-
-void nes_vt09new_hum_state::nes_vt09new_hummer_4mb(machine_config& config)
-{
-	nes_vt09new_hummer_2mb(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new_hum_state::vt_external_space_map_4mbyte);
-}
-
-void nes_vt09new_pjoy_state::nes_vt09new_pjoy_4mb(machine_config &config)
-{
-	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new_sp69_state::vt_external_space_map_4mbyte);
-	m_soc->set_201x_descramble(0x2, 0x3, 0x4, 0x5, 0x6, 0x7);
-	m_soc->set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x8, 0x7);
-	m_soc->set_410x_scramble(0x8, 0x7);
-}
-
-
-void nes_vt09new_sp69_state::nes_vt09new_4mb_sp69(machine_config& config)
-{
-	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new_sp69_state::vt_external_space_map_4mbyte);
-	m_soc->set_201x_descramble(0x4, 0x7, 0x2, 0x6, 0x5, 0x3);
-	m_soc->set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8);
-}
-
-void nes_vt09new_ablping_state::nes_vt09new_2mb_ablping(machine_config &config)
-{
-	NES_VT_SOC_PAL(config, m_soc, PAL_APU_CLOCK);
-	configure_soc(m_soc);
-
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new_ablping_state::vt_external_space_map_2mbyte);
-	m_soc->set_201x_descramble(0x4, 0x7, 0x2, 0x6, 0x5, 0x3);
-	m_soc->set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8);
-
-	m_soc->extra_read_2_callback().set(FUNC(nes_vt09new_ablping_state::ablping_extraio_r));
-	m_soc->extra_read_3_callback().set(FUNC(nes_vt09new_ablping_state::ablping_extraio_r));
-	m_soc->extra_write_2_callback().set(FUNC(nes_vt09new_ablping_state::ablping_extraio_w));
-	m_soc->extra_write_3_callback().set(FUNC(nes_vt09new_ablping_state::ablping_extraio_w));
 }
 
 uint8_t nes_vt09new_base_state::upper_412c_r()
@@ -1150,15 +754,6 @@ void nes_vt09new09_state::nes_vt09new_hh_4mb(machine_config& config)
 }
 
 
-void nes_vt09new_state::nes_vt09new_1mb_majkon(machine_config& config)
-{
-	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new_state::vt_external_space_map_1mbyte_majkon);
-	m_soc->force_raster_timing_hack();
-}
-
-
 static INPUT_PORTS_START( nes_vt09new )
 	PORT_START("IO0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("A")
@@ -1323,44 +918,17 @@ void nes_vt09new_dg_state::nes_vt09new_fa_4x16mb(machine_config& config) // fapo
 }
 
 
-void nes_vt09new_swap_op_d5_d6_state::nes_vt09new_vh2009(machine_config &config)
+void nes_vt09new_swap_op_d5_d6_state::nes_vt09new_vh2009_8mb(machine_config& config)
 {
 	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 
 	NES_VT_SOC_SCRAMBLE(config.replace(), m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
-}
 
-void nes_vt09new_swap_op_d5_d6_state::nes_vt09new_vh2009_1mb(machine_config& config)
-{
-	nes_vt09new_vh2009(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new_swap_op_d5_d6_state::vt_external_space_map_1mbyte);
-}
-
-void nes_vt09new_swap_op_d5_d6_state::nes_vt09new_vh2009_2mb(machine_config& config)
-{
-	nes_vt09new_vh2009(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new_swap_op_d5_d6_state::vt_external_space_map_2mbyte);
-}
-void nes_vt09new_swap_op_d5_d6_state::nes_vt09new_vh2009_4mb(machine_config& config)
-{
-	nes_vt09new_vh2009(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new_swap_op_d5_d6_state::vt_external_space_map_4mbyte);
-}
-
-void nes_vt09new_swap_op_d5_d6_state::nes_vt09new_vh2009_8mb(machine_config& config)
-{
-	nes_vt09new_vh2009(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new_swap_op_d5_d6_state::vt_external_space_map_8mbyte);
 }
 
-
-void nes_vt09new_swap_op_d5_d6_state::nes_vt09new_senwld_512kb(machine_config &config)
-{
-	nes_vt09new_vh2009(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new_swap_op_d5_d6_state::vt_external_space_map_senwld_512kbyte);
-}
 
 static INPUT_PORTS_START( nes_vt09new_fp )
 	PORT_INCLUDE(nes_vt09new)
@@ -1659,24 +1227,6 @@ void nes_vt09new_cy_lexibook_state::init_lxcmcypp()
 		ROM[i] = bitswap<16>(ROM[i], 4, 5, 6, 7, 0, 1, 2, 3, 12, 13, 14, 15, 8, 9, 10, 11);
 	}
 }
-
-void nes_vt09new_state::init_protpp()
-{
-	// this gets the tiles correct
-	u8 *src = memregion("mainrom")->base();
-	int len = memregion("mainrom")->bytes();
-
-	std::vector<u8> buffer(len);
-	{
-		for (int i = 0; i < len; i++)
-		{
-			buffer[i] = bitswap<8>(src[i],3,1,2,0,7,5,6,4);
-		}
-
-		std::copy(buffer.begin(), buffer.end(), &src[0]);
-	}
-}
-
 
 
 // Runs fine, non-sport 121 in 1 games perfect, but minor graphical issues in
