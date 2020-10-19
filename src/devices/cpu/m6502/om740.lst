@@ -761,3 +761,9 @@ sbct_zpx
 	do_sbct(TMP);
 	write(X, TMP2);
 	prefetch();
+
+tst_zpg
+	TMP = read_pc();
+	TMP2 = read(TMP);
+	set_nz(TMP2);
+	prefetch();
