@@ -22251,6 +22251,7 @@ rad_sf2                         // (c)2004 Radica
 rad_sf2p                        // (c)2004 Radica
 rad_gen1                        // (c)2004 Radica
 rad_gen2                        // (c)2004 Radica
+rad_md1
 rad_ssoc                        // (c)2004 Radica
 rad_sonic
 rad_orun
@@ -32301,6 +32302,8 @@ zdog
 otrail
 denv150
 techni4
+senario25
+dgun851
 sporzpp
 sporzbx
 sporztn

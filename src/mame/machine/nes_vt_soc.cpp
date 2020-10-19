@@ -15,7 +15,7 @@
 
   VT08 - ?
 
-  VT09 - alt 4bpp modes?
+  VT09 - alt 4bpp mode, 4KB system RAM
 
   VT16 - ?
   VT18 - ?
