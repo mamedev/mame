@@ -214,6 +214,7 @@ void dragon_cart(device_slot_interface &device)
 	device.option_add("ssc", COCO_SSC);
 	device.option_add("ram", COCO_PAK_RAM);
 	device.option_add("orch90", COCO_ORCH90);
+	device.option_add("stereo_composer", COCO_STEREO_COMPOSER);
 	device.option_add("gmc", COCO_PAK_GMC);
 	device.option_add("pak", COCO_PAK);
 	device.option_add("ccpsg", COCO_PSG);

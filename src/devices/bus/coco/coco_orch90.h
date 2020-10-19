@@ -9,5 +9,6 @@
 
 // device type definition
 DECLARE_DEVICE_TYPE(COCO_ORCH90, device_cococart_interface)
+DECLARE_DEVICE_TYPE(COCO_STEREO_COMPOSER, device_cococart_interface)
 
 #endif // MAME_BUS_COCO_COCO_ORCH90_H

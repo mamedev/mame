@@ -164,6 +164,7 @@ static void coco_cart_slot1_3(device_slot_interface &device)
 	device.option_add("rs232", COCO_RS232);
 	device.option_add("dcmodem", COCO_DCMODEM);
 	device.option_add("orch90", COCO_ORCH90);
+	device.option_add("stereo_composer", COCO_STEREO_COMPOSER);
 	device.option_add("ssc", COCO_SSC);
 	device.option_add("ram", COCO_PAK_RAM);
 	device.option_add("games_master", COCO_PAK_GMC);
@@ -178,6 +179,7 @@ static void coco_cart_slot4(device_slot_interface &device)
 	device.option_add("rs232", COCO_RS232);
 	device.option_add("dcmodem", COCO_DCMODEM);
 	device.option_add("orch90", COCO_ORCH90);
+	device.option_add("stereo_composer", COCO_STEREO_COMPOSER);
 	device.option_add("ssc", COCO_SSC);
 	device.option_add("ram", COCO_PAK_RAM);
 	device.option_add("games_master", COCO_PAK_GMC);
