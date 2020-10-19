@@ -100,6 +100,8 @@ public:
 	void vt_external_space_map_1mbyte(address_map& map);
 	void vt_external_space_map_512kbyte(address_map& map);
 
+	void init_lxcmcypp();
+
 protected:
 	required_device<nes_vt_soc_device> m_soc;
 };
@@ -125,10 +127,7 @@ public:
 	{ }
 
 	void nes_vt09new_cy(machine_config& config);
-
 	void nes_vt09new_cy_bigger(machine_config& config);
-
-
 	void nes_vt09new_bt(machine_config& config);
 	void nes_vt09new_bt_2x16mb(machine_config& config);
 
@@ -142,21 +141,6 @@ private:
 
 	uint8_t vt_rom_banked_r(offs_t offset);
 };
-
-class nes_vt09new_cy_lexibook_state : public nes_vt09new_cy_state
-{
-public:
-	nes_vt09new_cy_lexibook_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt09new_cy_state(mconfig, type, tag)
-	{ }
-
-	void init_lxcmcypp();
-
-protected:
-private:
-
-};
-
 
 class nes_vt09new_dg_state : public nes_vt09new_state
 {
@@ -1101,7 +1085,7 @@ ROM_START( zonefusn )
 	ROM_LOAD( "fusion.bin", 0x00000, 0x1000000, CRC(240bf970) SHA1(1b82d95a252c08e52fb8da6320276574a30b60db) )
 ROM_END
 
-void nes_vt09new_cy_lexibook_state::init_lxcmcypp()
+void nes_vt09new_state::init_lxcmcypp()
 {
 	int size = memregion("mainrom")->bytes()/2;
 	uint16_t* ROM = (uint16_t*)memregion("mainrom")->base();
@@ -1210,27 +1194,27 @@ CONS( 2016, fcpocket,  0,  0,  nes_vt09new_fp_4x16mb,   nes_vt09new_fp, nes_vt09
 ****************************************************************************************************************/
 
 // don't even get to menu. very enhanced chipset, VT368/9?
-CONS( 2012, dgun2561,  0,  0,  nes_vt09new_cy_bigger, nes_vt09new, nes_vt09new_cy_lexibook_state, empty_init, "dreamGEAR", "My Arcade Portable Gaming System with 140 Games (DGUN-2561)", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
-CONS( 2016, dgun2593,  0,  0,  nes_vt09new_cy_bigger, nes_vt09new, nes_vt09new_cy_lexibook_state, empty_init, "dreamGEAR", "My Arcade Retro Arcade Machine - 300 Handheld Video Games (DGUN-2593)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
+CONS( 2012, dgun2561,  0,  0,  nes_vt09new_cy_bigger, nes_vt09new, nes_vt09new_state, empty_init, "dreamGEAR", "My Arcade Portable Gaming System with 140 Games (DGUN-2561)", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
+CONS( 2016, dgun2593,  0,  0,  nes_vt09new_cy_bigger, nes_vt09new, nes_vt09new_state, empty_init, "dreamGEAR", "My Arcade Retro Arcade Machine - 300 Handheld Video Games (DGUN-2593)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
 
-CONS( 200?, lxcmcy,    0,  0,  nes_vt09new_cy_bigger, nes_vt09new, nes_vt09new_cy_lexibook_state, empty_init,    "Lexibook", "Lexibook Compact Cyber Arcade", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
-CONS( 200?, lxcmc250,  0,  0,  nes_vt09new_cy_bigger, nes_vt09new, nes_vt09new_cy_lexibook_state, empty_init,    "Lexibook", "Lexibook Compact Cyber Arcade - 250-in-1 (JL2375)", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
-CONS( 200?, lxcmcysw,  0,  0,  nes_vt09new_cy_bigger, nes_vt09new, nes_vt09new_cy_lexibook_state, empty_init,    "Lexibook", "Lexibook Compact Cyber Arcade - Star Wars Rebels", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
-CONS( 200?, lxcmcyfz,  0,  0,  nes_vt09new_cy_bigger, nes_vt09new, nes_vt09new_cy_lexibook_state, empty_init,    "Lexibook", "Lexibook Compact Cyber Arcade - Frozen", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
-CONS( 200?, lxcmcydp,  0,  0,  nes_vt09new_cy_bigger, nes_vt09new, nes_vt09new_cy_lexibook_state, empty_init,    "Lexibook", "Lexibook Compact Cyber Arcade - Disney Princess", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
-CONS( 200?, lxcmcysp,  0,  0,  nes_vt09new_cy_bigger, nes_vt09new, nes_vt09new_cy_lexibook_state, empty_init,    "Lexibook", "Lexibook Compact Cyber Arcade - Marvel Ultimate Spider-Man", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
-CONS( 200?, lxcmcycr,  0,  0,  nes_vt09new_cy_bigger, nes_vt09new, nes_vt09new_cy_lexibook_state, empty_init,    "Lexibook", "Lexibook Compact Cyber Arcade - Cars", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
+CONS( 200?, lxcmcy,    0,  0,  nes_vt09new_cy_bigger, nes_vt09new, nes_vt09new_state, empty_init,    "Lexibook", "Lexibook Compact Cyber Arcade", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
+CONS( 200?, lxcmc250,  0,  0,  nes_vt09new_cy_bigger, nes_vt09new, nes_vt09new_state, empty_init,    "Lexibook", "Lexibook Compact Cyber Arcade - 250-in-1 (JL2375)", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
+CONS( 200?, lxcmcysw,  0,  0,  nes_vt09new_cy_bigger, nes_vt09new, nes_vt09new_state, empty_init,    "Lexibook", "Lexibook Compact Cyber Arcade - Star Wars Rebels", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
+CONS( 200?, lxcmcyfz,  0,  0,  nes_vt09new_cy_bigger, nes_vt09new, nes_vt09new_state, empty_init,    "Lexibook", "Lexibook Compact Cyber Arcade - Frozen", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
+CONS( 200?, lxcmcydp,  0,  0,  nes_vt09new_cy_bigger, nes_vt09new, nes_vt09new_state, empty_init,    "Lexibook", "Lexibook Compact Cyber Arcade - Disney Princess", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
+CONS( 200?, lxcmcysp,  0,  0,  nes_vt09new_cy_bigger, nes_vt09new, nes_vt09new_state, empty_init,    "Lexibook", "Lexibook Compact Cyber Arcade - Marvel Ultimate Spider-Man", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
+CONS( 200?, lxcmcycr,  0,  0,  nes_vt09new_cy_bigger, nes_vt09new, nes_vt09new_state, empty_init,    "Lexibook", "Lexibook Compact Cyber Arcade - Cars", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
 // the data order is swapped for this one, maybe other internal differences?
-CONS( 200?, lxcmcypp,  0,  0,  nes_vt09new_cy_bigger, nes_vt09new, nes_vt09new_cy_lexibook_state, init_lxcmcypp, "Lexibook", "Lexibook Compact Cyber Arcade - Paw Patrol", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
+CONS( 200?, lxcmcypp,  0,  0,  nes_vt09new_cy_bigger, nes_vt09new, nes_vt09new_state, init_lxcmcypp, "Lexibook", "Lexibook Compact Cyber Arcade - Paw Patrol", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
 
 
-CONS( 200?, lxccminn,  0,  0,  nes_vt09new_cy_bigger, nes_vt09new, nes_vt09new_cy_lexibook_state, empty_init,    "Lexibook", "Lexibook Console Colour - Minnie Mouse", MACHINE_NOT_WORKING ) // 64Mbyte (used) ROM, must be externally banked, or different addressing scheme
-CONS( 200?, lxccplan,  0,  0,  nes_vt09new_cy_bigger, nes_vt09new, nes_vt09new_cy_lexibook_state, empty_init,    "Lexibook", "Lexibook Console Colour - Disney's Planes", MACHINE_NOT_WORKING ) // 64Mbyte (used) ROM, must be externally banked, or different addressing scheme
+CONS( 200?, lxccminn,  0,  0,  nes_vt09new_cy_bigger, nes_vt09new, nes_vt09new_state, empty_init,    "Lexibook", "Lexibook Console Colour - Minnie Mouse", MACHINE_NOT_WORKING ) // 64Mbyte (used) ROM, must be externally banked, or different addressing scheme
+CONS( 200?, lxccplan,  0,  0,  nes_vt09new_cy_bigger, nes_vt09new, nes_vt09new_state, empty_init,    "Lexibook", "Lexibook Console Colour - Disney's Planes", MACHINE_NOT_WORKING ) // 64Mbyte (used) ROM, must be externally banked, or different addressing scheme
 
 
 // GB-NO13-Main-VT389-2 on PCBs
-CONS( 2016, rtvgc300,  0,  0,  nes_vt09new_cy_bigger, nes_vt09new, nes_vt09new_cy_lexibook_state, empty_init,    "Lexibook", "Lexibook Retro TV Game Console - 300 Games", MACHINE_NOT_WORKING )  // 64Mbyte ROM, must be externally banked, or different addressing scheme
-CONS( 2017, rtvgc300fz,0,  0,  nes_vt09new_cy_bigger, nes_vt09new, nes_vt09new_cy_lexibook_state, empty_init,    "Lexibook", "Lexibook Retro TV Game Console - Frozen - 300 Games", MACHINE_NOT_WORKING )  // 64Mbyte ROM, must be externally banked, or different addressing scheme
+CONS( 2016, rtvgc300,  0,  0,  nes_vt09new_cy_bigger, nes_vt09new, nes_vt09new_state, empty_init,    "Lexibook", "Lexibook Retro TV Game Console - 300 Games", MACHINE_NOT_WORKING )  // 64Mbyte ROM, must be externally banked, or different addressing scheme
+CONS( 2017, rtvgc300fz,0,  0,  nes_vt09new_cy_bigger, nes_vt09new, nes_vt09new_state, empty_init,    "Lexibook", "Lexibook Retro TV Game Console - Frozen - 300 Games", MACHINE_NOT_WORKING )  // 64Mbyte ROM, must be externally banked, or different addressing scheme
 
 
 /* The following are also confirmed to be NES/VT derived units, most having a standard set of games with a handful of lazy graphic mods thrown in to fit the unit theme
@@ -1258,9 +1242,9 @@ CONS( 2017, rtvgc300fz,0,  0,  nes_vt09new_cy_bigger, nes_vt09new, nes_vt09new_c
 */
 
 // intial code isn't valid? scrambled?
-CONS( 201?, red5mam,  0,  0,  nes_vt09new_cy_bigger, nes_vt09new, nes_vt09new_cy_lexibook_state, empty_init, "Red5", "Mini Arcade Machine (Red5)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
+CONS( 201?, red5mam,  0,  0,  nes_vt09new_cy_bigger, nes_vt09new, nes_vt09new_state, empty_init, "Red5", "Mini Arcade Machine (Red5)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
 
-CONS( 201?, denv150,   0,  0,  nes_vt09new_cy_bigger, nes_vt09new, nes_vt09new_cy_lexibook_state, empty_init, "Denver", "Denver Game Console GMP-240C 150-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, denv150,   0,  0,  nes_vt09new_cy_bigger, nes_vt09new, nes_vt09new_state, empty_init, "Denver", "Denver Game Console GMP-240C 150-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // same encryption as above, but seems like newer hardware (or the above aren't using most of the features)
 CONS( 200?, lpgm240,    0,  0,  nes_vt09new_vh2009_8mb,        nes_vt09new, nes_vt09new_swap_op_d5_d6_state, empty_init, "<unknown>", "Let's Play! Game Machine 240 in 1", MACHINE_NOT_WORKING ) // mini 'retro-arcade' style cabinet
