@@ -2660,13 +2660,26 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="datagem">
+	<software name="datagem102f" cloneof="datagem">
 		<description>DataGem 1.02F</description>
-		<year>1985</year>
-		<publisher>Merlin Computer Products</publisher>
+		<year>1984</year>
+		<publisher>Gemini</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="DataGem-1.02F.rom" size="16384" crc="bfb21e7e" sha1="043f372195f25acb3e55b042a8d8e9f3f4e3806f"/>
+				<rom name="DataGem-1.02F.rom" size="16384" crc="bfb21e7e" sha1="043f372195f25acb3e55b042a8d8e9f3f4e3806f" offset="0x0000" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="datagem">
+		<description>DataGem 2.039</description>
+		<year>1984</year>
+		<publisher>Gemini</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<feature name="slot" value="datagem" />
+			<dataarea name="rom" size="24576">
+				<rom name="DataGem_A-2.039.rom" size="16384" crc="99db6f25" sha1="89980609542ee392ba650ed781cd1d43fdefe55c" offset="0x0000"/>
+				<rom name="DataGem_B-2.039.rom" size="8192" crc="cda9aaf9" sha1="70d28e0771efc45036ea104e64f86aa2dd06492f" offset="0x4000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3733,13 +3746,48 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="epromer2" supported="no">
-		<description>Epromer II</description>
+	<software name="epromer23" cloneof="epromer2" supported="no">
+		<description>Epromer II 2.3</description>
 		<year>1985</year>
 		<publisher>Technomatic</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="EpromerII-2.3.rom" size="16384" crc="8a3369a8" sha1="6229c77b756a70b8cb70d050dddc1bd445e3026c"/>
+				<rom name="Epromer-2.3.rom" size="16384" crc="8a3369a8" sha1="6229c77b756a70b8cb70d050dddc1bd445e3026c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="epromer2" supported="no">
+		<description>Epromer II 2.5</description>
+		<year>1985</year>
+		<publisher>Technomatic</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Epromer-2.5.rom" size="16384" crc="3e0cc2bb" sha1="bbd419500ce7000fffa1cc7e40ebb3de71c0a298"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="epromer31" cloneof="epromer3" supported="no">
+		<description>Epromer III 3.1</description>
+		<year>1987</year>
+		<publisher>Technomatic</publisher>
+		<sharedfeat name="compatibility" value="M"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Epromer-3.1.rom" size="16384" crc="e7708fb8" sha1="7a5ae8778af9df3b3f8492e4b9cac2a9380a0dc7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="epromer3" supported="no">
+		<description>Epromer III 3.3</description>
+		<year>1987</year>
+		<publisher>Technomatic</publisher>
+		<sharedfeat name="compatibility" value="M"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Epromer-3.3.rom" size="16384" crc="d4f73f96" sha1="1798db3fe9478a2ebadd39015830ca001fbac730"/>
 			</dataarea>
 		</part>
 	</software>
