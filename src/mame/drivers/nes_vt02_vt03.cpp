@@ -6,6 +6,9 @@
 
   VT02/VT03 systems go in here
 
+  - 2KB RAM
+  - VT03 adds alt palette style (not available on VT02?)
+
   NON-bugs (same happens on real hardware)
 
   Pause screen has corrupt GFX on enhanced version of Octopus
@@ -56,7 +59,7 @@ protected:
 	uint8_t vt_rom_r(offs_t offset);
 	void vtspace_w(offs_t offset, uint8_t data);
 
-	void configure_soc(nes_vt_soc_device* soc);
+	void configure_soc(nes_vt02_vt03_soc_device* soc);
 
 	uint8_t upper_412c_r();
 	uint8_t upper_412d_r();
@@ -107,7 +110,7 @@ public:
 	void init_protpp();
 
 protected:
-	required_device<nes_vt_soc_device> m_soc;
+	required_device<nes_vt02_vt03_soc_device> m_soc;
 };
 
 
@@ -515,7 +518,7 @@ void nes_vt_ablpinb_state::in0_w(uint8_t data)
 }
 
 
-void nes_vt_base_state::configure_soc(nes_vt_soc_device* soc)
+void nes_vt_base_state::configure_soc(nes_vt02_vt03_soc_device* soc)
 {
 	soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_32mbyte);
 	soc->read_0_callback().set(FUNC(nes_vt_base_state::in0_r));
@@ -530,21 +533,21 @@ void nes_vt_base_state::configure_soc(nes_vt_soc_device* soc)
 
 void nes_vt_state::nes_vt_512kb(machine_config& config)
 {
-	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
+	NES_VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_512kbyte);
 }
 
 void nes_vt_state::nes_vt_1mb(machine_config& config)
 {
-	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
+	NES_VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_1mbyte);
 }
 
 void nes_vt_state::nes_vt_2mb(machine_config& config)
 {
-	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
+	NES_VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_2mbyte);
 }
@@ -553,56 +556,56 @@ void nes_vt_state::nes_vt_2mb(machine_config& config)
 
 void nes_vt_state::nes_vt_4mb(machine_config& config)
 {
-	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
+	NES_VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_4mbyte);
 }
 
 void nes_vt_state::nes_vt_8mb(machine_config& config)
 {
-	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
+	NES_VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_8mbyte);
 }
 
 void nes_vt_state::nes_vt_16mb(machine_config& config)
 {
-	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
+	NES_VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_16mbyte);
 }
 
 void nes_vt_state::nes_vt_32mb(machine_config& config)
 {
-	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
+	NES_VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_32mbyte);
 }
 
 void nes_vt_state::nes_vt_pal_2mb(machine_config& config)
 {
-	NES_VT_SOC_PAL(config, m_soc, PAL_APU_CLOCK);
+	NES_VT02_VT03_SOC_PAL(config, m_soc, PAL_APU_CLOCK);
 	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_2mbyte);
 }
 
 void nes_vt_state::nes_vt_pal_4mb(machine_config& config)
 {
-	NES_VT_SOC_PAL(config, m_soc, PAL_APU_CLOCK);
+	NES_VT02_VT03_SOC_PAL(config, m_soc, PAL_APU_CLOCK);
 	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_4mbyte);
 }
 
 void nes_vt_state::nes_vt_pal_8mb(machine_config& config)
 {
-	NES_VT_SOC_PAL(config, m_soc, PAL_APU_CLOCK);
+	NES_VT02_VT03_SOC_PAL(config, m_soc, PAL_APU_CLOCK);
 	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_8mbyte);
 }
 
 void nes_vt_waixing_state::nes_vt_waixing_512kb(machine_config &config)
 {
-	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
+	NES_VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_waixing_state::vt_external_space_map_512kbyte);
 	m_soc->set_201x_descramble(0x3, 0x2, 0x7, 0x6, 0x5, 0x4);
@@ -617,7 +620,7 @@ void nes_vt_waixing_state::nes_vt_waixing_512kb_rasterhack(machine_config &confi
 
 void nes_vt_waixing_state::nes_vt_waixing_2mb(machine_config &config)
 {
-	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
+	NES_VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_waixing_state::vt_external_space_map_2mbyte);
 	m_soc->set_201x_descramble(0x3, 0x2, 0x7, 0x6, 0x5, 0x4);
@@ -625,7 +628,7 @@ void nes_vt_waixing_state::nes_vt_waixing_2mb(machine_config &config)
 
 void nes_vt_waixing_alt_state::nes_vt_waixing_alt_4mb(machine_config &config)
 {
-	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
+	NES_VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_waixing_state::vt_external_space_map_4mbyte);
 	m_soc->set_201x_descramble(0x3, 0x2, 0x7, 0x6, 0x5, 0x4);
@@ -634,7 +637,7 @@ void nes_vt_waixing_alt_state::nes_vt_waixing_alt_4mb(machine_config &config)
 
 void nes_vt_waixing_alt_state::nes_vt_waixing_alt_pal_8mb(machine_config &config)
 {
-	NES_VT_SOC_PAL(config, m_soc, PAL_APU_CLOCK);
+	NES_VT02_VT03_SOC_PAL(config, m_soc, PAL_APU_CLOCK);
 	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_waixing_alt_state::vt_external_space_map_8mbyte);
 	m_soc->set_201x_descramble(0x3, 0x2, 0x7, 0x6, 0x5, 0x4);
@@ -643,7 +646,7 @@ void nes_vt_waixing_alt_state::nes_vt_waixing_alt_pal_8mb(machine_config &config
 
 void nes_vt_waixing_alt_sporzpp_state::nes_vt_waixing_alt_4mb_sporzpp(machine_config& config)
 {
-	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
+	NES_VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_ablping_state::vt_external_space_map_4mbyte);
@@ -654,7 +657,7 @@ void nes_vt_waixing_alt_sporzpp_state::nes_vt_waixing_alt_4mb_sporzpp(machine_co
 
 void nes_vt_hum_state::nes_vt_hummer_2mb(machine_config& config)
 {
-	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
+	NES_VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_sp69_state::vt_external_space_map_2mbyte);
 	m_soc->set_201x_descramble(0x7, 0x6, 0x5, 0x4, 0x2, 0x3);
@@ -669,7 +672,7 @@ void nes_vt_hum_state::nes_vt_hummer_4mb(machine_config& config)
 
 void nes_vt_pjoy_state::nes_vt_pjoy_4mb(machine_config &config)
 {
-	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
+	NES_VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_sp69_state::vt_external_space_map_4mbyte);
 	m_soc->set_201x_descramble(0x2, 0x3, 0x4, 0x5, 0x6, 0x7);
@@ -680,7 +683,7 @@ void nes_vt_pjoy_state::nes_vt_pjoy_4mb(machine_config &config)
 
 void nes_vt_sp69_state::nes_vt_4mb_sp69(machine_config& config)
 {
-	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
+	NES_VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_sp69_state::vt_external_space_map_4mbyte);
 	m_soc->set_201x_descramble(0x4, 0x7, 0x2, 0x6, 0x5, 0x3);
@@ -689,7 +692,7 @@ void nes_vt_sp69_state::nes_vt_4mb_sp69(machine_config& config)
 
 void nes_vt_ablping_state::nes_vt_2mb_ablping(machine_config &config)
 {
-	NES_VT_SOC_PAL(config, m_soc, PAL_APU_CLOCK);
+	NES_VT02_VT03_SOC_PAL(config, m_soc, PAL_APU_CLOCK);
 	configure_soc(m_soc);
 
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_ablping_state::vt_external_space_map_2mbyte);
@@ -722,7 +725,7 @@ void nes_vt_base_state::upper_412c_w(uint8_t data)
 
 void nes_vt_state::nes_vt_1mb_majkon(machine_config& config)
 {
-	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
+	NES_VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_1mbyte_majkon);
 	m_soc->force_raster_timing_hack();
@@ -792,10 +795,10 @@ INPUT_PORTS_END
 
 void nes_vt_swap_op_d5_d6_state::nes_vt_vh2009(machine_config &config)
 {
-	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
+	NES_VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 
-	NES_VT_SOC_SCRAMBLE(config.replace(), m_soc, NTSC_APU_CLOCK);
+	NES_VT02_VT03_SOC_SCRAMBLE(config.replace(), m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 }
 

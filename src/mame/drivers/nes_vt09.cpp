@@ -6,6 +6,10 @@
 
   VT09 and higher go in here
 
+  - 4KB RAM
+  - Optional alt 4bpp tile mode
+  - DMA acts the same in both NTSC and PAL modes
+
   NON-bugs (same happens on real hardware)
 
   msisinv: Taito screen has bad palette, it's encoded as VT03 but hardware is VT09
@@ -57,7 +61,7 @@ protected:
 	uint8_t vt_rom_r(offs_t offset);
 	void vtspace_w(offs_t offset, uint8_t data);
 
-	void configure_soc(nes_vt_soc_device* soc);
+	void configure_soc(nes_vt02_vt03_soc_device* soc);
 
 	uint8_t upper_412c_r();
 	uint8_t upper_412d_r();
@@ -91,23 +95,23 @@ public:
 
 
 protected:
-	required_device<nes_vt_soc_device> m_soc;
+	required_device<nes_vt02_vt03_soc_device> m_soc;
 };
 
-class nes_vt09new09_state : public nes_vt09new_state
+class nes_vt09_state : public nes_vt09new_state
 {
 public:
-	nes_vt09new09_state(const machine_config& mconfig, device_type type, const char* tag) :
+	nes_vt09_state(const machine_config& mconfig, device_type type, const char* tag) :
 		nes_vt09new_state(mconfig, type, tag)
 	{ }
 
-	void nes_vt09new09(machine_config& config);
-	void nes_vt09new09_1mb(machine_config& config);
-	void nes_vt09new09_2mb(machine_config& config);
-	void nes_vt09new09_4mb(machine_config& config);
-	void nes_vt09new09_4mb_rasterhack(machine_config& config);
-	void nes_vt09new09_8mb(machine_config& config);
-	void nes_vt09new09_16mb(machine_config& config);
+	void nes_vt09(machine_config& config);
+	void nes_vt09_1mb(machine_config& config);
+	void nes_vt09_2mb(machine_config& config);
+	void nes_vt09_4mb(machine_config& config);
+	void nes_vt09_4mb_rasterhack(machine_config& config);
+	void nes_vt09_8mb(machine_config& config);
+	void nes_vt09_16mb(machine_config& config);
 
 private:
 };
@@ -254,7 +258,7 @@ void nes_vt09new_base_state::machine_reset()
 {
 }
 
-void nes_vt09new_base_state::configure_soc(nes_vt_soc_device* soc)
+void nes_vt09new_base_state::configure_soc(nes_vt02_vt03_soc_device* soc)
 {
 	soc->set_addrmap(AS_PROGRAM, &nes_vt09new_state::vt_external_space_map_32mbyte);
 	soc->read_0_callback().set(FUNC(nes_vt09new_base_state::in0_r));
@@ -287,52 +291,52 @@ void nes_vt09new_base_state::upper_412c_w(uint8_t data)
 
 
 
-void nes_vt09new09_state::nes_vt09new09(machine_config &config)
+void nes_vt09_state::nes_vt09(machine_config &config)
 {
 	/* basic machine hardware */
-	NES_VT_SOC_4KRAM(config, m_soc, NTSC_APU_CLOCK);
+	NES_VT09_SOC(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 
-	dynamic_cast<nes_vt_soc_4kram_device&>(*m_soc).upper_read_412c_callback().set(FUNC(nes_vt09new09_state::upper_412c_r));
-	dynamic_cast<nes_vt_soc_4kram_device&>(*m_soc).upper_read_412d_callback().set(FUNC(nes_vt09new09_state::upper_412d_r));
-	dynamic_cast<nes_vt_soc_4kram_device&>(*m_soc).upper_write_412c_callback().set(FUNC(nes_vt09new09_state::upper_412c_w));
+	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_read_412c_callback().set(FUNC(nes_vt09_state::upper_412c_r));
+	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_read_412d_callback().set(FUNC(nes_vt09_state::upper_412d_r));
+	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_write_412c_callback().set(FUNC(nes_vt09_state::upper_412c_w));
 
 	m_soc->force_bad_dma();
 }
 
-void nes_vt09new09_state::nes_vt09new09_16mb(machine_config& config)
+void nes_vt09_state::nes_vt09_16mb(machine_config& config)
 {
-	nes_vt09new09(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new09_state::vt_external_space_map_16mbyte);
+	nes_vt09(config);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09_state::vt_external_space_map_16mbyte);
 }
 
-void nes_vt09new09_state::nes_vt09new09_8mb(machine_config& config)
+void nes_vt09_state::nes_vt09_8mb(machine_config& config)
 {
-	nes_vt09new09(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new09_state::vt_external_space_map_8mbyte);
+	nes_vt09(config);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09_state::vt_external_space_map_8mbyte);
 }
 
-void nes_vt09new09_state::nes_vt09new09_1mb(machine_config& config)
+void nes_vt09_state::nes_vt09_1mb(machine_config& config)
 {
-	nes_vt09new09(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new09_state::vt_external_space_map_1mbyte);
+	nes_vt09(config);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09_state::vt_external_space_map_1mbyte);
 }
 
-void nes_vt09new09_state::nes_vt09new09_2mb(machine_config& config)
+void nes_vt09_state::nes_vt09_2mb(machine_config& config)
 {
-	nes_vt09new09(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new09_state::vt_external_space_map_2mbyte);
+	nes_vt09(config);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09_state::vt_external_space_map_2mbyte);
 }
 
-void nes_vt09new09_state::nes_vt09new09_4mb(machine_config& config)
+void nes_vt09_state::nes_vt09_4mb(machine_config& config)
 {
-	nes_vt09new09(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new09_state::vt_external_space_map_4mbyte);
+	nes_vt09(config);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09_state::vt_external_space_map_4mbyte);
 }
 
-void nes_vt09new09_state::nes_vt09new09_4mb_rasterhack(machine_config& config)
+void nes_vt09_state::nes_vt09_4mb_rasterhack(machine_config& config)
 {
-	nes_vt09new09_4mb(config);
+	nes_vt09_4mb(config);
 	m_soc->force_raster_timing_hack();
 }
 
@@ -479,35 +483,35 @@ ROM_END
 
 // There are meant to be multiple revisions of this software, some with theme tunes for the new wrestlers, some without. This one appears to lack them.
 // 2 box variations exist, one with Randy Savage in purple attire and another with green, this was dumped from a unit with purple on the box.
-CONS( 2017, msiwwe,     0,      0,  nes_vt09new09_2mb, nes_vt09new_msi, nes_vt09new09_state, empty_init, "MSI", "WWE Wrestlemania Steel Cage Challenge (Plug & Play) (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2017, msiwwe,     0,      0,  nes_vt09_2mb, nes_vt09new_msi, nes_vt09_state, empty_init, "MSI", "WWE Wrestlemania Steel Cage Challenge (Plug & Play) (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // this one was dumped from the version with Randy Savage in green, the box was much larger than the other one.  This one also has new theme music for the adjusted roster.
-CONS( 2017, msiwwea,    msiwwe, 0,  nes_vt09new09_1mb, nes_vt09new_msi, nes_vt09new09_state, empty_init, "MSI", "WWE Wrestlemania Steel Cage Challenge (Plug & Play) (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2017, msiwwea,    msiwwe, 0,  nes_vt09_1mb, nes_vt09new_msi, nes_vt09_state, empty_init, "MSI", "WWE Wrestlemania Steel Cage Challenge (Plug & Play) (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2017, msidd,      0,  0,  nes_vt09new09_2mb, nes_vt09new_msi, nes_vt09new09_state, empty_init, "MSI / Arc System Works", "Double Dragon - 30 Years Anniversary (Plug & Play)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2017, msidd,      0,  0,  nes_vt09_2mb, nes_vt09new_msi, nes_vt09_state, empty_init, "MSI / Arc System Works", "Double Dragon - 30 Years Anniversary (Plug & Play)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2016, msimpac,    0,  0,  nes_vt09new09_1mb, nes_vt09new_msi, nes_vt09new09_state, empty_init, "MSI / Bandai Namco", "Ms. Pac-Man (MSI Plug & Play)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2016, msimpac,    0,  0,  nes_vt09_1mb, nes_vt09new_msi, nes_vt09_state, empty_init, "MSI / Bandai Namco", "Ms. Pac-Man (MSI Plug & Play)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2017, msimm2,     0,  0,  nes_vt09new09_4mb, nes_vt09new_msi_mm2, nes_vt09new09_state, empty_init, "MSI / Capcom", "Mega Man 2 (MSI Plug & Play)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // various issues (glitched Metal Man stage boss, missing 'ready' text) happen on real unit
+CONS( 2017, msimm2,     0,  0,  nes_vt09_4mb, nes_vt09new_msi_mm2, nes_vt09_state, empty_init, "MSI / Capcom", "Mega Man 2 (MSI Plug & Play)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // various issues (glitched Metal Man stage boss, missing 'ready' text) happen on real unit
 
-CONS( 2016, msisinv,    0,  0,  nes_vt09new09_1mb, nes_vt09new_msi, nes_vt09new09_state, empty_init, "MSI / Taito", "Space Invaders (MSI Plug & Play)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2016, msisinv,    0,  0,  nes_vt09_1mb, nes_vt09new_msi, nes_vt09_state, empty_init, "MSI / Taito", "Space Invaders (MSI Plug & Play)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // This is from the version with the same case type as the above MSI units.
 // MSI also issued a version in the original Majesco shell but with the updated case logos and boot logos in the software, the software on that revision might match this one.
-CONS( 2016, msifrog,    0,  0,  nes_vt09new09_4mb_rasterhack, nes_vt09new_msi, nes_vt09new09_state, empty_init, "MSI / Konami", "Frogger (MSI Plug & Play, white joystick)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) //  raster timing for need a hack
+CONS( 2016, msifrog,    0,  0,  nes_vt09_4mb_rasterhack, nes_vt09new_msi, nes_vt09_state, empty_init, "MSI / Konami", "Frogger (MSI Plug & Play, white joystick)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) //  raster timing for need a hack
 
 // MSI Midway (Joust+Gauntlet 2 + Defender 2) has 2x Globs, rather than Glob + Flash ROM
 
 // this is VT09 based
-CONS( 2009, cybar120,  0,  0,  nes_vt09new09_16mb,nes_vt09new, nes_vt09new09_state, empty_init, "Defender / JungleTac",                      "Defender M2500P 120-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 200?, vsmaxtx2,  0,  0,  nes_vt09new09_4mb, nes_vt09new, nes_vt09new09_state, empty_init, "Senario / JungleTac",                       "Vs Maxx TX-2 50-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 200?, senario25, 0,  0,  nes_vt09new09_2mb, nes_vt09new, nes_vt09new09_state, empty_init, "Senario / JungleTac",                       "25 Video Games - All in 1 Video System (Senario)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // no Vs Maxx branding, newer style packaging
-CONS( 200?, rcapnp,    0,  0,  nes_vt09new09_2mb, nes_vt09new, nes_vt09new09_state, empty_init, "RCA / JungleTac",                           "RCA NS-500 30-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 200?, dturbogt,  0,  0,  nes_vt09new09_8mb, nes_vt09new, nes_vt09new09_state, empty_init, "dreamGEAR / JungleTac",                     "Turbo GT 50-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 200?, ventur25,  0,  0,  nes_vt09new09_4mb, nes_vt09new, nes_vt09new09_state, empty_init, "<unknown> / JungleTac",                     "Venturer '25 Games' 25-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 2005, vgpocket,  0,  0,  nes_vt09new09_4mb, nes_vt09new, nes_vt09new09_state, empty_init, "Performance Designed Products / JungleTac", "VG Pocket (VG-2000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 200?, vgpmini,   0,  0,  nes_vt09new09_4mb, nes_vt09new, nes_vt09new09_state, empty_init, "Performance Designed Products / JungleTac", "VG Pocket Mini (VG-1500)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2009, cybar120,  0,  0,  nes_vt09_16mb,nes_vt09new, nes_vt09_state, empty_init, "Defender / JungleTac",                      "Defender M2500P 120-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, vsmaxtx2,  0,  0,  nes_vt09_4mb, nes_vt09new, nes_vt09_state, empty_init, "Senario / JungleTac",                       "Vs Maxx TX-2 50-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, senario25, 0,  0,  nes_vt09_2mb, nes_vt09new, nes_vt09_state, empty_init, "Senario / JungleTac",                       "25 Video Games - All in 1 Video System (Senario)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // no Vs Maxx branding, newer style packaging
+CONS( 200?, rcapnp,    0,  0,  nes_vt09_2mb, nes_vt09new, nes_vt09_state, empty_init, "RCA / JungleTac",                           "RCA NS-500 30-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, dturbogt,  0,  0,  nes_vt09_8mb, nes_vt09new, nes_vt09_state, empty_init, "dreamGEAR / JungleTac",                     "Turbo GT 50-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, ventur25,  0,  0,  nes_vt09_4mb, nes_vt09new, nes_vt09_state, empty_init, "<unknown> / JungleTac",                     "Venturer '25 Games' 25-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, vgpocket,  0,  0,  nes_vt09_4mb, nes_vt09new, nes_vt09_state, empty_init, "Performance Designed Products / JungleTac", "VG Pocket (VG-2000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, vgpmini,   0,  0,  nes_vt09_4mb, nes_vt09new, nes_vt09_state, empty_init, "Performance Designed Products / JungleTac", "VG Pocket Mini (VG-1500)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // VG Pocket Max (VG-2500) (blue case, 75 games)
 // VG Pocket Max (VG-3000) (white case, 75 games) (does the game selection differ, or only the case?)
-CONS( 2006, vgtablet,  0, 0,  nes_vt09new09_4mb_rasterhack,  nes_vt09new, nes_vt09new09_state, empty_init, "Performance Designed Products (licensed by Konami) / JungleTac", "VG Pocket Tablet (VG-4000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // raster timing for Frogger needs a hack
+CONS( 2006, vgtablet,  0, 0,  nes_vt09_4mb_rasterhack,  nes_vt09new, nes_vt09_state, empty_init, "Performance Designed Products (licensed by Konami) / JungleTac", "VG Pocket Tablet (VG-4000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // raster timing for Frogger needs a hack
 // VG Pocket Caplet is SunPlus hardware instead, see spg2xx_lexibook.cpp
 

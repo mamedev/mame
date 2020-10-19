@@ -646,7 +646,9 @@ neogeocd.cpp
 nes.cpp
 nes_clone.cpp
 nes_sh6578.cpp
-nes_vt.cpp
+nes_vt02_vt03.cpp
+nes_vt09.cpp
+nes_vt32_vt369.cpp
 newbrain.cpp
 news_38xx.cpp
 news_68k.cpp
