@@ -80,6 +80,7 @@ protected:
 	O(rrf_zpg);
 	O(bra_rel);
 	O(jmp_zpi);
+	O(jsr_zpi);
 
 	O(adct_aba); O(adct_abx); O(adct_aby); O(adct_idx); O(adct_idy); O(adct_imm); O(adct_zpg); O(adct_zpx);
 	O(andt_aba); O(andt_abx); O(andt_aby); O(andt_imm); O(andt_idx); O(andt_idy); O(andt_zpg); O(andt_zpx);
