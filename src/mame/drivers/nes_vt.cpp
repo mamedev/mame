@@ -95,19 +95,12 @@ public:
 	void nes_vt_512kb(machine_config& config);
 	void nes_vt_1mb(machine_config& config);
 	void nes_vt_2mb(machine_config& config);
-	void nes_vt_1mb_baddma(machine_config& config);
-	void nes_vt_2mb_baddma(machine_config& config);
-	void nes_vt_4mb_baddma(machine_config& config);
-	void nes_vt_4mb_baddma_rasterhack(machine_config& config);
 	void nes_vt_4mb(machine_config& config);
 	void nes_vt_8mb(machine_config& config);
 	void nes_vt_16mb(machine_config& config);
 	void nes_vt_32mb(machine_config& config);
 
-	void nes_vt_4k_ram(machine_config& config);
-	void nes_vt_4k_ram_16mb(machine_config& config);
-
-	void nes_vt_4k_ram_pal(machine_config& config);
+	void nes_vt_1mb_majkon(machine_config& config);
 
 	void vt_external_space_map_32mbyte(address_map& map);
 	void vt_external_space_map_16mbyte(address_map& map);
@@ -117,7 +110,6 @@ public:
 	void vt_external_space_map_1mbyte(address_map& map);
 	void vt_external_space_map_512kbyte(address_map& map);
 
-	void nes_vt_1mb_majkon(machine_config& config);
 	void vt_external_space_map_1mbyte_majkon(address_map& map);
 
 	void init_protpp();
@@ -256,93 +248,6 @@ private:
 	void ablping_extraio_w(uint8_t data);
 };
 
-class nes_vt_cy_state : public nes_vt_state
-{
-public:
-	nes_vt_cy_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt_state(mconfig, type, tag)
-	{ }
-
-	void nes_vt_cy(machine_config& config);
-
-	void nes_vt_cy_bigger(machine_config& config);
-
-
-	void nes_vt_bt(machine_config& config);
-	void nes_vt_bt_2x16mb(machine_config& config);
-
-	void vt_external_space_map_bitboy_2x16mbyte(address_map& map);
-
-private:
-	void nes_vt_cy_map(address_map& map);
-	void nes_vt_bt_map(address_map& map);
-
-	void bittboy_412c_w(uint8_t data);
-
-	uint8_t vt_rom_banked_r(offs_t offset);
-};
-
-class nes_vt_cy_lexibook_state : public nes_vt_cy_state
-{
-public:
-	nes_vt_cy_lexibook_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt_cy_state(mconfig, type, tag),
-		m_latch0_bit(0),
-		m_latch1_bit(0)
-	{ }
-
-	void init_lxcmcypp();
-
-protected:
-	virtual uint8_t in0_r() override;
-	virtual uint8_t in1_r() override;
-	virtual void in0_w(uint8_t data) override;
-
-private:
-	uint8_t m_latch0_bit;
-	uint8_t m_latch1_bit;
-};
-
-
-class nes_vt_dg_state : public nes_vt_state
-{
-public:
-	nes_vt_dg_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt_state(mconfig, type, tag)
-	{ }
-
-	void nes_vt_dg(machine_config& config);
-	void nes_vt_dg_baddma_16mb(machine_config& config);
-	void nes_vt_dg_1mb(machine_config& config);
-
-	void nes_vt_fa(machine_config& config);
-	void nes_vt_fa_4x16mb(machine_config& config);
-
-protected:
-
-private:
-	uint8_t vt_rom_banked_r(offs_t offset);
-	void vt_external_space_map_fapocket_4x16mbyte(address_map& map);
-
-	void nes_vt_dg_map(address_map& map);
-	void nes_vt_dg_baddma_map(address_map& map);
-	void nes_vt_fa_map(address_map& map);
-
-	uint8_t fapocket_412c_r();
-	void fapocket_412c_w(uint8_t data);
-
-};
-
-class nes_vt_dg_fapocket_state : public nes_vt_dg_state
-{
-public:
-	nes_vt_dg_fapocket_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt_dg_state(mconfig, type, tag)
-	{ }
-
-protected:
-	virtual void machine_reset() override;
-};
 
 class nes_vt_ablpinb_state : public nes_vt_state
 {
@@ -433,29 +338,6 @@ void nes_vt_state::vt_external_space_map_1mbyte_majkon(address_map &map)
 	map(0x1400000, 0x1401fff).ram(); // rush'n attack writes to chr space, after setting the program and character outer bank to a mirror, is the correct way to handle it?	
 }
 
-// bitboy is 2 16Mbyte banks
-uint8_t nes_vt_cy_state::vt_rom_banked_r(offs_t offset)
-{
-	return m_prgrom[m_ahigh | offset];
-}
-
-void nes_vt_cy_state::vt_external_space_map_bitboy_2x16mbyte(address_map &map)
-{
-	map(0x0000000, 0x0ffffff).mirror(0x1000000).r(FUNC(nes_vt_cy_state::vt_rom_banked_r));
-}
-
-// fapocket is 4 16Mbyte banks
-uint8_t nes_vt_dg_state::vt_rom_banked_r(offs_t offset)
-{
-	return m_prgrom[m_ahigh | offset];
-}
-
-void nes_vt_dg_state::vt_external_space_map_fapocket_4x16mbyte(address_map &map)
-{
-	map(0x0000000, 0x0ffffff).mirror(0x1000000).r(FUNC(nes_vt_dg_state::vt_rom_banked_r));
-}
-
-
 uint8_t nes_vt_base_state::extrain_0_r()
 {
 	if (m_exin0)
@@ -537,43 +419,6 @@ void nes_vt_base_state::in0_w(uint8_t data)
 	m_previous_port0 = data;
 }
 
-/* Lexibook I/O handlers */
-
-uint8_t nes_vt_cy_lexibook_state::in0_r()
-{
-	//logerror("%s: in0_r\n", machine().describe_context());
-	uint8_t ret = m_latch0_bit;
-	return ret;
-}
-
-uint8_t nes_vt_cy_lexibook_state::in1_r()
-{
-	//logerror("%s: in1_r\n", machine().describe_context());
-	uint8_t ret = m_latch1_bit;
-	return ret;
-}
-
-void nes_vt_cy_lexibook_state::in0_w(uint8_t data)
-{
-	//logerror("%s: in0_w %02x\n", machine().describe_context(), data);
-	if ((!(data & 0x01)) && (m_previous_port0 & 0x01)) // 0x03 -> 0x02 transition
-	{
-		m_latch0 = m_io0->read();
-		m_latch1 = m_io1->read();
-	}
-
-	if ((!(data & 0x02)) && (m_previous_port0 & 0x02)) // 0x02 -> 0x00 transition
-	{
-		m_latch0_bit = m_latch0 & 0x01;
-		m_latch0 >>= 1;
-		m_latch1_bit = m_latch1 & 0x01;
-		m_latch1 >>= 1;
-	}
-
-	m_previous_port0 = data;
-}
-
-
 
 // ablping polls this (also writes here) what is it? 4-bit DAC? PCM? (inputs only start responding once it finishes writing data on startup but takes longer than a sample should)
 // (this is the extended IO port on VT)
@@ -615,16 +460,6 @@ void nes_vt_base_state::machine_reset()
 
 }
 
-void nes_vt_dg_fapocket_state::machine_reset()
-{
-	nes_vt_base_state::machine_reset();
-
-	// fapocket needs this, fcpocket instead reads the switch in software?
-	if (m_cartsel)
-		m_ahigh = (m_cartsel->read() == 0x01) ? (1 << 25) : 0x0;
-	else
-		m_ahigh = 0;
-}
 
 void nes_vt_ablpinb_state::machine_start()
 {
@@ -732,30 +567,6 @@ void nes_vt_state::nes_vt_2mb(machine_config& config)
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_2mbyte);
 }
 
-void nes_vt_state::nes_vt_1mb_baddma(machine_config& config)
-{
-	nes_vt_1mb(config);
-	m_soc->force_bad_dma();
-}
-
-void nes_vt_state::nes_vt_2mb_baddma(machine_config& config)
-{
-	nes_vt_2mb(config);
-	m_soc->force_bad_dma();
-}
-
-void nes_vt_state::nes_vt_4mb_baddma(machine_config& config)
-{
-	nes_vt_4mb(config);
-	m_soc->force_bad_dma();
-
-}
-
-void nes_vt_state::nes_vt_4mb_baddma_rasterhack(machine_config& config)
-{
-	nes_vt_2mb_baddma(config);
-	m_soc->force_raster_timing_hack();
-}
 
 
 void nes_vt_state::nes_vt_4mb(machine_config& config)
@@ -927,97 +738,6 @@ void nes_vt_base_state::upper_412c_w(uint8_t data)
 }
 
 
-void nes_vt_state::nes_vt_4k_ram(machine_config &config)
-{
-	/* basic machine hardware */
-	NES_VT_SOC_4KRAM(config, m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
-
-	dynamic_cast<nes_vt_soc_4kram_device&>(*m_soc).upper_read_412c_callback().set(FUNC(nes_vt_state::upper_412c_r));
-	dynamic_cast<nes_vt_soc_4kram_device&>(*m_soc).upper_read_412d_callback().set(FUNC(nes_vt_state::upper_412d_r));
-	dynamic_cast<nes_vt_soc_4kram_device&>(*m_soc).upper_write_412c_callback().set(FUNC(nes_vt_state::upper_412c_w));
-}
-
-void nes_vt_state::nes_vt_4k_ram_16mb(machine_config &config)
-{
-	nes_vt_4k_ram(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_16mbyte);
-}
-
-void nes_vt_state::nes_vt_4k_ram_pal(machine_config &config)
-{
-	nes_vt_4k_ram(config); // TODO, use PAL
-}
-
-void nes_vt_cy_state::nes_vt_cy(machine_config &config)
-{
-	nes_vt_4k_ram(config);
-
-	NES_VT_SOC_4KRAM_CY(config.replace(), m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
-}
-
-void nes_vt_cy_state::nes_vt_cy_bigger(machine_config &config)
-{
-	nes_vt_cy(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_cy_state::vt_external_space_map_32mbyte); // must be some banking of this kind of VT can address over 32mb
-}
-
-void nes_vt_cy_state::nes_vt_bt(machine_config &config)
-{
-	nes_vt_4k_ram(config);
-
-	NES_VT_SOC_4KRAM_BT(config.replace(), m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
-}
-
-
-void nes_vt_cy_state::bittboy_412c_w(uint8_t data)
-{
-	//bittboy (ok), mc_pg150 (not working)
-	logerror("%s: vt03_412c_extbank_w %02x\n", machine().describe_context(),  data);
-	m_ahigh = (data & 0x04) ? (1 << 24) : 0x0;
-}
-
-void nes_vt_cy_state::nes_vt_bt_2x16mb(machine_config& config)
-{
-	nes_vt_bt(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_cy_state::vt_external_space_map_bitboy_2x16mbyte);
-
-	dynamic_cast<nes_vt_soc_4kram_device&>(*m_soc).upper_write_412c_callback().set(FUNC(nes_vt_cy_state::bittboy_412c_w));
-}
-
-void nes_vt_dg_state::nes_vt_dg(machine_config &config)
-{
-	nes_vt_4k_ram(config);
-
-	NES_VT_SOC_8KRAM_DG(config.replace(), m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
-
-	/*
-	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_dg_state::nes_vt_dg_map);
-
-	m_screen->set_refresh_hz(50.0070);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((106.53/(PAL_APU_CLOCK.dvalue()/1000000)) *
-	                         (ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)));
-	m_screen->set_size(32*8, 312);
-	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
-	*/
-}
-
-void nes_vt_dg_state::nes_vt_dg_1mb(machine_config& config)
-{
-	nes_vt_dg(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_dg_state::vt_external_space_map_1mbyte);
-}
-
-void nes_vt_dg_state::nes_vt_dg_baddma_16mb(machine_config& config)
-{
-	nes_vt_dg(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_dg_state::vt_external_space_map_16mbyte);
-
-}
-
 void nes_vt_state::nes_vt_1mb_majkon(machine_config& config)
 {
 	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
@@ -1086,41 +806,6 @@ static INPUT_PORTS_START( dbdancem )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_NAME("P2 Left Arrow") PORT_16WAY
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_NAME("P2 Right Arrow") PORT_16WAY
 INPUT_PORTS_END
-
-void nes_vt_dg_state::nes_vt_fa(machine_config& config)
-{
-	nes_vt_4k_ram(config);
-
-	NES_VT_SOC_8KRAM_FA(config.replace(), m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
-}
-
-
-uint8_t nes_vt_dg_state::fapocket_412c_r()
-{
-	if (m_cartsel)
-		return m_cartsel->read();
-	else
-		return 0;
-}
-
-void nes_vt_dg_state::fapocket_412c_w(uint8_t data)
-{
-	// fapocket (ok?) (also uses bank from config switch for fake cartridge slot)
-	logerror("%s: vtfa_412c_extbank_w %02x\n", machine().describe_context(), data);
-	m_ahigh = 0;
-	m_ahigh |= (data & 0x01) ? (1 << 25) : 0x0;
-	m_ahigh |= (data & 0x02) ? (1 << 24) : 0x0;
-}
-
-void nes_vt_dg_state::nes_vt_fa_4x16mb(machine_config& config) // fapocket
-{
-	nes_vt_fa(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_dg_state::vt_external_space_map_fapocket_4x16mbyte);
-
-	dynamic_cast<nes_vt_soc_4kram_device&>(*m_soc).upper_read_412c_callback().set(FUNC(nes_vt_dg_state::fapocket_412c_r));
-	dynamic_cast<nes_vt_soc_4kram_device&>(*m_soc).upper_write_412c_callback().set(FUNC(nes_vt_dg_state::fapocket_412c_w));
-}
 
 
 void nes_vt_swap_op_d5_d6_state::nes_vt_vh2009(machine_config &config)
@@ -1623,19 +1308,6 @@ ROM_START( zdog )
 	ROM_LOAD( "zdog.bin", 0x00000, 0x400000, CRC(5ed3485b) SHA1(5ab0e9370d4ed1535205deb0456878c4e400dd81) )
 ROM_END
 
-
-
-
-void nes_vt_cy_lexibook_state::init_lxcmcypp()
-{
-	int size = memregion("mainrom")->bytes()/2;
-	uint16_t* ROM = (uint16_t*)memregion("mainrom")->base();
-
-	for (int i = 0; i < size; i++)
-	{
-		ROM[i] = bitswap<16>(ROM[i], 4, 5, 6, 7, 0, 1, 2, 3, 12, 13, 14, 15, 8, 9, 10, 11);
-	}
-}
 
 void nes_vt_state::init_protpp()
 {

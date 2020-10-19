@@ -89,26 +89,8 @@ public:
 		m_soc(*this, "soc")
 	{ }
 
-	void nes_vt09new_pal_2mb(machine_config& config);
-	void nes_vt09new_pal_4mb(machine_config& config);
-	void nes_vt09new_pal_8mb(machine_config& config);
-
-	void nes_vt09new_512kb(machine_config& config);
-	void nes_vt09new_1mb(machine_config& config);
-	void nes_vt09new_2mb(machine_config& config);
-	void nes_vt09new_1mb_baddma(machine_config& config);
-	void nes_vt09new_2mb_baddma(machine_config& config);
-	void nes_vt09new_4mb_baddma(machine_config& config);
-	void nes_vt09new_4mb_baddma_rasterhack(machine_config& config);
-	void nes_vt09new_4mb(machine_config& config);
-	void nes_vt09new_8mb(machine_config& config);
-	void nes_vt09new_16mb(machine_config& config);
-	void nes_vt09new_32mb(machine_config& config);
-
 	void nes_vt09new_4k_ram(machine_config& config);
 	void nes_vt09new_4k_ram_16mb(machine_config& config);
-
-	void nes_vt09new_4k_ram_pal(machine_config& config);
 
 	void vt_external_space_map_32mbyte(address_map& map);
 	void vt_external_space_map_16mbyte(address_map& map);
@@ -466,101 +448,7 @@ void nes_vt09new_base_state::configure_soc(nes_vt_soc_device* soc)
 	soc->extra_read_3_callback().set(FUNC(nes_vt09new_base_state::extrain_3_r));
 }
 
-void nes_vt09new_state::nes_vt09new_512kb(machine_config& config)
-{
-	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new_state::vt_external_space_map_512kbyte);
-}
 
-void nes_vt09new_state::nes_vt09new_1mb(machine_config& config)
-{
-	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new_state::vt_external_space_map_1mbyte);
-}
-
-void nes_vt09new_state::nes_vt09new_2mb(machine_config& config)
-{
-	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new_state::vt_external_space_map_2mbyte);
-}
-
-void nes_vt09new_state::nes_vt09new_1mb_baddma(machine_config& config)
-{
-	nes_vt09new_1mb(config);
-	m_soc->force_bad_dma();
-}
-
-void nes_vt09new_state::nes_vt09new_2mb_baddma(machine_config& config)
-{
-	nes_vt09new_2mb(config);
-	m_soc->force_bad_dma();
-}
-
-void nes_vt09new_state::nes_vt09new_4mb_baddma(machine_config& config)
-{
-	nes_vt09new_4mb(config);
-	m_soc->force_bad_dma();
-
-}
-
-void nes_vt09new_state::nes_vt09new_4mb_baddma_rasterhack(machine_config& config)
-{
-	nes_vt09new_2mb_baddma(config);
-	m_soc->force_raster_timing_hack();
-}
-
-
-void nes_vt09new_state::nes_vt09new_4mb(machine_config& config)
-{
-	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new_state::vt_external_space_map_4mbyte);
-}
-
-void nes_vt09new_state::nes_vt09new_8mb(machine_config& config)
-{
-	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new_state::vt_external_space_map_8mbyte);
-}
-
-void nes_vt09new_state::nes_vt09new_16mb(machine_config& config)
-{
-	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new_state::vt_external_space_map_16mbyte);
-}
-
-void nes_vt09new_state::nes_vt09new_32mb(machine_config& config)
-{
-	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new_state::vt_external_space_map_32mbyte);
-}
-
-void nes_vt09new_state::nes_vt09new_pal_2mb(machine_config& config)
-{
-	NES_VT_SOC_PAL(config, m_soc, PAL_APU_CLOCK);
-	configure_soc(m_soc);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new_state::vt_external_space_map_2mbyte);
-}
-
-void nes_vt09new_state::nes_vt09new_pal_4mb(machine_config& config)
-{
-	NES_VT_SOC_PAL(config, m_soc, PAL_APU_CLOCK);
-	configure_soc(m_soc);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new_state::vt_external_space_map_4mbyte);
-}
-
-void nes_vt09new_state::nes_vt09new_pal_8mb(machine_config& config)
-{
-	NES_VT_SOC_PAL(config, m_soc, PAL_APU_CLOCK);
-	configure_soc(m_soc);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new_state::vt_external_space_map_8mbyte);
-}
 
 uint8_t nes_vt09new_base_state::upper_412c_r()
 {
@@ -597,10 +485,6 @@ void nes_vt09new_state::nes_vt09new_4k_ram_16mb(machine_config &config)
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09new_state::vt_external_space_map_16mbyte);
 }
 
-void nes_vt09new_state::nes_vt09new_4k_ram_pal(machine_config &config)
-{
-	nes_vt09new_4k_ram(config); // TODO, use PAL
-}
 
 void nes_vt09new_cy_state::nes_vt09new_cy(machine_config &config)
 {
