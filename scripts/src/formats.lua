@@ -307,6 +307,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/aquarius_caq.h,FORMATS["AQUARIUS_CAQ"] = true
+--------------------------------------------------
+
+if (FORMATS["AQUARIUS_CAQ"]~=null  or _OPTIONS["with-tools"]) then
+	files {
+		MAME_DIR.. "src/lib/formats/aquarius_caq.cpp",
+		MAME_DIR.. "src/lib/formats/aquarius_caq.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/asst128_dsk.h,FORMATS["ASST128_DSK"] = true
 --------------------------------------------------
 
