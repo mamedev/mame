@@ -16,9 +16,9 @@ license:CC0
 					<path d="m 138.5,224.5 47,-166" />
 					<path d="m 561.5,224.5 -47,-166" />
 					<path d="M 163,136.5 H 537" />
-					<path d="M 350,247.5 V 38.5"
+					<path d="M 350,247.5 V 38.5" />
 				</g>
-				<g fill="#00ff00" stroke="none">
+				<g fill="#00ff00">
 					<rect width="12" height="39" x="344" y="0" />
 					<rect width="12" height="42" x="344" y="206" />
 				</g>
