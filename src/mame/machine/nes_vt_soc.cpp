@@ -9,13 +9,13 @@
 
   This list is incomplete
 
-  VT01 - plain famiclone?
+  VT01 - only enhancement over plain Famiclone is ability to drive STN displays directly
   VT02 - banking scheme to access 32MB, Dual APU with PCM support
   VT03 - above + 4bpp sprite / bg modes, enhanced palette
 
   VT08 - ?
 
-  VT09 - alt 4bpp mode, 4KB system RAM
+  VT09 - alt 4bpp mode, 4KB system RAM, DMA isn't bugged in NTSC mode?
 
   VT16 - ?
   VT18 - ?
