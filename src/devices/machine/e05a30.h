@@ -76,7 +76,8 @@ private:
 	uint8_t m_centronics_strobe;
 	uint8_t m_centronics_data_latch;
 	uint8_t m_centronics_data_latched;
-	int m_c000_shift_register;
+	uint32_t m_c000_shift_register;
+	uint8_t m_c000_read;
 };
 
 DECLARE_DEVICE_TYPE(E05A30, e05a30_device)
