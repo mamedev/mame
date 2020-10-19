@@ -51,12 +51,16 @@
 #define C15M (C7M*2)
 #define C32M (C15M*2)
 
+// M50753 emulation needs some work before this is a thing.
+//#define PMU_LLE
+
 class macportable_state : public driver_device
 {
 public:
 	macportable_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_pmu(*this, "pmu"),
 		m_via1(*this, "via1"),
 		m_macadb(*this, "macadb"),
 		m_ncr5380(*this, "ncr5380"),
@@ -76,6 +80,7 @@ public:
 
 private:
 	required_device<m68000_device> m_maincpu;
+	required_device<m50753_device> m_pmu;
 	required_device<via6522_device> m_via1;
 	required_device<macadb_device> m_macadb;
 	required_device<ncr5380_device> m_ncr5380;
@@ -108,7 +113,6 @@ private:
 	void field_interrupts();
 	DECLARE_WRITE_LINE_MEMBER(via_irq_w);
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
-	WRITE_LINE_MEMBER(via_cb2_w) { m_macadb->adb_data_w(state); }
 	int m_via_cycles, m_via_interrupt, m_scc_interrupt, m_asc_interrupt, m_last_taken_interrupt;
 	int m_irq_count, m_ca1_data, m_ca2_data;
 
@@ -149,6 +153,12 @@ private:
 		m_asc_interrupt = state;
 		field_interrupts();
 	}
+
+	u8 m_pmu_from_via, m_pmu_to_via, m_pmu_ack, m_pmu_req;
+	u8 pmu_data_r() { return m_pmu_from_via; }
+	void pmu_data_w(u8 data) { m_pmu_to_via = data; }
+	u8 pmu_comms_r() { return (m_pmu_req<<7); }
+	void pmu_comms_w(u8 data) { m_pmu_ack = (data & 0x40)>>6; }
 };
 
 void macportable_state::field_interrupts()
@@ -188,6 +198,8 @@ void macportable_state::machine_start()
 	m_via_interrupt = m_scc_interrupt = m_asc_interrupt = 0;
 	m_last_taken_interrupt = -1;
 	m_irq_count = m_ca1_data = m_ca2_data = 0;
+	m_pmu_to_via = m_pmu_from_via = 0;
+	m_pmu_ack = m_pmu_req = 0;
 
 	m_6015_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(macportable_state::mac_6015_tick),this));
 	m_6015_timer->adjust(attotime::never);
@@ -353,14 +365,24 @@ void macportable_state::macprtb_map(address_map &map)
 
 uint8_t macportable_state::mac_via_in_a()
 {
+	#ifdef PMU_LLE
+	return m_pmu_to_via;
+	#else
 	return m_macadb->get_pm_data_recv();
+	#endif
 }
 
 uint8_t macportable_state::mac_via_in_b()
 {
 	int val = 0;
 	//  printf("Read VIA B: PM_ACK %x\n", m_pm_ack);
-	val = 0x80 | 0x04 | m_macadb->get_pm_ack(); // SCC wait/request (bit 2 must be set at 900c1a or startup tests always fail)
+	val = 0x80 | 0x04;
+
+	#ifdef PMU_LLE
+	val |= ((m_pmu_ack & 1)<<1);
+	#else
+	val |= m_macadb->get_pm_ack(); // SCC wait/request (bit 2 must be set at 900c1a or startup tests always fail)
+	#endif
 
 	//  printf("%s VIA1 IN_B = %02x\n", machine().describe_context().c_str(), val);
 
@@ -370,15 +392,22 @@ uint8_t macportable_state::mac_via_in_b()
 void macportable_state::mac_via_out_a(uint8_t data)
 {
 	//  printf("%s VIA1 OUT A: %02x\n", machine().describe_context().c_str(), data);
-
+	#ifdef PMU_LLE
+	m_pmu_from_via = data;
+	#else
 	m_macadb->set_pm_data_send(data);
+	#endif
 }
 
 void macportable_state::mac_via_out_b(uint8_t data)
 {
 	//  printf("%s VIA1 OUT B: %02x\n", machine().describe_context().c_str(), data);
 	sony_set_sel_line(m_iwm.target(), (data & 0x20) >> 5);
+	#ifdef PMU_LLE
+	m_pmu_req = (data & 1);
+	#else
 	m_macadb->pmu_req_w(data & 1);
+	#endif
 }
 
 /***************************************************************************
@@ -412,13 +441,20 @@ INPUT_PORTS_END
 void macportable_state::macprtb(machine_config &config)
 {
 	/* basic machine hardware */
-	/* basic machine hardware */
 	M68000(config, m_maincpu, C15M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &macportable_state::macprtb_map);
 
-	M50753(config, "pmu", 3.93216_MHz_XTAL);
+	M50753(config, m_pmu, 3.93216_MHz_XTAL);
+	m_pmu->read_p<2>().set(FUNC(macportable_state::pmu_data_r));
+	m_pmu->write_p<2>().set(FUNC(macportable_state::pmu_data_w));
+	m_pmu->read_p<3>().set(FUNC(macportable_state::pmu_comms_r));
+	m_pmu->write_p<3>().set(FUNC(macportable_state::pmu_comms_w));
 
 	M50740(config, "kybd", 3.93216_MHz_XTAL).set_disable();
+
+	#ifdef PMU_LLE
+	config.set_perfect_quantum(m_maincpu);
+	#endif
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60.15);
@@ -451,7 +487,6 @@ void macportable_state::macprtb(machine_config &config)
 	m_via1->writepa_handler().set(FUNC(macportable_state::mac_via_out_a));
 	m_via1->writepb_handler().set(FUNC(macportable_state::mac_via_out_b));
 	m_via1->irq_handler().set(FUNC(macportable_state::via_irq_w));
-	m_via1->cb2_handler().set(FUNC(macportable_state::via_cb2_w));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
