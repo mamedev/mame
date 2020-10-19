@@ -66,7 +66,7 @@ private:
 	required_device<i8255_device> m_ppi8255;
 	required_device<pwm_display_device> m_display;
 	required_ioport_array<9> m_io_keyboard;
-	output_finder<3> m_leds;
+	output_finder<8> m_leds;
 };
 
 void savia84_state::mem_map(address_map &map)
