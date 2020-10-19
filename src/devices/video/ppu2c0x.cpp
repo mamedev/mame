@@ -279,7 +279,11 @@ void ppu2c04_clone_device::device_start()
 	causing sprite rendering to be one frame behind tile/background rendering
 	(mainly noticeable during scrolling)
 	to simulate that, we can just have a secondary OAM buffer and swap them
-	at the end of each frame
+	at the end of each frame.
+
+	(theoretically this can cause the wrong sprite tiles to be drawn for
+	one frame after changing CHR banks, but the Vs. SMB bootlegs that use
+	this clone hardware don't actually have CHR bank switching anyway)
 	*/
 	m_spritebuf = make_unique_clear<uint8_t[]>(SPRITERAM_SIZE);
 	save_pointer(NAME(m_spritebuf), SPRITERAM_SIZE);
