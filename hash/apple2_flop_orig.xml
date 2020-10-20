@@ -15574,4 +15574,26 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="extk8508">
+		<description>Extra K (Version 1985-08-30)</description>
+		<year>1985</year>
+		<publisher>Beagle Bros.</publisher>
+		<info name="release" value="2020-10-18"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - DOS 3.3"/>
+			<dataarea name="flop" size="234833">
+				<rom name="extra k side a - dos 3.3.woz" size="234833" crc="5303a52a" sha1="4fa2db1e130758a17d5969541135856a45aab1dd"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - ProDOS"/>
+			<dataarea name="flop" size="234832">
+				<rom name="extra k side b - prodos.woz" size="234832" crc="73e180d9" sha1="7a39338f3d089577f6ebe21cd7d38e0b0e8ab331"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
