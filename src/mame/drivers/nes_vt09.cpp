@@ -477,11 +477,6 @@ ROM_START( vgpmini )
 	// there was a dump of a 'secure' area with this, but it was just the bottom 0x10000 bytes of the existing rom.
 ROM_END
 
-ROM_START( ppgc200g )
-	ROM_REGION( 0x800000, "mainrom", 0 )
-	ROM_LOAD( "m29dw641.u2", 0x00000, 0x800000, CRC(b16dc677) SHA1(c1984fde4caf9345d41d127db946d1c21ec43ae0) )
-ROM_END
-
 // MSI Entertainment games (MSI previously operated as Majesco Entertainment)
 
 // There are meant to be multiple revisions of this software, some with theme tunes for the new wrestlers, some without. This one appears to lack them.
@@ -517,8 +512,3 @@ CONS( 200?, vgpmini,   0,  0,  nes_vt09_4mb, nes_vt09, nes_vt09_state, empty_ini
 // VG Pocket Max (VG-3000) (white case, 75 games) (does the game selection differ, or only the case?)
 CONS( 2006, vgtablet,  0, 0,  nes_vt09_4mb_rasterhack,  nes_vt09, nes_vt09_state, empty_init, "Performance Designed Products (licensed by Konami) / JungleTac", "VG Pocket Tablet (VG-4000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // raster timing for Frogger needs a hack
 // VG Pocket Caplet is SunPlus hardware instead, see spg2xx_lexibook.cpp
-
-// available in a number of colours, with various brands, but likely all the same.
-// This was a red coloured pad, contains various unlicensed bootleg reskinned NES game eg Blob Buster is a hack of Dig Dug 2 and there are also hacks of Xevious, Donkey Kong Jr, Donkey Kong 3 and many others.
-// Also available in handheld form where Supreme 200 is also shown on the main menu background
-CONS( 201?, ppgc200g,   0,         0,  nes_vt09_8mb, nes_vt09, nes_vt09_state, empty_init, "<unknown>", "Plug & Play Game Controller with 200 Games (Supreme 200)", MACHINE_IMPERFECT_GRAPHICS )
