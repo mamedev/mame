@@ -93,7 +93,6 @@
 #include "formats/pc_dsk.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"

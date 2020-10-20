@@ -36,7 +36,6 @@
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -1000,9 +999,6 @@ void pockstat_state::pockstat(machine_config &config)
 
 	SPEAKER(config, "speaker").front_center();
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "pockstat_cart", "gme");

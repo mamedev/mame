@@ -15,7 +15,6 @@
 
 #include "sound/dac.h"
 #include "machine/input_merger.h"
-#include "sound/volt_reg.h"
 
 
 namespace {
@@ -128,9 +127,6 @@ void gottlieb_sound_r0_device::device_add_mconfig(machine_config &config)
 
 	// sound devices
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 
@@ -261,9 +257,6 @@ void gottlieb_sound_r1_device::device_add_mconfig(machine_config &config)
 
 	// sound devices
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 
@@ -666,9 +659,10 @@ void gottlieb_sound_r2_device::device_add_mconfig(machine_config &config)
 
 	// sound hardware
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.075); // unknown DAC
-	DAC_8BIT_R2R(config, "dacvol", 0).add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dacvol", 1.0, DAC_VREF_POS_INPUT);
+	DAC_8BIT_R2R(config, "dacvol", 0)
+		.set_output_range(0, 1)
+		.add_route(0, "dac", 1.0, DAC_INPUT_RANGE_HI)
+		.add_route(0, "dac", -1.0, DAC_INPUT_RANGE_LO); // unknown DAC
 
 	AY8913(config, m_ay1, SOUND2_CLOCK/2).add_route(ALL_OUTPUTS, *this, 0.15);
 

@@ -65,7 +65,6 @@
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsihd.h"
 #include "bus/scsi/scsicd.h"
-#include "sound/volt_reg.h"
 
 // NuBus and 030/040 PDS cards
 #include "bus/nubus/nubus_48gc.h"

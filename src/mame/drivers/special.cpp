@@ -55,7 +55,6 @@ ToDo:
 #include "emu.h"
 #include "includes/special.h"
 
-#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -504,8 +503,6 @@ void special_state::special(machine_config &config)
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "mono", 0.0625);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	/* Devices */
 	I8255(config, m_ppi);
@@ -603,8 +600,6 @@ void special_state::erik(machine_config &config)
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "mono", 0.0625);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	/* Devices */
 	CASSETTE(config, m_cassette);

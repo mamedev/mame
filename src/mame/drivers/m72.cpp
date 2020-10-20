@@ -197,7 +197,6 @@ other supported games as well.
 #include "machine/irem_cpu.h"
 #include "machine/rstbuf.h"
 #include "sound/ym2151.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 
@@ -1825,9 +1824,6 @@ void m72_state::m72_audio_chips(machine_config &config)
 	ymsnd.add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.3); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void m72_state::m72_base(machine_config &config)

@@ -24,7 +24,6 @@
 #include "cpu/z180/z180.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/ramdac.h"
 #include "emupal.h"
 #include "screen.h"
@@ -393,9 +392,6 @@ void chsuper_state::chsuper(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // 74HC273 latch + R2R network (unknown values)
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 

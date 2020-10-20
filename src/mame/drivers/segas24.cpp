@@ -347,7 +347,6 @@ Notes:
 #include "machine/upd4701.h"
 #include "machine/315_5296.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "sound/ym2151.h"
 #include "video/segaic24.h"
 #include "speaker.h"
@@ -1961,9 +1960,6 @@ void segas24_state::system24(machine_config &config)
 	ymsnd.add_route(1, "rspeaker", 0.50);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void segas24_state::system24_rom(machine_config &config)

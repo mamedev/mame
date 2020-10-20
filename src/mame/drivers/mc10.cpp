@@ -18,7 +18,6 @@
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/ef9345.h"
 #include "video/mc6847.h"
 
@@ -684,8 +683,6 @@ void mc10_state::mc10(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.0625);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(coco_cassette_formats);
@@ -728,8 +725,6 @@ void mc10_state::alice32(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.0625);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(alice32_cassette_formats);

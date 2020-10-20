@@ -140,7 +140,6 @@ something wrong in the disk geometry reported by calchase.chd (20,255,63) since 
 #include "machine/ds128x.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/pc_vga.h"
 #include "screen.h"
 #include "speaker.h"
@@ -659,9 +658,6 @@ void calchase_state::calchase(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 	DAC_12BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.25); // unknown DAC
 	DAC_12BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void calchase_state::hostinv(machine_config &config)
@@ -690,9 +686,6 @@ void calchase_state::hostinv(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 	DAC_12BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.25); // unknown DAC
 	DAC_12BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 

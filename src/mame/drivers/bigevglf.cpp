@@ -65,7 +65,6 @@ J1100072A
 #include "machine/input_merger.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 
@@ -439,9 +438,6 @@ void bigevglf_state::bigevglf(machine_config &config)
 	// pin 22 Noise Output  not mapped
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "mono", 0.50); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 /***************************************************************************

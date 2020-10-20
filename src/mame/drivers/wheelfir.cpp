@@ -173,7 +173,6 @@ BIT N - ( scale < 50% ) ? 1 : 0
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/ramdac.h"
 #include "emupal.h"
 #include "screen.h"
@@ -757,9 +756,7 @@ void wheelfir_state::wheelfir(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 	DAC_10BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // unknown DAC
 	DAC_10BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
+;
 }
 
 

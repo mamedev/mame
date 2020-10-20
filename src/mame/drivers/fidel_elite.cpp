@@ -68,7 +68,6 @@ uninteresting to emulate as separate drivers.
 #include "machine/timer.h"
 #include "sound/s14001a.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/pwm.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
@@ -489,7 +488,6 @@ void elite_state::pc(machine_config &config)
 	m_speech->add_route(ALL_OUTPUTS, "speaker", 0.75);
 
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "fidel_scc");

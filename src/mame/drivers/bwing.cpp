@@ -31,7 +31,6 @@ Known issues:
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -405,9 +404,6 @@ void bwing_state::bwing(machine_config &config)
 	AY8912(config, "ay2", XTAL(24'000'000) / 2 / 8).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
 	DAC08(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.1);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 //****************************************************************************

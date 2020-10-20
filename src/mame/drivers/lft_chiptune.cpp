@@ -9,7 +9,6 @@
 #include "emu.h"
 #include "cpu/avr8/avr8.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 #define MASTER_CLOCK    8000000
@@ -72,9 +71,6 @@ void lft_chiptune_state::chiptune(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "avr8").front_center();
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, m_dac, 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, m_dac, -1.0, DAC_VREF_NEG_INPUT);
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(0, "avr8", 0.9);
 }
 

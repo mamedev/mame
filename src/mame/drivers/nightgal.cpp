@@ -31,7 +31,6 @@ TODO:
 #include "sound/2203intf.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/jangou_blitter.h"
 #include "video/resnet.h"
 #include "emupal.h"
@@ -834,9 +833,6 @@ void nightgal_state::sexygal(machine_config &config)
 	sampleclk.signal_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "mono", 0.25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	config.device_remove("aysnd");
 

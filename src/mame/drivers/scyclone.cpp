@@ -45,7 +45,6 @@
 #include "machine/mb14241.h"
 #include "sound/dac.h"
 #include "sound/sn76477.h"
-#include "sound/volt_reg.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -654,15 +653,7 @@ void scyclone_state::scyclone(machine_config &config)
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
 
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-
 	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
-
-	voltage_regulator_device &vref2(VOLTAGE_REGULATOR(config, "vref2", 0));
-	vref2.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT);
-	vref2.add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 ROM_START( scyclone )

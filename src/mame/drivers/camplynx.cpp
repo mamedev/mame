@@ -164,7 +164,6 @@
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/mc6845.h"
 #include "machine/ram.h"
 #include "emupal.h"
@@ -862,7 +861,6 @@ void camplynx_state::lynx_common(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_6BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.375); // unknown DAC
-	VOLTAGE_REGULATOR(config, "vref").add_route(0, m_dac, 1.0, DAC_VREF_POS_INPUT).add_route(0, m_dac, -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void camplynx_state::lynx_disk(machine_config &config)

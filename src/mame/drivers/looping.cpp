@@ -64,7 +64,6 @@ L056-6    9A          "      "      VLI-8-4 7A         "
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/tms5220.h"
-#include "sound/volt_reg.h"
 #include "video/resnet.h"
 #include "emupal.h"
 #include "screen.h"
@@ -676,9 +675,6 @@ void looping_state::looping(machine_config &config)
 	m_tms->add_route(ALL_OUTPUTS, "speaker", 0.5);
 
 	DAC_2BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.15); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, m_dac, 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, m_dac, -1.0, DAC_VREF_NEG_INPUT);
 
 	ls259_device &sen0(LS259(config, "sen0")); // B3 on sound board
 	sen0.q_out_cb<0>().set(FUNC(looping_state::souint_clr));

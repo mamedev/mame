@@ -29,7 +29,6 @@ and one for MCS48. A12 is forced high or low to select the bank.
 #include "cpu/z8/z8.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/pwm.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
@@ -209,7 +208,6 @@ void msc_state::msc(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "fidel_msc");

@@ -10,7 +10,6 @@
 
 #include "emu.h"
 #include "audio/bally.h"
-#include "sound/volt_reg.h"
 
 
 //**************************************************************************
@@ -510,9 +509,6 @@ void bally_cheap_squeak_device::device_add_mconfig(machine_config &config)
 	m_cpu->out_p2_cb().set(FUNC(bally_cheap_squeak_device::out_p2_cb));
 
 	ZN429E(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 1.00, AUTO_ALLOC_INPUT, 0);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 //-------------------------------------------------
@@ -661,9 +657,6 @@ void bally_squawk_n_talk_device::device_add_mconfig(machine_config &config)
 	m_dac_filter->add_route(ALL_OUTPUTS, *this, 1.0);
 	m_dac_filter->set_rc(filter_rc_device::HIGHPASS, 2000, 0, 0, CAP_U(2));
 	AD558(config, "dac", 0).add_route(ALL_OUTPUTS, "dac_filter", 0.75);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	// TODO: Calculate exact filter values. An AC filter is good enough for now
 	// and required as the chip likes to output a DC offset at idle.

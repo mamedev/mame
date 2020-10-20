@@ -13,7 +13,6 @@
 #include "sound/dac.h"
 #include "sound/discrete.h"
 #include "sound/samples.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
 #include "audio/vicdual.h"
 #include "audio/vicdual-97271p.h"
@@ -244,8 +243,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_psg(*this, "psg"),
 		m_pit(*this, "pit"),
-		m_dac(*this, "dac%u", 0),
-		m_vref(*this, "vref%u", 0)
+		m_dac(*this, "dac%u", 0)
 	{ }
 
 	void carnival(machine_config &config);
@@ -262,7 +260,6 @@ protected:
 	optional_device<ay8910_device> m_psg;
 	optional_device<pit8253_device> m_pit;
 	optional_device_array<dac_bit_interface, 3> m_dac;
-	optional_device_array<voltage_regulator_device, 3> m_vref;
 
 	void carnival_io_map(address_map &map);
 	void mboard_map(address_map &map);

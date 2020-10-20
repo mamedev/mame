@@ -8,7 +8,6 @@
 #include "machine/upd765.h"
 #include "formats/pc_dsk.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "machine/ins8250.h"
 #include "bus/rs232/rs232.h"
 
@@ -250,9 +249,6 @@ void mindset_sound_module::device_add_mconfig(machine_config &config)
 
 	SPEAKER(config, "rspeaker").front_right();
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, m_dac,  1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, m_dac, -1.0, DAC_VREF_NEG_INPUT);
 }
 
 
@@ -1359,9 +1355,6 @@ void mindset_state::mindset(machine_config &config)
 
 	SPEAKER(config, "lspeaker").front_left();
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, m_dac,  1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, m_dac, -1.0, DAC_VREF_NEG_INPUT);
 
 	MINDSET_MODULE(config, "m0", mindset_modules, "stereo", false);
 	MINDSET_MODULE(config, "m1", mindset_modules, "rs232", false);

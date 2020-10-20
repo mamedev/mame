@@ -46,7 +46,6 @@ ToDo:
 #include "machine/6821pia.h"
 #include "sound/dac.h"
 #include "sound/hc55516.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 #include "s6a.lh"
@@ -455,9 +454,6 @@ void s6a_state::s6a(machine_config &config)
 
 	SPEAKER(config, "speaker").front_center();
 	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	SPEAKER(config, "speech").front_center();
 	HC55516(config, m_hc55516, 0).add_route(ALL_OUTPUTS, "speech", 1.00);

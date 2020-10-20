@@ -78,7 +78,6 @@
 #include "machine/timer.h"
 #include "sound/beep.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "machine/1ma6.h"
 #include "machine/hp80_optrom.h"
 #include "machine/ram.h"
@@ -273,8 +272,6 @@ void hp80_base_state::hp80_base(machine_config &config)
 	// Beeper
 	SPEAKER(config, "mono").front_center();
 	DAC_1BIT(config, m_dac , 0).add_route(ALL_OUTPUTS, "mono", 0.5, AUTO_ALLOC_INPUT, 0);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	BEEP(config, m_beep, CPU_CLOCK / 512).add_route(ALL_OUTPUTS, "mono", 0.5, AUTO_ALLOC_INPUT, 0);
 
 	// Optional ROMs

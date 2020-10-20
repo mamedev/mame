@@ -26,7 +26,6 @@ Note: To start a game, certain switches need to be activated.  You must first pr
 #include "includes/s11a.h"
 
 #include "cpu/m6809/m6809.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 #include "s11a.lh"
@@ -219,8 +218,6 @@ void s11a_state::s11a_base(machine_config &config)
 	INPUT_MERGER_ANY_HIGH(config, m_audioirq).output_handler().set_inputline(m_audiocpu, M6802_IRQ_LINE);
 
 	MC1408(config, m_dac, 0);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, m_dac, 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, m_dac, -1.0, DAC_VREF_NEG_INPUT);
 
 	// common CVSD filter for system 11 and 11a, this is also the same filter circuit as Sinistar/System 6 uses,
 	// and is ALMOST the same filter from the s11 bg sound boards, see /mame/audio/s11c_bg.cpp

@@ -23,7 +23,6 @@ ToDo:
 #include "cpu/i8085/i8085.h"
 #include "formats/rk_cas.h"
 #include "includes/mikro80.h"
-#include "sound/volt_reg.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -252,8 +251,6 @@ void mikro80_state::radio99(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &mikro80_state::radio99_io);
 
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.50);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
 void mikro80_state::kristall(machine_config &config)
