@@ -32261,7 +32261,6 @@ mc_dcat8
 mc_dcat8a
 mc_89in1
 mc_tv200
-ppgc200g
 dgun2500
 
 @source:nes_vt09.cpp
@@ -32281,6 +32280,7 @@ ventur25
 vgpocket
 vgpmini
 vgtablet
+ppgc200g
 
 @source:nes_vt32_vt369.cpp
 bittboy

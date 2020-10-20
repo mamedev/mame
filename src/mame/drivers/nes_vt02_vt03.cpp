@@ -1283,11 +1283,6 @@ ROM_START( protpp )
 	ROM_LOAD( "vpingpong_s29al008d70tfi02_0001225b.bin", 0x00000, 0x100000, CRC(8cf46272) SHA1(298a6341d26712ec1f282e7514e995a7af5ac012) )
 ROM_END
 
-ROM_START( ppgc200g )
-	ROM_REGION( 0x800000, "mainrom", 0 )
-	ROM_LOAD( "m29dw641.u2", 0x00000, 0x800000, CRC(b16dc677) SHA1(c1984fde4caf9345d41d127db946d1c21ec43ae0) )
-ROM_END
-
 ROM_START( zdog )
 	ROM_REGION( 0x400000, "mainrom", 0 )
 	ROM_LOAD( "zdog.bin", 0x00000, 0x400000, CRC(5ed3485b) SHA1(5ab0e9370d4ed1535205deb0456878c4e400dd81) )
@@ -1460,9 +1455,6 @@ CONS( 201?, mc_89in1,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty
 // Works fine, uses ony VT02 features
 CONS( 201?, mc_tv200,   0,        0,  nes_vt_8mb,    nes_vt, nes_vt_state, empty_init, "Thumbs Up", "200 in 1 Retro TV Game", MACHINE_IMPERFECT_GRAPHICS )
 
-// available in a number of colours, with various brands, but likely all the same.
-// This was a red coloured pad, contains various unlicensed bootleg reskinned NES game eg Blob Buster is a hack of Dig Dug 2 and there are also hacks of Xevious, Donkey Kong Jr, Donkey Kong 3 and many others.
-CONS( 201?, ppgc200g,   0,         0,  nes_vt_8mb, nes_vt, nes_vt_state, empty_init, "<unknown>", "Plug & Play Game Controller with 200 Games (Supreme 200)", MACHINE_IMPERFECT_GRAPHICS )
 
 // Runs fine, non-sport 121 in 1 games perfect, but minor graphical issues in
 // sport games, also no sound in menu or sport games due to missing PCM
