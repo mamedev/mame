@@ -173,6 +173,7 @@ void e05a30_device::write(offs_t offset, uint8_t data)
 		 * that writing to c000 will clear the shift register. */
 	case 0x00:
 		m_c000_shift_register = 0;
+		break;
 		/* A similar Epson Gate Array, the e05a03 has a 24 bit shift
 		 * register documented in the LX-800 Technical Manual (p.48).
 		 * It is a guess that c001,c002, and c003 are the high, middle, and low bytes
