@@ -1662,10 +1662,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(ms32_state::ms32_interrupt)
 {
 	int scanline = param;
 	// vblank irq
-	// TODO: this causes an exception in sprite device if it's 240???
 	if(scanline == 224)
 		irq_raise(10);
-	// TODO: really a 120Hz interrupt
+	// TODO: really a 30Hz interrupt
 	if(scanline == 0)
 		irq_raise(9);
 	/* hayaosi1 needs at least 12 IRQ 0 per frame to work (see code at FFE02289) <- hayaosi1 is a megasys1 game ... -AS
