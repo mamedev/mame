@@ -21,7 +21,6 @@ See the wswan software list for the full game list.
 			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
-			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="4194304">
 				<rom name="mh32m16e133b.u3" size="4194304" crc="d7a0ab74" sha1="caf4a8de853ded732b2a72619acf2784eeceafc7" offset="000000" />
 			</dataarea>
@@ -297,7 +296,6 @@ See the wswan software list for the full game list.
 			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
-			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="4194304">
 				<rom name="sd32m16e203d.u3" size="4194304" crc="1e760c41" sha1="e31bfa54cbf539a9d28090b372d8e669a93c3e28" offset="000000" />
 			</dataarea>
@@ -320,7 +318,6 @@ See the wswan software list for the full game list.
 			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
-			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="4194304">
 				<rom name="sd32m16e198d.u3" size="4194304" crc="603cb5e6" sha1="ba16a0770f7a71dd49e2879799fd04a4f04f7e60" offset="000000" />
 			</dataarea>
@@ -955,7 +952,6 @@ See the wswan software list for the full game list.
 			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
-			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mh8m16e131b.u3" size="1048576" crc="0c9cb12c" sha1="1eb729aa9ab0a7df6f8a3470a6fede59d7622d4a" offset="000000" />
 			</dataarea>
@@ -1184,7 +1180,6 @@ See the wswan software list for the full game list.
 		<part name="cart" interface="wswan_cart">
 			<feature name="slot" value="ws_sram" />
 			<feature name="rtc" value="yes" />
-			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="524288">
 				<rom name="judgement silversword - rebirth edition (japan) (rev 4321).bin" size="524288" crc="60191872" sha1="657aea8377e207b9b5a182b13966a27f46633640" offset="000000" />
 			</dataarea>
@@ -1205,7 +1200,6 @@ See the wswan software list for the full game list.
 			<feature name="uX" value="CS18LV40963DCR70 SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<feature name="rtc" value="yes" />
-			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="2097152">
 				<rom name="jss2_051125.bin" size="2097152" crc="85c4c9a1" sha1="58c691cb31f96eea5689693fd23768d02e8b133f" offset="000000" />
 			</dataarea>
@@ -1272,7 +1266,6 @@ See the wswan software list for the full game list.
 			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
-			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="2097152">
 				<rom name="mh16m16u161c.u3" size="2097152" crc="274719f5" sha1="9942d1b7d1c00126b9891e560e6a3e264f8fdc2e" offset="000000" />
 			</dataarea>
@@ -1295,7 +1288,6 @@ See the wswan software list for the full game list.
 			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
-			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="4194304">
 				<rom name="mh32m16e167c.u3" size="4194304" crc="da4479bf" sha1="b019f41207e396d9fe3509dccdbe1cc6e7ac46bb" offset="000000" />
 			</dataarea>
@@ -1412,7 +1404,6 @@ See the wswan software list for the full game list.
 			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
-			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="4194304">
 				<rom name="mh32m16e154c.u3" size="4194304" crc="d75effc2" sha1="2358701531e8a38419859cd70bf2fbbd967b6745" offset="000000" />
 			</dataarea>
@@ -2084,7 +2075,6 @@ See the wswan software list for the full game list.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mh8m256s130b.u3" size="1048576" crc="0e467d97" sha1="983582fe8d18839df30b6d29fb75780a9e32f4ec" offset="000000" />
 			</dataarea>
@@ -2194,7 +2184,6 @@ See the wswan software list for the full game list.
 			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
-			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="4194304">
 				<rom name="mh32m16e128b.u3" size="4194304" crc="9bd8f08c" sha1="9532113e14b03c95f034c015168e21273d42eff1" offset="000000" />
 			</dataarea>
@@ -2217,7 +2206,6 @@ See the wswan software list for the full game list.
 			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
-			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="1048576">
 				<rom name="sd8m1e202d.u3" size="1048576" crc="7b0caea9" sha1="1a86403d7896d60fcb7a4c09367f5a976c7ea5a5" offset="000000" />
 			</dataarea>
@@ -2310,7 +2298,6 @@ See the wswan software list for the full game list.
 			<feature name="u3" value="ROM (epoxy blob)" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="4194304">
 				<rom name="136.u3" size="4194304" crc="12f10b27" sha1="55b54944efd6e277fa7140925ed2457a8cfb40b8" offset="000000" />
 			</dataarea>

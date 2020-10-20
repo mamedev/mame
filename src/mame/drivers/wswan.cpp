@@ -470,10 +470,7 @@ void wswan_state::machine_reset()
 {
 	m_bios_disabled = 0;
 
-	if (m_cart->exists())
-		m_rotate = m_cart->get_is_rotated();
-	else
-		m_rotate = 0;
+	m_rotate = 0;
 
 	/* Intialize ports */
 	std::copy(std::begin(ws_portram_init), std::end(ws_portram_init), std::begin(m_ws_portram));
@@ -884,10 +881,12 @@ void wswan_state::set_icons(u8 data) {
 
 	u8 old_rotate = m_rotate;
 
-	m_rotate = (!BIT(data, 2) && BIT(data, 1)) ? 1 : 0;
+	if ((!BIT(data, 2) && BIT(data, 1)) || (BIT(data, 2) && !BIT(data, 1))) {
+		m_rotate = (!BIT(data, 2) && BIT(data, 1)) ? 1 : 0;
 
-	if (old_rotate != m_rotate) {
-			set_rotate_view();
+		if (old_rotate != m_rotate) {
+				set_rotate_view();
+		}
 	}
 }
 

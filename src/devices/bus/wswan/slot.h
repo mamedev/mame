@@ -110,8 +110,6 @@ public:
 
 	void save_nvram() { device().save_item(NAME(m_nvram)); }
 	void set_has_rtc(bool val) { m_has_rtc = val; }
-	void set_is_rotated(bool val) { m_is_rotated = val; }
-	int get_is_rotated() { return m_is_rotated ? 1 : 0; }
 
 protected:
 	device_ws_cart_interface(const machine_config &mconfig, device_t &device);
@@ -123,7 +121,7 @@ protected:
 	u32 m_nvram_size;
 	int m_bank_mask;
 
-	bool m_has_rtc, m_is_rotated;
+	bool m_has_rtc;
 };
 
 
@@ -164,7 +162,6 @@ public:
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	int get_type() { return m_type; }
-	int get_is_rotated() { return m_cart->get_is_rotated(); }
 	int get_cart_type(const uint8_t *ROM, u32 len, u32 &nvram_len) const;
 	void internal_header_logging(uint8_t *ROM, u32 offs, u32 len);
 
