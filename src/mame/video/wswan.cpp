@@ -27,6 +27,7 @@ wswan_video_device::wswan_video_device(const machine_config &mconfig, const char
 	, m_set_irq_cb(*this)
 	, m_snd_dma_cb(*this)
 	, m_vdp_type(VDP_TYPE_WSWAN)
+	, m_icons_cb(*this)
 {
 }
 
@@ -72,7 +73,6 @@ void wswan_video_device::common_save()
 	save_item(NAME(m_layer_fg_scroll_x));
 	save_item(NAME(m_layer_fg_scroll_y));
 	save_item(NAME(m_lcd_control));
-	save_item(NAME(m_icons));
 	save_item(NAME(m_color_mode));
 	save_item(NAME(m_colors_16));
 	save_item(NAME(m_tile_packed));
@@ -112,6 +112,8 @@ void wswan_video_device::device_start()
 	}
 
 	common_save();
+
+	m_icons_cb.resolve();
 }
 
 // This is a copy of ws_portram_init
@@ -167,7 +169,6 @@ void wswan_video_device::device_reset()
 	m_layer_fg_scroll_x = 0;
 	m_layer_fg_scroll_y = 0;
 	m_lcd_control = 0x01;
-	m_icons = 0;
 	m_color_mode = 0;
 	m_colors_16 = 0;
 	m_tile_packed = 0;
@@ -1019,7 +1020,7 @@ void wswan_video_device::reg_w(offs_t offset, uint8_t data)
 					// Bit 4   - Dot 2 icon enable
 					// Bit 5   - Dot 3 icon enable
 					// Bit 6-7 - Unknown
-			m_icons = data; /* ummmmm */
+			m_icons_cb(data);
 			break;
 		case 0x1c:  // Palette colors 0 and 1
 					// Bit 0-3 - Gray tone setting for main palette index 0

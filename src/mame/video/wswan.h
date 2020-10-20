@@ -37,6 +37,8 @@ public:
 	uint8_t reg_r(offs_t offset);
 	void reg_w(offs_t offset, uint8_t data);
 
+	auto icons_cb() { return m_icons_cb.bind(); }
+
 	enum
 	{
 		VDP_TYPE_WSWAN = 0,
@@ -92,7 +94,6 @@ protected:
 	uint8_t m_layer_fg_scroll_x;        /* Foreground layer X scroll */
 	uint8_t m_layer_fg_scroll_y;        /* Foreground layer Y scroll */
 	uint8_t m_lcd_control;           /* LCD on/off */
-	uint8_t m_icons;                /* FIXME: What do we do with these? Maybe artwork? */
 	uint8_t m_color_mode;           /* monochrome/color mode */
 	uint8_t m_colors_16;            /* 4/16 colors mode */
 	uint8_t m_tile_packed;          /* layered/packed tile mode switch */
@@ -116,6 +117,8 @@ protected:
 	irq_cb_delegate m_set_irq_cb;
 	dmasnd_cb_delegate m_snd_dma_cb;
 	int m_vdp_type;
+
+	devcb_write8 m_icons_cb;
 
 	// timer IDs
 	static const device_timer_id TIMER_SCANLINE = 0;

@@ -59,7 +59,8 @@ public:
 		m_region_maincpu(*this, "maincpu"),
 		m_cursx(*this, "CURSX"),
 		m_cursy(*this, "CURSY"),
-		m_buttons(*this, "BUTTONS")
+		m_buttons(*this, "BUTTONS"),
+		m_icons(*this, "icon%u", 0U)
 	{ }
 
 	void wswan(machine_config &config);
@@ -116,6 +117,7 @@ protected:
 	required_ioport m_cursx;
 	required_ioport m_cursy;
 	required_ioport m_buttons;
+	output_finder<6> m_icons;
 
 	u8 bios_r(offs_t offset);
 	u8 port_r(offs_t offset);
@@ -137,7 +139,10 @@ protected:
 	void clear_irq_line(int irq);
 	virtual u16 get_internal_eeprom_address();
 	u32 get_vector() { return m_vector; }
+	void set_icons(u8 data);
+	void set_rotate_view();
 };
+
 
 class wscolor_state : public wswan_state
 {
@@ -267,6 +272,7 @@ void wswan_state::wswan(machine_config &config)
 	m_vdp->set_vdp_type(wswan_video_device::VDP_TYPE_WSWAN);
 	m_vdp->set_irq_callback(FUNC(wswan_state::set_irq_line));
 	m_vdp->set_dmasnd_callback(FUNC(wswan_state::dma_sound_cb));
+	m_vdp->icons_cb().set(FUNC(wswan_state::set_icons));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_screen_update("vdp", FUNC(wswan_video_device::screen_update));
@@ -424,6 +430,7 @@ void wswan_state::common_start()
 {
 	register_save();
 
+	m_icons.resolve();
 	m_vector = 0;
 
 	if (m_cart->exists())
@@ -471,8 +478,7 @@ void wswan_state::machine_reset()
 	/* Intialize ports */
 	std::copy(std::begin(ws_portram_init), std::end(ws_portram_init), std::begin(m_ws_portram));
 
-	render_target *target = machine().render().first_target();
-	target->set_view(m_rotate);
+	set_rotate_view();
 
 	/* Initialize sound DMA */
 	m_sound_dma = sound_dma_t();
@@ -862,6 +868,33 @@ void wswan_state::port_w(offs_t offset, u8 data)
 
 	// Update the port value
 	m_ws_portram[offset] = data;
+}
+
+
+void wswan_state::set_icons(u8 data) {
+	// Bit 0 - LCD sleep icon enable
+	// Bit 1 - Vertical position icon enable
+	// Bit 2 - Horizontal position icon enable
+	// Bit 3 - Dot 1 icon enable
+	// Bit 4 - Dot 2 icon enable
+	// Bit 5 - Dot 3 icon enable
+	for (int i = 0; i < 6; i++) {
+		m_icons[i] = BIT(data, i);
+	}
+
+	u8 old_rotate = m_rotate;
+
+	m_rotate = (!BIT(data, 2) && BIT(data, 1)) ? 1 : 0;
+
+	if (old_rotate != m_rotate) {
+			set_rotate_view();
+	}
+}
+
+
+void wswan_state::set_rotate_view() {
+	render_target *target = machine().render().first_target();
+	target->set_view(m_rotate);
 }
 
 
