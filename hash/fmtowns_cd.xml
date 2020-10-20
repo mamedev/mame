@@ -4438,11 +4438,11 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Dengeki Nurse.cue" size="213" crc="2f7dc86e" sha1="58a9b5a741529ac9b6c8c74f9a0db8de49561e77"/>
 		-->
 		<description>Dengeki Nurse</description>
-		<year>1994</year>
+		<year>1992</year>
 		<publisher>カクテル・ソフト (Cocktail Soft)</publisher>
 		<info name="serial" value="HMD-210"/>
 		<info name="alt_title" value="電撃ナース" />
-		<info name="release" value="199412xx" />
+		<info name="release" value="199212xx" />
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
@@ -4479,11 +4479,11 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Dengeki Nurse 2 - More Sexy (Japan).cue" size="2880" crc="3a947e2c" sha1="b26716f49f8da6576c8965761d6166d89108b035"/>
 		-->
 		<description>Dengeki Nurse 2 - More Sexy</description>
-		<year>1992</year>
+		<year>1994</year>
 		<publisher>カクテル・ソフト (Cocktail Soft)</publisher>
 		<info name="serial" value="IDES-026"/>
 		<info name="alt_title" value="電撃ナース２　～モアセクシー～" />
-		<info name="release" value="199212xx" />
+		<info name="release" value="199412xx" />
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
@@ -13016,7 +13016,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="serial" value="HME-252"/>
 		<info name="alt_title" value="燃えるあそこの牌牌遊戯　復活！まぁじゃん王国" /> <!-- まぁじゃん is correct. It's written that way on the cover and the title screen. -->
 		<info name="release" value="199312xx" />
-		<info name="usage" value="Requires HDD installation and 2 MB RAM"/>
+		<info name="usage" value="Requires HDD installation and 2 MB RAM"/>	
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="moeru asoko no paipai yuugi - fukkatsu mahjong oukoku (japan)" sha1="8bad4fec2ff8330c76dd48a8af276477b59075cb" />
