@@ -1192,14 +1192,19 @@ void sega315_5313_mode4_device::sprite_count_overflow(int line, int sprite_index
 
 void sega315_5124_device::select_sprites(int line)
 {
+	m_sprite_count = 0;
+	if (m_vdp_mode == 1)
+	{
+		/* Text mode, no sprite processing */
+		return;
+	}
+
 	/* Check if SI is set */
 	m_sprite_height = BIT(m_reg[0x01], 1) ? 16 : 8;
 	/* Check if MAG is set */
 	m_sprite_zoom_scale = BIT(m_reg[0x01], 0) ? 2 : 1;
 
-	m_sprite_count = 0;
-
-	if (m_vdp_mode < 4 && m_vdp_mode != 1)
+	if (m_vdp_mode < 4)
 	{
 		/* TMS9918 compatibility sprites */
 
