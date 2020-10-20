@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, Olivier Galibert
 /*
-    Mitsubishi M5074x 8-bit microcontroller family
+    Mitsubishi M5074x/5075x 8-bit microcontroller family
 */
 
 #include "emu.h"
@@ -11,19 +11,19 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define IRQ_CNTRREQ (0x80)
-#define IRQ_CNTRENA (0x40)
-#define IRQ_TMR1REQ (0x20)
-#define IRQ_TMR1ENA (0x10)
-#define IRQ_TMR2REQ (0x08)
-#define IRQ_TMR2ENA (0x04)
-#define IRQ_INTREQ  (0x02)
-#define IRQ_INTENA  (0x01)
+static constexpr u8 IRQ_CNTRREQ = 0x80;
+static constexpr u8 IRQ_CNTRENA = 0x40;
+static constexpr u8 IRQ_TMR1REQ = 0x20;
+static constexpr u8 IRQ_TMR1ENA = 0x10;
+static constexpr u8 IRQ_TMR2REQ = 0x08;
+static constexpr u8 IRQ_TMR2ENA = 0x04;
+static constexpr u8 IRQ_INTREQ  = 0x02;
+static constexpr u8 IRQ_INTENA  = 0x01;
 
-#define TMRC_TMRXREQ (0x80)
-#define TMRC_TMRXENA (0x40)
-#define TMRC_TMRXHLT (0x20)
-#define TMRC_TMRXMDE (0x0c)
+static constexpr u8 TMRC_TMRXREQ = 0x80;
+static constexpr u8 TMRC_TMRXENA = 0x40;
+static constexpr u8 TMRC_TMRXHLT = 0x20;
+static constexpr u8 TMRC_TMRXMDE = 0x0c;
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -567,4 +567,42 @@ uint8_t m50753_device::pwm_control_r()
 void m50753_device::pwm_control_w(uint8_t data)
 {
 	m_pwm_enabled = BIT(data, 0);
+}
+
+// interrupt bits on 50753 are slightly different from the 740/741.
+static constexpr u8 IRQ_50753_INT1REQ = 0x80;
+static constexpr u8 IRQ_50753_INT2REQ = 0x02;
+
+void m50753_device::execute_set_input(int inputnum, int state)
+{
+	switch (inputnum)
+	{
+	case M50753_INT1_LINE:
+		if (state == ASSERT_LINE)
+		{
+			m_intctrl |= IRQ_50753_INT1REQ;
+		}
+		else
+		{
+			m_intctrl &= ~IRQ_50753_INT1REQ;
+		}
+		break;
+
+	case M50753_INT2_LINE:
+		if (state == ASSERT_LINE)
+		{
+			m_intctrl |= IRQ_50753_INT2REQ;
+		}
+		else
+		{
+			m_intctrl &= ~IRQ_50753_INT2REQ;
+		}
+		break;
+
+	case M5074X_SET_OVERFLOW: // the base 740 class can handle this
+		m740_device::execute_set_input(M740_SET_OVERFLOW, state);
+		break;
+	}
+
+	recalc_irqs();
 }

@@ -107,6 +107,14 @@ class m50753_device : public m5074x_device
 public:
 	m50753_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	enum
+	{
+		M50753_INT1_LINE = INPUT_LINE_IRQ0,
+		M50753_INT2_LINE = INPUT_LINE_IRQ1,
+
+		M5074X_SET_OVERFLOW = M740_SET_OVERFLOW
+	};
+
 	template <std::size_t Bit> auto ad_in() { return m_ad_in[Bit].bind(); }
 
 protected:
@@ -115,6 +123,8 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	virtual void execute_set_input(int inputnum, int state) override;
 
 private:
 	void m50753_map(address_map &map);
