@@ -31,8 +31,7 @@ device_ws_cart_interface::device_ws_cart_interface(const machine_config &mconfig
 	m_rom_size(0),
 	m_nvram_size(0),
 	m_bank_mask(0),
-	m_has_rtc(false),
-	m_is_rotated(false)
+	m_has_rtc(false)
 {
 }
 
@@ -176,8 +175,6 @@ image_init_result ws_cart_slot_device::call_load()
 
 			if (ROM[(chunks - 1) * 0x10000 + 0xfffd])
 				m_cart->set_has_rtc(true);
-			if (ROM[(chunks - 1) * 0x10000 + 0xfffc] & 0x01)
-				m_cart->set_is_rotated(true);
 		}
 		else
 		{
@@ -194,11 +191,6 @@ image_init_result ws_cart_slot_device::call_load()
 			{
 				if (!core_stricmp(get_feature("rtc"), "yes"))
 					m_cart->set_has_rtc(true);
-			}
-			if (get_feature("rotated"))
-			{
-				if (!core_stricmp(get_feature("rotated"), "yes"))
-					m_cart->set_is_rotated(true);
 			}
 		}
 
