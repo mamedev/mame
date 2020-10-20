@@ -17,9 +17,11 @@
     Generally the sound quality is very poor compared to official Capcom hardware.
     Both music and sound effects are produced by just a single M6295.
     Background music consists of short pre-recorded clips which loop continuously.
-    Currently all games have no sound emulation due to the PICs being secured/protected.
-    Unless any un-protected PIcs ever turn up (unlikely) then "decapping" of working chips is probably the
-    only way valid dumps will ever be made.
+    Currently all games have no sound emulation due to the PICs being secured/protected or not hoocked up.
+
+    Unprotected PICs were found on 'dinopic' and 'punipic' PCBs, with the same content. So, for now
+    every child set of these games are suposed to use the same PIC ROM
+
 
 Status of each game:
 --------------------
@@ -33,9 +35,9 @@ slampic:           No sound. Some minor gfx issues (sprites on character select 
 slampic2:          No sound. All gfx issues confirmed present on real board.
 wofpic:            No sound. Some minor gfx issues (sprite priorities mainly).  https://youtu.be/Ozlb2gNRSfs
 
-all dinopic sets have some priority issues with sprites overlapping foreground objects on certain levels
+All dinopic sets have some priority issues with sprites overlapping foreground objects on certain levels
 
-brightness circuity present on pcb?
+Brightness circuity present on PCB?
     slampic2    yes
     dinopic3    no
     jurassic99  no
@@ -52,7 +54,7 @@ brightness circuity present on pcb?
 #include "speaker.h"
 
 
-#define CPS1_ROWSCROLL_OFFS  (0x20/2)    /* base of row scroll offsets in other RAM */
+#define CPS1_ROWSCROLL_OFFS  (0x20/2)    // Base of row scroll offsets in other RAM
 #define CODE_SIZE            0x400000
 
 
@@ -187,7 +189,7 @@ void cps1bl_pic_state::punipic_layer_w(offs_t offset, uint16_t data)
 		break;
 	case 0x02:
 		m_cps_a_regs[0x12 / 2] = data;
-		m_cps_a_regs[CPS1_ROWSCROLL_OFFS] = data; /* row scroll start */
+		m_cps_a_regs[CPS1_ROWSCROLL_OFFS] = data; // Row scroll start
 		break;
 	case 0x03:
 		m_cps_a_regs[0x10 / 2] = data + 0xffc0;
@@ -248,7 +250,7 @@ void cps1bl_pic_state::slampic_layer2_w(offs_t offset, uint16_t data, uint16_t m
 
 	if (offset == 0x22 / 2)
 	{
-		// doesn't seem to write anywhere outside mainram?
+		// Doesn't seem to write anywhere outside mainram?
 		m_cps_b_regs[m_layer_enable_reg / 2] = m_mainram[0x8d72 / 2];
 		m_cps_b_regs[m_layer_mask_reg[1] / 2] = m_mainram[0x8d74 / 2];
 		m_cps_b_regs[m_layer_mask_reg[2] / 2] = m_mainram[0x8d76 / 2];
@@ -397,19 +399,19 @@ void wofpic_state::wofpic_spr_base_w(uint16_t data)
 
 void dinopic_state::dinopic(machine_config &config)
 {
-	/* basic machine hardware */
+	// Basic machine hardware
 	M68000(config, m_maincpu, 12000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &dinopic_state::dinopic_map);
 	m_maincpu->set_vblank_int("screen", FUNC(dinopic_state::cps1_interrupt));
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &dinopic_state::cpu_space_map);
 
-	//PIC16C57(config, m_audiocpu, 3750000).set_disable(); /* no valid dumps .. */
+	//PIC16C57(config, m_audiocpu, 3750000).set_disable(); // Not hooked up
 
 	MCFG_MACHINE_START_OVERRIDE(dinopic_state, dinopic)
 
 	EEPROM_93C46_8BIT(config, "eeprom");
 
-	/* video hardware */
+	// Video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -422,7 +424,7 @@ void dinopic_state::dinopic(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
 	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0xc00);
 
-	/* sound hardware */
+	// Sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
@@ -432,19 +434,19 @@ void dinopic_state::dinopic(machine_config &config)
 
 void cps1bl_pic_state::punipic(machine_config &config)
 {
-	/* basic machine hardware */
+	// Basic machine hardware
 	M68000(config, m_maincpu, 12000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cps1bl_pic_state::punipic_map);
 	m_maincpu->set_vblank_int("screen", FUNC(cps1bl_pic_state::cps1_interrupt));
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &cps1bl_pic_state::cpu_space_map);
 
-	//PIC16C57(config, m_audiocpu, 12000000).set_disable(); /* no valid dumps .. */
+	//PIC16C57(config, m_audiocpu, 12000000).set_disable(); // Not hooked up
 
 	MCFG_MACHINE_START_OVERRIDE(cps1bl_pic_state, punipic)
 
 	EEPROM_93C46_8BIT(config, "eeprom");
 
-	/* video hardware */
+	// Video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -467,19 +469,19 @@ void cps1bl_pic_state::punipic(machine_config &config)
 
 void cps1bl_pic_state::slampic(machine_config &config)
 {
-	/* basic machine hardware */
+	// Basic machine hardware
 	M68000(config, m_maincpu, 12000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cps1bl_pic_state::slampic_map);
 	m_maincpu->set_vblank_int("screen", FUNC(cps1bl_pic_state::cps1_interrupt));
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &cps1bl_pic_state::cpu_space_map);
 
-	//PIC16C57(config, m_audiocpu, 12000000).set_disable(); /* no valid dumps .. */
+	//PIC16C57(config, m_audiocpu, 12000000).set_disable(); // No valid dumps...
 
 	MCFG_MACHINE_START_OVERRIDE(cps1bl_pic_state, slampic)
 
 	EEPROM_93C46_8BIT(config, "eeprom");
 
-	/* video hardware */
+	// Video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -492,7 +494,7 @@ void cps1bl_pic_state::slampic(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
 	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0xc00);
 
-	/* sound hardware */
+	// Sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.30);
@@ -1080,13 +1082,13 @@ Cadillac Bootleg Hardware:
 
 */
 ROM_START( dinopic )
-	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      // 68000 code
 	ROM_LOAD16_BYTE( "3.bin", 0x000001, 0x80000, CRC(13dfeb08) SHA1(cd2f9dd64f4fabe93901247e36dff3763169716d) )
 	ROM_LOAD16_BYTE( "5.bin", 0x000000, 0x80000, CRC(96dfcbf1) SHA1(a8bda6edae2c1b79db7ae8a8976fd2457f874373) )
 	ROM_LOAD16_BYTE( "2.bin", 0x100001, 0x80000, CRC(0e4058ba) SHA1(346f9e34ea53dd1bf5cdafa1e38bf2edb09b9a7f) )
 	ROM_LOAD16_BYTE( "7.bin", 0x100000, 0x80000, CRC(6133f349) SHA1(d13af99910623f62c090d25372a2253dbc2f8cbe) )
 
-	ROM_REGION( 0x400000, "gfx", 0 ) // same data, different format, except for 8 which is a 99% match (bad ROM?)
+	ROM_REGION( 0x400000, "gfx", 0 ) // Same data, different format, except for 8 which is a 99% match (bad ROM?)
 	ROM_LOAD64_BYTE( "4.bin",  0x000000, 0x40000, CRC(f3c2c98d) SHA1(98ae51a67fa4159456a4a205eebdd8d1775888d1) )
 	ROM_CONTINUE(              0x000004, 0x40000)
 	ROM_LOAD64_BYTE( "8.bin",  0x000001, 0x40000, CRC(d574befc) SHA1(56482e7a9aa8439f30e3cf72311495ce677a083d) )
@@ -1104,10 +1106,10 @@ ROM_START( dinopic )
 	ROM_LOAD64_BYTE( "10.bin", 0x200003, 0x40000, CRC(88847705) SHA1(05dc90067921960e417b7436056a5e1f86abaa1a) )
 	ROM_CONTINUE(              0x200007, 0x40000)
 
-	ROM_REGION( 0x28000, "audiocpu", 0 ) /* PIC16c57 - protected, dump isn't valid */
-	ROM_LOAD( "pic16c57-rp", 0x00000, 0x2d4c, BAD_DUMP CRC(5a6d393c) SHA1(1391a1590aff5f75bb6fae1c83eddb796b53135d) )
+	ROM_REGION( 0x1000, "audiocpu", 0 ) // PIC16c57
+	ROM_LOAD( "c2s_pic16c57.bin", 0x0000, 0x1000, CRC(0a5642ad) SHA1(799cbaf0d103fac0d94dcb4a2f97fa18833a4dcf) )
 
-	ROM_REGION( 0x80000, "oki", 0 ) /* OKI6295 samples */
+	ROM_REGION( 0x80000, "oki", 0 ) // OKI6295 samples
 	ROM_LOAD( "1.bin", 0x000000, 0x80000,  CRC(7d921309) SHA1(d51e60e904d302c2516b734189e141aa171b2b82) )
 ROM_END
 
@@ -1134,7 +1136,7 @@ ROM_END
   1x trimmer (volume)
 */
 ROM_START( dinopic2 )
-	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      // 68000 code
 	ROM_LOAD16_BYTE( "27c4000-m12374r-2.bin", 0x000001, 0x80000, CRC(13dfeb08) SHA1(cd2f9dd64f4fabe93901247e36dff3763169716d) )
 	ROM_LOAD16_BYTE( "27c4000-m12481.bin",    0x000000, 0x80000, CRC(96dfcbf1) SHA1(a8bda6edae2c1b79db7ae8a8976fd2457f874373) )
 	ROM_LOAD16_BYTE( "27c4000-m12374r-1.bin", 0x100001, 0x80000, CRC(0e4058ba) SHA1(346f9e34ea53dd1bf5cdafa1e38bf2edb09b9a7f) )
@@ -1158,10 +1160,10 @@ ROM_START( dinopic2 )
 	ROM_LOAD64_BYTE( "27c4000-m12481-5.bin", 0x200003, 0x40000, CRC(88847705) SHA1(05dc90067921960e417b7436056a5e1f86abaa1a) )
 	ROM_CONTINUE(                            0x200007, 0x40000)
 
-	ROM_REGION( 0x28000, "audiocpu", 0 ) /* PIC16c57 - protected, dump isn't valid */
-	ROM_LOAD( "pic16c57-xt.hex", 0x00000, 0x26cc, BAD_DUMP CRC(a6a5eac4) SHA1(2039789084836769180f0bfd230c2553a37e2aaf) )
+	ROM_REGION( 0x1000, "audiocpu", 0 ) // PIC16c57
+	ROM_LOAD( "c2s_pic16c57.bin", 0x0000, 0x1000, CRC(0a5642ad) SHA1(799cbaf0d103fac0d94dcb4a2f97fa18833a4dcf) )
 
-	ROM_REGION( 0x80000, "oki", 0 ) /* OKI6295 samples */
+	ROM_REGION( 0x80000, "oki", 0 ) // OKI6295 samples
 	ROM_LOAD( "27c4000-m12623.bin", 0x000000, 0x80000,  CRC(7d921309) SHA1(d51e60e904d302c2516b734189e141aa171b2b82) )
 
 	/* pld devices:
@@ -1214,9 +1216,9 @@ ROM_START( dinopic3 )
 	ROM_CONTINUE( 0x000006, 0x80000 )
 	ROM_CONTINUE( 0x200006, 0x80000 )
 
-	// no markings, assume pic16c57, secured
-	//ROM_REGION( 0x2000, "audiocpu", 0 )
-	//ROM_LOAD( "pic_t1.bin", 0x0000, 0x1007, NO_DUMP )
+	// No markings, assume PIC16c57
+	ROM_REGION( 0x1000, "audiocpu", 0 ) // PIC16c57
+	ROM_LOAD( "c2s_pic16c57.bin", 0x0000, 0x1000, CRC(0a5642ad) SHA1(799cbaf0d103fac0d94dcb4a2f97fa18833a4dcf) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "ti-i_27c040.bin", 0x000000, 0x80000, CRC(7d921309) SHA1(d51e60e904d302c2516b734189e141aa171b2b82) )  // = dinopic, dinopic2
@@ -1306,7 +1308,7 @@ ROM_START( jurassic99 )
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "21003_u27.bin", 0x000000, 0x80000, CRC(7d921309) SHA1(d51e60e904d302c2516b734189e141aa171b2b82) )  // == dinopic, dinopic2, dinopic3
 
-	/* pld devices:
+	/* PLD devices:
 	U25    ATF20V8B-15PC  1?  secured, bruteforce ok
 	U66    ATF16V8B-15PC  2   unsecured
 	U100   ATF16V8B-15PC  3   unsecured
@@ -1367,10 +1369,10 @@ ROM_START( punipic )
 	ROM_LOAD64_BYTE( "gfx10.bin", 0x200003, 0x40000, CRC(763974c9) SHA1(f9b93c7cf0cb8c212fc21c57c85459b7d2e4e2fd) )
 	ROM_CONTINUE(                 0x200007, 0x40000)
 
-	ROM_REGION( 0x28000, "audiocpu", 0 ) /* PIC16c57 - protected */
-	ROM_LOAD( "pic16c57", 0x00000, 0x4000, NO_DUMP )
+	ROM_REGION( 0x1000, "audiocpu", 0 ) // PIC16c57
+	ROM_LOAD( "c2s_pic16c57.bin", 0x0000, 0x1000, CRC(0a5642ad) SHA1(799cbaf0d103fac0d94dcb4a2f97fa18833a4dcf) )
 
-	ROM_REGION( 0x200000, "oki", 0 ) /* OKI6295 */
+	ROM_REGION( 0x200000, "oki", 0 ) // OKI6295
 	ROM_LOAD( "sound.bin", 0x000000, 0x80000, CRC(aeec9dc6) SHA1(56fd62e8db8aa96cdd242d8c705849a413567780) )
 ROM_END
 
@@ -1418,7 +1420,7 @@ Notes:
 
 */
 ROM_START( punipic2 )
-	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      // 68000 code
 	ROM_LOAD16_BYTE( "prg4.bin", 0x000000, 0x80000, CRC(c3151563) SHA1(61d3a20c25fea8a94ae6e473a87c21968867cba0) )
 	ROM_LOAD16_BYTE( "prg3.bin", 0x000001, 0x80000, CRC(8c2593ac) SHA1(4261bc72b96c3a5690df35c5d8b71524765693d9) )
 	ROM_LOAD16_BYTE( "prg2.bin", 0x100000, 0x80000, CRC(665a5485) SHA1(c07920d110ca9c35f6cbff94a6a889c17300f994) )
@@ -1434,20 +1436,20 @@ ROM_START( punipic2 )
 	ROM_CONTINUE(                   0x000006, 0x80000 )
 	ROM_CONTINUE(                   0x200006, 0x80000 )
 
-	ROM_REGION( 0x28000, "audiocpu", 0 ) /* PIC16c57 - protected */
-	ROM_LOAD( "pic16c57", 0x00000, 0x4000, NO_DUMP )
+	ROM_REGION( 0x1000, "audiocpu", 0 ) // PIC16c57
+	ROM_LOAD( "c2s_pic16c57.bin", 0x0000, 0x1000, CRC(0a5642ad) SHA1(799cbaf0d103fac0d94dcb4a2f97fa18833a4dcf) )
 
-	ROM_REGION( 0x200000, "oki", 0 ) /* OKI6295 */
+	ROM_REGION( 0x200000, "oki", 0 ) // OKI6295
 	ROM_LOAD( "sound.bin", 0x000000, 0x80000, CRC(aeec9dc6) SHA1(56fd62e8db8aa96cdd242d8c705849a413567780) )
 
-	ROM_REGION( 0x200000, "user1", 0 ) /* other */
+	ROM_REGION( 0x200000, "user1", 0 ) // Other
 	ROM_LOAD( "93c46.bin", 0x00, 0x80, CRC(36ab4e7d) SHA1(60bea43051d86d9aefcbb7a390cf0c7d8b905a4b) )
 ROM_END
 
-/* the readme doesn't actually state this has a PIC, and there's no sound ROM
+/* The readme doesn't actually state this has a PIC, and there's no sound ROM
    so it might be different */
 ROM_START( punipic3 )
-	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      // 68000 code
 	ROM_LOAD16_BYTE( "psb5b.rom", 0x000000, 0x80000, CRC(58f42c05) SHA1(e243928f0bbecdf2a8d07cf4a6fdea4440e46c01) )
 	ROM_LOAD16_BYTE( "psb3b.rom", 0x000001, 0x80000, CRC(90113db4) SHA1(4decc203ae3ee4abcb2e017f11cd20eae2abf3f3) )
 	ROM_LOAD16_BYTE( "psb4a.rom", 0x100000, 0x80000, CRC(665a5485) SHA1(c07920d110ca9c35f6cbff94a6a889c17300f994) )
@@ -1463,18 +1465,18 @@ ROM_START( punipic3 )
 	ROM_CONTINUE(                 0x200002, 0x80000 )
 	ROM_CONTINUE(                 0x200006, 0x80000 )
 
-	ROM_REGION( 0x28000, "audiocpu", ROMREGION_ERASE00 ) /* PIC16c57 (maybe, not listed in readme) */
-	//ROM_LOAD( "pic16c57", 0x00000, 0x4000, NO_DUMP )
+	ROM_REGION( 0x1000, "audiocpu", 0 ) // PIC16c57 (maybe, not listed in readme)
+	ROM_LOAD( "c2s_pic16c57.bin", 0x0000, 0x1000, CRC(0a5642ad) SHA1(799cbaf0d103fac0d94dcb4a2f97fa18833a4dcf) )
 
-	ROM_REGION( 0x200000, "oki", ROMREGION_ERASE00 ) /* OKI6295 */
-	//ROM_LOAD( "sound.bin", 0x000000, 0x80000, CRC(aeec9dc6) SHA1(56fd62e8db8aa96cdd242d8c705849a413567780) )
+	ROM_REGION( 0x200000, "oki", ROMREGION_ERASE00 ) // OKI6295
+	ROM_LOAD( "sound.bin", 0x000000, 0x80000, CRC(aeec9dc6) SHA1(56fd62e8db8aa96cdd242d8c705849a413567780) )
 ROM_END
 
 
 // ************************************************************************* SLAMPIC, SLAMPIC2
 
 ROM_START( slampic )
-	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      // 68000 code
 	ROM_LOAD16_BYTE( "5.bin", 0x000000, 0x80000,  CRC(7dba63cd) SHA1(222e781ffc40c5c23f5789c0682f549f00beeb8d) )
 	ROM_LOAD16_BYTE( "3.bin", 0x000001, 0x80000,  CRC(d86671f3) SHA1(d95fae27b0f4d3688f1c2229c9d3780724a870a8) )
 	ROM_LOAD16_BYTE( "4.bin", 0x100000, 0x80000,  CRC(d14d0e42) SHA1(b60c44193b247dc4856bd36d69cbbe9dcb2d21a7) )
@@ -1506,18 +1508,18 @@ ROM_START( slampic )
 	ROM_LOAD64_BYTE( "10.bin", 0x400003, 0x40000, CRC(f538e620) SHA1(354cd0548b067dfc8782bbe13b0a9c2083dbd290) )
 	ROM_CONTINUE(              0x400007, 0x40000)
 
-	ROM_REGION( 0x2000, "audiocpu", 0 ) /* PIC16c57 - protected, dump isn't valid */
+	ROM_REGION( 0x2000, "audiocpu", 0 ) // PIC16c57 - protected, dump isn't valid
 	ROM_LOAD( "pic16c57-xt-p.bin", 0x00000, 0x2000, BAD_DUMP CRC(aeae5ccc) SHA1(553afb68f7bf130cdf34e24512f72b4ecef1576f) )
 
-	ROM_REGION( 0x80000, "oki", 0 ) /* OKI6295 samples */
+	ROM_REGION( 0x80000, "oki", 0 ) // OKI6295 samples
 	ROM_LOAD( "18.bin", 0x00000, 0x80000, CRC(73a0c11c) SHA1(a66e1a964313e21c4436200d36c598dcb277cd34) )
 
-	ROM_REGION( 0x20000, "user1", 0 ) // not in the dump, but needed for protection
+	ROM_REGION( 0x20000, "user1", 0 ) // Not in the dump, but needed for protection
 	ROM_LOAD( "mb_qa.5k", 0x00000, 0x20000, CRC(e21a03c4) SHA1(98c03fd2c9b6bf8a4fc25a4edca87fff7c3c3819) )
 
-	/* pld devices:
+	/* PLD devices:
 	     ________________________
-	    |              1         |      (no component reference markings on pcb)
+	    |              1         |      (no component reference markings on PCB)
 	    |                        |
 	  ==         2               |
 	  ==                         |
@@ -1667,7 +1669,7 @@ ROM_START( slampic2 )
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "24.bin", 0x00000, 0x10000, CRC(13ea1c44) SHA1(5b05fe4c3920e33d94fac5f59e09ff14b3e427fe) )  // = various sf2 bootlegs (sf2ebbl etc.) "unknown (bootleg priority?)"
 
-	/* pld devices:
+	/* PLD devices:
 	#1    P7    palce16V8        todo...
 	#2    P1    palce16V8        secured, bruteforce ok
 	#3    P18   palce16V8        todo...
@@ -1728,10 +1730,10 @@ ROM_END
 
 // ************************************************************************* DRIVER MACROS
 
-GAME( 1993,  dinopic,    dino,      dinopic,   dino,      dinopic_state,     init_dinopic,   ROT0,  "bootleg",  "Cadillacs and Dinosaurs (bootleg with PIC16C57, set 1)",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )     // 930201 ETC
-GAME( 1993,  dinopic2,   dino,      dinopic,   dino,      dinopic_state,     init_dinopic,   ROT0,  "bootleg",  "Cadillacs and Dinosaurs (bootleg with PIC16C57, set 2)",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930201 ETC
-GAME( 1993,  dinopic3,   dino,      dinopic,   dino,      dinopic_state,     init_dinopic,   ROT0,  "bootleg",  "Cadillacs and Dinosaurs (bootleg with PIC16C57, set 3)",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )     // 930201 ETC
-GAME( 1993,  jurassic99, dino,      dinopic,   dino,      dinopic_state,     init_dinopic,   ROT0,  "bootleg",  "Jurassic 99 (Cadillacs and Dinosaurs bootleg with EM78P447AP)",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )     // 930201 ?
+GAME( 1993,  dinopic,    dino,      dinopic,   dino,      dinopic_state,     init_dinopic,   ROT0,  "bootleg",  "Cadillacs and Dinosaurs (bootleg with PIC16C57, set 1)",         MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930201 ETC
+GAME( 1993,  dinopic2,   dino,      dinopic,   dino,      dinopic_state,     init_dinopic,   ROT0,  "bootleg",  "Cadillacs and Dinosaurs (bootleg with PIC16C57, set 2)",         MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930201 ETC
+GAME( 1993,  dinopic3,   dino,      dinopic,   dino,      dinopic_state,     init_dinopic,   ROT0,  "bootleg",  "Cadillacs and Dinosaurs (bootleg with PIC16C57, set 3)",         MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930201 ETC
+GAME( 1993,  jurassic99, dino,      dinopic,   dino,      dinopic_state,     init_dinopic,   ROT0,  "bootleg",  "Jurassic 99 (Cadillacs and Dinosaurs bootleg with EM78P447AP)",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930201 ?
 
 GAME( 1993,  punipic,    punisher,  punipic,   punisher,  cps1bl_pic_state,  init_punipic,   ROT0,  "bootleg",  "The Punisher (bootleg with PIC16C57, set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930422 ETC
 GAME( 1993,  punipic2,   punisher,  punipic,   punisher,  cps1bl_pic_state,  init_punipic,   ROT0,  "bootleg",  "The Punisher (bootleg with PIC16C57, set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930422 ETC
