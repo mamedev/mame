@@ -55,8 +55,6 @@ private:
 
 	/* pia2 */
 	void pia2_pa_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( pia2_firq_a );
-	DECLARE_WRITE_LINE_MEMBER( pia2_firq_b );
 
 	/* psg */
 	uint8_t psg_porta_read();
@@ -69,9 +67,6 @@ private:
 	/* driver overrides */
 	virtual void device_start(void) override;
 	virtual void device_reset(void) override;
-
-	/* interrupts */
-	virtual bool firq_get_line(void) override;
 
 	void dgnalpha_io1(address_map &map);
 

@@ -91,7 +91,6 @@ void dragon_alpha_state::device_reset(void)
 }
 
 
-
 /***************************************************************************
   MODEM
 ***************************************************************************/
@@ -162,44 +161,6 @@ void dragon_alpha_state::pia2_pa_w(uint8_t data)
 			m_ay8912->address_w(m_pia_2->b_output());
 			break;
 	}
-}
-
-
-
-//-------------------------------------------------
-//  pia1_firq_a
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( dragon_alpha_state::pia2_firq_a )
-{
-	recalculate_firq();
-}
-
-
-
-//-------------------------------------------------
-//  pia1_firq_b
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( dragon_alpha_state::pia2_firq_b )
-{
-	recalculate_firq();
-}
-
-
-
-/***************************************************************************
-  CPU INTERRUPTS
-***************************************************************************/
-
-//-------------------------------------------------
-//  firq_get_line - gets the value of the FIRQ line
-//  passed into the CPU
-//-------------------------------------------------
-
-bool dragon_alpha_state::firq_get_line(void)
-{
-	return dragon_state::firq_get_line() || m_pia_2->irq_a_state() || m_pia_2->irq_b_state();
 }
 
 

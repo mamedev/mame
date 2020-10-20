@@ -44,9 +44,6 @@ public:
 	virtual uint8_t ff40_read(offs_t offset) override;
 	virtual void ff40_write(offs_t offset, uint8_t data) override;
 
-	DECLARE_WRITE_LINE_MEMBER(gime_firq_w) { recalculate_firq(); }
-	DECLARE_WRITE_LINE_MEMBER(gime_irq_w) { recalculate_irq(); }
-
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void coco3p(machine_config &config);
@@ -56,10 +53,6 @@ public:
 	void coco3_mem(address_map &map);
 protected:
 	virtual void update_cart_base(uint8_t *cart_base) override;
-
-	// interrupts
-	virtual bool firq_get_line(void) override;
-	virtual bool irq_get_line(void) override;
 
 	// miscellaneous
 	virtual void update_keyboard_input(uint8_t value) override;

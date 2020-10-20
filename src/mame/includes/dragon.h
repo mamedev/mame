@@ -69,7 +69,7 @@ public:
 	void dragon64(machine_config &config);
 	void tanodr64h(machine_config &config);
 	void dragon64h(machine_config &config);
-	DECLARE_WRITE_LINE_MEMBER( acia_irq );
+
 protected:
 	void d64_rom0(address_map &map);
 	void d64_rom1(address_map &map);
