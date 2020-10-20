@@ -37,7 +37,8 @@
 // ======================> snes_ppu_device
 
 class snes_ppu_device :  public device_t,
-							public device_video_interface
+							public device_video_interface,
+							public device_palette_interface
 {
 public:
 	// construction/destruction
@@ -311,6 +312,10 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// device_palette_interface overrides
+	virtual uint32_t palette_entries() const override { return 0x100 + (0x100 * 8) + 1; } // 256 word CG RAM data, 8 group of direct colours, Fixed color
+	virtual uint32_t palette_indirect_entries() const override { return 32 * 32 * 32; } // 15 bit BGR
 
 private:
 	devcb_read16  m_openbus_cb;
