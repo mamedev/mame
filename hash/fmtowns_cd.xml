@@ -13014,7 +13014,7 @@ User/save disks that can be created from the game itself are not included.
 		<year>1993</year>
 		<publisher>イリュージョン (Illusion)</publisher>
 		<info name="serial" value="HME-252"/>
-		<info name="alt_title" value="燃えるあそこの牌牌遊戯　復活！まぁじゃん王国" />
+		<info name="alt_title" value="燃えるあそこの牌牌遊戯　復活！まぁじゃん王国" /> <!-- まぁじゃん is correct. It's written that way on the cover and the title screen. -->
 		<info name="release" value="199312xx" />
 		<info name="usage" value="Requires HDD installation and 2 MB RAM"/>
 		<part name="cdrom" interface="fmt_cdrom">
