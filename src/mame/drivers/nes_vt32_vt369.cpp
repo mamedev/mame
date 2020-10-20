@@ -32,10 +32,7 @@ public:
 		m_io0(*this, "IO0"),
 		m_io1(*this, "IO1"),
 		m_cartsel(*this, "CARTSEL"),
-		m_exin0(*this, "EXTRAIN0"),
-		m_exin1(*this, "EXTRAIN1"),
-		m_exin2(*this, "EXTRAIN2"),
-		m_exin3(*this, "EXTRAIN3"),
+		m_exin(*this, "EXTRAIN%u", 0U),
 		m_prgrom(*this, "mainrom")
 	{ }
 
@@ -57,10 +54,7 @@ protected:
 	uint8_t m_previous_port0;
 
 	optional_ioport m_cartsel;
-	optional_ioport m_exin0;
-	optional_ioport m_exin1;
-	optional_ioport m_exin2;
-	optional_ioport m_exin3;
+	optional_ioport_array<4> m_exin;
 
 	/* Misc */
 	uint32_t m_ahigh; // external banking bits
@@ -80,13 +74,8 @@ protected:
 	void upper_412c_w(uint8_t data);
 
 private:
-	/* APU handling */
-
 	/* Extra IO */
-	uint8_t extrain_0_r();
-	uint8_t extrain_1_r();
-	uint8_t extrain_2_r();
-	uint8_t extrain_3_r();
+	template <uint8_t NUM> uint8_t extrain_r();
 };
 
 class nes_vt3x_state : public nes_vt3x_base_state
@@ -295,49 +284,18 @@ void nes_vt3x_unk_state::vt_external_space_map_fp_2x32mbyte(address_map &map)
 	map(0x0000000, 0x1ffffff).r(FUNC(nes_vt3x_unk_state::vt_rom_banked_r));
 }
 
-uint8_t nes_vt3x_base_state::extrain_0_r()
+
+template <uint8_t NUM> uint8_t nes_vt3x_base_state::extrain_r()
 {
-	if (m_exin0)
-		return m_exin0->read();
+	if (m_exin[NUM])
+		return m_exin[NUM]->read();
 	else
 	{
-		logerror("%s: extrain_0_r (not hooked up)\n", machine().describe_context());
+		logerror("%s: extrain_r (port %d) (not hooked up)\n", NUM, machine().describe_context());
 	}
 	return 0x00;
 }
 
-uint8_t nes_vt3x_base_state::extrain_1_r()
-{
-	if (m_exin1)
-		return m_exin1->read();
-	else
-	{
-		logerror("%s: extrain_1_r (not hooked up)\n", machine().describe_context());
-	}
-	return 0x00;
-}
-
-uint8_t nes_vt3x_base_state::extrain_2_r()
-{
-	if (m_exin2)
-		return m_exin2->read();
-	else
-	{
-		logerror("%s: extrain_2_r (not hooked up)\n", machine().describe_context());
-	}
-	return 0x00;
-}
-
-uint8_t nes_vt3x_base_state::extrain_3_r()
-{
-	if (m_exin3)
-		return m_exin3->read();
-	else
-	{
-		logerror("%s: extrain_3_r (not hooked up)\n", machine().describe_context());
-	}
-	return 0x00;
-}
 
 /* Standard I/O handlers (NES Controller clone) */
 
@@ -418,10 +376,10 @@ void nes_vt3x_base_state::configure_soc(nes_vt02_vt03_soc_device* soc)
 	soc->read_1_callback().set(FUNC(nes_vt3x_base_state::in1_r));
 	soc->write_0_callback().set(FUNC(nes_vt3x_base_state::in0_w));
 
-	soc->extra_read_0_callback().set(FUNC(nes_vt3x_base_state::extrain_0_r));
-	soc->extra_read_1_callback().set(FUNC(nes_vt3x_base_state::extrain_1_r));
-	soc->extra_read_2_callback().set(FUNC(nes_vt3x_base_state::extrain_2_r));
-	soc->extra_read_3_callback().set(FUNC(nes_vt3x_base_state::extrain_3_r));
+	soc->extra_read_0_callback().set(FUNC(nes_vt3x_base_state::extrain_r<0>));
+	soc->extra_read_1_callback().set(FUNC(nes_vt3x_base_state::extrain_r<1>));
+	soc->extra_read_2_callback().set(FUNC(nes_vt3x_base_state::extrain_r<2>));
+	soc->extra_read_3_callback().set(FUNC(nes_vt3x_base_state::extrain_r<3>));
 }
 
 uint8_t nes_vt3x_base_state::upper_412c_r()
