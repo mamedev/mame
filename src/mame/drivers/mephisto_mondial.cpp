@@ -218,7 +218,6 @@ void mephisto_mondial_state::mondial(machine_config &config)
 	m_maincpu->set_periodic_int(FUNC(mephisto_mondial_state::irq0_line_assert), attotime::from_hz(XTAL(2'000'000) / (1 << 12)));
 
 	config.device_remove("dac");
-	config.device_remove("vref");
 	BEEP(config, m_beeper, 2048).add_route(ALL_OUTPUTS, "speaker", 0.25); // measured C7(2093Hz)
 }
 

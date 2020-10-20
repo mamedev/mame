@@ -2061,7 +2061,6 @@ void segas16a_state::system16a_no7751(machine_config &config)
 	config.device_remove("n7751");
 	config.device_remove("n7751_8243");
 	config.device_remove("dac");
-	config.device_remove("vref");
 
 	YM2151(config.replace(), m_ymsnd, 4000000);
 	m_ymsnd->add_route(ALL_OUTPUTS, "speaker", 1.0);
@@ -2096,7 +2095,6 @@ void segas16a_state::system16a_fd1089a_no7751(machine_config &config)
 
 	config.device_remove("n7751");
 	config.device_remove("dac");
-	config.device_remove("vref");
 
 	YM2151(config.replace(), m_ymsnd, 4000000);
 	m_ymsnd->add_route(ALL_OUTPUTS, "speaker", 1.0);
@@ -2109,7 +2107,6 @@ void segas16a_state::system16a_fd1089b_no7751(machine_config &config)
 
 	config.device_remove("n7751");
 	config.device_remove("dac");
-	config.device_remove("vref");
 
 	YM2151(config.replace(), m_ymsnd, 4000000);
 	m_ymsnd->add_route(ALL_OUTPUTS, "speaker", 1.0);
@@ -2122,7 +2119,6 @@ void segas16a_state::system16a_fd1094_no7751(machine_config &config)
 
 	config.device_remove("n7751");
 	config.device_remove("dac");
-	config.device_remove("vref");
 
 	YM2151(config.replace(), m_ymsnd, 4000000);
 	m_ymsnd->add_route(ALL_OUTPUTS, "speaker", 1.0);

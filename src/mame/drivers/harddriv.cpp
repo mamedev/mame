@@ -1921,7 +1921,6 @@ void steeltal_board_device_state::device_add_mconfig(machine_config &config) //t
 	config.device_remove("ds3xdsp");
 	config.device_remove("ldac");
 	config.device_remove("rdac");
-	config.device_remove("vref");
 	config.device_remove("lspeaker");
 	config.device_remove("rspeaker");
 
