@@ -6458,7 +6458,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="free software collection 7 (japan)" sha1="acd3dfc82325f7cf86ea6b72acc583ec906afc6f" />
+				<disk name="free software collection 7 (japan) (rev a)" sha1="acd3dfc82325f7cf86ea6b72acc583ec906afc6f" />
 			</diskarea>
 		</part>
 	</software>
@@ -13016,7 +13016,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="serial" value="HME-252"/>
 		<info name="alt_title" value="燃えるあそこの牌牌遊戯　復活！まぁじゃん王国" /> <!-- まぁじゃん is correct. It's written that way on the cover and the title screen. -->
 		<info name="release" value="199312xx" />
-		<info name="usage" value="Requires HDD installation and 2 MB RAM"/>	
+		<info name="usage" value="Requires HDD installation and 2 MB RAM"/>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="moeru asoko no paipai yuugi - fukkatsu mahjong oukoku (japan)" sha1="8bad4fec2ff8330c76dd48a8af276477b59075cb" />
@@ -14686,7 +14686,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="release" value="199406xx" />
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="sangokushi iv with soundware (japan)" sha1="49dc6daa29837edd705cf281d57030f3d7a22aee" />
+				<disk name="sangokushi iv (japan)" sha1="49dc6daa29837edd705cf281d57030f3d7a22aee" />
 			</diskarea>
 		</part>
 	</software>
