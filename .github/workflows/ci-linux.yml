@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        compiler: [gcc, gcc-10, clang]
+        compiler: [gcc, gcc10, clang]
         include:
           - compiler: gcc
             cc: gcc
