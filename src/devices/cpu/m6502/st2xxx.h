@@ -84,6 +84,9 @@ public:
 	auto in_pl_callback() { return m_in_port_cb[6].bind(); }
 	auto out_pl_callback() { return m_out_port_cb[6].bind(); }
 
+	auto spi_in_callback() { return m_spi_in_port_cb.bind(); }
+	auto spi_out_callback() { return m_spi_out_port_cb.bind(); }
+
 protected:
 	st2xxx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal_map, int data_bits, bool has_banked_ram);
 
@@ -217,6 +220,8 @@ protected:
 	u8 lpwm_r();
 	void lpwm_w(u8 data);
 
+	u8 spi_r();
+	void spi_w(u8 data);
 	u8 sctr_r();
 	void sctr_w(u8 data);
 	u8 sckr_r();
@@ -254,6 +259,9 @@ protected:
 
 	devcb_read8::array<7> m_in_port_cb;
 	devcb_write8::array<7> m_out_port_cb;
+
+	devcb_read8 m_spi_in_port_cb;
+	devcb_write8 m_spi_out_port_cb;
 
 	const u16 m_prr_mask;
 	const u16 m_drr_mask;
