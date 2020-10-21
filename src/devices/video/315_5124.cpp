@@ -68,6 +68,25 @@ PAL frame timing
 #include "video/315_5124.h"
 
 
+/****************************************************************************
+ * Configurable logging
+ ****************************************************************************/
+
+#define LOG_GENERAL    (1U <<  0)
+#define LOG_VIDMODE    (1U <<  1)
+#define LOG_REGWRITE   (1U <<  2)
+#define LOG_VCOUNTREAD (1U <<  3)
+
+//#define VERBOSE (LOG_GENERAL | LOG_VIDMODE | LOG_REGWRITE | LOG_VCOUNTREAD)
+//#define LOG_OUTPUT_FUNC printf
+#include "logmacro.h"
+
+#define LOGVIDMODE(...)    LOGMASKED(LOG_VIDMODE, __VA_ARGS__)
+#define LOGREGWRITE(...)   LOGMASKED(LOG_REGWRITE, __VA_ARGS__)
+#define LOGVCOUNTREAD(...) LOGMASKED(LOG_VCOUNTREAD, __VA_ARGS__)
+
+/****************************************************************************/
+
 #define SEGA315_5124_PALETTE_SIZE     (64 + 16)
 #define SEGA315_5377_PALETTE_SIZE     4096
 
@@ -337,7 +356,7 @@ void sega315_5124_device::select_display_mode()
 		else if (!M1 && !M2 && M3) // Mode 3 (Multicolor Mode) */
 			m_vdp_mode = 3;
 		else
-			logerror("Unknown video mode detected (M1 = %c, M2 = %c, M3 = %c, M4 = %c)\n", M1 ? '1' : '0', M2 ? '1' : '0', M3 ? '1' : '0', M4 ? '1' : '0');
+			LOGVIDMODE("Unknown video mode detected (M1 = %c, M2 = %c, M3 = %c, M4 = %c)\n", M1 ? '1' : '0', M2 ? '1' : '0', M3 ? '1' : '0', M4 ? '1' : '0');
 	}
 
 }
@@ -351,7 +370,7 @@ void sega315_5313_mode4_device::select_display_mode()
 	{
 		/* mode 5, not implemented */
 		m_vdp_mode = 5;
-		logerror("Switched to unimplemented video mode 5 !\n");
+		LOGVIDMODE("Switched to unimplemented video mode 5 !\n");
 	}
 	else
 	{
@@ -394,17 +413,15 @@ u8 sega315_5124_device::vcount_read()
 {
 	u8 vc = vcount();
 
-	/*
-	osd_printf_verbose(
-		"fr %lld vpos %3d hpos %3d hc 0x%02X %s: vcount read value 0x%02X\n"
-		, screen().frame_number()
-		, screen().vpos()
-		, screen_hpos()
-		, hcount()
-		, machine().describe_context().c_str()
-		, vc
+	LOGVCOUNTREAD(
+		"fr %d vpos %3d hpos %3d hc 0x%02X %s: vcount read value 0x%02X\n",
+		screen().frame_number(),
+		screen().vpos(),
+		screen_hpos(),
+		hcount(),
+		machine().describe_context(),
+		vc
 	);
-	*/
 
 	return vc;
 }
@@ -902,14 +919,14 @@ void sega315_5124_device::control_write(u8 data)
 				break;
 			}
 			m_reg[reg_num] = m_addr & 0xff;
-			//logerror("%s: %s: setting register %x to %02x\n", machine().describe_context(), tag(), reg_num, m_addr & 0xff);
+			LOGREGWRITE("%s: %s: setting register %x to %02x\n", machine().describe_context(), tag(), reg_num, m_addr & 0xff);
 
 			switch (reg_num)
 			{
 			case 0:
 				set_display_settings();
 				if (BIT(m_addr, 1))
-					logerror("overscan enabled.\n");
+					LOGVIDMODE("overscan enabled.\n");
 				break;
 			case 1:
 				set_display_settings();
