@@ -1213,7 +1213,7 @@ ROM_START( aladmdb )
 	ROM_LOAD16_BYTE( "m4.bin", 0x100000, 0x080000,  CRC(bc712661) SHA1(dfd554d000399e17b4ddc69761e572195ed4e1f0) )
 
 	ROM_REGION( 0x1000, "pic", ROMREGION_ERASE00 )
-	ROM_LOAD( "pic16c57xtp", 0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "pic16c57xtp", 0x0000, 0x1000, NO_DUMP )
 ROM_END
 
 ROM_START( mk3mdb ) // ROMs are scrambled, we take care of the address descramble in the ROM load, and the data descramble in the init
@@ -1334,7 +1334,7 @@ ROM_START( jparkmb ) // Same PCB as twinktmb, JPA-028 label
 	ROM_LOAD16_BYTE( "f21.bin", 0x100001, 0x080000,  CRC(6ede6b6b) SHA1(cf29300d9278ea03f54cf54ea582bdd8b9bbdbbd) )
 
 	ROM_REGION( 0x1000, "pic", ROMREGION_ERASE00 )
-	ROM_LOAD( "pic16c57xtp", 0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "pic16c57xtp", 0x0000, 0x1000, NO_DUMP )
 ROM_END
 
 
