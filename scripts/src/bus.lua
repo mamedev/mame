@@ -2398,6 +2398,8 @@ if (BUSES["A2BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2bus/uthernet.h",
 		MAME_DIR .. "src/devices/bus/a2bus/sider.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/sider.h",
+		MAME_DIR .. "src/devices/bus/a2bus/grapplerplus.cpp",
+		MAME_DIR .. "src/devices/bus/a2bus/grapplerplus.h",
 	}
 end
 

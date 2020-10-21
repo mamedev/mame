@@ -110,6 +110,7 @@
 //#include "bus/a2bus/ramfast.h"
 #include "bus/a2bus/uthernet.h"
 #include "bus/a2bus/sider.h"
+#include "bus/a2bus/grapplerplus.h"
 
 #include "bus/a2gameio/gameio.h"
 
@@ -4593,6 +4594,7 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("uthernet", A2BUS_UTHERNET);  /* A2RetroSystems Uthernet card */
 	device.option_add("sider2", A2BUS_SIDER2); /* Advanced Tech Systems / First Class Peripherals Sider 2 SASI card */
 	device.option_add("sider1", A2BUS_SIDER1); /* Advanced Tech Systems / First Class Peripherals Sider 1 SASI card */
+	device.option_add("grapplerplus", A2BUS_GRAPPLERPLUS); /* Orange Micro Grappler Plus Parallel Interface card */
 }
 
 void apple2gs_state::apple2gs(machine_config &config)
