@@ -2688,7 +2688,6 @@ void nbmj8688_state::barline(machine_config &config)
 	YM3812(config.replace(), "psg", 20000000/8).add_route(ALL_OUTPUTS, "speaker", 0.35);
 
 	config.device_remove("dac");
-	config.device_remove("vref");
 }
 
 void nbmj8688_state::mbmj_p16bit(machine_config &config)

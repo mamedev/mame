@@ -674,28 +674,11 @@ QUICKLOAD_LOAD_MEMBER(homelab_state::quickload_cb)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int i=0;
-	u8 ch;
-	u16 quick_addr;
-	u16 quick_length;
-	u16 quick_end;
-	std::vector<u8> quick_data;
 	char pgmname[256];
 	u16 args[2];
-	int read_;
-
-	quick_length = image.length();
-	quick_data.resize(quick_length);
-
-	read_ = image.fread( &quick_data[0], quick_length);
-	if (read_ != quick_length)
-	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
-		image.message(" Cannot read the file");
-		return image_init_result::FAIL;
-	}
 
 	image.fseek(0x100, SEEK_SET);
-	ch = image.fgetc();
+	u8 ch = image.fgetc();
 	if (ch != 0xA5)
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid header");
@@ -712,7 +695,8 @@ QUICKLOAD_LOAD_MEMBER(homelab_state::quickload_cb)
 			return image_init_result::FAIL;
 		}
 
-		pgmname[i] = ch;    /* build program name */
+		// image.message treats characters with bit 7 as nulls, so replace with question mark
+		pgmname[i] = BIT(ch, 7) ? 0x3f : ch;    // build program description
 		i++;
 	}
 
@@ -725,9 +709,9 @@ QUICKLOAD_LOAD_MEMBER(homelab_state::quickload_cb)
 		return image_init_result::FAIL;
 	}
 
-	quick_addr = little_endianize_int16(args[0]);
-	quick_length = little_endianize_int16(args[1]);
-	quick_end = quick_addr+quick_length-1;
+	u16 quick_addr = little_endianize_int16(args[0]);
+	u16 quick_length = little_endianize_int16(args[1]);
+	u16 quick_end = quick_addr+quick_length-1;
 
 	if (quick_end > 0x7fff)
 	{

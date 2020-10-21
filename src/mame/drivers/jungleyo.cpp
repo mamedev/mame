@@ -151,8 +151,8 @@ void jungleyo_state::jungleyo(machine_config &config)
 
 ROM_START( jungleyo )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code, encrypted
-	ROM_LOAD16_BYTE( "jungle_=record=_rom3_vi3.02.u15", 0x00001, 0x20000, CRC(7c9f431e) SHA1(fb3f90c4fe59c938f36b30c5fa3af227031e7d7a) )
-	ROM_LOAD16_BYTE( "jungle_=record=_rom2_vi3.02.u14", 0x00000, 0x20000, CRC(f6a71260) SHA1(8e48cbb9d701ad968540244396820359afe97c28) )
+	ROM_LOAD16_BYTE( "jungle_=record=_rom3_vi3.02.u15", 0x00000, 0x20000, CRC(7c9f431e) SHA1(fb3f90c4fe59c938f36b30c5fa3af227031e7d7a) )
+	ROM_LOAD16_BYTE( "jungle_=record=_rom2_vi3.02.u14", 0x00001, 0x20000, CRC(f6a71260) SHA1(8e48cbb9d701ad968540244396820359afe97c28) )
 
 	ROM_REGION( 0x040000, "oki", 0 )
 	ROM_LOAD( "jungle_rom1.u99", 0x00000, 0x40000, CRC(05ef5b85) SHA1(ca7584646271c6adc7880eca5cf43a412340c522) )
@@ -173,7 +173,7 @@ void jungleyo_state::init_jungleyo() // TODO: just a start, gives correct (?) st
 	uint16_t *src = (uint16_t *)memregion("maincpu")->base();
 
 	for (int i = 0x00000; i < 0x40000 / 2; i++)
-		src[i] = bitswap<16>(src[i] ^ 0xff00, 14, 12, 10, 15, 11, 8, 9, 13, 0, 2, 7, 3, 1, 6, 4, 5); // TODO: possibly the bitswap and XOR are applied per byte and not per word, verify when more is discovered
+		src[i] = bitswap<16>(src[i] ^ 0x00ff, 8, 10, 15, 11, 9, 14, 12, 13, 6, 4, 2, 7, 3, 0, 1, 5); // TODO: possibly the bitswap and XOR are applied per byte and not per word, verify when more is discovered
 
 	/*char filename[256];
 	sprintf(filename,"p_decrypted_%s", machine().system().name);

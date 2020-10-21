@@ -1912,7 +1912,6 @@ void m72_state::rtype(machine_config &config)
 
 	config.device_remove("m72");
 	config.device_remove("dac");
-	config.device_remove("vref");
 }
 
 void m72_state::m72_xmultipl(machine_config &config)
