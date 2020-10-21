@@ -526,6 +526,8 @@ m79152pc.cpp
 mac.cpp
 mac128.cpp
 macpci.cpp
+macprtb.cpp
+macpwrbk030.cpp
 macquadra700.cpp
 magiceyes_pollux_vr3520f.cpp
 magnum.cpp
