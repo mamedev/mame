@@ -283,7 +283,9 @@ void ppu2c04_clone_device::device_start()
 
 	(theoretically this can cause the wrong sprite tiles to be drawn for
 	one frame after changing CHR banks, but the Vs. SMB bootlegs that use
-	this clone hardware don't actually have CHR bank switching anyway)
+	this clone hardware don't actually have CHR bank switching anyway.
+	also generally affects PPU-side read timings involving the OAM, but
+	this still doesn't seem to matter for Vs. SMB specifically)
 	*/
 	m_spritebuf = make_unique_clear<uint8_t[]>(SPRITERAM_SIZE);
 	save_pointer(NAME(m_spritebuf), SPRITERAM_SIZE);
