@@ -24,6 +24,7 @@
   - Add (real/proper) RTC support.
   - Fix wonderwitch
     - Make the flash rom changes save.
+	- Change the address maps to 16bit
 
 ***************************************************************************/
 

@@ -53,10 +53,10 @@ protected:
 	void interrupt(int int_num);
 
 	// Accessing memory and io
-	inline uint8_t read_byte(uint32_t segment, uint16_t addr);
-	inline uint16_t read_word(uint32_t segment, uint16_t addr);
-	inline void write_byte(uint32_t segment, uint16_t addr, uint8_t data);
-	inline void write_word(uint32_t segment, uint16_t addr, uint16_t data);
+	inline uint8_t read_byte(uint16_t segment, uint16_t addr);
+	inline uint16_t read_word(uint16_t segment, uint16_t addr);
+	inline void write_byte(uint16_t segment, uint16_t addr, uint8_t data);
+	inline void write_word(uint16_t segment, uint16_t addr, uint16_t data);
 	inline uint8_t read_port(uint16_t port);
 	inline uint16_t read_port_word(uint16_t port);
 	inline void write_port(uint16_t port, uint8_t data);
@@ -75,7 +75,7 @@ protected:
 	inline void clkm(uint32_t cycles_reg, uint32_t cycles_mem);
 
 	// Memory handling while executing instructions
-	inline uint32_t default_base(int seg);
+	inline uint16_t default_base(int seg);
 	inline void get_ea();
 	inline void store_ea_rm_byte(uint8_t data);
 	inline void store_ea_rm_word(uint16_t data);
@@ -86,10 +86,6 @@ protected:
 	inline uint16_t get_rm_word();
 	inline uint16_t get_next_rm_word();
 	inline uint8_t get_rm_byte();
-	inline void put_mem_byte(int seg, uint16_t offset, uint8_t data);
-	inline void put_mem_word(int seg, uint16_t offset, uint16_t data);
-	inline uint8_t get_mem_byte(int seg, uint16_t offset);
-	inline uint16_t get_mem_word(int seg, uint16_t offset);
 	inline void put_imm_rm_word();
 	inline void put_rm_word(uint16_t val);
 	inline void put_rm_byte(uint8_t val);
@@ -202,12 +198,12 @@ protected:
 	memory_access<16, 1, 0, ENDIANNESS_LITTLE>::specific m_io;
 	int m_icount;
 
-	uint32_t m_prefix_base; // base address of the latest prefix segment
+	uint16_t m_prefix_base; // base address of the latest prefix segment
 	bool m_seg_prefix;      // prefix segment indicator
 	bool m_seg_prefix_next; // prefix segment for next instruction
 
 	uint16_t m_eo;
-	uint32_t m_ea_seg;
+	uint16_t m_ea_seg;
 
 	// Used during execution of instructions
 	uint8_t   m_modrm;
