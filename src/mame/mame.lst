@@ -13080,6 +13080,11 @@ elf2                            //
 @source:elwro800.cpp
 elwro800                        //
 
+@source:emax.cpp
+emax                            //
+emax2                           //
+emaxp                           //
+
 @source:embargo.cpp
 embargo                         //
 
@@ -13090,7 +13095,6 @@ emma2                           // 1979 L.J.Technical Systems
 emu2                            //
 
 @source:emu3.cpp
-emax2                           //
 emu3                            //
 
 @source:emu68k.cpp
