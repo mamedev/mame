@@ -32663,7 +32663,9 @@ ns5652                          //
 pitchhit                        //
 
 @source:nsm.cpp
+cosflnsm                        //
 firebird                        //
+gamesnsm                        //
 
 @source:nsmpoker.cpp
 nsmpoker                        //
