@@ -85,7 +85,6 @@
 #define SNES_VRAM_SIZE        0x10000   /* 64kb of video ram */
 #define SNES_CGRAM_SIZE       0x200     /* 256 16-bit colours */
 #define SNES_OAM_SIZE         0x440     /* 1088 bytes of Object Attribute Memory */
-#define FIXED_COLOUR          0x900     /* Position in cgram for fixed colour */
 
 
 /* Definitions for PPU Memory-Mapped registers */
@@ -248,7 +247,7 @@ void snes_ppu_device::device_start()
 			const u16 direct = (c << 7 & 0x6000) + (group << 10 & 0x1000)
 							 + (c << 4 & 0x0380) + (group <<  5 & 0x0040)
 							 + (c << 2 & 0x001c) + (group <<  1 & 0x0002);
-			set_pen_indirect(256 + c + (group * 256), direct);
+			set_pen_indirect(DIRECT_COLOUR + c + (group * 256), direct);
 		}
 	}
 
@@ -1739,7 +1738,7 @@ uint16_t snes_ppu_device::direct_color(uint16_t palette, uint16_t group)
   //palette = -------- BBGGGRRR
   //group   = -------- -----bgr
   //output  = 0BBb00GG Gg0RRRr0
-  return pen_indirect(256 + palette + (group * 256));
+  return pen_indirect(DIRECT_COLOUR + palette + (group * 256));
 }
 
 void snes_ppu_device::set_current_vert(uint16_t value)
@@ -2381,7 +2380,7 @@ void snes_ppu_device::write(uint32_t offset, uint8_t data)
 			break;
 		case COLDATA:   /* Fixed colour data for fixed colour addition/subtraction */
 			{
-				/* Store it in the extra space we made in the CGRAM. It doesn't really go there, but it's as good a place as any. */
+				/* Store it in the extra space we made in the palette entry. */
 				uint8_t r, g, b;
 
 				/* Get existing value. */
