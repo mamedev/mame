@@ -1434,4 +1434,16 @@ Compiled by Robbbert
 			</dataarea>
 		</part>
 	</software>
+	<software name="invad2">
+		<description>Sorcerer Invaders (alt)</description>
+		<year>1980</year>
+		<publisher>System Software</publisher>
+		<info name="developer" value="Martin Seymor"/>
+		<info name="usage" value="In Basic, CLOAD then RUN" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="0x697a50">
+				<rom name="invad2.wav" size="0x697a50" crc="b450ddfd" sha1="54555ec44b57c30fbdcd637d6b5ff2cf61403eca" />
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>
