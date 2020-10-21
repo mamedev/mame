@@ -319,8 +319,8 @@ protected:
 	virtual uint32_t palette_indirect_entries() const override { return 32 * 32 * 32; } // 15 bit BGR
 
 private:
-	const uint16_t DIRECT_COLOUR = 0x100; // Position in palette entry for direct colour
-	const uint16_t FIXED_COLOUR = 0x100 + (0x100 * 8); // Position in palette entry for fixed colour
+	static constexpr uint16_t DIRECT_COLOUR = 0x100; // Position in palette entry for direct colour
+	static constexpr uint16_t FIXED_COLOUR = 0x100 + (0x100 * 8); // Position in palette entry for fixed colour
 
 	devcb_read16  m_openbus_cb;
 	optional_ioport m_options;
