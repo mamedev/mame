@@ -8,9 +8,7 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: Install dependencies
-        run: |
-          brew update
-          brew install sdl2
+        run: brew install sdl2
       - name: Build
         env:
           USE_LIBSDL: 1
