@@ -13,7 +13,7 @@ jobs:
             cc: gcc
             cxx: g++
             archopts: -U_FORTIFY_SOURCE
-          - compiler: gcc-10
+          - compiler: gcc10
             cc: gcc-10
             cxx: g++-10
             archopts: -U_FORTIFY_SOURCE
@@ -26,11 +26,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libsdl2-dev libsdl2-ttf-dev libasound2-dev libxinerama-dev libxi-dev qt5-default
-      - name: Install gcc-10
-        if: matrix.compiler == 'gcc-10'
-        run: |
-          sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
-          sudo apt-get install g++-10 gcc-10
       - name: Install clang
         if: matrix.compiler == 'clang'
         run: sudo apt-get install -y clang
