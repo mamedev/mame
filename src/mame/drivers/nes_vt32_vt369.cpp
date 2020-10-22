@@ -4,12 +4,11 @@
 
   nes_vt32_vt369.cpp
 
-  VT32, VT369 and higher
+  VT369 and unknown/higher
 
    - new screen modes
    - new registers for controlling banking
    - can run from SPI ROM
-   - backwards compatibility with mappers other than MMC3
    - additional audio cpu (like VT1682) and multiplier on VT369 models
 
    (not all features are used all games, but anything that has an SPI ROM
@@ -132,8 +131,6 @@ public:
 	void vt_external_space_map_bitboy_2x16mbyte(address_map& map);
 
 private:
-	void nes_vt3x_cy_map(address_map& map);
-	void nes_vt3x_bt_map(address_map& map);
 
 	void bittboy_412c_w(uint8_t data);
 
@@ -649,15 +646,6 @@ void nes_vt3x_swap_op_d5_d6_state::nes_vt3x_vh2009_8mb(machine_config& config)
 }
 
 
-static INPUT_PORTS_START( nes_vt3x_fp )
-	PORT_INCLUDE(nes_vt3x)
-
-	PORT_START("CARTSEL")
-	PORT_DIPNAME( 0x06, 0x00, "Cartridge Select" ) PORT_CODE(KEYCODE_3) PORT_TOGGLE
-	PORT_DIPSETTING(    0x00, "472-in-1" )
-	PORT_DIPSETTING(    0x06, "128-in-1" )
-INPUT_PORTS_END
-
 static INPUT_PORTS_START( nes_vt3x_fa )
 	PORT_INCLUDE(nes_vt3x)
 
@@ -772,15 +760,6 @@ ROM_START( sy888b )
 	ROM_LOAD( "sy888b_f25q32.bin", 0x00000, 0x400000, CRC(a8298c33) SHA1(7112dd13d5fb5f9f9d496816758defd22773ec6e) )
 ROM_END
 
-ROM_START( dgun2573 ) // this one lacked a DreamGear logo but was otherwise physically identical, is it a clone product or did DreamGear drop the logo in favor of just using the 'My Arcade' brand?
-	ROM_REGION( 0x2000000, "mainrom", 0 )
-	ROM_LOAD( "myarcadegamerportable_s29gl256p10tfi01_0001227e.bin", 0x00000, 0x2000000, CRC(8f8c8da7) SHA1(76a18458922e39abe1982f05f184babb5e65acf2) )
-ROM_END
-
-ROM_START( dgun2573a )
-	ROM_REGION( 0x2000000, "mainrom", 0 )
-	ROM_LOAD( "myarcadegamerportabledreamgear_s29gl256p10tfi01_0001227e.bin", 0x00000, 0x2000000, CRC(928c41ad) SHA1(c0119a13a47a5b784d0b834d1451973ff0b4a84f) )
-ROM_END
 
 ROM_START( bittboy )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
@@ -812,10 +791,6 @@ ROM_START( unkra200 ) // "Winbond 25Q64FVSIG 1324" SPI ROM
 	ROM_LOAD( "retro_machine_rom", 0x00000, 0x800000, CRC(0e824aa7) SHA1(957e98868559ecc22b3fa42c76692417b76bf132) )
 ROM_END
 
-ROM_START( rminitv )
-	ROM_REGION( 0x2000000, "mainrom", 0 )
-	ROM_LOAD( "29gl256.bin", 0x00000, 0x2000000, CRC(cb4048d4) SHA1(9877ce5716d13f8498abfc1cbfaefa9426205d3e) )
-ROM_END
 
 ROM_START( denv150 )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
@@ -827,10 +802,6 @@ ROM_START( mog_m320 )
 	ROM_LOAD( "w25q64fv.bin", 0x00000, 0x800000, CRC(3c5e1b36) SHA1(4bcbf35ebf2b1714ccde5de758a89a6a39528f89) )
 ROM_END
 
-ROM_START( fcpocket )
-	ROM_REGION( 0x8000000, "mainrom", 0 )
-	ROM_LOAD( "s29gl01gp.bin", 0x00000, 0x8000000, CRC(8703b18a) SHA1(07943443294e80ca93f83181c8bdbf950b87c52f) ) // 2nd half = 0x00 (so 64MByte of content)
-ROM_END
 
 ROM_START( fapocket )
 	ROM_REGION( 0x4000000, "mainrom", 0 )
@@ -888,16 +859,6 @@ CONS( 201?, mc_cb280,   0,        0,  nes_vt3x_hh_4mb, nes_vt3x, nes_vt3x_unk_st
 
 // Plays intro music but then crashes. same hardware as SY-88x but uses more features
 CONS( 2016, mog_m320,   0,        0,  nes_vt3x_hh_8mb, nes_vt3x, nes_vt3x_unk_state, empty_init, "MOGIS",    "MOGIS M320 246 in 1 Handheld", MACHINE_NOT_WORKING )
-
-// similar menus to above, but with opcode scrambling
-CONS( 2015, dgun2573,  0,         0,  nes_vt3x_fp_32mb,     nes_vt3x, nes_vt3x_unk_state, empty_init, "dreamGEAR", "My Arcade Gamer V Portable Gaming System (DGUN-2573) (set 1, newer)",  MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 2015, dgun2573a, dgun2573,  0,  nes_vt3x_fp_32mb,     nes_vt3x, nes_vt3x_unk_state, empty_init, "dreamGEAR", "My Arcade Gamer V Portable Gaming System (DGUN-2573) (set 2, older)",  MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // some menu graphics haven't been updated to reflect 'Panda' theme to the sports games
-
-CONS( 2015, rminitv,   0,  0,  nes_vt3x_fp_pal_32mb, nes_vt3x, nes_vt3x_unk_state, empty_init, "Orb Gaming", "Retro 'Mini TV' Console 300-in-1", MACHINE_IMPERFECT_GRAPHICS ) // single 32Mbyte bank!
-// New platform with scrambled opcodes, same as DGUN-2561. Runs fine with minor GFX and sound issues in menu
-// Use DIP switch to select console or cartridge, as cartridge is fake and just toggles a GPIO
-CONS( 2016, fcpocket,  0,  0,  nes_vt3x_fp_4x16mb,   nes_vt3x_fp, nes_vt3x_unk_state, empty_init, "<unknown>",   "FC Pocket 600 in 1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )  // has external banking (2x 32mbyte banks)
-
 
 /****************************************************************************************************************
 
