@@ -22,7 +22,7 @@
   ***************************************************************************/
 
 #include "emu.h"
-#include "machine/nes_vt09_soc.h"
+#include "machine/nes_vt32_vt369_soc.h"
 
 class nes_vt3x_base_state : public driver_device
 {
