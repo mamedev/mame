@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood
 /***************************************************************************
 
-  nes_vt369_vtunknown.cpp
+  nes_vt32.cpp
 
   VT32
 
