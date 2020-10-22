@@ -7,9 +7,11 @@
 ***********************************************************************************************************************************/
 
 #include "emu.h"
+#include "bus/nscsi/devices.h"
 #include "cpu/ns32000/ns32000.h"
 #include "machine/6850acia.h"
 #include "machine/eepromser.h"
+#include "machine/ncr5380n.h"
 #include "machine/pit8253.h"
 #include "machine/wd_fdc.h"
 #include "video/hd44780.h"
@@ -24,6 +26,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_ctc(*this, "ctc")
 		, m_fdc(*this, "fdc")
+		, m_hdc(*this, "scsi:7:hdc")
 		, m_lcdc(*this, "lcdc")
 	{
 	}
@@ -35,12 +38,15 @@ public:
 private:
 	HD44780_PIXEL_UPDATE(pixel_update);
 
+	u8 hdc_r(offs_t offset);
+	void hdc_w(offs_t offset, u8 data);
 	u8 timer_r(offs_t offset);
 	void timer_w(offs_t offset, u8 data);
 	void mux_w(u8 data);
 	void dac_w(u8 data);
 
 	void palette_init(palette_device &palette);
+	void scsihd(machine_config &config);
 
 	void emax_periphs(address_map &map);
 	void emax_map(address_map &map);
@@ -50,6 +56,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pit8254_device> m_ctc;
 	required_device<wd1772_device> m_fdc;
+	optional_device<ncr5380n_device> m_hdc;
 	required_device<hd44780_device> m_lcdc;
 };
 
@@ -59,6 +66,16 @@ HD44780_PIXEL_UPDATE(emax_state::pixel_update)
 		bitmap.pix(line * 8 + y, pos * 6 + x) = state;
 }
 
+
+u8 emax_state::hdc_r(offs_t offset)
+{
+	return m_hdc->read(offset >> 1);
+}
+
+void emax_state::hdc_w(offs_t offset, u8 data)
+{
+	m_hdc->write(offset >> 1, data);
+}
 
 u8 emax_state::timer_r(offs_t offset)
 {
@@ -81,10 +98,6 @@ void emax_state::dac_w(u8 data)
 void emax_state::emax_periphs(address_map &map)
 {
 	map(0x2c0000, 0x2c0000).select(6).rw(FUNC(emax_state::timer_r), FUNC(emax_state::timer_w));
-	map(0x818048, 0x818048).w("acia", FUNC(acia6850_device::control_w));
-	map(0x81804a, 0x81804a).r("acia", FUNC(acia6850_device::status_r));
-	map(0x81804c, 0x81804c).w("acia", FUNC(acia6850_device::data_w));
-	map(0x81804e, 0x81804e).r("acia", FUNC(acia6850_device::data_r));
 	map(0x822000, 0x822000).w(m_fdc, FUNC(wd1772_device::cmd_w));
 	map(0x822400, 0x822400).r(m_fdc, FUNC(wd1772_device::status_r));
 	map(0x822800, 0x822800).w(m_fdc, FUNC(wd1772_device::track_w));
@@ -108,6 +121,10 @@ void emax_state::emax_map(address_map &map)
 	map(0x000000, 0x000fff).rom().region("bootprom", 0);
 	map(0x008100, 0x0081ff).ram();
 	map(0x010000, 0x017fff).ram();
+	map(0x818048, 0x818048).w("acia", FUNC(acia6850_device::control_w));
+	map(0x81804a, 0x81804a).r("acia", FUNC(acia6850_device::status_r));
+	map(0x81804c, 0x81804c).w("acia", FUNC(acia6850_device::data_w));
+	map(0x81804e, 0x81804e).r("acia", FUNC(acia6850_device::data_r));
 	emax_periphs(map);
 }
 
@@ -116,6 +133,11 @@ void emax_state::emaxp_map(address_map &map)
 	map(0x000000, 0x001fff).rom().region("bootprom", 0);
 	map(0x008100, 0x0081ff).ram();
 	map(0x010000, 0x017fff).ram();
+	map(0x0f8000, 0x0f8000).select(0xe).rw(FUNC(emax_state::hdc_r), FUNC(emax_state::hdc_w));
+	map(0x818028, 0x818028).w("acia", FUNC(acia6850_device::control_w));
+	map(0x81802a, 0x81802a).r("acia", FUNC(acia6850_device::status_r));
+	map(0x81802c, 0x81802c).w("acia", FUNC(acia6850_device::data_w));
+	map(0x81802e, 0x81802e).r("acia", FUNC(acia6850_device::data_r));
 	emax_periphs(map);
 }
 
@@ -135,6 +157,7 @@ void emax_state::emax2_map(address_map &map)
 	map(0x0b0002, 0x0b0002).r(m_lcdc, FUNC(hd44780_device::control_r));
 	map(0x0b0004, 0x0b0004).w(m_lcdc, FUNC(hd44780_device::data_w));
 	map(0x0b0006, 0x0b0006).r(m_lcdc, FUNC(hd44780_device::data_r));
+	map(0x1f8000, 0x1f800f).rw(m_hdc, FUNC(ncr5380n_device::read), FUNC(ncr5380n_device::write)).umask16(0x00ff);
 	map(0x3f8000, 0x3f8007).rw(m_ctc, FUNC(pit8254_device::read), FUNC(pit8254_device::write)).umask16(0x00ff);
 	map(0x8e8000, 0x8e82ff).ram();
 	map(0xae2000, 0xae2000).w(m_fdc, FUNC(wd1772_device::cmd_w));
@@ -158,6 +181,19 @@ void emax_state::palette_init(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(131, 136, 139));
 	palette.set_pen_color(1, rgb_t( 92,  83,  88));
+}
+
+void emax_state::scsihd(machine_config &config)
+{
+	NSCSI_BUS(config, "scsi");
+	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi:3", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, "harddisk", false);
+	NSCSI_CONNECTOR(config, "scsi:7").option_set("hdc", NCR5380N);
 }
 
 void emax_state::emax(machine_config &config)
@@ -197,7 +233,7 @@ void emax_state::emaxp(machine_config &config)
 	emax(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &emax_state::emaxp_map);
 
-	// TODO: add SCSI
+	scsihd(config);
 }
 
 void emax_state::emax2(machine_config &config)
@@ -213,6 +249,8 @@ void emax_state::emax2(machine_config &config)
 
 	ACIA6850(config, "acia1");
 	ACIA6850(config, "acia2");
+
+	scsihd(config);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(50);
