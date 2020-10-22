@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_MACHINE_NES_VT32_VT369_SOC_H
-#define MAME_MACHINE_NES_VT32_VT369_SOC_H
+#ifndef MAME_MACHINE_NES_VT369_VTUNKOWN_SOC_H
+#define MAME_MACHINE_NES_VT369_VTUNKOWN_SOC_H
 
 #pragma once
 
@@ -14,10 +14,10 @@
 #include "screen.h"
 #include "speaker.h"
 
-class nes_vt09_soc_cy_device : public nes_vt09_soc_device
+class nes_vtunknown_soc_cy_device : public nes_vt09_soc_device
 {
 public:
-	nes_vt09_soc_cy_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	nes_vtunknown_soc_cy_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config& config) override;
@@ -41,10 +41,10 @@ protected:
 	uint8_t m_413x[8]; // CY only?
 };
 
-class nes_vt09_soc_bt_device : public nes_vt09_soc_device
+class nes_vtunknown_soc_bt_device : public nes_vt09_soc_device
 {
 public:
-	nes_vt09_soc_bt_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	nes_vtunknown_soc_bt_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config& config) override;
@@ -71,13 +71,13 @@ protected:
 
 };
 
-class nes_vt3x_soc_dg_device : public nes_vt09_soc_device
+class nes_vtunknown_soc_dg_device : public nes_vt09_soc_device
 {
 public:
-	nes_vt3x_soc_dg_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	nes_vtunknown_soc_dg_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 
 protected:
-	nes_vt3x_soc_dg_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock);
+	nes_vtunknown_soc_dg_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock);
 
 	virtual void device_add_mconfig(machine_config& config) override;
 
@@ -86,10 +86,10 @@ protected:
 	void vt03_411c_w(uint8_t data);
 };
 
-class nes_vt3x_soc_fa_device : public nes_vt3x_soc_dg_device
+class nes_vtunknown_soc_fa_device : public nes_vtunknown_soc_dg_device
 {
 public:
-	nes_vt3x_soc_fa_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	nes_vtunknown_soc_fa_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 
 protected:
 
@@ -103,11 +103,11 @@ protected:
 };
 
 
-DECLARE_DEVICE_TYPE(NES_VT09_SOC_CY, nes_vt09_soc_cy_device)
-DECLARE_DEVICE_TYPE(NES_VT09_SOC_BT, nes_vt09_soc_bt_device)
+DECLARE_DEVICE_TYPE(NES_VTUNKNOWN_SOC_CY, nes_vtunknown_soc_cy_device)
+DECLARE_DEVICE_TYPE(NES_VTUNKNOWN_SOC_BT, nes_vtunknown_soc_bt_device)
 DECLARE_DEVICE_TYPE(NES_VT369_SOC, nes_vt369_soc_device)
 
-DECLARE_DEVICE_TYPE(NES_VT3X_SOC_DG, nes_vt3x_soc_dg_device)
-DECLARE_DEVICE_TYPE(NES_VT3X_SOC_FA, nes_vt3x_soc_fa_device)
+DECLARE_DEVICE_TYPE(NES_VTUNKNOWN_SOC_DG, nes_vtunknown_soc_dg_device)
+DECLARE_DEVICE_TYPE(NES_VTUNKNOWN_SOC_FA, nes_vtunknown_soc_fa_device)
 
-#endif // MAME_MACHINE_NES_VT32_VT369_SOC_H
+#endif // MAME_MACHINE_NES_VT369_VTUNKOWN_SOC_H

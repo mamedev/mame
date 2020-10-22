@@ -19,6 +19,7 @@ class nes_vt09_soc_device : public nes_vt02_vt03_soc_device
 public:
 	nes_vt09_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 
+	// are these even part of vt09, or should they be moved out of here rather than this being treated as a base class for them?
 	auto upper_read_412c_callback() { return m_upper_read_412c_callback.bind(); }
 	auto upper_read_412d_callback() { return m_upper_read_412d_callback.bind(); }
 
@@ -33,6 +34,7 @@ protected:
 
 	void nes_vt_4k_ram_map(address_map& map);
 
+	// are these even part of vt09, or should they be moved out of here rather than this being treated as a base class for them?
 	devcb_write8 m_upper_write_412c_callback;
 
 	devcb_read8 m_upper_read_412c_callback;

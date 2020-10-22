@@ -51,16 +51,11 @@
     add support for VT368 (?) in DGUN-2561 and lxcmcy
     add support for the VT369 (?) featurs used by the MOGIS M320
 
-  (general)
-  split into multipe files once feature boundaries are properly established
-
 **************************************************************************/
 
 #include "emu.h"
 #include "nes_vt_soc.h"
 
-// TODO: identify what kind of SoCs each of these are (some are probably meant to be the same chip, just with subsets of the features added at the moment, especially the CY/BT/HH ones)
-// also work out if some of these features (eg. opcode scrambling) should be done with external callbacks, sometimes the die was the same (VH2009) but encryption not always present (pin control or external feature?)
 
 DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC,          nes_vt02_vt03_soc_device,          "nes_vt02_vt03_soc",       "VT02/03 series System on a Chip (NTSC)")
 DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_PAL,      nes_vt02_vt03_soc_pal_device,      "nes_vt02_vt03_soc_pal",   "VT02/03 series System on a Chip (PAL)")
