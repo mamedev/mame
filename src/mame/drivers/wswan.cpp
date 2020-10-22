@@ -68,27 +68,27 @@ public:
 
 protected:
 	// Interrupt flags
-	static const u8 WSWAN_IFLAG_STX    = 0x01;
-	static const u8 WSWAN_IFLAG_KEY    = 0x02;
-	static const u8 WSWAN_IFLAG_RTC    = 0x04;
-	static const u8 WSWAN_IFLAG_SRX    = 0x08;
-	static const u8 WSWAN_IFLAG_LCMP   = 0x10;
-	static const u8 WSWAN_IFLAG_VBLTMR = 0x20;
-	static const u8 WSWAN_IFLAG_VBL    = 0x40;
-	static const u8 WSWAN_IFLAG_HBLTMR = 0x80;
+	static constexpr u8 WSWAN_IFLAG_STX    = 0x01;
+	static constexpr u8 WSWAN_IFLAG_KEY    = 0x02;
+	static constexpr u8 WSWAN_IFLAG_RTC    = 0x04;
+	static constexpr u8 WSWAN_IFLAG_SRX    = 0x08;
+	static constexpr u8 WSWAN_IFLAG_LCMP   = 0x10;
+	static constexpr u8 WSWAN_IFLAG_VBLTMR = 0x20;
+	static constexpr u8 WSWAN_IFLAG_VBL    = 0x40;
+	static constexpr u8 WSWAN_IFLAG_HBLTMR = 0x80;
 
 	// Interrupts
-	static const u8 WSWAN_INT_STX    = 0;
-	static const u8 WSWAN_INT_KEY    = 1;
-	static const u8 WSWAN_INT_RTC    = 2;
-	static const u8 WSWAN_INT_SRX    = 3;
-	static const u8 WSWAN_INT_LCMP   = 4;
-	static const u8 WSWAN_INT_VBLTMR = 5;
-	static const u8 WSWAN_INT_VBL    = 6;
-	static const u8 WSWAN_INT_HBLTMR = 7;
+	static constexpr u8 WSWAN_INT_STX    = 0;
+	static constexpr u8 WSWAN_INT_KEY    = 1;
+	static constexpr u8 WSWAN_INT_RTC    = 2;
+	static constexpr u8 WSWAN_INT_SRX    = 3;
+	static constexpr u8 WSWAN_INT_LCMP   = 4;
+	static constexpr u8 WSWAN_INT_VBLTMR = 5;
+	static constexpr u8 WSWAN_INT_VBL    = 6;
+	static constexpr u8 WSWAN_INT_HBLTMR = 7;
 
-	static const u32 INTERNAL_EEPROM_SIZE = 1024;   // 16kbit on WSC
-	static const u32 INTERNAL_EEPROM_SIZE_WS = 64;  // 1kbit on WS
+	static constexpr u32 INTERNAL_EEPROM_SIZE = 1024;   // 16kbit on WSC
+	static constexpr u32 INTERNAL_EEPROM_SIZE_WS = 64;  // 1kbit on WS
 
 	enum enum_system { TYPE_WSWAN=0, TYPE_WSC };
 
@@ -158,6 +158,7 @@ protected:
 	virtual u16 get_internal_eeprom_address() override;
 };
 
+
 static const uint8_t ws_portram_init[256] =
 {
 	0x00, 0x00, 0x00/*?*/, 0xbb, 0x00, 0x00, 0x00, 0x26, 0xfe, 0xde, 0xf9, 0xfb, 0xdb, 0xd7, 0x7f, 0xf5,
@@ -177,6 +178,7 @@ static const uint8_t ws_portram_init[256] =
 	0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1,
 	0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1
 };
+
 
 void wswan_state::mem_map(address_map &map)
 {
@@ -223,6 +225,7 @@ static INPUT_PORTS_START( wswan )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Y2 - Right") PORT_CODE(KEYCODE_D)
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Y1 - Up") PORT_CODE(KEYCODE_W)
 INPUT_PORTS_END
+
 
 static GFXDECODE_START( gfx_wswan )
 GFXDECODE_END
@@ -496,9 +499,6 @@ u8 wswan_state::port_r(offs_t offset)
 {
 	u8 value = m_ws_portram[offset];
 
-	if (offset != 2)
-		logerror("PC=%X: port read %02X\n", m_maincpu->pc(), offset);
-
 	if (offset < 0x40 || (offset >= 0xa1 && offset < 0xb0))
 		return m_vdp->reg_r(offset);
 	if (offset >= 0x80 && offset <= 0x9f)
@@ -607,7 +607,6 @@ u8 wswan_state::port_r(offs_t offset)
 void wswan_state::port_w(offs_t offset, u8 data)
 {
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
-	logerror("PC=%X: port write %02X <- %02X\n", m_maincpu->pc(), offset, data);
 
 	if (offset < 0x40 || (offset >= 0xa1 && offset < 0xb0))
 	{
@@ -929,8 +928,8 @@ ROM_START(wscolor)
 
 	ROM_REGION(0x800, "nvram", 0)
 	// Need a dump from an original new unit
-	// Empty file containing just the name 'WONDERSANCOLOR' (TODO, from Youtube videos)
-	ROM_LOAD("internal_eeprom.wsc", 0x000, 0x800, BAD_DUMP CRC(9e29725c) SHA1(a903c2cb5f4bb94b67326ff87a2d91605dceffff))
+	// Empty file containing just the name 'WONDERSWANCOLOR' (from Youtube videos)
+	ROM_LOAD("internal_eeprom.wsc", 0x000, 0x800, BAD_DUMP CRC(ca11afc9) SHA1(0951845f01f83bee497268a63b5fb7baccfeff7c))
 ROM_END
 
 // SwanCrystal has the name 'SWANCRYSTAL' (from Youtube videos)
