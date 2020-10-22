@@ -109,6 +109,20 @@ private:
 	int m_rombase;
 };
 
+
+class nes_clone_afbm7800_state : public nes_clone_state
+{
+public:
+	nes_clone_afbm7800_state(const machine_config& mconfig, device_type type, const char* tag) :
+		nes_clone_state(mconfig, type, tag)
+	{ }
+	void nes_clone_afbm7800(machine_config& config);
+
+private:
+	void nes_clone_afbm7800_map(address_map& map);
+};
+
+
 void nes_clone_state::sprite_dma_w(address_space &space, uint8_t data)
 {
 	int source = (data & 7);
@@ -346,6 +360,22 @@ void nes_clone_vtvppong_state::nes_clone_vtvppong_map(address_map& map)
 }
 
 
+void nes_clone_afbm7800_state::nes_clone_afbm7800(machine_config& config)
+{
+	nes_clone_pal(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_clone_afbm7800_state::nes_clone_afbm7800_map);
+}
+
+void nes_clone_afbm7800_state::nes_clone_afbm7800_map(address_map& map)
+{
+	nes_clone_basemap(map);
+	map(0x8000, 0xffff).rom().region("maincpu", 0x38000);
+}
+
+
+
+
+
 void nes_clone_suduko_state::machine_reset()
 {
 	nes_clone_state::machine_reset();
@@ -478,7 +508,7 @@ void nes_clone_state::init_nes_clone()
 CONS( 200?, pjoypj001, 0, 0, nes_clone, nes_clone, nes_clone_state, init_nes_clone, "Trump Grand", "PowerJoy (PJ001, NES based plug & play)", MACHINE_NOT_WORKING )
 
 // "Flashback Mini 7800 uses normal NES-style hardware, together with a mapper chipset similar to the Waixing kk33xx cartridges (NES 2.0 Mapper 534)"
-CONS( 2004, afbm7800,  0,  0,  nes_clone,    nes_clone, nes_clone_state, init_nes_clone, "Atari", "Atari Flashback Mini 7800", MACHINE_NOT_WORKING )
+CONS( 2004, afbm7800,  0,  0,  nes_clone_afbm7800,    nes_clone, nes_clone_afbm7800_state, init_nes_clone, "Atari", "Atari Flashback Mini 7800", MACHINE_NOT_WORKING )
 
 CONS( 200?, vtvppong,  0,  0,  nes_clone_vtvppong,    nes_clone, nes_clone_vtvppong_state, init_vtvppong, "<unknown>", "Virtual TV Ping Pong", MACHINE_NOT_WORKING )
 
