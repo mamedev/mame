@@ -32,13 +32,13 @@ static INPUT_PORTS_START( grapplerplus )
 	PORT_DIPSETTING( 0x01, "8 bit" )
 
 	PORT_DIPNAME( 0x0e, 0x0e, "Printer Type ID (SW2-4)" )
-	PORT_DIPSETTING( 0x0e, "Epson Series" )
-	PORT_DIPSETTING( 0x06, "NEC 8023/C. Itoh 8510/DMP 85" )
-	PORT_DIPSETTING( 0x0a, "Star Gemini" )
 	PORT_DIPSETTING( 0x02, "Anadex Printers" )
-	PORT_DIPSETTING( 0x0c, "Okidata 82A, 83A, 84, 92, 93" )
-	PORT_DIPSETTING( 0x08, "Okidata 84 w/o Step II Graphics" )
 	PORT_DIPSETTING( 0x04, "Apple Dot Matrix" )
+	PORT_DIPSETTING( 0x06, "NEC 8023/C. Itoh 8510/DMP 85" )
+	PORT_DIPSETTING( 0x08, "Okidata 84 w/o Step II Graphics" )
+	PORT_DIPSETTING( 0x0a, "Star Gemini" )
+	PORT_DIPSETTING( 0x0c, "Okidata 82A, 83A, 84, 92, 93" )
+	PORT_DIPSETTING( 0x0e, "Epson Series" )
 INPUT_PORTS_END
 
 ioport_constructor a2bus_grapplerplus_device::device_input_ports() const
@@ -88,8 +88,9 @@ a2bus_grapplerplus_device::a2bus_grapplerplus_device(const machine_config &mconf
 	m_dsw1(*this, "DSW1"),
 	m_ctx(*this, GRAPPLERPLUS_CENTRONICS_TAG),
 	m_ctx_data_in(*this, "ctx_data_in"),
-	m_ctx_data_out(*this, "ctx_data_out"), m_rom(nullptr),
-	m_started(false), m_ack(0), m_irqenable(false), m_autostrobe(false), m_timer(nullptr)
+	m_ctx_data_out(*this, "ctx_data_out"),
+	m_rom(*this, GRAPPLERPLUS_ROM_REGION),
+	m_started(false), m_ack(0), m_busy(0), m_perror(0), m_select(0), m_irqbit(0), m_irqenable(false), m_timer(nullptr)
 {
 }
 
@@ -99,14 +100,17 @@ a2bus_grapplerplus_device::a2bus_grapplerplus_device(const machine_config &mconf
 
 void a2bus_grapplerplus_device::device_start()
 {
-	m_rom = device().machine().root_device().memregion(this->subtag(GRAPPLERPLUS_ROM_REGION).c_str())->base();
-
 	m_timer = timer_alloc(0, nullptr);
 	m_timer->adjust(attotime::never);
 
+	save_item(NAME(m_started));
 	save_item(NAME(m_ack));
+	save_item(NAME(m_busy));
+	save_item(NAME(m_perror));
+	save_item(NAME(m_select));
+	save_item(NAME(m_irqbit));
 	save_item(NAME(m_irqenable));
-	save_item(NAME(m_autostrobe));
+	save_item(NAME(m_rombank));
 }
 
 void a2bus_grapplerplus_device::device_reset()
@@ -115,11 +119,10 @@ void a2bus_grapplerplus_device::device_reset()
 	m_ack = 0;
 	m_irqenable = false;
 	m_irqbit = false;
-	m_autostrobe = false;
 	lower_slot_irq();
 	m_timer->adjust(attotime::never);
 
-	// set initial state of the strobe line depending on the dipswitch
+	// set initial state of the strobe line
 	clear_strobe();
 }
 

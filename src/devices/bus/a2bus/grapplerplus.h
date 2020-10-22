@@ -51,6 +51,7 @@ protected:
 	required_device<centronics_device> m_ctx;
 	required_device<input_buffer_device> m_ctx_data_in;
 	required_device<output_latch_device> m_ctx_data_out;
+	required_region_ptr<u8> m_rom;
 
 private:
 	DECLARE_WRITE_LINE_MEMBER( ack_w );
@@ -58,7 +59,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( perror_w );
 	DECLARE_WRITE_LINE_MEMBER( select_w );
 
-	uint8_t *m_rom;
 	bool m_started;
 	uint8_t m_ack;
 	uint8_t m_busy;
@@ -66,7 +66,6 @@ private:
 	uint8_t m_select;
 	uint8_t m_irqbit;
 	bool m_irqenable;
-	bool m_autostrobe;
 	emu_timer *m_timer;
 	uint8_t m_rombank;
 };
