@@ -170,6 +170,7 @@ void v30mz_cpu_device::device_start()
 	state_add(NEC_SS, "SS", m_sregs[SS]).callimport().callexport().formatstr("%04X");
 	state_add(NEC_DS0, "DS0", m_sregs[DS0]).callimport().callexport().formatstr("%04X");
 	state_add(NEC_DS1, "DS1", m_sregs[DS1]).callimport().callexport().formatstr("%04X");
+	state_add(NEC_FLAGS, "PSW", m_debugger_temp).callimport().callexport().formatstr("%04X");
 	state_add(NEC_VECTOR, "V", m_int_vector).callimport().callexport().formatstr("%02X");
 	state_add(NEC_PFP, "PFP", m_pfp).callimport().callexport().formatstr("%04X");
 
@@ -178,6 +179,28 @@ void v30mz_cpu_device::device_start()
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_TF).callimport().callexport().formatstr("%16s").noshow();
 
 	set_icountptr(m_icount);
+}
+
+
+void v30mz_cpu_device::state_import(const device_state_entry &entry)
+{
+	switch (entry.index())
+	{
+	case NEC_FLAGS:
+		expand_flags(m_debugger_temp);
+		break;
+	}
+}
+
+
+void v30mz_cpu_device::state_export(const device_state_entry &entry)
+{
+	switch (entry.index())
+	{
+	case NEC_FLAGS:
+		m_debugger_temp = compress_flags();
+		break;
+	}
 }
 
 
@@ -1537,307 +1560,7 @@ void v30mz_cpu_device::execute_run()
 				break;
 
 			case 0x0f: // i_pre_nec
-				{
-					uint32_t tmp, tmp2;
-
-					switch (fetch())
-					{
-					case 0x10:  // TEST1 not supported by v30mz
-						fatalerror("%s: %06x: TEST1 is not supported by v30mz\n", tag(), pc());
-						m_modrm = fetch();
-						tmp = get_rm_byte();
-						tmp2 = m_regs.b[CL] & 0x7;
-						m_ZeroVal = (tmp & (1<<tmp2)) ? 1 : 0;
-						m_CarryVal = m_OverVal = 0;
-						break;
-					case 0x11:  // TEST1 not supported by v30mz
-						fatalerror("%s: %06x: TEST1 is not supported by v30mz\n", tag(), pc());
-						m_modrm = fetch();
-						tmp = get_rm_word();
-						tmp2 = m_regs.b[CL] & 0xf;
-						m_ZeroVal = (tmp & (1<<tmp2)) ? 1 : 0;
-						m_CarryVal = m_OverVal = 0;
-						break;
-					case 0x12:  // CLR1 not supported by v30mz
-						fatalerror("%s: %06x: CLR1 is not supported by v30mz\n", tag(), pc());
-						m_modrm = fetch();
-						tmp = get_rm_byte();
-						tmp2 = m_regs.b[CL] & 0x7;
-						tmp &= ~(1<<tmp2);
-						store_ea_rm_byte(tmp);
-						break;
-					case 0x13:  // CLR1 not supported by v30mz
-						fatalerror("%s: %06x: CLR1 is not supported by v30mz\n", tag(), pc());
-						m_modrm = fetch();
-						tmp = get_rm_word();
-						tmp2 = m_regs.b[CL] & 0xf;
-						tmp &= ~(1<<tmp2);
-						store_ea_rm_word(tmp);
-						break;
-					case 0x14:  // SET1 not supported by v30mz
-						fatalerror("%s: %06x: SET1 is not supported by v30mz\n", tag(), pc());
-						m_modrm = fetch();
-						tmp = get_rm_byte();
-						tmp2 = m_regs.b[CL] & 0x7;
-						tmp |= (1<<tmp2);
-						store_ea_rm_byte(tmp);
-						break;
-					case 0x15:  // SET1 not supported by v30mz
-						fatalerror("%s: %06x: SET1 is not supported by v30mz\n", tag(), pc());
-						m_modrm = fetch();
-						tmp = get_rm_word();
-						tmp2 = m_regs.b[CL] & 0xf;
-						tmp |= (1<<tmp2);
-						store_ea_rm_word(tmp);
-						break;
-					case 0x16:  // NOT1 not supported by v30mz
-						fatalerror("%s: %06x: NOT1 is not supported by v30mz\n", tag(), pc());
-						m_modrm = fetch();
-						tmp = get_rm_byte();
-						tmp2 = m_regs.b[CL] & 0x7;
-						tmp ^= (1 << tmp2);
-						store_ea_rm_byte(tmp);
-						break;
-					case 0x17:  // NOT1 is not supported by v30mz
-						fatalerror("%s: %06x: NOT1 is not supported by v30mz\n", tag(), pc());
-						m_modrm = fetch();
-						tmp = get_rm_word();
-						tmp2 = m_regs.b[CL] & 0xf;
-						tmp ^= (1 << tmp2);
-						store_ea_rm_word(tmp);
-						break;
-
-					case 0x18:  // TEST1 not supported by v30mz
-						fatalerror("%s: %06x: TEST1 is not supported by v30mz\n", tag(), pc());
-						m_modrm = fetch();
-						tmp = get_rm_byte();
-						tmp2 = fetch() & 0x7;
-						m_ZeroVal = (tmp & (1<<tmp2)) ? 1 : 0;
-						m_CarryVal = m_OverVal = 0;
-						break;
-					case 0x19:  // TEST1 not supported by v30mz
-						fatalerror("%s: %06x: TEST1 is not supported by v30mz\n", tag(), pc());
-						m_modrm = fetch();
-						tmp = get_rm_word();
-						tmp2 = fetch() & 0xf;
-						m_ZeroVal = (tmp & (1<<tmp2)) ? 1 : 0;
-						m_CarryVal = m_OverVal = 0;
-						break;
-					case 0x1a:  // CLR1 not supported by v30mz
-						fatalerror("%s: %06x: CLR1 is not supported by v30mz\n", tag(), pc());
-						m_modrm = fetch();
-						tmp = get_rm_byte();
-						tmp2 = fetch() & 0x7;
-						tmp &= ~(1<<tmp2);
-						store_ea_rm_byte(tmp);
-						break;
-					case 0x1b:  // CLR1 not supported by v30mz
-						fatalerror("%s: %06x: CLR1 is not supported by v30mz\n", tag(), pc());
-						m_modrm = fetch();
-						tmp = get_rm_word();
-						tmp2 = fetch() & 0xf;
-						tmp &= ~(1<<tmp2);
-						store_ea_rm_word(tmp);
-						break;
-					case 0x1c:  // SET1 not supported by v30mz
-						fatalerror("%s: %06x: SET1 is not supported by v30mz\n", tag(), pc());
-						m_modrm = fetch();
-						tmp = get_rm_byte();
-						tmp2 = fetch() & 0x7;
-						tmp |= (1<<tmp2);
-						store_ea_rm_byte(tmp);
-						break;
-					case 0x1d:  // SET1 not supported by v30mz
-						fatalerror("%s: %06x: SET1 is not supported by v30mz\n", tag(), pc());
-						m_modrm = fetch();
-						tmp = get_rm_word();
-						tmp2 = fetch() & 0xf;
-						tmp |= (1<<tmp2);
-						store_ea_rm_word(tmp);
-						break;
-					case 0x1e:  // NOT1 not supported by v30mz
-						fatalerror("%s: %06x: NOT1 is not supported by v30mz\n", tag(), pc());
-						m_modrm = fetch();
-						tmp = get_rm_byte();
-						tmp2 = fetch() & 0x7;
-						tmp ^= (1 << tmp2);
-						store_ea_rm_byte(tmp);
-						break;
-					case 0x1f:  // NOT1 not supported by v30mz
-						fatalerror("%s: %06x: NOT1 is not supported by v30mz\n", tag(), pc());
-						m_modrm = fetch();
-						tmp = get_rm_word();
-						tmp2 = fetch() & 0xf;
-						tmp ^= (1 << tmp2);
-						store_ea_rm_word(tmp);
-						break;
-
-					case 0x20: // ADD4S not supported by v30mz
-						fatalerror("%s: %06x: ADD4S is not supported by v30mz\n", tag(), pc());
-						{
-							int count = (m_regs.b[CL]+1)/2;
-							uint16_t di = m_regs.w[IY];
-							uint16_t si = m_regs.w[IX];
-							if (m_seg_prefix)
-							{
-								logerror("%s: %06x: Warning: seg_prefix defined for add4s\n", tag(), pc());
-							}
-							m_ZeroVal = m_CarryVal = 0;
-							for (int i=0; i<count; i++)
-							{
-								clk(19);
-								tmp = read_byte(default_base(DS0), si);
-								tmp2 = read_byte(m_sregs[DS1], di);
-								int v1 = (tmp>>4)*10 + (tmp&0xf);
-								int v2 = (tmp2>>4)*10 + (tmp2&0xf);
-								int result = v1 + v2 + m_CarryVal;
-								m_CarryVal = result > 99 ? 1 : 0;
-								result = result % 100;
-								v1 = ((result/10)<<4) | (result % 10);
-								write_byte(m_sregs[DS1], di, v1);
-								if (v1)
-								{
-									m_ZeroVal = 1;
-								}
-								si++;
-								di++;
-							}
-						}
-						break;
-					case 0x22:  // SUB4S not supported by v30mz
-						fatalerror("%s: %06x: SUB4S is not supported by v30mz\n", tag(), pc());
-						{
-							int count = (m_regs.b[CL] + 1) / 2;
-							uint16_t di = m_regs.w[IY];
-							uint16_t si = m_regs.w[IX];
-							if (m_seg_prefix)
-							{
-								logerror("%s: %06x: Warning: seg_prefix defined for sub4s\n", tag(), pc());
-							}
-							m_ZeroVal = m_CarryVal = 0;
-							for (int i=0; i < count; i++)
-							{
-								int result;
-								clk(19);
-								tmp = read_byte(m_sregs[DS1], di);
-								tmp2 = read_byte(default_base(DS0), si);
-								int v1 = (tmp >> 4) * 10 + (tmp & 0xf);
-								int v2 = (tmp2 >> 4) * 10 + (tmp2 & 0xf);
-								if (v1 < (v2 + m_CarryVal))
-								{
-									v1 += 100;
-									result = v1 - (v2 + m_CarryVal);
-									m_CarryVal = 1;
-								}
-								else
-								{
-									result = v1 - (v2 + m_CarryVal);
-									m_CarryVal = 0;
-								}
-								v1 = ((result / 10) << 4) | (result % 10);
-								write_byte(m_sregs[DS1], di, v1);
-								if (v1)
-								{
-									m_ZeroVal = 1;
-								}
-								si++;
-								di++;
-							}
-						}
-						break;
-					case 0x26:  // CMP4S not supported by v30mz
-						fatalerror("%s: %06x: CMP4S is not supported by v30mz\n", tag(), pc());
-						{
-							int count = (m_regs.b[CL] + 1) / 2;
-							uint16_t di = m_regs.w[IY];
-							uint16_t si = m_regs.w[IX];
-							if (m_seg_prefix)
-							{
-								logerror("%s: %06x: Warning: seg_prefix defined for cmp4s\n", tag(), pc());
-							}
-							m_ZeroVal = m_CarryVal = 0;
-							for (int i=0; i < count; i++)
-							{
-								int result;
-								clk(19);
-								tmp = read_byte(m_sregs[DS1], di);
-								tmp2 = read_byte(default_base(DS0), si);
-								int v1 = (tmp >> 4) * 10 + (tmp & 0xf);
-								int v2 = (tmp2 >> 4) * 10 + (tmp2 & 0xf);
-								if (v1 < (v2 + m_CarryVal))
-								{
-									v1 += 100;
-									result = v1 - (v2 + m_CarryVal);
-									m_CarryVal = 1;
-								}
-								else
-								{
-									result = v1 - (v2 + m_CarryVal);
-									m_CarryVal = 0;
-								}
-								v1 = ((result / 10) << 4) | (result % 10);
-								if (v1)
-								{
-									m_ZeroVal = 1;
-								}
-								si++;
-								di++;
-							}
-						}
-						break;
-					case 0x28:  // ROL4 not supported by v30mz
-						fatalerror("%s: %06x: ROL4 is not supported by v30mz\n", tag(), pc());
-						m_modrm = fetch();
-						tmp = get_rm_byte();
-						tmp <<= 4;
-						tmp |= m_regs.b[AL] & 0xf;
-						m_regs.b[AL] = (m_regs.b[AL] & 0xf0) | ((tmp >> 8) & 0xf);
-						tmp &= 0xff;
-						store_ea_rm_byte(tmp);
-						clkm(9, 15);
-						break;
-					case 0x2a:  // ROR4 not supported on v30mz
-						fatalerror("%s: %06x: ROR4 is not supported on v30mz\n", tag(), pc());
-						m_modrm = fetch();
-						tmp = get_rm_byte();
-						tmp2 = (m_regs.b[AL] & 0xf) << 4;
-						m_regs.b[AL] = (m_regs.b[AL] & 0xf0) | (tmp & 0xf);
-						tmp = tmp2 | (tmp >> 4);
-						store_ea_rm_byte(tmp);
-						clkm(13, 19);
-						break;
-					case 0x31:  // INS not supported by v30mz
-						fatalerror("%s: %06x: INS is not supported by v30mz\n", tag(), pc());
-						m_modrm = fetch(); m_modrm = 0; logerror("%s: %06x: Unimplemented bitfield INS\n", tag(), pc()); break;
-					case 0x33:  // EXT not supported by v30mz
-						fatalerror("%s: %06x: EXT is not supported by v30mz\n", tag(), pc());
-						m_modrm = fetch(); m_modrm = 0; logerror("%s: %06x: Unimplemented bitfield EXT\n", tag(), pc()); break;
-					case 0x92:  // V25/35 FINT
-						fatalerror("%s: %06x: FINT is not supported by v30mz\n", tag(), pc());
-						clk(2);
-						break;
-					case 0xe0:
-						fatalerror("%s: %06x: BRKXA is not supported by v30mz\n", tag(), pc());
-						m_modrm = fetch();
-						m_modrm = 0;
-						logerror("%s: %06x: V33 unimplemented BRKXA (break to expansion address)\n", tag(), pc());
-						break;
-					case 0xf0:
-						fatalerror("%s: %06x: RETXA is not supported by v30mz\n", tag(), pc());
-						m_modrm = fetch();
-						m_modrm = 0;
-						logerror("%s: %06x: V33 unimplemented RETXA (return from expansion address)\n", tag(), pc());
-						break;
-					case 0xff:  // BRKEM not supported by v30mz
-						m_modrm = fetch();
-						m_modrm = 0;
-						fatalerror("%s: %06x: unimplemented BRKEM (break to 8080 emulation mode)\n", tag(), pc());
-						break;
-					default:
-						logerror("%s: %06x: Unknown V20 instruction\n", tag(), pc());
-						break;
-					}
-				}
+				clk(1);
 				break;
 
 

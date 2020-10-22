@@ -45,6 +45,8 @@ protected:
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
+	virtual void state_import(const device_state_entry &entry) override;
+	virtual void state_export(const device_state_entry &entry) override;
 
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
@@ -225,6 +227,7 @@ protected:
 	} m_Mod_RM;
 
 	devcb_read32 m_vector_func;
+	uint16_t m_debugger_temp;
 };
 
 #endif // MAME_CPU_V32MZ_V30MZ_H
