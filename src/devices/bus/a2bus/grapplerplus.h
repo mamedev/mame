@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont, Golden Child
 /*********************************************************************
 
-    grapplerplus.cpp
+    grapplerplus.h
 
     Orange Micro Grappler Plus Apple II Parallel Interface Card
 

@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont, Golden Child
 /*********************************************************************
 
-    grapplerplus.c
+    grapplerplus.cpp
 
     Orange Micro Grappler Plus Apple II Parallel Interface Card
 
@@ -17,11 +17,8 @@
 
 DEFINE_DEVICE_TYPE(A2BUS_GRAPPLERPLUS, a2bus_grapplerplus_device, "grapplerplus", "Grappler Interface Card")
 
-#define GRAPPLERPLUS_ROM_REGION  "grapplerplus_rom"
-#define GRAPPLERPLUS_CENTRONICS_TAG "centronics"
-
 ROM_START( grapplerplus )
-	ROM_REGION(0x001000, GRAPPLERPLUS_ROM_REGION, 0)
+	ROM_REGION(0x001000, "grapplerplus_rom", 0)
 	ROM_LOAD( "grapplerplus.bin", 0x000000, 0x001000, CRC(6f88b70c) SHA1(433ae61a0553ee9c1628ea5b6376dac848c04cad) )
 ROM_END
 
@@ -86,10 +83,10 @@ a2bus_grapplerplus_device::a2bus_grapplerplus_device(const machine_config &mconf
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_dsw1(*this, "DSW1"),
-	m_ctx(*this, GRAPPLERPLUS_CENTRONICS_TAG),
+	m_ctx(*this, "centronics"),
 	m_ctx_data_in(*this, "ctx_data_in"),
 	m_ctx_data_out(*this, "ctx_data_out"),
-	m_rom(*this, GRAPPLERPLUS_ROM_REGION),
+	m_rom(*this, "grapplerplus_rom"),
 	m_started(false), m_ack(0), m_busy(0), m_perror(0), m_select(0), m_irqbit(0), m_irqenable(false), m_timer(nullptr)
 {
 }
@@ -129,8 +126,6 @@ void a2bus_grapplerplus_device::device_reset()
 void a2bus_grapplerplus_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
 {
 	clear_strobe();
-
-	m_timer->adjust(attotime::never);
 }
 
 /*-------------------------------------------------
@@ -140,7 +135,7 @@ void a2bus_grapplerplus_device::device_timer(emu_timer &timer, device_timer_id t
 uint8_t a2bus_grapplerplus_device::read_cnxx(uint8_t offset)
 {
 	m_rombank = 0; // reads to cnxx will reset rom bank to bank 1
-	return m_rom[(offset&0xff)];
+	return m_rom[(offset & 0xff)];
 }
 
 /*-------------------------------------------------
@@ -199,9 +194,9 @@ void a2bus_grapplerplus_device::write_c0nx(uint8_t offset, uint8_t data)
 
 WRITE_LINE_MEMBER( a2bus_grapplerplus_device::ack_w )
 {
+	m_ack = state;
 	if (m_started)
 	{
-		m_ack = state;
 		if (state && m_irqenable)
 		{
 			raise_slot_irq();
@@ -212,17 +207,17 @@ WRITE_LINE_MEMBER( a2bus_grapplerplus_device::ack_w )
 
 WRITE_LINE_MEMBER( a2bus_grapplerplus_device::perror_w )
 {
-	m_perror = (state == ASSERT_LINE) ? true : false;
+	m_perror = state;
 }
 
 WRITE_LINE_MEMBER( a2bus_grapplerplus_device::busy_w )
 {
-	m_busy = (state == ASSERT_LINE) ? true : false;
+	m_busy = state;
 }
 
 WRITE_LINE_MEMBER( a2bus_grapplerplus_device::select_w )
 {
-	m_select = (state == ASSERT_LINE) ? true : false;
+	m_select = state;
 }
 
 void a2bus_grapplerplus_device::start_strobe()
