@@ -35,15 +35,16 @@
 //**************************************************************************
 
 // devices
-DEFINE_DEVICE_TYPE(PPU_2C02,    ppu2c02_device,    "ppu2c02",    "2C02 PPU")
-DEFINE_DEVICE_TYPE(PPU_2C03B,   ppu2c03b_device,   "ppu2c03b",   "2C03B PPC")
-DEFINE_DEVICE_TYPE(PPU_2C04,    ppu2c04_device,    "ppu2c04",    "2C04 PPU")
-DEFINE_DEVICE_TYPE(PPU_2C07,    ppu2c07_device,    "ppu2c07",    "2C07 PPU")
-DEFINE_DEVICE_TYPE(PPU_PALC,    ppupalc_device,    "ppupalc",    "Generic PAL Clone PPU")
-DEFINE_DEVICE_TYPE(PPU_2C05_01, ppu2c05_01_device, "ppu2c05_01", "2C05_01 PPU")
-DEFINE_DEVICE_TYPE(PPU_2C05_02, ppu2c05_02_device, "ppu2c05_02", "2C05_02 PPU")
-DEFINE_DEVICE_TYPE(PPU_2C05_03, ppu2c05_03_device, "ppu2c05_03", "2C05_03 PPU")
-DEFINE_DEVICE_TYPE(PPU_2C05_04, ppu2c05_04_device, "ppu2c05_04", "2C05_04 PPU")
+DEFINE_DEVICE_TYPE(PPU_2C02,    ppu2c02_device,       "ppu2c02",    "2C02 PPU")
+DEFINE_DEVICE_TYPE(PPU_2C03B,   ppu2c03b_device,      "ppu2c03b",   "2C03B PPC")
+DEFINE_DEVICE_TYPE(PPU_2C04,    ppu2c04_device,       "ppu2c04",    "2C04 PPU")
+DEFINE_DEVICE_TYPE(PPU_2C07,    ppu2c07_device,       "ppu2c07",    "2C07 PPU")
+DEFINE_DEVICE_TYPE(PPU_PALC,    ppupalc_device,       "ppupalc",    "Generic PAL Clone PPU")
+DEFINE_DEVICE_TYPE(PPU_2C05_01, ppu2c05_01_device,    "ppu2c05_01", "2C05_01 PPU")
+DEFINE_DEVICE_TYPE(PPU_2C05_02, ppu2c05_02_device,    "ppu2c05_02", "2C05_02 PPU")
+DEFINE_DEVICE_TYPE(PPU_2C05_03, ppu2c05_03_device,    "ppu2c05_03", "2C05_03 PPU")
+DEFINE_DEVICE_TYPE(PPU_2C05_04, ppu2c05_04_device,    "ppu2c05_04", "2C05_04 PPU")
+DEFINE_DEVICE_TYPE(PPU_2C04C,   ppu2c04_clone_device, "ppu2c04c",   "2C04 Clone PPU")
 
 
 // default address map
@@ -99,6 +100,7 @@ ppu2c0x_device::ppu2c0x_device(const machine_config& mconfig, device_type type, 
 	m_back_color(0),
 	m_refresh_data(0),
 	m_x_fine(0),
+	m_toggle(0),
 	m_tilecount(0),
 	m_latch(*this),
 	m_scanline_callback_proc(*this),
@@ -106,7 +108,6 @@ ppu2c0x_device::ppu2c0x_device(const machine_config& mconfig, device_type type, 
 	m_vidaccess_callback_proc(*this),
 	m_int_callback(*this),
 	m_refresh_latch(0),
-	m_toggle(0),
 	m_add(1),
 	m_videomem_addr(0),
 	m_data_latch(0),
@@ -197,6 +198,17 @@ ppu2c05_04_device::ppu2c05_04_device(const machine_config& mconfig, const char* 
 	m_security_value = 0x1b;
 }
 
+// Vs. Unisystem (Super Mario Bros. bootlegs)
+ppu2c04_clone_device::ppu2c04_clone_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+	ppu2c0x_device(mconfig, PPU_2C04C, tag, owner, clock),
+	m_palette_data(*this, "palette", 0x100)
+{
+	m_scanlines_per_frame = VS_CLONE_SCANLINES_PER_FRAME;
+	m_vblank_first_scanline = VBLANK_FIRST_SCANLINE_VS_CLONE;
+
+	// background and sprites are always enabled; monochrome and color emphasis aren't supported
+	m_regs[PPU_CONTROL1] = ~(PPU_CONTROL1_COLOR_EMPHASIS | PPU_CONTROL1_DISPLAY_MONO);
+}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -257,6 +269,26 @@ void ppu2c0x_device::device_start()
 		m_palette_ram[i] = 0x00;
 
 	save_item(NAME(m_palette_ram));
+}
+
+void ppu2c04_clone_device::device_start()
+{
+	ppu2c0x_device::device_start();
+
+	/* this PPU clone draws sprites into a frame buffer before displaying them,
+	causing sprite rendering to be one frame behind tile/background rendering
+	(mainly noticeable during scrolling)
+	to simulate that, we can just have a secondary OAM buffer and swap them
+	at the end of each frame.
+
+	(theoretically this can cause the wrong sprite tiles to be drawn for
+	one frame after changing CHR banks, but the Vs. SMB bootlegs that use
+	this clone hardware don't actually have CHR bank switching anyway.
+	also generally affects PPU-side read timings involving the OAM, but
+	this still doesn't seem to matter for Vs. SMB specifically)
+	*/
+	m_spritebuf = make_unique_clear<uint8_t[]>(SPRITERAM_SIZE);
+	save_pointer(NAME(m_spritebuf), SPRITERAM_SIZE);
 }
 
 //**************************************************************************
@@ -442,6 +474,24 @@ void ppu2c0x_rgb_device::init_palette_tables()
 			//set_pen_color(entry++, pal3bit(R), pal3bit(G), pal3bit(B));
 			entry++;
 		}
+	}
+}
+
+void ppu2c04_clone_device::init_palette_tables()
+{
+	/* clone HW doesn't use color emphasis bits.
+	   however, it does have two separate palettes: colors 0-63 for background, and 64-127 for sprites
+	   (although the tile and sprite colors are identical in the Vs. SMB bootleg ROMs)
+	*/
+	for (int color_num = 0; color_num < 64*2; color_num++)
+	{
+		/* A7 line on palette ROMs is always high, color bits are in reverse order */
+		u8 color = m_palette_data[color_num | 0x80];
+		int R = bitswap<3>(color, 0, 1, 2);
+		int G = bitswap<3>(color, 3, 4, 5);
+		int B = bitswap<2>(color, 6, 7);
+
+		m_nespens[color_num] = (pal3bit(R) << 16) | (pal3bit(G) << 8) | pal2bit(B);
 	}
 }
 
@@ -704,6 +754,15 @@ void ppu2c0x_device::draw_background(uint8_t* line_priority)
 	}
 }
 
+void ppu2c04_clone_device::draw_background(uint8_t* line_priority)
+{
+	// nametable selection is ignored below the hardwired scroll split position
+	if (m_scanline < 31)
+		m_refresh_data &= ~0x0c00;
+
+	ppu2c0x_device::draw_background(line_priority);
+}
+
 void ppu2c0x_device::draw_back_pen(uint32_t* dst, int back_pen)
 {
 	*dst = m_nespens[back_pen];
@@ -754,6 +813,17 @@ void ppu2c0x_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, ui
 	palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 1);
 
 	uint32_t pix = m_nespens[palval];
+	bitmap.pix(m_scanline, sprite_xpos + pixel) = pix;
+}
+
+void ppu2c04_clone_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_rgb32 &bitmap)
+{
+	/* clone PPU clips sprites at the screen edges */
+	if ((sprite_xpos + pixel < 8) || (sprite_xpos + pixel) >= (VISIBLE_SCREEN_WIDTH - 6))
+		return;
+
+	uint16_t palval = m_palette_ram[((4 * color) | pixel_data) & 0x1f];
+	uint32_t pix = m_nespens[palval | 0x40];
 	bitmap.pix(m_scanline, sprite_xpos + pixel) = pix;
 }
 
@@ -950,6 +1020,19 @@ void ppu2c0x_device::draw_sprites(uint8_t* line_priority)
 				}
 			}
 		}
+	}
+}
+
+void ppu2c04_clone_device::draw_sprites(uint8_t *line_priority)
+{
+	ppu2c0x_device::draw_sprites(line_priority);
+
+	if (m_scanline == BOTTOM_VISIBLE_SCANLINE)
+	{
+		/* this frame's sprite buffer is cleared after being displayed
+		and the other one that was filled this frame will be displayed next frame */
+		m_spriteram.swap(m_spritebuf);
+		memset(m_spritebuf.get(), 0, SPRITERAM_SIZE);
 	}
 }
 
@@ -1185,6 +1268,23 @@ uint8_t ppu2c0x_device::read(offs_t offset)
 	return m_data_latch;
 }
 
+uint8_t ppu2c04_clone_device::read(offs_t offset)
+{
+	switch (offset & 7)
+	{
+	case PPU_STATUS: /* 2 */
+		// $2002 on this clone only contains the sprite 0 hit flag,
+		// and it's hardwired to trigger after a specific scanline, not based on actual sprite positions
+		if (m_scanline < 31 || m_scanline >= (m_vblank_first_scanline - 1))
+			return ~PPU_STATUS_SPRITE0_HIT;
+		return 0xff;
+
+	case PPU_SPRITE_DATA: /* 4 */
+		return m_spritebuf[m_regs[PPU_SPRITE_ADDRESS]];
+	}
+
+	return ppu2c0x_device::read(offset);
+}
 
 /*************************************
  *
@@ -1322,6 +1422,49 @@ void ppu2c0x_device::write(offs_t offset, uint8_t data)
 	}
 
 	m_data_latch = data;
+}
+
+void ppu2c04_clone_device::write(offs_t offset, uint8_t data)
+{
+	switch (offset & 7)
+	{
+	case PPU_CONTROL0: /* 0 */
+		data &= (0x01 | PPU_CONTROL0_INC | PPU_CONTROL0_NMI); /* other bits of $2000 are ignored by this clone */
+		data |= PPU_CONTROL0_CHR_SELECT;
+		break;
+
+	case PPU_CONTROL1: /* 1 */
+	case PPU_SPRITE_ADDRESS: /* 3 */
+		return; /* $2001 and $2003 do nothing on this clone */
+
+	case PPU_SPRITE_DATA: /* 4 */
+		m_spritebuf[m_regs[PPU_SPRITE_ADDRESS]] = data;
+		m_regs[PPU_SPRITE_ADDRESS] = (m_regs[PPU_SPRITE_ADDRESS] + 1) & 0xff;
+		return;
+
+	case PPU_SCROLL: /* 5 */
+		if (m_toggle)
+			data = 0; /* no vertical scroll */
+		break;
+
+	case PPU_ADDRESS: /* 6 */
+		/* $2006 doesn't affect scroll latching */
+		if (m_toggle)
+		{
+			/* second write */
+			set_vram_dest((get_vram_dest() & 0xff00) | data);
+		}
+		else
+		{
+			/* first write */
+			set_vram_dest((get_vram_dest() & 0x00ff) | (data << 8));
+		}
+
+		m_toggle ^= 1;
+		return;
+	}
+
+	ppu2c0x_device::write(offset, data);
 }
 
 uint16_t ppu2c0x_device::get_vram_dest()

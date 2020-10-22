@@ -179,7 +179,7 @@ void vsnes_state::v_set_videorom_bank(  int start, int count, int vrom_start_ban
 	/* count determines the size of the area mapped */
 	for (i = 0; i < count; i++)
 	{
-		membank(chr_banknames[i + start])->set_entry(vrom_start_bank + i);
+		m_bank_vrom[i + start]->set_entry(vrom_start_bank + i);
 	}
 }
 
@@ -219,7 +219,8 @@ MACHINE_START_MEMBER(vsnes_state,vsnes)
 		for (i = 0; i < 8; i++)
 		{
 			ppu1_space.install_read_bank(0x0400 * i, 0x0400 * i + 0x03ff, chr_banknames[i]);
-			membank(chr_banknames[i])->configure_entries(0, m_vrom_banks, m_vrom[0], 0x400);
+			m_bank_vrom[i] = membank(chr_banknames[i]);
+			m_bank_vrom[i]->configure_entries(0, m_vrom_banks, m_vrom[0], 0x400);
 		}
 		v_set_videorom_bank(0, 8, 0);
 	}
@@ -255,10 +256,34 @@ MACHINE_START_MEMBER(vsnes_state,vsdual)
 	m_ppu1->space(AS_PROGRAM).install_read_bank(0x0000, 0x1fff, "bank2");
 	// read only!
 	m_ppu2->space(AS_PROGRAM).install_read_bank(0x0000, 0x1fff, "bank3");
-	membank("bank2")->configure_entries(0, m_vrom_size[0] / 0x2000, m_vrom[0], 0x2000);
-	membank("bank3")->configure_entries(0, m_vrom_size[1] / 0x2000, m_vrom[1], 0x2000);
-	membank("bank2")->set_entry(0);
-	membank("bank3")->set_entry(0);
+	m_bank_vrom[0] = membank("bank2");
+	m_bank_vrom[1] = membank("bank3");
+	m_bank_vrom[0]->configure_entries(0, m_vrom_size[0] / 0x2000, m_vrom[0], 0x2000);
+	m_bank_vrom[1]->configure_entries(0, m_vrom_size[1] / 0x2000, m_vrom[1], 0x2000);
+	m_bank_vrom[0]->set_entry(0);
+	m_bank_vrom[1]->set_entry(0);
+}
+
+MACHINE_START_MEMBER(vsnes_state, bootleg)
+{
+	address_space &ppu1_space = m_ppu1->space(AS_PROGRAM);
+
+	/* establish nametable ram */
+	m_nt_ram[0] = std::make_unique<uint8_t[]>(0x1000);
+	/* set mirroring */
+	v_set_mirroring(0, PPU_MIRROR_VERT);
+
+	ppu1_space.install_readwrite_handler(0x2000, 0x3eff, read8sm_delegate(*this, FUNC(vsnes_state::vsnes_nt0_r)), write8sm_delegate(*this, FUNC(vsnes_state::vsnes_nt0_w)));
+
+	m_vrom[0] = m_gfx1_rom->base();
+	m_vrom_size[0] = m_gfx1_rom->bytes();
+	m_vrom_banks = m_vrom_size[0] / 0x2000;
+
+	/* establish chr banks */
+	m_ppu1->space(AS_PROGRAM).install_read_bank(0x0000, 0x1fff, "bank2");
+	m_bank_vrom[0] = membank("bank2");
+	m_bank_vrom[0]->configure_entries(0, m_vrom_banks, m_vrom[0], 0x2000);
+	m_bank_vrom[0]->set_entry(0);
 }
 
 /*************************************
@@ -1017,7 +1042,7 @@ void vsnes_state::init_bnglngby()
 void vsnes_state::vsdual_vrom_banking_main(uint8_t data)
 {
 	/* switch vrom */
-	membank("bank2")->set_entry(BIT(data, 2));
+	m_bank_vrom[0]->set_entry(BIT(data, 2));
 
 	/* bit 1 ( data & 2 ) triggers irq on the other cpu */
 	m_subcpu->set_input_line(0, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
@@ -1029,7 +1054,7 @@ void vsnes_state::vsdual_vrom_banking_main(uint8_t data)
 void vsnes_state::vsdual_vrom_banking_sub(uint8_t data)
 {
 	/* switch vrom */
-	membank("bank3")->set_entry(BIT(data, 2));
+	m_bank_vrom[1]->set_entry(BIT(data, 2));
 
 	/* bit 1 ( data & 2 ) triggers irq on the other cpu */
 	m_maincpu->set_input_line(0, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
@@ -1049,4 +1074,39 @@ void vsnes_state::init_vsdual()
 	/* shared ram at $6000 */
 	m_maincpu->space(AS_PROGRAM).install_ram(0x6000, 0x7fff, &prg[0x6000]);
 	m_subcpu->space(AS_PROGRAM).install_ram(0x6000, 0x7fff, &prg[0x6000]);
+}
+
+/**********************************************************************************/
+/* Vs. Super Mario Bros (Bootleg) */
+
+void vsnes_state::vsnes_bootleg_scanline(int scanline, int vblank, int blanked)
+{
+	// Z80 IRQ is controlled by two factors:
+	// - bit 6 of current (next) scanline number
+	// - bit 6 of latched scanline number from Z80 reading $4000
+	if (!(m_bootleg_latched_scanline & 0x40))
+	{
+		m_subcpu->set_input_line(INPUT_LINE_IRQ0, ((scanline + 1) & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	}
+}
+
+uint8_t vsnes_state::vsnes_bootleg_ppudata()
+{
+	// CPU always reads higher CHR ROM banks from $2007, PPU always reads lower ones
+	m_bank_vrom[0]->set_entry(1);
+	uint8_t data = m_ppu1->read(0x2007);
+	m_bank_vrom[0]->set_entry(0);
+
+	return data;
+}
+
+void vsnes_state::init_bootleg()
+{
+	m_bootleg_sound_offset = 0;
+	m_bootleg_sound_data = 0;
+	m_bootleg_latched_scanline = 0;
+
+	m_ppu1->set_scanline_callback(*this, FUNC(vsnes_state::vsnes_bootleg_scanline));
+
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2007, 0x2007, read8smo_delegate(*this, FUNC(vsnes_state::vsnes_bootleg_ppudata)));
 }
