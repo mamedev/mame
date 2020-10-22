@@ -403,7 +403,8 @@ void aquarius_state::aquarius(machine_config &config)
 	RAM(config, RAM_TAG).set_default_size("20K").set_extra_options("4K,8K,36K");
 
 	/* software lists */
-	SOFTWARE_LIST(config, "cart_list").set_original("aquarius");
+	SOFTWARE_LIST(config, "cart_list").set_original("aquarius_cart");
+	SOFTWARE_LIST(config, "cass_list").set_original("aquarius_cass");
 }
 
 
