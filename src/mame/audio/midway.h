@@ -189,7 +189,8 @@ private:
 	// devices
 	required_device<mc6809e_device> m_cpu;
 	required_device<pia6821_device> m_pia;
-	required_device<dac_word_interface> m_dac;
+	required_device<ad7533_device> m_dac;
+	required_device_array<filter_biquad_device, 3> m_dac_filter;
 
 	// internal state
 	uint8_t m_status;

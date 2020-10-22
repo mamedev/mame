@@ -6,6 +6,15 @@
 
     Functions to emulate general the various Midway sound cards.
 
+    TODO: the "Turbo Cheap Squeak" and "Sounds Good" boards are nearly identical
+      in function, but use different CPUs and Memory maps (The PIA hookup, DAC
+      and Filter are all exactly the same), so these should probably be combined
+      into one base class with two subclass device implementations to reduce
+      duplicated code.
+      The "Cheap Squeak Deluxe" board in /audio/csd.cpp is also almost identical
+      to the "Sounds Good" board, and should also be a member of any future
+      combined class/device implementation.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -606,6 +615,7 @@ void midway_sounds_good_device::device_add_mconfig(machine_config &config)
 
 	AD7533(config, m_dac, 0); /// ad7533jn.u10
 
+	// The DAC filters here are identical to those on the "Turbo Cheap Squeak" and "Cheap Squeak Deluxe" boards.
 	//LM359 @U2.2, 2nd order MFB low-pass (fc = 5404.717733, Q = 0.625210, gain = -1.000000)
 	FILTER_BIQUAD(config, m_dac_filter[2]).opamp_mfb_lowpass_setup(RES_K(150), RES_K(82), RES_K(150), CAP_P(470), CAP_P(150)); // R115, R109, R108, C112, C111
 	m_dac_filter[2]->add_route(ALL_OUTPUTS, *this, 1.0);
@@ -665,12 +675,13 @@ void midway_sounds_good_device::device_timer(emu_timer &timer, device_timer_id i
 
 midway_turbo_cheap_squeak_device::midway_turbo_cheap_squeak_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MIDWAY_TURBO_CHEAP_SQUEAK, tag, owner, clock),
-		device_mixer_interface(mconfig, *this),
-		m_cpu(*this, "cpu"),
-		m_pia(*this, "pia"),
-		m_dac(*this, "dac"),
-		m_status(0),
-		m_dacval(0)
+		device_mixer_interface(mconfig, *this)
+		, m_cpu(*this, "cpu")
+		, m_pia(*this, "pia")
+		, m_dac(*this, "dac")
+		, m_dac_filter(*this, "dac_filter%u", 0U)
+		, m_status(0)
+		, m_dacval(0)
 {
 }
 
@@ -769,7 +780,19 @@ void midway_turbo_cheap_squeak_device::device_add_mconfig(machine_config &config
 	m_pia->irqa_handler().set(FUNC(midway_turbo_cheap_squeak_device::irq_w));
 	m_pia->irqb_handler().set(FUNC(midway_turbo_cheap_squeak_device::irq_w));
 
-	AD7533(config, m_dac, 0).add_route(ALL_OUTPUTS, *this, 1.0);
+	AD7533(config, m_dac, 0); /// ad7533jn.u11
+
+	// The DAC filters here are identical to those on the "Sounds Good" and "Cheap Squeak Deluxe" boards.
+	//LM359 @U14.2, 2nd order MFB low-pass (fc = 5404.717733, Q = 0.625210, gain = -1.000000)
+	FILTER_BIQUAD(config, m_dac_filter[2]).opamp_mfb_lowpass_setup(RES_K(150), RES_K(82), RES_K(150), CAP_P(470), CAP_P(150)); // R36, R37, R39, C19, C20
+	m_dac_filter[2]->add_route(ALL_OUTPUTS, *this, 1.0);
+	//LM359 @U13.2, 2nd order MFB low-pass (fc = 5310.690763, Q = 1.608630, gain = -1.000000)
+	FILTER_BIQUAD(config, m_dac_filter[1]).opamp_mfb_lowpass_setup(RES_K(33), RES_K(18), RES_K(33), CAP_P(5600), CAP_P(270)); // R32, R33, R35, C16, C17
+	m_dac_filter[1]->add_route(ALL_OUTPUTS, m_dac_filter[2], 1.0);
+	//LM359 @U13.1, 1st order MFB low-pass (fc = 4912.189602, Q = 0.707107(ignored), gain = -1.000000)
+	FILTER_BIQUAD(config, m_dac_filter[0]).opamp_mfb_lowpass_setup(RES_K(120), RES_K(0), RES_K(120), CAP_P(0), CAP_P(270)); // R27, <short>, R31, <nonexistent>, C14
+	m_dac_filter[0]->add_route(ALL_OUTPUTS, m_dac_filter[1], 1.0);
+	m_dac->add_route(ALL_OUTPUTS, m_dac_filter[0], 1.0);
 }
 
 
