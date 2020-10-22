@@ -2,7 +2,7 @@
 // copyright-holders:Felipe Sanches
 /****************************************************************************
 
-    Skeleton driver for Sony BETACAM-SP Videocassete Players and Recorders
+    Skeleton driver for Sony BETACAM-SP Videocassette Players and Recorders
 
     List of major ICs:
      - IC202 - H8/534 (Hitachi Single-Chip Microcomputer)
@@ -130,6 +130,6 @@ ROM_START(uvw1800)
 ROM_END
 
 //   YEAR  NAME   PARENT/COMPAT MACHINE  INPUT    CLASS          INIT       COMPANY  FULLNAME                                                FLAGS
-SYST(199?, uvw1200,   0, 0,     betacam, betacam, betacam_state, empty_init, "Sony", "BETACAM-SP Videocassete Player UVW-1200 RGB",          MACHINE_IS_SKELETON)
-SYST(199?, uvw1600,   0, 0,     betacam, betacam, betacam_state, empty_init, "Sony", "BETACAM-SP Videocassete Player/Recorder UVW-1600 RGB", MACHINE_IS_SKELETON)
-SYST(199?, uvw1800,   0, 0,     betacam, betacam, betacam_state, empty_init, "Sony", "BETACAM-SP Videocassete Player/Recorder UVW-1800 RGB", MACHINE_IS_SKELETON)
+SYST(199?, uvw1200,   0, 0,     betacam, betacam, betacam_state, empty_init, "Sony", "BETACAM-SP Videocassette Player UVW-1200 RGB",          MACHINE_IS_SKELETON)
+SYST(199?, uvw1600,   0, 0,     betacam, betacam, betacam_state, empty_init, "Sony", "BETACAM-SP Videocassette Player/Recorder UVW-1600 RGB", MACHINE_IS_SKELETON)
+SYST(199?, uvw1800,   0, 0,     betacam, betacam, betacam_state, empty_init, "Sony", "BETACAM-SP Videocassette Player/Recorder UVW-1800 RGB", MACHINE_IS_SKELETON)

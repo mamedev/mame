@@ -2,7 +2,7 @@
 // copyright-holders:Felipe Sanches
 /****************************************************************************
 
-	Skeleton driver for Sony U-Matic Videocassete Recorder
+    Skeleton driver for Sony U-Matic Videocassette Recorder
 
 ****************************************************************************/
 
@@ -63,9 +63,9 @@ void umatic_state::io_map(address_map &map)
 
 void umatic_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x17ff).rom();	// 8k-byte EPROM at IC26, but only the first 6kb are mapped.
+	map(0x0000, 0x17ff).rom();  // 8k-byte EPROM at IC26, but only the first 6kb are mapped.
 					// And remaining unmapped content is all 0xFF.
-	map(0x1800, 0x1fff).ram();	// 2k-byte CXK5816PN-15L at IC17
+	map(0x1800, 0x1fff).ram();  // 2k-byte CXK5816PN-15L at IC17
 }
 
 static INPUT_PORTS_START(umatic)
@@ -89,4 +89,4 @@ ROM_START(vo5850pm)
 ROM_END
 
 //   YEAR  NAME   PARENT/COMPAT MACHINE  INPUT    CLASS             INIT COMPANY  FULLNAME                                    FLAGS
-SYST(19??, vo5850pm,    0, 0,   umatic, umatic, umatic_state, empty_init, "Sony", "U-Matic Videocassete Recorder VO-5850PM",  MACHINE_IS_SKELETON)
+SYST(19??, vo5850pm,    0, 0,   umatic, umatic, umatic_state, empty_init, "Sony", "U-Matic Videocassette Recorder VO-5850PM",  MACHINE_IS_SKELETON)
