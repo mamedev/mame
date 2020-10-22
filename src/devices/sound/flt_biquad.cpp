@@ -143,6 +143,11 @@ filter_biquad_device& filter_biquad_device::opamp_sk_lowpass_setup(double r1, do
  * NOTE: vRef is not definable when setting up the filter.
  *  If the analog effects caused by vRef are important to the operation of the specific filter
  *  in question, a netlist implementation may work better under those circumstances.
+ * NOTE2: a variant of this circuit has the c1 capacitor left off. if so, set c1 to 0
+ *  which will form a controllable gain 1st order version of the circuit.
+ * NOTE3: There is a well known 'proper' 1st order version of this circuit where r2 is
+ *  a dead short, and c1 is also ommitted as in NOTE2. Set both r2 to 0 and c1 to 0 to
+ *  emulate a circuit of this type.
  *
  *                             .--------+---------.
  *                             |        |         |
@@ -160,14 +165,13 @@ filter_biquad_device& filter_biquad_device::opamp_sk_lowpass_setup(double r1, do
  */
 filter_biquad_device& filter_biquad_device::opamp_mfb_lowpass_setup(double r1, double r2, double r3, double c1, double c2)
 {
-	if ((r1 == 0) || (r2 == 0) || (r3 == 0) || (c2 == 0))
+	if ((r1 == 0) || ((r2 == 0) && (c1 != 0)) || (r3 == 0) || (c2 == 0))
 	{
-		fatalerror("filter_biquad_device::opamp_mfb_lowpass_setup() - only c1 can be 0; parameters were: r1: %f, r2: %f, r3: %f, c1: %f, c2: %f", r1, r2, r3, c1, c2); /* Filter can not be setup.  Undefined results. */
+		fatalerror("filter_biquad_device::opamp_mfb_lowpass_setup() - only c1 can be 0 (and if c1 is 0, r2 can also be 0); parameters were: r1: %f, r2: %f, r3: %f, c1: %f, c2: %f", r1, r2, r3, c1, c2); /* Filter can not be setup.  Undefined results. */
 	}
-
 	double const gain = -r3 / r1;
 	double fc, q = (M_SQRT2 / 2.0);
-	if (c1 == 0) // set C1 to 0 to run this filter in a degraded single pole mode where C1 was left off the filter entirely. Certain Williams boards seem to have omitted C1, presumably by accident.
+	if ((r2 != 0) && (c1 == 0)) // set C1 to 0 to run this filter in single pole mode where C1 was left off the filter entirely. Certain Williams boards seem to have omitted C1, presumably by accident.
 	{
 		fc = (r1 * r3) / (2 * M_PI * ((r1 * r2) + (r1 * r3) + (r2 * r3)) * r3 * c2);
 #ifdef FLT_BIQUAD_DEBUG_SETUP
@@ -175,12 +179,20 @@ filter_biquad_device& filter_biquad_device::opamp_mfb_lowpass_setup(double r1, d
 #endif
 		return setup(biquad_type::LOWPASS1P, fc, q, gain);
 	}
-	else
+	else if ((r2 == 0) && (c1 == 0)) // proper first order case, set both C1 to 0 and R2 to 0 for the first order
+	{
+		fc = 1.0 / (2 * M_PI * r3 * c2);
+#ifdef FLT_BIQUAD_DEBUG_SETUP
+		logerror("filter_biquad_device::opamp_mfb_lowpass_setup() in 1st order mode yields: fc = %f, Q = %f(ignored), gain = %f\n", fc, q, gain);
+#endif
+		return setup(biquad_type::LOWPASS1P, fc, q, gain);
+	}
+	else // common case, (r2 != 0) && (c1 != 0)
 	{
 		fc = 1.0 / (2 * M_PI * sqrt(r2 * r3 * c1 * c2));
 		q = sqrt(r2 * r3 * c1 * c2) / ((r3 * c2) + (r2 * c2) + ((r2 * c2) * -gain));
 #ifdef FLT_BIQUAD_DEBUG_SETUP
-		logerror("filter_biquad_device::opamp_mfb_lowpass_setup() yields: fc = %f, Q = %f, gain = %f\n", fc, q, gain);
+		logerror("filter_biquad_device::opamp_mfb_lowpass_setup() in 2nd order mode yields: fc = %f, Q = %f, gain = %f\n", fc, q, gain);
 #endif
 		return setup(biquad_type::LOWPASS, fc, q, gain);
 	}
@@ -226,7 +238,7 @@ filter_biquad_device& filter_biquad_device::opamp_mfb_bandpass_setup(double r1, 
 		r_in = 1.0 / (1.0/r1 + 1.0/r2);
 	}
 
-	double const fc = 1.0 / (2 * M_PI * sqrt(r_in * r3 * c1 * c2));
+	double const fc = 1.0 / (2 * M_PI * sqrt(r_in * r3 * c1 * c2)); // technically this is the center frequency of the bandpass
 	double const q = sqrt(r3 / r_in * c1 * c2) / (c1 + c2);
 	gain *= -r3 / r_in * c2 / (c1 + c2);
 #ifdef FLT_BIQUAD_DEBUG_SETUP
