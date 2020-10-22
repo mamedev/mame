@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_MACHINE_NES_VT39_VT369_SOC_H
-#define MAME_MACHINE_NES_VT39_VT369_SOC_H
+#ifndef MAME_MACHINE_NES_VT32_VT369_SOC_H
+#define MAME_MACHINE_NES_VT32_VT369_SOC_H
 
 #pragma once
 
@@ -71,36 +71,6 @@ protected:
 
 };
 
-class nes_vt32_soc_device : public nes_vt369_soc_device
-{
-public:
-	nes_vt32_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
-
-protected:
-	nes_vt32_soc_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock);
-
-	virtual void device_add_mconfig(machine_config& config) override;
-
-	void nes_vt_fp_map(address_map& map);
-
-	uint8_t vtfp_4119_r();
-	void vtfp_411e_w(uint8_t data);
-	void vtfp_412c_extbank_w(uint8_t data);
-	uint8_t vtfp_412d_r();
-	void vtfp_4242_w(uint8_t data);
-	void vtfp_4a00_w(uint8_t data);
-};
-
-class nes_vt32_soc_pal_device : public nes_vt32_soc_device
-{
-public:
-	nes_vt32_soc_pal_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
-
-protected:
-	virtual void device_add_mconfig(machine_config& config) override;
-};
-
-
 class nes_vt3x_soc_dg_device : public nes_vt09_soc_device
 {
 public:
@@ -137,10 +107,7 @@ DECLARE_DEVICE_TYPE(NES_VT09_SOC_CY, nes_vt09_soc_cy_device)
 DECLARE_DEVICE_TYPE(NES_VT09_SOC_BT, nes_vt09_soc_bt_device)
 DECLARE_DEVICE_TYPE(NES_VT369_SOC, nes_vt369_soc_device)
 
-DECLARE_DEVICE_TYPE(NES_VT32_SOC, nes_vt32_soc_device)
-DECLARE_DEVICE_TYPE(NES_VT32_SOC_PAL, nes_vt32_soc_pal_device)
-
 DECLARE_DEVICE_TYPE(NES_VT3X_SOC_DG, nes_vt3x_soc_dg_device)
 DECLARE_DEVICE_TYPE(NES_VT3X_SOC_FA, nes_vt3x_soc_fa_device)
 
-#endif // MAME_MACHINE_NES_VT39_VT369_SOC_H
+#endif // MAME_MACHINE_NES_VT32_VT369_SOC_H

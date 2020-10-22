@@ -3058,6 +3058,8 @@ files {
 	MAME_DIR .. "src/mame/machine/nes_vt_soc.h",
 	MAME_DIR .. "src/mame/machine/nes_vt09_soc.cpp",
 	MAME_DIR .. "src/mame/machine/nes_vt09_soc.h",
+	MAME_DIR .. "src/mame/machine/nes_vt32_soc.cpp",
+	MAME_DIR .. "src/mame/machine/nes_vt32_soc.h",
 	MAME_DIR .. "src/mame/machine/nes_vt32_vt369_soc.cpp",
 	MAME_DIR .. "src/mame/machine/nes_vt32_vt369_soc.h",
 	MAME_DIR .. "src/mame/drivers/nes_sh6578.cpp",
