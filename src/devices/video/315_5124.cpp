@@ -78,7 +78,7 @@ PAL frame timing
 #define LOG_VCOUNTREAD (1U <<  3)
 
 //#define VERBOSE (LOG_GENERAL | LOG_VIDMODE | LOG_REGWRITE | LOG_VCOUNTREAD)
-//#define LOG_OUTPUT_FUNC printf
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 #define LOGVIDMODE(...)    LOGMASKED(LOG_VIDMODE, __VA_ARGS__)
@@ -136,10 +136,10 @@ DEFINE_DEVICE_TYPE(SEGA315_5124, sega315_5124_device, "sega315_5124", "Sega 315-
 DEFINE_DEVICE_TYPE(SEGA315_5246, sega315_5246_device, "sega315_5246", "Sega 315-5246 SMS2 VDP")
 DEFINE_DEVICE_TYPE(SEGA315_5377, sega315_5377_device, "sega315_5377", "Sega 315-5377 Gamegear VDP")
 
-// (reference for VDP colors : http://www.sega-16.com/forum/showthread.php?30530-SMS-VDP-output-levels)
+// (reference for VDP colors: http://www.sega-16.com/forum/showthread.php?30530-SMS-VDP-output-levels)
 void sega315_5124_device::sega315_5124_palette(palette_device &palette) const
 {
-	static const u8 level[4] = {0,90,173,255};
+	static constexpr u8 level[4] = {0,90,173,255};
 	for (int i = 0; i < 64; i++)
 	{
 		const u8 r = i & 0x03;
@@ -171,7 +171,7 @@ void sega315_5124_device::sega315_5124_palette(palette_device &palette) const
 void sega315_5246_device::sega315_5246_palette(palette_device &palette) const
 {
 	// bit different output level compare to 315_5124
-	static const u8 level[4] = {0,89,174,255};
+	static constexpr u8 level[4] = {0,89,174,255};
 	for (int i = 0; i < 64; i++)
 	{
 		const u8 r = i & 0x03;
@@ -201,7 +201,7 @@ void sega315_5246_device::sega315_5246_palette(palette_device &palette) const
 
 void sega315_5377_device::sega315_5377_palette(palette_device &palette) const
 {
-	// TODO : linear? measure this
+	// TODO: linear? measure this
 	for (int i = 0; i < 4096; i++)
 	{
 		const u8 r = i & 0x000f;
@@ -214,8 +214,8 @@ void sega315_5377_device::sega315_5377_palette(palette_device &palette) const
 
 void sega315_5313_mode4_device::sega315_5313_palette(palette_device &palette) const
 {
-	// non-linear (reference : http://gendev.spritesmind.net/forum/viewtopic.php?f=22&t=2188)
-	static const u8 level[15] = {0,29,52,70,87,101,116,130,144,158,172,187,206,228,255};
+	// non-linear (reference: http://gendev.spritesmind.net/forum/viewtopic.php?f=22&t=2188)
+	static constexpr u8 level[15] = {0,29,52,70,87,101,116,130,144,158,172,187,206,228,255};
 	for (int i = 0; i < 512; i++)
 	{
 		const u8 r = (i & 0x0007) >> 0;
@@ -226,7 +226,7 @@ void sega315_5313_mode4_device::sega315_5313_palette(palette_device &palette) co
 		palette.set_pen_color(i + (512 * 2), level[7 + r], level[7 + g], level[7 + b]); // hilight
 	}
 	// seperated SMS compatible mode color
-	static const u8 sms_level[4] = {0,99,162,255};
+	static constexpr u8 sms_level[4] = {0,99,162,255};
 	for (int i = 0; i < 64; i++)
 	{
 		const u8 r = (i & 0x0003) >> 0;
@@ -241,7 +241,7 @@ void sega315_5313_mode4_device::sega315_5313_palette(palette_device &palette) co
 void sega315_5124_device::sega315_5124(address_map &map)
 {
 	if (!has_configured_map(0))
-		map(0x0000, VRAM_SIZE-1).ram();
+		map(0x0000, VRAM_SIZE - 1).ram();
 }
 
 
@@ -353,7 +353,7 @@ void sega315_5124_device::select_display_mode()
 			m_vdp_mode = 1;
 		else if (!M1 && M2 && !M3) // Mode 2 (Graphics II Mode)
 			m_vdp_mode = 2;
-		else if (!M1 && !M2 && M3) // Mode 3 (Multicolor Mode) */
+		else if (!M1 && !M2 && M3) // Mode 3 (Multicolor Mode)
 			m_vdp_mode = 3;
 		else
 			LOGVIDMODE("Unknown video mode detected (M1 = %c, M2 = %c, M3 = %c, M4 = %c)\n", M1 ? '1' : '0', M2 ? '1' : '0', M3 ? '1' : '0', M4 ? '1' : '0');
@@ -411,17 +411,16 @@ void sega315_5124_device::set_frame_timing()
 
 u8 sega315_5124_device::vcount_read()
 {
-	u8 vc = vcount();
+	const u8 vc = vcount();
 
 	LOGVCOUNTREAD(
-		"fr %d vpos %3d hpos %3d hc 0x%02X %s: vcount read value 0x%02X\n",
-		screen().frame_number(),
-		screen().vpos(),
-		screen_hpos(),
-		hcount(),
-		machine().describe_context(),
-		vc
-	);
+			"fr %d vpos %3d hpos %3d hc 0x%02X %s: vcount read value 0x%02X\n",
+			screen().frame_number(),
+			screen().vpos(),
+			screen_hpos(),
+			hcount(),
+			machine().describe_context(),
+			vc);
 
 	return vc;
 }
@@ -786,10 +785,8 @@ void sega315_5124_device::check_pending_flags()
 
 u8 sega315_5124_device::control_read()
 {
-	u8 temp;
-
 	check_pending_flags();
-	temp = m_status;
+	const u8 result = m_status;
 
 	if (!machine().side_effects_disabled())
 	{
@@ -809,7 +806,7 @@ u8 sega315_5124_device::control_read()
 		}
 	}
 
-	return temp;
+	return result;
 }
 
 
@@ -1078,8 +1075,8 @@ u16 sega315_5246_device::tile2_select_mode4(u16 tile_number)
 
 void sega315_5124_device::draw_scanline_mode4(int *line_buffer, int *priority_selected, int line)
 {
-	/* if top 2 rows of screen not affected by horizontal scrolling, then x_scroll = 0 */
-	/* else x_scroll = m_reg8copy                                                      */
+	// if top 2 rows of screen not affected by horizontal scrolling, then x_scroll = 0
+	// else x_scroll = m_reg8copy
 	const int x_scroll = ((BIT(m_reg[0x00], 6) && (line < 16)) ? 0 : m_reg8copy);
 
 	const int x_scroll_start_column = 32 - (x_scroll >> 3);             /* x starting column tile */
@@ -1601,17 +1598,13 @@ void sega315_5124_device::draw_scanline_mode2(int *line_buffer, int line)
 
 		for (int pixel_x = 0; pixel_x < 8; pixel_x++)
 		{
-			u8 pen_selected;
 			const int pixel_plot_x = (tile_column << 3) + pixel_x;
 
+			u8 pen_selected;
 			if (BIT(pattern, 7 - pixel_x))
-			{
 				pen_selected = colors >> 4;
-			}
 			else
-			{
 				pen_selected = colors & 0x0f;
-			}
 
 			if (!pen_selected)
 				pen_selected = BACKDROP_COLOR;
@@ -1785,11 +1778,12 @@ void sega315_5124_device::draw_scanline(int pixel_offset_x, int pixel_plot_y, in
 	/* Check if display is disabled or we're below/above active area */
 	if (m_display_disabled || line < 0 || line >= m_frame_timing[ACTIVE_DISPLAY_V])
 	{
-		rectangle rec;
-		rec.min_y = rec.max_y = pixel_plot_y + line;
+		const rectangle rec(
+				pixel_offset_x,
+				pixel_offset_x + 255,
+				pixel_plot_y + line,
+				pixel_plot_y + line);
 
-		rec.min_x = pixel_offset_x;
-		rec.max_x = pixel_offset_x + 255;
 		m_tmpbitmap.fill(m_palette_lut->pen(m_current_palette[BACKDROP_COLOR]), rec);
 		m_y1_bitmap.fill((m_reg[0x07] & 0x0f) ? 1 : 0, rec);
 	}
@@ -1946,7 +1940,7 @@ void sega315_5313_mode4_device::update_palette()
 
 void sega315_5124_device::cram_write(u8 data)
 {
-	u16 address = m_addr & m_cram_mask;
+	const u16 address = m_addr & m_cram_mask;
 	if (data != m_CRAM[address])
 	{
 		m_CRAM[address] = data;
@@ -1965,7 +1959,7 @@ void sega315_5377_device::cram_write(u8 data)
 	{
 		if (m_addr & 1)
 		{
-			u16 address = (m_addr & m_cram_mask) & ~1;
+			const u16 address = (m_addr & m_cram_mask) & ~1;
 			if (m_buffer != m_CRAM[address] || data != m_CRAM[address + 1])
 			{
 				m_CRAM[address] = m_buffer;
