@@ -91,7 +91,7 @@ void gigatron_cpu_device::reset_cpu()
 	m_out = 0;
 
 	m_out_cb(0, 0);
-	m_outx_cb(0, 0);
+	//m_outx_cb(0, 0);   // commented out because sound system isn't ready yet.
 
 	for(uint16_t i = 0; i < m_ramMask; i++)
 		gigatron_writemem8(i, floor(machine().rand() & 0xff));
