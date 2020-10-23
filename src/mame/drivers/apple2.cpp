@@ -54,6 +54,7 @@ II Plus: RAM options reduced to 16/32/48 KB.
 
 #include "sound/spkrdev.h"
 
+#include "bus/a2bus/4play.h"
 #include "bus/a2bus/a2alfam2.h"
 #include "bus/a2bus/a2applicard.h"
 #include "bus/a2bus/a2arcadebd.h"
@@ -63,6 +64,7 @@ II Plus: RAM options reduced to 16/32/48 KB.
 #include "bus/a2bus/a2diskiing.h"
 #include "bus/a2bus/a2dx1.h"
 #include "bus/a2bus/a2echoii.h"
+#include "bus/a2bus/a2iwm.h"
 #include "bus/a2bus/a2mcms.h"
 #include "bus/a2bus/a2memexp.h"
 #include "bus/a2bus/a2midi.h"
@@ -78,19 +80,18 @@ II Plus: RAM options reduced to 16/32/48 KB.
 #include "bus/a2bus/a2ultraterm.h"
 #include "bus/a2bus/a2videoterm.h"
 #include "bus/a2bus/a2zipdrive.h"
+#include "bus/a2bus/byte8251.h"
+#include "bus/a2bus/computereyes2.h"
 #include "bus/a2bus/ezcgi.h"
+#include "bus/a2bus/grapplerplus.h"
 #include "bus/a2bus/laser128.h"
 #include "bus/a2bus/mouse.h"
 #include "bus/a2bus/ramcard128k.h"
 #include "bus/a2bus/ramcard16k.h"
-#include "bus/a2bus/timemasterho.h"
-#include "bus/a2bus/ssprite.h"
 #include "bus/a2bus/ssbapple.h"
-#include "bus/a2bus/4play.h"
-#include "bus/a2bus/computereyes2.h"
+#include "bus/a2bus/ssprite.h"
+#include "bus/a2bus/timemasterho.h"
 #include "bus/a2bus/transwarp.h"
-#include "bus/a2bus/byte8251.h"
-#include "bus/a2bus/a2iwm.h"
 
 #include "bus/a2gameio/gameio.h"
 
@@ -1325,6 +1326,7 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("applesurance", A2BUS_APPLESURANCE);  /* Applesurance Diagnostic Controller */
 //  device.option_add("magicmusician", A2BUS_MAGICMUSICIAN);    /* Magic Musician Card */
 	device.option_add("byte8251", A2BUS_BYTE8251); /* BYTE Magazine 8251 serial card */
+	device.option_add("grapplerplus", A2BUS_GRAPPLERPLUS); /* Orange Micro Grappler+ Printer Interface card */
 }
 
 void apple2_state::apple2_common(machine_config &config)
