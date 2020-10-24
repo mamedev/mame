@@ -191,6 +191,16 @@ u8 a2bus_grapplerplus_device::read_cnxx(u8 offset)
 }
 
 
+void a2bus_grapplerplus_device::write_cnxx(u8 offset, u8 data)
+{
+	LOG("Write Cn%02X=%02X (bus conflict)\n", offset, data);
+
+	if (m_rom_bank)
+		LOG("Select low ROM bank\n");
+	m_rom_bank = 0x0000U;
+}
+
+
 u8 a2bus_grapplerplus_device::read_c800(u16 offset)
 {
 	return m_rom[(offset & 0x07ffU) | m_rom_bank];
