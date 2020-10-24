@@ -1078,12 +1078,14 @@ u16 sega315_5313_device::ctrl_port_r()
 	/* Megalo Mania also fussy - cares about pending flag*/
 
 	const int sprite_overflow = 0;
-	const int odd_frame = m_imode_odd_frame^1;
+	int odd_frame = 0;
 	int hblank_flag = 0;
 	const int dma_active = 0;
 	int vblank = m_vblank_flag;
 	const int fifo_empty = 1;
 	const int fifo_full = 0;
+
+	if (m_imode & 1) odd_frame = m_imode_odd_frame ^ 1;
 
 	const u16 hpos = get_hposition();
 
