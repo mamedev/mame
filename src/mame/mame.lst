@@ -32295,7 +32295,13 @@ vgpocket
 vgpmini
 vgtablet
 
-@source:nes_vt32_vt369.cpp
+@source:nes_vt32.cpp
+dgun2573
+dgun2573a
+rminitv
+fcpocket
+
+@source:nes_vt369_vtunknown.cpp
 bittboy
 mc_pg150
 mc_hh210
@@ -32306,10 +32312,6 @@ sy889
 sy888b
 mc_cb280
 mog_m320
-dgun2573
-dgun2573a
-rminitv
-fcpocket
 dgun2561
 dgun2593
 lxcmcy
