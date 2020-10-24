@@ -76,7 +76,7 @@ a2bus_grapplerplus_device::a2bus_grapplerplus_device(machine_config const &mconf
 INPUT_CHANGED_MEMBER(a2bus_grapplerplus_device::sw_msb)
 {
 	if (BIT(m_data_latch, 7))
-		m_printer_out->write(m_data_latch & ((BIT(m_s1->read(), 3) ? 0xffU : 0x7fU)));
+		m_printer_out->write(m_data_latch & (BIT(m_s1->read(), 3) ? 0xffU : 0x7fU));
 }
 
 
@@ -106,7 +106,7 @@ void a2bus_grapplerplus_device::write_c0nx(u8 offset, u8 data)
 		// latch output data - remember MSB can be forced low by DIP switch
 		LOG("Latch data %02X\n", data);
 		m_data_latch = data;
-		m_printer_out->write(data & ((BIT(m_s1->read(), 3) ? 0xffU : 0x7fU)));
+		m_printer_out->write(data & (BIT(m_s1->read(), 3) ? 0xffU : 0x7fU));
 
 		// clearing the ACK latch will acknowledge an interrupt
 		if (m_ack_in)
