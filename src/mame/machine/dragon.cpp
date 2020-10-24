@@ -57,7 +57,7 @@ void dragon_state::pia1_pa_changed(uint8_t data)
 	/* if strobe bit is high send data from pia0 port b to dragon parallel printer */
 	if (data & 0x02)
 	{
-		uint8_t output = pia_1().b_output();
+		uint8_t output = pia_0().b_output();
 		m_printer->output(output);
 	}
 }
