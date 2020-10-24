@@ -44,25 +44,25 @@ void picture_image_device::device_start()
 
 image_init_result picture_image_device::call_load()
 {
-    switch (render_detect_image(image_core_file()))
-    {
-    case RENDUTIL_IMGFORMAT_PNG:
-        render_load_png(m_picture, image_core_file());
-        break;
+	switch (render_detect_image(image_core_file()))
+	{
+	case RENDUTIL_IMGFORMAT_PNG:
+		render_load_png(m_picture, image_core_file());
+		break;
 
-    case RENDUTIL_IMGFORMAT_JPEG:
-        render_load_jpeg(m_picture, image_core_file());
-        break;
+	case RENDUTIL_IMGFORMAT_JPEG:
+		render_load_jpeg(m_picture, image_core_file());
+		break;
 
-    case RENDUTIL_IMGFORMAT_MSDIB:
-        render_load_msdib(m_picture, image_core_file());
-        break;
+	case RENDUTIL_IMGFORMAT_MSDIB:
+		render_load_msdib(m_picture, image_core_file());
+		break;
 
-    default:
-        m_picture.reset();
+	default:
+		m_picture.reset();
 	}
 
-    return m_picture.valid() ? image_init_result::PASS : image_init_result::FAIL;
+	return m_picture.valid() ? image_init_result::PASS : image_init_result::FAIL;
 }
 
 void picture_image_device::call_unload()
