@@ -39,8 +39,10 @@ inline menu_analog::field_data::field_data(ioport_field &f) noexcept
 	, range(f.maxval() - f.minval())
 	, neutral(float(f.analog_reverse() ? (f.maxval() - f.defvalue()) : (f.defvalue() - f.minval())) / range)
 	, origin((f.analog_wraps() && (f.defvalue() != f.minval()) && (f.defvalue() != f.maxval())) ? 0.0f : neutral)
+	, shift(0U)
 	, show_neutral((f.defvalue() != f.minval()) && (f.defvalue() != f.maxval()))
 {
+	for (ioport_value m = f.mask(); m && !BIT(m, 0); m >>= 1, ++shift) { }
 }
 
 
@@ -93,7 +95,7 @@ void menu_analog::custom_render(void *selectedref, float top, float bottom, floa
 
 		ioport_value cur(0U);
 		data.field.get().live().analog->read(cur);
-		cur -= data.field.get().minval();
+		cur = (cur >> data.shift) - data.field.get().minval();
 		float fill(float(cur) / data.range);
 		if (data.field.get().analog_reverse())
 			fill = 1.0f - fill;
