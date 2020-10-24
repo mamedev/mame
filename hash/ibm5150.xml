@@ -163,7 +163,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<info name="cracked" value="demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
-				<rom name="apple panic.img" size="163840" crc="5594040e" sha1="d865096cfdc42c964bf375725cfd2c5058a97217"/>
+				<rom name="apple panic.img" size="163840" crc="5594040e" sha1="d865096cfdc42c964bf375725cfd2c5058a97217" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -295,7 +295,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<info name="cracked" value="demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184320">
-				<rom name="big top.img" size="184320" crc="b5ed200c" sha1="3e9f581acb9022d97049124fa9e416d31d2efa68"/>
+				<rom name="big top.img" size="184320" crc="b5ed200c" sha1="3e9f581acb9022d97049124fa9e416d31d2efa68" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -456,7 +456,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
-				<rom name="centipede.img" size="163840" crc="fed8d765" sha1="06fa7489e6cab340fc3af554f8f0f244e8833c3e"/>
+				<rom name="centipede.img" size="163840" crc="fed8d765" sha1="06fa7489e6cab340fc3af554f8f0f244e8833c3e" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -683,7 +683,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
-				<rom name="digger.img" size="163840" crc="a983ea69" sha1="45b234cefb8fec44dc6b7ce593f8fa27d804c5ac"/>
+				<rom name="digger.img" size="163840" crc="a983ea69" sha1="45b234cefb8fec44dc6b7ce593f8fa27d804c5ac" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -708,7 +708,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
-				<rom name="donkey kong.img" size="163840" crc="dffb898a" sha1="8d06172ebaf565253b5ce10324b4f9498e071ad1"/>
+				<rom name="donkey kong.img" size="163840" crc="dffb898a" sha1="8d06172ebaf565253b5ce10324b4f9498e071ad1" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -735,7 +735,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<info name="cracked" value="demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
-				<rom name="dunzhin - warrior of ras volume i.img" size="163840" crc="b9262dc3" sha1="7e76c35d082debca67b06c9326a49b47db46463c"/>
+				<rom name="dunzhin - warrior of ras volume i.img" size="163840" crc="b9262dc3" sha1="7e76c35d082debca67b06c9326a49b47db46463c" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -1188,7 +1188,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<info name="cracked" value="demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
-				<rom name="j-bird.img" size="163840" crc="d5b17630" sha1="485b19cf53898edba077c33dfaa68ef218ee9137"/>
+				<rom name="j-bird.img" size="163840" crc="d5b17630" sha1="485b19cf53898edba077c33dfaa68ef218ee9137" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -1268,12 +1268,12 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<info name="cracked" value="demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="king's quest ii - romancing the throne v1.1h (disk 1 of 2).img" size="368640" crc="4107b044" sha1="874bc6ccffbd9a0e5faee8972b2eeedfb82aeb62"/>
+				<rom name="king's quest ii - romancing the throne v1.1h (disk 1 of 2).img" size="368640" crc="4107b044" sha1="874bc6ccffbd9a0e5faee8972b2eeedfb82aeb62" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="king's quest ii - romancing the throne v1.1h (disk 2 of 2).img" size="368640" crc="66d16848" sha1="bcb7df8439e1417ad5178e7406c814901b3b5300"/>
+				<rom name="king's quest ii - romancing the throne v1.1h (disk 2 of 2).img" size="368640" crc="66d16848" sha1="bcb7df8439e1417ad5178e7406c814901b3b5300" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -1382,12 +1382,12 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<info name="cracked" value="demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="marble madness (disk 1 of 2).img" size="409600" crc="256bcd8c" sha1="e68e7c0e2c7d55a5fdcf96fa41d52a6de7ee73a8"/>
+				<rom name="marble madness (disk 1 of 2).img" size="409600" crc="256bcd8c" sha1="e68e7c0e2c7d55a5fdcf96fa41d52a6de7ee73a8" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="marble madness (disk 2 of 2).img" size="368640" crc="a7489b5e" sha1="7f9678cc4e50e824b463cb0d9cfa66710848dfc1"/>
+				<rom name="marble madness (disk 2 of 2).img" size="368640" crc="a7489b5e" sha1="7f9678cc4e50e824b463cb0d9cfa66710848dfc1" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -1432,7 +1432,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<info name="cracked" value="demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184320">
-				<rom name="microsoft adventure [cr].img" size="184320" crc="7148422b" sha1="4d0704af33186890a7579a60f88e1576b718886d"/>
+				<rom name="microsoft adventure [cr].img" size="184320" crc="7148422b" sha1="4d0704af33186890a7579a60f88e1576b718886d" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -1445,7 +1445,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<info name="cracked" value="demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184320">
-				<rom name="microsoft decathlon.img" size="184320" crc="34435a3c" sha1="55bb5aa1b085c167e1f07ceb7cca845d6b18173e"/>
+				<rom name="microsoft decathlon.img" size="184320" crc="34435a3c" sha1="55bb5aa1b085c167e1f07ceb7cca845d6b18173e" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -1575,7 +1575,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<info name="cracked" value="demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="moon patrol.img" size="368640" crc="abba0f4a" sha1="ec9304efec24d91e4ce584f977dd899bf22353d3"/>
+				<rom name="moon patrol.img" size="368640" crc="abba0f4a" sha1="ec9304efec24d91e4ce584f977dd899bf22353d3" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -1599,7 +1599,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
-				<rom name="ms. pac-man.img" size="163840" crc="29a7126d" sha1="d234a633e09fae034809537e9890ffcfa60f0775"/>
+				<rom name="ms. pac-man.img" size="163840" crc="29a7126d" sha1="d234a633e09fae034809537e9890ffcfa60f0775" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -1635,7 +1635,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184320">
-				<rom name="mule (cr).img" size="184320" crc="5e0e758b" sha1="64081a590ab59a9836260c172b82aff0a4d855ce"/>
+				<rom name="mule (cr).img" size="184320" crc="5e0e758b" sha1="64081a590ab59a9836260c172b82aff0a4d855ce" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -1775,7 +1775,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<info name="cracked" value="demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="pinball construction set.img" size="409600" crc="6460e995" sha1="4e20da455dcd482371fa55510ea5f4c440580cce"/>
+				<rom name="pinball construction set.img" size="409600" crc="6460e995" sha1="4e20da455dcd482371fa55510ea5f4c440580cce" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -1799,12 +1799,12 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<info name="cracked" value="demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="pirates (disk 1 of 2).img" size="368640" crc="db732151" sha1="5e9c1d4866aa928fc8ac1d61779bd2971761c52b"/>
+				<rom name="pirates (disk 1 of 2).img" size="368640" crc="db732151" sha1="5e9c1d4866aa928fc8ac1d61779bd2971761c52b" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="pirates (disk 2 of 2).img" size="368640" crc="964cb6c9" sha1="215ffc08ea7fa144952ba5d8ed7eb0d49820a089"/>
+				<rom name="pirates (disk 2 of 2).img" size="368640" crc="964cb6c9" sha1="215ffc08ea7fa144952ba5d8ed7eb0d49820a089" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -1951,7 +1951,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<info name="cracked" value="demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
-				<rom name="serpentine.img" size="163840" crc="bcf96e44" sha1="e9fb3bf2e0d689ed7793e1b1426f20d76796c686"/>
+				<rom name="serpentine.img" size="163840" crc="bcf96e44" sha1="e9fb3bf2e0d689ed7793e1b1426f20d76796c686" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -8252,7 +8252,7 @@ has been replaced with an all-zero block. -->
 		<info name="ported by" value="NovaLogic" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Bubble Bobble (USA) (Disk 1).img" size="368640" crc="1dad38e6" sha1="6b2f5f9655ed5002dfd72b33b2cfb857c432752a"/>
+				<rom name="Bubble Bobble (USA) (Disk 1).img" size="368640" crc="1dad38e6" sha1="6b2f5f9655ed5002dfd72b33b2cfb857c432752a" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
@@ -10293,7 +10293,7 @@ has been replaced with an all-zero block. -->
 		<info name="developer" value="Exxos/ERE Informatique" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Kult (1989) (cracked).img" size="368640" crc="fddcaf43" sha1="e0789a5656461e6abd21c293c490b3d52cc89c9e"/>
+				<rom name="Kult (1989) (cracked).img" size="368640" crc="fddcaf43" sha1="e0789a5656461e6abd21c293c490b3d52cc89c9e" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -11711,6 +11711,7 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<!-- Game cracked - Missing copy protection track -->
 	<software name="platoon">
 		<description>Platoon</description>
 		<year>1987</year>
@@ -11718,12 +11719,12 @@ has been replaced with an all-zero block. -->
 		<info name="developer" value="Ocean Software" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Platoon [Data East] [1987] [5.25DD] [Disk 1 of 2].img" size="368640" crc="78008871" sha1="51bf517cdc22460565a37100a97b9dbccf630e2e"/>
+				<rom name="Platoon [Data East] [1987] [5.25DD] [Disk 1 of 2].img" size="368640" crc="78008871" sha1="51bf517cdc22460565a37100a97b9dbccf630e2e" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Platoon [Data East] [1987] [5.25DD] [Disk 2 of 2].img" size="368640" crc="d7ffc94f" sha1="7e2abcd1ea0173a66ec7f93827cd6b2223a8c232"/>
+				<rom name="Platoon [Data East] [1987] [5.25DD] [Disk 2 of 2].img" size="368640" crc="d7ffc94f" sha1="7e2abcd1ea0173a66ec7f93827cd6b2223a8c232" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -11882,12 +11883,12 @@ has been replaced with an all-zero block. -->
 		<info name="cracked" value="The Humble Guys" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="[PC] Prehistorik D1.2 [5.25].img" size="368640" crc="f60f5fe5" sha1="5b7d07f5c43c00e78b9821ae74c1565d8e13acf5"/>
+				<rom name="[PC] Prehistorik D1.2 [5.25].img" size="368640" crc="f60f5fe5" sha1="5b7d07f5c43c00e78b9821ae74c1565d8e13acf5" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="[PC] Prehistorik D2.2 [5.25].img" size="368640" crc="83e839da" sha1="4f8906e08e912eb957ba2eacf5be959aee001f6e"/>
+				<rom name="[PC] Prehistorik D2.2 [5.25].img" size="368640" crc="83e839da" sha1="4f8906e08e912eb957ba2eacf5be959aee001f6e" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
