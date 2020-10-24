@@ -36,6 +36,18 @@ X-6203 : Chess
 		</part>
 	</software>
 
+	<software name="aqworm">
+		<description>Aquariworm</description>
+		<year>2020</year>
+		<publisher>Cronosoft</publisher>
+		<info name="author" value="Roy Templeman"/>
+		<part name="cart" interface="aquarius_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="aworm.bin" size="0x4000" crc="0cbaa1cf" sha1="95bffb44e66d78c3caee834fd53a876d113e3d25"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="basic">
 		<description>Aquarius BASIC ROM</description>
 		<year>1982</year>
