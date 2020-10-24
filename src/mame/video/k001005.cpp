@@ -782,7 +782,7 @@ void k001005_renderer::render_polygons()
 				render_triangle(visarea, rd_scan_tex2d, 5, v[2], v[3], v[0]);
 			}
 		}
-		else if (cmd == 0x80000121 || cmd == 0x80000126)
+		else if (cmd == 0x80000106 || cmd == 0x80000121 || cmd == 0x80000126)
 		{
 			// no texture, color gouraud, Z
 
