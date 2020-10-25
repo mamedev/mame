@@ -4417,6 +4417,48 @@ ROM_START( mspacmanblt )
 	ROM_LOAD( "82s129-2.c9",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )
 ROM_END
 
+ROM_START( mspacmanblt2 ) // very small differences to the above
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "11.bin", 0x0000, 0x4000, CRC(763c2abb) SHA1(d9428ca04fc7b26f83cee4629be021c1c806e001) )
+	ROM_CONTINUE(       0x8000, 0x4000 )
+
+	ROM_REGION( 0x8000, "gfx1", 0 ) // first 0x2000 are identical to mspacmanblt
+	ROM_LOAD( "13.bin", 0x0000, 0x800, CRC(f2c5da43) SHA1(6a6de2ecc313a11ad12d8d1712c05f923984f668) )
+	ROM_CONTINUE(       0x1000, 0x800 )
+	ROM_CONTINUE(       0x0800, 0x800 )
+	ROM_CONTINUE(       0x1800, 0x800 )
+	ROM_IGNORE(         0x6000 )
+
+	ROM_REGION( 0x0120, "proms", 0 ) // not dumped for this set
+	ROM_LOAD( "82s123.h7",   0x0000, 0x0020, BAD_DUMP CRC(3545e7e9) SHA1(b866b02579438afb11296e5c53a32c6425bd044d) )
+	ROM_LOAD( "82s129-3.d1", 0x0020, 0x0100, BAD_DUMP CRC(3eb3a8e4) SHA1(19097b5f60d1030f8b82d9f1d3a241f93e5c75d6) )
+
+	ROM_REGION( 0x0200, "namco", 0 ) // sound PROMs, not dumped for this set
+	ROM_LOAD( "82s129-1.a9", 0x0000, 0x0100, BAD_DUMP CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
+	ROM_LOAD( "82s129-2.c9", 0x0100, 0x0100, BAD_DUMP CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )
+ROM_END
+
+ROM_START( mspacmanbg3 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "11.bin", 0x0000, 0x4000, CRC(b2894fa8) SHA1(00f22b1aa21d169002b96a063632a870e1a85199) )
+	ROM_CONTINUE(       0x8000, 0x4000 )
+
+	ROM_REGION( 0x8000, "gfx1", 0 ) // originally dumped as 27256 with first half 0xff filled, redumped as 27128, data matches
+	ROM_LOAD( "13.bin", 0x0000, 0x800, CRC(0ee117c9) SHA1(e7ff8670cdd004938d2b642509223176780298ee) ) // this only has the Pacman GFX, shows Pacman and not Ms. Pacman even on PCB pics, some small glitches in emulation (bad ROM or different arrangement?)
+	ROM_CONTINUE(       0x1000, 0x800 )
+	ROM_CONTINUE(       0x0800, 0x800 )
+	ROM_CONTINUE(       0x1800, 0x800 )
+	ROM_IGNORE(         0x2000 )
+
+	ROM_REGION( 0x0120, "proms", 0 ) // not dumped for this set
+	ROM_LOAD( "82s123.h7",   0x0000, 0x0020, BAD_DUMP CRC(3545e7e9) SHA1(b866b02579438afb11296e5c53a32c6425bd044d) )
+	ROM_LOAD( "82s129-3.d1", 0x0020, 0x0100, BAD_DUMP CRC(3eb3a8e4) SHA1(19097b5f60d1030f8b82d9f1d3a241f93e5c75d6) )
+
+	ROM_REGION( 0x0200, "namco", 0 ) // sound PROMs, not dumped for this set
+	ROM_LOAD( "82s129-1.a9", 0x0000, 0x0100, BAD_DUMP CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
+	ROM_LOAD( "82s129-2.c9", 0x0100, 0x0100, BAD_DUMP CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )
+ROM_END
+
 ROM_START( mspacmanbcc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "comecocos.bin",  0x0000, 0x4000, CRC(220eccae) SHA1(30183601d27e95f1e7a60983eaf2056505ab13d2) )
@@ -7849,15 +7891,17 @@ GAME( 1995, mschamps,   mspacman, mschamp,  mschamp,  pacman_state,  init_mscham
 
 // These bootlegs have MADE IN GREECE clearly visible and etched into the PCBs. They were very common in Spain with several operators having their own versions.
 // Based on the PCBs and copyright dates shown they  were produced late 80s / early 90s. Usually they run a version of Ms. Pacman, but were sometimes converted back to regular Pac-Man
-GAME( 198?, mspacmanbg, mspacman,woodpek, mspacman, pacman_state,  empty_init,    ROT90,  "bootleg",            "Ms. Pac-Man ('Made in Greece' bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, mspacmanbg2,mspacman,woodpek, mspacman, pacman_state,  empty_init,    ROT90,  "bootleg",            "Ms. Pac-Man ('Made in Greece' bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mspacmanbgd,mspacman,woodpek, mspacman, pacman_state,  empty_init,    ROT90,  "bootleg (Datamat)",  "Miss Pukman ('Made in Greece' Datamat bootleg)", MACHINE_SUPPORTS_SAVE ) // shows 'Miss Pukman 1991/1992' but confirmed to be the bootleg distributed by Datamat
-GAME( 1992, mspacmanblt,mspacman,woodpek, mspacman, pacman_state,  empty_init,    ROT90,  "bootleg (Triunvi)",  "Come-Cocos (Ms. Pac-Man) ('Made in Greece' Triunvi bootleg)", MACHINE_SUPPORTS_SAVE ) //
-GAME( 1991, mspacmanbcc,mspacman,woodpek, mspacman, pacman_state,  empty_init,    ROT90,  "bootleg (Tecnausa)", "Come-Cocos (Ms. Pac-Man) ('Made in Greece' Tecnausa bootleg)", MACHINE_SUPPORTS_SAVE ) // ^ same PCB, also dated 1991, distributed by Tecnausa
-GAME( 1991, mspacmanbhe,mspacman,woodpek, mspacman, pacman_state,  empty_init,    ROT90,  "bootleg (Herle SA)", "Come-Cocos (Ms. Pac-Man) ('Made in Greece' Herle SA bootleg)", MACHINE_SUPPORTS_SAVE ) // ^ same PCB
-GAME( 1992, mspacmanbco,mspacman,woodpek, mspacman, pacman_state,  empty_init,    ROT90,  "bootleg (Cocamatic)","Come-Cocos (Ms. Pac-Man) (Cocamatic bootleg)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // this PCB have swapped Blue and Green color lines (Ms.Pac-Man sprite should be pink), no "MADE IN GREECE" text at PCB
-GAME( 1993, mspacmanbi, mspacman,woodpek, mspacman, pacman_state,  empty_init,    ROT90,  "bootleg (Impeuropex)", "Ms. Pac-Man (Impeuropex bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 198?, pacmansp,   puckman, pacman,  pacmansp, pacman_state,  empty_init,    ROT90,  "bootleg (Video Game SA)", "Puck Man (Spanish, 'Made in Greece' bootleg)", MACHINE_SUPPORTS_SAVE ) // probably a further conversion of the mspacmanbg bootleg, still has some MS Pacman code + extra features
+GAME( 198?, mspacmanbg,   mspacman, woodpek, mspacman, pacman_state,  empty_init,    ROT90,  "bootleg",            "Ms. Pac-Man ('Made in Greece' bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, mspacmanbg2,  mspacman, woodpek, mspacman, pacman_state,  empty_init,    ROT90,  "bootleg",            "Ms. Pac-Man ('Made in Greece' bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 198?, mspacmanbg3,  mspacman, woodpek, mspacman, pacman_state,  empty_init,    ROT90,  "bootleg",            "Ms. Pac-Man ('Made in Greece' bootleg, set 3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // some small glitches (i.e. the o of Monedas on title screen)
+GAME( 1992, mspacmanbgd,  mspacman, woodpek, mspacman, pacman_state,  empty_init,    ROT90,  "bootleg (Datamat)",  "Miss Pukman ('Made in Greece' Datamat bootleg)", MACHINE_SUPPORTS_SAVE ) // shows 'Miss Pukman 1991/1992' but confirmed to be the bootleg distributed by Datamat
+GAME( 1992, mspacmanblt,  mspacman, woodpek, mspacman, pacman_state,  empty_init,    ROT90,  "bootleg (Triunvi)",  "Come-Cocos (Ms. Pac-Man) ('Made in Greece' Triunvi bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mspacmanblt2, mspacman, woodpek, mspacman, pacman_state,  empty_init,    ROT90,  "bootleg (Triunvi)",  "Come-Cocos (Ms. Pac-Man) ('Made in Greece' Triunvi bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mspacmanbcc,  mspacman, woodpek, mspacman, pacman_state,  empty_init,    ROT90,  "bootleg (Tecnausa)", "Come-Cocos (Ms. Pac-Man) ('Made in Greece' Tecnausa bootleg)", MACHINE_SUPPORTS_SAVE ) // ^ same PCB, also dated 1991, distributed by Tecnausa
+GAME( 1991, mspacmanbhe,  mspacman, woodpek, mspacman, pacman_state,  empty_init,    ROT90,  "bootleg (Herle SA)", "Come-Cocos (Ms. Pac-Man) ('Made in Greece' Herle SA bootleg)", MACHINE_SUPPORTS_SAVE ) // ^ same PCB
+GAME( 1992, mspacmanbco,  mspacman, woodpek, mspacman, pacman_state,  empty_init,    ROT90,  "bootleg (Cocamatic)","Come-Cocos (Ms. Pac-Man) (Cocamatic bootleg)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // this PCB have swapped Blue and Green color lines (Ms.Pac-Man sprite should be pink), no "MADE IN GREECE" text at PCB
+GAME( 1993, mspacmanbi,   mspacman, woodpek, mspacman, pacman_state,  empty_init,    ROT90,  "bootleg (Impeuropex)", "Ms. Pac-Man (Impeuropex bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 198?, pacmansp,     puckman,  pacman,  pacmansp, pacman_state,  empty_init,    ROT90,  "bootleg (Video Game SA)", "Puck Man (Spanish, 'Made in Greece' bootleg)", MACHINE_SUPPORTS_SAVE ) // probably a further conversion of the mspacmanbg bootleg, still has some MS Pacman code + extra features
 
 
 

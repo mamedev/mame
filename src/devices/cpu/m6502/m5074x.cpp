@@ -498,12 +498,17 @@ void m50753_device::m50753_map(address_map &map)
 	map(0x00e0, 0x00eb).rw(FUNC(m50753_device::ports_r), FUNC(m50753_device::ports_w));
 	map(0x00ee, 0x00ee).r(FUNC(m50753_device::in_r));
 	map(0x00ef, 0x00ef).r(FUNC(m50753_device::ad_r));
-	map(0x00f2, 0x00f2).w(FUNC(m50753_device::ad_control_w));
+	map(0x00f2, 0x00f2).w(FUNC(m50753_device::ad_start_w));
 	map(0x00f3, 0x00f3).rw(FUNC(m50753_device::ad_control_r), FUNC(m50753_device::ad_control_w));
 	map(0x00f5, 0x00f5).rw(FUNC(m50753_device::pwm_control_r), FUNC(m50753_device::pwm_control_w));
 	map(0x00f9, 0x00ff).rw(FUNC(m50753_device::tmrirq_r), FUNC(m50753_device::tmrirq_w));
 	map(0xe800, 0xffff).rom().region(DEVICE_SELF, 0);
 }
+
+// interrupt bits on 50753 are slightly different from the 740/741.
+static constexpr u8 IRQ_50753_INT1REQ = 0x80;
+static constexpr u8 IRQ_50753_INTADC = 0x20;
+static constexpr u8 IRQ_50753_INT2REQ = 0x02;
 
 m50753_device::m50753_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m50753_device(mconfig, M50753, tag, owner, clock)
@@ -545,12 +550,18 @@ uint8_t m50753_device::in_r()
 
 uint8_t m50753_device::ad_r()
 {
+	m_intctrl &= ~IRQ_50753_INTADC;
+	recalc_irqs();
+
 	return m_ad_in[m_ad_control & 0x07]();
 }
 
 void m50753_device::ad_start_w(uint8_t data)
 {
 	logerror("%s: A-D start (IN%d)\n", machine().describe_context(), m_ad_control & 0x07);
+
+	// starting a conversion.  M50753 documentation says conversion time is 72 microseconds.
+	m_timers[TIMER_ADC]->adjust(attotime::from_usec(72));
 }
 
 uint8_t m50753_device::ad_control_r()
@@ -572,10 +583,6 @@ void m50753_device::pwm_control_w(uint8_t data)
 {
 	m_pwm_enabled = BIT(data, 0);
 }
-
-// interrupt bits on 50753 are slightly different from the 740/741.
-static constexpr u8 IRQ_50753_INT1REQ = 0x80;
-static constexpr u8 IRQ_50753_INT2REQ = 0x02;
 
 void m50753_device::execute_set_input(int inputnum, int state)
 {
@@ -605,4 +612,25 @@ void m50753_device::execute_set_input(int inputnum, int state)
 	}
 
 	recalc_irqs();
+}
+
+void m50753_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_ADC:
+		m_timers[TIMER_ADC]->adjust(attotime::never);
+
+		// if interrupt source is the ADC, do it.
+		if (m_ad_control & 4)
+		{
+			m_intctrl |= IRQ_50753_INTADC;
+			recalc_irqs();
+		}
+		break;
+
+	default:
+		m5074x_device::device_timer(timer, id, param, ptr);
+		break;
+	}
 }
