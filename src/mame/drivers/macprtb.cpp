@@ -42,6 +42,10 @@
              1: A/D FILTER
              2: SOUND LATCH
              3: OFF HOOK
+             4: ?
+             5: Target Disk Mode flag (0 = TDM, 1 for normal boot)
+             6: ?
+             7: ?
 
     Port 0: 0: IWM_CNTRL
             1: N/C
@@ -157,9 +161,6 @@ private:
 
 	emu_timer *m_6015_timer;
 
-	WRITE_LINE_MEMBER(adb_irq_w) { m_adb_irq_pending = state; }
-	int m_adb_irq_pending;
-
 	uint16_t mac_via_r(offs_t offset);
 	void mac_via_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	uint8_t mac_via_in_a();
@@ -226,6 +227,11 @@ private:
 			m_pmu_ack = BIT(data, 6);
 		//printf("PMU ACK = %d\n", m_pmu_ack);
 	}
+	int m_adb_line;
+	void set_adb_line(int state) { m_adb_line = state; }
+	u8 pmu_adb_r() { return (m_adb_line<<1); }
+	void pmu_adb_w(u8 data) { m_macadb->adb_linechange_w(data & 1); }
+	u8 pmu_in_r() { return 0x20; }  // bit 5 is 0 if the Target Disk Mode should be enabled on the PB100
 };
 
 void macportable_state::field_interrupts()
@@ -490,6 +496,9 @@ void macportable_state::macprtb(machine_config &config)
 	m_pmu->write_p<2>().set(FUNC(macportable_state::pmu_data_w));
 	m_pmu->read_p<3>().set(FUNC(macportable_state::pmu_comms_r));
 	m_pmu->write_p<3>().set(FUNC(macportable_state::pmu_comms_w));
+	m_pmu->read_p<4>().set(FUNC(macportable_state::pmu_adb_r));
+	m_pmu->write_p<4>().set(FUNC(macportable_state::pmu_adb_w));
+	m_pmu->read_in_p().set(FUNC(macportable_state::pmu_in_r));
 
 	M50740(config, "kybd", 3.93216_MHz_XTAL).set_disable();
 
@@ -504,8 +513,8 @@ void macportable_state::macprtb(machine_config &config)
 	m_screen->set_screen_update(FUNC(macportable_state::screen_update));
 
 	MACADB(config, m_macadb, C15M);
-	m_macadb->set_pmu_mode(true);
-	m_macadb->set_pmu_is_via1(true);
+	m_macadb->set_mcu_mode(true);
+	m_macadb->adb_data_callback().set(FUNC(macportable_state::set_adb_line));
 
 	LEGACY_IWM(config, m_iwm, &mac_iwm_interface);
 	sonydriv_floppy_image_device::legacy_2_drives_add(config, &mac_floppy_interface);
