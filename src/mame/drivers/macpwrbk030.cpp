@@ -390,14 +390,19 @@ u32 macpb030_state::screen_update_macpb160(screen_device &screen, bitmap_ind16 &
 	{
 		u16 *line = &bitmap.pix(y);
 
-		for (int x = 0; x < 640 / 4; x++)
+		for (int x = 0; x < 640; x+=8)
 		{
-			uint8_t const pixels = vram8[(y * 160) + (BYTE4_XOR_BE(x))];
+			u8 const pixels = vram8[(y * 80) + (BYTE4_XOR_BE(x/8))];
+			static const u16 palette[2] = { 0, 3 };
 
-			*line++ = ((pixels >> 6) & 3);
-			*line++ = ((pixels >> 4) & 3);
-			*line++ = ((pixels >> 2) & 3);
-			*line++ = (pixels & 3);
+			*line++ = palette[(pixels >> 7)&1];
+			*line++ = palette[(pixels >> 6)&1];
+			*line++ = palette[(pixels >> 5)&1];
+			*line++ = palette[(pixels >> 4)&1];
+			*line++ = palette[(pixels >> 3)&1];
+			*line++ = palette[(pixels >> 2)&1];
+			*line++ = palette[(pixels >> 1)&1];
+			*line++ = palette[(pixels & 1)];
 		}
 	}
 	return 0;
@@ -407,15 +412,22 @@ u32 macpb030_state::screen_update_macpbwd(screen_device &screen, bitmap_rgb32 &b
 {
 	u8 const *vram8 = (uint8_t *)m_vram.target();
 
-	//    vram8 += 0x40000;
-
 	for (int y = 0; y < 480; y++)
 	{
-		u32 *scanline = &bitmap.pix(y);
-		for (int x = 0; x < 640; x++)
+		u32 *line = &bitmap.pix(y);
+		for (int x = 0; x < 640; x+=8)
 		{
-			uint8_t const pixels = vram8[(y * 640) + (BYTE4_XOR_BE(x))];
-			*scanline++ = m_wd_palette[pixels];
+			uint8_t const pixels = vram8[(y * 80) + (BYTE4_XOR_BE(x/8))];
+			static const u32 palette[2] = { 0xffffffff, 0 };
+
+			*line++ = palette[(pixels >> 7) & 1];
+			*line++ = palette[(pixels >> 6) & 1];
+			*line++ = palette[(pixels >> 5) & 1];
+			*line++ = palette[(pixels >> 4) & 1];
+			*line++ = palette[(pixels >> 3) & 1];
+			*line++ = palette[(pixels >> 2) & 1];
+			*line++ = palette[(pixels >> 1) & 1];
+			*line++ = palette[(pixels & 1)];
 		}
 	}
 
@@ -753,16 +765,7 @@ u8 macpb030_state::mac_via_in_a()
 
 u8 macpb030_state::mac_via_in_b()
 {
-	int val = 0;
-	// TODO: is this valid for VIA2 PMU machines?
-	/* video beam in display (! VBLANK && ! HBLANK basically) */
-
-	if (m_screen->vpos() >= 480)
-		val |= 0x40;
-
-	//  printf("%s VIA1 IN_B = %02x\n", machine().describe_context().c_str(), val);
-
-	return val;
+	return 0x08;    // flag indicating no Target Disk Mode
 }
 
 void macpb030_state::mac_via_out_a(u8 data)
