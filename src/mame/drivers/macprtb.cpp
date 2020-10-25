@@ -491,7 +491,7 @@ void macportable_state::macprtb(machine_config &config)
 	M68000(config, m_maincpu, C15M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &macportable_state::macprtb_map);
 
-	M50753(config, m_pmu, 3.93216_MHz_XTAL/4);
+	M50753(config, m_pmu, 3.93216_MHz_XTAL);
 	m_pmu->read_p<2>().set(FUNC(macportable_state::pmu_data_r));
 	m_pmu->write_p<2>().set(FUNC(macportable_state::pmu_data_w));
 	m_pmu->read_p<3>().set(FUNC(macportable_state::pmu_comms_r));

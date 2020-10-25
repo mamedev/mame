@@ -170,10 +170,6 @@ void m3745x_device::execute_set_input(int inputnum, int state)
 				m_intreq1 &= ~IRQ1_INT3;
 			}
 			break;
-
-		case M3745X_SET_OVERFLOW:   // the base 740 class can handle this
-			m740_device::execute_set_input(M740_SET_OVERFLOW, state);
-			break;
 	}
 
 	recalc_irqs();
@@ -389,8 +385,7 @@ void m3745x_device::adc_w(offs_t offset, uint8_t data)
 			// starting a conversion?  this takes 50 cycles.
 			if (!(m_adctrl & ADCTRL_COMPLETE))
 			{
-				double hz = (double)clock() / 50.0;
-				m_timers[TIMER_ADC]->adjust(attotime::from_hz(hz));
+				m_timers[TIMER_ADC]->adjust(cycles_to_attotime(50));
 			}
 			break;
 	}

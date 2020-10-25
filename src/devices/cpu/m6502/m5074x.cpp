@@ -174,10 +174,6 @@ void m5074x_device::execute_set_input(int inputnum, int state)
 				m_intctrl &= ~IRQ_INTREQ;
 			}
 			break;
-
-		case M5074X_SET_OVERFLOW:   // the base 740 class can handle this
-			m740_device::execute_set_input(M740_SET_OVERFLOW, state);
-			break;
 	}
 
 	recalc_irqs();
@@ -605,10 +601,6 @@ void m50753_device::execute_set_input(int inputnum, int state)
 		{
 			m_intctrl &= ~IRQ_50753_INT2REQ;
 		}
-		break;
-
-	case M5074X_SET_OVERFLOW: // the base 740 class can handle this
-		m740_device::execute_set_input(M740_SET_OVERFLOW, state);
 		break;
 	}
 
