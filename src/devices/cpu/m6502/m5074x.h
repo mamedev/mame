@@ -30,6 +30,8 @@ class m5074x_device :  public m740_device
 		TIMER_2,
 		TIMER_X,
 
+		TIMER_ADC,
+
 		NUM_TIMERS
 	};
 
@@ -125,6 +127,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -136,6 +139,7 @@ private:
 	void ad_start_w(uint8_t data);
 	uint8_t ad_control_r();
 	void ad_control_w(uint8_t data);
+	void ad_trigger_w(uint8_t data);
 	uint8_t pwm_control_r();
 	void pwm_control_w(uint8_t data);
 
