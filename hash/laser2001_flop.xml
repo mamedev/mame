@@ -5,7 +5,7 @@ license:CC0
 -->
 <softwarelist name="laser2001_flop" description="V-Tech Laser 2001 / Salora Manager disks">
 
-	<software name="kaarme">
+	<software name="kaarme" supported="no">
 		<description>Käärmepeli (Finland)</description>
 		<year>198?</year>
 		<publisher>Salora</publisher>
