@@ -68,7 +68,6 @@ public:
 	void depthch_audio(machine_config &config);
 	void carhntds(machine_config &config);
 	void alphaho(machine_config &config);
-	void tranqgun(machine_config &config);
 
 	DECLARE_READ_LINE_MEMBER(coin_status_r);
 	DECLARE_READ_LINE_MEMBER(get_64v);
@@ -133,7 +132,6 @@ protected:
 	void carhntds_io_w(offs_t offset, uint8_t data);
 	void sspacaho_io_w(offs_t offset, uint8_t data);
 	void headonn_io_w(offs_t offset, uint8_t data);
-	void tranqgun_io_w(offs_t offset, uint8_t data);
 	void spacetrk_io_w(offs_t offset, uint8_t data);
 	void brdrline_io_w(offs_t offset, uint8_t data);
 	void pulsar_io_w(offs_t offset, uint8_t data);
@@ -198,9 +196,33 @@ protected:
 	void spacetrk_io_map(address_map &map);
 	void sspacaho_io_map(address_map &map);
 	void sspaceat_io_map(address_map &map);
-	void tranqgun_io_map(address_map &map);
 	void vicdual_dualgame_map(address_map &map);
 };
+
+class tranqgun_state : public vicdual_state
+{
+public:
+	tranqgun_state(const machine_config &mconfig, device_type type, const char *tag) :
+		vicdual_state(mconfig, type, tag)
+	{ }
+
+	void tranqgun(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	void tranqgun_io_map(address_map &map);
+	void tranqgun_io_w(offs_t offset, uint8_t data);
+
+	uint8_t tranqgun_prot_r(offs_t offset);
+	void tranqgun_prot_w(offs_t offset, uint8_t data);
+
+	void tranqgun_dualgame_map(address_map &map);
+
+	uint8_t m_tranqgun_prot_return;
+};
+
 
 class nsub_state : public vicdual_state
 {
