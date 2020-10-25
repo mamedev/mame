@@ -14193,6 +14193,7 @@ galap4                          // hack
 galapx                          // hack
 galaxbsf                        // hack
 galaxbsf2                       // bootleg
+galaxcirsa                      // bootleg (Cirsa)
 galaxian                        // (c) Namco
 galaxiana                       // (c) Namco
 galaxianbl                      // bootleg
@@ -14220,6 +14221,7 @@ jumpbug                         // (c) 1981 Rock-ola
 jumpbugb                        // (c) 1981 Sega
 jungsub                         // bootleg
 kamakazi3                       // Video Games (UK) Ltd., hack or bootleg?
+kamikazesp                      // bootleg (Euromatic S.A.)
 kamikazp                        // bootleg (Potomac Games)
 kingball                        // (c) 1980 Namco
 kingballj                       // (c) 1980 Namco
@@ -14230,11 +14232,9 @@ losttomb                        // (c) 1982 Stern
 losttombh                       // (c) 1982 Stern
 luctoday                        // 1980 Sigma
 mandinga                        // bootleg (Artemi)
+mandingac                       // bootleg (Centromatic)
 mandingaeg                      // bootleg (Electrogame)
 mandingarf                      // bootleg (Recreativos Franco S.A.)
-mandingac                       // bootleg (Centromatic)
-olmandingo                      // bootleg
-olmandingc                      // bootleg (Calfesa)
 mltiwars                        // bootleg (Gayton Games)
 monsterz                        // (c) 1982 Nihon (Arcade TV Game List - P.102, Left, 20 from top)
 moonal2                         // [1980] Nichibutsu
@@ -14242,7 +14242,6 @@ moonal2b                        // [1980] Nichibutsu
 moonaln                         // [Nichibutsu] (Karateco license) or hack
 mooncmw                         // bootleg
 mooncptc                        // bootleg (Petaco S.A.)
-sirio2                          // bootleg (Calfesa S.L.)
 mooncreg                        // bootleg
 mooncrgx                        // bootleg
 mooncrs2                        // bootleg
@@ -14269,6 +14268,8 @@ mshuttlej                       // (c) 1981 Nichibutsu
 mshuttlej2                      // (c) 1981 Nichibutsu
 ncentury                        // bootleg (Petaco S.A.)
 offensiv                        // bootleg (Video Dens)
+olmandingo                      // bootleg
+olmandingc                      // bootleg (Calfesa)
 omegab                          // bootleg
 omni                            // bootleg
 orbitron                        // (c) 1982 Signatron USA (Arcade Tv Game List - P.160, Left, 22 from top)
@@ -14299,8 +14300,8 @@ scorpionb                       // (c) 1982 Zaccaria
 scorpionmc                      // bootleg
 scramble                        // GX387 (c) 1981 Konami
 scramblebb                      // bootleg?
-kamikazesp                      // bootleg (Euromatic S.A.)
 scramblebf                      // bootleg
+scramblebun                     // bootleg?
 scrambles                       // GX387 (c) 1981 Stern
 scrambles2                      // GX387 (c) 1981 Stern
 scrambp                         // bootleg (Billport S.A.)
@@ -14309,6 +14310,7 @@ scrammr                         // bootleg (Model Racing)
 scrampt                         // bootleg (Petaco S.A.)
 scramrf                         // bootleg (Recreativos Franco)
 sfx                             // (c) 1983 Nichibutsu
+sirio2                          // bootleg (Calfesa S.L.)
 skelagon                        // (c) 1983 Nichibutsu USA
 skybase                         // (c) 1982 Omori Electric Co., Ltd.
 skyraidr                        // bootleg
@@ -14361,7 +14363,6 @@ galaktron                       // bootleg (Petaco S.A.)
 zerotimed                       // hack (Datamat)
 zerotimemc                      // hack (Marti Colls)
 zerotimeu                       // hack
-galaxcirsa                      // bootleg (Cirsa)
 zigzagb                         // (c) 1982 LAX (bootleg)
 zigzagb2                        // (c) 1982 LAX (bootleg)
 
