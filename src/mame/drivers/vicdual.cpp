@@ -273,6 +273,15 @@ void carnival_state::machine_start()
 	save_item(NAME(m_musicBus));
 }
 
+void tranqgun_state::machine_start()
+{
+	vicdual_state::machine_start();
+
+	m_tranqgun_prot_return = 0;
+
+	save_item(NAME(m_tranqgun_prot_return));
+}
+
 
 void vicdual_state::vicdual_root(machine_config &config)
 {
@@ -1138,7 +1147,7 @@ void vicdual_state::sspacaho_io_w(offs_t offset, uint8_t data)
 }
 
 
-void vicdual_state::tranqgun_io_w(offs_t offset, uint8_t data)
+void tranqgun_state::tranqgun_io_w(offs_t offset, uint8_t data)
 {
 	if (offset & 0x01)  m_vicdual_sound->write(data);
 	if (offset & 0x02)  palette_bank_w(data);
@@ -1221,6 +1230,40 @@ void vicdual_state::vicdual_dualgame_map(address_map &map)
 	map(0x8800, 0x8fff).mirror(0x7000).ram().w(FUNC(vicdual_state::characterram_w)).share("characterram");
 }
 
+// see code at 0x3f04 (game over) and 0x3eba (passing level 3) in ROM
+// both functions make the same 3 checks, assume we never want the 'fail' result
+uint8_t tranqgun_state::tranqgun_prot_r(offs_t offset)
+{
+	logerror("%s: tranqgun_prot_r %04x\n", machine().describe_context(), offset);
+
+	if (offset == 0x3800)
+		return m_tranqgun_prot_return;
+
+	return 0x00;
+}
+
+void tranqgun_state::tranqgun_prot_w(offs_t offset, uint8_t data)
+{
+	logerror("%s: tranqgun_prot_w %04x %02x\n", machine().describe_context(), offset, data);
+
+	if (offset == 0x0000)
+	{
+		if (data == 0xd8)
+			m_tranqgun_prot_return = 0x02;
+		else if (data == 0x3a)
+			m_tranqgun_prot_return = 0x01;
+		else if (data == 0x6a)
+			m_tranqgun_prot_return = 0x06;
+	}
+}
+
+
+void tranqgun_state::tranqgun_dualgame_map(address_map &map)
+{
+	vicdual_dualgame_map(map);
+	map(0x4000, 0x7fff).rw(FUNC(tranqgun_state::tranqgun_prot_r), FUNC(tranqgun_state::tranqgun_prot_w));
+}
+
 void vicdual_state::carhntds_dualgame_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom(); // also has part of a rom mapped at 0x4000
@@ -1287,7 +1330,7 @@ void vicdual_state::sspacaho_io_map(address_map &map)
 }
 
 
-void vicdual_state::tranqgun_io_map(address_map &map)
+void tranqgun_state::tranqgun_io_map(address_map &map)
 {
 	map.global_mask(0x0f);
 
@@ -1298,7 +1341,7 @@ void vicdual_state::tranqgun_io_map(address_map &map)
 
 	/* no decoder, just logic gates, so in theory the
 	   game can write to multiple locations at once */
-	map(0x00, 0x0f).w(FUNC(vicdual_state::tranqgun_io_w));
+	map(0x00, 0x0f).w(FUNC(tranqgun_state::tranqgun_io_w));
 }
 
 
@@ -2251,12 +2294,13 @@ void carnival_state::carnivalh(machine_config &config)
 }
 
 
-void vicdual_state::tranqgun(machine_config &config)
+void tranqgun_state::tranqgun(machine_config &config)
 {
 	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_IO, &vicdual_state::tranqgun_io_map);
+	m_maincpu->set_addrmap(AS_IO, &tranqgun_state::tranqgun_io_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tranqgun_state::tranqgun_dualgame_map);
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4017,7 +4061,7 @@ GAME( 1980, samurai,    0,        samurai,   samurai,   vicdual_state,  empty_in
 GAME( 1979, invinco,    0,        invinco,   invinco,   vicdual_state,  empty_init, ROT270, "Sega", "Invinco", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, invds,      0,        invds,     invds,     vicdual_state,  empty_init, ROT270, "Sega", "Invinco / Deep Scan", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, carhntds,   0,        carhntds,  carhntds,  vicdual_state,  empty_init, ROT270, "Sega", "Car Hunt / Deep Scan (France)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, tranqgun,   0,        tranqgun,  tranqgun,  vicdual_state,  empty_init, ROT270, "Sega", "Tranquillizer Gun", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, tranqgun,   0,        tranqgun,  tranqgun,  tranqgun_state, empty_init, ROT270, "Sega", "Tranquillizer Gun", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, spacetrk,   0,        spacetrk,  spacetrk,  vicdual_state,  empty_init, ROT270, "Sega", "Space Trek (upright)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, spacetrkc,  spacetrk, spacetrk,  spacetrkc, vicdual_state,  empty_init, ROT270, "Sega", "Space Trek (cocktail)", MACHINE_IMPERFECT_GRAPHICS |MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, carnival,   0,        carnival,  carnival,  carnival_state, empty_init, ROT270, "Sega", "Carnival (upright, AY8912 music)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
@@ -4030,7 +4074,7 @@ GAME( 1981, brdrline,   0,        brdrline,  brdrline,  vicdual_state,  empty_in
 GAME( 1981, starrkr,    brdrline, brdrline,  starrkr,   vicdual_state,  empty_init, ROT270, "Sega", "Star Raker", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, brdrlins,   brdrline, brdrline,  brdrline,  vicdual_state,  empty_init, ROT270, "bootleg (Sidam)", "Borderline (Sidam bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, brdrlinb,   brdrline, brdrline,  brdrline,  vicdual_state,  empty_init, ROT270, "bootleg (Karateco)", "Borderline (Karateco bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, brdrlinet,  brdrline, tranqgun,  tranqgun,  vicdual_state,  empty_init, ROT270, "Sega", "Borderline (Tranquillizer Gun conversion)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // official factory conversion
+GAME( 1981, brdrlinet,  brdrline, tranqgun,  tranqgun,  tranqgun_state, empty_init, ROT270, "Sega", "Borderline (Tranquillizer Gun conversion)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // official factory conversion
 GAME( 198?, startrks,   0,        headons,   headons,   vicdual_state,  empty_init, ROT0,   "bootleg (Sidam)", "Star Trek (Head On hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, digger,     0,        digger,    digger,    vicdual_state,  empty_init, ROT270, "Sega", "Digger", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pulsar,     0,        pulsar,    pulsar,    vicdual_state,  empty_init, ROT270, "Sega", "Pulsar", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
