@@ -21,6 +21,65 @@
     and an M50753 microcontroller "PMU" handles power management, ADB, and
     clock/PRAM.
 
+    VIA connections:
+    Port A: 8-bit bidirectional data bus to the PMU
+    Port B: 0: PMU REQ
+            1: PMU ACK
+            2: VIA_TEST
+            3: MODEM
+            4: N/C
+            5: HDSEL (floppy head select)
+            6: STEREO
+            7: SCC REQ
+
+    CA1: 60 Hz clock
+    CA2: 1 second clock
+    CB1: PMU IRQ
+    CB2: SCSI IRQ
+
+    PMU (M50753) connections:
+    IN port: 0: PMGR_IN0
+             1: A/D FILTER
+             2: SOUND LATCH
+             3: OFF HOOK
+
+    Port 0: 0: IWM_CNTRL
+            1: N/C
+            2: HD PWR
+            3: MODEM PWR
+            4: SERIAL PWR
+            5: SOUND PWR
+            6: -5 EN
+            7: SYS_PWR
+
+    Port 1: 0: N/C
+            1: AKD
+            2: STOP CLK
+            3: CHRG ON
+            4: KBD RST (resets keyboard M50740)
+            5: HICHG
+            6: RING DETECT
+            7: N/C
+
+    Port 2: bi-directional data bus, connected to VIA port A
+
+    Port 3: 0: RESET
+            1: SYS_RST
+            2: VIA_TEST
+            3: SOUND OFF
+            4: 1 SEC
+            5: PMINT
+            6: PMACK
+            7: PMREQ
+
+    Port 4: 0: PMGR_ADB (ADB out)
+            1: ADB (ADB in)
+            2: DISP BLANK
+            3: MODEM_INS
+
+    INT1: 60 Hz clock
+    INT2: RESET
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -50,9 +109,6 @@
 #define C7M (7833600)
 #define C15M (C7M*2)
 #define C32M (C15M*2)
-
-// M50753 emulation needs some work before this is a thing.
-//#define PMU_LLE
 
 class macportable_state : public driver_device
 {
@@ -154,11 +210,22 @@ private:
 		field_interrupts();
 	}
 
-	u8 m_pmu_from_via, m_pmu_to_via, m_pmu_ack, m_pmu_req;
-	u8 pmu_data_r() { return m_pmu_from_via; }
-	void pmu_data_w(u8 data) { m_pmu_to_via = data; }
+	u8 m_pmu_via_bus, m_pmu_ack, m_pmu_req;
+	u8 pmu_data_r() { return m_pmu_via_bus; }
+	void pmu_data_w(u8 data) { m_pmu_via_bus = data; }
 	u8 pmu_comms_r() { return (m_pmu_req<<7); }
-	void pmu_comms_w(u8 data) { m_pmu_ack = (data & 0x40)>>6; }
+	void pmu_comms_w(u8 data)
+	{
+		if (BIT(data, 1))   // start the 68K if it's not already
+		{
+			m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		}
+
+		m_via1->write_cb1(BIT(data, 5));
+
+			m_pmu_ack = BIT(data, 6);
+		//printf("PMU ACK = %d\n", m_pmu_ack);
+	}
 };
 
 void macportable_state::field_interrupts()
@@ -198,7 +265,7 @@ void macportable_state::machine_start()
 	m_via_interrupt = m_scc_interrupt = m_asc_interrupt = 0;
 	m_last_taken_interrupt = -1;
 	m_irq_count = m_ca1_data = m_ca2_data = 0;
-	m_pmu_to_via = m_pmu_from_via = 0;
+	m_pmu_via_bus = 0;
 	m_pmu_ack = m_pmu_req = 0;
 
 	m_6015_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(macportable_state::mac_6015_tick),this));
@@ -212,18 +279,14 @@ void macportable_state::machine_reset()
 	m_last_taken_interrupt = -1;
 	m_irq_count = m_ca1_data = m_ca2_data = 0;
 
-	// put ROM mirror at 0
-	address_space& space = m_maincpu->space(AS_PROGRAM);
-	const u32 memory_size = std::min((u32)0x3fffff, m_rom_size);
-	const u32 memory_end = memory_size - 1;
-	offs_t memory_mirror = memory_end & ~(memory_size - 1);
-
-	space.unmap_write(0x00000000, memory_end);
-	space.install_read_bank(0x00000000, memory_end & ~memory_mirror, memory_mirror, "bank1");
-	membank("bank1")->set_base(m_rom_ptr);
+	m_pmu_via_bus = 0;
+	m_pmu_ack = 1;
 
 	// start 60.15 Hz timer
 	m_6015_timer->adjust(attotime::from_hz(60.15), 0, attotime::from_hz(60.15));
+
+	// as with Egret/Cuda, the PMU starts the 68K when it's ready
+	m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 void macportable_state::init_macprtb()
@@ -286,19 +349,20 @@ WRITE_LINE_MEMBER(macportable_state::via_irq_w)
 uint16_t macportable_state::rom_switch_r(offs_t offset)
 {
 	// disable the overlay
-	if (m_overlay)
+	if (!machine().side_effects_disabled())
 	{
-		address_space& space = m_maincpu->space(AS_PROGRAM);
-		const u32 memory_end = m_ram->size() - 1;
-		void *memory_data = m_ram->pointer();
-		offs_t memory_mirror = memory_end & ~memory_end;
+		if ((m_overlay) && (offset == 0x67f))
+		{
+			address_space &space = m_maincpu->space(AS_PROGRAM);
+			const u32 memory_end = m_ram->size() - 1;
+			void *memory_data = m_ram->pointer();
+			offs_t memory_mirror = memory_end & ~memory_end;
 
-		space.install_readwrite_bank(0x00000000, memory_end & ~memory_mirror, memory_mirror, "bank1");
-		membank("bank1")->set_base(memory_data);
-		m_overlay = false;
+			space.install_readwrite_bank(0x00000000, memory_end & ~memory_mirror, memory_mirror, "bank1");
+			membank("bank1")->set_base(memory_data);
+			m_overlay = false;
+		}
 	}
-
-	//printf("rom_switch_r: offset %08x ROM_size -1 = %08x, masked = %08x\n", offset, m_rom_size-1, offset & ((m_rom_size - 1)>>2));
 
 	return m_rom_ptr[offset & ((m_rom_size - 1)>>2)];
 }
@@ -308,6 +372,8 @@ TIMER_CALLBACK_MEMBER(macportable_state::mac_6015_tick)
 	/* signal VBlank on CA1 input on the VIA */
 	m_ca1_data ^= 1;
 	m_via1->write_ca1(m_ca1_data);
+
+	m_pmu->set_input_line(m50753_device::M50753_INT1_LINE, ASSERT_LINE);
 
 	if (++m_irq_count == 60)
 	{
@@ -351,7 +417,7 @@ void macportable_state::scsi_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 ***************************************************************************/
 void macportable_state::macprtb_map(address_map &map)
 {
-	map(0x000000, 0x8fffff).r(FUNC(macportable_state::rom_switch_r));
+	map(0x000000, 0x1fffff).r(FUNC(macportable_state::rom_switch_r));
 	map(0x900000, 0x93ffff).rom().region("bootrom", 0).mirror(0x0c0000);
 	map(0xf60000, 0xf6ffff).rw(FUNC(macportable_state::mac_iwm_r), FUNC(macportable_state::mac_iwm_w));
 	map(0xf70000, 0xf7ffff).rw(FUNC(macportable_state::mac_via_r), FUNC(macportable_state::mac_via_w));
@@ -365,49 +431,24 @@ void macportable_state::macprtb_map(address_map &map)
 
 uint8_t macportable_state::mac_via_in_a()
 {
-	#ifdef PMU_LLE
-	return m_pmu_to_via;
-	#else
-	return m_macadb->get_pm_data_recv();
-	#endif
+	return m_pmu_via_bus;
 }
 
 uint8_t macportable_state::mac_via_in_b()
 {
-	int val = 0;
-	//  printf("Read VIA B: PM_ACK %x\n", m_pm_ack);
-	val = 0x80 | 0x04;
-
-	#ifdef PMU_LLE
-	val |= ((m_pmu_ack & 1)<<1);
-	#else
-	val |= m_macadb->get_pm_ack(); // SCC wait/request (bit 2 must be set at 900c1a or startup tests always fail)
-	#endif
-
-	//  printf("%s VIA1 IN_B = %02x\n", machine().describe_context().c_str(), val);
-
-	return val;
+	return 0x80 | 0x04 | ((m_pmu_ack & 1)<<1);
 }
 
 void macportable_state::mac_via_out_a(uint8_t data)
 {
-	//  printf("%s VIA1 OUT A: %02x\n", machine().describe_context().c_str(), data);
-	#ifdef PMU_LLE
-	m_pmu_from_via = data;
-	#else
-	m_macadb->set_pm_data_send(data);
-	#endif
+	m_pmu_via_bus = data;
 }
 
 void macportable_state::mac_via_out_b(uint8_t data)
 {
-	//  printf("%s VIA1 OUT B: %02x\n", machine().describe_context().c_str(), data);
+	//printf("%s VIA1 OUT B: %02x\n", machine().describe_context().c_str(), data);
 	sony_set_sel_line(m_iwm.target(), (data & 0x20) >> 5);
-	#ifdef PMU_LLE
 	m_pmu_req = (data & 1);
-	#else
-	m_macadb->pmu_req_w(data & 1);
-	#endif
 }
 
 /***************************************************************************
@@ -444,7 +485,7 @@ void macportable_state::macprtb(machine_config &config)
 	M68000(config, m_maincpu, C15M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &macportable_state::macprtb_map);
 
-	M50753(config, m_pmu, 3.93216_MHz_XTAL);
+	M50753(config, m_pmu, 3.93216_MHz_XTAL/4);
 	m_pmu->read_p<2>().set(FUNC(macportable_state::pmu_data_r));
 	m_pmu->write_p<2>().set(FUNC(macportable_state::pmu_data_w));
 	m_pmu->read_p<3>().set(FUNC(macportable_state::pmu_comms_r));
@@ -452,9 +493,7 @@ void macportable_state::macprtb(machine_config &config)
 
 	M50740(config, "kybd", 3.93216_MHz_XTAL).set_disable();
 
-	#ifdef PMU_LLE
 	config.set_perfect_quantum(m_maincpu);
-	#endif
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60.15);
