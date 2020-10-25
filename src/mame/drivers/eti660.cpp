@@ -36,24 +36,96 @@
 **************************************************************************************************/
 
 #include "emu.h"
-#include "includes/eti660.h"
+#include "cpu/cosmac/cosmac.h"
+#include "machine/ram.h"
+#include "machine/6821pia.h"
+#include "machine/rescap.h"
+#include "sound/cdp1864.h"
+#include "imagedev/cassette.h"
+#include "imagedev/snapquik.h"
 #include "screen.h"
 #include "speaker.h"
+
+#define CDP1802_TAG     "ic3"
+#define CDP1864_TAG     "ic4"
+#define MC6821_TAG      "ic5"
+
+enum
+{
+	LED_POWER = 0,
+	LED_PULSE
+};
+
+class eti660_state : public driver_device
+{
+public:
+	eti660_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_p_videoram(*this, "videoram")
+		, m_maincpu(*this, CDP1802_TAG)
+		, m_cti(*this, CDP1864_TAG)
+		, m_pia(*this, MC6821_TAG)
+		, m_cassette(*this, "cassette")
+		, m_io_keyboard(*this, "KEY.%u", 0U)
+		, m_special(*this, "SPECIAL")
+		, m_leds(*this, "led%u", 0U)
+	{ }
+
+	void eti660(machine_config &config);
+
+private:
+	u8 pia_r();
+	void pia_w(u8 data);
+	void colorram_w(offs_t offset, u8 data);
+	DECLARE_READ_LINE_MEMBER( clear_r );
+	DECLARE_READ_LINE_MEMBER( ef2_r );
+	DECLARE_READ_LINE_MEMBER( ef4_r );
+	DECLARE_WRITE_LINE_MEMBER( q_w );
+	DECLARE_WRITE_LINE_MEMBER( ca2_w );
+	void dma_w(offs_t offset, u8 data);
+	u8 pia_pa_r();
+	void pia_pa_w(u8 data);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
+	required_shared_ptr<u8> m_p_videoram;
+
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
+
+	required_device<cosmac_device> m_maincpu;
+	required_device<cdp1864_device> m_cti;
+	required_device<pia6821_device> m_pia;
+	required_device<cassette_image_device> m_cassette;
+	required_ioport_array<4> m_io_keyboard;
+	required_ioport m_special;
+	output_finder<2> m_leds;
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	uint16_t m_resetcnt;
+
+	/* keyboard state */
+	u8 m_keylatch;
+
+	/* video state */
+	u8 m_color_ram[0xc0];
+	u8 m_color;
+	bool m_color_on;
+};
 
 
 /* Read/Write Handlers */
 // Schematic is wrong, PCB layout is correct: D0-7 swapped around on PIA.
 // There's still a bug in the PIA: if ca2 is instructed to go low, nothing happens.
-READ8_MEMBER( eti660_state::pia_r )
+u8 eti660_state::pia_r()
 {
-	uint8_t pia_offset = m_maincpu->get_memory_address() & 0x03;
+	u8 pia_offset = m_maincpu->get_memory_address() & 0x03;
 
 	return bitswap<8>(m_pia->read(pia_offset), 0,1,2,3,4,5,6,7);
 }
 
-WRITE8_MEMBER( eti660_state::pia_w )
+void eti660_state::pia_w(u8 data)
 {
-	uint8_t pia_offset = m_maincpu->get_memory_address() & 0x03;
+	u8 pia_offset = m_maincpu->get_memory_address() & 0x03;
 	data = bitswap<8>(data,0,1,2,3,4,5,6,7);
 	m_pia->write(pia_offset, data);
 
@@ -68,11 +140,11 @@ WRITE_LINE_MEMBER( eti660_state::ca2_w ) // test with Wipeout game - it should s
 	m_cti->con_w(state);
 }
 
-WRITE8_MEMBER( eti660_state::colorram_w )
+ void eti660_state::colorram_w(offs_t offset, u8 data)
 {
 	offset = m_maincpu->get_memory_address() - 0xc80;
 
-	uint8_t colorram_offset = (((offset & 0x1f0) >> 1) | (offset & 0x07));
+	u8 colorram_offset = (((offset & 0x1f0) >> 1) | (offset & 0x07));
 
 	if (colorram_offset < 0xc0)
 		m_color_ram[colorram_offset] = data;
@@ -167,7 +239,7 @@ WRITE_LINE_MEMBER( eti660_state::q_w )
 	m_cassette->output(state ? 1.0 : -1.0);
 }
 
-WRITE8_MEMBER( eti660_state::dma_w )
+void eti660_state::dma_w(offs_t offset, u8 data)
 {
 	offset -= 0x480;
 
@@ -175,7 +247,7 @@ WRITE8_MEMBER( eti660_state::dma_w )
 
 	if (m_color_on)
 	{
-		uint8_t colorram_offset = ((offset & 0x1f0) >> 1) | (offset & 0x07);
+		u8 colorram_offset = ((offset & 0x1f0) >> 1) | (offset & 0x07);
 
 		if (colorram_offset < 0xc0)
 			m_color = m_color_ram[colorram_offset];
@@ -188,7 +260,7 @@ WRITE8_MEMBER( eti660_state::dma_w )
 
 /* PIA6821 Interface */
 
-READ8_MEMBER( eti660_state::pia_pa_r )
+u8 eti660_state::pia_pa_r()
 {
 	/*
 
@@ -205,7 +277,7 @@ READ8_MEMBER( eti660_state::pia_pa_r )
 
 	*/
 
-	uint8_t i, data = 0xff;
+	u8 i, data = 0xff;
 
 	for (i = 0; i < 4; i++)
 		if (BIT(m_keylatch, i))
@@ -214,7 +286,7 @@ READ8_MEMBER( eti660_state::pia_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( eti660_state::pia_pa_w )
+void eti660_state::pia_pa_w(u8 data)
 {
 	/*
 
@@ -259,7 +331,7 @@ QUICKLOAD_LOAD_MEMBER(eti660_state::quickload_cb)
 	int i;
 	int quick_addr = 0x600;
 	int quick_length;
-	std::vector<uint8_t> quick_data;
+	std::vector<u8> quick_data;
 	int read_;
 	image_init_result result = image_init_result::FAIL;
 
@@ -305,11 +377,11 @@ void eti660_state::eti660(machine_config &config)
 	m_maincpu->dma_wr_cb().set(FUNC(eti660_state::dma_w));
 
 	/* video hardware */
-	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	CDP1864(config, m_cti, XTAL(8'867'238)/5).set_screen(SCREEN_TAG);
+	CDP1864(config, m_cti, XTAL(8'867'238)/5).set_screen("screen");
 	m_cti->inlace_cb().set_constant(0);
 	m_cti->int_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
 	m_cti->dma_out_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_DMAOUT);
@@ -336,7 +408,10 @@ void eti660_state::eti660(machine_config &config)
 	RAM(config, RAM_TAG).set_default_size("3K");
 
 	/* quickload */
-	QUICKLOAD(config, "quickload", "bin,c8,ch8", attotime::from_seconds(2)).set_load_callback(FUNC(eti660_state::quickload_cb));
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "bin,c8,ch8", attotime::from_seconds(2)));
+	quickload.set_load_callback(FUNC(eti660_state::quickload_cb));
+	quickload.set_interface("etiquik");
+	SOFTWARE_LIST(config, "quik_list").set_original("eti660_quik");
 }
 
 /* ROMs */
@@ -347,4 +422,4 @@ ROM_START( eti660 )
 ROM_END
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                            FULLNAME   FLAGS
-COMP( 1981, eti660, 0,      0,      eti660,  eti660, eti660_state, empty_init, "Electronics Today International", "ETI-660", 0 )
+COMP( 1981, eti660, 0,      0,      eti660,  eti660, eti660_state, empty_init, "Electronics Today International", "ETI-660 Learners' Microcomputer", MACHINE_SUPPORTS_SAVE )

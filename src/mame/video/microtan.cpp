@@ -18,7 +18,7 @@
 #include "includes/microtan.h"
 
 
-WRITE8_MEMBER(microtan_state::videoram_w)
+void microtan_state::videoram_w(offs_t offset, uint8_t data)
 {
 	if ((m_videoram[offset] != data) || (m_chunky_buffer[offset] != m_chunky_graphics))
 	{

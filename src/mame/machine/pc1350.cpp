@@ -7,19 +7,19 @@
 #include "includes/pc1350.h"
 #include "machine/ram.h"
 
-WRITE8_MEMBER(pc1350_state::out_b_w)
+void pc1350_state::out_b_w(uint8_t data)
 {
 	m_outb = data;
 }
 
-WRITE8_MEMBER(pc1350_state::out_c_w)
+void pc1350_state::out_c_w(uint8_t data)
 {
 }
 
-READ8_MEMBER(pc1350_state::in_a_r)
+uint8_t pc1350_state::in_a_r()
 {
 	int data = m_outa;
-	int t = keyboard_line_r(space, 0);
+	int t = keyboard_line_r();
 
 	for (int bit = 0; bit < 6; bit++)
 		if (BIT(t, bit))
@@ -50,7 +50,7 @@ READ8_MEMBER(pc1350_state::in_a_r)
 	return data;
 }
 
-READ8_MEMBER(pc1350_state::in_b_r)
+uint8_t pc1350_state::in_b_r()
 {
 	return m_outb;
 }

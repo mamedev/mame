@@ -101,7 +101,7 @@ sticker from Jan 95 and factory sticker 94*41.
 
 ***************************************************************************/
 
-WRITE8_MEMBER(paradise_state::rombank_w)
+void paradise_state::rombank_w(uint8_t data)
 {
 	int bank = data;
 	int bank_n = memregion("maincpu")->bytes() / 0x4000;
@@ -115,7 +115,7 @@ WRITE8_MEMBER(paradise_state::rombank_w)
 	membank("prgbank")->set_entry(bank);
 }
 
-WRITE8_MEMBER(paradise_state::paradise_okibank_w)
+void paradise_state::paradise_okibank_w(uint8_t data)
 {
 	if (data & ~0x02)
 		logerror("%s: unknown oki bank bits %02X\n", machine().describe_context(), data);
@@ -123,7 +123,7 @@ WRITE8_MEMBER(paradise_state::paradise_okibank_w)
 	m_oki2->set_rom_bank((data & 0x02) >> 1);
 }
 
-WRITE8_MEMBER(paradise_state::torus_coin_counter_w)
+void paradise_state::torus_coin_counter_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data ^ 0xff);
 }
@@ -1408,14 +1408,14 @@ void paradise_state::init_paradise()
 void paradise_state::init_tgtball()
 {
 	m_sprite_inc = 4;
-	m_maincpu->space(AS_IO).install_write_handler(0x2001, 0x2001, write8_delegate(*this, FUNC(paradise_state::tgtball_flipscreen_w)));
+	m_maincpu->space(AS_IO).install_write_handler(0x2001, 0x2001, write8smo_delegate(*this, FUNC(paradise_state::tgtball_flipscreen_w)));
 
 }
 
 void paradise_state::init_torus()
 {
 	m_sprite_inc = 4;
-	m_maincpu->space(AS_IO).install_write_handler(0x2070, 0x2070, write8_delegate(*this, FUNC(paradise_state::torus_coin_counter_w)));
+	m_maincpu->space(AS_IO).install_write_handler(0x2070, 0x2070, write8smo_delegate(*this, FUNC(paradise_state::torus_coin_counter_w)));
 }
 
 

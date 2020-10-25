@@ -107,6 +107,7 @@
 #include "emu.h"
 #include "nec.h"
 #include "necdasm.h"
+
 #include "debugger.h"
 
 typedef uint8_t BOOLEAN;
@@ -114,7 +115,7 @@ typedef uint8_t BYTE;
 typedef uint16_t WORD;
 typedef uint32_t DWORD;
 
-#include "necpriv.h"
+#include "necpriv.ipp"
 
 DEFINE_DEVICE_TYPE(V20,  v20_device,  "v20",  "NEC V20")
 DEFINE_DEVICE_TYPE(V30,  v30_device,  "v30",  "NEC V30")
@@ -497,19 +498,19 @@ void nec_common_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	if (m_program->data_width() == 8)
 	{
-		auto cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
-		m_dr8 = [cache](offs_t address) -> u8 { return cache->read_byte(address); };
+		m_program->cache(m_cache8);
+		m_dr8 = [this](offs_t address) -> u8 { return m_cache8.read_byte(address); };
 	}
 	else if (m_chip_type == V33_TYPE)
 	{
 		save_item(NAME(m_xa));
-		auto cache = m_program->cache<1, 0, ENDIANNESS_LITTLE>();
-		m_dr8 = [cache, this](offs_t address) -> u8 { return cache->read_byte(v33_translate(address)); };
+		m_program->cache(m_cache16);
+		m_dr8 = [this](offs_t address) -> u8 { return m_cache16.read_byte(v33_translate(address)); };
 	}
 	else
 	{
-		auto cache = m_program->cache<1, 0, ENDIANNESS_LITTLE>();
-		m_dr8 = [cache](offs_t address) -> u8 { return cache->read_byte(address); };
+		m_program->cache(m_cache16);
+		m_dr8 = [this](offs_t address) -> u8 { return m_cache16.read_byte(address); };
 	}
 
 	m_io = &space(AS_IO);

@@ -119,9 +119,11 @@ protected:
 	virtual void draw_scanline(int pixel_offset_x, int pixel_plot_y, int line);
 	virtual void blit_scanline(int *line_buffer, int *priority_selected, int pixel_offset_x, int pixel_plot_y, int line);
 	virtual void draw_leftmost_pixels_mode4(int *line_buffer, int *priority_selected, int fine_x_scroll, int palette_selected, int tile_line);
-	virtual u16 name_table_row_mode4(int row);
-	virtual u16 sprite_attributes_addr_mode4(u16 base);
-	virtual u8 sprite_tile_mask_mode4(u8 tile_number);
+	virtual u16 name_row_mode4(u16 row);
+	virtual u16 tile1_select_mode4(u16 tile_number);
+	virtual u16 tile2_select_mode4(u16 tile_number);
+	virtual u8 sprite_attribute_extra_offset_mode4(u8 offset);
+	virtual u8 sprite_tile_select_mode4(u8 tile_number);
 	void process_line_timer();
 	void draw_scanline_mode4(int *line_buffer, int *priority_selected, int line);
 	void draw_sprites_mode4(int *line_buffer, int *priority_selected, int line);
@@ -131,6 +133,8 @@ protected:
 	void draw_scanline_mode1(int *line_buffer, int line);
 	void draw_scanline_mode0(int *line_buffer, int line);
 	void check_pending_flags();
+	u8 vcount();
+	u8 hcount();
 
 	unsigned         m_hcounter_divide;
 	u8               m_reg[16];                  /* All the registers */
@@ -167,7 +171,7 @@ protected:
 	const u8         m_palette_offset;
 	const u8         m_reg_num_mask;
 	bool             m_display_disabled;
-	u16              m_sprite_base;
+	u16              m_sprite_attribute_base;
 	u16              m_sprite_pattern_line[8];
 	int              m_sprite_tile_selected[8];
 	int              m_sprite_x[8];
@@ -219,9 +223,11 @@ protected:
 
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	virtual u16 name_table_row_mode4(int row) override;
-	virtual u16 sprite_attributes_addr_mode4(u16 base) override;
-	virtual u8 sprite_tile_mask_mode4(u8 tile_number) override;
+	virtual u16 name_row_mode4(u16 row) override;
+	virtual u16 tile1_select_mode4(u16 tile_number) override;
+	virtual u16 tile2_select_mode4(u16 tile_number) override;
+	virtual u8 sprite_attribute_extra_offset_mode4(u8 offset) override;
+	virtual u8 sprite_tile_select_mode4(u8 tile_number) override;
 	virtual void select_extended_res_mode4(bool M1, bool M2, bool M3) override;
 
 private:

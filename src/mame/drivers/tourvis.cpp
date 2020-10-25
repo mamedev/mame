@@ -204,10 +204,10 @@ public:
 	void tourvision(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(tourvision_8085_d000_w);
-	DECLARE_WRITE8_MEMBER(tourvision_i8155_a_w);
-	DECLARE_WRITE8_MEMBER(tourvision_i8155_b_w);
-	DECLARE_WRITE8_MEMBER(tourvision_i8155_c_w);
+	void tourvision_8085_d000_w(uint8_t data);
+	void tourvision_i8155_a_w(uint8_t data);
+	void tourvision_i8155_b_w(uint8_t data);
+	void tourvision_i8155_c_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(tourvision_timer_out);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
@@ -349,7 +349,7 @@ void tourvision_state::pce_io(address_map &map)
 	map(0x00, 0x03).rw("huc6270", FUNC(huc6270_device::read), FUNC(huc6270_device::write));
 }
 
-WRITE8_MEMBER(tourvision_state::tourvision_8085_d000_w)
+void tourvision_state::tourvision_8085_d000_w(uint8_t data)
 {
 	//logerror( "D000 (8085) write %02x\n", data );
 }
@@ -368,18 +368,18 @@ void tourvision_state::tourvision_8085_map(address_map &map)
 	map(0xf000, 0xf000).nopr(); // protection or internal counter ? there is sometimes some data in BIOS0 which is replaced by 0xff in BIOS1
 }
 
-WRITE8_MEMBER(tourvision_state::tourvision_i8155_a_w)
+void tourvision_state::tourvision_i8155_a_w(uint8_t data)
 {
 	//logerror("i8155 Port A: %02X\n", data);
 }
 
-WRITE8_MEMBER(tourvision_state::tourvision_i8155_b_w)
+void tourvision_state::tourvision_i8155_b_w(uint8_t data)
 {
 	// Selects game slot in bits 0 - 1
 	//logerror("i8155 Port B: %02X\n", data);
 }
 
-WRITE8_MEMBER(tourvision_state::tourvision_i8155_c_w)
+void tourvision_state::tourvision_i8155_c_w(uint8_t data)
 {
 	//logerror("i8155 Port C: %02X\n", data);
 }
@@ -445,27 +445,29 @@ void tourvision_state::tourvision(machine_config &config)
 	ROMX_LOAD( "v4-60.ic29", 0x0000, 0x8000, CRC(1fd27e22) SHA1(b103d365eac3fa447c2e9addddf6974b4403ed41), ROM_BIOS(0) ) \
 	ROM_SYSTEM_BIOS( 1, "55", "V4-55" ) \
 	ROMX_LOAD( "v4-55.ic29", 0x0000, 0x8000, CRC(87cf66c1) SHA1(d6b42137be7a07a0e299c2d922328a6a9a2b7b8f), ROM_BIOS(1) ) \
-	ROM_SYSTEM_BIOS( 2, "53", "V4-53" ) \
-	ROMX_LOAD( "v4-53.ic29", 0x0000, 0x8000, CRC(bccb53c9) SHA1(a27113d70cf348c7eafa39fc7a76f55f63723ad7), ROM_BIOS(2) ) \
-	ROM_SYSTEM_BIOS( 3, "52", "V4-52" ) \
-	ROMX_LOAD( "v4-52.ic29", 0x0000, 0x8000, CRC(ffd7b0fe) SHA1(d1804865c91e925a01b05cf441e8458a3db23f50), ROM_BIOS(3) ) \
-	ROM_SYSTEM_BIOS( 4, "51", "V4-51" ) \
-	ROMX_LOAD( "v4-51.ic29", 0x0000, 0x8000, CRC(2de0b946) SHA1(c13051453aff3a2329f18ebade75c69aa3b1c28d), ROM_BIOS(4) ) \
-	ROM_SYSTEM_BIOS( 5, "43", "V4-43" ) \
-	ROMX_LOAD( "v4-43.ic29", 0x0000, 0x8000, CRC(88da23f3) SHA1(9d24faa116129783e55c7f79a4a08902a236d5a6), ROM_BIOS(5) ) \
-	ROM_SYSTEM_BIOS( 6, "42", "V4-42" ) \
-	ROMX_LOAD( "v4-42.ic29", 0x0000, 0x8000, CRC(0372606d) SHA1(8c6a63865b0b4951ea032725cf022d353115b93b), ROM_BIOS(6) ) \
-	ROM_SYSTEM_BIOS( 7, "40", "V4-40" ) \
-	ROMX_LOAD( "v4-40.ic29", 0x0000, 0x8000, CRC(ba6290cc) SHA1(92b0e9f55791e892ec209de4fadd80faef370622), ROM_BIOS(7) ) \
-	ROM_SYSTEM_BIOS( 8, "20", "VT-20" ) \
-	ROMX_LOAD( "vt_2.0.bin", 0x0000, 0x8000, CRC(36012f88) SHA1(5bd42fb51aa48ff65e704ea06a9181bb87ed2137), ROM_BIOS(8) ) \
-	ROM_SYSTEM_BIOS( 9, "11", "VT-11" ) \
-	ROMX_LOAD( "vt_1.1.bin", 0x0000, 0x8000, CRC(27abbc36) SHA1(881ea7802b9e241473bc8ced0472e0f1851c9886), ROM_BIOS(9) )
+	ROM_SYSTEM_BIOS( 2, "54", "V4-54" ) \
+	ROMX_LOAD( "v4-54.ic29", 0x0000, 0x8000, CRC(125e7a6e) SHA1(6f03c49acaad4feb9c2187f84fc1cb5451d0eb2b), ROM_BIOS(2) ) \
+	ROM_SYSTEM_BIOS( 3, "53", "V4-53" ) \
+	ROMX_LOAD( "v4-53.ic29", 0x0000, 0x8000, CRC(bccb53c9) SHA1(a27113d70cf348c7eafa39fc7a76f55f63723ad7), ROM_BIOS(3) ) \
+	ROM_SYSTEM_BIOS( 4, "52", "V4-52" ) \
+	ROMX_LOAD( "v4-52.ic29", 0x0000, 0x8000, CRC(ffd7b0fe) SHA1(d1804865c91e925a01b05cf441e8458a3db23f50), ROM_BIOS(4) ) \
+	ROM_SYSTEM_BIOS( 5, "51", "V4-51" ) \
+	ROMX_LOAD( "v4-51.ic29", 0x0000, 0x8000, CRC(2de0b946) SHA1(c13051453aff3a2329f18ebade75c69aa3b1c28d), ROM_BIOS(5) ) \
+	ROM_SYSTEM_BIOS( 6, "43", "V4-43" ) \
+	ROMX_LOAD( "v4-43.ic29", 0x0000, 0x8000, CRC(88da23f3) SHA1(9d24faa116129783e55c7f79a4a08902a236d5a6), ROM_BIOS(6) ) \
+	ROM_SYSTEM_BIOS( 7, "42", "V4-42" ) \
+	ROMX_LOAD( "v4-42.ic29", 0x0000, 0x8000, CRC(0372606d) SHA1(8c6a63865b0b4951ea032725cf022d353115b93b), ROM_BIOS(7) ) \
+	ROM_SYSTEM_BIOS( 8, "40", "V4-40" ) \
+	ROMX_LOAD( "v4-40.ic29", 0x0000, 0x8000, CRC(ba6290cc) SHA1(92b0e9f55791e892ec209de4fadd80faef370622), ROM_BIOS(8) ) \
+	ROM_SYSTEM_BIOS( 9, "20", "VT-20" ) \
+	ROMX_LOAD( "vt_2.0.bin", 0x0000, 0x8000, CRC(36012f88) SHA1(5bd42fb51aa48ff65e704ea06a9181bb87ed2137), ROM_BIOS(9) ) \
+	ROM_SYSTEM_BIOS(10, "11", "VT-11" ) \
+	ROMX_LOAD( "vt_1.1.bin", 0x0000, 0x8000, CRC(27abbc36) SHA1(881ea7802b9e241473bc8ced0472e0f1851c9886), ROM_BIOS(10) )
 
 ROM_START(tourvis)
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 )
 
-	TOURVISION_BIOS /* BIOS rom type is 27C256 */
+	TOURVISION_BIOS // BIOS rom type is 27C256
 ROM_END
 
 GAME( 19??, tourvis, 0, tourvision, tourvision, tourvision_state, init_pce_common, ROT0, "bootleg (Tourvision)", "Tourvision PCE bootleg", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING )

@@ -60,12 +60,12 @@ public:
 	DECLARE_READ_LINE_MEMBER(hopper_sensors_r);
 
 private:
-	DECLARE_READ8_MEMBER(coin_counter_r);
-	DECLARE_WRITE8_MEMBER(coin_counter_w);
-	DECLARE_WRITE8_MEMBER(hopper_w);
-	DECLARE_WRITE8_MEMBER(lamps1_w);
-	DECLARE_WRITE8_MEMBER(lamps2_w);
-	DECLARE_WRITE8_MEMBER(coinlockout_w);
+	uint8_t coin_counter_r();
+	void coin_counter_w(uint8_t data);
+	void hopper_w(uint8_t data);
+	void lamps1_w(uint8_t data);
+	void lamps2_w(uint8_t data);
+	void coinlockout_w(uint8_t data);
 
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -90,34 +90,34 @@ private:
 };
 
 
-READ8_MEMBER(segajw_state::coin_counter_r)
+uint8_t segajw_state::coin_counter_r()
 {
 	return m_coin_counter ^ 0xff;
 }
 
-WRITE8_MEMBER(segajw_state::coin_counter_w)
+void segajw_state::coin_counter_w(uint8_t data)
 {
 	m_coin_counter = data;
 }
 
-WRITE8_MEMBER(segajw_state::hopper_w)
+void segajw_state::hopper_w(uint8_t data)
 {
 	m_hopper_start_cycles = data & 0x02 ? 0 : m_maincpu->total_cycles();
 }
 
-WRITE8_MEMBER(segajw_state::lamps1_w)
+void segajw_state::lamps1_w(uint8_t data)
 {
 	for (int i = 0; i < 8; i++)
 		m_lamps[i] = BIT(data, i);
 }
 
-WRITE8_MEMBER(segajw_state::lamps2_w)
+void segajw_state::lamps2_w(uint8_t data)
 {
 	for (int i = 0; i < 8; i++)
 		m_lamps[8 + i] = BIT(data, i);
 }
 
-WRITE8_MEMBER(segajw_state::coinlockout_w)
+void segajw_state::coinlockout_w(uint8_t data)
 {
 	machine().bookkeeping().coin_lockout_w(0, data & 1);
 

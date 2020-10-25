@@ -26,10 +26,10 @@
 //**************************************************************************
 
 // pool allocation helpers
-#define pool_alloc(_pool, _type)                    (_pool).add_object(global_alloc(_type))
-#define pool_alloc_clear(_pool, _type)              (_pool).add_object(global_alloc_clear _type)
-#define pool_alloc_array(_pool, _type, _num)        (_pool).add_array(global_alloc_array(_type,_num), (_num))
-#define pool_alloc_array_clear(_pool, _type, _num)  (_pool).add_array(global_alloc_array_clear<_type>(_num), (_num))
+#define pool_alloc(_pool, _type)                    (_pool).add_object(new _type)
+#define pool_alloc_clear(_pool, _type)              (_pool).add_object(make_unique_clear _type .release())
+#define pool_alloc_array(_pool, _type, _num)        (_pool).add_array(new _type [_num], (_num))
+#define pool_alloc_array_clear(_pool, _type, _num)  (_pool).add_array(make_unique_clear<_type []>(_num).release(), (_num))
 #define pool_free(_pool, v)                         (_pool).remove(v)
 
 

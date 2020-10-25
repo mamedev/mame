@@ -31,6 +31,7 @@
 
 #include "cpu/z80/z80.h"
 #include "sound/okiadpcm.h"
+#include "dirom.h"
 
 class seibu_sound_common {
 public:
@@ -110,7 +111,7 @@ DECLARE_DEVICE_TYPE(SEIBU_SOUND, seibu_sound_device)
 
 // SEI80BU (Z80 program decryption)
 
-class sei80bu_device : public device_t, public device_rom_interface
+class sei80bu_device : public device_t, public device_rom_interface<16>
 {
 public:
 	sei80bu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -144,7 +145,7 @@ protected:
 	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 	// internal state

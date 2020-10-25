@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="ibm5150_hdd" description="IBM PC hard disk images">
+
+	<software name="xenix86">
+		<description>SCO XENIX System V release 2.1.3 for i8086</description>
+		<year>1986</year>
+		<publisher>SCO</publisher>
+		<part name="hdd" interface="st_hdd">
+			<diskarea name="harddriv">
+				<disk name="xenix86" sha1="74fb14bebea3cde0e86dd93557e2242608aa6f97" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

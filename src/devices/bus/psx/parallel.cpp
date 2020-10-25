@@ -74,10 +74,10 @@ void psx_parallel_slot_device::device_start()
 //  exp_r
 //-------------------------------------------------
 
-READ16_MEMBER(psx_parallel_slot_device::exp_r)
+uint16_t psx_parallel_slot_device::exp_r(offs_t offset)
 {
 	if (m_card)
-		return m_card->exp_r(space, offset);
+		return m_card->exp_r(offset);
 	else
 		return 0xff;
 }
@@ -86,10 +86,10 @@ READ16_MEMBER(psx_parallel_slot_device::exp_r)
 //  exp_w
 //-------------------------------------------------
 
-WRITE16_MEMBER(psx_parallel_slot_device::exp_w)
+void psx_parallel_slot_device::exp_w(offs_t offset, uint16_t data)
 {
 	if (m_card)
-		m_card->exp_w(space, offset, data);
+		m_card->exp_w(offset, data);
 }
 
 //-------------------------------------------------

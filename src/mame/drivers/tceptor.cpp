@@ -18,7 +18,6 @@
 #include "machine/nvram.h"
 #include "sound/dac.h"
 #include "sound/ym2151.h"
-#include "sound/volt_reg.h"
 #include "rendlay.h"
 #include "speaker.h"
 
@@ -27,12 +26,12 @@
 
 /*******************************************************************/
 
-READ8_MEMBER(tceptor_state::m68k_shared_r)
+uint8_t tceptor_state::m68k_shared_r(offs_t offset)
 {
 	return m_m68k_shared_ram[offset];
 }
 
-WRITE8_MEMBER(tceptor_state::m68k_shared_w)
+void tceptor_state::m68k_shared_w(offs_t offset, uint8_t data)
 {
 	m_m68k_shared_ram[offset] = data;
 }
@@ -40,29 +39,29 @@ WRITE8_MEMBER(tceptor_state::m68k_shared_w)
 
 /*******************************************************************/
 
-WRITE8_MEMBER(tceptor_state::m6809_irq_enable_w)
+void tceptor_state::m6809_irq_enable_w(uint8_t data)
 {
 	m_m6809_irq_enable = 1;
 }
 
-WRITE8_MEMBER(tceptor_state::m6809_irq_disable_w)
+void tceptor_state::m6809_irq_disable_w(uint8_t data)
 {
 	m_m6809_irq_enable = 0;
 }
 
 
-WRITE16_MEMBER(tceptor_state::m68k_irq_enable_w)
+void tceptor_state::m68k_irq_enable_w(uint16_t data)
 {
 	m_m68k_irq_enable = data;
 }
 
 
-WRITE8_MEMBER(tceptor_state::mcu_irq_enable_w)
+void tceptor_state::mcu_irq_enable_w(uint8_t data)
 {
 	m_mcu_irq_enable = 1;
 }
 
-WRITE8_MEMBER(tceptor_state::mcu_irq_disable_w)
+void tceptor_state::mcu_irq_disable_w(uint8_t data)
 {
 	m_mcu_irq_enable = 0;
 }
@@ -101,22 +100,22 @@ uint8_t tceptor_state::fix_input1(uint8_t in1, uint8_t in2)
 	return r;
 }
 
-READ8_MEMBER(tceptor_state::dsw0_r)
+uint8_t tceptor_state::dsw0_r()
 {
 	return fix_input0(ioport("DSW1")->read(), ioport("DSW2")->read());
 }
 
-READ8_MEMBER(tceptor_state::dsw1_r)
+uint8_t tceptor_state::dsw1_r()
 {
 	return fix_input1(ioport("DSW1")->read(), ioport("DSW2")->read());
 }
 
-READ8_MEMBER(tceptor_state::input0_r)
+uint8_t tceptor_state::input0_r()
 {
 	return fix_input0(ioport("BUTTONS")->read(), ioport("SERVICE")->read());
 }
 
-READ8_MEMBER(tceptor_state::input1_r)
+uint8_t tceptor_state::input1_r()
 {
 	return fix_input1(ioport("BUTTONS")->read(), ioport("SERVICE")->read());
 }
@@ -372,10 +371,6 @@ void tceptor_state::tceptor(machine_config &config)
 	dac_8bit_r2r_device &dac(DAC_8BIT_R2R(config, "dac", 0)); // unknown DAC
 	dac.add_route(ALL_OUTPUTS, "lspeaker", 0.4);
 	dac.add_route(ALL_OUTPUTS, "rspeaker", 0.4);
-
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 

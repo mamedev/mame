@@ -163,29 +163,29 @@ private:
 	virtual void machine_reset() override;
 	void psattack_mem(address_map &map);
 
-	DECLARE_READ16_MEMBER(cfcard_data_r);
-	DECLARE_READ8_MEMBER(cfcard_regs_r);
-	DECLARE_WRITE8_MEMBER(cfcard_regs_w);
-	DECLARE_WRITE32_MEMBER(output_w);
+	uint16_t cfcard_data_r();
+	uint8_t cfcard_regs_r(offs_t offset);
+	void cfcard_regs_w(offs_t offset, uint8_t data);
+	void output_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 };
 
 // TODO: wrong, likely PIC protected too
-READ8_MEMBER( psattack_state::cfcard_regs_r )
+uint8_t psattack_state::cfcard_regs_r(offs_t offset)
 {
-	return m_ata->read_cs0(offset & 7, 0x000000ff);
+	return m_ata->cs0_r(offset & 7, 0x000000ff);
 }
 
-WRITE8_MEMBER( psattack_state::cfcard_regs_w )
+void psattack_state::cfcard_regs_w(offs_t offset, uint8_t data)
 {
-	m_ata->write_cs0(offset & 7, 0x000000ff);
+	m_ata->cs0_w(offset & 7, 0x000000ff);
 }
 
-READ16_MEMBER( psattack_state::cfcard_data_r )
+uint16_t psattack_state::cfcard_data_r()
 {
-	return m_ata->read_cs0(0, 0x0000ffff);
+	return m_ata->cs0_r(0, 0x0000ffff);
 }
 
-WRITE32_MEMBER( psattack_state::output_w )
+void psattack_state::output_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// suppress logging for now
 	if (data)

@@ -243,12 +243,12 @@ void smsbootleg_state::sms_supergame_map(address_map &map)
 //  map(0xfffc, 0xffff).rw(FUNC(smsbootleg_state::sms_mapper_r), FUNC(smsbootleg_state::sms_mapper_w));       /* Bankswitch control */
 }
 
-WRITE8_MEMBER(smsbootleg_state::port08_w)
+void smsbootleg_state::port08_w(uint8_t data)
 {
 //  logerror("port08_w %02x\n", data);
 }
 
-WRITE8_MEMBER(smsbootleg_state::port18_w)
+void smsbootleg_state::port18_w(uint8_t data)
 {
 	logerror("port18_w %02x\n", data);
 }

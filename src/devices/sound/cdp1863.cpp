@@ -64,7 +64,7 @@ cdp1863_device::cdp1863_device(const machine_config &mconfig, const char *tag, d
 void cdp1863_device::device_start()
 {
 	// create sound stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
+	m_stream = stream_alloc(0, 1, SAMPLE_RATE_OUTPUT_ADAPTIVE);
 
 	// register for state saving
 	save_item(NAME(m_clock1));
@@ -81,20 +81,15 @@ void cdp1863_device::device_start()
 //  our sound stream
 //-------------------------------------------------
 
-void cdp1863_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void cdp1863_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	// reset the output stream
-	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
-
-	int16_t signal = m_signal;
-	stream_sample_t *buffer = outputs[0];
-
-	memset( buffer, 0, samples * sizeof(*buffer) );
+	stream_buffer::sample_t signal = m_signal;
+	auto &buffer = outputs[0];
 
 	if (m_oe)
 	{
 		double frequency;
-		int rate = machine().sample_rate() / 2;
+		int rate = buffer.sample_rate() / 2;
 
 		// get progress through wave
 		int incr = m_incr;
@@ -112,16 +107,16 @@ void cdp1863_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 		if (signal < 0)
 		{
-			signal = -0x7fff;
+			signal = -1.0;
 		}
 		else
 		{
-			signal = 0x7fff;
+			signal = 1.0;
 		}
 
-		while( samples-- > 0 )
+		for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
 		{
-			*buffer++ = signal;
+			buffer.put(sampindex, signal);
 			incr -= frequency;
 			while( incr < 0 )
 			{
@@ -134,6 +129,8 @@ void cdp1863_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		m_incr = incr;
 		m_signal = signal;
 	}
+	else
+		buffer.fill(0);
 }
 
 

@@ -109,23 +109,23 @@ license:CC0
 		<screen index="0">
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
-		<bezel name="lamp0" element="CARD1">
+		<element name="lamp0" ref="CARD1">
 			<bounds x="0.0" y="3.15" width="0.40" height="0.24" />
-		</bezel>
-		<bezel name="lamp1" element="CARD2">
+		</element>
+		<element name="lamp1" ref="CARD2">
 			<bounds x="0.5" y="3.15" width="0.40" height="0.24" />
-		</bezel>
-		<bezel name="lamp2" element="CARD3">
+		</element>
+		<element name="lamp2" ref="CARD3">
 			<bounds x="1.0" y="3.15" width="0.40" height="0.24" />
-		</bezel>
-		<bezel name="lamp3" element="CARD4">
+		</element>
+		<element name="lamp3" ref="CARD4">
 			<bounds x="1.5" y="3.15" width="0.40" height="0.24" />
-		</bezel>
-		<bezel name="lamp4" element="CARD5">
+		</element>
+		<element name="lamp4" ref="CARD5">
 			<bounds x="2.0" y="3.15" width="0.40" height="0.24" />
-		</bezel>
-		<bezel name="lamp5" element="START">
+		</element>
+		<element name="lamp5" ref="START">
 			<bounds x="2.5" y="3.15" width="0.40" height="0.24" />
-		</bezel>
+		</element>
 	</view>
 </mamelayout>

@@ -4,9 +4,9 @@
 license:CC0
 -->
 
-<softwarelist name="fidel_scc" description="Fidelity SCC Modules">
+<!-- optional bookrom for: Sensory Chess Challenger: 9, 12, A/S, ... -->
 
-<!-- Sensory Chess Challenger: 9, 12, A/S, .. -->
+<softwarelist name="fidel_scc" description="Fidelity SCC Modules">
 
 	<software name="cb9">
 		<description>Challenger Book Openings 1</description>

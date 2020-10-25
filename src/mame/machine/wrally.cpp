@@ -26,19 +26,19 @@ void wrally_state::machine_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(wrally_state::shareram_w)
+void wrally_state::shareram_w(offs_t offset, uint8_t data)
 {
 	// why isn't there address map functionality for this?
 	reinterpret_cast<u8 *>(m_shareram.target())[BYTE_XOR_BE(offset)] = data;
 }
 
-READ8_MEMBER(wrally_state::shareram_r)
+uint8_t wrally_state::shareram_r(offs_t offset)
 {
 	// why isn't there address map functionality for this?
 	return reinterpret_cast<u8 const *>(m_shareram.target())[BYTE_XOR_BE(offset)];
 }
 
-WRITE16_MEMBER(wrally_state::vram_w)
+void wrally_state::vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = gaelco_decrypt(space, offset, data, 0x1f, 0x522a);
 	COMBINE_DATA(&m_videoram[offset]);
@@ -51,7 +51,7 @@ WRITE_LINE_MEMBER(wrally_state::flipscreen_w)
 	flip_screen_set(state);
 }
 
-WRITE8_MEMBER(wrally_state::okim6295_bankswitch_w)
+void wrally_state::okim6295_bankswitch_w(uint8_t data)
 {
 	m_okibank->set_entry(data & 0x0f);
 }

@@ -30,7 +30,7 @@ bool dsp16_device_base::frontend::describe(opcode_desc &desc, opcode_desc const 
 	desc.length = 1U;
 	desc.cycles = 1U;
 
-	u16 const op(m_host.m_pcache->read_word(desc.physpc));
+	u16 const op(m_host.m_pcache.read_word(desc.physpc));
 	switch (op >> 11)
 	{
 	case 0x00: // goto JA
@@ -219,9 +219,9 @@ bool dsp16_device_base::frontend::describe(opcode_desc &desc, opcode_desc const 
     program fetch helpers
 ***********************************************************************/
 
-u16 dsp16_device_base::frontend::read_op(opcode_desc const &desc, u16 offset) const
+u16 dsp16_device_base::frontend::read_op(opcode_desc const &desc, u16 offset)
 {
-	return m_host.m_pcache->read_word((desc.physpc & XAAU_I_EXT) | ((desc.physpc + offset) & XAAU_I_MASK));
+	return m_host.m_pcache.read_word((desc.physpc & XAAU_I_EXT) | ((desc.physpc + offset) & XAAU_I_MASK));
 }
 
 /***********************************************************************

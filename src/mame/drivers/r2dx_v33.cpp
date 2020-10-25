@@ -358,7 +358,7 @@ void r2dx_v33_state::tilemapdma_w(address_space &space, u16 data)
 	{
 		u16 tileval = space.read_word(src);
 		src += 2;
-		m_videoram_private_w(space, i, tileval, 0xffff);
+		m_videoram_private_w(i, tileval);
 	}
 }
 

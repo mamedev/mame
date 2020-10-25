@@ -72,16 +72,16 @@ private:
 
 u32 ultrsprt_state::screen_update_ultrsprt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	u8 *vram = m_vram.get() + (m_cpu_vram_page ^ 1) * VRAM_PAGE_BYTES;
+	u8 const *const vram = m_vram.get() + (m_cpu_vram_page ^ 1) * VRAM_PAGE_BYTES;
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
 		int fb_index = y * 1024;
-		u16 *dest = &bitmap.pix16(y, cliprect.min_x);
+		u16 *dest = &bitmap.pix(y, cliprect.min_x);
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; ++x)
 		{
-			u8 p1 = vram[BYTE4_XOR_BE(fb_index + x + 512)];
+			u8 const p1 = vram[BYTE4_XOR_BE(fb_index + x + 512)];
 
 			if (p1 == 0)
 				*dest++ = vram[BYTE4_XOR_BE(fb_index + x)];

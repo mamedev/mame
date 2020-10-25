@@ -67,10 +67,10 @@ public:
 private:
 	virtual void driver_start() override;
 
-	DECLARE_WRITE8_MEMBER(ram0_out) { m_ram0_output = data; }
-	DECLARE_WRITE8_MEMBER(rom0_out) { m_rom0_output = data; }
-	DECLARE_WRITE8_MEMBER(rom1_out) { m_rom1_output = data; }
-	DECLARE_READ8_MEMBER(rom2_in);
+	void ram0_out(u8 data) { m_ram0_output = data; }
+	void rom0_out(u8 data) { m_rom0_output = data; }
+	void rom1_out(u8 data) { m_rom1_output = data; }
+	u8 rom2_in();
 
 	DECLARE_WRITE_LINE_MEMBER(cm_ram1_w);
 	DECLARE_WRITE_LINE_MEMBER(cm_ram2_w);
@@ -280,7 +280,7 @@ static INPUT_PORTS_START( flicker )
 INPUT_PORTS_END
 
 
-READ8_MEMBER(flicker_state::rom2_in)
+u8 flicker_state::rom2_in()
 {
 	return (m_switch.size() > m_mux_col) ? m_switch[m_mux_col]->read() : 0;
 }
@@ -288,7 +288,7 @@ READ8_MEMBER(flicker_state::rom2_in)
 
 WRITE_LINE_MEMBER(flicker_state::cm_ram1_w)
 {
-	static constexpr uint8_t led_digits[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0, 0, 0, 0, 0, 0 };
+	static constexpr u8 led_digits[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0, 0, 0, 0, 0, 0 };
 	static constexpr char const *const lamp_matrix[][4] = {
 			{ nullptr,                "lamp_credit_lamp",  "lamp_flippers",    "lamp_special"            },
 			{ "lamp_a_lamp",          "lamp_b_lamp",       "lamp_c_lamp",      "lamp_d_lamp"             },

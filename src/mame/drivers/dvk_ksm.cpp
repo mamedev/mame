@@ -123,8 +123,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(write_brgb);
 	DECLARE_WRITE_LINE_MEMBER(write_brgc);
 
-	DECLARE_WRITE8_MEMBER(ksm_ppi_porta_w);
-	DECLARE_WRITE8_MEMBER(ksm_ppi_portc_w);
+	void ksm_ppi_porta_w(uint8_t data);
+	void ksm_ppi_portc_w(uint8_t data);
 
 	void ksm_io(address_map &map);
 	void ksm_mem(address_map &map);
@@ -247,13 +247,13 @@ void ksm_state::video_start()
 	m_brg = timer_alloc(TIMER_ID_BRG);
 }
 
-WRITE8_MEMBER(ksm_state::ksm_ppi_porta_w)
+void ksm_state::ksm_ppi_porta_w(uint8_t data)
 {
 	LOG("PPI port A line %d\n", data);
 	m_video.line = data;
 }
 
-WRITE8_MEMBER(ksm_state::ksm_ppi_portc_w)
+void ksm_state::ksm_ppi_portc_w(uint8_t data)
 {
 	brgc = (data >> 5) & 3;
 
@@ -365,7 +365,6 @@ uint32_t ksm_state::draw_scanline(uint16_t *p, uint16_t offset, uint8_t scanline
 TIMER_DEVICE_CALLBACK_MEMBER(ksm_state::scanline_callback)
 {
 	uint16_t y = m_screen->vpos();
-	uint16_t offset;
 
 	LOGDBG("scanline_cb addr %02x frame %d x %.4d y %.3d row %.2d\n",
 		m_video.line, (int)m_screen->frame_number(), m_screen->hpos(), y, y%11);
@@ -374,6 +373,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ksm_state::scanline_callback)
 	y -= KSM_VERT_START;
 	if (y >= KSM_DISP_VERT) return;
 
+	uint16_t offset;
 	if (y < KSM_STATUSLINE_TOTAL)
 	{
 		offset = KSM_STATUSLINE_VRAM - 0xC000;
@@ -383,7 +383,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ksm_state::scanline_callback)
 		offset = 0x2000 + 0x30 + (((m_video.line + y / 11 - 1) % 48) << 7);
 	}
 
-	draw_scanline(&m_tmpbmp.pix16(y), offset, y % 11);
+	draw_scanline(&m_tmpbmp.pix(y), offset, y % 11);
 }
 
 uint32_t ksm_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

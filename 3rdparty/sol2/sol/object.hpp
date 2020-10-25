@@ -43,7 +43,7 @@ namespace sol {
 
 	template <typename T, typename R = reference, bool should_pop = !std::is_base_of<stack_reference, R>::value, typename... Args>
 	R make_reference(lua_State* L, Args&&... args) {
-		int backpedal = stack::push<T>(L, std::forward<Args>(args)...);
+		int backpedal = stack::push_specific<T>(L, std::forward<Args>(args)...);
 		R r = stack::get<R>(L, -backpedal);
 		if (should_pop) {
 			lua_pop(L, backpedal);
@@ -99,7 +99,7 @@ namespace sol {
 		basic_object(lua_State* L, int index = -1) noexcept : base_t(L, index) {}
 		basic_object(lua_State* L, ref_index index) noexcept : base_t(L, index) {}
 		template <typename T, typename... Args>
-		basic_object(lua_State* L, in_place_type_t<T>, Args&&... args) noexcept : basic_object(std::integral_constant<bool, !std::is_base_of<stack_reference, base_t>::value>(), L, -stack::push<T>(L, std::forward<Args>(args)...)) {}
+		basic_object(lua_State* L, in_place_type_t<T>, Args&&... args) noexcept : basic_object(std::integral_constant<bool, !std::is_base_of<stack_reference, base_t>::value>(), L, -stack::push_specific<T>(L, std::forward<Args>(args)...)) {}
 		template <typename T, typename... Args>
 		basic_object(lua_State* L, in_place_t, T&& arg, Args&&... args) noexcept : basic_object(L, in_place<T>, std::forward<T>(arg), std::forward<Args>(args)...) {}
 		basic_object& operator=(const basic_object&) = default;

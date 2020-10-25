@@ -55,11 +55,11 @@ private:
 	int m_old_back;
 	int m_old_fore;
 
-	DECLARE_WRITE16_MEMBER(background_w);
-	DECLARE_WRITE16_MEMBER(foreground_w);
-	DECLARE_WRITE16_MEMBER(text_w);
-	DECLARE_WRITE16_MEMBER(gfxbank_w);
-	DECLARE_WRITE16_MEMBER(control_w);
+	void background_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void foreground_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void text_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void gfxbank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);

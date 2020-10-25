@@ -59,14 +59,14 @@ void atarig42_state::machine_start()
  *
  *************************************/
 
-WRITE8_MEMBER(atarig42_state::a2d_select_w)
+void atarig42_state::a2d_select_w(offs_t offset, uint8_t data)
 {
 	if (m_adc.found())
 		m_adc->address_offset_start_w(offset, 0);
 }
 
 
-READ8_MEMBER(atarig42_state::a2d_data_r)
+uint8_t atarig42_state::a2d_data_r(offs_t offset)
 {
 	if (!m_adc.found())
 		return 0xff;
@@ -78,7 +78,7 @@ READ8_MEMBER(atarig42_state::a2d_data_r)
 }
 
 
-WRITE16_MEMBER(atarig42_state::io_latch_w)
+void atarig42_state::io_latch_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* upper byte */
 	if (ACCESSING_BITS_8_15)
@@ -105,7 +105,7 @@ WRITE16_MEMBER(atarig42_state::io_latch_w)
 }
 
 
-WRITE16_MEMBER(atarig42_state::mo_command_w)
+void atarig42_state::mo_command_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_mo_command);
 	m_rle->command_write((data == 0) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
@@ -231,7 +231,7 @@ void atarig42_0x200_state::roadriot_sloop_tweak(int offset)
 }
 
 
-READ16_MEMBER(atarig42_0x200_state::roadriot_sloop_data_r)
+uint16_t atarig42_0x200_state::roadriot_sloop_data_r(offs_t offset)
 {
 	roadriot_sloop_tweak(offset);
 	if (offset < 0x78000/2)
@@ -241,7 +241,7 @@ READ16_MEMBER(atarig42_0x200_state::roadriot_sloop_data_r)
 }
 
 
-WRITE16_MEMBER(atarig42_0x200_state::roadriot_sloop_data_w)
+void atarig42_0x200_state::roadriot_sloop_data_w(offs_t offset, uint16_t data)
 {
 	roadriot_sloop_tweak(offset);
 }
@@ -288,7 +288,7 @@ void atarig42_0x400_state::guardians_sloop_tweak(int offset)
 }
 
 
-READ16_MEMBER(atarig42_0x400_state::guardians_sloop_data_r)
+uint16_t atarig42_0x400_state::guardians_sloop_data_r(offs_t offset)
 {
 	guardians_sloop_tweak(offset);
 	if (offset < 0x78000/2)
@@ -298,7 +298,7 @@ READ16_MEMBER(atarig42_0x400_state::guardians_sloop_data_r)
 }
 
 
-WRITE16_MEMBER(atarig42_0x400_state::guardians_sloop_data_w)
+void atarig42_0x400_state::guardians_sloop_data_w(offs_t offset, uint16_t data)
 {
 	guardians_sloop_tweak(offset);
 }
@@ -825,7 +825,7 @@ void atarig42_0x200_state::init_roadriot()
 	m_playfield_base = 0x400;
 
 	address_space &main = m_maincpu->space(AS_PROGRAM);
-	main.install_readwrite_handler(0x000000, 0x07ffff, read16_delegate(*this, FUNC(atarig42_0x200_state::roadriot_sloop_data_r)), write16_delegate(*this, FUNC(atarig42_0x200_state::roadriot_sloop_data_w)));
+	main.install_readwrite_handler(0x000000, 0x07ffff, read16sm_delegate(*this, FUNC(atarig42_0x200_state::roadriot_sloop_data_r)), write16sm_delegate(*this, FUNC(atarig42_0x200_state::roadriot_sloop_data_w)));
 	m_sloop_base = (uint16_t *)memregion("maincpu")->base();
 
 	/*
@@ -860,7 +860,7 @@ void atarig42_0x400_state::init_guardian()
 	*(uint16_t *)&memregion("maincpu")->base()[0x80000] = 0x4E75;
 
 	address_space &main = m_maincpu->space(AS_PROGRAM);
-	main.install_readwrite_handler(0x000000, 0x07ffff, read16_delegate(*this, FUNC(atarig42_0x400_state::guardians_sloop_data_r)), write16_delegate(*this, FUNC(atarig42_0x400_state::guardians_sloop_data_w)));
+	main.install_readwrite_handler(0x000000, 0x07ffff, read16sm_delegate(*this, FUNC(atarig42_0x400_state::guardians_sloop_data_r)), write16sm_delegate(*this, FUNC(atarig42_0x400_state::guardians_sloop_data_w)));
 	m_sloop_base = (uint16_t *)memregion("maincpu")->base();
 
 	/*

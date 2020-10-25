@@ -28,10 +28,10 @@ public:
 	void mrjong(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(io_0x03_r);
-	DECLARE_WRITE8_MEMBER(mrjong_videoram_w);
-	DECLARE_WRITE8_MEMBER(mrjong_colorram_w);
-	DECLARE_WRITE8_MEMBER(mrjong_flipscreen_w);
+	uint8_t io_0x03_r();
+	void mrjong_videoram_w(offs_t offset, uint8_t data);
+	void mrjong_colorram_w(offs_t offset, uint8_t data);
+	void mrjong_flipscreen_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
 	void mrjong_palette(palette_device &palette) const;

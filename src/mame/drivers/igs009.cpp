@@ -49,12 +49,8 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
-		, m_bg_scroll(*this, "bg_scroll")
-		, m_reel1_ram(*this, "reel1_ram")
-		, m_reel2_ram(*this, "reel2_ram")
-		, m_reel3_ram(*this, "reel3_ram")
-		, m_reel4_ram(*this, "reel4_ram")
-		, m_bg_scroll2(*this, "bg_scroll2")
+		, m_bg_scroll(*this, "bg_scroll.%u", 0U)
+		, m_reel_ram(*this, "reel_ram.%u", 0U)
 		, m_fg_tile_ram(*this, "fg_tile_ram")
 		, m_fg_color_ram(*this, "fg_color_ram")
 		, m_leds(*this, "led%u", 0U)
@@ -68,31 +64,27 @@ public:
 
 	DECLARE_READ_LINE_MEMBER(hopper_r);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
-	DECLARE_WRITE8_MEMBER(reel1_ram_w);
-	DECLARE_WRITE8_MEMBER(reel2_ram_w);
-	DECLARE_WRITE8_MEMBER(reel3_ram_w);
-	DECLARE_WRITE8_MEMBER(reel4_ram_w);
-	DECLARE_WRITE8_MEMBER(bg_scroll_w);
-	DECLARE_WRITE8_MEMBER(fg_tile_w);
-	DECLARE_WRITE8_MEMBER(fg_color_w);
-	DECLARE_WRITE8_MEMBER(nmi_and_coins_w);
-	DECLARE_WRITE8_MEMBER(video_and_leds_w);
-	DECLARE_WRITE8_MEMBER(leds_w);
-	DECLARE_WRITE8_MEMBER(magic_w);
-	DECLARE_READ8_MEMBER(magic_r);
+	template<uint8_t Reel> void reel_ram_w(offs_t offset, uint8_t data);
+	void bg_scroll_w(offs_t offset, uint8_t data);
+	void fg_tile_w(offs_t offset, uint8_t data);
+	void fg_color_w(offs_t offset, uint8_t data);
+	void nmi_and_coins_w(uint8_t data);
+	void video_and_leds_w(uint8_t data);
+	void leds_w(uint8_t data);
+	void magic_w(offs_t offset, uint8_t data);
+	uint8_t magic_r();
 
 	void show_out();
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
-	TILE_GET_INFO_MEMBER(get_jingbell_reel1_tile_info);
-	TILE_GET_INFO_MEMBER(get_gp98_reel1_tile_info);
-	TILE_GET_INFO_MEMBER(get_jingbell_reel2_tile_info);
-	TILE_GET_INFO_MEMBER(get_gp98_reel2_tile_info);
-	TILE_GET_INFO_MEMBER(get_jingbell_reel3_tile_info);
-	TILE_GET_INFO_MEMBER(get_gp98_reel3_tile_info);
-	TILE_GET_INFO_MEMBER(get_jingbell_reel4_tile_info);
-	TILE_GET_INFO_MEMBER(get_gp98_reel4_tile_info);
+	template<uint8_t Reel> TILE_GET_INFO_MEMBER(get_jingbell_reel_tile_info);
+	template<uint8_t Reel> TILE_GET_INFO_MEMBER(get_gp98_reel_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
 	void decrypt_jingbell();
@@ -104,29 +96,18 @@ private:
 	void jingbell_map(address_map &map);
 	void jingbell_portmap(address_map &map);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<uint8_t> m_bg_scroll;
-	required_shared_ptr<uint8_t> m_reel1_ram;
-	required_shared_ptr<uint8_t> m_reel2_ram;
-	required_shared_ptr<uint8_t> m_reel3_ram;
-	required_shared_ptr<uint8_t> m_reel4_ram;
-	required_shared_ptr<uint8_t> m_bg_scroll2;
+	required_shared_ptr_array<uint8_t, 2> m_bg_scroll;
+	required_shared_ptr_array<uint8_t, 4> m_reel_ram;
 	required_shared_ptr<uint8_t> m_fg_tile_ram;
 	required_shared_ptr<uint8_t> m_fg_color_ram;
 	output_finder<7> m_leds;
 
-	tilemap_t *m_reel1_tilemap;
-	tilemap_t *m_reel2_tilemap;
-	tilemap_t *m_reel3_tilemap;
-	tilemap_t *m_reel4_tilemap;
+	tilemap_t *m_reel_tilemap[4];
 	tilemap_t *m_fg_tilemap;
 	int m_video_enable;
 	int m_nmi_enable;
@@ -141,16 +122,17 @@ private:
 ***************************************************************************/
 
 
-
-WRITE8_MEMBER(igs009_state::reel1_ram_w)
+template<uint8_t Reel>
+void igs009_state::reel_ram_w(offs_t offset, uint8_t data)
 {
-	m_reel1_ram[offset] = data;
-	m_reel1_tilemap->mark_tile_dirty(offset);
+	m_reel_ram[Reel][offset] = data;
+	m_reel_tilemap[Reel]->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(igs009_state::get_jingbell_reel1_tile_info)
+template<uint8_t Reel>
+TILE_GET_INFO_MEMBER(igs009_state::get_jingbell_reel_tile_info)
 {
-	int code = m_reel1_ram[tile_index];
+	int code = m_reel_ram[Reel][tile_index];
 
 	tileinfo.set(0,
 			(code)+(((tile_index+1)&0x3)*0x100),
@@ -158,10 +140,10 @@ TILE_GET_INFO_MEMBER(igs009_state::get_jingbell_reel1_tile_info)
 			0);
 }
 
-
-TILE_GET_INFO_MEMBER(igs009_state::get_gp98_reel1_tile_info)
+template<uint8_t Reel>
+TILE_GET_INFO_MEMBER(igs009_state::get_gp98_reel_tile_info)
 {
-	int code = m_reel1_ram[tile_index];
+	int code = m_reel_ram[Reel][tile_index];
 
 	tileinfo.set(0,
 			(code*4)+(tile_index&0x3),
@@ -169,94 +151,9 @@ TILE_GET_INFO_MEMBER(igs009_state::get_gp98_reel1_tile_info)
 			0);
 }
 
-
-WRITE8_MEMBER(igs009_state::reel2_ram_w)
+void igs009_state::bg_scroll_w(offs_t offset, uint8_t data)
 {
-	m_reel2_ram[offset] = data;
-	m_reel2_tilemap->mark_tile_dirty(offset);
-}
-
-TILE_GET_INFO_MEMBER(igs009_state::get_jingbell_reel2_tile_info)
-{
-	int code = m_reel2_ram[tile_index];
-
-	tileinfo.set(0,
-			(code)+(((tile_index+1)&0x3)*0x100),
-			(code & 0x80) ? 0xc : 0,
-			0);
-}
-
-TILE_GET_INFO_MEMBER(igs009_state::get_gp98_reel2_tile_info)
-{
-	int code = m_reel2_ram[tile_index];
-
-	tileinfo.set(0,
-			(code*4)+(tile_index&0x3),
-			0,
-			0);
-}
-
-
-
-WRITE8_MEMBER(igs009_state::reel3_ram_w)
-{
-	m_reel3_ram[offset] = data;
-	m_reel3_tilemap->mark_tile_dirty(offset);
-}
-
-TILE_GET_INFO_MEMBER(igs009_state::get_jingbell_reel3_tile_info)
-{
-	int code = m_reel3_ram[tile_index];
-
-	tileinfo.set(0,
-			(code)+(((tile_index+1)&0x3)*0x100),
-			(code & 0x80) ? 0xc : 0,
-			0);
-}
-
-TILE_GET_INFO_MEMBER(igs009_state::get_gp98_reel3_tile_info)
-{
-	int code = m_reel3_ram[tile_index];
-
-	tileinfo.set(0,
-			(code*4)+(tile_index&0x3),
-			0,
-			0);
-}
-
-
-
-WRITE8_MEMBER(igs009_state::reel4_ram_w)
-{
-	m_reel4_ram[offset] = data;
-	m_reel4_tilemap->mark_tile_dirty(offset);
-}
-
-TILE_GET_INFO_MEMBER(igs009_state::get_jingbell_reel4_tile_info)
-{
-	int code = m_reel4_ram[tile_index];
-
-	tileinfo.set(0,
-			(code)+(((tile_index+1)&0x3)*0x100),
-			(code & 0x80) ? 0xc : 0,
-			0);
-}
-
-TILE_GET_INFO_MEMBER(igs009_state::get_gp98_reel4_tile_info)
-{
-	int code = m_reel4_ram[tile_index];
-
-	tileinfo.set(0,
-			(code*4)+(tile_index&0x3),
-			0,
-			0);
-}
-
-
-
-WRITE8_MEMBER(igs009_state::bg_scroll_w)
-{
-	m_bg_scroll[offset] = data;
+	m_bg_scroll[0][offset] = data;
 //  bg_tilemap->set_scrolly(offset,data);
 }
 
@@ -267,13 +164,13 @@ TILE_GET_INFO_MEMBER(igs009_state::get_fg_tile_info)
 	tileinfo.set(1, code, (4*(code >> 14)+3), 0);
 }
 
-WRITE8_MEMBER(igs009_state::fg_tile_w)
+void igs009_state::fg_tile_w(offs_t offset, uint8_t data)
 {
 	m_fg_tile_ram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(igs009_state::fg_color_w)
+void igs009_state::fg_color_w(offs_t offset, uint8_t data)
 {
 	m_fg_color_ram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
@@ -284,15 +181,15 @@ void igs009_state::video_start()
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(igs009_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8,  8,  0x80,0x20);
 	m_fg_tilemap->set_transparent_pen(0);
 
-	m_reel1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(igs009_state::get_jingbell_reel1_tile_info)),TILEMAP_SCAN_ROWS,8,32, 128, 8);
-	m_reel2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(igs009_state::get_jingbell_reel2_tile_info)),TILEMAP_SCAN_ROWS,8,32, 128, 8);
-	m_reel3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(igs009_state::get_jingbell_reel3_tile_info)),TILEMAP_SCAN_ROWS,8,32, 128, 8);
-	m_reel4_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(igs009_state::get_jingbell_reel4_tile_info)),TILEMAP_SCAN_ROWS,8,32, 128, 8);
+	m_reel_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(igs009_state::get_jingbell_reel_tile_info<0>)),TILEMAP_SCAN_ROWS,8,32, 128, 8);
+	m_reel_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(igs009_state::get_jingbell_reel_tile_info<1>)),TILEMAP_SCAN_ROWS,8,32, 128, 8);
+	m_reel_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(igs009_state::get_jingbell_reel_tile_info<2>)),TILEMAP_SCAN_ROWS,8,32, 128, 8);
+	m_reel_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(igs009_state::get_jingbell_reel_tile_info<3>)),TILEMAP_SCAN_ROWS,8,32, 128, 8);
 
-	m_reel1_tilemap->set_scroll_cols(128);
-	m_reel2_tilemap->set_scroll_cols(128);
-	m_reel3_tilemap->set_scroll_cols(128);
-	m_reel4_tilemap->set_scroll_cols(128);
+	m_reel_tilemap[0]->set_scroll_cols(128);
+	m_reel_tilemap[1]->set_scroll_cols(128);
+	m_reel_tilemap[2]->set_scroll_cols(128);
+	m_reel_tilemap[3]->set_scroll_cols(128);
 }
 
 
@@ -301,15 +198,15 @@ VIDEO_START_MEMBER(igs009_state,gp98)
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(igs009_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8,  8,  0x80,0x20);
 	m_fg_tilemap->set_transparent_pen(0);
 
-	m_reel1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(igs009_state::get_gp98_reel1_tile_info)),TILEMAP_SCAN_ROWS,8,32, 128, 8);
-	m_reel2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(igs009_state::get_gp98_reel2_tile_info)),TILEMAP_SCAN_ROWS,8,32, 128, 8);
-	m_reel3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(igs009_state::get_gp98_reel3_tile_info)),TILEMAP_SCAN_ROWS,8,32, 128, 8);
-	m_reel4_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(igs009_state::get_gp98_reel4_tile_info)),TILEMAP_SCAN_ROWS,8,32, 128, 8);
+	m_reel_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(igs009_state::get_gp98_reel_tile_info<0>)),TILEMAP_SCAN_ROWS,8,32, 128, 8);
+	m_reel_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(igs009_state::get_gp98_reel_tile_info<1>)),TILEMAP_SCAN_ROWS,8,32, 128, 8);
+	m_reel_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(igs009_state::get_gp98_reel_tile_info<2>)),TILEMAP_SCAN_ROWS,8,32, 128, 8);
+	m_reel_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(igs009_state::get_gp98_reel_tile_info<3>)),TILEMAP_SCAN_ROWS,8,32, 128, 8);
 
-	m_reel1_tilemap->set_scroll_cols(128);
-	m_reel2_tilemap->set_scroll_cols(128);
-	m_reel3_tilemap->set_scroll_cols(128);
-	m_reel4_tilemap->set_scroll_cols(128);
+	m_reel_tilemap[0]->set_scroll_cols(128);
+	m_reel_tilemap[1]->set_scroll_cols(128);
+	m_reel_tilemap[2]->set_scroll_cols(128);
+	m_reel_tilemap[3]->set_scroll_cols(128);
 }
 
 
@@ -330,43 +227,42 @@ uint32_t igs009_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 	if (layers_ctrl & 1)
 	{
-		int zz,i;
 		int startclipmin = 0;
 		const rectangle &visarea = screen.visible_area();
 
-		for (i= 0;i < 0x80;i++)
+		for (int i= 0;i < 0x80;i++)
 		{
-			m_reel1_tilemap->set_scrolly(i, m_bg_scroll[i]*2);
-			m_reel2_tilemap->set_scrolly(i, m_bg_scroll[i+0x80]*2);
-			m_reel3_tilemap->set_scrolly(i, m_bg_scroll[i+0x100]*2);
-			m_reel4_tilemap->set_scrolly(i, m_bg_scroll[i+0x180]*2);
+			m_reel_tilemap[0]->set_scrolly(i, m_bg_scroll[0][i]*2);
+			m_reel_tilemap[1]->set_scrolly(i, m_bg_scroll[0][i+0x80]*2);
+			m_reel_tilemap[2]->set_scrolly(i, m_bg_scroll[0][i+0x100]*2);
+			m_reel_tilemap[3]->set_scrolly(i, m_bg_scroll[0][i+0x180]*2);
 		}
 
-		for (zz=0;zz<0x80-8;zz++) // -8 because of visible area (2*8 = 16)
+		for (int zz=0;zz<0x80-8;zz++) // -8 because of visible area (2*8 = 16)
 		{
 			rectangle clip;
-			int rowenable = m_bg_scroll2[zz];
+			int rowenable = m_bg_scroll[1][zz];
 
-			/* draw top of screen */
+			// draw top of screen
 			clip.set(visarea.min_x, visarea.max_x, startclipmin, startclipmin+2);
 
 			bitmap.fill(m_palette->pen(rowenable), clip);
 
 			if (rowenable==0)
 			{ // 0 and 1 are the same? or is there a global switchoff?
-				m_reel1_tilemap->draw(screen, bitmap, clip, 0,0);
+				m_reel_tilemap[0]->draw(screen, bitmap, clip, 0,0);
 			}
 			else if (rowenable==1)
 			{
-				m_reel2_tilemap->draw(screen, bitmap, clip, 0,0);
+				m_reel_tilemap[1]->draw(screen, bitmap, clip, 0,0);
 			}
 			else if (rowenable==2)
 			{
-				m_reel3_tilemap->draw(screen, bitmap, clip, 0,0);
+				m_reel_tilemap[2]->draw(screen, bitmap, clip, 0,0);
 			}
 			else if (rowenable==3)
 			{
-				m_reel4_tilemap->draw(screen, bitmap, clip, 0,0);
+				m_reel_tilemap[3]->draw(screen, bitmap, clip, 0,0);
 			}
 
 
@@ -400,7 +296,7 @@ void igs009_state::show_out()
 #endif
 }
 
-WRITE8_MEMBER(igs009_state::nmi_and_coins_w)
+void igs009_state::nmi_and_coins_w(uint8_t data)
 {
 	if ((m_nmi_enable ^ data) & (~0xdd))
 	{
@@ -421,7 +317,7 @@ WRITE8_MEMBER(igs009_state::nmi_and_coins_w)
 	show_out();
 }
 
-WRITE8_MEMBER(igs009_state::video_and_leds_w)
+void igs009_state::video_and_leds_w(uint8_t data)
 {
 	m_leds[4] = BIT(data, 0); // start?
 	m_leds[5] = BIT(data, 2); // l_bet?
@@ -433,7 +329,7 @@ WRITE8_MEMBER(igs009_state::video_and_leds_w)
 	show_out();
 }
 
-WRITE8_MEMBER(igs009_state::leds_w)
+void igs009_state::leds_w(uint8_t data)
 {
 	m_leds[0] = BIT(data, 0);  // stop_1
 	m_leds[1] = BIT(data, 1);  // stop_2
@@ -446,7 +342,7 @@ WRITE8_MEMBER(igs009_state::leds_w)
 }
 
 
-WRITE8_MEMBER(igs009_state::magic_w)
+void igs009_state::magic_w(offs_t offset, uint8_t data)
 {
 	m_igs_magic[offset] = data;
 
@@ -464,7 +360,7 @@ WRITE8_MEMBER(igs009_state::magic_w)
 	}
 }
 
-READ8_MEMBER(igs009_state::magic_r)
+uint8_t igs009_state::magic_r()
 {
 	switch(m_igs_magic[0])
 	{
@@ -495,22 +391,22 @@ void igs009_state::jingbell_portmap(address_map &map)
 {
 	map(0x0000, 0x003f).ram(); // Z180 internal regs
 
-	map(0x1000, 0x11ff).ram().w(FUNC(igs009_state::bg_scroll_w)).share("bg_scroll");
+	map(0x1000, 0x11ff).ram().w(FUNC(igs009_state::bg_scroll_w)).share(m_bg_scroll[0]);
 
 	map(0x2000, 0x23ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x2400, 0x27ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 
-	map(0x3000, 0x33ff).ram().w(FUNC(igs009_state::reel1_ram_w)).share("reel1_ram");
-	map(0x3400, 0x37ff).ram().w(FUNC(igs009_state::reel2_ram_w)).share("reel2_ram");
-	map(0x3800, 0x3bff).ram().w(FUNC(igs009_state::reel3_ram_w)).share("reel3_ram");
-	map(0x3c00, 0x3fff).ram().w(FUNC(igs009_state::reel4_ram_w)).share("reel4_ram");
+	map(0x3000, 0x33ff).ram().w(FUNC(igs009_state::reel_ram_w<0>)).share(m_reel_ram[0]);
+	map(0x3400, 0x37ff).ram().w(FUNC(igs009_state::reel_ram_w<1>)).share(m_reel_ram[1]);
+	map(0x3800, 0x3bff).ram().w(FUNC(igs009_state::reel_ram_w<2>)).share(m_reel_ram[2]);
+	map(0x3c00, 0x3fff).ram().w(FUNC(igs009_state::reel_ram_w<3>)).share(m_reel_ram[3]);
 
-	map(0x4000, 0x407f).ram().share("bg_scroll2");
+	map(0x4000, 0x407f).ram().share(m_bg_scroll[1]);
 
-	map(0x5000, 0x5fff).ram().w(FUNC(igs009_state::fg_tile_w)).share("fg_tile_ram");
+	map(0x5000, 0x5fff).ram().w(FUNC(igs009_state::fg_tile_w)).share(m_fg_tile_ram);
 
-	map(0x6480, 0x6483).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* NMI and coins (w), service (r), coins (r) */
-	map(0x6490, 0x6493).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* buttons 1 (r), video and leds (w), leds (w) */
+	map(0x6480, 0x6483).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    // NMI and coins (w), service (r), coins (r)
+	map(0x6490, 0x6493).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    // buttons 1 (r), video and leds (w), leds (w)
 
 	map(0x64a0, 0x64a0).portr("BUTTONS2");
 
@@ -520,7 +416,7 @@ void igs009_state::jingbell_portmap(address_map &map)
 
 	map(0x64d0, 0x64d1).rw(FUNC(igs009_state::magic_r), FUNC(igs009_state::magic_w));    // DSW1-5
 
-	map(0x7000, 0x7fff).ram().w(FUNC(igs009_state::fg_color_w)).share("fg_color_ram");
+	map(0x7000, 0x7fff).ram().w(FUNC(igs009_state::fg_color_w)).share(m_fg_color_ram);
 
 	map(0x8000, 0xffff).rom().region("data", 0);
 }
@@ -530,19 +426,19 @@ void igs009_state::gp98_portmap(address_map &map)
 {
 	map(0x0000, 0x003f).ram(); // Z180 internal regs
 
-	map(0x1000, 0x11ff).ram().w(FUNC(igs009_state::bg_scroll_w)).share("bg_scroll");
+	map(0x1000, 0x11ff).ram().w(FUNC(igs009_state::bg_scroll_w)).share(m_bg_scroll[0]);
 
 	map(0x2000, 0x23ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x2400, 0x27ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 
-	map(0x3000, 0x33ff).ram().w(FUNC(igs009_state::reel1_ram_w)).share("reel1_ram");
-	map(0x3400, 0x37ff).ram().w(FUNC(igs009_state::reel2_ram_w)).share("reel2_ram");
-	map(0x3800, 0x3bff).ram().w(FUNC(igs009_state::reel3_ram_w)).share("reel3_ram");
-	map(0x3c00, 0x3fff).ram().w(FUNC(igs009_state::reel4_ram_w)).share("reel4_ram");
+	map(0x3000, 0x33ff).ram().w(FUNC(igs009_state::reel_ram_w<0>)).share(m_reel_ram[0]);
+	map(0x3400, 0x37ff).ram().w(FUNC(igs009_state::reel_ram_w<1>)).share(m_reel_ram[1]);
+	map(0x3800, 0x3bff).ram().w(FUNC(igs009_state::reel_ram_w<2>)).share(m_reel_ram[2]);
+	map(0x3c00, 0x3fff).ram().w(FUNC(igs009_state::reel_ram_w<3>)).share(m_reel_ram[3]);
 
-	map(0x4000, 0x407f).ram().share("bg_scroll2");
+	map(0x4000, 0x407f).ram().share(m_bg_scroll[1]);
 
-	map(0x5000, 0x5fff).ram().w(FUNC(igs009_state::fg_tile_w)).share("fg_tile_ram");
+	map(0x5000, 0x5fff).ram().w(FUNC(igs009_state::fg_tile_w)).share(m_fg_tile_ram);
 
 	// seems to lack PPI devices...
 	map(0x6480, 0x6480).w(FUNC(igs009_state::nmi_and_coins_w));
@@ -559,7 +455,7 @@ void igs009_state::gp98_portmap(address_map &map)
 
 	map(0x64d0, 0x64d1).rw(FUNC(igs009_state::magic_r), FUNC(igs009_state::magic_w));    // DSW1-5
 
-	map(0x7000, 0x7fff).ram().w(FUNC(igs009_state::fg_color_w)).share("fg_color_ram");
+	map(0x7000, 0x7fff).ram().w(FUNC(igs009_state::fg_color_w)).share(m_fg_color_ram);
 
 	map(0x8000, 0xffff).rom().region("data", 0);
 }
@@ -670,7 +566,7 @@ static INPUT_PORTS_START( jingbell )
 	PORT_DIPSETTING(    0x80, "8" )
 	PORT_DIPSETTING(    0x00, "16" )
 
-// These are from the manual for v201us - DSW1-DSW4 match but DSW5 doesn't seem to match or actuallly do anything
+// These are from the manual for v201us - DSW1-DSW4 match but DSW5 doesn't seem to match or actually do anything
 	PORT_START("DSW5")
 	PORT_DIPNAME( 0x03, 0x00, "Maximum Play" )      PORT_DIPLOCATION("DSW5:1,2")
 	PORT_DIPSETTING(    0x00, "64" )
@@ -831,8 +727,8 @@ WRITE_LINE_MEMBER(igs009_state::vblank_irq)
 
 void igs009_state::jingbell(machine_config &config)
 {
-	/* basic machine hardware */
-	HD64180RP(config, m_maincpu, XTAL(12'000'000));   /* HD64180RP8, 8 MHz? */
+	// basic machine hardware
+	HD64180RP(config, m_maincpu, XTAL(12'000'000));   // HD64180RP8, 8 MHz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs009_state::jingbell_map);
 	m_maincpu->set_addrmap(AS_IO, &igs009_state::jingbell_portmap);
 
@@ -848,7 +744,7 @@ void igs009_state::jingbell(machine_config &config)
 	ppi1.out_pb_callback().set(FUNC(igs009_state::video_and_leds_w));
 	ppi1.out_pc_callback().set(FUNC(igs009_state::leds_w));
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -861,7 +757,7 @@ void igs009_state::jingbell(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jingbell);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x400);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	YM2413(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);
 
@@ -872,7 +768,7 @@ void igs009_state::jingbell(machine_config &config)
 void igs009_state::gp98(machine_config &config)
 {
 	jingbell(config);
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_IO, &igs009_state::gp98_portmap);
 
 	m_gfxdecode->set_info(gfx_gp98);

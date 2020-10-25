@@ -85,11 +85,11 @@ public:
 	void pzlestar(machine_config &config);
 
 protected:
-	DECLARE_WRITE8_MEMBER(pzlestar_bank_w);
-	DECLARE_WRITE8_MEMBER(pzlestar_mem_bank_w);
-	DECLARE_READ8_MEMBER(pzlestar_mem_bank_r);
-	DECLARE_READ8_MEMBER(sec_slot_r);
-	DECLARE_WRITE8_MEMBER(sec_slot_w);
+	void pzlestar_bank_w(uint8_t data);
+	void pzlestar_mem_bank_w(uint8_t data);
+	uint8_t pzlestar_mem_bank_r();
+	uint8_t sec_slot_r();
+	void sec_slot_w(uint8_t data);
 
 	virtual void machine_reset() override;
 
@@ -111,7 +111,7 @@ public:
 	void sexyboom(machine_config &config);
 
 protected:
-	DECLARE_WRITE8_MEMBER(sexyboom_bank_w);
+	void sexyboom_bank_w(offs_t offset, uint8_t data);
 
 	virtual void machine_reset() override;
 
@@ -221,24 +221,24 @@ void pzlestar_state::pzlestar_map_banks()
 		break;
 	}
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xffff, 0xffff, read8_delegate(*this, FUNC(pzlestar_state::sec_slot_r)), write8_delegate(*this, FUNC(pzlestar_state::sec_slot_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xffff, 0xffff, read8smo_delegate(*this, FUNC(pzlestar_state::sec_slot_r)), write8smo_delegate(*this, FUNC(pzlestar_state::sec_slot_w)));
 }
 
-WRITE8_MEMBER(pzlestar_state::pzlestar_bank_w)
+void pzlestar_state::pzlestar_bank_w(uint8_t data)
 {
 	logerror("rom bank %02x\n", data);
 	m_pzlestar_rom_bank = data;
 	pzlestar_map_banks();
 }
 
-WRITE8_MEMBER(pzlestar_state::pzlestar_mem_bank_w)
+void pzlestar_state::pzlestar_mem_bank_w(uint8_t data)
 {
 	logerror("mem bank %02x\n", data);
 	m_pzlestar_mem_bank = data;
 	pzlestar_map_banks();
 }
 
-READ8_MEMBER(pzlestar_state::pzlestar_mem_bank_r)
+uint8_t pzlestar_state::pzlestar_mem_bank_r()
 {
 	return m_pzlestar_mem_bank;
 }
@@ -280,19 +280,19 @@ void sexyboom_state::sexyboom_map_bank(int bank)
 	}
 }
 
-WRITE8_MEMBER(sexyboom_state::sexyboom_bank_w)
+void sexyboom_state::sexyboom_bank_w(offs_t offset, uint8_t data)
 {
 	m_sexyboom_bank[offset] = data;
 	sexyboom_map_bank(offset>>1);
 }
 
 /* secondary slot R/Ws from current primary slot number (see also mess/machine/msx.c) */
-READ8_MEMBER(pzlestar_state::sec_slot_r)
+uint8_t pzlestar_state::sec_slot_r()
 {
 	return m_sec_slot[m_pzlestar_mem_bank >> 6] ^ 0xff;
 }
 
-WRITE8_MEMBER(pzlestar_state::sec_slot_w)
+void pzlestar_state::sec_slot_w(uint8_t data)
 {
 	m_sec_slot[m_pzlestar_mem_bank >> 6] = data;
 }

@@ -47,15 +47,10 @@ protected:
 private:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-
 	required_device<ram_device> m_ramdisk;
 	required_device<wd1770_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	optional_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 
-	int m_fdc_ie;
-	int m_fdc_drq;
 	uint16_t m_ramdisk_page;
 };
 

@@ -25,7 +25,7 @@
 
 inline void pcw_state::pcw_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color)
 {
-	bitmap.pix16(y, x) = (uint16_t)color;
+	bitmap.pix(y, x) = (uint16_t)color;
 }
 
 /***************************************************************************
@@ -211,12 +211,12 @@ uint32_t pcw_state::screen_update_pcw_printer(screen_device &screen, bitmap_ind1
 	rectangle rect(0, PCW_PRINTER_WIDTH - 1, 0, PCW_PRINTER_HEIGHT - 1);
 	feed = -(m_paper_feed / 2);
 	copyscrollbitmap(bitmap,*m_prn_output,0,nullptr,1,&feed,rect);
-	bitmap.pix16(PCW_PRINTER_HEIGHT-1, m_printer_headpos) = 0;
-	bitmap.pix16(PCW_PRINTER_HEIGHT-2, m_printer_headpos) = 0;
-	bitmap.pix16(PCW_PRINTER_HEIGHT-3, m_printer_headpos) = 0;
-	bitmap.pix16(PCW_PRINTER_HEIGHT-1, m_printer_headpos-1) = 0;
-	bitmap.pix16(PCW_PRINTER_HEIGHT-2, m_printer_headpos-1) = 0;
-	bitmap.pix16(PCW_PRINTER_HEIGHT-1, m_printer_headpos+1) = 0;
-	bitmap.pix16(PCW_PRINTER_HEIGHT-2, m_printer_headpos+1) = 0;
+	bitmap.pix(PCW_PRINTER_HEIGHT-1, m_printer_headpos) = 0;
+	bitmap.pix(PCW_PRINTER_HEIGHT-2, m_printer_headpos) = 0;
+	bitmap.pix(PCW_PRINTER_HEIGHT-3, m_printer_headpos) = 0;
+	bitmap.pix(PCW_PRINTER_HEIGHT-1, m_printer_headpos-1) = 0;
+	bitmap.pix(PCW_PRINTER_HEIGHT-2, m_printer_headpos-1) = 0;
+	bitmap.pix(PCW_PRINTER_HEIGHT-1, m_printer_headpos+1) = 0;
+	bitmap.pix(PCW_PRINTER_HEIGHT-2, m_printer_headpos+1) = 0;
 	return 0;
 }

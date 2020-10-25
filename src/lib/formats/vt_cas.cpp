@@ -1,8 +1,8 @@
 // license:GPL-2.0+
 // copyright-holders:Juergen Buchmueller
-#include <cassert>
-
 #include "formats/vt_cas.h"
+
+#include <cassert>
 
 /*********************************************************************
     vtech 1/2 agnostic
@@ -97,28 +97,28 @@ static int vtech1_cassette_fill_wave(int16_t *buffer, int length, uint8_t *code)
 	return generic_fill_wave(buffer, length, code, V1_BITSAMPLES, V1_BYTESAMPLES, V1_LO, vtech1_fill_wave_byte);
 }
 
-static const struct CassetteLegacyWaveFiller vtech1_legacy_fill_wave =
+static const cassette_image::LegacyWaveFiller vtech1_legacy_fill_wave =
 {
-	vtech1_cassette_fill_wave,  /* fill_wave */
-	1,                          /* chunk_size */
-	V1_BYTESAMPLES,             /* chunk_samples */
-	nullptr,                       /* chunk_sample_calc */
-	600*V1_BITSAMPLES,          /* sample_frequency */
-	600*V1_BITSAMPLES,          /* header_samples */
-	600*V1_BITSAMPLES           /* trailer_samples */
+	vtech1_cassette_fill_wave,  // fill_wave
+	1,                          // chunk_size
+	V1_BYTESAMPLES,             // chunk_samples
+	nullptr,                    // chunk_sample_calc
+	600*V1_BITSAMPLES,          // sample_frequency
+	600*V1_BITSAMPLES,          // header_samples
+	600*V1_BITSAMPLES           // trailer_samples
 };
 
-static cassette_image::error vtech1_cas_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error vtech1_cas_identify(cassette_image *cassette, cassette_image::Options *opts)
 {
-	return cassette_legacy_identify(cassette, opts, &vtech1_legacy_fill_wave);
+	return cassette->legacy_identify(opts, &vtech1_legacy_fill_wave);
 }
 
 static cassette_image::error vtech1_cas_load(cassette_image *cassette)
 {
-	return cassette_legacy_construct(cassette, &vtech1_legacy_fill_wave);
+	return cassette->legacy_construct(&vtech1_legacy_fill_wave);
 }
 
-static const struct CassetteFormat vtech1_cas_format =
+static const cassette_image::Format vtech1_cas_format =
 {
 	"cas",
 	vtech1_cas_identify,
@@ -192,7 +192,7 @@ static int vtech2_cassette_fill_wave(int16_t *buffer, int length, uint8_t *code)
 	return generic_fill_wave(buffer, length, code, VT2_BITSAMPLES, VT2_BYTESAMPLES, VT2_LO, vtech2_fill_wave_byte);
 }
 
-static const struct CassetteLegacyWaveFiller vtech2_legacy_fill_wave =
+static const cassette_image::LegacyWaveFiller vtech2_legacy_fill_wave =
 {
 	vtech2_cassette_fill_wave,  /* fill_wave */
 	1,                          /* chunk_size */
@@ -203,17 +203,17 @@ static const struct CassetteLegacyWaveFiller vtech2_legacy_fill_wave =
 	600*VT2_BITSAMPLES          /* trailer_samples */
 };
 
-static cassette_image::error vtech2_cas_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error vtech2_cas_identify(cassette_image *cassette, cassette_image::Options *opts)
 {
-	return cassette_legacy_identify(cassette, opts, &vtech2_legacy_fill_wave);
+	return cassette->legacy_identify(opts, &vtech2_legacy_fill_wave);
 }
 
 static cassette_image::error vtech2_cas_load(cassette_image *cassette)
 {
-	return cassette_legacy_construct(cassette, &vtech2_legacy_fill_wave);
+	return cassette->legacy_construct(&vtech2_legacy_fill_wave);
 }
 
-static const struct CassetteFormat vtech2_cas_format =
+static const cassette_image::Format vtech2_cas_format =
 {
 	"cas",
 	vtech2_cas_identify,

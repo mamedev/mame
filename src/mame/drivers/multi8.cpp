@@ -52,20 +52,20 @@ public:
 	void multi8(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(key_input_r);
-	DECLARE_READ8_MEMBER(key_status_r);
-	DECLARE_READ8_MEMBER(vram_r);
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_READ8_MEMBER(pal_r);
-	DECLARE_WRITE8_MEMBER(pal_w);
-	DECLARE_READ8_MEMBER(kanji_r);
-	DECLARE_WRITE8_MEMBER(kanji_w);
-	DECLARE_READ8_MEMBER(porta_r);
-	DECLARE_WRITE8_MEMBER(portb_w);
-	DECLARE_WRITE8_MEMBER(portc_w);
-	DECLARE_WRITE8_MEMBER(ym2203_porta_w);
-	DECLARE_READ8_MEMBER(ay8912_0_r);
-	DECLARE_READ8_MEMBER(ay8912_1_r);
+	uint8_t key_input_r();
+	uint8_t key_status_r();
+	uint8_t vram_r(offs_t offset);
+	void vram_w(offs_t offset, uint8_t data);
+	uint8_t pal_r(offs_t offset);
+	void pal_w(offs_t offset, uint8_t data);
+	uint8_t kanji_r(offs_t offset);
+	void kanji_w(offs_t offset, uint8_t data);
+	uint8_t porta_r();
+	void portb_w(uint8_t data);
+	void portc_w(uint8_t data);
+	void ym2203_porta_w(uint8_t data);
+	uint8_t ay8912_0_r();
+	uint8_t ay8912_1_r();
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	DECLARE_WRITE_LINE_MEMBER(kansas_w);
@@ -115,14 +115,13 @@ void multi8_state::video_start()
 
 MC6845_UPDATE_ROW( multi8_state::crtc_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint8_t i,chr,gfx=0,color,pen,attr;
-	uint16_t mem = y*80,x;
-	uint32_t *p = &bitmap.pix32(y);
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	u16 mem = y*80;
+	u32 *p = &bitmap.pix(y);
 
-	for(x = 0; x < x_count; x++)
+	for(u16 x = 0; x < x_count; x++)
 	{
-		for(i = 0; i < 8; i++)
+		for(u8 i = 0; i < 8; i++)
 		{
 			u8 pen_b = BIT(m_p_vram[mem | 0x0000], 7-i);
 			u8 pen_r = BIT(m_p_vram[mem | 0x4000], 7-i);
@@ -143,18 +142,18 @@ MC6845_UPDATE_ROW( multi8_state::crtc_update_row )
 		mem++;
 	}
 
-	u8 x_width = BIT(m_display_reg, 6) ? 80 : 40;
-	u8 x_step = BIT(m_display_reg, 6) ? 1 : 2;
+	const u8 x_width = BIT(m_display_reg, 6) ? 80 : 40;
+	const u8 x_step = BIT(m_display_reg, 6) ? 1 : 2;
 	mem = 0xc000 + ma;
-	p = &bitmap.pix32(y);
+	p = &bitmap.pix(y);
 
-	for(x = 0; x < x_width; x++)
+	for(u16 x = 0; x < x_width; x++)
 	{
-		chr = m_p_vram[mem];
-		attr = m_p_vram[mem | 0x800];
-		color = (BIT(m_display_reg, 7)) ? 7 : (attr & 0x07);
+		const u8 chr = m_p_vram[mem];
+		const u8 attr = m_p_vram[mem | 0x800];
+		const u8 color = (BIT(m_display_reg, 7)) ? 7 : (attr & 0x07);
 
-		gfx = BIT(attr, 5);
+		u8 gfx = BIT(attr, 5);
 
 		if (cursor_x >= 0)
 			gfx ^= (x == (cursor_x / x_step));
@@ -165,9 +164,9 @@ MC6845_UPDATE_ROW( multi8_state::crtc_update_row )
 		if (ra < 8)
 			gfx ^= m_p_chargen[(chr << 3) | ra];
 
-		for(i = 0; i < 8; i++)
+		for(u8 i = 0; i < 8; i++)
 		{
-			pen = BIT(gfx, 7-i) ? color : 0;
+			u8 pen = BIT(gfx, 7-i) ? color : 0;
 
 			if (x_step == 1)
 			{
@@ -189,7 +188,7 @@ MC6845_UPDATE_ROW( multi8_state::crtc_update_row )
 	}
 }
 
-READ8_MEMBER( multi8_state::key_input_r )
+uint8_t multi8_state::key_input_r()
 {
 	if (m_mcu_init == 0)
 	{
@@ -202,7 +201,7 @@ READ8_MEMBER( multi8_state::key_input_r )
 	return m_keyb_press;
 }
 
-READ8_MEMBER( multi8_state::key_status_r )
+uint8_t multi8_state::key_status_r()
 {
 	if (m_mcu_init == 0)
 		return 1;
@@ -222,7 +221,7 @@ READ8_MEMBER( multi8_state::key_status_r )
 	return m_keyb_press_flag | (m_shift_press_flag << 7);
 }
 
-READ8_MEMBER( multi8_state::vram_r )
+uint8_t multi8_state::vram_r(offs_t offset)
 {
 	uint8_t res;
 
@@ -246,7 +245,7 @@ READ8_MEMBER( multi8_state::vram_r )
 	return res;
 }
 
-WRITE8_MEMBER( multi8_state::vram_w )
+void multi8_state::vram_w(offs_t offset, uint8_t data)
 {
 	if (!BIT(m_vram_bank, 4)) //select plain work ram
 	{
@@ -267,12 +266,12 @@ WRITE8_MEMBER( multi8_state::vram_w )
 		m_p_vram[offset | 0xc000] = data;
 }
 
-READ8_MEMBER( multi8_state::pal_r )
+uint8_t multi8_state::pal_r(offs_t offset)
 {
 	return m_pen_clut[offset];
 }
 
-WRITE8_MEMBER( multi8_state::pal_w )
+void multi8_state::pal_w(offs_t offset, uint8_t data)
 {
 	m_pen_clut[offset] = data;
 
@@ -288,15 +287,15 @@ WRITE8_MEMBER( multi8_state::pal_w )
 	}
 }
 
-READ8_MEMBER(multi8_state::ay8912_0_r){ return m_aysnd->data_r(); }
-READ8_MEMBER(multi8_state::ay8912_1_r){ return m_aysnd->data_r(); }
+uint8_t multi8_state::ay8912_0_r(){ return m_aysnd->data_r(); }
+uint8_t multi8_state::ay8912_1_r(){ return m_aysnd->data_r(); }
 
-READ8_MEMBER( multi8_state::kanji_r )
+uint8_t multi8_state::kanji_r(offs_t offset)
 {
 	return m_p_kanji[(m_knj_addr << 1) | (offset & 1)];
 }
 
-WRITE8_MEMBER( multi8_state::kanji_w )
+void multi8_state::kanji_w(offs_t offset, uint8_t data)
 {
 	m_knj_addr = (offset == 0) ? (m_knj_addr & 0xff00) | (data & 0xff) : (m_knj_addr & 0x00ff) | (data << 8);
 }
@@ -559,7 +558,7 @@ static GFXDECODE_START( gfx_multi8 )
 GFXDECODE_END
 
 
-READ8_MEMBER( multi8_state::porta_r )
+uint8_t multi8_state::porta_r()
 {
 	int vsync = (ioport("VBLANK")->read() & 0x1) << 5;
 	/*
@@ -572,7 +571,7 @@ READ8_MEMBER( multi8_state::porta_r )
 }
 
 
-WRITE8_MEMBER( multi8_state::portb_w )
+void multi8_state::portb_w(uint8_t data)
 {
 	/*
 	    x--- ---- color mode
@@ -584,7 +583,7 @@ WRITE8_MEMBER( multi8_state::portb_w )
 	m_display_reg = data;
 }
 
-WRITE8_MEMBER( multi8_state::portc_w )
+void multi8_state::portc_w(uint8_t data)
 {
 //  printf("Port C w = %02x\n",data);
 	m_vram_bank = data & 0x1f;
@@ -595,7 +594,7 @@ WRITE8_MEMBER( multi8_state::portc_w )
 }
 
 
-WRITE8_MEMBER( multi8_state::ym2203_porta_w )
+void multi8_state::ym2203_porta_w(uint8_t data)
 {
 	m_beeper->set_state(BIT(data, 3));
 }

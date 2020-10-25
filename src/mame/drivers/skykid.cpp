@@ -25,7 +25,7 @@ Notes:
 #include "speaker.h"
 
 
-WRITE8_MEMBER(skykid_state::inputport_select_w)
+void skykid_state::inputport_select_w(uint8_t data)
 {
 	if ((data & 0xe0) == 0x60)
 		m_inputport_selected = data & 0x07;
@@ -37,7 +37,7 @@ WRITE8_MEMBER(skykid_state::inputport_select_w)
 	}
 }
 
-READ8_MEMBER(skykid_state::inputport_r)
+uint8_t skykid_state::inputport_r()
 {
 	switch (m_inputport_selected)
 	{
@@ -60,24 +60,24 @@ READ8_MEMBER(skykid_state::inputport_r)
 	}
 }
 
-WRITE8_MEMBER(skykid_state::skykid_led_w)
+void skykid_state::skykid_led_w(uint8_t data)
 {
 	m_leds[0] = BIT(data, 3);
 	m_leds[1] = BIT(data, 4);
 }
 
-WRITE8_MEMBER(skykid_state::skykid_subreset_w)
+void skykid_state::skykid_subreset_w(offs_t offset, uint8_t data)
 {
 	int bit = !BIT(offset,11);
 	m_mcu->set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE8_MEMBER(skykid_state::skykid_bankswitch_w)
+void skykid_state::skykid_bankswitch_w(offs_t offset, uint8_t data)
 {
 	membank("bank1")->set_entry(!BIT(offset,11));
 }
 
-WRITE8_MEMBER(skykid_state::skykid_irq_1_ctrl_w)
+void skykid_state::skykid_irq_1_ctrl_w(offs_t offset, uint8_t data)
 {
 	int bit = !BIT(offset,11);
 	m_main_irq_mask = bit;
@@ -85,7 +85,7 @@ WRITE8_MEMBER(skykid_state::skykid_irq_1_ctrl_w)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(skykid_state::skykid_irq_2_ctrl_w)
+void skykid_state::skykid_irq_2_ctrl_w(offs_t offset, uint8_t data)
 {
 	int bit = !BIT(offset,13);
 	m_mcu_irq_mask = bit;

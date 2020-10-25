@@ -41,18 +41,18 @@ protected:
 		TIMER_NMI
 	};
 
-	DECLARE_READ8_MEMBER(wram_r);
-	DECLARE_READ8_MEMBER(analog_r);
-	DECLARE_READ8_MEMBER(coin_r);
-	DECLARE_READ8_MEMBER(collision_r);
-	DECLARE_READ8_MEMBER(options_r);
-	DECLARE_WRITE8_MEMBER(wram_w);
-	DECLARE_WRITE8_MEMBER(collision_reset_w);
-	DECLARE_WRITE8_MEMBER(da_latch_w);
+	uint8_t wram_r(offs_t offset);
+	uint8_t analog_r(offs_t offset);
+	uint8_t coin_r(offs_t offset);
+	uint8_t collision_r(offs_t offset);
+	uint8_t options_r(offs_t offset);
+	void wram_w(offs_t offset, uint8_t data);
+	void collision_reset_w(offs_t offset, uint8_t data);
+	void da_latch_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(lockout_w);
-	DECLARE_WRITE8_MEMBER(video_ram_w);
-	DECLARE_WRITE8_MEMBER(attract_w);
-	DECLARE_WRITE8_MEMBER(explosion_w);
+	void video_ram_w(offs_t offset, uint8_t data);
+	void attract_w(uint8_t data);
+	void explosion_w(uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

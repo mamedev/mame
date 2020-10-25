@@ -47,11 +47,11 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(cclownz_paddle);
 
 private:
-	DECLARE_WRITE16_MEMBER(ripribit_control_w);
-	DECLARE_WRITE16_MEMBER(cfarm_control_w);
-	DECLARE_WRITE16_MEMBER(cclownz_control_w);
-	DECLARE_READ16_MEMBER(lethalj_gun_r);
-	DECLARE_WRITE16_MEMBER(blitter_w);
+	void ripribit_control_w(uint16_t data);
+	void cfarm_control_w(uint16_t data);
+	void cclownz_control_w(uint16_t data);
+	uint16_t lethalj_gun_r(offs_t offset);
+	void blitter_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void do_blit();
 	inline void get_crosshair_xy(int player, int *x, int *y);
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_update);

@@ -5,9 +5,9 @@
     Tape support for Orao  TAP format
 
 */
-#include <cassert>
-
 #include "orao_cas.h"
+
+#include <cassert>
 
 
 #define ORAO_WAV_FREQUENCY  44100
@@ -19,7 +19,7 @@
 
 #define ORAO_HEADER_SIZE 360
 
-static int16_t    wave_data;
+static int16_t    wave_data; // FIXME: global variables prevent multiple instances
 static int      len;
 
 static void orao_output_wave( int16_t **buffer, int length ) {
@@ -85,7 +85,7 @@ static int orao_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes ) {
 
 
 
-static const struct CassetteLegacyWaveFiller orao_legacy_fill_wave = {
+static const cassette_image::LegacyWaveFiller orao_legacy_fill_wave = {
 	orao_cas_fill_wave,         /* fill_wave */
 	-1,                 /* chunk_size */
 	0,                  /* chunk_samples */
@@ -97,19 +97,19 @@ static const struct CassetteLegacyWaveFiller orao_legacy_fill_wave = {
 
 
 
-static cassette_image::error orao_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) {
-	return cassette_legacy_identify( cassette, opts, &orao_legacy_fill_wave );
+static cassette_image::error orao_cassette_identify( cassette_image *cassette, cassette_image::Options *opts ) {
+	return cassette->legacy_identify( opts, &orao_legacy_fill_wave );
 }
 
 
 
 static cassette_image::error orao_cassette_load( cassette_image *cassette ) {
-	return cassette_legacy_construct( cassette, &orao_legacy_fill_wave );
+	return cassette->legacy_construct( &orao_legacy_fill_wave );
 }
 
 
 
-static const struct CassetteFormat orao_cassette_format = {
+static const cassette_image::Format orao_cassette_format = {
 	"tap",
 	orao_cassette_identify,
 	orao_cassette_load,

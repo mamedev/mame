@@ -1369,7 +1369,7 @@ static const u16 spacegun_default_eeprom[64]=
 
 
 #if 0
-READ16_MEMBER(taitoz_state::eep_latch_r)
+u16 taitoz_state::eep_latch_r()
 {
 	return m_eep_latch;
 }

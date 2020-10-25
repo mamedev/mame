@@ -40,13 +40,12 @@ cosmicg - board can operate in b&w mode if there is no PROM, in this case
 #include "cpu/tms9900/tms9980a.h"
 #include "cpu/z80/z80.h"
 #include "sound/samples.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 
 /* Schematics show 12 triggers for discrete sound circuits */
 
-WRITE8_MEMBER(cosmic_state::panic_sound_output_w)
+void cosmic_state::panic_sound_output_w(offs_t offset, uint8_t data)
 {
 	/* Sound Enable / Disable */
 	if (offset == 11)
@@ -112,7 +111,7 @@ WRITE8_MEMBER(cosmic_state::panic_sound_output_w)
 	#endif
 }
 
-WRITE8_MEMBER(cosmic_state::panic_sound_output2_w)
+void cosmic_state::panic_sound_output2_w(offs_t offset, uint8_t data)
 {
 	if (m_sound_enabled)
 	{
@@ -128,7 +127,7 @@ WRITE8_MEMBER(cosmic_state::panic_sound_output2_w)
 #endif
 }
 
-WRITE8_MEMBER(cosmic_state::cosmicg_output_w)
+void cosmic_state::cosmicg_output_w(offs_t offset, uint8_t data)
 {
 	/* Sound Enable / Disable */
 	if (offset == 12)
@@ -190,7 +189,7 @@ WRITE8_MEMBER(cosmic_state::cosmicg_output_w)
 }
 
 
-WRITE8_MEMBER(cosmic_state::cosmica_sound_output_w)
+void cosmic_state::cosmica_sound_output_w(offs_t offset, uint8_t data)
 {
 	/* Sound Enable / Disable */
 	if (offset == 11)
@@ -327,17 +326,17 @@ WRITE8_MEMBER(cosmic_state::cosmica_sound_output_w)
 	#endif
 }
 
-WRITE8_MEMBER(cosmic_state::dac_w)
+void cosmic_state::dac_w(uint8_t data)
 {
 	m_dac->write(BIT(data, 7));
 }
 
-READ8_MEMBER(cosmic_state::cosmica_pixel_clock_r)
+uint8_t cosmic_state::cosmica_pixel_clock_r()
 {
 	return (m_screen->vpos() >> 2) & 0x3f;
 }
 
-READ8_MEMBER(cosmic_state::cosmicg_port_0_r)
+uint8_t cosmic_state::cosmicg_port_0_r(offs_t offset)
 {
 	/* The top four address lines from the CRTC are bits 0-3 */
 	if (offset >= 4)
@@ -346,12 +345,12 @@ READ8_MEMBER(cosmic_state::cosmicg_port_0_r)
 		return BIT(m_screen->vpos(), offset + 4);
 }
 
-READ8_MEMBER(cosmic_state::cosmicg_port_1_r)
+uint8_t cosmic_state::cosmicg_port_1_r(offs_t offset)
 {
 	return BIT(m_in_ports[1]->read(), offset);
 }
 
-READ8_MEMBER(cosmic_state::magspot_coinage_dip_r)
+uint8_t cosmic_state::magspot_coinage_dip_r(offs_t offset)
 {
 	return (m_dsw.read_safe(0) & (1 << (7 - offset))) ? 0 : 1;
 }
@@ -359,7 +358,7 @@ READ8_MEMBER(cosmic_state::magspot_coinage_dip_r)
 
 /* Has 8 way joystick, remap combinations to missing directions */
 
-READ8_MEMBER(cosmic_state::nomnlnd_port_0_1_r)
+uint8_t cosmic_state::nomnlnd_port_0_1_r(offs_t offset)
 {
 	int control = m_in_ports[offset]->read();
 	int fire = m_in_ports[3]->read();
@@ -378,7 +377,7 @@ READ8_MEMBER(cosmic_state::nomnlnd_port_0_1_r)
 
 
 
-WRITE8_MEMBER(cosmic_state::flip_screen_w)
+void cosmic_state::flip_screen_w(uint8_t data)
 {
 	flip_screen_set(data & 0x80);
 }
@@ -1064,8 +1063,6 @@ void cosmic_state::panic(machine_config &config)
 	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
 void cosmic_state::cosmica(machine_config &config)
@@ -1119,8 +1116,6 @@ void cosmic_state::cosmicg(machine_config &config)
 	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // NE556
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	// Other DACs include 3-bit binary-weighted (100K/50K/25K) DAC combined with another NE556 for attack march
 }
 
@@ -1142,8 +1137,6 @@ void cosmic_state::magspot(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
 void cosmic_state::devzone(machine_config &config)
@@ -1171,8 +1164,6 @@ void cosmic_state::nomnlnd(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
 
@@ -1597,16 +1588,16 @@ void cosmic_state::init_cosmica()
 
 void cosmic_state::init_devzone()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4807, 0x4807, write8_delegate(*this, FUNC(cosmic_state::cosmic_background_enable_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4807, 0x4807, write8smo_delegate(*this, FUNC(cosmic_state::cosmic_background_enable_w)));
 }
 
 
 void cosmic_state::init_nomnlnd()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x5000, 0x5001, read8_delegate(*this, FUNC(cosmic_state::nomnlnd_port_0_1_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x5000, 0x5001, read8sm_delegate(*this, FUNC(cosmic_state::nomnlnd_port_0_1_r)));
 	m_maincpu->space(AS_PROGRAM).nop_write(0x4800, 0x4800);
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4807, 0x4807, write8_delegate(*this, FUNC(cosmic_state::cosmic_background_enable_w)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x480a, 0x480a, write8_delegate(*this, FUNC(cosmic_state::dac_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4807, 0x4807, write8smo_delegate(*this, FUNC(cosmic_state::cosmic_background_enable_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x480a, 0x480a, write8smo_delegate(*this, FUNC(cosmic_state::dac_w)));
 }
 
 void cosmic_state::init_panic()

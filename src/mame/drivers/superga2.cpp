@@ -64,12 +64,12 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(ram_r);
-	DECLARE_WRITE8_MEMBER(ram_w);
-	DECLARE_READ8_MEMBER(speaker_toggle_r);
-	DECLARE_WRITE8_MEMBER(speaker_toggle_w);
-	DECLARE_READ8_MEMBER(switches_r);
-	DECLARE_READ8_MEMBER(reset_r);
+	uint8_t ram_r(offs_t offset);
+	void ram_w(offs_t offset, uint8_t data);
+	uint8_t speaker_toggle_r();
+	void speaker_toggle_w(uint8_t data);
+	uint8_t switches_r(offs_t offset);
+	uint8_t reset_r(offs_t offset);
 
 	void kuzmich(machine_config &config);
 	void kuzmich_map(address_map &map);
@@ -127,27 +127,27 @@ uint32_t superga2_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
     I/O
 ***************************************************************************/
 
-READ8_MEMBER(superga2_state::speaker_toggle_r)
+uint8_t superga2_state::speaker_toggle_r()
 {
 	if (!machine().side_effects_disabled())
-		speaker_toggle_w(space, offset, 0);
+		speaker_toggle_w(0);
 	return read_floatingbus();
 }
 
-WRITE8_MEMBER(superga2_state::speaker_toggle_w)
+void superga2_state::speaker_toggle_w(uint8_t data)
 {
 	m_speaker_state ^= 1;
 	m_speaker->level_w(m_speaker_state);
 }
 
-READ8_MEMBER(superga2_state::switches_r)
+uint8_t superga2_state::switches_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 		m_softlatch->write_bit((offset & 0x0e) >> 1, offset & 0x01);
 	return read_floatingbus();
 }
 
-READ8_MEMBER(superga2_state::reset_r)
+uint8_t superga2_state::reset_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -166,7 +166,7 @@ uint8_t superga2_state::read_floatingbus()
     ADDRESS MAP
 ***************************************************************************/
 
-READ8_MEMBER(superga2_state::ram_r)
+uint8_t superga2_state::ram_r(offs_t offset)
 {
 	if (offset < m_ram_size)
 	{
@@ -176,7 +176,7 @@ READ8_MEMBER(superga2_state::ram_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(superga2_state::ram_w)
+void superga2_state::ram_w(offs_t offset, uint8_t data)
 {
 	if (offset < m_ram_size)
 	{

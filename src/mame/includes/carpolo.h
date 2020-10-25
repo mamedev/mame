@@ -17,6 +17,9 @@
 #include "machine/7474.h"
 #include "machine/74148.h"
 #include "machine/74153.h"
+#include "machine/netlist.h"
+#include "netlist/nl_setup.h"
+#include "audio/nl_carpolo.h"
 #include "emupal.h"
 
 class carpolo_state : public driver_device
@@ -47,6 +50,7 @@ public:
 		, m_dial(*this, "DIAL%u", 0U)
 		, m_in(*this, "IN%u", 0U)
 		, m_pedals(*this, "PEDALS")
+		, m_player_crash(*this, "sound_nl:player_crash%u", 1U)
 	{ }
 
 	void init_carpolo();
@@ -99,20 +103,20 @@ private:
 	std::unique_ptr<bitmap_ind16> m_sprite_goal_collision_bitmap2;
 	std::unique_ptr<bitmap_ind16> m_sprite_border_collision_bitmap;
 
-	DECLARE_READ8_MEMBER(ball_screen_collision_cause_r);
-	DECLARE_READ8_MEMBER(car_ball_collision_x_r);
-	DECLARE_READ8_MEMBER(car_ball_collision_y_r);
-	DECLARE_READ8_MEMBER(car_car_collision_cause_r);
-	DECLARE_READ8_MEMBER(car_goal_collision_cause_r);
-	DECLARE_READ8_MEMBER(car_ball_collision_cause_r);
-	DECLARE_READ8_MEMBER(car_border_collision_cause_r);
-	DECLARE_READ8_MEMBER(interrupt_cause_r);
-	DECLARE_WRITE8_MEMBER(ball_screen_interrupt_clear_w);
-	DECLARE_WRITE8_MEMBER(car_car_interrupt_clear_w);
-	DECLARE_WRITE8_MEMBER(car_goal_interrupt_clear_w);
-	DECLARE_WRITE8_MEMBER(car_ball_interrupt_clear_w);
-	DECLARE_WRITE8_MEMBER(car_border_interrupt_clear_w);
-	DECLARE_WRITE8_MEMBER(timer_interrupt_clear_w);
+	uint8_t ball_screen_collision_cause_r();
+	uint8_t car_ball_collision_x_r();
+	uint8_t car_ball_collision_y_r();
+	uint8_t car_car_collision_cause_r();
+	uint8_t car_goal_collision_cause_r();
+	uint8_t car_ball_collision_cause_r();
+	uint8_t car_border_collision_cause_r();
+	uint8_t interrupt_cause_r();
+	void ball_screen_interrupt_clear_w(uint8_t data);
+	void car_car_interrupt_clear_w(uint8_t data);
+	void car_goal_interrupt_clear_w(uint8_t data);
+	void car_ball_interrupt_clear_w(uint8_t data);
+	void car_border_interrupt_clear_w(uint8_t data);
+	void timer_interrupt_clear_w(uint8_t data);
 	void carpolo_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
@@ -120,11 +124,11 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(coin2_interrupt_clear_w);
 	DECLARE_WRITE_LINE_MEMBER(coin3_interrupt_clear_w);
 	DECLARE_WRITE_LINE_MEMBER(coin4_interrupt_clear_w);
-	DECLARE_WRITE8_MEMBER(pia_0_port_a_w);
-	DECLARE_WRITE8_MEMBER(pia_0_port_b_w);
-	DECLARE_READ8_MEMBER(pia_0_port_b_r);
-	DECLARE_READ8_MEMBER(pia_1_port_a_r);
-	DECLARE_READ8_MEMBER(pia_1_port_b_r);
+	void pia_0_port_a_w(uint8_t data);
+	void pia_0_port_b_w(uint8_t data);
+	uint8_t pia_0_port_b_r();
+	uint8_t pia_1_port_a_r();
+	uint8_t pia_1_port_b_r();
 	DECLARE_WRITE_LINE_MEMBER(ttl7474_2s_1_q_cb);
 	DECLARE_WRITE_LINE_MEMBER(ttl7474_2s_2_q_cb);
 	DECLARE_WRITE_LINE_MEMBER(ttl7474_2u_1_q_cb);
@@ -132,7 +136,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(ls153_za_w);
 	DECLARE_WRITE_LINE_MEMBER(ls153_zb_w);
 
-	DECLARE_WRITE8_MEMBER(ttl74148_3s_cb);
+	void ttl74148_3s_cb(uint8_t data);
 
 	void timer_tick();
 	void remap_sprite_code(int bank, int code, int *remapped_code, int *flipy);
@@ -151,6 +155,8 @@ private:
 										int x2, int y2, int code2, int flipy2,
 										int *col_x, int *col_y);
 	void main_map(address_map &map);
+
+	required_device_array<netlist_mame_logic_input_device, 4> m_player_crash;
 };
 
 #endif // MAME_INCLUDES_CARPOLO_H

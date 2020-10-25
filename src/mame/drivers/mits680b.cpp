@@ -38,14 +38,14 @@ public:
 	void mits680b(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(status_check_r);
+	uint8_t status_check_r();
 
 	void mem_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 };
 
-READ8_MEMBER( mits680b_state::status_check_r )
+uint8_t mits680b_state::status_check_r()
 {
 	return 0; // crashes at start if bit 7 high
 }
@@ -93,4 +93,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME       FLAGS
-COMP( 1976, mits680b, 0,      0,      mits680b, mits680b, mits680b_state, empty_init, "MITS",  "Altair 680b", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1976, mits680b, 0,      0,      mits680b, mits680b, mits680b_state, empty_init, "MITS",  "Altair 680b", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

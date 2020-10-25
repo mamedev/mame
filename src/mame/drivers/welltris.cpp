@@ -327,7 +327,7 @@ TODO:
 #define WELLTRIS_4P_HACK 0
 
 
-WRITE8_MEMBER(welltris_state::sound_bankswitch_w)
+void welltris_state::sound_bankswitch_w(uint8_t data)
 {
 	membank("soundbank")->set_entry(data & 0x03);
 }

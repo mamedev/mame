@@ -2,7 +2,7 @@
 // copyright-holders:Andrew Gardner,Aaron Giles
 /***************************************************************************
 
-    okiadpcm.h
+    okiadpcm.cpp
 
     OKI ADPCM emulation.
 
@@ -39,14 +39,15 @@ int oki_adpcm_state::s_diff_lookup[49*16];
 void oki_adpcm_state::reset()
 {
 	// reset the signal/step
-	m_signal = -2;
-	m_step = 0;
+	m_signal = m_loop_signal = 0;
+	m_step = m_loop_step = 0;
+	m_saved = false;
 }
 
 
 //-------------------------------------------------
-//  device_clock_changed - called if the clock
-//  changes
+//  clock - decode single nibble and update
+//  ADPCM output
 //-------------------------------------------------
 
 int16_t oki_adpcm_state::clock(uint8_t nibble)
@@ -69,6 +70,33 @@ int16_t oki_adpcm_state::clock(uint8_t nibble)
 
 	// return the signal
 	return m_signal;
+}
+
+
+//-------------------------------------------------
+//  save - save current ADPCM state to buffer
+//-------------------------------------------------
+
+void oki_adpcm_state::save()
+{
+	if (!m_saved)
+	{
+		m_loop_signal = m_signal;
+		m_loop_step = m_step;
+		m_saved = true;
+	}
+}
+
+
+//-------------------------------------------------
+//  restore - restore previous ADPCM state
+//  from buffer
+//-------------------------------------------------
+
+void oki_adpcm_state::restore()
+{
+	m_signal = m_loop_signal;
+	m_step = m_loop_step;
 }
 
 
@@ -128,14 +156,15 @@ int oki_adpcm2_state::s_diff_lookup[49*16];
 void oki_adpcm2_state::reset()
 {
 	// reset the signal/step
-	m_signal = -2;
-	m_step = 0;
+	m_signal = m_loop_signal = -2;
+	m_step = m_loop_step = 0;
+	m_saved = false;
 }
 
 
 //-------------------------------------------------
-//  device_clock_changed - called if the clock
-//  changes
+//  clock - decode single nibble and update
+//  ADPCM output
 //-------------------------------------------------
 
 int16_t oki_adpcm2_state::clock(uint8_t nibble)
@@ -158,6 +187,33 @@ int16_t oki_adpcm2_state::clock(uint8_t nibble)
 
 	// return the signal
 	return m_signal;
+}
+
+
+//-------------------------------------------------
+//  save - save current ADPCM state to buffer
+//-------------------------------------------------
+
+void oki_adpcm2_state::save()
+{
+	if (!m_saved)
+	{
+		m_loop_signal = m_signal;
+		m_loop_step = m_step;
+		m_saved = true;
+	}
+}
+
+
+//-------------------------------------------------
+//  restore - restore previous ADPCM state
+//  from buffer
+//-------------------------------------------------
+
+void oki_adpcm2_state::restore()
+{
+	m_signal = m_loop_signal;
+	m_step = m_loop_step;
 }
 
 

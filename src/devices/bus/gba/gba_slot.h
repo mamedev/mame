@@ -43,14 +43,14 @@ public:
 	virtual ~device_gba_cart_interface();
 
 	// reading and writing
-	virtual DECLARE_READ32_MEMBER(read_rom) { return 0xffffffff; }
-	virtual DECLARE_READ32_MEMBER(read_ram) { return 0xffffffff; }
-	virtual DECLARE_READ32_MEMBER(read_gpio) { return 0; }
-	virtual DECLARE_READ32_MEMBER(read_tilt) { return 0xffffffff; }
-	virtual DECLARE_WRITE32_MEMBER(write_ram) { }
-	virtual DECLARE_WRITE32_MEMBER(write_gpio) { }
-	virtual DECLARE_WRITE32_MEMBER(write_tilt) { }
-	virtual DECLARE_WRITE32_MEMBER(write_mapper) { }
+	virtual uint32_t read_rom(offs_t offset) { return 0xffffffff; }
+	virtual uint32_t read_ram(offs_t offset, uint32_t mem_mask = ~0) { return 0xffffffff; }
+	virtual uint32_t read_gpio(offs_t offset, uint32_t mem_mask = ~0) { return 0; }
+	virtual uint32_t read_tilt(offs_t offset, uint32_t mem_mask = ~0) { return 0xffffffff; }
+	virtual void write_ram(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) { }
+	virtual void write_gpio(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) { }
+	virtual void write_tilt(offs_t offset, uint32_t data) { }
+	virtual void write_mapper(offs_t offset, uint32_t data) { }
 
 	void rom_alloc(uint32_t size, const char *tag);
 	void nvram_alloc(uint32_t size);
@@ -120,14 +120,14 @@ public:
 	uint32_t get_rom_size() { if (m_cart) return m_cart->get_rom_size(); return 0; }
 
 	// reading and writing
-	virtual DECLARE_READ32_MEMBER(read_rom);
-	virtual DECLARE_READ32_MEMBER(read_ram);
-	virtual DECLARE_READ32_MEMBER(read_gpio);
-	virtual DECLARE_READ32_MEMBER(read_tilt) { if (m_cart) return m_cart->read_tilt(space, offset, mem_mask); else return 0xffffffff; }
-	virtual DECLARE_WRITE32_MEMBER(write_ram);
-	virtual DECLARE_WRITE32_MEMBER(write_gpio);
-	virtual DECLARE_WRITE32_MEMBER(write_tilt) { if (m_cart) m_cart->write_tilt(space, offset, data, mem_mask); }
-	virtual DECLARE_WRITE32_MEMBER(write_mapper) { if (m_cart) m_cart->write_mapper(space, offset, data, mem_mask); }
+	virtual uint32_t read_rom(offs_t offset);
+	virtual uint32_t read_ram(offs_t offset, uint32_t mem_mask = ~0);
+	virtual uint32_t read_gpio(offs_t offset, uint32_t mem_mask = ~0);
+	virtual uint32_t read_tilt(offs_t offset, uint32_t mem_mask = ~0) { if (m_cart) return m_cart->read_tilt(offset); else return 0xffffffff; }
+	virtual void write_ram(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	virtual void write_gpio(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	virtual void write_tilt(offs_t offset, uint32_t data) { if (m_cart) m_cart->write_tilt(offset, data); }
+	virtual void write_mapper(offs_t offset, uint32_t data) { if (m_cart) m_cart->write_mapper(offset, data); }
 
 protected:
 	// device-level overrides

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz, David Haywood
 
-// Digi Makeover - this uses a camrea and touchpad, both currently unsupported
+// Digi Makeover - this uses a camera and touchpad, both currently unsupported
 //  - why do we need a hack to boot?
 
 #include "emu.h"
@@ -19,7 +19,7 @@ public:
 	void mem_map_digi(address_map& map);
 
 private:
-	virtual DECLARE_WRITE16_MEMBER(portc_w) override;
+	virtual void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 };
 
 void spg2xx_game_digimake_state::mem_map_digi(address_map &map)
@@ -183,7 +183,7 @@ void spg2xx_game_digimake_state::digimake(machine_config &config)
 
 }
 
-WRITE16_MEMBER(spg2xx_game_digimake_state::portc_w)
+void spg2xx_game_digimake_state::portc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s: portc_w %04x (%04x) %c %c %c %c | %c %c %c %c | %c %c %c %c | %c %c %c %c  \n", machine().describe_context(), data, mem_mask,
 		(mem_mask & 0x8000) ? ((data & 0x8000) ? '1' : '0') : 'x',

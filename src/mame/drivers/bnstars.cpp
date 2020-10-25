@@ -150,13 +150,13 @@ private:
 	required_ioport_array<4> m_p2_keys;
 
 	u32 m_bnstars1_mahjong_select;
-	DECLARE_WRITE16_MEMBER(ms32_tx0_ram_w);
-	DECLARE_WRITE16_MEMBER(ms32_tx1_ram_w);
-	DECLARE_WRITE16_MEMBER(ms32_bg0_ram_w);
-	DECLARE_WRITE16_MEMBER(ms32_bg1_ram_w);
-	DECLARE_WRITE16_MEMBER(ms32_roz0_ram_w);
-	DECLARE_WRITE16_MEMBER(ms32_roz1_ram_w);
-	DECLARE_WRITE32_MEMBER(bnstars1_mahjong_select_w);
+	void ms32_tx0_ram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void ms32_tx1_ram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void ms32_bg0_ram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void ms32_bg1_ram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void ms32_roz0_ram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void ms32_roz1_ram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void bnstars1_mahjong_select_w(u32 data);
 	TILE_GET_INFO_MEMBER(get_ms32_tx0_tile_info);
 	TILE_GET_INFO_MEMBER(get_ms32_tx1_tile_info);
 	TILE_GET_INFO_MEMBER(get_ms32_bg0_tile_info);
@@ -194,13 +194,13 @@ TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_tx1_tile_info)
 	tileinfo.set(5,tileno,colour,0);
 }
 
-WRITE16_MEMBER(bnstars_state::ms32_tx0_ram_w)
+void bnstars_state::ms32_tx0_ram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_ms32_tx0_ram[offset]);
 	m_ms32_tx_tilemap[0]->mark_tile_dirty(offset/2);
 }
 
-WRITE16_MEMBER(bnstars_state::ms32_tx1_ram_w)
+void bnstars_state::ms32_tx1_ram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_ms32_tx1_ram[offset]);
 	m_ms32_tx_tilemap[1]->mark_tile_dirty(offset/2);
@@ -228,13 +228,13 @@ TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_bg1_tile_info)
 	tileinfo.set(4,tileno,colour,0);
 }
 
-WRITE16_MEMBER(bnstars_state::ms32_bg0_ram_w)
+void bnstars_state::ms32_bg0_ram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_ms32_bg0_ram[offset]);
 	m_ms32_bg_tilemap[0]->mark_tile_dirty(offset/2);
 }
 
-WRITE16_MEMBER(bnstars_state::ms32_bg1_ram_w)
+void bnstars_state::ms32_bg1_ram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_ms32_bg1_ram[offset]);
 	m_ms32_bg_tilemap[1]->mark_tile_dirty(offset/2);
@@ -347,13 +347,13 @@ TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_roz1_tile_info)
 	tileinfo.set(3,tileno,colour,0);
 }
 
-WRITE16_MEMBER(bnstars_state::ms32_roz0_ram_w)
+void bnstars_state::ms32_roz0_ram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_ms32_roz0_ram[offset]);
 	m_ms32_roz_tilemap[0]->mark_tile_dirty(offset/2);
 }
 
-WRITE16_MEMBER(bnstars_state::ms32_roz1_ram_w)
+void bnstars_state::ms32_roz1_ram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_ms32_roz1_ram[offset]);
 	m_ms32_roz_tilemap[1]->mark_tile_dirty(offset/2);
@@ -712,7 +712,7 @@ CUSTOM_INPUT_MEMBER(bnstars_state::mahjong_ctrl_r)
 	}
 }
 
-WRITE32_MEMBER(bnstars_state::bnstars1_mahjong_select_w)
+void bnstars_state::bnstars1_mahjong_select_w(u32 data)
 {
 	m_bnstars1_mahjong_select = data;
 //  printf("%08x\n",m_bnstars1_mahjong_select);

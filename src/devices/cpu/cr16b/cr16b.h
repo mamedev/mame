@@ -42,8 +42,8 @@ protected:
 private:
 	// address space
 	address_space_config m_space_config;
-	address_space *m_space;
-	memory_access_cache<1, 0, ENDIANNESS_LITTLE> *m_cache;
+	memory_access<21, 1, 0, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<21, 1, 0, ENDIANNESS_LITTLE>::specific m_space;
 
 	// internal state
 	u16 m_regs[16];

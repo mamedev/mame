@@ -34,26 +34,28 @@ public:
 		, m_pio0(*this, "pio0")
 		, m_dma (*this, "dma")
 		, m_fdc (*this, "fdc")
+		, m_p_prom(*this, "proms")
 		, m_floppy0(*this, "fdc:0")
 		, m_floppy1(*this, "fdc:1")
+		, m_bankr(*this, "bankr%d", 0)
+		, m_bankw(*this, "bankw%d", 0)
 	{ }
 
 	void altos5(machine_config &config);
 
-	void init_altos5();
-
-	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
-
 private:
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
-	DECLARE_READ8_MEMBER(io_read_byte);
-	DECLARE_WRITE8_MEMBER(io_write_byte);
-	DECLARE_READ8_MEMBER(port08_r);
-	DECLARE_READ8_MEMBER(port09_r);
-	DECLARE_WRITE8_MEMBER(port08_w);
-	DECLARE_WRITE8_MEMBER(port09_w);
-	DECLARE_WRITE8_MEMBER(port14_w);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
+	uint8_t memory_read_byte(offs_t offset);
+	void memory_write_byte(offs_t offset, uint8_t data);
+	uint8_t io_read_byte(offs_t offset);
+	void io_write_byte(offs_t offset, uint8_t data);
+	uint8_t port08_r();
+	uint8_t port09_r();
+	void port08_w(uint8_t data);
+	void port09_w(uint8_t data);
+	void port14_w(uint8_t data);
+	void setup_banks(uint8_t source);
+	uint8_t convert(offs_t offset, bool state);
 	DECLARE_WRITE_LINE_MEMBER(busreq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 
@@ -62,19 +64,22 @@ private:
 
 	uint8_t m_port08;
 	uint8_t m_port09;
-	uint8_t *m_p_prom;
 	bool m_ipl;
 	offs_t m_curr_bank;
 	floppy_image_device *m_floppy;
-	uint8_t convert(offs_t offset, bool state);
-	void setup_banks(uint8_t source);
-	virtual void machine_reset() override;
+	std::unique_ptr<u8[]> m_ram;  // main ram 192k
+	std::unique_ptr<u8[]> m_dummy;  // for wrpt
+	void machine_reset() override;
+	void machine_start() override;
 	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_pio0;
 	required_device<z80dma_device> m_dma;
 	required_device<fd1797_device> m_fdc;
+	required_region_ptr<u8> m_p_prom;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
+	required_memory_bank_array<16> m_bankr;
+	required_memory_bank_array<16> m_bankw;
 };
 
 
@@ -91,12 +96,12 @@ void altos5_state::mem_map(address_map &map)
 	map(0x7000, 0x7fff).bankr("bankr7").bankw("bankw7");
 	map(0x8000, 0x8fff).bankr("bankr8").bankw("bankw8");
 	map(0x9000, 0x9fff).bankr("bankr9").bankw("bankw9");
-	map(0xa000, 0xafff).bankr("bankra").bankw("bankwa");
-	map(0xb000, 0xbfff).bankr("bankrb").bankw("bankwb");
-	map(0xc000, 0xcfff).bankr("bankrc").bankw("bankwc");
-	map(0xd000, 0xdfff).bankr("bankrd").bankw("bankwd");
-	map(0xe000, 0xefff).bankr("bankre").bankw("bankwe");
-	map(0xf000, 0xffff).bankr("bankrf").bankw("bankwf");
+	map(0xa000, 0xafff).bankr("bankr10").bankw("bankw10");
+	map(0xb000, 0xbfff).bankr("bankr11").bankw("bankw11");
+	map(0xc000, 0xcfff).bankr("bankr12").bankw("bankw12");
+	map(0xd000, 0xdfff).bankr("bankr13").bankw("bankw13");
+	map(0xe000, 0xefff).bankr("bankr14").bankw("bankw14");
+	map(0xf000, 0xffff).bankr("bankr15").bankw("bankw15");
 }
 
 void altos5_state::io_map(address_map &map)
@@ -147,40 +152,12 @@ void altos5_state::setup_banks(uint8_t source)
 	temp = offs;
 	if ((source == 2) || (temp != m_curr_bank))
 	{
-		membank("bankr0")->set_entry(convert(offs++, 0));
-		membank("bankr1")->set_entry(convert(offs++, 0));
-		membank("bankr2")->set_entry(convert(offs++, 0));
-		membank("bankr3")->set_entry(convert(offs++, 0));
-		membank("bankr4")->set_entry(convert(offs++, 0));
-		membank("bankr5")->set_entry(convert(offs++, 0));
-		membank("bankr6")->set_entry(convert(offs++, 0));
-		membank("bankr7")->set_entry(convert(offs++, 0));
-		membank("bankr8")->set_entry(convert(offs++, 0));
-		membank("bankr9")->set_entry(convert(offs++, 0));
-		membank("bankra")->set_entry(convert(offs++, 0));
-		membank("bankrb")->set_entry(convert(offs++, 0));
-		membank("bankrc")->set_entry(convert(offs++, 0));
-		membank("bankrd")->set_entry(convert(offs++, 0));
-		membank("bankre")->set_entry(convert(offs++, 0));
-		membank("bankrf")->set_entry(convert(offs++, 0));
+		for (auto &bank : m_bankr)
+			bank->set_entry(convert(offs++, 0));
 
 		offs = temp;
-		membank("bankw0")->set_entry(convert(offs++, 1));
-		membank("bankw1")->set_entry(convert(offs++, 1));
-		membank("bankw2")->set_entry(convert(offs++, 1));
-		membank("bankw3")->set_entry(convert(offs++, 1));
-		membank("bankw4")->set_entry(convert(offs++, 1));
-		membank("bankw5")->set_entry(convert(offs++, 1));
-		membank("bankw6")->set_entry(convert(offs++, 1));
-		membank("bankw7")->set_entry(convert(offs++, 1));
-		membank("bankw8")->set_entry(convert(offs++, 1));
-		membank("bankw9")->set_entry(convert(offs++, 1));
-		membank("bankwa")->set_entry(convert(offs++, 1));
-		membank("bankwb")->set_entry(convert(offs++, 1));
-		membank("bankwc")->set_entry(convert(offs++, 1));
-		membank("bankwd")->set_entry(convert(offs++, 1));
-		membank("bankwe")->set_entry(convert(offs++, 1));
-		membank("bankwf")->set_entry(convert(offs++, 1));
+		for (auto &bank : m_bankw)
+			bank->set_entry(convert(offs++, 1));
 	}
 
 	m_curr_bank = temp;
@@ -210,31 +187,31 @@ static const z80_daisy_config daisy_chain_intf[] =
 
 
 // turns off IPL mode, removes boot rom from memory map
-WRITE8_MEMBER( altos5_state::port14_w )
+void altos5_state::port14_w(uint8_t data)
 {
 	m_ipl = 0;
 	setup_banks(2);
 }
 
-READ8_MEMBER(altos5_state::memory_read_byte)
+uint8_t altos5_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(altos5_state::memory_write_byte)
+void altos5_state::memory_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	prog_space.write_byte(offset, data);
 }
 
-READ8_MEMBER(altos5_state::io_read_byte)
+uint8_t altos5_state::io_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(altos5_state::io_write_byte)
+void altos5_state::io_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	prog_space.write_byte(offset, data);
@@ -255,7 +232,7 @@ d2: unused configuration input (must be H to skip HD boot)
 d3: selected floppy is single(L) or double sided(H)
 d7: IRQ from FDC
 */
-READ8_MEMBER( altos5_state::port08_r )
+uint8_t altos5_state::port08_r()
 {
 	uint8_t data = m_port08 | 0x87;
 	if (m_floppy)
@@ -266,7 +243,7 @@ READ8_MEMBER( altos5_state::port08_r )
 /*
 d0: HD IRQ
 */
-READ8_MEMBER( altos5_state::port09_r )
+uint8_t altos5_state::port09_r()
 {
 	return m_port09 & 0xfe;
 }
@@ -276,7 +253,7 @@ d4: DDEN (H = double density)
 d5: DS (H = drive 2)
 d6: SS (H = side 2)
 */
-WRITE8_MEMBER( altos5_state::port08_w )
+void altos5_state::port08_w(uint8_t data)
 {
 	m_port08 = data & 0x70;
 
@@ -302,7 +279,7 @@ d3, 4: CPU bank select
 d5:    H = Write protect of common area
 d6, 7: DMA bank select (not emulated)
 */
-WRITE8_MEMBER( altos5_state::port09_w )
+void  altos5_state::port09_w(uint8_t data)
 {
 	m_port09 = data;
 	setup_banks(2);
@@ -368,44 +345,33 @@ WRITE_LINE_MEMBER( altos5_state::fdc_intrq_w )
 	m_pio0->port_a_write(data);
 }
 
-void altos5_state::init_altos5()
+void altos5_state::machine_start()
 {
-	m_p_prom =  memregion("proms")->base();
+	m_ram = make_unique_clear<u8[]>(0x30000);
+	m_dummy = std::make_unique<u8[]>(0x1000);
 
-	uint8_t *RAM = memregion("maincpu")->base();
+	u8 *r = m_ram.get();
+	u8 *d = m_dummy.get();
+	u8 *m = memregion("maincpu")->base();
 
-	membank("bankr0")->configure_entries(0, 50, &RAM[0], 0x1000);
-	membank("bankr1")->configure_entries(0, 50, &RAM[0], 0x1000);
-	membank("bankr2")->configure_entries(0, 50, &RAM[0], 0x1000);
-	membank("bankr3")->configure_entries(0, 50, &RAM[0], 0x1000);
-	membank("bankr4")->configure_entries(0, 50, &RAM[0], 0x1000);
-	membank("bankr5")->configure_entries(0, 50, &RAM[0], 0x1000);
-	membank("bankr6")->configure_entries(0, 50, &RAM[0], 0x1000);
-	membank("bankr7")->configure_entries(0, 50, &RAM[0], 0x1000);
-	membank("bankr8")->configure_entries(0, 50, &RAM[0], 0x1000);
-	membank("bankr9")->configure_entries(0, 50, &RAM[0], 0x1000);
-	membank("bankra")->configure_entries(0, 50, &RAM[0], 0x1000);
-	membank("bankrb")->configure_entries(0, 50, &RAM[0], 0x1000);
-	membank("bankrc")->configure_entries(0, 50, &RAM[0], 0x1000);
-	membank("bankrd")->configure_entries(0, 50, &RAM[0], 0x1000);
-	membank("bankre")->configure_entries(0, 50, &RAM[0], 0x1000);
-	membank("bankrf")->configure_entries(0, 50, &RAM[0], 0x1000);
-	membank("bankw0")->configure_entries(0, 50, &RAM[0], 0x1000);
-	membank("bankw1")->configure_entries(0, 50, &RAM[0], 0x1000);
-	membank("bankw2")->configure_entries(0, 50, &RAM[0], 0x1000);
-	membank("bankw3")->configure_entries(0, 50, &RAM[0], 0x1000);
-	membank("bankw4")->configure_entries(0, 50, &RAM[0], 0x1000);
-	membank("bankw5")->configure_entries(0, 50, &RAM[0], 0x1000);
-	membank("bankw6")->configure_entries(0, 50, &RAM[0], 0x1000);
-	membank("bankw7")->configure_entries(0, 50, &RAM[0], 0x1000);
-	membank("bankw8")->configure_entries(0, 50, &RAM[0], 0x1000);
-	membank("bankw9")->configure_entries(0, 50, &RAM[0], 0x1000);
-	membank("bankwa")->configure_entries(0, 50, &RAM[0], 0x1000);
-	membank("bankwb")->configure_entries(0, 50, &RAM[0], 0x1000);
-	membank("bankwc")->configure_entries(0, 50, &RAM[0], 0x1000);
-	membank("bankwd")->configure_entries(0, 50, &RAM[0], 0x1000);
-	membank("bankwe")->configure_entries(0, 50, &RAM[0], 0x1000);
-	membank("bankwf")->configure_entries(0, 50, &RAM[0], 0x1000);
+	for (auto &bank : m_bankr)
+		bank->configure_entries(0, 48, r, 0x1000);
+	for (auto &bank : m_bankw)
+		bank->configure_entries(0, 48, r, 0x1000);
+	for (auto &bank : m_bankr)
+		bank->configure_entry(48, d);
+	for (auto &bank : m_bankw)
+		bank->configure_entry(48, d);
+	for (auto &bank : m_bankr)
+		bank->configure_entry(49, m);
+	for (auto &bank : m_bankw)
+		bank->configure_entry(49, m);
+
+	save_pointer(NAME(m_ram), 0x30000);
+	save_item(NAME(m_port08));
+	save_item(NAME(m_port09));
+	save_item(NAME(m_ipl));
+	save_item(NAME(m_curr_bank));
 }
 
 void altos5_state::altos5(machine_config &config)
@@ -479,9 +445,9 @@ void altos5_state::altos5(machine_config &config)
 
 
 /* ROM definition */
-ROM_START( altos5 ) // 00000-2FFFF = ram banks; 30000-30FFF wprt space; 31000-31FFF ROM
-	ROM_REGION( 0x32000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD("2732.bin",   0x31000, 0x1000, CRC(15fdc7eb) SHA1(e15bdf5d5414ad56f8c4bb84edc6f967a5f01ba9)) // bios
+ROM_START( altos5 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD("2732.bin",   0x0000, 0x1000, CRC(15fdc7eb) SHA1(e15bdf5d5414ad56f8c4bb84edc6f967a5f01ba9)) // bios
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD("82s141.bin", 0x0000, 0x0200, CRC(35c8078c) SHA1(dce24374bfcc5d23959e2c03485d82a119c0c3c9)) // banking control
@@ -490,4 +456,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY  FULLNAME      FLAGS */
-COMP( 1982, altos5, 0,      0,      altos5,  altos5, altos5_state, init_altos5, "Altos", "Altos 5-15", MACHINE_NOT_WORKING )
+COMP( 1982, altos5, 0,      0,      altos5,  altos5, altos5_state, empty_init, "Altos", "Altos 5-15", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

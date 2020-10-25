@@ -12,10 +12,10 @@
 
 #include "machine/6532riot.h"
 #include "machine/gen_latch.h"
+#include "machine/slapstic.h"
 #include "machine/x2212.h"
 #include "sound/pokey.h"
 #include "sound/tms5220.h"
-#include "includes/slapstic.h"
 
 
 class starwars_state : public driver_device
@@ -73,27 +73,27 @@ private:
 	int16_t m_B;
 	int16_t m_C;
 	int32_t m_ACC;
-	DECLARE_WRITE8_MEMBER(irq_ack_w);
-	DECLARE_READ8_MEMBER(esb_slapstic_r);
-	DECLARE_WRITE8_MEMBER(esb_slapstic_w);
-	DECLARE_WRITE8_MEMBER(starwars_nstore_w);
+	void irq_ack_w(uint8_t data);
+	uint8_t esb_slapstic_r(address_space &space, offs_t offset);
+	void esb_slapstic_w(address_space &space, offs_t offset, uint8_t data);
+	void starwars_nstore_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(recall_w);
 	DECLARE_WRITE_LINE_MEMBER(coin1_counter_w);
 	DECLARE_WRITE_LINE_MEMBER(coin2_counter_w);
-	DECLARE_READ8_MEMBER(starwars_prng_r);
+	uint8_t starwars_prng_r();
 	DECLARE_WRITE_LINE_MEMBER(prng_reset_w);
-	DECLARE_READ8_MEMBER(starwars_div_reh_r);
-	DECLARE_READ8_MEMBER(starwars_div_rel_r);
-	DECLARE_WRITE8_MEMBER(starwars_math_w);
+	uint8_t starwars_div_reh_r();
+	uint8_t starwars_div_rel_r();
+	void starwars_math_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER(starwars_main_ready_flag_r);
+	uint8_t starwars_main_ready_flag_r();
 	DECLARE_WRITE_LINE_MEMBER(boost_interleave_hack);
-	DECLARE_WRITE8_MEMBER(starwars_soundrst_w);
-	DECLARE_WRITE8_MEMBER(quad_pokeyn_w);
+	void starwars_soundrst_w(uint8_t data);
+	void quad_pokeyn_w(offs_t offset, uint8_t data);
 	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(math_run_clear);
-	DECLARE_READ8_MEMBER(r6532_porta_r);
-	DECLARE_WRITE8_MEMBER(r6532_porta_w);
+	uint8_t r6532_porta_r();
+	void r6532_porta_w(uint8_t data);
 
 	void starwars_mproc_init();
 	void starwars_mproc_reset();

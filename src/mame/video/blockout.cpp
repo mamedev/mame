@@ -79,7 +79,7 @@ void blockout_state::videoram_w(offs_t offset, u8 data)
 		else
 			color = back | 0x100;
 
-		m_tmpbitmap.pix16(y, x) = color;
+		m_tmpbitmap.pix(y, x) = color;
 	}
 }
 
@@ -96,7 +96,7 @@ u32 blockout_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 		{
 			const u16 d = m_frontvideoram[((y & 0xff) << 6) + ((x & 0x1ff) >> 3)];
 			if (d & (1 << (7 - (x & 7))))
-				bitmap.pix16(y, x) = color;
+				bitmap.pix(y, x) = color;
 		}
 	}
 

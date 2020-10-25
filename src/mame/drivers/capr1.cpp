@@ -47,14 +47,14 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(output_w);
+	void output_w(u8 data);
 
 	required_device<cpu_device> m_maincpu;
 	void cspin2(machine_config &config);
 	void cspin2_map(address_map &map);
 };
 
-WRITE8_MEMBER(capr1_state::output_w)
+void capr1_state::output_w(u8 data)
 {
 	// bit 7 = watchdog?
 }

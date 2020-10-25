@@ -65,14 +65,14 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<ay8912_device> m_ay1;
 
-	DECLARE_READ8_MEMBER(dday_countdown_timer_r);
-	DECLARE_WRITE8_MEMBER(dday_bgvideoram_w);
-	DECLARE_WRITE8_MEMBER(dday_fgvideoram_w);
-	DECLARE_WRITE8_MEMBER(dday_textvideoram_w);
-	DECLARE_WRITE8_MEMBER(dday_colorram_w);
-	DECLARE_READ8_MEMBER(dday_colorram_r);
-	DECLARE_WRITE8_MEMBER(dday_sl_control_w);
-	DECLARE_WRITE8_MEMBER(dday_control_w);
+	uint8_t dday_countdown_timer_r();
+	void dday_bgvideoram_w(offs_t offset, uint8_t data);
+	void dday_fgvideoram_w(offs_t offset, uint8_t data);
+	void dday_textvideoram_w(offs_t offset, uint8_t data);
+	void dday_colorram_w(offs_t offset, uint8_t data);
+	uint8_t dday_colorram_r(offs_t offset);
+	void dday_sl_control_w(uint8_t data);
+	void dday_control_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);

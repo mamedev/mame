@@ -11,7 +11,7 @@ DEFINE_DEVICE_TYPE(SWP00, swp00_device, "swp00", "Yamaha SWP00 (TC170C120SF / XQ
 swp00_device::swp00_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SWP00, tag, owner, clock),
 	  device_sound_interface(mconfig, *this),
-	  device_rom_interface(mconfig, *this, 25+2, ENDIANNESS_LITTLE, 32)
+	  device_rom_interface(mconfig, *this)
 {
 }
 
@@ -97,6 +97,8 @@ void swp00_device::snd_w(offs_t offset, u8 data)
 
 // Synthesis
 
-void swp00_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void swp00_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
+	outputs[0].fill(0);
+	outputs[1].fill(0);
 }

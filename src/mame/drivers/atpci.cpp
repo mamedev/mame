@@ -27,7 +27,7 @@ public:
 protected:
 	void at_softlists(machine_config &config);
 
-	DECLARE_WRITE8_MEMBER(boot_state_w);
+	void boot_state_w(uint8_t data);
 
 	void tx_config(device_t *device);
 	void sb_config(device_t *device);
@@ -40,7 +40,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 };
 
-WRITE8_MEMBER(at586_state::boot_state_w)
+void at586_state::boot_state_w(uint8_t data)
 {
 	logerror("Boot state %02x\n", data);
 	printf("[%02X]",data);
@@ -103,6 +103,7 @@ void at586_state::at_softlists(machine_config &config)
 	SOFTWARE_LIST(config, "pc_disk_list").set_original("ibm5150");
 	SOFTWARE_LIST(config, "at_disk_list").set_original("ibm5170");
 	SOFTWARE_LIST(config, "at_cdrom_list").set_original("ibm5170_cdrom");
+	SOFTWARE_LIST(config, "at_hdd_list").set_original("ibm5170_hdd");
 	SOFTWARE_LIST(config, "midi_disk_list").set_compatible("midi_flop");
 }
 
@@ -154,7 +155,6 @@ void at586_state::at586x3(machine_config &config)
 }
 
 static INPUT_PORTS_START(at586m55)
-	PORT_INCLUDE(at_keyboard)
 INPUT_PORTS_END
 
 void at586_state::at586m55(machine_config &config)

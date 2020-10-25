@@ -784,18 +784,18 @@ std::string vcs_cart_slot_device::get_default_card_software(get_default_card_sof
  read
  -------------------------------------------------*/
 
-READ8_MEMBER(vcs_cart_slot_device::read_rom)
+uint8_t vcs_cart_slot_device::read_rom(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_rom(space, offset, mem_mask);
+		return m_cart->read_rom(offset);
 	else
 		return 0xff;
 }
 
-READ8_MEMBER(vcs_cart_slot_device::read_bank)
+uint8_t vcs_cart_slot_device::read_bank(address_space &space, offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_bank(space, offset, mem_mask);
+		return m_cart->read_bank(space, offset);
 	else
 		return 0xff;
 }
@@ -805,14 +805,14 @@ READ8_MEMBER(vcs_cart_slot_device::read_bank)
  write
  -------------------------------------------------*/
 
-WRITE8_MEMBER(vcs_cart_slot_device::write_bank)
+void vcs_cart_slot_device::write_bank(address_space &space, offs_t offset, uint8_t data)
 {
 	if (m_cart)
-		m_cart->write_bank(space, offset, data, mem_mask);
+		m_cart->write_bank(space, offset, data);
 }
 
-WRITE8_MEMBER(vcs_cart_slot_device::write_ram)
+void vcs_cart_slot_device::write_ram(offs_t offset, uint8_t data)
 {
 	if (m_cart)
-		m_cart->write_ram(space, offset, data, mem_mask);
+		m_cart->write_ram(offset, data);
 }

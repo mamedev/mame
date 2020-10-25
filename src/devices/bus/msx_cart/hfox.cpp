@@ -45,7 +45,7 @@ void msx_cart_hfox_device::initialize_cartridge()
 {
 	if (get_rom_size() < 0x10000)
 	{
-		fatalerror("rtype: Invalid ROM size\n");
+		fatalerror("hfox: Invalid ROM size\n");
 	}
 
 	restore_banks();

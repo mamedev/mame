@@ -1016,7 +1016,7 @@ void m6801_cpu_device::device_reset()
 	OCD = 0xffff;
 	TOD = 0xffff;
 	m_timer_next = 0xffff;
-	m_ram_ctrl |= 0x40;
+	m_ram_ctrl |= 0x78;
 	m_latch09 = 0;
 
 	m_trcsr = M6801_TRCSR_TDRE;

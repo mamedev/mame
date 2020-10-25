@@ -12,8 +12,10 @@ No diagram has been found. The following is guesswork.
 Test sequence: Press -, enter an address, press = to show contents, press
                up/down-arrow to cycle through addresses.
 
+Paste test: -=11H22H33H44H55H66H77H88H99HK-1000=
+Now press UP to see that the data has been entered.
+
 ToDo:
-- Artwork
 - Keys are a guess, need to be confirmed.
 - Needs to be tested by a subject-matter expert.
 - i8255 to be added (address is unknown)
@@ -35,6 +37,7 @@ ToDo:
 #include "machine/i8279.h"
 #include "bus/rs232/rs232.h"
 #include "machine/clock.h"
+#include "video/pwm.h"
 #include "selz80.lh"
 
 
@@ -45,36 +48,48 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_p_ram(*this, "ram")
-		, m_keyboard(*this, "X%u", 0)
+		, m_io_keyboard(*this, "X%u", 0U)
 		, m_clock(*this, "uart_clock")
-		, m_digits(*this, "digit%u", 0U)
+		, m_display(*this, "display")
 	{ }
 
 	void selz80(machine_config &config);
+
+protected:
+	void scanlines_w(uint8_t data);
+	void digit_w(uint8_t data);
+	uint8_t kbd_r();
+
+	void selz80_io(address_map &map);
+
+	u8 m_digit;
+	u8 m_seg;
+	void setup_baud();
+	void machine_start() override;
+	required_device<cpu_device> m_maincpu;
+	optional_shared_ptr<u8> m_p_ram;
+	required_ioport_array<4> m_io_keyboard;
+	required_device<clock_device> m_clock;
+	required_device<pwm_display_device> m_display;
+
+private:
+	void selz80_mem(address_map &map);
+	void machine_reset() override;
+
+};
+
+class dagz80_state : public selz80_state
+{
+public:
+	using selz80_state::selz80_state;
 	void dagz80(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(scanlines_w);
-	DECLARE_WRITE8_MEMBER(digit_w);
-	DECLARE_READ8_MEMBER(kbd_r);
-	DECLARE_MACHINE_RESET(dagz80);
-	DECLARE_MACHINE_RESET(selz80);
-
 	void dagz80_mem(address_map &map);
-	void selz80_io(address_map &map);
-	void selz80_mem(address_map &map);
-
-	uint8_t m_digit;
-	void setup_baud();
-	required_device<cpu_device> m_maincpu;
-	optional_shared_ptr<uint8_t> m_p_ram;
-	required_ioport_array<4> m_keyboard;
-	required_device<clock_device> m_clock;
-	output_finder<8> m_digits;
-	virtual void machine_start() override;
+	void machine_reset() override;
 };
 
-void selz80_state::dagz80_mem(address_map &map)
+void dagz80_state::dagz80_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).ram().share("ram");
@@ -112,9 +127,9 @@ RG EN SA SD     0(AF)  1(BC)  2(DE)  3(HL)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D FL") PORT_CODE(KEYCODE_D) PORT_CHAR('D')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C IS") PORT_CODE(KEYCODE_C) PORT_CHAR('C')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("MM") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RN") PORT_CODE(KEYCODE_W)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SS") PORT_CODE(KEYCODE_R)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RS") PORT_CODE(KEYCODE_T)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RN") PORT_CODE(KEYCODE_W) PORT_CHAR('W')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SS") PORT_CODE(KEYCODE_R) PORT_CHAR('R')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RS") PORT_CODE(KEYCODE_T) PORT_CHAR('T')
 
 	PORT_START("X1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B SP") PORT_CODE(KEYCODE_B) PORT_CHAR('B')
@@ -123,8 +138,8 @@ RG EN SA SD     0(AF)  1(BC)  2(DE)  3(HL)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8 IX") PORT_CODE(KEYCODE_8) PORT_CHAR('8')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("TR (tape read)") PORT_CODE(KEYCODE_Y)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("TW (tape write)") PORT_CODE(KEYCODE_U)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("BP") PORT_CODE(KEYCODE_I)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("EX") PORT_CODE(KEYCODE_O)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("BP") PORT_CODE(KEYCODE_I) PORT_CHAR('I')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("EX") PORT_CODE(KEYCODE_O) PORT_CHAR('O')
 
 	PORT_START("X2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7 HL'") PORT_CODE(KEYCODE_7) PORT_CHAR('7')
@@ -133,18 +148,18 @@ RG EN SA SD     0(AF)  1(BC)  2(DE)  3(HL)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4 AF'") PORT_CODE(KEYCODE_4) PORT_CHAR('4')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("+") PORT_CODE(KEYCODE_UP) PORT_CHAR('^')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("-") PORT_CODE(KEYCODE_DOWN) PORT_CHAR('V')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("IN") PORT_CODE(KEYCODE_S)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RL") PORT_CODE(KEYCODE_G)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("IN") PORT_CODE(KEYCODE_S) PORT_CHAR('S')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RL") PORT_CODE(KEYCODE_G) PORT_CHAR('G')
 
 	PORT_START("X3")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3 HL") PORT_CODE(KEYCODE_3) PORT_CHAR('3')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2 DE") PORT_CODE(KEYCODE_2) PORT_CHAR('2')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1 BC") PORT_CODE(KEYCODE_1) PORT_CHAR('1')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0 AF") PORT_CODE(KEYCODE_0) PORT_CHAR('0')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SD") PORT_CODE(KEYCODE_H)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SD") PORT_CODE(KEYCODE_H) PORT_CHAR('H')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SA") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("EN") PORT_CODE(KEYCODE_K)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RG") PORT_CODE(KEYCODE_L)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("EN") PORT_CODE(KEYCODE_K) PORT_CHAR('K')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RG") PORT_CODE(KEYCODE_L) PORT_CHAR('L')
 
 	PORT_START("BJ") // baud jumper
 	/* not connected to cpu, each pair of pins is connected directly to the output
@@ -176,12 +191,18 @@ void selz80_state::setup_baud()
 	}
 }
 
-MACHINE_RESET_MEMBER(selz80_state, selz80)
+void selz80_state::machine_start()
+{
+	save_item(NAME(m_digit));
+	save_item(NAME(m_seg));
+}
+
+void selz80_state::machine_reset()
 {
 	setup_baud();
 }
 
-MACHINE_RESET_MEMBER(selz80_state, dagz80)
+void dagz80_state::machine_reset()
 {
 	setup_baud();
 	uint8_t* rom = memregion("user1")->base();
@@ -190,45 +211,42 @@ MACHINE_RESET_MEMBER(selz80_state, dagz80)
 	m_maincpu->reset();
 }
 
-WRITE8_MEMBER( selz80_state::scanlines_w )
+void selz80_state::scanlines_w(uint8_t data)
 {
 	m_digit = data;
+	m_display->matrix(1 << m_digit, m_seg);
 }
 
-WRITE8_MEMBER( selz80_state::digit_w )
+void selz80_state::digit_w(uint8_t data)
 {
-	if (m_digit < 8)
-		m_digits[m_digit] = bitswap<8>(data, 3, 2, 1, 0, 7, 6, 5, 4);
+	m_seg = bitswap<8>(data, 3, 2, 1, 0, 7, 6, 5, 4);
+	m_display->matrix(1 << m_digit, m_seg);
 }
 
-READ8_MEMBER( selz80_state::kbd_r )
+uint8_t selz80_state::kbd_r()
 {
 	uint8_t data = 0xff;
 
-	if (m_digit < 4)
-		data = m_keyboard[m_digit]->read();
+	if ((m_digit & 7) < 4)
+		data = m_io_keyboard[m_digit & 3]->read();
 
 	return data;
-}
-
-void selz80_state::machine_start()
-{
-	m_digits.resolve();
 }
 
 void selz80_state::selz80(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(4'000'000)); // it's actually a 5MHz XTAL with a NEC uPD780C-1 cpu
+	Z80(config, m_maincpu, 4.9152_MHz_XTAL / 2); // NEC uPD780C-1 cpu
 	m_maincpu->set_addrmap(AS_PROGRAM, &selz80_state::selz80_mem);
 	m_maincpu->set_addrmap(AS_IO, &selz80_state::selz80_io);
-	MCFG_MACHINE_RESET_OVERRIDE(selz80_state, selz80 )
 
 	/* video hardware */
 	config.set_default_layout(layout_selz80);
+	PWM_DISPLAY(config, m_display).set_size(8, 8);
+	m_display->set_segmask(0xff, 0xff);
 
 	/* Devices */
-	CLOCK(config, m_clock, 153600);
+	CLOCK(config, m_clock, 153'600);
 	m_clock->signal_handler().set("uart", FUNC(i8251_device::write_txc));
 	m_clock->signal_handler().append("uart", FUNC(i8251_device::write_rxc));
 
@@ -242,7 +260,7 @@ void selz80_state::selz80(machine_config &config)
 	rs232.dsr_handler().set("uart", FUNC(i8251_device::write_dsr));
 	rs232.cts_handler().set("uart", FUNC(i8251_device::write_cts));
 
-	i8279_device &kbdc(I8279(config, "i8279", 5000000 / 2)); // based on divider
+	i8279_device &kbdc(I8279(config, "i8279", 4.9152_MHz_XTAL / 2)); // based on divider
 	kbdc.out_sl_callback().set(FUNC(selz80_state::scanlines_w));    // scan SL lines
 	kbdc.out_disp_callback().set(FUNC(selz80_state::digit_w));      // display A&B
 	kbdc.in_rl_callback().set(FUNC(selz80_state::kbd_r));           // kbd RL lines
@@ -250,11 +268,10 @@ void selz80_state::selz80(machine_config &config)
 	kbdc.in_ctrl_callback().set_constant(1);
 }
 
-void selz80_state::dagz80(machine_config &config)
+void dagz80_state::dagz80(machine_config &config)
 {
 	selz80(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &selz80_state::dagz80_mem);
-	MCFG_MACHINE_RESET_OVERRIDE(selz80_state, dagz80 )
+	m_maincpu->set_addrmap(AS_PROGRAM, &dagz80_state::dagz80_mem);
 }
 
 
@@ -278,5 +295,5 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME           FLAGS
-COMP( 1985, selz80, 0,      0,      selz80,  selz80, selz80_state, empty_init, "SEL",   "SEL Z80 Trainer", MACHINE_NO_SOUND_HW)
-COMP( 1988, dagz80, selz80, 0,      dagz80,  selz80, selz80_state, empty_init, "DAG",   "DAG Z80 Trainer", MACHINE_NO_SOUND_HW)
+COMP( 1985, selz80, 0,      0,      selz80,  selz80, selz80_state, empty_init, "SEL",   "SEL Z80 Trainer", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1988, dagz80, selz80, 0,      dagz80,  selz80, dagz80_state, empty_init, "DAG",   "DAG Z80 Trainer", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

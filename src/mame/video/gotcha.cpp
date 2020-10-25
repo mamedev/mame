@@ -10,7 +10,7 @@
 
 ***************************************************************************/
 
-TILEMAP_MAPPER_MEMBER(gotcha_state::gotcha_tilemap_scan)
+TILEMAP_MAPPER_MEMBER(gotcha_state::tilemap_scan)
 {
 	return (col & 0x1f) | (row << 5) | ((col & 0x20) << 5);
 }
@@ -43,8 +43,8 @@ TILE_GET_INFO_MEMBER(gotcha_state::bg_get_tile_info)
 
 void gotcha_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gotcha_state::fg_get_tile_info)), tilemap_mapper_delegate(*this, FUNC(gotcha_state::gotcha_tilemap_scan)), 16, 16, 64, 32);
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gotcha_state::bg_get_tile_info)), tilemap_mapper_delegate(*this, FUNC(gotcha_state::gotcha_tilemap_scan)), 16, 16, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gotcha_state::fg_get_tile_info)), tilemap_mapper_delegate(*this, FUNC(gotcha_state::tilemap_scan)), 16, 16, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gotcha_state::bg_get_tile_info)), tilemap_mapper_delegate(*this, FUNC(gotcha_state::tilemap_scan)), 16, 16, 64, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 
@@ -53,37 +53,33 @@ void gotcha_state::video_start()
 }
 
 
-WRITE16_MEMBER(gotcha_state::gotcha_fgvideoram_w)
+void gotcha_state::fgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fgvideoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(gotcha_state::gotcha_bgvideoram_w)
+void gotcha_state::bgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bgvideoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(gotcha_state::gotcha_gfxbank_select_w)
+void gotcha_state::gfxbank_select_w(uint8_t data)
 {
-	if (ACCESSING_BITS_8_15)
-		m_banksel = (data & 0x0300) >> 8;
+	m_banksel = data & 0x03;
 }
 
-WRITE16_MEMBER(gotcha_state::gotcha_gfxbank_w)
+void gotcha_state::gfxbank_w(uint8_t data)
 {
-	if (ACCESSING_BITS_8_15)
+	if (m_gfxbank[m_banksel] != (data & 0x0f))
 	{
-		if (m_gfxbank[m_banksel] != ((data & 0x0f00) >> 8))
-		{
-			m_gfxbank[m_banksel] = (data & 0x0f00) >> 8;
-			machine().tilemap().mark_all_dirty();
-		}
+		m_gfxbank[m_banksel] = data & 0x0f;
+		machine().tilemap().mark_all_dirty();
 	}
 }
 
-WRITE16_MEMBER(gotcha_state::gotcha_scroll_w)
+void gotcha_state::scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scroll[offset]);
 
@@ -97,10 +93,10 @@ WRITE16_MEMBER(gotcha_state::gotcha_scroll_w)
 }
 
 
-uint32_t gotcha_state::screen_update_gotcha(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gotcha_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect);
+	m_fg_tilemap->draw(screen, bitmap, cliprect);
 	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
 	return 0;
 }

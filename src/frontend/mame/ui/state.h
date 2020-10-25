@@ -7,13 +7,15 @@
     Menus for saving and loading state
 
 ***************************************************************************/
-
-#pragma once
-
 #ifndef MAME_FRONTEND_UI_STATE_H
 #define MAME_FRONTEND_UI_STATE_H
 
+#pragma once
+
 #include "ui/menu.h"
+
+#include <chrono>
+#include <unordered_map>
 
 namespace ui {
 
@@ -54,14 +56,15 @@ private:
 
 	std::unordered_map<std::string, file_entry>     m_file_entries;
 	std::unordered_map<std::string, std::string>    m_filename_to_code_map;
-	const char *                                    m_header;
-	const char *                                    m_footer;
-	bool                                            m_must_exist;
-	bool                                            m_pause_checked;
+	char const *const                               m_header;
+	char const *const                               m_footer;
+	bool const                                      m_must_exist;
 	bool                                            m_was_paused;
+	bool                                            m_keys_released;
 
 	static void *itemref_from_file_entry(const file_entry &entry);
 	static const file_entry &file_entry_from_itemref(void *itemref);
+
 	void try_select_slot(std::string &&name);
 	void slot_selected(std::string &&name);
 	std::string state_directory() const;
@@ -92,6 +95,6 @@ protected:
 	virtual void process_file(std::string &&file_name) override;
 };
 
-};
+} // namespace ui
 
 #endif // MAME_FRONTEND_UI_STATE_H

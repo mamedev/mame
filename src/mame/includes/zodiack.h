@@ -22,10 +22,10 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(sound_nmi_enable_w);
-	DECLARE_WRITE8_MEMBER(master_soundlatch_w);
-	DECLARE_WRITE8_MEMBER(control_w);
+	void nmi_mask_w(uint8_t data);
+	void sound_nmi_enable_w(uint8_t data);
+	void master_soundlatch_w(uint8_t data);
+	void control_w(uint8_t data);
 
 	// devices
 	required_device<z80_device> m_maincpu;

@@ -76,9 +76,9 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
 	DECLARE_WRITE_LINE_MEMBER(write_printer_clock);
 
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE8_MEMBER(text_control_w);
-	DECLARE_WRITE8_MEMBER(vmem_w);
+	void control_w(uint8_t data);
+	void text_control_w(uint8_t data);
+	void vmem_w(offs_t offset, uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -160,13 +160,13 @@ void sm7238_state::video_start()
 {
 }
 
-WRITE8_MEMBER(sm7238_state::control_w)
+void sm7238_state::control_w(uint8_t data)
 {
 	LOG("Control Write: %02xh: lut %d nvram %d c2 %d iack %d\n",
 		data, BIT(data, 0), BIT(data, 2), BIT(data, 3), BIT(data, 5));
 }
 
-WRITE8_MEMBER(sm7238_state::text_control_w)
+void sm7238_state::text_control_w(uint8_t data)
 {
 	if (data ^ m_video.control)
 	{
@@ -189,7 +189,7 @@ WRITE8_MEMBER(sm7238_state::text_control_w)
 	m_video.control = data;
 }
 
-WRITE8_MEMBER(sm7238_state::vmem_w)
+void sm7238_state::vmem_w(offs_t offset, uint8_t data)
 {
 	m_p_videoram[offset] = data;
 	m_p_videoram[offset + 0x1000] = data;
@@ -228,30 +228,30 @@ void sm7238_state::recompute_parameters()
 
 uint32_t sm7238_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y, ra, gfx, fg, bg, attr, ctl1, ctl2 = 0;
-	uint16_t chr, chraddr, sy = 0, ma = 0, x = 0;
-	bool double_width = false, double_height = false, bottom_half = false;
-	bool blink((m_screen->frame_number() % 30) > 14); // XXX guess
-
 	if (!BIT(m_video.control, 3))
 	{
 		bitmap.fill(0);
 		return 0;
 	}
 
-	for (y = 0; y < 26; y++)
+	uint8_t ctl2 = 0;
+	uint16_t sy = 0, ma = 0;
+	bool double_width = false, double_height = false, bottom_half = false;
+	bool blink((m_screen->frame_number() % 30) > 14); // XXX guess
+
+	for (uint8_t y = 0; y < 26; y++)
 	{
-		for (ra = 0; ra < 10; ra++)
+		for (uint8_t ra = 0; ra < 10; ra++)
 		{
 			if (y == 1 && ctl2 && ra < ctl2)
 				continue;
 
-			uint16_t *p = &bitmap.pix16(sy++, 0);
+			uint16_t *p = &bitmap.pix(sy++, 0);
 
-			for (x = ma; x < ma + m_video.stride; x++)
+			for (uint16_t x = ma; x < ma + m_video.stride; x++)
 			{
-				chr = m_p_videoram[x] << 4;
-				attr = m_p_videoram[x + 0x1000];
+				uint16_t chr = m_p_videoram[x] << 4;
+				uint8_t const attr = m_p_videoram[x + 0x1000];
 
 				// alternate font 1
 				if (BIT(attr, 6))
@@ -259,9 +259,10 @@ uint32_t sm7238_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 					chr += 0x1000;
 				}
 
-				bg = 0;
-				fg = 1;
+				uint8_t bg = 0;
+				uint8_t fg = 1;
 
+				uint16_t chraddr;
 				if (double_height)
 				{
 					chraddr = chr | (bottom_half ? (5 + (ra >> 1)) : (ra >> 1));
@@ -272,6 +273,7 @@ uint32_t sm7238_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 				}
 
 				// alternate font 2 (downloadable font) -- only in models .05 and .06
+				uint8_t gfx;
 				if (BIT(attr, 7) && m_p_charram[chr + 15])
 				{
 					gfx = m_p_charram[chraddr] ^ 255;
@@ -318,7 +320,7 @@ uint32_t sm7238_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 				if (double_width) x++;
 			}
 		}
-		ctl1 = m_p_videoram[ma + 0x1000 + m_video.stride];
+		uint8_t const ctl1 = m_p_videoram[ma + 0x1000 + m_video.stride];
 		double_width = BIT(ctl1, 6);
 		double_height = BIT(ctl1, 7);
 		bottom_half = BIT(ctl1, 5);

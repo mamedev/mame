@@ -34,14 +34,15 @@ public:
 	void evmbug(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(rs232_r);
-	DECLARE_WRITE8_MEMBER(rs232_w);
+	uint8_t rs232_r(offs_t offset);
+	void rs232_w(offs_t offset, uint8_t data);
 	void kbd_put(u8 data);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
 	virtual void machine_reset() override;
+	virtual void machine_start() override;
 	uint8_t m_term_data;
 	uint8_t m_term_out;
 	bool m_rin;
@@ -67,7 +68,7 @@ void evmbug_state::io_map(address_map &map)
 static INPUT_PORTS_START( evmbug )
 INPUT_PORTS_END
 
-READ8_MEMBER( evmbug_state::rs232_r )
+uint8_t evmbug_state::rs232_r(offs_t offset)
 {
 	if (offset < 8)
 		return BIT(m_term_data, offset);
@@ -84,7 +85,7 @@ READ8_MEMBER( evmbug_state::rs232_r )
 		return 0;
 }
 
-WRITE8_MEMBER( evmbug_state::rs232_w )
+void evmbug_state::rs232_w(offs_t offset, uint8_t data)
 {
 	if (offset < 8)
 	{
@@ -115,6 +116,14 @@ void evmbug_state::machine_reset()
 	m_maincpu->reset_line(ASSERT_LINE);
 }
 
+void evmbug_state::machine_start()
+{
+	save_item(NAME(m_term_data));
+	save_item(NAME(m_term_out));
+	save_item(NAME(m_rin));
+	save_item(NAME(m_rbrl));
+}
+
 void evmbug_state::evmbug(machine_config &config)
 {
 	// basic machine hardware
@@ -133,11 +142,11 @@ void evmbug_state::evmbug(machine_config &config)
 
 /* ROM definition */
 ROM_START( evmbug )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "evmbug.bin", 0x0000, 0x8000, CRC(a239ec56) SHA1(65b500d7d0f897ce0c320cf3ec32ff4042774599) )
 ROM_END
 
 /* Driver */
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY              FULLNAME    FLAGS
-COMP( 19??, evmbug, 0,      0,      evmbug,  evmbug, evmbug_state, empty_init, "Texas Instruments", "TMAM6095", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 19??, evmbug, 0,      0,      evmbug,  evmbug, evmbug_state, empty_init, "Texas Instruments", "TMAM6095", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

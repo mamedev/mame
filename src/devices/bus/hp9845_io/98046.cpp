@@ -78,7 +78,7 @@ hp98046_io_card_device::~hp98046_io_card_device()
 {
 }
 
-READ16_MEMBER(hp98046_io_card_device::reg_r)
+uint16_t hp98046_io_card_device::reg_r(address_space &space, offs_t offset)
 {
 	uint16_t res = 0;
 
@@ -129,7 +129,7 @@ READ16_MEMBER(hp98046_io_card_device::reg_r)
 	return res;
 }
 
-WRITE16_MEMBER(hp98046_io_card_device::reg_w)
+void hp98046_io_card_device::reg_w(address_space &space, offs_t offset, uint16_t data)
 {
 	LOG_CPU("wr R%u=%04x\n" , offset + 4 , data);
 
@@ -291,12 +291,12 @@ void hp98046_io_card_device::cpu_io_map(address_map &map)
 	map(0 , 0xff).rw(FUNC(hp98046_io_card_device::cpu_r) , FUNC(hp98046_io_card_device::cpu_w));
 }
 
-READ8_MEMBER(hp98046_io_card_device::ram_r)
+uint8_t hp98046_io_card_device::ram_r(offs_t offset)
 {
 	return m_ram[ offset ];
 }
 
-READ8_MEMBER(hp98046_io_card_device::cpu_r)
+uint8_t hp98046_io_card_device::cpu_r(offs_t offset)
 {
 	if (BIT(m_port_2 , 2)) {
 		return m_ram[ (offset & 0xff) | (uint16_t(m_port_2 & 3) << 8) ];
@@ -342,7 +342,7 @@ READ8_MEMBER(hp98046_io_card_device::cpu_r)
 	}
 }
 
-WRITE8_MEMBER(hp98046_io_card_device::cpu_w)
+void hp98046_io_card_device::cpu_w(offs_t offset, uint8_t data)
 {
 	if (BIT(m_port_2 , 2)) {
 		m_ram[ (offset & 0xff) | (uint16_t(m_port_2 & 3) << 8) ] = data;
@@ -414,7 +414,7 @@ WRITE8_MEMBER(hp98046_io_card_device::cpu_w)
 	}
 }
 
-READ8_MEMBER(hp98046_io_card_device::p1_r)
+uint8_t hp98046_io_card_device::p1_r()
 {
 	uint8_t res = 0;
 	// b7: b8 of word @ txFIFO head
@@ -453,7 +453,7 @@ READ8_MEMBER(hp98046_io_card_device::p1_r)
 	return res;
 }
 
-WRITE8_MEMBER(hp98046_io_card_device::p2_w)
+void hp98046_io_card_device::p2_w(uint8_t data)
 {
 	LOG_MCU("p2=%02x\n" , data);
 	uint8_t diff = data ^ m_port_2;

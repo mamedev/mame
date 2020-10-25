@@ -22,7 +22,7 @@
 
  *****************************************************************************
 
-   NES_APU.C
+   NES_APU.CPP
 
    Actual NES APU interface.
 
@@ -81,27 +81,10 @@ void nesapu_device::create_syncs(unsigned long sps)
 	}
 }
 
-/* INITIALIZE NOISE LOOKUP TABLE */
-static void create_noise(u8 *buf, const int bits, int size)
-{
-	int m = 0x0011;
-	int xor_val, i;
-
-	for (i = 0; i < size; i++)
-	{
-		xor_val = m & 1;
-		m >>= 1;
-		xor_val ^= (m & 1);
-		m |= xor_val << (bits - 1);
-
-		buf[i] = m;
-	}
-}
-
 DEFINE_DEVICE_TYPE(NES_APU, nesapu_device, "nesapu", "N2A03 APU")
 
-nesapu_device::nesapu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, NES_APU, tag, owner, clock)
+nesapu_device::nesapu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_samps_per_sync(0)
 	, m_buffer_size(0)
@@ -109,11 +92,6 @@ nesapu_device::nesapu_device(const machine_config &mconfig, const char *tag, dev
 	, m_irq_handler(*this)
 	, m_mem_read_cb(*this)
 {
-	for (auto & elem : m_noise_lut)
-	{
-		elem = 0;
-	}
-
 	for (auto & elem : m_vbl_times)
 	{
 		elem = 0;
@@ -128,6 +106,11 @@ nesapu_device::nesapu_device(const machine_config &mconfig, const char *tag, dev
 	{
 		elem = 0;
 	}
+}
+
+nesapu_device::nesapu_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock)
+	: nesapu_device(mconfig, NES_APU, tag, owner, clock)
+{
 }
 
 void nesapu_device::device_reset()
@@ -156,7 +139,7 @@ void nesapu_device::calculate_rates()
 	if (m_stream != nullptr)
 		m_stream->set_sample_rate(rate);
 	else
-		m_stream = machine().sound().stream_alloc(*this, 0, 1, rate);
+		m_stream = stream_alloc(0, 1, rate);
 }
 
 //-------------------------------------------------
@@ -168,8 +151,6 @@ void nesapu_device::device_start()
 	// resolve callbacks
 	m_irq_handler.resolve_safe();
 	m_mem_read_cb.resolve_safe(0x00);
-
-	create_noise(m_noise_lut, 13, apu_t::NOISE_LONG);
 
 	calculate_rates();
 
@@ -199,7 +180,7 @@ void nesapu_device::device_start()
 	save_item(NAME(m_APU.tri.enabled));
 
 	save_item(NAME(m_APU.noi.regs));
-	save_item(NAME(m_APU.noi.cur_pos));
+	save_item(NAME(m_APU.noi.seed));
 	save_item(NAME(m_APU.noi.vbl_length));
 	save_item(NAME(m_APU.noi.phaseacc));
 	save_item(NAME(m_APU.noi.output_vol));
@@ -409,12 +390,7 @@ s8 nesapu_device::apu_noise(apu_t::noise_t *chan)
 	while (chan->phaseacc < 0)
 	{
 		chan->phaseacc += freq;
-
-		chan->cur_pos++;
-		if (apu_t::NOISE_SHORT == chan->cur_pos && (chan->regs[2] & 0x80))
-			chan->cur_pos = 0;
-		else if (apu_t::NOISE_LONG == chan->cur_pos)
-			chan->cur_pos = 0;
+		chan->seed = (chan->seed >> 1) | ((BIT(chan->seed, 0) ^ BIT(chan->seed, (chan->regs[2] & 0x80) ? 6 : 1)) << 14);
 	}
 
 	if (chan->regs[0] & 0x10) /* fixed volume */
@@ -422,11 +398,11 @@ s8 nesapu_device::apu_noise(apu_t::noise_t *chan)
 	else
 		outvol = 0x0F - chan->env_vol;
 
-	output = m_noise_lut[chan->cur_pos];
+	output = chan->seed & 0xff;
 	if (output > outvol)
 		output = outvol;
 
-	if (m_noise_lut[chan->cur_pos] & 0x80) /* make it negative */
+	if (chan->seed & 0x80) /* make it negative */
 		output = -output;
 
 	return (s8) output;
@@ -757,12 +733,12 @@ void nesapu_device::write(offs_t address, u8 value)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void nesapu_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void nesapu_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	int accum;
-	memset( outputs[0], 0, samples*sizeof(*outputs[0]) );
+	auto &output = outputs[0];
 
-	while (samples--)
+	for (int sampindex = 0; sampindex < output.samples(); sampindex++)
 	{
 		accum = apu_square(&m_APU.squ[0]);
 		accum += apu_square(&m_APU.squ[1]);
@@ -770,12 +746,6 @@ void nesapu_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 		accum += apu_noise(&m_APU.noi);
 		accum += apu_dpcm(&m_APU.dpcm);
 
-		/* 8-bit clamps */
-		if (accum > 127)
-			accum = 127;
-		else if (accum < -128)
-			accum = -128;
-
-		*(outputs[0]++)=accum<<8;
+		output.put_int_clamp(sampindex, accum, 128);
 	}
 }

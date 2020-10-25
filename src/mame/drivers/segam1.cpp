@@ -67,8 +67,8 @@ public:
 	void segam1(machine_config &config);
 
 private:
-	DECLARE_WRITE16_MEMBER(paletteram_w);
-	DECLARE_WRITE8_MEMBER(sound_a0_bank_w);
+	void paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sound_a0_bank_w(uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -99,14 +99,14 @@ void segam1_state::video_start()
 {
 }
 
-WRITE8_MEMBER(segam1_state::sound_a0_bank_w)
+void segam1_state::sound_a0_bank_w(uint8_t data)
 {
 	membank("soundbank")->set_entry(data & 0x0f);
 }
 
 // 315-5242
 
-WRITE16_MEMBER(segam1_state::paletteram_w)
+void segam1_state::paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_paletteram[offset]);
 	data = m_paletteram[offset];

@@ -418,35 +418,35 @@ private:
 	int m_printer_motor;
 	emu_timer *m_power_timer;
 
-	DECLARE_READ8_MEMBER(ldsw);
-	DECLARE_READ8_MEMBER(cgdrr);
-	DECLARE_WRITE8_MEMBER(cgdrw);
-	DECLARE_WRITE8_MEMBER(u3_p0);
-	DECLARE_READ8_MEMBER(u3_p2);
-	DECLARE_READ8_MEMBER(u3_p3);
-	DECLARE_READ8_MEMBER(bv_p0);
-	DECLARE_READ8_MEMBER(bv_p1);
-	DECLARE_READ8_MEMBER(mkiv_pia_ina);
-	DECLARE_WRITE8_MEMBER(mkiv_pia_outa);
-	DECLARE_WRITE8_MEMBER(mlamps);
-	DECLARE_READ8_MEMBER(cashcade_r);
-	DECLARE_WRITE8_MEMBER(mk4_printer_w);
-	DECLARE_READ8_MEMBER(mk4_printer_r);
+	uint8_t ldsw();
+	uint8_t cgdrr();
+	void cgdrw(uint8_t data);
+	void u3_p0(uint8_t data);
+	uint8_t u3_p2();
+	uint8_t u3_p3();
+	uint8_t bv_p0();
+	uint8_t bv_p1();
+	uint8_t mkiv_pia_ina();
+	void mkiv_pia_outa(uint8_t data);
+	void mlamps(uint8_t data);
+	uint8_t cashcade_r();
+	void mk4_printer_w(uint8_t data);
+	uint8_t mk4_printer_r();
 	DECLARE_WRITE_LINE_MEMBER(mkiv_pia_ca2);
 	DECLARE_WRITE_LINE_MEMBER(mkiv_pia_cb2);
-	DECLARE_WRITE8_MEMBER(mkiv_pia_outb);
-	DECLARE_READ8_MEMBER(via_a_r);
-	DECLARE_READ8_MEMBER(via_b_r);
-	DECLARE_WRITE8_MEMBER(via_a_w);
-	DECLARE_WRITE8_MEMBER(via_b_w);
+	void mkiv_pia_outb(uint8_t data);
+	uint8_t via_a_r();
+	uint8_t via_b_r();
+	void via_a_w(uint8_t data);
+	void via_b_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(via_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(via_cb2_w);
-	DECLARE_WRITE8_MEMBER(pblp_out);
-	DECLARE_WRITE8_MEMBER(pbltlp_out);
-	DECLARE_WRITE8_MEMBER(zn434_w);
-	DECLARE_READ8_MEMBER(pa1_r);
-	DECLARE_READ8_MEMBER(pb1_r);
-	DECLARE_READ8_MEMBER(pc1_r);
+	void pblp_out(uint8_t data);
+	void pbltlp_out(uint8_t data);
+	void zn434_w(uint8_t data);
+	uint8_t pa1_r();
+	uint8_t pb1_r();
+	uint8_t pc1_r();
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -539,7 +539,7 @@ uint32_t aristmk4_state::screen_update_aristmk4(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-READ8_MEMBER(aristmk4_state::ldsw)
+uint8_t aristmk4_state::ldsw()
 {
 	int U3_p2_ret= ioport("5002")->read();
 	if(U3_p2_ret & 0x1)
@@ -549,7 +549,7 @@ READ8_MEMBER(aristmk4_state::ldsw)
 	return m_cgdrsw = ioport("5005")->read();
 }
 
-READ8_MEMBER(aristmk4_state::cgdrr)
+uint8_t aristmk4_state::cgdrr()
 {
 	if(m_cgdrsw) // is the LC closed
 	{
@@ -558,12 +558,12 @@ READ8_MEMBER(aristmk4_state::cgdrr)
 	return 0x0; // otherwise the counter outputs are set low.
 }
 
-WRITE8_MEMBER(aristmk4_state::cgdrw)
+void aristmk4_state::cgdrw(uint8_t data)
 {
 	m_ripple = data;
 }
 
-WRITE8_MEMBER(aristmk4_state::u3_p0)
+void aristmk4_state::u3_p0(uint8_t data)
 {
 	m_u3_p0_w = data;
 
@@ -575,7 +575,7 @@ WRITE8_MEMBER(aristmk4_state::u3_p0)
 	//logerror("u3_p0_w: %02X\n",m_u3_p0_w);
 }
 
-READ8_MEMBER(aristmk4_state::u3_p2)
+uint8_t aristmk4_state::u3_p2()
 {
 	int u3_p2_ret= ioport("5002")->read();
 	int u3_p3_ret= ioport("5003")->read();
@@ -600,7 +600,7 @@ READ8_MEMBER(aristmk4_state::u3_p2)
 	return u3_p2_ret;
 }
 
-READ8_MEMBER(aristmk4_state::u3_p3)
+uint8_t aristmk4_state::u3_p3()
 {
 	int u3_p3_ret= ioport("5003")->read();
 
@@ -621,7 +621,7 @@ TIMER_CALLBACK_MEMBER(aristmk4_state::note_input_reset)
 	m_insnote=0; //reset note input after 150msec
 }
 
-READ8_MEMBER(aristmk4_state::bv_p0)
+uint8_t aristmk4_state::bv_p0()
 {
 	int bv_p0_ret=0x00;
 
@@ -644,7 +644,7 @@ READ8_MEMBER(aristmk4_state::bv_p0)
 
 }
 
-READ8_MEMBER(aristmk4_state::bv_p1)
+uint8_t aristmk4_state::bv_p1()
 {
 	int bv_p1_ret=0x00;
 
@@ -676,7 +676,7 @@ PORTB - MECHANICAL METERS
 ******************************************************************************/
 
 //input a
-READ8_MEMBER(aristmk4_state::mkiv_pia_ina)
+uint8_t aristmk4_state::mkiv_pia_ina()
 {
 	/* uncomment this code once RTC is fixed */
 
@@ -685,7 +685,7 @@ READ8_MEMBER(aristmk4_state::mkiv_pia_ina)
 }
 
 //output a
-WRITE8_MEMBER(aristmk4_state::mkiv_pia_outa)
+void aristmk4_state::mkiv_pia_outa(uint8_t data)
 {
 	if(m_rtc_data_strobe)
 	{
@@ -714,7 +714,7 @@ WRITE_LINE_MEMBER(aristmk4_state::mkiv_pia_cb2)
 }
 
 //output b
-WRITE8_MEMBER(aristmk4_state::mkiv_pia_outb)
+void aristmk4_state::mkiv_pia_outb(uint8_t data)
 {
 	uint8_t emet[5];
 	int i = 0;
@@ -792,7 +792,7 @@ TIMER_CALLBACK_MEMBER(aristmk4_state::hopper_reset)
 }
 
 // Port A read (SW1)
-READ8_MEMBER(aristmk4_state::via_a_r)
+uint8_t aristmk4_state::via_a_r()
 {
 	int psg_ret=0;
 
@@ -810,7 +810,7 @@ READ8_MEMBER(aristmk4_state::via_a_r)
 	return psg_ret;
 }
 
-READ8_MEMBER(aristmk4_state::via_b_r)
+uint8_t aristmk4_state::via_b_r()
 {
 	int ret=ioport("via_port_b")->read();
 
@@ -861,13 +861,13 @@ READ8_MEMBER(aristmk4_state::via_b_r)
 	return ret;
 }
 
-WRITE8_MEMBER(aristmk4_state::via_a_w)
+void aristmk4_state::via_a_w(uint8_t data)
 {
 	//logerror("VIA port A write %02X\n",data);
 	m_psg_data = data;
 }
 
-WRITE8_MEMBER(aristmk4_state::via_b_w)
+void aristmk4_state::via_b_w(uint8_t data)
 {
 	m_ay8910_1 = ( data & 0x0F ) ; //only need first 4 bits per schematics
 		//NOTE: when bit 4 is off, we write to AY1, when bit 4 is on, we write to AY2
@@ -963,7 +963,7 @@ WRITE_LINE_MEMBER(aristmk4_state::via_cb2_w)
 
 // Lamp output
 
-WRITE8_MEMBER(aristmk4_state::pblp_out)
+void aristmk4_state::pblp_out(uint8_t data)
 {
 	m_lamps[ 1] = BIT(data, 0);
 	m_lamps[ 5] = BIT(data, 1);
@@ -976,7 +976,7 @@ WRITE8_MEMBER(aristmk4_state::pblp_out)
 	//logerror("Lights port A %02X\n",data);
 }
 
-WRITE8_MEMBER(aristmk4_state::pbltlp_out)
+void aristmk4_state::pbltlp_out(uint8_t data)
 {
 	m_lamps[ 8] = BIT(data, 0);
 	m_lamps[12] = BIT(data, 1);
@@ -989,32 +989,32 @@ WRITE8_MEMBER(aristmk4_state::pbltlp_out)
 	//logerror("Lights port B: %02X\n",data);
 }
 
-WRITE8_MEMBER(aristmk4_state::mlamps)
+void aristmk4_state::mlamps(uint8_t data)
 {
 	/* TAKE WIN AND GAMBLE LAMPS */
 	m_lamps[18] = BIT(data, 5);
 	m_lamps[13] = BIT(data, 6);
 }
 
-WRITE8_MEMBER(aristmk4_state::zn434_w)
+void aristmk4_state::zn434_w(uint8_t data)
 {
-	// Introducted to prevent warning in log for write to AY1 PORT B
-	// this is a write to the ZN434 DA convertors..
+	// Introduced to prevent warning in log for write to AY1 PORT B
+	// this is a write to the ZN434 DA converters..
 }
 
 
-READ8_MEMBER(aristmk4_state::cashcade_r)
+uint8_t aristmk4_state::cashcade_r()
 {
 	/* work around for cashcade games */
 	return cashcade_p[(m_cashcade_c++)%15];
 }
 
-WRITE8_MEMBER(aristmk4_state::mk4_printer_w)
+void aristmk4_state::mk4_printer_w(uint8_t data)
 {
 	//logerror("Printer: %c %d\n",data,data);
 }
 
-READ8_MEMBER(aristmk4_state::mk4_printer_r)
+uint8_t aristmk4_state::mk4_printer_r()
 {
 	return 0;
 }
@@ -1642,7 +1642,7 @@ static INPUT_PORTS_START(gldnpkr)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_CODE(KEYCODE_F)
 
 	PORT_MODIFY("500e")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_BET ) PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_CODE(KEYCODE_W)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Change") PORT_CODE(KEYCODE_A)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Hold 1 / Red") PORT_CODE(KEYCODE_S)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Hold 5 / Black") PORT_CODE(KEYCODE_H)
@@ -1685,17 +1685,17 @@ GFXDECODE_END
 
 /* read m/c number */
 
-READ8_MEMBER(aristmk4_state::pa1_r)
+uint8_t aristmk4_state::pa1_r()
 {
 	return (ioport("SW3")->read() << 4) + ioport("SW4")->read();
 }
 
-READ8_MEMBER(aristmk4_state::pb1_r)
+uint8_t aristmk4_state::pb1_r()
 {
 	return (ioport("SW5")->read() << 4) + ioport("SW6")->read();
 }
 
-READ8_MEMBER(aristmk4_state::pc1_r)
+uint8_t aristmk4_state::pc1_r()
 {
 	return 0;
 }
@@ -2342,47 +2342,49 @@ ROM_END
 ROM_START( fhunter )
 	ROM_REGION(0x10000, "maincpu", 0 )
 		/* VIDEO AND SOUND EPROM */
-	ROM_LOAD("2vas004.u59", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe))
-
+	ROM_LOAD("2vas004.u59", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // VIDEO SOUND 2VA/S004 U59/7 1AAA/FP34/8E00
+											// Alternate label:       VIDEO SOUND 2VA/S004/MEM/59/7 FP34/8E00
 		/* GAME EPROMs */
 	ROM_LOAD("2xf5196i01.u87", 0x06000, 0x2000, CRC(f9e6b760) SHA1(af7f16727e84ba8f07400f7f02302862e02d1af4))
 	ROM_LOAD("2xf5196i01.u86", 0x08000, 0x8000, CRC(6971ccee) SHA1(1292cfa8125cbaec3bcd9d136cb385a3574bfa4a))
 
 		/* SHAPE EPROMs */
 	ROM_REGION(0xc000, "tile_gfx", 0 )
-	ROM_LOAD("2xf5196.u20", 0x00000, 0x2000, CRC(96c81134) SHA1(e5e75e8b4897ee7cd9c27b0546fe4006cf384cba)) // unknown EPROM names, should contain VLSH or VL/SH letters on sticker
-	ROM_LOAD("2xf5196.u21", 0x02000, 0x2000, CRC(ad7bc6a0) SHA1(145e9a094212841e8a684136ea813bd1bea070fb))
-	ROM_LOAD("2xf5196.u22", 0x04000, 0x2000, CRC(450d47bb) SHA1(219a0eeca3989da8cec68405466c9a20f2ee9bfa))
-	ROM_LOAD("2xf5196.u45", 0x06000, 0x2000, CRC(560b2417) SHA1(1ed26ceaff87150d2f0115825f952348e34e0414))
-	ROM_LOAD("2xf5196.u46", 0x08000, 0x2000, CRC(7704c13f) SHA1(4cfca6ee9e2e543714e8bf0c6de4d9e9406ce250))
-	ROM_LOAD("2xf5196.u47", 0x0a000, 0x2000, CRC(a9e6da98) SHA1(3b7d8920d3ef4ae17a55d2e1968318eb3c70264d))
+	ROM_LOAD("1vlsh293.u20", 0x00000, 0x2000, CRC(96c81134) SHA1(e5e75e8b4897ee7cd9c27b0546fe4006cf384cba)) // F. HUNTER BLU-L 1VL/SH293 U20/8  516C/3780/8F37
+	ROM_LOAD("1vlsh293.u21", 0x02000, 0x2000, CRC(ad7bc6a0) SHA1(145e9a094212841e8a684136ea813bd1bea070fb)) // F. HUNTER GRN-L 1VL/SH293 U21/10 PC01/0649/05A6
+	ROM_LOAD("1vlsh293.u22", 0x04000, 0x2000, CRC(450d47bb) SHA1(219a0eeca3989da8cec68405466c9a20f2ee9bfa)) // F. HUNTER RED-L 1VL/SH293 U22/12 2H12/6AH8/EA7A
+	ROM_LOAD("1vlsh293.u45", 0x06000, 0x2000, CRC(560b2417) SHA1(1ed26ceaff87150d2f0115825f952348e34e0414)) // F. HUNTER BLU-M 1VL/SH293 U45/9  A0C8/0A1F/88C5
+	ROM_LOAD("1vlsh293.u46", 0x08000, 0x2000, CRC(7704c13f) SHA1(4cfca6ee9e2e543714e8bf0c6de4d9e9406ce250)) // F. HUNTER GRN-M 1VL/SH293 U46/11 2648/8H31/CEDD
+	ROM_LOAD("1vlsh293.u47", 0x0a000, 0x2000, CRC(a9e6da98) SHA1(3b7d8920d3ef4ae17a55d2e1968318eb3c70264d)) // F. HUNTER RED-M 1VL/SH293 U47/13 FFP8/AA7A/F5AD
 
 		/* COLOR PROM */
 	ROM_REGION(0x200, "proms", 0 )
-	ROM_LOAD("1cm48.u71", 0x0000, 0x0200, CRC(81daeeb0) SHA1(7dfe198c6def5c4ae4ecac488d65c2911fb3a890))
+	ROM_LOAD("1cm48.u71", 0x0000, 0x0200, CRC(81daeeb0) SHA1(7dfe198c6def5c4ae4ecac488d65c2911fb3a890)) // FORTUNE HUNTER 1CM48 8CFA U71/40
+											// Alternate label:    FH/3BF/LGF 1CM48 8CFA U71/40
 ROM_END
 
 ROM_START( fhuntera )
 	ROM_REGION(0x10000, "maincpu", 0 )
 		/* VIDEO AND SOUND EPROM */
-	ROM_LOAD("2vas004.u59", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe))
-
+	ROM_LOAD("2vas004.u59", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // VIDEO SOUND 2VA/S004 U59/7 1AAA/FP34/8E00
+											// Alternate label:       VIDEO SOUND 2VA/S004/MEM/59/7 FP34/8E00
 		/* GAME EPROMs */
 	ROM_LOAD("2xf5196i02.u87", 0x06000, 0x2000, CRC(4b532a14) SHA1(98d1753ad1d0d041f81a535947ed501d0eb1d85c))
 	ROM_LOAD("2xf5196i01.u86", 0x08000, 0x8000, CRC(6971ccee) SHA1(1292cfa8125cbaec3bcd9d136cb385a3574bfa4a))
 
 		/* SHAPE EPROMs */
 	ROM_REGION(0xc000, "tile_gfx", 0 )
-	ROM_LOAD("2xf5196.u20", 0x00000, 0x2000, CRC(96c81134) SHA1(e5e75e8b4897ee7cd9c27b0546fe4006cf384cba)) // unknown EPROM names, should contain VLSH or VL/SH letters on sticker
-	ROM_LOAD("2xf5196.u21", 0x02000, 0x2000, CRC(ad7bc6a0) SHA1(145e9a094212841e8a684136ea813bd1bea070fb))
-	ROM_LOAD("2xf5196.u22", 0x04000, 0x2000, CRC(450d47bb) SHA1(219a0eeca3989da8cec68405466c9a20f2ee9bfa))
-	ROM_LOAD("2xf5196.u45", 0x06000, 0x2000, CRC(560b2417) SHA1(1ed26ceaff87150d2f0115825f952348e34e0414))
-	ROM_LOAD("2xf5196.u46", 0x08000, 0x2000, CRC(7704c13f) SHA1(4cfca6ee9e2e543714e8bf0c6de4d9e9406ce250))
-	ROM_LOAD("2xf5196.u47", 0x0a000, 0x2000, CRC(a9e6da98) SHA1(3b7d8920d3ef4ae17a55d2e1968318eb3c70264d))
+	ROM_LOAD("1vlsh293.u20", 0x00000, 0x2000, CRC(96c81134) SHA1(e5e75e8b4897ee7cd9c27b0546fe4006cf384cba)) // F. HUNTER BLU-L 1VL/SH293 U20/8 516C/3780/8F37
+	ROM_LOAD("1vlsh293.u21", 0x02000, 0x2000, CRC(ad7bc6a0) SHA1(145e9a094212841e8a684136ea813bd1bea070fb)) // F. HUNTER GRN-L 1VL/SH293 U21/10 PC01/0649/05A6
+	ROM_LOAD("1vlsh293.u22", 0x04000, 0x2000, CRC(450d47bb) SHA1(219a0eeca3989da8cec68405466c9a20f2ee9bfa)) // F. HUNTER RED-L 1VL/SH293 U22/12 2H12/6AH8/EA7A
+	ROM_LOAD("1vlsh293.u45", 0x06000, 0x2000, CRC(560b2417) SHA1(1ed26ceaff87150d2f0115825f952348e34e0414)) // F. HUNTER BLU-M 1VL/SH293 U45/9 A0C8/0A1F/88C5
+	ROM_LOAD("1vlsh293.u46", 0x08000, 0x2000, CRC(7704c13f) SHA1(4cfca6ee9e2e543714e8bf0c6de4d9e9406ce250)) // F. HUNTER GRN-M 1VL/SH293 U46/11 2648/8H31/CEDD
+	ROM_LOAD("1vlsh293.u47", 0x0a000, 0x2000, CRC(a9e6da98) SHA1(3b7d8920d3ef4ae17a55d2e1968318eb3c70264d)) // F. HUNTER RED-M 1VL/SH293 U47/13 FFP8/AA7A/F5AD
 
 		/* COLOR PROM */
 	ROM_REGION(0x200, "proms", 0 )
-	ROM_LOAD("1cm48.u71", 0x0000, 0x0200, CRC(81daeeb0) SHA1(7dfe198c6def5c4ae4ecac488d65c2911fb3a890))
+	ROM_LOAD("1cm48.u71", 0x0000, 0x0200, CRC(81daeeb0) SHA1(7dfe198c6def5c4ae4ecac488d65c2911fb3a890)) // FORTUNE HUNTER 1CM48 8CFA U71/40
+											// Alternate label:    FH/3BF/LGF 1CM48 8CFA U71/40
 ROM_END
 
 ROM_START( arcwins )

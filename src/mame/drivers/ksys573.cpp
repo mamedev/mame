@@ -511,27 +511,27 @@ public:
 
 private:
 
-	DECLARE_READ16_MEMBER( control_r );
-	DECLARE_WRITE16_MEMBER( control_w );
-	DECLARE_WRITE16_MEMBER( atapi_reset_w );
-	DECLARE_WRITE16_MEMBER( security_w );
-	DECLARE_READ16_MEMBER( security_r );
-	DECLARE_READ16_MEMBER( ge765pwbba_r );
-	DECLARE_WRITE16_MEMBER( ge765pwbba_w );
-	DECLARE_READ16_MEMBER( gx700pwbf_io_r );
-	DECLARE_WRITE16_MEMBER( gx700pwbf_io_w );
-	DECLARE_WRITE16_MEMBER( gunmania_w );
-	DECLARE_READ16_MEMBER( gunmania_r );
+	uint16_t control_r(offs_t offset, uint16_t mem_mask = ~0);
+	void control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void atapi_reset_w(uint16_t data);
+	void security_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t security_r(offs_t offset, uint16_t mem_mask = ~0);
+	uint16_t ge765pwbba_r(offs_t offset, uint16_t mem_mask = ~0);
+	void ge765pwbba_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t gx700pwbf_io_r(offs_t offset, uint16_t mem_mask = ~0);
+	void gx700pwbf_io_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void gunmania_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t gunmania_r(offs_t offset, uint16_t mem_mask = ~0);
 	DECLARE_MACHINE_RESET( konami573 );
 	DECLARE_WRITE_LINE_MEMBER( ata_interrupt );
 
 	TIMER_CALLBACK_MEMBER( atapi_xfer_end );
-	DECLARE_WRITE8_MEMBER( ddr_output_callback );
-	DECLARE_WRITE8_MEMBER( ddrsolo_output_callback );
-	DECLARE_WRITE8_MEMBER( drmn_output_callback );
-	DECLARE_WRITE8_MEMBER( dmx_output_callback );
-	DECLARE_WRITE8_MEMBER( mamboagg_output_callback );
-	DECLARE_WRITE8_MEMBER( punchmania_output_callback );
+	void ddr_output_callback(offs_t offset, uint8_t data);
+	void ddrsolo_output_callback(offs_t offset, uint8_t data);
+	void drmn_output_callback(offs_t offset, uint8_t data);
+	void dmx_output_callback(offs_t offset, uint8_t data);
+	void mamboagg_output_callback(offs_t offset, uint8_t data);
+	void punchmania_output_callback(offs_t offset, uint8_t data);
 	double analogue_inputs_callback(uint8_t input);
 
 	void cdrom_dma_read( uint32_t *ram, uint32_t n_address, int32_t n_size );
@@ -565,7 +565,7 @@ private:
 	inline void ATTR_PRINTF( 3,4 ) verboselog( int n_level, const char *s_fmt, ... );
 	void update_disc();
 	void gx700pwbf_output( int offset, uint8_t data );
-	void gx700pwfbf_init( void ( ksys573_state::*output_callback_func )( address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint8_t data, ATTR_UNUSED uint8_t mem_mask ) );
+	void gx700pwfbf_init( void ( ksys573_state::*output_callback_func )( ATTR_UNUSED offs_t offset, ATTR_UNUSED uint8_t data ) );
 	void gn845pwbb_do_w( int offset, int data );
 	void gn845pwbb_clk_w( int offset, int data );
 
@@ -588,7 +588,7 @@ private:
 	int m_h8_clk;
 
 	uint8_t m_gx700pwbf_output_data[ 4 ];
-	void ( ksys573_state::*m_gx700pwfbf_output_callback )( address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint8_t data, ATTR_UNUSED uint8_t mem_mask );
+	void ( ksys573_state::*m_gx700pwfbf_output_callback )( ATTR_UNUSED offs_t offset, ATTR_UNUSED uint8_t data );
 
 	uint32_t m_stage_mask;
 	struct
@@ -708,14 +708,14 @@ void ksys573_state::gbbchmp_map(address_map& map)
 	map(0x1f640000, 0x1f640007).rw(m_duart, FUNC(mb89371_device::read), FUNC(mb89371_device::write)).umask32(0x00ff00ff);
 }
 
-READ16_MEMBER( ksys573_state::control_r )
+uint16_t ksys573_state::control_r(offs_t offset, uint16_t mem_mask)
 {
 	verboselog( 2, "control_r( %08x, %08x ) %08x\n", offset, mem_mask, m_control );
 
 	return m_control;
 }
 
-WRITE16_MEMBER( ksys573_state::control_w )
+void ksys573_state::control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_control );
 
@@ -734,15 +734,15 @@ TIMER_CALLBACK_MEMBER( ksys573_state::atapi_xfer_end )
 
 	for( int i = 0; i < m_atapi_xfersize; i++ )
 	{
-		uint32_t d = m_ata->read_cs0(0) << 0;
-		d |= m_ata->read_cs0(0) << 16;
+		uint32_t d = m_ata->cs0_r(0) << 0;
+		d |= m_ata->cs0_r(0) << 16;
 
 		m_p_n_psxram[ m_atapi_xferbase / 4 ] = d;
 		m_atapi_xferbase += 4;
 	}
 
 	/// HACK: konami80s only works if you dma more data than requested
-	if( ( m_ata->read_cs1(6) & 8 ) != 0 )
+	if( ( m_ata->cs1_r(6) & 8 ) != 0 )
 	{
 		m_atapi_timer->adjust( m_maincpu->cycles_to_attotime( ( ATAPI_CYCLES_PER_SECTOR * ( m_atapi_xfersize / 64 ) ) ) );
 	}
@@ -753,7 +753,7 @@ WRITE_LINE_MEMBER( ksys573_state::ata_interrupt )
 	m_psxirq->intin10( state );
 }
 
-WRITE16_MEMBER( ksys573_state::atapi_reset_w )
+void ksys573_state::atapi_reset_w(uint16_t data)
 {
 	if( !( data & 1 ) )
 	{
@@ -780,7 +780,7 @@ void ksys573_state::cdrom_dma_write( uint32_t *ram, uint32_t n_address, int32_t 
 	m_atapi_timer->adjust( m_maincpu->cycles_to_attotime( ( ATAPI_CYCLES_PER_SECTOR * ( n_size / 512 ) ) ) );
 }
 
-WRITE16_MEMBER( ksys573_state::security_w )
+void ksys573_state::security_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_n_security_control );
 
@@ -789,7 +789,7 @@ WRITE16_MEMBER( ksys573_state::security_w )
 	m_out1->write( data, mem_mask );
 }
 
-READ16_MEMBER( ksys573_state::security_r )
+uint16_t ksys573_state::security_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = m_n_security_control;
 	verboselog( 2, "security_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
@@ -940,7 +940,7 @@ todo:
 
 */
 
-READ16_MEMBER( ksys573_state::ge765pwbba_r )
+uint16_t ksys573_state::ge765pwbba_r(offs_t offset, uint16_t mem_mask)
 {
 	switch( offset )
 	{
@@ -957,7 +957,7 @@ READ16_MEMBER( ksys573_state::ge765pwbba_r )
 	return 0;
 }
 
-WRITE16_MEMBER( ksys573_state::ge765pwbba_w )
+void ksys573_state::ge765pwbba_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch( offset )
 	{
@@ -993,7 +993,7 @@ Analogue I/O board
 
 */
 
-READ16_MEMBER( ksys573_state::gx700pwbf_io_r )
+uint16_t ksys573_state::gx700pwbf_io_r(offs_t offset, uint16_t mem_mask)
 {
 	uint32_t data = 0;
 	switch( offset )
@@ -1036,14 +1036,14 @@ void ksys573_state::gx700pwbf_output( int offset, uint8_t data )
 			int newbit = ( data >> shift[ i ] ) & 1;
 			if( oldbit != newbit )
 			{
-				( this->*m_gx700pwfbf_output_callback )( m_maincpu->space( AS_PROGRAM ), ( offset * 8 ) + i, newbit, 0xff );
+				( this->*m_gx700pwfbf_output_callback )( ( offset * 8 ) + i, newbit );
 			}
 		}
 	}
 	m_gx700pwbf_output_data[ offset ] = data;
 }
 
-WRITE16_MEMBER( ksys573_state::gx700pwbf_io_w )
+void ksys573_state::gx700pwbf_io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	verboselog( 2, "gx700pwbf_io_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
 
@@ -1071,7 +1071,7 @@ WRITE16_MEMBER( ksys573_state::gx700pwbf_io_w )
 	}
 }
 
-void ksys573_state::gx700pwfbf_init( void ( ksys573_state::*output_callback_func )( address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint8_t data, ATTR_UNUSED uint8_t mem_mask ) )
+void ksys573_state::gx700pwfbf_init( void ( ksys573_state::*output_callback_func )( ATTR_UNUSED offs_t offset, ATTR_UNUSED uint8_t data ) )
 {
 	memset( m_gx700pwbf_output_data, 0, sizeof( m_gx700pwbf_output_data ) );
 
@@ -1159,7 +1159,7 @@ CUSTOM_INPUT_MEMBER( ksys573_state::gn845pwbb_read )
 	return m_stage->read() & m_stage_mask;
 }
 
-WRITE8_MEMBER( ksys573_state::ddr_output_callback )
+void ksys573_state::ddr_output_callback(offs_t offset, uint8_t data)
 {
 	switch( offset )
 	{
@@ -1278,7 +1278,7 @@ WRITE_LINE_MEMBER( ksys573_state::gtrfrks_lamps_b4 )
 
 /* ddr solo */
 
-WRITE8_MEMBER( ksys573_state::ddrsolo_output_callback )
+void ksys573_state::ddrsolo_output_callback(offs_t offset, uint8_t data)
 {
 	switch( offset )
 	{
@@ -1333,7 +1333,7 @@ WRITE8_MEMBER( ksys573_state::ddrsolo_output_callback )
 
 /* drummania */
 
-WRITE8_MEMBER( ksys573_state::drmn_output_callback )
+void ksys573_state::drmn_output_callback(offs_t offset, uint8_t data)
 {
 	switch( offset )
 	{
@@ -1404,7 +1404,7 @@ void ksys573_state::init_drmn()
 
 /* dance maniax */
 
-WRITE8_MEMBER( ksys573_state::dmx_output_callback )
+void ksys573_state::dmx_output_callback(offs_t offset, uint8_t data)
 {
 	switch( offset )
 	{
@@ -1814,7 +1814,7 @@ void ksys573_state::init_hyperbbc()
 
 /* Mambo A Go Go */
 
-WRITE8_MEMBER( ksys573_state::mamboagg_output_callback )
+void ksys573_state::mamboagg_output_callback(offs_t offset, uint8_t data)
 {
 	switch( offset )
 	{
@@ -1906,7 +1906,7 @@ void ksys573_state::punchmania_cassette_install(device_t *device)
 
 int pad_light[ 6 ];
 
-WRITE8_MEMBER( ksys573_state::punchmania_output_callback )
+void ksys573_state::punchmania_output_callback(offs_t offset, uint8_t data)
 {
 	double *pad_position = m_pad_position;
 	char pad[ 7 ];
@@ -2037,7 +2037,7 @@ void ksys573_state::init_pnchmn()
 
 /* GunMania */
 
-WRITE16_MEMBER( ksys573_state::gunmania_w )
+void ksys573_state::gunmania_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	char s[ 1024 ] = "";
 
@@ -2142,7 +2142,7 @@ READ_LINE_MEMBER( ksys573_state::gunmania_cable_holder_sensor )
 	return m_cable_holder_release;
 }
 
-READ16_MEMBER( ksys573_state::gunmania_r )
+uint16_t ksys573_state::gunmania_r(offs_t offset, uint16_t mem_mask)
 {
 	uint32_t data = 0;
 

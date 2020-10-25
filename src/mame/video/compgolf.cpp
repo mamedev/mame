@@ -35,13 +35,13 @@ void compgolf_state::compgolf_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(compgolf_state::compgolf_video_w)
+void compgolf_state::compgolf_video_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_text_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(compgolf_state::compgolf_back_w)
+void compgolf_state::compgolf_back_w(offs_t offset, uint8_t data)
 {
 	m_bg_ram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);

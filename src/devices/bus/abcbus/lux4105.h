@@ -50,13 +50,21 @@ protected:
 	virtual void abcbus_c1(uint8_t data) override;
 	virtual void abcbus_c3(uint8_t data) override;
 	virtual void abcbus_c4(uint8_t data) override;
+	virtual uint8_t abcbus_tren() override;
+	virtual void abcbus_tren(uint8_t data) override;
+	virtual void abcbus_prac(int state) override;
 
 private:
-	inline void update_trrq_int();
+	void internal_reset();
+	void update_ack();
+	void update_dma();
+	void write_dma_register(uint8_t data);
+	void write_sasi_data(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( write_sasi_bsy );
 	DECLARE_WRITE_LINE_MEMBER( write_sasi_cd );
 	DECLARE_WRITE_LINE_MEMBER( write_sasi_req );
+	DECLARE_WRITE_LINE_MEMBER( write_sasi_msg );
 	DECLARE_WRITE_LINE_MEMBER( write_sasi_io );
 
 	required_device<nscsi_callback_device> m_sasi;
@@ -64,7 +72,11 @@ private:
 	required_ioport m_5e;
 
 	bool m_cs;
+	uint8_t m_data_out;
 	uint8_t m_dma;
+	bool m_req;
+	bool m_drq;
+	bool m_pren;
 };
 
 

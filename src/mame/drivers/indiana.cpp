@@ -34,8 +34,8 @@ class indiana_state : public driver_device
 {
 public:
 	indiana_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{
 	}
 
@@ -43,10 +43,13 @@ public:
 
 	void init_indiana();
 
-private:
+protected:
 	virtual void machine_reset() override;
-	required_device<cpu_device> m_maincpu;
+
+private:
 	void indiana_mem(address_map &map);
+
+	required_device<cpu_device> m_maincpu;
 };
 
 

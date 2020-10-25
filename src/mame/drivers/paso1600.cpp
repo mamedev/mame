@@ -40,17 +40,15 @@ public:
 	void paso1600(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(paso1600_pcg_r);
-	DECLARE_WRITE8_MEMBER(paso1600_pcg_w);
-	DECLARE_WRITE8_MEMBER(paso1600_6845_address_w);
-	DECLARE_WRITE8_MEMBER(paso1600_6845_data_w);
-	DECLARE_READ8_MEMBER(paso1600_6845_data_r);
-	DECLARE_READ8_MEMBER(paso1600_6845_status_r);
-	DECLARE_READ8_MEMBER(key_r);
-	DECLARE_WRITE8_MEMBER(key_w);
-	DECLARE_READ16_MEMBER(test_hi_r);
-	DECLARE_READ8_MEMBER(pc_dma_read_byte);
-	DECLARE_WRITE8_MEMBER(pc_dma_write_byte);
+	uint8_t paso1600_pcg_r(offs_t offset);
+	void paso1600_pcg_w(offs_t offset, uint8_t data);
+	void paso1600_6845_address_w(uint8_t data);
+	void paso1600_6845_data_w(uint8_t data);
+	uint8_t key_r(offs_t offset);
+	void key_w(offs_t offset, uint8_t data);
+	uint16_t test_hi_r();
+	uint8_t pc_dma_read_byte(offs_t offset);
+	void pc_dma_write_byte(offs_t offset, uint8_t data);
 	uint32_t screen_update_paso1600(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void paso1600_io(address_map &map);
@@ -94,10 +92,7 @@ private:
 
 uint32_t paso1600_state::screen_update_paso1600(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x,y;
-	int xi,yi;
-	#if 0
-	uint32_t count;
+#if 0
 	static int test_x;
 
 	if(machine().input().code_pressed(KEYCODE_Z))
@@ -108,49 +103,48 @@ uint32_t paso1600_state::screen_update_paso1600(screen_device &screen, bitmap_in
 
 	popmessage("%d",test_x);
 
-	count = 0;
+	uint32_t count = 0;
 
-	for(y=0;y<475;y++)
+	for(int y=0;y<475;y++)
 	{
 		count &= 0xffff;
 
-		for(x=0;x<test_x/16;x++)
+		for(int x=0;x<test_x/16;x++)
 		{
-			for(xi=0;xi<16;xi++)
+			for(int xi=0;xi<16;xi++)
 			{
 				int pen = (m_p_gvram[count] >> xi) & 1;
 
 				if(y < 475 && x*16+xi < 640) /* TODO: safety check */
-					bitmap.pix16(y, x*16+xi) = m_palette->pen(pen);
+					bitmap.pix(y, x*16+xi) = m_palette->pen(pen);
 			}
 
 			count++;
 		}
 	}
-	#endif
+#endif
 
 //  popmessage("%d %d %d",mc6845_h_display,mc6845_v_display,mc6845_tile_height);
 
-	for(y=0;y<mc6845_v_display;y++)
+	for(int y=0;y<mc6845_v_display;y++)
 	{
-		for(x=0;x<mc6845_h_display;x++)
+		for(int x=0;x<mc6845_h_display;x++)
 		{
 			int tile = m_p_vram[x+y*mc6845_h_display] & 0xff;
 			int color = (m_p_vram[x+y*mc6845_h_display] & 0x700) >> 8;
-			int pen;
 
-			for(yi=0;yi<19;yi++)
+			for(int yi=0;yi<19;yi++)
 			{
-				for(xi=0;xi<8;xi++)
+				for(int xi=0;xi<8;xi++)
 				{
-					pen = (m_p_chargen[tile*8+(yi >> 1)] >> (7-xi) & 1) ? color : -1;
+					int pen = (m_p_chargen[tile*8+(yi >> 1)] >> (7-xi) & 1) ? color : -1;
 
 					if(yi & 0x10)
 						pen = -1;
 
 					if(pen != -1)
 						if(y*19 < 475 && x*8+xi < 640) /* TODO: safety check */
-							bitmap.pix16(y*19+yi, x*8+xi) = m_palette->pen(pen);
+							bitmap.pix(y*19+yi, x*8+xi) = m_palette->pen(pen);
 				}
 			}
 		}
@@ -158,15 +152,15 @@ uint32_t paso1600_state::screen_update_paso1600(screen_device &screen, bitmap_in
 
 	/* quick and dirty way to do the cursor */
 	if(0)
-	for(yi=0;yi<mc6845_tile_height;yi++)
+	for(int yi=0;yi<mc6845_tile_height;yi++)
 	{
-		for(xi=0;xi<8;xi++)
+		for(int xi=0;xi<8;xi++)
 		{
 			if((mc6845_cursor_y_start & 0x60) != 0x20 && mc6845_h_display)
 			{
-				x = mc6845_cursor_addr % mc6845_h_display;
-				y = mc6845_cursor_addr / mc6845_h_display;
-				bitmap.pix16(y*mc6845_tile_height+yi, x*8+xi) = m_palette->pen(7);
+				int x = mc6845_cursor_addr % mc6845_h_display;
+				int y = mc6845_cursor_addr / mc6845_h_display;
+				bitmap.pix(y*mc6845_tile_height+yi, x*8+xi) = m_palette->pen(7);
 			}
 		}
 	}
@@ -174,40 +168,30 @@ uint32_t paso1600_state::screen_update_paso1600(screen_device &screen, bitmap_in
 	return 0;
 }
 
-READ8_MEMBER( paso1600_state::paso1600_pcg_r )
+uint8_t paso1600_state::paso1600_pcg_r(offs_t offset)
 {
 	return m_p_pcg[offset];
 }
 
-WRITE8_MEMBER( paso1600_state::paso1600_pcg_w )
+void paso1600_state::paso1600_pcg_w(offs_t offset, uint8_t data)
 {
 	m_p_pcg[offset] = data;
 	m_gfxdecode->gfx(0)->mark_dirty(offset >> 3);
 }
 
-WRITE8_MEMBER( paso1600_state::paso1600_6845_address_w )
+void paso1600_state::paso1600_6845_address_w(uint8_t data)
 {
 	m_crtc_index = data;
 	m_crtc->address_w(data);
 }
 
-WRITE8_MEMBER( paso1600_state::paso1600_6845_data_w )
+void paso1600_state::paso1600_6845_data_w(uint8_t data)
 {
 	m_crtc_vreg[m_crtc_index] = data;
 	m_crtc->register_w(data);
 }
 
-READ8_MEMBER( paso1600_state::paso1600_6845_data_r )
-{
-	return m_crtc->register_r();
-}
-
-READ8_MEMBER( paso1600_state::paso1600_6845_status_r )
-{
-	return m_crtc->status_r();
-}
-
-READ8_MEMBER( paso1600_state::key_r )
+uint8_t paso1600_state::key_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -219,7 +203,7 @@ READ8_MEMBER( paso1600_state::key_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( paso1600_state::key_w )
+void paso1600_state::key_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -227,7 +211,7 @@ WRITE8_MEMBER( paso1600_state::key_w )
 	}
 }
 
-READ16_MEMBER( paso1600_state::test_hi_r )
+uint16_t  paso1600_state::test_hi_r()
 {
 	return 0xffff;
 }
@@ -251,8 +235,8 @@ void paso1600_state::paso1600_io(address_map &map)
 	map(0x001a, 0x001b).r(FUNC(paso1600_state::test_hi_r)); // causes RAM error otherwise?
 	map(0x0030, 0x0033).rw(FUNC(paso1600_state::key_r), FUNC(paso1600_state::key_w)); //UART keyboard?
 	map(0x0048, 0x0049).r(FUNC(paso1600_state::test_hi_r));
-	map(0x0090, 0x0090).rw(FUNC(paso1600_state::paso1600_6845_status_r), FUNC(paso1600_state::paso1600_6845_address_w));
-	map(0x0091, 0x0091).rw(FUNC(paso1600_state::paso1600_6845_data_r), FUNC(paso1600_state::paso1600_6845_data_w));
+	map(0x0090, 0x0090).r(m_crtc, FUNC(mc6845_device::status_r)).w(FUNC(paso1600_state::paso1600_6845_address_w));
+	map(0x0091, 0x0091).r(m_crtc, FUNC(mc6845_device::register_r)).w(FUNC(paso1600_state::paso1600_6845_data_w));
 //  map(0x00d8,0x00df) //fdc, unknown type
 // other undefined ports: 18, 1C, 92
 }
@@ -287,21 +271,24 @@ void paso1600_state::machine_reset()
 {
 }
 
-READ8_MEMBER(paso1600_state::pc_dma_read_byte)
+uint8_t paso1600_state::pc_dma_read_byte(offs_t offset)
 {
 	//offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
 	//  & 0xFF0000;
 
-	return space.read_byte(offset);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+
+	return program.read_byte(offset);
 }
 
 
-WRITE8_MEMBER(paso1600_state::pc_dma_write_byte)
+void paso1600_state::pc_dma_write_byte(offs_t offset, uint8_t data)
 {
 	//offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
 	//  & 0xFF0000;
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 
-	space.write_byte(offset, data);
+	program.write_byte(offset, data);
 }
 
 void paso1600_state::paso1600(machine_config &config)

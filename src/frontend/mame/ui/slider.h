@@ -25,12 +25,12 @@ typedef std::function<std::int32_t (running_machine &, void *, int, std::string 
 struct slider_state
 {
 	slider_update   update;             // callback
-	void *          arg;                // argument
-	std::int32_t    minval;             // minimum value
-	std::int32_t    defval;             // default value
-	std::int32_t    maxval;             // maximum value
-	std::int32_t    incval;             // increment value
-	int             id;
+	void *          arg = nullptr;      // argument
+	std::int32_t    minval = 0;         // minimum value
+	std::int32_t    defval = 0;         // default value
+	std::int32_t    maxval = 0;         // maximum value
+	std::int32_t    incval = 0;         // increment value
+	int             id = 0;
 	std::string     description;        // textual description
 };
 

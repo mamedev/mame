@@ -58,9 +58,9 @@ private:
 	int m_hidden;
 
 	DECLARE_WRITE_LINE_MEMBER(mainlatch_int) { m_slot->nmi_w(state); }
-	DECLARE_READ8_MEMBER(rom_r) { return m_romx[offset]; } // cartridge cpu rom
-	DECLARE_READ8_MEMBER(nvram_r) { return m_nvram[offset & m_nvram.mask()]; }
-	DECLARE_WRITE8_MEMBER(nvram_w) { m_nvram[offset & m_nvram.mask()] = data; }
+	uint8_t rom_r(offs_t offset) { return m_romx[offset]; } // cartridge cpu rom
+	uint8_t nvram_r(offs_t offset) { return m_nvram[offset & m_nvram.mask()]; }
+	void nvram_w(offs_t offset, uint8_t data) { m_nvram[offset & m_nvram.mask()] = data; }
 
 	void c64_fcc_map(address_map &map);
 };

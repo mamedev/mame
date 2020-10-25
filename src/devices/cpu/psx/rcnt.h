@@ -34,8 +34,8 @@ public:
 	auto irq1() { return m_irq1_handler.bind(); }
 	auto irq2() { return m_irq2_handler.bind(); }
 
-	DECLARE_WRITE32_MEMBER( write );
-	DECLARE_READ32_MEMBER( read );
+	void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t read(offs_t offset, uint32_t mem_mask = ~0);
 
 protected:
 	virtual void device_start() override;

@@ -2,7 +2,7 @@
 // copyright-holders:Peter Trauner
 /*****************************************************************************
  *
- *   cpustate->h
+ *   lh6801.h
  *   portable lh5801 emulator interface
  *
  *
@@ -99,9 +99,9 @@ private:
 
 	devcb_read8 m_in_func;
 
-	address_space *m_program;         //ME0
-	address_space *m_io;              //ME1
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program; // ME0
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_io;      // ME1
 
 	PAIR m_s;
 	PAIR m_p;

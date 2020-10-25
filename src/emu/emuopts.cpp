@@ -82,7 +82,7 @@ const options_entry emu_options::s_option_entries[] =
 	// performance options
 	{ nullptr,                                           nullptr,     OPTION_HEADER,     "CORE PERFORMANCE OPTIONS" },
 	{ OPTION_AUTOFRAMESKIP ";afs",                       "0",         OPTION_BOOLEAN,    "enable automatic frameskip adjustment to maintain emulation speed" },
-	{ OPTION_FRAMESKIP ";fs(0-10)",                      "0",         OPTION_INTEGER,    "set frameskip to fixed value, 0-10 (autoframeskip must be disabled)" },
+	{ OPTION_FRAMESKIP ";fs(0-10)",                      "0",         OPTION_INTEGER,    "set frameskip to fixed value, 0-10 (upper limit with autoframeskip)" },
 	{ OPTION_SECONDS_TO_RUN ";str",                      "0",         OPTION_INTEGER,    "number of emulated seconds to run before automatically exiting" },
 	{ OPTION_THROTTLE,                                   "1",         OPTION_BOOLEAN,    "throttle emulation to keep system running in sync with real time" },
 	{ OPTION_SLEEP,                                      "1",         OPTION_BOOLEAN,    "enable sleeping, which gives time back to other applications when idle" },
@@ -129,6 +129,7 @@ const options_entry emu_options::s_option_entries[] =
 	{ nullptr,                                           nullptr,     OPTION_HEADER,     "CORE VECTOR OPTIONS" },
 	{ OPTION_BEAM_WIDTH_MIN,                             "1.0",       OPTION_FLOAT,      "set vector beam width minimum" },
 	{ OPTION_BEAM_WIDTH_MAX,                             "1.0",       OPTION_FLOAT,      "set vector beam width maximum" },
+	{ OPTION_BEAM_DOT_SIZE,                              "1.0",       OPTION_FLOAT,      "set vector beam size for dots" },
 	{ OPTION_BEAM_INTENSITY_WEIGHT,                      "0",         OPTION_FLOAT,      "set vector beam intensity weight " },
 	{ OPTION_FLICKER,                                    "0",         OPTION_FLOAT,      "set vector flicker effect" },
 
@@ -137,6 +138,7 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_SAMPLERATE ";sr(1000-1000000)",             "48000",     OPTION_INTEGER,    "set sound output sample rate" },
 	{ OPTION_SAMPLES,                                    "1",         OPTION_BOOLEAN,    "enable the use of external samples if available" },
 	{ OPTION_VOLUME ";vol",                              "0",         OPTION_INTEGER,    "sound volume in decibels (-32 min, 0 max)" },
+	{ OPTION_SPEAKER_REPORT,                             "0",         OPTION_INTEGER,    "print report of speaker ouput maxima (0=none, or 1-4 for more detail)" },
 
 	// input options
 	{ nullptr,                                           nullptr,     OPTION_HEADER,     "CORE INPUT OPTIONS" },
@@ -176,6 +178,7 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_DEBUG ";d",                                 "0",         OPTION_BOOLEAN,    "enable/disable debugger" },
 	{ OPTION_UPDATEINPAUSE,                              "0",         OPTION_BOOLEAN,    "keep calling video updates while in pause" },
 	{ OPTION_DEBUGSCRIPT,                                nullptr,     OPTION_STRING,     "script for debugger" },
+	{ OPTION_DEBUGLOG,                                   "0",         OPTION_BOOLEAN,    "write debug console output to debug.log" },
 
 	// comm options
 	{ nullptr,                                           nullptr,     OPTION_HEADER,     "CORE COMM OPTIONS" },

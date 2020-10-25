@@ -14,7 +14,7 @@
 
 DEFINE_DEVICE_TYPE(ISA16_SB16, sb16_lle_device, "sb16", "SoundBlaster 16 Audio Adapter LLE")
 
-READ8_MEMBER( sb16_lle_device::dsp_data_r )
+uint8_t sb16_lle_device::dsp_data_r()
 {
 	if(!machine().side_effects_disabled())
 		m_data_in = false;
@@ -22,18 +22,18 @@ READ8_MEMBER( sb16_lle_device::dsp_data_r )
 	return m_in_byte;
 }
 
-WRITE8_MEMBER( sb16_lle_device::dsp_data_w )
+void sb16_lle_device::dsp_data_w(uint8_t data)
 {
 	m_data_out = true;
 	m_out_byte = data;
 }
 
-READ8_MEMBER( sb16_lle_device::dac_ctrl_r )
+uint8_t sb16_lle_device::dac_ctrl_r()
 {
 	return 0;
 }
 
-WRITE8_MEMBER( sb16_lle_device::dac_ctrl_w )
+void sb16_lle_device::dac_ctrl_w(uint8_t data)
 {
 	/* port 0x05
 	 * bit0 -
@@ -52,18 +52,18 @@ WRITE8_MEMBER( sb16_lle_device::dac_ctrl_w )
 	}
 }
 
-READ8_MEMBER( sb16_lle_device::adc_data_r )
+uint8_t sb16_lle_device::adc_data_r()
 {
 	return 0;
 }
 
-WRITE8_MEMBER( sb16_lle_device::dac_data_w )
+void sb16_lle_device::dac_data_w(uint8_t data)
 {
 	m_ldac->write(data << 8);
 	m_rdac->write(data << 8);
 }
 
-READ8_MEMBER( sb16_lle_device::p1_r )
+uint8_t sb16_lle_device::p1_r()
 {
 	uint8_t ret = 0;
 	ret |= m_data_out << 0;
@@ -71,7 +71,7 @@ READ8_MEMBER( sb16_lle_device::p1_r )
 	return ret;
 }
 
-WRITE8_MEMBER( sb16_lle_device::p1_w )
+void sb16_lle_device::p1_w(uint8_t data)
 {
 	/* port P1
 	 * bit0 - output byte ready
@@ -85,12 +85,12 @@ WRITE8_MEMBER( sb16_lle_device::p1_w )
 	*/
 }
 
-READ8_MEMBER( sb16_lle_device::p2_r )
+uint8_t sb16_lle_device::p2_r()
 {
 	return 0;
 }
 
-WRITE8_MEMBER( sb16_lle_device::p2_w )
+void sb16_lle_device::p2_w(uint8_t data)
 {
 	/* port P2
 	 * bit0 -
@@ -115,25 +115,25 @@ void sb16_lle_device::control_timer(bool start)
 		m_timer->adjust(attotime::never);
 }
 
-WRITE8_MEMBER( sb16_lle_device::rate_w )
+void sb16_lle_device::rate_w(uint8_t data)
 {
 	m_freq = data;
 	if(!(m_ctrl8 & 2) || !(m_ctrl16 & 2))
 		control_timer(true);
 }
 
-READ8_MEMBER( sb16_lle_device::dma8_r )
+uint8_t sb16_lle_device::dma8_r()
 {
 	return m_dac_fifo[0].b[0];
 }
 
-WRITE8_MEMBER( sb16_lle_device::dma8_w )
+void sb16_lle_device::dma8_w(uint8_t data)
 {
 	m_adc_fifo[0].b[0] = data;
 	m_isa->drq1_w(0);
 }
 
-READ8_MEMBER( sb16_lle_device::dma_stat_r )
+uint8_t sb16_lle_device::dma_stat_r()
 {
 	/* port 0x06
 	 * bit0 - 8 bit complete
@@ -149,12 +149,12 @@ READ8_MEMBER( sb16_lle_device::dma_stat_r )
 	return ret;
 }
 
-READ8_MEMBER( sb16_lle_device::ctrl8_r )
+uint8_t sb16_lle_device::ctrl8_r()
 {
 	return m_ctrl8;
 }
 
-WRITE8_MEMBER( sb16_lle_device::ctrl8_w )
+void sb16_lle_device::ctrl8_w(uint8_t data)
 {
 	/* port 0x08
 	 * bit0 - ?
@@ -190,12 +190,12 @@ WRITE8_MEMBER( sb16_lle_device::ctrl8_w )
 	m_ctrl8 = data;
 }
 
-READ8_MEMBER( sb16_lle_device::ctrl16_r )
+uint8_t sb16_lle_device::ctrl16_r()
 {
 	return m_ctrl16;
 }
 
-WRITE8_MEMBER( sb16_lle_device::ctrl16_w )
+void sb16_lle_device::ctrl16_w(uint8_t data)
 {
 	/* port 0x10
 	 * bit0 -
@@ -231,12 +231,12 @@ WRITE8_MEMBER( sb16_lle_device::ctrl16_w )
 	m_ctrl16 = data;
 }
 
-READ8_MEMBER( sb16_lle_device::dac_fifo_ctrl_r )
+uint8_t sb16_lle_device::dac_fifo_ctrl_r()
 {
 	return m_dac_fifo_ctrl;
 }
 
-WRITE8_MEMBER( sb16_lle_device::dac_fifo_ctrl_w )
+void sb16_lle_device::dac_fifo_ctrl_w(uint8_t data)
 {
 	/* port 0x0E
 	 * bit0 - reset fifo
@@ -258,12 +258,12 @@ WRITE8_MEMBER( sb16_lle_device::dac_fifo_ctrl_w )
 	m_dac_fifo_ctrl = data;
 }
 
-READ8_MEMBER( sb16_lle_device::adc_fifo_ctrl_r )
+uint8_t sb16_lle_device::adc_fifo_ctrl_r()
 {
 	return m_adc_fifo_ctrl;
 }
 
-WRITE8_MEMBER( sb16_lle_device::adc_fifo_ctrl_w )
+void sb16_lle_device::adc_fifo_ctrl_w(uint8_t data)
 {
 	/* port 0x16
 	 * bit0 - reset fifo
@@ -285,12 +285,12 @@ WRITE8_MEMBER( sb16_lle_device::adc_fifo_ctrl_w )
 	m_adc_fifo_ctrl = data;
 }
 
-READ8_MEMBER( sb16_lle_device::mode_r )
+uint8_t sb16_lle_device::mode_r()
 {
 	return m_mode;
 }
 
-WRITE8_MEMBER( sb16_lle_device::mode_w )
+void sb16_lle_device::mode_w(uint8_t data)
 {
 	/* port 0x04
 	 * bit0 - 1 -- dac 16, adc 8; 0 -- adc 16, dac 8
@@ -305,7 +305,7 @@ WRITE8_MEMBER( sb16_lle_device::mode_w )
 	m_mode = data;
 }
 
-READ8_MEMBER( sb16_lle_device::dma8_ready_r )
+uint8_t sb16_lle_device::dma8_ready_r()
 {
 	/* port 0x0F
 	 * bit0 -
@@ -320,7 +320,7 @@ READ8_MEMBER( sb16_lle_device::dma8_ready_r )
 	return ((m_dac_fifo_tail - m_dac_fifo_head) != 1) << 6;
 }
 
-READ8_MEMBER( sb16_lle_device::adc_data_ready_r )
+uint8_t sb16_lle_device::adc_data_ready_r()
 {
 	/* port 0x17
 	 * bit0 -
@@ -335,32 +335,32 @@ READ8_MEMBER( sb16_lle_device::adc_data_ready_r )
 	return (m_mode & 1) ? 0x80 : 0;
 }
 
-READ8_MEMBER( sb16_lle_device::dma8_cnt_lo_r )
+uint8_t sb16_lle_device::dma8_cnt_lo_r()
 {
 	return m_dma8_cnt & 0xff;
 }
 
-READ8_MEMBER( sb16_lle_device::dma8_cnt_hi_r )
+uint8_t sb16_lle_device::dma8_cnt_hi_r()
 {
 	return m_dma8_cnt >> 8;
 }
 
-WRITE8_MEMBER( sb16_lle_device::dma8_len_lo_w )
+void sb16_lle_device::dma8_len_lo_w(uint8_t data)
 {
 	m_dma8_len = (m_dma8_len & 0xff00) | data;
 }
 
-WRITE8_MEMBER( sb16_lle_device::dma8_len_hi_w )
+void sb16_lle_device::dma8_len_hi_w(uint8_t data)
 {
 	m_dma8_len = (m_dma8_len & 0xff) | (data << 8);
 }
 
-WRITE8_MEMBER( sb16_lle_device::dma16_len_lo_w )
+void sb16_lle_device::dma16_len_lo_w(uint8_t data)
 {
 	m_dma16_len = (m_dma16_len & 0xff00) | data;
 }
 
-WRITE8_MEMBER( sb16_lle_device::dma16_len_hi_w )
+void sb16_lle_device::dma16_len_hi_w(uint8_t data)
 {
 	m_dma16_len = (m_dma16_len & 0xff) | (data << 8);
 }
@@ -404,6 +404,14 @@ void sb16_lle_device::sb16_io(address_map &map)
 //  map(0x0082, 0x0082)
 }
 
+void sb16_lle_device::host_io(address_map &map)
+{
+	map(0x6, 0x7).w(FUNC(sb16_lle_device::dsp_reset_w));
+	map(0xa, 0xb).r(FUNC(sb16_lle_device::host_data_r));
+	map(0xc, 0xd).rw(FUNC(sb16_lle_device::dsp_wbuf_status_r), FUNC(sb16_lle_device::host_cmd_w));
+	map(0xe, 0xf).r(FUNC(sb16_lle_device::dsp_rbuf_status_r));
+}
+
 const tiny_rom_entry *sb16_lle_device::device_rom_region() const
 {
 	return ROM_NAME( sb16 );
@@ -432,13 +440,14 @@ void sb16_lle_device::device_add_mconfig(machine_config &config)
 	PC_JOY(config, m_joy);
 }
 
-READ8_MEMBER( sb16_lle_device::host_data_r )
+uint8_t sb16_lle_device::host_data_r()
 {
-	m_data_out = false;
+	if (!machine().side_effects_disabled())
+		m_data_out = false;
 	return m_out_byte;
 }
 
-WRITE8_MEMBER( sb16_lle_device::host_cmd_w )
+void sb16_lle_device::host_cmd_w(uint8_t data)
 {
 	m_data_in = true;
 	m_in_byte = data;
@@ -598,7 +607,7 @@ void sb16_lle_device::dack16_w(int line, uint16_t data)
 		m_isa->drq5_w(0);
 }
 
-WRITE8_MEMBER( sb16_lle_device::dsp_reset_w )
+void sb16_lle_device::dsp_reset_w(uint8_t data)
 {
 	if(data & 1)
 	{
@@ -607,39 +616,34 @@ WRITE8_MEMBER( sb16_lle_device::dsp_reset_w )
 	}
 }
 
-READ8_MEMBER( sb16_lle_device::dsp_wbuf_status_r )
+uint8_t sb16_lle_device::dsp_wbuf_status_r(offs_t offset)
 {
 	if(offset)
 		return 0xff;
 	return m_data_in << 7;
 }
 
-READ8_MEMBER( sb16_lle_device::dsp_rbuf_status_r )
+uint8_t sb16_lle_device::dsp_rbuf_status_r(offs_t offset)
 {
 	if(offset)
 	{
-		m_irq16 = false;
-		m_isa->irq5_w((m_irq8 || m_irq16 || m_irq_midi) ? ASSERT_LINE : CLEAR_LINE);
+		if(!machine().side_effects_disabled())
+		{
+			m_irq16 = false;
+			m_isa->irq5_w((m_irq8 || m_irq16 || m_irq_midi) ? ASSERT_LINE : CLEAR_LINE);
+		}
 		return 0xff;
 	}
-	m_irq8 = false;
-	m_isa->irq5_w((m_irq8 || m_irq16 || m_irq_midi) ? ASSERT_LINE : CLEAR_LINE);
+	if(!machine().side_effects_disabled())
+	{
+		m_irq8 = false;
+		m_isa->irq5_w((m_irq8 || m_irq16 || m_irq_midi) ? ASSERT_LINE : CLEAR_LINE);
+	}
 	return m_data_out << 7;
 }
 
-WRITE8_MEMBER( sb16_lle_device::invalid_w )
-{
-	logerror("sb16: invalid port write\n");
-}
-
-READ8_MEMBER( sb16_lle_device::invalid_r )
-{
-	logerror("sb16: invalid port read\n");
-	return 0xff;
-}
-
 // just using the old dummy mpu401 for now
-READ8_MEMBER( sb16_lle_device::mpu401_r )
+uint8_t sb16_lle_device::mpu401_r(offs_t offset)
 {
 	uint8_t res;
 
@@ -658,7 +662,7 @@ READ8_MEMBER( sb16_lle_device::mpu401_r )
 	return res;
 }
 
-WRITE8_MEMBER( sb16_lle_device::mpu401_w )
+void sb16_lle_device::mpu401_w(offs_t offset, uint8_t data)
 {
 	if(offset == 0) // data
 	{
@@ -705,12 +709,9 @@ void sb16_lle_device::device_start()
 	ymf262_device &ymf262 = *subdevice<ymf262_device>("ymf262");
 	set_isa_device();
 
-	m_isa->install_device(0x0200, 0x0207, read8_delegate(*subdevice<pc_joy_device>("pc_joy"), FUNC(pc_joy_device::joy_port_r)), write8_delegate(*subdevice<pc_joy_device>("pc_joy"), FUNC(pc_joy_device::joy_port_w)));
-	m_isa->install_device(0x0226, 0x0227, read8_delegate(*this, FUNC(sb16_lle_device::invalid_r)), write8_delegate(*this, FUNC(sb16_lle_device::dsp_reset_w)));
-	m_isa->install_device(0x022a, 0x022b, read8_delegate(*this, FUNC(sb16_lle_device::host_data_r)), write8_delegate(*this, FUNC(sb16_lle_device::invalid_w)) );
-	m_isa->install_device(0x022c, 0x022d, read8_delegate(*this, FUNC(sb16_lle_device::dsp_wbuf_status_r)), write8_delegate(*this, FUNC(sb16_lle_device::host_cmd_w)) );
-	m_isa->install_device(0x022e, 0x022f, read8_delegate(*this, FUNC(sb16_lle_device::dsp_rbuf_status_r)), write8_delegate(*this, FUNC(sb16_lle_device::invalid_w)) );
-	m_isa->install_device(0x0330, 0x0331, read8_delegate(*this, FUNC(sb16_lle_device::mpu401_r)), write8_delegate(*this, FUNC(sb16_lle_device::mpu401_w)));
+	m_isa->install_device(0x0200, 0x0207, read8smo_delegate(*subdevice<pc_joy_device>("pc_joy"), FUNC(pc_joy_device::joy_port_r)), write8smo_delegate(*subdevice<pc_joy_device>("pc_joy"), FUNC(pc_joy_device::joy_port_w)));
+	m_isa->install_device(0x0220, 0x022f, *this, &sb16_lle_device::host_io);
+	m_isa->install_device(0x0330, 0x0331, read8sm_delegate(*this, FUNC(sb16_lle_device::mpu401_r)), write8sm_delegate(*this, FUNC(sb16_lle_device::mpu401_w)));
 	m_isa->install_device(0x0388, 0x0389, read8sm_delegate(ymf262, FUNC(ymf262_device::read)), write8sm_delegate(ymf262, FUNC(ymf262_device::write)));
 	m_isa->install_device(0x0220, 0x0223, read8sm_delegate(ymf262, FUNC(ymf262_device::read)), write8sm_delegate(ymf262, FUNC(ymf262_device::write)));
 	m_isa->install_device(0x0228, 0x0229, read8sm_delegate(ymf262, FUNC(ymf262_device::read)), write8sm_delegate(ymf262, FUNC(ymf262_device::write)));

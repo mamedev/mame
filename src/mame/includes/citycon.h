@@ -43,11 +43,11 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	DECLARE_READ8_MEMBER(citycon_in_r);
-	DECLARE_READ8_MEMBER(citycon_irq_ack_r);
-	DECLARE_WRITE8_MEMBER(citycon_videoram_w);
-	DECLARE_WRITE8_MEMBER(citycon_linecolor_w);
-	DECLARE_WRITE8_MEMBER(citycon_background_w);
+	uint8_t citycon_in_r();
+	uint8_t citycon_irq_ack_r();
+	void citycon_videoram_w(offs_t offset, uint8_t data);
+	void citycon_linecolor_w(offs_t offset, uint8_t data);
+	void citycon_background_w(uint8_t data);
 	void init_citycon();
 	TILEMAP_MAPPER_MEMBER(citycon_scan);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);

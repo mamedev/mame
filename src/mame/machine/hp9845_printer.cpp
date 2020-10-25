@@ -193,7 +193,7 @@ void hp9845_printer_device::device_timer(emu_timer &timer, device_timer_id id, i
 	update_flg();
 }
 
-READ16_MEMBER(hp9845_printer_device::printer_r)
+uint16_t hp9845_printer_device::printer_r(offs_t offset)
 {
 	uint16_t res = 0;
 
@@ -221,7 +221,7 @@ READ16_MEMBER(hp9845_printer_device::printer_r)
 	return res;
 }
 
-WRITE16_MEMBER(hp9845_printer_device::printer_w)
+void hp9845_printer_device::printer_w(offs_t offset, uint16_t data)
 {
 	switch (offset) {
 	case 0:

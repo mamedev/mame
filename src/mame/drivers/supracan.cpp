@@ -139,20 +139,20 @@ private:
 	void supracan_mem(address_map &map);
 	void supracan_sound_mem(address_map &map);
 
-	DECLARE_READ16_MEMBER(_68k_soundram_r);
-	DECLARE_WRITE16_MEMBER(_68k_soundram_w);
-	DECLARE_READ8_MEMBER(_6502_soundmem_r);
-	DECLARE_WRITE8_MEMBER(_6502_soundmem_w);
+	uint16_t _68k_soundram_r(offs_t offset, uint16_t mem_mask = ~0);
+	void _68k_soundram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t _6502_soundmem_r(offs_t offset);
+	void _6502_soundmem_w(offs_t offset, uint8_t data);
 
-	void dma_w(address_space &space, int offset, uint16_t data, uint16_t mem_mask, int ch);
-	DECLARE_WRITE16_MEMBER(dma_channel0_w);
-	DECLARE_WRITE16_MEMBER(dma_channel1_w);
+	void dma_w(int offset, uint16_t data, uint16_t mem_mask, int ch);
+	void dma_channel0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void dma_channel1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER(sound_r);
-	DECLARE_WRITE16_MEMBER(sound_w);
-	DECLARE_READ16_MEMBER(video_r);
-	DECLARE_WRITE16_MEMBER(video_w);
-	DECLARE_WRITE16_MEMBER(vram_w);
+	uint16_t sound_r(offs_t offset, uint16_t mem_mask = 0);
+	void sound_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t video_r(offs_t offset, uint16_t mem_mask = 0);
+	void video_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	struct dma_regs_t
 	{
@@ -258,7 +258,7 @@ private:
 	TIMER_CALLBACK_MEMBER(line_off_callback);
 	TIMER_CALLBACK_MEMBER(video_callback);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
-	int get_tilemap_Region(int layer);
+	int get_tilemap_region(int layer);
 	void get_tilemap_info_common(int layer, tile_data &tileinfo, int count);
 	void get_roz_tilemap_info(int layer, tile_data &tileinfo, int count);
 	int get_tilemap_dimensions(int &xsize, int &ysize, int layer);
@@ -273,7 +273,7 @@ private:
 };
 
 
-int supracan_state::get_tilemap_Region(int layer)
+int supracan_state::get_tilemap_region(int layer)
 {
 	// HACK!!!
 	if (layer == 2)
@@ -305,7 +305,7 @@ void supracan_state::get_tilemap_info_common(int layer, tile_data &tileinfo, int
 
 	uint32_t base = m_tilemap_base_addr[layer];
 	int gfx_mode = (m_tilemap_mode[layer] & 0x7000) >> 12;
-	int region = get_tilemap_Region(layer);
+	int region = get_tilemap_region(layer);
 
 	count += base;
 
@@ -367,7 +367,7 @@ void supracan_state::get_roz_tilemap_info(int layer, tile_data &tileinfo, int co
 	uint16_t tile_bank = 0;
 	uint16_t palette_bank = 0;
 
-	region = get_tilemap_Region(layer);
+	region = get_tilemap_region(layer);
 
 	switch (m_roz_mode & 3) // FIXME: fix gfx bpp order
 	{
@@ -553,8 +553,8 @@ void supracan_state::draw_sprite_tile(bitmap_ind16 &dst, bitmap_ind8 &priomap, c
 	for (int y = dsty; y <= dstendy; y++)
 	{
 		const uint8_t *srcp = &src_data[srcx];
-		uint8_t *priop = &priomap.pix8(y, dstx);
-		uint16_t *dstp = &dst.pix16(y, dstx);
+		uint8_t *priop = &priomap.pix(y, dstx);
+		uint16_t *dstp = &dst.pix(y, dstx);
 		for (int x = dstx; x <= dstendx; x++)
 		{
 			const uint32_t srcdata = *srcp;
@@ -627,7 +627,7 @@ void supracan_state::draw_sprite_tile_mask(bitmap_ind8 &dst, const rectangle &cl
 	for (int y = dsty; y <= dstendy; y++)
 	{
 		const uint8_t *srcp = &src_data[srcx];
-		uint8_t *dstp = &dst.pix8(y, dstx);
+		uint8_t *dstp = &dst.pix(y, dstx);
 		for (int x = dstx; x <= dstendx; x++)
 		{
 			if (*srcp)
@@ -697,9 +697,9 @@ void supracan_state::draw_sprite_tile_masked(bitmap_ind16 &dst, bitmap_ind8 &mas
 	for (int y = dsty; y <= dstendy; y++)
 	{
 		const uint8_t *srcp = &src_data[srcx];
-		uint16_t *dstp = &dst.pix16(y, dstx);
-		uint8_t *priop = &priomap.pix8(y, dstx);
-		uint8_t *maskp = &mask.pix8(y, dstx);
+		uint16_t *dstp = &dst.pix(y, dstx);
+		uint8_t *priop = &priomap.pix(y, dstx);
+		uint8_t *maskp = &mask.pix(y, dstx);
 		for (int x = dstx; x <= dstendx; x++)
 		{
 			const uint32_t srcdata = *srcp;
@@ -838,8 +838,8 @@ void supracan_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &maskmap, bi
 			uint32_t delta = (1 << 17) / xscale;
 			for (int sy = 0; sy < ysize * 8; sy++)
 			{
-				uint16_t *src = &sprite_bitmap->pix16(sy);
-				uint16_t *dst = &bitmap.pix16(y + sy);
+				uint16_t *src = &sprite_bitmap->pix(sy);
+				uint16_t *dst = &bitmap.pix(y + sy);
 				uint32_t dx = x << 16;
 				for (int sx = 0; sx < xsize * 8; sx++)
 				{
@@ -897,7 +897,7 @@ void supracan_state::draw_roz_layer(bitmap_ind16 &bitmap, const rectangle &clipr
 			uint32_t cy = starty;
 
 			/* get dest and priority pointers */
-			uint16_t *dest = &bitmap.pix16(sy, sx);
+			uint16_t *dest = &bitmap.pix(sy, sx);
 
 			/* loop over columns */
 			while (x <= ex)
@@ -909,7 +909,7 @@ void supracan_state::draw_roz_layer(bitmap_ind16 &bitmap, const rectangle &clipr
 					{
 						int scroll = 0; // scrollram[(cx>>16)&0x3ff]);
 
-						uint16_t data = &srcbitmap.pix16(((cy >> 16) - scroll) & ymask, (cx >> 16) & xmask)[0];
+						uint16_t data = &srcbitmap.pix(((cy >> 16) - scroll) & ymask, (cx >> 16) & xmask)[0];
 
 						if ((data & transmask) != 0)
 							dest[0] = data;
@@ -918,7 +918,7 @@ void supracan_state::draw_roz_layer(bitmap_ind16 &bitmap, const rectangle &clipr
 					#endif
 					{
 						int scroll = 0;//scrollram[(cy>>16)&0x3ff]);
-						uint16_t data =  srcbitmap.pix16((cy >> 16) & ymask, ((cx >> 16) - scroll) & xmask);
+						uint16_t data =  srcbitmap.pix((cy >> 16) & ymask, ((cx >> 16) - scroll) & xmask);
 
 						if ((data & transmask) != 0)
 							*dest = data;
@@ -1028,7 +1028,7 @@ uint32_t supracan_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 //            tilemap_num = layer;
 				int which_tilemap_size = get_tilemap_dimensions(xsize, ysize, layer);
 				bitmap_ind16 &src_bitmap = m_tilemap_sizes[layer][which_tilemap_size]->pixmap();
-				int gfx_region = get_tilemap_Region(layer);
+				int gfx_region = get_tilemap_region(layer);
 				int transmask = 0xff;
 
 				switch (gfx_region)
@@ -1059,8 +1059,8 @@ uint32_t supracan_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 						for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 						{
-							// these will have to change to pix32 etc. once alpha blending is supported
-							uint16_t* screen = &bitmap.pix16(y);
+							// these will have to change to uint32_t* etc. once alpha blending is supported
+							uint16_t* screen = &bitmap.pix(y);
 
 							int actualy = y & mosaic_mask;
 							int realy = actualy + scrolly;
@@ -1069,8 +1069,8 @@ uint32_t supracan_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 								if (scrolly + y < 0 || scrolly + y > ((ysize * 8) - 1))
 									continue;
 
-							uint16_t* src = &src_bitmap.pix16(realy & ((ysize * 8) - 1));
-							uint8_t* priop = &m_prio_bitmap.pix8(y);
+							uint16_t* src = &src_bitmap.pix(realy & ((ysize * 8) - 1));
+							uint8_t* priop = &m_prio_bitmap.pix(y);
 
 							for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 							{
@@ -1163,9 +1163,9 @@ uint32_t supracan_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	{
 		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-			uint16_t* dstp = &bitmap.pix16(y);
-			uint8_t* priop = &m_prio_bitmap.pix8(y);
-			uint16_t* spritep = &m_sprite_final_bitmap.pix16(y);
+			uint16_t* dstp = &bitmap.pix(y);
+			uint8_t* priop = &m_prio_bitmap.pix(y);
+			uint16_t* spritep = &m_sprite_final_bitmap.pix(y);
 
 			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
@@ -1184,7 +1184,7 @@ uint32_t supracan_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-void supracan_state::dma_w(address_space &space, int offset, uint16_t data, uint16_t mem_mask, int ch)
+void supracan_state::dma_w(int offset, uint16_t data, uint16_t mem_mask, int ch)
 {
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 
@@ -1253,19 +1253,19 @@ void supracan_state::dma_w(address_space &space, int offset, uint16_t data, uint
 	}
 }
 
-WRITE16_MEMBER(supracan_state::dma_channel0_w)
+void supracan_state::dma_channel0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	dma_w(space, offset, data, mem_mask, 0);
+	dma_w(offset, data, mem_mask, 0);
 }
 
-WRITE16_MEMBER(supracan_state::dma_channel1_w)
+void supracan_state::dma_channel1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	dma_w(space, offset, data, mem_mask, 1);
+	dma_w(offset, data, mem_mask, 1);
 }
 
 
 #if 0
-WRITE16_MEMBER(supracan_state::supracan_pram_w)
+void supracan_state::supracan_pram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_pram[offset] &= ~mem_mask;
 	m_pram[offset] |= data & mem_mask;
@@ -1280,7 +1280,7 @@ void supracan_state::write_swapped_byte(int offset, uint8_t byte)
 	m_vram_addr_swapped[swapped_offset] = byte;
 }
 
-WRITE16_MEMBER(supracan_state::vram_w)
+void supracan_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram[offset]);
 
@@ -1322,7 +1322,7 @@ void supracan_state::set_sound_irq(uint8_t mask)
 	}
 }
 
-READ8_MEMBER(supracan_state::_6502_soundmem_r)
+uint8_t supracan_state::_6502_soundmem_r(offs_t offset)
 {
 	uint8_t data = m_soundram[offset];
 
@@ -1391,7 +1391,7 @@ READ8_MEMBER(supracan_state::_6502_soundmem_r)
 	return data;
 }
 
-WRITE8_MEMBER(supracan_state::_6502_soundmem_w)
+void supracan_state::_6502_soundmem_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -1491,9 +1491,8 @@ void supracan_state::palette_init(palette_device &palette) const
 	}
 }
 
-WRITE16_MEMBER(supracan_state::_68k_soundram_w)
+void supracan_state::_68k_soundram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	m_soundram[offset * 2 + 1] = data & 0xff;
 	m_soundram[offset * 2] = data >> 8;
 
@@ -1501,19 +1500,18 @@ WRITE16_MEMBER(supracan_state::_68k_soundram_w)
 	{
 		if (ACCESSING_BITS_8_15)
 		{
-			_6502_soundmem_w(mem, offset * 2, data >> 8);
+			_6502_soundmem_w(offset * 2, data >> 8);
 		}
 		if (ACCESSING_BITS_0_7)
 		{
-			_6502_soundmem_w(mem, offset * 2 + 1, data & 0xff);
+			_6502_soundmem_w(offset * 2 + 1, data & 0xff);
 		}
 	}
 	LOGMASKED(LOG_68K_SOUND, "%s: 68k sound RAM write: %04x & %04x = %04x\n", machine().describe_context(), offset << 1, mem_mask, (uint16_t)data);
 }
 
-READ16_MEMBER(supracan_state::_68k_soundram_r)
+uint16_t supracan_state::_68k_soundram_r(offs_t offset, uint16_t mem_mask)
 {
-	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	uint16_t data = m_soundram[offset * 2] << 8;
 	data |= m_soundram[offset * 2 + 1];
 
@@ -1522,11 +1520,11 @@ READ16_MEMBER(supracan_state::_68k_soundram_r)
 		data = 0;
 		if (ACCESSING_BITS_8_15)
 		{
-			data |= _6502_soundmem_r(mem, offset * 2) << 8;
+			data |= _6502_soundmem_r(offset * 2) << 8;
 		}
 		if (ACCESSING_BITS_0_7)
 		{
-			data |= _6502_soundmem_r(mem, offset * 2 + 1);
+			data |= _6502_soundmem_r(offset * 2 + 1);
 		}
 	}
 	//LOGMASKED(LOG_68K_SOUND, "%s: 68k sound RAM read: %04x & %04x (%04x)\n", machine().describe_context(), offset << 1, mem_mask, data);
@@ -1534,7 +1532,7 @@ READ16_MEMBER(supracan_state::_68k_soundram_r)
 	return data;
 }
 
-READ16_MEMBER(supracan_state::sound_r)
+uint16_t supracan_state::sound_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0;
 
@@ -1548,7 +1546,7 @@ READ16_MEMBER(supracan_state::sound_r)
 	return data;
 }
 
-WRITE16_MEMBER(supracan_state::sound_w)
+void supracan_state::sound_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -1586,7 +1584,7 @@ WRITE16_MEMBER(supracan_state::sound_w)
 }
 
 
-READ16_MEMBER(supracan_state::video_r)
+uint16_t supracan_state::video_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = m_video_regs[offset];
 
@@ -1692,7 +1690,7 @@ TIMER_CALLBACK_MEMBER(supracan_state::video_callback)
 	m_video_timer->adjust(m_screen->time_until_pos((vpos + 1) % 256, 0));
 }
 
-WRITE16_MEMBER(supracan_state::video_w)
+void supracan_state::video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 

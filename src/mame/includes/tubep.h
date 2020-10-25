@@ -6,6 +6,7 @@
 #pragma once
 
 #include "cpu/m6800/m6800.h"
+#include "machine/gen_latch.h"
 #include "sound/msm5205.h"
 #include "emupal.h"
 #include "screen.h"
@@ -15,16 +16,17 @@ class tubep_state : public driver_device
 public:
 	tubep_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_textram(*this, "textram"),
-		m_backgroundram(*this, "backgroundram"),
-		m_sprite_colorsharedram(*this, "sprite_color"),
-		m_rjammer_backgroundram(*this, "rjammer_bgram"),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_slave(*this, "slave"),
 		m_mcu(*this, "mcu"),
+		m_soundlatch(*this, "soundlatch"),
 		m_msm(*this, "msm"),
-		m_screen(*this, "screen")
+		m_screen(*this, "screen"),
+		m_textram(*this, "textram"),
+		m_backgroundram(*this, "backgroundram"),
+		m_sprite_colorsharedram(*this, "sprite_color"),
+		m_rjammer_backgroundram(*this, "rjammer_bgram")
 	{ }
 
 	void tubepb(machine_config &config);
@@ -39,16 +41,23 @@ private:
 		TIMER_SPRITE
 	};
 
-	uint8_t m_sound_latch;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
+	required_device<cpu_device> m_slave;
+	required_device<m6802_cpu_device> m_mcu;
+	required_device<generic_latch_8_device> m_soundlatch;
+	optional_device<msm5205_device> m_msm;
+	required_device<screen_device> m_screen;
+	required_shared_ptr<uint8_t> m_textram;
+	optional_shared_ptr<uint8_t> m_backgroundram;
+	required_shared_ptr<uint8_t> m_sprite_colorsharedram;
+	optional_shared_ptr<uint8_t> m_rjammer_backgroundram;
+
 	uint8_t m_ls74;
 	uint8_t m_ls377;
 	emu_timer *m_interrupt_timer;
 	emu_timer *m_sprite_timer;
 	int m_curr_scanline;
-	required_shared_ptr<uint8_t> m_textram;
-	optional_shared_ptr<uint8_t> m_backgroundram;
-	required_shared_ptr<uint8_t> m_sprite_colorsharedram;
-	optional_shared_ptr<uint8_t> m_rjammer_backgroundram;
 	std::unique_ptr<uint8_t[]> m_spritemap;
 	uint8_t m_prom2[32];
 	uint32_t m_romD_addr;
@@ -74,31 +83,29 @@ private:
 	uint32_t m_page;
 	DECLARE_WRITE_LINE_MEMBER(coin1_counter_w);
 	DECLARE_WRITE_LINE_MEMBER(coin2_counter_w);
-	DECLARE_WRITE8_MEMBER(main_cpu_irq_line_clear_w);
-	DECLARE_WRITE8_MEMBER(second_cpu_irq_line_clear_w);
-	DECLARE_WRITE8_MEMBER(tubep_soundlatch_w);
-	DECLARE_READ8_MEMBER(tubep_soundlatch_r);
-	DECLARE_READ8_MEMBER(tubep_sound_irq_ack);
-	DECLARE_WRITE8_MEMBER(tubep_sound_unknown);
-	DECLARE_WRITE8_MEMBER(rjammer_voice_input_w);
-	DECLARE_WRITE8_MEMBER(rjammer_voice_intensity_control_w);
-	DECLARE_WRITE8_MEMBER(tubep_textram_w);
+	void main_cpu_irq_line_clear_w(uint8_t data);
+	void second_cpu_irq_line_clear_w(uint8_t data);
+	uint8_t tubep_soundlatch_r();
+	uint8_t tubep_sound_irq_ack();
+	void rjammer_voice_input_w(uint8_t data);
+	void rjammer_voice_intensity_control_w(uint8_t data);
+	void tubep_textram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(screen_flip_w);
 	DECLARE_WRITE_LINE_MEMBER(background_romselect_w);
 	DECLARE_WRITE_LINE_MEMBER(colorproms_A4_line_w);
-	DECLARE_WRITE8_MEMBER(tubep_background_a000_w);
-	DECLARE_WRITE8_MEMBER(tubep_background_c000_w);
-	DECLARE_WRITE8_MEMBER(tubep_sprite_control_w);
-	DECLARE_WRITE8_MEMBER(rjammer_background_LS377_w);
-	DECLARE_WRITE8_MEMBER(rjammer_background_page_w);
-	DECLARE_WRITE8_MEMBER(rjammer_voice_startstop_w);
-	DECLARE_WRITE8_MEMBER(rjammer_voice_frequency_select_w);
-	DECLARE_WRITE8_MEMBER(ay8910_portA_0_w);
-	DECLARE_WRITE8_MEMBER(ay8910_portB_0_w);
-	DECLARE_WRITE8_MEMBER(ay8910_portA_1_w);
-	DECLARE_WRITE8_MEMBER(ay8910_portB_1_w);
-	DECLARE_WRITE8_MEMBER(ay8910_portA_2_w);
-	DECLARE_WRITE8_MEMBER(ay8910_portB_2_w);
+	void tubep_background_a000_w(uint8_t data);
+	void tubep_background_c000_w(uint8_t data);
+	void tubep_sprite_control_w(offs_t offset, uint8_t data);
+	void rjammer_background_LS377_w(uint8_t data);
+	void rjammer_background_page_w(uint8_t data);
+	void rjammer_voice_startstop_w(uint8_t data);
+	void rjammer_voice_frequency_select_w(uint8_t data);
+	void ay8910_portA_0_w(uint8_t data);
+	void ay8910_portB_0_w(uint8_t data);
+	void ay8910_portA_1_w(uint8_t data);
+	void ay8910_portB_1_w(uint8_t data);
+	void ay8910_portA_2_w(uint8_t data);
+	void ay8910_portB_2_w(uint8_t data);
 	DECLARE_MACHINE_START(tubep);
 	DECLARE_MACHINE_RESET(tubep);
 	virtual void video_start() override;
@@ -115,12 +122,6 @@ private:
 	void tubep_vblank_end();
 	void tubep_setup_save_state();
 	DECLARE_WRITE_LINE_MEMBER(rjammer_adpcm_vck);
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_soundcpu;
-	required_device<cpu_device> m_slave;
-	required_device<m6802_cpu_device> m_mcu;
-	optional_device<msm5205_device> m_msm;
-	required_device<screen_device> m_screen;
 
 	void nsc_map(address_map &map);
 	void rjammer_main_map(address_map &map);

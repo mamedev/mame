@@ -209,7 +209,7 @@ void md_eeprom_stm95_device::device_reset()
  mapper specific handlers
  -------------------------------------------------*/
 
-READ16_MEMBER(md_eeprom_stm95_device::read)
+uint16_t md_eeprom_stm95_device::read(offs_t offset)
 {
 	if (offset == 0x0015e6/2 || offset == 0x0015e8/2)
 	{
@@ -236,7 +236,7 @@ READ16_MEMBER(md_eeprom_stm95_device::read)
 	}
 }
 
-READ16_MEMBER(md_eeprom_stm95_device::read_a13)
+uint16_t md_eeprom_stm95_device::read_a13(offs_t offset)
 {
 	if (offset == 0x0a/2)
 	{
@@ -245,7 +245,7 @@ READ16_MEMBER(md_eeprom_stm95_device::read_a13)
 	return 0xffff;
 }
 
-WRITE16_MEMBER(md_eeprom_stm95_device::write_a13)
+void md_eeprom_stm95_device::write_a13(offs_t offset, uint16_t data)
 {
 	if (offset == 0x00/2)
 	{

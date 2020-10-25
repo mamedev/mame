@@ -38,12 +38,12 @@ namespace
 	{
 	public:
 		// construction/destruction
-		coco_pak_gmc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+		coco_pak_gmc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 		virtual void device_add_mconfig(machine_config &config) override;
 
 	protected:
 		// device-level overrides
-		virtual DECLARE_WRITE8_MEMBER(scs_write) override;
+		virtual void scs_write(offs_t offset, u8 data) override;
 
 	private:
 		required_device<sn76489a_device> m_psg;
@@ -68,7 +68,7 @@ DEFINE_DEVICE_TYPE_PRIVATE(COCO_PAK_GMC, device_cococart_interface, coco_pak_gmc
 //  coco_pak_device - constructor
 //-------------------------------------------------
 
-coco_pak_gmc_device::coco_pak_gmc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+coco_pak_gmc_device::coco_pak_gmc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: coco_pak_banked_device(mconfig, COCO_PAK_GMC, tag, owner, clock)
 	, m_psg(*this, SN76489AN_TAG)
 {
@@ -79,13 +79,13 @@ coco_pak_gmc_device::coco_pak_gmc_device(const machine_config &mconfig, const ch
 //    scs_write
 //-------------------------------------------------
 
-WRITE8_MEMBER(coco_pak_gmc_device::scs_write)
+void coco_pak_gmc_device::scs_write(offs_t offset, u8 data)
 {
 	switch(offset)
 	{
 		case 0:
 			/* set the bank */
-			coco_pak_banked_device::scs_write(space, offset, data, mem_mask);
+			coco_pak_banked_device::scs_write(offset, data);
 			break;
 		case 1:
 			m_psg->write(data);

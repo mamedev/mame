@@ -86,26 +86,26 @@ protected:
 	template <typename X> static void screen_sms_pal_raw_params(screen_device &screen, X &&pixelclock);
 	template <typename X> static void screen_sms_ntsc_raw_params(screen_device &screen, X &&pixelclock);
 
-	DECLARE_READ8_MEMBER(read_0000);
-	DECLARE_READ8_MEMBER(read_4000);
-	DECLARE_READ8_MEMBER(read_8000);
-	DECLARE_READ8_MEMBER(read_ram);
-	DECLARE_WRITE8_MEMBER(write_ram);
-	DECLARE_WRITE8_MEMBER(write_cart);
+	uint8_t read_0000(offs_t offset);
+	uint8_t read_4000(offs_t offset);
+	uint8_t read_8000(offs_t offset);
+	uint8_t read_ram(offs_t offset);
+	void write_ram(offs_t offset, uint8_t data);
+	void write_cart(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER(sms_mapper_r);
-	DECLARE_WRITE8_MEMBER(sms_mapper_w);
-	DECLARE_WRITE8_MEMBER(sms_mem_control_w);
-	DECLARE_WRITE8_MEMBER(sms_io_control_w);
-	DECLARE_READ8_MEMBER(sms_count_r);
-	DECLARE_READ8_MEMBER(sms_input_port_dc_r);
-	DECLARE_READ8_MEMBER(sms_input_port_dd_r);
-	DECLARE_READ8_MEMBER(sg1000m3_peripheral_r);
-	DECLARE_WRITE8_MEMBER(sg1000m3_peripheral_w);
-	DECLARE_READ8_MEMBER(smsj_audio_control_r);
-	DECLARE_WRITE8_MEMBER(smsj_audio_control_w);
-	DECLARE_WRITE8_MEMBER(smsj_ym2413_register_port_w);
-	DECLARE_WRITE8_MEMBER(smsj_ym2413_data_port_w);
+	uint8_t sms_mapper_r(offs_t offset);
+	void sms_mapper_w(offs_t offset, uint8_t data);
+	void sms_mem_control_w(uint8_t data);
+	void sms_io_control_w(uint8_t data);
+	uint8_t sms_count_r(offs_t offset);
+	uint8_t sms_input_port_dc_r();
+	uint8_t sms_input_port_dd_r();
+	uint8_t sg1000m3_peripheral_r(offs_t offset);
+	void sg1000m3_peripheral_w(offs_t offset, uint8_t data);
+	uint8_t smsj_audio_control_r();
+	void smsj_audio_control_w(uint8_t data);
+	void smsj_ym2413_register_port_w(uint8_t data);
+	void smsj_ym2413_data_port_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(rapid_n_csync_callback);
 	DECLARE_WRITE_LINE_MEMBER(sms_ctrl1_th_input);
@@ -119,7 +119,7 @@ protected:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	uint8_t read_bus(address_space &space, unsigned int bank, uint16_t base_addr, uint16_t offset);
+	uint8_t read_bus(unsigned int bank, uint16_t base_addr, uint16_t offset);
 	void setup_bios();
 	void setup_media_slots();
 	void setup_enabled_slots();
@@ -146,7 +146,6 @@ protected:
 	output_finder<> m_led_pwr;
 
 	required_memory_region m_region_maincpu;
-	address_space *m_space;
 	std::unique_ptr<uint8_t[]> m_mainram;
 	uint8_t *m_BIOS;
 
@@ -226,8 +225,8 @@ protected:
 	virtual void video_reset() override;
 
 private:
-	DECLARE_READ8_MEMBER(sscope_r);
-	DECLARE_WRITE8_MEMBER(sscope_w);
+	uint8_t sscope_r(offs_t offset);
+	void sscope_w(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(sscope_vblank);
 	uint32_t screen_update_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -267,12 +266,12 @@ protected:
 	virtual void device_post_load() override;
 
 private:
-	DECLARE_READ8_MEMBER(sms_store_cart_select_r);
-	DECLARE_WRITE8_MEMBER(sms_store_cart_select_w);
+	uint8_t sms_store_cart_select_r();
+	void sms_store_cart_select_w(uint8_t data);
 	void store_select_cart(uint8_t data);
-	DECLARE_WRITE8_MEMBER(sms_store_control_w);
+	void sms_store_control_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(store_cart_peek);
+	uint8_t store_cart_peek(offs_t offset);
 
 	DECLARE_WRITE_LINE_MEMBER(sms_store_int_callback);
 	void sms_store_mem(address_map &map);
@@ -304,10 +303,10 @@ protected:
 private:
 	template <typename X> static void screen_gg_raw_params(screen_device &screen, X &&pixelclock);
 
-	DECLARE_READ8_MEMBER(gg_input_port_00_r);
-	DECLARE_READ8_MEMBER(gg_sio_r);
-	DECLARE_WRITE8_MEMBER(gg_sio_w);
-	DECLARE_WRITE8_MEMBER(gg_psg_stereo_w);
+	uint8_t gg_input_port_00_r();
+	uint8_t gg_sio_r(offs_t offset);
+	void gg_sio_w(offs_t offset, uint8_t data);
+	void gg_psg_stereo_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(gg_pause_callback);
 	DECLARE_WRITE_LINE_MEMBER(gg_ext_th_input);

@@ -92,14 +92,14 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_READ16_MEMBER(ret_ffff);
-	DECLARE_WRITE16_MEMBER(gfxregs_w);
-	DECLARE_WRITE8_MEMBER(livequiz_coin_w);
-	DECLARE_READ16_MEMBER(hammer_sensor_r);
-	DECLARE_WRITE8_MEMBER(hammer_coin_w);
-	DECLARE_WRITE8_MEMBER(hammer_motor_w);
-	DECLARE_WRITE8_MEMBER(eeprom_w);
-	DECLARE_WRITE16_MEMBER(zoomtable_w);
+	uint16_t ret_ffff();
+	void gfxregs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void livequiz_coin_w(uint8_t data);
+	uint16_t hammer_sensor_r();
+	void hammer_coin_w(uint8_t data);
+	void hammer_motor_w(uint8_t data);
+	void eeprom_w(uint8_t data);
+	void zoomtable_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
@@ -138,7 +138,7 @@ uint32_t midas_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	return 0;
 }
 
-WRITE8_MEMBER(midas_state::eeprom_w)
+void midas_state::eeprom_w(uint8_t data)
 {
 	// latch the bit
 	m_eeprom->di_write((data & 0x04) >> 2);
@@ -150,12 +150,12 @@ WRITE8_MEMBER(midas_state::eeprom_w)
 	m_eeprom->clk_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
 }
 
-READ16_MEMBER(midas_state::ret_ffff)
+uint16_t midas_state::ret_ffff()
 {
 	return 0xffff;
 }
 
-WRITE16_MEMBER(midas_state::gfxregs_w)
+void midas_state::gfxregs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* accessing the LSB only is not mapped */
 	if (mem_mask != 0x00ff)
@@ -173,7 +173,7 @@ WRITE16_MEMBER(midas_state::gfxregs_w)
 	}
 }
 
-WRITE16_MEMBER(midas_state::zoomtable_w)
+void midas_state::zoomtable_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_zoomram[offset]);
 
@@ -188,7 +188,7 @@ WRITE16_MEMBER(midas_state::zoomtable_w)
                                        Live Quiz Show
 ***************************************************************************************/
 
-WRITE8_MEMBER(midas_state::livequiz_coin_w)
+void midas_state::livequiz_coin_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x0001);
 #ifdef MAME_DEBUG
@@ -234,7 +234,7 @@ void midas_state::livequiz_map(address_map &map)
                                           Hammer
 ***************************************************************************************/
 
-READ16_MEMBER(midas_state::hammer_sensor_r)
+uint16_t midas_state::hammer_sensor_r()
 {
 	if (ioport("HAMMER")->read() & 0x80)
 		return 0xffff;
@@ -242,7 +242,7 @@ READ16_MEMBER(midas_state::hammer_sensor_r)
 	return (ioport("SENSORY")->read() << 8) | ioport("SENSORX")->read();
 }
 
-WRITE8_MEMBER(midas_state::hammer_coin_w)
+void midas_state::hammer_coin_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
@@ -251,7 +251,7 @@ WRITE8_MEMBER(midas_state::hammer_coin_w)
 #endif
 }
 
-WRITE8_MEMBER(midas_state::hammer_motor_w)
+void midas_state::hammer_motor_w(uint8_t data)
 {
 	m_prize[0]->motor_w(BIT(data, 0));
 	m_prize[1]->motor_w(BIT(data, 1));

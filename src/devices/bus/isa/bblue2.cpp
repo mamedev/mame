@@ -217,23 +217,23 @@ void isa8_babyblue2_device::device_reset()
 		// map Z80 LPT port based on jumper setting
 		m_z80->space(AS_IO).install_readwrite_handler(z80lptloc, z80lptloc+7, read8sm_delegate(m_parallel, FUNC(pc_lpt_device::read)), write8sm_delegate(m_parallel, FUNC(pc_lpt_device::write)));
 
-		m_isa->install_device(ioloc, ioloc+1, read8_delegate(*this, FUNC(isa8_babyblue2_device::z80_control_r)), write8_delegate(*this, FUNC(isa8_babyblue2_device::z80_control_w)));
+		m_isa->install_device(ioloc, ioloc+1, read8sm_delegate(*this, FUNC(isa8_babyblue2_device::z80_control_r)), write8sm_delegate(*this, FUNC(isa8_babyblue2_device::z80_control_w)));
 		m_isa->install_device(lptloc, lptloc+7, read8sm_delegate(m_parallel, FUNC(pc_lpt_device::read)), write8sm_delegate(m_parallel, FUNC(pc_lpt_device::write)));
 		m_isa->install_device(0x3f8, 0x03ff, read8sm_delegate(m_serial1, FUNC(ins8250_device::ins8250_r)), write8sm_delegate(m_serial1, FUNC(ins8250_device::ins8250_w)));
 		m_isa->install_device(0x2f8, 0x02ff, read8sm_delegate(m_serial2, FUNC(ins8250_device::ins8250_r)), write8sm_delegate(m_serial2, FUNC(ins8250_device::ins8250_w)));
 		// TODO: RTC
-		m_isa->install_memory(ramloc, ramloc+0xffff, read8_delegate(*this, FUNC(isa8_babyblue2_device::z80_ram_r)),write8_delegate(*this, FUNC(isa8_babyblue2_device::z80_ram_w)));
+		m_isa->install_memory(ramloc, ramloc+0xffff, read8sm_delegate(*this, FUNC(isa8_babyblue2_device::z80_ram_r)),write8sm_delegate(*this, FUNC(isa8_babyblue2_device::z80_ram_w)));
 		m_devices_installed = true;
 	}
 }
 
-READ8_MEMBER(isa8_babyblue2_device::z80_control_r)
+uint8_t isa8_babyblue2_device::z80_control_r(offs_t offset)
 {
 	logerror("Z80 control line read\b");
 	return 0xff;
 }
 
-WRITE8_MEMBER(isa8_babyblue2_device::z80_control_w)
+void isa8_babyblue2_device::z80_control_w(offs_t offset, uint8_t data)
 {
 	if(offset == 0)
 	{

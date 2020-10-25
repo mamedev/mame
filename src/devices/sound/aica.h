@@ -39,7 +39,7 @@ protected:
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	// device_memory_interface configuration
 	virtual space_config_vector memory_space_config() const override;
@@ -124,7 +124,7 @@ private:
 	void w16(u32 addr,u16 val);
 	u16 r16(u32 addr);
 	inline s32 UpdateSlot(AICA_SLOT *slot);
-	void DoMasterSamples(int nsamples);
+	void DoMasterSamples(std::vector<read_stream_view> const &inputs, write_stream_view &bufl, write_stream_view &bufr);
 	void exec_dma();
 
 
@@ -147,8 +147,8 @@ private:
 	u16 m_EFSPAN[0x48];
 	AICA_SLOT m_Slots[64];
 
-	address_space                                *m_data;
-	memory_access_cache<1, 0, ENDIANNESS_LITTLE> *m_cache;
+	memory_access<23, 1, 0, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<23, 1, 0, ENDIANNESS_LITTLE>::specific m_data;
 	sound_stream * m_stream;
 
 	u32 m_IrqTimA;
@@ -183,11 +183,6 @@ private:
 	int m_ARTABLE[64], m_DRTABLE[64];
 
 	AICADSP m_DSP;
-
-	stream_sample_t *m_bufferl;
-	stream_sample_t *m_bufferr;
-	stream_sample_t *m_exts0;
-	stream_sample_t *m_exts1;
 
 	s32 m_EG_TABLE[0x400];
 	int m_PLFO_TRI[256],m_PLFO_SQR[256],m_PLFO_SAW[256],m_PLFO_NOI[256];

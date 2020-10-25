@@ -5,6 +5,7 @@
     debugger.h
 
     General debugging interfaces
+
 ****************************************************************************/
 
 #ifndef MAME_EMU_DEBUGGER_H

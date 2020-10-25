@@ -87,43 +87,43 @@ void virge_pci_device::refresh_linear_window()
 	}
 }
 
-READ32_MEMBER(virge_pci_device::base_address_r)
+uint32_t virge_pci_device::base_address_r()
 {
 	return downcast<s3virge_vga_device *>(m_vga.target())->get_linear_address();
 }
 
-WRITE32_MEMBER(virge_pci_device::base_address_w)
+void virge_pci_device::base_address_w(offs_t offset, uint32_t data)
 {
-	pci_device::address_base_w(space,offset,data,mem_mask);
+	pci_device::address_base_w(offset,data);
 	downcast<s3virge_vga_device *>(m_vga.target())->set_linear_address(data & 0xffff0000);
 	refresh_linear_window();
 }
 
-READ32_MEMBER(virge_pci_device::vga_3b0_r)
+uint32_t virge_pci_device::vga_3b0_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = 0;
 	if (ACCESSING_BITS_0_7)
-		result |= downcast<s3_vga_device *>(m_vga.target())->port_03b0_r(space, offset * 4 + 0, 0xff) << 0;
+		result |= downcast<s3_vga_device *>(m_vga.target())->port_03b0_r(offset * 4 + 0) << 0;
 	if (ACCESSING_BITS_8_15)
-		result |= downcast<s3_vga_device *>(m_vga.target())->port_03b0_r(space, offset * 4 + 1, 0xff) << 8;
+		result |= downcast<s3_vga_device *>(m_vga.target())->port_03b0_r(offset * 4 + 1) << 8;
 	if (ACCESSING_BITS_16_23)
-		result |= downcast<s3_vga_device *>(m_vga.target())->port_03b0_r(space, offset * 4 + 2, 0xff) << 16;
+		result |= downcast<s3_vga_device *>(m_vga.target())->port_03b0_r(offset * 4 + 2) << 16;
 	if (ACCESSING_BITS_24_31)
-		result |= downcast<s3_vga_device *>(m_vga.target())->port_03b0_r(space, offset * 4 + 3, 0xff) << 24;
+		result |= downcast<s3_vga_device *>(m_vga.target())->port_03b0_r(offset * 4 + 3) << 24;
 	return result;
 }
 
-WRITE32_MEMBER(virge_pci_device::vga_3b0_w)
+void virge_pci_device::vga_3b0_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		downcast<s3_vga_device *>(m_vga.target())->port_03b0_w(space, offset * 4 + 0, data >> 0, 0xff);
+		downcast<s3_vga_device *>(m_vga.target())->port_03b0_w(offset * 4 + 0, data >> 0);
 		if(offset == 1 && downcast<s3virge_vga_device *>(m_vga.target())->get_crtc_port() == 0x3b0)
 			m_current_crtc_reg = data & 0xff;
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		downcast<s3_vga_device *>(m_vga.target())->port_03b0_w(space, offset * 4 + 1, data >> 8, 0xff);
+		downcast<s3_vga_device *>(m_vga.target())->port_03b0_w(offset * 4 + 1, data >> 8);
 		if(offset == 1 && downcast<s3virge_vga_device *>(m_vga.target())->get_crtc_port() == 0x3b0)
 		{
 			if(m_current_crtc_reg == 0x58)
@@ -139,62 +139,62 @@ WRITE32_MEMBER(virge_pci_device::vga_3b0_w)
 		}
 	}
 	if (ACCESSING_BITS_16_23)
-		downcast<s3_vga_device *>(m_vga.target())->port_03b0_w(space, offset * 4 + 2, data >> 16, 0xff);
+		downcast<s3_vga_device *>(m_vga.target())->port_03b0_w(offset * 4 + 2, data >> 16);
 	if (ACCESSING_BITS_24_31)
-		downcast<s3_vga_device *>(m_vga.target())->port_03b0_w(space, offset * 4 + 3, data >> 24, 0xff);
+		downcast<s3_vga_device *>(m_vga.target())->port_03b0_w(offset * 4 + 3, data >> 24);
 }
 
-READ32_MEMBER(virge_pci_device::vga_3c0_r)
+uint32_t virge_pci_device::vga_3c0_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = 0;
 	if (ACCESSING_BITS_0_7)
-		result |= downcast<s3_vga_device *>(m_vga.target())->port_03c0_r(space, offset * 4 + 0, 0xff) << 0;
+		result |= downcast<s3_vga_device *>(m_vga.target())->port_03c0_r(offset * 4 + 0) << 0;
 	if (ACCESSING_BITS_8_15)
-		result |= downcast<s3_vga_device *>(m_vga.target())->port_03c0_r(space, offset * 4 + 1, 0xff) << 8;
+		result |= downcast<s3_vga_device *>(m_vga.target())->port_03c0_r(offset * 4 + 1) << 8;
 	if (ACCESSING_BITS_16_23)
-		result |= downcast<s3_vga_device *>(m_vga.target())->port_03c0_r(space, offset * 4 + 2, 0xff) << 16;
+		result |= downcast<s3_vga_device *>(m_vga.target())->port_03c0_r(offset * 4 + 2) << 16;
 	if (ACCESSING_BITS_24_31)
-		result |= downcast<s3_vga_device *>(m_vga.target())->port_03c0_r(space, offset * 4 + 3, 0xff) << 24;
+		result |= downcast<s3_vga_device *>(m_vga.target())->port_03c0_r(offset * 4 + 3) << 24;
 	return result;
 }
 
-WRITE32_MEMBER(virge_pci_device::vga_3c0_w)
+void virge_pci_device::vga_3c0_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
-		downcast<s3_vga_device *>(m_vga.target())->port_03c0_w(space, offset * 4 + 0, data >> 0, 0xff);
+		downcast<s3_vga_device *>(m_vga.target())->port_03c0_w(offset * 4 + 0, data >> 0);
 	if (ACCESSING_BITS_8_15)
-		downcast<s3_vga_device *>(m_vga.target())->port_03c0_w(space, offset * 4 + 1, data >> 8, 0xff);
+		downcast<s3_vga_device *>(m_vga.target())->port_03c0_w(offset * 4 + 1, data >> 8);
 	if (ACCESSING_BITS_16_23)
-		downcast<s3_vga_device *>(m_vga.target())->port_03c0_w(space, offset * 4 + 2, data >> 16, 0xff);
+		downcast<s3_vga_device *>(m_vga.target())->port_03c0_w(offset * 4 + 2, data >> 16);
 	if (ACCESSING_BITS_24_31)
-		downcast<s3_vga_device *>(m_vga.target())->port_03c0_w(space, offset * 4 + 3, data >> 24, 0xff);
+		downcast<s3_vga_device *>(m_vga.target())->port_03c0_w(offset * 4 + 3, data >> 24);
 }
 
-READ32_MEMBER(virge_pci_device::vga_3d0_r)
+uint32_t virge_pci_device::vga_3d0_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = 0;
 	if (ACCESSING_BITS_0_7)
-		result |= downcast<s3_vga_device *>(m_vga.target())->port_03d0_r(space, offset * 4 + 0, 0xff) << 0;
+		result |= downcast<s3_vga_device *>(m_vga.target())->port_03d0_r(offset * 4 + 0) << 0;
 	if (ACCESSING_BITS_8_15)
-		result |= downcast<s3_vga_device *>(m_vga.target())->port_03d0_r(space, offset * 4 + 1, 0xff) << 8;
+		result |= downcast<s3_vga_device *>(m_vga.target())->port_03d0_r(offset * 4 + 1) << 8;
 	if (ACCESSING_BITS_16_23)
-		result |= downcast<s3_vga_device *>(m_vga.target())->port_03d0_r(space, offset * 4 + 2, 0xff) << 16;
+		result |= downcast<s3_vga_device *>(m_vga.target())->port_03d0_r(offset * 4 + 2) << 16;
 	if (ACCESSING_BITS_24_31)
-		result |= downcast<s3_vga_device *>(m_vga.target())->port_03d0_r(space, offset * 4 + 3, 0xff) << 24;
+		result |= downcast<s3_vga_device *>(m_vga.target())->port_03d0_r(offset * 4 + 3) << 24;
 	return result;
 }
 
-WRITE32_MEMBER(virge_pci_device::vga_3d0_w)
+void virge_pci_device::vga_3d0_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		downcast<s3_vga_device *>(m_vga.target())->port_03d0_w(space, offset * 4 + 0, data >> 0, 0xff);
+		downcast<s3_vga_device *>(m_vga.target())->port_03d0_w(offset * 4 + 0, data >> 0);
 		if(offset == 1 && downcast<s3virge_vga_device *>(m_vga.target())->get_crtc_port() == 0x3d0)
 			m_current_crtc_reg = data & 0xff;
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		downcast<s3_vga_device *>(m_vga.target())->port_03d0_w(space, offset * 4 + 1, data >> 8, 0xff);
+		downcast<s3_vga_device *>(m_vga.target())->port_03d0_w(offset * 4 + 1, data >> 8);
 		if(offset == 1 && downcast<s3virge_vga_device *>(m_vga.target())->get_crtc_port() == 0x3d0)
 		{
 			if(m_current_crtc_reg >= 0x58 && m_current_crtc_reg <= 0x5a)
@@ -204,19 +204,19 @@ WRITE32_MEMBER(virge_pci_device::vga_3d0_w)
 		}
 	}
 	if (ACCESSING_BITS_16_23)
-		downcast<s3_vga_device *>(m_vga.target())->port_03d0_w(space, offset * 4 + 2, data >> 16, 0xff);
+		downcast<s3_vga_device *>(m_vga.target())->port_03d0_w(offset * 4 + 2, data >> 16);
 	if (ACCESSING_BITS_24_31)
-		downcast<s3_vga_device *>(m_vga.target())->port_03d0_w(space, offset * 4 + 3, data >> 24, 0xff);
+		downcast<s3_vga_device *>(m_vga.target())->port_03d0_w(offset * 4 + 3, data >> 24);
 }
 
-READ8_MEMBER(virge_pci_device::vram_r)
+uint8_t virge_pci_device::vram_r(offs_t offset)
 {
-	return downcast<s3_vga_device *>(m_vga.target())->mem_r(space, offset, 0xff);
+	return downcast<s3_vga_device *>(m_vga.target())->mem_r(offset);
 }
 
-WRITE8_MEMBER(virge_pci_device::vram_w)
+void virge_pci_device::vram_w(offs_t offset, uint8_t data)
 {
-	downcast<s3_vga_device *>(m_vga.target())->mem_w(space, offset, data, 0xff);
+	downcast<s3_vga_device *>(m_vga.target())->mem_w(offset, data);
 }
 
 void virge_pci_device::postload()
@@ -259,11 +259,11 @@ void virgedx_pci_device::device_start()
 void virge_pci_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
-	memory_space->install_readwrite_handler(0xa0000, 0xbffff, read8_delegate(*this, FUNC(virge_pci_device::vram_r)), write8_delegate(*this, FUNC(virge_pci_device::vram_w)));
+	memory_space->install_readwrite_handler(0xa0000, 0xbffff, read8sm_delegate(*this, FUNC(virge_pci_device::vram_r)), write8sm_delegate(*this, FUNC(virge_pci_device::vram_w)));
 
-	io_space->install_readwrite_handler(0x3b0, 0x3bf, read32_delegate(*this, FUNC(virge_pci_device::vga_3b0_r)), write32_delegate(*this, FUNC(virge_pci_device::vga_3b0_w)));
-	io_space->install_readwrite_handler(0x3c0, 0x3cf, read32_delegate(*this, FUNC(virge_pci_device::vga_3c0_r)), write32_delegate(*this, FUNC(virge_pci_device::vga_3c0_w)));
-	io_space->install_readwrite_handler(0x3d0, 0x3df, read32_delegate(*this, FUNC(virge_pci_device::vga_3d0_r)), write32_delegate(*this, FUNC(virge_pci_device::vga_3d0_w)));
+	io_space->install_readwrite_handler(0x3b0, 0x3bf, read32s_delegate(*this, FUNC(virge_pci_device::vga_3b0_r)), write32s_delegate(*this, FUNC(virge_pci_device::vga_3b0_w)));
+	io_space->install_readwrite_handler(0x3c0, 0x3cf, read32s_delegate(*this, FUNC(virge_pci_device::vga_3c0_r)), write32s_delegate(*this, FUNC(virge_pci_device::vga_3c0_w)));
+	io_space->install_readwrite_handler(0x3d0, 0x3df, read32s_delegate(*this, FUNC(virge_pci_device::vga_3d0_r)), write32s_delegate(*this, FUNC(virge_pci_device::vga_3d0_w)));
 }
 
 void virge_pci_device::device_add_mconfig(machine_config &config)

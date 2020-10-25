@@ -57,9 +57,9 @@ protected:
 	void machine_start() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(output_0_w);
-	DECLARE_READ8_MEMBER(input_1_r);
-	DECLARE_WRITE8_MEMBER(output_1_w);
+	void output_0_w(uint8_t data);
+	uint8_t input_1_r();
+	void output_1_w(uint8_t data);
 	void main_map(address_map &map);
 
 	uint8_t m_hop_io;
@@ -67,7 +67,7 @@ private:
 };
 
 
-WRITE8_MEMBER(cchance_state::output_0_w)
+void cchance_state::output_0_w(uint8_t data)
 {
 	//---- --x- divider?
 	machine().bookkeeping().coin_lockout_w(0, ~data & 1);
@@ -76,12 +76,12 @@ WRITE8_MEMBER(cchance_state::output_0_w)
 }
 
 
-READ8_MEMBER(cchance_state::input_1_r)
+uint8_t cchance_state::input_1_r()
 {
 	return (m_hop_io) | (m_bell_io) | (ioport("SP")->read() & 0xff);
 }
 
-WRITE8_MEMBER(cchance_state::output_1_w)
+void cchance_state::output_1_w(uint8_t data)
 {
 	m_hop_io = (data & 0x40)>>4;
 	m_bell_io = (data & 0x80)>>4;

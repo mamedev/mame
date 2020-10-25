@@ -19,8 +19,6 @@ mc88100_device::mc88100_device(const machine_config &mconfig, const char *tag, d
 	: cpu_device(mconfig, MC88100, tag, owner, clock)
 	, m_code_config("code", ENDIANNESS_BIG, 32, 32, 0)
 	, m_data_config("data", ENDIANNESS_BIG, 32, 32, 0)
-	, m_inst_cache(nullptr)
-	, m_data_space(nullptr)
 	, m_pc(0)
 	, m_r{0}
 	, m_cr{0}
@@ -45,8 +43,8 @@ device_memory_interface::space_config_vector mc88100_device::memory_space_config
 
 void mc88100_device::device_start()
 {
-	m_inst_cache = space(AS_PROGRAM).cache<2, 0, ENDIANNESS_BIG>();
-	m_data_space = &space(AS_DATA);
+	space(AS_PROGRAM).cache(m_inst_cache);
+	space(AS_DATA).specific(m_data_space);
 
 	set_icountptr(m_icount);
 

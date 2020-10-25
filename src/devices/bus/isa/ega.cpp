@@ -637,9 +637,9 @@ void isa8_ega_device::device_start()
 	m_plane[3] = m_videoram + 0x30000;
 
 	m_isa->install_rom(this, 0xc0000, 0xc3fff, "ega", "user2");
-	m_isa->install_device(0x3b0, 0x3bf, read8_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3b0_r)), write8_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3b0_w)));
-	m_isa->install_device(0x3c0, 0x3cf, read8_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3c0_r)), write8_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3c0_w)));
-	m_isa->install_device(0x3d0, 0x3df, read8_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3d0_r)), write8_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3d0_w)));
+	m_isa->install_device(0x3b0, 0x3bf, read8sm_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3b0_r)), write8sm_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3b0_w)));
+	m_isa->install_device(0x3c0, 0x3cf, read8sm_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3c0_r)), write8sm_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3c0_w)));
+	m_isa->install_device(0x3d0, 0x3df, read8sm_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3d0_r)), write8sm_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3d0_w)));
 }
 
 //-------------------------------------------------
@@ -693,7 +693,7 @@ void isa8_ega_device::install_banks()
 	case 0x00:      /* 0xA0000, 128KB */
 		if ( m_misc_output & 0x02 )
 		{
-			m_isa->install_memory(0xa0000, 0xbffff, read8_delegate(*this, FUNC(isa8_ega_device::read)), write8_delegate(*this, FUNC(isa8_ega_device::write)));
+			m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*this, FUNC(isa8_ega_device::read)), write8sm_delegate(*this, FUNC(isa8_ega_device::write)));
 		}
 		else
 		{
@@ -705,7 +705,7 @@ void isa8_ega_device::install_banks()
 	case 0x04:      /* 0xA0000, 64KB */
 		if ( m_misc_output & 0x02 )
 		{
-			m_isa->install_memory(0xa0000, 0xaffff, read8_delegate(*this, FUNC(isa8_ega_device::read)), write8_delegate(*this, FUNC(isa8_ega_device::write)));
+			m_isa->install_memory(0xa0000, 0xaffff, read8sm_delegate(*this, FUNC(isa8_ega_device::read)), write8sm_delegate(*this, FUNC(isa8_ega_device::write)));
 		}
 		else
 		{
@@ -718,7 +718,7 @@ void isa8_ega_device::install_banks()
 	case 0x08:      /* 0xB0000, 32KB */
 		if ( m_misc_output & 0x02 )
 		{
-			m_isa->install_memory(0xb0000, 0xb7fff, read8_delegate(*this, FUNC(isa8_ega_device::read)), write8_delegate(*this, FUNC(isa8_ega_device::write)));
+			m_isa->install_memory(0xb0000, 0xb7fff, read8sm_delegate(*this, FUNC(isa8_ega_device::read)), write8sm_delegate(*this, FUNC(isa8_ega_device::write)));
 		}
 		else
 		{
@@ -731,7 +731,7 @@ void isa8_ega_device::install_banks()
 	case 0x0c:      /* 0xB8000, 32KB */
 		if ( m_misc_output & 0x02 )
 		{
-			m_isa->install_memory(0xb8000, 0xbffff, read8_delegate(*this, FUNC(isa8_ega_device::read)), write8_delegate(*this, FUNC(isa8_ega_device::write)));
+			m_isa->install_memory(0xb8000, 0xbffff, read8sm_delegate(*this, FUNC(isa8_ega_device::read)), write8sm_delegate(*this, FUNC(isa8_ega_device::write)));
 		}
 		else
 		{
@@ -783,7 +783,7 @@ WRITE_LINE_MEMBER( isa8_ega_device::vblank_changed )
 
 CRTC_EGA_ROW_UPDATE( isa8_ega_device::pc_ega_graphics )
 {
-	uint16_t  *p = &bitmap.pix16(y);
+	uint16_t  *p = &bitmap.pix(y);
 
 	LOG("%s: y = %d, x_count = %d, ma = %d, ra = %d\n", FUNCNAME, y, x_count, ma, ra );
 
@@ -844,12 +844,11 @@ CRTC_EGA_ROW_UPDATE( isa8_ega_device::pc_ega_graphics )
 
 CRTC_EGA_ROW_UPDATE( isa8_ega_device::pc_ega_text )
 {
-	uint16_t  *p = &bitmap.pix16(y);
-	int i;
+	uint16_t  *p = &bitmap.pix(y);
 
 	LOG("%s: y = %d, x_count = %d, ma = %d, ra = %d\n", FUNCNAME, y, x_count, ma, ra );
 
-	for ( i = 0; i < x_count; i++ )
+	for ( int i = 0; i < x_count; i++ )
 	{
 		uint16_t  offset = ma + i;
 		uint8_t   chr = m_plane[0][ offset ];
@@ -901,8 +900,6 @@ CRTC_EGA_ROW_UPDATE( isa8_ega_device::pc_ega_text )
 
 void isa8_ega_device::change_mode()
 {
-	int clock, pixels;
-
 	m_video_mode = 0;
 
 	/* Check for graphics mode */
@@ -938,8 +935,8 @@ void isa8_ega_device::change_mode()
 	}
 
 	/* Check for changes to the crtc input clock and number of pixels per clock */
-	clock = ( ( m_misc_output & 0x0c ) ? 16257000 : 14318181 );
-	pixels = ( ( m_sequencer.data[0x01] & 0x01 ) ? 8 : 9 );
+	int clock = ( ( m_misc_output & 0x0c ) ? 16257000 : 14318181 );
+	int pixels = ( ( m_sequencer.data[0x01] & 0x01 ) ? 8 : 9 );
 
 	if ( m_sequencer.data[0x01] & 0x08 )
 	{
@@ -953,7 +950,7 @@ void isa8_ega_device::change_mode()
 }
 
 
-READ8_MEMBER( isa8_ega_device::read )
+uint8_t isa8_ega_device::read(offs_t offset)
 {
 	uint8_t data = 0xFF;
 
@@ -1013,7 +1010,7 @@ uint8_t isa8_ega_device::alu_op( uint8_t data, uint8_t latch_data )
 }
 
 
-WRITE8_MEMBER( isa8_ega_device::write )
+void isa8_ega_device::write(offs_t offset, uint8_t data)
 {
 	uint8_t d[4];
 	uint8_t alu[4];
@@ -1159,7 +1156,7 @@ WRITE8_MEMBER( isa8_ega_device::write )
 }
 
 
-READ8_MEMBER( isa8_ega_device::pc_ega8_3X0_r )
+uint8_t isa8_ega_device::pc_ega8_3X0_r(offs_t offset)
 {
 	int data = 0xff;
 
@@ -1196,7 +1193,7 @@ READ8_MEMBER( isa8_ega_device::pc_ega8_3X0_r )
 	return data;
 }
 
-WRITE8_MEMBER( isa8_ega_device::pc_ega8_3X0_w )
+void isa8_ega_device::pc_ega8_3X0_w(offs_t offset, uint8_t data)
 {
 	LOGSETUP("%s: offset = %02x, data = %02x\n", FUNCNAME, offset, data );
 
@@ -1229,37 +1226,37 @@ WRITE8_MEMBER( isa8_ega_device::pc_ega8_3X0_w )
 
 
 
-READ8_MEMBER(isa8_ega_device::pc_ega8_3b0_r )
+uint8_t isa8_ega_device::pc_ega8_3b0_r(offs_t offset)
 {
-	return ( m_misc_output & 0x01 ) ? 0xFF : pc_ega8_3X0_r(space, offset);
+	return ( m_misc_output & 0x01 ) ? 0xFF : pc_ega8_3X0_r(offset);
 }
 
 
-READ8_MEMBER(isa8_ega_device::pc_ega8_3d0_r )
+uint8_t isa8_ega_device::pc_ega8_3d0_r(offs_t offset)
 {
-	return ( m_misc_output & 0x01 ) ? pc_ega8_3X0_r(space, offset) : 0xFF;
+	return ( m_misc_output & 0x01 ) ? pc_ega8_3X0_r(offset) : 0xFF;
 }
 
 
-WRITE8_MEMBER(isa8_ega_device::pc_ega8_3b0_w )
+void isa8_ega_device::pc_ega8_3b0_w(offs_t offset, uint8_t data)
 {
 	if ( ! ( m_misc_output & 0x01 ) )
 	{
-		pc_ega8_3X0_w( space, offset, data );
+		pc_ega8_3X0_w( offset, data );
 	}
 }
 
 
-WRITE8_MEMBER(isa8_ega_device::pc_ega8_3d0_w )
+void isa8_ega_device::pc_ega8_3d0_w(offs_t offset, uint8_t data)
 {
 	if ( m_misc_output & 0x01 )
 	{
-		pc_ega8_3X0_w( space, offset, data );
+		pc_ega8_3X0_w( offset, data );
 	}
 }
 
 
-READ8_MEMBER(isa8_ega_device::pc_ega8_3c0_r )
+uint8_t isa8_ega_device::pc_ega8_3c0_r(offs_t offset)
 {
 	int data = 0xff;
 
@@ -1299,7 +1296,7 @@ READ8_MEMBER(isa8_ega_device::pc_ega8_3c0_r )
 }
 
 
-WRITE8_MEMBER(isa8_ega_device::pc_ega8_3c0_w )
+void isa8_ega_device::pc_ega8_3c0_w(offs_t offset, uint8_t data)
 {
 	static const uint8_t ar_reg_mask[0x20] =
 		{

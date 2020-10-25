@@ -78,7 +78,7 @@ void psxirq_device::psx_irq_update( void )
 	}
 }
 
-WRITE32_MEMBER( psxirq_device::write )
+void psxirq_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch( offset )
 	{
@@ -102,7 +102,7 @@ WRITE32_MEMBER( psxirq_device::write )
 	}
 }
 
-READ32_MEMBER( psxirq_device::read )
+uint32_t psxirq_device::read(offs_t offset)
 {
 	switch( offset )
 	{

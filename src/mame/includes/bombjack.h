@@ -36,12 +36,12 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_READ8_MEMBER(soundlatch_read_and_clear);
-	DECLARE_WRITE8_MEMBER(irq_mask_w);
-	DECLARE_WRITE8_MEMBER(bombjack_videoram_w);
-	DECLARE_WRITE8_MEMBER(bombjack_colorram_w);
-	DECLARE_WRITE8_MEMBER(bombjack_background_w);
-	DECLARE_WRITE8_MEMBER(bombjack_flipscreen_w);
+	uint8_t soundlatch_read_and_clear();
+	void irq_mask_w(uint8_t data);
+	void bombjack_videoram_w(offs_t offset, uint8_t data);
+	void bombjack_colorram_w(offs_t offset, uint8_t data);
+	void bombjack_background_w(uint8_t data);
+	void bombjack_flipscreen_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	uint32_t screen_update_bombjack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -226,8 +226,6 @@ void pgm_arm_type1_state::pgm_arm_type1(machine_config &config) // ARM7 Shared m
 	/* protection CPU */
 	ARM7(config, m_prot, 20000000);   // 55857E?
 	m_prot->set_addrmap(AS_PROGRAM, &pgm_arm_type1_state::_55857E_arm7_map);
-
-//  subdevice<screen_device>("screen")->set_refresh_hz(59.17); // Correct?
 }
 
 void pgm_arm_type1_state::pgm_arm_type1_sim(machine_config &config) // When simulated
@@ -245,8 +243,6 @@ void pgm_arm_type1_state::pgm_arm_type1_cave(machine_config &config)
 //  pgm_arm_type1(config); // When ARM7 ROM is dumped and hooked up
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &pgm_arm_type1_state::cavepgm_mem);
-
-	subdevice<screen_device>("screen")->set_refresh_hz(59.17); // verified on pcb
 }
 
 void pgm_arm_type1_state::arm7_type1_latch_init()
@@ -495,7 +491,7 @@ void pgm_arm_type1_state::init_kovqhsgs()
  bp A71A0,1,{d0=0x12;g}
 */
 
-READ16_MEMBER(pgm_arm_type1_state::arm7_type1_sim_r )
+u16 pgm_arm_type1_state::arm7_type1_sim_r(offs_t offset)
 {
 	if (offset == 0)
 	{
@@ -1020,39 +1016,104 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 	}
 }
 
+static u32 py2k2_sprite_offset(u16 base, u16 pos)
+{
+	u16 ret = 0;
+	u16 offset = (base * 16) + (pos & 0xf);
+
+	switch (base & ~0x3f)
+	{
+		case 0x000: ret = bitswap<16>(offset ^ 0x0030, 15, 14, 13, 12, 11, 10, 0, 2, 3, 9, 5, 4, 8, 7, 6, 1); break;
+		case 0x040: ret = bitswap<16>(offset ^ 0x03c0, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 1, 2, 0, 5, 3, 4); break;
+		case 0x080: ret = bitswap<16>(offset ^ 0x0000, 15, 14, 13, 12, 11, 10, 0, 3, 4, 6, 8, 7, 5, 9, 2, 1); break;
+		case 0x0c0: ret = bitswap<16>(offset ^ 0x0001, 15, 14, 13, 12, 11, 10, 6, 5, 4, 3, 2, 1, 9, 8, 7, 0); break;
+		case 0x100: ret = bitswap<16>(offset ^ 0x0030, 15, 14, 13, 12, 11, 10, 0, 2, 3, 9, 5, 4, 8, 7, 6, 1); break;
+		case 0x140: ret = bitswap<16>(offset ^ 0x01c0, 15, 14, 13, 12, 11, 10, 2, 8, 7, 6, 4, 3, 5, 9, 0, 1); break;
+		case 0x180: ret = bitswap<16>(offset ^ 0x0141, 15, 14, 13, 12, 11, 10, 4, 8, 2, 6, 1, 7, 9, 5, 3, 0); break;
+		case 0x1c0: ret = bitswap<16>(offset ^ 0x0090, 15, 14, 13, 12, 11, 10, 5, 3, 7, 2, 1, 4, 0, 9, 8, 6); break;
+		case 0x200: ret = bitswap<16>(offset ^ 0x02a1, 15, 14, 13, 12, 11, 10, 9, 1, 7, 8, 5, 6, 2, 4, 3, 0); break;
+		case 0x240: ret = bitswap<16>(offset ^ 0x0000, 15, 14, 13, 12, 11, 10, 3, 2, 1, 0, 9, 8, 7, 6, 5, 4); break;
+		case 0x280: ret = bitswap<16>(offset ^ 0x02a1, 15, 14, 13, 12, 11, 10, 9, 1, 7, 8, 5, 6, 2, 4, 3, 0); break;
+		case 0x2c0: ret = bitswap<16>(offset ^ 0x0000, 15, 14, 13, 12, 11, 10, 0, 3, 4, 6, 8, 7, 5, 9, 2, 1); break;
+		case 0x300: ret = bitswap<16>(offset ^ 0x03c0, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 1, 2, 0, 5, 3, 4); break;
+		case 0x340: ret = bitswap<16>(offset ^ 0x0030, 15, 14, 13, 12, 11, 10, 0, 2, 3, 9, 5, 4, 8, 7, 6, 1); break;
+		case 0x380: ret = bitswap<16>(offset ^ 0x0001, 15, 14, 13, 12, 11, 10, 6, 5, 4, 3, 2, 1, 9, 8, 7, 0); break;
+		case 0x3c0: ret = bitswap<16>(offset ^ 0x0090, 15, 14, 13, 12, 11, 10, 5, 3, 7, 2, 1, 4, 0, 9, 8, 6); break;
+		case 0x400: ret = bitswap<16>(offset ^ 0x02a1, 15, 14, 13, 12, 11, 10, 9, 1, 7, 8, 5, 6, 2, 4, 3, 0); break;
+		case 0x440: ret = bitswap<16>(offset ^ 0x03c0, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 1, 2, 0, 5, 3, 4); break;
+		case 0x480: ret = bitswap<16>(offset ^ 0x0141, 15, 14, 13, 12, 11, 10, 4, 8, 2, 6, 1, 7, 9, 5, 3, 0); break;
+		case 0x4c0: ret = bitswap<16>(offset ^ 0x01c0, 15, 14, 13, 12, 11, 10, 2, 8, 7, 6, 4, 3, 5, 9, 0, 1); break;
+		case 0x500: ret = bitswap<16>(offset ^ 0x0141, 15, 14, 13, 12, 11, 10, 4, 8, 2, 6, 1, 7, 9, 5, 3, 0); break;
+		case 0x540: ret = bitswap<16>(offset ^ 0x0030, 15, 14, 13, 12, 11, 10, 0, 2, 3, 9, 5, 4, 8, 7, 6, 1); break;
+		case 0x580: ret = bitswap<16>(offset ^ 0x03c0, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 1, 2, 0, 5, 3, 4); break;
+		case 0x5c0: ret = bitswap<16>(offset ^ 0x0090, 15, 14, 13, 12, 11, 10, 5, 3, 7, 2, 1, 4, 0, 9, 8, 6); break;
+		case 0x600: ret = bitswap<16>(offset ^ 0x0000, 15, 14, 13, 12, 11, 10, 0, 3, 4, 6, 8, 7, 5, 9, 2, 1); break;
+		case 0x640: ret = bitswap<16>(offset ^ 0x0000, 15, 14, 13, 12, 11, 10, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5); break;
+	}
+
+	if (offset >= 0xce80/2 && offset <= 0xceff/2) ret -= 0x0100;
+	if (offset >= 0xcf00/2 && offset <= 0xcf7f/2) ret += 0x0100;
+
+	return ret;
+}
+
 /* preliminary */
 void pgm_arm_type1_state::command_handler_py2k2(int pc)
 {
 	switch (m_ddp3lastcommand)
 	{
-		default:
-			puzzli2_printf("%06x command %02x | %04x\n", pc, m_ddp3lastcommand, m_value0);
-			m_valueresponse = 0x880000;
-			break;
-
+		case 0x30:
+			m_valueresponse = py2k2_sprite_offset(m_py2k2_sprite_base, m_py2k2_sprite_pos++);
+		break;
+		case 0x32:
+			m_py2k2_sprite_base = m_value0;
+			m_py2k2_sprite_pos = 0;
+			m_valueresponse = py2k2_sprite_offset(m_py2k2_sprite_base, m_py2k2_sprite_pos++);
+		break;
+		case 0xba:
+			m_valueresponse = m_py2k2_prev_base;
+			m_py2k2_prev_base = m_value0;
+		break;
+		case 0x99: // reset?
+			m_py2k2_prev_base = m_value0;
+			m_simregion = m_region->read();
+			m_valuekey = 0x100;
+			m_valueresponse = 0x00880000 | m_simregion<<8;
+		break;
 		case 0xc0:
 			puzzli2_printf("%06x command %02x | %04x\n", pc, m_ddp3lastcommand, m_value0);
 			m_valueresponse = 0x880000;
 			break;
-
+		case 0xc3:
+			m_valueresponse = 0x904000 + ((m_extra_ram[0xc0] + (m_value0 * 0x40)) * 4);
+		break;
+		case 0xd0:
+			m_valueresponse = 0xa01000 + (m_value0 * 0x20);
+		break;
+		case 0xdc:
+			m_valueresponse = 0xa00800 + (m_value0 * 0x40);
+		break;
+		case 0xe0:
+			m_valueresponse = 0xa00000 + ((m_value0 & 0x1f) * 0x40);
+		break;
 		case 0xcb: // Background layer 'x' select (pgm3in1, same as kov)
 			m_valueresponse = 0x880000;
-			m_kov_cb_value = m_value0;
 		break;
-
 		case 0xcc: // Background layer offset (pgm3in1, same as kov)
 		{
 			int y = m_value0;
 			if (y & 0x400) y = -(0x400 - (y & 0x3ff));
-			m_valueresponse = 0x900000 + ((m_kov_cb_value + (y * 0x40)) * 4);
+			m_valueresponse = 0x900000 + ((m_extra_ram[0xcb] + (y * 0x40)) * 4);
 		}
 		break;
-
-		case 0x99: // reset?
-			m_simregion = m_region->read();
-			m_valuekey = 0x100;
-			m_valueresponse = 0x00880000 | m_simregion<<8;
-
+		case 0x33:
+		case 0x34:
+		case 0x35:
+		case 0x37:
+		case 0x38:
+		default:
+			puzzli2_printf("%06x command %02x | %04x\n", pc, m_ddp3lastcommand, m_value0);
+			m_valueresponse = 0x880000;
 			break;
 	}
 }
@@ -1723,7 +1784,7 @@ void pgm_arm_type1_state::command_handler_oldsplus(int pc)
 	}
 }
 
-WRITE16_MEMBER(pgm_arm_type1_state::arm7_type1_sim_w )
+void pgm_arm_type1_state::arm7_type1_sim_w(offs_t offset, u16 data)
 {
 	const int pc = m_maincpu->pc();
 
@@ -1789,7 +1850,7 @@ void pgm_arm_type1_state::init_ddp3()
 	pgm_basic_init(false);
 	pgm_py2k2_decrypt(machine()); // yes, it's the same as photo y2k2
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_ddp3;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
 }
 
 void pgm_arm_type1_state::init_ket()
@@ -1797,7 +1858,7 @@ void pgm_arm_type1_state::init_ket()
 	pgm_basic_init(false);
 	pgm_ket_decrypt(machine());
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_ddp3;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x400000, 0x400005, read16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x400000, 0x400005, read16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
 }
 
 void pgm_arm_type1_state::init_espgal()
@@ -1805,7 +1866,7 @@ void pgm_arm_type1_state::init_espgal()
 	pgm_basic_init(false);
 	pgm_espgal_decrypt(machine());
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_ddp3;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x400000, 0x400005, read16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x400000, 0x400005, read16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
 }
 
 
@@ -2090,7 +2151,7 @@ void pgm_arm_type1_state::init_puzzli2()
 
 	pgm_puzzli2_decrypt(machine());
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_puzzli2;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_protram_r)));
 	m_irq4_disabled = 1; // // doesn't like this irq?? - seems to be RTC related
 
@@ -2219,8 +2280,15 @@ void pgm_arm_type1_state::init_py2k2()
 	pgm_basic_init();
 	pgm_py2k2_decrypt(machine());
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_py2k2;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_protram_r)));
+
+	m_py2k2_sprite_pos = 0;
+	m_py2k2_sprite_base = 0;
+	m_py2k2_prev_base = 0;
+	save_item(NAME(m_py2k2_sprite_pos));
+	save_item(NAME(m_py2k2_sprite_base));
+	save_item(NAME(m_py2k2_prev_base));
 }
 
 void pgm_arm_type1_state::init_pgm3in1()
@@ -2228,7 +2296,7 @@ void pgm_arm_type1_state::init_pgm3in1()
 	pgm_basic_init();
 	pgm_decrypt_pgm3in1(machine());
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_py2k2;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005,read16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005,read16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_protram_r)));
 	m_irq4_disabled = 1; // // doesn't like this irq??
 }
@@ -2248,7 +2316,7 @@ void pgm_arm_type1_state::init_pstar()
 	memset(m_slots, 0, 16 * sizeof(u32));
 
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_pstars;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16sm_delegate(*this, FUNC(pgm_arm_type1_state::pstars_arm7_type1_sim_protram_r)));
 
 	save_item(NAME(m_pstar_e7_value));
@@ -2267,7 +2335,7 @@ void pgm_arm_type1_state::init_kov()
 	m_kov_cb_value = 0;
 	m_kov_fe_value = 0;
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_kov;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_protram_r)));
 }
 
@@ -2281,7 +2349,7 @@ void pgm_arm_type1_state::init_kovboot()
 	m_kov_cb_value = 0;
 	m_kov_fe_value = 0;
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_kov;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_protram_r)));
 
 }
@@ -2294,7 +2362,7 @@ void pgm_arm_type1_state::init_oldsplus()
 	memset(m_extra_ram, 0, 0x100 * sizeof(u16));
 	memset(m_slots, 0, 0x100 * sizeof(u32));
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_oldsplus;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_protram_r)));
 	save_item(NAME(m_extra_ram));
 }

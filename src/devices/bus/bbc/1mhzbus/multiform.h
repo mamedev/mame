@@ -30,9 +30,9 @@ public:
 	// construction/destruction
 	bbc_multiform_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( mem_r );
-	DECLARE_WRITE8_MEMBER( mem_w );
-	DECLARE_WRITE8_MEMBER( rom_disable_w );
+	uint8_t mem_r(offs_t offset);
+	void mem_w(offs_t offset, uint8_t data);
+	void rom_disable_w(uint8_t data);
 
 protected:
 	// device-level overrides

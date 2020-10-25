@@ -152,4 +152,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS               INIT        COMPANY            FULLNAME    FLAGS
-COMP( 1986, scp300f, 0,      0,      seattle, seattle, seattle_comp_state, empty_init, "Seattle Computer", "SCP-300F", MACHINE_NO_SOUND_HW )
+COMP( 1986, scp300f, 0,      0,      seattle, seattle, seattle_comp_state, empty_init, "Seattle Computer", "SCP-300F", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

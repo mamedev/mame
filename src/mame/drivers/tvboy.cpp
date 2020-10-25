@@ -29,11 +29,12 @@ public:
 
 	void tvboyii(machine_config &config);
 
-private:
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE8_MEMBER(bank_write);
+private:
+	void bank_write(offs_t offset, uint8_t data);
 
 	void rom_map(address_map &map);
 	void tvboy_mem(address_map &map);
@@ -54,7 +55,7 @@ void tvboy_state::machine_reset()
 	a2600_base_state::machine_reset();
 }
 
-WRITE8_MEMBER(tvboy_state::bank_write)
+void tvboy_state::bank_write(offs_t offset, uint8_t data)
 {
 	logerror("banking (?) write %04x, %02x\n", offset, data);
 	if ((offset & 0xff00) == 0x0800)
@@ -101,14 +102,14 @@ void tvboy_state::tvboyii(machine_config &config)
 	MOS6532_NEW(config, m_riot, MASTER_CLOCK_PAL / 3);
 	m_riot->pa_rd_callback().set(FUNC(tvboy_state::switch_A_r));
 	m_riot->pa_wr_callback().set(FUNC(tvboy_state::switch_A_w));
-	m_riot->pb_rd_callback().set(FUNC(tvboy_state::riot_input_port_8_r));
+	m_riot->pb_rd_callback().set_ioport("SWB");
 	m_riot->pb_wr_callback().set(FUNC(tvboy_state::switch_B_w));
 	m_riot->irq_wr_callback().set(FUNC(tvboy_state::irq_callback));
 #else
 	RIOT6532(config, m_riot, MASTER_CLOCK_PAL / 3);
 	m_riot->in_pa_callback().set(FUNC(tvboy_state::switch_A_r));
 	m_riot->out_pa_callback().set(FUNC(tvboy_state::switch_A_w));
-	m_riot->in_pb_callback().set(FUNC(tvboy_state::riot_input_port_8_r));
+	m_riot->in_pb_callback().set_ioport("SWB");
 	m_riot->out_pb_callback().set(FUNC(tvboy_state::switch_B_w));
 	m_riot->irq_callback().set(FUNC(tvboy_state::irq_callback));
 #endif

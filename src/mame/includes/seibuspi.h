@@ -8,6 +8,7 @@
 
 #include "machine/eepromser.h"
 #include "machine/7200fifo.h"
+#include "machine/intelfsh.h"
 #include "sound/okim6295.h"
 #include "emupal.h"
 #include "tilemap.h"
@@ -29,6 +30,9 @@ public:
 		, m_key(*this, "KEY.%u", 0)
 		, m_special(*this, "SPECIAL")
 		, m_z80_bank(*this, "z80_bank")
+		, m_soundflash1(*this, "soundflash1")
+		, m_soundflash2(*this, "soundflash2")
+		, m_soundflash1_region(*this, "soundflash1")
 	{ }
 
 	void sys386f(machine_config &config);
@@ -74,6 +78,10 @@ protected:
 	optional_ioport m_special;
 
 	optional_memory_bank m_z80_bank;
+
+	optional_device<intel_e28f008sa_device> m_soundflash1, m_soundflash2;
+
+	optional_region_ptr<u8> m_soundflash1_region;
 
 	int m_z80_prg_transfer_pos;
 	int m_z80_lastbank;
@@ -132,14 +140,14 @@ protected:
 	void spi_layerbanks_eeprom_w(u8 data);
 	void oki_bank_w(u8 data);
 
-	DECLARE_READ32_MEMBER(senkyu_speedup_r);
-	DECLARE_READ32_MEMBER(senkyua_speedup_r);
-	DECLARE_READ32_MEMBER(batlball_speedup_r);
-	DECLARE_READ32_MEMBER(rdft_speedup_r);
-	DECLARE_READ32_MEMBER(viprp1_speedup_r);
-	DECLARE_READ32_MEMBER(viprp1o_speedup_r);
-	DECLARE_READ32_MEMBER(rf2_speedup_r);
-	DECLARE_READ32_MEMBER(rfjet_speedup_r);
+	u32 senkyu_speedup_r();
+	u32 senkyua_speedup_r();
+	u32 batlball_speedup_r();
+	u32 rdft_speedup_r();
+	u32 viprp1_speedup_r();
+	u32 viprp1o_speedup_r();
+	u32 rf2_speedup_r();
+	u32 rfjet_speedup_r();
 
 	DECLARE_WRITE_LINE_MEMBER(ymf_irqhandler);
 

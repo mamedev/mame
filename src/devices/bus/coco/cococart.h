@@ -23,7 +23,7 @@
 // ======================> cococart_base_update_delegate
 
 // direct region update handler
-typedef delegate<void (uint8_t *)> cococart_base_update_delegate;
+typedef delegate<void (u8 *)> cococart_base_update_delegate;
 
 
 // ======================> cococart_slot_device
@@ -53,7 +53,7 @@ public:
 
 	// construction/destruction
 	template <typename T>
-	cococart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&opts, const char *dflt)
+	cococart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&opts, const char *dflt)
 		: cococart_slot_device(mconfig, tag, owner, clock)
 	{
 		option_reset();
@@ -61,7 +61,7 @@ public:
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	cococart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cococart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	auto cart_callback() { return m_cart_callback.bind(); }
 	auto nmi_callback() { return m_nmi_callback.bind(); }
@@ -89,12 +89,12 @@ public:
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	// reading and writing to $C000-$FFEF
-	DECLARE_READ8_MEMBER(cts_read);
-	DECLARE_WRITE8_MEMBER(cts_write);
+	u8 cts_read(offs_t offset);
+	void cts_write(offs_t offset, u8 data);
 
 	// reading and writing to $FF40-$FF5F
-	DECLARE_READ8_MEMBER(scs_read);
-	DECLARE_WRITE8_MEMBER(scs_write);
+	u8 scs_read(offs_t offset);
+	void scs_write(offs_t offset, u8 data);
 
 	// manipulation of cartridge lines
 	void set_line_value(line line, line_value value);
@@ -105,8 +105,8 @@ public:
 	void twiddle_q_lines();
 
 	// cart base
-	uint8_t *get_cart_base();
-	virtual uint32_t get_cart_size();
+	u8 *get_cart_base();
+	u32 get_cart_size();
 	void set_cart_base_update(cococart_base_update_delegate update);
 
 private:
@@ -165,16 +165,16 @@ public:
 	// construction/destruction
 	virtual ~device_cococart_interface();
 
-	virtual DECLARE_READ8_MEMBER(cts_read);
-	virtual DECLARE_WRITE8_MEMBER(cts_write);
-	virtual DECLARE_READ8_MEMBER(scs_read);
-	virtual DECLARE_WRITE8_MEMBER(scs_write);
+	virtual u8 cts_read(offs_t offset);
+	virtual void cts_write(offs_t offset, u8 data);
+	virtual u8 scs_read(offs_t offset);
+	virtual void scs_write(offs_t offset, u8 data);
 	virtual void set_sound_enable(bool sound_enable);
 
-	virtual uint8_t* get_cart_base();
-	virtual uint32_t get_cart_size();
+	virtual u8 *get_cart_base();
+	virtual u32 get_cart_size();
 	void set_cart_base_update(cococart_base_update_delegate update);
-	virtual memory_region* get_cart_memregion();
+	virtual memory_region *get_cart_memregion();
 
 protected:
 	virtual void interface_config_complete() override;

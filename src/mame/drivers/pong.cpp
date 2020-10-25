@@ -52,7 +52,6 @@ TODO: Volleyball...
 #include "machine/netlist.h"
 
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 
 #include "video/fixfreq.h"
 
@@ -105,8 +104,8 @@ TODO: Volleyball...
  *
  */
 
-static const int NS_PER_CLOCK_PONG  = static_cast<int>((double) NETLIST_INTERNAL_RES / (double) 7159000 + 0.5);
-static const int MASTER_CLOCK_PONG  = static_cast<int>((double) NETLIST_INTERNAL_RES / (double) NS_PER_CLOCK_PONG + 0.5);
+static const int NS_PER_CLOCK_PONG  = static_cast<int>((double) netlist::config::INTERNAL_RES::value / (double) 7159000 + 0.5);
+static const int MASTER_CLOCK_PONG  = static_cast<int>((double) netlist::config::INTERNAL_RES::value / (double) NS_PER_CLOCK_PONG + 0.5);
 
 #define V_TOTAL_PONG    (0x105+1)       // 262
 #define H_TOTAL_PONG    (0x1C5+1)       // 454
@@ -127,8 +126,8 @@ static const int MASTER_CLOCK_PONG  = static_cast<int>((double) NETLIST_INTERNAL
  */
 
 //#define MASTER_CLOCK_BREAKOUT    (14318000)
-static const int NS_PER_CLOCK_BREAKOUT           = static_cast<int>((double) NETLIST_INTERNAL_RES / (double) 14318000 + 0.5);
-static const int MASTER_CLOCK_BREAKOUT  = static_cast<int>((double) NETLIST_INTERNAL_RES / (double) NS_PER_CLOCK_BREAKOUT + 0.5);
+static const int NS_PER_CLOCK_BREAKOUT  = static_cast<int>((double) netlist::config::INTERNAL_RES::value / (double) 14318000 + 0.5);
+static const int MASTER_CLOCK_BREAKOUT  = static_cast<int>((double) netlist::config::INTERNAL_RES::value / (double) NS_PER_CLOCK_BREAKOUT + 0.5);
 
 static const int V_TOTAL_BREAKOUT       = (0xFC);       // 252
 static const int H_TOTAL_BREAKOUT       = (448*2);      // 448
@@ -473,7 +472,7 @@ INPUT_PORTS_END
 void pong_state::pong(machine_config &config)
 {
 	/* basic machine hardware */
-	NETLIST_CPU(config, "maincpu", NETLIST_CLOCK).set_source(this, &pong_state::NETLIST_NAME(pong));
+	NETLIST_CPU(config, "maincpu", netlist::config::DEFAULT_CLOCK()).set_source(this, &pong_state::NETLIST_NAME(pong));
 
 	NETLIST_ANALOG_INPUT(config, "maincpu:vr0", "ic_b9_R.R").set_mult_offset(1.0 / 100.0 * RES_K(50), RES_K(56) );
 	NETLIST_ANALOG_INPUT(config, "maincpu:vr1", "ic_a9_R.R").set_mult_offset(1.0 / 100.0 * RES_K(50), RES_K(56) );
@@ -502,15 +501,12 @@ void pong_state::pong(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void breakout_state::breakout(machine_config &config)
 {
 	/* basic machine hardware */
-	NETLIST_CPU(config, "maincpu", NETLIST_CLOCK).set_source(NETLIST_NAME(breakout));
+	NETLIST_CPU(config, "maincpu", netlist::config::DEFAULT_CLOCK()).set_source(NETLIST_NAME(breakout));
 
 	NETLIST_ANALOG_INPUT(config, "maincpu:pot1", "POTP1.DIAL");
 	NETLIST_ANALOG_INPUT(config, "maincpu:pot2", "POTP2.DIAL");
@@ -559,9 +555,6 @@ void breakout_state::breakout(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void pong_state::pongf(machine_config &config)
@@ -576,7 +569,7 @@ void pong_state::pongf(machine_config &config)
 void pong_state::pongd(machine_config &config)
 {
 	/* basic machine hardware */
-	NETLIST_CPU(config, "maincpu", NETLIST_CLOCK).set_source(NETLIST_NAME(pongdoubles));
+	NETLIST_CPU(config, "maincpu", netlist::config::DEFAULT_CLOCK()).set_source(NETLIST_NAME(pongdoubles));
 
 	NETLIST_ANALOG_INPUT(config, "maincpu:pot0", "A10_POT.DIAL");
 	NETLIST_ANALOG_INPUT(config, "maincpu:pot1", "B10_POT.DIAL");
@@ -609,15 +602,12 @@ void pong_state::pongd(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void rebound_state::rebound(machine_config &config)
 {
 	/* basic machine hardware */
-	NETLIST_CPU(config, "maincpu", NETLIST_CLOCK).set_source(NETLIST_NAME(rebound));
+	NETLIST_CPU(config, "maincpu", netlist::config::DEFAULT_CLOCK()).set_source(NETLIST_NAME(rebound));
 
 	// FIXME: Later
 	NETLIST_ANALOG_INPUT(config, "maincpu:pot1", "POTP1.DIAL");
@@ -652,9 +642,6 @@ void rebound_state::rebound(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 	//FIXME: this is not related to reality at all.
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 

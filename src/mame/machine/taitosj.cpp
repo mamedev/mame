@@ -29,16 +29,15 @@ void taitosj_state::machine_start()
 
 void taitosj_state::machine_reset()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
 	/* set the default ROM bank (many games only have one bank and */
 	/* never write to the bank selector register) */
-	taitosj_bankswitch_w(space, 0, 0);
+	taitosj_bankswitch_w(0);
 
 	m_spacecr_prot_value = 0;
 }
 
 
-WRITE8_MEMBER(taitosj_state::taitosj_bankswitch_w)
+void taitosj_state::taitosj_bankswitch_w(uint8_t data)
 {
 	machine().bookkeeping().coin_lockout_global_w(~data & 1);
 
@@ -74,30 +73,30 @@ WRITE8_MEMBER(taitosj_state::taitosj_bankswitch_w)
  direct access to the Z80 memory space. It can also trigger IRQs on the Z80.
 
 ***************************************************************************/
-READ8_MEMBER(taitosj_state::taitosj_fake_data_r)
+uint8_t taitosj_state::taitosj_fake_data_r()
 {
 	LOG(("%04x: protection read\n",m_maincpu->pc()));
 	return 0;
 }
 
-WRITE8_MEMBER(taitosj_state::taitosj_fake_data_w)
+void taitosj_state::taitosj_fake_data_w(uint8_t data)
 {
 	LOG(("%04x: protection write %02x\n",m_maincpu->pc(),data));
 }
 
-READ8_MEMBER(taitosj_state::taitosj_fake_status_r)
+uint8_t taitosj_state::taitosj_fake_status_r()
 {
 	LOG(("%04x: protection status read\n",m_maincpu->pc()));
 	return 0xff;
 }
 
 
-READ8_MEMBER(taitosj_state::mcu_mem_r)
+uint8_t taitosj_state::mcu_mem_r(offs_t offset)
 {
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
 
-WRITE8_MEMBER(taitosj_state::mcu_mem_w)
+void taitosj_state::mcu_mem_w(offs_t offset, uint8_t data)
 {
 	m_maincpu->space(AS_PROGRAM).write_byte(offset, data);
 }
@@ -119,7 +118,7 @@ WRITE_LINE_MEMBER(taitosj_state::mcu_busrq_w)
 
 /* Space Cruiser protection (otherwise the game resets on the asteroids level) */
 
-READ8_MEMBER(taitosj_state::spacecr_prot_r)
+uint8_t taitosj_state::spacecr_prot_r()
 {
 	int pc = m_maincpu->pc();
 
@@ -134,7 +133,7 @@ READ8_MEMBER(taitosj_state::spacecr_prot_r)
 
 /* Alpine Ski protection crack routines */
 
-WRITE8_MEMBER(taitosj_state::alpine_protection_w)
+void taitosj_state::alpine_protection_w(uint8_t data)
 {
 	switch (data)
 	{
@@ -158,13 +157,13 @@ WRITE8_MEMBER(taitosj_state::alpine_protection_w)
 	}
 }
 
-WRITE8_MEMBER(taitosj_state::alpinea_bankswitch_w)
+void taitosj_state::alpinea_bankswitch_w(uint8_t data)
 {
-	taitosj_bankswitch_w(space, offset, data);
+	taitosj_bankswitch_w(data);
 	m_protection_value = data >> 2;
 }
 
-READ8_MEMBER(taitosj_state::alpine_port_2_r)
+uint8_t taitosj_state::alpine_port_2_r()
 {
 	return ioport("IN2")->read() | m_protection_value;
 }

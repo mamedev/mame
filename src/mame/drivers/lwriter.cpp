@@ -116,15 +116,15 @@ public:
 	void lwriter(machine_config &config);
 
 private:
-	DECLARE_READ16_MEMBER(bankedarea_r);
-	DECLARE_WRITE16_MEMBER(bankedarea_w);
-	DECLARE_WRITE8_MEMBER(led_out_w);
-	DECLARE_WRITE8_MEMBER(fifo_out_w);
-	DECLARE_READ8_MEMBER(via_pa_r);
-	DECLARE_WRITE8_MEMBER(via_pa_w);
+	uint16_t bankedarea_r(offs_t offset);
+	void bankedarea_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void led_out_w(uint8_t data);
+	void fifo_out_w(uint8_t data);
+	uint8_t via_pa_r();
+	void via_pa_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(via_ca2_w);
-	DECLARE_READ8_MEMBER(via_pb_r);
-	DECLARE_WRITE8_MEMBER(via_pb_w);
+	uint8_t via_pb_r();
+	void via_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(via_cb1_w);
 	DECLARE_WRITE_LINE_MEMBER(via_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(via_int_w);
@@ -249,7 +249,7 @@ void lwriter_state::machine_reset()
 }
 
 /* Overlay area */
-READ16_MEMBER(lwriter_state::bankedarea_r)
+uint16_t lwriter_state::bankedarea_r(offs_t offset)
 {
 	if (m_overlay)
 	{
@@ -264,7 +264,7 @@ READ16_MEMBER(lwriter_state::bankedarea_r)
 	return 0xFFFF;
 }
 
-WRITE16_MEMBER(lwriter_state::bankedarea_w)
+void lwriter_state::bankedarea_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_overlay)
 	{
@@ -281,7 +281,7 @@ WRITE16_MEMBER(lwriter_state::bankedarea_w)
 }
 
 /* 4 diagnostic LEDs, plus 4 i/o lines for the printer */
-WRITE8_MEMBER(lwriter_state::led_out_w)
+void lwriter_state::led_out_w(uint8_t data)
 {
 	//popmessage("LED status: %02X\n", data&0xFF);
 	logerror("LED status: %02X\n", data&0xFF);
@@ -289,20 +289,20 @@ WRITE8_MEMBER(lwriter_state::led_out_w)
 }
 
 /* FIFO to printer, 64 bytes long */
-WRITE8_MEMBER(lwriter_state::fifo_out_w)
+void lwriter_state::fifo_out_w(uint8_t data)
 {
 	/** TODO: actually emulate this */
 	logerror("FIFO written with: %02X\n", data&0xFF);
 }
 
 /* via stuff */
-READ8_MEMBER(lwriter_state::via_pa_r)
+uint8_t lwriter_state::via_pa_r()
 {
 	logerror(" VIA: Port A read!\n");
 	return 0xFF;
 }
 
-WRITE8_MEMBER(lwriter_state::via_pa_w)
+void lwriter_state::via_pa_w(uint8_t data)
 {
 	logerror(" VIA: Port A written with data of 0x%02x!\n", data);
 }
@@ -312,13 +312,13 @@ WRITE_LINE_MEMBER(lwriter_state::via_ca2_w)
 	logerror(" VIA: CA2 written with %d!\n", state);
 }
 
-READ8_MEMBER(lwriter_state::via_pb_r)
+uint8_t lwriter_state::via_pb_r()
 {
 	logerror(" VIA: Port B read!\n");
 	return 0xFF;
 }
 
-WRITE8_MEMBER(lwriter_state::via_pb_w)
+void lwriter_state::via_pb_w(uint8_t data)
 {
 	logerror(" VIA: Port B written with data of 0x%02x!\n", data);
 	/* Like early Mac models which had VIA A4 control overlaying, the

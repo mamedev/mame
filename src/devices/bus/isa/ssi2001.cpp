@@ -29,7 +29,7 @@ ssi2001_device::ssi2001_device(const machine_config &mconfig, const char *tag, d
 void ssi2001_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(0x0200, 0x0207, read8_delegate(*subdevice<pc_joy_device>("pc_joy"), FUNC(pc_joy_device::joy_port_r)), write8_delegate(*subdevice<pc_joy_device>("pc_joy"), FUNC(pc_joy_device::joy_port_w)));
+	m_isa->install_device(0x0200, 0x0207, read8smo_delegate(*subdevice<pc_joy_device>("pc_joy"), FUNC(pc_joy_device::joy_port_r)), write8smo_delegate(*subdevice<pc_joy_device>("pc_joy"), FUNC(pc_joy_device::joy_port_w)));
 	m_isa->install_device(0x0280, 0x029F, read8sm_delegate(*subdevice<mos6581_device>("sid6581"), FUNC(mos6581_device::read)), write8sm_delegate(*subdevice<mos6581_device>("sid6581"), FUNC(mos6581_device::write)));
 }
 

@@ -221,10 +221,10 @@ public:
 	void jubileep(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(jubileep_videoram_w);
-	DECLARE_WRITE8_MEMBER(jubileep_colorram_w);
-	DECLARE_WRITE8_MEMBER(unk_w);
-	DECLARE_READ8_MEMBER(mux_port_r);
+	void jubileep_videoram_w(offs_t offset, uint8_t data);
+	void jubileep_colorram_w(offs_t offset, uint8_t data);
+	void unk_w(offs_t offset, uint8_t data);
+	uint8_t mux_port_r(offs_t offset);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	uint32_t screen_update_jubileep(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(jubileep_interrupt);
@@ -250,13 +250,13 @@ private:
 *     Video Hardware     *
 *************************/
 
-WRITE8_MEMBER(jubilee_state::jubileep_videoram_w)
+void jubilee_state::jubileep_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(jubilee_state::jubileep_colorram_w)
+void jubilee_state::jubileep_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -333,7 +333,7 @@ void jubilee_state::jubileep_map(address_map &map)
 }
 
 
-WRITE8_MEMBER(jubilee_state::unk_w)
+void jubilee_state::unk_w(offs_t offset, uint8_t data)
 {
 /*  In particular, the interrupt from above must be cleared. We assume that
     this is done by one of the output lines, and from the 32 lines that are
@@ -566,7 +566,7 @@ WRITE8_MEMBER(jubilee_state::unk_w)
 	logerror("CRU write to address %04x: %d\n", offset<<1, data & 1);
 }
 
-READ8_MEMBER(jubilee_state::mux_port_r)
+uint8_t jubilee_state::mux_port_r(offs_t offset)
 {
 	switch( mux_sel )
 	{

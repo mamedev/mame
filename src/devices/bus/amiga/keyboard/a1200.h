@@ -33,10 +33,10 @@ public:
 
 protected:
 	// MPU I/O
-	DECLARE_READ8_MEMBER(mpu_portb_r);
-	DECLARE_WRITE8_MEMBER(mpu_porta_w);
-	DECLARE_WRITE8_MEMBER(mpu_portb_w);
-	DECLARE_WRITE8_MEMBER(mpu_portc_w);
+	u8 mpu_portb_r();
+	void mpu_porta_w(offs_t offset, u8 data, u8 mem_mask = ~0);
+	void mpu_portb_w(offs_t offset, u8 data, u8 mem_mask = ~0);
+	void mpu_portc_w(offs_t offset, u8 data, u8 mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(mpu_tcmp);
 
 	virtual tiny_rom_entry const *device_rom_region() const override;

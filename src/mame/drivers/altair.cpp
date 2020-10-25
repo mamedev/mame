@@ -38,7 +38,7 @@ public:
 	altair_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_ram(*this, "ram")
+		, m_ram(*this, "mainram")
 	{ }
 
 	void altair(machine_config &config);
@@ -59,9 +59,9 @@ private:
 void altair_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xfcff).ram().share("ram");
-	map(0xfd00, 0xfdff).rom();
-	map(0xff00, 0xffff).rom();
+	map(0x0000, 0xfcff).ram().share("mainram");
+	map(0xfd00, 0xfdff).rom().region("maincpu",0);
+	map(0xff00, 0xffff).rom().region("maincpu",0x100);
 }
 
 void altair_state::io_map(address_map &map)
@@ -124,12 +124,12 @@ void altair_state::altair(machine_config &config)
 
 /* ROM definition */
 ROM_START( al8800bt )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "turnmon.bin",  0xfd00, 0x0100, CRC(5c629294) SHA1(125c76216954b681721fff84a3aca05094b21a28))
-	ROM_LOAD( "88dskrom.bin", 0xff00, 0x0100, CRC(7c5232f3) SHA1(24f940ad70ad2829e1bc800c6790b6e993e6ebf6))
+	ROM_REGION( 0x0200, "maincpu", 0 )
+	ROM_LOAD( "turnmon.bin",  0x0000, 0x0100, CRC(5c629294) SHA1(125c76216954b681721fff84a3aca05094b21a28))
+	ROM_LOAD( "88dskrom.bin", 0x0100, 0x0100, CRC(7c5232f3) SHA1(24f940ad70ad2829e1bc800c6790b6e993e6ebf6))
 ROM_END
 
 /* Driver */
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT    CLASS         INIT        COMPANY  FULLNAME         FLAGS
-COMP( 1977, al8800bt, 0,      0,      altair,  altair,  altair_state, empty_init, "MITS",  "Altair 8800bt", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1977, al8800bt, 0,      0,      altair,  altair,  altair_state, empty_init, "MITS",  "Altair 8800bt", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

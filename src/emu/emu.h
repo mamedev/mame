@@ -50,7 +50,6 @@
 
 // memory and address spaces
 #include "emumem.h"
-#include "memarray.h"
 
 // machine-wide utilities
 #include "romentry.h"
@@ -67,7 +66,6 @@
 #include "addrmap.h" // Needs optional_device<> and required_device<>
 #include "distate.h"
 #include "dimemory.h"
-#include "dirom.h"
 #include "opresolv.h"
 #include "dipalette.h"
 #include "digfx.h"

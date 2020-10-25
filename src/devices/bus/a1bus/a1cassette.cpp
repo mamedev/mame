@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "a1cassette.h"
+#include "speaker.h"
 
 /***************************************************************************
     PARAMETERS
@@ -38,9 +39,11 @@ ROM_END
 
 void a1bus_cassette_device::device_add_mconfig(machine_config &config)
 {
+	SPEAKER(config, "mono").front_center();
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED);
 	m_cassette->set_interface("apple1_cass");
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.08);
 }
 
 const tiny_rom_entry *a1bus_cassette_device::device_rom_region() const
@@ -72,7 +75,7 @@ a1bus_cassette_device::a1bus_cassette_device(const machine_config &mconfig, devi
 
 void a1bus_cassette_device::device_start()
 {
-	install_device(0xc000, 0xc0ff, read8_delegate(*this, FUNC(a1bus_cassette_device::cassette_r)), write8_delegate(*this, FUNC(a1bus_cassette_device::cassette_w)));
+	install_device(0xc000, 0xc0ff, read8sm_delegate(*this, FUNC(a1bus_cassette_device::cassette_r)), write8sm_delegate(*this, FUNC(a1bus_cassette_device::cassette_w)));
 	install_bank(0xc100, 0xc1ff, "bank_a1cas", &m_rom[0]);
 
 	save_item(NAME(m_cassette_output_flipflop));
@@ -145,9 +148,10 @@ void a1bus_cassette_device::cassette_toggle_output()
 	m_cassette->output(m_cassette_output_flipflop ? 1.0 : -1.0);
 }
 
-READ8_MEMBER(a1bus_cassette_device::cassette_r)
+uint8_t a1bus_cassette_device::cassette_r(offs_t offset)
 {
-	cassette_toggle_output();
+	if (!machine().side_effects_disabled())
+		cassette_toggle_output();
 
 	if (offset <= 0x7f)
 	{
@@ -180,7 +184,7 @@ READ8_MEMBER(a1bus_cassette_device::cassette_r)
 	}
 }
 
-WRITE8_MEMBER(a1bus_cassette_device::cassette_w)
+void a1bus_cassette_device::cassette_w(offs_t offset, uint8_t data)
 {
 	/* Writes toggle the output flip-flop in the same way that reads
 	   do; other than that they have no effect.  Any repeated accesses

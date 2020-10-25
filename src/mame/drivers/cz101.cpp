@@ -37,6 +37,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_hd44780(*this, "hd44780"),
 		m_keys(*this, "kc%u", 0),
+		m_leds(*this, "led_%u", 0U),
 		m_port_b(0),
 		m_port_c(0)
 	{ }
@@ -54,18 +55,18 @@ private:
 	required_device<upd7810_device> m_maincpu;
 	required_device<hd44780_device> m_hd44780;
 	required_ioport_array<16> m_keys;
+	output_finder<32> m_leds;
 
 	void maincpu_map(address_map &map);
 
-	DECLARE_WRITE8_MEMBER(port_b_w);
-	DECLARE_READ8_MEMBER(port_c_r);
-	DECLARE_WRITE8_MEMBER(port_c_w);
+	void port_b_w(uint8_t data);
+	void port_c_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(led_1_w);
-	DECLARE_WRITE8_MEMBER(led_2_w);
-	DECLARE_WRITE8_MEMBER(led_3_w);
-	DECLARE_WRITE8_MEMBER(led_4_w);
-	DECLARE_READ8_MEMBER(keys_r);
+	void led_1_w(uint8_t data);
+	void led_2_w(uint8_t data);
+	void led_3_w(uint8_t data);
+	void led_4_w(uint8_t data);
+	uint8_t keys_r();
 
 	uint8_t m_port_b;
 	uint8_t m_port_c;
@@ -260,58 +261,58 @@ HD44780_PIXEL_UPDATE( cz101_state::lcd_pixel_update )
 		return;
 
 	if (line < 2 && pos < 16)
-		bitmap.pix16(1 + y + line*8 + line, 1 + pos*6 + x) = state ? 1 : 2;
+		bitmap.pix(1 + y + line*8 + line, 1 + pos*6 + x) = state ? 1 : 2;
 }
 
-WRITE8_MEMBER( cz101_state::led_4_w )
+void cz101_state::led_4_w(uint8_t data)
 {
-	output().set_value("led_0", BIT(data, 7) ? 0 : 1);
-	output().set_value("led_1", BIT(data, 6) ? 0 : 1);
-	output().set_value("led_2", BIT(data, 5) ? 0 : 1);
-	output().set_value("led_3", BIT(data, 4) ? 0 : 1);
-	output().set_value("led_4", BIT(data, 3) ? 0 : 1);
-	output().set_value("led_5", BIT(data, 2) ? 0 : 1);
-	output().set_value("led_6", BIT(data, 1) ? 0 : 1);
-	output().set_value("led_7", BIT(data, 0) ? 0 : 1);
+	m_leds[0] = BIT(data, 7) ? 0 : 1;
+	m_leds[1] = BIT(data, 6) ? 0 : 1;
+	m_leds[2] = BIT(data, 5) ? 0 : 1;
+	m_leds[3] = BIT(data, 4) ? 0 : 1;
+	m_leds[4] = BIT(data, 3) ? 0 : 1;
+	m_leds[5] = BIT(data, 2) ? 0 : 1;
+	m_leds[6] = BIT(data, 1) ? 0 : 1;
+	m_leds[7] = BIT(data, 0) ? 0 : 1;
 }
 
-WRITE8_MEMBER( cz101_state::led_3_w )
+void cz101_state::led_3_w(uint8_t data)
 {
-	output().set_value("led_8", BIT(data, 7) ? 0 : 1);
-	output().set_value("led_9", BIT(data, 6) ? 0 : 1);
-	output().set_value("led_10", BIT(data, 5) ? 0 : 1);
-	output().set_value("led_11", BIT(data, 4) ? 0 : 1);
-	output().set_value("led_12", BIT(data, 3) ? 0 : 1);
-	output().set_value("led_13", BIT(data, 2) ? 0 : 1);
-	output().set_value("led_14", BIT(data, 1) ? 0 : 1);
-	output().set_value("led_15", BIT(data, 0) ? 0 : 1);
+	m_leds[8] = BIT(data, 7) ? 0 : 1;
+	m_leds[9] = BIT(data, 6) ? 0 : 1;
+	m_leds[10] = BIT(data, 5) ? 0 : 1;
+	m_leds[11] = BIT(data, 4) ? 0 : 1;
+	m_leds[12] = BIT(data, 3) ? 0 : 1;
+	m_leds[13] = BIT(data, 2) ? 0 : 1;
+	m_leds[14] = BIT(data, 1) ? 0 : 1;
+	m_leds[15] = BIT(data, 0) ? 0 : 1;
 }
 
-WRITE8_MEMBER( cz101_state::led_2_w )
+void cz101_state::led_2_w(uint8_t data)
 {
-	output().set_value("led_16", BIT(data, 7) ? 0 : 1);
-	output().set_value("led_17", BIT(data, 6) ? 0 : 1);
-	output().set_value("led_18", BIT(data, 5) ? 0 : 1);
-	output().set_value("led_19", BIT(data, 4) ? 0 : 1);
-	output().set_value("led_20", BIT(data, 3) ? 0 : 1);
-	output().set_value("led_21", BIT(data, 2) ? 0 : 1);
-	output().set_value("led_22", BIT(data, 1) ? 0 : 1);
-	output().set_value("led_23", BIT(data, 0) ? 0 : 1);
+	m_leds[16] = BIT(data, 7) ? 0 : 1;
+	m_leds[17] = BIT(data, 6) ? 0 : 1;
+	m_leds[18] = BIT(data, 5) ? 0 : 1;
+	m_leds[19] = BIT(data, 4) ? 0 : 1;
+	m_leds[20] = BIT(data, 3) ? 0 : 1;
+	m_leds[21] = BIT(data, 2) ? 0 : 1;
+	m_leds[22] = BIT(data, 1) ? 0 : 1;
+	m_leds[23] = BIT(data, 0) ? 0 : 1;
 }
 
-WRITE8_MEMBER( cz101_state::led_1_w )
+void cz101_state::led_1_w(uint8_t data)
 {
-	output().set_value("led_24", BIT(data, 7) ? 0 : 1);
-	output().set_value("led_25", BIT(data, 6) ? 0 : 1);
-	output().set_value("led_26", BIT(data, 5) ? 0 : 1);
-	output().set_value("led_27", BIT(data, 4) ? 0 : 1);
-	output().set_value("led_28", BIT(data, 3) ? 0 : 1);
-	output().set_value("led_29", BIT(data, 2) ? 0 : 1);
-	output().set_value("led_30", BIT(data, 1) ? 0 : 1);
-	output().set_value("led_31", BIT(data, 0) ? 0 : 1);
+	m_leds[24] = BIT(data, 7) ? 0 : 1;
+	m_leds[25] = BIT(data, 6) ? 0 : 1;
+	m_leds[26] = BIT(data, 5) ? 0 : 1;
+	m_leds[27] = BIT(data, 4) ? 0 : 1;
+	m_leds[28] = BIT(data, 3) ? 0 : 1;
+	m_leds[29] = BIT(data, 2) ? 0 : 1;
+	m_leds[30] = BIT(data, 1) ? 0 : 1;
+	m_leds[31] = BIT(data, 0) ? 0 : 1;
 }
 
-READ8_MEMBER( cz101_state::keys_r )
+uint8_t cz101_state::keys_r()
 {
 	return m_keys[m_port_b & 0x0f]->read();
 }
@@ -322,7 +323,7 @@ READ8_MEMBER( cz101_state::keys_r )
 // ---4----  music lsi irq input
 // ----3210  key select output
 
-WRITE8_MEMBER( cz101_state::port_b_w )
+void cz101_state::port_b_w(uint8_t data)
 {
 	LOG("port_b_w: %02x\n", data);
 
@@ -338,7 +339,7 @@ WRITE8_MEMBER( cz101_state::port_b_w )
 // ------1-  midi input
 // -------0  midi output
 
-WRITE8_MEMBER( cz101_state::port_c_w )
+void cz101_state::port_c_w(uint8_t data)
 {
 	LOG("port_c_w: %02x\n", data);
 
@@ -350,6 +351,8 @@ WRITE8_MEMBER( cz101_state::port_c_w )
 
 void cz101_state::machine_start()
 {
+	m_leds.resolve();
+
 	// register for save states
 	save_item(NAME(m_port_b));
 	save_item(NAME(m_port_c));

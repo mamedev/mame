@@ -145,13 +145,13 @@ CUSTOM_INPUT_MEMBER(nova2001_state::ninjakun_io_A002_ctrl_r)
 	return m_ninjakun_io_a002_ctrl;
 }
 
-WRITE8_MEMBER(nova2001_state::ninjakun_cpu1_io_A002_w)
+void nova2001_state::ninjakun_cpu1_io_A002_w(u8 data)
 {
 	if( data == 0x80 ) m_ninjakun_io_a002_ctrl |= 0x01;
 	if( data == 0x40 ) m_ninjakun_io_a002_ctrl &= ~0x02;
 }
 
-WRITE8_MEMBER(nova2001_state::ninjakun_cpu2_io_A002_w)
+void nova2001_state::ninjakun_cpu2_io_A002_w(u8 data)
 {
 	if( data == 0x40 ) m_ninjakun_io_a002_ctrl |= 0x02;
 	if( data == 0x80 ) m_ninjakun_io_a002_ctrl &= ~0x01;

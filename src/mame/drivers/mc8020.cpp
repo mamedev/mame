@@ -36,15 +36,16 @@ public:
 	void mc8020(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(port_b_r);
-	DECLARE_WRITE8_MEMBER(port_a_w);
-	DECLARE_WRITE8_MEMBER(port_b_w);
+	u8 port_b_r();
+	void port_a_w(u8 data);
+	void port_b_w(u8 data);
 	uint32_t screen_update_mc8020(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
 	u8 m_row;
+	virtual void machine_start() override;
 	required_shared_ptr<u8> m_p_videoram;
 	required_device<z80_device> m_maincpu;
 	required_ioport_array<7> m_keyboard;
@@ -71,18 +72,18 @@ void mc8020_state::io_map(address_map &map)
 /* Input ports */
 static INPUT_PORTS_START( mc8020 )
 	PORT_START("X0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR('!')
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('@')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('#')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('$')
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('%')
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('&')
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('\'')
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('(')
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR(34)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('@')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'')
 
 	PORT_START("X1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('9') PORT_CHAR(')')
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('0') PORT_CHAR('\"')
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('+') PORT_CHAR('*')
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\') PORT_CHAR('^')
@@ -132,17 +133,17 @@ static INPUT_PORTS_START( mc8020 )
 
 	PORT_START("X6")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_UP)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ESC) PORT_CHAR(27)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DOWN)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RIGHT)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LEFT)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 INPUT_PORTS_END
 
 
-READ8_MEMBER( mc8020_state::port_b_r )
+u8 mc8020_state::port_b_r()
 {
 	if (m_row == 0x40)
 		return m_keyboard[0]->read();
@@ -168,20 +169,25 @@ READ8_MEMBER( mc8020_state::port_b_r )
 		return 0;
 }
 
-WRITE8_MEMBER( mc8020_state::port_a_w )
+void mc8020_state::port_a_w(u8 data)
 {
 	m_row = data;
 }
 
-WRITE8_MEMBER( mc8020_state::port_b_w )
+void mc8020_state::port_b_w(u8 data)
 {
+}
+
+void mc8020_state::machine_start()
+{
+	save_item(NAME(m_row));
 }
 
 
 // This is not a content of U402 510
 // but order is fine
 static const uint8_t prom[] = {
-	0x0c,0x11,0x13,0x15,0x17,0x10,0x0e,0x00, // @
+	0x0e,0x11,0x13,0x15,0x17,0x10,0x0e,0x00, // @
 	0x04,0x0a,0x11,0x11,0x1f,0x11,0x11,0x00, // A
 	0x1e,0x11,0x11,0x1e,0x11,0x11,0x1e,0x00, // B
 	0x0e,0x11,0x10,0x10,0x10,0x11,0x0e,0x00, // C
@@ -257,20 +263,20 @@ static const uint8_t prom[] = {
 
 uint32_t mc8020_state::screen_update_mc8020(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y,ra,chr,gfx;
-	uint16_t sy=0,ma=0,x;
+	u16 sy=0,ma=0;
 
-	for(y = 0; y < 8; y++ )
+	for (u8 y = 0; y < 8; y++ )
 	{
-		for (ra = 0; ra < 16; ra++)
+		for (u8 ra = 0; ra < 16; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			u16 *p = &bitmap.pix(sy++);
 
-			for (x = ma; x < ma + 32; x++)
+			for (u16 x = ma; x < ma + 32; x++)
 			{
+				u8 gfx;
 				if (ra > 3 && ra < 12)
 				{
-					chr = m_p_videoram[x];
+					u8 chr = m_p_videoram[x];
 					gfx = prom[(chr<<3) | (ra-4)];
 				}
 				else
@@ -331,7 +337,7 @@ void mc8020_state::mc8020(machine_config &config)
 
 /* ROM definition */
 ROM_START( mc8020 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x6000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "ver1", "Version 1")
 	ROMX_LOAD( "s01.rom",     0x0000, 0x0400, CRC(0f1c1a62) SHA1(270c0a9e8e165658f3b09d40a3e8bb3dc1b88184), ROM_BIOS(0))
 	ROMX_LOAD( "s02.rom",     0x0400, 0x0400, CRC(93b5811c) SHA1(8559d24072c9b5908a2627ff986d818308f51d59), ROM_BIOS(0))
@@ -371,4 +377,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                FULLNAME       FLAGS
-COMP( 198?, mc8020, 0,      0,      mc8020,  mc8020, mc8020_state, empty_init, "VEB Elektronik Gera", "MC-80.21/22", MACHINE_NO_SOUND )
+COMP( 198?, mc8020, 0,      0,      mc8020,  mc8020, mc8020_state, empty_init, "VEB Elektronik Gera", "MC-80.21/22", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

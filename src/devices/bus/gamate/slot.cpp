@@ -225,11 +225,11 @@ std::string gamate_cart_slot_device::get_default_card_software(get_default_card_
  read
  -------------------------------------------------*/
 
-READ8_MEMBER(gamate_cart_slot_device::read_cart)
+uint8_t gamate_cart_slot_device::read_cart(offs_t offset)
 {
 	if (m_cart)
 	{
-		return m_cart->read_cart(space, offset);
+		return m_cart->read_cart(offset);
 	}
 	else
 		return 0xff;
@@ -239,10 +239,10 @@ READ8_MEMBER(gamate_cart_slot_device::read_cart)
  write
  -------------------------------------------------*/
 
-WRITE8_MEMBER(gamate_cart_slot_device::write_cart)
+void gamate_cart_slot_device::write_cart(offs_t offset, uint8_t data)
 {
 	if (m_cart)
 	{
-		m_cart->write_cart(space, offset, data);
+		m_cart->write_cart(offset, data);
 	}
 }

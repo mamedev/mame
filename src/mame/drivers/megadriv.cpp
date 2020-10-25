@@ -21,7 +21,7 @@
 
 /* These overwrite the MAME ones in DRIVER_INIT */
 /* They're needed to give the users the choice between different controllers */
-READ8_MEMBER(md_cons_state::mess_md_io_read_data_port)
+uint8_t md_cons_state::mess_md_io_read_data_port(offs_t offset)
 {
 	int portnum = offset;
 
@@ -122,7 +122,7 @@ READ8_MEMBER(md_cons_state::mess_md_io_read_data_port)
 }
 
 
-WRITE16_MEMBER(md_cons_state::mess_md_io_write_data_port)
+void md_cons_state::mess_md_io_write_data_port(offs_t offset, uint16_t data)
 {
 	int portnum = offset;
 	int controller;
@@ -298,13 +298,14 @@ MACHINE_START_MEMBER(md_cons_state, md_common)
 void md_cons_state::install_cartslot()
 {
 	// for now m_cartslot is only in MD and not 32x and SegaCD
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7fffff, read16_delegate(*m_cart, FUNC(base_md_cart_slot_device::read)), write16_delegate(*m_cart, FUNC(base_md_cart_slot_device::write)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa13000, 0xa130ff, read16_delegate(*m_cart, FUNC(base_md_cart_slot_device::read_a13)), write16_delegate(*m_cart, FUNC(base_md_cart_slot_device::write_a13)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa15000, 0xa150ff, read16_delegate(*m_cart, FUNC(base_md_cart_slot_device::read_a15)), write16_delegate(*m_cart, FUNC(base_md_cart_slot_device::write_a15)));
-//  m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14000, 0xa14003, write16_delegate(*m_cart, FUNC(base_md_cart_slot_device::write_tmss_bank)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x000000, 0x7fffff, read16sm_delegate(*m_cart, FUNC(base_md_cart_slot_device::read)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x000000, 0x7fffff, write16s_delegate(*m_cart, FUNC(base_md_cart_slot_device::write)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa13000, 0xa130ff, read16sm_delegate(*m_cart, FUNC(base_md_cart_slot_device::read_a13)), write16sm_delegate(*m_cart, FUNC(base_md_cart_slot_device::write_a13)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa15000, 0xa150ff, read16sm_delegate(*m_cart, FUNC(base_md_cart_slot_device::read_a15)), write16sm_delegate(*m_cart, FUNC(base_md_cart_slot_device::write_a15)));
+//  m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14000, 0xa14003, write16sm_delegate(*m_cart, FUNC(base_md_cart_slot_device::write_tmss_bank)));
 }
 
-READ16_MEMBER( md_cons_state::tmss_r )
+uint16_t md_cons_state::tmss_r(offs_t offset)
 {
 	if (offset < 0x4000 / 2)
 		return m_tmss[offset];
@@ -312,12 +313,12 @@ READ16_MEMBER( md_cons_state::tmss_r )
 	return 0xffff;
 }
 
-WRITE16_MEMBER( md_cons_state::tmss_swap_w )
+void md_cons_state::tmss_swap_w(uint16_t data)
 {
 	if (data & 0x0001)
 	{
 		install_cartslot();
-		m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14100, 0xa14101, write16_delegate(*this, FUNC(md_cons_state::tmss_swap_w)));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14100, 0xa14101, write16smo_delegate(*this, FUNC(md_cons_state::tmss_swap_w)));
 	}
 	else
 	{
@@ -329,9 +330,9 @@ WRITE16_MEMBER( md_cons_state::tmss_swap_w )
 void md_cons_state::install_tmss()
 {
 	m_maincpu->space(AS_PROGRAM).unmap_readwrite(0x000000, 0x7fffff);
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x000000, 0x7fffff, read16_delegate(*this, FUNC(md_cons_state::tmss_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x000000, 0x7fffff, read16sm_delegate(*this, FUNC(md_cons_state::tmss_r)));
 
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14100, 0xa14101, write16_delegate(*this, FUNC(md_cons_state::tmss_swap_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14100, 0xa14101, write16smo_delegate(*this, FUNC(md_cons_state::tmss_swap_w)));
 
 }
 
@@ -513,8 +514,8 @@ ROM_END
 
 void md_cons_state::init_mess_md_common()
 {
-	m_megadrive_io_read_data_port_ptr = read8_delegate(*this, FUNC(md_cons_state::mess_md_io_read_data_port));
-	m_megadrive_io_write_data_port_ptr = write16_delegate(*this, FUNC(md_cons_state::mess_md_io_write_data_port));
+	m_megadrive_io_read_data_port_ptr = read8sm_delegate(*this, FUNC(md_cons_state::mess_md_io_read_data_port));
+	m_megadrive_io_write_data_port_ptr = write16sm_delegate(*this, FUNC(md_cons_state::mess_md_io_write_data_port));
 }
 
 void md_cons_state::init_genesis()

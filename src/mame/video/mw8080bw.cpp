@@ -21,7 +21,7 @@ uint32_t mw8080bw_state::screen_update_mw8080bw(screen_device &screen, bitmap_rg
 	{
 		// plot the current pixel
 		pen_t pen = (video_data & 0x01) ? rgb_t::white() : rgb_t::black();
-		bitmap.pix32(y - MW8080BW_VCOUNTER_START_NO_VBLANK, x) = pen;
+		bitmap.pix(y - MW8080BW_VCOUNTER_START_NO_VBLANK, x) = pen;
 
 		// next pixel
 		video_data = video_data >> 1;
@@ -34,7 +34,7 @@ uint32_t mw8080bw_state::screen_update_mw8080bw(screen_device &screen, bitmap_rg
 			for (int i = 0; i < 4; i++)
 			{
 				pen = (video_data & 0x01) ? rgb_t::white() : rgb_t::black();
-				bitmap.pix32(y - MW8080BW_VCOUNTER_START_NO_VBLANK, 256 + i) = pen;
+				bitmap.pix(y - MW8080BW_VCOUNTER_START_NO_VBLANK, 256 + i) = pen;
 
 				video_data = video_data >> 1;
 			}
@@ -144,7 +144,7 @@ uint32_t spcenctr_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 		if (m_brightness > (pen & 0xff))
 			pen = rgb_t(m_brightness, m_brightness, m_brightness);
 
-		bitmap.pix32(y - MW8080BW_VCOUNTER_START_NO_VBLANK, x) = pen;
+		bitmap.pix(y - MW8080BW_VCOUNTER_START_NO_VBLANK, x) = pen;
 
 		center = center + 1;
 		width = width + ((center & 0x80) ? -1 : 1);
@@ -166,7 +166,7 @@ uint32_t spcenctr_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 				else
 					pen = rgb_t::black();
 
-				bitmap.pix32(y - MW8080BW_VCOUNTER_START_NO_VBLANK, 256 + i) = pen;
+				bitmap.pix(y - MW8080BW_VCOUNTER_START_NO_VBLANK, 256 + i) = pen;
 
 				video_data = video_data >> 1;
 			}
@@ -266,7 +266,7 @@ uint32_t mw8080bw_state::screen_update_phantom2(screen_device &screen, bitmap_rg
 		else
 			pen = bit ? rgb_t::white() : rgb_t::black();
 
-		bitmap.pix32(y - MW8080BW_VCOUNTER_START_NO_VBLANK, x) = pen;
+		bitmap.pix(y - MW8080BW_VCOUNTER_START_NO_VBLANK, x) = pen;
 
 		/* move to next pixel -- if ripple carry is currently set,
 		   prepare for loading the shift register */
@@ -300,7 +300,7 @@ uint32_t mw8080bw_state::screen_update_phantom2(screen_device &screen, bitmap_rg
 			for (i = 0; i < 4; i++)
 			{
 				pen = (video_data & 0x01) ? rgb_t::white() : rgb_t::black();
-				bitmap.pix32(y - MW8080BW_VCOUNTER_START_NO_VBLANK, 256 + i) = pen;
+				bitmap.pix(y - MW8080BW_VCOUNTER_START_NO_VBLANK, 256 + i) = pen;
 
 				video_data = video_data >> 1;
 			}
@@ -365,9 +365,9 @@ uint32_t mw8080bw_state::screen_update_invaders(screen_device &screen, bitmap_rg
 		pen_t pen = (video_data & 0x01) ? rgb_t::white() : rgb_t::black();
 
 		if (m_flip_screen)
-			bitmap.pix32(MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), MW8080BW_HPIXCOUNT - 1 - x) = pen;
+			bitmap.pix(MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), MW8080BW_HPIXCOUNT - 1 - x) = pen;
 		else
-			bitmap.pix32(y - MW8080BW_VCOUNTER_START_NO_VBLANK, x) = pen;
+			bitmap.pix(y - MW8080BW_VCOUNTER_START_NO_VBLANK, x) = pen;
 
 		// next pixel
 		video_data = video_data >> 1;
@@ -382,9 +382,9 @@ uint32_t mw8080bw_state::screen_update_invaders(screen_device &screen, bitmap_rg
 				pen = (video_data & 0x01) ? rgb_t::white() : rgb_t::black();
 
 				if (m_flip_screen)
-					bitmap.pix32(MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), MW8080BW_HPIXCOUNT - 1 - (256 + i)) = pen;
+					bitmap.pix(MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), MW8080BW_HPIXCOUNT - 1 - (256 + i)) = pen;
 				else
-					bitmap.pix32(y - MW8080BW_VCOUNTER_START_NO_VBLANK, 256 + i) = pen;
+					bitmap.pix(y - MW8080BW_VCOUNTER_START_NO_VBLANK, 256 + i) = pen;
 
 				video_data = video_data >> 1;
 			}

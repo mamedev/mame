@@ -16,12 +16,12 @@
 
 
 ******************************************************************************/
-READ8_MEMBER(nbmj8900_state::palette_type1_r)
+uint8_t nbmj8900_state::palette_type1_r(offs_t offset)
 {
 	return m_palette_ptr[offset];
 }
 
-WRITE8_MEMBER(nbmj8900_state::palette_type1_w)
+void nbmj8900_state::palette_type1_w(offs_t offset, uint8_t data)
 {
 	int r, g, b;
 
@@ -39,12 +39,12 @@ WRITE8_MEMBER(nbmj8900_state::palette_type1_w)
 }
 
 #ifdef UNUSED_FUNCTION
-READ8_MEMBER(nbmj8900_state::palette_type2_r)
+uint8_t nbmj8900_state::palette_type2_r(offs_t offset)
 {
 	return m_palette_ptr[offset];
 }
 
-WRITE8_MEMBER(nbmj8900_state::palette_type2_w)
+void nbmj8900_state::palette_type2_w(offs_t offset, uint8_t data)
 {
 	int r, g, b;
 
@@ -61,12 +61,12 @@ WRITE8_MEMBER(nbmj8900_state::palette_type2_w)
 	m_palette->set_pen_color((offset & 0x0ff), pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
-READ8_MEMBER(nbmj8900_state::palette_type3_r)
+uint8_t nbmj8900_state::palette_type3_r(offs_t offset)
 {
 	return m_palette_ptr[offset];
 }
 
-WRITE8_MEMBER(nbmj8900_state::palette_type3_w)
+void nbmj8900_state::palette_type3_w(offs_t offset, uint8_t data)
 {
 	int r, g, b;
 
@@ -84,17 +84,17 @@ WRITE8_MEMBER(nbmj8900_state::palette_type3_w)
 }
 #endif
 
-WRITE8_MEMBER(nbmj8900_state::clutsel_w)
+void nbmj8900_state::clutsel_w(uint8_t data)
 {
 	m_clutsel = data;
 }
 
-READ8_MEMBER(nbmj8900_state::clut_r)
+uint8_t nbmj8900_state::clut_r(offs_t offset)
 {
 	return m_clut[offset];
 }
 
-WRITE8_MEMBER(nbmj8900_state::clut_w)
+void nbmj8900_state::clut_w(offs_t offset, uint8_t data)
 {
 	m_clut[((m_clutsel & 0x7f) * 0x10) + (offset & 0x0f)] = data;
 }
@@ -103,7 +103,7 @@ WRITE8_MEMBER(nbmj8900_state::clut_w)
 
 
 ******************************************************************************/
-WRITE8_MEMBER(nbmj8900_state::blitter_w)
+void nbmj8900_state::blitter_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -127,12 +127,12 @@ WRITE8_MEMBER(nbmj8900_state::blitter_w)
 	}
 }
 
-WRITE8_MEMBER(nbmj8900_state::scrolly_w)
+void nbmj8900_state::scrolly_w(uint8_t data)
 {
 	m_scrolly = data;
 }
 
-WRITE8_MEMBER(nbmj8900_state::vramsel_w)
+void nbmj8900_state::vramsel_w(uint8_t data)
 {
 	/* protection - not sure about this */
 	m_nb1413m3->m_sndromrgntag = (data & 0x20) ? "protdata" : "voice";
@@ -140,7 +140,7 @@ WRITE8_MEMBER(nbmj8900_state::vramsel_w)
 	m_vram = data;
 }
 
-WRITE8_MEMBER(nbmj8900_state::romsel_w)
+void nbmj8900_state::romsel_w(uint8_t data)
 {
 	m_gfxrom = (data & 0x0f);
 
@@ -188,13 +188,13 @@ void nbmj8900_state::vramflip(int vram)
 void nbmj8900_state::update_pixel0(int x, int y)
 {
 	uint8_t color = m_videoram0[(y * m_screen_width) + x];
-	m_tmpbitmap0.pix16(y, x) = m_palette->pen(color);
+	m_tmpbitmap0.pix(y, x) = m_palette->pen(color);
 }
 
 void nbmj8900_state::update_pixel1(int x, int y)
 {
 	uint8_t color = m_videoram1[(y * m_screen_width) + x];
-	m_tmpbitmap1.pix16(y, x) = m_palette->pen(color);
+	m_tmpbitmap1.pix(y, x) = m_palette->pen(color);
 }
 
 void nbmj8900_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)

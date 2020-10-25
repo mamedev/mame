@@ -24,31 +24,31 @@ public:
 	void amap(address_map &map);               // for range 0x005f7400-0x005f74ff
 	virtual void submap(address_map &map) = 0; // for range 0x005f7000-0x005f70ff
 
-	DECLARE_READ32_MEMBER(sb_gdstar_r);   // 5f7404
-	DECLARE_WRITE32_MEMBER(sb_gdstar_w);  // 5f7404
-	DECLARE_READ32_MEMBER(sb_gdlen_r);    // 5f7408
-	DECLARE_WRITE32_MEMBER(sb_gdlen_w);   // 5f7408
-	DECLARE_READ32_MEMBER(sb_gddir_r);    // 5f740c
-	DECLARE_WRITE32_MEMBER(sb_gddir_w);   // 5f740c
-	DECLARE_READ32_MEMBER(sb_gden_r);     // 5f7414
-	DECLARE_WRITE32_MEMBER(sb_gden_w);    // 5f7414
-	DECLARE_READ32_MEMBER(sb_gdst_r);     // 5f7418
-	DECLARE_WRITE32_MEMBER(sb_gdst_w);    // 5f7418
+	uint32_t sb_gdstar_r();   // 5f7404
+	void sb_gdstar_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);  // 5f7404
+	uint32_t sb_gdlen_r();    // 5f7408
+	void sb_gdlen_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);   // 5f7408
+	uint32_t sb_gddir_r();    // 5f740c
+	void sb_gddir_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);   // 5f740c
+	uint32_t sb_gden_r();     // 5f7414
+	void sb_gden_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);    // 5f7414
+	uint32_t sb_gdst_r();     // 5f7418
+	void sb_gdst_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);    // 5f7418
 
-	DECLARE_WRITE32_MEMBER(sb_g1rrc_w);   // 5f7480
-	DECLARE_WRITE32_MEMBER(sb_g1rwc_w);   // 5f7484
-	DECLARE_WRITE32_MEMBER(sb_g1frc_w);   // 5f7488
-	DECLARE_WRITE32_MEMBER(sb_g1fwc_w);   // 5f748c
-	DECLARE_WRITE32_MEMBER(sb_g1crc_w);   // 5f7490
-	DECLARE_WRITE32_MEMBER(sb_g1cwc_w);   // 5f7494
-	DECLARE_WRITE32_MEMBER(sb_g1gdrc_w);  // 5f74a0
-	DECLARE_WRITE32_MEMBER(sb_g1gdwc_w);  // 5f74a4
-	DECLARE_READ32_MEMBER(sb_g1sysm_r);   // 5f74b0
-	DECLARE_WRITE32_MEMBER(sb_g1crdyc_w); // 5f74b4
-	DECLARE_WRITE32_MEMBER(sb_gdapro_w);  // 5f74b8
+	void sb_g1rrc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);   // 5f7480
+	void sb_g1rwc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);   // 5f7484
+	void sb_g1frc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);   // 5f7488
+	void sb_g1fwc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);   // 5f748c
+	void sb_g1crc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);   // 5f7490
+	void sb_g1cwc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);   // 5f7494
+	void sb_g1gdrc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);  // 5f74a0
+	void sb_g1gdwc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);  // 5f74a4
+	uint32_t sb_g1sysm_r(offs_t offset, uint32_t mem_mask = ~0);   // 5f74b0
+	void sb_g1crdyc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0); // 5f74b4
+	void sb_gdapro_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);  // 5f74b8
 
-	DECLARE_READ32_MEMBER(sb_gdstard_r);  // 5f74f4
-	DECLARE_READ32_MEMBER(sb_gdlend_r);   // 5f74f8
+	uint32_t sb_gdstard_r(offs_t offset, uint32_t mem_mask = ~0);  // 5f74f4
+	uint32_t sb_gdlend_r(offs_t offset, uint32_t mem_mask = ~0);   // 5f74f8
 
 protected:
 	enum { G1_TIMER_ID = 0x42 };

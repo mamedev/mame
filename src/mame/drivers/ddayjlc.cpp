@@ -93,19 +93,19 @@ public:
 
 private:
 
-	DECLARE_WRITE8_MEMBER(prot_w);
-	DECLARE_WRITE8_MEMBER(char_bank_w);
-	DECLARE_WRITE8_MEMBER(bgvram_w);
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_WRITE8_MEMBER(sound_nmi_w);
-	DECLARE_WRITE8_MEMBER(main_nmi_w);
-	DECLARE_WRITE8_MEMBER(bg0_w);
-	DECLARE_WRITE8_MEMBER(bg1_w);
-	DECLARE_WRITE8_MEMBER(bg2_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(flip_screen_w);
-	DECLARE_WRITE8_MEMBER(i8257_CH0_w);
-	DECLARE_WRITE8_MEMBER(i8257_LMSR_w);
+	void prot_w(offs_t offset, uint8_t data);
+	void char_bank_w(uint8_t data);
+	void bgvram_w(offs_t offset, uint8_t data);
+	void vram_w(offs_t offset, uint8_t data);
+	void sound_nmi_w(uint8_t data);
+	void main_nmi_w(uint8_t data);
+	void bg0_w(uint8_t data);
+	void bg1_w(uint8_t data);
+	void bg2_w(uint8_t data);
+	void sound_w(uint8_t data);
+	void flip_screen_w(uint8_t data);
+	void i8257_CH0_w(offs_t offset, uint8_t data);
+	void i8257_LMSR_w(address_space &space, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info_bg);
 	TILE_GET_INFO_MEMBER(get_tile_info_fg);
 	void ddayjlc_palette(palette_device &palette) const;
@@ -286,12 +286,12 @@ CUSTOM_INPUT_MEMBER(ddayjlc_state::prot_r)
 	return prot_data[m_prot_addr];
 }
 
-WRITE8_MEMBER(ddayjlc_state::prot_w)
+void ddayjlc_state::prot_w(offs_t offset, uint8_t data)
 {
 	m_prot_addr = (m_prot_addr & (~(1 << offset))) | ((data & 1) << offset);
 }
 
-WRITE8_MEMBER(ddayjlc_state::char_bank_w)
+void ddayjlc_state::char_bank_w(uint8_t data)
 {
 	m_char_bank = BIT(data,0);
 	m_fg_tilemap->mark_all_dirty();
@@ -299,7 +299,7 @@ WRITE8_MEMBER(ddayjlc_state::char_bank_w)
 		logerror("Warning: char_bank_w with %02x\n",data);
 }
 
-WRITE8_MEMBER(ddayjlc_state::bgvram_w)
+void ddayjlc_state::bgvram_w(offs_t offset, uint8_t data)
 {
 	if (!offset)
 		m_bg_tilemap->set_scrollx(0, data + 8);
@@ -308,38 +308,38 @@ WRITE8_MEMBER(ddayjlc_state::bgvram_w)
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(ddayjlc_state::vram_w)
+void ddayjlc_state::vram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 
-WRITE8_MEMBER(ddayjlc_state::sound_nmi_w)
+void ddayjlc_state::sound_nmi_w(uint8_t data)
 {
 	m_sound_nmi_enable = BIT(data, 0);
 	if (!m_sound_nmi_enable)
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(ddayjlc_state::main_nmi_w)
+void ddayjlc_state::main_nmi_w(uint8_t data)
 {
 	m_main_nmi_enable = BIT(data, 0);
 	if (!m_main_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(ddayjlc_state::bg0_w)
+void ddayjlc_state::bg0_w(uint8_t data)
 {
 	m_bgadr = (m_bgadr & 0xfe) | (data & 1);
 }
 
-WRITE8_MEMBER(ddayjlc_state::bg1_w)
+void ddayjlc_state::bg1_w(uint8_t data)
 {
 	m_bgadr = (m_bgadr & 0xfd) | ((data & 1) << 1);
 }
 
-WRITE8_MEMBER(ddayjlc_state::bg2_w)
+void ddayjlc_state::bg2_w(uint8_t data)
 {
 	m_bgadr = (m_bgadr & 0xfb) | ((data & 1) << 2);
 	if (m_bgadr > 2)
@@ -348,24 +348,24 @@ WRITE8_MEMBER(ddayjlc_state::bg2_w)
 	membank("bank1")->set_entry(m_bgadr);
 }
 
-WRITE8_MEMBER(ddayjlc_state::sound_w)
+void ddayjlc_state::sound_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
-WRITE8_MEMBER(ddayjlc_state::flip_screen_w)
+void ddayjlc_state::flip_screen_w(uint8_t data)
 {
 	flip_screen_set(data & 1);
 }
 
-WRITE8_MEMBER(ddayjlc_state::i8257_CH0_w)
+void ddayjlc_state::i8257_CH0_w(offs_t offset, uint8_t data)
 {
 	m_e00x_d[offset][m_e00x_l[offset]] = data;
 	m_e00x_l[offset] ^= 1;
 }
 
-WRITE8_MEMBER(ddayjlc_state::i8257_LMSR_w)
+void ddayjlc_state::i8257_LMSR_w(address_space &space, uint8_t data)
 {
 	if (!data)
 	{

@@ -69,7 +69,7 @@ void sega_315_6154_device::regenerate_config_mapping()
 		}
 }
 
-READ32_MEMBER(sega_315_6154_device::registers_r)
+u32 sega_315_6154_device::registers_r(offs_t offset)
 {
 	return m_registers[offset];
 }
@@ -85,7 +85,7 @@ static inline void parse_address_register(u32 reg, u32 *base)
 	base[3] = reg << 24;
 }
 
-WRITE32_MEMBER(sega_315_6154_device::registers_w)
+void sega_315_6154_device::registers_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(m_registers + offset);
 

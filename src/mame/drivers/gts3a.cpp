@@ -49,12 +49,12 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(test_inp);
 
 private:
-	DECLARE_WRITE8_MEMBER(segbank_w);
-	DECLARE_READ8_MEMBER(u4a_r);
-	DECLARE_READ8_MEMBER(u4b_r);
-	DECLARE_WRITE8_MEMBER(u4b_w);
-	DECLARE_READ8_MEMBER(dmd_r);
-	DECLARE_WRITE8_MEMBER(dmd_w);
+	void segbank_w(offs_t offset, uint8_t data);
+	uint8_t u4a_r();
+	uint8_t u4b_r();
+	void u4b_w(uint8_t data);
+	uint8_t dmd_r();
+	void dmd_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(nmi_w);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	void palette_init(palette_device &palette);
@@ -240,7 +240,7 @@ WRITE_LINE_MEMBER( gts3a_state::nmi_w )
 	m_maincpu->set_input_line(INPUT_LINE_NMI, (state) ? CLEAR_LINE : HOLD_LINE);
 }
 
-WRITE8_MEMBER( gts3a_state::segbank_w )
+void gts3a_state::segbank_w(offs_t offset, uint8_t data)
 { // this is all wrong
 	uint32_t seg1,seg2;
 	m_segment[offset] = data;
@@ -249,7 +249,7 @@ WRITE8_MEMBER( gts3a_state::segbank_w )
 	m_digits[m_digit+(BIT(offset, 1) ? 0 : 20)] = seg2;
 }
 
-WRITE8_MEMBER( gts3a_state::u4b_w )
+void gts3a_state::u4b_w(uint8_t data)
 {
 	m_u4b = data & 0xe7;
 	bool clk_bit = BIT(data, 6);
@@ -276,7 +276,7 @@ WRITE8_MEMBER( gts3a_state::u4b_w )
 //  printf("%s B=%X ",machine().describe_context().c_str(),data&0xe0);
 }
 
-READ8_MEMBER( gts3a_state::u4a_r )
+uint8_t gts3a_state::u4a_r()
 {
 	if (m_row < 12)
 		return m_switches[m_row]->read();
@@ -284,7 +284,7 @@ READ8_MEMBER( gts3a_state::u4a_r )
 		return 0xff;
 }
 
-READ8_MEMBER( gts3a_state::u4b_r )
+uint8_t gts3a_state::u4b_r()
 {
 	return m_u4b | (ioport("TTS")->read() & 0x18);
 }
@@ -302,12 +302,12 @@ void gts3a_state::init_gts3a()
 	membank("bank1")->configure_entries(0, 32, &dmd[0x0000], 0x4000);
 }
 
-READ8_MEMBER( gts3a_state::dmd_r )
+uint8_t gts3a_state::dmd_r()
 {
 	return 0;
 }
 
-WRITE8_MEMBER( gts3a_state::dmd_w )
+void gts3a_state::dmd_w(uint8_t data)
 {
 	m_dmd = data;
 	membank("bank1")->set_entry(data & 0x1f);
@@ -321,14 +321,13 @@ void gts3a_state::palette_init(palette_device &palette)
 
 MC6845_UPDATE_ROW( gts3a_state::crtc_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	uint8_t gfx=0;
-	uint16_t mem,x;
-	uint32_t *p = &bitmap.pix32(y);
+	uint32_t *p = &bitmap.pix(y);
 
-	for (x = 0; x < x_count; x++)
+	for (uint16_t x = 0; x < x_count; x++)
 	{
-		mem = (ma + x) & 0xfff;mem++;
+		uint16_t mem = (ma + x) & 0xfff;mem++;
 		gfx = 4;//m_p_chargen[(chr<<4) | ra] ^ inv;
 
 		/* Display a scanline of a character */

@@ -115,7 +115,7 @@ void unsp_disassembler::print_mul(std::ostream& stream, uint16_t op)
 	int srs =  (op & 0x1000) >> 12;
 	//         (op & 0xe000) >> 13; fixed 111
 
-	int sign = (srs << 1) | srd;
+	int sign = (srd << 1) | srs;
 
 	util::stream_format(stream, "MR = %s*%s, %s", regs[rd], regs[rs], signmodes[sign] );
 }
@@ -130,7 +130,7 @@ void unsp_disassembler::print_muls(std::ostream& stream, uint16_t op)
 	int srs =  (op & 0x1000) >> 12;
 	//         (op & 0xe000) >> 13; fixed 111
 
-	int sign = (srs << 1) | srd;
+	int sign = (srd << 1) | srs;
 	if (size == 0) size = 16;
 
 	util::stream_format(stream, "MR = [%s]*[%s], %s, %d", regs[rd], regs[rs], signmodes[sign], size );

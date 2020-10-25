@@ -14,29 +14,21 @@
 namespace netlist {
 namespace factory {
 
-	class NETLIB_NAME(wrapper) : public device_t
+	// FIXME: this doesn't do anything, check how to remove
+	class NETLIB_NAME(wrapper) : public base_device_t
 	{
 	public:
 		NETLIB_NAME(wrapper)(netlist_state_t &anetlist, const pstring &name)
-		: device_t(anetlist, name)
+		: base_device_t(anetlist, name)
 		{
 		}
 	protected:
-		NETLIB_RESETI() { }
-		NETLIB_UPDATEI() { }
+		//NETLIB_RESETI() {}
 	};
 
-	element_t::element_t(const pstring &name, const pstring &classname,
-			const pstring &def_param, const pstring &sourcefile)
-		: m_name(name), m_classname(classname), m_def_param(def_param),
-		  m_sourcefile(sourcefile)
-	{
-	}
-
-	element_t::element_t(const pstring &name, const pstring &classname,
-			const pstring &def_param)
-		: m_name(name), m_classname(classname), m_def_param(def_param),
-		  m_sourcefile("<unknown>")
+	element_t::element_t(const pstring &name, properties &&props)
+	: m_name(name)
+	, m_properties(props)
 	{
 	}
 
@@ -49,14 +41,23 @@ namespace factory {
 	{
 	}
 
-	void list_t::register_device(plib::unique_ptr<element_t> &&factory)
+	bool exists(const pstring &name);
+
+	bool list_t::exists(const pstring &name) const noexcept
 	{
-		for (auto & e : *this)
-			if (e->name() == factory->name())
-			{
-				m_log.fatal(MF_FACTORY_ALREADY_CONTAINS_1(factory->name()));
-				throw nl_exception(MF_FACTORY_ALREADY_CONTAINS_1(factory->name()));
-			}
+		for (const auto & e : *this)
+			if (e->name() == name)
+				return true;
+		return false;
+	}
+
+	void list_t::add(host_arena::unique_ptr<element_t> &&factory)
+	{
+		if (exists(factory->name()))
+		{
+			m_log.fatal(MF_FACTORY_ALREADY_CONTAINS_1(factory->name()));
+			throw nl_exception(MF_FACTORY_ALREADY_CONTAINS_1(factory->name()));
+		}
 		push_back(std::move(factory));
 	}
 
@@ -73,19 +74,17 @@ namespace factory {
 	}
 
 	// -----------------------------------------------------------------------------
-	// factory_lib_entry_t: factory class to wrap macro based chips/elements
+	// library_element_t: factory class to wrap macro based chips/elements
 	// -----------------------------------------------------------------------------
 
-	unique_pool_ptr<device_t> library_element_t::make_device(nlmempool &pool, netlist_state_t &anetlist, const pstring &name)
+	library_element_t::library_element_t(const pstring &name, properties &&props)
+	: element_t(name, std::move(properties(props).set_type(element_type::MACRO)))
 	{
-		return pool.make_unique<NETLIB_NAME(wrapper)>(anetlist, name);
 	}
 
-	void library_element_t::macro_actions(nlparse_t &nparser, const pstring &name)
+	device_arena::unique_ptr<core_device_t> library_element_t::make_device(device_arena &pool, netlist_state_t &anetlist, const pstring &name)
 	{
-		nparser.namespace_push(name);
-		nparser.include(this->name());
-		nparser.namespace_pop();
+		return plib::make_unique<NETLIB_NAME(wrapper)>(pool, anetlist, name);
 	}
 
 

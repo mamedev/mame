@@ -216,7 +216,7 @@ public:
 	virtual osd_font::ptr font_alloc() override { return m_font_module->font_alloc(); }
 	virtual bool get_font_families(std::string const &font_path, std::vector<std::pair<std::string, std::string> > &result) override { return m_font_module->get_font_families(font_path, result); }
 
-	virtual osd_midi_device *create_midi_device() override { return m_midi->create_midi_device(); }
+	virtual std::unique_ptr<osd_midi_device> create_midi_device() override { return m_midi->create_midi_device(); }
 
 	// FIXME: everything below seems to be osd specific and not part of
 	//        this INTERFACE but part of the osd IMPLEMENTATION
@@ -311,10 +311,10 @@ private:
 
 
 // this template function creates a stub which constructs a debugger
-template<class _DeviceClass>
+template<class DeviceClass>
 debug_module *osd_debugger_creator()
 {
-	return global_alloc(_DeviceClass());
+	return new DeviceClass();
 }
 
 #endif  // MAME_OSD_LIB_OSDOBJ_COMMON_H

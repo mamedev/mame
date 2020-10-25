@@ -15,6 +15,7 @@
 #include "machine/6522via.h"
 #include "sound/ay8910.h"
 #include "sound/tms5220.h"
+#include "sound/votrax.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -27,10 +28,10 @@ class a2bus_ayboard_device:
 public:
 	DECLARE_WRITE_LINE_MEMBER( via1_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( via2_irq_w );
-	DECLARE_WRITE8_MEMBER(via1_out_a);
-	virtual DECLARE_WRITE8_MEMBER(via1_out_b);
-	DECLARE_WRITE8_MEMBER(via2_out_a);
-	virtual DECLARE_WRITE8_MEMBER(via2_out_b);
+	void via1_out_a(uint8_t data);
+	virtual void via1_out_b(uint8_t data);
+	void via2_out_a(uint8_t data);
+	virtual void via2_out_b(uint8_t data);
 
 protected:
 	// construction/destruction
@@ -61,6 +62,19 @@ class a2bus_mockingboard_device : public a2bus_ayboard_device
 {
 public:
 	a2bus_mockingboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void via1_out_b(uint8_t data) override;
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_reset() override;
+
+	required_device<votrax_sc01_device> m_sc01;
+
+private:
+	DECLARE_WRITE_LINE_MEMBER(write_via1_cb2);
+
+	uint8_t m_portb1;
+	int m_last_cb2_state;
 };
 
 class a2bus_phasor_device : public a2bus_ayboard_device
@@ -68,8 +82,8 @@ class a2bus_phasor_device : public a2bus_ayboard_device
 public:
 	a2bus_phasor_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER(via1_out_b) override;
-	DECLARE_WRITE8_MEMBER(via2_out_b) override;
+	void via1_out_b(uint8_t data) override;
+	void via2_out_b(uint8_t data) override;
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -83,6 +97,8 @@ protected:
 	required_device<ay8913_device> m_ay4;
 
 private:
+	void set_clocks();
+
 	bool m_native;
 };
 

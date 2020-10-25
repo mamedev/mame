@@ -101,7 +101,7 @@ DM81LS95 = TriState buffer
 #include "speaker.h"
 
 
-WRITE8_MEMBER(portrait_state::ctrl_w)
+void portrait_state::ctrl_w(uint8_t data)
 {
 	/* bits 4 and 5 are unknown */
 
@@ -117,12 +117,12 @@ WRITE8_MEMBER(portrait_state::ctrl_w)
 	output().set_value("photo", (data >> 7) & 1);
 }
 
-WRITE8_MEMBER(portrait_state::positive_scroll_w)
+void portrait_state::positive_scroll_w(uint8_t data)
 {
 	m_scroll = data;
 }
 
-WRITE8_MEMBER(portrait_state::negative_scroll_w)
+void portrait_state::negative_scroll_w(uint8_t data)
 {
 	m_scroll = - (data ^ 0xff);
 }

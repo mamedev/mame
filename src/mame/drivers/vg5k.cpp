@@ -12,9 +12,9 @@
     05/2009 Skeleton driver.
 
     Known issues:
-     - 1200 bauds cassette don't works
+     - Support the K7 filetype for ease of usage, but as read only.
 
-    Informations ( see the very informative http://vg5k.free.fr/ ):
+    Information ( see the very informative http://vg5k.free.fr/ ):
      - Variants: Radiola VG5000 and Schneider VG5000
      - CPU: Zilog Z80 running at 4MHz
      - ROM: 18KB (16 KB BASIC + 2 KB charset )
@@ -27,7 +27,7 @@
             - Colors: 8
      - Sound: Synthesizer, 4 Octaves
      - Keyboard: 63 keys AZERTY, Caps Lock, CTRL key to access 33 BASIC instructions
-     - I/O: Tape recorder connector (1200/2400 bauds), Scart connector to TV (RGB),
+     - I/O: Tape recorder connector (1200/2400 bauds), SCART connector to TV (RGB),
        External PSU (VU0022) connector, Bus connector (2x25 pins)
      - There are 2 versions of the VG5000 ROM, one with Basic v1.0,
        contained in two 8 KB ROMs, and one with Basic 1.1, contained in
@@ -55,7 +55,6 @@
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/ef9345.h"
 
 #include "screen.h"
@@ -82,8 +81,10 @@ public:
 
 	void init_vg5k();
 
+	DECLARE_INPUT_CHANGED_MEMBER(delta_button);
+
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<ef9345_device> m_ef9345;
 	required_device<dac_bit_interface> m_dac;
 	required_device<printer_image_device> m_printer;
@@ -95,13 +96,14 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( printer_r );
-	DECLARE_WRITE8_MEMBER( printer_w );
-	DECLARE_WRITE8_MEMBER ( ef9345_offset_w );
-	DECLARE_READ8_MEMBER ( ef9345_io_r );
-	DECLARE_WRITE8_MEMBER ( ef9345_io_w );
-	DECLARE_READ8_MEMBER ( cassette_r );
-	DECLARE_WRITE8_MEMBER ( cassette_w );
+	void z80_m1_w(uint8_t data);
+	uint8_t printer_r();
+	void printer_w(uint8_t data);
+	void ef9345_offset_w(uint8_t data);
+	uint8_t ef9345_io_r();
+	void ef9345_io_w(uint8_t data);
+	uint8_t cassette_r();
+	void cassette_w(uint8_t data);
 	TIMER_CALLBACK_MEMBER(z80_irq_clear);
 	TIMER_DEVICE_CALLBACK_MEMBER(z80_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(vg5k_scanline);
@@ -109,38 +111,47 @@ private:
 	void vg5k_mem(address_map &map);
 };
 
+void vg5k_state::z80_m1_w(uint8_t data)
+{
+	// Leverage the refresh callback of the Z80 emulator to pretend
+	// the second T state of the M1 cycle didn't happen.
+	// This simulates the WAIT line asserted at that moment, as
+	// the current implementation of the Z80 doesn't handle the WAIT
+	// line at that moment.
+	m_maincpu->adjust_icount(-1);
+}
 
-READ8_MEMBER( vg5k_state::printer_r )
+uint8_t vg5k_state::printer_r()
 {
 	return (m_printer->is_ready() ? 0x00 : 0xff);
 }
 
 
-WRITE8_MEMBER( vg5k_state::printer_w )
+void vg5k_state::printer_w(uint8_t data)
 {
 	m_printer->output(data);
 }
 
 
-WRITE8_MEMBER ( vg5k_state::ef9345_offset_w )
+void vg5k_state::ef9345_offset_w(uint8_t data)
 {
 	m_ef9345_offset = data;
 }
 
 
-READ8_MEMBER ( vg5k_state::ef9345_io_r )
+uint8_t vg5k_state::ef9345_io_r()
 {
 	return m_ef9345->data_r(m_ef9345_offset);
 }
 
 
-WRITE8_MEMBER ( vg5k_state::ef9345_io_w )
+void vg5k_state::ef9345_io_w(uint8_t data)
 {
 	m_ef9345->data_w(m_ef9345_offset, data);
 }
 
 
-READ8_MEMBER ( vg5k_state::cassette_r )
+uint8_t vg5k_state::cassette_r()
 {
 	double level = m_cassette->input();
 
@@ -148,16 +159,20 @@ READ8_MEMBER ( vg5k_state::cassette_r )
 }
 
 
-WRITE8_MEMBER ( vg5k_state::cassette_w )
+void vg5k_state::cassette_w(uint8_t data)
 {
 	m_dac->write(BIT(data, 3));
+	m_cassette->change_state(BIT(data, 1) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED , CASSETTE_MASK_MOTOR);
 
-	if (data == 0x03)
-		m_cassette->output(+1);
-	else if (data == 0x02)
-		m_cassette->output(-1);
-	else
+	if (BIT(data, 1)) {
+		if (BIT(data, 0)) {
+			m_cassette->output(+1);
+		} else {
+			m_cassette->output(-1);
+		}
+	} else {
 		m_cassette->output(0);
+	}
 }
 
 
@@ -292,6 +307,8 @@ static INPUT_PORTS_START( vg5k )
 		PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 		PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 		PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("direct")
+		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)        PORT_CODE(KEYCODE_END)                              PORT_NAME("DELTA")          PORT_CHANGED_MEMBER(DEVICE_SELF, vg5k_state, delta_button, 0)
 INPUT_PORTS_END
 
 
@@ -313,6 +330,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(vg5k_state::vg5k_scanline)
 	m_ef9345->update_scanline((uint16_t)param);
 }
 
+INPUT_CHANGED_MEMBER(vg5k_state::delta_button)
+{
+	// The yellow Delta key on the keyboard is wired so that it asserts directly the NMI line of the Z80.
+	if (!newval) {
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	}
+}
+
 
 void vg5k_state::machine_start()
 {
@@ -323,6 +348,7 @@ void vg5k_state::machine_reset()
 {
 	m_ef9345_offset = 0;
 }
+
 
 /* F4 Character Displayer */
 static const gfx_layout vg5k_charlayout =
@@ -371,6 +397,7 @@ void vg5k_state::vg5k(machine_config &config)
 	Z80(config, m_maincpu, XTAL(4'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &vg5k_state::vg5k_mem);
 	m_maincpu->set_addrmap(AS_IO, &vg5k_state::vg5k_io);
+	m_maincpu->refresh_cb().set(FUNC(vg5k_state::z80_m1_w));
 
 	TIMER(config, "vg5k_scanline").configure_scanline(FUNC(vg5k_state::vg5k_scanline), "screen", 0, 10);
 
@@ -393,8 +420,6 @@ void vg5k_state::vg5k(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.125);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	/* cassette */
 	CASSETTE(config, m_cassette);

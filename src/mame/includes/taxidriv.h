@@ -55,27 +55,27 @@ private:
 	int m_bghide;
 	int m_spritectrl[9];
 
-	DECLARE_WRITE8_MEMBER(p2a_w);
-	DECLARE_WRITE8_MEMBER(p2b_w);
-	DECLARE_WRITE8_MEMBER(p2c_w);
-	DECLARE_WRITE8_MEMBER(p3a_w);
-	DECLARE_WRITE8_MEMBER(p3b_w);
-	DECLARE_WRITE8_MEMBER(p3c_w);
-	DECLARE_WRITE8_MEMBER(p4a_w);
-	DECLARE_WRITE8_MEMBER(p4b_w);
-	DECLARE_WRITE8_MEMBER(p4c_w);
-	DECLARE_READ8_MEMBER(p0a_r);
-	DECLARE_READ8_MEMBER(p0c_r);
-	DECLARE_WRITE8_MEMBER(p0b_w);
-	DECLARE_WRITE8_MEMBER(p0c_w);
-	DECLARE_READ8_MEMBER(p1b_r);
-	DECLARE_READ8_MEMBER(p1c_r);
-	DECLARE_WRITE8_MEMBER(p1a_w);
-	DECLARE_WRITE8_MEMBER(p1c_w);
-	DECLARE_READ8_MEMBER(p8910_0a_r);
-	DECLARE_READ8_MEMBER(p8910_1a_r);
-	DECLARE_WRITE8_MEMBER(p8910_0b_w);
-	DECLARE_WRITE8_MEMBER(spritectrl_w);
+	void p2a_w(uint8_t data);
+	void p2b_w(uint8_t data);
+	void p2c_w(uint8_t data);
+	void p3a_w(uint8_t data);
+	void p3b_w(uint8_t data);
+	void p3c_w(uint8_t data);
+	void p4a_w(uint8_t data);
+	void p4b_w(uint8_t data);
+	void p4c_w(uint8_t data);
+	uint8_t p0a_r();
+	uint8_t p0c_r();
+	void p0b_w(uint8_t data);
+	void p0c_w(uint8_t data);
+	uint8_t p1b_r();
+	uint8_t p1c_r();
+	void p1a_w(uint8_t data);
+	void p1c_w(uint8_t data);
+	uint8_t p8910_0a_r();
+	uint8_t p8910_1a_r();
+	void p8910_0b_w(uint8_t data);
+	void spritectrl_w(offs_t offset, uint8_t data);
 
 	void taxidriv_palette(palette_device &palette) const;
 

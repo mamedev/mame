@@ -43,8 +43,8 @@ private:
 	bool m_suspended;
 	bool m_installed;
 
-	DECLARE_READ8_MEMBER(chessmsr_r);
-	DECLARE_WRITE8_MEMBER(chessmsr_w);
+	uint8_t chessmsr_r(offs_t offset);
+	void chessmsr_w(offs_t offset, uint8_t data);
 
 	void chessmsr_mem(address_map &map);
 };

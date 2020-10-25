@@ -218,7 +218,7 @@ void h8_disassembler::disassemble_am(std::ostream &stream, int am, offs_t pc, co
 		break;
 
 	case DASM_imm8:
-		util::stream_format(stream, "#h'%02x", opcodes.r8(pc+1));
+		util::stream_format(stream, "#h'%02x", opcodes.r8(epc-1));
 		break;
 
 	case DASM_imm16:

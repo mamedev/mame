@@ -88,13 +88,13 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(cxdio_reset_w);
 	DECLARE_WRITE_LINE_MEMBER(external_monitor_w);
 
-	DECLARE_READ8_MEMBER(io_ky_r);
-	DECLARE_WRITE8_MEMBER(io_sc_w);
-	DECLARE_WRITE8_MEMBER(io_le_w);
-	DECLARE_WRITE8_MEMBER(io_ld_w);
-	DECLARE_WRITE8_MEMBER(io_sel_w);
-	DECLARE_WRITE8_MEMBER(eeprom_w);
-	DECLARE_READ8_MEMBER(eeprom_r);
+	uint8_t io_ky_r();
+	void io_sc_w(uint8_t data);
+	void io_le_w(uint8_t data);
+	void io_ld_w(uint8_t data);
+	void io_sel_w(uint8_t data);
+	void eeprom_w(uint8_t data);
+	uint8_t eeprom_r();
 	void maincpu_io(address_map &map);
 	void maincpu_prg(address_map &map);
 	void subcpu_io(address_map &map);
@@ -282,19 +282,19 @@ WRITE_LINE_MEMBER(pve500_state::mb8421_intr)
 	m_subcpu->trg1(state);
 }
 
-READ8_MEMBER(pve500_state::eeprom_r)
+uint8_t pve500_state::eeprom_r()
 {
 	return (m_eeprom->ready_read() << 1) | m_eeprom->do_read();
 }
 
-WRITE8_MEMBER(pve500_state::eeprom_w)
+void pve500_state::eeprom_w(uint8_t data)
 {
 	m_eeprom->di_write( (data & (1 << 2)) ? ASSERT_LINE : CLEAR_LINE);
 	m_eeprom->clk_write( (data & (1 << 3)) ? ASSERT_LINE : CLEAR_LINE);
 	m_eeprom->cs_write( (data & (1 << 4)) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER(pve500_state::io_ky_r)
+uint8_t pve500_state::io_ky_r()
 {
 	io_KY = 0x00;
 	if (!BIT(io_SC, 0)) io_KY |= ioport("SCAN0")->read();
@@ -311,7 +311,7 @@ READ8_MEMBER(pve500_state::io_ky_r)
 	return io_KY;
 }
 
-WRITE8_MEMBER(pve500_state::io_sc_w)
+void pve500_state::io_sc_w(uint8_t data)
 {
 	const int swap[4] = {2,1,0,3};
 
@@ -332,7 +332,7 @@ WRITE8_MEMBER(pve500_state::io_sc_w)
 	}
 }
 
-WRITE8_MEMBER(pve500_state::io_le_w)
+void pve500_state::io_le_w(uint8_t data)
 {
 #if LOG_7SEG_DISPLAY_SIGNALS
 	printf("CXD1095 PORTB (io_LE=%02X)\n", data);
@@ -340,7 +340,7 @@ WRITE8_MEMBER(pve500_state::io_le_w)
 	io_LE = data;
 }
 
-WRITE8_MEMBER(pve500_state::io_ld_w)
+void pve500_state::io_ld_w(uint8_t data)
 {
 #if LOG_7SEG_DISPLAY_SIGNALS
 	printf("CXD1095 PORTD (io_LD=%02X)\n", data);
@@ -348,7 +348,7 @@ WRITE8_MEMBER(pve500_state::io_ld_w)
 	io_LD = data;
 }
 
-WRITE8_MEMBER(pve500_state::io_sel_w)
+void pve500_state::io_sel_w(uint8_t data)
 {
 #if LOG_7SEG_DISPLAY_SIGNALS
 	printf("CXD1095 PORTE (io_SEL=%02X)\n", data);

@@ -34,7 +34,6 @@ TODO:
 
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/sed1500.h"
 
 #include "screen.h"
@@ -75,8 +74,8 @@ private:
 	template<int N> void lcd_output_w(offs_t offset, u64 data) { m_lcd_data[N << 4 | offset] = data; } // buffer for screen_update
 	u32 screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE8_MEMBER(lcd_w) { m_lcd[m_lcd_cs]->write(offset, data); }
+	void control_w(offs_t offset, u8 data);
+	void lcd_w(offs_t offset, u8 data) { m_lcd[m_lcd_cs]->write(offset, data); }
 	DECLARE_WRITE_LINE_MEMBER(halt_changed) { m_halt = state; }
 
 	u64 m_lcd_data[32];
@@ -106,7 +105,7 @@ u32 monty_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, cons
 	// letters with width 5 with space in between them
 	for (int y = 0; y < 32; y++)
 		for (int x = 0; x < 40; x++)
-			bitmap.pix32(y + 1, x + x/5 + 1) = BIT(m_lcd_data[y], x) ? 0 : 0xffffff;
+			bitmap.pix(y + 1, x + x/5 + 1) = BIT(m_lcd_data[y], x) ? 0 : 0xffffff;
 
 	return 0;
 }
@@ -117,7 +116,7 @@ u32 monty_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, cons
     I/O
 ******************************************************************************/
 
-WRITE8_MEMBER(monty_state::control_w)
+void monty_state::control_w(offs_t offset, u8 data)
 {
 	// a0: speaker out
 	m_dac->write(BIT(offset, 0));
@@ -258,7 +257,6 @@ void monty_state::monty(machine_config &config)
 	// Sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
 void monty_state::mmonty(machine_config &config)

@@ -109,7 +109,7 @@ public:
 	required_memory_region m_vsync_prom;
 	required_memory_region m_line_prom;
 	required_memory_region m_attr_prom;
-	optional_shared_ptr<uint8_t> m_video_ram;
+	optional_shared_ptr<u8> m_video_ram;
 
 	enum
 	{
@@ -133,22 +133,22 @@ public:
 	virtual void machine_start() override;
 
 	virtual void video_start() override;
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void draw_scanline(bitmap_rgb32 &bitmap, int y);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
 	DECLARE_WRITE_LINE_MEMBER( vco_voltage_w );
 
-	DECLARE_READ8_MEMBER( pio_pa_r );
-	DECLARE_READ8_MEMBER( pio_pb_r );
-	DECLARE_WRITE8_MEMBER( pio_pb_w );
+	u8 pio_pa_r();
+	u8 pio_pb_r();
+	void pio_pb_w(u8 data);
 
 	DECLARE_WRITE_LINE_MEMBER( keydown_w );
 	void kbd_w(u8 data);
-	DECLARE_WRITE8_MEMBER( csg_w );
+	void csg_w(u8 data);
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
@@ -167,7 +167,7 @@ public:
 
 	// video state
 	bitmap_rgb32 m_bitmap;
-	uint8_t m_latch;
+	u8 m_latch;
 	int m_blink;
 	int m_c;
 	int m_r;

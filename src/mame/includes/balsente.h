@@ -95,10 +95,10 @@ public:
 	void init_gghost();
 
 private:
-	DECLARE_WRITE8_MEMBER(random_reset_w);
-	DECLARE_READ8_MEMBER(random_num_r);
-	DECLARE_WRITE8_MEMBER(rombank_select_w);
-	DECLARE_WRITE8_MEMBER(rombank2_select_w);
+	void random_reset_w(uint8_t data);
+	uint8_t random_num_r();
+	void rombank_select_w(uint8_t data);
+	void rombank2_select_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(out0_w);
 	DECLARE_WRITE_LINE_MEMBER(out1_w);
 	DECLARE_WRITE_LINE_MEMBER(out2_w);
@@ -107,25 +107,25 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(out5_w);
 	DECLARE_WRITE_LINE_MEMBER(out6_w);
 	DECLARE_WRITE_LINE_MEMBER(nvrecall_w);
-	DECLARE_READ8_MEMBER(novram_8bit_r);
-	DECLARE_WRITE8_MEMBER(novram_8bit_w);
-	DECLARE_WRITE8_MEMBER(acia_w);
-	DECLARE_READ8_MEMBER(adc_data_r);
-	DECLARE_WRITE8_MEMBER(adc_select_w);
-	DECLARE_WRITE8_MEMBER(spiker_expand_w);
-	DECLARE_READ8_MEMBER(spiker_expand_r);
-	DECLARE_READ8_MEMBER(grudge_steering_r);
-	DECLARE_READ8_MEMBER(shrike_shared_6809_r);
-	DECLARE_WRITE8_MEMBER(shrike_shared_6809_w);
-	DECLARE_WRITE16_MEMBER(shrike_io_68k_w);
-	DECLARE_READ16_MEMBER(shrike_io_68k_r);
-	DECLARE_READ8_MEMBER(teamht_extra_r);
-	DECLARE_WRITE8_MEMBER(teamht_multiplex_select_w);
+	uint8_t novram_8bit_r(address_space &space, offs_t offset);
+	void novram_8bit_w(offs_t offset, uint8_t data);
+	void acia_w(offs_t offset, uint8_t data);
+	uint8_t adc_data_r();
+	void adc_select_w(offs_t offset, uint8_t data);
+	void spiker_expand_w(offs_t offset, uint8_t data);
+	uint8_t spiker_expand_r();
+	uint8_t grudge_steering_r();
+	uint8_t shrike_shared_6809_r(offs_t offset);
+	void shrike_shared_6809_w(offs_t offset, uint8_t data);
+	void shrike_io_68k_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t shrike_io_68k_r(offs_t offset, uint16_t mem_mask = ~0);
+	uint8_t teamht_extra_r();
+	void teamht_multiplex_select_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(palette_select_w);
-	DECLARE_WRITE8_MEMBER(paletteram_w);
-	DECLARE_WRITE8_MEMBER(shrike_sprite_select_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void palette_select_w(uint8_t data);
+	void paletteram_w(offs_t offset, uint8_t data);
+	void shrike_sprite_select_w(uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

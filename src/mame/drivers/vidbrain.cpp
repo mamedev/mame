@@ -33,13 +33,27 @@
     - expander 1 (F3870 CPU, cassette, RS-232)
     - expander 2 (modem)
 
+Keyboard:
+    - When typing, (A .) key is often misinterpreted as (O #).
+    - Shift is a toggle. This prevents Natural Keyboard & Paste from being
+      able to shift as needed. The shift state shows as a block on the intro
+      screen.
+
+Using the system:
+    - At startup, the intro screen gives the choices TEXT, COLOR, CLOCK, ALARM.
+    - Press F1 for TEXT - this allows you to test the keyboard, but note that
+      the Space key simply advances the cursor - it doesn't erase.
+    - Press F2 for COLOR - this shows colour bars, presumably as a hardware test.
+      In emulation, the colours are offset to the right and wrap around a bit.
+    - Press F3 for CLOCK
+    - Press F4 for ALARM
+
 */
 
 #include "emu.h"
 #include "includes/vidbrain.h"
 
 #include "machine/rescap.h"
-#include "sound/volt_reg.h"
 #include "softlist.h"
 #include "speaker.h"
 
@@ -63,7 +77,7 @@
 //  keyboard_w - keyboard column write
 //-------------------------------------------------
 
-WRITE8_MEMBER( vidbrain_state::keyboard_w )
+void vidbrain_state::keyboard_w(uint8_t data)
 {
 	/*
 
@@ -90,7 +104,7 @@ WRITE8_MEMBER( vidbrain_state::keyboard_w )
 //  keyboard_r - keyboard row read
 //-------------------------------------------------
 
-READ8_MEMBER( vidbrain_state::keyboard_r )
+uint8_t vidbrain_state::keyboard_r()
 {
 	/*
 
@@ -124,7 +138,7 @@ READ8_MEMBER( vidbrain_state::keyboard_r )
 //  sound_w - sound clock write
 //-------------------------------------------------
 
-WRITE8_MEMBER( vidbrain_state::sound_w )
+void vidbrain_state::sound_w(uint8_t data)
 {
 	/*
 
@@ -246,25 +260,25 @@ static INPUT_PORTS_START( vidbrain )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E') PORT_CHAR('8')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F') PORT_CHAR('6')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('V') PORT_CHAR('+')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("SPECIAL ALARM") PORT_CODE(KEYCODE_F4)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("SPECIAL ALARM") PORT_CODE(KEYCODE_F4) PORT_CHAR(UCHAR_MAMEKEY(F4))
 
 	PORT_START("IO06")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('W') PORT_CHAR('7')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D') PORT_CHAR('5')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C') PORT_CHAR('3')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("NEXT CLOCK") PORT_CODE(KEYCODE_F3)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("NEXT CLOCK") PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F3))
 
 	PORT_START("IO07")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q') PORT_CHAR('%')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S') PORT_CHAR('4')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('X') PORT_CHAR('2')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("PREVIOUS COLOR") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("PREVIOUS COLOR") PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2))
 
 	PORT_START("UV201-31")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A') PORT_CHAR('.')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z') PORT_CHAR('1')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('?') PORT_CHAR('0')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("BACK TEXT") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("BACK TEXT") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))
 
 	PORT_START("RESET")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("MASTER CONTROL") PORT_CODE(KEYCODE_F5) PORT_CHAR(UCHAR_MAMEKEY(F5)) PORT_CHANGED_MEMBER(DEVICE_SELF, vidbrain_state, trigger_reset, 0)
@@ -343,7 +357,7 @@ WRITE_LINE_MEMBER( vidbrain_state::hblank_w )
 	}
 }
 
-READ8_MEMBER(vidbrain_state::memory_read_byte)
+uint8_t vidbrain_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
@@ -418,9 +432,6 @@ void vidbrain_state::vidbrain(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_2BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.167); // 74ls74.u16 + 120k + 56k
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	// devices
 	F3853(config, m_smi, XTAL(4'000'000)/2);

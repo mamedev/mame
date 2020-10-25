@@ -88,9 +88,9 @@ private:
 
 	// I/O handlers
 	void update_display();
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(digit_w);
-	DECLARE_WRITE8_MEMBER(control_w);
+	u8 input_r();
+	void digit_w(u8 data);
+	void control_w(u8 data);
 
 	u8 m_digit_data;
 	u8 m_led_select;
@@ -128,7 +128,7 @@ void intel02_state::update_display()
 	m_display->matrix(m_led_select, m_digit_data);
 }
 
-READ8_MEMBER(intel02_state::input_r)
+u8 intel02_state::input_r()
 {
 	// d0-d3: buttons through a maze of logic gates
 	// basically giving each button its own 4-bit scancode
@@ -138,14 +138,14 @@ READ8_MEMBER(intel02_state::input_r)
 	return data | (~m_inputs[1]->read() << 4 & 0xf0);
 }
 
-WRITE8_MEMBER(intel02_state::digit_w)
+void intel02_state::digit_w(u8 data)
 {
 	// d0-d6: digit segment data, d7: N/C
 	m_digit_data = bitswap<7>(data,0,1,2,3,4,5,6);
 	update_display();
 }
 
-WRITE8_MEMBER(intel02_state::control_w)
+void intel02_state::control_w(u8 data)
 {
 	// d0-d5: select digit/leds
 	m_led_select = data;
@@ -184,8 +184,8 @@ void intel02_state::main_io(address_map &map)
 static INPUT_PORTS_START( intel02 )
 	PORT_START("IN.0")
 	PORT_BIT(0x0007, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_NAME("ПП (View Position)")
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("УИ (Game Level)")
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_NAME(u8"ПП (View Position)")
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME(u8"УИ (Game Level)")
 	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
 	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CODE(KEYCODE_H) PORT_NAME("H8")
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CODE(KEYCODE_G) PORT_NAME("G7")
@@ -199,12 +199,12 @@ static INPUT_PORTS_START( intel02 )
 
 	PORT_START("IN.1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("ВВ (Input)")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("ВИ (Game Select)")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("СТ (Erase)")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME(u8"ВВ (Input)")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME(u8"ВИ (Game Select)")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME(u8"СТ (Erase)")
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, intel02_state, reset_button, 0) PORT_NAME("СБ (Reset)")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, intel02_state, reset_button, 0) PORT_NAME(u8"СБ (Reset)")
 INPUT_PORTS_END
 
 

@@ -207,7 +207,7 @@ void zerohour_stars_device::draw(bitmap_ind16 &bitmap, rectangle const &cliprect
 			if (cliprect.contains(xloc, yloc) && (hcond == vcond))
 			{
 				if (((state & 0x000ff) == 0x000ff) && !feedback && (xloc >= firstx) && (xloc <= lastx))
-					bitmap.pix16(yloc, xloc) = pal_offs + ((state >> 9) & 0x1f);
+					bitmap.pix(yloc, xloc) = pal_offs + ((state >> 9) & 0x1f);
 			}
 
 			// update LFSR state
@@ -403,7 +403,7 @@ TILE_GET_INFO_MEMBER(sraider_state::get_grid_tile_info)
 	}
 }
 
-WRITE8_MEMBER(sraider_state::sraider_io_w)
+void sraider_state::sraider_io_w(uint8_t data)
 {
 	// bit7 = flip
 	// bit6 = grid red

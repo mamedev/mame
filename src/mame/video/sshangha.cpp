@@ -13,7 +13,7 @@
 
 /******************************************************************************/
 
-WRITE16_MEMBER(sshangha_state::video_w)
+void sshangha_state::video_w(uint16_t data)
 {
 	/* 0x4: Special video mode, other bits unknown */
 	m_video_control = data;

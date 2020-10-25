@@ -36,7 +36,8 @@ GD build date
 | | 2004     | Wangan Midnight Maximum Tune (Export)                | Namco                    | GDROM  | GDX-0009   | 317-5101-COM |
 | | 2004     | Wangan Midnight Maximum Tune (Export, Rev A)         | Namco                    | GDROM  | GDX-0009A  | 317-5101-COM |
 |*| 20040610 | Wangan Midnight Maximum Tune (Export, Rev B)         | Namco                    | GDROM  | GDX-0009B  | 317-5101-COM |
-| | 2004     | Sega Club Golf                                       | Sega                     | GDROM  | GDX-0010   |              |
+| | 2004     | Sega Golf Club Network Pro Tour 2005                 | Sega                     | GDROM  | GDX-0010   | ???          |
+|*| 2004     | Sega Golf Club Network Pro Tour 2005 (Rev C)         | Sega                     | GDROM  | GDX-0010C  | ???          |
 |*| 20040909 | OutRun 2 Special Tours (Japan)                       | Sega                     | GDROM  | GDX-0011   | 317-0396-COM |
 |*| 20041229 | OutRun 2 Special Tours (Japan, Rev A)                | Sega                     | GDROM  | GDX-0011A  | 317-0396-COM |
 |*| 20040914 | Ghost Squad                                          | Sega                     | GDROM  | GDX-0012   | 317-0398-COM |
@@ -633,8 +634,8 @@ public:
 	void chihiro_base(machine_config &config);
 
 private:
-	DECLARE_READ32_MEMBER(mediaboard_r);
-	DECLARE_WRITE32_MEMBER(mediaboard_w);
+	uint32_t mediaboard_r(offs_t offset, uint32_t mem_mask = ~0);
+	void mediaboard_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	virtual void machine_start() override;
 	void baseboard_ide_event(int type, uint8_t *read, uint8_t *write);
@@ -682,7 +683,6 @@ St.     Instr.       Comment
 /* jamtable disassembler */
 void chihiro_state::jamtable_disasm(address_space &space, uint32_t address, uint32_t size) // 0xff000080 == fff00080
 {
-	debugger_cpu &cpu = machine().debugger().cpu();
 	debugger_console &con = machine().debugger().console();
 	offs_t addr = (offs_t)address;
 	if (!space.device().memory().translate(space.spacenum(), TRANSLATE_READ_DEBUG, addr))
@@ -694,11 +694,11 @@ void chihiro_state::jamtable_disasm(address_space &space, uint32_t address, uint
 	{
 		offs_t base = addr;
 
-		uint32_t opcode = cpu.read_byte(space, addr, true);
+		uint32_t opcode = space.read_byte(addr);
 		addr++;
-		uint32_t op1 = cpu.read_dword(space, addr, true);
+		uint32_t op1 = space.read_dword_unaligned(addr);
 		addr += 4;
-		uint32_t op2 = cpu.read_dword(space, addr, true);
+		uint32_t op2 = space.read_dword_unaligned(addr);
 		addr += 4;
 
 		char sop1[16];
@@ -1730,7 +1730,7 @@ uint8_t *chihiro_state::baseboard_ide_dimmboard(uint32_t lba)
 	return nullptr;
 }
 
-READ32_MEMBER(chihiro_state::mediaboard_r)
+uint32_t chihiro_state::mediaboard_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r;
 
@@ -1751,7 +1751,7 @@ READ32_MEMBER(chihiro_state::mediaboard_r)
 	return r;
 }
 
-WRITE32_MEMBER(chihiro_state::mediaboard_w)
+void chihiro_state::mediaboard_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("I/O port write %04x mask %08X value %08X\n", offset * 4 + 0x4000, mem_mask, data);
 	// irq 10
@@ -1953,8 +1953,10 @@ void chihiro_state::chihirogd(machine_config &config)
 	ROM_SYSTEM_BIOS( 0, "bios0", "Chihiro Bios" ) \
 	ROM_LOAD_BIOS( 0,  "chihiro_xbox_bios.bin", 0x000000, 0x80000, CRC(66232714) SHA1(b700b0041af8f84835e45d1d1250247bf7077188) ) \
 	ROM_REGION( 0x200000, "mediaboard", 0) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "fpr-23887_29lv160te.ic4", 0x000000, 0x200000, CRC(13034372) SHA1(77197fba2781ed1d81402c48bd743adb26d3161a) ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "fpr21042_m29w160et.bin", 0x000000, 0x200000, CRC(a4fcab0b) SHA1(a13cf9c5cdfe8605d82150b7573652f419b30197) ) \
 	ROM_REGION( 0x204080, "others", 0) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "315-6351a_epc1pc8.ic2", 0x0000, 0x1ff01, CRC(488624ea) SHA1(1a607337a186415ae90b48934ce2aae81639d4de) ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "ic10_g24lc64.bin", 0x0000, 0x2000,   CRC(cfc5e06f) SHA1(3ababd4334d8d57abb22dd98bd2d347df39648d9) ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "ic11_24lc024.bin", 0x2000, 0x80,     CRC(8dc8374e) SHA1(cc03a0650bfac4bf6cb66e414bbef121cba53efe) ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "pc20_g24lc64.bin", 0x2080, 0x2000,   CRC(7742ab62) SHA1(82dad6e2a75bab4a4840dc6939462f1fb9b95101) )
@@ -2161,6 +2163,16 @@ ROM_START( wangmid )
 	// 01/10/12        NA
 	// ?? : ME163-5258Z01
 	ROM_LOAD("crp1231lr10_ver0110.ic2", 0, 0x20000, CRC(0d30707c) SHA1(425e25c6203d0b400d12391916db3f7cdad00f7a) ) // H8/3003 code
+ROM_END
+
+ROM_START( scg05nt )
+	CHIHIRO_BIOS
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdx-0010c", 0, SHA1(ef3d7577960a21cc71b4523fa26880f7897b628c) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	ROM_LOAD( "317-unknown.pic", 0x000000, 0x004000, CRC(36858860) SHA1(b36a0c10b614fdeb7dcd94f4898efc24e5db896a) )
 ROM_END
 
 ROM_START( outr2stjo )
@@ -2578,7 +2590,8 @@ ROM_END
 // 0009     GAME( 2004, wangmido, wangmid,  chihirogd,    chihiro, chihiro_state, empty_init, ROT0, "Namco",                    "Wangan Midnight Maximum Tune (Export) (GDX-0009)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 // 0009A    GAME( 2004, wangmida, wangmid,  chihirogd,    chihiro, chihiro_state, empty_init, ROT0, "Namco",                    "Wangan Midnight Maximum Tune (Export, Rev A) (GDX-0009A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 /* 0009B */ GAME( 2004, wangmid,  chihiro,  chihirogd,    chihiro, chihiro_state, empty_init, ROT0, "Namco",                    "Wangan Midnight Maximum Tune (Export, Rev B) (GDX-0009B)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-// 0010  Sega Golf Club
+// 0010  Sega Golf Club Network Pro Tour 2005
+/* 0010C */ GAME( 2004, scg05nt,  chihiro,  chihirogd,    chihiro, chihiro_state, empty_init, ROT0, "Sega",                     "Sega Golf Club Network Pro Tour 2005 (Rev C) (GDX-0010C)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 /* 0011  */ GAME( 2004, outr2stjo,outr2st,  chihirogd,    chihiro, chihiro_state, empty_init, ROT0, "Sega",                     "OutRun 2 Special Tours (Japan) (GDX-0011)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )
 /* 0011A */ GAME( 2004, outr2stj, outr2st,  chihirogd,    chihiro, chihiro_state, empty_init, ROT0, "Sega",                     "OutRun 2 Special Tours (Japan, Rev A) (GDX-0011A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )
 /* 0012  */ GAME( 2004, ghostsqo, ghostsqu, chihirogd,    chihiro, chihiro_state, empty_init, ROT0, "Sega",                     "Ghost Squad (GDX-0012)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )

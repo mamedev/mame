@@ -36,7 +36,7 @@ protected:
 
 	virtual void device_post_load() override;
 
-	DECLARE_WRITE16_MEMBER(write_bankpvc);
+	void write_bankpvc(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void install_common();
 	void install_banked_bios();
@@ -448,10 +448,10 @@ void neopcb_state::kf2k3pcb_sp1_decrypt()
 /*********************************************** non-carts */
 
 
-WRITE16_MEMBER(neopcb_state::write_bankpvc)
+void neopcb_state::write_bankpvc(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// write to cart ram
-	m_pvc_prot->protection_w(space, offset, data, mem_mask);
+	m_pvc_prot->protection_w(offset, data, mem_mask);
 
 	// actual bankswitch
 	if (offset >= 0xff8)
@@ -469,7 +469,8 @@ void neopcb_state::install_common()
 	membank("cpu_bank")->set_base(m_region_maincpu->base() + 0x100000);
 
 	// install protection handlers + bankswitch handler
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2fe000, 0x2fffff, read16_delegate(*m_pvc_prot, FUNC(pvc_prot_device::protection_r)), write16_delegate(*this, FUNC(neopcb_state::write_bankpvc)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2fe000, 0x2fffff, read16sm_delegate(*m_pvc_prot, FUNC(pvc_prot_device::protection_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x2fe000, 0x2fffff, write16s_delegate(*this, FUNC(neopcb_state::write_bankpvc)));
 
 	// perform basic memory initialization that are usually done on-cart
 	m_curr_slot = 0;

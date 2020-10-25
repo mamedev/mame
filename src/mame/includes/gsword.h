@@ -54,14 +54,14 @@ protected:
 	tilemap_t *m_bg_tilemap;
 
 	// common
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(charbank_w);
-	DECLARE_WRITE8_MEMBER(videoctrl_w);
-	DECLARE_WRITE8_MEMBER(scroll_w);
-	DECLARE_WRITE8_MEMBER(ay8910_control_port_0_w);
-	DECLARE_WRITE8_MEMBER(ay8910_control_port_1_w);
-	DECLARE_READ8_MEMBER(fake_0_r);
-	DECLARE_READ8_MEMBER(fake_1_r);
+	void videoram_w(offs_t offset, u8 data);
+	void charbank_w(u8 data);
+	void videoctrl_w(u8 data);
+	void scroll_w(u8 data);
+	void ay8910_control_port_0_w(u8 data);
+	void ay8910_control_port_1_w(u8 data);
+	u8 fake_0_r();
+	u8 fake_1_r();
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
@@ -97,12 +97,12 @@ public:
 	void gsword(machine_config &config);
 
 protected:
-	DECLARE_READ8_MEMBER(hack_r);
-	DECLARE_WRITE8_MEMBER(nmi_set_w);
-	DECLARE_WRITE8_MEMBER(sound_command_w);
-	DECLARE_WRITE8_MEMBER(adpcm_data_w);
-	DECLARE_READ8_MEMBER(mcu2_p1_r);
-	DECLARE_WRITE8_MEMBER(mcu3_p2_w);
+	u8 hack_r(offs_t offset);
+	void nmi_set_w(u8 data);
+	void sound_command_w(u8 data);
+	void adpcm_data_w(u8 data);
+	u8 mcu2_p1_r();
+	void mcu3_p2_w(u8 data);
 
 	INTERRUPT_GEN_MEMBER(sound_interrupt);
 
@@ -143,17 +143,17 @@ public:
 	void josvolly(machine_config &config);
 
 protected:
-	DECLARE_READ8_MEMBER(mcu1_p1_r);
-	DECLARE_READ8_MEMBER(mcu1_p2_r);
-	DECLARE_READ8_MEMBER(mcu2_p1_r);
-	DECLARE_READ8_MEMBER(mcu2_p2_r);
+	u8 mcu1_p1_r();
+	u8 mcu1_p2_r();
+	u8 mcu2_p1_r();
+	u8 mcu2_p2_r();
 
-	DECLARE_WRITE8_MEMBER(cpu2_nmi_enable_w);
-	DECLARE_WRITE8_MEMBER(cpu2_irq_clear_w);
-	DECLARE_WRITE8_MEMBER(mcu1_p1_w);
-	DECLARE_WRITE8_MEMBER(mcu1_p2_w);
-	DECLARE_WRITE8_MEMBER(mcu2_p1_w);
-	DECLARE_WRITE8_MEMBER(mcu2_p2_w);
+	void cpu2_nmi_enable_w(u8 data);
+	void cpu2_irq_clear_w(u8 data);
+	void mcu1_p1_w(u8 data);
+	void mcu1_p2_w(u8 data);
+	void mcu2_p1_w(u8 data);
+	void mcu2_p2_w(u8 data);
 
 	void josvolly_palette(palette_device &palette) const;
 

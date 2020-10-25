@@ -49,7 +49,7 @@ uint8_t ti68k_state::keypad_r()
 }
 
 
-WRITE16_MEMBER ( ti68k_state::ti68k_io_w )
+void ti68k_state::ti68k_io_w(offs_t offset, uint16_t data)
 {
 	switch(offset & 0x0f)
 	{
@@ -92,7 +92,7 @@ WRITE16_MEMBER ( ti68k_state::ti68k_io_w )
 }
 
 
-READ16_MEMBER ( ti68k_state::ti68k_io_r )
+uint16_t ti68k_state::ti68k_io_r(offs_t offset)
 {
 	uint16_t data;
 
@@ -114,7 +114,7 @@ READ16_MEMBER ( ti68k_state::ti68k_io_r )
 }
 
 
-WRITE16_MEMBER ( ti68k_state::ti68k_io2_w )
+void ti68k_state::ti68k_io2_w(offs_t offset, uint16_t data)
 {
 	switch(offset & 0x7f)
 	{
@@ -130,7 +130,7 @@ WRITE16_MEMBER ( ti68k_state::ti68k_io2_w )
 }
 
 
-READ16_MEMBER ( ti68k_state::ti68k_io2_r )
+uint16_t ti68k_state::ti68k_io2_r(offs_t offset)
 {
 	uint16_t data;
 
@@ -143,7 +143,7 @@ READ16_MEMBER ( ti68k_state::ti68k_io2_r )
 }
 
 
-READ16_MEMBER ( ti68k_state::rom_r )
+uint16_t ti68k_state::rom_r(offs_t offset)
 {
 	return m_rom_base[offset];
 }
@@ -464,11 +464,11 @@ void ti68k_state::machine_start()
 
 		if (initial_pc > 0x400000)
 		{
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0x400000, 0x5fffff, read16_delegate(*this, FUNC(ti68k_state::rom_r)));
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x400000, 0x5fffff, read16sm_delegate(*this, FUNC(ti68k_state::rom_r)));
 		}
 		else
 		{
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x3fffff, read16_delegate(*this, FUNC(ti68k_state::rom_r)));
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x3fffff, read16sm_delegate(*this, FUNC(ti68k_state::rom_r)));
 		}
 	}
 
@@ -498,19 +498,18 @@ void ti68k_state::machine_reset()
 uint32_t ti68k_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* preliminary implementation, doesn't use the contrast value */
-	uint8_t width = screen.width();
-	uint8_t height = screen.height();
-	uint8_t x, y, b;
+	uint8_t const width = screen.width();
+	uint8_t const height = screen.height();
 
 	if (!m_lcd_on || !m_lcd_base)
 		bitmap.fill(0);
 	else
-		for (y = 0; y < height; y++)
-			for (x = 0; x < width / 8; x++)
+		for (uint8_t y = 0; y < height; y++)
+			for (uint8_t x = 0; x < width / 8; x++)
 			{
 				uint8_t s_byte= m_maincpu->space(AS_PROGRAM).read_byte(m_lcd_base + y * (width/8) + x);
-				for (b = 0; b<8; b++)
-					bitmap.pix16(y, x * 8 + (7 - b)) = BIT(s_byte, b);
+				for (uint8_t b = 0; b<8; b++)
+					bitmap.pix(y, x * 8 + (7 - b)) = BIT(s_byte, b);
 			}
 
 	return 0;

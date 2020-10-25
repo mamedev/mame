@@ -11,7 +11,7 @@
 #include "screen.h"
 #include "speaker.h"
 
-WRITE8_MEMBER( comx35_state::cdp1869_w )
+void comx35_state::cdp1869_w(offs_t offset, uint8_t data)
 {
 	uint16_t ma = m_maincpu->get_memory_address();
 

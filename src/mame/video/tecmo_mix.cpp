@@ -72,20 +72,17 @@ void tecmo_mix_device::mix_bitmaps(screen_device &screen, bitmap_rgb32 &bitmap, 
 	//int frame = (screen.frame_number()) & 1;
 	// note this game has no tx layer, comments relate to other drivers
 
-	int y, x;
-	const pen_t *paldata = palette.pens();
+	pen_t const *const paldata = palette.pens();
 
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint32_t *dd = &bitmap.pix32(y);
-		uint16_t *sd2 = &bitmap_sp->pix16(y);
-		uint16_t *fg = &bitmap_fg->pix16(y);
-		uint16_t *bg = &bitmap_bg->pix16(y);
-		uint16_t *tx = nullptr;
-		if (bitmap_tx != nullptr)
-			tx = &bitmap_tx->pix16(y);
+		uint32_t *const dd = &bitmap.pix(y);
+		uint16_t *const sd2 = &bitmap_sp->pix(y);
+		uint16_t *const fg = &bitmap_fg->pix(y);
+		uint16_t *const bg = &bitmap_bg->pix(y);
+		uint16_t *const tx = bitmap_tx ? &bitmap_tx->pix(y) : nullptr;
 
-		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			uint16_t sprpixel = (sd2[x]);
 

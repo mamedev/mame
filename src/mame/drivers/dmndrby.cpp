@@ -100,9 +100,9 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE8_MEMBER(dderby_sound_w);
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(output_w);
+	void dderby_sound_w(uint8_t data);
+	uint8_t input_r(offs_t offset);
+	void output_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_dmndrby_tile_info);
 	void dmndrby_palette(palette_device &palette) const;
 	uint32_t screen_update_dderby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -114,14 +114,14 @@ private:
 };
 
 
-WRITE8_MEMBER(dmndrby_state::dderby_sound_w)
+void dmndrby_state::dderby_sound_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 
-READ8_MEMBER(dmndrby_state::input_r)
+uint8_t dmndrby_state::input_r(offs_t offset)
 {
 	switch(offset & 7)
 	{
@@ -138,7 +138,7 @@ READ8_MEMBER(dmndrby_state::input_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(dmndrby_state::output_w)
+void dmndrby_state::output_w(offs_t offset, uint8_t data)
 {
 	/*
 	---- x--- refill meter [4]

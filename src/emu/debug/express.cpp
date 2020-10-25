@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    express.c
+    express.cpp
 
     Generic expressions engine.
 
@@ -131,6 +131,10 @@ public:
 	// construction/destruction
 	function_symbol_entry(symbol_table &table, const char *name, int minparams, int maxparams, symbol_table::execute_func execute);
 
+	// getters
+	u16 minparams() const { return m_minparams; }
+	u16 maxparams() const { return m_maxparams; }
+
 	// symbol access
 	virtual bool is_lval() const override;
 	virtual u64 value() const override;
@@ -157,7 +161,7 @@ private:
 //  given expression error
 //-------------------------------------------------
 
-const char *expression_error::code_string() const
+std::string expression_error::code_string() const
 {
 	switch (m_code)
 	{
@@ -173,6 +177,8 @@ const char *expression_error::code_string() const
 		case DIVIDE_BY_ZERO:        return "divide by zero";
 		case OUT_OF_MEMORY:         return "out of memory";
 		case INVALID_PARAM_COUNT:   return "invalid number of parameters";
+		case TOO_FEW_PARAMS:        return util::string_format("too few parameters (at least %d required)", m_num);
+		case TOO_MANY_PARAMS:       return util::string_format("too many parameters (no more than %d accepted)", m_num);
 		case UNBALANCED_QUOTES:     return "unbalanced quotes";
 		case TOO_MANY_STRINGS:      return "too many strings";
 		case INVALID_MEMORY_SIZE:   return "invalid memory size (b/w/d/q expected)";
@@ -283,7 +289,7 @@ void integer_symbol_entry::set_value(u64 newvalue)
 	if (m_setter != nullptr)
 		m_setter(newvalue);
 	else
-		throw emu_fatalerror("Symbol '%s' is read-only", m_name.c_str());
+		throw emu_fatalerror("Symbol '%s' is read-only", m_name);
 }
 
 
@@ -321,7 +327,7 @@ bool function_symbol_entry::is_lval() const
 
 u64 function_symbol_entry::value() const
 {
-	throw emu_fatalerror("Symbol '%s' is a function and cannot be used in this context", m_name.c_str());
+	throw emu_fatalerror("Symbol '%s' is a function and cannot be used in this context", m_name);
 }
 
 
@@ -331,7 +337,7 @@ u64 function_symbol_entry::value() const
 
 void function_symbol_entry::set_value(u64 newvalue)
 {
-	throw emu_fatalerror("Symbol '%s' is a function and cannot be written", m_name.c_str());
+	throw emu_fatalerror("Symbol '%s' is a function and cannot be written", m_name);
 }
 
 
@@ -342,9 +348,9 @@ void function_symbol_entry::set_value(u64 newvalue)
 u64 function_symbol_entry::execute(int numparams, const u64 *paramlist)
 {
 	if (numparams < m_minparams)
-		throw emu_fatalerror("Function '%s' requires at least %d parameters", m_name.c_str(), m_minparams);
+		throw emu_fatalerror("Function '%s' requires at least %d parameters", m_name, m_minparams);
 	if (numparams > m_maxparams)
-		throw emu_fatalerror("Function '%s' accepts no more than %d parameters", m_name.c_str(), m_maxparams);
+		throw emu_fatalerror("Function '%s' accepts no more than %d parameters", m_name, m_maxparams);
 	return m_execute(numparams, paramlist);
 }
 
@@ -358,24 +364,23 @@ u64 function_symbol_entry::execute(int numparams, const u64 *paramlist)
 //  symbol_table - constructor
 //-------------------------------------------------
 
-symbol_table::symbol_table(symbol_table *parent)
-	: m_parent(parent),
-		m_memory_valid(nullptr),
-		m_memory_read(nullptr),
-		m_memory_write(nullptr)
+symbol_table::symbol_table(running_machine &machine, symbol_table *parent, device_t *device)
+	: m_machine(machine)
+	, m_parent(parent)
+	, m_memintf(dynamic_cast<device_memory_interface *>(device))
+	, m_memory_modified(nullptr)
 {
 }
 
 
 //-------------------------------------------------
-//  add - add a new u64 pointer symbol
+//  set_memory_modified_func - install notifier
+//  for when memory is modified in debugger
 //-------------------------------------------------
 
-void symbol_table::configure_memory(valid_func valid, read_func read, write_func write)
+void symbol_table::set_memory_modified_func(memory_modified_func modified)
 {
-	m_memory_valid = std::move(valid);
-	m_memory_read = std::move(read);
-	m_memory_write = std::move(write);
+	m_memory_modified = std::move(modified);
 }
 
 
@@ -464,6 +469,492 @@ void symbol_table::set_value(const char *symbol, u64 value)
 }
 
 
+
+//**************************************************************************
+//  EXPRESSION MEMORY HANDLERS
+//**************************************************************************
+
+//-------------------------------------------------
+//  read_memory - return 1,2,4 or 8 bytes
+//  from the specified memory space
+//-------------------------------------------------
+
+u64 symbol_table::read_memory(address_space &space, offs_t address, int size, bool apply_translation)
+{
+	u64 result = ~u64(0) >> (64 - 8*size);
+
+	if (apply_translation)
+	{
+		// mask against the logical byte mask
+		address &= space.logaddrmask();
+
+		// translate if necessary; if not mapped, return 0xffffffffffffffff
+		if (!space.device().memory().translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
+			return result;
+	}
+
+	// otherwise, call the reading function for the translated address
+	switch (size)
+	{
+	case 1:     result = space.read_byte(address);              break;
+	case 2:     result = space.read_word_unaligned(address);    break;
+	case 4:     result = space.read_dword_unaligned(address);   break;
+	case 8:     result = space.read_qword_unaligned(address);   break;
+	}
+	return result;
+}
+
+
+//-------------------------------------------------
+//  write_memory - write 1,2,4 or 8 bytes to the
+//  specified memory space
+//-------------------------------------------------
+
+void symbol_table::write_memory(address_space &space, offs_t address, u64 data, int size, bool apply_translation)
+{
+	if (apply_translation)
+	{
+		// mask against the logical byte mask
+		address &= space.logaddrmask();
+
+		// translate if necessary; if not mapped, we're done
+		if (!space.device().memory().translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
+			return;
+	}
+
+	// otherwise, call the writing function for the translated address
+	switch (size)
+	{
+	case 1:     space.write_byte(address, data);            break;
+	case 2:     space.write_word_unaligned(address, data);  break;
+	case 4:     space.write_dword_unaligned(address, data); break;
+	case 8:     space.write_qword_unaligned(address, data); break;
+	}
+
+	notify_memory_modified();
+}
+
+
+//-------------------------------------------------
+//  expression_get_device - return a device
+//  based on a case insensitive tag search
+//-------------------------------------------------
+
+device_t *symbol_table::expression_get_device(const char *tag)
+{
+	// convert to lowercase then lookup the name (tags are enforced to be all lower case)
+	std::string fullname(tag);
+	strmakelower(fullname);
+	return m_machine.root_device().subdevice(fullname.c_str());
+}
+
+
+//-------------------------------------------------
+//  notify_memory_modified - notify that memory
+//  has been changed
+//-------------------------------------------------
+
+void symbol_table::notify_memory_modified()
+{
+	// walk up the table hierarchy to find the owner
+	for (symbol_table *symtable = this; symtable != nullptr; symtable = symtable->m_parent)
+		if (symtable->m_memory_modified)
+			symtable->m_memory_modified();
+}
+
+
+//-------------------------------------------------
+//  memory_value - read 1,2,4 or 8 bytes at the
+//  given offset in the given address space
+//-------------------------------------------------
+
+u64 symbol_table::memory_value(const char *name, expression_space spacenum, u32 address, int size, bool disable_se)
+{
+	device_memory_interface *memory = m_memintf;
+
+	switch (spacenum)
+	{
+	case EXPSPACE_PROGRAM_LOGICAL:
+	case EXPSPACE_DATA_LOGICAL:
+	case EXPSPACE_IO_LOGICAL:
+	case EXPSPACE_SPACE3_LOGICAL:
+		if (name != nullptr)
+		{
+			device_t *device = expression_get_device(name);
+			if (device != nullptr)
+				device->interface(memory);
+		}
+		if (memory != nullptr && memory->has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL)))
+		{
+			address_space &space = memory->space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL));
+			auto dis = m_machine.disable_side_effects(disable_se);
+			return read_memory(space, address, size, true);
+		}
+		break;
+
+	case EXPSPACE_PROGRAM_PHYSICAL:
+	case EXPSPACE_DATA_PHYSICAL:
+	case EXPSPACE_IO_PHYSICAL:
+	case EXPSPACE_SPACE3_PHYSICAL:
+		if (name != nullptr)
+		{
+			device_t *device = expression_get_device(name);
+			if (device != nullptr)
+				device->interface(memory);
+		}
+		if (memory->has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL)))
+		{
+			address_space &space = memory->space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL));
+			auto dis = m_machine.disable_side_effects(disable_se);
+			return read_memory(space, address, size, false);
+		}
+		break;
+
+	case EXPSPACE_RAMWRITE:
+		if (name != nullptr)
+		{
+			device_t *device = expression_get_device(name);
+			if (device != nullptr)
+				device->interface(memory);
+		}
+		if (memory != nullptr && memory->has_space(AS_PROGRAM))
+		{
+			auto dis = m_machine.disable_side_effects(disable_se);
+			return read_program_direct(memory->space(AS_PROGRAM), (spacenum == EXPSPACE_OPCODE), address, size);
+		}
+		break;
+
+	case EXPSPACE_OPCODE:
+		if (name != nullptr)
+		{
+			device_t *device = expression_get_device(name);
+			if (device != nullptr)
+				device->interface(memory);
+		}
+		if (memory != nullptr && memory->has_space(AS_OPCODES))
+		{
+			auto dis = m_machine.disable_side_effects(disable_se);
+			return read_program_direct(memory->space(AS_OPCODES), (spacenum == EXPSPACE_OPCODE), address, size);
+		}
+		break;
+
+	case EXPSPACE_REGION:
+		if (name == nullptr)
+			break;
+		return read_memory_region(name, address, size);
+
+	default:
+		break;
+	}
+
+	return 0;
+}
+
+
+//-------------------------------------------------
+//  read_program_direct - read memory directly
+//  from an opcode or RAM pointer
+//-------------------------------------------------
+
+u64 symbol_table::read_program_direct(address_space &space, int opcode, offs_t address, int size)
+{
+	u8 *base;
+
+	// adjust the address into a byte address, but not if being called recursively
+	if ((opcode & 2) == 0)
+		address = space.address_to_byte(address);
+
+	// call ourself recursively until we are byte-sized
+	if (size > 1)
+	{
+		int halfsize = size / 2;
+
+		// read each half, from lower address to upper address
+		u64 r0 = read_program_direct(space, opcode | 2, address + 0, halfsize);
+		u64 r1 = read_program_direct(space, opcode | 2, address + halfsize, halfsize);
+
+		// assemble based on the target endianness
+		if (space.endianness() == ENDIANNESS_LITTLE)
+			return r0 | (r1 << (8 * halfsize));
+		else
+			return r1 | (r0 << (8 * halfsize));
+	}
+
+	// handle the byte-sized final requests
+	else
+	{
+		// lowmask specified which address bits are within the databus width
+		offs_t lowmask = space.data_width() / 8 - 1;
+
+		// get the base of memory, aligned to the address minus the lowbits
+		base = (u8 *)space.get_read_ptr(address & ~lowmask);
+
+		// if we have a valid base, return the appropriate byte
+		if (base != nullptr)
+		{
+			if (space.endianness() == ENDIANNESS_LITTLE)
+				return base[BYTE8_XOR_LE(address) & lowmask];
+			else
+				return base[BYTE8_XOR_BE(address) & lowmask];
+		}
+	}
+
+	return 0;
+}
+
+
+//-------------------------------------------------
+//  read_memory_region - read memory from a
+//  memory region
+//-------------------------------------------------
+
+u64 symbol_table::read_memory_region(const char *rgntag, offs_t address, int size)
+{
+	memory_region *region = m_machine.root_device().memregion(rgntag);
+	u64 result = ~u64(0) >> (64 - 8*size);
+
+	// make sure we get a valid base before proceeding
+	if (region != nullptr)
+	{
+		// call ourself recursively until we are byte-sized
+		if (size > 1)
+		{
+			int halfsize = size / 2;
+			u64 r0, r1;
+
+			// read each half, from lower address to upper address
+			r0 = read_memory_region(rgntag, address + 0, halfsize);
+			r1 = read_memory_region(rgntag, address + halfsize, halfsize);
+
+			// assemble based on the target endianness
+			if (region->endianness() == ENDIANNESS_LITTLE)
+				result = r0 | (r1 << (8 * halfsize));
+			else
+				result = r1 | (r0 << (8 * halfsize));
+		}
+
+		// only process if we're within range
+		else if (address < region->bytes())
+		{
+			// lowmask specified which address bits are within the databus width
+			u32 lowmask = region->bytewidth() - 1;
+			u8 *base = region->base() + (address & ~lowmask);
+
+			// if we have a valid base, return the appropriate byte
+			if (region->endianness() == ENDIANNESS_LITTLE)
+				result = base[BYTE8_XOR_LE(address) & lowmask];
+			else
+				result = base[BYTE8_XOR_BE(address) & lowmask];
+		}
+	}
+	return result;
+}
+
+
+//-------------------------------------------------
+//  set_memory_value - write 1,2,4 or 8 bytes at
+//  the given offset in the given address space
+//-------------------------------------------------
+
+void symbol_table::set_memory_value(const char *name, expression_space spacenum, u32 address, int size, u64 data, bool disable_se)
+{
+	device_memory_interface *memory = m_memintf;
+
+	switch (spacenum)
+	{
+	case EXPSPACE_PROGRAM_LOGICAL:
+	case EXPSPACE_DATA_LOGICAL:
+	case EXPSPACE_IO_LOGICAL:
+	case EXPSPACE_SPACE3_LOGICAL:
+		if (name != nullptr)
+		{
+			device_t *device = expression_get_device(name);
+			if (device != nullptr)
+				device->interface(memory);
+		}
+		if (memory != nullptr && memory->has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL)))
+		{
+			address_space &space = memory->space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL));
+			auto dis = m_machine.disable_side_effects(disable_se);
+			write_memory(space, address, data, size, true);
+		}
+		break;
+
+	case EXPSPACE_PROGRAM_PHYSICAL:
+	case EXPSPACE_DATA_PHYSICAL:
+	case EXPSPACE_IO_PHYSICAL:
+	case EXPSPACE_SPACE3_PHYSICAL:
+		if (name != nullptr)
+		{
+			device_t *device = expression_get_device(name);
+			if (device != nullptr)
+				device->interface(memory);
+		}
+		if (memory != nullptr && memory->has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL)))
+		{
+			address_space &space = memory->space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL));
+			auto dis = m_machine.disable_side_effects(disable_se);
+			write_memory(space, address, data, size, false);
+		}
+		break;
+
+	case EXPSPACE_RAMWRITE: {
+		if (name != nullptr)
+		{
+			device_t *device = expression_get_device(name);
+			if (device != nullptr)
+				device->interface(memory);
+		}
+		if (memory != nullptr && memory->has_space(AS_PROGRAM))
+		{
+			auto dis = m_machine.disable_side_effects(disable_se);
+			write_program_direct(memory->space(AS_PROGRAM), (spacenum == EXPSPACE_OPCODE), address, size, data);
+		}
+		break;
+	}
+
+	case EXPSPACE_OPCODE: {
+		if (name != nullptr)
+		{
+			device_t *device = expression_get_device(name);
+			if (device != nullptr)
+				device->interface(memory);
+		}
+		if (memory != nullptr && memory->has_space(AS_OPCODES))
+		{
+			auto dis = m_machine.disable_side_effects(disable_se);
+			write_program_direct(memory->space(AS_OPCODES), (spacenum == EXPSPACE_OPCODE), address, size, data);
+		}
+		break;
+	}
+
+	case EXPSPACE_REGION:
+		if (name == nullptr)
+			break;
+		write_memory_region(name, address, size, data);
+		break;
+
+	default:
+		break;
+	}
+}
+
+
+//-------------------------------------------------
+//  write_program_direct - write memory directly
+//  to an opcode or RAM pointer
+//-------------------------------------------------
+
+void symbol_table::write_program_direct(address_space &space, int opcode, offs_t address, int size, u64 data)
+{
+	// adjust the address into a byte address, but not if being called recursively
+	if ((opcode & 2) == 0)
+		address = space.address_to_byte(address);
+
+	// call ourself recursively until we are byte-sized
+	if (size > 1)
+	{
+		int halfsize = size / 2;
+
+		// break apart based on the target endianness
+		u64 halfmask = ~u64(0) >> (64 - 8 * halfsize);
+		u64 r0, r1;
+		if (space.endianness() == ENDIANNESS_LITTLE)
+		{
+			r0 = data & halfmask;
+			r1 = (data >> (8 * halfsize)) & halfmask;
+		}
+		else
+		{
+			r0 = (data >> (8 * halfsize)) & halfmask;
+			r1 = data & halfmask;
+		}
+
+		// write each half, from lower address to upper address
+		write_program_direct(space, opcode | 2, address + 0, halfsize, r0);
+		write_program_direct(space, opcode | 2, address + halfsize, halfsize, r1);
+	}
+
+	// handle the byte-sized final case
+	else
+	{
+		// lowmask specified which address bits are within the databus width
+		offs_t lowmask = space.data_width() / 8 - 1;
+
+		// get the base of memory, aligned to the address minus the lowbits
+		u8 *base = (u8 *)space.get_read_ptr(address & ~lowmask);
+
+		// if we have a valid base, write the appropriate byte
+		if (base != nullptr)
+		{
+			if (space.endianness() == ENDIANNESS_LITTLE)
+				base[BYTE8_XOR_LE(address) & lowmask] = data;
+			else
+				base[BYTE8_XOR_BE(address) & lowmask] = data;
+			notify_memory_modified();
+		}
+	}
+}
+
+
+//-------------------------------------------------
+//  write_memory_region - write memory to a
+//  memory region
+//-------------------------------------------------
+
+void symbol_table::write_memory_region(const char *rgntag, offs_t address, int size, u64 data)
+{
+	memory_region *region = m_machine.root_device().memregion(rgntag);
+
+	// make sure we get a valid base before proceeding
+	if (region != nullptr)
+	{
+		// call ourself recursively until we are byte-sized
+		if (size > 1)
+		{
+			int halfsize = size / 2;
+
+			// break apart based on the target endianness
+			u64 halfmask = ~u64(0) >> (64 - 8 * halfsize);
+			u64 r0, r1;
+			if (region->endianness() == ENDIANNESS_LITTLE)
+			{
+				r0 = data & halfmask;
+				r1 = (data >> (8 * halfsize)) & halfmask;
+			}
+			else
+			{
+				r0 = (data >> (8 * halfsize)) & halfmask;
+				r1 = data & halfmask;
+			}
+
+			// write each half, from lower address to upper address
+			write_memory_region(rgntag, address + 0, halfsize, r0);
+			write_memory_region(rgntag, address + halfsize, halfsize, r1);
+		}
+
+		// only process if we're within range
+		else if (address < region->bytes())
+		{
+			// lowmask specified which address bits are within the databus width
+			u32 lowmask = region->bytewidth() - 1;
+			u8 *base = region->base() + (address & ~lowmask);
+
+			// if we have a valid base, set the appropriate byte
+			if (region->endianness() == ENDIANNESS_LITTLE)
+			{
+				base[BYTE8_XOR_LE(address) & lowmask] = data;
+			}
+			else
+			{
+				base[BYTE8_XOR_BE(address) & lowmask] = data;
+			}
+			notify_memory_modified();
+		}
+	}
+}
+
+
 //-------------------------------------------------
 //  memory_valid - return true if the given
 //  memory name/space/offset combination is valid
@@ -471,52 +962,87 @@ void symbol_table::set_value(const char *symbol, u64 value)
 
 expression_error::error_code symbol_table::memory_valid(const char *name, expression_space space)
 {
-	// walk up the table hierarchy to find the owner
-	for (symbol_table *symtable = this; symtable != nullptr; symtable = symtable->m_parent)
-		if (symtable->m_memory_valid != nullptr)
+	device_memory_interface *memory = m_memintf;
+
+	switch (space)
+	{
+	case EXPSPACE_PROGRAM_LOGICAL:
+	case EXPSPACE_DATA_LOGICAL:
+	case EXPSPACE_IO_LOGICAL:
+	case EXPSPACE_SPACE3_LOGICAL:
+		if (name != nullptr)
 		{
-			expression_error::error_code err = symtable->m_memory_valid(name, space);
-			if (err != expression_error::NO_SUCH_MEMORY_SPACE)
-				return err;
+			device_t *device = expression_get_device(name);
+			if (device == nullptr)
+				return expression_error::INVALID_MEMORY_NAME;
+			if (!device->interface(memory))
+				return expression_error::NO_SUCH_MEMORY_SPACE;
 		}
-	return expression_error::NO_SUCH_MEMORY_SPACE;
-}
+		else if (memory == nullptr)
+			return expression_error::MISSING_MEMORY_NAME;
+		if (!memory->has_space(AS_PROGRAM + (space - EXPSPACE_PROGRAM_LOGICAL)))
+			return expression_error::NO_SUCH_MEMORY_SPACE;
+		break;
 
-
-//-------------------------------------------------
-//  memory_value - return a value read from memory
-//-------------------------------------------------
-
-u64 symbol_table::memory_value(const char *name, expression_space space, u32 offset, int size, bool disable_se)
-{
-	// walk up the table hierarchy to find the owner
-	for (symbol_table *symtable = this; symtable != nullptr; symtable = symtable->m_parent)
-		if (symtable->m_memory_valid != nullptr)
+	case EXPSPACE_PROGRAM_PHYSICAL:
+	case EXPSPACE_DATA_PHYSICAL:
+	case EXPSPACE_IO_PHYSICAL:
+	case EXPSPACE_SPACE3_PHYSICAL:
+		if (name)
 		{
-			expression_error::error_code err = symtable->m_memory_valid(name, space);
-			if (err != expression_error::NO_SUCH_MEMORY_SPACE && symtable->m_memory_read != nullptr)
-				return symtable->m_memory_read(name, space, offset, size, disable_se);
-			return 0;
+			device_t *device = expression_get_device(name);
+			if (device == nullptr)
+				return expression_error::INVALID_MEMORY_NAME;
+			if (!device->interface(memory))
+				return expression_error::NO_SUCH_MEMORY_SPACE;
 		}
-	return 0;
-}
+		else if (memory == nullptr)
+			return expression_error::MISSING_MEMORY_NAME;
+		if (!memory->has_space(AS_PROGRAM + (space - EXPSPACE_PROGRAM_PHYSICAL)))
+			return expression_error::NO_SUCH_MEMORY_SPACE;
+		break;
 
-
-//-------------------------------------------------
-//  set_memory_value - write a value to memory
-//-------------------------------------------------
-
-void symbol_table::set_memory_value(const char *name, expression_space space, u32 offset, int size, u64 value, bool disable_se)
-{
-	// walk up the table hierarchy to find the owner
-	for (symbol_table *symtable = this; symtable != nullptr; symtable = symtable->m_parent)
-		if (symtable->m_memory_valid != nullptr)
+	case EXPSPACE_RAMWRITE:
+		if (name)
 		{
-			expression_error::error_code err = symtable->m_memory_valid(name, space);
-			if (err != expression_error::NO_SUCH_MEMORY_SPACE && symtable->m_memory_write != nullptr)
-				symtable->m_memory_write(name, space, offset, size, value, disable_se);
-			return;
+			device_t *device = expression_get_device(name);
+			if (device == nullptr)
+				return expression_error::INVALID_MEMORY_NAME;
+			if (!device->interface(memory))
+				return expression_error::NO_SUCH_MEMORY_SPACE;
 		}
+		else if (memory == nullptr)
+			return expression_error::MISSING_MEMORY_NAME;
+		if (!memory->has_space(AS_PROGRAM))
+			return expression_error::NO_SUCH_MEMORY_SPACE;
+		break;
+
+	case EXPSPACE_OPCODE:
+		if (name)
+		{
+			device_t *device = expression_get_device(name);
+			if (device == nullptr)
+				return expression_error::INVALID_MEMORY_NAME;
+			if (!device->interface(memory))
+				return expression_error::NO_SUCH_MEMORY_SPACE;
+		}
+		else if (memory == nullptr)
+			return expression_error::MISSING_MEMORY_NAME;
+		if (!memory->has_space(AS_OPCODES))
+			return expression_error::NO_SUCH_MEMORY_SPACE;
+		break;
+
+	case EXPSPACE_REGION:
+		if (!name)
+			return expression_error::MISSING_MEMORY_NAME;
+		if (!m_machine.root_device().memregion(name) || !m_machine.root_device().memregion(name)->base())
+			return expression_error::INVALID_MEMORY_NAME;
+		break;
+
+	default:
+		return expression_error::NO_SUCH_MEMORY_SPACE;
+	}
+	return expression_error::NONE;
 }
 
 
@@ -563,7 +1089,7 @@ void parsed_expression::parse(const char *expression)
 {
 	// copy the string and reset our parsing state
 	m_original_string.assign(expression);
-	m_tokenlist.reset();
+	m_tokenlist.clear();
 	m_stringlist.clear();
 
 	// first parse the tokens into the token array in order
@@ -698,7 +1224,8 @@ void parsed_expression::parse_string_into_tokens()
 			break;
 
 		// initialize the current token object
-		parse_token &token = m_tokenlist.append(*global_alloc(parse_token(string - stringstart)));
+		m_tokenlist.emplace_back(string - stringstart);
+		parse_token &token = m_tokenlist.back();
 
 		// switch off the first character
 		switch (tolower(u8(string[0])))
@@ -969,7 +1496,8 @@ void parsed_expression::parse_symbol_or_number(parse_token &token, const char *&
 			// if this is a function symbol, synthesize an execute function operator
 			if (symbol->is_function())
 			{
-				parse_token &newtoken = m_tokenlist.append(*global_alloc(parse_token(string - stringstart)));
+				m_tokenlist.emplace_back(string - stringstart);
+				parse_token &newtoken = m_tokenlist.back();
 				newtoken.configure_operator(TVL_EXECUTEFUNC, 0);
 			}
 			return;
@@ -1168,7 +1696,7 @@ void parsed_expression::parse_memory_operator(parse_token &token, const char *st
 //  ambiguities based on neighboring tokens
 //-------------------------------------------------
 
-void parsed_expression::normalize_operator(parse_token *prevtoken, parse_token &thistoken)
+void parsed_expression::normalize_operator(parse_token *prevtoken, parse_token &thistoken, const std::list<parse_token> &stack, bool was_rparen)
 {
 	parse_token *nexttoken = thistoken.next();
 	switch (thistoken.optype())
@@ -1204,15 +1732,15 @@ void parsed_expression::normalize_operator(parse_token *prevtoken, parse_token &
 		case TVL_SUBTRACT:
 			// Assume we're unary if we are the first token, or if the previous token is not
 			// a symbol, a number, or a right parenthesis
-			if (prevtoken == nullptr || (!prevtoken->is_symbol() && !prevtoken->is_number() && !prevtoken->is_operator(TVL_RPAREN)))
+			if (prevtoken == nullptr || (!prevtoken->is_symbol() && !prevtoken->is_number() && !was_rparen))
 				thistoken.configure_operator(thistoken.is_operator(TVL_ADD) ? TVL_UPLUS : TVL_UMINUS, 2);
 			break;
 
 		// Determine if , refers to a function parameter
 		case TVL_COMMA:
-			for (auto lookback = m_token_stack.rbegin(); lookback != m_token_stack.rend(); ++lookback)
+			for (auto lookback = stack.begin(); lookback != stack.end(); ++lookback)
 			{
-				parse_token &peek = *lookback;
+				const parse_token &peek = *lookback;
 
 				// if we hit an execute function operator, or else a left parenthesis that is
 				// already tagged, then tag us as well
@@ -1234,51 +1762,63 @@ void parsed_expression::normalize_operator(parse_token *prevtoken, parse_token &
 
 void parsed_expression::infix_to_postfix()
 {
-	simple_list<parse_token> stack;
+	std::list<parse_token> stack;
+	parse_token *prev = nullptr;
+
+	// this flag is used to avoid looking back at a closing parenthesis that was already destroyed
+	bool was_rparen = false;
 
 	// loop over all the original tokens
-	parse_token *prev = nullptr;
-	parse_token *next;
-	for (parse_token *token = m_tokenlist.detach_all(); token != nullptr; prev = token, token = next)
+	std::list<parse_token>::iterator next;
+	std::list<parse_token> origlist = std::move(m_tokenlist);
+	m_tokenlist.clear();
+	for (std::list<parse_token>::iterator token = origlist.begin(); token != origlist.end(); token = next)
 	{
 		// pre-determine our next token
-		next = token->next();
+		next = std::next(token);
 
 		// if the character is an operand, append it to the result string
 		if (token->is_number() || token->is_symbol() || token->is_string())
-			m_tokenlist.append(*token);
+		{
+			m_tokenlist.splice(m_tokenlist.end(), origlist, token);
+
+			// remember this as the previous token
+			prev = &*token;
+			was_rparen = false;
+		}
 
 		// if this is an operator, process it
 		else if (token->is_operator())
 		{
 			// normalize the operator based on neighbors
-			normalize_operator(prev, *token);
+			normalize_operator(prev, *token, stack, was_rparen);
+			was_rparen = false;
 
 			// if the token is an opening parenthesis, push it onto the stack.
 			if (token->is_operator(TVL_LPAREN))
-				stack.prepend(*token);
+				stack.splice(stack.begin(), origlist, token);
 
 			// if the token is a closing parenthesis, pop all operators until we
 			// reach an opening parenthesis and append them to the result string,
-			// discaring the open parenthesis
+			// discarding the open parenthesis
 			else if (token->is_operator(TVL_RPAREN))
 			{
-				// loop until we find our matching opener
-				parse_token *popped;
-				while ((popped = stack.detach_head()) != nullptr)
-				{
-					if (popped->is_operator(TVL_LPAREN))
-						break;
-					m_tokenlist.append(*popped);
-				}
+				// find our matching opener
+				std::list<parse_token>::iterator lparen = std::find_if(stack.begin(), stack.end(),
+					[] (const parse_token &token) { return token.is_operator(TVL_LPAREN); }
+				);
 
 				// if we didn't find an open paren, it's an error
-				if (popped == nullptr)
+				if (lparen == stack.end())
 					throw expression_error(expression_error::UNBALANCED_PARENS, token->offset());
 
+				// move the stacked operators to the end of the new list
+				m_tokenlist.splice(m_tokenlist.end(), stack, stack.begin(), lparen);
+
 				// free ourself and our matching opening parenthesis
-				global_free(token);
-				global_free(popped);
+				origlist.erase(token);
+				stack.erase(lparen);
+				was_rparen = true;
 			}
 
 			// if the token is an operator, pop operators until we reach an opening parenthesis,
@@ -1289,8 +1829,8 @@ void parsed_expression::infix_to_postfix()
 				int our_precedence = token->precedence();
 
 				// loop until we can't peek at the stack anymore
-				parse_token *peek;
-				while ((peek = stack.first()) != nullptr)
+				std::list<parse_token>::iterator peek;
+				for (peek = stack.begin(); peek != stack.end(); ++peek)
 				{
 					// break if any of the above conditions are true
 					if (peek->is_operator(TVL_LPAREN))
@@ -1298,28 +1838,29 @@ void parsed_expression::infix_to_postfix()
 					int stack_precedence = peek->precedence();
 					if (stack_precedence > our_precedence || (stack_precedence == our_precedence && peek->right_to_left()))
 						break;
-
-					// pop this token
-					m_tokenlist.append(*stack.detach_head());
 				}
 
+				// move the stacked operands to the end of the new list
+				m_tokenlist.splice(m_tokenlist.end(), stack, stack.begin(), peek);
+
 				// push the new operator
-				stack.prepend(*token);
+				stack.splice(stack.begin(), origlist, token);
 			}
+
+			if (!was_rparen)
+				prev = &*token;
 		}
 	}
 
-	// finish popping the stack
-	parse_token *popped;
-	while ((popped = stack.detach_head()) != nullptr)
-	{
-		// it is an error to have a left parenthesis still on the stack
-		if (popped->is_operator(TVL_LPAREN))
-			throw expression_error(expression_error::UNBALANCED_PARENS, popped->offset());
+	// it is an error to have a left parenthesis still on the stack
+	std::list<parse_token>::iterator lparen = std::find_if(stack.begin(), stack.end(),
+		[] (const parse_token &token) { return token.is_operator(TVL_LPAREN); }
+	);
+	if (lparen != stack.end())
+		throw expression_error(expression_error::UNBALANCED_PARENS, lparen->offset());
 
-		// pop this token
-		m_tokenlist.append(*popped);
-	}
+	// pop all remaining tokens
+	m_tokenlist.splice(m_tokenlist.end(), stack, stack.begin(), stack.end());
 }
 
 
@@ -1751,8 +2292,14 @@ void parsed_expression::execute_function(parse_token &token)
 	if (paramcount == MAX_FUNCTION_PARAMS)
 		throw expression_error(expression_error::INVALID_PARAM_COUNT, token.offset());
 
-	// execute the function and push the result
+	// validate parameters
 	function_symbol_entry *function = downcast<function_symbol_entry *>(symbol);
+	if (paramcount < function->minparams())
+		throw expression_error(expression_error::TOO_FEW_PARAMS, token.offset(), function->minparams());
+	if (paramcount > function->maxparams())
+		throw expression_error(expression_error::TOO_MANY_PARAMS, token.offset(), function->maxparams());
+
+	// execute the function and push the result
 	parse_token result(token.offset());
 	result.configure_number(function->execute(paramcount, &funcparams[MAX_FUNCTION_PARAMS - paramcount]));
 	push_token(result);

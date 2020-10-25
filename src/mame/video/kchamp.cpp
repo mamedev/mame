@@ -2,7 +2,7 @@
 // copyright-holders:Ernesto Corvi
 /***************************************************************************
 
-  video.c
+  kchamp.cpp
 
   Functions to emulate the video hardware of the machine.
 
@@ -25,13 +25,13 @@ void kchamp_state::kchamp_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(kchamp_state::kchamp_videoram_w)
+void kchamp_state::kchamp_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(kchamp_state::kchamp_colorram_w)
+void kchamp_state::kchamp_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);

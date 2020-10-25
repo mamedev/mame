@@ -30,8 +30,8 @@ public:
 	template <typename T>
 	void set_cpu(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
 
-	DECLARE_READ8_MEMBER(p1_fdc_r);
-	DECLARE_WRITE8_MEMBER(p1_fdc_w);
+	uint8_t p1_fdc_r(offs_t offset);
+	void p1_fdc_w(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides

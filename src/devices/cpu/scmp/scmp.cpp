@@ -31,7 +31,7 @@ scmp_device::scmp_device(const machine_config &mconfig, const char *tag, device_
 scmp_device::scmp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0)
-	, m_AC(0), m_ER(0), m_SR(0), m_program(nullptr), m_cache(nullptr), m_icount(0)
+	, m_AC(0), m_ER(0), m_SR(0), m_icount(0)
 	, m_flag_out_func(*this)
 	, m_sout_func(*this)
 	, m_sin_func(*this)
@@ -70,24 +70,24 @@ uint8_t scmp_device::ROP()
 {
 	uint16_t pc = m_PC.w.l;
 	m_PC.w.l = ADD12(m_PC.w.l,1);
-	return m_cache->read_byte( pc);
+	return m_cache.read_byte( pc);
 }
 
 uint8_t scmp_device::ARG()
 {
 	uint16_t pc = m_PC.w.l;
 	m_PC.w.l = ADD12(m_PC.w.l,1);
-	return m_cache->read_byte(pc);
+	return m_cache.read_byte(pc);
 }
 
 uint8_t scmp_device::RM(uint32_t a)
 {
-	return m_program->read_byte(a);
+	return m_program.read_byte(a);
 }
 
 void scmp_device::WM(uint32_t a, uint8_t v)
 {
-	m_program->write_byte(a, v);
+	m_program.write_byte(a, v);
 }
 
 void scmp_device::illegal(uint8_t opcode)
@@ -312,7 +312,7 @@ void scmp_device::execute_one(int opcode)
 						m_AC = 0xff;
 						break;
 			// Others are illegal
-			default :   m_icount -= 1;
+			default :   m_icount -= 5;
 						illegal (opcode);
 						break;
 		}
@@ -444,7 +444,7 @@ void scmp_device::execute_one(int opcode)
 						m_icount -= 5;
 						break;
 			// Others are illegal
-			default :   m_icount -= 1;
+			default :   m_icount -= 5;
 						illegal (opcode);
 						break;
 		}
@@ -455,6 +455,7 @@ void scmp_device::execute_one(int opcode)
 /***************************************************************************
     COMMON EXECUTION
 ***************************************************************************/
+
 void scmp_device::take_interrupt()
 {
 	uint16_t tmp = ADD12(m_PC.w.l,-1); // We fix PC so at return it goes to current location
@@ -501,8 +502,8 @@ void scmp_device::device_start()
 		state_add(SCMP_SR,     "SR",    m_SR);
 	}
 
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
 
 	/* resolve callbacks */
 	m_flag_out_func.resolve_safe();

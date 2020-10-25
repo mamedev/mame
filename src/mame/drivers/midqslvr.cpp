@@ -276,15 +276,15 @@ private:
 	uint8_t m_mtxc_config_reg[256];
 	uint8_t m_piix4_config_reg[4][256];
 
-	DECLARE_WRITE32_MEMBER( isa_ram1_w );
-	DECLARE_WRITE32_MEMBER( isa_ram2_w );
+	void isa_ram1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void isa_ram2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_WRITE32_MEMBER( bios_ext1_ram_w );
-	DECLARE_WRITE32_MEMBER( bios_ext2_ram_w );
-	DECLARE_WRITE32_MEMBER( bios_ext3_ram_w );
-	DECLARE_WRITE32_MEMBER( bios_ext4_ram_w );
+	void bios_ext1_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void bios_ext2_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void bios_ext3_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void bios_ext4_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_WRITE32_MEMBER( bios_ram_w );
+	void bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void intel82439tx_init();
@@ -527,7 +527,7 @@ void midqslvr_state::intel82371ab_pci_w(int function, int reg, uint32_t data, ui
 }
 
 
-WRITE32_MEMBER(midqslvr_state::isa_ram1_w)
+void midqslvr_state::isa_ram1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x5a] & 0x2)      // write to RAM if this region is write-enabled
 	{
@@ -535,7 +535,7 @@ WRITE32_MEMBER(midqslvr_state::isa_ram1_w)
 	}
 }
 
-WRITE32_MEMBER(midqslvr_state::isa_ram2_w)
+void midqslvr_state::isa_ram2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x5a] & 0x2)      // write to RAM if this region is write-enabled
 	{
@@ -543,7 +543,7 @@ WRITE32_MEMBER(midqslvr_state::isa_ram2_w)
 	}
 }
 
-WRITE32_MEMBER(midqslvr_state::bios_ext1_ram_w)
+void midqslvr_state::bios_ext1_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x5e] & 0x2)      // write to RAM if this region is write-enabled
 	{
@@ -552,7 +552,7 @@ WRITE32_MEMBER(midqslvr_state::bios_ext1_ram_w)
 }
 
 
-WRITE32_MEMBER(midqslvr_state::bios_ext2_ram_w)
+void midqslvr_state::bios_ext2_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x5e] & 0x20)     // write to RAM if this region is write-enabled
 	{
@@ -561,7 +561,7 @@ WRITE32_MEMBER(midqslvr_state::bios_ext2_ram_w)
 }
 
 
-WRITE32_MEMBER(midqslvr_state::bios_ext3_ram_w)
+void midqslvr_state::bios_ext3_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x5f] & 0x2)      // write to RAM if this region is write-enabled
 	{
@@ -570,7 +570,7 @@ WRITE32_MEMBER(midqslvr_state::bios_ext3_ram_w)
 }
 
 
-WRITE32_MEMBER(midqslvr_state::bios_ext4_ram_w)
+void midqslvr_state::bios_ext4_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x5f] & 0x20)     // write to RAM if this region is write-enabled
 	{
@@ -579,7 +579,7 @@ WRITE32_MEMBER(midqslvr_state::bios_ext4_ram_w)
 }
 
 
-WRITE32_MEMBER(midqslvr_state::bios_ram_w)
+void midqslvr_state::bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x59] & 0x20)     // write to RAM if this region is write-enabled
 	{
@@ -747,11 +747,11 @@ ROM_START( ultarctcup )
 ROM_END
 
 // there are almost certainly multiple versions of these; updates were offered on floppy disk.  The version numbers for the existing CHDs are unknown.
-GAME(1999, hydrthnd,    0,        midqslvr, at_keyboard, midqslvr_state, empty_init, ROT0, "Midway Games", "Hydro Thunder", MACHINE_IS_SKELETON)
+GAME(1999, hydrthnd,    0,        midqslvr, 0, midqslvr_state, empty_init, ROT0, "Midway Games", "Hydro Thunder", MACHINE_IS_SKELETON)
 
-GAME(2000, offrthnd,    0,        midqslvr, at_keyboard, midqslvr_state, empty_init, ROT0, "Midway Games", "Offroad Thunder", MACHINE_IS_SKELETON)
+GAME(2000, offrthnd,    0,        midqslvr, 0, midqslvr_state, empty_init, ROT0, "Midway Games", "Offroad Thunder", MACHINE_IS_SKELETON)
 
-GAME(2001, arctthnd,    0,        graphite, at_keyboard, midqslvr_state, empty_init, ROT0, "Midway Games", "Arctic Thunder (v1.002)", MACHINE_IS_SKELETON)
+GAME(2001, arctthnd,    0,        graphite, 0, midqslvr_state, empty_init, ROT0, "Midway Games", "Arctic Thunder (v1.002)", MACHINE_IS_SKELETON)
 
-GAME(2001, ultarctc,    0,        graphite, at_keyboard, midqslvr_state, empty_init, ROT0, "Midway Games", "Ultimate Arctic Thunder", MACHINE_IS_SKELETON)
-GAME(2004, ultarctcup,  ultarctc, graphite, at_keyboard, midqslvr_state, empty_init, ROT0, "Midway Games", "Ultimate Arctic Thunder Update CD ver 1.950 (5/3/04)", MACHINE_IS_SKELETON)
+GAME(2001, ultarctc,    0,        graphite, 0, midqslvr_state, empty_init, ROT0, "Midway Games", "Ultimate Arctic Thunder", MACHINE_IS_SKELETON)
+GAME(2004, ultarctcup,  ultarctc, graphite, 0, midqslvr_state, empty_init, ROT0, "Midway Games", "Ultimate Arctic Thunder Update CD ver 1.950 (5/3/04)", MACHINE_IS_SKELETON)

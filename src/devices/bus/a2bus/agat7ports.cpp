@@ -158,7 +158,7 @@ void a2bus_agat7_ports_device::write_c0nx(uint8_t offset, uint8_t data)
  * 6    /INIT
  * 7    /STROBE
  */
-WRITE8_MEMBER(a2bus_agat7_ports_device::write_portb)
+void a2bus_agat7_ports_device::write_portb(uint8_t data)
 {
 	m_centronics->write_strobe(BIT(data, 5));
 	m_centronics->write_init(BIT(data, 4));
@@ -173,7 +173,7 @@ WRITE8_MEMBER(a2bus_agat7_ports_device::write_portb)
  * 6    dip ABRLEV (0: BUSY, /ACK.  1: READY, ACK)
  * 7    ready signal from device
  */
-READ8_MEMBER(a2bus_agat7_ports_device::read_portc)
+uint8_t a2bus_agat7_ports_device::read_portc()
 {
 	return (m_centronics_busy << 7) | m_printer_cfg->read();
 }

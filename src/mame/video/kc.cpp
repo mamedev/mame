@@ -69,19 +69,17 @@ WRITE_LINE_MEMBER( kc_state::video_toggle_blink_state )
 /* draw 8 pixels */
 void kc_state::video_draw_8_pixels(bitmap_ind16 &bitmap, int x, int y, uint8_t colour_byte, uint8_t gfx_byte)
 {
-	int pens[4];
-	int px;
-
 	if (m_high_resolution)
 	{
 		/* High resolution: 4 colors for block */
 
-		pens[0] = 0;    // black
-		pens[1] = 2;    // red
-		pens[2] = 5;    // cyan
-		pens[3] = 7;    // white
+		int const pens[4] = {
+				0,    // black
+				2,    // red
+				5,    // cyan
+				7 };  // white
 
-		px = x;
+		int px = x;
 
 		for (int a=0; a<8; a++)
 		{
@@ -89,7 +87,7 @@ void kc_state::video_draw_8_pixels(bitmap_ind16 &bitmap, int x, int y, uint8_t c
 
 			if ((px >= 0) && (px < bitmap.width()) && (y >= 0) && (y < bitmap.height()))
 			{
-				bitmap.pix16(y, px) = pen;
+				bitmap.pix(y, px) = pen;
 			}
 
 			px++;
@@ -121,10 +119,9 @@ void kc_state::video_draw_8_pixels(bitmap_ind16 &bitmap, int x, int y, uint8_t c
 			foreground_pen = background_pen;
 		}
 
-		pens[0] = background_pen;
-		pens[1] = foreground_pen;
+		int const pens[2] = { background_pen, foreground_pen };
 
-		px = x;
+		int px = x;
 
 		for (int a=0; a<8; a++)
 		{
@@ -132,10 +129,10 @@ void kc_state::video_draw_8_pixels(bitmap_ind16 &bitmap, int x, int y, uint8_t c
 
 			if ((px >= 0) && (px < bitmap.width()) && (y >= 0) && (y < bitmap.height()))
 			{
-				bitmap.pix16(y, px) = pen;
+				bitmap.pix(y, px) = pen;
 			}
 			px++;
-			gfx_byte = gfx_byte<<1;
+			gfx_byte <<= 1;
 		}
 	}
 }

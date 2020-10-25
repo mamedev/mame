@@ -229,7 +229,7 @@ Code at 505: waits for bit 1 to go low, writes command, waits for bit
 
 
 /* Read/Write Handlers */
-READ8_MEMBER(airbustr_state::devram_r)
+uint8_t airbustr_state::devram_r(address_space &space, offs_t offset)
 {
 	// There's an MCU here, possibly
 	switch (offset)
@@ -262,17 +262,17 @@ READ8_MEMBER(airbustr_state::devram_r)
 	}
 }
 
-WRITE8_MEMBER(airbustr_state::master_nmi_trigger_w)
+void airbustr_state::master_nmi_trigger_w(uint8_t data)
 {
 	m_slave->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-WRITE8_MEMBER(airbustr_state::master_bankswitch_w)
+void airbustr_state::master_bankswitch_w(uint8_t data)
 {
 	m_masterbank->set_entry(data & 0x07);
 }
 
-WRITE8_MEMBER(airbustr_state::slave_bankswitch_w)
+void airbustr_state::slave_bankswitch_w(uint8_t data)
 {
 	m_slavebank->set_entry(data & 0x07);
 
@@ -285,12 +285,12 @@ WRITE8_MEMBER(airbustr_state::slave_bankswitch_w)
 	m_pandora->set_clear_bitmap(BIT(data, 5));
 }
 
-WRITE8_MEMBER(airbustr_state::sound_bankswitch_w)
+void airbustr_state::sound_bankswitch_w(uint8_t data)
 {
 	m_audiobank->set_entry(data & 0x07);
 }
 
-READ8_MEMBER(airbustr_state::soundcommand_status_r)
+uint8_t airbustr_state::soundcommand_status_r()
 {
 	// bits: 2 <-> ?    1 <-> soundlatch full   0 <-> soundlatch2 empty
 	return 4 | (m_soundlatch[0]->pending_r() << 1) | !m_soundlatch[1]->pending_r();
@@ -298,20 +298,20 @@ READ8_MEMBER(airbustr_state::soundcommand_status_r)
 
 
 template<int Layer>
-WRITE8_MEMBER(airbustr_state::videoram_w)
+void airbustr_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[Layer][offset] = data;
 	m_tilemap[Layer]->mark_tile_dirty(offset);
 }
 
 template<int Layer>
-WRITE8_MEMBER(airbustr_state::colorram_w)
+void airbustr_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[Layer][offset] = data;
 	m_tilemap[Layer]->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(airbustr_state::coin_counter_w)
+void airbustr_state::coin_counter_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 	machine().bookkeeping().coin_counter_w(1, data & 2);
@@ -699,7 +699,7 @@ ROM_END
 
 void airbustr_state::init_airbustr()
 {
-	m_master->space(AS_PROGRAM).install_read_handler(0xe000, 0xefff, read8_delegate(*this, FUNC(airbustr_state::devram_r))); // protection device lives here
+	m_master->space(AS_PROGRAM).install_read_handler(0xe000, 0xefff, read8m_delegate(*this, FUNC(airbustr_state::devram_r))); // protection device lives here
 }
 
 

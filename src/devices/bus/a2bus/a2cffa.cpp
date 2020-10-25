@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont
 /*********************************************************************
 
-    a2cffa.c
+    a2cffa.cpp
 
     Implementation of Rich Dreher's IDE/CompactFlash card
     for the Apple II.
@@ -16,18 +16,12 @@
 #include "imagedev/harddriv.h"
 #include "softlist.h"
 
-/***************************************************************************
-    PARAMETERS
-***************************************************************************/
-
-#define LOG_A2CFFA  1
-
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(A2BUS_CFFA2,      a2bus_cffa2_device,      "a2cffa2",  "CFFA2000 Compact Flash (65C02 firmware, www.dreher.net)")
-DEFINE_DEVICE_TYPE(A2BUS_CFFA2_6502, a2bus_cffa2_6502_device, "a2cffa02", "CFFA2000 Compact Flash (6502 firmware, www.dreher.net)")
+DEFINE_DEVICE_TYPE(A2BUS_CFFA2,      a2bus_cffa2_device,      "a2cffa2",  "CFFA 2.0 Compact Flash (65C02 firmware, www.dreher.net)")
+DEFINE_DEVICE_TYPE(A2BUS_CFFA2_6502, a2bus_cffa2_6502_device, "a2cffa02", "CFFA 2.0 Compact Flash (6502 firmware, www.dreher.net)")
 
 #define CFFA2_ROM_REGION  "cffa2_rom"
 #define CFFA2_ATA_TAG     "cffa2_ata"
@@ -52,7 +46,7 @@ ROM_END
 
 void a2bus_cffa2000_device::device_add_mconfig(machine_config &config)
 {
-	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, false);
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", "hdd", false);
 
 // not yet, the core explodes
 //  SOFTWARE_LIST(config, "hdd_list").set_original("apple2gs_hdd");
@@ -145,7 +139,7 @@ uint8_t a2bus_cffa2000_device::read_c0nx(uint8_t offset)
 			// Apple /// driver uses sta $c080,x when writing, which causes spurious reads of c088
 			if (!m_inwritecycle)
 			{
-				m_lastreaddata = m_ata->read_cs0(offset - 8);
+				m_lastreaddata = m_ata->cs0_r(offset - 8);
 			}
 			return m_lastreaddata & 0xff;
 
@@ -156,7 +150,7 @@ uint8_t a2bus_cffa2000_device::read_c0nx(uint8_t offset)
 		case 0xd:
 		case 0xe:
 		case 0xf:
-			return m_ata->read_cs0(offset-8, 0xff);
+			return m_ata->cs0_r(offset-8, 0xff);
 	}
 
 	return 0xff;
@@ -192,7 +186,7 @@ void a2bus_cffa2000_device::write_c0nx(uint8_t offset, uint8_t data)
 			m_lastdata &= 0xff00;
 			m_lastdata |= data;
 //          printf("%02x to 8, m_lastdata = %x\n", data, m_lastdata);
-			m_ata->write_cs0(offset-8, m_lastdata);
+			m_ata->cs0_w(offset-8, m_lastdata);
 			break;
 
 		case 9:
@@ -202,7 +196,7 @@ void a2bus_cffa2000_device::write_c0nx(uint8_t offset, uint8_t data)
 		case 0xd:
 		case 0xe:
 		case 0xf:
-			m_ata->write_cs0(offset-8, data, 0xff);
+			m_ata->cs0_w(offset-8, data, 0xff);
 			break;
 	}
 }

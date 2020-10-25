@@ -57,9 +57,9 @@ public:
 	void init_phunsy();
 
 private:
-	DECLARE_READ8_MEMBER(phunsy_data_r);
-	DECLARE_WRITE8_MEMBER(phunsy_ctrl_w);
-	DECLARE_WRITE8_MEMBER(phunsy_data_w);
+	uint8_t phunsy_data_r();
+	void phunsy_ctrl_w(uint8_t data);
+	void phunsy_data_w(uint8_t data);
 	void kbd_put(u8 data);
 	DECLARE_READ_LINE_MEMBER(cass_r);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
@@ -115,7 +115,7 @@ void phunsy_state::phunsy_data(address_map &map)
 }
 
 
-WRITE8_MEMBER( phunsy_state::phunsy_ctrl_w )
+void phunsy_state::phunsy_ctrl_w(uint8_t data)
 {
 	if (LOG)
 		logerror("%s: phunsy_ctrl_w %02x\n", machine().describe_context(), data);
@@ -131,7 +131,7 @@ WRITE8_MEMBER( phunsy_state::phunsy_ctrl_w )
 }
 
 
-WRITE8_MEMBER( phunsy_state::phunsy_data_w )
+void phunsy_state::phunsy_data_w(uint8_t data)
 {
 	if (LOG)
 		logerror("%s: phunsy_data_w %02x\n", machine().describe_context(), data);
@@ -156,7 +156,7 @@ WRITE8_MEMBER( phunsy_state::phunsy_data_w )
 }
 
 
-READ8_MEMBER( phunsy_state::phunsy_data_r )
+uint8_t phunsy_state::phunsy_data_r()
 {
 	uint8_t data = 0xff;
 
@@ -218,19 +218,19 @@ void phunsy_state::phunsy_palette(palette_device &palette) const
 
 uint32_t phunsy_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y,ra,chr,gfx,col;
-	uint16_t sy=0,ma=0,x;
+	uint16_t sy=0,ma=0;
 
-	for (y = 0; y < 32; y++)
+	for (uint8_t y = 0; y < 32; y++)
 	{
-		for (ra = 0; ra < 8; ra++)
+		for (uint8_t ra = 0; ra < 8; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix(sy++);
 
-			for (x = ma; x < ma+64; x++)
+			for (uint16_t x = ma; x < ma+64; x++)
 			{
-				chr = m_p_videoram[x];
+				uint8_t const chr = m_p_videoram[x];
 
+				uint8_t gfx,col;
 				if (BIT(chr, 7))
 				{
 					/* Graphics mode */

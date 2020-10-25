@@ -198,14 +198,14 @@ protected:
 	uint16_t m_reg_r26;   // R26 register
 	uint16_t m_reg_r27;   // R27 register
 
-	address_space *m_program;
+	memory_access<22, 1, -1, ENDIANNESS_BIG>::cache m_cache;
+	memory_access<22, 1, -1, ENDIANNESS_BIG>::specific m_program;
+	memory_access< 6, 1, -1, ENDIANNESS_BIG>::specific m_io;
 
 private:
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 
-	memory_access_cache<1, -1, ENDIANNESS_BIG> *m_cache;
-	address_space *m_io;
 
 	uint32_t get_ea(uint16_t opcode);
 	void do_add(uint16_t& addend1 , uint16_t addend2);

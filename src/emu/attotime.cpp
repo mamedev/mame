@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    attotime.c
+    attotime.cpp
 
     Support functions for working with attotime data.
 

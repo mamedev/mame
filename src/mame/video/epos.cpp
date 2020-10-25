@@ -55,12 +55,12 @@ void epos_state::set_pal_color(palette_device &palette, uint8_t offset, uint8_t 
 }
 
 // later (tristar 9000) games uses a dynamic palette instead of prom
-WRITE8_MEMBER(epos_state::dealer_pal_w)
+void epos_state::dealer_pal_w(offs_t offset, uint8_t data)
 {
 	set_pal_color(*m_palette, offset, data);
 }
 
-WRITE8_MEMBER(epos_state::port_1_w)
+void epos_state::port_1_w(uint8_t data)
 {
 	/* D0 - start light #1
 	   D1 - start light #2
@@ -89,13 +89,13 @@ uint32_t epos_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 		if (flip_screen())
 		{
-			bitmap.pix32(240 - y, 270 - x + 1) = m_palette->pen((m_palette_bank << 4) | (data & 0x0f));
-			bitmap.pix32(240 - y, 270 - x + 0) = m_palette->pen((m_palette_bank << 4) | (data >> 4));
+			bitmap.pix(240 - y, 270 - x + 1) = m_palette->pen((m_palette_bank << 4) | (data & 0x0f));
+			bitmap.pix(240 - y, 270 - x + 0) = m_palette->pen((m_palette_bank << 4) | (data >> 4));
 		}
 		else
 		{
-			bitmap.pix32(y, x + 0) = m_palette->pen((m_palette_bank << 4) | (data & 0x0f));
-			bitmap.pix32(y, x + 1) = m_palette->pen((m_palette_bank << 4) | (data >> 4));
+			bitmap.pix(y, x + 0) = m_palette->pen((m_palette_bank << 4) | (data & 0x0f));
+			bitmap.pix(y, x + 1) = m_palette->pen((m_palette_bank << 4) | (data >> 4));
 		}
 	}
 

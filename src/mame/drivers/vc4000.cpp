@@ -137,7 +137,7 @@ Q-0900^76203F0161063005080E492DCD4890597877103F020E75105A0A0C1E89F4101879
 #include "speaker.h"
 
 
-READ8_MEMBER( vc4000_state::vc4000_key_r )
+uint8_t vc4000_state::vc4000_key_r(offs_t offset)
 {
 	uint8_t data=0;
 	switch(offset & 0x0f)
@@ -167,19 +167,19 @@ READ8_MEMBER( vc4000_state::vc4000_key_r )
 	return data;
 }
 
-WRITE8_MEMBER( vc4000_state::vc4000_sound_ctl )
+void vc4000_state::vc4000_sound_ctl(offs_t offset, uint8_t data)
 {
 	logerror("Write to sound control register offset= %d value= %d\n", offset, data);
 }
 
 // Write cassette - Address 0x1DFF
-WRITE8_MEMBER( vc4000_state::elektor_cass_w )
+void vc4000_state::elektor_cass_w(uint8_t data)
 {
 	m_cassette->output(BIT(data, 7) ? -1.0 : +1.0);
 }
 
 // Read cassette - Address 0x1DBF
-READ8_MEMBER( vc4000_state::elektor_cass_r )
+uint8_t vc4000_state::elektor_cass_r()
 {
 	return (m_cassette->input() > 0.03) ? 0xff : 0x7f;
 }
@@ -502,7 +502,7 @@ QUICKLOAD_LOAD_MEMBER(vc4000_state::quickload_cb)
 									read_ = quick_length;
 								if (quick_length > 0x1FC0)
 									for (i = 0x1F50; i < read_; i++)
-										vc4000_video_w(space, i-0x1f00, quick_data[i]);
+										vc4000_video_w(i-0x1f00, quick_data[i]);
 
 								/* display a message about the loaded quickload */
 								image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);

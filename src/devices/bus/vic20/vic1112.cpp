@@ -34,7 +34,7 @@ WRITE_LINE_MEMBER( vic1112_device::via0_irq_w )
 	m_slot->irq_w(m_via0_irq | m_via1_irq);
 }
 
-READ8_MEMBER( vic1112_device::via0_pb_r )
+uint8_t vic1112_device::via0_pb_r()
 {
 	/*
 
@@ -62,7 +62,7 @@ READ8_MEMBER( vic1112_device::via0_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( vic1112_device::via0_pb_w )
+void vic1112_device::via0_pb_w(uint8_t data)
 {
 	/*
 

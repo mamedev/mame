@@ -26,6 +26,7 @@ Common Issues and Questions (FAQ)
 20. :ref:`ControllerIssues`
 21. :ref:`ExternalOPL`
 22. :ref:`Autofire`
+23. :ref:`gsync-freesync`
 
 
 .. _rapid-coins:
@@ -276,3 +277,19 @@ Note that if you set the autofire button to an input button that's also defined 
  If you set button 3 on your controller to autofire and set button 3 to be powerup as well, you will trigger the powerup action every time you grab a powerup because the powerup button is also being held down along with the autofire button.
 
  It is suggested you choose a button for autofire that is not in use for anything else in the current system.
+
+
+.. _gsync-freesync:
+
+Does MAME support G-Sync or FreeSync? How do I configure MAME to use them?
+--------------------------------------------------------------------------
+
+MAME supports both G-Sync and FreeSync right out of the box for Windows and Linux, however macOS does not support G-Sync or FreeSync.
+
+* Make sure your monitor is capable of at least 120Hz G-Sync/FreeSync. If your monitor is only capable of 60Hz in G-Sync/FreeSync modes, you will hit problems with drivers such as *Pac-Man* that run at 60.60606Hz and may hit problems with others that are very close to but not quite 60Hz.
+* If playing MAME windowed or using the BGFX video system, you'll need to make sure that you have G-Sync/FreeSync turned on for windowed applications as well as full screen in your video driver. 
+* Be sure to leave triple buffering turned off.
+* Turning VSync on is suggested in general with G-Sync and FreeSync.
+* Low Latency Mode will not affect MAME performance with G-Sync/FreeSync.
+
+The effects of G-Sync and FreeSync will be most noticeable in drivers that run at refresh rates that are very different from normal PC refresh rates. For instance, the first three *Mortal Kombat* titles run at 54.706841Hz.

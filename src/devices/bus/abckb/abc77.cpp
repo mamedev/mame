@@ -501,7 +501,7 @@ void abc77_device::txd_w(int state)
 //  p1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( abc77_device::p1_r )
+uint8_t abc77_device::p1_r()
 {
 	/*
 
@@ -536,7 +536,7 @@ READ8_MEMBER( abc77_device::p1_r )
 //  p2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc77_device::p2_w )
+void abc77_device::p2_w(uint8_t data)
 {
 	/*
 
@@ -601,7 +601,7 @@ WRITE_LINE_MEMBER( abc77_device::prog_w )
 //  j3_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc77_device::j3_w )
+void abc77_device::j3_w(uint8_t data)
 {
 	m_j3 = data;
 }

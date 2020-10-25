@@ -67,11 +67,11 @@ public:
 	void init_v117();
 
 private:
-	DECLARE_READ8_MEMBER(porta_r);
-	DECLARE_READ8_MEMBER(portb_r);
-	DECLARE_WRITE8_MEMBER(portc_w);
-	DECLARE_WRITE8_MEMBER(disp_w);
-	DECLARE_WRITE8_MEMBER(lamp_w);
+	uint8_t porta_r();
+	uint8_t portb_r();
+	void portc_w(uint8_t data);
+	void disp_w(offs_t offset, uint8_t data);
+	void lamp_w(offs_t offset, uint8_t data);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 	uint8_t m_seg[6];
@@ -194,7 +194,7 @@ void g627_state::init_v117()
 }
 
 // inputs
-READ8_MEMBER( g627_state::porta_r )
+uint8_t g627_state::porta_r()
 {
 	if (!m_portc)
 		return ((m_motor >> 1)^m_motor) | 3; // convert to Gray Code
@@ -205,7 +205,7 @@ READ8_MEMBER( g627_state::porta_r )
 }
 
 // diagnostic keyboard
-READ8_MEMBER( g627_state::portb_r )
+uint8_t g627_state::portb_r()
 {
 	if (m_portc < 6)
 		return m_testipt[m_portc]->read();
@@ -214,7 +214,7 @@ READ8_MEMBER( g627_state::portb_r )
 }
 
 // display digits
-WRITE8_MEMBER( g627_state::portc_w )
+void g627_state::portc_w(uint8_t data)
 {
 	m_portc = data;
 	if ((m_type) && (data < 6))
@@ -239,7 +239,7 @@ WRITE8_MEMBER( g627_state::portc_w )
 }
 
 // save segments until we can write the digits
-WRITE8_MEMBER( g627_state::disp_w )
+void g627_state::disp_w(offs_t offset, uint8_t data)
 {
 	static const uint8_t patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0 }; // 7448
 	offset <<= 1;
@@ -248,7 +248,7 @@ WRITE8_MEMBER( g627_state::disp_w )
 }
 
 // lamps and solenoids
-WRITE8_MEMBER( g627_state::lamp_w )
+void g627_state::lamp_w(offs_t offset, uint8_t data)
 {
 /* offset 0 together with m_portc activates the lamps.
    offset 1 and 2 are solenoids.

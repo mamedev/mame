@@ -39,8 +39,6 @@ rx01_cpu_device::rx01_cpu_device(const machine_config &mconfig, const char *tag,
 	: cpu_device(mconfig, RX01_CPU, tag, owner, clock)
 	, m_inst_config("program", ENDIANNESS_LITTLE, 8, 12, 0)
 	, m_data_config("sector data", ENDIANNESS_LITTLE, 8, 10, 0) // actually 1 bit wide
-	, m_inst_cache(nullptr)
-	, m_data_cache(nullptr)
 	, m_pc(0)
 	, m_ppc(0)
 	, m_mb(0)
@@ -77,8 +75,8 @@ device_memory_interface::space_config_vector rx01_cpu_device::memory_space_confi
 
 void rx01_cpu_device::device_start()
 {
-	m_inst_cache = space(AS_PROGRAM).cache<0, 0, ENDIANNESS_LITTLE>();
-	m_data_cache = space(AS_DATA).cache<0, 0, ENDIANNESS_LITTLE>();
+	space(AS_PROGRAM).cache(m_inst_cache);
+	space(AS_DATA).cache(m_data_cache);
 
 	set_icountptr(m_icount);
 
@@ -137,7 +135,7 @@ u8 rx01_cpu_device::mux_out()
 	if (BIT(m_mb, 0))
 		return m_sp[m_spar];
 	else
-		return m_inst_cache->read_byte(m_pc);
+		return m_inst_cache.read_byte(m_pc);
 }
 
 bool rx01_cpu_device::data_in()
@@ -243,7 +241,7 @@ bool rx01_cpu_device::test_condition()
 		if (m_flags & FF_WRTBUF)
 			return sec_buf_in();
 		else
-			return m_data_cache->read_byte(m_bar) & 1;
+			return m_data_cache.read_byte(m_bar) & 1;
 
 	case 074:
 		// Flag state equals one
@@ -259,7 +257,7 @@ bool rx01_cpu_device::test_condition()
 void rx01_cpu_device::set_bar(u16 bar)
 {
 	if (m_bar != bar && (m_flags & FF_WRTBUF))
-		m_data_cache->write_byte(m_bar, sec_buf_in());
+		m_data_cache.write_byte(m_bar, sec_buf_in());
 	m_bar = bar;
 }
 
@@ -303,7 +301,7 @@ void rx01_cpu_device::execute_run()
 				m_ppc = m_pc;
 				debugger_instruction_hook(m_pc);
 
-				m_mb = m_inst_cache->read_byte(m_pc);
+				m_mb = m_inst_cache.read_byte(m_pc);
 				m_pc = (m_pc + 1) & 03777;
 			}
 
@@ -398,7 +396,7 @@ void rx01_cpu_device::execute_run()
 					m_flags |= FF_WRTBUF;
 				else if (m_flags & FF_WRTBUF)
 				{
-					m_data_cache->write_byte(m_bar, sec_buf_in());
+					m_data_cache.write_byte(m_bar, sec_buf_in());
 					m_flags &= ~FF_WRTBUF;
 				}
 				break;

@@ -51,12 +51,14 @@ void ppu_sh6578_device::ppu_internal_map(address_map& map)
 
 void ppu_sh6578_device::device_start()
 {
-	ppu2c0x_device::device_start();
+	start_nopalram();
 
 	m_palette_ram.resize(0x40);
 
 	for (int i = 0; i < 0x40; i++)
 		m_palette_ram[i] = 0x00;
+
+	save_item(NAME(m_palette_ram));
 }
 
 void ppu_sh6578_device::device_reset()
@@ -89,7 +91,7 @@ void ppu_sh6578_device::scanline_increment_fine_ycounter()
 void ppu_sh6578_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_rgb32& bitmap)
 {
 	uint8_t palval = m_palette_ram[(pixel_data | color << 2)] & 0x3f;
-	bitmap.pix32(m_scanline, sprite_xpos + pixel) = this->pen(palval);
+	bitmap.pix(m_scanline, sprite_xpos + pixel) = m_nespens[palval];
 }
 
 void ppu_sh6578_device::read_tile_plane_data(int address, int color)
@@ -97,15 +99,25 @@ void ppu_sh6578_device::read_tile_plane_data(int address, int color)
 	m_planebuf[0] = readbyte(address);
 	m_planebuf[1] = readbyte(address + 8);
 
-	m_extplanebuf[0] = readbyte(address + 16);
-	m_extplanebuf[1] = readbyte(address + 24);
+	if (m_colsel_pntstart & 0x80)
+	{
+		m_extplanebuf[0] = readbyte(address + 16);
+		m_extplanebuf[1] = readbyte(address + 24);
+	}
 }
 
-void ppu_sh6578_device::draw_tile(uint8_t* line_priority, int color_byte, int color_bits, int address, int start_x, pen_t back_pen, uint32_t*& dest, const pen_t* color_table)
+void ppu_sh6578_device::draw_tile(uint8_t* line_priority, int color_byte, int color_bits, int address, int start_x, uint32_t back_pen, uint32_t*& dest)
 {
 	int color = color_byte;
 
-	color &= 0xc;
+	if (m_colsel_pntstart & 0x80)
+	{
+		color &= 0xc;
+	}
+	else
+	{
+		color &= 0xf;
+	}
 
 	read_tile_plane_data(address, color);
 
@@ -116,19 +128,29 @@ void ppu_sh6578_device::draw_tile(uint8_t* line_priority, int color_byte, int co
 
 		pix =  ((m_planebuf[0] & 0x80) >> 7);
 		pix |= ((m_planebuf[1] & 0x80) >> 6);
-		pix |= ((m_extplanebuf[0] & 0x80) >> 5);
-		pix |= ((m_extplanebuf[1] & 0x80) >> 4);
+
+		if (m_colsel_pntstart & 0x80)
+		{
+			pix |= ((m_extplanebuf[0] & 0x80) >> 5);
+			pix |= ((m_extplanebuf[1] & 0x80) >> 4);
+		}
 
 		m_planebuf[0] <<= 1;
 		m_planebuf[1] <<= 1;
-		m_extplanebuf[0] <<= 1;
-		m_extplanebuf[1] <<= 1;
+
+		if (m_colsel_pntstart & 0x80)
+		{
+			m_extplanebuf[0] <<= 1;
+			m_extplanebuf[1] <<= 1;
+		}
 
 		if ((start_x + i) >= 0 && (start_x + i) < VISIBLE_SCREEN_WIDTH)
 		{
 			pen_t pen;
 
-			uint8_t palval = m_palette_ram[(pix | color << 2)] & 0x3f;
+			uint8_t palval;
+
+			palval = m_palette_ram[(pix | color << 2)] & 0x3f;
 
 			bool trans = false;
 			if ((palval & 0x1f) == 0x1f)
@@ -136,12 +158,12 @@ void ppu_sh6578_device::draw_tile(uint8_t* line_priority, int color_byte, int co
 
 			if (!trans)
 			{
-				pen = this->pen(palval);
+				pen = m_nespens[palval];
 			}
 			else
 			{
 				uint8_t palval = m_palette_ram[0x0] & 0x3f;
-				pen = this->pen(palval);
+				pen = m_nespens[palval];
 			}
 
 			*dest = pen;
@@ -158,23 +180,24 @@ void ppu_sh6578_device::draw_background(uint8_t* line_priority)
 {
 	bitmap_rgb32& bitmap = *m_bitmap;
 
-	uint8_t color_mask;
-	const pen_t* color_table;
+	uint8_t color_mask = 0xff;
+	//const pen_t* color_table;
 
 	/* setup the color mask and colortable to use */
+
+	//TODO FIX
 	if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
 	{
 		color_mask = 0xf0;
-		color_table = m_colortable_mono.get();
 	}
 	else
 	{
 		color_mask = 0xff;
-		color_table = m_colortable.get();
 	}
 
+
 	/* cache the background pen */
-	pen_t back_pen = pen(m_back_color & color_mask);
+	pen_t back_pen = m_nespens[m_back_color & color_mask];
 
 	/* determine where in the nametable to start drawing from */
 	/* based on the current scanline and scroll regs */
@@ -190,7 +213,7 @@ void ppu_sh6578_device::draw_background(uint8_t* line_priority)
 
 	/* set up dest */
 	int start_x = (m_x_fine ^ 0x07) - 7;
-	uint32_t* dest = &bitmap.pix32(m_scanline, start_x);
+	uint32_t* dest = &bitmap.pix(m_scanline, start_x);
 
 	m_tilecount = 0;
 
@@ -225,7 +248,7 @@ void ppu_sh6578_device::draw_background(uint8_t* line_priority)
 			// plus something that accounts for y
 			address += scroll_y_fine;
 
-			draw_tile(line_priority, (color_byte >> 4) & 0xf, 0, address, start_x, back_pen, dest, color_table);
+			draw_tile(line_priority, (color_byte >> 4) & 0xf, 0, address, start_x, back_pen, dest);
 
 			start_x += 8;
 
@@ -243,7 +266,7 @@ void ppu_sh6578_device::draw_background(uint8_t* line_priority)
 	/* if the left 8 pixels for the background are off, blank 'em */
 	if (!(m_regs[PPU_CONTROL1] & PPU_CONTROL1_BACKGROUND_L8))
 	{
-		dest = &bitmap.pix32(m_scanline);
+		dest = &bitmap.pix(m_scanline);
 		for (int i = 0; i < 8; i++)
 		{
 			*(dest++) = back_pen;

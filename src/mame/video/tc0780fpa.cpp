@@ -52,8 +52,8 @@ void tc0780fpa_renderer::render_solid_scan(int32_t scanline, const extent_t &ext
 	float z = extent.param[0].start;
 	int color = extent.param[1].start;
 	float dz = extent.param[0].dpdx;
-	uint16_t *fb = &m_fb[m_current_fb]->pix16(scanline);
-	uint16_t *zb = &m_zb->pix16(scanline);
+	uint16_t *const fb = &m_fb[m_current_fb]->pix(scanline);
+	uint16_t *const zb = &m_zb->pix(scanline);
 
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
@@ -75,8 +75,8 @@ void tc0780fpa_renderer::render_shade_scan(int32_t scanline, const extent_t &ext
 	float color = extent.param[1].start;
 	float dz = extent.param[0].dpdx;
 	float dcolor = extent.param[1].dpdx;
-	uint16_t *fb = &m_fb[m_current_fb]->pix16(scanline);
-	uint16_t *zb = &m_zb->pix16(scanline);
+	uint16_t *const fb = &m_fb[m_current_fb]->pix(scanline);
+	uint16_t *const zb = &m_zb->pix(scanline);
 
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
@@ -104,8 +104,8 @@ void tc0780fpa_renderer::render_texture_scan(int32_t scanline, const extent_t &e
 	float du = extent.param[1].dpdx;
 	float dv = extent.param[2].dpdx;
 	float dcolor = extent.param[3].dpdx;
-	uint16_t *fb = &m_fb[m_current_fb]->pix16(scanline);
-	uint16_t *zb = &m_zb->pix16(scanline);
+	uint16_t *const fb = &m_fb[m_current_fb]->pix(scanline);
+	uint16_t *const zb = &m_zb->pix(scanline);
 	int tex_wrap_x = extradata.tex_wrap_x;
 	int tex_wrap_y = extradata.tex_wrap_y;
 	int tex_base_x = extradata.tex_base_x;
@@ -440,12 +440,12 @@ void tc0780fpa_device::device_stop()
     DEVICE HANDLERS
 *****************************************************************************/
 
-READ16_MEMBER(tc0780fpa_device::tex_addr_r)
+uint16_t tc0780fpa_device::tex_addr_r()
 {
 	return m_tex_address;
 }
 
-WRITE16_MEMBER(tc0780fpa_device::tex_addr_w)
+void tc0780fpa_device::tex_addr_w(uint16_t data)
 {
 	m_tex_address = data;
 
@@ -455,7 +455,7 @@ WRITE16_MEMBER(tc0780fpa_device::tex_addr_w)
 	m_tex_offset = 0;
 }
 
-WRITE16_MEMBER(tc0780fpa_device::tex_w)
+void tc0780fpa_device::tex_w(uint16_t data)
 {
 	int x = ((m_tex_offset >> 0) & 0x1f) | ((m_tex_offset >> 5) & 0x20);
 	int y = ((m_tex_offset >> 5) & 0x1f) | ((m_tex_offset >> 6) & 0x20);
@@ -466,7 +466,7 @@ WRITE16_MEMBER(tc0780fpa_device::tex_w)
 	m_tex_offset++;
 }
 
-WRITE16_MEMBER(tc0780fpa_device::poly_fifo_w)
+void tc0780fpa_device::poly_fifo_w(uint16_t data)
 {
 	assert (m_poly_fifo_ptr < POLY_FIFO_SIZE); // never happens
 	m_poly_fifo[m_poly_fifo_ptr++] = data;
@@ -482,7 +482,7 @@ WRITE16_MEMBER(tc0780fpa_device::poly_fifo_w)
 
 }
 
-WRITE16_MEMBER(tc0780fpa_device::render_w)
+void tc0780fpa_device::render_w(uint16_t data)
 {
 }
 

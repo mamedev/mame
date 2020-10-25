@@ -63,11 +63,11 @@ private:
 
 	// address space
 	const address_space_config m_program_config;
-	address_space *            m_program;
+	memory_access<23, 0, 0, ENDIANNESS_BIG>::specific m_program;
 
 	// cpu interfaces
 	required_device<cpu_device> m_cpuexec[2];
-	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cpucache[2];
+	memory_access<23, 0, 0, ENDIANNESS_BIG>::cache m_cpucache[2];
 
 	required_device<watchdog_timer_device> m_watchdog;
 };

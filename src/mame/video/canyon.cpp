@@ -10,7 +10,7 @@ Atari Canyon Bomber video emulation
 #include "includes/canyon.h"
 
 
-WRITE8_MEMBER(canyon_state::canyon_videoram_w)
+void canyon_state::canyon_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);

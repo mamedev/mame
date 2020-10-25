@@ -96,9 +96,9 @@ DEFINE_DEVICE_TYPE(COP446C, cop446c_cpu_device, "cop446c", "National Semiconduct
     MACROS
 ***************************************************************************/
 
-#define ROM(a)          m_cache->read_byte(a)
-#define RAM_R(a)        m_data->read_byte(a)
-#define RAM_W(a, v)     m_data->write_byte(a, v)
+#define ROM(a)          m_program.read_byte(a)
+#define RAM_R(a)        m_data.read_byte(a)
+#define RAM_W(a, v)     m_data.write_byte(a, v)
 
 #define IN_G()          (m_read_g(0, 0xff) & m_g_mask)
 #define IN_L()          m_read_l(0, 0xff)
@@ -1073,9 +1073,8 @@ void cop400_cpu_device::device_timer(emu_timer &timer, device_timer_id id, int p
 void cop400_cpu_device::device_start()
 {
 	/* find address spaces */
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
-	m_data = &space(AS_DATA);
+	space(AS_PROGRAM).cache(m_program);
+	space(AS_DATA).specific(m_data);
 
 	/* find i/o handlers */
 	m_read_l.resolve_safe(0);
@@ -1125,7 +1124,7 @@ void cop400_cpu_device::device_start()
 	save_item(NAME(m_second_byte));
 
 	// setup debugger state display
-	offs_t pc_mask = m_program->addrmask();
+	offs_t pc_mask = m_program.space().addrmask();
 
 	using namespace std::placeholders;
 	state_add(STATE_GENPC, "GENPC", m_pc).mask(pc_mask).noshow();
@@ -1330,7 +1329,7 @@ void cop400_cpu_device::set_flags(uint8_t flags)
 	m_skl = BIT(flags, 0);
 }
 
-uint8_t cop400_cpu_device::get_m() const
+uint8_t cop400_cpu_device::get_m()
 {
 	auto dis = machine().disable_side_effects();
 	return RAM_R(B);

@@ -307,7 +307,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namconb1_state::scantimer)
 	}
 
 	// Handle POSIRQ
-	uint32_t posirq_scanline = m_c116->get_reg(5) - 32;
+	u32 posirq_scanline = m_c116->get_reg(5) - 32;
 
 	if (scanline == posirq_scanline)
 	{
@@ -339,7 +339,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namconb1_state::mcu_irq2_cb)
 
 /****************************************************************************/
 
-WRITE8_MEMBER(namconb1_state::namconb1_cpureg_w)
+void namconb1_state::namconb1_cpureg_w(offs_t offset, u8 data)
 {
 	/**
 	 * 400000 0x00
@@ -426,7 +426,7 @@ WRITE8_MEMBER(namconb1_state::namconb1_cpureg_w)
 }
 
 
-WRITE8_MEMBER(namconb1_state::namconb2_cpureg_w)
+void namconb1_state::namconb2_cpureg_w(offs_t offset, u8 data)
 {
 	/**
 	 * f00000 VBL IRQ enable/level
@@ -514,7 +514,7 @@ WRITE8_MEMBER(namconb1_state::namconb2_cpureg_w)
 }
 
 
-READ8_MEMBER(namconb1_state::namconb1_cpureg_r)
+u8 namconb1_state::namconb1_cpureg_r(offs_t offset)
 {
 	// 16: Watchdog
 	if (ENABLE_LOGGING)
@@ -527,7 +527,7 @@ READ8_MEMBER(namconb1_state::namconb1_cpureg_r)
 }
 
 
-READ8_MEMBER(namconb1_state::namconb2_cpureg_r)
+u8 namconb1_state::namconb2_cpureg_r(offs_t offset)
 {
 	// 14: Watchdog
 	if (ENABLE_LOGGING)
@@ -542,14 +542,14 @@ READ8_MEMBER(namconb1_state::namconb2_cpureg_r)
 
 /****************************************************************************/
 
-READ32_MEMBER(namconb1_state::custom_key_r)
+u32 namconb1_state::custom_key_r(offs_t offset)
 {
-	uint16_t old_count = m_count;
+	u16 old_count = m_count;
 
 	do
 	{ /* pick a random number, but don't pick the same twice in a row */
 		m_count = machine().rand();
-	} while( m_count==old_count );
+	} while (m_count == old_count);
 
 	switch (m_gametype)
 	{
@@ -572,23 +572,23 @@ READ32_MEMBER(namconb1_state::custom_key_r)
 		switch (offset)
 		{
 			case 0: return 0x0189;
-			case 1: return  m_count<<16;
+			case 1: return  m_count << 16;
 		}
 		break;
 
 	case NAMCONB1_SWS96:
 		switch (offset)
 		{
-			case 0: return 0x01aa<<16;
-			case 4: return m_count<<16;
+			case 0: return 0x01aa << 16;
+			case 4: return m_count << 16;
 		}
 		break;
 
 	case NAMCONB1_SWS97:
 		switch (offset)
 		{
-			case 2: return 0x1b2<<16;
-			case 5: return m_count<<16;
+			case 2: return 0x1b2 << 16;
+			case 5: return m_count << 16;
 		}
 		break;
 
@@ -596,7 +596,7 @@ READ32_MEMBER(namconb1_state::custom_key_r)
 		switch (offset)
 		{
 			case 0: return 0x0167;
-			case 1: return m_count<<16;
+			case 1: return m_count << 16;
 		}
 		break;
 
@@ -604,7 +604,7 @@ READ32_MEMBER(namconb1_state::custom_key_r)
 		switch (offset)
 		{
 		case 1: return 0;
-		case 3: return (0x0171<<16) | m_count;
+		case 3: return (0x0171 << 16) | m_count;
 		}
 		break;
 
@@ -619,8 +619,8 @@ READ32_MEMBER(namconb1_state::custom_key_r)
 	case NAMCONB1_VSHOOT:
 		switch (offset)
 		{
-			case 2: return m_count<<16;
-			case 3: return 0x0170<<16;
+			case 2: return m_count << 16;
+			case 3: return 0x0170 << 16;
 		}
 		break;
 
@@ -628,7 +628,7 @@ READ32_MEMBER(namconb1_state::custom_key_r)
 		switch (offset)
 		{
 			case 0: return 0x0186;
-			case 1: return m_count<<16;
+			case 1: return m_count << 16;
 		}
 		break;
 
@@ -643,26 +643,26 @@ READ32_MEMBER(namconb1_state::custom_key_r)
 /***************************************************************/
 
 
-READ32_MEMBER(namconb1_state::gunbulet_gun_r)
+u32 namconb1_state::gunbulet_gun_r(offs_t offset)
 {
 	int result = 0;
 
 	switch (offset)
 	{
-		case 0: case 1: result = (uint8_t)(0x0f + m_light1_y->read() * 224/255); break; /* Y (p2) */
-		case 2: case 3: result = (uint8_t)(0x26 + m_light1_x->read() * 288/314); break; /* X (p2) */
-		case 4: case 5: result = (uint8_t)(0x0f + m_light0_y->read() * 224/255); break; /* Y (p1) */
-		case 6: case 7: result = (uint8_t)(0x26 + m_light0_x->read() * 288/314); break; /* X (p1) */
+		case 0: case 1: result = (u8)(0x0f + m_light1_y->read() * 224/255); break; /* Y (p2) */
+		case 2: case 3: result = (u8)(0x26 + m_light1_x->read() * 288/314); break; /* X (p2) */
+		case 4: case 5: result = (u8)(0x0f + m_light0_y->read() * 224/255); break; /* Y (p1) */
+		case 6: case 7: result = (u8)(0x26 + m_light0_x->read() * 288/314); break; /* X (p1) */
 	}
 	return result<<24;
 } /* gunbulet_gun_r */
 
-READ32_MEMBER(namconb1_state::randgen_r)
+u32 namconb1_state::randgen_r()
 {
 	return machine().rand();
 } /* randgen_r */
 
-WRITE32_MEMBER(namconb1_state::srand_w)
+void namconb1_state::srand_w(u32 data)
 {
 	/**
 	 * Used to seed the hardware random number generator.
@@ -670,17 +670,17 @@ WRITE32_MEMBER(namconb1_state::srand_w)
 	 */
 } /* srand_w */
 
-READ32_MEMBER(namconb1_state::share_r)
+u32 namconb1_state::share_r(offs_t offset)
 {
-	return (m_namconb_shareram[offset*2] << 16) | m_namconb_shareram[offset*2+1];
+	return (m_namconb_shareram[offset * 2] << 16) | m_namconb_shareram[offset * 2 + 1];
 }
 
-WRITE32_MEMBER(namconb1_state::share_w)
+void namconb1_state::share_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	COMBINE_DATA(m_namconb_shareram+offset*2+1);
+	COMBINE_DATA(m_namconb_shareram + offset * 2 + 1);
 	data >>= 16;
 	mem_mask >>= 16;
-	COMBINE_DATA(m_namconb_shareram+offset*2);
+	COMBINE_DATA(m_namconb_shareram + offset  *2);
 }
 
 void namconb1_state::namconb1_am(address_map &map)
@@ -726,7 +726,7 @@ void namconb1_state::namconb2_am(address_map &map)
 	map(0xf00000, 0xf0001f).rw(FUNC(namconb1_state::namconb2_cpureg_r), FUNC(namconb1_state::namconb2_cpureg_w));
 }
 
-WRITE16_MEMBER(namconb1_state::mcu_shared_w)
+void namconb1_state::mcu_shared_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	// HACK!  Many games data ROM routines redirect the vector from the sound command read to an RTS.
 	// This needs more investigation.  nebulray and vshoot do NOT do this.
@@ -755,17 +755,17 @@ void namconb1_state::namcoc75_am(address_map &map)
 }
 
 
-READ8_MEMBER(namconb1_state::port6_r)
+uint8_t namconb1_state::port6_r()
 {
 	return m_port6;
 }
 
-WRITE8_MEMBER(namconb1_state::port6_w)
+void namconb1_state::port6_w(uint8_t data)
 {
 	m_port6 = data;
 }
 
-READ8_MEMBER(namconb1_state::port7_r)
+uint8_t namconb1_state::port7_r()
 {
 	switch (m_port6 & 0xf0)
 	{
@@ -792,9 +792,9 @@ READ8_MEMBER(namconb1_state::port7_r)
 // so the 8 bits of player 3 got routed to the 8 analog inputs.  +5V on the analog input will
 // register full scale, so it works...
 template <int Bit>
-uint16_t namconb1_state::dac_bit_r()
+u16 namconb1_state::dac_bit_r()
 {
-	return (m_p3.read_safe(0xff)<<(7-Bit))&0x80;
+	return (m_p3.read_safe(0xff) << (7 - Bit)) & 0x80;
 }
 
 
@@ -955,10 +955,10 @@ void namconb1_state::machine_reset()
 
 void namconb1_state::namconb1(machine_config &config)
 {
-	M68EC020(config, m_maincpu, MASTER_CLOCK/2);
+	M68EC020(config, m_maincpu, MASTER_CLOCK / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namconb1_state::namconb1_am);
 
-	NAMCO_C75(config, m_mcu, MASTER_CLOCK/3);
+	NAMCO_C75(config, m_mcu, MASTER_CLOCK / 3);
 	m_mcu->set_addrmap(AS_PROGRAM, &namconb1_state::namcoc75_am);
 	m_mcu->p6_in_cb().set(FUNC(namconb1_state::port6_r));
 	m_mcu->p6_out_cb().set(FUNC(namconb1_state::port6_w));
@@ -981,9 +981,9 @@ void namconb1_state::namconb1(machine_config &config)
 	TIMER(config, "mcu_irq2").configure_periodic(FUNC(namconb1_state::mcu_irq2_cb), attotime::from_hz(60));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(MASTER_CLOCK/8, 384, 0, 288, 264, 0, 224);
+	m_screen->set_raw(MASTER_CLOCK / 8, 384, 0, 288, 264, 0, 224);
 	m_screen->set_screen_update(FUNC(namconb1_state::screen_update_namconb1));
-	m_screen->screen_vblank().set(m_c355spr, FUNC(namco_c355spr_device::vblank));
+	m_screen->screen_vblank().set(FUNC(namconb1_state::screen_vblank));
 	m_screen->set_palette(m_c116);
 
 	NAMCO_C355SPR(config, m_c355spr, 0);
@@ -1002,8 +1002,6 @@ void namconb1_state::namconb1(machine_config &config)
 
 	NAMCO_C116(config, m_c116, 0);
 	m_c116->enable_shadows();
-
-	MCFG_VIDEO_START_OVERRIDE(namconb1_state,namconb1)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -1026,7 +1024,7 @@ void namconb1_state::namconb2(machine_config &config)
 	NAMCO_C169ROZ(config, m_c169roz, 0);
 	m_c169roz->set_palette(m_c116);
 	m_c169roz->set_is_namcofl(false);
-	m_c169roz->set_ram_words(0x20000/2);
+	m_c169roz->set_ram_words(0x20000 / 2);
 	m_c169roz->set_color_base(0x1800);
 }
 
@@ -1039,8 +1037,6 @@ void namconb1_state::machbrkr(machine_config &config)
 	m_c169roz->set_tile_callback(namco_c169roz_device::c169_tilemap_delegate(&namconb1_state::NB2RozCB_machbrkr, this));
 
 	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&namconb1_state::NB2objcode2tile_machbrkr, this));
-
-	MCFG_VIDEO_START_OVERRIDE(namconb1_state,machbrkr)
 }
 
 void namconb1_state::outfxies(machine_config &config)
@@ -1052,8 +1048,6 @@ void namconb1_state::outfxies(machine_config &config)
 	m_c169roz->set_tile_callback(namco_c169roz_device::c169_tilemap_delegate(&namconb1_state::NB2RozCB_outfxies, this));
 
 	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&namconb1_state::NB2objcode2tile_outfxies, this));
-
-	MCFG_VIDEO_START_OVERRIDE(namconb1_state,outfxies)
 }
 
 

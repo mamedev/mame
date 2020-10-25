@@ -67,20 +67,20 @@ void citycon_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(citycon_state::citycon_videoram_w)
+void citycon_state::citycon_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(citycon_state::citycon_linecolor_w)
+void citycon_state::citycon_linecolor_w(offs_t offset, uint8_t data)
 {
 	m_linecolor[offset] = data;
 }
 
 
-WRITE8_MEMBER(citycon_state::citycon_background_w)
+void citycon_state::citycon_background_w(uint8_t data)
 {
 	/* bits 4-7 control the background image */
 	if (m_bg_image != (data >> 4))

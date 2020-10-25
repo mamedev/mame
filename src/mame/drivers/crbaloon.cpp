@@ -58,7 +58,7 @@ void crbaloon_state::pc3092_update()
 }
 
 
-WRITE8_MEMBER(crbaloon_state::pc3092_w)
+void crbaloon_state::pc3092_w(offs_t offset, uint8_t data)
 {
 	m_pc3092_data[offset] = data & 0x0f;
 
@@ -114,7 +114,7 @@ void crbaloon_state::pc3259_update(void)
 }
 
 
-READ8_MEMBER(crbaloon_state::pc3259_r)
+uint8_t crbaloon_state::pc3259_r(offs_t offset)
 {
 	uint8_t ret = 0;
 	uint8_t reg = offset >> 2;
@@ -155,7 +155,7 @@ READ8_MEMBER(crbaloon_state::pc3259_r)
  *
  *************************************/
 
-WRITE8_MEMBER(crbaloon_state::port_sound_w)
+void crbaloon_state::port_sound_w(uint8_t data)
 {
 	/* D0 - interrupt enable - also goes to PC3259 as /HTCTRL */
 	m_irq_mask = data & 0x01;
@@ -165,7 +165,7 @@ WRITE8_MEMBER(crbaloon_state::port_sound_w)
 	machine().sound().system_enable((data & 0x02) ? true : false);
 
 	/* D2 - unlabeled - music enable */
-	crbaloon_audio_set_music_enable(space, 0, (data & 0x04) ? true : false);
+	crbaloon_audio_set_music_enable((data & 0x04) ? true : false);
 
 	/* D3 - EXPLOSION */
 	crbaloon_audio_set_explosion_enable((data & 0x08) ? true : false);
@@ -177,7 +177,7 @@ WRITE8_MEMBER(crbaloon_state::port_sound_w)
 	crbaloon_audio_set_appear_enable((data & 0x20) ? true : false);
 
 	/* D6 - unlabeled - laugh enable */
-	crbaloon_audio_set_laugh_enable(space, 0, (data & 0x40) ? true : false);
+	crbaloon_audio_set_laugh_enable((data & 0x40) ? true : false);
 
 	/* D7 - unlabeled - goes to PC3259 pin 16 */
 
@@ -339,11 +339,9 @@ GFXDECODE_END
 
 void crbaloon_state::machine_reset()
 {
-	address_space &space = m_maincpu->space(AS_IO);
-
 	pc3092_reset();
-	port_sound_w(space, 0, 0);
-	crbaloon_audio_set_music_freq(space, 0, 0);
+	port_sound_w(0);
+	crbaloon_audio_set_music_freq(0);
 }
 
 

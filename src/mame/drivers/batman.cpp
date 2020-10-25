@@ -49,7 +49,7 @@ void batman_state::machine_start()
  *
  *************************************/
 
-WRITE16_MEMBER(batman_state::latch_w)
+void batman_state::latch_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int oldword = m_latch_data;
 	COMBINE_DATA(&m_latch_data);

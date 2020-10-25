@@ -11,7 +11,7 @@ DEFINE_DEVICE_TYPE(SWP20, swp20_device, "swp20", "Yamaha SWP20 sound chip")
 swp20_device::swp20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SWP20, tag, owner, clock),
 	  device_sound_interface(mconfig, *this),
-	  device_rom_interface(mconfig, *this, 23+2, ENDIANNESS_LITTLE, 16)
+	  device_rom_interface(mconfig, *this)
 {
 }
 
@@ -69,7 +69,8 @@ void swp20_device::snd_w(offs_t offset, u8 data)
 	logerror("w %02x, %02x %s\n", offset, data, machine().describe_context());
 }
 
-void swp20_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void swp20_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
+	outputs[0].fill(0);
 }
 

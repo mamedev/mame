@@ -99,6 +99,13 @@ Adaptec AHA-1540CF/1542CF Installation Guide
 http://download.adaptec.com/pdfs/installation_guides/aha1540cf_ig.pdf
  */
 
+/*
+Adaptec QFP ASICs
+— AHA-1540/42C: AIC-???? (covered by sticker)
+— AHA-1540/42CP: AIC-7970Q
+— AHA-1540/42CF: AIC-3370P, AIC-???? (covered by sticker)
+*/
+
 #include "emu.h"
 #include "aha1542c.h"
 #include "cpu/z80/z80.h"
@@ -141,7 +148,7 @@ http://download.adaptec.com/pdfs/installation_guides/aha1540cf_ig.pdf
 #define CMD_NOP         0x00    // No operation
 #define CMD_MBINIT      0x01    // mailbox initialization
 #define CMD_START_SCSI  0x02    // Start SCSI command
-#define CMD_BIOSCMD     0x03    // undocumented BIOS conmmand (shadow RAM etc.)
+#define CMD_BIOSCMD     0x03    // undocumented BIOS command (shadow RAM etc.)
 #define CMD_INQUIRY     0x04    // Adapter inquiry
 #define CMD_EMBOI       0x05    // enable Mailbox Out Interrupt
 #define CMD_SELTIMEOUT  0x06    // Set SEL timeout
@@ -165,13 +172,13 @@ DEFINE_DEVICE_TYPE(AHA1542CP, aha1542cp_device, "aha1542cp", "AHA-1542CP SCSI Co
 
 #define Z84C0010_TAG "z84c0010"
 
-READ8_MEMBER( aha1542c_device::aha1542_r )
+u8 aha1542c_device::aha1542_r(offs_t offset)
 {
 	logerror("%s aha1542_r(): offset=%d\n", machine().describe_context(), offset);
 	return 0xff;
 }
 
-WRITE8_MEMBER( aha1542c_device::aha1542_w )
+void aha1542c_device::aha1542_w(offs_t offset, u8 data)
 {
 	logerror("%s aha1542_w(): offset=%d data=0x%02x\n", machine().describe_context(), offset, data);
 }
@@ -378,8 +385,8 @@ void aha1542c_device::device_start()
 	set_isa_device();
 	m_isa->install_rom(this, 0xdc000, 0xdffff, "aha1542", "aha1542");
 	m_isa->install_device(0x330, 0x333,
-			read8_delegate(*this, FUNC(aha1542cf_device::aha1542_r)),
-			write8_delegate(*this, FUNC(aha1542cf_device::aha1542_w)));
+			read8sm_delegate(*this, FUNC(aha1542cf_device::aha1542_r)),
+			write8sm_delegate(*this, FUNC(aha1542cf_device::aha1542_w)));
 }
 
 

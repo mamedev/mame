@@ -35,14 +35,14 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_WRITE16_MEMBER(soundcmd_w);
-	DECLARE_WRITE16_MEMBER(fg_vram_w);
-	DECLARE_WRITE16_MEMBER(tx_vram_w);
+	void soundcmd_w(u16 data);
+	void fg_vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void tx_vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void fg_scrolly_w(offs_t offset, u16 data, u16 mem_mask);
 	void fg_scrollx_w(offs_t offset, u16 data, u16 mem_mask);
 	void bg_scrolly_w(offs_t offset, u16 data, u16 mem_mask);
 	void bg_scrollx_w(offs_t offset, u16 data, u16 mem_mask);
-	DECLARE_WRITE8_MEMBER(upd_port_w);
+	void upd_port_w(u8 data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);

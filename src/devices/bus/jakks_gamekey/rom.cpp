@@ -45,34 +45,34 @@ jakks_gamekey_rom_i2c_24lc04_device::jakks_gamekey_rom_i2c_24lc04_device(const m
 
 // plain
 
-READ16_MEMBER(jakks_gamekey_rom_plain_device::read_cart)
+uint16_t jakks_gamekey_rom_plain_device::read_cart(offs_t offset)
 {
-	return read_rom(space, offset, mem_mask);
+	return read_rom(offset);
 }
 
-READ16_MEMBER(jakks_gamekey_rom_plain_device::read_rom)
+uint16_t jakks_gamekey_rom_plain_device::read_rom(offs_t offset)
 {
 	return m_rom[offset & (m_rom_size-1)];
 }
 
-WRITE16_MEMBER(jakks_gamekey_rom_plain_device::write_cart)
+void jakks_gamekey_rom_plain_device::write_cart(offs_t offset, uint16_t data)
 {
-	write_rom(space, offset, data, mem_mask);
+	write_rom(offset, data);
 }
 
-WRITE16_MEMBER(jakks_gamekey_rom_plain_device::write_rom)
+void jakks_gamekey_rom_plain_device::write_rom(offs_t offset, uint16_t data)
 {
-	logerror("jakks_gamekey_rom_plain_device::write_rom %08x %02x\n", offset, data);
+	logerror("jakks_gamekey_rom_plain_device::write_rom %08x %04x\n", offset, data);
 }
 
 // i2c base
 
-WRITE16_MEMBER(jakks_gamekey_rom_i2c_base_device::write_rom)
+void jakks_gamekey_rom_i2c_base_device::write_rom(offs_t offset, uint16_t data)
 {
-	logerror("jakks_gamekey_rom_i2c_base_device::write_rom %08x %02x\n", offset, data);
+	logerror("jakks_gamekey_rom_i2c_base_device::write_rom %08x %04x\n", offset, data);
 }
 
-READ16_MEMBER(jakks_gamekey_rom_i2c_base_device::read_rom)
+uint16_t jakks_gamekey_rom_i2c_base_device::read_rom(offs_t offset)
 {
 	return m_rom[offset & (m_rom_size - 1)];
 }
@@ -84,7 +84,7 @@ uint8_t jakks_gamekey_rom_i2c_base_device::read_cart_seeprom(void)
 	return m_i2cmem->read_sda();
 }
 
-WRITE16_MEMBER(jakks_gamekey_rom_i2c_base_device::write_cart_seeprom)
+void jakks_gamekey_rom_i2c_base_device::write_cart_seeprom(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (BIT(mem_mask, 1))
 		m_i2cmem->write_scl(BIT(data, 1));

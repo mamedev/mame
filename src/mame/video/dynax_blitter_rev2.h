@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "dirom.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -17,7 +18,7 @@
 
 // ======================> dynax_blitter_rev2_device
 
-class dynax_blitter_rev2_device : public device_t, public device_rom_interface
+class dynax_blitter_rev2_device : public device_t, public device_rom_interface<20>
 {
 public:
 	// construction/destruction

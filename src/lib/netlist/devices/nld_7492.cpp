@@ -3,17 +3,61 @@
 /*
  * nld_7492.cpp
  *
+ *  SN7492: Divide-by-12 Counter
+ *
+ *          +--------------+
+ *        B |1     ++    14| A
+ *       NC |2           13| NC
+ *       NC |3           12| QA
+ *       NC |4    7492   11| QD
+ *      VCC |5           10| GND
+ *      R01 |6            9| QB
+ *      R02 |7            8| QC
+ *          +--------------+
+ *
+ *          Counter Sequence
+ *
+ *          +-------++----+----+----+----+
+ *          | COUNT || QD | QC | QB | QA |
+ *          +=======++====+====+====+====+
+ *          |    0  ||  0 |  0 |  0 |  0 |
+ *          |    1  ||  0 |  0 |  0 |  1 |
+ *          |    2  ||  0 |  0 |  1 |  0 |
+ *          |    3  ||  0 |  0 |  1 |  1 |
+ *          |    4  ||  0 |  1 |  0 |  0 |
+ *          |    5  ||  0 |  1 |  0 |  1 |
+ *          |    6  ||  1 |  0 |  0 |  0 |
+ *          |    7  ||  1 |  0 |  0 |  1 |
+ *          |    8  ||  1 |  0 |  1 |  0 |
+ *          |    9  ||  1 |  0 |  1 |  1 |
+ *          |   10  ||  1 |  1 |  0 |  0 |
+ *          |   11  ||  1 |  1 |  0 |  1 |
+ *          +-------++----+----+----+----+
+ *
+ *          Note A Output QA is connected to input B
+ *
+ *          Reset Count Function table
+ *
+ *          +-----+-----++----+----+----+----+
+ *          | R01 | R02 || QD | QC | QB | QA |
+ *          +=====+=====++====+====+====+====+
+ *          |  1  |  1  ||  0 |  0 |  0 |  0 |
+ *          |  0  |  X  ||       COUNT       |
+ *          |  X  |  0  ||       COUNT       |
+ *          +-----+-----++----+----+----+----+
+ *
+ *  Naming conventions follow Texas Instruments datasheet
+ *
  */
 
-#include "nld_7492.h"
-#include "netlist/nl_base.h"
+#include "nl_base.h"
 
 namespace netlist
 {
 namespace devices
 {
 
-	static C14CONSTEXPR const std::array<netlist_time, 4> delay =
+	static constexpr const std::array<netlist_time, 4> delay =
 	{
 			NLTIME_FROM_NS(18),
 			NLTIME_FROM_NS(36) - NLTIME_FROM_NS(18),
@@ -24,10 +68,10 @@ namespace devices
 	NETLIB_OBJECT(7492)
 	{
 		NETLIB_CONSTRUCTOR(7492)
-		, m_A(*this, "A")
-		, m_B(*this, "B")
-		, m_R1(*this, "R1")
-		, m_R2(*this, "R2")
+		, m_A(*this, "A", NETLIB_DELEGATE(inputs))
+		, m_B(*this, "B", NETLIB_DELEGATE(inputs))
+		, m_R1(*this, "R1", NETLIB_DELEGATE(inputs))
+		, m_R2(*this, "R2", NETLIB_DELEGATE(inputs))
 		, m_cnt(*this, "m_cnt", 0)
 		, m_last_A(*this, "m_last_A", 0)
 		, m_last_B(*this, "m_last_B", 0)
@@ -37,13 +81,43 @@ namespace devices
 		}
 
 	private:
-		NETLIB_UPDATEI();
-		NETLIB_RESETI();
 
-		void update_outputs() noexcept
+		NETLIB_HANDLERI(inputs)
 		{
-			for (std::size_t i=0; i<4; i++)
-				m_Q[i].push((m_cnt >> i) & 1, delay[i]);
+			const netlist_sig_t new_A = m_A();
+			const netlist_sig_t new_B = m_B();
+
+			if (m_R1() & m_R2())
+			{
+				m_cnt = 0;
+				m_Q.push(0, delay);
+			}
+			else
+			{
+				if (m_last_A && !new_A)  // High - Low
+				{
+					m_cnt ^= 1;
+					m_Q[0].push(m_cnt & 1, delay[0]);
+				}
+				if (m_last_B && !new_B)  // High - Low
+				{
+					m_cnt += 2;
+					if (m_cnt == 6)
+						m_cnt = 8;
+					if (m_cnt == 14)
+						m_cnt = 0;
+					m_Q.push(m_cnt, delay);
+				}
+			}
+			m_last_A = new_A;
+			m_last_B = new_B;
+		}
+
+		NETLIB_RESETI()
+		{
+			m_cnt = 0;
+			m_last_A = 0;
+			m_last_B = 0;
 		}
 
 		logic_input_t m_A;
@@ -59,74 +133,7 @@ namespace devices
 		nld_power_pins m_power_pins;
 	};
 
-	NETLIB_OBJECT(7492_dip)
-	{
-		NETLIB_CONSTRUCTOR(7492_dip)
-		, A(*this, "A")
-		{
-			register_subalias("1", "A.B");
-			// register_subalias("2", ); --> NC
-			// register_subalias("3", ); --> NC
-
-			// register_subalias("4", ); --> NC
-			register_subalias("5", "A.VCC");
-			register_subalias("6", "A.R1");
-			register_subalias("7", "A.R2");
-
-			register_subalias("8", "A.QC");
-			register_subalias("9", "A.QB");
-			register_subalias("10", "A.GND");
-			register_subalias("11", "A.QD");
-			register_subalias("12", "A.QA");
-			// register_subalias("13", ); --> NC
-			register_subalias("14", "A.A");
-		}
-		NETLIB_RESETI() {}
-		NETLIB_UPDATEI() {}
-	private:
-		NETLIB_SUB(7492) A;
-	};
-
-	NETLIB_RESET(7492)
-	{
-		m_cnt = 0;
-		m_last_A = 0;
-		m_last_B = 0;
-	}
-
-	NETLIB_UPDATE(7492)
-	{
-		const netlist_sig_t new_A = m_A();
-		const netlist_sig_t new_B = m_B();
-
-		if (m_R1() & m_R2())
-		{
-			m_cnt = 0;
-			update_outputs();
-		}
-		else
-		{
-			if (m_last_A && !new_A)  // High - Low
-			{
-				m_cnt ^= 1;
-				m_Q[0].push(m_cnt & 1, delay[0]);
-			}
-			if (m_last_B && !new_B)  // High - Low
-			{
-				m_cnt += 2;
-				if (m_cnt == 6)
-					m_cnt = 8;
-				if (m_cnt == 14)
-					m_cnt = 0;
-				update_outputs();
-			}
-		}
-		m_last_A = new_A;
-		m_last_B = new_B;
-	}
-
 	NETLIB_DEVICE_IMPL(7492,     "TTL_7492",        "+A,+B,+R1,+R2,@VCC,@GND")
-	NETLIB_DEVICE_IMPL(7492_dip, "TTL_7492_DIP",    "")
 
 } // namespace devices
 } // namespace netlist

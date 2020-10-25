@@ -190,22 +190,22 @@ private:
 	optional_device<samples_device> m_samples;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE8_MEMBER(m63_videoram_w);
-	DECLARE_WRITE8_MEMBER(m63_colorram_w);
-	DECLARE_WRITE8_MEMBER(m63_videoram2_w);
+	void m63_videoram_w(offs_t offset, uint8_t data);
+	void m63_colorram_w(offs_t offset, uint8_t data);
+	void m63_videoram2_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pal_bank_w);
 	DECLARE_WRITE_LINE_MEMBER(m63_flipscreen_w);
 	DECLARE_WRITE_LINE_MEMBER(fghtbskt_flipscreen_w);
 	DECLARE_WRITE_LINE_MEMBER(coin1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin2_w);
-	DECLARE_WRITE8_MEMBER(snd_irq_w);
-	DECLARE_WRITE8_MEMBER(snddata_w);
-	DECLARE_WRITE8_MEMBER(p1_w);
-	DECLARE_WRITE8_MEMBER(p2_w);
-	DECLARE_READ8_MEMBER(snd_status_r);
+	void snd_irq_w(uint8_t data);
+	void snddata_w(offs_t offset, uint8_t data);
+	void p1_w(uint8_t data);
+	void p2_w(uint8_t data);
+	uint8_t snd_status_r();
 	DECLARE_READ_LINE_MEMBER(irq_r);
-	DECLARE_READ8_MEMBER(snddata_r);
-	DECLARE_WRITE8_MEMBER(fghtbskt_samples_w);
+	uint8_t snddata_r(offs_t offset);
+	void fghtbskt_samples_w(uint8_t data);
 	SAMPLES_START_CB_MEMBER(fghtbskt_sh_start);
 	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -280,19 +280,19 @@ void m63_state::m63_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(m63_state::m63_videoram_w)
+void m63_state::m63_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(m63_state::m63_colorram_w)
+void m63_state::m63_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(m63_state::m63_videoram2_w)
+void m63_state::m63_videoram2_w(offs_t offset, uint8_t data)
 {
 	m_videoram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
@@ -405,13 +405,13 @@ WRITE_LINE_MEMBER(m63_state::coin2_w)
 	machine().bookkeeping().coin_counter_w(1, state);
 }
 
-WRITE8_MEMBER(m63_state::snd_irq_w)
+void m63_state::snd_irq_w(uint8_t data)
 {
 	m_soundcpu->set_input_line(0, ASSERT_LINE);
 	machine().scheduler().synchronize();
 }
 
-WRITE8_MEMBER(m63_state::snddata_w)
+void m63_state::snddata_w(offs_t offset, uint8_t data)
 {
 	if ((m_p2 & 0xf0) == 0xe0)
 		m_ay1->address_w(offset);
@@ -425,12 +425,12 @@ WRITE8_MEMBER(m63_state::snddata_w)
 		m_sound_status = offset;
 }
 
-WRITE8_MEMBER(m63_state::p1_w)
+void m63_state::p1_w(uint8_t data)
 {
 	m_p1 = data;
 }
 
-WRITE8_MEMBER(m63_state::p2_w)
+void m63_state::p2_w(uint8_t data)
 {
 	m_p2 = data;
 	if((m_p2 & 0xf0) == 0x50)
@@ -439,7 +439,7 @@ WRITE8_MEMBER(m63_state::p2_w)
 	}
 }
 
-READ8_MEMBER(m63_state::snd_status_r)
+uint8_t m63_state::snd_status_r()
 {
 	return m_sound_status;
 }
@@ -454,7 +454,7 @@ READ_LINE_MEMBER(m63_state::irq_r)
 	return 0;
 }
 
-READ8_MEMBER(m63_state::snddata_r)
+uint8_t m63_state::snddata_r(offs_t offset)
 {
 	switch (m_p2 & 0xf0)
 	{
@@ -464,7 +464,7 @@ READ8_MEMBER(m63_state::snddata_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(m63_state::fghtbskt_samples_w)
+void m63_state::fghtbskt_samples_w(uint8_t data)
 {
 	if (data & 1)
 		m_samples->start_raw(0, m_samplebuf.get() + ((data & 0xf0) << 8), 0x2000, 8000);

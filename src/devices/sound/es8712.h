@@ -9,6 +9,7 @@
 
 #include "machine/74157.h"
 #include "sound/msm5205.h"
+#include "dirom.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -17,7 +18,7 @@
 
 // ======================> es8712_device
 
-class es8712_device : public device_t, public device_rom_interface
+class es8712_device : public device_t, public device_rom_interface<20> // TODO : 20 address bits?
 {
 public:
 	es8712_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

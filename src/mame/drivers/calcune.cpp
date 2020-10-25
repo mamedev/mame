@@ -54,10 +54,10 @@ private:
 
 	IRQ_CALLBACK_MEMBER(genesis_int_callback);
 
-	DECLARE_READ16_MEMBER(cal_700000_r);
-	DECLARE_WRITE16_MEMBER(cal_770000_w);
-	DECLARE_READ16_MEMBER(cal_vdp_r);
-	DECLARE_WRITE16_MEMBER(cal_vdp_w);
+	uint16_t cal_700000_r();
+	void cal_770000_w(uint16_t data);
+	uint16_t cal_vdp_r(offs_t offset, uint16_t mem_mask = ~0);
+	void cal_vdp_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	uint32_t screen_update_calcune(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void calcune_map(address_map &map);
@@ -94,23 +94,23 @@ static INPUT_PORTS_START( calcune )
 INPUT_PORTS_END
 
 
-READ16_MEMBER(calcune_state::cal_700000_r)
+uint16_t calcune_state::cal_700000_r()
 {
 	m_vdp_state = 0;
 	return 0;
 }
 
-WRITE16_MEMBER(calcune_state::cal_770000_w)
+void calcune_state::cal_770000_w(uint16_t data)
 {
 	m_vdp_state = data;
 }
 
-READ16_MEMBER(calcune_state::cal_vdp_r)
+uint16_t calcune_state::cal_vdp_r(offs_t offset, uint16_t mem_mask)
 {
 	return m_vdp[m_vdp_state ? 1 : 0]->vdp_r(offset, mem_mask);
 }
 
-WRITE16_MEMBER(calcune_state::cal_vdp_w)
+void calcune_state::cal_vdp_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_vdp[m_vdp_state ? 1 : 0]->vdp_w(offset, data, mem_mask);
 }
@@ -149,7 +149,7 @@ uint32_t calcune_state::screen_update_calcune(screen_device &screen, bitmap_rgb3
 	{
 		const unsigned palette_per_scanline = 64 * y;
 
-		uint32_t *dst = &bitmap.pix32(y);
+		uint32_t *const dst = &bitmap.pix(y);
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			int pix;

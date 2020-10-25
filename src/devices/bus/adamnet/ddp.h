@@ -51,10 +51,10 @@ private:
 	int m_wr1;
 	int m_track;
 
-	DECLARE_WRITE8_MEMBER( p1_w );
-	DECLARE_READ8_MEMBER( p2_r );
-	DECLARE_WRITE8_MEMBER( p2_w );
-	DECLARE_READ8_MEMBER( p4_r );
+	void p1_w(uint8_t data);
+	uint8_t p2_r();
+	void p2_w(uint8_t data);
+	uint8_t p4_r();
 
 	void adam_ddp_mem(address_map &map);
 };

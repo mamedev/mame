@@ -155,7 +155,6 @@ Tetris         -         -         -         -         EPR12169  EPR12170  -    
 #include "machine/nvram.h"
 #include "machine/segacrp2_device.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 
@@ -167,7 +166,7 @@ Tetris         -         -         -         -         EPR12169  EPR12170  -    
 //  misc_control_w - miscellaneous video controls
 //-------------------------------------------------
 
-WRITE8_MEMBER( segas16a_state::misc_control_w )
+void segas16a_state::misc_control_w(uint8_t data)
 {
 	//
 	//  PPI port B
@@ -211,7 +210,7 @@ WRITE8_MEMBER( segas16a_state::misc_control_w )
 //  tilemap_sound_w - tilemap and sound control
 //-------------------------------------------------
 
-WRITE8_MEMBER( segas16a_state::tilemap_sound_w )
+void segas16a_state::tilemap_sound_w(uint8_t data)
 {
 	//
 	//  PPI port C
@@ -242,7 +241,7 @@ WRITE8_MEMBER( segas16a_state::tilemap_sound_w )
 //  standard_io_r - default I/O handler for reads
 //-------------------------------------------------
 
-READ16_MEMBER( segas16a_state::standard_io_r )
+uint16_t segas16a_state::standard_io_r(offs_t offset)
 {
 	offset &= 0x3fff/2;
 	switch (offset & (0x3000/2))
@@ -268,7 +267,7 @@ READ16_MEMBER( segas16a_state::standard_io_r )
 //  standard_io_r - default I/O handler for writes
 //-------------------------------------------------
 
-WRITE16_MEMBER( segas16a_state::standard_io_w )
+void segas16a_state::standard_io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset &= 0x3fff/2;
 	switch (offset & (0x3000/2))
@@ -288,10 +287,10 @@ WRITE16_MEMBER( segas16a_state::standard_io_w )
 //  misc_io_r - miscellaneous I/O reads
 //-------------------------------------------------
 
-READ16_MEMBER( segas16a_state::misc_io_r )
+uint16_t segas16a_state::misc_io_r(offs_t offset)
 {
 	// just call custom handler
-	return m_custom_io_r(space, offset, mem_mask);
+	return m_custom_io_r(offset);
 }
 
 
@@ -299,10 +298,10 @@ READ16_MEMBER( segas16a_state::misc_io_r )
 //  misc_io_w - miscellaneous I/O writes
 //-------------------------------------------------
 
-WRITE16_MEMBER( segas16a_state::misc_io_w )
+void segas16a_state::misc_io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// just call custom handler
-	m_custom_io_w(space, offset, data, mem_mask);
+	m_custom_io_w(offset, data, mem_mask);
 }
 
 
@@ -315,7 +314,7 @@ WRITE16_MEMBER( segas16a_state::misc_io_w )
 //  sound_data_r - read data from the sound latch
 //-------------------------------------------------
 
-READ8_MEMBER( segas16a_state::sound_data_r )
+uint8_t segas16a_state::sound_data_r()
 {
 	// assert ACK
 	m_i8255->pc6_w(CLEAR_LINE);
@@ -327,7 +326,7 @@ READ8_MEMBER( segas16a_state::sound_data_r )
 //  n7751_command_w - control the N7751
 //-------------------------------------------------
 
-WRITE8_MEMBER( segas16a_state::n7751_command_w )
+void segas16a_state::n7751_command_w(uint8_t data)
 {
 	//
 	//  Z80 7751 control port
@@ -354,7 +353,7 @@ WRITE8_MEMBER( segas16a_state::n7751_command_w )
 //  n7751_control_w - YM2151 output port callback
 //-------------------------------------------------
 
-WRITE8_MEMBER( segas16a_state::n7751_control_w )
+void segas16a_state::n7751_control_w(uint8_t data)
 {
 	//
 	//  YM2151 output port
@@ -392,7 +391,7 @@ void segas16a_state::n7751_rom_offset_w(uint8_t data)
 //  n7751_rom_r - MCU reads from BUS
 //-------------------------------------------------
 
-READ8_MEMBER( segas16a_state::n7751_rom_r )
+uint8_t segas16a_state::n7751_rom_r()
 {
 	// read from BUS
 	return memregion("n7751data")->base()[m_n7751_rom_address];
@@ -403,7 +402,7 @@ READ8_MEMBER( segas16a_state::n7751_rom_r )
 //  n7751_p2_r - MCU reads from the P2 lines
 //-------------------------------------------------
 
-READ8_MEMBER( segas16a_state::n7751_p2_r )
+uint8_t segas16a_state::n7751_p2_r()
 {
 	// read from P2 - 8255's PC0-2 connects to 7751's S0-2 (P24-P26 on an 8048)
 	// bit 0x80 is an alternate way to control the sample on/off; doesn't appear to be used
@@ -415,7 +414,7 @@ READ8_MEMBER( segas16a_state::n7751_p2_r )
 //  n7751_p2_w - MCU writes to the P2 lines
 //-------------------------------------------------
 
-WRITE8_MEMBER( segas16a_state::n7751_p2_w )
+void segas16a_state::n7751_p2_w(uint8_t data)
 {
 	// write to P2; low 4 bits go to 8243
 	m_n7751_i8243->p2_w(data & 0x0f);
@@ -434,7 +433,7 @@ WRITE8_MEMBER( segas16a_state::n7751_p2_w )
 //  mcu_control_w - control lines from the MCU
 //-------------------------------------------------
 
-WRITE8_MEMBER( segas16a_state::mcu_control_w )
+void segas16a_state::mcu_control_w(uint8_t data)
 {
 	// if we have a fake i8751 handler, ignore writes by the actual 8751
 	if (!m_i8751_vblank_hook.isnull())
@@ -465,7 +464,7 @@ WRITE8_MEMBER( segas16a_state::mcu_control_w )
 //  to the 68000's address space
 //-------------------------------------------------
 
-WRITE8_MEMBER( segas16a_state::mcu_io_w )
+void segas16a_state::mcu_io_w(offs_t offset, uint8_t data)
 {
 	//
 	//  1.00 0... = work RAM (accessed @ $4000+x) or I/O (accessed @ $8000+x)
@@ -520,7 +519,7 @@ WRITE8_MEMBER( segas16a_state::mcu_io_w )
 //  to the 68000's address space
 //-------------------------------------------------
 
-READ8_MEMBER( segas16a_state::mcu_io_r )
+uint8_t segas16a_state::mcu_io_r(address_space &space, offs_t offset)
 {
 	switch ((m_mcu_control >> 3) & 7)
 	{
@@ -707,7 +706,7 @@ void segas16a_state::dumpmtmt_i8751_sim()
 //  for Ace Attacker
 //-------------------------------------------------
 
-READ16_MEMBER( segas16a_state::aceattaca_custom_io_r )
+uint16_t segas16a_state::aceattaca_custom_io_r(offs_t offset)
 {
 	switch (offset & (0x3000/2))
 	{
@@ -750,10 +749,10 @@ READ16_MEMBER( segas16a_state::aceattaca_custom_io_r )
 				return m_cxdio->read(offset & 0x0f);
 			break;
 	}
-	return standard_io_r(space, offset, mem_mask);
+	return standard_io_r(offset);
 }
 
-WRITE16_MEMBER( segas16a_state::aceattaca_custom_io_w )
+void segas16a_state::aceattaca_custom_io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset & (0x3000/2))
 	{
@@ -765,7 +764,7 @@ WRITE16_MEMBER( segas16a_state::aceattaca_custom_io_w )
 			}
 			break;
 	}
-	standard_io_w(space, offset, data, mem_mask);
+	standard_io_w(offset, data, mem_mask);
 }
 
 
@@ -774,7 +773,7 @@ WRITE16_MEMBER( segas16a_state::aceattaca_custom_io_w )
 //  for Major League
 //-------------------------------------------------
 
-READ16_MEMBER( segas16a_state::mjleague_custom_io_r )
+uint16_t segas16a_state::mjleague_custom_io_r(offs_t offset)
 {
 	switch (offset & (0x3000/2))
 	{
@@ -845,7 +844,7 @@ READ16_MEMBER( segas16a_state::mjleague_custom_io_r )
 			}
 			break;
 	}
-	return standard_io_r(space, offset, mem_mask);
+	return standard_io_r(offset);
 }
 
 
@@ -854,7 +853,7 @@ READ16_MEMBER( segas16a_state::mjleague_custom_io_r )
 //  for Passing Shot
 //-------------------------------------------------
 
-READ16_MEMBER( segas16a_state::passsht16a_custom_io_r )
+uint16_t segas16a_state::passsht16a_custom_io_r(offs_t offset)
 {
 	switch (offset & (0x3000/2))
 	{
@@ -878,7 +877,7 @@ READ16_MEMBER( segas16a_state::passsht16a_custom_io_r )
 			}
 			break;
 	}
-	return standard_io_r(space, offset, mem_mask);
+	return standard_io_r(offset);
 }
 
 
@@ -887,7 +886,7 @@ READ16_MEMBER( segas16a_state::passsht16a_custom_io_r )
 //  for SDI
 //-------------------------------------------------
 
-READ16_MEMBER( segas16a_state::sdi_custom_io_r )
+uint16_t segas16a_state::sdi_custom_io_r(offs_t offset)
 {
 	switch (offset & (0x3000/2))
 	{
@@ -899,7 +898,7 @@ READ16_MEMBER( segas16a_state::sdi_custom_io_r )
 			}
 			break;
 	}
-	return standard_io_r(space, offset, mem_mask);
+	return standard_io_r(offset);
 }
 
 
@@ -908,7 +907,7 @@ READ16_MEMBER( segas16a_state::sdi_custom_io_r )
 //  for Sukeban Jansi Ryuko
 //-------------------------------------------------
 
-READ16_MEMBER( segas16a_state::sjryuko_custom_io_r )
+uint16_t segas16a_state::sjryuko_custom_io_r(offs_t offset)
 {
 	switch (offset & (0x3000/2))
 	{
@@ -925,7 +924,7 @@ READ16_MEMBER( segas16a_state::sjryuko_custom_io_r )
 			}
 			break;
 	}
-	return standard_io_r(space, offset, mem_mask);
+	return standard_io_r(offset);
 }
 
 
@@ -2008,9 +2007,6 @@ void segas16a_state::system16a(machine_config &config)
 	m_ymsnd->add_route(ALL_OUTPUTS, "speaker", 0.43);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 
@@ -2065,7 +2061,6 @@ void segas16a_state::system16a_no7751(machine_config &config)
 	config.device_remove("n7751");
 	config.device_remove("n7751_8243");
 	config.device_remove("dac");
-	config.device_remove("vref");
 
 	YM2151(config.replace(), m_ymsnd, 4000000);
 	m_ymsnd->add_route(ALL_OUTPUTS, "speaker", 1.0);
@@ -2100,7 +2095,6 @@ void segas16a_state::system16a_fd1089a_no7751(machine_config &config)
 
 	config.device_remove("n7751");
 	config.device_remove("dac");
-	config.device_remove("vref");
 
 	YM2151(config.replace(), m_ymsnd, 4000000);
 	m_ymsnd->add_route(ALL_OUTPUTS, "speaker", 1.0);
@@ -2113,7 +2107,6 @@ void segas16a_state::system16a_fd1089b_no7751(machine_config &config)
 
 	config.device_remove("n7751");
 	config.device_remove("dac");
-	config.device_remove("vref");
 
 	YM2151(config.replace(), m_ymsnd, 4000000);
 	m_ymsnd->add_route(ALL_OUTPUTS, "speaker", 1.0);
@@ -2126,7 +2119,6 @@ void segas16a_state::system16a_fd1094_no7751(machine_config &config)
 
 	config.device_remove("n7751");
 	config.device_remove("dac");
-	config.device_remove("vref");
 
 	YM2151(config.replace(), m_ymsnd, 4000000);
 	m_ymsnd->add_route(ALL_OUTPUTS, "speaker", 1.0);
@@ -2827,7 +2819,7 @@ ROM_START( fantzonepr )
 	ROM_LOAD16_BYTE( "ic18-2614.bin",  0x10000, 0x8000, CRC(e05a1e25) SHA1(9691d9f0763b7483ee6912437902f22ab4b78a05) ) // MATCH
 
 	// these were missing, but it seems like they should be different?
-	ROM_LOAD16_BYTE( "ic23",  0x20001, 0x8000, BAD_DUMP CRC(531ca13f) SHA1(19e68bc515f6021e1145cff4f3f0e083839ee8f3) ) // misisng
+	ROM_LOAD16_BYTE( "ic23",  0x20001, 0x8000, BAD_DUMP CRC(531ca13f) SHA1(19e68bc515f6021e1145cff4f3f0e083839ee8f3) ) // missing
 	ROM_LOAD16_BYTE( "ic24",  0x20000, 0x8000, BAD_DUMP CRC(68807b49) SHA1(0a189da8cdd2090e76d6d06c55b478abce60542d) ) // missing
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) // sound CPU
@@ -3052,6 +3044,8 @@ ROM_END
 //
 //  CPU/Video/Sound Board: 171-5335
 //  ROM Board:             171-5336
+//  Sega game ID: 837-5934
+//     ROM board: 837-5935
 //
 ROM_START( quartet2 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
@@ -3889,8 +3883,8 @@ void segas16a_state::init_generic()
 	m_nvram->set_base(m_workram, m_workram.bytes());
 
 	// create default read/write handlers
-	m_custom_io_r = read16_delegate(*this, FUNC(segas16a_state::standard_io_r));
-	m_custom_io_w = write16_delegate(*this, FUNC(segas16a_state::standard_io_w));
+	m_custom_io_r = read16sm_delegate(*this, FUNC(segas16a_state::standard_io_r));
+	m_custom_io_w = write16s_delegate(*this, FUNC(segas16a_state::standard_io_w));
 
 	// save state
 	save_item(NAME(m_video_control));
@@ -3911,8 +3905,8 @@ void segas16a_state::init_generic()
 void segas16a_state::init_aceattaca()
 {
 	init_generic();
-	m_custom_io_r = read16_delegate(*this, FUNC(segas16a_state::aceattaca_custom_io_r));
-	m_custom_io_w = write16_delegate(*this, FUNC(segas16a_state::aceattaca_custom_io_w));
+	m_custom_io_r = read16sm_delegate(*this, FUNC(segas16a_state::aceattaca_custom_io_r));
+	m_custom_io_w = write16s_delegate(*this, FUNC(segas16a_state::aceattaca_custom_io_w));
 }
 
 void segas16a_state::init_dumpmtmt()
@@ -3924,25 +3918,25 @@ void segas16a_state::init_dumpmtmt()
 void segas16a_state::init_mjleague()
 {
 	init_generic();
-	m_custom_io_r = read16_delegate(*this, FUNC(segas16a_state::mjleague_custom_io_r));
+	m_custom_io_r = read16sm_delegate(*this, FUNC(segas16a_state::mjleague_custom_io_r));
 }
 
 void segas16a_state::init_passsht16a()
 {
 	init_generic();
-	m_custom_io_r = read16_delegate(*this, FUNC(segas16a_state::passsht16a_custom_io_r));
+	m_custom_io_r = read16sm_delegate(*this, FUNC(segas16a_state::passsht16a_custom_io_r));
 }
 
 void segas16a_state::init_sdi()
 {
 	init_generic();
-	m_custom_io_r = read16_delegate(*this, FUNC(segas16a_state::sdi_custom_io_r));
+	m_custom_io_r = read16sm_delegate(*this, FUNC(segas16a_state::sdi_custom_io_r));
 }
 
 void segas16a_state::init_sjryukoa()
 {
 	init_generic();
-	m_custom_io_r = read16_delegate(*this, FUNC(segas16a_state::sjryuko_custom_io_r));
+	m_custom_io_r = read16sm_delegate(*this, FUNC(segas16a_state::sjryuko_custom_io_r));
 	m_lamp_changed_w = lamp_changed_delegate(&segas16a_state::sjryuko_lamp_changed_w, this);
 }
 

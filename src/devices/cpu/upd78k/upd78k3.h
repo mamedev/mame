@@ -73,11 +73,12 @@ private:
 	address_space_config m_program_config;
 	address_space_config m_iram_config;
 	address_space_config m_sfr_config;
-	address_space *m_program_space;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_program_cache;
 	required_shared_ptr<u16> m_iram;
-	memory_access_cache<1, 0, ENDIANNESS_LITTLE> *m_iram_cache;
-	address_space *m_sfr_space;
+
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache m_program_cache;
+	memory_access< 8, 1, 0, ENDIANNESS_LITTLE>::cache m_iram_cache;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program_space;
+	memory_access< 8, 1, 0, ENDIANNESS_LITTLE>::specific m_sfr_space;
 
 	// core registers and execution state
 	u16 m_pc;

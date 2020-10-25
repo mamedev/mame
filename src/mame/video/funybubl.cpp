@@ -15,7 +15,7 @@ rgb_t funybubl_state::funybubl_R6B6G6(uint32_t raw)
 	return rgb_t(pal6bit(raw >> 12), pal6bit(raw >>  0), pal6bit(raw >>  6));
 }
 
-WRITE8_MEMBER(funybubl_state::tilemap_w)
+void funybubl_state::tilemap_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	COMBINE_DATA(&m_tilemapram[offset]);
 	m_tilemap->mark_tile_dirty(offset>>1);

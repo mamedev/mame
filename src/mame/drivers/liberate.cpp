@@ -33,7 +33,7 @@
  *
  *************************************/
 
-READ8_MEMBER(liberate_state::deco16_bank_r)
+uint8_t liberate_state::deco16_bank_r(offs_t offset)
 {
 	const uint8_t *ROM = memregion("user1")->base();
 
@@ -60,7 +60,7 @@ READ8_MEMBER(liberate_state::deco16_bank_r)
 	return 0;
 }
 
-READ8_MEMBER(liberate_state::deco16_io_r)
+uint8_t liberate_state::deco16_io_r(offs_t offset)
 {
 	if (offset == 0) return ioport("IN1")->read(); /* Player 1 controls */
 	if (offset == 1) return ioport("IN2")->read(); /* Player 2 controls */
@@ -72,17 +72,17 @@ READ8_MEMBER(liberate_state::deco16_io_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(liberate_state::deco16_bank_w)
+void liberate_state::deco16_bank_w(uint8_t data)
 {
 	m_bank = data;
 
 	if (m_bank)
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x800f, read8_delegate(*this, FUNC(liberate_state::deco16_io_r)));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x800f, read8sm_delegate(*this, FUNC(liberate_state::deco16_io_r)));
 	else
 		m_maincpu->space(AS_PROGRAM).install_read_bank(0x8000, 0x800f, "bank1");
 }
 
-READ8_MEMBER(liberate_state::prosoccr_bank_r)
+uint8_t liberate_state::prosoccr_bank_r(offs_t offset)
 {
 	const uint8_t *ROM = memregion("user1")->base();
 
@@ -111,7 +111,7 @@ READ8_MEMBER(liberate_state::prosoccr_bank_r)
 	return 0;
 }
 
-READ8_MEMBER(liberate_state::prosoccr_charram_r)
+uint8_t liberate_state::prosoccr_charram_r(offs_t offset)
 {
 	uint8_t *SRC_GFX = memregion("shared_gfx")->base();
 
@@ -132,11 +132,11 @@ READ8_MEMBER(liberate_state::prosoccr_charram_r)
 	return m_charram[offset + m_gfx_rom_readback * 0x1800];
 }
 
-WRITE8_MEMBER(liberate_state::prosoccr_charram_w)
+void liberate_state::prosoccr_charram_w(offs_t offset, uint8_t data)
 {
 	if (m_bank)
 	{
-		prosoccr_io_w(space, offset & 0x0f, data);
+		prosoccr_io_w(offset & 0x0f, data);
 	}
 	else
 	{
@@ -167,7 +167,7 @@ WRITE8_MEMBER(liberate_state::prosoccr_charram_w)
 //  m_gfxdecode->gfx(0)->mark_dirty((offset | 0x1800) >> 3);
 }
 
-WRITE8_MEMBER(liberate_state::prosoccr_char_bank_w)
+void liberate_state::prosoccr_char_bank_w(uint8_t data)
 {
 	m_gfx_rom_readback = data & 1; //enable GFX rom read-back
 
@@ -175,18 +175,18 @@ WRITE8_MEMBER(liberate_state::prosoccr_char_bank_w)
 		printf("%02x\n", data);
 }
 
-WRITE8_MEMBER(liberate_state::prosoccr_io_bank_w)
+void liberate_state::prosoccr_io_bank_w(uint8_t data)
 {
 	m_bank = data & 1;
 
 	if (m_bank)
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x800f, read8_delegate(*this, FUNC(liberate_state::deco16_io_r)));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x800f, read8sm_delegate(*this, FUNC(liberate_state::deco16_io_r)));
 	else
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x800f, read8_delegate(*this, FUNC(liberate_state::prosoccr_charram_r)));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x800f, read8sm_delegate(*this, FUNC(liberate_state::prosoccr_charram_r)));
 
 }
 
-READ8_MEMBER(liberate_state::prosport_charram_r)
+uint8_t liberate_state::prosport_charram_r(offs_t offset)
 {
 	uint8_t *FG_GFX = memregion("progolf_fg_gfx")->base();
 
@@ -206,7 +206,7 @@ READ8_MEMBER(liberate_state::prosport_charram_r)
 	return 0;
 }
 
-WRITE8_MEMBER(liberate_state::prosport_charram_w)
+void liberate_state::prosport_charram_w(offs_t offset, uint8_t data)
 {
 	uint8_t *FG_GFX = memregion("progolf_fg_gfx")->base();
 

@@ -68,10 +68,8 @@ protected:
 	TIMER_CALLBACK_MEMBER( timerproc_callback );
 
 private:
-
 	void timer_adjust();
 	void clear_display();
-	void new_key(u8 data, bool skey, bool ckey);
 	void new_fifo(u8 data);
 	void set_irq(bool state);
 
@@ -98,7 +96,9 @@ private:
 	bool m_autoinc;     // auto-increment flag
 	bool m_read_flag;   // read from where
 	bool m_ctrl_key;    // previous state of strobe input
-	u16 m_key_down;
+	bool m_se_mode;     // special error mode flag
+	u8 m_key_down;      // current key being debounced
+	u8 m_debounce;      // debounce counter
 };
 
 

@@ -41,6 +41,8 @@
 
     Information and programs can be found at http://chip8.com/?page=78
 
+    Due to the way the keyboard is scanned, Natural Keyboard/Paste is not possible.
+
 **********************************************************************************/
 
 
@@ -66,14 +68,7 @@ public:
 		, m_pia(*this, "pia")
 		, m_beeper(*this, "beeper")
 		, m_videoram(*this, "videoram")
-		, m_io_x0(*this, "X0")
-		, m_io_x1(*this, "X1")
-		, m_io_x2(*this, "X2")
-		, m_io_x3(*this, "X3")
-		, m_io_y0(*this, "Y0")
-		, m_io_y1(*this, "Y1")
-		, m_io_y2(*this, "Y2")
-		, m_io_y3(*this, "Y3")
+		, m_io_keyboard(*this, "X%u", 0U)
 		, m_io_shift(*this, "SHIFT")
 		{ }
 
@@ -83,10 +78,10 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 private:
-	DECLARE_READ8_MEMBER( d6800_cassette_r );
-	DECLARE_WRITE8_MEMBER( d6800_cassette_w );
-	DECLARE_READ8_MEMBER( d6800_keyboard_r );
-	DECLARE_WRITE8_MEMBER( d6800_keyboard_w );
+	uint8_t d6800_cassette_r();
+	void d6800_cassette_w(uint8_t data);
+	uint8_t d6800_keyboard_r();
+	void d6800_keyboard_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( d6800_screen_w );
 	uint32_t screen_update_d6800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
@@ -107,14 +102,7 @@ private:
 	required_device<pia6821_device> m_pia;
 	required_device<beep_device> m_beeper;
 	required_shared_ptr<uint8_t> m_videoram;
-	required_ioport m_io_x0;
-	required_ioport m_io_x1;
-	required_ioport m_io_x2;
-	required_ioport m_io_x3;
-	required_ioport m_io_y0;
-	required_ioport m_io_y1;
-	required_ioport m_io_y2;
-	required_ioport m_io_y3;
+	required_ioport_array<4> m_io_keyboard;
 	required_ioport m_io_shift;
 };
 
@@ -126,69 +114,41 @@ void d6800_state::d6800_map(address_map &map)
 	map(0x0000, 0x00ff).ram();
 	map(0x0100, 0x01ff).ram().share("videoram");
 	map(0x0200, 0x17ff).ram();
-	//map(0x1800, 0x1fff).rom();   // for dreamsoft_1, if we can find a good copy
+	//map(0x1800, 0x1fff).rom().region("maincpu",0x800);   // for dreamsoft_1, if we can find a good copy
 	map(0x8010, 0x8013).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0xc000, 0xc7ff).mirror(0x3800).rom();
+	map(0xc000, 0xc7ff).mirror(0x3800).rom().region("maincpu",0);
 }
 
 /* Input Ports */
 
 static INPUT_PORTS_START( d6800 )
 	PORT_START("X0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_NAME("0") // ee
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_NAME("1") // ed
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_NAME("2") // eb
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_NAME("3") // e7
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("X1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_NAME("4") // de
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_NAME("5") // dd
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_NAME("6") // db
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_NAME("7") // d7
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("X2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_NAME("8") // be
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_NAME("9") // bd
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_NAME("A") // bb
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_NAME("B") // b7
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("X3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_NAME("C") // 7e
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_NAME("D") // 7d
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_NAME("E") // 7b
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_NAME("F") // 77
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("Y0")
-	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8')
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
-
-	PORT_START("Y1")
-	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9')
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
-
-	PORT_START("Y2")
-	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
-
-	PORT_START("Y3")
-	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
 
 	PORT_START("SHIFT")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("FN") PORT_CODE(KEYCODE_LSHIFT)
@@ -197,7 +157,6 @@ static INPUT_PORTS_START( d6800 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RST") PORT_CODE(KEYCODE_LALT) PORT_CHANGED_MEMBER(DEVICE_SELF, d6800_state, reset_button, 0)
 
 	PORT_START("VS")
-	/* vblank */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
@@ -212,16 +171,16 @@ INPUT_CHANGED_MEMBER(d6800_state::reset_button)
 /* Video */
 uint32_t d6800_state::screen_update_d6800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t x,y,gfx=0;
+	uint8_t gfx=0;
 
-	for (y = 0; y < 32; y++)
+	for (uint8_t y = 0; y < 32; y++)
 	{
-		uint16_t *p = &bitmap.pix16(y);
+		uint16_t *p = &bitmap.pix(y);
 
-		for (x = 0; x < 8; x++)
+		for (uint8_t x = 0; x < 8; x++)
 		{
 			if (m_cb2)
-				gfx = m_videoram[ x | (y<<3)];
+				gfx = m_videoram[x | (y<<3)];
 
 			*p++ = BIT(gfx, 7);
 			*p++ = BIT(gfx, 6);
@@ -262,7 +221,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(d6800_state::kansas_r)
 	if (m_rtc > 159)
 		m_rtc = 0;
 
-	uint8_t data = m_io_x0->read() & m_io_x1->read() & m_io_x2->read() & m_io_x3->read();
+	uint8_t data = m_io_keyboard[0]->read() & m_io_keyboard[1]->read() & m_io_keyboard[2]->read() & m_io_keyboard[3]->read();
 	int ca1 = (data == 255) ? 0 : 1;
 	int ca2 = m_io_shift->read();
 	int cb1 = (m_rtc) ? 1 : 0;
@@ -289,7 +248,7 @@ WRITE_LINE_MEMBER( d6800_state::d6800_screen_w )
 	m_cb2 = state;
 }
 
-READ8_MEMBER( d6800_state::d6800_cassette_r )
+uint8_t d6800_state::d6800_cassette_r()
 {
 	/*
 	Cassette circuit consists of a 741 op-amp, a 74121 oneshot, and a 74LS74.
@@ -301,7 +260,7 @@ READ8_MEMBER( d6800_state::d6800_cassette_r )
 	return m_cass_data[2] | m_portb;
 }
 
-WRITE8_MEMBER( d6800_state::d6800_cassette_w )
+void d6800_state::d6800_cassette_w(uint8_t data)
 {
 	/*
 	    A NE556 runs at either 1200 or 2400 Hz, depending on the state of bit 0.
@@ -316,20 +275,28 @@ WRITE8_MEMBER( d6800_state::d6800_cassette_w )
 	m_portb = data & 0x7f;
 }
 
-READ8_MEMBER( d6800_state::d6800_keyboard_r )
+uint8_t d6800_state::d6800_keyboard_r()
 {
 	/*
 	This system reads the key matrix one way, then swaps the input and output
 	lines around and reads it another way. This isolates the key that was pressed.
 	*/
 
-	uint8_t data = m_io_x0->read() & m_io_x1->read() & m_io_x2->read() & m_io_x3->read()
-				& m_io_y0->read() & m_io_y1->read() & m_io_y2->read() & m_io_y3->read();
+	u8 y = 8;
+	for (u8 i = 0; i < 4; i++)
+	{
+		u8 data = m_io_keyboard[i]->read() & 15;
+		y <<= 1;
+		if (data < 15)
+			for (u8 j = 0; j < 4; j++)
+				if (!BIT(data, j))
+					return data | (0xf0 - y);
+	}
 
-	return data;
+	return 0xff;
 }
 
-WRITE8_MEMBER( d6800_state::d6800_keyboard_w )
+void d6800_state::d6800_keyboard_w(uint8_t data)
 {
 	/*
 
@@ -352,6 +319,11 @@ WRITE8_MEMBER( d6800_state::d6800_keyboard_w )
 
 void d6800_state::machine_start()
 {
+	save_item(NAME(m_rtc));
+	save_item(NAME(m_cb2));
+	save_item(NAME(m_cassold));
+	save_item(NAME(m_cass_data));
+	save_item(NAME(m_portb));
 }
 
 void d6800_state::machine_reset()
@@ -451,16 +423,16 @@ void d6800_state::d6800(machine_config &config)
 /* ROMs */
 
 ROM_START( d6800 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "0", "Original")   // "chipos"
-	ROMX_LOAD( "d6800.bin",     0xc000, 0x0400, CRC(3f97ca2e) SHA1(60f26e57a058262b30befceceab4363a5d65d877), ROM_BIOS(0) )
-	ROM_RELOAD(                 0xc400, 0x0400 )
-	//ROMX_LOAD( "d6800d1.bin",   0x1800, 0x0800, BAD_DUMP CRC(e552cae3) SHA1(0b90504922d46b9c46278924768c45b1b276709f), ROM_BIOS(0) )   // need a good dump, this one is broken
+	ROMX_LOAD( "d6800.bin",     0x0000, 0x0400, CRC(3f97ca2e) SHA1(60f26e57a058262b30befceceab4363a5d65d877), ROM_BIOS(0) )
+	ROM_RELOAD(                 0x0400, 0x0400 )
+	//ROMX_LOAD( "d6800d1.bin",   0x0800, 0x0800, BAD_DUMP CRC(e552cae3) SHA1(0b90504922d46b9c46278924768c45b1b276709f), ROM_BIOS(0) )   // need a good dump, this one is broken
 	ROM_SYSTEM_BIOS(1, "d2", "Dreamsoft2")
-	ROMX_LOAD( "d6800d2.bin",   0xc000, 0x0800, CRC(ded5712f) SHA1(f594f313a74d7135c9fdd0bcb0093fc5771a9b7d), ROM_BIOS(1) )
+	ROMX_LOAD( "d6800d2.bin",   0x0000, 0x0800, CRC(ded5712f) SHA1(f594f313a74d7135c9fdd0bcb0093fc5771a9b7d), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(2, "d2m", "Dreamsoft2m")
-	ROMX_LOAD( "d6800d2m.bin",  0xc000, 0x0800, CRC(eec8e56f) SHA1(f587ccbc0872f2982d61120d033f481a862b902b), ROM_BIOS(2) )
+	ROMX_LOAD( "d6800d2m.bin",  0x0000, 0x0800, CRC(eec8e56f) SHA1(f587ccbc0872f2982d61120d033f481a862b902b), ROM_BIOS(2) )
 ROM_END
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY          FULLNAME      FLAGS
-COMP( 1979, d6800, 0,      0,      d6800,   d6800, d6800_state, empty_init, "Michael Bauer", "Dream 6800", 0 )
+COMP( 1979, d6800, 0,      0,      d6800,   d6800, d6800_state, empty_init, "Michael Bauer", "Dream 6800", MACHINE_SUPPORTS_SAVE )

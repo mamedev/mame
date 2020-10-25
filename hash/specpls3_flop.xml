@@ -644,9 +644,12 @@ license:CC0
 		</part>
 	</software>
 
-<!--    <software name="ledstorm">-->
-		<!-- SPS (CAPS) release 3585 -->
-<!--        <description>LED Storm Rally 2011</description>
+<!--
+    <software name="ledstorm">
+-->
+<!-- SPS (CAPS) release 3585 -->
+<!--
+        <description>LED Storm Rally 2011</description>
         <year>1988</year>
         <publisher>Go!</publisher>
         <part name="flop1" interface="floppy_3">
@@ -654,7 +657,8 @@ license:CC0
                 <rom name="3585 - led storm - lazer enhanced destruction (europe).ipf" size="266892" crc="a861168e" sha1="" offset="0" />
             </dataarea>
         </part>
-    </software>-->
+    </software>
+-->
 
 	<software name="lmidnght">
 		<!-- SPS (CAPS) release 3518 -->
@@ -1007,9 +1011,12 @@ license:CC0
 		</part>
 	</software>
 
-<!--    <software name="rockhams">-->
-		<!-- SPS (CAPS) release 3607 -->
-<!--        <description>Rock Star Ate My Hamster</description>
+<!--
+    <software name="rockhams">
+-->
+<!-- SPS (CAPS) release 3607 -->
+<!--
+        <description>Rock Star Ate My Hamster</description>
         <year>1989</year>
         <publisher>Code Masters</publisher>
         <part name="flop1" interface="floppy_3">
@@ -1017,7 +1024,8 @@ license:CC0
                 <rom name="3607 - rock star ate my hamster (europe).ipf" size="234180" crc="7cbd3549" sha1="" offset="0" />
             </dataarea>
         </part>
-    </software>-->
+    </software>
+-->
 
 	<software name="rthunder">
 		<!-- SPS (CAPS) release 3608 -->
@@ -1442,9 +1450,12 @@ license:CC0
 		</part>
 	</software>
 
-<!--    <software name="tigeroad">-->
-		<!-- SPS (CAPS) release 3625 -->
-<!--        <description>Tiger Road</description>
+<!--
+    <software name="tigeroad">
+-->
+<!-- SPS (CAPS) release 3625 -->
+<!--
+        <description>Tiger Road</description>
         <year>1988</year>
         <publisher>Go!</publisher>
         <part name="flop1" interface="floppy_3">
@@ -1452,7 +1463,8 @@ license:CC0
                 <rom name="3625 - tiger road (europe).ipf" size="266892" crc="f47981e2" sha1="" offset="0" />
             </dataarea>
         </part>
-    </software>-->
+    </software>
+-->
 
 	<software name="totrecal">
 		<!-- SPS (CAPS) release 3542 -->
@@ -2686,7 +2698,7 @@ license:CC0
 		<publisher>Topo Soft</publisher>
 		<part name="flop1" interface="floppy_3">
 		<!-- Side missing from dump, using same as parent set -->
-		<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="180224">
 				<rom name="transfer +3 (1988)(topo soft)(es)(side a).dsk" size="180224" crc="ce9356db" sha1="3c20847d71a2ff8227ba0205b5fecad8bb3597d0" offset="0" />
 			</dataarea>

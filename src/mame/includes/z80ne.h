@@ -69,11 +69,10 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_uart(*this, "uart"),
 		m_uart_clock(*this, "uart_clock"),
-		m_maincpu(*this, "z80ne"),
+		m_maincpu(*this, "maincpu"),
 		m_cassette1(*this, "cassette"),
 		m_cassette2(*this, "cassette2"),
 		m_ram(*this, RAM_TAG),
-		m_region_z80ne(*this, "z80ne"),
 		m_bank1(*this, "bank1"),
 		m_bank2(*this, "bank2"),
 		m_bank3(*this, "bank3"),
@@ -84,24 +83,24 @@ public:
 		m_io_rst(*this, "RST"),
 		m_io_lx_385(*this, "LX.385"),
 		m_lx383_digits(*this, "digit%u", 0U)
-	{
-	}
+		, m_rom(*this, "maincpu")
+		, m_mram(*this, "mainram")
+	{ }
 
 	void z80ne(machine_config &config);
+	void init_z80ne();
 
 	DECLARE_INPUT_CHANGED_MEMBER(z80ne_reset);
 
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void driver_init() override;
 
 	void base_reset();
+	void save_state_vars();
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
-	required_device<ay31015_device> m_uart;
-	required_device<clock_device> m_uart_clock;
 	uint8_t m_lx383_scan_counter;
 	uint8_t m_lx383_key[LX383_KEYS];
 	int m_lx383_downsampler;
@@ -110,9 +109,9 @@ protected:
 	emu_timer *m_kbd_timer;
 	z80ne_cass_data_t m_cass_data;
 
-	DECLARE_READ8_MEMBER(lx383_r);
-	DECLARE_WRITE8_MEMBER(lx383_w);
-	DECLARE_READ8_MEMBER(lx385_ctrl_r);
+	uint8_t lx383_r();
+	void lx383_w(offs_t offset, uint8_t data);
+	uint8_t lx385_ctrl_r();
 	void lx385_ctrl_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(lx385_uart_tx_clock_w);
 
@@ -121,11 +120,13 @@ protected:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
+	memory_passthrough_handler *m_rom_shadow_tap;
+	required_device<ay31015_device> m_uart;
+	required_device<clock_device> m_uart_clock;
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette1;
 	required_device<cassette_image_device> m_cassette2;
-	required_device<ram_device> m_ram;
-	required_memory_region m_region_z80ne;
+	optional_device<ram_device> m_ram;
 	optional_memory_bank m_bank1;
 	optional_memory_bank m_bank2;
 	optional_memory_bank m_bank3;
@@ -136,16 +137,16 @@ protected:
 	required_ioport m_io_rst;
 	required_ioport m_io_lx_385;
 	output_finder<8> m_lx383_digits;
+	required_region_ptr<u8> m_rom;
+	optional_shared_ptr<u8> m_mram;
 
 	emu_timer *m_timer_nmi;
-	emu_timer *m_timer_reset;
 
 	cassette_image_device *cassette_device_image();
-	void reset_lx382_banking();
 
 private:
-	void main_mem(address_map &map);
-	void main_io(address_map &map);
+	void mem_map(address_map &map);
+	void io_map(address_map &map);
 };
 
 class z80net_state : public z80ne_state
@@ -168,13 +169,12 @@ public:
 
 protected:
 	virtual void machine_reset() override;
-	virtual void driver_init() override;
 
 	DECLARE_READ_LINE_MEMBER(lx387_shift_r);
 	DECLARE_READ_LINE_MEMBER(lx387_control_r);
-	DECLARE_READ8_MEMBER(lx387_data_r);
-	DECLARE_READ8_MEMBER(lx388_mc6847_videoram_r);
-	DECLARE_READ8_MEMBER(lx388_read_field_sync);
+	uint8_t lx387_data_r();
+	uint8_t lx388_mc6847_videoram_r(offs_t offset);
+	uint8_t lx388_read_field_sync();
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_device<mc6847_base_device> m_vdg;
@@ -184,10 +184,10 @@ protected:
 
 	void reset_lx387();
 
-	void main_io(address_map &map);
+	void io_map(address_map &map);
 
 private:
-	void main_mem(address_map &map);
+	void mem_map(address_map &map);
 };
 
 class z80netb_state : public z80net_state
@@ -202,10 +202,9 @@ public:
 
 protected:
 	virtual void machine_reset() override;
-	virtual void driver_init() override { }
 
 private:
-	void main_mem(address_map &map);
+	void mem_map(address_map &map);
 };
 
 class z80netf_state : public z80netb_state
@@ -235,13 +234,12 @@ private:
 		uint8_t head;  /* current head */
 	};
 
-	void main_mem(address_map &map);
-	void main_io(address_map &map);
+	void mem_map(address_map &map);
+	void io_map(address_map &map);
 
-	DECLARE_WRITE8_MEMBER(lx390_motor_w);
-	DECLARE_READ8_MEMBER(lx390_reset_bank);
-	DECLARE_READ8_MEMBER(lx390_fdc_r);
-	DECLARE_WRITE8_MEMBER(lx390_fdc_w);
+	void lx390_motor_w(uint8_t data);
+	uint8_t lx390_fdc_r(offs_t offset);
+	void lx390_fdc_w(offs_t offset, uint8_t data);
 
 	void reset_lx390_banking();
 

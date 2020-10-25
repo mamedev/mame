@@ -136,7 +136,7 @@ void d9060_device_base::hdc_mem(address_map &map)
 //  riot6532 0
 //-------------------------------------------------
 
-READ8_MEMBER( d9060_device_base::dio_r )
+uint8_t d9060_device_base::dio_r()
 {
 	/*
 
@@ -153,11 +153,11 @@ READ8_MEMBER( d9060_device_base::dio_r )
 
 	*/
 
-	return m_bus->read_dio();
+	return m_bus->dio_r();
 }
 
 
-WRITE8_MEMBER( d9060_device_base::dio_w )
+void d9060_device_base::dio_w(uint8_t data)
 {
 	/*
 
@@ -182,7 +182,7 @@ WRITE8_MEMBER( d9060_device_base::dio_w )
 //  riot6532 1
 //-------------------------------------------------
 
-READ8_MEMBER( d9060_device_base::riot1_pa_r )
+uint8_t d9060_device_base::riot1_pa_r()
 {
 	/*
 
@@ -213,7 +213,7 @@ READ8_MEMBER( d9060_device_base::riot1_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( d9060_device_base::riot1_pa_w )
+void d9060_device_base::riot1_pa_w(uint8_t data)
 {
 	/*
 
@@ -248,7 +248,7 @@ WRITE8_MEMBER( d9060_device_base::riot1_pa_w )
 	update_ieee_signals();
 }
 
-READ8_MEMBER( d9060_device_base::riot1_pb_r )
+uint8_t d9060_device_base::riot1_pb_r()
 {
 	/*
 
@@ -279,7 +279,7 @@ READ8_MEMBER( d9060_device_base::riot1_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( d9060_device_base::riot1_pb_w )
+void d9060_device_base::riot1_pb_w(uint8_t data)
 {
 	/*
 
@@ -307,7 +307,7 @@ WRITE8_MEMBER( d9060_device_base::riot1_pb_w )
 }
 
 
-WRITE8_MEMBER( d9060_device_base::via_pb_w )
+void d9060_device_base::via_pb_w(uint8_t data)
 {
 	/*
 
@@ -347,7 +347,7 @@ WRITE_LINE_MEMBER( d9060_device_base::enable_w )
 	}
 }
 
-WRITE8_MEMBER( d9060_device_base::scsi_data_w )
+void d9060_device_base::scsi_data_w(uint8_t data)
 {
 	m_data = data;
 

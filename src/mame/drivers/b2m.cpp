@@ -2,24 +2,40 @@
 // copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
-        Bashkiria-2M driver by Miodrag Milanovic
+Bashkiria-2M driver by Miodrag Milanovic
 
-        28/03/2008 Preliminary driver.
+2008-03-28 Preliminary driver.
+
+To get numbers, you have to hold down Shift.
+
+B2M:
+- Hit enter while the square block is showing - it will attempt to boot
+  a disk. But, it is loaded corruptly, and it runs into the weeds.
+- Or, just wait and a menu appears with choices S,L,W,R,G. It's all in
+  Russian, and choosing any of them produces an error.
+
+B2MROM:
+- At start you are in an empty ramdisk called A:
+- You can use SAVE to create an empty file in the CP/M fashion, and you can
+  TYPE it.
+- You can go to Basic by typing BAS. This is corrupted and only a few
+  commands are accepted: REM, LIST. The commands RUN and NEW cause a disk
+  error and the machine freezes. SYSTEM quits back to A:
+- There's nothing else on the romdisk.
+
+So, in the end, nothing useful works.
+
+Need a schematic so that the fdc could be repaired.
 
 ****************************************************************************/
 
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
-#include "machine/i8255.h"
-#include "machine/pic8259.h"
 #include "machine/i8251.h"
-#include "machine/wd_fdc.h"
-#include "machine/ram.h"
 #include "includes/b2m.h"
 #include "formats/smx_dsk.h"
 #include "screen.h"
-#include "softlist.h"
 #include "speaker.h"
 
 /* Address maps */
@@ -36,10 +52,10 @@ void b2m_state::b2m_io(address_map &map)
 {
 	map.global_mask(0x1f);
 	map(0x00, 0x03).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0x04, 0x07).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x08, 0x0b).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x0c, 0x0c).rw(FUNC(b2m_state::b2m_localmachine_r), FUNC(b2m_state::b2m_localmachine_w));
-	map(0x10, 0x13).rw(FUNC(b2m_state::b2m_palette_r), FUNC(b2m_state::b2m_palette_w));
+	map(0x04, 0x07).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x08, 0x0b).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x0c, 0x0c).rw(FUNC(b2m_state::localmachine_r), FUNC(b2m_state::localmachine_w));
+	map(0x10, 0x13).rw(FUNC(b2m_state::palette_r), FUNC(b2m_state::palette_w));
 	map(0x14, 0x15).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x18, 0x19).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x1c, 0x1f).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
@@ -49,10 +65,10 @@ void b2m_state::b2m_rom_io(address_map &map)
 {
 	map.global_mask(0x1f);
 	map(0x00, 0x03).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0x04, 0x07).rw("ppi8255_3", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x08, 0x0b).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x0c, 0x0c).rw(FUNC(b2m_state::b2m_localmachine_r), FUNC(b2m_state::b2m_localmachine_w));
-	map(0x10, 0x13).rw(FUNC(b2m_state::b2m_palette_r), FUNC(b2m_state::b2m_palette_w));
+	map(0x04, 0x07).rw("ppi3", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x08, 0x0b).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x0c, 0x0c).rw(FUNC(b2m_state::localmachine_r), FUNC(b2m_state::localmachine_w));
+	map(0x10, 0x13).rw(FUNC(b2m_state::palette_r), FUNC(b2m_state::palette_w));
 	map(0x14, 0x15).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x18, 0x19).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 }
@@ -192,8 +208,8 @@ void b2m_state::b2m(machine_config &config)
 	i8080_cpu_device &maincpu(I8080(config, m_maincpu, 2000000));
 	maincpu.set_addrmap(AS_PROGRAM, &b2m_state::b2m_mem);
 	maincpu.set_addrmap(AS_IO, &b2m_state::b2m_io);
-	maincpu.set_vblank_int("screen", FUNC(b2m_state::b2m_vblank_interrupt));
-	maincpu.in_inta_func().set("pic8259", FUNC(pic8259_device::acknowledge));
+	maincpu.set_vblank_int("screen", FUNC(b2m_state::vblank_interrupt));
+	maincpu.in_inta_func().set("pic", FUNC(pic8259_device::acknowledge));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -201,7 +217,7 @@ void b2m_state::b2m(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(384, 256);
 	screen.set_visarea_full();
-	screen.set_screen_update(FUNC(b2m_state::screen_update_b2m));
+	screen.set_screen_update(FUNC(b2m_state::screen_update));
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(b2m_state::b2m_palette), 4);
@@ -210,23 +226,23 @@ void b2m_state::b2m(machine_config &config)
 	m_pit->set_clk<0>(0);
 	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir1_w));
 	m_pit->set_clk<1>(2000000);
-	m_pit->out_handler<1>().set(FUNC(b2m_state::bm2_pit_out1));
+	m_pit->out_handler<1>().set(FUNC(b2m_state::pit_out1));
 	m_pit->set_clk<2>(2000000);
 	m_pit->out_handler<2>().set(m_pit, FUNC(pit8253_device::write_clk0));
 
-	i8255_device &ppi1(I8255(config, "ppi8255_1"));
-	ppi1.out_pa_callback().set(FUNC(b2m_state::b2m_8255_porta_w));
-	ppi1.in_pb_callback().set(FUNC(b2m_state::b2m_8255_portb_r));
-	ppi1.out_pb_callback().set(FUNC(b2m_state::b2m_8255_portb_w));
-	ppi1.out_pc_callback().set(FUNC(b2m_state::b2m_8255_portc_w));
+	i8255_device &ppi1(I8255(config, "ppi1"));
+	ppi1.out_pa_callback().set(FUNC(b2m_state::ppi1_porta_w));
+	ppi1.in_pb_callback().set(FUNC(b2m_state::ppi1_portb_r));
+	ppi1.out_pb_callback().set(FUNC(b2m_state::ppi1_portb_w));
+	ppi1.out_pc_callback().set(FUNC(b2m_state::ppi1_portc_w));
 
-	i8255_device &ppi2(I8255(config, "ppi8255_2"));
-	ppi2.out_pc_callback().set(FUNC(b2m_state::b2m_ext_8255_portc_w));
+	i8255_device &ppi2(I8255(config, "ppi2"));
+	ppi2.out_pc_callback().set(FUNC(b2m_state::ppi2_portc_w));
 
-	i8255_device &ppi3(I8255(config, "ppi8255_3"));
-	ppi3.in_pa_callback().set(FUNC(b2m_state::b2m_romdisk_porta_r));
-	ppi3.out_pb_callback().set(FUNC(b2m_state::b2m_romdisk_portb_w));
-	ppi3.out_pc_callback().set(FUNC(b2m_state::b2m_romdisk_portc_w));
+	i8255_device &ppi3(I8255(config, "ppi3"));
+	ppi3.in_pa_callback().set(FUNC(b2m_state::romdisk_porta_r));
+	ppi3.out_pb_callback().set(FUNC(b2m_state::romdisk_portb_w));
+	ppi3.out_pc_callback().set(FUNC(b2m_state::romdisk_portc_w));
 
 	PIC8259(config, m_pic, 0);
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
@@ -239,7 +255,7 @@ void b2m_state::b2m(machine_config &config)
 	I8251(config, "uart", 0);
 
 	FD1793(config, m_fdc, 8_MHz_XTAL / 8);
-	m_fdc->drq_wr_callback().set(FUNC(b2m_state::b2m_fdc_drq));
+	m_fdc->drq_wr_callback().set(FUNC(b2m_state::fdc_drq));
 
 	FLOPPY_CONNECTOR(config, "fd0", b2m_floppies, "525qd", b2m_state::b2m_floppy_formats);
 	FLOPPY_CONNECTOR(config, "fd1", b2m_floppies, "525qd", b2m_state::b2m_floppy_formats);
@@ -258,19 +274,19 @@ void b2m_state::b2mrom(machine_config &config)
 /* ROM definition */
 
 ROM_START( b2m )
-	ROM_REGION( 0x12000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "b2m.rom", 0x10000, 0x2000, CRC(3f3214d6) SHA1(dd93e7fbabf14d1aed6777fe1ccfe0a3ca8fcaf2) )
+	ROM_REGION( 0x2000, "maincpu", 0 )
+	ROM_LOAD( "b2m.rom", 0x0000, 0x2000, CRC(3f3214d6) SHA1(dd93e7fbabf14d1aed6777fe1ccfe0a3ca8fcaf2) )
 ROM_END
 
 ROM_START( b2mrom )
-	ROM_REGION( 0x22000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "bios2.rom",  0x10000, 0x2000, CRC(c22a98b7) SHA1(7de91e653bf4b191ded62cf21532578268e4a2c1) )
-	ROM_LOAD( "ramdos.sys", 0x12000, 0x60c0, CRC(91ed6df0) SHA1(4fd040f2647a6b7930c330c75560a035027d0606) )
+	ROM_REGION( 0x12000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "bios2.rom",  0x00000, 0x2000, CRC(c22a98b7) SHA1(7de91e653bf4b191ded62cf21532578268e4a2c1) )
+	ROM_LOAD( "ramdos.sys", 0x02000, 0x60c0, CRC(91ed6df0) SHA1(4fd040f2647a6b7930c330c75560a035027d0606) )
 ROM_END
 
 
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME                 FLAGS */
-COMP( 1989, b2m,    0,      0,      b2m,     b2m,   b2m_state, empty_init, "BNPO",  "Bashkiria-2M",          MACHINE_SUPPORTS_SAVE)
-COMP( 1989, b2mrom, b2m,    0,      b2mrom,  b2m,   b2m_state, empty_init, "BNPO",  "Bashkiria-2M ROM-disk", MACHINE_SUPPORTS_SAVE)
+COMP( 1989, b2m,    0,      0,      b2m,     b2m,   b2m_state, empty_init, "BNPO",  "Bashkiria-2M",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)
+COMP( 1989, b2mrom, b2m,    0,      b2mrom,  b2m,   b2m_state, empty_init, "BNPO",  "Bashkiria-2M ROM-disk", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)

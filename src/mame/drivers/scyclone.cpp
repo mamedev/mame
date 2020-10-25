@@ -45,7 +45,6 @@
 #include "machine/mb14241.h"
 #include "sound/dac.h"
 #include "sound/sn76477.h"
-#include "sound/volt_reg.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -70,23 +69,23 @@ public:
 	DECLARE_READ_LINE_MEMBER(collision_r);
 
 private:
-	DECLARE_WRITE8_MEMBER(vidctrl_w);
+	void vidctrl_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(sprite_xpos_w);
-	DECLARE_WRITE8_MEMBER(sprite_ypos_w);
-	DECLARE_WRITE8_MEMBER(sprite_colour_w);
-	DECLARE_WRITE8_MEMBER(sprite_tile_w);
-	DECLARE_WRITE8_MEMBER(starscroll_w);
-	DECLARE_WRITE8_MEMBER(port0e_w);
-	DECLARE_WRITE8_MEMBER(port06_w);
-	DECLARE_WRITE8_MEMBER(videomask1_w);
-	DECLARE_WRITE8_MEMBER(videomask2_w);
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_READ8_MEMBER(vram_r);
-	DECLARE_WRITE8_MEMBER(snd_3001_w);
-//  DECLARE_WRITE8_MEMBER(snd_3003_w);
-//  DECLARE_WRITE8_MEMBER(snd_3004_w);
-	DECLARE_WRITE8_MEMBER(snd_3005_w);
+	void sprite_xpos_w(uint8_t data);
+	void sprite_ypos_w(uint8_t data);
+	void sprite_colour_w(uint8_t data);
+	void sprite_tile_w(uint8_t data);
+	void starscroll_w(uint8_t data);
+	void port0e_w(uint8_t data);
+	void port06_w(uint8_t data);
+	void videomask1_w(uint8_t data);
+	void videomask2_w(uint8_t data);
+	void vram_w(offs_t offset, uint8_t data);
+	uint8_t vram_r(offs_t offset);
+	void snd_3001_w(uint8_t data);
+//  void snd_3003_w(uint8_t data);
+//  void snd_3004_w(uint8_t data);
+	void snd_3005_w(uint8_t data);
 
 	uint32_t screen_update_scyclone(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -234,9 +233,9 @@ uint32_t scyclone_state::draw_starfield(screen_device &screen, bitmap_rgb32 &bit
 
 
 					if (y == star && star != 0 && noclipped)
-						bitmap.pix32(ypos, x) = paldata[7];
+						bitmap.pix(ypos, x) = paldata[7];
 					else
-						bitmap.pix32(ypos, x) = paldata[0];
+						bitmap.pix(ypos, x) = paldata[0];
 				}
 			}
 		}
@@ -273,13 +272,13 @@ uint32_t scyclone_state::draw_bitmap_and_sprite(screen_device &screen, bitmap_rg
 
 				uint8_t pal = get_bitmap_pixel(realx, realy);
 
-				if (pal) bitmap.pix32(y, (x*8)+i) = paldata[pal];
+				if (pal) bitmap.pix(y, (x*8)+i) = paldata[pal];
 
 				uint8_t pal2 = get_sprite_pixel(realx, realy);
 
 				if (pal2 & 0x3)
 				{
-					bitmap.pix32(y, (x*8)+i) = paldata[8+pal2];
+					bitmap.pix(y, (x*8)+i) = paldata[8+pal2];
 					if (pal == 0x7) m_hascollided = 1;
 				}
 			}
@@ -401,7 +400,7 @@ static INPUT_PORTS_START( scyclone )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DSW0:8" )
 INPUT_PORTS_END
 
-READ8_MEMBER(scyclone_state::vram_r)
+uint8_t scyclone_state::vram_r(offs_t offset)
 {
 	uint8_t ret = 0;
 	// not sure, collisions depend on readback
@@ -413,7 +412,7 @@ READ8_MEMBER(scyclone_state::vram_r)
 }
 
 
-WRITE8_MEMBER(scyclone_state::vram_w)
+void scyclone_state::vram_w(offs_t offset, uint8_t data)
 {
 #if 0
 	// halves are NOT equal in between level cutscenes
@@ -461,7 +460,7 @@ WRITE8_MEMBER(scyclone_state::vram_w)
 }
 
 
-WRITE8_MEMBER(scyclone_state::vidctrl_w)
+void scyclone_state::vidctrl_w(uint8_t data)
 {
 	// ---- facu
 	// f = flipscreen (always set during player 2 turn, even in upright mode?!)
@@ -476,52 +475,52 @@ WRITE8_MEMBER(scyclone_state::vidctrl_w)
 	}
 }
 
-WRITE8_MEMBER(scyclone_state::sprite_xpos_w)
+void scyclone_state::sprite_xpos_w(uint8_t data)
 {
 	m_sprite_xpos = data;
 }
 
-WRITE8_MEMBER(scyclone_state::sprite_ypos_w)
+void scyclone_state::sprite_ypos_w(uint8_t data)
 {
 	m_sprite_ypos = data;
 }
 
-WRITE8_MEMBER(scyclone_state::sprite_colour_w)
+void scyclone_state::sprite_colour_w(uint8_t data)
 {
 	m_sprite_colour = data;
 }
 
-WRITE8_MEMBER(scyclone_state::sprite_tile_w)
+void scyclone_state::sprite_tile_w(uint8_t data)
 {
 	m_sprite_tile = data;
 }
 
-WRITE8_MEMBER(scyclone_state::starscroll_w)
+void scyclone_state::starscroll_w(uint8_t data)
 {
 	m_starscroll = data;
 }
 
-WRITE8_MEMBER(scyclone_state::port0e_w)
+void scyclone_state::port0e_w(uint8_t data)
 {
 	// could be related to basic sound effects?
 	//logerror("port0e_w %02x\n",data);
 	m_p0e = data;
 }
 
-WRITE8_MEMBER(scyclone_state::port06_w)
+void scyclone_state::port06_w(uint8_t data)
 {
 	// watchdog?
 }
 
 // these seem to select where the vram writes go
 // 3 possible planes, probably one 4 bits per 2 pixels?
-WRITE8_MEMBER(scyclone_state::videomask1_w)
+void scyclone_state::videomask1_w(uint8_t data)
 {
 	// format seems to be -xxx -xxx
 	m_videowritemask = data;
 }
 
-WRITE8_MEMBER(scyclone_state::videomask2_w)
+void scyclone_state::videomask2_w(uint8_t data)
 {
 	// format seems to be -xxx -xxx
 	m_videowritemask2 = data;
@@ -529,7 +528,7 @@ WRITE8_MEMBER(scyclone_state::videomask2_w)
 
 // Sound CPU handlers
 
-WRITE8_MEMBER(scyclone_state::snd_3001_w)
+void scyclone_state::snd_3001_w(uint8_t data)
 {
 	// need to clear the latch somewhere, the command value is written back here and at 3005
 	// after acknowledging a command
@@ -538,18 +537,18 @@ WRITE8_MEMBER(scyclone_state::snd_3001_w)
 }
 
 /*
-WRITE8_MEMBER(scyclone_state::snd_3003_w)
+void scyclone_state::snd_3003_w(uint8_t data)
 {
 //  m_soundlatch->clear_w();
 }
 
-WRITE8_MEMBER(scyclone_state::snd_3004_w)
+void scyclone_state::snd_3004_w(uint8_t data)
 {
 //  m_soundlatch->clear_w();
 }
 */
 
-WRITE8_MEMBER(scyclone_state::snd_3005_w)
+void scyclone_state::snd_3005_w(uint8_t data)
 {
 //  m_soundlatch->clear_w();
 }
@@ -654,15 +653,7 @@ void scyclone_state::scyclone(machine_config &config)
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
 
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-
 	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
-
-	voltage_regulator_device &vref2(VOLTAGE_REGULATOR(config, "vref2", 0));
-	vref2.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT);
-	vref2.add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 ROM_START( scyclone )

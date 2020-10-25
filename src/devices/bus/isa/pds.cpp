@@ -29,14 +29,14 @@ isa8_pds_device::isa8_pds_device(const machine_config &mconfig, const char *tag,
 }
 
 
-READ8_MEMBER(isa8_pds_device::ppi_r)
+uint8_t isa8_pds_device::ppi_r(offs_t offset)
 {
 	if(!(offset & 0x01))
 		return m_ppi->read(offset/2);
 	return 0xff;
 }
 
-WRITE8_MEMBER(isa8_pds_device::ppi_w)
+void isa8_pds_device::ppi_w(offs_t offset, uint8_t data)
 {
 	if(!(offset & 0x01))
 		m_ppi->write(offset/2,data);
@@ -45,7 +45,7 @@ WRITE8_MEMBER(isa8_pds_device::ppi_w)
 void isa8_pds_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(0x0300, 0x0307, read8_delegate(*this, FUNC(isa8_pds_device::ppi_r)), write8_delegate(*this, FUNC(isa8_pds_device::ppi_w)));
+	m_isa->install_device(0x0300, 0x0307, read8sm_delegate(*this, FUNC(isa8_pds_device::ppi_r)), write8sm_delegate(*this, FUNC(isa8_pds_device::ppi_w)));
 }
 
 void isa8_pds_device::device_reset()

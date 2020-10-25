@@ -75,7 +75,7 @@ building MAME on a 64-bit system.  Instructions may need to be adjusted for
   add **OSD=sdl** to the make options.  The main emulator binary will have an
   ``sdl`` prefix prepended (e.g. ``sdlmame64.exe`` or ``sdlmame.exe``).  You
   will need to install the MSYS2 packages for SDL 2 version 2.0.3 or later.
-* By default, MAME will include the native Windows debugger.  To also inculde
+* By default, MAME will include the native Windows debugger.  To also include
   the portable Qt debugger, add **USE_QTDEBUG=1** to the make options.  You
   will need to install the MSYS2 packages for Qt 5.
 
@@ -96,10 +96,13 @@ with MSYS2 and the **pacman** package manager.
 * Install packages necessary to build MAME.  At the very least, you'll need
   ``bash``, ``git``, ``make``.
 * For 64-bit builds you'll need ``mingw-w64-x86_64-gcc`` and
-  ``mingw-w64-x86_64-python2``.
+  ``mingw-w64-x86_64-python``.
 * For 32-bit builds you'll need ``mingw-w64-i686-gcc`` and
-  ``mingw-w64-i686-python2``.
+  ``mingw-w64-i686-python``.
 * For debugging you may want to install ``gdb``.
+* To link using the LLVM linker (generally much faster than the GNU linker),
+  you'll need ``mingw-w64-x86_64-lld`` for 64-bit builds, or
+  ``mingw-w64-i686-lld`` for 32-bit builds.
 * To build against the portable SDL interfaces, you'll need
   ``mingw-w64-x86_64-SDL2`` and ``mingw-w64-x86_64-SDL2_ttf`` for 64-bit builds,
   or ``mingw-w64-i686-SDL2`` and ``mingw-w64-i686-SDL2_ttf`` for 32-bit builds.
@@ -139,7 +142,8 @@ Building with Microsoft Visual Studio
 Fedora Linux
 ------------
 
-You'll need a few prerequisites from your distro. Make sure you get SDL2 2.0.3 or 2.0.4 as earlier versions are buggy.
+You'll need a few prerequisites from your Linux distribution.  Make sure you get
+SDL2 2.0.4 or later as earlier versions are buggy.
 
 **sudo dnf install gcc gcc-c++ SDL2-devel SDL2_ttf-devel libXi-devel libXinerama-devel qt5-qtbase-devel qt5-qttools expat-devel fontconfig-devel alsa-lib-devel**
 
@@ -151,7 +155,8 @@ Compilation is exactly as described above in All Platforms.
 Debian and Ubuntu (including Raspberry Pi and ODROID devices)
 -------------------------------------------------------------
 
-You'll need a few prerequisites from your distro. Make sure you get SDL2 2.0.3 or 2.0.4 as earlier versions are buggy.
+You'll need a few prerequisites from your Linux distribution.  Make sure you get
+SDL2 2.0.4 or later as earlier versions are buggy.
 
 **sudo apt-get install git build-essential python libsdl2-dev libsdl2-ttf-dev libfontconfig-dev qt5-default**
 
@@ -175,7 +180,7 @@ Compilation is exactly as described above in All Platforms.
 Apple Mac OS X
 --------------
 
-You'll need a few prerequisites to get started. Make sure you're on OS X 10.9 Mavericks or later. You will NEED SDL2 2.0.4 for OS X.
+You'll need a few prerequisites to get started. Make sure you're on OS X 10.9 Mavericks or later. You will need SDL2 2.0.4 or later for OS X.
 
 * Install **Xcode** from the Mac App Store
 * Launch **Xcode**. It will download a few additional prerequisites. Let this run through before proceeding.
@@ -491,6 +496,16 @@ variables.
 
 Unusual Build Configurations
 ----------------------------
+
+Linking using the LLVM linker
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The LLVM linker is generally faster than the GNU linker that GCC uses by
+default.  This is more pronounced on systems with a high overhead for file
+system operations (e.g. Microsoft Windows, or when compiling on a disk mounted
+over a network).  To use the LLVM linker with GCC, ensure the LLVM linker is
+installed and add ``-fuse-ld=lld`` to the linker options (e.g. in the
+**LDFLAGS** environment variable or in the **ARCHOPTS** setting).
 
 Cross-compiling MAME
 ~~~~~~~~~~~~~~~~~~~~

@@ -14,10 +14,10 @@ HNZC
 
 */
 
-#define OP_HANDLER(name) void m6805_base_device::name()
-#define OP_HANDLER_BIT(name) template <unsigned B> void m6805_base_device::name()
-#define OP_HANDLER_BRA(name) template <bool C> void m6805_base_device::name()
-#define OP_HANDLER_MODE(name) template <m6805_base_device::addr_mode M> void m6805_base_device::name()
+#define OP_HANDLER(name) template<bool big> void m6805_base_device::name()
+#define OP_HANDLER_BIT(name) template <bool big, unsigned B> void m6805_base_device::name()
+#define OP_HANDLER_BRA(name) template <bool big, bool C> void m6805_base_device::name()
+#define OP_HANDLER_MODE(name) template <bool big, m6805_base_device::addr_mode M> void m6805_base_device::name()
 
 
 OP_HANDLER( illegal )
@@ -30,7 +30,7 @@ OP_HANDLER_BIT( brset )
 {
 	u8 t, r;
 	DIRBYTE(r);
-	immbyte(t);
+	immbyte<big>(t);
 	CLC;
 	if (BIT(r, B)) { SEC; PC += SIGNED(t); }
 }
@@ -40,7 +40,7 @@ OP_HANDLER_BIT( brclr )
 {
 	u8 t, r;
 	DIRBYTE(r);
-	immbyte(t);
+	immbyte<big>(t);
 	SEC;
 	if (!BIT(r, B)) { CLC; PC += SIGNED(t); }
 }
@@ -50,7 +50,7 @@ OP_HANDLER_BIT( bset )
 {
 	u8 t;
 	DIRBYTE(t);
-	wm(EAD, t | (u8(1) << B));
+	wm<big>(EAD, t | (u8(1) << B));
 }
 
 // $11/$13/$15/$17/$19/$1B/$1D/$1F BCLR direct ----
@@ -58,7 +58,7 @@ OP_HANDLER_BIT( bclr )
 {
 	u8 t;
 	DIRBYTE(t);
-	wm(EAD, t & ~(u8(1) << B));
+	wm<big>(EAD, t & ~(u8(1) << B));
 }
 
 // $20 BRA relative ----
@@ -103,7 +103,7 @@ OP_HANDLER_MODE( neg )
 	u16 const r = -t;
 	clr_nzc();
 	set_nzc8(r);
-	wm(EAD, r);
+	wm<big>(EAD, r);
 }
 
 // $31 ILLEGAL
@@ -125,7 +125,7 @@ OP_HANDLER_MODE( com )
 	clr_nz();
 	set_nz8(t);
 	SEC;
-	wm(EAD, t);
+	wm<big>(EAD, t);
 }
 
 // $34 LSR direct                   -0**
@@ -139,7 +139,7 @@ OP_HANDLER_MODE( lsr )
 	CC |= BIT(t, 0);
 	t >>= 1;
 	set_z8(t);
-	wm(EAD, t);
+	wm<big>(EAD, t);
 }
 
 // $35 ILLEGAL
@@ -158,7 +158,7 @@ OP_HANDLER_MODE( ror )
 	CC |= BIT(t, 0);
 	r |= t >> 1;
 	set_nz8(r);
-	wm(EAD, r);
+	wm<big>(EAD, r);
 }
 
 // $37 ASR direct                   -***
@@ -172,7 +172,7 @@ OP_HANDLER_MODE( asr )
 	CC |= BIT(t, 0);
 	t = (t >> 1) | (t & 0x80);
 	set_nz8(t);
-	wm(EAD, t);
+	wm<big>(EAD, t);
 }
 
 // $38 LSL direct                   -***
@@ -185,7 +185,7 @@ OP_HANDLER_MODE( lsl )
 	u16 const r = u16(t) << 1;
 	clr_nzc();
 	set_nzc8(r);
-	wm(EAD, r);
+	wm<big>(EAD, r);
 }
 
 // $39 ROL direct                   -***
@@ -198,7 +198,7 @@ OP_HANDLER_MODE( rol )
 	u16 const r = BIT(CC, 0) | (t << 1);
 	clr_nzc();
 	set_nzc8(r);
-	wm(EAD, r);
+	wm<big>(EAD, r);
 }
 
 // $3a DEC direct                   -**-
@@ -210,7 +210,7 @@ OP_HANDLER_MODE( dec )
 	--t;
 	clr_nz();
 	set_nz8(t);
-	wm(EAD, t);
+	wm<big>(EAD, t);
 }
 
 // $3b ILLEGAL
@@ -227,7 +227,7 @@ OP_HANDLER_MODE( inc )
 	++t;
 	clr_nz();
 	set_nz8(t);
-	wm(EAD, t);
+	wm<big>(EAD, t);
 }
 
 // $3d TST direct                   -**-
@@ -253,7 +253,7 @@ OP_HANDLER_MODE( clr )
 	ARGADDR;
 	clr_nz();
 	SEZ;
-	wm(EAD, 0);
+	wm<big>(EAD, 0);
 }
 
 // $40 NEGA inherent -***
@@ -480,16 +480,16 @@ OP_HANDLER( clrx )
 // $80 RTI inherent ####
 OP_HANDLER( rti )
 {
-	pullbyte(CC);
-	pullbyte(A);
-	pullbyte(X);
-	pullword(m_pc);
+	pullbyte<big>(CC);
+	pullbyte<big>(A);
+	pullbyte<big>(X);
+	pullword<big>(m_pc);
 }
 
 // $81 RTS inherent ----
 OP_HANDLER( rts )
 {
-	pullword(m_pc);
+	pullword<big>(m_pc);
 }
 
 // $82 ILLEGAL
@@ -497,12 +497,12 @@ OP_HANDLER( rts )
 // $83 SWI absolute indirect ----
 OP_HANDLER( swi )
 {
-	pushword(m_pc);
-	pushbyte(m_x);
-	pushbyte(m_a);
-	pushbyte(m_cc);
+	pushword<big>(m_pc);
+	pushbyte<big>(m_x);
+	pushbyte<big>(m_a);
+	pushbyte<big>(m_cc);
 	SEI;
-	rm16(m_params.m_swi_vector & m_params.m_vector_mask, m_pc);
+	rm16<big>(m_params.m_swi_vector & m_params.m_vector_mask, m_pc);
 }
 
 // $84 ILLEGAL
@@ -697,7 +697,7 @@ OP_HANDLER_MODE( sta )
 	clr_nz();
 	set_nz8(A);
 	ARGADDR;
-	wm(EAD, A);
+	wm<big>(EAD, A);
 }
 
 // $a8 EORA immediate               -**-
@@ -778,8 +778,8 @@ OP_HANDLER_MODE( jmp )
 OP_HANDLER( bsr )
 {
 	u8 t;
-	immbyte(t);
-	pushword(m_pc);
+	immbyte<big>(t);
+	pushword<big>(m_pc);
 	PC += SIGNED(t);
 }
 
@@ -791,7 +791,7 @@ OP_HANDLER( bsr )
 OP_HANDLER_MODE( jsr )
 {
 	ARGADDR;
-	pushword(m_pc);
+	pushword<big>(m_pc);
 	PC = EA;
 }
 
@@ -819,5 +819,5 @@ OP_HANDLER_MODE( stx )
 	clr_nz();
 	set_nz8(X);
 	ARGADDR;
-	wm(EAD, X);
+	wm<big>(EAD, X);
 }

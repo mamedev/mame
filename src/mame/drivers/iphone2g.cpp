@@ -227,7 +227,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ32_MEMBER(clock1_r);
+	uint32_t clock1_r(offs_t offset);
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -249,7 +249,7 @@ uint32_t iphone2g_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	return 0;
 }
 
-READ32_MEMBER(iphone2g_state::clock1_r)
+uint32_t iphone2g_state::clock1_r(offs_t offset)
 {
 	uint32_t ret = 0;
 	switch(offset)

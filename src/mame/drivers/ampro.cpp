@@ -38,20 +38,21 @@ public:
 	ampro_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_rom(*this, "maincpu")
+		, m_ram(*this, "mainram")
+		, m_bank1(*this, "bank1")
 		, m_dart(*this, "dart")
 		, m_ctc(*this, "ctc")
 		, m_fdc(*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
+		, m_floppy1(*this, "fdc:1")
+		, m_floppy2(*this, "fdc:2")
+		, m_floppy3(*this, "fdc:3")
 		, m_ncr(*this, "scsi:7:ncr")
 		, m_printer(*this, "printer")
 	{ }
 
 	void ampro(machine_config &config);
-
-	void init_ampro();
-
-protected:
-	virtual void machine_reset() override;
 
 private:
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
@@ -62,21 +63,29 @@ private:
 	uint8_t dart_r(offs_t offset);
 	void ctc_w(offs_t offset, uint8_t data);
 	void dart_w(offs_t offset, uint8_t data);
+	void machine_reset() override;
+	void machine_start() override;
 
-	void ampro_io(address_map &map);
-	void ampro_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 
 	required_device<z80_device> m_maincpu;
+	required_region_ptr<u8> m_rom;
+	required_shared_ptr<u8> m_ram;
+	required_memory_bank    m_bank1;
 	required_device<z80dart_device> m_dart;
 	required_device<z80ctc_device> m_ctc;
 	required_device<wd1772_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+	required_device<floppy_connector> m_floppy2;
+	required_device<floppy_connector> m_floppy3;
 	required_device<ncr5380n_device> m_ncr;
 	required_device<centronics_device> m_printer;
 };
 
 /*
-d0..d3 Drive select 0-3 (we only emulate 1 drive)
+d0..d3 Drive select 0-3
 d4     Side select 0=side0
 d5     /DDEN
 d6     Banking 0=rom
@@ -84,10 +93,13 @@ d7     FDC master clock 0=8MHz 1=16MHz (for 20cm disks, not emulated)
 */
 void ampro_state::port00_w(uint8_t data)
 {
-	membank("bankr0")->set_entry(BIT(data, 6));
+	m_bank1->set_entry(BIT(~data, 6));
 	m_fdc->dden_w(BIT(data, 5));
 	floppy_image_device *floppy = nullptr;
 	if (BIT(data, 0)) floppy = m_floppy0->get_device();
+	if (BIT(data, 1)) floppy = m_floppy1->get_device();
+	if (BIT(data, 2)) floppy = m_floppy2->get_device();
+	if (BIT(data, 3)) floppy = m_floppy3->get_device();
 	m_fdc->set_floppy(floppy);
 	if (floppy)
 		floppy->ss_w(BIT(data, 4));
@@ -123,14 +135,13 @@ void ampro_state::dart_w(offs_t offset, uint8_t data)
 	m_dart->ba_cd_w(offset>>2, data);
 }
 
-void ampro_state::ampro_mem(address_map &map)
+void ampro_state::mem_map(address_map &map)
 {
-	map.unmap_value_high();
-	map(0x0000, 0x0fff).bankr("bankr0").bankw("bankw0");
-	map(0x1000, 0xffff).ram();
+	map(0x0000, 0xffff).ram().share("mainram");
+	map(0x0000, 0x0fff).bankr("bank1");
 }
 
-void ampro_state::ampro_io(address_map &map)
+void ampro_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
@@ -178,29 +189,26 @@ static INPUT_PORTS_START( ampro )
 	PORT_DIPSETTING(0x07, "7")
 INPUT_PORTS_END
 
+void ampro_state::machine_start()
+{
+	m_bank1->configure_entry(0, m_ram);
+	m_bank1->configure_entry(1, m_rom);
+}
+
 void ampro_state::machine_reset()
 {
-	membank("bankw0")->set_entry(0); // always write to ram
+	m_bank1->set_entry(1);
 
 	port00_w(0);
 	clear_strobe(0);
-}
-
-void ampro_state::init_ampro()
-{
-	uint8_t *main = memregion("maincpu")->base();
-
-	membank("bankr0")->configure_entry(1, &main[0x0000]);
-	membank("bankr0")->configure_entry(0, &main[0x10000]);
-	membank("bankw0")->configure_entry(0, &main[0x0000]);
 }
 
 void ampro_state::ampro(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &ampro_state::ampro_mem);
-	m_maincpu->set_addrmap(AS_IO, &ampro_state::ampro_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ampro_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &ampro_state::io_map);
 	m_maincpu->set_daisy_config(daisy_chain_intf);
 
 	/* Devices */
@@ -237,6 +245,9 @@ void ampro_state::ampro(machine_config &config)
 	//m_fdc->drq_wr_callback().set(m_dart, FUNC(z80dart_device::ria_w)); // only if JMP7 shorted
 	m_fdc->ready_wr_callback().set(m_dart, FUNC(z80dart_device::dcdb_w)); // actually from the drive, and not used by the FDC at all
 	FLOPPY_CONNECTOR(config, "fdc:0", ampro_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", ampro_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:2", ampro_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:3", ampro_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
 	SOFTWARE_LIST(config, "flop_list").set_original("ampro");
 
 	NSCSI_BUS(config, "scsi");
@@ -255,16 +266,16 @@ void ampro_state::ampro(machine_config &config)
 
 /* ROM definition */
 ROM_START( ampro )
-	ROM_REGION( 0x11000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "mntr", "Monitor")
-	ROMX_LOAD( "mntr", 0x10000, 0x1000, CRC(d59d0909) SHA1(936410f414b1e71445253840eea0045545e4ff0b), ROM_BIOS(0))
+	ROMX_LOAD( "mntr", 0x0000, 0x1000, CRC(d59d0909) SHA1(936410f414b1e71445253840eea0045545e4ff0b), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "boot", "Boot")
-	ROMX_LOAD( "boot", 0x10000, 0x1000, CRC(b3524046) SHA1(5466f7d28c1a04cfbf328095cb35ad1525e91f44), ROM_BIOS(1))
+	ROMX_LOAD( "boot", 0x0000, 0x1000, CRC(b3524046) SHA1(5466f7d28c1a04cfbf328095cb35ad1525e91f44), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "scsi", "SCSI Boot")
-	ROMX_LOAD( "scsi", 0x10000, 0x1000, CRC(8eb20e5d) SHA1(0ab1ff65cf6d3c1a713a8ac5c1ee4c662ac3da0c), ROM_BIOS(2))
+	ROMX_LOAD( "scsi", 0x0000, 0x1000, CRC(8eb20e5d) SHA1(0ab1ff65cf6d3c1a713a8ac5c1ee4c662ac3da0c), ROM_BIOS(2))
 ROM_END
 
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME            FLAGS
-COMP( 1980, ampro, 0,      0,      ampro,   ampro, ampro_state, init_ampro, "Ampro", "Little Z80 Board", 0 )
+COMP( 1980, ampro, 0,      0,      ampro,   ampro, ampro_state, empty_init, "Ampro", "Little Z80 Board", MACHINE_SUPPORTS_SAVE )

@@ -29,10 +29,10 @@ public:
 
 	void gmsshoot(machine_config &config);
 private:
-	DECLARE_WRITE8_MEMBER(output_1100);
-	DECLARE_WRITE8_MEMBER(output_1300);
-	DECLARE_WRITE8_MEMBER(output_1520);
-	DECLARE_WRITE8_MEMBER(output_1540);
+	void output_1100(uint8_t data);
+	void output_1300(uint8_t data);
+	void output_1520(uint8_t data);
+	void output_1540(offs_t offset, uint8_t data);
 
 	void mem_map(address_map &map);
 
@@ -40,23 +40,23 @@ private:
 };
 
 
-WRITE8_MEMBER(gamemasters_state::output_1100)
+void gamemasters_state::output_1100(uint8_t data)
 {
 	// IRQ ack?
 	logerror("%s: Writing %02X to 1100\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(gamemasters_state::output_1300)
+void gamemasters_state::output_1300(uint8_t data)
 {
 	logerror("%s: Writing %02X to 1300\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(gamemasters_state::output_1520)
+void gamemasters_state::output_1520(uint8_t data)
 {
 	logerror("%s: Writing %02X to 1520\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(gamemasters_state::output_1540)
+void gamemasters_state::output_1540(offs_t offset, uint8_t data)
 {
 	logerror("%s: Writing %02X to 1540 + %X\n", machine().describe_context(), data, offset);
 }

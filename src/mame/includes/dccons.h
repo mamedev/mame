@@ -30,13 +30,11 @@ public:
 	void init_dcjp();
 	void init_tream();
 
-	DECLARE_READ64_MEMBER(dcus_idle_skip_r);
-	DECLARE_READ64_MEMBER(dcjp_idle_skip_r);
+	uint64_t dcus_idle_skip_r();
+	uint64_t dcjp_idle_skip_r();
 
-	DECLARE_READ64_MEMBER(dc_pdtra_r);
-	DECLARE_WRITE64_MEMBER(dc_pdtra_w);
-	DECLARE_READ64_MEMBER(dc_arm_r);
-	DECLARE_WRITE64_MEMBER(dc_arm_w);
+	uint64_t dc_pdtra_r();
+	void dc_pdtra_w(uint64_t data);
 	DECLARE_WRITE_LINE_MEMBER(aica_irq);
 	DECLARE_WRITE_LINE_MEMBER(sh4_aica_irq);
 	DECLARE_WRITE_LINE_MEMBER(ata_interrupt);
@@ -44,10 +42,10 @@ public:
 	TIMER_CALLBACK_MEMBER( atapi_xfer_end );
 
 	void dreamcast_atapi_init();
-	DECLARE_READ32_MEMBER( dc_mess_g1_ctrl_r );
-	DECLARE_WRITE32_MEMBER( dc_mess_g1_ctrl_w );
-	DECLARE_READ8_MEMBER( dc_flash_r );
-	DECLARE_WRITE8_MEMBER( dc_flash_w );
+	uint32_t dc_mess_g1_ctrl_r(offs_t offset);
+	void dc_mess_g1_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint8_t dc_flash_r(offs_t offset);
+	void dc_flash_w(offs_t offset, uint8_t data);
 
 	static void gdrom_config(device_t *device);
 	void dc_base(machine_config &config);

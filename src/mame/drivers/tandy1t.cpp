@@ -107,19 +107,19 @@ private:
 	required_device<pcvideo_t1000_device> m_video;
 	required_device<ram_device> m_ram;
 
-	DECLARE_WRITE8_MEMBER ( pc_t1t_p37x_w );
-	DECLARE_READ8_MEMBER ( pc_t1t_p37x_r );
+	void pc_t1t_p37x_w(offs_t offset, uint8_t data);
+	uint8_t pc_t1t_p37x_r(offs_t offset);
 
-	DECLARE_WRITE8_MEMBER ( tandy1000_pio_w );
-	DECLARE_READ8_MEMBER(tandy1000_pio_r);
-	DECLARE_READ8_MEMBER( tandy1000_bank_r );
-	DECLARE_WRITE8_MEMBER( tandy1000_bank_w );
-	DECLARE_WRITE8_MEMBER( nmi_vram_bank_w );
-	DECLARE_WRITE8_MEMBER( vram_bank_w );
-	DECLARE_READ8_MEMBER( vram_r );
-	DECLARE_WRITE8_MEMBER( vram_w );
-	DECLARE_WRITE8_MEMBER( devctrl_w );
-	DECLARE_READ8_MEMBER( unk_r );
+	void tandy1000_pio_w(offs_t offset, uint8_t data);
+	uint8_t tandy1000_pio_r(offs_t offset);
+	uint8_t tandy1000_bank_r(offs_t offset);
+	void tandy1000_bank_w(offs_t offset, uint8_t data);
+	void nmi_vram_bank_w(uint8_t data);
+	void vram_bank_w(uint8_t data);
+	uint8_t vram_r(offs_t offset);
+	void vram_w(offs_t offset, uint8_t data);
+	void devctrl_w(uint8_t data);
+	uint8_t unk_r();
 
 	int tandy1000_read_eeprom();
 	void tandy1000_write_eeprom(uint8_t data);
@@ -279,7 +279,7 @@ void tandy1000_state::tandy1000_write_eeprom(uint8_t data)
 	m_eeprom_clock=data&4;
 }
 
-WRITE8_MEMBER( tandy1000_state::pc_t1t_p37x_w )
+void tandy1000_state::pc_t1t_p37x_w(offs_t offset, uint8_t data)
 {
 //  DBG_LOG(2,"T1T_p37x_w",("%.5x #%d $%02x\n", m_maincpu->pc( ),offset, data));
 	if (offset!=4)
@@ -293,7 +293,7 @@ WRITE8_MEMBER( tandy1000_state::pc_t1t_p37x_w )
 	}
 }
 
-READ8_MEMBER( tandy1000_state::pc_t1t_p37x_r )
+uint8_t tandy1000_state::pc_t1t_p37x_r(offs_t offset)
 {
 	int data = m_tandy_data[offset];
 //  DBG_LOG(1,"T1T_p37x_r",("%.5x #%d $%02x\n", m_maincpu->pc( ), offset, data));
@@ -309,7 +309,7 @@ READ8_MEMBER( tandy1000_state::pc_t1t_p37x_r )
    bit 3 output turbo mode
 */
 
-WRITE8_MEMBER( tandy1000_state::tandy1000_pio_w )
+void tandy1000_state::tandy1000_pio_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -335,7 +335,7 @@ WRITE8_MEMBER( tandy1000_state::tandy1000_pio_w )
 	}
 }
 
-READ8_MEMBER(tandy1000_state::tandy1000_pio_r)
+uint8_t tandy1000_state::tandy1000_pio_r(offs_t offset)
 {
 	int data=0xff;
 	switch (offset)
@@ -361,29 +361,29 @@ READ8_MEMBER(tandy1000_state::tandy1000_pio_r)
 	return data;
 }
 
-WRITE8_MEMBER( tandy1000_state::nmi_vram_bank_w )
+void tandy1000_state::nmi_vram_bank_w(uint8_t data)
 {
 	m_mb->nmi_enable_w(data & 0x80);
-	vram_bank_w(space, 0, data & 0x1e);
+	vram_bank_w(data & 0x1e);
 	m_video->disable_w((data & 1) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER( tandy1000_state::vram_bank_w )
+void tandy1000_state::vram_bank_w(uint8_t data)
 {
 	m_vram_bank = (data >> 1) & 7;
 }
 
-WRITE8_MEMBER( tandy1000_state::devctrl_w )
+void tandy1000_state::devctrl_w(uint8_t data)
 {
 	m_video->disable_w((data & 4) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER( tandy1000_state::unk_r )
+uint8_t tandy1000_state::unk_r()
 {
 	return 0; // status port?
 }
 
-READ8_MEMBER( tandy1000_state::vram_r )
+uint8_t tandy1000_state::vram_r(offs_t offset)
 {
 	uint8_t vram_base = (m_ram->size() >> 17) - 1;
 	if((m_vram_bank - vram_base) == (offset >> 17))
@@ -391,7 +391,7 @@ READ8_MEMBER( tandy1000_state::vram_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( tandy1000_state::vram_w )
+void tandy1000_state::vram_w(offs_t offset, uint8_t data)
 {
 	uint8_t vram_base = (m_ram->size() >> 17) - 1;
 	if((m_vram_bank - vram_base) == (offset >> 17))
@@ -432,14 +432,14 @@ void tandy1000_state::machine_start()
 	m_maincpu->space(AS_PROGRAM).install_ram(0, m_ram->size() - (128*1024) - 1, &m_ram->pointer()[128*1024]);
 	if(m_maincpu->space(AS_PROGRAM).data_width() == 8)
 		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(m_ram->size() - (128*1024), 640*1024 - 1,
-				read8_delegate(*this, FUNC(tandy1000_state::vram_r)), write8_delegate(*this, FUNC(tandy1000_state::vram_w)));
+				read8sm_delegate(*this, FUNC(tandy1000_state::vram_r)), write8sm_delegate(*this, FUNC(tandy1000_state::vram_w)));
 	else
 		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(m_ram->size() - (128*1024), 640*1024 - 1,
-				read8_delegate(*this, FUNC(tandy1000_state::vram_r)), write8_delegate(*this, FUNC(tandy1000_state::vram_w)), 0xffff);
+				read8sm_delegate(*this, FUNC(tandy1000_state::vram_r)), write8sm_delegate(*this, FUNC(tandy1000_state::vram_w)), 0xffff);
 	subdevice<nvram_device>("nvram")->set_base(m_eeprom_ee, sizeof(m_eeprom_ee));
 }
 
-READ8_MEMBER( tandy1000_state::tandy1000_bank_r )
+uint8_t tandy1000_state::tandy1000_bank_r(offs_t offset)
 {
 	uint8_t data = 0xFF;
 
@@ -456,7 +456,7 @@ READ8_MEMBER( tandy1000_state::tandy1000_bank_r )
 }
 
 
-WRITE8_MEMBER( tandy1000_state::tandy1000_bank_w )
+void tandy1000_state::tandy1000_bank_w(offs_t offset, uint8_t data)
 {
 	logerror( "%s: tandy1000_bank_w: offset = %x, data = %02x\n", machine().describe_context(), offset, data );
 
@@ -479,7 +479,7 @@ WRITE8_MEMBER( tandy1000_state::tandy1000_bank_w )
 	}
 }
 
-static INPUT_PORTS_START( t1000_common )
+static INPUT_PORTS_START( t1000 )
 	PORT_START("IN0") /* IN0 */
 	PORT_BIT ( 0xf0, 0xf0,   IPT_UNUSED )
 	PORT_BIT ( 0x08, 0x08,   IPT_CUSTOM ) PORT_VBLANK("pcvideo_t1000:screen")
@@ -554,15 +554,29 @@ static INPUT_PORTS_START( t1000_keyboard )
 	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F12") PORT_CODE(KEYCODE_F12) /* F12                         5a  Da */
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( t1000_90key )
-	PORT_INCLUDE(t1000_common)
-	PORT_INCLUDE(t1000_keyboard)
-INPUT_PORTS_END
+class t1000_keyboard_device : public pc_keyboard_device
+{
+public:
+	t1000_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-static INPUT_PORTS_START( t1000_101key )
-	PORT_INCLUDE(t1000_common)
-	PORT_INCLUDE(at_keyboard)
-INPUT_PORTS_END
+protected:
+	virtual ioport_constructor device_input_ports() const override;
+};
+
+DEFINE_DEVICE_TYPE(T1000_KEYB, t1000_keyboard_device, "t1000_keyb", "Tandy 1000 Keyboard")
+
+t1000_keyboard_device::t1000_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	pc_keyboard_device(mconfig, T1000_KEYB, tag, owner, clock)
+{
+	m_type = KEYBOARD_TYPE::PC;
+}
+
+ioport_constructor t1000_keyboard_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(t1000_keyboard);
+}
+
+
 
 void tandy1000_state::tandy1000_map(address_map &map)
 {
@@ -696,7 +710,7 @@ void tandy1000_state::tandy1000_common(machine_config &config)
 
 void tandy1000_state::tandy1000_90key(machine_config &config)
 {
-	PC_KEYB(config, m_keyboard);
+	T1000_KEYB(config, m_keyboard);
 	m_keyboard->keypress().set("mb:pic8259", FUNC(pic8259_device::ir1_w));
 }
 
@@ -957,10 +971,10 @@ ROM_END
 
 
 // tandy 1000
-//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT         CLASS            INIT        COMPANY              FULLNAME           FLAGS
-COMP( 1987, t1000hx,  ibm5150, 0,      t1000hx,  t1000_90key,  tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 HX",   0 )
-COMP( 1987, t1000sx,  ibm5150, 0,      t1000sx,  t1000_90key,  tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 SX",   0 )
-COMP( 1987, t1000tx,  ibm5150, 0,      t1000tx,  t1000_90key,  tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 TX",   0 )
-COMP( 1989, t1000rl,  ibm5150, 0,      t1000rl,  t1000_101key, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 RL",   0 )
-COMP( 1989, t1000tl2, ibm5150, 0,      t1000tl,  t1000_101key, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 TL/2", 0 )
-COMP( 1988, t1000sl2, ibm5150, 0,      t1000sl2, t1000_101key, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 SL/2", 0 )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT  CLASS            INIT        COMPANY              FULLNAME           FLAGS
+COMP( 1987, t1000hx,  ibm5150, 0,      t1000hx,  t1000, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 HX",   0 )
+COMP( 1987, t1000sx,  ibm5150, 0,      t1000sx,  t1000, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 SX",   0 )
+COMP( 1987, t1000tx,  ibm5150, 0,      t1000tx,  t1000, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 TX",   0 )
+COMP( 1989, t1000rl,  ibm5150, 0,      t1000rl,  t1000, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 RL",   0 )
+COMP( 1989, t1000tl2, ibm5150, 0,      t1000tl,  t1000, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 TL/2", 0 )
+COMP( 1988, t1000sl2, ibm5150, 0,      t1000sl2, t1000, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 SL/2", 0 )

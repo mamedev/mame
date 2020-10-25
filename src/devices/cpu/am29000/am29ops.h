@@ -947,7 +947,7 @@ void am29000_cpu_device::LOAD()
 				return;
 			}
 
-			r = m_data->read_dword(addr);
+			r = m_data.read_dword(addr);
 		}
 	}
 
@@ -1013,7 +1013,7 @@ void am29000_cpu_device::LOADM()
 				return;
 			}
 
-			r = m_data->read_dword(addr);
+			r = m_data.read_dword(addr);
 		}
 	}
 
@@ -1035,7 +1035,7 @@ void am29000_cpu_device::LOADM()
 
 	for (int32_t cnt = 0; cnt <= GET_CHC_CR; ++cnt)
 	{
-		m_r[r] = m_data->read_dword(addr);
+		m_r[r] = m_data.read_dword(addr);
 
 //          SET_CHC_CR(cnt - 1);
 		addr += 4;
@@ -1076,7 +1076,7 @@ void am29000_cpu_device::STORE()
 		}
 	}
 
-	m_data->write_dword(addr, m_r[RA]);
+	m_data.write_dword(addr, m_r[RA]);
 
 	if (!FREEZE_MODE)
 	{
@@ -1148,7 +1148,7 @@ void am29000_cpu_device::STOREM()
 
 	for (int32_t cnt = 0; cnt <= GET_CHC_CR; ++cnt)
 	{
-		m_data->write_dword(addr, m_r[r]);
+		m_data.write_dword(addr, m_r[r]);
 
 		addr += 4;
 

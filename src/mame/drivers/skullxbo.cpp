@@ -72,7 +72,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(skullxbo_state::scanline_timer)
 }
 
 
-WRITE16_MEMBER(skullxbo_state::skullxbo_halt_until_hblank_0_w)
+void skullxbo_state::skullxbo_halt_until_hblank_0_w(uint16_t data)
 {
 	halt_until_hblank_0(*m_maincpu, *m_screen);
 }
@@ -95,7 +95,7 @@ void skullxbo_state::machine_start()
  *
  *************************************/
 
-WRITE16_MEMBER(skullxbo_state::skullxbo_mobwr_w)
+void skullxbo_state::skullxbo_mobwr_w(offs_t offset, uint16_t data)
 {
 	logerror("MOBWR[%02X] = %04X\n", offset, data);
 }

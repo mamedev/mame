@@ -525,7 +525,7 @@ void am7990_device_base::send_complete_cb(int result)
 	m_transmit_poll->adjust(attotime::zero, 0, TX_POLL_PERIOD);
 }
 
-READ16_MEMBER(am7990_device_base::regs_r)
+u16 am7990_device_base::regs_r(address_space &space, offs_t offset)
 {
 	if (!offset)
 	{
@@ -540,7 +540,7 @@ READ16_MEMBER(am7990_device_base::regs_r)
 		return m_rap;
 }
 
-WRITE16_MEMBER(am7990_device_base::regs_w)
+void am7990_device_base::regs_w(offs_t offset, u16 data)
 {
 	if (!offset)
 	{

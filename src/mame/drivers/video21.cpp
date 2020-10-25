@@ -51,9 +51,9 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(lamp1_w);
-	DECLARE_WRITE8_MEMBER(lamp2_w);
+	void sound_w(uint8_t data);
+	void lamp1_w(uint8_t data);
+	void lamp2_w(uint8_t data);
 
 	int m_hopper_motor;
 	int m_hopper_coin;
@@ -74,19 +74,18 @@ private:
 
 uint32_t video21_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y,ra,chr,gfx;
-	uint16_t sy=0,ma=0,x;
+	uint16_t sy=0,ma=0;
 
-	for (y = 0; y < 28; y++)
+	for (uint8_t y = 0; y < 28; y++)
 	{
-		for (ra = 0; ra < 8; ra++)
+		for (uint8_t ra = 0; ra < 8; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix(sy++);
 
-			for (x = 0; x < 32; x++)
+			for (uint16_t x = 0; x < 32; x++)
 			{
-				chr = m_p_videoram[x+ma] & 0x7f;
-				gfx = m_p_chargen[(chr<<3) | ra ];
+				uint8_t chr = m_p_videoram[x+ma] & 0x7f;
+				uint8_t gfx = m_p_chargen[(chr<<3) | ra ];
 
 				/* Display a scanline of a character */
 				*p++ = BIT(gfx, 7);
@@ -112,14 +111,14 @@ TIMER_CALLBACK_MEMBER(video21_state::hopper_coinout)
 		m_hopper_timer->adjust(attotime::from_msec(100), m_hopper_coin ^ 1);
 }
 
-WRITE8_MEMBER(video21_state::sound_w)
+void video21_state::sound_w(uint8_t data)
 {
 	// beeper pitch
 	m_beeper->set_state(data != 0xff); // FF is off
 	m_beeper->set_clock(4 * data);
 }
 
-WRITE8_MEMBER(video21_state::lamp1_w)
+void video21_state::lamp1_w(uint8_t data)
 {
 	// d1-d3: coincounters
 	machine().bookkeeping().coin_counter_w(0, data & 0x04); // coin in
@@ -139,7 +138,7 @@ WRITE8_MEMBER(video21_state::lamp1_w)
 		m_lamps[i+0] = BIT(data, 7-i);
 }
 
-WRITE8_MEMBER(video21_state::lamp2_w)
+void video21_state::lamp2_w(uint8_t data)
 {
 	// lamps:
 	// d5: bet

@@ -50,15 +50,15 @@ private:
 	u8 m_inp_mux;
 
 	void refresh_ram();
-	template<int N> DECLARE_WRITE8_MEMBER(ram_address_w);
-	DECLARE_WRITE8_MEMBER(ram_data_w);
-	DECLARE_READ8_MEMBER(ram_data_r);
-	DECLARE_WRITE8_MEMBER(strobe_w);
+	template<int N> void ram_address_w(u8 data);
+	void ram_data_w(u8 data);
+	u8 ram_data_r();
+	void strobe_w(u8 data);
 
 	void update_leds();
-	DECLARE_WRITE8_MEMBER(led_w);
-	DECLARE_WRITE8_MEMBER(input_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void led_w(u8 data);
+	void input_w(u8 data);
+	u8 input_r(offs_t offset);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(tp3_clock) { m_maincpu->set_input_line(0, ASSERT_LINE); }
 	TIMER_DEVICE_CALLBACK_MEMBER(tp3_clear) { m_maincpu->set_input_line(0, CLEAR_LINE); }
@@ -128,7 +128,7 @@ void tb303_state::refresh_ram()
 }
 
 template<int N>
-WRITE8_MEMBER(tb303_state::ram_address_w)
+void tb303_state::ram_address_w(u8 data)
 {
 	// MCU D,F,E: RAM address
 	m_ram_addrset[N] = data;
@@ -138,14 +138,14 @@ WRITE8_MEMBER(tb303_state::ram_address_w)
 	//..
 }
 
-WRITE8_MEMBER(tb303_state::ram_data_w)
+void tb303_state::ram_data_w(u8 data)
 {
 	// MCU C: RAM data
 	m_ram_data = data;
 	refresh_ram();
 }
 
-READ8_MEMBER(tb303_state::ram_data_r)
+u8 tb303_state::ram_data_r()
 {
 	// MCU C: RAM data
 	if (m_ram_ce && !m_ram_we)
@@ -154,7 +154,7 @@ READ8_MEMBER(tb303_state::ram_data_r)
 		return 0;
 }
 
-WRITE8_MEMBER(tb303_state::strobe_w)
+void tb303_state::strobe_w(u8 data)
 {
 	// MCU I0: RAM _WE
 	m_ram_we = (data & 1) ? false : true;
@@ -182,21 +182,21 @@ void tb303_state::update_leds()
 	// todo: 4 more leds(see top-left part)
 }
 
-WRITE8_MEMBER(tb303_state::led_w)
+void tb303_state::led_w(u8 data)
 {
 	// MCU G: leds state
 	m_led_data = data;
 	update_leds();
 }
 
-WRITE8_MEMBER(tb303_state::input_w)
+void tb303_state::input_w(u8 data)
 {
 	// MCU H: input/led mux
 	m_inp_mux = data ^ 0xf;
 	update_leds();
 }
 
-READ8_MEMBER(tb303_state::input_r)
+u8 tb303_state::input_r(offs_t offset)
 {
 	u8 data = 0;
 

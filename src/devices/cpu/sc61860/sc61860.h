@@ -111,8 +111,9 @@ private:
 	struct { int t2ms, t512ms; int count; } m_timer;
 	emu_timer *m_2ms_tick_timer;
 
-	address_space *m_program;
-	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache;
+	memory_access<16, 0, 0, ENDIANNESS_BIG>::cache m_cache;
+	memory_access<16, 0, 0, ENDIANNESS_BIG>::specific m_program;
+
 	int m_icount;
 	uint8_t m_ram[0x100]; // internal special ram, should be 0x60, 0x100 to avoid memory corruption for now
 

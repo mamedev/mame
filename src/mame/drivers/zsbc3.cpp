@@ -53,21 +53,20 @@ public:
 	void zsbc3(machine_config &config);
 
 private:
-	void zsbc3_io(address_map &map);
-	void zsbc3_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 };
 
 
-void zsbc3_state::zsbc3_mem(address_map &map)
+void zsbc3_state::mem_map(address_map &map)
 {
-	map.unmap_value_high();
 	map(0x0000, 0x07ff).rom();
 	map(0x0800, 0xffff).ram();
 }
 
-void zsbc3_state::zsbc3_io(address_map &map)
+void zsbc3_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
@@ -86,8 +85,8 @@ void zsbc3_state::zsbc3(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &zsbc3_state::zsbc3_mem);
-	m_maincpu->set_addrmap(AS_IO, &zsbc3_state::zsbc3_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &zsbc3_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &zsbc3_state::io_map);
 
 	z80ctc_device &ctc(Z80CTC(config, "ctc", 16_MHz_XTAL / 4));
 	ctc.set_clk<0>(16_MHz_XTAL / 8);
@@ -113,14 +112,14 @@ void zsbc3_state::zsbc3(machine_config &config)
 
 /* ROM definition */
 ROM_START( zsbc3 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "54-3002_zsbc_monitor_1.09.bin", 0x0000, 0x0800, CRC(628588e9) SHA1(8f0d489147ec8382ca007236e0a95a83b6ebcd86))
 
-	ROM_REGION( 0x10000, "hdc", ROMREGION_ERASEFF )
+	ROM_REGION( 0x0400, "hdc", 0 )
 	ROM_LOAD( "54-8622_hdc13.bin", 0x0000, 0x0400, CRC(02c7cd6d) SHA1(494281ba081a0f7fbadfc30a7d2ea18c59e55101))
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE        INIT        COMPANY                 FULLNAME  FLAGS */
-COMP( 1980, zsbc3, 0,      0,      zsbc3,   zsbc3, zsbc3_state, empty_init, "Digital Microsystems", "ZSBC-3", MACHINE_NO_SOUND_HW)
+COMP( 1980, zsbc3, 0,      0,      zsbc3,   zsbc3, zsbc3_state, empty_init, "Digital Microsystems", "ZSBC-3", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

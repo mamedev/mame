@@ -110,12 +110,12 @@ protected:
 	required_device<inder_vid_device> m_indervid;
 
 private:
-	DECLARE_READ8_MEMBER(pic_porta_r);
-	DECLARE_WRITE8_MEMBER(pic_porta_w);
-	DECLARE_READ8_MEMBER(pic_portb_r);
-	DECLARE_WRITE8_MEMBER(pic_portb_w);
-	DECLARE_READ8_MEMBER(ppi_portc_r);
-	DECLARE_WRITE8_MEMBER(ppi_portc_w);
+	uint8_t pic_porta_r();
+	void pic_porta_w(uint8_t data);
+	uint8_t pic_portb_r();
+	void pic_portb_w(uint8_t data);
+	uint8_t ppi_portc_r();
+	void ppi_portc_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(dsw_w);
 
 	void megaphx_68k_map(address_map &map);
@@ -294,7 +294,7 @@ INPUT_PORTS_END
 // --1-   w  not used
 // ---0  rw  serial data
 
-READ8_MEMBER( megaphx_state::pic_porta_r )
+uint8_t megaphx_state::pic_porta_r()
 {
 	uint8_t data = 0;
 
@@ -307,7 +307,7 @@ READ8_MEMBER( megaphx_state::pic_porta_r )
 	return data;
 }
 
-WRITE8_MEMBER( megaphx_state::pic_porta_w )
+void megaphx_state::pic_porta_w(uint8_t data)
 {
 	m_pic_to_ppi_data = BIT(data, 0);
 	m_pic_to_ppi_clock = BIT(data, 2);
@@ -324,7 +324,7 @@ WRITE8_MEMBER( megaphx_state::pic_porta_w )
 // ------1-  r   dip switch data
 // -------0  r   ppi to pic command incoming
 
-READ8_MEMBER( megaphx_state::pic_portb_r )
+uint8_t megaphx_state::pic_portb_r()
 {
 	uint8_t data = 0;
 
@@ -335,7 +335,7 @@ READ8_MEMBER( megaphx_state::pic_portb_r )
 	return data;
 }
 
-WRITE8_MEMBER( megaphx_state::pic_portb_w )
+void megaphx_state::pic_portb_w(uint8_t data)
 {
 
 	m_dsw_shifter[0]->shift_load_w(BIT(data, 2));
@@ -355,7 +355,7 @@ WRITE8_MEMBER( megaphx_state::pic_portb_w )
 // ------1-  r   pic to ppi data
 // -------0  r   unknown
 
-READ8_MEMBER( megaphx_state::ppi_portc_r )
+uint8_t megaphx_state::ppi_portc_r()
 {
 	uint8_t data = 0;
 
@@ -365,7 +365,7 @@ READ8_MEMBER( megaphx_state::ppi_portc_r )
 	return data;
 }
 
-WRITE8_MEMBER( megaphx_state::ppi_portc_w )
+void megaphx_state::ppi_portc_w(uint8_t data)
 {
 	// avoid bogus write on reset
 	if (data == 0xff)

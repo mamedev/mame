@@ -1,9 +1,8 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 
-#include "nld_opamps.h"
-#include "netlist/nl_base.h"
-#include "netlist/nl_errstr.h"
+#include "nl_base.h"
+#include "nl_errstr.h"
 #include "nlid_fourterm.h"
 #include "nlid_twoterm.h"
 
@@ -102,20 +101,20 @@ namespace netlist
 	};
 
 
-	NETLIB_OBJECT(opamp)
+	NETLIB_BASE_OBJECT(opamp)
 	{
 		NETLIB_CONSTRUCTOR(opamp)
 		, m_RP(*this, "RP1")
 		, m_G1(*this, "G1")
-		, m_VCC(*this, "VCC")
-		, m_GND(*this, "GND")
+		, m_VCC(*this, "VCC", NETLIB_DELEGATE(supply))
+		, m_GND(*this, "GND", NETLIB_DELEGATE(supply))
 		, m_model(*this, "MODEL", "LM324")
 		, m_modacc(m_model)
 		, m_VH(*this, "VH")
 		, m_VL(*this, "VL")
 		, m_VREF(*this, "VREF")
 		{
-			m_type = static_cast<int>(m_modacc.m_TYPE);
+			m_type = plib::narrow_cast<int>(m_modacc.m_TYPE);
 			if (m_type < 1 || m_type > 3)
 			{
 				log().fatal(MF_OPAMP_UNKNOWN_TYPE(m_type));
@@ -135,8 +134,8 @@ namespace netlist
 			}
 			if (m_type == 2 || m_type == 3)
 			{
-				create_and_register_subdevice("CP1", m_CP);
-				create_and_register_subdevice("EBUF", m_EBUF);
+				create_and_register_subdevice(*this, "CP1", m_CP);
+				create_and_register_subdevice(*this, "EBUF", m_EBUF);
 #if TEST_ALT_OUTPUT
 				create_and_register_subdevice("RO", m_RO);
 #endif
@@ -166,8 +165,8 @@ namespace netlist
 			if (m_type == 3)
 			{
 
-				create_and_register_subdevice("DN", m_DN, "D(IS=1e-15 N=1)");
-				create_and_register_subdevice("DP", m_DP, "D(IS=1e-15 N=1)");
+				create_and_register_subdevice(*this, "DN", m_DN, "D(IS=1e-15 N=1)");
+				create_and_register_subdevice(*this, "DP", m_DP, "D(IS=1e-15 N=1)");
 
 				connect("DP.K", "VH");
 				connect("VL", "DN.A");
@@ -183,10 +182,21 @@ namespace netlist
 
 		}
 
-		NETLIB_UPDATEI();
+		NETLIB_HANDLERI(supply)
+		{
+			const nl_fptype cVt = nlconst::np_VT(nlconst::one()); // * m_n;
+			const nl_fptype cId = m_modacc.m_DAB; // 3 mA
+			const nl_fptype cVd = cVt * plib::log(cId / nlconst::np_Is() + nlconst::one());
+
+			m_VH.push(m_VCC() - m_modacc.m_VLH - cVd);
+			m_VL.push(m_GND() + m_modacc.m_VLL + cVd);
+			m_VREF.push((m_VCC() + m_GND()) / nlconst::two());
+		}
+
 		NETLIB_RESETI()
 		{
 		}
+
 		NETLIB_UPDATE_PARAMI();
 
 	private:
@@ -213,17 +223,6 @@ namespace netlist
 		// state
 		int m_type;
 	};
-
-	NETLIB_UPDATE(opamp)
-	{
-		const nl_fptype cVt = nlconst::np_VT(nlconst::one()); // * m_n;
-		const nl_fptype cId = m_modacc.m_DAB; // 3 mA
-		const nl_fptype cVd = cVt * plib::log(cId / nlconst::np_Is() + nlconst::one());
-
-		m_VH.push(m_VCC() - m_modacc.m_VLH - cVd);
-		m_VL.push(m_GND() + m_modacc.m_VLL + cVd);
-		m_VREF.push((m_VCC() + m_GND()) / nlconst::two());
-	}
 
 	NETLIB_UPDATE_PARAM(opamp)
 	{

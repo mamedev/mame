@@ -61,26 +61,26 @@ private:
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_web_tilemap;
 
-	DECLARE_READ8_MEMBER(fastfred_custom_io_r);
-	DECLARE_READ8_MEMBER(flyboy_custom1_io_r);
-	DECLARE_READ8_MEMBER(flyboy_custom2_io_r);
-	DECLARE_READ8_MEMBER(jumpcoas_custom_io_r);
-	DECLARE_READ8_MEMBER(boggy84_custom_io_r);
+	uint8_t fastfred_custom_io_r(offs_t offset);
+	uint8_t flyboy_custom1_io_r(offs_t offset);
+	uint8_t flyboy_custom2_io_r(offs_t offset);
+	uint8_t jumpcoas_custom_io_r(offs_t offset);
+	uint8_t boggy84_custom_io_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(imago_dma_irq_w);
-	DECLARE_WRITE8_MEMBER(imago_sprites_bank_w);
-	DECLARE_WRITE8_MEMBER(imago_sprites_dma_w);
-	DECLARE_READ8_MEMBER(imago_sprites_offset_r);
+	void imago_sprites_bank_w(uint8_t data);
+	void imago_sprites_dma_w(offs_t offset, uint8_t data);
+	uint8_t imago_sprites_offset_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(sound_nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(fastfred_videoram_w);
-	DECLARE_WRITE8_MEMBER(fastfred_attributes_w);
+	void sound_nmi_mask_w(uint8_t data);
+	void fastfred_videoram_w(offs_t offset, uint8_t data);
+	void fastfred_attributes_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(charbank1_w);
 	DECLARE_WRITE_LINE_MEMBER(charbank2_w);
 	DECLARE_WRITE_LINE_MEMBER(colorbank1_w);
 	DECLARE_WRITE_LINE_MEMBER(colorbank2_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
-	DECLARE_WRITE8_MEMBER(imago_fg_videoram_w);
+	void imago_fg_videoram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(imago_charbank_w);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);

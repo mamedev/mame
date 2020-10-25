@@ -15,7 +15,6 @@
 
 #include "sound/dac.h"
 #include "machine/input_merger.h"
-#include "sound/volt_reg.h"
 
 
 namespace {
@@ -128,9 +127,6 @@ void gottlieb_sound_r0_device::device_add_mconfig(machine_config &config)
 
 	// sound devices
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 
@@ -261,9 +257,6 @@ void gottlieb_sound_r1_device::device_add_mconfig(machine_config &config)
 
 	// sound devices
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 
@@ -347,7 +340,7 @@ void gottlieb_sound_r1_with_votrax_device::device_post_load()
 	gottlieb_sound_r1_device::device_post_load();
 
 	// totally random guesswork; would like to get real measurements on a board
-	m_votrax->set_unscaled_clock(600000 + (m_last_speech_clock - 0xa0) * 10000);
+	m_votrax->set_unscaled_clock(900000 + (m_last_speech_clock - 0xa0) * 9000);
 }
 
 
@@ -371,7 +364,7 @@ void gottlieb_sound_r1_with_votrax_device::votrax_data_w(uint8_t data)
 void gottlieb_sound_r1_with_votrax_device::speech_clock_dac_w(uint8_t data)
 {
 	// prevent negative clock values (and possible crash)
-	if (data < 0x65) data = 0x65;
+	if (data < 0x60) data = 0x60;
 
 	// nominal clock is 0xa0
 	if (data != m_last_speech_clock)
@@ -379,7 +372,7 @@ void gottlieb_sound_r1_with_votrax_device::speech_clock_dac_w(uint8_t data)
 		logerror("clock = %02X\n", data);
 
 		// totally random guesswork; would like to get real measurements on a board
-		m_votrax->set_unscaled_clock(600000 + (data - 0xa0) * 10000);
+		m_votrax->set_unscaled_clock(950000 + (data - 0xa0) * 5500);
 		m_last_speech_clock = data;
 	}
 }
@@ -666,9 +659,10 @@ void gottlieb_sound_r2_device::device_add_mconfig(machine_config &config)
 
 	// sound hardware
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.075); // unknown DAC
-	DAC_8BIT_R2R(config, "dacvol", 0).add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dacvol", 1.0, DAC_VREF_POS_INPUT);
+	DAC_8BIT_R2R(config, "dacvol", 0)
+		.set_output_range(0, 1)
+		.add_route(0, "dac", 1.0, DAC_INPUT_RANGE_HI)
+		.add_route(0, "dac", -1.0, DAC_INPUT_RANGE_LO); // unknown DAC
 
 	AY8913(config, m_ay1, SOUND2_CLOCK/2).add_route(ALL_OUTPUTS, *this, 0.15);
 

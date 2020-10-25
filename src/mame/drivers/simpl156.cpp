@@ -1046,7 +1046,7 @@ void simpl156_state::init_simpl156()
 }
 
 /* Everything seems more stable if we run the CPU speed x4 and use Idle skips.. maybe it has an internal multipler? */
-READ32_MEMBER(simpl156_state::joemacr_speedup_r)
+u32 simpl156_state::joemacr_speedup_r()
 {
 	if (m_maincpu->pc() == 0x284)
 		m_maincpu->spin_until_time(attotime::from_usec(400));
@@ -1056,11 +1056,11 @@ READ32_MEMBER(simpl156_state::joemacr_speedup_r)
 
 void simpl156_state::init_joemacr()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201018, 0x020101b, read32_delegate(*this, FUNC(simpl156_state::joemacr_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201018, 0x020101b, read32smo_delegate(*this, FUNC(simpl156_state::joemacr_speedup_r)));
 	init_simpl156();
 }
 
-READ32_MEMBER(simpl156_state::chainrec_speedup_r)
+u32 simpl156_state::chainrec_speedup_r()
 {
 	if (m_maincpu->pc() == 0x2d4)
 		m_maincpu->spin_until_time(attotime::from_usec(400));
@@ -1069,11 +1069,11 @@ READ32_MEMBER(simpl156_state::chainrec_speedup_r)
 
 void simpl156_state::init_chainrec()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201018, 0x020101b, read32_delegate(*this, FUNC(simpl156_state::chainrec_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201018, 0x020101b, read32smo_delegate(*this, FUNC(simpl156_state::chainrec_speedup_r)));
 	init_simpl156();
 }
 
-READ32_MEMBER(simpl156_state::prtytime_speedup_r)
+u32 simpl156_state::prtytime_speedup_r()
 {
 	if (m_maincpu->pc() == 0x4f0)
 		m_maincpu->spin_until_time(attotime::from_usec(400));
@@ -1082,12 +1082,12 @@ READ32_MEMBER(simpl156_state::prtytime_speedup_r)
 
 void simpl156_state::init_prtytime()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201ae0, 0x0201ae3, read32_delegate(*this, FUNC(simpl156_state::prtytime_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201ae0, 0x0201ae3, read32smo_delegate(*this, FUNC(simpl156_state::prtytime_speedup_r)));
 	init_simpl156();
 }
 
 
-READ32_MEMBER(simpl156_state::charlien_speedup_r)
+u32 simpl156_state::charlien_speedup_r()
 {
 	if (m_maincpu->pc() == 0xc8c8)
 		m_maincpu->spin_until_time(attotime::from_usec(400));
@@ -1096,11 +1096,11 @@ READ32_MEMBER(simpl156_state::charlien_speedup_r)
 
 void simpl156_state::init_charlien()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201010, 0x0201013, read32_delegate(*this, FUNC(simpl156_state::charlien_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201010, 0x0201013, read32smo_delegate(*this, FUNC(simpl156_state::charlien_speedup_r)));
 	init_simpl156();
 }
 
-READ32_MEMBER(simpl156_state::osman_speedup_r)
+u32 simpl156_state::osman_speedup_r()
 {
 	if (m_maincpu->pc() == 0x5974)
 		m_maincpu->spin_until_time(attotime::from_usec(400));
@@ -1109,7 +1109,7 @@ READ32_MEMBER(simpl156_state::osman_speedup_r)
 
 void simpl156_state::init_osman()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201010, 0x0201013, read32_delegate(*this, FUNC(simpl156_state::osman_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201010, 0x0201013, read32smo_delegate(*this, FUNC(simpl156_state::osman_speedup_r)));
 	init_simpl156();
 
 }

@@ -123,9 +123,9 @@ private:
 	uint8_t m_latched_coin;
 	uint8_t m_last_coin;
 
-	DECLARE_WRITE8_MEMBER(statriv2_videoram_w);
-	DECLARE_READ8_MEMBER(question_data_r);
-	DECLARE_WRITE8_MEMBER(ppi_portc_hi_w);
+	void statriv2_videoram_w(offs_t offset, uint8_t data);
+	uint8_t question_data_r();
+	void ppi_portc_hi_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(horizontal_tile_info);
 	TILE_GET_INFO_MEMBER(vertical_tile_info);
@@ -203,7 +203,7 @@ VIDEO_START_MEMBER(statriv2_state,vertical)
  *
  *************************************/
 
-WRITE8_MEMBER(statriv2_state::statriv2_videoram_w)
+void statriv2_state::statriv2_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset & 0x3ff);
@@ -266,7 +266,7 @@ INTERRUPT_GEN_MEMBER(statriv2_state::tripdraw_interrupt)
  *
  *************************************/
 
-READ8_MEMBER(statriv2_state::question_data_r)
+uint8_t statriv2_state::question_data_r()
 {
 	const uint8_t *qrom = memregion("questions")->base();
 	uint32_t qromsize = memregion("questions")->bytes();
@@ -297,7 +297,7 @@ READ_LINE_MEMBER(statriv2_state::latched_coin_r)
 }
 
 
-WRITE8_MEMBER(statriv2_state::ppi_portc_hi_w)
+void statriv2_state::ppi_portc_hi_w(uint8_t data)
 {
 	data >>= 4;
 	if (data != 0x0f)
@@ -375,9 +375,9 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( funcsino )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_BET )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )     PORT_NAME("Draw")      PORT_CODE(KEYCODE_3)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )      PORT_NAME("Deal")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Draw")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Discard 1 / Horse 1 / Point")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Discard 2 / Horse 2")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Discard 3 / Horse 3")
@@ -385,7 +385,7 @@ static INPUT_PORTS_START( funcsino )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Discard 5 / Horse 5 / No Point")
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Stand")         PORT_CODE(KEYCODE_4)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_STAND )                       PORT_CODE(KEYCODE_4)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Select Game")   PORT_CODE(KEYCODE_S)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(statriv2_state, latched_coin_r)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -411,9 +411,9 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( tripdraw )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_BET )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )     PORT_NAME("Draw")      PORT_CODE(KEYCODE_3)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )      PORT_NAME("Deal")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Draw")      PORT_CODE(KEYCODE_3)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Discard 1 / Lo")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Discard 2")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Discard 3 / Double")
@@ -421,7 +421,7 @@ static INPUT_PORTS_START( tripdraw )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Discard 5 / Hi")
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Stand")         PORT_CODE(KEYCODE_4)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_STAND )                       PORT_CODE(KEYCODE_4)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(statriv2_state, latched_coin_r)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -447,14 +447,14 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( bigcsino ) // flyer shows 8 buttons on the cabinet
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_BET ) PORT_NAME("Play")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )   PORT_NAME("Play")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )     PORT_NAME("Stand")      PORT_CODE(KEYCODE_3)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Select Joker Poker / Discard 1 / Horse 1 / Point")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Select Blackjack / Discard 2 / Horse 2")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Select Baccarat / Discard 3 / Horse 3")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Select Craps / Discard 4 / Horse 4")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Select Race Time / Discard 5 / Horse 5 / No Point")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_STAND )                         PORT_CODE(KEYCODE_3)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )  PORT_NAME("Select Joker Poker / Discard 1 / Horse 1 / Point")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )  PORT_NAME("Select Blackjack / Discard 2 / Horse 2")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )  PORT_NAME("Select Baccarat / Discard 3 / Horse 3")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )  PORT_NAME("Select Craps / Discard 4 / Horse 4")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )  PORT_NAME("Select Race Time / Discard 5 / Horse 5 / No Point")
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1748,7 +1748,7 @@ GAME( 1985, cs5_ssp,   0,         statusbj,  funcsino, statriv2_state, init_lase
 GAME( 1988, cs6_sps,   0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip VI (Poker version, for Sony LD)",   MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1985, cs6_ssp,   0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip VI (Shooting Game version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1986, cs8_ssp,   0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip VIII (Shooting Game version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1985, cs8_spp,    0,        statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip VIII (Poker version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1985, cs8_spp,   0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip VIII (Poker version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1988, cs8_sps,   0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip VIII (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1992, cs9_qps,   0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Quantum Industries", "Casino Strip IX (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1985, cs9_spp,   0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip IX (Poker version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

@@ -133,32 +133,32 @@ private:
 	required_device<segas24_mixer_device> m_vmixer;
 
 	DECLARE_WRITE_LINE_MEMBER(irq_ym);
-	DECLARE_READ16_MEMBER(  paletteram_r );
-	DECLARE_WRITE16_MEMBER( paletteram_w );
-	DECLARE_READ16_MEMBER(  irq_r );
-	DECLARE_WRITE16_MEMBER( irq_w );
-	DECLARE_READ16_MEMBER(  fdc_r );
-	DECLARE_WRITE16_MEMBER( fdc_w );
-	DECLARE_READ16_MEMBER(  fdc_status_r );
-	DECLARE_WRITE16_MEMBER( fdc_ctrl_w );
-	DECLARE_READ8_MEMBER(  curbank_r );
-	DECLARE_WRITE8_MEMBER( curbank_w );
-	DECLARE_READ8_MEMBER(  frc_mode_r );
-	DECLARE_WRITE8_MEMBER( frc_mode_w );
-	DECLARE_READ8_MEMBER(  frc_r );
-	DECLARE_WRITE8_MEMBER( frc_w );
-	DECLARE_READ8_MEMBER(  mlatch_r );
-	DECLARE_WRITE8_MEMBER( mlatch_w );
-	DECLARE_READ16_MEMBER(  iod_r );
-	DECLARE_WRITE16_MEMBER( iod_w );
+	uint16_t paletteram_r(offs_t offset);
+	void paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t irq_r(offs_t offset);
+	void irq_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t fdc_r(offs_t offset);
+	void fdc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t fdc_status_r();
+	void fdc_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t curbank_r();
+	void curbank_w(uint8_t data);
+	uint8_t frc_mode_r();
+	void frc_mode_w(uint8_t data);
+	uint8_t frc_r();
+	void frc_w(uint8_t data);
+	uint8_t mlatch_r();
+	void mlatch_w(uint8_t data);
+	uint16_t iod_r(offs_t offset);
+	void iod_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	READ8_MEMBER(dcclub_p1_r);
-	READ8_MEMBER(dcclub_p3_r);
-	READ8_MEMBER(mahmajn_input_line_r);
-	READ8_MEMBER(mahmajn_inputs_r);
+	uint8_t dcclub_p1_r();
+	uint8_t dcclub_p3_r();
+	uint8_t mahmajn_input_line_r();
+	uint8_t mahmajn_inputs_r();
 
-	WRITE8_MEMBER(mahmajn_mux_w);
-	WRITE8_MEMBER(hotrod_lamps_w);
+	void mahmajn_mux_w(uint8_t data);
+	void hotrod_lamps_w(uint8_t data);
 
 	void fdc_init();
 	void reset_reset();

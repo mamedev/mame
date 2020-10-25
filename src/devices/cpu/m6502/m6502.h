@@ -33,10 +33,11 @@ protected:
 
 	class memory_interface {
 	public:
-		address_space *program, *sprogram;
-		memory_access_cache<0, 0, ENDIANNESS_LITTLE> *cache, *scache;
+		memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache cprogram, csprogram;
+		memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific program;
+		memory_access<14, 0, 0, ENDIANNESS_LITTLE>::specific program14;
 
-		virtual ~memory_interface() {}
+		virtual ~memory_interface() = default;
 		virtual uint8_t read(uint16_t adr) = 0;
 		virtual uint8_t read_9(uint16_t adr);
 		virtual uint8_t read_sync(uint16_t adr) = 0;
@@ -47,10 +48,17 @@ protected:
 
 	class mi_default : public memory_interface {
 	public:
-		virtual ~mi_default() {}
+		virtual ~mi_default() = default;
 		virtual uint8_t read(uint16_t adr) override;
 		virtual uint8_t read_sync(uint16_t adr) override;
 		virtual uint8_t read_arg(uint16_t adr) override;
+		virtual void write(uint16_t adr, uint8_t val) override;
+	};
+
+	class mi_default14 : public mi_default {
+	public:
+		virtual ~mi_default14() = default;
+		virtual uint8_t read(uint16_t adr) override;
 		virtual void write(uint16_t adr, uint8_t val) override;
 	};
 
@@ -114,7 +122,7 @@ protected:
 	int inst_state, inst_substate;
 	int icount, bcount, count_before_instruction_step;
 	bool nmi_state, irq_state, apu_irq_state, v_state;
-	bool irq_taken, sync, inhibit_interrupts;
+	bool nmi_pending, irq_taken, sync, inhibit_interrupts;
 
 	uint8_t read(uint16_t adr) { return mintf->read(adr); }
 	uint8_t read_9(uint16_t adr) { return mintf->read_9(adr); }

@@ -29,7 +29,7 @@ public:
 	void vt420(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(vt520_some_r);
+	uint8_t vt520_some_r();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_vt520(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -51,7 +51,7 @@ void vt520_state::vt520_mem(address_map &map)
     there is 43.320MHz xtal near by
 */
 
-READ8_MEMBER( vt520_state::vt520_some_r )
+uint8_t vt520_state::vt520_some_r()
 {
 	//bit 5 0
 	//bit 6 1
@@ -138,7 +138,10 @@ Crystals: 43.320
 
 ROM_START( vt420 )
 	ROM_REGION(0x20000, "maincpu", 0)
-	ROM_LOAD( "23-068e9-00.e2", 0x00000, 0x20000, CRC(22c3f93b) SHA1(b212911c41e4dba2e09d91fdd1f72d6c7536b0af) )
+	ROM_SYSTEM_BIOS(0, "v14", "Version 1.4")
+	ROMX_LOAD( "23-202e9.e2",    0x00000, 0x20000, CRC(ca6cfb18) SHA1(2e0d3c16e04808bc6a45a0fc032b597458e6dd85), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS(1, "v13", "Version 1.3")
+	ROMX_LOAD( "23-068e9-00.e2", 0x00000, 0x20000, CRC(22c3f93b) SHA1(b212911c41e4dba2e09d91fdd1f72d6c7536b0af), ROM_BIOS(1) )
 ROM_END
 
 ROM_START( vt520 )

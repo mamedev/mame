@@ -135,9 +135,37 @@ public:
 		m_node_id(*this, APOLLO_NI_TAG),
 		m_isa(*this, APOLLO_ISA_TAG),
 		m_graphics(*this, APOLLO_SCREEN_TAG),
-		m_keyboard(*this, APOLLO_KBD_TAG)
+		m_keyboard(*this, APOLLO_KBD_TAG),
+		m_internal_leds(*this, "internal_led_%u", 1U),
+		m_external_leds(*this, "external_led_%c", unsigned('a'))
 	{ }
 
+	void dn3500(machine_config &config);
+	void dn5500_19i(machine_config &config);
+	void dn3000(machine_config &config);
+	void dn3000_15i(machine_config &config);
+	void dn3000_19i(machine_config &config);
+	void dn3500_15i(machine_config &config);
+	void dsp3000(machine_config &config);
+	void dsp3500(machine_config &config);
+	void dsp5500(machine_config &config);
+	void dn5500(machine_config &config);
+	void dn5500_15i(machine_config &config);
+	void dn3500_19i(machine_config &config);
+
+	void init_dsp3000();
+	void init_dsp5500();
+	void init_dn3500();
+	void init_dn3000();
+	void init_dsp3500();
+	void init_dn5500();
+	void init_apollo();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
 	required_device<m68000_base_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_shared_ptr<uint32_t> m_messram_ptr;
@@ -154,64 +182,57 @@ public:
 	required_device<isa16_device> m_isa;
 	optional_device<apollo_graphics_15i> m_graphics;
 	optional_device<apollo_kbd_device> m_keyboard;
+	output_finder<4> m_internal_leds;
+	output_finder<4> m_external_leds;
 
-	DECLARE_WRITE16_MEMBER(apollo_csr_status_register_w);
-	DECLARE_READ16_MEMBER(apollo_csr_status_register_r);
-	DECLARE_WRITE16_MEMBER(apollo_csr_control_register_w);
-	DECLARE_READ16_MEMBER(apollo_csr_control_register_r);
-	DECLARE_WRITE8_MEMBER(apollo_dma_1_w);
-	DECLARE_READ8_MEMBER(apollo_dma_1_r);
-	DECLARE_WRITE8_MEMBER(apollo_dma_2_w);
-	DECLARE_READ8_MEMBER(apollo_dma_2_r);
-	DECLARE_WRITE8_MEMBER(apollo_dma_page_register_w);
-	DECLARE_READ8_MEMBER(apollo_dma_page_register_r);
-	DECLARE_WRITE16_MEMBER(apollo_address_translation_map_w);
-	DECLARE_READ16_MEMBER(apollo_address_translation_map_r);
-	DECLARE_READ8_MEMBER(apollo_dma_read_byte);
-	DECLARE_WRITE8_MEMBER(apollo_dma_write_byte);
-	DECLARE_READ8_MEMBER(apollo_dma_read_word);
-	DECLARE_WRITE8_MEMBER(apollo_dma_write_word);
-	DECLARE_WRITE8_MEMBER(apollo_rtc_w);
-	DECLARE_READ8_MEMBER(apollo_rtc_r);
-	DECLARE_WRITE8_MEMBER(cache_control_register_w);
-	DECLARE_READ8_MEMBER(cache_status_register_r);
-	DECLARE_WRITE8_MEMBER(task_alias_register_w);
-	DECLARE_READ8_MEMBER(task_alias_register_r);
-	DECLARE_WRITE16_MEMBER(latch_page_on_parity_error_register_w);
-	DECLARE_READ16_MEMBER(latch_page_on_parity_error_register_r);
-	DECLARE_WRITE8_MEMBER(master_req_register_w);
-	DECLARE_READ8_MEMBER(master_req_register_r);
-	DECLARE_WRITE16_MEMBER(selective_clear_locations_w);
-	DECLARE_READ16_MEMBER(selective_clear_locations_r);
-	DECLARE_READ32_MEMBER(ram_with_parity_r);
-	DECLARE_WRITE32_MEMBER(ram_with_parity_w);
-	DECLARE_READ32_MEMBER(apollo_unmapped_r);
-	DECLARE_WRITE32_MEMBER(apollo_unmapped_w);
-	DECLARE_WRITE32_MEMBER(apollo_rom_w);
-	DECLARE_READ16_MEMBER(apollo_atbus_io_r);
-	DECLARE_WRITE16_MEMBER(apollo_atbus_io_w);
-	DECLARE_READ16_MEMBER(apollo_atbus_memory_r);
-	DECLARE_WRITE16_MEMBER(apollo_atbus_memory_w);
-	DECLARE_READ16_MEMBER(apollo_atbus_unmap_io_r);
-	DECLARE_WRITE16_MEMBER(apollo_atbus_unmap_io_w);
-	DECLARE_READ8_MEMBER(apollo_atbus_unmap_r);
-	DECLARE_WRITE8_MEMBER(apollo_atbus_unmap_w);
-	DECLARE_WRITE8_MEMBER(dn5500_memory_present_register_w);
-	DECLARE_READ8_MEMBER(dn5500_memory_present_register_r);
-	DECLARE_WRITE8_MEMBER(dn5500_11500_w);
-	DECLARE_READ8_MEMBER(dn5500_11500_r);
-	DECLARE_WRITE8_MEMBER(dn5500_io_protection_map_w);
-	DECLARE_READ8_MEMBER(dn5500_io_protection_map_r);
-	void init_dsp3000();
-	void init_dsp5500();
-	void init_dn3500();
-	void init_dn3000();
-	void init_dsp3500();
-	void init_dn5500();
-	void init_apollo();
+	void apollo_csr_status_register_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t apollo_csr_status_register_r(offs_t offset, uint16_t mem_mask = ~0);
+	void apollo_csr_control_register_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t apollo_csr_control_register_r(offs_t offset, uint16_t mem_mask = ~0);
+	void apollo_dma_1_w(offs_t offset, uint8_t data);
+	uint8_t apollo_dma_1_r(offs_t offset);
+	void apollo_dma_2_w(offs_t offset, uint8_t data);
+	uint8_t apollo_dma_2_r(offs_t offset);
+	void apollo_dma_page_register_w(offs_t offset, uint8_t data);
+	uint8_t apollo_dma_page_register_r(offs_t offset);
+	void apollo_address_translation_map_w(offs_t offset, uint16_t data);
+	uint16_t apollo_address_translation_map_r(offs_t offset);
+	uint8_t apollo_dma_read_byte(offs_t offset);
+	void apollo_dma_write_byte(offs_t offset, uint8_t data);
+	uint8_t apollo_dma_read_word(offs_t offset);
+	void apollo_dma_write_word(offs_t offset, uint8_t data);
+	void apollo_rtc_w(offs_t offset, uint8_t data);
+	uint8_t apollo_rtc_r(offs_t offset);
+	void cache_control_register_w(offs_t offset, uint8_t data);
+	uint8_t cache_status_register_r(offs_t offset);
+	void task_alias_register_w(offs_t offset, uint8_t data);
+	uint8_t task_alias_register_r(offs_t offset);
+	void latch_page_on_parity_error_register_w(offs_t offset, uint16_t data);
+	uint16_t latch_page_on_parity_error_register_r(offs_t offset);
+	void master_req_register_w(offs_t offset, uint8_t data);
+	uint8_t master_req_register_r(offs_t offset);
+	void selective_clear_locations_w(offs_t offset, uint16_t data);
+	uint16_t selective_clear_locations_r(offs_t offset);
+	uint32_t ram_with_parity_r(offs_t offset, uint32_t mem_mask = ~0);
+	void ram_with_parity_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t apollo_unmapped_r(offs_t offset, uint32_t mem_mask = ~0);
+	void apollo_unmapped_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void apollo_rom_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint16_t apollo_atbus_io_r(offs_t offset, uint16_t mem_mask = ~0);
+	void apollo_atbus_io_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t apollo_atbus_memory_r(offs_t offset, uint16_t mem_mask = ~0);
+	void apollo_atbus_memory_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t apollo_atbus_unmap_io_r(offs_t offset, uint16_t mem_mask = ~0);
+	void apollo_atbus_unmap_io_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t apollo_atbus_unmap_r(offs_t offset, uint8_t mem_mask = ~0);
+	void apollo_atbus_unmap_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
+	void dn5500_memory_present_register_w(offs_t offset, uint8_t data);
+	uint8_t dn5500_memory_present_register_r(offs_t offset);
+	void dn5500_11500_w(offs_t offset, uint8_t data);
+	uint8_t dn5500_11500_r(offs_t offset);
+	void dn5500_io_protection_map_w(offs_t offset, uint8_t data);
+	uint8_t dn5500_io_protection_map_r(offs_t offset);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	DECLARE_MACHINE_RESET(apollo);
 	DECLARE_MACHINE_START(apollo);
 
@@ -226,27 +247,27 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( apollo_pic8259_master_set_int_line );
 	DECLARE_WRITE_LINE_MEMBER( apollo_pic8259_slave_set_int_line );
 	DECLARE_WRITE_LINE_MEMBER( sio_irq_handler );
-	DECLARE_WRITE8_MEMBER( sio_output );
+	void sio_output(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( sio2_irq_handler );
 	DECLARE_WRITE_LINE_MEMBER( apollo_ptm_irq_function );
 	DECLARE_WRITE_LINE_MEMBER( apollo_ptm_timer_tick );
-	DECLARE_READ8_MEMBER( apollo_pic8259_get_slave_ack );
+	uint8_t apollo_pic8259_get_slave_ack(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER( apollo_rtc_irq_function );
 
-	DECLARE_READ8_MEMBER(pc_dma8237_0_dack_r);
-	DECLARE_READ8_MEMBER(pc_dma8237_1_dack_r);
-	DECLARE_READ8_MEMBER(pc_dma8237_2_dack_r);
-	DECLARE_READ8_MEMBER(pc_dma8237_3_dack_r);
-	DECLARE_READ8_MEMBER(pc_dma8237_5_dack_r);
-	DECLARE_READ8_MEMBER(pc_dma8237_6_dack_r);
-	DECLARE_READ8_MEMBER(pc_dma8237_7_dack_r);
-	DECLARE_WRITE8_MEMBER(pc_dma8237_0_dack_w);
-	DECLARE_WRITE8_MEMBER(pc_dma8237_1_dack_w);
-	DECLARE_WRITE8_MEMBER(pc_dma8237_2_dack_w);
-	DECLARE_WRITE8_MEMBER(pc_dma8237_3_dack_w);
-	DECLARE_WRITE8_MEMBER(pc_dma8237_5_dack_w);
-	DECLARE_WRITE8_MEMBER(pc_dma8237_6_dack_w);
-	DECLARE_WRITE8_MEMBER(pc_dma8237_7_dack_w);
+	uint8_t pc_dma8237_0_dack_r();
+	uint8_t pc_dma8237_1_dack_r();
+	uint8_t pc_dma8237_2_dack_r();
+	uint8_t pc_dma8237_3_dack_r();
+	uint8_t pc_dma8237_5_dack_r();
+	uint8_t pc_dma8237_6_dack_r();
+	uint8_t pc_dma8237_7_dack_r();
+	void pc_dma8237_0_dack_w(uint8_t data);
+	void pc_dma8237_1_dack_w(uint8_t data);
+	void pc_dma8237_2_dack_w(uint8_t data);
+	void pc_dma8237_3_dack_w(uint8_t data);
+	void pc_dma8237_5_dack_w(uint8_t data);
+	void pc_dma8237_6_dack_w(uint8_t data);
+	void pc_dma8237_7_dack_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pc_dack0_w);
 	DECLARE_WRITE_LINE_MEMBER(pc_dack1_w);
 	DECLARE_WRITE_LINE_MEMBER(pc_dack2_w);
@@ -264,25 +285,14 @@ public:
 	void common(machine_config &config);
 	void apollo(machine_config &config);
 	void apollo_terminal(machine_config &config);
-	void dn3500(machine_config &config);
-	void dn5500_19i(machine_config &config);
-	void dn3000(machine_config &config);
-	void dn3000_15i(machine_config &config);
-	void dn3000_19i(machine_config &config);
-	void dn3500_15i(machine_config &config);
-	void dsp3000(machine_config &config);
-	void dsp3500(machine_config &config);
-	void dsp5500(machine_config &config);
-	void dn5500(machine_config &config);
-	void dn5500_15i(machine_config &config);
-	void dn3500_19i(machine_config &config);
+
 	void dn3000_map(address_map &map);
 	void dn3500_map(address_map &map);
 	void dn5500_map(address_map &map);
 	void dsp3000_map(address_map &map);
 	void dsp3500_map(address_map &map);
 	void dsp5500_map(address_map &map);
-private:
+
 	uint32_t ptm_counter;
 	uint8_t sio_output_data;
 	int m_dma_channel;
@@ -300,7 +310,7 @@ private:
 #define APOLLO_CONF_MONO_15I     0x0008
 #define APOLLO_CONF_MONO_19I     0x0010
 #define APOLLO_CONF_GERMAN_KBD   0x0020
-#define APOLLO_CONF_20_YEARS_AGO 0x0040
+#define APOLLO_CONF_30_YEARS_AGO 0x0040
 #define APOLLO_CONF_25_YEARS_AGO 0x0080
 #define APOLLO_CONF_NODE_ID      0x0100
 #define APOLLO_CONF_IDLE_SLEEP   0x0200
@@ -384,8 +394,8 @@ public:
 	virtual const char *custom_instance_name() const noexcept override { return "node_id"; }
 	virtual const char *custom_brief_instance_name() const noexcept override { return "ni"; }
 
-	DECLARE_WRITE16_MEMBER(write);
-	DECLARE_READ16_MEMBER(read);
+	void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t read(offs_t offset, uint16_t mem_mask = ~0);
 
 	void set_node_id_from_disk();
 
@@ -414,22 +424,22 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	// monochrome control
-	DECLARE_READ8_MEMBER( apollo_mcr_r );
-	DECLARE_WRITE8_MEMBER( apollo_mcr_w );
+	uint8_t  apollo_mcr_r(offs_t offset);
+	void apollo_mcr_w(offs_t offset, uint8_t data);
 
 	// monochrome and color memory
-	DECLARE_READ16_MEMBER( apollo_mem_r );
-	DECLARE_WRITE16_MEMBER( apollo_mem_w );
+	uint16_t apollo_mem_r(offs_t offset, uint16_t mem_mask = ~0);
+	void apollo_mem_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	// color control
-	DECLARE_READ8_MEMBER( apollo_ccr_r );
-	DECLARE_WRITE8_MEMBER( apollo_ccr_w );
+	uint8_t  apollo_ccr_r(offs_t offset);
+	void apollo_ccr_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ16_MEMBER( apollo_mgm_r );
-	DECLARE_WRITE16_MEMBER( apollo_mgm_w );
+	uint16_t apollo_mgm_r(offs_t offset, uint16_t mem_mask = ~0);
+	void apollo_mgm_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER( apollo_cgm_r );
-	DECLARE_WRITE16_MEMBER( apollo_cgm_w );
+	uint16_t apollo_cgm_r(offs_t offset, uint16_t mem_mask = ~0);
+	void apollo_cgm_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void vblank_state_changed(screen_device &screen, bool vblank_state);
 
@@ -438,7 +448,7 @@ public:
 protected:
 	required_device<screen_device> m_screen;
 
-	apollo_graphics_15i(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type);
+	apollo_graphics_15i(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -544,8 +554,8 @@ protected:
 
 	uint32_t m_color_lookup_table[16];
 
-	lut_fifo *m_lut_fifo;
-	bt458 *m_bt458;
+	std::unique_ptr<lut_fifo> m_lut_fifo;
+	std::unique_ptr<bt458> m_bt458;
 };
 
 

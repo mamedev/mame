@@ -431,12 +431,12 @@ void efdt_state::machine_reset()
 *               Sound Latches                *
 *********************************************/
 
-READ8_MEMBER(efdt_state::main_soundlatch_r)
+uint8_t efdt_state::main_soundlatch_r(offs_t offset)
 {
 	return m_soundlatch[offset];
 }
 
-WRITE8_MEMBER(efdt_state::main_soundlatch_w)
+void efdt_state::main_soundlatch_w(offs_t offset, uint8_t data)
 {
 	m_soundlatch[offset] = data;
 	switch (offset)
@@ -452,22 +452,22 @@ WRITE8_MEMBER(efdt_state::main_soundlatch_w)
 	}
 }
 
-READ8_MEMBER(efdt_state::soundlatch_0_r)
+uint8_t efdt_state::soundlatch_0_r()
 {
 	return m_soundCommand;
 }
 
-READ8_MEMBER(efdt_state::soundlatch_1_r)
+uint8_t efdt_state::soundlatch_1_r()
 {
 	return m_soundControl;
 }
 
-WRITE8_MEMBER(efdt_state::soundlatch_0_w)
+void efdt_state::soundlatch_0_w(uint8_t data)
 {
 	//m_soundCommand;
 }
 
-WRITE8_MEMBER(efdt_state::soundlatch_1_w)
+void efdt_state::soundlatch_1_w(uint8_t data)
 {
 	if (!(data == 0xfd || data == 0xf5))
 	{
@@ -481,22 +481,22 @@ WRITE8_MEMBER(efdt_state::soundlatch_1_w)
 	//  m_soundControl &= ~1;
 }
 
-READ8_MEMBER(efdt_state::soundlatch_2_r)
+uint8_t efdt_state::soundlatch_2_r()
 {
 	return m_soundControl;
 }
 
-READ8_MEMBER(efdt_state::soundlatch_3_r)
+uint8_t efdt_state::soundlatch_3_r()
 {
 	return m_soundControl;
 }
 
-WRITE8_MEMBER(efdt_state::soundlatch_2_w)
+void efdt_state::soundlatch_2_w(uint8_t data)
 {
 	//m_soundCommand;
 }
 
-WRITE8_MEMBER(efdt_state::soundlatch_3_w)
+void efdt_state::soundlatch_3_w(uint8_t data)
 {
 	m_soundControl = data;
 }

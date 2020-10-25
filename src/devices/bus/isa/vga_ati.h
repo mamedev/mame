@@ -30,7 +30,7 @@ public:
 	// construction/destruction
 	isa16_vga_gfxultra_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(input_port_0_r);
+	uint8_t input_port_0_r();
 
 protected:
 	// device-level overrides
@@ -54,7 +54,7 @@ public:
 	// construction/destruction
 	isa16_vga_gfxultrapro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(input_port_0_r);
+	uint8_t input_port_0_r();
 
 protected:
 	// device-level overrides
@@ -77,7 +77,7 @@ public:
 	// construction/destruction
 	isa16_vga_mach64_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(input_port_0_r);
+	uint8_t input_port_0_r();
 
 protected:
 	// device-level overrides

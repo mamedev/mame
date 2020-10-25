@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria, Aaron Giles, Alex W. Jackson
 /***************************************************************************
 
-    digfx.c
+    digfx.cpp
 
     Device graphics interfaces.
 

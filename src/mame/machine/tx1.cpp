@@ -546,7 +546,7 @@ void tx1_state::tx1_update_state()
 	}
 }
 
-READ16_MEMBER(tx1_state::tx1_math_r)
+uint16_t tx1_state::tx1_math_r(offs_t offset)
 {
 	offset = offset << 1;
 
@@ -661,7 +661,7 @@ READ16_MEMBER(tx1_state::tx1_math_r)
 	return m_math.retval;
 }
 
-WRITE16_MEMBER(tx1_state::tx1_math_w)
+void tx1_state::tx1_math_w(offs_t offset, uint16_t data)
 {
 	m_math.cpulatch = data;
 	offset <<= 1;
@@ -747,7 +747,7 @@ WRITE16_MEMBER(tx1_state::tx1_math_w)
 	}
 }
 
-READ16_MEMBER(tx1_state::tx1_spcs_rom_r)
+uint16_t tx1_state::tx1_spcs_rom_r(offs_t offset)
 {
 	m_math.cpulatch = *(uint16_t*)((uint8_t*)memregion("math_cpu")->base() + 0x04000 + 0x1000 + offset*2);
 
@@ -809,7 +809,7 @@ READ16_MEMBER(tx1_state::tx1_spcs_rom_r)
 
 }
 
-READ16_MEMBER(tx1_state::tx1_spcs_ram_r)
+uint16_t tx1_state::tx1_spcs_ram_r(offs_t offset)
 {
 	m_math.cpulatch = m_math_ram[offset];
 
@@ -871,7 +871,7 @@ READ16_MEMBER(tx1_state::tx1_spcs_ram_r)
 }
 
 /* Should never occur */
-WRITE16_MEMBER(tx1_state::tx1_spcs_ram_w)
+void tx1_state::tx1_spcs_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	osd_printf_debug("Write to /SPCS RAM?");
 	COMBINE_DATA(&m_math_ram[offset]);
@@ -1034,7 +1034,7 @@ void tx1_state::buggyboy_update_state()
 	}
 }
 
-READ16_MEMBER(tx1_state::buggyboy_math_r)
+uint16_t tx1_state::buggyboy_math_r(offs_t offset)
 {
 	offset = offset << 1;
 
@@ -1110,7 +1110,7 @@ READ16_MEMBER(tx1_state::buggyboy_math_r)
 	return m_math.retval;
 }
 
-WRITE16_MEMBER(tx1_state::buggyboy_math_w)
+void tx1_state::buggyboy_math_w(offs_t offset, uint16_t data)
 {
 	m_math.cpulatch = data;
 
@@ -1197,7 +1197,7 @@ WRITE16_MEMBER(tx1_state::buggyboy_math_w)
 /*
     This is for ROM range 0x5000-0x7fff
 */
-READ16_MEMBER(tx1_state::buggyboy_spcs_rom_r)
+uint16_t tx1_state::buggyboy_spcs_rom_r(offs_t offset)
 {
 	m_math.cpulatch = *(uint16_t*)((uint8_t*)memregion("math_cpu")->base() + 0x04000 + 0x1000 + offset*2);
 
@@ -1258,12 +1258,12 @@ READ16_MEMBER(tx1_state::buggyboy_spcs_rom_r)
 	return m_math.cpulatch;
 }
 
-WRITE16_MEMBER(tx1_state::buggyboy_spcs_ram_w)
+void tx1_state::buggyboy_spcs_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_math_ram[offset]);
 }
 
-READ16_MEMBER(tx1_state::buggyboy_spcs_ram_r)
+uint16_t tx1_state::buggyboy_spcs_ram_r(offs_t offset)
 {
 	m_math.cpulatch = m_math_ram[offset];
 

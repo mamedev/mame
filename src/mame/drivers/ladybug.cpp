@@ -73,7 +73,7 @@ TODO:
 
 
 // Protection?
-READ8_MEMBER(sraider_state::sraider_8005_r)
+uint8_t sraider_state::sraider_8005_r()
 {
 	// This must return X011111X or cpu #1 will hang
 	// see code at rst $10
@@ -81,7 +81,7 @@ READ8_MEMBER(sraider_state::sraider_8005_r)
 }
 
 // Unknown IO
-WRITE8_MEMBER(sraider_state::sraider_misc_w)
+void sraider_state::sraider_misc_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{

@@ -12,6 +12,9 @@
     Known bugs:
         * none at this time
 
+    The video sync chain is almost identical to System 2, though many other
+    hardware aspects are very different.
+
 ****************************************************************************
 
     Memory map (TBA)
@@ -56,7 +59,7 @@ void toobin_state::machine_start()
  *
  *************************************/
 
-WRITE16_MEMBER(toobin_state::interrupt_scan_w)
+void toobin_state::interrupt_scan_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int oldword = m_interrupt_scan[offset];
 	int newword = oldword;

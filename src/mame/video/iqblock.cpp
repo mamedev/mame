@@ -55,19 +55,19 @@ void iqblock_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(iqblock_state::fgvideoram_w)
+void iqblock_state::fgvideoram_w(offs_t offset, uint8_t data)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(iqblock_state::bgvideoram_w)
+void iqblock_state::bgvideoram_w(offs_t offset, uint8_t data)
 {
 	m_bgvideoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-WRITE8_MEMBER(iqblock_state::fgscroll_w)
+void iqblock_state::fgscroll_w(offs_t offset, uint8_t data)
 {
 	m_fg_tilemap->set_scrolly(offset,data);
 }

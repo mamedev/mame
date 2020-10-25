@@ -49,21 +49,21 @@ public:
 	int m_sound_command2;
 
 	// common
-	DECLARE_WRITE16_MEMBER(flipscreen_w);
-	DECLARE_WRITE16_MEMBER(background_videoram_w);
-	DECLARE_WRITE16_MEMBER(text_videoram_w);
+	void flipscreen_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void background_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void text_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	// cabal specific
 	void sound_irq_trigger_word_w(offs_t, u16 data, u16 mem_mask);
 
 	// cabalbl specific
-	DECLARE_WRITE16_MEMBER(cabalbl_sndcmd_w);
-	DECLARE_WRITE16_MEMBER(cabalbl_sound_irq_trigger_word_w);
-	DECLARE_READ8_MEMBER(cabalbl_snd2_r);
-	DECLARE_READ8_MEMBER(cabalbl_snd1_r);
-	DECLARE_WRITE8_MEMBER(cabalbl_coin_w);
-	DECLARE_WRITE8_MEMBER(cabalbl_1_adpcm_w);
-	DECLARE_WRITE8_MEMBER(cabalbl_2_adpcm_w);
+	void cabalbl_sndcmd_w(offs_t offset, uint16_t data);
+	void cabalbl_sound_irq_trigger_word_w(uint16_t data);
+	uint8_t cabalbl_snd2_r();
+	uint8_t cabalbl_snd1_r();
+	void cabalbl_coin_w(uint8_t data);
+	void cabalbl_1_adpcm_w(uint8_t data);
+	void cabalbl_2_adpcm_w(uint8_t data);
 
 	void init_cabal();
 	DECLARE_MACHINE_START(cabalbl);

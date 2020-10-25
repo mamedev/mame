@@ -110,7 +110,7 @@ void konppc_device::set_cgboard_texture_bank(int board, const char *bank, uint8_
 
 /* CG Board DSP interface for PowerPC */
 
-READ32_MEMBER( konppc_device::cgboard_dsp_comm_r_ppc )
+uint32_t konppc_device::cgboard_dsp_comm_r_ppc(offs_t offset, uint32_t mem_mask)
 {
 	if (cgboard_id < MAX_CG_BOARDS)
 	{
@@ -123,7 +123,7 @@ READ32_MEMBER( konppc_device::cgboard_dsp_comm_r_ppc )
 	}
 }
 
-WRITE32_MEMBER( konppc_device::cgboard_dsp_comm_w_ppc )
+void konppc_device::cgboard_dsp_comm_w_ppc(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  osd_printf_debug("%s dsp_cmd_w: (board %d) %08X, %08X, %08X\n", machine().describe_context(), cgboard_id, data, offset, mem_mask);
 
@@ -165,7 +165,7 @@ WRITE32_MEMBER( konppc_device::cgboard_dsp_comm_w_ppc )
 
 
 
-READ32_MEMBER( konppc_device::cgboard_dsp_shared_r_ppc )
+uint32_t konppc_device::cgboard_dsp_shared_r_ppc(offs_t offset)
 {
 	if (cgboard_id < MAX_CG_BOARDS)
 	{
@@ -177,7 +177,7 @@ READ32_MEMBER( konppc_device::cgboard_dsp_shared_r_ppc )
 	}
 }
 
-WRITE32_MEMBER( konppc_device::cgboard_dsp_shared_w_ppc )
+void konppc_device::cgboard_dsp_shared_w_ppc(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (cgboard_id < MAX_CG_BOARDS)
 	{
@@ -195,7 +195,7 @@ uint32_t konppc_device::dsp_comm_sharc_r(int board, int offset)
 	return dsp_comm_ppc[board][offset];
 }
 
-void konppc_device::dsp_comm_sharc_w(address_space &space, int board, int offset, uint32_t data)
+void konppc_device::dsp_comm_sharc_w(int board, int offset, uint32_t data)
 {
 	if (offset >= 2)
 	{
@@ -288,49 +288,49 @@ void konppc_device::dsp_shared_ram_w_sharc(int board, int offset, uint32_t data)
 	}
 }
 
-READ32_MEMBER( konppc_device::cgboard_0_comm_sharc_r )
+uint32_t konppc_device::cgboard_0_comm_sharc_r(offs_t offset)
 {
 	return dsp_comm_sharc_r(0, offset);
 }
 
-WRITE32_MEMBER( konppc_device::cgboard_0_comm_sharc_w )
+void konppc_device::cgboard_0_comm_sharc_w(offs_t offset, uint32_t data)
 {
-	dsp_comm_sharc_w(space, 0, offset, data);
+	dsp_comm_sharc_w(0, offset, data);
 }
 
-READ32_MEMBER( konppc_device::cgboard_0_shared_sharc_r )
+uint32_t konppc_device::cgboard_0_shared_sharc_r(offs_t offset)
 {
 	return dsp_shared_ram_r_sharc(0, offset);
 }
 
-WRITE32_MEMBER( konppc_device::cgboard_0_shared_sharc_w )
+void konppc_device::cgboard_0_shared_sharc_w(offs_t offset, uint32_t data)
 {
 	dsp_shared_ram_w_sharc(0, offset, data);
 }
 
-READ32_MEMBER( konppc_device::cgboard_1_comm_sharc_r )
+uint32_t konppc_device::cgboard_1_comm_sharc_r(offs_t offset)
 {
 	return dsp_comm_sharc_r(1, offset);
 }
 
-WRITE32_MEMBER( konppc_device::cgboard_1_comm_sharc_w )
+void konppc_device::cgboard_1_comm_sharc_w(offs_t offset, uint32_t data)
 {
-	dsp_comm_sharc_w(space, 1, offset, data);
+	dsp_comm_sharc_w(1, offset, data);
 }
 
-READ32_MEMBER( konppc_device::cgboard_1_shared_sharc_r )
+uint32_t konppc_device::cgboard_1_shared_sharc_r(offs_t offset)
 {
 	return dsp_shared_ram_r_sharc(1, offset);
 }
 
-WRITE32_MEMBER( konppc_device::cgboard_1_shared_sharc_w )
+void konppc_device::cgboard_1_shared_sharc_w(offs_t offset, uint32_t data)
 {
 	dsp_shared_ram_w_sharc(1, offset, data);
 }
 
 /*****************************************************************************/
 
-uint32_t konppc_device::nwk_fifo_r(address_space &space, int board)
+uint32_t konppc_device::nwk_fifo_r(int board)
 {
 	if (nwk_fifo_read_ptr[board] < nwk_fifo_half_full_r)
 	{
@@ -377,37 +377,37 @@ void konppc_device::nwk_fifo_w(int board, uint32_t data)
 
 /*****************************************************************************/
 
-/* Konami K033906 PCI bridge (most emulation is now in src/emu/machine/k033906.c ) */
+/* Konami K033906 PCI bridge (most emulation is now in src/devices/machine/k033906.cpp ) */
 
-READ32_MEMBER( konppc_device::K033906_0_r )
+uint32_t konppc_device::K033906_0_r(offs_t offset)
 {
 	if (nwk_device_sel[0] & 0x01)
-		return nwk_fifo_r(space, 0);
+		return nwk_fifo_r(0);
 	else
 		return m_k033906[0]->read(offset);
 }
 
-WRITE32_MEMBER( konppc_device::K033906_0_w )
+void konppc_device::K033906_0_w(offs_t offset, uint32_t data)
 {
 	m_k033906[0]->write(offset, data);
 }
 
-READ32_MEMBER( konppc_device::K033906_1_r )
+uint32_t konppc_device::K033906_1_r(offs_t offset)
 {
 	if (nwk_device_sel[1] & 0x01)
-		return nwk_fifo_r(space, 1);
+		return nwk_fifo_r(1);
 	else
 		return m_k033906[1]->read(offset);
 }
 
-WRITE32_MEMBER( konppc_device::K033906_1_w)
+void konppc_device::K033906_1_w(offs_t offset, uint32_t data)
 {
 	m_k033906[1]->write(offset, data);
 }
 
 /*****************************************************************************/
 
-WRITE32_MEMBER( konppc_device::nwk_fifo_0_w)
+void konppc_device::nwk_fifo_0_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (nwk_device_sel[0] & 0x01)
 	{
@@ -424,7 +424,7 @@ WRITE32_MEMBER( konppc_device::nwk_fifo_0_w)
 	}
 }
 
-WRITE32_MEMBER( konppc_device::nwk_fifo_1_w)
+void konppc_device::nwk_fifo_1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (nwk_device_sel[1] & 0x01)
 	{
@@ -441,7 +441,7 @@ WRITE32_MEMBER( konppc_device::nwk_fifo_1_w)
 	}
 }
 
-READ32_MEMBER( konppc_device::nwk_voodoo_0_r)
+uint32_t konppc_device::nwk_voodoo_0_r(offs_t offset)
 {
 	if ((nwk_device_sel[0] == 0x4) && offset >= 0x100000 && offset < 0x200000)
 	{
@@ -453,7 +453,7 @@ READ32_MEMBER( konppc_device::nwk_voodoo_0_r)
 	}
 }
 
-READ32_MEMBER( konppc_device::nwk_voodoo_1_r)
+uint32_t konppc_device::nwk_voodoo_1_r(offs_t offset)
 {
 	if ((nwk_device_sel[1] == 0x4) && offset >= 0x100000 && offset < 0x200000)
 	{
@@ -465,7 +465,7 @@ READ32_MEMBER( konppc_device::nwk_voodoo_1_r)
 	}
 }
 
-WRITE32_MEMBER( konppc_device::nwk_voodoo_0_w)
+void konppc_device::nwk_voodoo_0_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (nwk_device_sel[0] & 0x01)
 	{
@@ -482,7 +482,7 @@ WRITE32_MEMBER( konppc_device::nwk_voodoo_0_w)
 	}
 }
 
-WRITE32_MEMBER( konppc_device::nwk_voodoo_1_w)
+void konppc_device::nwk_voodoo_1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (nwk_device_sel[1] & 0x01)
 	{
@@ -496,48 +496,5 @@ WRITE32_MEMBER( konppc_device::nwk_voodoo_1_w)
 	else
 	{
 		m_voodoo[1]->voodoo_w(offset, data, mem_mask);
-	}
-}
-
-/*****************************************************************************/
-
-#define LED_ON      0xff00ff00
-
-void draw_7segment_led(bitmap_rgb32 &bitmap, int x, int y, uint8_t value)
-{
-	if ((value & 0x7f) == 0x7f)
-	{
-		return;
-	}
-
-	bitmap.plot_box(x-1, y-1, 7, 11, 0x00000000);
-
-	/* Top */
-	if( (value & 0x40) == 0 ) {
-		bitmap.plot_box(x+1, y+0, 3, 1, LED_ON);
-	}
-	/* Middle */
-	if( (value & 0x01) == 0 ) {
-		bitmap.plot_box(x+1, y+4, 3, 1, LED_ON);
-	}
-	/* Bottom */
-	if( (value & 0x08) == 0 ) {
-		bitmap.plot_box(x+1, y+8, 3, 1, LED_ON);
-	}
-	/* Top Left */
-	if( (value & 0x02) == 0 ) {
-		bitmap.plot_box(x+0, y+1, 1, 3, LED_ON);
-	}
-	/* Top Right */
-	if( (value & 0x20) == 0 ) {
-		bitmap.plot_box(x+4, y+1, 1, 3, LED_ON);
-	}
-	/* Bottom Left */
-	if( (value & 0x04) == 0 ) {
-		bitmap.plot_box(x+0, y+5, 1, 3, LED_ON);
-	}
-	/* Bottom Right */
-	if( (value & 0x10) == 0 ) {
-		bitmap.plot_box(x+4, y+5, 1, 3, LED_ON);
 	}
 }

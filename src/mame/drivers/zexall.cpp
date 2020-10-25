@@ -41,12 +41,12 @@ public:
 	void zexall(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER( output_ack_r );
-	DECLARE_READ8_MEMBER( output_req_r );
-	DECLARE_READ8_MEMBER( output_data_r );
-	DECLARE_WRITE8_MEMBER( output_ack_w );
-	DECLARE_WRITE8_MEMBER( output_req_w );
-	DECLARE_WRITE8_MEMBER( output_data_w );
+	uint8_t output_ack_r();
+	uint8_t output_req_r();
+	uint8_t output_data_r();
+	void output_ack_w(uint8_t data);
+	void output_req_w(uint8_t data);
+	void output_data_w(uint8_t data);
 
 	void mem_map(address_map &map);
 
@@ -94,7 +94,7 @@ void zexall_state::machine_reset()
  I/O Handlers
 ******************************************************************************/
 
-READ8_MEMBER( zexall_state::output_ack_r )
+uint8_t zexall_state::output_ack_r()
 {
 	// spit out the byte in out_byte if out_req is not equal to out_req_last
 	if (m_out_req != m_out_req_last)
@@ -106,28 +106,28 @@ READ8_MEMBER( zexall_state::output_ack_r )
 	return m_out_ack;
 }
 
-WRITE8_MEMBER( zexall_state::output_ack_w )
+void zexall_state::output_ack_w(uint8_t data)
 {
 	m_out_ack = data;
 }
 
-READ8_MEMBER( zexall_state::output_req_r )
+uint8_t zexall_state::output_req_r()
 {
 	return m_out_req;
 }
 
-WRITE8_MEMBER( zexall_state::output_req_w )
+void zexall_state::output_req_w(uint8_t data)
 {
 	m_out_req_last = m_out_req;
 	m_out_req = data;
 }
 
-READ8_MEMBER( zexall_state::output_data_r )
+uint8_t zexall_state::output_data_r()
 {
 	return m_out_data;
 }
 
-WRITE8_MEMBER( zexall_state::output_data_w )
+void zexall_state::output_data_w(uint8_t data)
 {
 	m_out_data = data;
 }

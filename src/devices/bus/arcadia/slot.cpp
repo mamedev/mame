@@ -215,10 +215,10 @@ std::string arcadia_cart_slot_device::get_default_card_software(get_default_card
  read
  -------------------------------------------------*/
 
-READ8_MEMBER(arcadia_cart_slot_device::read_rom)
+uint8_t arcadia_cart_slot_device::read_rom(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_rom(space, offset);
+		return m_cart->read_rom(offset);
 	else
 		return 0xff;
 }
@@ -227,10 +227,10 @@ READ8_MEMBER(arcadia_cart_slot_device::read_rom)
  write
  -------------------------------------------------*/
 
-READ8_MEMBER(arcadia_cart_slot_device::extra_rom)
+uint8_t arcadia_cart_slot_device::extra_rom(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->extra_rom(space, offset);
+		return m_cart->extra_rom(offset);
 	else
 		return 0xff;
 }

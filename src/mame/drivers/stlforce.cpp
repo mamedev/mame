@@ -73,14 +73,14 @@ TO DO :
 #include "includes/stlforce.h"
 
 
-WRITE8_MEMBER(stlforce_state::eeprom_w)
+void stlforce_state::eeprom_w(uint8_t data)
 {
 	m_eeprom->di_write(data & 0x01);
 	m_eeprom->cs_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
 	m_eeprom->clk_write((data & 0x04) ? ASSERT_LINE : CLEAR_LINE );
 }
 
-WRITE8_MEMBER(stlforce_state::oki_bank_w)
+void stlforce_state::oki_bank_w(uint8_t data)
 {
 	if (m_okibank.found())
 	{

@@ -17,7 +17,7 @@
         0x01    = Scroll MSB
 */
 
-WRITE8_MEMBER(battlane_state::battlane_palette_w)
+void battlane_state::battlane_palette_w(offs_t offset, uint8_t data)
 {
 	int r, g, b;
 	int bit0, bit1, bit2;
@@ -46,50 +46,47 @@ WRITE8_MEMBER(battlane_state::battlane_palette_w)
 	m_palette->set_pen_color(offset, rgb_t(r, g, b));
 }
 
-WRITE8_MEMBER(battlane_state::battlane_scrollx_w)
+void battlane_state::battlane_scrollx_w(uint8_t data)
 {
 	m_bg_tilemap->set_scrollx(0, ((m_video_ctrl & 0x01) << 8) + data);
 }
 
-WRITE8_MEMBER(battlane_state::battlane_scrolly_w)
+void battlane_state::battlane_scrolly_w(uint8_t data)
 {
 	m_bg_tilemap->set_scrolly(0, ((m_cpu_control & 0x01) << 8) + data);
 }
 
-WRITE8_MEMBER(battlane_state::battlane_tileram_w)
+void battlane_state::battlane_tileram_w(offs_t offset, uint8_t data)
 {
 	m_tileram[offset] = data;
 	//m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(battlane_state::battlane_spriteram_w)
+void battlane_state::battlane_spriteram_w(offs_t offset, uint8_t data)
 {
 	m_spriteram[offset] = data;
 }
 
-WRITE8_MEMBER(battlane_state::battlane_bitmap_w)
+void battlane_state::battlane_bitmap_w(offs_t offset, uint8_t data)
 {
-	int i, orval;
-
-	orval = (~m_video_ctrl >> 1) & 0x07;
-
+	int orval = (~m_video_ctrl >> 1) & 0x07;
 	if (!orval)
 		orval = 7;
 
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		if (data & 1 << i)
 		{
-			m_screen_bitmap.pix8(offset % 0x100, (offset / 0x100) * 8 + i) |= orval;
+			m_screen_bitmap.pix(offset % 0x100, (offset / 0x100) * 8 + i) |= orval;
 		}
 		else
 		{
-			m_screen_bitmap.pix8(offset % 0x100, (offset / 0x100) * 8 + i) &= ~orval;
+			m_screen_bitmap.pix(offset % 0x100, (offset / 0x100) * 8 + i) &= ~orval;
 		}
 	}
 }
 
-WRITE8_MEMBER(battlane_state::battlane_video_ctrl_w)
+void battlane_state::battlane_video_ctrl_w(uint8_t data)
 {
 	m_video_ctrl = data;
 }
@@ -207,20 +204,18 @@ void battlane_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 void battlane_state::draw_fg_bitmap( bitmap_ind16 &bitmap )
 {
-	int x, y, data;
-
-	for (y = 0; y < 32 * 8; y++)
+	for (int y = 0; y < 32 * 8; y++)
 	{
-		for (x = 0; x < 32 * 8; x++)
+		for (int x = 0; x < 32 * 8; x++)
 		{
-			data = m_screen_bitmap.pix8(y, x);
+			int const data = m_screen_bitmap.pix(y, x);
 
 			if (data)
 			{
 				if (flip_screen())
-					bitmap.pix16(255 - y, 255 - x) = data;
+					bitmap.pix(255 - y, 255 - x) = data;
 				else
-					bitmap.pix16(y, x) = data;
+					bitmap.pix(y, x) = data;
 			}
 		}
 	}

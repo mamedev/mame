@@ -116,7 +116,7 @@ WRITE_LINE_MEMBER( c1581_device::sp_w )
 	update_iec();
 }
 
-READ8_MEMBER( c1581_device::cia_pa_r )
+uint8_t c1581_device::cia_pa_r()
 {
 	/*
 
@@ -147,7 +147,7 @@ READ8_MEMBER( c1581_device::cia_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( c1581_device::cia_pa_w )
+void c1581_device::cia_pa_w(uint8_t data)
 {
 	/*
 
@@ -177,7 +177,7 @@ WRITE8_MEMBER( c1581_device::cia_pa_w )
 	m_leds[LED_ACT] = BIT(data, 6);
 }
 
-READ8_MEMBER( c1581_device::cia_pb_r )
+uint8_t c1581_device::cia_pb_r()
 {
 	/*
 
@@ -211,7 +211,7 @@ READ8_MEMBER( c1581_device::cia_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( c1581_device::cia_pb_w )
+void c1581_device::cia_pb_w(uint8_t data)
 {
 	/*
 

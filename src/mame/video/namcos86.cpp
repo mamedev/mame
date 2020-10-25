@@ -164,19 +164,19 @@ void namcos86_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(namcos86_state::videoram1_w)
+void namcos86_state::videoram1_w(offs_t offset, uint8_t data)
 {
 	m_rthunder_videoram1[offset] = data;
 	m_bg_tilemap[offset/0x1000]->mark_tile_dirty((offset & 0xfff)/2);
 }
 
-WRITE8_MEMBER(namcos86_state::videoram2_w)
+void namcos86_state::videoram2_w(offs_t offset, uint8_t data)
 {
 	m_rthunder_videoram2[offset] = data;
 	m_bg_tilemap[2+offset/0x1000]->mark_tile_dirty((offset & 0xfff)/2);
 }
 
-WRITE8_MEMBER(namcos86_state::tilebank_select_w)
+void namcos86_state::tilebank_select_w(offs_t offset, uint8_t data)
 {
 	int bit = BIT(offset,10);
 	if (m_tilebank != bit)
@@ -187,7 +187,7 @@ WRITE8_MEMBER(namcos86_state::tilebank_select_w)
 	}
 }
 
-void namcos86_state::scroll_w(address_space &space, int offset, int data, int layer)
+void namcos86_state::scroll_w(offs_t offset, int data, int layer)
 {
 	switch (offset)
 	{
@@ -203,30 +203,30 @@ void namcos86_state::scroll_w(address_space &space, int offset, int data, int la
 	}
 }
 
-WRITE8_MEMBER(namcos86_state::scroll0_w)
+void namcos86_state::scroll0_w(offs_t offset, uint8_t data)
 {
-	scroll_w(space,offset,data,0);
+	scroll_w(offset,data,0);
 }
-WRITE8_MEMBER(namcos86_state::scroll1_w)
+void namcos86_state::scroll1_w(offs_t offset, uint8_t data)
 {
-	scroll_w(space,offset,data,1);
+	scroll_w(offset,data,1);
 }
-WRITE8_MEMBER(namcos86_state::scroll2_w)
+void namcos86_state::scroll2_w(offs_t offset, uint8_t data)
 {
-	scroll_w(space,offset,data,2);
+	scroll_w(offset,data,2);
 }
-WRITE8_MEMBER(namcos86_state::scroll3_w)
+void namcos86_state::scroll3_w(offs_t offset, uint8_t data)
 {
-	scroll_w(space,offset,data,3);
+	scroll_w(offset,data,3);
 }
 
-WRITE8_MEMBER(namcos86_state::backcolor_w)
+void namcos86_state::backcolor_w(uint8_t data)
 {
 	m_backcolor = data;
 }
 
 
-WRITE8_MEMBER(namcos86_state::spriteram_w)
+void namcos86_state::spriteram_w(offs_t offset, uint8_t data)
 {
 	m_rthunder_spriteram[offset] = data;
 

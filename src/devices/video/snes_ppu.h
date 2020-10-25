@@ -37,7 +37,8 @@
 // ======================> snes_ppu_device
 
 class snes_ppu_device :  public device_t,
-							public device_video_interface
+							public device_video_interface,
+							public device_palette_interface
 {
 public:
 	// construction/destruction
@@ -52,8 +53,8 @@ public:
 	int16_t current_y() const { return screen().vpos(); }
 	void set_latch_hv(int16_t x, int16_t y);
 
-	uint8_t read(address_space &space, uint32_t offset, uint8_t wrio_bit7);
-	void write(address_space &space, uint32_t offset, uint8_t data);
+	uint8_t read(uint32_t offset, uint8_t wrio_bit7);
+	void write(uint32_t offset, uint8_t data);
 
 	int vtotal() const { return ((m_stat78 & 0x10) == SNES_NTSC) ? SNES_VTOTAL_NTSC : SNES_VTOTAL_PAL; }
 	uint16_t htmult() const { return m_htmult; }
@@ -312,7 +313,15 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// device_palette_interface overrides
+	// 256 word CG RAM data (0x000-0x0ff), 8 group of direct colours (0x100-0x8ff), Fixed color (0x900)
+	virtual uint32_t palette_entries() const override { return 0x100 + (0x100 * 8) + 1; }
+	virtual uint32_t palette_indirect_entries() const override { return 32 * 32 * 32; } // 15 bit BGR
+
 private:
+	static constexpr uint16_t DIRECT_COLOUR = 0x100; // Position in palette entry for direct colour
+	static constexpr uint16_t FIXED_COLOUR = 0x100 + (0x100 * 8); // Position in palette entry for fixed colour
+
 	devcb_read16  m_openbus_cb;
 	optional_ioport m_options;
 	optional_ioport m_debug1;

@@ -68,17 +68,17 @@ void tandy2k_state::speaker_update()
 	m_speaker->level_w(level);
 }
 
-READ8_MEMBER( tandy2k_state::char_ram_r )
+uint8_t tandy2k_state::char_ram_r(offs_t offset)
 {
 	return m_char_ram[offset];
 }
 
-WRITE8_MEMBER( tandy2k_state::char_ram_w )
+void tandy2k_state::char_ram_w(offs_t offset, uint8_t data)
 {
 	m_char_ram[offset] = data;
 }
 
-READ8_MEMBER( tandy2k_state::videoram_r )
+uint8_t tandy2k_state::videoram_r(offs_t offset)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
@@ -94,7 +94,7 @@ READ8_MEMBER( tandy2k_state::videoram_r )
 	return data & 0xff;
 }
 
-READ8_MEMBER( tandy2k_state::enable_r )
+uint8_t tandy2k_state::enable_r()
 {
 	/*
 
@@ -119,7 +119,7 @@ READ8_MEMBER( tandy2k_state::enable_r )
 	return data;
 }
 
-WRITE8_MEMBER( tandy2k_state::enable_w )
+void tandy2k_state::enable_w(uint8_t data)
 {
 	/*
 
@@ -157,10 +157,7 @@ WRITE8_MEMBER( tandy2k_state::enable_w )
 	m_pit->write_gate2(BIT(data, 4));
 
 	// FDC reset
-	if (!BIT(data, 5))
-	{
-		m_fdc->soft_reset();
-	}
+	m_fdc->reset_w(!BIT(data, 5));
 
 	// timer 0 enable
 	m_maincpu->tmrin0_w(BIT(data, 6));
@@ -169,7 +166,7 @@ WRITE8_MEMBER( tandy2k_state::enable_w )
 	m_maincpu->tmrin1_w(BIT(data, 7));
 }
 
-WRITE8_MEMBER( tandy2k_state::dma_mux_w )
+void tandy2k_state::dma_mux_w(uint8_t data)
 {
 	/*
 
@@ -206,7 +203,7 @@ WRITE8_MEMBER( tandy2k_state::dma_mux_w )
 	update_drq();
 }
 
-READ8_MEMBER( tandy2k_state::kbint_clr_r )
+uint8_t tandy2k_state::kbint_clr_r()
 {
 	if (m_pb_sel == KBDINEN)
 	{
@@ -219,7 +216,7 @@ READ8_MEMBER( tandy2k_state::kbint_clr_r )
 	return 0xff;
 }
 
-READ8_MEMBER( tandy2k_state::clkmouse_r )
+uint8_t tandy2k_state::clkmouse_r(offs_t offset)
 {
 	uint8_t ret = 0;
 	switch (offset)
@@ -241,7 +238,7 @@ READ8_MEMBER( tandy2k_state::clkmouse_r )
 	return ret;
 }
 
-WRITE8_MEMBER( tandy2k_state::clkmouse_w )
+void tandy2k_state::clkmouse_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -290,22 +287,22 @@ WRITE8_MEMBER( tandy2k_state::clkmouse_w )
 	}
 }
 
-READ8_MEMBER( tandy2k_state::fldtc_r )
+uint8_t tandy2k_state::fldtc_r()
 {
 	if (LOG) logerror("FLDTC\n");
 
-	fldtc_w(space, 0, 0);
+	fldtc_w(0);
 
 	return 0;
 }
 
-WRITE8_MEMBER( tandy2k_state::fldtc_w )
+void tandy2k_state::fldtc_w(uint8_t data)
 {
 	m_fdc->tc_w(1);
 	m_fdc->tc_w(false);
 }
 
-WRITE8_MEMBER( tandy2k_state::addr_ctrl_w )
+void tandy2k_state::addr_ctrl_w(uint8_t data)
 {
 	/*
 
@@ -406,6 +403,20 @@ void tandy2k_state::vpac_mem(address_map &map)
 
 static INPUT_PORTS_START( tandy2k )
 	// defined in machine/tandy2kb.c
+	PORT_START("MOUSEBTN")
+	PORT_BIT( 0xff8f, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, tandy2k_state, input_changed, 0)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(MOUSECODE_BUTTON2) PORT_CHANGED_MEMBER(DEVICE_SELF, tandy2k_state, input_changed, 0)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )  /* this would be button three but AFAIK no tandy mouse ever had one */
+
+	PORT_START("MOUSEX")
+	PORT_BIT( 0xffff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_CHANGED_MEMBER(DEVICE_SELF, tandy2k_state, input_changed, 0)
+
+	PORT_START("MOUSEY")
+	PORT_BIT( 0xffff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_CHANGED_MEMBER(DEVICE_SELF, tandy2k_state, input_changed, 0)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( tandy2kb_hle )
 	PORT_INCLUDE(pc_keyboard)
 
 	PORT_MODIFY("pc_keyboard_2")
@@ -440,19 +451,29 @@ static INPUT_PORTS_START( tandy2k )
 	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Home") PORT_CODE(KEYCODE_HOME) /* HOME                        58  D8 */
 	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F11") PORT_CODE(KEYCODE_F11) /* F11                         59  D9 */
 	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F12") PORT_CODE(KEYCODE_F12) /* F12                         5a  Da */
-
-	PORT_START("MOUSEBTN")
-	PORT_BIT( 0xff8f, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, tandy2k_state, input_changed, 0)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(MOUSECODE_BUTTON2) PORT_CHANGED_MEMBER(DEVICE_SELF, tandy2k_state, input_changed, 0)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )  /* this would be button three but AFAIK no tandy mouse ever had one */
-
-	PORT_START("MOUSEX")
-	PORT_BIT( 0xffff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_CHANGED_MEMBER(DEVICE_SELF, tandy2k_state, input_changed, 0)
-
-	PORT_START("MOUSEY")
-	PORT_BIT( 0xffff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_CHANGED_MEMBER(DEVICE_SELF, tandy2k_state, input_changed, 0)
 INPUT_PORTS_END
+
+class tandy2kb_hle_device : public pc_keyboard_device
+{
+public:
+	tandy2kb_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+protected:
+	virtual ioport_constructor device_input_ports() const override;
+};
+
+DEFINE_DEVICE_TYPE(TANDY2K_HLE_KEYB, tandy2kb_hle_device, "tandy2kb_hle", "Tandy 2000 Keyboard HLE")
+
+tandy2kb_hle_device::tandy2kb_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	pc_keyboard_device(mconfig, TANDY2K_HLE_KEYB, tag, owner, clock)
+{
+	m_type = KEYBOARD_TYPE::PC;
+}
+
+ioport_constructor tandy2kb_hle_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(tandy2kb_hle);
+}
 
 INPUT_CHANGED_MEMBER(tandy2k_state::input_changed)
 {
@@ -502,7 +523,7 @@ uint32_t tandy2k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 				for (int x = 0; x < 8; x++)
 				{
 					int color = BIT(a, x) | (BIT(b, x) << 1) | (BIT(c, x) << 2);
-					bitmap.pix32(y, (sx * 8) + (7 - x)) = cpen[color];
+					bitmap.pix(y, (sx * 8) + (7 - x)) = cpen[color];
 				}
 			}
 			else
@@ -517,7 +538,7 @@ uint32_t tandy2k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 				for (int x = 0; x < 8; x++)
 				{
 					int color = 4 | (BIT(attr, 6) << 1) | BIT(data, 7);
-					bitmap.pix32(y, (sx * 8) + x) = cpen[color];
+					bitmap.pix(y, (sx * 8) + x) = cpen[color];
 					data <<= 1;
 				}
 			}
@@ -567,7 +588,7 @@ WRITE_LINE_MEMBER( tandy2k_state::vpac_sld_w )
 	m_vac->sld_w(state);
 }
 
-WRITE8_MEMBER( tandy2k_state::hires_plane_w )
+void tandy2k_state::hires_plane_w(uint8_t data)
 {
 	int bank = 3;
 	if (((data & 1) + ((data >> 1) & 1) + ((data >> 2) & 1)) == 1)
@@ -579,17 +600,17 @@ WRITE8_MEMBER( tandy2k_state::hires_plane_w )
 // bit 0 - 0 = hires board installed
 // bit 1 - 0 = 1 plane, 1 = 3 planes
 // bit 2-4 - board rev
-READ8_MEMBER( tandy2k_state::hires_status_r )
+uint8_t tandy2k_state::hires_status_r()
 {
 	return 2;
 }
 
-WRITE8_MEMBER( tandy2k_state::vidla_w )
+void tandy2k_state::vidla_w(uint8_t data)
 {
 	m_vidla = data;
 }
 
-WRITE8_MEMBER( tandy2k_state::drb_attr_w )
+void tandy2k_state::drb_attr_w(uint8_t data)
 {
 	/*
 
@@ -624,7 +645,7 @@ CRT9021_DRAW_CHARACTER_MEMBER( tandy2k_state::vac_draw_character )
 	{
 		int color = BIT(video, 7 - i);
 
-		bitmap.pix32(y, x++) = pen[color];
+		bitmap.pix(y, x++) = pen[color];
 	}
 }
 
@@ -729,7 +750,7 @@ WRITE_LINE_MEMBER( tandy2k_state::write_centronics_fault )
 	m_centronics_fault = state;
 }
 
-READ8_MEMBER( tandy2k_state::ppi_pb_r )
+uint8_t tandy2k_state::ppi_pb_r()
 {
 	/*
 
@@ -781,7 +802,7 @@ READ8_MEMBER( tandy2k_state::ppi_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( tandy2k_state::ppi_pc_w )
+void tandy2k_state::ppi_pc_w(uint8_t data)
 {
 	/*
 
@@ -883,7 +904,7 @@ WRITE_LINE_MEMBER( tandy2k_state::kbddat_w )
 	m_kbddat = state;
 }
 
-READ8_MEMBER( tandy2k_state::irq_callback )
+uint8_t tandy2k_state::irq_callback(offs_t offset)
 {
 	return (offset ? m_pic1 : m_pic0)->acknowledge();
 }
@@ -1079,7 +1100,7 @@ void tandy2k_state::tandy2k(machine_config &config)
 	m_kb->data_wr_callback().set(FUNC(tandy2k_state::kbddat_w));
 
 	// temporary until the tandy keyboard has a rom dump
-	PC_KEYB(config, m_pc_keyboard, 0).keypress().set(I8259A_1_TAG, FUNC(pic8259_device::ir0_w));
+	TANDY2K_HLE_KEYB(config, m_pc_keyboard, 0).keypress().set(I8259A_1_TAG, FUNC(pic8259_device::ir0_w));
 
 	// software lists
 	SOFTWARE_LIST(config, "flop_list").set_original("tandy2k");

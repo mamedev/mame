@@ -66,6 +66,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_flash(*this, "at29c020" ),
 		m_videoram(*this, "videoram"),
+		m_charram(*this, "charram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_bnk2000(*this, "bnk2000")
@@ -74,18 +75,18 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<at29c020_device> m_flash;
 	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_charram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<address_map_bank_device> m_bnk2000;
 
 	uint8_t m_irq_mask;
 
-	DECLARE_READ8_MEMBER(cmmb_charram_r);
-	DECLARE_WRITE8_MEMBER(cmmb_charram_w);
-	DECLARE_READ8_MEMBER(cmmb_input_r);
-	DECLARE_WRITE8_MEMBER(cmmb_output_w);
-	DECLARE_READ8_MEMBER(flash_r);
-	DECLARE_WRITE8_MEMBER(flash_w);
+	void cmmb_charram_w(offs_t offset, uint8_t data);
+	uint8_t cmmb_input_r(offs_t offset);
+	void cmmb_output_w(offs_t offset, uint8_t data);
+	uint8_t flash_r(offs_t offset);
+	void flash_w(offs_t offset, uint8_t data);
 
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -124,37 +125,26 @@ uint32_t cmmb_state::screen_update_cmmb(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-READ8_MEMBER(cmmb_state::cmmb_charram_r)
+void cmmb_state::cmmb_charram_w(offs_t offset, uint8_t data)
 {
-	uint8_t *GFX = memregion("gfx")->base();
-
-	return GFX[offset];
-}
-
-WRITE8_MEMBER(cmmb_state::cmmb_charram_w)
-{
-	uint8_t *GFX = memregion("gfx")->base();
-
-	GFX[offset] = data;
-
-	offset&=0xfff;
+	m_charram[offset] = data;
 
 	/* dirty char */
 	m_gfxdecode->gfx(0)->mark_dirty(offset >> 4);
 	m_gfxdecode->gfx(1)->mark_dirty(offset >> 5);
 }
 
-READ8_MEMBER(cmmb_state::flash_r)
+uint8_t cmmb_state::flash_r(offs_t offset)
 {
 	return m_flash->read(offset + 0x2000);
 }
 
-WRITE8_MEMBER(cmmb_state::flash_w)
+void cmmb_state::flash_w(offs_t offset, uint8_t data)
 {
 	m_flash->write(offset + 0x2000, data);
 }
 
-READ8_MEMBER(cmmb_state::cmmb_input_r)
+uint8_t cmmb_state::cmmb_input_r(offs_t offset)
 {
 	//printf("%02x R\n",offset);
 	switch(offset)
@@ -168,7 +158,7 @@ READ8_MEMBER(cmmb_state::cmmb_input_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(cmmb_state::cmmb_output_w)
+void cmmb_state::cmmb_output_w(offs_t offset, uint8_t data)
 {
 	//printf("%02x -> [%02x] W\n",data,offset);
 	switch(offset)
@@ -216,7 +206,7 @@ void cmmb_state::cmmb_map(address_map &map)
 	map(0x1000, 0x1fff).ram().share("videoram");
 	map(0x2000, 0x9fff).m(m_bnk2000, FUNC(address_map_bank_device::amap8));
 	map(0xa000, 0xafff).ram();
-	map(0xb000, 0xbfff).rw(FUNC(cmmb_state::cmmb_charram_r), FUNC(cmmb_state::cmmb_charram_w));
+	map(0xb000, 0xbfff).ram().w(FUNC(cmmb_state::cmmb_charram_w)).share(m_charram);
 	map(0xc000, 0xc00f).rw(FUNC(cmmb_state::cmmb_input_r), FUNC(cmmb_state::cmmb_output_w));
 	map(0xc010, 0xffff).rom().region("maincpu", 0x1c010);
 }
@@ -398,8 +388,8 @@ static const gfx_layout spritelayout =
 
 
 static GFXDECODE_START( gfx_cmmb )
-	GFXDECODE_ENTRY( "gfx", 0, charlayout,     0x00, 4 )
-	GFXDECODE_ENTRY( "gfx", 0, spritelayout,   0x10, 4 )
+	GFXDECODE_RAM( "charram", 0, charlayout,     0x00, 4 )
+	GFXDECODE_RAM( "charram", 0, spritelayout,   0x10, 4 )
 GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(cmmb_state::vblank_irq)
@@ -454,8 +444,6 @@ ROM_START( cmmb162 )
 	ROM_LOAD( "cmmb162.u2",   0x10000, 0x40000, CRC(71a5a75d) SHA1(0ad7b97580082cda98cb1e8aab8efcf491d0ed25) )
 	ROM_COPY( "maincpu",      0x18000, 0x08000, 0x08000 )
 	ROM_FILL( 0x1c124, 2, 0xea ) // temporary patch to avoid waiting on IRQs
-
-	ROM_REGION( 0x1000, "gfx", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( cmmb103 )
@@ -463,9 +451,7 @@ ROM_START( cmmb103 )
 	ROM_LOAD( "cmm103.u2",    0x10000, 0x40000, CRC(5e925b6b) SHA1(ac675d65bf5cdbd8b0456bb23e46bb00dcae916a) )
 	ROM_COPY( "maincpu",      0x18000, 0x08000, 0x08000 )
 	//ROM_FILL( 0x1c124, 2, 0xea ) // temporary patch to avoid waiting on IRQs
-
-	ROM_REGION( 0x1000, "gfx", ROMREGION_ERASE00 )
 ROM_END
 
-GAME( 2001, cmmb103, 0, cmmb, cmmb, cmmb_state, empty_init, ROT270, "Cosmodog / Team Play (Licensed from Infogrames via Midway Games West)", "Centipede / Millipede / Missile Command (rev 1.03)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-GAME( 2002, cmmb162, 0, cmmb, cmmb, cmmb_state, empty_init, ROT270, "Cosmodog / Team Play (Licensed from Infogrames via Midway Games West)", "Centipede / Millipede / Missile Command / Let's Go Bowling (rev 1.62)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2001, cmmb103, 0, cmmb, cmmb, cmmb_state, empty_init, ROT270, "Cosmodog / Team Play (licensed from Infogrames via Midway Games West)", "Centipede / Millipede / Missile Command (rev 1.03)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2002, cmmb162, 0, cmmb, cmmb, cmmb_state, empty_init, ROT270, "Cosmodog / Team Play (licensed from Infogrames via Midway Games West)", "Centipede / Millipede / Missile Command / Let's Go Bowling (rev 1.62)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )

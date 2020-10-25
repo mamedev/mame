@@ -51,7 +51,6 @@ ToDO:
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/votrax.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 #include "taito.lh"
@@ -80,10 +79,10 @@ public:
 	void init_taito();
 
 private:
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
-	DECLARE_READ8_MEMBER(pia_pb_r);
-	DECLARE_WRITE8_MEMBER(pia_pb_w);
+	uint8_t io_r(offs_t offset);
+	void io_w(offs_t offset, uint8_t data);
+	uint8_t pia_pb_r();
+	void pia_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pia_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(votrax_request);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
@@ -287,12 +286,12 @@ static INPUT_PORTS_START( taito )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )
 INPUT_PORTS_END
 
-READ8_MEMBER( taito_state::io_r )
+uint8_t taito_state::io_r(offs_t offset)
 {
 	return m_io[offset];
 }
 
-WRITE8_MEMBER( taito_state::io_w )
+void taito_state::io_w(offs_t offset, uint8_t data)
 {
 	m_io[offset] = data;
 
@@ -312,12 +311,12 @@ WRITE_LINE_MEMBER( taito_state::pia_cb2_w )
 	m_votrax->write(m_votrax_cmd);
 }
 
-READ8_MEMBER( taito_state::pia_pb_r )
+uint8_t taito_state::pia_pb_r()
 {
 	return ~m_sndcmd;
 }
 
-WRITE8_MEMBER( taito_state::pia_pb_w )
+void taito_state::pia_pb_w(uint8_t data)
 {
 	m_votrax_cmd = data;
 }
@@ -362,9 +361,6 @@ void taito_state::taito(machine_config &config)
 
 	SPEAKER(config, "speaker").front_center();
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.475); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	PIA6821(config, m_pia);
 	//m_pia->readpa_handler().set(FUNC(taito_state::pia_pa_r));
@@ -541,6 +537,18 @@ ROM_END
 /*--------------------------------
 / Football
 /-------------------------------*/
+ROM_START(football)
+	ROM_REGION(0x2000, "roms", 0)
+	ROM_LOAD( "fb1.bin", 0x0000, 0x0400, NO_DUMP)
+	ROM_LOAD( "fb2.bin", 0x0400, 0x0400, NO_DUMP)
+	ROM_LOAD( "fb3.bin", 0x0800, 0x0400, NO_DUMP)
+	ROM_LOAD( "fb4.bin", 0x0c00, 0x0400, NO_DUMP)
+	ROM_LOAD( "fb5.bin", 0x1800, 0x0400, NO_DUMP)
+
+	ROM_REGION(0x0800, "cpu2", 0)
+	ROM_LOAD("fb_s2.bin", 0x0000, 0x0400, CRC(48c0e50a) SHA1(dc8d951a84a9ef27882ddc205caeeb92b18ba462))
+	ROM_LOAD("fb_s1.bin", 0x0400, 0x0400, CRC(457c9b78) SHA1(8c17dff49ad397f0c0d90f5fb45f12920335e25b))
+ROM_END
 
 /*--------------------------------
 / Gemini 2000
@@ -1026,6 +1034,7 @@ GAME(1982,  sharkt,     0,          taito2, taito, taito_state, init_taito,  ROT
 GAME(1982,  stest,      0,          taito,  taito, taito_state, init_taito,  ROT0,   "Taito do Brasil",  "Speed Test",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME(1982,  lunelle,    0,          taito2, taito, taito_state, init_taito,  ROT0,   "Taito do Brasil",  "Lunelle",                       MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1980,  rally,      0,          taito,  taito, taito_state, init_taito,  ROT0,   "Taito do Brasil",  "Rally",                         MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1981,  football,   0,          shock,  taito, taito_state, init_taito,  ROT0,   "Taito do Brasil",  "Football",                      MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // dac and vox (sintevox)
 GAME(1981,  fireact,    0,          taito4, taito, taito_state, init_taito,  ROT0,   "Taito do Brasil",  "Fire Action",                   MACHINE_IS_SKELETON_MECHANICAL)

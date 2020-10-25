@@ -37,7 +37,6 @@ ToDo:
 #include "machine/genpin.h"
 #include "sound/dac.h"
 #include "sound/hc55516.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 #include "s9.lh"
@@ -56,6 +55,7 @@ public:
 		, m_pia28(*this, "pia28")
 		, m_pia30(*this, "pia30")
 		, m_digits(*this, "digit%u", 0U)
+		, m_swarray(*this, "SW.%u", 0U)
 	{ }
 
 	void s9(machine_config &config);
@@ -66,16 +66,16 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 
 private:
-	DECLARE_READ8_MEMBER(sound_r);
-	DECLARE_WRITE8_MEMBER(dig0_w);
-	DECLARE_WRITE8_MEMBER(dig1_w);
-	DECLARE_WRITE8_MEMBER(lamp0_w) { };
-	DECLARE_WRITE8_MEMBER(lamp1_w) { };
-	DECLARE_WRITE8_MEMBER(sol2_w) { }; // solenoids 8-15
-	DECLARE_WRITE8_MEMBER(sol3_w) { }; // solenoids 0-7
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_READ8_MEMBER(switch_r);
-	DECLARE_WRITE8_MEMBER(switch_w);
+	uint8_t sound_r();
+	void dig0_w(uint8_t data);
+	void dig1_w(uint8_t data);
+	void lamp0_w(uint8_t data) { };
+	void lamp1_w(uint8_t data) { };
+	void sol2_w(uint8_t data) { }; // solenoids 8-15
+	void sol3_w(uint8_t data) { }; // solenoids 0-7
+	void sound_w(uint8_t data);
+	uint8_t switch_r();
+	void switch_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER(pia21_ca1_r);
 	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { }; // enable solenoids
@@ -90,7 +90,7 @@ private:
 
 	uint8_t m_sound_data;
 	uint8_t m_strobe;
-	uint8_t m_kbdrow;
+	uint8_t m_switch_col;
 	bool m_data_ok;
 	emu_timer* m_irq_timer;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -105,6 +105,7 @@ private:
 	required_device<pia6821_device> m_pia28;
 	required_device<pia6821_device> m_pia30;
 	output_finder<61> m_digits;
+	required_ioport_array<8> m_swarray;
 };
 
 void s9_state::s9_main_map(address_map &map)
@@ -127,10 +128,7 @@ void s9_state::s9_audio_map(address_map &map)
 }
 
 static INPUT_PORTS_START( s9 )
-	PORT_START("X0")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("X1")
+	PORT_START("SW.0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START )
@@ -140,7 +138,7 @@ static INPUT_PORTS_START( s9 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )
 
-	PORT_START("X2")
+	PORT_START("SW.1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D)
@@ -150,7 +148,7 @@ static INPUT_PORTS_START( s9 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K)
 
-	PORT_START("X4")
+	PORT_START("SW.2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C)
@@ -160,7 +158,7 @@ static INPUT_PORTS_START( s9 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COMMA)
 
-	PORT_START("X8")
+	PORT_START("SW.3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_SLASH)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
@@ -170,7 +168,7 @@ static INPUT_PORTS_START( s9 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_EQUALS)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSPACE)
 
-	PORT_START("X10")
+	PORT_START("SW.4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_OPENBRACE)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_CLOSEBRACE)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSLASH)
@@ -180,7 +178,7 @@ static INPUT_PORTS_START( s9 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_UP)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_DOWN)
 
-	PORT_START("X20")
+	PORT_START("SW.5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E)
@@ -190,14 +188,14 @@ static INPUT_PORTS_START( s9 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_O)
 
-	PORT_START("X40")
+	PORT_START("SW.6")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_RSHIFT)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_SPACE)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_LALT)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_LSHIFT)
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("X80")
+	PORT_START("SW.7")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DIAGS")
@@ -221,7 +219,7 @@ INPUT_CHANGED_MEMBER( s9_state::audio_nmi )
 		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-WRITE8_MEMBER( s9_state::sound_w )
+void s9_state::sound_w(uint8_t data)
 {
 	m_sound_data = data;
 }
@@ -238,7 +236,7 @@ WRITE_LINE_MEMBER( s9_state::pia21_ca2_w )
 	m_pias->ca1_w(state);
 }
 
-WRITE8_MEMBER( s9_state::dig0_w )
+void s9_state::dig0_w(uint8_t data)
 {
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7447
 	data &= 0x7f;
@@ -247,7 +245,7 @@ WRITE8_MEMBER( s9_state::dig0_w )
 	m_digits[60] = patterns[data>>4]; // diag digit
 }
 
-WRITE8_MEMBER( s9_state::dig1_w )
+void s9_state::dig1_w(uint8_t data)
 {
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // MC14558
 	if (m_data_ok)
@@ -258,19 +256,27 @@ WRITE8_MEMBER( s9_state::dig1_w )
 	m_data_ok = false;
 }
 
-READ8_MEMBER( s9_state::switch_r )
+uint8_t s9_state::switch_r()
 {
-	char kbdrow[8];
-	sprintf(kbdrow,"X%X",m_kbdrow);
-	return ioport(kbdrow)->read() ^ 0xff;
+	uint8_t retval = 0xff;
+	// scan all 8 input columns, since multiple can be selected at once
+	for (int i = 0; i < 7; i++)
+	{
+		if (m_switch_col & (1<<i))
+			retval &= m_swarray[i]->read();
+	}
+	//retval &= ioport("OPTOS")->read(); // optos should be read here as well, and are always active even if no column is selected
+	return ~retval;
 }
 
-WRITE8_MEMBER( s9_state::switch_w )
+void s9_state::switch_w(uint8_t data)
 {
-	m_kbdrow = data;
+	// this drives the pulldown 2N3904 NPN transistors Q7-Q14, each of which drives one column of the switch matrix low
+	// it is possible for multiple columns to be enabled at once, this is handled in switch_r above.
+	m_switch_col = data;
 }
 
-READ8_MEMBER( s9_state::sound_r )
+uint8_t s9_state::sound_r()
 {
 	return m_sound_data;
 }
@@ -339,6 +345,7 @@ void s9_state::s9(machine_config &config)
 	/* Devices */
 	PIA6821(config, m_pia21, 0);
 	m_pia21->readpa_handler().set(FUNC(s9_state::sound_r));
+	m_pia21->set_port_a_input_overrides_output_mask(0xff);
 	m_pia21->readca1_handler().set(FUNC(s9_state::pia21_ca1_r));
 	m_pia21->writepa_handler().set(FUNC(s9_state::sound_w));
 	m_pia21->writepb_handler().set(FUNC(s9_state::sol2_w));
@@ -364,6 +371,7 @@ void s9_state::s9(machine_config &config)
 
 	PIA6821(config, m_pia30, 0);
 	m_pia30->readpa_handler().set(FUNC(s9_state::switch_r));
+	m_pia30->set_port_a_input_overrides_output_mask(0xff);
 	m_pia30->writepb_handler().set(FUNC(s9_state::switch_w));
 	m_pia30->irqa_handler().set(FUNC(s9_state::pia_irq));
 	m_pia30->irqb_handler().set(FUNC(s9_state::pia_irq));
@@ -376,20 +384,18 @@ void s9_state::s9(machine_config &config)
 
 	SPEAKER(config, "speaker").front_center();
 	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	SPEAKER(config, "speech").front_center();
 	HC55516(config, m_hc55516, 0).add_route(ALL_OUTPUTS, "speech", 1.00);
 
 	PIA6821(config, m_pias, 0);
 	m_pias->readpa_handler().set(FUNC(s9_state::sound_r));
+	m_pias->set_port_a_input_overrides_output_mask(0xff);
 	m_pias->writepb_handler().set("dac", FUNC(dac_byte_interface::data_w));
 	m_pias->ca2_handler().set("hc55516", FUNC(hc55516_device::clock_w));
 	m_pias->cb2_handler().set("hc55516", FUNC(hc55516_device::digit_w));
 	m_pias->irqa_handler().set_inputline("audiocpu", M6808_IRQ_LINE);
-	m_pias->irqa_handler().set_inputline("audiocpu", M6808_IRQ_LINE);
+	m_pias->irqb_handler().set_inputline("audiocpu", M6808_IRQ_LINE);
 }
 
 /*-----------------------------

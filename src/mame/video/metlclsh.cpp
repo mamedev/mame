@@ -24,7 +24,7 @@
 #include "includes/metlclsh.h"
 
 
-WRITE8_MEMBER(metlclsh_state::metlclsh_rambank_w)
+void metlclsh_state::metlclsh_rambank_w(uint8_t data)
 {
 	if (data & 1)
 	{
@@ -38,7 +38,7 @@ WRITE8_MEMBER(metlclsh_state::metlclsh_rambank_w)
 	}
 }
 
-WRITE8_MEMBER(metlclsh_state::metlclsh_gfxbank_w)
+void metlclsh_state::metlclsh_gfxbank_w(uint8_t data)
 {
 	if (!(data & 4) && (m_gfxbank != data))
 	{
@@ -74,7 +74,7 @@ TILE_GET_INFO_MEMBER(metlclsh_state::get_bg_tile_info)
 	tileinfo.set(1, m_bgram[tile_index] + (m_gfxbank << 7), 0, 0);
 }
 
-WRITE8_MEMBER(metlclsh_state::metlclsh_bgram_w)
+void metlclsh_state::metlclsh_bgram_w(offs_t offset, uint8_t data)
 {
 	/*  This ram is banked: it's either the tilemap (e401 = 1)
 	    or bit n of another area (e401 = n << 1)? (that I don't understand) */
@@ -118,7 +118,7 @@ TILE_GET_INFO_MEMBER(metlclsh_state::get_fg_tile_info)
 	tileinfo.category = ((attr & 0x80) ? 1 : 2);
 }
 
-WRITE8_MEMBER(metlclsh_state::metlclsh_fgram_w)
+void metlclsh_state::metlclsh_fgram_w(offs_t offset, uint8_t data)
 {
 	m_fgram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);

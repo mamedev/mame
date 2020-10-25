@@ -120,7 +120,7 @@ public:
 	void init_jrpacman();
 
 private:
-	DECLARE_WRITE8_MEMBER(jrpacman_interrupt_vector_w);
+	void jrpacman_interrupt_vector_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void main_map(address_map &map);
@@ -129,7 +129,7 @@ private:
 
 
 
-WRITE8_MEMBER(jrpacman_state::jrpacman_interrupt_vector_w)
+void jrpacman_state::jrpacman_interrupt_vector_w(uint8_t data)
 {
 	m_maincpu->set_input_line_vector(0, data); // Z80
 	m_maincpu->set_input_line(0, CLEAR_LINE);

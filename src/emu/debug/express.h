@@ -49,6 +49,8 @@ enum expression_space
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+using offs_t = u32;
+
 // ======================> expression_error
 
 // an expression_error holds an error code and a string offset
@@ -71,6 +73,8 @@ public:
 		DIVIDE_BY_ZERO,
 		OUT_OF_MEMORY,
 		INVALID_PARAM_COUNT,
+		TOO_FEW_PARAMS,
+		TOO_MANY_PARAMS,
 		UNBALANCED_QUOTES,
 		TOO_MANY_STRINGS,
 		INVALID_MEMORY_SIZE,
@@ -81,9 +85,10 @@ public:
 	};
 
 	// construction/destruction
-	expression_error(error_code code, int offset = 0)
+	expression_error(error_code code, int offset = 0, int num = 0)
 		: m_code(code),
-			m_offset(offset) { }
+			m_offset(offset),
+			m_num(num) { }
 
 	// operators
 	operator error_code() const { return m_code; }
@@ -91,12 +96,13 @@ public:
 	// getters
 	error_code code() const { return m_code; }
 	int offset() const { return m_offset; }
-	const char *code_string() const;
+	std::string code_string() const;
 
 private:
 	// internal state
 	error_code          m_code;
 	int                 m_offset;
+	int                 m_num;
 };
 
 
@@ -154,9 +160,7 @@ public:
 	typedef std::function<u64(int numparams, const u64 *paramlist)> execute_func;
 
 	// callback functions for memory reads/writes
-	typedef std::function<expression_error::error_code(const char *name, expression_space space)> valid_func;
-	typedef std::function<u64(const char *name, expression_space space, u32 offset, int size, bool disable_se)> read_func;
-	typedef std::function<void(const char *name, expression_space space, u32 offset, int size, u64 value, bool disable_se)> write_func;
+	typedef std::function<void()> memory_modified_func;
 
 	enum read_write
 	{
@@ -165,14 +169,14 @@ public:
 	};
 
 	// construction/destruction
-	symbol_table(symbol_table *parent = nullptr);
+	symbol_table(running_machine &machine, symbol_table *parent = nullptr, device_t *device = nullptr);
 
 	// getters
 	const std::unordered_map<std::string, std::unique_ptr<symbol_entry>> &entries() const { return m_symlist; }
 	symbol_table *parent() const { return m_parent; }
 
 	// setters
-	void configure_memory(valid_func valid, read_func read, write_func write);
+	void set_memory_modified_func(memory_modified_func modified);
 
 	// symbol access
 	void add(const char *name, read_write rw, u64 *ptr = nullptr);
@@ -190,14 +194,24 @@ public:
 	expression_error::error_code memory_valid(const char *name, expression_space space);
 	u64 memory_value(const char *name, expression_space space, u32 offset, int size, bool disable_se);
 	void set_memory_value(const char *name, expression_space space, u32 offset, int size, u64 value, bool disable_se);
+	u64 read_memory(address_space &space, offs_t address, int size, bool apply_translation);
+	void write_memory(address_space &space, offs_t address, u64 data, int size, bool apply_translation);
 
 private:
+	// memory helpers
+	u64 read_program_direct(address_space &space, int opcode, offs_t address, int size);
+	u64 read_memory_region(const char *rgntag, offs_t address, int size);
+	void write_program_direct(address_space &space, int opcode, offs_t address, int size, u64 data);
+	void write_memory_region(const char *rgntag, offs_t address, int size, u64 data);
+	device_t *expression_get_device(const char *tag);
+	void notify_memory_modified();
+
 	// internal state
+	running_machine &       m_machine;          // reference to the machine
 	symbol_table *          m_parent;           // pointer to the parent symbol table
 	std::unordered_map<std::string,std::unique_ptr<symbol_entry>> m_symlist;        // list of symbols
-	valid_func              m_memory_valid;     // validation callback
-	read_func               m_memory_read;      // read callback
-	write_func              m_memory_write;     // write callback
+	device_memory_interface *const m_memintf;   // pointer to the local memory interface (if any)
+	memory_modified_func    m_memory_modified;  // memory modified callback
 };
 
 
@@ -218,7 +232,7 @@ public:
 	parsed_expression &operator=(parsed_expression &&src) = default;
 
 	// getters
-	bool is_empty() const { return (m_tokenlist.count() == 0); }
+	bool is_empty() const { return m_tokenlist.empty(); }
 	const char *original_string() const { return m_original_string.c_str(); }
 	symbol_table &symbols() const { return m_symtable.get(); }
 
@@ -234,8 +248,6 @@ private:
 	// a single token
 	class parse_token
 	{
-		friend class simple_list<parse_token>;
-
 		// operator flags
 		enum
 		{
@@ -337,7 +349,7 @@ private:
 	void parse_quoted_char(parse_token &token, const char *&string);
 	void parse_quoted_string(parse_token &token, const char *&string);
 	void parse_memory_operator(parse_token &token, const char *string, bool disable_se);
-	void normalize_operator(parse_token *prevtoken, parse_token &thistoken);
+	void normalize_operator(parse_token *prevtoken, parse_token &thistoken, const std::list<parse_token> &stack, bool was_rparen);
 	void infix_to_postfix();
 
 	// execution helpers
@@ -355,7 +367,7 @@ private:
 	std::reference_wrapper<symbol_table> m_symtable;    // symbol table
 	int                 m_default_base;                 // default base
 	std::string         m_original_string;              // original string (prior to parsing)
-	simple_list<parse_token> m_tokenlist;               // token list
+	std::list<parse_token> m_tokenlist;                 // token list
 	std::list<std::string> m_stringlist;                // string list
 	std::deque<parse_token> m_token_stack;              // token stack (used during execution)
 };

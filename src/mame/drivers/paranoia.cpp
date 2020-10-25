@@ -57,14 +57,14 @@ public:
 	void paranoia(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(i8085_d000_w);
-	DECLARE_READ8_MEMBER(z80_io_01_r);
-	DECLARE_READ8_MEMBER(z80_io_02_r);
-	DECLARE_WRITE8_MEMBER(z80_io_17_w);
-	DECLARE_WRITE8_MEMBER(z80_io_37_w);
-	DECLARE_WRITE8_MEMBER(i8155_a_w);
-	DECLARE_WRITE8_MEMBER(i8155_b_w);
-	DECLARE_WRITE8_MEMBER(i8155_c_w);
+	void i8085_d000_w(uint8_t data);
+	uint8_t z80_io_01_r();
+	uint8_t z80_io_02_r();
+	void z80_io_17_w(uint8_t data);
+	void z80_io_37_w(uint8_t data);
+	void i8155_a_w(uint8_t data);
+	void i8155_b_w(uint8_t data);
+	void i8155_c_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(i8155_timer_out);
 	void paranoia_8085_io_map(address_map &map);
 	void paranoia_8085_map(address_map &map);
@@ -92,7 +92,7 @@ void paranoia_state::pce_io(address_map &map)
 	map(0x00, 0x03).rw("huc6270", FUNC(huc6270_device::read), FUNC(huc6270_device::write));
 }
 
-WRITE8_MEMBER(paranoia_state::i8085_d000_w)
+void paranoia_state::i8085_d000_w(uint8_t data)
 {
 	//logerror( "D000 (8085) write %02x\n", data );
 }
@@ -117,21 +117,21 @@ void paranoia_state::paranoia_z80_map(address_map &map)
 	map(0x7000, 0x73ff).ram();
 }
 
-READ8_MEMBER(paranoia_state::z80_io_01_r)
+uint8_t paranoia_state::z80_io_01_r()
 {
 	return 0;
 }
 
-READ8_MEMBER(paranoia_state::z80_io_02_r)
+uint8_t paranoia_state::z80_io_02_r()
 {
 	return 0;
 }
 
-WRITE8_MEMBER(paranoia_state::z80_io_17_w)
+void paranoia_state::z80_io_17_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER(paranoia_state::z80_io_37_w)
+void paranoia_state::z80_io_37_w(uint8_t data)
 {
 }
 
@@ -144,17 +144,17 @@ void paranoia_state::paranoia_z80_io_map(address_map &map)
 	map(0x37, 0x37).w(FUNC(paranoia_state::z80_io_37_w));
 }
 
-WRITE8_MEMBER(paranoia_state::i8155_a_w)
+void paranoia_state::i8155_a_w(uint8_t data)
 {
 	//logerror("i8155 Port A: %02X\n", data);
 }
 
-WRITE8_MEMBER(paranoia_state::i8155_b_w)
+void paranoia_state::i8155_b_w(uint8_t data)
 {
 	//logerror("i8155 Port B: %02X\n", data);
 }
 
-WRITE8_MEMBER(paranoia_state::i8155_c_w)
+void paranoia_state::i8155_c_w(uint8_t data)
 {
 	//logerror("i8155 Port C: %02X\n", data);
 }

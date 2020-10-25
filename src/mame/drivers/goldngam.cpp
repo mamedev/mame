@@ -265,7 +265,7 @@ private:
 	static constexpr int MOVIECRD_DUART1_IRQ = M68K_IRQ_2;
 	static constexpr int MOVIECRD_DUART2_IRQ = M68K_IRQ_4;
 
-	DECLARE_READ8_MEMBER(unk_r);
+	uint8_t unk_r();
 	virtual void video_start() override;
 	void palette_init(palette_device &palette);
 	uint32_t screen_update_goldngam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -300,8 +300,8 @@ uint32_t goldngam_state::screen_update_goldngam(screen_device &screen, bitmap_in
 		for(int x = 0; x < 384; x += 2)
 		{
 			uint16_t word = m_videoram[index];
-			bitmap.pix16(y, x) = word >> 8;
-			bitmap.pix16(y, x+1) = word & 0xff;
+			bitmap.pix(y, x) = word >> 8;
+			bitmap.pix(y, x+1) = word & 0xff;
 			++index;
 		}
 	}
@@ -320,7 +320,7 @@ void goldngam_state::palette_init(palette_device &palette)
 * Memory Map Information *
 *************************/
 
-READ8_MEMBER(goldngam_state::unk_r)
+uint8_t goldngam_state::unk_r()
 {
 	// hopper status read ?
 	return 1;

@@ -54,17 +54,17 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
 
 private:
-	DECLARE_READ8_MEMBER(port1_r);
-	DECLARE_WRITE8_MEMBER(port1_w);
-	DECLARE_READ8_MEMBER(port2_r);
-	DECLARE_WRITE8_MEMBER(port2_w);
-	DECLARE_READ8_MEMBER(pia0_a_r);
-	DECLARE_WRITE8_MEMBER(pia0_a_w);
-	DECLARE_READ8_MEMBER(pia0_b_r);
-	DECLARE_WRITE8_MEMBER(pia0_b_w);
-	DECLARE_READ8_MEMBER(pia1_a_r);
-	DECLARE_WRITE8_MEMBER(pia1_a_w);
-	DECLARE_WRITE8_MEMBER(pia1_b_w);
+	uint8_t port1_r();
+	void port1_w(uint8_t data);
+	uint8_t port2_r();
+	void port2_w(uint8_t data);
+	uint8_t pia0_a_r();
+	void pia0_a_w(uint8_t data);
+	uint8_t pia0_b_r();
+	void pia0_b_w(uint8_t data);
+	uint8_t pia1_a_r();
+	void pia1_a_w(uint8_t data);
+	void pia1_b_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pia0_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia0_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia1_cb2_w);
@@ -169,18 +169,18 @@ INPUT_CHANGED_MEMBER( by6803_state::self_test )
 	m_pia0->ca1_w(newval);
 }
 
-READ8_MEMBER( by6803_state::port1_r )
+uint8_t by6803_state::port1_r()
 {
 	return m_port1;
 }
 
 // P10-17 - goes to peripheral bus
-WRITE8_MEMBER( by6803_state::port1_w )
+void by6803_state::port1_w(uint8_t data)
 {
 	m_port1 = data; // sound data = P10,11,12,13,24; P14-17 unknown
 }
 
-READ8_MEMBER( by6803_state::port2_r )
+uint8_t by6803_state::port2_r()
 {
 	return m_port2;
 }
@@ -190,7 +190,7 @@ READ8_MEMBER( by6803_state::port2_r )
 // P22 - LED, connects to reset circuit, could be a watchdog
 // P23 - high
 // P24 - sound strobe
-WRITE8_MEMBER( by6803_state::port2_w )
+void by6803_state::port2_w(uint8_t data)
 {
 	m_port2 = data;
 	output().set_value("led0", BIT(data, 2)); // P22 drives LED
@@ -211,7 +211,7 @@ WRITE_LINE_MEMBER( by6803_state::pia1_cb2_w )
 {
 }
 
-READ8_MEMBER( by6803_state::pia0_a_r )
+uint8_t by6803_state::pia0_a_r()
 {
 	return m_pia0_a;
 }
@@ -221,7 +221,7 @@ READ8_MEMBER( by6803_state::pia0_a_r )
 // d0-3 lamp rows & d5=0 & pia0:cb2=1 (1st lamp bank)
 // d0-3 lamp rows & d6=0 & pia0:cb2=1 (2nd lamp bank)
 // d0-3 lamp rows & d7=0 & pia0:cb2=1 (3rd lamp bank)
-WRITE8_MEMBER( by6803_state::pia0_a_w )
+void by6803_state::pia0_a_w(uint8_t data)
 {
 	m_pia0_a = data;
 #if 0
@@ -250,7 +250,7 @@ WRITE8_MEMBER( by6803_state::pia0_a_w )
 }
 
 // switch returns
-READ8_MEMBER( by6803_state::pia0_b_r )
+uint8_t by6803_state::pia0_b_r()
 {
 	uint8_t data = 0;
 
@@ -272,25 +272,25 @@ READ8_MEMBER( by6803_state::pia0_b_r )
 	return data;
 }
 
-WRITE8_MEMBER( by6803_state::pia0_b_w )
+void by6803_state::pia0_b_w(uint8_t data)
 {
 	m_pia0_b = data;
 }
 
-READ8_MEMBER( by6803_state::pia1_a_r )
+uint8_t by6803_state::pia1_a_r()
 {
 	return m_pia1_a;
 }
 
 // segment data; d0 & pia0:ca2 = comma; passed to digits when PA0? is high (assume they mean pia0:pa0)
-WRITE8_MEMBER( by6803_state::pia1_a_w )
+void by6803_state::pia1_a_w(uint8_t data)
 {
 	m_pia1_a = data;
 	m_segment = data >> 1;
 }
 
 // solenoids, activated when pia1:cb2 is low
-WRITE8_MEMBER( by6803_state::pia1_b_w )
+void by6803_state::pia1_b_w(uint8_t data)
 {
 	m_pia1_b = data;
 	switch (data & 15)

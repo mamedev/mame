@@ -58,14 +58,14 @@ private:
 	int m_bankreg;
 	bitmap_ind16 m_tmpbitmap;
 
-	DECLARE_READ8_MEMBER(in0_port_r);
-	DECLARE_READ8_MEMBER(dsw0_port_r);
-	DECLARE_READ8_MEMBER(popflame_protection_r);
-	DECLARE_WRITE8_MEMBER(popflame_protection_w);
-	DECLARE_READ8_MEMBER(trvmstr_questions_r);
-	DECLARE_WRITE8_MEMBER(trvmstr_questions_w);
-	DECLARE_WRITE8_MEMBER(naughtyb_videoreg_w);
-	DECLARE_WRITE8_MEMBER(popflame_videoreg_w);
+	uint8_t in0_port_r();
+	uint8_t dsw0_port_r();
+	uint8_t popflame_protection_r();
+	void popflame_protection_w(uint8_t data);
+	uint8_t trvmstr_questions_r();
+	void trvmstr_questions_w(offs_t offset, uint8_t data);
+	void naughtyb_videoreg_w(uint8_t data);
+	void popflame_videoreg_w(uint8_t data);
 
 	void naughtyb_palette(palette_device &palette) const;
 

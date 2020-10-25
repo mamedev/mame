@@ -185,8 +185,8 @@ void pc_t1t_device::pcjr_palette(palette_device &palette) const
 
 MC6845_UPDATE_ROW( pc_t1t_device::t1000_text_inten_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint32_t  *p = &bitmap.pix32(y);
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint32_t *p = &bitmap.pix(y);
 
 	if ( y == 0 ) logerror("t1000_text_inten_update_row\n");
 	for (int i = 0; i < x_count; i++)
@@ -203,22 +203,22 @@ MC6845_UPDATE_ROW( pc_t1t_device::t1000_text_inten_update_row )
 			data = 0xFF;
 		}
 
-		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x40 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x20 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x10 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x08 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x04 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x02 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x01 ) ? fg : bg]; p++;
+		*p++ = palette[BIT(data, 7) ? fg : bg];
+		*p++ = palette[BIT(data, 6) ? fg : bg];
+		*p++ = palette[BIT(data, 5) ? fg : bg];
+		*p++ = palette[BIT(data, 4) ? fg : bg];
+		*p++ = palette[BIT(data, 3) ? fg : bg];
+		*p++ = palette[BIT(data, 2) ? fg : bg];
+		*p++ = palette[BIT(data, 1) ? fg : bg];
+		*p++ = palette[BIT(data, 0) ? fg : bg];
 	}
 }
 
 
 MC6845_UPDATE_ROW( pc_t1t_device::t1000_text_blink_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint32_t  *p = &bitmap.pix32(y);
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint32_t *p = &bitmap.pix(y);
 
 	for (int i = 0; i < x_count; i++)
 	{
@@ -244,24 +244,23 @@ MC6845_UPDATE_ROW( pc_t1t_device::t1000_text_blink_update_row )
 			}
 		}
 
-		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x40 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x20 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x10 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x08 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x04 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x02 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x01 ) ? fg : bg]; p++;
+		*p++ = palette[BIT(data, 7) ? fg : bg];
+		*p++ = palette[BIT(data, 6) ? fg : bg];
+		*p++ = palette[BIT(data, 5) ? fg : bg];
+		*p++ = palette[BIT(data, 4) ? fg : bg];
+		*p++ = palette[BIT(data, 3) ? fg : bg];
+		*p++ = palette[BIT(data, 2) ? fg : bg];
+		*p++ = palette[BIT(data, 1) ? fg : bg];
+		*p++ = palette[BIT(data, 0) ? fg : bg];
 	}
 }
 
 MC6845_UPDATE_ROW( pcvideo_pcjr_device::pcjx_text_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint32_t  *p = &bitmap.pix32(y);
-	int i;
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint32_t *p = &bitmap.pix(y);
 
-	for ( i = 0; i < x_count; i++ )
+	for (int i = 0; i < x_count; i++)
 	{
 		uint16_t offset = ( ( ma + i ) << 1 ) & 0x3fff;
 		uint8_t chr = m_displayram[ offset ];
@@ -285,157 +284,152 @@ MC6845_UPDATE_ROW( pcvideo_pcjr_device::pcjx_text_update_row )
 		else
 			data = ((i == cursor_x) && (m_pc_framecnt & 8)) ? 0xff: 0;
 
-		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x40 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x20 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x10 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x08 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x04 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x02 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x01 ) ? fg : bg]; p++;
+		*p++ = palette[BIT(data, 7) ? fg : bg];
+		*p++ = palette[BIT(data, 6) ? fg : bg];
+		*p++ = palette[BIT(data, 5) ? fg : bg];
+		*p++ = palette[BIT(data, 4) ? fg : bg];
+		*p++ = palette[BIT(data, 3) ? fg : bg];
+		*p++ = palette[BIT(data, 2) ? fg : bg];
+		*p++ = palette[BIT(data, 1) ? fg : bg];
+		*p++ = palette[BIT(data, 0) ? fg : bg];
 	}
 }
 
 MC6845_UPDATE_ROW( pc_t1t_device::t1000_gfx_4bpp_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint32_t  *p = &bitmap.pix32(y);
-	uint8_t   *vid = m_displayram + ( ra << 13 );
-	int i;
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint32_t *p = &bitmap.pix(y);
+	uint8_t const *const vid = m_displayram + ( ra << 13 );
 
-	for ( i = 0; i < x_count; i++ )
+	for (int i = 0; i < x_count; i++)
 	{
 		uint16_t offset = ( ( ma + i ) << 1 ) & 0x1fff;
-		uint8_t data = vid[ offset ];
+		uint8_t data = vid[offset];
 
-		*p = palette[m_palette_base + m_reg.data[0x10 + ( data >> 4 )]]; p++;
-		*p = palette[m_palette_base + m_reg.data[0x10 + ( data >> 4 )]]; p++;
-		*p = palette[m_palette_base + m_reg.data[0x10 + ( data & 0x0F )]]; p++;
-		*p = palette[m_palette_base + m_reg.data[0x10 + ( data & 0x0F )]]; p++;
+		*p++ = palette[m_palette_base + m_reg.data[0x10 | (data >> 4)]];
+		*p++ = palette[m_palette_base + m_reg.data[0x10 | (data >> 4)]];
+		*p++ = palette[m_palette_base + m_reg.data[0x10 | (data & 0x0f)]];
+		*p++ = palette[m_palette_base + m_reg.data[0x10 | (data & 0x0f)]];
 
-		data = vid[ offset + 1 ];
+		data = vid[offset + 1];
 
-		*p = palette[m_palette_base + m_reg.data[0x10 + ( data >> 4 )]]; p++;
-		*p = palette[m_palette_base + m_reg.data[0x10 + ( data >> 4 )]]; p++;
-		*p = palette[m_palette_base + m_reg.data[0x10 + ( data & 0x0F )]]; p++;
-		*p = palette[m_palette_base + m_reg.data[0x10 + ( data & 0x0F )]]; p++;
+		*p++ = palette[m_palette_base + m_reg.data[0x10 | (data >> 4)]];
+		*p++ = palette[m_palette_base + m_reg.data[0x10 | (data >> 4)]];
+		*p++ = palette[m_palette_base + m_reg.data[0x10 | (data & 0x0f)]];
+		*p++ = palette[m_palette_base + m_reg.data[0x10 | (data & 0x0f)]];
 	}
 }
 
 
 MC6845_UPDATE_ROW( pc_t1t_device::t1000_gfx_2bpp_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint32_t  *p = &bitmap.pix32(y);
-	uint8_t   *vid = m_displayram + ( ra << 13 );
-	int i;
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint32_t *p = &bitmap.pix(y);
+	uint8_t const *const vid = m_displayram + ( ra << 13 );
 
-	for ( i = 0; i < x_count; i++ )
+	for (int i = 0; i < x_count; i++)
 	{
 		uint16_t offset = ( ( ma + i ) << 1 ) & 0x1fff;
-		uint8_t data = vid[ offset ];
+		uint8_t data = vid[offset];
 
-		*p = palette[m_palette_base + m_reg.data[ 0x10 + ( ( data >> 6 ) & 0x03 ) ]]; p++;
-		*p = palette[m_palette_base + m_reg.data[ 0x10 + ( ( data >> 4 ) & 0x03 ) ]]; p++;
-		*p = palette[m_palette_base + m_reg.data[ 0x10 + ( ( data >> 2 ) & 0x03 ) ]]; p++;
-		*p = palette[m_palette_base + m_reg.data[ 0x10 + (   data        & 0x03 ) ]]; p++;
+		*p++ = palette[m_palette_base + m_reg.data[0x10 | ((data >> 6) & 0x03)]];
+		*p++ = palette[m_palette_base + m_reg.data[0x10 | ((data >> 4) & 0x03)]];
+		*p++ = palette[m_palette_base + m_reg.data[0x10 | ((data >> 2) & 0x03)]];
+		*p++ = palette[m_palette_base + m_reg.data[0x10 | ((data >> 0) & 0x03)]];
 
-		data = vid[ offset+1 ];
+		data = vid[offset + 1];
 
-		*p = palette[m_palette_base + m_reg.data[ 0x10 + ( ( data >> 6 ) & 0x03 ) ]]; p++;
-		*p = palette[m_palette_base + m_reg.data[ 0x10 + ( ( data >> 4 ) & 0x03 ) ]]; p++;
-		*p = palette[m_palette_base + m_reg.data[ 0x10 + ( ( data >> 2 ) & 0x03 ) ]]; p++;
-		*p = palette[m_palette_base + m_reg.data[ 0x10 + (   data        & 0x03 ) ]]; p++;
+		*p++ = palette[m_palette_base + m_reg.data[0x10 | ((data >> 6) & 0x03)]];
+		*p++ = palette[m_palette_base + m_reg.data[0x10 | ((data >> 4) & 0x03)]];
+		*p++ = palette[m_palette_base + m_reg.data[0x10 | ((data >> 2) & 0x03)]];
+		*p++ = palette[m_palette_base + m_reg.data[0x10 | ((data >> 0) & 0x03)]];
 	}
 }
 
 
 MC6845_UPDATE_ROW( pcvideo_pcjr_device::pcjr_gfx_2bpp_high_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint32_t  *p = &bitmap.pix32(y);
-	uint8_t   *vid = m_displayram + ( ra << 13 );
-	int i;
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint32_t *p = &bitmap.pix(y);
+	uint8_t const *const vid = m_displayram + ( ra << 13 );
 
-	for ( i = 0; i < x_count; i++ )
+	for (int i = 0; i < x_count; i++)
 	{
 		uint16_t offset = ( ( ma + i ) << 1 ) & 0x1fff;
-		uint8_t data0 = vid[ offset ];
-		uint8_t data1 = vid[ offset + 1 ];
+		uint8_t data0 = vid[offset];
+		uint8_t data1 = vid[offset + 1];
 
-		*p = palette[m_palette_base + m_reg.data[ 0x10 + ( ( ( data0 & 0x80 ) >> 7 ) | ( ( data1 & 0x80 ) >> 6 ) ) ]]; p++;
-		*p = palette[m_palette_base + m_reg.data[ 0x10 + ( ( ( data0 & 0x40 ) >> 6 ) | ( ( data1 & 0x40 ) >> 5 ) ) ]]; p++;
-		*p = palette[m_palette_base + m_reg.data[ 0x10 + ( ( ( data0 & 0x20 ) >> 5 ) | ( ( data1 & 0x20 ) >> 4 ) ) ]]; p++;
-		*p = palette[m_palette_base + m_reg.data[ 0x10 + ( ( ( data0 & 0x10 ) >> 4 ) | ( ( data1 & 0x10 ) >> 3 ) ) ]]; p++;
-		*p = palette[m_palette_base + m_reg.data[ 0x10 + ( ( ( data0 & 0x08 ) >> 3 ) | ( ( data1 & 0x08 ) >> 2 ) ) ]]; p++;
-		*p = palette[m_palette_base + m_reg.data[ 0x10 + ( ( ( data0 & 0x04 ) >> 2 ) | ( ( data1 & 0x04 ) >> 1 ) ) ]]; p++;
-		*p = palette[m_palette_base + m_reg.data[ 0x10 + ( ( ( data0 & 0x02 ) >> 1 ) | ( ( data1 & 0x02 )      ) ) ]]; p++;
-		*p = palette[m_palette_base + m_reg.data[ 0x10 + ( ( ( data0 & 0x01 )      ) | ( ( data1 & 0x01 ) << 1 ) ) ]]; p++;
+		*p++ = palette[m_palette_base + m_reg.data[0x10 | ((data0 >> 7) & 0x01) | ((data1 >> 6) & 0x02)]];
+		*p++ = palette[m_palette_base + m_reg.data[0x10 | ((data0 >> 6) & 0x01) | ((data1 >> 5) & 0x02)]];
+		*p++ = palette[m_palette_base + m_reg.data[0x10 | ((data0 >> 5) & 0x01) | ((data1 >> 4) & 0x02)]];
+		*p++ = palette[m_palette_base + m_reg.data[0x10 | ((data0 >> 4) & 0x01) | ((data1 >> 3) & 0x02)]];
+		*p++ = palette[m_palette_base + m_reg.data[0x10 | ((data0 >> 3) & 0x01) | ((data1 >> 2) & 0x02)]];
+		*p++ = palette[m_palette_base + m_reg.data[0x10 | ((data0 >> 2) & 0x01) | ((data1 >> 1) & 0x02)]];
+		*p++ = palette[m_palette_base + m_reg.data[0x10 | ((data0 >> 1) & 0x01) | ((data1 >> 0) & 0x02)]];
+		*p++ = palette[m_palette_base + m_reg.data[0x10 | ((data0 >> 0) & 0x01) | ((data1 << 1) & 0x02)]];
 	}
 }
 
 
 MC6845_UPDATE_ROW( pc_t1t_device::t1000_gfx_2bpp_tga_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint32_t  *p = &bitmap.pix32(y);
-	uint8_t   *vid = m_displayram + ( ra << 13 );
-	int i;
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint32_t *p = &bitmap.pix(y);
+	uint8_t const *const vid = m_displayram + ( ra << 13 );
 
-	if ( y == 0 ) logerror("t1000_gfx_2bpp_tga_update_row\n");
-	for ( i = 0; i < x_count; i++ )
+	if (y == 0) logerror("t1000_gfx_2bpp_tga_update_row\n");
+	for (int i = 0; i < x_count; i++)
 	{
 		uint16_t offset = ( ( ma + i ) << 1 ) & 0x1fff;
-		uint8_t data = vid[ offset ];
-		uint16_t data2 = ( vid[ offset + 1 ] ) << 1;
+		uint8_t data = vid[offset];
+		uint8_t data2 = vid[offset + 1] << 1;
 
-		*p = palette[m_reg.data[ 0x10 + ( ( ( data2 & 0x100 ) | ( data & 0x80 ) ) >> 7 ) ]]; p++;
-		*p = palette[m_reg.data[ 0x10 + ( ( ( data2 & 0x80 ) | ( data & 0x40 ) ) >> 6 ) ]]; p++;
-		*p = palette[m_reg.data[ 0x10 + ( ( ( data2 & 0x40 ) | ( data & 0x20 ) ) >> 5 ) ]]; p++;
-		*p = palette[m_reg.data[ 0x10 + ( ( ( data2 & 0x20 ) | ( data & 0x10 ) ) >> 4 ) ]]; p++;
+		*p++ = palette[m_reg.data[0x10 | (((data2 & 0x100) | (data & 0x80)) >> 7)]];
+		*p++ = palette[m_reg.data[0x10 | (((data2 & 0x080) | (data & 0x40)) >> 6)]];
+		*p++ = palette[m_reg.data[0x10 | (((data2 & 0x040) | (data & 0x20)) >> 5)]];
+		*p++ = palette[m_reg.data[0x10 | (((data2 & 0x020) | (data & 0x10)) >> 4)]];
 
-		*p = palette[m_reg.data[ 0x10 + ( ( ( data2 & 0x10 ) | ( data & 0x08 ) ) >> 3 ) ]]; p++;
-		*p = palette[m_reg.data[ 0x10 + ( ( ( data2 & 0x08 ) | ( data & 0x04 ) ) >> 2 ) ]]; p++;
-		*p = palette[m_reg.data[ 0x10 + ( ( ( data2 & 0x04 ) | ( data & 0x02 ) ) >> 1 ) ]]; p++;
-		*p = palette[m_reg.data[ 0x10 + (   ( data2 & 0x02 ) | ( data & 0x01 )        ) ]]; p++;
+		*p++ = palette[m_reg.data[0x10 | (((data2 & 0x010) | (data & 0x08)) >> 3)]];
+		*p++ = palette[m_reg.data[0x10 | (((data2 & 0x008) | (data & 0x04)) >> 2)]];
+		*p++ = palette[m_reg.data[0x10 | (((data2 & 0x004) | (data & 0x02)) >> 1)]];
+		*p++ = palette[m_reg.data[0x10 | (((data2 & 0x002) | (data & 0x01)) >> 0)]];
 	}
 }
 
 
 MC6845_UPDATE_ROW( pc_t1t_device::t1000_gfx_1bpp_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint32_t  *p = &bitmap.pix32(y);
-	uint8_t   *vid = m_displayram + ( ra << 13 );
-	uint8_t   fg = m_palette_base + m_reg.data[0x11];
-	uint8_t   bg = m_palette_base + m_reg.data[0x10];
-	int i;
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint32_t *p = &bitmap.pix(y);
+	uint8_t const *const vid = m_displayram + ( ra << 13 );
+	uint8_t fg = m_palette_base + m_reg.data[0x11];
+	uint8_t bg = m_palette_base + m_reg.data[0x10];
 
-	if ( y == 0 ) logerror("t1000_gfx_1bpp_update_row\n");
-	for ( i = 0; i < x_count; i++ )
+	if (y == 0) logerror("t1000_gfx_1bpp_update_row\n");
+	for (int i = 0; i < x_count; i++)
 	{
 		uint16_t offset = ( ( ma + i ) << 1 ) & 0x1fff;
-		uint8_t data = vid[ offset ];
+		uint8_t data = vid[offset];
 
-		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x40 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x20 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x10 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x08 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x04 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x02 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x01 ) ? fg : bg]; p++;
+		*p++ = palette[BIT(data, 7) ? fg : bg];
+		*p++ = palette[BIT(data, 6) ? fg : bg];
+		*p++ = palette[BIT(data, 5) ? fg : bg];
+		*p++ = palette[BIT(data, 4) ? fg : bg];
+		*p++ = palette[BIT(data, 3) ? fg : bg];
+		*p++ = palette[BIT(data, 2) ? fg : bg];
+		*p++ = palette[BIT(data, 1) ? fg : bg];
+		*p++ = palette[BIT(data, 0) ? fg : bg];
 
-		data = vid[ offset + 1 ];
+		data = vid[offset + 1];
 
-		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x40 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x20 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x10 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x08 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x04 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x02 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x01 ) ? fg : bg]; p++;
+		*p++ = palette[BIT(data, 7) ? fg : bg];
+		*p++ = palette[BIT(data, 6) ? fg : bg];
+		*p++ = palette[BIT(data, 5) ? fg : bg];
+		*p++ = palette[BIT(data, 4) ? fg : bg];
+		*p++ = palette[BIT(data, 3) ? fg : bg];
+		*p++ = palette[BIT(data, 2) ? fg : bg];
+		*p++ = palette[BIT(data, 1) ? fg : bg];
+		*p++ = palette[BIT(data, 0) ? fg : bg];
 	}
 }
 

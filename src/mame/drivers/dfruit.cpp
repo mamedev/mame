@@ -45,7 +45,7 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
-	DECLARE_WRITE8_MEMBER(output_w);
+	void output_w(uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_callback);
 	void dfruit_map(address_map &map);
@@ -276,7 +276,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(dfruit_state::scanline_callback)
 	}
 }
 
-WRITE8_MEMBER(dfruit_state::output_w)
+void dfruit_state::output_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 	machine().bookkeeping().coin_counter_w(1, data & 2);

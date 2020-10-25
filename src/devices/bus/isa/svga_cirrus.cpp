@@ -66,7 +66,7 @@ isa16_svga_cirrus_device::isa16_svga_cirrus_device(const machine_config &mconfig
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-READ8_MEMBER(isa16_svga_cirrus_device::input_port_0_r ) { return 0xff; } //return machine().root_device().ioport("IN0")->read(); }
+uint8_t isa16_svga_cirrus_device::input_port_0_r() { return 0xff; } //return machine().root_device().ioport("IN0")->read(); }
 
 void isa16_svga_cirrus_device::device_start()
 {
@@ -74,11 +74,11 @@ void isa16_svga_cirrus_device::device_start()
 
 	m_isa->install_rom(this, 0xc0000, 0xc7fff, "svga", "dm_clgd5430");
 
-	m_isa->install_device(0x03b0, 0x03bf, read8_delegate(*m_vga, FUNC(cirrus_gd5430_device::port_03b0_r)), write8_delegate(*m_vga, FUNC(cirrus_gd5430_device::port_03b0_w)));
-	m_isa->install_device(0x03c0, 0x03cf, read8_delegate(*m_vga, FUNC(cirrus_gd5430_device::port_03c0_r)), write8_delegate(*m_vga, FUNC(cirrus_gd5430_device::port_03c0_w)));
-	m_isa->install_device(0x03d0, 0x03df, read8_delegate(*m_vga, FUNC(cirrus_gd5430_device::port_03d0_r)), write8_delegate(*m_vga, FUNC(cirrus_gd5430_device::port_03d0_w)));
+	m_isa->install_device(0x03b0, 0x03bf, read8sm_delegate(*m_vga, FUNC(cirrus_gd5430_device::port_03b0_r)), write8sm_delegate(*m_vga, FUNC(cirrus_gd5430_device::port_03b0_w)));
+	m_isa->install_device(0x03c0, 0x03cf, read8sm_delegate(*m_vga, FUNC(cirrus_gd5430_device::port_03c0_r)), write8sm_delegate(*m_vga, FUNC(cirrus_gd5430_device::port_03c0_w)));
+	m_isa->install_device(0x03d0, 0x03df, read8sm_delegate(*m_vga, FUNC(cirrus_gd5430_device::port_03d0_r)), write8sm_delegate(*m_vga, FUNC(cirrus_gd5430_device::port_03d0_w)));
 
-	m_isa->install_memory(0xa0000, 0xbffff, read8_delegate(*m_vga, FUNC(cirrus_gd5430_device::mem_r)), write8_delegate(*m_vga, FUNC(cirrus_gd5430_device::mem_w)));
+	m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(cirrus_gd5430_device::mem_r)), write8sm_delegate(*m_vga, FUNC(cirrus_gd5430_device::mem_w)));
 }
 
 //-------------------------------------------------
@@ -144,7 +144,7 @@ isa16_svga_cirrus_gd542x_device::isa16_svga_cirrus_gd542x_device(const machine_c
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-READ8_MEMBER(isa16_svga_cirrus_gd542x_device::input_port_0_r ) { return 0xff; } //return machine().root_device().ioport("IN0")->read(); }
+uint8_t isa16_svga_cirrus_gd542x_device::input_port_0_r() { return 0xff; } //return machine().root_device().ioport("IN0")->read(); }
 
 void isa16_svga_cirrus_gd542x_device::device_start()
 {
@@ -152,11 +152,11 @@ void isa16_svga_cirrus_gd542x_device::device_start()
 
 	m_isa->install_rom(this, 0xc0000, 0xc7fff, "svga", "clgd542x");
 
-	m_isa->install_device(0x03b0, 0x03bf, read8_delegate(*m_vga, FUNC(cirrus_gd5428_device::port_03b0_r)), write8_delegate(*m_vga, FUNC(cirrus_gd5428_device::port_03b0_w)));
-	m_isa->install_device(0x03c0, 0x03cf, read8_delegate(*m_vga, FUNC(cirrus_gd5428_device::port_03c0_r)), write8_delegate(*m_vga, FUNC(cirrus_gd5428_device::port_03c0_w)));
-	m_isa->install_device(0x03d0, 0x03df, read8_delegate(*m_vga, FUNC(cirrus_gd5428_device::port_03d0_r)), write8_delegate(*m_vga, FUNC(cirrus_gd5428_device::port_03d0_w)));
+	m_isa->install_device(0x03b0, 0x03bf, read8sm_delegate(*m_vga, FUNC(cirrus_gd5428_device::port_03b0_r)), write8sm_delegate(*m_vga, FUNC(cirrus_gd5428_device::port_03b0_w)));
+	m_isa->install_device(0x03c0, 0x03cf, read8sm_delegate(*m_vga, FUNC(cirrus_gd5428_device::port_03c0_r)), write8sm_delegate(*m_vga, FUNC(cirrus_gd5428_device::port_03c0_w)));
+	m_isa->install_device(0x03d0, 0x03df, read8sm_delegate(*m_vga, FUNC(cirrus_gd5428_device::port_03d0_r)), write8sm_delegate(*m_vga, FUNC(cirrus_gd5428_device::port_03d0_w)));
 
-	m_isa->install_memory(0xa0000, 0xbffff, read8_delegate(*m_vga, FUNC(cirrus_gd5428_device::mem_r)), write8_delegate(*m_vga, FUNC(cirrus_gd5428_device::mem_w)));
+	m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(cirrus_gd5428_device::mem_r)), write8sm_delegate(*m_vga, FUNC(cirrus_gd5428_device::mem_w)));
 }
 
 //-------------------------------------------------

@@ -218,7 +218,7 @@ WRITE_LINE_MEMBER(bloodbro_state::weststry_opl_irq_w)
 	weststry_soundnmi_update();
 }
 
-WRITE8_MEMBER(bloodbro_state::weststry_opl_w)
+void bloodbro_state::weststry_opl_w(offs_t offset, uint8_t data)
 {
 	// NMI cannot be accepted between address and data writes, or else registers get corrupted
 	m_weststry_soundnmi_mask = BIT(offset, 0);
@@ -226,7 +226,7 @@ WRITE8_MEMBER(bloodbro_state::weststry_opl_w)
 	weststry_soundnmi_update();
 }
 
-WRITE8_MEMBER(bloodbro_state::weststry_soundnmi_ack_w)
+void bloodbro_state::weststry_soundnmi_ack_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	weststry_soundnmi_update();
@@ -505,17 +505,17 @@ static GFXDECODE_START( gfx_weststry )
 	GFXDECODE_ENTRY( "gfx3", 0x00000, weststry_spritelayout,   0x00*16,  0x10 )
 GFXDECODE_END
 
-WRITE16_MEMBER( bloodbro_state::layer_en_w )
+void bloodbro_state::layer_en_w(uint16_t data)
 {
 	m_layer_en = data;
 }
 
-WRITE16_MEMBER( bloodbro_state::layer_scroll_w )
+void bloodbro_state::layer_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scrollram[offset]);
 }
 
-WRITE16_MEMBER( bloodbro_state::weststry_layer_scroll_w )
+void bloodbro_state::weststry_layer_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scrollram[offset]);
 }

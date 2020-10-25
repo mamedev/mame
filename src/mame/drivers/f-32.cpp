@@ -56,7 +56,7 @@ private:
 	/* memory pointers */
 	required_shared_ptr<uint32_t> m_videoram;
 
-	DECLARE_READ32_MEMBER(f32_input_port_1_r);
+	uint32_t f32_input_port_1_r();
 	uint32_t screen_update_mosaicf2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void common_map(address_map &map);
 	void mosaicf2_io(address_map &map);
@@ -67,17 +67,15 @@ private:
 
 uint32_t mosaicf2_state::screen_update_mosaicf2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	offs_t offs;
-
-	for (offs = 0; offs < 0x10000; offs++)
+	for (offs_t offs = 0; offs < 0x10000; offs++)
 	{
 		int y = offs >> 8;
 		int x = offs & 0xff;
 
 		if ((x < 0xa0) && (y < 0xe0))
 		{
-			bitmap.pix16(y, (x * 2) + 0) = (m_videoram[offs] >> 16) & 0x7fff;
-			bitmap.pix16(y, (x * 2) + 1) = (m_videoram[offs] >>  0) & 0x7fff;
+			bitmap.pix(y, (x * 2) + 0) = (m_videoram[offs] >> 16) & 0x7fff;
+			bitmap.pix(y, (x * 2) + 1) = (m_videoram[offs] >>  0) & 0x7fff;
 		}
 	}
 
@@ -94,7 +92,7 @@ void mosaicf2_state::common_map(address_map &map)
 	map(0xfff00000, 0xffffffff).rom().region("user1", 0);
 }
 
-READ32_MEMBER(mosaicf2_state::f32_input_port_1_r)
+uint32_t mosaicf2_state::f32_input_port_1_r()
 {
 	/* burn a bunch of cycles because this is polled frequently during busy loops */
 

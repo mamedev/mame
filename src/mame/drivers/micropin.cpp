@@ -52,16 +52,16 @@ public:
 	void init_micropin();
 
 private:
-	DECLARE_READ8_MEMBER(pia51_r);
-	DECLARE_WRITE8_MEMBER(pia51_w);
-	DECLARE_READ8_MEMBER(p51b_r);
-	DECLARE_WRITE8_MEMBER(sol_w);
+	uint8_t pia51_r(offs_t offset);
+	void pia51_w(offs_t offset, uint8_t data);
+	uint8_t p51b_r();
+	void sol_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(p50ca2_w);
-	DECLARE_WRITE8_MEMBER(sw_w);
-	DECLARE_WRITE8_MEMBER(lamp_w);
-	DECLARE_WRITE8_MEMBER(p50a_w);
-	DECLARE_WRITE8_MEMBER(p50b_w);
-	DECLARE_WRITE8_MEMBER(p51a_w);
+	void sw_w(uint8_t data);
+	void lamp_w(uint8_t data);
+	void p50a_w(uint8_t data);
+	void p50b_w(uint8_t data);
+	void p51a_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
 	void micropin_map(address_map &map);
 	void pentacup2_io(address_map &map);
@@ -175,18 +175,18 @@ static INPUT_PORTS_START( micropin )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_8_PAD)
 INPUT_PORTS_END
 
-READ8_MEMBER( micropin_state::pia51_r )
+uint8_t  micropin_state::pia51_r(offs_t offset)
 {
 	return m_pia51->read(offset) ^ 0xff;
 }
 
-WRITE8_MEMBER( micropin_state::pia51_w )
+void micropin_state::pia51_w(offs_t offset, uint8_t data)
 {
 	m_pia51->write(offset, data ^ 0xff);
 }
 
 // lamps and disp strobes
-WRITE8_MEMBER( micropin_state::lamp_w )
+void micropin_state::lamp_w(uint8_t data)
 {
 	m_row = data & 15;
 	m_counter = 0;
@@ -194,16 +194,16 @@ WRITE8_MEMBER( micropin_state::lamp_w )
 }
 
 // solenoids
-WRITE8_MEMBER( micropin_state::sol_w )
+void micropin_state::sol_w(uint8_t data)
 {
 }
 
 // offs 0,5 = solenoids; else lamps
-WRITE8_MEMBER( micropin_state::sw_w )
+void micropin_state::sw_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER( micropin_state::p50a_w )
+void micropin_state::p50a_w(uint8_t data)
 {
 	m_counter++;
 	if (m_counter == 1)
@@ -214,7 +214,7 @@ WRITE8_MEMBER( micropin_state::p50a_w )
 	}
 }
 
-WRITE8_MEMBER( micropin_state::p50b_w )
+void micropin_state::p50b_w(uint8_t data)
 {
 	m_counter++;
 	if (m_counter == 2)
@@ -242,7 +242,7 @@ WRITE_LINE_MEMBER( micropin_state::p50ca2_w )
 // The sound never gets muted, but is turned down with an electronic volume control,
 //   which must be the most complex circuit in this machine. We use a beeper to
 //   make the tones, and turn it off if no new commands arrive within .1 second.
-WRITE8_MEMBER( micropin_state::p51a_w )
+void micropin_state::p51a_w(uint8_t data)
 {
 	static uint16_t frequency[16] = { 387, 435, 488, 517, 581, 652, 691, 775, 870, 977, 1035, 1161, 1304, 1381, 1550, 1740 };
 	m_beep->set_clock(frequency[data & 15]);
@@ -250,7 +250,7 @@ WRITE8_MEMBER( micropin_state::p51a_w )
 	m_beep->set_state(1);
 }
 
-READ8_MEMBER( micropin_state::p51b_r )
+uint8_t micropin_state::p51b_r()
 {
 	return ioport("X0")->read();
 }
@@ -365,10 +365,10 @@ ROM_END
 
 ROM_START(pentacup2)
 	ROM_REGION(0x2000, "v2cpu", 0)
-	ROM_LOAD("micro_1.bin", 0x0000, 0x0800, CRC(4d6dc218) SHA1(745c553f3a42124f925ca8f2e52fd08d05999594))
-	ROM_LOAD("micro_2.bin", 0x0800, 0x0800, CRC(33cd226d) SHA1(d1dff8445a0f35da09d560a16038c969845ff21f))
-	ROM_LOAD("micro_3.bin", 0x1000, 0x0800, CRC(997bde74) SHA1(c3ea33f7afbdc7f2a22798a13ec323d7c6628dd4))
-	ROM_LOAD("micro_4.bin", 0x1800, 0x0800, CRC(a804e7d6) SHA1(f414d6a5308266744645849940c00cd422e920d2))
+	ROM_LOAD("micro_1.bin", 0x0000, 0x0800, CRC(62d04111) SHA1(f0ce705c06a43a81293d8610394ce7c4143148e9))
+	ROM_LOAD("micro_2.bin", 0x0800, 0x0800, CRC(832e4223) SHA1(1409b0c7de35012b9d0eba9bb73b52aecc93c0f2))
+	ROM_LOAD("micro_3.bin", 0x1000, 0x0800, CRC(9d5d04d1) SHA1(1af32c418b73ee457f06ee9a8362cfec75e61f30))
+	ROM_LOAD("micro_4.bin", 0x1800, 0x0800, CRC(358ffd6a) SHA1(f5299e39d991bf882f827a62a1d9bb18e46dbcfc))
 	// 2 undumped proms DMA-01, DMA-02
 ROM_END
 

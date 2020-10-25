@@ -58,7 +58,7 @@ public:
 	auto mem_read_cb() { return m_mem_r.bind(); }
 	auto int_cb() { return m_int_w.bind(); }
 
-	DECLARE_READ16_MEMBER(reg_r);
+	uint16_t reg_r(offs_t offset);
 	void reg_w(offs_t offset, uint16_t data);
 
 	void update();
@@ -68,7 +68,7 @@ protected:
 	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 	enum

@@ -68,6 +68,7 @@ clipper_c300_device::clipper_c300_device(const machine_config &mconfig, const ch
 
 clipper_c400_device::clipper_c400_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: clipper_device(mconfig, CLIPPER_C400, tag, owner, clock, ENDIANNESS_LITTLE, SSW_ID_C4R4)
+	, m_db_pc(0)
 	, m_cammu(*this, "^cammu")
 {
 }
@@ -81,6 +82,12 @@ clipper_device::clipper_device(const machine_config &mconfig, device_type type, 
 	, m_psw(endianness == ENDIANNESS_BIG ? PSW_BIG : 0)
 	, m_ssw(cpuid)
 	, m_r(m_rs)
+	, m_ru{0}
+	, m_rs{0}
+	, m_f{0}
+	, m_fp_pc(0)
+	, m_fp_dst(0)
+	, m_info{0}
 {
 }
 
@@ -333,7 +340,7 @@ bool clipper_device::memory_translate(int spacenum, int intention, offs_t &addre
 	return ((intention & TRANSLATE_TYPE_MASK) == TRANSLATE_FETCH ? get_icammu() : get_dcammu()).memory_translate(m_ssw, spacenum, intention, address);
 }
 
-WRITE16_MEMBER(clipper_device::set_exception)
+void clipper_device::set_exception(u16 data)
 {
 	LOGMASKED(LOG_EXCEPTION, "external exception 0x%04x triggered\n", data);
 

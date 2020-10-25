@@ -54,13 +54,13 @@ private:
 	DECLARE_FLOPPY_FORMATS(dragon_formats);
 
 	/* pia2 */
-	DECLARE_WRITE8_MEMBER( pia2_pa_w );
+	void pia2_pa_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( pia2_firq_a );
 	DECLARE_WRITE_LINE_MEMBER( pia2_firq_b );
 
 	/* psg */
-	DECLARE_READ8_MEMBER( psg_porta_read );
-	DECLARE_WRITE8_MEMBER( psg_porta_write );
+	uint8_t psg_porta_read();
+	void psg_porta_write(uint8_t data);
 
 	/* fdc */
 	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );

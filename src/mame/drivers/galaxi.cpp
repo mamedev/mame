@@ -109,14 +109,14 @@ private:
 	int       m_ticket;
 	uint16_t    m_out;
 
-	DECLARE_WRITE16_MEMBER(bg1_w);
-	DECLARE_WRITE16_MEMBER(bg2_w);
-	DECLARE_WRITE16_MEMBER(bg3_w);
-	DECLARE_WRITE16_MEMBER(bg4_w);
-	DECLARE_WRITE16_MEMBER(fg_w);
-	DECLARE_WRITE16_MEMBER(_500000_w);
-	DECLARE_WRITE16_MEMBER(_500002_w);
-	DECLARE_WRITE16_MEMBER(_500004_w);
+	void bg1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void bg2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void bg3_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void bg4_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void fg_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void _500000_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void _500002_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void _500004_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
@@ -166,31 +166,31 @@ TILE_GET_INFO_MEMBER(galaxi_state::get_fg_tile_info)
 	tileinfo.set(1, code, 0x20 + (code >> 12), 0);
 }
 
-WRITE16_MEMBER(galaxi_state::bg1_w)
+void galaxi_state::bg1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg1_ram[offset]);
 	m_bg1_tmap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(galaxi_state::bg2_w)
+void galaxi_state::bg2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg2_ram[offset]);
 	m_bg2_tmap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(galaxi_state::bg3_w)
+void galaxi_state::bg3_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg3_ram[offset]);
 	m_bg3_tmap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(galaxi_state::bg4_w)
+void galaxi_state::bg4_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg4_ram[offset]);
 	m_bg4_tmap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(galaxi_state::fg_w)
+void galaxi_state::fg_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fg_ram[offset]);
 	m_fg_tmap->mark_tile_dirty(offset);
@@ -254,19 +254,19 @@ void galaxi_state::show_out(  )
 //  popmessage("%04x", m_out);
 }
 
-WRITE16_MEMBER(galaxi_state::_500000_w)
+void galaxi_state::_500000_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg3_yscroll);
 	show_out();
 }
 
-WRITE16_MEMBER(galaxi_state::_500002_w)
+void galaxi_state::_500002_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg3_xscroll);
 	show_out();
 }
 
-WRITE16_MEMBER(galaxi_state::_500004_w)
+void galaxi_state::_500004_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{

@@ -3,6 +3,8 @@
 /***************************************************************************
 
 Samsung SPC-1000 driver by Miodrag Milanovic
+This was the first computer from Samsung. It featured a cassette player
+embedded in the righthand side of the keyboard.
 
 2009-05-10 Preliminary driver.
 2014-02-16 Added cassette, many games are playable
@@ -158,23 +160,23 @@ public:
 	void spc1000(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(iplk_w);
-	DECLARE_READ8_MEMBER(iplk_r);
+	void iplk_w(uint8_t data);
+	uint8_t iplk_r();
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
-	DECLARE_WRITE8_MEMBER(gmode_w);
-	DECLARE_READ8_MEMBER(gmode_r);
-	DECLARE_READ8_MEMBER(porta_r);
+	void gmode_w(uint8_t data);
+	uint8_t gmode_r();
+	uint8_t porta_r();
 	DECLARE_WRITE_LINE_MEMBER( centronics_busy_w ) { m_centronics_busy = state; }
-	DECLARE_READ8_MEMBER(mc6847_videoram_r);
-	DECLARE_WRITE8_MEMBER(cass_w);
-	DECLARE_READ8_MEMBER(keyboard_r);
+	uint8_t mc6847_videoram_r(offs_t offset);
+	void cass_w(uint8_t data);
+	uint8_t keyboard_r(offs_t offset);
 	MC6847_GET_CHARROM_MEMBER(get_char_rom)
 	{
 		return m_p_videoram[0x1000 + (ch & 0x7f) * 16 + line];
 	}
 
-	void spc1000_io(address_map &map);
-	void spc1000_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 
 	uint8_t m_IPLK;
 	uint8_t m_GMODE;
@@ -194,21 +196,21 @@ private:
 	required_device<centronics_device> m_centronics;
 };
 
-void spc1000_state::spc1000_mem(address_map &map)
+void spc1000_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x7fff).bankr("bank1").bankw("bank2");
 	map(0x8000, 0xffff).bankr("bank3").bankw("bank4");
 }
 
-WRITE8_MEMBER(spc1000_state::iplk_w)
+void spc1000_state::iplk_w(uint8_t data)
 {
 	m_IPLK = m_IPLK ? 0 : 1;
 	membank("bank1")->set_entry(m_IPLK);
 	membank("bank3")->set_entry(m_IPLK);
 }
 
-READ8_MEMBER(spc1000_state::iplk_r)
+uint8_t spc1000_state::iplk_r()
 {
 	m_IPLK = m_IPLK ? 0 : 1;
 	membank("bank1")->set_entry(m_IPLK);
@@ -217,7 +219,7 @@ READ8_MEMBER(spc1000_state::iplk_r)
 	return 0;
 }
 
-WRITE8_MEMBER( spc1000_state::cass_w )
+void spc1000_state::cass_w(uint8_t data)
 {
 	attotime time = machine().scheduler().time();
 	m_cass->output(BIT(data, 0) ? -1.0 : 1.0);
@@ -232,7 +234,7 @@ WRITE8_MEMBER( spc1000_state::cass_w )
 	m_centronics->write_strobe(BIT(data, 2) ? true : false);
 }
 
-WRITE8_MEMBER(spc1000_state::gmode_w)
+void spc1000_state::gmode_w(uint8_t data)
 {
 	m_GMODE = data;
 
@@ -245,12 +247,12 @@ WRITE8_MEMBER(spc1000_state::gmode_w)
 	m_page = ((BIT(data, 5) << 1) | BIT(data, 4)) * 0x200;
 }
 
-READ8_MEMBER(spc1000_state::gmode_r)
+uint8_t spc1000_state::gmode_r()
 {
 	return m_GMODE;
 }
 
-READ8_MEMBER( spc1000_state::keyboard_r )
+uint8_t spc1000_state::keyboard_r(offs_t offset)
 {
 	// most games just read kb in $8000-$8009 but a few of them
 	// (e.g. Toiler Adventure II and Vela) use mirrored addr instead
@@ -263,7 +265,7 @@ READ8_MEMBER( spc1000_state::keyboard_r )
 }
 
 
-void spc1000_state::spc1000_io(address_map &map)
+void spc1000_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).ram().share("videoram");
@@ -321,8 +323,8 @@ static INPUT_PORTS_START( spc1000 )
 	PORT_START("LINE.4")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\\ |") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\') PORT_CHAR('|') PORT_CHAR(0x1c)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\\ |") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\') PORT_CHAR('|') PORT_CHAR(0x1c) // shows symbols
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("N") PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N') PORT_CHAR(0x0e)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F') PORT_CHAR(0x06)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R') PORT_CHAR(0x12)
@@ -331,7 +333,7 @@ static INPUT_PORTS_START( spc1000 )
 	PORT_START("LINE.5")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F1)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("M") PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M') PORT_CHAR(0x0d)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G") PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G') PORT_CHAR(0x07)
@@ -351,7 +353,7 @@ static INPUT_PORTS_START( spc1000 )
 	PORT_START("LINE.7")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F3") PORT_CODE(KEYCODE_F3)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P") PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P') PORT_CHAR(0x10)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(". >") PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("J") PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J') PORT_CHAR(0x0a)
@@ -361,7 +363,7 @@ static INPUT_PORTS_START( spc1000 )
 	PORT_START("LINE.8")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F4") PORT_CODE(KEYCODE_F4)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(": *") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(':') PORT_CHAR('*')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("/ ?") PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("K") PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K') PORT_CHAR(0x0b)
@@ -391,6 +393,8 @@ INPUT_PORTS_END
 
 void spc1000_state::machine_start()
 {
+	m_work_ram = make_unique_clear<uint8_t[]>(0x10000);
+
 	uint8_t *mem = memregion("maincpu")->base();
 	uint8_t *ram = m_ram->pointer();
 
@@ -399,23 +403,29 @@ void spc1000_state::machine_start()
 	membank("bank1")->configure_entry(1, mem);
 	membank("bank3")->configure_entry(0, ram + 0x8000);
 	membank("bank3")->configure_entry(1, mem);
-	membank("bank1")->set_entry(1);
-	membank("bank3")->set_entry(1);
 
 	// intialize banks 2 & 4 (write banks)
 	membank("bank2")->set_base(ram);
 	membank("bank4")->set_base(ram + 0x8000);
 
 	m_time = machine().scheduler().time();
+
+	save_item(NAME(m_IPLK));
+	save_item(NAME(m_GMODE));
+	save_item(NAME(m_page));
+	save_pointer(NAME(m_work_ram), 0x10000);
+	save_item(NAME(m_time));
+	save_item(NAME(m_centronics_busy));
 }
 
 void spc1000_state::machine_reset()
 {
-	m_work_ram = make_unique_clear<uint8_t[]>(0x10000);
 	m_IPLK = 1;
+	membank("bank1")->set_entry(1);
+	membank("bank3")->set_entry(1);
 }
 
-READ8_MEMBER(spc1000_state::mc6847_videoram_r)
+uint8_t spc1000_state::mc6847_videoram_r(offs_t offset)
 {
 	if (offset == ~0)
 		return 0xff;
@@ -436,7 +446,7 @@ READ8_MEMBER(spc1000_state::mc6847_videoram_r)
 	}
 }
 
-READ8_MEMBER( spc1000_state::porta_r )
+uint8_t spc1000_state::porta_r()
 {
 	uint8_t data = 0x3f;
 	data |= (m_cass->input() > 0.0038) ? 0x80 : 0;
@@ -466,8 +476,8 @@ void spc1000_state::spc1000(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(4'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &spc1000_state::spc1000_mem);
-	m_maincpu->set_addrmap(AS_IO, &spc1000_state::spc1000_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spc1000_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &spc1000_state::io_map);
 
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
@@ -511,20 +521,13 @@ void spc1000_state::spc1000(machine_config &config)
 
 /* ROM definition */
 ROM_START( spc1000 )
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x8000, "maincpu", ROMREGION_ERASEFF)
+	//ROM_LOAD("spcall.rom", 0x0000, 0x8000, CRC(2fbb6eca) SHA1(cc9a076b0f00d54b2aec31f1f558b10f43ef61c8))  // bad?
 	ROM_LOAD("spcall.rom", 0x0000, 0x8000, CRC(240426be) SHA1(8eb32e147c17a6d0f947b8bb3c6844750a7b64a8))
 ROM_END
-
-#if 0
-ROM_START( spc1000 )
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("spcall.rom", 0x0000, 0x8000, CRC(2fbb6eca) SHA1(cc9a076b0f00d54b2aec31f1f558b10f43ef61c8))
-	/// more roms to come...
-ROM_END
-#endif
 
 
 /* Driver */
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY    FULLNAME    FLAGS
-COMP( 1982, spc1000, 0,      0,      spc1000, spc1000, spc1000_state, empty_init, "Samsung", "SPC-1000", 0 )
+COMP( 1982, spc1000, 0,      0,      spc1000, spc1000, spc1000_state, empty_init, "Samsung", "SPC-1000", MACHINE_SUPPORTS_SAVE )

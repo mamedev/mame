@@ -45,13 +45,13 @@ public:
 	void play_1(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(port07_r);
-	DECLARE_WRITE8_MEMBER(port01_w);
-	DECLARE_WRITE8_MEMBER(port02_w);
-	DECLARE_WRITE8_MEMBER(port03_w);
-	DECLARE_WRITE8_MEMBER(port04_w);
-	DECLARE_WRITE8_MEMBER(port05_w);
-	DECLARE_WRITE8_MEMBER(port06_w);
+	uint8_t port07_r();
+	void port01_w(uint8_t data);
+	void port02_w(uint8_t data);
+	void port03_w(uint8_t data);
+	void port04_w(uint8_t data);
+	void port05_w(uint8_t data);
+	void port06_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER(clear_r);
 	DECLARE_READ_LINE_MEMBER(wait_r);
 	DECLARE_READ_LINE_MEMBER(ef2_r);
@@ -264,7 +264,7 @@ void play_1_state::machine_reset()
 	m_ball = 0;
 }
 
-READ8_MEMBER( play_1_state::port07_r )
+uint8_t play_1_state::port07_r()
 {
 	uint8_t data = m_dips[3]->read() & 0x3f;
 	data |= (m_segment & m_dips[1]->read()) ? 0x40 : 0;
@@ -272,7 +272,7 @@ READ8_MEMBER( play_1_state::port07_r )
 	return data;
 }
 
-WRITE8_MEMBER( play_1_state::port01_w )
+void play_1_state::port01_w(uint8_t data)
 {
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // 4511
 	// d0-1 via 4013 to match-game board
@@ -297,14 +297,14 @@ WRITE8_MEMBER( play_1_state::port01_w )
 	m_waitcnt = 0;
 }
 
-WRITE8_MEMBER( play_1_state::port02_w )
+void play_1_state::port02_w(uint8_t data)
 {
 	// N1-8, segments and other
 	m_segment = data;
 	m_waitcnt = 0;
 }
 
-WRITE8_MEMBER( play_1_state::port03_w )
+void play_1_state::port03_w(uint8_t data)
 {
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // 4511
 	// D1-4, digit select
@@ -395,20 +395,20 @@ WRITE8_MEMBER( play_1_state::port03_w )
 	m_waitcnt = 0;
 }
 
-WRITE8_MEMBER( play_1_state::port04_w )
+void play_1_state::port04_w(uint8_t data)
 {
 	// U1-8
 	m_ball = data;
 	m_waitcnt = 0;
 }
 
-WRITE8_MEMBER( play_1_state::port05_w )
+void play_1_state::port05_w(uint8_t data)
 {
 	// V1-8
 	m_waitcnt = 0;
 }
 
-WRITE8_MEMBER( play_1_state::port06_w )
+void play_1_state::port06_w(uint8_t data)
 {
 	// W1-8
 	m_waitcnt = 0;

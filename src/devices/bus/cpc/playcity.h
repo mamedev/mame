@@ -30,14 +30,14 @@ public:
 	// construction/destruction
 	cpc_playcity_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(ctc_r);
-	DECLARE_WRITE8_MEMBER(ctc_w);
-	DECLARE_WRITE8_MEMBER(ymz1_address_w);
-	DECLARE_WRITE8_MEMBER(ymz2_address_w);
-	DECLARE_WRITE8_MEMBER(ymz1_data_w);
-	DECLARE_WRITE8_MEMBER(ymz2_data_w);
-	DECLARE_READ8_MEMBER(ymz1_data_r);
-	DECLARE_READ8_MEMBER(ymz2_data_r);
+	uint8_t ctc_r(offs_t offset);
+	void ctc_w(offs_t offset, uint8_t data);
+	void ymz1_address_w(uint8_t data);
+	void ymz2_address_w(uint8_t data);
+	void ymz1_data_w(uint8_t data);
+	void ymz2_data_w(uint8_t data);
+	uint8_t ymz1_data_r();
+	uint8_t ymz2_data_r();
 
 	virtual WRITE_LINE_MEMBER(cursor_w) override { m_ctc->trg1(state); }
 

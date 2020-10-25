@@ -6,6 +6,9 @@
 
     driver by Angelo Salese
 
+    Computer box contains 2 floppy drives on the right, and a front-loading cassette player on the left.
+    Keyboard is separate, and the key layout is very similar to the fm7.
+
     TODO:
     - Kanji text is cutted in half when font_size is 1 / interlace is disabled, different ROM used? (check Back to the Future);
     - Implement external ROM hook-up;
@@ -69,23 +72,23 @@ void mz2500_state::mz2500_draw_pixel(bitmap_ind16 &bitmap,int x,int y,uint16_t  
 {
 	if(width && height)
 	{
-		bitmap.pix16(y*2+0, x*2+0) = m_palette->pen(pen);
-		bitmap.pix16(y*2+0, x*2+1) = m_palette->pen(pen);
-		bitmap.pix16(y*2+1, x*2+0) = m_palette->pen(pen);
-		bitmap.pix16(y*2+1, x*2+1) = m_palette->pen(pen);
+		bitmap.pix(y*2+0, x*2+0) = m_palette->pen(pen);
+		bitmap.pix(y*2+0, x*2+1) = m_palette->pen(pen);
+		bitmap.pix(y*2+1, x*2+0) = m_palette->pen(pen);
+		bitmap.pix(y*2+1, x*2+1) = m_palette->pen(pen);
 	}
 	else if(width)
 	{
-		bitmap.pix16(y, x*2+0) = m_palette->pen(pen);
-		bitmap.pix16(y, x*2+1) = m_palette->pen(pen);
+		bitmap.pix(y, x*2+0) = m_palette->pen(pen);
+		bitmap.pix(y, x*2+1) = m_palette->pen(pen);
 	}
 	else if(height)
 	{
-		bitmap.pix16(y*2+0, x) = m_palette->pen(pen);
-		bitmap.pix16(y*2+1, x) = m_palette->pen(pen);
+		bitmap.pix(y*2+0, x) = m_palette->pen(pen);
+		bitmap.pix(y*2+1, x) = m_palette->pen(pen);
 	}
 	else
-		bitmap.pix16(y, x) = m_palette->pen(pen);
+		bitmap.pix(y, x) = m_palette->pen(pen);
 }
 
 void mz2500_state::draw_80x25(bitmap_ind16 &bitmap,const rectangle &cliprect,uint16_t map_addr)
@@ -597,18 +600,18 @@ uint8_t mz2500_state::mz2500_cg_latch_compare()
 	return res;
 }
 
-READ8_MEMBER(mz2500_state::mz2500_bank_addr_r)
+uint8_t mz2500_state::mz2500_bank_addr_r()
 {
 	return m_bank_addr;
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_bank_addr_w)
+void mz2500_state::mz2500_bank_addr_w(uint8_t data)
 {
 //  printf("%02x\n",data);
 	m_bank_addr = data & 7;
 }
 
-READ8_MEMBER(mz2500_state::mz2500_bank_data_r)
+uint8_t mz2500_state::mz2500_bank_data_r()
 {
 	uint8_t res;
 
@@ -620,7 +623,7 @@ READ8_MEMBER(mz2500_state::mz2500_bank_data_r)
 	return res;
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_bank_data_w)
+void mz2500_state::mz2500_bank_data_w(uint8_t data)
 {
 	m_bank_val[m_bank_addr] = data & 0x3f;
 	m_rambank[m_bank_addr]->set_bank(m_bank_val[m_bank_addr]);
@@ -634,18 +637,18 @@ WRITE8_MEMBER(mz2500_state::mz2500_bank_data_w)
 	m_bank_addr&=7;
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_kanji_bank_w)
+void mz2500_state::mz2500_kanji_bank_w(uint8_t data)
 {
 	m_kanji_bank = data;
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_dictionary_bank_w)
+void mz2500_state::mz2500_dictionary_bank_w(uint8_t data)
 {
 	m_dic_bank = data;
 }
 
 /* 0xf4 - 0xf7 all returns vblank / hblank states */
-READ8_MEMBER(mz2500_state::mz2500_crtc_hvblank_r)
+uint8_t mz2500_state::mz2500_crtc_hvblank_r()
 {
 	uint8_t vblank_bit, hblank_bit;
 
@@ -694,7 +697,7 @@ uint8_t mz2500_state::pal_256_param(int index, int param)
 	return val;
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_tv_crtc_w)
+void mz2500_state::mz2500_tv_crtc_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -774,7 +777,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_tv_crtc_w)
 	}
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_irq_sel_w)
+void mz2500_state::mz2500_irq_sel_w(uint8_t data)
 {
 	m_irq_sel = data;
 	//printf("%02x\n",m_irq_sel);
@@ -785,7 +788,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_irq_sel_w)
 	m_irq_mask[3] = (data & 0x01); //RP5c15
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_irq_data_w)
+void mz2500_state::mz2500_irq_data_w(uint8_t data)
 {
 	if(m_irq_sel & 0x80)
 		m_irq_vector[0] = data; //CRTC
@@ -799,7 +802,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_irq_data_w)
 //  popmessage("%02x %02x %02x %02x",m_irq_vector[0],m_irq_vector[1],m_irq_vector[2],m_irq_vector[3]);
 }
 
-WRITE8_MEMBER(mz2500_state::floppy_select_w)
+void mz2500_state::floppy_select_w(uint8_t data)
 {
 	switch ((data & 0x03) ^ m_fdc_reverse)
 	{
@@ -815,7 +818,7 @@ WRITE8_MEMBER(mz2500_state::floppy_select_w)
 		m_floppy->mon_w(!BIT(data, 7));
 }
 
-WRITE8_MEMBER(mz2500_state::floppy_side_w)
+void mz2500_state::floppy_side_w(uint8_t data)
 {
 	if (m_floppy)
 		m_floppy->ss_w(BIT(data, 0));
@@ -833,7 +836,7 @@ void mz2500_state::mz2500_map(address_map &map)
 	map(0xe000, 0xffff).m(m_rambank[7], FUNC(address_map_bank_device::amap8));
 }
 
-READ8_MEMBER(mz2500_state::rmw_r)
+uint8_t mz2500_state::rmw_r(offs_t offset)
 {
 	// TODO: correct?
 	if(m_cg_reg[0x0e] == 0x3)
@@ -852,7 +855,7 @@ READ8_MEMBER(mz2500_state::rmw_r)
 	return m_cg_latch[plane];
 }
 
-WRITE8_MEMBER(mz2500_state::rmw_w)
+void mz2500_state::rmw_w(offs_t offset, uint8_t data)
 {
 	// TODO: correct?
 	if(m_cg_reg[0x0e] == 0x3)
@@ -906,7 +909,7 @@ WRITE8_MEMBER(mz2500_state::rmw_w)
 	}
 }
 
-READ8_MEMBER(mz2500_state::kanji_pcg_r)
+uint8_t mz2500_state::kanji_pcg_r(offs_t offset)
 {
 	if(m_kanji_bank & 0x80) //kanji ROM
 		return m_kanji_rom[(offset & 0x7ff)+((m_kanji_bank & 0x7f)*0x800)];
@@ -915,7 +918,7 @@ READ8_MEMBER(mz2500_state::kanji_pcg_r)
 	return m_pcg_ram[offset];
 }
 
-WRITE8_MEMBER(mz2500_state::kanji_pcg_w)
+void mz2500_state::kanji_pcg_w(offs_t offset, uint8_t data)
 {
 	if((m_kanji_bank & 0x80) == 0) ////PCG RAM
 	{
@@ -928,7 +931,7 @@ WRITE8_MEMBER(mz2500_state::kanji_pcg_w)
 	// kanji ROM is read only
 }
 
-READ8_MEMBER(mz2500_state::dict_rom_r)
+uint8_t mz2500_state::dict_rom_r(offs_t offset)
 {
 	return m_dic_rom[(offset & 0x1fff) + ((m_dic_bank & 0x1f)*0x2000)];
 }
@@ -957,7 +960,7 @@ void mz2500_state::mz2500_bank_window_map(address_map &map)
 	map(0x78000,0x7ffff).rom().region("phone", 0);
 }
 
-READ8_MEMBER(mz2500_state::mz2500_rom_r)
+uint8_t mz2500_state::mz2500_rom_r()
 {
 	m_lrom_index = (m_maincpu->state_int(Z80_B));
 
@@ -966,7 +969,7 @@ READ8_MEMBER(mz2500_state::mz2500_rom_r)
 	return m_iplpro_rom[m_rom_index];
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_rom_w)
+void mz2500_state::mz2500_rom_w(uint8_t data)
 {
 	m_hrom_index = (m_maincpu->state_int(Z80_B));
 
@@ -975,7 +978,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_rom_w)
 }
 
 /* sets 16 color entries out of 4096 possible combinations */
-WRITE8_MEMBER(mz2500_state::palette4096_io_w)
+void mz2500_state::palette4096_io_w(uint8_t data)
 {
 	uint8_t pal_index;
 	uint8_t pal_entry;
@@ -994,17 +997,17 @@ WRITE8_MEMBER(mz2500_state::palette4096_io_w)
 	m_palette->set_pen_color(pal_entry+0x10, pal4bit(m_pal[pal_entry].r), pal4bit(m_pal[pal_entry].g), pal4bit(m_pal[pal_entry].b));
 }
 
-READ8_MEMBER(mz2500_state::fdc_r)
+uint8_t mz2500_state::fdc_r(offs_t offset)
 {
 	return m_fdc->read(offset) ^ 0xff;
 }
 
-WRITE8_MEMBER(mz2500_state::fdc_w)
+void mz2500_state::fdc_w(offs_t offset, uint8_t data)
 {
 	m_fdc->write(offset, data ^ 0xff);
 }
 
-READ8_MEMBER(mz2500_state::mz2500_bplane_latch_r)
+uint8_t mz2500_state::mz2500_bplane_latch_r()
 {
 	if(m_cg_reg[7] & 0x10)
 		return mz2500_cg_latch_compare();
@@ -1013,7 +1016,7 @@ READ8_MEMBER(mz2500_state::mz2500_bplane_latch_r)
 }
 
 
-READ8_MEMBER(mz2500_state::mz2500_rplane_latch_r)
+uint8_t mz2500_state::mz2500_rplane_latch_r()
 {
 	if(m_cg_reg[0x07] & 0x10)
 	{
@@ -1027,12 +1030,12 @@ READ8_MEMBER(mz2500_state::mz2500_rplane_latch_r)
 		return m_cg_latch[1];
 }
 
-READ8_MEMBER(mz2500_state::mz2500_gplane_latch_r)
+uint8_t mz2500_state::mz2500_gplane_latch_r()
 {
 	return m_cg_latch[2];
 }
 
-READ8_MEMBER(mz2500_state::mz2500_iplane_latch_r)
+uint8_t mz2500_state::mz2500_iplane_latch_r()
 {
 	return m_cg_latch[3];
 }
@@ -1067,12 +1070,12 @@ READ8_MEMBER(mz2500_state::mz2500_iplane_latch_r)
 0x18: CG color masking
 */
 
-WRITE8_MEMBER(mz2500_state::mz2500_cg_addr_w)
+void mz2500_state::mz2500_cg_addr_w(uint8_t data)
 {
 	m_cg_reg_index = data;
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_cg_data_w)
+void mz2500_state::mz2500_cg_data_w(uint8_t data)
 {
 	m_cg_reg[m_cg_reg_index & 0x1f] = data;
 
@@ -1122,7 +1125,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_cg_data_w)
 		m_cg_reg_index = (m_cg_reg_index & 0xfc) | ((m_cg_reg_index + 1) & 0x03);
 }
 
-WRITE8_MEMBER(mz2500_state::timer_w)
+void mz2500_state::timer_w(uint8_t data)
 {
 	m_pit->write_gate0(1);
 	m_pit->write_gate1(1);
@@ -1133,7 +1136,7 @@ WRITE8_MEMBER(mz2500_state::timer_w)
 }
 
 
-READ8_MEMBER(mz2500_state::mz2500_joystick_r)
+uint8_t mz2500_state::mz2500_joystick_r()
 {
 	uint8_t res,dir_en,in_r;
 
@@ -1161,32 +1164,32 @@ READ8_MEMBER(mz2500_state::mz2500_joystick_r)
 	return res;
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_joystick_w)
+void mz2500_state::mz2500_joystick_w(uint8_t data)
 {
 	m_joy_mode = data;
 }
 
 
-READ8_MEMBER(mz2500_state::mz2500_kanji_r)
+uint8_t mz2500_state::mz2500_kanji_r(offs_t offset)
 {
 	printf("Read from kanji 2 ROM\n");
 
 	return m_kanji2_rom[(m_kanji_index << 1) | (offset & 1)];
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_kanji_w)
+void mz2500_state::mz2500_kanji_w(offs_t offset, uint8_t data)
 {
 	(offset & 1) ? (m_kanji_index = (data << 8) | (m_kanji_index & 0xff)) : (m_kanji_index = (data & 0xff) | (m_kanji_index & 0xff00));
 }
 
-READ8_MEMBER(mz2500_state::rp5c15_8_r)
+uint8_t mz2500_state::rp5c15_8_r()
 {
 	uint8_t rtc_index = (m_maincpu->state_int(Z80_B));
 
 	return m_rtc->read(rtc_index);
 }
 
-WRITE8_MEMBER(mz2500_state::rp5c15_8_w)
+void mz2500_state::rp5c15_8_w(uint8_t data)
 {
 	uint8_t rtc_index = (m_maincpu->state_int(Z80_B));
 
@@ -1194,7 +1197,7 @@ WRITE8_MEMBER(mz2500_state::rp5c15_8_w)
 }
 
 
-READ8_MEMBER(mz2500_state::mz2500_emm_data_r)
+uint8_t mz2500_state::mz2500_emm_data_r()
 {
 	uint8_t emm_lo_index;
 
@@ -1208,7 +1211,7 @@ READ8_MEMBER(mz2500_state::mz2500_emm_data_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_emm_addr_w)
+void mz2500_state::mz2500_emm_addr_w(uint8_t data)
 {
 	uint8_t emm_hi_index;
 
@@ -1217,7 +1220,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_emm_addr_w)
 	m_emm_offset = ((emm_hi_index & 0xff) << 16) | ((data & 0xff) << 8) | (m_emm_offset & 0xff);
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_emm_data_w)
+void mz2500_state::mz2500_emm_data_w(uint8_t data)
 {
 	uint8_t emm_lo_index;
 
@@ -1274,18 +1277,18 @@ void mz2500_state::mz2500_io(address_map &map)
 /* Input ports */
 static INPUT_PORTS_START( mz2500 )
 	PORT_START("KEY0")
-	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F1)
-	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("F2") PORT_CODE(KEYCODE_F2)
-	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("F3") PORT_CODE(KEYCODE_F3)
-	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("F4") PORT_CODE(KEYCODE_F4)
-	PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("F5") PORT_CODE(KEYCODE_F5)
-	PORT_BIT(0x20,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("F6") PORT_CODE(KEYCODE_F6)
-	PORT_BIT(0x40,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("F7") PORT_CODE(KEYCODE_F7)
-	PORT_BIT(0x80,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("F8") PORT_CODE(KEYCODE_F8)
+	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))
+	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("F2") PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2))
+	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("F3") PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F3))
+	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("F4") PORT_CODE(KEYCODE_F4) PORT_CHAR(UCHAR_MAMEKEY(F4))
+	PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("F5") PORT_CODE(KEYCODE_F5) PORT_CHAR(UCHAR_MAMEKEY(F5))
+	PORT_BIT(0x20,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("F6") PORT_CODE(KEYCODE_F6) PORT_CHAR(UCHAR_MAMEKEY(F6))
+	PORT_BIT(0x40,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("F7") PORT_CODE(KEYCODE_F7) PORT_CHAR(UCHAR_MAMEKEY(F7))
+	PORT_BIT(0x80,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("F8") PORT_CODE(KEYCODE_F8) PORT_CHAR(UCHAR_MAMEKEY(F8))
 
 	PORT_START("KEY1")
-	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("F9") PORT_CODE(KEYCODE_F9)
-	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("F10") PORT_CODE(KEYCODE_F10)
+	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("F9") PORT_CODE(KEYCODE_F9) PORT_CHAR(UCHAR_MAMEKEY(F9))
+	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("F10") PORT_CODE(KEYCODE_F10) PORT_CHAR(UCHAR_MAMEKEY(F10))
 	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("8 (PAD)") PORT_CODE(KEYCODE_8_PAD)
 	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("9 (PAD)") PORT_CODE(KEYCODE_9_PAD)
 	PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME(", (PAD)") PORT_CODE(KEYCODE_COMMA_PAD)
@@ -1304,91 +1307,91 @@ static INPUT_PORTS_START( mz2500 )
 	PORT_BIT(0x80,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("7 (PAD)") PORT_CODE(KEYCODE_7_PAD)
 
 	PORT_START("KEY3")
-	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("TAB") PORT_CODE(KEYCODE_TAB)
+	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("TAB") PORT_CODE(KEYCODE_TAB) PORT_CHAR(9)
 	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
-	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(27)
-	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP)
-	PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN)
-	PORT_BIT(0x20,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT)
-	PORT_BIT(0x40,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT)
-	PORT_BIT(0x80,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("BREAK") //PORT_CODE(KEYCODE_ESC)
+	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
+	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT(0x20,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT(0x40,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT(0x80,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("BREAK") PORT_CHAR(3) //PORT_CODE(KEYCODE_ESC)
 
 	PORT_START("KEY4")
-	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("/") //PORT_CODE(KEYCODE_SLASH)
-	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A) PORT_CHAR('A')
-	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B) PORT_CHAR('B')
-	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C) PORT_CHAR('C')
-	PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D) PORT_CHAR('D')
-	PORT_BIT(0x20,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E) PORT_CHAR('E')
-	PORT_BIT(0x40,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F) PORT_CHAR('F')
-	PORT_BIT(0x80,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("G") PORT_CODE(KEYCODE_G) PORT_CHAR('G')
+	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("/") PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
+	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')
+	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B')
+	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')
+	PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D')
+	PORT_BIT(0x20,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')
+	PORT_BIT(0x40,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F')
+	PORT_BIT(0x80,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("G") PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G')
 
 	PORT_START("KEY5")
-	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("H") PORT_CODE(KEYCODE_H) PORT_CHAR('H')
-	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("I") PORT_CODE(KEYCODE_I) PORT_CHAR('I')
-	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("J") PORT_CODE(KEYCODE_J) PORT_CHAR('J')
-	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("K") PORT_CODE(KEYCODE_K) PORT_CHAR('K')
-	PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("L") PORT_CODE(KEYCODE_L) PORT_CHAR('L')
-	PORT_BIT(0x20,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("M") PORT_CODE(KEYCODE_M) PORT_CHAR('M')
-	PORT_BIT(0x40,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("N") PORT_CODE(KEYCODE_N) PORT_CHAR('N')
-	PORT_BIT(0x80,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("O") PORT_CODE(KEYCODE_O) PORT_CHAR('O')
+	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("H") PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')
+	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("I") PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I')
+	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("J") PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')
+	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("K") PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')
+	PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("L") PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L')
+	PORT_BIT(0x20,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("M") PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')
+	PORT_BIT(0x40,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("N") PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')
+	PORT_BIT(0x80,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("O") PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O')
 
 	PORT_START("KEY6")
-	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("P") PORT_CODE(KEYCODE_P) PORT_CHAR('P')
-	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("Q") PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
-	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R) PORT_CHAR('R')
-	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("S") PORT_CODE(KEYCODE_S) PORT_CHAR('S')
-	PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("T") PORT_CODE(KEYCODE_T) PORT_CHAR('T')
-	PORT_BIT(0x20,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("U") PORT_CODE(KEYCODE_U) PORT_CHAR('U')
-	PORT_BIT(0x40,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("V") PORT_CODE(KEYCODE_V) PORT_CHAR('V')
-	PORT_BIT(0x80,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("W") PORT_CODE(KEYCODE_W) PORT_CHAR('W')
+	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("P") PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
+	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("Q") PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')
+	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R')
+	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("S") PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')
+	PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("T") PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T')
+	PORT_BIT(0x20,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("U") PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')
+	PORT_BIT(0x40,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("V") PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V')
+	PORT_BIT(0x80,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("W") PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')
 
 	PORT_START("KEY7")
-	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("X") PORT_CODE(KEYCODE_X) PORT_CHAR('X')
-	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("Y") PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
-	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
-	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("^")
-	PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_KEYBOARD) //Yen symbol
-	PORT_BIT(0x20,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("_")
-	PORT_BIT(0x40,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME(".")
-	PORT_BIT(0x80,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME(",")
+	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("X") PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')
+	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("Y") PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')
+	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')
+	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("^") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('^')
+	PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("\xEF\xBF\xA5") PORT_CHAR(165) PORT_CHAR('|') //Yen symbol
+	PORT_BIT(0x20,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("_") PORT_CHAR('_')
+	PORT_BIT(0x40,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME(".") PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
+	PORT_BIT(0x80,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME(",") PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
 
 	PORT_START("KEY8")
 	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0) PORT_CHAR('0')
-	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1) PORT_CHAR('1')
-	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2) PORT_CHAR('2')
-	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3) PORT_CHAR('3')
-	PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4) PORT_CHAR('4')
-	PORT_BIT(0x20,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5) PORT_CHAR('5')
-	PORT_BIT(0x40,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6) PORT_CHAR('6')
-	PORT_BIT(0x80,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7) PORT_CHAR('7')
+	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
+	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"')
+	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
+	PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
+	PORT_BIT(0x20,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
+	PORT_BIT(0x40,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
+	PORT_BIT(0x80,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'')
 
 	PORT_START("KEY9")
-	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8) PORT_CHAR('8')
-	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9) PORT_CHAR('9')
-	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME(":")
-	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME(";")
-	PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("-") PORT_CODE(KEYCODE_MINUS)
-	PORT_BIT(0x20,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("@")
-	PORT_BIT(0x40,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("[")
+	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
+	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
+	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME(":") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(':') PORT_CHAR('*')
+	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME(";") PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR('+')
+	PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("-") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-')  PORT_CHAR('=')
+	PORT_BIT(0x20,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("@") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('@') PORT_CHAR('`')
+	PORT_BIT(0x40,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("[") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('[') PORT_CHAR('{')
 	PORT_BIT(0x80,IP_ACTIVE_LOW,IPT_UNUSED)
 
 	PORT_START("KEYA")
-	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("]")
+	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("]") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR(']') PORT_CHAR('}')
 	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("COPY")
 	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("CLR")
 	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("INST")
-	PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("BACKSPACE") PORT_CODE(KEYCODE_BACKSPACE)
-	PORT_BIT(0x20,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("ESC")
+	PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("BACKSPACE") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
+	PORT_BIT(0x20,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("ESC") PORT_CODE(KEYCODE_TILDE) PORT_CHAR(27)
 	PORT_BIT(0x40,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("* (PAD)") PORT_CODE(KEYCODE_ASTERISK)
 	PORT_BIT(0x80,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("/ (PAD)") PORT_CODE(KEYCODE_SLASH_PAD)
 
 	PORT_START("KEYB")
 	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("GRPH")
 	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("SLOCK")
-	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT)
+	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("KANA")
-	PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("CTRL")
+	PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT(0xe0,IP_ACTIVE_LOW,IPT_UNUSED)
 
 	PORT_START("KEYC")
@@ -1599,14 +1602,14 @@ IRQ_CALLBACK_MEMBER(mz2500_state::mz2500_irq_ack)
 	return 0;
 }
 
-READ8_MEMBER(mz2500_state::mz2500_porta_r)
+uint8_t mz2500_state::mz2500_porta_r()
 {
 	logerror("PPI PORTA R\n");
 
 	return 0xff;
 }
 
-READ8_MEMBER(mz2500_state::mz2500_portb_r)
+uint8_t mz2500_state::mz2500_portb_r()
 {
 	uint8_t vblank_bit;
 
@@ -1615,24 +1618,24 @@ READ8_MEMBER(mz2500_state::mz2500_portb_r)
 	return 0xfe | vblank_bit;
 }
 
-READ8_MEMBER(mz2500_state::mz2500_portc_r)
+uint8_t mz2500_state::mz2500_portc_r()
 {
 	logerror("PPI PORTC R\n");
 
 	return 0xff;
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_porta_w)
+void mz2500_state::mz2500_porta_w(uint8_t data)
 {
 	logerror("PPI PORTA W %02x\n",data);
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_portb_w)
+void mz2500_state::mz2500_portb_w(uint8_t data)
 {
 	logerror("PPI PORTB W %02x\n",data);
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_portc_w)
+void mz2500_state::mz2500_portc_w(uint8_t data)
 {
 	/*
 	---- x--- 0->1 transition = IPL reset
@@ -1665,7 +1668,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_portc_w)
 		logerror("PPI PORTC W %02x\n",data & ~0x0f);
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_pio1_porta_w)
+void mz2500_state::mz2500_pio1_porta_w(uint8_t data)
 {
 //  printf("%02x\n",data);
 
@@ -1679,7 +1682,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_pio1_porta_w)
 }
 
 
-READ8_MEMBER(mz2500_state::mz2500_pio1_porta_r)
+uint8_t mz2500_state::mz2500_pio1_porta_r()
 {
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3",
 											"KEY4", "KEY5", "KEY6", "KEY7",
@@ -1705,18 +1708,18 @@ READ8_MEMBER(mz2500_state::mz2500_pio1_porta_r)
 }
 
 #if 0
-READ8_MEMBER(mz2500_state::mz2500_pio1_portb_r)
+uint8_t mz2500_state::mz2500_pio1_portb_r()
 {
 	return m_pio_latchb;
 }
 #endif
 
-READ8_MEMBER(mz2500_state::opn_porta_r)
+uint8_t mz2500_state::opn_porta_r()
 {
 	return m_ym_porta;
 }
 
-WRITE8_MEMBER(mz2500_state::opn_porta_w)
+void mz2500_state::opn_porta_w(uint8_t data)
 {
 	/*
 	---- x--- mouse select

@@ -7,10 +7,10 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "render.h"
+#include "includes/tx1.h"
+
 #include "video/resnet.h"
 #include "cpu/i86/i86.h"
-#include "includes/tx1.h"
 
 
 #define OBJ_FRAC    16
@@ -42,12 +42,12 @@ TIMER_CALLBACK_MEMBER(tx1_state::interrupt_callback)
 }
 
 
-READ16_MEMBER(tx1_state::tx1_crtc_r)
+uint16_t tx1_state::tx1_crtc_r()
 {
 	return 0xffff;
 }
 
-WRITE16_MEMBER(tx1_state::tx1_crtc_w)
+void tx1_state::tx1_crtc_w(offs_t offset, uint16_t data)
 {
 if (PRINT_CRTC_DATA)
 {
@@ -143,7 +143,7 @@ void tx1_state::tx1_palette(palette_device &palette) const
  *
  *************************************/
 
-WRITE16_MEMBER(tx1_state::tx1_bankcs_w)
+void tx1_state::tx1_bankcs_w(offs_t offset, uint16_t data)
 {
 	vregs_t &tx1_vregs = m_vregs;
 
@@ -196,7 +196,7 @@ WRITE16_MEMBER(tx1_state::tx1_bankcs_w)
 	}
 }
 
-WRITE16_MEMBER(tx1_state::tx1_slincs_w)
+void tx1_state::tx1_slincs_w(offs_t offset, uint16_t data)
 {
 	if (offset == 1)
 		m_vregs.slin_inc = data;
@@ -204,17 +204,17 @@ WRITE16_MEMBER(tx1_state::tx1_slincs_w)
 		m_vregs.slin_inc = m_vregs.slin_val = 0;
 }
 
-WRITE16_MEMBER(tx1_state::tx1_slock_w)
+void tx1_state::tx1_slock_w(uint16_t data)
 {
 	m_vregs.slock = data & 1;
 }
 
-WRITE16_MEMBER(tx1_state::tx1_scolst_w)
+void tx1_state::tx1_scolst_w(uint16_t data)
 {
 	m_vregs.scol = data & 0x0707;
 }
 
-WRITE16_MEMBER(tx1_state::tx1_flgcs_w)
+void tx1_state::tx1_flgcs_w(uint16_t data)
 {
 	m_vregs.flags = data & 0xff;
 }
@@ -1123,14 +1123,13 @@ WRITE_LINE_MEMBER(tx1_state::screen_vblank_tx1)
 
 void tx1_state::tx1_combine_layers(bitmap_ind16 &bitmap, int screen)
 {
-	int x, y;
-	uint8_t *chr_pal = &m_proms[0x900];
+	uint8_t const *const chr_pal = &m_proms[0x900];
 
 	int x_offset = screen * 256;
 
-	for (y = 0; y < 240; ++y)
+	for (int y = 0; y < 240; ++y)
 	{
-		uint16_t *bmp_addr = &bitmap.pix16(y);
+		uint16_t *bmp_addr = &bitmap.pix(y);
 
 		uint32_t bmp_offset = y * 768 + x_offset;
 
@@ -1138,7 +1137,7 @@ void tx1_state::tx1_combine_layers(bitmap_ind16 &bitmap, int screen)
 		uint8_t *rod_addr = m_rod_bmp.get() + bmp_offset;
 		uint8_t *obj_addr = m_obj_bmp.get() + bmp_offset;
 
-		for (x = 0; x < 256; ++x)
+		for (int x = 0; x < 256; ++x)
 		{
 			uint8_t out_val;
 			uint32_t char_val = chr_addr[x];
@@ -2826,7 +2825,7 @@ void tx1_state::buggyboy_draw_objs(uint8_t *bitmap, bool wide)
     /WASET  = 24A0-F, 24B0-F
     /FLAGS  = 24E0-F, 24F0-F
 */
-WRITE16_MEMBER(tx1_state::buggyboy_gas_w)
+void tx1_state::buggyboy_gas_w(offs_t offset, uint16_t data)
 {
 	vregs_t &vregs = m_vregs;
 	offset <<= 1;
@@ -2899,12 +2898,12 @@ WRITE16_MEMBER(tx1_state::buggyboy_gas_w)
 	vregs.gas = data;
 }
 
-WRITE16_MEMBER(tx1_state::buggyboy_sky_w)
+void tx1_state::buggyboy_sky_w(uint16_t data)
 {
 	m_vregs.sky = data;
 }
 
-WRITE16_MEMBER(tx1_state::buggyboy_scolst_w)
+void tx1_state::buggyboy_scolst_w(uint16_t data)
 {
 	m_vregs.scol = data;
 }
@@ -2918,10 +2917,9 @@ WRITE16_MEMBER(tx1_state::buggyboy_scolst_w)
 
 void tx1_state::bb_combine_layers(bitmap_ind16 &bitmap, int screen)
 {
-	uint8_t *chr_pal = &m_proms[0x400];
+	uint8_t const *const chr_pal = &m_proms[0x400];
 	uint32_t bmp_stride;
 	uint32_t x_offset;
-	uint32_t y;
 
 	if (screen < 0)
 	{
@@ -2934,10 +2932,8 @@ void tx1_state::bb_combine_layers(bitmap_ind16 &bitmap, int screen)
 		x_offset = 256 * screen;
 	}
 
-	for (y = 0; y < 240; ++y)
+	for (uint32_t y = 0; y < 240; ++y)
 	{
-		uint32_t x;
-
 		uint32_t bmp_offset = y * bmp_stride + x_offset;
 
 		uint8_t *chr_addr = m_chr_bmp.get() + bmp_offset;
@@ -2947,9 +2943,9 @@ void tx1_state::bb_combine_layers(bitmap_ind16 &bitmap, int screen)
 		uint32_t sky_en = BIT(m_vregs.sky, 7);
 		uint32_t sky_val = (((m_vregs.sky & 0x7f) + y) >> 2) & 0x3f;
 
-		uint16_t *bmp_addr = &bitmap.pix16(y);
+		uint16_t *bmp_addr = &bitmap.pix(y);
 
-		for (x = 0; x < 256; ++x)
+		for (uint32_t x = 0; x < 256; ++x)
 		{
 			uint32_t out_val;
 

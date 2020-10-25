@@ -51,7 +51,7 @@ DEFINE_DEVICE_TYPE(PDP8, pdp8_device, "pdp8_cpu", "DEC PDP8")
 
 pdp8_device::pdp8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, PDP8, tag, owner, clock),
-		m_program_config("program", ENDIANNESS_BIG, 12, 12),
+		m_program_config("program", ENDIANNESS_BIG, 12, 12, -1),
 		m_pc(0),
 		m_ac(0),
 		m_mb(0),

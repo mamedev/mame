@@ -19,8 +19,8 @@ public:
 	// construction/destruction
 	xtide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides
@@ -34,6 +34,7 @@ protected:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
+	uint8_t eeprom_read(offs_t offset);
 
 	required_device<ata_interface_device> m_ata;
 	required_device<eeprom_parallel_28xx_device> m_eeprom;

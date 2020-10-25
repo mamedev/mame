@@ -208,44 +208,44 @@ std::string vsmile_cart_slot_device::get_default_card_software(get_default_card_
  cart accessors
  -------------------------------------------------*/
 
-READ16_MEMBER(vsmile_cart_slot_device::bank0_r)
+uint16_t vsmile_cart_slot_device::bank0_r(offs_t offset)
 {
-	return m_cart->bank0_r(space, offset, mem_mask);
+	return m_cart->bank0_r(offset);
 }
 
-READ16_MEMBER(vsmile_cart_slot_device::bank1_r)
+uint16_t vsmile_cart_slot_device::bank1_r(offs_t offset)
 {
-	return m_cart->bank1_r(space, offset, mem_mask);
+	return m_cart->bank1_r(offset);
 }
 
-READ16_MEMBER(vsmile_cart_slot_device::bank2_r)
+uint16_t vsmile_cart_slot_device::bank2_r(offs_t offset)
 {
-	return m_cart->bank2_r(space, offset, mem_mask);
+	return m_cart->bank2_r(offset);
 }
 
-READ16_MEMBER(vsmile_cart_slot_device::bank3_r)
+uint16_t vsmile_cart_slot_device::bank3_r(offs_t offset)
 {
-	return m_cart->bank3_r(space, offset, mem_mask);
+	return m_cart->bank3_r(offset);
 }
 
-WRITE16_MEMBER(vsmile_cart_slot_device::bank0_w)
+void vsmile_cart_slot_device::bank0_w(offs_t offset, uint16_t data)
 {
-	m_cart->bank0_w(space, offset, data, mem_mask);
+	m_cart->bank0_w(offset, data);
 }
 
-WRITE16_MEMBER(vsmile_cart_slot_device::bank1_w)
+void vsmile_cart_slot_device::bank1_w(offs_t offset, uint16_t data)
 {
-	m_cart->bank1_w(space, offset, data, mem_mask);
+	m_cart->bank1_w(offset, data);
 }
 
-WRITE16_MEMBER(vsmile_cart_slot_device::bank2_w)
+void vsmile_cart_slot_device::bank2_w(offs_t offset, uint16_t data)
 {
-	m_cart->bank2_w(space, offset, data, mem_mask);
+	m_cart->bank2_w(offset, data);
 }
 
-WRITE16_MEMBER(vsmile_cart_slot_device::bank3_w)
+void vsmile_cart_slot_device::bank3_w(offs_t offset, uint16_t data)
 {
-	m_cart->bank3_w(space, offset, data, mem_mask);
+	m_cart->bank3_w(offset, data);
 }
 
 void vsmile_cart_slot_device::set_cs2(bool cs2)

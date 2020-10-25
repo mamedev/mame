@@ -71,12 +71,11 @@ REAR BOARD      1C026           N/U       (CUSTOM ON ORIGINAL)
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
 
-READ8_MEMBER(megazone_state::megazone_port_a_r)
+uint8_t megazone_state::megazone_port_a_r()
 {
 	int clock, timer;
 
@@ -95,7 +94,7 @@ READ8_MEMBER(megazone_state::megazone_port_a_r)
 	return (timer << 4) | m_i8039_status;
 }
 
-WRITE8_MEMBER(megazone_state::megazone_port_b_w)
+void megazone_state::megazone_port_b_w(uint8_t data)
 {
 	for (int i = 0; i < 3; i++)
 	{
@@ -110,12 +109,12 @@ WRITE8_MEMBER(megazone_state::megazone_port_b_w)
 	}
 }
 
-WRITE8_MEMBER(megazone_state::megazone_i8039_irq_w)
+void megazone_state::megazone_i8039_irq_w(uint8_t data)
 {
 	m_daccpu->set_input_line(0, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(megazone_state::i8039_irqen_and_status_w)
+void megazone_state::i8039_irqen_and_status_w(uint8_t data)
 {
 	if ((data & 0x80) == 0)
 		m_daccpu->set_input_line(0, CLEAR_LINE);
@@ -345,9 +344,6 @@ void megazone_state::megazone(machine_config &config)
 	aysnd.add_route(2, "filter.0.2", 0.30);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	FILTER_RC(config, m_filter[0]).add_route(ALL_OUTPUTS, "speaker", 1.0);
 	FILTER_RC(config, m_filter[1]).add_route(ALL_OUTPUTS, "speaker", 1.0);

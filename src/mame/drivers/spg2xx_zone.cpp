@@ -30,9 +30,9 @@ protected:
 	uint16_t m_w60_p2_ctrl_mask;
 	uint8_t m_bankmask;
 
-	DECLARE_WRITE16_MEMBER(wireless60_porta_w);
-	DECLARE_WRITE16_MEMBER(wireless60_portb_w);
-	DECLARE_READ16_MEMBER(wireless60_porta_r);
+	void wireless60_porta_w(uint16_t data);
+	void wireless60_portb_w(uint16_t data);
+	uint16_t wireless60_porta_r();
 
 private:
 };
@@ -58,9 +58,9 @@ protected:
 
 private:
 	virtual void mem_map_z40(address_map &map);
-	DECLARE_READ16_MEMBER(z40_rom_r);
-	DECLARE_READ16_MEMBER(zone40_porta_r);
-	DECLARE_WRITE16_MEMBER(zone40_porta_w);
+	uint16_t z40_rom_r(offs_t offset);
+	uint16_t zone40_porta_r();
+	void zone40_porta_w(uint16_t data);
 	required_region_ptr<uint16_t> m_romregion;
 	uint16_t m_z40_rombase;
 	uint16_t m_porta_dat;
@@ -68,7 +68,7 @@ private:
 };
 
 
-WRITE16_MEMBER(wireless60_state::wireless60_porta_w)
+void wireless60_state::wireless60_porta_w(uint16_t data)
 {
 	//logerror("%s: wireless60_porta_w %04x\n", machine().describe_context(), data);
 
@@ -93,21 +93,21 @@ WRITE16_MEMBER(wireless60_state::wireless60_porta_w)
 	}
 }
 
-READ16_MEMBER(wireless60_state::wireless60_porta_r)
+uint16_t wireless60_state::wireless60_porta_r()
 {
 	//logerror("%s: wireless60_porta_r\n", machine().describe_context());
 	return m_w60_porta_data;
 }
 
-WRITE16_MEMBER(wireless60_state::wireless60_portb_w)
+void wireless60_state::wireless60_portb_w(uint16_t data)
 {
 	logerror("%s: wireless60_portb_w (bankswitch) %04x\n", machine().describe_context(), data);
 	switch_bank(data & m_bankmask);
 }
 
-WRITE16_MEMBER(zone40_state::zone40_porta_w)
+void zone40_state::zone40_porta_w(uint16_t data)
 {
-	wireless60_porta_w(space, offset, data);
+	wireless60_porta_w(data);
 
 	m_z40_rombase = (m_z40_rombase & 0xff00) | (data & 0x0ff);
 
@@ -123,15 +123,15 @@ WRITE16_MEMBER(zone40_state::zone40_porta_w)
 
 }
 
-READ16_MEMBER(zone40_state::zone40_porta_r)
+uint16_t zone40_state::zone40_porta_r()
 {
-	uint16_t ret = wireless60_porta_r(space, offset) & (0x0300 | m_w60_p1_ctrl_mask | m_w60_p2_ctrl_mask);
+	uint16_t ret = wireless60_porta_r() & (0x0300 | m_w60_p1_ctrl_mask | m_w60_p2_ctrl_mask);
 	ret = (ret & 0xdf00) | (m_porta_dat & 0x20ff);
 	return ret;
 }
 
 
-READ16_MEMBER(zone40_state::z40_rom_r)
+uint16_t zone40_state::z40_rom_r(offs_t offset)
 {
 	// due to granularity of rom bank this manual method is safer
 	return m_romregion[(offset + (m_z40_rombase * 0x20000)) & (m_romsize-1)];
@@ -341,18 +341,44 @@ ROM_START( lx_jg7415 )
 	ROM_LOAD16_WORD_SWAP( "rom.bin", 0x0000, 0x10000000, CRC(59442e00) SHA1(7e91cf6b19c37f9b4fa4dc21e241c6634d6a6f95) )
 ROM_END
 
+ROM_START( zonemini )
+	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "zonemini.bin", 0x0000, 0x4000000, CRC(ba8c367c) SHA1(92ce2e895145ad76ea68ab7575d2c52aa0c0c5a9) )
+ROM_END
 
-CONS( 2009, zone40,   0, 0, zone40,     wirels60, zone40_state,      init_zone40,     "Jungle Soft / Ultimate Products (HK) Ltd",    "Zone 40",                             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2009, itvg49,   0, 0, zone40p,    wirels60, zone40_state,      init_reactmd,    "TaiKee",                                      "Interactive TV Games 49-in-1 (PAL)",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // Badminton hangs, otherwise everything runs
+ROM_START( react )
+	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "reactor.bin", 0x0000, 0x0800000, CRC(0378c594) SHA1(b2214e3e235f26fb501df6c66a9b2c0da87b1c73))
+	ROM_CONTINUE(0x1000000, 0x0800000)
+	ROM_CONTINUE(0x0800000, 0x0800000)
+	ROM_CONTINUE(0x1800000, 0x0800000)
+	ROM_CONTINUE(0x2000000, 0x0800000)
+	ROM_CONTINUE(0x3000000, 0x0800000)
+	ROM_CONTINUE(0x2800000, 0x0800000)
+	ROM_CONTINUE(0x3800000, 0x0800000)
+ROM_END
 
-CONS( 2010, zone60,   0, 0, wireless60, wirels60, wireless60_state,  empty_init,      "Jungle's Soft / Ultimate Products (HK) Ltd",  "Zone 60",                             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, zone100,  0, 0, wireless60, wirels60, wireless60_state,  init_zone100,    "Jungle's Soft / Ultimate Products (HK) Ltd",  "Zone 100",                            MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // unit was black, menus still show white controllers, unlike wireless 60
-CONS( 2010, wirels60, 0, 0, wireless60, wirels60, wireless60_state,  empty_init,      "Jungle Soft / Kids Station Toys Inc",         "Wireless 60",                         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2011, lx_jg7415,0, 0, wireless60, wirels60, wireless60_state,  init_lx_jg7415,  "Lexibook",                                    "Lexibook JG7415 120-in-1",            MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+// These have games from Waixing and were likely manufactured  by Subor and sold by Ultimate Products Ltd.
+// Many of these games are rewrites of VT1682 based titles, which in turn were based on older NES/VT ones
+// Badminton hangs in units where it is present (cause not yet investigated), otherwise everything runs
 
+// Waixing = "Fuzhou Waixing Computer Science & Technology Co.,LTD"
+
+CONS( 2009, zone40,   0, 0, zone40,     wirels60, zone40_state,      init_zone40,     "Ultimate Products Ltd. / Waixing",                      "Zone 40",                             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2009, itvg49,   0, 0, zone40p,    wirels60, zone40_state,      init_reactmd,    "TaiKee / Waixing",                                      "Interactive TV Games 49-in-1 (PAL)",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, zonemini, 0, 0, zone40,     wirels60, zone40_state,      init_reactmd,    "Ultimate Products Ltd. / Waixing",                      "Zone Mini",                           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2009, react,    0, 0, zone40,     wirels60, zone40_state,      init_reactmd,    "Ultimate Products Ltd. / Waixing",                      "Reactor 32-in-1 (NTSC)",              MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // Two systems in one unit - Genesis on a Chip and SunPlus, only the SunPlus part is currently emulated.  Genesis on a chip is a very poor implementation with many issues on real hardware.
 // This should actually boot to a menu on the MD size, with the SunPlus only being enabled if selected from that menu.  MD side menu runs in some enhanced / custom MD mode tho.
 // Badminton hangs, as it does in the 49-in-1 above
-CONS( 2009, reactmd,  0, 0, zone40p,    wirels60, zone40_state,      init_reactmd,    "AtGames / Sega",                              "Reactor MD (PAL)",                    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2009, reactmd,  0, 0, zone40p,    wirels60, zone40_state,      init_reactmd,    "AtGames / Sega / Waixing",                              "Reactor MD (PAL)",                    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+// These have a newer selection of games by JungleTac instead of the Waixing ones
+
+CONS( 2010, zone60,   0, 0, wireless60, wirels60, wireless60_state,  empty_init,      "Ultimate Products (HK) Ltd / Jungle's Soft",  "Zone 60",                             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, zone100,  0, 0, wireless60, wirels60, wireless60_state,  init_zone100,    "Ultimate Products (HK) Ltd / Jungle's Soft",  "Zone 100",                            MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // unit was black, menus still show white controllers, unlike wireless 60
+CONS( 2010, wirels60, 0, 0, wireless60, wirels60, wireless60_state,  empty_init,      "Kids Station Toys Inc / Jungle Soft",         "Wireless 60",                         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2011, lx_jg7415,0, 0, wireless60, wirels60, wireless60_state,  init_lx_jg7415,  "Lexibook / JungleTac",                        "Lexibook JG7415 120-in-1",            MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
 

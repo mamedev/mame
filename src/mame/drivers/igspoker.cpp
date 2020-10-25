@@ -128,16 +128,16 @@ public:
 	DECLARE_READ_LINE_MEMBER(hopper_r);
 
 private:
-	DECLARE_READ8_MEMBER(igs_irqack_r);
-	DECLARE_WRITE8_MEMBER(igs_irqack_w);
-	DECLARE_WRITE8_MEMBER(bg_tile_w);
-	DECLARE_WRITE8_MEMBER(fg_tile_w);
-	DECLARE_WRITE8_MEMBER(fg_color_w);
-	DECLARE_WRITE8_MEMBER(igs_nmi_and_coins_w);
-	DECLARE_WRITE8_MEMBER(igs_lamps_w);
-	DECLARE_READ8_MEMBER(custom_io_r);
-	DECLARE_WRITE8_MEMBER(custom_io_w);
-	DECLARE_READ8_MEMBER(exp_rom_r);
+	uint8_t igs_irqack_r();
+	void igs_irqack_w(uint8_t data);
+	void bg_tile_w(offs_t offset, uint8_t data);
+	void fg_tile_w(offs_t offset, uint8_t data);
+	void fg_color_w(offs_t offset, uint8_t data);
+	void igs_nmi_and_coins_w(uint8_t data);
+	void igs_lamps_w(uint8_t data);
+	uint8_t custom_io_r();
+	void custom_io_w(uint8_t data);
+	uint8_t exp_rom_r(offs_t offset);
 	void show_out();
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -198,13 +198,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(igspoker_state::igs_interrupt)
 }
 
 
-READ8_MEMBER(igspoker_state::igs_irqack_r)
+uint8_t igspoker_state::igs_irqack_r()
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 	return 0;
 }
 
-WRITE8_MEMBER(igspoker_state::igs_irqack_w)
+void igspoker_state::igs_irqack_w(uint8_t data)
 {
 //  m_maincpu->set_input_line(0, CLEAR_LINE);
 }
@@ -223,19 +223,19 @@ TILE_GET_INFO_MEMBER(igspoker_state::get_fg_tile_info)
 	tileinfo.set(0, code, tile != 0x1fff ? ((code >> 12) & 0xe) + 1 : 0, 0);
 }
 
-WRITE8_MEMBER(igspoker_state::bg_tile_w)
+void igspoker_state::bg_tile_w(offs_t offset, uint8_t data)
 {
 	m_bg_tile_ram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(igspoker_state::fg_tile_w)
+void igspoker_state::fg_tile_w(offs_t offset, uint8_t data)
 {
 	m_fg_tile_ram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(igspoker_state::fg_color_w)
+void igspoker_state::fg_color_w(offs_t offset, uint8_t data)
 {
 	m_fg_color_ram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
@@ -281,7 +281,7 @@ void igspoker_state::show_out()
 #endif
 }
 
-WRITE8_MEMBER(igspoker_state::igs_nmi_and_coins_w)
+void igspoker_state::igs_nmi_and_coins_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0,        data & 0x01);   // coin_a
 	machine().bookkeeping().coin_counter_w(1,        data & 0x04);   // coin_c
@@ -299,7 +299,7 @@ WRITE8_MEMBER(igspoker_state::igs_nmi_and_coins_w)
 	show_out();
 }
 
-WRITE8_MEMBER(igspoker_state::igs_lamps_w)
+void igspoker_state::igs_lamps_w(uint8_t data)
 {
 /*
     - Lbits -
@@ -341,7 +341,7 @@ WRITE8_MEMBER(igspoker_state::igs_lamps_w)
 
 
 
-READ8_MEMBER(igspoker_state::custom_io_r)
+uint8_t igspoker_state::custom_io_r()
 {
 #if VERBOSE
 	logerror("PC %06X: Protection read %02x\n",m_maincpu->pc(), m_protection_res);
@@ -349,7 +349,7 @@ READ8_MEMBER(igspoker_state::custom_io_r)
 	return m_protection_res;
 }
 
-WRITE8_MEMBER(igspoker_state::custom_io_w)
+void igspoker_state::custom_io_w(uint8_t data)
 {
 #if VERBOSE
 	logerror("PC %06X: Protection write %02x\n",m_maincpu->pc(),data);
@@ -400,7 +400,7 @@ READ_LINE_MEMBER(igspoker_state::hopper_r)
 	return machine().input().code_pressed(KEYCODE_H);
 }
 
-READ8_MEMBER(igspoker_state::exp_rom_r)
+uint8_t igspoker_state::exp_rom_r(offs_t offset)
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	return rom[offset+0x10000];

@@ -50,7 +50,6 @@ ToDo:
 #include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 #include "atari_s1.lh"
@@ -80,19 +79,19 @@ public:
 	void atarians(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(m1080_r);
-	DECLARE_WRITE8_MEMBER(m1080_w);
-	DECLARE_READ8_MEMBER(m1084_r);
-	DECLARE_WRITE8_MEMBER(m1084_w);
-	DECLARE_READ8_MEMBER(m1088_r);
-	DECLARE_WRITE8_MEMBER(m1088_w);
-	DECLARE_READ8_MEMBER(m108c_r);
-	DECLARE_WRITE8_MEMBER(m108c_w);
-	DECLARE_READ8_MEMBER(switch_r);
-	DECLARE_WRITE8_MEMBER(meter_w);
-	DECLARE_WRITE8_MEMBER(audioen_w);
-	DECLARE_WRITE8_MEMBER(audiores_w);
-	DECLARE_WRITE8_MEMBER(midearth_w);
+	uint8_t m1080_r();
+	void m1080_w(uint8_t data);
+	uint8_t m1084_r();
+	void m1084_w(uint8_t data);
+	uint8_t m1088_r();
+	void m1088_w(uint8_t data);
+	uint8_t m108c_r();
+	void m108c_w(uint8_t data);
+	uint8_t switch_r(offs_t offset);
+	void meter_w(uint8_t data);
+	void audioen_w(uint8_t data);
+	void audiores_w(uint8_t data);
+	void midearth_w(offs_t offset, uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
 	void atari_s1_map(address_map &map);
@@ -296,22 +295,22 @@ static INPUT_PORTS_START( atari_s1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER )
 INPUT_PORTS_END
 
-READ8_MEMBER( atari_s1_state::m1080_r )
+uint8_t atari_s1_state::m1080_r()
 {
 	return m_1080 & 0xf0;
 }
 
-WRITE8_MEMBER( atari_s1_state::m1080_w )
+void atari_s1_state::m1080_w(uint8_t data)
 {
 	m_1080 = data;
 }
 
-READ8_MEMBER( atari_s1_state::m1084_r )
+uint8_t atari_s1_state::m1084_r()
 {
 	return m_1084 & 0xf0;
 }
 
-WRITE8_MEMBER( atari_s1_state::m1084_w )
+void atari_s1_state::m1084_w(uint8_t data)
 {
 	m_1084 = data;
 
@@ -325,54 +324,54 @@ WRITE8_MEMBER( atari_s1_state::m1084_w )
 	}
 }
 
-READ8_MEMBER( atari_s1_state::m1088_r )
+uint8_t atari_s1_state::m1088_r()
 {
 	return m_1088 & 0xf0;
 }
 
-WRITE8_MEMBER( atari_s1_state::m1088_w )
+void atari_s1_state::m1088_w(uint8_t data)
 {
 	m_1088 = data;
 }
 
-READ8_MEMBER( atari_s1_state::m108c_r )
+uint8_t atari_s1_state::m108c_r()
 {
 	return m_108c;
 }
 
-WRITE8_MEMBER( atari_s1_state::m108c_w )
+void atari_s1_state::m108c_w(uint8_t data)
 {
 	m_108c = data;
 }
 
-WRITE8_MEMBER( atari_s1_state::meter_w )
+void atari_s1_state::meter_w(uint8_t data)
 {
 // time2000 has optional coin counters etc
 }
 
 // midearth has a ram mirror that goes on top of the output ports
-WRITE8_MEMBER( atari_s1_state::midearth_w )
+void atari_s1_state::midearth_w(offs_t offset, uint8_t data)
 {
 	m_p_ram[offset] = data;
 
 	switch (offset)
 	{
 		case 0x80:
-			m1080_w(space, 0, data);
+			m1080_w(data);
 			break;
 		case 0x84:
-			m1084_w(space, 0, data);
+			m1084_w(data);
 			break;
 		case 0x88:
-			m1088_w(space, 0, data);
+			m1088_w(data);
 			break;
 		case 0x8c:
-			m108c_w(space, 0, data);
+			m108c_w(data);
 			break;
 	}
 }
 
-READ8_MEMBER( atari_s1_state::switch_r )
+uint8_t atari_s1_state::switch_r(offs_t offset)
 {
 	return (BIT(m_switch[offset>>3]->read(), offset&7 ) << 7) | (BIT(m_bit6, 1) << 6); // switch bit | BIT6_CLK
 }
@@ -430,11 +429,11 @@ TIMER_DEVICE_CALLBACK_MEMBER( atari_s1_state::timer_s )
 	}
 }
 
-WRITE8_MEMBER( atari_s1_state::audioen_w )
+void atari_s1_state::audioen_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER( atari_s1_state::audiores_w )
+void atari_s1_state::audiores_w(uint8_t data)
 {
 	if (data==0x5b) data=0; // spcrider
 	m_audiores = (data) ? 0 : 1;
@@ -463,9 +462,6 @@ void atari_s1_state::atari_s1(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	DAC_4BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.3); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	/* Video */
 	config.set_default_layout(layout_atari_s1);
@@ -531,7 +527,16 @@ ROM_START(midearth)
 	ROM_LOAD("608.bin", 0x7800, 0x0800, CRC(28b92faf) SHA1(8585770f4059049f1dcbc0c6ef5718b6ff1a5431))
 
 	ROM_REGION(0x0200, "proms", 0)
-	ROM_LOAD("82s130.bin", 0x0000, 0x0200, CRC(da1f77b4) SHA1(b21fdc1c6f196c320ec5404013d672c35f95890b))
+	ROM_LOAD("20252-01.bin", 0x0000, 0x0200, CRC(3d44551d) SHA1(926100f8169ab20230ad2168f94e6ad65fb1a7dc))
+ROM_END
+
+ROM_START(mideartha)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("20855-01.bin", 0x7000, 0x0800, CRC(4a9d47ca) SHA1(57c4458822109c3ba2fa53ac1c1cd6e169e51b24))
+	ROM_LOAD("20856-01.bin", 0x7800, 0x0800, CRC(8f119e37) SHA1(5a4d63605865f3ceca4c09dbdcd888498c615b89))
+
+	ROM_REGION(0x0200, "proms", 0)
+	ROM_LOAD("20252-01.bin", 0x0000, 0x0200, CRC(3d44551d) SHA1(926100f8169ab20230ad2168f94e6ad65fb1a7dc))
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -547,8 +552,9 @@ ROM_START(spcrider)
 ROM_END
 
 
-GAME( 1976, atarians, 0, atarians, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "The Atarians",     MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-GAME( 1977, time2000, 0, atari_s1, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "Time 2000",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-GAME( 1977, aavenger, 0, atari_s1, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "Airborne Avenger", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-GAME( 1978, midearth, 0, midearth, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "Middle Earth",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1978, spcrider, 0, atari_s1, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "Space Riders",     MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+GAME( 1976, atarians,  0,        atarians, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "The Atarians",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+GAME( 1977, time2000,  0,        atari_s1, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "Time 2000",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+GAME( 1977, aavenger,  0,        atari_s1, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "Airborne Avenger",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+GAME( 1978, midearth,  0,        midearth, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "Middle Earth",             MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1978, mideartha, midearth, midearth, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "Middle Earth (alternate)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1978, spcrider,  0,        atari_s1, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "Space Riders",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

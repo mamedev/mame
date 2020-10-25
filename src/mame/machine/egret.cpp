@@ -86,7 +86,7 @@ void egret_device::egret_map(address_map &map)
 
 void egret_device::device_add_mconfig(machine_config &config)
 {
-	M68HC05EG(config, m_maincpu, XTAL(32'768)*192);  // 32.768 kHz input clock, can be PLL'ed to x128 = 4.1 MHz under s/w control
+	M68HC05EG(config, m_maincpu, XTAL(32'768)*128);  // Intended to run 4.1 MHz, the ADB timings in uS are twice as long as spec at 2.1
 	m_maincpu->set_addrmap(AS_PROGRAM, &egret_device::egret_map);
 }
 
@@ -111,19 +111,20 @@ void egret_device::send_port(uint8_t offset, uint8_t data)
 
 			if ((data & 0x80) != last_adb)
 			{
-/*                if (data & 0x80)
-                {
-                    printf("EG ADB: 1->0 time %lld\n", machine().time().as_ticks(1000000) - last_adb_time);
-                }
-                else
-                {
-                    printf("EG ADB: 0->1 time %lld\n", machine().time().as_ticks(1000000) - last_adb_time);
-                }*/
-
+				m_adb_dtime = (int)(machine().time().as_ticks(1000000) - last_adb_time);
+				/*
+				if (data & 0x80)
+				{
+				    printf("EG ADB: 1->0 time %d\n", m_adb_dtime);
+				}
+				else
+				{
+				    printf("EG ADB: 0->1 time %d\n", m_adb_dtime);
+				}
+				*/
 				// allow the linechange handler to override us
 				adb_in = (data & 0x80) ? true : false;
 
-				m_adb_dtime = (int)(machine().time().as_ticks(1000000) - last_adb_time);
 				write_linechange(((data & 0x80) >> 7) ^ 1);
 
 				last_adb = data & 0x80;

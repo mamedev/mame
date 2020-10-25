@@ -205,17 +205,17 @@ private:
 	void geniusiq_palette(palette_device &palette) const;
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ16_MEMBER(input_r);
-	DECLARE_WRITE16_MEMBER(mouse_pos_w);
-	DECLARE_WRITE16_MEMBER(gfx_base_w);
-	DECLARE_WRITE16_MEMBER(gfx_dest_w);
-	DECLARE_WRITE16_MEMBER(gfx_color_w);
-	DECLARE_WRITE16_MEMBER(gfx_idx_w);
+	uint16_t input_r();
+	void mouse_pos_w(offs_t offset, uint16_t data);
+	void gfx_base_w(offs_t offset, uint16_t data);
+	void gfx_dest_w(offs_t offset, uint16_t data);
+	void gfx_color_w(offs_t offset, uint16_t data);
+	void gfx_idx_w(uint16_t data);
 	void queue_input(uint16_t data);
-	DECLARE_READ16_MEMBER(cart_state_r);
+	uint16_t cart_state_r();
 
-	DECLARE_READ16_MEMBER(unk0_r) { return 0; }
-	DECLARE_READ16_MEMBER(unk_r) { return machine().rand(); }
+	uint16_t unk0_r() { return 0; }
+	uint16_t unk_r() { return machine().rand(); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(cart_unload);
 
@@ -275,7 +275,7 @@ uint32_t geniusiq_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 			for(int b=0; b<4; b++)
 			{
-				bitmap.pix16(y, x*2 + b) = (data>>12) & 0x0f;
+				bitmap.pix(y, x*2 + b) = (data>>12) & 0x0f;
 				data <<= 4;
 			}
 		}
@@ -292,7 +292,7 @@ uint32_t geniusiq_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 				// I assume color 0 is transparent
 				if(pen != 0 && screen.visible_area().contains(m_mouse_gfx_posx + x*4 + b, m_mouse_gfx_posy + y))
-					bitmap.pix16(m_mouse_gfx_posy + y, m_mouse_gfx_posx + x*4 + b) = pen;
+					bitmap.pix(m_mouse_gfx_posy + y, m_mouse_gfx_posx + x*4 + b) = pen;
 				data <<= 2;
 			}
 		}
@@ -300,12 +300,12 @@ uint32_t geniusiq_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-READ16_MEMBER( geniusiq_state::cart_state_r )
+uint16_t geniusiq_state::cart_state_r()
 {
 	return m_cart_state;
 }
 
-WRITE16_MEMBER( geniusiq_state::mouse_pos_w )
+void geniusiq_state::mouse_pos_w(offs_t offset, uint16_t data)
 {
 	if (offset)
 		m_mouse_gfx_posy = data;
@@ -313,12 +313,12 @@ WRITE16_MEMBER( geniusiq_state::mouse_pos_w )
 		m_mouse_gfx_posx = data;
 }
 
-WRITE16_MEMBER(geniusiq_state::gfx_color_w)
+void geniusiq_state::gfx_color_w(offs_t offset, uint16_t data)
 {
 	m_gfx_color[offset & 1] = data & 0x0f;
 }
 
-WRITE16_MEMBER(geniusiq_state::gfx_dest_w)
+void geniusiq_state::gfx_dest_w(offs_t offset, uint16_t data)
 {
 	if (offset)
 		m_gfx_y = data;
@@ -326,7 +326,7 @@ WRITE16_MEMBER(geniusiq_state::gfx_dest_w)
 		m_gfx_x = data;
 }
 
-WRITE16_MEMBER(geniusiq_state::gfx_base_w)
+void geniusiq_state::gfx_base_w(offs_t offset, uint16_t data)
 {
 	if (offset)
 		m_gfx_base = (m_gfx_base & 0xffff0000) | (data<<0);
@@ -334,7 +334,7 @@ WRITE16_MEMBER(geniusiq_state::gfx_base_w)
 		m_gfx_base = (m_gfx_base & 0x0000ffff) | (data<<16);
 }
 
-WRITE16_MEMBER(geniusiq_state::gfx_idx_w)
+void geniusiq_state::gfx_idx_w(uint16_t data)
 {
 	uint16_t *gfx = m_rom + ((m_gfx_base + (data & 0xff)*32)>>1);
 
@@ -354,7 +354,7 @@ WRITE16_MEMBER(geniusiq_state::gfx_idx_w)
 		}
 }
 
-READ16_MEMBER( geniusiq_state::input_r )
+uint16_t geniusiq_state::input_r()
 {
 	/*
 	    this is guesswork and may not be correct
@@ -487,7 +487,7 @@ static INPUT_PORTS_START( geniusiq )
 	PORT_START( "IN2" )
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_0 )         PORT_CHAR(0x00e0)   PORT_CHAR('0')  PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x20 )
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Return") PORT_CODE( KEYCODE_ENTER )     PORT_CHAR(13)   PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x21 )
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Backspace") PORT_CODE( KEYCODE_BACKSPACE ) PORT_CHAR(UCHAR_MAMEKEY(BACKSPACE))  PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x22 )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Backspace") PORT_CODE( KEYCODE_BACKSPACE ) PORT_CHAR(8)  PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x22 )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_L )         PORT_CHAR('l')  PORT_CHAR('L')  PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x23 )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_O )         PORT_CHAR('o')  PORT_CHAR('O')  PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x24 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_9 )         PORT_CHAR(0x00e7)   PORT_CHAR('9')  PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x25 )
@@ -610,7 +610,7 @@ static INPUT_PORTS_START( geniusiq_de )
 	PORT_MODIFY( "IN1" )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_QUOTE )     PORT_CHAR('^')  PORT_CHAR(0x00b0)   PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x17 )
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_BACKSLASH ) PORT_CHAR('+')  PORT_CHAR('*')      PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x18 )
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_EQUALS )    PORT_CHAR('{')  PORT_CHAR('}')  PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x19 )
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_EQUALS )    PORT_CHAR('}')  PORT_CHAR('{')  PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x19 )
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_CLOSEBRACE ) PORT_CHAR(0x00b0)  PORT_CHAR('?')  PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x1a )
 	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_OPENBRACE )  PORT_CHAR(0x00e4)  PORT_CHAR(0x00c4)   PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x1b )
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_SLASH )     PORT_CHAR(0x00fc)   PORT_CHAR(0x00dc)   PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x1c )

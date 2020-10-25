@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
+// thanks-to:digshadow, segher
 /***************************************************************************
 
   Bandai Tamagotchi generation 1 hardware
@@ -24,7 +25,6 @@ public:
 	tamag1_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_speaker(*this, "speaker"),
 		m_out_x(*this, "%u.%u", 0U, 0U)
 	{ }
 
@@ -33,14 +33,12 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
 
 private:
-	DECLARE_WRITE8_MEMBER(speaker_w);
 	void tama_palette(palette_device &palette) const;
 	E0C6S46_PIXEL_UPDATE(pixel_update);
 
 	virtual void machine_start() override;
 
 	required_device<e0c6s46_device> m_maincpu;
-	required_device<speaker_sound_device> m_speaker;
 	output_finder<16, 40> m_out_x;
 };
 
@@ -71,7 +69,7 @@ E0C6S46_PIXEL_UPDATE(tamag1_state::pixel_update)
 
 	int y = com, x = seg2x[seg];
 	if (cliprect.contains(x, y))
-		bitmap.pix16(y, x) = state;
+		bitmap.pix(y, x) = state;
 
 	// 2 rows of indicators:
 	// above screen: 0:meal, 1:lamp, 2:play, 3:medicine
@@ -86,20 +84,6 @@ void tamag1_state::tama_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(0xf1, 0xf0, 0xf9)); // background
 	palette.set_pen_color(1, rgb_t(0x3c, 0x38, 0x38)); // lcd pixel
-}
-
-
-
-/***************************************************************************
-
-  I/O
-
-***************************************************************************/
-
-WRITE8_MEMBER(tamag1_state::speaker_w)
-{
-	// R43: speaker out
-	m_speaker->level_w(data >> 3 & 1);
 }
 
 
@@ -140,7 +124,7 @@ void tamag1_state::tama(machine_config &config)
 	/* basic machine hardware */
 	E0C6S46(config, m_maincpu, 32.768_kHz_XTAL);
 	m_maincpu->set_pixel_update_cb(FUNC(tamag1_state::pixel_update));
-	m_maincpu->write_r<4>().set(FUNC(tamag1_state::speaker_w));
+	m_maincpu->write_r<4>().set("speaker", FUNC(speaker_sound_device::level_w)).bit(3);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
@@ -156,7 +140,7 @@ void tamag1_state::tama(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 

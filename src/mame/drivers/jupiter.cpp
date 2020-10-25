@@ -86,9 +86,9 @@ public:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void kbd_put(u8 data);
-	DECLARE_READ8_MEMBER(status_r);
-	DECLARE_READ8_MEMBER(key_r);
-	DECLARE_READ8_MEMBER(ff_r);
+	uint8_t status_r();
+	uint8_t key_r();
+	uint8_t ff_r();
 
 	void jupiter3_io(address_map &map);
 	void jupiter3_mem(address_map &map);
@@ -161,7 +161,7 @@ void jupiter3_state::jupiter3_io(address_map &map)
 	map(0xb2, 0xb2).r(FUNC(jupiter3_state::key_r));
 }
 
-READ8_MEMBER( jupiter3_state::ff_r )
+uint8_t jupiter3_state::ff_r()
 {
 	return 0xfd;
 }
@@ -177,14 +177,14 @@ READ8_MEMBER( jupiter3_state::ff_r )
 static INPUT_PORTS_START( jupiter )
 INPUT_PORTS_END
 
-READ8_MEMBER( jupiter3_state::key_r )
+uint8_t jupiter3_state::key_r()
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-READ8_MEMBER( jupiter3_state::status_r )
+uint8_t jupiter3_state::status_r()
 {
 	return (m_term_data) ? 0x80 : 0x00;
 }
@@ -202,21 +202,20 @@ void jupiter3_state::kbd_put(u8 data)
 
 uint32_t jupiter3_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y,ra,chr,gfx;
-	uint16_t sy=0,ma=0,x;
+	uint16_t sy=0,ma=0;
 
-	for (y = 0; y < 32; y++)
+	for (uint8_t y = 0; y < 32; y++)
 	{
-		for (ra = 0; ra < 10; ra++)
+		for (uint8_t ra = 0; ra < 10; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix(sy++);
 
-			for (x = ma; x < ma + 64; x++)
+			for (uint16_t x = ma; x < ma + 64; x++)
 			{
-				gfx = 0;
+				uint8_t gfx = 0;
 				if (ra < 9)
 				{
-					chr = m_p_videoram[x];
+					uint8_t chr = m_p_videoram[x];
 					gfx = m_p_chargen[(chr<<4) | ra ];
 				}
 

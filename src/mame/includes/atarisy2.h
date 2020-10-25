@@ -10,6 +10,7 @@
 #include "cpu/t11/t11.h"
 #include "machine/bankdev.h"
 #include "machine/gen_latch.h"
+#include "machine/slapstic.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
@@ -18,7 +19,6 @@
 #include "video/atarimo.h"
 #include "emupal.h"
 #include "screen.h"
-#include "slapstic.h"
 #include "tilemap.h"
 
 class atarisy2_state : public driver_device
@@ -146,11 +146,11 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(vblank_int);
 	TIMER_CALLBACK_MEMBER(delayed_int_enable_w);
 	TIMER_CALLBACK_MEMBER(reset_yscroll_callback);
-	DECLARE_READ16_MEMBER(slapstic_r);
-	DECLARE_WRITE16_MEMBER(slapstic_w);
-	DECLARE_WRITE16_MEMBER(yscroll_w);
-	DECLARE_WRITE16_MEMBER(xscroll_w);
-	DECLARE_WRITE16_MEMBER(spriteram_w);
+	uint16_t slapstic_r(address_space &space, offs_t offset);
+	void slapstic_w(address_space &space, offs_t offset, uint16_t data);
+	void yscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void xscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void spriteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	static rgb_t RRRRGGGGBBBBIIII(uint32_t raw);
 
 	static const atari_motion_objects_config s_mob_config;

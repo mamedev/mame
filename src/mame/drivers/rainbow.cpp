@@ -458,14 +458,14 @@ public:
 		m_inp2(*this, "W14"),
 		m_inp3(*this, "W15"),
 		m_inp4(*this, "W18"),
-		m_inp5(*this, "DEC HARD DISK"), // DO NOT CHANGE ORDER
-		m_inp6(*this, "CORVUS HARD DISKS"), // DO NOT CHANGE ORDER
-		m_inp7(*this, "GRAPHICS OPTION"),   // DO NOT CHANGE ORDER
-		m_inp9(*this, "MONO MONITOR TYPE"),
+		m_inp5(*this, "DEC_HARD_DISK"), // DO NOT CHANGE ORDER
+		m_inp6(*this, "CORVUS_HARD_DISKS"), // DO NOT CHANGE ORDER
+		m_inp7(*this, "GRAPHICS_OPTION"),   // DO NOT CHANGE ORDER
+		m_inp9(*this, "MONO_MONITOR_TYPE"),
 		m_inp10(*this, "J17"),
 		m_inp11(*this, "CLIKCLOK"),
 		m_inp12(*this, "WATCHDOG"),
-		m_inp13(*this, "MONITOR CONFIGURATION"),
+		m_inp13(*this, "MONITOR_CONFIGURATION"),
 
 		m_crtc(*this, "vt100_video"),
 
@@ -497,7 +497,9 @@ public:
 		m_palette2(*this, "palette2"), // GDC
 		m_video_ram(*this, "vram"),
 
-		m_digits(*this, "digit%u", 0U)
+		m_digits(*this, "digit%u", 0U),
+		m_leds(*this, "led%u", 1U),
+		m_driveleds(*this, "driveled%u", 0U)
 	{
 	}
 
@@ -511,30 +513,30 @@ protected:
 	void rainbow8088_base_map(address_map &map);
 	void rainbow8088_base_io(address_map &map);
 
-	DECLARE_READ8_MEMBER(ext_ram_r);
+	uint8_t ext_ram_r(offs_t offset);
 
-	DECLARE_WRITE8_MEMBER(rtc_w);
+	void rtc_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER(read_video_ram_r);
+	uint8_t read_video_ram_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(video_interrupt);
 
-	DECLARE_READ8_MEMBER(diagnostic_r);
-	DECLARE_WRITE8_MEMBER(diagnostic_w);
+	uint8_t diagnostic_r();
+	void diagnostic_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(comm_control_r);
-	DECLARE_WRITE8_MEMBER(comm_control_w);
+	uint8_t comm_control_r();
+	void comm_control_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(share_z80_r);
-	DECLARE_WRITE8_MEMBER(share_z80_w);
+	uint8_t share_z80_r(offs_t offset);
+	void share_z80_w(offs_t offset, uint8_t data);
 
 	// 'RD51' MFM CONTROLLER (WD1010) *************************************
-	DECLARE_READ8_MEMBER(hd_status_60_r); // TRI STATE DATA PORT (R/W)
-	DECLARE_WRITE8_MEMBER(hd_status_60_w);
+	uint8_t hd_status_60_r(); // TRI STATE DATA PORT (R/W)
+	void hd_status_60_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(hd_status_68_r); // EXTRA REGISTER 0x68 (R/W 8088)
-	DECLARE_WRITE8_MEMBER(hd_status_68_w);
+	uint8_t hd_status_68_r(); // EXTRA REGISTER 0x68 (R/W 8088)
+	void hd_status_68_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(hd_status_69_r); // EXTRA REGISTER 0x69 (R/- 8088)
+	uint8_t hd_status_69_r(); // EXTRA REGISTER 0x69 (R/- 8088)
 
 	DECLARE_WRITE_LINE_MEMBER(bundle_irq);
 	DECLARE_WRITE_LINE_MEMBER(hdc_bdrq);  // BUFFER DATA REQUEST (FROM WD)
@@ -549,37 +551,37 @@ protected:
 	DECLARE_READ_LINE_MEMBER(hdc_drive_ready);
 	DECLARE_READ_LINE_MEMBER(hdc_write_fault);
 
-	DECLARE_READ8_MEMBER(corvus_status_r);
+	uint8_t corvus_status_r();
 
-	DECLARE_READ8_MEMBER(i8088_latch_r);
-	DECLARE_WRITE8_MEMBER(i8088_latch_w);
-	DECLARE_READ8_MEMBER(z80_latch_r);
-	DECLARE_WRITE8_MEMBER(z80_latch_w);
+	uint8_t i8088_latch_r();
+	void i8088_latch_w(uint8_t data);
+	uint8_t z80_latch_r();
+	void z80_latch_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(z80_diskdiag_read_w);
-	DECLARE_WRITE8_MEMBER(z80_diskdiag_write_w);
+	void z80_diskdiag_read_w(uint8_t data);
+	void z80_diskdiag_write_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(z80_generalstat_r);
+	uint8_t z80_generalstat_r();
 
-	DECLARE_READ8_MEMBER(z80_diskstatus_r);
-	DECLARE_WRITE8_MEMBER(z80_diskcontrol_w);
+	uint8_t z80_diskstatus_r();
+	void z80_diskcontrol_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(kbd_tx);
 	DECLARE_WRITE_LINE_MEMBER(kbd_rxready_w);
 	DECLARE_WRITE_LINE_MEMBER(kbd_txready_w);
 
-	DECLARE_READ8_MEMBER(rtc_reset);
-	DECLARE_READ8_MEMBER(rtc_enable);
+	uint8_t rtc_reset();
+	uint8_t rtc_enable();
 
 	DECLARE_WRITE_LINE_MEMBER(mpsc_irq);
-	DECLARE_WRITE8_MEMBER(comm_bitrate_w);
-	DECLARE_WRITE8_MEMBER(printer_bitrate_w);
-	DECLARE_WRITE8_MEMBER(bitrate_counter_w);
+	void comm_bitrate_w(uint8_t data);
+	void printer_bitrate_w(uint8_t data);
+	void bitrate_counter_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(dbrg_fr_w);
 	DECLARE_WRITE_LINE_MEMBER(dbrg_ft_w);
 
-	DECLARE_WRITE8_MEMBER(GDC_EXTRA_REGISTER_w);
-	DECLARE_READ8_MEMBER(GDC_EXTRA_REGISTER_r);
+	void GDC_EXTRA_REGISTER_w(offs_t offset, uint8_t data);
+	uint8_t GDC_EXTRA_REGISTER_r(offs_t offset);
 
 	uint32_t screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	IRQ_CALLBACK_MEMBER(irq_callback);
@@ -589,8 +591,8 @@ protected:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
-	DECLARE_READ16_MEMBER(vram_r);
-	DECLARE_WRITE16_MEMBER(vram_w);
+	uint16_t vram_r(offs_t offset);
+	void vram_w(offs_t offset, uint16_t data);
 	DECLARE_WRITE_LINE_MEMBER(GDC_vblank_irq);
 
 	void rainbowz80_io(address_map &map);
@@ -652,6 +654,8 @@ protected:
 	required_shared_ptr<uint16_t> m_video_ram;
 
 	output_finder<2> m_digits;
+	output_finder<7> m_leds;
+	output_finder<4> m_driveleds;
 
 	void raise_8088_irq(int ref);
 	void lower_8088_irq(int ref);
@@ -757,10 +761,10 @@ private:
 	void rainbow8088_map(address_map &map);
 	void rainbow8088_io(address_map &map);
 
-	DECLARE_WRITE8_MEMBER(ext_ram_w);
-	DECLARE_READ8_MEMBER(rtc_r);
+	void ext_ram_w(offs_t offset, uint8_t data);
+	uint8_t rtc_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(irq_hi_w);
-	DECLARE_READ8_MEMBER(system_parameter_r);
+	uint8_t system_parameter_r();
 };
 
 class rainbow_modelb_state : public rainbow_base_state
@@ -779,10 +783,10 @@ private:
 	void rainbow8088_map(address_map &map);
 	void rainbow8088_io(address_map &map);
 
-	DECLARE_WRITE8_MEMBER(ext_ram_w);
-	DECLARE_READ8_MEMBER(rtc_r);
+	void ext_ram_w(offs_t offset, uint8_t data);
+	uint8_t rtc_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(irq_hi_w);
-	DECLARE_READ8_MEMBER(system_parameter_r);
+	uint8_t system_parameter_r();
 };
 
 // It * should be * OK to RESET the SCROLL_BUFFER and the COLOR_MAP (at least with WELL WRITTEN programs)
@@ -830,7 +834,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( rainbow_base_state::hgdc_display_pixels )
 		for (int xi = 0; xi < 16; xi++) // blank screen when VT102 output active (..)
 		{
 			if (bitmap.cliprect().contains(x + xi, y))
-				bitmap.pix32(y, x + xi) = 0;
+				bitmap.pix(y, x + xi) = 0;
 		}
 		return; // no output from graphics option
 	}
@@ -864,7 +868,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( rainbow_base_state::hgdc_display_pixels )
 			 (BIT(plane3 ,xi) << 3);
 
 		if (bitmap.cliprect().contains(x + xi, y))
-			bitmap.pix32(y, x + xi) = paletteX[mono ? (pen + 16) : pen];
+			bitmap.pix(y, x + xi) = paletteX[mono ? (pen + 16) : pen];
 	}
 }
 
@@ -893,6 +897,8 @@ void rainbow_base_state::machine_start()
 	switch_off_timer->adjust(attotime::from_msec(10));
 
 	m_digits.resolve();
+	m_leds.resolve();
+	m_driveleds.resolve();
 
 	m_screen_blank = false;
 
@@ -1093,7 +1099,7 @@ void rainbow_base_state::rainbowz80_io(address_map &map)
 /* DIP switches */
 static INPUT_PORTS_START(rainbow100b_in)
 
-	PORT_START("MONO MONITOR TYPE")
+	PORT_START("MONO_MONITOR_TYPE")
 	PORT_DIPNAME(0x03, 0x03, "MONO MONITOR TYPE")
 	PORT_DIPSETTING(0x01, "WHITE (VR201-A)")
 	PORT_DIPSETTING(0x02, "GREEN (VR201-B)")
@@ -1102,12 +1108,12 @@ static INPUT_PORTS_START(rainbow100b_in)
 	// FLOPPY, BUNDLE, GRAPHICS affect 'system_parameter_r':
 
 	// EXT.COMM.card -or- RD51 HD. controller (marketed later).
-	PORT_START("DEC HARD DISK") // BUNDLE_OPTION
+	PORT_START("DEC_HARD_DISK") // BUNDLE_OPTION
 	PORT_DIPNAME(0x01, 0x00, "DEC HARD DISK (#1)") PORT_TOGGLE
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x01, DEF_STR(On))
 
-	PORT_START("CORVUS HARD DISKS")
+	PORT_START("CORVUS_HARD_DISKS")
 	PORT_DIPNAME(0x01, 0x00, "CORVUS HARD DISKS (#2 to #5)") PORT_TOGGLE
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x01, DEF_STR(On))
@@ -1117,7 +1123,7 @@ static INPUT_PORTS_START(rainbow100b_in)
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x01, DEF_STR(On))
 
-	PORT_START("GRAPHICS OPTION") // GDC
+	PORT_START("GRAPHICS_OPTION") // GDC
 	PORT_DIPNAME(0x01, 0x00, "GRAPHICS OPTION") PORT_TOGGLE
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x01, DEF_STR(On))
@@ -1154,7 +1160,7 @@ static INPUT_PORTS_START(rainbow100b_in)
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x01, DEF_STR(On))
 
-	PORT_START("MONITOR CONFIGURATION") // GDC
+	PORT_START("MONITOR_CONFIGURATION") // GDC
 	PORT_DIPNAME(0x0F, 0x04, "MONITOR CONFIGURATION")
 	PORT_DIPSETTING(0x04, "AUTODETECT")
 	PORT_DIPSETTING(0x01, "MONO ONLY / 4 to 16 monochrome shades (single VR-201)")
@@ -1178,8 +1184,8 @@ void rainbow_base_state::machine_reset()
 	{
 		// Install 8088 read / write handler
 		io.unmap_readwrite(0x60, 0x60);
-		io.install_read_handler(0x60, 0x60, read8_delegate(*this, FUNC(rainbow_base_state::hd_status_60_r)));
-		io.install_write_handler(0x60, 0x60, write8_delegate(*this, FUNC(rainbow_base_state::hd_status_60_w)));
+		io.install_read_handler(0x60, 0x60, read8smo_delegate(*this, FUNC(rainbow_base_state::hd_status_60_r)));
+		io.install_write_handler(0x60, 0x60, write8smo_delegate(*this, FUNC(rainbow_base_state::hd_status_60_w)));
 
 		hdc_reset();
 		m_hdc_drive_ready = true;
@@ -1188,7 +1194,7 @@ void rainbow_base_state::machine_reset()
 		hard_disk_file *local_hard_disk;
 		local_hard_disk = rainbow_hdc_file(0); // one hard disk for now.
 
-		output().set_value("led1", 0);
+		m_leds[0] = 0;
 		switch_off_timer->adjust(attotime::from_msec(500));
 
 		if (local_hard_disk)
@@ -1196,7 +1202,7 @@ void rainbow_base_state::machine_reset()
 			hard_disk_info *info;
 			if ((info = hard_disk_get_info(local_hard_disk)))
 			{
-				output().set_value("led1", 1);
+				m_leds[0] = 1;
 
 				uint32_t max_sector = (info->cylinders) * (info->heads) * (info->sectors);
 				popmessage("DEC %u (%3.2f) MB HARD DISK MOUNTED.\nGEOMETRY: %d HEADS (1..%d ARE OK).\n%d CYLINDERS (151 to %d ARE OK).\n%d SECTORS / TRACK (up to %d ARE OK). \n%d BYTES / SECTOR (128 to 1024 ARE OK).\n",
@@ -1251,19 +1257,15 @@ void rainbow_base_state::machine_reset()
 	m_irq_mask = 0;
 
 	// RESET RED LEDs
-	output().set_value("led1", 1);
-	output().set_value("led2", 1);
-	output().set_value("led3", 1);
-	output().set_value("led4", 1);
-	output().set_value("led5", 1);
-	output().set_value("led6", 1);
-	output().set_value("led7", 1);
+	m_leds[0] = 1;
+	m_leds[1] = 1;
+	m_leds[2] = 1;
+	m_leds[3] = 1;
+	m_leds[4] = 1;
+	m_leds[5] = 1;
+	m_leds[6] = 1;
 
-	// GREEN KEYBOARD LEDs (1 = on, 0 = off):
-	output().set_value("led_wait", 0);    // led8
-	output().set_value("led_compose", 0); // led9
-	output().set_value("led_lock", 0);    // led10
-	output().set_value("led_hold", 0);    // led11
+	// GREEN KEYBOARD LEDs (see machine/dec_lk201.cpp)
 }
 
 void rainbow_modela_state::machine_reset()
@@ -1302,13 +1304,13 @@ void rainbow_base_state::device_timer(emu_timer &timer, device_timer_id tid, int
 
 		switch_off_timer->adjust(attotime::never);
 
-		output().set_value("driveled0", 0); // DRIVE 0 (A)
-		output().set_value("driveled1", 0); // DRIVE 1 (B)
-		output().set_value("driveled2", 0); // DRIVE 2 (C)
-		output().set_value("driveled3", 0); // DRIVE 3 (D)
+		m_driveleds[0] = 0; // DRIVE 0 (A)
+		m_driveleds[1] = 0; // DRIVE 1 (B)
+		m_driveleds[2] = 0; // DRIVE 2 (C)
+		m_driveleds[3] = 0; // DRIVE 3 (D)
 
-		output().set_value("led1", 1);  // 1 = OFF (One of the CPU LEDs as drive LED for DEC hard disk)
-		output().set_value("led2", 1);  // 1 = OFF (One of the CPU LEDs as drive LED for Corvus HD)
+		m_leds[0] = 1;  // 1 = OFF (One of the CPU LEDs as drive LED for DEC hard disk)
+		m_leds[1] = 1;  // 1 = OFF (One of the CPU LEDs as drive LED for Corvus HD)
 
 		break; // case 1
 
@@ -1399,7 +1401,7 @@ WRITE_LINE_MEMBER(rainbow_base_state::mpsc_irq)
 }
 
 // PORT 0x06 : Communication bit rates (see page 21 of PC 100 SPEC)
-WRITE8_MEMBER(rainbow_base_state::comm_bitrate_w)
+void rainbow_base_state::comm_bitrate_w(uint8_t data)
 {
 	m_dbrg->str_w(data & 0x0f);  // PDF is wrong, low nibble is RECEIVE clock (verified in SETUP).
 	logerror("\n(COMM.) receive bitrate = %d ($%02x)\n", comm_rates[data & 0x0f] , data & 0x0f);
@@ -1409,7 +1411,7 @@ WRITE8_MEMBER(rainbow_base_state::comm_bitrate_w)
 }
 
 // PORT 0x0e : Printer bit rates
-WRITE8_MEMBER(rainbow_base_state::printer_bitrate_w)
+void rainbow_base_state::printer_bitrate_w(uint8_t data)
 {
 	m_printer_bitrate = data & 7;
 	// bits 0 - 2 = 0: nominally 75 bps, actually 75.35 bps
@@ -1437,7 +1439,7 @@ WRITE_LINE_MEMBER(rainbow_base_state::dbrg_ft_w)
 	m_mpsc->txca_w(state);
 }
 
-WRITE8_MEMBER(rainbow_base_state::bitrate_counter_w)
+void rainbow_base_state::bitrate_counter_w(uint8_t data)
 {
 	bool prt_rxtxc = BIT(data, 7 - m_printer_bitrate);
 	bool kbd_rxtxc = BIT(data, 1);
@@ -1454,7 +1456,7 @@ WRITE8_MEMBER(rainbow_base_state::bitrate_counter_w)
 
 // Shared memory is contended by refresh, concurrent
 //    8088 accesses and arbitration logic (DMA).
-READ8_MEMBER(rainbow_base_state::share_z80_r)
+uint8_t rainbow_base_state::share_z80_r(offs_t offset)
 {
 	if (m_zflip)
 	{
@@ -1480,7 +1482,7 @@ READ8_MEMBER(rainbow_base_state::share_z80_r)
 	}
 }
 
-WRITE8_MEMBER(rainbow_base_state::share_z80_w)
+void rainbow_base_state::share_z80_w(offs_t offset, uint8_t data)
 {
 	if (m_zflip)
 	{
@@ -1507,21 +1509,21 @@ WRITE8_MEMBER(rainbow_base_state::share_z80_w)
 	return;
 }
 
-READ8_MEMBER(rainbow_base_state::ext_ram_r)
+uint8_t rainbow_base_state::ext_ram_r(offs_t offset)
 {
 	if (offset < m_ram->size())
 		return m_ram->read(offset);
 	return 0;
 }
 
-WRITE8_MEMBER(rainbow_modela_state::ext_ram_w)
+void rainbow_modela_state::ext_ram_w(offs_t offset, uint8_t data)
 {
 	if (offset < m_ram->size())
 		m_ram->write(offset, data);
 }
 
 // NMI logic (parity test)
-WRITE8_MEMBER(rainbow_modelb_state::ext_ram_w)
+void rainbow_modelb_state::ext_ram_w(offs_t offset, uint8_t data)
 {
 	if (offset < m_ram->size())
 		m_ram->write(offset, data);
@@ -1536,7 +1538,7 @@ WRITE8_MEMBER(rainbow_modelb_state::ext_ram_w)
 
 // Requires a short program from the Suitable Solutions ClikClok distribution disk (CLIKA.COM)
 // - also needed to set time/date (*).                   Reads $ed000, writes ed0fe/ed0ff.
-WRITE8_MEMBER(rainbow_base_state::rtc_w)
+void rainbow_base_state::rtc_w(offs_t offset, uint8_t data)
 {
 	if (m_inp11->read() == 0x01) // if enabled...
 	{
@@ -1563,7 +1565,7 @@ WRITE8_MEMBER(rainbow_base_state::rtc_w)
 // ------------------------ClikClok (for 100-B; DS1315)  ------------------------------------------------
 // Add-on hardware, occupies one of the EPROM sockets of the 100-B. TODO: check address decoders on board
 // Requires CLIKCLOK.COM or RBCLIK21.COM (freeware from Latrobe).                       Uses FC000/FE000.
-READ8_MEMBER(rainbow_modela_state::rtc_r)
+uint8_t rainbow_modela_state::rtc_r(offs_t offset)
 {
 	if (m_inp11->read() == 0x01) // if enabled...
 	{
@@ -1579,7 +1581,7 @@ READ8_MEMBER(rainbow_modela_state::rtc_r)
 	return m_p_vol_ram[offset];  // return volatile RAM
 }
 
-READ8_MEMBER(rainbow_modelb_state::rtc_r)
+uint8_t rainbow_modelb_state::rtc_r(offs_t offset)
 {
 	if (m_inp11->read() == 0x01) // if enabled...
 	{
@@ -1628,7 +1630,7 @@ READ8_MEMBER(rainbow_modelb_state::rtc_r)
 
 // --------------------------------- Corvus (B/H)  -----------------------------------------
 // PORT 0x21 : Corvus status register (ready / direction)
-READ8_MEMBER(rainbow_base_state::corvus_status_r)
+uint8_t rainbow_base_state::corvus_status_r()
 {
 	if (m_inp6->read() == 0) // Corvus controller
 	{
@@ -1637,7 +1639,7 @@ READ8_MEMBER(rainbow_base_state::corvus_status_r)
 	}
 	else
 	{
-		output().set_value("led2", 0);
+		m_leds[1] = 0;
 		switch_off_timer->adjust(attotime::from_msec(500));
 
 		uint8_t status = m_corvus_hdc->status_r();
@@ -1747,7 +1749,7 @@ WRITE_LINE_MEMBER(rainbow_base_state::hdc_read_sector)
 		if ((state == 0) && (last_state == 1) && (drv == 0))
 		{
 			read_status = 2; //          logerror("\nTRYING TO READ");
-			output().set_value("led1", 0);
+			m_leds[0] = 0;
 			switch_off_timer->adjust(attotime::from_msec(500));
 
 			int hi = (m_hdc->read(0x05)) & 0x07;
@@ -1765,7 +1767,7 @@ WRITE_LINE_MEMBER(rainbow_base_state::hdc_read_sector)
 				if ((info = hard_disk_get_info(local_hard_disk)))
 				{
 					read_status = 4;
-					output().set_value("led1", 1);
+					m_leds[0] = 1;
 
 					// Pointer to info + C + H + S
 					uint32_t lbasector = get_and_print_lbasector(this, info, cylinder, sdh & 0x07, sector_number);
@@ -1816,7 +1818,7 @@ WRITE_LINE_MEMBER(rainbow_base_state::hdc_write_sector)
 
 	if (state == 0 && wg_last == 1 && drv == 0)  // Check correct state transition and DRIVE 0 ....
 	{
-		output().set_value("led1", 0);  // (1 = OFF ) =HARD DISK ACTIVITY =
+		m_leds[0] = 0;  // (1 = OFF ) =HARD DISK ACTIVITY =
 		switch_off_timer->adjust(attotime::from_msec(500));
 
 		if (rainbow_hdc_file(0) != nullptr)
@@ -1853,7 +1855,7 @@ WRITE_LINE_MEMBER(rainbow_base_state::hdc_write_sector)
 int rainbow_base_state::do_write_sector()
 {
 	int feedback = 0; // no error
-	output().set_value("led1", 0); // ON
+	m_leds[0] = 0; // ON
 	switch_off_timer->adjust(attotime::from_msec(500));
 
 	hard_disk_file *local_hard_disk = rainbow_hdc_file(0); // one hard disk for now.
@@ -1864,7 +1866,7 @@ int rainbow_base_state::do_write_sector()
 		if (info)
 		{
 			feedback = 10;
-			output().set_value("led1", 1); // OFF
+			m_leds[0] = 1; // OFF
 
 			uint8_t sdh = (m_hdc->read(0x06));
 
@@ -1899,7 +1901,7 @@ int rainbow_base_state::do_write_sector()
 }
 
 
-READ8_MEMBER(rainbow_base_state::hd_status_60_r)
+uint8_t rainbow_base_state::hd_status_60_r()
 {
 	int data = m_hdc_buffer[m_hdc_buf_offset];
 	//logerror("HARD DISK DISK BUFFER: READ offset %04x | data = %02x\n", m_hdc_buf_offset, data); // ! DO NOT CHANGE ORDER !
@@ -1913,7 +1915,7 @@ READ8_MEMBER(rainbow_base_state::hd_status_60_r)
 	return data;
 }
 
-WRITE8_MEMBER(rainbow_base_state::hd_status_60_w)
+void rainbow_base_state::hd_status_60_w(uint8_t data)
 {
 	//logerror("HARD DISK BUFFER: WRITE offset %04x | data = %02x\n", m_hdc_buf_offset, data);
 
@@ -1935,7 +1937,7 @@ WRITE8_MEMBER(rainbow_base_state::hd_status_60_w)
 // - 3 hard-wired controller module identification bits.
 // - signals from the WD1010 chip,
 // - disk drive(latched status signals)
-READ8_MEMBER(rainbow_base_state::hd_status_68_r)
+uint8_t rainbow_base_state::hd_status_68_r()
 {
 	// (*) Bits 5-7 : HARD WIRED IDENTIFICATION BITS, bits 5+7 = 1 and bit 6 = 0  (= 101 f?r RD51 module)
 	int data = 0xe0; // 111 gives DRIVE NOT READY (when W is pressed on boot screen)
@@ -1981,7 +1983,7 @@ READ8_MEMBER(rainbow_base_state::hd_status_68_r)
 
 // 68 (WRITE): Secondary Command Registers (68H) - -  "write-only register for commands"
 // - see TABLE 4.8 (4-24)
-WRITE8_MEMBER(rainbow_base_state::hd_status_68_w)
+void rainbow_base_state::hd_status_68_w(uint8_t data)
 {
 	// Bit 4-7 : --- not used / reserved
 
@@ -2007,7 +2009,7 @@ WRITE8_MEMBER(rainbow_base_state::hd_status_68_w)
 	//                 1 : see  @ 088D after 'READ_SECTOR_OK'
 	if (data & 0x01)
 	{
-		output().set_value("led1", 0);  // 1 = OFF (One of the CPU LEDs as DRIVE LED) = HARD DISK ACTIVITY =
+		m_leds[0] = 0;  // 1 = OFF (One of the CPU LEDs as DRIVE LED) = HARD DISK ACTIVITY =
 		switch_off_timer->adjust(attotime::from_msec(500));
 
 		m_hdc->buffer_ready(true);
@@ -2041,7 +2043,7 @@ inhibited.
 7 Track 0 - The disk drive sets this bit high (1) when the R/W heads are
 positioned over cylinder 0 (the data track furthest away from the spindle).
 */
-READ8_MEMBER(rainbow_base_state::hd_status_69_r)
+uint8_t rainbow_base_state::hd_status_69_r()
 {
 	int hs = m_hdc->read(0x06) & (1 + 2 + 4); // SDH bits 0-2 = HEAD #
 //  logerror("(x69 READ) %i = HEAD SELECT WD1010\n", hs);
@@ -2075,7 +2077,7 @@ WRITE_LINE_MEMBER(rainbow_base_state::hdc_step)
 {
 	m_hdc_step_latch = true;
 
-	output().set_value("led1", 0);  // 1 = OFF (One of the CPU LEDs as DRIVE LED)  = HARD DISK ACTIVITY =
+	m_leds[0] = 0;  // 1 = OFF (One of the CPU LEDs as DRIVE LED)  = HARD DISK ACTIVITY =
 	switch_off_timer->adjust(attotime::from_msec(500));
 }
 
@@ -2155,7 +2157,7 @@ WRITE_LINE_MEMBER(rainbow_base_state::bundle_irq)
 }
 
 
-READ8_MEMBER(rainbow_modela_state::system_parameter_r)
+uint8_t rainbow_modela_state::system_parameter_r()
 {
 	/*  Info about option boards is in bits 0 - 3:
 	SYSTEM PARAMETER INFORMATION: see AA-P308A-TV page 92 section 14.0
@@ -2175,7 +2177,7 @@ READ8_MEMBER(rainbow_modela_state::system_parameter_r)
 			0xf0); // unverified
 }
 
-READ8_MEMBER(rainbow_modelb_state::system_parameter_r)
+uint8_t rainbow_modelb_state::system_parameter_r()
 {
 	/*  Info about option boards is in bits 0 - 3:
 	SYSTEM PARAMETER INFORMATION: see AA-P308A-TV page 92 section 14.0
@@ -2203,7 +2205,7 @@ READ8_MEMBER(rainbow_modelb_state::system_parameter_r)
 // 2 COMM DSR  (reflects status of DSR at COMM)
 // 3 COMM CTS  (reflects status of CTS at COMM)
 // 4 COMM RLSD (receive line signal detect at COMM; also connected to DCDA on MPSC)
-READ8_MEMBER(rainbow_base_state::comm_control_r)
+uint8_t rainbow_base_state::comm_control_r()
 {
 	bool is_mhfu_enabled = false;
 	if (m_power_good)
@@ -2226,7 +2228,7 @@ READ8_MEMBER(rainbow_base_state::comm_control_r)
 // 1 COMM SRTS H     (controls secondary request to send line of COMM)
 // 2 COMM DTR L      (controls terminal ready line of COMM)
 // 3 COMM RTS        (controls request to send line of COMM)
-WRITE8_MEMBER(rainbow_base_state::comm_control_w)
+void rainbow_base_state::comm_control_w(uint8_t data)
 {
 	logerror("%02x to COMM.CONTROL REGISTER ", data);
 
@@ -2240,15 +2242,15 @@ WRITE8_MEMBER(rainbow_base_state::comm_control_w)
 	D6 -D5-D4-D3  <- INTERNAL LED NUMBER (DEC PDF)
 	-4--5--6--7-  <- NUMBERS EMBOSSED ON BACK OF PLASTIC HOUSING (see error chart)
 	*/
-	output().set_value("led4", BIT(data, 5)); // LED "D6"
-	output().set_value("led5", BIT(data, 7)); // LED "D5"
-	output().set_value("led6", BIT(data, 6)); // LED "D4"
-	output().set_value("led7", BIT(data, 4)); // LED "D3"
+	m_leds[3] = BIT(data, 5); // LED "D6"
+	m_leds[4] = BIT(data, 7); // LED "D5"
+	m_leds[5] = BIT(data, 6); // LED "D4"
+	m_leds[6] = BIT(data, 4); // LED "D3"
 }
 
 // 8088 writes to port 0x00 (interrupts Z80)
 // See page 133 (4-34)
-WRITE8_MEMBER(rainbow_base_state::i8088_latch_w)
+void rainbow_base_state::i8088_latch_w(uint8_t data)
 {
 	// logerror("%02x to Z80 mailbox\n", data);
 
@@ -2263,7 +2265,7 @@ WRITE8_MEMBER(rainbow_base_state::i8088_latch_w)
 
 // Z80 reads port 0x00
 // See page 134 (4-35)
-READ8_MEMBER(rainbow_base_state::z80_latch_r)
+uint8_t rainbow_base_state::z80_latch_r()
 {
 	// logerror("Read %02x from Z80 mailbox\n", m_z80_mailbox);
 	m_z80->set_input_line(0, CLEAR_LINE);
@@ -2274,7 +2276,7 @@ READ8_MEMBER(rainbow_base_state::z80_latch_r)
 
 // Z80 writes to port 0x00 (interrupts 8088)
 // See page 134 (4-35)
-WRITE8_MEMBER(rainbow_base_state::z80_latch_w)
+void rainbow_base_state::z80_latch_w(uint8_t data)
 {
 	// logerror("%02x to 8088 mailbox\n", data);
 	raise_8088_irq(IRQ_8088_MAILBOX);
@@ -2284,7 +2286,7 @@ WRITE8_MEMBER(rainbow_base_state::z80_latch_w)
 }
 
 // 8088 reads port 0x00. See page 133 (4-34)
-READ8_MEMBER(rainbow_base_state::i8088_latch_r)
+uint8_t rainbow_base_state::i8088_latch_r()
 {
 	// logerror("Read %02x from 8088 mailbox\n", m_8088_mailbox);
 	lower_8088_irq(IRQ_8088_MAILBOX);
@@ -2294,28 +2296,28 @@ READ8_MEMBER(rainbow_base_state::i8088_latch_r)
 }
 
 // (Z80) : WRITE to 0x20
-WRITE8_MEMBER(rainbow_base_state::z80_diskdiag_read_w)
+void rainbow_base_state::z80_diskdiag_read_w(uint8_t data)
 {
 	m_zflip = true; //  "a write to 20H will _SET_ ZFLIP"
 }
 
 // (Z80) : PORT 21H * WRITE *
-WRITE8_MEMBER(rainbow_base_state::z80_diskdiag_write_w)
+void rainbow_base_state::z80_diskdiag_write_w(uint8_t data)
 {
 	/*   Z80 LEDs:
 	4   5   6  <- bit #
 	D11 D10 -D9 <- INTERNAL LED NUMBER (see PDF)
 	-1 --2-- 3  <- NUMBERS EMBOSSED ON BACK OF PLASTIC HOUSING (see error chart)
 	*/
-	output().set_value("led1", BIT(data, 4)); // LED "D11"
-	output().set_value("led2", BIT(data, 5)); // LED "D10"
-	output().set_value("led3", BIT(data, 6)); // LED "D9"
+	m_leds[0] = BIT(data, 4); // LED "D11"
+	m_leds[1] = BIT(data, 5); // LED "D10"
+	m_leds[2] = BIT(data, 6); // LED "D9"
 
 	m_zflip = false; // "a write to 21H will reset ZFLIP"
 }
 
 // (Z80) : PORT 20H / 21H  _READ_
-READ8_MEMBER(rainbow_base_state::z80_generalstat_r)
+uint8_t rainbow_base_state::z80_generalstat_r()
 {
 	/*
 	General / diag.status register Z80 / see page 157 (table 4-18).
@@ -2381,7 +2383,7 @@ READ8_MEMBER(rainbow_base_state::z80_generalstat_r)
 
 // (Z80) : PORT 40H _READ_
 // 40H diskette status Register **** READ ONLY *** ( 4-60 of TM100.pdf )
-READ8_MEMBER(rainbow_base_state::z80_diskstatus_r)
+uint8_t rainbow_base_state::z80_diskstatus_r()
 {
 	int track = 0xEE;
 	int data = m_z80_diskcontrol & (255 - 0x80 - 0x40 - 0x20 - 0x04); // 00011011
@@ -2429,7 +2431,7 @@ READ8_MEMBER(rainbow_base_state::z80_diskstatus_r)
 
 // ALL SIGNALS ARE HIGH ACTIVE (H), EXCEPT:
 // BIT 5 : SIDE 0 L : For single sided drives, this bit is always set to 0 for side O.
-WRITE8_MEMBER(rainbow_base_state::z80_diskcontrol_w)
+void rainbow_base_state::z80_diskcontrol_w(uint8_t data)
 {
 	int enable_start;
 	int disable_start; // set defaults
@@ -2457,11 +2459,8 @@ WRITE8_MEMBER(rainbow_base_state::z80_diskcontrol_w)
 		m_floppy = nullptr;
 	}
 
-	output().set_value("driveled0", (selected_drive == 0) ? 1 : 0);
-	output().set_value("driveled1", (selected_drive == 1) ? 1 : 0);
-
-	output().set_value("driveled2", (selected_drive == 2) ? 1 : 0);
-	output().set_value("driveled3", (selected_drive == 3) ? 1 : 0);
+	for (int i = 0; i < 4; i++)
+		m_driveleds[i] = (selected_drive == i) ? 1 : 0;
 	switch_off_timer->adjust(attotime::from_msec(500));
 
 	if (m_floppy != nullptr)
@@ -2483,14 +2482,14 @@ WRITE8_MEMBER(rainbow_base_state::z80_diskcontrol_w)
 		m_fdc->set_force_ready(force_ready); // 1 : assert DRIVE READY on FDC (diagnostic override)
 
 		if (selected_drive < 2)
-		{   data |= 8;
+		{
+			data |= 8;
 			enable_start = 0;
 			disable_start = 2;
 		}
-			else
+		else
 		{
 			data |= 16;
-
 			enable_start = 2;
 			disable_start = 4;
 		}
@@ -2520,7 +2519,7 @@ WRITE8_MEMBER(rainbow_base_state::z80_diskcontrol_w)
 }
 // --------- END OF Z80 --------------------
 
-READ8_MEMBER(rainbow_base_state::read_video_ram_r)
+uint8_t rainbow_base_state::read_video_ram_r(offs_t offset)
 {
 	return m_p_ram[offset];
 }
@@ -2666,12 +2665,12 @@ WRITE_LINE_MEMBER(rainbow_base_state::video_interrupt)
 }
 
 // Reflects bits from 'diagnostic_w' (1:1), except test jumpers
-READ8_MEMBER(rainbow_base_state::diagnostic_r) // 8088 (port 0A READ). Fig.4-29 + table 4-15
+uint8_t rainbow_base_state::diagnostic_r() // 8088 (port 0A READ). Fig.4-29 + table 4-15
 {
 	return ((m_diagnostic & 0xf1) | m_inp1->read() | m_inp2->read() | m_inp3->read());
 }
 
-WRITE8_MEMBER(rainbow_base_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 + table 4-15
+void rainbow_base_state::diagnostic_w(uint8_t data) // 8088 (port 0A WRITTEN). Fig.4-28 + table 4-15
 {
 	//    logerror("%02x to diag port (PC=%x)\n", data, m_i8088->pc());
 
@@ -2839,7 +2838,7 @@ WRITE_LINE_MEMBER(rainbow_modelb_state::irq_hi_w)
 // NOTE: "More than one plane at a time can be enabled for a write operation; however,
 //        only one plane can be enabled for a read operation at anyone time."
 
-READ16_MEMBER(rainbow_base_state::vram_r)
+uint16_t rainbow_base_state::vram_r(offs_t offset)
 {
 	if ((!(m_gdc_mode_register & GDC_MODE_VECTOR)) || machine().side_effects_disabled())  // (NOT VECTOR MODE)
 	{
@@ -2860,7 +2859,7 @@ READ16_MEMBER(rainbow_base_state::vram_r)
 }
 
 // NOTE: Rainbow has separate registers for fore and background.
-WRITE16_MEMBER(rainbow_base_state::vram_w)
+void rainbow_base_state::vram_w(offs_t offset, uint16_t data)
 {
 	if (m_gdc_mode_register & GDC_MODE_HIGHRES)
 		offset = (m_gdc_scroll_buffer[(offset & 0x3FC0) >> 6] << 6) | (offset & 0x3F);
@@ -2941,7 +2940,7 @@ WRITE16_MEMBER(rainbow_base_state::vram_w)
 
 // (READ)
 // Read  scroll buffer (see GDC Diagnostic Disk, SCROLL BUFFER test)
-READ8_MEMBER(rainbow_base_state::GDC_EXTRA_REGISTER_r)
+uint8_t rainbow_base_state::GDC_EXTRA_REGISTER_r(offs_t offset)
 {
 	uint8_t data = 0;
 	switch (offset)
@@ -2974,7 +2973,7 @@ READ8_MEMBER(rainbow_base_state::GDC_EXTRA_REGISTER_r)
 	return data;
 }
 
-WRITE8_MEMBER(rainbow_base_state::GDC_EXTRA_REGISTER_w)
+void rainbow_base_state::GDC_EXTRA_REGISTER_w(offs_t offset, uint8_t data)
 {
 	static int last_message, last_mode, last_readback, last_scroll_index;
 

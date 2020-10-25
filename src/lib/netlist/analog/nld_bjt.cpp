@@ -1,8 +1,8 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 
-#include "netlist/solver/nld_solver.h"
-#include "netlist/nl_setup.h"
+#include "solver/nld_solver.h"
+#include "nl_base.h"
 #include "nlid_twoterm.h"
 
 // FIXME: Remove QBJT_switch - no more use
@@ -46,6 +46,11 @@ namespace analog
 	// -----------------------------------------------------------------------------
 	// nld_Q - Base classes
 	// -----------------------------------------------------------------------------
+
+	enum class bjt_type {
+		BJT_NPN,
+		BJT_PNP
+	};
 
 	/// \brief Class representing the bjt model parameters.
 	///
@@ -101,7 +106,8 @@ namespace analog
 	{
 	public:
 		bjt_model_t(param_model_t &model)
-		: m_IS (model, "IS")
+		: m_type((model.type() == "NPN") ? bjt_type::BJT_NPN : bjt_type::BJT_PNP)
+		, m_IS (model, "IS")
 		, m_BF (model, "BF")
 		, m_NF (model, "NF")
 		, m_BR (model, "BR")
@@ -110,6 +116,7 @@ namespace analog
 		, m_CJC(model, "CJC")
 		{}
 
+		bjt_type m_type;
 		param_model_t::value_t m_IS;  //!< transport saturation current
 		param_model_t::value_t m_BF;  //!< ideal maximum forward beta
 		param_model_t::value_t m_NF;  //!< forward current emission coefficient
@@ -122,33 +129,28 @@ namespace analog
 
 	// Have a common start for transistors
 
-	NETLIB_OBJECT(QBJT)
+	NETLIB_BASE_OBJECT(QBJT)
 	{
 	public:
-		enum q_type {
-			BJT_NPN,
-			BJT_PNP
-		};
 
 		NETLIB_CONSTRUCTOR_EX(QBJT, const pstring &model = "NPN")
 		, m_model(*this, "MODEL", model)
-		, m_qtype(BJT_NPN)
+		, m_qtype(bjt_type::BJT_NPN)
 		{
 		}
 
 		NETLIB_IS_DYNAMIC(true)
 
 		//NETLIB_RESETI();
-		NETLIB_UPDATEI();
 
-		q_type qtype() const noexcept { return m_qtype; }
-		bool is_qtype(q_type atype) const noexcept { return m_qtype == atype; }
-		void set_qtype(q_type atype) noexcept { m_qtype = atype; }
+		bjt_type qtype() const noexcept { return m_qtype; }
+		bool is_qtype(bjt_type atype) const noexcept { return m_qtype == atype; }
+		void set_qtype(bjt_type atype) noexcept { m_qtype = atype; }
 	protected:
 
 		param_model_t m_model;
 	private:
-		q_type m_qtype;
+		bjt_type m_qtype;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -171,14 +173,15 @@ namespace analog
 
 	NETLIB_OBJECT_DERIVED(QBJT_switch, QBJT)
 	{
-		NETLIB_CONSTRUCTOR_DERIVED(QBJT_switch, QBJT)
-			, m_RB(*this, "m_RB", true)
-			, m_RC(*this, "m_RC", true)
-			, m_BC(*this, "m_BC", true)
-			, m_gB(nlconst::cgmin())
-			, m_gC(nlconst::cgmin())
-			, m_V(nlconst::zero())
-			, m_state_on(*this, "m_state_on", 0u)
+		NETLIB_CONSTRUCTOR(QBJT_switch)
+		, m_modacc(m_model)
+		, m_RB(*this, "m_RB", NETLIB_DELEGATE(termhandler))
+		, m_RC(*this, "m_RC", NETLIB_DELEGATE(termhandler))
+		, m_BC(*this, "m_BC", NETLIB_DELEGATE(termhandler))
+		, m_gB(nlconst::cgmin())
+		, m_gC(nlconst::cgmin())
+		, m_V(nlconst::zero())
+		, m_state_on(*this, "m_state_on", 0U)
 		{
 			register_subalias("B", m_RB.P());
 			register_subalias("E", m_RB.N());
@@ -190,11 +193,20 @@ namespace analog
 		}
 
 		NETLIB_RESETI();
-		NETLIB_UPDATEI();
+		NETLIB_HANDLERI(termhandler)
+		{
+			auto *solv(m_RB.solver());
+			if (solv != nullptr)
+				solv->solve_now();
+			else
+				m_RC.solver()->solve_now();
+		}
+
 		NETLIB_UPDATE_PARAMI();
 		NETLIB_UPDATE_TERMINALSI();
 
 	private:
+		bjt_model_t m_modacc;
 		nld_twoterm m_RB;
 		nld_twoterm m_RC;
 		nld_twoterm m_BC;
@@ -214,13 +226,13 @@ namespace analog
 	NETLIB_OBJECT_DERIVED(QBJT_EB, QBJT)
 	{
 	public:
-		NETLIB_CONSTRUCTOR_DERIVED(QBJT_EB, QBJT)
+		NETLIB_CONSTRUCTOR(QBJT_EB)
 		, m_modacc(m_model)
 		, m_gD_BC(*this, "m_D_BC")
 		, m_gD_BE(*this, "m_D_BE")
-		, m_D_CB(*this, "m_D_CB", true)
-		, m_D_EB(*this, "m_D_EB", true)
-		, m_D_EC(*this, "m_D_EC", true)
+		, m_D_CB(*this, "m_D_CB", NETLIB_DELEGATE(termhandler))
+		, m_D_EB(*this, "m_D_EB", NETLIB_DELEGATE(termhandler))
+		, m_D_EC(*this, "m_D_EC", NETLIB_DELEGATE(termhandler))
 		, m_alpha_f(0)
 		, m_alpha_r(0)
 		{
@@ -235,13 +247,13 @@ namespace analog
 
 			if (m_modacc.m_CJE > nlconst::zero())
 			{
-				create_and_register_subdevice("m_CJE", m_CJE);
+				create_and_register_subdevice(*this, "m_CJE", m_CJE);
 				connect("B", "m_CJE.1");
 				connect("E", "m_CJE.2");
 			}
 			if (m_modacc.m_CJC > nlconst::zero())
 			{
-				create_and_register_subdevice("m_CJC", m_CJC);
+				create_and_register_subdevice(*this, "m_CJC", m_CJC);
 				connect("B", "m_CJC.1");
 				connect("C", "m_CJC.2");
 			}
@@ -251,7 +263,15 @@ namespace analog
 	protected:
 
 		NETLIB_RESETI();
-		NETLIB_UPDATEI();
+		NETLIB_HANDLERI(termhandler)
+		{
+			auto *solv(m_D_EB.solver());
+			if (solv != nullptr)
+				solv->solve_now();
+			else
+				m_D_CB.solver()->solve_now();
+		}
+
 		NETLIB_UPDATE_PARAMI();
 		NETLIB_UPDATE_TERMINALSI();
 
@@ -273,21 +293,14 @@ namespace analog
 
 
 	// ----------------------------------------------------------------------------------------
-	// nld_Q
-	// ----------------------------------------------------------------------------------------
-
-	NETLIB_UPDATE(QBJT)
-	{
-	//    netlist().solver()->schedule1();
-	}
-
-	// ----------------------------------------------------------------------------------------
 	// nld_QBJT_switch
 	// ----------------------------------------------------------------------------------------
 
 
 	NETLIB_RESET(QBJT_switch)
 	{
+		if (m_RB.solver() == nullptr && m_RC.solver() == nullptr)
+			throw nl_exception(MF_DEVICE_FRY_1(this->name()));
 		NETLIB_NAME(QBJT)::reset();
 		const auto zero(nlconst::zero());
 
@@ -300,29 +313,15 @@ namespace analog
 
 	}
 
-	NETLIB_UPDATE(QBJT_switch)
-	{
-		// FIXME: this should never be called
-		if (!m_RB.P().net().is_rail_net())
-			m_RB.P().solve_now();   // Basis
-		else if (!m_RB.N().net().is_rail_net())
-			m_RB.N().solve_now();   // Emitter
-		else if (!m_RC.P().net().is_rail_net())
-			m_RC.P().solve_now();   // Collector
-	}
-
-
 	NETLIB_UPDATE_PARAM(QBJT_switch)
 	{
-		bjt_model_t model(m_model);
-
-		nl_fptype IS = model.m_IS;
-		nl_fptype BF = model.m_BF;
-		nl_fptype NF = model.m_NF;
-		//nl_fptype VJE = model.dValue("VJE", 0.75);
+		nl_fptype IS = m_modacc.m_IS;
+		nl_fptype BF = m_modacc.m_BF;
+		nl_fptype NF = m_modacc.m_NF;
+		//nl_fptype VJE = m_modacc.dValue("VJE", 0.75);
 
 		// FIXME: check for PNP as well and bail out
-		set_qtype((m_model.type() == "NPN") ? BJT_NPN : BJT_PNP);
+		set_qtype(m_modacc.m_type);
 
 		nl_fptype alpha = BF / (nlconst::one() + BF);
 
@@ -347,7 +346,7 @@ namespace analog
 
 	NETLIB_UPDATE_TERMINALS(QBJT_switch)
 	{
-		const nl_fptype m = (is_qtype( BJT_NPN) ? 1 : -1);
+		const nl_fptype m = (is_qtype( bjt_type::BJT_NPN) ? 1 : -1);
 
 		const unsigned new_state = (m_RB.deltaV() * m > m_V ) ? 1 : 0;
 		if (m_state_on ^ new_state)
@@ -368,20 +367,10 @@ namespace analog
 	// nld_Q - Ebers Moll
 	// ----------------------------------------------------------------------------------------
 
-
-	NETLIB_UPDATE(QBJT_EB)
-	{
-		// FIXME: this should never be called
-		if (!m_D_EB.P().net().is_rail_net())
-			m_D_EB.P().solve_now();   // Basis
-		else if (!m_D_EB.N().net().is_rail_net())
-			m_D_EB.N().solve_now();   // Emitter
-		else
-			m_D_CB.N().solve_now();   // Collector
-	}
-
 	NETLIB_RESET(QBJT_EB)
 	{
+		if (m_D_EB.solver() == nullptr && m_D_CB.solver() == nullptr)
+			throw nl_exception(MF_DEVICE_FRY_1(this->name()));
 		NETLIB_NAME(QBJT)::reset();
 		if (m_CJE)
 		{
@@ -393,12 +382,11 @@ namespace analog
 			m_CJC->reset();
 			m_CJC->set_cap_embedded(m_modacc.m_CJC);
 		}
-
 	}
 
 	NETLIB_UPDATE_TERMINALS(QBJT_EB)
 	{
-		const nl_fptype polarity(qtype() == BJT_NPN ? nlconst::one() : -nlconst::one());
+		const nl_fptype polarity(qtype() == bjt_type::BJT_NPN ? nlconst::one() : -nlconst::one());
 
 		m_gD_BE.update_diode(-m_D_EB.deltaV() * polarity);
 		m_gD_BC.update_diode(-m_D_CB.deltaV() * polarity);
@@ -422,7 +410,6 @@ namespace analog
 							-gce,         0,    0);
 	}
 
-
 	NETLIB_UPDATE_PARAM(QBJT_EB)
 	{
 		nl_fptype IS = m_modacc.m_IS;
@@ -430,10 +417,10 @@ namespace analog
 		nl_fptype NF = m_modacc.m_NF;
 		nl_fptype BR = m_modacc.m_BR;
 		nl_fptype NR = m_modacc.m_NR;
-		//nl_fptype VJE = m_model.dValue("VJE", 0.75);
+		//nl_fptype VJE = m_m_modacc.dValue("VJE", 0.75);
 
 		// FIXME: check for PNP as well and bail out
-		set_qtype((m_model.type() == "NPN") ? BJT_NPN : BJT_PNP);
+		set_qtype(m_modacc.m_type);
 
 		m_alpha_f = BF / (nlconst::one() + BF);
 		m_alpha_r = BR / (nlconst::one() + BR);

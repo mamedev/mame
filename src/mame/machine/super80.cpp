@@ -191,12 +191,9 @@ void super80_state::portf0_w(u8 data)
 
 void super80_state::machine_start_common()
 {
-	// zerofill
-	m_ram = make_unique_clear<u8[]>(0x10000);
 	m_cass_led.resolve();
 
 	// register for savestates
-	save_pointer(NAME(m_ram), 0x10000);
 	save_item(NAME(m_portf0));
 	save_item(NAME(m_s_options));
 	save_item(NAME(m_palette_index));
@@ -213,17 +210,13 @@ void super80_state::machine_start()
 	save_item(NAME(m_int_sw));
 	save_item(NAME(m_vidpg));
 	save_item(NAME(m_current_charset));
-	std::copy_n(&m_rom[0], 0x3000, &m_ram[0xc000]);   // make 0 F1 C0 work
-	std::fill_n(&m_ram[0xf000], 0x1000, 0xff);        // make O F1 FF work
-}
-
-void super80r_state::machine_start()
-{
-	machine_start_common();
 }
 
 void super80v_state::machine_start()
 {
+	// zerofill
+	m_vram = make_unique_clear<u8[]>(0x3000);
+	save_pointer(NAME(m_vram), 0x3000);
 	machine_start_common();
 }
 
@@ -234,19 +227,29 @@ void super80_state::machine_reset_common()
 	m_keylatch = 0xff;
 	m_key_pressed = 0;
 	m_palette_index = 0;
+
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	program.install_rom(0x0000, 0x0fff, m_rom);   // do it here for F3
+	m_rom_shadow_tap = program.install_read_tap(0xc000, 0xcfff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
+	{
+		if (!machine().side_effects_disabled())
+		{
+			// delete this tap
+			m_rom_shadow_tap->remove();
+
+			// reinstall ram over the rom shadow
+			m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x0fff, m_ram);
+		}
+
+		// return the original data
+		return data;
+	});
 }
 
 void super80_state::machine_reset()
 {
-	std::copy_n(&m_rom[0], 0x3000, &m_ram[0xc000]);   // make 0 F1 C0 work
-	std::fill_n(&m_ram[0xf000], 0x1000, 0xff);        // make O F1 FF work
 	machine_reset_common();
 	m_vidpg = 0xfe00;
-}
-
-void super80r_state::machine_reset()
-{
-	machine_reset_common();
 }
 
 void super80v_state::machine_reset()

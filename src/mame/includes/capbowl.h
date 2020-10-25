@@ -55,19 +55,19 @@ public:
 	emu_timer *m_update_timer;
 
 	// common
-	DECLARE_READ8_MEMBER(track_0_r);
-	DECLARE_READ8_MEMBER(track_1_r);
-	DECLARE_WRITE8_MEMBER(track_reset_w);
-	DECLARE_WRITE8_MEMBER(sndcmd_w);
-	DECLARE_WRITE8_MEMBER(tms34061_w);
-	DECLARE_READ8_MEMBER(tms34061_r);
+	uint8_t track_0_r();
+	uint8_t track_1_r();
+	void track_reset_w(uint8_t data);
+	void sndcmd_w(uint8_t data);
+	void tms34061_w(offs_t offset, uint8_t data);
+	uint8_t tms34061_r(offs_t offset);
 
 	// capbowl specific
-	DECLARE_WRITE8_MEMBER(capbowl_rom_select_w);
+	void capbowl_rom_select_w(uint8_t data);
 
 	// bowlrama specific
-	DECLARE_WRITE8_MEMBER(bowlrama_blitter_w);
-	DECLARE_READ8_MEMBER(bowlrama_blitter_r);
+	void bowlrama_blitter_w(offs_t offset, uint8_t data);
+	uint8_t bowlrama_blitter_r(offs_t offset);
 
 	void init_capbowl();
 	virtual void machine_start() override;

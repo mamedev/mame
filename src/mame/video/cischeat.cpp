@@ -98,7 +98,7 @@ void wildplt_state::video_start()
 	m_spriteram = m_allocated_spriteram.get();
 }
 
-WRITE16_MEMBER(wildplt_state::sprite_dma_w)
+void wildplt_state::sprite_dma_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// bit 13: 0 -> 1 transition triggers a sprite DMA
 	if(data & 0x2000 && (m_sprite_dma_reg & 0x2000) == 0)
@@ -131,7 +131,7 @@ WRITE16_MEMBER(wildplt_state::sprite_dma_w)
                                 Big Run
 **************************************************************************/
 
-READ16_MEMBER(cischeat_state::bigrun_ip_select_r)
+uint16_t cischeat_state::bigrun_ip_select_r()
 {
 	switch (m_ip_select & 0x3)
 	{
@@ -144,13 +144,13 @@ READ16_MEMBER(cischeat_state::bigrun_ip_select_r)
 }
 
 
-WRITE16_MEMBER(cischeat_state::unknown_out_w)
+void cischeat_state::unknown_out_w(uint16_t data)
 {
 	// ?? 91/1/91/1 ...
 }
 
 
-WRITE16_MEMBER(cischeat_state::motor_out_w)
+void cischeat_state::motor_out_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// motor (seat?)
 	if (ACCESSING_BITS_0_7)
@@ -159,26 +159,26 @@ WRITE16_MEMBER(cischeat_state::motor_out_w)
 }
 
 
-WRITE16_MEMBER(cischeat_state::wheel_out_w)
+void cischeat_state::wheel_out_w(uint16_t data)
 {
 	// motor (wheel?)
 }
 
 
-WRITE16_MEMBER(cischeat_state::ip_select_w)
+void cischeat_state::ip_select_w(uint16_t data)
 {
 	m_ip_select = data;
 }
 
 
-WRITE16_MEMBER(cischeat_state::ip_select_plus1_w)
+void cischeat_state::ip_select_plus1_w(uint16_t data)
 {
 	// value above + 1
 	m_ip_select = data + 1;
 }
 
 
-WRITE16_MEMBER(cischeat_state::bigrun_comms_w)
+void cischeat_state::bigrun_comms_w(uint16_t data)
 {
 	/* Not sure about this one.. */
 	m_cpu2->set_input_line(INPUT_LINE_RESET, (data & 2) ? ASSERT_LINE : CLEAR_LINE);
@@ -187,7 +187,7 @@ WRITE16_MEMBER(cischeat_state::bigrun_comms_w)
 }
 
 // TODO: fake port, never written to my knowledge!
-WRITE16_MEMBER(cischeat_state::active_layers_w)
+void cischeat_state::active_layers_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_active_layers);
 }
@@ -197,7 +197,7 @@ WRITE16_MEMBER(cischeat_state::active_layers_w)
                                 Cisco Heat
 **************************************************************************/
 
-READ16_MEMBER(cischeat_state::cischeat_ip_select_r)
+uint16_t cischeat_state::cischeat_ip_select_r()
 {
 	switch (m_ip_select & 0x3)
 	{
@@ -209,7 +209,7 @@ READ16_MEMBER(cischeat_state::cischeat_ip_select_r)
 }
 
 
-WRITE16_MEMBER(cischeat_state::cischeat_soundlatch_w)
+void cischeat_state::cischeat_soundlatch_w(uint16_t data)
 {
 	/* Sound CPU: reads latch during int 4, and stores command */
 	m_soundlatch->write(data);
@@ -217,7 +217,7 @@ WRITE16_MEMBER(cischeat_state::cischeat_soundlatch_w)
 }
 
 
-WRITE16_MEMBER(cischeat_state::cischeat_comms_w)
+void cischeat_state::cischeat_comms_w(uint16_t data)
 {
 	/* Not sure about this one.. */
 	m_cpu2->set_input_line(INPUT_LINE_RESET, (data & 2) ? ASSERT_LINE : CLEAR_LINE);
@@ -231,13 +231,13 @@ WRITE16_MEMBER(cischeat_state::cischeat_comms_w)
                             F1 GrandPrix Star
 **************************************************************************/
 
-READ16_MEMBER(cischeat_state::f1gpstar_wheel_r)
+uint16_t cischeat_state::f1gpstar_wheel_r()
 {
 	return (ioport("PEDAL")->read() & 0xff) + ((ioport("IN5")->read() & 0xff)<<8);
 }
 
 
-READ16_MEMBER(cischeat_state::f1gpstr2_ioready_r)
+uint16_t cischeat_state::f1gpstr2_ioready_r()
 {
 	return (m_f1gpstr2_ioready[0]&1) ? 0xff : 0xf0;
 }
@@ -248,7 +248,7 @@ READ16_MEMBER(cischeat_state::f1gpstr2_ioready_r)
 **************************************************************************/
 
 
-WRITE16_MEMBER(cischeat_state::f1gpstar_motor_w)
+void cischeat_state::f1gpstar_motor_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// "shudder" motors, leds
 	if (ACCESSING_BITS_0_7)
@@ -263,14 +263,14 @@ WRITE16_MEMBER(cischeat_state::f1gpstar_motor_w)
 }
 
 
-WRITE16_MEMBER(cischeat_state::f1gpstar_soundint_w)
+void cischeat_state::f1gpstar_soundint_w(uint16_t data)
 {
 	/* $80008 and $80018 usually written in sequence, but not always */
 	m_soundcpu->set_input_line(4, HOLD_LINE);
 }
 
 
-WRITE16_MEMBER(cischeat_state::f1gpstar_comms_w)
+void cischeat_state::f1gpstar_comms_w(uint16_t data)
 {
 	/* Not sure about this one. Values: $10 then 0, $7 then 0 */
 	m_cpu2->set_input_line(INPUT_LINE_RESET, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
@@ -279,7 +279,7 @@ WRITE16_MEMBER(cischeat_state::f1gpstar_comms_w)
 }
 
 
-WRITE16_MEMBER(cischeat_state::f1gpstr2_io_w)
+void cischeat_state::f1gpstr2_io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -995,12 +995,10 @@ if ( machine().input().code_pressed(KEYCODE_Z) || machine().input().code_pressed
 {
 #if 1
 	{
-		address_space &space = m_maincpu->space(AS_PROGRAM);
-
 		popmessage("Cmd: %04X Pos:%04X Lim:%04X Inp:%02X",
 							m_scudhamm_motor_command,
-							scudhamm_motor_pos_r(space,0,0xffff),
-							scudhamm_motor_status_r(space,0,0xffff),
+							scudhamm_motor_pos_r(),
+							scudhamm_motor_status_r(),
 							scudhamm_analog_r() );
 
 #if 0

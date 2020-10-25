@@ -51,7 +51,7 @@ void isa8_chessmdr_device::device_reset()
 	{
 		// MAME doesn't allow reading ioport at device_start
 		u16 port = ioport("DSW")->read() * 0x40 + 0x10;
-		m_isa->install_device(port, port+1, read8_delegate(*this, FUNC(isa8_chessmdr_device::chessmdr_r)), write8_delegate(*this, FUNC(isa8_chessmdr_device::chessmdr_w)));
+		m_isa->install_device(port, port+1, read8sm_delegate(*this, FUNC(isa8_chessmdr_device::chessmdr_r)), write8sm_delegate(*this, FUNC(isa8_chessmdr_device::chessmdr_w)));
 
 		m_installed = true;
 	}
@@ -106,7 +106,7 @@ void isa8_chessmdr_device::device_add_mconfig(machine_config &config)
     I/O
 ******************************************************************************/
 
-READ8_MEMBER(isa8_chessmdr_device::chessmdr_r)
+uint8_t isa8_chessmdr_device::chessmdr_r(offs_t offset)
 {
 	if (offset == 1)
 		return m_chessm->data_r() ? 0 : 0x80;
@@ -114,7 +114,7 @@ READ8_MEMBER(isa8_chessmdr_device::chessmdr_r)
 		return 0xff;
 }
 
-WRITE8_MEMBER(isa8_chessmdr_device::chessmdr_w)
+void isa8_chessmdr_device::chessmdr_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{

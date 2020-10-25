@@ -419,8 +419,8 @@ u32 dgpix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, cons
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		int x = cliprect.left();
-		u16 *src = &m_vram[(m_vbuffer ? 0 : 0x20000) | (y << 9) | x];
-		u16 *dest = &bitmap.pix16(y, x);
+		u16 const *src = &m_vram[(m_vbuffer ? 0 : 0x20000) | (y << 9) | x];
+		u16 *dest = &bitmap.pix(y, x);
 
 		for (; x <= cliprect.right(); x++)
 		{

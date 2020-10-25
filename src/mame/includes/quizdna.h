@@ -36,16 +36,16 @@ private:
 	int m_video_enable;
 
 	// common
-	DECLARE_WRITE8_MEMBER(bg_ram_w);
-	DECLARE_WRITE8_MEMBER(fg_ram_w);
-	DECLARE_WRITE8_MEMBER(bg_yscroll_w);
-	DECLARE_WRITE8_MEMBER(bg_xscroll_w);
-	DECLARE_WRITE8_MEMBER(screen_ctrl_w);
-	DECLARE_WRITE8_MEMBER(paletteram_xBGR_RRRR_GGGG_BBBB_w);
-	DECLARE_WRITE8_MEMBER(rombank_w);
+	void bg_ram_w(offs_t offset, uint8_t data);
+	void fg_ram_w(offs_t offset, uint8_t data);
+	void bg_yscroll_w(uint8_t data);
+	void bg_xscroll_w(offs_t offset, uint8_t data);
+	void screen_ctrl_w(uint8_t data);
+	void paletteram_xBGR_RRRR_GGGG_BBBB_w(offs_t offset, uint8_t data);
+	void rombank_w(uint8_t data);
 
 	// game specific
-	DECLARE_WRITE8_MEMBER(gekiretu_rombank_w);
+	void gekiretu_rombank_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);

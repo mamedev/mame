@@ -458,7 +458,7 @@ static const int dendego_pressure_table[0x100] =
 #define DSP_IDLESKIP        1 /* dsp idle skipping speedup hack */
 
 
-WRITE8_MEMBER(taitojc_state::coin_control_w)
+void taitojc_state::coin_control_w(uint8_t data)
 {
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
 	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
@@ -474,7 +474,7 @@ WRITE8_MEMBER(taitojc_state::coin_control_w)
 ***************************************************************************/
 
 // dsp common ram has similar interrupt capability as MB8421
-WRITE16_MEMBER(taitojc_state::dsp_to_main_7fe_w)
+void taitojc_state::dsp_to_main_7fe_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_dsp_shared_ram[0x7fe]);
 
@@ -483,7 +483,7 @@ WRITE16_MEMBER(taitojc_state::dsp_to_main_7fe_w)
 		m_maincpu->set_input_line(6, ASSERT_LINE);
 }
 
-READ16_MEMBER(taitojc_state::dsp_to_main_7fe_r)
+uint16_t taitojc_state::dsp_to_main_7fe_r(offs_t offset, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_maincpu->set_input_line(6, CLEAR_LINE);
@@ -491,7 +491,7 @@ READ16_MEMBER(taitojc_state::dsp_to_main_7fe_r)
 	return m_dsp_shared_ram[0x7fe];
 }
 
-WRITE16_MEMBER(taitojc_state::main_to_dsp_7ff_w)
+void taitojc_state::main_to_dsp_7ff_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_dsp_shared_ram[0x7ff]);
 
@@ -536,7 +536,7 @@ INTERRUPT_GEN_MEMBER(taitojc_state::taitojc_vblank)
 	device.execute().set_input_line(2, HOLD_LINE); // where does it come from?
 }
 
-WRITE8_MEMBER(taitojc_state::jc_irq_unk_w)
+void taitojc_state::jc_irq_unk_w(uint8_t data)
 {
 	// gets written to at the end of irq6 routine
 	// writes $02 or $06, depending on a value in DSP RAM, what does it mean?
@@ -549,18 +549,18 @@ WRITE8_MEMBER(taitojc_state::jc_irq_unk_w)
 
 ***************************************************************************/
 
-READ16_MEMBER(taitojc_state::dsp_shared_r)
+uint16_t taitojc_state::dsp_shared_r(offs_t offset)
 {
 	return m_dsp_shared_ram[offset];
 }
 
-WRITE16_MEMBER(taitojc_state::dsp_shared_w)
+void taitojc_state::dsp_shared_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_dsp_shared_ram[offset]);
 }
 
 
-READ8_MEMBER(taitojc_state::mcu_comm_r)
+uint8_t taitojc_state::mcu_comm_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -578,7 +578,7 @@ READ8_MEMBER(taitojc_state::mcu_comm_r)
 	return 0;
 }
 
-WRITE8_MEMBER(taitojc_state::mcu_comm_w)
+void taitojc_state::mcu_comm_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -598,7 +598,7 @@ WRITE8_MEMBER(taitojc_state::mcu_comm_w)
 }
 
 
-READ8_MEMBER(taitojc_state::jc_pcbid_r)
+uint8_t taitojc_state::jc_pcbid_r(offs_t offset)
 {
 	static const char pcb_id[0x40] =
 	{ "DEV=TC0870HVP   SYS=CG  VER=1.0"};
@@ -618,12 +618,12 @@ Not emulated yet...
 
 */
 
-READ8_MEMBER(taitojc_state::jc_lan_r)
+uint8_t taitojc_state::jc_lan_r()
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER(taitojc_state::jc_lan_w)
+void taitojc_state::jc_lan_w(uint8_t data)
 {
 }
 
@@ -660,7 +660,7 @@ The OKI is used for seat vibration effects.
 
 */
 
-WRITE8_MEMBER(taitojc_state::dendego_speedmeter_w)
+void taitojc_state::dendego_speedmeter_w(uint8_t data)
 {
 	if (m_speed_meter != dendego_odometer_table[data])
 	{
@@ -670,7 +670,7 @@ WRITE8_MEMBER(taitojc_state::dendego_speedmeter_w)
 	}
 }
 
-WRITE8_MEMBER(taitojc_state::dendego_brakemeter_w)
+void taitojc_state::dendego_brakemeter_w(uint8_t data)
 {
 	if (m_brake_meter != dendego_pressure_table[data])
 	{
@@ -696,28 +696,28 @@ void taitojc_state::dendego_map(address_map &map)
 
 ***************************************************************************/
 
-READ8_MEMBER(taitojc_state::hc11_comm_r)
+uint8_t taitojc_state::hc11_comm_r()
 {
 	return m_mcu_comm_hc11;
 }
 
-WRITE8_MEMBER(taitojc_state::hc11_comm_w)
+void taitojc_state::hc11_comm_w(uint8_t data)
 {
 }
 
-READ8_MEMBER(taitojc_state::hc11_data_r)
+uint8_t taitojc_state::hc11_data_r()
 {
 	m_mcu_comm_hc11 |= 0x04;
 	m_mcu_comm_main |= 0x20;
 	return m_mcu_data_hc11;
 }
 
-WRITE8_MEMBER(taitojc_state::hc11_data_w)
+void taitojc_state::hc11_data_w(uint8_t data)
 {
 	m_mcu_data_main = data;
 }
 
-WRITE8_MEMBER(taitojc_state::hc11_output_w)
+void taitojc_state::hc11_output_w(uint8_t data)
 {
 /*
     cabinet lamps, active high
@@ -786,37 +786,37 @@ void taitojc_state::hc11_pgm_map(address_map &map)
     0x703b: Unknown read/write
 */
 
-WRITE16_MEMBER(taitojc_state::dsp_math_projection_w)
+void taitojc_state::dsp_math_projection_w(offs_t offset, uint16_t data)
 {
 	m_projection_data[offset] = data;
 }
 
-WRITE16_MEMBER(taitojc_state::dsp_math_viewport_w)
+void taitojc_state::dsp_math_viewport_w(offs_t offset, uint16_t data)
 {
 	m_viewport_data[offset] = data;
 }
 
-READ16_MEMBER(taitojc_state::dsp_math_projection_y_r)
+uint16_t taitojc_state::dsp_math_projection_y_r()
 {
 	return (m_projection_data[2] != 0) ? (m_projection_data[0] * m_viewport_data[0]) / m_projection_data[2] : 0;
 }
 
-READ16_MEMBER(taitojc_state::dsp_math_projection_x_r)
+uint16_t taitojc_state::dsp_math_projection_x_r()
 {
 	return (m_projection_data[2] != 0) ? (m_projection_data[1] * m_viewport_data[1]) / m_projection_data[2] : 0;
 }
 
-WRITE16_MEMBER(taitojc_state::dsp_math_intersection_w)
+void taitojc_state::dsp_math_intersection_w(offs_t offset, uint16_t data)
 {
 	m_intersection_data[offset] = data;
 }
 
-READ16_MEMBER(taitojc_state::dsp_math_intersection_r)
+uint16_t taitojc_state::dsp_math_intersection_r()
 {
 	return (m_intersection_data[2] != 0) ? (m_intersection_data[0] * m_intersection_data[1]) / m_intersection_data[2] : 0;
 }
 
-READ16_MEMBER(taitojc_state::dsp_math_unk_r)
+uint16_t taitojc_state::dsp_math_unk_r()
 {
 	return 0x7fff;
 }
@@ -824,13 +824,13 @@ READ16_MEMBER(taitojc_state::dsp_math_unk_r)
 
 /**************************************************************************/
 
-READ16_MEMBER(taitojc_state::dsp_rom_r)
+uint16_t taitojc_state::dsp_rom_r()
 {
 	assert (m_dsp_rom_pos < 0x800000); // never happens
 	return m_dspgfx[machine().side_effects_disabled() ? m_dsp_rom_pos : m_dsp_rom_pos++];
 }
 
-WRITE16_MEMBER(taitojc_state::dsp_rom_w)
+void taitojc_state::dsp_rom_w(offs_t offset, uint16_t data)
 {
 	if (offset == 0)
 	{
@@ -1125,7 +1125,12 @@ void taitojc_state::taitojc(machine_config &config)
 	TC0780FPA(config, m_tc0780fpa, 0);
 
 	/* sound hardware */
-	TAITO_EN(config, "taito_en", 0);
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	taito_en_device &taito_en(TAITO_EN(config, "taito_en", 0));
+	taito_en.add_route(0, "lspeaker", 1.0);
+	taito_en.add_route(1, "rspeaker", 1.0);
 }
 
 void taitojc_state::dendego(machine_config &config)
@@ -1154,7 +1159,7 @@ void taitojc_state::dendego(machine_config &config)
 
 ***************************************************************************/
 
-READ16_MEMBER(taitojc_state::taitojc_dsp_idle_skip_r)
+uint16_t taitojc_state::taitojc_dsp_idle_skip_r()
 {
 	if (m_dsp->pc() == 0x404c)
 		m_dsp->spin_until_time(attotime::from_usec(500));
@@ -1162,7 +1167,7 @@ READ16_MEMBER(taitojc_state::taitojc_dsp_idle_skip_r)
 	return m_dsp_shared_ram[0x7f0];
 }
 
-READ16_MEMBER(taitojc_state::dendego2_dsp_idle_skip_r)
+uint16_t taitojc_state::dendego2_dsp_idle_skip_r()
 {
 	if (m_dsp->pc() == 0x402e)
 		m_dsp->spin_until_time(attotime::from_usec(500));
@@ -1176,7 +1181,7 @@ void taitojc_state::init_taitojc()
 	m_has_dsp_hack = 1;
 
 	if (DSP_IDLESKIP)
-		m_dsp->space(AS_DATA).install_read_handler(0x7ff0, 0x7ff0, read16_delegate(*this, FUNC(taitojc_state::taitojc_dsp_idle_skip_r)));
+		m_dsp->space(AS_DATA).install_read_handler(0x7ff0, 0x7ff0, read16smo_delegate(*this, FUNC(taitojc_state::taitojc_dsp_idle_skip_r)));
 }
 
 void taitojc_state::init_dendego2()
@@ -1184,7 +1189,7 @@ void taitojc_state::init_dendego2()
 	init_taitojc();
 
 	if (DSP_IDLESKIP)
-		m_dsp->space(AS_DATA).install_read_handler(0x7ff0, 0x7ff0, read16_delegate(*this, FUNC(taitojc_state::dendego2_dsp_idle_skip_r)));
+		m_dsp->space(AS_DATA).install_read_handler(0x7ff0, 0x7ff0, read16smo_delegate(*this, FUNC(taitojc_state::dendego2_dsp_idle_skip_r)));
 }
 
 void taitojc_state::init_dangcurv()
@@ -1233,7 +1238,7 @@ ROM_START( sidebs ) /* Side by Side ver 2.7 J */
 	ROM_LOAD( "e23-10.ic20",  0x0c00000, 0x200000, CRC(038370d9) SHA1(c02f68a25121d2d5aae62c419522b25cd6ec32b6) )
 	ROM_LOAD( "e23-11.ic21",  0x0e00000, 0x200000, CRC(91fab03d) SHA1(1865d8b679faa6f2b3c14db2c6c461c00afd547c) )
 
-	ROM_REGION16_BE( 0x1000000, "ensoniq.0", ROMREGION_ERASE00  )
+	ROM_REGION16_BE( 0x1000000, "taito_en:ensoniq", ROMREGION_ERASE00  )
 	ROM_LOAD16_BYTE( "e23-15.ic32",  0x000000, 0x200000, CRC(8955b7c7) SHA1(767626bd5cf6810b0368ee85e487c12ef7e8a23d) )
 	ROM_LOAD16_BYTE( "e23-16.ic33",  0x400000, 0x200000, CRC(1d63d785) SHA1(0cf74bb433e9c453e35f7a552fdf9e22084b2f49) )
 	ROM_LOAD16_BYTE( "e23-17.ic34",  0x800000, 0x200000, CRC(1c54021a) SHA1(a1efbdb02d23a5d32ebd25cb8e99dface3178ebd) )
@@ -1276,7 +1281,7 @@ ROM_START( sidebsja ) /* Side by Side ver 2.6 J */
 	ROM_LOAD( "e23-10.ic20",  0x0c00000, 0x200000, CRC(038370d9) SHA1(c02f68a25121d2d5aae62c419522b25cd6ec32b6) )
 	ROM_LOAD( "e23-11.ic21",  0x0e00000, 0x200000, CRC(91fab03d) SHA1(1865d8b679faa6f2b3c14db2c6c461c00afd547c) )
 
-	ROM_REGION16_BE( 0x1000000, "ensoniq.0", ROMREGION_ERASE00  )
+	ROM_REGION16_BE( 0x1000000, "taito_en:ensoniq", ROMREGION_ERASE00  )
 	ROM_LOAD16_BYTE( "e23-15.ic32",  0x000000, 0x200000, CRC(8955b7c7) SHA1(767626bd5cf6810b0368ee85e487c12ef7e8a23d) )
 	ROM_LOAD16_BYTE( "e23-16.ic33",  0x400000, 0x200000, CRC(1d63d785) SHA1(0cf74bb433e9c453e35f7a552fdf9e22084b2f49) )
 	ROM_LOAD16_BYTE( "e23-17.ic34",  0x800000, 0x200000, CRC(1c54021a) SHA1(a1efbdb02d23a5d32ebd25cb8e99dface3178ebd) )
@@ -1319,7 +1324,7 @@ ROM_START( sidebsjb ) /* Side by Side ver 2.5 J */
 	ROM_LOAD( "e23-10.ic20",  0x0c00000, 0x200000, CRC(038370d9) SHA1(c02f68a25121d2d5aae62c419522b25cd6ec32b6) )
 	ROM_LOAD( "e23-11.ic21",  0x0e00000, 0x200000, CRC(91fab03d) SHA1(1865d8b679faa6f2b3c14db2c6c461c00afd547c) )
 
-	ROM_REGION16_BE( 0x1000000, "ensoniq.0", ROMREGION_ERASE00  )
+	ROM_REGION16_BE( 0x1000000, "taito_en:ensoniq", ROMREGION_ERASE00  )
 	ROM_LOAD16_BYTE( "e23-15.ic32",  0x000000, 0x200000, CRC(8955b7c7) SHA1(767626bd5cf6810b0368ee85e487c12ef7e8a23d) )
 	ROM_LOAD16_BYTE( "e23-16.ic33",  0x400000, 0x200000, CRC(1d63d785) SHA1(0cf74bb433e9c453e35f7a552fdf9e22084b2f49) )
 	ROM_LOAD16_BYTE( "e23-17.ic34",  0x800000, 0x200000, CRC(1c54021a) SHA1(a1efbdb02d23a5d32ebd25cb8e99dface3178ebd) )
@@ -1369,7 +1374,7 @@ ROM_START( sidebs2 ) /* Side by Side 2 Ver 2.6 OK */
 	ROM_RELOAD(              0x0f00000, 0x080000 )
 	ROM_RELOAD(              0x0f80000, 0x080000 )
 
-	ROM_REGION16_BE( 0x1000000, "ensoniq.0", ROMREGION_ERASE00  )
+	ROM_REGION16_BE( 0x1000000, "taito_en:ensoniq", ROMREGION_ERASE00  )
 	ROM_LOAD16_BYTE( "e23-15.ic32", 0x000000, 0x200000, CRC(8955b7c7) SHA1(767626bd5cf6810b0368ee85e487c12ef7e8a23d) ) // from sidebs (redump)
 	ROM_LOAD16_BYTE( "e38-17.ic33", 0x400000, 0x200000, CRC(61e81c7f) SHA1(aa650bc139685ad456c233b79aa60005a8fd6d79) )
 	ROM_LOAD16_BYTE( "e38-18.ic34", 0x800000, 0x200000, CRC(43e2f149) SHA1(32ea9156948a886dda5bd071e9f493ddc2b06212) )
@@ -1435,7 +1440,7 @@ ROM_START( sidebs2u ) /* Side by Side 2 Ver 2.6 A */
 	ROM_RELOAD(              0x0f00000, 0x080000 )
 	ROM_RELOAD(              0x0f80000, 0x080000 )
 
-	ROM_REGION16_BE( 0x1000000, "ensoniq.0", ROMREGION_ERASE00  )
+	ROM_REGION16_BE( 0x1000000, "taito_en:ensoniq", ROMREGION_ERASE00  )
 	ROM_LOAD16_BYTE( "e23-15.ic32", 0x000000, 0x200000, CRC(8955b7c7) SHA1(767626bd5cf6810b0368ee85e487c12ef7e8a23d) ) // from sidebs (redump)
 	ROM_LOAD16_BYTE( "e38-17.ic33", 0x400000, 0x200000, CRC(61e81c7f) SHA1(aa650bc139685ad456c233b79aa60005a8fd6d79) )
 	ROM_LOAD16_BYTE( "e38-18.ic34", 0x800000, 0x200000, CRC(43e2f149) SHA1(32ea9156948a886dda5bd071e9f493ddc2b06212) )
@@ -1501,7 +1506,7 @@ ROM_START( sidebs2j ) /* Side by Side 2 Evoluzione RR Ver 3.1 J */
 	ROM_RELOAD(              0x0f00000, 0x080000 )
 	ROM_RELOAD(              0x0f80000, 0x080000 )
 
-	ROM_REGION16_BE( 0x1000000, "ensoniq.0", ROMREGION_ERASE00  )
+	ROM_REGION16_BE( 0x1000000, "taito_en:ensoniq", ROMREGION_ERASE00  )
 	ROM_LOAD16_BYTE( "e23-15.ic32", 0x000000, 0x200000, CRC(8955b7c7) SHA1(767626bd5cf6810b0368ee85e487c12ef7e8a23d) ) // from sidebs (redump)
 	ROM_LOAD16_BYTE( "e38-17.ic33", 0x400000, 0x200000, CRC(61e81c7f) SHA1(aa650bc139685ad456c233b79aa60005a8fd6d79) )
 	ROM_LOAD16_BYTE( "e38-18.ic34", 0x800000, 0x200000, CRC(43e2f149) SHA1(32ea9156948a886dda5bd071e9f493ddc2b06212) )
@@ -1567,7 +1572,7 @@ ROM_START( sidebs2ja ) /* Side by Side 2 Evoluzione Ver 2.4 J */
 	ROM_RELOAD(              0x0f00000, 0x080000 )
 	ROM_RELOAD(              0x0f80000, 0x080000 )
 
-	ROM_REGION16_BE( 0x1000000, "ensoniq.0", ROMREGION_ERASE00  )
+	ROM_REGION16_BE( 0x1000000, "taito_en:ensoniq", ROMREGION_ERASE00  )
 	ROM_LOAD16_BYTE( "e23-15.ic32", 0x000000, 0x200000, CRC(8955b7c7) SHA1(767626bd5cf6810b0368ee85e487c12ef7e8a23d) ) // from sidebs (redump)
 	ROM_LOAD16_BYTE( "e38-17.ic33", 0x400000, 0x200000, CRC(61e81c7f) SHA1(aa650bc139685ad456c233b79aa60005a8fd6d79) )
 	ROM_LOAD16_BYTE( "e38-18.ic34", 0x800000, 0x200000, CRC(43e2f149) SHA1(32ea9156948a886dda5bd071e9f493ddc2b06212) )
@@ -1630,7 +1635,7 @@ ROM_START( dendego )
 	ROM_REGION( 0x40000, "oki", 0 )     /* train board, OKI6295 sound samples */
 	ROM_LOAD( "e35-28.trn",  0x000000, 0x040000, CRC(d1b571c1) SHA1(cac7d3f0285544fe36b8b744edfbac0190cdecab) )
 
-	ROM_REGION16_BE( 0x1000000, "ensoniq.0", ROMREGION_ERASE00  )
+	ROM_REGION16_BE( 0x1000000, "taito_en:ensoniq", ROMREGION_ERASE00  )
 	ROM_LOAD16_BYTE( "e35-17.ic32",  0x000000, 0x200000, CRC(3bc23aa1) SHA1(621e0f2f5f3dbd7d7ce05c9cd317958c361c1c26) )
 	ROM_LOAD16_BYTE( "e35-18.ic33",  0x400000, 0x200000, CRC(a084d3aa) SHA1(18ea39366006e362e16d6732ce3e79cd3bfa041e) )
 	ROM_LOAD16_BYTE( "e35-19.ic34",  0x800000, 0x200000, CRC(ebe2dcef) SHA1(16ae41e0f3bb242cbc2922f53cacbd99961a3f97) )
@@ -1677,7 +1682,7 @@ ROM_START( dendegox )
 	ROM_REGION( 0x40000, "oki", 0 )     /* train board, OKI6295 sound samples */
 	ROM_LOAD( "e35-28.trn",  0x000000, 0x040000, CRC(d1b571c1) SHA1(cac7d3f0285544fe36b8b744edfbac0190cdecab) )
 
-	ROM_REGION16_BE( 0x1000000, "ensoniq.0", ROMREGION_ERASE00  )
+	ROM_REGION16_BE( 0x1000000, "taito_en:ensoniq", ROMREGION_ERASE00  )
 	ROM_LOAD16_BYTE( "e35-17.ic32",  0x000000, 0x200000, CRC(3bc23aa1) SHA1(621e0f2f5f3dbd7d7ce05c9cd317958c361c1c26) )
 	ROM_LOAD16_BYTE( "e35-18.ic33",  0x400000, 0x200000, CRC(a084d3aa) SHA1(18ea39366006e362e16d6732ce3e79cd3bfa041e) )
 	ROM_LOAD16_BYTE( "e35-19.ic34",  0x800000, 0x200000, CRC(ebe2dcef) SHA1(16ae41e0f3bb242cbc2922f53cacbd99961a3f97) )
@@ -1728,7 +1733,7 @@ ROM_START( dendego2 )
 	ROM_REGION( 0x40000, "oki", 0 )     /* train board, OKI6295 sound samples */
 	ROM_LOAD( "e35-28.trn",  0x000000, 0x040000, CRC(d1b571c1) SHA1(cac7d3f0285544fe36b8b744edfbac0190cdecab) )
 
-	ROM_REGION16_BE( 0x1000000, "ensoniq.0", ROMREGION_ERASE00  )
+	ROM_REGION16_BE( 0x1000000, "taito_en:ensoniq", ROMREGION_ERASE00  )
 	ROM_LOAD16_BYTE( "e52-21.ic32",  0x000000, 0x200000, CRC(ba58081d) SHA1(bcb6c8781191d48f906ed404a3e7388097a64781) )
 	ROM_LOAD16_BYTE( "e52-22.ic33",  0x400000, 0x200000, CRC(dda281b1) SHA1(4851a6bf7902548c5033090a0e5c15f74c00ef58) )
 	ROM_LOAD16_BYTE( "e52-23.ic34",  0x800000, 0x200000, CRC(ebe2dcef) SHA1(16ae41e0f3bb242cbc2922f53cacbd99961a3f97) ) // same as e35-19.ic34 from dendego
@@ -1779,7 +1784,7 @@ ROM_START( dendego23k )
 	ROM_REGION( 0x40000, "oki", 0 )     /* train board, OKI6295 sound samples */
 	ROM_LOAD( "e35-28.trn",  0x000000, 0x040000, CRC(d1b571c1) SHA1(cac7d3f0285544fe36b8b744edfbac0190cdecab) )
 
-	ROM_REGION16_BE( 0x1000000, "ensoniq.0", ROMREGION_ERASE00  )
+	ROM_REGION16_BE( 0x1000000, "taito_en:ensoniq", ROMREGION_ERASE00  )
 	ROM_LOAD16_BYTE( "e52-21.ic32",  0x000000, 0x200000, CRC(ba58081d) SHA1(bcb6c8781191d48f906ed404a3e7388097a64781) )
 	ROM_LOAD16_BYTE( "e52-22.ic33",  0x400000, 0x200000, CRC(dda281b1) SHA1(4851a6bf7902548c5033090a0e5c15f74c00ef58) )
 	ROM_LOAD16_BYTE( "e52-23.ic34",  0x800000, 0x200000, CRC(ebe2dcef) SHA1(16ae41e0f3bb242cbc2922f53cacbd99961a3f97) ) // same as e35-19.ic34 from dendego
@@ -1825,7 +1830,7 @@ ROM_START( landgear ) /* Landing Gear Ver 4.2 O */
 	ROM_LOAD( "e17-07.ic18",  0x0800000, 0x200000, CRC(0f180eb0) SHA1(5e1dd920f110a62a029bace6f4cb80fee0fdaf03) )
 	ROM_LOAD( "e17-08.ic19",  0x0a00000, 0x200000, CRC(3107e154) SHA1(59a99770c2aa535cac6569f41b03be1554e0e800) )
 
-	ROM_REGION16_BE( 0x1000000, "ensoniq.0", ROMREGION_ERASE00  )
+	ROM_REGION16_BE( 0x1000000, "taito_en:ensoniq", ROMREGION_ERASE00  )
 	ROM_LOAD16_BYTE( "e17-13.ic32",  0x000000, 0x200000, CRC(6cf238e7) SHA1(0745d2dcfea26178adde3ad08650156e8e30651f) )
 	ROM_LOAD16_BYTE( "e17-14.ic33",  0x400000, 0x200000, CRC(5efec311) SHA1(f253bc40f2567f59ddfb617fddb8b9a389bfac89) )
 	ROM_LOAD16_BYTE( "e17-15.ic34",  0x800000, 0x200000, CRC(41d7a7d0) SHA1(f5a8b79c1d47611e93d46aaf921107b52090bb5f) )
@@ -1879,7 +1884,7 @@ ROM_START( landgearj ) /* Landing Gear Ver 4.2 J */
 	ROM_LOAD( "e17-07.ic18",  0x0800000, 0x200000, CRC(0f180eb0) SHA1(5e1dd920f110a62a029bace6f4cb80fee0fdaf03) )
 	ROM_LOAD( "e17-08.ic19",  0x0a00000, 0x200000, CRC(3107e154) SHA1(59a99770c2aa535cac6569f41b03be1554e0e800) )
 
-	ROM_REGION16_BE( 0x1000000, "ensoniq.0", ROMREGION_ERASE00  )
+	ROM_REGION16_BE( 0x1000000, "taito_en:ensoniq", ROMREGION_ERASE00  )
 	ROM_LOAD16_BYTE( "e17-13.ic32",  0x000000, 0x200000, CRC(6cf238e7) SHA1(0745d2dcfea26178adde3ad08650156e8e30651f) )
 	ROM_LOAD16_BYTE( "e17-14.ic33",  0x400000, 0x200000, CRC(5efec311) SHA1(f253bc40f2567f59ddfb617fddb8b9a389bfac89) )
 	ROM_LOAD16_BYTE( "e17-15.ic34",  0x800000, 0x200000, CRC(41d7a7d0) SHA1(f5a8b79c1d47611e93d46aaf921107b52090bb5f) )
@@ -1933,7 +1938,7 @@ ROM_START( landgeara ) /* Landing Gear Ver 3.1 O, is there an alternate set with
 	ROM_LOAD( "e17-07.ic18",  0x0800000, 0x200000, CRC(0f180eb0) SHA1(5e1dd920f110a62a029bace6f4cb80fee0fdaf03) )
 	ROM_LOAD( "e17-08.ic19",  0x0a00000, 0x200000, CRC(3107e154) SHA1(59a99770c2aa535cac6569f41b03be1554e0e800) )
 
-	ROM_REGION16_BE( 0x1000000, "ensoniq.0", ROMREGION_ERASE00  )
+	ROM_REGION16_BE( 0x1000000, "taito_en:ensoniq", ROMREGION_ERASE00  )
 	ROM_LOAD16_BYTE( "e17-13.ic32",  0x000000, 0x200000, CRC(6cf238e7) SHA1(0745d2dcfea26178adde3ad08650156e8e30651f) )
 	ROM_LOAD16_BYTE( "e17-14.ic33",  0x400000, 0x200000, CRC(5efec311) SHA1(f253bc40f2567f59ddfb617fddb8b9a389bfac89) )
 	ROM_LOAD16_BYTE( "e17-15.ic34",  0x800000, 0x200000, CRC(41d7a7d0) SHA1(f5a8b79c1d47611e93d46aaf921107b52090bb5f) )
@@ -1987,7 +1992,7 @@ ROM_START( landgearja ) /* Landing Gear Ver 3.0 J, is there an alternate set wit
 	ROM_LOAD( "e17-07.ic18",  0x0800000, 0x200000, CRC(0f180eb0) SHA1(5e1dd920f110a62a029bace6f4cb80fee0fdaf03) )
 	ROM_LOAD( "e17-08.ic19",  0x0a00000, 0x200000, CRC(3107e154) SHA1(59a99770c2aa535cac6569f41b03be1554e0e800) )
 
-	ROM_REGION16_BE( 0x1000000, "ensoniq.0", ROMREGION_ERASE00  )
+	ROM_REGION16_BE( 0x1000000, "taito_en:ensoniq", ROMREGION_ERASE00  )
 	ROM_LOAD16_BYTE( "e17-13.ic32",  0x000000, 0x200000, CRC(6cf238e7) SHA1(0745d2dcfea26178adde3ad08650156e8e30651f) )
 	ROM_LOAD16_BYTE( "e17-14.ic33",  0x400000, 0x200000, CRC(5efec311) SHA1(f253bc40f2567f59ddfb617fddb8b9a389bfac89) )
 	ROM_LOAD16_BYTE( "e17-15.ic34",  0x800000, 0x200000, CRC(41d7a7d0) SHA1(f5a8b79c1d47611e93d46aaf921107b52090bb5f) )
@@ -2045,7 +2050,7 @@ ROM_START( dangcurv ) /* Dangerous Curves Ver 2.9 O */
 	ROM_LOAD( "e09-11.ic20",  0x0c00000, 0x200000, CRC(18cc0ba7) SHA1(626929a501def6f1b8bd6a468786efb0b0dda9fa) )
 	ROM_LOAD( "e09-12.ic21",  0x0e00000, 0x200000, CRC(3273e438) SHA1(e9581d52f5db1c1924a860464579332a2f23e713) )
 
-	ROM_REGION16_BE( 0x1000000, "ensoniq.0", ROMREGION_ERASE00  )
+	ROM_REGION16_BE( 0x1000000, "taito_en:ensoniq", ROMREGION_ERASE00  )
 	ROM_LOAD16_BYTE( "e09-17.ic32",  0x000000, 0x200000, CRC(a8a6512e) SHA1(71bd3ccd65b731270b92da334b9fb99c28e267fe) )
 	ROM_LOAD16_BYTE( "e09-18.ic33",  0x400000, 0x200000, CRC(bdf1f5eb) SHA1(a568a99a90e0afbcd26ddd320f515ed62cf0db1a) )
 	ROM_LOAD16_BYTE( "e09-19.ic34",  0x800000, 0x200000, CRC(3626c7ed) SHA1(7535f0457b3d9fe1d54712a26322d6144b9e7de6) )
@@ -2102,7 +2107,7 @@ ROM_START( dangcurvj ) /* Dangerous Curves Ver 2.2 J */
 	ROM_LOAD( "e09-11.ic20",  0x0c00000, 0x200000, CRC(18cc0ba7) SHA1(626929a501def6f1b8bd6a468786efb0b0dda9fa) )
 	ROM_LOAD( "e09-12.ic21",  0x0e00000, 0x200000, CRC(3273e438) SHA1(e9581d52f5db1c1924a860464579332a2f23e713) )
 
-	ROM_REGION16_BE( 0x1000000, "ensoniq.0", ROMREGION_ERASE00  )
+	ROM_REGION16_BE( 0x1000000, "taito_en:ensoniq", ROMREGION_ERASE00  )
 	ROM_LOAD16_BYTE( "e09-17.ic32",  0x000000, 0x200000, CRC(a8a6512e) SHA1(71bd3ccd65b731270b92da334b9fb99c28e267fe) )
 	ROM_LOAD16_BYTE( "e09-18.ic33",  0x400000, 0x200000, CRC(bdf1f5eb) SHA1(a568a99a90e0afbcd26ddd320f515ed62cf0db1a) )
 	ROM_LOAD16_BYTE( "e09-19.ic34",  0x800000, 0x200000, CRC(3626c7ed) SHA1(7535f0457b3d9fe1d54712a26322d6144b9e7de6) )

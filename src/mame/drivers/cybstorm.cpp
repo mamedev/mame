@@ -44,13 +44,13 @@ void cybstorm_state::machine_start()
  *
  *************************************/
 
-READ32_MEMBER(cybstorm_state::special_port1_r)
+uint32_t cybstorm_state::special_port1_r()
 {
 	return ioport("9F0010")->read();
 }
 
 
-WRITE32_MEMBER(cybstorm_state::latch_w)
+void cybstorm_state::latch_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t oldword = m_latch_data;
 	COMBINE_DATA(&m_latch_data);

@@ -91,21 +91,21 @@ private:
 
 	uint16_t m_video_enable;
 
-	DECLARE_READ16_MEMBER(video_enable_r);
-	DECLARE_WRITE16_MEMBER(video_enable_w);
+	uint16_t video_enable_r();
+	void video_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER(dpram_word_r);
-	DECLARE_WRITE16_MEMBER(dpram_word_w);
-	DECLARE_READ8_MEMBER(dpram_byte_r);
-	DECLARE_WRITE8_MEMBER(dpram_byte_w);
+	uint16_t dpram_word_r(offs_t offset);
+	void dpram_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t dpram_byte_r(offs_t offset);
+	void dpram_byte_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(eeprom_w);
-	DECLARE_READ8_MEMBER(eeprom_r);
+	void eeprom_w(offs_t offset, uint8_t data);
+	uint8_t eeprom_r(offs_t offset);
 
-	DECLARE_WRITE8_MEMBER(sound_bankselect_w);
+	void sound_bankselect_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(sound_reset_w);
-	DECLARE_WRITE8_MEMBER(system_reset_w);
+	void sound_reset_w(uint8_t data);
+	void system_reset_w(uint8_t data);
 	void reset_all_subcpus(int state);
 
 	std::unique_ptr<uint8_t[]> m_eeprom;
@@ -204,7 +204,7 @@ void namco_de_pcbstack_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	C140(config, m_c140, 8000000/374);
+	C140(config, m_c140, 49.152_MHz_XTAL / 2304);
 	m_c140->set_addrmap(0, &namco_de_pcbstack_device::c140_map);
 	m_c140->int1_callback().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
 	m_c140->add_route(0, "lspeaker", 0.50);
@@ -244,12 +244,12 @@ uint32_t namco_de_pcbstack_device::screen_update(screen_device &screen, bitmap_i
 
 }
 
-READ16_MEMBER(namco_de_pcbstack_device::video_enable_r)
+uint16_t namco_de_pcbstack_device::video_enable_r()
 {
 	return m_video_enable;
 }
 
-WRITE16_MEMBER(namco_de_pcbstack_device::video_enable_w)
+void namco_de_pcbstack_device::video_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_video_enable ); /* 0x40 = enable */
 	if( m_video_enable!=0 && m_video_enable!=0x40 )
@@ -262,12 +262,12 @@ WRITE16_MEMBER(namco_de_pcbstack_device::video_enable_w)
 
 /* dual port ram memory handlers */
 
-READ16_MEMBER(namco_de_pcbstack_device::dpram_word_r)
+uint16_t namco_de_pcbstack_device::dpram_word_r(offs_t offset)
 {
 	return m_dpram[offset];
 }
 
-WRITE16_MEMBER(namco_de_pcbstack_device::dpram_word_w)
+void namco_de_pcbstack_device::dpram_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if( ACCESSING_BITS_0_7 )
 	{
@@ -275,12 +275,12 @@ WRITE16_MEMBER(namco_de_pcbstack_device::dpram_word_w)
 	}
 }
 
-READ8_MEMBER(namco_de_pcbstack_device::dpram_byte_r)
+uint8_t namco_de_pcbstack_device::dpram_byte_r(offs_t offset)
 {
 	return m_dpram[offset];
 }
 
-WRITE8_MEMBER(namco_de_pcbstack_device::dpram_byte_w)
+void namco_de_pcbstack_device::dpram_byte_w(offs_t offset, uint8_t data)
 {
 	m_dpram[offset] = data;
 }
@@ -383,12 +383,12 @@ void namco_de_pcbstack_device::driveyes_slave_map(address_map &map)
 	map(0x1c0000, 0x1fffff).m(m_slave_intc, FUNC(namco_c148_device::map));
 }
 
-WRITE8_MEMBER( namco_de_pcbstack_device::sound_bankselect_w )
+void namco_de_pcbstack_device::sound_bankselect_w(uint8_t data)
 {
 	m_audiobank->set_entry(data>>4);
 }
 
-WRITE8_MEMBER(namco_de_pcbstack_device::sound_reset_w)
+void namco_de_pcbstack_device::sound_reset_w(uint8_t data)
 {
 	if (data & 0x01)
 	{
@@ -403,7 +403,7 @@ WRITE8_MEMBER(namco_de_pcbstack_device::sound_reset_w)
 	}
 }
 
-WRITE8_MEMBER(namco_de_pcbstack_device::system_reset_w)
+void namco_de_pcbstack_device::system_reset_w(uint8_t data)
 {
 	reset_all_subcpus(data & 1 ? CLEAR_LINE : ASSERT_LINE);
 
@@ -417,12 +417,12 @@ void namco_de_pcbstack_device::reset_all_subcpus(int state)
 	m_c68->ext_reset(state);
 }
 
-WRITE8_MEMBER(namco_de_pcbstack_device::eeprom_w)
+void namco_de_pcbstack_device::eeprom_w(offs_t offset, uint8_t data)
 {
 	m_eeprom[offset] = data;
 }
 
-READ8_MEMBER(namco_de_pcbstack_device::eeprom_r)
+uint8_t namco_de_pcbstack_device::eeprom_r(offs_t offset)
 {
 	return m_eeprom[offset];
 }

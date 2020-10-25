@@ -15,7 +15,6 @@
 
 #include "emu.h"
 #include "includes/exidy.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 
@@ -55,7 +54,7 @@ void exidy_state::adjust_sample(uint8_t freq)
 }
 
 
-WRITE8_MEMBER( exidy_state::targ_audio_1_w )
+void exidy_state::targ_audio_1_w(uint8_t data)
 {
 	/* CPU music */
 	if (BIT(m_port_1_last ^ data, 0))
@@ -104,7 +103,7 @@ WRITE8_MEMBER( exidy_state::targ_audio_1_w )
 }
 
 
-WRITE8_MEMBER( exidy_state::targ_audio_2_w )
+void exidy_state::targ_audio_2_w(uint8_t data)
 {
 	if ((data & 0x01) && !(m_port_2_last & 0x01))
 	{
@@ -119,7 +118,7 @@ WRITE8_MEMBER( exidy_state::targ_audio_2_w )
 }
 
 
-WRITE8_MEMBER( exidy_state::spectar_audio_2_w )
+void exidy_state::spectar_audio_2_w(uint8_t data)
 {
 	adjust_sample(data);
 }
@@ -187,8 +186,6 @@ void exidy_state::spectar_audio(machine_config &config)
 	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
 void exidy_state::targ_audio(machine_config &config)
@@ -202,6 +199,4 @@ void exidy_state::targ_audio(machine_config &config)
 	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }

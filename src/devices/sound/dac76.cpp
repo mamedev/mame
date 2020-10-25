@@ -51,7 +51,7 @@ dac76_device::dac76_device(const machine_config &mconfig, const char *tag, devic
 void dac76_device::device_start()
 {
 	// create sound stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate() * 8);
+	m_stream = stream_alloc(0, 1, machine().sample_rate() * 8);
 
 	// register for save states
 	save_item(NAME(m_chord));
@@ -75,18 +75,15 @@ void dac76_device::device_reset()
 //  our sound stream
 //-------------------------------------------------
 
-void dac76_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void dac76_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	// get current output level
 	int step_size = (2 << m_chord);
-	stream_sample_t vout = m_level[m_chord] + m_step * step_size;
+	s32 vout = m_level[m_chord] + m_step * step_size;
 
 	// apply sign bit
 	vout *= (m_sb ? +1 : -1);
 
-	// range is 0-8031, normalize to about 0-32768 range
-	vout *= 4;
-
-	for (int i = 0; i < samples; i++)
-		outputs[0][i] = vout;
+	// range is 0-8031, normalize to 0-1 range
+	outputs[0].fill(stream_buffer::sample_t(vout) * (1.0 / 8031.0));
 }

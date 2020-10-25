@@ -24,6 +24,8 @@
 
 #include "unspdasm.h"
 
+#include <climits>
+
 DEFINE_DEVICE_TYPE(UNSP,    unsp_device,    "unsp",    "SunPlus u'nSP (ISA 1.0)")
 // 1.1 is just 1.0 with better CPI?
 DEFINE_DEVICE_TYPE(UNSP_11, unsp_11_device, "unsp_11", "SunPlus u'nSP (ISA 1.1)")
@@ -39,12 +41,11 @@ unsp_device::unsp_device(const machine_config &mconfig, device_type type, const 
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_core(nullptr)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 23, -1, internal)
-	, m_program(nullptr)
 	, m_debugger_temp(0)
 #if UNSP_LOG_OPCODES || UNSP_LOG_REGS
 	, m_log_ops(0)
 #endif
-	, m_cache(CACHE_SIZE + sizeof(unsp_device))
+	, m_drccache(CACHE_SIZE + sizeof(unsp_device))
 	, m_drcuml(nullptr)
 	, m_drcfe(nullptr)
 	, m_drcoptions(0)
@@ -191,7 +192,7 @@ void unsp_device::unimplemented_opcode(uint16_t op, uint16_t ximm, uint16_t ximm
 void unsp_device::device_start()
 {
 
-	m_core = (internal_unsp_state *)m_cache.alloc_near(sizeof(internal_unsp_state));
+	m_core = (internal_unsp_state *)m_drccache.alloc_near(sizeof(internal_unsp_state));
 	memset(m_core, 0, sizeof(internal_unsp_state));
 
 #if ENABLE_UNSP_DRC
@@ -209,13 +210,11 @@ void unsp_device::device_start()
 
 	m_debugger_temp = 0;
 
-	m_program = &space(AS_PROGRAM);
-	auto cache = m_program->cache<1, -1, ENDIANNESS_BIG>();
-	m_pr16 = [cache](offs_t address) -> u16 { return cache->read_word(address); };
-	m_prptr = [cache](offs_t address) -> const void * { return cache->read_ptr(address); };
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
 
 	uint32_t umlflags = 0;
-	m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, umlflags, 1, 23, 0);
+	m_drcuml = std::make_unique<drcuml_state>(*this, m_drccache, umlflags, 1, 23, 0);
 
 	// add UML symbols-
 	m_drcuml->symbol_add(&m_core->m_r[REG_SP], sizeof(uint32_t), "SP");
@@ -257,11 +256,11 @@ void unsp_device::device_start()
 	state_add(UNSP_FIQ_EN, "FIQE", m_core->m_enable_fiq).formatstr("%1u");
 	state_add(UNSP_FIR_MOV_EN, "FIR_MOV", m_core->m_fir_move).formatstr("%1u");
 	state_add(UNSP_SB,     "SB", m_core->m_sb).formatstr("%1X");
-	state_add(UNSP_AQ,     "AQ", m_core->m_sb).formatstr("%1u");
-	state_add(UNSP_FRA,    "FRA", m_core->m_sb).formatstr("%1u");
-	state_add(UNSP_BNK,    "BNK", m_core->m_sb).formatstr("%1u");
-	state_add(UNSP_INE,    "INE", m_core->m_sb).formatstr("%1u");
-	state_add(UNSP_PRI,    "PRI", m_core->m_sb).formatstr("%1u");
+	state_add(UNSP_AQ,     "AQ", m_core->m_aq).formatstr("%1u");
+	state_add(UNSP_FRA,    "FRA", m_core->m_fra).formatstr("%1u");
+	state_add(UNSP_BNK,    "BNK", m_core->m_bnk).formatstr("%1u");
+	state_add(UNSP_INE,    "INE", m_core->m_ine).formatstr("%1u");
+	state_add(UNSP_PRI,    "PRI", m_core->m_pri).formatstr("%1u");
 #if UNSP_LOG_OPCODES || UNSP_LOG_REGS
 	state_add(UNSP_LOG_OPS,"LOG", m_log_ops).formatstr("%1u");
 #endif
@@ -281,6 +280,9 @@ void unsp_device::device_start()
 	save_item(NAME(m_core->m_bnk));
 	save_item(NAME(m_core->m_ine));
 	save_item(NAME(m_core->m_pri));
+	save_item(NAME(m_core->m_divq_bit));
+	save_item(NAME(m_core->m_divq_dividend));
+	save_item(NAME(m_core->m_divq_divisor));
 
 	set_icountptr(m_core->m_icount);
 }
@@ -328,6 +330,7 @@ void unsp_device::device_reset()
 	m_core->m_fiq = 0;
 	m_core->m_irq = 0;
 	m_core->m_sirq = 0;
+	m_core->m_divq_bit = UINT_MAX;
 }
 
 void unsp_20_device::device_reset()

@@ -36,7 +36,7 @@ Interesting test cases (macrossp, quizmoon doesn't use tilemap zoom):
 
 /*** SCR A LAYER ***/
 
-WRITE32_MEMBER(macrossp_state::macrossp_scra_videoram_w)
+void macrossp_state::macrossp_scra_videoram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_scra_videoram[offset]);
 
@@ -71,7 +71,7 @@ TILE_GET_INFO_MEMBER(macrossp_state::get_macrossp_scra_tile_info)
 
 /*** SCR B LAYER ***/
 
-WRITE32_MEMBER(macrossp_state::macrossp_scrb_videoram_w)
+void macrossp_state::macrossp_scrb_videoram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_scrb_videoram[offset]);
 
@@ -106,7 +106,7 @@ TILE_GET_INFO_MEMBER(macrossp_state::get_macrossp_scrb_tile_info)
 
 /*** SCR C LAYER ***/
 
-WRITE32_MEMBER(macrossp_state::macrossp_scrc_videoram_w)
+void macrossp_state::macrossp_scrc_videoram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_scrc_videoram[offset]);
 
@@ -141,7 +141,7 @@ TILE_GET_INFO_MEMBER(macrossp_state::get_macrossp_scrc_tile_info)
 
 /*** TEXT LAYER ***/
 
-WRITE32_MEMBER(macrossp_state::macrossp_text_videoram_w)
+void macrossp_state::macrossp_text_videoram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_text_videoram[offset]);
 

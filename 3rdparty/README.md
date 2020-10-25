@@ -2,6 +2,8 @@
 
 asio - [Boost Software License](http://www.boost.org/LICENSE_1_0.txt)
 
+asmjit - [zlib license](http://opensource.org/licenses/Zlib)
+
 benchmark - [Apache License, Version 2.0](http://opensource.org/licenses/Apache-2.0) (used only for testing, not part of distribution)
 
 bgfx - [The BSD 2-Clause License](http://opensource.org/licenses/BSD-2-Clause)

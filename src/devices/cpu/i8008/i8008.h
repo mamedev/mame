@@ -81,9 +81,9 @@ protected:
 
 	uint8_t m_PARITY[256];
 
-	address_space *m_program;
-	address_space *m_io;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
+	memory_access<14, 0, 0, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<14, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
+	memory_access< 5, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
 };
 
 // device type definition

@@ -64,7 +64,6 @@ expected: 43 FB CC 9A D4 23 6C 01 3E  <- From ROM 4
 #include "machine/pit8253.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/mc6845.h"
 #include "emupal.h"
 #include "screen.h"
@@ -105,13 +104,13 @@ private:
 	required_device<palette_device> m_palette;
 	required_device_array<dac_byte_interface, 6> m_dac;
 
-	DECLARE_READ8_MEMBER(vram_r);
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_WRITE8_MEMBER(videoctrl_w);
-	DECLARE_READ8_MEMBER(z1_r);
-	DECLARE_READ8_MEMBER(track_lo_r);
-	DECLARE_READ8_MEMBER(track_hi_r);
-	DECLARE_WRITE8_MEMBER(out_w);
+	uint8_t vram_r(offs_t offset);
+	void vram_w(offs_t offset, uint8_t data);
+	void videoctrl_w(offs_t offset, uint8_t data);
+	uint8_t z1_r(offs_t offset);
+	uint8_t track_lo_r();
+	uint8_t track_hi_r();
+	void out_w(uint8_t data);
 	template<uint8_t Which> DECLARE_WRITE_LINE_MEMBER(pit_out_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(laserbas_scanline);
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -150,8 +149,8 @@ MC6845_UPDATE_ROW( laserbas_state::crtc_update_row )
 	}
 
 	int pixaddr = y << 8;
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint32_t *b = &bitmap.pix32(y);
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint32_t *const b = &bitmap.pix(y);
 
 	while (x != x_max)
 	{
@@ -175,17 +174,17 @@ MC6845_UPDATE_ROW( laserbas_state::crtc_update_row )
 	}
 }
 
-READ8_MEMBER(laserbas_state::vram_r)
+uint8_t laserbas_state::vram_r(offs_t offset)
 {
 	return m_vram[offset+(m_vrambank?0x8000:0)];
 }
 
-WRITE8_MEMBER(laserbas_state::vram_w)
+void laserbas_state::vram_w(offs_t offset, uint8_t data)
 {
 	m_vram[offset+(m_vrambank?0x8000:0)] = data;
 }
 
-WRITE8_MEMBER(laserbas_state::videoctrl_w)
+void laserbas_state::videoctrl_w(offs_t offset, uint8_t data)
 {
 	if (!(offset&1))
 	{
@@ -203,7 +202,7 @@ WRITE8_MEMBER(laserbas_state::videoctrl_w)
 	}
 }
 
-READ8_MEMBER(laserbas_state::z1_r)
+uint8_t laserbas_state::z1_r(offs_t offset)
 {
 	m_z1data = (m_z1data >> 10) | (uint64_t(offset & 0x03ff) << 30);
 
@@ -223,7 +222,7 @@ READ8_MEMBER(laserbas_state::z1_r)
 	return (bit7 << 7) | (bit6 << 6) | (bit5 << 5) | (bit4 << 4) | (bit3 << 3) | (bit2 << 2) | (bit1 << 1) | (bit0 << 0);
 }
 
-READ8_MEMBER(laserbas_state::track_lo_r)
+uint8_t laserbas_state::track_lo_r()
 {
 	uint8_t dx = ioport("TRACK_X")->read();
 	uint8_t dy = ioport("TRACK_Y")->read();
@@ -235,13 +234,13 @@ READ8_MEMBER(laserbas_state::track_lo_r)
 	return data;
 }
 
-READ8_MEMBER(laserbas_state::track_hi_r)
+uint8_t laserbas_state::track_hi_r()
 {
 	int data =   ((ioport("TRACK_X")->read() & 0x10) >> 4) | ((ioport("TRACK_Y")->read() & 0x10) >> 3);
 	return data;
 }
 
-WRITE8_MEMBER(laserbas_state::out_w)
+void laserbas_state::out_w(uint8_t data)
 {
 	/* sound related , maybe also lamps */
 }
@@ -412,13 +411,6 @@ void laserbas_state::laserbas(machine_config &config)
 	DAC_4BIT_R2R(config, m_dac[3], 0).add_route(ALL_OUTPUTS, "speaker", 0.16);
 	DAC_4BIT_R2R(config, m_dac[4], 0).add_route(ALL_OUTPUTS, "speaker", 0.16);
 	DAC_4BIT_R2R(config, m_dac[5], 0).add_route(ALL_OUTPUTS, "speaker", 0.16);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac3", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac3", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac4", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac4", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac5", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac5", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac6", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac6", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 /*

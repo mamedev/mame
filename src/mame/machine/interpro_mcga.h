@@ -13,8 +13,8 @@ public:
 
 	virtual void map(address_map &map);
 
-	DECLARE_READ16_MEMBER(reg00_r) { return m_reg[0]; }
-	DECLARE_WRITE16_MEMBER(reg00_w) { m_reg[0] = data; }
+	u16 reg00_r() { return m_reg[0]; }
+	void reg00_w(u16 data) { m_reg[0] = data; }
 
 	enum control_mask
 	{
@@ -29,8 +29,8 @@ public:
 
 		CONTROL_MASK       = 0x871f
 	};
-	DECLARE_READ16_MEMBER(control_r) { return m_control; }
-	virtual DECLARE_WRITE16_MEMBER(control_w);
+	u16 control_r() { return m_control; }
+	virtual void control_w(u16 data);
 
 	enum error_mask
 	{
@@ -40,23 +40,23 @@ public:
 		ERROR_ADDR  = 0x1c00,
 		ERROR_VALID = 0x8000
 	};
-	DECLARE_READ16_MEMBER(error_r) { return m_error; }
-	DECLARE_WRITE16_MEMBER(error_w) { m_error = data; }
-	DECLARE_READ8_MEMBER(frcrd_r) { return m_frcrd; }
-	DECLARE_WRITE8_MEMBER(frcrd_w) { m_frcrd = data; }
-	DECLARE_READ8_MEMBER(cbsub_r) { return m_cbsub; }
-	DECLARE_WRITE8_MEMBER(cbsub_w) { m_cbsub = data; }
-	DECLARE_READ16_MEMBER(reg28_r) { return m_reg[1]; }
-	DECLARE_WRITE16_MEMBER(reg28_w) { m_reg[1] = data; }
-	DECLARE_READ16_MEMBER(reg30_r) { return m_reg[2]; }
-	DECLARE_WRITE16_MEMBER(reg30_w) { m_reg[2] = data; }
+	u16 error_r() { return m_error; }
+	void error_w(u16 data) { m_error = data; }
+	u8 frcrd_r() { return m_frcrd; }
+	void frcrd_w(u8 data) { m_frcrd = data; }
+	u8 cbsub_r() { return m_cbsub; }
+	void cbsub_w(u8 data) { m_cbsub = data; }
+	u16 reg28_r() { return m_reg[1]; }
+	void reg28_w(u16 data) { m_reg[1] = data; }
+	u16 reg30_r() { return m_reg[2]; }
+	void reg30_w(u16 data) { m_reg[2] = data; }
 
 	enum memsize_mask
 	{
 		MEMSIZE_ADDR = 0x007f
 	};
-	DECLARE_READ16_MEMBER(memsize_r) { return m_memsize; }
-	DECLARE_WRITE16_MEMBER(memsize_w) { m_memsize = data; }
+	u16 memsize_r() { return m_memsize; }
+	void memsize_w(u16 data) { m_memsize = data; }
 
 protected:
 	interpro_mcga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -96,7 +96,7 @@ public:
 
 		CONTROL_MASK       = 0x8fff
 	};
-	DECLARE_WRITE16_MEMBER(control_w) override;
+	void control_w(u16 data) override;
 
 	enum error_mask
 	{
@@ -112,8 +112,8 @@ public:
 		ERROR_CONTROL_CYCLE = 0x003f,
 		ERROR_CONTROL_TAG   = 0x01c0
 	};
-	DECLARE_READ16_MEMBER(error_control_r) { return m_error_control; }
-	DECLARE_WRITE16_MEMBER(error_control_w) { m_error_control = data; }
+	u16 error_control_r() { return m_error_control; }
+	void error_control_w(u16 data) { m_error_control = data; }
 
 private:
 	u16 m_error_control;

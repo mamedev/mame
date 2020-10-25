@@ -42,20 +42,20 @@ private:
 
 	void maincpu_map(address_map &map);
 
-	DECLARE_WRITE8_MEMBER(port_a_w);
+	void port_a_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(music_w);
-	DECLARE_WRITE8_MEMBER(pg1_w);
-	DECLARE_WRITE8_MEMBER(pg2_w);
-	DECLARE_WRITE8_MEMBER(pg3_w);
-	DECLARE_WRITE8_MEMBER(led_w);
-	DECLARE_WRITE8_MEMBER(led_addr_w);
-	DECLARE_WRITE8_MEMBER(led_data_w);
-	DECLARE_READ8_MEMBER(switches_r);
-	DECLARE_READ8_MEMBER(keys_r);
-	DECLARE_WRITE8_MEMBER(ram_card_l_w);
-	DECLARE_WRITE8_MEMBER(ram_card_h_w);
-	DECLARE_READ8_MEMBER(rom2_r);
+	void music_w(offs_t offset, uint8_t data);
+	void pg1_w(uint8_t data);
+	void pg2_w(uint8_t data);
+	void pg3_w(uint8_t data);
+	void led_w(uint8_t data);
+	void led_addr_w(uint8_t data);
+	void led_data_w(uint8_t data);
+	uint8_t switches_r();
+	uint8_t keys_r();
+	void ram_card_l_w(uint8_t data);
+	void ram_card_h_w(uint8_t data);
+	uint8_t rom2_r(offs_t offset);
 
 	uint8_t m_port_a;
 	uint8_t m_led_latch;
@@ -223,39 +223,39 @@ INPUT_PORTS_END
 //  MACHINE EMULATION
 //**************************************************************************
 
-WRITE8_MEMBER( ht6000_state::port_a_w )
+void ht6000_state::port_a_w(uint8_t data)
 {
 	logerror("port_a_w: %02x\n", data);
 	m_port_a = data;
 }
 
-WRITE8_MEMBER( ht6000_state::music_w )
+void ht6000_state::music_w(offs_t offset, uint8_t data)
 {
 	// a8-a11 selects the chip (there are 4), a6-a7 selects command or data
 	logerror("music_w: offset = %02x, %02x = %02x\n", offset >> 8, (offset >> 6 & 0x03), data);
 }
 
-WRITE8_MEMBER( ht6000_state::pg1_w )
+void ht6000_state::pg1_w(uint8_t data)
 {
 	logerror("pg1_w: %02x\n", data);
 }
 
-WRITE8_MEMBER( ht6000_state::pg2_w )
+void ht6000_state::pg2_w(uint8_t data)
 {
 	logerror("pg2_w: %02x\n", data);
 }
 
-WRITE8_MEMBER( ht6000_state::pg3_w )
+void ht6000_state::pg3_w(uint8_t data)
 {
 	logerror("pg3_w: %02x\n", data);
 }
 
-WRITE8_MEMBER( ht6000_state::led_w )
+void ht6000_state::led_w(uint8_t data)
 {
 	logerror("led_w: %02x\n", data);
 }
 
-WRITE8_MEMBER( ht6000_state::led_addr_w )
+void ht6000_state::led_addr_w(uint8_t data)
 {
 	if (data != 0x00)
 	{
@@ -263,34 +263,34 @@ WRITE8_MEMBER( ht6000_state::led_addr_w )
 	}
 }
 
-WRITE8_MEMBER( ht6000_state::led_data_w )
+void ht6000_state::led_data_w(uint8_t data)
 {
 	m_led_latch = data;
 }
 
-READ8_MEMBER( ht6000_state::switches_r )
+uint8_t ht6000_state::switches_r()
 {
 	return m_switches[m_port_a & 0x0f]->read();
 }
 
-READ8_MEMBER( ht6000_state::keys_r )
+uint8_t ht6000_state::keys_r()
 {
 	return 0;
 }
 
-WRITE8_MEMBER( ht6000_state::ram_card_l_w )
+void ht6000_state::ram_card_l_w(uint8_t data)
 {
 	// a0-a7
 	m_ram_card_addr = (m_ram_card_addr & 0xff00) | (data << 0);
 }
 
-WRITE8_MEMBER( ht6000_state::ram_card_h_w )
+void ht6000_state::ram_card_h_w(uint8_t data)
 {
 	data &= 0x1f; // a8-a12
 	m_ram_card_addr = (m_ram_card_addr & 0x00ff) | (data << 8);
 }
 
-READ8_MEMBER( ht6000_state::rom2_r )
+uint8_t ht6000_state::rom2_r(offs_t offset)
 {
 	// a12-14 from port a
 	offs_t addr = ((m_port_a >> 4) & 0x07) << 12;

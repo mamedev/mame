@@ -49,8 +49,8 @@ private:
 	// address spaces
 	address_space_config m_code_config;
 	address_space_config m_data_config;
-	memory_access_cache<2, 0, ENDIANNESS_BIG> *m_inst_cache;
-	address_space *m_data_space;
+	memory_access<32, 2, 0, ENDIANNESS_BIG>::cache m_inst_cache;
+	memory_access<32, 2, 0, ENDIANNESS_BIG>::specific m_data_space;
 
 	// register storage
 	u32 m_pc;

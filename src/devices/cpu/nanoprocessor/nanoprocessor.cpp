@@ -80,9 +80,9 @@ void hp_nanoprocessor_device::device_start()
 	state_add(NANO_REG_ISR, "ISR", m_reg_ISR).formatstr("%03X");
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_flags).noshow().formatstr("%10s");
 
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<0, 0, ENDIANNESS_BIG>();
-	m_io = &space(AS_IO);
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
+	space(AS_IO).specific(m_io);
 
 	save_item(NAME(m_reg_A));
 	save_item(NAME(m_reg_R));
@@ -457,12 +457,12 @@ void hp_nanoprocessor_device::execute_one(uint8_t opcode)
 			switch (opcode & 0xf0) {
 			case 0x40:
 				// INA
-				m_reg_A = m_io->read_byte(opcode & 0xf);
+				m_reg_A = m_io.read_byte(opcode & 0xf);
 				break;
 
 			case 0x50:
 				// OTA
-				m_io->write_byte(opcode & 0xf, m_reg_A);
+				m_io.write_byte(opcode & 0xf, m_reg_A);
 				break;
 
 			case 0x60:
@@ -477,7 +477,7 @@ void hp_nanoprocessor_device::execute_one(uint8_t opcode)
 
 			case 0xc0:
 				// OTR
-				m_io->write_byte(opcode & 0xf, fetch());
+				m_io.write_byte(opcode & 0xf, fetch());
 				break;
 
 			case 0xd0:
@@ -510,7 +510,7 @@ uint16_t hp_nanoprocessor_device::pa_offset(unsigned off) const
 
 uint8_t hp_nanoprocessor_device::fetch(void)
 {
-	uint8_t res = m_cache->read_byte(m_reg_PA);
+	uint8_t res = m_cache.read_byte(m_reg_PA);
 	m_reg_PA = pa_offset(1);
 	return res;
 }

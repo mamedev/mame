@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:David Haywood, R. Belmont, Angelo Salese, Dirk Best
 /*
 
 TODO:
@@ -124,22 +124,22 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ32_MEMBER(igt_gk_28010008_r)
+	uint32_t igt_gk_28010008_r()
 	{
 		return machine().rand();  // don't quite understand this one
 	};
 
-	DECLARE_READ32_MEMBER(uart_status_r);
-	DECLARE_WRITE32_MEMBER(uart_w);
-	DECLARE_WRITE8_MEMBER(irq_enable_w);
-	DECLARE_WRITE8_MEMBER(irq_ack_w);
-	DECLARE_READ8_MEMBER(irq_vector_r);
-	DECLARE_WRITE8_MEMBER(unk_w);
-	DECLARE_READ8_MEMBER(frame_number_r);
+	uint32_t uart_status_r();
+	void uart_w(uint32_t data);
+	void irq_enable_w(uint8_t data);
+	void irq_ack_w(uint8_t data);
+	uint8_t irq_vector_r();
+	void unk_w(uint8_t data);
+	uint8_t frame_number_r();
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
-	DECLARE_READ8_MEMBER(timer_r);
-	DECLARE_READ16_MEMBER(version_r);
+	uint8_t timer_r();
+	uint16_t version_r();
 
 	void igt_gameking_map(address_map &map);
 	void igt_ms72c_map(address_map &map);
@@ -162,22 +162,18 @@ void igt_gameking_state::video_start()
 
 uint32_t igt_gameking_state::screen_update_igt_gameking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x,y;
-
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	for(y = 0; y < 480; y++)
+	for(int y = 0; y < 480; y++)
 	{
-		for(x = 0; x < 640; x+=4)
+		for(int x = 0; x < 640; x+=4)
 		{
 			for(int xi=0;xi<4;xi++)
 			{
-				uint32_t color;
-
-				color = (m_vram[(x+y*1024)/4] >> (xi*8)) & 0xff;
+				uint32_t const color = (m_vram[(x+y*1024)/4] >> (xi*8)) & 0xff;
 
 				if(cliprect.contains(x+xi, y))
-					bitmap.pix16(y, x+xi) = m_palette->pen(color);
+					bitmap.pix(y, x+xi) = m_palette->pen(color);
 
 			}
 		}
@@ -188,40 +184,40 @@ uint32_t igt_gameking_state::screen_update_igt_gameking(screen_device &screen, b
 }
 
 
-READ32_MEMBER(igt_gameking_state::uart_status_r)
+uint32_t igt_gameking_state::uart_status_r()
 {
 	return 0x00040004;
 }
 
-WRITE32_MEMBER(igt_gameking_state::uart_w)
+void igt_gameking_state::uart_w(uint32_t data)
 {
 	printf("%c", (data>>16) & 0x7f);
 }
 
-WRITE8_MEMBER(igt_gameking_state::irq_enable_w)
+void igt_gameking_state::irq_enable_w(uint8_t data)
 {
 	m_irq_enable = data;
 }
 
-WRITE8_MEMBER(igt_gameking_state::irq_ack_w)
+void igt_gameking_state::irq_ack_w(uint8_t data)
 {
 	//logerror("%02x\n",data);
 	m_maincpu->set_input_line(I960_IRQ0,CLEAR_LINE);
 	m_irq_pend = 0;
 }
 
-READ8_MEMBER(igt_gameking_state::irq_vector_r)
+uint8_t igt_gameking_state::irq_vector_r()
 {
 	return m_irq_pend;
 }
 
-READ8_MEMBER(igt_gameking_state::frame_number_r)
+uint8_t igt_gameking_state::frame_number_r()
 {
 	// TODO: likely not right, checked in irq 0
 	return 0;//m_screen->frame_number() & 7;
 }
 
-WRITE8_MEMBER(igt_gameking_state::unk_w)
+void igt_gameking_state::unk_w(uint8_t data)
 {
 	// bit 7 toggled, unknown purpose
 }
@@ -280,13 +276,13 @@ void igt_gameking_state::igt_gameking_map(address_map &map)
 	map(0xa1000000, 0xa1011fff).ram(); // used by gkkey for restart IAC
 }
 
-READ16_MEMBER(igt_gameking_state::version_r)
+uint16_t igt_gameking_state::version_r()
 {
 	// TODO: unknown value required, checked at "Cold powerup machine setup"
 	return 0xf777;
 }
 
-READ8_MEMBER(igt_gameking_state::timer_r)
+uint8_t igt_gameking_state::timer_r()
 {
 	// TODO: ms72c 8011ab0 "init_io" check, gets printed as "New security latch value = %x"
 	return m_timer_count++;

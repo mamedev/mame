@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+
+<!--
+
+These cartridges contain program code for 2 CPU architectures.
+The 1st half is for Z8, 2nd half is for MCS48. A12 is forced high or low.
+
+-->
+
+<softwarelist name="fidel_msc" description="Fidelity MSC Modules">
+
+	<software name="cac">
+		<description>Challenger Advanced Chess</description>
+		<year>1982</year>
+		<publisher>Fidelity Electronics</publisher>
+		<part name="cart" interface="fidel_msc">
+			<dataarea name="rom" size="0x2000">
+				<rom name="mk36977n-4_101-1038a01" size="0x2000" crc="b31e3542" sha1="490086981e8f5770dae477b12b6d945e0b196107" /> <!-- MK36000 -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cbo">
+		<description>Challenger Book Openings</description>
+		<year>1982</year>
+		<publisher>Fidelity Electronics</publisher>
+		<part name="cart" interface="fidel_msc">
+			<dataarea name="rom" size="0x2000">
+				<rom name="mk36a43n-4_101-1043a01" size="0x2000" crc="430d0969" sha1="34a436fdf26c5feb503228ffcf6ce5ac2632168e" /> <!-- MK36000 -->
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

@@ -45,11 +45,10 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void video_int_ack_w(uint16_t data);
-	void video_int_ack_extra_w(uint16_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update);
 	uint8_t adc_r(offs_t offset);
 	void eprom_latch_w(uint8_t data);
-	template<bool maincpu> DECLARE_WRITE16_MEMBER(sync_w);
+	template<bool maincpu> void sync_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	TILE_GET_INFO_MEMBER(guts_get_playfield_tile_info);

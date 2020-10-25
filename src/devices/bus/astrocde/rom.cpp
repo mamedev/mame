@@ -75,7 +75,7 @@ void astrocade_rom_512k_device::device_reset()
  mapper specific handlers
  -------------------------------------------------*/
 
-READ8_MEMBER(astrocade_rom_device::read_rom)
+uint8_t astrocade_rom_device::read_rom(offs_t offset)
 {
 	if (offset < m_rom_size)
 		return m_rom[offset];
@@ -83,7 +83,7 @@ READ8_MEMBER(astrocade_rom_device::read_rom)
 		return 0xff;
 }
 
-READ8_MEMBER(astrocade_rom_256k_device::read_rom)
+uint8_t astrocade_rom_256k_device::read_rom(offs_t offset)
 {
 	if (offset < 0x1000)    // 0x2000-0x2fff
 		return m_rom[offset + 0x1000 * 0x3f];
@@ -93,7 +93,7 @@ READ8_MEMBER(astrocade_rom_256k_device::read_rom)
 		return m_base_bank = offset & 0x3f;
 }
 
-READ8_MEMBER(astrocade_rom_512k_device::read_rom)
+uint8_t astrocade_rom_512k_device::read_rom(offs_t offset)
 {
 	if (offset < 0x1000)    // 0x2000-0x2fff
 		return m_rom[offset + 0x1000 * 0x7f];
@@ -103,7 +103,7 @@ READ8_MEMBER(astrocade_rom_512k_device::read_rom)
 		return m_base_bank = offset & 0x7f;
 }
 
-READ8_MEMBER(astrocade_rom_cass_device::read_rom)
+uint8_t astrocade_rom_cass_device::read_rom(offs_t offset)
 {
 	if (offset < m_rom_size)
 		return m_rom[offset];

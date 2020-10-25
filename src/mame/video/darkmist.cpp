@@ -103,12 +103,12 @@ void darkmist_state::mix_layer(screen_device &screen, bitmap_ind16 &bitmap, cons
 {
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint16_t *dest = &bitmap.pix16(y);
-		uint16_t *src = &m_temp_bitmap.pix16(y);
+		uint16_t *const dest = &bitmap.pix(y);
+		uint16_t const *const src = &m_temp_bitmap.pix(y);
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			uint16_t pix = (src[x] & 0xff);
-			uint16_t real = clut[pix];
+			uint16_t const pix = (src[x] & 0xff);
+			uint16_t const real = clut[pix];
 
 			if (!(real & 0x40))
 				dest[x] = src[x];
@@ -194,7 +194,7 @@ uint32_t darkmist_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-WRITE8_MEMBER(darkmist_state::tx_vram_w)
+void darkmist_state::tx_vram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_txtilemap->mark_tile_dirty(offset & 0x3ff);

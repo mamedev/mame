@@ -125,7 +125,7 @@ WRITE_LINE_MEMBER(p1_fdc_device::p1_fdc_irq_drq)
 		m_isa->set_ready(CLEAR_LINE); // deassert I/O CH RDY
 }
 
-READ8_MEMBER(p1_fdc_device::p1_fdc_r)
+uint8_t p1_fdc_device::p1_fdc_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -142,7 +142,7 @@ READ8_MEMBER(p1_fdc_device::p1_fdc_r)
 	return data;
 }
 
-WRITE8_MEMBER(p1_fdc_device::p1_fdc_w)
+void p1_fdc_device::p1_fdc_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -174,7 +174,7 @@ void p1_fdc_device::device_start()
 	set_isa_device();
 	m_isa->install_rom(this, 0xe0000, 0xe07ff, "XXX", "p1_fdc");
 	m_isa->install_device(0x00c0, 0x00c3, read8sm_delegate(*m_fdc, FUNC(fd1793_device::read)), write8sm_delegate(*m_fdc, FUNC(fd1793_device::write)));
-	m_isa->install_device(0x00c4, 0x00c7, read8_delegate(*this, FUNC(p1_fdc_device::p1_fdc_r)), write8_delegate(*this, FUNC(p1_fdc_device::p1_fdc_w)));
+	m_isa->install_device(0x00c4, 0x00c7, read8sm_delegate(*this, FUNC(p1_fdc_device::p1_fdc_r)), write8sm_delegate(*this, FUNC(p1_fdc_device::p1_fdc_w)));
 }
 
 

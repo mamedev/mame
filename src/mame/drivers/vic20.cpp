@@ -88,10 +88,10 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( vic_videoram_r );
+	uint8_t vic_videoram_r(offs_t offset);
 
 	DECLARE_WRITE_LINE_MEMBER( write_light_pen );
 	DECLARE_WRITE_LINE_MEMBER( write_user_joy0 );
@@ -100,13 +100,13 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( write_user_light_pen );
 	DECLARE_WRITE_LINE_MEMBER( write_user_cassette_switch );
 
-	DECLARE_READ8_MEMBER( via1_pa_r );
-	DECLARE_WRITE8_MEMBER( via1_pa_w );
-	DECLARE_WRITE8_MEMBER( via1_pb_w );
+	uint8_t via1_pa_r();
+	void via1_pa_w(uint8_t data);
+	void via1_pb_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( via2_pa_r );
-	DECLARE_READ8_MEMBER( via2_pb_r );
-	DECLARE_WRITE8_MEMBER( via2_pb_w );
+	uint8_t via2_pa_r();
+	uint8_t via2_pb_r();
+	void via2_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( via2_ca2_w );
 	DECLARE_WRITE_LINE_MEMBER( via2_cb2_w );
 
@@ -175,7 +175,7 @@ QUICKLOAD_LOAD_MEMBER(vic20_state::quickload_vc20)
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( vic20_state::read )
+uint8_t vic20_state::read(offs_t offset)
 {
 	uint8_t data = m_vic->bus_r();
 
@@ -256,7 +256,7 @@ READ8_MEMBER( vic20_state::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( vic20_state::write )
+void vic20_state::write(offs_t offset, uint8_t data)
 {
 	int ram1 = 1, ram2 = 1, ram3 = 1;
 	int blk1 = 1, blk2 = 1, blk3 = 1, blk5 = 1;
@@ -323,7 +323,7 @@ WRITE8_MEMBER( vic20_state::write )
 //  vic_videoram_r -
 //-------------------------------------------------
 
-READ8_MEMBER( vic20_state::vic_videoram_r )
+uint8_t vic20_state::vic_videoram_r(offs_t offset)
 {
 	int ram1 = 1, ram2 = 1, ram3 = 1;
 	int blk1 = 1, blk2 = 1, blk3 = 1, blk5 = 1;
@@ -464,7 +464,7 @@ static INPUT_PORTS_START( vic20 )
 
 	PORT_START( "ROW6" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F3)             PORT_CHAR(UCHAR_MAMEKEY(F5)) PORT_CHAR(UCHAR_MAMEKEY(F6))
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x91  Pi") PORT_CODE(KEYCODE_DEL) PORT_CHAR(0x2191) PORT_CHAR(0x03C0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x91  Pi") PORT_CODE(KEYCODE_DEL) PORT_CHAR(0x2191,'^') PORT_CHAR(0x03C0)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE)      PORT_CHAR('@')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O)              PORT_CHAR('O')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U)              PORT_CHAR('U')
@@ -537,7 +537,7 @@ INPUT_PORTS_END
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-READ8_MEMBER( vic20_state::via1_pa_r )
+uint8_t vic20_state::via1_pa_r()
 {
 	/*
 
@@ -576,7 +576,7 @@ READ8_MEMBER( vic20_state::via1_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( vic20_state::via1_pa_w )
+void vic20_state::via1_pa_w(uint8_t data)
 {
 	/*
 
@@ -602,7 +602,7 @@ WRITE8_MEMBER( vic20_state::via1_pa_w )
 	m_iec->host_atn_w(!BIT(data, 7));
 }
 
-WRITE8_MEMBER( vic20_state::via1_pb_w )
+void vic20_state::via1_pb_w(uint8_t data)
 {
 	m_user->write_c((data>>0)&1);
 	m_user->write_d((data>>1)&1);
@@ -614,7 +614,7 @@ WRITE8_MEMBER( vic20_state::via1_pb_w )
 	m_user->write_l((data>>7)&1);
 }
 
-READ8_MEMBER( vic20_state::via2_pa_r )
+uint8_t vic20_state::via2_pa_r()
 {
 	/*
 
@@ -641,7 +641,7 @@ READ8_MEMBER( vic20_state::via2_pa_r )
 	return data;
 }
 
-READ8_MEMBER( vic20_state::via2_pb_r )
+uint8_t vic20_state::via2_pb_r()
 {
 	/*
 
@@ -668,7 +668,7 @@ READ8_MEMBER( vic20_state::via2_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( vic20_state::via2_pb_w )
+void vic20_state::via2_pb_w(uint8_t data)
 {
 	/*
 

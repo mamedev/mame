@@ -53,8 +53,8 @@ public:
 	void install_handlers(int addr1, int addr2);
 
 	// thread safe mode, with no delays & shadow ram copy
-	DECLARE_READ32_MEMBER(blitter_r);
-	DECLARE_WRITE32_MEMBER(blitter_w);
+	u32 blitter_r(offs_t offset, u32 mem_mask = ~0);
+	void blitter_w(address_space &space, offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 m_gfx_addr_shadowcopy;
 	u32 m_gfx_scroll_0_x_shadowcopy, m_gfx_scroll_0_y_shadowcopy;
 	u32 m_gfx_scroll_1_x_shadowcopy, m_gfx_scroll_1_y_shadowcopy;
@@ -67,11 +67,11 @@ public:
 	inline void gfx_draw(offs_t *addr);
 	void gfx_exec(void);
 	u32 gfx_ready_r();
-	DECLARE_WRITE32_MEMBER(gfx_exec_w);
+	void gfx_exec_w(address_space &space, offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	// for thread unsafe mode with blitter delays, no shadow copy of RAM
-	DECLARE_READ32_MEMBER(blitter_r_unsafe);
-	DECLARE_WRITE32_MEMBER(blitter_w_unsafe);
+	u32 blitter_r_unsafe(offs_t offset, u32 mem_mask = ~0);
+	void blitter_w_unsafe(address_space &space, offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 gfx_ready_r_unsafe();
 	void gfx_exec_w_unsafe(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void gfx_exec_unsafe(void);

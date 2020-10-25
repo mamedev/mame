@@ -50,21 +50,21 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(chance32_fgram_w)
+	void chance32_fgram_w(offs_t offset, uint8_t data)
 	{
 		m_fgram[offset] = data;
 		m_fg_tilemap->mark_tile_dirty(offset / 2);
 	}
 
-	DECLARE_WRITE8_MEMBER(chance32_bgram_w)
+	void chance32_bgram_w(offs_t offset, uint8_t data)
 	{
 		m_bgram[offset] = data;
 		m_bg_tilemap->mark_tile_dirty(offset / 2);
 	}
 
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_WRITE8_MEMBER(muxout_w);
-	DECLARE_READ8_MEMBER(mux_r);
+	void mux_w(uint8_t data);
+	void muxout_w(uint8_t data);
+	uint8_t mux_r();
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -127,12 +127,12 @@ uint32_t chance32_state::screen_update_chance32(screen_device &screen, bitmap_rg
 }
 
 
-WRITE8_MEMBER(chance32_state::mux_w)
+void chance32_state::mux_w(uint8_t data)
 {
 	mux_data = data;
 }
 
-READ8_MEMBER(chance32_state::mux_r)
+uint8_t chance32_state::mux_r()
 {
 	uint8_t res,i;
 	const char *const muxnames[4] = { "IN0", "IN1", "IN2", "IN3" };
@@ -148,7 +148,7 @@ READ8_MEMBER(chance32_state::mux_r)
 }
 
 
-WRITE8_MEMBER(chance32_state::muxout_w)
+void chance32_state::muxout_w(uint8_t data)
 {
 /* Muxed Lamps
 
@@ -395,7 +395,7 @@ static INPUT_PORTS_START( chance32 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_GAMBLE_DEAL )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_GAMBLE_D_UP )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_GAMBLE_BOOK )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_POKER_BET )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_GAMBLE_BET )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -424,7 +424,7 @@ static INPUT_PORTS_START( chance32 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(3) PORT_NAME("Coin A")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MEMORY_RESET ) PORT_NAME("Reset")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(3) PORT_NAME("Coin B")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CODE(KEYCODE_8) PORT_NAME("Flip Screen 1")  /* unknown purpose */
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CODE(KEYCODE_9) PORT_NAME("Flip Screen 2")  /* unknown purpose */

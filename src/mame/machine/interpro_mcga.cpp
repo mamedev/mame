@@ -77,7 +77,7 @@ void interpro_mcga_device::device_reset()
 	m_memsize = 0x0340;
 }
 
-WRITE16_MEMBER(interpro_mcga_device::control_w)
+void interpro_mcga_device::control_w(u16 data)
 {
 	m_control = data & CONTROL_MASK;
 
@@ -88,7 +88,7 @@ WRITE16_MEMBER(interpro_mcga_device::control_w)
 	//  m_error &= ~ERROR_VALID;
 }
 
-WRITE16_MEMBER(interpro_fmcc_device::control_w)
+void interpro_fmcc_device::control_w(u16 data)
 {
 	m_control = data & CONTROL_MASK;
 

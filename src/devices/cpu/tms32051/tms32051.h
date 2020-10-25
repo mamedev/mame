@@ -59,8 +59,8 @@ public:
 	// construction/destruction
 	tms32051_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ16_MEMBER( cpuregs_r );
-	DECLARE_WRITE16_MEMBER( cpuregs_w );
+	uint16_t cpuregs_r(offs_t offset);
+	void cpuregs_w(offs_t offset, uint16_t data);
 
 	void tms32051_internal_data(address_map &map);
 	void tms32051_internal_pgm(address_map &map);
@@ -160,10 +160,10 @@ protected:
 		int32_t treg2;
 	} m_shadow;
 
-	address_space *m_program;
-	memory_access_cache<1, -1, ENDIANNESS_LITTLE> *m_cache;
-	address_space *m_data;
-	address_space *m_io;
+	memory_access<16, 1, -1, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<16, 1, -1, ENDIANNESS_LITTLE>::specific m_program;
+	memory_access<16, 1, -1, ENDIANNESS_LITTLE>::specific m_data;
+	memory_access<16, 1, -1, ENDIANNESS_LITTLE>::specific m_io;
 	int m_icount;
 
 	bool m_idle;

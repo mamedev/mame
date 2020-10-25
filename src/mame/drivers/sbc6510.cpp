@@ -47,6 +47,8 @@ ToDo:
 
 - No software to test with.
 
+- Natural keyboard & Paste do not work when shift is involved.
+
 
 ****************************************************************************/
 
@@ -68,26 +70,26 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_videocpu(*this, "videocpu")
 		, m_terminal(*this, "terminal")
-		, m_keyboard(*this, "X%u", 0)
+		, m_keyboard(*this, "X%u", 0U)
 	{ }
 
 	void sbc6510(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(a2_r);
-	DECLARE_WRITE8_MEMBER(a2_w);
-	DECLARE_READ8_MEMBER(psg_a_r);
-	DECLARE_READ8_MEMBER(psg_b_r);
-	DECLARE_WRITE8_MEMBER(key_w);
-	DECLARE_READ8_MEMBER(key_r);
+	u8 a2_r();
+	void a2_w(u8 data);
+	u8 psg_a_r();
+	u8 psg_b_r();
+	void key_w(u8 data);
+	u8 key_r();
 
-	void sbc6510_mem(address_map &map);
-	void sbc6510_video_data(address_map &map);
-	void sbc6510_video_io(address_map &map);
-	void sbc6510_video_mem(address_map &map);
+	void main_mem_map(address_map &map);
+	void video_data_map(address_map &map);
+	void video_io_map(address_map &map);
+	void video_mem_map(address_map &map);
 
-	uint8_t m_key_row;
-	uint8_t m_2;
+	u8 m_key_row;
+	u8 m_2;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -97,7 +99,7 @@ private:
 };
 
 
-void sbc6510_state::sbc6510_mem(address_map &map)
+void sbc6510_state::main_mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x0001).ram();
@@ -106,20 +108,20 @@ void sbc6510_state::sbc6510_mem(address_map &map)
 	map(0xe000, 0xe00f).mirror(0x1f0).rw("cia6526", FUNC(mos6526_device::read), FUNC(mos6526_device::write));
 	map(0xe800, 0xe800).mirror(0x1ff).w("ay8910", FUNC(ay8910_device::address_w));
 	map(0xea00, 0xea00).mirror(0x1ff).rw("ay8910", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
-	map(0xf000, 0xffff).rom();
+	map(0xf000, 0xffff).rom().region("maincpu",0);
 }
 
-void sbc6510_state::sbc6510_video_mem(address_map &map)
+void sbc6510_state::video_mem_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 }
 
-void sbc6510_state::sbc6510_video_data(address_map &map)
+void sbc6510_state::video_data_map(address_map &map)
 {
 	map(0x0100, 0x04ff).ram();
 }
 
-void sbc6510_state::sbc6510_video_io(address_map &map)
+void sbc6510_state::video_io_map(address_map &map)
 {
 }
 
@@ -137,42 +139,42 @@ static INPUT_PORTS_START( sbc6510 ) // cbm keyboard
 
 	PORT_START( "X1" )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Shift (Left)")    PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E)         PORT_CHAR('E')
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S)         PORT_CHAR('S')
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z)         PORT_CHAR('Z')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E)         PORT_CHAR('e') PORT_CHAR('E')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S)         PORT_CHAR('s') PORT_CHAR('S')
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z)         PORT_CHAR('z') PORT_CHAR('Z')
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4)         PORT_CHAR('4') PORT_CHAR('$')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A)         PORT_CHAR('A')
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W)         PORT_CHAR('W')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A)         PORT_CHAR('a') PORT_CHAR('A')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W)         PORT_CHAR('w') PORT_CHAR('W')
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3)         PORT_CHAR('3') PORT_CHAR('#')
 
 	PORT_START( "X2" )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X)         PORT_CHAR('X')
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T)         PORT_CHAR('T')
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F)         PORT_CHAR('F')
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C)         PORT_CHAR('C')
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X)         PORT_CHAR('x') PORT_CHAR('X')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T)         PORT_CHAR('t') PORT_CHAR('T')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F)         PORT_CHAR('f') PORT_CHAR('F')
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C)         PORT_CHAR('c') PORT_CHAR('C')
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6)         PORT_CHAR('6') PORT_CHAR('&')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D)         PORT_CHAR('D')
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R)         PORT_CHAR('R')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D)         PORT_CHAR('d') PORT_CHAR('D')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R)         PORT_CHAR('r') PORT_CHAR('R')
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5)         PORT_CHAR('5') PORT_CHAR('%')
 
 	PORT_START( "X3" )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V)         PORT_CHAR('V')
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U)         PORT_CHAR('U')
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H)         PORT_CHAR('H')
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B)         PORT_CHAR('B')
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V)         PORT_CHAR('v') PORT_CHAR('V')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U)         PORT_CHAR('u') PORT_CHAR('U')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H)         PORT_CHAR('h') PORT_CHAR('H')
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B)         PORT_CHAR('b') PORT_CHAR('B')
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8)         PORT_CHAR('8') PORT_CHAR('(')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G)         PORT_CHAR('G')
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y)         PORT_CHAR('Y')
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7)         PORT_CHAR('7') PORT_CHAR('\'')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G)         PORT_CHAR('g') PORT_CHAR('G')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y)         PORT_CHAR('y') PORT_CHAR('Y')
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7)         PORT_CHAR('7')
 
 	PORT_START( "X4" )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N)         PORT_CHAR('N')
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O)         PORT_CHAR('O')
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K)         PORT_CHAR('K')
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M)         PORT_CHAR('M')
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N)         PORT_CHAR('n') PORT_CHAR('N')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O)         PORT_CHAR('o') PORT_CHAR('O')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K)         PORT_CHAR('k') PORT_CHAR('K')
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M)         PORT_CHAR('m') PORT_CHAR('M')
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0)         PORT_CHAR('0')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J)         PORT_CHAR('J')
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I)         PORT_CHAR('I')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J)         PORT_CHAR('j') PORT_CHAR('J')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I)         PORT_CHAR('i') PORT_CHAR('I')
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9)         PORT_CHAR('9') PORT_CHAR(')')
 
 	PORT_START( "X5" )
@@ -181,15 +183,15 @@ static INPUT_PORTS_START( sbc6510 ) // cbm keyboard
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON)     PORT_CHAR(':') PORT_CHAR('[')
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP)      PORT_CHAR('.') PORT_CHAR('>')
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS)    PORT_CHAR('-')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L)         PORT_CHAR('L')
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P)         PORT_CHAR('P')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L)         PORT_CHAR('l') PORT_CHAR('L')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P)         PORT_CHAR('p') PORT_CHAR('P')
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS)     PORT_CHAR('+')
 
 	PORT_START( "X6" )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH)     PORT_CHAR('/') PORT_CHAR('?')
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x91  Pi") PORT_CODE(KEYCODE_DEL) PORT_CHAR(0x2191) PORT_CHAR(0x03C0)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('=')
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Shift (Right)")   PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Shift (Right)")   PORT_CODE(KEYCODE_RSHIFT)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Home  Clr")       PORT_CODE(KEYCODE_INSERT)     PORT_CHAR(UCHAR_MAMEKEY(HOME))
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE)     PORT_CHAR(';') PORT_CHAR(']')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE)    PORT_CHAR('*')
@@ -197,12 +199,12 @@ static INPUT_PORTS_START( sbc6510 ) // cbm keyboard
 
 	PORT_START( "X7" )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Stop Run")        PORT_CODE(KEYCODE_HOME)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q)         PORT_CHAR('Q')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q)         PORT_CHAR('q') PORT_CHAR('Q')
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("CBM")             PORT_CODE(KEYCODE_LALT)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SPACE)     PORT_CHAR(' ')
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2)         PORT_CHAR('2') PORT_CHAR('"')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TAB)       PORT_CHAR(UCHAR_SHIFT_2)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x90")    PORT_CODE(KEYCODE_TILDE)   PORT_CHAR(0x2190)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TAB)       PORT_CHAR(9)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x90")    PORT_CODE(KEYCODE_TILDE)   PORT_CHAR(0x2190) // newline
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1)         PORT_CHAR('1') PORT_CHAR('!')
 
 	PORT_START( "X8" )  /* unused */
@@ -213,12 +215,12 @@ static INPUT_PORTS_START( sbc6510 ) // cbm keyboard
 INPUT_PORTS_END
 
 
-READ8_MEMBER( sbc6510_state::a2_r )
+u8 sbc6510_state::a2_r()
 {
 	return m_2;
 }
 
-WRITE8_MEMBER( sbc6510_state::a2_w )
+void sbc6510_state::a2_w(u8 data)
 {
 	m_2 = data;
 	m_terminal->write(data);
@@ -226,6 +228,8 @@ WRITE8_MEMBER( sbc6510_state::a2_w )
 
 void sbc6510_state::machine_start()
 {
+	save_item(NAME(m_key_row));
+	save_item(NAME(m_2));
 }
 
 
@@ -233,17 +237,17 @@ void sbc6510_state::machine_reset()
 {
 }
 
-READ8_MEMBER( sbc6510_state::psg_a_r )
+u8 sbc6510_state::psg_a_r()
 {
 	return 0xff;
 }
 
-READ8_MEMBER( sbc6510_state::psg_b_r )
+u8 sbc6510_state::psg_b_r()
 {
 	return 0x7f;
 }
 
-READ8_MEMBER( sbc6510_state::key_r )
+u8 sbc6510_state::key_r()
 {
 	u8 i, data=0;
 
@@ -254,7 +258,7 @@ READ8_MEMBER( sbc6510_state::key_r )
 	return ~data;
 }
 
-WRITE8_MEMBER( sbc6510_state::key_w )
+void sbc6510_state::key_w(u8 data)
 {
 	m_key_row = data;
 }
@@ -280,12 +284,12 @@ void sbc6510_state::sbc6510(machine_config &config)
 {
 	/* basic machine hardware */
 	M6510(config, m_maincpu, XTAL(1'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &sbc6510_state::sbc6510_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sbc6510_state::main_mem_map);
 
 	ATMEGA88(config, m_videocpu, XTAL(16'000'000)); // Video CPU trips SLEEP opcode, needs to be emulated
-	m_videocpu->set_addrmap(AS_PROGRAM, &sbc6510_state::sbc6510_video_mem);
-	m_videocpu->set_addrmap(AS_DATA, &sbc6510_state::sbc6510_video_data);
-	m_videocpu->set_addrmap(AS_IO, &sbc6510_state::sbc6510_video_io);
+	m_videocpu->set_addrmap(AS_PROGRAM, &sbc6510_state::video_mem_map);
+	m_videocpu->set_addrmap(AS_DATA, &sbc6510_state::video_data_map);
+	m_videocpu->set_addrmap(AS_IO, &sbc6510_state::video_io_map);
 	m_videocpu->set_eeprom_tag("eeprom");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME); // for F4 displayer only
@@ -311,16 +315,19 @@ void sbc6510_state::sbc6510(machine_config &config)
 
 /* ROM definition */
 ROM_START( sbc6510 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "sbc6510.rom", 0xf000, 0x1000, CRC(e13a5e62) SHA1(1e7482e9b98b39d0cc456254fbe8fd0981e9377e))
-	ROM_REGION( 0x10000, "videocpu", ROMREGION_ERASEFF ) // ATMEGA8 at 16MHz
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "sbc6510.rom", 0x0000, 0x1000, CRC(e13a5e62) SHA1(1e7482e9b98b39d0cc456254fbe8fd0981e9377e))
+
+	ROM_REGION( 0x2000, "videocpu", 0 ) // ATMEGA8 at 16MHz
 	ROM_LOAD( "video.bin",   0x0000, 0x2000, CRC(809f31ce) SHA1(4639de5f7b8f6c036d74f217ba85e7e897039094))
-	ROM_REGION( 0x200, "gal", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x0200, "gal", ROMREGION_ERASEFF )
 	ROM_LOAD( "sbc6510.gal", 0x0000, 0x0117, CRC(f78f9927) SHA1(b951163958f5722032826d0d17a07c81dbd5f68e))
+
 	ROM_REGION( 0x2000, "eeprom", ROMREGION_ERASEFF )
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY            FULLNAME   FLAGS */
-COMP( 2009, sbc6510, 0,      0,      sbc6510, sbc6510, sbc6510_state, empty_init, "Josip Perusanec", "SBC6510", MACHINE_NOT_WORKING )
+COMP( 2009, sbc6510, 0,      0,      sbc6510, sbc6510, sbc6510_state, empty_init, "Josip Perusanec", "SBC6510", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

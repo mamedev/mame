@@ -30,30 +30,30 @@ protected:
 	virtual void set_bank_to_rom(const char *banktag, uint32_t offset) override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
-	virtual DECLARE_WRITE16_MEMBER(write) override;
-	virtual DECLARE_READ16_MEMBER(read_a15) override;
-	virtual DECLARE_WRITE16_MEMBER(write_a15) override;
+	virtual uint16_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+	virtual uint16_t read_a15(offs_t offset) override;
+	virtual void write_a15(offs_t offset, uint16_t data) override;
 
 	virtual int read_test() override;
 
-	virtual DECLARE_READ16_MEMBER(rom_read1);
-	virtual DECLARE_READ16_MEMBER(rom_read2);
+	virtual uint16_t rom_read1(offs_t offset);
+	virtual uint16_t rom_read2(offs_t offset);
 
-	virtual DECLARE_READ16_MEMBER(read_pm0);
-	virtual DECLARE_READ16_MEMBER(read_pm1);
-	virtual DECLARE_READ16_MEMBER(read_pm2);
-	virtual DECLARE_READ16_MEMBER(read_pm4);
-	virtual DECLARE_READ16_MEMBER(read_xst);
-	virtual DECLARE_READ16_MEMBER(read_pmc);
-	virtual DECLARE_READ16_MEMBER(read_al);
-	virtual DECLARE_WRITE16_MEMBER(write_pm0);
-	virtual DECLARE_WRITE16_MEMBER(write_pm1);
-	virtual DECLARE_WRITE16_MEMBER(write_pm2);
-	virtual DECLARE_WRITE16_MEMBER(write_pm4);
-	virtual DECLARE_WRITE16_MEMBER(write_xst);
-	virtual DECLARE_WRITE16_MEMBER(write_pmc);
-	virtual DECLARE_WRITE16_MEMBER(write_al);
+	virtual uint16_t read_pm0();
+	virtual uint16_t read_pm1();
+	virtual uint16_t read_pm2();
+	virtual uint16_t read_pm4();
+	virtual uint16_t read_xst();
+	virtual uint16_t read_pmc();
+	virtual uint16_t read_al();
+	virtual void write_pm0(uint16_t data);
+	virtual void write_pm1(uint16_t data);
+	virtual void write_pm2(uint16_t data);
+	virtual void write_pm4(uint16_t data);
+	virtual void write_xst(uint16_t data);
+	virtual void write_pmc(uint16_t data);
+	virtual void write_al(uint16_t data);
 
 private:
 	required_device<cpu_device> m_svp;

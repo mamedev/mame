@@ -14,7 +14,6 @@
 #include "video/mc6845.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -76,8 +75,8 @@ private:
 	required_memory_bank m_rombank;
 	required_memory_bank m_vrambank;
 	std::unique_ptr<uint8_t[]> m_vram;
-	DECLARE_WRITE8_MEMBER(dac_adr_s_w);
-	DECLARE_WRITE8_MEMBER(dac_adr_e_w);
+	void dac_adr_s_w(uint8_t data);
+	void dac_adr_e_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(rombank_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
 	DECLARE_WRITE_LINE_MEMBER(colorbank_w);
@@ -86,9 +85,9 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(vrambank_w);
 	DECLARE_WRITE_LINE_MEMBER(dac_bank_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
-	DECLARE_WRITE8_MEMBER(input_sel1_w);
-	DECLARE_WRITE8_MEMBER(input_sel2_w);
-	DECLARE_READ8_MEMBER(keys_r);
+	void input_sel1_w(uint8_t data);
+	void input_sel2_w(uint8_t data);
+	uint8_t keys_r();
 	TIMER_CALLBACK_MEMBER(dac_callback);
 	INTERRUPT_GEN_MEMBER(interrupt);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -139,8 +138,8 @@ MC6845_UPDATE_ROW( mjsister_state::crtc_update_row )
 		// background layer
 		uint8_t data_bg = m_vram[0x400 + ((ma << 3) | (ra << 7) | i)];
 
-		bitmap.pix32(y, x1) = pen[m_colorbank << 5 | ((data_bg & 0x0f) >> 0)];
-		bitmap.pix32(y, x2) = pen[m_colorbank << 5 | ((data_bg & 0xf0) >> 4)];
+		bitmap.pix(y, x1) = pen[m_colorbank << 5 | ((data_bg & 0x0f) >> 0)];
+		bitmap.pix(y, x2) = pen[m_colorbank << 5 | ((data_bg & 0xf0) >> 4)];
 
 		// foreground layer
 		uint8_t data_fg = m_vram[0x8000 | (0x400 + ((ma << 3) | (ra << 7) | i))];
@@ -149,8 +148,8 @@ MC6845_UPDATE_ROW( mjsister_state::crtc_update_row )
 		uint8_t c2 = ((data_fg & 0xf0) >> 4);
 
 		// 0 is transparent
-		if (c1) bitmap.pix32(y, x1) = pen[m_colorbank << 5 | 0x10 | c1];
-		if (c2) bitmap.pix32(y, x2) = pen[m_colorbank << 5 | 0x10 | c2];
+		if (c1) bitmap.pix(y, x1) = pen[m_colorbank << 5 | 0x10 | c1];
+		if (c2) bitmap.pix(y, x2) = pen[m_colorbank << 5 | 0x10 | c2];
 	}
 }
 
@@ -185,12 +184,12 @@ TIMER_CALLBACK_MEMBER(mjsister_state::dac_callback)
 		m_dac_busy = 0;
 }
 
-WRITE8_MEMBER(mjsister_state::dac_adr_s_w)
+void mjsister_state::dac_adr_s_w(uint8_t data)
 {
 	m_dac_adr_s = data;
 }
 
-WRITE8_MEMBER(mjsister_state::dac_adr_e_w)
+void mjsister_state::dac_adr_e_w(uint8_t data)
 {
 	m_dac_adr_e = data;
 	m_dac_adr = m_dac_adr_s << 8;
@@ -243,17 +242,17 @@ WRITE_LINE_MEMBER(mjsister_state::coin_counter_w)
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE8_MEMBER(mjsister_state::input_sel1_w)
+void mjsister_state::input_sel1_w(uint8_t data)
 {
 	m_input_sel1 = data;
 }
 
-WRITE8_MEMBER(mjsister_state::input_sel2_w)
+void mjsister_state::input_sel2_w(uint8_t data)
 {
 	m_input_sel2 = data;
 }
 
-READ8_MEMBER(mjsister_state::keys_r)
+uint8_t mjsister_state::keys_r()
 {
 	int p, i, ret = 0;
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
@@ -488,9 +487,6 @@ void mjsister_state::mjsister(machine_config &config)
 	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.15);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 /*************************************

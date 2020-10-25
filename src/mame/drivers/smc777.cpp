@@ -77,38 +77,38 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(mc6845_w);
-	DECLARE_READ8_MEMBER(vram_r);
-	DECLARE_READ8_MEMBER(attr_r);
-	DECLARE_READ8_MEMBER(pcg_r);
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_WRITE8_MEMBER(attr_w);
-	DECLARE_WRITE8_MEMBER(pcg_w);
-	DECLARE_READ8_MEMBER(fbuf_r);
-	DECLARE_WRITE8_MEMBER(fbuf_w);
-	DECLARE_READ8_MEMBER(key_r);
-	DECLARE_WRITE8_MEMBER(key_w);
-	DECLARE_WRITE8_MEMBER(border_col_w);
-	DECLARE_READ8_MEMBER(io_status_1c_r);
-	DECLARE_READ8_MEMBER(io_status_1d_r);
-	DECLARE_WRITE8_MEMBER(io_control_w);
-	DECLARE_WRITE8_MEMBER(color_mode_w);
-	DECLARE_WRITE8_MEMBER(ramdac_w);
-	DECLARE_READ8_MEMBER(gcw_r);
-	DECLARE_WRITE8_MEMBER(gcw_w);
-	DECLARE_READ8_MEMBER(smc777_mem_r);
-	DECLARE_WRITE8_MEMBER(smc777_mem_w);
-	DECLARE_READ8_MEMBER(vsync_irq_status_r);
-	DECLARE_WRITE8_MEMBER(vsync_irq_enable_w);
+	void mc6845_w(offs_t offset, uint8_t data);
+	uint8_t vram_r(offs_t offset);
+	uint8_t attr_r(offs_t offset);
+	uint8_t pcg_r(offs_t offset);
+	void vram_w(offs_t offset, uint8_t data);
+	void attr_w(offs_t offset, uint8_t data);
+	void pcg_w(offs_t offset, uint8_t data);
+	uint8_t fbuf_r(offs_t offset);
+	void fbuf_w(offs_t offset, uint8_t data);
+	uint8_t key_r(offs_t offset);
+	void key_w(offs_t offset, uint8_t data);
+	void border_col_w(uint8_t data);
+	uint8_t io_status_1c_r();
+	uint8_t io_status_1d_r();
+	void io_control_w(uint8_t data);
+	void color_mode_w(uint8_t data);
+	void ramdac_w(offs_t offset, uint8_t data);
+	uint8_t gcw_r();
+	void gcw_w(uint8_t data);
+	uint8_t smc777_mem_r(offs_t offset);
+	void smc777_mem_w(offs_t offset, uint8_t data);
+	uint8_t vsync_irq_status_r();
+	void vsync_irq_enable_w(uint8_t data);
 	void smc777_palette(palette_device &palette) const;
 	uint32_t screen_update_smc777(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vsync_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 
-	DECLARE_READ8_MEMBER(fdc_r);
-	DECLARE_WRITE8_MEMBER(fdc_w);
-	DECLARE_READ8_MEMBER(fdc1_fast_status_r);
-	DECLARE_WRITE8_MEMBER(fdc1_select_w);
+	uint8_t fdc_r(offs_t offset);
+	void fdc_w(offs_t offset, uint8_t data);
+	uint8_t fdc1_fast_status_r();
+	void fdc1_select_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 
@@ -164,47 +164,44 @@ void smc777_state::video_start()
 
 uint32_t smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x,y,yi;
 	uint16_t count;
-	int x_width;
 
 //  popmessage("%d %d %d %d",mc6845_v_char_total,mc6845_v_total_adj,mc6845_v_display,mc6845_v_sync_pos);
 
 	bitmap.fill(m_palette->pen(m_backdrop_pen), cliprect);
 
-	x_width = ((m_display_reg & 0x80) >> 7);
+	int x_width = ((m_display_reg & 0x80) >> 7);
 
 	count = 0x0000;
 
-	for(yi=0;yi<8;yi++)
+	for(int yi=0;yi<8;yi++)
 	{
-		for(y=0;y<200;y+=8)
+		for(int y=0;y<200;y+=8)
 		{
-			for(x=0;x<160;x++)
+			for(int x=0;x<160;x++)
 			{
-				uint16_t color;
+				uint16_t color = (m_gvram[count] & 0xf0) >> 4;
 
-				color = (m_gvram[count] & 0xf0) >> 4;
 				/* todo: clean this up! */
 				//if(x_width)
 				{
-					bitmap.pix16(y+yi+CRTC_MIN_Y, x*4+0+CRTC_MIN_X) = m_palette->pen(color);
-					bitmap.pix16(y+yi+CRTC_MIN_Y, x*4+1+CRTC_MIN_X) = m_palette->pen(color);
+					bitmap.pix(y+yi+CRTC_MIN_Y, x*4+0+CRTC_MIN_X) = m_palette->pen(color);
+					bitmap.pix(y+yi+CRTC_MIN_Y, x*4+1+CRTC_MIN_X) = m_palette->pen(color);
 				}
 				//else
 				//{
-				//  bitmap.pix16(y+yi+CRTC_MIN_Y, x*2+0+CRTC_MIN_X) = m_palette->pen(color);
+				//  bitmap.pix(y+yi+CRTC_MIN_Y, x*2+0+CRTC_MIN_X) = m_palette->pen(color);
 				//}
 
 				color = (m_gvram[count] & 0x0f) >> 0;
 				//if(x_width)
 				{
-					bitmap.pix16(y+yi+CRTC_MIN_Y, x*4+2+CRTC_MIN_X) = m_palette->pen(color);
-					bitmap.pix16(y+yi+CRTC_MIN_Y, x*4+3+CRTC_MIN_X) = m_palette->pen(color);
+					bitmap.pix(y+yi+CRTC_MIN_Y, x*4+2+CRTC_MIN_X) = m_palette->pen(color);
+					bitmap.pix(y+yi+CRTC_MIN_Y, x*4+3+CRTC_MIN_X) = m_palette->pen(color);
 				}
 				//else
 				//{
-				//  bitmap.pix16(y+yi+CRTC_MIN_Y, x*2+1+CRTC_MIN_X) = m_palette->pen(color);
+				//  bitmap.pix(y+yi+CRTC_MIN_Y, x*2+1+CRTC_MIN_X) = m_palette->pen(color);
 				//}
 
 				count++;
@@ -216,9 +213,9 @@ uint32_t smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 
 
 	count = 0x0000;
 
-	for(y=0;y<25;y++)
+	for(int y=0;y<25;y++)
 	{
-		for(x=0;x<80/(x_width+1);x++)
+		for(int x=0;x<80/(x_width+1);x++)
 		{
 			/*
 			-x-- ---- blink
@@ -229,11 +226,9 @@ uint32_t smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 
 			int color = m_attr[count] & 7;
 			int bk_color = (m_attr[count] & 0x18) >> 3;
 			int blink = m_attr[count] & 0x40;
-			int xi;
-			int bk_pen;
 			//int bk_struct[4] = { -1, 0x10, 0x11, (color & 7) ^ 8 };
 
-			bk_pen = -1;
+			int bk_pen = -1;
 			switch(bk_color & 3)
 			{
 				case 0: bk_pen = -1; break; //transparent
@@ -245,23 +240,21 @@ uint32_t smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 
 			if(blink && m_screen->frame_number() & 0x10) //blinking, used by Dragon's Alphabet
 				color = bk_pen;
 
-			for(yi=0;yi<8;yi++)
+			for(int yi=0;yi<8;yi++)
 			{
-				for(xi=0;xi<8;xi++)
+				for(int xi=0;xi<8;xi++)
 				{
-					int pen;
-
-					pen = ((m_pcg[tile*8+yi]>>(7-xi)) & 1) ? (color+m_pal_mode) : bk_pen;
+					int pen = ((m_pcg[tile*8+yi]>>(7-xi)) & 1) ? (color+m_pal_mode) : bk_pen;
 
 					if (pen != -1)
 					{
 						if(x_width)
 						{
-							bitmap.pix16(y*8+CRTC_MIN_Y+yi, (x*8+xi)*2+0+CRTC_MIN_X) = m_palette->pen(pen);
-							bitmap.pix16(y*8+CRTC_MIN_Y+yi, (x*8+xi)*2+1+CRTC_MIN_X) = m_palette->pen(pen);
+							bitmap.pix(y*8+CRTC_MIN_Y+yi, (x*8+xi)*2+0+CRTC_MIN_X) = m_palette->pen(pen);
+							bitmap.pix(y*8+CRTC_MIN_Y+yi, (x*8+xi)*2+1+CRTC_MIN_X) = m_palette->pen(pen);
 						}
 						else
-							bitmap.pix16(y*8+CRTC_MIN_Y+yi, x*8+CRTC_MIN_X+xi) = m_palette->pen(pen);
+							bitmap.pix(y*8+CRTC_MIN_Y+yi, x*8+CRTC_MIN_X+xi) = m_palette->pen(pen);
 					}
 				}
 			}
@@ -269,9 +262,7 @@ uint32_t smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 
 			// draw cursor
 			if(mc6845_cursor_addr == count)
 			{
-				int xc,yc,cursor_on;
-
-				cursor_on = 0;
+				int cursor_on = 0;
 				switch(mc6845_cursor_y_start & 0x60)
 				{
 					case 0x00: cursor_on = 1; break; //always on
@@ -282,17 +273,17 @@ uint32_t smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 
 
 				if(cursor_on)
 				{
-					for(yc=0;yc<(8-(mc6845_cursor_y_start & 7));yc++)
+					for(int yc=0;yc<(8-(mc6845_cursor_y_start & 7));yc++)
 					{
-						for(xc=0;xc<8;xc++)
+						for(int xc=0;xc<8;xc++)
 						{
 							if(x_width)
 							{
-								bitmap.pix16(y*8+CRTC_MIN_Y-yc+7, (x*8+xc)*2+0+CRTC_MIN_X) = m_palette->pen(0x7);
-								bitmap.pix16(y*8+CRTC_MIN_Y-yc+7, (x*8+xc)*2+1+CRTC_MIN_X) = m_palette->pen(0x7);
+								bitmap.pix(y*8+CRTC_MIN_Y-yc+7, (x*8+xc)*2+0+CRTC_MIN_X) = m_palette->pen(0x7);
+								bitmap.pix(y*8+CRTC_MIN_Y-yc+7, (x*8+xc)*2+1+CRTC_MIN_X) = m_palette->pen(0x7);
 							}
 							else
-								bitmap.pix16(y*8+CRTC_MIN_Y-yc+7, x*8+CRTC_MIN_X+xc) = m_palette->pen(0x7);
+								bitmap.pix(y*8+CRTC_MIN_Y-yc+7, x*8+CRTC_MIN_X+xc) = m_palette->pen(0x7);
 						}
 					}
 				}
@@ -305,7 +296,7 @@ uint32_t smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-WRITE8_MEMBER(smc777_state::mc6845_w)
+void smc777_state::mc6845_w(offs_t offset, uint8_t data)
 {
 	if(offset == 0)
 	{
@@ -319,7 +310,7 @@ WRITE8_MEMBER(smc777_state::mc6845_w)
 	}
 }
 
-READ8_MEMBER(smc777_state::vram_r)
+uint8_t smc777_state::vram_r(offs_t offset)
 {
 	uint16_t vram_index;
 
@@ -329,7 +320,7 @@ READ8_MEMBER(smc777_state::vram_r)
 	return m_vram[vram_index];
 }
 
-READ8_MEMBER(smc777_state::attr_r)
+uint8_t smc777_state::attr_r(offs_t offset)
 {
 	uint16_t vram_index;
 
@@ -339,7 +330,7 @@ READ8_MEMBER(smc777_state::attr_r)
 	return m_attr[vram_index];
 }
 
-READ8_MEMBER(smc777_state::pcg_r)
+uint8_t smc777_state::pcg_r(offs_t offset)
 {
 	uint16_t vram_index;
 
@@ -349,7 +340,7 @@ READ8_MEMBER(smc777_state::pcg_r)
 	return m_pcg[vram_index];
 }
 
-WRITE8_MEMBER(smc777_state::vram_w)
+void smc777_state::vram_w(offs_t offset, uint8_t data)
 {
 	uint16_t vram_index;
 
@@ -359,7 +350,7 @@ WRITE8_MEMBER(smc777_state::vram_w)
 	m_vram[vram_index] = data;
 }
 
-WRITE8_MEMBER(smc777_state::attr_w)
+void smc777_state::attr_w(offs_t offset, uint8_t data)
 {
 	uint16_t vram_index;
 
@@ -369,7 +360,7 @@ WRITE8_MEMBER(smc777_state::attr_w)
 	m_attr[vram_index] = data;
 }
 
-WRITE8_MEMBER(smc777_state::pcg_w)
+void smc777_state::pcg_w(offs_t offset, uint8_t data)
 {
 	uint16_t vram_index;
 
@@ -381,7 +372,7 @@ WRITE8_MEMBER(smc777_state::pcg_w)
 	m_gfxdecode->gfx(0)->mark_dirty(vram_index >> 3);
 }
 
-READ8_MEMBER(smc777_state::fbuf_r)
+uint8_t smc777_state::fbuf_r(offs_t offset)
 {
 	uint16_t vram_index;
 
@@ -391,7 +382,7 @@ READ8_MEMBER(smc777_state::fbuf_r)
 	return m_gvram[vram_index];
 }
 
-WRITE8_MEMBER(smc777_state::fbuf_w)
+void smc777_state::fbuf_w(offs_t offset, uint8_t data)
 {
 	uint16_t vram_index;
 
@@ -448,17 +439,17 @@ QUICKLOAD_LOAD_MEMBER(smc777_state::quickload_cb)
 	return image_init_result::PASS;
 }
 
-READ8_MEMBER( smc777_state::fdc_r )
+uint8_t smc777_state::fdc_r(offs_t offset)
 {
 	return m_fdc->read(offset) ^ 0xff;
 }
 
-WRITE8_MEMBER( smc777_state::fdc_w )
+void smc777_state::fdc_w(offs_t offset, uint8_t data)
 {
 	m_fdc->write(offset, data ^ 0xff);
 }
 
-READ8_MEMBER( smc777_state::fdc1_fast_status_r )
+uint8_t smc777_state::fdc1_fast_status_r()
 {
 	uint8_t data = 0;
 
@@ -469,7 +460,7 @@ READ8_MEMBER( smc777_state::fdc1_fast_status_r )
 	return data;
 }
 
-WRITE8_MEMBER( smc777_state::fdc1_select_w )
+void smc777_state::fdc1_select_w(uint8_t data)
 {
 	floppy_image_device *floppy = nullptr;
 
@@ -498,7 +489,7 @@ WRITE_LINE_MEMBER( smc777_state::fdc_drq_w )
 	m_fdc_drq_flag = state;
 }
 
-READ8_MEMBER(smc777_state::key_r)
+uint8_t smc777_state::key_r(offs_t offset)
 {
 	/*
 	-x-- ---- shift key
@@ -529,7 +520,7 @@ READ8_MEMBER(smc777_state::key_r)
 }
 
 /* TODO: the packet commands strikes me as something I've already seen before, don't remember where however ... */
-WRITE8_MEMBER(smc777_state::key_w)
+void smc777_state::key_w(offs_t offset, uint8_t data)
 {
 	if(offset == 1) //keyboard command
 		m_keyb_cmd = data;
@@ -539,7 +530,7 @@ WRITE8_MEMBER(smc777_state::key_w)
 	}
 }
 
-WRITE8_MEMBER(smc777_state::border_col_w)
+void smc777_state::border_col_w(uint8_t data)
 {
 	if(data & 0xf0)
 		printf("Special border color enabled %02x\n",data);
@@ -548,7 +539,7 @@ WRITE8_MEMBER(smc777_state::border_col_w)
 }
 
 
-READ8_MEMBER(smc777_state::io_status_1c_r)
+uint8_t smc777_state::io_status_1c_r()
 {
 	/*
 	 * RES     x--- ---- Power On bit (1=reset switch)
@@ -564,7 +555,7 @@ READ8_MEMBER(smc777_state::io_status_1c_r)
 	return 0;
 }
 
-READ8_MEMBER(smc777_state::io_status_1d_r)
+uint8_t smc777_state::io_status_1d_r()
 {
 	/*
 	 * TCIN    x--- ---- CMT read data
@@ -579,7 +570,7 @@ READ8_MEMBER(smc777_state::io_status_1d_r)
 }
 
 
-WRITE8_MEMBER(smc777_state::io_control_w)
+void smc777_state::io_control_w(uint8_t data)
 {
 	/*
 	 * flip-flop based
@@ -606,7 +597,7 @@ WRITE8_MEMBER(smc777_state::io_control_w)
 	}
 }
 
-WRITE8_MEMBER(smc777_state::color_mode_w)
+void smc777_state::color_mode_w(uint8_t data)
 {
 	/*
 	 * ---x -111 gfx palette select
@@ -622,7 +613,7 @@ WRITE8_MEMBER(smc777_state::color_mode_w)
 	}
 }
 
-WRITE8_MEMBER(smc777_state::ramdac_w)
+void smc777_state::ramdac_w(offs_t offset, uint8_t data)
 {
 	uint8_t pal_index;
 	pal_index = (offset & 0xf00) >> 8;
@@ -639,13 +630,13 @@ WRITE8_MEMBER(smc777_state::ramdac_w)
 	}
 }
 
-READ8_MEMBER(smc777_state::gcw_r)
+uint8_t smc777_state::gcw_r()
 {
 	return m_display_reg;
 }
 
 /* x */
-WRITE8_MEMBER(smc777_state::gcw_w)
+void smc777_state::gcw_w(uint8_t data)
 {
 	/*
 	 * x--- ---- text mode (0 = 80x25 1 = 40x25)
@@ -666,7 +657,7 @@ WRITE8_MEMBER(smc777_state::gcw_w)
 	m_display_reg = data;
 }
 
-READ8_MEMBER(smc777_state::smc777_mem_r)
+uint8_t smc777_state::smc777_mem_r(offs_t offset)
 {
 	uint8_t z80_r;
 
@@ -688,12 +679,12 @@ READ8_MEMBER(smc777_state::smc777_mem_r)
 	return m_work_ram[offset];
 }
 
-WRITE8_MEMBER(smc777_state::smc777_mem_w)
+void smc777_state::smc777_mem_w(offs_t offset, uint8_t data)
 {
 	m_work_ram[offset] = data;
 }
 
-READ8_MEMBER(smc777_state::vsync_irq_status_r)
+uint8_t smc777_state::vsync_irq_status_r()
 {
 	if (m_vsync_idf == true)
 	{
@@ -704,7 +695,7 @@ READ8_MEMBER(smc777_state::vsync_irq_status_r)
 	return 0;
 }
 
-WRITE8_MEMBER(smc777_state::vsync_irq_enable_w)
+void smc777_state::vsync_irq_enable_w(uint8_t data)
 {
 	if(data & 0xfe)
 		logerror("Irq mask = %02x\n",data & 0xfe);

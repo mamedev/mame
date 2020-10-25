@@ -88,10 +88,10 @@ public:
 	void init_dlta();
 	void init_argh();
 
-	DECLARE_WRITE16_MEMBER(arcadia_multibios_change_game);
+	void arcadia_multibios_change_game(uint16_t data);
 	template <int Coin> DECLARE_CUSTOM_INPUT_MEMBER(coin_counter_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_changed_callback);
-	DECLARE_WRITE8_MEMBER(arcadia_cia_0_portb_w);
+	void arcadia_cia_0_portb_w(uint8_t data);
 
 private:
 	inline void generic_decode(const char *tag, int bit7, int bit6, int bit5, int bit4, int bit3, int bit2, int bit1, int bit0);
@@ -116,12 +116,12 @@ private:
  *
  *************************************/
 
-WRITE16_MEMBER(arcadia_amiga_state::arcadia_multibios_change_game)
+void arcadia_amiga_state::arcadia_multibios_change_game(uint16_t data)
 {
 	if (data == 0)
-		space.install_read_bank(0x800000, 0x97ffff, "bank2");
+		m_maincpu->space(AS_PROGRAM).install_read_bank(0x800000, 0x97ffff, "bank2");
 	else
-		space.nop_read(0x800000, 0x97ffff);
+		m_maincpu->space(AS_PROGRAM).nop_read(0x800000, 0x97ffff);
 }
 
 
@@ -142,7 +142,7 @@ WRITE16_MEMBER(arcadia_amiga_state::arcadia_multibios_change_game)
  *
  *************************************/
 
-WRITE8_MEMBER(arcadia_amiga_state::arcadia_cia_0_portb_w)
+void arcadia_amiga_state::arcadia_cia_0_portb_w(uint8_t data)
 {
 	/* writing a 0 in the low bit clears one of the coins */
 	if ((data & 1) == 0)

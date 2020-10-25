@@ -19,14 +19,14 @@ public:
 
 	void update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bool update_visible_area);
 
-	DECLARE_READ16_MEMBER(gfxram_r);
-	DECLARE_WRITE16_MEMBER(gfxram_w);
+	uint16_t gfxram_r(offs_t offset, uint16_t mem_mask = ~0);
+	void gfxram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER(regs_r);
-	DECLARE_WRITE16_MEMBER(regs_w);
+	uint16_t regs_r(offs_t offset);
+	void regs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER(sprram_r);
-	DECLARE_WRITE16_MEMBER(sprram_w);
+	uint16_t sprram_r(offs_t offset);
+	void sprram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 protected:
 	virtual void device_start() override;
@@ -44,15 +44,15 @@ private:
 	std::unique_ptr<uint16_t[]> m_spriteram;
 	std::unique_ptr<uint16_t[]> m_regs;
 
-	DECLARE_WRITE16_MEMBER(regs_st0020_w);
-	DECLARE_WRITE16_MEMBER(regs_st0032_w);
+	void regs_st0020_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void regs_st0032_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	int m_gfxram_bank;
-	DECLARE_WRITE16_MEMBER(gfxram_bank_w);
+	void gfxram_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	// blitter
 	optional_region_ptr<uint8_t> m_rom_ptr;
-	DECLARE_WRITE16_MEMBER(do_blit_w);
+	void do_blit_w(uint16_t data);
 
 	// tilemaps
 	tilemap_t *m_tmap[4];
@@ -63,8 +63,8 @@ private:
 	int tmap_offset(int i);
 	int tmap_priority(int i);
 	int tmap_is_enabled(int i);
-	DECLARE_WRITE16_MEMBER(tmap_st0020_w);
-	DECLARE_WRITE16_MEMBER(tmap_st0032_w);
+	void tmap_st0020_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void tmap_st0032_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	// sprites
 	void draw_zooming_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);

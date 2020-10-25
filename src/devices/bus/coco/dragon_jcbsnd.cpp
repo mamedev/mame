@@ -40,7 +40,7 @@ DEFINE_DEVICE_TYPE(DRAGON_JCBSND, dragon_jcbsnd_device, "dragon_jcbsnd", "Dragon
 //  dragon_jcbsnd_device - constructor
 //-------------------------------------------------
 
-dragon_jcbsnd_device::dragon_jcbsnd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+dragon_jcbsnd_device::dragon_jcbsnd_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, DRAGON_JCBSND, tag, owner, clock)
 	, device_cococart_interface(mconfig, *this )
 	, m_eprom(*this, "eprom")
@@ -61,7 +61,7 @@ void dragon_jcbsnd_device::device_start()
 //  dragon_jcbsnd_device::get_cart_base
 //-------------------------------------------------
 
-uint8_t* dragon_jcbsnd_device::get_cart_base()
+u8 *dragon_jcbsnd_device::get_cart_base()
 {
 	return m_eprom->base();
 }
@@ -70,7 +70,7 @@ uint8_t* dragon_jcbsnd_device::get_cart_base()
 //  dragon_jcbsnd_device::get_cart_memregion
 //-------------------------------------------------
 
-memory_region* dragon_jcbsnd_device::get_cart_memregion()
+memory_region *dragon_jcbsnd_device::get_cart_memregion()
 {
 	return m_eprom;
 }
@@ -99,7 +99,7 @@ const tiny_rom_entry *dragon_jcbsnd_device::device_rom_region() const
 //  cts_read
 //-------------------------------------------------
 
-READ8_MEMBER(dragon_jcbsnd_device::cts_read)
+u8 dragon_jcbsnd_device::cts_read(offs_t offset)
 {
 	if (offset == 0x3eff)
 		return m_ay8910->data_r();
@@ -111,7 +111,7 @@ READ8_MEMBER(dragon_jcbsnd_device::cts_read)
 //  cts_write
 //-------------------------------------------------
 
-WRITE8_MEMBER(dragon_jcbsnd_device::cts_write)
+void dragon_jcbsnd_device::cts_write(offs_t offset, u8 data)
 {
 	if ((offset & ~1) == 0x3efe)
 		m_ay8910->address_data_w(offset & 1, data);

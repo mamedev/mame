@@ -40,25 +40,25 @@ void ohmygod_state::video_start()
 
 ***************************************************************************/
 
-WRITE16_MEMBER(ohmygod_state::ohmygod_videoram_w)
+void ohmygod_state::ohmygod_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_MEMBER(ohmygod_state::ohmygod_spritebank_w)
+void ohmygod_state::ohmygod_spritebank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 		m_spritebank = data & 0x8000;
 }
 
-WRITE16_MEMBER(ohmygod_state::ohmygod_scrollx_w)
+void ohmygod_state::ohmygod_scrollx_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scrollx);
 	m_bg_tilemap->set_scrollx(0, m_scrollx - 0x81ec);
 }
 
-WRITE16_MEMBER(ohmygod_state::ohmygod_scrolly_w)
+void ohmygod_state::ohmygod_scrolly_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scrolly);
 	m_bg_tilemap->set_scrolly(0, m_scrolly - 0x81ef);

@@ -83,10 +83,6 @@ sam6883_device::sam6883_device(const machine_config &mconfig, const char *tag, d
 	, m_io1_config("I/O1", ENDIANNESS_BIG, 8, 5, 0)
 	, m_io2_config("I/O2", ENDIANNESS_BIG, 8, 5, 0)
 	, m_boot_config("boot", ENDIANNESS_BIG, 8, 7, 0)
-	, m_ram_space(nullptr)
-	, m_rom_space{nullptr, nullptr, nullptr}
-	, m_io_space{nullptr, nullptr, nullptr}
-	, m_boot_space(nullptr)
 {
 }
 
@@ -126,12 +122,12 @@ device_memory_interface::space_config_vector sam6883_device::memory_space_config
 void sam6883_device::device_start()
 {
 	// get spaces
-	m_ram_space = space(0).cache<0, 0, ENDIANNESS_BIG>();
+	space(0).cache(m_ram_space);
 	for (int i = 0; i < 3; i++)
-		m_rom_space[i] = space(i + 1).cache<0, 0, ENDIANNESS_BIG>();
+		space(i + 1).cache(m_rom_space[i]);
 	for (int i = 0; i < 3; i++)
-		m_io_space[i] = &space(i + 4);
-	m_boot_space = space(7).cache<0, 0, ENDIANNESS_BIG>();
+		space(i + 4).specific(m_io_space[i]);
+	space(7).cache(m_boot_space);
 
 	// save state support
 	save_item(NAME(m_sam_state));
@@ -153,27 +149,27 @@ uint8_t sam6883_device::read(offs_t offset)
 		// RAM reads: 0000–7FFF or 0000–FEFF
 		if (mode_64k && (m_sam_state & (SAM_STATE_TY|SAM_STATE_P1)) == SAM_STATE_P1)
 			offset |= 0x8000;
-		return m_ram_space->read_byte(offset);
+		return m_ram_space.read_byte(offset);
 	}
 	else if (offset < 0xc000 || offset >= 0xffe0)
 	{
 		// ROM spaces: 8000–9FFF and A000–BFFF + FFE0–FFFF
-		return m_rom_space[BIT(offset, 13)]->read_byte(offset & 0x1fff);
+		return m_rom_space[BIT(offset, 13)].read_byte(offset & 0x1fff);
 	}
 	else if (offset < 0xff00)
 	{
 		// ROM2 space: C000–FEFF
-		return m_rom_space[2]->read_byte(offset & 0x3fff);
+		return m_rom_space[2].read_byte(offset & 0x3fff);
 	}
 	else if (offset < 0xff60)
 	{
 		// I/O spaces: FF00–FF1F (slow), FF20–FF3F, FF40–FF5F
-		return m_io_space[BIT(offset, 5, 2)]->read_byte(offset & 0x1f);
+		return m_io_space[BIT(offset, 5, 2)].read_byte(offset & 0x1f);
 	}
 	else
 	{
 		// FF60–FFDF
-		return m_boot_space->read_byte(offset - 0xff60);
+		return m_boot_space.read_byte(offset - 0xff60);
 	}
 }
 
@@ -190,31 +186,31 @@ void sam6883_device::write(offs_t offset, uint8_t data)
 		// RAM write space: 0000–7FFF (nominally space 7)
 		if (mode_64k && (m_sam_state & (SAM_STATE_TY|SAM_STATE_P1)) == SAM_STATE_P1)
 			offset |= 0x8000;
-		m_ram_space->write_byte(offset, data);
+		m_ram_space.write_byte(offset, data);
 	}
 	else if (offset < 0xc000 || offset >= 0xffe0)
 	{
 		// ROM spaces: 8000–9FFF and A000–BFFF + FFE0–FFFF (may write through to RAM)
 		if (offset < 0xc000 && mode_64k && (m_sam_state & SAM_STATE_TY))
-			m_ram_space->write_byte(offset, data);
-		m_rom_space[BIT(offset, 13)]->write_byte(offset & 0x1fff, data);
+			m_ram_space.write_byte(offset, data);
+		m_rom_space[BIT(offset, 13)].write_byte(offset & 0x1fff, data);
 	}
 	else if (offset < 0xff00)
 	{
 		// ROM2 space: C000–FEFF (may write through to RAM)
 		if (mode_64k && (m_sam_state & SAM_STATE_TY))
-			m_ram_space->write_byte(offset, data);
-		m_rom_space[2]->write_byte(offset & 0x3fff, data);
+			m_ram_space.write_byte(offset, data);
+		m_rom_space[2].write_byte(offset & 0x3fff, data);
 	}
 	else if (offset < 0xff60)
 	{
 		// I/O spaces: FF00–FF1F (slow), FF20–FF3F, FF40–FF5F
-		m_io_space[BIT(offset, 5, 2)]->write_byte(offset & 0x1f, data);
+		m_io_space[BIT(offset, 5, 2)].write_byte(offset & 0x1f, data);
 	}
 	else
 	{
 		// FF60–FFDF
-		m_boot_space->write_byte(offset - 0xff60, data);
+		m_boot_space.write_byte(offset - 0xff60, data);
 		if (offset >= 0xffc0)
 			internal_write(offset & 0x1f, data);
 	}

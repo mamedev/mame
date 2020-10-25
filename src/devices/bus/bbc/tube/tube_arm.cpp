@@ -57,7 +57,6 @@ void bbc_tube_arm_device::device_add_mconfig(machine_config &config)
 	m_arm->set_addrmap(AS_PROGRAM, &bbc_tube_arm_device::tube_arm_mem);
 
 	TUBE(config, m_ula);
-	m_ula->hirq_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_tube_slot_device::irq_w));
 	m_ula->pnmi_handler().set_inputline(m_arm, ARM_FIRQ_LINE);
 	m_ula->pirq_handler().set_inputline(m_arm, ARM_IRQ_LINE);
 
@@ -86,13 +85,13 @@ const tiny_rom_entry *bbc_tube_arm_device::device_rom_region() const
 //-------------------------------------------------
 
 bbc_tube_arm_device::bbc_tube_arm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BBC_TUBE_ARM, tag, owner, clock),
-		device_bbc_tube_interface(mconfig, *this),
-		m_arm(*this, "arm"),
-		m_ula(*this, "ula"),
-		m_ram(*this, "ram"),
-		m_bootstrap(*this, "bootstrap"),
-		m_rom_select(true)
+	: device_t(mconfig, BBC_TUBE_ARM, tag, owner, clock)
+	, device_bbc_tube_interface(mconfig, *this)
+	, m_arm(*this, "arm")
+	, m_ula(*this, "ula")
+	, m_ram(*this, "ram")
+	, m_bootstrap(*this, "bootstrap")
+	, m_rom_select(true)
 {
 }
 
@@ -102,7 +101,6 @@ bbc_tube_arm_device::bbc_tube_arm_device(const machine_config &mconfig, const ch
 
 void bbc_tube_arm_device::device_start()
 {
-	m_slot = dynamic_cast<bbc_tube_slot_device *>(owner());
 }
 
 //-------------------------------------------------

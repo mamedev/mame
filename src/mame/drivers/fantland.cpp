@@ -49,7 +49,6 @@ Year + Game             Main CPU  Sound CPU  Sound                         Video
 #include "sound/3526intf.h"
 #include "sound/dac.h"
 #include "sound/sn76496.h"
-#include "sound/volt_reg.h"
 #include "sound/ym2151.h"
 #include "speaker.h"
 
@@ -60,7 +59,7 @@ Year + Game             Main CPU  Sound CPU  Sound                         Video
 
 ***************************************************************************/
 
-WRITE8_MEMBER(fantland_state::nmi_enable_w)
+void fantland_state::nmi_enable_w(uint8_t data)
 {
 	m_nmi_enable = data;
 
@@ -68,7 +67,7 @@ WRITE8_MEMBER(fantland_state::nmi_enable_w)
 		logerror("CPU #0 PC = %04X: nmi_enable = %02x\n", m_maincpu->pc(), data);
 }
 
-WRITE8_MEMBER(fantland_state::soundlatch_w)
+void fantland_state::soundlatch_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
@@ -78,22 +77,22 @@ WRITE8_MEMBER(fantland_state::soundlatch_w)
                                 Fantasy Land
 ***************************************************************************/
 
-READ8_MEMBER(fantland_state::spriteram_r)
+uint8_t fantland_state::spriteram_r(offs_t offset)
 {
 	return m_spriteram[offset];
 }
 
-READ8_MEMBER(fantland_state::spriteram2_r)
+uint8_t fantland_state::spriteram2_r(offs_t offset)
 {
 	return m_spriteram2[offset];
 }
 
-WRITE8_MEMBER(fantland_state::spriteram_w)
+void fantland_state::spriteram_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	COMBINE_DATA(&m_spriteram[offset]);
 }
 
-WRITE8_MEMBER(fantland_state::spriteram2_w)
+void fantland_state::spriteram2_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	COMBINE_DATA(&m_spriteram2[offset]);
 }
@@ -147,7 +146,7 @@ void fantland_state::galaxygn_map(address_map &map)
 
 // data & 0x31 changes when lightgun fires
 #if 0
-WRITE8_MEMBER(borntofi_state::nmi_enable_w)
+void borntofi_state::nmi_enable_w(uint8_t data)
 {
 	m_nmi_enable = data;
 
@@ -159,7 +158,7 @@ WRITE8_MEMBER(borntofi_state::nmi_enable_w)
 #endif
 
 // Trackball doesn't work correctly
-READ8_MEMBER(borntofi_state::inputs_r)
+uint8_t borntofi_state::inputs_r(offs_t offset)
 {
 	int x, y, f;
 
@@ -172,8 +171,8 @@ READ8_MEMBER(borntofi_state::inputs_r)
 
 	// Trackball
 
-	x = ioport(offset ? "P2 Trackball X" : "P1 Trackball X")->read();
-	y = ioport(offset ? "P2 Trackball Y" : "P1 Trackball Y")->read();
+	x = ioport(offset ? "P2-TRK.X" : "P1-TRK.X")->read();
+	y = ioport(offset ? "P2-TRK.Y" : "P1-TRK.Y")->read();
 	f = m_screen->frame_number();
 
 	m_input_ret[offset] = (m_input_ret[offset] & 0x14) | (ioport(offset ? "P2_TRACK" : "P1_TRACK")->read() & 0xc3);
@@ -227,10 +226,10 @@ void borntofi_state::main_map(address_map &map)
 
 	map(0x54000, 0x567ff).ram().share("spriteram");
 
-	map(0x57000, 0x57000).portr("P1 Lightgun Y");
-	map(0x57001, 0x57001).portr("P1 Lightgun X");
-	map(0x57002, 0x57002).portr("P2 Lightgun Y");
-	map(0x57003, 0x57003).portr("P2 Lightgun X");
+	map(0x57000, 0x57000).portr("P1-GUN.Y");
+	map(0x57001, 0x57001).portr("P1-GUN.X");
+	map(0x57002, 0x57002).portr("P2-GUN.Y");
+	map(0x57003, 0x57003).portr("P2-GUN.X");
 
 	map(0x60000, 0x6ffff).ram().share("spriteram2");
 
@@ -308,7 +307,7 @@ void borntofi_state::adpcm_stop(int voice)
 	m_adpcm_playing[voice] = 0;
 }
 
-WRITE8_MEMBER(borntofi_state::msm5205_w)
+void borntofi_state::msm5205_w(offs_t offset, uint8_t data)
 {
 	int voice = offset / 8;
 	int reg = offset % 8;
@@ -655,28 +654,28 @@ static INPUT_PORTS_START( borntofi )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x0040, "DSW2:7" )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x0080, "DSW2:8" )
 
-	PORT_START("P1 Lightgun Y")     /* 57000 */
+	PORT_START("P1-GUN.Y")     /* 57000 */
 	PORT_BIT( 0xff, 0xb0, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, (352.0 - 12) / 352, 12.0 / 352, 0) PORT_MINMAX(0x80,0xfc) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_PLAYER(1)
 
-	PORT_START("P1 Lightgun X")     /* 57001 */
+	PORT_START("P1-GUN.X")     /* 57001 */
 	PORT_BIT( 0xff, 0x60, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0x07,0xb7) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_PLAYER(1)
 
-	PORT_START("P2 Lightgun Y")     /* 57002 */
+	PORT_START("P2-GUN.Y")     /* 57002 */
 	PORT_BIT( 0xff, 0xb0, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, (352.0 - 12) / 352, 12.0 / 352, 0) PORT_MINMAX(0x80,0xfc) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_PLAYER(2)
 
-	PORT_START("P2 Lightgun X")     /* 57003 */
+	PORT_START("P2-GUN.X")     /* 57003 */
 	PORT_BIT( 0xff, 0x70, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0x07,0xb7) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_PLAYER(2)
 
-	PORT_START("P1 Trackball Y")    /* 53000 */
+	PORT_START("P1-TRK.Y")    /* 53000 */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(10) PORT_KEYDELTA(5) PORT_PLAYER(1) PORT_RESET
 
-	PORT_START("P1 Trackball X")    /* 53000 */
+	PORT_START("P1-TRK.X")    /* 53000 */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(10) PORT_KEYDELTA(5) PORT_PLAYER(1) PORT_RESET
 
-	PORT_START("P2 Trackball Y")    /* 53001 */
+	PORT_START("P2-TRK.Y")    /* 53001 */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(10) PORT_KEYDELTA(5) PORT_PLAYER(2)
 
-	PORT_START("P2 Trackball X")    /* 53001 */
+	PORT_START("P2-TRK.X")    /* 53001 */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(10) PORT_KEYDELTA(5) PORT_PLAYER(2)
 INPUT_PORTS_END
 
@@ -839,9 +838,6 @@ void fantland_state::fantland(machine_config &config)
 	YM2151(config, "ymsnd", 3000000).add_route(0, "speaker", 0.35).add_route(1, "speaker", 0.35);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 

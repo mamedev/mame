@@ -132,7 +132,8 @@ public:
 	// optional operation overrides for ABC 1600
 	virtual int abcbus_csb() { return 1; }
 	virtual uint8_t abcbus_ops() { return 0xff; }
-	virtual void abcbus_tren(int state) { }
+	virtual uint8_t abcbus_tren() { return 0xff; }
+	virtual void abcbus_tren(uint8_t data) { }
 	virtual void abcbus_prac(int state) { }
 	virtual uint8_t abcbus_exp() { return 0xff; }
 	virtual int abcbus_xcsb2() { return 1; }
@@ -198,20 +199,19 @@ public:
 	DECLARE_READ_LINE_MEMBER( xcsb3_r ) { return m_card ? m_card->abcbus_xcsb3() : 1; }
 	DECLARE_READ_LINE_MEMBER( xcsb4_r ) { return m_card ? m_card->abcbus_xcsb4() : 1; }
 	DECLARE_READ_LINE_MEMBER( xcsb5_r ) { return m_card ? m_card->abcbus_xcsb5() : 1; }
-	DECLARE_WRITE_LINE_MEMBER( tren_w ) { if (m_card) m_card->abcbus_tren(state); }
+	uint8_t read_tren() { return m_card ? m_card->abcbus_tren() : 0xff; }
+	void write_tren(uint8_t data) { if (m_card) m_card->abcbus_tren(data); }
 	DECLARE_WRITE_LINE_MEMBER( prac_w ) { if (m_card) m_card->abcbus_prac(state); }
 
-	DECLARE_WRITE8_MEMBER( cs_w ) { write_cs(data); }
-	DECLARE_READ8_MEMBER( rst_r ) { return read_rst(); }
-	DECLARE_READ8_MEMBER( inp_r ) { return read_inp(); }
-	DECLARE_WRITE8_MEMBER( out_w ) { write_out(data); }
-	DECLARE_READ8_MEMBER( stat_r ) { return read_stat(); }
-	DECLARE_WRITE8_MEMBER( c1_w ) { write_c1(data); }
-	DECLARE_WRITE8_MEMBER( c2_w ) { write_c2(data); }
-	DECLARE_WRITE8_MEMBER( c3_w ) { write_c3(data); }
-	DECLARE_WRITE8_MEMBER( c4_w ) { write_c4(data); }
-	DECLARE_READ8_MEMBER( xmemfl_r ) { return xmemfl_r(offset); }
-	DECLARE_WRITE8_MEMBER( xmemw_w ) { xmemw_w(offset, data); }
+	void cs_w(uint8_t data) { write_cs(data); }
+	uint8_t rst_r() { return read_rst(); }
+	uint8_t inp_r() { return read_inp(); }
+	void out_w(uint8_t data) { write_out(data); }
+	uint8_t stat_r() { return read_stat(); }
+	void c1_w(uint8_t data) { write_c1(data); }
+	void c2_w(uint8_t data) { write_c2(data); }
+	void c3_w(uint8_t data) { write_c3(data); }
+	void c4_w(uint8_t data) { write_c4(data); }
 
 	DECLARE_READ_LINE_MEMBER( irq_r ) { return m_irq; }
 	DECLARE_READ_LINE_MEMBER( nmi_r ) { return m_nmi; }

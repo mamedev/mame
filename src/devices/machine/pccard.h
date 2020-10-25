@@ -9,10 +9,10 @@
 class device_pccard_interface : public device_interface
 {
 public:
-	virtual DECLARE_READ16_MEMBER(read_memory);
-	virtual DECLARE_READ16_MEMBER(read_reg);
-	virtual DECLARE_WRITE16_MEMBER(write_memory);
-	virtual DECLARE_WRITE16_MEMBER(write_reg);
+	virtual uint16_t read_memory(offs_t offset, uint16_t mem_mask = ~0);
+	virtual uint16_t read_reg(offs_t offset, uint16_t mem_mask = ~0);
+	virtual void write_memory(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	virtual void write_reg(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	virtual ~device_pccard_interface() {}
 
@@ -37,10 +37,10 @@ public:
 	pccard_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ_LINE_MEMBER(read_line_inserted);
-	DECLARE_READ16_MEMBER(read_memory);
-	DECLARE_READ16_MEMBER(read_reg);
-	DECLARE_WRITE16_MEMBER(write_memory);
-	DECLARE_WRITE16_MEMBER(write_reg);
+	uint16_t read_memory(offs_t offset, uint16_t mem_mask = ~0);
+	uint16_t read_reg(offs_t offset, uint16_t mem_mask = ~0);
+	void write_memory(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void write_reg(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 protected:
 	virtual void device_start() override;

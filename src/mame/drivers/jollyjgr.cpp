@@ -163,10 +163,10 @@ private:
 	uint8_t      m_bitmap_disable;
 	uint8_t      m_tilemap_bank;
 	uint8_t      m_pri;
-	DECLARE_WRITE8_MEMBER(jollyjgr_videoram_w);
-	DECLARE_WRITE8_MEMBER(jollyjgr_attrram_w);
-	DECLARE_WRITE8_MEMBER(jollyjgr_misc_w);
-	DECLARE_WRITE8_MEMBER(jollyjgr_coin_lookout_w);
+	void jollyjgr_videoram_w(offs_t offset, uint8_t data);
+	void jollyjgr_attrram_w(offs_t offset, uint8_t data);
+	void jollyjgr_misc_w(uint8_t data);
+	void jollyjgr_coin_lookout_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -191,13 +191,13 @@ private:
  *
  *************************************/
 
-WRITE8_MEMBER(jollyjgr_state::jollyjgr_videoram_w)
+void jollyjgr_state::jollyjgr_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(jollyjgr_state::jollyjgr_attrram_w)
+void jollyjgr_state::jollyjgr_attrram_w(offs_t offset, uint8_t data)
 {
 	if (offset & 1)
 	{
@@ -215,7 +215,7 @@ WRITE8_MEMBER(jollyjgr_state::jollyjgr_attrram_w)
 	m_colorram[offset] = data;
 }
 
-WRITE8_MEMBER(jollyjgr_state::jollyjgr_misc_w)
+void jollyjgr_state::jollyjgr_misc_w(uint8_t data)
 {
 	// they could be swapped, because it always set "data & 3"
 	m_flip_x = data & 1;
@@ -234,7 +234,7 @@ WRITE8_MEMBER(jollyjgr_state::jollyjgr_misc_w)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(jollyjgr_state::jollyjgr_coin_lookout_w)
+void jollyjgr_state::jollyjgr_coin_lookout_w(uint8_t data)
 {
 	machine().bookkeeping().coin_lockout_global_w(data & 1);
 
@@ -514,13 +514,13 @@ void jollyjgr_state::draw_bitmap(bitmap_rgb32 &bitmap)
 				if (color)
 				{
 					if (m_flip_x && m_flip_y)
-						bitmap.pix32(y, x * 8 + i) = m_bm_palette->pen_color(color);
+						bitmap.pix(y, x * 8 + i) = m_bm_palette->pen_color(color);
 					else if (m_flip_x && !m_flip_y)
-						bitmap.pix32(255 - y, x * 8 + i) = m_bm_palette->pen_color(color);
+						bitmap.pix(255 - y, x * 8 + i) = m_bm_palette->pen_color(color);
 					else if (!m_flip_x && m_flip_y)
-						bitmap.pix32(y, 255 - x * 8 - i) = m_bm_palette->pen_color(color);
+						bitmap.pix(y, 255 - x * 8 - i) = m_bm_palette->pen_color(color);
 					else
-						bitmap.pix32(255 - y, 255 - x * 8 - i) = m_bm_palette->pen_color(color);
+						bitmap.pix(255 - y, 255 - x * 8 - i) = m_bm_palette->pen_color(color);
 				}
 			}
 
@@ -602,7 +602,7 @@ uint32_t jollyjgr_state::screen_update_fspider(screen_device &screen, bitmap_rgb
 		if (sy>=cliprect.min_y && sy<=cliprect.max_y)
 			for (int x=sx-4;x<sx;x++)
 				if (x>=cliprect.min_x && x<=cliprect.max_x)
-					bitmap.pix32(sy, x) = m_bm_palette->pen_color(bc);
+					bitmap.pix(sy, x) = m_bm_palette->pen_color(bc);
 	}
 
 	return 0;

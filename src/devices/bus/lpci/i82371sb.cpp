@@ -164,8 +164,8 @@ void i82371sb_device::map_busmaster_dma()
 {
 	if (m_base != 0)
 	{
-		spaceio->install_readwrite_handler(m_base, m_base + 0x7, read32_delegate(*m_ide, FUNC(bus_master_ide_controller_device::bmdma_r)), write32_delegate(*m_ide, FUNC(bus_master_ide_controller_device::bmdma_w)), 0xffffffff);
-		spaceio->install_readwrite_handler(m_base + 0x8, m_base + 0xf, read32_delegate(*m_ide2, FUNC(bus_master_ide_controller_device::bmdma_r)), write32_delegate(*m_ide2, FUNC(bus_master_ide_controller_device::bmdma_w)), 0xffffffff);
+		spaceio->install_readwrite_handler(m_base, m_base + 0x7, read32s_delegate(*m_ide, FUNC(bus_master_ide_controller_device::bmdma_r)), write32s_delegate(*m_ide, FUNC(bus_master_ide_controller_device::bmdma_w)), 0xffffffff);
+		spaceio->install_readwrite_handler(m_base + 0x8, m_base + 0xf, read32s_delegate(*m_ide2, FUNC(bus_master_ide_controller_device::bmdma_r)), write32s_delegate(*m_ide2, FUNC(bus_master_ide_controller_device::bmdma_w)), 0xffffffff);
 	}
 }
 
@@ -254,7 +254,7 @@ void i82371sb_device::device_start()
 
 	southbridge_device::device_start();
 	m_ide_io_ports_enabled = false;
-	spaceio.install_readwrite_handler(0x00b0, 0x00b3, read8_delegate(*this, FUNC(i82371sb_device::read_apmcapms)), write8_delegate(*this, FUNC(i82371sb_device::write_apmcapms)), 0xffff0000);
+	spaceio.install_readwrite_handler(0x00b0, 0x00b3, read8sm_delegate(*this, FUNC(i82371sb_device::read_apmcapms)), write8sm_delegate(*this, FUNC(i82371sb_device::write_apmcapms)), 0xffff0000);
 	m_smi_callback.resolve_safe();
 	m_boot_state_hook.resolve_safe();
 	// setup save states
@@ -301,7 +301,7 @@ void i82371sb_device::port80_debug_write(uint8_t value)
 	m_boot_state_hook((offs_t)0, value);
 }
 
-READ8_MEMBER(i82371sb_device::read_apmcapms)
+uint8_t i82371sb_device::read_apmcapms(offs_t offset)
 {
 	if (offset == 0)
 		return m_apmc;
@@ -309,7 +309,7 @@ READ8_MEMBER(i82371sb_device::read_apmcapms)
 		return m_apms;
 }
 
-WRITE8_MEMBER(i82371sb_device::write_apmcapms)
+void i82371sb_device::write_apmcapms(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{

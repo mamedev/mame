@@ -35,11 +35,11 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	template <unsigned Channel> DECLARE_READ32_MEMBER(load_address_r) { return m_channel[Channel].load_address; }
-	template <unsigned Channel> DECLARE_READ32_MEMBER(diag_r) { return 0; }
+	template <unsigned Channel> u32 load_address_r() { return m_channel[Channel].load_address; }
+	template <unsigned Channel> u32 diag_r() { return 0; }
 	template <unsigned Channel> u16 fifo_r();
-	template <unsigned Channel> DECLARE_READ32_MEMBER(mode_r);
-	template <unsigned Channel> DECLARE_READ16_MEMBER(block_count_r)
+	template <unsigned Channel> u32 mode_r();
+	template <unsigned Channel> u16 block_count_r()
 	{
 		if ((Channel == 0) || !(m_channel[Channel].mode & MODE_CHANNEL_EN))
 			return m_channel[Channel].block_count;
@@ -56,21 +56,21 @@ protected:
 
 		return m_channel[Channel].block_count - (block_cycles % (m_channel[Channel].block_count + 1));
 	}
-	template <unsigned Channel> DECLARE_READ32_MEMBER(current_address_r) { return m_channel[Channel].current_address; }
+	template <unsigned Channel> u32 current_address_r() { return m_channel[Channel].current_address; }
 
-	DECLARE_READ32_MEMBER(tcount_r);
-	DECLARE_READ32_MEMBER(tbreak_r) { return m_tbreak; }
-	DECLARE_READ32_MEMBER(error_r) { return 0; }
-	DECLARE_READ32_MEMBER(control_r) { return 0; }
+	u32 tcount_r();
+	u32 tbreak_r() { return m_tbreak; }
+	u32 error_r() { return 0; }
+	u32 control_r() { return 0; }
 
-	template <unsigned Channel> DECLARE_WRITE32_MEMBER(load_address_w);
+	template <unsigned Channel> void load_address_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	template <unsigned Channel> void fifo_w(u16 data);
-	template <unsigned Channel> DECLARE_WRITE32_MEMBER(mode_w);
-	template <unsigned Channel> DECLARE_WRITE16_MEMBER(block_count_w);
+	template <unsigned Channel> void mode_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	template <unsigned Channel> void block_count_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	DECLARE_WRITE32_MEMBER(tcount_w);
-	DECLARE_WRITE32_MEMBER(tbreak_w);
-	DECLARE_WRITE32_MEMBER(control_w);
+	void tcount_w(u32 data);
+	void tbreak_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void control_w(u32 data);
 
 	TIMER_CALLBACK_MEMBER(timer);
 	TIMER_CALLBACK_MEMBER(dma);

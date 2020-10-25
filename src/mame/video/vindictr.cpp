@@ -93,7 +93,7 @@ void vindictr_state::video_start()
  *
  *************************************/
 
-WRITE16_MEMBER( vindictr_state::vindictr_paletteram_w )
+void vindictr_state::vindictr_paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	static const int ztable[16] =
 		{ 0x0, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0x10, 0x11 };
@@ -215,8 +215,8 @@ uint32_t vindictr_state::screen_update_vindictr(screen_device &screen, bitmap_in
 	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->top(); y <= rect->bottom(); y++)
 		{
-			uint16_t *mo = &mobitmap.pix16(y);
-			uint16_t *pf = &bitmap.pix16(y);
+			uint16_t const *const mo = &mobitmap.pix(y);
+			uint16_t *const pf = &bitmap.pix(y);
 			for (int x = rect->left(); x <= rect->right(); x++)
 				if (mo[x] != 0xffff)
 				{
@@ -229,7 +229,7 @@ uint32_t vindictr_state::screen_update_vindictr(screen_device &screen, bitmap_in
 
 					    MOG3-1 = ~MAT3-1 if MAT6==1 and MSD3==1
 					*/
-					int mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
+					int const mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
 
 					/* upper bit of MO priority signals special rendering and doesn't draw anything */
 					if (mopriority & 4)
@@ -255,8 +255,8 @@ uint32_t vindictr_state::screen_update_vindictr(screen_device &screen, bitmap_in
 	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->top(); y <= rect->bottom(); y++)
 		{
-			uint16_t *mo = &mobitmap.pix16(y);
-			uint16_t *pf = &bitmap.pix16(y);
+			uint16_t const *const mo = &mobitmap.pix(y);
+			uint16_t *const pf = &bitmap.pix(y);
 			for (int x = rect->left(); x <= rect->right(); x++)
 				if (mo[x] != 0xffff)
 				{

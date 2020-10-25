@@ -7,15 +7,16 @@
     Internal menus for video options
 
 ***************************************************************************/
-
-#pragma once
-
 #ifndef MAME_FRONTEND_UI_VIDEOOPT_H
 #define MAME_FRONTEND_UI_VIDEOOPT_H
 
+#pragma once
+
 #include "ui/menu.h"
 
+
 namespace ui {
+
 class menu_video_targets : public menu
 {
 public:
@@ -27,25 +28,20 @@ private:
 	virtual void handle() override;
 };
 
+
 class menu_video_options : public menu
 {
 public:
-	menu_video_options(mame_ui_manager &mui, render_container &container, render_target *target);
+	menu_video_options(mame_ui_manager &mui, render_container &container, render_target &target);
 	virtual ~menu_video_options() override;
 
 private:
-	enum : uint32_t {
-		VIDEO_ITEM_ROTATE = 0x80000000,
-		VIDEO_ITEM_ZOOM,
-		VIDEO_ITEM_VIEW
-	};
-
 	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
-	render_target *target;
+	render_target &m_target;
 };
 
 } // namespace ui
 
-#endif  /* MAME_FRONTEND_UI_VIDEOOPT_H */
+#endif  // MAME_FRONTEND_UI_VIDEOOPT_H

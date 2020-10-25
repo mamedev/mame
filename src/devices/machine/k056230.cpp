@@ -2,7 +2,17 @@
 // copyright-holders:Fabio Priuli
 /***************************************************************************
 
-    Konami IC 056230 (LANC)
+Konami IC 056230 (LANC)
+
+Device Notes:
+-The custom IC itself
+-64k shared ram
+-LS161 4-bit binary counter
+-PAL(056787) for racinfrc's sub board and plygonet.cpp
+-PAL(056787A) for zr107.cpp, gticlub.cpp and thunderh's I/O board
+-HYC2485S RS485 transceiver
+
+TODO: nearly everything
 
 ***************************************************************************/
 

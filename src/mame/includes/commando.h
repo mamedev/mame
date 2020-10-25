@@ -37,13 +37,13 @@ public:
 	void commando(machine_config &config);
 
 protected:
-	DECLARE_WRITE8_MEMBER(commando_videoram_w);
-	DECLARE_WRITE8_MEMBER(commando_colorram_w);
-	DECLARE_WRITE8_MEMBER(commando_videoram2_w);
-	DECLARE_WRITE8_MEMBER(commando_colorram2_w);
-	DECLARE_WRITE8_MEMBER(commando_scrollx_w);
-	DECLARE_WRITE8_MEMBER(commando_scrolly_w);
-	DECLARE_WRITE8_MEMBER(commando_c804_w);
+	void commando_videoram_w(offs_t offset, uint8_t data);
+	void commando_colorram_w(offs_t offset, uint8_t data);
+	void commando_videoram2_w(offs_t offset, uint8_t data);
+	void commando_colorram2_w(offs_t offset, uint8_t data);
+	void commando_scrollx_w(offs_t offset, uint8_t data);
+	void commando_scrolly_w(offs_t offset, uint8_t data);
+	void commando_c804_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_start() override;

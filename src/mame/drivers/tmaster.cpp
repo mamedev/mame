@@ -140,8 +140,8 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 
-	DECLARE_READ16_MEMBER(rtc_r);
-	DECLARE_WRITE16_MEMBER(rtc_w);
+	uint16_t rtc_r(offs_t offset);
+	void rtc_w(offs_t offset, uint16_t data);
 
 	void tmaster_map(address_map &map);
 	void cpu_space_map(address_map &map);
@@ -232,7 +232,7 @@ uint8_t binary_to_bcd(uint8_t data)
 	return ((data / 10) << 4) | (data % 10);
 }
 
-READ16_MEMBER(tmaster_state::rtc_r)
+uint16_t tmaster_state::rtc_r(offs_t offset)
 {
 	system_time systime;
 
@@ -248,7 +248,7 @@ READ16_MEMBER(tmaster_state::rtc_r)
 	return m_rtc_ram[offset];
 }
 
-WRITE16_MEMBER(tmaster_state::rtc_w)
+void tmaster_state::rtc_w(offs_t offset, uint16_t data)
 {
 	if ( offset == 0 )
 	{
@@ -558,8 +558,8 @@ ROM_END
 
 ROM_START( tm2kspeval ) /* NOT FOR RELEASE / FOR EVALUATION - still requires credits - Defaults to Spanish but English can be selected */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // 68000 Code
-	ROM_LOAD16_BYTE( "touch_master_2000_spain_451_4.xx3.u51", 0x000000, 0x080000, CRC(ba51f4dd) SHA1(bcdf6acbe6546a562e74178d4f9cdb0e167baee2) ) /* Ver: 4.XX3 Spanish 6-26-97 - Evaluation Only (yes, it's actually 451 and not U51) */
-	ROM_LOAD16_BYTE( "touch_master_2000_spain_452_4.xx3.u52", 0x000001, 0x080000, CRC(6ca86264) SHA1(2fb04b8d4bd0a51653ca80e1af7fedab5aebb9dd) ) /* Ver: 4.XX3 Spanish 6-26-97 - Evaluation Only (yes, it's actually 452 and not U52) */
+	ROM_LOAD16_BYTE( "touch_master_2000_span_451_4.xx3.u51", 0x000000, 0x080000, CRC(ba51f4dd) SHA1(bcdf6acbe6546a562e74178d4f9cdb0e167baee2) ) /* Ver: 4.XX3 Spanish 6-26-97 - Evaluation Only (yes, it's actually 451 and not U51) */
+	ROM_LOAD16_BYTE( "touch_master_2000_span_452_4.xx3.u52", 0x000001, 0x080000, CRC(6ca86264) SHA1(2fb04b8d4bd0a51653ca80e1af7fedab5aebb9dd) ) /* Ver: 4.XX3 Spanish 6-26-97 - Evaluation Only (yes, it's actually 452 and not U52) */
 
 	ROM_REGION( 0x400000, "blitter", ROMREGION_ERASE )  // Blitter gfx
 	ROM_LOAD16_BYTE( "touch_master_2000_u38_4.x.u38", 0x100000, 0x080000, CRC(22bb6cc5) SHA1(fc6cfd4e1e6e1455d648a7b63f2c8e37cdfe86d6) ) /* All 4 graphic roms marked as Rev 4.X */

@@ -31,7 +31,6 @@ the S14001A in the 70s), this time a 65C02 software solution.
 #include "machine/sensorboard.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/pwm.h"
 #include "speaker.h"
 
@@ -80,8 +79,8 @@ private:
 	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
 
 	// I/O handlers
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void control_w(offs_t offset, u8 data);
+	u8 input_r(offs_t offset);
 
 	int m_numbanks = 0;
 	u8 m_speech_bank = 0;
@@ -109,7 +108,7 @@ void chesster_state::machine_start()
 
 // TTL/generic
 
-WRITE8_MEMBER(chesster_state::control_w)
+void chesster_state::control_w(offs_t offset, u8 data)
 {
 	// a0-a2,d7: 74259(1)
 	u8 mask = 1 << offset;
@@ -129,7 +128,7 @@ WRITE8_MEMBER(chesster_state::control_w)
 	m_rombank->set_entry(bank & (m_numbanks - 1));
 }
 
-READ8_MEMBER(chesster_state::input_r)
+u8 chesster_state::input_r(offs_t offset)
 {
 	u8 sel = m_select >> 4 & 0xf;
 	u8 data = 0;
@@ -207,9 +206,6 @@ void chesster_state::chesster(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.5); // m74hc374b1.ic1 + 8l513_02.z2
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void chesster_state::kishon(machine_config &config)

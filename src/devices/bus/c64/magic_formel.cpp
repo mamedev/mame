@@ -34,7 +34,7 @@
 DEFINE_DEVICE_TYPE(C64_MAGIC_FORMEL, c64_magic_formel_cartridge_device, "c64_magic_formel", "C64 Magic Formel cartridge")
 
 
-WRITE8_MEMBER( c64_magic_formel_cartridge_device::pia_pa_w )
+void c64_magic_formel_cartridge_device::pia_pa_w(uint8_t data)
 {
 	/*
 
@@ -56,7 +56,7 @@ WRITE8_MEMBER( c64_magic_formel_cartridge_device::pia_pa_w )
 	m_ram_oe = BIT(data, 4);
 }
 
-WRITE8_MEMBER( c64_magic_formel_cartridge_device::pia_pb_w )
+void c64_magic_formel_cartridge_device::pia_pb_w(uint8_t data)
 {
 	/*
 

@@ -6,16 +6,16 @@
     AMD Am2901B / Am2901C
     Four-Bit Bipolar Microprocessor Slice
 
-	To Do:
-	- Opcode hookup
-	- Verification
+    To Do:
+    - Opcode hookup
+    - Verification
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "am2901b.h"
 
-#define VERBOSE	(1)
+#define VERBOSE (1)
 #include "logmacro.h"
 
 /*****************************************************************************/

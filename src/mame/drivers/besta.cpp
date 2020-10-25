@@ -30,8 +30,8 @@ public:
 
 protected:
 	void besta_mem(address_map &map);
-	DECLARE_READ8_MEMBER( mpcc_reg_r );
-	DECLARE_WRITE8_MEMBER( mpcc_reg_w );
+	uint8_t mpcc_reg_r(offs_t offset);
+	void mpcc_reg_w(offs_t offset, uint8_t data);
 	void kbd_put(u8 data);
 	virtual void machine_reset() override;
 
@@ -46,7 +46,7 @@ protected:
 	required_shared_ptr<uint32_t> m_p_ram;
 };
 
-READ8_MEMBER( besta_state::mpcc_reg_r )
+uint8_t besta_state::mpcc_reg_r(offs_t offset)
 {
 	uint8_t ret;
 
@@ -62,7 +62,7 @@ READ8_MEMBER( besta_state::mpcc_reg_r )
 	}
 }
 
-WRITE8_MEMBER( besta_state::mpcc_reg_w )
+void besta_state::mpcc_reg_w(offs_t offset, uint8_t data)
 {
 	switch (offset) {
 		case 2:

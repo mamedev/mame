@@ -47,13 +47,13 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(int_mask_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
-	DECLARE_WRITE8_MEMBER(nmi_mask_w);
+	void nmi_mask_w(uint8_t data);
 
 	void sub_palette(palette_device &palette) const;
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	DECLARE_WRITE8_MEMBER(attr_w);
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_WRITE8_MEMBER(scrolly_w);
+	void attr_w(offs_t offset, uint8_t data);
+	void vram_w(offs_t offset, uint8_t data);
+	void scrolly_w(offs_t offset, uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(main_irq);

@@ -48,10 +48,6 @@ private:
 	tilemap_t      *m_tilemap[2];
 	int             m_tilebank;
 
-	DECLARE_WRITE8_MEMBER(efdt_videoram_w);
-	DECLARE_WRITE8_MEMBER(efdt_vregs1_w);
-	DECLARE_WRITE8_MEMBER(efdt_vregs2_w);
-
 	TILE_GET_INFO_MEMBER(get_tile_info_0);
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
 
@@ -60,18 +56,18 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(vblank_nmi_w);
 	DECLARE_WRITE_LINE_MEMBER(nmi_clear_w);
 
-	DECLARE_READ8_MEMBER(main_soundlatch_r);
-	DECLARE_WRITE8_MEMBER(main_soundlatch_w);
+	uint8_t main_soundlatch_r(offs_t offset);
+	void main_soundlatch_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER(soundlatch_0_r);
-	DECLARE_READ8_MEMBER(soundlatch_1_r);
-	DECLARE_READ8_MEMBER(soundlatch_2_r);
-	DECLARE_READ8_MEMBER(soundlatch_3_r);
+	uint8_t soundlatch_0_r();
+	uint8_t soundlatch_1_r();
+	uint8_t soundlatch_2_r();
+	uint8_t soundlatch_3_r();
 
-	DECLARE_WRITE8_MEMBER(soundlatch_0_w);
-	DECLARE_WRITE8_MEMBER(soundlatch_1_w);
-	DECLARE_WRITE8_MEMBER(soundlatch_2_w);
-	DECLARE_WRITE8_MEMBER(soundlatch_3_w);
+	void soundlatch_0_w(uint8_t data);
+	void soundlatch_1_w(uint8_t data);
+	void soundlatch_2_w(uint8_t data);
+	void soundlatch_3_w(uint8_t data);
 
 	uint32_t screen_update_efdt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

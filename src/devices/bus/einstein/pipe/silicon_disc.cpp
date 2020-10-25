@@ -87,8 +87,8 @@ void einstein_silicon_disc_device::device_reset()
 	// install i/o ports
 	io_space().install_device(0xf0, 0xff, *this, &einstein_silicon_disc_device::map);
 	io_space().install_readwrite_handler(0xfa, 0xfa, 0, 0, 0xff00,
-			read8_delegate(*this, FUNC(einstein_silicon_disc_device::ram_r)),
-			write8_delegate(*this, FUNC(einstein_silicon_disc_device::ram_w)));
+			read8sm_delegate(*this, FUNC(einstein_silicon_disc_device::ram_r)),
+			write8sm_delegate(*this, FUNC(einstein_silicon_disc_device::ram_w)));
 }
 
 
@@ -96,25 +96,25 @@ void einstein_silicon_disc_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-WRITE8_MEMBER( einstein_silicon_disc_device::sector_low_w )
+void einstein_silicon_disc_device::sector_low_w(uint8_t data)
 {
 	m_sector &= 0xff00;
 	m_sector |= data;
 }
 
-WRITE8_MEMBER( einstein_silicon_disc_device::sector_high_w )
+void einstein_silicon_disc_device::sector_high_w(uint8_t data)
 {
 	m_sector &= 0x00ff;
 	m_sector |= ((data & 0x07) << 8);
 }
 
 // a8 to a14 are used to specify the byte in a 128-byte sector
-READ8_MEMBER( einstein_silicon_disc_device::ram_r )
+uint8_t einstein_silicon_disc_device::ram_r(offs_t offset)
 {
 	return m_ram[(m_sector * 0x80) | ((offset >> 8) & 0x7f)];
 }
 
-WRITE8_MEMBER( einstein_silicon_disc_device::ram_w )
+void einstein_silicon_disc_device::ram_w(offs_t offset, uint8_t data)
 {
 	m_ram[(m_sector * 0x80) | ((offset >> 8) & 0x7f)] = data;
 }

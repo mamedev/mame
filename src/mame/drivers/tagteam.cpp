@@ -32,7 +32,6 @@ TODO:
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -42,7 +41,7 @@ void tagteam_state::machine_start()
 	save_item(NAME(m_sound_nmi_mask));
 }
 
-WRITE8_MEMBER(tagteam_state::irq_clear_w)
+void tagteam_state::irq_clear_w(uint8_t data)
 {
 	m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 }
@@ -61,7 +60,7 @@ void tagteam_state::main_map(address_map &map)
 	map(0x8000, 0xffff).rom();
 }
 
-WRITE8_MEMBER(tagteam_state::sound_nmi_mask_w)
+void tagteam_state::sound_nmi_mask_w(uint8_t data)
 {
 	m_sound_nmi_mask = data & 1;
 }
@@ -241,9 +240,6 @@ void tagteam_state::tagteam(machine_config &config)
 	AY8910(config, "ay2", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 

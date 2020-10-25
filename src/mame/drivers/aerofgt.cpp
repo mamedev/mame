@@ -75,34 +75,34 @@ Verification still needed for the other PCBs.
 #include "speaker.h"
 
 
-WRITE8_MEMBER(aerofgt_state::karatblzbl_soundlatch_w)
+void aerofgt_state::karatblzbl_soundlatch_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-READ8_MEMBER(aerofgt_state::pending_command_r)
+uint8_t aerofgt_state::pending_command_r()
 {
 	return m_soundlatch->pending_r();
 }
 
-WRITE8_MEMBER(aerofgt_state::aerofgt_sh_bankswitch_w)
+void aerofgt_state::aerofgt_sh_bankswitch_w(uint8_t data)
 {
 	m_soundbank->set_entry(data & 0x03);
 }
 
-WRITE8_MEMBER(aerofgt_state::spinlbrk_sh_bankswitch_w)
+void aerofgt_state::spinlbrk_sh_bankswitch_w(uint8_t data)
 {
 	m_soundbank->set_entry(data & 0x01);
 }
 
-WRITE16_MEMBER(aerofgt_state::pspikesb_oki_banking_w)
+void aerofgt_state::pspikesb_oki_banking_w(uint16_t data)
 {
 	m_oki->set_rom_bank(data & 3);
 }
 
 /*TODO: sound banking. */
-WRITE16_MEMBER(aerofgt_state::aerfboo2_okim6295_banking_w)
+void aerofgt_state::aerfboo2_okim6295_banking_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  if(ACCESSING_BITS_8_15)
 //  {
@@ -110,40 +110,40 @@ WRITE16_MEMBER(aerofgt_state::aerfboo2_okim6295_banking_w)
 //  }
 }
 
-WRITE8_MEMBER(aerofgt_state::aerfboot_okim6295_banking_w)
+void aerofgt_state::aerfboot_okim6295_banking_w(uint8_t data)
 {
 	/*bit 2 (0x4) set too?*/
 	if (data & 0x4)
 		m_okibank->set_entry(data & 0x3);
 }
 
-WRITE8_MEMBER(aerofgt_state::karatblzbl_d7759_write_port_0_w)
+void aerofgt_state::karatblzbl_d7759_write_port_0_w(uint8_t data)
 {
 	m_upd7759->port_w(data);
 	m_upd7759->start_w(0);
 	m_upd7759->start_w(1);
 }
 
-WRITE8_MEMBER(aerofgt_state::karatblzbl_d7759_reset_w)
+void aerofgt_state::karatblzbl_d7759_reset_w(uint8_t data)
 {
 	m_upd7759->reset_w(BIT(data, 7));
 }
 
 template<int Layer>
-WRITE16_MEMBER(aerofgt_state::vram_w)
+void aerofgt_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram[Layer][offset]);
 	m_tilemap[Layer]->mark_tile_dirty(offset);
 }
 
 template<int Layer>
-WRITE16_MEMBER(aerofgt_state::scrollx_w)
+void aerofgt_state::scrollx_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scrollx[Layer]);
 }
 
 template<int Layer>
-WRITE16_MEMBER(aerofgt_state::scrolly_w)
+void aerofgt_state::scrolly_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scrolly[Layer]);
 }
@@ -1979,7 +1979,7 @@ void aerofgt_state::aerofgt(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(aerofgt_state::irq1_line_hold)); /* all irq vectors are the same */
 
 	Z80(config, m_audiocpu, XTAL(20'000'000)/4); /* 5 MHz verified on pcb */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &aerofgt_state::sound_map);;
+	m_audiocpu->set_addrmap(AS_PROGRAM, &aerofgt_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &aerofgt_state::aerofgt_sound_portmap); /* IRQs are triggered by the YM2610 */
 
 	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,aerofgt)

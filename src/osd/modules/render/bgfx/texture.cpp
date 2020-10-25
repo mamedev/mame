@@ -32,16 +32,17 @@ bgfx_texture::bgfx_texture(std::string name, bgfx::TextureFormat::Enum format, u
 	}
 }
 
-bgfx_texture::bgfx_texture(std::string name, bgfx::TextureFormat::Enum format, uint16_t width, uint16_t height, const bgfx::Memory* data, uint32_t flags, uint16_t pitch)
+bgfx_texture::bgfx_texture(std::string name, bgfx::TextureFormat::Enum format, uint16_t width, uint16_t height, const bgfx::Memory* data, uint32_t flags, uint16_t pitch, uint16_t rowpixels)
 	: m_name(name)
 	, m_format(format)
 	, m_width(width)
 	, m_height(height)
+	, m_rowpixels(rowpixels ? rowpixels : width)
 {
 	bgfx::TextureInfo info;
-	bgfx::calcTextureSize(info, width, height, 1, false, false, 1, format);
-	m_texture = bgfx::createTexture2D(width, height, false, 1, format, flags, nullptr);
-	bgfx::updateTexture2D(m_texture, 0, 0, 0, 0, width, height, data, pitch);
+	bgfx::calcTextureSize(info, m_rowpixels, height, 1, false, false, 1, format);
+	m_texture = bgfx::createTexture2D(m_rowpixels, height, false, 1, format, flags, nullptr);
+	bgfx::updateTexture2D(m_texture, 0, 0, 0, 0, m_rowpixels, height, data, pitch);
 }
 
 bgfx_texture::~bgfx_texture()

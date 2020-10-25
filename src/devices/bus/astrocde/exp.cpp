@@ -66,18 +66,18 @@ void astrocade_exp_device::device_start()
  read
  -------------------------------------------------*/
 
-READ8_MEMBER(astrocade_exp_device::read)
+uint8_t astrocade_exp_device::read(offs_t offset)
 {
 	if (m_card)
-		return m_card->read(space, offset);
+		return m_card->read(offset);
 	else
 		return 0xff;
 }
 
-READ8_MEMBER(astrocade_exp_device::read_io)
+uint8_t astrocade_exp_device::read_io(offs_t offset)
 {
 	if (m_card)
-		return m_card->read_io(space, offset);
+		return m_card->read_io(offset);
 	else
 		return 0xff;
 }
@@ -86,14 +86,14 @@ READ8_MEMBER(astrocade_exp_device::read_io)
  write
  -------------------------------------------------*/
 
-WRITE8_MEMBER(astrocade_exp_device::write)
+void astrocade_exp_device::write(offs_t offset, uint8_t data)
 {
 	if (m_card)
-		m_card->write(space, offset, data);
+		m_card->write(offset, data);
 }
 
-WRITE8_MEMBER(astrocade_exp_device::write_io)
+void astrocade_exp_device::write_io(offs_t offset, uint8_t data)
 {
 	if (m_card)
-		m_card->write_io(space, offset, data);
+		m_card->write_io(offset, data);
 }

@@ -76,11 +76,11 @@ protected:
 		IRQDMA,
 		IRQ_SOURCES_SIZE
 	};
-	template <unsigned Which> DECLARE_READ32_MEMBER( irqst_r );
-	template <unsigned Which> DECLARE_READ32_MEMBER( irqrq_r );
-	template <unsigned Which> DECLARE_WRITE32_MEMBER( irqrq_w );
-	template <unsigned Which> DECLARE_READ32_MEMBER( irqmsk_r );
-	template <unsigned Which> DECLARE_WRITE32_MEMBER( irqmsk_w );
+	template <unsigned Which> u32 irqst_r();
+	template <unsigned Which> u32 irqrq_r();
+	template <unsigned Which> void irqrq_w(u32 data);
+	template <unsigned Which> u32 irqmsk_r();
+	template <unsigned Which> void irqmsk_w(u32 data);
 
 	// TODO: convert to ARM7 device instead, enums shouldn't be public
 	required_device<cpu_device> m_host_cpu;
@@ -95,27 +95,27 @@ private:
 	devcb_read_line m_iocr_read_id_cb;
 	devcb_write_line m_iocr_write_id_cb;
 
-	DECLARE_READ32_MEMBER( iocr_r );
-	DECLARE_WRITE32_MEMBER( iocr_w );
+	u32 iocr_r();
+	void iocr_w(u32 data);
 
-	DECLARE_READ32_MEMBER( kbddat_r );
-	DECLARE_WRITE32_MEMBER( kbddat_w );
-	DECLARE_READ32_MEMBER( kbdcr_r );
-	DECLARE_WRITE32_MEMBER( kbdcr_w );
+	u32 kbddat_r();
+	void kbddat_w(u32 data);
+	u32 kbdcr_r();
+	void kbdcr_w(u32 data);
 
 	u32 m_vidinita, m_vidend;
 	bool m_vidlast, m_videqual;
 	bool m_video_enable;
-	DECLARE_READ32_MEMBER( vidcr_r );
-	DECLARE_WRITE32_MEMBER( vidcr_w );
-	DECLARE_READ32_MEMBER( vidend_r );
-	DECLARE_WRITE32_MEMBER( vidend_w );
-	DECLARE_READ32_MEMBER( vidinita_r );
-	DECLARE_WRITE32_MEMBER( vidinita_w );
+	u32 vidcr_r();
+	void vidcr_w(u32 data);
+	u32 vidend_r();
+	void vidend_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 vidinita_r();
+	void vidinita_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 m_cursinit;
 	bool m_cursor_enable;
-	DECLARE_READ32_MEMBER( cursinit_r );
-	DECLARE_WRITE32_MEMBER( cursinit_w );
+	u32 cursinit_r();
+	void cursinit_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	static constexpr int sounddma_ch_size = 2;
 	u32 m_sndcur, m_sndend;
@@ -126,13 +126,13 @@ private:
 	u8 m_sndcur_buffer;
 	bool m_snd_overrun, m_snd_int;
 	inline void sounddma_swap_buffer();
-	template <unsigned Which> DECLARE_READ32_MEMBER( sdcur_r );
-	template <unsigned Which> DECLARE_WRITE32_MEMBER( sdcur_w );
-	template <unsigned Which> DECLARE_READ32_MEMBER( sdend_r );
-	template <unsigned Which> DECLARE_WRITE32_MEMBER( sdend_w );
-	DECLARE_READ32_MEMBER( sdcr_r );
-	DECLARE_WRITE32_MEMBER( sdcr_w );
-	DECLARE_READ32_MEMBER( sdst_r );
+	template <unsigned Which> u32 sdcur_r();
+	template <unsigned Which> void sdcur_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	template <unsigned Which> u32 sdend_r();
+	template <unsigned Which> void sdend_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 sdcr_r();
+	void sdcr_w(u32 data);
+	u32 sdst_r();
 
 	u8 m_irq_status[IRQ_SOURCES_SIZE], m_irq_mask[IRQ_SOURCES_SIZE];
 	inline u8 update_irqa_type(u8 data);
@@ -151,15 +151,15 @@ private:
 	u8  m_timer_readinc[2];
 	emu_timer *m_timer[2];
 
-	template <unsigned Which> DECLARE_READ32_MEMBER( tNlow_r );
-	template <unsigned Which> DECLARE_READ32_MEMBER( tNhigh_r );
-	template <unsigned Which> DECLARE_WRITE32_MEMBER( tNlow_w );
-	template <unsigned Which> DECLARE_WRITE32_MEMBER( tNhigh_w );
-	template <unsigned Which> DECLARE_WRITE32_MEMBER( tNgo_w );
-	template <unsigned Which> DECLARE_WRITE32_MEMBER( tNlatch_w );
+	template <unsigned Which> u32 tNlow_r();
+	template <unsigned Which> u32 tNhigh_r();
+	template <unsigned Which> void tNlow_w(u32 data);
+	template <unsigned Which> void tNhigh_w(u32 data);
+	template <unsigned Which> void tNgo_w(u32 data);
+	template <unsigned Which> void tNlatch_w(u32 data);
 
-	template <unsigned Nibble> DECLARE_READ32_MEMBER( id_r );
-	DECLARE_READ32_MEMBER( version_r );
+	template <unsigned Nibble> u32 id_r();
+	u32 version_r();
 
 	// used in vidcr_r / sndcr_r, documentation hints this is a purged idea during chip development, to be checked out
 	static constexpr u8 dmaid_size = 0x10; // qword transfer
@@ -186,15 +186,15 @@ private:
 
 	bool m_cpuclk_divider, m_memclk_divider, m_ioclk_divider;
 	inline void refresh_host_cpu_clocks();
-	DECLARE_READ32_MEMBER( clkctl_r );
-	DECLARE_WRITE32_MEMBER( clkctl_w );
+	u32 clkctl_r();
+	void clkctl_w(u32 data);
 
 	u8 m_iolines_ddr;
-	DECLARE_READ32_MEMBER( iolines_r );
-	DECLARE_WRITE32_MEMBER( iolines_w );
+	u32 iolines_r();
+	void iolines_w(u32 data);
 
-	DECLARE_READ32_MEMBER( msecr_r );
-	DECLARE_WRITE32_MEMBER( msecr_w );
+	u32 msecr_r();
+	void msecr_w(u32 data);
 };
 
 // device type definition

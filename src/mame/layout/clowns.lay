@@ -30,8 +30,8 @@ license:CC0
 		<screen index="0">
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
-		<overlay element="overlay">
+		<element ref="overlay" blend="multiply">
 			<bounds left="0" top="0" right="4" bottom="3" />
-		</overlay>
+		</element>
 	</view>
 </mamelayout>

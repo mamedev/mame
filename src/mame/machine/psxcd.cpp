@@ -146,12 +146,12 @@ void psxcd_device::device_stop()
 	for (int i = 0; i < MAX_PSXCD_TIMERS; i++)
 	{
 		if(m_timerinuse[i] && m_timers[i]->ptr())
-			global_free((command_result *)m_timers[i]->ptr());
+			delete (command_result *)m_timers[i]->ptr();
 	}
 	while(res_queue)
 	{
 		command_result *res = res_queue->next;
-		global_free(res_queue);
+		delete res_queue;
 		res_queue = res;
 	}
 }
@@ -164,7 +164,7 @@ void psxcd_device::device_reset()
 	for (int i = 0; i < MAX_PSXCD_TIMERS; i++)
 	{
 		if(m_timerinuse[i] && m_timers[i]->ptr())
-			global_free((command_result *)m_timers[i]->ptr());
+			delete (command_result *)m_timers[i]->ptr();
 		m_timers[i]->adjust(attotime::never, 0, attotime::never);
 		m_timerinuse[i] = false;
 	}
@@ -175,7 +175,7 @@ void psxcd_device::device_reset()
 	while(res_queue)
 	{
 		command_result *res = res_queue->next;
-		global_free(res_queue);
+		delete res_queue;
 		res_queue = res;
 	}
 
@@ -363,7 +363,7 @@ void psxcd_device::write(offs_t offset, uint8_t data)
 						m_int1 = nullptr;
 
 					res_queue = res->next;
-					global_free(res);
+					delete res;
 					m_regs.sr &= ~0x20;
 					rdp = 0;
 					if(res_queue)
@@ -867,7 +867,7 @@ void psxcd_device::cmd_complete(command_result *res)
 
 psxcd_device::command_result *psxcd_device::prepare_result(uint8_t res, uint8_t *data, int sz, uint8_t errcode)
 {
-	auto cr=global_alloc(command_result);
+	auto cr=new command_result;
 
 	cr->res=res;
 	if (sz)
@@ -1072,7 +1072,7 @@ void psxcd_device::play_sector()
 
 		if ((mode&mode_report) && !(sector & 15)) // slow the int rate
 		{
-			auto res=global_alloc(command_result);
+			auto res=new command_result;
 			uint8_t track = cdrom_get_track(m_cdrom_handle, sector) + 1;
 			res->res=intr_dataready;
 

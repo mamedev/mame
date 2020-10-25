@@ -121,7 +121,7 @@ void side116_device::device_reset()
 
 	// install io access
 	if ((m_config->read() & 0x20) == 0x20)
-		m_isa->install_device(0x360, 0x36f, read8_delegate(*this, FUNC(side116_device::read)), write8_delegate(*this, FUNC(side116_device::write)));
+		m_isa->install_device(0x360, 0x36f, read8sm_delegate(*this, FUNC(side116_device::read)), write8sm_delegate(*this, FUNC(side116_device::write)));
 }
 
 
@@ -129,19 +129,19 @@ void side116_device::device_reset()
 //  IDE INTERFACE
 //**************************************************************************
 
-READ8_MEMBER( side116_device::read )
+uint8_t side116_device::read(offs_t offset)
 {
 	uint8_t data;
 
 	if (offset == 0)
 	{
-		uint16_t ide_data = m_ata->read_cs0(0);
+		uint16_t ide_data = m_ata->cs0_r(0);
 		data = ide_data & 0xff;
 		m_latch = ide_data >> 8;
 	}
 	else if (offset < 8)
 	{
-		data = m_ata->read_cs0(offset & 7, 0xff);
+		data = m_ata->cs0_r(offset & 7, 0xff);
 	}
 	else if (offset == 8)
 	{
@@ -149,22 +149,22 @@ READ8_MEMBER( side116_device::read )
 	}
 	else
 	{
-		data = m_ata->read_cs1(offset & 7, 0xff);
+		data = m_ata->cs1_r(offset & 7, 0xff);
 	}
 
 	return data;
 }
 
-WRITE8_MEMBER( side116_device::write )
+void side116_device::write(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{
 		uint16_t ide_data = (m_latch << 8) | data;
-		m_ata->write_cs0(0, ide_data);
+		m_ata->cs0_w(0, ide_data);
 	}
 	else if (offset < 8)
 	{
-		m_ata->write_cs0(offset & 7, data, 0xff);
+		m_ata->cs0_w(offset & 7, data, 0xff);
 	}
 	else if (offset == 8)
 	{
@@ -172,7 +172,7 @@ WRITE8_MEMBER( side116_device::write )
 	}
 	else
 	{
-		m_ata->write_cs1(offset & 7, data, 0xff);
+		m_ata->cs1_w(offset & 7, data, 0xff);
 	}
 }
 

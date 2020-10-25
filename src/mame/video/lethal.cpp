@@ -71,7 +71,7 @@ void lethal_state::video_start()
 	}
 }
 
-WRITE8_MEMBER(lethal_state::lethalen_palette_control)
+void lethal_state::lethalen_palette_control(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{

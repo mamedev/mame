@@ -42,19 +42,19 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_WRITE16_MEMBER(gotcha_lamps_w);
-	DECLARE_WRITE16_MEMBER(gotcha_fgvideoram_w);
-	DECLARE_WRITE16_MEMBER(gotcha_bgvideoram_w);
-	DECLARE_WRITE16_MEMBER(gotcha_gfxbank_select_w);
-	DECLARE_WRITE16_MEMBER(gotcha_gfxbank_w);
-	DECLARE_WRITE16_MEMBER(gotcha_scroll_w);
-	DECLARE_WRITE8_MEMBER(gotcha_oki_bank_w);
-	TILEMAP_MAPPER_MEMBER(gotcha_tilemap_scan);
+	void lamps_w(uint16_t data);
+	void fgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void bgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void gfxbank_select_w(uint8_t data);
+	void gfxbank_w(uint8_t data);
+	void scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void oki_bank_w(uint8_t data);
+	TILEMAP_MAPPER_MEMBER(tilemap_scan);
 	TILE_GET_INFO_MEMBER(fg_get_tile_info);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
-	uint32_t screen_update_gotcha(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	inline void get_tile_info( tile_data &tileinfo, int tile_index ,uint16_t *vram, int color_offs);
-	void gotcha_map(address_map &map);
+	void main_map(address_map &map);
 	void sound_map(address_map &map);
 
 	/* memory pointers */
@@ -64,11 +64,11 @@ private:
 	optional_device<decospr_device> m_sprgen;
 
 	/* video-related */
-	tilemap_t     *m_bg_tilemap;
-	tilemap_t     *m_fg_tilemap;
-	int         m_banksel;
-	int         m_gfxbank[4];
-	uint16_t      m_scroll[4];
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_fg_tilemap;
+	uint8_t m_banksel;
+	uint8_t m_gfxbank[4];
+	uint16_t m_scroll[4];
 
 	/* devices */
 	required_device<cpu_device> m_audiocpu;

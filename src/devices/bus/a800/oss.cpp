@@ -102,7 +102,7 @@ void a800_rom_oss91_device::device_reset()
 
  -------------------------------------------------*/
 
-READ8_MEMBER(a800_rom_oss8k_device::read_80xx)
+uint8_t a800_rom_oss8k_device::read_80xx(offs_t offset)
 {
 	if (offset >= 0x1000)
 		return m_rom[offset & 0xfff];
@@ -110,7 +110,7 @@ READ8_MEMBER(a800_rom_oss8k_device::read_80xx)
 		return m_rom[(offset & 0xfff) + (m_bank * 0x1000)];
 }
 
-WRITE8_MEMBER(a800_rom_oss8k_device::write_d5xx)
+void a800_rom_oss8k_device::write_d5xx(offs_t offset, uint8_t data)
 {
 	switch (offset & 0x09)
 	{
@@ -136,7 +136,7 @@ WRITE8_MEMBER(a800_rom_oss8k_device::write_d5xx)
 
  -------------------------------------------------*/
 
-READ8_MEMBER(a800_rom_oss34_device::read_80xx)
+uint8_t a800_rom_oss34_device::read_80xx(offs_t offset)
 {
 	if (offset >= 0x1000)
 		return m_rom[(offset & 0xfff) + 0x3000];
@@ -146,7 +146,7 @@ READ8_MEMBER(a800_rom_oss34_device::read_80xx)
 		return m_rom[(offset & 0xfff) + (m_bank * 0x1000)];
 }
 
-WRITE8_MEMBER(a800_rom_oss34_device::write_d5xx)
+void a800_rom_oss34_device::write_d5xx(offs_t offset, uint8_t data)
 {
 	switch (offset & 0x0f)
 	{
@@ -180,7 +180,7 @@ WRITE8_MEMBER(a800_rom_oss34_device::write_d5xx)
 
  -------------------------------------------------*/
 
-READ8_MEMBER(a800_rom_oss43_device::read_80xx)
+uint8_t a800_rom_oss43_device::read_80xx(offs_t offset)
 {
 	if (offset >= 0x1000)
 		return m_rom[(offset & 0xfff) + 0x3000];
@@ -190,7 +190,7 @@ READ8_MEMBER(a800_rom_oss43_device::read_80xx)
 		return m_rom[(offset & 0xfff) + (m_bank * 0x1000)];
 }
 
-WRITE8_MEMBER(a800_rom_oss43_device::write_d5xx)
+void a800_rom_oss43_device::write_d5xx(offs_t offset, uint8_t data)
 {
 	switch (offset & 0x0f)
 	{
@@ -225,7 +225,7 @@ WRITE8_MEMBER(a800_rom_oss43_device::write_d5xx)
 
  -------------------------------------------------*/
 
-READ8_MEMBER(a800_rom_oss91_device::read_80xx)
+uint8_t a800_rom_oss91_device::read_80xx(offs_t offset)
 {
 	if (offset >= 0x1000)
 		return m_rom[offset & 0xfff];
@@ -233,7 +233,7 @@ READ8_MEMBER(a800_rom_oss91_device::read_80xx)
 		return m_rom[(offset & 0xfff) + (m_bank * 0x1000)];
 }
 
-WRITE8_MEMBER(a800_rom_oss91_device::write_d5xx)
+void a800_rom_oss91_device::write_d5xx(offs_t offset, uint8_t data)
 {
 	switch (offset & 0x09)
 	{

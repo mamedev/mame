@@ -507,7 +507,7 @@ READ_LINE_MEMBER(lle_device_base::t1_r)
 	return BIT(m_lower[m_count >> 3]->read(), m_count & 0x7) ? ASSERT_LINE : CLEAR_LINE;
 }
 
-WRITE8_MEMBER(lle_device_base::p1_w)
+void lle_device_base::p1_w(u8 data)
 {
 	LOGMASKED(LOG_PORT, "p1_w 0x%02x (%s)\n", data, machine().describe_context());
 
@@ -534,7 +534,7 @@ WRITE8_MEMBER(lle_device_base::p1_w)
 	m_p1 = data;
 }
 
-WRITE8_MEMBER(lle_device_base::p2_w)
+void lle_device_base::p2_w(u8 data)
 {
 	LOGMASKED(LOG_PORT, "p2_w 0x%02x (%s)\n", data, machine().describe_context());
 
@@ -573,7 +573,7 @@ WRITE8_MEMBER(lle_device_base::p2_w)
 	m_p2 = data;
 }
 
-READ8_MEMBER(lle_device_base::bus_r)
+u8 lle_device_base::bus_r()
 {
 	if (!BIT(m_p1, 5))
 	{
@@ -587,7 +587,7 @@ READ8_MEMBER(lle_device_base::bus_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(lle_device_base::bus_w)
+void lle_device_base::bus_w(u8 data)
 {
 	if (data != 0xff)
 		LOGMASKED(LOG_PORT, "bus_w 0x%02x (%s)\n", data, machine().describe_context());

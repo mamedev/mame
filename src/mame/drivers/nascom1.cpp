@@ -76,11 +76,11 @@ protected:
 
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER(nascom1_port_00_r);
-	DECLARE_WRITE8_MEMBER(nascom1_port_00_w);
-	DECLARE_READ8_MEMBER(nascom1_port_01_r);
-	DECLARE_WRITE8_MEMBER(nascom1_port_01_w);
-	DECLARE_READ8_MEMBER(nascom1_port_02_r);
+	uint8_t nascom1_port_00_r();
+	void nascom1_port_00_w(uint8_t data);
+	uint8_t nascom1_port_01_r();
+	void nascom1_port_01_w(uint8_t data);
+	uint8_t nascom1_port_02_r();
 	DECLARE_READ_LINE_MEMBER(hd6402_si);
 	DECLARE_WRITE_LINE_MEMBER(hd6402_so);
 
@@ -175,12 +175,12 @@ private:
 //  KEYBOARD
 //**************************************************************************
 
-READ8_MEMBER( nascom_state::nascom1_port_00_r )
+uint8_t nascom_state::nascom1_port_00_r()
 {
 	return m_keyboard[m_kb_select]->read() | ~0x7f;
 }
 
-WRITE8_MEMBER( nascom_state::nascom1_port_00_w )
+void nascom_state::nascom1_port_00_w(uint8_t data)
 {
 	u8 bits = data ^ m_port00;
 
@@ -203,17 +203,17 @@ WRITE8_MEMBER( nascom_state::nascom1_port_00_w )
 //  CASSETTE
 //**************************************************************************
 
-READ8_MEMBER( nascom_state::nascom1_port_01_r )
+uint8_t nascom_state::nascom1_port_01_r()
 {
 	return m_hd6402->receive();
 }
 
-WRITE8_MEMBER( nascom_state::nascom1_port_01_w )
+void nascom_state::nascom1_port_01_w(uint8_t data)
 {
 	m_hd6402->transmit(data);
 }
 
-READ8_MEMBER( nascom_state::nascom1_port_02_r )
+uint8_t nascom_state::nascom1_port_02_r()
 {
 	uint8_t data = 0x31; // bits 0,4,5 not used
 
@@ -630,7 +630,7 @@ static INPUT_PORTS_START( nascom1 )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("New Line")              PORT_CODE(KEYCODE_ENTER)      PORT_CHAR(13)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('=')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('@')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR(0xff) PORT_CHAR('@')  // have to press shift to get @
 	PORT_BIT(0x48, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("KEY.1")
@@ -671,7 +671,7 @@ static INPUT_PORTS_START( nascom1 )
 
 	PORT_START("KEY.5")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR('+')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)  PORT_CHAR('.') PORT_CHAR('>')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)  PORT_CHAR('.') PORT_CHAR('>') // > nascom2 only
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)     PORT_CHAR('9') PORT_CHAR(')')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)     PORT_CHAR('3') PORT_CHAR(0xA3)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)     PORT_CHAR('Q') PORT_CHAR('q')
@@ -681,7 +681,7 @@ static INPUT_PORTS_START( nascom1 )
 	PORT_START("KEY.6")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(':') PORT_CHAR('*')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)     PORT_CHAR('0')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)     PORT_CHAR('0') PORT_CHAR('^')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)     PORT_CHAR('2') PORT_CHAR('\"')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)     PORT_CHAR('1') PORT_CHAR('!')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)     PORT_CHAR('P') PORT_CHAR('p')

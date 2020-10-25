@@ -29,12 +29,12 @@ public:
 	void quorum(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(beta_neutral_r);
-	DECLARE_READ8_MEMBER(beta_enable_r);
-	DECLARE_READ8_MEMBER(beta_disable_r);
-	DECLARE_WRITE8_MEMBER(scorpion_0000_w);
-	DECLARE_WRITE8_MEMBER(scorpion_port_7ffd_w);
-	DECLARE_WRITE8_MEMBER(scorpion_port_1ffd_w);
+	uint8_t beta_neutral_r(offs_t offset);
+	uint8_t beta_enable_r(offs_t offset);
+	uint8_t beta_disable_r(offs_t offset);
+	void scorpion_0000_w(offs_t offset, uint8_t data);
+	void scorpion_port_7ffd_w(uint8_t data);
+	void scorpion_port_1ffd_w(uint8_t data);
 	DECLARE_MACHINE_START(scorpion);
 	DECLARE_MACHINE_RESET(scorpion);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_check_callback);
@@ -108,7 +108,7 @@ void scorpion_state::scorpion_update_memory()
 	}
 }
 
-WRITE8_MEMBER(scorpion_state::scorpion_0000_w)
+void scorpion_state::scorpion_0000_w(offs_t offset, uint8_t data)
 {
 	if ( ! m_ram_0000 )
 		return;
@@ -130,7 +130,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(scorpion_state::nmi_check_callback)
 	}
 }
 
-WRITE8_MEMBER(scorpion_state::scorpion_port_7ffd_w)
+void scorpion_state::scorpion_port_7ffd_w(uint8_t data)
 {
 	/* disable paging */
 	if (m_port_7ffd_data & 0x20)
@@ -143,18 +143,18 @@ WRITE8_MEMBER(scorpion_state::scorpion_port_7ffd_w)
 	scorpion_update_memory();
 }
 
-WRITE8_MEMBER(scorpion_state::scorpion_port_1ffd_w)
+void scorpion_state::scorpion_port_1ffd_w(uint8_t data)
 {
 	m_port_1ffd_data = data;
 	scorpion_update_memory();
 }
 
-READ8_MEMBER(scorpion_state::beta_neutral_r)
+uint8_t scorpion_state::beta_neutral_r(offs_t offset)
 {
 	return m_program->read_byte(offset);
 }
 
-READ8_MEMBER(scorpion_state::beta_enable_r)
+uint8_t scorpion_state::beta_enable_r(offs_t offset)
 {
 	if(m_ROMSelection == 1) {
 		m_ROMSelection = 3;
@@ -167,7 +167,7 @@ READ8_MEMBER(scorpion_state::beta_enable_r)
 	return m_program->read_byte(offset + 0x3d00);
 }
 
-READ8_MEMBER(scorpion_state::beta_disable_r)
+uint8_t scorpion_state::beta_disable_r(offs_t offset)
 {
 	if (m_beta->started() && m_beta->is_active()) {
 		m_ROMSelection = BIT(m_port_7ffd_data, 4);
@@ -217,7 +217,7 @@ MACHINE_RESET_MEMBER(scorpion_state,scorpion)
 
 	m_ram_0000 = nullptr;
 	m_program->install_read_bank(0x0000, 0x3fff, "bank1");
-	m_program->install_write_handler(0x0000, 0x3fff, write8_delegate(*this, FUNC(scorpion_state::scorpion_0000_w)));
+	m_program->install_write_handler(0x0000, 0x3fff, write8sm_delegate(*this, FUNC(scorpion_state::scorpion_0000_w)));
 
 	m_beta->disable();
 

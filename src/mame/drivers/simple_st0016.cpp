@@ -54,7 +54,7 @@ void st0016_state::renju_mem(address_map &map)
 }
 
 
-READ8_MEMBER(st0016_state::mux_r)
+uint8_t st0016_state::mux_r()
 {
 /*
     76543210
@@ -78,12 +78,12 @@ READ8_MEMBER(st0016_state::mux_r)
 	return retval;
 }
 
-WRITE8_MEMBER(st0016_state::mux_select_w)
+void st0016_state::mux_select_w(uint8_t data)
 {
 	mux_port=data;
 }
 
-WRITE8_MEMBER(st0016_state::st0016_rom_bank_w)
+void st0016_state::st0016_rom_bank_w(uint8_t data)
 {
 	m_mainbank->set_entry(data);
 	// st0016_rom_bank = data;
@@ -111,14 +111,14 @@ void st0016_state::st0016_io(address_map &map)
 
 static uint32_t latches[8];
 
-READ32_MEMBER(st0016_state::latch32_r)
+uint32_t st0016_state::latch32_r(offs_t offset)
 {
 	if(!offset)
 		latches[2]&=~2;
 	return latches[offset];
 }
 
-WRITE32_MEMBER(st0016_state::latch32_w)
+void st0016_state::latch32_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if(!offset)
 		latches[2]|=1;
@@ -126,14 +126,14 @@ WRITE32_MEMBER(st0016_state::latch32_w)
 	machine().scheduler().synchronize();
 }
 
-READ8_MEMBER(st0016_state::latch8_r)
+uint8_t st0016_state::latch8_r(offs_t offset)
 {
 	if(!offset)
 		latches[2]&=~1;
 	return latches[offset];
 }
 
-WRITE8_MEMBER(st0016_state::latch8_w)
+void st0016_state::latch8_w(offs_t offset, uint8_t data)
 {
 	if(!offset)
 		latches[2]|=2;

@@ -76,9 +76,9 @@ private:
 		TIMER_ID_MOTOR
 	};
 
-	DECLARE_WRITE8_MEMBER(flr_w);
-	DECLARE_READ8_MEMBER(status_r);
-	DECLARE_READ8_MEMBER(status2_r);
+	void flr_w(uint8_t data);
+	uint8_t status_r();
+	uint8_t status2_r();
 
 	void motor(int mon);
 
@@ -86,7 +86,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(inuse_w);
 	DECLARE_WRITE_LINE_MEMBER(motor_w);
 	DECLARE_WRITE_LINE_MEMBER(select_w);
-	DECLARE_WRITE_LINE_MEMBER(resf_w);
 	DECLARE_WRITE_LINE_MEMBER(mini_w);
 	DECLARE_WRITE_LINE_MEMBER(mstop_w);
 

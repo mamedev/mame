@@ -116,17 +116,17 @@ protected:
 		uint16_t clip_max_y;
 	};
 
-	DECLARE_WRITE16_MEMBER(gpu_w);
-	DECLARE_READ16_MEMBER(gpu_r);
-	DECLARE_READ16_MEMBER(m68k_shared_0_r);
-	DECLARE_WRITE16_MEMBER(m68k_shared_0_w);
-	DECLARE_READ16_MEMBER(m68k_shared_1_r);
-	DECLARE_WRITE16_MEMBER(m68k_shared_1_w);
-	DECLARE_READ16_MEMBER(dsp0_status_r);
-	DECLARE_WRITE16_MEMBER(dsp0_control_w);
+	void gpu_w(offs_t offset, uint16_t data);
+	uint16_t gpu_r(offs_t offset);
+	uint16_t m68k_shared_0_r(offs_t offset);
+	void m68k_shared_0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t m68k_shared_1_r(offs_t offset);
+	void m68k_shared_1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t dsp0_status_r();
+	void dsp0_control_w(uint16_t data);
 	DECLARE_READ_LINE_MEMBER(dsp0_bio_r);
-	DECLARE_WRITE16_MEMBER(dsp0_bank_w);
-	DECLARE_READ16_MEMBER(analog_r);
+	void dsp0_bank_w(uint16_t data);
+	uint16_t analog_r();
 
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -189,10 +189,10 @@ public:
 	void airrace(machine_config &config);
 
 protected:
-	DECLARE_READ16_MEMBER(dsp1_status_r);
-	DECLARE_WRITE16_MEMBER(dsp1_control_w);
+	uint16_t dsp1_status_r();
+	void dsp1_control_w(uint16_t data);
 	DECLARE_READ_LINE_MEMBER(dsp1_bio_r);
-	DECLARE_WRITE16_MEMBER(dsp1_bank_w);
+	void dsp1_bank_w(uint16_t data);
 
 	virtual void machine_reset() override;
 
@@ -231,7 +231,6 @@ void atarisy4_state::video_reset()
 
 uint32_t atarisy4_state::screen_update_atarisy4(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int y;
 	uint32_t offset = 0;
 
 	if (m_gpu.bcrw & 0x80)
@@ -245,15 +244,14 @@ uint32_t atarisy4_state::screen_update_atarisy4(screen_device &screen, bitmap_rg
 
 	//uint32_t offset = m_gpu.dpr << 5;
 
-	for (y = cliprect.top(); y <= cliprect.bottom(); ++y)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); ++y)
 	{
-		uint16_t *src = &m_screen_ram[(offset + (4096 * y)) / 2];
-		uint32_t *dest = &bitmap.pix32(y, cliprect.left());
-		int x;
+		uint16_t const *src = &m_screen_ram[(offset + (4096 * y)) / 2];
+		uint32_t *dest = &bitmap.pix(y, cliprect.left());
 
-		for (x = cliprect.left(); x < cliprect.right(); x += 2)
+		for (int x = cliprect.left(); x < cliprect.right(); x += 2)
 		{
-			uint16_t data = *src++;
+			uint16_t const data = *src++;
 
 			*dest++ = m_palette->pen(data & 0xff);
 			*dest++ = m_palette->pen(data >> 8);
@@ -518,7 +516,7 @@ void atarisy4_state::execute_gpu_command()
 	}
 }
 
-WRITE16_MEMBER(atarisy4_state::gpu_w)
+void atarisy4_state::gpu_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
@@ -565,7 +563,7 @@ WRITE16_MEMBER(atarisy4_state::gpu_w)
 	}
 }
 
-READ16_MEMBER(atarisy4_state::gpu_r)
+uint16_t atarisy4_state::gpu_r(offs_t offset)
 {
 	uint16_t res = 0;
 
@@ -600,7 +598,7 @@ INTERRUPT_GEN_MEMBER(atarisy4_state::vblank_int)
  *
  *************************************/
 
-READ16_MEMBER(atarisy4_state::m68k_shared_0_r)
+uint16_t atarisy4_state::m68k_shared_0_r(offs_t offset)
 {
 	if (!BIT(m_csr[0], 3))
 		return (m_shared_ram[0][offset]);
@@ -608,13 +606,13 @@ READ16_MEMBER(atarisy4_state::m68k_shared_0_r)
 		return 0xffff;
 }
 
-WRITE16_MEMBER(atarisy4_state::m68k_shared_0_w)
+void atarisy4_state::m68k_shared_0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (!BIT(m_csr[0], 3))
 		COMBINE_DATA(&m_shared_ram[0][offset]);
 }
 
-READ16_MEMBER(atarisy4_state::m68k_shared_1_r)
+uint16_t atarisy4_state::m68k_shared_1_r(offs_t offset)
 {
 	if (!BIT(m_csr[1], 3))
 		return (m_shared_ram[1][offset]);
@@ -622,18 +620,18 @@ READ16_MEMBER(atarisy4_state::m68k_shared_1_r)
 		return 0xffff;
 }
 
-WRITE16_MEMBER(atarisy4_state::m68k_shared_1_w)
+void atarisy4_state::m68k_shared_1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (!BIT(m_csr[1], 3))
 		COMBINE_DATA(&m_shared_ram[1][offset]);
 }
 
-READ16_MEMBER(atarisy4_state::dsp0_status_r)
+uint16_t atarisy4_state::dsp0_status_r()
 {
 	return m_csr[0];
 }
 
-WRITE16_MEMBER(atarisy4_state::dsp0_control_w)
+void atarisy4_state::dsp0_control_w(uint16_t data)
 {
 	m_dsp0->set_input_line(INPUT_LINE_RESET, data & 0x01 ? CLEAR_LINE : ASSERT_LINE);
 	m_dsp0->set_input_line(0, data & 0x02 ? ASSERT_LINE : CLEAR_LINE);
@@ -646,7 +644,7 @@ READ_LINE_MEMBER(atarisy4_state::dsp0_bio_r)
 	return BIT(m_csr[0], 2);
 }
 
-WRITE16_MEMBER(atarisy4_state::dsp0_bank_w)
+void atarisy4_state::dsp0_bank_w(uint16_t data)
 {
 	if (data & 0x4000)
 	{
@@ -662,12 +660,12 @@ WRITE16_MEMBER(atarisy4_state::dsp0_bank_w)
 	m_dsp_bank[0] = data;
 }
 
-READ16_MEMBER(airrace_state::dsp1_status_r)
+uint16_t airrace_state::dsp1_status_r()
 {
 	return m_csr[1];
 }
 
-WRITE16_MEMBER(airrace_state::dsp1_control_w)
+void airrace_state::dsp1_control_w(uint16_t data)
 {
 	m_dsp1->set_input_line(INPUT_LINE_RESET, data & 0x01 ? CLEAR_LINE : ASSERT_LINE);
 	m_dsp1->set_input_line(0, data & 0x02 ? ASSERT_LINE : CLEAR_LINE);
@@ -680,7 +678,7 @@ READ_LINE_MEMBER(airrace_state::dsp1_bio_r)
 	return BIT(m_csr[1], 2);
 }
 
-WRITE16_MEMBER(airrace_state::dsp1_bank_w)
+void airrace_state::dsp1_bank_w(uint16_t data)
 {
 	if (data & 0x4000)
 	{
@@ -769,7 +767,7 @@ void airrace_state::dsp1_io_map(address_map &map)
  *
  *************************************/
 
-READ16_MEMBER(atarisy4_state::analog_r)
+uint16_t atarisy4_state::analog_r()
 {
 	return (m_stick[0]->read() << 8) | m_stick[1]->read();
 }

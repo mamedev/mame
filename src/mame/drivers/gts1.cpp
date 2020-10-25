@@ -93,19 +93,19 @@ public:
 	void gts1(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER (gts1_solenoid_r);
-	DECLARE_WRITE8_MEMBER(gts1_solenoid_w);
-	DECLARE_READ8_MEMBER (gts1_switches_r);
-	DECLARE_WRITE8_MEMBER(gts1_switches_w);
-	DECLARE_WRITE8_MEMBER(gts1_display_w);
-	DECLARE_READ8_MEMBER (gts1_lamp_apm_r);
-	DECLARE_WRITE8_MEMBER(gts1_lamp_apm_w);
-	DECLARE_READ8_MEMBER (gts1_nvram_r);
-	DECLARE_WRITE8_MEMBER(gts1_nvram_w);
-	DECLARE_READ8_MEMBER (gts1_io_r);
-	DECLARE_WRITE8_MEMBER(gts1_io_w);
-	DECLARE_READ8_MEMBER (gts1_pa_r);
-	DECLARE_WRITE8_MEMBER(gts1_do_w);
+	uint8_t gts1_solenoid_r(offs_t offset);
+	void gts1_solenoid_w(offs_t offset, uint8_t data);
+	uint8_t gts1_switches_r(offs_t offset);
+	void gts1_switches_w(offs_t offset, uint8_t data);
+	void gts1_display_w(offs_t offset, uint8_t data);
+	uint8_t gts1_lamp_apm_r(offs_t offset);
+	void gts1_lamp_apm_w(offs_t offset, uint8_t data);
+	uint8_t gts1_nvram_r(offs_t offset);
+	void gts1_nvram_w(offs_t offset, uint8_t data);
+	uint8_t gts1_io_r(offs_t offset);
+	void gts1_io_w(offs_t offset, uint8_t data);
+	uint8_t gts1_pa_r();
+	void gts1_do_w(uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -365,14 +365,14 @@ void gts1_state::machine_reset()
 	m_z30_out = 0;
 }
 
-READ8_MEMBER (gts1_state::gts1_solenoid_r)
+uint8_t gts1_state::gts1_solenoid_r(offs_t offset)
 {
 	uint8_t data = 0;
 	LOG("%s: solenoid[%02x] -> %x\n", __FUNCTION__, offset, data);
 	return data;
 }
 
-WRITE8_MEMBER(gts1_state::gts1_solenoid_w)
+void gts1_state::gts1_solenoid_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -420,7 +420,7 @@ WRITE8_MEMBER(gts1_state::gts1_solenoid_w)
 	}
 }
 
-READ8_MEMBER (gts1_state::gts1_switches_r)
+uint8_t gts1_state::gts1_switches_r(offs_t offset)
 {
 	uint8_t data = 1;
 	if (offset >= 8 && offset < 16) {
@@ -435,7 +435,7 @@ READ8_MEMBER (gts1_state::gts1_switches_r)
 	return data;
 }
 
-WRITE8_MEMBER(gts1_state::gts1_switches_w)
+void gts1_state::gts1_switches_w(offs_t offset, uint8_t data)
 {
 	LOG("%s: switches[%x] <- %x\n", __FUNCTION__, offset, data);
 	if (offset < 5) {
@@ -449,7 +449,7 @@ WRITE8_MEMBER(gts1_state::gts1_switches_w)
  * @param offset digit number 0 .. 19
  * @param data 4-bit value to display
  */
-WRITE8_MEMBER(gts1_state::gts1_display_w)
+void gts1_state::gts1_display_w(offs_t offset, uint8_t data)
 {
 	/*
 	 * The 7448 is modified to be disabled through RI/RBO
@@ -511,7 +511,7 @@ WRITE8_MEMBER(gts1_state::gts1_display_w)
  * @param offset 0 ... 2 = group
  * @return 4-bit value read from the group
  */
-READ8_MEMBER (gts1_state::gts1_nvram_r)
+uint8_t gts1_state::gts1_nvram_r(offs_t offset)
 {
 	uint8_t data = 0x0f;
 	switch (offset)
@@ -538,7 +538,7 @@ READ8_MEMBER (gts1_state::gts1_nvram_r)
  * @param offset 0 ... 2 = group
  * @param data 4 bit value to write
  */
-WRITE8_MEMBER(gts1_state::gts1_nvram_w)
+void gts1_state::gts1_nvram_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -564,7 +564,7 @@ WRITE8_MEMBER(gts1_state::gts1_nvram_w)
  * @param offset 0 ... 2 = group
  * @return 4-bit value read from the group
  */
-READ8_MEMBER (gts1_state::gts1_lamp_apm_r)
+uint8_t gts1_state::gts1_lamp_apm_r(offs_t offset)
 {
 	uint8_t data = 0x0f;
 	switch (offset) {
@@ -653,7 +653,7 @@ READ8_MEMBER (gts1_state::gts1_lamp_apm_r)
  * @param offset 0 ... 2 = group
  * @param data 4 bit value to write
  */
-WRITE8_MEMBER(gts1_state::gts1_lamp_apm_w)
+void gts1_state::gts1_lamp_apm_w(offs_t offset, uint8_t data)
 {
 	switch (offset) {
 		case 0: // LD1-LD4 on jumper J5
@@ -668,19 +668,19 @@ WRITE8_MEMBER(gts1_state::gts1_lamp_apm_w)
 	}
 }
 
-READ8_MEMBER (gts1_state::gts1_io_r)
+uint8_t gts1_state::gts1_io_r(offs_t offset)
 {
 	const uint8_t data = 0x0f;
 	LOG("%s: unmapped io[%02x] -> %x\n", __FUNCTION__, offset, data);
 	return data;
 }
 
-WRITE8_MEMBER(gts1_state::gts1_io_w)
+void gts1_state::gts1_io_w(offs_t offset, uint8_t data)
 {
 	LOG("%s: unmapped io[%02x] <- %x\n", __FUNCTION__, offset, data);
 }
 
-READ8_MEMBER (gts1_state::gts1_pa_r)
+uint8_t gts1_state::gts1_pa_r()
 {
 	// return ROM nibble
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -689,7 +689,7 @@ READ8_MEMBER (gts1_state::gts1_pa_r)
 	return data;
 }
 
-WRITE8_MEMBER(gts1_state::gts1_do_w)
+void gts1_state::gts1_do_w(uint8_t data)
 {
 	// write address lines (DO1-4 to A0-3, DIO1-4 to A4-7)
 	m_6351_addr = (m_6351_addr & 0x300) | data;
@@ -905,6 +905,15 @@ ROM_END
 /*-------------------------------------------------------------------
 / Sahara Love (1984)
 /-------------------------------------------------------------------*/
+ROM_START(sahalove)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("u5_cf.bin", 0x0000, 0x0800, CRC(e0d4b405) SHA1(17aadd79c0dcbb336aadd5d203bc6ca866492345))
+	ROM_LOAD("u4_ce.bin", 0x0800, 0x0800, CRC(4cd312dd) SHA1(31245daa9972ef8652caee69986585bb8239e86e))
+	ROM_LOAD("412.cpu",   0x2000, 0x0400, CRC(84a86b83) SHA1(f331f2ffd7d1b279b4ffbb939aa8649e723f5fac))
+
+	ROM_REGION(0x2000, "audiocpu", 0) // extra Z80 for sound. TODO: emulate
+	ROM_LOAD("sahalove.bin", 0x0000, 0x2000,  CRC(3512840a) SHA1(eb36bb78bbf2f8610bc1d71a6651b937db3a5c69))
+ROM_END
 
 /*-------------------------------------------------------------------
 / Sinbad (05/1978) #412
@@ -1023,4 +1032,5 @@ GAME(1980,  roldisco, gts1s,  gts1, gts1,     gts1_state, empty_init, ROT0, "Got
 GAME(1980,  astannie, gts1s,  gts1, gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Asteroid Annie and the Aliens",        MACHINE_IS_SKELETON_MECHANICAL)
 
 // homebrew
+GAME(1984,  sahalove, sinbad, gts1, gts1,     gts1_state, empty_init, ROT0, "Christian Tabart", "Sahara Love (France)",                 MACHINE_IS_SKELETON_MECHANICAL) // based on sinbad, 150 units produced, not sure it's 'homebrew'
 GAME(1986,  hexagone, gts1s,  gts1, gts1,     gts1_state, empty_init, ROT0, "Christian Tabart", "L'Hexagone (France)",                  MACHINE_IS_SKELETON_MECHANICAL)

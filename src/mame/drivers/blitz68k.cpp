@@ -12,6 +12,7 @@ Year  Game                        Manufacturer
 ----------------------------------------------------------------------
 1990  Mega Double Poker           Blitz Systems Inc.
 1990  Mega Double Poker Jackpot   Blitz Systems Inc.
+1992  Mega Double Strip           Blitz Systems Inc.
 1993  Bank Robbery                Entertainment Technology Corp.
 1993? Poker 52                    Blitz Systems Inc.
 1993  Strip Teaser                <unknown>
@@ -94,6 +95,7 @@ public:
 	void init_megadblj();
 	void init_hermit();
 	void init_dualgame();
+	void init_megastrp();
 
 	void hermit(machine_config &config);
 	void bankrob(machine_config &config);
@@ -111,81 +113,81 @@ protected:
 	virtual void machine_start() override { m_leds.resolve(); }
 
 private:
-	DECLARE_WRITE16_MEMBER(blit_copy_w);
-	DECLARE_READ8_MEMBER(blit_status_r);
-	DECLARE_WRITE8_MEMBER(blit_x_w);
-	DECLARE_WRITE8_MEMBER(blit_y_w);
-	DECLARE_WRITE8_MEMBER(blit_xy_w);
-	DECLARE_WRITE8_MEMBER(blit_w_w);
-	DECLARE_WRITE8_MEMBER(blit_h_w);
-	DECLARE_WRITE8_MEMBER(blit_wh_w);
-	DECLARE_WRITE8_MEMBER(blit_addr0_w);
-	DECLARE_WRITE8_MEMBER(blit_addr1_w);
-	DECLARE_WRITE8_MEMBER(blit_addr01_w);
-	DECLARE_WRITE8_MEMBER(blit_addr2_w);
-	DECLARE_WRITE8_MEMBER(blit_pens_w);
-	DECLARE_WRITE8_MEMBER(blit_pen0_w);
-	DECLARE_WRITE8_MEMBER(blit_pen1_w);
-	DECLARE_WRITE8_MEMBER(blit_pen2_w);
-	DECLARE_WRITE8_MEMBER(blit_pen3_w);
-	DECLARE_WRITE8_MEMBER(blit_flag0_w);
-	DECLARE_WRITE8_MEMBER(blit_flag1_w);
-	DECLARE_WRITE8_MEMBER(blit_flipx_w);
-	DECLARE_WRITE8_MEMBER(blit_flipy_w);
-	DECLARE_WRITE8_MEMBER(blit_solid_w);
-	DECLARE_WRITE8_MEMBER(blit_trans_w);
-	DECLARE_WRITE8_MEMBER(blit_flag6_w);
-	DECLARE_WRITE8_MEMBER(blit_flag7_w);
-	DECLARE_WRITE8_MEMBER(blit_flags_w);
-	DECLARE_WRITE8_MEMBER(blit_draw_w);
-	DECLARE_WRITE8_MEMBER(blit_hwyxa_draw_w);
-	DECLARE_READ16_MEMBER(blitter_status_r);
-	DECLARE_WRITE16_MEMBER(lamps_w);
-	DECLARE_READ16_MEMBER(test_r);
-	DECLARE_READ8_MEMBER(bankrob_mcu1_r);
-	DECLARE_READ8_MEMBER(bankrob_mcu2_r);
-	DECLARE_READ8_MEMBER(bankrob_mcu_status_read_r);
-	DECLARE_READ8_MEMBER(bankrob_mcu_status_write_r);
-	DECLARE_WRITE8_MEMBER(bankrob_mcu1_w);
-	DECLARE_WRITE8_MEMBER(bankrob_mcu2_w);
-	DECLARE_READ8_MEMBER(bankroba_mcu1_r);
-	DECLARE_READ8_MEMBER(bankroba_mcu2_r);
-	DECLARE_READ8_MEMBER(bankroba_mcu1_status_write_r);
-	DECLARE_READ8_MEMBER(bankroba_mcu2_status_write_r);
-	DECLARE_WRITE8_MEMBER(bankroba_mcu1_w);
-	DECLARE_WRITE8_MEMBER(bankroba_mcu2_w);
-	DECLARE_WRITE16_MEMBER(cjffruit_leds1_w);
-	DECLARE_WRITE16_MEMBER(cjffruit_leds2_w);
-	DECLARE_WRITE16_MEMBER(cjffruit_leds3_w);
-	DECLARE_READ8_MEMBER(crtc_r);
-	DECLARE_WRITE8_MEMBER(crtc_w);
-	DECLARE_READ16_MEMBER(cjffruit_mcu_r);
-	DECLARE_WRITE16_MEMBER(cjffruit_mcu_w);
-	DECLARE_READ16_MEMBER(deucesw2_mcu_r);
-	DECLARE_WRITE16_MEMBER(deucesw2_mcu_w);
-	DECLARE_WRITE16_MEMBER(deucesw2_leds1_w);
-	DECLARE_WRITE16_MEMBER(deucesw2_leds2_w);
-	DECLARE_WRITE16_MEMBER(deucesw2_leds3_w);
-	DECLARE_READ8_MEMBER(dualgame_mcu1_r);
-	DECLARE_READ8_MEMBER(dualgame_mcu2_r);
-	DECLARE_READ8_MEMBER(dualgame_mcu_status_read_r);
-	DECLARE_READ8_MEMBER(dualgame_mcu_status_write_r);
-	DECLARE_WRITE8_MEMBER(dualgame_mcu1_w);
-	DECLARE_WRITE8_MEMBER(dualgame_mcu2_w);
-	DECLARE_READ16_MEMBER(hermit_mcu_r);
-	DECLARE_WRITE16_MEMBER(hermit_mcu_w);
-	DECLARE_WRITE16_MEMBER(hermit_leds1_w);
-	DECLARE_WRITE16_MEMBER(hermit_leds2_w);
-	DECLARE_READ16_MEMBER(hermit_track_r);
-	DECLARE_READ8_MEMBER(maxidbl_mcu1_r);
-	DECLARE_READ8_MEMBER(maxidbl_mcu2_r);
-	DECLARE_READ8_MEMBER(maxidbl_mcu_status_read_r);
-	DECLARE_READ8_MEMBER(maxidbl_mcu_status_write_r);
-	DECLARE_WRITE8_MEMBER(maxidbl_mcu1_w);
-	DECLARE_WRITE8_MEMBER(maxidbl_mcu2_w);
+	void blit_copy_w(uint16_t data);
+	uint8_t blit_status_r();
+	void blit_x_w(uint8_t data);
+	void blit_y_w(uint8_t data);
+	void blit_xy_w(offs_t offset, uint8_t data);
+	void blit_w_w(uint8_t data);
+	void blit_h_w(uint8_t data);
+	void blit_wh_w(offs_t offset, uint8_t data);
+	void blit_addr0_w(uint8_t data);
+	void blit_addr1_w(uint8_t data);
+	void blit_addr01_w(offs_t offset, uint8_t data);
+	void blit_addr2_w(uint8_t data);
+	void blit_pens_w(offs_t offset, uint8_t data);
+	void blit_pen0_w(uint8_t data);
+	void blit_pen1_w(uint8_t data);
+	void blit_pen2_w(uint8_t data);
+	void blit_pen3_w(uint8_t data);
+	void blit_flag0_w(uint8_t data);
+	void blit_flag1_w(uint8_t data);
+	void blit_flipx_w(uint8_t data);
+	void blit_flipy_w(uint8_t data);
+	void blit_solid_w(uint8_t data);
+	void blit_trans_w(uint8_t data);
+	void blit_flag6_w(uint8_t data);
+	void blit_flag7_w(uint8_t data);
+	void blit_flags_w(offs_t offset, uint8_t data);
+	void blit_draw_w(uint8_t data);
+	void blit_hwyxa_draw_w(offs_t offset, uint8_t data);
+	uint16_t blitter_status_r();
+	void lamps_w(uint16_t data);
+	uint16_t test_r();
+	uint8_t bankrob_mcu1_r();
+	uint8_t bankrob_mcu2_r();
+	uint8_t bankrob_mcu_status_read_r();
+	uint8_t bankrob_mcu_status_write_r();
+	void bankrob_mcu1_w(uint8_t data);
+	void bankrob_mcu2_w(uint8_t data);
+	uint8_t bankroba_mcu1_r();
+	uint8_t bankroba_mcu2_r();
+	uint8_t bankroba_mcu1_status_write_r();
+	uint8_t bankroba_mcu2_status_write_r();
+	void bankroba_mcu1_w(uint8_t data);
+	void bankroba_mcu2_w(uint8_t data);
+	void cjffruit_leds1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void cjffruit_leds2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void cjffruit_leds3_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t crtc_r(offs_t offset);
+	void crtc_w(offs_t offset, uint8_t data);
+	uint16_t cjffruit_mcu_r();
+	void cjffruit_mcu_w(uint16_t data);
+	uint16_t deucesw2_mcu_r();
+	void deucesw2_mcu_w(uint16_t data);
+	void deucesw2_leds1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void deucesw2_leds2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void deucesw2_leds3_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t dualgame_mcu1_r();
+	uint8_t dualgame_mcu2_r();
+	uint8_t dualgame_mcu_status_read_r();
+	uint8_t dualgame_mcu_status_write_r();
+	void dualgame_mcu1_w(uint8_t data);
+	void dualgame_mcu2_w(uint8_t data);
+	uint16_t hermit_mcu_r();
+	void hermit_mcu_w(uint16_t data);
+	void hermit_leds1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void hermit_leds2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t hermit_track_r();
+	uint8_t maxidbl_mcu1_r();
+	uint8_t maxidbl_mcu2_r();
+	uint8_t maxidbl_mcu_status_read_r();
+	uint8_t maxidbl_mcu_status_write_r();
+	void maxidbl_mcu1_w(uint8_t data);
+	void maxidbl_mcu2_w(uint8_t data);
 	void show_leds123();
 	void show_leds12();
-	DECLARE_WRITE16_MEMBER(crtc_lpen_w);
+	void crtc_lpen_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vsync_irq1);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vsync_irq3);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vsync_irq5);
@@ -274,13 +276,13 @@ VIDEO_START_MEMBER(blitz68k_state,blitz68k_addr_factor1)
 
 uint32_t blitz68k_state::screen_update_blitz68k(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *src = m_blit_buffer.get();
+	const uint8_t *src = m_blit_buffer.get();
 
 	for(int y = 0; y < 256; y++)
 	{
 		for(int x = 0; x < 512; x++)
 		{
-			bitmap.pix32(y, x) = m_palette->pen(*src++);
+			bitmap.pix(y, x) = m_palette->pen(*src++);
 		}
 	}
 
@@ -292,17 +294,17 @@ uint32_t blitz68k_state::screen_update_blitz68k(screen_device &screen, bitmap_rg
 
 uint32_t blitz68k_state::screen_update_blitz68k_noblit(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint16_t *src = m_frame_buffer;
+	const uint16_t *src = m_frame_buffer;
 
 	for(int y = 0; y < 256; y++)
 	{
 		for(int x = 0; x < 512; )
 		{
-			uint16_t pen = *src++;
-			bitmap.pix32(y, x++) = m_palette->pen((pen >>  8) & 0xf);
-			bitmap.pix32(y, x++) = m_palette->pen((pen >> 12) & 0xf);
-			bitmap.pix32(y, x++) = m_palette->pen((pen >>  0) & 0xf);
-			bitmap.pix32(y, x++) = m_palette->pen((pen >>  4) & 0xf);
+			const uint16_t pen = *src++;
+			bitmap.pix(y, x++) = m_palette->pen((pen >>  8) & 0xf);
+			bitmap.pix(y, x++) = m_palette->pen((pen >> 12) & 0xf);
+			bitmap.pix(y, x++) = m_palette->pen((pen >>  0) & 0xf);
+			bitmap.pix(y, x++) = m_palette->pen((pen >>  4) & 0xf);
 		}
 	}
 
@@ -327,7 +329,7 @@ uint32_t blitz68k_state::screen_update_blitz68k_noblit(screen_device &screen, bi
 *************************************************************************************************************/
 
 
-WRITE16_MEMBER(blitz68k_state::blit_copy_w)
+void blitz68k_state::blit_copy_w(uint16_t data)
 {
 	uint8_t *blit_rom = m_blit_rom->base();
 	uint32_t blit_dst_xpos;
@@ -389,133 +391,133 @@ WRITE16_MEMBER(blitz68k_state::blit_copy_w)
 
 *************************************************************************************************************/
 
-READ8_MEMBER(blitz68k_state::blit_status_r)
+uint8_t blitz68k_state::blit_status_r()
 {
 	return 0;   // bit 0 = blitter busy
 }
 
-WRITE8_MEMBER(blitz68k_state::blit_x_w)
+void blitz68k_state::blit_x_w(uint8_t data)
 {
 	m_blit.x = data;
 }
-WRITE8_MEMBER(blitz68k_state::blit_y_w)
+void blitz68k_state::blit_y_w(uint8_t data)
 {
 	m_blit.y = data;
 }
-WRITE8_MEMBER(blitz68k_state::blit_xy_w)
+void blitz68k_state::blit_xy_w(offs_t offset, uint8_t data)
 {
 	if (offset)
-		blit_x_w(space, offset, data);
+		blit_x_w(data);
 	else
-		blit_y_w(space, offset, data);
+		blit_y_w(data);
 }
 
 
-WRITE8_MEMBER(blitz68k_state::blit_w_w)
+void blitz68k_state::blit_w_w(uint8_t data)
 {
 	m_blit.w = data;
 }
-WRITE8_MEMBER(blitz68k_state::blit_h_w)
+void blitz68k_state::blit_h_w(uint8_t data)
 {
 	m_blit.h = data;
 }
-WRITE8_MEMBER(blitz68k_state::blit_wh_w)
+void blitz68k_state::blit_wh_w(offs_t offset, uint8_t data)
 {
 	if (offset)
-		blit_w_w(space, offset, data-1);
+		blit_w_w(data-1);
 	else
-		blit_h_w(space, offset, -data-1);
+		blit_h_w(-data-1);
 }
 
 
-WRITE8_MEMBER(blitz68k_state::blit_addr0_w)
+void blitz68k_state::blit_addr0_w(uint8_t data)
 {
 	m_blit.addr[0] = data;
 }
-WRITE8_MEMBER(blitz68k_state::blit_addr1_w)
+void blitz68k_state::blit_addr1_w(uint8_t data)
 {
 	m_blit.addr[1] = data;
 }
-WRITE8_MEMBER(blitz68k_state::blit_addr01_w)
+void blitz68k_state::blit_addr01_w(offs_t offset, uint8_t data)
 {
 	if (offset)
-		blit_addr0_w(space, offset, data);
+		blit_addr0_w(data);
 	else
-		blit_addr1_w(space, offset, data);
+		blit_addr1_w(data);
 }
-WRITE8_MEMBER(blitz68k_state::blit_addr2_w)
+void blitz68k_state::blit_addr2_w(uint8_t data)
 {
 	m_blit.addr[2] = data;
 }
 
 
-WRITE8_MEMBER(blitz68k_state::blit_pens_w)
+void blitz68k_state::blit_pens_w(offs_t offset, uint8_t data)
 {
 	m_blit.pen[offset] = data;
 }
-WRITE8_MEMBER(blitz68k_state::blit_pen0_w)
+void blitz68k_state::blit_pen0_w(uint8_t data)
 {
 	m_blit.pen[0] = data;
 }
-WRITE8_MEMBER(blitz68k_state::blit_pen1_w)
+void blitz68k_state::blit_pen1_w(uint8_t data)
 {
 	m_blit.pen[1] = data;
 }
-WRITE8_MEMBER(blitz68k_state::blit_pen2_w)
+void blitz68k_state::blit_pen2_w(uint8_t data)
 {
 	m_blit.pen[2] = data;
 }
-WRITE8_MEMBER(blitz68k_state::blit_pen3_w)
+void blitz68k_state::blit_pen3_w(uint8_t data)
 {
 	m_blit.pen[3] = data;
 }
 
 
-WRITE8_MEMBER(blitz68k_state::blit_flag0_w)
+void blitz68k_state::blit_flag0_w(uint8_t data)
 {
 	m_blit.flag[0] = data;
 }
-WRITE8_MEMBER(blitz68k_state::blit_flag1_w)
+void blitz68k_state::blit_flag1_w(uint8_t data)
 {
 	m_blit.flag[1] = data;
 }
-WRITE8_MEMBER(blitz68k_state::blit_flipx_w)
+void blitz68k_state::blit_flipx_w(uint8_t data)
 {
 	m_blit.flipx = data;
 }
-WRITE8_MEMBER(blitz68k_state::blit_flipy_w)
+void blitz68k_state::blit_flipy_w(uint8_t data)
 {
 	m_blit.flipy = data;
 }
-WRITE8_MEMBER(blitz68k_state::blit_solid_w)
+void blitz68k_state::blit_solid_w(uint8_t data)
 {
 	m_blit.solid = data;
 }
-WRITE8_MEMBER(blitz68k_state::blit_trans_w)
+void blitz68k_state::blit_trans_w(uint8_t data)
 {
 	m_blit.trans = data;
 }
-WRITE8_MEMBER(blitz68k_state::blit_flag6_w)
+void blitz68k_state::blit_flag6_w(uint8_t data)
 {
 	m_blit.flag[6] = data;
 }
-WRITE8_MEMBER(blitz68k_state::blit_flag7_w)
+void blitz68k_state::blit_flag7_w(uint8_t data)
 {
 	m_blit.flag[7] = data;
 }
 
-WRITE8_MEMBER(blitz68k_state::blit_flags_w)
+void blitz68k_state::blit_flags_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
-		case 0: blit_flipx_w(space, offset, data);  break;
-		case 1: blit_flipy_w(space, offset, data);  break;
-		case 2: blit_solid_w(space, offset, data);  break;
-		case 3: blit_trans_w(space, offset, data);  break;
+		case 0: blit_flipx_w(data);  break;
+		case 1: blit_flipy_w(data);  break;
+		case 2: blit_solid_w(data);  break;
+		case 3: blit_trans_w(data);  break;
 	}
 }
 
-WRITE8_MEMBER(blitz68k_state::blit_draw_w)
+void blitz68k_state::blit_draw_w(uint8_t data)
 {
 	uint8_t *blit_rom = m_blit_rom->base();
 	int blit_romsize = m_blit_rom->bytes();
@@ -583,18 +585,18 @@ WRITE8_MEMBER(blitz68k_state::blit_draw_w)
 	m_blit.y = blit_dst_ypos;
 }
 
-WRITE8_MEMBER(blitz68k_state::blit_hwyxa_draw_w)
+void blitz68k_state::blit_hwyxa_draw_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
-		case 0: blit_h_w        (space, offset, data);  break;
-		case 1: blit_w_w        (space, offset, data);  break;
-		case 2: blit_y_w        (space, offset, data);  break;
-		case 3: blit_x_w        (space, offset, data);  break;
-		case 4: blit_addr2_w    (space, offset, data);  break;
-		case 5: blit_addr1_w    (space, offset, data);  break;
-		case 6: blit_addr0_w    (space, offset, data);  break;
-		case 7: blit_draw_w     (space, offset, data);  break;
+		case 0: blit_h_w        (data);  break;
+		case 1: blit_w_w        (data);  break;
+		case 2: blit_y_w        (data);  break;
+		case 3: blit_x_w        (data);  break;
+		case 4: blit_addr2_w    (data);  break;
+		case 5: blit_addr1_w    (data);  break;
+		case 6: blit_addr0_w    (data);  break;
+		case 7: blit_draw_w     (data);  break;
 	}
 }
 
@@ -622,30 +624,30 @@ void blitz68k_state::show_leds12()
 *************************************************************************************************************/
 
 /*bit 0 is the blitter busy flag*/
-READ16_MEMBER(blitz68k_state::blitter_status_r)
+uint16_t blitz68k_state::blitter_status_r()
 {
 	return 0;
 }
 
 /*TODO*/
-WRITE16_MEMBER(blitz68k_state::lamps_w)
+void blitz68k_state::lamps_w(uint16_t data)
 {
 //  popmessage("%02x",data);
 }
 
-READ16_MEMBER(blitz68k_state::test_r)
+uint16_t blitz68k_state::test_r()
 {
 	return 0xffff;//machine().rand();
 }
 
 #if 0
-WRITE16_MEMBER(blitz68k_state::irq_callback_w)
+void blitz68k_state::irq_callback_w(uint16_t data)
 {
 //  popmessage("%02x",data);
 	m_maincpu->set_input_line(3, HOLD_LINE );
 }
 
-WRITE16_MEMBER(blitz68k_state::sound_write_w)
+void blitz68k_state::sound_write_w(uint16_t data)
 {
 	popmessage("%02x",data);
 	dac_data_w(0, data & 0x0f);     /* Sound DAC? */
@@ -719,34 +721,34 @@ void blitz68k_state::steaser_map(address_map &map)
 *************************************************************************************************************/
 
 // MCU simulation (to be done)
-READ8_MEMBER(blitz68k_state::bankrob_mcu1_r)
+uint8_t blitz68k_state::bankrob_mcu1_r()
 {
 	uint8_t ret = 0;  // machine().rand() gives "interesting" results
 	logerror("%s: mcu1 reads %02x\n", machine().describe_context(), ret);
 	return ret;
 }
-READ8_MEMBER(blitz68k_state::bankrob_mcu2_r)
+uint8_t blitz68k_state::bankrob_mcu2_r()
 {
 	uint8_t ret = 0;  // machine().rand() gives "interesting" results
 	logerror("%s: mcu2 reads %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-READ8_MEMBER(blitz68k_state::bankrob_mcu_status_read_r)
+uint8_t blitz68k_state::bankrob_mcu_status_read_r()
 {
 	return 0x03;    // bit 0 = MCU1, bit 1 = MCU2. Active high.
 }
 
-READ8_MEMBER(blitz68k_state::bankrob_mcu_status_write_r)
+uint8_t blitz68k_state::bankrob_mcu_status_write_r()
 {
 	return 0x03;    // bit 0 = MCU1, bit 1 = MCU2. Active high.
 }
 
-WRITE8_MEMBER(blitz68k_state::bankrob_mcu1_w)
+void blitz68k_state::bankrob_mcu1_w(uint8_t data)
 {
 	logerror("%s: mcu1 written with %02x\n", machine().describe_context(), data);
 }
-WRITE8_MEMBER(blitz68k_state::bankrob_mcu2_w)
+void blitz68k_state::bankrob_mcu2_w(uint8_t data)
 {
 	logerror("%s: mcu2 written with %02x\n", machine().describe_context(), data);
 }
@@ -806,33 +808,33 @@ void blitz68k_state::bankrob_map(address_map &map)
 // bankroba:
 
 // MCU simulation (to be done)
-READ8_MEMBER(blitz68k_state::bankroba_mcu1_r)
+uint8_t blitz68k_state::bankroba_mcu1_r()
 {
 	uint8_t ret = machine().rand();   // machine().rand() gives "interesting" results
 	logerror("%s: mcu1 reads %02x\n", machine().describe_context(), ret);
 	return ret;
 }
-READ8_MEMBER(blitz68k_state::bankroba_mcu2_r)
+uint8_t blitz68k_state::bankroba_mcu2_r()
 {
 	uint8_t ret = machine().rand();   // machine().rand() gives "interesting" results
 	logerror("%s: mcu2 reads %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-READ8_MEMBER(blitz68k_state::bankroba_mcu1_status_write_r)
+uint8_t blitz68k_state::bankroba_mcu1_status_write_r()
 {
 	return 0x00;    // bit 0 = MCU1. Active low.
 }
-READ8_MEMBER(blitz68k_state::bankroba_mcu2_status_write_r)
+uint8_t blitz68k_state::bankroba_mcu2_status_write_r()
 {
 	return 0x01;    // bit 0 = MCU2. Active high.
 }
 
-WRITE8_MEMBER(blitz68k_state::bankroba_mcu1_w)
+void blitz68k_state::bankroba_mcu1_w(uint8_t data)
 {
 	logerror("%s: mcu1 written with %02x\n", machine().describe_context(), data);
 }
-WRITE8_MEMBER(blitz68k_state::bankroba_mcu2_w)
+void blitz68k_state::bankroba_mcu2_w(uint8_t data)
 {
 	logerror("%s: mcu2 written with %02x\n", machine().describe_context(), data);
 }
@@ -895,7 +897,7 @@ void blitz68k_state::bankroba_map(address_map &map)
     Funny Fruit
 *************************************************************************************************************/
 
-WRITE16_MEMBER(blitz68k_state::cjffruit_leds1_w)
+void blitz68k_state::cjffruit_leds1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(m_leds0);
 	if (ACCESSING_BITS_8_15)
@@ -912,7 +914,7 @@ WRITE16_MEMBER(blitz68k_state::cjffruit_leds1_w)
 	}
 }
 
-WRITE16_MEMBER(blitz68k_state::cjffruit_leds2_w)
+void blitz68k_state::cjffruit_leds2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(m_leds1);
 	if (ACCESSING_BITS_8_15)
@@ -929,7 +931,7 @@ WRITE16_MEMBER(blitz68k_state::cjffruit_leds2_w)
 	}
 }
 
-WRITE16_MEMBER(blitz68k_state::cjffruit_leds3_w)
+void blitz68k_state::cjffruit_leds3_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(m_leds2);
 	if (ACCESSING_BITS_8_15)
@@ -941,7 +943,7 @@ WRITE16_MEMBER(blitz68k_state::cjffruit_leds3_w)
 }
 
 // CRTC
-READ8_MEMBER(blitz68k_state::crtc_r)
+uint8_t blitz68k_state::crtc_r(offs_t offset)
 {
 	if (offset)
 		return m_crtc->register_r();
@@ -949,7 +951,7 @@ READ8_MEMBER(blitz68k_state::crtc_r)
 		return m_crtc->status_r();
 }
 
-WRITE8_MEMBER(blitz68k_state::crtc_w)
+void blitz68k_state::crtc_w(offs_t offset, uint8_t data)
 {
 	if (offset)
 		m_crtc->register_w(data);
@@ -957,7 +959,7 @@ WRITE8_MEMBER(blitz68k_state::crtc_w)
 		m_crtc->address_w(data);
 }
 
-WRITE16_MEMBER(blitz68k_state::crtc_lpen_w)
+void blitz68k_state::crtc_lpen_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// 8fe0006: 0->1
 	if (ACCESSING_BITS_8_15 && (data & 0x0100))
@@ -966,14 +968,14 @@ WRITE16_MEMBER(blitz68k_state::crtc_lpen_w)
 }
 
 // MCU simulation (to be done)
-READ16_MEMBER(blitz68k_state::cjffruit_mcu_r)
+uint16_t blitz68k_state::cjffruit_mcu_r()
 {
 	uint8_t ret = 0x00;   // machine().rand() gives "interesting" results
 	logerror("%s: mcu reads %02x\n", machine().describe_context(), ret);
 	return ret << 8;
 }
 
-WRITE16_MEMBER(blitz68k_state::cjffruit_mcu_w)
+void blitz68k_state::cjffruit_mcu_w(uint16_t data)
 {
 	logerror("%s: mcu written with %02x\n", machine().describe_context(),data >> 8);
 }
@@ -1021,19 +1023,19 @@ void blitz68k_state::cjffruit_map(address_map &map)
 *************************************************************************************************************/
 
 // MCU simulation (to be done)
-READ16_MEMBER(blitz68k_state::deucesw2_mcu_r)
+uint16_t blitz68k_state::deucesw2_mcu_r()
 {
 	uint8_t ret = 0x00;   // machine().rand() gives "interesting" results
 	logerror("%s: mcu reads %02x\n", machine().describe_context(), ret);
 	return ret << 8;
 }
 
-WRITE16_MEMBER(blitz68k_state::deucesw2_mcu_w)
+void blitz68k_state::deucesw2_mcu_w(uint16_t data)
 {
 	logerror("%s: mcu written with %02x\n", machine().describe_context(),data >> 8);
 }
 
-WRITE16_MEMBER(blitz68k_state::deucesw2_leds1_w)
+void blitz68k_state::deucesw2_leds1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(m_leds0);
 	if (ACCESSING_BITS_8_15)
@@ -1050,7 +1052,7 @@ WRITE16_MEMBER(blitz68k_state::deucesw2_leds1_w)
 	}
 }
 
-WRITE16_MEMBER(blitz68k_state::deucesw2_leds2_w)
+void blitz68k_state::deucesw2_leds2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(m_leds1);
 	if (ACCESSING_BITS_8_15)
@@ -1067,7 +1069,7 @@ WRITE16_MEMBER(blitz68k_state::deucesw2_leds2_w)
 	}
 }
 
-WRITE16_MEMBER(blitz68k_state::deucesw2_leds3_w)
+void blitz68k_state::deucesw2_leds3_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(m_leds2);
 	if (ACCESSING_BITS_8_15)
@@ -1121,34 +1123,34 @@ void blitz68k_state::deucesw2_map(address_map &map)
 *************************************************************************************************************/
 
 // MCU simulation (to be done)
-READ8_MEMBER(blitz68k_state::dualgame_mcu1_r)
+uint8_t blitz68k_state::dualgame_mcu1_r()
 {
 	uint8_t ret = 0;  // machine().rand() gives "interesting" results
 	logerror("%s: mcu1 reads %02x\n", machine().describe_context(), ret);
 	return ret;
 }
-READ8_MEMBER(blitz68k_state::dualgame_mcu2_r)
+uint8_t blitz68k_state::dualgame_mcu2_r()
 {
 	uint8_t ret = 0;  // machine().rand() gives "interesting" results
 	logerror("%s: mcu2 reads %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-READ8_MEMBER(blitz68k_state::dualgame_mcu_status_read_r)
+uint8_t blitz68k_state::dualgame_mcu_status_read_r()
 {
 	return 0x03;    // bit 0 = MCU1, bit 1 = MCU2. Active high.
 }
 
-READ8_MEMBER(blitz68k_state::dualgame_mcu_status_write_r)
+uint8_t blitz68k_state::dualgame_mcu_status_write_r()
 {
 	return 0x03;    // bit 0 = MCU1, bit 1 = MCU2. Active high.
 }
 
-WRITE8_MEMBER(blitz68k_state::dualgame_mcu1_w)
+void blitz68k_state::dualgame_mcu1_w(uint8_t data)
 {
 	logerror("%s: mcu1 written with %02x\n", machine().describe_context(), data);
 }
-WRITE8_MEMBER(blitz68k_state::dualgame_mcu2_w)
+void blitz68k_state::dualgame_mcu2_w(uint8_t data)
 {
 	logerror("%s: mcu2 written with %02x\n", machine().describe_context(), data);
 }
@@ -1213,19 +1215,19 @@ void blitz68k_state::dualgame_map(address_map &map)
 *************************************************************************************************************/
 
 // MCU simulation (to be done)
-READ16_MEMBER(blitz68k_state::hermit_mcu_r)
+uint16_t blitz68k_state::hermit_mcu_r()
 {
 	uint8_t ret = 0x00;   // machine().rand() gives "interesting" results
 	logerror("%s: mcu reads %02x\n", machine().describe_context(), ret);
 	return ret << 8;
 }
 
-WRITE16_MEMBER(blitz68k_state::hermit_mcu_w)
+void blitz68k_state::hermit_mcu_w(uint16_t data)
 {
 	logerror("%s: mcu written with %02x\n", machine().describe_context(),data >> 8);
 }
 
-WRITE16_MEMBER(blitz68k_state::hermit_leds1_w)
+void blitz68k_state::hermit_leds1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(m_leds0);
 	if (ACCESSING_BITS_8_15)
@@ -1235,7 +1237,7 @@ WRITE16_MEMBER(blitz68k_state::hermit_leds1_w)
 	}
 }
 
-WRITE16_MEMBER(blitz68k_state::hermit_leds2_w)
+void blitz68k_state::hermit_leds2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(m_leds1);
 	if (ACCESSING_BITS_8_15)
@@ -1245,7 +1247,7 @@ WRITE16_MEMBER(blitz68k_state::hermit_leds2_w)
 	}
 }
 
-READ16_MEMBER(blitz68k_state::hermit_track_r)
+uint16_t blitz68k_state::hermit_track_r()
 {
 #ifdef MAME_DEBUG
 //  popmessage("track %02x %02x", ioport("TRACK_X")->read(), ioport("TRACK_Y")->read());
@@ -1299,34 +1301,34 @@ void blitz68k_state::hermit_map(address_map &map)
 *************************************************************************************************************/
 
 // MCU simulation (to be done)
-READ8_MEMBER(blitz68k_state::maxidbl_mcu1_r)
+uint8_t blitz68k_state::maxidbl_mcu1_r()
 {
 	uint8_t ret = 0;  // machine().rand() gives "interesting" results
 	logerror("%s: mcu1 reads %02x\n", machine().describe_context(), ret);
 	return ret;
 }
-READ8_MEMBER(blitz68k_state::maxidbl_mcu2_r)
+uint8_t blitz68k_state::maxidbl_mcu2_r()
 {
 	uint8_t ret = 0;  // machine().rand() gives "interesting" results
 	logerror("%s: mcu2 reads %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-READ8_MEMBER(blitz68k_state::maxidbl_mcu_status_read_r)
+uint8_t blitz68k_state::maxidbl_mcu_status_read_r()
 {
 	return 0x03;    // bit 0 = MCU1, bit 1 = MCU2. Active high.
 }
 
-READ8_MEMBER(blitz68k_state::maxidbl_mcu_status_write_r)
+uint8_t blitz68k_state::maxidbl_mcu_status_write_r()
 {
 	return 0x03;    // bit 0 = MCU1, bit 1 = MCU2. Active high.
 }
 
-WRITE8_MEMBER(blitz68k_state::maxidbl_mcu1_w)
+void blitz68k_state::maxidbl_mcu1_w(uint8_t data)
 {
 	logerror("%s: mcu1 written with %02x\n", machine().describe_context(), data);
 }
-WRITE8_MEMBER(blitz68k_state::maxidbl_mcu2_w)
+void blitz68k_state::maxidbl_mcu2_w(uint8_t data)
 {
 	logerror("%s: mcu2 written with %02x\n", machine().describe_context(), data);
 }
@@ -2211,6 +2213,32 @@ ROM_START( bankrobb ) // DK-B main PCB + 8L74 sub PCB
 	ROM_LOAD( "palce16v8h.u71", 0x000, 0x117, NO_DUMP )
 ROM_END
 
+// Mega Strip on ROM labels
+// Maxi Strip Poker and both copyright 91 and 1992 in ROMs
+// Mega Double Strip on title screen, 1992 copyright on following screen
+// English and French strings in ROMs
+// Main PCB: DK-B Copyright 1991 Blitz System inc.
+// Sub PCB: BLZ AB1 Copyright 1992, Blitz System Inc.
+
+ROM_START( megastrp )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code, on main board
+	ROM_LOAD16_BYTE( "1992_mega_strip_1.10b_b.u32", 0x00000, 0x20000, CRC(aaac8916) SHA1(74320bdf8b0f4de8a571fc6494252f01eff32cf9) ) // 1xxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "1992_mega_strip_1.10b_a.u31", 0x00001, 0x20000, CRC(7661bd45) SHA1(b25b20b893ca428e0364f6b6d0ad435354958c31) ) // 1xxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x2000, "mcu1", 0 ) // 68HC705C8P code, on main board
+	ROM_LOAD( "1992_mega_strip_control_1.0.u2", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION( 0x2000, "mcu2", 0 ) // 68HC705C8P code, on sub board
+	ROM_LOAD( "blz_10b-4.01.u2", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION16_BE( 0x100000, "blitter", 0 ) // on main board
+	ROM_LOAD( "1992_mega_strip_1.10b_c.u46", 0x00000, 0x80000, CRC(d3813101) SHA1(80c6311ddea1b161a03fcd69c1b8d4e8a2d99636) )
+	ROM_LOAD( "1992_mega_strip_1.10b_d.u51", 0x80000, 0x80000, CRC(ee45ca2f) SHA1(9d1faeac17f60f1ea72d3fd3355544ea2d89a2bb) )
+
+	ROM_REGION( 0x80000, "samples", 0 ) // on main board
+	ROM_LOAD( "1992_mega_strip_1.10_sound.u18", 0x00000, 0x80000, CRC(8c345dc2) SHA1(2ad9dea4543d2c16f42a38653d740ff0c0fa1798) )
+ROM_END
+
 /*************************************************************************************************************
 
 Triple Play
@@ -3018,11 +3046,22 @@ void blitz68k_state::init_megadble()
 	ROM[0x1d40/2] = 0x4e71;
 }
 
+void blitz68k_state::init_megastrp()
+{
+	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
+
+	// skip loops until the MCUs are dumped and the hardware better understood
+	ROM[0x1678/2] = 0x4e71;
+
+	ROM[0x10c80/2] = 0x4e71;
+}
+
 
 
 GAME( 1992,  maxidbl,  0,       maxidbl,  maxidbl,  blitz68k_state, init_maxidbl,  ROT0, "Blitz Systems Inc.",             "Maxi Double Poker (Ver. 1.10)",                  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_WRONG_COLORS )
 GAME( 1990,  megadblj, 0,       maxidbl,  maxidbl,  blitz68k_state, init_megadblj, ROT0, "Blitz Systems Inc.",             "Mega Double Poker Jackpot (Ver. 1.26)",          MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // JUNE 28TH, 1993
 GAME( 1990,  megadble, 0,       maxidbl,  maxidbl,  blitz68k_state, init_megadble, ROT0, "Blitz Systems Inc.",             "Mega Double Poker (Ver. 1.63 Espagnol)",         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_WRONG_COLORS ) // NOVEMBER 1994
+GAME( 1992,  megastrp, 0,       bankroba, bankrob,  blitz68k_state, init_megastrp, ROT0, "Blitz Systems Inc.",             "Mega Double Strip (Ver. 1.10b)",                 MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // @ 1993 BLITZ SYSTEM INC
 GAME( 1993,  steaser,  0,       steaser,  steaser,  blitz68k_state, empty_init,    ROT0, "<unknown>",                      "Strip Teaser (Italy, Ver. 1.22)",                MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // In-game strings are in Italian but service mode is half English / half French?
 GAME( 1993,  bankrob,  0,       bankrob,  bankrob,  blitz68k_state, init_bankrob,  ROT0, "Entertainment Technology Corp.", "Bank Robbery (Ver. 3.32)",                       MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // BLITZ SYSTEM INC APRIL 1995
 GAME( 1993,  bankroba, bankrob, bankroba, bankrob,  blitz68k_state, init_bankroba, ROT0, "Entertainment Technology Corp.", "Bank Robbery (Ver. 2.00)",                       MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // BLITZ SYSTEM INC MAY 10TH, 1993

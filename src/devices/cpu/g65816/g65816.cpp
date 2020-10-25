@@ -88,6 +88,10 @@ TODO general:
     - Add 1 cycle in Emulation mode (E=1) for (dir),y; abs,x; and abs,y
       addressing modes.
 
+    - Rename g65* to w65*? (including filenames)
+
+    - Any difference between W65C8* and G65SC8*?
+
 */
 /* ======================================================================== */
 /* ================================= DATA ================================= */
@@ -97,27 +101,34 @@ TODO general:
 #include "g65816.h"
 
 
-DEFINE_DEVICE_TYPE(G65816, g65816_device, "g65c816", "Western Design Center G65C816")
+DEFINE_DEVICE_TYPE(G65816, g65816_device, "w65c816", "WDC W65C816")
+DEFINE_DEVICE_TYPE(G65802, g65802_device, "w65c802", "WDC W65C802")
 DEFINE_DEVICE_TYPE(_5A22,  _5a22_device,  "5a22",    "Ricoh 5A22")
 
 enum
 {
-	CPU_TYPE_G65816 = 0,
-	CPU_TYPE_5A22 = 1
+	CPU_TYPE_W65C816 = 0,
+	CPU_TYPE_W65C802 = 1,
+	CPU_TYPE_5A22 = 2
 };
 
 
 g65816_device::g65816_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: g65816_device(mconfig, G65816, tag, owner, clock, CPU_TYPE_G65816, address_map_constructor())
+	: g65816_device(mconfig, G65816, tag, owner, clock, CPU_TYPE_W65C816, address_map_constructor())
+{
+}
+
+g65802_device::g65802_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: g65816_device(mconfig, G65802, tag, owner, clock, CPU_TYPE_W65C802, address_map_constructor())
 {
 }
 
 
 g65816_device::g65816_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cpu_type, address_map_constructor internal)
 	: cpu_device(mconfig, type, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_LITTLE, 8, 24, 0, internal)
-	, m_data_config("data", ENDIANNESS_LITTLE, 8, 24, 0, internal)
-	, m_opcode_config("opcodes", ENDIANNESS_LITTLE, 8, 24, 0, internal)
+	, m_program_config("program", ENDIANNESS_LITTLE, 8, (cpu_type == CPU_TYPE_W65C802) ? 16 : 24, 0, internal)
+	, m_data_config("data", ENDIANNESS_LITTLE, 8, (cpu_type == CPU_TYPE_W65C802) ? 16 : 24, 0, internal)
+	, m_opcode_config("opcodes", ENDIANNESS_LITTLE, 8, (cpu_type == CPU_TYPE_W65C802) ? 16 : 24, 0, internal)
 	, m_vector_config("vectors", ENDIANNESS_LITTLE, 8, 5, 0)
 	, m_wdm_w(*this)
 	, m_cpu_type(cpu_type)
@@ -860,10 +871,9 @@ void g65816_device::device_start()
 	m_execute = nullptr;
 	m_debugger_temp = 0;
 
-	address_space &program_space = space(AS_PROGRAM);
-	m_data_space = has_space(AS_DATA) ? &space(AS_DATA) : &program_space;
-	m_program_cache = program_space.cache<0, 0, ENDIANNESS_LITTLE>();
-	m_opcode_cache = (has_space(AS_OPCODES) ? space(AS_OPCODES) : program_space).cache<0, 0, ENDIANNESS_LITTLE>();
+	space(AS_PROGRAM).cache(m_program);
+	(has_space(AS_OPCODES) ? space(AS_OPCODES) : space(AS_PROGRAM)).cache(m_opcode);
+	(has_space(AS_DATA) ? space(AS_DATA) : space(AS_PROGRAM)).specific(m_data);
 
 	m_wdm_w.resolve_safe();
 
@@ -1024,7 +1034,7 @@ SNES specific, used to handle master cycles, based off byuu's BSNES code
 
 int g65816_device::bus_5A22_cycle_burst(unsigned addr)
 {
-	if(m_cpu_type == CPU_TYPE_G65816)
+	if(m_cpu_type != CPU_TYPE_5A22)
 		return 0;
 
 	if(addr & 0x408000) {

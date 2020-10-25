@@ -78,7 +78,7 @@ void mario_state::mario_palette(palette_device &palette) const
 	palette.palette()->normalize_range(0, 255);
 }
 
-WRITE8_MEMBER(mario_state::mario_videoram_w)
+void mario_state::mario_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -96,7 +96,7 @@ WRITE_LINE_MEMBER(mario_state::palette_bank_w)
 	machine().tilemap().mark_all_dirty();
 }
 
-WRITE8_MEMBER(mario_state::mario_scroll_w)
+void mario_state::mario_scroll_w(uint8_t data)
 {
 	m_gfx_scroll = data + 17;
 }

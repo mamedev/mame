@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include "dirom.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -20,7 +21,7 @@
 
 class wswan_sound_device : public device_t,
 	public device_sound_interface,
-	public device_rom_interface
+	public device_rom_interface<14>
 {
 public:
 	wswan_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -58,7 +59,7 @@ protected:
 	virtual void rom_bank_updated() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 	void wswan_ch_set_freq( CHAN *ch, uint16_t freq );

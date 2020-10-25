@@ -46,8 +46,8 @@ protected:
 	virtual int c64_game_r(offs_t offset, int sphi2, int ba, int rw) override;
 
 private:
-	DECLARE_WRITE8_MEMBER( pia_pa_w );
-	DECLARE_WRITE8_MEMBER( pia_pb_w );
+	void pia_pa_w(uint8_t data);
+	void pia_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( pia_cb2_w );
 
 	required_device<pia6821_device> m_pia;

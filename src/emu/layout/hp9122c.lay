@@ -16,13 +16,13 @@ Hewlett-Packard HP 9122C floppy drive Layout
 	<element name="led2_s"> <text string="E"> <color red="1.0" green="1.0" blue="1.0" /></text></element>
 
 	<group name="panel">
-		<bezel element="background"><bounds x="0" y="0" width="~scr0width~" height="64"/></bezel>
+		<element ref="background"><bounds x="0" y="0" width="~scr0width~" height="64"/></element>
 		<repeat count="3">
 			<param name="left" start="20" increment="20" />
 			<param name="right" start="36" increment="20" />
 			<param name="num" start="0" increment="1" />
-			<bezel name="led~num~_s" element="led~num~_s"><bounds left="~left~" right="~right~" top="8" bottom="24"/></bezel>
-			<bezel name="led~num~" element="ledr"><bounds left="~left~" right="~right~" top="32" bottom="48"/></bezel>
+			<element name="led~num~_s" ref="led~num~_s"><bounds left="~left~" right="~right~" top="8" bottom="24"/></element>
+			<element name="led~num~" ref="ledr"><bounds left="~left~" right="~right~" top="32" bottom="48"/></element>
 		</repeat>
 	</group>
 

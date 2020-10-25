@@ -39,14 +39,14 @@ protected:
 	void pc1260_mem(address_map &map);
 	void pc1261_mem(address_map &map);
 
-	DECLARE_WRITE8_MEMBER(out_b_w);
-	DECLARE_WRITE8_MEMBER(out_c_w);
+	void out_b_w(uint8_t data);
+	void out_c_w(uint8_t data);
 
 	DECLARE_READ_LINE_MEMBER(reset_r);
-	DECLARE_READ8_MEMBER(in_a_r);
-	DECLARE_READ8_MEMBER(in_b_r);
-	DECLARE_READ8_MEMBER(lcd_read);
-	DECLARE_WRITE8_MEMBER(lcd_write);
+	uint8_t in_a_r();
+	uint8_t in_b_r();
+	uint8_t lcd_read(offs_t offset);
+	void lcd_write(offs_t offset, uint8_t data);
 
 private:
 	required_ioport_array<10> m_keys;

@@ -42,7 +42,7 @@ WRITE_LINE_MEMBER(starshp1_state::phasor_w)
 }
 
 
-WRITE8_MEMBER(starshp1_state::starshp1_collision_reset_w)
+void starshp1_state::starshp1_collision_reset_w(uint8_t data)
 {
 	m_collision_latch = 0;
 }
@@ -78,13 +78,13 @@ CUSTOM_INPUT_MEMBER(starshp1_state::collision_latch_r)
 }
 
 
-WRITE8_MEMBER(starshp1_state::starshp1_analog_in_w)
+void starshp1_state::starshp1_analog_in_w(offs_t offset, uint8_t data)
 {
 	m_analog_in_select = offset & 3;
 }
 
 
-WRITE8_MEMBER(starshp1_state::starshp1_analog_out_w)
+void starshp1_state::starshp1_analog_out_w(offs_t offset, uint8_t data)
 {
 	switch (offset & 7)
 	{

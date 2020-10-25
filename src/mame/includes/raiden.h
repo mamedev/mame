@@ -54,7 +54,7 @@ protected:
 
 	uint32_t screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t *scrollregs);
 
-	DECLARE_WRITE16_MEMBER(raiden_text_w);
+	void raiden_text_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void common_video_start();
 
@@ -73,9 +73,9 @@ protected:
 	tilemap_t *m_fg_layer;
 	tilemap_t *m_tx_layer;
 
-	DECLARE_WRITE16_MEMBER(raiden_background_w);
-	DECLARE_WRITE16_MEMBER(raiden_foreground_w);
-	DECLARE_WRITE8_MEMBER(raiden_control_w);
+	void raiden_background_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void raiden_foreground_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void raiden_control_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
 	TILE_GET_INFO_MEMBER(get_fore_tile_info);
@@ -113,9 +113,9 @@ private:
 
 	uint32_t screen_update_raidenb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE8_MEMBER(raidenb_control_w);
-	DECLARE_WRITE16_MEMBER(raidenb_layer_enable_w);
-	DECLARE_WRITE16_MEMBER(raidenb_layer_scroll_w);
+	void raidenb_control_w(uint8_t data);
+	void raidenb_layer_enable_w(uint16_t data);
+	void raidenb_layer_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void raidenb_main_map(address_map &map);
 };

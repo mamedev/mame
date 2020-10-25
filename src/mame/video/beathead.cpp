@@ -34,7 +34,7 @@ void beathead_state::video_start()
  *
  *************************************/
 
-WRITE32_MEMBER( beathead_state::vram_transparent_w )
+void beathead_state::vram_transparent_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/* writes to this area appear to handle transparency */
 	if (!(data & 0x000000ff)) mem_mask &= ~0x000000ff;
@@ -45,7 +45,7 @@ WRITE32_MEMBER( beathead_state::vram_transparent_w )
 }
 
 
-WRITE32_MEMBER( beathead_state::vram_bulk_w )
+void beathead_state::vram_bulk_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/* it appears that writes to this area pass in a mask for 4 words in VRAM */
 	/* allowing them to be filled from a preset latch */
@@ -60,14 +60,14 @@ WRITE32_MEMBER( beathead_state::vram_bulk_w )
 }
 
 
-WRITE32_MEMBER( beathead_state::vram_latch_w )
+void beathead_state::vram_latch_w(offs_t offset, uint32_t data)
 {
 	/* latch the address */
 	m_vram_latch_offset = (4 * offset) & 0x7ffff;
 }
 
 
-WRITE32_MEMBER( beathead_state::vram_copy_w )
+void beathead_state::vram_copy_w(offs_t offset, uint32_t data)
 {
 	/* copy from VRAM to VRAM, for 1024 bytes */
 	offs_t dest_offset = (4 * offset) & 0x7ffff;
@@ -82,7 +82,7 @@ WRITE32_MEMBER( beathead_state::vram_copy_w )
  *
  *************************************/
 
-WRITE32_MEMBER( beathead_state::finescroll_w )
+void beathead_state::finescroll_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t oldword = m_finescroll;
 	uint32_t newword = COMBINE_DATA(&m_finescroll);
@@ -103,7 +103,7 @@ WRITE32_MEMBER( beathead_state::finescroll_w )
  *
  *************************************/
 
-READ32_MEMBER( beathead_state::hsync_ram_r )
+uint32_t beathead_state::hsync_ram_r(offs_t offset)
 {
 	/* offset 0 is probably write-only */
 	if (offset == 0)
@@ -116,7 +116,7 @@ READ32_MEMBER( beathead_state::hsync_ram_r )
 	return 0;
 }
 
-WRITE32_MEMBER( beathead_state::hsync_ram_w )
+void beathead_state::hsync_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/* offset 0 selects the address, and can specify the start address */
 	if (offset == 0)

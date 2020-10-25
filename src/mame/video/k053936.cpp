@@ -266,22 +266,22 @@ void k053936_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-WRITE16_MEMBER( k053936_device::ctrl_w )
+void k053936_device::ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_ctrl[offset]);
 }
 
-READ16_MEMBER( k053936_device::ctrl_r )
+uint16_t k053936_device::ctrl_r(offs_t offset)
 {
 	return m_ctrl[offset];
 }
 
-WRITE16_MEMBER( k053936_device::linectrl_w )
+void k053936_device::linectrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_linectrl[offset]);
 }
 
-READ16_MEMBER( k053936_device::linectrl_r )
+uint16_t k053936_device::linectrl_r(offs_t offset)
 {
 	return m_linectrl[offset];
 }
@@ -589,7 +589,7 @@ static inline void K053936GP_copyroz32clip( running_machine &machine,
 
 	// adjust entry points and other loop constants
 	dst_pitch = dst_bitmap.rowpixels();
-	dst_base = &dst_bitmap.pix32(0);
+	dst_base = &dst_bitmap.pix(0);
 	dst_base2 = sy * dst_pitch + sx + tx;
 	ecx = tx = -tx;
 
@@ -598,7 +598,7 @@ static inline void K053936GP_copyroz32clip( running_machine &machine,
 	cmask = colormask[tilebpp];
 
 	src_pitch = src_bitmap.rowpixels();
-	src_base = &src_bitmap.pix16(0);
+	src_base = &src_bitmap.pix(0);
 	src_size = src_bitmap.width() * src_bitmap.height();
 	dst_size = dst_bitmap.width() * dst_bitmap.height();
 	dst_ptr = 0;//dst_base;

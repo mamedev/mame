@@ -48,13 +48,13 @@ protected:
 
 private:
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi);
-	DECLARE_WRITE8_MEMBER(port_a0_w);
-	DECLARE_WRITE8_MEMBER(port_c0_w);
-	template<int C> DECLARE_WRITE8_MEMBER(palette_w);
-	DECLARE_READ8_MEMBER(kbd_bus_r);
-	DECLARE_READ8_MEMBER(kbd_p1_r);
-	DECLARE_WRITE8_MEMBER(kbd_p1_w);
-	DECLARE_WRITE8_MEMBER(kbd_p2_w);
+	void port_a0_w(uint8_t data);
+	void port_c0_w(uint8_t data);
+	template<int C> void palette_w(uint8_t data);
+	uint8_t kbd_bus_r();
+	uint8_t kbd_p1_r();
+	void kbd_p1_w(uint8_t data);
+	void kbd_p2_w(uint8_t data);
 
 	void palette_init(palette_device &palette);
 
@@ -110,24 +110,24 @@ void mupid2_state::kbdcpu_mem(address_map &map)
 INPUT_PORTS_START( mupid2 )
 INPUT_PORTS_END
 
-READ8_MEMBER(mupid2_state::kbd_bus_r)
+uint8_t mupid2_state::kbd_bus_r()
 {
 //  logerror("kbd_bus_r\n");
 	return 0xff;
 }
 
-READ8_MEMBER(mupid2_state::kbd_p1_r)
+uint8_t mupid2_state::kbd_p1_r()
 {
 //  logerror("kbd_p1_r\n");
 	return 0xff;
 }
 
-WRITE8_MEMBER(mupid2_state::kbd_p1_w)
+void mupid2_state::kbd_p1_w(uint8_t data)
 {
 //  logerror("kbd_p1_w: %02x\n", data);
 }
 
-WRITE8_MEMBER(mupid2_state::kbd_p2_w)
+void mupid2_state::kbd_p2_w(uint8_t data)
 {
 //  logerror("kbd_p2_w: %02x\n", data);
 }
@@ -150,7 +150,7 @@ void mupid2_state::palette_init(palette_device &palette)
 }
 
 template<int C>
-WRITE8_MEMBER(mupid2_state::palette_w)
+void mupid2_state::palette_w(uint8_t data)
 {
 	int i = data & 0x0f;
 	m_color_ram[i][C] = data >> 4;
@@ -190,7 +190,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mupid2_state::nmi)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-WRITE8_MEMBER(mupid2_state::port_a0_w)
+void mupid2_state::port_a0_w(uint8_t data)
 {
 	logerror("port_a0_w: %02x\n", data);
 
@@ -204,7 +204,7 @@ WRITE8_MEMBER(mupid2_state::port_a0_w)
 	// -------0  unknown
 }
 
-WRITE8_MEMBER(mupid2_state::port_c0_w)
+void mupid2_state::port_c0_w(uint8_t data)
 {
 	logerror("port_c0_w: %02x\n", data);
 

@@ -400,7 +400,7 @@ void cdp1869_device::device_start()
 	m_bkg = 0;
 
 	// create sound stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
+	m_stream = stream_alloc(0, 1, SAMPLE_RATE_OUTPUT_ADAPTIVE);
 
 	// initialize other
 	m_tonediv = 0;
@@ -510,36 +510,33 @@ void cdp1869_device::cdp1869_palette(palette_device &palette) const
 //  our sound stream
 //-------------------------------------------------
 
-void cdp1869_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void cdp1869_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	// reset the output stream
-	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
-
-	int16_t signal = m_signal;
-	stream_sample_t *buffer = outputs[0];
+	stream_buffer::sample_t signal = m_signal;
+	auto &buffer = outputs[0];
 
 	if (!m_toneoff && m_toneamp)
 	{
 		double frequency = (clock() / 2) / (512 >> m_tonefreq) / (m_tonediv + 1);
 //      double amplitude = m_toneamp * ((0.78*5) / 15);
 
-		int rate = machine().sample_rate() / 2;
+		int rate = buffer.sample_rate() / 2;
 
 		/* get progress through wave */
 		int incr = m_incr;
 
 		if (signal < 0)
 		{
-			signal = -(m_toneamp * (0x07fff / 15));
+			signal = -(stream_buffer::sample_t(m_toneamp) / 15.0);
 		}
 		else
 		{
-			signal = m_toneamp * (0x07fff / 15);
+			signal = stream_buffer::sample_t(m_toneamp) / 15.0;
 		}
 
-		while( samples-- > 0 )
+		for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
 		{
-			*buffer++ = signal;
+			buffer.put(sampindex, signal);
 			incr -= frequency;
 			while( incr < 0 )
 			{
@@ -552,6 +549,8 @@ void cdp1869_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		m_incr = incr;
 		m_signal = signal;
 	}
+	else
+		buffer.fill(0);
 /*
     if (!m_wnoff)
     {
@@ -575,29 +574,28 @@ void cdp1869_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 void cdp1869_device::draw_line(bitmap_rgb32 &bitmap, const rectangle &rect, int x, int y, uint8_t data, int color)
 {
-	int i;
-	pen_t fg = m_palette->pen(color);
+	pen_t const fg = m_palette->pen(color);
 
 	data <<= 2;
 
-	for (i = 0; i < CH_WIDTH; i++)
+	for (int i = 0; i < CH_WIDTH; i++)
 	{
 		if (data & 0x80)
 		{
-			bitmap.pix32(y, x) = fg;
+			bitmap.pix(y, x) = fg;
 
 			if (!m_fresvert)
 			{
-				bitmap.pix32(y + 1, x) = fg;
+				bitmap.pix(y + 1, x) = fg;
 			}
 
 			if (!m_freshorz)
 			{
-				bitmap.pix32(y, x + 1) = fg;
+				bitmap.pix(y, x + 1) = fg;
 
 				if (!m_fresvert)
 				{
-					bitmap.pix32(y + 1, x + 1) = fg;
+					bitmap.pix(y + 1, x + 1) = fg;
 				}
 			}
 		}

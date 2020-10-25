@@ -52,19 +52,19 @@ TODO:
 
 ***************************************************************************/
 
-WRITE8_MEMBER(exzisus_state::cpua_bankswitch_w)
+void exzisus_state::cpua_bankswitch_w(uint8_t data)
 {
 	membank("cpuabank")->set_entry(data & 0x0f);
 	flip_screen_set(data & 0x40);
 }
 
-WRITE8_MEMBER(exzisus_state::cpub_bankswitch_w)
+void exzisus_state::cpub_bankswitch_w(uint8_t data)
 {
 	membank("cpubbank")->set_entry(data & 0x0f);
 	flip_screen_set(data & 0x40);
 }
 
-WRITE8_MEMBER(exzisus_state::coincounter_w)
+void exzisus_state::coincounter_w(uint8_t data)
 {
 	machine().bookkeeping().coin_lockout_w(0,~data & 0x01);
 	machine().bookkeeping().coin_lockout_w(1,~data & 0x02);
@@ -73,7 +73,7 @@ WRITE8_MEMBER(exzisus_state::coincounter_w)
 }
 
 // is it ok that cpub_reset refers to cpuc?
-WRITE8_MEMBER(exzisus_state::cpub_reset_w)
+void exzisus_state::cpub_reset_w(uint8_t data)
 {
 	m_cpuc->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }

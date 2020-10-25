@@ -172,7 +172,7 @@ void lynx_sound_device::init()
 
 void lynx_sound_device::device_start()
 {
-	m_mixer_channel = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
+	m_mixer_channel = stream_alloc(0, 1, machine().sample_rate());
 	m_usec_per_sample = 1000000 / machine().sample_rate();
 	m_timer_delegate.resolve();
 	init();
@@ -182,7 +182,7 @@ void lynx_sound_device::device_start()
 
 void lynx2_sound_device::device_start()
 {
-	m_mixer_channel = machine().sound().stream_alloc(*this, 0, 2, machine().sample_rate());
+	m_mixer_channel = stream_alloc(0, 2, machine().sample_rate());
 	m_usec_per_sample = 1000000 / machine().sample_rate();
 	m_timer_delegate.resolve();
 	init();
@@ -470,20 +470,21 @@ void lynx_sound_device::write(offs_t offset, uint8_t data)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void lynx_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void lynx_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	int v;
-	stream_sample_t *buffer = outputs[0];
+	auto &buffer = outputs[0];
 
-	for (int i = 0; i < samples; i++, buffer++)
+	for (int i = 0; i < buffer.samples(); i++)
 	{
-		*buffer = 0;
+		s32 result = 0;
 		for (int channel = 0; channel < LYNX_AUDIO_CHANNELS; channel++)
 		{
 			execute(channel);
 			v = m_audio[channel].reg.output;
-			*buffer += v * 15; // where does the *15 come from?
+			result += v * 15; // where does the *15 come from?
 		}
+		buffer.put_int(i, result, 32768);
 	}
 }
 
@@ -491,15 +492,16 @@ void lynx_sound_device::sound_stream_update(sound_stream &stream, stream_sample_
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void lynx2_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void lynx2_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *left=outputs[0], *right=outputs[1];
+	auto &left=outputs[0];
+	auto &right=outputs[1];
 	int v;
 
-	for (int i = 0; i < samples; i++, left++, right++)
+	for (int i = 0; i < left.samples(); i++)
 	{
-		*left = 0;
-		*right= 0;
+		s32 lsum = 0;
+		s32 rsum = 0;
 		for (int channel = 0; channel < LYNX_AUDIO_CHANNELS; channel++)
 		{
 			execute(channel);
@@ -507,17 +509,19 @@ void lynx2_sound_device::sound_stream_update(sound_stream &stream, stream_sample
 			if (!(m_master_enable & (0x10 << channel)))
 			{
 				if (m_attenuation_enable & (0x10 << channel))
-					*left += v * (m_audio[channel].attenuation >> 4);
+					lsum += v * (m_audio[channel].attenuation >> 4);
 				else
-					*left += v * 15;
+					lsum += v * 15;
 			}
 			if (!(m_master_enable & (1 << channel)))
 			{
 				if (m_attenuation_enable & (1 << channel))
-					*right += v * (m_audio[channel].attenuation & 0xf);
+					rsum += v * (m_audio[channel].attenuation & 0xf);
 				else
-					*right += v * 15;
+					rsum += v * 15;
 			}
 		}
+		left.put_int(i, lsum, 32768);
+		right.put_int(i, rsum, 32768);
 	}
 }

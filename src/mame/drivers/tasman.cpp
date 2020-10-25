@@ -70,11 +70,11 @@ private:
 	required_device<palette_device> m_palette;
 
 	optional_shared_ptr<uint32_t> m_vram;
-	DECLARE_READ32_MEMBER(eeprom_r);
-	DECLARE_WRITE8_MEMBER(eeprom_w);
-	DECLARE_WRITE8_MEMBER(kongambl_ff_w);
-	DECLARE_READ32_MEMBER(test_r);
-	// DECLARE_READ32_MEMBER(rng_r);
+	uint32_t eeprom_r(offs_t offset, uint32_t mem_mask = ~0);
+	void eeprom_w(offs_t offset, uint8_t data);
+	void kongambl_ff_w(uint8_t data);
+	uint32_t test_r();
+	// uint32_t rng_r();
 
 	DECLARE_VIDEO_START(kongambl);
 	uint8_t m_irq_mask;
@@ -154,7 +154,7 @@ uint32_t kongambl_state::screen_update_kongambl(screen_device &screen, bitmap_in
 	return 0;
 }
 
-READ32_MEMBER(kongambl_state::eeprom_r)
+uint32_t kongambl_state::eeprom_r(offs_t offset, uint32_t mem_mask)
 {
 	//return machine().rand();
 	uint32_t retval = 0;
@@ -176,7 +176,7 @@ READ32_MEMBER(kongambl_state::eeprom_r)
 
 	return retval;
 }
-WRITE8_MEMBER(kongambl_state::eeprom_w)
+void kongambl_state::eeprom_w(offs_t offset, uint8_t data)
 {
 	// offset == 3 seems mux writes (active low)
 
@@ -193,19 +193,19 @@ WRITE8_MEMBER(kongambl_state::eeprom_w)
 		m_irq_mask = data;
 }
 
-READ32_MEMBER(kongambl_state::test_r)
+uint32_t kongambl_state::test_r()
 {
 	return -1;//machine().rand();
 }
 
 /*
- READ32_MEMBER(kongambl_state::rng_r)
+ uint32_t kongambl_state::rng_r()
 {
     return machine().rand();
 }
 */
 
-WRITE8_MEMBER(kongambl_state::kongambl_ff_w)
+void kongambl_state::kongambl_ff_w(uint8_t data)
 {
 	/* enables thru 0->1 */
 	/* ---- x--- (related to OBJ ROM) */

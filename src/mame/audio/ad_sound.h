@@ -5,8 +5,8 @@
 //    Functions to emulate the Alpha Denshi "59MC07" audio board
 //****************************************************************************
 
-#ifndef MAME_AUDIO_AD_SOUND_BOARDS_H
-#define MAME_AUDIO_AD_SOUND_BOARDS_H
+#ifndef MAME_AUDIO_AD_SOUND_H
+#define MAME_AUDIO_AD_SOUND_H
 
 #pragma once
 
@@ -128,4 +128,4 @@ private:
 	INTERRUPT_GEN_MEMBER(sound_irq) { m_audiocpu->set_input_line(0, HOLD_LINE); }
 };
 
-#endif // MAME_AUDIO_AD_SOUND_BOARDS_H
+#endif // MAME_AUDIO_AD_SOUND_H

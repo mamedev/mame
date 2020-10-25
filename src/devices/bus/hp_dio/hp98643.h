@@ -55,16 +55,16 @@ private:
 	void update_int();
 	int get_irq_line();
 
-	READ16_MEMBER(sc_r);
-	WRITE16_MEMBER(sc_w);
-	READ16_MEMBER(id_r);
-	WRITE16_MEMBER(id_w);
-	READ16_MEMBER(novram_r);
-	WRITE16_MEMBER(novram_w);
+	uint16_t sc_r();
+	void sc_w(uint16_t data);
+	uint16_t id_r();
+	void id_w(uint16_t data);
+	uint16_t novram_r(offs_t offset);
+	void novram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	DECLARE_WRITE_LINE_MEMBER(lance_int_w);
-	DECLARE_WRITE16_MEMBER(lance_dma_out);
-	DECLARE_READ16_MEMBER(lance_dma_in);
+	void lance_dma_out(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t lance_dma_in(offs_t offset);
 
 	uint16_t m_novram[32] = {
 		0xfff0, 0xfff0, 0xfff0, 0xfff0,

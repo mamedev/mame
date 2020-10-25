@@ -28,14 +28,14 @@ public:
 	void tunhunt(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_READ8_MEMBER(button_r);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_READ8_MEMBER(dsw2_0r);
-	DECLARE_READ8_MEMBER(dsw2_1r);
-	DECLARE_READ8_MEMBER(dsw2_2r);
-	DECLARE_READ8_MEMBER(dsw2_3r);
-	DECLARE_READ8_MEMBER(dsw2_4r);
+	void control_w(uint8_t data);
+	uint8_t button_r(offs_t offset);
+	void videoram_w(offs_t offset, uint8_t data);
+	uint8_t dsw2_0r();
+	uint8_t dsw2_1r();
+	uint8_t dsw2_2r();
+	uint8_t dsw2_3r();
+	uint8_t dsw2_4r();
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 

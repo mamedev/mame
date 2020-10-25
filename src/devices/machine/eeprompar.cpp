@@ -140,7 +140,7 @@ void eeprom_parallel_28xx_device::device_reset()
 //  read/write - read/write handlers
 //-------------------------------------------------
 
-WRITE8_MEMBER(eeprom_parallel_28xx_device::write)
+void eeprom_parallel_28xx_device::write(offs_t offset, uint8_t data)
 {
 	if (m_oe == 0)
 	{
@@ -157,7 +157,7 @@ WRITE8_MEMBER(eeprom_parallel_28xx_device::write)
 	}
 }
 
-READ8_MEMBER(eeprom_parallel_28xx_device::read)
+uint8_t eeprom_parallel_28xx_device::read(address_space &space, offs_t offset)
 {
 	if (m_oe == 1)
 	{
@@ -192,9 +192,9 @@ WRITE_LINE_MEMBER(eeprom_parallel_28xx_device::oe_w)
 //  /OE line through external flip-flop
 //-------------------------------------------------
 
-WRITE8_MEMBER(eeprom_parallel_28xx_device::unlock_write8) { oe_w(1); }
-WRITE16_MEMBER(eeprom_parallel_28xx_device::unlock_write16) { oe_w(1); }
-WRITE32_MEMBER(eeprom_parallel_28xx_device::unlock_write32) { oe_w(1); }
+void eeprom_parallel_28xx_device::unlock_write8(uint8_t data) { oe_w(1); }
+void eeprom_parallel_28xx_device::unlock_write16(uint16_t data) { oe_w(1); }
+void eeprom_parallel_28xx_device::unlock_write32(uint32_t data) { oe_w(1); }
 
 
 //**************************************************************************

@@ -205,25 +205,25 @@ static const uint32_t mtc0_writemask[]=
 	0x00000000  /* PRID */
 };
 
-READ32_MEMBER( psxcpu_device::berr_r )
+uint32_t psxcpu_device::berr_r()
 {
 	if( !machine().side_effects_disabled() )
 		m_berr = 1;
 	return 0;
 }
 
-WRITE32_MEMBER( psxcpu_device::berr_w )
+void psxcpu_device::berr_w(uint32_t data)
 {
 	if( !machine().side_effects_disabled() )
 		m_berr = 1;
 }
 
-READ32_MEMBER( psxcpu_device::exp_base_r )
+uint32_t psxcpu_device::exp_base_r()
 {
 	return m_exp_base;
 }
 
-WRITE32_MEMBER( psxcpu_device::exp_base_w )
+void psxcpu_device::exp_base_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA( &m_exp_base ); // TODO: check byte writes
 
@@ -235,24 +235,24 @@ uint32_t psxcpu_device::exp_base()
 	return m_exp_base;
 }
 
-READ32_MEMBER( psxcpu_device::exp_config_r )
+uint32_t psxcpu_device::exp_config_r()
 {
 	return m_exp_config;
 }
 
-WRITE32_MEMBER( psxcpu_device::exp_config_w )
+void psxcpu_device::exp_config_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA( &m_exp_config ); // TODO: check byte writes
 
 	m_exp_config &= 0xaf1fffff;
 }
 
-READ32_MEMBER( psxcpu_device::ram_config_r )
+uint32_t psxcpu_device::ram_config_r()
 {
 	return m_ram_config;
 }
 
-WRITE32_MEMBER( psxcpu_device::ram_config_w )
+void psxcpu_device::ram_config_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old = m_ram_config;
 
@@ -264,12 +264,12 @@ WRITE32_MEMBER( psxcpu_device::ram_config_w )
 	}
 }
 
-READ32_MEMBER( psxcpu_device::rom_config_r )
+uint32_t psxcpu_device::rom_config_r()
 {
 	return m_rom_config;
 }
 
-WRITE32_MEMBER( psxcpu_device::rom_config_w )
+void psxcpu_device::rom_config_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old = m_rom_config;
 
@@ -281,24 +281,24 @@ WRITE32_MEMBER( psxcpu_device::rom_config_w )
 	}
 }
 
-READ32_MEMBER( psxcpu_device::com_delay_r )
+uint32_t psxcpu_device::com_delay_r(offs_t offset, uint32_t mem_mask)
 {
 	//verboselog( p_psx, 1, "psx_com_delay_r( %08x )\n", mem_mask );
 	return m_com_delay;
 }
 
-WRITE32_MEMBER( psxcpu_device::com_delay_w )
+void psxcpu_device::com_delay_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA( &m_com_delay ); // TODO: check byte writes
 	//verboselog( p_psx, 1, "psx_com_delay_w( %08x %08x )\n", data, mem_mask );
 }
 
-READ32_MEMBER( psxcpu_device::biu_r )
+uint32_t psxcpu_device::biu_r()
 {
 	return m_biu;
 }
 
-WRITE32_MEMBER( psxcpu_device::biu_w )
+void psxcpu_device::biu_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old = m_biu;
 
@@ -386,7 +386,7 @@ uint8_t psxcpu_device::readbyte( uint32_t address )
 {
 	if( m_bus_attached )
 	{
-		return m_program->read_byte( address );
+		return m_data.read_byte( address );
 	}
 
 	return cache_readword( address ) >> ( ( address & 3 ) * 8 );
@@ -396,7 +396,7 @@ uint16_t psxcpu_device::readhalf( uint32_t address )
 {
 	if( m_bus_attached )
 	{
-		return m_program->read_word( address );
+		return m_data.read_word( address );
 	}
 
 	return cache_readword( address ) >> ( ( address & 2 ) * 8 );
@@ -406,7 +406,7 @@ uint32_t psxcpu_device::readword( uint32_t address )
 {
 	if( m_bus_attached )
 	{
-		return m_program->read_dword( address );
+		return m_data.read_dword( address );
 	}
 
 	return cache_readword( address );
@@ -416,7 +416,7 @@ uint32_t psxcpu_device::readword_masked( uint32_t address, uint32_t mask )
 {
 	if( m_bus_attached )
 	{
-		return m_program->read_dword( address, mask );
+		return m_data.read_dword( address, mask );
 	}
 
 	return cache_readword( address );
@@ -426,7 +426,7 @@ void psxcpu_device::writeword( uint32_t address, uint32_t data )
 {
 	if( m_bus_attached )
 	{
-		m_program->write_dword( address, data );
+		m_data.write_dword( address, data );
 	}
 	else
 	{
@@ -438,7 +438,7 @@ void psxcpu_device::writeword_masked( uint32_t address, uint32_t data, uint32_t 
 {
 	if( m_bus_attached )
 	{
-		m_program->write_dword( address, data, mask );
+		m_data.write_dword( address, data, mask );
 	}
 	else
 	{
@@ -1338,11 +1338,11 @@ void psxcpu_device::update_scratchpad()
 {
 	if( ( m_biu & BIU_RAM ) == 0 )
 	{
-		m_program->install_readwrite_handler( 0x1f800000, 0x1f8003ff, read32_delegate(*this, FUNC(psxcpu_device::berr_r)), write32_delegate(*this, FUNC(psxcpu_device::berr_w)) );
+		m_program->install_readwrite_handler( 0x1f800000, 0x1f8003ff, read32smo_delegate(*this, FUNC(psxcpu_device::berr_r)), write32smo_delegate(*this, FUNC(psxcpu_device::berr_w)) );
 	}
 	else if( ( m_biu & BIU_DS ) == 0 )
 	{
-		m_program->install_read_handler( 0x1f800000, 0x1f8003ff, read32_delegate(*this, FUNC(psxcpu_device::berr_r)) );
+		m_program->install_read_handler( 0x1f800000, 0x1f8003ff, read32smo_delegate(*this, FUNC(psxcpu_device::berr_r)) );
 		m_program->nop_write( 0x1f800000, 0x1f8003ff );
 	}
 	else
@@ -1397,9 +1397,9 @@ void psxcpu_device::update_ram_config()
 		}
 	}
 
-	m_program->install_readwrite_handler( 0x00000000 + window_size, 0x1effffff, read32_delegate(*this, FUNC(psxcpu_device::berr_r)), write32_delegate(*this, FUNC(psxcpu_device::berr_w)) );
-	m_program->install_readwrite_handler( 0x80000000 + window_size, 0x9effffff, read32_delegate(*this, FUNC(psxcpu_device::berr_r)), write32_delegate(*this, FUNC(psxcpu_device::berr_w)) );
-	m_program->install_readwrite_handler( 0xa0000000 + window_size, 0xbeffffff, read32_delegate(*this, FUNC(psxcpu_device::berr_r)), write32_delegate(*this, FUNC(psxcpu_device::berr_w)) );
+	m_program->install_readwrite_handler( 0x00000000 + window_size, 0x1effffff, read32smo_delegate(*this, FUNC(psxcpu_device::berr_r)), write32smo_delegate(*this, FUNC(psxcpu_device::berr_w)) );
+	m_program->install_readwrite_handler( 0x80000000 + window_size, 0x9effffff, read32smo_delegate(*this, FUNC(psxcpu_device::berr_r)), write32smo_delegate(*this, FUNC(psxcpu_device::berr_w)) );
+	m_program->install_readwrite_handler( 0xa0000000 + window_size, 0xbeffffff, read32smo_delegate(*this, FUNC(psxcpu_device::berr_r)), write32smo_delegate(*this, FUNC(psxcpu_device::berr_w)) );
 }
 
 void psxcpu_device::update_rom_config()
@@ -1434,9 +1434,9 @@ void psxcpu_device::update_rom_config()
 
 	if( window_size < max_window_size && !m_disable_rom_berr)
 	{
-		m_program->install_readwrite_handler( 0x1fc00000 + window_size, 0x1fffffff, read32_delegate(*this, FUNC(psxcpu_device::berr_r)), write32_delegate(*this, FUNC(psxcpu_device::berr_w)) );
-		m_program->install_readwrite_handler( 0x9fc00000 + window_size, 0x9fffffff, read32_delegate(*this, FUNC(psxcpu_device::berr_r)), write32_delegate(*this, FUNC(psxcpu_device::berr_w)) );
-		m_program->install_readwrite_handler( 0xbfc00000 + window_size, 0xbfffffff, read32_delegate(*this, FUNC(psxcpu_device::berr_r)), write32_delegate(*this, FUNC(psxcpu_device::berr_w)) );
+		m_program->install_readwrite_handler( 0x1fc00000 + window_size, 0x1fffffff, read32smo_delegate(*this, FUNC(psxcpu_device::berr_r)), write32smo_delegate(*this, FUNC(psxcpu_device::berr_w)) );
+		m_program->install_readwrite_handler( 0x9fc00000 + window_size, 0x9fffffff, read32smo_delegate(*this, FUNC(psxcpu_device::berr_r)), write32smo_delegate(*this, FUNC(psxcpu_device::berr_w)) );
+		m_program->install_readwrite_handler( 0xbfc00000 + window_size, 0xbfffffff, read32smo_delegate(*this, FUNC(psxcpu_device::berr_r)), write32smo_delegate(*this, FUNC(psxcpu_device::berr_w)) );
 	}
 }
 
@@ -1462,7 +1462,7 @@ void psxcpu_device::update_cop0(int reg)
 			//if (ip & CAUSE_IP5) debugger_interrupt_hook(PSXCPU_IRQ3);
 			//if (ip & CAUSE_IP6) debugger_interrupt_hook(PSXCPU_IRQ4);
 			//if (ip & CAUSE_IP7) debugger_interrupt_hook(PSXCPU_IRQ5);
-			m_op = m_cache->read_dword(m_pc);
+			m_op = m_instruction.read_dword(m_pc);
 			execute_unstoppable_instructions(1);
 			exception(EXC_INT);
 		}
@@ -1490,11 +1490,11 @@ void psxcpu_device::fetch_next_op()
 	{
 		uint32_t safepc = m_delayv & ~m_bad_word_address_mask;
 
-		m_op = m_cache->read_dword( safepc );
+		m_op = m_instruction.read_dword( safepc );
 	}
 	else
 	{
-		m_op = m_cache->read_dword( m_pc + 4 );
+		m_op = m_instruction.read_dword( m_pc + 4 );
 	}
 }
 
@@ -1837,7 +1837,8 @@ void psxcpu_device::device_start()
 {
 	// get our address spaces
 	m_program = &space( AS_PROGRAM );
-	m_cache = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
+	m_program->cache(m_instruction);
+	m_program->specific(m_data);
 
 	save_item( NAME( m_op ) );
 	save_item( NAME( m_pc ) );
@@ -2349,7 +2350,7 @@ void psxcpu_device::execute_run()
 		}
 		else
 		{
-			m_op = m_cache->read_dword(m_pc);
+			m_op = m_instruction.read_dword(m_pc);
 
 			if( m_berr )
 			{
@@ -3400,34 +3401,34 @@ void psxcpu_device::setcp3cr( int reg, uint32_t value )
 {
 }
 
-READ32_MEMBER( psxcpu_device::gpu_r )
+uint32_t psxcpu_device::gpu_r(offs_t offset, uint32_t mem_mask)
 {
-	return m_gpu_read_handler( space, offset, mem_mask );
+	return m_gpu_read_handler( offset, mem_mask );
 }
 
-WRITE32_MEMBER( psxcpu_device::gpu_w )
+void psxcpu_device::gpu_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	m_gpu_write_handler( space, offset, data, mem_mask );
+	m_gpu_write_handler( offset, data, mem_mask );
 }
 
-READ16_MEMBER( psxcpu_device::spu_r )
+uint16_t psxcpu_device::spu_r(offs_t offset, uint16_t mem_mask)
 {
-	return m_spu_read_handler( space, offset, mem_mask );
+	return m_spu_read_handler( offset, mem_mask );
 }
 
-WRITE16_MEMBER( psxcpu_device::spu_w )
+void psxcpu_device::spu_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_spu_write_handler( space, offset, data, mem_mask );
+	m_spu_write_handler( offset, data, mem_mask );
 }
 
-READ8_MEMBER( psxcpu_device::cd_r )
+uint8_t psxcpu_device::cd_r(offs_t offset, uint8_t mem_mask)
 {
-	return m_cd_read_handler( space, offset, mem_mask );
+	return m_cd_read_handler( offset, mem_mask );
 }
 
-WRITE8_MEMBER( psxcpu_device::cd_w )
+void psxcpu_device::cd_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
-	m_cd_write_handler( space, offset, data, mem_mask );
+	m_cd_write_handler( offset, data, mem_mask );
 }
 
 void psxcpu_device::set_disable_rom_berr(bool mode)

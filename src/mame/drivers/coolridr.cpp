@@ -378,22 +378,22 @@ public:
 	uint32_t get_20bit_data(uint32_t romoffset, int _20bitwordnum);
 	uint16_t get_10bit_data(uint32_t romoffset, int _10bitwordnum);
 
-	DECLARE_READ32_MEMBER(sound_dma_r);
-	DECLARE_WRITE32_MEMBER(sound_dma_w);
-	DECLARE_READ32_MEMBER(unk_blit_r);
-	DECLARE_WRITE32_MEMBER(unk_blit_w);
-	DECLARE_WRITE32_MEMBER(blit_mode_w);
-	DECLARE_WRITE32_MEMBER(blit_data_w);
-	DECLARE_WRITE32_MEMBER(fb_mode_w);
-	DECLARE_WRITE32_MEMBER(fb_data_w);
+	uint32_t sound_dma_r(offs_t offset);
+	void sound_dma_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t unk_blit_r(offs_t offset);
+	void unk_blit_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void blit_mode_w(uint32_t data);
+	void blit_data_w(address_space &space, uint32_t data);
+	void fb_mode_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void fb_data_w(offs_t offset, uint32_t data);
 
-	DECLARE_WRITE32_MEMBER(dma_w);
-	template<int Chip> DECLARE_READ16_MEMBER(soundram_r);
-	template<int Chip> DECLARE_WRITE16_MEMBER(soundram_w);
-	DECLARE_WRITE8_MEMBER(lamps_w);
+	void dma_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	template<int Chip> uint16_t soundram_r(offs_t offset);
+	template<int Chip> void soundram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void lamps_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(scsp1_to_sh1_irq);
 	DECLARE_WRITE_LINE_MEMBER(scsp2_to_sh1_irq);
-	DECLARE_WRITE8_MEMBER(sound_to_sh1_w);
+	void sound_to_sh1_w(uint8_t data);
 	void init_coolridr();
 	void init_aquastge();
 	virtual void machine_start() override;
@@ -414,7 +414,7 @@ public:
 	void blit_current_sprite(address_space &space);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_main);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_sub);
-	DECLARE_WRITE8_MEMBER(scsp_irq);
+	void scsp_irq(offs_t offset, uint8_t data);
 
 	void dma_transfer( address_space &space, uint16_t dma_index );
 
@@ -663,17 +663,17 @@ do {                                                                            
 			/* iterate over pixels in Y */                                          \
 			for (cury = desty; cury <= destendy; cury++)                            \
 			{                                                                       \
-				PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, destx);          \
-				const uint8_t *srcptr = srcdata;                                      \
+				PIXEL_TYPE *destptr = &dest.pix(cury, destx);                       \
+				const uint8_t *srcptr = srcdata;                                    \
 				srcdata += dy;                                                      \
 																					\
 				/* iterate over unrolled blocks of 4 */                             \
 				for (curx = 0; curx < numblocks; curx++)                            \
 				{                                                                   \
-					COOL_PIXEL_OP(destptr[0], srcptr[0]);                     \
-					COOL_PIXEL_OP(destptr[1], srcptr[1]);                     \
-					COOL_PIXEL_OP(destptr[2], srcptr[2]);                     \
-					COOL_PIXEL_OP(destptr[3], srcptr[3]);                     \
+					COOL_PIXEL_OP(destptr[0], srcptr[0]);                           \
+					COOL_PIXEL_OP(destptr[1], srcptr[1]);                           \
+					COOL_PIXEL_OP(destptr[2], srcptr[2]);                           \
+					COOL_PIXEL_OP(destptr[3], srcptr[3]);                           \
 																					\
 					srcptr += 4;                                                    \
 					destptr += 4;                                                   \
@@ -682,7 +682,7 @@ do {                                                                            
 				/* iterate over leftover pixels */                                  \
 				for (curx = 0; curx < leftovers; curx++)                            \
 				{                                                                   \
-					COOL_PIXEL_OP(destptr[0], srcptr[0]);                     \
+					COOL_PIXEL_OP(destptr[0], srcptr[0]);                           \
 					srcptr++;                                                       \
 					destptr++;                                                      \
 				}                                                                   \
@@ -695,8 +695,8 @@ do {                                                                            
 			/* iterate over pixels in Y */                                          \
 			for (cury = desty; cury <= destendy; cury++)                            \
 			{                                                                       \
-				PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, destx);          \
-				const uint8_t *srcptr = srcdata;                                      \
+				PIXEL_TYPE *destptr = &dest.pix(cury, destx);                       \
+				const uint8_t *srcptr = srcdata;                                    \
 				srcdata += dy;                                                      \
 																					\
 				/* iterate over unrolled blocks of 4 */                             \
@@ -910,8 +910,8 @@ uint32_t coolridr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		uint16_t* linesrc = &m_screen_bitmap[Screen].pix16(y);
-		uint16_t* linedest = &bitmap.pix16(y);
+		uint16_t const *const linesrc = &m_screen_bitmap[Screen].pix(y);
+		uint16_t *const linedest = &bitmap.pix(y);
 
 		for (int x = cliprect.left(); x<= cliprect.right(); x++)
 		{
@@ -1129,8 +1129,8 @@ uint32_t coolridr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		const int pixelOffsetnextX = ((hPositionTable) + ((h+1)* 16 * hZoomHere)) / 0x40; \
 		if (drawy>clipmaxY) { break; }; \
 		if (drawy<clipminY) { drawy++; continue; }; \
-		line = &drawbitmap->pix16(drawy); \
-		/* zline = &object->zbitmap->pix16(drawy); */ \
+		uint16_t *const line = &drawbitmap->pix(drawy); \
+		/* uint16_t *const zline = &object->zbitmap->pix(drawy); */ \
 		int blockwide = pixelOffsetnextX-pixelOffsetX; \
 		if (pixelOffsetX+blockwide <clipminX) { drawy++; continue; } \
 		if (pixelOffsetX>clipmaxX)  { drawy++; continue; } \
@@ -1167,8 +1167,8 @@ uint32_t coolridr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		int realy = ((y*incy)>>21); \
 		const int drawy = pixelOffsetY+y; \
 		if ((drawy>clipmaxY) || (drawy<clipminY)) continue; \
-		line = &drawbitmap->pix16(drawy); \
-		/* zline = &object->zbitmap->pix16(drawy); */ \
+		uint16_t *const line = &drawbitmap->pix(drawy); \
+		/* uint16_t *const zline = &object->zbitmap->pix(drawy); */ \
 		int drawx = pixelOffsetX; \
 		for (int x = 0; x < blockwide; x++) \
 		{ \
@@ -1185,8 +1185,8 @@ uint32_t coolridr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	{ \
 		const int drawy = pixelOffsetY+realy; \
 		if ((drawy>clipmaxY) || (drawy<clipminY)) continue; \
-		line = &drawbitmap->pix16(drawy); \
-		/* zline = &object->zbitmap->pix16(drawy); */ \
+		uint16_t *const line = &drawbitmap->pix(drawy); \
+		/* uint16_t *const zline = &object->zbitmap->pix(drawy); */ \
 		int drawx = pixelOffsetX; \
 		for (int realx = 0; realx < 16; realx++) \
 		{ \
@@ -1937,9 +1937,6 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 			uint32_t incy = 0x8000000 / vZoom;
 
 			// DEBUG: Draw 16x16 block
-			uint16_t* line;
-			//uint16_t* zline;
-
 
 			if (indirect_zoom_enable)
 			{
@@ -2300,7 +2297,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 }
 
 
-WRITE32_MEMBER(coolridr_state::blit_mode_w)
+void coolridr_state::blit_mode_w(uint32_t data)
 {
 	m_blitterMode = (data & 0x00ff0000) >> 16;
 
@@ -2366,7 +2363,7 @@ WRITE32_MEMBER(coolridr_state::blit_mode_w)
 	{
 		// Could be a full clear of VRAM?
 		for(uint32_t vramAddr = 0x3f40000; vramAddr < 0x3f4ffff; vramAddr+=4)
-			space.write_dword(vramAddr, 0x00000000);
+			m_maincpu->space(AS_PROGRAM).write_dword(vramAddr, 0x00000000);
 
 		m_blitterSerialCount = 0;
 	}
@@ -2386,7 +2383,7 @@ WRITE32_MEMBER(coolridr_state::blit_mode_w)
 	}
 }
 
-WRITE32_MEMBER(coolridr_state::blit_data_w)
+void coolridr_state::blit_data_w(address_space &space, uint32_t data)
 {
 	if (m_blitterMode == 0xf4)
 	{
@@ -2449,7 +2446,7 @@ WRITE32_MEMBER(coolridr_state::blit_data_w)
 	}
 }
 
-WRITE32_MEMBER(coolridr_state::fb_mode_w)
+void coolridr_state::fb_mode_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/*
 	This does the fb display/clear phases of blitter data processed in the previous frame.
@@ -2481,7 +2478,7 @@ WRITE32_MEMBER(coolridr_state::fb_mode_w)
 
 
 
-WRITE32_MEMBER(coolridr_state::fb_data_w)
+void coolridr_state::fb_data_w(offs_t offset, uint32_t data)
 {
 	if(m_blitterClearCount == 0)
 	{
@@ -2615,7 +2612,7 @@ WRITE32_MEMBER(coolridr_state::fb_data_w)
 	m_blitterClearCount++;
 }
 
-READ32_MEMBER(coolridr_state::unk_blit_r)
+uint32_t coolridr_state::unk_blit_r(offs_t offset)
 {
 //  if(offset == 0x0c/4) // TODO
 
@@ -2623,7 +2620,7 @@ READ32_MEMBER(coolridr_state::unk_blit_r)
 }
 
 
-WRITE32_MEMBER(coolridr_state::unk_blit_w)
+void coolridr_state::unk_blit_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_txt_blit[offset]);
 
@@ -2767,7 +2764,7 @@ void coolridr_state::dma_transfer( address_space &space, uint16_t dma_index )
 	}while(!end_dma_mark );
 }
 
-WRITE32_MEMBER(coolridr_state::dma_w)
+void coolridr_state::dma_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_framebuffer_vram[offset]);
 
@@ -2816,19 +2813,19 @@ void coolridr_state::aquastge_h1_map(address_map &map)
 }
 
 template<int Chip>
-READ16_MEMBER( coolridr_state::soundram_r)
+uint16_t coolridr_state::soundram_r(offs_t offset)
 {
 	return m_soundram[Chip][offset];
 }
 
 template<int Chip>
-WRITE16_MEMBER( coolridr_state::soundram_w)
+void coolridr_state::soundram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_soundram[Chip][offset]);
 }
 
 
-WRITE8_MEMBER( coolridr_state::lamps_w )
+void coolridr_state::lamps_w(uint8_t data)
 {
 	/*
 	x--- ---- P2 Music select Lamp
@@ -2842,7 +2839,7 @@ WRITE8_MEMBER( coolridr_state::lamps_w )
 }
 
 
-READ32_MEMBER(coolridr_state::sound_dma_r)
+uint32_t coolridr_state::sound_dma_r(offs_t offset)
 {
 	if(offset == 8)
 	{
@@ -2863,7 +2860,7 @@ READ32_MEMBER(coolridr_state::sound_dma_r)
 	return m_sound_dma[offset];
 }
 
-WRITE32_MEMBER(coolridr_state::sound_dma_w)
+void coolridr_state::sound_dma_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	address_space &main_space = m_maincpu->space(AS_PROGRAM);
 	address_space &sound_space = m_soundcpu->space(AS_PROGRAM);
@@ -2959,7 +2956,7 @@ void coolridr_state::aquastge_submap(address_map &map)
 }
 
 /* TODO: what is this for, volume mixing? MIDI? */
-WRITE8_MEMBER(coolridr_state::sound_to_sh1_w)
+void coolridr_state::sound_to_sh1_w(uint8_t data)
 {
 	m_sound_fifo = data;
 }
@@ -3204,7 +3201,7 @@ void coolridr_state::machine_reset()
 	m_usethreads = m_io_config->read()&1;
 }
 
-WRITE8_MEMBER(coolridr_state::scsp_irq)
+void coolridr_state::scsp_irq(offs_t offset, uint8_t data)
 {
 	m_soundcpu->set_input_line(offset, data);
 }

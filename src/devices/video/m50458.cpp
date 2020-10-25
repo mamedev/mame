@@ -53,12 +53,12 @@ ROM_START( m50458 )
 	ROM_LOAD("m50458_char.bin",  0x0000, 0x1200, BAD_DUMP CRC(011cc342) SHA1(d5b9f32d6e251b4b25945267d7c68c099bd83e96) )
 ROM_END
 
-WRITE16_MEMBER( m50458_device::vreg_120_w)
+void m50458_device::vreg_120_w(uint16_t data)
 {
 //  printf("%04x\n",data);
 }
 
-WRITE16_MEMBER( m50458_device::vreg_121_w)
+void m50458_device::vreg_121_w(uint16_t data)
 {
 	/* Horizontal char size for line 0 */
 	m_hsz1 = (data & 0xc0) >> 6;
@@ -71,7 +71,7 @@ WRITE16_MEMBER( m50458_device::vreg_121_w)
 }
 
 
-WRITE16_MEMBER( m50458_device::vreg_122_w)
+void m50458_device::vreg_122_w(uint16_t data)
 {
 	/* Vertical char size for line 0 */
 	m_vsz1 = (data & 0xc0) >> 6;
@@ -84,7 +84,7 @@ WRITE16_MEMBER( m50458_device::vreg_122_w)
 
 }
 
-WRITE16_MEMBER( m50458_device::vreg_123_w)
+void m50458_device::vreg_123_w(uint16_t data)
 {
 	/* fractional part of vertical scrolling */
 	m_scrf = data & 0x1f;
@@ -97,17 +97,17 @@ WRITE16_MEMBER( m50458_device::vreg_123_w)
 //  printf("%02x %02x %02x\n",m_scrr,m_scrf,m_space);
 }
 
-WRITE16_MEMBER( m50458_device::vreg_124_w)
+void m50458_device::vreg_124_w(uint16_t data)
 {
 }
 
-WRITE16_MEMBER( m50458_device::vreg_125_w)
+void m50458_device::vreg_125_w(uint16_t data)
 {
 	/* blinking cycle */
 	m_blink = data & 4 ? 0x20 : 0x40;
 }
 
-WRITE16_MEMBER( m50458_device::vreg_126_w)
+void m50458_device::vreg_126_w(uint16_t data)
 {
 	/* Raster Color Setting */
 	m_phase = data & 7;
@@ -116,7 +116,7 @@ WRITE16_MEMBER( m50458_device::vreg_126_w)
 }
 
 
-WRITE16_MEMBER( m50458_device::vreg_127_w)
+void m50458_device::vreg_127_w(uint16_t data)
 {
 	if(data & 0x20) // RAMERS, display RAM is erased
 	{
@@ -204,21 +204,19 @@ void m50458_device::device_validity_check(validity_checker &valid) const
 
 void m50458_device::device_start()
 {
-	uint16_t tmp;
-	uint8_t *pcg = memregion("m50458")->base();
-	int tile;
-	int yi;
-	uint16_t src,dst;
+	uint8_t const *const pcg = memregion("m50458")->base();
 
 	/* Create an array for shadow gfx */
 	/* this will spread the source ROM into four directions (up-left, up-right, down-left, down-right) thus creating a working shadow copy */
 	m_shadow_gfx = make_unique_clear<uint8_t[]>(0x1200);
 
-	for(tile=0;tile<0x80;tile++)
+	for(int tile=0;tile<0x80;tile++)
 	{
-		for(yi=1;yi<17;yi++)
+		for(int yi=1;yi<17;yi++)
 		{
-			src = (tile & 0x7f)*36+yi*2; /* source offset */
+			uint16_t tmp, dst;
+
+			uint16_t const src = (tile & 0x7f)*36+yi*2; /* source offset */
 
 			dst = (tile & 0x7f)*36+(yi-1)*2; /* destination offset */
 
@@ -331,40 +329,34 @@ WRITE_LINE_MEMBER( m50458_device::set_clock_line )
 
 uint32_t m50458_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int x,y;
-	uint8_t *pcg = memregion("m50458")->base();
-	uint8_t bg_r,bg_g,bg_b;
+	uint8_t const *const pcg = memregion("m50458")->base();
 
 	/* TODO: there's probably a way to control the brightness in this */
-	bg_r = m_phase & 1 ? 0xdf : 0;
-	bg_g = m_phase & 2 ? 0xdf : 0;
-	bg_b = m_phase & 4 ? 0xdf : 0;
+	uint8_t const bg_r = m_phase & 1 ? 0xdf : 0;
+	uint8_t const bg_g = m_phase & 2 ? 0xdf : 0;
+	uint8_t const bg_b = m_phase & 4 ? 0xdf : 0;
 	bitmap.fill(rgb_t(0xff,bg_r,bg_g,bg_b),cliprect);
 
-	for(y=0;y<12;y++)
+	for(int y=0;y<12;y++)
 	{
-		for(x=0;x<24;x++)
+		for(int x=0;x<24;x++)
 		{
-			int xi,yi;
-			uint16_t tile;
 			int y_base = y;
 
 			if(y != 0 && m_scrr > 1) { y_base+=(m_scrr - 1); }
 			if(y_base > 11)          { y_base -= 11; }
 			if(m_scrr && y == 11)    { y_base = 0; } /* Guess: repeat line 0 if scrolling is active */
 
-			tile = read_word(x+y_base*24);
+			uint16_t const tile = read_word(x+y_base*24);
 
-			for(yi=0;yi<18;yi++)
+			for(int yi=0;yi<18;yi++)
 			{
-				for(xi=4;xi<16;xi++) /* TODO: remove 4 / 16 / -4 offset once that the ROM is fixed */
+				for(int xi=4;xi<16;xi++) /* TODO: remove 4 / 16 / -4 offset once that the ROM is fixed */
 				{
-					uint8_t pix;
-					uint8_t color = (tile & 0x700) >> 8;
-					uint16_t offset = ((tile & 0x7f)*36+yi*2);
-					int res_y,res_x;
-					uint8_t xh,yh;
+					uint8_t const color = (tile & 0x700) >> 8;
+					uint16_t const offset = ((tile & 0x7f)*36+yi*2);
 
+					uint8_t pix;
 					if(xi>=8)
 						pix = ((pcg[offset+1] >> (7-(xi & 0x7))) & 1) << 1;
 					else
@@ -382,8 +374,8 @@ uint32_t m50458_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 					if(yi == 17 && tile & 0x1000) /* underline? */
 						pix |= 1;
 
-					res_y = y*18+yi;
-					res_x = x*12+(xi-4);
+					int res_y = y*18+yi;
+					int res_x = x*12+(xi-4);
 
 					if(y != 0 && y != 11)
 					{
@@ -419,9 +411,9 @@ uint32_t m50458_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 							if(res_y > 215 || res_x > 288)
 								continue;
 
-							for(yh=0;yh<m_vsz1+1;yh++)
-								for(xh=0;xh<m_hsz1+1;xh++)
-									bitmap.pix32(res_y+yh,res_x+xh) = r << 16 | g << 8 | b;
+							for(uint8_t yh=0;yh<m_vsz1+1;yh++)
+								for(uint8_t xh=0;xh<m_hsz1+1;xh++)
+									bitmap.pix(res_y+yh,res_x+xh) = r << 16 | g << 8 | b;
 						}
 						else if(y_base == 11)
 						{
@@ -432,9 +424,9 @@ uint32_t m50458_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 							if(res_y > 215 || res_x > 288)
 								continue;
 
-							for(yh=0;yh<m_vsz3+1;yh++)
-								for(xh=0;xh<m_hsz3+1;xh++)
-									bitmap.pix32(res_y+yh,res_x+xh) = r << 16 | g << 8 | b;
+							for(uint8_t yh=0;yh<m_vsz3+1;yh++)
+								for(uint8_t xh=0;xh<m_hsz3+1;xh++)
+									bitmap.pix(res_y+yh,res_x+xh) = r << 16 | g << 8 | b;
 						}
 						else
 						{
@@ -444,9 +436,9 @@ uint32_t m50458_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 							if(res_y > 215 || res_x > 288)
 								continue;
 
-							for(yh=0;yh<m_vsz2+1;yh++)
-								for(xh=0;xh<m_hsz2+1;xh++)
-									bitmap.pix32(res_y+yh,res_x+xh) = r << 16 | g << 8 | b;
+							for(uint8_t yh=0;yh<m_vsz2+1;yh++)
+								for(uint8_t xh=0;xh<m_hsz2+1;xh++)
+									bitmap.pix(res_y+yh,res_x+xh) = r << 16 | g << 8 | b;
 						}
 					}
 				}

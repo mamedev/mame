@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include "dirom.h"
 #include "scspdsp.h"
 
 #define SCSP_FM_DELAY    0    // delay in number of slots processed before samples are written to the FM ring buffer
@@ -17,7 +18,7 @@
 
 class scsp_device : public device_t,
 	public device_sound_interface,
-	public device_rom_interface
+	public device_rom_interface<20, 1, 0, ENDIANNESS_BIG>
 {
 public:
 	static constexpr feature_type imperfect_features() { return feature::SOUND; } // DSP / EG incorrections, etc
@@ -28,12 +29,12 @@ public:
 	auto main_irq_cb() { return m_main_irq_cb.bind(); }
 
 	// SCSP register access
-	DECLARE_READ16_MEMBER(read);
-	DECLARE_WRITE16_MEMBER(write);
+	u16 read(offs_t offset);
+	void write(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	// MIDI I/O access (used for comms on Model 2/3)
 	void midi_in(u8 data);
-	DECLARE_READ16_MEMBER(midi_out_r);
+	u16 midi_out_r();
 
 protected:
 	// device-level overrides
@@ -44,7 +45,7 @@ protected:
 	virtual void rom_bank_updated() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 	enum SCSP_STATE { SCSP_ATTACK, SCSP_DECAY1, SCSP_DECAY2, SCSP_RELEASE };
@@ -147,13 +148,6 @@ private:
 
 	SCSPDSP m_DSP;
 
-	stream_sample_t *m_bufferl;
-	stream_sample_t *m_bufferr;
-	stream_sample_t *m_exts0;
-	stream_sample_t *m_exts1;
-
-	int m_length;
-
 	s16 *m_RBUFDST;   //this points to where the sample will be stored in the RingBuf
 
 	//LFO
@@ -186,7 +180,7 @@ private:
 	void w16(u32 addr, u16 val);
 	u16 r16(u32 addr);
 	inline s32 UpdateSlot(SCSP_SLOT *slot);
-	void DoMasterSamples(int nsamples);
+	void DoMasterSamples(std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs);
 
 	//LFO
 	void LFO_Init();

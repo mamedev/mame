@@ -73,8 +73,8 @@ protected:
 	// address spaces
 	address_space_config m_rom_config;
 	address_space_config m_ram_config;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_rom_cache;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_ram_cache;
+	memory_access<10, 0, 0, ENDIANNESS_LITTLE>::cache m_rom_cache;
+	memory_access<11, 0, 0, ENDIANNESS_LITTLE>::cache m_ram_cache;
 
 	// device callbacks
 	devcb_write_line m_baud_9600_callback;

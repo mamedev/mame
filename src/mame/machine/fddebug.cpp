@@ -883,7 +883,7 @@ static void execute_fdeliminate(running_machine &machine, int ref, int params, c
 
 static void execute_fdunlock(running_machine &machine, int ref, int params, const char **param)
 {
-	device_t *cpu = machine.debugger().cpu().get_visible_cpu();
+	device_t *cpu = machine.debugger().console().get_visible_cpu();
 
 	/* support 0 or 1 parameters */
 	uint64_t offset;
@@ -920,7 +920,7 @@ static void execute_fdunlock(running_machine &machine, int ref, int params, cons
 
 static void execute_fdignore(running_machine &machine, int ref, int params, const char **param)
 {
-	device_t *cpu = machine.debugger().cpu().get_visible_cpu();
+	device_t *cpu = machine.debugger().console().get_visible_cpu();
 
 	/* support 0 or 1 parameters */
 	if (params == 1 && strcmp(param[0], "all") == 0)
@@ -944,7 +944,7 @@ static void execute_fdignore(running_machine &machine, int ref, int params, cons
 
 	/* if no parameter given, implicitly run as well */
 	if (params == 0)
-		machine.debugger().cpu().get_visible_cpu()->debug()->go();
+		machine.debugger().console().get_visible_cpu()->debug()->go();
 }
 
 
@@ -1026,7 +1026,7 @@ static void execute_fdstate(running_machine &machine, int ref, int params, const
 
 static void execute_fdpc(running_machine &machine, int ref, int params, const char **param)
 {
-	device_t *cpu = machine.debugger().cpu().get_visible_cpu();
+	device_t *cpu = machine.debugger().console().get_visible_cpu();
 
 	/* support 0 or 1 parameters */
 	uint64_t newpc = 0;
@@ -1048,7 +1048,7 @@ static void execute_fdpc(running_machine &machine, int ref, int params, const ch
 
 static void execute_fdsearch(running_machine &machine, int ref, int params, const char **param)
 {
-	address_space &space = machine->debugger().cpu().get_visible_cpu()->memory().space(AS_PROGRAM);
+	address_space &space = machine->debugger().console().get_visible_cpu()->memory().space(AS_PROGRAM);
 	int pc = space.device().state().pc();
 	int length, first = true;
 	uint8_t instrdata[2];
@@ -1174,7 +1174,7 @@ static void execute_fdsearch(running_machine &machine, int ref, int params, cons
 
 static void execute_fddasm(running_machine &machine, int ref, int params, const char **param)
 {
-	address_space &space = machine->debugger().cpu().get_visible_cpu()->memory().space(AS_PROGRAM);
+	address_space &space = machine->debugger().console().get_visible_cpu()->memory().space(AS_PROGRAM);
 	int origstate = fd1094_set_state(keyregion, -1);
 	const char *filename;
 	int skipped = false;

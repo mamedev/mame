@@ -22,7 +22,7 @@ public:
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	DECLARE_WRITE8_MEMBER(rombank_w);
+	void rombank_w(uint8_t data);
 	virtual void set_mapping(uint8_t type) override;
 
 protected:

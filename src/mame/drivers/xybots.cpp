@@ -49,7 +49,7 @@ void xybots_state::video_int_ack_w(uint16_t data)
  *
  *************************************/
 
-READ16_MEMBER(xybots_state::special_port1_r)
+uint16_t xybots_state::special_port1_r()
 {
 	int result = ioport("FFE200")->read();
 	result ^= m_h256 ^= 0x0400;
@@ -387,7 +387,7 @@ ROM_END
 void xybots_state::init_xybots()
 {
 	m_h256 = 0x0400;
-	slapstic_configure(*m_maincpu, 0x008000, 0, memregion("maincpu")->base() + 0x8000);
+	m_slapstic->legacy_configure(*m_maincpu, 0x008000, 0, memregion("maincpu")->base() + 0x8000);
 }
 
 

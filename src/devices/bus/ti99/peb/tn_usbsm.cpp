@@ -88,7 +88,7 @@ nouspikel_usb_smartmedia_device::nouspikel_usb_smartmedia_device(const machine_c
 /*
     CRU read
 */
-READ8Z_MEMBER(nouspikel_usb_smartmedia_device::crureadz)
+void nouspikel_usb_smartmedia_device::crureadz(offs_t offset, uint8_t *value)
 {
 	if ((offset & 0xff00)==m_cru_base)
 	{
@@ -188,7 +188,7 @@ void nouspikel_usb_smartmedia_device::cruwrite(offs_t offset, uint8_t data)
     Memory read
     TODO: Check whether AMA/B/C is actually checked
 */
-READ8Z_MEMBER(nouspikel_usb_smartmedia_device::readz)
+void nouspikel_usb_smartmedia_device::readz(offs_t offset, uint8_t *value)
 {
 	if (machine().side_effects_disabled()) return;
 

@@ -516,21 +516,19 @@ const tiny_rom_entry *stic_device::device_rom_region() const
 
 void stic_device::intv_set_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color)
 {
-	int w, h;
-
 	// output scaling
 	x *= m_x_scale;
 	y *= m_y_scale;
 	color = SET_COLOR(color);
 
-	for (h = 0; h < m_y_scale; h++)
-		for (w = 0; w < m_x_scale; w++)
-			bitmap.pix16(y + h, x + w) = color;
+	for (int h = 0; h < m_y_scale; h++)
+		for (int w = 0; w < m_x_scale; w++)
+			bitmap.pix(y + h, x + w) = color;
 }
 
 uint32_t stic_device::intv_get_pixel(bitmap_ind16 &bitmap, int x, int y)
 {
-	return GET_COLOR(bitmap.pix16(y * m_y_scale, x * m_x_scale));
+	return GET_COLOR(bitmap.pix(y * m_y_scale, x * m_x_scale));
 }
 
 void stic_device::intv_plot_box(bitmap_ind16 &bitmap, int x, int y, int w, int h, int color)
@@ -1148,7 +1146,7 @@ void stic_device::screenrefresh()
 
 
 
-READ16_MEMBER( stic_device::read )
+uint16_t stic_device::read(offs_t offset)
 {
 	//logerror("%x = stic_r(%x)\n",0,offset);
 	switch (offset)
@@ -1212,7 +1210,7 @@ READ16_MEMBER( stic_device::read )
 	}
 }
 
-WRITE16_MEMBER( stic_device::write )
+void stic_device::write(offs_t offset, uint16_t data)
 {
 	intv_sprite_type *s;
 
@@ -1321,12 +1319,12 @@ WRITE16_MEMBER( stic_device::write )
 }
 
 
-READ16_MEMBER( stic_device::gram_read )
+uint16_t stic_device::gram_read(offs_t offset)
 {
 	return m_gram[offset];
 }
 
-WRITE16_MEMBER( stic_device::gram_write )
+void stic_device::gram_write(offs_t offset, uint16_t data)
 {
 	data &= 0xff;
 	m_gram[offset] = data;

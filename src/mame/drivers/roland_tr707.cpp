@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "audio/mb63h114.h"
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 //#include "bus/midi/midi.h"
@@ -25,6 +26,7 @@ public:
 	roland_tr707_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_mac(*this, "mac")
 		, m_key_switches(*this, "KEY%u", 0U)
 		, m_misc_select(0xff)
 	{
@@ -46,6 +48,7 @@ private:
 	void mem_map(address_map &map);
 
 	required_device<hd6303x_cpu_device> m_maincpu;
+	required_device<mb63h114_device> m_mac;
 	required_ioport_array<4> m_key_switches;
 
 	u8 m_misc_select;
@@ -83,6 +86,7 @@ void roland_tr707_state::accent_level_w(u8 data)
 
 void roland_tr707_state::ga_trigger_w(offs_t offset, u8 data)
 {
+	m_mac->xst_w(offset & 0xff);
 }
 
 void roland_tr707_state::voice_select_w(u8 data)
@@ -161,7 +165,7 @@ void roland_tr707_state::tr707(machine_config &config)
 
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, nullptr, "tr707_cart");
 
-	//RD63H114(config, "muxsound", 1.6_MHz_XTAL);
+	MB63H114(config, m_mac, 1.6_MHz_XTAL);
 }
 
 ROM_START(tr707)

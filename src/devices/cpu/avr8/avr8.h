@@ -3,38 +3,6 @@
 /*
     Atmel 8-bit AVR simulator
 
-    - Notes -
-      Cycle counts are generally considered to be 100% accurate per-instruction, does not support mid-instruction
-      interrupts although no software has been encountered yet that requires it. Evidence of cycle accuracy is given
-      in the form of the demoscene 'wild' demo, Craft, by [lft], which uses an ATmega88 to write video out a 6-bit
-      RGB DAC pixel-by-pixel, synchronously with the frame timing. Intentionally modifying the timing of any of
-      the existing opcodes has been shown to wildly corrupt the video output in Craft, so one can assume that the
-      existing timing is 100% correct.
-
-      Unimplemented opcodes: SPM, SPM Z+, SLEEP, BREAK, WDR, EICALL, JMP, CALL
-
-    - Changelist -
-      23 Dec. 2012 [Sandro Ronco]
-      - Added CPSE, LD Z+, ST -Z/-Y/-X and ICALL opcodes
-      - Fixed Z flag in CPC, SBC and SBCI opcodes
-      - Fixed V and C flags in SBIW opcode
-
-      30 Oct. 2012
-      - Added FMUL, FMULS, FMULSU opcodes [Ryan Holtz]
-      - Fixed incorrect flag calculation in ROR opcode [Ryan Holtz]
-      - Fixed incorrect bit testing in SBIC/SBIS opcodes [Ryan Holtz]
-
-      25 Oct. 2012
-      - Added MULS, ANDI, STI Z+, LD -Z, LD -Y, LD -X, LD Y+q, LD Z+q, SWAP, ASR, ROR and SBIS opcodes [Ryan Holtz]
-      - Corrected cycle counts for LD and ST opcodes [Ryan Holtz]
-      - Moved opcycles init into inner while loop, fixes 2-cycle and 3-cycle opcodes effectively forcing
-        all subsequent 1-cycle opcodes to be 2 or 3 cycles [Ryan Holtz]
-      - Fixed register behavior in MULSU, LD -Z, and LD -Y opcodes [Ryan Holtz]
-
-      18 Oct. 2012
-      - Added OR, SBCI, ORI, ST Y+, ADIQ opcodes [Ryan Holtz]
-      - Fixed COM, NEG, LSR opcodes [Ryan Holtz]
-
 */
 
 #ifndef MAME_CPU_AVR8_AVR8_H

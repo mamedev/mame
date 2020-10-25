@@ -162,7 +162,7 @@ void bbc_multiform_device::fred_w(offs_t offset, uint8_t data)
 	}
 }
 
-READ8_MEMBER(bbc_multiform_device::mem_r)
+uint8_t bbc_multiform_device::mem_r(offs_t offset)
 {
 	uint8_t data;
 
@@ -174,12 +174,12 @@ READ8_MEMBER(bbc_multiform_device::mem_r)
 	return data;
 }
 
-WRITE8_MEMBER(bbc_multiform_device::mem_w)
+void bbc_multiform_device::mem_w(offs_t offset, uint8_t data)
 {
 	m_ram[offset] = data;
 }
 
-WRITE8_MEMBER(bbc_multiform_device::rom_disable_w)
+void bbc_multiform_device::rom_disable_w(uint8_t data)
 {
 	if (!machine().side_effects_disabled())
 		m_rom_enabled = false;

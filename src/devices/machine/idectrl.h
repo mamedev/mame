@@ -46,10 +46,10 @@ public:
 	void write_cs0(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void write_cs1(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER(cs0_r) { return read_cs0(offset, mem_mask); }
-	DECLARE_READ16_MEMBER(cs1_r) { return read_cs1(offset, mem_mask); }
-	DECLARE_WRITE16_MEMBER(cs0_w) { write_cs0(offset, data, mem_mask); }
-	DECLARE_WRITE16_MEMBER(cs1_w) { write_cs1(offset, data, mem_mask); }
+	uint16_t cs0_r(offs_t offset, uint16_t mem_mask = ~0) { return read_cs0(offset, mem_mask); }
+	uint16_t cs1_r(offs_t offset, uint16_t mem_mask = ~0) { return read_cs1(offset, mem_mask); }
+	void cs0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { write_cs0(offset, data, mem_mask); }
+	void cs1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { write_cs1(offset, data, mem_mask); }
 
 protected:
 	ide_controller_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -89,10 +89,10 @@ public:
 	void write_cs0(offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void write_cs1(offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_READ32_MEMBER(cs0_r) { return read_cs0(offset, mem_mask); }
-	DECLARE_READ32_MEMBER(cs1_r) { return read_cs1(offset, mem_mask); }
-	DECLARE_WRITE32_MEMBER(cs0_w) { write_cs0(offset, data, mem_mask); }
-	DECLARE_WRITE32_MEMBER(cs1_w) { write_cs1(offset, data, mem_mask); }
+	uint32_t cs0_r(offs_t offset, uint32_t mem_mask = ~0) { return read_cs0(offset, mem_mask); }
+	uint32_t cs1_r(offs_t offset, uint32_t mem_mask = ~0) { return read_cs1(offset, mem_mask); }
+	void cs0_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) { write_cs0(offset, data, mem_mask); }
+	void cs1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) { write_cs1(offset, data, mem_mask); }
 
 protected:
 	ide_controller_32_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -128,8 +128,8 @@ public:
 		return *this;
 	}
 
-	DECLARE_READ32_MEMBER( bmdma_r );
-	DECLARE_WRITE32_MEMBER( bmdma_w );
+	uint32_t bmdma_r(offs_t offset, uint32_t mem_mask = ~0);
+	void bmdma_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 protected:
 	virtual void device_start() override;

@@ -5,7 +5,7 @@
     The MESS TI-99/8 emulation driver
 
     The TI-99/8 was the envisaged successor to the TI-99/4A but never passed
-    its prototype state. Only a few dozens of consoles were built. The ROMs
+    its prototype state. Only a few dozen consoles were built. The ROMs
     were not even finalized, so the few available consoles have different
     operating system versions and capabilities.
 
@@ -15,7 +15,7 @@
 
     Name: "Texas Instruments Computer TI-99/8" (no "Home")
 
-    Inofficial nickname: "Armadillo"
+    Unofficial nickname: "Armadillo"
 
     CPU: Single-CPU system using a TMS9995, but as a variant named MP9537. This
          variant does not offer on-chip RAM or decrementer.
@@ -81,7 +81,7 @@
     Modes:
          - Compatibility mode (TI-99/4A mode): Memory-mapped devices are
            placed at the same location as found in the TI-99/4A, thereby
-           providing a good downward compatibility.
+           providing good downward compatibility.
            The console starts up in compatibility mode.
          - Native mode (Armadillo mode): Devices are located at positions above
            0xF000 that allow for a contiguous usage of memory.
@@ -94,7 +94,7 @@
     From the 32 bits, 24 bits define the physical address, so this allows for
     a maximum of 16 MiB of mapped-addressable memory.
 
-    See more about the mapper in the file mapper8.c.
+    See more about the mapper in the file 998board.cpp
 
 
     Availability of ROMs and documentation
@@ -164,8 +164,6 @@ Known Issues (MZ, 2019-05-10)
 #include "emu.h"
 #include "cpu/tms9900/tms9995.h"
 
-#include "bus/ti99/ti99defs.h"
-
 #include "sound/sn76496.h"
 #include "machine/tms9901.h"
 #include "machine/tmc0430.h"
@@ -214,7 +212,7 @@ public:
 	ti99_8_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_cpu(*this, "maincpu"),
-		m_tms9901(*this, TI_TMS9901_TAG),
+		m_tms9901(*this, TI998_TMS9901_TAG),
 		m_gromport(*this, TI99_GROMPORT_TAG),
 		m_ioport(*this, TI99_IOPORT_TAG),
 		m_mainboard(*this, TI998_MAINBOARD_TAG),
@@ -734,11 +732,11 @@ void ti99_8_state::ti99_8(machine_config& config)
 	m_ioport->ready_cb().set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::pbox_ready));
 
 	// Hexbus
-	HEXBUS(config, TI_HEXBUS_TAG, 0, hexbus_options, nullptr);
+	HEXBUS(config, TI998_HEXBUS_TAG, 0, hexbus_options, nullptr);
 
 	// Sound hardware
 	SPEAKER(config, "sound_out").front_center();
-	sn76496_device& soundgen(SN76496(config, TI_SOUNDCHIP_TAG, 3579545));
+	sn76496_device& soundgen(SN76496(config, TI998_SOUNDCHIP_TAG, 3579545));
 	soundgen.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::sound_ready));
 	soundgen.add_route(ALL_OUTPUTS, "sound_out", 0.75);
 
@@ -754,7 +752,7 @@ void ti99_8_state::ti99_8(machine_config& config)
 
 	// Cassette drive
 	SPEAKER(config, "cass_out").front_center();
-	CASSETTE(config, "cassette", 0).add_route(ALL_OUTPUTS, "cass_out", 0.25);;
+	CASSETTE(config, "cassette", 0).add_route(ALL_OUTPUTS, "cass_out", 0.25);
 
 	// GROM library
 	using namespace bus::ti99::internal;
@@ -795,7 +793,7 @@ void ti99_8_state::ti99_8_60hz(machine_config &config)
 {
 	ti99_8(config);
 	// Video hardware
-	tms9118_device &video(TMS9118(config, TI_VDP_TAG, XTAL(10'738'635)));
+	tms9118_device &video(TMS9118(config, TI998_VDP_TAG, XTAL(10'738'635)));
 	video.set_vram_size(0x4000);
 	video.int_callback().set(FUNC(ti99_8_state::video_interrupt));
 	video.set_screen("screen");
@@ -810,7 +808,7 @@ void ti99_8_state::ti99_8_50hz(machine_config &config)
 {
 	ti99_8(config);
 	// Video hardware
-	tms9129_device &video(TMS9129(config, TI_VDP_TAG, XTAL(10'738'635)));
+	tms9129_device &video(TMS9129(config, TI998_VDP_TAG, XTAL(10'738'635)));
 	video.set_vram_size(0x4000);
 	video.int_callback().set(FUNC(ti99_8_state::video_interrupt));
 	video.set_screen("screen");

@@ -68,8 +68,8 @@ public:
 		INPUT_X4        = 4
 	};
 
-	DECLARE_READ32_MEMBER(mp_param_r);
-	DECLARE_WRITE32_MEMBER(mp_param_w);
+	uint32_t mp_param_r(offs_t offset, uint32_t mem_mask = ~0);
+	void mp_param_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	template <typename... T> void set_command_callback(T &&... args) { m_cmd_callback.set(std::forward<T>(args)...); }
 
@@ -129,10 +129,10 @@ protected:
 
 	int m_icount;
 
-	address_space *m_program;
-	memory_access_cache<2, 0, ENDIANNESS_BIG> * m_cache;
+	memory_access<32, 2, 0, ENDIANNESS_BIG>::cache m_cache;
+	memory_access<32, 2, 0, ENDIANNESS_BIG>::specific m_program;
 
-	write32_delegate m_cmd_callback;
+	write32mo_delegate m_cmd_callback;
 
 	void check_interrupts();
 	void processor_command(uint32_t command);
@@ -189,8 +189,8 @@ protected:
 
 	int m_icount;
 
-	address_space *m_program;
-	memory_access_cache<2, 0, ENDIANNESS_BIG> * m_cache;
+	memory_access<32, 2, 0, ENDIANNESS_BIG>::cache m_cache;
+	memory_access<32, 2, 0, ENDIANNESS_BIG>::specific m_program;
 };
 
 

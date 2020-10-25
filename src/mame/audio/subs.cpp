@@ -2,7 +2,7 @@
 // copyright-holders:Derrick Renaud
 /*************************************************************************
 
-    audio\subs.c
+    audio\subs.cpp
 
 *************************************************************************/
 #include "emu.h"
@@ -14,7 +14,7 @@
 sub sound functions
 ***************************************************************************/
 
-WRITE8_MEMBER(subs_state::noise_reset_w)
+void subs_state::noise_reset_w(uint8_t data)
 {
 	/* Pulse noise reset */
 	m_discrete->write(SUBS_NOISE_RESET, 0);

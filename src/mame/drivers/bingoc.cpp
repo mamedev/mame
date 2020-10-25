@@ -53,9 +53,9 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	uint8_t m_x;
-	DECLARE_READ16_MEMBER(unknown_r);
-	DECLARE_WRITE16_MEMBER(main_sound_latch_w);
-	DECLARE_WRITE8_MEMBER(sound_play_w);
+	uint16_t unknown_r();
+	void main_sound_latch_w(uint8_t data);
+	void sound_play_w(uint8_t data);
 	virtual void video_start() override;
 	uint32_t screen_update_bingoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
@@ -80,7 +80,7 @@ uint32_t bingoc_state::screen_update_bingoc(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-READ16_MEMBER(bingoc_state::unknown_r)
+uint16_t bingoc_state::unknown_r()
 {
 	return 0xffff;
 }
@@ -92,7 +92,7 @@ READ16_MEMBER(bingoc_state::unknown_r)
 0x80-0x85 ym2151 bgm
 0x90-0x9b ym2151 sfx
 */
-READ8_MEMBER(bingoc_state::sound_test_r)
+uint8_t bingoc_state::sound_test_r()
 {
 	if(machine().input().code_pressed_once(KEYCODE_Z))
 		m_x++;
@@ -107,14 +107,14 @@ READ8_MEMBER(bingoc_state::sound_test_r)
 	return m_x;
 }
 #else
-WRITE16_MEMBER(bingoc_state::main_sound_latch_w)
+void bingoc_state::main_sound_latch_w(uint8_t data)
 {
 	m_soundlatch->write(data&0xff);
 	m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 #endif
 
-WRITE8_MEMBER(bingoc_state::sound_play_w)
+void bingoc_state::sound_play_w(uint8_t data)
 {
 	/*
 	---- --x- sound rom banking

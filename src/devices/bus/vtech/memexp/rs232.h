@@ -35,8 +35,8 @@ protected:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER( rs232_rx_w );
-	DECLARE_READ8_MEMBER( receive_data_r );
-	DECLARE_WRITE8_MEMBER( transmit_data_w );
+	uint8_t receive_data_r();
+	void transmit_data_w(uint8_t data);
 
 	required_device<rs232_port_device> m_rs232;
 

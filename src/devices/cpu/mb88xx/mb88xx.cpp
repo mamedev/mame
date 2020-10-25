@@ -47,10 +47,10 @@ DEFINE_DEVICE_TYPE(MB8844,  mb8844_cpu_device,  "mb8844",  "Fujitsu MB8844")
     MACROS
 ***************************************************************************/
 
-#define READOP(a)           (m_cache->read_byte(a))
+#define READOP(a)           (m_cache.read_byte(a))
 
-#define RDMEM(a)            (m_data->read_byte(a))
-#define WRMEM(a,v)          (m_data->write_byte((a), (v)))
+#define RDMEM(a)            (m_data.read_byte(a))
+#define WRMEM(a,v)          (m_data.write_byte((a), (v)))
 
 #define TEST_ST()           (m_st & 1)
 #define TEST_ZF()           (m_zf & 1)
@@ -182,9 +182,9 @@ std::unique_ptr<util::disasm_interface> mb88_cpu_device::create_disassembler()
 
 void mb88_cpu_device::device_start()
 {
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<0, 0, ENDIANNESS_BIG>();
-	m_data = &space(AS_DATA);
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
+	space(AS_DATA).specific(m_data);
 
 	m_read_k.resolve_safe(0);
 	m_write_o.resolve_safe();
@@ -369,12 +369,12 @@ int mb88_cpu_device::pla( int inA, int inB )
 void mb88_cpu_device::execute_set_input(int inputnum, int state)
 {
 	/* on rising edge trigger interrupt */
-	if ( (m_pio & 0x04) && !m_nf && state == ASSERT_LINE )
+	if ( (m_pio & 0x04) && !m_nf && state != CLEAR_LINE )
 	{
 		m_pending_interrupt |= INT_CAUSE_EXTERNAL;
 	}
 
-	m_nf = state == ASSERT_LINE;
+	m_nf = state != CLEAR_LINE;
 }
 
 void mb88_cpu_device::update_pio_enable( uint8_t newpio )

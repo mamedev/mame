@@ -115,7 +115,8 @@ READ_LINE_MEMBER(psikyo_state::mcu_status_r)
 	if (m_mcu_status)
 		ret = 0x01;
 
-	m_mcu_status = !m_mcu_status;   /* hack */
+	if (!machine().side_effects_disabled())
+		m_mcu_status = !m_mcu_status;   /* hack */
 
 	return ret;
 }
@@ -201,18 +202,20 @@ void psikyo_state::s1945_mcu_command_w(uint8_t data)
 }
 
 // TODO: make this handler 8-bit
-uint32_t psikyo_state::s1945_mcu_data_r()
+u32 psikyo_state::s1945_mcu_data_r()
 {
 	u32 res;
 	if (m_s1945_mcu_control & 16)
 	{
 		res = m_s1945_mcu_latching & 4 ? 0x0000ff00 : m_s1945_mcu_latch1 << 8;
-		m_s1945_mcu_latching |= 4;
+		if (!machine().side_effects_disabled())
+			m_s1945_mcu_latching |= 4;
 	}
 	else
 	{
 		res = m_s1945_mcu_latching & 1 ? 0x0000ff00 : m_s1945_mcu_latch2 << 8;
-		m_s1945_mcu_latching |= 1;
+		if (!machine().side_effects_disabled())
+			m_s1945_mcu_latching |= 1;
 	}
 	res |= m_s1945_mcu_bctrl & 0xf0;
 	return res;
@@ -265,12 +268,12 @@ void psikyo_state::psikyo_map(address_map &map)
 }
 
 template<int Shift>
-WRITE8_MEMBER(psikyo_state::sound_bankswitch_w)
+void psikyo_state::sound_bankswitch_w(u8 data)
 {
 	m_audiobank->set_entry((data >> Shift) & 0x03);
 }
 
-WRITE8_MEMBER(psikyo_state::s1945bl_okibank_w)
+void psikyo_state::s1945bl_okibank_w(u8 data)
 {
 	// not at all sure about this, it seems to write 0 too often
 	if (data < 5)
@@ -306,7 +309,7 @@ void psikyo_state::psikyo_bootleg_map(address_map &map)
                         Sengoku Ace / Samurai Aces
 ***************************************************************************/
 
-READ32_MEMBER(psikyo_state::sngkace_input_r)
+u32 psikyo_state::sngkace_input_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -346,7 +349,7 @@ void psikyo_state::sngkace_sound_io_map(address_map &map)
                                 Gun Bird
 ***************************************************************************/
 
-READ32_MEMBER(psikyo_state::gunbird_input_r)
+u32 psikyo_state::gunbird_input_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -391,7 +394,7 @@ void psikyo_state::gunbird_sound_io_map(address_map &map)
                         Strikers 1945 / Tengai
 ***************************************************************************/
 
-READ32_MEMBER(psikyo_state::s1945_input_r)
+u32 psikyo_state::s1945_input_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -442,7 +445,8 @@ READ_LINE_MEMBER(psikyo_state::z80_nmi_r)
 
 		/* main CPU might be waiting for sound CPU to finish NMI,
 		   so set a timer to give sound CPU a chance to run */
-		machine().scheduler().synchronize();
+		if (!machine().side_effects_disabled())
+			machine().scheduler().synchronize();
 //      logerror("%s - Read coin port during Z80 NMI\n", machine().describe_context());
 	}
 

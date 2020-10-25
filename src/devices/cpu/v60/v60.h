@@ -163,6 +163,9 @@ private:
 	uint8_t               m_irq_line;
 	uint8_t               m_nmi_line;
 	address_space *m_program;
+	memory_access<32, 1, 0, ENDIANNESS_LITTLE>::cache m_cache16;
+	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache m_cache32;
+
 	std::function<u8  (offs_t)> m_pr8;
 	std::function<u16 (offs_t)> m_pr16;
 	std::function<u32 (offs_t)> m_pr32;

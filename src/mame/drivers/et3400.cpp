@@ -57,13 +57,13 @@ private:
 
 	virtual void machine_start() override;
 
-	DECLARE_READ8_MEMBER(keypad_r);
-	DECLARE_WRITE8_MEMBER(display_w);
-	template <int Digit> DECLARE_WRITE8_MEMBER(led_w);
-	DECLARE_READ8_MEMBER(pia_ar);
-	DECLARE_WRITE8_MEMBER(pia_aw);
-	DECLARE_READ8_MEMBER(pia_br);
-	DECLARE_WRITE8_MEMBER(pia_bw);
+	uint8_t keypad_r(offs_t offset);
+	void display_w(offs_t offset, uint8_t data);
+	template <int Digit> void led_w(uint8_t data);
+	uint8_t pia_ar();
+	void pia_aw(uint8_t data);
+	uint8_t pia_br();
+	void pia_bw(uint8_t data);
 
 	void mem_map(address_map &map);
 
@@ -84,7 +84,7 @@ void et3400_state::machine_start()
 }
 
 
-READ8_MEMBER(et3400_state::keypad_r)
+uint8_t et3400_state::keypad_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -95,7 +95,7 @@ READ8_MEMBER(et3400_state::keypad_r)
 	return data;
 }
 
-WRITE8_MEMBER(et3400_state::display_w)
+void et3400_state::display_w(offs_t offset, uint8_t data)
 {
 	// A6-A4 decoded by IC22 (74LS42); D0 inverted by one gate of IC21 (74S00)
 	uint8_t digit = (offset >> 4) & 7;
@@ -104,7 +104,7 @@ WRITE8_MEMBER(et3400_state::display_w)
 }
 
 template <int Digit>
-WRITE8_MEMBER(et3400_state::led_w)
+void et3400_state::led_w(uint8_t data)
 {
 	// This computer sets each segment, one at a time.
 	m_digit[Digit - 1] = bitswap<8>(~data, 7, 0, 1, 2, 3, 4, 5, 6);
@@ -113,25 +113,25 @@ WRITE8_MEMBER(et3400_state::led_w)
 // d1,2,3 = Baud rate
 // d4 = gnd
 // d7 = rs232 in
-READ8_MEMBER(et3400_state::pia_ar)
+uint8_t et3400_state::pia_ar()
 {
 	return ioport("BAUD")->read() | (m_rs232->rxd_r() << 7);
 }
 
 // d0 = rs232 out
-WRITE8_MEMBER(et3400_state::pia_aw)
+void et3400_state::pia_aw(uint8_t data)
 {
 	m_rs232->write_txd(BIT(data, 0));
 }
 
 // d7 = cass in
-READ8_MEMBER(et3400_state::pia_br)
+uint8_t et3400_state::pia_br()
 {
 	return (m_cass->input() > +0.0) << 7;
 }
 
 // d0 = cass out
-WRITE8_MEMBER(et3400_state::pia_bw)
+void et3400_state::pia_bw(uint8_t data)
 {
 	m_cass->output(BIT(data, 0) ? -1.0 : +1.0);
 }
@@ -265,4 +265,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY          FULLNAME                                         FLAGS */
-COMP( 1976, et3400, 0,      0,      et3400,  et3400, et3400_state, empty_init, "Heath Company", "Heathkit Model ET-3400 Microprocessor Trainer", 0 )
+COMP( 1976, et3400, 0,      0,      et3400,  et3400, et3400_state, empty_init, "Heath Company", "Heathkit Model ET-3400 Microprocessor Trainer", MACHINE_SUPPORTS_SAVE )

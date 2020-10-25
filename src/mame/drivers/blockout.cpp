@@ -79,12 +79,12 @@
 #define MAIN_CLOCK XTAL(10'000'000)
 #define AUDIO_CLOCK XTAL(3'579'545)
 
-WRITE16_MEMBER(blockout_state::blockout_irq6_ack_w)
+void blockout_state::blockout_irq6_ack_w(uint16_t data)
 {
 	m_maincpu->set_input_line(6, CLEAR_LINE);
 }
 
-WRITE16_MEMBER(blockout_state::blockout_irq5_ack_w)
+void blockout_state::blockout_irq5_ack_w(uint16_t data)
 {
 	m_maincpu->set_input_line(5, CLEAR_LINE);
 }

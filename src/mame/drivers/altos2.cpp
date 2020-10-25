@@ -43,9 +43,9 @@ public:
 	void altos2(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(vpac_r);
-	DECLARE_WRITE8_MEMBER(vpac_w);
-	DECLARE_WRITE8_MEMBER(video_mode_w);
+	u8 vpac_r(offs_t offset);
+	void vpac_w(offs_t offset, u8 data);
+	void video_mode_w(u8 data);
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -67,17 +67,17 @@ void altos2_state::machine_reset()
 	m_novram->recall(CLEAR_LINE);
 }
 
-READ8_MEMBER(altos2_state::vpac_r)
+u8 altos2_state::vpac_r(offs_t offset)
 {
 	return m_vpac->read(offset >> 1);
 }
 
-WRITE8_MEMBER(altos2_state::vpac_w)
+void altos2_state::vpac_w(offs_t offset, u8 data)
 {
 	m_vpac->write(offset >> 1, data);
 }
 
-WRITE8_MEMBER(altos2_state::video_mode_w)
+void altos2_state::video_mode_w(u8 data)
 {
 	if (BIT(data, 5))
 	{

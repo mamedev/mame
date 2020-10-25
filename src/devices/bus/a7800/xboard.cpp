@@ -139,38 +139,38 @@ void a78_xm_device::device_add_mconfig(machine_config &config)
 
  -------------------------------------------------*/
 
-READ8_MEMBER(a78_xboard_device::read_40xx)
+uint8_t a78_xboard_device::read_40xx(offs_t offset)
 {
 	if (BIT(m_reg, 3) && offset < 0x4000)
 		return m_ram[offset + (m_ram_bank * 0x4000)];
 	else
-		return m_xbslot->read_40xx(space, offset);
+		return m_xbslot->read_40xx(offset);
 }
 
-WRITE8_MEMBER(a78_xboard_device::write_40xx)
+void a78_xboard_device::write_40xx(offs_t offset, uint8_t data)
 {
 	if (BIT(m_reg, 3) && offset < 0x4000)
 		m_ram[offset + (m_ram_bank * 0x4000)] = data;
 	else
-		m_xbslot->write_40xx(space, offset, data);
+		m_xbslot->write_40xx(offset, data);
 }
 
-READ8_MEMBER(a78_xboard_device::read_04xx)
+uint8_t a78_xboard_device::read_04xx(offs_t offset)
 {
 	if (BIT(m_reg, 4) && offset >= 0x50 && offset < 0x60)
 		return m_pokey->read(offset & 0x0f);
 	else if (BIT(m_reg, 4) && offset >= 0x60 && offset < 0x70)
-		return m_xbslot->read_04xx(space, offset - 0x10);   // access second POKEY
+		return m_xbslot->read_04xx(offset - 0x10);   // access second POKEY
 	else
 		return 0xff;
 }
 
-WRITE8_MEMBER(a78_xboard_device::write_04xx)
+void a78_xboard_device::write_04xx(offs_t offset, uint8_t data)
 {
 	if (BIT(m_reg, 4) && offset >= 0x50 && offset < 0x60)
 		m_pokey->write(offset & 0x0f, data);
 	else if (BIT(m_reg, 4) && offset >= 0x60 && offset < 0x70)
-		m_xbslot->write_04xx(space, offset - 0x10, data);   // access second POKEY
+		m_xbslot->write_04xx(offset - 0x10, data);   // access second POKEY
 	else if (offset >= 0x70 && offset < 0x80)
 	{
 		m_reg = data;
@@ -185,41 +185,41 @@ WRITE8_MEMBER(a78_xboard_device::write_04xx)
 
  -------------------------------------------------*/
 
-READ8_MEMBER(a78_xm_device::read_10xx)
+uint8_t a78_xm_device::read_10xx(offs_t offset)
 {
 	return m_nvram[offset];
 }
 
-WRITE8_MEMBER(a78_xm_device::write_10xx)
+void a78_xm_device::write_10xx(offs_t offset, uint8_t data)
 {
 	m_nvram[offset] = data;
 }
 
-READ8_MEMBER(a78_xm_device::read_30xx)
+uint8_t a78_xm_device::read_30xx(offs_t offset)
 {
 	return m_rom[offset];
 }
 
-READ8_MEMBER(a78_xm_device::read_04xx)
+uint8_t a78_xm_device::read_04xx(offs_t offset)
 {
 	if (BIT(m_reg, 4) && offset >= 0x50 && offset < 0x60)
 		return m_pokey->read(offset & 0x0f);
 	else if (m_ym_enabled && offset >= 0x60 && offset <= 0x61)
 		return m_ym->read(offset & 1);
 	else if (BIT(m_reg, 4) && offset >= 0x60 && offset < 0x70)
-		return m_xbslot->read_04xx(space, offset - 0x10);   // access second POKEY
+		return m_xbslot->read_04xx(offset - 0x10);   // access second POKEY
 	else
 		return 0xff;
 }
 
-WRITE8_MEMBER(a78_xm_device::write_04xx)
+void a78_xm_device::write_04xx(offs_t offset, uint8_t data)
 {
 	if (BIT(m_reg, 4) && offset >= 0x50 && offset < 0x60)
 		m_pokey->write(offset & 0x0f, data);
 	else if (m_ym_enabled && offset >= 0x60 && offset <= 0x61)
 		m_ym->write(offset & 1, data);
 	else if (BIT(m_reg, 4) && offset >= 0x60 && offset < 0x70)
-		m_xbslot->write_04xx(space, offset - 0x10, data);   // access second POKEY
+		m_xbslot->write_04xx(offset - 0x10, data);   // access second POKEY
 	else if (offset >= 0x70 && offset < 0x80)
 	{
 		//printf("regs 0x%X\n", data);

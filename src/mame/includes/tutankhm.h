@@ -43,10 +43,10 @@ public:
 
 protected:
 	DECLARE_WRITE_LINE_MEMBER(irq_enable_w);
-	DECLARE_WRITE8_MEMBER(tutankhm_bankselect_w);
+	void tutankhm_bankselect_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
-	DECLARE_WRITE8_MEMBER(sound_on_w);
+	void sound_on_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
 	virtual void machine_start() override;
@@ -81,7 +81,7 @@ protected:
 	optional_ioport m_stars_config;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scramble_stars_blink_timer);
-	DECLARE_WRITE8_MEMBER(galaxian_stars_enable_w);
+	void galaxian_stars_enable_w(uint8_t data);
 	void stars_init();
 	void stars_init_scramble();
 	void stars_init_bootleg();

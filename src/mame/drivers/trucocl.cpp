@@ -39,13 +39,12 @@ Daughterboard: Custom made, plugged in the 2 roms and Z80 mainboard sockets.
 
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
 
 // TODO: doesn't seem suited to neither irq nor nmi
-WRITE8_MEMBER(trucocl_state::irq_enable_w)
+void trucocl_state::irq_enable_w(uint8_t data)
 {
 	m_irq_mask = (data & 1) ^ 1;
 }
@@ -64,7 +63,7 @@ void trucocl_state::device_timer(emu_timer &timer, device_timer_id id, int param
 }
 
 
-WRITE8_MEMBER(trucocl_state::audio_dac_w)
+void trucocl_state::audio_dac_w(uint8_t data)
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	int dac_address = ( data & 0xf0 ) << 8;
@@ -206,9 +205,6 @@ void trucocl_state::trucocl(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 /***************************************************************************

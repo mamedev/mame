@@ -30,7 +30,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(A2BUS_MOCKINGBOARD, a2bus_mockingboard_device, "a2mockbd", "Sweet Micro Systems Mockingboard")
+DEFINE_DEVICE_TYPE(A2BUS_MOCKINGBOARD, a2bus_mockingboard_device, "a2mockbd", "Sweet Micro Systems Mockingboard Sound/Speech I")
 DEFINE_DEVICE_TYPE(A2BUS_PHASOR,       a2bus_phasor_device,       "a2phasor", "Applied Engineering Phasor")
 DEFINE_DEVICE_TYPE(A2BUS_ECHOPLUS,     a2bus_echoplus_device,     "a2echop",  "Street Electronics Echo Plus")
 
@@ -53,7 +53,7 @@ void a2bus_ayboard_device::add_common_devices(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 	AY8913(config, m_ay1, 1022727);
-	m_ay1->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_ay1->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
 }
 
 void a2bus_ayboard_device::device_add_mconfig(machine_config &config)
@@ -61,7 +61,23 @@ void a2bus_ayboard_device::device_add_mconfig(machine_config &config)
 	add_common_devices(config);
 
 	AY8913(config, m_ay2, 1022727);
-	m_ay2->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_ay2->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+}
+
+void a2bus_mockingboard_device::device_add_mconfig(machine_config &config)
+{
+	add_common_devices(config);
+
+	m_via1->writepb_handler().set(FUNC(a2bus_mockingboard_device::via1_out_b));
+	m_via1->cb2_handler().set(FUNC(a2bus_mockingboard_device::write_via1_cb2));
+
+	AY8913(config, m_ay2, 1022727);
+	m_ay2->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+
+	VOTRAX_SC01(config, m_sc01, 1022727);
+	m_sc01->ar_callback().set(m_via1, FUNC(via6522_device::write_cb1));
+	m_sc01->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_sc01->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
 
 void a2bus_phasor_device::device_add_mconfig(machine_config &config)
@@ -76,9 +92,9 @@ void a2bus_phasor_device::device_add_mconfig(machine_config &config)
 	AY8913(config, m_ay2, 1022727);
 	AY8913(config, m_ay3, 1022727);
 	AY8913(config, m_ay4, 1022727);
-	m_ay2->add_route(ALL_OUTPUTS, "lspeaker2", 1.0);
-	m_ay3->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	m_ay4->add_route(ALL_OUTPUTS, "rspeaker2", 1.0);
+	m_ay2->add_route(ALL_OUTPUTS, "lspeaker2", 0.5);
+	m_ay3->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	m_ay4->add_route(ALL_OUTPUTS, "rspeaker2", 0.5);
 }
 
 void a2bus_echoplus_device::device_add_mconfig(machine_config &config)
@@ -86,7 +102,7 @@ void a2bus_echoplus_device::device_add_mconfig(machine_config &config)
 	add_common_devices(config);
 
 	AY8913(config, m_ay2, 1022727);
-	m_ay2->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_ay2->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 
 	SPEAKER(config, "echosp").front_center();
 	TMS5220(config, m_tms, 640000);
@@ -111,7 +127,8 @@ a2bus_ayboard_device::a2bus_ayboard_device(const machine_config &mconfig, device
 }
 
 a2bus_mockingboard_device::a2bus_mockingboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	a2bus_ayboard_device(mconfig, A2BUS_MOCKINGBOARD, tag, owner, clock)
+	a2bus_ayboard_device(mconfig, A2BUS_MOCKINGBOARD, tag, owner, clock),
+	m_sc01(*this, "sc01")
 {
 }
 
@@ -229,12 +246,12 @@ WRITE_LINE_MEMBER( a2bus_ayboard_device::via2_irq_w )
 		lower_slot_irq();
 }
 
-WRITE8_MEMBER( a2bus_ayboard_device::via1_out_a )
+void a2bus_ayboard_device::via1_out_a(uint8_t data)
 {
 	m_porta1 = data;
 }
 
-WRITE8_MEMBER( a2bus_ayboard_device::via1_out_b )
+void a2bus_ayboard_device::via1_out_b(uint8_t data)
 {
 	if (!BIT(data, 2))
 	{
@@ -262,7 +279,7 @@ WRITE8_MEMBER( a2bus_ayboard_device::via1_out_b )
 	}
 }
 
-WRITE8_MEMBER( a2bus_phasor_device::via1_out_b )
+void a2bus_phasor_device::via1_out_b(uint8_t data)
 {
 	if (!(data & 4))
 	{
@@ -311,12 +328,12 @@ WRITE8_MEMBER( a2bus_phasor_device::via1_out_b )
 	}
 }
 
-WRITE8_MEMBER( a2bus_ayboard_device::via2_out_a )
+void a2bus_ayboard_device::via2_out_a(uint8_t data)
 {
 	m_porta2 = data;
 }
 
-WRITE8_MEMBER( a2bus_ayboard_device::via2_out_b )
+void a2bus_ayboard_device::via2_out_b(uint8_t data)
 {
 	if (!BIT(data, 2))
 	{
@@ -344,7 +361,7 @@ WRITE8_MEMBER( a2bus_ayboard_device::via2_out_b )
 	}
 }
 
-WRITE8_MEMBER( a2bus_phasor_device::via2_out_b )
+void a2bus_phasor_device::via2_out_b(uint8_t data)
 {
 	if (!BIT(data, 2))
 	{
@@ -397,16 +414,35 @@ WRITE8_MEMBER( a2bus_phasor_device::via2_out_b )
 	}
 }
 
+void a2bus_phasor_device::set_clocks()
+{
+	if (m_native)
+	{
+		m_ay1->set_clock(1022727*2);
+		m_ay2->set_clock(1022727*2);
+		m_ay3->set_clock(1022727*2);
+		m_ay4->set_clock(1022727*2);
+	}
+	else
+	{
+		m_ay1->set_clock(1022727);
+		m_ay2->set_clock(1022727);
+		m_ay3->set_clock(1022727);
+		m_ay4->set_clock(1022727);
+	}
+}
 
 uint8_t a2bus_phasor_device::read_c0nx(uint8_t offset)
 {
 	m_native = BIT(offset, 0);
+	set_clocks();
 	return 0xff;
 }
 
 void a2bus_phasor_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	m_native = BIT(offset, 0);
+	set_clocks();
 }
 
 uint8_t a2bus_echoplus_device::read_c0nx(uint8_t offset)
@@ -427,5 +463,50 @@ void a2bus_echoplus_device::write_c0nx(uint8_t offset, uint8_t data)
 		case 0:
 			m_tms->data_w(data);
 			break;
+	}
+}
+
+void a2bus_mockingboard_device::device_reset()
+{
+	m_porta1 = m_porta2 = m_portb1 = 0;
+	m_last_cb2_state = ASSERT_LINE;
+}
+
+WRITE_LINE_MEMBER( a2bus_mockingboard_device::write_via1_cb2 )
+{
+	if ((state == CLEAR_LINE) && (m_last_cb2_state == ASSERT_LINE))
+	{
+		m_sc01->write(m_portb1);
+	}
+	m_last_cb2_state = state;
+}
+
+void a2bus_mockingboard_device::via1_out_b(uint8_t data)
+{
+	m_portb1 = data;
+
+	if (!BIT(data, 2))
+	{
+		m_ay1->reset_w();
+	}
+	else
+	{
+		switch (data & 3)
+		{
+			case 0: // BDIR=0, BC1=0 (inactive)
+				break;
+
+			case 1: // BDIR=0, BC1=1 (read PSG)
+				m_porta1 = m_ay1->data_r();
+				break;
+
+			case 2: // BDIR=1, BC1=0 (write PSG)
+				m_ay1->data_w(m_porta1);
+				break;
+
+			case 3: // BDIR=1, BC1=1 (latch)
+				m_ay1->address_w(m_porta1);
+				break;
+		}
 	}
 }

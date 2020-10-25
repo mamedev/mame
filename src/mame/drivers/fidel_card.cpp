@@ -176,7 +176,6 @@ Two card decks exist (red and blue), each has the same set of barcodes.
 #include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/s14001a.h"
-#include "sound/volt_reg.h"
 #include "video/pwm.h"
 #include "speaker.h"
 
@@ -237,9 +236,9 @@ private:
 
 	// I/O handlers
 	void update_display();
-	DECLARE_WRITE8_MEMBER(speech_w);
-	DECLARE_WRITE8_MEMBER(mcu_p1_w);
-	DECLARE_READ8_MEMBER(mcu_p2_r);
+	void speech_w(u8 data);
+	void mcu_p1_w(u8 data);
+	u8 mcu_p2_r();
 	DECLARE_READ_LINE_MEMBER(mcu_t0_r);
 	template<int P> void ioexp_port_w(uint8_t data);
 };
@@ -278,7 +277,7 @@ void card_state::update_display()
 		m_dac->write(BIT(~m_inp_mux, 7) & BIT(m_vfd_data, 13));
 }
 
-WRITE8_MEMBER(card_state::speech_w)
+void card_state::speech_w(u8 data)
 {
 	if (m_speech == nullptr)
 		return;
@@ -326,14 +325,14 @@ void card_state::ioexp_port_w(uint8_t data)
 
 // I8041 MCU
 
-WRITE8_MEMBER(card_state::mcu_p1_w)
+void card_state::mcu_p1_w(u8 data)
 {
 	// P10-P17: input mux, digit select
 	m_inp_mux = data;
 	update_display();
 }
 
-READ8_MEMBER(card_state::mcu_p2_r)
+u8 card_state::mcu_p2_r()
 {
 	// P20-P23: I8243 P2
 	u8 data = m_i8243->p2_r() & 0x0f;
@@ -609,7 +608,6 @@ void card_state::brc(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
 void card_state::vbrc(machine_config &config)

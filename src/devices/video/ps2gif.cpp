@@ -94,7 +94,7 @@ void ps2_gif_device::gif_reset()
 	m_vu_mem_address = 0;
 }
 
-READ32_MEMBER(ps2_gif_device::read)
+uint32_t ps2_gif_device::read(offs_t offset)
 {
 	uint32_t ret = 0;
 	switch (offset)
@@ -163,7 +163,7 @@ READ32_MEMBER(ps2_gif_device::read)
 	return ret;
 }
 
-WRITE32_MEMBER(ps2_gif_device::write)
+void ps2_gif_device::write(offs_t offset, uint32_t data)
 {
 	switch (offset)
 	{

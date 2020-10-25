@@ -24,22 +24,22 @@ public:
 
 private:
 	struct track_info {
-		uint32_t cylinder, head, type;
-		uint32_t sigtype, process, reserved[3];
-		uint32_t size_bytes, size_cells;
-		uint32_t index_bytes, index_cells;
-		uint32_t datasize_cells, gapsize_cells;
-		uint32_t block_count, weak_bits;
+		uint32_t cylinder = 0, head = 0, type = 0;
+		uint32_t sigtype = 0, process = 0, reserved[3] = { 0, 0, 0 };
+		uint32_t size_bytes = 0, size_cells = 0;
+		uint32_t index_bytes = 0, index_cells = 0;
+		uint32_t datasize_cells = 0, gapsize_cells = 0;
+		uint32_t block_count = 0, weak_bits = 0;
 
-		uint32_t data_size_bits;
+		uint32_t data_size_bits = 0;
 
-		bool info_set;
+		bool info_set = false;
 
-		const uint8_t *data;
-		uint32_t data_size;
+		const uint8_t *data = nullptr;
+		uint32_t data_size = 0;
 	};
 
-	track_info *tinfos;
+	std::vector<track_info> tinfos;
 	uint32_t tcount;
 
 	uint32_t type, release, revision;

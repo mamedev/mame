@@ -28,38 +28,6 @@ enum
 	JAGUAR_R24,JAGUAR_R25,JAGUAR_R26,JAGUAR_R27,JAGUAR_R28,JAGUAR_R29,JAGUAR_R30,JAGUAR_R31
 };
 
-enum
-{
-	G_FLAGS = 0,
-	G_MTXC,
-	G_MTXA,
-	G_END,
-	G_PC,
-	G_CTRL,
-	G_HIDATA,
-	G_DIVCTRL,
-	G_DUMMY,
-	G_REMAINDER,
-	G_CTRLMAX
-};
-
-enum
-{
-	D_FLAGS = 0,
-	D_MTXC,
-	D_MTXA,
-	D_END,
-	D_PC,
-	D_CTRL,
-	D_MOD,
-	D_DIVCTRL,
-	D_MACHI,
-	D_REMAINDER,
-	D_CTRLMAX
-};
-
-
-
 /***************************************************************************
     INTERRUPT CONSTANTS
 ***************************************************************************/
@@ -81,7 +49,7 @@ DECLARE_DEVICE_TYPE(JAGUARGPU, jaguargpu_cpu_device)
 DECLARE_DEVICE_TYPE(JAGUARDSP, jaguardsp_cpu_device)
 
 
-class jaguar_cpu_device :  public cpu_device
+class jaguar_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
@@ -90,11 +58,13 @@ public:
 	// configuration helpers
 	auto irq() { return m_cpu_interrupt.bind(); }
 
-	virtual void ctrl_w(offs_t offset, u32 data, u32 mem_mask = ~0) = 0;
-	virtual u32 ctrl_r(offs_t offset) = 0;
+	// TODO: add which device triggered the I/O
+	void iobus_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 iobus_r(offs_t offset, u32 mem_mask = ~0);
+	DECLARE_WRITE_LINE_MEMBER(go_w);
 
 protected:
-	jaguar_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 version, bool isdsp);
+	jaguar_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 version, bool isdsp, address_map_constructor io_map);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -112,6 +82,18 @@ protected:
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
+
+	// I/Os (common)
+	u32 flags_r();
+	void flags_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void matrix_control_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void matrix_address_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void end_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void pc_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 status_r();
+	void control_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 div_remainder_r();
+	void div_control_w(u32 data);
 
 	// defines
 	inline void CLR_Z();
@@ -138,6 +120,7 @@ protected:
 	inline u16 ROPCODE(offs_t pc);
 
 	address_space_config m_program_config;
+	address_space_config m_io_config;
 
 	/* core registers */
 	u32      m_r[32];
@@ -146,7 +129,6 @@ protected:
 	u32 *    m_b1;
 
 	/* control registers */
-	u32      m_ctrl[G_CTRLMAX];
 	u32      m_ppc;
 	u64      m_accum;
 
@@ -156,16 +138,15 @@ protected:
 	int         m_icount;
 	int         m_bankswitch_icount;
 	devcb_write_line m_cpu_interrupt;
-	address_space *m_program;
-	memory_access_cache<2, 0, ENDIANNESS_BIG> *m_cache;
+	memory_access<24, 2, 0, ENDIANNESS_BIG>::cache m_cache;
+	memory_access<24, 2, 0, ENDIANNESS_BIG>::specific m_program;
+	memory_access< 8, 2, 0, ENDIANNESS_BIG>::specific m_io;
 
 	u32      m_internal_ram_start;
 	u32      m_internal_ram_end;
 
 	typedef void (jaguar_cpu_device::*op_func)(u16 op);
 
-	static const op_func gpu_op_table[64];
-	static const op_func dsp_op_table[64];
 	static const u32 convert_zero[32];
 	bool m_tables_referenced;
 
@@ -179,7 +160,6 @@ protected:
 	void add_rn_rn(u16 op);
 	void addc_rn_rn(u16 op);
 	void addq_n_rn(u16 op);
-	void addqmod_n_rn(u16 op);  /* DSP only */
 	void addqt_n_rn(u16 op);
 	void and_rn_rn(u16 op);
 	void bclr_n_rn(u16 op);
@@ -201,8 +181,6 @@ protected:
 	void load_r15rn_rn(u16 op);
 	void loadb_rn_rn(u16 op);
 	void loadw_rn_rn(u16 op);
-	void loadp_rn_rn(u16 op);   /* GPU only */
-	void mirror_rn(u16 op); /* DSP only */
 	void mmult_rn_rn(u16 op);
 	void move_rn_rn(u16 op);
 	void move_pc_rn(u16 op);
@@ -217,15 +195,10 @@ protected:
 	void normi_rn_rn(u16 op);
 	void not_rn(u16 op);
 	void or_rn_rn(u16 op);
-	void pack_rn(u16 op);       /* GPU only */
 	void resmac_rn(u16 op);
 	void ror_rn_rn(u16 op);
 	void rorq_n_rn(u16 op);
-	void sat8_rn(u16 op);       /* GPU only */
-	void sat16_rn(u16 op);      /* GPU only */
-	void sat16s_rn(u16 op);     /* DSP only */
-	void sat24_rn(u16 op);          /* GPU only */
-	void sat32s_rn(u16 op);     /* DSP only */
+
 	void sh_rn_rn(u16 op);
 	void sha_rn_rn(u16 op);
 	void sharq_n_rn(u16 op);
@@ -238,16 +211,58 @@ protected:
 	void store_rn_r15rn(u16 op);
 	void storeb_rn_rn(u16 op);
 	void storew_rn_rn(u16 op);
-	void storep_rn_rn(u16 op);  /* GPU only */
 	void sub_rn_rn(u16 op);
 	void subc_rn_rn(u16 op);
 	void subq_n_rn(u16 op);
-	void subqmod_n_rn(u16 op);  /* DSP only */
 	void subqt_n_rn(u16 op);
 	void xor_rn_rn(u16 op);
+	// GPU only opcodes
+	void loadp_rn_rn(u16 op);
+	void pack_rn(u16 op);
+	void sat8_rn(u16 op);
+	void sat16_rn(u16 op);
+	void sat24_rn(u16 op);
+	void storep_rn_rn(u16 op);
+	// DSP only opcodes
+	void addqmod_n_rn(u16 op);
+	void mirror_rn(u16 op);
+	void sat16s_rn(u16 op);
+	void sat32s_rn(u16 op);
+	void subqmod_n_rn(u16 op);
+
 	void update_register_banks();
 	void check_irqs();
 	void init_tables();
+
+	// I/O internal regs
+	void io_common_map(address_map &map);
+	// TODO: the m_io* stubs are conventionally given for allowing a correct register setup from vanilla 68k.
+	// This is yet another reason about needing a bus device dispatcher for this system.
+	u32 m_io_end;
+	u32 m_io_pc;
+	u32 m_io_status;
+	u32 m_io_mtxc;
+	u32 m_io_mtxa;
+
+	u32 m_pc;
+	u32 m_flags;
+	bool m_imask;
+	bool m_maddw;
+	u8 m_mwidth;
+	u32 m_mtxaddr;
+	bool m_go;
+	u8 m_int_latch;
+	u8 m_int_mask;
+	bool m_bus_hog;
+	u32 m_div_remainder;
+	bool m_div_offset;
+
+	// GPU specific
+	u32 m_hidata;
+	static const op_func gpu_op_table[64];
+	// DSP specific
+	u32 m_modulo;
+	static const op_func dsp_op_table[64];
 };
 
 
@@ -257,12 +272,14 @@ public:
 	// construction/destruction
 	jaguargpu_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	void ctrl_w(offs_t offset, u32 data, u32 mem_mask = ~0) override;
-	u32 ctrl_r(offs_t offset) override;
+	void io_map(address_map &map);
 
 protected:
 	virtual void execute_run() override;
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
+	void hidata_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 hidata_r();
 };
 
 
@@ -272,14 +289,16 @@ public:
 	// construction/destruction
 	jaguardsp_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	void ctrl_w(offs_t offset, u32 data, u32 mem_mask = ~0) override;
-	u32 ctrl_r(offs_t offset) override;
+	void io_map(address_map &map);
 
 protected:
 	virtual u32 execute_input_lines() const noexcept override { return 6; }
 	virtual void execute_run() override;
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+	void modulo_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void dsp_end_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 high_accum_r();
 };
 
 

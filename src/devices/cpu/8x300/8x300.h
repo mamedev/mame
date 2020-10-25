@@ -82,9 +82,9 @@ protected:
 	int m_icount;
 	bool m_increment_pc;
 
-	address_space *m_program;
-	memory_access_cache<1, -1, ENDIANNESS_BIG> *m_cache;
-	address_space *m_io;
+	memory_access<13, 1, -1, ENDIANNESS_BIG>::cache m_cache;
+	memory_access<13, 1, -1, ENDIANNESS_BIG>::specific m_program;
+	memory_access< 9, 0,  0, ENDIANNESS_BIG>::specific m_io;
 
 	devcb_write8 m_sc_callback;  // Select Command (address latch)
 

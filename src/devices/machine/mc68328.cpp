@@ -3043,22 +3043,18 @@ uint16_t mc68328_device::internal_read(offs_t offset, uint16_t mem_mask)
 /* THIS IS PRETTY MUCH TOTALLY WRONG AND DOESN'T REFLECT THE MC68328'S INTERNAL FUNCTIONALITY AT ALL! */
 uint32_t mc68328_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	auto mcache = space(AS_PROGRAM).cache<1, 0, ENDIANNESS_BIG>();
 	uint32_t vram_addr = m_regs.lssa & 0x00fffffe;
-	uint16_t word;
-	uint16_t *line;
-	int y, x, b;
 
 	if (m_regs.lckcon & LCKCON_LCDC_EN)
 	{
-		for (y = 0; y < 160; y++)
+		for (int y = 0; y < 160; y++)
 		{
-			line = &bitmap.pix16(y);
+			uint16_t *const line = &bitmap.pix(y);
 
-			for (x = 0; x < 160; x += 16, vram_addr += 2)
+			for (int x = 0; x < 160; x += 16, vram_addr += 2)
 			{
-				word = mcache->read_word(vram_addr);
-				for (b = 0; b < 16; b++)
+				uint16_t const word = space(AS_PROGRAM).read_word(vram_addr);
+				for (int b = 0; b < 16; b++)
 				{
 					line[x + b] = (word >> (15 - b)) & 0x0001;
 				}
@@ -3067,11 +3063,11 @@ uint32_t mc68328_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	}
 	else
 	{
-		for (y = 0; y < 160; y++)
+		for (int y = 0; y < 160; y++)
 		{
-			line = &bitmap.pix16(y);
+			uint16_t *const line = &bitmap.pix(y);
 
-			for (x = 0; x < 160; x++)
+			for (int x = 0; x < 160; x++)
 			{
 				line[x] = 0;
 			}

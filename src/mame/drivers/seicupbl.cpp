@@ -73,12 +73,12 @@ private:
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE8_MEMBER(okim_rombank_w);
-	DECLARE_WRITE16_MEMBER(vram_sc0_w);
-	DECLARE_WRITE16_MEMBER(vram_sc1_w);
-	DECLARE_WRITE16_MEMBER(vram_sc2_w);
-	DECLARE_WRITE16_MEMBER(vram_sc3_w);
-	DECLARE_WRITE16_MEMBER(layer_disable_w);
+	void okim_rombank_w(uint8_t data);
+	void vram_sc0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void vram_sc1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void vram_sc2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void vram_sc3_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void layer_disable_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_sc0_tileinfo);
 	TILE_GET_INFO_MEMBER(get_sc1_tileinfo);
 	TILE_GET_INFO_MEMBER(get_sc2_tileinfo);
@@ -317,31 +317,31 @@ uint32_t seicupbl_state::screen_update( screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-WRITE16_MEMBER(seicupbl_state::vram_sc0_w)
+void seicupbl_state::vram_sc0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_back_data[offset]);
 	m_sc_layer[0]->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(seicupbl_state::vram_sc1_w)
+void seicupbl_state::vram_sc1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_mid_data[offset]);
 	m_sc_layer[1]->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(seicupbl_state::vram_sc2_w)
+void seicupbl_state::vram_sc2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fore_data[offset]);
 	m_sc_layer[2]->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(seicupbl_state::vram_sc3_w)
+void seicupbl_state::vram_sc3_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_textram[offset]);
 	m_sc_layer[3]->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(seicupbl_state::layer_disable_w)
+void seicupbl_state::layer_disable_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_layer_disable);
 }
@@ -370,7 +370,7 @@ void seicupbl_state::cupsocbl_mem(address_map &map)
 	map(0x108000, 0x11ffff).ram();
 }
 
-WRITE8_MEMBER(seicupbl_state::okim_rombank_w)
+void seicupbl_state::okim_rombank_w(uint8_t data)
 {
 //  popmessage("%08x",0x40000 * (data & 0x07));
 	m_oki->set_rom_bank(data & 0x7);

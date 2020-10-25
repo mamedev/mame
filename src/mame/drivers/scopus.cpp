@@ -48,7 +48,7 @@ public:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
-	DECLARE_READ8_MEMBER(memory_read_byte);
+	uint8_t memory_read_byte(offs_t offset);
 	I8275_DRAW_CHARACTER_MEMBER(crtc_display_pixels);
 
 	void maincpu_io_map(address_map &map);
@@ -94,11 +94,10 @@ GFXDECODE_END
 
 I8275_DRAW_CHARACTER_MEMBER(sagitta180_state::crtc_display_pixels)
 {
-	unsigned i;
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint8_t chargen_byte = m_chargen[ (linecount & 7) | ((unsigned)charcode << 3) ];
-	uint8_t pixels;
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint8_t const chargen_byte = m_chargen[ (linecount & 7) | ((unsigned)charcode << 3) ];
 
+	uint8_t pixels;
 	if (lten) {
 		pixels = ~0;
 	} else if (vsp != 0 || (linecount & 8) != 0) {
@@ -111,8 +110,8 @@ I8275_DRAW_CHARACTER_MEMBER(sagitta180_state::crtc_display_pixels)
 		pixels = ~pixels;
 	}
 
-	for (i = 0; i < 7; i++) {
-		bitmap.pix32(y, x + i) = palette[ (pixels & (1U << (7 - i))) != 0 ];
+	for (unsigned i = 0; i < 7; i++) {
+		bitmap.pix(y, x + i) = palette[ BIT(pixels, 7 - i) ];
 	}
 }
 
@@ -167,7 +166,7 @@ WRITE_LINE_MEMBER(sagitta180_state::hrq_w)
 	m_dma8257->hlda_w(state);
 }
 
-READ8_MEMBER(sagitta180_state::memory_read_byte)
+uint8_t sagitta180_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);

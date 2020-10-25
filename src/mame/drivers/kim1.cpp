@@ -56,26 +56,86 @@ TODO:
 - hook up Single Step dip switch
 - slots for expansion & application ports
 - add TTY support
+
+Paste test:
+    N-0100=11^22^33^44^55^66^77^88^99^-0100=
+    Press UP to verify data.
+
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/kim1.h"
+#include "cpu/m6502/m6502.h"
+#include "machine/mos6530.h"
+#include "machine/timer.h"
+#include "imagedev/cassette.h"
+#include "formats/kim1_cas.h"
 #include "speaker.h"
 #include "kim1.lh"
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+class kim1_state : public driver_device
+{
+public:
+	kim1_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_riot2(*this, "miot_u2")
+		, m_cass(*this, "cassette")
+		, m_row(*this, "ROW%u", 0U)
+		, m_special(*this, "SPECIAL")
+		, m_digit(*this, "digit%u", 0U)
+	{ }
+
+	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
+	DECLARE_INPUT_CHANGED_MEMBER(trigger_nmi);
+	void kim1(machine_config &config);
+
+private:
+	uint8_t kim1_u2_read_a();
+	void kim1_u2_write_a(uint8_t data);
+	uint8_t kim1_u2_read_b();
+	void kim1_u2_write_b(uint8_t data);
+
+	// device overrides
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	TIMER_DEVICE_CALLBACK_MEMBER(kim1_cassette_input);
+	TIMER_DEVICE_CALLBACK_MEMBER(kim1_update_leds);
+
+	void mem_map(address_map &map);
+
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<mos6530_device> m_riot2;
+	required_device<cassette_image_device> m_cass;
+
+	required_ioport_array<3> m_row;
+	required_ioport m_special;
+	output_finder<6> m_digit;
+
+	uint8_t m_u2_port_b;
+	uint8_t m_311_output;
+	uint32_t m_cassette_high_count;
+	uint8_t m_led_time[6];
+};
+
 
 //**************************************************************************
 //  ADDRESS MAPS
 //**************************************************************************
 
-void kim1_state::kim1_map(address_map &map)
+void kim1_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x03ff).mirror(0xe000).ram();
-	map(0x1700, 0x173f).mirror(0xe000).rw("miot_u3", FUNC(mos6530_device::read), FUNC(mos6530_device::write));
-	map(0x1740, 0x177f).mirror(0xe000).rw(m_riot2, FUNC(mos6530_device::read), FUNC(mos6530_device::write));
-	map(0x1780, 0x17bf).mirror(0xe000).ram();
-	map(0x17c0, 0x17ff).mirror(0xe000).ram();
-	map(0x1800, 0x1bff).mirror(0xe000).rom();
-	map(0x1c00, 0x1fff).mirror(0xe000).rom();
+	map.global_mask(0x1fff);
+	map(0x0000, 0x03ff).ram();
+	map(0x1700, 0x173f).rw("miot_u3", FUNC(mos6530_device::read), FUNC(mos6530_device::write));
+	map(0x1740, 0x177f).rw(m_riot2, FUNC(mos6530_device::read), FUNC(mos6530_device::write));
+	map(0x1780, 0x17ff).ram();
+	map(0x1800, 0x1fff).rom().region("maincpu",0);
 }
 
 // RS and ST key input
@@ -120,14 +180,14 @@ static INPUT_PORTS_START( kim1 )
 	PORT_BIT( 0x20, 0x20, IPT_KEYBOARD ) PORT_NAME("F")  PORT_CODE(KEYCODE_F)      PORT_CHAR('F')
 	PORT_BIT( 0x10, 0x10, IPT_KEYBOARD ) PORT_NAME("AD") PORT_CODE(KEYCODE_MINUS)  PORT_CHAR('-') PORT_CODE(KEYCODE_MINUS_PAD)
 	PORT_BIT( 0x08, 0x08, IPT_KEYBOARD ) PORT_NAME("DA") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=')
-	PORT_BIT( 0x04, 0x04, IPT_KEYBOARD ) PORT_NAME("+")  PORT_CODE(KEYCODE_UP)     PORT_CHAR(' ') PORT_CODE(KEYCODE_PLUS_PAD)
-	PORT_BIT( 0x02, 0x02, IPT_KEYBOARD ) PORT_NAME("GO") PORT_CODE(KEYCODE_ENTER)  PORT_CHAR(13)  PORT_CODE(KEYCODE_ENTER_PAD)
+	PORT_BIT( 0x04, 0x04, IPT_KEYBOARD ) PORT_NAME("+")  PORT_CODE(KEYCODE_UP)     PORT_CHAR('^') PORT_CODE(KEYCODE_PLUS_PAD)
+	PORT_BIT( 0x02, 0x02, IPT_KEYBOARD ) PORT_NAME("GO") PORT_CODE(KEYCODE_ENTER)  PORT_CHAR('X') PORT_CODE(KEYCODE_ENTER_PAD)
 	PORT_BIT( 0x01, 0x01, IPT_KEYBOARD ) PORT_NAME("PC") PORT_CODE(KEYCODE_F6)
 
 	PORT_START("SPECIAL")
 	PORT_BIT( 0x80, 0x00, IPT_UNUSED )
-	PORT_BIT( 0x40, 0x40, IPT_KEYBOARD ) PORT_NAME("sw1: ST") PORT_CODE(KEYCODE_F7) PORT_CHANGED_MEMBER(DEVICE_SELF, kim1_state, trigger_nmi, 0)
-	PORT_BIT( 0x20, 0x20, IPT_KEYBOARD ) PORT_NAME("sw2: RS") PORT_CODE(KEYCODE_F3) PORT_CHANGED_MEMBER(DEVICE_SELF, kim1_state, trigger_reset, 0)
+	PORT_BIT( 0x40, 0x40, IPT_KEYBOARD ) PORT_NAME("sw1: ST") PORT_CODE(KEYCODE_F7) PORT_CHANGED_MEMBER(DEVICE_SELF, kim1_state, trigger_nmi, 0) PORT_CHAR('S')
+	PORT_BIT( 0x20, 0x20, IPT_KEYBOARD ) PORT_NAME("sw2: RS") PORT_CODE(KEYCODE_F3) PORT_CHANGED_MEMBER(DEVICE_SELF, kim1_state, trigger_reset, 0) PORT_CHAR('N')
 	PORT_DIPNAME(0x10, 0x10, "sw3: SS")                       PORT_CODE(KEYCODE_NUMLOCK) PORT_TOGGLE
 	PORT_DIPSETTING( 0x00, "single step")
 	PORT_DIPSETTING( 0x10, "run")
@@ -138,7 +198,7 @@ static INPUT_PORTS_START( kim1 )
 INPUT_PORTS_END
 
 // Read from keyboard
-READ8_MEMBER( kim1_state::kim1_u2_read_a )
+uint8_t kim1_state::kim1_u2_read_a()
 {
 	uint8_t data = 0xff;
 
@@ -150,7 +210,7 @@ READ8_MEMBER( kim1_state::kim1_u2_read_a )
 }
 
 // Write to 7-Segment LEDs
-WRITE8_MEMBER( kim1_state::kim1_u2_write_a )
+void kim1_state::kim1_u2_write_a(uint8_t data)
 {
 	uint8_t idx = ( m_u2_port_b >> 1 ) & 0x0f;
 
@@ -165,7 +225,7 @@ WRITE8_MEMBER( kim1_state::kim1_u2_write_a )
 }
 
 // Load from cassette
-READ8_MEMBER( kim1_state::kim1_u2_read_b )
+uint8_t kim1_state::kim1_u2_read_b()
 {
 	if ( m_riot2->portb_out_get() & 0x20 )
 		return 0xFF;
@@ -174,7 +234,7 @@ READ8_MEMBER( kim1_state::kim1_u2_read_b )
 }
 
 // Save to cassette
-WRITE8_MEMBER( kim1_state::kim1_u2_write_b )
+void kim1_state::kim1_u2_write_b(uint8_t data)
 {
 	m_u2_port_b = data;
 
@@ -224,6 +284,7 @@ void kim1_state::machine_start()
 	save_item(NAME(m_u2_port_b));
 	save_item(NAME(m_311_output));
 	save_item(NAME(m_cassette_high_count));
+	save_item(NAME(m_led_time));
 }
 
 void kim1_state::machine_reset()
@@ -244,8 +305,8 @@ void kim1_state::machine_reset()
 void kim1_state::kim1(machine_config &config)
 {
 	// basic machine hardware
-	M6502(config, m_maincpu, 1000000);        /* 1 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &kim1_state::kim1_map);
+	M6502(config, m_maincpu, 1_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &kim1_state::mem_map);
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	// video hardware
@@ -254,13 +315,13 @@ void kim1_state::kim1(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	// devices
-	MOS6530(config, m_riot2, 1000000);
+	MOS6530(config, m_riot2, 1_MHz_XTAL);
 	m_riot2->in_pa_callback().set(FUNC(kim1_state::kim1_u2_read_a));
 	m_riot2->out_pa_callback().set(FUNC(kim1_state::kim1_u2_write_a));
 	m_riot2->in_pb_callback().set(FUNC(kim1_state::kim1_u2_read_b));
 	m_riot2->out_pb_callback().set(FUNC(kim1_state::kim1_u2_write_b));
 
-	MOS6530(config, "miot_u3", 1000000);
+	MOS6530(config, "miot_u3", 1_MHz_XTAL);
 
 	CASSETTE(config, m_cass);
 	m_cass->set_formats(kim1_cassette_formats);
@@ -280,9 +341,9 @@ void kim1_state::kim1(machine_config &config)
 //**************************************************************************
 
 ROM_START(kim1)
-	ROM_REGION(0x10000,"maincpu",0)
-	ROM_LOAD("6530-003.bin",    0x1800, 0x0400, CRC(a2a56502) SHA1(60b6e48f35fe4899e29166641bac3e81e3b9d220))
-	ROM_LOAD("6530-002.bin",    0x1c00, 0x0400, CRC(2b08e923) SHA1(054f7f6989af3a59462ffb0372b6f56f307b5362))
+	ROM_REGION(0x0800,"maincpu",0)
+	ROM_LOAD("6530-003.bin",    0x0000, 0x0400, CRC(a2a56502) SHA1(60b6e48f35fe4899e29166641bac3e81e3b9d220))
+	ROM_LOAD("6530-002.bin",    0x0400, 0x0400, CRC(2b08e923) SHA1(054f7f6989af3a59462ffb0372b6f56f307b5362))
 ROM_END
 
 //**************************************************************************

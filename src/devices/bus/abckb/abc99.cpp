@@ -572,7 +572,7 @@ void abc99_device::txd_w(int state)
 //  z2_bus_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc99_device::z2_led_w )
+void abc99_device::z2_led_w(uint8_t data)
 {
 	if (m_led_en) return;
 
@@ -591,7 +591,7 @@ WRITE8_MEMBER( abc99_device::z2_led_w )
 //  z2_p1_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc99_device::z2_p1_w )
+void abc99_device::z2_p1_w(uint8_t data)
 {
 	/*
 
@@ -635,7 +635,7 @@ WRITE8_MEMBER( abc99_device::z2_p1_w )
 //  z2_p2_r -
 //-------------------------------------------------
 
-READ8_MEMBER( abc99_device::z2_p2_r )
+uint8_t abc99_device::z2_p2_r()
 {
 	/*
 
@@ -682,7 +682,7 @@ READ_LINE_MEMBER( abc99_device::z2_t1_r )
 //  z5_p1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( abc99_device::z5_p1_r )
+uint8_t abc99_device::z5_p1_r()
 {
 	/*
 
@@ -715,7 +715,7 @@ READ8_MEMBER( abc99_device::z5_p1_r )
 //  z5_p2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc99_device::z5_p2_w )
+void abc99_device::z5_p2_w(uint8_t data)
 {
 	/*
 
@@ -764,7 +764,7 @@ WRITE8_MEMBER( abc99_device::z5_p2_w )
 //  z5_t1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( abc99_device::z5_t1_r )
+uint8_t abc99_device::z5_t1_r()
 {
 	return m_t1_z5;
 }

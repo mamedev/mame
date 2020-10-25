@@ -206,7 +206,7 @@ mcms_device::mcms_device(const machine_config &mconfig, const char *tag, device_
 void mcms_device::device_start()
 {
 	m_write_irq.resolve();
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, 31250);
+	m_stream = stream_alloc(0, 2, 31250);
 	m_timer = timer_alloc(0, nullptr);
 	m_clrtimer = timer_alloc(1, nullptr);
 	m_enabled = false;
@@ -252,20 +252,19 @@ void mcms_device::device_timer(emu_timer &timer, device_timer_id tid, int param,
 	}
 }
 
-void mcms_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void mcms_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *outL, *outR;
 	int i, v;
 	uint16_t wptr;
 	int8_t sample;
 	int32_t mixL, mixR;
 
-	outL = outputs[1];
-	outR = outputs[0];
+	auto &outL = outputs[1];
+	auto &outR = outputs[0];
 
 	if (m_enabled)
 	{
-		for (i = 0; i < samples; i++)
+		for (i = 0; i < outL.samples(); i++)
 		{
 			mixL = mixR = 0;
 
@@ -286,16 +285,14 @@ void mcms_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 				}
 			}
 
-			outL[i] = (mixL * m_mastervol)>>9;
-			outR[i] = (mixR * m_mastervol)>>9;
+			outL.put_int(i, mixL * m_mastervol, 32768 << 9);
+			outR.put_int(i, mixR * m_mastervol, 32768 << 9);
 		}
 	}
 	else
 	{
-		for (i = 0; i < samples; i++)
-		{
-			outL[i] = outR[i] = 0;
-		}
+		outL.fill(0);
+		outR.fill(0);
 	}
 }
 

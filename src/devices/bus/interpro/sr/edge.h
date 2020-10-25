@@ -31,26 +31,26 @@ protected:
 
 	DECLARE_WRITE_LINE_MEMBER(scc_irq);
 
-	DECLARE_READ32_MEMBER(reg0_r);
-	DECLARE_WRITE32_MEMBER(reg0_w) { COMBINE_DATA(&m_reg0); }
+	u32 reg0_r();
+	void reg0_w(offs_t offset, u32 data, u32 mem_mask = ~0) { COMBINE_DATA(&m_reg0); }
 
-	DECLARE_READ32_MEMBER(control_r) { return m_control; };
-	DECLARE_WRITE32_MEMBER(control_w);
-	DECLARE_READ32_MEMBER(status_r) { return m_status; };
-	DECLARE_WRITE32_MEMBER(status_w) { COMBINE_DATA(&m_status); }
-	DECLARE_READ32_MEMBER(fifo_r) { return m_fifo; };
-	DECLARE_WRITE32_MEMBER(fifo_w) { COMBINE_DATA(&m_fifo); }
-	DECLARE_READ32_MEMBER(kernel_r) { return m_kernel; };
-	DECLARE_WRITE32_MEMBER(kernel_w);
+	u32 control_r() { return m_control; };
+	void control_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 status_r() { return m_status; };
+	void status_w(offs_t offset, u32 data, u32 mem_mask = ~0) { COMBINE_DATA(&m_status); }
+	u32 fifo_r() { return m_fifo; };
+	void fifo_w(offs_t offset, u32 data, u32 mem_mask = ~0) { COMBINE_DATA(&m_fifo); }
+	u32 kernel_r() { return m_kernel; };
+	void kernel_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
-	DECLARE_READ32_MEMBER(attention_r) { return m_attention; };
-	DECLARE_WRITE32_MEMBER(attention_w) { COMBINE_DATA(&m_attention); }
+	u32 attention_r() { return m_attention; };
+	void attention_w(offs_t offset, u32 data, u32 mem_mask = ~0) { COMBINE_DATA(&m_attention); }
 
-	DECLARE_WRITE32_MEMBER(ififo_lwm_w) { COMBINE_DATA(&m_ififo_lwm); }
-	DECLARE_WRITE32_MEMBER(ififo_hwm_w) { COMBINE_DATA(&m_ififo_hwm); }
+	void ififo_lwm_w(offs_t offset, u32 data, u32 mem_mask = ~0) { COMBINE_DATA(&m_ififo_lwm); }
+	void ififo_hwm_w(offs_t offset, u32 data, u32 mem_mask = ~0) { COMBINE_DATA(&m_ififo_hwm); }
 
-	DECLARE_READ32_MEMBER(srx_master_control_r) { return m_srx_master_control; }
-	DECLARE_WRITE32_MEMBER(srx_master_control_w) { COMBINE_DATA(&m_srx_master_control); }
+	u32 srx_master_control_r() { return m_srx_master_control; }
+	void srx_master_control_w(offs_t offset, u32 data, u32 mem_mask = ~0) { COMBINE_DATA(&m_srx_master_control); }
 
 	required_device<screen_device> m_screen;
 	required_device<ram_device> m_sram;
@@ -112,21 +112,21 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(holda);
 	DECLARE_WRITE_LINE_MEMBER(scc_irq);
 
-	DECLARE_READ32_MEMBER(control_r) { return m_control; };
-	DECLARE_WRITE32_MEMBER(control_w);
-	DECLARE_READ32_MEMBER(status_r) { return m_status; };
-	DECLARE_WRITE32_MEMBER(status_w) { COMBINE_DATA(&m_status); }
-	DECLARE_READ32_MEMBER(kernel_r) { return m_kernel; };
-	DECLARE_WRITE32_MEMBER(kernel_w);
-	DECLARE_WRITE32_MEMBER(mapping_w) { COMBINE_DATA(&m_mapping); }
-	DECLARE_READ32_MEMBER(attention_r) { return m_attention; };
-	DECLARE_WRITE32_MEMBER(attention_w) { COMBINE_DATA(&m_attention); }
+	u32 control_r() { return m_control; };
+	void control_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 status_r() { return m_status; };
+	void status_w(offs_t offset, u32 data, u32 mem_mask = ~0) { COMBINE_DATA(&m_status); }
+	u32 kernel_r() { return m_kernel; };
+	void kernel_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void mapping_w(offs_t offset, u32 data, u32 mem_mask = ~0) { COMBINE_DATA(&m_mapping); }
+	u32 attention_r() { return m_attention; };
+	void attention_w(offs_t offset, u32 data, u32 mem_mask = ~0) { COMBINE_DATA(&m_attention); }
 
-	DECLARE_WRITE32_MEMBER(ififo_lwm_w) { COMBINE_DATA(&m_ififo_lwm); }
-	DECLARE_WRITE32_MEMBER(ififo_hwm_w) { COMBINE_DATA(&m_ififo_hwm); }
+	void ififo_lwm_w(offs_t offset, u32 data, u32 mem_mask = ~0) { COMBINE_DATA(&m_ififo_lwm); }
+	void ififo_hwm_w(offs_t offset, u32 data, u32 mem_mask = ~0) { COMBINE_DATA(&m_ififo_hwm); }
 
-	DECLARE_READ32_MEMBER(reg0_r);
-	DECLARE_WRITE32_MEMBER(reg0_w) { COMBINE_DATA(&m_reg0); }
+	u32 reg0_r();
+	void reg0_w(offs_t offset, u32 data, u32 mem_mask = ~0) { COMBINE_DATA(&m_reg0); }
 
 
 private:
@@ -159,12 +159,12 @@ protected:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE32_MEMBER(lut_select_w);
+	void lut_select_w(u32 data);
 
-	DECLARE_WRITE32_MEMBER(unk_300_w) { m_unk_304 = 0x1000; }
-	DECLARE_READ32_MEMBER(unk_304_r) { m_unk_304 ^= 0x1000; return m_unk_304; }
+	void unk_300_w(u32 data) { m_unk_304 = 0x1000; }
+	u32 unk_304_r() { m_unk_304 ^= 0x1000; return m_unk_304; }
 
-	DECLARE_WRITE32_MEMBER(select_w) { COMBINE_DATA(&m_select); }
+	void select_w(offs_t offset, u32 data, u32 mem_mask = ~0) { COMBINE_DATA(&m_select); }
 
 	required_device<screen_device> m_screen;
 	required_device<ram_device> m_sram;

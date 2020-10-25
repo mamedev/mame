@@ -35,7 +35,7 @@ void fastfred_state::machine_start()
 // These values were derived based on disassembly of the code. Usually, it
 // was pretty obvious what the values should be. Of course, this will have
 // to change if a different ROM set ever surfaces.
-READ8_MEMBER(fastfred_state::fastfred_custom_io_r)
+uint8_t fastfred_state::fastfred_custom_io_r(offs_t offset)
 {
 	switch (m_maincpu->pc())
 	{
@@ -67,7 +67,7 @@ READ8_MEMBER(fastfred_state::fastfred_custom_io_r)
 	return 0x00;
 }
 
-READ8_MEMBER(fastfred_state::flyboy_custom1_io_r)
+uint8_t fastfred_state::flyboy_custom1_io_r(offs_t offset)
 {
 	switch (m_maincpu->pc())
 	{
@@ -94,7 +94,7 @@ READ8_MEMBER(fastfred_state::flyboy_custom1_io_r)
 	return 0x00;
 }
 
-READ8_MEMBER(fastfred_state::flyboy_custom2_io_r)
+uint8_t fastfred_state::flyboy_custom2_io_r(offs_t offset)
 {
 	switch (m_maincpu->pc())
 	{
@@ -119,14 +119,14 @@ READ8_MEMBER(fastfred_state::flyboy_custom2_io_r)
 }
 
 
-READ8_MEMBER(fastfred_state::jumpcoas_custom_io_r)
+uint8_t fastfred_state::jumpcoas_custom_io_r(offs_t offset)
 {
 	if (offset == 0x100)  return 0x63;
 
 	return 0x00;
 }
 
-READ8_MEMBER(fastfred_state::boggy84_custom_io_r)
+uint8_t fastfred_state::boggy84_custom_io_r(offs_t offset)
 {
 	if (offset == 0x100)  return 0x6a;
 
@@ -149,12 +149,12 @@ WRITE_LINE_MEMBER(fastfred_state::imago_dma_irq_w)
 	m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(fastfred_state::imago_sprites_bank_w)
+void fastfred_state::imago_sprites_bank_w(uint8_t data)
 {
 	m_imago_sprites_bank = (data & 2) >> 1;
 }
 
-WRITE8_MEMBER(fastfred_state::imago_sprites_dma_w)
+void fastfred_state::imago_sprites_dma_w(offs_t offset, uint8_t data)
 {
 	uint8_t *rom = (uint8_t *)memregion("gfx2")->base();
 	uint8_t sprites_data;
@@ -171,7 +171,7 @@ WRITE8_MEMBER(fastfred_state::imago_sprites_dma_w)
 	m_gfxdecode->gfx(1)->mark_dirty(offset/32);
 }
 
-READ8_MEMBER(fastfred_state::imago_sprites_offset_r)
+uint8_t fastfred_state::imago_sprites_offset_r(offs_t offset)
 {
 	m_imago_sprites_address = offset;
 	return 0xff; //not really used
@@ -184,7 +184,7 @@ WRITE_LINE_MEMBER(fastfred_state::nmi_mask_w)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(fastfred_state::sound_nmi_mask_w)
+void fastfred_state::sound_nmi_mask_w(uint8_t data)
 {
 	m_sound_nmi_mask = data & 1;
 }
@@ -1050,8 +1050,8 @@ ROM_END
 
 void fastfred_state::init_flyboy()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc085, 0xc099, read8_delegate(*this, FUNC(fastfred_state::flyboy_custom1_io_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc8fb, 0xc900, read8_delegate(*this, FUNC(fastfred_state::flyboy_custom2_io_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc085, 0xc099, read8sm_delegate(*this, FUNC(fastfred_state::flyboy_custom1_io_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc8fb, 0xc900, read8sm_delegate(*this, FUNC(fastfred_state::flyboy_custom2_io_r)));
 	m_hardware_type = 1;
 }
 
@@ -1062,28 +1062,28 @@ void fastfred_state::init_flyboyb()
 
 void fastfred_state::init_fastfred()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc800, 0xcfff, read8_delegate(*this, FUNC(fastfred_state::fastfred_custom_io_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc800, 0xcfff, read8sm_delegate(*this, FUNC(fastfred_state::fastfred_custom_io_r)));
 	m_maincpu->space(AS_PROGRAM).nop_write(0xc800, 0xcfff);
 	m_hardware_type = 1;
 }
 
 void fastfred_state::init_jumpcoas()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc800, 0xcfff, read8_delegate(*this, FUNC(fastfred_state::jumpcoas_custom_io_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc800, 0xcfff, read8sm_delegate(*this, FUNC(fastfred_state::jumpcoas_custom_io_r)));
 	m_maincpu->space(AS_PROGRAM).nop_write(0xc800, 0xcfff);
 	m_hardware_type = 0;
 }
 
 void fastfred_state::init_boggy84b()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc800, 0xcfff, read8_delegate(*this, FUNC(fastfred_state::jumpcoas_custom_io_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc800, 0xcfff, read8sm_delegate(*this, FUNC(fastfred_state::jumpcoas_custom_io_r)));
 	m_maincpu->space(AS_PROGRAM).nop_write(0xc800, 0xcfff);
 	m_hardware_type = 2;
 }
 
 void fastfred_state::init_boggy84()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc800, 0xcfff, read8_delegate(*this, FUNC(fastfred_state::boggy84_custom_io_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc800, 0xcfff, read8sm_delegate(*this, FUNC(fastfred_state::boggy84_custom_io_r)));
 	m_maincpu->space(AS_PROGRAM).nop_write(0xc800, 0xcfff);
 	m_hardware_type = 2;
 }

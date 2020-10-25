@@ -8,12 +8,10 @@
 
 ***************************************************************************/
 
-#include <cassert>
-
 #include "bitmap.h"
 
+#include <cassert>
 #include <new>
-
 
 
 //**************************************************************************
@@ -361,7 +359,7 @@ void bitmap_t::wrap(void *base, int width, int height, int rowpixels)
  * @param   subrect The subrect.
  */
 
-void bitmap_t::wrap(const bitmap_t &source, const rectangle &subrect)
+void bitmap_t::wrap(bitmap_t &source, const rectangle &subrect)
 {
 	assert(m_format == source.m_format);
 	assert(m_bpp == source.m_bpp);
@@ -407,7 +405,7 @@ void bitmap_t::set_palette(palette_t *palette)
 }
 
 /**
- * @fn  void bitmap_t::fill(uint32_t color, const rectangle &cliprect)
+ * @fn  void bitmap_t::fill(uint64_t color, const rectangle &bounds)
  *
  * @brief   -------------------------------------------------
  *            fill -- fill a bitmap with a solid color
@@ -417,93 +415,45 @@ void bitmap_t::set_palette(palette_t *palette)
  * @param   cliprect    The cliprect.
  */
 
-void bitmap_t::fill(uint32_t color, const rectangle &cliprect)
+void bitmap_t::fill(uint64_t color, const rectangle &bounds)
 {
 	// if we have a cliprect, intersect with that
-	rectangle fill = cliprect;
+	rectangle fill(bounds);
 	fill &= m_cliprect;
-	if (fill.empty())
-		return;
-
-	// based on the bpp go from there
-	switch (m_bpp)
+	if (!fill.empty())
 	{
+		// based on the bpp go from there
+		switch (m_bpp)
+		{
 		case 8:
-			// 8bpp always uses memset
 			for (int32_t y = fill.top(); y <= fill.bottom(); y++)
-				memset(raw_pixptr(y, fill.left()), uint8_t(color), fill.width());
+				std::fill_n(&pixt<uint8_t>(y, fill.left()), fill.width(), uint8_t(color));
 			break;
 
 		case 16:
-			// 16bpp can use memset if the bytes are equal
-			if (uint8_t(color >> 8) == uint8_t(color))
-			{
-				for (int32_t y = fill.top(); y <= fill.bottom(); y++)
-					memset(raw_pixptr(y, fill.left()), uint8_t(color), fill.width() * 2);
-			}
-			else
-			{
-				// Fill the first line the hard way
-				uint16_t *destrow = &pixt<uint16_t>(fill.top());
-				for (int32_t x = fill.left(); x <= fill.right(); x++)
-					destrow[x] = uint16_t(color);
-
-				// For the other lines, just copy the first one
-				void *destrow0 = &pixt<uint16_t>(fill.top(), fill.left());
-				for (int32_t y = fill.top() + 1; y <= fill.bottom(); y++)
-				{
-					destrow = &pixt<uint16_t>(y, fill.left());
-					memcpy(destrow, destrow0, fill.width() * 2);
-				}
-			}
+			for (int32_t y = fill.top(); y <= fill.bottom(); ++y)
+				std::fill_n(&pixt<uint16_t>(y, fill.left()), fill.width(), uint16_t(color));
 			break;
 
 		case 32:
-			// 32bpp can use memset if the bytes are equal
-			if ((uint8_t)(color >> 8) == (uint8_t)color && (uint16_t)(color >> 16) == (uint16_t)color)
-			{
-				for (int32_t y = fill.top(); y <= fill.bottom(); y++)
-					memset(&pixt<uint32_t>(y, fill.left()), uint8_t(color), fill.width() * 4);
-			}
-			else
-			{
-				// Fill the first line the hard way
-				uint32_t *destrow  = &pixt<uint32_t>(fill.top());
-				for (int32_t x = fill.left(); x <= fill.right(); x++)
-					destrow[x] = uint32_t(color);
-
-				// For the other lines, just copy the first one
-				uint32_t *destrow0 = &pixt<uint32_t>(fill.top(), fill.left());
-				for (int32_t y = fill.top() + 1; y <= fill.bottom(); y++)
-				{
-					destrow = &pixt<uint32_t>(y, fill.left());
-					memcpy(destrow, destrow0, fill.width() * 4);
-				}
-			}
+			for (int32_t y = fill.top(); y <= fill.bottom(); ++y)
+				std::fill_n(&pixt<uint32_t>(y, fill.left()), fill.width(), uint32_t(color));
 			break;
 
 		case 64:
-			// 64bpp can use memset if the bytes are equal
-			if (uint8_t(color >> 8) == uint8_t(color) && uint16_t(color >> 16) == uint16_t(color)) // FIXME: really?  wat about the upper bits that would be zeroed when done the "hard way"?
-			{
-				for (int32_t y = fill.top(); y <= fill.bottom(); y++)
-					memset(&pixt<uint64_t>(y, fill.left()), uint8_t(color), fill.width() * 8);
-			}
-			else
-			{
-				// Fill the first line the hard way
-				uint64_t *destrow  = &pixt<uint64_t>(fill.top());
-				for (int32_t x = fill.left(); x <= fill.right(); x++)
-					destrow[x] = uint64_t(color);
-
-				// For the other lines, just copy the first one
-				uint64_t *destrow0 = &pixt<uint64_t>(fill.top(), fill.left());
-				for (int32_t y = fill.top() + 1; y <= fill.bottom(); y++)
-				{
-					destrow = &pixt<uint64_t>(y, fill.left());
-					memcpy(destrow, destrow0, fill.width() * 8);
-				}
-			}
+			for (int32_t y = fill.top(); y <= fill.bottom(); ++y)
+				std::fill_n(&pixt<uint64_t>(y, fill.left()), fill.width(), uint64_t(color));
 			break;
+		}
 	}
 }
+
+
+//**************************************************************************
+//  EXPLICIT TEMPLATE INSTANTIATIONS
+//**************************************************************************
+
+template class bitmap_specific<uint8_t>;
+template class bitmap_specific<uint16_t>;
+template class bitmap_specific<uint32_t>;
+template class bitmap_specific<uint64_t>;

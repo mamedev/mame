@@ -6,6 +6,7 @@
 #pragma once
 
 #include "machine/74259.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/namco.h"
 #include "emupal.h"
@@ -99,60 +100,60 @@ protected:
 
 	uint8_t m_irq_mask;
 
-	DECLARE_WRITE8_MEMBER(pacman_interrupt_vector_w);
-	DECLARE_WRITE8_MEMBER(piranha_interrupt_vector_w);
-	DECLARE_WRITE8_MEMBER(nmouse_interrupt_vector_w);
+	void pacman_interrupt_vector_w(uint8_t data);
+	void piranha_interrupt_vector_w(uint8_t data);
+	void nmouse_interrupt_vector_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_lockout_global_w);
-	DECLARE_WRITE8_MEMBER(alibaba_sound_w);
-	DECLARE_READ8_MEMBER(alibaba_mystery_1_r);
-	DECLARE_READ8_MEMBER(alibaba_mystery_2_r);
-	DECLARE_WRITE8_MEMBER(maketrax_protection_w);
-	DECLARE_READ8_MEMBER(mbrush_prot_r);
-	DECLARE_READ8_MEMBER(maketrax_special_port2_r);
-	DECLARE_READ8_MEMBER(maketrax_special_port3_r);
-	DECLARE_READ8_MEMBER(mschamp_kludge_r);
-	DECLARE_WRITE8_MEMBER(bigbucks_bank_w);
-	DECLARE_READ8_MEMBER(bigbucks_question_r);
-	DECLARE_WRITE8_MEMBER(porky_banking_w);
-	DECLARE_READ8_MEMBER(drivfrcp_port1_r);
-	DECLARE_READ8_MEMBER(_8bpm_port1_r);
-	DECLARE_READ8_MEMBER(porky_port1_r);
-	DECLARE_READ8_MEMBER(rocktrv2_prot1_data_r);
-	DECLARE_READ8_MEMBER(rocktrv2_prot2_data_r);
-	DECLARE_READ8_MEMBER(rocktrv2_prot3_data_r);
-	DECLARE_READ8_MEMBER(rocktrv2_prot4_data_r);
-	DECLARE_WRITE8_MEMBER(rocktrv2_prot_data_w);
-	DECLARE_WRITE8_MEMBER(rocktrv2_question_bank_w);
-	DECLARE_READ8_MEMBER(rocktrv2_question_r);
-	DECLARE_READ8_MEMBER(pacman_read_nop);
-	DECLARE_READ8_MEMBER(mspacman_disable_decode_r_0x0038);
-	DECLARE_READ8_MEMBER(mspacman_disable_decode_r_0x03b0);
-	DECLARE_READ8_MEMBER(mspacman_disable_decode_r_0x1600);
-	DECLARE_READ8_MEMBER(mspacman_disable_decode_r_0x2120);
-	DECLARE_READ8_MEMBER(mspacman_disable_decode_r_0x3ff0);
-	DECLARE_READ8_MEMBER(mspacman_disable_decode_r_0x8000);
-	DECLARE_READ8_MEMBER(mspacman_disable_decode_r_0x97f0);
-	DECLARE_WRITE8_MEMBER(mspacman_disable_decode_w);
-	DECLARE_READ8_MEMBER(mspacman_enable_decode_r_0x3ff8);
-	DECLARE_WRITE8_MEMBER(mspacman_enable_decode_w);
+	void alibaba_sound_w(offs_t offset, uint8_t data);
+	uint8_t alibaba_mystery_1_r();
+	uint8_t alibaba_mystery_2_r();
+	void maketrax_protection_w(uint8_t data);
+	uint8_t mbrush_prot_r(offs_t offset);
+	uint8_t maketrax_special_port2_r(offs_t offset);
+	uint8_t maketrax_special_port3_r(offs_t offset);
+	uint8_t mschamp_kludge_r();
+	void bigbucks_bank_w(uint8_t data);
+	uint8_t bigbucks_question_r(offs_t offset);
+	void porky_banking_w(uint8_t data);
+	uint8_t drivfrcp_port1_r();
+	uint8_t _8bpm_port1_r();
+	uint8_t porky_port1_r();
+	uint8_t rocktrv2_prot1_data_r();
+	uint8_t rocktrv2_prot2_data_r();
+	uint8_t rocktrv2_prot3_data_r();
+	uint8_t rocktrv2_prot4_data_r();
+	void rocktrv2_prot_data_w(offs_t offset, uint8_t data);
+	void rocktrv2_question_bank_w(uint8_t data);
+	uint8_t rocktrv2_question_r(offs_t offset);
+	uint8_t pacman_read_nop();
+	uint8_t mspacman_disable_decode_r_0x0038(offs_t offset);
+	uint8_t mspacman_disable_decode_r_0x03b0(offs_t offset);
+	uint8_t mspacman_disable_decode_r_0x1600(offs_t offset);
+	uint8_t mspacman_disable_decode_r_0x2120(offs_t offset);
+	uint8_t mspacman_disable_decode_r_0x3ff0(offs_t offset);
+	uint8_t mspacman_disable_decode_r_0x8000(offs_t offset);
+	uint8_t mspacman_disable_decode_r_0x97f0(offs_t offset);
+	void mspacman_disable_decode_w(uint8_t data);
+	uint8_t mspacman_enable_decode_r_0x3ff8(offs_t offset);
+	void mspacman_enable_decode_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
-	DECLARE_READ8_MEMBER(mspacii_protection_r);
-	DECLARE_READ8_MEMBER(cannonbp_protection_r);
-	DECLARE_WRITE8_MEMBER(pacman_videoram_w);
-	DECLARE_WRITE8_MEMBER(pacman_colorram_w);
+	uint8_t mspacii_protection_r(offs_t offset);
+	uint8_t cannonbp_protection_r(offs_t offset);
+	void pacman_videoram_w(offs_t offset, uint8_t data);
+	void pacman_colorram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_WRITE_LINE_MEMBER(pengo_palettebank_w);
 	DECLARE_WRITE_LINE_MEMBER(pengo_colortablebank_w);
 	DECLARE_WRITE_LINE_MEMBER(pengo_gfxbank_w);
-	DECLARE_WRITE8_MEMBER(s2650games_videoram_w);
-	DECLARE_WRITE8_MEMBER(s2650games_colorram_w);
-	DECLARE_WRITE8_MEMBER(s2650games_scroll_w);
-	DECLARE_WRITE8_MEMBER(s2650games_tilesbank_w);
-	DECLARE_WRITE8_MEMBER(jrpacman_videoram_w);
+	void s2650games_videoram_w(offs_t offset, uint8_t data);
+	void s2650games_colorram_w(offs_t offset, uint8_t data);
+	void s2650games_scroll_w(offs_t offset, uint8_t data);
+	void s2650games_tilesbank_w(offs_t offset, uint8_t data);
+	void jrpacman_videoram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(jrpacman_charbank_w);
 	DECLARE_WRITE_LINE_MEMBER(jrpacman_spritebank_w);
-	DECLARE_WRITE8_MEMBER(jrpacman_scroll_w);
+	void jrpacman_scroll_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(jrpacman_bgpriority_w);
 	void superabc_bank_w(uint8_t data);
 
@@ -175,7 +176,6 @@ public:
 	void init_mschamp();
 	void init_mbrush();
 	void init_pengomc1();
-	void init_clubpacma();
 
 protected:
 	TILEMAP_MAPPER_MEMBER(pacman_scan_rows);
@@ -252,7 +252,7 @@ public:
 	void eeekkp(machine_config &config);
 
 protected:
-	DECLARE_READ8_MEMBER(epos_decryption_w);
+	uint8_t epos_decryption_w(offs_t offset);
 	DECLARE_MACHINE_START(theglobp);
 	DECLARE_MACHINE_RESET(theglobp);
 	DECLARE_MACHINE_START(eeekkp);
@@ -262,6 +262,28 @@ protected:
 
 	void epos_map(address_map &map);
 	void epos_portmap(address_map &map);
+};
+
+class clubpacm_state : public pacman_state
+{
+public:
+	clubpacm_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pacman_state(mconfig, type, tag)
+		, m_sublatch(*this, "sublatch")
+		, m_players(*this, "P%u", 1)
+	{ }
+
+	void clubpacm(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(clubpacm_input_r);
+
+	void init_clubpacma();
+
+protected:
+	void clubpacm_map(address_map &map);
+
+	required_device<generic_latch_8_device> m_sublatch;
+	required_ioport_array<2> m_players;
 };
 
 #endif // MAME_INCLUDES_PACMAN_H

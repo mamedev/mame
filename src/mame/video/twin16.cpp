@@ -38,25 +38,25 @@ enum
 };
 
 
-WRITE16_MEMBER(twin16_state::fixram_w)
+void twin16_state::fixram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fixram[offset]);
 	m_fixed_tmap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(twin16_state::videoram0_w)
+void twin16_state::videoram0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[0][offset]);
 	m_scroll_tmap[0]->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(twin16_state::videoram1_w)
+void twin16_state::videoram1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[1][offset]);
 	m_scroll_tmap[1]->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(twin16_state::zipram_w)
+void twin16_state::zipram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t old = m_zipram[offset];
 	COMBINE_DATA(&m_zipram[offset]);
@@ -69,7 +69,7 @@ void twin16_state::twin16_postload()
 	m_gfxdecode->gfx(1)->mark_all_dirty();
 }
 
-WRITE16_MEMBER(fround_state::gfx_bank_w)
+void fround_state::gfx_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int changed = 0;
 
@@ -96,7 +96,7 @@ WRITE16_MEMBER(fround_state::gfx_bank_w)
 	}
 }
 
-WRITE16_MEMBER(twin16_state::video_register_w)
+void twin16_state::video_register_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -189,7 +189,7 @@ WRITE16_MEMBER(twin16_state::video_register_w)
  *   3  | ------------xxxx | color
  */
 
-READ16_MEMBER(twin16_state::sprite_status_r)
+uint16_t twin16_state::sprite_status_r()
 {
 	// bit 0: busy, other bits: dunno
 	return m_sprite_busy;
@@ -274,7 +274,6 @@ void twin16_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, co
 		{
 			int xpos = source[1];
 			int ypos = source[2];
-			int x,y;
 
 			int pal_base = ((attributes&0xf)+0x10)*16;
 			int height  = 16<<((attributes>>6)&0x3);
@@ -335,15 +334,15 @@ void twin16_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, co
 			if( ypos>=256 ) ypos -= 65536;
 
 			/* slow slow slow, but it's ok for now */
-			for( y=0; y<height; y++, pen_data += width/4 )
+			for( int y=0; y<height; y++, pen_data += width/4 )
 			{
 				int sy = (flipy)?(ypos+height-1-y):(ypos+y);
 				if( sy>=cliprect.min_y && sy<=cliprect.max_y )
 				{
-					uint16_t *dest = &bitmap.pix16(sy);
-					uint8_t *pdest = &screen.priority().pix8(sy);
+					uint16_t *const dest = &bitmap.pix(sy);
+					uint8_t *const pdest = &screen.priority().pix(sy);
 
-					for( x=0; x<width; x++ )
+					for( int x=0; x<width; x++ )
 					{
 						int sx = (flipx)?(xpos+width-1-x):(xpos+x);
 						if( sx>=cliprect.min_x && sx<=cliprect.max_x )

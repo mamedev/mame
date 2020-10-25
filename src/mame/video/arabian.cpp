@@ -263,7 +263,7 @@ void arabian_state::blit_area( uint8_t plane, uint16_t src, uint8_t x, uint8_t y
  *
  *************************************/
 
-WRITE8_MEMBER(arabian_state::arabian_blitter_w)
+void arabian_state::arabian_blitter_w(offs_t offset, uint8_t data)
 {
 	/* write the data */
 	m_blitter[offset] = data;
@@ -292,7 +292,7 @@ WRITE8_MEMBER(arabian_state::arabian_blitter_w)
  *
  *************************************/
 
-WRITE8_MEMBER(arabian_state::arabian_videoram_w)
+void arabian_state::arabian_videoram_w(offs_t offset, uint8_t data)
 {
 	uint8_t *base;
 	uint8_t x, y;

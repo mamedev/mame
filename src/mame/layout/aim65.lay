@@ -22,26 +22,26 @@ copyright-holders:Dirk Best, Eric Roberts
 
 	<group name="displays">
 		<bounds left="50" top="20" right="770" bottom="141" />
-		<bezel element="static_black">
+		<element ref="static_black">
 			<bounds left="50" top="20" right="770" bottom="141" />
-		</bezel>
+		</element>
 
-		<!-- bezel -->
+		<!-- element -->
 
-		<bezel element="static_white"><bounds left="50" top="20" right="770" bottom="141" /></bezel>
-		<bezel element="static_black"><bounds left="53" top="23" right="767" bottom="138" /></bezel>
+		<element ref="static_white"><bounds left="50" top="20" right="770" bottom="141" /></element>
+		<element ref="static_black"><bounds left="53" top="23" right="767" bottom="138" /></element>
 
 		<repeat count="4">
 			<param name="xl" start="63" increment="173" />
 			<param name="xsbase" start="97.6" increment="173" />
-			<bezel element="static_white"><bounds x="~xl~" y="129" width="2" height="10" /></bezel>
+			<element ref="static_white"><bounds x="~xl~" y="129" width="2" height="10" /></element>
 			<repeat count="4">
 				<param name="xs" start="~xsbase~" increment="34.6" />
-				<bezel element="static_white"><bounds x="~xs~" y="135" width="2" height="4" /></bezel>
+				<element ref="static_white"><bounds x="~xs~" y="135" width="2" height="4" /></element>
 			</repeat>
 		</repeat>
 
-		<bezel element="static_white"><bounds x="755" y="129" width="2" height="10" /></bezel>
+		<element ref="static_white"><bounds x="755" y="129" width="2" height="10" /></element>
 
 
 		<!-- digits -->
@@ -53,7 +53,7 @@ copyright-holders:Dirk Best, Eric Roberts
 			<repeat count="4">
 				<param name="digitno" start="~moduleno~" increment="1" />
 				<param name="digitx" start="~modulex~" increment="34" />
-				<bezel name="digit~digitno~" element="digit"><bounds x="~digitx~" y="40" width="25" height="70" /></bezel>
+				<element name="digit~digitno~" ref="digit"><bounds x="~digitx~" y="40" width="25" height="70" /></element>
 			</repeat>
 		</repeat>
 	</group>
@@ -74,24 +74,24 @@ copyright-holders:Dirk Best, Eric Roberts
 	</view>
 
 	<view name="Terminal Below">
-		<group ref="displays">
-			<bounds x="0" y="0" width="241" height="16" />
-		</group>
 		<screen index="1">
 			<bounds x="0" y="16" width="241" height="180.75" />
 		</screen>
-	</view>
-
-	<view name="Printer and Terminal">
 		<group ref="displays">
 			<bounds x="0" y="0" width="241" height="16" />
 		</group>
+	</view>
+
+	<view name="Printer and Terminal">
 		<screen index="0">
 			<bounds x="0" y="16" width="241" height="180.75" />
 		</screen>
 		<screen index="1">
 			<bounds x="250" y="0" width="241" height="196.75" />
 		</screen>
+		<group ref="displays">
+			<bounds x="0" y="0" width="241" height="16" />
+		</group>
 	</view>
 
 </mamelayout>

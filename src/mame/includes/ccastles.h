@@ -36,20 +36,20 @@ public:
 	void ccastles(machine_config &config);
 
 protected:
-	DECLARE_WRITE8_MEMBER(irq_ack_w);
-	DECLARE_READ8_MEMBER(leta_r);
-	DECLARE_WRITE8_MEMBER(nvram_recall_w);
+	void irq_ack_w(uint8_t data);
+	uint8_t leta_r(offs_t offset);
+	void nvram_recall_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(nvram_store_w);
-	DECLARE_READ8_MEMBER(nvram_r);
-	DECLARE_WRITE8_MEMBER(nvram_w);
-	DECLARE_WRITE8_MEMBER(ccastles_hscroll_w);
-	DECLARE_WRITE8_MEMBER(ccastles_vscroll_w);
-	DECLARE_WRITE8_MEMBER(ccastles_video_control_w);
-	DECLARE_WRITE8_MEMBER(ccastles_paletteram_w);
-	DECLARE_WRITE8_MEMBER(ccastles_videoram_w);
-	DECLARE_READ8_MEMBER(ccastles_bitmode_r);
-	DECLARE_WRITE8_MEMBER(ccastles_bitmode_w);
-	DECLARE_WRITE8_MEMBER(ccastles_bitmode_addr_w);
+	uint8_t nvram_r(address_space &space, offs_t offset);
+	void nvram_w(offs_t offset, uint8_t data);
+	void ccastles_hscroll_w(uint8_t data);
+	void ccastles_vscroll_w(uint8_t data);
+	void ccastles_video_control_w(offs_t offset, uint8_t data);
+	void ccastles_paletteram_w(offs_t offset, uint8_t data);
+	void ccastles_videoram_w(offs_t offset, uint8_t data);
+	uint8_t ccastles_bitmode_r();
+	void ccastles_bitmode_w(uint8_t data);
+	void ccastles_bitmode_addr_w(offs_t offset, uint8_t data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

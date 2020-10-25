@@ -45,7 +45,7 @@ TILE_GET_INFO_MEMBER(drgnmst_base_state::get_fg_tile_info)
 	tileinfo.set(1, tileno, colour, TILE_FLIPYX(flipyx));
 }
 
-WRITE16_MEMBER(drgnmst_base_state::fg_videoram_w)
+void drgnmst_base_state::fg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fg_videoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
@@ -67,7 +67,7 @@ TILE_GET_INFO_MEMBER(drgnmst_base_state::get_bg_tile_info)
 	tileinfo.set(3, tileno, colour, TILE_FLIPYX(flipyx));
 }
 
-WRITE16_MEMBER(drgnmst_base_state::bg_videoram_w)
+void drgnmst_base_state::bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg_videoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
@@ -89,7 +89,7 @@ TILE_GET_INFO_MEMBER(drgnmst_base_state::get_md_tile_info)
 	tileinfo.set(2, tileno, colour, TILE_FLIPYX(flipyx));
 }
 
-WRITE16_MEMBER(drgnmst_base_state::md_videoram_w)
+void drgnmst_base_state::md_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_md_videoram[offset]);
 	m_md_tilemap->mark_tile_dirty(offset / 2);

@@ -125,41 +125,41 @@ public:
 	auto adc_data_r_cb() { return m_data_r_cb.bind(); }
 	auto i2s_data_w_cb() { return m_data_w_cb.bind(); }
 
-	DECLARE_READ32_MEMBER(lcd_r);
-	DECLARE_READ32_MEMBER(clkpow_r);
-	DECLARE_READ32_MEMBER(irq_r);
-	DECLARE_READ32_MEMBER(pwm_r);
-	DECLARE_READ32_MEMBER(iic_r);
-	DECLARE_READ32_MEMBER(gpio_r);
-	DECLARE_READ32_MEMBER(uart_0_r);
-	DECLARE_READ32_MEMBER(uart_1_r);
-	DECLARE_READ32_MEMBER(wdt_r);
-	DECLARE_READ32_MEMBER(cpuwrap_r);
-	DECLARE_READ32_MEMBER(adc_r);
-	DECLARE_READ32_MEMBER(sio_r);
-	DECLARE_READ32_MEMBER(iis_r);
-	DECLARE_READ32_MEMBER(zdma_0_r);
-	DECLARE_READ32_MEMBER(zdma_1_r);
-	DECLARE_READ32_MEMBER(bdma_0_r);
-	DECLARE_READ32_MEMBER(bdma_1_r);
+	uint32_t lcd_r(offs_t offset, uint32_t mem_mask = ~0);
+	uint32_t clkpow_r(offs_t offset, uint32_t mem_mask = ~0);
+	uint32_t irq_r(offs_t offset, uint32_t mem_mask = ~0);
+	uint32_t pwm_r(offs_t offset, uint32_t mem_mask = ~0);
+	uint32_t iic_r(offs_t offset, uint32_t mem_mask = ~0);
+	uint32_t gpio_r(offs_t offset, uint32_t mem_mask = ~0);
+	uint32_t uart_0_r(offs_t offset, uint32_t mem_mask = ~0);
+	uint32_t uart_1_r(offs_t offset, uint32_t mem_mask = ~0);
+	uint32_t wdt_r(offs_t offset, uint32_t mem_mask = ~0);
+	uint32_t cpuwrap_r(offs_t offset, uint32_t mem_mask = ~0);
+	uint32_t adc_r(offs_t offset, uint32_t mem_mask = ~0);
+	uint32_t sio_r(offs_t offset, uint32_t mem_mask = ~0);
+	uint32_t iis_r(offs_t offset, uint32_t mem_mask = ~0);
+	uint32_t zdma_0_r(offs_t offset, uint32_t mem_mask = ~0);
+	uint32_t zdma_1_r(offs_t offset, uint32_t mem_mask = ~0);
+	uint32_t bdma_0_r(offs_t offset, uint32_t mem_mask = ~0);
+	uint32_t bdma_1_r(offs_t offset, uint32_t mem_mask = ~0);
 
-	DECLARE_WRITE32_MEMBER(lcd_w);
-	DECLARE_WRITE32_MEMBER(clkpow_w);
-	DECLARE_WRITE32_MEMBER(irq_w);
-	DECLARE_WRITE32_MEMBER(pwm_w);
-	DECLARE_WRITE32_MEMBER(iic_w);
-	DECLARE_WRITE32_MEMBER(gpio_w);
-	DECLARE_WRITE32_MEMBER(uart_0_w);
-	DECLARE_WRITE32_MEMBER(uart_1_w);
-	DECLARE_WRITE32_MEMBER(wdt_w);
-	DECLARE_WRITE32_MEMBER(cpuwrap_w);
-	DECLARE_WRITE32_MEMBER(adc_w);
-	DECLARE_WRITE32_MEMBER(sio_w);
-	DECLARE_WRITE32_MEMBER(iis_w);
-	DECLARE_WRITE32_MEMBER(zdma_0_w);
-	DECLARE_WRITE32_MEMBER(zdma_1_w);
-	DECLARE_WRITE32_MEMBER(bdma_0_w);
-	DECLARE_WRITE32_MEMBER(bdma_1_w);
+	void lcd_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void clkpow_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void irq_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void pwm_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void iic_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void gpio_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void uart_0_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void uart_1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void wdt_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void cpuwrap_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void adc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void sio_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void iis_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void zdma_0_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void zdma_1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void bdma_0_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void bdma_1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	void request_eint(uint32_t number);
 	uint32_t video_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -553,7 +553,7 @@ private:
 	TIMER_CALLBACK_MEMBER(sio_timer_exp);
 
 	// IIS
-	inline void iface_i2s_data_w(address_space &space, int ch, uint16_t data);
+	inline void iface_i2s_data_w(int ch, uint16_t data);
 	void iis_start();
 	void iis_stop();
 	TIMER_CALLBACK_MEMBER(iis_timer_exp);
@@ -600,7 +600,7 @@ private:
 	devcb_read32 m_data_r_cb;
 	devcb_write16 m_data_w_cb;
 
-	memory_access_cache<2, 0, ENDIANNESS_LITTLE> *m_cache;
+	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache m_cache;
 };
 
 DECLARE_DEVICE_TYPE(S3C44B0, s3c44b0_device)

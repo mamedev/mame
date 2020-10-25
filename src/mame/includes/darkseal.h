@@ -35,9 +35,9 @@ public:
 	void init_darkseal();
 
 private:
-	DECLARE_WRITE16_MEMBER(irq_ack_w);
-	DECLARE_WRITE16_MEMBER(palette_w);
-	DECLARE_WRITE16_MEMBER(palette_ext_w);
+	void irq_ack_w(uint16_t data);
+	void palette_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void palette_ext_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void update_palette(int offset);

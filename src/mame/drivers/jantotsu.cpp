@@ -132,13 +132,13 @@ private:
 	uint8_t    m_col_bank;
 	uint8_t    m_display_on;
 	uint8_t    m_bitmap[0x8000];
-	DECLARE_READ8_MEMBER(jantotsu_bitmap_r);
-	DECLARE_WRITE8_MEMBER(jantotsu_bitmap_w);
-	DECLARE_WRITE8_MEMBER(bankaddr_w);
-	DECLARE_READ8_MEMBER(jantotsu_mux_r);
-	DECLARE_WRITE8_MEMBER(jantotsu_mux_w);
-	DECLARE_READ8_MEMBER(jantotsu_dsw2_r);
-	DECLARE_WRITE8_MEMBER(jan_adpcm_w);
+	uint8_t jantotsu_bitmap_r(offs_t offset);
+	void jantotsu_bitmap_w(offs_t offset, uint8_t data);
+	void bankaddr_w(uint8_t data);
+	uint8_t jantotsu_mux_r();
+	void jantotsu_mux_w(uint8_t data);
+	uint8_t jantotsu_dsw2_r();
+	void jan_adpcm_w(offs_t offset, uint8_t data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -166,28 +166,23 @@ void jantotsu_state::video_start()
 
 uint32_t jantotsu_state::screen_update_jantotsu(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int x, y, i;
-	int count = 0;
-	uint8_t pen_i;
-
 	if(!m_display_on)
 		return 0;
 
-	for (y = 0; y < 256; y++)
+	int count = 0;
+	for (int y = 0; y < 256; y++)
 	{
-		for (x = 0; x < 256; x += 8)
+		for (int x = 0; x < 256; x += 8)
 		{
-			uint8_t color;
-
-			for (i = 0; i < 8; i++)
+			for (int i = 0; i < 8; i++)
 			{
-				color = m_col_bank;
+				uint8_t color = m_col_bank;
 
-				for(pen_i = 0;pen_i<4;pen_i++)
+				for (uint8_t pen_i = 0;pen_i<4;pen_i++)
 					color |= (((m_bitmap[count + pen_i*0x2000]) >> (7 - i)) & 1) << pen_i;
 
 				if (cliprect.contains(x + i, y))
-					bitmap.pix32(y, x + i) = m_palette->pen(color);
+					bitmap.pix(y, x + i) = m_palette->pen(color);
 			}
 
 			count++;
@@ -198,17 +193,17 @@ uint32_t jantotsu_state::screen_update_jantotsu(screen_device &screen, bitmap_rg
 }
 
 /* banked vram */
-READ8_MEMBER(jantotsu_state::jantotsu_bitmap_r)
+uint8_t jantotsu_state::jantotsu_bitmap_r(offs_t offset)
 {
 	return m_bitmap[offset + ((m_vram_bank & 3) * 0x2000)];
 }
 
-WRITE8_MEMBER(jantotsu_state::jantotsu_bitmap_w)
+void jantotsu_state::jantotsu_bitmap_w(offs_t offset, uint8_t data)
 {
 	m_bitmap[offset + ((m_vram_bank & 3) * 0x2000)] = data;
 }
 
-WRITE8_MEMBER(jantotsu_state::bankaddr_w)
+void jantotsu_state::bankaddr_w(uint8_t data)
 {
 	m_vram_bank = ((data & 0xc0) >> 6);
 
@@ -252,7 +247,7 @@ void jantotsu_state::jantotsu_palette(palette_device &palette) const
  *************************************/
 
 /*Multiplexer is mapped as 6-bits reads,bits 6 & 7 are always connected to the coin mechs.*/
-READ8_MEMBER(jantotsu_state::jantotsu_mux_r)
+uint8_t jantotsu_state::jantotsu_mux_r()
 {
 	const char *const portnames[] = { "PL1_1", "PL1_2", "PL1_3", "PL1_4",
 										"PL2_1", "PL2_2", "PL2_3", "PL2_4" };
@@ -270,7 +265,7 @@ READ8_MEMBER(jantotsu_state::jantotsu_mux_r)
 	return res;
 }
 
-WRITE8_MEMBER(jantotsu_state::jantotsu_mux_w)
+void jantotsu_state::jantotsu_mux_w(uint8_t data)
 {
 	m_mux_data = data;
 }
@@ -279,12 +274,12 @@ WRITE8_MEMBER(jantotsu_state::jantotsu_mux_w)
   so I'm guessing that these bits can't be read by the z80 at all but directly
   hard-wired to the video chip. However I need the schematics / pcb snaps and/or
   a side-by-side test (to know if the background colors really works) to be sure. */
-READ8_MEMBER(jantotsu_state::jantotsu_dsw2_r)
+uint8_t jantotsu_state::jantotsu_dsw2_r()
 {
 	return (ioport("DSW2")->read() & 0x3f) | 0x80;
 }
 
-WRITE8_MEMBER(jantotsu_state::jan_adpcm_w)
+void jantotsu_state::jan_adpcm_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{

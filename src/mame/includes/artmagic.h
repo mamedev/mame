@@ -58,11 +58,11 @@ public:
 	uint8_t m_blitter_page;
 	attotime m_blitter_busy_until;
 	emu_timer * m_irq_off_timer;
-	DECLARE_WRITE16_MEMBER(control_w);
-	DECLARE_READ16_MEMBER(ultennis_hack_r);
-	DECLARE_WRITE16_MEMBER(protection_bit_w);
-	DECLARE_READ16_MEMBER(blitter_r);
-	DECLARE_WRITE16_MEMBER(blitter_w);
+	void control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t ultennis_hack_r();
+	void protection_bit_w(offs_t offset, uint16_t data);
+	uint16_t blitter_r();
+	void blitter_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(m68k_gen_int);
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);

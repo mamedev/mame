@@ -106,6 +106,9 @@ Notes:
         0704: rr   a
         0706: call $073F
 
+        There is an alternate format function in the controller firmware that allows to set a secret byte which is stored in the sector header.
+        Copy protected software checks the secret byte read from the sector header and refuses to start if the disk has not been appropriately formatted.
+
 */
 
 #include "emu.h"
@@ -197,17 +200,17 @@ void luxor_55_10828_device::luxor_55_10828_io(address_map &map)
 //  Z80PIO
 //-------------------------------------------------
 
-READ8_MEMBER( luxor_55_10828_device::pio_pa_r )
+uint8_t luxor_55_10828_device::pio_pa_r()
 {
 	return m_data;
 }
 
-WRITE8_MEMBER( luxor_55_10828_device::pio_pa_w )
+void luxor_55_10828_device::pio_pa_w(uint8_t data)
 {
 	m_data = data;
 }
 
-READ8_MEMBER( luxor_55_10828_device::pio_pb_r )
+uint8_t luxor_55_10828_device::pio_pb_r()
 {
 	/*
 
@@ -252,7 +255,7 @@ READ8_MEMBER( luxor_55_10828_device::pio_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( luxor_55_10828_device::pio_pb_w )
+void luxor_55_10828_device::pio_pb_w(uint8_t data)
 {
 	/*
 
@@ -367,12 +370,12 @@ INPUT_PORTS_START( luxor_55_10828 )
 	PORT_DIPSETTING(    0x00, "44 (ABC 832/834/850)" )
 	PORT_DIPSETTING(    0x01, "45 (ABC 830)" )
 
-	PORT_START("S2,S3")
+	PORT_START("S2_S3")
 	PORT_DIPNAME( 0x01, 0x01, "Shift Clock" )
 	PORT_DIPSETTING(    0x00, "2 MHz" )
 	PORT_DIPSETTING(    0x01, "4 MHz" )
 
-	PORT_START("S4,S5")
+	PORT_START("S4_S5")
 	PORT_DIPNAME( 0x01, 0x01, "Write Precompensation" )
 	PORT_DIPSETTING(    0x00, "Always On" )
 	PORT_DIPSETTING(    0x01, "Programmable" )
@@ -455,8 +458,7 @@ void luxor_55_10828_device::device_reset()
 {
 	m_cs = false;
 
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	ctrl_w(space, 0, 0);
+	ctrl_w(0);
 
 	m_data = 0;
 }
@@ -574,7 +576,7 @@ void luxor_55_10828_device::abcbus_c3(uint8_t data)
 //  ctrl_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( luxor_55_10828_device::ctrl_w )
+void luxor_55_10828_device::ctrl_w(uint8_t data)
 {
 	/*
 
@@ -626,7 +628,7 @@ WRITE8_MEMBER( luxor_55_10828_device::ctrl_w )
 //  status_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( luxor_55_10828_device::status_w )
+void luxor_55_10828_device::status_w(uint8_t data)
 {
 	/*
 
@@ -657,7 +659,7 @@ WRITE8_MEMBER( luxor_55_10828_device::status_w )
 //  fdc_r -
 //-------------------------------------------------
 
-READ8_MEMBER( luxor_55_10828_device::fdc_r )
+uint8_t luxor_55_10828_device::fdc_r(offs_t offset)
 {
 	if (machine().side_effects_disabled())
 		return 0xff;
@@ -685,7 +687,7 @@ READ8_MEMBER( luxor_55_10828_device::fdc_r )
 //  fdc_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( luxor_55_10828_device::fdc_w )
+void luxor_55_10828_device::fdc_w(offs_t offset, uint8_t data)
 {
 	if (machine().side_effects_disabled())
 		return;

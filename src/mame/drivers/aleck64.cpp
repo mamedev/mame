@@ -199,10 +199,10 @@ public:
 	void init_aleck64();
 
 private:
-	DECLARE_WRITE32_MEMBER(aleck_dips_w);
-	DECLARE_READ32_MEMBER(aleck_dips_r);
-	DECLARE_READ16_MEMBER(e90_prot_r);
-	DECLARE_WRITE16_MEMBER(e90_prot_w);
+	void aleck_dips_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t aleck_dips_r(offs_t offset, uint32_t mem_mask = ~0);
+	uint16_t e90_prot_r();
+	void e90_prot_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	uint32_t screen_update_e90(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -216,7 +216,7 @@ private:
 };
 
 
-WRITE32_MEMBER(aleck64_state::aleck_dips_w)
+void aleck64_state::aleck_dips_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/*
 	    mtetrisc uses offset 0x1c and 0x03 a good bit in conjunction with reading INMJ.
@@ -236,7 +236,7 @@ WRITE32_MEMBER(aleck64_state::aleck_dips_w)
 	}
 }
 
-READ32_MEMBER(aleck64_state::aleck_dips_r)
+uint32_t aleck64_state::aleck_dips_r(offs_t offset, uint32_t mem_mask)
 {
 	// srmvs uses 0x40, communications?
 
@@ -345,13 +345,13 @@ void aleck64_state::n64_map(address_map &map)
  E90 protection handlers
 */
 
-READ16_MEMBER(aleck64_state::e90_prot_r)
+uint16_t aleck64_state::e90_prot_r()
 {
 // offset 0 $800 = status ready, active high
 	return 0;
 }
 
-WRITE16_MEMBER(aleck64_state::e90_prot_w)
+void aleck64_state::e90_prot_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset*2)
 	{
@@ -1085,10 +1085,6 @@ uint32_t aleck64_state::screen_update_e90(screen_device &screen, bitmap_rgb32 &b
 
 	for(int offs=0;offs<0x1000/4;offs+=2)
 	{
-		int xi,yi;
-		int r,g,b;
-		int pal_offs;
-		int pal_shift;
 		// 0x400 is another enable? end code if off?
 		//uint16_t tile = m_e90_vram[offs] >> 16;
 
@@ -1113,28 +1109,26 @@ uint32_t aleck64_state::screen_update_e90(screen_device &screen, bitmap_rgb32 &b
 		// some pieces needs this color adjustment (see T piece / 5 block version of I piece)
 		pal |= (attr & 0xc0) >> 4;
 
-		for(yi=0;yi<8;yi++)
+		for(int yi=0;yi<8;yi++)
 		{
-			for(xi=0;xi<8;xi++)
+			for(int xi=0;xi<8;xi++)
 			{
-				int res_x,res_y;
-				uint16_t raw_rgb;
-				res_x = x+xi + 4;
-				res_y = (y & 0xff)+yi + 7;
+				int res_x = x+xi + 4;
+				int res_y = (y & 0xff)+yi + 7;
 
-				pal_offs = (pal*0x10);
+				int pal_offs = (pal*0x10);
 				pal_offs+= pal_table[xi+yi*8];
-				pal_shift = pal_offs & 1 ? 0 : 16;
-				raw_rgb = m_e90_pal[pal_offs>>1] >> pal_shift;
-				r = (raw_rgb & 0x001f) >> 0;
-				g = (raw_rgb & 0x03e0) >> 5;
-				b = (raw_rgb & 0x7c00) >> 10;
+				int pal_shift = pal_offs & 1 ? 0 : 16;
+				uint16_t raw_rgb = m_e90_pal[pal_offs>>1] >> pal_shift;
+				int r = (raw_rgb & 0x001f) >> 0;
+				int g = (raw_rgb & 0x03e0) >> 5;
+				int b = (raw_rgb & 0x7c00) >> 10;
 				r = pal5bit(r);
 				g = pal5bit(g);
 				b = pal5bit(b);
 
 				if(cliprect.contains(res_x, res_y))
-					bitmap.pix32(res_y, res_x) = r << 16 | g << 8 | b;
+					bitmap.pix(res_y, res_x) = r << 16 | g << 8 | b;
 			}
 		}
 	}

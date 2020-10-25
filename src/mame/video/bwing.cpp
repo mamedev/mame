@@ -19,28 +19,28 @@ revised by Alex W. Jackson
 // Exports
 
 
-WRITE8_MEMBER(bwing_state::videoram_w)
+void bwing_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_charmap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(bwing_state::fgscrollram_w)
+void bwing_state::fgscrollram_w(offs_t offset, uint8_t data)
 {
 	m_fgscrollram[offset] = data;
 	m_fgmap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(bwing_state::bgscrollram_w)
+void bwing_state::bgscrollram_w(offs_t offset, uint8_t data)
 {
 	m_bgscrollram[offset] = data;
 	m_bgmap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(bwing_state::gfxram_w)
+void bwing_state::gfxram_w(offs_t offset, uint8_t data)
 {
 	m_gfxram[offset] = data;
 	int whichgfx = (offset & 0x1000) ? 3 : 2;
@@ -48,7 +48,7 @@ WRITE8_MEMBER(bwing_state::gfxram_w)
 }
 
 
-WRITE8_MEMBER(bwing_state::scrollreg_w)
+void bwing_state::scrollreg_w(offs_t offset, uint8_t data)
 {
 	m_sreg[offset] = data;
 
@@ -64,7 +64,7 @@ WRITE8_MEMBER(bwing_state::scrollreg_w)
 }
 
 
-WRITE8_MEMBER(bwing_state::paletteram_w)
+void bwing_state::paletteram_w(offs_t offset, uint8_t data)
 {
 	static const float rgb[4][3] = {
 		{0.85f, 0.95f, 1.00f},

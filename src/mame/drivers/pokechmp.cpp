@@ -52,7 +52,7 @@ ClawGrip, Jul 2006
 #include "speaker.h"
 
 
-WRITE8_MEMBER(pokechmp_state::pokechmp_bank_w)
+void pokechmp_state::pokechmp_bank_w(uint8_t data)
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -65,14 +65,14 @@ WRITE8_MEMBER(pokechmp_state::pokechmp_bank_w)
 }
 
 
-WRITE8_MEMBER(pokechmp_state::pokechmp_sound_bank_w)
+void pokechmp_state::pokechmp_sound_bank_w(uint8_t data)
 {
 	uint8_t *ROM = memregion("oki")->base();
 	membank("okibank")->set_base(&ROM[data*0x8000]);
 }
 
 
-WRITE8_MEMBER(pokechmp_state::pokechmp_sound_w)
+void pokechmp_state::pokechmp_sound_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);

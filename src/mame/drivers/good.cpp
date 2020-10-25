@@ -66,8 +66,8 @@ private:
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
 	tilemap_t  *m_fg_tilemap;
-	DECLARE_WRITE16_MEMBER(fg_tilemapram_w);
-	DECLARE_WRITE16_MEMBER(bg_tilemapram_w);
+	void fg_tilemapram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void bg_tilemapram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	uint32_t screen_update_good(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -77,7 +77,7 @@ private:
 };
 
 
-WRITE16_MEMBER(good_state::fg_tilemapram_w)
+void good_state::fg_tilemapram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fg_tilemapram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
@@ -90,7 +90,7 @@ TILE_GET_INFO_MEMBER(good_state::get_fg_tile_info)
 	tileinfo.set(0, tileno, attr, 0);
 }
 
-WRITE16_MEMBER(good_state::bg_tilemapram_w)
+void good_state::bg_tilemapram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg_tilemapram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset / 2);

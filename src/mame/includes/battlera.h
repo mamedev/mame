@@ -34,10 +34,10 @@ public:
 	int m_msm5205next;
 	int m_toggle;
 
-	DECLARE_WRITE8_MEMBER(control_data_w);
-	DECLARE_READ8_MEMBER(control_data_r);
-	DECLARE_WRITE8_MEMBER(adpcm_data_w);
-	DECLARE_WRITE8_MEMBER(adpcm_reset_w);
+	void control_data_w(uint8_t data);
+	uint8_t control_data_r();
+	void adpcm_data_w(uint8_t data);
+	void adpcm_reset_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 
 	virtual void machine_start() override;

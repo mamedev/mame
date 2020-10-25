@@ -68,10 +68,11 @@ private:
 	uint8_t m_fifo_a[20];
 	uint8_t m_fifo_b[20];
 
-	DECLARE_READ32_MEMBER(gba_io_r);
-	DECLARE_WRITE32_MEMBER(gba_io_w);
-	DECLARE_READ32_MEMBER(gba_bios_r);
-	DECLARE_READ32_MEMBER(gba_10000000_r);
+
+	uint32_t gba_io_r(offs_t offset, uint32_t mem_mask = ~0);
+	void gba_io_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t gba_bios_r(offs_t offset, uint32_t mem_mask = ~0);
+	uint32_t gba_10000000_r(offs_t offset, uint32_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(int_hblank_callback);
 	DECLARE_WRITE_LINE_MEMBER(int_vblank_callback);
 	DECLARE_WRITE_LINE_MEMBER(int_vcount_callback);

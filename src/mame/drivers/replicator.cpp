@@ -27,7 +27,6 @@
 #include "emu.h"
 #include "cpu/avr8/avr8.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/hd44780.h"
 #include "emupal.h"
 #include "screen.h"
@@ -186,8 +185,8 @@ private:
 	required_device<hd44780_device> m_lcdc;
 	required_device<dac_bit_interface> m_dac;
 
-	DECLARE_READ8_MEMBER(port_r);
-	DECLARE_WRITE8_MEMBER(port_w);
+	uint8_t port_r(offs_t offset);
+	void port_w(offs_t offset, uint8_t data);
 	virtual void machine_reset() override;
 	void replicator_palette(palette_device &palette) const;
 	void replicator_data_map(address_map &map);
@@ -199,7 +198,7 @@ void replicator_state::machine_start()
 {
 }
 
-READ8_MEMBER(replicator_state::port_r)
+uint8_t replicator_state::port_r(offs_t offset)
 {
 	switch( offset )
 	{
@@ -284,7 +283,7 @@ READ8_MEMBER(replicator_state::port_r)
 	return 0;
 }
 
-WRITE8_MEMBER(replicator_state::port_w)
+void replicator_state::port_w(offs_t offset, uint8_t data)
 {
 	switch( offset )
 	{
@@ -635,8 +634,6 @@ void replicator_state::replicator(machine_config &config)
 	/* A piezo is connected to the PORT G bit 5 (OC0B pin driven by Timer/Counter #4) */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac, 0).add_route(0, "speaker", 0.5);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
 ROM_START( replica1 )

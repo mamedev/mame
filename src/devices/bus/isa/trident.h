@@ -17,22 +17,22 @@
 class trident_vga_device :  public svga_device
 {
 public:
-	virtual READ8_MEMBER(port_03c0_r) override;
-	virtual WRITE8_MEMBER(port_03c0_w) override;
-	virtual READ8_MEMBER(port_03d0_r) override;
-	virtual WRITE8_MEMBER(port_03d0_w) override;
-	DECLARE_READ8_MEMBER(port_83c6_r);
-	DECLARE_WRITE8_MEMBER(port_83c6_w);
-	DECLARE_READ8_MEMBER(port_43c6_r);
-	DECLARE_WRITE8_MEMBER(port_43c6_w);
-	DECLARE_READ8_MEMBER(vram_r);
-	DECLARE_WRITE8_MEMBER(vram_w);
-	virtual READ8_MEMBER(mem_r) override;
-	virtual WRITE8_MEMBER(mem_w) override;
+	virtual uint8_t port_03c0_r(offs_t offset) override;
+	virtual void port_03c0_w(offs_t offset, uint8_t data) override;
+	virtual uint8_t port_03d0_r(offs_t offset) override;
+	virtual void port_03d0_w(offs_t offset, uint8_t data) override;
+	uint8_t port_83c6_r(offs_t offset);
+	void port_83c6_w(offs_t offset, uint8_t data);
+	uint8_t port_43c6_r(offs_t offset);
+	void port_43c6_w(offs_t offset, uint8_t data);
+	uint8_t vram_r(offs_t offset);
+	void vram_w(offs_t offset, uint8_t data);
+	virtual uint8_t mem_r(offs_t offset) override;
+	virtual void mem_w(offs_t offset, uint8_t data) override;
 	virtual uint16_t offset() override;
 
-	DECLARE_READ8_MEMBER(accel_r);
-	DECLARE_WRITE8_MEMBER(accel_w);
+	uint8_t accel_r(offs_t offset);
+	void accel_w(offs_t offset, uint8_t data);
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
@@ -128,8 +128,8 @@ private:
 	int calculate_clock();
 
 	// old style MMIO (0xBFF00)
-	void old_mmio_w(address_space& space, uint32_t offset, uint8_t data);
-	uint8_t old_mmio_r(address_space& space, uint32_t offset);
+	void old_mmio_w(offs_t offset, uint8_t data);
+	uint8_t old_mmio_r(offs_t offset);
 
 	// 2D acceleration
 	void accel_command();

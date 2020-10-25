@@ -65,21 +65,20 @@ static constexpr int CLOCKS_PER_SAMPLE = 64;
 
 // device type definition
 DEFINE_DEVICE_TYPE(K053260, k053260_device, "k053260", "K053260 KDSC")
-    ;
 
 
 // Pan multipliers.  Set according to integer angles in degrees, amusingly.
 // Exact precision hard to know, the floating point-ish output format makes
 // comparisons iffy.  So we used a 1.16 format.
 const int k053260_device::pan_mul[8][2] = {
-    {     0,     0 }, // No sound for pan 0
-    { 65536,     0 }, //  0 degrees
-    { 59870, 26656 }, // 24 degrees
-    { 53684, 37950 }, // 35 degrees
-    { 46341, 46341 }, // 45 degrees
-    { 37950, 53684 }, // 55 degrees
-    { 26656, 59870 }, // 66 degrees
-    {     0, 65536 }  // 90 degrees
+	{     0,     0 }, // No sound for pan 0
+	{ 65536,     0 }, //  0 degrees
+	{ 59870, 26656 }, // 24 degrees
+	{ 53684, 37950 }, // 35 degrees
+	{ 46341, 46341 }, // 45 degrees
+	{ 37950, 53684 }, // 55 degrees
+	{ 26656, 59870 }, // 66 degrees
+	{     0, 65536 }  // 90 degrees
 };
 
 
@@ -94,7 +93,7 @@ const int k053260_device::pan_mul[8][2] = {
 k053260_device::k053260_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, K053260, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, device_rom_interface(mconfig, *this, 21)
+	, device_rom_interface(mconfig, *this)
 	, m_sh1_cb(*this)
 	, m_sh2_cb(*this)
 	, m_stream(nullptr)
@@ -210,7 +209,7 @@ u8 k053260_device::read(offs_t offset)
 
 		case 0x2e: // read ROM
 			if (m_mode & 1)
-				ret = m_voice[0].read_rom();
+				ret = m_voice[0].read_rom(!(machine().side_effects_disabled()));
 			else
 				logerror("%s: Attempting to read K053260 ROM without mode bit set\n", machine().describe_context());
 			break;
@@ -302,25 +301,17 @@ void k053260_device::write(offs_t offset, u8 data)
 	}
 }
 
-static inline int limit(int val, int max, int min)
-{
-	return std::max(min, std::min(max, val));
-}
-
-static constexpr s32 MAXOUT = 0x7fff;
-static constexpr s32 MINOUT = -0x8000;
-
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void k053260_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void k053260_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	if (m_mode & 2)
 	{
-		for ( int j = 0; j < samples; j++ )
+		for ( int j = 0; j < outputs[0].samples(); j++ )
 		{
-			stream_sample_t buffer[2] = {0, 0};
+			s32 buffer[2] = {0, 0};
 
 			for (auto & voice : m_voice)
 			{
@@ -328,14 +319,14 @@ void k053260_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 					voice.play(buffer);
 			}
 
-			outputs[0][j] = limit( buffer[0], MAXOUT, MINOUT );
-			outputs[1][j] = limit( buffer[1], MAXOUT, MINOUT );
+			outputs[0].put_int_clamp(j, buffer[0], 32768);
+			outputs[1].put_int_clamp(j, buffer[1], 32768);
 		}
 	}
 	else
 	{
-		std::fill_n(&outputs[0][0], samples, 0);
-		std::fill_n(&outputs[1][0], samples, 0);
+		outputs[0].fill(0);
+		outputs[1].fill(0);
 	}
 }
 
@@ -444,7 +435,7 @@ void k053260_device::KDSC_Voice::key_off()
 	m_playing = false;
 }
 
-void k053260_device::KDSC_Voice::play(stream_sample_t *outputs)
+void k053260_device::KDSC_Voice::play(s32 *outputs)
 {
 	m_counter += CLOCKS_PER_SAMPLE;
 
@@ -494,11 +485,12 @@ void k053260_device::KDSC_Voice::play(stream_sample_t *outputs)
 	outputs[1] += (m_output * m_pan_volume[1]) >> 15;
 }
 
-u8 k053260_device::KDSC_Voice::read_rom()
+u8 k053260_device::KDSC_Voice::read_rom(bool side_effects)
 {
 	u32 offs = m_start + m_position;
 
-	m_position = (m_position + 1) & 0xffff;
+	if (side_effects)
+		m_position = (m_position + 1) & 0xffff;
 
 	return m_device.read_byte(offs);
 }

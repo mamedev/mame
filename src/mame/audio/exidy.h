@@ -7,6 +7,8 @@
 
 #include "machine/6532riot.h"
 #include "machine/6821pia.h"
+#include "machine/timer.h"
+#include "sound/flt_biquad.h"
 #include "sound/hc55516.h"
 #include "sound/tms5220.h"
 
@@ -54,8 +56,8 @@ protected:
 	void sh6840_register_state_globals();
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
-	virtual stream_sample_t generate_music_sample();
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual s32 generate_music_sample();
 
 	static inline void sh6840_apply_clock(sh6840_timer_channel *t, int clocks);
 
@@ -102,7 +104,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual stream_sample_t generate_music_sample() override;
+	virtual s32 generate_music_sample() override;
 
 	void r6532_porta_w(uint8_t data);
 	uint8_t r6532_porta_r();
@@ -120,7 +122,9 @@ protected:
 	required_device<riot6532_device> m_riot;
 
 	/* 5220/CVSD variables */
-	optional_device<hc55516_device> m_cvsd;
+	optional_device<mc3417_device> m_cvsd;
+	optional_device<filter_biquad_device> m_cvsd_filter;
+	optional_device<filter_biquad_device> m_cvsd_filter2;
 	optional_device<cpu_device> m_cvsdcpu;
 	optional_device<tms5220_device> m_tms;
 	required_device<pia6821_device> m_pia;
@@ -177,11 +181,15 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
+	required_device<timer_device> m_cvsd_timer;
+	TIMER_DEVICE_CALLBACK_MEMBER(cvsd_timer);
 	void voiceio_w(offs_t offset, uint8_t data);
 	uint8_t voiceio_r(offs_t offset);
+	bool m_cvsd_clk;
 
 	void cvsd_map(address_map &map);
 	void cvsd_iomap(address_map &map);

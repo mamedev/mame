@@ -37,8 +37,8 @@ protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-	DECLARE_READ32_MEMBER(special_port1_r);
-	DECLARE_WRITE32_MEMBER(latch_w);
+	uint32_t special_port1_r();
+	void latch_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);

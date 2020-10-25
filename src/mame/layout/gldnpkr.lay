@@ -229,57 +229,57 @@ license:CC0
 		<screen index="0">
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
-		<bezel name="lamp6" element="COLLECT" inputtag="500e" inputmask="0x01">
+		<element name="lamp6" ref="COLLECT" inputtag="500e" inputmask="0x01">
 			<bounds x="0.67" y="3.02" width="0.31" height="0.24" />
-		</bezel>
-		<bezel name="lamp1" element="BET" inputtag="500e" inputmask="0x02">
+		</element>
+		<element name="lamp1" ref="BET" inputtag="500e" inputmask="0x02">
 			<bounds x="1.08" y="3.02" width="0.31" height="0.24" />
-		</bezel>
-		<bezel name="lamp2" element="DRAW" inputtag="500e" inputmask="0x80">
+		</element>
+		<element name="lamp2" ref="DRAW" inputtag="500e" inputmask="0x80">
 			<bounds x="1.91" y="3.02" width="0.31" height="0.24" />
-		</bezel>
-		<bezel name="lamp7" element="DOUBLEUP" inputtag="500d" inputmask="0x02">
+		</element>
+		<element name="lamp7" ref="DOUBLEUP" inputtag="500d" inputmask="0x02">
 			<bounds x="3.13" y="3.02" width="0.31" height="0.24" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp5" element="CHANGE" inputtag="500e" inputmask="0x04">
+		<element name="lamp5" ref="CHANGE" inputtag="500e" inputmask="0x04">
 			<bounds x="0.67" y="3.28" width="0.31" height="0.24" />
-		</bezel>
-		<bezel name="lamp4" element="HOLD1" inputtag="500e" inputmask="0x08">
+		</element>
+		<element name="lamp4" ref="HOLD1" inputtag="500e" inputmask="0x08">
 			<bounds x="1.08" y="3.28" width="0.31" height="0.24" />
-		</bezel>
-		<bezel name="lamp11" element="HOLD2" inputtag="500d" inputmask="0x04">
+		</element>
+		<element name="lamp11" ref="HOLD2" inputtag="500d" inputmask="0x04">
 			<bounds x="1.49" y="3.28" width="0.31" height="0.24" />
-		</bezel>
-		<bezel name="lamp10" element="HOLD3" inputtag="500d" inputmask="0x08">
+		</element>
+		<element name="lamp10" ref="HOLD3" inputtag="500d" inputmask="0x08">
 			<bounds x="1.91" y="3.28" width="0.31" height="0.24" />
-		</bezel>
-		<bezel name="lamp9" element="HOLD4" inputtag="500e" inputmask="0x20">
+		</element>
+		<element name="lamp9" ref="HOLD4" inputtag="500e" inputmask="0x20">
 			<bounds x="2.31" y="3.28" width="0.31" height="0.24" />
-		</bezel>
-		<bezel name="lamp8" element="HOLD5" inputtag="500e" inputmask="0x10">
+		</element>
+		<element name="lamp8" ref="HOLD5" inputtag="500e" inputmask="0x10">
 			<bounds x="2.72" y="3.28" width="0.31" height="0.24" />
-		</bezel>
-		<bezel name="lamp3" element="TAKEWIN" inputtag="500e" inputmask="0x40">
+		</element>
+		<element name="lamp3" ref="TAKEWIN" inputtag="500e" inputmask="0x40">
 			<bounds x="3.13" y="3.28" width="0.31" height="0.24" />
-		</bezel>
-		<bezel name="lamp14" element="light tower1">
+		</element>
+		<element name="lamp14" ref="light tower1">
 			<bounds x="3.70" y="3.28" width="0.10" height="0.10" />
-		</bezel>
-		<bezel name="lamp15" element="light tower2">
+		</element>
+		<element name="lamp15" ref="light tower2">
 			<bounds x="3.80" y="3.28" width="0.10" height="0.10" />
-		</bezel>
-		<bezel name="lamp16" element="light tower3">
+		</element>
+		<element name="lamp16" ref="light tower3">
 			<bounds x="3.70" y="3.38" width="0.10" height="0.10" />
-		</bezel>
-		<bezel name="lamp17" element="light tower4">
+		</element>
+		<element name="lamp17" ref="light tower4">
 			<bounds x="3.80" y="3.38" width="0.10" height="0.10" />
-		</bezel>
-		<bezel name="lamp19" element="auditkey" inputtag="5002" inputmask="0x10">
+		</element>
+		<element name="lamp19" ref="auditkey" inputtag="5002" inputmask="0x10">
 			<bounds x="0.26" y="3.09" width="0.31" height="0.12" />
-		</bezel>
-		<bezel name="lamp20" element="jackpotkey" inputtag="5003" inputmask="0x04">
+		</element>
+		<element name="lamp20" ref="jackpotkey" inputtag="5003" inputmask="0x04">
 			<bounds x="0.26" y="3.34" width="0.31" height="0.12" />
-		</bezel>
+		</element>
 	</view>
 </mamelayout>

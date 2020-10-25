@@ -226,7 +226,7 @@ INTERRUPT_GEN_MEMBER(badlands_state::vblank_int)
 	m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
 }
 
-WRITE16_MEMBER(badlands_state::video_int_ack_w)
+void badlands_state::video_int_ack_w(uint16_t data)
 {
 	m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 }

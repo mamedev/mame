@@ -47,7 +47,7 @@ inline void lethalj_state::get_crosshair_xy(int player, int *x, int *y)
  *
  *************************************/
 
-READ16_MEMBER(lethalj_state::lethalj_gun_r)
+uint16_t lethalj_state::lethalj_gun_r(offs_t offset)
 {
 	uint16_t result = 0;
 	int beamx, beamy;
@@ -156,7 +156,7 @@ void lethalj_state::do_blit()
 }
 
 
-WRITE16_MEMBER(lethalj_state::blitter_w)
+void lethalj_state::blitter_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* combine the data */
 	COMBINE_DATA(&m_blitter_data[offset]);
@@ -187,22 +187,22 @@ WRITE16_MEMBER(lethalj_state::blitter_w)
 
 TMS340X0_SCANLINE_IND16_CB_MEMBER(lethalj_state::scanline_update)
 {
-	uint16_t *src = &m_screenram[(m_vispage << 17) | ((params->rowaddr << 9) & 0x3fe00)];
-	uint16_t *dest = &bitmap.pix16(scanline);
+	uint16_t const *const src = &m_screenram[(m_vispage << 17) | ((params->rowaddr << 9) & 0x3fe00)];
+	uint16_t *const dest = &bitmap.pix(scanline);
 	int coladdr = params->coladdr << 1;
-	int x;
 
 	/* blank palette: fill with white */
 	if (m_blank_palette)
 	{
-		for (x = params->heblnk; x < params->hsblnk; x++)
+		for (int x = params->heblnk; x < params->hsblnk; x++)
 			dest[x] = 0x7fff;
 		if (scanline == screen.visible_area().max_y)
 			m_blank_palette = 0;
-		return;
 	}
-
-	/* copy the non-blanked portions of this scanline */
-	for (x = params->heblnk; x < params->hsblnk; x++)
-		dest[x] = src[coladdr++ & 0x1ff] & 0x7fff;
+	else
+	{
+		/* copy the non-blanked portions of this scanline */
+		for (int x = params->heblnk; x < params->hsblnk; x++)
+			dest[x] = src[coladdr++ & 0x1ff] & 0x7fff;
+	}
 }

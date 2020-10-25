@@ -58,10 +58,10 @@ void namco_c117_device::device_start()
 {
 	m_subres_cb.resolve_safe();
 
-	m_program = &space(AS_PROGRAM);
+	space(AS_PROGRAM).specific(m_program);
 
-	m_cpucache[0] = m_cpuexec[0]->space(AS_PROGRAM).cache<0, 0, ENDIANNESS_BIG>();
-	m_cpucache[1] = m_cpuexec[1]->space(AS_PROGRAM).cache<0, 0, ENDIANNESS_BIG>();
+	m_cpuexec[0]->space(AS_PROGRAM).cache(m_cpucache[0]);
+	m_cpuexec[1]->space(AS_PROGRAM).cache(m_cpucache[1]);
 
 	memset(&m_offsets, 0, sizeof(m_offsets));
 	m_subres = m_wdog = 0;
@@ -106,18 +106,18 @@ void namco_c117_device::device_add_mconfig(machine_config &config)
 
 uint8_t namco_c117_device::main_r(offs_t offset)
 {
-	return m_program->read_byte(remap(0, offset));
+	return m_program.read_byte(remap(0, offset));
 }
 
 uint8_t namco_c117_device::sub_r(offs_t offset)
 {
-	return m_program->read_byte(remap(1, offset));
+	return m_program.read_byte(remap(1, offset));
 }
 
 void namco_c117_device::main_w(offs_t offset, uint8_t data)
 {
 	if (offset < 0xe000)
-		m_program->write_byte(remap(0, offset), data);
+		m_program.write_byte(remap(0, offset), data);
 	else
 		register_w(0, offset, data);
 }
@@ -125,7 +125,7 @@ void namco_c117_device::main_w(offs_t offset, uint8_t data)
 void namco_c117_device::sub_w(offs_t offset, uint8_t data)
 {
 	if (offset < 0xe000)
-		m_program->write_byte(remap(1, offset), data);
+		m_program.write_byte(remap(1, offset), data);
 	else
 		register_w(1, offset, data);
 }

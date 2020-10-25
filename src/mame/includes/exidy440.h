@@ -42,23 +42,23 @@ public:
 	void exidy440(machine_config &config);
 
 protected:
-	DECLARE_WRITE8_MEMBER(bankram_w);
-	DECLARE_READ8_MEMBER(exidy440_input_port_3_r);
-	DECLARE_READ8_MEMBER(sound_command_ack_r);
-	DECLARE_WRITE8_MEMBER(sound_command_w);
-	DECLARE_WRITE8_MEMBER(exidy440_input_port_3_w);
-	DECLARE_WRITE8_MEMBER(exidy440_coin_counter_w);
-	DECLARE_READ8_MEMBER(showdown_bank0_r);
-	DECLARE_READ8_MEMBER(claypign_protection_r);
-	DECLARE_READ8_MEMBER(exidy440_videoram_r);
-	DECLARE_WRITE8_MEMBER(exidy440_videoram_w);
-	DECLARE_READ8_MEMBER(exidy440_paletteram_r);
-	DECLARE_WRITE8_MEMBER(exidy440_paletteram_w);
-	DECLARE_READ8_MEMBER(exidy440_horizontal_pos_r);
-	DECLARE_READ8_MEMBER(exidy440_vertical_pos_r);
-	DECLARE_WRITE8_MEMBER(exidy440_spriteram_w);
-	DECLARE_WRITE8_MEMBER(exidy440_control_w);
-	DECLARE_WRITE8_MEMBER(exidy440_interrupt_clear_w);
+	void bankram_w(offs_t offset, uint8_t data);
+	uint8_t exidy440_input_port_3_r();
+	uint8_t sound_command_ack_r();
+	void sound_command_w(uint8_t data);
+	void exidy440_input_port_3_w(uint8_t data);
+	void exidy440_coin_counter_w(uint8_t data);
+	uint8_t showdown_bank0_r(offs_t offset);
+	uint8_t claypign_protection_r();
+	uint8_t exidy440_videoram_r(offs_t offset);
+	void exidy440_videoram_w(offs_t offset, uint8_t data);
+	uint8_t exidy440_paletteram_r(offs_t offset);
+	void exidy440_paletteram_w(offs_t offset, uint8_t data);
+	uint8_t exidy440_horizontal_pos_r();
+	uint8_t exidy440_vertical_pos_r();
+	void exidy440_spriteram_w(offs_t offset, uint8_t data);
+	void exidy440_control_w(offs_t offset, uint8_t data);
+	void exidy440_interrupt_clear_w(uint8_t data);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int scroll_offset, int check_collision);
 	void update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect,  int scroll_offset, int check_collision);
 	uint32_t screen_update_exidy440(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -113,8 +113,8 @@ public:
 
 protected:
 	void topsecex_video(machine_config &config);
-	DECLARE_READ8_MEMBER(topsecex_input_port_5_r);
-	DECLARE_WRITE8_MEMBER(topsecex_yscroll_w);
+	uint8_t topsecex_input_port_5_r();
+	void topsecex_yscroll_w(uint8_t data);
 	uint32_t screen_update_topsecex(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	virtual void video_start() override;

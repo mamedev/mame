@@ -157,7 +157,7 @@ Notes:
 #define MASTER_CLOCK    XTAL(24'000'000)
 
 
-WRITE8_MEMBER(lsasquad_state::lsasquad_bankswitch_w)
+void lsasquad_state::lsasquad_bankswitch_w(uint8_t data)
 {
 	/* bits 0-2 select ROM bank */
 	membank("bank1")->set_entry(data & 0x07);
@@ -539,7 +539,7 @@ static GFXDECODE_START( gfx_lsasquad )
 GFXDECODE_END
 
 
-WRITE8_MEMBER(lsasquad_state::unk)
+void lsasquad_state::unk(uint8_t data)
 {
 }
 

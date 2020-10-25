@@ -28,7 +28,7 @@ public:
 	alesis_dm3ag_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device interface
-	DECLARE_WRITE8_MEMBER(write);
+	void write(uint8_t data);
 
 protected:
 	// device-level overrides
@@ -61,14 +61,10 @@ public:
 		m_lcdc(*this, "hd44780"),
 		m_cassette(*this, "cassette"),
 		m_maincpu(*this, "maincpu"),
-		m_col1(*this, "COL1"),
-		m_col2(*this, "COL2"),
-		m_col3(*this, "COL3"),
-		m_col4(*this, "COL4"),
-		m_col5(*this, "COL5"),
-		m_col6(*this, "COL6"),
+		m_col(*this, "COL%u", 1U),
 		m_select(*this, "SELECT"),
 		m_digit(*this, "digit%u", 0U),
+		m_pattern(*this, "pattern"),
 		m_track_led(*this, "track_led%u", 1U),
 		m_patt_led(*this, "patt_led"),
 		m_song_led(*this, "song_led"),
@@ -140,17 +136,17 @@ protected:
 	virtual void machine_reset() override;
 
 	void update_lcd_symbols(bitmap_ind16 &bitmap, uint8_t pos, uint8_t y, uint8_t x, int state);
-	DECLARE_WRITE8_MEMBER( led_w );
-	DECLARE_WRITE8_MEMBER( mmt8_led_w );
-	DECLARE_READ8_MEMBER( mmt8_led_r );
-	DECLARE_WRITE8_MEMBER( track_led_w );
-	DECLARE_WRITE8_MEMBER( kb_matrix_w );
-	DECLARE_READ8_MEMBER( kb_r );
-	DECLARE_READ8_MEMBER( p3_r );
-	DECLARE_WRITE8_MEMBER( p3_w );
-	DECLARE_READ8_MEMBER( mmt8_p3_r );
-	DECLARE_WRITE8_MEMBER( mmt8_p3_w );
-	DECLARE_WRITE8_MEMBER( sr16_lcd_w );
+	void led_w(uint8_t data);
+	void mmt8_led_w(uint8_t data);
+	uint8_t mmt8_led_r();
+	void track_led_w(uint8_t data);
+	void kb_matrix_w(uint8_t data);
+	uint8_t kb_r();
+	uint8_t p3_r();
+	void p3_w(uint8_t data);
+	uint8_t mmt8_p3_r();
+	void mmt8_p3_w(uint8_t data);
+	void sr16_lcd_w(uint8_t data);
 	HD44780_PIXEL_UPDATE(sr16_pixel_update);
 
 	void hr16_io(address_map &map);
@@ -168,14 +164,10 @@ private:
 	optional_device<cassette_image_device> m_cassette;
 	required_device<mcs51_cpu_device> m_maincpu;
 
-	required_ioport m_col1;
-	required_ioport m_col2;
-	required_ioport m_col3;
-	required_ioport m_col4;
-	required_ioport m_col5;
-	required_ioport m_col6;
+	required_ioport_array<6> m_col;
 	optional_ioport m_select;
 	output_finder<5> m_digit;
+	output_finder<> m_pattern;
 	output_finder<8> m_track_led;
 	output_finder<> m_patt_led;
 	output_finder<> m_song_led;

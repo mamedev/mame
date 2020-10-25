@@ -23,7 +23,7 @@ Notes:
 #include "speaker.h"
 
 
-WRITE16_MEMBER(ohmygod_state::ohmygod_ctrl_w)
+void ohmygod_state::ohmygod_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{

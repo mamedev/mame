@@ -10,7 +10,7 @@ inline void pgm2_state::draw_sprite_pixel(const rectangle &cliprect, u32 palette
 	{
 		u16 const pix = m_sprites_colour[palette_offset] & 0x3f; // there are some stray 0xff bytes in some roms, so mask
 		u16 const pendat = pix + (pal * 0x40);
-		u16* dstptr_bitmap = &m_sprite_bitmap.pix16(realy);
+		u16 *const dstptr_bitmap = &m_sprite_bitmap.pix(realy);
 		dstptr_bitmap[realx] = pendat;
 	}
 }
@@ -270,14 +270,12 @@ void pgm2_state::copy_sprites_from_bitmap(bitmap_rgb32 &bitmap, const rectangle 
 {
 	pri <<= 12;
 
-	const pen_t *paldata = m_sp_palette->pens();
-	u16* srcptr_bitmap;
-	u32* dstptr_bitmap;
+	pen_t const *const paldata = m_sp_palette->pens();
 
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		srcptr_bitmap = &m_sprite_bitmap.pix16(y);
-		dstptr_bitmap = &bitmap.pix32(y);
+		u16 const *const srcptr_bitmap = &m_sprite_bitmap.pix(y);
+		u32 *const dstptr_bitmap = &bitmap.pix(y);
 
 		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
@@ -339,7 +337,7 @@ WRITE_LINE_MEMBER(pgm2_state::screen_vblank)
 	}
 }
 
-WRITE32_MEMBER(pgm2_state::fg_videoram_w)
+void pgm2_state::fg_videoram_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_fg_videoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset);
@@ -354,7 +352,7 @@ TILE_GET_INFO_MEMBER(pgm2_state::get_fg_tile_info)
 	tileinfo.set(0, tileno, colour, TILE_FLIPXY(flipxy));
 }
 
-WRITE32_MEMBER(pgm2_state::bg_videoram_w)
+void pgm2_state::bg_videoram_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_bg_videoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);

@@ -29,29 +29,27 @@
 
 inline uint16_t diablo1300_cpu_device::opcode_read(uint16_t address)
 {
-	return m_cache->read_word(address);
+	return m_cache.read_word(address);
 }
 
 inline uint16_t diablo1300_cpu_device::program_read16(uint16_t address)
 {
-	return m_program->read_word(address);
+	return m_program.read_word(address);
 }
 
 inline void diablo1300_cpu_device::program_write16(uint16_t address, uint16_t data)
 {
-	m_program->write_word(address, data);
-	return;
+	m_program.write_word(address, data);
 }
 
 inline uint8_t diablo1300_cpu_device::data_read8(uint16_t address)
 {
-	return m_data->read_byte(address);
+	return m_data.read_byte(address);
 }
 
 inline void diablo1300_cpu_device::data_write8(uint16_t address, uint8_t data)
 {
-	m_data->write_byte(address, data);
-	return;
+	m_data.write_byte(address, data);
 }
 
 inline uint8_t diablo1300_cpu_device::read_reg(uint16_t reg)
@@ -98,9 +96,6 @@ diablo1300_cpu_device::diablo1300_cpu_device(const machine_config &mconfig, cons
 	, m_b(0)
 	, m_carry(0)
 	, m_power_on(ASSERT_LINE)
-	, m_program(nullptr)
-	, m_data(nullptr)
-	, m_cache(nullptr)
 	, m_table(nullptr)
 {
 	// Allocate & setup
@@ -109,9 +104,9 @@ diablo1300_cpu_device::diablo1300_cpu_device(const machine_config &mconfig, cons
 
 void diablo1300_cpu_device::device_start()
 {
-	m_program = &space(AS_PROGRAM);
-	m_data    = &space(AS_DATA);
-	m_cache   = m_program->cache<1, -1, ENDIANNESS_LITTLE>();
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
+	space(AS_DATA).specific(m_data);
 	m_table   = memregion("trom");
 
 	// register our state for the debugger

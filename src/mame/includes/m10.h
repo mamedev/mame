@@ -104,17 +104,17 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	DECLARE_WRITE8_MEMBER(m10_ctrl_w);
-	DECLARE_WRITE8_MEMBER(m11_ctrl_w);
-	DECLARE_WRITE8_MEMBER(m15_ctrl_w);
-	DECLARE_WRITE8_MEMBER(m10_a500_w);
-	DECLARE_WRITE8_MEMBER(m11_a100_w);
-	DECLARE_WRITE8_MEMBER(m15_a100_w);
-	DECLARE_READ8_MEMBER(m10_a700_r);
-	DECLARE_READ8_MEMBER(m11_a700_r);
-	DECLARE_WRITE8_MEMBER(m10_colorram_w);
-	DECLARE_WRITE8_MEMBER(m10_chargen_w);
-	DECLARE_WRITE8_MEMBER(m15_chargen_w);
+	void m10_ctrl_w(uint8_t data);
+	void m11_ctrl_w(uint8_t data);
+	void m15_ctrl_w(uint8_t data);
+	void m10_a500_w(uint8_t data);
+	void m11_a100_w(uint8_t data);
+	void m15_a100_w(uint8_t data);
+	uint8_t m10_a700_r();
+	uint8_t m11_a700_r();
+	void m10_colorram_w(offs_t offset, uint8_t data);
+	void m10_chargen_w(offs_t offset, uint8_t data);
+	void m15_chargen_w(offs_t offset, uint8_t data);
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	DECLARE_MACHINE_START(m10);

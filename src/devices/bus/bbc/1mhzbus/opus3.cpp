@@ -16,14 +16,14 @@
   &FCFC                               1770 drive control
 
   Drive control register
-  0   Select side: 0=side 0, 1=side 1
-  1   Select drive 0
-  2   Select drive 1
-  3   ?Unused?
-  4   ?Always Set
-  5   Density select: 0=double, 1=single
-  6   ?Unused?
-  7   ?Unused?
+  0   SS   Select side: 0=side 0, 1=side 1
+  1   DS0  Select drive 0
+  2   DS1  Select drive 1
+  3   DS2  Select drive 2
+  4   MO   Motor enable
+  5   DDEN Density select: 0=double, 1=single
+  6   NC
+  7   NC
 
   The RAM is accessible through JIM (page &FD). One page is visible in JIM at a time.
   The selected page is controlled by the two paging registers:
@@ -97,14 +97,12 @@ ROM_END
 
 void bbc_opus3_device::device_add_mconfig(machine_config &config)
 {
-	/* fdc */
 	WD1770(config, m_fdc, 16_MHz_XTAL / 2);
-	m_fdc->drq_wr_callback().set(FUNC(bbc_opus3_device::fdc_drq_w));
+	m_fdc->drq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_1mhzbus_slot_device::nmi_w));
 
-	FLOPPY_CONNECTOR(config, m_floppy0, bbc_floppies, "525qd", floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, bbc_floppies, nullptr, floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], bbc_floppies, "525qd", floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], bbc_floppies, nullptr, floppy_formats).enable_sound(true);
 
-	/* ram disk */
 	RAM(config, m_ramdisk).set_default_size("512K").set_extra_options("256K").set_default_value(0);
 }
 
@@ -131,8 +129,7 @@ bbc_opus3_device::bbc_opus3_device(const machine_config &mconfig, device_type ty
 	, device_bbc_1mhzbus_interface(mconfig, *this)
 	, m_ramdisk(*this, "ramdisk")
 	, m_fdc(*this, "wd1770")
-	, m_floppy0(*this, "wd1770:0")
-	, m_floppy1(*this, "wd1770:1")
+	, m_floppy(*this, "wd1770:%u", 0)
 	, m_ramdisk_page(0)
 {
 }
@@ -193,16 +190,15 @@ void bbc_opus3_device::fred_w(offs_t offset, uint8_t data)
 		break;
 	case 0xfc:
 		// bit 1, 2: drive select
-		if (BIT(data, 1)) floppy = m_floppy0->get_device();
-		if (BIT(data, 2)) floppy = m_floppy1->get_device();
+		if (BIT(data, 1)) floppy = m_floppy[0]->get_device();
+		if (BIT(data, 2)) floppy = m_floppy[1]->get_device();
 		m_fdc->set_floppy(floppy);
 
 		// bit 0: side select
 		if (floppy)
 			floppy->ss_w(BIT(data, 0));
 
-		// bit 4: interrupt enabled
-		m_fdc_ie = BIT(data, 4);
+		// bit 4: motor enable (always set)
 
 		// bit 5: density
 		m_fdc->dden_w(BIT(data, 5));
@@ -214,13 +210,6 @@ void bbc_opus3_device::fred_w(offs_t offset, uint8_t data)
 		m_ramdisk_page = (m_ramdisk_page & 0xff00) | (data << 0);
 		break;
 	}
-}
-
-WRITE_LINE_MEMBER(bbc_opus3_device::fdc_drq_w)
-{
-	m_fdc_drq = state;
-
-	m_slot->nmi_w((m_fdc_drq && m_fdc_ie) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 uint8_t bbc_opus3_device::jim_r(offs_t offset)

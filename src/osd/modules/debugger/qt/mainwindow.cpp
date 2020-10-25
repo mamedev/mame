@@ -14,6 +14,7 @@
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 #include "debug/dvdisasm.h"
+#include "debug/points.h"
 
 
 MainWindow::MainWindow(running_machine* machine, QWidget* parent) :
@@ -214,13 +215,13 @@ bool MainWindow::eventFilter(QObject* obj, QEvent* event)
 void MainWindow::toggleBreakpointAtCursor(bool changedTo)
 {
 	debug_view_disasm *const dasmView = downcast<debug_view_disasm*>(m_dasmFrame->view()->view());
-	if (dasmView->cursor_visible() && (m_machine->debugger().cpu().get_visible_cpu() == dasmView->source()->device()))
+	if (dasmView->cursor_visible() && (m_machine->debugger().console().get_visible_cpu() == dasmView->source()->device()))
 	{
 		offs_t const address = downcast<debug_view_disasm *>(dasmView)->selected_address();
 		device_debug *const cpuinfo = dasmView->source()->device()->debug();
 
 		// Find an existing breakpoint at this address
-		const device_debug::breakpoint *bp = cpuinfo->breakpoint_find(address);
+		const debug_breakpoint *bp = cpuinfo->breakpoint_find(address);
 
 		// If none exists, add a new one
 		std::string command;
@@ -242,13 +243,13 @@ void MainWindow::toggleBreakpointAtCursor(bool changedTo)
 void MainWindow::enableBreakpointAtCursor(bool changedTo)
 {
 	debug_view_disasm *const dasmView = downcast<debug_view_disasm*>(m_dasmFrame->view()->view());
-	if (dasmView->cursor_visible() && (m_machine->debugger().cpu().get_visible_cpu() == dasmView->source()->device()))
+	if (dasmView->cursor_visible() && (m_machine->debugger().console().get_visible_cpu() == dasmView->source()->device()))
 	{
 		offs_t const address = dasmView->selected_address();
 		device_debug *const cpuinfo = dasmView->source()->device()->debug();
 
 		// Find an existing breakpoint at this address
-		const device_debug::breakpoint *bp = cpuinfo->breakpoint_find(address);
+		const debug_breakpoint *bp = cpuinfo->breakpoint_find(address);
 
 		if (bp != nullptr)
 		{
@@ -265,7 +266,7 @@ void MainWindow::enableBreakpointAtCursor(bool changedTo)
 void MainWindow::runToCursor(bool changedTo)
 {
 	debug_view_disasm* dasmView = downcast<debug_view_disasm*>(m_dasmFrame->view()->view());
-	if (dasmView->cursor_visible() && (m_machine->debugger().cpu().get_visible_cpu() == dasmView->source()->device()))
+	if (dasmView->cursor_visible() && (m_machine->debugger().console().get_visible_cpu() == dasmView->source()->device()))
 	{
 		offs_t address = downcast<debug_view_disasm*>(dasmView)->selected_address();
 		std::string command = string_format("go 0x%X", address);
@@ -304,7 +305,7 @@ void MainWindow::executeCommand(bool withClear)
 	// A blank command is a "silent step"
 	if (command == "")
 	{
-		m_machine->debugger().cpu().get_visible_cpu()->debug()->single_step();
+		m_machine->debugger().console().get_visible_cpu()->debug()->single_step();
 		return;
 	}
 
@@ -396,7 +397,7 @@ void MainWindow::unmountImage(bool changedTo)
 void MainWindow::dasmViewUpdated()
 {
 	debug_view_disasm *const dasmView = downcast<debug_view_disasm*>(m_dasmFrame->view()->view());
-	bool const haveCursor = dasmView->cursor_visible() && (m_machine->debugger().cpu().get_visible_cpu() == dasmView->source()->device());
+	bool const haveCursor = dasmView->cursor_visible() && (m_machine->debugger().console().get_visible_cpu() == dasmView->source()->device());
 	bool haveBreakpoint = false;
 	bool breakpointEnabled = false;
 	if (haveCursor)
@@ -406,7 +407,7 @@ void MainWindow::dasmViewUpdated()
 		device_debug *const cpuinfo = device->debug();
 
 		// Find an existing breakpoint at this address
-		const device_debug::breakpoint *bp = cpuinfo->breakpoint_find(address);
+		const debug_breakpoint *bp = cpuinfo->breakpoint_find(address);
 
 		if (bp != nullptr)
 		{

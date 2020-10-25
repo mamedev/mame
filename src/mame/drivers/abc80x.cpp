@@ -174,10 +174,13 @@ DISCRETE_SOUND_END
 //  pling_r - speaker read
 //-------------------------------------------------
 
-READ8_MEMBER( abc800_state::pling_r )
+uint8_t abc800_state::pling_r()
 {
-	m_discrete->write(NODE_01, 0);
-	m_discrete->write(NODE_01, 1);
+	if (!machine().side_effects_disabled())
+	{
+		m_discrete->write(NODE_01, 0);
+		m_discrete->write(NODE_01, 1);
+	}
 
 	return 0xff;
 }
@@ -188,7 +191,7 @@ READ8_MEMBER( abc800_state::pling_r )
 //  MEMORY BANKING
 //**************************************************************************
 
-READ8_MEMBER( abc800_state::read )
+uint8_t abc800_state::read(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -216,7 +219,7 @@ READ8_MEMBER( abc800_state::read )
 	return data;
 }
 
-WRITE8_MEMBER( abc800_state::write )
+void abc800_state::write(offs_t offset, uint8_t data)
 {
 	if (offset < 0x4000 && (!m_keydtr || m_fetch_charram))
 	{
@@ -232,7 +235,7 @@ WRITE8_MEMBER( abc800_state::write )
 	}
 }
 
-READ8_MEMBER( abc802_state::read )
+uint8_t abc802_state::read(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -269,7 +272,7 @@ READ8_MEMBER( abc802_state::read )
 	return data;
 }
 
-WRITE8_MEMBER( abc802_state::write )
+void abc802_state::write(offs_t offset, uint8_t data)
 {
 	if (offset < 0x8000)
 	{
@@ -344,7 +347,7 @@ void abc806_state::read_pal_p4(offs_t offset, bool m1l, bool xml, offs_t &m, boo
 	m = (mux ? ((map & 0x7f) << 12 | (offset & 0xfff)) : ((m_hrs & 0xf0) << 11 | (offset & 0x7fff))) & videoram_mask;
 }
 
-READ8_MEMBER( abc806_state::read )
+uint8_t abc806_state::read(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -369,13 +372,13 @@ READ8_MEMBER( abc806_state::read )
 
 	if (!vr)
 	{
-		data = charram_r(space, offset & 0x7ff);
+		data = charram_r(offset & 0x7ff);
 	}
 
 	return data;
 }
 
-READ8_MEMBER( abc806_state::m1_r )
+uint8_t abc806_state::m1_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -400,13 +403,13 @@ READ8_MEMBER( abc806_state::m1_r )
 
 	if (!vr)
 	{
-		data = charram_r(space, offset & 0x7ff);
+		data = charram_r(offset & 0x7ff);
 	}
 
 	return data;
 }
 
-WRITE8_MEMBER( abc806_state::write )
+void abc806_state::write(offs_t offset, uint8_t data)
 {
 	offs_t m = 0;
 	bool m1l = 1, xml = 1, romd = 0, ramd = 0, hre = 0, vr = 1;
@@ -424,7 +427,7 @@ WRITE8_MEMBER( abc806_state::write )
 
 	if (!vr)
 	{
-		charram_w(space, offset & 0x7ff, data);
+		charram_w(offset & 0x7ff, data);
 	}
 }
 
@@ -433,7 +436,7 @@ WRITE8_MEMBER( abc806_state::write )
 //  m1_r - opcode read
 //-------------------------------------------------
 
-READ8_MEMBER( abc800_state::m1_r )
+uint8_t abc800_state::m1_r(offs_t offset)
 {
 	if (offset >= 0x7800 && offset < 0x8000)
 	{
@@ -452,7 +455,7 @@ READ8_MEMBER( abc800_state::m1_r )
 //  mai_r - memory bank map read
 //-------------------------------------------------
 
-READ8_MEMBER( abc806_state::mai_r )
+uint8_t abc806_state::mai_r(offs_t offset)
 {
 	int bank = offset >> 12;
 
@@ -464,7 +467,7 @@ READ8_MEMBER( abc806_state::mai_r )
 //  mao_w - memory bank map write
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc806_state::mao_w )
+void abc806_state::mao_w(offs_t offset, uint8_t data)
 {
 	/*
 

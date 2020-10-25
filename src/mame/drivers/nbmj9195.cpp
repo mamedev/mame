@@ -28,7 +28,6 @@ Notes:
 #include "machine/nvram.h"
 #include "sound/3812intf.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 
@@ -42,12 +41,12 @@ void nbmj9195_state::machine_start()
 	save_item(NAME(m_mscoutm_inputport));
 }
 
-WRITE8_MEMBER(nbmj9195_state::soundbank_w)
+void nbmj9195_state::soundbank_w(uint8_t data)
 {
 	membank("soundbank")->set_entry(data & 0x03);
 }
 
-WRITE8_MEMBER(nbmj9195_state::outcoin_flag_w)
+void nbmj9195_state::outcoin_flag_w(uint8_t data)
 {
 	// bit0: coin in counter
 	// bit1: coin out counter
@@ -58,7 +57,7 @@ WRITE8_MEMBER(nbmj9195_state::outcoin_flag_w)
 	else m_outcoin_flag = 1;
 }
 
-WRITE8_MEMBER(nbmj9195_state::inputportsel_w)
+void nbmj9195_state::inputportsel_w(uint8_t data)
 {
 	m_inputport = (data ^ 0xff);
 }
@@ -68,7 +67,7 @@ int nbmj9195_state::dipsw_r()
 	return (((ioport("DSWA")->read() & 0xff) | ((ioport("DSWB")->read() & 0xff) << 8)) >> m_dipswbitsel) & 0x01;
 }
 
-WRITE8_MEMBER(nbmj9195_state::dipswbitsel_w)
+void nbmj9195_state::dipswbitsel_w(uint8_t data)
 {
 	switch (data & 0xc0)
 	{
@@ -87,12 +86,12 @@ WRITE8_MEMBER(nbmj9195_state::dipswbitsel_w)
 	}
 }
 
-WRITE8_MEMBER(nbmj9195_state::mscoutm_inputportsel_w)
+void nbmj9195_state::mscoutm_inputportsel_w(uint8_t data)
 {
 	m_mscoutm_inputport = (data ^ 0x1f);
 }
 
-READ8_MEMBER(nbmj9195_state::mscoutm_dipsw_0_r)
+uint8_t nbmj9195_state::mscoutm_dipsw_0_r()
 {
 	// DIPSW A
 	return (((ioport("DSWA")->read() & 0x01) << 7) | ((ioport("DSWA")->read() & 0x02) << 5) |
@@ -101,7 +100,7 @@ READ8_MEMBER(nbmj9195_state::mscoutm_dipsw_0_r)
 			((ioport("DSWA")->read() & 0x40) >> 5) | ((ioport("DSWA")->read() & 0x80) >> 7));
 }
 
-READ8_MEMBER(nbmj9195_state::mscoutm_dipsw_1_r)
+uint8_t nbmj9195_state::mscoutm_dipsw_1_r()
 {
 	// DIPSW B
 	return (((ioport("DSWB")->read() & 0x01) << 7) | ((ioport("DSWB")->read() & 0x02) << 5) |
@@ -113,7 +112,7 @@ READ8_MEMBER(nbmj9195_state::mscoutm_dipsw_1_r)
 
 /* TMPZ84C011 PIO emulation */
 
-READ8_MEMBER(nbmj9195_state::mscoutm_cpu_portb_r)
+uint8_t nbmj9195_state::mscoutm_cpu_portb_r()
 {
 	// PLAYER1 KEY, DIPSW A/B
 	switch (m_mscoutm_inputport)
@@ -134,7 +133,7 @@ READ8_MEMBER(nbmj9195_state::mscoutm_cpu_portb_r)
 	}
 }
 
-READ8_MEMBER(nbmj9195_state::mscoutm_cpu_portc_r)
+uint8_t nbmj9195_state::mscoutm_cpu_portc_r()
 {
 	// PLAYER2 KEY
 	switch (m_mscoutm_inputport)
@@ -157,13 +156,13 @@ READ8_MEMBER(nbmj9195_state::mscoutm_cpu_portc_r)
 
 // other games
 
-READ8_MEMBER(nbmj9195_state::others_cpu_porta_r)
+uint8_t nbmj9195_state::others_cpu_porta_r()
 {
 	// COIN IN, ETC...
 	return ((ioport("SYSTEM")->read() & 0xfe) | m_outcoin_flag);
 }
 
-READ8_MEMBER(nbmj9195_state::others_cpu_portb_r)
+uint8_t nbmj9195_state::others_cpu_portb_r()
 {
 	// PLAYER1 KEY, DIPSW A/B
 	switch (m_inputport)
@@ -183,7 +182,7 @@ READ8_MEMBER(nbmj9195_state::others_cpu_portb_r)
 	}
 }
 
-READ8_MEMBER(nbmj9195_state::others_cpu_portc_r)
+uint8_t nbmj9195_state::others_cpu_portc_r()
 {
 	// PLAYER2 KEY
 	switch (m_inputport)
@@ -203,7 +202,7 @@ READ8_MEMBER(nbmj9195_state::others_cpu_portc_r)
 	}
 }
 
-WRITE8_MEMBER(nbmj9195_state::soundcpu_porte_w)
+void nbmj9195_state::soundcpu_porte_w(uint8_t data)
 {
 	if (!(data & 0x01)) m_soundlatch->clear_w();
 }
@@ -2547,9 +2546,6 @@ void nbmj9195_state::NBMJDRV1_base(machine_config &config)
 
 	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
 	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void nbmj9195_state::NBMJDRV1(machine_config &config)

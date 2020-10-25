@@ -393,7 +393,7 @@ void gaelco2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 						{
 							/* get a pointer to the current line in the screen bitmap */
 							const int ypos = ((sy + ey * 16 + py) & 0x1ff);
-							u16 *srcy = &bitmap.pix16(ypos);
+							u16 *const srcy = &bitmap.pix(ypos);
 
 							const int gfx_py = yflip ? (gfx->height() - 1 - py) : py;
 
@@ -403,7 +403,7 @@ void gaelco2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 							{
 								/* get current pixel */
 								const int xpos = (((sx + ex * 16 + px) & 0x3ff) + spr_x_adjust) & 0x3ff;
-								u16 *pixel = srcy + xpos;
+								u16 *const pixel = srcy + xpos;
 								const u16 src_color = *pixel;
 
 								const int gfx_px = xflip ? (gfx->width() - 1 - px) : px;

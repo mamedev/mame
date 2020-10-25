@@ -121,7 +121,6 @@
 #include "emu.h"
 #include "includes/meadows.h"
 
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 #include "deadeye.lh"
@@ -138,21 +137,21 @@
  *
  *************************************/
 
-READ8_MEMBER(meadows_state::hsync_chain_r)
+uint8_t meadows_state::hsync_chain_r()
 {
 	uint8_t val = m_screen->hpos();
 	return bitswap<8>(val,0,1,2,3,4,5,6,7);
 }
 
 
-READ8_MEMBER(meadows_state::vsync_chain_hi_r)
+uint8_t meadows_state::vsync_chain_hi_r()
 {
 	uint8_t val = m_screen->vpos();
 	return ((val >> 1) & 0x08) | ((val >> 3) & 0x04) | ((val >> 5) & 0x02) | (val >> 7);
 }
 
 
-READ8_MEMBER(meadows_state::vsync_chain_lo_r)
+uint8_t meadows_state::vsync_chain_lo_r()
 {
 	uint8_t val = m_screen->vpos();
 	return val & 0x0f;
@@ -166,7 +165,7 @@ READ8_MEMBER(meadows_state::vsync_chain_lo_r)
  *
  *************************************/
 
-WRITE8_MEMBER(meadows_state::meadows_audio_w)
+void meadows_state::meadows_audio_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -235,7 +234,7 @@ WRITE_LINE_MEMBER(meadows_state::minferno_vblank_irq)
 	if (state)
 	{
 		m_main_sense_state++;
-		m_maincpu->set_input_line(1, (m_main_sense_state & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+		m_maincpu->set_input_line(S2650_SENSE_LINE, (m_main_sense_state & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -247,7 +246,7 @@ WRITE_LINE_MEMBER(meadows_state::minferno_vblank_irq)
  *
  *************************************/
 
-WRITE8_MEMBER(meadows_state::audio_hardware_w)
+void meadows_state::audio_hardware_w(offs_t offset, uint8_t data)
 {
 	switch (offset & 3)
 	{
@@ -289,7 +288,7 @@ WRITE8_MEMBER(meadows_state::audio_hardware_w)
  *
  *************************************/
 
-READ8_MEMBER(meadows_state::audio_hardware_r)
+uint8_t meadows_state::audio_hardware_r(offs_t offset)
 {
 	int data = 0;
 
@@ -649,9 +648,6 @@ void meadows_state::meadows(machine_config &config)
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(2);
@@ -687,6 +683,7 @@ void meadows_state::bowl3d(machine_config &config)
 	/* basic machine hardware */
 	S2650(config, m_maincpu, MASTER_CLOCK/8);  /* 5MHz / 8 = 625 kHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &meadows_state::bowl3d_main_map);
+	m_maincpu->intack_handler().set([]() { return 0x82; });
 
 	S2650(config, m_audiocpu, MASTER_CLOCK/8); /* 5MHz / 8 = 625 kHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &meadows_state::audio_map);
@@ -709,9 +706,6 @@ void meadows_state::bowl3d(machine_config &config)
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(2);

@@ -105,28 +105,20 @@ void namco_52xx_device::O_w(uint8_t data)
 		m_address = (m_address & 0xf0ff) | ((data & 0xf) << 8);
 }
 
-TIMER_CALLBACK_MEMBER( namco_52xx_device::irq_clear )
-{
-	m_cpu->set_input_line(0, CLEAR_LINE);
-}
 
 void namco_52xx_device::write(uint8_t data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_52xx_device::latch_callback),this), data);
 
-	m_cpu->set_input_line(0, ASSERT_LINE);
-
-	// The execution time of one instruction is ~4us, so we must make sure to
-	// give the cpu time to poll the /IRQ input before we clear it.
-	// The input clock to the 06XX interface chip is 64H, that is
-	// 18432000/6/64 = 48kHz, so it makes sense for the irq line to be
-	// asserted for one clock cycle ~= 21us.
-
-	/* the 52xx uses TSTI to check for an interrupt; it also may be handling
-	   a timer interrupt, so we need to ensure the IRQ line is held long enough */
-	machine().scheduler().timer_set(attotime::from_usec(5*21), timer_expired_delegate(FUNC(namco_52xx_device::irq_clear),this), 0);
+	// TODO: should use chip_select line for this
+	m_cpu->pulse_input_line(0, m_irq_duration);
 }
 
+WRITE_LINE_MEMBER( namco_52xx_device::chip_select )
+{
+	// TODO: broken sound when using this
+	//m_cpu->set_input_line(0, state);
+}
 
 TIMER_CALLBACK_MEMBER( namco_52xx_device::external_clock_pulse )
 {
@@ -151,6 +143,7 @@ namco_52xx_device::namco_52xx_device(const machine_config &mconfig, const char *
 	: device_t(mconfig, NAMCO_52XX, tag, owner, clock),
 	m_cpu(*this, "mcu"),
 	m_discrete(*this, finder_base::DUMMY_TAG),
+	m_irq_duration(attotime::from_usec(100)),
 	m_basenode(0),
 	m_extclock(0),
 	m_romread(*this),

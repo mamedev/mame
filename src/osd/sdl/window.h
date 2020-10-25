@@ -8,8 +8,8 @@
 //
 //============================================================
 
-#ifndef __SDLWINDOW__
-#define __SDLWINDOW__
+#ifndef MAME_OSD_SDL_WINDOW_H
+#define MAME_OSD_SDL_WINDOW_H
 
 #include "osdsdl.h"
 #include "video.h"
@@ -87,7 +87,7 @@ private:
 	render_target *     m_target;
 
 	// Original display_mode
-	SDL_DM_Wrapper      *m_original_mode;
+	std::unique_ptr<SDL_DM_Wrapper> m_original_mode;
 
 	int                 m_extra_flags;
 
@@ -152,4 +152,4 @@ int drawsdl2_init(running_machine &machine, osd_draw_callbacks *callbacks);
 
 int drawbgfx_init(running_machine &machine, osd_draw_callbacks *callbacks);
 
-#endif /* __SDLWINDOW__ */
+#endif // MAME_OSD_SDL_WINDOW_H

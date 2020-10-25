@@ -633,7 +633,7 @@
 *   - Input Ports -   *
 **********************/
 
-READ8_MEMBER(snookr10_state::dsw_port_1_r)
+uint8_t snookr10_state::dsw_port_1_r()
 {
 /*
    --------------------------------
@@ -673,7 +673,7 @@ return ioport("SW1")->read();
     STOP5  = bit4
 */
 
-WRITE8_MEMBER(snookr10_state::output_port_0_w)
+void snookr10_state::output_port_0_w(uint8_t data)
 {
 /*
    ----------------------------
@@ -714,7 +714,7 @@ WRITE8_MEMBER(snookr10_state::output_port_0_w)
 //  popmessage("written : %02X", data);
 }
 
-WRITE8_MEMBER(snookr10_state::output_port_1_w)
+void snookr10_state::output_port_1_w(uint8_t data)
 {
 /*
    ----------------------------
@@ -749,7 +749,7 @@ WRITE8_MEMBER(snookr10_state::output_port_1_w)
 }
 
 
-READ8_MEMBER(snookr10_state::port2000_8_r)
+uint8_t snookr10_state::port2000_8_r()
 {
 /*
     Ports 2000-2008 expect data, otherwise the program trigger

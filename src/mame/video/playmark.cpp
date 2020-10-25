@@ -246,43 +246,43 @@ VIDEO_START_MEMBER(playmark_state,hrdtimes)
 
 ***************************************************************************/
 
-WRITE16_MEMBER(playmark_state::wbeachvl_txvideoram_w)
+void playmark_state::wbeachvl_txvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram1[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_MEMBER(playmark_state::wbeachvl_fgvideoram_w)
+void playmark_state::wbeachvl_fgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram2[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_MEMBER(playmark_state::wbeachvl_bgvideoram_w)
+void playmark_state::wbeachvl_bgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram3[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_MEMBER(playmark_state::hrdtimes_txvideoram_w)
+void playmark_state::hrdtimes_txvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram1[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(playmark_state::hrdtimes_fgvideoram_w)
+void playmark_state::hrdtimes_fgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram2[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(playmark_state::hrdtimes_bgvideoram_w)
+void playmark_state::hrdtimes_bgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram3[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(playmark_state::bigtwin_scroll_w)
+void playmark_state::bigtwin_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(&m_scroll[offset]);
 
@@ -300,7 +300,7 @@ WRITE16_MEMBER(playmark_state::bigtwin_scroll_w)
 	}
 }
 
-WRITE16_MEMBER(playmark_state::wbeachvl_scroll_w)
+void playmark_state::wbeachvl_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(&m_scroll[offset]);
 
@@ -317,7 +317,7 @@ WRITE16_MEMBER(playmark_state::wbeachvl_scroll_w)
 	}
 }
 
-WRITE16_MEMBER(playmark_state::excelsr_scroll_w)
+void playmark_state::excelsr_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(&m_scroll[offset]);
 
@@ -335,7 +335,7 @@ WRITE16_MEMBER(playmark_state::excelsr_scroll_w)
 	}
 }
 
-WRITE16_MEMBER(playmark_state::hrdtimes_scroll_w)
+void playmark_state::hrdtimes_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(&m_scroll[offset]);
 
@@ -437,24 +437,20 @@ void playmark_state::bigtwinb_draw_sprites( screen_device &screen, bitmap_ind16 
 
 void playmark_state::draw_bitmap( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	int x, y, count;
-	int color;
-	uint8_t *pri;
-
-	count = 0;
-	for (y = 0; y < 512; y++)
+	int count = 0;
+	for (int y = 0; y < 512; y++)
 	{
-		for (x = 0; x < 512; x++)
+		for (int x = 0; x < 512; x++)
 		{
-			color = m_bgvideoram[count] & 0xff;
+			int const color = m_bgvideoram[count] & 0xff;
 
 			if (color)
 			{
 				if (m_bg_full_size)
 				{
-					bitmap.pix16((y + m_bgscrolly) & 0x1ff, (x + m_bgscrollx) & 0x1ff) = 0x100 + color;
+					bitmap.pix((y + m_bgscrolly) & 0x1ff, (x + m_bgscrollx) & 0x1ff) = 0x100 + color;
 
-					pri = &screen.priority().pix8((y + m_bgscrolly) & 0x1ff);
+					uint8_t *const pri = &screen.priority().pix((y + m_bgscrolly) & 0x1ff);
 					pri[(x + m_bgscrollx) & 0x1ff] |= 2;
 				}
 				else
@@ -462,9 +458,9 @@ void playmark_state::draw_bitmap( screen_device &screen, bitmap_ind16 &bitmap, c
 					/* 50% size */
 					if(!(x % 2) && !(y % 2))
 					{
-						bitmap.pix16((y / 2 + m_bgscrolly) & 0x1ff, (x / 2 + m_bgscrollx) & 0x1ff) = 0x100 + color;
+						bitmap.pix((y / 2 + m_bgscrolly) & 0x1ff, (x / 2 + m_bgscrollx) & 0x1ff) = 0x100 + color;
 
-						pri = &screen.priority().pix8((y / 2 + m_bgscrolly) & 0x1ff);
+						uint8_t *const pri = &screen.priority().pix((y / 2 + m_bgscrolly) & 0x1ff);
 						pri[(x / 2 + m_bgscrollx) & 0x1ff] |= 2;
 					}
 				}

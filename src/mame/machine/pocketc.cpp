@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "includes/pocketc.h"
 
-WRITE8_MEMBER(pocketc_state::out_a_w)
+void pocketc_state::out_a_w(uint8_t data)
 {
 	m_outa = data;
 }

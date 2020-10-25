@@ -20,7 +20,6 @@
 #include "includes/comx35.h"
 #include "formats/imageutl.h"
 #include "screen.h"
-#include "softlist.h"
 
 /***************************************************************************
     PARAMETERS
@@ -210,7 +209,7 @@ QUICKLOAD_LOAD_MEMBER(comx35_state::quickload_cb)
 //  mem_r - memory read
 //-------------------------------------------------
 
-READ8_MEMBER( comx35_state::mem_r )
+uint8_t comx35_state::mem_r(offs_t offset)
 {
 	int extrom = 1;
 
@@ -237,7 +236,7 @@ READ8_MEMBER( comx35_state::mem_r )
 //  mem_w - memory write
 //-------------------------------------------------
 
-WRITE8_MEMBER( comx35_state::mem_w )
+void comx35_state::mem_w(offs_t offset, uint8_t data)
 {
 	m_exp->mwr_w(offset, data);
 
@@ -260,7 +259,7 @@ WRITE8_MEMBER( comx35_state::mem_w )
 //  io_r - I/O read
 //-------------------------------------------------
 
-READ8_MEMBER( comx35_state::io_r )
+uint8_t comx35_state::io_r(offs_t offset)
 {
 	uint8_t data = m_exp->io_r(offset);
 
@@ -277,13 +276,13 @@ READ8_MEMBER( comx35_state::io_r )
 //  io_w - I/O write
 //-------------------------------------------------
 
-WRITE8_MEMBER( comx35_state::io_w )
+void comx35_state::io_w(offs_t offset, uint8_t data)
 {
 	m_exp->io_w(offset, data);
 
 	if (offset >= 3)
 	{
-		cdp1869_w(space, offset, data);
+		cdp1869_w(offset, data);
 	}
 }
 
@@ -346,7 +345,7 @@ static INPUT_PORTS_START( comx35 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('?')
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR(39)
 
 	PORT_START("D2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('[')
@@ -392,11 +391,11 @@ static INPUT_PORTS_START( comx35 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('X')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR('+') PORT_CHAR('{')
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('-') PORT_CHAR('|')
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('*') PORT_CHAR('}')
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('~')
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ') PORT_CHAR(8)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR('+')
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('-')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('*')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/')
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
 
 	PORT_START("D7")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -485,7 +484,7 @@ WRITE_LINE_MEMBER( comx35_state::q_w )
 	m_exp->q_w(state);
 }
 
-WRITE8_MEMBER( comx35_state::sc_w )
+void comx35_state::sc_w(uint8_t data)
 {
 	switch (data)
 	{
@@ -633,7 +632,6 @@ void comx35_state::base(machine_config &config, const XTAL clock)
 	QUICKLOAD(config, "quickload", "comx").set_load_callback(FUNC(comx35_state::quickload_cb));
 
 	CASSETTE(config, m_cassette).set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
-	//m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	// expansion bus
 	COMX_EXPANSION_SLOT(config, m_exp, 0, comx_expansion_cards, "eb").irq_callback().set(FUNC(comx35_state::irq_w));

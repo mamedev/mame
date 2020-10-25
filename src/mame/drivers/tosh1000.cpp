@@ -78,11 +78,10 @@ public:
 private:
 	DECLARE_MACHINE_RESET(tosh1000);
 
-	DECLARE_WRITE8_MEMBER(romdos_bank_w);
-	DECLARE_READ8_MEMBER(romdos_bank_r);
+	void romdos_bank_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(bram_w);
-	DECLARE_READ8_MEMBER(bram_r);
+	void bram_w(offs_t offset, uint8_t data);
+	uint8_t bram_r(offs_t offset);
 
 	static void cfg_fdc_35(device_t *device);
 	void tosh1000_io(address_map &map);
@@ -116,7 +115,7 @@ MACHINE_RESET_MEMBER(tosh1000_state, tosh1000)
 }
 
 
-WRITE8_MEMBER(tosh1000_state::romdos_bank_w)
+void tosh1000_state::romdos_bank_w(uint8_t data)
 {
 	LOGDBG("ROM-DOS <- %02x (%s, accessing bank %d)\n", data, BIT(data, 7)?"enable":"disable", data&7);
 
@@ -130,7 +129,7 @@ WRITE8_MEMBER(tosh1000_state::romdos_bank_w)
 	}
 }
 
-WRITE8_MEMBER(tosh1000_state::bram_w)
+void tosh1000_state::bram_w(offs_t offset, uint8_t data)
 {
 	LOGDBG("BRAM %02x <- %02x\n", 0xc0 + offset, data);
 
@@ -177,7 +176,7 @@ WRITE8_MEMBER(tosh1000_state::bram_w)
 	}
 }
 
-READ8_MEMBER(tosh1000_state::bram_r)
+uint8_t tosh1000_state::bram_r(offs_t offset)
 {
 	uint8_t data = 0;
 

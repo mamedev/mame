@@ -55,9 +55,9 @@ protected:
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_READ8_MEMBER( keyboard_r );
-	DECLARE_WRITE8_MEMBER( keyboard_w );
-	DECLARE_WRITE8_MEMBER( ctrl_w );
+	uint8_t keyboard_r();
+	void keyboard_w(uint8_t data);
+	void ctrl_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 
@@ -101,25 +101,21 @@ public:
 	c1p_state(const machine_config &mconfig, device_type type, const char *tag)
 		: sb2m600_state(mconfig, type, tag)
 		, m_beeper(*this, "beeper")
+		, m_beep_timer(*this, "beep_timer")
 	{ }
 
 	void init_c1p();
 	void c1p(machine_config &config);
 
 protected:
-	enum
-	{
-		TIMER_SETUP_BEEP
-	};
-
 	virtual void machine_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-	DECLARE_WRITE8_MEMBER( osi630_ctrl_w );
-	DECLARE_WRITE8_MEMBER( osi630_sound_w );
+	void osi630_ctrl_w(uint8_t data);
+	void osi630_sound_w(uint8_t data);
 	void c1p_mem(address_map &map);
+	TIMER_DEVICE_CALLBACK_MEMBER(beep_timer);
 
 	required_device<beep_device> m_beeper;
+	required_device<timer_device> m_beep_timer;
 };
 
 class c1pmf_state : public c1p_state
@@ -136,9 +132,9 @@ public:
 protected:
 	virtual void machine_start() override;
 
-	DECLARE_READ8_MEMBER( osi470_pia_pa_r );
-	DECLARE_WRITE8_MEMBER( osi470_pia_pa_w );
-	DECLARE_WRITE8_MEMBER( osi470_pia_pb_w );
+	uint8_t osi470_pia_pa_r();
+	void osi470_pia_pa_w(uint8_t data);
+	void osi470_pia_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( osi470_pia_cb2_w );
 
 	void c1pmf_mem(address_map &map);
@@ -160,7 +156,7 @@ public:
 protected:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE8_MEMBER( keyboard_w );
+	void keyboard_w(uint8_t data);
 	void uk101_video(machine_config &config);
 	void uk101_mem(address_map &map);
 };

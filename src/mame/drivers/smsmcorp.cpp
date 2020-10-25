@@ -239,16 +239,16 @@ public:
 	void sms(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_READ8_MEMBER(link_r);
-	DECLARE_WRITE8_MEMBER(link_w);
-	DECLARE_READ8_MEMBER(z80_8088_r);
-	DECLARE_READ8_MEMBER(p03_r);
-	DECLARE_WRITE8_MEMBER(p03_w);
-	DECLARE_WRITE8_MEMBER(video_w);
-	DECLARE_READ8_MEMBER(ppi0_c_r);
-	DECLARE_WRITE8_MEMBER(ppi0_a_w);
-	DECLARE_WRITE8_MEMBER(ppi0_b_w);
+	void bankswitch_w(uint8_t data);
+	uint8_t link_r(offs_t offset);
+	void link_w(offs_t offset, uint8_t data);
+	uint8_t z80_8088_r();
+	uint8_t p03_r(offs_t offset);
+	void p03_w(offs_t offset, uint8_t data);
+	void video_w(offs_t offset, uint8_t data);
+	uint8_t ppi0_c_r();
+	void ppi0_a_w(uint8_t data);
+	void ppi0_b_w(uint8_t data);
 	DECLARE_MACHINE_START(sureshot);
 	uint32_t screen_update_sms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void sms_map(address_map &map);
@@ -275,7 +275,7 @@ private:
  *
  *************************************/
 
-WRITE8_MEMBER(smsmfg_state::bankswitch_w)
+void smsmfg_state::bankswitch_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data);
 }
@@ -286,7 +286,7 @@ WRITE8_MEMBER(smsmfg_state::bankswitch_w)
  *
  *************************************/
 
-READ8_MEMBER(smsmfg_state::link_r)
+uint8_t smsmfg_state::link_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -302,7 +302,7 @@ READ8_MEMBER(smsmfg_state::link_r)
 	return 0;
 }
 
-WRITE8_MEMBER(smsmfg_state::link_w)
+void smsmfg_state::link_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -317,12 +317,12 @@ WRITE8_MEMBER(smsmfg_state::link_w)
 	}
 }
 
-READ8_MEMBER(smsmfg_state::z80_8088_r)
+uint8_t smsmfg_state::z80_8088_r()
 {
 	return m_communication_port_status;
 }
 
-READ8_MEMBER(smsmfg_state::p03_r)
+uint8_t smsmfg_state::p03_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -336,7 +336,7 @@ READ8_MEMBER(smsmfg_state::p03_r)
 	return 0;
 }
 
-WRITE8_MEMBER(smsmfg_state::p03_w)
+void smsmfg_state::p03_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -396,7 +396,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-READ8_MEMBER(smsmfg_state::ppi0_c_r)
+uint8_t smsmfg_state::ppi0_c_r()
 {
 /*
   PC7 - unused
@@ -414,7 +414,7 @@ READ8_MEMBER(smsmfg_state::ppi0_c_r)
 	return 0;
 }
 
-WRITE8_MEMBER(smsmfg_state::ppi0_a_w)
+void smsmfg_state::ppi0_a_w(uint8_t data)
 {
 	//popmessage("Lamps: %d %d %d %d %d %d %d", BIT(data,7), BIT(data,6), BIT(data,5), BIT(data,4), BIT(data,3), BIT(data,2), BIT(data,1) );
 	m_lamps[0] = BIT(~data, 7); /* Display Light 1 */
@@ -427,7 +427,7 @@ WRITE8_MEMBER(smsmfg_state::ppi0_a_w)
 	m_lamps[7] = BIT(~data, 0); /* Draw Light */
 }
 
-WRITE8_MEMBER(smsmfg_state::ppi0_b_w)
+void smsmfg_state::ppi0_b_w(uint8_t data)
 {
 	m_lamps[8] = BIT(~data, 7); /* Stand Light */
 	m_lamps[9] = BIT(~data, 6); /* Cancel Light */
@@ -443,12 +443,11 @@ WRITE8_MEMBER(smsmfg_state::ppi0_b_w)
  *
  *************************************/
 
-WRITE8_MEMBER(smsmfg_state::video_w)
+void smsmfg_state::video_w(offs_t offset, uint8_t data)
 {
 	m_vid_regs[offset] = data;
 	if ( offset == 5 )
 	{
-		int x,y;
 		int xstart = m_vid_regs[0] + m_vid_regs[1]*256;
 		int width = m_vid_regs[2];
 		int ystart = m_vid_regs[3];
@@ -461,12 +460,12 @@ WRITE8_MEMBER(smsmfg_state::video_w)
 		if ( width == 0 )
 			width = 256;
 
-		for ( y = ystart; y < ystart + height; y++ )
+		for ( int y = ystart; y < ystart + height; y++ )
 		{
-			for ( x = xstart; x < xstart + width; x++ )
+			for ( int x = xstart; x < xstart + width; x++ )
 			{
 				if ( y < 256 )
-				m_bitmap.pix16(y, x) = color;
+				m_bitmap.pix(y, x) = color;
 			}
 		}
 	}
@@ -866,7 +865,21 @@ ROM_START( trvhanga )
 ROM_END
 
 
-ROM_START( sms4in1 )
+ROM_START( sms4in1 ) // VERSION SWS1-052587
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "sms_26.19", 0xf8000, 0x02000, CRC(f6da0e37) SHA1(e7c64bb1915955dacb01ab0b19c327066615b5bb) )
+	ROM_LOAD( "sms_26.18", 0xfa000, 0x02000, CRC(6685c236) SHA1(7cc96d4b6253f3a57f5dd1da115997eb89184c0b) )
+	ROM_LOAD( "sms_26.17", 0xfc000, 0x02000, CRC(9972f206) SHA1(afcfbf004ee5457cb576ad421bee61ec42f5c057) )
+	ROM_LOAD( "sms_26.16", 0xfe000, 0x02000, CRC(0290772b) SHA1(7e7b68598473b86fcf770f3472560c828241d966) )
+	ROM_COPY( "maincpu",   0xf8000, 0x08000, 0x8000 )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "sms_26.26", 0x0000, 0x1000, CRC(e04bb922) SHA1(1df90720f11a5b736273f43272d7727b3020f848) )
+	ROM_RELOAD(            0x1000, 0x1000 )
+ROM_END
+
+
+ROM_START( sms4in1a ) // VERSION SWS1-110984
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "set4_u19_2764.bin", 0xf8000, 0x02000, CRC(6f6116b9) SHA1(f91412ca9b911e2a822dab91c96e5f655e7ebb1b) )
 	ROM_LOAD( "set4_u18_2764.bin", 0xfa000, 0x02000, CRC(cc13a404) SHA1(1c00d173706c5e88cee69f9c52efa64dbdf4c15b) )
@@ -957,9 +970,11 @@ ROM_START( secondch )
 	ROM_RELOAD(         0x1000, 0x1000 )
 ROM_END
 
-GAME( 1984, trvhang,  0, sms,      sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "Trivia Hangup (question set 1)",   MACHINE_SUPPORTS_SAVE ) /* Version Trivia-1-050185 */
-GAME( 1984, trvhanga, 0, sms,      sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "Trivia Hangup (question set 2)",   MACHINE_NOT_WORKING ) /* Version Trivia-2-011586 */
-GAME( 1984, sms4in1,  0, sureshot, sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "4-in-1",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1985, smsjoker, 0, sureshot, sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "Joker Poker With Hi-Lo Double-Up", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, sureshot, 0, sureshot, sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "Sure Shot",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1985, secondch, 0, sureshot, sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "Second Chance",                    MACHINE_SUPPORTS_SAVE )
+
+GAME( 1984, trvhang,  0,       sms,      sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "Trivia Hangup (question set 1)",   MACHINE_SUPPORTS_SAVE ) // Version Trivia-1-050185
+GAME( 1984, trvhanga, 0,       sms,      sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "Trivia Hangup (question set 2)",   MACHINE_NOT_WORKING )   // Version Trivia-2-011586
+GAME( 1984, sms4in1,  0,       sureshot, sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "4-in-1 (version SWS1-052587)",     MACHINE_SUPPORTS_SAVE ) // still shows 1984 copyright on title screen
+GAME( 1984, sms4in1a, sms4in1, sureshot, sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "4-in-1 (version SWS1-110984)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1985, smsjoker, 0,       sureshot, sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "Joker Poker With Hi-Lo Double-Up", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sureshot, 0,       sureshot, sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "Sure Shot",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1985, secondch, 0,       sureshot, sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "Second Chance",                    MACHINE_SUPPORTS_SAVE )

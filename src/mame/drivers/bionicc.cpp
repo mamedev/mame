@@ -150,10 +150,10 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
-	DECLARE_WRITE16_MEMBER(bgvideoram_w);
-	DECLARE_WRITE16_MEMBER(fgvideoram_w);
-	DECLARE_WRITE16_MEMBER(txvideoram_w);
-	DECLARE_WRITE16_MEMBER(scroll_w);
+	void bgvideoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void fgvideoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void txvideoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	tilemap_t   *m_tx_tilemap;
 	tilemap_t   *m_bg_tilemap;
@@ -336,25 +336,25 @@ rgb_t bionicc_state::RRRRGGGGBBBBIIII(uint32_t raw)
 
 */
 
-WRITE16_MEMBER(bionicc_state::bgvideoram_w)
+void bionicc_state::bgvideoram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_bgvideoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_MEMBER(bionicc_state::fgvideoram_w)
+void bionicc_state::fgvideoram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_fgvideoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_MEMBER(bionicc_state::txvideoram_w)
+void bionicc_state::txvideoram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_txvideoram[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE16_MEMBER(bionicc_state::scroll_w)
+void bionicc_state::scroll_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	data = COMBINE_DATA(&m_scroll[offset]);
 

@@ -15,13 +15,12 @@ public:
 
 	// configuration
 	template <typename T> void set_gfx_region(T &&tag) { m_gfxrom.set_tag(std::forward<T>(tag)); }
-	void set_tex_layout(int layout) { m_tex_layout = layout; }
 
 	uint32_t fetch_texel(int page, int pal_index, int u, int v);
-	void preprocess_texture_data(uint8_t *dst, uint8_t *src, int length, int gticlub);
+	void preprocess_texture_data(uint8_t *dst, uint8_t *src, int length);
 
-	DECLARE_READ32_MEMBER( read );
-	DECLARE_WRITE32_MEMBER( write );
+	uint32_t read(offs_t offset);
+	void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 protected:
 	// device-level overrides
@@ -44,7 +43,6 @@ private:
 	//int m_tex_height;
 	//int m_tex_mirror_x;
 	//int m_tex_mirror_y;
-	int m_tex_layout;
 };
 
 

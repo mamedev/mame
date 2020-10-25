@@ -211,6 +211,7 @@ void m37710_cpu_device::irq_register_map(address_map &map)
 // (M37702E2: same with EPROM instead of mask ROM)
 void m37702m2_device::map(address_map &map)
 {
+	map(0x000000, 0x00007f).noprw();
 	map(0x000002, 0x000015).rw(FUNC(m37702m2_device::port_r<0>), FUNC(m37702m2_device::port_w<0>)).umask16(0x00ff);
 	map(0x000002, 0x000011).rw(FUNC(m37702m2_device::port_r<1>), FUNC(m37702m2_device::port_w<1>)).umask16(0xff00);
 	map(0x00005e, 0x00005e).rw(FUNC(m37702m2_device::proc_mode_r), FUNC(m37702m2_device::proc_mode_w));
@@ -229,6 +230,7 @@ void m37702m2_device::map(address_map &map)
 // M37702S1: 512 bytes internal RAM, no internal ROM
 void m37702s1_device::map(address_map &map)
 {
+	map(0x000000, 0x00007f).noprw();
 	map(0x000002, 0x000015).rw(FUNC(m37702s1_device::port_r<0>), FUNC(m37702s1_device::port_w<0>)).umask16(0x00ff);
 	map(0x000002, 0x000011).rw(FUNC(m37702s1_device::port_r<1>), FUNC(m37702s1_device::port_w<1>)).umask16(0xff00);
 	map(0x00005e, 0x00005e).rw(FUNC(m37702s1_device::proc_mode_r), FUNC(m37702s1_device::proc_mode_w));
@@ -246,6 +248,8 @@ void m37702s1_device::map(address_map &map)
 // M37710S4: 2048 bytes internal RAM, no internal ROM
 void m37710s4_device::map(address_map &map)
 {
+	map(0x000000, 0x000001).noprw();
+	map(0x00000a, 0x00007f).noprw();
 	map(0x00000a, 0x000015).rw(FUNC(m37710s4_device::port_r<4>), FUNC(m37710s4_device::port_w<4>)).umask16(0x00ff);
 	map(0x00000a, 0x000011).rw(FUNC(m37710s4_device::port_r<5>), FUNC(m37710s4_device::port_w<5>)).umask16(0xff00);
 	map(0x00001a, 0x00001d).w(FUNC(m37710s4_device::da_reg_w)).umask16(0x00ff);
@@ -265,6 +269,8 @@ void m37710s4_device::map(address_map &map)
 // M37720S1: 512 bytes internal RAM, no internal ROM, built-in DMA
 void m37720s1_device::map(address_map &map)
 {
+	map(0x000000, 0x000001).noprw();
+	map(0x00000a, 0x00007f).noprw();
 	map(0x00000a, 0x000019).rw(FUNC(m37720s1_device::port_r<4>), FUNC(m37720s1_device::port_w<4>)).umask16(0x00ff);
 	map(0x00000a, 0x000015).rw(FUNC(m37720s1_device::port_r<5>), FUNC(m37720s1_device::port_w<5>)).umask16(0xff00);
 	map(0x00001a, 0x00001d).w(FUNC(m37720s1_device::pulse_output_w)).umask16(0x00ff);
@@ -290,6 +296,8 @@ void m37720s1_device::map(address_map &map)
 // M37730S2: 1024 bytes internal RAM, no internal ROM
 void m37730s2_device::map(address_map &map)
 {
+	map(0x000000, 0x000001).noprw();
+	map(0x00000a, 0x00007f).noprw();
 	map(0x00000a, 0x000015).rw(FUNC(m37730s2_device::port_r<4>), FUNC(m37730s2_device::port_w<4>)).umask16(0x00ff);
 	map(0x00000a, 0x00000d).rw(FUNC(m37730s2_device::port_r<5>), FUNC(m37730s2_device::port_w<5>)).umask16(0xff00);
 	map(0x00005e, 0x00005e).rw(FUNC(m37730s2_device::proc_mode_r), FUNC(m37730s2_device::proc_mode_w));
@@ -644,14 +652,14 @@ uint16_t m37710_cpu_device::ad_result_r(offs_t offset)
 {
 	uint16_t result = m_ad_result[offset];
 
-	LOGMASKED(LOG_AD, "ad_result_r from %02x: A/D %d = %x (PC=%x)\n", (int)(offset * 2) + 0x20, offset, result, REG_PB<<16 | REG_PC);
+	LOGMASKED(LOG_AD, "ad_result_r from %02x: A/D %d = %x (PC=%x)\n", (int)(offset * 2) + 0x20, offset, result, REG_PG | REG_PC);
 
 	return result;
 }
 
 uint8_t m37710_cpu_device::uart0_mode_r()
 {
-	LOGMASKED(LOG_UART, "uart0_mode_r: UART0 transmit/recv mode = %x (PC=%x)\n", m_uart_mode[0], REG_PB<<16 | REG_PC);
+	LOGMASKED(LOG_UART, "uart0_mode_r: UART0 transmit/recv mode = %x (PC=%x)\n", m_uart_mode[0], REG_PG | REG_PC);
 
 	return m_uart_mode[0];
 }
@@ -665,7 +673,7 @@ void m37710_cpu_device::uart0_mode_w(uint8_t data)
 
 uint8_t m37710_cpu_device::uart1_mode_r()
 {
-	LOGMASKED(LOG_UART, "uart1_mode_r: UART1 transmit/recv mode = %x (PC=%x)\n", m_uart_mode[1], REG_PB<<16 | REG_PC);
+	LOGMASKED(LOG_UART, "uart1_mode_r: UART1 transmit/recv mode = %x (PC=%x)\n", m_uart_mode[1], REG_PG | REG_PC);
 
 	return m_uart_mode[1];
 }
@@ -703,7 +711,7 @@ void m37710_cpu_device::uart1_tbuf_w(uint16_t data)
 
 uint8_t m37710_cpu_device::uart0_ctrl_reg0_r()
 {
-	LOGMASKED(LOG_UART, "uart0_ctrl_reg0_r: UART0 transmit/recv ctrl 0 = %x (PC=%x)\n", m_uart_ctrl_reg0[0], REG_PB<<16 | REG_PC);
+	LOGMASKED(LOG_UART, "uart0_ctrl_reg0_r: UART0 transmit/recv ctrl 0 = %x (PC=%x)\n", m_uart_ctrl_reg0[0], REG_PG | REG_PC);
 
 	return m_uart_ctrl_reg0[0];
 }
@@ -718,7 +726,7 @@ void m37710_cpu_device::uart0_ctrl_reg0_w(uint8_t data)
 
 uint8_t m37710_cpu_device::uart1_ctrl_reg0_r()
 {
-	LOGMASKED(LOG_UART, "uart1_ctrl_reg0_r: UART1 transmit/recv ctrl 0 = %x (PC=%x)\n", m_uart_ctrl_reg0[1], REG_PB<<16 | REG_PC);
+	LOGMASKED(LOG_UART, "uart1_ctrl_reg0_r: UART1 transmit/recv ctrl 0 = %x (PC=%x)\n", m_uart_ctrl_reg0[1], REG_PG | REG_PC);
 
 	return m_uart_ctrl_reg0[1];
 }
@@ -733,7 +741,7 @@ void m37710_cpu_device::uart1_ctrl_reg0_w(uint8_t data)
 
 uint8_t m37710_cpu_device::uart0_ctrl_reg1_r()
 {
-	LOGMASKED(LOG_UART, "uart0_ctrl_reg1_r: UART0 transmit/recv ctrl 1 = %x (PC=%x)\n", m_uart_ctrl_reg1[0], REG_PB<<16 | REG_PC);
+	LOGMASKED(LOG_UART, "uart0_ctrl_reg1_r: UART0 transmit/recv ctrl 1 = %x (PC=%x)\n", m_uart_ctrl_reg1[0], REG_PG | REG_PC);
 
 	return m_uart_ctrl_reg1[0];
 }
@@ -747,7 +755,7 @@ void m37710_cpu_device::uart0_ctrl_reg1_w(uint8_t data)
 
 uint8_t m37710_cpu_device::uart1_ctrl_reg1_r()
 {
-	LOGMASKED(LOG_UART, "uart1_ctrl_reg1_r: UART1 transmit/recv ctrl 1 = %x (PC=%x)\n", m_uart_ctrl_reg1[1], REG_PB<<16 | REG_PC);
+	LOGMASKED(LOG_UART, "uart1_ctrl_reg1_r: UART1 transmit/recv ctrl 1 = %x (PC=%x)\n", m_uart_ctrl_reg1[1], REG_PG | REG_PC);
 
 	return m_uart_ctrl_reg1[1];
 }
@@ -761,21 +769,21 @@ void m37710_cpu_device::uart1_ctrl_reg1_w(uint8_t data)
 
 uint16_t m37710_cpu_device::uart0_rbuf_r()
 {
-	LOGMASKED(LOG_UART, "uart0_rbuf_r: UART0 recv buf (PC=%x)\n", REG_PB<<16 | REG_PC);
+	LOGMASKED(LOG_UART, "uart0_rbuf_r: UART0 recv buf (PC=%x)\n", REG_PG | REG_PC);
 
 	return 0;
 }
 
 uint16_t m37710_cpu_device::uart1_rbuf_r()
 {
-	LOGMASKED(LOG_UART, "uart1_rbuf_r: UART1 recv buf (PC=%x)\n", REG_PB<<16 | REG_PC);
+	LOGMASKED(LOG_UART, "uart1_rbuf_r: UART1 recv buf (PC=%x)\n", REG_PG | REG_PC);
 
 	return 0;
 }
 
 uint8_t m37710_cpu_device::count_start_r()
 {
-	LOGMASKED(LOG_TIMER, "count_start_r: Count start = %x (PC=%x)\n", m_count_start, REG_PB<<16 | REG_PC);
+	LOGMASKED(LOG_TIMER, "count_start_r: Count start = %x (PC=%x)\n", m_count_start, REG_PG | REG_PC);
 
 	return m_count_start;
 }
@@ -801,7 +809,7 @@ void m37710_cpu_device::one_shot_start_w(uint8_t data)
 
 uint8_t m37710_cpu_device::up_down_r()
 {
-	LOGMASKED(LOG_TIMER, "up_down_r: Up-down register = %x (PC=%x)\n", m_up_down_reg, REG_PB<<16 | REG_PC);
+	LOGMASKED(LOG_TIMER, "up_down_r: Up-down register = %x (PC=%x)\n", m_up_down_reg, REG_PG | REG_PC);
 
 	// bits 7-5 read back as 0
 	return m_up_down_reg & 0x1f;
@@ -828,7 +836,7 @@ void m37710_cpu_device::timer_reg_w(offs_t offset, uint16_t data, uint16_t mem_m
 
 uint8_t m37710_cpu_device::timer_mode_r(offs_t offset)
 {
-	LOGMASKED(LOG_TIMER, "timer_mode_r from %02x: Timer %s mode = %x (PC=%x)\n", (int)offset + 0x56, m37710_tnames[offset], m_timer_mode[offset], REG_PB<<16 | REG_PC);
+	LOGMASKED(LOG_TIMER, "timer_mode_r from %02x: Timer %s mode = %x (PC=%x)\n", (int)offset + 0x56, m37710_tnames[offset], m_timer_mode[offset], REG_PG | REG_PC);
 
 	return m_timer_mode[offset];
 }
@@ -842,7 +850,7 @@ void m37710_cpu_device::timer_mode_w(offs_t offset, uint8_t data)
 
 uint8_t m37710_cpu_device::proc_mode_r(offs_t offset)
 {
-	LOGMASKED(LOG_GENERAL, "proc_mode_r: Processor mode = %x (PC=%x)\n", m_proc_mode, REG_PB<<16 | REG_PC);
+	LOGMASKED(LOG_GENERAL, "proc_mode_r: Processor mode = %x (PC=%x)\n", m_proc_mode, REG_PG | REG_PC);
 
 	return m_proc_mode & 0xf7;
 }
@@ -873,7 +881,7 @@ void m37710_cpu_device::watchdog_freq_w(uint8_t data)
 
 uint8_t m37710_cpu_device::waveform_mode_r()
 {
-	LOGMASKED(LOG_GENERAL, "waveform_mode_r: Waveform output mode (PC=%x)\n", REG_PB<<16 | REG_PC);
+	LOGMASKED(LOG_GENERAL, "waveform_mode_r: Waveform output mode (PC=%x)\n", REG_PG | REG_PC);
 
 	return 0;
 }
@@ -885,7 +893,7 @@ void m37710_cpu_device::waveform_mode_w(uint8_t data)
 
 uint8_t m37710_cpu_device::rto_control_r()
 {
-	LOGMASKED(LOG_GENERAL, "rto_control_r: Real-time output control = %x (PC=%x)\n", m_rto_control, REG_PB<<16 | REG_PC);
+	LOGMASKED(LOG_GENERAL, "rto_control_r: Real-time output control = %x (PC=%x)\n", m_rto_control, REG_PG | REG_PC);
 
 	return m_rto_control;
 }
@@ -899,7 +907,7 @@ void m37710_cpu_device::rto_control_w(uint8_t data)
 
 uint8_t m37710_cpu_device::dram_control_r()
 {
-	LOGMASKED(LOG_GENERAL, "dram_control_r: DRAM control = %x (PC=%x)\n", m_dram_control, REG_PB<<16 | REG_PC);
+	LOGMASKED(LOG_GENERAL, "dram_control_r: DRAM control = %x (PC=%x)\n", m_dram_control, REG_PG | REG_PC);
 
 	return m_dram_control;
 }
@@ -932,7 +940,7 @@ uint8_t m37710_cpu_device::get_int_control(int level)
 {
 	assert(level < M37710_MASKABLE_INTERRUPTS);
 
-	//LOGMASKED(LOG_INT, "int_control_r: %s IRQ ctrl = %x (PC=%x)\n", m37710_intnames[level], m_int_control[level], REG_PB<<16 | REG_PC);
+	//LOGMASKED(LOG_INT, "int_control_r: %s IRQ ctrl = %x (PC=%x)\n", m37710_intnames[level], m_int_control[level], REG_PG | REG_PC);
 
 	uint8_t result = m_int_control[level];
 
@@ -1025,7 +1033,7 @@ void m37710_cpu_device::m37710i_update_irqs()
 				if (!FLAG_I && thispri > curpri && thispri > m_ipl)
 				{
 					// mark us as the best candidate
-					LOGMASKED(LOG_INT, "%s interrupt active with priority %d (PC=%x)\n", m37710_intnames[curirq], thispri, REG_PB<<16 | REG_PC);
+					LOGMASKED(LOG_INT, "%s interrupt active with priority %d (PC=%x)\n", m37710_intnames[curirq], thispri, REG_PG | REG_PC);
 					wantedIRQ = curirq;
 					curpri = thispri;
 				}
@@ -1033,7 +1041,7 @@ void m37710_cpu_device::m37710i_update_irqs()
 			else
 			{
 				// non-maskable
-				LOGMASKED(LOG_INT, "%s interrupt active (PC=%x)\n", m37710_intnames[curirq], REG_PB<<16 | REG_PC);
+				LOGMASKED(LOG_INT, "%s interrupt active (PC=%x)\n", m37710_intnames[curirq], REG_PG | REG_PC);
 				wantedIRQ = curirq;
 				curpri = 7;
 				break;  // no more processing, NMIs always win
@@ -1054,16 +1062,16 @@ void m37710_cpu_device::m37710i_update_irqs()
 		// let's do it...
 		// push PB, then PC, then status
 		CLK(13);
-		m37710i_push_8(REG_PB>>16);
+		m37710i_push_8(REG_PG>>16);
 		m37710i_push_16(REG_PC);
 		m37710i_push_8(m_ipl);
-		m37710i_push_8(m37710i_get_reg_p());
+		m37710i_push_8(m37710i_get_reg_ps());
 
 		// set I to 1, set IPL to the interrupt we're taking
 		FLAG_I = IFLAG_SET;
 		m_ipl = curpri;
-		// then PB=0, PC=(vector)
-		REG_PB = 0;
+		// then PG=0, PC=(vector)
+		REG_PG = 0;
 		REG_PC = m37710_read_16(m37710_irq_vectors[wantedIRQ]);
 	}
 }
@@ -1131,9 +1139,9 @@ void m37710_cpu_device::device_reset()
 	IRQ_DELAY = 0;
 
 	/* 37710 boots in full native mode */
-	REG_D = 0;
-	REG_PB = 0;
-	REG_DB = 0;
+	REG_DPR = 0;
+	REG_PG = 0;
+	REG_DT = 0;
 	REG_S = (REG_S & 0xff) | 0x100;
 	REG_XH = REG_X & 0xff00; REG_X &= 0xff;
 	REG_YH = REG_Y & 0xff00; REG_Y &= 0xff;
@@ -1268,9 +1276,9 @@ void m37710_cpu_device::device_start()
 	m_s = 0;
 	m_pc = 0;
 	m_ppc = 0;
-	m_pb = 0;
-	m_db = 0;
-	m_d = 0;
+	m_pg = 0;
+	m_dt = 0;
+	m_dpr = 0;
 	m_flag_e = 0;
 	m_flag_m = 0;
 	m_flag_x = 0;
@@ -1307,8 +1315,8 @@ void m37710_cpu_device::device_start()
 	m_watchdog_freq = 0;
 	std::fill(std::begin(m_int_control), std::end(m_int_control), 0);
 
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<1, 0, ENDIANNESS_LITTLE>();
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
 
 	m_port_in_cb.resolve_all_safe(0xff);
 	m_port_out_cb.resolve_all_safe();
@@ -1339,9 +1347,9 @@ void m37710_cpu_device::device_start()
 	save_item(NAME(m_s));
 	save_item(NAME(m_pc));
 	save_item(NAME(m_ppc));
-	save_item(NAME(m_pb));
-	save_item(NAME(m_db));
-	save_item(NAME(m_d));
+	save_item(NAME(m_pg));
+	save_item(NAME(m_dt));
+	save_item(NAME(m_dpr));
 	save_item(NAME(m_flag_e));
 	save_item(NAME(m_flag_m));
 	save_item(NAME(m_flag_x));
@@ -1390,11 +1398,11 @@ void m37710_cpu_device::device_start()
 	machine().save().register_postload(save_prepost_delegate(save_prepost_delegate(FUNC(m37710_cpu_device::m37710_restore_state), this)));
 
 	state_add( M37710_PC,        "PC",  m_pc).formatstr("%04X");
-	state_add( M37710_PB,        "PB",  m_debugger_pb).callimport().callexport().formatstr("%02X");
-	state_add( M37710_DB,        "DB",  m_debugger_db).callimport().callexport().formatstr("%02X");
-	state_add( M37710_D,         "D",   m_d).formatstr("%04X");
+	state_add( M37710_PG,        "PG",  m_debugger_pg).callimport().callexport().formatstr("%02X");
+	state_add( M37710_DT,        "DT",  m_debugger_dt).callimport().callexport().formatstr("%02X");
+	state_add( M37710_DPR,       "DPR", m_dpr).formatstr("%04X");
 	state_add( M37710_S,         "S",   m_s).formatstr("%04X");
-	state_add( M37710_P,         "P",   m_debugger_p).callimport().callexport().formatstr("%04X");
+	state_add( M37710_PS,        "PS", m_debugger_ps).callimport().callexport().formatstr("%04X");
 	state_add( M37710_E,         "E",   m_flag_e).formatstr("%01X");
 	state_add( M37710_A,         "A",   m_debugger_a).callimport().callexport().formatstr("%04X");
 	state_add( M37710_B,         "B",   m_debugger_b).callimport().callexport().formatstr("%04X");
@@ -1404,7 +1412,7 @@ void m37710_cpu_device::device_start()
 
 	state_add( STATE_GENPC, "GENPC", m_debugger_pc ).callimport().callexport().noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_debugger_pc ).callimport().callexport().noshow();
-	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_p ).formatstr("%8s").noshow();
+	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_ps ).formatstr("%8s").noshow();
 
 	set_icountptr(m_ICount);
 }
@@ -1414,17 +1422,17 @@ void m37710_cpu_device::state_import(const device_state_entry &entry)
 {
 	switch (entry.index())
 	{
-		case M37710_PB:
-			m37710_set_reg(M37710_PB, m_debugger_pb);
+		case M37710_PG:
+			m37710_set_reg(M37710_PG, m_debugger_pg);
 			break;
 
-		case M37710_DB:
-			m37710_set_reg(M37710_DB, m_debugger_db);
+		case M37710_DT:
+			m37710_set_reg(M37710_DT, m_debugger_dt);
 			break;
 
-		case M37710_P:
-			m37710_set_reg(M37710_P, m_debugger_p&0xff);
-			m_ipl = (m_debugger_p>>8)&0xff;
+		case M37710_PS:
+			m37710_set_reg(M37710_PS, m_debugger_ps&0xff);
+			m_ipl = (m_debugger_ps>>8)&0xff;
 			break;
 
 		case M37710_A:
@@ -1437,7 +1445,7 @@ void m37710_cpu_device::state_import(const device_state_entry &entry)
 
 		case STATE_GENPC:
 		case STATE_GENPCBASE:
-			REG_PB = m_debugger_pc & 0xff0000;
+			REG_PG = m_debugger_pc & 0xff0000;
 			m37710_set_pc(m_debugger_pc & 0xffff);
 			break;
 	}
@@ -1448,16 +1456,16 @@ void m37710_cpu_device::state_export(const device_state_entry &entry)
 {
 	switch (entry.index())
 	{
-		case M37710_PB:
-			m_debugger_pb = m_pb >> 16;
+		case M37710_PG:
+			m_debugger_pg = m_pg >> 16;
 			break;
 
-		case M37710_DB:
-			m_debugger_db = m_db >> 16;
+		case M37710_DT:
+			m_debugger_dt = m_dt >> 16;
 			break;
 
-		case M37710_P:
-			m_debugger_p = (m_flag_n&0x80) | ((m_flag_v>>1)&0x40) | m_flag_m | m_flag_x | m_flag_d | m_flag_i | ((!m_flag_z)<<1) | ((m_flag_c>>8)&1) | (m_ipl<<8);
+		case M37710_PS:
+			m_debugger_ps = (m_flag_n&0x80) | ((m_flag_v>>1)&0x40) | m_flag_m | m_flag_x | m_flag_d | m_flag_i | ((!m_flag_z)<<1) | ((m_flag_c>>8)&1) | (m_ipl<<8);
 			break;
 
 		case M37710_A:
@@ -1470,7 +1478,7 @@ void m37710_cpu_device::state_export(const device_state_entry &entry)
 
 		case STATE_GENPC:
 		case STATE_GENPCBASE:
-			m_debugger_pc = (REG_PB | REG_PC);
+			m_debugger_pc = (REG_PG | REG_PC);
 			break;
 	}
 }
@@ -1549,12 +1557,12 @@ void m37710_cpu_device::m37710i_set_execution_mode(uint32_t mode)
 void m37710_cpu_device::m37710i_interrupt_software(uint32_t vector)
 {
 	CLK(13);
-	m37710i_push_8(REG_PB>>16);
+	m37710i_push_8(REG_PG>>16);
 	m37710i_push_16(REG_PC);
 	m37710i_push_8(m_ipl);
-	m37710i_push_8(m37710i_get_reg_p());
+	m37710i_push_8(m37710i_get_reg_ps());
 	FLAG_I = IFLAG_SET;
-	REG_PB = 0;
+	REG_PG = 0;
 	REG_PC = m37710_read_16(vector);
 }
 

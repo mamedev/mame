@@ -35,12 +35,12 @@ inline uint8_t madalien_state::shift_common(uint8_t hi, uint8_t lo)
 	return table[((hi & 0x07) << 8) | lo];
 }
 
-READ8_MEMBER(madalien_state::shift_r)
+uint8_t madalien_state::shift_r()
 {
 	return shift_common(*m_shift_hi, *m_shift_lo);
 }
 
-READ8_MEMBER(madalien_state::shift_rev_r)
+uint8_t madalien_state::shift_rev_r()
 {
 	uint8_t hi = *m_shift_hi ^ 0x07;
 	uint8_t lo = bitswap<8>(*m_shift_lo,0,1,2,3,4,5,6,7);
@@ -51,17 +51,17 @@ READ8_MEMBER(madalien_state::shift_rev_r)
 }
 
 
-WRITE8_MEMBER(madalien_state::madalien_output_w)
+void madalien_state::madalien_output_w(uint8_t data)
 {
 	/* output latch, eight output bits, none connected */
 }
 
 
-WRITE8_MEMBER(madalien_state::madalien_portA_w)
+void madalien_state::madalien_portA_w(uint8_t data)
 {
 	m_discrete->write(MADALIEN_8910_PORTA, data);
 }
-WRITE8_MEMBER(madalien_state::madalien_portB_w)
+void madalien_state::madalien_portB_w(uint8_t data)
 {
 	m_discrete->write(MADALIEN_8910_PORTB, data);
 }

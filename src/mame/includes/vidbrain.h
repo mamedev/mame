@@ -73,13 +73,13 @@ private:
 		TIMER_JOYSTICK
 	};
 
-	DECLARE_WRITE8_MEMBER( keyboard_w );
-	DECLARE_READ8_MEMBER( keyboard_r );
-	DECLARE_WRITE8_MEMBER( sound_w );
+	void keyboard_w(uint8_t data);
+	uint8_t keyboard_r();
+	void sound_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( ext_int_w );
 	DECLARE_WRITE_LINE_MEMBER( hblank_w );
-	DECLARE_READ8_MEMBER(memory_read_byte);
+	uint8_t memory_read_byte(offs_t offset);
 
 	// keyboard state
 	uint8_t m_keylatch;

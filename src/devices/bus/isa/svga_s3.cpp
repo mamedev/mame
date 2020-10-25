@@ -76,7 +76,7 @@ isa16_svga_s3_device::isa16_svga_s3_device(const machine_config &mconfig, const 
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-READ8_MEMBER(isa16_svga_s3_device::input_port_0_r ) { return 0xff; } //return machine().root_device().ioport("IN0")->read(); }
+uint8_t isa16_svga_s3_device::input_port_0_r() { return 0xff; } //return machine().root_device().ioport("IN0")->read(); }
 
 void isa16_svga_s3_device::device_start()
 {
@@ -84,27 +84,27 @@ void isa16_svga_s3_device::device_start()
 
 	m_isa->install_rom(this, 0xc0000, 0xc7fff, "svga", "s3_764");
 
-	m_isa->install_device(0x03b0, 0x03bf, read8_delegate(*m_vga, FUNC(s3_vga_device::port_03b0_r)), write8_delegate(*m_vga, FUNC(s3_vga_device::port_03b0_w)));
-	m_isa->install_device(0x03c0, 0x03cf, read8_delegate(*m_vga, FUNC(s3_vga_device::port_03c0_r)), write8_delegate(*m_vga, FUNC(s3_vga_device::port_03c0_w)));
-	m_isa->install_device(0x03d0, 0x03df, read8_delegate(*m_vga, FUNC(s3_vga_device::port_03d0_r)), write8_delegate(*m_vga, FUNC(s3_vga_device::port_03d0_w)));
-	m_isa->install16_device(0x82e8, 0x82eb, read16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_currenty_r)), write16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_currenty_w)));
-	m_isa->install16_device(0x86e8, 0x86eb, read16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_currentx_r)), write16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_currentx_w)));
-	m_isa->install16_device(0x8ae8, 0x8aeb, read16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_desty_r)), write16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_desty_w)));
-	m_isa->install16_device(0x8ee8, 0x8eeb, read16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_destx_r)), write16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_destx_w)));
-	m_isa->install16_device(0x92e8, 0x92eb, read16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_line_error_r)), write16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_line_error_w)));
-	m_isa->install16_device(0x96e8, 0x96eb, read16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_width_r)), write16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_width_w)));
-	m_isa->install16_device(0x9ae8, 0x9aeb, read16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_gpstatus_r)), write16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_cmd_w)));
-	m_isa->install16_device(0x9ee8, 0x9eeb, read16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_ssv_r)), write16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_ssv_w)));
-	m_isa->install16_device(0xa2e8, 0xa2eb, read16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_bgcolour_r)), write16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_bgcolour_w)));
-	m_isa->install16_device(0xa6e8, 0xa6eb, read16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_fgcolour_r)), write16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_fgcolour_w)));
-	m_isa->install16_device(0xaae8, 0xaaeb, read16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_write_mask_r)), write16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_write_mask_w)));
-	m_isa->install16_device(0xaee8, 0xaeeb, read16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_read_mask_r)), write16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_read_mask_w)));
-	m_isa->install16_device(0xb6e8, 0xb6eb, read16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_backmix_r)), write16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_backmix_w)));
-	m_isa->install16_device(0xbae8, 0xbaeb, read16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_foremix_r)), write16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_foremix_w)));
-	m_isa->install16_device(0xbee8, 0xbeeb, read16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_multifunc_r)), write16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_multifunc_w)));
-	m_isa->install16_device(0xe2e8, 0xe2eb, read16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_pixel_xfer_r)), write16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_pixel_xfer_w)));
+	m_isa->install_device(0x03b0, 0x03bf, read8sm_delegate(*m_vga, FUNC(s3_vga_device::port_03b0_r)), write8sm_delegate(*m_vga, FUNC(s3_vga_device::port_03b0_w)));
+	m_isa->install_device(0x03c0, 0x03cf, read8sm_delegate(*m_vga, FUNC(s3_vga_device::port_03c0_r)), write8sm_delegate(*m_vga, FUNC(s3_vga_device::port_03c0_w)));
+	m_isa->install_device(0x03d0, 0x03df, read8sm_delegate(*m_vga, FUNC(s3_vga_device::port_03d0_r)), write8sm_delegate(*m_vga, FUNC(s3_vga_device::port_03d0_w)));
+	m_isa->install16_device(0x82e8, 0x82eb, read16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_currenty_r)), write16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_currenty_w)));
+	m_isa->install16_device(0x86e8, 0x86eb, read16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_currentx_r)), write16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_currentx_w)));
+	m_isa->install16_device(0x8ae8, 0x8aeb, read16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_desty_r)), write16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_desty_w)));
+	m_isa->install16_device(0x8ee8, 0x8eeb, read16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_destx_r)), write16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_destx_w)));
+	m_isa->install16_device(0x92e8, 0x92eb, read16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_line_error_r)), write16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_line_error_w)));
+	m_isa->install16_device(0x96e8, 0x96eb, read16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_width_r)), write16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_width_w)));
+	m_isa->install16_device(0x9ae8, 0x9aeb, read16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_gpstatus_r)), write16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_cmd_w)));
+	m_isa->install16_device(0x9ee8, 0x9eeb, read16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_ssv_r)), write16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_ssv_w)));
+	m_isa->install16_device(0xa2e8, 0xa2eb, read16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_bgcolour_r)), write16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_bgcolour_w)));
+	m_isa->install16_device(0xa6e8, 0xa6eb, read16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_fgcolour_r)), write16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_fgcolour_w)));
+	m_isa->install16_device(0xaae8, 0xaaeb, read16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_write_mask_r)), write16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_write_mask_w)));
+	m_isa->install16_device(0xaee8, 0xaeeb, read16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_read_mask_r)), write16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_read_mask_w)));
+	m_isa->install16_device(0xb6e8, 0xb6eb, read16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_backmix_r)), write16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_backmix_w)));
+	m_isa->install16_device(0xbae8, 0xbaeb, read16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_foremix_r)), write16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_foremix_w)));
+	m_isa->install16_device(0xbee8, 0xbeeb, read16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_multifunc_r)), write16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_multifunc_w)));
+	m_isa->install16_device(0xe2e8, 0xe2eb, read16sm_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_pixel_xfer_r)), write16sm_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_pixel_xfer_w)));
 
-	m_isa->install_memory(0xa0000, 0xbffff, read8_delegate(*m_vga, FUNC(s3_vga_device::mem_r)), write8_delegate(*m_vga, FUNC(s3_vga_device::mem_w)));
+	m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(s3_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(s3_vga_device::mem_w)));
 }
 
 //-------------------------------------------------
@@ -190,7 +190,7 @@ isa16_s3virge_device::isa16_s3virge_device(const machine_config &mconfig, const 
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-READ8_MEMBER(isa16_s3virge_device::input_port_0_r ) { return 0xff; } //return machine().root_device().ioport("IN0")->read(); }
+uint8_t isa16_s3virge_device::input_port_0_r() { return 0xff; } //return machine().root_device().ioport("IN0")->read(); }
 
 void isa16_s3virge_device::device_start()
 {
@@ -198,11 +198,11 @@ void isa16_s3virge_device::device_start()
 
 	m_isa->install_rom(this, 0xc0000, 0xc7fff, "svga", "s3virge");
 
-	m_isa->install_device(0x03b0, 0x03bf, read8_delegate(*m_vga, FUNC(s3virge_vga_device::port_03b0_r)), write8_delegate(*m_vga, FUNC(s3virge_vga_device::port_03b0_w)));
-	m_isa->install_device(0x03c0, 0x03cf, read8_delegate(*m_vga, FUNC(s3virge_vga_device::port_03c0_r)), write8_delegate(*m_vga, FUNC(s3virge_vga_device::port_03c0_w)));
-	m_isa->install_device(0x03d0, 0x03df, read8_delegate(*m_vga, FUNC(s3virge_vga_device::port_03d0_r)), write8_delegate(*m_vga, FUNC(s3virge_vga_device::port_03d0_w)));
+	m_isa->install_device(0x03b0, 0x03bf, read8sm_delegate(*m_vga, FUNC(s3virge_vga_device::port_03b0_r)), write8sm_delegate(*m_vga, FUNC(s3virge_vga_device::port_03b0_w)));
+	m_isa->install_device(0x03c0, 0x03cf, read8sm_delegate(*m_vga, FUNC(s3virge_vga_device::port_03c0_r)), write8sm_delegate(*m_vga, FUNC(s3virge_vga_device::port_03c0_w)));
+	m_isa->install_device(0x03d0, 0x03df, read8sm_delegate(*m_vga, FUNC(s3virge_vga_device::port_03d0_r)), write8sm_delegate(*m_vga, FUNC(s3virge_vga_device::port_03d0_w)));
 
-	m_isa->install_memory(0xa0000, 0xbffff, read8_delegate(*m_vga, FUNC(s3virge_vga_device::mem_r)), write8_delegate(*m_vga, FUNC(s3virge_vga_device::mem_w)));
+	m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(s3virge_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(s3virge_vga_device::mem_w)));
 }
 
 //-------------------------------------------------
@@ -261,7 +261,7 @@ WRITE_LINE_MEMBER(isa16_s3virgedx_device::linear_config_changed_w)
 		}
 		m_lfb_start = m_vga->get_linear_address();
 		m_lfb_end = m_lfb_start + m_vga->get_linear_address_size_full() - 1;
-		m_isa->install_memory(m_lfb_start, m_lfb_end, read8_delegate(*m_vga, FUNC(s3virge_vga_device::fb_r)), write8_delegate(*m_vga, FUNC(s3virge_vga_device::fb_w)));
+		m_isa->install_memory(m_lfb_start, m_lfb_end, read8sm_delegate(*m_vga, FUNC(s3virge_vga_device::fb_r)), write8sm_delegate(*m_vga, FUNC(s3virge_vga_device::fb_w)));
 	}
 	else
 	{
@@ -296,7 +296,7 @@ isa16_s3virgedx_device::isa16_s3virgedx_device(const machine_config &mconfig, co
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-READ8_MEMBER(isa16_s3virgedx_device::input_port_0_r ) { return 0xff; } //return machine().root_device().ioport("IN0")->read(); }
+uint8_t isa16_s3virgedx_device::input_port_0_r() { return 0xff; } //return machine().root_device().ioport("IN0")->read(); }
 
 void isa16_s3virgedx_device::device_start()
 {
@@ -304,11 +304,11 @@ void isa16_s3virgedx_device::device_start()
 
 	m_isa->install_rom(this, 0xc0000, 0xc7fff, "svga", "s3virgedx");
 
-	m_isa->install_device(0x03b0, 0x03bf, read8_delegate(*m_vga, FUNC(s3virge_vga_device::port_03b0_r)), write8_delegate(*m_vga, FUNC(s3virge_vga_device::port_03b0_w)));
-	m_isa->install_device(0x03c0, 0x03cf, read8_delegate(*m_vga, FUNC(s3virge_vga_device::port_03c0_r)), write8_delegate(*m_vga, FUNC(s3virge_vga_device::port_03c0_w)));
-	m_isa->install_device(0x03d0, 0x03df, read8_delegate(*m_vga, FUNC(s3virge_vga_device::port_03d0_r)), write8_delegate(*m_vga, FUNC(s3virge_vga_device::port_03d0_w)));
+	m_isa->install_device(0x03b0, 0x03bf, read8sm_delegate(*m_vga, FUNC(s3virge_vga_device::port_03b0_r)), write8sm_delegate(*m_vga, FUNC(s3virge_vga_device::port_03b0_w)));
+	m_isa->install_device(0x03c0, 0x03cf, read8sm_delegate(*m_vga, FUNC(s3virge_vga_device::port_03c0_r)), write8sm_delegate(*m_vga, FUNC(s3virge_vga_device::port_03c0_w)));
+	m_isa->install_device(0x03d0, 0x03df, read8sm_delegate(*m_vga, FUNC(s3virge_vga_device::port_03d0_r)), write8sm_delegate(*m_vga, FUNC(s3virge_vga_device::port_03d0_w)));
 
-	m_isa->install_memory(0xa0000, 0xbffff, read8_delegate(*m_vga, FUNC(s3virge_vga_device::mem_r)), write8_delegate(*m_vga, FUNC(s3virge_vga_device::mem_w)));
+	m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(s3virge_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(s3virge_vga_device::mem_w)));
 
 	save_item(NAME(m_lfb_enable));
 	save_item(NAME(m_lfb_start));
@@ -394,7 +394,7 @@ isa16_stealth3d2kpro_device::isa16_stealth3d2kpro_device(const machine_config &m
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-READ8_MEMBER(isa16_stealth3d2kpro_device::input_port_0_r ) { return 0xff; } //return machine().root_device().ioport("IN0")->read(); }
+uint8_t isa16_stealth3d2kpro_device::input_port_0_r() { return 0xff; } //return machine().root_device().ioport("IN0")->read(); }
 
 void isa16_stealth3d2kpro_device::device_start()
 {
@@ -402,11 +402,11 @@ void isa16_stealth3d2kpro_device::device_start()
 
 	m_isa->install_rom(this, 0xc0000, 0xc7fff, "svga", "stealth3d");
 
-	m_isa->install_device(0x03b0, 0x03bf, read8_delegate(*m_vga, FUNC(s3virge_vga_device::port_03b0_r)), write8_delegate(*m_vga, FUNC(s3virge_vga_device::port_03b0_w)));
-	m_isa->install_device(0x03c0, 0x03cf, read8_delegate(*m_vga, FUNC(s3virge_vga_device::port_03c0_r)), write8_delegate(*m_vga, FUNC(s3virge_vga_device::port_03c0_w)));
-	m_isa->install_device(0x03d0, 0x03df, read8_delegate(*m_vga, FUNC(s3virge_vga_device::port_03d0_r)), write8_delegate(*m_vga, FUNC(s3virge_vga_device::port_03d0_w)));
+	m_isa->install_device(0x03b0, 0x03bf, read8sm_delegate(*m_vga, FUNC(s3virge_vga_device::port_03b0_r)), write8sm_delegate(*m_vga, FUNC(s3virge_vga_device::port_03b0_w)));
+	m_isa->install_device(0x03c0, 0x03cf, read8sm_delegate(*m_vga, FUNC(s3virge_vga_device::port_03c0_r)), write8sm_delegate(*m_vga, FUNC(s3virge_vga_device::port_03c0_w)));
+	m_isa->install_device(0x03d0, 0x03df, read8sm_delegate(*m_vga, FUNC(s3virge_vga_device::port_03d0_r)), write8sm_delegate(*m_vga, FUNC(s3virge_vga_device::port_03d0_w)));
 
-	m_isa->install_memory(0xa0000, 0xbffff, read8_delegate(*m_vga, FUNC(s3virge_vga_device::mem_r)), write8_delegate(*m_vga, FUNC(s3virge_vga_device::mem_w)));
+	m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(s3virge_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(s3virge_vga_device::mem_w)));
 }
 
 //-------------------------------------------------

@@ -45,7 +45,6 @@ public:
 	void lft(machine_config &config);
 
 private:
-
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
@@ -129,9 +128,8 @@ ROM_START( lft1510 )
 	ROM_IGNORE(0x1000)
 ROM_END
 
-
 /* Driver */
 
 //    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY             FULLNAME                      FLAGS
-COMP( 1986, lft1510, 0,       0,      lft,     lft,   lft_state, empty_init, "L/F Technologies", "A1510 186 User Processor",   MACHINE_IS_SKELETON)
-COMP( 1985, lft1230, lft1510, 0,      lft,     lft,   lft_state, empty_init, "L/F Technologies", "A1230 186 Master Processor", MACHINE_IS_SKELETON)
+COMP( 1986, lft1510, 0,       0,      lft,     lft,   lft_state, empty_init, "L/F Technologies", "A1510 186 User Processor",   MACHINE_IS_SKELETON | MACHINE_SUPPORTS_SAVE )
+COMP( 1985, lft1230, lft1510, 0,      lft,     lft,   lft_state, empty_init, "L/F Technologies", "A1230 186 Master Processor", MACHINE_IS_SKELETON | MACHINE_SUPPORTS_SAVE )

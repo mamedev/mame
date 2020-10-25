@@ -22,6 +22,7 @@
 #include "ui/info_pty.h"
 #include "ui/inifile.h"
 #include "ui/inputmap.h"
+#include "ui/keyboard.h"
 #include "ui/miscmenu.h"
 #include "ui/pluginopt.h"
 #include "ui/selgame.h"
@@ -75,6 +76,9 @@ void menu_main::populate(float &customtop, float &custombottom)
 
 	item_append(_("Machine Information"), "", 0, (void *)GAME_INFO);
 
+	if (ui().found_machine_warnings())
+		item_append(_("Warning Information"), "", 0, (void *)WARN_INFO);
+
 	for (device_image_interface &image : image_interface_iterator(machine().root_device()))
 	{
 		if (image.user_loadable())
@@ -105,7 +109,7 @@ void menu_main::populate(float &customtop, float &custombottom)
 	if (network_interface_iterator(machine().root_device()).first() != nullptr)
 		item_append(_("Network Devices"), "", 0, (void*)NETWORK_DEVICES);
 
-	if (ui().machine_info().has_keyboard() && machine().ioport().natkeyboard().can_post())
+	if (machine().ioport().natkeyboard().keyboard_count())
 		item_append(_("Keyboard Mode"), "", 0, (void *)KEYBOARD_MODE);
 
 	item_append(_("Slider Controls"), "", 0, (void *)SLIDERS);
@@ -184,6 +188,10 @@ void menu_main::handle()
 			menu::stack_push<menu_game_info>(ui(), container());
 			break;
 
+		case WARN_INFO:
+			menu::stack_push<menu_warn_info>(ui(), container());
+			break;
+
 		case IMAGE_MENU_IMAGE_INFO:
 			menu::stack_push<menu_image_info>(ui(), container());
 			break;
@@ -221,7 +229,7 @@ void menu_main::handle()
 			break;
 
 		case VIDEO_OPTIONS:
-			menu::stack_push<menu_video_options>(ui(), container(), machine().render().first_target());
+			menu::stack_push<menu_video_options>(ui(), container(), *machine().render().first_target());
 			break;
 
 		case CROSSHAIR:

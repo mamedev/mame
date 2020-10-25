@@ -9,6 +9,8 @@
 ///
 
 #include "pconfig.h"
+#include "pgsl.h"
+#include "pmath.h"
 #include "ptypes.h"
 
 //#include <algorithm>
@@ -24,11 +26,11 @@ namespace plib
 	/// This is a Mersenne Twister implementation which is state saveable.
 	/// It has been written following this wikipedia entry:
 	///
-	/// 	https://en.wikipedia.org/wiki/Mersenne_Twister
+	///     https://en.wikipedia.org/wiki/Mersenne_Twister
 	///
 	/// The implementation has basic support for the interface described here
 	///
-	/// 	https://en.cppreference.com/w/cpp/numeric/random/mersenne_twister_engine
+	///     https://en.cppreference.com/w/cpp/numeric/random/mersenne_twister_engine
 	///
 	/// so that it can be used with the C++11 random environment
 	///
@@ -49,7 +51,7 @@ namespace plib
 			seed(5489);
 		}
 
-		static constexpr T min() noexcept { return static_cast<T>(0); }
+		static constexpr T min() noexcept { return T(0); }
 		static constexpr T max() noexcept { return ~T(0) >> (sizeof(T)*8 - w); }
 
 		template <typename ST>
@@ -99,10 +101,10 @@ namespace plib
 		}
 
 	private:
-		void twist()
+		void twist() noexcept
 		{
 			const T lowest_w(~T(0) >> (sizeof(T)*8 - w));
-			const T lower_mask((static_cast<T>(1) << r) - 1); // That is, the binary number of r 1's
+			const T lower_mask((T(1) << r) - 1); // That is, the binary number of r 1's
 			const T upper_mask((~lower_mask) & lowest_w);
 
 			for (std::size_t i=0; i<N; i++)
@@ -119,12 +121,12 @@ namespace plib
 	};
 
 	template <typename FT, typename T>
-	FT normalize_uniform(T &p, FT m = constants<FT>::one(), FT b = constants<FT>::zero())
+	FT normalize_uniform(T &p, FT m = constants<FT>::one(), FT b = constants<FT>::zero()) noexcept
 	{
-		const auto mmin(static_cast<FT>(p.min()));
-		const auto mmax(static_cast<FT>(p.max()));
+		constexpr const auto mmin(narrow_cast<FT>(T::min()));
+		constexpr const auto mmax(narrow_cast<FT>(T::max()));
 		// -> 0 to a
-		return (p() - mmin) / (mmax - mmin) * m - b;
+		return (narrow_cast<FT>(p())- mmin) / (mmax - mmin) * m - b;
 	}
 
 	template<typename FT>
@@ -187,27 +189,27 @@ namespace plib
 				FT s;
 				FT v1;
 				FT v2;
-			    do
-			    {
-			        v1 = normalize_uniform(p, constants<FT>::two(), constants<FT>::one()); // [-1..1[
-			        v2 = normalize_uniform(p, constants<FT>::two(), constants<FT>::one()); // [-1..1[
-			        s = v1 * v1 + v2 * v2;
-			    } while (s >= constants<FT>::one());
-			    if (s == constants<FT>::zero())
-			    {
-			    	m_buf[i] = s;
-			    	m_buf[i+1] = s;
-			    }
-			    else
-			    {
-			    	// last value without error for log(s)/s
-			    	// double: 1.000000e-305
-			    	// float: 9.999999e-37
-			    	// FIXME: with 128 bit randoms log(s)/w will fail 1/(2^128) ~ 2.9e-39
-			    	const auto m(m_stddev * plib::sqrt(-constants<FT>::two() * plib::log(s)/s));
-			    	m_buf[i] = /*mean+*/ m * v1;
-			    	m_buf[i+1] = /*mean+*/ m * v2;
-			    }
+				do
+				{
+					v1 = normalize_uniform(p, constants<FT>::two(), constants<FT>::one()); // [-1..1[
+					v2 = normalize_uniform(p, constants<FT>::two(), constants<FT>::one()); // [-1..1[
+					s = v1 * v1 + v2 * v2;
+				} while (s >= constants<FT>::one());
+				if (s == constants<FT>::zero())
+				{
+					m_buf[i] = s;
+					m_buf[i+1] = s;
+				}
+				else
+				{
+					// last value without error for log(s)/s
+					// double: 1.000000e-305
+					// float: 9.999999e-37
+					// FIXME: with 128 bit randoms log(s)/w will fail 1/(2^128) ~ 2.9e-39
+					const auto m(m_stddev * plib::sqrt(-constants<FT>::two() * plib::log(s)/s));
+					m_buf[i] = /*mean+*/ m * v1;
+					m_buf[i+1] = /*mean+*/ m * v2;
+				}
 			}
 			m_p = 0;
 		}

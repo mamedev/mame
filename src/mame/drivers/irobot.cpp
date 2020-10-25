@@ -95,19 +95,19 @@
  *
  *************************************/
 
-WRITE8_MEMBER(irobot_state::irobot_clearirq_w)
+void irobot_state::irobot_clearirq_w(uint8_t data)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE ,CLEAR_LINE);
 }
 
 
-WRITE8_MEMBER(irobot_state::irobot_clearfirq_w)
+void irobot_state::irobot_clearfirq_w(uint8_t data)
 {
 	m_maincpu->set_input_line(M6809_FIRQ_LINE ,CLEAR_LINE);
 }
 
 
-READ8_MEMBER(irobot_state::quad_pokeyn_r)
+uint8_t irobot_state::quad_pokeyn_r(offs_t offset)
 {
 	int pokey_num = (offset >> 3) & ~0x04;
 	int control = (offset & 0x20) >> 2;
@@ -116,7 +116,7 @@ READ8_MEMBER(irobot_state::quad_pokeyn_r)
 	return m_pokey[pokey_num]->read(pokey_reg);
 }
 
-WRITE8_MEMBER(irobot_state::quad_pokeyn_w)
+void irobot_state::quad_pokeyn_w(offs_t offset, uint8_t data)
 {
 	int pokey_num = (offset >> 3) & ~0x04;
 	int control = (offset & 0x20) >> 2;

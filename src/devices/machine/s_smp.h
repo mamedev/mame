@@ -39,17 +39,17 @@ protected:
 	address_space_config m_data_config;
 
 private:
-	address_space                                *m_data;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_dcache;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache m_dcache;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
 	inline u8 data_read_byte(offs_t a)
 	{
 		/* IPL ROM enabled */
 		if (a >= 0xffc0 && m_ctrl & 0x80)
 			return m_ipl_region[a & 0x3f];
 
-		return m_dcache->read_byte(a);
+		return m_dcache.read_byte(a);
 	}
-	inline void data_write_byte(offs_t a, u8 d) { m_data->write_byte(a, d); }
+	inline void data_write_byte(offs_t a, u8 d) { m_data.write_byte(a, d); }
 
 	required_region_ptr<u8> m_ipl_region;     /* SPC top 64 bytes */
 

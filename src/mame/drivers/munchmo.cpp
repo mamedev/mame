@@ -63,23 +63,23 @@ IRQ_CALLBACK_MEMBER(munchmo_state::generic_irq_ack)
 	return 0xff;
 }
 
-WRITE8_MEMBER(munchmo_state::nmi_ack_w)
+void munchmo_state::nmi_ack_w(uint8_t data)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(munchmo_state::sound_nmi_ack_w)
+void munchmo_state::sound_nmi_ack_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-READ8_MEMBER(munchmo_state::ay1reset_r)
+uint8_t munchmo_state::ay1reset_r()
 {
 	m_ay8910[0]->reset_w();
 	return 0;
 }
 
-READ8_MEMBER(munchmo_state::ay2reset_r)
+uint8_t munchmo_state::ay2reset_r()
 {
 	m_ay8910[1]->reset_w();
 	return 0;

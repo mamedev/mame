@@ -87,7 +87,7 @@ private:
 
 /* CGLayer */
 #if 0
-WRITE32_MEMBER(igs_m027_state::igs_cg_videoram_w)
+void igs_m027_state::igs_cg_videoram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_igs_cg_videoram[offset]);
 	//if(data!=0)

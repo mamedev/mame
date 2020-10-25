@@ -108,8 +108,8 @@ renderer_bgfx::renderer_bgfx(std::shared_ptr<osd_window> w)
 renderer_bgfx::~renderer_bgfx()
 {
 	bgfx::reset(0, 0, BGFX_RESET_NONE);
-	bgfx::touch(0);
-	bgfx::frame();
+	//bgfx::touch(0);
+	//bgfx::frame();
 	if (m_avi_writer != nullptr && m_avi_writer->recording())
 	{
 		m_avi_writer->stop();
@@ -957,7 +957,7 @@ void renderer_bgfx::update_recording()
 	int i = 0;
 	for (int y = 0; y < m_avi_bitmap.height(); y++)
 	{
-		uint32_t *dst = &m_avi_bitmap.pix32(y);
+		uint32_t *dst = &m_avi_bitmap.pix(y);
 
 		for (int x = 0; x < m_avi_bitmap.width(); x++)
 		{
@@ -1171,7 +1171,7 @@ void renderer_bgfx::process_atlas_packs(std::vector<std::vector<rectangle_packer
 			m_hash_to_entry[rect.hash()] = rect;
 			bgfx::TextureFormat::Enum dst_format = bgfx::TextureFormat::RGBA8;
 			uint16_t pitch = rect.width();
-			const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(dst_format, rect.format(), rect.width(), rect.height(), rect.rowpixels(), rect.palette(), rect.base(), &pitch);
+			const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(dst_format, rect.format(), rect.rowpixels(), rect.height(), rect.palette(), rect.base(), &pitch);
 			bgfx::updateTexture2D(m_texture_cache->texture(), 0, 0, rect.x(), rect.y(), rect.width(), rect.height(), mem, pitch);
 		}
 	}

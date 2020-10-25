@@ -74,23 +74,23 @@ protected:
 	enum { TIMER_SCANLINE };
 
 	// control ports
-	DECLARE_WRITE8_MEMBER(ct_io_w);
-	DECLARE_READ8_MEMBER(rrowx_r);
+	void ct_io_w(uint8_t data);
+	uint8_t rrowx_r();
 
 	INTERRUPT_GEN_MEMBER(laserbat_interrupt);
 
 	// video memory and control ports
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(wcoh_w);
-	DECLARE_WRITE8_MEMBER(wcov_w);
-	DECLARE_WRITE8_MEMBER(cnt_eff_w);
-	DECLARE_WRITE8_MEMBER(cnt_nav_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void wcoh_w(uint8_t data);
+	void wcov_w(uint8_t data);
+	void cnt_eff_w(uint8_t data);
+	void cnt_nav_w(uint8_t data);
 
 	// sound control ports
-	virtual DECLARE_READ8_MEMBER(rhsc_r);
-	virtual DECLARE_WRITE8_MEMBER(whsc_w);
-	virtual DECLARE_WRITE8_MEMBER(csound1_w);
-	virtual DECLARE_WRITE8_MEMBER(csound2_w);
+	virtual uint8_t rhsc_r();
+	virtual void whsc_w(uint8_t data);
+	virtual void csound1_w(uint8_t data);
+	virtual void csound2_w(uint8_t data);
 
 	// running the video
 	virtual void video_start() override;
@@ -176,7 +176,7 @@ protected:
 	void laserbat_palette(palette_device &palette) const;
 
 	// sound control ports
-	virtual DECLARE_WRITE8_MEMBER(csound2_w) override;
+	virtual void csound2_w(uint8_t data) override;
 
 	// sound board devices
 	required_device<sn76477_device> m_csg;
@@ -205,8 +205,8 @@ protected:
 	void catnmous_palette(palette_device &palette) const;
 
 	// sound control ports
-	virtual DECLARE_WRITE8_MEMBER(csound1_w) override;
-	virtual DECLARE_WRITE8_MEMBER(csound2_w) override;
+	virtual void csound1_w(uint8_t data) override;
+	virtual void csound2_w(uint8_t data) override;
 
 	required_device<zac1b11107_audio_device>    m_audiopcb;
 };

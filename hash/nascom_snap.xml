@@ -33,6 +33,32 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="advent16" cloneof="advent32">
+		<description>Adventure 16K</description>
+		<year>1981</year>
+		<publisher>Syrtis Software</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap1" interface="nascom_snap">
+			<dataarea name="snap" size="71683">
+				<rom name="adventure_16k.nas" size="71683" crc="4c13ee90" sha1="94c5bf72c66f6e855cd20df25ec57720f5464a39"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="advent32">
+		<description>Adventure 32K</description>
+		<year>1982</year>
+		<publisher>Syrtis Software</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap1" interface="nascom_snap">
+			<dataarea name="snap" size="143363">
+				<rom name="adventure_32k.nas" size="143363" crc="f6ddd1eb" sha1="8a5fe36b072e162c73e7fb03b6ace2b45fd23e7a"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="advquest">
 		<description>Adventure Quest</description>
 		<year>1982</year>
@@ -92,15 +118,8 @@ license:CC0
 		<info name="usage" value="Enter E1000 to start" />
 		<sharedfeat name="compatibility" value="NASCOM2"/>
 		<part name="snap1" interface="nascom_snap">
-			<feature name="part_id" value="32K"/>
-			<dataarea name="snap" size="143363">
-				<rom name="cave_32k.nas" size="143363" crc="f6ddd1eb" sha1="8a5fe36b072e162c73e7fb03b6ace2b45fd23e7a"/>
-			</dataarea>
-		</part>
-		<part name="snap2" interface="nascom_snap">
-			<feature name="part_id" value="16K"/>
-			<dataarea name="snap" size="71683">
-				<rom name="cave_16k.nas" size="71683" crc="4c13ee90" sha1="94c5bf72c66f6e855cd20df25ec57720f5464a39"/>
+			<dataarea name="snap" size="125443">
+				<rom name="colossal_32k.nas" size="125443" crc="dac5fac3" sha1="06c9c9830901d8e7c319303503ceaefbccc2fbfc"/>
 			</dataarea>
 		</part>
 	</software>

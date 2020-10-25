@@ -100,7 +100,7 @@ void super6_state::bankswitch()
 //  s100_w - S-100 bus extended address A16-A23
 //-------------------------------------------------
 
-WRITE8_MEMBER( super6_state::s100_w )
+void super6_state::s100_w(uint8_t data)
 {
 	/*
 
@@ -125,7 +125,7 @@ WRITE8_MEMBER( super6_state::s100_w )
 //  bank0_w - on-board memory control port #0
 //-------------------------------------------------
 
-WRITE8_MEMBER( super6_state::bank0_w )
+void super6_state::bank0_w(uint8_t data)
 {
 	/*
 
@@ -152,7 +152,7 @@ WRITE8_MEMBER( super6_state::bank0_w )
 //  bank1_w - on-board memory control port #1
 //-------------------------------------------------
 
-WRITE8_MEMBER( super6_state::bank1_w )
+void super6_state::bank1_w(uint8_t data)
 {
 	/*
 
@@ -184,7 +184,7 @@ WRITE8_MEMBER( super6_state::bank1_w )
 //  floppy_r - FDC synchronization/drive/density
 //-------------------------------------------------
 
-READ8_MEMBER( super6_state::fdc_r )
+uint8_t super6_state::fdc_r()
 {
 	/*
 
@@ -211,7 +211,7 @@ READ8_MEMBER( super6_state::fdc_r )
 //  floppy_w - FDC synchronization/drive/density
 //-------------------------------------------------
 
-WRITE8_MEMBER( super6_state::fdc_w )
+void super6_state::fdc_w(uint8_t data)
 {
 	/*
 
@@ -345,25 +345,25 @@ INPUT_PORTS_END
 //  Z80DMA
 //-------------------------------------------------
 
-READ8_MEMBER(super6_state::memory_read_byte)
+uint8_t super6_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(super6_state::memory_write_byte)
+void super6_state::memory_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	prog_space.write_byte(offset, data);
 }
 
-READ8_MEMBER(super6_state::io_read_byte)
+uint8_t super6_state::io_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(super6_state::io_write_byte)
+void super6_state::io_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	prog_space.write_byte(offset, data);

@@ -55,7 +55,7 @@ void a800_rom_spartados_device::device_reset()
 
  -------------------------------------------------*/
 
-READ8_MEMBER(a800_rom_spartados_device::read_80xx)
+uint8_t a800_rom_spartados_device::read_80xx(offs_t offset)
 {
 	if (!m_subslot_enabled)
 		return m_rom[(offset & 0x1fff) + (m_bank * 0x2000)];
@@ -63,7 +63,7 @@ READ8_MEMBER(a800_rom_spartados_device::read_80xx)
 		return 0xff;    // subslot, currently not implemented
 }
 
-WRITE8_MEMBER(a800_rom_spartados_device::write_d5xx)
+void a800_rom_spartados_device::write_d5xx(offs_t offset, uint8_t data)
 {
 	if (offset & 0x08)
 		m_subslot_enabled = !BIT(offset, 2);

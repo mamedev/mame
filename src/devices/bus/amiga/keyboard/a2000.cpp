@@ -515,7 +515,7 @@ WRITE_LINE_MEMBER(a2000_kbd_g80_device::kdat_w)
 	}
 }
 
-READ8_MEMBER(a2000_kbd_g80_device::mcu_bus_r)
+u8 a2000_kbd_g80_device::mcu_bus_r(offs_t offset)
 {
 	// when jumpered for external ROM, offset latched by U2 is 0x60 + (row << 1)
 	uint8_t result(0U);
@@ -528,12 +528,12 @@ READ8_MEMBER(a2000_kbd_g80_device::mcu_bus_r)
 	return result;
 }
 
-WRITE8_MEMBER(a2000_kbd_g80_device::mcu_p1_w)
+void a2000_kbd_g80_device::mcu_p1_w(u8 data)
 {
 	m_row_drive = (m_row_drive & 0x1f00U) | uint16_t(data);
 }
 
-WRITE8_MEMBER(a2000_kbd_g80_device::mcu_p2_w)
+void a2000_kbd_g80_device::mcu_p2_w(u8 data)
 {
 	m_row_drive = (m_row_drive & 0x00ffU) | (uint16_t(data & 0x1fU) << 8);
 

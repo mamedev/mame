@@ -121,12 +121,12 @@ void retofinv_state::machine_start()
 	save_item(NAME(m_cpu2_m6000));
 }
 
-WRITE8_MEMBER(retofinv_state::cpu2_m6000_w)
+void retofinv_state::cpu2_m6000_w(uint8_t data)
 {
 	m_cpu2_m6000 = data;
 }
 
-READ8_MEMBER(retofinv_state::cpu0_mf800_r)
+uint8_t retofinv_state::cpu0_mf800_r()
 {
 	return m_cpu2_m6000;
 }
@@ -145,7 +145,7 @@ WRITE_LINE_MEMBER(retofinv_state::irq1_ack_w)
 		m_subcpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(retofinv_state::coincounter_w)
+void retofinv_state::coincounter_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 }
@@ -155,7 +155,7 @@ WRITE_LINE_MEMBER(retofinv_state::coinlockout_w)
 	machine().bookkeeping().coin_lockout_w(0, !state);
 }
 
-READ8_MEMBER(retofinv_state::mcu_status_r)
+uint8_t retofinv_state::mcu_status_r()
 {
 	/* bit 4 = when 1, mcu is ready to receive data from main cpu */
 	/* bit 5 = when 1, mcu has sent data to the main cpu */

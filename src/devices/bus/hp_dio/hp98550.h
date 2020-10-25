@@ -21,16 +21,14 @@ class dio32_98550_device :
 public:
 	dio32_98550_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ16_MEMBER(rom_r);
-	DECLARE_WRITE16_MEMBER(rom_w);
+	uint16_t rom_r(offs_t offset, uint16_t mem_mask = ~0);
+	void rom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER(topcat_r);
-	DECLARE_WRITE16_MEMBER(topcat_w);
-	DECLARE_READ16_MEMBER(catseye_r);
-	DECLARE_WRITE16_MEMBER(catseye_w);
+	uint16_t catseye_r(address_space &space, offs_t offset, uint16_t mem_mask = ~0);
+	void catseye_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER(vram_r);
-	DECLARE_WRITE16_MEMBER(vram_w);
+	uint16_t vram_r(offs_t offset, uint16_t mem_mask = ~0);
+	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	static constexpr int CATSEYE_COUNT = 8;
 
@@ -51,7 +49,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
-	DECLARE_WRITE8_MEMBER(int_w);
+	void int_w(offs_t offset, uint8_t data);
 
 	const address_space_config m_space_config;
 	void map(address_map &map);

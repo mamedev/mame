@@ -55,14 +55,14 @@ private:
 
 	char m_led_array[21];
 
-	DECLARE_WRITE8_MEMBER(firq_ack_w);
-	DECLARE_WRITE8_MEMBER(nmi_ack_w);
-	DECLARE_READ8_MEMBER(printer_status_r);
-	DECLARE_READ8_MEMBER(display_ready_r);
-	DECLARE_WRITE8_MEMBER(display_w);
-	DECLARE_WRITE8_MEMBER(out_w);
+	void firq_ack_w(uint8_t data);
+	void nmi_ack_w(uint8_t data);
+	uint8_t printer_status_r();
+	uint8_t display_ready_r();
+	void display_w(uint8_t data);
+	void out_w(uint8_t data);
 	void bank_select_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER(sound_w);
+	void sound_w(offs_t offset, uint8_t data);
 
 	void main_map(address_map &map);
 protected:
@@ -99,17 +99,17 @@ uint32_t destiny_state::screen_update_destiny(screen_device &screen, bitmap_ind1
 
 ***************************************************************************/
 
-WRITE8_MEMBER(destiny_state::firq_ack_w)
+void destiny_state::firq_ack_w(uint8_t data)
 {
 	m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(destiny_state::nmi_ack_w)
+void destiny_state::nmi_ack_w(uint8_t data)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-READ8_MEMBER(destiny_state::printer_status_r)
+uint8_t destiny_state::printer_status_r()
 {
 	// d2: mark sensor
 	// d3: motor stop
@@ -120,14 +120,14 @@ READ8_MEMBER(destiny_state::printer_status_r)
 	return 0xff;
 }
 
-READ8_MEMBER(destiny_state::display_ready_r)
+uint8_t destiny_state::display_ready_r()
 {
 	// d7: /display ready
 	// other bits: N/C
 	return 0;
 }
 
-WRITE8_MEMBER(destiny_state::display_w)
+void destiny_state::display_w(uint8_t data)
 {
 	/* this is preliminary, just fills a string and doesn't support control codes etc. */
 
@@ -139,7 +139,7 @@ WRITE8_MEMBER(destiny_state::display_w)
 	m_led_array[19] = data;
 }
 
-WRITE8_MEMBER(destiny_state::out_w)
+void destiny_state::out_w(uint8_t data)
 {
 	// d0: coin blocker
 	machine().bookkeeping().coin_lockout_w(0, ~data & 1);
@@ -166,7 +166,7 @@ INPUT_CHANGED_MEMBER(destiny_state::coin_inserted)
 		machine().bookkeeping().coin_counter_w(0, newval);
 }
 
-WRITE8_MEMBER(destiny_state::sound_w)
+void destiny_state::sound_w(offs_t offset, uint8_t data)
 {
 	// a0: sound on/off
 	m_beeper->set_state(~offset & 1);

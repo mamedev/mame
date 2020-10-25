@@ -66,15 +66,15 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(out2_changed);
 	DECLARE_WRITE_LINE_MEMBER(keyb_interrupt);
 
-	DECLARE_WRITE8_MEMBER(pc_nmi_enable_w);
-	DECLARE_READ8_MEMBER(pcjr_nmi_enable_r);
+	void pc_nmi_enable_w(uint8_t data);
+	uint8_t pcjr_nmi_enable_r();
 	DECLARE_WRITE_LINE_MEMBER(pic8259_set_int_line);
 
-	DECLARE_WRITE8_MEMBER(pcjr_ppi_portb_w);
-	DECLARE_READ8_MEMBER(pcjr_ppi_portc_r);
-	DECLARE_WRITE8_MEMBER(pcjr_fdc_dor_w);
-	DECLARE_READ8_MEMBER(pcjx_port_1ff_r);
-	DECLARE_WRITE8_MEMBER(pcjx_port_1ff_w);
+	void pcjr_ppi_portb_w(uint8_t data);
+	uint8_t pcjr_ppi_portc_r();
+	void pcjr_fdc_dor_w(uint8_t data);
+	uint8_t pcjx_port_1ff_r();
+	void pcjx_port_1ff_w(uint8_t data);
 	void pcjx_set_bank(int unk1, int unk2, int unk3);
 
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot);
@@ -119,8 +119,6 @@ private:
 };
 
 static INPUT_PORTS_START( ibmpcjr )
-	PORT_INCLUDE(pc_keyboard)
-
 	PORT_START("IN0") /* IN0 */
 	PORT_BIT ( 0xf0, 0xf0,   IPT_UNUSED )
 	PORT_BIT ( 0x08, 0x08,   IPT_CUSTOM ) PORT_VBLANK("pcvideo_pcjr:screen")
@@ -226,6 +224,7 @@ WRITE_LINE_MEMBER(pcjr_state::out2_changed)
 {
 	m_pit_out2 = state ? 1 : 0;
 	m_speaker->level_w(m_pc_spkrdata & m_pit_out2);
+	m_cassette->output(state ? 1.0 : -1.0);
 }
 
 /*************************************************************
@@ -310,20 +309,20 @@ WRITE_LINE_MEMBER(pcjr_state::keyb_interrupt)
 	}
 }
 
-READ8_MEMBER(pcjr_state::pcjr_nmi_enable_r)
+uint8_t pcjr_state::pcjr_nmi_enable_r()
 {
 	m_latch = 0;
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return m_nmi_enabled;
 }
 
-WRITE8_MEMBER(pcjr_state::pc_nmi_enable_w)
+void pcjr_state::pc_nmi_enable_w(uint8_t data)
 {
 	m_nmi_enabled = data & 0x80;
 	m_maincpu->set_input_line(INPUT_LINE_NMI, m_nmi_enabled && m_latch);
 }
 
-WRITE8_MEMBER(pcjr_state::pcjr_ppi_portb_w)
+void pcjr_state::pcjr_ppi_portb_w(uint8_t data)
 {
 	/* KB controller port B */
 	m_ppi_portb = data;
@@ -345,7 +344,7 @@ WRITE8_MEMBER(pcjr_state::pcjr_ppi_portb_w)
  * PC6 - KYBD IN
  * PC7 - (keyboard) CABLE CONNECTED
  */
-READ8_MEMBER(pcjr_state::pcjr_ppi_portc_r)
+uint8_t pcjr_state::pcjr_ppi_portc_r()
 {
 	int data=0xff;
 
@@ -380,7 +379,7 @@ READ8_MEMBER(pcjr_state::pcjr_ppi_portc_r)
 	return data;
 }
 
-WRITE8_MEMBER(pcjr_state::pcjr_fdc_dor_w)
+void pcjr_state::pcjr_fdc_dor_w(uint8_t data)
 {
 	logerror("fdc: dor = %02x\n", data);
 	uint8_t pdor = m_pcjr_dor;
@@ -403,8 +402,7 @@ WRITE8_MEMBER(pcjr_state::pcjr_fdc_dor_w)
 	else
 		m_fdc->set_floppy(nullptr);
 
-	if((pdor^m_pcjr_dor) & 0x80)
-		m_fdc->soft_reset();
+	m_fdc->reset_w(!BIT(m_pcjr_dor, 7));
 
 	if(m_pcjr_dor & 0x20) {
 		if((pdor & 0x40) && !(m_pcjr_dor & 0x40))
@@ -422,7 +420,7 @@ void pcjr_state::pcjx_set_bank(int unk1, int unk2, int unk3)
 	logerror("pcjx: 0x1ff 0:%02x 1:%02x 2:%02x\n", unk1, unk2, unk3);
 }
 
-WRITE8_MEMBER(pcjr_state::pcjx_port_1ff_w)
+void pcjr_state::pcjx_port_1ff_w(uint8_t data)
 {
 	switch(m_pcjx_1ff_count) {
 	case 0:
@@ -441,7 +439,7 @@ WRITE8_MEMBER(pcjr_state::pcjx_port_1ff_w)
 	}
 }
 
-READ8_MEMBER(pcjr_state::pcjx_port_1ff_r)
+uint8_t pcjr_state::pcjx_port_1ff_r()
 {
 	if(m_pcjx_1ff_count == 2)
 		pcjx_set_bank(m_pcjx_1ff_bankval, m_pcjx_1ff_bank[m_pcjx_1ff_bankval & 0x1f][0], m_pcjx_1ff_bank[m_pcjx_1ff_bankval & 0x1f][1]);
@@ -656,6 +654,7 @@ void pcjr_state::ibmpcjr(machine_config &config)
 	/* cassette */
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	UPD765A(config, m_fdc, 8'000'000, false, false);
 

@@ -8,6 +8,7 @@
 /// \file nld_ms_direct2.h
 ///
 
+#include "nld_matrix_solver_ext.h"
 #include "nld_ms_direct.h"
 #include "nld_solver.h"
 
@@ -27,10 +28,10 @@ namespace solver
 
 		using float_type = FT;
 
-		matrix_solver_direct2_t(netlist_state_t &anetlist, const pstring &name,
-			const analog_net_t::list_t &nets,
-			const solver_parameters_t *params)
-		: matrix_solver_direct_t<FT, 2>(anetlist, name, nets, params, 2)
+		matrix_solver_direct2_t(devices::nld_solver &main_solver, const pstring &name,
+			const matrix_solver_t::net_list_t &nets,
+			const solver::solver_parameters_t *params)
+		: matrix_solver_direct_t<FT, 2>(main_solver, name, nets, params, 2)
 		{}
 		void vsolve_non_dynamic() override
 		{

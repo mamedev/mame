@@ -145,7 +145,7 @@ uint32_t itgambl2_state::screen_update_itgambl2(screen_device &screen, bitmap_rg
 			uint32_t const color = (blit_ram[count] & 0xff) >> 0;
 
 			if(cliprect.contains(x, y))
-				bitmap.pix32(y, x) = m_palette->pen(color);
+				bitmap.pix(y, x) = m_palette->pen(color);
 
 			count++;
 		}

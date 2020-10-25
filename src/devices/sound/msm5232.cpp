@@ -34,7 +34,7 @@ void msm5232_device::device_start()
 
 	init(clock(), rate);
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 11, rate);
+	m_stream = stream_alloc(0, 11, rate);
 
 	/* register with the save state system */
 	save_item(NAME(m_EN_out16));
@@ -437,7 +437,11 @@ void msm5232_device::write(offs_t offset, uint8_t data)
 			m_control1 = data;
 
 			for (i=0; i<4; i++)
+			{
+				if ( (data&0x10) && (m_voi[i].eg_sect == 1) )
+					m_voi[i].eg_sect = 0;
 				m_voi[i].eg_arm = data&0x10;
+			}
 
 			m_EN_out16[0] = (data&1) ? ~0:0;
 			m_EN_out8[0]  = (data&2) ? ~0:0;
@@ -458,7 +462,11 @@ void msm5232_device::write(offs_t offset, uint8_t data)
 			gate_update();
 
 			for (i=0; i<4; i++)
+			{
+				if ( (data&0x10) && (m_voi[i+4].eg_sect == 1) )
+					m_voi[i+4].eg_sect = 0;
 				m_voi[i+4].eg_arm = data&0x10;
+			}
 
 			m_EN_out16[1] = (data&1) ? ~0:0;
 			m_EN_out8[1]  = (data&2) ? ~0:0;
@@ -728,31 +736,31 @@ void msm5232_device::set_clock(int clock)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void msm5232_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void msm5232_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *buf1 = outputs[0];
-	stream_sample_t *buf2 = outputs[1];
-	stream_sample_t *buf3 = outputs[2];
-	stream_sample_t *buf4 = outputs[3];
-	stream_sample_t *buf5 = outputs[4];
-	stream_sample_t *buf6 = outputs[5];
-	stream_sample_t *buf7 = outputs[6];
-	stream_sample_t *buf8 = outputs[7];
-	stream_sample_t *bufsolo1 = outputs[8];
-	stream_sample_t *bufsolo2 = outputs[9];
-	stream_sample_t *bufnoise = outputs[10];
+	auto &buf1 = outputs[0];
+	auto &buf2 = outputs[1];
+	auto &buf3 = outputs[2];
+	auto &buf4 = outputs[3];
+	auto &buf5 = outputs[4];
+	auto &buf6 = outputs[5];
+	auto &buf7 = outputs[6];
+	auto &buf8 = outputs[7];
+	auto &bufsolo1 = outputs[8];
+	auto &bufsolo2 = outputs[9];
+	auto &bufnoise = outputs[10];
 	int i;
 
-	for (i=0; i<samples; i++)
+	for (i=0; i<buf1.samples(); i++)
 	{
 		/* calculate all voices' envelopes */
 		EG_voices_advance();
 
 		TG_group_advance(0);   /* calculate tones group 1 */
-		buf1[i] = o2;
-		buf2[i] = o4;
-		buf3[i] = o8;
-		buf4[i] = o16;
+		buf1.put_int(i, o2, 32768);
+		buf2.put_int(i, o4, 32768);
+		buf3.put_int(i, o8, 32768);
+		buf4.put_int(i, o16, 32768);
 
 		SAVE_SINGLE_CHANNEL(0,o2)
 		SAVE_SINGLE_CHANNEL(1,o4)
@@ -760,13 +768,13 @@ void msm5232_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		SAVE_SINGLE_CHANNEL(3,o16)
 
 		TG_group_advance(1);   /* calculate tones group 2 */
-		buf5[i] = o2;
-		buf6[i] = o4;
-		buf7[i] = o8;
-		buf8[i] = o16;
+		buf5.put_int(i, o2, 32768);
+		buf6.put_int(i, o4, 32768);
+		buf7.put_int(i, o8, 32768);
+		buf8.put_int(i, o16, 32768);
 
-		bufsolo1[i] = solo8;
-		bufsolo2[i] = solo16;
+		bufsolo1.put_int(i, solo8, 32768);
+		bufsolo2.put_int(i, solo16, 32768);
 
 		SAVE_SINGLE_CHANNEL(4,o2)
 		SAVE_SINGLE_CHANNEL(5,o4)
@@ -794,6 +802,6 @@ void msm5232_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			}
 		}
 
-		bufnoise[i] = (m_noise_rng & (1<<16)) ? 32767 : 0;
+		bufnoise.put(i, (m_noise_rng & (1<<16)) ? 1.0 : 0.0);
 	}
 }

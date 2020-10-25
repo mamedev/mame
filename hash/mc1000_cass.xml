@@ -852,8 +852,10 @@ Info for original games comes from https://web.archive.org/web/20141023024713/mc
 		<publisher>&lt;unknown&gt;</publisher>
 
 		<part name="cass1" interface="mc1000_cass">
-<!--            <dataarea name="cass" size="702764">
-                <rom name="aventura.wav" size="702764" crc="82a6263b" sha1="834d9511e22f5c34244923108366201e82b89179"/> -->
+<!--
+            <dataarea name="cass" size="702764">
+                <rom name="aventura.wav" size="702764" crc="82a6263b" sha1="834d9511e22f5c34244923108366201e82b89179"/>
+-->
 			<dataarea name="cass" size="168558">
 				<rom name="aventura.wav" size="168558" crc="208c0c8b" sha1="169010d35d4fa3a63cf00f5758717e57fd4754e2"/>
 			</dataarea>
@@ -907,8 +909,10 @@ Info for original games comes from https://web.archive.org/web/20141023024713/mc
 		<publisher>&lt;unknown&gt;</publisher>
 
 		<part name="cass1" interface="mc1000_cass">
-<!--            <dataarea name="cass" size="176812">
-                <rom name="circulos.wav" size="176812" crc="402caaea" sha1="614201ff32f80c91bf433243bc046eee78e190bf"/> -->
+<!--
+            <dataarea name="cass" size="176812">
+                <rom name="circulos.wav" size="176812" crc="402caaea" sha1="614201ff32f80c91bf433243bc046eee78e190bf"/>
+-->
 			<dataarea name="cass" size="40350">
 				<rom name="circulos.wav" size="40350" crc="007a7c30" sha1="0002df62b1b37cd1c3d5b0db3a7a86f733604106"/>
 			</dataarea>
@@ -974,8 +978,10 @@ Info for original games comes from https://web.archive.org/web/20141023024713/mc
 		<publisher>&lt;type-in&gt;</publisher>
 
 		<part name="cass1" interface="mc1000_cass">
-<!--            <dataarea name="cass" size="549964">
-                <rom name="explosao.wav" size="549964" crc="d231d3af" sha1="a3cce871efa9f8762257ac7ea47c71311f25920f"/> -->
+<!--
+            <dataarea name="cass" size="549964">
+                <rom name="explosao.wav" size="549964" crc="d231d3af" sha1="a3cce871efa9f8762257ac7ea47c71311f25920f"/>
+-->
 			<dataarea name="cass" size="130822">
 				<rom name="explosao.wav" size="130822" crc="0b46f290" sha1="821b95bd675097d5ffba1c4c97898d20c9d10bb3"/>
 			</dataarea>

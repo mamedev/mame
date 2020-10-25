@@ -22,8 +22,8 @@ class stvcd_device : public device_t,
 public:
 	stvcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ32_MEMBER(stvcd_r);
-	DECLARE_WRITE32_MEMBER(stvcd_w);
+	uint32_t stvcd_r(offs_t offset, uint32_t mem_mask = ~0);
+	void stvcd_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	void set_tray_open();
 	void set_tray_close();
@@ -256,24 +256,24 @@ private:
 	void cmd_get_mpeg_card_boot_rom();
 
 	// comms
-	DECLARE_READ32_MEMBER(datatrns_r);
-	DECLARE_WRITE32_MEMBER(datatrns_w);
+	uint32_t datatrns_r(offs_t offset, uint32_t mem_mask = ~0);
+	void datatrns_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	inline u32 dataxfer_long_r();
 	inline u16 dataxfer_word_r();
 	inline void dataxfer_long_w(u32 data);
-	DECLARE_READ16_MEMBER(cr1_r);
-	DECLARE_READ16_MEMBER(cr2_r);
-	DECLARE_READ16_MEMBER(cr3_r);
-	DECLARE_READ16_MEMBER(cr4_r);
-	DECLARE_WRITE16_MEMBER(cr1_w);
-	DECLARE_WRITE16_MEMBER(cr2_w);
-	DECLARE_WRITE16_MEMBER(cr3_w);
-	DECLARE_WRITE16_MEMBER(cr4_w);
+	uint16_t cr1_r();
+	uint16_t cr2_r();
+	uint16_t cr3_r();
+	uint16_t cr4_r();
+	void cr1_w(uint16_t data);
+	void cr2_w(uint16_t data);
+	void cr3_w(uint16_t data);
+	void cr4_w(uint16_t data);
 
-	DECLARE_READ16_MEMBER(hirq_r);
-	DECLARE_WRITE16_MEMBER(hirq_w);
-	DECLARE_READ16_MEMBER(hirqmask_r);
-	DECLARE_WRITE16_MEMBER(hirqmask_w);
+	uint16_t hirq_r();
+	void hirq_w(uint16_t data);
+	uint16_t hirqmask_r();
+	void hirqmask_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 };
 
 // device type definition

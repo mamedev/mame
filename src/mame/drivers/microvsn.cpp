@@ -32,7 +32,6 @@ TODO:
 #include "cpu/tms1000/tms1100.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/hlcd0488.h"
 #include "video/pwm.h"
 
@@ -95,20 +94,20 @@ private:
 	bool m_paddle_on;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE16_MEMBER(lcd_output_w) { m_lcd_pwm->matrix(offset, data); }
+	void lcd_output_w(offs_t offset, u16 data) { m_lcd_pwm->matrix(offset, data); }
 
 	// TMS1100 interface
-	DECLARE_READ8_MEMBER(tms1100_k_r);
-	DECLARE_WRITE16_MEMBER(tms1100_o_w);
-	DECLARE_WRITE16_MEMBER(tms1100_r_w);
+	u8 tms1100_k_r();
+	void tms1100_o_w(u16 data);
+	void tms1100_r_w(u16 data);
 
 	u16 m_r = 0;
 
 	// Intel 8021 interface
-	DECLARE_READ8_MEMBER(i8021_p0_r);
-	DECLARE_WRITE8_MEMBER(i8021_p0_w);
-	DECLARE_WRITE8_MEMBER(i8021_p1_w);
-	DECLARE_WRITE8_MEMBER(i8021_p2_w);
+	u8 i8021_p0_r();
+	void i8021_p0_w(u8 data);
+	void i8021_p1_w(u8 data);
+	void i8021_p2_w(u8 data);
 	DECLARE_READ_LINE_MEMBER(i8021_t1_r);
 
 	u8 m_p0 = 0xff;
@@ -204,13 +203,20 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state::cart_load)
 
 	if (image.loaded_through_softlist())
 	{
-		u32 sclock = strtoul(image.get_feature("clock"), nullptr, 0);
+		const char *cclock = image.get_feature("clock");
+		u32 sclock = cclock ? strtoul(cclock, nullptr, 0) : 0;
 		if (sclock != 0)
 			clock = sclock;
 
-		m_butmask_auto = ~strtoul(image.get_feature("butmask"), nullptr, 0) & 0xfff;
-		m_pla_auto = strtoul(image.get_feature("pla"), nullptr, 0) ? 1 : 0;
-		m_paddle_auto = bool(strtoul(image.get_feature("paddle"), nullptr, 0) ? 1 : 0);
+		const char *butmask = image.get_feature("butmask");
+		m_butmask_auto = butmask ? strtoul(butmask, nullptr, 0) : 0;
+		m_butmask_auto = ~m_butmask_auto & 0xfff;
+
+		const char *pla = image.get_feature("pla");
+		m_pla_auto = pla && strtoul(pla, nullptr, 0) ? 1 : 0;
+
+		const char *paddle = image.get_feature("paddle");
+		m_paddle_auto = paddle && strtoul(paddle, nullptr, 0);
 	}
 
 	// detect MCU on file size
@@ -259,7 +265,8 @@ uint32_t microvision_state::screen_update(screen_device &screen, bitmap_rgb32 &b
 			int p = m_lcd_pwm->read_element_bri(y ^ 15, x ^ 15) * 10000;
 			p = (p > 255) ? 0 : p ^ 255;
 
-			bitmap.pix32(y, x) = p << 16 | p << 8 | p;
+			if (cliprect.contains(x, y))
+				bitmap.pix(y, x) = p << 16 | p << 8 | p;
 		}
 	}
 
@@ -274,7 +281,7 @@ uint32_t microvision_state::screen_update(screen_device &screen, bitmap_rgb32 &b
 
 // TMS1100 interface
 
-READ8_MEMBER(microvision_state::tms1100_k_r)
+u8 microvision_state::tms1100_k_r()
 {
 	u8 data = 0;
 
@@ -290,13 +297,13 @@ READ8_MEMBER(microvision_state::tms1100_k_r)
 	return data;
 }
 
-WRITE16_MEMBER(microvision_state::tms1100_o_w)
+void microvision_state::tms1100_o_w(u16 data)
 {
 	// O0-O3: LCD data
 	m_lcd->data_w(data & 0xf);
 }
 
-WRITE16_MEMBER(microvision_state::tms1100_r_w)
+void microvision_state::tms1100_r_w(u16 data)
 {
 	// R2: charge paddle capacitor when high
 	if (~m_r & data & 4 && m_paddle_on)
@@ -322,7 +329,7 @@ WRITE16_MEMBER(microvision_state::tms1100_r_w)
 
 // Intel 8021 interface
 
-READ8_MEMBER( microvision_state::i8021_p0_r )
+u8 microvision_state::i8021_p0_r()
 {
 	u8 in[3];
 	for (int i = 0; i < 3; i++)
@@ -343,13 +350,13 @@ READ8_MEMBER( microvision_state::i8021_p0_r )
 	return ~data & m_p0;
 }
 
-WRITE8_MEMBER(microvision_state::i8021_p0_w)
+void microvision_state::i8021_p0_w(u8 data)
 {
 	// P0-P2, P4-P7: input mux
 	m_p0 = data;
 }
 
-WRITE8_MEMBER(microvision_state::i8021_p1_w)
+void microvision_state::i8021_p1_w(u8 data)
 {
 	// P14-P17: lcd data
 	m_lcd->data_w(data >> 4 & 0xf);
@@ -360,7 +367,7 @@ WRITE8_MEMBER(microvision_state::i8021_p1_w)
 	m_lcd->data_clk_w(BIT(data, 1));
 }
 
-WRITE8_MEMBER(microvision_state::i8021_p2_w)
+void microvision_state::i8021_p2_w(u8 data)
 {
 	// P20: speaker lead 1
 	// P21: speaker lead 2
@@ -469,9 +476,6 @@ void microvision_state::microvision(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_2BIT_BINARY_WEIGHTED_ONES_COMPLEMENT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "microvision_cart");

@@ -382,7 +382,7 @@ void abc800_keyboard_device::txd_w(int state)
 //  kb_p1_r - keyboard column data read
 //-------------------------------------------------
 
-READ8_MEMBER( abc800_keyboard_device::kb_p1_r )
+uint8_t abc800_keyboard_device::kb_p1_r()
 {
 	uint8_t data = 0xff;
 
@@ -402,7 +402,7 @@ READ8_MEMBER( abc800_keyboard_device::kb_p1_r )
 //  kb_p1_w - keyboard row write
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc800_keyboard_device::kb_p1_w )
+void abc800_keyboard_device::kb_p1_w(uint8_t data)
 {
 	/*
 
@@ -431,7 +431,7 @@ WRITE8_MEMBER( abc800_keyboard_device::kb_p1_w )
 //  kb_p2_w - keyboard control write
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc800_keyboard_device::kb_p2_w )
+void abc800_keyboard_device::kb_p2_w(uint8_t data)
 {
 	/*
 

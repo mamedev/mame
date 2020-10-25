@@ -3,7 +3,7 @@
 // thanks-to:Enrique Sanchez
 /***************************************************************************
 
-  video.c
+  yiear.cpp
 
   Functions to emulate the video hardware of the machine.
 
@@ -31,7 +31,7 @@
 
 ***************************************************************************/
 
-void yiear_state::yiear_palette(palette_device &palette) const
+void yiear_state::palette(palette_device &palette) const
 {
 	uint8_t const *color_prom = memregion("proms")->base();
 
@@ -62,13 +62,13 @@ void yiear_state::yiear_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(yiear_state::yiear_videoram_w)
+void yiear_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(yiear_state::yiear_control_w)
+void yiear_state::control_w(uint8_t data)
 {
 	/* bit 0 flips screen */
 	if (flip_screen() != (data & 0x01))
@@ -78,10 +78,10 @@ WRITE8_MEMBER(yiear_state::yiear_control_w)
 	}
 
 	/* bit 1 is NMI enable */
-	m_yiear_nmi_enable = data & 0x02;
+	m_nmi_enable = data & 0x02;
 
 	/* bit 2 is IRQ enable */
-	m_yiear_irq_enable = data & 0x04;
+	m_irq_enable = data & 0x04;
 
 	/* bits 3 and 4 are coin counters */
 	machine().bookkeeping().coin_counter_w(0, data & 0x08);
@@ -106,19 +106,15 @@ void yiear_state::video_start()
 
 void yiear_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	uint8_t *spriteram = m_spriteram;
-	uint8_t *spriteram_2 = m_spriteram2;
-	int offs;
-
-	for (offs = m_spriteram.bytes() - 2; offs >= 0; offs -= 2)
+	for (int offs = m_spriteram.bytes() - 2; offs >= 0; offs -= 2)
 	{
-		int attr = spriteram[offs];
-		int code = spriteram_2[offs + 1] + 256 * (attr & 0x01);
+		int attr = m_spriteram[offs];
+		int code = m_spriteram2[offs + 1] + 256 * (attr & 0x01);
 		int color = 0;
 		int flipx = ~attr & 0x40;
 		int flipy = attr & 0x80;
-		int sy = 240 - spriteram[offs + 1];
-		int sx = spriteram_2[offs];
+		int sy = 240 - m_spriteram[offs + 1];
+		int sx = m_spriteram2[offs];
 
 		if (flip_screen())
 		{
@@ -139,7 +135,7 @@ void yiear_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect 
 	}
 }
 
-uint32_t yiear_state::screen_update_yiear(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t yiear_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);

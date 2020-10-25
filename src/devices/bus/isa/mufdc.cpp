@@ -170,7 +170,7 @@ void mufdc_device::device_reset()
 //  FDC INTERFACE
 //**************************************************************************
 
-READ8_MEMBER( mufdc_device::fdc_input_r )
+uint8_t mufdc_device::fdc_input_r()
 {
 	return ~m_config->read();
 }

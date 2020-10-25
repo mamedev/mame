@@ -68,13 +68,13 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(sclock_w);
 	DECLARE_READ_LINE_MEMBER(sdata_r);
 
-	DECLARE_WRITE8_MEMBER(t1_write_r);
-	DECLARE_WRITE8_MEMBER(t1_write_s);
+	void t1_write_r(u8 data);
+	void t1_write_s(u8 data);
 	virtual u8 input_r() override;
 
 	void t2_update_audio();
-	DECLARE_WRITE8_MEMBER(t2_write_r);
-	DECLARE_WRITE8_MEMBER(t2_write_s);
+	void t2_write_r(u8 data);
+	void t2_write_s(u8 data);
 
 	virtual void machine_start() override;
 };
@@ -156,7 +156,7 @@ READ_LINE_MEMBER(rzone_state::sdata_r)
 
 // cartridge type 1: simple SM510
 
-WRITE8_MEMBER(rzone_state::t1_write_r)
+void rzone_state::t1_write_r(u8 data)
 {
 	// R1: Audio
 	audio_w(data & 1);
@@ -165,7 +165,7 @@ WRITE8_MEMBER(rzone_state::t1_write_r)
 	sctrl_w(data >> 1 & 1);
 }
 
-WRITE8_MEMBER(rzone_state::t1_write_s)
+void rzone_state::t1_write_s(u8 data)
 {
 	// S1: LED
 	led_w(data & 1);
@@ -188,14 +188,14 @@ void rzone_state::t2_update_audio()
 	audio_w((m_s >> 2 & 1) | (m_r & 1));
 }
 
-WRITE8_MEMBER(rzone_state::t2_write_r)
+void rzone_state::t2_write_r(u8 data)
 {
 	// R: Audio
 	m_r = data;
 	t2_update_audio();
 }
 
-WRITE8_MEMBER(rzone_state::t2_write_s)
+void rzone_state::t2_write_s(u8 data)
 {
 	// S1: SCTRL
 	sctrl_w(data & 1);

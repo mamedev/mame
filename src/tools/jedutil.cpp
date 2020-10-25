@@ -6184,7 +6184,7 @@ static void config_gal20v8_pins(const pal_data* pal, const jed_data* jed)
 						input_pins_combinatorialsimple[input_pin_count] = macrocells[index].pin;
 
 						++input_pin_count;
-     				}
+					}
 					else
 					{
 						output_pins[output_pin_count].flags |= OUTPUT_FEEDBACK_NONE;

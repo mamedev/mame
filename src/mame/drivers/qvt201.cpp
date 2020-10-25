@@ -34,10 +34,10 @@ public:
 private:
 	SCN2672_DRAW_CHARACTER_MEMBER(draw_character);
 
-	DECLARE_WRITE8_MEMBER(offset_w);
-	DECLARE_WRITE8_MEMBER(keyboard_w);
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(duart_out_w);
+	void offset_w(uint8_t data);
+	void keyboard_w(uint8_t data);
+	uint8_t keyboard_r();
+	void duart_out_w(uint8_t data);
 
 	void mem_map(address_map &map);
 
@@ -55,20 +55,20 @@ SCN2672_DRAW_CHARACTER_MEMBER(qvt201_state::draw_character)
 {
 }
 
-WRITE8_MEMBER(qvt201_state::offset_w)
+void qvt201_state::offset_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER(qvt201_state::keyboard_w)
+void qvt201_state::keyboard_w(uint8_t data)
 {
 }
 
-READ8_MEMBER(qvt201_state::keyboard_r)
+uint8_t qvt201_state::keyboard_r()
 {
 	return 1;
 }
 
-WRITE8_MEMBER(qvt201_state::duart_out_w)
+void qvt201_state::duart_out_w(uint8_t data)
 {
 	// OP0 = RTS (EIA pin 4)
 	// OP1 = DTR (EIA pin 20)

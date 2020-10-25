@@ -73,13 +73,13 @@ public:
 private:
 	virtual void machine_start() override;
 
-	DECLARE_READ8_MEMBER(key_matrix_r);
-	DECLARE_READ8_MEMBER(nd80z_key_r);
-	DECLARE_READ8_MEMBER(serial_r);
-	DECLARE_WRITE8_MEMBER(serial_w);
-	DECLARE_WRITE8_MEMBER(mikrolab_serial_w);
-	DECLARE_READ8_MEMBER(display_r);
-	DECLARE_WRITE8_MEMBER(display_w);
+	uint8_t key_matrix_r();
+	uint8_t nd80z_key_r();
+	uint8_t serial_r();
+	void serial_w(uint8_t data);
+	void mikrolab_serial_w(uint8_t data);
+	uint8_t display_r(offs_t offset);
+	void display_w(offs_t offset, uint8_t data);
 
 	void ics8080_mem(address_map &map);
 	void mikrolab_io(address_map &map);
@@ -111,12 +111,12 @@ void tk80_state::machine_start()
 	save_item(NAME(m_ppi_portc));
 }
 
-READ8_MEMBER( tk80_state::display_r )
+uint8_t tk80_state::display_r(offs_t offset)
 {
 	return m_digit[offset & 0x7];
 }
 
-WRITE8_MEMBER( tk80_state::display_w )
+void tk80_state::display_w(offs_t offset, uint8_t data)
 {
 	m_digit[offset & 0x7] = data;
 }
@@ -262,7 +262,7 @@ static INPUT_PORTS_START( tk85 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("REG") PORT_CODE(KEYCODE_R)
 INPUT_PORTS_END
 
-READ8_MEMBER( tk80_state::key_matrix_r )
+uint8_t tk80_state::key_matrix_r()
 {
 	// PA0-7 keyscan in
 
@@ -278,7 +278,7 @@ READ8_MEMBER( tk80_state::key_matrix_r )
 	return data;
 }
 
-READ8_MEMBER( tk80_state::nd80z_key_r )
+uint8_t tk80_state::nd80z_key_r()
 {
 	// PA0-7 keyscan in
 
@@ -293,7 +293,7 @@ READ8_MEMBER( tk80_state::nd80z_key_r )
 	return data;
 }
 
-READ8_MEMBER( tk80_state::serial_r )
+uint8_t tk80_state::serial_r()
 {
 	// PB0 - serial in
 	//printf("B R\n");
@@ -301,7 +301,7 @@ READ8_MEMBER( tk80_state::serial_r )
 	return 0;
 }
 
-WRITE8_MEMBER( tk80_state::serial_w )
+void tk80_state::serial_w(uint8_t data)
 {
 	// PC0 - serial out
 	// PC4-6 keyscan out
@@ -309,7 +309,7 @@ WRITE8_MEMBER( tk80_state::serial_w )
 	m_ppi_portc = data ^ 0x70;
 }
 
-WRITE8_MEMBER( tk80_state::mikrolab_serial_w )
+void tk80_state::mikrolab_serial_w(uint8_t data)
 {
 	// PC0 - serial out
 	// PC4-6 keyscan out
@@ -385,34 +385,35 @@ void tk80_state::ics8080(machine_config &config)
 
 /* ROM definition */
 ROM_START( tk80 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x0300, "maincpu", 0 )
 	ROM_LOAD( "tk80-1.bin", 0x0000, 0x0100, CRC(897295e4) SHA1(50fb42b07252fc48044830e2f228e218fc59481c))
 	ROM_LOAD( "tk80-2.bin", 0x0100, 0x0100, CRC(d54480c3) SHA1(354962aca1710ac75b40c8c23a6c303938f9d596))
 	ROM_LOAD( "tk80-3.bin", 0x0200, 0x0100, CRC(8d4b02ef) SHA1(2b5a1ee8f97db23ffec48b96f12986461024c995))
 ROM_END
 
 ROM_START( ics8080 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD( "amtsmnonv27.rom1", 0x0000, 0x0800, CRC(82d40dc5) SHA1(9215457101c3b9b8706dbebe902196494993a282) )
 	ROM_LOAD( "thmcplv11.rom2",   0x0800, 0x0800, CRC(51784f70) SHA1(c05c75d566c4ff8f681eba29cd48e72b95be89e0) )
 	ROM_LOAD( "tunev08.rom3",     0x1000, 0x0800, CRC(aae2344b) SHA1(b02b22cadb43c7ac26c43d443688b9b19d465973) )
 	ROM_LOAD( "mtrspdv12.rom4",   0x1800, 0x0800, CRC(920dda33) SHA1(631ee5e6314d9788e7be0ae00a97b55693eeb855) )
+	ROM_FILL(0x2be,1,0x7c)    // Fix display of B
 ROM_END
 
 ROM_START( mikrolab )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x0800, "maincpu", 0 )
 	/* these dumps are taken from PDF so need check with real device */
 	ROM_LOAD( "rom-1.bin", 0x0000, 0x0200, BAD_DUMP CRC(eed5f23b) SHA1(c82f7a16ce44c4fcbcb333245555feae1fcdf058))
 	ROM_LOAD( "rom-2.bin", 0x0200, 0x0200, BAD_DUMP CRC(726a224f) SHA1(7ed8d2c6dd4fb7836475e207e1972e33a6a91d2f))
 ROM_END
 
 ROM_START( nectk85 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "tk85.bin",  0x0000, 0x0800, CRC(8a0b6d7e) SHA1(6acc8c04990692b08929043ccf638761b7301def))
 ROM_END
 
 ROM_START( nd80z )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "ndf.bin",  0x0000, 0x0800, CRC(fe829f1d) SHA1(6fff31884b8d984076d4450ca3a3e48efadeb648))
 ROM_END
 

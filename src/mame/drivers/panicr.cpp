@@ -113,12 +113,12 @@ private:
 	std::unique_ptr<bitmap_ind16> m_tempbitmap_1;
 	rectangle m_tempbitmap_clip;
 
-	DECLARE_READ8_MEMBER(collision_r);
-	DECLARE_WRITE8_MEMBER(scrollx_lo_w);
-	DECLARE_WRITE8_MEMBER(scrollx_hi_w);
-	DECLARE_WRITE8_MEMBER(output_w);
-	DECLARE_READ8_MEMBER(t5182shared_r);
-	DECLARE_WRITE8_MEMBER(t5182shared_w);
+	uint8_t collision_r(offs_t offset);
+	void scrollx_lo_w(uint8_t data);
+	void scrollx_hi_w(uint8_t data);
+	void output_w(uint8_t data);
+	uint8_t t5182shared_r(offs_t offset);
+	void t5182shared_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_bgtile_info);
 	TILE_GET_INFO_MEMBER(get_infotile_info_2);
@@ -298,12 +298,12 @@ uint32_t panicr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 	for (int y=0;y<256;y++)
 	{
-		uint16_t* srcline = &m_temprender->pix16(y);
-		uint16_t* dstline = &bitmap.pix16(y);
+		uint16_t const *const srcline = &m_temprender->pix(y);
+		uint16_t *const dstline = &bitmap.pix(y);
 
 		for (int x=0;x<256;x++)
 		{
-			uint16_t dat = srcline[x];
+			uint16_t const dat = srcline[x];
 
 			dstline[x] = ((dat & 0x00f) | ((dat & 0x1e0)>>0)) + 0x200;
 
@@ -315,12 +315,12 @@ uint32_t panicr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 	for (int y=0;y<256;y++)
 	{
-		uint16_t* srcline = &m_temprender->pix16(y);
-		uint16_t* dstline = &bitmap.pix16(y);
+		uint16_t const *const srcline = &m_temprender->pix(y);
+		uint16_t *const dstline = &bitmap.pix(y);
 
 		for (int x=0;x<256;x++)
 		{
-			uint16_t dat = srcline[x];
+			uint16_t const dat = srcline[x];
 			if (dat & 0x10)
 				dstline[x] = ((dat & 0x00f) | ((dat & 0x1e0)>>0)) + 0x200;
 
@@ -341,7 +341,7 @@ uint32_t panicr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 ***************************************************************************/
 
-READ8_MEMBER(panicr_state::collision_r)
+uint8_t panicr_state::collision_r(offs_t offset)
 {
 	// re-render the collision data here
 	// collisions are based on 2 bits from the tile data, relative to a page of tiles
@@ -367,7 +367,7 @@ READ8_MEMBER(panicr_state::collision_r)
 
 
 	uint8_t ret = 0;
-	uint16_t* srcline = &m_tempbitmap_1->pix16(actual_line);
+	uint16_t const *const srcline = &m_tempbitmap_1->pix(actual_line);
 
 
 	ret |= (srcline[(actual_column+0)&0xff]&3) << 6;
@@ -384,19 +384,19 @@ READ8_MEMBER(panicr_state::collision_r)
 }
 
 
-WRITE8_MEMBER(panicr_state::scrollx_lo_w)
+void panicr_state::scrollx_lo_w(uint8_t data)
 {
 	logerror("scrollx_lo_w %02x\n", data);
 	m_scrollx = (m_scrollx & 0xff00) | (data << 1 & 0xfe) | (data >> 7 & 0x01);
 }
 
-WRITE8_MEMBER(panicr_state::scrollx_hi_w)
+void panicr_state::scrollx_hi_w(uint8_t data)
 {
 	logerror("scrollx_hi_w %02x\n", data);
 	m_scrollx = (m_scrollx & 0xff) | ((data &0xf0) << 4) | ((data & 0x0f) << 12);
 }
 
-WRITE8_MEMBER(panicr_state::output_w)
+void panicr_state::output_w(uint8_t data)
 {
 	// d6, d7: play counter? (it only triggers on 1st coin)
 	machine().bookkeeping().coin_counter_w(0, (data & 0x40) ? 1 : 0);
@@ -407,7 +407,7 @@ WRITE8_MEMBER(panicr_state::output_w)
 	// other bits: ?
 }
 
-READ8_MEMBER(panicr_state::t5182shared_r)
+uint8_t panicr_state::t5182shared_r(offs_t offset)
 {
 	if ((offset & 1) == 0)
 		return m_t5182->sharedram_r(offset/2);
@@ -415,7 +415,7 @@ READ8_MEMBER(panicr_state::t5182shared_r)
 		return 0;
 }
 
-WRITE8_MEMBER(panicr_state::t5182shared_w)
+void panicr_state::t5182shared_w(offs_t offset, uint8_t data)
 {
 	if ((offset & 1) == 0)
 		m_t5182->sharedram_w(offset/2, data);

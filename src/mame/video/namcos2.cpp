@@ -29,19 +29,19 @@ void namcos2_state::TilemapCB_finalap2(uint16_t code, int *tile, int *mask)
  * ---- ---- xxxx ---- always zero?
  * ---- ---- ---- xxxx sprite bank
  */
-READ16_MEMBER(namcos2_state::gfx_ctrl_r)
+uint16_t namcos2_state::gfx_ctrl_r()
 {
 	return m_gfx_ctrl;
 }
 
-WRITE16_MEMBER(namcos2_state::gfx_ctrl_w)
+void namcos2_state::gfx_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_gfx_ctrl);
 }
 
 /**************************************************************************/
 
-READ8_MEMBER(namcos2_state::c116_r)
+uint8_t namcos2_state::c116_r(offs_t offset)
 {
 	if ((offset & 0x1800) == 0x1800)
 	{
@@ -70,6 +70,8 @@ void namcos2_state::create_shadow_table()
 void namcos2_state::video_start()
 {
 	create_shadow_table();
+
+	save_item(NAME(m_gfx_ctrl));
 }
 
 void namcos2_state::apply_clip(rectangle &clip, const rectangle &cliprect)

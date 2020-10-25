@@ -6,19 +6,19 @@
 #include "includes/kickgoal.h"
 
 
-WRITE16_MEMBER(kickgoal_state::fgram_w)
+void kickgoal_state::fgram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_fgram[offset]);
 	m_fgtm->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_MEMBER(kickgoal_state::bgram_w)
+void kickgoal_state::bgram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_bgram[offset]);
 	m_bgtm->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_MEMBER(kickgoal_state::bg2ram_w)
+void kickgoal_state::bg2ram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_bg2ram[offset]);
 	m_bg2tm->mark_tile_dirty(offset / 2);

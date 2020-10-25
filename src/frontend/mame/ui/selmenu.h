@@ -20,6 +20,7 @@
 #include <vector>
 
 
+class media_auditor;
 struct ui_software_info;
 
 namespace ui {
@@ -154,6 +155,8 @@ protected:
 		void *const selected_ref(get_selection_ref());
 		return (uintptr_t(selected_ref) > skip_main_items) ? selected_ref : m_prev_selected;
 	}
+
+	static std::string make_audit_fail_text(bool found, media_auditor const &auditor);
 
 	int         m_available_items;
 	int         skip_main_items;

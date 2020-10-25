@@ -50,6 +50,83 @@
     20      DK      EK      FK
     Bull    --      HM      --
 
+Notes about dipswitches:
+
+There's a separate additional subboard just for dipswitches:
+ ___________________________________________________
+ |                                                  |
+ | MM74C14N       __________           _____        |___
+ |  ____         |CD4013BCN|           |SW |          __|
+ |  |  |                               |_1_|          __|
+ |  |  |          __________           _____          __|
+ |  |  |         |HCF4520BE|           |SW |          __|
+ |  |__|                               |_2_|          __|
+ |            __________               _____          __|
+ |           |MC14093BCP|              |SW |          __|
+ |                                     |_3_|         ___|
+ |                                                  |
+ |__________________________________________________|
+
+And a sticker on the cab with the following manufacturer instructions about
+the dipswitches:
+
+--------------------------------------------------
+Coin credit options for 6000 and 7000 series games
+--------------------------------------------------
+
+Figure 1 shows the available coinage variances for each coin slot.
+Set SW1 to desired position shown at FIGURE 1 to control the right facing coin slot.
+Set SW2 in the same manner to control the left facing coin slot.
+Set SW3 so that at least one switch is "ON", it doesn't matter which one(s).
+
+                                                    FIGURE 2
+        FIGURE 1                                  DIP SWITCHES
+        SWITCH #                            (SWITCHES ARE DISPLAYED AS
+  _____________________                         SET AT THE FACTORY)
+  |   | 4 | 3 | 2 | 1 |
+# +---+---+---+---+---|       .....................................................
+  | 1 | 0 | 0 | 0 | 1 |       |                                                   |
+O +---+---+---+---+---|       |  1   2   3   4    1   2   3   4    1   2   3   4  |
+F | 2 | 0 | 0 | 1 | 0 |       |  ON OFF OFF OFF   ON OFF OFF OFF   ON OFF OFF OFF |
+  +---+---+---+---+---|       |       SW3              SW2              SW1       |
+C | 3 | 0 | 0 | 1 | 1 |       |_________                                  ________|
+R +---+---+---+---+---|                 |                                |
+E | 4 | 0 | 1 | 0 | 0 |                 |__|__|__|__|__|__|__|__|__|__|__|
+D +---+---+---+---+---|
+I | 5 | 0 | 1 | 0 | 1 |                                FIGURE 3
+T +---+---+---+---+---|   IMPORTANT: IF USING THE MAIN BOARD DIP SWITCH COIN OPTIONS, SET ALL THREE
+S | 6 | 0 | 1 | 1 | 0 |   COIN CREDIT DIP SWITCHES SO THAT THEY READ 1(ON) 2(OFF) 3(OFF) 4(OFF)
+  +---+---+---+---+---|          ______________________________________________________
+  | 7 | 0 | 1 | 1 | 1 |          |          |                  | MAIN BOARD DIP SWITCH |
+  +---+---+---+---+---|          |          |                  |      POSITIONS        |
+  | 8 | 1 | 0 | 0 | 0 |          |# OF COINS|GIVES # OF CREDITS|-----+-----+-----+-----|
+  +---+---+---+---+---|          |          |                  |  1  |  2  |  3  |  4  |
+  | 9 | 1 | 0 | 0 | 1 |          |----------+------------------+-----+-----+-----+-----|
+  +---+---+---+---+---|          |    4     |         3        |  ON | OFF | OFF | OFF |
+  |10 | 1 | 0 | 1 | 0 |          |----------+------------------+-----+-----+-----+-----|
+  +---+---+---+---+---|          |    4     |         5        | OFF |  ON | OFF | OFF |
+  |11 | 1 | 0 | 1 | 1 |          |----------+------------------+-----+-----+-----+-----|
+  +---+---+---+---+---|          |--------------------------+--------------------------|
+  |12 | 1 | 1 | 0 | 0 |          |   FOR 4 COIN / 3 CREDITS | FOR 4 COIN / 5 CREDITS   |
+  +---+---+---+---+---|          |--------------------------+--------------------------|
+  |13 | 1 | 1 | 0 | 1 |          | COIN 1 = 0 CREDIT        | COIN 1 = 1 CREDIT        |
+  +---+---+---+---+---|          | COIN 2 = 1 CREDIT        | COIN 2 = 1 CREDIT        |
+  |14 | 1 | 1 | 1 | 0 |          | COIN 3 = 1 CREDIT        | COIN 3 = 1 CREDIT        |
+  +---+---+---+---+---|          | COIN 4 = 1 CREDIT        | COIN 4 = 2 CREDIT        |
+  |15 | 1 | 1 | 1 | 1 |          |       -----------------  |       -----------------  |
+  +---+---+---+---+---|          |        = 3 CREDITS TOTAL |        = 5 CREDITS TOTAL |
+                                 |__________________________|__________________________|
+
+
+              FIGURE 4
+     MAIN PC BOARD DIP SWITCHES
+ IMPORTANT: SWITCHES 1&2 MUST BE IN
+THE OFF POSIION UNLESS THE COINAGES
+      LISTED IN FIG.3 ARE USED
+
+            1   2   3   4
+          OFF OFF OFF OFF
+
 
     TODO:
     - Dip Switches (Controls credits per coin), Currently 2 coins per credit
@@ -96,18 +173,18 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 
 	virtual void machine_start() override;
-	DECLARE_READ8_MEMBER( pia_u4_pa_r );
-	DECLARE_READ8_MEMBER( pia_u4_pb_r );
+	uint8_t pia_u4_pa_r();
+	uint8_t pia_u4_pb_r();
 	DECLARE_READ_LINE_MEMBER( pia_u4_pca_r );
 	DECLARE_READ_LINE_MEMBER( pia_u4_pcb_r );
-	DECLARE_WRITE8_MEMBER( pia_u4_pa_w );
-	DECLARE_WRITE8_MEMBER( pia_u4_pb_w );
+	void pia_u4_pa_w(uint8_t data);
+	void pia_u4_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( pia_u4_pca_w );
 	DECLARE_WRITE_LINE_MEMBER( pia_u4_pcb_w );
 
-	DECLARE_READ8_MEMBER( pia_u17_pa_r );
+	uint8_t pia_u17_pa_r();
 	DECLARE_READ_LINE_MEMBER( pia_u17_pca_r );
-	DECLARE_WRITE8_MEMBER( pia_u17_pb_w );
+	void pia_u17_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( pia_u17_pcb_w );
 
 	DECLARE_WRITE_LINE_MEMBER(ptm_o1_callback);
@@ -287,7 +364,7 @@ uint8_t arachnid_state::read_keyboard(int pa)
 	return 0xff;
 }
 
-READ8_MEMBER( arachnid_state::pia_u4_pa_r )
+uint8_t arachnid_state::pia_u4_pa_r()
 {
 	// Pulses from Switch Matrix Part I
 	// PA0 - G
@@ -305,7 +382,7 @@ READ8_MEMBER( arachnid_state::pia_u4_pa_r )
 	return data;
 }
 
-READ8_MEMBER( arachnid_state::pia_u4_pb_r )
+uint8_t arachnid_state::pia_u4_pb_r()
 {
 	// Pulses from Switch Matrix Part II
 	// PB0 - J
@@ -343,7 +420,7 @@ READ_LINE_MEMBER( arachnid_state::pia_u4_pcb_r )
 	return data;
 }
 
-READ8_MEMBER( arachnid_state::pia_u17_pa_r )
+uint8_t arachnid_state::pia_u17_pa_r()
 {
 	// PA0 - Select
 	// PA1 - Player Change
@@ -366,12 +443,12 @@ READ_LINE_MEMBER( arachnid_state::pia_u17_pca_r )
 	return data;
 }
 
-WRITE8_MEMBER( arachnid_state::pia_u4_pa_w )
+void arachnid_state::pia_u4_pa_w(uint8_t data)
 {
 	// PA0 thru PA7 Pulses to Switch Matrix Part I
 }
 
-WRITE8_MEMBER( arachnid_state::pia_u4_pb_w )
+void arachnid_state::pia_u4_pb_w(uint8_t data)
 {
 	// PA0 thru PA7 Pulses to Switch Matrix Part II
 }
@@ -386,7 +463,7 @@ WRITE_LINE_MEMBER( arachnid_state::pia_u4_pcb_w )
 	// CB2 - Throw Darts Lamp
 }
 
-WRITE8_MEMBER( arachnid_state::pia_u17_pb_w )
+void arachnid_state::pia_u17_pb_w(uint8_t data)
 {
 	// PB0 - Select Lamp
 	// PB1 - Player Change Lamp
@@ -473,9 +550,15 @@ ROM_START( arac6000 )
 	ROM_LOAD( "01-0140-6300-v2.7-19910208.u15", 0x0000, 0x8000, CRC(f1c4412d) SHA1(6ff9a8f25f315c2df5c0785043521d036ec0964e) )
 ROM_END
 
+ROM_START( arac6spa )
+	ROM_REGION( 0x8000, M6809_TAG, 0 )
+	ROM_LOAD( "1.u15", 0x0000, 0x8000, CRC(397e890e) SHA1(5b532b046f36dcfbd7118bd5a0fab3436b0b8dc1) )
+ROM_END
+
 /***************************************************************************
     SYSTEM DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT        MONITOR  COMPANY     FULLNAME */
-GAME( 1990, arac6000, 0,      arachnid, arachnid, arachnid_state, empty_init, ROT0,    "Arachnid", "Super Six Plus II English Mark Darts", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT        MONITOR  COMPANY     FULLNAME
+GAME( 1990, arac6000, 0,        arachnid, arachnid, arachnid_state, empty_init, ROT0,    "Arachnid", "Super Six Plus II English Mark Darts",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // 6300 v2.7
+GAME( 1990, arac6spa, arac6000, arachnid, arachnid, arachnid_state, empty_init, ROT0,    "Arachnid", "Super Six Plus II English Mark Darts (Spanish)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // 6307 v2.8

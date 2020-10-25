@@ -44,7 +44,7 @@ T8 (Plymate Amsterdam)
 - 32KB ROM, rest similar to A0
 
 A3 (Plymate Victoria)
-- W65C02S8P-14 @ 6.144Mhz (12.288MHz XTAL)
+- W65C02S8P-14(14? probably replaced chip from a repair) @ 6.144Mhz (12.288MHz XTAL)
 - 32KB ROM, rest similar to A0
 
 Library modules:
@@ -102,9 +102,9 @@ private:
 	void main_map(address_map &map);
 
 	// I/O handlers
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(leds_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
+	u8 input_r();
+	void leds_w(offs_t offset, u8 data);
+	void sound_w(u8 data);
 
 	u8 m_inp_mux = 0;
 };
@@ -120,7 +120,7 @@ void conchess_state::machine_start()
     I/O
 ******************************************************************************/
 
-READ8_MEMBER(conchess_state::input_r)
+u8 conchess_state::input_r()
 {
 	u8 data = 0;
 
@@ -135,7 +135,7 @@ READ8_MEMBER(conchess_state::input_r)
 	return ~data;
 }
 
-WRITE8_MEMBER(conchess_state::leds_w)
+void conchess_state::leds_w(offs_t offset, u8 data)
 {
 	// a0-a3: CD4028B to led select/input mux
 	m_inp_mux = offset;
@@ -146,7 +146,7 @@ WRITE8_MEMBER(conchess_state::leds_w)
 	m_display->matrix(1 << m_inp_mux, data);
 }
 
-WRITE8_MEMBER(conchess_state::sound_w)
+void conchess_state::sound_w(u8 data)
 {
 	// d7: enable beeper
 	m_beeper->set_state(BIT(data, 7));

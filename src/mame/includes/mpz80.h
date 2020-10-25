@@ -56,18 +56,18 @@ private:
 	inline void check_traps();
 	inline void check_interrupt();
 
-	DECLARE_READ8_MEMBER( mmu_r );
-	DECLARE_WRITE8_MEMBER( mmu_w );
-	DECLARE_READ8_MEMBER( mmu_io_r );
-	DECLARE_WRITE8_MEMBER( mmu_io_w );
-	DECLARE_READ8_MEMBER( trap_addr_r );
-	DECLARE_READ8_MEMBER( keyboard_r );
-	DECLARE_READ8_MEMBER( switch_r );
-	DECLARE_READ8_MEMBER( status_r );
-	DECLARE_WRITE8_MEMBER( disp_seg_w );
-	DECLARE_WRITE8_MEMBER( disp_col_w );
-	DECLARE_WRITE8_MEMBER( task_w );
-	DECLARE_WRITE8_MEMBER( mask_w );
+	uint8_t mmu_r(offs_t offset);
+	void mmu_w(offs_t offset, uint8_t data);
+	uint8_t mmu_io_r(offs_t offset);
+	void mmu_io_w(offs_t offset, uint8_t data);
+	uint8_t trap_addr_r();
+	uint8_t keyboard_r();
+	uint8_t switch_r();
+	uint8_t status_r();
+	void disp_seg_w(uint8_t data);
+	void disp_col_w(uint8_t data);
+	void task_w(uint8_t data);
+	void mask_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( s100_pint_w );
 	DECLARE_WRITE_LINE_MEMBER( s100_nmi_w );
 

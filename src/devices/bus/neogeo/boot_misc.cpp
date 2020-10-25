@@ -292,7 +292,7 @@ ioport_constructor neogeo_kog_cart_device::device_input_ports() const
 }
 
 
-READ16_MEMBER(neogeo_kog_cart_device::protection_r)
+uint16_t neogeo_kog_cart_device::protection_r(address_space &space, offs_t offset)
 {
 	return m_jumper->read();
 }

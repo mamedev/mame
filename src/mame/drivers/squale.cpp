@@ -52,6 +52,30 @@
     3) VID_RD2 : [7..0] = I2,R2,G2,B2,I3,R3,G3,B3 (I=Intensity,R=Red,G=Green,B=Blue)
     3) REG1 : [7..0] = EPROM Bank,-,Modem,K7,I,R,G,B (I=Intensity,R=Red,V=Green,B=Blue)
 
+
+LIST OF MONITOR COMMANDS (all addresses must be 4 characters)
+C         Load a file from tape
+D         Load DOS from floppy
+E         Load a file from tape and run it
+G a       Go (a = address)
+M a       Memory dump (a = start address) Use the arrow keys to move around.
+R         Reset then load DOS from floppy
+S a b c   Save memory to tape  (a = start, b = end, c = exec)
+
+KEYBOARD
+- When started, the Lock is engaged, so numbers appear as symbols. Hitting
+  Shift will unlock this and return the keyboard to normal.
+- To use the natural keyboard, hit > (or some other shifted character),
+  then proceed as normal.
+- To paste, use the emulated keyboard and hit Shift, then do the paste.
+- The monitor command-line cannot handle the arrow keys or Del correctly.
+- It is thought that the BASIC cartridge has better keyboard handling.
+
+TODO
+- Cassette
+- ACIA
+
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -98,26 +122,26 @@ public:
 	void squale(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(ctrl_w);
-	DECLARE_READ8_MEMBER(video_ram_read_reg1);
-	DECLARE_READ8_MEMBER(video_ram_read_reg2);
-	DECLARE_WRITE8_MEMBER(fdc_sel0_w);
-	DECLARE_READ8_MEMBER(fdc_sel0_r);
-	DECLARE_WRITE8_MEMBER(fdc_sel1_w);
-	DECLARE_READ8_MEMBER(fdc_sel1_r);
-	DECLARE_READ8_MEMBER(pia_u72_porta_r);
-	DECLARE_READ8_MEMBER(pia_u72_portb_r);
-	DECLARE_READ8_MEMBER(pia_u75_porta_r);
-	DECLARE_READ8_MEMBER(pia_u75_portb_r);
-	DECLARE_WRITE8_MEMBER(pia_u72_porta_w);
-	DECLARE_WRITE8_MEMBER(pia_u72_portb_w);
-	DECLARE_WRITE8_MEMBER(pia_u75_porta_w);
-	DECLARE_WRITE8_MEMBER(pia_u75_portb_w);
+	void ctrl_w(uint8_t data);
+	uint8_t video_ram_read_reg1();
+	uint8_t video_ram_read_reg2();
+	void fdc_sel0_w(uint8_t data);
+	uint8_t fdc_sel0_r();
+	void fdc_sel1_w(uint8_t data);
+	uint8_t fdc_sel1_r();
+	uint8_t pia_u72_porta_r();
+	uint8_t pia_u72_portb_r();
+	uint8_t pia_u75_porta_r();
+	uint8_t pia_u75_portb_r();
+	void pia_u72_porta_w(uint8_t data);
+	void pia_u72_portb_w(uint8_t data);
+	void pia_u75_porta_w(uint8_t data);
+	void pia_u75_portb_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(ay_porta_r);
-	DECLARE_READ8_MEMBER(ay_portb_r);
-	DECLARE_WRITE8_MEMBER(ay_porta_w);
-	DECLARE_WRITE8_MEMBER(ay_portb_w);
+	uint8_t ay_porta_r();
+	uint8_t ay_portb_r();
+	void ay_porta_w(uint8_t data);
+	void ay_portb_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(pia_u72_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia_u72_cb2_w);
@@ -159,7 +183,7 @@ private:
 * Machine control register I/O Handlers  *
 ******************************************/
 
-WRITE8_MEMBER( squale_state::ctrl_w )
+void squale_state::ctrl_w(uint8_t data)
 {
 	#ifdef DBGMODE
 	printf("write ctrl reg : 0x%X\n",data);
@@ -170,7 +194,7 @@ WRITE8_MEMBER( squale_state::ctrl_w )
 	m_ef9365->set_color_filler(data & 0xF);
 }
 
-READ8_MEMBER( squale_state::video_ram_read_reg1 )
+uint8_t  squale_state::video_ram_read_reg1()
 {
 	uint8_t data;
 	int p;
@@ -205,7 +229,7 @@ READ8_MEMBER( squale_state::video_ram_read_reg1 )
 	return data;
 }
 
-READ8_MEMBER( squale_state::video_ram_read_reg2 )
+uint8_t squale_state::video_ram_read_reg2()
 {
 	uint8_t data;
 	int p;
@@ -244,7 +268,7 @@ READ8_MEMBER( squale_state::video_ram_read_reg2 )
 * Floppy controller I/O Handlers  *
 ***********************************/
 
-WRITE8_MEMBER( squale_state::fdc_sel0_w )
+void squale_state::fdc_sel0_w(uint8_t data)
 {
 	floppy_image_device *floppy = 0;
 
@@ -292,7 +316,7 @@ WRITE8_MEMBER( squale_state::fdc_sel0_w )
 	m_fdc->set_floppy(floppy);
 }
 
-WRITE8_MEMBER( squale_state::fdc_sel1_w )
+void squale_state::fdc_sel1_w(uint8_t data)
 {
 	#ifdef DBGMODE
 	printf("%s: write fdc_sel1_w reg : 0x%X\n",machine().describe_context().c_str(),data);
@@ -301,7 +325,7 @@ WRITE8_MEMBER( squale_state::fdc_sel1_w )
 	fdc_sel1 = data;
 }
 
-READ8_MEMBER( squale_state::fdc_sel0_r )
+uint8_t squale_state::fdc_sel0_r()
 {
 	uint8_t data;
 
@@ -314,7 +338,7 @@ READ8_MEMBER( squale_state::fdc_sel0_r )
 	return data;
 }
 
-READ8_MEMBER( squale_state::fdc_sel1_r )
+uint8_t squale_state::fdc_sel1_r()
 {
 	uint8_t data;
 
@@ -331,7 +355,7 @@ READ8_MEMBER( squale_state::fdc_sel1_r )
 *      Keyboard I/O Handlers      *
 ***********************************/
 
-WRITE8_MEMBER( squale_state::pia_u75_porta_w )
+void squale_state::pia_u75_porta_w(uint8_t data)
 {
 	// U75 PIA Port A : Keyboard rows output
 	#ifdef DBGMODE
@@ -341,7 +365,7 @@ WRITE8_MEMBER( squale_state::pia_u75_porta_w )
 	return;
 }
 
-READ8_MEMBER( squale_state::pia_u75_porta_r )
+uint8_t squale_state::pia_u75_porta_r()
 {
 	// U75 PIA Port A : Keyboard rows output
 	uint8_t data;
@@ -354,7 +378,7 @@ READ8_MEMBER( squale_state::pia_u75_porta_r )
 	return data;
 }
 
-READ8_MEMBER( squale_state::pia_u75_portb_r )
+uint8_t squale_state::pia_u75_portb_r()
 {
 	// U75 PIA Port B : Keyboard column input
 	char kbdrow[3];
@@ -389,7 +413,7 @@ READ8_MEMBER( squale_state::pia_u75_portb_r )
 	return data;
 }
 
-WRITE8_MEMBER( squale_state::pia_u75_portb_w )
+void squale_state::pia_u75_portb_w(uint8_t data)
 {
 	// U75 PIA Port B : Keyboard column input
 	#ifdef DBGMODE
@@ -403,7 +427,7 @@ WRITE8_MEMBER( squale_state::pia_u75_portb_w )
 * (Joysticks, Ctrl/Shift keys,...) *
 ************************************/
 
-READ8_MEMBER( squale_state::ay_portb_r )
+uint8_t squale_state::ay_portb_r()
 {
 	// AY-8910 Port B : Joystick 2, Shift, Shift Lock, Ctrl Keys
 	// B7 : Joystick 2 - Fire
@@ -427,7 +451,7 @@ READ8_MEMBER( squale_state::ay_portb_r )
 	return data;
 }
 
-READ8_MEMBER( squale_state::ay_porta_r )
+uint8_t squale_state::ay_porta_r()
 {
 	// AY-8910 Port A : Joystick 1, light pen
 	// B7 : Joystick 1 - Fire
@@ -450,7 +474,7 @@ READ8_MEMBER( squale_state::ay_porta_r )
 	return data;
 }
 
-WRITE8_MEMBER( squale_state::ay_porta_w )
+void squale_state::ay_porta_w(uint8_t data)
 {
 	// AY-8910 Port A : Joystick 1, light pen
 	// B7 : Joystick 1 - Fire
@@ -468,7 +492,7 @@ WRITE8_MEMBER( squale_state::ay_porta_w )
 	return;
 }
 
-WRITE8_MEMBER( squale_state::ay_portb_w )
+void squale_state::ay_portb_w(uint8_t data)
 {
 	// AY-8910 Port B : Joystick 2, Shift, Shift Lock, Ctrl Keys
 	// B7 : Joystick 2 - Fire
@@ -490,7 +514,7 @@ WRITE8_MEMBER( squale_state::ay_portb_w )
 *      Cartridge I/O Handlers      *
 ************************************/
 
-READ8_MEMBER( squale_state::pia_u72_porta_r )
+uint8_t squale_state::pia_u72_porta_r()
 {
 	// U72 PIA Port A : Cartridge data bus
 	uint8_t data;
@@ -507,7 +531,7 @@ READ8_MEMBER( squale_state::pia_u72_porta_r )
 	return data;
 }
 
-WRITE8_MEMBER( squale_state::pia_u72_porta_w )
+void squale_state::pia_u72_porta_w(uint8_t data)
 {
 	// U72 PIA Port A : Cartridge data bus
 
@@ -566,7 +590,7 @@ WRITE_LINE_MEMBER( squale_state::pia_u75_cb2_w )
 *      Printer I/O Handlers      *
 ***********************************/
 
-READ8_MEMBER( squale_state::pia_u72_portb_r )
+uint8_t squale_state::pia_u72_portb_r()
 {
 	// U72 PIA Port B : Printer data bus
 
@@ -579,7 +603,7 @@ READ8_MEMBER( squale_state::pia_u72_portb_r )
 	return data;
 }
 
-WRITE8_MEMBER( squale_state::pia_u72_portb_w )
+void squale_state::pia_u72_portb_w(uint8_t data)
 {
 	// U72 PIA Port B : Printer data bus
 
@@ -649,7 +673,7 @@ static INPUT_PORTS_START( squale )
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I')
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F3)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))  // 0x0b
 
 	PORT_START("X1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -658,28 +682,28 @@ static INPUT_PORTS_START( squale )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R')
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("BackS  Delete") PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR(8) PORT_CHAR(UCHAR_MAMEKEY(DEL))
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(';')
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Del") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8) PORT_CHAR(UCHAR_MAMEKEY(DEL)) // 0x7f
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR('+')
 
 	PORT_START("X2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ESC) PORT_CHAR(27)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3) PORT_CHAR('3')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5) PORT_CHAR('5')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_CHAR('6')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9) PORT_CHAR('9')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Return") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Ret") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
 
 	PORT_START("X3")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CHAR('1')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2) PORT_CHAR('2')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CHAR('4')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CHAR('7')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CHAR('8')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON) PORT_CHAR(':')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('-')
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR(39)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR(':') PORT_CHAR('*')
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('-') PORT_CHAR('=')
 
 	PORT_START("X4")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -687,8 +711,8 @@ static INPUT_PORTS_START( squale )
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V')
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('[')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR(']')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("X5")
@@ -699,7 +723,7 @@ static INPUT_PORTS_START( squale )
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("BS") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT)) // 0x08
 
 	PORT_START("X6")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -709,7 +733,7 @@ static INPUT_PORTS_START( squale )
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G')
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("TAB") PORT_CODE(KEYCODE_TAB) PORT_CHAR(UCHAR_MAMEKEY(TAB))
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) // 0x09
 
 	PORT_START("X7")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -718,12 +742,12 @@ static INPUT_PORTS_START( squale )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B')
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("LF") PORT_CODE(KEYCODE_RALT) PORT_CHAR(10)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_DOWN) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN)) // 0x0a
 
 	PORT_START("ay_keys")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift Lck") PORT_CODE(KEYCODE_RSHIFT)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Lock") PORT_CODE(KEYCODE_LALT)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
 
 	PORT_START("ay_joy_1")
@@ -837,7 +861,7 @@ void squale_state::squale(machine_config &config)
 	WD1770(config, m_fdc, 8_MHz_XTAL);
 	FLOPPY_CONNECTOR(config, "wd1770:0", squale_floppies, "525qd", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, "wd1770:1", squale_floppies, "525qd", floppy_image_device::default_floppy_formats);
-	SOFTWARE_LIST(config, "flop525_list").set_original("squale");
+	//SOFTWARE_LIST(config, "flop525_list").set_original("squale_flop");   // list does not exist
 
 	/* Cartridge slot */
 	GENERIC_CARTSLOT(config, "cartslot", generic_linear_slot, "squale_cart").set_device_load(FUNC(squale_state::cart_load));

@@ -153,4 +153,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                     FULLNAME              FLAGS
-COMP( 1981, dual68, 0,      0,      dual68,  dual68, dual68_state, empty_init, "Dual Systems Corporation", "Dual Systems 68000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1981, dual68, 0,      0,      dual68,  dual68, dual68_state, empty_init, "Dual Systems Corporation", "Dual Systems 68000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

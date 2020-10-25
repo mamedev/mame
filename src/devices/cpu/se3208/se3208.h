@@ -62,17 +62,13 @@ private:
 	uint32_t m_ER;
 	uint32_t m_PPC;
 
-	address_space *m_program;
-	memory_access_cache<2, 0, ENDIANNESS_LITTLE> *m_cache;
+	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::specific m_program;
 	uint8_t m_IRQ;
 	uint8_t m_NMI;
 
 	int m_icount;
 
-	inline uint32_t read_dword_unaligned(address_space &space, uint32_t address);
-	inline uint16_t read_word_unaligned(address_space &space, uint32_t address);
-	inline void write_dword_unaligned(address_space &space, uint32_t address, uint32_t data);
-	inline void write_word_unaligned(address_space &space, uint32_t address, uint16_t data);
 	inline uint8_t SE3208_Read8(uint32_t addr);
 	inline uint16_t SE3208_Read16(uint32_t addr);
 	inline uint32_t SE3208_Read32(uint32_t addr);

@@ -38,7 +38,7 @@ DEFINE_DEVICE_TYPE(SEGA315_5838_COMP, sega_315_5838_comp_device, "sega315_5838",
 
 sega_315_5838_comp_device::sega_315_5838_comp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SEGA315_5838_COMP, tag, owner, clock),
-	device_rom_interface(mconfig, *this, 23),
+	device_rom_interface(mconfig, *this),
 	m_hackmode(0)
 {
 }

@@ -1,9 +1,9 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 
-#include "netlist/solver/nld_solver.h"
+#include "solver/nld_solver.h"
 
-#include "netlist/nl_factory.h"
+#include "nl_factory.h"
 #include "nlid_twoterm.h"
 
 namespace netlist
@@ -18,7 +18,7 @@ namespace analog
 	solver::matrix_solver_t * NETLIB_NAME(twoterm)::solver() const noexcept
 	{
 		auto *solv(m_P.solver());
-		if (solv)
+		if (solv != nullptr)
 			return solv;
 		return m_N.solver();
 	}
@@ -27,26 +27,16 @@ namespace analog
 	void NETLIB_NAME(twoterm)::solve_now() const
 	{
 		auto *solv(solver());
-		if (solv)
+		if (solv != nullptr)
 			solv->solve_now();
 	}
 
-	NETLIB_UPDATE(twoterm)
+	NETLIB_HANDLER(twoterm, termhandler)
 	{
 		// only called if connected to a rail net ==> notify the solver to recalculate
+		//printf("%s update\n", this->name().c_str());
 		solve_now();
 	}
-
-	// ----------------------------------------------------------------------------------------
-	// nld_R_base
-	// ----------------------------------------------------------------------------------------
-
-	NETLIB_RESET(R_base)
-	{
-		NETLIB_NAME(twoterm)::reset();
-		set_R(plib::reciprocal(exec().gmin()));
-	}
-
 	// ----------------------------------------------------------------------------------------
 	// nld_POT
 	// ----------------------------------------------------------------------------------------
@@ -132,11 +122,21 @@ namespace analog
 
 	NETLIB_TIMESTEP(L)
 	{
-		// Gpar should support convergence
-		m_I += m_G * deltaV();
-		m_G = step / m_L() + m_gmin;
-		set_mat( m_G, -m_G, -m_I,
-				-m_G,  m_G,  m_I);
+		if (ts_type == timestep_type::FORWARD)
+		{
+			m_last_I = m_I;
+			m_last_G = m_G;
+			// Gpar should support convergence
+			m_I += m_G * deltaV();
+			m_G = step / m_L() + m_gmin;
+			set_mat( m_G, -m_G, -m_I,
+					-m_G,  m_G,  m_I);
+		}
+		else
+		{
+			m_I = m_last_I;
+			m_G = m_last_G;
+		}
 	}
 
 	// ----------------------------------------------------------------------------------------
@@ -145,9 +145,8 @@ namespace analog
 
 	NETLIB_RESET(D)
 	{
-		diode_model_t modacc(m_model);
-		nl_fptype Is = modacc.m_IS;
-		nl_fptype n = modacc.m_N;
+		nl_fptype Is = m_modacc.m_IS;
+		nl_fptype n = m_modacc.m_N;
 
 		m_D.set_param(Is, n, exec().gmin(), nlconst::T0());
 		set_G_V_I(m_D.G(), nlconst::zero(), m_D.Ieq());
@@ -155,9 +154,8 @@ namespace analog
 
 	NETLIB_UPDATE_PARAM(D)
 	{
-		diode_model_t modacc(m_model);
-		nl_fptype Is = modacc.m_IS;
-		nl_fptype n = modacc.m_N;
+		nl_fptype Is = m_modacc.m_IS;
+		nl_fptype n = m_modacc.m_N;
 
 		m_D.set_param(Is, n, exec().gmin(), nlconst::T0());
 	}
@@ -178,21 +176,19 @@ namespace analog
 
 	NETLIB_RESET(Z)
 	{
-		zdiode_model_t modacc(m_model);
-		nl_fptype IsBV = modacc.m_IBV / (plib::exp(modacc.m_BV / nlconst::np_VT(modacc.m_NBV)) - nlconst::one());
+		nl_fptype IsBV = m_modacc.m_IBV / (plib::exp(m_modacc.m_BV / nlconst::np_VT(m_modacc.m_NBV)) - nlconst::one());
 
-		m_D.set_param(modacc.m_IS, modacc.m_N, exec().gmin(), nlconst::T0());
-		m_R.set_param(IsBV, modacc.m_NBV, exec().gmin(), nlconst::T0());
+		m_D.set_param(m_modacc.m_IS, m_modacc.m_N, exec().gmin(), nlconst::T0());
+		m_R.set_param(IsBV, m_modacc.m_NBV, exec().gmin(), nlconst::T0());
 		set_G_V_I(m_D.G(), nlconst::zero(), m_D.Ieq());
 	}
 
 	NETLIB_UPDATE_PARAM(Z)
 	{
-		zdiode_model_t modacc(m_model);
-		nl_fptype IsBV = modacc.m_IBV / (plib::exp(modacc.m_BV / nlconst::np_VT(modacc.m_NBV)) - nlconst::one());
+		nl_fptype IsBV = m_modacc.m_IBV / (plib::exp(m_modacc.m_BV / nlconst::np_VT(m_modacc.m_NBV)) - nlconst::one());
 
-		m_D.set_param(modacc.m_IS, modacc.m_N, exec().gmin(), nlconst::T0());
-		m_R.set_param(IsBV, modacc.m_NBV, exec().gmin(), nlconst::T0());
+		m_D.set_param(m_modacc.m_IS, m_modacc.m_N, exec().gmin(), nlconst::T0());
+		m_R.set_param(IsBV, m_modacc.m_NBV, exec().gmin(), nlconst::T0());
 		set_G_V_I(m_D.G(), nlconst::zero(), m_D.Ieq());
 	}
 

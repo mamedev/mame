@@ -588,8 +588,8 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME           PARENT    COMPAT  MACHINE        INPUT    CLASS          INIT        COMPANY  FULLNAME                     FLAGS */
-COMP( 1980, acrnsys2,      acrnsys3, 0,      acrnsys2,      acrnsys, acrnsys_state, empty_init, "Acorn", "Acorn System 2",            MACHINE_NO_SOUND_HW )
-COMP( 1980, acrnsys3,      0,        0,      acrnsys3,      acrnsys, acrnsys_state, empty_init, "Acorn", "Acorn System 3 (6502 CPU)", MACHINE_NO_SOUND_HW )
-COMP( 1980, acrnsys3_6809, acrnsys3, 0,      acrnsys3_6809, acrnsys, acrnsys_state, empty_init, "Acorn", "Acorn System 3 (6809 CPU)", MACHINE_NO_SOUND_HW )
-COMP( 1980, acrnsys4,      acrnsys3, 0,      acrnsys4,      acrnsys, acrnsys_state, empty_init, "Acorn", "Acorn System 4",            MACHINE_NO_SOUND_HW )
-COMP( 1982, acrnsys5,      0,        0,      acrnsys5,      acrnsys, acrnsys_state, empty_init, "Acorn", "Acorn System 5",            MACHINE_NO_SOUND_HW )
+COMP( 1980, acrnsys2,      acrnsys3, 0,      acrnsys2,      acrnsys, acrnsys_state, empty_init, "Acorn", "Acorn System 2",            MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1980, acrnsys3,      0,        0,      acrnsys3,      acrnsys, acrnsys_state, empty_init, "Acorn", "Acorn System 3 (6502 CPU)", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1980, acrnsys3_6809, acrnsys3, 0,      acrnsys3_6809, acrnsys, acrnsys_state, empty_init, "Acorn", "Acorn System 3 (6809 CPU)", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1980, acrnsys4,      acrnsys3, 0,      acrnsys4,      acrnsys, acrnsys_state, empty_init, "Acorn", "Acorn System 4",            MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1982, acrnsys5,      0,        0,      acrnsys5,      acrnsys, acrnsys_state, empty_init, "Acorn", "Acorn System 5",            MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

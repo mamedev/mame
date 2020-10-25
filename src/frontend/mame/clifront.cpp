@@ -343,7 +343,7 @@ int cli_frontend::execute(std::vector<std::string> &args)
 	}
 
 	util::archive_file::cache_clear();
-	global_free(manager);
+	delete manager;
 
 	return m_result;
 }
@@ -1452,7 +1452,9 @@ void cli_frontend::romident(const std::vector<std::string> &args)
 	ident.identify(filename);
 
 	// return the appropriate error code
-	if (ident.matches() == ident.total())
+	if (ident.total() == 0)
+		throw emu_fatalerror(EMU_ERR_MISSING_FILES, "No files found.\n");
+	else if (ident.matches() == ident.total())
 		return;
 	else if (ident.matches() == ident.total() - ident.nonroms())
 		throw emu_fatalerror(EMU_ERR_IDENT_NONROMS, "Out of %d files, %d matched, %d are not roms.\n", ident.total(), ident.matches(), ident.nonroms());
@@ -1630,8 +1632,7 @@ void cli_frontend::execute_commands(const char *exename)
 			osd_printf_error("Auxiliary verb -validate takes at most 1 argument\n");
 			return;
 		}
-		validity_checker valid(m_options);
-		valid.set_validate_all(true);
+		validity_checker valid(m_options, false);
 		const char *sysname = m_options.command_arguments().empty() ? nullptr : m_options.command_arguments()[0].c_str();
 		bool result = valid.check_all_matching(sysname);
 		if (!result)
@@ -1727,16 +1728,25 @@ void cli_frontend::execute_commands(const char *exename)
 
 void cli_frontend::display_help(const char *exename)
 {
-	osd_printf_info("%s v%s\n%s\n\n", emulator_info::get_appname(),build_version,emulator_info::get_copyright_info());
-	osd_printf_info("This software reproduces, more or less faithfully, the behaviour of a wide range\n"
-					"of machines. But hardware is useless without software, so images of the ROMs and\n"
-					"other media which run on that hardware are also required.\n\n");
-	osd_printf_info("Usage:  %s [machine] [media] [software] [options]",exename);
-	osd_printf_info("\n\n"
-			"        %s -showusage    for a list of options\n"
-			"        %s -showconfig   to show your current %s.ini\n"
-			"        %s -listmedia    for a full list of supported media\n"
-			"        %s -createconfig to create a %s.ini\n\n"
-			"For usage instructions, please consult the files config.txt and windows.txt.\n",exename,
-			exename,emulator_info::get_configname(),exename,exename,emulator_info::get_configname());
+	osd_printf_info(
+			"%3$s v%2$s\n"
+			"%5$s\n"
+			"\n"
+			"This software reproduces, more or less faithfully, the behaviour of a wide range\n"
+			"of machines. But hardware is useless without software, so images of the ROMs and\n"
+			"other media which run on that hardware are also required.\n"
+			"\n"
+			"Usage:  %1$s [machine] [media] [software] [options]\n"
+			"\n"
+			"        %1$s -showusage    for a list of options\n"
+			"        %1$s -showconfig   to show current configuration in %4$s.ini format\n"
+			"        %1$s -listmedia    for a full list of supported media\n"
+			"        %1$s -createconfig to create a %4$s.ini file\n"
+			"\n"
+			"For usage instructions, please visit https://docs.mamedev.org/\n",
+			exename,
+			build_version,
+			emulator_info::get_appname(),
+			emulator_info::get_configname(),
+			emulator_info::get_copyright_info());
 }

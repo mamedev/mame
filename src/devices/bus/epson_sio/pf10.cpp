@@ -140,42 +140,42 @@ void epson_pf10_device::device_timer(emu_timer &timer, device_timer_id id, int p
 //  CPU
 //**************************************************************************
 
-READ8_MEMBER( epson_pf10_device::port1_r )
+uint8_t epson_pf10_device::port1_r()
 {
 	logerror("%s: port1_r(%02x)\n", tag(), m_port1);
 	return m_port1;
 }
 
-WRITE8_MEMBER( epson_pf10_device::port1_w )
+void epson_pf10_device::port1_w(uint8_t data)
 {
 	logerror("%s: port1_w(%02x)\n", tag(), data);
 }
 
-READ8_MEMBER( epson_pf10_device::port2_r )
+uint8_t epson_pf10_device::port2_r()
 {
 	logerror("%s: port2_r(%02x)\n", tag(), m_port2);
 	return m_port2;
 }
 
-WRITE8_MEMBER( epson_pf10_device::port2_w )
+void epson_pf10_device::port2_w(uint8_t data)
 {
 	if (m_floppy->get_device() != nullptr)
 		m_floppy->get_device()->mon_w(data & PORT2_MON);
 	logerror("%s: port2_w(%02x)\n", tag(), data);
 }
 
-READ8_MEMBER( epson_pf10_device::fdc_r )
+uint8_t epson_pf10_device::fdc_r(offs_t offset)
 {
 	logerror("%s: fdc_r @ %04x\n", tag(), offset);
 	return 0xff;
 }
 
-WRITE8_MEMBER( epson_pf10_device::fdc_w )
+void epson_pf10_device::fdc_w(offs_t offset, uint8_t data)
 {
 	logerror("%s: fdc_w @ %04x (%02x)\n", tag(), offset, data);
 }
 
-WRITE8_MEMBER( epson_pf10_device::fdc_tc_w )
+void epson_pf10_device::fdc_tc_w(uint8_t data)
 {
 	logerror("%s: fdc_tc_w(%02x)\n", tag(), data);
 }

@@ -15,7 +15,6 @@ DEFINE_DEVICE_TYPE(TRACKFLD_AUDIO, trackfld_audio_device, "trackfld_audio", "Tra
 
 trackfld_audio_device::trackfld_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TRACKFLD_AUDIO, tag, owner, clock)
-	, device_sound_interface(mconfig, *this)
 	, m_audiocpu(*this, finder_base::DUMMY_TAG)
 	, m_vlm(*this, finder_base::DUMMY_TAG)
 	, m_last_addr(0)
@@ -129,14 +128,4 @@ WRITE_LINE_MEMBER(trackfld_audio_device::sh_irqtrigger_w)
 	}
 
 	m_last_irq = state;
-}
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void trackfld_audio_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }

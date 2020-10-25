@@ -182,7 +182,7 @@ void exerion_state::video_start()
  *
  *************************************/
 
-WRITE8_MEMBER(exerion_state::exerion_videoreg_w)
+void exerion_state::exerion_videoreg_w(uint8_t data)
 {
 	/* bit 0 = flip screen and joystick input multiplexer */
 	m_cocktail_flip = data & 1;
@@ -200,7 +200,7 @@ WRITE8_MEMBER(exerion_state::exerion_videoreg_w)
 }
 
 
-WRITE8_MEMBER(exerion_state::exerion_video_latch_w)
+void exerion_state::exerion_video_latch_w(offs_t offset, uint8_t data)
 {
 	int scanline = m_screen->vpos();
 	if (scanline > 0)
@@ -209,7 +209,7 @@ WRITE8_MEMBER(exerion_state::exerion_video_latch_w)
 }
 
 
-READ8_MEMBER(exerion_state::exerion_video_timing_r)
+uint8_t exerion_state::exerion_video_timing_r()
 {
 	/* bit 0 is the SNMI signal, which is the negated value of H6, if H7=1 & H8=1 & VBLANK=0, otherwise 1 */
 	/* bit 1 is VBLANK */

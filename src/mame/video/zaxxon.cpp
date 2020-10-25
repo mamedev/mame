@@ -191,7 +191,7 @@ WRITE_LINE_MEMBER(zaxxon_state::fg_color_w)
 }
 
 
-WRITE8_MEMBER(zaxxon_state::bg_position_w)
+void zaxxon_state::bg_position_w(offs_t offset, uint8_t data)
 {
 	/* 11 bits of scroll position are stored */
 	if (offset == 0)
@@ -238,14 +238,14 @@ WRITE_LINE_MEMBER(zaxxon_state::congo_color_bank_w)
  *
  *************************************/
 
-WRITE8_MEMBER(zaxxon_state::zaxxon_videoram_w)
+void zaxxon_state::zaxxon_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(zaxxon_state::congo_colorram_w)
+void zaxxon_state::congo_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
@@ -259,10 +259,8 @@ WRITE8_MEMBER(zaxxon_state::congo_colorram_w)
  *
  *************************************/
 
-WRITE8_MEMBER(zaxxon_state::congo_sprite_custom_w)
+void zaxxon_state::congo_sprite_custom_w(address_space &space, offs_t offset, uint8_t data)
 {
-	uint8_t *spriteram = m_spriteram;
-
 	m_congo_custom[offset] = data;
 
 	/* seems to trigger on a write of 1 to the 4th byte */
@@ -278,10 +276,10 @@ WRITE8_MEMBER(zaxxon_state::congo_sprite_custom_w)
 		while (count-- >= 0)
 		{
 			uint8_t daddr = space.read_byte(saddr + 0) * 4;
-			spriteram[(daddr + 0) & 0xff] = space.read_byte(saddr + 1);
-			spriteram[(daddr + 1) & 0xff] = space.read_byte(saddr + 2);
-			spriteram[(daddr + 2) & 0xff] = space.read_byte(saddr + 3);
-			spriteram[(daddr + 3) & 0xff] = space.read_byte(saddr + 4);
+			m_spriteram[(daddr + 0) & 0xff] = space.read_byte(saddr + 1);
+			m_spriteram[(daddr + 1) & 0xff] = space.read_byte(saddr + 2);
+			m_spriteram[(daddr + 2) & 0xff] = space.read_byte(saddr + 3);
+			m_spriteram[(daddr + 3) & 0xff] = space.read_byte(saddr + 4);
 			saddr += 0x20;
 		}
 	}
@@ -306,7 +304,6 @@ void zaxxon_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clipre
 		int ymask = pixmap.height() - 1;
 		int flipmask = m_flip_screen ? 0xff : 0x00;
 		int flipoffs = m_flip_screen ? 0x38 : 0x40;
-		int x, y;
 
 		/* the starting X value is offset by 1 pixel (normal) or 7 pixels */
 		/* (flipped) due to a delay in the loading */
@@ -316,25 +313,23 @@ void zaxxon_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clipre
 			flipoffs += 7;
 
 		/* loop over visible rows */
-		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-			uint16_t *dst = &bitmap.pix16(y);
-			int srcx, srcy, vf;
-			uint16_t *src;
+			uint16_t *const dst = &bitmap.pix(y);
 
 			/* VF = flipped V signals */
-			vf = y ^ flipmask;
+			int vf = y ^ flipmask;
 
 			/* base of the source row comes from VF plus the scroll value */
 			/* this is done by the 3 4-bit adders at U56, U74, U75 */
-			srcy = vf + ((m_bg_position << 1) ^ 0xfff) + 1;
-			src = &pixmap.pix16(srcy & ymask);
+			int srcy = vf + ((m_bg_position << 1) ^ 0xfff) + 1;
+			uint16_t const *src = &pixmap.pix(srcy & ymask);
 
 			/* loop over visible columns */
-			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
 				/* start with HF = flipped H signals */
-				srcx = x ^ flipmask;
+				int srcx = x ^ flipmask;
 				if (skew)
 				{
 					/* position within source row is a two-stage addition */

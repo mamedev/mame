@@ -38,16 +38,16 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(cpu2_m6000_w);
-	DECLARE_READ8_MEMBER(cpu0_mf800_r);
+	void cpu2_m6000_w(uint8_t data);
+	uint8_t cpu0_mf800_r();
 	DECLARE_WRITE_LINE_MEMBER(irq0_ack_w);
 	DECLARE_WRITE_LINE_MEMBER(irq1_ack_w);
-	DECLARE_WRITE8_MEMBER(coincounter_w);
+	void coincounter_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(coinlockout_w);
-	DECLARE_READ8_MEMBER(mcu_status_r);
-	DECLARE_WRITE8_MEMBER(bg_videoram_w);
-	DECLARE_WRITE8_MEMBER(fg_videoram_w);
-	DECLARE_WRITE8_MEMBER(gfx_ctrl_w);
+	uint8_t mcu_status_r();
+	void bg_videoram_w(offs_t offset, uint8_t data);
+	void fg_videoram_w(offs_t offset, uint8_t data);
+	void gfx_ctrl_w(offs_t offset, uint8_t data);
 
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);

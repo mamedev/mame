@@ -4,10 +4,8 @@ license:CC0
 -->
 <mamelayout version="2">
 
-	<element name="red_led">
-		<disk>
-			<color red="1.0" green="0.0" blue="0.0" />
-		</disk>
+	<element name="red_led" defstate="0">
+		<disk state="0"><color red="1.0" green="0.0" blue="0.0" /></disk>
 	</element>
 
 	<element name="CASSETTE">
@@ -23,18 +21,18 @@ license:CC0
 	</element>
 
 	<view name="Cassette LED">
-	<!--    <bezel name="cass_txt" element="CASSETTE">
-	        <bounds left="0" right="100" top="1030" bottom="1050" />
-	    </bezel> -->
-		<bezel name="cass_led" element="red_led">
-			<bounds left="0" right="20" top="1020" bottom="1045" />
-		</bezel>
-	<!--    <bezel element="background">
-	        <bounds left="0" top="850" right="1" bottom="855" />
-	    </bezel> -->
 		<screen index="0">
 			<bounds x="0" y="0" width="1400" height="1050" />
 		</screen>
+	<!--    <element name="cass_txt" ref="CASSETTE">
+	        <bounds left="0" right="100" top="1030" bottom="1050" />
+	    </element> -->
+		<element name="cass_led" ref="red_led">
+			<bounds left="0" right="20" top="1020" bottom="1045" />
+		</element>
+	<!--    <element ref="background">
+	        <bounds left="0" top="850" right="1" bottom="855" />
+	    </element> -->
 	</view>
 
 </mamelayout>

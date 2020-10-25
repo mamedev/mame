@@ -52,11 +52,11 @@ protected:
 	virtual void ecbbus_io_w(offs_t offset, uint8_t data) override;
 
 private:
-	DECLARE_READ8_MEMBER( ppi_pa_r );
-	DECLARE_WRITE8_MEMBER( ppi_pa_w );
-	DECLARE_READ8_MEMBER( ppi_pb_r );
-	DECLARE_WRITE8_MEMBER( ppi_pc_w );
-	DECLARE_READ8_MEMBER( sti_gpio_r );
+	uint8_t ppi_pa_r();
+	void ppi_pa_w(uint8_t data);
+	uint8_t ppi_pb_r();
+	void ppi_pc_w(uint8_t data);
+	uint8_t sti_gpio_r();
 	DECLARE_WRITE_LINE_MEMBER( speaker_w );
 
 	void kb_w(uint8_t data);
@@ -103,23 +103,23 @@ private:
 	// timers
 	emu_timer *m_kb_timer;
 
-	DECLARE_WRITE8_MEMBER( vol0_w );
-	DECLARE_WRITE8_MEMBER( vol1_w );
-	DECLARE_WRITE8_MEMBER( flash_w );
-	DECLARE_WRITE8_MEMBER( page_w );
-	DECLARE_READ8_MEMBER( stat_r );
-	DECLARE_READ8_MEMBER( lrs_r );
-	DECLARE_WRITE8_MEMBER( lrs_w );
-	DECLARE_READ8_MEMBER( cxstb_r );
-	DECLARE_WRITE8_MEMBER( cxstb_w );
+	void vol0_w(uint8_t data);
+	void vol1_w(uint8_t data);
+	void flash_w(uint8_t data);
+	void page_w(uint8_t data);
+	uint8_t stat_r();
+	uint8_t lrs_r();
+	void lrs_w(uint8_t data);
+	uint8_t cxstb_r();
+	void cxstb_w(uint8_t data);
 
 	void grip_io(address_map &map);
 	void grip_mem(address_map &map);
 
 	/*
 	required_device<hd6345_device> m_crtc;
-	DECLARE_WRITE8_MEMBER( eprom_w );
-	DECLARE_WRITE8_MEMBER( dpage_w );
+	void eprom_w(uint8_t data);
+	void dpage_w(uint8_t data);
 
 	// video state
 	int m_dpage;            // displayed video page

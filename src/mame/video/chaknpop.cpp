@@ -66,12 +66,12 @@ void chaknpop_state::tx_tilemap_mark_all_dirty()
 	m_tx_tilemap->set_flip(m_flip_x | m_flip_y);
 }
 
-READ8_MEMBER(chaknpop_state::gfxmode_r)
+uint8_t chaknpop_state::gfxmode_r()
 {
 	return m_gfxmode;
 }
 
-WRITE8_MEMBER(chaknpop_state::gfxmode_w)
+void chaknpop_state::gfxmode_w(uint8_t data)
 {
 	if (m_gfxmode != data)
 	{
@@ -97,13 +97,13 @@ WRITE8_MEMBER(chaknpop_state::gfxmode_w)
 	}
 }
 
-WRITE8_MEMBER(chaknpop_state::txram_w)
+void chaknpop_state::txram_w(offs_t offset, uint8_t data)
 {
 	m_tx_ram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(chaknpop_state::attrram_w)
+void chaknpop_state::attrram_w(offs_t offset, uint8_t data)
 {
 	if (m_attr_ram[offset] != data)
 	{
@@ -208,9 +208,8 @@ void chaknpop_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 void chaknpop_state::draw_bitmap( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	int dx = m_flip_x ? -1 : 1;
-	int offs, i;
 
-	for (offs = 0; offs < 0x2000; offs++)
+	for (int offs = 0; offs < 0x2000; offs++)
 	{
 		int x = ((offs & 0x1f) << 3) + 7;
 		int y = offs >> 5;
@@ -221,7 +220,7 @@ void chaknpop_state::draw_bitmap( bitmap_ind16 &bitmap, const rectangle &cliprec
 		if (!m_flip_y)
 			y = 255 - y;
 
-		for (i = 0x80; i > 0; i >>= 1, x += dx)
+		for (int i = 0x80; i > 0; i >>= 1, x += dx)
 		{
 			pen_t color = 0;
 
@@ -235,11 +234,7 @@ void chaknpop_state::draw_bitmap( bitmap_ind16 &bitmap, const rectangle &cliprec
 				color |= 0x040; // tx mask
 
 			if (color)
-			{
-				pen_t pen = bitmap.pix16(y, x);
-				pen |= color;
-				bitmap.pix16(y, x) = pen;
-			}
+				bitmap.pix(y, x) |= color;
 		}
 	}
 }

@@ -65,7 +65,7 @@ isa8_svga_et4k_device::isa8_svga_et4k_device(const machine_config &mconfig, cons
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-READ8_MEMBER(isa8_svga_et4k_device::input_port_0_r ) { return 0xff; } //return machine().root_device().ioport("IN0")->read(); }
+uint8_t isa8_svga_et4k_device::input_port_0_r() { return 0xff; } //return machine().root_device().ioport("IN0")->read(); }
 
 void isa8_svga_et4k_device::device_start()
 {
@@ -102,14 +102,14 @@ void isa8_svga_et4k_device::remap(int space_id, offs_t start, offs_t end)
 
 void isa8_svga_et4k_device::map_io()
 {
-	m_isa->install_device(0x3b0, 0x3bf, read8_delegate(*m_vga, FUNC(tseng_vga_device::port_03b0_r)), write8_delegate(*m_vga, FUNC(tseng_vga_device::port_03b0_w)));
-	m_isa->install_device(0x3c0, 0x3cf, read8_delegate(*m_vga, FUNC(tseng_vga_device::port_03c0_r)), write8_delegate(*m_vga, FUNC(tseng_vga_device::port_03c0_w)));
-	m_isa->install_device(0x3d0, 0x3df, read8_delegate(*m_vga, FUNC(tseng_vga_device::port_03d0_r)), write8_delegate(*m_vga, FUNC(tseng_vga_device::port_03d0_w)));
+	m_isa->install_device(0x3b0, 0x3bf, read8sm_delegate(*m_vga, FUNC(tseng_vga_device::port_03b0_r)), write8sm_delegate(*m_vga, FUNC(tseng_vga_device::port_03b0_w)));
+	m_isa->install_device(0x3c0, 0x3cf, read8sm_delegate(*m_vga, FUNC(tseng_vga_device::port_03c0_r)), write8sm_delegate(*m_vga, FUNC(tseng_vga_device::port_03c0_w)));
+	m_isa->install_device(0x3d0, 0x3df, read8sm_delegate(*m_vga, FUNC(tseng_vga_device::port_03d0_r)), write8sm_delegate(*m_vga, FUNC(tseng_vga_device::port_03d0_w)));
 }
 
 void isa8_svga_et4k_device::map_ram()
 {
-	m_isa->install_memory(0xa0000, 0xbffff, read8_delegate(*m_vga, FUNC(tseng_vga_device::mem_r)), write8_delegate(*m_vga, FUNC(tseng_vga_device::mem_w)));
+	m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(tseng_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(tseng_vga_device::mem_w)));
 }
 
 void isa8_svga_et4k_device::map_rom()

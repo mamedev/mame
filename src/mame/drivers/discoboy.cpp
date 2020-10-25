@@ -97,16 +97,14 @@ private:
 	required_shared_ptr<uint8_t> m_ram_2;
 	uint8_t    m_ram_3[0x1000];
 	uint8_t    m_ram_4[0x1000];
-	DECLARE_WRITE8_MEMBER(rambank_select_w);
-	DECLARE_WRITE8_MEMBER(port_00_w);
-	DECLARE_WRITE8_MEMBER(port_01_w);
-	DECLARE_WRITE8_MEMBER(port_06_w);
-	DECLARE_WRITE8_MEMBER(rambank_w);
-	DECLARE_READ8_MEMBER(rambank_r);
-	DECLARE_READ8_MEMBER(rambank2_r);
-	DECLARE_WRITE8_MEMBER(rambank2_w);
-	DECLARE_READ8_MEMBER(port_06_r);
-	DECLARE_WRITE8_MEMBER(yunsung8_sound_bankswitch_w);
+	void rambank_select_w(uint8_t data);
+	void port_00_w(uint8_t data);
+	void port_01_w(uint8_t data);
+	void port_06_w(uint8_t data);
+	uint8_t rambank2_r(offs_t offset);
+	void rambank2_w(offs_t offset, uint8_t data);
+	uint8_t port_06_r();
+	void yunsung8_sound_bankswitch_w(uint8_t data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -223,7 +221,7 @@ uint32_t discoboy_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-WRITE8_MEMBER(discoboy_state::rambank_select_w)
+void discoboy_state::rambank_select_w(uint8_t data)
 {
 	if (data & 0x20)
 		m_rambank1->set_bank(1);
@@ -233,13 +231,13 @@ WRITE8_MEMBER(discoboy_state::rambank_select_w)
 	if (data &= 0x83) logerror("rambank_select_w !!!!!");
 }
 
-WRITE8_MEMBER(discoboy_state::port_00_w)
+void discoboy_state::port_00_w(uint8_t data)
 {
 	if (data & 0xfe) logerror("unk port_00_w %02x\n",data);
 	m_port_00 = data;
 }
 
-WRITE8_MEMBER(discoboy_state::port_01_w)
+void discoboy_state::port_01_w(uint8_t data)
 {
 	// 00 10 20 30 during gameplay  1,2,3 other times?? title screen bit 0x40 toggle
 	//printf("unk port_01_w %02x\n",data);
@@ -249,13 +247,13 @@ WRITE8_MEMBER(discoboy_state::port_01_w)
 	membank("mainbank")->set_entry(data & 0x07);
 }
 
-WRITE8_MEMBER(discoboy_state::port_06_w)
+void discoboy_state::port_06_w(uint8_t data)
 {
 	//printf("unk discoboy_port_06_w %02x\n",data);
 	if (data != 0) logerror("port 06!!!! %02x\n",data);
 }
 
-READ8_MEMBER(discoboy_state::rambank2_r)
+uint8_t discoboy_state::rambank2_r(offs_t offset)
 {
 	if (m_port_00 == 0x00)
 		return m_ram_3[offset];
@@ -267,7 +265,7 @@ READ8_MEMBER(discoboy_state::rambank2_r)
 	return machine().rand();
 }
 
-WRITE8_MEMBER(discoboy_state::rambank2_w)
+void discoboy_state::rambank2_w(offs_t offset, uint8_t data)
 {
 	if (m_port_00 == 0x00)
 		m_ram_3[offset] = data;
@@ -295,7 +293,7 @@ void discoboy_state::rambank1_map(address_map &map)
 }
 
 
-READ8_MEMBER(discoboy_state::port_06_r)
+uint8_t discoboy_state::port_06_r()
 {
 	return 0x00;
 }
@@ -314,7 +312,7 @@ void discoboy_state::io_map(address_map &map)
 
 /* Sound */
 
-WRITE8_MEMBER(discoboy_state::yunsung8_sound_bankswitch_w)
+void discoboy_state::yunsung8_sound_bankswitch_w(uint8_t data)
 {
 	/* Note: this is bit 5 on yunsung8.cpp */
 	m_msm->reset_w((data & 0x08) >> 3);

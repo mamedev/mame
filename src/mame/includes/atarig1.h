@@ -9,6 +9,7 @@
 #include "audio/atarijsa.h"
 #include "machine/adc0808.h"
 #include "machine/atarigen.h"
+#include "machine/slapstic.h"
 #include "machine/timer.h"
 #include "video/atarirle.h"
 #include "cpu/m68000/m68000.h"
@@ -19,6 +20,7 @@ class atarig1_state : public atarigen_state
 public:
 	atarig1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
+			m_slapstic(*this, "slapstic"),
 			m_jsa(*this, "jsa"),
 			m_playfield_tilemap(*this, "playfield"),
 			m_alpha_tilemap(*this, "alpha"),
@@ -27,6 +29,7 @@ public:
 			m_in1(*this, "IN1"),
 			m_mo_command(*this, "mo_command") { }
 
+	optional_device<atari_slapstic_device> m_slapstic;
 	required_device<atari_jsa_ii_device> m_jsa;
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<tilemap_device> m_alpha_tilemap;
@@ -53,10 +56,10 @@ public:
 	virtual void device_post_load() override;
 	void video_int_ack_w(uint16_t data = 0);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update);
-	DECLARE_WRITE16_MEMBER(mo_command_w);
-	DECLARE_WRITE16_MEMBER(a2d_select_w);
-	DECLARE_READ16_MEMBER(a2d_data_r);
-	DECLARE_READ16_MEMBER(pitfightb_cheap_slapstic_r);
+	void mo_command_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void a2d_select_w(offs_t offset, uint16_t data);
+	uint16_t a2d_data_r();
+	uint16_t pitfightb_cheap_slapstic_r(offs_t offset);
 	void update_bank(int bank);
 	void init_hydrap();
 	void init_hydra();

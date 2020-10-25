@@ -14,11 +14,9 @@
 // standard C headers
 #include <process.h>
 
+#include <algorithm>
 #include <atomic>
 #include <cstring>
-#include <chrono>
-#include <list>
-#include <memory>
 
 // MAME headers
 #include "emu.h"
@@ -72,7 +70,8 @@ using namespace Windows::UI::Core;
 #define FULLSCREEN_STYLE_EX             WS_EX_TOPMOST
 
 // minimum window dimension
-#define MIN_WINDOW_DIM                  200
+#define MIN_WINDOW_DIMX                 200
+#define MIN_WINDOW_DIMY                 50
 
 // custom window messages
 #define WM_USER_REDRAW                  (WM_USER + 2)
@@ -95,7 +94,7 @@ static DWORD main_threadid;
 //============================================================
 
 // event handling
-static std::chrono::system_clock::time_point last_event_check;
+static std::chrono::steady_clock::time_point last_event_check;
 
 static int ui_temp_pause;
 static int ui_temp_was_paused;
@@ -294,28 +293,31 @@ void windows_osd_interface::window_exit()
 		CloseHandle(ui_pause_event);
 }
 
+
 win_window_info::win_window_info(
-	running_machine &machine,
-	int index,
-	std::shared_ptr<osd_monitor_info> monitor,
-	const osd_window_config *config) : osd_window_t(*config),
-		m_next(nullptr),
-		m_init_state(0),
-		m_startmaximized(0),
-		m_isminimized(0),
-		m_ismaximized(0),
-		m_monitor(monitor),
-		m_fullscreen(!video_config.windowed),
-		m_fullscreen_safe(0),
-		m_aspect(0),
-		m_target(nullptr),
-		m_targetview(0),
-		m_targetorient(0),
-		m_lastclicktime(std::chrono::system_clock::time_point::min()),
-		m_lastclickx(0),
-		m_lastclicky(0),
-		m_machine(machine),
-		m_attached_mode(false)
+		running_machine &machine,
+		int index,
+		std::shared_ptr<osd_monitor_info> monitor,
+		const osd_window_config *config)
+	: osd_window_t(*config)
+	, m_next(nullptr)
+	, m_init_state(0)
+	, m_startmaximized(0)
+	, m_isminimized(0)
+	, m_ismaximized(0)
+	, m_monitor(monitor)
+	, m_fullscreen(!video_config.windowed)
+	, m_fullscreen_safe(0)
+	, m_aspect(0)
+	, m_target(nullptr)
+	, m_targetview(0)
+	, m_targetorient(0)
+	, m_targetvismask(0)
+	, m_lastclicktime(std::chrono::steady_clock::time_point::min())
+	, m_lastclickx(0)
+	, m_lastclicky(0)
+	, m_machine(machine)
+	, m_attached_mode(false)
 {
 	memset(m_title,0,sizeof(m_title));
 	m_non_fullscreen_bounds.left = 0;
@@ -348,7 +350,7 @@ void win_window_info::hide_pointer()
 {
 	GetCursorPos(&s_saved_cursor_pos);
 
-	while (ShowCursor(FALSE) >= -1) {};
+	while (ShowCursor(FALSE) >= -1) { }
 	ShowCursor(TRUE);
 }
 
@@ -400,7 +402,7 @@ void win_window_info::show_pointer()
 
 void winwindow_process_events_periodic(running_machine &machine)
 {
-	auto currticks = std::chrono::system_clock::now();
+	auto currticks = std::chrono::steady_clock::now();
 
 	assert(GetCurrentThreadId() == main_threadid);
 
@@ -463,7 +465,7 @@ void winwindow_process_events(running_machine &machine, bool ingame, bool nodisp
 	assert(GetCurrentThreadId() == main_threadid);
 
 	// remember the last time we did this
-	last_event_check = std::chrono::system_clock::now();
+	last_event_check = std::chrono::steady_clock::now();
 
 	do
 	{
@@ -789,6 +791,7 @@ void win_window_info::create(running_machine &machine, int index, std::shared_pt
 	window->m_targetview = window->m_target->view();
 	window->m_targetorient = window->m_target->orientation();
 	window->m_targetlayerconfig = window->m_target->layer_config();
+	window->m_targetvismask = window->m_target->visibility_mask();
 
 	// make the window title
 	if (video_config.numscreens == 1)
@@ -858,20 +861,19 @@ void win_window_info::destroy()
 
 void win_window_info::update()
 {
-	int targetview, targetorient;
-	render_layer_config targetlayerconfig;
-
 	assert(GetCurrentThreadId() == main_threadid);
 
 	// see if the target has changed significantly in window mode
-	targetview = m_target->view();
-	targetorient = m_target->orientation();
-	targetlayerconfig = m_target->layer_config();
-	if (targetview != m_targetview || targetorient != m_targetorient || targetlayerconfig != m_targetlayerconfig)
+	unsigned const targetview = m_target->view();
+	int const targetorient = m_target->orientation();
+	render_layer_config const targetlayerconfig = m_target->layer_config();
+	u32 const targetvismask = m_target->visibility_mask();
+	if (targetview != m_targetview || targetorient != m_targetorient || targetlayerconfig != m_targetlayerconfig || targetvismask != m_targetvismask)
 	{
 		m_targetview = targetview;
 		m_targetorient = targetorient;
 		m_targetlayerconfig = targetlayerconfig;
+		m_targetvismask = targetvismask;
 
 		// in window mode, reminimize/maximize
 		if (!fullscreen())
@@ -1183,7 +1185,7 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 	auto *window = (win_window_info *)ptr;
 
 	// we may get called before SetWindowLongPtr is called
-	if (window != nullptr)
+	if (window)
 	{
 		assert(GetCurrentThreadId() == window_threadid);
 		window->update_minmax_state();
@@ -1192,8 +1194,8 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 	// handle a few messages
 	switch (message)
 	{
-		// paint: redraw the last bitmap
-		case WM_PAINT:
+	// paint: redraw the last bitmap
+	case WM_PAINT:
 		{
 			PAINTSTRUCT pstruct;
 			HDC hdc = BeginPaint(wnd, &pstruct);
@@ -1201,37 +1203,37 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 			if (window->win_has_menu())
 				DrawMenuBar(window->platform_window());
 			EndPaint(wnd, &pstruct);
-			break;
 		}
+		break;
 
-		// non-client paint: punt if full screen
-		case WM_NCPAINT:
-			if (!window->fullscreen() || window->win_has_menu())
-				return DefWindowProc(wnd, message, wparam, lparam);
-			break;
+	// non-client paint: punt if full screen
+	case WM_NCPAINT:
+		if (!window->fullscreen() || window->win_has_menu())
+			return DefWindowProc(wnd, message, wparam, lparam);
+		break;
 
-		// input: handle the raw input
-		case WM_INPUT:
-			downcast<windows_osd_interface&>(window->machine().osd()).handle_input_event(INPUT_EVENT_RAWINPUT, &lparam);
-			break;
+	// input: handle the raw input
+	case WM_INPUT:
+		downcast<windows_osd_interface&>(window->machine().osd()).handle_input_event(INPUT_EVENT_RAWINPUT, &lparam);
+		break;
 
-		// syskeys - ignore
-		case WM_SYSKEYUP:
-		case WM_SYSKEYDOWN:
-			break;
+	// syskeys - ignore
+	case WM_SYSKEYUP:
+	case WM_SYSKEYDOWN:
+		break;
 
-		// input events
-		case WM_MOUSEMOVE:
-			window->machine().ui_input().push_mouse_move_event(window->m_target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
-			break;
+	// input events
+	case WM_MOUSEMOVE:
+		window->machine().ui_input().push_mouse_move_event(window->m_target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
+		break;
 
-		case WM_MOUSELEAVE:
-			window->machine().ui_input().push_mouse_leave_event(window->m_target);
-			break;
+	case WM_MOUSELEAVE:
+		window->machine().ui_input().push_mouse_leave_event(window->m_target);
+		break;
 
-		case WM_LBUTTONDOWN:
+	case WM_LBUTTONDOWN:
 		{
-			auto ticks = std::chrono::system_clock::now();
+			auto const ticks = std::chrono::steady_clock::now();
 			window->machine().ui_input().push_mouse_down_event(window->m_target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
 
 			// check for a double-click
@@ -1239,7 +1241,7 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 				GET_X_LPARAM(lparam) >= window->m_lastclickx - 4 && GET_X_LPARAM(lparam) <= window->m_lastclickx + 4 &&
 				GET_Y_LPARAM(lparam) >= window->m_lastclicky - 4 && GET_Y_LPARAM(lparam) <= window->m_lastclicky + 4)
 			{
-				window->m_lastclicktime = std::chrono::system_clock::time_point::min();
+				window->m_lastclicktime = std::chrono::steady_clock::time_point::min();
 				window->machine().ui_input().push_mouse_double_click_event(window->m_target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
 			}
 			else
@@ -1248,26 +1250,26 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 				window->m_lastclickx = GET_X_LPARAM(lparam);
 				window->m_lastclicky = GET_Y_LPARAM(lparam);
 			}
-			break;
 		}
+		break;
 
-		case WM_LBUTTONUP:
-			window->machine().ui_input().push_mouse_up_event(window->m_target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
-			break;
+	case WM_LBUTTONUP:
+		window->machine().ui_input().push_mouse_up_event(window->m_target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
+		break;
 
-		case WM_RBUTTONDOWN:
-			window->machine().ui_input().push_mouse_rdown_event(window->m_target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
-			break;
+	case WM_RBUTTONDOWN:
+		window->machine().ui_input().push_mouse_rdown_event(window->m_target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
+		break;
 
-		case WM_RBUTTONUP:
-			window->machine().ui_input().push_mouse_rup_event(window->m_target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
-			break;
+	case WM_RBUTTONUP:
+		window->machine().ui_input().push_mouse_rup_event(window->m_target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
+		break;
 
-		case WM_CHAR:
-			window->machine().ui_input().push_char_event(window->m_target, (char32_t) wparam);
-			break;
+	case WM_CHAR:
+		window->machine().ui_input().push_char_event(window->m_target, (char32_t) wparam);
+		break;
 
-		case WM_MOUSEWHEEL:
+	case WM_MOUSEWHEEL:
 		{
 			UINT ucNumLines = 3; // default
 			SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &ucNumLines, 0);
@@ -1275,32 +1277,33 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 			break;
 		}
 
-		// pause the system when we start a menu or resize
-		case WM_ENTERSIZEMOVE:
-			window->m_resize_state = RESIZE_STATE_RESIZING;
-		case WM_ENTERMENULOOP:
-			winwindow_ui_pause(window->machine(), TRUE);
-			break;
+	// pause the system when we start a menu or resize
+	case WM_ENTERSIZEMOVE:
+		window->m_resize_state = RESIZE_STATE_RESIZING;
+	case WM_ENTERMENULOOP:
+		winwindow_ui_pause(window->machine(), TRUE);
+		break;
 
-		// unpause the system when we stop a menu or resize and force a redraw
-		case WM_EXITSIZEMOVE:
-			window->m_resize_state = RESIZE_STATE_PENDING;
-		case WM_EXITMENULOOP:
-			winwindow_ui_pause(window->machine(), FALSE);
-			InvalidateRect(wnd, nullptr, FALSE);
-			break;
+	// unpause the system when we stop a menu or resize and force a redraw
+	case WM_EXITSIZEMOVE:
+		window->m_resize_state = RESIZE_STATE_PENDING;
+	case WM_EXITMENULOOP:
+		winwindow_ui_pause(window->machine(), FALSE);
+		InvalidateRect(wnd, nullptr, FALSE);
+		break;
 
-		// get min/max info: set the minimum window size
-		case WM_GETMINMAXINFO:
+	// get min/max info: set the minimum window size
+	case WM_GETMINMAXINFO:
 		{
 			auto *minmax = (MINMAXINFO *)lparam;
-			minmax->ptMinTrackSize.x = MIN_WINDOW_DIM;
-			minmax->ptMinTrackSize.y = MIN_WINDOW_DIM;
+			minmax->ptMinTrackSize.x = MIN_WINDOW_DIMX;
+			minmax->ptMinTrackSize.y = MIN_WINDOW_DIMY;
 			break;
 		}
+		break;
 
-		// sizing: constrain to the aspect ratio unless control key is held down
-		case WM_SIZING:
+	// sizing: constrain to the aspect ratio unless control key is held down
+	case WM_SIZING:
 		{
 			RECT *rect = (RECT *)lparam;
 			if (video_config.keepaspect && !(GetAsyncKeyState(VK_CONTROL) & 0x8000))
@@ -1312,11 +1315,11 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 				rect->right = r.right();
 			}
 			InvalidateRect(wnd, nullptr, FALSE);
-			break;
 		}
+		break;
 
-		// syscommands: catch win_start_maximized
-		case WM_SYSCOMMAND:
+	// syscommands: catch win_start_maximized
+	case WM_SYSCOMMAND:
 		{
 			uint16_t cmd = wparam & 0xfff0;
 
@@ -1337,22 +1340,22 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 					window->maximize_window();
 				break;
 			}
-			return DefWindowProc(wnd, message, wparam, lparam);
 		}
+		return DefWindowProc(wnd, message, wparam, lparam);
 
-		// close: cause MAME to exit
-		case WM_CLOSE:
-			window->machine().schedule_exit();
-			break;
+	// close: cause MAME to exit
+	case WM_CLOSE:
+		window->machine().schedule_exit();
+		break;
 
-		// destroy: clean up all attached rendering bits and nullptr out our hwnd
-		case WM_DESTROY:
-			window->renderer_reset();
-			window->set_platform_window(nullptr);
-			return DefWindowProc(wnd, message, wparam, lparam);
+	// destroy: clean up all attached rendering bits and nullptr out our hwnd
+	case WM_DESTROY:
+		window->renderer_reset();
+		window->set_platform_window(nullptr);
+		return DefWindowProc(wnd, message, wparam, lparam);
 
-		// self redraw: draw ourself in a non-painty way
-		case WM_USER_REDRAW:
+	// self redraw: draw ourself in a non-painty way
+	case WM_USER_REDRAW:
 		{
 			HDC hdc = GetDC(wnd);
 
@@ -1360,46 +1363,46 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 			window->draw_video_contents(hdc, false);
 
 			ReleaseDC(wnd, hdc);
-			break;
 		}
+		break;
 
-		// fullscreen set
-		case WM_USER_SET_FULLSCREEN:
-			window->set_fullscreen(wparam);
-			break;
+	// fullscreen set
+	case WM_USER_SET_FULLSCREEN:
+		window->set_fullscreen(wparam);
+		break;
 
-		// minimum size set
-		case WM_USER_SET_MINSIZE:
-			window->minimize_window();
-			break;
+	// minimum size set
+	case WM_USER_SET_MINSIZE:
+		window->minimize_window();
+		break;
 
-		// maximum size set
-		case WM_USER_SET_MAXSIZE:
-			window->maximize_window();
-			break;
+	// maximum size set
+	case WM_USER_SET_MAXSIZE:
+		window->maximize_window();
+		break;
 
-		// maximum size set
-		case WM_DISPLAYCHANGE:
-			/* FIXME: The current codebase has an issue with setting aspect
-			 * ratios correctly after display change. set_aspect should
-			 * be set_forced_aspect and on a refresh this forced aspect should
-			 * be preserved if set. If not, the standard aspect calculation
-			 * should be used.
-			 */
-			window->m_monitor->refresh();
-			window->m_monitor->update_resolution(LOWORD(lparam), HIWORD(lparam));
-			break;
+	// maximum size set
+	case WM_DISPLAYCHANGE:
+		/* FIXME: The current codebase has an issue with setting aspect
+		 * ratios correctly after display change. set_aspect should
+		 * be set_forced_aspect and on a refresh this forced aspect should
+		 * be preserved if set. If not, the standard aspect calculation
+		 * should be used.
+		 */
+		window->m_monitor->refresh();
+		window->m_monitor->update_resolution(LOWORD(lparam), HIWORD(lparam));
+		break;
 
-		// set focus: if we're not the primary window, switch back
-		// commented out ATM because this prevents us from resizing secondary windows
-//      case WM_SETFOCUS:
-//          if (window != osd_common_t::s_window_list && osd_common_t::s_window_list != nullptr)
-//              SetFocus(osd_common_t::s_window_list->m_hwnd);
-//          break;
+	// set focus: if we're not the primary window, switch back
+	// commented out ATM because this prevents us from resizing secondary windows
+//  case WM_SETFOCUS:
+//      if (window != osd_common_t::s_window_list && osd_common_t::s_window_list != nullptr)
+//          SetFocus(osd_common_t::s_window_list->m_hwnd);
+//      break;
 
-		// everything else: defaults
-		default:
-			return DefWindowProc(wnd, message, wparam, lparam);
+	// everything else: defaults
+	default:
+		return DefWindowProc(wnd, message, wparam, lparam);
 	}
 
 	return 0;
@@ -1498,14 +1501,6 @@ osd_rect win_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int ad
 	// get the minimum width/height for the current layout
 	m_target->compute_minimum_size(minwidth, minheight);
 
-	// clamp against the absolute minimum
-	propwidth = std::max(propwidth, MIN_WINDOW_DIM);
-	propheight = std::max(propheight, MIN_WINDOW_DIM);
-
-	// clamp against the minimum width and height
-	propwidth = std::max(propwidth, minwidth);
-	propheight = std::max(propheight, minheight);
-
 	// clamp against the maximum (fit on one screen for full screen mode)
 	if (fullscreen())
 	{
@@ -1517,12 +1512,24 @@ osd_rect win_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int ad
 		maxwidth = monitor->usuable_position_size().width() - extrawidth;
 		maxheight = monitor->usuable_position_size().height() - extraheight;
 
-		// further clamp to the maximum width/height in the window
+		// clamp minimum against half of maximum to allow resizing very large targets (eg. SVG screen)
+		minwidth = std::min(minwidth, maxwidth / 2);
+		minheight = std::min(minheight, maxheight / 2);
+
+		// clamp maximum to the maximum width/height in the window
 		if (m_win_config.width != 0)
 			maxwidth = std::min(maxwidth, m_win_config.width + extrawidth);
 		if (m_win_config.height != 0)
 			maxheight = std::min(maxheight, m_win_config.height + extraheight);
 	}
+
+	// clamp against the absolute minimum
+	propwidth = std::max(propwidth, MIN_WINDOW_DIMX);
+	propheight = std::max(propheight, MIN_WINDOW_DIMY);
+
+	// clamp against the minimum width and height
+	propwidth = std::max(propwidth, minwidth);
+	propheight = std::max(propheight, minheight);
 
 	// clamp to the maximum
 	propwidth = std::min(propwidth, maxwidth);
@@ -1580,10 +1587,10 @@ osd_dim win_window_info::get_min_bounds(int constrain)
 	m_target->compute_minimum_size(minwidth, minheight);
 
 	// expand to our minimum dimensions
-	if (minwidth < MIN_WINDOW_DIM)
-		minwidth = MIN_WINDOW_DIM;
-	if (minheight < MIN_WINDOW_DIM)
-		minheight = MIN_WINDOW_DIM;
+	if (minwidth < MIN_WINDOW_DIMX)
+		minwidth = MIN_WINDOW_DIMX;
+	if (minheight < MIN_WINDOW_DIMY)
+		minheight = MIN_WINDOW_DIMY;
 
 	// account for extra window stuff
 	minwidth += wnd_extra_width();
@@ -1757,32 +1764,32 @@ void win_window_info::adjust_window_position_after_major_change()
 		// constrain the existing size to the aspect ratio
 		if (video_config.keepaspect)
 			newrect = constrain_to_aspect_ratio(newrect, WMSZ_BOTTOMRIGHT);
+
+		// restrict the window to one monitor and avoid toolbars if possible
+		HMONITOR const nearest_monitor = MonitorFromWindow(platform_window(), MONITOR_DEFAULTTONEAREST);
+		if (NULL != nearest_monitor)
+		{
+			MONITORINFO info;
+			std::memset(&info, 0, sizeof(info));
+			info.cbSize = sizeof(info);
+			if (GetMonitorInfo(nearest_monitor, &info))
+			{
+				if (newrect.right() > info.rcWork.right)
+					newrect = newrect.move_by(info.rcWork.right - newrect.right(), 0);
+				if (newrect.bottom() > info.rcWork.bottom)
+					newrect = newrect.move_by(0, info.rcWork.bottom - newrect.bottom());
+				if (newrect.left() < info.rcWork.left)
+					newrect = newrect.move_by(info.rcWork.left - newrect.left(), 0);
+				if (newrect.top() < info.rcWork.top)
+					newrect = newrect.move_by(0, info.rcWork.top - newrect.top());
+			}
+		}
 	}
 	else
 	{
 		// in full screen, make sure it covers the primary display
 		std::shared_ptr<osd_monitor_info> monitor = monitor_from_rect(nullptr);
 		newrect = monitor->position_size();
-	}
-
-	// restrict the window to one monitor and avoid toolbars if possible
-	HMONITOR const nearest_monitor = MonitorFromWindow(platform_window(), MONITOR_DEFAULTTONEAREST);
-	if (NULL != nearest_monitor)
-	{
-		MONITORINFO info;
-		std::memset(&info, 0, sizeof(info));
-		info.cbSize = sizeof(info);
-		if (GetMonitorInfo(nearest_monitor, &info))
-		{
-			if (newrect.right() > info.rcWork.right)
-				newrect = newrect.move_by(info.rcWork.right - newrect.right(), 0);
-			if (newrect.bottom() > info.rcWork.bottom)
-				newrect = newrect.move_by(0, info.rcWork.bottom - newrect.bottom());
-			if (newrect.left() < info.rcWork.left)
-				newrect = newrect.move_by(info.rcWork.left - newrect.left(), 0);
-			if (newrect.top() < info.rcWork.top)
-				newrect = newrect.move_by(0, info.rcWork.top - newrect.top());
-		}
 	}
 
 	// adjust the position if different
@@ -1844,7 +1851,7 @@ void win_window_info::set_fullscreen(int fullscreen)
 		// otherwise, set a small size and maximize from there
 		else
 		{
-			SetWindowPos(platform_window(), HWND_TOP, 0, 0, MIN_WINDOW_DIM, MIN_WINDOW_DIM, SWP_NOZORDER);
+			SetWindowPos(platform_window(), HWND_TOP, 0, 0, MIN_WINDOW_DIMX, MIN_WINDOW_DIMY, SWP_NOZORDER);
 			maximize_window();
 		}
 	}

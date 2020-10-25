@@ -133,7 +133,7 @@ Stephh's notes (based on the games Z80 code and some tests) for other games :
 
 
 /* Send sound data to the sound cpu and cause an nmi */
-READ8_MEMBER(galaxold_state::drivfrcg_port0_r)
+uint8_t galaxold_state::drivfrcg_port0_r()
 {
 	switch (m_maincpu->pc())
 	{
@@ -351,10 +351,10 @@ void galaxold_state::scramblb_map(address_map &map)
 	map(0x8202, 0x8202).r(FUNC(galaxold_state::scramblb_protection_2_r));
 }
 
-READ8_MEMBER(galaxold_state::scramb2_protection_r){ return 0x25; }
-READ8_MEMBER(galaxold_state::scramb2_port0_r){ return (ioport("IN0")->read() >> offset) & 0x1; }
-READ8_MEMBER(galaxold_state::scramb2_port1_r){ return (ioport("IN1")->read() >> offset) & 0x1; }
-READ8_MEMBER(galaxold_state::scramb2_port2_r){ return (ioport("IN2")->read() >> offset) & 0x1; }
+uint8_t galaxold_state::scramb2_protection_r(){ return 0x25; }
+uint8_t galaxold_state::scramb2_port0_r(offs_t offset){ return (ioport("IN0")->read() >> offset) & 0x1; }
+uint8_t galaxold_state::scramb2_port1_r(offs_t offset){ return (ioport("IN1")->read() >> offset) & 0x1; }
+uint8_t galaxold_state::scramb2_port2_r(offs_t offset){ return (ioport("IN2")->read() >> offset) & 0x1; }
 
 void galaxold_state::scramb_common_map(address_map &map)
 {
@@ -392,7 +392,7 @@ void galaxold_state::scramb3_map(address_map &map)
 	map(0x6003, 0x6003).w(FUNC(galaxold_state::galaxold_coin_counter_w));
 }
 
-READ8_MEMBER( galaxold_state::scrambler_protection_2_r )
+uint8_t galaxold_state::scrambler_protection_2_r()
 {
 	// if this doesn't return a value the code is happy with then it jumps out of ROM space after reading the port
 	return 0xff;
@@ -442,7 +442,7 @@ void galaxold_state::scrambleo_map(address_map &map)
 	map(0x7001, 0x7001).w(FUNC(galaxold_state::galaxold_nmi_enable_w));
 }
 
-WRITE8_MEMBER( galaxold_state::guttang_rombank_w )
+void galaxold_state::guttang_rombank_w(uint8_t data)
 {
 //  printf("rombank %02x\n",data);
 	if (data&1)
@@ -793,7 +793,7 @@ void galaxold_state::racknrol_io(address_map &map)
 	map(0x20, 0x3f).w(FUNC(galaxold_state::racknrol_tiles_bank_w)).share("racknrol_tbank");
 }
 
-READ8_MEMBER(galaxold_state::hexpoola_data_port_r)
+uint8_t galaxold_state::hexpoola_data_port_r()
 {
 	switch (m_maincpu->pc())
 	{
@@ -818,7 +818,7 @@ void galaxold_state::hexpoola_data(address_map &map)
 	map(S2650_DATA_PORT, S2650_DATA_PORT).r(FUNC(galaxold_state::hexpoola_data_port_r)).w("snsnd", FUNC(sn76496_device::write));
 }
 
-READ8_MEMBER(galaxold_state::bullsdrtg_data_port_r)
+uint8_t galaxold_state::bullsdrtg_data_port_r()
 {
 	switch (m_maincpu->pc())
 	{

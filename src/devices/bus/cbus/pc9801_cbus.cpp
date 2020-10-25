@@ -95,7 +95,7 @@ void pc9801_slot_device::device_start()
 //  m_card = dynamic_cast<device_pc9801_slot_card_interface *>(get_card_device());
 }
 
-void pc9801_slot_device::install_io(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler)
+template<typename R, typename W> void pc9801_slot_device::install_io(offs_t start, offs_t end, R rhandler, W whandler)
 {
 	int buswidth = m_iospace->data_width();
 	switch(buswidth)
@@ -113,3 +113,8 @@ void pc9801_slot_device::install_io(offs_t start, offs_t end, read8_delegate rha
 			fatalerror("PC-9801-26: Bus width %d not supported\n", buswidth);
 	}
 }
+
+template void pc9801_slot_device::install_io<read8_delegate,    write8_delegate   >(offs_t start, offs_t end, read8_delegate rhandler,    write8_delegate whandler);
+template void pc9801_slot_device::install_io<read8s_delegate,   write8s_delegate  >(offs_t start, offs_t end, read8s_delegate rhandler,   write8s_delegate whandler);
+template void pc9801_slot_device::install_io<read8sm_delegate,  write8sm_delegate >(offs_t start, offs_t end, read8sm_delegate rhandler,  write8sm_delegate whandler);
+template void pc9801_slot_device::install_io<read8smo_delegate, write8smo_delegate>(offs_t start, offs_t end, read8smo_delegate rhandler, write8smo_delegate whandler);

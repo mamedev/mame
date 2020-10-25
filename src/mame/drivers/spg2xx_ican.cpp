@@ -29,13 +29,13 @@ protected:
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load_icanguit);
 
-	DECLARE_READ16_MEMBER(porta_r);
-	virtual DECLARE_READ16_MEMBER(portb_r);
-	DECLARE_READ16_MEMBER(portc_r);
+	uint16_t porta_r();
+	virtual uint16_t portb_r();
+	uint16_t portc_r();
 
-	virtual DECLARE_WRITE16_MEMBER(porta_w) override;
-	virtual DECLARE_WRITE16_MEMBER(portb_w) override;
-	virtual DECLARE_WRITE16_MEMBER(portc_w) override;
+	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+	virtual void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+	virtual void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
 	required_device<generic_slot_device> m_cart;
 	memory_region *m_cart_region;
@@ -58,10 +58,10 @@ public:
 	void icanpian(machine_config &config);
 
 protected:
-	virtual DECLARE_READ16_MEMBER(portb_r) override;
+	virtual uint16_t portb_r() override;
 
-	virtual DECLARE_WRITE16_MEMBER(porta_w) override;
-	virtual DECLARE_WRITE16_MEMBER(portb_w) override;
+	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+	virtual void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
 	//optional_device<eeprom_serial_93cxx_device> m_eeprom;
 };
@@ -275,38 +275,38 @@ INPUT_PORTS_END
 
 
 
-READ16_MEMBER(icanguit_state::porta_r)
+uint16_t icanguit_state::porta_r()
 {
 	logerror("%s: porta_r\n", machine().describe_context());
 	return m_inlatch_a;
 }
 
 
-READ16_MEMBER(icanguit_state::portc_r)
+uint16_t icanguit_state::portc_r()
 {
 	logerror("%s: portc_r\n", machine().describe_context());
 	return m_inlatch_c;
 }
 
 
-WRITE16_MEMBER(icanguit_state::portc_w)
+void icanguit_state::portc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s: portc_w (%04x)\n", machine().describe_context(), data);
 }
 
 
-READ16_MEMBER(icanguit_state::portb_r)
+uint16_t icanguit_state::portb_r()
 {
 	logerror("%s: portb_r\n", machine().describe_context());
 	return m_io_p2->read();
 }
 
-WRITE16_MEMBER(icanguit_state::portb_w)
+void icanguit_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s: portb_w (%04x)\n", machine().describe_context(), data);
 }
 
-WRITE16_MEMBER(icanguit_state::porta_w)
+void icanguit_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//logerror("%s: porta_w (%04x)\n", machine().describe_context(), data);
 
@@ -352,7 +352,7 @@ WRITE16_MEMBER(icanguit_state::porta_w)
 
 // icanpian differences
 
-WRITE16_MEMBER(icanpian_state::porta_w)
+void icanpian_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (data == 0x0000)
 	{
@@ -381,7 +381,7 @@ WRITE16_MEMBER(icanpian_state::porta_w)
 
 // accesses are made for what appears to be a serial eeprom on port B, very similar to dreamlif, but beyond blanking it at the start it doesn't
 // seem to ever be used, maybe it was never added to hardware, or just never used?
-READ16_MEMBER(icanpian_state::portb_r)
+uint16_t icanpian_state::portb_r()
 {
 /*
     uint16_t ret = 0x0000;
@@ -392,7 +392,7 @@ READ16_MEMBER(icanpian_state::portb_r)
 	return 0x0000;
 }
 
-WRITE16_MEMBER(icanpian_state::portb_w)
+void icanpian_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 /*
     logerror("%s: portbxx_w (%04x)\n", machine().describe_context(), data);

@@ -182,7 +182,7 @@ private:
 	// address spaces
 	address_space_config const  m_space_config[7];
 	address_space               *m_spaces[7];
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
+	memory_access<12, 0, 0, ENDIANNESS_LITTLE>::cache m_cache;
 
 	// bus snooping callback
 	bus_cycle_delegate          m_bus_cycle_cb;

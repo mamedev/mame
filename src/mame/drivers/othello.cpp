@@ -45,7 +45,6 @@ Limit for help/undo (matta):
 #include "machine/i8243.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/mc6845.h"
 
 #include "emupal.h"
@@ -102,21 +101,21 @@ private:
 
 	required_region_ptr<uint8_t> m_n7751_data;
 
-	DECLARE_READ8_MEMBER(unk_87_r);
-	DECLARE_WRITE8_MEMBER(unk_8a_w);
-	DECLARE_WRITE8_MEMBER(unk_8c_w);
-	DECLARE_READ8_MEMBER(unk_8c_r);
-	DECLARE_READ8_MEMBER(sound_ack_r);
-	DECLARE_WRITE8_MEMBER(unk_8f_w);
-	DECLARE_WRITE8_MEMBER(tilebank_w);
-	DECLARE_READ8_MEMBER(latch_r);
-	DECLARE_WRITE8_MEMBER(ay_select_w);
-	DECLARE_WRITE8_MEMBER(ack_w);
-	DECLARE_WRITE8_MEMBER(ay_address_w);
-	DECLARE_WRITE8_MEMBER(ay_data_w);
-	DECLARE_READ8_MEMBER(n7751_rom_r);
-	DECLARE_READ8_MEMBER(n7751_command_r);
-	DECLARE_WRITE8_MEMBER(n7751_p2_w);
+	uint8_t unk_87_r();
+	void unk_8a_w(uint8_t data);
+	void unk_8c_w(uint8_t data);
+	uint8_t unk_8c_r();
+	uint8_t sound_ack_r();
+	void unk_8f_w(uint8_t data);
+	void tilebank_w(uint8_t data);
+	uint8_t latch_r();
+	void ay_select_w(uint8_t data);
+	void ack_w(uint8_t data);
+	void ay_address_w(uint8_t data);
+	void ay_data_w(uint8_t data);
+	uint8_t n7751_rom_r();
+	uint8_t n7751_command_r();
+	void n7751_p2_w(uint8_t data);
 	template<int Shift> void n7751_rom_addr_w(uint8_t data);
 	void n7751_rom_select_w(uint8_t data);
 
@@ -132,9 +131,9 @@ private:
 
 MC6845_UPDATE_ROW( othello_state::crtc_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
-	const uint8_t *gfx = memregion("gfx")->base();
+	uint8_t const *const gfx = memregion("gfx")->base();
 
 	for(int cx = 0; cx < x_count; ++cx)
 	{
@@ -143,7 +142,7 @@ MC6845_UPDATE_ROW( othello_state::crtc_update_row )
 
 		for(int x = 0; x < TILE_WIDTH; ++x)
 		{
-			bitmap.pix32(y, (cx * TILE_WIDTH + x) ^ 1) = palette[tmp & 0x0f];
+			bitmap.pix(y, (cx * TILE_WIDTH + x) ^ 1) = palette[tmp & 0x0f];
 			tmp >>= 4;
 		}
 	}
@@ -172,13 +171,13 @@ void othello_state::main_map(address_map &map)
 	map(0xf000, 0xffff).ram();
 }
 
-READ8_MEMBER(othello_state::unk_87_r)
+uint8_t othello_state::unk_87_r()
 {
 	/* n7751_status_r ?  bit 7 = ack/status from device connected  to port 8a? */
 	return machine().rand();
 }
 
-WRITE8_MEMBER(othello_state::unk_8a_w)
+void othello_state::unk_8a_w(uint8_t data)
 {
 	/*
 	m_n7751_command = (data & 0x07);
@@ -190,27 +189,27 @@ WRITE8_MEMBER(othello_state::unk_8a_w)
 	logerror("8a -> %x\n", data);
 }
 
-WRITE8_MEMBER(othello_state::unk_8c_w)
+void othello_state::unk_8c_w(uint8_t data)
 {
 	logerror("8c -> %x\n", data);
 }
 
-READ8_MEMBER(othello_state::unk_8c_r)
+uint8_t othello_state::unk_8c_r()
 {
 	return machine().rand();
 }
 
-READ8_MEMBER(othello_state::sound_ack_r)
+uint8_t othello_state::sound_ack_r()
 {
 	return m_ack_data;
 }
 
-WRITE8_MEMBER(othello_state::unk_8f_w)
+void othello_state::unk_8f_w(uint8_t data)
 {
 	logerror("8f -> %x\n", data);
 }
 
-WRITE8_MEMBER(othello_state::tilebank_w)
+void othello_state::tilebank_w(uint8_t data)
 {
 	m_tile_bank = (data == 0x0f) ? 0x100 : 0x00;
 	logerror("tilebank -> %x\n", data);
@@ -232,30 +231,30 @@ void othello_state::main_portmap(address_map &map)
 	map(0x8f, 0x8f).w(FUNC(othello_state::unk_8f_w));
 }
 
-READ8_MEMBER(othello_state::latch_r)
+uint8_t othello_state::latch_r()
 {
 	int retval = m_soundlatch->read();
 	m_soundlatch->clear_w();
 	return retval;
 }
 
-WRITE8_MEMBER(othello_state::ay_select_w)
+void othello_state::ay_select_w(uint8_t data)
 {
 	m_ay_select = data;
 }
 
-WRITE8_MEMBER(othello_state::ack_w)
+void othello_state::ack_w(uint8_t data)
 {
 	m_ack_data = data;
 }
 
-WRITE8_MEMBER(othello_state::ay_address_w)
+void othello_state::ay_address_w(uint8_t data)
 {
 	if (m_ay_select & 1) m_ay[0]->address_w(data);
 	if (m_ay_select & 2) m_ay[1]->address_w(data);
 }
 
-WRITE8_MEMBER(othello_state::ay_data_w)
+void othello_state::ay_data_w(uint8_t data)
 {
 	if (m_ay_select & 1) m_ay[0]->data_w(data);
 	if (m_ay_select & 2) m_ay[1]->data_w(data);
@@ -297,17 +296,17 @@ void othello_state::n7751_rom_select_w(uint8_t data)
 	if (!BIT(data, 3)) m_sound_addr |= 0x3000;
 }
 
-READ8_MEMBER(othello_state::n7751_rom_r)
+uint8_t othello_state::n7751_rom_r()
 {
 	return m_n7751_data[m_sound_addr];
 }
 
-READ8_MEMBER(othello_state::n7751_command_r)
+uint8_t othello_state::n7751_command_r()
 {
 	return 0x80 | ((m_n7751_command & 0x07) << 4);
 }
 
-WRITE8_MEMBER(othello_state::n7751_p2_w)
+void othello_state::n7751_p2_w(uint8_t data)
 {
 	/* write to P2; low 4 bits go to 8243 */
 	m_i8243->p2_w(data & 0x0f);
@@ -434,9 +433,6 @@ void othello_state::othello(machine_config &config)
 	AY8910(config, m_ay[1], 2000000).add_route(ALL_OUTPUTS, "speaker", 0.15);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.3); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 ROM_START( othello )

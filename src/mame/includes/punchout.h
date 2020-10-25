@@ -69,17 +69,16 @@ private:
 	tilemap_t *m_spr2_tilemap;
 
 	bool m_nmi_mask;
-	DECLARE_WRITE8_MEMBER(punchout_2a03_reset_w);
-	DECLARE_READ8_MEMBER(spunchout_exp_r);
-	DECLARE_WRITE8_MEMBER(spunchout_exp_w);
-	DECLARE_WRITE8_MEMBER(spunchout_rp5h01_reset_w);
-	DECLARE_WRITE8_MEMBER(spunchout_rp5h01_clock_w);
+	uint8_t spunchout_exp_r(offs_t offset);
+	void spunchout_exp_w(offs_t offset, uint8_t data);
+	void spunchout_rp5h01_reset_w(uint8_t data);
+	void spunchout_rp5h01_clock_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(punchout_bg_top_videoram_w);
-	DECLARE_WRITE8_MEMBER(punchout_bg_bot_videoram_w);
-	DECLARE_WRITE8_MEMBER(armwrest_fg_videoram_w);
-	DECLARE_WRITE8_MEMBER(punchout_spr1_videoram_w);
-	DECLARE_WRITE8_MEMBER(punchout_spr2_videoram_w);
+	void punchout_bg_top_videoram_w(offs_t offset, uint8_t data);
+	void punchout_bg_bot_videoram_w(offs_t offset, uint8_t data);
+	void armwrest_fg_videoram_w(offs_t offset, uint8_t data);
+	void punchout_spr1_videoram_w(offs_t offset, uint8_t data);
+	void punchout_spr2_videoram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(top_get_info);
 	TILE_GET_INFO_MEMBER(armwrest_top_get_info);
 	TILE_GET_INFO_MEMBER(bot_get_info);

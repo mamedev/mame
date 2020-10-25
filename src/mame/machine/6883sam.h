@@ -114,7 +114,7 @@ public:
 			if (bit3_carry)
 				counter_carry_bit3();
 		}
-		return m_ram_space->read_byte(m_counter & m_counter_mask);
+		return m_ram_space.read_byte(m_counter & m_counter_mask);
 	}
 
 	DECLARE_WRITE_LINE_MEMBER( hs_w );
@@ -140,11 +140,10 @@ private:
 	address_space_config        m_boot_config;
 
 	// memory spaces
-	using memory_cache_8be = memory_access_cache<0, 0, ENDIANNESS_BIG>;
-	memory_cache_8be *          m_ram_space;
-	memory_cache_8be *          m_rom_space[3];
-	address_space *             m_io_space[3];
-	memory_cache_8be *          m_boot_space;
+	memory_access<16, 0, 0, ENDIANNESS_BIG>::cache m_ram_space;
+	memory_access<14, 0, 0, ENDIANNESS_BIG>::cache m_rom_space[3];
+	memory_access< 5, 0, 0, ENDIANNESS_BIG>::specific m_io_space[3];
+	memory_access< 7, 0, 0, ENDIANNESS_BIG>::cache m_boot_space;
 	uint16_t                    m_counter_mask;
 
 	// SAM state

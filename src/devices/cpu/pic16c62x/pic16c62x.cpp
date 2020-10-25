@@ -187,16 +187,16 @@ std::unique_ptr<util::disasm_interface> pic16c62x_device::create_disassembler()
 
 void pic16c62x_device::update_internalram_ptr()
 {
-	m_internalram = (uint8_t *)m_data->get_write_ptr(0x00);
+	m_internalram = (uint8_t *)m_data.space().get_write_ptr(0x00);
 }
 
-#define PIC16C62x_RDOP(A)         (m_cache->read_word(A))
-#define PIC16C62x_RAM_RDMEM(A)    ((uint8_t)m_data->read_byte(A))
-#define PIC16C62x_RAM_WRMEM(A,V)  (m_data->write_byte(A,V))
-#define PIC16C62x_In(Port)        ((uint8_t)m_io->read_byte((Port)))
-#define PIC16C62x_Out(Port,Value) (m_io->write_byte((Port),Value))
+#define PIC16C62x_RDOP(A)         (m_cache.read_word(A))
+#define PIC16C62x_RAM_RDMEM(A)    ((uint8_t)m_data.read_byte(A))
+#define PIC16C62x_RAM_WRMEM(A,V)  (m_data.write_byte(A,V))
+#define PIC16C62x_In(Port)        ((uint8_t)m_io.read_byte((Port)))
+#define PIC16C62x_Out(Port,Value) (m_io.write_byte((Port),Value))
 /************  Read the state of the T0 Clock input signal  ************/
-#define PIC16C62x_T0_In           (m_io->read_byte(PIC16C62x_T0) >> 4)
+#define PIC16C62x_T0_In           (m_io.read_byte(PIC16C62x_T0) >> 4)
 
 #define M_RDRAM(A)      (((A) == 0) ? m_internalram[0] : PIC16C62x_RAM_RDMEM(A))
 #define M_WRTRAM(A,V)   do { if ((A) == 0) m_internalram[0] = (V); else PIC16C62x_RAM_WRMEM(A,V); } while (0)
@@ -887,10 +887,10 @@ void pic16c62x_device::build_opcode_table(void)
 
 void pic16c62x_device::device_start()
 {
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<1, -1, ENDIANNESS_LITTLE>();
-	m_data = &space(AS_DATA);
-	m_io = &space(AS_IO);
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
+	space(AS_DATA).specific(m_data);
+	space(AS_IO).specific(m_io);
 
 	/* ensure the internal ram pointers are set before get_info is called */
 	update_internalram_ptr();

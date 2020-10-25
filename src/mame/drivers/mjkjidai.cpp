@@ -32,7 +32,7 @@ TODO:
 #include "speaker.h"
 
 
-WRITE8_MEMBER(mjkjidai_state::adpcm_w)
+void mjkjidai_state::adpcm_w(uint8_t data)
 {
 	m_adpcm_pos = (data & 0x07) * 0x1000 * 2;
 	m_adpcm_end = m_adpcm_pos + 0x1000 * 2;
@@ -69,12 +69,12 @@ CUSTOM_INPUT_MEMBER(mjkjidai_state::keyboard_r)
 	return res;
 }
 
-WRITE8_MEMBER(mjkjidai_state::keyboard_select_lo_w)
+void mjkjidai_state::keyboard_select_lo_w(uint8_t data)
 {
 	m_keyb = (m_keyb & 0xff00) | (data);
 }
 
-WRITE8_MEMBER(mjkjidai_state::keyboard_select_hi_w)
+void mjkjidai_state::keyboard_select_hi_w(uint8_t data)
 {
 	m_keyb = (m_keyb & 0x00ff) | (data << 8);
 }

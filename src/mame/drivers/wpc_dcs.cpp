@@ -25,7 +25,7 @@ public:
 		, nvram(*this, "nvram")
 		, lamp(*this, "lamp")
 		, out(*this, "out")
-		, swarray(*this, "SW.%u", 0)
+		, swarray(*this, "SW.%u", 0U)
 	{ }
 
 	void wpc_dcs(machine_config &config);
@@ -39,18 +39,18 @@ public:
 	void init_afv();
 
 private:
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_WRITE8_MEMBER(watchdog_w);
-	DECLARE_WRITE8_MEMBER(irq_ack_w);
-	DECLARE_READ8_MEMBER(firq_src_r);
-	DECLARE_READ8_MEMBER(zc_r);
-	DECLARE_READ8_MEMBER(dcs_data_r);
-	DECLARE_WRITE8_MEMBER(dcs_data_w);
-	DECLARE_READ8_MEMBER(dcs_ctrl_r);
-	DECLARE_WRITE8_MEMBER(dcs_reset_w);
-	DECLARE_READ8_MEMBER(rtc_r);
-	DECLARE_READ8_MEMBER(switches_r);
-	DECLARE_WRITE8_MEMBER(switches_w);
+	void bank_w(uint8_t data);
+	void watchdog_w(uint8_t data);
+	void irq_ack_w(uint8_t data);
+	uint8_t firq_src_r();
+	uint8_t zc_r();
+	uint8_t dcs_data_r();
+	void dcs_data_w(uint8_t data);
+	uint8_t dcs_ctrl_r();
+	void dcs_reset_w(uint8_t data);
+	uint8_t rtc_r(offs_t offset);
+	uint8_t switches_r();
+	void switches_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(scanline_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(zc_timer);
@@ -113,28 +113,28 @@ void wpc_dcs_state::wpc_dcs_map(address_map &map)
 	map(0x8000, 0xffff).rom().region("maincpu", 0x78000);
 }
 
-READ8_MEMBER(wpc_dcs_state::dcs_data_r)
+uint8_t wpc_dcs_state::dcs_data_r()
 {
 	return dcs->data_r();
 }
 
-WRITE8_MEMBER(wpc_dcs_state::dcs_data_w)
+void wpc_dcs_state::dcs_data_w(uint8_t data)
 {
 	dcs->data_w(data);
 }
 
-READ8_MEMBER(wpc_dcs_state::dcs_ctrl_r)
+uint8_t wpc_dcs_state::dcs_ctrl_r()
 {
 	return dcs->control_r();
 }
 
-WRITE8_MEMBER(wpc_dcs_state::dcs_reset_w)
+void wpc_dcs_state::dcs_reset_w(uint8_t data)
 {
 	dcs->reset_w(0);
 	dcs->reset_w(1);
 }
 
-READ8_MEMBER(wpc_dcs_state::switches_r)
+uint8_t wpc_dcs_state::switches_r()
 {
 	uint8_t res = 0xff;
 	for(int i=0; i<8; i++)
@@ -143,12 +143,12 @@ READ8_MEMBER(wpc_dcs_state::switches_r)
 	return res;
 }
 
-WRITE8_MEMBER(wpc_dcs_state::switches_w)
+void wpc_dcs_state::switches_w(uint8_t data)
 {
 	switch_col = data;
 }
 
-READ8_MEMBER(wpc_dcs_state::rtc_r)
+uint8_t wpc_dcs_state::rtc_r(offs_t offset)
 {
 	system_time systime;
 	machine().base_datetime(systime);
@@ -170,12 +170,12 @@ READ8_MEMBER(wpc_dcs_state::rtc_r)
 	}
 }
 
-READ8_MEMBER(wpc_dcs_state::firq_src_r)
+uint8_t wpc_dcs_state::firq_src_r()
 {
 	return firq_src;
 }
 
-READ8_MEMBER(wpc_dcs_state::zc_r)
+uint8_t wpc_dcs_state::zc_r()
 {
 	uint8_t res = zc;
 	zc &= 0x7f;
@@ -187,12 +187,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(wpc_dcs_state::zc_timer)
 	zc |= 0x80;
 }
 
-WRITE8_MEMBER(wpc_dcs_state::bank_w)
+void wpc_dcs_state::bank_w(uint8_t data)
 {
 	rombank->set_entry(data & 0x1f);
 }
 
-WRITE8_MEMBER(wpc_dcs_state::watchdog_w)
+void wpc_dcs_state::watchdog_w(uint8_t data)
 {
 	// Mhhh?  Maybe it's not 3ff3, maybe it's going down by itself...
 	maincpu->set_input_line(0, CLEAR_LINE);
@@ -204,7 +204,7 @@ WRITE_LINE_MEMBER(wpc_dcs_state::scanline_irq)
 	maincpu->set_input_line(1, state);
 }
 
-WRITE8_MEMBER(wpc_dcs_state::irq_ack_w)
+void wpc_dcs_state::irq_ack_w(uint8_t data)
 {
 	maincpu->set_input_line(0, CLEAR_LINE);
 	maincpu->set_input_line(1, CLEAR_LINE);

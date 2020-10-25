@@ -266,7 +266,7 @@ void pgm_arm_type3_state::svg_latch_init()
 	save_item(NAME(m_svg_latchdata_arm_w));
 }
 
-READ32_MEMBER(pgm_arm_type3_state::theglad_speedup_r )
+u32 pgm_arm_type3_state::theglad_speedup_r()
 {
 	const int pc = m_prot->pc();
 	if (pc == 0x7c4) m_prot->eat_cycles(500);
@@ -275,7 +275,7 @@ READ32_MEMBER(pgm_arm_type3_state::theglad_speedup_r )
 }
 
 
-READ32_MEMBER(pgm_arm_type3_state::happy6_speedup_r )
+u32 pgm_arm_type3_state::happy6_speedup_r()
 {
 	const int pc = m_prot->pc();
 	if (pc == 0x0a08) m_prot->eat_cycles(500);
@@ -284,14 +284,14 @@ READ32_MEMBER(pgm_arm_type3_state::happy6_speedup_r )
 }
 
 // installed over rom
-READ32_MEMBER(pgm_arm_type3_state::svg_speedup_r )
+u32 pgm_arm_type3_state::svg_speedup_r()
 {
 	const int pc = m_prot->pc();
 	if (pc == 0xb90) m_prot->eat_cycles(500);
 	return m_armrom[0xb90/4];
 }
 
-READ32_MEMBER(pgm_arm_type3_state::svgpcb_speedup_r )
+u32 pgm_arm_type3_state::svgpcb_speedup_r()
 {
 	const int pc = m_prot->pc();
 	if (pc == 0x9e0) m_prot->eat_cycles(500);
@@ -530,7 +530,7 @@ void pgm_arm_type3_state::init_theglad()
 	pgm_create_dummy_internal_arm_region_theglad(0);
 
 
-	m_prot->space(AS_PROGRAM).install_read_handler(0x1000000c, 0x1000000f, read32_delegate(*this, FUNC(pgm_arm_type3_state::theglad_speedup_r)));
+	m_prot->space(AS_PROGRAM).install_read_handler(0x1000000c, 0x1000000f, read32smo_delegate(*this, FUNC(pgm_arm_type3_state::theglad_speedup_r)));
 }
 
 
@@ -664,7 +664,7 @@ void pgm_arm_type3_state::init_svg()
 	svg_latch_init();
 	pgm_create_dummy_internal_arm_region_theglad(1);
 	m_armrom = (u32 *)memregion("prot")->base();
-	m_prot->space(AS_PROGRAM).install_read_handler(0xB90, 0xB93, read32_delegate(*this, FUNC(pgm_arm_type3_state::svg_speedup_r)));
+	m_prot->space(AS_PROGRAM).install_read_handler(0xB90, 0xB93, read32smo_delegate(*this, FUNC(pgm_arm_type3_state::svg_speedup_r)));
 }
 
 void pgm_arm_type3_state::init_svgpcb()
@@ -674,11 +674,11 @@ void pgm_arm_type3_state::init_svgpcb()
 	svg_latch_init();
 	pgm_create_dummy_internal_arm_region_theglad(0);
 	m_armrom = (u32 *)memregion("prot")->base();
-	m_prot->space(AS_PROGRAM).install_read_handler(0x9e0, 0x9e3, read32_delegate(*this, FUNC(pgm_arm_type3_state::svgpcb_speedup_r)));
+	m_prot->space(AS_PROGRAM).install_read_handler(0x9e0, 0x9e3, read32smo_delegate(*this, FUNC(pgm_arm_type3_state::svgpcb_speedup_r)));
 }
 
 
-READ32_MEMBER(pgm_arm_type3_state::killbldp_speedup_r )
+u32 pgm_arm_type3_state::killbldp_speedup_r()
 {
 	const int pc = m_prot->pc();
 	if (pc == 0x7d8) m_prot->eat_cycles(500);
@@ -692,7 +692,7 @@ void pgm_arm_type3_state::init_killbldp()
 	pgm_killbldp_decrypt(machine());
 	svg_latch_init();
 
-	m_prot->space(AS_PROGRAM).install_read_handler(0x1000000c, 0x1000000f, read32_delegate(*this, FUNC(pgm_arm_type3_state::killbldp_speedup_r)));
+	m_prot->space(AS_PROGRAM).install_read_handler(0x1000000c, 0x1000000f, read32smo_delegate(*this, FUNC(pgm_arm_type3_state::killbldp_speedup_r)));
 
 //  u16 *temp16 = (u16 *)memregion("prot")->base();
 //  int base = 0xfc; // startup table uploads
@@ -709,7 +709,7 @@ void pgm_arm_type3_state::init_killbldp()
 
 }
 
-READ32_MEMBER(pgm_arm_type3_state::dmnfrnt_speedup_r )
+u32 pgm_arm_type3_state::dmnfrnt_speedup_r()
 {
 	const int pc = m_prot->pc();
 	if (pc == 0x8000fea) m_prot->eat_cycles(500);
@@ -717,7 +717,7 @@ READ32_MEMBER(pgm_arm_type3_state::dmnfrnt_speedup_r )
 	return m_arm_ram[0x000444/4];
 }
 
-READ16_MEMBER(pgm_arm_type3_state::dmnfrnt_main_speedup_r )
+u16 pgm_arm_type3_state::dmnfrnt_main_speedup_r()
 {
 	u16 data = m_mainram[0xa03c/2];
 	const int pc = m_maincpu->pc();
@@ -735,8 +735,8 @@ void pgm_arm_type3_state::init_dmnfrnt()
 	/* put some fake code for the ARM here ... */
 	pgm_create_dummy_internal_arm_region(0x4000);
 
-	m_prot->space(AS_PROGRAM).install_read_handler(0x18000444, 0x18000447, read32_delegate(*this, FUNC(pgm_arm_type3_state::dmnfrnt_speedup_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80a03c, 0x80a03d, read16_delegate(*this, FUNC(pgm_arm_type3_state::dmnfrnt_main_speedup_r)));
+	m_prot->space(AS_PROGRAM).install_read_handler(0x18000444, 0x18000447, read32smo_delegate(*this, FUNC(pgm_arm_type3_state::dmnfrnt_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80a03c, 0x80a03d, read16smo_delegate(*this, FUNC(pgm_arm_type3_state::dmnfrnt_main_speedup_r)));
 
 	m_svg_ram_sel = 1;
 
@@ -844,5 +844,5 @@ void pgm_arm_type3_state::init_happy6()
 	svg_latch_init();
 	pgm_create_dummy_internal_arm_region_theglad(0);
 
-	m_prot->space(AS_PROGRAM).install_read_handler(0x1000000c, 0x1000000f, read32_delegate(*this, FUNC(pgm_arm_type3_state::happy6_speedup_r)));
+	m_prot->space(AS_PROGRAM).install_read_handler(0x1000000c, 0x1000000f, read32smo_delegate(*this, FUNC(pgm_arm_type3_state::happy6_speedup_r)));
 }

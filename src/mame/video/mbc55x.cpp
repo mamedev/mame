@@ -95,21 +95,12 @@ void mbc55x_state::video_debug(int ref, const std::vector<std::string> &params)
 
 MC6845_UPDATE_ROW( mbc55x_state::crtc_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
-	uint8_t   *ram    = &m_ram->pointer()[0];
-	uint8_t   *red    = &m_video_mem[RED_PLANE_OFFSET];
-	uint8_t   *blue   = &m_video_mem[BLUE_PLANE_OFFSET];
-	uint8_t   *green;
-	int     offset;
-	uint8_t   rpx,gpx,bpx;
-	uint8_t   rb,gb,bb;
-
-	int     x_pos;
-	int     pixelno;
-	uint8_t   bitno;
-	uint8_t   shifts;
-	uint8_t   colour;
+	uint8_t const *const ram = &m_ram->pointer()[0];
+	uint8_t const *const red = &m_video_mem[RED_PLANE_OFFSET];
+	uint8_t const *const blue = &m_video_mem[BLUE_PLANE_OFFSET];
+	uint8_t const *green;
 
 	switch(m_vram_page)
 	{
@@ -124,30 +115,30 @@ MC6845_UPDATE_ROW( mbc55x_state::crtc_update_row )
 	if(DEBUG_SET(DEBUG_LINES))
 		logerror("MC6845_UPDATE_ROW: ma=%d, ra=%d, y=%d, x_count=%d\n",ma,ra,y,x_count);
 
-	offset=((ma*4) + ra) % COLOUR_PLANE_SIZE;
+	int offset=((ma*4) + ra) % COLOUR_PLANE_SIZE;
 
 	if(DEBUG_SET(DEBUG_LINES))
 		logerror("offset=%05X\n",offset);
 
-	for(x_pos=0; x_pos<x_count; x_pos++)
+	for(int x_pos=0; x_pos<x_count; x_pos++)
 	{
 		uint16_t mem = (offset+(x_pos*4)) % COLOUR_PLANE_SIZE;
-		rpx=red[mem];
-		gpx=green[mem];
-		bpx=blue[mem];
+		uint8_t rpx=red[mem];
+		uint8_t gpx=green[mem];
+		uint8_t bpx=blue[mem];
 
-		bitno=0x80;
-		shifts=7;
+		uint8_t bitno=0x80;
+		uint8_t shifts=7;
 
-		for(pixelno=0; pixelno<8; pixelno++)
+		for(int pixelno=0; pixelno<8; pixelno++)
 		{
-			rb=(rpx & bitno) >> shifts;
-			gb=(gpx & bitno) >> shifts;
-			bb=(bpx & bitno) >> shifts;
+			uint8_t rb=(rpx & bitno) >> shifts;
+			uint8_t gb=(gpx & bitno) >> shifts;
+			uint8_t bb=(bpx & bitno) >> shifts;
 
-			colour=(rb<<2) | (gb<<1) | (bb<<0);
+			uint8_t colour=(rb<<2) | (gb<<1) | (bb<<0);
 
-			bitmap.pix32(y, (x_pos*8)+pixelno)=palette[colour];
+			bitmap.pix(y, (x_pos*8)+pixelno)=palette[colour];
 			//logerror("set pixel (%d,%d)=%d\n",y, ((x_pos*8)+pixelno),colour);
 			bitno=bitno>>1;
 			shifts--;

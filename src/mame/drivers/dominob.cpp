@@ -101,8 +101,8 @@ private:
 	//uint8_t m_paddle_select;
 	//uint8_t m_paddle_value;
 
-	DECLARE_WRITE8_MEMBER(dominob_d008_w);
-	DECLARE_READ8_MEMBER(dominob_unk_port02_r);
+	void dominob_d008_w(uint8_t data);
+	uint8_t dominob_unk_port02_r();
 	uint32_t screen_update_dominob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void memmap(address_map &map);
@@ -182,7 +182,7 @@ uint32_t dominob_state::screen_update_dominob(screen_device &screen, bitmap_ind1
 }
 
 
-WRITE8_MEMBER(dominob_state::dominob_d008_w)
+void dominob_state::dominob_d008_w(uint8_t data)
 {
 	/* is there a purpose on this ? always set to 0x00 (read from 0xc47b in RAM) */
 }
@@ -209,7 +209,7 @@ void dominob_state::memmap(address_map &map)
 }
 
 /* I don't know if this has a purpose - also read in 'arkatayt' but not handled */
-READ8_MEMBER(dominob_state::dominob_unk_port02_r)
+uint8_t dominob_state::dominob_unk_port02_r()
 {
 	return 0xff;
 }

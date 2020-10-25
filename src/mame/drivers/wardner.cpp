@@ -158,7 +158,7 @@ protected:
 private:
 	required_device<address_map_bank_device> m_membank;
 
-	DECLARE_WRITE8_MEMBER(wardner_bank_w);
+	void wardner_bank_w(uint8_t data);
 
 	void dsp_io_map(address_map &map);
 	void dsp_program_map(address_map &map);
@@ -172,7 +172,7 @@ private:
 
 /***************************** Z80 Main Memory Map **************************/
 
-WRITE8_MEMBER(wardner_state::wardner_bank_w)
+void wardner_state::wardner_bank_w(uint8_t data)
 {
 	m_membank->set_bank(data & 7);
 }

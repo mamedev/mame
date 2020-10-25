@@ -26,7 +26,8 @@ Known modules (*denotes undumped):
 - CB9: Challenger Book Openings 1 - 8KB (label not known)
 - CB16: Challenger Book Openings 2 - 8+8KB 101-1042A01,02
 - *CG64: 64 Greatest Games
-- *EOA-EOE: Challenger Book Openings - Chess Encyclopedia A-E (5 modules)
+- *EOA-EOE: Challenger Book Openings: Chess Encyclopedia Volume A-E (5 modules)
+- *TDF: Challenger Book Openings: Tarrasch Defense to the Queen's Gambit
 
 The edge connector has D0-D7, A0-A13, 2 chip select lines, read/write lines, IRQ line.
 IRQ and write strobe are unused. Maximum known size is 16KB.
@@ -38,7 +39,6 @@ IRQ and write strobe are unused. Maximum known size is 16KB.
 #include "machine/sensorboard.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/pwm.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
@@ -95,10 +95,10 @@ protected:
 
 	// I/O handlers
 	void update_display();
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE8_MEMBER(led_w);
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_READ8_MEMBER(input_d7_r);
+	void control_w(u8 data);
+	void led_w(offs_t offset, u8 data);
+	u8 input_r();
+	u8 input_d7_r(offs_t offset);
 
 	u8 m_inp_mux;
 	u8 m_led_data;
@@ -156,7 +156,7 @@ void sc9_state::update_display()
 	m_display->matrix(1 << m_inp_mux, m_led_data);
 }
 
-WRITE8_MEMBER(sc9_state::control_w)
+void sc9_state::control_w(u8 data)
 {
 	// d0-d3: 74245 P0-P3
 	// 74245 Q0-Q8: input mux, led select
@@ -170,14 +170,14 @@ WRITE8_MEMBER(sc9_state::control_w)
 	// d6,d7: N/C
 }
 
-WRITE8_MEMBER(sc9_state::led_w)
+void sc9_state::led_w(offs_t offset, u8 data)
 {
 	// a0-a2,d0: led data via NE591N
 	m_led_data = (m_led_data & ~(1 << offset)) | ((data & 1) << offset);
 	update_display();
 }
 
-READ8_MEMBER(sc9_state::input_r)
+u8 sc9_state::input_r()
 {
 	u8 data = 0;
 
@@ -193,10 +193,10 @@ READ8_MEMBER(sc9_state::input_r)
 	return ~data;
 }
 
-READ8_MEMBER(sc9_state::input_d7_r)
+u8 sc9_state::input_d7_r(offs_t offset)
 {
 	// a0-a2,d7: multiplexed inputs
-	return (input_r(space, 0) >> offset & 1) ? 0x80 : 0;
+	return (input_r() >> offset & 1) ? 0x80 : 0;
 }
 
 
@@ -278,7 +278,6 @@ void sc9_state::sc9d(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "fidel_scc");

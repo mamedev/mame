@@ -31,17 +31,17 @@ void kof2k3bl_prot_device::device_reset()
 
 /* The King of Fighters 2003 (bootleg set 1) */
 
-READ16_MEMBER( kof2k3bl_prot_device::protection_r)
+uint16_t kof2k3bl_prot_device::protection_r(offs_t offset)
 {
 	return m_cartridge_ram[offset];
 }
 
-READ16_MEMBER(kof2k3bl_prot_device::overlay_r) // hack?
+uint16_t kof2k3bl_prot_device::overlay_r() // hack?
 {
 	return m_overlay;
 }
 
-WRITE16_MEMBER(kof2k3bl_prot_device::kof2003_w)
+void kof2k3bl_prot_device::kof2003_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(&m_cartridge_ram[offset]);
 	if (offset == 0x1ff0/2 || offset == 0x1ff2/2)
@@ -60,7 +60,7 @@ WRITE16_MEMBER(kof2k3bl_prot_device::kof2003_w)
 	}
 }
 
-WRITE16_MEMBER(kof2k3bl_prot_device::kof2003p_w)
+void kof2k3bl_prot_device::kof2003p_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(&m_cartridge_ram[offset]);
 	if (offset == 0x1ff0/2 || offset == 0x1ff2/2)

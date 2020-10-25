@@ -18,7 +18,7 @@ Ping Pong (c) 1985 Konami
 
 
 
-WRITE8_MEMBER(pingpong_state::cashquiz_question_bank_high_w)
+void pingpong_state::cashquiz_question_bank_high_w(uint8_t data)
 {
 	if( data != 0xff )
 	{
@@ -35,7 +35,7 @@ WRITE8_MEMBER(pingpong_state::cashquiz_question_bank_high_w)
 	}
 }
 
-WRITE8_MEMBER(pingpong_state::cashquiz_question_bank_low_w)
+void pingpong_state::cashquiz_question_bank_low_w(uint8_t data)
 {
 	if(data >= 0x60 && data <= 0xdf)
 	{
@@ -49,7 +49,7 @@ WRITE8_MEMBER(pingpong_state::cashquiz_question_bank_low_w)
 }
 
 
-WRITE8_MEMBER(pingpong_state::coin_w)
+void pingpong_state::coin_w(uint8_t data)
 {
 	/* bit 2 = irq enable, bit 3 = nmi enable */
 	m_intenable = data & 0x0c;
@@ -582,8 +582,8 @@ void pingpong_state::init_cashquiz()
 		ROM[i] = bitswap<8>(ROM[i],0,1,2,3,4,5,6,7);
 
 	/* questions banking handlers */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4000, 0x4000, write8_delegate(*this, FUNC(pingpong_state::cashquiz_question_bank_high_w)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4001, 0x4001, write8_delegate(*this, FUNC(pingpong_state::cashquiz_question_bank_low_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4000, 0x4000, write8smo_delegate(*this, FUNC(pingpong_state::cashquiz_question_bank_high_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4001, 0x4001, write8smo_delegate(*this, FUNC(pingpong_state::cashquiz_question_bank_low_w)));
 
 	// 8 independents banks for questions
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0x5000, 0x50ff, "bank1");

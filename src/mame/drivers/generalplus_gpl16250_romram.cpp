@@ -1,15 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 /*
-	GPL16250 / GPAC800 / GMC384 / GCM420 related support
+    GPL16250 / GPAC800 / GMC384 / GCM420 related support
 
-	GPL16250 is the GeneralPlus / SunPlus part number
-	GPAC800 is the JAKKS Pacific codename
-	GMC384 / GCM420 is what is printed on the die
+    GPL16250 is the GeneralPlus / SunPlus part number
+    GPAC800 is the JAKKS Pacific codename
+    GMC384 / GCM420 is what is printed on the die
 
-	----
+    ----
 
-	GPL16250 games using ROM + RAM configuration
+    GPL16250 games using ROM + RAM configuration
 */
 
 #include "emu.h"
@@ -191,25 +191,114 @@ static INPUT_PORTS_START( paccon ) // for Test Mode hold buttons 1+2 until the s
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( jak_ths )
+	PORT_START("IN0")
+	PORT_DIPNAME( 0x0001, 0x0001, "IN0" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("A")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("B")
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON3 )
 
+	PORT_START("IN1")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-READ16_MEMBER(wrlshunt_game_state::cs0_r)
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x0001, 0x0001, "IN2" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
+uint16_t wrlshunt_game_state::cs0_r(offs_t offset)
 {
 	return m_romregion[offset & m_romwords_mask];
 }
 
-WRITE16_MEMBER(wrlshunt_game_state::cs0_w)
+void wrlshunt_game_state::cs0_w(offs_t offset, uint16_t data)
 {
 	logerror("cs0_w write to ROM?\n");
 	//m_romregion[offset & 0x3ffffff] = data;
 }
 
-READ16_MEMBER(wrlshunt_game_state::cs1_r)
+uint16_t wrlshunt_game_state::cs1_r(offs_t offset)
 {
 	return m_sdram[offset & 0x3fffff];
 }
 
-WRITE16_MEMBER(wrlshunt_game_state::cs1_w)
+void wrlshunt_game_state::cs1_w(offs_t offset, uint16_t data)
 {
 	m_sdram[offset & 0x3fffff] = data;
 }
@@ -227,7 +316,7 @@ void wrlshunt_game_state::machine_reset()
 	m_maincpu->set_cs_space(m_memory->get_program());
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
 
-	m_maincpu->set_paldisplaybank_high_hack(1);
+	//m_maincpu->set_paldisplaybank_high_hack(1);
 	m_maincpu->set_alt_tile_addressing_hack(1);
 }
 
@@ -241,26 +330,19 @@ void wrlshunt_game_state::init_ths()
 	m_sdram.resize(0x400000); // 0x400000 words, 0x800000 bytes (verify)
 }
 
-void wrlshunt_game_state::wrlshunt(machine_config &config)
+void wrlshunt_game_state::gpl16250_romram(machine_config &config)
 {
 	gcm394_game_state::base(config);
 }
 
-void wrlshunt_game_state::paccon(machine_config &config)
-{
-	gcm394_game_state::base(config);
-
-	m_maincpu->set_clock(96000000); // needs to be somewhere in this region or the emulator running on the SunPlus is too slow
-}
-
-READ16_MEMBER(wrlshunt_game_state::porta_r)
+uint16_t wrlshunt_game_state::porta_r()
 {
 	uint16_t data = m_io[0]->read();
 	logerror("%s: Port A Read: %04x\n",  machine().describe_context(), data);
 	return data;
 }
 
-WRITE16_MEMBER(wrlshunt_game_state::porta_w)
+void wrlshunt_game_state::porta_w(uint16_t data)
 {
 	logerror("%s: Port A:WRITE %04x\n", machine().describe_context(), data);
 
@@ -273,7 +355,7 @@ WRITE16_MEMBER(wrlshunt_game_state::porta_w)
 
 
 
-READ16_MEMBER(jak_s500_game_state::porta_r)
+uint16_t jak_s500_game_state::porta_r()
 {
 	uint16_t data = m_io[0]->read();
 	logerror("%s: Port A Read: %04x\n", machine().describe_context(), data);
@@ -295,7 +377,7 @@ READ16_MEMBER(jak_s500_game_state::porta_r)
 	return data;
 }
 
-READ16_MEMBER(jak_s500_game_state::portb_r)
+uint16_t jak_s500_game_state::portb_r()
 {
 	uint16_t data = m_io[1]->read();
 	logerror("%s: Port B Read: %04x\n", machine().describe_context(), data);
@@ -309,13 +391,62 @@ void jak_s500_game_state::machine_reset()
 	m_maincpu->set_cs_space(m_memory->get_program());
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
 
-	m_maincpu->set_paldisplaybank_high_hack(0);
+	//m_maincpu->set_paldisplaybank_high_hack(0);
 	m_maincpu->set_alt_tile_addressing_hack(1);
 }
 
 
+void lazertag_game_state::machine_reset()
+{
+	jak_s500_game_state::machine_reset();
+	//m_maincpu->set_pal_sprites_hack(0x800);
+}
+
+void paccon_game_state::machine_reset()
+{
+	jak_s500_game_state::machine_reset();
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6593, 0x6593, read16smo_delegate(*this, FUNC(paccon_game_state::paccon_speedup_hack_r)));
+//  install_speedup_hack(0x6593, 0x30033);
+}
+
+void jak_pf_game_state::machine_reset()
+{
+	jak_s500_game_state::machine_reset();
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0001, 0x0001, read16smo_delegate(*this, FUNC(jak_pf_game_state::jak_pf_speedup_hack_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x13dd, 0x13dd, read16smo_delegate(*this, FUNC(jak_pf_game_state::jak_pf_speedup_hack2_r)));
+}
+
+void jak_prft_game_state::machine_reset()
+{
+	jak_s500_game_state::machine_reset();
+	//m_maincpu->set_alt_tile_addressing_hack(0);
+	m_maincpu->set_alt_extrasprite_hack(1);
+}
 
 
+uint16_t paccon_game_state::paccon_speedup_hack_r()
+{
+	u32 const pc = m_maincpu->pc();
+	if (pc == 0x30033)
+		m_maincpu->spin_until_time(m_maincpu->cycles_to_attotime(2000));
+	return m_maincpu->get_ram_addr(0x6593);
+}
+
+uint16_t jak_pf_game_state::jak_pf_speedup_hack_r()
+{
+	u32 const pc = m_maincpu->pc();
+	if (pc == 0x30010)
+		m_maincpu->spin_until_time(m_maincpu->cycles_to_attotime(2000));
+	return m_maincpu->get_ram_addr(0x0001);
+}
+
+uint16_t jak_pf_game_state::jak_pf_speedup_hack2_r()
+{
+	u32 const pc = m_maincpu->pc();
+	if (pc == 0x2611b4)
+		m_maincpu->spin_until_time(m_maincpu->cycles_to_attotime(2000));
+	return m_maincpu->get_ram_addr(0x13dd);
+}
 
 ROM_START( paccon )
 	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
@@ -482,18 +613,20 @@ which is also found in the Wireless Air 60 ROM.
 */
 
 
+
+
 // also sold as "Pac-Man Connect & Play 35th Anniversary" (same ROM?)
-CONS(2012, paccon, 0, 0, paccon, paccon, jak_s500_game_state, init_wrlshunt, "Bandai", "Pac-Man Connect & Play (Feb 14 2012 10:46:23)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2012, paccon,   0, 0, gpl16250_romram, paccon, paccon_game_state, init_wrlshunt, "Bandai", "Pac-Man Connect & Play (Feb 14 2012 10:46:23)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
-CONS(2008, lazertag, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "Tiger Electronics", "Lazer Tag Video Game Module", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2008, lazertag, 0, 0, gpl16250_romram, jak_s500, lazertag_game_state, init_wrlshunt, "Tiger Electronics", "Lazer Tag Video Game Module", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
-CONS(2009, jak_s500, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "SpongeBob SquarePants Bikini Bottom 500 (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2009, jak_smwm, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "Spider-Man Web Master (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2010, jak_pf,   0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "Phineas and Ferb: Best Game Ever! (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // build date is 2009, but onscreen display is 2010
-CONS(200?, jak_totm, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "Toy Story - Toys on the Move (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // Toys on the Move has ISSI 404A
-CONS(2009, jak_prft, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / Santa Cruz Games",    "Power Rangers Force In Time (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2009, jak_tink, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / Santa Cruz Games",    "Tinker Bell and the Lost Treasure (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2009, jak_ths,  0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_ths,      "JAKKS Pacific Inc / Super Happy Fun Fun", "Triple Header Sports (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2009, jak_s500, 0, 0, gpl16250_romram, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "SpongeBob SquarePants Bikini Bottom 500 (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2009, jak_smwm, 0, 0, gpl16250_romram, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "Spider-Man Web Master (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2010, jak_pf,   0, 0, gpl16250_romram, jak_s500, jak_pf_game_state,   init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "Phineas and Ferb: Best Game Ever! (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // build date is 2009, but onscreen display is 2010
+CONS(200?, jak_totm, 0, 0, gpl16250_romram, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "Toy Story - Toys on the Move (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // Toys on the Move has ISSI 404A
+CONS(2009, jak_prft, 0, 0, gpl16250_romram, jak_s500, jak_prft_game_state, init_wrlshunt, "JAKKS Pacific Inc / Santa Cruz Games",    "Power Rangers Force In Time (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2009, jak_tink, 0, 0, gpl16250_romram, jak_s500, jak_prft_game_state, init_wrlshunt, "JAKKS Pacific Inc / Santa Cruz Games",    "Tinker Bell and the Lost Treasure (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2009, jak_ths,  0, 0, gpl16250_romram, jak_ths,  jak_s500_game_state, init_ths,      "JAKKS Pacific Inc / Super Happy Fun Fun", "Triple Header Sports (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
-CONS(2011, wrlshunt, 0, 0, wrlshunt, wrlshunt, wrlshunt_game_state, init_wrlshunt, "Hamy / Kids Station Toys Inc", "Wireless Hunting Video Game System", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(2011, wrlshunt, 0, 0, gpl16250_romram, wrlshunt, wrlshunt_game_state, init_wrlshunt, "Hamy / Kids Station Toys Inc", "Wireless Hunting Video Game System", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 

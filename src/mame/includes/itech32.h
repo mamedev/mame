@@ -161,7 +161,7 @@ protected:
 	template<unsigned Layer> void color_w(u8 data);
 	void bloodstm_plane_w(u8 data);
 	void itech020_plane_w(u8 data);
-	DECLARE_WRITE16_MEMBER(bloodstm_paletteram_w);
+	void bloodstm_paletteram_w(offs_t offset, u16 data, u16 mem_mask = u16(~0));
 	void video_w(offs_t offset, u16 data, u16 mem_mask = u16(~0));
 	u16 video_r(offs_t offset);
 	void bloodstm_video_w(offs_t offset, u16 data, u16 mem_mask = u16(~0));
@@ -194,7 +194,7 @@ protected:
 	void draw_rle(u16 *base, u16 color);
 	virtual void shiftreg_clear(u16 *base, u16 *zbase);
 	void handle_video_command();
-	void update_interrupts(int vint, int xint, int qint);
+	virtual void update_interrupts(int vint, int xint, int qint);
 	void bloodstm_map(address_map &map);
 	void itech020_map(address_map &map);
 	void sound_020_map(address_map &map);
@@ -228,14 +228,14 @@ protected:
 	u16 steering_r();
 	u16 gas_r();
 
-	DECLARE_READ32_MEMBER(tms1_speedup_r);
-	DECLARE_READ32_MEMBER(tms2_speedup_r);
-	DECLARE_WRITE32_MEMBER(tms_reset_assert_w);
-	DECLARE_WRITE32_MEMBER(tms_reset_clear_w);
-	DECLARE_WRITE32_MEMBER(tms1_68k_ram_w);
-	DECLARE_WRITE32_MEMBER(tms2_68k_ram_w);
-	DECLARE_WRITE32_MEMBER(tms1_trigger_w);
-	DECLARE_WRITE32_MEMBER(tms2_trigger_w);
+	u32 tms1_speedup_r(address_space &space);
+	u32 tms2_speedup_r(address_space &space);
+	void tms_reset_assert_w(u32 data);
+	void tms_reset_clear_w(u32 data);
+	void tms1_68k_ram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void tms2_68k_ram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void tms1_trigger_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void tms2_trigger_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	void zbuf_control_w(offs_t offset, u32 data, u32 mem_mask = u32(~0));
 
@@ -263,6 +263,39 @@ protected:
 	required_ioport m_gas;
 
 	u8 m_tms_spinning[2];
+};
+
+class shoottv_state : public itech32_state
+{
+public:
+	shoottv_state(const machine_config &mconfig, device_type type, const char *tag) :
+		itech32_state(mconfig, type, tag),
+		m_buttons(*this, "P%u", 1U),
+		m_dips(*this, "DIPS"),
+		m_gun_x(*this, "GUNX%u", 1U),
+		m_gun_y(*this, "GUNY%u", 1U),
+		m_nvram_b(*this, "nvram_b", 0),
+		m_gun_timer(nullptr)
+	{ }
+
+	void shoottv(machine_config &config);
+
+private:
+	void driver_init() override;
+	void video_start() override;
+
+	void update_interrupts(int vint, int xint, int qint) override;
+
+	void shoottv_map(address_map &map);
+
+	TIMER_CALLBACK_MEMBER(gun_interrupt);
+
+	required_ioport_array<3> m_buttons;
+	required_ioport m_dips;
+	required_ioport_array<2> m_gun_x;
+	required_ioport_array<2> m_gun_y;
+	optional_shared_ptr<u16> m_nvram_b;
+	emu_timer *m_gun_timer;
 };
 
 #endif // MAME_INCLUDES_ITECH32_H

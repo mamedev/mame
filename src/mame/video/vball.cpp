@@ -56,13 +56,13 @@ void vball_state::video_start()
 	save_item(NAME(m_spprombank));
 }
 
-WRITE8_MEMBER(vball_state::videoram_w)
+void vball_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(vball_state::attrib_w)
+void vball_state::attrib_w(offs_t offset, uint8_t data)
 {
 	m_attribram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);

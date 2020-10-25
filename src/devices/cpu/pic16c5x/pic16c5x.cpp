@@ -130,9 +130,11 @@ pic16c5x_device::pic16c5x_device(const machine_config &mconfig, device_type type
 					   , ( ( program_width == 9 ) ? address_map_constructor(FUNC(pic16c5x_device::rom_9), this): ( ( program_width == 10 ) ? address_map_constructor(FUNC(pic16c5x_device::rom_10), this) : address_map_constructor(FUNC(pic16c5x_device::rom_11), this) )))
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, data_width, 0
 					, ( ( data_width == 5 ) ? address_map_constructor(FUNC(pic16c5x_device::ram_5), this) : address_map_constructor(FUNC(pic16c5x_device::ram_7), this) ) )
+	, m_internalram(nullptr)
 	, m_reset_vector((program_width == 9) ? 0x1ff : ((program_width == 10) ? 0x3ff : 0x7ff))
 	, m_picmodel(picmodel)
 	, m_temp_config(0)
+	, m_rtcc(0)
 	, m_picRAMmask((data_width == 5) ? 0x1f : 0x7f)
 	, m_read_a(*this)
 	, m_read_b(*this)
@@ -197,14 +199,14 @@ std::unique_ptr<util::disasm_interface> pic16c5x_device::create_disassembler()
 
 void pic16c5x_device::update_internalram_ptr()
 {
-	m_internalram = (uint8_t *)m_data->get_write_ptr(0x00);
+	m_internalram = (uint8_t *)space(AS_DATA).get_write_ptr(0x00);
 }
 
 
 
-#define PIC16C5x_RDOP(A)         (m_cache->read_word(A))
-#define PIC16C5x_RAM_RDMEM(A)    ((uint8_t)m_data->read_byte(A))
-#define PIC16C5x_RAM_WRMEM(A,V)  (m_data->write_byte(A,V))
+#define PIC16C5x_RDOP(A)         (m_program.read_word(A))
+#define PIC16C5x_RAM_RDMEM(A)    ((uint8_t)m_data.read_byte(A))
+#define PIC16C5x_RAM_WRMEM(A,V)  (m_data.write_byte(A,V))
 
 #define M_RDRAM(A)      (((A) < 9) ? m_internalram[A] : PIC16C5x_RAM_RDMEM(A))
 #define M_WRTRAM(A,V)   do { if ((A) < 9) m_internalram[A] = (V); else PIC16C5x_RAM_WRMEM(A,V); } while (0)
@@ -887,9 +889,8 @@ enum
 
 void pic16c5x_device::device_start()
 {
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<1, -1, ENDIANNESS_LITTLE>();
-	m_data = &space(AS_DATA);
+	space(AS_PROGRAM).cache(m_program);
+	space(AS_DATA).specific(m_data);
 
 	m_read_a.resolve_safe(0);
 	m_read_b.resolve_safe(0);

@@ -118,7 +118,7 @@ WRITE_LINE_MEMBER(nemesis_state::gfx_flipy_w)
 }
 
 
-WRITE16_MEMBER(nemesis_state::salamand_control_port_word_w)
+void nemesis_state::salamand_control_port_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -181,7 +181,7 @@ void nemesis_state::create_palette_lookups()
 }
 
 
-WRITE16_MEMBER(nemesis_state::nemesis_palette_word_w)
+void nemesis_state::nemesis_palette_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_paletteram + offset);
 	data = m_paletteram[offset];
@@ -193,32 +193,32 @@ WRITE16_MEMBER(nemesis_state::nemesis_palette_word_w)
 }
 
 
-WRITE16_MEMBER(nemesis_state::nemesis_videoram1_word_w)
+void nemesis_state::nemesis_videoram1_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_videoram1 + offset);
 	m_foreground->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(nemesis_state::nemesis_videoram2_word_w)
+void nemesis_state::nemesis_videoram2_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_videoram2 + offset);
 	m_background->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(nemesis_state::nemesis_colorram1_word_w)
+void nemesis_state::nemesis_colorram1_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_colorram1 + offset);
 	m_foreground->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(nemesis_state::nemesis_colorram2_word_w)
+void nemesis_state::nemesis_colorram2_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_colorram2 + offset);
 	m_background->mark_tile_dirty(offset);
 }
 
 
-WRITE16_MEMBER(nemesis_state::nemesis_charram_word_w)
+void nemesis_state::nemesis_charram_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t oldword = m_charram[offset];
 

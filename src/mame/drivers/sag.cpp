@@ -85,13 +85,13 @@ private:
 	u16 m_grid = 0;
 	u16 m_plate = 0;
 
-	DECLARE_WRITE8_MEMBER(hmcs40_write_r);
-	DECLARE_WRITE16_MEMBER(hmcs40_write_d);
-	DECLARE_READ16_MEMBER(hmcs40_read_d);
+	void hmcs40_write_r(offs_t offset, u8 data);
+	void hmcs40_write_d(u16 data);
+	u16 hmcs40_read_d();
 
-	DECLARE_WRITE16_MEMBER(tms1k_write_r);
-	DECLARE_WRITE16_MEMBER(tms1k_write_o);
-	DECLARE_READ8_MEMBER(tms1k_read_k);
+	void tms1k_write_r(u16 data);
+	void tms1k_write_o(u16 data);
+	u8 tms1k_read_k();
 };
 
 void sag_state::machine_start()
@@ -206,7 +206,7 @@ void sag_state::speaker_w(int state)
 
 // cartridge type 1: HD38800
 
-WRITE8_MEMBER(sag_state::hmcs40_write_r)
+void sag_state::hmcs40_write_r(offs_t offset, u8 data)
 {
 	// R0x-R3x: vfd plate
 	int shift = offset * 4;
@@ -214,7 +214,7 @@ WRITE8_MEMBER(sag_state::hmcs40_write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(sag_state::hmcs40_write_d)
+void sag_state::hmcs40_write_d(u16 data)
 {
 	// D0: speaker out
 	speaker_w(data & 1);
@@ -224,7 +224,7 @@ WRITE16_MEMBER(sag_state::hmcs40_write_d)
 	update_display();
 }
 
-READ16_MEMBER(sag_state::hmcs40_read_d)
+u16 sag_state::hmcs40_read_d()
 {
 	// D13-D15: multiplexed inputs
 	return input_r() << 13;
@@ -233,7 +233,7 @@ READ16_MEMBER(sag_state::hmcs40_read_d)
 
 // cartridge type 2: TMS1670
 
-WRITE16_MEMBER(sag_state::tms1k_write_r)
+void sag_state::tms1k_write_r(u16 data)
 {
 	// R0: speaker out
 	speaker_w(data & 1);
@@ -245,14 +245,14 @@ WRITE16_MEMBER(sag_state::tms1k_write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(sag_state::tms1k_write_o)
+void sag_state::tms1k_write_o(u16 data)
 {
 	// O0-O7: vfd plate 4-11
 	m_plate = (m_plate & 0xf) | data << 4;
 	update_display();
 }
 
-READ8_MEMBER(sag_state::tms1k_read_k)
+u8 sag_state::tms1k_read_k()
 {
 	// K1-K4: multiplexed inputs
 	return input_r();

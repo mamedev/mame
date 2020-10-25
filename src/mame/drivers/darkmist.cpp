@@ -38,7 +38,7 @@ void darkmist_state::machine_start()
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
-WRITE8_MEMBER(darkmist_state::hw_w)
+void darkmist_state::hw_w(uint8_t data)
 {
 	m_hw=data;
 	membank("bank1")->set_entry((data&0x80)?1:0);

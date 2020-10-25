@@ -152,22 +152,22 @@ device_memory_interface::space_config_vector isa16_device::memory_space_config()
 	};
 }
 
-READ8_MEMBER(isa8_device::mem_r)
+uint8_t isa8_device::mem_r(offs_t offset)
 {
 	return m_memspace->read_byte(offset);
 }
 
-WRITE8_MEMBER(isa8_device::mem_w)
+void isa8_device::mem_w(offs_t offset, uint8_t data)
 {
 	m_memspace->write_byte(offset, data);
 }
 
-READ8_MEMBER(isa8_device::io_r)
+uint8_t isa8_device::io_r(offs_t offset)
 {
 	return m_iospace->read_byte(offset);
 }
 
-WRITE8_MEMBER(isa8_device::io_w)
+void isa8_device::io_w(offs_t offset, uint8_t data)
 {
 	m_iospace->write_byte(offset, data);
 }
@@ -518,7 +518,7 @@ void isa16_device::device_start()
 	m_out_drq7_cb.resolve_safe();
 }
 
-void isa16_device::install16_device(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler)
+template<typename R, typename W> void isa16_device::install16_device(offs_t start, offs_t end, R rhandler, W whandler)
 {
 	int buswidth = m_iowidth;
 	switch(buswidth)
@@ -535,7 +535,7 @@ void isa16_device::install16_device(offs_t start, offs_t end, read16_delegate rh
 					m_iospace->install_readwrite_handler(start, end,   rhandler, whandler, 0xffffffff);
 				}
 			} else {
-				// we handle just misalligned by 2
+				// we handle just misaligned by 2
 				m_iospace->install_readwrite_handler(start-2, end, rhandler, whandler, 0xffff0000);
 			}
 
@@ -545,27 +545,32 @@ void isa16_device::install16_device(offs_t start, offs_t end, read16_delegate rh
 	}
 }
 
-READ16_MEMBER(isa16_device::mem16_r)
+template void isa16_device::install16_device<read16_delegate,    write16_delegate   >(offs_t start, offs_t end, read16_delegate rhandler,    write16_delegate whandler);
+template void isa16_device::install16_device<read16s_delegate,   write16s_delegate  >(offs_t start, offs_t end, read16s_delegate rhandler,   write16s_delegate whandler);
+template void isa16_device::install16_device<read16sm_delegate,  write16sm_delegate >(offs_t start, offs_t end, read16sm_delegate rhandler,  write16sm_delegate whandler);
+template void isa16_device::install16_device<read16smo_delegate, write16smo_delegate>(offs_t start, offs_t end, read16smo_delegate rhandler, write16smo_delegate whandler);
+
+uint16_t isa16_device::mem16_r(offs_t offset, uint16_t mem_mask)
 {
 	return m_memspace->read_word(offset<<1, mem_mask);
 }
 
-WRITE16_MEMBER(isa16_device::mem16_w)
+void isa16_device::mem16_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_memspace->write_word(offset<<1, data, mem_mask);
 }
 
-READ16_MEMBER(isa16_device::io16_r)
+uint16_t isa16_device::io16_r(offs_t offset, uint16_t mem_mask)
 {
 	return m_iospace->read_word(offset<<1, mem_mask);
 }
 
-WRITE16_MEMBER(isa16_device::io16_w)
+void isa16_device::io16_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_iospace->write_word(offset<<1, data, mem_mask);
 }
 
-READ16_MEMBER(isa16_device::mem16_swap_r)
+uint16_t isa16_device::mem16_swap_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t rv;
 	mem_mask = (mem_mask<<8) | (mem_mask>>8);
@@ -575,14 +580,14 @@ READ16_MEMBER(isa16_device::mem16_swap_r)
 	return (rv<<8) | (rv>>8);
 }
 
-WRITE16_MEMBER(isa16_device::mem16_swap_w)
+void isa16_device::mem16_swap_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	mem_mask = (mem_mask<<8) | (mem_mask>>8);
 	data = (data<<8) | (data>>8);
 	m_memspace->write_word(offset<<1, data, mem_mask);
 }
 
-READ16_MEMBER(isa16_device::io16_swap_r)
+uint16_t isa16_device::io16_swap_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t rv;
 	mem_mask = (mem_mask<<8) | (mem_mask>>8);
@@ -592,7 +597,7 @@ READ16_MEMBER(isa16_device::io16_swap_r)
 	return (rv<<8) | (rv>>8);
 }
 
-WRITE16_MEMBER(isa16_device::io16_swap_w)
+void isa16_device::io16_swap_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	mem_mask = (mem_mask<<8) | (mem_mask>>8);
 	data = (data<<8) | (data>>8);

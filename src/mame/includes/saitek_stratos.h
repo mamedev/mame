@@ -12,10 +12,7 @@
 
 #pragma once
 
-#include "machine/timer.h"
 #include "video/pwm.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
 
 #include <algorithm>
 
@@ -27,7 +24,6 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_display(*this, "display"),
-		m_extrom(*this, "extrom"),
 		m_out_digit(*this, "digit%u", 0U),
 		m_out_lcd(*this, "lcd%u.%u.%u", 0U, 0U, 0U)
 	{ }
@@ -44,7 +40,6 @@ protected:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<pwm_display_device> m_display;
-	required_device<generic_slot_device> m_extrom;
 	output_finder<8+1> m_out_digit;
 	output_finder<4, 16, 4> m_out_lcd;
 
@@ -53,8 +48,6 @@ protected:
 	void update_lcd();
 	void power_off();
 	void set_cpu_freq();
-
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(extrom_load);
 	void lcd_data_w(u8 data);
 
 	bool m_power;

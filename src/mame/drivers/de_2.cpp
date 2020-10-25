@@ -58,39 +58,39 @@ private:
 	void de_2_map(address_map &map);
 	void de_2_audio_map(address_map &map);
 
-	DECLARE_WRITE8_MEMBER(sample_w);
-	DECLARE_WRITE8_MEMBER(pia34_pa_w);
-	DECLARE_WRITE8_MEMBER(type2alpha3_pia34_pa_w);
-	DECLARE_WRITE8_MEMBER(alpha3_pia34_pa_w);
-	DECLARE_READ8_MEMBER(switch_r);
-	DECLARE_WRITE8_MEMBER(switch_w);
-	DECLARE_WRITE8_MEMBER(pia2c_pa_w);
-	DECLARE_WRITE8_MEMBER(pia2c_pb_w);
+	void sample_w(uint8_t data);
+	void pia34_pa_w(uint8_t data);
+	void type2alpha3_pia34_pa_w(uint8_t data);
+	void alpha3_pia34_pa_w(uint8_t data);
+	uint8_t switch_r();
+	void switch_w(uint8_t data);
+	void pia2c_pa_w(uint8_t data);
+	void pia2c_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { } // comma3&4
 	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { } // comma1&2
-	DECLARE_READ8_MEMBER(pia28_w7_r);
-	DECLARE_WRITE8_MEMBER(dig0_w);
-	DECLARE_WRITE8_MEMBER(dig1_w);
-	DECLARE_WRITE8_MEMBER(type2alpha3_dig1_w);
-	DECLARE_WRITE8_MEMBER(alpha3_dig1_w);
-	DECLARE_WRITE8_MEMBER(lamp0_w);
-	DECLARE_WRITE8_MEMBER(lamp1_w) { }
+	uint8_t pia28_w7_r();
+	void dig0_w(uint8_t data);
+	void dig1_w(uint8_t data);
+	void type2alpha3_dig1_w(uint8_t data);
+	void alpha3_dig1_w(uint8_t data);
+	void lamp0_w(uint8_t data);
+	void lamp1_w(uint8_t data) { }
 	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(msm5205_irq_w);
-	DECLARE_WRITE8_MEMBER(sol2_w) { } // solenoids 8-15
-	DECLARE_WRITE8_MEMBER(sol3_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
+	void sol2_w(uint8_t data) { } // solenoids 8-15
+	void sol3_w(uint8_t data);
+	void sound_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
 
-	DECLARE_READ8_MEMBER(sound_latch_r);
-	DECLARE_WRITE8_MEMBER(sample_bank_w);
+	uint8_t sound_latch_r();
+	void sample_bank_w(uint8_t data);
 
 	// devcb callbacks
-	DECLARE_READ8_MEMBER(display_r);
-	DECLARE_WRITE8_MEMBER(display_w);
-	DECLARE_WRITE8_MEMBER(type2alpha3_display_w);
-	DECLARE_WRITE8_MEMBER(type3_display_w);
-	DECLARE_WRITE8_MEMBER(lamps_w);
+	uint8_t display_r(offs_t offset);
+	void display_w(offs_t offset, uint8_t data);
+	void type2alpha3_display_w(offs_t offset, uint8_t data);
+	void type3_display_w(offs_t offset, uint8_t data);
+	void lamps_w(offs_t offset, uint8_t data);
 
 	// devices
 	required_device<ym2151_device> m_ym2151;
@@ -259,11 +259,11 @@ WRITE_LINE_MEMBER(de_2_state::msm5205_irq_w)
 }
 
 // 6821 PIA at 0x2100
-WRITE8_MEMBER( de_2_state::sol3_w )
+void de_2_state::sol3_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER( de_2_state::sound_w )
+void de_2_state::sound_w(uint8_t data)
 {
 	m_sound_data = data;
 	m_audiocpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
@@ -276,12 +276,12 @@ WRITE_LINE_MEMBER( de_2_state::pia21_ca2_w )
 }
 
 // 6821 PIA at 0x2400
-WRITE8_MEMBER( de_2_state::lamp0_w )
+void de_2_state::lamp0_w(uint8_t data)
 {
 }
 
 // 6821 PIA at 0x2800
-WRITE8_MEMBER( de_2_state::dig0_w )
+void de_2_state::dig0_w(uint8_t data)
 {
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7447
 	data &= 0x7f;
@@ -292,7 +292,7 @@ WRITE8_MEMBER( de_2_state::dig0_w )
 	m_segment2 = 0;
 }
 
-WRITE8_MEMBER( de_2_state::dig1_w )
+void de_2_state::dig1_w(uint8_t data)
 {
 	m_segment2 |= data;
 	m_segment2 |= 0x30000;
@@ -303,7 +303,7 @@ WRITE8_MEMBER( de_2_state::dig1_w )
 	}
 }
 
-WRITE8_MEMBER( de_2_state::type2alpha3_dig1_w )
+void de_2_state::type2alpha3_dig1_w(uint8_t data)
 {
 	m_segment2 |= data;
 	m_segment2 |= 0x20000;
@@ -314,7 +314,7 @@ WRITE8_MEMBER( de_2_state::type2alpha3_dig1_w )
 	}
 }
 
-WRITE8_MEMBER( de_2_state::alpha3_dig1_w )
+void de_2_state::alpha3_dig1_w(uint8_t data)
 {
 	m_segment2 |= data;
 	m_segment2 |= 0x20000;
@@ -325,7 +325,7 @@ WRITE8_MEMBER( de_2_state::alpha3_dig1_w )
 	}
 }
 
-READ8_MEMBER( de_2_state::pia28_w7_r )
+uint8_t de_2_state::pia28_w7_r()
 {
 	uint8_t ret = 0x80;
 
@@ -336,7 +336,7 @@ READ8_MEMBER( de_2_state::pia28_w7_r )
 }
 
 // 6821 PIA at 0x2c00
-WRITE8_MEMBER( de_2_state::pia2c_pa_w )
+void de_2_state::pia2c_pa_w(uint8_t data)
 {
 	m_segment1 |= (data<<8);
 	m_segment1 |= 0x10000;
@@ -347,7 +347,7 @@ WRITE8_MEMBER( de_2_state::pia2c_pa_w )
 	}
 }
 
-WRITE8_MEMBER( de_2_state::pia2c_pb_w )
+void de_2_state::pia2c_pb_w(uint8_t data)
 {
 	m_segment1 |= data;
 	m_segment1 |= 0x20000;
@@ -360,17 +360,16 @@ WRITE8_MEMBER( de_2_state::pia2c_pb_w )
 
 
 // 6821 PIA at 0x3000
-READ8_MEMBER( de_2_state::switch_r )
+uint8_t de_2_state::switch_r()
 {
 	char kbdrow[8];
 	sprintf(kbdrow,"INP%X",m_kbdrow);
 	return ~ioport(kbdrow)->read();
 }
 
-WRITE8_MEMBER( de_2_state::switch_w )
+void de_2_state::switch_w(uint8_t data)
 {
 	int x;
-
 	// about every second, 0xFF is written here, but it would be impossible to select more than one set of switches
 	// at once, so just return the first bit set.  Maybe 0xFF has special meaning, or is just a disable?
 	for(x=0;x<8;x++)
@@ -382,12 +381,12 @@ WRITE8_MEMBER( de_2_state::switch_w )
 }
 
 // 6821 PIA at 0x3400
-WRITE8_MEMBER( de_2_state::pia34_pa_w )
+void de_2_state::pia34_pa_w(uint8_t data)
 {
 	// Not connected on alphanumeric type 2 boards
 }
 
-WRITE8_MEMBER( de_2_state::type2alpha3_pia34_pa_w )
+void de_2_state::type2alpha3_pia34_pa_w(uint8_t data)
 {
 	m_segment2 |= (data<<8);
 	m_segment2 |= 0x10000;
@@ -398,7 +397,7 @@ WRITE8_MEMBER( de_2_state::type2alpha3_pia34_pa_w )
 	}
 }
 
-WRITE8_MEMBER( de_2_state::alpha3_pia34_pa_w )
+void de_2_state::alpha3_pia34_pa_w(uint8_t data)
 {
 	m_segment2 |= (data<<8);
 	m_segment2 |= 0x10000;
@@ -411,18 +410,18 @@ WRITE8_MEMBER( de_2_state::alpha3_pia34_pa_w )
 
 
 // Sound board
-WRITE8_MEMBER(de_2_state::sample_w)
+void de_2_state::sample_w(uint8_t data)
 {
 	m_sample_data = data;
 }
 
-READ8_MEMBER( de_2_state::sound_latch_r )
+uint8_t de_2_state::sound_latch_r()
 {
 	m_audiocpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 	return m_sound_data;
 }
 
-WRITE8_MEMBER( de_2_state::sample_bank_w )
+void de_2_state::sample_bank_w(uint8_t data)
 {
 	static constexpr uint8_t prescale[4] = { msm5205_device::S96_4B, msm5205_device::S48_4B, msm5205_device::S64_4B, 0 };
 
@@ -434,95 +433,95 @@ WRITE8_MEMBER( de_2_state::sample_bank_w )
 	m_msm5205->reset_w(data & 0x40);
 }
 
-READ8_MEMBER(de_2_state::display_r)
+uint8_t de_2_state::display_r(offs_t offset)
 {
 	uint8_t ret = 0x00;
 
 	switch(offset)
 	{
 	case 0:
-		ret = pia28_w7_r(space,0);
+		ret = pia28_w7_r();
 		break;
 	}
 
 	return ret;
 }
 
-WRITE8_MEMBER(de_2_state::display_w)
+void de_2_state::display_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
 	case 0:
-		dig0_w(space,0,data);
+		dig0_w(data);
 		break;
 	case 1:
-		dig1_w(space,0,data);
+		dig1_w(data);
 		break;
 	case 2:
-		pia2c_pa_w(space,0,data);
+		pia2c_pa_w(data);
 		break;
 	case 3:
-		pia2c_pb_w(space,0,data);
+		pia2c_pb_w(data);
 		break;
 	case 4:
-		pia34_pa_w(space,0,data);
+		pia34_pa_w(data);
 		break;
 	}
 }
 
-WRITE8_MEMBER(de_2_state::type2alpha3_display_w)
+void de_2_state::type2alpha3_display_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
 	case 0:
-		dig0_w(space,0,data);
+		dig0_w(data);
 		break;
 	case 1:
-		type2alpha3_dig1_w(space,0,data);
+		type2alpha3_dig1_w(data);
 		break;
 	case 2:
-		pia2c_pa_w(space,0,data);
+		pia2c_pa_w(data);
 		break;
 	case 3:
-		pia2c_pb_w(space,0,data);
+		pia2c_pb_w(data);
 		break;
 	case 4:
-		type2alpha3_pia34_pa_w(space,0,data);
+		type2alpha3_pia34_pa_w(data);
 		break;
 	}
 }
 
-WRITE8_MEMBER(de_2_state::type3_display_w)
+void de_2_state::type3_display_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
 	case 0:
-		dig0_w(space,0,data);
+		dig0_w(data);
 		break;
 	case 1:
-		alpha3_dig1_w(space,0,data);
+		alpha3_dig1_w(data);
 		break;
 	case 2:
-		pia2c_pa_w(space,0,data);
+		pia2c_pa_w(data);
 		break;
 	case 3:
-		pia2c_pb_w(space,0,data);
+		pia2c_pb_w(data);
 		break;
 	case 4:
-		alpha3_pia34_pa_w(space,0,data);
+		alpha3_pia34_pa_w(data);
 		break;
 	}
 }
 
-WRITE8_MEMBER(de_2_state::lamps_w)
+void de_2_state::lamps_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
 	case 0:
-		lamp0_w(space,0,data);
+		lamp0_w(data);
 		break;
 	case 1:
-		lamp1_w(space,0,data);
+		lamp1_w(data);
 		break;
 	}
 }

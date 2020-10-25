@@ -84,14 +84,14 @@ void gottlieb_state::laserdisc_video_control_w(u8 data)
  *
  *************************************/
 
-WRITE8_MEMBER(gottlieb_state::videoram_w)
+void gottlieb_state::videoram_w(offs_t offset, u8 data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(gottlieb_state::charram_w)
+void gottlieb_state::charram_w(offs_t offset, u8 data)
 {
 	if (m_charram[offset] != data)
 	{

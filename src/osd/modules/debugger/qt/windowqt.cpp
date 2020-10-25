@@ -12,6 +12,7 @@
 #include "deviceswindow.h"
 
 #include "debug/debugcpu.h"
+#include "debug/debugcon.h"
 
 bool WindowQt::s_refreshAll = false;
 bool WindowQt::s_hideAll = false;
@@ -179,49 +180,49 @@ void WindowQt::debugActOpenDevices()
 
 void WindowQt::debugActRun()
 {
-	m_machine->debugger().cpu().get_visible_cpu()->debug()->go();
+	m_machine->debugger().console().get_visible_cpu()->debug()->go();
 }
 
 void WindowQt::debugActRunAndHide()
 {
-	m_machine->debugger().cpu().get_visible_cpu()->debug()->go();
+	m_machine->debugger().console().get_visible_cpu()->debug()->go();
 	hideAll();
 }
 
 void WindowQt::debugActRunToNextCpu()
 {
-	m_machine->debugger().cpu().get_visible_cpu()->debug()->go_next_device();
+	m_machine->debugger().console().get_visible_cpu()->debug()->go_next_device();
 }
 
 void WindowQt::debugActRunNextInt()
 {
-	m_machine->debugger().cpu().get_visible_cpu()->debug()->go_interrupt();
+	m_machine->debugger().console().get_visible_cpu()->debug()->go_interrupt();
 }
 
 void WindowQt::debugActRunNextVBlank()
 {
-	m_machine->debugger().cpu().get_visible_cpu()->debug()->go_vblank();
+	m_machine->debugger().console().get_visible_cpu()->debug()->go_vblank();
 }
 
 void WindowQt::debugActStepInto()
 {
-	m_machine->debugger().cpu().get_visible_cpu()->debug()->single_step();
+	m_machine->debugger().console().get_visible_cpu()->debug()->single_step();
 }
 
 void WindowQt::debugActStepOver()
 {
-	m_machine->debugger().cpu().get_visible_cpu()->debug()->single_step_over();
+	m_machine->debugger().console().get_visible_cpu()->debug()->single_step_over();
 }
 
 void WindowQt::debugActStepOut()
 {
-	m_machine->debugger().cpu().get_visible_cpu()->debug()->single_step_out();
+	m_machine->debugger().console().get_visible_cpu()->debug()->single_step_out();
 }
 
 void WindowQt::debugActSoftReset()
 {
 	m_machine->schedule_soft_reset();
-	m_machine->debugger().cpu().get_visible_cpu()->debug()->single_step();
+	m_machine->debugger().console().get_visible_cpu()->debug()->single_step();
 }
 
 void WindowQt::debugActHardReset()

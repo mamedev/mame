@@ -107,8 +107,8 @@ void isa8_myb3k_com_device::device_reset()
 					write8sm_delegate(*m_usart, FUNC(i8251_device::write)));
 
 		m_isa->install_device(base + 2, base + 2,
-					read8_delegate(*this, FUNC(isa8_myb3k_com_device::dce_status)),
-					write8_delegate(*this, FUNC(isa8_myb3k_com_device::dce_control)));
+					read8smo_delegate(*this, FUNC(isa8_myb3k_com_device::dce_status)),
+					write8smo_delegate(*this, FUNC(isa8_myb3k_com_device::dce_control)));
 
 		m_isa->install_device(base + 4, base + 7,
 					read8sm_delegate(*subdevice<pit8253_device>("pit"), FUNC(pit8253_device::read)),
@@ -234,7 +234,7 @@ WRITE_LINE_MEMBER(isa8_myb3k_com_device::ri_w)
 // dce_control -
 //------------------------------------------------
 #define TX_IRQ_RESET_BIT 0x40
-WRITE8_MEMBER(isa8_myb3k_com_device::dce_control)
+void isa8_myb3k_com_device::dce_control(uint8_t data)
 {
 	m_control = data;
 	if (m_control & TX_IRQ_RESET_BIT)
@@ -247,7 +247,7 @@ WRITE8_MEMBER(isa8_myb3k_com_device::dce_control)
 //------------------------------------------------
 // dce_status - open LS368 gate and read status
 //------------------------------------------------
-READ8_MEMBER(isa8_myb3k_com_device::dce_status)
+uint8_t isa8_myb3k_com_device::dce_status()
 {
 	return m_status;
 }

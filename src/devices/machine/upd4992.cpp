@@ -38,6 +38,7 @@ upd4992_device::upd4992_device(const machine_config &mconfig, const char *tag, d
 	, device_rtc_interface(mconfig, *this)
 	, m_timer_clock(nullptr)
 {
+	std::fill(std::begin(m_rtc_regs), std::end(m_rtc_regs), 0);
 }
 
 

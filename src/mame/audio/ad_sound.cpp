@@ -79,7 +79,6 @@
 
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 
@@ -370,11 +369,6 @@ void ad_59mc07_device::device_add_mconfig(machine_config &config)
 
 	DAC_6BIT_R2R(config, m_dac_1, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
 	DAC_6BIT_R2R(config, m_dac_2, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
 
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(3);

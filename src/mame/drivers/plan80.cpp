@@ -2,24 +2,24 @@
 // copyright-holders:Miodrag Milanovic, Robbbert
 /***************************************************************************
 
-        Plan-80
+Plan-80
 
-        06/12/2009 Skeleton driver.
+2009-12-06 Skeleton driver.
 
-        Summary of Monitor commands:
+Summary of Monitor commands:
 
-        D - dump memory
-        F - fill memory
-        G - go (execute program at address)
-        I - in from a port and display
-        M - move?
-        O - out to a port
-        S - edit memory
+D - dump memory
+F - fill memory
+G - go (execute program at address)
+I - in from a port and display
+M - move?
+O - out to a port
+S - edit memory
 
-        ToDo:
-        - fix autorepeat on the keyboard
-        - Add missing devices
-        - Picture of unit shows graphics, possibly a PCG
+ToDo:
+- fix autorepeat on the keyboard
+- Add missing devices
+- Picture of unit shows graphics, possibly a PCG
 
 ****************************************************************************/
 
@@ -37,42 +37,38 @@ public:
 	plan80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_p_videoram(*this, "videoram")
+		, m_rom(*this, "maincpu")
+		, m_ram(*this, "mainram")
+		, m_vram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
 		, m_speaker(*this, "speaker")
 	{ }
 
 	void plan80(machine_config &config);
 
-	void init_plan80();
-
 private:
-	enum
-	{
-		TIMER_BOOT
-	};
-
-	DECLARE_READ8_MEMBER(port04_r);
-	DECLARE_WRITE8_MEMBER(port09_w);
-	DECLARE_WRITE8_MEMBER(port10_w);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	void plan80_io(address_map &map);
-	void plan80_mem(address_map &map);
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	uint8_t m_kbd_row;
+	u8 port04_r();
+	void port09_w(u8 data);
+	void port10_w(u8 data);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
+	u8 m_kbd_row;
 	bool m_spk_pol;
 	virtual void machine_reset() override;
+	virtual void machine_start() override;
+	memory_passthrough_handler *m_rom_shadow_tap;
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<uint8_t> m_p_videoram;
+	required_region_ptr<u8> m_rom;
+	required_shared_ptr<u8> m_ram;
+	required_shared_ptr<u8> m_vram;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<speaker_sound_device> m_speaker;
 };
 
-READ8_MEMBER( plan80_state::port04_r )
+u8 plan80_state::port04_r()
 {
-	uint8_t data = 0xff;
+	u8 data = 0xff;
 
 	if (m_kbd_row == 0xfe)
 		data = ioport("LINE0")->read();
@@ -92,28 +88,27 @@ READ8_MEMBER( plan80_state::port04_r )
 	return data;
 }
 
-WRITE8_MEMBER( plan80_state::port09_w )
+void plan80_state::port09_w(u8 data)
 {
 	m_kbd_row = data;
 }
 
-WRITE8_MEMBER( plan80_state::port10_w )
+void plan80_state::port10_w(u8 data)
 {
 	m_spk_pol ^= 1;
 	m_speaker->level_w(m_spk_pol);
 }
 
 
-void plan80_state::plan80_mem(address_map &map)
+void plan80_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x07ff).bankrw("boot");
-	map(0x0800, 0xefff).ram();
+	map(0x0000, 0xefff).ram().share("mainram");
 	map(0xf000, 0xf7ff).ram().share("videoram");
-	map(0xf800, 0xffff).rom();
+	map(0xf800, 0xffff).rom().region("maincpu", 0);
 }
 
-void plan80_state::plan80_io(address_map &map)
+void plan80_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
@@ -127,7 +122,7 @@ static INPUT_PORTS_START( plan80 ) // Keyboard was worked out by trial & error;'
 	PORT_START("LINE0") /* FE */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("??") PORT_CODE(KEYCODE_F1)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("??") PORT_CODE(KEYCODE_F2)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A -") PORT_CODE(KEYCODE_A) PORT_CHAR('A') PORT_CHAR('-')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Q ! 1") PORT_CODE(KEYCODE_Q) PORT_CHAR('Q') PORT_CHAR('!') PORT_CHAR('1')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F-shift") PORT_CODE(KEYCODE_RSHIFT)
@@ -135,7 +130,7 @@ static INPUT_PORTS_START( plan80 ) // Keyboard was worked out by trial & error;'
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P ?? 0") PORT_CODE(KEYCODE_P) PORT_CHAR('P') PORT_CHAR('0')
 	PORT_START("LINE1") /* FD */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Backspace") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Numbers") PORT_CODE(KEYCODE_LCONTROL)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Numbers") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("X /") PORT_CODE(KEYCODE_X) PORT_CHAR('X') PORT_CHAR('/')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D =") PORT_CODE(KEYCODE_D) PORT_CHAR('D') PORT_CHAR('=')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E # 3") PORT_CODE(KEYCODE_E) PORT_CHAR('E') PORT_CHAR('#') PORT_CHAR('3')
@@ -172,46 +167,46 @@ static INPUT_PORTS_START( plan80 ) // Keyboard was worked out by trial & error;'
 INPUT_PORTS_END
 
 
-void plan80_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch (id)
-	{
-	case TIMER_BOOT:
-		/* after the first 4 bytes have been read from ROM, switch the ram back in */
-		membank("boot")->set_entry(0);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in plan80_state::device_timer");
-	}
-}
-
 void plan80_state::machine_reset()
 {
-	membank("boot")->set_entry(1);
-	timer_set(attotime::from_usec(10), TIMER_BOOT);
-}
-
-void plan80_state::init_plan80()
-{
-	uint8_t *RAM = memregion("maincpu")->base();
-	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xf800);
-}
-
-uint32_t plan80_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	uint8_t y,ra,chr,gfx;
-	uint16_t sy=0,ma=0,x;
-
-	for (y = 0; y < 32; y++)
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	program.install_rom(0x0000, 0x07ff, m_rom);   // do it here for F3
+	m_rom_shadow_tap = program.install_read_tap(0xf800, 0xffff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
 	{
-		for (ra = 0; ra < 8; ra++)
+		if (!machine().side_effects_disabled())
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			// delete this tap
+			m_rom_shadow_tap->remove();
 
-			for (x = ma; x < ma+48; x++)
+			// reinstall ram over the rom shadow
+			m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x07ff, m_ram);
+		}
+
+		// return the original data
+		return data;
+	});
+}
+
+void plan80_state::machine_start()
+{
+	save_item(NAME(m_kbd_row));
+	save_item(NAME(m_spk_pol));
+}
+
+u32 plan80_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	u16 sy=0,ma=0;
+
+	for (u8 y = 0; y < 32; y++)
+	{
+		for (u8 ra = 0; ra < 8; ra++)
+		{
+			u16 *p = &bitmap.pix(sy++);
+
+			for (u16 x = ma; x < ma+48; x++)
 			{
-				chr = m_p_videoram[x];
-				gfx = m_p_chargen[(chr << 3) | ra] ^ (BIT(chr, 7) ? 0xff : 0);
+				u8 chr = m_vram[x];
+				u8 gfx = m_p_chargen[(chr << 3) | ra] ^ (BIT(chr, 7) ? 0xff : 0);
 
 				/* Display a scanline of a character */
 				*p++ = BIT(gfx, 6);
@@ -228,7 +223,7 @@ uint32_t plan80_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 }
 
 /* F4 Character Displayer */
-static const gfx_layout plan80_charlayout =
+static const gfx_layout charlayout =
 {
 	8, 8,                   /* 8 x 8 characters */
 	256,                    /* 256 characters */
@@ -242,7 +237,7 @@ static const gfx_layout plan80_charlayout =
 };
 
 static GFXDECODE_START( gfx_plan80 )
-	GFXDECODE_ENTRY( "chargen", 0x0000, plan80_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, charlayout, 0, 1 )
 GFXDECODE_END
 
 
@@ -250,8 +245,8 @@ void plan80_state::plan80(machine_config &config)
 {
 	/* basic machine hardware */
 	I8080(config, m_maincpu, 2048000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &plan80_state::plan80_mem);
-	m_maincpu->set_addrmap(AS_IO, &plan80_state::plan80_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &plan80_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &plan80_state::io_map);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
@@ -272,17 +267,18 @@ void plan80_state::plan80(machine_config &config)
 
 /* ROM definition */
 ROM_START( plan80 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "pl80mon.bin", 0xf800, 0x0800, CRC(433fb685) SHA1(43d53c35544d3a197ab71b6089328d104535cfa5))
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "pl80mon.bin", 0x0000, 0x0800, CRC(433fb685) SHA1(43d53c35544d3a197ab71b6089328d104535cfa5) )
 
-	ROM_REGION( 0x10000, "spare", 0 )
-	ROM_LOAD_OPTIONAL( "pl80mod.bin", 0xf000, 0x0800, CRC(6bdd7136) SHA1(721eab193c33c9330e0817616d3d2b601285fe50))
+	// This rom 2nd half is missing, so useless. It uses the videoram address range, so it might have been for some other system
+	//ROM_REGION( 0x10000, "spare", 0 )
+	//ROM_LOAD_OPTIONAL( "pl80mod.bin", 0xf000, 0x0800, CRC(6bdd7136) SHA1(721eab193c33c9330e0817616d3d2b601285fe50))
 
 	ROM_REGION( 0x0800, "chargen", 0 )
-	ROM_LOAD( "pl80gzn.bin", 0x0000, 0x0800, CRC(b4ddbdb6) SHA1(31bf9cf0f2ed53f48dda29ea830f74cea7b9b9b2))
+	ROM_LOAD( "pl80gzn.bin", 0x0000, 0x0800, CRC(b4ddbdb6) SHA1(31bf9cf0f2ed53f48dda29ea830f74cea7b9b9b2) )
 ROM_END
 
 /* Driver */
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY        FULLNAME   FLAGS
-COMP( 1988, plan80, 0,      0,      plan80,  plan80, plan80_state, init_plan80, "Tesla Eltos", "Plan-80", MACHINE_NOT_WORKING )
+COMP( 1988, plan80, 0,      0,      plan80,  plan80, plan80_state, empty_init, "Tesla Eltos", "Plan-80", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

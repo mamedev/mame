@@ -38,14 +38,14 @@ private:
 	required_device<isa8_device> m_isabus;
 	required_ioport_array<4> m_inp;
 
-	DECLARE_READ8_MEMBER(fruit_inp_r);
-	DECLARE_WRITE8_MEMBER(dma8237_1_dack_w);
+	uint8_t fruit_inp_r(offs_t offset);
+	void dma8237_1_dack_w(uint8_t data);
 	static void fruitpc_sb_conf(device_t *device);
 	void fruitpc_io(address_map &map);
 	void fruitpc_map(address_map &map);
 };
 
-READ8_MEMBER(fruitpc_state::fruit_inp_r)
+uint8_t fruitpc_state::fruit_inp_r(offs_t offset)
 {
 	return m_inp[offset & 0x03]->read();
 }
@@ -98,7 +98,7 @@ static INPUT_PORTS_START( fruitpc )
 INPUT_PORTS_END
 
 //TODO: use atmb device
-WRITE8_MEMBER( fruitpc_state::dma8237_1_dack_w ){ m_isabus->dack_w(1, data); }
+void fruitpc_state::dma8237_1_dack_w(uint8_t data) { m_isabus->dack_w(1, data); }
 
 static void fruitpc_isa8_cards(device_slot_interface &device)
 {

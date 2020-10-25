@@ -59,7 +59,11 @@ bgfx_texture* texture_manager::create_png_texture(std::string path, std::string 
 {
 	bitmap_argb32 bitmap;
 	emu_file file(path.c_str(), OPEN_FLAG_READ);
-	render_load_png(bitmap, file, nullptr, file_name.c_str());
+	if (file.open(file_name) == osd_file::error::NONE)
+	{
+		render_load_png(bitmap, file);
+		file.close();
+	}
 
 	if (bitmap.width() == 0 || bitmap.height() == 0)
 	{
@@ -118,7 +122,7 @@ bgfx::TextureHandle texture_manager::create_or_update_mame_texture(uint32_t form
 				{
 					bgfx::TextureFormat::Enum dst_format = bgfx::TextureFormat::BGRA8;
 					uint16_t pitch = width;
-					const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(dst_format, format, width, height, rowpixels, palette, base, &pitch);
+					const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(dst_format, format, rowpixels, height, palette, base, &pitch);
 					bgfx::updateTexture2D(handle, 0, 0, 0, 0, (uint16_t)width, (uint16_t)height, mem, pitch);
 					return handle;
 				}
@@ -146,7 +150,7 @@ bgfx::TextureHandle texture_manager::create_or_update_mame_texture(uint32_t form
 				{
 					bgfx::TextureFormat::Enum dst_format = bgfx::TextureFormat::BGRA8;
 					uint16_t pitch = width;
-					const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(dst_format, format, width, height, rowpixels, palette, base, &pitch);
+					const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(dst_format, format, rowpixels, height, palette, base, &pitch);
 					bgfx::updateTexture2D(handle, 0, 0, 0, 0, (uint16_t)width, (uint16_t)height, mem, pitch);
 					return handle;
 				}
@@ -157,7 +161,7 @@ bgfx::TextureHandle texture_manager::create_or_update_mame_texture(uint32_t form
 
 	bgfx::TextureFormat::Enum dst_format = bgfx::TextureFormat::BGRA8;
 	uint16_t pitch = width;
-	const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(dst_format, format, width, height, rowpixels, palette, base, &pitch);
+	const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(dst_format, format, rowpixels, height, palette, base, &pitch);
 	handle = bgfx::createTexture2D(width, height, false, 1, dst_format, flags, nullptr);
 	bgfx::updateTexture2D(handle, 0, 0, 0, 0, (uint16_t)width, (uint16_t)height, mem, pitch);
 

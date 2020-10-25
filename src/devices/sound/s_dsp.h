@@ -30,7 +30,7 @@ protected:
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	// device_memory_interface configuration
 	virtual space_config_vector memory_space_config() const override;
@@ -38,11 +38,11 @@ protected:
 	address_space_config m_data_config;
 
 private:
-	address_space                                *m_data;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
-	inline u8 read_byte(offs_t a) { return m_cache->read_byte(a); }
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
+	inline u8 read_byte(offs_t a) { return m_cache.read_byte(a); }
 	inline u16 read_word(offs_t a) { return read_byte(a) | (read_byte(a + 1) << 8); }
-	inline void write_byte(offs_t a, u8 d) { m_data->write_byte(a, d); }
+	inline void write_byte(offs_t a, u8 d) { m_data.write_byte(a, d); }
 	inline void write_word(offs_t a, u16 d) { write_byte(a, d & 0xff); write_byte(a + 1, (d >> 8) & 0xff); }
 
 	enum class env_state_t32 : u8

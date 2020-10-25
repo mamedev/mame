@@ -65,21 +65,21 @@ private:
 	void markham_slave_map(address_map &map);
 	void strnskil_slave_map(address_map &map);
 
-	DECLARE_WRITE8_MEMBER(coin_output_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
+	void coin_output_w(uint8_t data);
+	void flipscreen_w(uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
 
 	// markham specific
-	DECLARE_READ8_MEMBER(markham_e004_r);
+	uint8_t markham_e004_r();
 
 	// strnskil specific
-	DECLARE_READ8_MEMBER(strnskil_d800_r);
-	DECLARE_WRITE8_MEMBER(strnskil_master_output_w);
+	uint8_t strnskil_d800_r();
+	void strnskil_master_output_w(uint8_t data);
 
 	// protection comms for banbam/pettanp
-	DECLARE_READ8_MEMBER(banbam_protection_r);
-	DECLARE_WRITE8_MEMBER(banbam_protection_w);
-	DECLARE_WRITE8_MEMBER(mcu_reset_w);
+	uint8_t banbam_protection_r();
+	void banbam_protection_w(uint8_t data);
+	void mcu_reset_w(uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

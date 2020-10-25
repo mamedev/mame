@@ -69,8 +69,8 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
 	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
 
@@ -108,13 +108,13 @@ TILE_GET_INFO_MEMBER(skyarmy_state::get_tile_info)
 	tileinfo.set(0, code, attr, 0);
 }
 
-WRITE8_MEMBER(skyarmy_state::videoram_w)
+void skyarmy_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(skyarmy_state::colorram_w)
+void skyarmy_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);

@@ -127,14 +127,14 @@ uint8_t m68340_cpu_device::int_ack(offs_t offset)
 
 /* 68340 specifics - MOVE */
 
-READ32_MEMBER( m68340_cpu_device::m68340_internal_base_r )
+uint32_t m68340_cpu_device::m68340_internal_base_r(offs_t offset, uint32_t mem_mask)
 {
 	if (!machine().side_effects_disabled())
 		LOGMASKED(LOG_BASE, "%08x m68340_internal_base_r %08x, (%08x)\n", m_ppc, offset*4,mem_mask);
 	return m_m68340_base;
 }
 
-WRITE32_MEMBER( m68340_cpu_device::m68340_internal_base_w )
+void m68340_cpu_device::m68340_internal_base_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_BASE, "%08x m68340_internal_base_w %08x, %08x (%08x)\n", m_ppc, offset*4,data,mem_mask);
 
@@ -162,26 +162,26 @@ WRITE32_MEMBER( m68340_cpu_device::m68340_internal_base_w )
 			int base = m_m68340_base & 0xfffff000;
 
 			m_internal->install_readwrite_handler(base + 0x000, base + 0x03f,
-					read16_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_sim_r)),
-					write16_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_sim_w)),0xffffffff);
+					read16s_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_sim_r)),
+					write16s_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_sim_w)),0xffffffff);
 			m_internal->install_readwrite_handler(base + 0x010, base + 0x01f, // Intentionally punches a hole in previous address mapping
-					read8_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_sim_ports_r)),
-					write8_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_sim_ports_w)),0xffffffff);
+					read8sm_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_sim_ports_r)),
+					write8sm_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_sim_ports_w)),0xffffffff);
 			m_internal->install_readwrite_handler(base + 0x040, base + 0x05f,
-					read32_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_sim_cs_r)),
-					write32_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_sim_cs_w)));
+					read32s_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_sim_cs_r)),
+					write32s_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_sim_cs_w)));
 			m_internal->install_readwrite_handler(base + 0x600, base + 0x63f,
-					read16_delegate(*m_timer[0], FUNC(mc68340_timer_module_device::read)),
-					write16_delegate(*m_timer[0], FUNC(mc68340_timer_module_device::write)),0xffffffff);
+					read16s_delegate(*m_timer[0], FUNC(mc68340_timer_module_device::read)),
+					write16s_delegate(*m_timer[0], FUNC(mc68340_timer_module_device::write)),0xffffffff);
 			m_internal->install_readwrite_handler(base + 0x640, base + 0x67f,
-					read16_delegate(*m_timer[1], FUNC(mc68340_timer_module_device::read)),
-					write16_delegate(*m_timer[1], FUNC(mc68340_timer_module_device::write)),0xffffffff);
+					read16s_delegate(*m_timer[1], FUNC(mc68340_timer_module_device::read)),
+					write16s_delegate(*m_timer[1], FUNC(mc68340_timer_module_device::write)),0xffffffff);
 			m_internal->install_readwrite_handler(base + 0x700, base + 0x723,
 					read8sm_delegate(*m_serial, FUNC(mc68340_serial_module_device::read)),
 					write8sm_delegate(*m_serial, FUNC(mc68340_serial_module_device::write)),0xffffffff);
 			m_internal->install_readwrite_handler(base + 0x780, base + 0x7bf,
-					read32_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_dma_r)),
-					write32_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_dma_w)));
+					read32s_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_dma_r)),
+					write32s_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_dma_w)));
 		}
 	}
 	else

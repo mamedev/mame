@@ -82,7 +82,7 @@ private:
 
 MC6845_UPDATE_ROW(multi16_state::crtc_update_row)
 {
-	uint8_t *vram = reinterpret_cast<uint8_t *>(m_vram.target());
+	uint8_t const *const vram = reinterpret_cast<uint8_t *>(m_vram.target());
 
 	for (int i = 0; i < x_count; i++)
 	{
@@ -101,7 +101,7 @@ MC6845_UPDATE_ROW(multi16_state::crtc_update_row)
 			color |= BIT(data_g, 7 - x) << 1;
 			color |= BIT(data_b, 7 - x) << 2;
 
-			bitmap.pix32(y, x + i * 8) = m_palette->pens()[color];
+			bitmap.pix(y, x + i * 8) = m_palette->pens()[color];
 		}
 	}
 }

@@ -129,16 +129,16 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(pio_portA_r);
-	DECLARE_READ8_MEMBER(pio_portB_r);
-	DECLARE_WRITE8_MEMBER(pio_portA_w);
-	DECLARE_WRITE8_MEMBER(pio_portB_w);
+	uint8_t pio_portA_r();
+	uint8_t pio_portB_r();
+	void pio_portA_w(uint8_t data);
+	void pio_portB_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(dma_mem_r);
-	DECLARE_WRITE8_MEMBER(dma_mem_w);
+	uint8_t dma_mem_r(offs_t offset);
+	void dma_mem_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER(fdc_dma_r);
-	DECLARE_WRITE8_MEMBER(fdc_dma_w);
+	uint8_t fdc_dma_r();
+	void fdc_dma_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(hreq_w);
 	DECLARE_WRITE_LINE_MEMBER(eop_w);
@@ -176,19 +176,19 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER(rom_r);
-	DECLARE_WRITE8_MEMBER(rom_w);
+	uint8_t rom_r(offs_t offset);
+	void rom_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(display_command_w);
-	DECLARE_READ8_MEMBER(display_data_r);
-	DECLARE_WRITE8_MEMBER(display_data_w);
-	DECLARE_READ8_MEMBER(dma_mask_r);
-	DECLARE_WRITE8_MEMBER(dma_mask_w);
+	void display_command_w(uint8_t data);
+	uint8_t display_data_r(offs_t offset);
+	void display_data_w(offs_t offset, uint8_t data);
+	uint8_t dma_mask_r();
+	void dma_mask_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(memmap_r);
-	DECLARE_WRITE8_MEMBER(memmap_w);
+	uint8_t memmap_r();
+	void memmap_w(uint8_t data);
 
-	void operation_strobe(address_space& space,uint8_t data);
+	void operation_strobe(uint8_t data);
 	void keyboard_clock_w(bool state);
 	uint8_t keyboard_data_r();
 	uint16_t get_key();
@@ -262,14 +262,14 @@ public:
 	void attache816(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(x86_comms_w);
-	DECLARE_READ8_MEMBER(x86_comms_r);
-	DECLARE_WRITE8_MEMBER(x86_irq_enable);
-	DECLARE_WRITE8_MEMBER(x86_iobf_enable_w);
-	DECLARE_READ8_MEMBER(z80_comms_r);
-	DECLARE_WRITE8_MEMBER(z80_comms_w);
-	DECLARE_READ8_MEMBER(z80_comms_status_r);
-	DECLARE_WRITE8_MEMBER(z80_comms_ctrl_w);
+	void x86_comms_w(uint8_t data);
+	uint8_t x86_comms_r();
+	void x86_irq_enable(uint8_t data);
+	void x86_iobf_enable_w(offs_t offset, uint8_t data);
+	uint8_t z80_comms_r();
+	void z80_comms_w(uint8_t data);
+	uint8_t z80_comms_status_r();
+	void z80_comms_ctrl_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(ppi_irq);
 	DECLARE_WRITE_LINE_MEMBER(x86_dsr);
 
@@ -299,39 +299,35 @@ private:
 // bit 7 = subscript (superscript and subscript combined produces strikethrough)
 uint32_t attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint8_t x,y,vy,start,bit,scan,data;
-	uint8_t dbl_mode = 0;  // detemines which half of character to display when using double size attribute,
-							// as it can start on either odd or even character cells.
-
 	// Graphics output (if enabled)
 	if(m_gfx_enabled)
 	{
-		const pen_t *pen = m_palette->pens();
+		pen_t const *const pen = m_palette->pens();
 
-		for(y=0;y<(bitmap.height()-1)/10;y++)
+		for(uint8_t y=0;y<(bitmap.height()-1)/10;y++)
 		{
-			for(x=0;x<(bitmap.width()-1)/8;x++)
+			for(uint8_t x=0;x<(bitmap.width()-1)/8;x++)
 			{
 				// graphics pixels use half the clock of text, so 4 graphics pixels per character
-				for(scan=0;scan<10;scan+=2)
+				for(uint8_t scan=0;scan<10;scan+=2)
 				{
-					data = m_gfx_ram[(128*32*(scan/2))+(y*128+x)];
-					bitmap.pix32(y*10+scan,x*8)   = pen[BIT(data,7)];
-					bitmap.pix32(y*10+scan,x*8+1) = pen[BIT(data,7)];
-					bitmap.pix32(y*10+scan,x*8+2) = pen[BIT(data,6)];
-					bitmap.pix32(y*10+scan,x*8+3) = pen[BIT(data,6)];
-					bitmap.pix32(y*10+scan,x*8+4) = pen[BIT(data,5)];
-					bitmap.pix32(y*10+scan,x*8+5) = pen[BIT(data,5)];
-					bitmap.pix32(y*10+scan,x*8+6) = pen[BIT(data,4)];
-					bitmap.pix32(y*10+scan,x*8+7) = pen[BIT(data,4)];
-					bitmap.pix32(y*10+scan+1,x*8)   = pen[BIT(data,3)];
-					bitmap.pix32(y*10+scan+1,x*8+1) = pen[BIT(data,3)];
-					bitmap.pix32(y*10+scan+1,x*8+2) = pen[BIT(data,2)];
-					bitmap.pix32(y*10+scan+1,x*8+3) = pen[BIT(data,2)];
-					bitmap.pix32(y*10+scan+1,x*8+4) = pen[BIT(data,1)];
-					bitmap.pix32(y*10+scan+1,x*8+5) = pen[BIT(data,1)];
-					bitmap.pix32(y*10+scan+1,x*8+6) = pen[BIT(data,0)];
-					bitmap.pix32(y*10+scan+1,x*8+7) = pen[BIT(data,0)];
+					uint8_t const data = m_gfx_ram[(128*32*(scan/2))+(y*128+x)];
+					bitmap.pix(y*10+scan,x*8)   = pen[BIT(data,7)];
+					bitmap.pix(y*10+scan,x*8+1) = pen[BIT(data,7)];
+					bitmap.pix(y*10+scan,x*8+2) = pen[BIT(data,6)];
+					bitmap.pix(y*10+scan,x*8+3) = pen[BIT(data,6)];
+					bitmap.pix(y*10+scan,x*8+4) = pen[BIT(data,5)];
+					bitmap.pix(y*10+scan,x*8+5) = pen[BIT(data,5)];
+					bitmap.pix(y*10+scan,x*8+6) = pen[BIT(data,4)];
+					bitmap.pix(y*10+scan,x*8+7) = pen[BIT(data,4)];
+					bitmap.pix(y*10+scan+1,x*8)   = pen[BIT(data,3)];
+					bitmap.pix(y*10+scan+1,x*8+1) = pen[BIT(data,3)];
+					bitmap.pix(y*10+scan+1,x*8+2) = pen[BIT(data,2)];
+					bitmap.pix(y*10+scan+1,x*8+3) = pen[BIT(data,2)];
+					bitmap.pix(y*10+scan+1,x*8+4) = pen[BIT(data,1)];
+					bitmap.pix(y*10+scan+1,x*8+5) = pen[BIT(data,1)];
+					bitmap.pix(y*10+scan+1,x*8+6) = pen[BIT(data,0)];
+					bitmap.pix(y*10+scan+1,x*8+7) = pen[BIT(data,0)];
 				}
 			}
 		}
@@ -340,12 +336,14 @@ uint32_t attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		bitmap.fill(0);
 
 	// Text output
-	for(y=0;y<(bitmap.height()-1)/10;y++)  // lines
+	uint8_t dbl_mode = 0;  // detemines which half of character to display when using double size attribute,
+							// as it can start on either odd or even character cells.
+	for(uint8_t y=0;y<(bitmap.height()-1)/10;y++)  // lines
 	{
-		start = m_crtc->upscroll_offset();
-		vy = (start + y) % 24;
+		uint8_t const start = m_crtc->upscroll_offset();
+		uint8_t const vy = (start + y) % 24;
 
-		for(x=0;x<(bitmap.width()-1)/8;x++)  // columns
+		for(uint8_t x=0;x<(bitmap.width()-1)/8;x++)  // columns
 		{
 			assert(((y*128)+x) >= 0 && ((y*128)+x) < ARRAY_LENGTH(m_char_ram));
 			assert(((vy*128)+x) >= 0 && ((vy*128)+x) < ARRAY_LENGTH(m_char_ram));
@@ -356,9 +354,9 @@ uint32_t attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 			else
 				dbl_mode = 0;
 
-			for(scan=0;scan<10;scan++)  // 10 scanlines per line
+			for(uint8_t scan=0;scan<10;scan++)  // 10 scanlines per line
 			{
-				data = m_char_rom->base()[(ch*16+scan)];
+				uint8_t data = m_char_rom->base()[(ch*16+scan)];
 				if((m_attr_ram[(vy*128)+x] & 0xc0) != 0xc0)  // if not strikethrough
 				{
 					if(m_attr_ram[(vy*128)+x] & 0x40)  // superscript
@@ -402,13 +400,13 @@ uint32_t attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 					data = newdata;
 				}
 
-				for(bit=0;bit<8;bit++)  // 8 pixels per character
+				for(uint8_t bit=0;bit<8;bit++)  // 8 pixels per character
 				{
-					uint16_t xpos = x*8+bit;
-					uint16_t ypos = y*10+scan;
+					uint16_t const xpos = x*8+bit;
+					uint16_t const ypos = y*10+scan;
 
 					if(BIT(data,7-bit))
-						bitmap.pix32(ypos,xpos) = fg;
+						bitmap.pix(ypos,xpos) = fg;
 				}
 			}
 		}
@@ -416,7 +414,7 @@ uint32_t attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-READ8_MEMBER(attache_state::rom_r)
+uint8_t attache_state::rom_r(offs_t offset)
 {
 	if(m_rom_active)
 		return m_rom->base()[offset];
@@ -424,7 +422,7 @@ READ8_MEMBER(attache_state::rom_r)
 		return m_ram->pointer()[m_membank1->entry()*0x2000 + offset];
 }
 
-WRITE8_MEMBER(attache_state::rom_w)
+void attache_state::rom_w(offs_t offset, uint8_t data)
 {
 	m_ram->pointer()[m_membank1->entry()*0x2000 + offset] = data;
 }
@@ -498,7 +496,7 @@ void attache_state::keyboard_clock_w(bool state)
 }
 
 // TODO: Figure out exactly how the HLD, RD, WR and CS lines on the RTC are hooked up
-READ8_MEMBER(attache_state::pio_portA_r)
+uint8_t attache_state::pio_portA_r()
 {
 	uint8_t ret = 0xff;
 	uint8_t porta = m_pio_porta;
@@ -547,14 +545,14 @@ READ8_MEMBER(attache_state::pio_portA_r)
 	return ret;
 }
 
-READ8_MEMBER(attache_state::pio_portB_r)
+uint8_t attache_state::pio_portB_r()
 {
 	uint8_t ret = m_pio_portb & 0xbf;
 	ret |= keyboard_data_r();
 	return ret;
 }
 
-void attache_state::operation_strobe(address_space& space, uint8_t data)
+void attache_state::operation_strobe(uint8_t data)
 {
 	//logerror("PIO: Port A write operation %i, data %02x\n",m_pio_select,data);
 	switch(m_pio_select)
@@ -605,7 +603,7 @@ void attache_state::operation_strobe(address_space& space, uint8_t data)
 	}
 }
 
-WRITE8_MEMBER(attache_state::pio_portA_w)
+void attache_state::pio_portA_w(uint8_t data)
 {
 	//  AO-7 = LATCH DATA OUT:
 	//  LO = MOTOR ON
@@ -620,7 +618,7 @@ WRITE8_MEMBER(attache_state::pio_portA_w)
 	m_pio_porta = data;
 }
 
-WRITE8_MEMBER(attache_state::pio_portB_w)
+void attache_state::pio_portB_w(uint8_t data)
 {
 	//  BO-1 = 5101 A4-5
 	//  B2-4 = OPERATION SELECT
@@ -639,14 +637,14 @@ WRITE8_MEMBER(attache_state::pio_portB_w)
 	if(!(data & 0x20) && (m_pio_portb & 0x20))
 	{
 		m_pio_select = (data & 0x1c) >> 2;
-		operation_strobe(space,m_pio_porta);
+		operation_strobe(m_pio_porta);
 	}
 	m_pio_portb = data;
 	keyboard_clock_w(data & 0x80);
 }
 
 // Display uses A8-A15 placed on the bus by the OUT instruction as an extra parameter
-READ8_MEMBER(attache_state::display_data_r)
+uint8_t attache_state::display_data_r(offs_t offset)
 {
 	uint8_t ret = 0xff;
 	uint8_t param = (offset & 0xff00) >> 8;
@@ -684,7 +682,7 @@ READ8_MEMBER(attache_state::display_data_r)
 	return ret;
 }
 
-WRITE8_MEMBER(attache_state::display_data_w)
+void attache_state::display_data_w(offs_t offset, uint8_t data)
 {
 	uint8_t param = (offset & 0xff00) >> 8;
 	switch(m_current_cmd)
@@ -719,7 +717,7 @@ WRITE8_MEMBER(attache_state::display_data_w)
 	}
 }
 
-WRITE8_MEMBER(attache_state::display_command_w)
+void attache_state::display_command_w(uint8_t data)
 {
 	uint8_t cmd = (data & 0xe0) >> 5;
 
@@ -749,12 +747,12 @@ WRITE8_MEMBER(attache_state::display_command_w)
 	}
 }
 
-READ8_MEMBER(attache_state::memmap_r)
+uint8_t attache_state::memmap_r()
 {
 	return m_memmap;
 }
 
-WRITE8_MEMBER(attache_state::memmap_w)
+void attache_state::memmap_w(uint8_t data)
 {
 	// TODO: figure this out properly
 	// Tech manual says that RAM is split into 8kB chunks.
@@ -769,33 +767,33 @@ WRITE8_MEMBER(attache_state::memmap_w)
 	logerror("MEM: write %02x - bank %i, location %i\n",data, bank, loc);
 }
 
-READ8_MEMBER(attache_state::dma_mask_r)
+uint8_t attache_state::dma_mask_r()
 {
 	return m_dma->read(0x0f);
 }
 
-WRITE8_MEMBER(attache_state::dma_mask_w)
+void attache_state::dma_mask_w(uint8_t data)
 {
 	m_dma->write(0x0f,data);
 }
 
-READ8_MEMBER(attache_state::fdc_dma_r)
+uint8_t attache_state::fdc_dma_r()
 {
 	uint8_t ret = m_fdc->dma_r();
 	return ret;
 }
 
-WRITE8_MEMBER(attache_state::fdc_dma_w)
+void attache_state::fdc_dma_w(uint8_t data)
 {
 	m_fdc->dma_w(data);
 }
 
-READ8_MEMBER(attache_state::dma_mem_r)
+uint8_t attache_state::dma_mem_r(offs_t offset)
 {
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
 
-WRITE8_MEMBER(attache_state::dma_mem_w)
+void attache_state::dma_mem_w(offs_t offset, uint8_t data)
 {
 	m_maincpu->space(AS_PROGRAM).write_byte(offset,data);
 }
@@ -820,14 +818,14 @@ WRITE_LINE_MEMBER( attache_state::fdc_dack_w )
  * Z80 <-> 8086 communication
  */
 
-WRITE8_MEMBER(attache816_state::x86_comms_w)
+void attache816_state::x86_comms_w(uint8_t data)
 {
 	m_comms_val = data;
 	m_ppi->pc6_w(1);
 	m_z80_rx_ready = false;
 }
 
-READ8_MEMBER(attache816_state::x86_comms_r)
+uint8_t attache816_state::x86_comms_r()
 {
 	m_z80_tx_ready = false;
 	m_ppi->pc4_w(1);
@@ -841,12 +839,12 @@ READ8_MEMBER(attache816_state::x86_comms_r)
 // bit 3: 8087 FPU
 // bit 4: enable WAIT logic
 // bit 5: enable high-resolution graphics
-WRITE8_MEMBER(attache816_state::x86_irq_enable)
+void attache816_state::x86_irq_enable(uint8_t data)
 {
 	m_x86_irq_enable = data;
 }
 
-WRITE8_MEMBER(attache816_state::x86_iobf_enable_w)
+void attache816_state::x86_iobf_enable_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -867,14 +865,14 @@ WRITE8_MEMBER(attache816_state::x86_iobf_enable_w)
 	}
 }
 
-READ8_MEMBER(attache816_state::z80_comms_r)
+uint8_t attache816_state::z80_comms_r()
 {
 	m_z80_rx_ready = true;
 	m_ppi->pc6_w(0);
 	return m_comms_val;
 }
 
-WRITE8_MEMBER(attache816_state::z80_comms_w)
+void attache816_state::z80_comms_w(uint8_t data)
 {
 	m_comms_val = data;
 	m_z80_tx_ready = true;
@@ -884,7 +882,7 @@ WRITE8_MEMBER(attache816_state::z80_comms_w)
 // Z80 comms status
 // bit 0: set if no data is ready
 // bit 1: set if ready to accept data
-READ8_MEMBER(attache816_state::z80_comms_status_r)
+uint8_t attache816_state::z80_comms_status_r()
 {
 	uint8_t ret = 0xf0;  // low nibble always high?
 
@@ -898,7 +896,7 @@ READ8_MEMBER(attache816_state::z80_comms_status_r)
 
 // Z80 comms controller
 // bit 0: Reset 8086
-WRITE8_MEMBER(attache816_state::z80_comms_ctrl_w)
+void attache816_state::z80_comms_ctrl_w(uint8_t data)
 {
 	m_extcpu->set_input_line(INPUT_LINE_RESET,(data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -973,9 +971,9 @@ static INPUT_PORTS_START(attache)
 	PORT_START("row0")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("BS") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
 	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("TAB") PORT_CODE(KEYCODE_TAB) PORT_CHAR(9)
-	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("LF") PORT_CODE(KEYCODE_PGDN)
+	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("LF") PORT_CODE(KEYCODE_PGDN) PORT_CHAR(10)
 	PORT_BIT(0x18,IP_ACTIVE_HIGH,IPT_UNUSED)
-	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Return") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(27)
+	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Return") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_UNUSED)
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("LOCK") PORT_CODE(KEYCODE_PGUP)
 
@@ -983,75 +981,74 @@ static INPUT_PORTS_START(attache)
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
 	PORT_BIT(0x06,IP_ACTIVE_HIGH,IPT_UNUSED)
 	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("ESC") PORT_CODE(KEYCODE_ESC) PORT_CHAR(27)
-	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT)
-	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT)
-	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP)
-	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN)
+	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 
 	PORT_START("row2")
-	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("0 ^") PORT_CODE(KEYCODE_0) PORT_CHAR('0')
-	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("1 !") PORT_CODE(KEYCODE_1) PORT_CHAR('1')
-	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("2 @") PORT_CODE(KEYCODE_2) PORT_CHAR('2')
-	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("3 #") PORT_CODE(KEYCODE_3) PORT_CHAR('3')
-	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("4 $") PORT_CODE(KEYCODE_4) PORT_CHAR('4')
-	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("5 %") PORT_CODE(KEYCODE_5) PORT_CHAR('5')
-	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("6 &") PORT_CODE(KEYCODE_6) PORT_CHAR('6')
-	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("7 *") PORT_CODE(KEYCODE_7) PORT_CHAR('7')
+	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("0 ^") PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR('^')
+	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("1 !") PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
+	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("2 @") PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('@')
+	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("3 #") PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
+	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("4 $") PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
+	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("5 %") PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
+	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("6 &") PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
+	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("7 *") PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('*')
 
 	PORT_START("row3")
-	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("8 (") PORT_CODE(KEYCODE_8) PORT_CHAR('8')
-	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("9 )") PORT_CODE(KEYCODE_9) PORT_CHAR('9')
-	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("' \"") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('\'')
-	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("; :") PORT_CODE(KEYCODE_COLON) PORT_CHAR(';')
-	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(", <") PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',')
-	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("= +") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=')
-	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(". >") PORT_CODE(KEYCODE_STOP) PORT_CHAR('.')
-	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("/ ?") PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/')
+	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("8 (") PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
+	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("9 )") PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
+	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("' \"") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('\'') PORT_CHAR('"')
+	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("; :") PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR(':')
+	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(", <") PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
+	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("= +") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_CHAR('+')
+	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(". >") PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
+	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("/ ?") PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
 
 	PORT_START("row4")
-	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("` ~") PORT_CODE(KEYCODE_TILDE) PORT_CHAR('`')
-	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A) PORT_CHAR('A')
-	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B) PORT_CHAR('B')
-	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C) PORT_CHAR('C')
-	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D) PORT_CHAR('D')
-	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E) PORT_CHAR('E')
-	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F) PORT_CHAR('F')
-	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("G") PORT_CODE(KEYCODE_G) PORT_CHAR('G')
+	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("` ~") PORT_CODE(KEYCODE_TILDE) PORT_CHAR('`') PORT_CHAR('~')
+	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')
+	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B')
+	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')
+	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D')
+	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')
+	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F')
+	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("G") PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G')
 
 	PORT_START("row5")
-	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("H") PORT_CODE(KEYCODE_H) PORT_CHAR('H')
-	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("I") PORT_CODE(KEYCODE_I) PORT_CHAR('I')
-	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("J") PORT_CODE(KEYCODE_J) PORT_CHAR('J')
-	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("K") PORT_CODE(KEYCODE_K) PORT_CHAR('K')
-	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("L") PORT_CODE(KEYCODE_L) PORT_CHAR('L')
-	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("M") PORT_CODE(KEYCODE_M) PORT_CHAR('M')
-	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("N") PORT_CODE(KEYCODE_N) PORT_CHAR('N')
-	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("O") PORT_CODE(KEYCODE_O) PORT_CHAR('O')
+	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("H") PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')
+	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("I") PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I')
+	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("J") PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')
+	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("K") PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')
+	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("L") PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L')
+	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("M") PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')
+	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("N") PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')
+	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("O") PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O')
 
 	PORT_START("row6")
-	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("P") PORT_CODE(KEYCODE_P) PORT_CHAR('P')
-	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Q") PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
-	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R) PORT_CHAR('R')
-	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("S") PORT_CODE(KEYCODE_S) PORT_CHAR('S')
-	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("T") PORT_CODE(KEYCODE_T) PORT_CHAR('T')
-	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("U") PORT_CODE(KEYCODE_U) PORT_CHAR('U')
-	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("V") PORT_CODE(KEYCODE_V) PORT_CHAR('V')
-	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("W") PORT_CODE(KEYCODE_W) PORT_CHAR('W')
+	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("P") PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
+	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Q") PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')
+	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R')
+	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("S") PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')
+	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("T") PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T')
+	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("U") PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')
+	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("V") PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V')
+	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("W") PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')
 
 	PORT_START("row7")
-	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("X") PORT_CODE(KEYCODE_X) PORT_CHAR('X')
-	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Y") PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
-	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
-	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("[ {") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[')
-	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("\\ |") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\')
-	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("] }") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']')
-	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("- _") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-')
-	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("DEL") PORT_CODE(KEYCODE_DEL)
+	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("X") PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')
+	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Y") PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')
+	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')
+	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("[ {") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[') PORT_CHAR('{')
+	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("\\ |") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\') PORT_CHAR('|')
+	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("] }") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')
+	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("- _") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('_')
+	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("DEL") PORT_CODE(KEYCODE_DEL) PORT_CHAR(UCHAR_MAMEKEY(DEL))
 
 	PORT_START("modifiers")
-	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT)
-	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LCONTROL)
-
+	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
 INPUT_PORTS_END
 
 // IRQ daisy chain = CTC -> SIO -> Expansion
@@ -1094,7 +1091,7 @@ void attache_state::driver_start()
 
 	m_nvram->set_base(m_cmos_ram,64);
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0000,0x0fff, read8_delegate(*this, FUNC(attache_state::rom_r)), write8_delegate(*this, FUNC(attache_state::rom_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0000,0x0fff, read8sm_delegate(*this, FUNC(attache_state::rom_r)), write8sm_delegate(*this, FUNC(attache_state::rom_w)));
 
 	save_pointer(m_char_ram,"Character RAM",128*32);
 	save_pointer(m_attr_ram,"Attribute RAM",128*32);

@@ -161,13 +161,13 @@ void dio16_98644_device::device_reset()
 		dio().install_memory(
 				0x600000 + (code * 0x10000),
 				0x6007ff + (code * 0x10000),
-				read16_delegate(*this, FUNC(dio16_98644_device::io_r)),
-				write16_delegate(*this, FUNC(dio16_98644_device::io_w)));
+				read16sm_delegate(*this, FUNC(dio16_98644_device::io_r)),
+				write16sm_delegate(*this, FUNC(dio16_98644_device::io_w)));
 		m_installed_io = true;
 	}
 }
 
-READ16_MEMBER(dio16_98644_device::io_r)
+uint16_t dio16_98644_device::io_r(offs_t offset)
 {
 	uint16_t ret = 0xffff;
 
@@ -204,7 +204,7 @@ READ16_MEMBER(dio16_98644_device::io_r)
 	return ret;
 }
 
-WRITE16_MEMBER(dio16_98644_device::io_w)
+void dio16_98644_device::io_w(offs_t offset, uint16_t data)
 {
 	if (offset == 0x0c)
 		m_loopback = (data & 0x10) ? true : false;

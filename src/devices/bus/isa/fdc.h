@@ -34,9 +34,6 @@ protected:
 	// construction/destruction
 	isa8_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_reset() override;
-
 	virtual uint8_t dack_r(int line) override;
 	virtual void dack_w(int line, uint8_t data) override;
 	virtual void dack_line_w(int line, int state) override;
@@ -53,6 +50,7 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	uint8_t dor_r();
 	void dor_w(uint8_t data);

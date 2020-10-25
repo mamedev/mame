@@ -41,13 +41,13 @@
 #include "speaker.h"
 
 
-WRITE8_MEMBER(f1gp_state::sh_bankswitch_w)
+void f1gp_state::sh_bankswitch_w(uint8_t data)
 {
 	m_z80bank->set_entry(data & 0x01);
 }
 
 
-READ8_MEMBER(f1gp_state::command_pending_r)
+uint8_t f1gp_state::command_pending_r()
 {
 	return (m_soundlatch->pending_r() ? 0xff : 0);
 }
@@ -127,7 +127,7 @@ void f1gp_state::sound_io_map(address_map &map)
 	map(0x18, 0x1b).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
 }
 
-WRITE16_MEMBER(f1gp_state::f1gpb_misc_w)
+void f1gp_state::f1gpb_misc_w(uint16_t data)
 {
 	/*
 	static int old=-1;

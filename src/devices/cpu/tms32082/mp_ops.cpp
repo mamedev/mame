@@ -142,38 +142,38 @@ void tms32082_mp_device::vector_loadstore()
 	{
 		case 0x01:          // vst.s
 		{
-			m_program->write_dword(m_outp, m_reg[rd]);
+			m_program.write_dword(m_outp, m_reg[rd]);
 			m_outp += 4;
 			break;
 		}
 		case 0x03:          // vst.d
 		{
 			uint64_t data = m_fpair[rd >> 1];
-			m_program->write_qword(m_outp, data);
+			m_program.write_qword(m_outp, data);
 			m_outp += 8;
 			break;
 		}
 		case 0x04:          // vld0.s
 		{
-			m_reg[rd] = m_program->read_dword(m_in0p);
+			m_reg[rd] = m_program.read_dword(m_in0p);
 			m_in0p += 4;
 			break;
 		}
 		case 0x05:          // vld1.s
 		{
-			m_reg[rd] = m_program->read_dword(m_in1p);
+			m_reg[rd] = m_program.read_dword(m_in1p);
 			m_in1p += 4;
 			break;
 		}
 		case 0x06:          // vld0.d
 		{
-			m_fpair[rd >> 1] = m_program->read_qword(m_in0p);
+			m_fpair[rd >> 1] = m_program.read_qword(m_in0p);
 			m_in0p += 8;
 			break;
 		}
 		case 0x07:          // vld1.d
 		{
-			m_fpair[rd >> 1] = m_program->read_qword(m_in1p);
+			m_fpair[rd >> 1] = m_program.read_qword(m_in1p);
 			m_in1p += 8;
 			break;
 		}
@@ -518,7 +518,7 @@ void tms32082_mp_device::execute_short_imm()
 			int32_t offset = OP_SIMM15();
 
 			uint32_t address = m_reg[base] + offset;
-			uint32_t data = (uint8_t)m_program->read_byte(address);
+			uint32_t data = (uint8_t)m_program.read_byte(address);
 			if (data & 0x80) data |= 0xffffff00;
 			if (rd)
 				m_reg[rd] = data;
@@ -537,7 +537,7 @@ void tms32082_mp_device::execute_short_imm()
 			int32_t offset = OP_SIMM15();
 
 			uint32_t address = m_reg[base] + offset;
-			uint32_t data = (uint16_t)m_program->read_word(address);
+			uint32_t data = (uint16_t)m_program.read_word(address);
 			if (data & 0x8000) data |= 0xffff0000;
 			if (rd)
 				m_reg[rd] = data;
@@ -556,7 +556,7 @@ void tms32082_mp_device::execute_short_imm()
 			int32_t offset = OP_SIMM15();
 
 			uint32_t address = m_reg[base] + offset;
-			uint32_t data = m_program->read_dword(address);
+			uint32_t data = m_program.read_dword(address);
 			if (rd)
 				m_reg[rd] = data;
 
@@ -574,8 +574,8 @@ void tms32082_mp_device::execute_short_imm()
 			int32_t offset = OP_SIMM15();
 
 			uint32_t address = m_reg[base] + offset;
-			uint32_t data1 = m_program->read_dword(address);
-			uint32_t data2 = m_program->read_dword(address+4);
+			uint32_t data1 = m_program.read_dword(address);
+			uint32_t data2 = m_program.read_dword(address+4);
 			if (rd)
 			{
 				m_reg[(rd & ~1)+1] = data1;
@@ -596,7 +596,7 @@ void tms32082_mp_device::execute_short_imm()
 			int32_t offset = OP_SIMM15();
 
 			uint32_t address = m_reg[base] + offset;
-			uint32_t data = (uint8_t)(m_program->read_byte(address));
+			uint32_t data = (uint8_t)(m_program.read_byte(address));
 			if (rd)
 				m_reg[rd] = data;
 
@@ -614,7 +614,7 @@ void tms32082_mp_device::execute_short_imm()
 			int32_t offset = OP_SIMM15();
 
 			uint32_t address = m_reg[base] + offset;
-			uint32_t data = (uint16_t)(m_program->read_word(address));
+			uint32_t data = (uint16_t)(m_program.read_word(address));
 			if (rd)
 				m_reg[rd] = data;
 
@@ -633,7 +633,7 @@ void tms32082_mp_device::execute_short_imm()
 
 			uint32_t address = m_reg[base] + offset;
 
-			m_program->write_byte(address, (uint8_t)(m_reg[rd]));
+			m_program.write_byte(address, (uint8_t)(m_reg[rd]));
 
 			if (m && base)
 				m_reg[base] = address;
@@ -650,7 +650,7 @@ void tms32082_mp_device::execute_short_imm()
 
 			uint32_t address = m_reg[base] + offset;
 
-			m_program->write_word(address, (uint16_t)(m_reg[rd]));
+			m_program.write_word(address, (uint16_t)(m_reg[rd]));
 
 			if (m && base)
 				m_reg[base] = address;
@@ -667,7 +667,7 @@ void tms32082_mp_device::execute_short_imm()
 
 			uint32_t address = m_reg[base] + offset;
 
-			m_program->write_dword(address, m_reg[rd]);
+			m_program.write_dword(address, m_reg[rd]);
 
 			if (m && base)
 				m_reg[base] = address;
@@ -684,8 +684,8 @@ void tms32082_mp_device::execute_short_imm()
 
 			uint32_t address = m_reg[base] + offset;
 
-			m_program->write_dword(address+0, m_reg[(rd & ~1) + 1]);
-			m_program->write_dword(address+4, m_reg[rd & ~1]);
+			m_program.write_dword(address+0, m_reg[(rd & ~1) + 1]);
+			m_program.write_dword(address+4, m_reg[rd & ~1]);
 
 			if (m && base)
 				m_reg[base] = address;
@@ -1043,7 +1043,7 @@ void tms32082_mp_device::execute_reg_long_imm()
 			int rd = OP_RD();
 
 			uint32_t address = m_reg[base] + (has_imm ? imm32 : m_reg[OP_SRC1()]);
-			uint32_t r = m_program->read_byte(address);
+			uint32_t r = m_program.read_byte(address);
 			if (r & 0x80) r |= 0xffffff00;
 
 			if (rd)
@@ -1066,7 +1066,7 @@ void tms32082_mp_device::execute_reg_long_imm()
 			int rd = OP_RD();
 
 			uint32_t address = m_reg[base] + ((has_imm ? imm32 : m_reg[OP_SRC1()]) << shift);
-			uint32_t r = m_program->read_word(address);
+			uint32_t r = m_program.read_word(address);
 			if (r & 0x8000) r |= 0xffff0000;
 
 			if (rd)
@@ -1088,7 +1088,7 @@ void tms32082_mp_device::execute_reg_long_imm()
 			int rd = OP_RD();
 
 			uint32_t address = m_reg[base] + ((has_imm ? imm32 : m_reg[OP_SRC1()]) << shift);
-			uint32_t r = m_program->read_dword(address);
+			uint32_t r = m_program.read_dword(address);
 
 			if (rd)
 				m_reg[rd] = r;
@@ -1109,7 +1109,7 @@ void tms32082_mp_device::execute_reg_long_imm()
 			int rd = OP_RD();
 
 			uint32_t address = m_reg[base] + ((has_imm ? imm32 : m_reg[OP_SRC1()]) << shift);
-			uint64_t r = m_program->read_qword(address);
+			uint64_t r = m_program.read_qword(address);
 
 			if (rd)
 				m_fpair[rd >> 1] = r;
@@ -1129,7 +1129,7 @@ void tms32082_mp_device::execute_reg_long_imm()
 			int rd = OP_RD();
 
 			uint32_t address = m_reg[base] + (has_imm ? imm32 : m_reg[OP_SRC1()]);
-			uint32_t r = (uint8_t)(m_program->read_byte(address));
+			uint32_t r = (uint8_t)(m_program.read_byte(address));
 
 			if (rd)
 				m_reg[rd] = r;
@@ -1150,7 +1150,7 @@ void tms32082_mp_device::execute_reg_long_imm()
 			int rd = OP_RD();
 
 			uint32_t address = m_reg[base] + ((has_imm ? imm32 : m_reg[OP_SRC1()]) << shift);
-			uint32_t r = (uint16_t)(m_program->read_word(address));
+			uint32_t r = (uint16_t)(m_program.read_word(address));
 
 			if (rd)
 				m_reg[rd] = r;
@@ -1170,7 +1170,7 @@ void tms32082_mp_device::execute_reg_long_imm()
 			int base = OP_BASE();
 
 			uint32_t address = m_reg[base] + (has_imm ? imm32 : m_reg[OP_SRC1()]);
-			m_program->write_byte(address, (uint8_t)(m_reg[OP_RD()]));
+			m_program.write_byte(address, (uint8_t)(m_reg[OP_RD()]));
 
 			if (m && base)
 				m_reg[base] = address;
@@ -1188,7 +1188,7 @@ void tms32082_mp_device::execute_reg_long_imm()
 			int base = OP_BASE();
 
 			uint32_t address = m_reg[base] + ((has_imm ? imm32 : m_reg[OP_SRC1()]) << shift);
-			m_program->write_word(address, (uint16_t)(m_reg[OP_RD()]));
+			m_program.write_word(address, (uint16_t)(m_reg[OP_RD()]));
 
 			if (m && base)
 				m_reg[base] = address;
@@ -1206,7 +1206,7 @@ void tms32082_mp_device::execute_reg_long_imm()
 			int base = OP_BASE();
 
 			uint32_t address = m_reg[base] + ((has_imm ? imm32 : m_reg[OP_SRC1()]) << shift);
-			m_program->write_dword(address, m_reg[OP_RD()]);
+			m_program.write_dword(address, m_reg[OP_RD()]);
 
 			if (m && base)
 				m_reg[base] = address;

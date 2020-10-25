@@ -78,7 +78,7 @@ protected:
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	// device_memory_interface configuration
 	virtual space_config_vector memory_space_config() const override;
@@ -115,7 +115,7 @@ private:
 			std::fill(std::begin(EnvTarget), std::end(EnvTarget), 0);
 		}
 
-		memory_access_cache<1, 0, ENDIANNESS_LITTLE> *Cache;
+		memory_access<23, 1, 0, ENDIANNESS_LITTLE>::cache *Cache;
 		u32 CurSAddr = 0; // Current Address Pointer, 22.10 Fixed Point
 		s32 EnvVol = 0; // Envelope Volume (Overall Volume), S.7.16 Fixed Point
 		u8 EnvStage = 1; // Envelope Stage
@@ -132,9 +132,9 @@ private:
 		void write(offs_t offset, u16 data, u16 mem_mask);
 	};
 
-	memory_access_cache<1, 0, ENDIANNESS_LITTLE> *m_texcache;
-	memory_access_cache<1, 0, ENDIANNESS_LITTLE> *m_fbcache;
-	memory_access_cache<1, 0, ENDIANNESS_LITTLE> *m_texcache_ctrl;
+	memory_access<23, 1, 0, ENDIANNESS_LITTLE>::cache m_texcache;
+	memory_access<23, 1, 0, ENDIANNESS_LITTLE>::cache m_fbcache;
+	memory_access<23, 1, 0, ENDIANNESS_LITTLE>::cache *m_texcache_ctrl;
 
 	channel_t m_channel[32];
 	sound_stream *m_stream;
@@ -151,7 +151,7 @@ private:
 	u8 m_MaxChn = 0x1f; // Max Channels - 1
 	u8 m_ChnClkNum = 0; // Clock Number per Channel
 	u16 m_Ctrl = 0; // 0x602 Control Functions
-	void VR0_RenderAudio(int nsamples, stream_sample_t *l, stream_sample_t *r);
+	void VR0_RenderAudio(write_stream_view &l, write_stream_view &r);
 };
 
 DECLARE_DEVICE_TYPE(SOUND_VRENDER0, vr0sound_device)

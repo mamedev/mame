@@ -47,7 +47,7 @@ Both games run on Konami's PWB351024A PCB
 #include "speaker.h"
 
 
-WRITE8_MEMBER(mainevt_state::dv_nmienable_w)
+void mainevt_state::dv_nmienable_w(uint8_t data)
 {
 	m_nmi_enable = data;
 }
@@ -59,7 +59,7 @@ WRITE_LINE_MEMBER(mainevt_state::dv_vblank_w)
 }
 
 
-WRITE8_MEMBER(mainevt_state::mainevt_bankswitch_w)
+void mainevt_state::mainevt_bankswitch_w(uint8_t data)
 {
 	/* bit 0-1 ROM bank select */
 	m_rombank->set_entry(data & 0x03);
@@ -75,7 +75,7 @@ WRITE8_MEMBER(mainevt_state::mainevt_bankswitch_w)
 	/* other bits unused */
 }
 
-WRITE8_MEMBER(mainevt_state::mainevt_coin_w)
+void mainevt_state::mainevt_coin_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x10);
 	machine().bookkeeping().coin_counter_w(1, data & 0x20);
@@ -85,17 +85,17 @@ WRITE8_MEMBER(mainevt_state::mainevt_coin_w)
 	m_leds[3] = BIT(data, 3);
 }
 
-WRITE8_MEMBER(mainevt_state::mainevt_sh_irqtrigger_w)
+void mainevt_state::mainevt_sh_irqtrigger_w(uint8_t data)
 {
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
-READ8_MEMBER(mainevt_state::mainevt_sh_busy_r)
+uint8_t mainevt_state::mainevt_sh_busy_r()
 {
 	return m_upd7759->busy_r();
 }
 
-WRITE8_MEMBER(mainevt_state::mainevt_sh_irqcontrol_w)
+void mainevt_state::mainevt_sh_irqcontrol_w(uint8_t data)
 {
 	m_upd7759->reset_w(data & 2);
 	m_upd7759->start_w(data & 1);
@@ -103,12 +103,12 @@ WRITE8_MEMBER(mainevt_state::mainevt_sh_irqcontrol_w)
 	m_sound_irq_mask = data & 4;
 }
 
-WRITE8_MEMBER(mainevt_state::devstor_sh_irqcontrol_w)
+void mainevt_state::devstor_sh_irqcontrol_w(uint8_t data)
 {
 	m_sound_irq_mask = data & 4;
 }
 
-WRITE8_MEMBER(mainevt_state::mainevt_sh_bankswitch_w)
+void mainevt_state::mainevt_sh_bankswitch_w(uint8_t data)
 {
 	int bank_A, bank_B;
 
@@ -123,7 +123,7 @@ WRITE8_MEMBER(mainevt_state::mainevt_sh_bankswitch_w)
 	m_upd7759->set_rom_bank((data >> 4) & 0x03);
 }
 
-WRITE8_MEMBER(mainevt_state::dv_sh_bankswitch_w)
+void mainevt_state::dv_sh_bankswitch_w(uint8_t data)
 {
 	int bank_A, bank_B;
 
@@ -135,7 +135,7 @@ WRITE8_MEMBER(mainevt_state::dv_sh_bankswitch_w)
 	m_k007232->set_bank(bank_A, bank_B);
 }
 
-READ8_MEMBER(mainevt_state::k052109_051960_r)
+uint8_t mainevt_state::k052109_051960_r(offs_t offset)
 {
 	if (m_k052109->get_rmrd_line() == CLEAR_LINE)
 	{
@@ -150,7 +150,7 @@ READ8_MEMBER(mainevt_state::k052109_051960_r)
 		return m_k052109->read(offset);
 }
 
-WRITE8_MEMBER(mainevt_state::k052109_051960_w)
+void mainevt_state::k052109_051960_w(offs_t offset, uint8_t data)
 {
 	if (offset >= 0x3800 && offset < 0x3808)
 		m_k051960->k051937_w(offset - 0x3800, data);
@@ -387,7 +387,7 @@ INPUT_PORTS_END
 
 /*****************************************************************************/
 
-WRITE8_MEMBER(mainevt_state::volume_callback)
+void mainevt_state::volume_callback(uint8_t data)
 {
 	m_k007232->set_volume(0, (data >> 4) * 0x11, 0);
 	m_k007232->set_volume(1, 0, (data & 0x0f) * 0x11);

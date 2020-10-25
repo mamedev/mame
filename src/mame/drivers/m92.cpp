@@ -4,35 +4,40 @@
 
     Irem M92 system games:
 
-    Gunforce (World)                M92-A   (c) 1991 Irem Corp
-    Gunforce (USA)                  M92-A   (c) 1991 Irem America Corp
-    Gunforce (Japan)                M92-A   (c) 1991 Irem Corp
-    Blade Master (World)                    (c) 1991 Irem Corp
-    Cross Blades! (Japan)                   (c) 1991 Irem Corp
-    Lethal Thunder (World)                  (c) 1991 Irem Corp
-    Thunder Blaster (Japan)                 (c) 1991 Irem Corp
-    Undercover Cops (World)                 (c) 1992 Irem Corp
-    Undercover Cops (Japan)                 (c) 1992 Irem Corp
-    Mystic Riders (World)                   (c) 1992 Irem Corp
-    Gun Hohki (Japan)                       (c) 1992 Irem Corp
-    Major Title 2 (World)           M92-F   (c) 1992 Irem Corp
-    Major Title 2 (Japan)           M92-F   (c) 1992 Irem Corp
-    The Irem Skins Game (USA Set 1) M92-F   (c) 1992 Irem America Corp
-    The Irem Skins Game (USA Set 2) M92-F   (c) 1992 Irem America Corp
-    Hook (World)                            (c) 1992 Irem Corp
-    Hook (Japan)                            (c) 1992 Irem Corp
-    Hook (USA)                              (c) 1992 Irem America Corp
-    R-Type Leo (World)                      (c) 1992 Irem Corp
-    R-Type Leo (Japan)                      (c) 1992 Irem Corp
-    In The Hunt (World)             M92-E   (c) 1993 Irem Corp
-    In The Hunt (USA)               M92-E   (c) 1993 Irem Corp
-    Kaitei Daisensou (Japan)        M92-E   (c) 1993 Irem Corp
-    Ninja Baseball Batman (USA)             (c) 1993 Irem America Corp
-    Yakyuu Kakutou League-Man (Japan)       (c) 1993 Irem Corp
-    Perfect Soldiers (Japan)        M92-G   (c) 1993 Irem Corp
-    Dream Soccer 94 (Japan)         M92-G   (c) 1994 Irem Corp
-    Gunforce 2 (US)                 M92-G   (c) 1994 Irem Corp
-    Geostorm (Japan)                M92-G   (c) 1994 Irem Corp
+    Gunforce (World)                                 M92-A   (c) 1991 Irem Corp
+    Gunforce (USA)                                   M92-A   (c) 1991 Irem America Corp
+    Gunforce (Japan)                                 M92-A   (c) 1991 Irem Corp
+    Blade Master (World)                             M92-B   (c) 1991 Irem Corp
+    Cross Blades! (Japan)                            M92-D   (c) 1991 Irem Corp
+    Lethal Thunder (World)                                   (c) 1991 Irem Corp
+    Thunder Blaster (Japan)                          M92-C   (c) 1991 Irem Corp
+    Undercover Cops (World)                          M92-E   (c) 1992 Irem Corp
+    Undercover Cops (US)                             M92-E   (c) 1992 Irem America Corp
+    Undercover Cops (Japan)                          M92-E   (c) 1992 Irem Corp
+    Undercover Cops - Alpha Renewal Version (World)  M92-E   (c) 1992 Irem Corp
+    Undercover Cops - Alpha Renewal Version (US)     M92-E   (c) 1992 Irem America Corp
+    Mystic Riders (World)                                    (c) 1992 Irem Corp
+    Mahou Keibitai Gun Hohki (Japan)                         (c) 1992 Irem Corp
+    Major Title 2 (World)                            M92-F   (c) 1992 Irem Corp
+    Major Title 2 (Japan)                            M92-F   (c) 1992 Irem Corp
+    The Irem Skins Game (USA Set 1)                  M92-F   (c) 1992 Irem America Corp
+    The Irem Skins Game (USA Set 2)                  M92-F   (c) 1992 Irem America Corp
+    Hook (World)                                             (c) 1992 Irem Corp
+    Hook (USA)                                               (c) 1992 Irem America Corp
+    Hook (Japan)                                             (c) 1992 Irem Corp
+    R-Type Leo (World)                                       (c) 1992 Irem Corp
+    R-Type Leo (Japan)                                       (c) 1992 Irem Corp
+    In The Hunt (World)                              M92-E   (c) 1993 Irem Corp
+    In The Hunt (USA)                                M92-E   (c) 1993 Irem Corp
+    Kaitei Daisensou (Japan)                         M92-E   (c) 1993 Irem Corp
+    Ninja Baseball Batman (World)                            (c) 1993 Irem Corp
+    Ninja Baseball Batman (USA)                              (c) 1993 Irem America Corp
+    Yakyuu Kakutou League-Man (Japan)                        (c) 1993 Irem Corp
+    Superior Soldiers (US)                           M92-G   (c) 1993 Irem Corp
+    Perfect Soldiers (Japan)                         M92-G   (c) 1993 Irem Corp
+    Dream Soccer '94 (Japan)                         M92-G   (c) 1994 Irem Corp
+    Gun Force II (US)                                M92-G   (c) 1994 Irem Corp
+    Geo Storm (Japan)                                M92-G   (c) 1994 Irem Corp
 
 System notes:
     Each game has an encrypted sound cpu (see irem_cpu.c), the sound cpu and
@@ -97,7 +102,7 @@ Perfect Soldiers              1993  Rev 3.50 M92
 World PK Soccer               1995  Rev 3.51 M92
 Fire Barrel                   1993  Rev 3.52 M92
 Dream Soccer '94              1994  Rev 3.53 M92
-Gunforce 2                    1994  Rev 3.53 M92
+Gun Force II                  1994  Rev 3.53 M92
 
 Gun Force
 1991, Irem Corp.
@@ -254,20 +259,20 @@ TIMER_DEVICE_CALLBACK_MEMBER(m92_state::scanline_interrupt)
 
 /*****************************************************************************/
 
-READ16_MEMBER(m92_state::eeprom_r)
+uint16_t m92_state::eeprom_r(offs_t offset)
 {
 //  logerror("%05x: EEPROM RE %04x\n",m_maincpu->pc(),offset);
 	return m_eeprom[offset] | 0xff00;
 }
 
-WRITE16_MEMBER(m92_state::eeprom_w)
+void m92_state::eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  logerror("%05x: EEPROM WR %04x\n",m_maincpu->pc(),offset);
 	if (ACCESSING_BITS_0_7)
 		m_eeprom[offset] = data;
 }
 
-WRITE8_MEMBER(m92_state::coincounter_w)
+void m92_state::coincounter_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);
@@ -276,7 +281,7 @@ WRITE8_MEMBER(m92_state::coincounter_w)
 	/* Bit 0x40 set in Blade Master test mode input check */
 }
 
-WRITE8_MEMBER(m92_state::bankswitch_w)
+void m92_state::bankswitch_w(uint8_t data)
 {
 	m_mainbank->set_entry((data & 0x06) >> 1);
 	if (data & 0xf9)
@@ -289,7 +294,7 @@ READ_LINE_MEMBER(m92_state::sprite_busy_r)
 }
 
 template<int Layer>
-WRITE16_MEMBER(m92_state::pf_control_w)
+void m92_state::pf_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//Fix for nbbm stage start screen
 	//m_screen->update_partial(m_screen->vpos());
@@ -298,7 +303,7 @@ WRITE16_MEMBER(m92_state::pf_control_w)
 
 /*****************************************************************************/
 
-WRITE16_MEMBER(m92_state::sound_reset_w)
+void m92_state::sound_reset_w(uint16_t data)
 {
 	if (m_soundcpu)
 		m_soundcpu->set_input_line(INPUT_LINE_RESET, (data) ? CLEAR_LINE : ASSERT_LINE);
@@ -371,7 +376,7 @@ void m92_state::m92_banked_portmap(address_map &map)
 	map(0x20, 0x20).w(FUNC(m92_state::bankswitch_w));
 }
 
-WRITE16_MEMBER(m92_state::oki_bank_w)
+void m92_state::oki_bank_w(uint16_t data)
 {
 	m_oki->set_rom_bank((data+1) & 0x3); // +1?
 }
@@ -1460,83 +1465,83 @@ ROM_END
 
 ROM_START( inthunt )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "ith-h0-d.bin", 0x000001, 0x040000, CRC(52f8e7a6) SHA1(26d9e272b01e7b82019812059dcc9fbb043c6129) )
-	ROM_LOAD16_BYTE( "ith-l0-d.bin", 0x000000, 0x040000, CRC(5db79eb7) SHA1(ffd4228d7b88a44a82e639a5583753da183fcb23) )
-	ROM_LOAD16_BYTE( "ith-h1-b.bin", 0x080001, 0x020000, CRC(fc2899df) SHA1(f811ff5fd55655afdb25950d317db85c8091b6d6) )
-	ROM_LOAD16_BYTE( "ith-l1-b.bin", 0x080000, 0x020000, CRC(955a605a) SHA1(2515accc2f4a06b07418e45eb62e746d09c81720) )
+	ROM_LOAD16_BYTE( "ith-h0-d.ic28", 0x000001, 0x040000, CRC(52f8e7a6) SHA1(26d9e272b01e7b82019812059dcc9fbb043c6129) )
+	ROM_LOAD16_BYTE( "ith-l0-d.ic39", 0x000000, 0x040000, CRC(5db79eb7) SHA1(ffd4228d7b88a44a82e639a5583753da183fcb23) )
+	ROM_LOAD16_BYTE( "ith-h1-b.ic38", 0x080001, 0x020000, CRC(fc2899df) SHA1(f811ff5fd55655afdb25950d317db85c8091b6d6) )
+	ROM_LOAD16_BYTE( "ith-l1-b.ic27", 0x080000, 0x020000, CRC(955a605a) SHA1(2515accc2f4a06b07418e45eb62e746d09c81720) )
 
 	ROM_REGION( 0x20000, "soundcpu", 0 )    /* Irem D8000011A1 */
-	ROM_LOAD16_BYTE( "ith-sh0.rom", 0x00001, 0x10000, CRC(209c8b7f) SHA1(eaf4a6d9222fe181df65cea1f13c3f2ebff2ec5b) )
-	ROM_LOAD16_BYTE( "ith-sl0.rom", 0x00000, 0x10000, CRC(18472d65) SHA1(2705e94ee350ffda272c50ea3bf605826aa19978) )
+	ROM_LOAD16_BYTE( "ith-sh0.ic30", 0x00001, 0x10000, CRC(209c8b7f) SHA1(eaf4a6d9222fe181df65cea1f13c3f2ebff2ec5b) )
+	ROM_LOAD16_BYTE( "ith-sl0.ic31", 0x00000, 0x10000, CRC(18472d65) SHA1(2705e94ee350ffda272c50ea3bf605826aa19978) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 ) /* Tiles */
-	ROM_LOAD( "ith_ic26.rom", 0x000000, 0x080000, CRC(4c1818cf) SHA1(fc8c2ae640bc3504a52736be46febb92c998fd7d) )
-	ROM_LOAD( "ith_ic25.rom", 0x080000, 0x080000, CRC(91145bae) SHA1(71b2695575f189a2fc72635831ba408f824d4928) )
-	ROM_LOAD( "ith_ic24.rom", 0x100000, 0x080000, CRC(fc03fe3b) SHA1(7e34220b9b21b82e012dcbf3052cccb118e3c382) )
-	ROM_LOAD( "ith_ic23.rom", 0x180000, 0x080000, CRC(ee156a0a) SHA1(4a303ed292ce79e3f990139c35b921213eb2711d) )
+	ROM_LOAD( "ith_c0.ic26", 0x000000, 0x080000, CRC(4c1818cf) SHA1(fc8c2ae640bc3504a52736be46febb92c998fd7d) )
+	ROM_LOAD( "ith_c1.ic25", 0x080000, 0x080000, CRC(91145bae) SHA1(71b2695575f189a2fc72635831ba408f824d4928) )
+	ROM_LOAD( "ith_c2.ic24", 0x100000, 0x080000, CRC(fc03fe3b) SHA1(7e34220b9b21b82e012dcbf3052cccb118e3c382) )
+	ROM_LOAD( "ith_c3.ic23", 0x180000, 0x080000, CRC(ee156a0a) SHA1(4a303ed292ce79e3f990139c35b921213eb2711d) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* Sprites */
-	ROM_LOAD( "ith_ic34.rom", 0x000000, 0x100000, CRC(a019766e) SHA1(59012a41d152a471a95f1f86b6b1e0f9dd3f9711) )
-	ROM_LOAD( "ith_ic35.rom", 0x100000, 0x100000, CRC(3fca3073) SHA1(bdae171cb7705647f28354ca83ecdea3a15f6e22) )
-	ROM_LOAD( "ith_ic36.rom", 0x200000, 0x100000, CRC(20d1b28b) SHA1(290947d77242e837444766ff5d420bc9b53b5b01) )
-	ROM_LOAD( "ith_ic37.rom", 0x300000, 0x100000, CRC(90b6fd4b) SHA1(99237ebab7cf4689e06965bd546cd80a825ab024) )
+	ROM_LOAD( "ith_000.ic34", 0x000000, 0x100000, CRC(a019766e) SHA1(59012a41d152a471a95f1f86b6b1e0f9dd3f9711) )
+	ROM_LOAD( "ith_010.ic35", 0x100000, 0x100000, CRC(3fca3073) SHA1(bdae171cb7705647f28354ca83ecdea3a15f6e22) )
+	ROM_LOAD( "ith_020.ic36", 0x200000, 0x100000, CRC(20d1b28b) SHA1(290947d77242e837444766ff5d420bc9b53b5b01) )
+	ROM_LOAD( "ith_030.ic37", 0x300000, 0x100000, CRC(90b6fd4b) SHA1(99237ebab7cf4689e06965bd546cd80a825ab024) )
 
 	ROM_REGION( 0x80000, "irem", 0 )
-	ROM_LOAD( "ith_ic9.rom", 0x000000, 0x080000, CRC(318ee71a) SHA1(e6f49a7adf7155ba40c4f33a8fdc9553c00f5e3d) )
+	ROM_LOAD( "ith_da.ic9", 0x000000, 0x080000, CRC(318ee71a) SHA1(e6f49a7adf7155ba40c4f33a8fdc9553c00f5e3d) )
 ROM_END
 
 ROM_START( inthuntu )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "ith-h0-c.bin", 0x000001, 0x040000, CRC(563dcec0) SHA1(0c7588ba603926fb0b490f2ba324ff73362a54d5) )
-	ROM_LOAD16_BYTE( "ith-l0-c.bin", 0x000000, 0x040000, CRC(1638c705) SHA1(8ca7a12c2f75172d4c2c808ea666b2f2e969398c) )
-	ROM_LOAD16_BYTE( "ith-h1-a.bin", 0x080001, 0x020000, CRC(0253065f) SHA1(a11e6bf014c19b2e317b75f01a7f0d7a9a85c7d3) )
-	ROM_LOAD16_BYTE( "ith-l1-a.bin", 0x080000, 0x020000, CRC(a57d688d) SHA1(aa049de5c41097b6f1da31e9bf3bac132f67aa6c) )
+	ROM_LOAD16_BYTE( "ith-h0-c.ic28", 0x000001, 0x040000, CRC(563dcec0) SHA1(0c7588ba603926fb0b490f2ba324ff73362a54d5) )
+	ROM_LOAD16_BYTE( "ith-l0-c.ic39", 0x000000, 0x040000, CRC(1638c705) SHA1(8ca7a12c2f75172d4c2c808ea666b2f2e969398c) )
+	ROM_LOAD16_BYTE( "ith-h1-a.ic38", 0x080001, 0x020000, CRC(0253065f) SHA1(a11e6bf014c19b2e317b75f01a7f0d7a9a85c7d3) )
+	ROM_LOAD16_BYTE( "ith-l1-a.ic27", 0x080000, 0x020000, CRC(a57d688d) SHA1(aa049de5c41097b6f1da31e9bf3bac132f67aa6c) )
 
 	ROM_REGION( 0x20000, "soundcpu", 0 )    /* Irem D8000011A1 */
-	ROM_LOAD16_BYTE( "ith-sh0.rom", 0x00001, 0x10000, CRC(209c8b7f) SHA1(eaf4a6d9222fe181df65cea1f13c3f2ebff2ec5b) )
-	ROM_LOAD16_BYTE( "ith-sl0.rom", 0x00000, 0x10000, CRC(18472d65) SHA1(2705e94ee350ffda272c50ea3bf605826aa19978) )
+	ROM_LOAD16_BYTE( "ith-sh0.ic30", 0x00001, 0x10000, CRC(209c8b7f) SHA1(eaf4a6d9222fe181df65cea1f13c3f2ebff2ec5b) )
+	ROM_LOAD16_BYTE( "ith-sl0.ic31", 0x00000, 0x10000, CRC(18472d65) SHA1(2705e94ee350ffda272c50ea3bf605826aa19978) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 ) /* Tiles */
-	ROM_LOAD( "ith_ic26.rom", 0x000000, 0x080000, CRC(4c1818cf) SHA1(fc8c2ae640bc3504a52736be46febb92c998fd7d) )
-	ROM_LOAD( "ith_ic25.rom", 0x080000, 0x080000, CRC(91145bae) SHA1(71b2695575f189a2fc72635831ba408f824d4928) )
-	ROM_LOAD( "ith_ic24.rom", 0x100000, 0x080000, CRC(fc03fe3b) SHA1(7e34220b9b21b82e012dcbf3052cccb118e3c382) )
-	ROM_LOAD( "ith_ic23.rom", 0x180000, 0x080000, CRC(ee156a0a) SHA1(4a303ed292ce79e3f990139c35b921213eb2711d) )
+	ROM_LOAD( "ith_c0.ic26", 0x000000, 0x080000, CRC(4c1818cf) SHA1(fc8c2ae640bc3504a52736be46febb92c998fd7d) )
+	ROM_LOAD( "ith_c1.ic25", 0x080000, 0x080000, CRC(91145bae) SHA1(71b2695575f189a2fc72635831ba408f824d4928) )
+	ROM_LOAD( "ith_c2.ic24", 0x100000, 0x080000, CRC(fc03fe3b) SHA1(7e34220b9b21b82e012dcbf3052cccb118e3c382) )
+	ROM_LOAD( "ith_c3.ic23", 0x180000, 0x080000, CRC(ee156a0a) SHA1(4a303ed292ce79e3f990139c35b921213eb2711d) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* Sprites */
-	ROM_LOAD( "ith_ic34.rom", 0x000000, 0x100000, CRC(a019766e) SHA1(59012a41d152a471a95f1f86b6b1e0f9dd3f9711) )
-	ROM_LOAD( "ith_ic35.rom", 0x100000, 0x100000, CRC(3fca3073) SHA1(bdae171cb7705647f28354ca83ecdea3a15f6e22) )
-	ROM_LOAD( "ith_ic36.rom", 0x200000, 0x100000, CRC(20d1b28b) SHA1(290947d77242e837444766ff5d420bc9b53b5b01) )
-	ROM_LOAD( "ith_ic37.rom", 0x300000, 0x100000, CRC(90b6fd4b) SHA1(99237ebab7cf4689e06965bd546cd80a825ab024) )
+	ROM_LOAD( "ith_000.ic34", 0x000000, 0x100000, CRC(a019766e) SHA1(59012a41d152a471a95f1f86b6b1e0f9dd3f9711) )
+	ROM_LOAD( "ith_010.ic35", 0x100000, 0x100000, CRC(3fca3073) SHA1(bdae171cb7705647f28354ca83ecdea3a15f6e22) )
+	ROM_LOAD( "ith_020.ic36", 0x200000, 0x100000, CRC(20d1b28b) SHA1(290947d77242e837444766ff5d420bc9b53b5b01) )
+	ROM_LOAD( "ith_030.ic37", 0x300000, 0x100000, CRC(90b6fd4b) SHA1(99237ebab7cf4689e06965bd546cd80a825ab024) )
 
 	ROM_REGION( 0x80000, "irem", 0 )
-	ROM_LOAD( "ith_ic9.rom", 0x000000, 0x080000, CRC(318ee71a) SHA1(e6f49a7adf7155ba40c4f33a8fdc9553c00f5e3d) )
+	ROM_LOAD( "ith_da.ic9", 0x000000, 0x080000, CRC(318ee71a) SHA1(e6f49a7adf7155ba40c4f33a8fdc9553c00f5e3d) )
 ROM_END
 
 ROM_START( kaiteids )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "ith-h0j.bin", 0x000001, 0x040000, CRC(dc1dec36) SHA1(f0a6e3be19752bffd9fd5f435405c8f591eab258) )
-	ROM_LOAD16_BYTE( "ith-l0j.bin", 0x000000, 0x040000, CRC(8835d704) SHA1(42be25ccdc31824797a17e6f76bd06edfe853833) )
-	ROM_LOAD16_BYTE( "ith-h1j.bin", 0x080001, 0x020000, CRC(5a7b212d) SHA1(50562d804a43aed7c34c19c8345782ac2f85caa7) )
-	ROM_LOAD16_BYTE( "ith-l1j.bin", 0x080000, 0x020000, CRC(4c084494) SHA1(4f32003db32f13e19dd07c66996b4328ac2a671e) )
+	ROM_LOAD16_BYTE( "ith-h0j.ic28", 0x000001, 0x040000, CRC(dc1dec36) SHA1(f0a6e3be19752bffd9fd5f435405c8f591eab258) )
+	ROM_LOAD16_BYTE( "ith-l0j.ic39", 0x000000, 0x040000, CRC(8835d704) SHA1(42be25ccdc31824797a17e6f76bd06edfe853833) )
+	ROM_LOAD16_BYTE( "ith-h1j.ic38", 0x080001, 0x020000, CRC(5a7b212d) SHA1(50562d804a43aed7c34c19c8345782ac2f85caa7) )
+	ROM_LOAD16_BYTE( "ith-l1j.ic27", 0x080000, 0x020000, CRC(4c084494) SHA1(4f32003db32f13e19dd07c66996b4328ac2a671e) )
 
 	ROM_REGION( 0x20000, "soundcpu", 0 )    /* Irem D8000011A1 */
-	ROM_LOAD16_BYTE( "ith-sh0.rom", 0x00001, 0x10000, CRC(209c8b7f) SHA1(eaf4a6d9222fe181df65cea1f13c3f2ebff2ec5b) )
-	ROM_LOAD16_BYTE( "ith-sl0.rom", 0x00000, 0x10000, CRC(18472d65) SHA1(2705e94ee350ffda272c50ea3bf605826aa19978) )
+	ROM_LOAD16_BYTE( "ith-sh0.ic30", 0x00001, 0x10000, CRC(209c8b7f) SHA1(eaf4a6d9222fe181df65cea1f13c3f2ebff2ec5b) )
+	ROM_LOAD16_BYTE( "ith-sl0.ic31", 0x00000, 0x10000, CRC(18472d65) SHA1(2705e94ee350ffda272c50ea3bf605826aa19978) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 ) /* Tiles */
-	ROM_LOAD( "ith_ic26.rom", 0x000000, 0x080000, CRC(4c1818cf) SHA1(fc8c2ae640bc3504a52736be46febb92c998fd7d) )
-	ROM_LOAD( "ith_ic25.rom", 0x080000, 0x080000, CRC(91145bae) SHA1(71b2695575f189a2fc72635831ba408f824d4928) )
-	ROM_LOAD( "ith_ic24.rom", 0x100000, 0x080000, CRC(fc03fe3b) SHA1(7e34220b9b21b82e012dcbf3052cccb118e3c382) )
-	ROM_LOAD( "ith_ic23.rom", 0x180000, 0x080000, CRC(ee156a0a) SHA1(4a303ed292ce79e3f990139c35b921213eb2711d) )
+	ROM_LOAD( "ith_c0.ic26", 0x000000, 0x080000, CRC(4c1818cf) SHA1(fc8c2ae640bc3504a52736be46febb92c998fd7d) )
+	ROM_LOAD( "ith_c1.ic25", 0x080000, 0x080000, CRC(91145bae) SHA1(71b2695575f189a2fc72635831ba408f824d4928) )
+	ROM_LOAD( "ith_c2.ic24", 0x100000, 0x080000, CRC(fc03fe3b) SHA1(7e34220b9b21b82e012dcbf3052cccb118e3c382) )
+	ROM_LOAD( "ith_c3.ic23", 0x180000, 0x080000, CRC(ee156a0a) SHA1(4a303ed292ce79e3f990139c35b921213eb2711d) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* Sprites */
-	ROM_LOAD( "ith_ic34.rom", 0x000000, 0x100000, CRC(a019766e) SHA1(59012a41d152a471a95f1f86b6b1e0f9dd3f9711) )
-	ROM_LOAD( "ith_ic35.rom", 0x100000, 0x100000, CRC(3fca3073) SHA1(bdae171cb7705647f28354ca83ecdea3a15f6e22) )
-	ROM_LOAD( "ith_ic36.rom", 0x200000, 0x100000, CRC(20d1b28b) SHA1(290947d77242e837444766ff5d420bc9b53b5b01) )
-	ROM_LOAD( "ith_ic37.rom", 0x300000, 0x100000, CRC(90b6fd4b) SHA1(99237ebab7cf4689e06965bd546cd80a825ab024) )
+	ROM_LOAD( "ith_000.ic34", 0x000000, 0x100000, CRC(a019766e) SHA1(59012a41d152a471a95f1f86b6b1e0f9dd3f9711) )
+	ROM_LOAD( "ith_010.ic35", 0x100000, 0x100000, CRC(3fca3073) SHA1(bdae171cb7705647f28354ca83ecdea3a15f6e22) )
+	ROM_LOAD( "ith_020.ic36", 0x200000, 0x100000, CRC(20d1b28b) SHA1(290947d77242e837444766ff5d420bc9b53b5b01) )
+	ROM_LOAD( "ith_030.ic37", 0x300000, 0x100000, CRC(90b6fd4b) SHA1(99237ebab7cf4689e06965bd546cd80a825ab024) )
 
 	ROM_REGION( 0x80000, "irem", 0 )
-	ROM_LOAD( "ith_ic9.rom", 0x000000, 0x080000, CRC(318ee71a) SHA1(e6f49a7adf7155ba40c4f33a8fdc9553c00f5e3d) )
+	ROM_LOAD( "ith_da.ic9", 0x000000, 0x080000, CRC(318ee71a) SHA1(e6f49a7adf7155ba40c4f33a8fdc9553c00f5e3d) )
 ROM_END
 
 ROM_START( hook )
@@ -1793,14 +1798,14 @@ ROM_END
 
 ROM_START( uccops )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "uc_h0.ic28", 0x000001, 0x040000, CRC(240aa5f7) SHA1(8d864bb1377e9f6d266631ed365c5809b9da33f8) )
-	ROM_LOAD16_BYTE( "uc_l0.ic39", 0x000000, 0x040000, CRC(df9a4826) SHA1(298033d97b9587e3548cb3bffa16b7ba9a6ff20d) )
-	ROM_LOAD16_BYTE( "uc_h1.ic27", 0x080001, 0x020000, CRC(8d29bcd6) SHA1(470b77d1b8f88824bac294bd12a205a23dad2287) )
-	ROM_LOAD16_BYTE( "uc_l1.ic38", 0x080000, 0x020000, CRC(a8a402d8) SHA1(0b40fb69f0a3e24e6b60117d2d2fd4cc170bc621) )
+	ROM_LOAD16_BYTE( "ucc_e-h0.ic28", 0x000001, 0x040000, CRC(240aa5f7) SHA1(8d864bb1377e9f6d266631ed365c5809b9da33f8) )
+	ROM_LOAD16_BYTE( "ucc_e-l0.ic39", 0x000000, 0x040000, CRC(df9a4826) SHA1(298033d97b9587e3548cb3bffa16b7ba9a6ff20d) )
+	ROM_LOAD16_BYTE( "ucc_h1.ic27",   0x080001, 0x020000, CRC(8d29bcd6) SHA1(470b77d1b8f88824bac294bd12a205a23dad2287) )
+	ROM_LOAD16_BYTE( "ucc_l1.ic38",   0x080000, 0x020000, CRC(a8a402d8) SHA1(0b40fb69f0a3e24e6b60117d2d2fd4cc170bc621) )
 
 	ROM_REGION( 0x20000, "soundcpu", 0 )
-	ROM_LOAD16_BYTE( "uc_sh0.rom", 0x00001, 0x10000, CRC(df90b198) SHA1(6b334457f06f6b9cfb355ba3d399bebb37b5733e) )
-	ROM_LOAD16_BYTE( "uc_sl0.rom", 0x00000, 0x10000, CRC(96c11aac) SHA1(16c47b4f97f0532fff30bb163f26d8cf6b923a2e) )
+	ROM_LOAD16_BYTE( "ucc_e-sh0.ic30", 0x00001, 0x10000, CRC(df90b198) SHA1(6b334457f06f6b9cfb355ba3d399bebb37b5733e) )
+	ROM_LOAD16_BYTE( "ucc_e-sl0.ic31", 0x00000, 0x10000, CRC(96c11aac) SHA1(16c47b4f97f0532fff30bb163f26d8cf6b923a2e) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 ) /* Tiles */
 	ROM_LOAD( "uc_w38m.rom", 0x000000, 0x080000, CRC(130a40e5) SHA1(f70bad2fe126bb0e451a3fa6100a610928e9a502) )
@@ -1820,14 +1825,14 @@ ROM_END
 
 ROM_START( uccopsu )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "uc_h0.ic28",   0x000001, 0x040000, CRC(240aa5f7) SHA1(8d864bb1377e9f6d266631ed365c5809b9da33f8) )
-	ROM_LOAD16_BYTE( "uc_l0.ic39",   0x000000, 0x040000, CRC(df9a4826) SHA1(298033d97b9587e3548cb3bffa16b7ba9a6ff20d) )
-	ROM_LOAD16_BYTE( "uc_h1-g.ic27", 0x080001, 0x020000, CRC(6b8ca2de) SHA1(1096b93bbaa4c97d4900e8c083cde99195cad5ba) )
-	ROM_LOAD16_BYTE( "uc_l1-g.ic38", 0x080000, 0x020000, CRC(2bdec7dd) SHA1(58817099e74fd5bc299b7bc14d83ee75ed200b53) )
+	ROM_LOAD16_BYTE( "ucc_e-h0.ic28", 0x000001, 0x040000, CRC(240aa5f7) SHA1(8d864bb1377e9f6d266631ed365c5809b9da33f8) )
+	ROM_LOAD16_BYTE( "ucc_e-l0.ic39", 0x000000, 0x040000, CRC(df9a4826) SHA1(298033d97b9587e3548cb3bffa16b7ba9a6ff20d) )
+	ROM_LOAD16_BYTE( "ucc_h1-g.ic27", 0x080001, 0x020000, CRC(6b8ca2de) SHA1(1096b93bbaa4c97d4900e8c083cde99195cad5ba) )
+	ROM_LOAD16_BYTE( "ucc_l1-g.ic38", 0x080000, 0x020000, CRC(2bdec7dd) SHA1(58817099e74fd5bc299b7bc14d83ee75ed200b53) )
 
 	ROM_REGION( 0x20000, "soundcpu", 0 )
-	ROM_LOAD16_BYTE( "uc_sh0.rom", 0x00001, 0x10000, CRC(df90b198) SHA1(6b334457f06f6b9cfb355ba3d399bebb37b5733e) )
-	ROM_LOAD16_BYTE( "uc_sl0.rom", 0x00000, 0x10000, CRC(96c11aac) SHA1(16c47b4f97f0532fff30bb163f26d8cf6b923a2e) )
+	ROM_LOAD16_BYTE( "ucc_e-sh0.ic30", 0x00001, 0x10000, CRC(df90b198) SHA1(6b334457f06f6b9cfb355ba3d399bebb37b5733e) )
+	ROM_LOAD16_BYTE( "ucc_e-sl0.ic31", 0x00000, 0x10000, CRC(96c11aac) SHA1(16c47b4f97f0532fff30bb163f26d8cf6b923a2e) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 ) /* Tiles */
 	ROM_LOAD( "uc_w38m.rom", 0x000000, 0x080000, CRC(130a40e5) SHA1(f70bad2fe126bb0e451a3fa6100a610928e9a502) )

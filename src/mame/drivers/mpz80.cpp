@@ -163,7 +163,7 @@ inline offs_t mpz80_state::get_address(offs_t offset)
 //  mmu_r -
 //-------------------------------------------------
 
-READ8_MEMBER( mpz80_state::mmu_r )
+uint8_t mpz80_state::mmu_r(offs_t offset)
 {
 	if (m_trap && offset >= m_trap_start && offset <= m_trap_start + 0xf)
 		return m_rom->base()[0x3f0 | (m_trap_reset << 10) | (offset - m_trap_start)];
@@ -189,19 +189,19 @@ READ8_MEMBER( mpz80_state::mmu_r )
 		}
 		else if (offset == 0x400)
 		{
-			data = trap_addr_r(space, 0);
+			data = trap_addr_r();
 		}
 		else if (offset == 0x401)
 		{
-			data = keyboard_r(space, 0);
+			data = keyboard_r();
 		}
 		else if (offset == 0x402)
 		{
-			data = switch_r(space, 0);
+			data = switch_r();
 		}
 		else if (offset == 0x403)
 		{
-			data = status_r(space, 0);
+			data = status_r();
 		}
 		else if (offset >= 0x600 && offset < 0x800)
 		{
@@ -230,7 +230,7 @@ READ8_MEMBER( mpz80_state::mmu_r )
 //  mmu_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( mpz80_state::mmu_w )
+void mpz80_state::mmu_w(offs_t offset, uint8_t data)
 {
 	m_addr = get_address(offset);
 
@@ -242,19 +242,19 @@ WRITE8_MEMBER( mpz80_state::mmu_w )
 		}
 		else if (offset == 0x400)
 		{
-			disp_seg_w(space, 0, data);
+			disp_seg_w(data);
 		}
 		else if (offset == 0x401)
 		{
-			disp_col_w(space, 0, data);
+			disp_col_w(data);
 		}
 		else if (offset == 0x402)
 		{
-			task_w(space, 0, data);
+			task_w(data);
 		}
 		else if (offset == 0x403)
 		{
-			mask_w(space, 0, data);
+			mask_w(data);
 		}
 		else if (offset >= 0x600 && offset < 0x800)
 		{
@@ -292,7 +292,7 @@ inline offs_t mpz80_state::get_io_address(offs_t offset)
 //  mmu_io_r -
 //-------------------------------------------------
 
-READ8_MEMBER( mpz80_state::mmu_io_r )
+uint8_t mpz80_state::mmu_io_r(offs_t offset)
 {
 	return m_s100->sinp_r(get_io_address(offset));
 }
@@ -302,7 +302,7 @@ READ8_MEMBER( mpz80_state::mmu_io_r )
 //  mmu_io_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( mpz80_state::mmu_io_w )
+void mpz80_state::mmu_io_w(offs_t offset, uint8_t data)
 {
 	m_s100->sout_w(get_io_address(offset), data);
 }
@@ -312,7 +312,7 @@ WRITE8_MEMBER( mpz80_state::mmu_io_w )
 //  trap_addr_r - trap address register
 //-------------------------------------------------
 
-READ8_MEMBER( mpz80_state::trap_addr_r )
+uint8_t mpz80_state::trap_addr_r()
 {
 	/*
 
@@ -337,7 +337,7 @@ READ8_MEMBER( mpz80_state::trap_addr_r )
 //  status_r - trap status register
 //-------------------------------------------------
 
-READ8_MEMBER( mpz80_state::status_r )
+uint8_t mpz80_state::status_r()
 {
 	/*
 
@@ -362,7 +362,7 @@ READ8_MEMBER( mpz80_state::status_r )
 //  task_w - task register
 //-------------------------------------------------
 
-WRITE8_MEMBER( mpz80_state::task_w )
+void mpz80_state::task_w(uint8_t data)
 {
 	/*
 
@@ -390,7 +390,7 @@ WRITE8_MEMBER( mpz80_state::task_w )
 //  mask_w - mask register
 //-------------------------------------------------
 
-WRITE8_MEMBER( mpz80_state::mask_w )
+void mpz80_state::mask_w(uint8_t data)
 {
 	/*
 
@@ -420,7 +420,7 @@ WRITE8_MEMBER( mpz80_state::mask_w )
 //  keyboard_r - front panel keyboard
 //-------------------------------------------------
 
-READ8_MEMBER( mpz80_state::keyboard_r )
+uint8_t mpz80_state::keyboard_r()
 {
 	/*
 
@@ -445,7 +445,7 @@ READ8_MEMBER( mpz80_state::keyboard_r )
 //  switch_r - switch register
 //-------------------------------------------------
 
-READ8_MEMBER( mpz80_state::switch_r )
+uint8_t mpz80_state::switch_r()
 {
 	/*
 
@@ -481,7 +481,7 @@ READ8_MEMBER( mpz80_state::switch_r )
 //  disp_seg_w - front panel segment
 //-------------------------------------------------
 
-WRITE8_MEMBER( mpz80_state::disp_seg_w )
+void mpz80_state::disp_seg_w(uint8_t data)
 {
 	/*
 
@@ -504,7 +504,7 @@ WRITE8_MEMBER( mpz80_state::disp_seg_w )
 //  disp_col_w - front panel column
 //-------------------------------------------------
 
-WRITE8_MEMBER( mpz80_state::disp_col_w )
+void mpz80_state::disp_col_w(uint8_t data)
 {
 	/*
 

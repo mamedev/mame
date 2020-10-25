@@ -36,12 +36,12 @@ private:
 		TIMER_IRQ_OFF
 	};
 
-	DECLARE_WRITE8_MEMBER(pentagon_port_7ffd_w);
-	DECLARE_WRITE8_MEMBER(pentagon_scr_w);
-	DECLARE_WRITE8_MEMBER(pentagon_scr2_w);
-	DECLARE_READ8_MEMBER(beta_neutral_r);
-	DECLARE_READ8_MEMBER(beta_enable_r);
-	DECLARE_READ8_MEMBER(beta_disable_r);
+	void pentagon_port_7ffd_w(uint8_t data);
+	void pentagon_scr_w(offs_t offset, uint8_t data);
+	void pentagon_scr2_w(offs_t offset, uint8_t data);
+	uint8_t beta_neutral_r(offs_t offset);
+	uint8_t beta_enable_r(offs_t offset);
+	uint8_t beta_disable_r(offs_t offset);
 	DECLARE_MACHINE_RESET(pentagon);
 	DECLARE_VIDEO_START(pentagon);
 	INTERRUPT_GEN_MEMBER(pentagon_interrupt);
@@ -95,7 +95,7 @@ void pentagon_state::pentagon_update_memory()
 	m_bank1->set_base(&m_p_ram[0x10000 + (m_ROMSelection<<14)]);
 }
 
-WRITE8_MEMBER(pentagon_state::pentagon_port_7ffd_w)
+void pentagon_state::pentagon_port_7ffd_w(uint8_t data)
 {
 	/* disable paging */
 	if (m_port_7ffd_data & 0x20)
@@ -111,14 +111,14 @@ WRITE8_MEMBER(pentagon_state::pentagon_port_7ffd_w)
 	pentagon_update_memory();
 }
 
-WRITE8_MEMBER(pentagon_state::pentagon_scr_w)
+void pentagon_state::pentagon_scr_w(offs_t offset, uint8_t data)
 {
 	spectrum_UpdateScreenBitmap();
 
 	*((uint8_t*)m_bank2->base() + offset) = data;
 }
 
-WRITE8_MEMBER(pentagon_state::pentagon_scr2_w)
+void pentagon_state::pentagon_scr2_w(offs_t offset, uint8_t data)
 {
 	if ((m_port_7ffd_data & 0x0f) == 0x0f || (m_port_7ffd_data & 0x0f) == 5)
 		spectrum_UpdateScreenBitmap();
@@ -157,12 +157,12 @@ INTERRUPT_GEN_MEMBER(pentagon_state::pentagon_interrupt)
 	timer_set(attotime::from_ticks(179, XTAL(14'000'000) / 4), TIMER_IRQ_ON, 0);
 }
 
-READ8_MEMBER(pentagon_state::beta_neutral_r)
+uint8_t pentagon_state::beta_neutral_r(offs_t offset)
 {
 	return m_program->read_byte(offset);
 }
 
-READ8_MEMBER(pentagon_state::beta_enable_r)
+uint8_t pentagon_state::beta_enable_r(offs_t offset)
 {
 	if (!(machine().side_effects_disabled())) {
 		if (m_ROMSelection == 1) {
@@ -177,7 +177,7 @@ READ8_MEMBER(pentagon_state::beta_enable_r)
 	return m_program->read_byte(offset + 0x3d00);
 }
 
-READ8_MEMBER(pentagon_state::beta_disable_r)
+uint8_t pentagon_state::beta_disable_r(offs_t offset)
 {
 	if (!(machine().side_effects_disabled())) {
 		if (m_beta->started() && m_beta->is_active()) {
@@ -225,8 +225,8 @@ MACHINE_RESET_MEMBER(pentagon_state,pentagon)
 	m_program = &m_maincpu->space(AS_PROGRAM);
 	m_p_ram = memregion("maincpu")->base();
 
-	m_program->install_write_handler(0x4000, 0x5aff, write8_delegate(*this, FUNC(pentagon_state::pentagon_scr_w)));
-	m_program->install_write_handler(0xc000, 0xdaff, write8_delegate(*this, FUNC(pentagon_state::pentagon_scr2_w)));
+	m_program->install_write_handler(0x4000, 0x5aff, write8sm_delegate(*this, FUNC(pentagon_state::pentagon_scr_w)));
+	m_program->install_write_handler(0xc000, 0xdaff, write8sm_delegate(*this, FUNC(pentagon_state::pentagon_scr2_w)));
 
 	if (m_beta->started())
 	{

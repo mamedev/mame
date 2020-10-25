@@ -28,12 +28,12 @@ public:
 private:
 	required_shared_ptr<uint16_t> m_plasmaram;
 
-	DECLARE_READ16_MEMBER( mpu4plasma_unk_r )
+	uint16_t mpu4plasma_unk_r()
 	{
 		return machine().rand();
 	}
 
-	DECLARE_WRITE16_MEMBER( mpu4plasma_unk_w )
+	void mpu4plasma_unk_w(uint16_t data)
 	{
 	}
 	uint32_t screen_update_mpu4plasma(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -56,31 +56,23 @@ void mpu4plasma_state::mpu4plasma_map(address_map &map)
 uint32_t mpu4plasma_state::screen_update_mpu4plasma(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// don't know if this really gets drawn straight from ram..
-	int base = 0x1600 / 2;
+	int const base = 0x1600 / 2;
 
-	uint16_t* rambase = m_plasmaram;
-	uint16_t* dst_bitmap;
+	uint16_t const *const rambase = m_plasmaram;
 
-	int i,y,x,p;
-	i = 0;
+	int i = 0;
 
-	for (y=0;y<40;y++)
+	for (int y=0; y<40; y++)
 	{
-		dst_bitmap = &bitmap.pix16(y);
+		uint16_t *const dst_bitmap = &bitmap.pix(y);
 
-		for (x=0;x<128/16;x++)
+		for (int x=0; x<128/16; x++)
 		{
-			uint16_t pix = rambase[base+i];
-
-			for (p=0;p<16;p++)
-			{
-				uint16_t bit = (pix << p)&0x8000;
-				if (bit) dst_bitmap[x*16 + p] = 1;
-				else dst_bitmap[x*16 + p] = 0;
-			}
+			uint16_t const pix = rambase[base+i];
+			for (int p=0; p<16; p++)
+				dst_bitmap[x*16 + p] = ((pix << p) & 0x8000) ? 1 : 0;
 
 			i++;
-
 		}
 	}
 
@@ -173,8 +165,8 @@ ROM_END
 
 #define M4APACH_PLASMA \
 	ROM_REGION( 0x40000, "plasmacpu", 0 ) \
-	ROM_LOAD16_BYTE( "plasma.p0", 0x00000, 0x010000, NO_DUMP ) \
-	ROM_LOAD16_BYTE( "plasma.p1", 0x00001, 0x010000, NO_DUMP )
+	ROM_LOAD16_BYTE( "a6ppl.p0", 0x00000, 0x020000, CRC(350da2df) SHA1(a390e0c7e1e624c17f0e254e0b99ef9dbf56269d) ) \
+	ROM_LOAD16_BYTE( "a6ppl.p1", 0x00001, 0x020000, CRC(63038aba) SHA1(8ec4e02109e872460a9598e469b59919cc5450dd) ) \
 
 ROM_START( m4apach )
 	ROM_REGION( 0x10000, "maincpu", 0 )

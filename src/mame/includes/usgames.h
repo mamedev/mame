@@ -38,10 +38,10 @@ private:
 	output_finder<5> m_leds;
 	required_device<palette_device> m_palette;
 
-	DECLARE_WRITE8_MEMBER(rombank_w);
-	DECLARE_WRITE8_MEMBER(lamps1_w);
-	DECLARE_WRITE8_MEMBER(lamps2_w);
-	DECLARE_WRITE8_MEMBER(charram_w);
+	void rombank_w(uint8_t data);
+	void lamps1_w(uint8_t data);
+	void lamps2_w(uint8_t data);
+	void charram_w(offs_t offset, uint8_t data);
 
 	void usgames_palette(palette_device &palette) const;
 

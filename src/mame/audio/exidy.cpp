@@ -180,7 +180,7 @@ void exidy_sound_device::common_sh_start()
 	m_sh6840_clocks_per_sample = (int)(SH6840_CLOCK.dvalue() / (double)sample_rate * (double)(1 << 24));
 
 	/* allocate the stream */
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, sample_rate);
+	m_stream = stream_alloc(0, 1, sample_rate);
 
 	sh6840_register_state_globals();
 }
@@ -196,6 +196,8 @@ exidy_sh8253_sound_device::exidy_sh8253_sound_device(const machine_config &mconf
 	: exidy_sound_device(mconfig, type, tag, owner, clock),
 		m_riot(*this, "riot"),
 		m_cvsd(*this, "cvsd"),
+		m_cvsd_filter(*this, "cvsd_filter"),
+		m_cvsd_filter2(*this, "cvsd_filter2"),
 		m_cvsdcpu(*this, "cvsdcpu"),
 		m_tms(*this, "tms"),
 		m_pia(*this, "pia")
@@ -242,20 +244,20 @@ void exidy_sound_device::device_reset()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void exidy_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void exidy_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	sh6840_timer_channel *sh6840_timer = m_sh6840_timer;
 
 	/* hack to skip the expensive lfsr noise generation unless at least one of the 3 channels actually depends on it being generated */
 	int noisy = ((sh6840_timer[0].cr & sh6840_timer[1].cr & sh6840_timer[2].cr & 0x02) == 0);
-	stream_sample_t *buffer = outputs[0];
+	auto &buffer = outputs[0];
 
 	/* loop over samples */
-	while (samples--)
+	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
 	{
 		sh6840_timer_channel *t;
 		int clocks;
-		stream_sample_t sample = 0;
+		s32 sample = 0;
 
 		/* determine how many 6840 clocks this sample */
 		m_sh6840_clock_count += m_sh6840_clocks_per_sample;
@@ -310,19 +312,19 @@ void exidy_sound_device::sound_stream_update(sound_stream &stream, stream_sample
 		sample += generate_music_sample();
 
 		/* stash */
-		*buffer++ = sample;
+		buffer.put_int(sampindex, sample, 32768);
 	}
 }
 
-stream_sample_t exidy_sound_device::generate_music_sample()
+s32 exidy_sound_device::generate_music_sample()
 {
 	return 0;
 }
 
-stream_sample_t exidy_sh8253_sound_device::generate_music_sample()
+s32 exidy_sh8253_sound_device::generate_music_sample()
 {
 	sh8253_timer_channel *c;
-	stream_sample_t sample = 0;
+	s32 sample = 0;
 
 	/* music channel 0 */
 	c = &m_sh8253_timer[0];
@@ -788,7 +790,31 @@ DEFINE_DEVICE_TYPE(EXIDY_MTRAP, mtrap_sound_device, "mtrap_sound", "Exidy SFX+PS
 
 mtrap_sound_device::mtrap_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: venture_sound_device(mconfig, EXIDY_MTRAP, tag, owner, clock)
+	, m_cvsd_timer(*this,"cvsd_timer")
+	, m_cvsd_clk(false)
 {
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void mtrap_sound_device::device_start()
+{
+	common_sh_start();
+
+	/* 8253 */
+	m_freq_to_step = (1 << 24) / SH8253_CLOCK;
+
+	sh8253_register_state_globals();
+
+	save_item(NAME(m_cvsd_clk));
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(mtrap_sound_device::cvsd_timer)
+{
+	m_cvsd_clk = !m_cvsd_clk;
+	m_cvsd->clock_w(m_cvsd_clk);
 }
 
 void mtrap_sound_device::voiceio_w(offs_t offset, uint8_t data)
@@ -803,19 +829,24 @@ void mtrap_sound_device::voiceio_w(offs_t offset, uint8_t data)
 
 uint8_t mtrap_sound_device::voiceio_r(offs_t offset)
 {
+	uint8_t retval = 0xff; // this should probably be open bus
 	if (!(offset & 0x80))
 	{
+		retval &= 0xf0;
 		uint8_t porta = m_riot->porta_out_get();
 		uint8_t data = (porta & 0x06) >> 1;
 		data |= (porta & 0x01) << 2;
 		data |= (porta & 0x08);
-		return data;
+		retval |= data;
 	}
 
 	if (!(offset & 0x40))
-		return m_cvsd->clock_state_r() << 7;
+	{
+		retval &= 0x7f;
+		retval |= (m_cvsd_clk << 7);
+	}
 
-	return 0;
+	return retval;
 }
 
 
@@ -841,8 +872,15 @@ void mtrap_sound_device::device_add_mconfig(machine_config &config)
 	m_cvsdcpu->set_addrmap(AS_PROGRAM, &mtrap_sound_device::cvsd_map);
 	m_cvsdcpu->set_addrmap(AS_IO, &mtrap_sound_device::cvsd_iomap);
 
+	TIMER(config, m_cvsd_timer).configure_periodic(FUNC(mtrap_sound_device::cvsd_timer), attotime::from_hz(CVSD_CLOCK*2.0)); // this is a 555 timer with 53% duty cycle, within margin of error of 50% duty cycle; the handler clocks on both clock edges, hence * 2.0
+
 	/* audio hardware */
-	MC3417(config, m_cvsd, CVSD_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
+	FILTER_BIQUAD(config, m_cvsd_filter2).opamp_mfb_lowpass_setup(RES_K(10), RES_K(3.9), RES_K(18), CAP_N(20), CAP_N(2.2));
+	m_cvsd_filter2->add_route(ALL_OUTPUTS, "mono", 1.0);
+	FILTER_BIQUAD(config, m_cvsd_filter).opamp_mfb_lowpass_setup(RES_K(10), RES_K(3.9), RES_K(18), CAP_N(20), CAP_N(2.2));
+	m_cvsd_filter->add_route(ALL_OUTPUTS, m_cvsd_filter2, 1.0);
+	MC3417(config, m_cvsd, 0).add_route(ALL_OUTPUTS, m_cvsd_filter, 0.3086); // each filter has gain of 1.8 for total gain of 3.24, 0.3086 cancels this out. was 0.8
+
 }
 
 

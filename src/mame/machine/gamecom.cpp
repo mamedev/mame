@@ -202,7 +202,7 @@ void gamecom_state::handle_input_press(uint16_t mux_data)
 	}
 }
 
-WRITE8_MEMBER( gamecom_state::gamecom_pio_w )
+void gamecom_state::gamecom_pio_w(offs_t offset, uint8_t data)
 {
 	offset += 0x14;
 	m_p_ram[offset] = data;
@@ -225,12 +225,12 @@ WRITE8_MEMBER( gamecom_state::gamecom_pio_w )
 	}
 }
 
-READ8_MEMBER( gamecom_state::gamecom_pio_r )
+uint8_t gamecom_state::gamecom_pio_r(offs_t offset)
 {
 	return m_p_ram[offset + 0x14];
 }
 
-READ8_MEMBER( gamecom_state::gamecom_internal_r )
+uint8_t gamecom_state::gamecom_internal_r(offs_t offset)
 {
 	return m_p_ram[offset + 0x20];
 }
@@ -265,7 +265,7 @@ void gamecom_state::recompute_lcd_params()
 	m_screen->configure(hblank_period, vblank_period, visarea, refresh);
 }
 
-WRITE8_MEMBER( gamecom_state::gamecom_internal_w )
+void gamecom_state::gamecom_internal_w(offs_t offset, uint8_t data)
 {
 	offset += 0x20;
 	switch( offset )
@@ -457,7 +457,7 @@ WRITE8_MEMBER( gamecom_state::gamecom_internal_w )
 /* The manual is not conclusive as to which bit of the DMVP register (offset 0x3D) determines
    which page for source or destination is used.
    Also, there's nothing about what happens if the block overflows the source or destination. */
-WRITE8_MEMBER( gamecom_state::gamecom_handle_dma )
+void gamecom_state::gamecom_handle_dma(uint8_t data)
 {
 	u8 dmc = m_p_ram[SM8521_DMC];
 	if (!BIT(dmc, 7))
@@ -573,7 +573,7 @@ WRITE8_MEMBER( gamecom_state::gamecom_handle_dma )
 	m_maincpu->set_input_line(sm8500_cpu_device::DMA_INT, ASSERT_LINE );
 }
 
-WRITE8_MEMBER( gamecom_state::gamecom_update_timers )
+void gamecom_state::gamecom_update_timers(uint8_t data)
 {
 	if ( m_timer[0].enabled )
 	{

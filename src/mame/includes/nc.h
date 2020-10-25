@@ -63,15 +63,15 @@ public:
 	void init_nc();
 
 protected:
-	DECLARE_READ8_MEMBER(nc_memory_management_r);
-	DECLARE_WRITE8_MEMBER(nc_memory_management_w);
-	DECLARE_WRITE8_MEMBER(nc_irq_mask_w);
-	DECLARE_WRITE8_MEMBER(nc_irq_status_w);
-	DECLARE_READ8_MEMBER(nc_irq_status_r);
-	DECLARE_READ8_MEMBER(nc_key_data_in_r);
-	DECLARE_WRITE8_MEMBER(nc_sound_w);
-	DECLARE_WRITE8_MEMBER(nc_uart_control_w);
-	DECLARE_WRITE8_MEMBER(nc100_display_memory_start_w);
+	uint8_t nc_memory_management_r(offs_t offset);
+	void nc_memory_management_w(offs_t offset, uint8_t data);
+	void nc_irq_mask_w(uint8_t data);
+	void nc_irq_status_w(uint8_t data);
+	uint8_t nc_irq_status_r();
+	uint8_t nc_key_data_in_r(offs_t offset);
+	void nc_sound_w(offs_t offset, uint8_t data);
+	void nc_uart_control_w(uint8_t data);
+	void nc100_display_memory_start_w(uint8_t data);
 
 	void nc_colours(palette_device &palette) const;
 	TIMER_CALLBACK_MEMBER(nc_keyboard_timer_callback);
@@ -146,10 +146,10 @@ public:
 	void nc100(machine_config &config);
 
 protected:
-	DECLARE_WRITE8_MEMBER(nc100_uart_control_w);
-	DECLARE_WRITE8_MEMBER(nc100_poweroff_control_w);
-	DECLARE_READ8_MEMBER(nc100_card_battery_status_r);
-	DECLARE_WRITE8_MEMBER(nc100_memory_card_wait_state_w);
+	void nc100_uart_control_w(uint8_t data);
+	void nc100_poweroff_control_w(uint8_t data);
+	uint8_t nc100_card_battery_status_r();
+	void nc100_memory_card_wait_state_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(nc100_tc8521_alarm_callback);
 	DECLARE_WRITE_LINE_MEMBER(nc100_txrdy_callback);
@@ -176,12 +176,12 @@ public:
 	void nc200(machine_config &config);
 
 protected:
-	DECLARE_WRITE8_MEMBER(nc200_irq_status_w);
-	DECLARE_READ8_MEMBER(nc200_card_battery_status_r);
-	DECLARE_READ8_MEMBER(nc200_printer_status_r);
-	DECLARE_WRITE8_MEMBER(nc200_uart_control_w);
-	DECLARE_WRITE8_MEMBER(nc200_memory_card_wait_state_w);
-	DECLARE_WRITE8_MEMBER(nc200_poweroff_control_w);
+	void nc200_irq_status_w(uint8_t data);
+	uint8_t nc200_card_battery_status_r();
+	uint8_t nc200_printer_status_r();
+	void nc200_uart_control_w(uint8_t data);
+	void nc200_memory_card_wait_state_w(uint8_t data);
+	void nc200_poweroff_control_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(write_nc200_centronics_ack);
 	DECLARE_WRITE_LINE_MEMBER(nc200_txrdy_callback);

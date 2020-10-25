@@ -32,7 +32,7 @@ public:
 	void tvgame(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(speaker_w);
+	void speaker_w(uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
@@ -69,22 +69,21 @@ INPUT_PORTS_START( tvgame )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-WRITE8_MEMBER( tvgame_state::speaker_w )
+void tvgame_state::speaker_w(uint8_t data)
 {
 	m_speaker->level_w(BIT(data, 0));
 }
 
 uint32_t tvgame_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y,gfx;
-	uint16_t sy=0,ma=241,x;
+	uint16_t sy=0,ma=241;
 
-	for (y = 0; y < 213; y++)
+	for (uint8_t y = 0; y < 213; y++)
 	{
-		uint16_t *p = &bitmap.pix16(sy++);
-		for (x = ma; x < ma+27; x++)
+		uint16_t *p = &bitmap.pix(sy++);
+		for (uint16_t x = ma; x < ma+27; x++)
 		{
-			gfx = m_p_videoram[x];
+			uint8_t gfx = m_p_videoram[x];
 
 			/* Display a scanline of a character (8 pixels) */
 			*p++ = BIT(gfx, 0);
@@ -140,4 +139,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS         INIT        COMPANY      FULLNAME              FLAGS
-CONS( 2011, tvgame, 0,      0,       tvgame,    tvgame,  tvgame_state, empty_init, "Mr. Isizu", "Z80 TV Game System", 0 )
+CONS( 2011, tvgame, 0,      0,       tvgame,    tvgame,  tvgame_state, empty_init, "Mr. Isizu", "Z80 TV Game System", MACHINE_SUPPORTS_SAVE )

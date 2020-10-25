@@ -40,12 +40,12 @@ public:
 	void nitedrvr(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(nitedrvr_steering_reset_r);
-	DECLARE_WRITE8_MEMBER(nitedrvr_steering_reset_w);
-	DECLARE_READ8_MEMBER(nitedrvr_in0_r);
-	DECLARE_READ8_MEMBER(nitedrvr_in1_r);
-	DECLARE_WRITE8_MEMBER(nitedrvr_out0_w);
-	DECLARE_WRITE8_MEMBER(nitedrvr_out1_w);
+	uint8_t nitedrvr_steering_reset_r();
+	void nitedrvr_steering_reset_w(uint8_t data);
+	uint8_t nitedrvr_in0_r(offs_t offset);
+	uint8_t nitedrvr_in1_r(offs_t offset);
+	void nitedrvr_out0_w(uint8_t data);
+	void nitedrvr_out1_w(uint8_t data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_nitedrvr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

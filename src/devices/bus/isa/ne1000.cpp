@@ -31,7 +31,7 @@ void ne1000_device::device_start() {
 	memcpy(m_prom, mac, 6);
 	m_dp8390->set_mac(mac);
 	set_isa_device();
-	m_isa->install_device(0x0300, 0x031f, read8_delegate(*this, FUNC(ne1000_device::ne1000_port_r)), write8_delegate(*this, FUNC(ne1000_device::ne1000_port_w)));
+	m_isa->install_device(0x0300, 0x031f, read8sm_delegate(*this, FUNC(ne1000_device::ne1000_port_r)), write8sm_delegate(*this, FUNC(ne1000_device::ne1000_port_w)));
 }
 
 void ne1000_device::device_reset() {
@@ -39,15 +39,13 @@ void ne1000_device::device_reset() {
 	m_irq = ioport("CONFIG")->read() & 3;
 }
 
-READ8_MEMBER(ne1000_device::ne1000_port_r) {
+uint8_t ne1000_device::ne1000_port_r(offs_t offset) {
 	if(offset < 16) {
-		m_dp8390->dp8390_cs(CLEAR_LINE);
-		return m_dp8390->dp8390_r(space, offset, mem_mask);
+		return m_dp8390->cs_read(offset);
 	}
 	switch(offset) {
 	case 16:
-		m_dp8390->dp8390_cs(ASSERT_LINE);
-		return m_dp8390->dp8390_r(space, offset, mem_mask);
+		return m_dp8390->remote_read();
 	case 31:
 		m_dp8390->dp8390_reset(CLEAR_LINE);
 		return 0;
@@ -57,16 +55,14 @@ READ8_MEMBER(ne1000_device::ne1000_port_r) {
 	return 0;
 }
 
-WRITE8_MEMBER(ne1000_device::ne1000_port_w) {
+void ne1000_device::ne1000_port_w(offs_t offset, uint8_t data) {
 	if(offset < 16) {
-		m_dp8390->dp8390_cs(CLEAR_LINE);
-		m_dp8390->dp8390_w(space, offset, data, mem_mask);
+		m_dp8390->cs_write(offset, data);
 		return;
 	}
 	switch(offset) {
 	case 16:
-		m_dp8390->dp8390_cs(ASSERT_LINE);
-		m_dp8390->dp8390_w(space, offset, data, mem_mask);
+		m_dp8390->remote_write(data);
 		return;
 	case 31:
 		m_dp8390->dp8390_reset(ASSERT_LINE);
@@ -94,7 +90,7 @@ WRITE_LINE_MEMBER(ne1000_device::ne1000_irq_w) {
 	}
 }
 
-READ8_MEMBER(ne1000_device::ne1000_mem_read) {
+uint8_t ne1000_device::ne1000_mem_read(offs_t offset) {
 	offset &= ~0xc000; // verify
 	if(offset < 16) return m_prom[offset];
 	if((offset < (8*1024)) || (offset >= (16*1024))) {
@@ -104,7 +100,7 @@ READ8_MEMBER(ne1000_device::ne1000_mem_read) {
 	return m_board_ram[offset - (8*1024)];
 }
 
-WRITE8_MEMBER(ne1000_device::ne1000_mem_write) {
+void ne1000_device::ne1000_mem_write(offs_t offset, uint8_t data) {
 	offset &= ~0xc000; // verify
 	if((offset < (8*1024)) || (offset >= (16*1024))) {
 		logerror("ne1000: invalid memory write %04X\n", offset);

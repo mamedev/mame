@@ -194,7 +194,7 @@ SAMPLES_START_CB_MEMBER(ninjakd2_state::ninjakd2_init_samples)
 	m_sampledata = sampledata;
 }
 
-WRITE8_MEMBER(ninjakd2_state::ninjakd2_pcm_play_w)
+void ninjakd2_state::ninjakd2_pcm_play_w(uint8_t data)
 {
 	// only Ninja Kid II uses this
 	if (m_pcm_region == nullptr)
@@ -249,7 +249,7 @@ void omegaf_state::io_protection_reset()
 	m_io_protection_tick = 0;
 }
 
-READ8_MEMBER(omegaf_state::io_protection_r)
+uint8_t omegaf_state::io_protection_r(offs_t offset)
 {
 	uint8_t result = 0xff;
 
@@ -332,7 +332,7 @@ READ8_MEMBER(omegaf_state::io_protection_r)
 	return result;
 }
 
-WRITE8_MEMBER(omegaf_state::io_protection_w)
+void omegaf_state::io_protection_w(offs_t offset, uint8_t data)
 {
 	// load parameter on c006 bit 0 rise transition
 	if (offset == 2 && (data & 1) && !(m_io_protection[2] & 1))
@@ -348,12 +348,12 @@ WRITE8_MEMBER(omegaf_state::io_protection_w)
 
 /*****************************************************************************/
 
-WRITE8_MEMBER(ninjakd2_state::ninjakd2_bankselect_w)
+void ninjakd2_state::ninjakd2_bankselect_w(uint8_t data)
 {
 	m_mainbank->set_entry(data & m_rom_bank_mask);
 }
 
-WRITE8_MEMBER(ninjakd2_state::ninjakd2_soundreset_w)
+void ninjakd2_state::ninjakd2_soundreset_w(uint8_t data)
 {
 	// bit 4 resets sound CPU
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
@@ -365,19 +365,19 @@ WRITE8_MEMBER(ninjakd2_state::ninjakd2_soundreset_w)
 }
 
 template<int Layer>
-WRITE8_MEMBER(robokid_state::robokid_bg_bank_w)
+void robokid_state::robokid_bg_bank_w(uint8_t data)
 {
 	m_robokid_bg_bank[Layer] = data & m_vram_bank_mask;
 }
 
 template<int Layer>
-READ8_MEMBER(robokid_state::robokid_bg_videoram_r)
+uint8_t robokid_state::robokid_bg_videoram_r(offs_t offset)
 {
 	return m_robokid_bg_videoram[Layer][(m_robokid_bg_bank[Layer] << 10) | offset];
 }
 
 template<int Layer>
-WRITE8_MEMBER(robokid_state::robokid_bg_videoram_w)
+void robokid_state::robokid_bg_videoram_w(offs_t offset, uint8_t data)
 {
 	int const address = (m_robokid_bg_bank[Layer] << 10 ) | offset;
 
@@ -386,7 +386,7 @@ WRITE8_MEMBER(robokid_state::robokid_bg_videoram_w)
 }
 
 template<int Layer>
-WRITE8_MEMBER(robokid_state::robokid_bg_ctrl_w)
+void robokid_state::robokid_bg_ctrl_w(offs_t offset, uint8_t data)
 {
 	bg_ctrl(offset, data, m_robokid_tilemap[Layer]);
 }
@@ -395,7 +395,7 @@ WRITE8_MEMBER(robokid_state::robokid_bg_ctrl_w)
 // returning 0 and no small enemies shoot any bullet.
 // returning 0xff seems enough
 // TODO: find a better reference and verify if there are more gameplay quirks, this might really be anything!
-READ8_MEMBER(omegaf_state::unk_r)
+uint8_t omegaf_state::unk_r()
 {
 	return 0xff;
 }
@@ -1642,7 +1642,7 @@ void mnight_state::init_mnight()
 
 /*****************************************************************************/
 
-READ8_MEMBER(robokid_state::motion_error_verbose_r)
+uint8_t robokid_state::motion_error_verbose_r()
 {
 	popmessage("%s MOTION ERROR, contact MAMEdev", machine().system().name);
 	logerror("maincpu %04x MOTION ERROR\n", m_maincpu->pc());
@@ -1663,7 +1663,7 @@ void robokid_state::motion_error_kludge(uint16_t offset)
 	ROM[2] = 0x18;
 	ROM[3] = 0xf6; // jr $-8
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(offset, offset, read8_delegate(*this, FUNC(robokid_state::motion_error_verbose_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(offset, offset, read8smo_delegate(*this, FUNC(robokid_state::motion_error_verbose_r)));
 }
 
 void robokid_state::init_robokid()

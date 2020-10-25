@@ -284,7 +284,7 @@ void konamigx_state::konamigx_mixer_init(screen_device &screen, int objdma)
 	m_gx_objdma = 0;
 	m_gx_primode = 0;
 
-	m_gx_objzbuf = &screen.priority().pix8(0);
+	m_gx_objzbuf = &screen.priority().pix(0);
 	m_gx_shdzbuf = std::make_unique<uint8_t[]>(GX_ZBUFSIZE);
 	gx_objpool = auto_alloc_array(machine(), struct GX_OBJ, GX_MAX_OBJECTS);
 
@@ -327,7 +327,7 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 	int cltc_shdpri, /*prflp,*/ disp;
 
 	// buffer can move when it's resized, so refresh the pointer
-	m_gx_objzbuf = &screen.priority().pix8(0);
+	m_gx_objzbuf = &screen.priority().pix(0);
 
 	// abort if object database failed to initialize
 	objpool = gx_objpool;
@@ -778,22 +778,21 @@ void konamigx_state::gx_draw_basic_extended_tilemaps_2(screen_device &screen, bi
 		{
 			if (extra_bitmap) // soccer superstars roz layer
 			{
-				int xx,yy;
 				int width = screen.width();
 				int height = screen.height();
-				const pen_t *paldata = m_palette->pens();
+				pen_t const *const paldata = m_palette->pens();
 
 				// the output size of the roz layer has to be doubled horizontally
 				// so that it aligns with the sprites and normal tilemaps.  This appears
 				// to be done as a post-processing / mixing step effect
 				//
 				// - todo, use the pixeldouble_output I just added for vsnet instead?
-				for (yy=0;yy<height;yy++)
+				for (int yy=0;yy<height;yy++)
 				{
-					uint16_t* src = &extra_bitmap->pix16(yy);
-					uint32_t* dst = &bitmap.pix32(yy);
+					uint16_t const *const src = &extra_bitmap->pix(yy);
+					uint32_t *const dst = &bitmap.pix(yy);
 					int shiftpos = 0;
-					for (xx=0;xx<width;xx+=2)
+					for (int xx=0;xx<width;xx+=2)
 					{
 						uint16_t dat = src[(((xx/2)+shiftpos))%width];
 						if (dat&0xff)
@@ -924,7 +923,7 @@ TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac_tile_info)
 }
 
 
-WRITE8_MEMBER(konamigx_state::type3_bank_w)
+void konamigx_state::type3_bank_w(offs_t offset, uint8_t data)
 {
 	// other bits are used for something...
 
@@ -1462,29 +1461,27 @@ uint32_t konamigx_state::screen_update_konamigx(screen_device &screen, bitmap_rg
 	/* Hack! draw type-1 roz layer here for testing purposes only */
 	if (m_gx_specialrozenable == 1)
 	{
-		const pen_t *paldata = m_palette->pens();
+		pen_t const *const paldata = m_palette->pens();
 
 		// hack, draw the roz tilemap if W is held
 		if ( machine().input().code_pressed(KEYCODE_W) )
 		{
-			int y,x;
-
 			// make it flicker, to compare positioning
 			//if (screen.frame_number() & 1)
 			{
-				for (y=0;y<256;y++)
+				for (int y=0;y<256;y++)
 				{
-					//uint32_t* dst = &bitmap.pix32(y);
+					//uint32_t *const dst = &bitmap.pix(y);
 					// ths K053936 rendering should probably just be flipped
 					// this is just kludged to align the racing force 2d logo
-					uint16_t* src = &m_gxtype1_roz_dstbitmap2->pix16(y);
-					//uint16_t* src = &m_gxtype1_roz_dstbitmap->pix16(y);
+					uint16_t const *const src = &m_gxtype1_roz_dstbitmap2->pix(y);
+					//uint16_t const *const src = &m_gxtype1_roz_dstbitmap->pix(y);
 
-					uint32_t* dst = &bitmap.pix32((256+16)-y);
+					uint32_t *const dst = &bitmap.pix((256+16)-y);
 
-					for (x=0;x<512;x++)
+					for (int x=0;x<512;x++)
 					{
-						uint16_t dat = src[x];
+						uint16_t const dat = src[x];
 						dst[x] = paldata[dat];
 					}
 				}
@@ -1589,7 +1586,7 @@ static inline void set_color_555(palette_device &palette, pen_t color, int rshif
 
 #ifdef UNUSED_FUNCTION
 // main monitor for type 3
-WRITE32_MEMBER(konamigx_state::konamigx_555_palette_w)
+void konamigx_state::konamigx_555_palette_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t coldat;
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
@@ -1601,7 +1598,7 @@ WRITE32_MEMBER(konamigx_state::konamigx_555_palette_w)
 }
 
 // sub monitor for type 3
-WRITE32_MEMBER(konamigx_state::konamigx_555_palette2_w)
+void konamigx_state::konamigx_555_palette2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t coldat;
 	COMBINE_DATA(&m_subpaletteram32[offset]);
@@ -1614,7 +1611,7 @@ WRITE32_MEMBER(konamigx_state::konamigx_555_palette2_w)
 }
 #endif
 
-WRITE32_MEMBER(konamigx_state::konamigx_tilebank_w)
+void konamigx_state::konamigx_tilebank_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 		m_gx_tilebanks[offset*4] = (data>>24)&0xff;
@@ -1627,7 +1624,7 @@ WRITE32_MEMBER(konamigx_state::konamigx_tilebank_w)
 }
 
 // type 1 RAM-based PSAC tilemap
-WRITE32_MEMBER(konamigx_state::konamigx_t1_psacmap_w)
+void konamigx_state::konamigx_t1_psacmap_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_psacram[offset]);
 	m_gx_psac_tilemap->mark_tile_dirty(offset/2);
@@ -1635,7 +1632,7 @@ WRITE32_MEMBER(konamigx_state::konamigx_t1_psacmap_w)
 }
 
 // type 4 RAM-based PSAC tilemap
-WRITE32_MEMBER(konamigx_state::konamigx_t4_psacmap_w)
+void konamigx_state::konamigx_t4_psacmap_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_psacram[offset]);
 

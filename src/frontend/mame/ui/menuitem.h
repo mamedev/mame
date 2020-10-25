@@ -9,13 +9,14 @@
 
 ***************************************************************************/
 
-#pragma once
-
 #ifndef MAME_FRONTEND_UI_MENUITEM_H
 #define MAME_FRONTEND_UI_MENUITEM_H
 
+#pragma once
+
 
 namespace ui {
+
 // special menu item for separators
 #define MENU_SEPARATOR_ITEM         "---"
 
@@ -38,7 +39,7 @@ public:
 
 	std::string     text;
 	std::string     subtext;
-	uint32_t          flags;
+	uint32_t        flags;
 	void            *ref;
 	menu_item_type  type;   // item type (eventually will go away when itemref is proper ui_menu_item class rather than void*)
 };

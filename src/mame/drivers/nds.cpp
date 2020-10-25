@@ -70,7 +70,7 @@ static inline void ATTR_PRINTF(3,4) verboselog(device_t &device, int n_level, co
 	}
 }
 
-READ32_MEMBER(nds_state::arm7_io_r)
+uint32_t nds_state::arm7_io_r(offs_t offset, uint32_t mem_mask)
 {
 	uint8_t temp1, temp2;
 	switch(offset)
@@ -195,7 +195,7 @@ READ32_MEMBER(nds_state::arm7_io_r)
 	return 0;
 }
 
-WRITE32_MEMBER(nds_state::arm7_io_w)
+void nds_state::arm7_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch(offset)
 	{
@@ -358,7 +358,7 @@ WRITE32_MEMBER(nds_state::arm7_io_w)
 	}
 }
 
-READ32_MEMBER(nds_state::arm9_io_r)
+uint32_t nds_state::arm9_io_r(offs_t offset, uint32_t mem_mask)
 {
 	switch(offset)
 	{
@@ -432,7 +432,7 @@ READ32_MEMBER(nds_state::arm9_io_r)
 	return 0;
 }
 
-WRITE32_MEMBER(nds_state::arm9_io_w)
+void nds_state::arm9_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch(offset)
 	{
@@ -621,12 +621,12 @@ void nds_state::nds9_wram_map(address_map &map)
 	map(0x18000, 0x1ffff).noprw().nopw();       // probably actually open bus?  GBATEK describes as "random"
 }
 
-READ32_MEMBER(nds_state::wram_first_half_r) { return m_WRAM[offset]; }
-READ32_MEMBER(nds_state::wram_second_half_r) { return m_WRAM[offset+0x4000]; }
-WRITE32_MEMBER(nds_state::wram_first_half_w) { COMBINE_DATA(&m_WRAM[offset]); }
-WRITE32_MEMBER(nds_state::wram_second_half_w) { COMBINE_DATA(&m_WRAM[offset+0x4000]); }
-READ32_MEMBER(nds_state::wram_arm7mirror_r) { return m_arm7ram[offset]; }
-WRITE32_MEMBER(nds_state::wram_arm7mirror_w) { COMBINE_DATA(&m_arm7ram[offset]); }
+uint32_t nds_state::wram_first_half_r(offs_t offset) { return m_WRAM[offset]; }
+uint32_t nds_state::wram_second_half_r(offs_t offset) { return m_WRAM[offset+0x4000]; }
+void nds_state::wram_first_half_w(offs_t offset, uint32_t data, uint32_t mem_mask) { COMBINE_DATA(&m_WRAM[offset]); }
+void nds_state::wram_second_half_w(offs_t offset, uint32_t data, uint32_t mem_mask) { COMBINE_DATA(&m_WRAM[offset+0x4000]); }
+uint32_t nds_state::wram_arm7mirror_r(offs_t offset) { return m_arm7ram[offset]; }
+void nds_state::wram_arm7mirror_w(offs_t offset, uint32_t data, uint32_t mem_mask) { COMBINE_DATA(&m_arm7ram[offset]); }
 
 static INPUT_PORTS_START( nds )
 INPUT_PORTS_END

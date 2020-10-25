@@ -373,6 +373,7 @@ void ninjaw_state::pancontrol_w(offs_t offset, u8 data)
 {
 	filter_volume_device *flt = nullptr;
 	offset &= 3;
+	offset ^= 1;
 
 	switch (offset)
 	{
@@ -618,7 +619,7 @@ protected:
 	virtual void device_start();
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 	// internal state
@@ -657,8 +658,9 @@ void subwoofer_device::device_start()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void subwoofer_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void subwoofer_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
+	outputs[0].fill(0);
 }
 
 

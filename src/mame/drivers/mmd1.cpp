@@ -98,16 +98,12 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-
-private:
-	DECLARE_WRITE8_MEMBER(port00_w);
-	DECLARE_WRITE8_MEMBER(port01_w);
-	DECLARE_WRITE8_MEMBER(port02_w);
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_READ8_MEMBER(port13_r);
+	void round_leds_w(offs_t offset, u8 data);
+	u8 keyboard_r();
+	u8 port13_r();
 	DECLARE_READ_LINE_MEMBER(si);
 	DECLARE_WRITE_LINE_MEMBER(so);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
@@ -118,7 +114,7 @@ private:
 
 	u8 m_cass_data[4];
 	bool m_cassinbit, m_cassoutbit, m_cassold;
-	uint8_t m_return_code;
+	u8 m_return_code;
 
 	required_device<i8080_cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
@@ -128,48 +124,19 @@ private:
 };
 
 
-WRITE8_MEMBER( mmd1_state::port00_w )
+void mmd1_state::round_leds_w(offs_t offset, u8 data)
 {
-	m_p[0][7] = BIT(data,7) ? 0 : 1;
-	m_p[0][6] = BIT(data,6) ? 0 : 1;
-	m_p[0][5] = BIT(data,5) ? 0 : 1;
-	m_p[0][4] = BIT(data,4) ? 0 : 1;
-	m_p[0][3] = BIT(data,3) ? 0 : 1;
-	m_p[0][2] = BIT(data,2) ? 0 : 1;
-	m_p[0][1] = BIT(data,1) ? 0 : 1;
-	m_p[0][0] = BIT(data,0) ? 0 : 1;
+	for (u8 i = 0; i < 8; i++)
+		m_p[offset][i] = BIT(data, i) ? 0 : 1;
 }
 
-WRITE8_MEMBER( mmd1_state::port01_w )
-{
-	m_p[1][7] = BIT(data,7) ? 0 : 1;
-	m_p[1][6] = BIT(data,6) ? 0 : 1;
-	m_p[1][5] = BIT(data,5) ? 0 : 1;
-	m_p[1][4] = BIT(data,4) ? 0 : 1;
-	m_p[1][3] = BIT(data,3) ? 0 : 1;
-	m_p[1][2] = BIT(data,2) ? 0 : 1;
-	m_p[1][1] = BIT(data,1) ? 0 : 1;
-	m_p[1][0] = BIT(data,0) ? 0 : 1;
-}
-
-WRITE8_MEMBER( mmd1_state::port02_w )
-{
-	m_p[2][7] = BIT(data,7) ? 0 : 1;
-	m_p[2][6] = BIT(data,6) ? 0 : 1;
-	m_p[2][5] = BIT(data,5) ? 0 : 1;
-	m_p[2][4] = BIT(data,4) ? 0 : 1;
-	m_p[2][3] = BIT(data,3) ? 0 : 1;
-	m_p[2][2] = BIT(data,2) ? 0 : 1;
-	m_p[2][1] = BIT(data,1) ? 0 : 1;
-	m_p[2][0] = BIT(data,0) ? 0 : 1;
-}
 
 // keyboard has a keydown and a keyup code. Keyup = last keydown + bit 7 set
-READ8_MEMBER( mmd1_state::keyboard_r )
+u8 mmd1_state::keyboard_r()
 {
-	uint8_t line1 = ioport("LINE1")->read();
-	uint8_t line2 = ioport("LINE2")->read();
-	uint8_t i, data = 0xff;
+	u8 line1 = ioport("LINE1")->read();
+	u8 line2 = ioport("LINE2")->read();
+	u8 i, data = 0xff;
 
 
 	for (i = 0; i < 8; i++)
@@ -193,7 +160,7 @@ READ8_MEMBER( mmd1_state::keyboard_r )
 		return m_return_code;
 }
 
-READ8_MEMBER(mmd1_state::port13_r)
+u8 mmd1_state::port13_r()
 {
 	u8 data = 0xfa;
 	data |= m_uart->dav_r() ? 1 : 0;
@@ -250,7 +217,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( mmd1_state::kansas_r )
 		return;
 
 	/* cassette - turn 1200/2400Hz to a bit */
-	uint8_t cass_ws = (m_cass->input() > +0.04) ? 1 : 0;
+	u8 cass_ws = (m_cass->input() > +0.04) ? 1 : 0;
 
 	if (cass_ws != m_cass_data[0])
 	{
@@ -273,9 +240,8 @@ void mmd1_state::mem_map(address_map &map)
 void mmd1_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00, 0x00).rw(FUNC(mmd1_state::keyboard_r), FUNC(mmd1_state::port00_w));
-	map(0x01, 0x01).w(FUNC(mmd1_state::port01_w));
-	map(0x02, 0x02).w(FUNC(mmd1_state::port02_w));
+	map(0x00, 0x02).w(FUNC(mmd1_state::round_leds_w));
+	map(0x00, 0x00).r(FUNC(mmd1_state::keyboard_r));
 	//map(0x10, 0x11).rw  TTY UART
 	map(0x12, 0x12).rw(m_uart, FUNC(ay51013_device::receive), FUNC(ay51013_device::transmit));
 	map(0x13, 0x13).r(FUNC(mmd1_state::port13_r));
@@ -317,6 +283,11 @@ void mmd1_state::machine_start()
 {
 	m_digits.resolve();
 	m_p.resolve();
+	save_item(NAME(m_cass_data));
+	save_item(NAME(m_cassinbit));
+	save_item(NAME(m_cassoutbit));
+	save_item(NAME(m_cassold));
+	save_item(NAME(m_return_code));
 }
 
 void mmd1_state::machine_reset()
@@ -368,4 +339,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                FULLNAME  FLAGS
-COMP( 1976, mmd1,  0,      0,      mmd1,    mmd1,  mmd1_state, empty_init, "E&L Instruments Inc", "MMD-1",  MACHINE_NO_SOUND_HW )
+COMP( 1976, mmd1,  0,      0,      mmd1,    mmd1,  mmd1_state, empty_init, "E&L Instruments Inc", "MMD-1 Mini-Micro Designer",  MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

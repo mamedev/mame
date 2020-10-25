@@ -37,11 +37,11 @@ private:
 	tilemap_t *m_bg_tilemap;
 	uint8_t m_nmi_enable;
 
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_WRITE8_MEMBER(palettebank_w);
-	DECLARE_WRITE8_MEMBER(scroll_w);
-	DECLARE_WRITE8_MEMBER(nmi_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
+	void palettebank_w(uint8_t data);
+	void scroll_w(uint8_t data);
+	void nmi_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 

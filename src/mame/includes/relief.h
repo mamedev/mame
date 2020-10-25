@@ -38,9 +38,9 @@ public:
 private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_READ16_MEMBER(special_port2_r);
-	DECLARE_WRITE16_MEMBER(audio_control_w);
-	DECLARE_WRITE16_MEMBER(audio_volume_w);
+	uint16_t special_port2_r();
+	void audio_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void audio_volume_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield2_tile_info);
 	uint32_t screen_update_relief(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

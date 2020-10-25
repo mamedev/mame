@@ -53,7 +53,7 @@ protected:
 private:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	DECLARE_READ8_MEMBER( fdc_input_r );
+	uint8_t fdc_input_r();
 	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 

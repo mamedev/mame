@@ -47,10 +47,10 @@ private:
 
 	required_shared_ptr<uint8_t> m_videoram;
 
-	DECLARE_READ8_MEMBER(portb_r);
-	DECLARE_WRITE8_MEMBER(porta_w);
-	DECLARE_WRITE8_MEMBER(portc_w);
-	DECLARE_WRITE8_MEMBER(port30_w);
+	uint8_t portb_r();
+	void porta_w(uint8_t data);
+	void portc_w(uint8_t data);
+	void port30_w(uint8_t data);
 
 	bool m_flipscreen;
 	uint8_t m_last;
@@ -89,7 +89,7 @@ void rotaryf_state::machine_start()
 	save_item(NAME(m_last));
 }
 
-READ8_MEMBER(rotaryf_state::portb_r)
+uint8_t rotaryf_state::portb_r()
 {
 	uint8_t data = ioport("INPUTS")->read();
 
@@ -98,7 +98,7 @@ READ8_MEMBER(rotaryf_state::portb_r)
 	return (data & 0xCD) | ((data & 0x01) << 1) | ((data & 0x0c) << 2);
 }
 
-WRITE8_MEMBER(rotaryf_state::porta_w)
+void rotaryf_state::porta_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_last;
 
@@ -121,14 +121,14 @@ WRITE8_MEMBER(rotaryf_state::porta_w)
 	m_last = data;
 }
 
-WRITE8_MEMBER(rotaryf_state::portc_w)
+void rotaryf_state::portc_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 1));
 
 	// bit 5 set when game starts, but isn't coin lockout?
 }
 
-WRITE8_MEMBER(rotaryf_state::port30_w)
+void rotaryf_state::port30_w(uint8_t data)
 {
 	/* bit 0 = player 2 is playing */
 
@@ -166,24 +166,20 @@ TIMER_DEVICE_CALLBACK_MEMBER(rotaryf_state::rotaryf_interrupt)
 
 uint32_t rotaryf_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	offs_t offs;
-	pen_t pens[2];
-	pens[0] = rgb_t::black();
-	pens[1] = rgb_t::white();
-	uint8_t i,x,y,data;
+	pen_t const pens[2] = { rgb_t::black(), rgb_t::white() };
 
-	for (offs = 0; offs < m_videoram.bytes(); offs++)
+	for (offs_t offs = 0; offs < m_videoram.bytes(); offs++)
 	{
-		x = offs << 3;
-		y = offs >> 5;
-		data = m_videoram[offs];
+		uint8_t x = offs << 3;
+		uint8_t y = offs >> 5;
+		uint8_t data = m_videoram[offs];
 
-		for (i = 0; i < 8; i++)
+		for (uint8_t i = 0; i < 8; i++)
 		{
 			if (m_flipscreen)
-				bitmap.pix32(255-y, 247-(x|i)) = pens[data & 1];
+				bitmap.pix(255-y, 247-(x|i)) = pens[data & 1];
 			else
-				bitmap.pix32(y, x|i) = pens[data & 1];
+				bitmap.pix(y, x|i) = pens[data & 1];
 
 			data >>= 1;
 		}

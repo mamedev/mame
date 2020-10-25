@@ -38,19 +38,19 @@ protected:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE8_MEMBER( beep_w );
-	DECLARE_WRITE8_MEMBER( bank_w );
-	DECLARE_READ8_MEMBER( kb_r );
+	void beep_w(uint8_t data);
+	void bank_w(uint8_t data);
+	uint8_t kb_r(offs_t offset);
 
 	//LCD controller
 	void update_ac();
 	void set_busy_flag(uint16_t usec);
 
-	DECLARE_WRITE8_MEMBER(lcd_control_w);
-	DECLARE_READ8_MEMBER(lcd_control_r);
-	DECLARE_WRITE8_MEMBER(lcd_data_w);
-	DECLARE_READ8_MEMBER(lcd_data_r);
-	DECLARE_WRITE8_MEMBER( lcd_offset_w );
+	void lcd_control_w(uint8_t data);
+	uint8_t lcd_control_r();
+	void lcd_data_w(uint8_t data);
+	uint8_t lcd_data_r();
+	void lcd_offset_w(uint8_t data);
 
 	void pc4_palette(palette_device &palette) const;
 

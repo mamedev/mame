@@ -24,14 +24,14 @@ class pv1000_sound_device : public device_t,
 public:
 	pv1000_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER(voice_w);
+	void voice_w(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 
@@ -60,7 +60,7 @@ pv1000_sound_device::pv1000_sound_device(const machine_config &mconfig, const ch
 
 void pv1000_sound_device::device_start()
 {
-	m_sh_channel = machine().sound().stream_alloc(*this, 0, 1, clock() / 1024);
+	m_sh_channel = stream_alloc(0, 1, clock() / 1024);
 
 	save_item(NAME(m_voice[0].count));
 	save_item(NAME(m_voice[0].period));
@@ -77,7 +77,7 @@ void pv1000_sound_device::device_start()
 	save_item(NAME(m_voice[3].val));
 }
 
-WRITE8_MEMBER(pv1000_sound_device::voice_w)
+void pv1000_sound_device::voice_w(offs_t offset, uint8_t data)
 {
 	offset &= 0x03;
 	m_voice[offset].period = data;
@@ -98,20 +98,20 @@ WRITE8_MEMBER(pv1000_sound_device::voice_w)
  Note: the register periods are inverted.
  */
 
-void pv1000_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void pv1000_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *buffer = outputs[0];
+	auto &buffer = outputs[0];
 
-	while (samples > 0)
+	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
 	{
-		*buffer=0;
+		s32 sum = 0;
 
 		for (int i = 0; i < 3; i++)
 		{
 			uint32_t per = (0x3f - (m_voice[i].period & 0x3f));
 
 			if (per != 0)   //OFF!
-				*buffer += m_voice[i].val * 8192;
+				sum += m_voice[i].val * 8192;
 
 			m_voice[i].count++;
 
@@ -122,8 +122,7 @@ void pv1000_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 			}
 		}
 
-		buffer++;
-		samples--;
+		buffer.put_int(sampindex, sum, 32768);
 	}
 }
 
@@ -148,8 +147,8 @@ public:
 	void pv1000(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(io_w);
-	DECLARE_READ8_MEMBER(io_r);
+	void io_w(offs_t offset, uint8_t data);
+	uint8_t io_r(offs_t offset);
 	void gfxram_w(offs_t offset, uint8_t data);
 	uint8_t   m_io_regs[8];
 	uint8_t   m_fd_data;
@@ -206,7 +205,7 @@ void pv1000_state::gfxram_w(offs_t offset, uint8_t data)
 }
 
 
-WRITE8_MEMBER( pv1000_state::io_w )
+void pv1000_state::io_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -214,7 +213,7 @@ WRITE8_MEMBER( pv1000_state::io_w )
 	case 0x01:
 	case 0x02:
 		//logerror("io_w offset=%02x, data=%02x (%03d)\n", offset, data , data);
-		m_sound->voice_w(space, offset, data);
+		m_sound->voice_w(offset, data);
 	break;
 
 	case 0x03:
@@ -237,7 +236,7 @@ WRITE8_MEMBER( pv1000_state::io_w )
 }
 
 
-READ8_MEMBER( pv1000_state::io_r )
+uint8_t pv1000_state::io_r(offs_t offset)
 {
 	uint8_t data = m_io_regs[offset];
 

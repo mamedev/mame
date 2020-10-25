@@ -36,8 +36,8 @@ public:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(clock_tick);
-	DECLARE_WRITE8_MEMBER(inputs_w);
-	DECLARE_READ8_MEMBER(inputs_r);
+	void inputs_w(offs_t offset, u8 data);
+	u8 inputs_r();
 
 	void maincpu_map(address_map &map);
 
@@ -174,7 +174,7 @@ static INPUT_PORTS_START( inderp )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-READ8_MEMBER( inderp_state::inputs_r )
+u8 inderp_state::inputs_r()
 {
 	if (m_inbank < 10)
 		return m_inputs[m_inbank]->read();
@@ -183,7 +183,7 @@ READ8_MEMBER( inderp_state::inputs_r )
 }
 
 // 0-2 select a dipsw bank; 3-9 select banks of mechanical inputs; A-F not connected
-WRITE8_MEMBER( inderp_state::inputs_w )
+void inderp_state::inputs_w(offs_t offset, u8 data)
 {
 	m_inbank = offset;
 }

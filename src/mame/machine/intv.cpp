@@ -8,7 +8,7 @@
 
 // Dual Port Memory handlers
 
-WRITE16_MEMBER( intv_state::intvkbd_dualport16_w )
+void intv_state::intvkbd_dualport16_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	unsigned char *RAM;
 
@@ -19,12 +19,12 @@ WRITE16_MEMBER( intv_state::intvkbd_dualport16_w )
 	RAM[offset] = (uint8_t) (data >> 0);
 }
 
-READ8_MEMBER( intv_state::intvkbd_dualport8_lsb_r )
+uint8_t intv_state::intvkbd_dualport8_lsb_r(offs_t offset)
 {
 	return (uint8_t) (m_intvkbd_dualport_ram[offset] >> 0);
 }
 
-WRITE8_MEMBER( intv_state::intvkbd_dualport8_lsb_w )
+void intv_state::intvkbd_dualport8_lsb_w(offs_t offset, uint8_t data)
 {
 	unsigned char *RAM;
 
@@ -36,12 +36,12 @@ WRITE8_MEMBER( intv_state::intvkbd_dualport8_lsb_w )
 	RAM[offset] = data;
 }
 
-READ8_MEMBER( intv_state::intvkbd_dualport8_msb_r )
+uint8_t intv_state::intvkbd_dualport8_msb_r(offs_t offset)
 {
 	return (m_intvkbd_dualport_ram[offset+0x200]&0x0300)>>8;
 }
 
-WRITE8_MEMBER( intv_state::intvkbd_dualport8_msb_w )
+void intv_state::intvkbd_dualport8_msb_w(offs_t offset, uint8_t data)
 {
 	unsigned int mask = m_intvkbd_dualport_ram[offset+0x200] & 0x00ff;
 	m_intvkbd_dualport_ram[offset+0x200] = mask | ((data<<8)&0x0300);
@@ -79,7 +79,7 @@ struct tape_drive_state_type
 //};
 
 
-READ8_MEMBER( intv_state::intvkbd_io_r )
+uint8_t intv_state::intvkbd_io_r(offs_t offset)
 {
 	unsigned char rv = 0x00;
 
@@ -168,7 +168,7 @@ READ8_MEMBER( intv_state::intvkbd_io_r )
 	return rv;
 }
 
-WRITE8_MEMBER( intv_state::intvkbd_io_w )
+void intv_state::intvkbd_io_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -430,7 +430,7 @@ void update_tape_drive(void)
 
 ////////////
 
-READ8_MEMBER( intv_state::intvkbd_periph_r )
+uint8_t intv_state::intvkbd_periph_r(offs_t offset)
 {
 	uint8_t value = 0;
 	switch(offset) {
@@ -458,7 +458,7 @@ READ8_MEMBER( intv_state::intvkbd_periph_r )
 	}
 }
 
-WRITE8_MEMBER( intv_state::intvkbd_periph_w )
+void intv_state::intvkbd_periph_w(offs_t offset, uint8_t data)
 {
 	switch(offset) {
 		case 0x06:
@@ -481,62 +481,62 @@ WRITE8_MEMBER( intv_state::intvkbd_periph_w )
 	}
 }
 
-READ16_MEMBER( intv_state::intv_stic_r )
+uint16_t intv_state::intv_stic_r(offs_t offset)
 {
 	if (m_bus_copy_mode || !m_stic->read_stic_handshake())
-		return m_stic->read(space, offset, mem_mask);
+		return m_stic->read(offset);
 	else
 		return offset;
 }
 
-WRITE16_MEMBER( intv_state::intv_stic_w )
+void intv_state::intv_stic_w(offs_t offset, uint16_t data)
 {
 	if (m_bus_copy_mode || !m_stic->read_stic_handshake())
-		m_stic->write(space, offset, data, mem_mask);
+		m_stic->write(offset, data);
 }
 
 
-READ16_MEMBER( intv_state::intv_gram_r )
+uint16_t intv_state::intv_gram_r(offs_t offset)
 {
 	//logerror("read: %d = GRAM(%d)\n",state->m_gram[offset],offset);
 	if (m_bus_copy_mode || !m_stic->read_stic_handshake())
-		return m_stic->gram_read(space, offset, mem_mask);
+		return m_stic->gram_read(offset);
 	else
 		return offset;
 }
 
-WRITE16_MEMBER( intv_state::intv_gram_w )
+void intv_state::intv_gram_w(offs_t offset, uint16_t data)
 {
 	if (m_bus_copy_mode || !m_stic->read_stic_handshake())
-		m_stic->gram_write(space, offset, data, mem_mask);
+		m_stic->gram_write(offset, data);
 }
 
-READ16_MEMBER( intv_state::intv_ram8_r )
+uint16_t intv_state::intv_ram8_r(offs_t offset)
 {
 	//logerror("%x = ram8_r(%x)\n",state->m_ram8[offset],offset);
 	return (int)m_ram8[offset];
 }
 
-WRITE16_MEMBER( intv_state::intv_ram8_w )
+void intv_state::intv_ram8_w(offs_t offset, uint16_t data)
 {
 	//logerror("ram8_w(%x) = %x\n",offset,data);
 	m_ram8[offset] = data&0xff;
 }
 
-READ16_MEMBER( intv_state::intv_ram16_r )
+uint16_t intv_state::intv_ram16_r(offs_t offset)
 {
 	//logerror("%x = ram16_r(%x)\n",state->m_ram16[offset],offset);
 	return (int)m_ram16[offset];
 }
 
-WRITE16_MEMBER( intv_state::intv_ram16_w )
+void intv_state::intv_ram16_w(offs_t offset, uint16_t data)
 {
 	//logerror("%g: WRITING TO GRAM offset = %d\n",machine.time(),offset);
 	//logerror("ram16_w(%x) = %x\n",offset,data);
 	m_ram16[offset] = data & 0xffff;
 }
 
-READ8_MEMBER( intv_state::intvkb_iocart_r )
+uint8_t intv_state::intvkb_iocart_r(offs_t offset)
 {
 	if (m_iocart1->exists())
 		return m_iocart1->read_rom(offset);

@@ -1378,7 +1378,7 @@ void tms32051_device::op_out()
 	uint16_t ea = GET_ADDRESS();
 
 	uint16_t data = DM_READ16(ea);
-	m_io->write_word(port << 1, data);
+	m_io.write_word(port << 1, data);
 
 	// TODO: handle repeat
 	CYCLES(3);

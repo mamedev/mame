@@ -16,7 +16,7 @@
 
 ******************************************************************************/
 
-WRITE8_MEMBER(nbmj8991_state::palette_type1_w)
+void nbmj8991_state::palette_type1_w(offs_t offset, uint8_t data)
 {
 	int r, g, b;
 
@@ -33,7 +33,7 @@ WRITE8_MEMBER(nbmj8991_state::palette_type1_w)
 	m_palette->set_pen_color((offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
-WRITE8_MEMBER(nbmj8991_state::palette_type2_w)
+void nbmj8991_state::palette_type2_w(offs_t offset, uint8_t data)
 {
 	int r, g, b;
 
@@ -50,7 +50,7 @@ WRITE8_MEMBER(nbmj8991_state::palette_type2_w)
 	m_palette->set_pen_color((offset / 2), pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
-WRITE8_MEMBER(nbmj8991_state::palette_type3_w)
+void nbmj8991_state::palette_type3_w(offs_t offset, uint8_t data)
 {
 	int r, g, b;
 
@@ -71,7 +71,7 @@ WRITE8_MEMBER(nbmj8991_state::palette_type3_w)
 
 
 ******************************************************************************/
-WRITE8_MEMBER(nbmj8991_state::blitter_w)
+void nbmj8991_state::blitter_w(offs_t offset, uint8_t data)
 {
 	int gfxlen = memregion("gfx1")->bytes();
 
@@ -115,12 +115,12 @@ WRITE8_MEMBER(nbmj8991_state::blitter_w)
 	}
 }
 
-READ8_MEMBER(nbmj8991_state::clut_r)
+uint8_t nbmj8991_state::clut_r(offs_t offset)
 {
 	return m_clut[offset];
 }
 
-WRITE8_MEMBER(nbmj8991_state::clut_w)
+void nbmj8991_state::clut_w(offs_t offset, uint8_t data)
 {
 	m_clut[((m_clutsel & 0x7f) * 0x10) + (offset & 0x0f)] = data;
 }
@@ -131,20 +131,18 @@ WRITE8_MEMBER(nbmj8991_state::clut_w)
 ******************************************************************************/
 void nbmj8991_state::vramflip()
 {
-	int x, y;
-	uint8_t color1, color2;
 	int width = m_screen->width();
 	int height = m_screen->height();
 
 	if (m_flipscreen == m_flipscreen_old) return;
 
-	for (y = 0; y < height / 2; y++)
+	for (int y = 0; y < height / 2; y++)
 	{
-		for (x = 0; x < width / 2; x++)
+		for (int x = 0; x < width / 2; x++)
 		{
 			// rotate 180 degrees (   0,   0) - ( 511, 511)
-			color1 = m_videoram[(y * width) + x];
-			color2 = m_videoram[(((height - 1) - y) * width) + (((width / 2) - 1) - x)];
+			uint8_t color1 = m_videoram[(y * width) + x];
+			uint8_t color2 = m_videoram[(((height - 1) - y) * width) + (((width / 2) - 1) - x)];
 			m_videoram[(y * width) + x] = color2;
 			m_videoram[(((height - 1) - y) * width) + (((width / 2) - 1) - x)] = color1;
 			// rotate 180 degrees ( 512,   0) - (1023, 511)
@@ -162,7 +160,7 @@ void nbmj8991_state::vramflip()
 void nbmj8991_state::update_pixel(int x, int y)
 {
 	uint8_t color = m_videoram[(y * m_screen->width()) + x];
-	m_tmpbitmap.pix16(y, x) = color;
+	m_tmpbitmap.pix(y, x) = color;
 }
 
 void nbmj8991_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)

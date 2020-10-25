@@ -119,18 +119,18 @@ public:
 	void init_rabbit();
 
 private:
-	DECLARE_WRITE32_MEMBER(tilemap0_w);
-	DECLARE_WRITE32_MEMBER(tilemap1_w);
-	DECLARE_WRITE32_MEMBER(tilemap2_w);
-	DECLARE_WRITE32_MEMBER(tilemap3_w);
-	DECLARE_READ32_MEMBER(tilemap0_r);
-	DECLARE_READ32_MEMBER(tilemap1_r);
-	DECLARE_READ32_MEMBER(tilemap2_r);
-	DECLARE_READ32_MEMBER(tilemap3_r);
-	DECLARE_READ32_MEMBER(randomrabbits);
-	DECLARE_WRITE32_MEMBER(rombank_w);
-	DECLARE_WRITE32_MEMBER(blitter_w);
-	DECLARE_WRITE32_MEMBER(eeprom_write);
+	void tilemap0_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void tilemap1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void tilemap2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void tilemap3_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t tilemap0_r(offs_t offset);
+	uint32_t tilemap1_r(offs_t offset);
+	uint32_t tilemap2_r(offs_t offset);
+	uint32_t tilemap3_r(offs_t offset);
+	uint32_t randomrabbits();
+	void rombank_w(uint32_t data);
+	void blitter_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void eeprom_write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	void rabbit_map(address_map &map);
 
@@ -259,26 +259,26 @@ TILE_GET_INFO_MEMBER(rabbit_state::get_tilemap3_tile_info)
 	get_tilemap_info(tileinfo,tile_index,3,0);
 }
 
-WRITE32_MEMBER(rabbit_state::tilemap0_w)
+void rabbit_state::tilemap0_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_tilemap_ram[0][offset]);
 	m_tilemap[0]->mark_tile_dirty(offset);
 }
 
-WRITE32_MEMBER(rabbit_state::tilemap1_w)
+void rabbit_state::tilemap1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_tilemap_ram[1][offset]);
 	m_tilemap[1]->mark_tile_dirty(offset);
 }
 
-WRITE32_MEMBER(rabbit_state::tilemap2_w)
+void rabbit_state::tilemap2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_tilemap_ram[2][offset]);
 	m_tilemap[2]->mark_tile_dirty(offset);
 }
 
 
-WRITE32_MEMBER(rabbit_state::tilemap3_w)
+void rabbit_state::tilemap3_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_tilemap_ram[3][offset]);
 	m_tilemap[3]->mark_tile_dirty(offset);
@@ -340,26 +340,21 @@ void rabbit_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect 
 /* the sprite bitmap can probably be handled better than this ... */
 void rabbit_state::clearspritebitmap( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	int startx, starty;
-	int y;
-	int amountx,amounty;
-	uint16_t *dstline;
-
 	/* clears a *sensible* amount of the sprite bitmap */
-	startx = (m_spriteregs[0]&0x00000fff);
-	starty = (m_spriteregs[1]&0x0fff0000)>>16;
+	int startx = (m_spriteregs[0]&0x00000fff);
+	int starty = (m_spriteregs[1]&0x0fff0000)>>16;
 
 	startx-=200;
 	starty-=200;
-	amountx =650;
-	amounty =600;
+	int amountx =650;
+	int amounty =600;
 
 	if (startx < 0) { amountx += startx; startx = 0; }
 	if ((startx+amountx)>=0x1000) amountx-=(0x1000-(startx+amountx));
 
-	for (y=0; y<amounty;y++)
+	for (int y=0; y<amounty;y++)
 	{
-		dstline = &m_sprite_bitmap->pix16((starty+y)&0xfff);
+		uint16_t *const dstline = &m_sprite_bitmap->pix((starty+y)&0xfff);
 		memset(dstline+startx,0x00,amountx*2);
 	}
 }
@@ -367,17 +362,11 @@ void rabbit_state::clearspritebitmap( bitmap_ind16 &bitmap, const rectangle &cli
 /* todo: fix zoom, it's inaccurate and this code is ugly */
 void rabbit_state::draw_sprite_bitmap( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	uint32_t x,y;
-	uint16_t *srcline;
-	uint16_t *dstline;
-	uint16_t pixdata;
 	uint32_t xsize, ysize;
-	uint32_t xdrawpos, ydrawpos;
 	uint32_t xstep,ystep;
 
-	int startx, starty;
-	startx = ((m_spriteregs[0]&0x00000fff));
-	starty = ((m_spriteregs[1]&0x0fff0000)>>16);
+	int startx = ((m_spriteregs[0]&0x00000fff));
+	int starty = ((m_spriteregs[1]&0x0fff0000)>>16);
 
 	/* zoom compensation? */
 	startx-=((m_spriteregs[1]&0x000001ff)>>1);
@@ -390,22 +379,21 @@ void rabbit_state::draw_sprite_bitmap( bitmap_ind16 &bitmap, const rectangle &cl
 	ysize+=0x80;
 	xstep = ((320*128)<<16) / xsize;
 	ystep = ((224*128)<<16) / ysize;
-	ydrawpos = 0;
-	for (y=0;y<ysize;y+=0x80)
+	for (uint32_t y=0;y<ysize;y+=0x80)
 	{
-		ydrawpos = ((y>>7)*ystep);
+		uint32_t ydrawpos = ((y>>7)*ystep);
 		ydrawpos >>=16;
 
 		if ((ydrawpos >= cliprect.min_y) && (ydrawpos <= cliprect.max_y))
 		{
-			srcline = &m_sprite_bitmap->pix16((starty+(y>>7))&0xfff);
-			dstline = &bitmap.pix16(ydrawpos);
+			uint16_t const *const srcline = &m_sprite_bitmap->pix((starty+(y>>7))&0xfff);
+			uint16_t *const dstline = &bitmap.pix(ydrawpos);
 
-			for (x=0;x<xsize;x+=0x80)
+			for (uint32_t x=0;x<xsize;x+=0x80)
 			{
-				xdrawpos = ((x>>7)*xstep);
+				uint32_t xdrawpos = ((x>>7)*xstep);
 				xdrawpos >>=16;
-				pixdata = srcline[(startx+(x>>7))&0xfff];
+				uint16_t const pixdata = srcline[(startx+(x>>7))&0xfff];
 
 				if (pixdata)
 					if ((xdrawpos >= cliprect.min_x) && (xdrawpos <= cliprect.max_x))
@@ -537,33 +525,33 @@ uint32_t rabbit_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 
 
-READ32_MEMBER(rabbit_state::tilemap0_r)
+uint32_t rabbit_state::tilemap0_r(offs_t offset)
 {
 	return m_tilemap_ram[0][offset];
 }
 
-READ32_MEMBER(rabbit_state::tilemap1_r)
+uint32_t rabbit_state::tilemap1_r(offs_t offset)
 {
 	return m_tilemap_ram[1][offset];
 }
 
-READ32_MEMBER(rabbit_state::tilemap2_r)
+uint32_t rabbit_state::tilemap2_r(offs_t offset)
 {
 	return m_tilemap_ram[2][offset];
 }
 
-READ32_MEMBER(rabbit_state::tilemap3_r)
+uint32_t rabbit_state::tilemap3_r(offs_t offset)
 {
 	return m_tilemap_ram[3][offset];
 }
 
-READ32_MEMBER(rabbit_state::randomrabbits)
+uint32_t rabbit_state::randomrabbits()
 {
 	return machine().rand();
 }
 
 /* rom bank is used when testing roms, not currently hooked up */
-WRITE32_MEMBER(rabbit_state::rombank_w)
+void rabbit_state::rombank_w(uint32_t data)
 {
 	uint8_t *dataroms = memregion("gfx1")->base();
 #if 0
@@ -689,7 +677,7 @@ void rabbit_state::do_blit()
 
 
 
-WRITE32_MEMBER(rabbit_state::blitter_w)
+void rabbit_state::blitter_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_blitterregs[offset]);
 
@@ -699,7 +687,7 @@ WRITE32_MEMBER(rabbit_state::blitter_w)
 	}
 }
 
-WRITE32_MEMBER(rabbit_state::eeprom_write)
+void rabbit_state::eeprom_write(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// don't disturb the EEPROM if we're not actually writing to it
 	// (in particular, data & 0x100 here with mask = ffff00ff looks to be the watchdog)

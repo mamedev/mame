@@ -60,14 +60,14 @@ public:
 	/* misc */
 	int m_count;
 	int m_disable_irq;
-	DECLARE_READ8_MEMBER(aeroboto_201_r);
-	DECLARE_READ8_MEMBER(aeroboto_irq_ack_r);
-	DECLARE_READ8_MEMBER(aeroboto_2973_r);
-	DECLARE_WRITE8_MEMBER(aeroboto_1a2_w);
-	DECLARE_READ8_MEMBER(aeroboto_in0_r);
-	DECLARE_WRITE8_MEMBER(aeroboto_3000_w);
-	DECLARE_WRITE8_MEMBER(aeroboto_videoram_w);
-	DECLARE_WRITE8_MEMBER(aeroboto_tilecolor_w);
+	uint8_t aeroboto_201_r();
+	uint8_t aeroboto_irq_ack_r();
+	uint8_t aeroboto_2973_r();
+	void aeroboto_1a2_w(uint8_t data);
+	uint8_t aeroboto_in0_r();
+	void aeroboto_3000_w(uint8_t data);
+	void aeroboto_videoram_w(offs_t offset, uint8_t data);
+	void aeroboto_tilecolor_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

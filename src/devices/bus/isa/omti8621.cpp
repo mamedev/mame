@@ -253,8 +253,15 @@ void omti8621_device::device_add_mconfig(machine_config &config)
 	m_fdc->intrq_wr_callback().set(FUNC(omti8621_device::fdc_irq_w));
 	m_fdc->drq_wr_callback().set(FUNC(omti8621_device::fdc_drq_w));
 	FLOPPY_CONNECTOR(config, m_floppy[0], pc_hd_floppies, "525hd", omti8621_device::floppy_formats);
-// Apollo workstations never have more then 1 floppy drive
-//  FLOPPY_CONNECTOR(config, m_floppy[1], pc_hd_floppies, nullptr, omti8621_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[1], pc_hd_floppies, nullptr, omti8621_device::floppy_formats);
+}
+
+void omti8621_apollo_device::device_add_mconfig(machine_config &config)
+{
+	omti8621_device::device_add_mconfig(config);
+
+	// Apollo workstations never have more then 1 floppy drive
+	config.device_remove(OMTI_FDC_TAG":1");
 }
 
 const tiny_rom_entry *omti8621_device::device_rom_region() const
@@ -310,7 +317,7 @@ void omti8621_device::device_reset()
 		int esdi_base = io_bases[m_iobase->read() & 7];
 
 		// install the ESDI ports
-		m_isa->install16_device(esdi_base, esdi_base + 7, read16_delegate(*this, FUNC(omti8621_device::read)), write16_delegate(*this, FUNC(omti8621_device::write)));
+		m_isa->install16_device(esdi_base, esdi_base + 7, read16s_delegate(*this, FUNC(omti8621_device::read)), write16s_delegate(*this, FUNC(omti8621_device::write)));
 
 		// and the onboard AT FDC ports
 		if (m_iobase->read() & 8)
@@ -1033,16 +1040,16 @@ void omti8621_device::set_data(uint16_t data)
  OMTI8621 Disk Controller-AT Registers
 ***************************************************************************/
 
-WRITE16_MEMBER(omti8621_device::write)
+void omti8621_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (mem_mask)
 	{
 		case 0x00ff:
-			write8(space, offset*2, data, mem_mask);
+			write8(offset*2, data);
 			break;
 
 		case 0xff00:
-			write8(space, offset*2+1, data>>8, mem_mask>>8);
+			write8(offset*2+1, data>>8);
 			break;
 
 		default:
@@ -1051,7 +1058,7 @@ WRITE16_MEMBER(omti8621_device::write)
 	}
 }
 
-WRITE8_MEMBER(omti8621_device::write8)
+void omti8621_device::write8(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -1145,20 +1152,20 @@ WRITE8_MEMBER(omti8621_device::write8)
 	}
 }
 
-READ16_MEMBER(omti8621_device::read)
+uint16_t omti8621_device::read(offs_t offset, uint16_t mem_mask)
 {
 	switch (mem_mask)
 	{
 		case 0x00ff:
-			return read8(space, offset*2, mem_mask);
+			return read8(offset*2);
 		case 0xff00:
-			return read8(space, offset*2+1, mem_mask >> 8) << 8;
+			return read8(offset*2+1) << 8;
 		default:
 			return get_data();
 	}
 }
 
-READ8_MEMBER(omti8621_device::read8)
+uint8_t omti8621_device::read8(offs_t offset)
 {
 	uint8_t data = 0xff;
 	static uint8_t last_data = 0xff;
@@ -1326,8 +1333,7 @@ void omti8621_device::fd_moten_w(uint8_t data)
 
 	m_moten = data;
 
-	if (!BIT(data, 2))
-		m_fdc->soft_reset();
+	m_fdc->reset_w(!BIT(data, 2));
 
 	for (int i = 0; i < 2; i++)
 	{
@@ -1342,8 +1348,11 @@ void omti8621_device::fd_moten_w(uint8_t data)
 
 void omti8621_device::fd_rate_w(uint8_t data)
 {
-	// Bit 1 = FD_MINI (TODO)
-	// Bit 0 = FD_RATE (TODO)
+	// Bit 1 = FD_MINI (connects to pin 3 of FDC9239)
+	// Bit 0 = FD_RATE (inverted output connects to pin 4 of 74F163)
+	u32 fdc_clk = (48_MHz_XTAL / (BIT(data, 0) ? 5 : 3) / (BIT(data, 1) ? 4 : 2)).value();
+	m_fdc->set_unscaled_clock(fdc_clk);
+	m_fdc->set_rate(fdc_clk / 16);
 }
 
 void omti8621_device::fd_extra_w(uint8_t data)

@@ -75,6 +75,7 @@ private:
 	uint32_t m_data_idx;    /* current read/write position in data */
 	uint32_t m_data_id;     /* chrd_id for sector write */
 	uint8_t  m_index_pulse;
+	uint8_t  m_crc_wait;
 
 	/* trigger delayed actions (bottom halves) */
 	emu_timer* m_timer_cont;
@@ -88,6 +89,7 @@ private:
 	int address_search_read(chrn_id* id);
 	void finish_RCR();
 	void cont_SR();
+	void finish_SR();
 	void cont_SW();
 
 };

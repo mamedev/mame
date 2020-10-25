@@ -19,7 +19,7 @@
 h8_device::h8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor map_delegate) :
 	cpu_device(mconfig, type, tag, owner, clock),
 	program_config("program", ENDIANNESS_BIG, 16, 16, 0, map_delegate),
-	io_config("io", ENDIANNESS_BIG, 16, 16, -1), program(nullptr), io(nullptr), cache(nullptr), PPC(0), NPC(0), PC(0), PIR(0), EXR(0), CCR(0), MAC(0), MACF(0),
+	io_config("io", ENDIANNESS_BIG, 16, 16, -1), PPC(0), NPC(0), PC(0), PIR(0), EXR(0), CCR(0), MAC(0), MACF(0),
 	TMP1(0), TMP2(0), TMPR(0), inst_state(0), inst_substate(0), icount(0), bcount(0), irq_vector(0), taken_irq_vector(0), irq_level(0), taken_irq_level(0), irq_required(false), irq_nmi(false)
 {
 	supports_advanced = false;
@@ -38,9 +38,9 @@ void h8_device::device_config_complete()
 
 void h8_device::device_start()
 {
-	program = &space(AS_PROGRAM);
-	cache   = program->cache<1, 0, ENDIANNESS_BIG>();
-	io      = &space(AS_IO);
+	space(AS_PROGRAM).cache(cache);
+	space(AS_PROGRAM).specific(program);
+	space(AS_IO).specific(io);
 
 	uint32_t pcmask = mode_advanced ? 0xffffff : 0xffff;
 	state_add<uint32_t>(H8_PC, "PC",
@@ -347,7 +347,7 @@ void h8_device::state_string_export(const device_state_entry &entry, std::string
 uint16_t h8_device::read16i(uint32_t adr)
 {
 	icount--;
-	return cache->read_word(adr & ~1);
+	return cache.read_word(adr & ~1);
 }
 
 uint16_t h8_device::fetch()
@@ -360,25 +360,25 @@ uint16_t h8_device::fetch()
 uint8_t h8_device::read8(uint32_t adr)
 {
 	icount--;
-	return program->read_byte(adr);
+	return program.read_byte(adr);
 }
 
 void h8_device::write8(uint32_t adr, uint8_t data)
 {
 	icount--;
-	program->write_byte(adr, data);
+	program.write_byte(adr, data);
 }
 
 uint16_t h8_device::read16(uint32_t adr)
 {
 	icount--;
-	return program->read_word(adr & ~1);
+	return program.read_word(adr & ~1);
 }
 
 void h8_device::write16(uint32_t adr, uint16_t data)
 {
 	icount--;
-	program->write_word(adr & ~1, data);
+	program.write_word(adr & ~1, data);
 }
 
 bool h8_device::exr_in_stack() const

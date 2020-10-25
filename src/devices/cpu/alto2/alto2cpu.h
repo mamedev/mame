@@ -5,8 +5,8 @@
  *   Xerox AltoII CPU core interface
  *
  *****************************************************************************/
-#ifndef MAME_DEVICES_CPU_ALTO2_H
-#define MAME_DEVICES_CPU_ALTO2_H
+#ifndef MAME_CPU_ALTO2_ALTO2CPU_H
+#define MAME_CPU_ALTO2_ALTO2CPU_H
 
 #pragma once
 
@@ -260,19 +260,19 @@ private:
 	void iomem_map(address_map &map);
 
 	//! read microcode CROM or CRAM, depending on m_ucode_ram_base
-	DECLARE_READ32_MEMBER ( crom_cram_r );
+	uint32_t crom_cram_r(offs_t offset);
 
 	//! write microcode CRAM, depending on m_ucode_ram_base (ignore writes to CROM)
-	DECLARE_WRITE32_MEMBER( crom_cram_w );
+	void crom_cram_w(offs_t offset, uint32_t data);
 
 	//! read constants PROM
-	DECLARE_READ16_MEMBER ( const_r );
+	uint16_t const_r(offs_t offset);
 
 	//! read i/o space RAM
-	DECLARE_READ16_MEMBER ( ioram_r );
+	uint16_t ioram_r(offs_t offset);
 
 	//!< write i/o space RAM
-	DECLARE_WRITE16_MEMBER( ioram_w );
+	void ioram_w(offs_t offset, uint16_t data);
 
 	int m_icount;
 
@@ -875,11 +875,11 @@ private:
 	[[noreturn]] void f2_early_bad();               //! f2 dummy early function
 	[[noreturn]] void f2_late_bad();                //! f2 dummy late function
 
-	DECLARE_READ16_MEMBER( noop_r );                //!< read open bus (0177777)
-	DECLARE_WRITE16_MEMBER( noop_w );               //!< write open bus
+	uint16_t noop_r (offs_t offset);                //!< read open bus (0177777)
+	void noop_w(offs_t offset, uint16_t data);      //!< write open bus
 
-	DECLARE_READ16_MEMBER( bank_reg_r );            //!< read bank register in memory mapped I/O range
-	DECLARE_WRITE16_MEMBER( bank_reg_w );           //!< write bank register in memory mapped I/O range
+	uint16_t bank_reg_r(offs_t offset);             //!< read bank register in memory mapped I/O range
+	void bank_reg_w(offs_t offset, uint16_t data);  //!< write bank register in memory mapped I/O range
 
 	void bs_early_read_r();                         //!< bus source: drive bus by R register
 	void bs_early_load_r();                         //!< bus source: load R places 0 on the BUS
@@ -935,4 +935,4 @@ private:
 
 DECLARE_DEVICE_TYPE(ALTO2, alto2_cpu_device)
 
-#endif // MAME_DEVICES_CPU_ALTO2_H
+#endif // MAME_CPU_ALTO2_ALTO2CPU_H

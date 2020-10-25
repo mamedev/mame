@@ -56,11 +56,11 @@ Dip locations and factory settings verified with US manual
 
 /* Read/Write Handlers */
 
-READ16_MEMBER(deadang_state::ghunter_trackball_low_r)
+uint16_t deadang_state::ghunter_trackball_low_r()
 {
 	return (ioport("TRACKX")->read() & 0xff) | ((ioport("TRACKY")->read() & 0xff) << 8);
 }
-READ16_MEMBER(deadang_state::ghunter_trackball_high_r)
+uint16_t deadang_state::ghunter_trackball_high_r()
 {
 	return ((ioport("TRACKX")->read() & 0x0f00) >> 4) | (ioport("TRACKY")->read() & 0x0f00);
 }
@@ -733,8 +733,8 @@ void deadang_state::init_ghunter()
 	m_adpcm1->decrypt();
 	m_adpcm2->decrypt();
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80000, 0x80001, read16_delegate(*this, FUNC(deadang_state::ghunter_trackball_low_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xb0000, 0xb0001, read16_delegate(*this, FUNC(deadang_state::ghunter_trackball_high_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80000, 0x80001, read16smo_delegate(*this, FUNC(deadang_state::ghunter_trackball_low_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xb0000, 0xb0001, read16smo_delegate(*this, FUNC(deadang_state::ghunter_trackball_high_r)));
 }
 
 /* Game Drivers */

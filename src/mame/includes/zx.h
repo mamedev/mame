@@ -60,15 +60,15 @@ public:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(ula_high_r);
-	DECLARE_READ8_MEMBER(ula_low_r);
-	DECLARE_WRITE8_MEMBER(refresh_w);
-	DECLARE_READ8_MEMBER(zx80_io_r);
-	DECLARE_READ8_MEMBER(zx81_io_r);
-	DECLARE_READ8_MEMBER(pc8300_io_r);
-	DECLARE_READ8_MEMBER(pow3000_io_r);
-	DECLARE_WRITE8_MEMBER(zx80_io_w);
-	DECLARE_WRITE8_MEMBER(zx81_io_w);
+	uint8_t ula_high_r(offs_t offset);
+	uint8_t ula_low_r(offs_t offset);
+	void refresh_w(offs_t offset, uint8_t data);
+	uint8_t zx80_io_r(offs_t offset);
+	uint8_t zx81_io_r(offs_t offset);
+	uint8_t pc8300_io_r(offs_t offset);
+	uint8_t pow3000_io_r(offs_t offset);
+	void zx80_io_w(offs_t offset, uint8_t data);
+	void zx81_io_w(offs_t offset, uint8_t data);
 
 	virtual void machine_reset() override;
 	virtual void video_start() override;

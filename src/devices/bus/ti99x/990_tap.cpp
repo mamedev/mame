@@ -853,7 +853,7 @@ void tap_990_device::execute_command()
 /*
     Read one register in TPCS space
 */
-READ16_MEMBER( tap_990_device::read )
+uint16_t tap_990_device::read(offs_t offset)
 {
 	if (offset < 8)
 		return m_w[offset];
@@ -864,7 +864,7 @@ READ16_MEMBER( tap_990_device::read )
 /*
     Write one register in TPCS space.  Execute command if w7_idle is cleared.
 */
-WRITE16_MEMBER( tap_990_device::write )
+void tap_990_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset < 8)
 	{

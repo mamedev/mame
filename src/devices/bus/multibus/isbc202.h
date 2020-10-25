@@ -32,12 +32,12 @@ public:
 	virtual void install_mem_rw(address_space& space) override;
 
 	// Access to I/O space by CPU
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
+	uint8_t io_r(address_space &space, offs_t offset);
+	void io_w(address_space &space, offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(co_w);
 
-	DECLARE_READ8_MEMBER(px_r);
+	uint8_t px_r();
 
 protected:
 	// device_t overrides
@@ -64,7 +64,7 @@ private:
 	required_device_array<floppy_connector , 4> m_drives;
 
 	address_space_config m_program_config;
-	memory_access_cache<2 , -2 , ENDIANNESS_BIG> *m_cache;
+	memory_access<9, 2 , -2 , ENDIANNESS_BIG>::cache m_cache;
 
 	address_space *m_mem_space;
 

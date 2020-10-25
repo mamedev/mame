@@ -50,7 +50,7 @@ template <typename X> constexpr TIME_TYPE MULTIPLY_TIME_BY_INT(TIME_TYPE const &
 #endif
 
 
-typedef stream_sample_t FMSAMPLE;
+typedef s32 FMSAMPLE;
 /*
 #if (FM_SAMPLE_BITS==16)
 typedef int16_t FMSAMPLE;
@@ -108,7 +108,7 @@ void ym2203_reset_chip(void *chip);
 /*
 ** update one of chip
 */
-void ym2203_update_one(void *chip, FMSAMPLE *buffer, int length);
+void ym2203_update_one(void *chip, write_stream_view &buffer);
 
 /*
 ** Write
@@ -142,7 +142,7 @@ void * ym2608_init(device_t *device, int baseclock, int rate,
 void ym2608_clock_changed(void *chip, int clock, int rate);
 void ym2608_shutdown(void *chip);
 void ym2608_reset_chip(void *chip);
-void ym2608_update_one(void *chip, FMSAMPLE **buffer, int length);
+void ym2608_update_one(void *chip, std::vector<write_stream_view> &buffer);
 
 int ym2608_write(void *chip, int a,unsigned char v);
 unsigned char ym2608_read(void *chip,int a);
@@ -158,10 +158,10 @@ void * ym2610_init(device_t *device, int baseclock, int rate,
 void ym2610_clock_changed(void *chip, int clock, int rate);
 void ym2610_shutdown(void *chip);
 void ym2610_reset_chip(void *chip);
-void ym2610_update_one(void *chip, FMSAMPLE **buffer, int length);
+void ym2610_update_one(void *chip, std::vector<write_stream_view> &buffer);
 
 #if BUILD_YM2610B
-void ym2610b_update_one(void *chip, FMSAMPLE **buffer, int length);
+void ym2610b_update_one(void *chip, std::vector<write_stream_view> &buffer);
 #endif /* BUILD_YM2610B */
 
 int ym2610_write(void *chip, int a,unsigned char v);
@@ -176,7 +176,7 @@ void * ym2612_init(device_t *device, int baseclock, int rate,
 void ym2612_clock_changed(void *chip, int clock, int rate);
 void ym2612_shutdown(void *chip);
 void ym2612_reset_chip(void *chip);
-void ym2612_update_one(void *chip, FMSAMPLE **buffer, int length, u8 output_bits);
+void ym2612_update_one(void *chip, std::vector<write_stream_view> &buffer, u8 output_bits);
 
 int ym2612_write(void *chip, int a,unsigned char v);
 unsigned char ym2612_read(void *chip,int a);

@@ -27,7 +27,7 @@ SAMPLES_START_CB_MEMBER(suna8_state::sh_start)
 	m_numsamples = len / SAMPLEN;
 }
 
-WRITE8_MEMBER(suna8_state::suna8_samples_number_w)
+void suna8_state::suna8_samples_number_w(uint8_t data)
 {
 	m_sample = data;
 	logerror("%s: sample number = %02X\n", machine().describe_context(), data);
@@ -46,7 +46,7 @@ void suna8_state::play_sample(int index)
 	}
 }
 
-WRITE8_MEMBER(suna8_state::suna8_play_samples_w)
+void suna8_state::suna8_play_samples_w(uint8_t data)
 {
 	logerror("%s: play sample = %02X\n", machine().describe_context(), data);
 
@@ -61,7 +61,7 @@ WRITE8_MEMBER(suna8_state::suna8_play_samples_w)
 	m_play = data;
 }
 
-WRITE8_MEMBER(suna8_state::rranger_play_samples_w)
+void suna8_state::rranger_play_samples_w(uint8_t data)
 {
 	logerror("%s: play sample = %02X\n", machine().describe_context(), data);
 

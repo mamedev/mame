@@ -129,10 +129,9 @@ private:
 
 	bool m_ietemp;       /* import/export temp space */
 
-	address_space *m_program;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_opcode_cache;
-	address_space *m_io;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache m_cprogram, m_copcodes;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
+	memory_access< 8, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
 	int m_icount;
 
 	/* cycles lookup */

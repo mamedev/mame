@@ -4,14 +4,15 @@
 /******************************************************************************
 
 SciSys Delta-1, it was sold by both Novag and SciSys, ROM has "COPY RIGHT WINKLER
-HK 1979", Winkler was the founder of SciSys(later renamed to Saitek).
+HK 1979", Winkler was the founder of SciSys(later renamed to Saitek). It was
+released in late-1980, even though it says 1979 in the ROM and manual.
 
 Hardware notes:
 - 3850PK CPU at ~2MHz, 3853PK memory interface
 - 4KB ROM(2332A), 256 bytes RAM(2*2111A-4)
 - 4-digit 7seg panel, no sound, no chessboard
 
--------------------------------------------------------------------------------
+===============================================================================
 
 Program origin notes by bataais:
 
@@ -74,9 +75,9 @@ private:
 
 	// I/O handlers
 	void update_display();
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_WRITE8_MEMBER(digit_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void mux_w(u8 data);
+	void digit_w(u8 data);
+	u8 input_r();
 
 	u8 m_mux_data = 0;
 	u8 m_led_select = 0;
@@ -113,7 +114,7 @@ void delta1_state::update_display()
 	m_display->matrix(m_led_select, (m_blink && m_7seg_rc) ? 0 : m_7seg_data);
 }
 
-WRITE8_MEMBER(delta1_state::mux_w)
+void delta1_state::mux_w(u8 data)
 {
 	// IO00-02: MC14028B A-C (D to GND)
 	// MC14028B Q3-Q7: input mux
@@ -126,7 +127,7 @@ WRITE8_MEMBER(delta1_state::mux_w)
 	m_mux_data = data;
 }
 
-READ8_MEMBER(delta1_state::input_r)
+u8 delta1_state::input_r()
 {
 	u8 data = 0;
 
@@ -139,7 +140,7 @@ READ8_MEMBER(delta1_state::input_r)
 	return data << 4 | m_mux_data | 8;
 }
 
-WRITE8_MEMBER(delta1_state::digit_w)
+void delta1_state::digit_w(u8 data)
 {
 	// IO17: R/C circuit to segment commons (for automated blinking)
 	// IO10-16: digit segments A-G
@@ -252,4 +253,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME      PARENT CMP MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1979, ccdelta1, 0,      0, delta1,  delta1, delta1_state, empty_init, "SciSys / Novag", "Chess Champion: Delta-1", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, ccdelta1, 0,      0, delta1,  delta1, delta1_state, empty_init, "SciSys / Novag", "Chess Champion: Delta-1", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK )

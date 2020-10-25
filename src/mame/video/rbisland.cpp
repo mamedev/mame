@@ -24,7 +24,7 @@ void rbisland_state::rbisland_colpri_cb(u32 &sprite_colbank, u32 &pri_mask, u16 
 	pri_mask = 0xfc; /* sprites under top bg layer */
 }
 
-WRITE16_MEMBER(rbisland_state::jumping_spritectrl_w)
+void rbisland_state::jumping_spritectrl_w(offs_t offset, uint16_t data)
 {
 	if (offset == 0)
 	{

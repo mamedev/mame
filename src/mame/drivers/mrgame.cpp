@@ -40,7 +40,6 @@ ToDo:
 //#include "machine/watchdog.h"
 #include "sound/dac.h"
 #include "sound/tms5220.h"
-#include "sound/volt_reg.h"
 #include "video/resnet.h"
 #include "emupal.h"
 #include "screen.h"
@@ -78,24 +77,24 @@ protected:
 
 private:
 	void mrgame_palette(palette_device &palette) const;
-	DECLARE_WRITE8_MEMBER(ack1_w);
-	DECLARE_WRITE8_MEMBER(ack2_w);
-	DECLARE_WRITE8_MEMBER(portb_w);
-	DECLARE_WRITE8_MEMBER(row_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(triple_w);
-	DECLARE_WRITE8_MEMBER(video_w);
+	void ack1_w(uint8_t data);
+	void ack2_w(uint8_t data);
+	void portb_w(uint8_t data);
+	void row_w(uint8_t data);
+	void sound_w(uint8_t data);
+	void triple_w(uint8_t data);
+	void video_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(video_a11_w);
 	DECLARE_WRITE_LINE_MEMBER(video_a12_w);
 	DECLARE_WRITE_LINE_MEMBER(video_a13_w);
 	DECLARE_WRITE_LINE_MEMBER(intst_w);
 	DECLARE_WRITE_LINE_MEMBER(nmi_intst_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_w);
-	DECLARE_READ8_MEMBER(col_r);
-	DECLARE_READ8_MEMBER(sound_r);
-	DECLARE_READ8_MEMBER(porta_r);
-	DECLARE_READ8_MEMBER(portc_r);
-	DECLARE_READ8_MEMBER(rsw_r);
+	uint8_t col_r();
+	uint8_t sound_r();
+	uint8_t porta_r();
+	uint8_t portc_r();
+	uint8_t rsw_r();
 	DECLARE_WRITE_LINE_MEMBER(vblank_int_w);
 	DECLARE_WRITE_LINE_MEMBER(vblank_nmi_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
@@ -255,13 +254,13 @@ static INPUT_PORTS_START( mrgame )
 	PORT_BIT( 0xe9, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-READ8_MEMBER(mrgame_state::rsw_r)
+uint8_t mrgame_state::rsw_r()
 {
 	return m_io_dsw0->read() | ((uint8_t)m_ack1 << 5) | ((uint8_t)m_ack2 << 4);
 }
 
 // this is like a keyboard, energise a row and read the column data
-READ8_MEMBER(mrgame_state::col_r)
+uint8_t mrgame_state::col_r()
 {
 	if (m_row_data == 0)
 		return m_io_x0->read();
@@ -276,17 +275,17 @@ READ8_MEMBER(mrgame_state::col_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(mrgame_state::row_w)
+void mrgame_state::row_w(uint8_t data)
 {
 	m_row_data = data & 7;
 }
 
-READ8_MEMBER(mrgame_state::sound_r)
+uint8_t mrgame_state::sound_r()
 {
 	return m_sound_data;
 }
 
-WRITE8_MEMBER(mrgame_state::sound_w)
+void mrgame_state::sound_w(uint8_t data)
 {
 	m_sound_data = data;
 	m_audiocpu1->set_input_line(INPUT_LINE_NMI, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
@@ -294,13 +293,13 @@ WRITE8_MEMBER(mrgame_state::sound_w)
 }
 
 // this produces 24 outputs from three driver chips to drive lamps & solenoids
-WRITE8_MEMBER(mrgame_state::triple_w)
+void mrgame_state::triple_w(uint8_t data)
 {
 	if ((data & 0x18)==0)
 		m_ackv = BIT(data, 7);
 }
 
-WRITE8_MEMBER(mrgame_state::video_w)
+void mrgame_state::video_w(uint8_t data)
 {
 	m_video_data = data;
 }
@@ -339,28 +338,28 @@ WRITE_LINE_MEMBER(mrgame_state::flip_w)
 	m_flip = state;
 }
 
-WRITE8_MEMBER(mrgame_state::ack1_w)
+void mrgame_state::ack1_w(uint8_t data)
 {
 	m_ack1 = BIT(data, 0);
 }
 
-WRITE8_MEMBER(mrgame_state::ack2_w)
+void mrgame_state::ack2_w(uint8_t data)
 {
 	m_ack2 = BIT(data, 0);
 }
 
-READ8_MEMBER(mrgame_state::porta_r)
+uint8_t mrgame_state::porta_r()
 {
 	return m_video_data;
 }
 
-WRITE8_MEMBER(mrgame_state::portb_w)
+void mrgame_state::portb_w(uint8_t data)
 {
 	m_video_status = data;
 	m_ackv = 0;
 }
 
-READ8_MEMBER(mrgame_state::portc_r)
+uint8_t mrgame_state::portc_r()
 {
 	return m_io_dsw1->read() | ((uint8_t)m_ackv << 4);
 }
@@ -584,15 +583,12 @@ void mrgame_state::mrgame(machine_config &config)
 	DAC_8BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.25); // unknown DAC
 	DAC_8BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
 
-	dac_8bit_r2r_device &dacvol(DAC_8BIT_R2R(config, "dacvol", 0)); // unknown DAC
-	dacvol.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
-	dacvol.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
-	dacvol.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
-	dacvol.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
-
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dacvol", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dacvol", -1.0, DAC_VREF_NEG_INPUT);
+	dac_8bit_r2r_device &dacvol(DAC_8BIT_R2R(config, "dacvol", 0));
+	dacvol.set_output_range(0, 1); // unknown DAC
+	dacvol.add_route(0, "ldac", 1.0, DAC_INPUT_RANGE_HI);
+	dacvol.add_route(0, "ldac", -1.0, DAC_INPUT_RANGE_LO);
+	dacvol.add_route(0, "rdac", 1.0, DAC_INPUT_RANGE_HI);
+	dacvol.add_route(0, "rdac", -1.0, DAC_INPUT_RANGE_LO);
 
 	tms5220_device &tms(TMS5220(config, "tms", 672000)); // uses a RC combination. 672k copied from jedi.h
 	tms.ready_cb().set_inputline("audiocpu2", Z80_INPUT_LINE_BOGUSWAIT);

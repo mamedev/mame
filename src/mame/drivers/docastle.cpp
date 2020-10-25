@@ -199,14 +199,14 @@ WRITE_LINE_MEMBER(docastle_state::idsoccer_adpcm_int)
 	}
 }
 
-READ8_MEMBER(docastle_state::idsoccer_adpcm_status_r)
+uint8_t docastle_state::idsoccer_adpcm_status_r()
 {
 	// this is wrong, but the samples work anyway!!
 	m_adpcm_status ^= 0x80;
 	return m_adpcm_status;
 }
 
-WRITE8_MEMBER(docastle_state::idsoccer_adpcm_w)
+void docastle_state::idsoccer_adpcm_w(uint8_t data)
 {
 	if (data & 0x80)
 	{
@@ -909,7 +909,7 @@ ROM_START( spiero )
 	ROM_LOAD( "bprom1.bin",   0x0000, 0x0200, CRC(fc1b66ff) SHA1(0a73f7e00501c638f017473b1e0786d7bcbbe82a) ) // color prom
 ROM_END
 
-ROM_START( dowild )
+ROM_START( dowild ) // UNIVERSAL 8339A PCB
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "w1",           0x0000, 0x2000, CRC(097de78b) SHA1(8d0cedde09a893ff67db0cb8e239babeb2cb3701) )
 	ROM_LOAD( "w3",           0x4000, 0x2000, CRC(fc6a1cbb) SHA1(4cf59459d521c725e41bbd9363fb58bffdad13a2) )

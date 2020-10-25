@@ -10,8 +10,8 @@ license:CC0
 			<bounds left="0.1" top="0.1" right="0.9" bottom="0.9" />
 		</disk>
 		<disk state ="1">
-		  <color red="0.4" green="0.4" blue="0.0" />
-		  <bounds left="0.1" top="0.1" right="0.9" bottom="0.9" />
+			<color red="0.4" green="0.4" blue="0.0" />
+			<bounds left="0.1" top="0.1" right="0.9" bottom="0.9" />
 		</disk>
 
 		<text string="SELECT" align="0">
@@ -19,8 +19,8 @@ license:CC0
 			<bounds left="0.10" top="0.3" right="0.90" bottom="0.7" />
 		</text>
 
-		<rect state="1000">
-			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+		<rect>
+			<color alpha="0" />
 			<bounds x="0" y="0" width="1" height="1" />
 		</rect>
 	</element>
@@ -31,8 +31,8 @@ license:CC0
 			<bounds left="0.1" top="0.1" right="0.9" bottom="0.9" />
 		</disk>
 		<disk state ="1">
-		  <color red="0.0" green="0.4" blue="0.0" />
-		  <bounds left="0.1" top="0.1" right="0.9" bottom="0.9" />
+			<color red="0.0" green="0.4" blue="0.0" />
+			<bounds left="0.1" top="0.1" right="0.9" bottom="0.9" />
 		</disk>
 
 		<text string="OK" align="0">
@@ -40,8 +40,8 @@ license:CC0
 			<bounds left="0.15" top="0.3" right="0.85" bottom="0.7" />
 		</text>
 
-		<rect state="1000">
-			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+		<rect>
+			<color alpha="0" />
 			<bounds x="0" y="0" width="1" height="1" />
 		</rect>
 	</element>
@@ -116,8 +116,8 @@ license:CC0
 			<bounds left="0.47" top="0.645" right="0.53" bottom="0.675" />
 		</disk>
 
-		<rect state="1000">
-			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+		<rect>
+			<color alpha="0" />
 			<bounds x="0" y="0" width="1" height="1" />
 		</rect>
 	</element>
@@ -133,8 +133,8 @@ license:CC0
 			<bounds left="0.10" top="0.425" right="0.45" bottom="0.485" />
 		</rect>
 
-		<rect state="1000">
-			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+		<rect>
+			<color alpha="0" />
 			<bounds x="0" y="0" width="1" height="1" />
 		</rect>
 	</element>
@@ -150,8 +150,8 @@ license:CC0
 			<bounds left="0.55" top="0.425" right="0.90" bottom="0.485" />
 		</rect>
 
-		<rect state="1000">
-			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+		<rect>
+			<color alpha="0" />
 			<bounds x="0" y="0" width="1" height="1" />
 		</rect>
 	</element>
@@ -167,8 +167,8 @@ license:CC0
 			<bounds left="0.10" top="0.495" right="0.45" bottom="0.555" />
 		</rect>
 
-		<rect state="1000">
-			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+		<rect>
+			<color alpha="0" />
 			<bounds x="0" y="0" width="1" height="1" />
 		</rect>
 	</element>
@@ -183,8 +183,8 @@ license:CC0
 			<color red="0.6" green="0.6" blue="0.6" />
 			<bounds left="0.55" top="0.495" right="0.90" bottom="0.555" />
 		</rect>
-		<rect state="1000">
-			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+		<rect>
+			<color alpha="0" />
 			<bounds x="0" y="0" width="1" height="1" />
 		</rect>
 	</element>
@@ -200,8 +200,8 @@ license:CC0
 			<bounds left="0.10" top="0.565" right="0.45" bottom="0.625" />
 		</rect>
 
-		<rect state="1000">
-			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+		<rect>
+			<color alpha="0" />
 			<bounds x="0" y="0" width="1" height="1" />
 		</rect>
 	</element>
@@ -217,8 +217,8 @@ license:CC0
 			<bounds left="0.55" top="0.565" right="0.90" bottom="0.625" />
 		</rect>
 
-		<rect state="1000">
-			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+		<rect>
+			<color alpha="0" />
 			<bounds x="0" y="0" width="1" height="1" />
 		</rect>
 	</element>
@@ -229,8 +229,8 @@ license:CC0
 			<bounds left="0.10" top="0.425" right="0.45" bottom="0.485" />
 		</text>
 
-		<rect state="1000">
-			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+		<rect>
+			<color alpha="0" />
 			<bounds x="0" y="0" width="1" height="1" />
 		</rect>
 	</element>
@@ -241,8 +241,8 @@ license:CC0
 			<bounds left="0.55" top="0.425" right="0.90" bottom="0.485" />
 		</text>
 
-		<rect state="1000">
-			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+		<rect>
+			<color alpha="0" />
 			<bounds x="0" y="0" width="1" height="1" />
 		</rect>
 	</element>
@@ -253,8 +253,8 @@ license:CC0
 			<bounds left="0.10" top="0.495" right="0.45" bottom="0.555" />
 		</text>
 
-		<rect state="1000">
-			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+		<rect>
+			<color alpha="0" />
 			<bounds x="0" y="0" width="1" height="1" />
 		</rect>
 	</element>
@@ -265,8 +265,8 @@ license:CC0
 			<bounds left="0.55" top="0.495" right="0.90" bottom="0.555" />
 		</text>
 
-		<rect state="1000">
-			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+		<rect>
+			<color alpha="0" />
 			<bounds x="0" y="0" width="1" height="1" />
 		</rect>
 	</element>
@@ -277,8 +277,8 @@ license:CC0
 			<bounds left="0.10" top="0.565" right="0.45" bottom="0.625" />
 		</text>
 
-		<rect state="1000">
-			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+		<rect>
+			<color alpha="0" />
 			<bounds x="0" y="0" width="1" height="1" />
 		</rect>
 	</element>
@@ -289,8 +289,8 @@ license:CC0
 			<bounds left="0.55" top="0.565" right="0.90" bottom="0.625" />
 		</text>
 
-		<rect state="1000">
-			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+		<rect>
+			<color alpha="0" />
 			<bounds x="0" y="0" width="1" height="1" />
 		</rect>
 	</element>
@@ -354,8 +354,8 @@ license:CC0
 			<bounds left="0.09" top="0.045" right="0.46" bottom="0.25" />
 		</text>
 
-		<rect state="1000">
-			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+		<rect>
+			<color alpha="0" />
 			<bounds x="0" y="0" width="1" height="1" />
 		</rect>
 	</element>
@@ -383,8 +383,8 @@ license:CC0
 			<bounds left="0.255" top="0.295" right="0.44" bottom="0.40" />
 		</text>
 
-		<rect state="1000">
-			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+		<rect>
+			<color alpha="0" />
 			<bounds x="0" y="0" width="1" height="1" />
 		</rect>
 	</element>
@@ -448,8 +448,8 @@ license:CC0
 			<bounds left="0.54" top="0.045" right="0.91" bottom="0.25" />
 		</text>
 
-		<rect state="1000">
-			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+		<rect>
+			<color alpha="0" />
 			<bounds x="0" y="0" width="1" height="1" />
 		</rect>
 	</element>
@@ -477,405 +477,129 @@ license:CC0
 			<bounds left="0.695" top="0.295" right="0.91" bottom="0.40" />
 		</text>
 
-		<rect state="1000">
-			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+		<rect>
+			<color alpha="0" />
 			<bounds x="0" y="0" width="1" height="1" />
 		</rect>
 	</element>
 
-	<view name="Screen">
-		<!-- Player 1 -->
-		<bezel name="BACKGROUND_BZ0" element="DISPLAYBG">
-			<bounds left="4.5" top="0" right="5.0" bottom="1" />
-		</bezel>
-		<bezel name="SUITE_LEFT_BZ0" element="SUITE_LEFT">
-			<bounds left="4.5" top="0" right="5.0" bottom="1" />
-		</bezel>
-		<bezel name="NUMBER_LEFT_BZ0" element="NUMBER_LEFT">
-			<bounds left="4.5" top="0" right="5.0" bottom="1" />
-		</bezel>
-		<bezel name="SUITE_RIGHT_BZ0" element="SUITE_RIGHT">
-			<bounds left="4.5" top="0" right="5.0" bottom="1" />
-		</bezel>
-		<bezel name="NUMBER_RIGHT_BZ0" element="NUMBER_RIGHT">
-			<bounds left="4.5" top="0" right="5.0" bottom="1" />
-		</bezel>
-		<bezel name="LED_BZ0" element="LED">
-			<bounds left="4.5" top="0" right="5.0" bottom="1" />
-		</bezel>
-		<bezel name="SELECT_FOLD_BZ0" element="OPTION_SELECTS_FOLD">
-			<bounds left="4.5" top="0" right="5.0" bottom="1" />
-		</bezel>
-		<bezel name="SELECT_CHECK_BZ0" element="OPTION_SELECTS_CHECK">
-			<bounds left="4.5" top="0" right="5.0" bottom="1" />
-		</bezel>
-		<bezel name="SELECT_BET_BZ0" element="OPTION_SELECTS_BET">
-			<bounds left="4.5" top="0" right="5.0" bottom="1" />
-		</bezel>
-		<bezel name="SELECT_CALL_BZ0" element="OPTION_SELECTS_CALL">
-			<bounds left="4.5" top="0" right="5.0" bottom="1" />
-		</bezel>
-		<bezel name="SELECT_RAISE_BZ0" element="OPTION_SELECTS_RAISE">
-			<bounds left="4.5" top="0" right="5.0" bottom="1" />
-		</bezel>
-		<bezel name="SELECT_ALLIN_BZ0" element="OPTION_SELECTS_ALLIN">
-			<bounds left="4.5" top="0" right="5.0" bottom="1" />
-		</bezel>
-		<bezel name="OPTION_FOLD_BZ0" element="OPTION_FOLD">
-			<bounds left="4.5" top="0" right="5.0" bottom="1" />
-		</bezel>
-		<bezel name="OPTION_CHECK_BZ0" element="OPTION_CHECK">
-			<bounds left="4.5" top="0" right="5.0" bottom="1" />
-		</bezel>
-		<bezel name="OPTION_BET_BZ0" element="OPTION_BET">
-			<bounds left="4.5" top="0" right="5.0" bottom="1" />
-		</bezel>
-		<bezel name="OPTION_CALL_BZ0" element="OPTION_CALL">
-			<bounds left="4.5" top="0" right="5.0" bottom="1" />
-		</bezel>
-		<bezel name="OPTION_RAISE_BZ0" element="OPTION_RAISE">
-			<bounds left="4.5" top="0" right="5.0" bottom="1" />
-		</bezel>
-		<bezel name="OPTION_ALLIN_BZ0" element="OPTION_ALLIN">
-			<bounds left="4.5" top="0" right="5.0" bottom="1" />
-		</bezel>
-		<bezel element="SELECT" inputtag="CTRL1" inputmask="0x1">
-			<bounds x="4.685" y="0.685" width="0.13" height="0.13" />
-		</bezel>
-		<bezel element="OK" inputtag="CTRL1" inputmask="0x2">
-			<bounds x="4.685" y="0.81" width="0.13" height="0.13" />
-		</bezel>
-		<bezel name="REVEALTXT_BZ0" element="REVEAL">
-			<bounds x="4.691" y="0.94" width="0.13" height="0.04" />
-		</bezel>
-
-		<!-- Player 2 -->
-		<bezel name="BACKGROUND_BZ1" element="DISPLAYBG">
-			<bounds left="4.5" top="1" right="5.0" bottom="2" />
-		</bezel>
-		<bezel name="SUITE_LEFT_BZ1" element="SUITE_LEFT">
-				<bounds left="4.5" top="1" right="5.0" bottom="2" />
-		</bezel>
-		<bezel name="NUMBER_LEFT_BZ1" element="NUMBER_LEFT">
-			<bounds left="4.5" top="1" right="5.0" bottom="2" />
-		</bezel>
-		<bezel name="SUITE_RIGHT_BZ1" element="SUITE_RIGHT">
-			<bounds left="4.5" top="1" right="5.0" bottom="2" />
-		</bezel>
-		<bezel name="NUMBER_RIGHT_BZ1" element="NUMBER_RIGHT">
-			<bounds left="4.5" top="1" right="5.0" bottom="2" />
-		</bezel>
-		<bezel name="LED_BZ1" element="LED">
-			<bounds left="4.5" top="1" right="5.0" bottom="2" />
-		</bezel>
-		<bezel name="SELECT_FOLD_BZ1" element="OPTION_SELECTS_FOLD">
-			<bounds left="4.5" top="1" right="5.0" bottom="2" />
-		</bezel>
-		<bezel name="SELECT_CHECK_BZ1" element="OPTION_SELECTS_CHECK">
-			<bounds left="4.5" top="1" right="5.0" bottom="2" />
-		</bezel>
-		<bezel name="SELECT_BET_BZ1" element="OPTION_SELECTS_BET">
-			<bounds left="4.5" top="1" right="5.0" bottom="2" />
-		</bezel>
-		<bezel name="SELECT_CALL_BZ1" element="OPTION_SELECTS_CALL">
-			<bounds left="4.5" top="1" right="5.0" bottom="2" />
-		</bezel>
-		<bezel name="SELECT_RAISE_BZ1" element="OPTION_SELECTS_RAISE">
-			<bounds left="4.5" top="1" right="5.0" bottom="2" />
-		</bezel>
-		<bezel name="SELECT_ALLIN_BZ1" element="OPTION_SELECTS_ALLIN">
-			<bounds left="4.5" top="1" right="5.0" bottom="2" />
-		</bezel>
-		<bezel name="OPTION_FOLD_BZ1" element="OPTION_FOLD">
-			<bounds left="4.5" top="1" right="5.0" bottom="2" />
-		</bezel>
-		<bezel name="OPTION_CHECK_BZ1" element="OPTION_CHECK">
-			<bounds left="4.5" top="1" right="5.0" bottom="2" />
-		</bezel>
-		<bezel name="OPTION_BET_BZ1" element="OPTION_BET">
-			<bounds left="4.5" top="1" right="5.0" bottom="2" />
-		</bezel>
-		<bezel name="OPTION_CALL_BZ1" element="OPTION_CALL">
-			<bounds left="4.5" top="1" right="5.0" bottom="2" />
-		</bezel>
-		<bezel name="OPTION_RAISE_BZ1" element="OPTION_RAISE">
-			<bounds left="4.5" top="1" right="5.0" bottom="2" />
-		</bezel>
-		<bezel name="OPTION_ALLIN_BZ1" element="OPTION_ALLIN">
-			<bounds left="4.5" top="1" right="5.0" bottom="2" />
-		</bezel>
-		<bezel element="SELECT" inputtag="CTRL2" inputmask="0x1">
-			<bounds x="4.685" y="1.685" width="0.13" height="0.13" />
-		</bezel>
-		<bezel element="OK" inputtag="CTRL2" inputmask="0x2">
-			<bounds x="4.685" y="1.81" width="0.13" height="0.13" />
-		</bezel>
-		<bezel name="REVEALTXT_BZ1" element="REVEAL">
-			<bounds x="4.691" y="1.94" width="0.13" height="0.04" />
-		</bezel>
-
-		<!-- Player 3 -->
-		<bezel name="BACKGROUND_BZ2" element="DISPLAYBG">
-			<bounds left="4.5" top="2" right="5.0" bottom="3" />
-		</bezel>
-		<bezel name="SUITE_LEFT_BZ2" element="SUITE_LEFT">
-			<bounds left="4.5" top="2" right="5.0" bottom="3" />
-		</bezel>
-		<bezel name="NUMBER_LEFT_BZ2" element="NUMBER_LEFT">
-			<bounds left="4.5" top="2" right="5.0" bottom="3" />
-		</bezel>
-		<bezel name="SUITE_RIGHT_BZ2" element="SUITE_RIGHT">
-			<bounds left="4.5" top="2" right="5.0" bottom="3" />
-		</bezel>
-		<bezel name="NUMBER_RIGHT_BZ2" element="NUMBER_RIGHT">
-			<bounds left="4.5" top="2" right="5.0" bottom="3" />
-		</bezel>
-		<bezel name="LED_BZ2" element="LED">
-			<bounds left="4.5" top="2" right="5.0" bottom="3" />
-		</bezel>
-		<bezel name="SELECT_FOLD_BZ2" element="OPTION_SELECTS_FOLD">
-			<bounds left="4.5" top="2" right="5.0" bottom="3" />
-		</bezel>
-		<bezel name="SELECT_CHECK_BZ2" element="OPTION_SELECTS_CHECK">
-			<bounds left="4.5" top="2" right="5.0" bottom="3" />
-		</bezel>
-		<bezel name="SELECT_BET_BZ2" element="OPTION_SELECTS_BET">
-			<bounds left="4.5" top="2" right="5.0" bottom="3" />
-		</bezel>
-		<bezel name="SELECT_CALL_BZ2" element="OPTION_SELECTS_CALL">
-			<bounds left="4.5" top="2" right="5.0" bottom="3" />
-		</bezel>
-		<bezel name="SELECT_RAISE_BZ2" element="OPTION_SELECTS_RAISE">
-			<bounds left="4.5" top="2" right="5.0" bottom="3" />
-		</bezel>
-		<bezel name="SELECT_ALLIN_BZ2" element="OPTION_SELECTS_ALLIN">
-			<bounds left="4.5" top="2" right="5.0" bottom="3" />
-		</bezel>
-		<bezel name="OPTION_FOLD_BZ2" element="OPTION_FOLD">
-			<bounds left="4.5" top="2" right="5.0" bottom="3" />
-		</bezel>
-		<bezel name="OPTION_CHECK_BZ2" element="OPTION_CHECK">
-			<bounds left="4.5" top="2" right="5.0" bottom="3" />
-		</bezel>
-		<bezel name="OPTION_BET_BZ2" element="OPTION_BET">
-			<bounds left="4.5" top="2" right="5.0" bottom="3" />
-		</bezel>
-		<bezel name="OPTION_CALL_BZ2" element="OPTION_CALL">
-			<bounds left="4.5" top="2" right="5.0" bottom="3" />
-		</bezel>
-		<bezel name="OPTION_RAISE_BZ2" element="OPTION_RAISE">
-			<bounds left="4.5" top="2" right="5.0" bottom="3" />
-		</bezel>
-		<bezel name="OPTION_ALLIN_BZ2" element="OPTION_ALLIN">
-			<bounds left="4.5" top="2" right="5.0" bottom="3" />
-		</bezel>
-		<bezel element="SELECT" inputtag="CTRL3" inputmask="0x1">
-			<bounds x="4.685" y="2.685" width="0.13" height="0.13" />
-		</bezel>
-		<bezel element="OK" inputtag="CTRL3" inputmask="0x2">
-			<bounds x="4.685" y="2.81" width="0.13" height="0.13" />
-		</bezel>
-		<bezel name="REVEALTXT_BZ2" element="REVEAL">
-			<bounds x="4.691" y="2.94" width="0.13" height="0.04" />
-		</bezel>
-
-		<!-- Player 4 -->
-		<bezel name="BACKGROUND_BZ3" element="DISPLAYBG">
-			<bounds left="0" top="2" right="0.5" bottom="3" />
-		</bezel>
-		<bezel name="SUITE_LEFT_BZ3" element="SUITE_LEFT">
-			<bounds left="0" top="2" right="0.5" bottom="3" />
-		</bezel>
-		<bezel name="NUMBER_LEFT_BZ3" element="NUMBER_LEFT">
-			<bounds left="0" top="2" right="0.5" bottom="3" />
-		</bezel>
-		<bezel name="SUITE_RIGHT_BZ3" element="SUITE_RIGHT">
-			<bounds left="0" top="2" right="0.5" bottom="3" />
-		</bezel>
-		<bezel name="NUMBER_RIGHT_BZ3" element="NUMBER_RIGHT">
-			<bounds left="0" top="2" right="0.5" bottom="3" />
-		</bezel>
-		<bezel name="LED_BZ3" element="LED">
-			<bounds left="0" top="2" right="0.5" bottom="3" />
-		</bezel>
-		<bezel name="SELECT_FOLD_BZ3" element="OPTION_SELECTS_FOLD">
-			<bounds left="0" top="2" right="0.5" bottom="3" />
-		</bezel>
-		<bezel name="SELECT_CHECK_BZ3" element="OPTION_SELECTS_CHECK">
-			<bounds left="0" top="2" right="0.5" bottom="3" />
-		</bezel>
-		<bezel name="SELECT_BET_BZ3" element="OPTION_SELECTS_BET">
-			<bounds left="0" top="2" right="0.5" bottom="3" />
-		</bezel>
-		<bezel name="SELECT_CALL_BZ3" element="OPTION_SELECTS_CALL">
-			<bounds left="0" top="2" right="0.5" bottom="3" />
-		</bezel>
-		<bezel name="SELECT_RAISE_BZ3" element="OPTION_SELECTS_RAISE">
-			<bounds left="0" top="2" right="0.5" bottom="3" />
-		</bezel>
-		<bezel name="SELECT_ALLIN_BZ3" element="OPTION_SELECTS_ALLIN">
-			<bounds left="0" top="2" right="0.5" bottom="3" />
-		</bezel>
-		<bezel name="OPTION_FOLD_BZ3" element="OPTION_FOLD">
-			<bounds left="0" top="2" right="0.5" bottom="3" />
-		</bezel>
-		<bezel name="OPTION_CHECK_BZ3" element="OPTION_CHECK">
-			<bounds left="0" top="2" right="0.5" bottom="3" />
-		</bezel>
-		<bezel name="OPTION_BET_BZ3" element="OPTION_BET">
-			<bounds left="0" top="2" right="0.5" bottom="3" />
-		</bezel>
-		<bezel name="OPTION_CALL_BZ3" element="OPTION_CALL">
-			<bounds left="0" top="2" right="0.5" bottom="3" />
-		</bezel>
-		<bezel name="OPTION_RAISE_BZ3" element="OPTION_RAISE">
-			<bounds left="0" top="2" right="0.5" bottom="3" />
-		</bezel>
-		<bezel name="OPTION_ALLIN_BZ3" element="OPTION_ALLIN">
-			<bounds left="0" top="2" right="0.5" bottom="3" />
-		</bezel>
-		<bezel element="SELECT" inputtag="CTRL4" inputmask="0x1">
-			<bounds x="0.185" y="2.685" width="0.13" height="0.13" />
-		</bezel>
-		<bezel element="OK" inputtag="CTRL4" inputmask="0x2">
-			<bounds x="0.185" y="2.81" width="0.13" height="0.13" />
-		</bezel>
-		<bezel name="REVEALTXT_BZ3" element="REVEAL">
-			<bounds x="0.191" y="2.94" width="0.13" height="0.04" />
-		</bezel>
-
-		<!-- Player 5 -->
-		<bezel name="BACKGROUND_BZ4" element="DISPLAYBG">
-			<bounds left="0" top="1" right="0.5" bottom="2" />
-		</bezel>
-		<bezel name="SUITE_LEFT_BZ4" element="SUITE_LEFT">
-			<bounds left="0" top="1" right="0.5" bottom="2" />
-		</bezel>
-		<bezel name="NUMBER_LEFT_BZ4" element="NUMBER_LEFT">
-			<bounds left="0" top="1" right="0.5" bottom="2" />
-		</bezel>
-		<bezel name="SUITE_RIGHT_BZ4" element="SUITE_RIGHT">
-			<bounds left="0" top="1" right="0.5" bottom="2" />
-		</bezel>
-		<bezel name="NUMBER_RIGHT_BZ4" element="NUMBER_RIGHT">
-			<bounds left="0" top="1" right="0.5" bottom="2" />
-		</bezel>
-		<bezel name="LED_BZ4" element="LED">
-			<bounds left="0" top="1" right="0.5" bottom="2" />
-		</bezel>
-		<bezel name="SELECT_FOLD_BZ4" element="OPTION_SELECTS_FOLD">
-			<bounds left="0" top="1" right="0.5" bottom="2" />
-		</bezel>
-		<bezel name="SELECT_CHECK_BZ4" element="OPTION_SELECTS_CHECK">
-			<bounds left="0" top="1" right="0.5" bottom="2" />
-		</bezel>
-		<bezel name="SELECT_BET_BZ4" element="OPTION_SELECTS_BET">
-			<bounds left="0" top="1" right="0.5" bottom="2" />
-		</bezel>
-		<bezel name="SELECT_CALL_BZ4" element="OPTION_SELECTS_CALL">
-			<bounds left="0" top="1" right="0.5" bottom="2" />
-		</bezel>
-		<bezel name="SELECT_RAISE_BZ4" element="OPTION_SELECTS_RAISE">
-			<bounds left="0" top="1" right="0.5" bottom="2" />
-		</bezel>
-		<bezel name="SELECT_ALLIN_BZ4" element="OPTION_SELECTS_ALLIN">
-			<bounds left="0" top="1" right="0.5" bottom="2" />
-		</bezel>
-		<bezel name="OPTION_FOLD_BZ4" element="OPTION_FOLD">
-			<bounds left="0" top="1" right="0.5" bottom="2" />
-		</bezel>
-		<bezel name="OPTION_CHECK_BZ4" element="OPTION_CHECK">
-			<bounds left="0" top="1" right="0.5" bottom="2" />
-		</bezel>
-		<bezel name="OPTION_BET_BZ4" element="OPTION_BET">
-			<bounds left="0" top="1" right="0.5" bottom="2" />
-		</bezel>
-		<bezel name="OPTION_CALL_BZ4" element="OPTION_CALL">
-			<bounds left="0" top="1" right="0.5" bottom="2" />
-		</bezel>
-		<bezel name="OPTION_RAISE_BZ4" element="OPTION_RAISE">
-			<bounds left="0" top="1" right="0.5" bottom="2" />
-		</bezel>
-		<bezel name="OPTION_ALLIN_BZ4" element="OPTION_ALLIN">
-			<bounds left="0" top="1" right="0.5" bottom="2" />
-		</bezel>
-		<bezel element="SELECT" inputtag="CTRL5" inputmask="0x1">
-			<bounds x="0.185" y="1.685" width="0.13" height="0.13" />
-		</bezel>
-		<bezel element="OK" inputtag="CTRL5" inputmask="0x2">
-			<bounds x="0.185" y="1.81" width="0.13" height="0.13" />
-		</bezel>
-		<bezel name="REVEALTXT_BZ4" element="REVEAL">
-			<bounds x="0.191" y="1.94" width="0.13" height="0.04" />
-		</bezel>
-
-		<!-- Player 6 -->
-		<bezel name="BACKGROUND_BZ5" element="DISPLAYBG">
+	<group name="controller">
+		<element name="BACKGROUND_BZ~player~" ref="DISPLAYBG">
 			<bounds left="0" top="0" right="0.5" bottom="1" />
-		</bezel>
-		<bezel name="SUITE_LEFT_BZ5" element="SUITE_LEFT">
+		</element>
+		<element name="SUITE_LEFT_BZ~player~" ref="SUITE_LEFT">
 			<bounds left="0" top="0" right="0.5" bottom="1" />
-		</bezel>
-		<bezel name="NUMBER_LEFT_BZ5" element="NUMBER_LEFT">
+		</element>
+		<element name="NUMBER_LEFT_BZ~player~" ref="NUMBER_LEFT">
 			<bounds left="0" top="0" right="0.5" bottom="1" />
-		</bezel>
-		<bezel name="SUITE_RIGHT_BZ5" element="SUITE_RIGHT">
+		</element>
+		<element name="SUITE_RIGHT_BZ~player~" ref="SUITE_RIGHT">
 			<bounds left="0" top="0" right="0.5" bottom="1" />
-		</bezel>
-		<bezel name="NUMBER_RIGHT_BZ5" element="NUMBER_RIGHT">
+		</element>
+		<element name="NUMBER_RIGHT_BZ~player~" ref="NUMBER_RIGHT">
 			<bounds left="0" top="0" right="0.5" bottom="1" />
-		</bezel>
-		<bezel name="LED_BZ5" element="LED">
+		</element>
+		<element name="LED_BZ~player~" ref="LED">
 			<bounds left="0" top="0" right="0.5" bottom="1" />
-		</bezel>
-		<bezel name="SELECT_FOLD_BZ5" element="OPTION_SELECTS_FOLD">
+		</element>
+		<element name="SELECT_FOLD_BZ~player~" ref="OPTION_SELECTS_FOLD">
 			<bounds left="0" top="0" right="0.5" bottom="1" />
-		</bezel>
-		<bezel name="SELECT_CHECK_BZ5" element="OPTION_SELECTS_CHECK">
+		</element>
+		<element name="SELECT_CHECK_BZ~player~" ref="OPTION_SELECTS_CHECK">
 			<bounds left="0" top="0" right="0.5" bottom="1" />
-		</bezel>
-		<bezel name="SELECT_BET_BZ5" element="OPTION_SELECTS_BET">
+		</element>
+		<element name="SELECT_BET_BZ~player~" ref="OPTION_SELECTS_BET">
 			<bounds left="0" top="0" right="0.5" bottom="1" />
-		</bezel>
-		<bezel name="SELECT_CALL_BZ5" element="OPTION_SELECTS_CALL">
+		</element>
+		<element name="SELECT_CALL_BZ~player~" ref="OPTION_SELECTS_CALL">
 			<bounds left="0" top="0" right="0.5" bottom="1" />
-		</bezel>
-		<bezel name="SELECT_RAISE_BZ5" element="OPTION_SELECTS_RAISE">
+		</element>
+		<element name="SELECT_RAISE_BZ~player~" ref="OPTION_SELECTS_RAISE">
 			<bounds left="0" top="0" right="0.5" bottom="1" />
-		</bezel>
-		<bezel name="SELECT_ALLIN_BZ5" element="OPTION_SELECTS_ALLIN">
+		</element>
+		<element name="SELECT_ALLIN_BZ~player~" ref="OPTION_SELECTS_ALLIN">
 			<bounds left="0" top="0" right="0.5" bottom="1" />
-		</bezel>
-		<bezel name="OPTION_FOLD_BZ5" element="OPTION_FOLD">
+		</element>
+		<element name="OPTION_FOLD_BZ~player~" ref="OPTION_FOLD">
 			<bounds left="0" top="0" right="0.5" bottom="1" />
-		</bezel>
-		<bezel name="OPTION_CHECK_BZ5" element="OPTION_CHECK">
+		</element>
+		<element name="OPTION_CHECK_BZ~player~" ref="OPTION_CHECK">
 			<bounds left="0" top="0" right="0.5" bottom="1" />
-		</bezel>
-		<bezel name="OPTION_BET_BZ5" element="OPTION_BET">
+		</element>
+		<element name="OPTION_BET_BZ~player~" ref="OPTION_BET">
 			<bounds left="0" top="0" right="0.5" bottom="1" />
-		</bezel>
-		<bezel name="OPTION_CALL_BZ5" element="OPTION_CALL">
+		</element>
+		<element name="OPTION_CALL_BZ~player~" ref="OPTION_CALL">
 			<bounds left="0" top="0" right="0.5" bottom="1" />
-		</bezel>
-		<bezel name="OPTION_RAISE_BZ5" element="OPTION_RAISE">
+		</element>
+		<element name="OPTION_RAISE_BZ~player~" ref="OPTION_RAISE">
 			<bounds left="0" top="0" right="0.5" bottom="1" />
-		</bezel>
-		<bezel name="OPTION_ALLIN_BZ5" element="OPTION_ALLIN">
+		</element>
+		<element name="OPTION_ALLIN_BZ~player~" ref="OPTION_ALLIN">
 			<bounds left="0" top="0" right="0.5" bottom="1" />
-		</bezel>
-		<bezel element="SELECT" inputtag="CTRL6" inputmask="0x1">
+		</element>
+		<element ref="SELECT" inputtag="CTRL~port~" inputmask="0x1">
 			<bounds x="0.185" y="0.685" width="0.13" height="0.13" />
-		</bezel>
-		<bezel element="OK" inputtag="CTRL6" inputmask="0x2">
+		</element>
+		<element ref="OK" inputtag="CTRL~port~" inputmask="0x2">
 			<bounds x="0.185" y="0.81" width="0.13" height="0.13" />
-		</bezel>
-		<bezel name="REVEALTXT_BZ5" element="REVEAL">
+		</element>
+		<element name="REVEALTXT_BZ~player~" ref="REVEAL">
 			<bounds x="0.191" y="0.94" width="0.13" height="0.04" />
-		</bezel>
+		</element>
+	</group>
 
+	<view name="Screen and Controllers">
 		<screen index="0">
 			<bounds left="0.5" top="0" right="4.5" bottom="3" />
 		</screen>
+
+		<collection name="Player 1 Controller">
+			<param name="player" value="0" />
+			<param name="port" value="1" />
+			<group ref="controller">
+				<bounds x="4.5" y="0" width="0.5" height="1" />
+			</group>
+		</collection>
+
+		<collection name="Player 2 Controller">
+			<param name="player" value="1" />
+			<param name="port" value="2" />
+			<group ref="controller">
+				<bounds x="4.5" y="1" width="0.5" height="1" />
+			</group>
+		</collection>
+
+		<collection name="Player 3 Controller">
+			<param name="player" value="2" />
+			<param name="port" value="3" />
+			<group ref="controller">
+				<bounds x="4.5" y="2" width="0.5" height="1" />
+			</group>
+		</collection>
+
+		<collection name="Player 4 Controller">
+			<param name="player" value="3" />
+			<param name="port" value="4" />
+			<group ref="controller">
+				<bounds x="0" y="2" width="0.5" height="1" />
+			</group>
+		</collection>
+
+		<collection name="Player 5 Controller">
+			<param name="player" value="4" />
+			<param name="port" value="5" />
+			<group ref="controller">
+				<bounds x="0" y="1" width="0.5" height="1" />
+			</group>
+		</collection>
+
+		<collection name="Player 6 Controller">
+			<param name="player" value="5" />
+			<param name="port" value="6" />
+			<group ref="controller">
+				<bounds x="0" y="0" width="0.5" height="1" />
+			</group>
+		</collection>
 	</view>
 </mamelayout>

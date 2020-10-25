@@ -346,28 +346,28 @@ private:
 
 	uint16_t m_winrun_color;
 	uint16_t m_winrun_gpu_register[0x10/2];
-	DECLARE_READ16_MEMBER(video_enable_r);
-	DECLARE_WRITE16_MEMBER(video_enable_w);
+	uint16_t video_enable_r();
+	void video_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER(dpram_word_r);
-	DECLARE_WRITE16_MEMBER(dpram_word_w);
-	DECLARE_READ8_MEMBER(dpram_byte_r);
-	DECLARE_WRITE8_MEMBER(dpram_byte_w);
+	uint16_t dpram_word_r(offs_t offset);
+	void dpram_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t dpram_byte_r(offs_t offset);
+	void dpram_byte_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ16_MEMBER(winrun_gpu_color_r);
-	DECLARE_WRITE16_MEMBER(winrun_gpu_color_w);
-	DECLARE_READ16_MEMBER(winrun_gpu_register_r);
-	DECLARE_WRITE16_MEMBER(winrun_gpu_register_w);
-	DECLARE_WRITE16_MEMBER(winrun_gpu_videoram_w);
-	DECLARE_READ16_MEMBER(winrun_gpu_videoram_r);
+	uint16_t winrun_gpu_color_r();
+	void winrun_gpu_color_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t winrun_gpu_register_r(offs_t offset);
+	void winrun_gpu_register_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void winrun_gpu_videoram_w(offs_t offset, uint16_t data);
+	uint16_t winrun_gpu_videoram_r(offs_t offset);
 
-	DECLARE_WRITE8_MEMBER(eeprom_w);
-	DECLARE_READ8_MEMBER(eeprom_r);
+	void eeprom_w(offs_t offset, uint8_t data);
+	uint8_t eeprom_r(offs_t offset);
 
-	DECLARE_WRITE8_MEMBER(sound_bankselect_w);
+	void sound_bankselect_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(sound_reset_w);
-	DECLARE_WRITE8_MEMBER(system_reset_w);
+	void sound_reset_w(uint8_t data);
+	void system_reset_w(uint8_t data);
 	void reset_all_subcpus(int state);
 
 	std::unique_ptr<uint8_t[]> m_eeprom;
@@ -391,33 +391,32 @@ private:
 	void c140_map(address_map &map);
 };
 
-READ16_MEMBER(namcos21_state::winrun_gpu_color_r)
+uint16_t namcos21_state::winrun_gpu_color_r()
 {
 	return m_winrun_color;
 }
 
-WRITE16_MEMBER(namcos21_state::winrun_gpu_color_w)
+void namcos21_state::winrun_gpu_color_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_winrun_color );
 }
 
-READ16_MEMBER(namcos21_state::winrun_gpu_register_r)
+uint16_t namcos21_state::winrun_gpu_register_r(offs_t offset)
 {
 	return m_winrun_gpu_register[offset];
 }
 
-WRITE16_MEMBER(namcos21_state::winrun_gpu_register_w)
+void namcos21_state::winrun_gpu_register_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_winrun_gpu_register[offset] );
 	m_screen->update_partial(m_screen->vpos());
 }
 
-WRITE16_MEMBER(namcos21_state::winrun_gpu_videoram_w)
+void namcos21_state::winrun_gpu_videoram_w(offs_t offset, uint16_t data)
 {
 	int color = data>>8;
 	int mask  = data&0xff;
-	int i;
-	for( i=0; i<8; i++ )
+	for( int i=0; i<8; i++ )
 	{
 		if( mask&(0x01<<i) )
 		{
@@ -427,27 +426,26 @@ WRITE16_MEMBER(namcos21_state::winrun_gpu_videoram_w)
 	}
 }
 
-READ16_MEMBER(namcos21_state::winrun_gpu_videoram_r)
+uint16_t namcos21_state::winrun_gpu_videoram_r(offs_t offset)
 {
 	return (m_gpu_videoram[offset]<<8) | m_gpu_maskram[offset];
 }
 
 void namcos21_state::winrun_bitmap_draw(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *videoram = m_gpu_videoram.get();
+	uint8_t const *const videoram = m_gpu_videoram.get();
 	//printf("%d %d (%d %d) - %04x %04x %04x|%04x %04x\n",cliprect.top(),cliprect.bottom(),m_screen->vpos(),m_gpu_intc->get_posirq_line(),m_winrun_gpu_register[0],m_winrun_gpu_register[2/2],m_winrun_gpu_register[4/2],m_winrun_gpu_register[0xa/2],m_winrun_gpu_register[0xc/2]);
 
-	int yscroll = -cliprect.top()+(int16_t)m_winrun_gpu_register[0x2/2];
-	int xscroll = 0;//m_winrun_gpu_register[0xc/2] >> 7;
-	int base = 0x1000+0x100*(m_winrun_color&0xf);
-	int sx,sy;
-	for( sy=cliprect.top(); sy<=cliprect.bottom(); sy++ )
+	int const yscroll = -cliprect.top()+(int16_t)m_winrun_gpu_register[0x2/2];
+	int const xscroll = 0;//m_winrun_gpu_register[0xc/2] >> 7;
+	int const base = 0x1000+0x100*(m_winrun_color&0xf);
+	for( int sy=cliprect.top(); sy<=cliprect.bottom(); sy++ )
 	{
-		const uint8_t *pSource = &videoram[((yscroll+sy)&0x3ff)*0x200];
-		uint16_t *pDest = &bitmap.pix16(sy);
-		for( sx=cliprect.left(); sx<=cliprect.right(); sx++ )
+		uint8_t const *const pSource = &videoram[((yscroll+sy)&0x3ff)*0x200];
+		uint16_t *const pDest = &bitmap.pix(sy);
+		for( int sx=cliprect.left(); sx<=cliprect.right(); sx++ )
 		{
-			int pen = pSource[(sx+xscroll) & 0x1ff];
+			int const pen = pSource[(sx+xscroll) & 0x1ff];
 			switch( pen )
 			{
 			case 0xff:
@@ -483,12 +481,12 @@ uint32_t namcos21_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 
 
-READ16_MEMBER(namcos21_state::video_enable_r)
+uint16_t namcos21_state::video_enable_r()
 {
 	return m_video_enable;
 }
 
-WRITE16_MEMBER(namcos21_state::video_enable_w)
+void namcos21_state::video_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_video_enable ); /* 0x40 = enable */
 	if( m_video_enable!=0 && m_video_enable!=0x40 )
@@ -501,12 +499,12 @@ WRITE16_MEMBER(namcos21_state::video_enable_w)
 
 /* dual port ram memory handlers */
 
-READ16_MEMBER(namcos21_state::dpram_word_r)
+uint16_t namcos21_state::dpram_word_r(offs_t offset)
 {
 	return m_dpram[offset];
 }
 
-WRITE16_MEMBER(namcos21_state::dpram_word_w)
+void namcos21_state::dpram_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if( ACCESSING_BITS_0_7 )
 	{
@@ -514,12 +512,12 @@ WRITE16_MEMBER(namcos21_state::dpram_word_w)
 	}
 }
 
-READ8_MEMBER(namcos21_state::dpram_byte_r)
+uint8_t namcos21_state::dpram_byte_r(offs_t offset)
 {
 	return m_dpram[offset];
 }
 
-WRITE8_MEMBER(namcos21_state::dpram_byte_w)
+void namcos21_state::dpram_byte_w(offs_t offset, uint8_t data)
 {
 	m_dpram[offset] = data;
 }
@@ -765,12 +763,12 @@ static INPUT_PORTS_START( winrungp )
 	PORT_DIPSETTING(    0x00, "4M" )
 INPUT_PORTS_END
 
-WRITE8_MEMBER( namcos21_state::sound_bankselect_w )
+void namcos21_state::sound_bankselect_w(uint8_t data)
 {
 	m_audiobank->set_entry(data>>4);
 }
 
-WRITE8_MEMBER(namcos21_state::sound_reset_w)
+void namcos21_state::sound_reset_w(uint8_t data)
 {
 	if (data & 0x01)
 	{
@@ -785,7 +783,7 @@ WRITE8_MEMBER(namcos21_state::sound_reset_w)
 	}
 }
 
-WRITE8_MEMBER(namcos21_state::system_reset_w)
+void namcos21_state::system_reset_w(uint8_t data)
 {
 	reset_all_subcpus(data & 1 ? CLEAR_LINE : ASSERT_LINE);
 
@@ -799,12 +797,12 @@ void namcos21_state::reset_all_subcpus(int state)
 	m_c65->ext_reset(state);
 }
 
-WRITE8_MEMBER(namcos21_state::eeprom_w)
+void namcos21_state::eeprom_w(offs_t offset, uint8_t data)
 {
 	m_eeprom[offset] = data;
 }
 
-READ8_MEMBER(namcos21_state::eeprom_r)
+uint8_t namcos21_state::eeprom_r(offs_t offset)
 {
 	return m_eeprom[offset];
 }
@@ -907,7 +905,7 @@ void namcos21_state::winrun(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	C140(config, m_c140, 8000000/374);
+	C140(config, m_c140, 49.152_MHz_XTAL / 2304);
 	m_c140->set_addrmap(0, &namcos21_state::c140_map);
 	m_c140->int1_callback().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
 	m_c140->add_route(0, "lspeaker", 0.50);

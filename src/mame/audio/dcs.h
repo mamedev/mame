@@ -26,7 +26,7 @@ public:
 
 	void set_auto_ack(int state);
 
-	void set_fifo_callbacks(read16smo_delegate fifo_data_r, read16_delegate fifo_status_r, write_line_delegate fifo_reset_w);
+	void set_fifo_callbacks(read16smo_delegate fifo_data_r, read16mo_delegate fifo_status_r, write_line_delegate fifo_reset_w);
 	void set_io_callbacks(write_line_delegate output_full_cb, write_line_delegate input_empty_cb);
 
 	uint16_t data_r();
@@ -39,11 +39,11 @@ public:
 
 	void fifo_notify(int count, int max);
 
-	DECLARE_WRITE32_MEMBER( dsio_idma_addr_w );
-	DECLARE_WRITE32_MEMBER( dsio_idma_data_w );
-	DECLARE_READ32_MEMBER( dsio_idma_data_r );
+	void dsio_idma_addr_w(uint32_t data);
+	void dsio_idma_data_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t dsio_idma_data_r();
 	void dmovlay_remap_memory();
-	WRITE32_MEMBER(dmovlay_callback);
+	void dmovlay_callback(uint32_t data);
 	void denver_postload(void);
 	void install_speedup(void);
 
@@ -51,51 +51,51 @@ public:
 	void dcs_boot();
 	TIMER_CALLBACK_MEMBER( dcs_reset );
 	void dcs_register_state();
-	DECLARE_READ16_MEMBER( dcs_dataram_r );
-	DECLARE_WRITE16_MEMBER( dcs_dataram_w );
-	DECLARE_WRITE16_MEMBER( dcs_data_bank_select_w );
-	DECLARE_WRITE16_MEMBER( dcs_data_bank_select2_w );
+	uint16_t dcs_dataram_r(offs_t offset);
+	void dcs_dataram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void dcs_data_bank_select_w(uint16_t data);
+	void dcs_data_bank_select2_w(uint16_t data);
 	inline void sdrc_update_bank_pointers();
 	void sdrc_remap_memory();
 	void sdrc_reset();
-	DECLARE_READ16_MEMBER( sdrc_r );
-	DECLARE_WRITE16_MEMBER( sdrc_w );
+	uint16_t sdrc_r(offs_t offset);
+	void sdrc_w(offs_t offset, uint16_t data);
 	void dsio_reset();
-	DECLARE_READ16_MEMBER( dsio_r );
-	DECLARE_WRITE16_MEMBER( dsio_w );
+	uint16_t dsio_r(offs_t offset);
+	void dsio_w(offs_t offset, uint16_t data);
 	void denver_alloc_dmadac(void);
 	void denver_reset();
-	DECLARE_READ16_MEMBER( denver_r );
-	DECLARE_WRITE16_MEMBER( denver_w );
-	DECLARE_READ16_MEMBER( latch_status_r );
-	DECLARE_READ16_MEMBER( fifo_input_r );
+	uint16_t denver_r(offs_t offset);
+	void denver_w(offs_t offset, uint16_t data);
+	uint16_t latch_status_r(address_space &space);
+	uint16_t fifo_input_r();
 	void dcs_delayed_data_w(uint16_t data);
 	TIMER_CALLBACK_MEMBER( dcs_delayed_data_w_callback );
-	DECLARE_WRITE16_MEMBER( input_latch_ack_w );
-	DECLARE_READ16_MEMBER( input_latch_r );
-	DECLARE_READ32_MEMBER( input_latch32_r );
+	void input_latch_ack_w(uint16_t data);
+	uint16_t input_latch_r();
+	uint32_t input_latch32_r();
 	TIMER_CALLBACK_MEMBER( latch_delayed_w );
 	void output_latch_w(uint16_t data);
-	DECLARE_WRITE32_MEMBER( output_latch32_w );
+	void output_latch32_w(uint32_t data);
 	void delayed_ack_w();
 	TIMER_CALLBACK_MEMBER( delayed_ack_w_callback );
 	TIMER_CALLBACK_MEMBER( output_control_delayed_w );
-	DECLARE_WRITE16_MEMBER( output_control_w );
-	DECLARE_READ16_MEMBER( output_control_r );
+	void output_control_w(uint16_t data);
+	uint16_t output_control_r();
 	void update_timer_count();
 	TIMER_DEVICE_CALLBACK_MEMBER( internal_timer_callback );
 	void reset_timer();
 	DECLARE_WRITE_LINE_MEMBER(timer_enable_callback);
-	DECLARE_READ16_MEMBER( adsp_control_r );
-	DECLARE_WRITE16_MEMBER( adsp_control_w );
+	uint16_t adsp_control_r(offs_t offset);
+	void adsp_control_w(offs_t offset, uint16_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER( dcs_irq );
 	TIMER_DEVICE_CALLBACK_MEMBER( sport0_irq );
 	void recompute_sample_rate();
-	WRITE32_MEMBER(sound_tx_callback);
-	DECLARE_READ16_MEMBER( dcs_polling_r );
-	DECLARE_WRITE16_MEMBER( dcs_polling_w );
-	DECLARE_READ32_MEMBER(dcs_polling32_r);
-	DECLARE_WRITE32_MEMBER(dcs_polling32_w);
+	void sound_tx_callback(offs_t offset, uint32_t data);
+	uint16_t dcs_polling_r(address_space &space);
+	void dcs_polling_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint32_t dcs_polling32_r(address_space &space);
+	void dcs_polling32_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	TIMER_DEVICE_CALLBACK_MEMBER( transfer_watchdog_callback );
 	TIMER_CALLBACK_MEMBER( s1_ack_callback2 );
 	TIMER_CALLBACK_MEMBER( s1_ack_callback1 );
@@ -218,7 +218,7 @@ protected:
 	write_line_delegate m_input_empty_cb;
 
 	read16smo_delegate m_fifo_data_r;
-	read16_delegate m_fifo_status_r;
+	read16mo_delegate m_fifo_status_r;
 	write_line_delegate m_fifo_reset_w;
 
 	/* timers */

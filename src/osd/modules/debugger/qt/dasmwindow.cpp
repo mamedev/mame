@@ -12,6 +12,7 @@
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 #include "debug/dvdisasm.h"
+#include "debug/points.h"
 
 
 DasmWindow::DasmWindow(running_machine* machine, QWidget* parent) :
@@ -141,7 +142,7 @@ void DasmWindow::toggleBreakpointAtCursor(bool changedTo)
 		device_debug *const cpuinfo = device->debug();
 
 		// Find an existing breakpoint at this address
-		const device_debug::breakpoint *bp = cpuinfo->breakpoint_find(address);
+		const debug_breakpoint *bp = cpuinfo->breakpoint_find(address);
 
 		// If none exists, add a new one
 		if (bp == nullptr)
@@ -172,7 +173,7 @@ void DasmWindow::enableBreakpointAtCursor(bool changedTo)
 		device_debug *const cpuinfo = device->debug();
 
 		// Find an existing breakpoint at this address
-		const device_debug::breakpoint *bp = cpuinfo->breakpoint_find(address);
+		const debug_breakpoint *bp = cpuinfo->breakpoint_find(address);
 
 		if (bp != nullptr)
 		{
@@ -228,7 +229,7 @@ void DasmWindow::dasmViewUpdated()
 		device_debug *const cpuinfo = device->debug();
 
 		// Find an existing breakpoint at this address
-		const device_debug::breakpoint *bp = cpuinfo->breakpoint_find(address);
+		const debug_breakpoint *bp = cpuinfo->breakpoint_find(address);
 
 		if (bp != nullptr)
 		{
@@ -260,7 +261,7 @@ void DasmWindow::populateComboBox()
 
 void DasmWindow::setToCurrentCpu()
 {
-	device_t* curCpu = m_machine->debugger().cpu().get_visible_cpu();
+	device_t* curCpu = m_machine->debugger().console().get_visible_cpu();
 	if (curCpu)
 	{
 		const debug_view_source *source = m_dasmView->view()->source_for_device(curCpu);

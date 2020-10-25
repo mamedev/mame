@@ -72,19 +72,19 @@ VIDEO_START_MEMBER(holeland_state,crzrally)
 	save_item(NAME(m_palette_offset));
 }
 
-WRITE8_MEMBER(holeland_state::videoram_w)
+void holeland_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(holeland_state::colorram_w)
+void holeland_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(holeland_state::pal_offs_w)
+void holeland_state::pal_offs_w(uint8_t data)
 {
 	if ((m_palette_offset >> 4) != (data & 3))
 	{
@@ -93,7 +93,7 @@ WRITE8_MEMBER(holeland_state::pal_offs_w)
 	}
 }
 
-WRITE8_MEMBER(holeland_state::scroll_w)
+void holeland_state::scroll_w(uint8_t data)
 {
 	m_bg_tilemap->set_scrollx(0, data);
 }

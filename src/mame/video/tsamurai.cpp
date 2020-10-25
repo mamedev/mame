@@ -76,17 +76,17 @@ VIDEO_START_MEMBER(tsamurai_state, m660)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(tsamurai_state::scrolly_w)
+void tsamurai_state::scrolly_w(uint8_t data)
 {
 	m_background->set_scrolly(0, data );
 }
 
-WRITE8_MEMBER(tsamurai_state::scrollx_w)
+void tsamurai_state::scrollx_w(uint8_t data)
 {
 	m_background->set_scrollx(0, data );
 }
 
-WRITE8_MEMBER(tsamurai_state::bgcolor_w)
+void tsamurai_state::bgcolor_w(uint8_t data)
 {
 	m_bgcolor = data;
 }
@@ -103,18 +103,18 @@ WRITE_LINE_MEMBER(tsamurai_state::textbank2_w)
 	m_foreground->mark_all_dirty();
 }
 
-WRITE8_MEMBER(tsamurai_state::bg_videoram_w)
+void tsamurai_state::bg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_bg_videoram[offset]=data;
 	offset = offset/2;
 	m_background->mark_tile_dirty(offset);
 }
-WRITE8_MEMBER(tsamurai_state::fg_videoram_w)
+void tsamurai_state::fg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset]=data;
 	m_foreground->mark_tile_dirty(offset);
 }
-WRITE8_MEMBER(tsamurai_state::fg_colorram_w)
+void tsamurai_state::fg_colorram_w(offs_t offset, uint8_t data)
 {
 	if( m_colorram[offset]!=data )
 	{
@@ -228,7 +228,7 @@ VS Gong Fight runs on older hardware
 ***************************************************************************/
 
 
-WRITE8_MEMBER(tsamurai_state::vsgongf_color_w)
+void tsamurai_state::vsgongf_color_w(uint8_t data)
 {
 	if( m_vsgongf_color != data )
 	{

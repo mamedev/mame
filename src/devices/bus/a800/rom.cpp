@@ -206,7 +206,7 @@ void a5200_rom_bbsb_device::device_reset()
 
  -------------------------------------------------*/
 
-READ8_MEMBER(a800_rom_device::read_80xx)
+uint8_t a800_rom_device::read_80xx(offs_t offset)
 {
 	return m_rom[offset & (m_rom_size - 1)];
 }
@@ -226,7 +226,7 @@ READ8_MEMBER(a800_rom_device::read_80xx)
 
  -------------------------------------------------*/
 
-READ8_MEMBER(a800_rom_bbsb_device::read_80xx)
+uint8_t a800_rom_bbsb_device::read_80xx(offs_t offset)
 {
 	if (offset < 0x1000)
 		return m_rom[(offset & 0xfff) + (m_banks[0] * 0x1000) + 0];
@@ -236,7 +236,7 @@ READ8_MEMBER(a800_rom_bbsb_device::read_80xx)
 		return m_rom[(offset & 0x1fff) + 0x8000];
 }
 
-WRITE8_MEMBER(a800_rom_bbsb_device::write_80xx)
+void a800_rom_bbsb_device::write_80xx(offs_t offset, uint8_t data)
 {
 	uint16_t addr = offset & 0xfff;
 	if (addr >= 0xff6 && addr <= 0xff9)
@@ -252,7 +252,7 @@ WRITE8_MEMBER(a800_rom_bbsb_device::write_80xx)
 
  -------------------------------------------------*/
 
-READ8_MEMBER(xegs_rom_device::read_80xx)
+uint8_t xegs_rom_device::read_80xx(offs_t offset)
 {
 	if (offset < 0x2000)
 		return m_rom[(offset & 0x1fff) + (m_bank * 0x2000)];
@@ -261,7 +261,7 @@ READ8_MEMBER(xegs_rom_device::read_80xx)
 
 }
 
-WRITE8_MEMBER(xegs_rom_device::write_d5xx)
+void xegs_rom_device::write_d5xx(offs_t offset, uint8_t data)
 {
 	m_bank = data & m_bank_mask;
 }
@@ -280,12 +280,12 @@ WRITE8_MEMBER(xegs_rom_device::write_d5xx)
 
  -------------------------------------------------*/
 
-READ8_MEMBER(a800_rom_williams_device::read_80xx)
+uint8_t a800_rom_williams_device::read_80xx(offs_t offset)
 {
 	return m_rom[(offset & 0x1fff) + (m_bank * 0x2000)];
 }
 
-WRITE8_MEMBER(a800_rom_williams_device::write_d5xx)
+void a800_rom_williams_device::write_d5xx(offs_t offset, uint8_t data)
 {
 	m_bank = (offset & 0x07);
 }
@@ -303,12 +303,12 @@ WRITE8_MEMBER(a800_rom_williams_device::write_d5xx)
 
  -------------------------------------------------*/
 
-READ8_MEMBER(a800_rom_express_device::read_80xx)
+uint8_t a800_rom_express_device::read_80xx(offs_t offset)
 {
 	return m_rom[(offset & 0x1fff) + (m_bank * 0x2000)];
 }
 
-WRITE8_MEMBER(a800_rom_express_device::write_d5xx)
+void a800_rom_express_device::write_d5xx(offs_t offset, uint8_t data)
 {
 	m_bank = (offset ^ 0x07) & 0x0f;
 }
@@ -321,12 +321,12 @@ WRITE8_MEMBER(a800_rom_express_device::write_d5xx)
 
  -------------------------------------------------*/
 
-READ8_MEMBER(a800_rom_turbo_device::read_80xx)
+uint8_t a800_rom_turbo_device::read_80xx(offs_t offset)
 {
 	return m_rom[(offset & 0x1fff) + (m_bank * 0x2000)];
 }
 
-WRITE8_MEMBER(a800_rom_turbo_device::write_d5xx)
+void a800_rom_turbo_device::write_d5xx(offs_t offset, uint8_t data)
 {
 	m_bank = offset & m_bank_mask;
 }
@@ -339,7 +339,7 @@ WRITE8_MEMBER(a800_rom_turbo_device::write_d5xx)
 
  -------------------------------------------------*/
 
-READ8_MEMBER(a800_rom_telelink2_device::read_80xx)
+uint8_t a800_rom_telelink2_device::read_80xx(offs_t offset)
 {
 	if (offset >= 0x2000)
 		return m_rom[offset & 0x1fff];
@@ -349,18 +349,18 @@ READ8_MEMBER(a800_rom_telelink2_device::read_80xx)
 	return 0xff;
 }
 
-WRITE8_MEMBER(a800_rom_telelink2_device::write_80xx)
+void a800_rom_telelink2_device::write_80xx(offs_t offset, uint8_t data)
 {
 	m_nvram[offset & 0xff] = data | 0xf0;   // low 4bits only
 }
 
-READ8_MEMBER(a800_rom_telelink2_device::read_d5xx)
+uint8_t a800_rom_telelink2_device::read_d5xx(offs_t offset)
 {
 	// this should affect NVRAM enable / save
 	return 0xff;
 }
 
-WRITE8_MEMBER(a800_rom_telelink2_device::write_d5xx)
+void a800_rom_telelink2_device::write_d5xx(offs_t offset, uint8_t data)
 {
 	// this should affect NVRAM enable / save
 }
@@ -374,12 +374,12 @@ WRITE8_MEMBER(a800_rom_telelink2_device::write_d5xx)
 
  -------------------------------------------------*/
 
-READ8_MEMBER(a800_rom_microcalc_device::read_80xx)
+uint8_t a800_rom_microcalc_device::read_80xx(offs_t offset)
 {
 	return m_rom[(offset & 0x1fff) + (m_bank * 0x2000)];
 }
 
-WRITE8_MEMBER(a800_rom_microcalc_device::write_d5xx)
+void a800_rom_microcalc_device::write_d5xx(offs_t offset, uint8_t data)
 {
 	m_bank = data;
 }
@@ -407,7 +407,7 @@ WRITE8_MEMBER(a800_rom_microcalc_device::write_d5xx)
 
  -------------------------------------------------*/
 
-READ8_MEMBER(a5200_rom_2chips_device::read_80xx)
+uint8_t a5200_rom_2chips_device::read_80xx(offs_t offset)
 {
 	if (offset < 0x4000)
 		return m_rom[offset & 0x1fff];
@@ -431,7 +431,7 @@ READ8_MEMBER(a5200_rom_2chips_device::read_80xx)
 
  -------------------------------------------------*/
 
-READ8_MEMBER(a5200_rom_bbsb_device::read_80xx)
+uint8_t a5200_rom_bbsb_device::read_80xx(offs_t offset)
 {
 	if (offset < 0x1000)
 		return m_rom[(offset & 0xfff) + (m_banks[0] * 0x1000) + 0];
@@ -443,7 +443,7 @@ READ8_MEMBER(a5200_rom_bbsb_device::read_80xx)
 		return 0;
 }
 
-WRITE8_MEMBER(a5200_rom_bbsb_device::write_80xx)
+void a5200_rom_bbsb_device::write_80xx(offs_t offset, uint8_t data)
 {
 	uint16_t addr = offset & 0xfff;
 	if (addr >= 0xff6 && addr <= 0xff9)

@@ -21,6 +21,14 @@ protected:
 private:
 	virtual void received_byte(uint8_t data) override;
 
+	output_finder<> m_led_kana;
+	output_finder<> m_led_romaji;
+	output_finder<> m_led_code;
+	output_finder<> m_led_caps;
+	output_finder<> m_led_insert;
+	output_finder<> m_led_hiragana;
+	output_finder<> m_led_fullsize;
+
 	int m_delay;  // keypress delay after initial press
 	int m_repeat; // keypress repeat rate
 	uint8_t m_enabled;  // keyboard enabled?

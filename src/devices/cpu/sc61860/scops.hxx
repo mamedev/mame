@@ -18,29 +18,29 @@
 
 uint8_t sc61860_device::READ_OP()
 {
-	return m_cache->read_byte(m_pc++);
+	return m_cache.read_byte(m_pc++);
 }
 
 uint8_t sc61860_device::READ_OP_ARG()
 {
-	return m_cache->read_byte(m_pc++);
+	return m_cache.read_byte(m_pc++);
 }
 
 uint16_t sc61860_device::READ_OP_ARG_WORD()
 {
-	uint16_t t=m_cache->read_byte(m_pc++)<<8;
-	t|=m_cache->read_byte(m_pc++);
+	uint16_t t=m_cache.read_byte(m_pc++)<<8;
+	t|=m_cache.read_byte(m_pc++);
 	return t;
 }
 
 uint8_t sc61860_device::READ_BYTE(uint16_t adr)
 {
-	return m_program->read_byte(adr);
+	return m_program.read_byte(adr);
 }
 
 void sc61860_device::WRITE_BYTE(uint16_t a, uint8_t v)
 {
-	m_program->write_byte(a, v);
+	m_program.write_byte(a, v);
 }
 
 uint8_t sc61860_device::READ_RAM(int r)

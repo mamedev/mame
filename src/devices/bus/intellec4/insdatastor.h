@@ -172,9 +172,9 @@ protected:
 	virtual DECLARE_WRITE_LINE_MEMBER(reset_4002_in) override;
 
 private:
-	DECLARE_WRITE8_MEMBER(ram_out);
-	DECLARE_WRITE8_MEMBER(rom_out);
-	DECLARE_READ8_MEMBER(rom_in);
+	void ram_out(offs_t offset, u8 data);
+	void rom_out(offs_t offset, u8 data);
+	u8 rom_in(offs_t offset);
 
 	void allocate();
 	void map_ram_io();

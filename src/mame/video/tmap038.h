@@ -27,8 +27,8 @@ public:
 	void set_yoffs(int yoffs, int flipped_yoffs) { m_yoffs = yoffs; m_flipped_yoffs = flipped_yoffs; }
 
 	// call to do the rendering etc.
-	template<class _BitmapClass>
-	void draw_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, u32 flags, u8 pri = 0, u8 pri_mask = ~0);
+	template<class BitmapClass>
+	void draw_common(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, u32 flags, u8 pri = 0, u8 pri_mask = ~0);
 
 	void prepare();
 	void draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u32 flags, u8 pri = 0, u8 pri_mask = ~0);

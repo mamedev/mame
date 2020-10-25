@@ -92,9 +92,9 @@ private:
 	virtual void machine_reset() override;
 	uint32_t screen_update_jr100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(sound_tick);
-	DECLARE_READ8_MEMBER(pb_r);
-	DECLARE_WRITE8_MEMBER(pa_w);
-	DECLARE_WRITE8_MEMBER(pb_w);
+	uint8_t pb_r();
+	void pa_w(uint8_t data);
+	void pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(cb2_w);
 	uint32_t readByLittleEndian(uint8_t *buf,int pos);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
@@ -122,13 +122,13 @@ void jr100_state::mem_map(address_map &map)
 	map(0x0000, 0x3fff).ram().share("ram");
 	//map(0x4000, 0x7fff).ram();   expansion ram
 	//map(0x8000, 0xbfff).rom();   expansion rom
-	map(0xc000, 0xc0ff).ram().share("pcg").region("maincpu", 0xc000);
+	map(0xc000, 0xc0ff).ram().share("pcg");
 	map(0xc100, 0xc3ff).ram().share("vram");
 	map(0xc800, 0xc80f).m(m_via, FUNC(via6522_device::map));
 	//map(0xcc00, 0xcfff).;   expansion i/o
 	//map(0xd000, 0xd7ff).rom();   expansion rom for printer control
 	//map(0xd800, 0xdfff).rom();   expansion rom
-	map(0xe000, 0xffff).rom().share("rom");
+	map(0xe000, 0xffff).rom().share("rom").region("maincpu",0);
 }
 
 // Input ports - names in [ ] are screen actions; otherwise the text is literally printed onscreen
@@ -170,10 +170,10 @@ INPUT_PORTS_START( jr100 )
 	PORT_BIT(0xE0, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_START("LINE5")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Y Locate") PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("U @ If") PORT_CODE(KEYCODE_U) PORT_CHAR('U')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("U @ If") PORT_CODE(KEYCODE_U) PORT_CHAR('U') PORT_CHAR('@')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("I \xc2\xa5 Input") PORT_CODE(KEYCODE_I) PORT_CHAR('I')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("O [ Option") PORT_CODE(KEYCODE_O) PORT_CHAR('O')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P ] Print") PORT_CODE(KEYCODE_P) PORT_CHAR('P')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("O [ Option") PORT_CODE(KEYCODE_O) PORT_CHAR('O') PORT_CHAR('[')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P ] Print") PORT_CODE(KEYCODE_P) PORT_CHAR('P') PORT_CHAR(']')
 	PORT_BIT(0xE0, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_START("LINE6")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("H Poke") PORT_CODE(KEYCODE_H) PORT_CHAR('H')
@@ -202,6 +202,10 @@ void jr100_state::machine_start()
 {
 	if (!m_sound_timer)
 		m_sound_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(jr100_state::sound_tick), this));
+
+	save_item(NAME(m_keyboard_line));
+	save_item(NAME(m_use_pcg));
+	save_item(NAME(m_pb7));
 }
 
 void jr100_state::machine_reset()
@@ -212,20 +216,19 @@ void jr100_state::machine_reset()
 
 uint32_t jr100_state::screen_update_jr100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bool attr;
-	u8 y,ra,gfx,chr;
-	u16 x,sy=0,ma=0;
+	u16 sy=0,ma=0;
 
-	for (y = 0; y < 24; y++)
+	for (u8 y = 0; y < 24; y++)
 	{
-		for (ra = 0; ra < 8; ra++)
+		for (u8 ra = 0; ra < 8; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
-			for (x = ma; x < ma + 32; x++)
+			uint16_t *p = &bitmap.pix(sy++);
+			for (u16 x = ma; x < ma + 32; x++)
 			{
-				chr = m_vram[x];
-				attr = BIT(chr, 7);
+				u8 chr = m_vram[x];
+				bool const attr = BIT(chr, 7);
 				chr &= 0x7f;
+				u8 gfx;
 				// ATTR is inverted for normal char or use PCG in case of CMODE1
 				if (m_use_pcg && attr && (chr < 32))
 					gfx = m_pcg[(chr<<3) | ra];
@@ -271,11 +274,11 @@ static const gfx_layout tilesram_layout =
 };
 
 static GFXDECODE_START( gfx_jr100 )
-	GFXDECODE_ENTRY( "maincpu", 0xe000, tilesrom_layout, 0, 1 )   // inside rom
-	GFXDECODE_ENTRY( "maincpu", 0xc000, tilesram_layout, 0, 1 )   // user defined
+	GFXDECODE_ENTRY( "maincpu", 0x0000, tilesrom_layout, 0, 1 )   // inside rom
+	GFXDECODE_RAM  ( "pcg",     0x0000, tilesram_layout, 0, 1 )   // user defined
 GFXDECODE_END
 
-READ8_MEMBER(jr100_state::pb_r)
+uint8_t jr100_state::pb_r()
 {
 	uint8_t data = 0x1f;
 	if (m_keyboard_line < 9)
@@ -284,12 +287,12 @@ READ8_MEMBER(jr100_state::pb_r)
 	return data;
 }
 
-WRITE8_MEMBER(jr100_state::pa_w)
+void jr100_state::pa_w(uint8_t data)
 {
 	m_keyboard_line = data & 0x0f;
 }
 
-WRITE8_MEMBER(jr100_state::pb_w)
+void jr100_state::pb_w(uint8_t data)
 {
 	m_use_pcg = BIT(data, 5);
 	m_pb7 = BIT(data, 7);
@@ -397,7 +400,7 @@ void jr100_state::jr100(machine_config &config)
 	m_via->irq_handler().set_inputline(m_maincpu, M6800_IRQ_LINE);
 
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	CASSETTE(config, m_cassette, 0);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
@@ -410,17 +413,17 @@ void jr100_state::jr100(machine_config &config)
 
 /* ROM definition */
 ROM_START( jr100 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "jr100.ic5", 0xe000, 0x2000, CRC(951d08a1) SHA1(edae3daaa94924e444bbe485ac2bcd5cb5b22ca2))
+	ROM_REGION( 0x2000, "maincpu", 0 )
+	ROM_LOAD( "jr100.ic5", 0x0000, 0x2000, CRC(951d08a1) SHA1(edae3daaa94924e444bbe485ac2bcd5cb5b22ca2))
 ROM_END
 
 ROM_START( jr100u )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "jr100u.ic5", 0xe000, 0x2000, CRC(f589dd8d) SHA1(78a51f2ae055bf4dc1b0887a6277f5dbbd8ba512))
+	ROM_REGION( 0x2000, "maincpu", 0 )
+	ROM_LOAD( "jr100u.ic5", 0x0000, 0x2000, CRC(f589dd8d) SHA1(78a51f2ae055bf4dc1b0887a6277f5dbbd8ba512))
 ROM_END
 
 /* Driver */
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME   FLAGS
-COMP( 1981, jr100,  0,      0,      jr100,   jr100, jr100_state, empty_init, "National",  "JR-100",  0 )
-COMP( 1981, jr100u, jr100,  0,      jr100,   jr100, jr100_state, empty_init, "Panasonic", "JR-100U", 0 )
+COMP( 1981, jr100,  0,      0,      jr100,   jr100, jr100_state, empty_init, "National",  "JR-100",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, jr100u, jr100,  0,      jr100,   jr100, jr100_state, empty_init, "Panasonic", "JR-100U", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

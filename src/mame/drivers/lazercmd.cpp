@@ -235,7 +235,6 @@
 
 #include "emu.h"
 #include "includes/lazercmd.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -284,30 +283,30 @@ TIMER_DEVICE_CALLBACK_MEMBER(lazercmd_state::bbonk_timer)
  *************************************************************/
 
 /* triggered by WRTC,r opcode */
-WRITE8_MEMBER(lazercmd_state::lazercmd_ctrl_port_w)
+void lazercmd_state::lazercmd_ctrl_port_w(uint8_t data)
 {
 }
 
 /* triggered by REDC,r opcode */
-READ8_MEMBER(lazercmd_state::lazercmd_ctrl_port_r)
+uint8_t lazercmd_state::lazercmd_ctrl_port_r()
 {
 	uint8_t data = 0;
 	return data;
 }
 
 /* triggered by WRTD,r opcode */
-WRITE8_MEMBER(lazercmd_state::lazercmd_data_port_w)
+void lazercmd_state::lazercmd_data_port_w(uint8_t data)
 {
 }
 
 /* triggered by REDD,r opcode */
-READ8_MEMBER(lazercmd_state::lazercmd_data_port_r)
+uint8_t lazercmd_state::lazercmd_data_port_r()
 {
 	uint8_t data = ioport("DSW")->read() & 0x0f;
 	return data;
 }
 
-WRITE8_MEMBER(lazercmd_state::lazercmd_hardware_w)
+void lazercmd_state::lazercmd_hardware_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -329,7 +328,7 @@ WRITE8_MEMBER(lazercmd_state::lazercmd_hardware_w)
 	}
 }
 
-WRITE8_MEMBER(lazercmd_state::medlanes_hardware_w)
+void lazercmd_state::medlanes_hardware_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -352,7 +351,7 @@ WRITE8_MEMBER(lazercmd_state::medlanes_hardware_w)
 	}
 }
 
-WRITE8_MEMBER(lazercmd_state::bbonk_hardware_w)
+void lazercmd_state::bbonk_hardware_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -369,7 +368,7 @@ WRITE8_MEMBER(lazercmd_state::bbonk_hardware_w)
 	}
 }
 
-READ8_MEMBER(lazercmd_state::lazercmd_hardware_r)
+uint8_t lazercmd_state::lazercmd_hardware_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -656,11 +655,6 @@ void lazercmd_state::lazercmd(machine_config &config)
 	DAC_1BIT(config, m_dac1, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
 	DAC_1BIT(config, m_dac2, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
 	DAC_1BIT(config, m_dac3, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac0", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac3", 1.0, DAC_VREF_POS_INPUT);
 }
 
 
@@ -692,9 +686,6 @@ void lazercmd_state::medlanes(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac2, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
 	DAC_1BIT(config, m_dac3, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac3", 1.0, DAC_VREF_POS_INPUT);
 }
 
 
@@ -726,9 +717,6 @@ void lazercmd_state::bbonk(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac2, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
 	DAC_1BIT(config, m_dac3, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac3", 1.0, DAC_VREF_POS_INPUT);
 }
 
 /***************************************************************************

@@ -125,9 +125,9 @@ TIMER_CALLBACK_MEMBER( pasopia_state::pio_timer )
 
 MC6845_UPDATE_ROW( pasopia_state::crtc_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	u8 fg=7,bg=0; // colours need to be determined
-	uint32_t *p = &bitmap.pix32(y);
+	uint32_t *p = &bitmap.pix(y);
 
 	for (u16 x = 0; x < x_count; x++)
 	{
@@ -392,6 +392,7 @@ void pasopia_state::pasopia(machine_config &config)
 	CASSETTE(config, m_cass);
 	m_cass->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cass->set_interface("pasopia_cass");
 
 	PASOPIA_PAC2(config, "dtfcst", pac2_default_devices, nullptr); // "Data File Cassette"
 	PASOPIA_PAC2(config, "dtfunt", pac2_default_devices, nullptr); // "Data File Unit"

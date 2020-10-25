@@ -34,8 +34,8 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	virtual DECLARE_READ16_MEMBER(exp_r) override;
-	virtual DECLARE_WRITE16_MEMBER(exp_w) override;
+	virtual uint16_t exp_r(offs_t offset, uint16_t mem_mask = ~0) override;
+	virtual void exp_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
 private:
 	required_memory_region m_rom;

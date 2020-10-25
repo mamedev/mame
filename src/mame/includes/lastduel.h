@@ -58,12 +58,12 @@ private:
 	int         m_sprite_pri_mask;
 	int         m_tilemap_priority;
 
-	DECLARE_WRITE8_MEMBER(mg_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(flip_w);
-	DECLARE_WRITE16_MEMBER(vctrl_w);
-	template<int Layer> DECLARE_WRITE16_MEMBER(lastduel_vram_w);
-	DECLARE_WRITE16_MEMBER(txram_w);
-	template<int Layer> DECLARE_WRITE16_MEMBER(madgear_vram_w);
+	void mg_bankswitch_w(uint8_t data);
+	void flip_w(uint8_t data);
+	void vctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	template<int Layer> void lastduel_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void txram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	template<int Layer> void madgear_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	static rgb_t lastduel_RRRRGGGGBBBBIIII(uint32_t raw);
 	TILE_GET_INFO_MEMBER(ld_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(ld_get_fg_tile_info);

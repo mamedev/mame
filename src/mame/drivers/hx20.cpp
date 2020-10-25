@@ -65,7 +65,7 @@ void hx20_state::update_interrupt()
 //  ksc_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( hx20_state::ksc_w )
+void hx20_state::ksc_w(uint8_t data)
 {
 	logerror("KSC %02x\n", data);
 
@@ -77,7 +77,7 @@ WRITE8_MEMBER( hx20_state::ksc_w )
 //  krtn07_r -
 //-------------------------------------------------
 
-READ8_MEMBER( hx20_state::krtn07_r )
+uint8_t hx20_state::krtn07_r()
 {
 	uint8_t data = 0xff;
 	for (int b = 0; 8 > b; ++b)
@@ -92,7 +92,7 @@ READ8_MEMBER( hx20_state::krtn07_r )
 //  krtn89_r -
 //-------------------------------------------------
 
-READ8_MEMBER( hx20_state::krtn89_r )
+uint8_t hx20_state::krtn89_r()
 {
 	/*
 
@@ -122,7 +122,7 @@ READ8_MEMBER( hx20_state::krtn89_r )
 //  lcd_cs_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( hx20_state::lcd_cs_w )
+void hx20_state::lcd_cs_w(uint8_t data)
 {
 	/*
 
@@ -161,7 +161,7 @@ WRITE8_MEMBER( hx20_state::lcd_cs_w )
 //  lcd_data_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( hx20_state::lcd_data_w )
+void hx20_state::lcd_data_w(uint8_t data)
 {
 	logerror("LCD DATA %02x\n", data);
 
@@ -173,7 +173,7 @@ WRITE8_MEMBER( hx20_state::lcd_data_w )
 //  main_p1_r - main CPU port 1 read
 //-------------------------------------------------
 
-READ8_MEMBER( hx20_state::main_p1_r )
+uint8_t hx20_state::main_p1_r()
 {
 	/*
 
@@ -210,7 +210,7 @@ READ8_MEMBER( hx20_state::main_p1_r )
 //  main_p1_w - main CPU port 1 write
 //-------------------------------------------------
 
-WRITE8_MEMBER( hx20_state::main_p1_w )
+void hx20_state::main_p1_w(uint8_t data)
 {
 	/*
 
@@ -233,7 +233,7 @@ WRITE8_MEMBER( hx20_state::main_p1_w )
 //  main_p2_r - main CPU port 2 read
 //-------------------------------------------------
 
-READ8_MEMBER( hx20_state::main_p2_r )
+uint8_t hx20_state::main_p2_r()
 {
 	/*
 
@@ -268,7 +268,7 @@ READ8_MEMBER( hx20_state::main_p2_r )
 //  main_p2_w - main CPU port 2 write
 //-------------------------------------------------
 
-WRITE8_MEMBER( hx20_state::main_p2_w )
+void hx20_state::main_p2_w(uint8_t data)
 {
 	/*
 
@@ -302,7 +302,7 @@ WRITE8_MEMBER( hx20_state::main_p2_w )
 //  slave_p1_r - slave CPU port 1 read
 //-------------------------------------------------
 
-READ8_MEMBER( hx20_state::slave_p1_r )
+uint8_t hx20_state::slave_p1_r()
 {
 	/*
 
@@ -329,7 +329,7 @@ READ8_MEMBER( hx20_state::slave_p1_r )
 //  slave_p1_w - slave CPU port 1 write
 //-------------------------------------------------
 
-WRITE8_MEMBER( hx20_state::slave_p1_w )
+void hx20_state::slave_p1_w(uint8_t data)
 {
 	/*
 
@@ -355,7 +355,7 @@ WRITE8_MEMBER( hx20_state::slave_p1_w )
 //  slave_p2_r - slave CPU port 2 read
 //-------------------------------------------------
 
-READ8_MEMBER( hx20_state::slave_p2_r )
+uint8_t hx20_state::slave_p2_r()
 {
 	/*
 
@@ -385,7 +385,7 @@ READ8_MEMBER( hx20_state::slave_p2_r )
 //  slave_p2_w - slave CPU port 2 write
 //-------------------------------------------------
 
-WRITE8_MEMBER( hx20_state::slave_p2_w )
+void hx20_state::slave_p2_w(uint8_t data)
 {
 	/*
 
@@ -411,7 +411,7 @@ WRITE8_MEMBER( hx20_state::slave_p2_w )
 //  slave_p3_r - slave CPU port 3 read
 //-------------------------------------------------
 
-READ8_MEMBER( hx20_state::slave_p3_r )
+uint8_t hx20_state::slave_p3_r()
 {
 	/*
 
@@ -438,7 +438,7 @@ READ8_MEMBER( hx20_state::slave_p3_r )
 //  slave_p3_w - slave CPU port 3 write
 //-------------------------------------------------
 
-WRITE8_MEMBER( hx20_state::slave_p3_w )
+void hx20_state::slave_p3_w(uint8_t data)
 {
 	/*
 
@@ -467,7 +467,7 @@ WRITE8_MEMBER( hx20_state::slave_p3_w )
 //  slave_p4_r - slave CPU port 4 read
 //-------------------------------------------------
 
-READ8_MEMBER( hx20_state::slave_p4_r )
+uint8_t hx20_state::slave_p4_r()
 {
 	/*
 
@@ -497,7 +497,7 @@ READ8_MEMBER( hx20_state::slave_p4_r )
 //  slave_p4_w - slave CPU port 4 write
 //-------------------------------------------------
 
-WRITE8_MEMBER( hx20_state::slave_p4_w )
+void hx20_state::slave_p4_w(uint8_t data)
 {
 	/*
 
@@ -845,7 +845,7 @@ DEVICE_IMAGE_LOAD_MEMBER(hx20_state::optrom_load)
 	return image_init_result::PASS;
 }
 
-READ8_MEMBER(hx20_state::optrom_r)
+uint8_t hx20_state::optrom_r(offs_t offset)
 {
 	if (m_optrom->exists())
 		return m_optrom->read_rom(offset);

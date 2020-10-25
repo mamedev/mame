@@ -12,6 +12,7 @@
 #include "debugviewinfo.h"
 
 #include "debugger.h"
+#include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 #include "window.h"
 #include "winutf8.h"
@@ -300,31 +301,31 @@ bool debugwin_info::handle_command(WPARAM wparam, LPARAM lparam)
 		case ID_RUN_AND_HIDE:
 			debugger().hide_all();
 		case ID_RUN:
-			machine().debugger().cpu().get_visible_cpu()->debug()->go();
+			machine().debugger().console().get_visible_cpu()->debug()->go();
 			return true;
 
 		case ID_NEXT_CPU:
-			machine().debugger().cpu().get_visible_cpu()->debug()->go_next_device();
+			machine().debugger().console().get_visible_cpu()->debug()->go_next_device();
 			return true;
 
 		case ID_RUN_VBLANK:
-			machine().debugger().cpu().get_visible_cpu()->debug()->go_vblank();
+			machine().debugger().console().get_visible_cpu()->debug()->go_vblank();
 			return true;
 
 		case ID_RUN_IRQ:
-			machine().debugger().cpu().get_visible_cpu()->debug()->go_interrupt();
+			machine().debugger().console().get_visible_cpu()->debug()->go_interrupt();
 			return true;
 
 		case ID_STEP:
-			machine().debugger().cpu().get_visible_cpu()->debug()->single_step();
+			machine().debugger().console().get_visible_cpu()->debug()->single_step();
 			return true;
 
 		case ID_STEP_OVER:
-			machine().debugger().cpu().get_visible_cpu()->debug()->single_step_over();
+			machine().debugger().console().get_visible_cpu()->debug()->single_step_over();
 			return true;
 
 		case ID_STEP_OUT:
-			machine().debugger().cpu().get_visible_cpu()->debug()->single_step_out();
+			machine().debugger().console().get_visible_cpu()->debug()->single_step_out();
 			return true;
 
 		case ID_REWIND_STEP:
@@ -348,7 +349,7 @@ bool debugwin_info::handle_command(WPARAM wparam, LPARAM lparam)
 
 		case ID_SOFT_RESET:
 			machine().schedule_soft_reset();
-			machine().debugger().cpu().get_visible_cpu()->debug()->go();
+			machine().debugger().console().get_visible_cpu()->debug()->go();
 			return true;
 
 		case ID_EXIT:
@@ -507,7 +508,7 @@ LRESULT debugwin_info::window_proc(UINT message, WPARAM wparam, LPARAM lparam)
 		if (m_is_main_console)
 		{
 			debugger().hide_all();
-			machine().debugger().cpu().get_visible_cpu()->debug()->go();
+			machine().debugger().console().get_visible_cpu()->debug()->go();
 		}
 		else
 		{

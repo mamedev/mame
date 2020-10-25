@@ -32,8 +32,8 @@ public:
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
 
-	DECLARE_READ8_MEMBER(sdx_status_r);
-	DECLARE_WRITE8_MEMBER(sdx_control_w);
+	uint8_t sdx_status_r();
+	void sdx_control_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(motor_w);
 
 protected:
@@ -81,8 +81,8 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	DECLARE_READ8_MEMBER(mtx_80col_r);
-	DECLARE_WRITE8_MEMBER(mtx_80col_w);
+	uint8_t mtx_80col_r(offs_t offset);
+	void mtx_80col_w(offs_t offset, uint8_t data);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	required_device<screen_device> m_screen;

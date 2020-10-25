@@ -101,10 +101,10 @@ private:
 	uint16_t  m_memaccess;
 	int     m_addr_mask;
 
-	address_space *m_program;
-	memory_access_cache<1, -1, ENDIANNESS_BIG> *m_cache;
-	address_space *m_data;
-	address_space *m_io;
+	memory_access<12, 1, -1, ENDIANNESS_BIG>::cache m_cache;
+	memory_access<12, 1, -1, ENDIANNESS_BIG>::specific m_program;
+	memory_access< 8, 1, -1, ENDIANNESS_BIG>::specific m_data;
+	memory_access< 4, 1, -1, ENDIANNESS_BIG>::specific m_io;
 
 	inline void CLR(uint16_t flag);
 	inline void SET_FLAG(uint16_t flag);

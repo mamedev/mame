@@ -40,7 +40,7 @@ public:
 	void berlinp(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(input_r);
+	u8 input_r();
 
 	void berlin_mem(address_map &map);
 	void berlinp_mem(address_map &map);
@@ -57,7 +57,7 @@ private:
     I/O
 ******************************************************************************/
 
-READ8_MEMBER(berlin_state::input_r)
+u8 berlin_state::input_r()
 {
 	if (m_board->mux_r() == 0xff)
 		return m_keys->read();
@@ -138,6 +138,8 @@ void berlin_state::berlin(machine_config &config)
 	ADDRESS_MAP_BANK(config, "nvram_map").set_map(&berlin_state::nvram_map).set_options(ENDIANNESS_BIG, 8, 13);
 
 	MEPHISTO_BUTTONS_BOARD(config, m_board);
+	subdevice<sensorboard_device>("board:board")->set_nvram_enable(true);
+
 	MEPHISTO_DISPLAY_MODULE2(config, "display");
 	config.set_default_layout(layout_mephisto_berlin);
 }

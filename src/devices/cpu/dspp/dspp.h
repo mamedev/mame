@@ -41,30 +41,30 @@ public:
 	auto dma_write_handler() { return m_dma_write_handler.bind(); }
 
 	// Public interfaces
-	DECLARE_READ32_MEMBER( read );
-	DECLARE_WRITE32_MEMBER( write );
+	uint32_t read(offs_t offset);
+	void write(offs_t offset, uint32_t data);
 
 	uint16_t read_output_fifo();
 
 	void dump_state(); // TODO: DEBUG REMOVE ME
 
 	// Internal registers
-	DECLARE_READ16_MEMBER( input_r );
-	DECLARE_WRITE16_MEMBER( output_w );
-	DECLARE_READ16_MEMBER( fifo_osc_r );
-	DECLARE_WRITE16_MEMBER( fifo_osc_w );
-	DECLARE_WRITE16_MEMBER( input_control_w );
-	DECLARE_WRITE16_MEMBER( output_control_w );
-	DECLARE_READ16_MEMBER( input_status_r );
-	DECLARE_READ16_MEMBER( output_status_r );
-	DECLARE_WRITE16_MEMBER( cpu_int_w );
-	DECLARE_READ16_MEMBER( pc_r );
-	DECLARE_WRITE16_MEMBER( pc_w );
-	DECLARE_READ16_MEMBER( audlock_r );
-	DECLARE_WRITE16_MEMBER( audlock_w );
-	DECLARE_READ16_MEMBER( clock_r );
-	DECLARE_WRITE16_MEMBER( clock_w );
-	DECLARE_READ16_MEMBER( noise_r );
+	uint16_t input_r();
+	void output_w(offs_t offset, uint16_t data);
+	uint16_t fifo_osc_r(offs_t offset);
+	void fifo_osc_w(offs_t offset, uint16_t data);
+	void input_control_w(uint16_t data);
+	void output_control_w(uint16_t data);
+	uint16_t input_status_r();
+	uint16_t output_status_r();
+	void cpu_int_w(uint16_t data);
+	uint16_t pc_r();
+	void pc_w(uint16_t data);
+	uint16_t audlock_r();
+	void audlock_w(uint16_t data);
+	uint16_t clock_r();
+	void clock_w(uint16_t data);
+	uint16_t noise_r();
 
 	void update_fifo_dma();
 	void print_sums() { printf("%04x: %04x\n", (uint16_t)m_core->m_arg0, (uint16_t)m_core->m_arg1); }
@@ -199,11 +199,9 @@ private:
 	// Address spaces
 	const address_space_config  m_code_config;
 	const address_space_config  m_data_config;
-	address_space *     m_code;
-	address_space *     m_data;
-	memory_access_cache<1, -1, ENDIANNESS_BIG> *m_code_cache;
-	std::function<uint16_t (offs_t)> m_code16;
-	std::function<const void * (offs_t)> m_codeptr;
+	memory_access<10, 1, -1, ENDIANNESS_BIG>::cache m_code_cache;
+	memory_access<10, 1, -1, ENDIANNESS_BIG>::specific m_code;
+	memory_access<10, 1, -1, ENDIANNESS_BIG>::specific m_data;
 
 	struct dspp_internal_state
 	{

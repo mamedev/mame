@@ -104,7 +104,7 @@ INPUT_PORTS_END
 
 void tp1983_state::tp1983(machine_config &config)
 {
-	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK).set_source(netlist_tp1983);
+	NETLIST_CPU(config, m_maincpu, netlist::config::DEFAULT_CLOCK()).set_source(netlist_tp1983);
 
 	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0").set_params("videomix", m_video, FUNC(fixedfreq_device::update_composite_monochrome));
 
@@ -120,7 +120,7 @@ void tp1983_state::tp1983(machine_config &config)
 
 void tp1985_state::tp1985(machine_config &config)
 {
-	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK).set_source(netlist_tp1985);
+	NETLIST_CPU(config, m_maincpu, netlist::config::DEFAULT_CLOCK()).set_source(netlist_tp1985);
 
 	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0").set_params("videomix", FUNC(tp1985_state::video_out_cb));
 

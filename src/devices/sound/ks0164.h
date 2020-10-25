@@ -23,7 +23,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual space_config_vector memory_space_config() const override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -42,7 +42,7 @@ private:
 	address_space_config m_mem_config;
 	sound_stream *m_stream;
 	emu_timer *m_timer;
-	memory_access_cache<1, 0, ENDIANNESS_BIG> *m_mem_cache;
+	memory_access<23, 1, 0, ENDIANNESS_BIG>::cache m_mem_cache;
 
 	u32 m_bank1_base, m_bank2_base;
 	u16 m_bank1_select, m_bank2_select;

@@ -68,13 +68,13 @@ private:
 	required_region_ptr<uint8_t> m_mainregion;
 	required_shared_ptr<uint8_t> m_videoram;
 	uint8_t    m_videoram2[0x4000];
-	DECLARE_WRITE8_MEMBER(bank_select_w);
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_WRITE8_MEMBER(jongkyo_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(videoram2_w);
-	DECLARE_WRITE8_MEMBER(unknown_w);
-	DECLARE_READ8_MEMBER(input_1p_r);
-	DECLARE_READ8_MEMBER(input_2p_r);
+	void bank_select_w(offs_t offset, uint8_t data);
+	void mux_w(uint8_t data);
+	void jongkyo_coin_counter_w(uint8_t data);
+	void videoram2_w(offs_t offset, uint8_t data);
+	void unknown_w(offs_t offset, uint8_t data);
+	uint8_t input_1p_r();
+	uint8_t input_2p_r();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -98,18 +98,10 @@ void jongkyo_state::video_start()
 
 uint32_t jongkyo_state::screen_update_jongkyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int y;
-
-	for (y = 0; y < 256; ++y)
+	for (int y = 0; y < 256; ++y)
 	{
-		int x;
-
-		for (x = 0; x < 256; x += 4)
+		for (int x = 0; x < 256; x += 4)
 		{
-			int b;
-			int res_x,res_y;
-			uint8_t data1;
-			uint8_t data2;
 			uint8_t data3;
 
 	//      data3 = m_videoram2[x/4 + y*64]; // wrong
@@ -120,15 +112,14 @@ uint32_t jongkyo_state::screen_update_jongkyo(screen_device &screen, bitmap_ind1
 	//  data3 = 0x00; // we're missing 2 bits.. there must be another piece of video ram somewhere or we can't use all the colours (6bpp).. banked somehow?
 
 
+			uint8_t data1 = m_videoram[0x4000 + x / 4 + y * 64];
+			uint8_t data2 = m_videoram[x / 4 + y * 64];
 
-			data1 = m_videoram[0x4000 + x / 4 + y * 64];
-			data2 = m_videoram[x / 4 + y * 64];
-
-			for (b = 0; b < 4; ++b)
+			for (int b = 0; b < 4; ++b)
 			{
-				res_x = m_flip_screen ? 255 - (x + b) : (x + b);
-				res_y = m_flip_screen ? 255 - y : y;
-				bitmap.pix16(res_y, res_x) = ((data2 & 0x01)) + ((data2 & 0x10) >> 3) +
+				int const res_x = m_flip_screen ? 255 - (x + b) : (x + b);
+				int const res_y = m_flip_screen ? 255 - y : y;
+				bitmap.pix(res_y, res_x) = ((data2 & 0x01)) + ((data2 & 0x10) >> 3) +
 															((data1 & 0x01) << 2) + ((data1 & 0x10) >> 1) +
 															((data3 & 0x01) << 4) + ((data3 & 0x10) << 1);
 				data1 >>= 1;
@@ -148,7 +139,7 @@ uint32_t jongkyo_state::screen_update_jongkyo(screen_device &screen, bitmap_ind1
  *
  *************************************/
 
-WRITE8_MEMBER(jongkyo_state::bank_select_w)
+void jongkyo_state::bank_select_w(offs_t offset, uint8_t data)
 {
 	int mask = 1 << (offset >> 1);
 
@@ -161,13 +152,13 @@ WRITE8_MEMBER(jongkyo_state::bank_select_w)
 	m_bank1d->set_entry(m_rom_bank);
 }
 
-WRITE8_MEMBER(jongkyo_state::mux_w)
+void jongkyo_state::mux_w(uint8_t data)
 {
 	m_mux_data = ~data;
 	//  printf("%02x\n", m_mux_data);
 }
 
-WRITE8_MEMBER(jongkyo_state::jongkyo_coin_counter_w)
+void jongkyo_state::jongkyo_coin_counter_w(uint8_t data)
 {
 	/* bit 0 = hopper out? */
 
@@ -178,7 +169,7 @@ WRITE8_MEMBER(jongkyo_state::jongkyo_coin_counter_w)
 	m_flip_screen = (data & 4) >> 2;
 }
 
-READ8_MEMBER(jongkyo_state::input_1p_r)
+uint8_t jongkyo_state::input_1p_r()
 {
 	uint8_t cr_clear = ioport("CR_CLEAR")->read();
 
@@ -197,7 +188,7 @@ READ8_MEMBER(jongkyo_state::input_1p_r)
 			ioport("PL1_4")->read() & ioport("PL1_5")->read() & ioport("PL1_6")->read()) | cr_clear;
 }
 
-READ8_MEMBER(jongkyo_state::input_2p_r)
+uint8_t jongkyo_state::input_2p_r()
 {
 	uint8_t coin_port = ioport("COINS")->read();
 
@@ -216,18 +207,18 @@ READ8_MEMBER(jongkyo_state::input_2p_r)
 			ioport("PL2_4")->read() & ioport("PL2_5")->read() & ioport("PL2_6")->read()) | coin_port;
 }
 
-WRITE8_MEMBER(jongkyo_state::videoram2_w)
+void jongkyo_state::videoram2_w(offs_t offset, uint8_t data)
 {
 	m_videoram2[offset] = data;
 }
 
-WRITE8_MEMBER(jongkyo_state::unknown_w)
+void jongkyo_state::unknown_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
 		case 0: // different values
 			break;
-		case 1: // set to 0 at the boot and set to 1 continuesly
+		case 1: // set to 0 at the boot and set to 1 continuously
 			break;
 		case 2: // only set to 0 at the boot
 			break;

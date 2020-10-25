@@ -63,12 +63,12 @@ void cpc_smartwatch_device::device_start()
 void cpc_smartwatch_device::device_reset()
 {
 	address_space &space = m_slot->cpu().space(AS_PROGRAM);
-	space.install_read_handler(0xc000,0xc001, read8_delegate(*this, FUNC(cpc_smartwatch_device::rtc_w)));
-	space.install_read_handler(0xc004,0xc004, read8_delegate(*this, FUNC(cpc_smartwatch_device::rtc_r)));
+	space.install_read_handler(0xc000,0xc001, read8sm_delegate(*this, FUNC(cpc_smartwatch_device::rtc_w)));
+	space.install_read_handler(0xc004,0xc004, read8smo_delegate(*this, FUNC(cpc_smartwatch_device::rtc_r)));
 	m_bank = membank(":bank7");
 }
 
-READ8_MEMBER(cpc_smartwatch_device::rtc_w)
+uint8_t cpc_smartwatch_device::rtc_w(offs_t offset)
 {
 	uint8_t* bank = (uint8_t*)m_bank->base();
 	if (!machine().side_effects_disabled())
@@ -81,8 +81,8 @@ READ8_MEMBER(cpc_smartwatch_device::rtc_w)
 	return bank[offset & 1];
 }
 
-READ8_MEMBER(cpc_smartwatch_device::rtc_r)
+uint8_t cpc_smartwatch_device::rtc_r()
 {
 	uint8_t* bank = (uint8_t*)m_bank->base();
-	return ((bank[(offset & 1)+4]) & 0xfe) | (m_rtc->read_data() & 0x01);
+	return (bank[4] & 0xfe) | (m_rtc->read_data() & 0x01);
 }

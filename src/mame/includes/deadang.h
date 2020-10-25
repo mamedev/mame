@@ -37,7 +37,7 @@ public:
 	void init_deadang();
 	void init_ghunter();
 
-	DECLARE_WRITE16_MEMBER(foreground_w);
+	void foreground_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	TILEMAP_MAPPER_MEMBER(bg_scan);
 	TILE_GET_INFO_MEMBER(get_pf1_tile_info);
@@ -67,8 +67,8 @@ protected:
 	tilemap_t *m_pf1_layer;
 	tilemap_t *m_text_layer;
 
-	DECLARE_WRITE16_MEMBER(text_w);
-	DECLARE_WRITE16_MEMBER(bank_w);
+	void text_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void sound_decrypted_opcodes_map(address_map &map);
 	void sound_map(address_map &map);
@@ -79,8 +79,8 @@ protected:
 	optional_device<seibu_adpcm_device> m_adpcm1;
 	optional_device<seibu_adpcm_device> m_adpcm2;
 
-	DECLARE_READ16_MEMBER(ghunter_trackball_low_r);
-	DECLARE_READ16_MEMBER(ghunter_trackball_high_r);
+	uint16_t ghunter_trackball_low_r();
+	uint16_t ghunter_trackball_high_r();
 
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -107,7 +107,7 @@ protected:
 
 private:
 	TILE_GET_INFO_MEMBER(get_popnrun_text_tile_info);
-	DECLARE_WRITE16_MEMBER(popnrun_text_w);
+	void popnrun_text_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void popnrun_main_map(address_map &map);
 	void popnrun_sub_map(address_map &map);
 	void popnrun_sound_map(address_map &map);

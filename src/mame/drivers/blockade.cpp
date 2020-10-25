@@ -46,15 +46,15 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	DECLARE_READ_LINE_MEMBER(coin_r);
-	DECLARE_WRITE8_MEMBER(coin_latch_w);
+	void coin_latch_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(videoram_w);
+	void videoram_w(offs_t offset, uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(tile_info);
 
-	DECLARE_WRITE8_MEMBER(sound_freq_w);
-	DECLARE_WRITE8_MEMBER(env_on_w);
-	DECLARE_WRITE8_MEMBER(env_off_w);
+	void sound_freq_w(uint8_t data);
+	void env_on_w(uint8_t data);
+	void env_off_w(uint8_t data);
 
 	void blockade(machine_config &config);
 	void main_io_map(address_map &map);
@@ -337,7 +337,7 @@ READ_LINE_MEMBER( blockade_state::coin_r )
 	return m_coin_latch;
 }
 
-WRITE8_MEMBER( blockade_state::coin_latch_w )
+void blockade_state::coin_latch_w(uint8_t data)
 {
 	if (BIT(data, 7))
 	{
@@ -351,7 +351,7 @@ WRITE8_MEMBER( blockade_state::coin_latch_w )
 //  VIDEO
 //**************************************************************************
 
-WRITE8_MEMBER( blockade_state::videoram_w )
+void blockade_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
@@ -412,17 +412,17 @@ DISCRETE_SOUND_START( blockade_discrete )
 	DISCRETE_OUTPUT(NODE_10, 7500)
 DISCRETE_SOUND_END
 
-WRITE8_MEMBER( blockade_state::sound_freq_w )
+void blockade_state::sound_freq_w(uint8_t data)
 {
 	m_discrete->write(BLOCKADE_NOTE_DATA, data);
 }
 
-WRITE8_MEMBER( blockade_state::env_on_w )
+void blockade_state::env_on_w(uint8_t data)
 {
 	m_samples->start(0, 0);
 }
 
-WRITE8_MEMBER( blockade_state::env_off_w )
+void blockade_state::env_off_w(uint8_t data)
 {
 }
 

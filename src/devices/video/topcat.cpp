@@ -70,7 +70,7 @@ void topcat_device::device_reset()
 	m_pixel_replacement_rule = TOPCAT_REPLACE_RULE_SRC;
 }
 
-READ16_MEMBER(topcat_device::vram_r)
+uint16_t topcat_device::vram_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t ret = 0;
 
@@ -83,7 +83,7 @@ READ16_MEMBER(topcat_device::vram_r)
 	return ret;
 }
 
-WRITE16_MEMBER(topcat_device::vram_w)
+void topcat_device::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (mem_mask & m_plane_mask && (m_fb_write_enable & (m_plane_mask << 8))) {
 		bool src = data & m_plane_mask;
@@ -243,7 +243,7 @@ void topcat_device::update_int()
 	m_int_write_func((m_wmove_intrq || m_vert_retrace_intrq) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ16_MEMBER(topcat_device::ctrl_r)
+uint16_t topcat_device::ctrl_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (!m_read_enable)
 		return 0;
@@ -338,7 +338,7 @@ READ16_MEMBER(topcat_device::ctrl_r)
 	return ret;
 }
 
-WRITE16_MEMBER(topcat_device::ctrl_w)
+void topcat_device::ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data &= mem_mask;
 

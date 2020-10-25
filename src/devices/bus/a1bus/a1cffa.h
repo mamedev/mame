@@ -28,8 +28,8 @@ public:
 	// construction/destruction
 	a1bus_cffa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(cffa_r);
-	DECLARE_WRITE8_MEMBER(cffa_w);
+	uint8_t cffa_r(offs_t offset);
+	void cffa_w(offs_t offset, uint8_t data);
 
 protected:
 	a1bus_cffa_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

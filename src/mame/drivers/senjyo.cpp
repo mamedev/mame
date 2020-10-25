@@ -83,7 +83,6 @@ I/O read/write
 #include "cpu/z80/z80.h"
 #include "machine/segacrpt_device.h"
 #include "sound/sn76496.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -102,18 +101,18 @@ void senjyo_state::machine_reset()
 	m_sound_state = 0;
 }
 
-WRITE8_MEMBER(senjyo_state::irq_ctrl_w)
+void senjyo_state::irq_ctrl_w(uint8_t data)
 {
 	// irq ack is mandatory for senjyo: it's basically used as an irq mask during POST.
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(senjyo_state::flip_screen_w)
+void senjyo_state::flip_screen_w(uint8_t data)
 {
 	flip_screen_set(data);
 }
 
-WRITE8_MEMBER(senjyo_state::sound_cmd_w)
+void senjyo_state::sound_cmd_w(uint8_t data)
 {
 	m_sound_cmd = data;
 
@@ -185,13 +184,13 @@ void senjyo_state::senjyo_sound_io_map(address_map &map)
 /* For the bootleg */
 
 /* are scroll registers 1+2 linked on the bootleg?, only one copy is written */
-WRITE8_MEMBER(senjyo_state::starforb_scrolly2)
+void senjyo_state::starforb_scrolly2(offs_t offset, uint8_t data)
 {
 	m_scrolly2[offset] = data;
 	m_scrolly1[offset] = data;
 }
 
-WRITE8_MEMBER(senjyo_state::starforb_scrollx2)
+void senjyo_state::starforb_scrollx2(offs_t offset, uint8_t data)
 {
 	m_scrollx2[offset] = data;
 	m_scrollx1[offset] = data;
@@ -595,9 +594,6 @@ void senjyo_state::senjyo(machine_config &config)
 	SN76496(config, "sn3", 2000000).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
 	DAC_4BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.05); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 

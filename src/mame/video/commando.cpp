@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria
 /***************************************************************************
 
-  video.c
+  commando.cpp
 
   Functions to emulate the video hardware of the machine.
 
@@ -12,43 +12,43 @@
 #include "includes/commando.h"
 
 
-WRITE8_MEMBER(commando_state::commando_videoram_w)
+void commando_state::commando_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(commando_state::commando_colorram_w)
+void commando_state::commando_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(commando_state::commando_videoram2_w)
+void commando_state::commando_videoram2_w(offs_t offset, uint8_t data)
 {
 	m_videoram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(commando_state::commando_colorram2_w)
+void commando_state::commando_colorram2_w(offs_t offset, uint8_t data)
 {
 	m_colorram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(commando_state::commando_scrollx_w)
+void commando_state::commando_scrollx_w(offs_t offset, uint8_t data)
 {
 	m_scroll_x[offset] = data;
 	m_bg_tilemap->set_scrollx(0, m_scroll_x[0] | (m_scroll_x[1] << 8));
 }
 
-WRITE8_MEMBER(commando_state::commando_scrolly_w)
+void commando_state::commando_scrolly_w(offs_t offset, uint8_t data)
 {
 	m_scroll_y[offset] = data;
 	m_bg_tilemap->set_scrolly(0, m_scroll_y[0] | (m_scroll_y[1] << 8));
 }
 
-WRITE8_MEMBER(commando_state::commando_c804_w)
+void commando_state::commando_c804_w(uint8_t data)
 {
 	// bits 0 and 1 are coin counters
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);

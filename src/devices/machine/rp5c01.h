@@ -65,6 +65,7 @@ protected:
 	virtual void nvram_default() override;
 	virtual void nvram_read(emu_file &file) override;
 	virtual void nvram_write(emu_file &file) override;
+	virtual bool nvram_can_write() override { return m_battery_backed; }
 
 private:
 	inline void set_alarm_line();

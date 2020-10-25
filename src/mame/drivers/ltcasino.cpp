@@ -137,11 +137,11 @@ private:
 	void machine_start_ltcasino();
 	void machine_start_ltcasin2();
 
-	DECLARE_READ8_MEMBER(input_q_r);
-	DECLARE_READ8_MEMBER(input_s_r);
+	uint8_t input_q_r();
+	uint8_t input_s_r();
 
-	DECLARE_WRITE8_MEMBER(output_r_w);
-	DECLARE_WRITE8_MEMBER(output_t_w);
+	void output_r_w(uint8_t data);
+	void output_t_w(uint8_t data);
 };
 
 
@@ -440,7 +440,7 @@ void ltcasino_state::machine_start_ltcasin2()
 	m_lamps.resolve();
 }
 
-READ8_MEMBER(ltcasino_state::input_s_r)
+uint8_t ltcasino_state::input_s_r()
 {
 	uint8_t data = m_input_s->read() & 0xf1;
 
@@ -452,7 +452,7 @@ READ8_MEMBER(ltcasino_state::input_s_r)
 	return data;
 }
 
-READ8_MEMBER(ltcasino_state::input_q_r)
+uint8_t ltcasino_state::input_q_r()
 {
 	uint8_t data = m_input_q->read() & 0x1f;
 
@@ -464,7 +464,7 @@ READ8_MEMBER(ltcasino_state::input_q_r)
 	return data;
 }
 
-WRITE8_MEMBER(ltcasino_state::output_r_w)
+void ltcasino_state::output_r_w(uint8_t data)
 {
 	// 7------- unknown (toggles rapidly)
 	// -6------ unknown (toggles rapidly)
@@ -480,7 +480,7 @@ WRITE8_MEMBER(ltcasino_state::output_r_w)
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 5));
 }
 
-WRITE8_MEMBER(ltcasino_state::output_t_w)
+void ltcasino_state::output_t_w(uint8_t data)
 {
 	// 76543210 unknown
 

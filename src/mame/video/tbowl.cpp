@@ -21,7 +21,7 @@ TILE_GET_INFO_MEMBER(tbowl_state::get_tx_tile_info)
 	tileinfo.set(0,tileno,col,0);
 }
 
-WRITE8_MEMBER(tbowl_state::txvideoram_w)
+void tbowl_state::txvideoram_w(offs_t offset, uint8_t data)
 {
 	m_txvideoram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset & 0x7ff);
@@ -40,28 +40,28 @@ TILE_GET_INFO_MEMBER(tbowl_state::get_bg_tile_info)
 	tileinfo.set(1,tileno,col,0);
 }
 
-WRITE8_MEMBER(tbowl_state::bg2videoram_w)
+void tbowl_state::bg2videoram_w(offs_t offset, uint8_t data)
 {
 	m_bg2videoram[offset] = data;
 	m_bg2_tilemap->mark_tile_dirty(offset & 0xfff);
 }
 
-WRITE8_MEMBER(tbowl_state::bgxscroll_lo)
+void tbowl_state::bgxscroll_lo(uint8_t data)
 {
 	m_xscroll = (m_xscroll & 0xff00) | data;
 }
 
-WRITE8_MEMBER(tbowl_state::bgxscroll_hi)
+void tbowl_state::bgxscroll_hi(uint8_t data)
 {
 	m_xscroll = (m_xscroll & 0x00ff) | (data << 8);
 }
 
-WRITE8_MEMBER(tbowl_state::bgyscroll_lo)
+void tbowl_state::bgyscroll_lo(uint8_t data)
 {
 	m_yscroll = (m_yscroll & 0xff00) | data;
 }
 
-WRITE8_MEMBER(tbowl_state::bgyscroll_hi)
+void tbowl_state::bgyscroll_hi(uint8_t data)
 {
 	m_yscroll = (m_yscroll & 0x00ff) | (data << 8);
 }
@@ -80,28 +80,28 @@ TILE_GET_INFO_MEMBER(tbowl_state::get_bg2_tile_info)
 	tileinfo.set(2,tileno,col,0);
 }
 
-WRITE8_MEMBER(tbowl_state::bgvideoram_w)
+void tbowl_state::bgvideoram_w(offs_t offset, uint8_t data)
 {
 	m_bgvideoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0xfff);
 }
 
-WRITE8_MEMBER(tbowl_state::bg2xscroll_lo)
+void tbowl_state::bg2xscroll_lo(uint8_t data)
 {
 	m_bg2xscroll = (m_bg2xscroll & 0xff00) | data;
 }
 
-WRITE8_MEMBER(tbowl_state::bg2xscroll_hi)
+void tbowl_state::bg2xscroll_hi(uint8_t data)
 {
 	m_bg2xscroll = (m_bg2xscroll & 0x00ff) | (data << 8);
 }
 
-WRITE8_MEMBER(tbowl_state::bg2yscroll_lo)
+void tbowl_state::bg2yscroll_lo(uint8_t data)
 {
 	m_bg2yscroll = (m_bg2yscroll & 0xff00) | data;
 }
 
-WRITE8_MEMBER(tbowl_state::bg2yscroll_hi)
+void tbowl_state::bg2yscroll_hi(uint8_t data)
 {
 	m_bg2yscroll = (m_bg2yscroll & 0x00ff) | (data << 8);
 }

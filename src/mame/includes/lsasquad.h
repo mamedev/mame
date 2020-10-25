@@ -45,15 +45,15 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	DECLARE_WRITE8_MEMBER(lsasquad_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(lsasquad_sh_nmi_disable_w);
-	DECLARE_WRITE8_MEMBER(lsasquad_sh_nmi_enable_w);
-	DECLARE_READ8_MEMBER(lsasquad_sound_status_r);
-	DECLARE_READ8_MEMBER(daikaiju_sound_status_r);
+	void lsasquad_bankswitch_w(uint8_t data);
+	void lsasquad_sh_nmi_disable_w(uint8_t data);
+	void lsasquad_sh_nmi_enable_w(uint8_t data);
+	uint8_t lsasquad_sound_status_r();
+	uint8_t daikaiju_sound_status_r();
 
-	DECLARE_READ8_MEMBER(lsasquad_mcu_status_r);
-	DECLARE_READ8_MEMBER(daikaiju_mcu_status_r);
-	DECLARE_WRITE8_MEMBER(unk);
+	uint8_t lsasquad_mcu_status_r();
+	uint8_t daikaiju_mcu_status_r();
+	void unk(uint8_t data);
 	DECLARE_MACHINE_START(lsasquad);
 	DECLARE_MACHINE_RESET(lsasquad);
 	uint32_t screen_update_lsasquad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

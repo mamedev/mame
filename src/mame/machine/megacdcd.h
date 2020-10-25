@@ -30,23 +30,23 @@ public:
 
 	uint16_t get_segacd_irq_mask() const { return segacd_irq_mask; }
 
-	DECLARE_READ16_MEMBER( segacd_irq_mask_r );
-	DECLARE_WRITE16_MEMBER( segacd_irq_mask_w );
-	DECLARE_READ16_MEMBER( segacd_cdd_ctrl_r );
-	DECLARE_WRITE16_MEMBER( segacd_cdd_ctrl_w );
-	DECLARE_READ8_MEMBER( segacd_cdd_rx_r );
-	DECLARE_WRITE8_MEMBER( segacd_cdd_tx_w );
-	READ16_MEMBER( segacd_cdfader_r );
-	WRITE16_MEMBER( segacd_cdfader_w );
+	uint16_t segacd_irq_mask_r();
+	void segacd_irq_mask_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t segacd_cdd_ctrl_r();
+	void segacd_cdd_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t segacd_cdd_rx_r(offs_t offset);
+	void segacd_cdd_tx_w(offs_t offset, uint8_t data);
+	uint16_t segacd_cdfader_r();
+	void segacd_cdfader_w(uint16_t data);
 
-	WRITE16_MEMBER( segacd_cdc_mode_address_w );
-	READ16_MEMBER( segacd_cdc_mode_address_r );
-	WRITE16_MEMBER( segacd_cdc_data_w );
-	READ16_MEMBER( segacd_cdc_data_r );
-	READ16_MEMBER( cdc_data_sub_r );
-	READ16_MEMBER( cdc_data_main_r );
+	void segacd_cdc_mode_address_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t segacd_cdc_mode_address_r();
+	void segacd_cdc_data_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t segacd_cdc_data_r(offs_t offset, uint16_t mem_mask = ~0);
+	uint16_t cdc_data_sub_r();
+	uint16_t cdc_data_main_r();
 
-	void CDC_Do_DMA(running_machine& machine, int rate);
+	void CDC_Do_DMA(int rate);
 
 	uint8_t CDC_Reg_r(void);
 	void CDC_Reg_w(uint8_t data);
@@ -132,11 +132,11 @@ protected:
 	void CDD_DoChecksum(void);
 	bool CDD_Check_TX_Checksum(void);
 	void CDD_Export(bool neocd_hack = false);
-	void scd_ctrl_checks(running_machine& machine);
+	void scd_ctrl_checks();
 	void scd_advance_current_readpos(void);
-	int Read_LBA_To_Buffer(running_machine& machine);
+	int Read_LBA_To_Buffer();
 	void CDD_GetStatus(void);
-	void CDD_Stop(running_machine &machine);
+	void CDD_Stop();
 	void CDD_GetPos(void);
 	void CDD_GetTrackPos(void);
 	void CDD_GetTrack(void);
@@ -145,12 +145,12 @@ protected:
 	void CDD_GetTrackAdr(void);
 	void CDD_GetTrackType(void);
 	uint32_t getmsf_from_regs(void);
-	void CDD_Play(running_machine &machine);
+	void CDD_Play();
 	void CDD_Seek(void);
-	void CDD_Pause(running_machine &machine);
-	void CDD_Resume(running_machine &machine);
-	void CDD_FF(running_machine &machine);
-	void CDD_RW(running_machine &machine);
+	void CDD_Pause();
+	void CDD_Resume();
+	void CDD_FF();
+	void CDD_RW();
 	void CDD_Open(void);
 	void CDD_Close(void);
 	void CDD_Init(void);
@@ -158,11 +158,11 @@ protected:
 	void CDD_Reset(void);
 	void CDC_Reset(void);
 	void lc89510_Reset(void);
-	void CDC_End_Transfer(running_machine& machine);
-	uint16_t CDC_Host_r(running_machine& machine, uint16_t type);
-	void CDD_Process(running_machine& machine, int reason);
+	void CDC_End_Transfer();
+	uint16_t CDC_Host_r(uint16_t type);
+	void CDD_Process(int reason);
 	void CDD_Handle_TOC_Commands(void);
-	bool CDD_Import(running_machine& machine);
+	bool CDD_Import();
 
 	uint16_t segacd_irq_mask;
 

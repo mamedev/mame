@@ -280,6 +280,7 @@ Timings:
     b: only if the CPU is requesting a RAM write
     c: only if the CPU is requesting a RAM read
 
+
 *******************************************************************************/
 
 #include "emu.h"
@@ -287,7 +288,6 @@ Timings:
 
 #include "cpu/i8085/i8085.h"
 
-#include "softlist.h"
 #include "speaker.h"
 
 #include "formats/lviv_lvt.h"
@@ -328,7 +328,7 @@ static INPUT_PORTS_START (lviv)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)            PORT_CHAR(']')
 		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER)        PORT_CHAR(13)
 		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Run") PORT_CODE(KEYCODE_DEL) PORT_CHAR(UCHAR_MAMEKEY(DEL))
-		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE)   PORT_CHAR('*') PORT_CHAR(':')
+		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE)   PORT_CHAR(':') PORT_CHAR('*')
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)    PORT_CHAR('H')
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)            PORT_CHAR('Z')
 	PORT_START("KEY2") /* 2nd PPI port A bit 2 low */
@@ -354,7 +354,7 @@ static INPUT_PORTS_START (lviv)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("(G)") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("(B)") PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2))
 		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)            PORT_CHAR('5') PORT_CHAR('%')
-		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4)            PORT_CHAR('4') PORT_CHAR('$')
+		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4)            PORT_CHAR('4') PORT_CHAR(164)
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)            PORT_CHAR('3') PORT_CHAR('#')
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)            PORT_CHAR('2') PORT_CHAR('"')
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)            PORT_CHAR('1') PORT_CHAR('!')
@@ -429,20 +429,20 @@ void lviv_state::lviv(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	I8255(config, m_ppi[0]);
-	m_ppi[0]->in_pa_callback().set(FUNC(lviv_state::ppi_0_porta_r));
-	m_ppi[0]->out_pa_callback().set(FUNC(lviv_state::ppi_0_porta_w));
-	m_ppi[0]->in_pb_callback().set(FUNC(lviv_state::ppi_0_portb_r));
-	m_ppi[0]->out_pb_callback().set(FUNC(lviv_state::ppi_0_portb_w));
-	m_ppi[0]->in_pc_callback().set(FUNC(lviv_state::ppi_0_portc_r));
-	m_ppi[0]->out_pc_callback().set(FUNC(lviv_state::ppi_0_portc_w));
+	m_ppi[0]->in_pa_callback().set(FUNC(lviv_state::ppi0_porta_r));
+	m_ppi[0]->out_pa_callback().set(FUNC(lviv_state::ppi0_porta_w));
+	m_ppi[0]->in_pb_callback().set(FUNC(lviv_state::ppi0_portb_r));
+	m_ppi[0]->out_pb_callback().set(FUNC(lviv_state::ppi0_portb_w));
+	m_ppi[0]->in_pc_callback().set(FUNC(lviv_state::ppi0_portc_r));
+	m_ppi[0]->out_pc_callback().set(FUNC(lviv_state::ppi0_portc_w));
 
 	I8255(config, m_ppi[1]);
-	m_ppi[1]->in_pa_callback().set(FUNC(lviv_state::ppi_1_porta_r));
-	m_ppi[1]->out_pa_callback().set(FUNC(lviv_state::ppi_1_porta_w));
-	m_ppi[1]->in_pb_callback().set(FUNC(lviv_state::ppi_1_portb_r));
-	m_ppi[1]->out_pb_callback().set(FUNC(lviv_state::ppi_1_portb_w));
-	m_ppi[1]->in_pc_callback().set(FUNC(lviv_state::ppi_1_portc_r));
-	m_ppi[1]->out_pc_callback().set(FUNC(lviv_state::ppi_1_portc_w));
+	m_ppi[1]->in_pa_callback().set(FUNC(lviv_state::ppi1_porta_r));
+	m_ppi[1]->out_pa_callback().set(FUNC(lviv_state::ppi1_porta_w));
+	m_ppi[1]->in_pb_callback().set(FUNC(lviv_state::ppi1_portb_r));
+	m_ppi[1]->out_pb_callback().set(FUNC(lviv_state::ppi1_portb_w));
+	m_ppi[1]->in_pc_callback().set(FUNC(lviv_state::ppi1_portc_r));
+	m_ppi[1]->out_pc_callback().set(FUNC(lviv_state::ppi1_portc_w));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -476,14 +476,14 @@ void lviv_state::lviv(machine_config &config)
 
 
 ROM_START(lviv)
-	ROM_REGION(0x14000,"maincpu",0)
+	ROM_REGION(0x4000,"maincpu",0)
 	ROM_SYSTEM_BIOS( 0, "lviv", "Lviv/L'vov" )
-	ROMX_LOAD("lviv.bin", 0x10000, 0x4000, CRC(44a347d9) SHA1(74e067493b2b7d9ab17333202009a1a4f5e460fd), ROM_BIOS(0))
+	ROMX_LOAD("lviv.bin", 0x0000, 0x4000, CRC(44a347d9) SHA1(74e067493b2b7d9ab17333202009a1a4f5e460fd), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "lviva", "Lviv/L'vov (alternate)" )
-	ROMX_LOAD("lviva.bin", 0x10000, 0x4000, CRC(551622f5) SHA1(b225f3542b029d767b7db9dce562e8a3f77f92a2), ROM_BIOS(1))
+	ROMX_LOAD("lviva.bin", 0x0000, 0x4000, CRC(551622f5) SHA1(b225f3542b029d767b7db9dce562e8a3f77f92a2), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "lvivp", "Lviv/L'vov (prototype)" )
-	ROMX_LOAD("lvivp.bin", 0x10000, 0x4000, CRC(f171c282) SHA1(c7dc2bdb02400e6b5cdcc50040eb06f506a7ed84), ROM_BIOS(2))
+	ROMX_LOAD("lvivp.bin", 0x0000, 0x4000, CRC(f171c282) SHA1(c7dc2bdb02400e6b5cdcc50040eb06f506a7ed84), ROM_BIOS(2))
 ROM_END
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY        FULLNAME      FLAGS */
-COMP( 1989, lviv, 0,      0,      lviv,    lviv,  lviv_state, empty_init, "V. I. Lenin", "PK-01 Lviv", 0 )
+COMP( 1989, lviv, 0,      0,      lviv,    lviv,  lviv_state, empty_init, "V. I. Lenin", "PK-01 Lviv", MACHINE_SUPPORTS_SAVE )

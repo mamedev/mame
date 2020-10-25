@@ -290,7 +290,7 @@ void model3_state::tap_reset()
 /*****************************************************************************/
 /* Epson RTC-72421 */
 
-READ32_MEMBER(model3_state::rtc72421_r)
+uint32_t model3_state::rtc72421_r(offs_t offset)
 {
 	int reg = offset;
 	uint32_t data;
@@ -299,7 +299,7 @@ READ32_MEMBER(model3_state::rtc72421_r)
 	return data;
 }
 
-WRITE32_MEMBER(model3_state::rtc72421_w)
+void model3_state::rtc72421_w(offs_t offset, uint32_t data)
 {
 	m_rtc->write(offset, data >> 24);
 }

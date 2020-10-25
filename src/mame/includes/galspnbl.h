@@ -55,7 +55,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE16_MEMBER(soundcommand_w);
+	void soundcommand_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	virtual void machine_start() override;
 	void galspnbl_palette(palette_device &palette) const;
 	uint32_t screen_update_galspnbl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

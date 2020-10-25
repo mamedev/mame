@@ -96,7 +96,7 @@ WRITE_LINE_MEMBER(hp82900_io_card_device::reset_w)
 	}
 }
 
-READ8_MEMBER(hp82900_io_card_device::cpu_mem_r)
+uint8_t hp82900_io_card_device::cpu_mem_r(offs_t offset)
 {
 	if (m_rom_enabled) {
 		return m_rom[ offset & 0x7ff ];
@@ -105,12 +105,12 @@ READ8_MEMBER(hp82900_io_card_device::cpu_mem_r)
 	}
 }
 
-WRITE8_MEMBER(hp82900_io_card_device::cpu_mem_w)
+void hp82900_io_card_device::cpu_mem_w(offs_t offset, uint8_t data)
 {
 	m_ram[ offset ] = data;
 }
 
-READ8_MEMBER(hp82900_io_card_device::cpu_io_r)
+uint8_t hp82900_io_card_device::cpu_io_r(offs_t offset)
 {
 	m_rom_enabled = false;
 
@@ -123,7 +123,7 @@ READ8_MEMBER(hp82900_io_card_device::cpu_io_r)
 	return res;
 }
 
-WRITE8_MEMBER(hp82900_io_card_device::cpu_io_w)
+void hp82900_io_card_device::cpu_io_w(offs_t offset, uint8_t data)
 {
 	m_rom_enabled = false;
 	if (BIT(offset , 6) && (m_addr_latch & 0x82) == 0) {
@@ -146,7 +146,7 @@ void hp82900_io_card_device::cpu_io_map(address_map &map)
 	map(0x00 , 0xff).rw(FUNC(hp82900_io_card_device::cpu_io_r) , FUNC(hp82900_io_card_device::cpu_io_w));
 }
 
-WRITE8_MEMBER(hp82900_io_card_device::z80_m1_w)
+void hp82900_io_card_device::z80_m1_w(uint8_t data)
 {
 	// 1 wait state on each M1 cycle
 	m_cpu->adjust_icount(-1);

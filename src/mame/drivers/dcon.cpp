@@ -263,12 +263,12 @@ static GFXDECODE_START( gfx_dcon )
 	GFXDECODE_ENTRY( "gfx5", 0, dcon_tilelayout,           0, 64 )
 GFXDECODE_END
 
-WRITE16_MEMBER( dcon_state::layer_en_w )
+void dcon_state::layer_en_w(uint16_t data)
 {
 	m_layer_en = data;
 }
 
-WRITE16_MEMBER( dcon_state::layer_scroll_w )
+void dcon_state::layer_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scroll_ram[offset]);
 }

@@ -68,12 +68,12 @@ private:
 	required_device<ram_device> m_ram;
 	required_device<m3002_device> m_rtc;
 
-	DECLARE_WRITE8_MEMBER( europc_pio_w );
-	DECLARE_READ8_MEMBER( europc_pio_r );
+	void europc_pio_w(offs_t offset, uint8_t data);
+	uint8_t europc_pio_r(offs_t offset);
 
-	DECLARE_WRITE8_MEMBER ( europc_jim_w );
-	DECLARE_READ8_MEMBER ( europc_jim_r );
-	DECLARE_READ8_MEMBER ( europc_jim2_r );
+	void europc_jim_w(offs_t offset, uint8_t data);
+	uint8_t europc_jim_r(offs_t offset);
+	uint8_t europc_jim2_r();
 
 	uint8_t m_jim_data[16];
 	uint8_t m_jim_state;
@@ -164,7 +164,7 @@ private:
 
 */
 
-WRITE8_MEMBER( europc_pc_state::europc_jim_w )
+void europc_pc_state::europc_jim_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -202,7 +202,7 @@ WRITE8_MEMBER( europc_pc_state::europc_jim_w )
 	m_jim_data[offset] = data;
 }
 
-READ8_MEMBER( europc_pc_state::europc_jim_r )
+uint8_t europc_pc_state::europc_jim_r(offs_t offset)
 {
 	int data = 0;
 	switch(offset)
@@ -214,7 +214,7 @@ READ8_MEMBER( europc_pc_state::europc_jim_r )
 	return data;
 }
 
-READ8_MEMBER( europc_pc_state::europc_jim2_r )
+uint8_t europc_pc_state::europc_jim2_r()
 {
 	switch (m_jim_state)
 	{
@@ -276,7 +276,7 @@ void europc_pc_state::init_europc()
 	}
 }
 
-WRITE8_MEMBER( europc_pc_state::europc_pio_w )
+void europc_pc_state::europc_pio_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -294,7 +294,7 @@ WRITE8_MEMBER( europc_pc_state::europc_pio_w )
 }
 
 
-READ8_MEMBER( europc_pc_state::europc_pio_r )
+uint8_t europc_pc_state::europc_pio_r(offs_t offset)
 {
 	int data = 0;
 	switch (offset)
@@ -366,7 +366,9 @@ static INPUT_PORTS_START( europc )
 	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
 	PORT_BIT( 0x02, 0x02,   IPT_UNUSED ) /* no turbo switch */
 	PORT_BIT( 0x01, 0x01,   IPT_UNUSED )
+INPUT_PORTS_END
 
+static INPUT_PORTS_START( europc_keyboard )
 	PORT_INCLUDE(pc_keyboard)
 	PORT_MODIFY("pc_keyboard_2") /* IN6 */
 	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("` ~") PORT_CODE(KEYCODE_BACKSLASH) /* `                           29  A9 */
@@ -382,6 +384,28 @@ static INPUT_PORTS_START( europc )
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP Enter") PORT_CODE(KEYCODE_ENTER_PAD)       /* PAD Enter                   60  e0 */
 	PORT_BIT(0xfffe, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
+
+class europc_keyboard_device : public pc_keyboard_device
+{
+public:
+	europc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+protected:
+	virtual ioport_constructor device_input_ports() const override;
+};
+
+DEFINE_DEVICE_TYPE(EUROPC_KEYB, europc_keyboard_device, "europc_keyb", "EURO PC Keyboard")
+
+europc_keyboard_device::europc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	pc_keyboard_device(mconfig, EUROPC_KEYB, tag, owner, clock)
+{
+	m_type = KEYBOARD_TYPE::PC;
+}
+
+ioport_constructor europc_keyboard_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(europc_keyboard);
+}
 
 void europc_pc_state::europc_map(address_map &map)
 {
@@ -471,7 +495,7 @@ void europc_pc_state::europc(machine_config &config)
 	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "lpt", true);
 	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "com", true);
 	ISA8_SLOT(config, "isa4", 0, "mb:isa", europc_fdc, "fdc", true);
-	PC_KEYB(config, m_keyboard);
+	EUROPC_KEYB(config, m_keyboard);
 	m_keyboard->keypress().set("mb:pic8259", FUNC(pic8259_device::ir1_w));
 
 	M3002(config, m_rtc, 32.768_kHz_XTAL);
@@ -498,6 +522,9 @@ void europc_pc_state::euroxt(machine_config &config)
 	europc(config);
 
 	config.device_remove("kbdctrl");
+
+	PC_KEYB(config.replace(), m_keyboard);
+	m_keyboard->keypress().set("mb:pic8259", FUNC(pic8259_device::ir1_w));
 
 	m_ram->set_default_size("768K");
 
@@ -546,10 +573,12 @@ ROM_START( euroxt )
 	ROMX_LOAD("euroxt_bios_v1.01.bin", 0x8000, 0x8000, CRC(1e1fe931) SHA1(bb7cae224d66ae48045f323ecb9ad59bf49ed0a2), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "v1.02", "EuroXT v1.02" )
 	ROMX_LOAD("euro_xt_bios_id.nr.51463_v1.02.bin", 0x8000, 0x8000, CRC(c36de60e) SHA1(c668cc9c5f3325233f30eac654678e1b8b7a7847), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS( 2, "v1.04", "EuroXT v1.04" )
+	ROM_SYSTEM_BIOS( 2, "v1.04", "EuroXT v1.04" ) // no display
 	ROMX_LOAD("euro_xt_bios_v1.04_cs8b00_5.12.89_21_25.bin", 0x8000, 0x8000, CRC(24033a62) SHA1(9d1d89cb8b99569b6c0aaa7c6aceb355dc20b2fd), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS( 3, "v1.05", "EuroXT v1.05" ) // no display
+	ROMX_LOAD("euro-xt_bios_id.nr.51463_v1.05.bin", 0x8000, 0x8000, CRC(e3d2591d) SHA1(710cdbafeb913f2e436b64eedd7a1794c589a48a), ROM_BIOS(3))
 
-	// BIOS ROM versions 1.02 and 1.04 were accompanied by identical char ROM versions 50146, which in turn match the one used in /bus/isa/aga.cpp
+	// BIOS ROM versions 1.02, 1.04 and 1.05 were accompanied by identical char ROM versions 50146, which in turn match the one used in /bus/isa/aga.cpp
 ROM_END
 
 //    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT   CLASS            INIT         COMPANY              FULLNAME      FLAGS

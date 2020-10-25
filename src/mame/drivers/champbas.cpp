@@ -86,7 +86,6 @@ TODO:
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -125,7 +124,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(exctsccr_state::exctsccr_sound_irq)
  *************************************/
 
 /* champbja another protection */
-READ8_MEMBER(champbas_state::champbja_protection_r)
+uint8_t champbas_state::champbja_protection_r(offs_t offset)
 {
 	uint8_t data = 0;
 	/*
@@ -279,6 +278,13 @@ void exctsccr_state::exctsccr_sound_io_map(address_map &map)
 	map(0x86, 0x87).w("ay2", FUNC(ay8910_device::data_address_w));
 	map(0x8a, 0x8b).w("ay3", FUNC(ay8910_device::data_address_w));
 	map(0x8e, 0x8f).w("ay4", FUNC(ay8910_device::data_address_w));
+}
+
+void exctsccr_state::exctscc2_sound_io_map(address_map &map)
+{
+	map.global_mask(0x00ff);
+	map(0x8a, 0x8b).w("ay1", FUNC(ay8910_device::data_address_w));
+	map(0x8e, 0x8f).w("ay2", FUNC(ay8910_device::data_address_w));
 }
 
 
@@ -591,9 +597,6 @@ void champbas_state::champbas(machine_config &config)
 	AY8910(config, "ay1", XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.3);
 
 	DAC_6BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.7); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void champbas_state::champbasj(machine_config &config)
@@ -710,9 +713,19 @@ void exctsccr_state::exctsccr(machine_config &config)
 
 	DAC_6BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.3); // unknown DAC
 	DAC_6BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.3); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
+}
+
+void exctsccr_state::exctscc2(machine_config &config)
+{
+	exctsccr(config);
+
+	m_audiocpu->set_addrmap(AS_IO, &exctsccr_state::exctscc2_sound_io_map);
+
+	subdevice<ay8910_device>("ay1")->set_clock(XTAL(14'318'181)/8); // measured on PCB
+
+	// Exciting Soccer II only has two AYs
+	config.device_remove("ay3");
+	config.device_remove("ay4");
 }
 
 /* Bootleg running on a modified Champion Baseball board */
@@ -760,9 +773,6 @@ void exctsccr_state::exctsccrb(machine_config &config)
 	AY8910(config, "ay1", XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.3);
 
 	DAC_6BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.7); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 
@@ -1001,6 +1011,7 @@ ROM_START( exctsccr ) /* Teams: ITA AUS GBR FRA FRG BRA */
 	ROM_LOAD( "prom2.8r",     0x0120, 0x0100, CRC(8a9c0edf) SHA1(8aad387e9409cff0eeb42eeb57e9ea88770a8c9a) ) /* lookup table */
 ROM_END
 
+// CPU BOARD NO. 58AS50-1, DISPLAY BOARD NO. 58AS51-1, MUSIC & VOICE BOARD NO. 59MC02
 ROM_START( exctsccra ) /* Teams: ITA AUS GBR FRA FRG BRA */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1_g10.bin",    0x0000, 0x2000, CRC(aa68df66) SHA1(f10cac5a4c5aad1e1eb8835174dc8d517bb2921a) )
@@ -1181,37 +1192,37 @@ ROM_START( exctsccrb )
 	ROM_LOAD( "prom2.8r",     0x0120, 0x0100, CRC(8a9c0edf) SHA1(8aad387e9409cff0eeb42eeb57e9ea88770a8c9a) ) /* lookup table */
 ROM_END
 
-ROM_START( exctscc2 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "vr.3j",        0x0000, 0x2000, CRC(c6115362) SHA1(6a258631abd72ef6b8d7968bb4b2bc88e89e597d) )
-	ROM_LOAD( "vr.3k",        0x2000, 0x2000, CRC(de36ba00) SHA1(0a0d92e710b8c749f145571bc8a204609456d19d) )
-	ROM_LOAD( "vr.3l",        0x4000, 0x2000, CRC(1ddfdf65) SHA1(313d0a7f13fc2de15aa32492c38a59fbafad9f01) )
+ROM_START( exctscc2 ) // 2-PCB stack: CPU & SOUND BOARD + DISPLAY BOARD N. 58AS51-1
+	ROM_REGION( 0x10000, "maincpu", 0 ) // on CPU & sound board
+	ROM_LOAD( "eprom_1_vr_b_alpha_denshi.3j",      0x0000, 0x2000, CRC(c6115362) SHA1(6a258631abd72ef6b8d7968bb4b2bc88e89e597d) ) // B handwritten
+	ROM_LOAD( "eprom_2_vr_alpha_denshi.3k",        0x2000, 0x2000, CRC(de36ba00) SHA1(0a0d92e710b8c749f145571bc8a204609456d19d) )
+	ROM_LOAD( "eprom_3_vr_v_alpha_denshi.3l",      0x4000, 0x2000, CRC(1ddfdf65) SHA1(313d0a7f13fc2de15aa32492c38a59fbafad9f01) ) // V handwritten
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "vr.7d",        0x0000, 0x2000, CRC(2c675a43) SHA1(aa0a8dbcae955e3da92c435202f2a1ed238c377e) )
-	ROM_LOAD( "vr.7e",        0x2000, 0x2000, CRC(e571873d) SHA1(2dfff24f5dac86e92612f40cf3642005c7f36ad3) )
-	ROM_LOAD( "8_d6.bin",     0x4000, 0x2000, CRC(88651ee1) SHA1(2052e1b3f9784439369f464e31f4a2b0d1bb0565) )    /* vr.7f */
-	ROM_LOAD( "7_c6.bin",     0x6000, 0x2000, CRC(6d51521e) SHA1(2809bd2e61f40dcd31d43c62520982bdcfb0a865) )    /* vr.7h */
-	ROM_LOAD( "1_a6.bin",     0x8000, 0x1000, CRC(20f2207e) SHA1(b1ed2237d0bd50ddbe593fd2fbff9f1d67c1eb11) )    /* vr.7k */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // on CPU & sound board
+	ROM_LOAD( "eprom_0_vr_alpha_denshi.7d",     0x0000, 0x2000, CRC(2c675a43) SHA1(aa0a8dbcae955e3da92c435202f2a1ed238c377e) ) // yes 0, not 10
+	ROM_LOAD( "eprom_9_vr_alpha_denshi.7e",     0x2000, 0x2000, CRC(e571873d) SHA1(2dfff24f5dac86e92612f40cf3642005c7f36ad3) )
+	ROM_LOAD( "eprom_8_vr_alpha_denshi.7f",     0x4000, 0x2000, CRC(88651ee1) SHA1(2052e1b3f9784439369f464e31f4a2b0d1bb0565) )
+	ROM_LOAD( "eprom_7_vr_alpha_denshi.7h",     0x6000, 0x2000, CRC(6d51521e) SHA1(2809bd2e61f40dcd31d43c62520982bdcfb0a865) )
+	ROM_LOAD( "eprom_1_vr_alpha_denshi.7k",     0x8000, 0x1000, CRC(20f2207e) SHA1(b1ed2237d0bd50ddbe593fd2fbff9f1d67c1eb11) ) // marked for a 2764 but populated with a 2732
 
-	ROM_REGION( 0x2000, "alpha_8201:mcu", 0 )
-	ROM_LOAD( "alpha-8303_44801b42.bin", 0x0000, 0x2000, CRC(66adcb37) SHA1(e1c72ecb161129dcbddc0b16dd90e716d0c79311) )
+	ROM_REGION( 0x2000, "alpha_8201:mcu", 0 ) // on CPU & sound board
+	ROM_LOAD( "alpha-8303_44801b42.1d", 0x0000, 0x2000, CRC(66adcb37) SHA1(e1c72ecb161129dcbddc0b16dd90e716d0c79311) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )    // 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only chars
-	ROM_LOAD( "vr.5a",        0x0000, 0x2000, CRC(4ff1783d) SHA1(c45074864c3a4bcbf3a87d164027ae16dca53d9c) ) /* planes 0,1 */
-	ROM_LOAD( "vr.5c",        0x2000, 0x2000, CRC(1fb84ee6) SHA1(56ceb86c509be783f806403ac21e7c9684760d5f) ) /* plane 3 */
+	ROM_REGION( 0x04000, "gfx1", 0 )    // 3bpp chars + sprites: rearranged by init_exctsccr() to leave only chars, on display board
+	ROM_LOAD( "eprom_4_vr_alpha_denshi.5a",        0x0000, 0x2000, CRC(4ff1783d) SHA1(c45074864c3a4bcbf3a87d164027ae16dca53d9c) ) // planes 0,1
+	ROM_LOAD( "eprom_6_vr_alpha_denshi.5c",        0x2000, 0x2000, CRC(1fb84ee6) SHA1(56ceb86c509be783f806403ac21e7c9684760d5f) ) // plane 3
 
-	ROM_REGION( 0x04000, "gfx2", 0 )    // 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only sprites
-	ROM_LOAD( "vr.5b",        0x0000, 0x2000, CRC(5605b60b) SHA1(19d5909896ae4a3d7552225c369d30475c56793b) ) /* planes 0,1 */
+	ROM_REGION( 0x04000, "gfx2", 0 )    // 3bpp chars + sprites: rearranged by init_exctsccr() to leave only sprites, on display board
+	ROM_LOAD( "eprom_5_vr_alpha_denshi.5b",        0x0000, 0x2000, CRC(5605b60b) SHA1(19d5909896ae4a3d7552225c369d30475c56793b) ) // planes 0,1
 
-	ROM_REGION( 0x02000, "gfx3", 0 )    // 4bpp sprites
-	ROM_LOAD( "vr.5k",        0x0000, 0x1000, CRC(1d37edfa) SHA1(184fa6dd7b1b3fff4c5fc19b42301ccb7979ac84) )
-	ROM_LOAD( "vr.5l",        0x1000, 0x1000, CRC(b97f396c) SHA1(4ffe512acf047230bd593911a615fc0ef66b481d) )
+	ROM_REGION( 0x02000, "gfx3", 0 )    // 4bpp sprites, on display board
+	ROM_LOAD( "eprom_7_vr_alpha_denshi.5k",        0x0000, 0x1000, CRC(1d37edfa) SHA1(184fa6dd7b1b3fff4c5fc19b42301ccb7979ac84) )
+	ROM_LOAD( "eprom_8_vr_alpha_denshi.5l",        0x1000, 0x1000, CRC(b97f396c) SHA1(4ffe512acf047230bd593911a615fc0ef66b481d) )
 
-	ROM_REGION( 0x0220, "proms", 0 )
-	ROM_LOAD( "prom1.e1",     0x0000, 0x0020, CRC(d9b10bf0) SHA1(bc1263331968f4bf37eb70ec4f56a8cb763c29d2) ) /* palette */
-	ROM_LOAD( "prom3.k5",     0x0020, 0x0100, CRC(b5db1c2c) SHA1(900aaaac6b674a9c5c7b7804a4b0c3d5cce761aa) ) /* lookup table */
-	ROM_LOAD( "prom2.8r",     0x0120, 0x0100, CRC(8a9c0edf) SHA1(8aad387e9409cff0eeb42eeb57e9ea88770a8c9a) ) /* lookup table */
+	ROM_REGION( 0x0220, "proms", 0 ) // colors match video from PCB (even the field one)
+	ROM_LOAD( "tbp18s030.5j",     0x0000, 0x0020, CRC(899d153d) SHA1(669f1a2de387ae7cdce16c2714a384c9586ed255) ) // palette, marked as 7051 on CPU & sound board
+	ROM_LOAD( "tbp24s10.61d",     0x0020, 0x0100, CRC(75613784) SHA1(38dc1c1d2d0f33d58f035942e71665c9810fdab1) ) // lookup table, marked as 7052 on display board
+	ROM_LOAD( "tbp24s10.60h",     0x0120, 0x0100, CRC(1a52d6eb) SHA1(cd0c8cbaf5d8df14df34103cde2ec595039a6d51) ) // lookup table, marked as 7052 on display board
 ROM_END
 
 
@@ -1290,4 +1301,4 @@ GAME( 1983, exctsccra,  exctsccr, exctsccr,   exctsccr, exctsccr_state, init_exc
 GAME( 1983, exctsccrj,  exctsccr, exctsccr,   exctsccr, exctsccr_state, init_exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, exctsccrjo, exctsccr, exctsccr,   exctsccr, exctsccr_state, init_exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (Japan, older)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, exctsccrb,  exctsccr, exctsccrb,  exctsccr, exctsccr_state, init_exctsccr, ROT270, "bootleg (Kazutomi)", "Exciting Soccer (bootleg)", MACHINE_SUPPORTS_SAVE ) // on champbasj hardware
-GAME( 1984, exctscc2,   0,        exctsccr,   exctsccr, exctsccr_state, init_exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer II", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, exctscc2,   0,        exctscc2,   exctsccr, exctsccr_state, init_exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer II", MACHINE_SUPPORTS_SAVE )

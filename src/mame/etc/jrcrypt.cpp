@@ -2,7 +2,7 @@
 // copyright-holders:David Caldwell
 /***************************************************************************
 
-  jrcrypt.c
+  jrcrypt.cpp
 
   This file is not part of MAME. It is here to provide detailed
   documentation of the encryption used by Jr. Pac Man ROMs.
@@ -400,7 +400,7 @@ void write_rom_section(char *prefix,char *suffix,int start,int end)
 }
 #endif
 
-WRITE8_HANDLER( jrpacman_interrupt_mask_w )
+void jrpacman_interrupt_mask_w(uint8_t data)
 {
 	irq_mask = data;
 }

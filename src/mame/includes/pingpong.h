@@ -32,11 +32,11 @@ public:
 	required_device<palette_device> m_palette;
 	tilemap_t *m_bg_tilemap;
 
-	DECLARE_WRITE8_MEMBER(cashquiz_question_bank_high_w);
-	DECLARE_WRITE8_MEMBER(cashquiz_question_bank_low_w);
-	DECLARE_WRITE8_MEMBER(coin_w);
-	DECLARE_WRITE8_MEMBER(pingpong_videoram_w);
-	DECLARE_WRITE8_MEMBER(pingpong_colorram_w);
+	void cashquiz_question_bank_high_w(uint8_t data);
+	void cashquiz_question_bank_low_w(uint8_t data);
+	void coin_w(uint8_t data);
+	void pingpong_videoram_w(offs_t offset, uint8_t data);
+	void pingpong_colorram_w(offs_t offset, uint8_t data);
 	void init_cashquiz();
 	void init_merlinmm();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

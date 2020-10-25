@@ -23,15 +23,15 @@ public:
 	// construction/destruction
 	cpc_symbiface2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(ide_cs0_r);
-	DECLARE_WRITE8_MEMBER(ide_cs0_w);
-	DECLARE_READ8_MEMBER(ide_cs1_r);
-	DECLARE_WRITE8_MEMBER(ide_cs1_w);
-	DECLARE_READ8_MEMBER(rtc_r);
-	DECLARE_WRITE8_MEMBER(rtc_w);
-	DECLARE_READ8_MEMBER(mouse_r);
-	DECLARE_READ8_MEMBER(rom_rewrite_r);
-	DECLARE_WRITE8_MEMBER(rom_rewrite_w);
+	uint8_t ide_cs0_r(offs_t offset);
+	void ide_cs0_w(offs_t offset, uint8_t data);
+	uint8_t ide_cs1_r(offs_t offset);
+	void ide_cs1_w(offs_t offset, uint8_t data);
+	uint8_t rtc_r(offs_t offset);
+	void rtc_w(offs_t offset, uint8_t data);
+	uint8_t mouse_r();
+	uint8_t rom_rewrite_r();
+	void rom_rewrite_w(uint8_t data);
 	DECLARE_INPUT_CHANGED_MEMBER(mouse_change_x);
 	DECLARE_INPUT_CHANGED_MEMBER(mouse_change_y);
 	DECLARE_INPUT_CHANGED_MEMBER(mouse_change_buttons);

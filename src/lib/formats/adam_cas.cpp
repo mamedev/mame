@@ -1,10 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
+#include "adam_cas.h"
 
 #include <cassert>
 
-#include "cassimg.h"
-#include "adam_cas.h"
 
 // This code will reproduce the timing of an adam tape played back on a standard tape deck with a 1 7/8ips speed.
 #define CASS_AMP 0x1fffffff
@@ -50,7 +49,7 @@ Data is phase encoded, with 70us bit cells with a transition at 31us for a 1 and
 ****************************************************************/
 
 
-static cassette_image::error coladam_ddp_identify ( cassette_image *cass, struct CassetteOptions *opts )
+static cassette_image::error coladam_ddp_identify ( cassette_image *cass, cassette_image::Options *opts )
 {
 	opts -> bits_per_sample = 16;
 	opts -> channels = 2;
@@ -67,14 +66,14 @@ cassette_image::error coladam_put_byte(cassette_image *cass, int channel, double
 	{
 		if(byte & 0x80)
 		{
-			err = cassette_put_sample( cass, channel, *time_index, COL_ADAM_PERIOD1, -CASS_AMP*(*prev_sign) );
+			err = cass->put_sample( channel, *time_index, COL_ADAM_PERIOD1, -CASS_AMP*(*prev_sign) );
 			(*time_index) += COL_ADAM_PERIOD1;
-			err = cassette_put_sample( cass, channel, *time_index, COL_ADAM_PERIOD2,  CASS_AMP*(*prev_sign) );
+			err = cass->put_sample( channel, *time_index, COL_ADAM_PERIOD2,  CASS_AMP*(*prev_sign) );
 			(*time_index) += COL_ADAM_PERIOD2;
 		}
 		else
 		{
-			err = cassette_put_sample( cass, channel, *time_index, COL_ADAM_PERIOD, -CASS_AMP*(*prev_sign) );
+			err = cass->put_sample( channel, *time_index, COL_ADAM_PERIOD, -CASS_AMP*(*prev_sign) );
 			(*prev_sign) *=-1;
 			(*time_index) += COL_ADAM_PERIOD;
 		}
@@ -146,12 +145,12 @@ static cassette_image::error coladam_ddp_load( cassette_image *cass )
 
 	for (block = 0; block < 128; block++)
 	{
-		cassette_image_read( cass, buffer, 0x20000+0x400*block, 0x400 );
+		cass->image_read( buffer, 0x20000+0x400*block, 0x400 );
 		err = coladam_put_block(cass, 0, &time, &prev_sign, block, buffer, layout_type);
 	}
 	for (block = 128; block < 131; block++)
 	{
-		cassette_image_read( cass, buffer, 0x3f400+0x400*(block-128), 0x400 );
+		cass->image_read( buffer, 0x3f400+0x400*(block-128), 0x400 );
 		err = coladam_put_block(cass, 0, &time, &prev_sign, block, buffer, layout_type);
 	}
 
@@ -165,17 +164,17 @@ static cassette_image::error coladam_ddp_load( cassette_image *cass )
 	{
 		for (block = 0; block < 64; block++)
 		{
-			cassette_image_read( cass, buffer, 0x10000+0x400*block, 0x400 );
+			cass->image_read( buffer, 0x10000+0x400*block, 0x400 );
 			err = coladam_put_block(cass, 1, &time, &prev_sign, block, buffer, layout_type);
 		}
 		for (block = 64; block < 128; block++)
 		{
-			cassette_image_read( cass, buffer, 0x00000+0x400*(block-64), 0x400 );
+			cass->image_read( buffer, 0x00000+0x400*(block-64), 0x400 );
 			err = coladam_put_block(cass, 1, &time, &prev_sign, block, buffer, layout_type);
 		}
 		for (block = 128; block < 131; block++)
 		{
-			cassette_image_read( cass, buffer, 0x0f400+0x400*(block-128), 0x400 );
+			cass->image_read( buffer, 0x0f400+0x400*(block-128), 0x400 );
 			err = coladam_put_block(cass, 1, &time, &prev_sign, block, buffer, layout_type);
 		}
 	}
@@ -188,12 +187,12 @@ static cassette_image::error coladam_ddp_load( cassette_image *cass )
 		}
 		for (block = 0; block < 128; block++)
 		{
-			cassette_image_read( cass, buffer, 0x400*block, 0x400 );
+			cass->image_read( buffer, 0x400*block, 0x400 );
 			err = coladam_put_block(cass, 1, &time, &prev_sign, block, buffer, layout_type);
 		}
 		for (block = 128; block < 131; block++)
 		{
-			cassette_image_read( cass, buffer, 0x1f400+0x400*(block-128), 0x400 );
+			cass->image_read( buffer, 0x1f400+0x400*(block-128), 0x400 );
 			err = coladam_put_block(cass, 1, &time, &prev_sign, block, buffer, layout_type);
 		}
 	}
@@ -203,7 +202,7 @@ static cassette_image::error coladam_ddp_load( cassette_image *cass )
 
 
 
-static const struct CassetteFormat coladam_ddp =
+static const cassette_image::Format coladam_ddp =
 { "ddp", coladam_ddp_identify, coladam_ddp_load, nullptr /* no save */ };
 
 CASSETTE_FORMATLIST_START(coleco_adam_cassette_formats)

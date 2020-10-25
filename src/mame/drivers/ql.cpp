@@ -165,15 +165,15 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE8_MEMBER( ipc_w );
-	DECLARE_WRITE8_MEMBER( ipc_port1_w );
-	DECLARE_WRITE8_MEMBER( ipc_port2_w );
-	DECLARE_READ8_MEMBER( ipc_port2_r );
+	void ipc_w(uint8_t data);
+	void ipc_port1_w(uint8_t data);
+	void ipc_port2_w(uint8_t data);
+	uint8_t ipc_port2_r();
 	DECLARE_READ_LINE_MEMBER( ipc_t1_r );
-	DECLARE_READ8_MEMBER( ipc_bus_r );
+	uint8_t ipc_bus_r();
 	DECLARE_WRITE_LINE_MEMBER( ql_baudx4_w );
 	DECLARE_WRITE_LINE_MEMBER( ql_comdata_w );
 	DECLARE_WRITE_LINE_MEMBER( zx8302_mdselck_w );
@@ -214,7 +214,7 @@ private:
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( ql_state::read )
+uint8_t ql_state::read(offs_t offset)
 {
 	uint8_t data = 0;
 	int cart_romoeh = 0;
@@ -273,7 +273,7 @@ READ8_MEMBER( ql_state::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ql_state::write )
+void ql_state::write(offs_t offset, uint8_t data)
 {
 	if (offset >= 0x18000 && offset <= 0x18001)
 	{
@@ -329,7 +329,7 @@ WRITE8_MEMBER( ql_state::write )
 //  ipc_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ql_state::ipc_w )
+void ql_state::ipc_w(uint8_t data)
 {
 	m_zx8302->comctl_w(0);
 	m_zx8302->comctl_w(1);
@@ -340,7 +340,7 @@ WRITE8_MEMBER( ql_state::ipc_w )
 //  ipc_port1_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ql_state::ipc_port1_w )
+void ql_state::ipc_port1_w(uint8_t data)
 {
 	/*
 
@@ -365,7 +365,7 @@ WRITE8_MEMBER( ql_state::ipc_port1_w )
 //  ipc_port2_r -
 //-------------------------------------------------
 
-READ8_MEMBER( ql_state::ipc_port2_r )
+uint8_t ql_state::ipc_port2_r()
 {
 	/*
 
@@ -398,7 +398,7 @@ READ8_MEMBER( ql_state::ipc_port2_r )
 //  ipc_port2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ql_state::ipc_port2_w )
+void ql_state::ipc_port2_w(uint8_t data)
 {
 	/*
 
@@ -458,7 +458,7 @@ READ_LINE_MEMBER( ql_state::ipc_t1_r )
 //  ipc_bus_r -
 //-------------------------------------------------
 
-READ8_MEMBER( ql_state::ipc_bus_r )
+uint8_t ql_state::ipc_bus_r()
 {
 	/*
 

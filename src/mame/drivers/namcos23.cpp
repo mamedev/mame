@@ -1458,52 +1458,52 @@ private:
 	void update_main_interrupts(uint32_t cause);
 	void update_mixer();
 
-	DECLARE_WRITE32_MEMBER(textram_w);
-	DECLARE_WRITE32_MEMBER(textchar_w);
-	DECLARE_WRITE32_MEMBER(paletteram_w);
-	DECLARE_READ16_MEMBER(c417_r);
-	DECLARE_WRITE16_MEMBER(c417_w);
-	DECLARE_READ16_MEMBER(c412_ram_r);
-	DECLARE_WRITE16_MEMBER(c412_ram_w);
-	DECLARE_READ16_MEMBER(c412_r);
-	DECLARE_WRITE16_MEMBER(c412_w);
-	DECLARE_READ16_MEMBER(c421_ram_r);
-	DECLARE_WRITE16_MEMBER(c421_ram_w);
-	DECLARE_READ16_MEMBER(c421_r);
-	DECLARE_WRITE16_MEMBER(c421_w);
-	DECLARE_WRITE16_MEMBER(ctl_w);
-	DECLARE_READ16_MEMBER(ctl_r);
-	DECLARE_WRITE16_MEMBER(c361_w);
-	DECLARE_READ16_MEMBER(c361_r);
-	DECLARE_READ16_MEMBER(c422_r);
-	DECLARE_WRITE16_MEMBER(c422_w);
-	DECLARE_WRITE16_MEMBER(mcuen_w);
-	DECLARE_READ16_MEMBER(sub_comm_r);
-	DECLARE_WRITE16_MEMBER(sub_comm_w);
-	DECLARE_READ32_MEMBER(c435_r);
-	DECLARE_WRITE32_MEMBER(c435_w);
-	DECLARE_READ32_MEMBER(gmen_trigger_sh2);
-	DECLARE_READ32_MEMBER(sh2_shared_r);
-	DECLARE_WRITE32_MEMBER(sh2_shared_w);
-	DECLARE_WRITE16_MEMBER(sharedram_sub_w);
-	DECLARE_READ16_MEMBER(sharedram_sub_r);
-	DECLARE_WRITE16_MEMBER(sub_interrupt_main_w);
-	DECLARE_READ16_MEMBER(mcu_p8_r);
-	DECLARE_WRITE16_MEMBER(mcu_p8_w);
-	DECLARE_READ16_MEMBER(mcu_pa_r);
-	DECLARE_WRITE16_MEMBER(mcu_pa_w);
-	DECLARE_READ16_MEMBER(mcu_pb_r);
-	DECLARE_WRITE16_MEMBER(mcu_pb_w);
-	DECLARE_READ16_MEMBER(mcu_p6_r);
-	DECLARE_WRITE16_MEMBER(mcu_p6_w);
-	DECLARE_READ16_MEMBER(iob_p4_r);
-	DECLARE_WRITE16_MEMBER(iob_p4_w);
-	DECLARE_READ16_MEMBER(iob_p6_r);
-	DECLARE_WRITE16_MEMBER(iob_p6_w);
-	DECLARE_READ8_MEMBER(iob_gun_r);
-	DECLARE_READ16_MEMBER(iob_analog_r);
-	DECLARE_WRITE16_MEMBER(c435_state_pio_w);
-	DECLARE_WRITE16_MEMBER(c435_state_reset_w);
+	void textram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void textchar_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void paletteram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint16_t c417_r(offs_t offset, uint16_t mem_mask = ~0);
+	void c417_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t c412_ram_r(offs_t offset);
+	void c412_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t c412_r(offs_t offset, uint16_t mem_mask = ~0);
+	void c412_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t c421_ram_r(offs_t offset);
+	void c421_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t c421_r(offs_t offset, uint16_t mem_mask = ~0);
+	void c421_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void ctl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t ctl_r(offs_t offset, uint16_t mem_mask = ~0);
+	void c361_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t c361_r(offs_t offset, uint16_t mem_mask = ~0);
+	uint16_t c422_r(offs_t offset);
+	void c422_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void mcuen_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t sub_comm_r(offs_t offset);
+	void sub_comm_w(offs_t offset, uint16_t data);
+	uint32_t c435_r(offs_t offset, uint32_t mem_mask = ~0);
+	void c435_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t gmen_trigger_sh2();
+	uint32_t sh2_shared_r(offs_t offset);
+	void sh2_shared_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void sharedram_sub_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t sharedram_sub_r(offs_t offset);
+	void sub_interrupt_main_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t mcu_p8_r();
+	void mcu_p8_w(uint16_t data);
+	uint16_t mcu_pa_r();
+	void mcu_pa_w(uint16_t data);
+	uint16_t mcu_pb_r();
+	void mcu_pb_w(uint16_t data);
+	uint16_t mcu_p6_r();
+	void mcu_p6_w(uint16_t data);
+	uint16_t iob_p4_r();
+	void iob_p4_w(uint16_t data);
+	uint16_t iob_p6_r();
+	void iob_p6_w(uint16_t data);
+	uint8_t iob_gun_r(offs_t offset);
+	uint16_t iob_analog_r(offs_t offset);
+	void c435_state_pio_w(uint16_t data);
+	void c435_state_reset_w(uint16_t data);
 
 	TILE_GET_INFO_MEMBER(TextTilemapGetInfo);
 	DECLARE_VIDEO_START(s23);
@@ -1764,12 +1764,12 @@ void namcos23_state::c435_state_set(uint16_t type, const uint16_t *param)
 	}
 }
 
-WRITE16_MEMBER(namcos23_state::c435_state_reset_w)
+void namcos23_state::c435_state_reset_w(uint16_t data)
 {
 	m_c435_buffer_pos = 0;
 }
 
-WRITE16_MEMBER(namcos23_state::c435_state_pio_w)
+void namcos23_state::c435_state_pio_w(uint16_t data)
 {
 	m_c435_buffer[m_c435_buffer_pos++] = data;
 	int psize = c435_get_state_entry_size(m_c435_buffer[0]);
@@ -2019,7 +2019,7 @@ void namcos23_state::c435_dma(address_space &space, uint32_t adr, uint32_t size)
 		c435_pio_w(space.read_word(adr+pos));
 }
 
-READ32_MEMBER(namcos23_state::c435_r)
+uint32_t namcos23_state::c435_r(offs_t offset, uint32_t mem_mask)
 {
 	switch(offset) {
 	case 0xa:
@@ -2030,7 +2030,7 @@ READ32_MEMBER(namcos23_state::c435_r)
 	return 0;
 }
 
-WRITE32_MEMBER(namcos23_state::c435_w)
+void namcos23_state::c435_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch(offset) {
 	case 0x7:
@@ -2060,16 +2060,16 @@ void namcos23_renderer::render_scanline(int32_t scanline, const extent_t& extent
 	float u = extent.param[1].start;
 	float v = extent.param[2].start;
 	float l = extent.param[3].start;
-	float dw = extent.param[0].dpdx;
-	float du = extent.param[1].dpdx;
-	float dv = extent.param[2].dpdx;
-	float dl = extent.param[3].dpdx;
+	const float dw = extent.param[0].dpdx;
+	const float du = extent.param[1].dpdx;
+	const float dv = extent.param[2].dpdx;
+	const float dl = extent.param[3].dpdx;
 
-	uint32_t *img = &object.bitmap->pix32(scanline, extent.startx);
+	uint32_t *img = &object.bitmap->pix(scanline, extent.startx);
 
 	for(int x = extent.startx; x < extent.stopx; x++) {
-		float z = w ? 1/w : 0;
-		uint32_t pcol = rd.texture_lookup(*rd.machine, rd.pens, u*z, v*z);
+		const float z = w ? 1/w : 0;
+		const uint32_t pcol = rd.texture_lookup(*rd.machine, rd.pens, u*z, v*z);
 		float ll = l*z;
 		*img = (light(pcol >> 16, ll) << 16) | (light(pcol >> 8, ll) << 8) | light(pcol, ll);
 
@@ -2365,7 +2365,7 @@ void namcos23_state::update_mixer()
 	m_c404.layer = nthword(m_gammaram, 0x1f) & 0xff;
 }
 
-WRITE32_MEMBER(namcos23_state::paletteram_w)
+void namcos23_state::paletteram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 
@@ -2394,14 +2394,14 @@ TILE_GET_INFO_MEMBER(namcos23_state::TextTilemapGetInfo)
 	tileinfo.set(0, data&0x03ff, data>>12, TILE_FLIPYX((data&0x0c00)>>10));
 }
 
-WRITE32_MEMBER(namcos23_state::textram_w)
+void namcos23_state::textram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA( &m_textram[offset] );
 	m_bgtilemap->mark_tile_dirty(offset*2);
 	m_bgtilemap->mark_tile_dirty((offset*2)+1);
 }
 
-WRITE32_MEMBER(namcos23_state::textchar_w)
+void namcos23_state::textchar_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_charram[offset]);
 	m_gfxdecode->gfx(0)->mark_dirty(offset/32);
@@ -2499,7 +2499,7 @@ WRITE_LINE_MEMBER(namcos23_state::sub_irq)
 
 // C417
 
-READ16_MEMBER(namcos23_state::c417_r)
+uint16_t namcos23_state::c417_r(offs_t offset, uint16_t mem_mask)
 {
 	switch(offset) {
 	/* According to timecrs2v4a, +0 is the status word with bits being:
@@ -2538,7 +2538,7 @@ READ16_MEMBER(namcos23_state::c417_r)
 	return 0;
 }
 
-WRITE16_MEMBER(namcos23_state::c417_w)
+void namcos23_state::c417_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset) {
 	case 0:
@@ -2571,7 +2571,7 @@ WRITE16_MEMBER(namcos23_state::c417_w)
 
 // C412
 
-READ16_MEMBER(namcos23_state::c412_ram_r)
+uint16_t namcos23_state::c412_ram_r(offs_t offset)
 {
 	//  logerror("c412_ram_r %06x (%08x, %08x)\n", offset, m_maincpu->pc(), (unsigned int)m_maincpu->state_int(MIPS3_R31));
 	if(offset < 0x100000)
@@ -2586,7 +2586,7 @@ READ16_MEMBER(namcos23_state::c412_ram_r)
 	return 0xffff;
 }
 
-WRITE16_MEMBER(namcos23_state::c412_ram_w)
+void namcos23_state::c412_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//  logerror("c412_ram_w %06x = %04x (%08x, %08x)\n", offset, data, m_maincpu->pc(), (unsigned int)m_maincpu->state_int(MIPS3_R31));
 	if(offset < 0x100000)
@@ -2599,7 +2599,7 @@ WRITE16_MEMBER(namcos23_state::c412_ram_w)
 		COMBINE_DATA(m_c412.pczram  + (offset & 0x001ff));
 }
 
-READ16_MEMBER(namcos23_state::c412_r)
+uint16_t namcos23_state::c412_r(offs_t offset, uint16_t mem_mask)
 {
 	switch(offset) {
 	case 0x3:
@@ -2609,7 +2609,7 @@ READ16_MEMBER(namcos23_state::c412_r)
 	case 0x9:
 		return m_c412.adr >> 16;
 	case 0xa:
-		return c412_ram_r(space, m_c412.adr, mem_mask);
+		return c412_ram_r(m_c412.adr);
 	case 0xc:
 		// unknown status, 500gp reads it and waits for a transition
 		// no other games use it?
@@ -2621,7 +2621,7 @@ READ16_MEMBER(namcos23_state::c412_r)
 	return 0;
 }
 
-WRITE16_MEMBER(namcos23_state::c412_w)
+void namcos23_state::c412_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset) {
 	case 0x2:
@@ -2635,7 +2635,7 @@ WRITE16_MEMBER(namcos23_state::c412_w)
 		m_c412.adr = ((data & mem_mask) << 16) | (m_c412.adr & (0xffffffff ^ (mem_mask << 16)));
 		break;
 	case 0xa:
-		c412_ram_w(space, m_c412.adr, data, mem_mask);
+		c412_ram_w(m_c412.adr, data, mem_mask);
 		m_c412.adr += 2;
 		break;
 	default:
@@ -2648,7 +2648,7 @@ WRITE16_MEMBER(namcos23_state::c412_w)
 
 // C421
 
-READ16_MEMBER(namcos23_state::c421_ram_r)
+uint16_t namcos23_state::c421_ram_r(offs_t offset)
 {
 	//  logerror("c421_ram_r %06x (%08x, %08x)\n", offset, m_maincpu->pc(), (unsigned int)m_maincpu->state_int(MIPS3_R31));
 	if(offset < 0x40000)
@@ -2661,7 +2661,7 @@ READ16_MEMBER(namcos23_state::c421_ram_r)
 	return 0xffff;
 }
 
-WRITE16_MEMBER(namcos23_state::c421_ram_w)
+void namcos23_state::c421_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//  logerror("c421_ram_w %06x = %04x (%08x, %08x)\n", offset, data, m_maincpu->pc(), (unsigned int)m_maincpu->state_int(MIPS3_R31));
 	if(offset < 0x40000)
@@ -2672,11 +2672,11 @@ WRITE16_MEMBER(namcos23_state::c421_ram_w)
 		COMBINE_DATA(m_c421.sram   + (offset & 0x07fff));
 }
 
-READ16_MEMBER(namcos23_state::c421_r)
+uint16_t namcos23_state::c421_r(offs_t offset, uint16_t mem_mask)
 {
 	switch(offset) {
 	case 0:
-		return c421_ram_r(space, m_c421.adr & 0xfffff, mem_mask);
+		return c421_ram_r(m_c421.adr & 0xfffff);
 
 	case 2:
 		return m_c421.adr >> 16;
@@ -2688,11 +2688,11 @@ READ16_MEMBER(namcos23_state::c421_r)
 	return 0;
 }
 
-WRITE16_MEMBER(namcos23_state::c421_w)
+void namcos23_state::c421_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset) {
 	case 0:
-		c421_ram_w(space, m_c421.adr & 0xfffff, data, mem_mask);
+		c421_ram_w(m_c421.adr & 0xfffff, data, mem_mask);
 		m_c421.adr += 2;
 		break;
 	case 2:
@@ -2711,12 +2711,12 @@ WRITE16_MEMBER(namcos23_state::c421_w)
 
 // C422
 
-READ16_MEMBER(namcos23_state::c422_r)
+uint16_t namcos23_state::c422_r(offs_t offset)
 {
 	return m_c422.regs[offset];
 }
 
-WRITE16_MEMBER(namcos23_state::c422_w)
+void namcos23_state::c422_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset) {
 	case 1:
@@ -2756,7 +2756,7 @@ TIMER_CALLBACK_MEMBER(namcos23_state::c361_timer_cb)
 		update_main_interrupts(m_main_irqcause & ~MAIN_C361_IRQ);
 }
 
-WRITE16_MEMBER(namcos23_state::c361_w)
+void namcos23_state::c361_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset) {
 	case 0:
@@ -2778,7 +2778,7 @@ WRITE16_MEMBER(namcos23_state::c361_w)
 	}
 }
 
-READ16_MEMBER(namcos23_state::c361_r)
+uint16_t namcos23_state::c361_r(offs_t offset, uint16_t mem_mask)
 {
 	switch(offset) {
 	// current raster position
@@ -2799,7 +2799,7 @@ READ16_MEMBER(namcos23_state::c361_r)
 
 // C?? (control)
 
-WRITE16_MEMBER(namcos23_state::ctl_w)
+void namcos23_state::ctl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset) {
 	case 0:
@@ -2832,7 +2832,7 @@ WRITE16_MEMBER(namcos23_state::ctl_w)
 	}
 }
 
-READ16_MEMBER(namcos23_state::ctl_r)
+uint16_t namcos23_state::ctl_r(offs_t offset, uint16_t mem_mask)
 {
 	switch(offset) {
 	// 0100 set freezes gorgon (polygon fifo flag)
@@ -2853,7 +2853,7 @@ READ16_MEMBER(namcos23_state::ctl_r)
 
 // C?? (MCU enable)
 
-WRITE16_MEMBER(namcos23_state::mcuen_w)
+void namcos23_state::mcuen_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset) {
 	case 2:
@@ -2893,7 +2893,7 @@ WRITE16_MEMBER(namcos23_state::mcuen_w)
 
 // while getting the subcpu to be ready, panicprk sits in a tight loop waiting for this AND 0002 to be non-zero (at PC=BFC02F00)
 // timecrs2 locks up in a similar way as panicprk, at the beginning of the 2nd level, by reading/writing to this register a couple of times
-READ16_MEMBER(namcos23_state::sub_comm_r)
+uint16_t namcos23_state::sub_comm_r(offs_t offset)
 {
 	// status register
 	if (offset == 0)
@@ -2912,7 +2912,7 @@ READ16_MEMBER(namcos23_state::sub_comm_r)
 	return m_mcu_unk; //machine().rand();
 }
 
-WRITE16_MEMBER(namcos23_state::sub_comm_w)
+void namcos23_state::sub_comm_w(offs_t offset, uint16_t data)
 {
 	if (offset == 1)
 	{
@@ -2981,7 +2981,7 @@ void namcos23_state::s23_map(address_map &map)
 
 // GMEN interface
 
-READ32_MEMBER(namcos23_state::gmen_trigger_sh2)
+uint32_t namcos23_state::gmen_trigger_sh2()
 {
 	logerror("gmen_trigger_sh2: booting SH-2\n");
 	m_gmen_sh2->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
@@ -2989,12 +2989,12 @@ READ32_MEMBER(namcos23_state::gmen_trigger_sh2)
 	return 0;
 }
 
-READ32_MEMBER(namcos23_state::sh2_shared_r)
+uint32_t namcos23_state::sh2_shared_r(offs_t offset)
 {
 	return m_gmen_sh2_shared[offset];
 }
 
-WRITE32_MEMBER(namcos23_state::sh2_shared_w)
+void namcos23_state::sh2_shared_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_gmen_sh2_shared[offset]);
 }
@@ -3029,7 +3029,7 @@ void namcos23_state::gmen_sh2_map(address_map &map)
 
 ***************************************************************************/
 
-WRITE16_MEMBER(namcos23_state::sharedram_sub_w)
+void namcos23_state::sharedram_sub_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t *shared16 = reinterpret_cast<uint16_t *>(m_shared_ram.target());
 
@@ -3043,7 +3043,7 @@ WRITE16_MEMBER(namcos23_state::sharedram_sub_w)
 	COMBINE_DATA(&shared16[BYTE_XOR_BE(offset)]);
 }
 
-READ16_MEMBER(namcos23_state::sharedram_sub_r)
+uint16_t namcos23_state::sharedram_sub_r(offs_t offset)
 {
 	uint16_t *shared16 = reinterpret_cast<uint16_t *>(m_shared_ram.target());
 
@@ -3051,7 +3051,7 @@ READ16_MEMBER(namcos23_state::sharedram_sub_r)
 }
 
 
-WRITE16_MEMBER(namcos23_state::sub_interrupt_main_w)
+void namcos23_state::sub_interrupt_main_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if((mem_mask == 0xffff) && (data == 0x3170)) {
 		update_main_interrupts(m_main_irqcause | MAIN_SUBCPU_IRQ);
@@ -3064,13 +3064,13 @@ WRITE16_MEMBER(namcos23_state::sub_interrupt_main_w)
 
 // Port 6
 
-READ16_MEMBER(namcos23_state::mcu_p6_r)
+uint16_t namcos23_state::mcu_p6_r()
 {
 	// bit 1 = JVS cable present sense (1 = I/O board plugged in)
 	return (m_jvssense << 1) | 0xfd;
 }
 
-WRITE16_MEMBER(namcos23_state::mcu_p6_w)
+void namcos23_state::mcu_p6_w(uint16_t data)
 {
 	//printf("%02x to port 6\n", data);
 }
@@ -3079,12 +3079,12 @@ WRITE16_MEMBER(namcos23_state::mcu_p6_w)
 
 // Port 8, looks like serial comms, where to/from?
 
-READ16_MEMBER(namcos23_state::mcu_p8_r)
+uint16_t namcos23_state::mcu_p8_r()
 {
 	return 0x02;
 }
 
-WRITE16_MEMBER(namcos23_state::mcu_p8_w)
+void namcos23_state::mcu_p8_w(uint16_t data)
 {
 	;
 }
@@ -3093,12 +3093,12 @@ WRITE16_MEMBER(namcos23_state::mcu_p8_w)
 
 // Port A
 
-READ16_MEMBER(namcos23_state::mcu_pa_r)
+uint16_t namcos23_state::mcu_pa_r()
 {
 	return m_sub_porta;
 }
 
-WRITE16_MEMBER(namcos23_state::mcu_pa_w)
+void namcos23_state::mcu_pa_w(uint16_t data)
 {
 	m_rtc->ce_w(data & 1);
 	m_sub_porta = data;
@@ -3110,12 +3110,12 @@ WRITE16_MEMBER(namcos23_state::mcu_pa_w)
 
 // Port B
 
-READ16_MEMBER(namcos23_state::mcu_pb_r)
+uint16_t namcos23_state::mcu_pb_r()
 {
 	return m_sub_portb;
 }
 
-WRITE16_MEMBER(namcos23_state::mcu_pb_w)
+void namcos23_state::mcu_pb_w(uint16_t data)
 {
 	m_sub_portb = (m_sub_portb & 0xc0) | (data & 0x3f);
 	m_rtc->ce_w((m_sub_portb & 0x20) && (m_sub_porta & 1));
@@ -3159,12 +3159,12 @@ void namcos23_state::s23h8iomap(address_map &map)
 
 // Port 4
 
-READ16_MEMBER(namcos23_state::iob_p4_r)
+uint16_t namcos23_state::iob_p4_r()
 {
 	return m_tssio_port_4;
 }
 
-WRITE16_MEMBER(namcos23_state::iob_p4_w)
+void namcos23_state::iob_p4_w(uint16_t data)
 {
 	m_tssio_port_4 = data;
 
@@ -3176,7 +3176,7 @@ WRITE16_MEMBER(namcos23_state::iob_p4_w)
 
 // Port 6
 
-READ16_MEMBER(namcos23_state::iob_p6_r)
+uint16_t namcos23_state::iob_p6_r()
 {
 	// d4 is service button
 	uint8_t sb = (ioport("SERVICE")->read() & 1) << 4;
@@ -3185,7 +3185,7 @@ READ16_MEMBER(namcos23_state::iob_p6_r)
 	return sb | 0;
 }
 
-WRITE16_MEMBER(namcos23_state::iob_p6_w)
+void namcos23_state::iob_p6_w(uint16_t data)
 {
 	//printf("iob %02x to port 6\n", data);
 }
@@ -3193,7 +3193,7 @@ WRITE16_MEMBER(namcos23_state::iob_p6_w)
 
 // Analog Ports
 
-READ16_MEMBER(namcos23_state::iob_analog_r)
+uint16_t namcos23_state::iob_analog_r(offs_t offset)
 {
 	return m_adc_ports[offset].read_safe(0);
 }
@@ -3222,7 +3222,7 @@ void namcos23_state::s23iobrdiomap(address_map &map)
 
 // Time Crisis lightgun
 
-READ8_MEMBER(namcos23_state::iob_gun_r)
+uint8_t namcos23_state::iob_gun_r(offs_t offset)
 {
 	uint16_t xpos = m_lightx->read();
 	uint16_t ypos = m_lighty->read();
@@ -3551,6 +3551,7 @@ void namcos23_state::init_s23()
 	if((!strcmp(machine().system().name, "motoxgo")) ||
 		(!strcmp(machine().system().name, "panicprk")) ||
 		(!strcmp(machine().system().name, "panicprkj")) ||
+		(!strcmp(machine().system().name, "panicprkj2")) ||
 		(!strcmp(machine().system().name, "rapidrvr")) ||
 		(!strcmp(machine().system().name, "rapidrvrv2c")) ||
 		(!strcmp(machine().system().name, "rapidrvrp")) ||
@@ -3832,7 +3833,9 @@ void namcos23_state::ss23e2(machine_config &config)
 	m_subcpu->subdevice<h8_sci_device>("sci0")->tx_handler().set("iocpu:sci0", FUNC(h8_sci_device::rx_w));
 }
 
-
+// a note about "user1" ROMs:
+// serial number data is at offset 0x201 (interleaved) and it's the only difference between sets marked as 'set 1' and 'set 2'
+// TODO: verify if it's better to just keep one set and note the alternate serial numbers
 
 ROM_START( rapidrvr )
 	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* 4 megs for main R4650 code */
@@ -4853,6 +4856,53 @@ ROM_START( panicprkj )
 ROM_END
 
 
+ROM_START( panicprkj2 )
+	ROM_REGION32_BE( 0x400000, "user1", 0 ) // 4 megs for main R4650 code
+	ROM_LOAD16_BYTE( "pnp1verb.ic2", 0x000000, 0x200000, CRC(59748d7d) SHA1(f7677ec9027439a7352c88494873861e78ae9a41) )
+	ROM_LOAD16_BYTE( "pnp1verb.ic1", 0x000001, 0x200000, CRC(718ff346) SHA1(0f631fe32e864623455d9bc39cdfa80b34c6dbb0) )
+
+	ROM_REGION( 0x80000, "subcpu", 0 )  // Hitachi H8/3002 MCU code
+	ROM_LOAD16_WORD_SWAP( "pnp1vera.ic3", 0x000000, 0x080000, CRC(fe4bc6f4) SHA1(2114dc4bc63d589e6c3b26a73dbc60924f3b1765) )
+
+	ROM_REGION( 0x40000, "iocpu", 0 )   // I/O board HD643334 H8/3334 MCU code
+	ROM_LOAD( "asca-3a.ic14", 0x000000, 0x040000, CRC(8e9266e5) SHA1(ffa8782ca641d71d57df23ed1c5911db05d3df97) )
+
+	ROM_REGION32_BE( 0x2000000, "data", 0 )
+	ROM_LOAD16_BYTE( "pnp1mtah.2j",  0x000000, 0x800000, CRC(37addddd) SHA1(3032989653304417df80606bc3fde6e9425d8cbb) )
+	ROM_LOAD16_BYTE( "pnp1mtal.2h",  0x000001, 0x800000, CRC(6490faaa) SHA1(03443746009b434e5d4074ea6314910418907360) )
+
+	ROM_REGION( 0x2000000, "textile", 0 )
+	ROM_LOAD( "pnp1cgll.4m",  0x0000000, 0x800000, CRC(d03932cf) SHA1(49240e44923cc6e815e9457b6290fd18466658af) )
+	ROM_LOAD( "pnp1cglm.5k",  0x0800000, 0x800000, CRC(abf4ccf2) SHA1(3848e26d0ba6c872bbc6d5e0eb23a9d4b34152d5) )
+	ROM_LOAD( "pnp1cgum.4j",  0x1000000, 0x800000, CRC(206217ca) SHA1(9c095bba7764f3405c3fab10513b9b78981ec44d) )
+	ROM_LOAD( "pnp1cguu.5f",  0x1800000, 0x800000, CRC(cd64f57f) SHA1(8780270298e0823db1acbbf79396788df0c3c19c) )
+
+	ROM_REGION16_LE( 0x200000, "textilemapl", 0 )
+	ROM_LOAD( "pnp1ccrl.7f",  0x000000, 0x200000, CRC(b7bc43c2) SHA1(f4b470540194486ca6822f438fc1d4700cfb2ab1) )
+
+	ROM_REGION( 0x200000, "textilemaph", 0 )
+	ROM_LOAD( "pnp1ccrh.7e",  0x000000, 0x200000, CRC(caaf1b73) SHA1(b436992817ab4e4dad05e7429eb102d4fb57fa6a) )
+
+	ROM_REGION32_BE( 0x2000000, "pointrom", 0 )
+	ROM_LOAD32_WORD_SWAP( "pnp1pt0h.7a",  0x000000, 0x400000, CRC(43fc2246) SHA1(301d321cd4a01ebd7ccfa6f295d6c3daf0a19efe) )
+	ROM_LOAD32_WORD_SWAP( "pnp1pt0l.7c",  0x000002, 0x400000, CRC(26af5fa1) SHA1(12fcf98c2a59643e0fdfdd7186f9f16baf54a9cf) )
+	ROM_LOAD32_WORD_SWAP( "pnp1pt1h.5a",  0x800000, 0x400000, CRC(1ff470c0) SHA1(ca8fad90743589744939d681b0ce94f368337b3f) )
+	ROM_LOAD32_WORD_SWAP( "pnp1pt1l.5c",  0x800002, 0x400000, CRC(15c6f236) SHA1(e8c393359a91cdce6e9110a48c0a80708f8fc132) )
+
+	ROM_REGION( 0x1000000, "c352", 0 )
+	ROM_LOAD( "pnp1wavel.2c", 0x000000, 0x800000, CRC(35c6a9bd) SHA1(4b56fdc37525c15e57d93091e6609d6a6905fc5c) )
+	ROM_LOAD( "pnp1waveh.2a", 0x800000, 0x800000, CRC(6fa1826a) SHA1(20a5af49e65ae2bc57c016b5cd9bafa5a5220d35) )
+
+	ROM_REGION( 0x800000, "dups", 0 )   // duplicate ROMs
+	ROM_LOAD( "pnp1cguu.4f",  0x000000, 0x800000, CRC(cd64f57f) SHA1(8780270298e0823db1acbbf79396788df0c3c19c) )
+	ROM_LOAD( "pnp1cgum.5j",  0x000000, 0x800000, CRC(206217ca) SHA1(9c095bba7764f3405c3fab10513b9b78981ec44d) )
+	ROM_LOAD( "pnp1cgll.5m",  0x000000, 0x800000, CRC(d03932cf) SHA1(49240e44923cc6e815e9457b6290fd18466658af) )
+	ROM_LOAD( "pnp1cglm.4k",  0x000000, 0x800000, CRC(abf4ccf2) SHA1(3848e26d0ba6c872bbc6d5e0eb23a9d4b34152d5) )
+	ROM_LOAD( "pnp1ccrl.7m",  0x000000, 0x200000, CRC(b7bc43c2) SHA1(f4b470540194486ca6822f438fc1d4700cfb2ab1) )
+	ROM_LOAD( "pnp1ccrh.7k",  0x000000, 0x200000, CRC(caaf1b73) SHA1(b436992817ab4e4dad05e7429eb102d4fb57fa6a) )
+ROM_END
+
+
 ROM_START( gunwars )
 	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* 4 megs for main R4650 code */
 	ROM_LOAD16_BYTE( "gm1verb.ic2",  0x000000, 0x200000, CRC(401f8264) SHA1(281f245ae0fbc2b82248c7aacaa5dfcdb114e2ee) )
@@ -5330,8 +5380,9 @@ GAME( 1997, timecrs2v2b, timecrs2, timecrs2,    timecrs2,  namcos23_state, init_
 GAME( 1997, timecrs2v1b, timecrs2, timecrs2,    timecrs2,  namcos23_state, init_s23, ROT0, "Namco", "Time Crisis II (Japan, TSS1 Ver. B)", GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1997, timecrs2v4a, timecrs2, timecrs2v4a, timecrs2,  namcos23_state, init_s23, ROT0, "Namco", "Time Crisis II (World, TSS4 Ver. A)", GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1997, timecrs2v5a, timecrs2, timecrs2v4a, timecrs2,  namcos23_state, init_s23, ROT0, "Namco", "Time Crisis II (US, TSS5 Ver. A)", GAME_FLAGS | MACHINE_NODEVICE_LAN )
-GAME( 1997, panicprk,    0,        s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Panic Park (World, PNP2 Ver. A)",     GAME_FLAGS )
-GAME( 1997, panicprkj,   panicprk, s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Panic Park (Japan, PNP1 Ver. B)",     GAME_FLAGS )
+GAME( 1997, panicprk,    0,        s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Panic Park (World, PNP2 Ver. A)",            GAME_FLAGS )
+GAME( 1997, panicprkj,   panicprk, s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Panic Park (Japan, PNP1 Ver. B, set 1)",     GAME_FLAGS )
+GAME( 1997, panicprkj2,  panicprk, s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Panic Park (Japan, PNP1 Ver. B, set 2)",     GAME_FLAGS )
 GAME( 1998, gunwars,     0,        gmen,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Gunmen Wars (Japan, GM1 Ver. B)",     GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1998, gunwarsa,    gunwars,  gmen,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Gunmen Wars (Japan, GM1 Ver. A)",     GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1998, raceon,      0,        gmen,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Race On! (World, RO2 Ver. A)",        GAME_FLAGS | MACHINE_NODEVICE_LAN )

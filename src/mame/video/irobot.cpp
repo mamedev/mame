@@ -59,7 +59,7 @@ void irobot_state::irobot_palette(palette_device &palette) const
 }
 
 
-WRITE8_MEMBER(irobot_state::irobot_paletteram_w)
+void irobot_state::irobot_paletteram_w(offs_t offset, uint8_t data)
 {
 	int r,g,b;
 	int bits,intensity;

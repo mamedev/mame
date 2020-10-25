@@ -5,12 +5,14 @@
 
 #pragma once
 
+#include "dirom.h"
+
 // #define SEGA315_DUMP_DEBUG // dump stuff to files to help with decryption efforts
 
 DECLARE_DEVICE_TYPE(SEGA315_5838_COMP, sega_315_5838_comp_device)
 
 class sega_315_5838_comp_device :  public device_t,
-								   public device_rom_interface
+								   public device_rom_interface<23>
 {
 public:
 	// construction/destruction

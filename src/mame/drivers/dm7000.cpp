@@ -57,31 +57,31 @@ static inline void ATTR_PRINTF(3,4) verboselog( device_t &device, int n_level, c
 	}
 }
 
-READ8_MEMBER( dm7000_state::dm7000_iic0_r )
+uint8_t dm7000_state::dm7000_iic0_r(offs_t offset)
 {
 	uint8_t data = 0; // dummy
 	verboselog(*this, 9, "(IIC0) %08X -> %08X\n", 0x40030000 + offset, data);
 	return data;
 }
 
-WRITE8_MEMBER( dm7000_state::dm7000_iic0_w )
+void dm7000_state::dm7000_iic0_w(offs_t offset, uint8_t data)
 {
 	verboselog(*this, 9, "(IIC0) %08X <- %08X\n", 0x40030000 + offset, data);
 }
 
-READ8_MEMBER( dm7000_state::dm7000_iic1_r )
+uint8_t dm7000_state::dm7000_iic1_r(offs_t offset)
 {
 	uint8_t data = 0; // dummy
 	verboselog(*this, 9, "(IIC1) %08X -> %08X\n", 0x400b0000 + offset, data);
 	return data;
 }
 
-WRITE8_MEMBER( dm7000_state::dm7000_iic1_w )
+void dm7000_state::dm7000_iic1_w(offs_t offset, uint8_t data)
 {
 	verboselog(*this, 9, "(IIC1) %08X <- %08X\n", 0x400b0000 + offset, data);
 }
 
-READ8_MEMBER( dm7000_state::dm7000_scc0_r )
+uint8_t dm7000_state::dm7000_scc0_r(offs_t offset)
 {
 	uint8_t data = 0;
 	switch(offset) {
@@ -102,7 +102,7 @@ READ8_MEMBER( dm7000_state::dm7000_scc0_r )
 	return data;
 }
 
-WRITE8_MEMBER( dm7000_state::dm7000_scc0_w )
+void dm7000_state::dm7000_scc0_w(offs_t offset, uint8_t data)
 {
 	switch(offset) {
 		case UART_THR:
@@ -118,19 +118,19 @@ WRITE8_MEMBER( dm7000_state::dm7000_scc0_w )
 	verboselog(*this, 9, "(SCC0) %08X <- %08X\n", 0x40040000 + offset, data);
 }
 
-READ8_MEMBER( dm7000_state::dm7000_gpio0_r )
+uint8_t dm7000_state::dm7000_gpio0_r(offs_t offset)
 {
 	uint8_t data = 0; // dummy
 	verboselog(*this, 9, "(GPIO0) %08X -> %08X\n", 0x40060000 + offset, data);
 	return data;
 }
 
-WRITE8_MEMBER( dm7000_state::dm7000_gpio0_w )
+void dm7000_state::dm7000_gpio0_w(offs_t offset, uint8_t data)
 {
 	verboselog(*this, 9, "(GPIO0) %08X <- %08X\n", 0x40060000 + offset, data);
 }
 
-READ8_MEMBER( dm7000_state::dm7000_scp0_r )
+uint8_t dm7000_state::dm7000_scp0_r(offs_t offset)
 {
 	uint8_t data = 0; // dummy
 	switch(offset) {
@@ -142,7 +142,7 @@ READ8_MEMBER( dm7000_state::dm7000_scp0_r )
 	return data;
 }
 
-WRITE8_MEMBER( dm7000_state::dm7000_scp0_w )
+void dm7000_state::dm7000_scp0_w(offs_t offset, uint8_t data)
 {
 	verboselog(*this, 9, "(SCP0) %08X <- %08X\n", 0x400c0000 + offset, data);
 	switch(offset) {
@@ -152,7 +152,7 @@ WRITE8_MEMBER( dm7000_state::dm7000_scp0_w )
 	}
 }
 
-READ16_MEMBER( dm7000_state::dm7000_enet_r )
+uint16_t dm7000_state::dm7000_enet_r(offs_t offset)
 {
 	uint16_t data;
 	switch (offset) {
@@ -173,7 +173,7 @@ READ16_MEMBER( dm7000_state::dm7000_enet_r )
 	return data;
 }
 
-WRITE16_MEMBER( dm7000_state::dm7000_enet_w )
+void dm7000_state::dm7000_enet_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	verboselog(*this, 9, "(ENET) %08X <- %08X\n", 0x72000600 + (offset), data);
 	COMBINE_DATA(&m_enet_regs[offset]);
@@ -261,8 +261,8 @@ void dm7000_state::machine_reset()
 	dcr[DCRSTB045_FRAME_BUFR_BASE] = 0x0f000000;
 	m_scc0_lsr = UART_LSR_THRE | UART_LSR_TEMT;
 
-	m_maincpu->ppc4xx_set_dcr_read_handler(read32_delegate(*this, FUNC(dm7000_state::dcr_r)));
-	m_maincpu->ppc4xx_set_dcr_write_handler(write32_delegate(*this, FUNC(dm7000_state::dcr_w)));
+	m_maincpu->ppc4xx_set_dcr_read_handler(read32sm_delegate(*this, FUNC(dm7000_state::dcr_r)));
+	m_maincpu->ppc4xx_set_dcr_write_handler(write32sm_delegate(*this, FUNC(dm7000_state::dcr_w)));
 }
 
 void dm7000_state::video_start()
@@ -274,7 +274,7 @@ uint32_t dm7000_state::screen_update_dm7000(screen_device &screen, bitmap_rgb32 
 	return 0;
 }
 
-READ32_MEMBER( dm7000_state::dcr_r )
+uint32_t dm7000_state::dcr_r(offs_t offset)
 {
 	osd_printf_debug("DCR %03X read\n", offset);
 	if(offset>=1024) {printf("get %04X\n", offset); return 0;} else
@@ -287,7 +287,7 @@ READ32_MEMBER( dm7000_state::dcr_r )
 
 }
 
-WRITE32_MEMBER( dm7000_state::dcr_w )
+void dm7000_state::dcr_w(offs_t offset, uint32_t data)
 {
 	osd_printf_debug("DCR %03X write = %08X\n", offset, data);
 	if(offset>=1024) {printf("get %04X\n", offset); } else

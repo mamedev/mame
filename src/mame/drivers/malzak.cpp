@@ -79,12 +79,12 @@
 #include <algorithm>
 
 
-READ8_MEMBER(malzak_state::fake_VRLE_r)
+uint8_t malzak_state::fake_VRLE_r()
 {
 	return (m_s2636[0]->read_data(0xcb) & 0x3f) + (m_screen->vblank() ? 0x40 : 0x00);
 }
 
-READ8_MEMBER(malzak_state::s2636_portA_r)
+uint8_t malzak_state::s2636_portA_r()
 {
 	// POT switch position, read from port A of the first S2636
 	// Not sure of the correct values to return, but these should
@@ -147,13 +147,13 @@ void malzak_state::malzak2_map(address_map &map)
 }
 
 
-READ8_MEMBER(malzak_state::s2650_data_r)
+uint8_t malzak_state::s2650_data_r()
 {
 //  popmessage("S2650 data port read");
 	return 0xff;
 }
 
-WRITE8_MEMBER(malzak_state::port40_w)
+void malzak_state::port40_w(uint8_t data)
 {
 //  Bit 0 is constantly set high during gameplay
 //  Bit 4 is set high, then low, upon death
@@ -172,7 +172,7 @@ WRITE8_MEMBER(malzak_state::port40_w)
 	}
 }
 
-READ8_MEMBER(malzak_state::collision_r)
+uint8_t malzak_state::collision_r()
 {
 	// s2636 (0 only?) <-> tilemap collision detection
 	// yyyy ---- y collision

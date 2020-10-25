@@ -65,7 +65,7 @@ public:
 	void horizon2mhz(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(ff_r);
+	uint8_t ff_r();
 
 	void horizon_io(address_map &map);
 	void horizon_mem(address_map &map);
@@ -128,7 +128,7 @@ void horizon_state::machine_reset()
 	m_maincpu->set_pc(0xe800);
 }
 
-READ8_MEMBER( horizon_state::ff_r )
+uint8_t horizon_state::ff_r()
 {
 	return 0xff;
 }

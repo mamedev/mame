@@ -39,26 +39,22 @@ void pc88va_state::video_start()
 
 void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint16_t *tvram = m_tvram;
-	int offs,i;
+	uint16_t const *const tvram = m_tvram;
 
-	offs = m_tsp.spr_offset;
-	for(i=0;i<(0x100);i+=(8))
+	int offs = m_tsp.spr_offset;
+	for(int i=0;i<(0x100);i+=(8))
 	{
-		int xp,yp,sw,md,xsize,ysize,spda,fg_col,bc;
-		int x_i,y_i,x_s;
 		int spr_count;
-		int pen;
 
-		ysize = (tvram[(offs + i + 0) / 2] & 0xfc00) >> 10;
-		sw = (tvram[(offs + i + 0) / 2] & 0x200) >> 9;
-		yp = (tvram[(offs + i + 0) / 2] & 0x1ff);
-		xsize = (tvram[(offs + i + 2) / 2] & 0xf800) >> 11;
-		md = (tvram[(offs + i + 2) / 2] & 0x400) >> 10;
-		xp = (tvram[(offs + i + 2) / 2] & 0x3ff);
-		spda = (tvram[(offs + i + 4) / 2] & 0xffff);
-		fg_col = (tvram[(offs + i + 6) / 2] & 0xf0) >> 4;
-		bc = (tvram[(offs + i + 6) / 2] & 0x08) >> 3;
+		int ysize = (tvram[(offs + i + 0) / 2] & 0xfc00) >> 10;
+		int sw = (tvram[(offs + i + 0) / 2] & 0x200) >> 9;
+		int yp = (tvram[(offs + i + 0) / 2] & 0x1ff);
+		int xsize = (tvram[(offs + i + 2) / 2] & 0xf800) >> 11;
+		int md = (tvram[(offs + i + 2) / 2] & 0x400) >> 10;
+		int xp = (tvram[(offs + i + 2) / 2] & 0x3ff);
+		int spda = (tvram[(offs + i + 4) / 2] & 0xffff);
+		int fg_col = (tvram[(offs + i + 6) / 2] & 0xf0) >> 4;
+		int bc = (tvram[(offs + i + 6) / 2] & 0x08) >> 3;
 
 		if(!sw)
 			continue;
@@ -86,18 +82,18 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 			spr_count = 0;
 
-			for(y_i=0;y_i<ysize;y_i++)
+			for(int y_i=0;y_i<ysize;y_i++)
 			{
-				for(x_i=0;x_i<xsize;x_i+=16)
+				for(int x_i=0;x_i<xsize;x_i+=16)
 				{
-					for(x_s=0;x_s<16;x_s++)
+					for(int x_s=0;x_s<16;x_s++)
 					{
-						pen = (bitswap<16>(tvram[(spda+spr_count) / 2],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8) >> (15-x_s)) & 1;
+						int pen = (bitswap<16>(tvram[(spda+spr_count) / 2],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8) >> (15-x_s)) & 1;
 
 						pen = pen & 1 ? fg_col : (bc) ? 8 : -1;
 
 						if(pen != -1) //transparent pen
-							bitmap.pix32(yp+y_i, xp+x_i+(x_s)) = m_palette->pen(pen);
+							bitmap.pix(yp+y_i, xp+x_i+(x_s)) = m_palette->pen(pen);
 					}
 					spr_count+=2;
 				}
@@ -113,16 +109,16 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 			spr_count = 0;
 
-			for(y_i=0;y_i<ysize;y_i++)
+			for(int y_i=0;y_i<ysize;y_i++)
 			{
-				for(x_i=0;x_i<xsize;x_i+=2)
+				for(int x_i=0;x_i<xsize;x_i+=2)
 				{
-					for(x_s=0;x_s<2;x_s++)
+					for(int x_s=0;x_s<2;x_s++)
 					{
-						pen = (bitswap<16>(tvram[(spda+spr_count) / 2],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8)) >> (16-(x_s*8)) & 0xf;
+						int pen = (bitswap<16>(tvram[(spda+spr_count) / 2],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8)) >> (16-(x_s*8)) & 0xf;
 
 						//if(bc != -1) //transparent pen
-						bitmap.pix32(yp+y_i, xp+x_i+(x_s)) = m_palette->pen(pen);
+						bitmap.pix(yp+y_i, xp+x_i+(x_s)) = m_palette->pen(pen);
 					}
 					spr_count+=2;
 				}
@@ -148,41 +144,31 @@ uint32_t pc88va_state::calc_kanji_rom_addr(uint8_t jis1,uint8_t jis2,int x,int y
 
 void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint16_t *tvram = m_tvram;
+	uint16_t const *const tvram = m_tvram;
 	// TODO: PCG select won't work with this arrangement
-	uint8_t *kanji = memregion("kanji")->base();
-	int xi,yi;
-	int x,y;
-	int res_x,res_y;
-	uint16_t lr_half_gfx;
-	uint8_t jis1,jis2;
-	uint32_t count;
-	uint32_t tile_num;
-	uint16_t attr;
-	uint8_t attr_mode;
-	uint8_t fg_col,bg_col,secret,reverse;
-	//uint8_t blink,dwidc,dwid,uline,hline;
-	uint8_t screen_fg_col,screen_bg_col;
+	uint8_t const *const kanji = memregion("kanji")->base();
 
-	count = tvram[m_tsp.tvram_vreg_offset/2];
+	uint32_t count = tvram[m_tsp.tvram_vreg_offset/2];
 
-	attr_mode = tvram[(m_tsp.tvram_vreg_offset+0xa) / 2] & 0x1f;
+	uint8_t attr_mode = tvram[(m_tsp.tvram_vreg_offset+0xa) / 2] & 0x1f;
 	/* Note: bug in docs has the following two reversed */
-	screen_fg_col = (tvram[(m_tsp.tvram_vreg_offset+0xa) / 2] & 0xf000) >> 12;
-	screen_bg_col = (tvram[(m_tsp.tvram_vreg_offset+0xa) / 2] & 0x0f00) >> 8;
+	uint8_t screen_fg_col = (tvram[(m_tsp.tvram_vreg_offset+0xa) / 2] & 0xf000) >> 12;
+	uint8_t screen_bg_col = (tvram[(m_tsp.tvram_vreg_offset+0xa) / 2] & 0x0f00) >> 8;
 
-	for(y=0;y<13;y++)
+	for(int y=0;y<13;y++)
 	{
-		for(x=0;x<80;x++)
+		for(int x=0;x<80;x++)
 		{
-			jis1 = (tvram[count] & 0x7f) + 0x20;
-			jis2 = (tvram[count] & 0x7f00) >> 8;
-			lr_half_gfx = ((tvram[count] & 0x8000) >> 15);
+			uint8_t jis1 = (tvram[count] & 0x7f) + 0x20;
+			uint8_t jis2 = (tvram[count] & 0x7f00) >> 8;
+			uint16_t lr_half_gfx = ((tvram[count] & 0x8000) >> 15);
 
-			tile_num = calc_kanji_rom_addr(jis1,jis2,x,y);
+			uint32_t tile_num = calc_kanji_rom_addr(jis1,jis2,x,y);
 
-			attr = (tvram[count+(m_tsp.attr_offset/2)] & 0x00ff);
+			uint16_t attr = (tvram[count+(m_tsp.attr_offset/2)] & 0x00ff);
 
+			uint8_t fg_col,bg_col,secret,reverse;
+			//uint8_t blink,dwidc,dwid,uline,hline;
 			fg_col = bg_col = reverse = secret = 0; //blink = dwidc = dwid = uline = hline = 0;
 
 			switch(attr_mode)
@@ -296,19 +282,17 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 					return;
 			}
 
-			for(yi=0;yi<16;yi++)
+			for(int yi=0;yi<16;yi++)
 			{
-				for(xi=0;xi<8;xi++)
+				for(int xi=0;xi<8;xi++)
 				{
-					int pen;
-
-					res_x = x*8+xi;
-					res_y = y*16+yi;
+					int res_x = x*8+xi;
+					int res_y = y*16+yi;
 
 					if(!cliprect.contains(res_x, res_y))
 						continue;
 
-					pen = kanji[((yi*2)+lr_half_gfx)+tile_num] >> (7-xi) & 1;
+					int pen = kanji[((yi*2)+lr_half_gfx)+tile_num] >> (7-xi) & 1;
 
 					if(reverse)
 						pen = pen & 1 ? bg_col : fg_col;
@@ -318,7 +302,7 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 					if(secret) { pen = 0; } //hide text
 
 					if(pen != -1) //transparent
-						bitmap.pix32(res_y, res_x) = m_palette->pen(pen);
+						bitmap.pix(res_y, res_x) = m_palette->pen(pen);
 				}
 			}
 
@@ -422,12 +406,12 @@ void pc88va_state::pc88va_map(address_map &map)
 /* 0x40000 - 0x4ffff Kanji ROM 2*/
 /* 0x50000 - 0x53fff Backup RAM */
 /* above that is a NOP presumably */
-READ8_MEMBER(pc88va_state::kanji_ram_r)
+uint8_t pc88va_state::kanji_ram_r(offs_t offset)
 {
 	return m_kanjiram[offset];
 }
 
-WRITE8_MEMBER(pc88va_state::kanji_ram_w)
+void pc88va_state::kanji_ram_w(offs_t offset, uint8_t data)
 {
 	// TODO: there's an area that can be write protected
 	m_kanjiram[offset] = data;
@@ -452,7 +436,7 @@ void pc88va_state::sysbank_map(address_map &map)
 }
 
 /* IDP = NEC uPD72022 */
-READ8_MEMBER(pc88va_state::idp_status_r)
+uint8_t pc88va_state::idp_status_r()
 {
 /*
     x--- ---- LP   Light-pen signal detection (with VA use failure)
@@ -482,7 +466,7 @@ READ8_MEMBER(pc88va_state::idp_status_r)
 #define SPRSW  0x85
 #define SPROV  0x81
 
-WRITE8_MEMBER(pc88va_state::idp_command_w)
+void pc88va_state::idp_command_w(uint8_t data)
 {
 	switch(data)
 	{
@@ -697,7 +681,7 @@ void pc88va_state::execute_sprsw_cmd()
 	tsp_sprite_enable(m_tsp.spr_offset + (m_buf_ram[0] & 0xf8), (m_buf_ram[0] & 2) << 8);
 }
 
-WRITE8_MEMBER(pc88va_state::idp_param_w)
+void pc88va_state::idp_param_w(uint8_t data)
 {
 	if(m_cmd == DSPOFF || m_cmd == EXIT || m_cmd == SPROFF || m_cmd == SPROV) // no param commands
 		return;
@@ -727,7 +711,7 @@ WRITE8_MEMBER(pc88va_state::idp_param_w)
 	}
 }
 
-WRITE16_MEMBER(pc88va_state::palette_ram_w)
+void pc88va_state::palette_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int r,g,b;
 	COMBINE_DATA(&m_palram[offset]);
@@ -739,7 +723,7 @@ WRITE16_MEMBER(pc88va_state::palette_ram_w)
 	m_palette->set_pen_color(offset,pal4bit(r),pal4bit(g),pal4bit(b));
 }
 
-READ16_MEMBER(pc88va_state::sys_port4_r)
+uint16_t pc88va_state::sys_port4_r()
 {
 	uint8_t vrtc,sw1;
 	vrtc = (m_screen->vpos() < 200) ? 0x20 : 0x00; // vblank
@@ -749,12 +733,12 @@ READ16_MEMBER(pc88va_state::sys_port4_r)
 	return vrtc | sw1 | 0xc0;
 }
 
-READ16_MEMBER(pc88va_state::bios_bank_r)
+uint16_t pc88va_state::bios_bank_r()
 {
 	return m_bank_reg;
 }
 
-WRITE16_MEMBER(pc88va_state::bios_bank_w)
+void pc88va_state::bios_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	-x-- ---- ---- ---- SMM (compatibility mode)
@@ -784,12 +768,12 @@ WRITE16_MEMBER(pc88va_state::bios_bank_w)
 	}
 }
 
-READ8_MEMBER(pc88va_state::rom_bank_r)
+uint8_t pc88va_state::rom_bank_r()
 {
 	return 0xff; // bit 7 low is va91 rom bank status
 }
 
-READ8_MEMBER(pc88va_state::key_r)
+uint8_t pc88va_state::key_r(offs_t offset)
 {
 	// note row D bit 2 does something at POST ... some kind of test mode?
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3",
@@ -800,22 +784,22 @@ READ8_MEMBER(pc88va_state::key_r)
 	return ioport(keynames[offset])->read();
 }
 
-WRITE16_MEMBER(pc88va_state::backupram_wp_1_w)
+void pc88va_state::backupram_wp_1_w(uint16_t data)
 {
 	m_backupram_wp = 1;
 }
 
-WRITE16_MEMBER(pc88va_state::backupram_wp_0_w)
+void pc88va_state::backupram_wp_0_w(uint16_t data)
 {
 	m_backupram_wp = 0;
 }
 
-READ8_MEMBER(pc88va_state::hdd_status_r)
+uint8_t pc88va_state::hdd_status_r()
 {
 	return 0x20;
 }
 
-READ8_MEMBER(pc88va_state::pc88va_fdc_r)
+uint8_t pc88va_state::pc88va_fdc_r(offs_t offset)
 {
 	printf("%08x\n",offset);
 
@@ -868,7 +852,7 @@ void pc88va_state::pc88va_fdc_update_ready(floppy_image_device *, int)
 	m_fdc->ready_w(ready);
 }
 
-WRITE8_MEMBER(pc88va_state::pc88va_fdc_w)
+void pc88va_state::pc88va_fdc_w(offs_t offset, uint8_t data)
 {
 	printf("%08x %02x\n",offset<<1,data);
 	switch(offset<<1)
@@ -945,7 +929,7 @@ WRITE8_MEMBER(pc88va_state::pc88va_fdc_w)
 }
 
 
-READ16_MEMBER(pc88va_state::sysop_r)
+uint16_t pc88va_state::sysop_r()
 {
 	uint8_t sys_op;
 
@@ -954,12 +938,12 @@ READ16_MEMBER(pc88va_state::sysop_r)
 	return 0xfffc | sys_op; // docs says all the other bits are high
 }
 
-READ16_MEMBER(pc88va_state::screen_ctrl_r)
+uint16_t pc88va_state::screen_ctrl_r()
 {
 	return m_screen_ctrl_reg;
 }
 
-WRITE16_MEMBER(pc88va_state::screen_ctrl_w)
+void pc88va_state::screen_ctrl_w(uint16_t data)
 {
 	m_screen_ctrl_reg = data;
 }
@@ -974,7 +958,7 @@ TIMER_CALLBACK_MEMBER(pc88va_state::t3_mouse_callback)
 	}
 }
 
-WRITE8_MEMBER(pc88va_state::timer3_ctrl_reg_w)
+void pc88va_state::timer3_ctrl_reg_w(uint8_t data)
 {
 	/*
 	x--- ---- MINTEN (TCU irq enable)
@@ -991,12 +975,12 @@ WRITE8_MEMBER(pc88va_state::timer3_ctrl_reg_w)
 	}
 }
 
-WRITE16_MEMBER(pc88va_state::video_pri_w)
+void pc88va_state::video_pri_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_video_pri_reg[offset]);
 }
 
-READ8_MEMBER(pc88va_state::backupram_dsw_r)
+uint8_t pc88va_state::backupram_dsw_r(offs_t offset)
 {
 	if(offset == 0)
 		return m_kanjiram[0x1fc2 / 2] & 0xff;
@@ -1004,13 +988,13 @@ READ8_MEMBER(pc88va_state::backupram_dsw_r)
 	return m_kanjiram[0x1fc6 / 2] & 0xff;
 }
 
-WRITE8_MEMBER(pc88va_state::sys_port1_w)
+void pc88va_state::sys_port1_w(uint8_t data)
 {
 	// ...
 }
 
 #if !TEST_SUBFDC
-READ8_MEMBER(pc88va_state::no_subfdc_r)
+uint8_t pc88va_state::no_subfdc_r()
 {
 	return machine().rand();
 }
@@ -1107,19 +1091,19 @@ void pc88va_state::pc88va_z80_map(address_map &map)
 	map(0x4000, 0x7fff).ram();
 }
 
-READ8_MEMBER(pc88va_state::upd765_tc_r)
+uint8_t pc88va_state::upd765_tc_r()
 {
 	m_fdc->tc_w(true);
 	timer_set(attotime::from_usec(50), TIMER_PC8801FD_UPD765_TC_TO_ZERO);
 	return 0;
 }
 
-WRITE8_MEMBER(pc88va_state::fdc_irq_vector_w)
+void pc88va_state::fdc_irq_vector_w(uint8_t data)
 {
 	m_fdc_irq_opcode = data;
 }
 
-WRITE8_MEMBER(pc88va_state::upd765_mc_w)
+void pc88va_state::upd765_mc_w(uint8_t data)
 {
 	m_fdd[0]->get_device()->mon_w(!(data & 1));
 	m_fdd[1]->get_device()->mon_w(!(data & 2));
@@ -1378,27 +1362,27 @@ static GFXDECODE_START( gfx_pc88va )
 	GFXDECODE_ENTRY( nullptr,   0x00000, pc88va_kanji_16x16,  0, 1 )
 GFXDECODE_END
 
-READ8_MEMBER(pc88va_state::cpu_8255_c_r)
+uint8_t pc88va_state::cpu_8255_c_r()
 {
 	return m_i8255_1_pc >> 4;
 }
 
-WRITE8_MEMBER(pc88va_state::cpu_8255_c_w)
+void pc88va_state::cpu_8255_c_w(uint8_t data)
 {
 	m_i8255_0_pc = data;
 }
 
-READ8_MEMBER(pc88va_state::fdc_8255_c_r)
+uint8_t pc88va_state::fdc_8255_c_r()
 {
 	return m_i8255_0_pc >> 4;
 }
 
-WRITE8_MEMBER(pc88va_state::fdc_8255_c_w)
+void pc88va_state::fdc_8255_c_w(uint8_t data)
 {
 	m_i8255_1_pc = data;
 }
 
-READ8_MEMBER(pc88va_state::r232_ctrl_porta_r)
+uint8_t pc88va_state::r232_ctrl_porta_r()
 {
 	uint8_t sw5, sw4, sw3, sw2,speed_sw;
 
@@ -1411,7 +1395,7 @@ READ8_MEMBER(pc88va_state::r232_ctrl_porta_r)
 	return 0xc1 | sw5 | sw4 | sw3 | sw2 | speed_sw;
 }
 
-READ8_MEMBER(pc88va_state::r232_ctrl_portb_r)
+uint8_t pc88va_state::r232_ctrl_portb_r()
 {
 	uint8_t xsw1;
 
@@ -1420,27 +1404,27 @@ READ8_MEMBER(pc88va_state::r232_ctrl_portb_r)
 	return 0xf7 | xsw1;
 }
 
-READ8_MEMBER(pc88va_state::r232_ctrl_portc_r)
+uint8_t pc88va_state::r232_ctrl_portc_r()
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER(pc88va_state::r232_ctrl_porta_w)
+void pc88va_state::r232_ctrl_porta_w(uint8_t data)
 {
 	// ...
 }
 
-WRITE8_MEMBER(pc88va_state::r232_ctrl_portb_w)
+void pc88va_state::r232_ctrl_portb_w(uint8_t data)
 {
 	// ...
 }
 
-WRITE8_MEMBER(pc88va_state::r232_ctrl_portc_w)
+void pc88va_state::r232_ctrl_portc_w(uint8_t data)
 {
 	// ...
 }
 
-READ8_MEMBER(pc88va_state::get_slave_ack)
+uint8_t pc88va_state::get_slave_ack(offs_t offset)
 {
 	if (offset==7) { // IRQ = 7
 		return m_pic2->acknowledge();
@@ -1552,13 +1536,13 @@ WRITE_LINE_MEMBER( pc88va_state::pc88va_tc_w )
 }
 
 
-READ8_MEMBER(pc88va_state::fdc_dma_r)
+uint8_t pc88va_state::fdc_dma_r()
 {
 	printf("R DMA\n");
 	return m_fdc->dma_r();
 }
 
-WRITE8_MEMBER(pc88va_state::fdc_dma_w)
+void pc88va_state::fdc_dma_w(uint8_t data)
 {
 	printf("W DMA %08x\n",data);
 	m_fdc->dma_w(data);
@@ -1573,13 +1557,13 @@ static void pc88va_floppies(device_slot_interface &device)
 	device.option_add("525hd", FLOPPY_525_HD);
 }
 
-READ8_MEMBER(pc88va_state::dma_memr_cb)
+uint8_t pc88va_state::dma_memr_cb(offs_t offset)
 {
 	printf("%08x\n",offset);
 	return 0;
 }
 
-WRITE8_MEMBER(pc88va_state::dma_memw_cb)
+void pc88va_state::dma_memw_cb(offs_t offset, uint8_t data)
 {
 	printf("%08x %02x\n",offset,data);
 }

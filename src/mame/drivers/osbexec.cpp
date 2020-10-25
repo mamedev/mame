@@ -112,17 +112,17 @@ private:
 			m_ram_c000 = m_vram.get();
 	}
 
-	DECLARE_WRITE8_MEMBER(osbexec_0000_w);
-	DECLARE_READ8_MEMBER(osbexec_c000_r);
-	DECLARE_WRITE8_MEMBER(osbexec_c000_w);
-	DECLARE_READ8_MEMBER(osbexec_kbd_r);
-	DECLARE_READ8_MEMBER(osbexec_rtc_r);
+	void osbexec_0000_w(offs_t offset, uint8_t data);
+	uint8_t osbexec_c000_r(offs_t offset);
+	void osbexec_c000_w(offs_t offset, uint8_t data);
+	uint8_t osbexec_kbd_r(offs_t offset);
+	uint8_t osbexec_rtc_r();
 	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(osbexec_video_callback);
-	DECLARE_READ8_MEMBER(osbexec_pia0_a_r);
-	DECLARE_WRITE8_MEMBER(osbexec_pia0_a_w);
-	DECLARE_READ8_MEMBER(osbexec_pia0_b_r);
-	DECLARE_WRITE8_MEMBER(osbexec_pia0_b_w);
+	uint8_t osbexec_pia0_a_r();
+	void osbexec_pia0_a_w(uint8_t data);
+	uint8_t osbexec_pia0_b_r();
+	void osbexec_pia0_b_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(osbexec_pia0_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(osbexec_pia0_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(modem_txclk_w);
@@ -135,7 +135,7 @@ private:
 };
 
 
-WRITE8_MEMBER(osbexec_state::osbexec_0000_w)
+void osbexec_state::osbexec_0000_w(offs_t offset, uint8_t data)
 {
 	/* Font RAM writing is enabled when ROM bank is enabled */
 	if ( m_pia0_porta & 0x80 )
@@ -150,7 +150,7 @@ WRITE8_MEMBER(osbexec_state::osbexec_0000_w)
 }
 
 
-READ8_MEMBER(osbexec_state::osbexec_c000_r)
+uint8_t osbexec_state::osbexec_c000_r(offs_t offset)
 {
 	uint8_t   data = m_ram_c000[offset];
 
@@ -163,7 +163,7 @@ READ8_MEMBER(osbexec_state::osbexec_c000_r)
 }
 
 
-WRITE8_MEMBER(osbexec_state::osbexec_c000_w)
+void osbexec_state::osbexec_c000_w(offs_t offset, uint8_t data)
 {
 	m_ram_c000[offset] = data;
 
@@ -174,7 +174,7 @@ WRITE8_MEMBER(osbexec_state::osbexec_c000_w)
 }
 
 
-READ8_MEMBER(osbexec_state::osbexec_kbd_r)
+uint8_t osbexec_state::osbexec_kbd_r(offs_t offset)
 {
 	uint8_t data = 0xFF;
 
@@ -186,7 +186,7 @@ READ8_MEMBER(osbexec_state::osbexec_kbd_r)
 }
 
 
-READ8_MEMBER(osbexec_state::osbexec_rtc_r)
+uint8_t osbexec_state::osbexec_rtc_r()
 {
 	// 74LS244 buffer @ UF13
 	return m_rtc->count();
@@ -241,38 +241,38 @@ static INPUT_PORTS_START( osbexec )
 
 	PORT_START("ROW2")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_I)            PORT_CHAR('i') PORT_CHAR('I')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)            PORT_CHAR('u') PORT_CHAR('U')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y)            PORT_CHAR('y') PORT_CHAR('Y')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_T)            PORT_CHAR('t') PORT_CHAR('T')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_R)            PORT_CHAR('r') PORT_CHAR('R')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_E)            PORT_CHAR('e') PORT_CHAR('E')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_W)            PORT_CHAR('w') PORT_CHAR('W')
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)            PORT_CHAR('q') PORT_CHAR('Q')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)            PORT_CHAR('u') PORT_CHAR('U') PORT_CHAR(21)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y)            PORT_CHAR('y') PORT_CHAR('Y') PORT_CHAR(25)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_T)            PORT_CHAR('t') PORT_CHAR('T') PORT_CHAR(20)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_R)            PORT_CHAR('r') PORT_CHAR('R') PORT_CHAR(18)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_E)            PORT_CHAR('e') PORT_CHAR('E') PORT_CHAR(5)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_W)            PORT_CHAR('w') PORT_CHAR('W') PORT_CHAR(23)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)            PORT_CHAR('q') PORT_CHAR('Q') PORT_CHAR(17)
 
 	PORT_START("ROW3")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)            PORT_CHAR('k') PORT_CHAR('K')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_J)            PORT_CHAR('j') PORT_CHAR('J')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_H)            PORT_CHAR('h') PORT_CHAR('H')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_G)            PORT_CHAR('g') PORT_CHAR('G')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F)            PORT_CHAR('f') PORT_CHAR('F')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_D)            PORT_CHAR('d') PORT_CHAR('D')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)            PORT_CHAR('s') PORT_CHAR('S')
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)            PORT_CHAR('a') PORT_CHAR('A')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)            PORT_CHAR('k') PORT_CHAR('K') PORT_CHAR(11)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_J)            PORT_CHAR('j') PORT_CHAR('J') PORT_CHAR(10)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_H)            PORT_CHAR('h') PORT_CHAR('H') PORT_CHAR(8)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_G)            PORT_CHAR('g') PORT_CHAR('G') PORT_CHAR(7)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F)            PORT_CHAR('f') PORT_CHAR('F') PORT_CHAR(6)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_D)            PORT_CHAR('d') PORT_CHAR('D') PORT_CHAR(4)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)            PORT_CHAR('s') PORT_CHAR('S') PORT_CHAR(19)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)            PORT_CHAR('a') PORT_CHAR('A') PORT_CHAR(1)
 
 	PORT_START("ROW4")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)        PORT_CHAR(',') PORT_CHAR('<')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)            PORT_CHAR('m') PORT_CHAR('M')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)            PORT_CHAR('n') PORT_CHAR('N')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)            PORT_CHAR('b') PORT_CHAR('B')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_V)            PORT_CHAR('v') PORT_CHAR('V')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_C)            PORT_CHAR('c') PORT_CHAR('C')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_X)            PORT_CHAR('x') PORT_CHAR('X')
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)            PORT_CHAR('z') PORT_CHAR('Z')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)            PORT_CHAR('n') PORT_CHAR('N') PORT_CHAR(14)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)            PORT_CHAR('b') PORT_CHAR('B') PORT_CHAR(2)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_V)            PORT_CHAR('v') PORT_CHAR('V') PORT_CHAR(22)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_C)            PORT_CHAR('c') PORT_CHAR('C') PORT_CHAR(3)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_X)            PORT_CHAR('x') PORT_CHAR('X') PORT_CHAR(24)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)            PORT_CHAR('z') PORT_CHAR('Z') PORT_CHAR(26)
 
 	PORT_START("ROW5")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)            PORT_CHAR('9') PORT_CHAR('(')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)            PORT_CHAR('o') PORT_CHAR('O')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)            PORT_CHAR('p') PORT_CHAR('P')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)            PORT_CHAR('o') PORT_CHAR('O') PORT_CHAR(15)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)            PORT_CHAR('p') PORT_CHAR('P') PORT_CHAR(16)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)         PORT_CHAR('.') PORT_CHAR('>')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)        PORT_CHAR(' ')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)            PORT_CHAR('0') PORT_CHAR(')')
@@ -281,7 +281,7 @@ static INPUT_PORTS_START( osbexec )
 
 	PORT_START("ROW6")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)       PORT_CHAR('=') PORT_CHAR('+')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)            PORT_CHAR('l') PORT_CHAR('L')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)            PORT_CHAR('l') PORT_CHAR('L') PORT_CHAR(12)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)    PORT_CHAR('\\') PORT_CHAR('|')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)        PORT_CHAR(';') PORT_CHAR(':')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)        PORT_CHAR('/') PORT_CHAR('?')
@@ -342,13 +342,13 @@ uint32_t osbexec_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
   CB2 - 60/50 (?)
 */
 
-READ8_MEMBER(osbexec_state::osbexec_pia0_a_r)
+uint8_t osbexec_state::osbexec_pia0_a_r()
 {
 	return m_pia0_porta;
 }
 
 
-WRITE8_MEMBER(osbexec_state::osbexec_pia0_a_w)
+void osbexec_state::osbexec_pia0_a_w(uint8_t data)
 {
 	//logerror("osbexec_pia0_a_w: %02x\n", data );
 
@@ -358,13 +358,13 @@ WRITE8_MEMBER(osbexec_state::osbexec_pia0_a_w)
 }
 
 
-READ8_MEMBER(osbexec_state::osbexec_pia0_b_r)
+uint8_t osbexec_state::osbexec_pia0_b_r()
 {
 	return m_pia0_portb;
 }
 
 
-WRITE8_MEMBER(osbexec_state::osbexec_pia0_b_w)
+void osbexec_state::osbexec_pia0_b_w(uint8_t data)
 {
 	m_pia0_portb = (m_pia0_portb & 0xc0) | (data & 0x3f);
 
@@ -465,7 +465,7 @@ TIMER_CALLBACK_MEMBER(osbexec_state::osbexec_video_callback)
 	if ( y < 240 )
 	{
 		uint16_t row_addr = ( y / 10 ) * 128;
-		uint16_t *p = &m_bitmap.pix16(y);
+		uint16_t *const p = &m_bitmap.pix(y);
 		uint8_t char_line = y % 10;
 
 		for ( int x = 0; x < 80; x++ )

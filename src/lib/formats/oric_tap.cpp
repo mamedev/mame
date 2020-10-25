@@ -1,8 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Kevin Thacker
+#include "oric_tap.h"
+
 #include <cassert>
 
-#include "oric_tap.h"
 
 #define ORIC_WAV_DEBUG 0
 #define LOG(x) do { if (ORIC_WAV_DEBUG) printf x; } while (0)
@@ -481,7 +482,7 @@ static int oric_cassette_fill_wave(int16_t *buffer, int length, uint8_t *bytes)
 
 
 
-static const struct CassetteLegacyWaveFiller oric_legacy_fill_wave =
+static const cassette_image::LegacyWaveFiller oric_legacy_fill_wave =
 {
 	oric_cassette_fill_wave,                    /* fill_wave */
 	-1,                                         /* chunk_size */
@@ -494,21 +495,21 @@ static const struct CassetteLegacyWaveFiller oric_legacy_fill_wave =
 
 
 
-static cassette_image::error oric_tap_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error oric_tap_identify(cassette_image *cassette, cassette_image::Options *opts)
 {
-	return cassette_legacy_identify(cassette, opts, &oric_legacy_fill_wave);
+	return cassette->legacy_identify(opts, &oric_legacy_fill_wave);
 }
 
 
 
 static cassette_image::error oric_tap_load(cassette_image *cassette)
 {
-	return cassette_legacy_construct(cassette, &oric_legacy_fill_wave);
+	return cassette->legacy_construct(&oric_legacy_fill_wave);
 }
 
 
 
-static const struct CassetteFormat oric_tap_format =
+static const cassette_image::Format oric_tap_format =
 {
 	"tap",
 	oric_tap_identify,

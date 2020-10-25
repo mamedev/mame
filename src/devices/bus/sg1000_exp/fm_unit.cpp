@@ -102,7 +102,7 @@ void sega_fm_unit_device::device_reset()
 //  peripheral_r - fm unit read
 //-------------------------------------------------
 
-READ8_MEMBER(sega_fm_unit_device::peripheral_r)
+uint8_t sega_fm_unit_device::peripheral_r(offs_t offset)
 {
 	// the value previously written to the control port is returned on all
 	// active read offsets.
@@ -118,7 +118,7 @@ READ8_MEMBER(sega_fm_unit_device::peripheral_r)
 //  peripheral_w - fm unit write
 //-------------------------------------------------
 
-WRITE8_MEMBER(sega_fm_unit_device::peripheral_w)
+void sega_fm_unit_device::peripheral_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{

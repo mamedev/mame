@@ -386,7 +386,7 @@ void am79c30a_device::set_lmr1(u8 data)
 	if (BIT(data, 6) != BIT(m_lmr1, 6))
 		LOG("%s: LIU receiver/transmitter %sabled\n", machine().describe_context(), BIT(data, 6) ? "en" : "dis");
 	if (BIT(data, 7))
-		logerror("%s: LMR1 reserved bit 7 set\n");
+		logerror("%s: LMR1 reserved bit 7 set\n", machine().describe_context());
 
 	m_lmr1 = data;
 }
@@ -414,7 +414,7 @@ void am79c30a_device::set_lmr2(u8 data)
 	if (BIT(data, 6) != BIT(m_lmr2, 6))
 		LOG("%s: F7 change of state interrupt %sabled\n", machine().describe_context(), BIT(data, 6) ? "en" : "dis");
 	if (BIT(data, 7))
-		logerror("%s: LMR2 reserved bit 7 set\n");
+		logerror("%s: LMR2 reserved bit 7 set\n", machine().describe_context());
 
 	m_lmr2 = data;
 }
@@ -492,9 +492,9 @@ void am79c30a_device::set_mcr(unsigned n, u8 data)
 		if (data == 0)
 			LOG("%s: No connect (MCR%d)\n", machine().describe_context(), n + 1);
 		else if ((data & 0xf0) >> 4 == (data & 0x0f))
-			LOG("%s: %s loopback (MCR%d)\n", machine().describe_context(), data & 0x0f, n + 1);
+			LOG("%s: %s loopback (MCR%d)\n", machine().describe_context(), s_mcr_channels[data & 0x0f], n + 1);
 		else
-			LOG("%s: %s <-> %s (MCR%d)\n", machine().describe_context(), (data & 0xf0) >> 4, data & 0x0f, n + 1);
+			LOG("%s: %s <-> %s (MCR%d)\n", machine().describe_context(), s_mcr_channels[(data & 0xf0) >> 4], s_mcr_channels[data & 0x0f], n + 1);
 	}
 
 	m_mcr[n] = data;
@@ -753,7 +753,9 @@ void am79c30a_device::set_stra(u8 data)
 		else
 		{
 			u8 a = 15 - ((data & 0xf0) >> 4);
-			LOG("%s: Secondary tone ringer %.2f V peak-to-peak, %d dB relative\n", BIT(a, 0) ? 3.53553390593274 : 5.0 / (1 << (a / 2)), a * -3);
+			LOG("%s: Secondary tone ringer %.2f V peak-to-peak, %d dB relative\n", machine().describe_context(),
+				BIT(a, 0) ? 3.53553390593274 : 5.0 / (1 << (a / 2)),
+				a * -3);
 		}
 	}
 

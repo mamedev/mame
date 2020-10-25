@@ -26,7 +26,6 @@
 #include "machine/rstbuf.h"
 #include "sound/dac.h"
 #include "sound/ym2151.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -39,7 +38,7 @@ void m90_state::machine_start()
 
 /***************************************************************************/
 
-WRITE16_MEMBER(m90_state::coincounter_w)
+void m90_state::coincounter_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -50,14 +49,14 @@ WRITE16_MEMBER(m90_state::coincounter_w)
 	}
 }
 
-WRITE16_MEMBER(m90_state::quizf1_bankswitch_w)
+void m90_state::quizf1_bankswitch_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_mainbank->set_entry(data & 0xf);
 }
 
 #ifdef UNUSED_FUNCTION
-WRITE16_MEMBER(m90_state::unknown_w)
+void m90_state::unknown_w(uint16_t data)
 {
 	printf("%04x    ",data);
 }
@@ -769,9 +768,6 @@ void m90_state::m90(machine_config &config)
 	ymsnd.add_route(1, "speaker", 0.15);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.1); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void m90_state::hasamu(machine_config &config)

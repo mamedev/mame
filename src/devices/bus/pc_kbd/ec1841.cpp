@@ -344,7 +344,7 @@ WRITE_LINE_MEMBER( ec_1841_keyboard_device::data_write )
 //  bus_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ec_1841_keyboard_device::bus_w )
+void ec_1841_keyboard_device::bus_w(uint8_t data)
 {
 	LOGDBG("bus_w %02x\n", data);
 
@@ -356,7 +356,7 @@ WRITE8_MEMBER( ec_1841_keyboard_device::bus_w )
 //  p1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( ec_1841_keyboard_device::p1_r )
+uint8_t ec_1841_keyboard_device::p1_r()
 {
 	/*
 
@@ -388,7 +388,7 @@ READ8_MEMBER( ec_1841_keyboard_device::p1_r )
 //  p1_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ec_1841_keyboard_device::p1_w )
+void ec_1841_keyboard_device::p1_w(uint8_t data)
 {
 	/*
 	    bit     description
@@ -412,7 +412,7 @@ WRITE8_MEMBER( ec_1841_keyboard_device::p1_w )
 //  p2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ec_1841_keyboard_device::p2_w )
+void ec_1841_keyboard_device::p2_w(uint8_t data)
 {
 	/*
 	    bit     description

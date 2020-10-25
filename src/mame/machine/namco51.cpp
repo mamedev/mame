@@ -61,7 +61,7 @@
 #include "screen.h"
 
 
-WRITE_LINE_MEMBER( namco_51xx_device::reset ) // make active low in the name
+WRITE_LINE_MEMBER( namco_51xx_device::reset )
 {
 	// Reset line is active low.
 	m_cpu->set_input_line(INPUT_LINE_RESET, !state);
@@ -85,12 +85,7 @@ TIMER_CALLBACK_MEMBER( namco_51xx_device::rw_sync )
 
 WRITE_LINE_MEMBER( namco_51xx_device::chip_select )
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_51xx_device::chip_select_sync),this), state);
-}
-
-TIMER_CALLBACK_MEMBER( namco_51xx_device::chip_select_sync )
-{
-	m_cpu->set_input_line(0, param);
+	m_cpu->set_input_line(0, state);
 }
 
 uint8_t namco_51xx_device::read()
@@ -140,6 +135,11 @@ void namco_51xx_device::O_w(uint8_t data)
 		m_portO = (m_portO & 0x0f) | (out << 4);
 	else
 		m_portO = (m_portO & 0xf0) | (out);
+}
+
+void namco_51xx_device::P_w(uint8_t data)
+{
+	m_out(data);
 }
 
 /***************************************************************************
@@ -194,6 +194,7 @@ void namco_51xx_device::device_add_mconfig(machine_config &config)
 	m_cpu->read_r<2>().set(FUNC(namco_51xx_device::R2_r));
 	m_cpu->read_r<3>().set(FUNC(namco_51xx_device::R3_r));
 	m_cpu->write_o().set(FUNC(namco_51xx_device::O_w));
+	m_cpu->write_p().set(FUNC(namco_51xx_device::P_w));
 }
 
 //-------------------------------------------------

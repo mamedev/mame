@@ -5,7 +5,9 @@
 
 #pragma once
 
-class x1_010_device : public device_t, public device_sound_interface, public device_rom_interface
+#include "dirom.h"
+
+class x1_010_device : public device_t, public device_sound_interface, public device_rom_interface<20>
 {
 public:
 	x1_010_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -24,7 +26,7 @@ protected:
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	// device_rom_interface overrides
 	virtual void rom_bank_updated() override;

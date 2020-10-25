@@ -89,24 +89,21 @@ private:
 	bool        m_single_screen_mode;
 	uint8_t       m_video_mux_bank;
 
-	DECLARE_READ16_MEMBER(sysregs_r);
-	DECLARE_WRITE16_MEMBER(sysregs_w);
-	DECLARE_WRITE16_MEMBER(sound_cmd1_w);
-	DECLARE_WRITE16_MEMBER(sound_cmd2_w);
-	DECLARE_WRITE16_MEMBER(sound_irq_w);
-	DECLARE_READ16_MEMBER(sound_status_msb_r);
-	DECLARE_WRITE8_MEMBER(sound_status_w);
-	DECLARE_WRITE8_MEMBER(sound_ctrl_w);
-	DECLARE_READ16_MEMBER(ttl_ram_r);
-	DECLARE_WRITE16_MEMBER(ttl_ram_w);
-	DECLARE_READ16_MEMBER(psac2_videoram_r);
-	DECLARE_WRITE16_MEMBER(psac2_videoram_w);
-	DECLARE_READ8_MEMBER(k53936_rom_r);
+	uint16_t sysregs_r(offs_t offset, uint16_t mem_mask = ~0);
+	void sysregs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sound_irq_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sound_status_w(uint8_t data);
+	void sound_ctrl_w(uint8_t data);
+	uint16_t ttl_ram_r(offs_t offset);
+	void ttl_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t psac2_videoram_r(offs_t offset);
+	void psac2_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t k53936_rom_r(offs_t offset);
 	TILE_GET_INFO_MEMBER(ttl_get_tile_info);
 	TILE_GET_INFO_MEMBER(get_rng_936_tile_info);
 	DECLARE_WRITE_LINE_MEMBER(k054539_nmi_gen);
-	DECLARE_READ16_MEMBER(palette_read);
-	DECLARE_WRITE16_MEMBER(palette_write);
+	uint16_t palette_read(offs_t offset);
+	void palette_write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 
 	K055673_CB_MEMBER(sprite_callback);

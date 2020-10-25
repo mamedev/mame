@@ -32,9 +32,9 @@ public:
 
 	TIMER_CALLBACK_MEMBER(motor_callback);
 
-	DECLARE_READ8_MEMBER(mc1502_fdc_r);
-	DECLARE_READ8_MEMBER(mc1502_fdcv2_r);
-	DECLARE_WRITE8_MEMBER(mc1502_fdc_w);
+	uint8_t mc1502_fdc_r(offs_t offset);
+	uint8_t mc1502_fdcv2_r(offs_t offset);
+	void mc1502_fdc_w(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides

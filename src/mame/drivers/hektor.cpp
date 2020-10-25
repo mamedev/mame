@@ -49,8 +49,8 @@ public:
 		, m_rs232(*this, "rs232")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(i8155_porta_w);
-	DECLARE_READ8_MEMBER(i8155_portb_r);
+	void i8155_porta_w(uint8_t data);
+	uint8_t i8155_portb_r();
 	DECLARE_READ_LINE_MEMBER(sid_r);
 	DECLARE_WRITE_LINE_MEMBER(sod_w);
 
@@ -90,7 +90,7 @@ public:
 private:
 	void hektor2_mem(address_map &map);
 
-	DECLARE_WRITE8_MEMBER(i8155_portc_w);
+	void i8155_portc_w(uint8_t data);
 
 	required_device<ef9364_device> m_ef9364;
 };
@@ -115,7 +115,7 @@ private:
 	uint8_t mem_r(offs_t offset);
 	void mem_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(i8155_portc_w);
+	void i8155_portc_w(uint8_t data);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	required_device<ram_device> m_ram;
@@ -124,12 +124,12 @@ private:
 };
 
 
-WRITE8_MEMBER(hektor_state::i8155_porta_w)
+void hektor_state::i8155_porta_w(uint8_t data)
 {
 	m_kbd_row = data;
 }
 
-READ8_MEMBER(hektor_state::i8155_portb_r)
+uint8_t hektor_state::i8155_portb_r()
 {
 	for (int col = 0; col < 8; col++)
 	{
@@ -139,7 +139,7 @@ READ8_MEMBER(hektor_state::i8155_portb_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(hektor2_state::i8155_portc_w)
+void hektor2_state::i8155_portc_w(uint8_t data)
 {
 	m_i8155_portc = data;
 
@@ -156,7 +156,7 @@ WRITE8_MEMBER(hektor2_state::i8155_portc_w)
 	m_speaker->level_w(BIT(data, 6)); // TODO: verify which bit
 }
 
-WRITE8_MEMBER(hektor3_state::i8155_portc_w)
+void hektor3_state::i8155_portc_w(uint8_t data)
 {
 	m_i8155_portc = data;
 
@@ -215,14 +215,14 @@ MC6845_UPDATE_ROW(hektor3_state::crtc_update_row)
 		uint8_t data = m_ram->pointer()[~offset & 0xffff];
 		if (x == cursor_x) data ^= 0xff;
 
-		bitmap.pix32(y, x * 8 + 0) = pen[BIT(data, 7)];
-		bitmap.pix32(y, x * 8 + 1) = pen[BIT(data, 6)];
-		bitmap.pix32(y, x * 8 + 2) = pen[BIT(data, 5)];
-		bitmap.pix32(y, x * 8 + 3) = pen[BIT(data, 4)];
-		bitmap.pix32(y, x * 8 + 4) = pen[BIT(data, 3)];
-		bitmap.pix32(y, x * 8 + 5) = pen[BIT(data, 2)];
-		bitmap.pix32(y, x * 8 + 6) = pen[BIT(data, 1)];
-		bitmap.pix32(y, x * 8 + 7) = pen[BIT(data, 0)];
+		bitmap.pix(y, x * 8 + 0) = pen[BIT(data, 7)];
+		bitmap.pix(y, x * 8 + 1) = pen[BIT(data, 6)];
+		bitmap.pix(y, x * 8 + 2) = pen[BIT(data, 5)];
+		bitmap.pix(y, x * 8 + 3) = pen[BIT(data, 4)];
+		bitmap.pix(y, x * 8 + 4) = pen[BIT(data, 3)];
+		bitmap.pix(y, x * 8 + 5) = pen[BIT(data, 2)];
+		bitmap.pix(y, x * 8 + 6) = pen[BIT(data, 1)];
+		bitmap.pix(y, x * 8 + 7) = pen[BIT(data, 0)];
 	}
 }
 

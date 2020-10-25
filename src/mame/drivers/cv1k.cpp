@@ -156,7 +156,6 @@ Touchscreen
  - Used for mmmbanc, needs SH3 serial support.
 
 Remaining Video issues
- - measure h/v video timing
  - mmpork startup screen flicker - the FOR USE IN JAPAN screen doesn't appear on the real PCB until after the graphics are fully loaded, it still displays 'please wait' until that point.
  - is the use of the 'scroll' registers 100% correct? (related to above?)
  - Sometimes the 'sprites' in mushisam lag by a frame vs the 'backgrounds' is this a timing problem, does the real game do it?
@@ -180,7 +179,6 @@ Common game codes:
 #include "video/epic12.h"
 
 #include "emupal.h"
-#include "profiler.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -211,18 +209,18 @@ public:
 	required_shared_ptr<uint64_t> m_ram;
 	required_shared_ptr<uint64_t> m_rombase;
 
-	DECLARE_READ8_MEMBER(flash_io_r);
-	DECLARE_WRITE8_MEMBER(flash_io_w);
-	DECLARE_READ8_MEMBER(serial_rtc_eeprom_r);
-	DECLARE_WRITE8_MEMBER(serial_rtc_eeprom_w);
-	DECLARE_READ64_MEMBER(flash_port_e_r);
+	uint8_t flash_io_r(offs_t offset);
+	void flash_io_w(offs_t offset, uint8_t data);
+	uint8_t serial_rtc_eeprom_r(offs_t offset);
+	void serial_rtc_eeprom_w(offs_t offset, uint8_t data);
+	uint64_t flash_port_e_r();
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	virtual void machine_reset() override;
 
 	/* game specific */
-	DECLARE_READ64_MEMBER(speedup_r);
+	uint64_t speedup_r();
 	void init_mushisam();
 	void init_ibara();
 	void init_espgal2();
@@ -258,13 +256,13 @@ uint32_t cv1k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 // FLASH interface
 
-READ64_MEMBER( cv1k_state::flash_port_e_r )
+uint64_t cv1k_state::flash_port_e_r()
 {
 	return ((m_serflash->flash_ready_r() ? 0x20 : 0x00)) | 0xdf;
 }
 
 
-READ8_MEMBER( cv1k_state::flash_io_r )
+uint8_t cv1k_state::flash_io_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -285,7 +283,7 @@ READ8_MEMBER( cv1k_state::flash_io_r )
 	}
 }
 
-WRITE8_MEMBER( cv1k_state::flash_io_w )
+void cv1k_state::flash_io_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -312,7 +310,7 @@ WRITE8_MEMBER( cv1k_state::flash_io_w )
 
 // ibarablk uses the rtc to render the clock in the first attract demo
 // if this code returns bad values it has gfx corruption.  the ibarablka set doesn't do this?!
-READ8_MEMBER( cv1k_state::serial_rtc_eeprom_r )
+uint8_t cv1k_state::serial_rtc_eeprom_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -324,7 +322,7 @@ READ8_MEMBER( cv1k_state::serial_rtc_eeprom_r )
 	}
 }
 
-WRITE8_MEMBER( cv1k_state::serial_rtc_eeprom_w )
+void cv1k_state::serial_rtc_eeprom_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -479,10 +477,10 @@ void cv1k_state::cv1k(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
+	screen.set_refresh(HZ_TO_ATTOSECONDS(60.02)); // measured from ibara PCB rates - 60.02Hz, 262 total lines
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(0x200, 0x200);
-	screen.set_visarea(0, 0x140-1, 0, 0xf0-1);
+	screen.set_size(512, 512);
+	screen.set_visarea(0, 320-1, 0, 240-1);
 	screen.set_screen_update(FUNC(cv1k_state::screen_update));
 
 	PALETTE(config, "palette").set_entries(0x10000);
@@ -882,7 +880,7 @@ ROM_START( akatana )
 	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(10760fed) SHA1(b70f4506c00f3901ff38f5efd4b897af1afc7a0c) )
 ROM_END
 
-READ64_MEMBER(cv1k_state::speedup_r)
+uint64_t cv1k_state::speedup_r()
 {
 	offs_t pc = m_maincpu->pc();
 
@@ -900,7 +898,7 @@ void cv1k_state::install_speedups(uint32_t idleramoff, uint32_t idlepc, bool is_
 
 	m_maincpu->sh2drc_add_pcflush(idlepc+2);
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000000+m_idleramoffs, 0xc000000+m_idleramoffs+7, read64_delegate(*this, FUNC(cv1k_state::speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000000+m_idleramoffs, 0xc000000+m_idleramoffs+7, read64smo_delegate(*this, FUNC(cv1k_state::speedup_r)));
 
 	m_maincpu->sh2drc_add_fastram(0x00000000, 0x003fffff, true,  m_rombase);
 

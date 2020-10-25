@@ -234,16 +234,16 @@ void gottlieb_state::machine_start()
 	if (m_laserdisc != nullptr)
 	{
 		/* attach to the I/O ports */
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x05805, 0x05807, 0, 0x07f8, 0, read8_delegate(*this, FUNC(gottlieb_state::laserdisc_status_r)));
-		m_maincpu->space(AS_PROGRAM).install_write_handler(0x05805, 0x05805, 0, 0x07f8, 0, write8_delegate(*this, FUNC(gottlieb_state::laserdisc_command_w)));    /* command for the player */
-		m_maincpu->space(AS_PROGRAM).install_write_handler(0x05806, 0x05806, 0, 0x07f8, 0, write8_delegate(*this, FUNC(gottlieb_state::laserdisc_select_w)));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x05805, 0x05807, 0, 0x07f8, 0, read8sm_delegate(*this, FUNC(gottlieb_state::laserdisc_status_r)));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0x05805, 0x05805, 0, 0x07f8, 0, write8smo_delegate(*this, FUNC(gottlieb_state::laserdisc_command_w)));    /* command for the player */
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0x05806, 0x05806, 0, 0x07f8, 0, write8smo_delegate(*this, FUNC(gottlieb_state::laserdisc_select_w)));
 
 		/* allocate a timer for serial transmission, and one for philips code processing */
 		m_laserdisc_bit_timer = timer_alloc(TIMER_LASERDISC_BIT);
 		m_laserdisc_philips_timer = timer_alloc(TIMER_LASERDISC_PHILIPS);
 
 		/* create some audio RAM */
-		m_laserdisc_audio_buffer = std::make_unique<uint8_t[]>(AUDIORAM_SIZE);
+		m_laserdisc_audio_buffer = std::make_unique<u8[]>(AUDIORAM_SIZE);
 		m_laserdisc_status = 0x38;
 
 		/* more save state registration */
@@ -285,7 +285,7 @@ CUSTOM_INPUT_MEMBER(gottlieb_state::track_delta_r)
 }
 
 
-WRITE8_MEMBER(gottlieb_state::analog_reset_w)
+void gottlieb_state::analog_reset_w(u8 data)
 {
 	/* reset the trackball counters */
 	m_track[0] = m_track_x.read_safe(0);
@@ -324,7 +324,7 @@ void gottlieb_state::general_output_w(u8 data)
 }
 
 // custom overrides
-WRITE8_MEMBER(gottlieb_state::reactor_output_w)
+void gottlieb_state::reactor_output_w(u8 data)
 {
 	general_output_w(data & ~0xe0);
 
@@ -333,7 +333,7 @@ WRITE8_MEMBER(gottlieb_state::reactor_output_w)
 	m_leds[2] = BIT(data, 7);
 }
 
-WRITE8_MEMBER(gottlieb_state::qbert_output_w)
+void gottlieb_state::qbert_output_w(u8 data)
 {
 	general_output_w(data & ~0x20);
 
@@ -341,7 +341,7 @@ WRITE8_MEMBER(gottlieb_state::qbert_output_w)
 	qbert_knocker(data >> 5 & 1);
 }
 
-WRITE8_MEMBER(gottlieb_state::qbertqub_output_w)
+void gottlieb_state::qbertqub_output_w(u8 data)
 {
 	// coincounter is on bit 5 instead
 	general_output_w((data >> 1 & 0x10) | (data & ~0x30));
@@ -350,7 +350,7 @@ WRITE8_MEMBER(gottlieb_state::qbertqub_output_w)
 	m_spritebank = (data & 0x10) >> 4;
 }
 
-WRITE8_MEMBER(gottlieb_state::stooges_output_w)
+void gottlieb_state::stooges_output_w(u8 data)
 {
 	general_output_w(data & ~0x60);
 
@@ -366,7 +366,7 @@ WRITE8_MEMBER(gottlieb_state::stooges_output_w)
  *
  *************************************/
 
-READ8_MEMBER(gottlieb_state::laserdisc_status_r)
+uint8_t gottlieb_state::laserdisc_status_r(offs_t offset)
 {
 	/* IP5 reads low 8 bits of Philips code */
 	if (offset == 0)
@@ -389,21 +389,21 @@ READ8_MEMBER(gottlieb_state::laserdisc_status_r)
 	}
 	else
 	{
-		uint8_t result = m_laserdisc_audio_buffer[m_laserdisc_audio_address++];
+		u8 result = m_laserdisc_audio_buffer[m_laserdisc_audio_address++];
 		m_laserdisc_audio_address %= AUDIORAM_SIZE;
 		return result;
 	}
 }
 
 
-WRITE8_MEMBER(gottlieb_state::laserdisc_select_w)
+void gottlieb_state::laserdisc_select_w(u8 data)
 {
 	/* selects between reading audio data and reading status */
 	m_laserdisc_select = data & 1;
 }
 
 
-WRITE8_MEMBER(gottlieb_state::laserdisc_command_w)
+void gottlieb_state::laserdisc_command_w(u8 data)
 {
 	/* a write here latches data into a 8-bit register and starts
 	   a sequence of events that sends serial data to the player */
@@ -452,8 +452,8 @@ TIMER_CALLBACK_MEMBER(gottlieb_state::laserdisc_bit_off_callback)
 
 TIMER_CALLBACK_MEMBER(gottlieb_state::laserdisc_bit_callback)
 {
-	uint8_t bitsleft = param >> 16;
-	uint8_t data = param;
+	u8 bitsleft = param >> 16;
+	u8 data = param;
 	attotime duration;
 
 	/* assert the line and set a timer for deassertion */
@@ -656,7 +656,7 @@ void gottlieb_state::laserdisc_audio_process(int samplerate, int samples, const 
 //   a real kicker/knocker, hook it up via output "knocker0")
 //-------------------------------------------------
 
-void gottlieb_state::qbert_knocker(uint8_t knock)
+void gottlieb_state::qbert_knocker(u8 knock)
 {
 	output().set_value("knocker0", knock);
 
@@ -2600,21 +2600,21 @@ void gottlieb_state::init_romtiles()
 void gottlieb_state::init_qbert()
 {
 	init_romtiles();
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x5803, 0x5803, 0, 0x07f8, 0, write8_delegate(*this, FUNC(gottlieb_state::qbert_output_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x5803, 0x5803, 0, 0x07f8, 0, write8smo_delegate(*this, FUNC(gottlieb_state::qbert_output_w)));
 }
 
 
 void gottlieb_state::init_qbertqub()
 {
 	init_romtiles();
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x5803, 0x5803, 0, 0x07f8, 0, write8_delegate(*this, FUNC(gottlieb_state::qbertqub_output_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x5803, 0x5803, 0, 0x07f8, 0, write8smo_delegate(*this, FUNC(gottlieb_state::qbertqub_output_w)));
 }
 
 
 void gottlieb_state::init_stooges()
 {
 	init_ramtiles();
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x5803, 0x5803, 0, 0x07f8, 0, write8_delegate(*this, FUNC(gottlieb_state::stooges_output_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x5803, 0x5803, 0, 0x07f8, 0, write8smo_delegate(*this, FUNC(gottlieb_state::stooges_output_w)));
 }
 
 

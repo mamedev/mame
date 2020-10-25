@@ -4,13 +4,47 @@
 
     Leapfrog Clickstart Emulation
 
-        Die markings show "SunPlus QL8041C" ( known as Sunplus SPG2?? )
-    The keyboard has a "SunPlus PU6583" MCU under a glob, and the
-     mouse optical sensor is a N2163, probably from Agilent.
+         Die markings show "SunPlus QL8041C" (known as Sunplus SPG2??).
+         The keyboard has a "SunPlus PU6583" MCU under a glob, and the
+         mouse optical sensor is a N2163, probably from Agilent.
+
+    ClickStart cartridges pinout:
+
+         1 N/C          2 GND
+         3 GND          4 VCC
+         5 GND          6 VCC
+         7 N/C          8 N/C
+         9 N/C         10 N/C
+        11 N/C         12 to 53
+        13 A2          14 A1
+        15 A4          16 A3
+        17 A6          18 A5
+        19 A17         20 A7
+                 Key
+        21 N/C         22 A18
+        23 A19         24 A20
+        25 A9          26 A8
+        27 A11         28 A10
+        29 A13         30 A12
+        31 A15         32 A14
+        33 D15         34 A16
+        35 D14         36 D7
+        37 D13         38 D6
+        39 D12         40 D5
+        41 D11         42 D4
+        43 D10         44 D3
+        45 D9          46 D2
+        47 D8          48 D1
+        49 N/C         50 D0
+        51 /OE         52 A0
+        53 to 12       54 N/C
+        55 GND         56 N/C
+        57 GND         58 N/C
+        59 GND         60 GND
 
     Status:
 
-        Some games have Checksums listed in the header area that appear to be
+         Some games have Checksums listed in the header area that appear to be
          like the byte checksums on the Radica games in vii.cpp, however the
          calculation doesn't add up correctly.  There is also a checksum in
          a footer area at the end of every ROM that does add up correctly in
@@ -78,16 +112,16 @@ private:
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
-	DECLARE_READ16_MEMBER(rom_r);
+	uint16_t rom_r(offs_t offset);
 
-	DECLARE_WRITE16_MEMBER(porta_w);
-	DECLARE_WRITE16_MEMBER(portb_w);
-	DECLARE_WRITE16_MEMBER(portc_w);
-	DECLARE_READ16_MEMBER(porta_r);
-	DECLARE_READ16_MEMBER(portb_r);
-	DECLARE_READ16_MEMBER(portc_r);
+	void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t porta_r(offs_t offset, uint16_t mem_mask = ~0);
+	uint16_t portb_r(offs_t offset, uint16_t mem_mask = ~0);
+	uint16_t portc_r(offs_t offset, uint16_t mem_mask = ~0);
 
-	DECLARE_WRITE8_MEMBER(chip_sel_w);
+	void chip_sel_w(uint8_t data);
 
 	void handle_uart_tx();
 	void uart_tx_fifo_push(uint8_t value);
@@ -289,7 +323,7 @@ void clickstart_state::update_mouse_buffer()
 	uart_tx_fifo_push((uint8_t)sum);
 }
 
-READ16_MEMBER(clickstart_state::rom_r)
+uint16_t clickstart_state::rom_r(offs_t offset)
 {
 	if (offset < 0x400000 / 2)
 	{
@@ -304,37 +338,37 @@ READ16_MEMBER(clickstart_state::rom_r)
 	}
 }
 
-WRITE16_MEMBER(clickstart_state::porta_w)
+void clickstart_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//logerror("%s: porta_w: %04x & %04x\n", machine().describe_context(), data, mem_mask);
 }
 
-WRITE16_MEMBER(clickstart_state::portb_w)
+void clickstart_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//logerror("%s: portb_w: %04x & %04x\n", machine().describe_context(), data, mem_mask);
 }
 
-WRITE16_MEMBER(clickstart_state::portc_w)
+void clickstart_state::portc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// Bit 12: SCK from SPG SIO
 	// Bit 11: SDA from SPG SIO
 	//logerror("%s: portc_w: %04x & %04x\n", machine().describe_context(), data, mem_mask);
 }
 
-READ16_MEMBER(clickstart_state::porta_r)
+uint16_t clickstart_state::porta_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0x4000;
 	logerror("%s: porta_r: %04x & %04x\n", machine().describe_context(), data, mem_mask);
 	return data;
 }
 
-READ16_MEMBER(clickstart_state::portb_r)
+uint16_t clickstart_state::portb_r(offs_t offset, uint16_t mem_mask)
 {
 	//logerror("%s: portb_r: %04x\n", machine().describe_context(), mem_mask);
 	return 0;
 }
 
-READ16_MEMBER(clickstart_state::portc_r)
+uint16_t clickstart_state::portc_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = m_unk_portc_toggle;
 	m_unk_portc_toggle ^= 0x0400;
@@ -342,7 +376,7 @@ READ16_MEMBER(clickstart_state::portc_r)
 	return data;
 }
 
-WRITE8_MEMBER(clickstart_state::chip_sel_w)
+void clickstart_state::chip_sel_w(uint8_t data)
 {
 	// Seems unused, currently
 }

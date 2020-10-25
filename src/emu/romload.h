@@ -5,7 +5,9 @@
     romload.h
 
     ROM loading functions.
+
 *********************************************************************/
+
 #ifndef MAME_EMU_ROMLOAD_H
 #define MAME_EMU_ROMLOAD_H
 
@@ -477,6 +479,7 @@ private:
 
 /* return pointer to the first ROM region within a source */
 const rom_entry *rom_first_region(const device_t &device);
+const rom_entry *rom_first_region(const rom_entry *romp);
 
 /* return pointer to the next ROM region within a source */
 const rom_entry *rom_next_region(const rom_entry *romp);

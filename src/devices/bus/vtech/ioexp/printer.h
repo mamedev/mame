@@ -36,8 +36,8 @@ protected:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER( busy_w );
-	DECLARE_READ8_MEMBER( busy_r );
-	DECLARE_WRITE8_MEMBER( strobe_w );
+	uint8_t busy_r();
+	void strobe_w(uint8_t data);
 
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_latch;

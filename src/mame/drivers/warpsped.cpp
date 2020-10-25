@@ -115,8 +115,8 @@ private:
 	tilemap_t   *m_starfield_tilemap;
 	uint8_t       m_regs[0x28];
 
-	DECLARE_WRITE8_MEMBER(hardware_w);
-	DECLARE_WRITE8_MEMBER(vidram_w);
+	void hardware_w(offs_t offset, uint8_t data);
+	void vidram_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	TILE_GET_INFO_MEMBER(get_starfield_tile_info);
@@ -130,7 +130,7 @@ private:
 	void warpspeed_map(address_map &map);
 };
 
-WRITE8_MEMBER(warpspeed_state::hardware_w)
+void warpspeed_state::hardware_w(offs_t offset, uint8_t data)
 {
 	m_regs[offset] = data;
 }
@@ -151,7 +151,7 @@ TILE_GET_INFO_MEMBER(warpspeed_state::get_starfield_tile_info)
 	tileinfo.set(1, code, 0, 0);
 }
 
-WRITE8_MEMBER(warpspeed_state::vidram_w)
+void warpspeed_state::vidram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_text_tilemap->mark_tile_dirty(offset);
@@ -171,7 +171,7 @@ static void draw_circle_line(bitmap_ind16 &bitmap, int x, int y, int l, int colo
 {
 	if (y >= 0 && y <= bitmap.height() - 1)
 	{
-		uint16_t* pLine = &bitmap.pix16(y);
+		uint16_t *const pLine = &bitmap.pix(y);
 
 		int h1 = x - l;
 		int h2 = x + l;

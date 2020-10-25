@@ -45,12 +45,12 @@ WRITE_LINE_MEMBER(micro3d_state::duart_txb)
 	m_audiocpu->set_input_line(MCS51_RX_LINE, CLEAR_LINE);
 }
 
-READ8_MEMBER(micro3d_state::data_to_i8031)
+uint8_t micro3d_state::data_to_i8031()
 {
 	return m_m68681_tx0;
 }
 
-WRITE8_MEMBER(micro3d_state::data_from_i8031)
+void micro3d_state::data_from_i8031(uint8_t data)
 {
 	m_duart->rx_b_w(data);
 }
@@ -63,7 +63,7 @@ WRITE8_MEMBER(micro3d_state::data_from_i8031)
  * 4: -
  * 5: -
  */
-READ8_MEMBER(micro3d_state::duart_input_r)
+uint8_t micro3d_state::duart_input_r()
 {
 	return 0x2;
 }
@@ -72,7 +72,7 @@ READ8_MEMBER(micro3d_state::duart_input_r)
  * 5: /I8051 reset
  * 7: Status LED
 */
-WRITE8_MEMBER(micro3d_state::duart_output_w)
+void micro3d_state::duart_output_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, data & 0x20 ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -84,7 +84,7 @@ WRITE8_MEMBER(micro3d_state::duart_output_w)
  *
  *************************************/
 
-READ8_MEMBER( micro3d_state::vgb_uart_r )
+uint8_t micro3d_state::vgb_uart_r(offs_t offset)
 {
 	// the mode and sync registers switched places?
 	if (offset == 1 || offset == 2)
@@ -93,7 +93,7 @@ READ8_MEMBER( micro3d_state::vgb_uart_r )
 	return m_vgb_uart->read(offset);
 }
 
-WRITE8_MEMBER( micro3d_state::vgb_uart_w )
+void micro3d_state::vgb_uart_w(offs_t offset, uint8_t data)
 {
 	// the mode and sync registers switched places?
 	if (offset == 1 || offset == 2)
@@ -143,18 +143,18 @@ TIMER_CALLBACK_MEMBER(micro3d_state::mac_done_callback)
 	m_mac_stat = 0;
 }
 
-WRITE32_MEMBER(micro3d_state::micro3d_mac1_w)
+void micro3d_state::micro3d_mac1_w(uint32_t data)
 {
 	m_vtx_addr = (data & 0x3ffff);
 	m_sram_w_addr = (data >> 18) & 0xfff;
 }
 
-READ32_MEMBER(micro3d_state::micro3d_mac2_r)
+uint32_t micro3d_state::micro3d_mac2_r()
 {
 	return (m_mac_inst << 1) | m_mac_stat;
 }
 
-WRITE32_MEMBER(micro3d_state::micro3d_mac2_w)
+void micro3d_state::micro3d_mac2_w(uint32_t data)
 {
 	uint32_t cnt = data & 0xff;
 	uint32_t inst = (data >> 8) & 0x1f;
@@ -349,7 +349,7 @@ WRITE32_MEMBER(micro3d_state::micro3d_mac2_w)
  *
  *************************************/
 
-READ16_MEMBER(micro3d_state::micro3d_encoder_h_r)
+uint16_t micro3d_state::micro3d_encoder_h_r()
 {
 	uint16_t x_encoder = m_joystick_x.read_safe(0);
 	uint16_t y_encoder = m_joystick_y.read_safe(0);
@@ -357,7 +357,7 @@ READ16_MEMBER(micro3d_state::micro3d_encoder_h_r)
 	return (y_encoder & 0xf00) | ((x_encoder & 0xf00) >> 8);
 }
 
-READ16_MEMBER(micro3d_state::micro3d_encoder_l_r)
+uint16_t micro3d_state::micro3d_encoder_l_r()
 {
 	uint16_t x_encoder = m_joystick_x.read_safe(0);
 	uint16_t y_encoder = m_joystick_y.read_safe(0);
@@ -365,7 +365,7 @@ READ16_MEMBER(micro3d_state::micro3d_encoder_l_r)
 	return ((y_encoder & 0xff) << 8) | (x_encoder & 0xff);
 }
 
-READ8_MEMBER( micro3d_state::adc_volume_r )
+uint8_t micro3d_state::adc_volume_r()
 {
 	return (uint8_t)((255.0/100.0) * m_volume->read() + 0.5);
 }
@@ -375,13 +375,13 @@ READ_LINE_MEMBER(micro3d_state::botss_hwchk_r)
 	return m_botss_latch;
 }
 
-READ16_MEMBER(micro3d_state::botss_140000_r)
+uint16_t micro3d_state::botss_140000_r()
 {
 	m_botss_latch = 0;
 	return 0xffff;
 }
 
-READ16_MEMBER(micro3d_state::botss_180000_r)
+uint16_t micro3d_state::botss_180000_r()
 {
 	m_botss_latch = 1;
 	return 0xffff;
@@ -393,7 +393,7 @@ READ16_MEMBER(micro3d_state::botss_180000_r)
  *
  *************************************/
 
-WRITE16_MEMBER(micro3d_state::micro3d_reset_w)
+void micro3d_state::micro3d_reset_w(uint16_t data)
 {
 	data >>= 8;
 	m_drmath->set_input_line(INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
@@ -401,7 +401,7 @@ WRITE16_MEMBER(micro3d_state::micro3d_reset_w)
 	/* TODO: Joystick reset? */
 }
 
-WRITE16_MEMBER(micro3d_state::host_drmath_int_w)
+void micro3d_state::host_drmath_int_w(uint16_t data)
 {
 	m_drmath->set_input_line(AM29000_INTR2, ASSERT_LINE);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
@@ -414,23 +414,23 @@ WRITE16_MEMBER(micro3d_state::host_drmath_int_w)
  *
  *************************************/
 
-WRITE32_MEMBER(micro3d_state::micro3d_shared_w)
+void micro3d_state::micro3d_shared_w(offs_t offset, uint32_t data)
 {
 	m_shared_ram[offset * 2 + 1] = data & 0xffff;
 	m_shared_ram[offset * 2 + 0] = data >> 16;
 }
 
-READ32_MEMBER(micro3d_state::micro3d_shared_r)
+uint32_t micro3d_state::micro3d_shared_r(offs_t offset)
 {
 	return (m_shared_ram[offset * 2] << 16) | m_shared_ram[offset * 2 + 1];
 }
 
-WRITE32_MEMBER(micro3d_state::drmath_int_w)
+void micro3d_state::drmath_int_w(uint32_t data)
 {
 	m_maincpu->set_input_line(5, HOLD_LINE);
 }
 
-WRITE32_MEMBER(micro3d_state::drmath_intr2_ack)
+void micro3d_state::drmath_intr2_ack(uint32_t data)
 {
 	m_drmath->set_input_line(AM29000_INTR2, CLEAR_LINE);
 }
@@ -454,18 +454,18 @@ WRITE32_MEMBER(micro3d_state::drmath_intr2_ack)
 ***************************************************************************/
 
 
-WRITE8_MEMBER(micro3d_state::micro3d_snd_dac_a)
+void micro3d_state::micro3d_snd_dac_a(uint8_t data)
 {
 	m_noise_1->dac_w(data);
 	m_noise_2->dac_w(data);
 }
 
-WRITE8_MEMBER(micro3d_state::micro3d_snd_dac_b)
+void micro3d_state::micro3d_snd_dac_b(uint8_t data)
 {
 	/* TODO: This controls upd7759 volume */
 }
 
-WRITE8_MEMBER(micro3d_state::micro3d_sound_p1_w)
+void micro3d_state::micro3d_sound_p1_w(uint8_t data)
 {
 	m_sound_port_latch[1] = data;
 
@@ -473,7 +473,7 @@ WRITE8_MEMBER(micro3d_state::micro3d_sound_p1_w)
 	noise->noise_sh_w(data);
 }
 
-WRITE8_MEMBER(micro3d_state::micro3d_sound_p3_w)
+void micro3d_state::micro3d_sound_p3_w(uint8_t data)
 {
 	m_sound_port_latch[3] = data;
 
@@ -481,17 +481,17 @@ WRITE8_MEMBER(micro3d_state::micro3d_sound_p3_w)
 	m_upd7759->reset_w(!BIT(data, 4));
 }
 
-READ8_MEMBER(micro3d_state::micro3d_sound_p1_r)
+uint8_t micro3d_state::micro3d_sound_p1_r()
 {
 	return (m_sound_port_latch[1] & 0x7f) | m_sound_sw->read();
 }
 
-READ8_MEMBER(micro3d_state::micro3d_sound_p3_r)
+uint8_t micro3d_state::micro3d_sound_p3_r()
 {
 	return (m_sound_port_latch[3] & 0xf7) | (m_upd7759->busy_r() ? 0x08 : 0);
 }
 
-WRITE8_MEMBER(micro3d_state::micro3d_upd7759_w)
+void micro3d_state::micro3d_upd7759_w(uint8_t data)
 {
 	m_upd7759->port_w(data);
 	m_upd7759->start_w(0);
@@ -524,8 +524,8 @@ void micro3d_state::init_botss()
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* Required to pass the hardware version check */
-	space.install_read_handler(0x140000, 0x140001, read16_delegate(*this, FUNC(micro3d_state::botss_140000_r)));
-	space.install_read_handler(0x180000, 0x180001, read16_delegate(*this, FUNC(micro3d_state::botss_180000_r)));
+	space.install_read_handler(0x140000, 0x140001, read16smo_delegate(*this, FUNC(micro3d_state::botss_140000_r)));
+	space.install_read_handler(0x180000, 0x180001, read16smo_delegate(*this, FUNC(micro3d_state::botss_180000_r)));
 
 	init_micro3d();
 }

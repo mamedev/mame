@@ -128,7 +128,7 @@ ROM_START(hp82939)
 	ROM_LOAD("1820-2438.bin" , 0 , 0x800 , CRC(3a2f42a2) SHA1(0f6a70eb8981a8a87c7514ce8226ff1af3ac1668))
 ROM_END
 
-READ8_MEMBER(hp82939_io_card_device::p1_r)
+uint8_t hp82939_io_card_device::p1_r()
 {
 	uint8_t res = uint8_t(m_sw12->read() & 0x7f);
 
@@ -137,14 +137,14 @@ READ8_MEMBER(hp82939_io_card_device::p1_r)
 	return res;
 }
 
-WRITE8_MEMBER(hp82939_io_card_device::p1_w)
+void hp82939_io_card_device::p1_w(uint8_t data)
 {
 	if (BIT(data , 7)) {
 		m_uart->reset();
 	}
 }
 
-READ8_MEMBER(hp82939_io_card_device::p2_r)
+uint8_t hp82939_io_card_device::p2_r()
 {
 	uint8_t res = uint8_t((m_sw12->read() >> 7) & 0xf);
 
@@ -163,7 +163,7 @@ READ8_MEMBER(hp82939_io_card_device::p2_r)
 	return res;
 }
 
-READ8_MEMBER(hp82939_io_card_device::cpu_r)
+uint8_t hp82939_io_card_device::cpu_r(offs_t offset)
 {
 	if ((offset & 0x82) == 0x00) {
 		return m_translator->uc_r(offset & 1);
@@ -174,7 +174,7 @@ READ8_MEMBER(hp82939_io_card_device::cpu_r)
 	}
 }
 
-WRITE8_MEMBER(hp82939_io_card_device::cpu_w)
+void hp82939_io_card_device::cpu_w(offs_t offset, uint8_t data)
 {
 	if ((offset & 0x82) == 0x00) {
 		m_translator->uc_w(offset & 1 , data);

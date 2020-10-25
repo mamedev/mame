@@ -9,14 +9,15 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "screen.h"
+
 #include "emuopts.h"
-#include "png.h"
+#include "render.h"
 #include "rendutil.h"
 
-#include <nanosvg/src/nanosvg.h>
-#include <nanosvg/src/nanosvgrast.h>
+#include "nanosvg.h"
+#include "png.h"
 
-#include <clocale>
 #include <set>
 
 
@@ -43,7 +44,6 @@ u32 screen_device::m_id_counter = 0;
 class screen_device::svg_renderer {
 public:
 	svg_renderer(memory_region *region);
-	~svg_renderer();
 
 	int width() const;
 	int height() const;
@@ -69,8 +69,8 @@ private:
 		int x0, y0, x1, y1;
 	};
 
-	NSVGimage *m_image;
-	NSVGrasterizer *m_rasterizer;
+	util::nsvg_image_ptr m_image;
+	util::nsvg_rasterizer_ptr m_rasterizer;
 	std::vector<bool> m_key_state;
 	std::vector<std::vector<NSVGshape *>> m_keyed_shapes;
 	std::unordered_map<std::string, int> m_key_ids;
@@ -94,20 +94,11 @@ private:
 
 screen_device::svg_renderer::svg_renderer(memory_region *region)
 {
-	// nanosvg makes assumptions about the global locale
-	{
-		const std::unique_ptr<char []> s(new char[region->bytes() + 1]);
-		memcpy(s.get(), region->base(), region->bytes());
-		s[region->bytes()] = 0;
-		const std::string lcctype(std::setlocale(LC_CTYPE, nullptr));
-		const std::string lcnumeric(std::setlocale(LC_NUMERIC, nullptr));
-		std::setlocale(LC_CTYPE, "C");
-		std::setlocale(LC_NUMERIC, "C");
-		m_image = nsvgParse(s.get(), "px", 72);
-		std::setlocale(LC_CTYPE, lcctype.c_str());
-		std::setlocale(LC_NUMERIC, lcnumeric.c_str());
-	}
-	m_rasterizer = nsvgCreateRasterizer();
+	const std::unique_ptr<char []> s(new char[region->bytes() + 1]);
+	memcpy(s.get(), region->base(), region->bytes());
+	s[region->bytes()] = 0;
+	m_image.reset(nsvgParse(s.get(), "px", 72));
+	m_rasterizer.reset(nsvgCreateRasterizer());
 
 	m_key_count = 0;
 
@@ -132,12 +123,6 @@ screen_device::svg_renderer::svg_renderer(memory_region *region)
 	osd_printf_verbose("Parsed SVG '%s', aspect ratio %f\n", region->name(), (m_image->height == 0.0f) ? 0 : m_image->width / m_image->height);
 }
 
-screen_device::svg_renderer::~svg_renderer()
-{
-	nsvgDeleteRasterizer(m_rasterizer);
-	nsvgDelete(m_image);
-}
-
 int screen_device::svg_renderer::width() const
 {
 	return int(m_image->width + 0.5);
@@ -159,7 +144,7 @@ void screen_device::svg_renderer::render_state(std::vector<u32> &dest, const std
 				s->flags &= ~NSVG_FLAGS_VISIBLE;
 	}
 
-	nsvgRasterize(m_rasterizer, m_image, 0, 0, m_scale, (unsigned char *)&dest[0], m_sx, m_sy, m_sx*4);
+	nsvgRasterize(m_rasterizer.get(), m_image.get(), 0, 0, m_scale, (unsigned char *)&dest[0], m_sx, m_sy, m_sx*4);
 
 	// Nanosvg generates non-premultiplied alpha, so remultiply by
 	// alpha to "blend" against a black background.  Plus align the
@@ -569,7 +554,7 @@ screen_device::screen_device(const machine_config &mconfig, const char *tag, dev
 	, m_curtexture(0)
 	, m_changed(true)
 	, m_last_partial_scan(0)
-	, m_partial_scan_hpos(0)
+	, m_partial_scan_hpos(-1)
 	, m_color(rgb_t(0xff, 0xff, 0xff, 0xff))
 	, m_brightness(0xff)
 	, m_frame_period(DEFAULT_FRAME_PERIOD.as_attoseconds())
@@ -1260,6 +1245,7 @@ bool screen_device::update_partial(int scanline)
 
 	// remember where we left off
 	m_last_partial_scan = scanline + 1;
+	m_partial_scan_hpos = -1;
 	return true;
 }
 
@@ -1293,16 +1279,30 @@ void screen_device::update_now()
 	int current_hpos = hpos();
 	rectangle clip = m_visarea;
 
+	// skip if we already rendered this line
+	if (current_vpos < m_last_partial_scan)
+	{
+		LOG_PARTIAL_UPDATES(("skipped because line was already rendered\n"));
+		return;
+	}
+
+	// if beam position is the same, there's nothing to update
+	if (current_vpos == m_last_partial_scan && current_hpos == m_partial_scan_hpos)
+	{
+		LOG_PARTIAL_UPDATES(("skipped because beam position is unchanged\n"));
+		return;
+	}
+
 	LOG_PARTIAL_UPDATES(("update_now(): Y=%d, X=%d, last partial %d, partial hpos %d  (vis %d %d)\n", current_vpos, current_hpos, m_last_partial_scan, m_partial_scan_hpos, m_visarea.right(), m_visarea.bottom()));
 
 	// start off by doing a partial update up to the line before us, in case that was necessary
 	if (current_vpos > m_last_partial_scan)
 	{
 		// if the line before us was incomplete, we must do it in two pieces
-		if (m_partial_scan_hpos > 0)
+		if (m_partial_scan_hpos >= 0)
 		{
 			// now finish the previous partial scanline
-			clip.set((std::max)(clip.left(), m_partial_scan_hpos),
+			clip.set((std::max)(clip.left(), m_partial_scan_hpos + 1),
 					 clip.right(),
 					 (std::max)(clip.top(), m_last_partial_scan),
 					 (std::min)(clip.bottom(), m_last_partial_scan));
@@ -1312,6 +1312,7 @@ void screen_device::update_now()
 			{
 				g_profiler.start(PROFILER_VIDEO);
 
+				u32 flags = 0;
 				screen_bitmap &curbitmap = m_bitmap[m_curbitmap];
 				if (m_video_attributes & VIDEO_VARIABLE_WIDTH)
 				{
@@ -1319,8 +1320,8 @@ void screen_device::update_now()
 					switch (curbitmap.format())
 					{
 						default:
-						case BITMAP_FORMAT_IND16: m_screen_update_ind16(*this, *(bitmap_ind16 *)m_scan_bitmaps[m_curbitmap][m_last_partial_scan], clip);   break;
-						case BITMAP_FORMAT_RGB32: m_screen_update_rgb32(*this, *(bitmap_rgb32 *)m_scan_bitmaps[m_curbitmap][m_last_partial_scan], clip);   break;
+						case BITMAP_FORMAT_IND16:   flags = m_screen_update_ind16(*this, *(bitmap_ind16 *)m_scan_bitmaps[m_curbitmap][m_last_partial_scan], clip);   break;
+						case BITMAP_FORMAT_RGB32:   flags = m_screen_update_rgb32(*this, *(bitmap_rgb32 *)m_scan_bitmaps[m_curbitmap][m_last_partial_scan], clip);   break;
 					}
 				}
 				else
@@ -1328,16 +1329,20 @@ void screen_device::update_now()
 					switch (curbitmap.format())
 					{
 						default:
-						case BITMAP_FORMAT_IND16: m_screen_update_ind16(*this, curbitmap.as_ind16(), clip);   break;
-						case BITMAP_FORMAT_RGB32: m_screen_update_rgb32(*this, curbitmap.as_rgb32(), clip);   break;
+						case BITMAP_FORMAT_IND16:   flags = m_screen_update_ind16(*this, curbitmap.as_ind16(), clip);   break;
+						case BITMAP_FORMAT_RGB32:   flags = m_screen_update_rgb32(*this, curbitmap.as_rgb32(), clip);   break;
 					}
 				}
 
-				m_partial_updates_this_frame++;
 				g_profiler.stop();
-				m_partial_scan_hpos = 0;
-				m_last_partial_scan++;
+				m_partial_updates_this_frame++;
+
+				// if we modified the bitmap, we have to commit
+				m_changed |= ~flags & UPDATE_HAS_NOT_CHANGED;
 			}
+
+			m_partial_scan_hpos = -1;
+			m_last_partial_scan++;
 		}
 		if (current_vpos > m_last_partial_scan)
 		{
@@ -1348,7 +1353,7 @@ void screen_device::update_now()
 	// now draw this partial scanline
 	clip = m_visarea;
 
-	clip.set((std::max)(clip.left(), m_partial_scan_hpos),
+	clip.set((std::max)(clip.left(), m_partial_scan_hpos + 1),
 			 (std::min)(clip.right(), current_hpos),
 			 (std::max)(clip.top(), current_vpos),
 			 (std::min)(clip.bottom(), current_vpos));
@@ -1387,18 +1392,11 @@ void screen_device::update_now()
 
 		// if we modified the bitmap, we have to commit
 		m_changed |= ~flags & UPDATE_HAS_NOT_CHANGED;
-
-		// remember where we left off
-		m_partial_scan_hpos = current_hpos;
-		m_last_partial_scan = current_vpos;
-
-		// if we completed the line, mark it so
-		if (current_hpos >= m_visarea.right())
-		{
-			m_partial_scan_hpos = 0;
-			m_last_partial_scan = current_vpos + 1;
-		}
 	}
+
+	// remember where we left off
+	m_partial_scan_hpos = current_hpos;
+	m_last_partial_scan = current_vpos;
 }
 
 
@@ -1410,7 +1408,7 @@ void screen_device::update_now()
 void screen_device::reset_partial_updates()
 {
 	m_last_partial_scan = 0;
-	m_partial_scan_hpos = 0;
+	m_partial_scan_hpos = -1;
 	m_partial_updates_this_frame = 0;
 	m_scanline0_timer->adjust(time_until_pos(0));
 }
@@ -1717,9 +1715,9 @@ void screen_device::create_composited_bitmap()
 		{
 			for (int y = 0; y < dstheight; y++)
 			{
-				bitmap_ind16 &srcbitmap = *(bitmap_ind16 *)m_scan_bitmaps[m_curbitmap][y];
-				u16 *dst = &curbitmap.as_ind16().pix16(y);
-				const u16 *src = &srcbitmap.pix16(0);
+				const bitmap_ind16 &srcbitmap = *(bitmap_ind16 *)m_scan_bitmaps[m_curbitmap][y];
+				u16 *dst = &curbitmap.as_ind16().pix(y);
+				const u16 *src = &srcbitmap.pix(0);
 				const int dx = (m_scan_widths[y] << 15) / dstwidth;
 				for (int x = 0; x < m_scan_widths[y]; x += dx)
 				{
@@ -1733,9 +1731,9 @@ void screen_device::create_composited_bitmap()
 		{
 			for (int y = 0; y < dstheight; y++)
 			{
-				bitmap_rgb32 &srcbitmap = *(bitmap_rgb32 *)m_scan_bitmaps[m_curbitmap][y];
-				u32 *dst = &curbitmap.as_rgb32().pix32(y);
-				const u32 *src = &srcbitmap.pix32(0);
+				const bitmap_rgb32 &srcbitmap = *(bitmap_rgb32 *)m_scan_bitmaps[m_curbitmap][y];
+				u32 *dst = &curbitmap.as_rgb32().pix(y);
+				const u32 *src = &srcbitmap.pix(0);
 				const int dx = (m_scan_widths[y] << 15) / dstwidth;
 				for (int x = 0; x < dstwidth << 15; x += dx)
 				{
@@ -1824,10 +1822,10 @@ void screen_device::update_burnin()
 			// iterate over rows in the destination
 			for (int y = 0, srcy = ystart; y < dstheight; y++, srcy += ystep)
 			{
-				bitmap_ind16 &srcbitmap = per_scanline ? *(bitmap_ind16 *)m_scan_bitmaps[m_curbitmap][y] : curbitmap.as_ind16();
-				u64 *dst = &m_burnin.pix64(y);
-				const u16 *src = &srcbitmap.pix16(per_scanline ? 0 : (srcy >> 16));
-				const rgb_t *palette = m_palette->palette()->entry_list_adjusted();
+				const bitmap_ind16 &srcbitmap = per_scanline ? *(bitmap_ind16 *)m_scan_bitmaps[m_curbitmap][y] : curbitmap.as_ind16();
+				u64 *const dst = &m_burnin.pix(y);
+				u16 const *const src = &srcbitmap.pix(per_scanline ? 0 : (srcy >> 16));
+				rgb_t const *const palette = m_palette->palette()->entry_list_adjusted();
 				for (int x = 0, srcx = xstart; x < dstwidth; x++, srcx += xstep)
 				{
 					rgb_t pixel = palette[src[srcx >> 16]];
@@ -1842,9 +1840,9 @@ void screen_device::update_burnin()
 			// iterate over rows in the destination
 			for (int y = 0, srcy = ystart; y < dstheight; y++, srcy += ystep)
 			{
-				bitmap_rgb32 &srcbitmap = per_scanline ? *(bitmap_rgb32 *)m_scan_bitmaps[m_curbitmap][y] : curbitmap.as_rgb32();
-				u64 *dst = &m_burnin.pix64(y);
-				const u32 *src = &srcbitmap.pix32(per_scanline ? 0 : (srcy >> 16));
+				const bitmap_rgb32 &srcbitmap = per_scanline ? *(bitmap_rgb32 *)m_scan_bitmaps[m_curbitmap][y] : curbitmap.as_rgb32();
+				u64 *const dst = &m_burnin.pix(y);
+				u32 const *const src = &srcbitmap.pix(per_scanline ? 0 : (srcy >> 16));
 				for (int x = 0, srcx = xstart; x < dstwidth; x++, srcx += xstep)
 				{
 					rgb_t pixel = src[srcx >> 16];
@@ -1887,7 +1885,7 @@ void screen_device::finalize_burnin()
 	u64 maxval = 0;
 	for (int y = 0; y < srcheight; y++)
 	{
-		u64 *src = &m_burnin.pix64(y);
+		u64 const *const src = &m_burnin.pix(y);
 		for (int x = 0; x < srcwidth; x++)
 		{
 			minval = std::min(minval, src[x]);
@@ -1901,8 +1899,8 @@ void screen_device::finalize_burnin()
 	// now normalize and convert to RGB
 	for (int y = 0, srcy = 0; y < dstheight; y++, srcy += ystep)
 	{
-		u64 *src = &m_burnin.pix64(srcy >> 16);
-		u32 *dst = &finalmap.pix32(y);
+		u64 const *const src = &m_burnin.pix(srcy >> 16);
+		u32 *const dst = &finalmap.pix(y);
 		for (int x = 0, srcx = 0; x < dstwidth; x++, srcx += xstep)
 		{
 			int brightness = u64(maxval - src[srcx >> 16]) * 255 / (maxval - minval);
@@ -1917,14 +1915,14 @@ void screen_device::finalize_burnin()
 	osd_file::error filerr = file.open(util::string_format("%s" PATH_SEPARATOR "burnin-%s.png", machine().basename(), tag() + 1));
 	if (filerr == osd_file::error::NONE)
 	{
-		png_info pnginfo;
+		util::png_info pnginfo;
 
 		// add two text entries describing the image
 		pnginfo.add_text("Software", util::string_format("%s %s", emulator_info::get_appname(), emulator_info::get_build_version()).c_str());
 		pnginfo.add_text("System", util::string_format("%s %s", machine().system().manufacturer, machine().system().type.fullname()).c_str());
 
 		// now do the actual work
-		png_write_bitmap(file, &pnginfo, finalmap, 0, nullptr);
+		util::png_write_bitmap(file, &pnginfo, finalmap, 0, nullptr);
 	}
 }
 
@@ -1943,8 +1941,13 @@ void screen_device::load_effect_overlay(const char *filename)
 	fullname.append(".png");
 
 	// load the file
+	m_screen_overlay_bitmap.reset();
 	emu_file file(machine().options().art_path(), OPEN_FLAG_READ);
-	render_load_png(m_screen_overlay_bitmap, file, nullptr, fullname.c_str());
+	if (file.open(fullname) == osd_file::error::NONE)
+	{
+		render_load_png(m_screen_overlay_bitmap, file);
+		file.close();
+	}
 	if (m_screen_overlay_bitmap.valid())
 		m_container->set_overlay(&m_screen_overlay_bitmap);
 	else

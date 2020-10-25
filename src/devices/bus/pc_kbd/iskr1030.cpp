@@ -392,7 +392,7 @@ READ_LINE_MEMBER( iskr_1030_keyboard_device::t1_r )
 //  ram_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( iskr_1030_keyboard_device::ram_w )
+void iskr_1030_keyboard_device::ram_w(offs_t offset, uint8_t data)
 {
 	LOGDBG("ram_w[%02x] <- %02x\n", offset, data);
 
@@ -405,7 +405,7 @@ WRITE8_MEMBER( iskr_1030_keyboard_device::ram_w )
 //  ram_r -
 //-------------------------------------------------
 
-READ8_MEMBER( iskr_1030_keyboard_device::ram_r )
+uint8_t iskr_1030_keyboard_device::ram_r(offs_t offset)
 {
 	LOGDBG("ram_r[%02x] = %02x\n", offset, m_ram[offset]);
 
@@ -417,7 +417,7 @@ READ8_MEMBER( iskr_1030_keyboard_device::ram_r )
 //  p1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( iskr_1030_keyboard_device::p1_r )
+uint8_t iskr_1030_keyboard_device::p1_r()
 {
 	/*
 	    bit     description
@@ -444,7 +444,7 @@ READ8_MEMBER( iskr_1030_keyboard_device::p1_r )
 //  p2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( iskr_1030_keyboard_device::p2_w )
+void iskr_1030_keyboard_device::p2_w(uint8_t data)
 {
 	/*
 	    bit     description
@@ -468,7 +468,7 @@ WRITE8_MEMBER( iskr_1030_keyboard_device::p2_w )
 //  p1_w - OK
 //-------------------------------------------------
 
-WRITE8_MEMBER( iskr_1030_keyboard_device::p1_w )
+void iskr_1030_keyboard_device::p1_w(uint8_t data)
 {
 	/*
 	    bit     description

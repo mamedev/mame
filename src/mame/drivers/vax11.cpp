@@ -85,33 +85,33 @@ public:
 private:
 	required_device<t11_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
-	DECLARE_READ16_MEMBER( term_r );
-	DECLARE_READ16_MEMBER( term_tx_status_r );
-	DECLARE_READ16_MEMBER( term_rx_status_r );
-	DECLARE_WRITE16_MEMBER( term_w );
+	uint16_t term_r();
+	uint16_t term_tx_status_r();
+	uint16_t term_rx_status_r();
+	void term_w(uint16_t data);
 	void kbd_put(u8 data);
 	uint8_t m_term_data;
 	uint16_t m_term_status;
 	void vax11_mem(address_map &map);
 };
 
-WRITE16_MEMBER(vax11_state::term_w)
+void vax11_state::term_w(uint16_t data)
 {
 	m_terminal->write(data);
 }
 
-READ16_MEMBER(vax11_state::term_r)
+uint16_t vax11_state::term_r()
 {
 	m_term_status = 0x0000;
 	return m_term_data;
 }
 
-READ16_MEMBER(vax11_state::term_tx_status_r)
+uint16_t vax11_state::term_tx_status_r()
 {   // always ready
 	return 0xffff;
 }
 
-READ16_MEMBER(vax11_state::term_rx_status_r)
+uint16_t vax11_state::term_rx_status_r()
 {
 	return m_term_status;
 }

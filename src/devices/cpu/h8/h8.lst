@@ -577,8 +577,23 @@ macro jsr32 %opc %spreg
 	write16(TMP1, (CCR << 8) | CCR);
 	prefetch_done();
 
+01410400     ffffff00     0 orc      imm8     exr      s20
+	EXR |= IR[1];
+	update_irq_filter();
+	prefetch_noirq();
+
+01410500     ffffff00     0 xorc     imm8     exr      s20
+	EXR ^= IR[1] & ~EXR_NC;
+	update_irq_filter();
+	prefetch_noirq();
+
+01410600     ffffff00     0 andc     imm8     exr      s20
+	EXR &= IR[1] | EXR_NC;
+	update_irq_filter();
+	prefetch_noirq();
+
 01410700     ffffff00     0 ldc      imm8     exr      s20
-	EXR = IR[1];
+	EXR = IR[1] | EXR_NC;
 	update_irq_filter();
 	prefetch_noirq();
 
@@ -873,7 +888,7 @@ macro jsr32 %opc %spreg
 	prefetch_noirq();
 
 0310         fff0         0 ldc      r8l      exr      s20
-	EXR = r8_r(IR[0]);
+	EXR = r8_r(IR[0]) | EXR_NC;
 	update_irq_filter();
 	prefetch_noirq();
 
@@ -1542,7 +1557,7 @@ macro jsr32 %opc %spreg
 	TMP1 = r32_r(7);
 	if(mode_advanced) {
 		if(exr_in_stack()) {
-			EXR = read16(TMP1) >> 8;
+			EXR = (read16(TMP1) >> 8) | EXR_NC;
 			TMP1 += 2;
 		}
 		TMP2 = read16(TMP1);

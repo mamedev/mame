@@ -71,14 +71,14 @@ void acorn_econet_device::device_reset()
 	address_space &space = m_bus->memspace();
 
 	space.install_readwrite_handler(0x1940, 0x1943, read8sm_delegate(*m_adlc, FUNC(mc6854_device::read)), write8sm_delegate(*m_adlc, FUNC(mc6854_device::write)));
-	space.install_read_handler(0x1944, 0x1944, read8_delegate(*this, FUNC(acorn_econet_device::statid_r)));
+	space.install_read_handler(0x1944, 0x1944, read8smo_delegate(*this, FUNC(acorn_econet_device::statid_r)));
 }
 
 //**************************************************************************
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER(acorn_econet_device::statid_r)
+uint8_t acorn_econet_device::statid_r()
 {
 	return 0xfe;
 }

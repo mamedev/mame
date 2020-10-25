@@ -542,7 +542,7 @@ void psxmdec_device::dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t
 		n_1_status &= ~( 1L << 29 );
 }
 
-WRITE32_MEMBER( psxmdec_device::write )
+void psxmdec_device::write(offs_t offset, uint32_t data)
 {
 	switch( offset )
 	{
@@ -557,7 +557,7 @@ WRITE32_MEMBER( psxmdec_device::write )
 	}
 }
 
-READ32_MEMBER( psxmdec_device::read )
+uint32_t psxmdec_device::read(offs_t offset)
 {
 	switch( offset )
 	{

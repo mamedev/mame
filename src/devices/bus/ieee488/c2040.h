@@ -32,13 +32,13 @@ public:
 	// construction/destruction
 	c2040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( dio_r );
-	DECLARE_WRITE8_MEMBER( dio_w );
-	DECLARE_READ8_MEMBER( riot1_pa_r );
-	DECLARE_WRITE8_MEMBER( riot1_pa_w );
-	DECLARE_READ8_MEMBER( riot1_pb_r );
-	DECLARE_WRITE8_MEMBER( riot1_pb_w );
-	DECLARE_WRITE8_MEMBER( via_pb_w );
+	uint8_t dio_r();
+	void dio_w(uint8_t data);
+	uint8_t riot1_pa_r();
+	void riot1_pa_w(uint8_t data);
+	uint8_t riot1_pb_r();
+	void riot1_pb_w(uint8_t data);
+	void via_pb_w(uint8_t data);
 
 	void c2040_fdc_mem(address_map &map);
 	void c2040_main_mem(address_map &map);

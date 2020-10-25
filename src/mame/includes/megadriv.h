@@ -24,7 +24,7 @@
 #define MD_CPU_REGION_SIZE 0x800000
 
 
-/*----------- defined in machine/megadriv.c -----------*/
+/*----------- defined in machine/megadriv.cpp -----------*/
 
 INPUT_PORTS_EXTERN( md_common );
 INPUT_PORTS_EXTERN( megadriv );
@@ -76,26 +76,26 @@ public:
 	void init_megadriv();
 	void init_megadrij();
 
-	DECLARE_READ8_MEMBER(megadriv_68k_YM2612_read);
-	DECLARE_WRITE8_MEMBER(megadriv_68k_YM2612_write);
+	uint8_t megadriv_68k_YM2612_read(offs_t offset, uint8_t mem_mask = ~0);
+	void megadriv_68k_YM2612_write(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
 	IRQ_CALLBACK_MEMBER(genesis_int_callback);
 	void megadriv_init_common();
 
 	void megadriv_z80_bank_w(uint16_t data);
-	DECLARE_WRITE16_MEMBER( megadriv_68k_z80_bank_write );
-	DECLARE_WRITE8_MEMBER(megadriv_z80_z80_bank_w);
-	DECLARE_READ16_MEMBER( megadriv_68k_io_read );
-	DECLARE_WRITE16_MEMBER( megadriv_68k_io_write );
-	DECLARE_READ16_MEMBER( megadriv_68k_read_z80_ram );
-	DECLARE_WRITE16_MEMBER( megadriv_68k_write_z80_ram );
-	DECLARE_READ16_MEMBER( megadriv_68k_check_z80_bus );
-	DECLARE_WRITE16_MEMBER( megadriv_68k_req_z80_bus );
-	DECLARE_WRITE16_MEMBER ( megadriv_68k_req_z80_reset );
-	DECLARE_READ8_MEMBER( z80_read_68k_banked_data );
-	DECLARE_WRITE8_MEMBER( z80_write_68k_banked_data );
-	DECLARE_WRITE8_MEMBER( megadriv_z80_vdp_write );
-	DECLARE_READ8_MEMBER( megadriv_z80_vdp_read );
-	DECLARE_READ8_MEMBER( megadriv_z80_unmapped_read );
+	void megadriv_68k_z80_bank_write(uint16_t data);
+	void megadriv_z80_z80_bank_w(uint8_t data);
+	uint16_t megadriv_68k_io_read(offs_t offset);
+	void megadriv_68k_io_write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t megadriv_68k_read_z80_ram(offs_t offset, uint16_t mem_mask = ~0);
+	void megadriv_68k_write_z80_ram(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t megadriv_68k_check_z80_bus(offs_t offset, uint16_t mem_mask = ~0);
+	void megadriv_68k_req_z80_bus(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void megadriv_68k_req_z80_reset(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t z80_read_68k_banked_data(offs_t offset);
+	void z80_write_68k_banked_data(offs_t offset, uint8_t data);
+	void megadriv_z80_vdp_write(offs_t offset, uint8_t data);
+	uint8_t megadriv_z80_vdp_read(offs_t offset);
+	uint8_t megadriv_z80_unmapped_read();
 	TIMER_CALLBACK_MEMBER(megadriv_z80_run_state);
 
 	/* Megadrive / Genesis has 3 I/O ports */
@@ -104,8 +104,8 @@ public:
 	uint8_t m_megadrive_io_data_regs[3];
 	uint8_t m_megadrive_io_ctrl_regs[3];
 	uint8_t m_megadrive_io_tx_regs[3];
-	read8_delegate m_megadrive_io_read_data_port_ptr;
-	write16_delegate m_megadrive_io_write_data_port_ptr;
+	read8sm_delegate m_megadrive_io_read_data_port_ptr;
+	write16sm_delegate m_megadrive_io_write_data_port_ptr;
 
 	WRITE_LINE_MEMBER(vdp_sndirqline_callback_genesis_z80);
 	WRITE_LINE_MEMBER(vdp_lv6irqline_callback_genesis_68k);
@@ -113,15 +113,15 @@ public:
 
 	TIMER_CALLBACK_MEMBER( io_timeout_timer_callback );
 	void megadrive_reset_io();
-	DECLARE_READ8_MEMBER(megadrive_io_read_data_port_6button);
-	DECLARE_READ8_MEMBER(megadrive_io_read_data_port_3button);
+	uint8_t megadrive_io_read_data_port_6button(offs_t offset);
+	uint8_t megadrive_io_read_data_port_3button(offs_t offset);
 	uint8_t megadrive_io_read_ctrl_port(int portnum);
 	uint8_t megadrive_io_read_tx_port(int portnum);
 	uint8_t megadrive_io_read_rx_port(int portnum);
 	uint8_t megadrive_io_read_sctrl_port(int portnum);
 
-	DECLARE_WRITE16_MEMBER(megadrive_io_write_data_port_3button);
-	DECLARE_WRITE16_MEMBER(megadrive_io_write_data_port_6button);
+	void megadrive_io_write_data_port_3button(offs_t offset, uint16_t data);
+	void megadrive_io_write_data_port_6button(offs_t offset, uint16_t data);
 	void megadrive_io_write_ctrl_port(int portnum, uint16_t data);
 	void megadrive_io_write_tx_port(int portnum, uint16_t data);
 	void megadrive_io_write_rx_port(int portnum, uint16_t data);
@@ -135,7 +135,7 @@ public:
 	uint32_t screen_update_megadriv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_megadriv);
 
-	DECLARE_WRITE8_MEMBER(megadriv_tas_callback);
+	void megadriv_tas_callback(offs_t offset, uint8_t data);
 
 	void megadriv_timers(machine_config &config);
 	void md_ntsc(machine_config &config);
@@ -175,8 +175,8 @@ public:
 	void init_md_eur();
 	void init_md_jpn();
 
-	READ8_MEMBER(mess_md_io_read_data_port);
-	WRITE16_MEMBER(mess_md_io_write_data_port);
+	uint8_t mess_md_io_read_data_port(offs_t offset);
+	void mess_md_io_write_data_port(offs_t offset, uint16_t data);
 
 	DECLARE_MACHINE_START( md_common );     // setup ioport_port
 	DECLARE_MACHINE_START( ms_megadriv );   // setup ioport_port + install cartslot handlers
@@ -193,8 +193,8 @@ public:
 
 	void install_cartslot();
 	void install_tmss();
-	DECLARE_READ16_MEMBER(tmss_r);
-	DECLARE_WRITE16_MEMBER(tmss_swap_w);
+	uint16_t tmss_r(offs_t offset);
+	void tmss_swap_w(uint16_t data);
 	void genesis_32x_scd(machine_config &config);
 	void mdj_32x_scd(machine_config &config);
 	void ms_megadpal(machine_config &config);

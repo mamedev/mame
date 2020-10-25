@@ -64,19 +64,19 @@ void wc90b_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(wc90b_state::bgvideoram_w)
+void wc90b_state::bgvideoram_w(offs_t offset, uint8_t data)
 {
 	m_bgvideoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-WRITE8_MEMBER(wc90b_state::fgvideoram_w)
+void wc90b_state::fgvideoram_w(offs_t offset, uint8_t data)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-WRITE8_MEMBER(wc90b_state::txvideoram_w)
+void wc90b_state::txvideoram_w(offs_t offset, uint8_t data)
 {
 	m_txvideoram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset & 0x7ff);

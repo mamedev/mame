@@ -19,10 +19,10 @@ public:
 	void set_ram_words(uint32_t size) { m_ramsize = size; }
 	void set_color_base(int color) { m_color_base = color; }
 
-	DECLARE_READ16_MEMBER( control_r );
-	DECLARE_WRITE16_MEMBER( control_w );
-	DECLARE_READ16_MEMBER( videoram_r );
-	DECLARE_WRITE16_MEMBER( videoram_w );
+	uint16_t control_r(offs_t offset);
+	void control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t videoram_r(offs_t offset);
+	void videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	typedef delegate<void (uint16_t, int*, int*, int)> c169_tilemap_delegate;
 	void set_tile_callback(c169_tilemap_delegate tilemap_cb) { m_c169_cb = tilemap_cb; }

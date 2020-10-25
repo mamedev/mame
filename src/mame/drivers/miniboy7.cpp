@@ -320,7 +320,7 @@ int miniboy7_state::get_color_offset(uint8_t tile, uint8_t attr, int ra, int px)
 
 MC6845_UPDATE_ROW( miniboy7_state::crtc_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
 	for (uint8_t cx = 0; cx < x_count; cx+=1)
 	{
@@ -332,9 +332,9 @@ MC6845_UPDATE_ROW( miniboy7_state::crtc_update_row )
 			uint8_t color_b = m_proms[offset_b] & 0x0f;
 
 			if (color_a && (m_gpri || !color_b))          // videoram A has priority
-				bitmap.pix32(y, (cx << 3) + px) = palette[offset_a];
+				bitmap.pix(y, (cx << 3) + px) = palette[offset_a];
 			else if (color_b && (!m_gpri || !color_a))    // videoram B has priority
-				bitmap.pix32(y, (cx << 3) + px) = palette[offset_b];
+				bitmap.pix(y, (cx << 3) + px) = palette[offset_b];
 		}
 	}
 }

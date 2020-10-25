@@ -59,10 +59,10 @@ public:
 	void init_gp_1();
 
 private:
-	DECLARE_WRITE8_MEMBER(porta_w);
-	DECLARE_WRITE8_MEMBER(portas_w);
-	DECLARE_WRITE8_MEMBER(portc_w);
-	DECLARE_READ8_MEMBER(portb_r);
+	void porta_w(uint8_t data);
+	void portas_w(uint8_t data);
+	void portc_w(uint8_t data);
+	uint8_t portb_r();
 	TIMER_DEVICE_CALLBACK_MEMBER(zero_timer);
 	void gp_1_io(address_map &map);
 	void gp_1_map(address_map &map);
@@ -284,7 +284,7 @@ static INPUT_PORTS_START( gp_1 )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-READ8_MEMBER( gp_1_state::portb_r )
+uint8_t gp_1_state::portb_r()
 {
 	switch (m_u14)
 	{
@@ -310,7 +310,7 @@ READ8_MEMBER( gp_1_state::portb_r )
 	return 0;
 }
 
-WRITE8_MEMBER( gp_1_state::porta_w )
+void gp_1_state::porta_w(uint8_t data)
 {
 	m_u14 = data >> 4;
 	if ((data > 0x0f) && (data < 0x30))
@@ -375,7 +375,7 @@ WRITE8_MEMBER( gp_1_state::porta_w )
 	}
 }
 
-WRITE8_MEMBER( gp_1_state::portas_w )
+void gp_1_state::portas_w(uint8_t data)
 {
 	m_u14 = data >> 4;
 	if (m_u14 == 1)
@@ -407,10 +407,10 @@ WRITE8_MEMBER( gp_1_state::portas_w )
 		}
 	}
 
-	porta_w(space, offset, data);
+	porta_w(data);
 }
 
-WRITE8_MEMBER( gp_1_state::portc_w )
+void gp_1_state::portc_w(uint8_t data)
 {
 	output().set_value("led0", !BIT(data, 3));
 	m_digit = data & 7;

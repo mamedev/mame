@@ -283,9 +283,9 @@ void zsg2_device::filter_samples(zchan *ch)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void zsg2_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void zsg2_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	for (int i = 0; i < samples; i++)
+	for (int i = 0; i < outputs[0].samples(); i++)
 	{
 		int32_t mix[4] = {};
 
@@ -355,8 +355,7 @@ void zsg2_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 		}
 
 		for(int output=0; output<4; output++)
-			outputs[output][i] = std::min<int32_t>(std::max<int32_t>(mix[output], -32768), 32767);
-
+			outputs[output].put_int_clamp(i, mix[output], 32768);
 	}
 	m_sample_count++;
 }
@@ -609,7 +608,7 @@ uint16_t zsg2_device::control_r(int reg)
 
 /******************************************************************************/
 
-WRITE16_MEMBER(zsg2_device::write)
+void zsg2_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// we only support full 16-bit accesses
 	if (mem_mask != 0xffff)
@@ -633,7 +632,7 @@ WRITE16_MEMBER(zsg2_device::write)
 	}
 }
 
-READ16_MEMBER(zsg2_device::read)
+uint16_t zsg2_device::read(offs_t offset, uint16_t mem_mask)
 {
 	// we only support full 16-bit accesses
 	if (mem_mask != 0xffff)

@@ -141,16 +141,16 @@ public:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ16_MEMBER(port3_r);
-	DECLARE_WRITE16_MEMBER(port3_w);
-	DECLARE_READ16_MEMBER(port5_r);
-	DECLARE_WRITE16_MEMBER(port5_w);
-	DECLARE_READ16_MEMBER(port6_r);
-	DECLARE_WRITE16_MEMBER(port6_w);
-	DECLARE_READ16_MEMBER(porta_r);
-	DECLARE_READ16_MEMBER(portg_r);
+	uint16_t port3_r();
+	void port3_w(uint16_t data);
+	uint16_t port5_r();
+	void port5_w(uint16_t data);
+	uint16_t port6_r();
+	void port6_w(uint16_t data);
+	uint16_t porta_r();
+	uint16_t portg_r();
 
-	DECLARE_WRITE16_MEMBER(vctl_w);
+	void vctl_w(uint16_t data);
 
 	void invqix_io_map(address_map &map);
 	void invqix_prg_map(address_map &map);
@@ -174,8 +174,6 @@ void invqix_state::video_start()
 
 uint32_t invqix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int x,y;
-
 	// this means freeze or blank or something
 	if (m_vctl == 0x100)
 	{
@@ -184,45 +182,39 @@ uint32_t invqix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 	if (m_vctl == 0x0000)
 	{
-		for(y=0;y<256;y++)
+		for(int y=0;y<256;y++)
 		{
-			for(x=0;x<256;x++)
+			for(int x=0;x<256;x++)
 			{
-				uint8_t r,g,b;
-				int pen_data;
-
-				pen_data = (m_vram[(x+y*256)]);
-				b = (pen_data & 0x001f);
-				g = (pen_data & 0x03e0) >> 5;
-				r = (pen_data & 0x7c00) >> 10;
+				int pen_data = (m_vram[(x+y*256)]);
+				uint8_t b = (pen_data & 0x001f);
+				uint8_t g = (pen_data & 0x03e0) >> 5;
+				uint8_t r = (pen_data & 0x7c00) >> 10;
 				r = (r << 3) | (r & 0x7);
 				g = (g << 3) | (g & 0x7);
 				b = (b << 3) | (b & 0x7);
 
 				if(cliprect.contains(x, y))
-					bitmap.pix32(y, x) = r << 16 | g << 8 | b;
+					bitmap.pix(y, x) = r << 16 | g << 8 | b;
 			}
 		}
 	}
 	else if (m_vctl == 0x0001)  // flip
 	{
-		for(y=0;y<256;y++)
+		for(int y=0;y<256;y++)
 		{
-			for(x=0;x<256;x++)
+			for(int x=0;x<256;x++)
 			{
-				uint8_t r,g,b;
-				int pen_data;
-
-				pen_data = (m_vram[(256-x)+((256-y)*256)]);
-				b = (pen_data & 0x001f);
-				g = (pen_data & 0x03e0) >> 5;
-				r = (pen_data & 0x7c00) >> 10;
+				int pen_data = (m_vram[(256-x)+((256-y)*256)]);
+				uint8_t b = (pen_data & 0x001f);
+				uint8_t g = (pen_data & 0x03e0) >> 5;
+				uint8_t r = (pen_data & 0x7c00) >> 10;
 				r = (r << 3) | (r & 0x7);
 				g = (g << 3) | (g & 0x7);
 				b = (b << 3) | (b & 0x7);
 
 				if(cliprect.contains(x, y))
-					bitmap.pix32(y, x) = r << 16 | g << 8 | b;
+					bitmap.pix(y, x) = r << 16 | g << 8 | b;
 			}
 		}
 	}
@@ -234,47 +226,47 @@ uint32_t invqix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	return 0;
 }
 
-READ16_MEMBER(invqix_state::port3_r)
+uint16_t invqix_state::port3_r()
 {
 	return (m_eeprom->do_read() << 5) | 0x03;
 }
 
-WRITE16_MEMBER(invqix_state::port3_w)
+void invqix_state::port3_w(uint16_t data)
 {
 	m_eeprom->cs_write((data >> 2) & 1);
 	m_eeprom->di_write((data >> 4) & 1);
 	m_eeprom->clk_write((data >> 3) & 1);
 }
 
-READ16_MEMBER(invqix_state::port5_r)
+uint16_t invqix_state::port5_r()
 {
 	return 0;
 }
 
-WRITE16_MEMBER(invqix_state::port5_w)
+void invqix_state::port5_w(uint16_t data)
 {
 }
 
-READ16_MEMBER(invqix_state::port6_r)
+uint16_t invqix_state::port6_r()
 {
 	return 0;
 }
 
-WRITE16_MEMBER(invqix_state::port6_w)
+void invqix_state::port6_w(uint16_t data)
 {
 }
 
-READ16_MEMBER(invqix_state::porta_r)
+uint16_t invqix_state::porta_r()
 {
 	return 0xf0;
 }
 
-READ16_MEMBER(invqix_state::portg_r)
+uint16_t invqix_state::portg_r()
 {
 	return 0;
 }
 
-WRITE16_MEMBER(invqix_state::vctl_w)
+void invqix_state::vctl_w(uint16_t data)
 {
 	m_vctl = data;
 }

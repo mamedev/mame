@@ -77,12 +77,6 @@ DEFINE_DEVICE_TYPE(C219, c219_device, "c219", "Namco C219")
 //  LIVE DEVICE
 //**************************************************************************
 
-static inline int limit(s32 in)
-{
-	return std::max(-0x7fff, std::min(0x8000, in));
-}
-
-
 //-------------------------------------------------
 //  c140_device - constructor
 //-------------------------------------------------
@@ -95,7 +89,7 @@ c140_device::c140_device(const machine_config &mconfig, const char *tag, device_
 c140_device::c140_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, device_rom_interface(mconfig, *this, 25, ENDIANNESS_BIG, 16) // Verified from schematics (24 bit address, 12(16? for C219) bit data)
+	, device_rom_interface(mconfig, *this)
 	, m_int1_callback(*this)
 	, m_sample_rate(0)
 	, m_stream(nullptr)
@@ -206,7 +200,7 @@ void c140_device::device_clock_changed()
 
 	/* allocate a pair of buffers to mix into - 1 second's worth should be more than enough */
 	m_mixer_buffer_left = std::make_unique<s16[]>(m_sample_rate);
-	m_mixer_buffer_right = std::make_unique<s16[]>(m_sample_rate);;
+	m_mixer_buffer_right = std::make_unique<s16[]>(m_sample_rate);
 }
 
 
@@ -220,7 +214,7 @@ void c140_device::rom_bank_updated()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void c140_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	s32   dt;
 
@@ -228,6 +222,7 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 
 	s16   *lmix, *rmix;
 
+	int samples = outputs[0].samples();
 	if (samples > m_sample_rate) samples = m_sample_rate;
 
 	/* zap the contents of the mixer buffer */
@@ -323,21 +318,17 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 	lmix = m_mixer_buffer_left.get();
 	rmix = m_mixer_buffer_right.get();
 	{
-		stream_sample_t *dest1 = outputs[0];
-		stream_sample_t *dest2 = outputs[1];
+		auto &dest1 = outputs[0];
+		auto &dest2 = outputs[1];
 		for (int i = 0; i < samples; i++)
 		{
-			s32 val;
-
-			val = 8 * (*lmix++);
-			*dest1++ = limit(val);
-			val = 8 * (*rmix++);
-			*dest2++ = limit(val);
+			dest1.put_int_clamp(i, *lmix++, 32768 / 8);
+			dest2.put_int_clamp(i, *rmix++, 32768 / 8);
 		}
 	}
 }
 
-void c219_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void c219_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	s32   dt;
 
@@ -345,6 +336,7 @@ void c219_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 
 	s16   *lmix, *rmix;
 
+	int samples = outputs[0].samples();
 	if (samples > m_sample_rate) samples = m_sample_rate;
 
 	/* zap the contents of the mixer buffer */
@@ -419,7 +411,7 @@ void c219_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 
 					if (ch_noise(v)) // noise
 					{
-        				m_lfsr = (m_lfsr >> 1) ^ ((-(m_lfsr & 1)) & 0xfff6);
+						m_lfsr = (m_lfsr >> 1) ^ ((-(m_lfsr & 1)) & 0xfff6);
 						lastdt = s16(m_lfsr);
 					}
 					else
@@ -460,16 +452,12 @@ void c219_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 	lmix = m_mixer_buffer_left.get();
 	rmix = m_mixer_buffer_right.get();
 	{
-		stream_sample_t *dest1 = outputs[0];
-		stream_sample_t *dest2 = outputs[1];
+		auto &dest1 = outputs[0];
+		auto &dest2 = outputs[1];
 		for (int i = 0; i < samples; i++)
 		{
-			s32 val;
-
-			val = 8 * (*lmix++);
-			*dest1++ = limit(val);
-			val = 8 * (*rmix++);
-			*dest2++ = limit(val);
+			dest1.put_int_clamp(i, *lmix++, 32768 / 8);
+			dest2.put_int_clamp(i, *rmix++, 32768 / 8);
 		}
 	}
 }

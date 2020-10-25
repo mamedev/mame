@@ -33,11 +33,11 @@ public:
 	}
 	auto dmairq_cb() { return m_dmairq_cb.bind(); }
 
-	DECLARE_READ16_MEMBER(reg_r);
-	DECLARE_WRITE16_MEMBER(reg_w);
-	DECLARE_READ16_MEMBER(ram_r);
-	DECLARE_WRITE16_MEMBER(ram_w);
-	DECLARE_READ16_MEMBER(rom_r);
+	uint16_t reg_r(offs_t offset);
+	void reg_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t ram_r(offs_t offset);
+	void ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t rom_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 	DECLARE_READ_LINE_MEMBER(dmairq_r);
 

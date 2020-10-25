@@ -22,8 +22,8 @@ public:
 	void set_xpos_shift(u8 data) { m_xpos_shift = data; }
 	void set_color_entry_mask(u16 data) { m_color_entry_mask = data; }
 
-	DECLARE_READ16_MEMBER(spriteram_r);
-	DECLARE_WRITE16_MEMBER(spriteram_w);
+	u16 spriteram_r(offs_t offset);
+	void spriteram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int group, u16 start_offset, u16 end_offset);
 	void draw_sprites_all(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites_alt(bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -93,7 +93,7 @@ private:
 	TILE_GET_INFO_MEMBER(dkong3abl_char_tile_info);
 
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
-	DECLARE_WRITE8_MEMBER(scroll_ram_w);
+	void scroll_ram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(color_bank_1_w);
 	DECLARE_WRITE_LINE_MEMBER(color_bank_2_w);
 
@@ -103,7 +103,7 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
-	DECLARE_WRITE8_MEMBER(output_latches_w);
+	void output_latches_w(offs_t offset, uint8_t data);
 
 	void bootleg_map(address_map &map);
 	void main_map(address_map &map);
@@ -562,7 +562,7 @@ WRITE_LINE_MEMBER(ambush_state::flip_screen_w)
 	flip_screen_set(state);
 }
 
-WRITE8_MEMBER( ambush_state::scroll_ram_w )
+void ambush_state::scroll_ram_w(offs_t offset, uint8_t data)
 {
 	m_scroll_ram[offset] = data;
 	m_char_tilemap->set_scrolly(offset, data + 1);
@@ -715,7 +715,7 @@ WRITE_LINE_MEMBER(ambush_state::coin_counter_2_w)
 	machine().bookkeeping().coin_counter_w(1, state);
 }
 
-WRITE8_MEMBER(ambush_state::output_latches_w)
+void ambush_state::output_latches_w(offs_t offset, uint8_t data)
 {
 	m_outlatch[0]->write_bit(offset, BIT(data, 0));
 	m_outlatch[1]->write_bit(offset, BIT(data, 1));

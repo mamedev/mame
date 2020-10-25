@@ -39,6 +39,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( centronics_input_data6 ) { if (state) m_centronics_data |= 0x40; else m_centronics_data &= ~0x40; }
 	DECLARE_WRITE_LINE_MEMBER( centronics_input_data7 ) { if (state) m_centronics_data |= 0x80; else m_centronics_data &= ~0x80; }
 
+		int ready_led() { return !m_centronics_busy; }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -74,6 +76,7 @@ private:
 	uint8_t m_centronics_strobe;
 	uint8_t m_centronics_data_latch;
 	uint8_t m_centronics_data_latched;
+	uint32_t m_c000_shift_register;
 };
 
 DECLARE_DEVICE_TYPE(E05A30, e05a30_device)

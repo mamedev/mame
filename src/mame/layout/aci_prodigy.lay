@@ -360,100 +360,100 @@ license:CC0
 		<bounds x="0" y="0" width="80" height="80" />
 
 		<!-- squares (avoid seams) -->
-		<bezel element="cwhite"><bounds x="0"  y="0" width="11" height="11" /></bezel>
-		<bezel element="cblack"><bounds x="10" y="0" width="11" height="11" /></bezel>
-		<bezel element="cwhite"><bounds x="20" y="0" width="11" height="11" /></bezel>
-		<bezel element="cblack"><bounds x="30" y="0" width="11" height="11" /></bezel>
-		<bezel element="cwhite"><bounds x="40" y="0" width="11" height="11" /></bezel>
-		<bezel element="cblack"><bounds x="50" y="0" width="11" height="11" /></bezel>
-		<bezel element="cwhite"><bounds x="60" y="0" width="11" height="11" /></bezel>
-		<bezel element="cblack"><bounds x="70" y="0" width="10" height="11" /></bezel>
+		<element ref="cwhite"><bounds x="0"  y="0" width="11" height="11" /></element>
+		<element ref="cblack"><bounds x="10" y="0" width="11" height="11" /></element>
+		<element ref="cwhite"><bounds x="20" y="0" width="11" height="11" /></element>
+		<element ref="cblack"><bounds x="30" y="0" width="11" height="11" /></element>
+		<element ref="cwhite"><bounds x="40" y="0" width="11" height="11" /></element>
+		<element ref="cblack"><bounds x="50" y="0" width="11" height="11" /></element>
+		<element ref="cwhite"><bounds x="60" y="0" width="11" height="11" /></element>
+		<element ref="cblack"><bounds x="70" y="0" width="10" height="11" /></element>
 
-		<bezel element="cblack"><bounds x="0"  y="10" width="11" height="11" /></bezel>
-		<bezel element="cwhite"><bounds x="10" y="10" width="11" height="11" /></bezel>
-		<bezel element="cblack"><bounds x="20" y="10" width="11" height="11" /></bezel>
-		<bezel element="cwhite"><bounds x="30" y="10" width="11" height="11" /></bezel>
-		<bezel element="cblack"><bounds x="40" y="10" width="11" height="11" /></bezel>
-		<bezel element="cwhite"><bounds x="50" y="10" width="11" height="11" /></bezel>
-		<bezel element="cblack"><bounds x="60" y="10" width="11" height="11" /></bezel>
-		<bezel element="cwhite"><bounds x="70" y="10" width="10" height="11" /></bezel>
+		<element ref="cblack"><bounds x="0"  y="10" width="11" height="11" /></element>
+		<element ref="cwhite"><bounds x="10" y="10" width="11" height="11" /></element>
+		<element ref="cblack"><bounds x="20" y="10" width="11" height="11" /></element>
+		<element ref="cwhite"><bounds x="30" y="10" width="11" height="11" /></element>
+		<element ref="cblack"><bounds x="40" y="10" width="11" height="11" /></element>
+		<element ref="cwhite"><bounds x="50" y="10" width="11" height="11" /></element>
+		<element ref="cblack"><bounds x="60" y="10" width="11" height="11" /></element>
+		<element ref="cwhite"><bounds x="70" y="10" width="10" height="11" /></element>
 
-		<bezel element="cwhite"><bounds x="0"  y="20" width="11" height="11" /></bezel>
-		<bezel element="cblack"><bounds x="10" y="20" width="11" height="11" /></bezel>
-		<bezel element="cwhite"><bounds x="20" y="20" width="11" height="11" /></bezel>
-		<bezel element="cblack"><bounds x="30" y="20" width="11" height="11" /></bezel>
-		<bezel element="cwhite"><bounds x="40" y="20" width="11" height="11" /></bezel>
-		<bezel element="cblack"><bounds x="50" y="20" width="11" height="11" /></bezel>
-		<bezel element="cwhite"><bounds x="60" y="20" width="11" height="11" /></bezel>
-		<bezel element="cblack"><bounds x="70" y="20" width="10" height="11" /></bezel>
+		<element ref="cwhite"><bounds x="0"  y="20" width="11" height="11" /></element>
+		<element ref="cblack"><bounds x="10" y="20" width="11" height="11" /></element>
+		<element ref="cwhite"><bounds x="20" y="20" width="11" height="11" /></element>
+		<element ref="cblack"><bounds x="30" y="20" width="11" height="11" /></element>
+		<element ref="cwhite"><bounds x="40" y="20" width="11" height="11" /></element>
+		<element ref="cblack"><bounds x="50" y="20" width="11" height="11" /></element>
+		<element ref="cwhite"><bounds x="60" y="20" width="11" height="11" /></element>
+		<element ref="cblack"><bounds x="70" y="20" width="10" height="11" /></element>
 
-		<bezel element="cblack"><bounds x="0"  y="30" width="11" height="11" /></bezel>
-		<bezel element="cwhite"><bounds x="10" y="30" width="11" height="11" /></bezel>
-		<bezel element="cblack"><bounds x="20" y="30" width="11" height="11" /></bezel>
-		<bezel element="cwhite"><bounds x="30" y="30" width="11" height="11" /></bezel>
-		<bezel element="cblack"><bounds x="40" y="30" width="11" height="11" /></bezel>
-		<bezel element="cwhite"><bounds x="50" y="30" width="11" height="11" /></bezel>
-		<bezel element="cblack"><bounds x="60" y="30" width="11" height="11" /></bezel>
-		<bezel element="cwhite"><bounds x="70" y="30" width="10" height="11" /></bezel>
+		<element ref="cblack"><bounds x="0"  y="30" width="11" height="11" /></element>
+		<element ref="cwhite"><bounds x="10" y="30" width="11" height="11" /></element>
+		<element ref="cblack"><bounds x="20" y="30" width="11" height="11" /></element>
+		<element ref="cwhite"><bounds x="30" y="30" width="11" height="11" /></element>
+		<element ref="cblack"><bounds x="40" y="30" width="11" height="11" /></element>
+		<element ref="cwhite"><bounds x="50" y="30" width="11" height="11" /></element>
+		<element ref="cblack"><bounds x="60" y="30" width="11" height="11" /></element>
+		<element ref="cwhite"><bounds x="70" y="30" width="10" height="11" /></element>
 
-		<bezel element="cwhite"><bounds x="0"  y="40" width="11" height="11" /></bezel>
-		<bezel element="cblack"><bounds x="10" y="40" width="11" height="11" /></bezel>
-		<bezel element="cwhite"><bounds x="20" y="40" width="11" height="11" /></bezel>
-		<bezel element="cblack"><bounds x="30" y="40" width="11" height="11" /></bezel>
-		<bezel element="cwhite"><bounds x="40" y="40" width="11" height="11" /></bezel>
-		<bezel element="cblack"><bounds x="50" y="40" width="11" height="11" /></bezel>
-		<bezel element="cwhite"><bounds x="60" y="40" width="11" height="11" /></bezel>
-		<bezel element="cblack"><bounds x="70" y="40" width="10" height="11" /></bezel>
+		<element ref="cwhite"><bounds x="0"  y="40" width="11" height="11" /></element>
+		<element ref="cblack"><bounds x="10" y="40" width="11" height="11" /></element>
+		<element ref="cwhite"><bounds x="20" y="40" width="11" height="11" /></element>
+		<element ref="cblack"><bounds x="30" y="40" width="11" height="11" /></element>
+		<element ref="cwhite"><bounds x="40" y="40" width="11" height="11" /></element>
+		<element ref="cblack"><bounds x="50" y="40" width="11" height="11" /></element>
+		<element ref="cwhite"><bounds x="60" y="40" width="11" height="11" /></element>
+		<element ref="cblack"><bounds x="70" y="40" width="10" height="11" /></element>
 
-		<bezel element="cblack"><bounds x="0"  y="50" width="11" height="11" /></bezel>
-		<bezel element="cwhite"><bounds x="10" y="50" width="11" height="11" /></bezel>
-		<bezel element="cblack"><bounds x="20" y="50" width="11" height="11" /></bezel>
-		<bezel element="cwhite"><bounds x="30" y="50" width="11" height="11" /></bezel>
-		<bezel element="cblack"><bounds x="40" y="50" width="11" height="11" /></bezel>
-		<bezel element="cwhite"><bounds x="50" y="50" width="11" height="11" /></bezel>
-		<bezel element="cblack"><bounds x="60" y="50" width="11" height="11" /></bezel>
-		<bezel element="cwhite"><bounds x="70" y="50" width="10" height="11" /></bezel>
+		<element ref="cblack"><bounds x="0"  y="50" width="11" height="11" /></element>
+		<element ref="cwhite"><bounds x="10" y="50" width="11" height="11" /></element>
+		<element ref="cblack"><bounds x="20" y="50" width="11" height="11" /></element>
+		<element ref="cwhite"><bounds x="30" y="50" width="11" height="11" /></element>
+		<element ref="cblack"><bounds x="40" y="50" width="11" height="11" /></element>
+		<element ref="cwhite"><bounds x="50" y="50" width="11" height="11" /></element>
+		<element ref="cblack"><bounds x="60" y="50" width="11" height="11" /></element>
+		<element ref="cwhite"><bounds x="70" y="50" width="10" height="11" /></element>
 
-		<bezel element="cwhite"><bounds x="0"  y="60" width="11" height="11" /></bezel>
-		<bezel element="cblack"><bounds x="10" y="60" width="11" height="11" /></bezel>
-		<bezel element="cwhite"><bounds x="20" y="60" width="11" height="11" /></bezel>
-		<bezel element="cblack"><bounds x="30" y="60" width="11" height="11" /></bezel>
-		<bezel element="cwhite"><bounds x="40" y="60" width="11" height="11" /></bezel>
-		<bezel element="cblack"><bounds x="50" y="60" width="11" height="11" /></bezel>
-		<bezel element="cwhite"><bounds x="60" y="60" width="11" height="11" /></bezel>
-		<bezel element="cblack"><bounds x="70" y="60" width="10" height="11" /></bezel>
+		<element ref="cwhite"><bounds x="0"  y="60" width="11" height="11" /></element>
+		<element ref="cblack"><bounds x="10" y="60" width="11" height="11" /></element>
+		<element ref="cwhite"><bounds x="20" y="60" width="11" height="11" /></element>
+		<element ref="cblack"><bounds x="30" y="60" width="11" height="11" /></element>
+		<element ref="cwhite"><bounds x="40" y="60" width="11" height="11" /></element>
+		<element ref="cblack"><bounds x="50" y="60" width="11" height="11" /></element>
+		<element ref="cwhite"><bounds x="60" y="60" width="11" height="11" /></element>
+		<element ref="cblack"><bounds x="70" y="60" width="10" height="11" /></element>
 
-		<bezel element="cblack"><bounds x="0"  y="70" width="11" height="10" /></bezel>
-		<bezel element="cwhite"><bounds x="10" y="70" width="11" height="10" /></bezel>
-		<bezel element="cblack"><bounds x="20" y="70" width="11" height="10" /></bezel>
-		<bezel element="cwhite"><bounds x="30" y="70" width="11" height="10" /></bezel>
-		<bezel element="cblack"><bounds x="40" y="70" width="11" height="10" /></bezel>
-		<bezel element="cwhite"><bounds x="50" y="70" width="11" height="10" /></bezel>
-		<bezel element="cblack"><bounds x="60" y="70" width="11" height="10" /></bezel>
-		<bezel element="cwhite"><bounds x="70" y="70" width="10" height="10" /></bezel>
+		<element ref="cblack"><bounds x="0"  y="70" width="11" height="10" /></element>
+		<element ref="cwhite"><bounds x="10" y="70" width="11" height="10" /></element>
+		<element ref="cblack"><bounds x="20" y="70" width="11" height="10" /></element>
+		<element ref="cwhite"><bounds x="30" y="70" width="11" height="10" /></element>
+		<element ref="cblack"><bounds x="40" y="70" width="11" height="10" /></element>
+		<element ref="cwhite"><bounds x="50" y="70" width="11" height="10" /></element>
+		<element ref="cblack"><bounds x="60" y="70" width="11" height="10" /></element>
+		<element ref="cwhite"><bounds x="70" y="70" width="10" height="10" /></element>
 
 		<!-- sensors, pieces -->
 		<repeat count="8">
 			<param name="y" start="0" increment="10" />
 			<param name="i" start="8" increment="-1" />
 
-			<bezel element="hlbb" inputtag="board:RANK.~i~" inputmask="0x01"><bounds x="0"  y="~y~" width="10" height="10" /><color alpha="0.04" /></bezel>
-			<bezel element="hlbb" inputtag="board:RANK.~i~" inputmask="0x02"><bounds x="10" y="~y~" width="10" height="10" /><color alpha="0.04" /></bezel>
-			<bezel element="hlbb" inputtag="board:RANK.~i~" inputmask="0x04"><bounds x="20" y="~y~" width="10" height="10" /><color alpha="0.04" /></bezel>
-			<bezel element="hlbb" inputtag="board:RANK.~i~" inputmask="0x08"><bounds x="30" y="~y~" width="10" height="10" /><color alpha="0.04" /></bezel>
-			<bezel element="hlbb" inputtag="board:RANK.~i~" inputmask="0x10"><bounds x="40" y="~y~" width="10" height="10" /><color alpha="0.04" /></bezel>
-			<bezel element="hlbb" inputtag="board:RANK.~i~" inputmask="0x20"><bounds x="50" y="~y~" width="10" height="10" /><color alpha="0.04" /></bezel>
-			<bezel element="hlbb" inputtag="board:RANK.~i~" inputmask="0x40"><bounds x="60" y="~y~" width="10" height="10" /><color alpha="0.04" /></bezel>
-			<bezel element="hlbb" inputtag="board:RANK.~i~" inputmask="0x80"><bounds x="70" y="~y~" width="10" height="10" /><color alpha="0.04" /></bezel>
+			<element ref="hlbb" inputtag="board:RANK.~i~" inputmask="0x01"><bounds x="0"  y="~y~" width="10" height="10" /><color alpha="0.04" /></element>
+			<element ref="hlbb" inputtag="board:RANK.~i~" inputmask="0x02"><bounds x="10" y="~y~" width="10" height="10" /><color alpha="0.04" /></element>
+			<element ref="hlbb" inputtag="board:RANK.~i~" inputmask="0x04"><bounds x="20" y="~y~" width="10" height="10" /><color alpha="0.04" /></element>
+			<element ref="hlbb" inputtag="board:RANK.~i~" inputmask="0x08"><bounds x="30" y="~y~" width="10" height="10" /><color alpha="0.04" /></element>
+			<element ref="hlbb" inputtag="board:RANK.~i~" inputmask="0x10"><bounds x="40" y="~y~" width="10" height="10" /><color alpha="0.04" /></element>
+			<element ref="hlbb" inputtag="board:RANK.~i~" inputmask="0x20"><bounds x="50" y="~y~" width="10" height="10" /><color alpha="0.04" /></element>
+			<element ref="hlbb" inputtag="board:RANK.~i~" inputmask="0x40"><bounds x="60" y="~y~" width="10" height="10" /><color alpha="0.04" /></element>
+			<element ref="hlbb" inputtag="board:RANK.~i~" inputmask="0x80"><bounds x="70" y="~y~" width="10" height="10" /><color alpha="0.04" /></element>
 
-			<bezel name="piece_a~i~" element="piece"><bounds x="0"  y="~y~" width="10" height="10" /></bezel>
-			<bezel name="piece_b~i~" element="piece"><bounds x="10" y="~y~" width="10" height="10" /></bezel>
-			<bezel name="piece_c~i~" element="piece"><bounds x="20" y="~y~" width="10" height="10" /></bezel>
-			<bezel name="piece_d~i~" element="piece"><bounds x="30" y="~y~" width="10" height="10" /></bezel>
-			<bezel name="piece_e~i~" element="piece"><bounds x="40" y="~y~" width="10" height="10" /></bezel>
-			<bezel name="piece_f~i~" element="piece"><bounds x="50" y="~y~" width="10" height="10" /></bezel>
-			<bezel name="piece_g~i~" element="piece"><bounds x="60" y="~y~" width="10" height="10" /></bezel>
-			<bezel name="piece_h~i~" element="piece"><bounds x="70" y="~y~" width="10" height="10" /></bezel>
+			<element name="piece_a~i~" ref="piece"><bounds x="0"  y="~y~" width="10" height="10" /></element>
+			<element name="piece_b~i~" ref="piece"><bounds x="10" y="~y~" width="10" height="10" /></element>
+			<element name="piece_c~i~" ref="piece"><bounds x="20" y="~y~" width="10" height="10" /></element>
+			<element name="piece_d~i~" ref="piece"><bounds x="30" y="~y~" width="10" height="10" /></element>
+			<element name="piece_e~i~" ref="piece"><bounds x="40" y="~y~" width="10" height="10" /></element>
+			<element name="piece_f~i~" ref="piece"><bounds x="50" y="~y~" width="10" height="10" /></element>
+			<element name="piece_g~i~" ref="piece"><bounds x="60" y="~y~" width="10" height="10" /></element>
+			<element name="piece_h~i~" ref="piece"><bounds x="70" y="~y~" width="10" height="10" /></element>
 		</repeat>
 	</group>
 
@@ -512,82 +512,82 @@ license:CC0
 
 	<group name="sb_ui">
 		<bounds x="0" y="0" width="10" height="80" />
-		<bezel element="cblack"><bounds x="0" y="0" width="10" height="1" /></bezel>
-		<bezel element="cblack"><bounds x="0" y="7" width="10" height="1" /></bezel>
-		<bezel element="cblack"><bounds x="0" y="79" width="10" height="1" /></bezel>
-		<bezel element="text_uit1"><bounds x="0" y="2" width="10" height="2" /></bezel>
-		<bezel element="text_uit2"><bounds x="0" y="4" width="10" height="2" /></bezel>
+		<element ref="cblack"><bounds x="0" y="0" width="10" height="1" /></element>
+		<element ref="cblack"><bounds x="0" y="7" width="10" height="1" /></element>
+		<element ref="cblack"><bounds x="0" y="79" width="10" height="1" /></element>
+		<element ref="text_uit1"><bounds x="0" y="2" width="10" height="2" /></element>
+		<element ref="text_uit2"><bounds x="0" y="4" width="10" height="2" /></element>
 
 		<!-- board -->
-		<bezel element="text_uib1"><bounds x="0" y="9" width="10" height="2" /></bezel>
-		<bezel element="cwhite"><bounds x="1" y="11.5" width="8" height="2.5" /></bezel>
-		<bezel element="cwhite"><bounds x="1" y="15" width="8" height="2.5" /></bezel>
+		<element ref="text_uib1"><bounds x="0" y="9" width="10" height="2" /></element>
+		<element ref="cwhite"><bounds x="1" y="11.5" width="8" height="2.5" /></element>
+		<element ref="cwhite"><bounds x="1" y="15" width="8" height="2.5" /></element>
 
-		<bezel element="text_uib2"><bounds x="1.5" y="11.75" width="7" height="2" /></bezel>
-		<bezel element="text_uib3"><bounds x="1.5" y="15.25" width="7" height="2" /></bezel>
+		<element ref="text_uib2"><bounds x="1.5" y="11.75" width="7" height="2" /></element>
+		<element ref="text_uib3"><bounds x="1.5" y="15.25" width="7" height="2" /></element>
 
-		<bezel element="hlub" inputtag="board:UI" inputmask="0x200"><bounds x="1" y="11.5" width="8" height="2.5" /><color alpha="0.25" /></bezel>
-		<bezel element="hlub" inputtag="board:UI" inputmask="0x100"><bounds x="1" y="15" width="8" height="2.5" /><color alpha="0.25" /></bezel>
+		<element ref="hlub" inputtag="board:UI" inputmask="0x200"><bounds x="1" y="11.5" width="8" height="2.5" /><color alpha="0.25" /></element>
+		<element ref="hlub" inputtag="board:UI" inputmask="0x100"><bounds x="1" y="15" width="8" height="2.5" /><color alpha="0.25" /></element>
 
 		<!-- spawn -->
-		<bezel element="text_uis1"><bounds x="0" y="20.5" width="10" height="2" /></bezel>
-		<bezel element="cwhite"><bounds x="1" y="23" width="8" height="12" /></bezel>
-		<bezel element="cwhite"><bounds x="1" y="36" width="8" height="12" /></bezel>
+		<element ref="text_uis1"><bounds x="0" y="20.5" width="10" height="2" /></element>
+		<element ref="cwhite"><bounds x="1" y="23" width="8" height="12" /></element>
+		<element ref="cwhite"><bounds x="1" y="36" width="8" height="12" /></element>
 
-		<bezel name="piece_ui1" element="piece"><bounds x="1" y="23" width="4" height="4" /></bezel>
-		<bezel name="piece_ui2" element="piece"><bounds x="1" y="27" width="4" height="4" /></bezel>
-		<bezel name="piece_ui3" element="piece"><bounds x="1" y="31" width="4" height="4" /></bezel>
-		<bezel name="piece_ui4" element="piece"><bounds x="5" y="23" width="4" height="4" /></bezel>
-		<bezel name="piece_ui5" element="piece"><bounds x="5" y="27" width="4" height="4" /></bezel>
-		<bezel name="piece_ui6" element="piece"><bounds x="5" y="31" width="4" height="4" /></bezel>
-		<bezel name="piece_ui7" element="piece"><bounds x="1" y="36" width="4" height="4" /></bezel>
-		<bezel name="piece_ui8" element="piece"><bounds x="1" y="40" width="4" height="4" /></bezel>
-		<bezel name="piece_ui9" element="piece"><bounds x="1" y="44" width="4" height="4" /></bezel>
-		<bezel name="piece_ui10" element="piece"><bounds x="5" y="36" width="4" height="4" /></bezel>
-		<bezel name="piece_ui11" element="piece"><bounds x="5" y="40" width="4" height="4" /></bezel>
-		<bezel name="piece_ui12" element="piece"><bounds x="5" y="44" width="4" height="4" /></bezel>
+		<element name="piece_ui1" ref="piece"><bounds x="1" y="23" width="4" height="4" /></element>
+		<element name="piece_ui2" ref="piece"><bounds x="1" y="27" width="4" height="4" /></element>
+		<element name="piece_ui3" ref="piece"><bounds x="1" y="31" width="4" height="4" /></element>
+		<element name="piece_ui4" ref="piece"><bounds x="5" y="23" width="4" height="4" /></element>
+		<element name="piece_ui5" ref="piece"><bounds x="5" y="27" width="4" height="4" /></element>
+		<element name="piece_ui6" ref="piece"><bounds x="5" y="31" width="4" height="4" /></element>
+		<element name="piece_ui7" ref="piece"><bounds x="1" y="36" width="4" height="4" /></element>
+		<element name="piece_ui8" ref="piece"><bounds x="1" y="40" width="4" height="4" /></element>
+		<element name="piece_ui9" ref="piece"><bounds x="1" y="44" width="4" height="4" /></element>
+		<element name="piece_ui10" ref="piece"><bounds x="5" y="36" width="4" height="4" /></element>
+		<element name="piece_ui11" ref="piece"><bounds x="5" y="40" width="4" height="4" /></element>
+		<element name="piece_ui12" ref="piece"><bounds x="5" y="44" width="4" height="4" /></element>
 
-		<bezel element="hlub" inputtag="board:SPAWN" inputmask="0x0001"><bounds x="1" y="23" width="4" height="4" /><color alpha="0.25" /></bezel>
-		<bezel element="hlub" inputtag="board:SPAWN" inputmask="0x0002"><bounds x="1" y="27" width="4" height="4" /><color alpha="0.25" /></bezel>
-		<bezel element="hlub" inputtag="board:SPAWN" inputmask="0x0004"><bounds x="1" y="31" width="4" height="4" /><color alpha="0.25" /></bezel>
-		<bezel element="hlub" inputtag="board:SPAWN" inputmask="0x0008"><bounds x="5" y="23" width="4" height="4" /><color alpha="0.25" /></bezel>
-		<bezel element="hlub" inputtag="board:SPAWN" inputmask="0x0010"><bounds x="5" y="27" width="4" height="4" /><color alpha="0.25" /></bezel>
-		<bezel element="hlub" inputtag="board:SPAWN" inputmask="0x0020"><bounds x="5" y="31" width="4" height="4" /><color alpha="0.25" /></bezel>
-		<bezel element="hlub" inputtag="board:SPAWN" inputmask="0x0040"><bounds x="1" y="36" width="4" height="4" /><color alpha="0.25" /></bezel>
-		<bezel element="hlub" inputtag="board:SPAWN" inputmask="0x0080"><bounds x="1" y="40" width="4" height="4" /><color alpha="0.25" /></bezel>
-		<bezel element="hlub" inputtag="board:SPAWN" inputmask="0x0100"><bounds x="1" y="44" width="4" height="4" /><color alpha="0.25" /></bezel>
-		<bezel element="hlub" inputtag="board:SPAWN" inputmask="0x0200"><bounds x="5" y="36" width="4" height="4" /><color alpha="0.25" /></bezel>
-		<bezel element="hlub" inputtag="board:SPAWN" inputmask="0x0400"><bounds x="5" y="40" width="4" height="4" /><color alpha="0.25" /></bezel>
-		<bezel element="hlub" inputtag="board:SPAWN" inputmask="0x0800"><bounds x="5" y="44" width="4" height="4" /><color alpha="0.25" /></bezel>
+		<element ref="hlub" inputtag="board:SPAWN" inputmask="0x0001"><bounds x="1" y="23" width="4" height="4" /><color alpha="0.25" /></element>
+		<element ref="hlub" inputtag="board:SPAWN" inputmask="0x0002"><bounds x="1" y="27" width="4" height="4" /><color alpha="0.25" /></element>
+		<element ref="hlub" inputtag="board:SPAWN" inputmask="0x0004"><bounds x="1" y="31" width="4" height="4" /><color alpha="0.25" /></element>
+		<element ref="hlub" inputtag="board:SPAWN" inputmask="0x0008"><bounds x="5" y="23" width="4" height="4" /><color alpha="0.25" /></element>
+		<element ref="hlub" inputtag="board:SPAWN" inputmask="0x0010"><bounds x="5" y="27" width="4" height="4" /><color alpha="0.25" /></element>
+		<element ref="hlub" inputtag="board:SPAWN" inputmask="0x0020"><bounds x="5" y="31" width="4" height="4" /><color alpha="0.25" /></element>
+		<element ref="hlub" inputtag="board:SPAWN" inputmask="0x0040"><bounds x="1" y="36" width="4" height="4" /><color alpha="0.25" /></element>
+		<element ref="hlub" inputtag="board:SPAWN" inputmask="0x0080"><bounds x="1" y="40" width="4" height="4" /><color alpha="0.25" /></element>
+		<element ref="hlub" inputtag="board:SPAWN" inputmask="0x0100"><bounds x="1" y="44" width="4" height="4" /><color alpha="0.25" /></element>
+		<element ref="hlub" inputtag="board:SPAWN" inputmask="0x0200"><bounds x="5" y="36" width="4" height="4" /><color alpha="0.25" /></element>
+		<element ref="hlub" inputtag="board:SPAWN" inputmask="0x0400"><bounds x="5" y="40" width="4" height="4" /><color alpha="0.25" /></element>
+		<element ref="hlub" inputtag="board:SPAWN" inputmask="0x0800"><bounds x="5" y="44" width="4" height="4" /><color alpha="0.25" /></element>
 
 		<!-- hand -->
-		<bezel element="text_uih1"><bounds x="0" y="51" width="10" height="2" /></bezel>
-		<bezel element="cblack"><bounds x="1" y="53.5" width="8" height="6" /></bezel>
-		<bezel name="piece_ui0" element="piece"><bounds x="2" y="53.5" width="6" height="6" /></bezel>
+		<element ref="text_uih1"><bounds x="0" y="51" width="10" height="2" /></element>
+		<element ref="cblack"><bounds x="1" y="53.5" width="8" height="6" /></element>
+		<element name="piece_ui0" ref="piece"><bounds x="2" y="53.5" width="6" height="6" /></element>
 
-		<bezel element="cwhite"><bounds x="1" y="60.5" width="8" height="2.5" /></bezel>
-		<bezel element="text_uih2"><bounds x="1.5" y="60.75" width="7" height="2" /></bezel>
-		<bezel element="hlub" inputtag="board:UI" inputmask="0x08"><bounds x="1" y="60.5" width="8" height="2.5" /><color alpha="0.25" /></bezel>
+		<element ref="cwhite"><bounds x="1" y="60.5" width="8" height="2.5" /></element>
+		<element ref="text_uih2"><bounds x="1.5" y="60.75" width="7" height="2" /></element>
+		<element ref="hlub" inputtag="board:UI" inputmask="0x08"><bounds x="1" y="60.5" width="8" height="2.5" /><color alpha="0.25" /></element>
 
 		<!-- undo -->
-		<bezel element="text_uiu1"><bounds x="0" y="66" width="10" height="2" /></bezel>
-		<bezel element="cwhite"><bounds x="1" y="68.5" width="1.7" height="6" /></bezel>
-		<bezel element="cwhite"><bounds x="3.1" y="68.5" width="1.7" height="6" /></bezel>
-		<bezel element="cwhite"><bounds x="5.2" y="68.5" width="1.7" height="6" /></bezel>
-		<bezel element="cwhite"><bounds x="7.3" y="68.5" width="1.7" height="6" /></bezel>
-		<bezel element="text_uiu2a"><bounds x="1" y="69.5" width="1.7" height="4" /></bezel>
-		<bezel element="text_uiu2b"><bounds x="3.1" y="69.5" width="1.7" height="4" /></bezel>
-		<bezel element="text_uiu2c"><bounds x="5.2" y="69.5" width="1.7" height="4" /></bezel>
-		<bezel element="text_uiu2d"><bounds x="7.3" y="69.5" width="1.7" height="4" /></bezel>
+		<element ref="text_uiu1"><bounds x="0" y="66" width="10" height="2" /></element>
+		<element ref="cwhite"><bounds x="1" y="68.5" width="1.7" height="6" /></element>
+		<element ref="cwhite"><bounds x="3.1" y="68.5" width="1.7" height="6" /></element>
+		<element ref="cwhite"><bounds x="5.2" y="68.5" width="1.7" height="6" /></element>
+		<element ref="cwhite"><bounds x="7.3" y="68.5" width="1.7" height="6" /></element>
+		<element ref="text_uiu2a"><bounds x="1" y="69.5" width="1.7" height="4" /></element>
+		<element ref="text_uiu2b"><bounds x="3.1" y="69.5" width="1.7" height="4" /></element>
+		<element ref="text_uiu2c"><bounds x="5.2" y="69.5" width="1.7" height="4" /></element>
+		<element ref="text_uiu2d"><bounds x="7.3" y="69.5" width="1.7" height="4" /></element>
 
-		<bezel element="hlub" inputtag="board:UI" inputmask="0x10"><bounds x="1" y="68.5" width="1.7" height="6" /><color alpha="0.25" /></bezel>
-		<bezel element="hlub" inputtag="board:UI" inputmask="0x20"><bounds x="3.1" y="68.5" width="1.7" height="6" /><color alpha="0.25" /></bezel>
-		<bezel element="hlub" inputtag="board:UI" inputmask="0x40"><bounds x="5.2" y="68.5" width="1.7" height="6" /><color alpha="0.25" /></bezel>
-		<bezel element="hlub" inputtag="board:UI" inputmask="0x80"><bounds x="7.3" y="68.5" width="1.7" height="6" /><color alpha="0.25" /></bezel>
+		<element ref="hlub" inputtag="board:UI" inputmask="0x10"><bounds x="1" y="68.5" width="1.7" height="6" /><color alpha="0.25" /></element>
+		<element ref="hlub" inputtag="board:UI" inputmask="0x20"><bounds x="3.1" y="68.5" width="1.7" height="6" /><color alpha="0.25" /></element>
+		<element ref="hlub" inputtag="board:UI" inputmask="0x40"><bounds x="5.2" y="68.5" width="1.7" height="6" /><color alpha="0.25" /></element>
+		<element ref="hlub" inputtag="board:UI" inputmask="0x80"><bounds x="7.3" y="68.5" width="1.7" height="6" /><color alpha="0.25" /></element>
 
-		<bezel name="count_ui0" element="text_uiu3a"><bounds x="0" y="75" width="4" height="2" /></bezel>
-		<bezel name="count_ui1" element="text_uiu3c"><bounds x="6" y="75" width="4" height="2" /></bezel>
-		<bezel element="text_uiu3b"><bounds x="4" y="75" width="2" height="2" /></bezel>
+		<element name="count_ui0" ref="text_uiu3a"><bounds x="0" y="75" width="4" height="2" /></element>
+		<element name="count_ui1" ref="text_uiu3c"><bounds x="6" y="75" width="4" height="2" /></element>
+		<element ref="text_uiu3b"><bounds x="4" y="75" width="2" height="2" /></element>
 	</group>
 
 
@@ -596,141 +596,141 @@ license:CC0
 	<view name="Internal Layout">
 		<bounds left="-28.75" top="187" right="784" bottom="628" />
 
-		<bezel element="white"><bounds x="33" y="187" width="751" height="441" /></bezel>
+		<element ref="white"><bounds x="33" y="187" width="751" height="441" /></element>
 
 		<!-- chessboard coords/leds -->
-		<bezel element="text_a"><bounds x="77.875"  y="600" width="14" height="14" /></bezel>
-		<bezel element="text_b"><bounds x="127.625" y="600" width="14" height="14" /></bezel>
-		<bezel element="text_c"><bounds x="177.375" y="600" width="14" height="14" /></bezel>
-		<bezel element="text_d"><bounds x="227.125" y="600" width="14" height="14" /></bezel>
-		<bezel element="text_e"><bounds x="276.875" y="600" width="14" height="14" /></bezel>
-		<bezel element="text_f"><bounds x="326.625" y="600" width="14" height="14" /></bezel>
-		<bezel element="text_g"><bounds x="376.375" y="600" width="14" height="14" /></bezel>
-		<bezel element="text_h"><bounds x="426.125" y="600" width="14" height="14" /></bezel>
+		<element ref="text_a"><bounds x="77.875"  y="600" width="14" height="14" /></element>
+		<element ref="text_b"><bounds x="127.625" y="600" width="14" height="14" /></element>
+		<element ref="text_c"><bounds x="177.375" y="600" width="14" height="14" /></element>
+		<element ref="text_d"><bounds x="227.125" y="600" width="14" height="14" /></element>
+		<element ref="text_e"><bounds x="276.875" y="600" width="14" height="14" /></element>
+		<element ref="text_f"><bounds x="326.625" y="600" width="14" height="14" /></element>
+		<element ref="text_g"><bounds x="376.375" y="600" width="14" height="14" /></element>
+		<element ref="text_h"><bounds x="426.125" y="600" width="14" height="14" /></element>
 
-		<bezel element="text_8"><bounds x="45" y="217.875" width="14" height="14" /></bezel>
-		<bezel element="text_7"><bounds x="45" y="267.625" width="14" height="14" /></bezel>
-		<bezel element="text_6"><bounds x="45" y="317.375" width="14" height="14" /></bezel>
-		<bezel element="text_5"><bounds x="45" y="367.125" width="14" height="14" /></bezel>
-		<bezel element="text_4"><bounds x="45" y="416.875" width="14" height="14" /></bezel>
-		<bezel element="text_3"><bounds x="45" y="466.625" width="14" height="14" /></bezel>
-		<bezel element="text_2"><bounds x="45" y="516.375" width="14" height="14" /></bezel>
-		<bezel element="text_1"><bounds x="45" y="566.125" width="14" height="14" /></bezel>
+		<element ref="text_8"><bounds x="45" y="217.875" width="14" height="14" /></element>
+		<element ref="text_7"><bounds x="45" y="267.625" width="14" height="14" /></element>
+		<element ref="text_6"><bounds x="45" y="317.375" width="14" height="14" /></element>
+		<element ref="text_5"><bounds x="45" y="367.125" width="14" height="14" /></element>
+		<element ref="text_4"><bounds x="45" y="416.875" width="14" height="14" /></element>
+		<element ref="text_3"><bounds x="45" y="466.625" width="14" height="14" /></element>
+		<element ref="text_2"><bounds x="45" y="516.375" width="14" height="14" /></element>
+		<element ref="text_1"><bounds x="45" y="566.125" width="14" height="14" /></element>
 
-		<bezel name="4.0" element="led"><bounds x="79.875"  y="614" width="10" height="10" /></bezel>
-		<bezel name="4.1" element="led"><bounds x="129.625" y="614" width="10" height="10" /></bezel>
-		<bezel name="4.2" element="led"><bounds x="179.375" y="614" width="10" height="10" /></bezel>
-		<bezel name="4.3" element="led"><bounds x="229.125" y="614" width="10" height="10" /></bezel>
-		<bezel name="4.4" element="led"><bounds x="278.875" y="614" width="10" height="10" /></bezel>
-		<bezel name="4.5" element="led"><bounds x="328.625" y="614" width="10" height="10" /></bezel>
-		<bezel name="4.6" element="led"><bounds x="378.375" y="614" width="10" height="10" /></bezel>
-		<bezel name="4.7" element="led"><bounds x="428.125" y="614" width="10" height="10" /></bezel>
+		<element name="4.0" ref="led"><bounds x="79.875"  y="614" width="10" height="10" /></element>
+		<element name="4.1" ref="led"><bounds x="129.625" y="614" width="10" height="10" /></element>
+		<element name="4.2" ref="led"><bounds x="179.375" y="614" width="10" height="10" /></element>
+		<element name="4.3" ref="led"><bounds x="229.125" y="614" width="10" height="10" /></element>
+		<element name="4.4" ref="led"><bounds x="278.875" y="614" width="10" height="10" /></element>
+		<element name="4.5" ref="led"><bounds x="328.625" y="614" width="10" height="10" /></element>
+		<element name="4.6" ref="led"><bounds x="378.375" y="614" width="10" height="10" /></element>
+		<element name="4.7" ref="led"><bounds x="428.125" y="614" width="10" height="10" /></element>
 
-		<bezel name="5.7" element="led"><bounds x="37" y="219.875" width="10" height="10" /></bezel>
-		<bezel name="5.6" element="led"><bounds x="37" y="269.625" width="10" height="10" /></bezel>
-		<bezel name="5.5" element="led"><bounds x="37" y="319.375" width="10" height="10" /></bezel>
-		<bezel name="5.4" element="led"><bounds x="37" y="369.125" width="10" height="10" /></bezel>
-		<bezel name="5.3" element="led"><bounds x="37" y="418.875" width="10" height="10" /></bezel>
-		<bezel name="5.2" element="led"><bounds x="37" y="468.625" width="10" height="10" /></bezel>
-		<bezel name="5.1" element="led"><bounds x="37" y="518.375" width="10" height="10" /></bezel>
-		<bezel name="5.0" element="led"><bounds x="37" y="568.125" width="10" height="10" /></bezel>
+		<element name="5.7" ref="led"><bounds x="37" y="219.875" width="10" height="10" /></element>
+		<element name="5.6" ref="led"><bounds x="37" y="269.625" width="10" height="10" /></element>
+		<element name="5.5" ref="led"><bounds x="37" y="319.375" width="10" height="10" /></element>
+		<element name="5.4" ref="led"><bounds x="37" y="369.125" width="10" height="10" /></element>
+		<element name="5.3" ref="led"><bounds x="37" y="418.875" width="10" height="10" /></element>
+		<element name="5.2" ref="led"><bounds x="37" y="468.625" width="10" height="10" /></element>
+		<element name="5.1" ref="led"><bounds x="37" y="518.375" width="10" height="10" /></element>
+		<element name="5.0" ref="led"><bounds x="37" y="568.125" width="10" height="10" /></element>
 
 		<!-- chessboard/ui -->
-		<bezel element="gold"><bounds x="57" y="197" width="404" height="404" /></bezel>
+		<element ref="gold"><bounds x="57" y="197" width="404" height="404" /></element>
 		<group ref="sb_board"><bounds x="60" y="200" width="398" height="398" /></group>
 		<group ref="sb_ui"><bounds x="-22.75" y="200" width="49.75" height="398" /></group>
 
 		<!-- display -->
-		<bezel element="gold"><bounds x="471" y="197" width="303" height="121" /></bezel>
-		<bezel element="black"><bounds x="474" y="200" width="297" height="115" /></bezel>
-		<bezel element="blackb"><bounds x="523.5" y="210" width="198" height="49" /></bezel>
-		<bezel name="digit0" element="digit"><bounds x="542.5" y="215" width="26" height="39" /></bezel>
-		<bezel name="digit1" element="digit"><bounds x="587.5" y="215" width="26" height="39" /></bezel>
-		<bezel name="digit2" element="digit"><bounds x="631.5" y="215" width="26" height="39" /></bezel>
-		<bezel name="digit3" element="digit"><bounds x="676.5" y="215" width="26" height="39" /></bezel>
+		<element ref="gold"><bounds x="471" y="197" width="303" height="121" /></element>
+		<element ref="black"><bounds x="474" y="200" width="297" height="115" /></element>
+		<element ref="blackb"><bounds x="523.5" y="210" width="198" height="49" /></element>
+		<element name="digit0" ref="digit"><bounds x="542.5" y="215" width="26" height="39" /></element>
+		<element name="digit1" ref="digit"><bounds x="587.5" y="215" width="26" height="39" /></element>
+		<element name="digit2" ref="digit"><bounds x="631.5" y="215" width="26" height="39" /></element>
+		<element name="digit3" ref="digit"><bounds x="676.5" y="215" width="26" height="39" /></element>
 
 		<!-- keypad -->
-		<bezel element="gold"><bounds x="471" y="328" width="303" height="273" /></bezel>
+		<element ref="gold"><bounds x="471" y="328" width="303" height="273" /></element>
 
-		<bezel element="black"><bounds x="474" y="331" width="72" height="51" /></bezel>
-		<bezel element="black"><bounds x="474" y="385" width="72" height="51" /></bezel>
-		<bezel element="black"><bounds x="474" y="439" width="72" height="51" /></bezel>
-		<bezel element="black"><bounds x="474" y="493" width="72" height="51" /></bezel>
-		<bezel element="black"><bounds x="474" y="547" width="72" height="51" /></bezel>
-		<bezel element="black"><bounds x="549" y="331" width="72" height="51" /></bezel>
-		<bezel element="black"><bounds x="549" y="385" width="72" height="51" /></bezel>
-		<bezel element="black"><bounds x="549" y="439" width="72" height="51" /></bezel>
-		<bezel element="black"><bounds x="549" y="493" width="72" height="51" /></bezel>
-		<bezel element="black"><bounds x="549" y="547" width="72" height="51" /></bezel>
-		<bezel element="black"><bounds x="624" y="331" width="72" height="51" /></bezel>
-		<bezel element="black"><bounds x="624" y="385" width="72" height="51" /></bezel>
-		<bezel element="black"><bounds x="624" y="439" width="72" height="51" /></bezel>
-		<bezel element="black"><bounds x="624" y="493" width="72" height="51" /></bezel>
-		<bezel element="black"><bounds x="624" y="547" width="72" height="51" /></bezel>
-		<bezel element="black"><bounds x="699" y="331" width="72" height="51" /></bezel>
-		<bezel element="black"><bounds x="699" y="385" width="72" height="51" /></bezel>
-		<bezel element="black"><bounds x="699" y="439" width="72" height="51" /></bezel>
-		<bezel element="black"><bounds x="699" y="493" width="72" height="51" /></bezel>
-		<bezel element="black"><bounds x="699" y="547" width="72" height="51" /></bezel>
+		<element ref="black"><bounds x="474" y="331" width="72" height="51" /></element>
+		<element ref="black"><bounds x="474" y="385" width="72" height="51" /></element>
+		<element ref="black"><bounds x="474" y="439" width="72" height="51" /></element>
+		<element ref="black"><bounds x="474" y="493" width="72" height="51" /></element>
+		<element ref="black"><bounds x="474" y="547" width="72" height="51" /></element>
+		<element ref="black"><bounds x="549" y="331" width="72" height="51" /></element>
+		<element ref="black"><bounds x="549" y="385" width="72" height="51" /></element>
+		<element ref="black"><bounds x="549" y="439" width="72" height="51" /></element>
+		<element ref="black"><bounds x="549" y="493" width="72" height="51" /></element>
+		<element ref="black"><bounds x="549" y="547" width="72" height="51" /></element>
+		<element ref="black"><bounds x="624" y="331" width="72" height="51" /></element>
+		<element ref="black"><bounds x="624" y="385" width="72" height="51" /></element>
+		<element ref="black"><bounds x="624" y="439" width="72" height="51" /></element>
+		<element ref="black"><bounds x="624" y="493" width="72" height="51" /></element>
+		<element ref="black"><bounds x="624" y="547" width="72" height="51" /></element>
+		<element ref="black"><bounds x="699" y="331" width="72" height="51" /></element>
+		<element ref="black"><bounds x="699" y="385" width="72" height="51" /></element>
+		<element ref="black"><bounds x="699" y="439" width="72" height="51" /></element>
+		<element ref="black"><bounds x="699" y="493" width="72" height="51" /></element>
+		<element ref="black"><bounds x="699" y="547" width="72" height="51" /></element>
 
-		<bezel element="text_restore"><bounds x="475" y="347" width="70" height="18" /></bezel>
-		<bezel element="text_halt"><bounds x="550" y="335" width="70" height="18" /></bezel>
-		<bezel element="text_hint"><bounds x="550" y="359" width="70" height="18" /></bezel>
-		<bezel element="text_audio"><bounds x="625" y="347" width="70" height="18" /></bezel>
-		<bezel element="text_ce"><bounds x="700" y="347" width="70" height="18" /></bezel>
+		<element ref="text_restore"><bounds x="475" y="347" width="70" height="18" /></element>
+		<element ref="text_halt"><bounds x="550" y="335" width="70" height="18" /></element>
+		<element ref="text_hint"><bounds x="550" y="359" width="70" height="18" /></element>
+		<element ref="text_audio"><bounds x="625" y="347" width="70" height="18" /></element>
+		<element ref="text_ce"><bounds x="700" y="347" width="70" height="18" /></element>
 
-		<bezel element="text_g7"><bounds x="475" y="401" width="70" height="18" /></bezel>
-		<bezel element="text_h8"><bounds x="550" y="401" width="70" height="18" /></bezel>
-		<bezel element="text_time"><bounds x="625" y="389" width="70" height="18" /></bezel>
-		<bezel element="text_number"><bounds x="625" y="413" width="70" height="18" /></bezel>
-		<bezel element="text_level"><bounds x="700" y="401" width="70" height="18" /></bezel>
+		<element ref="text_g7"><bounds x="475" y="401" width="70" height="18" /></element>
+		<element ref="text_h8"><bounds x="550" y="401" width="70" height="18" /></element>
+		<element ref="text_time"><bounds x="625" y="389" width="70" height="18" /></element>
+		<element ref="text_number"><bounds x="625" y="413" width="70" height="18" /></element>
+		<element ref="text_level"><bounds x="700" y="401" width="70" height="18" /></element>
 
-		<bezel element="text_d4"><bounds x="475" y="443" width="70" height="18" /></bezel>
-		<bezel element="text_e5"><bounds x="550" y="443" width="70" height="18" /></bezel>
-		<bezel element="text_f6"><bounds x="625" y="443" width="70" height="18" /></bezel>
-		<bezel element="text_change"><bounds x="700" y="446" width="70" height="18" /></bezel>
-		<bezel element="text_board"><bounds x="700" y="464" width="70" height="18" /></bezel>
+		<element ref="text_d4"><bounds x="475" y="443" width="70" height="18" /></element>
+		<element ref="text_e5"><bounds x="550" y="443" width="70" height="18" /></element>
+		<element ref="text_f6"><bounds x="625" y="443" width="70" height="18" /></element>
+		<element ref="text_change"><bounds x="700" y="446" width="70" height="18" /></element>
+		<element ref="text_board"><bounds x="700" y="464" width="70" height="18" /></element>
 
-		<bezel element="text_a1"><bounds x="475" y="497" width="70" height="18" /></bezel>
-		<bezel element="text_b2"><bounds x="550" y="497" width="70" height="18" /></bezel>
-		<bezel element="text_c3"><bounds x="625" y="497" width="70" height="18" /></bezel>
-		<bezel element="text_verify"><bounds x="700" y="509" width="70" height="18" /></bezel>
+		<element ref="text_a1"><bounds x="475" y="497" width="70" height="18" /></element>
+		<element ref="text_b2"><bounds x="550" y="497" width="70" height="18" /></element>
+		<element ref="text_c3"><bounds x="625" y="497" width="70" height="18" /></element>
+		<element ref="text_verify"><bounds x="700" y="509" width="70" height="18" /></element>
 
-		<bezel element="text_go"><bounds x="475" y="560" width="70" height="24" /></bezel>
-		<bezel element="text_black"><bounds x="550" y="563" width="70" height="18" /></bezel>
-		<bezel element="text_white"><bounds x="625" y="563" width="70" height="18" /></bezel>
-		<bezel element="text_enter"><bounds x="700" y="563" width="70" height="18" /></bezel>
+		<element ref="text_go"><bounds x="475" y="560" width="70" height="24" /></element>
+		<element ref="text_black"><bounds x="550" y="563" width="70" height="18" /></element>
+		<element ref="text_white"><bounds x="625" y="563" width="70" height="18" /></element>
+		<element ref="text_enter"><bounds x="700" y="563" width="70" height="18" /></element>
 
-		<bezel element="disk_white"><bounds x="582.5" y="354" width="5" height="5" /></bezel>
-		<bezel element="disk_white"><bounds x="657.5" y="408" width="5" height="5" /></bezel>
+		<element ref="disk_white"><bounds x="582.5" y="354" width="5" height="5" /></element>
+		<element ref="disk_white"><bounds x="657.5" y="408" width="5" height="5" /></element>
 
-		<bezel element="piece_1"><bounds x="500" y="519" width="20" height="20" /></bezel>
-		<bezel element="piece_2"><bounds x="575" y="519" width="20" height="20" /></bezel>
-		<bezel element="piece_3"><bounds x="650" y="519" width="20" height="20" /></bezel>
-		<bezel element="piece_4"><bounds x="500" y="465" width="20" height="20" /></bezel>
-		<bezel element="piece_5"><bounds x="575" y="465" width="20" height="20" /></bezel>
-		<bezel element="piece_6"><bounds x="650" y="465" width="20" height="20" /></bezel>
+		<element ref="piece_1"><bounds x="500" y="519" width="20" height="20" /></element>
+		<element ref="piece_2"><bounds x="575" y="519" width="20" height="20" /></element>
+		<element ref="piece_3"><bounds x="650" y="519" width="20" height="20" /></element>
+		<element ref="piece_4"><bounds x="500" y="465" width="20" height="20" /></element>
+		<element ref="piece_5"><bounds x="575" y="465" width="20" height="20" /></element>
+		<element ref="piece_6"><bounds x="650" y="465" width="20" height="20" /></element>
 
-		<bezel element="hl" inputtag="IN.0" inputmask="0x010"><bounds x="474" y="331" width="72" height="51" /><color alpha="0.15" /></bezel>
-		<bezel element="hl" inputtag="IN.0" inputmask="0x008"><bounds x="474" y="385" width="72" height="51" /><color alpha="0.15" /></bezel>
-		<bezel element="hl" inputtag="IN.0" inputmask="0x004"><bounds x="474" y="439" width="72" height="51" /><color alpha="0.15" /></bezel>
-		<bezel element="hl" inputtag="IN.0" inputmask="0x002"><bounds x="474" y="493" width="72" height="51" /><color alpha="0.15" /></bezel>
-		<bezel element="hl" inputtag="IN.0" inputmask="0x001"><bounds x="474" y="547" width="72" height="51" /><color alpha="0.15" /></bezel>
-		<bezel element="hl" inputtag="IN.1" inputmask="0x010"><bounds x="549" y="331" width="72" height="51" /><color alpha="0.15" /></bezel>
-		<bezel element="hl" inputtag="IN.1" inputmask="0x008"><bounds x="549" y="385" width="72" height="51" /><color alpha="0.15" /></bezel>
-		<bezel element="hl" inputtag="IN.1" inputmask="0x004"><bounds x="549" y="439" width="72" height="51" /><color alpha="0.15" /></bezel>
-		<bezel element="hl" inputtag="IN.1" inputmask="0x002"><bounds x="549" y="493" width="72" height="51" /><color alpha="0.15" /></bezel>
-		<bezel element="hl" inputtag="IN.1" inputmask="0x001"><bounds x="549" y="547" width="72" height="51" /><color alpha="0.15" /></bezel>
-		<bezel element="hl" inputtag="IN.1" inputmask="0x020"><bounds x="624" y="331" width="72" height="51" /><color alpha="0.15" /></bezel>
-		<bezel element="hl" inputtag="IN.1" inputmask="0x040"><bounds x="624" y="385" width="72" height="51" /><color alpha="0.15" /></bezel>
-		<bezel element="hl" inputtag="IN.1" inputmask="0x080"><bounds x="624" y="439" width="72" height="51" /><color alpha="0.15" /></bezel>
-		<bezel element="hl" inputtag="IN.1" inputmask="0x100"><bounds x="624" y="493" width="72" height="51" /><color alpha="0.15" /></bezel>
-		<bezel element="hl" inputtag="IN.1" inputmask="0x200"><bounds x="624" y="547" width="72" height="51" /><color alpha="0.15" /></bezel>
-		<bezel element="hl" inputtag="IN.0" inputmask="0x020"><bounds x="699" y="331" width="72" height="51" /><color alpha="0.15" /></bezel>
-		<bezel element="hl" inputtag="IN.0" inputmask="0x040"><bounds x="699" y="385" width="72" height="51" /><color alpha="0.15" /></bezel>
-		<bezel element="hl" inputtag="IN.0" inputmask="0x080"><bounds x="699" y="439" width="72" height="51" /><color alpha="0.15" /></bezel>
-		<bezel element="hl" inputtag="IN.0" inputmask="0x100"><bounds x="699" y="493" width="72" height="51" /><color alpha="0.15" /></bezel>
-		<bezel element="hl" inputtag="IN.0" inputmask="0x200"><bounds x="699" y="547" width="72" height="51" /><color alpha="0.15" /></bezel>
+		<element ref="hl" inputtag="IN.0" inputmask="0x010"><bounds x="474" y="331" width="72" height="51" /><color alpha="0.15" /></element>
+		<element ref="hl" inputtag="IN.0" inputmask="0x008"><bounds x="474" y="385" width="72" height="51" /><color alpha="0.15" /></element>
+		<element ref="hl" inputtag="IN.0" inputmask="0x004"><bounds x="474" y="439" width="72" height="51" /><color alpha="0.15" /></element>
+		<element ref="hl" inputtag="IN.0" inputmask="0x002"><bounds x="474" y="493" width="72" height="51" /><color alpha="0.15" /></element>
+		<element ref="hl" inputtag="IN.0" inputmask="0x001"><bounds x="474" y="547" width="72" height="51" /><color alpha="0.15" /></element>
+		<element ref="hl" inputtag="IN.1" inputmask="0x010"><bounds x="549" y="331" width="72" height="51" /><color alpha="0.15" /></element>
+		<element ref="hl" inputtag="IN.1" inputmask="0x008"><bounds x="549" y="385" width="72" height="51" /><color alpha="0.15" /></element>
+		<element ref="hl" inputtag="IN.1" inputmask="0x004"><bounds x="549" y="439" width="72" height="51" /><color alpha="0.15" /></element>
+		<element ref="hl" inputtag="IN.1" inputmask="0x002"><bounds x="549" y="493" width="72" height="51" /><color alpha="0.15" /></element>
+		<element ref="hl" inputtag="IN.1" inputmask="0x001"><bounds x="549" y="547" width="72" height="51" /><color alpha="0.15" /></element>
+		<element ref="hl" inputtag="IN.1" inputmask="0x020"><bounds x="624" y="331" width="72" height="51" /><color alpha="0.15" /></element>
+		<element ref="hl" inputtag="IN.1" inputmask="0x040"><bounds x="624" y="385" width="72" height="51" /><color alpha="0.15" /></element>
+		<element ref="hl" inputtag="IN.1" inputmask="0x080"><bounds x="624" y="439" width="72" height="51" /><color alpha="0.15" /></element>
+		<element ref="hl" inputtag="IN.1" inputmask="0x100"><bounds x="624" y="493" width="72" height="51" /><color alpha="0.15" /></element>
+		<element ref="hl" inputtag="IN.1" inputmask="0x200"><bounds x="624" y="547" width="72" height="51" /><color alpha="0.15" /></element>
+		<element ref="hl" inputtag="IN.0" inputmask="0x020"><bounds x="699" y="331" width="72" height="51" /><color alpha="0.15" /></element>
+		<element ref="hl" inputtag="IN.0" inputmask="0x040"><bounds x="699" y="385" width="72" height="51" /><color alpha="0.15" /></element>
+		<element ref="hl" inputtag="IN.0" inputmask="0x080"><bounds x="699" y="439" width="72" height="51" /><color alpha="0.15" /></element>
+		<element ref="hl" inputtag="IN.0" inputmask="0x100"><bounds x="699" y="493" width="72" height="51" /><color alpha="0.15" /></element>
+		<element ref="hl" inputtag="IN.0" inputmask="0x200"><bounds x="699" y="547" width="72" height="51" /><color alpha="0.15" /></element>
 
 	</view>
 </mamelayout>

@@ -55,10 +55,10 @@ public:
 	virtual ~device_a800_cart_interface();
 
 	// memory accessor
-	virtual DECLARE_READ8_MEMBER(read_80xx) { return 0xff; }
-	virtual DECLARE_READ8_MEMBER(read_d5xx) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_80xx) {}
-	virtual DECLARE_WRITE8_MEMBER(write_d5xx) {}
+	virtual uint8_t read_80xx(offs_t offset) { return 0xff; }
+	virtual uint8_t read_d5xx(offs_t offset) { return 0xff; }
+	virtual void write_80xx(offs_t offset, uint8_t data) {}
+	virtual void write_d5xx(offs_t offset, uint8_t data) {}
 
 	void rom_alloc(uint32_t size, const char *tag);
 	void ram_alloc(uint32_t size);
@@ -124,10 +124,10 @@ public:
 	bool has_cart() { return m_cart != nullptr; }
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_80xx);
-	virtual DECLARE_READ8_MEMBER(read_d5xx);
-	virtual DECLARE_WRITE8_MEMBER(write_80xx);
-	virtual DECLARE_WRITE8_MEMBER(write_d5xx);
+	uint8_t read_80xx(offs_t offset);
+	uint8_t read_d5xx(offs_t offset);
+	void write_80xx(offs_t offset, uint8_t data);
+	void write_d5xx(offs_t offset, uint8_t data);
 
 protected:
 	a800_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

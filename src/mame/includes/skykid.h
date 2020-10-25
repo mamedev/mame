@@ -31,20 +31,20 @@ public:
 	void init_skykid();
 
 private:
-	DECLARE_WRITE8_MEMBER(inputport_select_w);
-	DECLARE_READ8_MEMBER(inputport_r);
-	DECLARE_WRITE8_MEMBER(skykid_led_w);
-	DECLARE_WRITE8_MEMBER(skykid_subreset_w);
-	DECLARE_WRITE8_MEMBER(skykid_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(skykid_irq_1_ctrl_w);
-	DECLARE_WRITE8_MEMBER(skykid_irq_2_ctrl_w);
-	DECLARE_READ8_MEMBER(skykid_videoram_r);
-	DECLARE_WRITE8_MEMBER(skykid_videoram_w);
-	DECLARE_READ8_MEMBER(skykid_textram_r);
-	DECLARE_WRITE8_MEMBER(skykid_textram_w);
-	DECLARE_WRITE8_MEMBER(skykid_scroll_x_w);
-	DECLARE_WRITE8_MEMBER(skykid_scroll_y_w);
-	DECLARE_WRITE8_MEMBER(skykid_flipscreen_priority_w);
+	void inputport_select_w(uint8_t data);
+	uint8_t inputport_r();
+	void skykid_led_w(uint8_t data);
+	void skykid_subreset_w(offs_t offset, uint8_t data);
+	void skykid_bankswitch_w(offs_t offset, uint8_t data);
+	void skykid_irq_1_ctrl_w(offs_t offset, uint8_t data);
+	void skykid_irq_2_ctrl_w(offs_t offset, uint8_t data);
+	uint8_t skykid_videoram_r(offs_t offset);
+	void skykid_videoram_w(offs_t offset, uint8_t data);
+	uint8_t skykid_textram_r(offs_t offset);
+	void skykid_textram_w(offs_t offset, uint8_t data);
+	void skykid_scroll_x_w(offs_t offset, uint8_t data);
+	void skykid_scroll_y_w(offs_t offset, uint8_t data);
+	void skykid_flipscreen_priority_w(offs_t offset, uint8_t data);
 	TILEMAP_MAPPER_MEMBER(tx_tilemap_scan);
 	TILE_GET_INFO_MEMBER(tx_get_tile_info);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);

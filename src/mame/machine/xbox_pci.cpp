@@ -76,12 +76,12 @@ void nv2a_ram_device::device_start()
 	ram.resize(ram_size * 1024 * 1024 / 4);
 }
 
-READ32_MEMBER(nv2a_ram_device::config_register_r)
+uint32_t nv2a_ram_device::config_register_r()
 {
 	return 0x08800044;
 }
 
-WRITE32_MEMBER(nv2a_ram_device::config_register_w)
+void nv2a_ram_device::config_register_w(uint32_t data)
 {
 }
 
@@ -125,7 +125,9 @@ void mcpx_isalpc_device::map_extra(uint64_t memory_window_start, uint64_t memory
 mcpx_isalpc_device::mcpx_isalpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subsystem_id)
 	: mcpx_isalpc_device(mconfig, tag, owner, clock)
 {
-	set_ids(0x10de01b2, 0xb4, 0, subsystem_id); // revision id must be at least 0xb4, otherwise usb will require a hub
+	// revision id must be at least 0xb4 in the xbox, otherwise usb will require a hub
+	// in the a7n266-c motherboard it has revision 0xc3
+	set_ids(0x10de01b2, 0xb4, 0x060100, subsystem_id);
 }
 
 mcpx_isalpc_device::mcpx_isalpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -162,7 +164,7 @@ void mcpx_isalpc_device::device_start()
 	add_map(0x00000100, M_IO, FUNC(mcpx_isalpc_device::lpc_io));
 	bank_infos[0].adr = 0x8000;
 	status = 0x00b0;
-	command = 0x0081;
+	command = 0x0001;
 	command_mask = 0x01be;
 	for (int a = 0; a < 16; a++)
 		lpcdevices[a] = nullptr;
@@ -236,7 +238,7 @@ void mcpx_isalpc_device::update_smi_line()
 		m_smi_callback(0);
 }
 
-READ32_MEMBER(mcpx_isalpc_device::acpi_r)
+uint32_t mcpx_isalpc_device::acpi_r(offs_t offset, uint32_t mem_mask)
 {
 	logerror("Acpi read from %04X mask %08X\n", (bank_infos[0].adr & 0xfffffffe) + offset * 4, mem_mask);
 	if ((offset == 0xa) && ACCESSING_BITS_0_15)
@@ -246,7 +248,7 @@ READ32_MEMBER(mcpx_isalpc_device::acpi_r)
 	return 0;
 }
 
-WRITE32_MEMBER(mcpx_isalpc_device::acpi_w)
+void mcpx_isalpc_device::acpi_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("Acpi write %08X to %04X mask %08X\n", data, (bank_infos[0].adr & 0xfffffffe) + offset * 4, mem_mask);
 	// Seen using word registers at offsets
@@ -302,7 +304,7 @@ WRITE32_MEMBER(mcpx_isalpc_device::acpi_w)
 		logerror("Acpi write not recognized\n");
 }
 
-WRITE8_MEMBER(mcpx_isalpc_device::boot_state_w)
+void mcpx_isalpc_device::boot_state_w(uint8_t data)
 {
 	if (m_boot_state_hook)
 		m_boot_state_hook((offs_t)0, data);
@@ -313,7 +315,7 @@ WRITE_LINE_MEMBER(mcpx_isalpc_device::interrupt_ouptut_changed)
 	m_interrupt_output(state);
 }
 
-READ8_MEMBER(mcpx_isalpc_device::get_slave_ack)
+uint8_t mcpx_isalpc_device::get_slave_ack(offs_t offset)
 {
 	if (offset == 2) // IRQ = 2
 		return pic8259_2->acknowledge();
@@ -367,7 +369,7 @@ WRITE_LINE_MEMBER(mcpx_isalpc_device::irq15)
 	pic8259_2->ir7_w(state);
 }
 
-READ8_MEMBER(mcpx_isalpc_device::portb_r)
+uint8_t mcpx_isalpc_device::portb_r()
 {
 	uint8_t data = m_speaker;
 
@@ -382,7 +384,7 @@ READ8_MEMBER(mcpx_isalpc_device::portb_r)
 	return data;
 }
 
-WRITE8_MEMBER(mcpx_isalpc_device::portb_w)
+void mcpx_isalpc_device::portb_w(uint8_t data)
 {
 	m_speaker = data;
 	pit8254->write_gate2(BIT(data, 0));
@@ -491,6 +493,13 @@ void mcpx_isalpc_device::remap()
 
 DEFINE_DEVICE_TYPE(MCPX_SMBUS, mcpx_smbus_device, "mcpx_smbus", "MCPX SMBus Controller")
 
+void mcpx_smbus_device::config_map(address_map &map)
+{
+	pci_device::config_map(map);
+	map(0x3e, 0x3e).r(FUNC(mcpx_smbus_device::minimum_grant_r));
+	map(0x3f, 0x3f).r(FUNC(mcpx_smbus_device::maximum_latency_r));
+}
+
 void mcpx_smbus_device::smbus_io0(address_map &map)
 {
 	map(0x00000000, 0x0000000f).rw(FUNC(mcpx_smbus_device::smbus0_r), FUNC(mcpx_smbus_device::smbus0_w));
@@ -506,11 +515,16 @@ void mcpx_smbus_device::smbus_io2(address_map &map)
 	map(0x00000000, 0x0000001f).noprw();
 }
 
+mcpx_smbus_device::mcpx_smbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subsystem_id)
+	: mcpx_smbus_device(mconfig, tag, owner, clock)
+{
+	set_ids(0x10de01b4, 0xc1, 0x0c0500, subsystem_id);
+}
+
 mcpx_smbus_device::mcpx_smbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, MCPX_SMBUS, tag, owner, clock),
 	m_interrupt_handler(*this)
 {
-	set_ids(0x10de01b4, 0, 0, 0);
 }
 
 void mcpx_smbus_device::device_start()
@@ -525,6 +539,9 @@ void mcpx_smbus_device::device_start()
 	add_map(0x00000020, M_IO, FUNC(mcpx_smbus_device::smbus_io2));
 	bank_infos[2].adr = 0xc200;
 	status = 0x00b0;
+	command = 0x0001;
+	// Min Grant 3
+	// Max Latency 1
 	intr_pin = 1;
 	memset(&smbusst, 0, sizeof(smbusst));
 	for (int b = 0; b < 2; b++)
@@ -628,22 +645,22 @@ void mcpx_smbus_device::smbus_write(int bus, offs_t offset, uint32_t data, uint3
 		smbusst[bus].command = data;
 }
 
-READ32_MEMBER(mcpx_smbus_device::smbus0_r)
+uint32_t mcpx_smbus_device::smbus0_r(offs_t offset, uint32_t mem_mask)
 {
 	return smbus_read(0, offset, mem_mask);
 }
 
-WRITE32_MEMBER(mcpx_smbus_device::smbus0_w)
+void mcpx_smbus_device::smbus0_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	smbus_write(0, offset, data, mem_mask);
 }
 
-READ32_MEMBER(mcpx_smbus_device::smbus1_r)
+uint32_t mcpx_smbus_device::smbus1_r(offs_t offset, uint32_t mem_mask)
 {
 	return smbus_read(1, offset, mem_mask);
 }
 
-WRITE32_MEMBER(mcpx_smbus_device::smbus1_w)
+void mcpx_smbus_device::smbus1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	smbus_write(1, offset, data, mem_mask);
 }
@@ -654,9 +671,22 @@ WRITE32_MEMBER(mcpx_smbus_device::smbus1_w)
 
 DEFINE_DEVICE_TYPE(MCPX_OHCI, mcpx_ohci_device, "mcpx_ohci", "MCPX OHCI USB Controller")
 
+void mcpx_ohci_device::config_map(address_map &map)
+{
+	pci_device::config_map(map);
+	map(0x3e, 0x3e).r(FUNC(mcpx_ohci_device::minimum_grant_r));
+	map(0x3f, 0x3f).r(FUNC(mcpx_ohci_device::maximum_latency_r));
+}
+
 void mcpx_ohci_device::ohci_mmio(address_map &map)
 {
 	map(0x00000000, 0x00000fff).rw(FUNC(mcpx_ohci_device::ohci_r), FUNC(mcpx_ohci_device::ohci_w));
+}
+
+mcpx_ohci_device::mcpx_ohci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subsystem_id)
+	: mcpx_ohci_device(mconfig, tag, owner, clock)
+{
+	set_ids(0x10de01c2, 0xc3, 0x0c0310, subsystem_id);
 }
 
 mcpx_ohci_device::mcpx_ohci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -667,7 +697,6 @@ mcpx_ohci_device::mcpx_ohci_device(const machine_config &mconfig, const char *ta
 	maincpu(*this, ":maincpu"),
 	connecteds_count(0)
 {
-	set_ids(0x10de01c2, 0, 0, 0);
 }
 
 void mcpx_ohci_device::plug_usb_device(int port, device_usb_ohci_function_interface *function)
@@ -683,6 +712,7 @@ void mcpx_ohci_device::device_start()
 	add_map(0x00001000, M_MEM, FUNC(mcpx_ohci_device::ohci_mmio));
 	bank_infos[0].adr = 0xfed00000;
 	status = 0x00b0;
+	command = 0x0002;
 	intr_pin = 1;
 	ohci_usb = new ohci_usb_controller();
 	ohci_usb->set_cpu(maincpu.target());
@@ -733,7 +763,7 @@ void mcpx_ohci_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 		ohci_usb->timer(timer, id, param, ptr);
 }
 
-READ32_MEMBER(mcpx_ohci_device::ohci_r)
+uint32_t mcpx_ohci_device::ohci_r(offs_t offset)
 {
 	if (!ohci_usb)
 		return 0;
@@ -741,13 +771,13 @@ READ32_MEMBER(mcpx_ohci_device::ohci_r)
 	{
 		hack_callback();
 	}
-	return ohci_usb->read(space, offset, mem_mask);
+	return ohci_usb->read(offset);
 }
 
-WRITE32_MEMBER(mcpx_ohci_device::ohci_w)
+void mcpx_ohci_device::ohci_w(offs_t offset, uint32_t data)
 {
 	if (ohci_usb)
-		ohci_usb->write(space, offset, data, mem_mask);
+		ohci_usb->write(offset, data);
 }
 
 /*
@@ -786,21 +816,21 @@ void mcpx_eth_device::device_reset()
 	pci_device::device_reset();
 }
 
-READ32_MEMBER(mcpx_eth_device::eth_r)
+uint32_t mcpx_eth_device::eth_r()
 {
 	return 0;
 }
 
-WRITE32_MEMBER(mcpx_eth_device::eth_w)
+void mcpx_eth_device::eth_w(uint32_t data)
 {
 }
 
-READ32_MEMBER(mcpx_eth_device::eth_io_r)
+uint32_t mcpx_eth_device::eth_io_r()
 {
 	return 0;
 }
 
-WRITE32_MEMBER(mcpx_eth_device::eth_io_w)
+void mcpx_eth_device::eth_io_w(uint32_t data)
 {
 }
 
@@ -809,6 +839,13 @@ WRITE32_MEMBER(mcpx_eth_device::eth_io_w)
  */
 
 DEFINE_DEVICE_TYPE(MCPX_APU, mcpx_apu_device, "mcpx_apu", "MCP APU")
+
+void mcpx_apu_device::config_map(address_map &map)
+{
+	pci_device::config_map(map);
+	map(0x3e, 0x3e).r(FUNC(mcpx_apu_device::minimum_grant_r));
+	map(0x3f, 0x3f).r(FUNC(mcpx_apu_device::maximum_latency_r));
+}
 
 void mcpx_apu_device::apu_mmio(address_map &map)
 {
@@ -827,6 +864,7 @@ void mcpx_apu_device::device_start()
 	add_map(0x00080000, M_MEM, FUNC(mcpx_apu_device::apu_mmio));
 	bank_infos[0].adr = 0xfe800000;
 	status = 0x00b0;
+	command = 0x0002;
 	intr_pin = 1;
 	memset(apust.memory, 0, sizeof(apust.memory));
 	memset(apust.voices_heap_blockaddr, 0, sizeof(apust.voices_heap_blockaddr));
@@ -876,7 +914,7 @@ void mcpx_apu_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	}
 }
 
-READ32_MEMBER(mcpx_apu_device::apu_r)
+uint32_t mcpx_apu_device::apu_r(offs_t offset, uint32_t mem_mask)
 {
 #ifdef LOG_AUDIO
 	logerror("Audio_APU: read from %08X mask %08X\n", 0xfe800000 + offset * 4, mem_mask);
@@ -886,7 +924,7 @@ READ32_MEMBER(mcpx_apu_device::apu_r)
 	return apust.memory[offset];
 }
 
-WRITE32_MEMBER(mcpx_apu_device::apu_w)
+void mcpx_apu_device::apu_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t v;
 
@@ -999,6 +1037,13 @@ WRITE32_MEMBER(mcpx_apu_device::apu_w)
 
 DEFINE_DEVICE_TYPE(MCPX_AC97_AUDIO, mcpx_ac97_audio_device, "mcpx_ac97_audio", "MCPX AC'97 Audio Codec Interface")
 
+void mcpx_ac97_audio_device::config_map(address_map &map)
+{
+	pci_device::config_map(map);
+	map(0x3e, 0x3e).r(FUNC(mcpx_ac97_audio_device::minimum_grant_r));
+	map(0x3f, 0x3f).r(FUNC(mcpx_ac97_audio_device::maximum_latency_r));
+}
+
 void mcpx_ac97_audio_device::ac97_mmio(address_map &map)
 {
 	map(0x00000000, 0x000000fff).rw(FUNC(mcpx_ac97_audio_device::ac97_audio_r), FUNC(mcpx_ac97_audio_device::ac97_audio_w));
@@ -1014,10 +1059,15 @@ void mcpx_ac97_audio_device::ac97_io1(address_map &map)
 	map(0x00000000, 0x00000007f).rw(FUNC(mcpx_ac97_audio_device::ac97_audio_io1_r), FUNC(mcpx_ac97_audio_device::ac97_audio_io1_w));
 }
 
+mcpx_ac97_audio_device::mcpx_ac97_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subsystem_id)
+	: mcpx_ac97_audio_device(mconfig, tag, owner, clock)
+{
+	set_ids(0x10de01b1, 0xc2, 0x040100, subsystem_id);
+}
+
 mcpx_ac97_audio_device::mcpx_ac97_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, MCPX_AC97_AUDIO, tag, owner, clock)
 {
-	set_ids(0x10de01b1, 0, 0, 0);
 }
 
 void mcpx_ac97_audio_device::device_start()
@@ -1031,6 +1081,7 @@ void mcpx_ac97_audio_device::device_start()
 	add_map(0x00001000, M_MEM, FUNC(mcpx_ac97_audio_device::ac97_mmio));
 	bank_infos[2].adr = 0xfec00000;
 	status = 0x00b0;
+	command = 0x0003;
 	intr_pin = 1;
 	memset(&ac97st, 0, sizeof(ac97st));
 }
@@ -1040,7 +1091,7 @@ void mcpx_ac97_audio_device::device_reset()
 	pci_device::device_reset();
 }
 
-READ32_MEMBER(mcpx_ac97_audio_device::ac97_audio_r)
+uint32_t mcpx_ac97_audio_device::ac97_audio_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t ret = 0;
 
@@ -1071,7 +1122,7 @@ READ32_MEMBER(mcpx_ac97_audio_device::ac97_audio_r)
 	return ret;
 }
 
-WRITE32_MEMBER(mcpx_ac97_audio_device::ac97_audio_w)
+void mcpx_ac97_audio_device::ac97_audio_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 #ifdef LOG_AUDIO
 	logerror("Audio_AC3: write at %08X mask %08X value %08X\n", 0xfec00000 + offset * 4, mem_mask, data);
@@ -1087,21 +1138,21 @@ WRITE32_MEMBER(mcpx_ac97_audio_device::ac97_audio_w)
 	}
 }
 
-READ32_MEMBER(mcpx_ac97_audio_device::ac97_audio_io0_r)
+uint32_t mcpx_ac97_audio_device::ac97_audio_io0_r()
 {
 	return 0;
 }
 
-WRITE32_MEMBER(mcpx_ac97_audio_device::ac97_audio_io0_w)
+void mcpx_ac97_audio_device::ac97_audio_io0_w(uint32_t data)
 {
 }
 
-READ32_MEMBER(mcpx_ac97_audio_device::ac97_audio_io1_r)
+uint32_t mcpx_ac97_audio_device::ac97_audio_io1_r()
 {
 	return 0;
 }
 
-WRITE32_MEMBER(mcpx_ac97_audio_device::ac97_audio_io1_w)
+void mcpx_ac97_audio_device::ac97_audio_io1_w(uint32_t data)
 {
 }
 
@@ -1127,6 +1178,8 @@ void mcpx_ide_device::config_map(address_map &map)
 {
 	pci_device::config_map(map);
 	map(0x08, 0x0b).rw(FUNC(pci_device::class_rev_r), FUNC(mcpx_ide_device::class_rev_w));
+	map(0x3e, 0x3e).r(FUNC(mcpx_ide_device::minimum_grant_r));
+	map(0x3f, 0x3f).r(FUNC(mcpx_ide_device::maximum_latency_r));
 }
 
 void mcpx_ide_device::ide_pri_command(address_map &map)
@@ -1157,6 +1210,12 @@ void mcpx_ide_device::ide_io(address_map &map)
 	map(0x0008, 0x000f).rw("ide2", FUNC(bus_master_ide_controller_device::bmdma_r), FUNC(bus_master_ide_controller_device::bmdma_w));
 }
 
+mcpx_ide_device::mcpx_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subsystem_id)
+	: mcpx_ide_device(mconfig, tag, owner, clock)
+{
+	set_ids(0x10de01bc, 0xc3, 0x01018a, subsystem_id);
+}
+
 mcpx_ide_device::mcpx_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, MCPX_IDE, tag, owner, clock),
 	m_pri(*this, "ide1"),
@@ -1164,7 +1223,6 @@ mcpx_ide_device::mcpx_ide_device(const machine_config &mconfig, const char *tag,
 	m_pri_interrupt_handler(*this),
 	m_sec_interrupt_handler(*this)
 {
-	set_ids(0x10de01bc, 0, 0x01018a, 0);
 }
 
 void mcpx_ide_device::device_start()
@@ -1177,6 +1235,7 @@ void mcpx_ide_device::device_start()
 	add_map(0x00000010, M_IO, FUNC(mcpx_ide_device::ide_io));
 	bank_infos[4].adr = 0xff60;
 	status = 0x00b0;
+	command = 0x0001;
 	m_pri_interrupt_handler.resolve_safe();
 	m_sec_interrupt_handler.resolve_safe();
 }
@@ -1219,7 +1278,7 @@ void mcpx_ide_device::map_extra(uint64_t memory_window_start, uint64_t memory_wi
 	}
 }
 
-WRITE32_MEMBER(mcpx_ide_device::class_rev_w)
+void mcpx_ide_device::class_rev_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -1254,22 +1313,22 @@ WRITE32_MEMBER(mcpx_ide_device::class_rev_w)
 	}
 }
 
-READ8_MEMBER(mcpx_ide_device::pri_read_cs1_r)
+uint8_t mcpx_ide_device::pri_read_cs1_r()
 {
 	return m_pri->read_cs1(1, 0xff0000) >> 16;
 }
 
-WRITE8_MEMBER(mcpx_ide_device::pri_write_cs1_w)
+void mcpx_ide_device::pri_write_cs1_w(uint8_t data)
 {
 	m_pri->write_cs1(1, data << 16, 0xff0000);
 }
 
-READ8_MEMBER(mcpx_ide_device::sec_read_cs1_r)
+uint8_t mcpx_ide_device::sec_read_cs1_r()
 {
 	return m_sec->read_cs1(1, 0xff0000) >> 16;
 }
 
-WRITE8_MEMBER(mcpx_ide_device::sec_write_cs1_w)
+void mcpx_ide_device::sec_write_cs1_w(uint8_t data)
 {
 	m_sec->write_cs1(1, data << 16, 0xff0000);
 }
@@ -1311,7 +1370,7 @@ void nv2a_agp_device::device_reset()
 	agp_bridge_device::device_reset();
 }
 
-READ32_MEMBER(nv2a_agp_device::unknown_r)
+uint32_t nv2a_agp_device::unknown_r(offs_t offset, uint32_t mem_mask)
 {
 	// 4c 8 or 32
 	// 44 8
@@ -1324,7 +1383,7 @@ READ32_MEMBER(nv2a_agp_device::unknown_r)
 	return 0;
 }
 
-WRITE32_MEMBER(nv2a_agp_device::unknown_w)
+void nv2a_agp_device::unknown_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//printf("W %08X %08X %08X\n", 0x40+offset*4, mem_mask, data);
 }
@@ -1381,22 +1440,22 @@ void nv2a_gpu_device::device_reset()
 	nvidia_nv2a->set_ram_base(m_program->get_read_ptr(0));
 }
 
-READ32_MEMBER(nv2a_gpu_device::geforce_r)
+uint32_t nv2a_gpu_device::geforce_r(offs_t offset, uint32_t mem_mask)
 {
-	return nvidia_nv2a->geforce_r(space, offset, mem_mask);
+	return nvidia_nv2a->geforce_r(offset, mem_mask);
 }
 
-WRITE32_MEMBER(nv2a_gpu_device::geforce_w)
+void nv2a_gpu_device::geforce_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	nvidia_nv2a->geforce_w(space, offset, data, mem_mask);
 }
 
-READ32_MEMBER(nv2a_gpu_device::nv2a_mirror_r)
+uint32_t nv2a_gpu_device::nv2a_mirror_r(offs_t offset, uint32_t mem_mask)
 {
 	return m_program->read_dword(offset << 2);
 }
 
-WRITE32_MEMBER(nv2a_gpu_device::nv2a_mirror_w)
+void nv2a_gpu_device::nv2a_mirror_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_program->write_dword(offset << 2, data, mem_mask);
 }

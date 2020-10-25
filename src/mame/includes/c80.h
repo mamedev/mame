@@ -39,9 +39,9 @@ public:
 
 	virtual void machine_start() override;
 
-	DECLARE_READ8_MEMBER( pio1_pa_r );
-	DECLARE_WRITE8_MEMBER( pio1_pa_w );
-	DECLARE_WRITE8_MEMBER( pio1_pb_w );
+	uint8_t pio1_pa_r();
+	void pio1_pa_w(uint8_t data);
+	void pio1_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( pio1_brdy_w );
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );

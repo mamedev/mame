@@ -35,7 +35,6 @@
 #include "cpu/tms32025/tms32025.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -63,21 +62,20 @@ static const uint16_t nvram_unlock_seq[] =
 
 TMS340X0_SCANLINE_RGB32_CB_MEMBER(coolpool_state::amerdart_scanline)
 {
-	uint16_t *vram = &m_vram_base[(params->rowaddr << 8) & 0xff00];
-	uint32_t *dest = &bitmap.pix32(scanline);
+	uint16_t const *const vram = &m_vram_base[(params->rowaddr << 8) & 0xff00];
+	uint32_t *const dest = &bitmap.pix(scanline);
 	rgb_t pens[16];
 	int coladdr = params->coladdr;
-	int x;
 
 	/* update the palette */
 	if (scanline < 256)
-		for (x = 0; x < 16; x++)
+		for (int x = 0; x < 16; x++)
 		{
 			uint16_t pal = m_vram_base[x];
 			pens[x] = rgb_t(pal4bit(pal >> 4), pal4bit(pal >> 8), pal4bit(pal >> 12));
 		}
 
-	for (x = params->heblnk; x < params->hsblnk; x += 4)
+	for (int x = params->heblnk; x < params->hsblnk; x += 4)
 	{
 		uint16_t pixels = vram[coladdr++ & 0xff];
 		dest[x + 0] = pens[(pixels >> 0) & 15];
@@ -90,13 +88,12 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(coolpool_state::amerdart_scanline)
 
 TMS340X0_SCANLINE_RGB32_CB_MEMBER(coolpool_state::coolpool_scanline)
 {
-	uint16_t *vram = &m_vram_base[(params->rowaddr << 8) & 0x1ff00];
-	uint32_t *dest = &bitmap.pix32(scanline);
-	const pen_t *pens = m_tlc34076->pens();
+	uint16_t const *const vram = &m_vram_base[(params->rowaddr << 8) & 0x1ff00];
+	uint32_t *const dest = &bitmap.pix(scanline);
+	pen_t const *const pens = m_tlc34076->pens();
 	int coladdr = params->coladdr;
-	int x;
 
-	for (x = params->heblnk; x < params->hsblnk; x += 2)
+	for (int x = params->heblnk; x < params->hsblnk; x += 2)
 	{
 		uint16_t pixels = vram[coladdr++ & 0xff];
 		dest[x + 0] = pens[pixels & 0xff];
@@ -156,7 +153,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(coolpool_state::nvram_write_timeout)
 }
 
 
-WRITE16_MEMBER(coolpool_state::nvram_thrash_w)
+void coolpool_state::nvram_thrash_w(offs_t offset, uint16_t data)
 {
 	/* keep track of the last few writes */
 	memmove(&m_nvram_write_seq[0], &m_nvram_write_seq[1], (NVRAM_UNLOCK_SEQ_LEN - 1) * sizeof(m_nvram_write_seq[0]));
@@ -171,7 +168,7 @@ WRITE16_MEMBER(coolpool_state::nvram_thrash_w)
 }
 
 
-WRITE16_MEMBER(coolpool_state::nvram_data_w)
+void coolpool_state::nvram_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* only the low 8 bits matter */
 	if (ACCESSING_BITS_0_7)
@@ -184,10 +181,10 @@ WRITE16_MEMBER(coolpool_state::nvram_data_w)
 }
 
 
-WRITE16_MEMBER(coolpool_state::nvram_thrash_data_w)
+void coolpool_state::nvram_thrash_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	nvram_data_w(space, offset, data, mem_mask);
-	nvram_thrash_w(space, offset, data, mem_mask);
+	nvram_data_w(offset, data, mem_mask);
+	nvram_thrash_w(offset, data);
 }
 
 
@@ -205,7 +202,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(coolpool_state::amerdart_audio_int_gen)
 }
 
 
-WRITE16_MEMBER(coolpool_state::amerdart_misc_w)
+void coolpool_state::amerdart_misc_w(uint16_t data)
 {
 	logerror("%08x:IOP_system_w %04x\n",m_maincpu->pc(),data);
 
@@ -317,7 +314,7 @@ int coolpool_state::amerdart_trackball_direction(int num, int data)
 }
 
 
-READ16_MEMBER(coolpool_state::amerdart_trackball_r)
+uint16_t coolpool_state::amerdart_trackball_r(offs_t offset)
 {
 /*
     Trackballs seem to be handled as though they're rotated 45 degrees anti-clockwise.
@@ -389,7 +386,7 @@ READ16_MEMBER(coolpool_state::amerdart_trackball_r)
  *
  *************************************/
 
-WRITE16_MEMBER(coolpool_state::coolpool_misc_w)
+void coolpool_state::coolpool_misc_w(uint16_t data)
 {
 	logerror("%08x:IOP_system_w %04x\n",m_maincpu->pc(),data);
 
@@ -408,13 +405,13 @@ WRITE16_MEMBER(coolpool_state::coolpool_misc_w)
  *************************************/
 
 
-READ16_MEMBER(coolpool_state::dsp_bio_line_r)
+uint16_t coolpool_state::dsp_bio_line_r()
 {
 	return m_main2dsp->pending_r() ? CLEAR_LINE : ASSERT_LINE;
 }
 
 
-READ16_MEMBER(coolpool_state::dsp_hold_line_r)
+uint16_t coolpool_state::dsp_hold_line_r()
 {
 	return CLEAR_LINE;  /* ??? */
 }
@@ -426,13 +423,13 @@ READ16_MEMBER(coolpool_state::dsp_hold_line_r)
  *
  *************************************/
 
-READ16_MEMBER(coolpool_state::dsp_rom_r)
+uint16_t coolpool_state::dsp_rom_r()
 {
 	return m_dsp_rom[m_iop_romaddr & (m_dsp_rom.mask())];
 }
 
 
-WRITE16_MEMBER(coolpool_state::dsp_romaddr_w)
+void coolpool_state::dsp_romaddr_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
@@ -454,7 +451,7 @@ WRITE16_MEMBER(coolpool_state::dsp_romaddr_w)
  *
  *************************************/
 
-READ16_MEMBER(coolpool_state::coolpool_input_r)
+uint16_t coolpool_state::coolpool_input_r(offs_t offset)
 {
 	m_result = (ioport("IN1")->read() & 0x00ff) | (m_lastresult & 0xff00);
 	m_newx[1] = ioport("XAXIS")->read();
@@ -747,9 +744,6 @@ void coolpool_state::amerdart(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	MP1210(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 
@@ -795,9 +789,6 @@ void coolpool_state::coolpool(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	MP1210(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 

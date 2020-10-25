@@ -29,7 +29,7 @@
  *  1 1 0    Command register
  */
 
-WRITE16_MEMBER(jpmimpct_state::jpmimpct_bt477_w)
+void jpmimpct_state::jpmimpct_bt477_w(offs_t offset, uint16_t data)
 {
 	uint8_t val = data & 0xff;
 
@@ -75,7 +75,7 @@ WRITE16_MEMBER(jpmimpct_state::jpmimpct_bt477_w)
 	}
 }
 
-READ16_MEMBER(jpmimpct_state::jpmimpct_bt477_r)
+uint16_t jpmimpct_state::jpmimpct_bt477_r(offs_t offset)
 {
 	popmessage("Bt477: Unhandled read access (offset:%x)", offset);
 	return 0;
@@ -107,14 +107,13 @@ TMS340X0_FROM_SHIFTREG_CB_MEMBER(jpmimpct_state::from_shiftreg)
 
 TMS340X0_SCANLINE_RGB32_CB_MEMBER(jpmimpct_state::scanline_update)
 {
-	uint16_t *vram = &m_vram[(params->rowaddr << 8) & 0x3ff00];
-	uint32_t *dest = &bitmap.pix32(scanline);
+	uint16_t const *const vram = &m_vram[(params->rowaddr << 8) & 0x3ff00];
+	uint32_t *const dest = &bitmap.pix(scanline);
 	int coladdr = params->coladdr;
-	int x;
 
-	for (x = params->heblnk; x < params->hsblnk; x += 2)
+	for (int x = params->heblnk; x < params->hsblnk; x += 2)
 	{
-		uint16_t pixels = vram[coladdr++ & 0xff];
+		uint16_t const pixels = vram[coladdr++ & 0xff];
 		dest[x + 0] = m_palette->pen(pixels & 0xff);
 		dest[x + 1] = m_palette->pen(pixels >> 8);
 	}

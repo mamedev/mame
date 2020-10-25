@@ -35,6 +35,9 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "v25.h"
+#include "necdasm.h"
+
 #include "debugger.h"
 
 typedef uint8_t BOOLEAN;
@@ -42,9 +45,8 @@ typedef uint8_t BYTE;
 typedef uint16_t WORD;
 typedef uint32_t DWORD;
 
-#include "v25.h"
-#include "v25priv.h"
-#include "necdasm.h"
+#include "v25priv.ipp"
+
 
 DEFINE_DEVICE_TYPE(V25, v25_device, "v25", "NEC V25")
 DEFINE_DEVICE_TYPE(V35, v35_device, "v35", "NEC V35")
@@ -621,11 +623,11 @@ void v25_common_device::device_start()
 
 	m_program = &space(AS_PROGRAM);
 	if(m_program->data_width() == 8) {
-		auto cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
-		m_dr8 = [cache](offs_t address) -> u8 { return cache->read_byte(address); };
+		m_program->cache(m_cache8);
+		m_dr8 = [this](offs_t address) -> u8 { return m_cache8.read_byte(address); };
 	} else {
-		auto cache = m_program->cache<1, 0, ENDIANNESS_LITTLE>();
-		m_dr8 = [cache](offs_t address) -> u8 { return cache->read_byte(address); };
+		m_program->cache(m_cache16);
+		m_dr8 = [this](offs_t address) -> u8 { return m_cache16.read_byte(address); };
 	}
 	m_data = &space(AS_DATA);
 	m_io = &space(AS_IO);

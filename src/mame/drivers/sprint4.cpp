@@ -149,45 +149,45 @@ void sprint4_state::machine_reset()
 }
 
 
-READ8_MEMBER(sprint4_state::wram_r)
+uint8_t sprint4_state::wram_r(offs_t offset)
 {
 	return m_videoram[0x380 + offset];
 }
 
 
-READ8_MEMBER(sprint4_state::analog_r)
+uint8_t sprint4_state::analog_r(offs_t offset)
 {
 	return (ioport("ANALOG")->read() << (~offset & 7)) & 0x80;
 }
-READ8_MEMBER(sprint4_state::coin_r)
+uint8_t sprint4_state::coin_r(offs_t offset)
 {
 	return (ioport("COIN")->read() << (~offset & 7)) & 0x80;
 }
-READ8_MEMBER(sprint4_state::collision_r)
+uint8_t sprint4_state::collision_r(offs_t offset)
 {
 	return (ioport("COLLISION")->read() << (~offset & 7)) & 0x80;
 }
 
 
-READ8_MEMBER(sprint4_state::options_r)
+uint8_t sprint4_state::options_r(offs_t offset)
 {
 	return (ioport("DIP")->read() >> (2 * (offset & 3))) & 3;
 }
 
 
-WRITE8_MEMBER(sprint4_state::wram_w)
+void sprint4_state::wram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[0x380 + offset] = data;
 }
 
 
-WRITE8_MEMBER(sprint4_state::collision_reset_w)
+void sprint4_state::collision_reset_w(offs_t offset, uint8_t data)
 {
 	m_collision[(offset >> 1) & 3] = 0;
 }
 
 
-WRITE8_MEMBER(sprint4_state::da_latch_w)
+void sprint4_state::da_latch_w(uint8_t data)
 {
 	m_da_latch = data & 15;
 }
@@ -195,20 +195,20 @@ WRITE8_MEMBER(sprint4_state::da_latch_w)
 
 
 #ifdef UNUSED_FUNCTION
-WRITE8_MEMBER(sprint4_state::lockout_w)
+void sprint4_state::lockout_w(offs_t offset, uint8_t data)
 {
 	machine().bookkeeping().coin_lockout_global_w(~offset & 1);
 }
 #endif
 
 
-WRITE8_MEMBER(sprint4_state::bang_w)
+void sprint4_state::bang_w(uint8_t data)
 {
 	m_discrete->write(SPRINT4_BANG_DATA, data & 0x0f);
 }
 
 
-WRITE8_MEMBER(sprint4_state::attract_w)
+void sprint4_state::attract_w(uint8_t data)
 {
 	m_discrete->write(SPRINT4_ATTRACT_EN, data & 1);
 }

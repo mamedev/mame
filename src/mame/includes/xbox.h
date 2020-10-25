@@ -82,10 +82,10 @@ public:
 	virtual void map_extra(address_space *memory_space, address_space *io_space) override;
 	virtual void set_host(int index, lpcbus_host_interface *host) override;
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_READ8_MEMBER(read_rs232);
-	DECLARE_WRITE8_MEMBER(write_rs232);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+	uint8_t read_rs232(offs_t offset);
+	void write_rs232(offs_t offset, uint8_t data);
 
 protected:
 	virtual void device_start() override;
@@ -164,6 +164,7 @@ private:
 	void grab_texture_command(int ref, const std::vector<std::string> &params);
 	void grab_vprog_command(int ref, const std::vector<std::string> &params);
 	void vprogdis_command(int ref, const std::vector<std::string> &params);
+	void vdeclaration_command(int ref, const std::vector<std::string> &params);
 	void help_command(int ref, const std::vector<std::string> &params);
 	void xbox_debug_commands(int ref, const std::vector<std::string> &params);
 	int find_bios_index();

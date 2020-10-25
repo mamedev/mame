@@ -53,14 +53,15 @@ void svision_sound_device::device_start()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void svision_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void svision_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *left=outputs[0], *right=outputs[1];
+	auto &left=outputs[0];
+	auto &right=outputs[1];
 
-	for (int i = 0; i < samples; i++, left++, right++)
+	for (int i = 0; i < left.samples(); i++)
 	{
-		*left = 0;
-		*right = 0;
+		s32 lsum = 0;
+		s32 rsum = 0;
 		for (int j = 0; j < ARRAY_LENGTH(m_channel); j++)
 		{
 			CHANNEL &channel(m_channel[j]);
@@ -88,9 +89,9 @@ void svision_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 					{
 						int16_t s = on ? channel.volume << 8 : 0;
 						if (j == 0)
-							*right += s;
+							rsum += s;
 						else
-							*left += s;
+							lsum += s;
 					}
 				}
 				channel.pos++;
@@ -103,9 +104,9 @@ void svision_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 			int16_t s = (m_noise.value ? 1 << 8: 0) * m_noise.volume;
 			int b1, b2;
 			if (m_noise.left)
-				*left += s;
+				lsum += s;
 			if (m_noise.right)
-				*right += s;
+				rsum += s;
 			m_noise.pos += m_noise.step;
 			if (m_noise.pos >= 1.0)
 			{
@@ -146,9 +147,9 @@ void svision_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 				s = (sample & 0xf0) >> 4;
 			s <<= 8;
 			if (m_dma.left)
-				*left += s;
+				lsum += s;
 			if (m_dma.right)
-				*right += s;
+				rsum += s;
 			m_dma.pos += m_dma.step;
 			if (m_dma.pos >= m_dma.size)
 			{
@@ -157,6 +158,8 @@ void svision_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 				m_irq_cb(1);
 			}
 		}
+		left.put_int(i, lsum, 32768);
+		right.put_int(i, rsum, 32768);
 	}
 }
 

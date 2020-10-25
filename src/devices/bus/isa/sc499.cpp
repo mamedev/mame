@@ -389,7 +389,7 @@ void sc499_device::device_reset()
 		m_irq = m_irqdrq->read() & 7;
 		m_drq = m_irqdrq->read()>>4;
 
-		m_isa->install_device(base, base+7, read8_delegate(*this, FUNC(sc499_device::read)), write8_delegate(*this, FUNC(sc499_device::write)));
+		m_isa->install_device(base, base+7, read8sm_delegate(*this, FUNC(sc499_device::read)), write8sm_delegate(*this, FUNC(sc499_device::write)));
 		m_isa->set_dma_channel(m_drq, this, true);
 
 		m_installed = true;
@@ -1014,7 +1014,7 @@ void sc499_device::write_dma_reset( uint8_t data)
 	m_control = 0;
 }
 
-WRITE8_MEMBER(sc499_device::write)
+void sc499_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -1036,7 +1036,7 @@ WRITE8_MEMBER(sc499_device::write)
 	}
 }
 
-READ8_MEMBER(sc499_device::read)
+uint8_t sc499_device::read(offs_t offset)
 {
 	uint8_t data = 0xff;
 

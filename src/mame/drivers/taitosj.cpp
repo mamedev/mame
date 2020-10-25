@@ -173,25 +173,25 @@ TODO:
 #include "speaker.h"
 
 
-WRITE8_MEMBER(taitosj_state::taitosj_sndnmi_msk_w)
+void taitosj_state::taitosj_sndnmi_msk_w(uint8_t data)
 {
 	/* B0 is the sound nmi enable, active low */
 	m_soundnmi->in_w<0>((~data)&1);
 }
 
-WRITE8_MEMBER(taitosj_state::soundlatch_w)
+void taitosj_state::soundlatch_w(uint8_t data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(taitosj_state::soundlatch_w_cb), this), data);
 }
 
 
-WRITE8_MEMBER(taitosj_state::input_port_4_f0_w)
+void taitosj_state::input_port_4_f0_w(uint8_t data)
 {
 	m_input_port_4_f0 = data >> 4;
 }
 
 // EPORT2
-WRITE8_MEMBER(taitosj_state::sound_semaphore2_w)
+void taitosj_state::sound_semaphore2_w(uint8_t data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(taitosj_state::sound_semaphore2_w_cb), this), data);
 }
@@ -341,7 +341,7 @@ TIMER_CALLBACK_MEMBER(taitosj_state::sound_semaphore2_clear_w_cb)
 }
 
 // RD5000
-READ8_MEMBER(taitosj_state::soundlatch_r)
+uint8_t taitosj_state::soundlatch_r()
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -352,19 +352,19 @@ READ8_MEMBER(taitosj_state::soundlatch_r)
 }
 
 // RD5001
-READ8_MEMBER(taitosj_state::soundlatch_flags_r)
+uint8_t taitosj_state::soundlatch_flags_r()
 {
 	return (m_soundlatch_flag?8:0) | (m_sound_semaphore2?4:0) | 3;
 }
 
 // WR5000
-WRITE8_MEMBER(taitosj_state::soundlatch_clear7_w)
+void taitosj_state::soundlatch_clear7_w(uint8_t data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(taitosj_state::soundlatch_clear7_w_cb), this), data);
 }
 
 // WR5001
-WRITE8_MEMBER(taitosj_state::sound_semaphore2_clear_w)
+void taitosj_state::sound_semaphore2_clear_w(uint8_t data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(taitosj_state::sound_semaphore2_clear_w_cb), this), data);
 }
@@ -1770,7 +1770,7 @@ DISCRETE_SOUND_START(taitosj_dacvol_discrete)
 	DISCRETE_OUTPUT(NODE_02, 9637)
 DISCRETE_SOUND_END
 
-WRITE8_MEMBER(taitosj_state::taitosj_dacvol_w)
+void taitosj_state::taitosj_dacvol_w(uint8_t data)
 {
 	m_dacvol->write(NODE_01, data ^ 0xff); // 7416 hex inverter
 }
@@ -1842,8 +1842,8 @@ void taitosj_state::nomcu(machine_config &config)
 
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.15); // 30k r-2r network
 	DISCRETE(config, m_dacvol, taitosj_dacvol_discrete);
-	m_dacvol->add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	m_dacvol->add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+	m_dacvol->add_route(0, "dac", 1.0, DAC_INPUT_RANGE_HI);
+	m_dacvol->add_route(0, "dac", -1.0, DAC_INPUT_RANGE_LO);
 }
 
 
@@ -2851,7 +2851,7 @@ void taitosj_state::init_spacecr()
 	init_common();
 
 	/* install protection handler */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd48b, 0xd48b, read8_delegate(*this, FUNC(taitosj_state::spacecr_prot_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd48b, 0xd48b, read8smo_delegate(*this, FUNC(taitosj_state::spacecr_prot_r)));
 }
 
 void taitosj_state::init_alpine()
@@ -2859,8 +2859,8 @@ void taitosj_state::init_alpine()
 	init_common();
 
 	/* install protection handlers */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd40b, 0xd40b, read8_delegate(*this, FUNC(taitosj_state::alpine_port_2_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd50f, 0xd50f, write8_delegate(*this, FUNC(taitosj_state::alpine_protection_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd40b, 0xd40b, read8smo_delegate(*this, FUNC(taitosj_state::alpine_port_2_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd50f, 0xd50f, write8smo_delegate(*this, FUNC(taitosj_state::alpine_protection_w)));
 }
 
 void taitosj_state::init_alpinea()
@@ -2868,8 +2868,8 @@ void taitosj_state::init_alpinea()
 	init_common();
 
 	/* install protection handlers */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd40b, 0xd40b, read8_delegate(*this, FUNC(taitosj_state::alpine_port_2_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd50e, 0xd50e, write8_delegate(*this, FUNC(taitosj_state::alpinea_bankswitch_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd40b, 0xd40b, read8smo_delegate(*this, FUNC(taitosj_state::alpine_port_2_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd50e, 0xd50e, write8smo_delegate(*this, FUNC(taitosj_state::alpinea_bankswitch_w)));
 }
 
 void taitosj_state::init_junglhbr()
@@ -2877,7 +2877,7 @@ void taitosj_state::init_junglhbr()
 	init_common();
 
 	/* inverter on bits 0 and 1 */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x9000, 0xbfff, write8_delegate(*this, FUNC(taitosj_state::junglhbr_characterram_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x9000, 0xbfff, write8sm_delegate(*this, FUNC(taitosj_state::junglhbr_characterram_w)));
 }
 
 GAME( 1981, spaceskr,  0,        nomcu,    spaceskr, taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "Space Seeker", MACHINE_SUPPORTS_SAVE )
@@ -2894,13 +2894,13 @@ GAME( 1982, alpinea,   alpine,   nomcu,    alpinea,  taitosj_state, init_alpinea
 GAME( 1982, timetunl,  0,        nomcu,    timetunl, taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "Time Tunnel", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, wwestern,  0,        nomcu,    wwestern, taitosj_state, init_taitosj, ROT270, "Taito Corporation",         "Wild Western (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, wwestern1, wwestern, nomcu,    wwestern, taitosj_state, init_taitosj, ROT270, "Taito Corporation",         "Wild Western (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, frontlin,  0,        mcu,      frontlin, taitosj_state, init_taitosj, ROT270, "Taito Corporation",         "Front Line (AA1, 4 pcb version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, frontlina, frontlin, mcu,      frontlin, taitosj_state, init_taitosj, ROT270, "Taito Corporation",         "Front Line (FL, 5 pcb version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, elevator,  0,        mcu,      elevator, taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "Elevator Action (BA3, 4 pcb version, 1.1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, elevatora, elevator, mcu,      elevator, taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "Elevator Action (EA, 5 pcb version, 1.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, frontlin,  0,        mcu,      frontlin, taitosj_state, init_taitosj, ROT270, "Taito Corporation",         "Front Line (AA1, 4 PCB version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, frontlina, frontlin, mcu,      frontlin, taitosj_state, init_taitosj, ROT270, "Taito Corporation",         "Front Line (FL, 5 PCB version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, elevator,  0,        mcu,      elevator, taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "Elevator Action (BA3, 4 PCB version, 1.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, elevatora, elevator, mcu,      elevator, taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "Elevator Action (EA, 5 PCB version, 1.1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, elevatorb, elevator, nomcu,    elevator, taitosj_state, init_taitosj, ROT0,   "bootleg",                   "Elevator Action (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, tinstar,   0,        mcu,      tinstar,  taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "The Tin Star (A10, 4 pcb version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, tinstara,  tinstar,  mcu,      tinstar,  taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "The Tin Star (TS, 5 pcb version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, tinstar,   0,        mcu,      tinstar,  taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "The Tin Star (A10, 4 PCB version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, tinstara,  tinstar,  mcu,      tinstar,  taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "The Tin Star (TS, 5 PCB version)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, waterski,  0,        nomcu,    waterski, taitosj_state, init_taitosj, ROT270, "Taito Corporation",         "Water Ski", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, bioatack,  0,        nomcu,    bioatack, taitosj_state, init_taitosj, ROT270, "Taito Corporation (Fox Video Games license)", "Bio Attack", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, sfposeid,  0,        mcu,      sfposeid, taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "Sea Fighter Poseidon", MACHINE_SUPPORTS_SAVE )

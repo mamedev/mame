@@ -41,7 +41,7 @@ thought to be a watchdog before.
 #include "speaker.h"
 
 
-WRITE8_MEMBER(gng_state::gng_bankswitch_w)
+void gng_state::gng_bankswitch_w(uint8_t data)
 {
 	if (data == 4)
 		membank("bank1")->set_entry(4);
@@ -58,7 +58,7 @@ WRITE_LINE_MEMBER(gng_state::ym_reset_w)
 	}
 }
 
-READ8_MEMBER(gng_state::diamond_hack_r)
+uint8_t gng_state::diamond_hack_r()
 {
 	return 0;
 }

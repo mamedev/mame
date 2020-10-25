@@ -134,7 +134,7 @@ void divebomb_state::divebomb_fgcpu_iomap(address_map &map)
 }
 
 
-READ8_MEMBER(divebomb_state::fgcpu_comm_flags_r)
+uint8_t divebomb_state::fgcpu_comm_flags_r()
 {
 	uint8_t result = 0;
 
@@ -170,7 +170,7 @@ void divebomb_state::divebomb_spritecpu_iomap(address_map &map)
 }
 
 
-WRITE8_MEMBER(divebomb_state::spritecpu_port00_w)
+void divebomb_state::spritecpu_port00_w(uint8_t data)
 {
 	// Written with 0x00 on reset
 	// Written with 0x34 7 times in succession on occasion (see PC:0x00E3)
@@ -184,14 +184,14 @@ WRITE8_MEMBER(divebomb_state::spritecpu_port00_w)
  *************************************/
 
 template<int Chip>
-WRITE8_MEMBER(divebomb_state::rozcpu_wrap_enable_w)
+void divebomb_state::rozcpu_wrap_enable_w(uint8_t data)
 {
 	m_k051316[Chip]->wraparound_enable(!(data & 1));
 }
 
 
 template<int Chip>
-WRITE8_MEMBER(divebomb_state::rozcpu_enable_w)
+void divebomb_state::rozcpu_enable_w(uint8_t data)
 {
 	m_roz_enable[Chip] = !(data & 1);
 }
@@ -222,7 +222,7 @@ void divebomb_state::divebomb_rozcpu_iomap(address_map &map)
 }
 
 
-WRITE8_MEMBER(divebomb_state::rozcpu_bank_w)
+void divebomb_state::rozcpu_bank_w(uint8_t data)
 {
 	uint32_t bank = bitswap<8>(data, 4, 5, 6, 7, 3, 2, 1, 0) >> 4;
 	m_rozbank->set_entry(bank);

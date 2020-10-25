@@ -43,23 +43,23 @@ private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	DECLARE_WRITE8_MEMBER(output_latch_w);
+	void output_latch_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_left_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_right_w);
 
 	DECLARE_WRITE_LINE_MEMBER(trackball_reset_w);
-	DECLARE_READ8_MEMBER(port0_r);
+	uint8_t port0_r();
 
-	DECLARE_WRITE8_MEMBER( bitmap_w );
-	DECLARE_READ8_MEMBER( bitmap_xy_r );
-	DECLARE_WRITE8_MEMBER( bitmap_xy_w );
+	void bitmap_w(offs_t offset, uint8_t data);
+	uint8_t bitmap_xy_r();
+	void bitmap_xy_w(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	// early raster EAROM interface
-	DECLARE_READ8_MEMBER( earom_r );
-	DECLARE_WRITE8_MEMBER( earom_w );
-	DECLARE_WRITE8_MEMBER( earom_control_w );
+	uint8_t earom_r();
+	void earom_w(offs_t offset, uint8_t data);
+	void earom_control_w(uint8_t data);
 
 	void liberat2_map(address_map &map);
 	void liberatr_map(address_map &map);

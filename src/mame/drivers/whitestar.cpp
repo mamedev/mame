@@ -31,11 +31,11 @@ private:
 	optional_device<decobsmt_device> m_decobsmt;
 	required_device<decodmd_type2_device> m_decodmd;
 
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_WRITE8_MEMBER(dmddata_w);
+	void bank_w(uint8_t data);
+	void dmddata_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(switch_r);
-	DECLARE_WRITE8_MEMBER(switch_w);
+	uint8_t switch_r();
+	void switch_w(uint8_t data);
 	virtual void machine_start() override;
 	INTERRUPT_GEN_MEMBER(whitestar_firq_interrupt);
 
@@ -95,22 +95,22 @@ void whitestar_state::whitestarm_map(address_map &map)
 	// TODO: sound writes
 }
 
-READ8_MEMBER(whitestar_state::switch_r)
+uint8_t whitestar_state::switch_r()
 {
 	return 0;
 }
 
-WRITE8_MEMBER(whitestar_state::switch_w)
+void whitestar_state::switch_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER(whitestar_state::bank_w)
+void whitestar_state::bank_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x1f);
 }
 
 // Whitestar automatically pulses the DMD IRQ line?  DE hardware doesn't do that...
-WRITE8_MEMBER(whitestar_state::dmddata_w)
+void whitestar_state::dmddata_w(uint8_t data)
 {
 	m_decodmd->data_w(data);
 	m_decodmd->ctrl_w(1);

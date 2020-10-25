@@ -136,14 +136,13 @@ private:
 	virtual void machine_reset() override;
 
 	uint8_t random_read();
-	DECLARE_READ16_MEMBER(protection_r);
-	DECLARE_WRITE16_MEMBER(scroll_w);
-	DECLARE_READ8_MEMBER(via_b_in);
-	DECLARE_WRITE8_MEMBER(via_a_out);
-	DECLARE_WRITE8_MEMBER(via_b_out);
+	uint16_t protection_r();
+	void scroll_w(uint16_t data);
+	void via_a_out(uint8_t data);
+	void via_b_out(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(via_ca2_out);
-	DECLARE_READ8_MEMBER(dips1_r);
-	DECLARE_WRITE8_MEMBER(input_mux_w);
+	uint8_t dips1_r();
+	void input_mux_w(uint8_t data);
 	void int_ack_w(uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void init_stats(const uint8_t *table, int table_len, int address);
@@ -168,41 +167,42 @@ uint32_t bmcbowl_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
         missing scroll and priorities   (maybe fixed ones)
 */
 
-	int x,y,z,pixdat;
 	bitmap.fill(rgb_t::black(), cliprect);
 
-	z=0;
-	for (y=0;y<230;y++)
+	int z=0;
+	for (int y=0; y<230; y++)
 	{
-		for (x=0;x<280;x+=2)
+		for (int x=0; x<280; x+=2)
 		{
+			int pixdat;
+
 			pixdat = m_vid2[0x8000+z];
 
 			if(pixdat&0xff)
-				bitmap.pix32(y, x+1) = m_palette->pen(pixdat&0xff);
+				bitmap.pix(y, x+1) = m_palette->pen(pixdat&0xff);
 			if(pixdat>>8)
-				bitmap.pix32(y, x) = m_palette->pen(pixdat>>8);
+				bitmap.pix(y, x) = m_palette->pen(pixdat>>8);
 
 			pixdat = m_vid2[z];
 
 			if(pixdat&0xff)
-				bitmap.pix32(y, x+1) = m_palette->pen(pixdat&0xff);
+				bitmap.pix(y, x+1) = m_palette->pen(pixdat&0xff);
 			if(pixdat>>8)
-				bitmap.pix32(y, x) = m_palette->pen(pixdat>>8);
+				bitmap.pix(y, x) = m_palette->pen(pixdat>>8);
 
 			pixdat = m_vid1[0x8000+z];
 
 			if(pixdat&0xff)
-				bitmap.pix32(y, x+1) = m_palette->pen(pixdat&0xff);
+				bitmap.pix(y, x+1) = m_palette->pen(pixdat&0xff);
 			if(pixdat>>8)
-				bitmap.pix32(y, x) = m_palette->pen(pixdat>>8);
+				bitmap.pix(y, x) = m_palette->pen(pixdat>>8);
 
 			pixdat = m_vid1[z];
 
 			if(pixdat&0xff)
-				bitmap.pix32(y, x+1) = m_palette->pen(pixdat&0xff);
+				bitmap.pix(y, x+1) = m_palette->pen(pixdat&0xff);
 			if(pixdat>>8)
-				bitmap.pix32(y, x) = m_palette->pen(pixdat>>8);
+				bitmap.pix(y, x) = m_palette->pen(pixdat>>8);
 
 			z++;
 		}
@@ -215,7 +215,7 @@ uint8_t bmcbowl_state::random_read()
 	return machine().rand();
 }
 
-READ16_MEMBER(bmcbowl_state::protection_r)
+uint16_t bmcbowl_state::protection_r()
 {
 	switch(m_maincpu->pcbase())
 	{
@@ -231,24 +231,17 @@ READ16_MEMBER(bmcbowl_state::protection_r)
 	return machine().rand();
 }
 
-WRITE16_MEMBER(bmcbowl_state::scroll_w)
+void bmcbowl_state::scroll_w(uint16_t data)
 {
 	//TODO - scroll
 }
 
-
-READ8_MEMBER(bmcbowl_state::via_b_in)
-{
-	return ioport("IN3")->read();
-}
-
-
-WRITE8_MEMBER(bmcbowl_state::via_a_out)
+void bmcbowl_state::via_a_out(uint8_t data)
 {
 	// related to video hw ? BG scroll ?
 }
 
-WRITE8_MEMBER(bmcbowl_state::via_b_out)
+void bmcbowl_state::via_b_out(uint8_t data)
 {
 	//used
 }
@@ -446,7 +439,7 @@ static INPUT_PORTS_START( bmcbowl )
 
 INPUT_PORTS_END
 
-READ8_MEMBER(bmcbowl_state::dips1_r)
+uint8_t bmcbowl_state::dips1_r()
 {
 	switch(m_selected_input)
 	{
@@ -458,7 +451,7 @@ READ8_MEMBER(bmcbowl_state::dips1_r)
 }
 
 
-WRITE8_MEMBER(bmcbowl_state::input_mux_w)
+void bmcbowl_state::input_mux_w(uint8_t data)
 {
 	m_selected_input = data;
 }
@@ -507,7 +500,7 @@ void bmcbowl_state::bmcbowl(machine_config &config)
 
 	/* via */
 	via6522_device &via(VIA6522(config, "via6522_0", XTAL(3'579'545) / 4)); // clock not verified (controls music tempo)
-	via.readpb_handler().set(FUNC(bmcbowl_state::via_b_in));
+	via.readpb_handler().set_ioport("IN3");
 	via.writepa_handler().set(FUNC(bmcbowl_state::via_a_out));
 	via.writepb_handler().set(FUNC(bmcbowl_state::via_b_out));
 	via.ca2_handler().set(FUNC(bmcbowl_state::via_ca2_out));

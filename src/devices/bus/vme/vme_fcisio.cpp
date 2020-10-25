@@ -426,11 +426,11 @@ void vme_fcisio1_card_device::device_reset()
 }
 
 /* Boot vector handler, the PCB hardwires the first 8 bytes from 0x80000 to 0x0 */
-READ16_MEMBER (vme_fcisio1_card_device::bootvect_r){
+uint16_t vme_fcisio1_card_device::bootvect_r(offs_t offset){
 	return m_sysrom [offset];
 }
 
-READ8_MEMBER (vme_fcisio1_card_device::not_implemented_r){
+uint8_t vme_fcisio1_card_device::not_implemented_r(){
 	static int been_here = 0;
 	if (!been_here++){
 		logerror(TODO);
@@ -439,7 +439,7 @@ READ8_MEMBER (vme_fcisio1_card_device::not_implemented_r){
 	return (uint8_t) 0;
 }
 
-WRITE8_MEMBER (vme_fcisio1_card_device::not_implemented_w){
+void vme_fcisio1_card_device::not_implemented_w(uint8_t data){
 	static int been_here = 0;
 	if (!been_here++){
 		logerror(TODO);
@@ -449,7 +449,7 @@ WRITE8_MEMBER (vme_fcisio1_card_device::not_implemented_w){
 }
 
 // TODO: Get a manual to understand the config options for real
-READ8_MEMBER (vme_fcisio1_card_device::config_rd){
+uint8_t vme_fcisio1_card_device::config_rd(){
 	uint8_t ret = 0;
 	LOG("%s\n", FUNCNAME);
 

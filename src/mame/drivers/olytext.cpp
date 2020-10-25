@@ -129,7 +129,7 @@ void olytext_state::keyboard_put(u8 data)
 //  }
 }
 
-//WRITE8_MEMBER( olytext_state::fdcctrl_w )
+//void olytext_state::fdcctrl_w(uint8_t data)
 //{
 //  m_fdcctrl = data;
 //  m_romen = (m_fdcctrl & 1) ? false : true;

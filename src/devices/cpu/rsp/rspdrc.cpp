@@ -142,7 +142,7 @@ inline void rsp_device::ccfunc_read32()
 
 static void cfunc_read32(void *param)
 {
-	((rsp_device *)param)->ccfunc_read32();;
+	((rsp_device *)param)->ccfunc_read32();
 }
 
 inline void rsp_device::ccfunc_write8()
@@ -152,7 +152,7 @@ inline void rsp_device::ccfunc_write8()
 
 static void cfunc_write8(void *param)
 {
-	((rsp_device *)param)->ccfunc_write8();;
+	((rsp_device *)param)->ccfunc_write8();
 }
 
 inline void rsp_device::ccfunc_write16()
@@ -162,7 +162,7 @@ inline void rsp_device::ccfunc_write16()
 
 static void cfunc_write16(void *param)
 {
-	((rsp_device *)param)->ccfunc_write16();;
+	((rsp_device *)param)->ccfunc_write16();
 }
 
 inline void rsp_device::ccfunc_write32()
@@ -172,7 +172,7 @@ inline void rsp_device::ccfunc_write32()
 
 static void cfunc_write32(void *param)
 {
-	((rsp_device *)param)->ccfunc_write32();;
+	((rsp_device *)param)->ccfunc_write32();
 }
 
 /*****************************************************************************/
@@ -405,7 +405,7 @@ void rsp_device::code_compile_block(offs_t pc)
 				}
 
 				/* validate this code block if we're not pointing into ROM */
-				if (m_program->get_write_ptr(seqhead->physpc) != nullptr)
+				if (m_program.space().get_write_ptr(seqhead->physpc) != nullptr)
 					generate_checksum_block(block, compiler, seqhead, seqlast);
 
 				/* label this instruction, if it may be jumped to locally */
@@ -654,12 +654,12 @@ void rsp_device::generate_checksum_block(drcuml_block &block, compiler_state &co
 		if (!(seqhead->flags & OPFLAG_VIRTUAL_NOOP))
 		{
 			uint32_t sum = seqhead->opptr.l[0];
-			void *base = m_pcache->read_ptr(seqhead->physpc | 0x1000);
+			void *base = m_pcache.read_ptr(seqhead->physpc | 0x1000);
 			UML_LOAD(block, I0, base, 0, SIZE_DWORD, SCALE_x4);                         // load    i0,base,0,dword
 
 			if (seqhead->delay.first() != nullptr && seqhead->physpc != seqhead->delay.first()->physpc)
 			{
-				base = m_pcache->read_ptr((seqhead->delay.first()->physpc & 0x00000fff) | 0x1000);
+				base = m_pcache.read_ptr((seqhead->delay.first()->physpc & 0x00000fff) | 0x1000);
 				assert(base != nullptr);
 				UML_LOAD(block, I1, base, 0, SIZE_DWORD, SCALE_x4);                 // load    i1,base,dword
 				UML_ADD(block, I0, I0, I1);                     // add     i0,i0,i1
@@ -676,13 +676,13 @@ void rsp_device::generate_checksum_block(drcuml_block &block, compiler_state &co
 	else
 	{
 		uint32_t sum = 0;
-		void *base = m_pcache->read_ptr(seqhead->physpc | 0x1000);
+		void *base = m_pcache.read_ptr(seqhead->physpc | 0x1000);
 		UML_LOAD(block, I0, base, 0, SIZE_DWORD, SCALE_x4);                             // load    i0,base,0,dword
 		sum += seqhead->opptr.l[0];
 		for (curdesc = seqhead->next(); curdesc != seqlast->next(); curdesc = curdesc->next())
 			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 			{
-				base = m_pcache->read_ptr(curdesc->physpc | 0x1000);
+				base = m_pcache.read_ptr(curdesc->physpc | 0x1000);
 				assert(base != nullptr);
 				UML_LOAD(block, I1, base, 0, SIZE_DWORD, SCALE_x4);                     // load    i1,base,dword
 				UML_ADD(block, I0, I0, I1);                         // add     i0,i0,i1
@@ -690,7 +690,7 @@ void rsp_device::generate_checksum_block(drcuml_block &block, compiler_state &co
 
 				if (curdesc->delay.first() != nullptr && (curdesc == seqlast || (curdesc->next() != nullptr && curdesc->next()->physpc != curdesc->delay.first()->physpc)))
 				{
-					base = m_pcache->read_ptr((curdesc->delay.first()->physpc & 0x00000fff) | 0x1000);
+					base = m_pcache.read_ptr((curdesc->delay.first()->physpc & 0x00000fff) | 0x1000);
 					assert(base != nullptr);
 					UML_LOAD(block, I1, base, 0, SIZE_DWORD, SCALE_x4);                 // load    i1,base,dword
 					UML_ADD(block, I0, I0, I1);                     // add     i0,i0,i1

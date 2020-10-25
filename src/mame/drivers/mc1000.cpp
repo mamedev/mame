@@ -91,16 +91,16 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( printer_r );
-	DECLARE_WRITE8_MEMBER( printer_w );
-	DECLARE_WRITE8_MEMBER( mc6845_ctrl_w );
-	DECLARE_WRITE8_MEMBER( mc6847_attr_w );
+	uint8_t printer_r();
+	void printer_w(uint8_t data);
+	void mc6845_ctrl_w(uint8_t data);
+	void mc6847_attr_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( fs_w );
 	DECLARE_WRITE_LINE_MEMBER( hs_w );
-	DECLARE_READ8_MEMBER( videoram_r );
-	DECLARE_WRITE8_MEMBER( keylatch_w );
-	DECLARE_READ8_MEMBER( keydata_r );
-	DECLARE_READ8_MEMBER( rom_banking_r );
+	uint8_t videoram_r(offs_t offset);
+	void keylatch_w(uint8_t data);
+	uint8_t keydata_r();
+	uint8_t rom_banking_r(offs_t offset);
 
 	void bankswitch();
 
@@ -186,24 +186,24 @@ WRITE_LINE_MEMBER( mc1000_state::write_centronics_busy )
 	m_centronics_busy = state;
 }
 
-READ8_MEMBER( mc1000_state::printer_r )
+uint8_t mc1000_state::printer_r()
 {
 	return m_centronics_busy;
 }
 
-WRITE8_MEMBER( mc1000_state::printer_w )
+void mc1000_state::printer_w(uint8_t data)
 {
 	m_centronics->write_strobe(BIT(data, 0));
 }
 
-WRITE8_MEMBER( mc1000_state::mc6845_ctrl_w )
+void mc1000_state::mc6845_ctrl_w(uint8_t data)
 {
 	m_mc6845_bank = BIT(data, 0);
 
 	bankswitch();
 }
 
-WRITE8_MEMBER( mc1000_state::mc6847_attr_w )
+void mc1000_state::mc6847_attr_w(uint8_t data)
 {
 	/*
 
@@ -389,7 +389,7 @@ WRITE_LINE_MEMBER( mc1000_state::hs_w )
 	m_hsync = state;
 }
 
-READ8_MEMBER( mc1000_state::videoram_r )
+uint8_t mc1000_state::videoram_r(offs_t offset)
 {
 	if (offset == ~0) return 0xff;
 
@@ -400,14 +400,14 @@ READ8_MEMBER( mc1000_state::videoram_r )
 
 /* AY-3-8910 Interface */
 
-WRITE8_MEMBER( mc1000_state::keylatch_w )
+void mc1000_state::keylatch_w(uint8_t data)
 {
 	m_keylatch = data;
 
 	m_cassette->output(BIT(data, 7) ? -1.0 : +1.0);
 }
 
-READ8_MEMBER( mc1000_state::keydata_r )
+uint8_t mc1000_state::keydata_r()
 {
 	uint8_t data = 0xff;
 
@@ -439,7 +439,7 @@ READ8_MEMBER( mc1000_state::keydata_r )
 }
 
 
-READ8_MEMBER( mc1000_state::rom_banking_r )
+uint8_t mc1000_state::rom_banking_r(offs_t offset)
 {
 	membank("bank1")->set_entry(0);
 	m_rom0000 = 0;

@@ -435,8 +435,8 @@ void aica_device::Init()
 	m_MidiR = m_MidiW = 0;
 	m_MidiOutR = m_MidiOutW = 0;
 
-	m_DSP.space = m_data;
-	m_DSP.cache = m_cache;
+	space().specific(m_DSP.space);
+	space().cache(m_DSP.cache);
 	m_timerA = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aica_device::timerA_cb), this));
 	m_timerB = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aica_device::timerB_cb), this));
 	m_timerC = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aica_device::timerC_cb), this));
@@ -1112,8 +1112,8 @@ s32 aica_device::UpdateSlot(AICA_SLOT *slot)
 
 	if (PCMS(slot) == 1) // 8-bit signed
 	{
-		s8 p1 = m_cache->read_byte(SA(slot) + addr1);
-		s8 p2 = m_cache->read_byte(SA(slot) + addr2);
+		s8 p1 = m_cache.read_byte(SA(slot) + addr1);
+		s8 p2 = m_cache.read_byte(SA(slot) + addr2);
 		s32 s;
 		s32 fpart=slot->cur_addr & ((1 << SHIFT) - 1);
 		s = (int)(p1 << 8) * ((1 << SHIFT) - fpart) + (int)(p2 << 8) * fpart;
@@ -1121,8 +1121,8 @@ s32 aica_device::UpdateSlot(AICA_SLOT *slot)
 	}
 	else if (PCMS(slot) == 0)   //16 bit signed
 	{
-		s16 p1 = m_cache->read_word(SA(slot) + addr1);
-		s16 p2 = m_cache->read_word(SA(slot) + addr2);
+		s16 p1 = m_cache.read_word(SA(slot) + addr1);
+		s16 p2 = m_cache.read_word(SA(slot) + addr2);
 		s32 s;
 		s32 fpart = slot->cur_addr & ((1 << SHIFT) - 1);
 		s = (int)(p1) * ((1 << SHIFT) - fpart) + (int)(p2) * fpart;
@@ -1142,7 +1142,7 @@ s32 aica_device::UpdateSlot(AICA_SLOT *slot)
 		while (curstep < steps_to_go)
 		{
 			int shift1 = 4 & (curstep << 2);
-			u8 delta1 = (m_cache->read_byte(base) >> shift1) & 0xf;
+			u8 delta1 = (m_cache.read_byte(base) >> shift1) & 0xf;
 			DecodeADPCM(&(slot->cur_sample), delta1, &(slot->cur_quant));
 			if (!(++curstep & 1))
 				base++;
@@ -1229,17 +1229,11 @@ s32 aica_device::UpdateSlot(AICA_SLOT *slot)
 	return sample;
 }
 
-void aica_device::DoMasterSamples(int nsamples)
+void aica_device::DoMasterSamples(std::vector<read_stream_view> const &inputs, write_stream_view &bufl, write_stream_view &bufr)
 {
-	stream_sample_t *exts[2];
 	int i;
 
-	stream_sample_t *bufr = m_bufferr;
-	stream_sample_t *bufl = m_bufferl;
-	exts[0] = m_exts0;
-	exts[1] = m_exts1;
-
-	for (int s = 0; s < nsamples; ++s)
+	for (int s = 0; s < bufl.samples(); ++s)
 	{
 		s32 smpl = 0, smpr = 0;
 
@@ -1280,7 +1274,7 @@ void aica_device::DoMasterSamples(int nsamples)
 		{
 			if (EFSDL(i + 16)) // 16,17 for EXTS
 			{
-				m_DSP.EXTS[i] = exts[i][s];
+				m_DSP.EXTS[i] = s16(inputs[i].get(s) * 32767.0);
 				u32 Enc = ((EFPAN(i + 16)) << 0x8) | ((EFSDL(i + 16)) << 0xd);
 				smpl += (m_DSP.EXTS[i] * m_LPANTABLE[Enc]) >> SHIFT;
 				smpr += (m_DSP.EXTS[i] * m_RPANTABLE[Enc]) >> SHIFT;
@@ -1298,8 +1292,8 @@ void aica_device::DoMasterSamples(int nsamples)
 			smpr = clip16(smpr >> 3);
 		}
 
-		*bufl++ = (smpl * m_LPANTABLE[MVOL() << 0xd]) >> SHIFT;
-		*bufr++ = (smpr * m_LPANTABLE[MVOL() << 0xd]) >> SHIFT;
+		bufl.put_int(s, smpl * m_LPANTABLE[MVOL() << 0xd], 32768 << SHIFT);
+		bufr.put_int(s, smpr * m_LPANTABLE[MVOL() << 0xd], 32768 << SHIFT);
 	}
 }
 
@@ -1329,7 +1323,7 @@ void aica_device::exec_dma()
 		{
 			for (i = 0; i < m_dma.dlg; i+=2)
 			{
-				m_data->write_word(m_dma.dmea, 0);
+				m_data.write_word(m_dma.dmea, 0);
 				m_dma.dmea += 2;
 			}
 		}
@@ -1339,7 +1333,7 @@ void aica_device::exec_dma()
 			{
 				u16 tmp;
 				tmp = r16(m_dma.drga);
-				m_data->write_word(m_dma.dmea, tmp);
+				m_data.write_word(m_dma.dmea, tmp);
 				m_dma.dmea += 4;
 				m_dma.drga += 4;
 			}
@@ -1359,7 +1353,7 @@ void aica_device::exec_dma()
 		{
 			for (i = 0; i < m_dma.dlg; i+=2)
 			{
-				u16 tmp = m_cache->read_word(m_dma.dmea);
+				u16 tmp = m_cache.read_word(m_dma.dmea);
 				w16(m_dma.drga, tmp);
 				m_dma.dmea += 4;
 				m_dma.drga += 4;
@@ -1393,13 +1387,9 @@ int aica_device::IRQCB(void *param)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void aica_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void aica_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	m_bufferl = outputs[0];
-	m_bufferr = outputs[1];
-	m_exts0 = inputs[0];
-	m_exts1 = inputs[1];
-	DoMasterSamples(samples);
+	DoMasterSamples(inputs, outputs[0], outputs[1]);
 }
 
 //-------------------------------------------------
@@ -1408,9 +1398,8 @@ void aica_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 
 void aica_device::device_start()
 {
-	m_data = &space(0);
-	// Find our direct access
-	m_cache = space().cache<1, 0, ENDIANNESS_LITTLE>();
+	space().specific(m_data);
+	space().cache(m_cache);
 
 	// init the emulation
 	Init();
@@ -1419,7 +1408,7 @@ void aica_device::device_start()
 	m_irq_cb.resolve_safe();
 	m_main_irq_cb.resolve_safe();
 
-	m_stream = machine().sound().stream_alloc(*this, 2, 2, (int)m_rate);
+	m_stream = stream_alloc(2, 2, (int)m_rate);
 
 	// save state
 	save_item(NAME(m_udata.data));
@@ -1569,10 +1558,6 @@ aica_device::aica_device(const machine_config &mconfig, const char *tag, device_
 	, m_MidiR(0)
 	, m_mcieb(0)
 	, m_mcipd(0)
-	, m_bufferl(nullptr)
-	, m_bufferr(nullptr)
-	, m_exts0(nullptr)
-	, m_exts1(nullptr)
 
 {
 	memset(&m_udata.data, 0, sizeof(m_udata.data));

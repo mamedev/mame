@@ -60,23 +60,23 @@ private:
 
 	required_shared_ptr<uint16_t> m_nvram;
 
-	DECLARE_WRITE16_MEMBER(midtunit_cmos_enable_w);
-	DECLARE_WRITE16_MEMBER(midtunit_cmos_w);
-	DECLARE_READ16_MEMBER(midtunit_cmos_r);
-	DECLARE_READ16_MEMBER(midtunit_sound_state_r);
-	DECLARE_READ16_MEMBER(midtunit_sound_r);
-	DECLARE_WRITE16_MEMBER(midtunit_sound_w);
-	DECLARE_READ16_MEMBER(mk_prot_r);
-	DECLARE_WRITE16_MEMBER(mk_prot_w);
-	DECLARE_READ16_MEMBER(mkturbo_prot_r);
-	DECLARE_READ16_MEMBER(mk2_prot_const_r);
-	DECLARE_READ16_MEMBER(mk2_prot_r);
-	DECLARE_READ16_MEMBER(mk2_prot_shift_r);
-	DECLARE_WRITE16_MEMBER(mk2_prot_w);
-	DECLARE_READ16_MEMBER(nbajam_prot_r);
-	DECLARE_WRITE16_MEMBER(nbajam_prot_w);
-	DECLARE_WRITE16_MEMBER(jdredd_prot_w);
-	DECLARE_READ16_MEMBER(jdredd_prot_r);
+	void midtunit_cmos_enable_w(uint16_t data);
+	void midtunit_cmos_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t midtunit_cmos_r(offs_t offset);
+	uint16_t midtunit_sound_state_r();
+	uint16_t midtunit_sound_r();
+	void midtunit_sound_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t mk_prot_r(offs_t offset);
+	void mk_prot_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t mkturbo_prot_r();
+	uint16_t mk2_prot_const_r();
+	uint16_t mk2_prot_r();
+	uint16_t mk2_prot_shift_r();
+	void mk2_prot_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t nbajam_prot_r();
+	void nbajam_prot_w(offs_t offset, uint16_t data);
+	void jdredd_prot_w(offs_t offset, uint16_t data);
+	uint16_t jdredd_prot_r(offs_t offset);
 
 	void register_state_saving();
 	void init_tunit_generic(int sound);

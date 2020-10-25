@@ -20,7 +20,7 @@ pointswin_info::pointswin_info(debugger_windows_interface &debugger) :
 	if (!window())
 		return;
 
-	m_views[0].reset(global_alloc(debugview_info(debugger, *this, window(), DVT_BREAK_POINTS)));
+	m_views[0].reset(new debugview_info(debugger, *this, window(), DVT_BREAK_POINTS));
 	if ((m_views[0] == nullptr) || !m_views[0]->is_valid())
 	{
 		m_views[0].reset();
@@ -96,7 +96,7 @@ bool pointswin_info::handle_command(WPARAM wparam, LPARAM lparam)
 		{
 		case ID_SHOW_BREAKPOINTS:
 			m_views[0].reset();
-			m_views[0].reset(global_alloc(debugview_info(debugger(), *this, window(), DVT_BREAK_POINTS)));
+			m_views[0].reset(new debugview_info(debugger(), *this, window(), DVT_BREAK_POINTS));
 			if (!m_views[0]->is_valid())
 				m_views[0].reset();
 			win_set_window_text_utf8(window(), "All Breakpoints");
@@ -105,7 +105,7 @@ bool pointswin_info::handle_command(WPARAM wparam, LPARAM lparam)
 
 		case ID_SHOW_WATCHPOINTS:
 			m_views[0].reset();
-			m_views[0].reset(global_alloc(debugview_info(debugger(), *this, window(), DVT_WATCH_POINTS)));
+			m_views[0].reset(new debugview_info(debugger(), *this, window(), DVT_WATCH_POINTS));
 			if (!m_views[0]->is_valid())
 				m_views[0].reset();
 			win_set_window_text_utf8(window(), "All Watchpoints");

@@ -58,14 +58,14 @@ public:
 	int m_ycenter;
 	emu_timer *m_refresh_end_timer;
 
-	DECLARE_WRITE16_MEMBER(led_w);
-	DECLARE_WRITE16_MEMBER(refresh_control_w);
-	DECLARE_WRITE8_MEMBER(reset_coin_flag_w);
-	DECLARE_READ8_MEMBER(coin_sound_r);
-	DECLARE_READ8_MEMBER(soundlatch2_r);
-	DECLARE_WRITE8_MEMBER(soundlatch4_w);
-	DECLARE_WRITE16_MEMBER(io_w);
-	DECLARE_READ16_MEMBER(io_r);
+	void led_w(offs_t offset, uint16_t data);
+	void refresh_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void reset_coin_flag_w(uint8_t data);
+	uint8_t coin_sound_r();
+	uint8_t soundlatch2_r();
+	void soundlatch4_w(uint8_t data);
+	void io_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t io_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(ctc_timer_1_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_timer_2_w);
 

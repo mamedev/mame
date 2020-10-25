@@ -75,8 +75,8 @@ void vtech_rs232_interface_device::device_reset()
 	program_space().install_rom(0x4000, 0x47ff, 0x800, memregion("software")->base());
 
 	// data
-	program_space().install_read_handler(0x5000, 0x57ff, read8_delegate(*this, FUNC(vtech_rs232_interface_device::receive_data_r)));
-	program_space().install_write_handler(0x5800, 0x5fff, write8_delegate(*this, FUNC(vtech_rs232_interface_device::transmit_data_w)));
+	program_space().install_read_handler(0x5000, 0x57ff, read8smo_delegate(*this, FUNC(vtech_rs232_interface_device::receive_data_r)));
+	program_space().install_write_handler(0x5800, 0x5fff, write8smo_delegate(*this, FUNC(vtech_rs232_interface_device::transmit_data_w)));
 }
 
 
@@ -89,12 +89,12 @@ WRITE_LINE_MEMBER( vtech_rs232_interface_device::rs232_rx_w )
 	m_rx = state;
 }
 
-READ8_MEMBER( vtech_rs232_interface_device::receive_data_r )
+uint8_t vtech_rs232_interface_device::receive_data_r()
 {
 	return 0x7f | (m_rx << 7);
 }
 
-WRITE8_MEMBER( vtech_rs232_interface_device::transmit_data_w )
+void vtech_rs232_interface_device::transmit_data_w(uint8_t data)
 {
 	m_rs232->write_txd(!BIT(data, 7));
 }

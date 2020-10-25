@@ -87,7 +87,7 @@ public:
 	void init_dkbanans();
 
 private:
-	DECLARE_READ64_MEMBER(test_r);
+	uint64_t test_r();
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -110,7 +110,7 @@ uint32_t alien_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	return 0;
 }
 
-READ64_MEMBER( alien_state::test_r )
+uint64_t alien_state::test_r()
 {
 	return machine().rand();
 }

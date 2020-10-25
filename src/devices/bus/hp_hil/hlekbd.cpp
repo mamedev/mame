@@ -439,6 +439,7 @@ void hle_hp_itf_device::transmit_byte(uint8_t byte)
 hle_hp_ipc_device::hle_hp_ipc_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
 	: hle_device_base(mconfig, HP_IPC_HLE_KEYBOARD, tag, owner, clock)
 	, device_matrix_keyboard_interface(mconfig, *this, "COL1", "COL2", "COL3", "COL4", "COL5", "COL6", "COL7", "COL8", "COL9", "COL10", "COL11", "COL12", "COL13", "COL14", "COL15")
+	, m_modifiers(*this, "COL8")
 { }
 
 void hle_hp_ipc_device::device_reset()
@@ -446,6 +447,9 @@ void hle_hp_ipc_device::device_reset()
 	m_fifo.clear();
 	reset_key_state();
 	start_processing(attotime::from_hz(1'200));
+	typematic_stop();
+	m_typematic = false;
+	m_typematic_rate = 0;
 }
 
 void hle_hp_ipc_device::hil_idd()
@@ -454,16 +458,65 @@ void hle_hp_ipc_device::hil_idd()
 	m_hp_hil_mlc->hil_write(m_device_id16 | 0);
 }
 
+void hle_hp_ipc_device::hil_typematic(uint8_t command)
+{
+	switch (command)
+	{
+	case HPHIL_DKA:
+		typematic_stop();
+		m_typematic = false;
+		m_typematic_rate = 0;
+		break;
+
+	case HPHIL_EK1:
+		m_typematic = true;
+		m_typematic_rate = 30;
+		break;
+
+	case HPHIL_EK2:
+		m_typematic = true;
+		m_typematic_rate = 60;
+		break;
+	}
+}
+
 void hle_hp_ipc_device::key_make(uint8_t row, uint8_t column)
+{
+	transmit_byte((((row + 1) ^ 8) << 4) + (column << 1));
+	if (m_typematic)
+		typematic_start(row, column, typematic_delay(), typematic_period());
+}
+
+void hle_hp_ipc_device::key_repeat(uint8_t row, uint8_t column)
 {
 	transmit_byte((((row + 1) ^ 8) << 4) + (column << 1));
 }
 
-
 void hle_hp_ipc_device::key_break(uint8_t row, uint8_t column)
 {
 	transmit_byte((((row + 1) ^ 8) << 4) + (column << 1) + 1);
+	typematic_stop();
 }
+
+void hle_hp_ipc_device::will_scan_row(u8 row)
+{
+	u16 const modifiers(m_modifiers->read() & 0x7c);
+	if (modifiers != m_last_modifiers && m_typematic)
+		typematic_restart(typematic_delay(), typematic_period());
+
+	m_last_modifiers = modifiers;
+}
+
+attotime hle_hp_ipc_device::typematic_delay() const
+{
+	return attotime::from_msec(250); // XXX
+}
+
+attotime hle_hp_ipc_device::typematic_period() const
+{
+	return attotime::from_hz(m_typematic_rate);
+}
+
 
 int hle_hp_ipc_device::hil_poll()
 {

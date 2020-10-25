@@ -58,7 +58,7 @@ void alphajuno_state::machine_reset()
 HD44780_PIXEL_UPDATE(alphajuno_state::lcd_pixel_update)
 {
 	if (x < 5 && y < 8 && line < 2 && pos < 8)
-		bitmap.pix16(y, (line * 8 + pos) * 6 + x) = state;
+		bitmap.pix(y, (line * 8 + pos) * 6 + x) = state;
 }
 
 

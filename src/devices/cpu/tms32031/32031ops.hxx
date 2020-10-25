@@ -2,9 +2,9 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    32031ops.cpp
+    32031ops.hxx
 
-    TMS32031/2 emulator
+    TMS320C3x family 32-bit floating point DSP emulator
 
 ***************************************************************************/
 

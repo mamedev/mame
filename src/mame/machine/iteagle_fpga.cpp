@@ -249,7 +249,7 @@ WRITE_LINE_MEMBER(iteagle_fpga_device::serial_interrupt)
 	m_cpu->set_input_line(m_serial_irq_num, state);
 }
 
-WRITE8_MEMBER(iteagle_fpga_device::serial_rx_w)
+void iteagle_fpga_device::serial_rx_w(uint8_t data)
 {
 	std::string tmpStr;
 	tmpStr += data;
@@ -260,7 +260,7 @@ WRITE8_MEMBER(iteagle_fpga_device::serial_rx_w)
 	}
 }
 
-READ32_MEMBER( iteagle_fpga_device::fpga_r )
+uint32_t iteagle_fpga_device::fpga_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = m_fpga_regs[offset];
 
@@ -351,7 +351,7 @@ READ32_MEMBER( iteagle_fpga_device::fpga_r )
 	return result;
 }
 
-WRITE32_MEMBER( iteagle_fpga_device::fpga_w )
+void iteagle_fpga_device::fpga_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_fpga_regs[offset]);
 	switch (offset) {
@@ -579,7 +579,7 @@ void iteagle_am85c30::write_rx_str(int channel, std::string resp)
 //*************************************
 //*  RTC M48T02
 //*************************************
-READ32_MEMBER( iteagle_fpga_device::rtc_r )
+uint32_t iteagle_fpga_device::rtc_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = m_rtc_regs[offset];
 
@@ -592,7 +592,7 @@ READ32_MEMBER( iteagle_fpga_device::rtc_r )
 	return result;
 }
 
-WRITE32_MEMBER( iteagle_fpga_device::rtc_w )
+void iteagle_fpga_device::rtc_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	system_time systime;
 	int raw[8];
@@ -631,7 +631,7 @@ WRITE32_MEMBER( iteagle_fpga_device::rtc_w )
 //*************************************
 //*  FPGA NV RAM -- Eagle 1 only
 //*************************************
-READ32_MEMBER(iteagle_fpga_device::e1_nvram_r)
+uint32_t iteagle_fpga_device::e1_nvram_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = m_e1_nv_data[offset];
 	if (LOG_RAM)
@@ -639,7 +639,7 @@ READ32_MEMBER(iteagle_fpga_device::e1_nvram_r)
 	return result;
 }
 
-WRITE32_MEMBER(iteagle_fpga_device::e1_nvram_w)
+void iteagle_fpga_device::e1_nvram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_e1_nv_data[offset]);
 	if (LOG_RAM)
@@ -648,7 +648,7 @@ WRITE32_MEMBER(iteagle_fpga_device::e1_nvram_w)
 //*************************************
 //*  FPGA RAM -- Eagle 1 only
 //*************************************
-READ32_MEMBER( iteagle_fpga_device::e1_ram_r )
+uint32_t iteagle_fpga_device::e1_ram_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = m_e1_ram[offset];
 	if (LOG_RAM)
@@ -656,7 +656,7 @@ READ32_MEMBER( iteagle_fpga_device::e1_ram_r )
 	return result;
 }
 
-WRITE32_MEMBER( iteagle_fpga_device::e1_ram_w )
+void iteagle_fpga_device::e1_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_e1_ram[offset]);
 	if (LOG_RAM)
@@ -741,7 +741,7 @@ void iteagle_eeprom_device::map_extra(uint64_t memory_window_start, uint64_t mem
 	m_memory_space = memory_space;
 }
 
-READ32_MEMBER( iteagle_eeprom_device::eeprom_r )
+uint32_t iteagle_eeprom_device::eeprom_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = 0;
 
@@ -762,7 +762,7 @@ READ32_MEMBER( iteagle_eeprom_device::eeprom_r )
 	return result;
 }
 
-WRITE32_MEMBER( iteagle_eeprom_device::eeprom_w )
+void iteagle_eeprom_device::eeprom_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset) {
 		case 0x8/4: // 8255x PORT command
@@ -845,7 +845,7 @@ void iteagle_periph_device::device_reset()
 	m_ctrl_regs[0x10/4] =  0x00040002;
 }
 
-READ32_MEMBER( iteagle_periph_device::ctrl_r )
+uint32_t iteagle_periph_device::ctrl_r(offs_t offset, uint32_t mem_mask)
 {
 	system_time systime;
 	uint32_t result = m_ctrl_regs[offset];
@@ -895,7 +895,7 @@ READ32_MEMBER( iteagle_periph_device::ctrl_r )
 	return result;
 }
 
-WRITE32_MEMBER( iteagle_periph_device::ctrl_w )
+void iteagle_periph_device::ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_ctrl_regs[offset]);
 	switch (offset) {

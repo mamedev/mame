@@ -27,6 +27,9 @@ Notes:
    press =  to increment to next address or to scan through them.
 - PPI1 is programmed to mode 0, Port A output, Port B input, PC0-3 output, PC4-7 input.
 
+Paste test:
+    Paste --1C00^11^22^33^44^55^66^77^88^99^---1C00^
+    Press = to verify the data that was entered.
 
 *******************************************************************************************/
 
@@ -60,12 +63,12 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(int_button);
 
 private:
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(keyboard_w);
-	DECLARE_WRITE8_MEMBER(leds_w);
+	uint8_t keyboard_r();
+	void keyboard_w(uint8_t data);
+	void leds_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
-	void pmi80_io(address_map &map);
-	void pmi80_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 
 	uint8_t m_keyrow;
 	bool m_ledready;
@@ -81,7 +84,7 @@ private:
 };
 
 
-READ8_MEMBER( pmi80_state::keyboard_r)
+uint8_t pmi80_state::keyboard_r()
 {
 	u8 data = 0x7f;
 	if (m_keyrow > 0xF6)
@@ -91,13 +94,13 @@ READ8_MEMBER( pmi80_state::keyboard_r)
 	return data;
 }
 
-WRITE8_MEMBER( pmi80_state::keyboard_w )
+void pmi80_state::keyboard_w(uint8_t data)
 {
 	m_keyrow = data;
 	m_ledready = true;
 }
 
-WRITE8_MEMBER( pmi80_state::leds_w )
+void pmi80_state::leds_w(uint8_t data)
 {
 	if (m_ledready)
 	{
@@ -125,15 +128,15 @@ TIMER_DEVICE_CALLBACK_MEMBER( pmi80_state::kansas_r )
 }
 
 
-void pmi80_state::pmi80_mem(address_map &map)
+void pmi80_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xdfff); // A13 not used
-	map(0x0000, 0x07ff).rom().region("maincpu", 0);
+	map(0x0000, 0x07ff).rom();
 	map(0x1c00, 0x1fff).ram();
 }
 
-void pmi80_state::pmi80_io(address_map &map)
+void pmi80_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0x0f);
@@ -144,44 +147,44 @@ void pmi80_state::pmi80_io(address_map &map)
 /* Input ports */
 static INPUT_PORTS_START( pmi80 )
 	PORT_START("SP")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RE") PORT_CODE(KEYCODE_LALT) PORT_CHANGED_MEMBER(DEVICE_SELF, pmi80_state, reset_button, 0)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("I") PORT_CODE(KEYCODE_I) PORT_CHANGED_MEMBER(DEVICE_SELF, pmi80_state, int_button, 0)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RE") PORT_CODE(KEYCODE_LALT) PORT_CHANGED_MEMBER(DEVICE_SELF, pmi80_state, reset_button, 0) PORT_CHAR('W')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("I") PORT_CODE(KEYCODE_I) PORT_CHANGED_MEMBER(DEVICE_SELF, pmi80_state, int_button, 0) PORT_CHAR('I')
 	PORT_START("X0")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("=") PORT_CODE(KEYCODE_EQUALS)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("=") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('^')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3) PORT_CHAR('3')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1) PORT_CHAR('1')
 	PORT_START("X1")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7) PORT_CHAR('7')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5) PORT_CHAR('5')
 	PORT_START("X2")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B BC") PORT_CODE(KEYCODE_B)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9 HL") PORT_CODE(KEYCODE_9)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B BC") PORT_CODE(KEYCODE_B) PORT_CHAR('B')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9 HL") PORT_CODE(KEYCODE_9) PORT_CHAR('9')
 	PORT_START("X3")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("M") PORT_CODE(KEYCODE_M) // Memory mode
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("M") PORT_CODE(KEYCODE_M) PORT_CHAR('-')// Memory mode
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E) PORT_CHAR('E')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C) PORT_CHAR('C')
 	PORT_START("X4")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("BR") PORT_CODE(KEYCODE_Q) // Breakpoint
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D DE") PORT_CODE(KEYCODE_D)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("BR") PORT_CODE(KEYCODE_Q) PORT_CHAR('Q') // Breakpoint
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F) PORT_CHAR('F')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D DE") PORT_CODE(KEYCODE_D) PORT_CHAR('D')
 	PORT_START("X5")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R) // Registers
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("EX") PORT_CODE(KEYCODE_G) // Go
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R) PORT_CHAR('R') // Registers
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("EX") PORT_CODE(KEYCODE_G) PORT_CHAR('X') // Go
 	PORT_START("X6")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("L") PORT_CODE(KEYCODE_L) // Load tape
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A AF") PORT_CODE(KEYCODE_A)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8 SP") PORT_CODE(KEYCODE_8)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("L") PORT_CODE(KEYCODE_L) PORT_CHAR('L') // Load tape
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A AF") PORT_CODE(KEYCODE_A) PORT_CHAR('A')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8 SP") PORT_CODE(KEYCODE_8) PORT_CHAR('8')
 	PORT_START("X7")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S") PORT_CODE(KEYCODE_S) // Save tape
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S") PORT_CODE(KEYCODE_S) PORT_CHAR('S') // Save tape
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6) PORT_CHAR('6')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4) PORT_CHAR('4')
 	PORT_START("X8")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2) PORT_CHAR('2')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0) PORT_CHAR('0')
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(pmi80_state::reset_button)
@@ -202,6 +205,12 @@ void pmi80_state::machine_reset()
 void pmi80_state::machine_start()
 {
 	m_digits.resolve();
+
+	save_item(NAME(m_keyrow));
+	save_item(NAME(m_ledready));
+	save_item(NAME(m_cassbit));
+	save_item(NAME(m_cassold));
+	save_item(NAME(m_cass_cnt));
 }
 
 
@@ -209,8 +218,8 @@ void pmi80_state::pmi80(machine_config &config)
 {
 	/* basic machine hardware */
 	I8080(config, m_maincpu, XTAL(10'000'000)/9);   // 10MHz divided by 9 (by MH8224)
-	m_maincpu->set_addrmap(AS_PROGRAM, &pmi80_state::pmi80_mem);
-	m_maincpu->set_addrmap(AS_IO, &pmi80_state::pmi80_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pmi80_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &pmi80_state::io_map);
 
 	I8255A(config, m_ppi1);
 	m_ppi1->out_pa_callback().set(FUNC(pmi80_state::leds_w));
@@ -241,4 +250,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME  FLAGS
-COMP( 1982, pmi80, 0,      0,      pmi80,   pmi80, pmi80_state, empty_init, "Tesla", "PMI-80", 0)
+COMP( 1982, pmi80, 0,      0,      pmi80,   pmi80, pmi80_state, empty_init, "Tesla", "PMI-80", MACHINE_SUPPORTS_SAVE )

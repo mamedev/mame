@@ -52,6 +52,8 @@ Known undumped protos
   * Jack Nicklaus Power Challenge
   * Danny Sullivan's Indy Heat
   * Star Trek Starfleet Academy
+  * Teenage Mutant Hero Turtles - The Hyperstone Heist (Euro)
+  * Spot Goes to Hollywood (Euro)
 
 Known undumped pirates
 
@@ -12549,7 +12551,7 @@ but dumps still have to be confirmed.
 
 	<software name="chester">
 		<description>Chester Cheetah - Too Cool to Fool (USA)</description>
-		<year>1992</year>
+		<year>1993</year>
 		<publisher>Kaneko</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -12560,7 +12562,7 @@ but dumps still have to be confirmed.
 
 	<software name="chesterw">
 		<description>Chester Cheetah - Wild Wild Quest (USA)</description>
-		<year>1992</year>
+		<year>1994</year>
 		<publisher>Kaneko</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -13664,7 +13666,7 @@ but dumps still have to be confirmed.
 
 <!-- This dump comes from an internal "Confidential Preview" cart at Acclaim USA -->
 	<software name="cutthrp" cloneof="cutthr">
-		<description>CutThroat Island (Prototye)</description>
+		<description>CutThroat Island (Prototype)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -14304,7 +14306,7 @@ but dumps still have to be confirmed.
 
 	<software name="ddragon">
 		<description>Double Dragon (Euro, USA)</description>
-		<year>1993</year>
+		<year>1992</year>
 		<publisher>Ballistic</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
@@ -14703,6 +14705,7 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
+	<!-- Majesco re-release comes on a 670128 REV 1 PCB with a single chip, while original release is split into two chips. -->
 	<software name="ejimu" cloneof="ejim">
 		<description>Earthworm Jim (USA)</description>
 		<year>1994</year>
@@ -21420,6 +21423,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+	<!-- this 'prototype' set has also been found on a PAL/UK Radica Out Run 2019 Plug & Play unit (see rad_orun in megadriv_rad.cpp) -->
 	<software name="outr2019up" cloneof="outr2019">
 		<description>Out Run 2019 (USA, Prototype)</description>
 		<year>1993</year>
@@ -26245,6 +26249,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+<!-- Board comes with two chips, proper dumps required. -->
 	<software name="sor3u" cloneof="sor3">
 		<description>Streets of Rage 3 (USA)</description>
 		<year>1994</year>
@@ -32504,6 +32509,17 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+	<software name="starwarsp">
+		<description>Starwars (Prototype 19930125)</description>
+		<year>1993</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="Star Wars (Jan 25, 1993 prototype).md" size="1048576" crc="e1c32fec" sha1="46cd5c0380f09c93f4a53de14a65481037e4dba5"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="starjedi" cloneof="wolfchld">
 		<description>Star Wars Jedi (Rus)</description>
 		<year>199?</year>
@@ -32976,6 +32992,21 @@ This dump is either a bad dump or a wrongly patched one.
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="0x400000">
 				<rom name="titan-overdrivemegademo.bin" size="0x3f01be" crc="3deb19a9" sha1="6085182099d6a9ad2c8242eae263507e42269b66"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Doesn't boot correctly.  Needs emulation improvements -->
+	<!-- titan-overdrive2.zip -->
+	<!-- http://www.pouet.net/prod.php?which=69648 -->
+	<software name="d_titov2" supported="no">
+		<description>Overdrive 2 (Demo) (Euro)</description>
+		<year>2017</year>
+		<publisher>Titan</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_ssf2"/>
+			<dataarea name="rom" width="16" endianness="big" size="16777216">
+				<rom name="titan-overdrive2.bin" size="8386056" crc="f0429fd6" sha1="603db0a214ee50c6c11e15c0d1d3bba919116d07" offset="00000"/>
 			</dataarea>
 		</part>
 	</software>

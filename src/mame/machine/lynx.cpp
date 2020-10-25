@@ -892,7 +892,7 @@ void lynx_state::lynx_multiply()
 	}
 }
 
-READ8_MEMBER(lynx_state::suzy_read)
+uint8_t lynx_state::suzy_read(offs_t offset)
 {
 	uint8_t value = 0, input;
 
@@ -1042,7 +1042,7 @@ READ8_MEMBER(lynx_state::suzy_read)
 	return value;
 }
 
-WRITE8_MEMBER(lynx_state::suzy_write)
+void lynx_state::suzy_write(offs_t offset, uint8_t data)
 {
 	m_suzy.data[offset] = data;
 	//logerror("suzy write %.2x %.2x\n",offset,data);
@@ -1310,7 +1310,7 @@ void lynx_state::lynx_draw_line()
 	if (m_mikey.data[0x92] & 0x02)
 	{
 		j -= 160 * 102 / 2 - 1;
-		uint32_t *const line = &m_bitmap_temp.pix32(102 - 1 - y);
+		uint32_t *const line = &m_bitmap_temp.pix(102 - 1 - y);
 		for (int x = 160 - 2; x >= 0; j++, x -= 2)
 		{
 			uint8_t const byte = lynx_read_ram(j);
@@ -1320,7 +1320,7 @@ void lynx_state::lynx_draw_line()
 	}
 	else
 	{
-		uint32_t *const line = &m_bitmap_temp.pix32(y);
+		uint32_t *const line = &m_bitmap_temp.pix(y);
 		for (int x = 0; x < 160; j++, x += 2)
 		{
 			uint8_t const byte = lynx_read_ram(j);
@@ -1632,7 +1632,7 @@ TIMER_CALLBACK_MEMBER(lynx_state::lynx_uart_timer)
 	}
 }
 
-READ8_MEMBER(lynx_state::lynx_uart_r)
+uint8_t lynx_state::lynx_uart_r(offs_t offset)
 {
 	uint8_t value = 0x00;
 	switch (offset)
@@ -1654,7 +1654,7 @@ READ8_MEMBER(lynx_state::lynx_uart_r)
 	return value;
 }
 
-WRITE8_MEMBER(lynx_state::lynx_uart_w)
+void lynx_state::lynx_uart_w(offs_t offset, uint8_t data)
 {
 	logerror("uart write %.2x %.2x\n", offset, data);
 	switch (offset)
@@ -1688,7 +1688,7 @@ WRITE8_MEMBER(lynx_state::lynx_uart_w)
 ****************************************/
 
 
-READ8_MEMBER(lynx_state::mikey_read)
+uint8_t lynx_state::mikey_read(offs_t offset)
 {
 	uint8_t direction, value = 0x00;
 
@@ -1747,7 +1747,7 @@ READ8_MEMBER(lynx_state::mikey_read)
 
 	case 0x8c:
 	case 0x8d:
-		value = lynx_uart_r(space, offset, mem_mask);
+		value = lynx_uart_r(offset);
 		break;
 
 	default:
@@ -1757,7 +1757,7 @@ READ8_MEMBER(lynx_state::mikey_read)
 	return value;
 }
 
-WRITE8_MEMBER(lynx_state::mikey_write)
+void lynx_state::mikey_write(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -1819,7 +1819,7 @@ WRITE8_MEMBER(lynx_state::mikey_write)
 		break;
 
 	case 0x8c: case 0x8d:
-		lynx_uart_w(space, offset, data);
+		lynx_uart_w(offset, data);
 		break;
 
 	case 0xa0: case 0xa1: case 0xa2: case 0xa3: case 0xa4: case 0xa5: case 0xa6: case 0xa7:
@@ -1872,7 +1872,7 @@ WRITE8_MEMBER(lynx_state::mikey_write)
 
 ****************************************/
 
-READ8_MEMBER(lynx_state::lynx_memory_config_r)
+uint8_t lynx_state::lynx_memory_config_r()
 {
 	return m_memory_config;
 }

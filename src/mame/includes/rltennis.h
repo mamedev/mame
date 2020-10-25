@@ -39,10 +39,10 @@ private:
 	std::unique_ptr<bitmap_ind16> m_tmp_bitmap[RLT_NUM_BITMAPS];
 	emu_timer *m_timer;
 
-	DECLARE_READ16_MEMBER(io_r);
-	DECLARE_WRITE16_MEMBER(snd1_w);
-	DECLARE_WRITE16_MEMBER(snd2_w);
-	DECLARE_WRITE16_MEMBER(blitter_w);
+	uint16_t io_r();
+	void snd1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void snd2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void blitter_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

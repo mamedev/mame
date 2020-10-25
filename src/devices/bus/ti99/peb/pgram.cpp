@@ -168,7 +168,7 @@ pgram_device::pgram_device(const machine_config &mconfig, const char *tag, devic
 
     Decoding is done by the 74ls138 and 74ls139 circuits on the board.
 */
-READ8Z_MEMBER(pgram_device::readz)
+void pgram_device::readz(offs_t offset, uint8_t *value)
 {
 	if (!m_active) return;
 
@@ -231,7 +231,7 @@ void pgram_device::write(offs_t offset, uint8_t data)
     area 6000-7fff. A second bank can be selected for both DSR and RAM using
     CRU bits 3 and 4.
 */
-READ8Z_MEMBER(pgram_device::dsr_ram_read)
+void pgram_device::dsr_ram_read(offs_t offset, uint8_t *value)
 {
 	// ..0. .... .... .... = DSR
 	// ..1. .... .... .... = RAM
@@ -317,7 +317,7 @@ void pgram_device::dsr_ram_write(offs_t offset, uint8_t data)
     When the GROM address is outside the area for G3-G7, the access is ignored.
     GRAM access requires setting CRU bit 1 before.
 */
-READ8Z_MEMBER(pgram_device::gram_read)
+void pgram_device::gram_read(offs_t offset, uint8_t *value)
 {
 	// Don't let the debugger mess with the GRAM emulation
 	if (machine().side_effects_disabled())

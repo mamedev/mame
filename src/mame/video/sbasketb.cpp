@@ -90,13 +90,13 @@ void sbasketb_state::sbasketb_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(sbasketb_state::sbasketb_videoram_w)
+void sbasketb_state::sbasketb_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sbasketb_state::sbasketb_colorram_w)
+void sbasketb_state::sbasketb_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);

@@ -48,7 +48,6 @@ TODO:
 #include "sound/3812intf.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 
@@ -310,7 +309,7 @@ void nbmj8891_state::hanaoji_map(address_map &map)
 	map(0xf800, 0xffff).ram().share("nvram");
 }
 
-READ8_MEMBER(nbmj8891_state::taiwanmb_unk_r)
+uint8_t nbmj8891_state::taiwanmb_unk_r()
 {
 	return 0x00;                                                    // MCU or 1413M3 STATUS?
 }
@@ -2212,9 +2211,6 @@ void nbmj8891_state::gionbana(machine_config &config)
 	YM3812(config, "fmsnd", 2500000).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.37); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void nbmj8891_state::mgion(machine_config &config)

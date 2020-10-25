@@ -90,7 +90,7 @@ void isa16_ex1280_device::device_add_mconfig(machine_config &config)
 //  regs_r - register read handler
 //-------------------------------------------------
 
-READ16_MEMBER(isa16_ex1280_device::regs_r)
+uint16_t isa16_ex1280_device::regs_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0;
 	if (offset == 0)
@@ -110,7 +110,7 @@ READ16_MEMBER(isa16_ex1280_device::regs_r)
 //  regs_w - register write handler
 //-------------------------------------------------
 
-WRITE16_MEMBER(isa16_ex1280_device::regs_w)
+void isa16_ex1280_device::regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s: regs_w: %08x = %04x & %04x\n", machine().describe_context(), 0x04000000 | (offset << 1), data, mem_mask);
 }
@@ -120,7 +120,7 @@ WRITE16_MEMBER(isa16_ex1280_device::regs_w)
 //  vram_r - VRAM direct read handler
 //-------------------------------------------------
 
-READ16_MEMBER(isa16_ex1280_device::vram_r)
+uint16_t isa16_ex1280_device::vram_r(offs_t offset)
 {
 	logerror("vram_r: %08x = %04x\n", offset, m_vram[offset]);
 	return m_vram[offset];
@@ -128,10 +128,10 @@ READ16_MEMBER(isa16_ex1280_device::vram_r)
 
 
 //-------------------------------------------------
-//  vram_r - VRAM direct write handler
+//  vram_w - VRAM direct write handler
 //-------------------------------------------------
 
-WRITE16_MEMBER(isa16_ex1280_device::vram_w)
+void isa16_ex1280_device::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("vram_r: %08x = %04x & %04x\n", offset, data, mem_mask);
 	COMBINE_DATA(&m_vram[offset]);
@@ -144,15 +144,15 @@ WRITE16_MEMBER(isa16_ex1280_device::vram_w)
 
 TMS340X0_SCANLINE_RGB32_CB_MEMBER(isa16_ex1280_device::scanline_update)
 {
-	uint16_t *src = &m_vram[params->rowaddr << 8];
-	uint32_t *dest = &bitmap.pix32(scanline);
-	const pen_t *pens = m_ramdac->pens();
+	uint16_t const *const src = &m_vram[params->rowaddr << 8];
+	uint32_t *const dest = &bitmap.pix(scanline);
+	pen_t const *const pens = m_ramdac->pens();
 	int coladdr = params->coladdr << 1;
 
 	/* copy the non-blanked portions of this scanline */
 	for (int x = params->heblnk; x < params->hsblnk; x += 4)
 	{
-		uint16_t pixels = src[coladdr++];
+		uint16_t const pixels = src[coladdr++];
 		dest[x + 0] = pens[pixels & 0x0f];
 		dest[x + 1] = pens[(pixels >> 4) & 0x0f];
 		dest[x + 2] = pens[(pixels >> 8) & 0x0f];

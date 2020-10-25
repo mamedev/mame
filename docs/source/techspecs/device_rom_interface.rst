@@ -15,12 +15,13 @@ as rom.  In the region/block cases, banking is automatically handled.
 2. Setup
 --------
 
-| **device_rom_interface**\ (const machine_config &mconfig, device_t &device, u8 addrwidth, endianness_t endian = ENDIANNESS_LITTLE, u8 datawidth = 8)
+| device_rom_interface<AddrWidth, DataWidth=0, AddrShift=0, Endian=ENDIANNESS_LITTLE>
 
-The constructor of the interface wants, in addition to the standard
-parameters, the address bus width of the dedicated bus.  In addition
-the endianness (if not little endian or byte-sized bus) and data bus
-width (if not byte) can be provided.
+The interface is a template that takes the address bus width of the
+dedicated bus as a parameter.  In addition the data bus width (if not
+byte), address shift (if not 0) and endianness (if not little endian
+or byte-sized bus) can be provided.  Data bus width is 0 for byte, 1
+for word, etc.
 
 | **MCFG_DEVICE_ADDRESS_MAP**\ (AS_0, map)
 
@@ -41,14 +42,10 @@ rom description for the system, it will be automatically picked up as
 the connected rom.  An address map has priority over the region if
 present in the machine config.
 
-| void **set_rom_endianness**\ (endianness_t endian)
-| void **set_rom_data_width**\ (u8 width)
-| void **set_rom_addr_width**\ (u8 width)
+| void **override_address_width**\ (u8 width)
 
-These methods, intended for generic devices with indefinite hardware
-specifications, override the endianness, data bus width and address
-bus width assigned through the constructor. They must be called from
-within the device before **config_complete** time.
+This method allows to override the address bus width. It must be
+called from within the device before **config_complete** time.
 
 | void **set_rom**\ (const void \*base, u32 size);
 

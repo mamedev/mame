@@ -66,21 +66,18 @@ void micro3d_state::video_reset()
 
 TMS340X0_SCANLINE_IND16_CB_MEMBER(micro3d_state::scanline_update)
 {
-	uint16_t *src = &m_sprite_vram[(params->rowaddr << 8) & 0x7fe00];
-	uint16_t *dest = &bitmap.pix16(scanline);
+	uint16_t const *const src = &m_sprite_vram[(params->rowaddr << 8) & 0x7fe00];
+	uint16_t *dest = &bitmap.pix(scanline);
 	int coladdr = params->coladdr;
 	int sd_11_7 = (m_creg & 0x1f) << 7;
-	int x;
-
-	uint16_t *frame_src;
 
 	scanline = std::max((scanline - params->veblnk), 0);
-	frame_src = m_frame_buffers[m_display_buffer].get() + (scanline << 10);
+	uint16_t const *frame_src = m_frame_buffers[m_display_buffer].get() + (scanline << 10);
 
 	/* TODO: XFER3DK - X/Y offsets for 3D */
 
 	/* Copy the non-blanked portions of this scanline */
-	for (x = params->heblnk; x < params->hsblnk; x += 2)
+	for (int x = params->heblnk; x < params->hsblnk; x += 2)
 	{
 		uint16_t pix = src[coladdr++ & 0x1ff];
 
@@ -105,7 +102,7 @@ TMS340X0_SCANLINE_IND16_CB_MEMBER(micro3d_state::scanline_update)
 	}
 }
 
-WRITE16_MEMBER(micro3d_state::micro3d_creg_w)
+void micro3d_state::micro3d_creg_w(uint16_t data)
 {
 	if (~data & 0x80)
 		m_vgb->set_input_line(0, CLEAR_LINE);
@@ -113,7 +110,7 @@ WRITE16_MEMBER(micro3d_state::micro3d_creg_w)
 	m_creg = data;
 }
 
-WRITE16_MEMBER(micro3d_state::micro3d_xfer3dk_w)
+void micro3d_state::micro3d_xfer3dk_w(uint16_t data)
 {
 	m_xfer3dk = data;
 }
@@ -620,7 +617,7 @@ bc000000-1fc DPRAM address for read access
 
 ******************************************************************************/
 
-WRITE32_MEMBER(micro3d_state::micro3d_fifo_w)
+void micro3d_state::micro3d_fifo_w(uint32_t data)
 {
 	uint32_t opcode = data >> 24;
 
@@ -720,12 +717,12 @@ WRITE32_MEMBER(micro3d_state::micro3d_fifo_w)
 	}
 }
 
-WRITE32_MEMBER(micro3d_state::micro3d_alt_fifo_w)
+void micro3d_state::micro3d_alt_fifo_w(uint32_t data)
 {
 	m_vtx_fifo[m_fifo_idx++] = VTX_SEX(data);
 }
 
-READ32_MEMBER(micro3d_state::micro3d_pipe_r)
+uint32_t micro3d_state::micro3d_pipe_r()
 {
 	m_drmath->set_input_line(AM29000_INTR1, CLEAR_LINE);
 	return m_pipe_data;

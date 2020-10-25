@@ -13,14 +13,14 @@
 
 TILE_GET_INFO_MEMBER(crshrace_state::get_tile_info1)
 {
-	int code = m_videoram1[tile_index];
+	int code = m_videoram[0][tile_index];
 
 	tileinfo.set(1, (code & 0xfff) + (m_roz_bank << 12), code >> 12, 0);
 }
 
 TILE_GET_INFO_MEMBER(crshrace_state::get_tile_info2)
 {
-	int code = m_videoram2[tile_index];
+	int code = m_videoram[1][tile_index];
 
 	tileinfo.set(0, code, 0, 0);
 }
@@ -33,19 +33,19 @@ TILE_GET_INFO_MEMBER(crshrace_state::get_tile_info2)
 ***************************************************************************/
 
 
-uint32_t crshrace_state::crshrace_tile_callback( uint32_t code )
+uint32_t crshrace_state::tile_callback(uint32_t code)
 {
-	return m_spriteram2->buffer()[code&0x7fff];
+	return m_spriteram[1]->buffer()[code&0x7fff];
 }
 
 
 void crshrace_state::video_start()
 {
-	m_tilemap1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(crshrace_state::get_tile_info1)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	m_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(crshrace_state::get_tile_info2)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(crshrace_state::get_tile_info1)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(crshrace_state::get_tile_info2)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
-	m_tilemap1->set_transparent_pen(0x0f);
-	m_tilemap2->set_transparent_pen(0xff);
+	m_tilemap[0]->set_transparent_pen(0x0f);
+	m_tilemap[1]->set_transparent_pen(0xff);
 
 }
 
@@ -56,38 +56,21 @@ void crshrace_state::video_start()
 
 ***************************************************************************/
 
-WRITE16_MEMBER(crshrace_state::crshrace_videoram1_w)
-{
-	COMBINE_DATA(&m_videoram1[offset]);
-	m_tilemap1->mark_tile_dirty(offset);
-}
 
-WRITE16_MEMBER(crshrace_state::crshrace_videoram2_w)
+void crshrace_state::roz_bank_w(offs_t offset, uint8_t data)
 {
-	COMBINE_DATA(&m_videoram2[offset]);
-	m_tilemap2->mark_tile_dirty(offset);
-}
-
-WRITE16_MEMBER(crshrace_state::crshrace_roz_bank_w)
-{
-	if (ACCESSING_BITS_0_7)
+	if (m_roz_bank != data)
 	{
-		if (m_roz_bank != (data & 0xff))
-		{
-			m_roz_bank = data & 0xff;
-			m_tilemap1->mark_all_dirty();
-		}
+		m_roz_bank = data;
+		m_tilemap[0]->mark_all_dirty();
 	}
 }
 
 
-WRITE16_MEMBER(crshrace_state::crshrace_gfxctrl_w)
+void crshrace_state::gfxctrl_w(offs_t offset, uint8_t data)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		m_gfxctrl = data & 0xdf;
-		m_flipscreen = data & 0x20;
-	}
+	m_gfxctrl = data;
+	m_flipscreen = data & 0x20;
 }
 
 
@@ -97,21 +80,21 @@ WRITE16_MEMBER(crshrace_state::crshrace_gfxctrl_w)
 
 ***************************************************************************/
 
-void crshrace_state::draw_bg( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void crshrace_state::draw_bg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_tilemap2->draw(screen, bitmap, cliprect, 0, 0);
+	m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
 }
 
 
 void crshrace_state::draw_fg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_k053936->zoom_draw(screen, bitmap, cliprect, m_tilemap1, 0, 0, 1);
+	m_k053936->zoom_draw(screen, bitmap, cliprect, m_tilemap[0], 0, 0, 1);
 }
 
 
-uint32_t crshrace_state::screen_update_crshrace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t crshrace_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if (m_gfxctrl & 0x04)   /* display disable? */
+	if (m_gfxctrl & 0x04)   // display disable?
 	{
 		bitmap.fill(m_palette->black_pen(), cliprect);
 		return 0;
@@ -123,8 +106,8 @@ uint32_t crshrace_state::screen_update_crshrace(screen_device &screen, bitmap_in
 
 	switch (m_gfxctrl & 0xfb)
 	{
-		case 0x00:  /* high score screen */
-			m_spr->draw_sprites(m_spriteram->buffer(), 0x2000,  screen, bitmap, cliprect);
+		case 0x00:  // high score screen
+			m_spr->draw_sprites(m_spriteram[0]->buffer(), 0x2000,  screen, bitmap, cliprect);
 			draw_bg(screen, bitmap, cliprect);
 			draw_fg(screen, bitmap, cliprect);
 			break;
@@ -132,7 +115,7 @@ uint32_t crshrace_state::screen_update_crshrace(screen_device &screen, bitmap_in
 		case 0x02:
 			draw_bg(screen, bitmap, cliprect);
 			draw_fg(screen, bitmap, cliprect);
-			m_spr->draw_sprites(m_spriteram->buffer(), 0x2000,  screen, bitmap, cliprect);
+			m_spr->draw_sprites(m_spriteram[0]->buffer(), 0x2000,  screen, bitmap, cliprect);
 			break;
 		default:
 			popmessage("gfxctrl = %02x", m_gfxctrl);

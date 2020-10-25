@@ -73,7 +73,6 @@ ToDo:
 #include "machine/6821pia.h"
 #include "machine/timer.h"
 #include "audio/bally.h"
-#include "render.h"
 #include "speaker.h"
 
 //#define VERBOSE 1
@@ -143,15 +142,15 @@ protected:
 		, m_sound_int_handler(*this)
 	{ }
 
-	DECLARE_READ8_MEMBER(u10_a_r);
-	DECLARE_WRITE8_MEMBER(u10_a_w);
-	DECLARE_READ8_MEMBER(u10_b_r);
-	DECLARE_WRITE8_MEMBER(u10_b_w);
-	DECLARE_READ8_MEMBER(u11_a_r);
-	DECLARE_WRITE8_MEMBER(u11_a_w);
-	DECLARE_WRITE8_MEMBER(u11_b_w);
-	DECLARE_READ8_MEMBER(nibble_nvram_r);
-	DECLARE_WRITE8_MEMBER(nibble_nvram_w);
+	uint8_t u10_a_r();
+	void u10_a_w(uint8_t data);
+	uint8_t u10_b_r();
+	void u10_b_w(uint8_t data);
+	uint8_t u11_a_r();
+	void u11_a_w(uint8_t data);
+	void u11_b_w(uint8_t data);
+	uint8_t nibble_nvram_r(offs_t offset);
+	void nibble_nvram_w(offs_t offset, uint8_t data);
 	DECLARE_READ_LINE_MEMBER(u10_ca1_r);
 	DECLARE_READ_LINE_MEMBER(u10_cb1_r);
 	DECLARE_WRITE_LINE_MEMBER(u10_ca2_w);
@@ -1008,12 +1007,12 @@ READ_LINE_MEMBER( by35_state::drop_target_x0 )
 	return ((m_io_hold_x[port] >> bit_shift) & 1);
 }
 
-READ8_MEMBER(by35_state::nibble_nvram_r)
+uint8_t by35_state::nibble_nvram_r(offs_t offset)
 {
 	return (m_nvram[offset] | 0x0f);
 }
 
-WRITE8_MEMBER(by35_state::nibble_nvram_w)
+void by35_state::nibble_nvram_w(offs_t offset, uint8_t data)
 {
 	m_nvram[offset] = (data | 0x0f);
 }
@@ -1094,12 +1093,12 @@ WRITE_LINE_MEMBER( by35_state::u11_cb2_w )
 	m_u11_cb2 = state;
 }
 
-READ8_MEMBER( by35_state::u10_a_r )
+uint8_t by35_state::u10_a_r()
 {
 	return m_u10a;
 }
 
-WRITE8_MEMBER( by35_state::u10_a_w )
+void by35_state::u10_a_w(uint8_t data)
 {
 	LOG("Writing %02x to U10 PIA, CB2 state is %01x,  CA2 state is %01x, Lamp_Dec is %02x\n",data, m_u10_cb2, m_u10_ca2, (m_lamp_decode & 0x0f));
 
@@ -1137,7 +1136,7 @@ WRITE8_MEMBER( by35_state::u10_a_w )
 	m_u10a = data;
 }
 
-READ8_MEMBER( by35_state::u10_b_r )
+uint8_t by35_state::u10_b_r()
 {
 	uint8_t data = 0;
 
@@ -1171,17 +1170,17 @@ READ8_MEMBER( by35_state::u10_b_r )
 	return data;
 }
 
-WRITE8_MEMBER( by35_state::u10_b_w )
+void by35_state::u10_b_w(uint8_t data)
 {
 	m_u10b = data;
 }
 
-READ8_MEMBER( by35_state::u11_a_r )
+uint8_t by35_state::u11_a_r()
 {
 	return m_u11a;
 }
 
-WRITE8_MEMBER( by35_state::u11_a_w )
+void by35_state::u11_a_w(uint8_t data)
 {
 	if (BIT(data, 0)==0)            // Display Credit/Ball
 	{
@@ -1229,7 +1228,7 @@ WRITE8_MEMBER( by35_state::u11_a_w )
 	m_u11a = data;
 }
 
-WRITE8_MEMBER( by35_state::u11_b_w )
+void by35_state::u11_b_w(uint8_t data)
 {
 	if (!m_u11_cb2)
 	{
@@ -1440,10 +1439,6 @@ void by35_state::machine_start()
 void by35_state::machine_reset()
 {
 	genpin_class::machine_reset();
-
-	render_target *target = machine().render().first_target();
-
-	target->set_view(0);
 
 	m_u10a = 0;
 	m_u10b = 0;
@@ -2776,7 +2771,7 @@ ROM_START(blbeauty)
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD( "cpu_u1.716", 0x1000, 0x0800, CRC(e2550957) SHA1(e445548b650fec5d593ca7da587300799ef94991))
 	ROM_LOAD( "cpu_u5.716", 0x1800, 0x0800, CRC(70fcd9f7) SHA1(ca5c2ea09f45f5ba50526880c158aaac61f007d5))
-	ROM_LOAD( "cpu_u2.716", 0x5000, 0x0800, CRC(3f55d17f) SHA1(e6333e53570fb05a841a7f141872c8bd14143f9c))
+	ROM_LOAD( "cpu_u2.716", 0x5000, 0x0800, CRC(3f55d17f) SHA1(e6333e53570fb05a841a7f141872c8bd14143f9c)) // filled with FF, but assume dump is OK
 	ROM_LOAD( "cpu_u6.716", 0x5800, 0x0800, CRC(842cd307) SHA1(8429d84e8bc4343b437801d0236150e04de79b75))
 	ROM_RELOAD( 0x7800, 0x0800)
 ROM_END
@@ -2876,5 +2871,5 @@ GAME( 1988, bbbowlin, 0,        by35,             by35, by35_state, init_by35_7,
 GAME( 1988, monrobwl, 0,        by35,             by35, by35_state, init_by35_7, ROT0, "Monroe Bowling Co.", "Stars & Strikes (Bowler)",           MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1984, bigbat,   0,        squawk_n_talk_ay, by35, by35_state, init_by35_7, ROT0, "Bally Midway",       "Big Bat (Bat game)",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
 GAME( 1984, mdntmrdr, 0,        squawk_n_talk_ay, by35, by35_state, init_by35_6, ROT0, "Bally Midway",       "Midnight Marauders (Gun game)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1988, blbeauty, 0,        by35,             by35, by35_state, init_by35_7, ROT0, "Stern",              "Black Beauty (Shuffle)",             MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1984, blbeauty, 0,        by35,             by35, by35_state, init_by35_7, ROT0, "Stern",              "Black Beauty (Shuffle)",             MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1984, myststar, 0,        by35,             by35, by35_state, init_by35_6, ROT0, "Zaccaria",           "Mystic Star",                        MACHINE_IS_SKELETON_MECHANICAL)

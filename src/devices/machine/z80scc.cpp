@@ -724,6 +724,7 @@ uint8_t z80scc_device::modify_vector(uint8_t vec, int i, uint8_t src)
 	// Modify vector according to Hi/lo bit of WR9
 	if (m_wr9 & WR9_BIT_SHSL) // Affect V4-V6
 	{
+		src = bitswap<4>(src, 3, 0, 1, 2); // order switched (see table above)
 		vec &= 0x8f;
 		vec |= src << 4;
 	}

@@ -60,50 +60,50 @@ private:
 	uint32_t    m_Bank;
 	uint32_t    m_maxbank;
 
-	DECLARE_READ32_MEMBER(FlashCmd_r);
-	DECLARE_WRITE32_MEMBER(FlashCmd_w);
-	DECLARE_WRITE32_MEMBER(Banksw_w);
+	uint32_t FlashCmd_r();
+	void FlashCmd_w(uint32_t data);
+	void Banksw_w(uint32_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void trivrus_mem(address_map &map);
 
 	// PIO
-	DECLARE_READ32_MEMBER(PIOldat_r);
+	uint32_t PIOldat_r();
 	uint32_t m_PIO;
-	DECLARE_WRITE32_MEMBER(PIOldat_w);
-	DECLARE_READ32_MEMBER(PIOedat_r);
+	void PIOldat_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t PIOedat_r();
 
-	DECLARE_READ8_MEMBER(trivrus_input_r);
-	DECLARE_WRITE8_MEMBER(trivrus_input_w);
+	uint8_t trivrus_input_r();
+	void trivrus_input_w(uint8_t data);
 	uint8_t m_trivrus_input;
 };
 
 
-WRITE32_MEMBER(trivrus_state::FlashCmd_w)
+void trivrus_state::FlashCmd_w(uint32_t data)
 {
 	m_FlashCmd = data;
 }
 
-READ32_MEMBER(trivrus_state::PIOedat_r)
+uint32_t trivrus_state::PIOedat_r()
 {
 	return 0;
 }
 
-READ32_MEMBER(trivrus_state::PIOldat_r)
+uint32_t trivrus_state::PIOldat_r()
 {
 	// ...
 	return m_PIO;
 }
 
 // PIO Latched output DATa Register
-WRITE32_MEMBER(trivrus_state::PIOldat_w)
+void trivrus_state::PIOldat_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// ...
 	COMBINE_DATA(&m_PIO);
 }
 
-READ8_MEMBER(trivrus_state::trivrus_input_r)
+uint8_t trivrus_state::trivrus_input_r()
 {
 	switch (m_trivrus_input)
 	{
@@ -118,12 +118,12 @@ READ8_MEMBER(trivrus_state::trivrus_input_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(trivrus_state::trivrus_input_w)
+void trivrus_state::trivrus_input_w(uint8_t data)
 {
 	m_trivrus_input = data & 0xff;
 }
 
-READ32_MEMBER(trivrus_state::FlashCmd_r)
+uint32_t trivrus_state::FlashCmd_r()
 {
 	if ((m_FlashCmd & 0xff) == 0xff)
 	{
@@ -146,7 +146,7 @@ READ32_MEMBER(trivrus_state::FlashCmd_r)
 }
 
 
-WRITE32_MEMBER(trivrus_state::Banksw_w)
+void trivrus_state::Banksw_w(uint32_t data)
 {
 	m_Bank = (data >> 1) & 7;
 	m_mainbank->set_entry(m_Bank);

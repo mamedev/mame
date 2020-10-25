@@ -103,7 +103,7 @@ public:
 	void init_wms();
 
 private:
-	DECLARE_READ8_MEMBER(test_r);
+	uint8_t test_r();
 	uint32_t screen_update_wms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void adsp_data_map(address_map &map);
@@ -130,7 +130,7 @@ void wms_state::wms_map(address_map &map)
 	map(0x60000, 0xfffff).rom().region("maincpu", 0x60000); // TODO: fix me
 }
 
-READ8_MEMBER(wms_state::test_r)
+uint8_t wms_state::test_r()
 {
 	return 1;
 }

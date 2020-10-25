@@ -69,11 +69,11 @@ public:
 private:
 	void testIrq();
 
-	DECLARE_READ8_MEMBER(irqpend_r);
-	DECLARE_WRITE8_MEMBER(irqen_w);
-	DECLARE_READ8_MEMBER(test_r);
-	DECLARE_WRITE64_MEMBER(eeprom_w);
-	DECLARE_READ64_MEMBER(hwver_r);
+	uint8_t irqpend_r(offs_t offset);
+	void irqen_w(offs_t offset, uint8_t data);
+	uint8_t test_r(offs_t offset);
+	void eeprom_w(uint64_t data);
+	uint64_t hwver_r();
 	uint32_t screen_update_aristmk6(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	virtual void video_start() override;
@@ -173,7 +173,7 @@ uint32_t aristmk6_state::screen_update_aristmk6(screen_device &screen, bitmap_rg
 				b = (b << 3) | (b & 0x7);
 
 				if(cliprect.contains(x, y))
-					bitmap.pix32(y, x) = r | g<<8 | b<<16;
+					bitmap.pix(y, x) = r | g<<8 | b<<16;
 
 				count+=2;
 			}
@@ -184,7 +184,7 @@ uint32_t aristmk6_state::screen_update_aristmk6(screen_device &screen, bitmap_rg
 				color = blit_ram[count];
 
 				if(cliprect.contains(x, y))
-					bitmap.pix32(y, x) = m_palette->pen(color);
+					bitmap.pix(y, x) = m_palette->pen(color);
 
 				count++;
 			}
@@ -205,12 +205,12 @@ uint32_t aristmk6_state::screen_update_aristmk6(screen_device &screen, bitmap_rg
 			pix1 = pix & 0xffffffff;
 			col = 0;
 			if (pix1) col = 1;
-			bitmap.pix32(y, x*2) = m_palette->pen(col);
+			bitmap.pix(y, x*2) = m_palette->pen(col);
 
 			pix1 = pix >> 32;
 			col = 0;
 			if (pix1) col = 1;
-			bitmap.pix32(y, x*2+1) = m_palette->pen(col);
+			bitmap.pix(y, x*2+1) = m_palette->pen(col);
 
 
 			count++;
@@ -229,7 +229,7 @@ void aristmk6_state::testIrq()
 	m_maincpu->set_input_line(SH4_IRL3, ((irl3pend0 & irl3en0) || (irl3pend1 & irl3en1)) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER(aristmk6_state::irqpend_r)
+uint8_t aristmk6_state::irqpend_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -249,7 +249,7 @@ READ8_MEMBER(aristmk6_state::irqpend_r)
 	}
 }
 
-WRITE8_MEMBER(aristmk6_state::irqen_w)
+void aristmk6_state::irqen_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -283,7 +283,7 @@ WRITE8_MEMBER(aristmk6_state::irqen_w)
 	}
 }
 
-READ8_MEMBER(aristmk6_state::test_r)
+uint8_t aristmk6_state::test_r(offs_t offset)
 {
 	static int flip;
 
@@ -302,14 +302,14 @@ READ8_MEMBER(aristmk6_state::test_r)
 	return 0;
 }
 
-WRITE64_MEMBER(aristmk6_state::eeprom_w)
+void aristmk6_state::eeprom_w(uint64_t data)
 {
 	m_eeprom0->di_write((data & 0x01) >> 0);
 	m_eeprom0->cs_write((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
 	m_eeprom0->clk_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ64_MEMBER(aristmk6_state::hwver_r)
+uint64_t aristmk6_state::hwver_r()
 {
 	// hardware version/revison register
 	// bit 0-3: acceptable values 0-2 (deadloop otherwise), if > 0 - add 4 to unk B3800000 registers offsets

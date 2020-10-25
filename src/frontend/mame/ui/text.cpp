@@ -295,7 +295,7 @@ float text_layout::actual_height() const
 void text_layout::start_new_line(text_layout::text_justify justify, float height)
 {
 	// create a new line
-	std::unique_ptr<line> new_line(global_alloc_clear<line>(*this, justify, actual_height(), height * yscale()));
+	std::unique_ptr<line> new_line(std::make_unique<line>(*this, justify, actual_height(), height * yscale()));
 
 	// update the current line
 	m_current_line = new_line.get();
@@ -303,7 +303,7 @@ void text_layout::start_new_line(text_layout::text_justify justify, float height
 	m_truncating = false;
 
 	// append it
-	m_lines.push_back(std::move(new_line));
+	m_lines.emplace_back(std::move(new_line));
 }
 
 

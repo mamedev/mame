@@ -41,7 +41,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 
-	DECLARE_WRITE8_MEMBER( port_f2_w );
+	void port_f2_w(uint8_t data);
 
 	uint8_t m_port_f2;
 	virtual void machine_reset() override;
@@ -167,7 +167,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(h89_state::h89_irq_timer)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); // Z80
 }
 
-WRITE8_MEMBER( h89_state::port_f2_w )
+void h89_state::port_f2_w(uint8_t data)
 {
 	// Bit 0 - Single-step
 	// Bit 1 - Enable timer interrupt (2mSec Clock)

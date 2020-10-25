@@ -124,6 +124,7 @@
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/votrax.h"
+#include "sound/flt_rc.h"
 
 #include "speaker.h"
 
@@ -141,20 +142,20 @@
  *
  *************************************/
 
-WRITE8_MEMBER(astrocde_state::protected_ram_enable_w)
+void astrocde_state::protected_ram_enable_w(uint8_t data)
 {
 	m_ram_write_enable = true;
 }
 
 
-READ8_MEMBER(astrocde_state::protected_ram_r)
+uint8_t astrocde_state::protected_ram_r(offs_t offset)
 {
 	m_ram_write_enable = false;
 	return m_protected_ram ? m_protected_ram[offset] : m_nvram[offset];
 }
 
 
-WRITE8_MEMBER(astrocde_state::protected_ram_w)
+void astrocde_state::protected_ram_w(offs_t offset, uint8_t data)
 {
 	if (m_ram_write_enable)
 		(m_protected_ram ? m_protected_ram : m_nvram)[offset] = data;
@@ -169,7 +170,7 @@ WRITE8_MEMBER(astrocde_state::protected_ram_w)
  *
  *************************************/
 
-WRITE8_MEMBER(seawolf2_state::sound_1_w)// Port 40
+void seawolf2_state::sound_1_w(uint8_t data) // Port 40
 {
 	uint8_t rising_bits = data & ~m_port_1_last;
 	m_port_1_last = data;
@@ -183,7 +184,7 @@ WRITE8_MEMBER(seawolf2_state::sound_1_w)// Port 40
 }
 
 
-WRITE8_MEMBER(seawolf2_state::sound_2_w)// Port 41
+void seawolf2_state::sound_2_w(uint8_t data) // Port 41
 {
 	uint8_t rising_bits = data & ~m_port_2_last;
 	m_port_2_last = data;
@@ -220,7 +221,7 @@ WRITE8_MEMBER(seawolf2_state::sound_2_w)// Port 41
  *
  *************************************/
 
-READ8_MEMBER(astrocde_state::input_mux_r)
+uint8_t astrocde_state::input_mux_r(offs_t offset)
 {
 	return m_handle[offset & 3].read_safe(0xff);
 }
@@ -253,13 +254,13 @@ CUSTOM_INPUT_MEMBER(ebases_state::trackball_r)
 }
 
 
-WRITE8_MEMBER(ebases_state::trackball_select_w)
+void ebases_state::trackball_select_w(uint8_t data)
 {
 	m_input_select = data & 3;
 }
 
 
-WRITE8_MEMBER(ebases_state::coin_w)
+void ebases_state::coin_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 }
@@ -286,7 +287,7 @@ WRITE_LINE_MEMBER(astrocde_state::gorf_sound_switch_w)
  *
  *************************************/
 
-WRITE8_MEMBER(astrocde_state::demndrgn_banksw_w)
+void astrocde_state::demndrgn_banksw_w(uint8_t data)
 {
 	int bank = (data >> 5) & 3;
 	m_bank4000->set_bank(bank);
@@ -304,7 +305,7 @@ CUSTOM_INPUT_MEMBER(demndrgn_state::joystick_r)
 }
 
 
-WRITE8_MEMBER(demndrgn_state::sound_w)
+void demndrgn_state::sound_w(uint8_t data)
 {
 	logerror("Trigger sound sample 0x%02x\n",data);
 }
@@ -318,9 +319,9 @@ WRITE8_MEMBER(demndrgn_state::sound_w)
  *************************************/
 
 
-WRITE8_MEMBER(astrocde_state::profpac_banksw_w)
+void astrocde_state::profpac_banksw_w(uint8_t data)
 {
-	demndrgn_banksw_w(space, 0, data);
+	demndrgn_banksw_w(data);
 
 	if (data & 0x80)
 	{
@@ -343,7 +344,7 @@ WRITE8_MEMBER(astrocde_state::profpac_banksw_w)
  *
  *************************************/
 
-WRITE8_MEMBER(tenpindx_state::lamp_w)
+void tenpindx_state::lamp_w(offs_t offset, uint8_t data)
 {
 	/* lamps */
 	if (offset == 0)
@@ -365,14 +366,14 @@ WRITE8_MEMBER(tenpindx_state::lamp_w)
 }
 
 
-WRITE8_MEMBER(tenpindx_state::counter_w)
+void tenpindx_state::counter_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 	if (data & 0xfc) osd_printf_debug("tenpindx_counter_w = %02X\n", data);
 }
 
 
-WRITE8_MEMBER(tenpindx_state::lights_w)
+void tenpindx_state::lights_w(uint8_t data)
 {
 	/* "flashlights" */
 	int which = data >> 4;
@@ -395,12 +396,13 @@ WRITE8_MEMBER(tenpindx_state::lights_w)
  *
  *************************************/
 
-WRITE8_MEMBER(astrocde_state::votrax_speech_w)
+void astrocde_state::votrax_speech_w(uint8_t data)
 {
-	m_votrax->inflection_w(data >> 6);
+	// Note that the frequency change is smooth, but we just can't
+	// handle that.
+	m_votrax->set_clock(data & 0x40 ? 782000 : 756000);
+	m_votrax->inflection_w(data & 0x80 ? 0 : 2);
 	m_votrax->write(data & 0x3f);
-
-	/* Note : We should really also use volume in this as well as frequency */
 }
 
 
@@ -1355,8 +1357,13 @@ void astrocde_state::wow(machine_config &config)
 	m_astrocade_sound1->so_cb<5>().set("outlatch", FUNC(cd4099_device::write_nibble_d0));
 	m_astrocade_sound1->so_cb<7>().set(FUNC(astrocde_state::votrax_speech_w));
 
-	VOTRAX_SC01(config, m_votrax, 720000);
-	m_votrax->add_route(ALL_OUTPUTS, "center", 0.85);
+	VOTRAX_SC01(config, m_votrax, 756000);
+
+	m_votrax->add_route(0, "f1", 0.85);
+	FILTER_RC(config, "f1").set_lowpass(110e3, 560e-12).add_route(0, "f2", 1.00);
+	FILTER_RC(config, "f2").set_lowpass(110e3, 560e-12).add_route(0, "f3", 1.00);
+	FILTER_RC(config, "f3").set_lowpass(110e3, 560e-12).add_route(0, "f4", 1.00);
+	FILTER_RC(config, "f4").set_lowpass(110e3, 560e-12).add_route(0, "center", 1.00);
 }
 
 void astrocde_state::gorf(machine_config &config)
@@ -1406,7 +1413,7 @@ void astrocde_state::gorf(machine_config &config)
 
 	ASTROCADE_IO(config, "astrocade2", ASTROCADE_CLOCK/4).add_route(ALL_OUTPUTS, "lower", 1.0);
 
-	VOTRAX_SC01(config, m_votrax, 720000);
+	VOTRAX_SC01(config, m_votrax, 756000);
 	m_votrax->add_route(ALL_OUTPUTS, "upper", 0.85);
 }
 

@@ -72,7 +72,7 @@ int myarc_memory_expansion_device::get_base(int offset)
     RAM is at 2000-3fff, a000-ffff;
     ROM is at 4000-5fff (if CRU bit 0 is set)
 */
-READ8Z_MEMBER(myarc_memory_expansion_device::readz)
+void myarc_memory_expansion_device::readz(offs_t offset, uint8_t *value)
 {
 	int base = get_base(offset);
 
@@ -127,7 +127,7 @@ void myarc_memory_expansion_device::write(offs_t offset, uint8_t data)
 /*
     CRU read. None here.
 */
-READ8Z_MEMBER(myarc_memory_expansion_device::crureadz)
+void myarc_memory_expansion_device::crureadz(offs_t offset, uint8_t *value)
 {
 }
 

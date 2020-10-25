@@ -58,17 +58,17 @@ Note: SW2, SW3 & SW4 not populated
 #include "speaker.h"
 
 
-WRITE8_MEMBER(funybubl_state::vidram_bank_w)
+void funybubl_state::vidram_bank_w(uint8_t data)
 {
 	m_vrambank->set_bank(data & 1);
 }
 
-WRITE8_MEMBER(funybubl_state::cpurombank_w)
+void funybubl_state::cpurombank_w(uint8_t data)
 {
 	m_mainbank->set_entry(data & 0x3f);   // should we add a check that (data&0x3f) < #banks?
 }
 
-WRITE8_MEMBER(funybubl_state::oki_bank_w)
+void funybubl_state::oki_bank_w(uint8_t data)
 {
 	m_okibank->set_entry(data & 1);
 }

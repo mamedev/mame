@@ -70,15 +70,15 @@ private:
 	tilemap_t *m_bg_tilemap;
 	int m_lastscroll;
 
-	DECLARE_WRITE8_MEMBER(spd_adpcm_w);
-	DECLARE_READ8_MEMBER(mcu63701_r);
+	void spd_adpcm_w(offs_t offset, uint8_t data);
+	uint8_t mcu63701_r(offs_t offset);
 	void mcu_data_w(offs_t offset, uint8_t data);
 	void mcu_status_w(uint8_t data);
 	void mcu_nmi_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(scrollx_lo_w);
-	DECLARE_WRITE8_MEMBER(ctrl_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
+	void scrollx_lo_w(uint8_t data);
+	void ctrl_w(uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(spd_adpcm_int_1);
 	DECLARE_WRITE_LINE_MEMBER(spd_adpcm_int_2);
 

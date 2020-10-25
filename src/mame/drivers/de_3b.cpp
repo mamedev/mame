@@ -32,20 +32,20 @@ private:
 	optional_device<decobsmt_device> m_decobsmt;
 	optional_device<decodmd_type3_device> m_dmdtype3;
 
-	DECLARE_WRITE8_MEMBER(lamp0_w) { };
-	DECLARE_WRITE8_MEMBER(lamp1_w) { };
-	DECLARE_READ8_MEMBER(switch_r);
-	DECLARE_WRITE8_MEMBER(switch_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_READ8_MEMBER(dmd_status_r);
-	DECLARE_WRITE8_MEMBER(pia2c_pa_w);
-	DECLARE_READ8_MEMBER(pia2c_pb_r);
-	DECLARE_WRITE8_MEMBER(pia2c_pb_w);
+	void lamp0_w(uint8_t data) { };
+	void lamp1_w(uint8_t data) { };
+	uint8_t switch_r();
+	void switch_w(uint8_t data);
+	void sound_w(uint8_t data);
+	uint8_t dmd_status_r();
+	void pia2c_pa_w(uint8_t data);
+	uint8_t pia2c_pb_r();
+	void pia2c_pb_w(uint8_t data);
 
 	// devcb callbacks
-	DECLARE_READ8_MEMBER(display_r);
-	DECLARE_WRITE8_MEMBER(display_w);
-	DECLARE_WRITE8_MEMBER(lamps_w);
+	uint8_t display_r(offs_t offset);
+	void display_w(offs_t offset, uint8_t data);
+	void lamps_w(offs_t offset, uint8_t data);
 
 	// driver_device overrides
 	virtual void machine_reset() override;
@@ -127,14 +127,14 @@ static INPUT_PORTS_START( de_3b )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-READ8_MEMBER( de_3b_state::switch_r )
+uint8_t de_3b_state::switch_r()
 {
 	char kbdrow[8];
 	sprintf(kbdrow,"INP%X",m_kbdrow);
 	return ~ioport(kbdrow)->read();
 }
 
-WRITE8_MEMBER( de_3b_state::switch_w )
+void de_3b_state::switch_w(uint8_t data)
 {
 	int x;
 
@@ -146,84 +146,84 @@ WRITE8_MEMBER( de_3b_state::switch_w )
 	m_kbdrow = data & (1<<x);
 }
 
-WRITE8_MEMBER( de_3b_state::sound_w )
+void de_3b_state::sound_w(uint8_t data)
 {
 	m_sound_data = data;
 	if(m_sound_data != 0xfe)
 		m_decobsmt->bsmt_comms_w(m_sound_data);
 }
 
-READ8_MEMBER( de_3b_state::dmd_status_r )
+uint8_t de_3b_state::dmd_status_r()
 {
 	return m_dmdtype3->status_r();
 }
 
-WRITE8_MEMBER( de_3b_state::pia2c_pa_w )
+void de_3b_state::pia2c_pa_w(uint8_t data)
 {
 	/* DMD data */
 	m_dmdtype3->data_w(data);
 	logerror("DMD: Data write %02x\n", data);
 }
 
-READ8_MEMBER( de_3b_state::pia2c_pb_r )
+uint8_t de_3b_state::pia2c_pb_r()
 {
 	return m_dmdtype3->busy_r();
 }
 
-WRITE8_MEMBER( de_3b_state::pia2c_pb_w )
+void de_3b_state::pia2c_pb_w(uint8_t data)
 {
 	/* DMD ctrl */
 	m_dmdtype3->ctrl_w(data);
 	logerror("DMD: Control write %02x\n", data);
 }
-READ8_MEMBER(de_3b_state::display_r)
+uint8_t de_3b_state::display_r(offs_t offset)
 {
 	uint8_t ret = 0x00;
 
 	switch(offset)
 	{
 	case 0:
-//      ret = pia28_w7_r(space,0);
+//      ret = pia28_w7_r();
 		break;
 	case 3:
-		ret = pia2c_pb_r(space,0);
+		ret = pia2c_pb_r();
 		break;
 	}
 
 	return ret;
 }
 
-WRITE8_MEMBER(de_3b_state::display_w)
+void de_3b_state::display_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
 	case 0:
-//      dig0_w(space,0,data);
+//      dig0_w(data);
 		break;
 	case 1:
-//      dig1_w(space,0,data);
+//      dig1_w(data);
 		break;
 	case 2:
-		pia2c_pa_w(space,0,data);
+		pia2c_pa_w(data);
 		break;
 	case 3:
-		pia2c_pb_w(space,0,data);
+		pia2c_pb_w(data);
 		break;
 	case 4:
-//      pia34_pa_w(space,0,data);
+//      pia34_pa_w(data);
 		break;
 	}
 }
 
-WRITE8_MEMBER(de_3b_state::lamps_w)
+void de_3b_state::lamps_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
 	case 0:
-		lamp0_w(space,0,data);
+		lamp0_w(data);
 		break;
 	case 1:
-		lamp1_w(space,0,data);
+		lamp1_w(data);
 		break;
 	}
 }
@@ -522,8 +522,8 @@ ROM_START(bay_d400)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("baycpud.400", 0x0000, 0x10000, CRC(45019616) SHA1(5a1e04cdfa00f179f010c09fae52d090553cd82e))
 	ROM_REGION(0x01000000, "cpu3", 0)
-	ROM_LOAD16_BYTE("bayrom0d.400", 0x00000000, 0x00080000, CRC(3f195829) SHA1(a10a1b7f125f239b0eff87ee6667c8250b7ffc87))
-	ROM_LOAD16_BYTE("bayrom3d.400", 0x00000001, 0x00080000, CRC(ae3d8585) SHA1(28b38ebc2755ffb3859f8091a9bf50d868794a3e))
+	ROM_LOAD16_BYTE("bayrom0a.400", 0x00000000, 0x00080000, CRC(43d615c6) SHA1(7c843b6d5215305b02a55c9fa1d62375ef0766ea))
+	ROM_LOAD16_BYTE("bayrom3a.400", 0x00000001, 0x00080000, CRC(41bcb66b) SHA1(e6f0a9236e14c2e919881ca1ffe3356aaa121730))
 	ROM_REGION(0x010000, "soundcpu", 0)
 	ROM_LOAD("bayw.u7", 0x0000, 0x10000, CRC(90d6d8a8) SHA1(482c5643453f21a078257aa13398845ef19cab3c))
 	ROM_REGION(0x1000000, "bsmt", 0)
@@ -533,7 +533,7 @@ ROM_END
 
 ROM_START(bay_e400)
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("baycpua2.400", 0x0000, 0x10000, CRC(07b77fe2) SHA1(4f81a5b3d821907e06d6b547117ad39c238a900c))
+	ROM_LOAD("baycpue.400", 0x0000, 0x10000, CRC(07b77fe2) SHA1(4f81a5b3d821907e06d6b547117ad39c238a900c))
 	ROM_REGION(0x01000000, "cpu3", 0)
 	ROM_LOAD16_BYTE("bayrom0a.400", 0x00000000, 0x00080000, CRC(43d615c6) SHA1(7c843b6d5215305b02a55c9fa1d62375ef0766ea))
 	ROM_LOAD16_BYTE("bayrom3a.400", 0x00000001, 0x00080000, CRC(41bcb66b) SHA1(e6f0a9236e14c2e919881ca1ffe3356aaa121730))
@@ -549,8 +549,21 @@ ROM_START(bay_d300)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("baycpud.300", 0x0000, 0x10000, CRC(c160f045) SHA1(d1f75d5ba292b25278539b01e0f4908276d34e34))
 	ROM_REGION(0x01000000, "cpu3", 0)
-	ROM_LOAD16_BYTE("bayrom0d.300", 0x00000000, 0x00080000, CRC(3f195829) SHA1(a10a1b7f125f239b0eff87ee6667c8250b7ffc87))
-	ROM_LOAD16_BYTE("bayrom3d.300", 0x00000001, 0x00080000, CRC(ae3d8585) SHA1(28b38ebc2755ffb3859f8091a9bf50d868794a3e))
+	ROM_LOAD16_BYTE("bayrom0a.300", 0x00000000, 0x00080000, CRC(3f195829) SHA1(a10a1b7f125f239b0eff87ee6667c8250b7ffc87))
+	ROM_LOAD16_BYTE("bayrom3a.300", 0x00000001, 0x00080000, CRC(ae3d8585) SHA1(28b38ebc2755ffb3859f8091a9bf50d868794a3e))
+	ROM_REGION(0x010000, "soundcpu", 0)
+	ROM_LOAD("bayw.u7", 0x0000, 0x10000, CRC(90d6d8a8) SHA1(482c5643453f21a078257aa13398845ef19cab3c))
+	ROM_REGION(0x1000000, "bsmt", 0)
+	ROM_LOAD("bayw.u17", 0x000000, 0x80000, CRC(b20fde56) SHA1(2f2db49245e4a6a8251cbe896b2437fcec88d42d))
+	ROM_LOAD("bayw.u21", 0x080000, 0x80000, CRC(b7598881) SHA1(19d1dde1cb6634a7c7b5cdb4fa01cd09cc7d7777))
+ROM_END
+
+ROM_START(bay_f201)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("baycpuf.201", 0x0000, 0x10000, CRC(d2fddeaa) SHA1(839baca46823dc72a7ef1421764815f69f0e7084))
+	ROM_REGION(0x01000000, "cpu3", 0)
+	ROM_LOAD16_BYTE("bayrom0f.200", 0x00000000, 0x00080000, CRC(6dc898b6) SHA1(087b043acf64b2a16c8e4c879b90dbea1d79c614))
+	ROM_LOAD16_BYTE("bayrom3f.200", 0x00000001, 0x00080000, CRC(9db1b94e) SHA1(056c1a0fd1c99c1c9426f2e2cdd68f4bbaa89d81))
 	ROM_REGION(0x010000, "soundcpu", 0)
 	ROM_LOAD("bayw.u7", 0x0000, 0x10000, CRC(90d6d8a8) SHA1(482c5643453f21a078257aa13398845ef19cab3c))
 	ROM_REGION(0x1000000, "bsmt", 0)
@@ -700,6 +713,7 @@ GAME(1995,  baywatch, 0,       de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Se
 GAME(1995,  bay_d300, baywatch,de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Baywatch (3.00 Dutch)",                 MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1995,  bay_d400, baywatch,de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Baywatch (4.00 English)",               MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1995,  bay_e400, baywatch,de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Baywatch (4.00 Dutch)",                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  bay_f201, baywatch,de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Baywatch (2.01 French)",                MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1994,  frankst,  0,       de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Mary Shelley's Frankenstein",           MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1995,  frankstg, frankst, de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Mary Shelley's Frankenstein (Germany)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1994,  mav_402,  0,       de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Maverick (Display Rev. 4.02)",          MACHINE_IS_SKELETON_MECHANICAL)

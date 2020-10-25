@@ -10,9 +10,9 @@ it's all a guess.
 
 ********************************************************************/
 
-#include <cassert>
-
 #include "fc100_cas.h"
+
+#include <cassert>
 
 #define WAVEENTRY_LOW  -32768
 #define WAVEENTRY_HIGH  32767
@@ -21,7 +21,7 @@ it's all a guess.
 #define FC100_HEADER_BYTES    16
 
 // image size
-static int fc100_image_size;
+static int fc100_image_size; // FIXME: global variable prevents multiple instances
 
 static int fc100_put_samples(int16_t *buffer, int sample_pos, int count, int level)
 {
@@ -122,7 +122,7 @@ static int fc100_cassette_calculate_size_in_samples(const uint8_t *bytes, int le
 	return fc100_handle_cassette(nullptr, bytes);
 }
 
-static const struct CassetteLegacyWaveFiller fc100_legacy_fill_wave =
+static const cassette_image::LegacyWaveFiller fc100_legacy_fill_wave =
 {
 	fc100_cassette_fill_wave,                 /* fill_wave */
 	-1,                                     /* chunk_size */
@@ -133,17 +133,17 @@ static const struct CassetteLegacyWaveFiller fc100_legacy_fill_wave =
 	0                                       /* trailer_samples */
 };
 
-static cassette_image::error fc100_cassette_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error fc100_cassette_identify(cassette_image *cassette, cassette_image::Options *opts)
 {
-	return cassette_legacy_identify(cassette, opts, &fc100_legacy_fill_wave);
+	return cassette->legacy_identify(opts, &fc100_legacy_fill_wave);
 }
 
 static cassette_image::error fc100_cassette_load(cassette_image *cassette)
 {
-	return cassette_legacy_construct(cassette, &fc100_legacy_fill_wave);
+	return cassette->legacy_construct(&fc100_legacy_fill_wave);
 }
 
-static const struct CassetteFormat fc100_cassette_image_format =
+static const cassette_image::Format fc100_cassette_image_format =
 {
 	"cas",
 	fc100_cassette_identify,

@@ -31,9 +31,6 @@ necdsp_device::necdsp_device(const machine_config &mconfig, device_type type, co
 		m_data_config("data", ENDIANNESS_BIG, 16, dbits, -1), m_icount(0),   // -1 for WORD-addressable
 		m_irq(0),
 		m_irq_firing(0),
-		m_program(nullptr),
-		m_data(nullptr),
-		m_cache(nullptr),
 		m_in_int_cb(*this),
 		//m_in_si_cb(*this),
 		//m_in_sck_cb(*this),
@@ -66,9 +63,9 @@ upd96050_device::upd96050_device(const machine_config &mconfig, const char *tag,
 void necdsp_device::device_start()
 {
 	// get our address spaces
-	m_program = &space(AS_PROGRAM);
-	m_data = &space(AS_DATA);
-	m_cache = m_program->cache<2, -2, ENDIANNESS_BIG>();
+	space(AS_PROGRAM).specific(m_program);
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_DATA).specific(m_data);
 
 	// register our state for the debugger
 	state_add(STATE_GENPC, "GENPC", regs.pc).noshow();
@@ -340,7 +337,7 @@ void necdsp_device::execute_run()
 
 		if (m_irq_firing == 0) // normal opcode
 		{
-			opcode = m_cache->read_dword(regs.pc) >> 8;
+			opcode = m_cache.read_dword(regs.pc) >> 8;
 			regs.pc++;
 		}
 		else if (m_irq_firing == 1) // if we're in an interrupt cycle, execute a op 'nop' first...
@@ -392,7 +389,7 @@ void necdsp_device::exec_op(uint32_t opcode) {
 	case  3: regs.idb = regs.tr; break;
 	case  4: regs.idb = regs.dp; break;
 	case  5: regs.idb = regs.rp; break;
-	case  6: regs.idb = m_data->read_word(regs.rp); break;
+	case  6: regs.idb = m_data.read_word(regs.rp); break;
 	case  7: regs.idb = 0x8000 - regs.flaga.s1; break;  //SGN
 	case  8: regs.idb = regs.dr; regs.sr.rqm = 1; break;
 	case  9: regs.idb = regs.dr; break;
@@ -589,7 +586,7 @@ void necdsp_device::exec_ld(uint32_t opcode) {
 	case  8: regs.so = bitswap<16>(id, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15); break;  //LSB first output, output tapped at bit 15 shifting left
 	case  9: regs.so = id; break;  //MSB first output, output tapped at bit 15 shifting left
 	case 10: regs.k = id; break;
-	case 11: regs.k = id; regs.l = m_data->read_word(regs.rp); break;
+	case 11: regs.k = id; regs.l = m_data.read_word(regs.rp); break;
 	case 12: regs.l = id; regs.k = dataRAM[regs.dp | 0x40]; break;
 	case 13: regs.l = id; break;
 	case 14: regs.trb = id; break;

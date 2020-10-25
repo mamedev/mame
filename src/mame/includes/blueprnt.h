@@ -48,14 +48,14 @@ public:
 	/* misc */
 	int     m_dipsw;
 
-	DECLARE_READ8_MEMBER(blueprnt_sh_dipsw_r);
-	DECLARE_READ8_MEMBER(grasspin_sh_dipsw_r);
-	DECLARE_WRITE8_MEMBER(blueprnt_sound_command_w);
-	DECLARE_WRITE8_MEMBER(blueprnt_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(blueprnt_videoram_w);
-	DECLARE_WRITE8_MEMBER(blueprnt_colorram_w);
-	DECLARE_WRITE8_MEMBER(blueprnt_flipscreen_w);
-	DECLARE_WRITE8_MEMBER(dipsw_w);
+	uint8_t blueprnt_sh_dipsw_r();
+	uint8_t grasspin_sh_dipsw_r();
+	void blueprnt_sound_command_w(uint8_t data);
+	void blueprnt_coin_counter_w(uint8_t data);
+	void blueprnt_videoram_w(offs_t offset, uint8_t data);
+	void blueprnt_colorram_w(offs_t offset, uint8_t data);
+	void blueprnt_flipscreen_w(uint8_t data);
+	void dipsw_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

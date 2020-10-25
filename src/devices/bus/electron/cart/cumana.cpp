@@ -26,14 +26,14 @@ DEFINE_DEVICE_TYPE(ELECTRON_CUMANA, electron_cumana_device, "electron_cumana", "
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( cumana )
+//  FLOPPY_FORMATS( cumana )
 //-------------------------------------------------
 
 FLOPPY_FORMATS_MEMBER(electron_cumana_device::floppy_formats)
 	FLOPPY_ACORN_SSD_FORMAT,
 	FLOPPY_ACORN_DSD_FORMAT,
 	FLOPPY_ACORN_ADFS_OLD_FORMAT
-FLOPPY_FORMATS_END0
+FLOPPY_FORMATS_END
 
 void cumana_floppies(device_slot_interface &device)
 {
@@ -93,13 +93,12 @@ uint8_t electron_cumana_device::read(offs_t offset, int infc, int infd, int romq
 
 	if (infc)
 	{
-		switch (offset & 0xff)
+		switch (offset & 0xfc)
 		{
 		case 0x90:
-		case 0x91:
-		case 0x92:
-		case 0x93:
 			data = m_fdc->read(offset & 0x03);
+			break;
+		case 0x94:
 			break;
 		case 0x98:
 		case 0x9c:
@@ -138,12 +137,9 @@ void electron_cumana_device::write(offs_t offset, uint8_t data, int infc, int in
 {
 	if (infc)
 	{
-		switch (offset & 0xff)
+		switch (offset & 0xfc)
 		{
 		case 0x90:
-		case 0x91:
-		case 0x92:
-		case 0x93:
 			m_fdc->write(offset & 0x03, data);
 			break;
 		case 0x94:

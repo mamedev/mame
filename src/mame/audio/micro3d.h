@@ -24,7 +24,7 @@ protected:
 	virtual void device_reset() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 	enum dac_registers {
@@ -45,8 +45,8 @@ private:
 		void init(double fs);
 		void recompute(double k, double q, double fc);
 
-		std::unique_ptr<float[]> history;
-		std::unique_ptr<float[]> coef;
+		float history[2 * 2];
+		float coef[4 * 2 + 1];
 		double fs;
 		biquad proto_coef[2];
 	};

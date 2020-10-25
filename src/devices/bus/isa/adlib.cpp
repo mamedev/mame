@@ -15,7 +15,7 @@
 
 #define ym3812_StdClock 3579545
 
-READ8_MEMBER( isa8_adlib_device::ym3812_16_r )
+uint8_t isa8_adlib_device::ym3812_16_r(offs_t offset)
 {
 	uint8_t retVal = 0xff;
 	switch(offset)
@@ -25,7 +25,7 @@ READ8_MEMBER( isa8_adlib_device::ym3812_16_r )
 	return retVal;
 }
 
-WRITE8_MEMBER( isa8_adlib_device::ym3812_16_w )
+void isa8_adlib_device::ym3812_16_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -72,7 +72,7 @@ isa8_adlib_device::isa8_adlib_device(const machine_config &mconfig, const char *
 void isa8_adlib_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(0x0388, 0x0389, read8_delegate(*this, FUNC(isa8_adlib_device::ym3812_16_r)), write8_delegate(*this, FUNC(isa8_adlib_device::ym3812_16_w)));
+	m_isa->install_device(0x0388, 0x0389, read8sm_delegate(*this, FUNC(isa8_adlib_device::ym3812_16_r)), write8sm_delegate(*this, FUNC(isa8_adlib_device::ym3812_16_w)));
 }
 
 //-------------------------------------------------

@@ -2,7 +2,7 @@
 // copyright-holders:Brad Oliver
 /***************************************************************************
 
-  video.c
+  arkanoid.cpp
 
   Functions to emulate the video hardware of the machine.
 
@@ -12,13 +12,13 @@
 #include "includes/arkanoid.h"
 
 
-WRITE8_MEMBER(arkanoid_state::arkanoid_videoram_w)
+void arkanoid_state::arkanoid_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(arkanoid_state::arkanoid_d008_w)
+void arkanoid_state::arkanoid_d008_w(uint8_t data)
 {
 	int bank;
 
@@ -60,7 +60,7 @@ WRITE8_MEMBER(arkanoid_state::arkanoid_d008_w)
 }
 
 
-WRITE8_MEMBER(arkanoid_state::brixian_d008_w)
+void arkanoid_state::brixian_d008_w(uint8_t data)
 {
 	int bank;
 
@@ -100,7 +100,7 @@ WRITE8_MEMBER(arkanoid_state::brixian_d008_w)
 
 
 /* different hook-up, everything except for bits 0-1 and 7 aren't tested afaik. */
-WRITE8_MEMBER(arkanoid_state::tetrsark_d008_w)
+void arkanoid_state::tetrsark_d008_w(uint8_t data)
 {
 	int bank;
 
@@ -137,7 +137,7 @@ WRITE8_MEMBER(arkanoid_state::tetrsark_d008_w)
 }
 
 
-WRITE8_MEMBER(arkanoid_state::hexa_d008_w)
+void arkanoid_state::hexa_d008_w(uint8_t data)
 {
 	/* bits 0 and 1 flip X and Y */
 	flip_screen_x_set(data & 0x01);

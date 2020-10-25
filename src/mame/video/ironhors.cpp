@@ -73,19 +73,19 @@ void ironhors_state::ironhors_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(ironhors_state::videoram_w)
+void ironhors_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(ironhors_state::colorram_w)
+void ironhors_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(ironhors_state::charbank_w)
+void ironhors_state::charbank_w(uint8_t data)
 {
 	if (m_charbank != (data & 0x03))
 	{
@@ -98,7 +98,7 @@ WRITE8_MEMBER(ironhors_state::charbank_w)
 	/* other bits unknown */
 }
 
-WRITE8_MEMBER(ironhors_state::palettebank_w)
+void ironhors_state::palettebank_w(uint8_t data)
 {
 	if (m_palettebank != (data & 0x07))
 	{
@@ -115,7 +115,7 @@ WRITE8_MEMBER(ironhors_state::palettebank_w)
 		popmessage("palettebank_w %02x",data);
 }
 
-WRITE8_MEMBER(ironhors_state::flipscreen_w)
+void ironhors_state::flipscreen_w(uint8_t data)
 {
 	if (flip_screen() != (~data & 0x08))
 	{

@@ -163,6 +163,7 @@ void atari_cage_device::device_start()
 	save_item(NAME(m_timer_enabled));
 	save_item(NAME(m_from_main));
 	save_item(NAME(m_control));
+	save_item(NAME(m_tms32031_io_regs));
 }
 
 
@@ -324,7 +325,10 @@ void atari_cage_device::update_serial()
 		serial_clock_period *= 2;
 
 	/* now multiply by the timer period */
-	bit_clock_period = serial_clock_period * (m_tms32031_io_regs[SPORT_TIMER_PERIOD] & 0xffff);
+	if ((m_tms32031_io_regs[SPORT_TIMER_PERIOD] & 0xffff) == 0)
+		bit_clock_period = (m_tms32031_io_regs[SPORT_GLOBAL_CTL] & 4) ? serial_clock_period : attotime::never;
+	else
+		bit_clock_period = serial_clock_period * (m_tms32031_io_regs[SPORT_TIMER_PERIOD] & 0xffff);
 
 	/* and times the number of bits per sample */
 	m_serial_period_per_word = bit_clock_period * (8 * (((m_tms32031_io_regs[SPORT_GLOBAL_CTL] >> 18) & 3) + 1));

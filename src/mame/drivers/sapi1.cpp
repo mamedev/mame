@@ -81,27 +81,27 @@ public:
 private:
 	optional_shared_ptr<uint8_t> m_p_videoram;
 	void kbd_put(u8 data);
-	DECLARE_READ8_MEMBER(sapi1_keyboard_r);
-	DECLARE_WRITE8_MEMBER(sapi1_keyboard_w);
-	DECLARE_READ8_MEMBER(sapi2_keyboard_status_r);
-	DECLARE_READ8_MEMBER(sapi2_keyboard_data_r);
-	DECLARE_READ8_MEMBER(sapi3_0c_r);
-	DECLARE_WRITE8_MEMBER(sapi3_00_w);
-	DECLARE_READ8_MEMBER(sapi3_25_r);
-	DECLARE_WRITE8_MEMBER(sapi3_25_w);
-	DECLARE_WRITE8_MEMBER(port10_w);
-	DECLARE_WRITE8_MEMBER(port11_w);
-	DECLARE_WRITE8_MEMBER(port13_w);
-	DECLARE_WRITE8_MEMBER(port43_w);
-	DECLARE_READ8_MEMBER(port10_r);
-	DECLARE_READ8_MEMBER(port11_r);
-	DECLARE_READ8_MEMBER(port40_r);
-	DECLARE_READ8_MEMBER(port41_r);
-	DECLARE_MACHINE_RESET(sapi1);
-	DECLARE_MACHINE_RESET(sapizps3);
+	uint8_t sapi1_keyboard_r();
+	void sapi1_keyboard_w(uint8_t data);
+	uint8_t sapi2_keyboard_status_r();
+	uint8_t sapi2_keyboard_data_r();
+	uint8_t sapi3_0c_r();
+	void sapi3_00_w(uint8_t data);
+	uint8_t sapi3_25_r();
+	void sapi3_25_w(uint8_t data);
+	void port10_w(uint8_t data);
+	void port11_w(uint8_t data);
+	void port13_w(uint8_t data);
+	void port43_w(uint8_t data);
+	uint8_t port10_r();
+	uint8_t port11_r();
+	uint8_t port40_r();
+	uint8_t port41_r();
 	MC6845_UPDATE_ROW(crtc_update_row);
 	DECLARE_READ_LINE_MEMBER(si);
 	DECLARE_WRITE_LINE_MEMBER(so);
+	void machine_reset() override;
+	void machine_start() override;
 	uint32_t screen_update_sapi1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_sapi3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -383,24 +383,20 @@ INPUT_PORTS_END
 
 uint32_t sapi_state::screen_update_sapi1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bool val;
-	uint16_t addr,xpos;
-	uint8_t chr,attr,ra,x,y,b;
-
-	for(y = 0; y < 24; y++ )
+	for(uint8_t y = 0; y < 24; y++ )
 	{
-		addr = y*64;
-		xpos = 0;
-		for(x = 0; x < 40; x++ )
+		uint16_t addr = y*64;
+		uint16_t xpos = 0;
+		for(uint8_t x = 0; x < 40; x++ )
 		{
-			chr = m_p_videoram[addr + x];
-			attr = (chr >> 6) & 3;
+			uint8_t chr = m_p_videoram[addr + x];
+			uint8_t attr = (chr >> 6) & 3;
 			chr &= 0x3f;
-			for(ra = 0; ra < 9; ra++ )
+			for(uint8_t ra = 0; ra < 9; ra++ )
 			{
-				for(b = 0; b < 6; b++ )
+				for(uint8_t b = 0; b < 6; b++ )
 				{
-					val = 0;
+					bool val = 0;
 
 					if (ra==8)
 					{
@@ -416,12 +412,12 @@ uint32_t sapi_state::screen_update_sapi1(screen_device &screen, bitmap_ind16 &bi
 
 					if(attr==3)
 					{
-						bitmap.pix16(y*9+ra, xpos+2*b   ) = val;
-						bitmap.pix16(y*9+ra, xpos+2*b+1 ) = val;
+						bitmap.pix(y*9+ra, xpos+2*b   ) = val;
+						bitmap.pix(y*9+ra, xpos+2*b+1 ) = val;
 					}
 					else
 					{
-						bitmap.pix16(y*9+ra, xpos+b ) = val;
+						bitmap.pix(y*9+ra, xpos+b ) = val;
 					}
 				}
 			}
@@ -436,26 +432,22 @@ uint32_t sapi_state::screen_update_sapi1(screen_device &screen, bitmap_ind16 &bi
 // The attributes seem to be different on this one, they need to be understood, so disabled for now
 uint32_t sapi_state::screen_update_sapi3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bool val;
-	uint16_t addr,xpos;
-	uint8_t chr,attr,ra,x,y,b;
-
-	for(y = 0; y < 20; y++ )
+	for(uint8_t y = 0; y < 20; y++ )
 	{
-		addr = y*64;
-		xpos = 0;
-		for(x = 0; x < 40; x++ )
+		uint16_t addr = y*64;
+		uint16_t xpos = 0;
+		for(uint8_t x = 0; x < 40; x++ )
 		{
-			chr = m_p_videoram[addr + x];
-			attr = 0;//(chr >> 6) & 3;
+			uint8_t chr = m_p_videoram[addr + x];
+			uint8_t attr = 0;//(chr >> 6) & 3;
 			if (chr > 0x3f)
 				chr &= 0x1f;
 
-			for(ra = 0; ra < 9; ra++ )
+			for(uint8_t ra = 0; ra < 9; ra++ )
 			{
-				for(b = 0; b < 6; b++ )
+				for(uint8_t b = 0; b < 6; b++ )
 				{
-					val = 0;
+					bool val = 0;
 
 					if (ra==8)
 					{
@@ -471,12 +463,12 @@ uint32_t sapi_state::screen_update_sapi3(screen_device &screen, bitmap_ind16 &bi
 
 					if(attr==3)
 					{
-						bitmap.pix16(y*9+ra, xpos+2*b   ) = val;
-						bitmap.pix16(y*9+ra, xpos+2*b+1 ) = val;
+						bitmap.pix(y*9+ra, xpos+2*b   ) = val;
+						bitmap.pix(y*9+ra, xpos+2*b+1 ) = val;
 					}
 					else
 					{
-						bitmap.pix16(y*9+ra, xpos+b ) = val;
+						bitmap.pix(y*9+ra, xpos+b ) = val;
 					}
 				}
 			}
@@ -490,17 +482,15 @@ uint32_t sapi_state::screen_update_sapi3(screen_device &screen, bitmap_ind16 &bi
 
 MC6845_UPDATE_ROW( sapi_state::crtc_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint8_t chr,gfx,inv;
-	uint16_t mem,x;
-	uint32_t *p = &bitmap.pix32(y);
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint32_t *p = &bitmap.pix(y);
 
-	for (x = 0; x < x_count; x++)
+	for (uint16_t x = 0; x < x_count; x++)
 	{
-		inv = gfx = 0;
+		uint8_t inv = 0, gfx = 0;
 		if (x == cursor_x) inv ^= 0xff;
-		mem = (2*(ma + x)) & 0xfff;
-		chr = m_p_videoram[mem] & 0x3f;
+		uint16_t mem = (2*(ma + x)) & 0xfff;
+		uint8_t chr = m_p_videoram[mem] & 0x3f;
 
 		if (ra < 8)
 			gfx = MHB2501[(chr<<3) | ra] ^ inv;
@@ -521,7 +511,7 @@ MC6845_UPDATE_ROW( sapi_state::crtc_update_row )
 
 **************************************/
 
-READ8_MEMBER( sapi_state::sapi1_keyboard_r )
+uint8_t sapi_state::sapi1_keyboard_r()
 {
 	uint8_t key = 0xff;
 	if (BIT(m_keyboard_mask, 0)) key &= m_io_keyboard[0]->read();
@@ -532,24 +522,24 @@ READ8_MEMBER( sapi_state::sapi1_keyboard_r )
 	return key;
 }
 
-WRITE8_MEMBER( sapi_state::sapi1_keyboard_w )
+void sapi_state::sapi1_keyboard_w(uint8_t data)
 {
 	m_keyboard_mask = (data ^ 0xff ) & 0x1f;
 }
 
-READ8_MEMBER( sapi_state::sapi2_keyboard_status_r)
+uint8_t sapi_state::sapi2_keyboard_status_r()
 {
 	return (m_term_data) ? 0 : 1;
 }
 
-READ8_MEMBER( sapi_state::sapi2_keyboard_data_r)
+uint8_t sapi_state::sapi2_keyboard_data_r()
 {
 	uint8_t ret = ~m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-READ8_MEMBER(sapi_state::port10_r)
+uint8_t sapi_state::port10_r()
 {
 	uint8_t result = 0;
 	result |= m_uart->tbmt_r() || m_uart->dav_r();
@@ -566,7 +556,7 @@ READ8_MEMBER(sapi_state::port10_r)
 	return result;
 }
 
-WRITE8_MEMBER(sapi_state::port10_w)
+void sapi_state::port10_w(uint8_t data)
 {
 	if (m_v24)
 	{
@@ -583,7 +573,7 @@ WRITE8_MEMBER(sapi_state::port10_w)
 	m_ier = BIT(data, 7);
 }
 
-READ8_MEMBER(sapi_state::port11_r)
+uint8_t sapi_state::port11_r()
 {
 	u8 data = 0x3f;
 	data |= m_uart->dav_r() ? 0x80 : 0;
@@ -591,7 +581,7 @@ READ8_MEMBER(sapi_state::port11_r)
 	return data;
 }
 
-WRITE8_MEMBER(sapi_state::port11_w)
+void sapi_state::port11_w(uint8_t data)
 {
 	m_uart->write_np(BIT(data, 0));
 	m_uart->write_tsb(BIT(data, 1));
@@ -602,19 +592,19 @@ WRITE8_MEMBER(sapi_state::port11_w)
 	m_uart->write_cs(0);
 }
 
-WRITE8_MEMBER(sapi_state::port13_w)
+void sapi_state::port13_w(uint8_t data)
 {
 	// really pulsed by K155AG3 (=74123N): R29=22k, C16=220 (output combined with master reset)
 	m_uart->write_xr(0);
 	m_uart->write_xr(1);
 }
 
-READ8_MEMBER( sapi_state::port40_r )
+uint8_t sapi_state::port40_r()
 {
 	return ~m_uart->receive();
 }
 
-READ8_MEMBER(sapi_state::port41_r)
+uint8_t sapi_state::port41_r()
 {
 	u8 data = 0x7e;
 	data |= m_uart->dav_r() ? 0 : 1;
@@ -622,7 +612,7 @@ READ8_MEMBER(sapi_state::port41_r)
 	return data;
 }
 
-WRITE8_MEMBER( sapi_state::port43_w )
+void sapi_state::port43_w(uint8_t data)
 {
 	m_uart->transmit(~data);
 }
@@ -702,46 +692,61 @@ void sapi_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
-READ8_MEMBER( sapi_state::sapi3_0c_r )
+uint8_t sapi_state::sapi3_0c_r()
 {
 	return 0xc0;
 }
 
 /* switch out the rom shadow */
-WRITE8_MEMBER( sapi_state::sapi3_00_w )
+void sapi_state::sapi3_00_w(uint8_t data)
 {
 	m_bank1->set_entry(0);
 }
 
 /* to stop execution in random ram */
-READ8_MEMBER( sapi_state::sapi3_25_r )
+uint8_t sapi_state::sapi3_25_r()
 {
 	return m_zps3_25;
 }
 
-WRITE8_MEMBER( sapi_state::sapi3_25_w )
+void sapi_state::sapi3_25_w(uint8_t data)
 {
 	m_zps3_25 = data & 0xfc; //??
 }
 
-MACHINE_RESET_MEMBER( sapi_state, sapi1 )
+void sapi_state::machine_reset()
 {
 	m_keyboard_mask = 0;
 	m_refresh_counter = 0x20;
-	// setup uart to 8N2 for sapi1 -bios 0
-	m_uart->write_np(1);
-	m_uart->write_tsb(1);
-	m_uart->write_nb1(1);
-	m_uart->write_nb2(1);
-	m_uart->write_eps(1);
-	m_uart->write_cs(1);
-	m_uart->write_cs(0);
+
+	if (m_uart)
+	{
+		// setup uart to 8N2 for sapi1 -bios 0
+		m_uart->write_np(1);
+		m_uart->write_tsb(1);
+		m_uart->write_nb1(1);
+		m_uart->write_nb2(1);
+		m_uart->write_eps(1);
+		m_uart->write_cs(1);
+		m_uart->write_cs(0);
+	}
+
+	if (m_bank1)
+		m_bank1->set_entry(1);
 }
 
-MACHINE_RESET_MEMBER( sapi_state, sapizps3 )
+void sapi_state::machine_start()
 {
-	m_keyboard_mask = 0;
-	m_bank1->set_entry(1);
+	save_item(NAME(m_term_data));
+	save_item(NAME(m_keyboard_mask));
+	save_item(NAME(m_refresh_counter));
+	save_item(NAME(m_zps3_25));
+	save_item(NAME(m_cass_data));
+	save_item(NAME(m_cassinbit));
+	save_item(NAME(m_cassoutbit));
+	save_item(NAME(m_cassold));
+	save_item(NAME(m_ier));
+	save_item(NAME(m_iet));
 }
 
 void sapi_state::init_sapizps3()
@@ -771,7 +776,6 @@ void sapi_state::sapi1(machine_config &config)
 	I8080A(config, m_maincpu, 18_MHz_XTAL / 9); // Tesla MHB8080A + MHB8224 + MHB8228
 	m_maincpu->set_addrmap(AS_PROGRAM, &sapi_state::sapi1_mem);
 	m_maincpu->set_addrmap(AS_IO, &sapi_state::sapi1_io);
-	MCFG_MACHINE_RESET_OVERRIDE(sapi_state, sapi1)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -821,7 +825,6 @@ void sapi_state::sapi3(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &sapi_state::sapi3_mem);
 	m_maincpu->set_addrmap(AS_IO, &sapi_state::sapi3_io);
-	MCFG_MACHINE_RESET_OVERRIDE(sapi_state, sapizps3 )
 
 	screen_device &screen(*subdevice<screen_device>("screen"));
 	screen.set_size(40*6, 20*9);
@@ -867,7 +870,6 @@ void sapi_state::sapi3a(machine_config &config)
 	I8080A(config, m_maincpu, 18_MHz_XTAL / 9); // Tesla MHB8080A + MHB8224 + MHB8228
 	m_maincpu->set_addrmap(AS_PROGRAM, &sapi_state::sapi3a_mem);
 	m_maincpu->set_addrmap(AS_IO, &sapi_state::sapi3a_io);
-	MCFG_MACHINE_RESET_OVERRIDE(sapi_state, sapizps3 )
 
 	/* video hardware */
 	AY51013(config, m_uart); // Tesla MHB1012
@@ -942,9 +944,9 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME       PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT            COMPANY  FULLNAME                   FLAGS
-COMP( 1985, sapi1,     0,      0,      sapi1,   sapi1, sapi_state, empty_init,     "Tesla", "SAPI-1 ZPS 1",            MACHINE_NO_SOUND_HW )
-COMP( 1985, sapizps2,  sapi1,  0,      sapi2,   sapi1, sapi_state, empty_init,     "Tesla", "SAPI-1 ZPS 2",            MACHINE_NO_SOUND_HW )
-COMP( 1985, sapizps3,  sapi1,  0,      sapi3,   sapi1, sapi_state, init_sapizps3,  "Tesla", "SAPI-1 ZPS 3",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1985, sapizps3a, sapi1,  0,      sapi3a,  sapi1, sapi_state, init_sapizps3a, "Tesla", "SAPI-1 ZPS 3 (terminal)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1985, sapizps3b, sapi1,  0,      sapi3b,  sapi1, sapi_state, init_sapizps3b, "Tesla", "SAPI-1 ZPS 3 (6845)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1985, sapi1,     0,      0,      sapi1,   sapi1, sapi_state, empty_init,     "Tesla", "SAPI-1 ZPS 1",            MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1985, sapizps2,  sapi1,  0,      sapi2,   sapi1, sapi_state, empty_init,     "Tesla", "SAPI-1 ZPS 2",            MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1985, sapizps3,  sapi1,  0,      sapi3,   sapi1, sapi_state, init_sapizps3,  "Tesla", "SAPI-1 ZPS 3",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1985, sapizps3a, sapi1,  0,      sapi3a,  sapi1, sapi_state, init_sapizps3a, "Tesla", "SAPI-1 ZPS 3 (terminal)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1985, sapizps3b, sapi1,  0,      sapi3b,  sapi1, sapi_state, init_sapizps3b, "Tesla", "SAPI-1 ZPS 3 (6845)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
 

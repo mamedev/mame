@@ -247,7 +247,7 @@ WRITE_LINE_MEMBER(hle_msmouse_device_base::input_dtr)
 
 WRITE_LINE_MEMBER(hle_msmouse_device_base::input_rts)
 {
-	m_dtr = state ? 1U : 0U;
+	m_rts = state ? 1U : 0U;
 	check_enable();
 }
 

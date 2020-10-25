@@ -31,7 +31,6 @@ BTANB:
 #include "machine/6821pia.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/pwm.h"
 #include "speaker.h"
 
@@ -78,11 +77,11 @@ private:
 	// I/O handlers
 	void update_display();
 	void update_dac();
-	DECLARE_WRITE8_MEMBER(pia0_pa_w);
-	DECLARE_WRITE8_MEMBER(pia0_pb_w);
-	DECLARE_READ8_MEMBER(pia1_pa_r);
-	DECLARE_READ8_MEMBER(pia1_pb_r);
-	DECLARE_WRITE8_MEMBER(pia1_pb_w);
+	void pia0_pa_w(u8 data);
+	void pia0_pb_w(u8 data);
+	u8 pia1_pa_r();
+	u8 pia1_pb_r();
+	void pia1_pb_w(u8 data);
 
 	u8 m_inp_mux = 0;
 	u8 m_led_data = 0;
@@ -112,7 +111,7 @@ void cchess2_state::update_dac()
 	m_dac->write(m_dac_on & BIT(m_inp_mux, 1));
 }
 
-WRITE8_MEMBER(cchess2_state::pia0_pa_w)
+void cchess2_state::pia0_pa_w(u8 data)
 {
 	// d0-d7: input mux/led select
 	// d1: dac data
@@ -121,14 +120,14 @@ WRITE8_MEMBER(cchess2_state::pia0_pa_w)
 	update_dac();
 }
 
-WRITE8_MEMBER(cchess2_state::pia0_pb_w)
+void cchess2_state::pia0_pb_w(u8 data)
 {
 	// d0-d7: led data
 	m_led_data = data;
 	update_display();
 }
 
-READ8_MEMBER(cchess2_state::pia1_pa_r)
+u8 cchess2_state::pia1_pa_r()
 {
 	u8 data = 0;
 
@@ -140,7 +139,7 @@ READ8_MEMBER(cchess2_state::pia1_pa_r)
 	return ~data;
 }
 
-READ8_MEMBER(cchess2_state::pia1_pb_r)
+u8 cchess2_state::pia1_pb_r()
 {
 	u8 data = 0;
 
@@ -152,7 +151,7 @@ READ8_MEMBER(cchess2_state::pia1_pb_r)
 	return data;
 }
 
-WRITE8_MEMBER(cchess2_state::pia1_pb_w)
+void cchess2_state::pia1_pb_w(u8 data)
 {
 	// d7: dac on
 	m_dac_on = BIT(data, 7);
@@ -259,7 +258,6 @@ void cchess2_state::cncchess2(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
 

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Stefan Jokisch
+// copyright-holders:Stefan Jokisch, Ivan Vangelista, Ryan Holtz
 /***************************************************************************
 
 Atari Flyball Driver
@@ -11,11 +11,6 @@ Etched in copper on top of board:
     MADE IN USA
     PAT NO 3793483
 
-
-TODO:
-- discrete sound
-- accurate video timing
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -23,7 +18,12 @@ TODO:
 #include "machine/74259.h"
 #include "emupal.h"
 #include "screen.h"
+#include "speaker.h"
 #include "tilemap.h"
+#include "machine/netlist.h"
+
+#include "netlist/nl_setup.h"
+#include "audio/nl_flyball.h"
 
 static constexpr XTAL MASTER_CLOCK  = 12.096_MHz_XTAL;
 static constexpr XTAL PIXEL_CLOCK   = MASTER_CLOCK / 2;
@@ -39,6 +39,11 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_outlatch(*this, "outlatch"),
+		m_bat_sound(*this, "sound_nl:bat_sound"),
+		m_footstep(*this, "sound_nl:footstep"),
+		m_crowd_sl(*this, "sound_nl:crowd_sl"),
+		m_crowd_on(*this, "sound_nl:crowd_on"),
+		m_crowd_vl(*this, "sound_nl:crowd_vl"),
 		m_playfield_ram(*this, "playfield_ram"),
 		m_lamp(*this, "lamp0")
 	{ }
@@ -53,16 +58,16 @@ private:
 		TIMER_QUARTER
 	};
 
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_READ8_MEMBER(scanline_r);
-	DECLARE_READ8_MEMBER(potsense_r);
-	DECLARE_WRITE8_MEMBER(potmask_w);
-	DECLARE_WRITE8_MEMBER(pitcher_pic_w);
-	DECLARE_WRITE8_MEMBER(ball_vert_w);
-	DECLARE_WRITE8_MEMBER(ball_horz_w);
-	DECLARE_WRITE8_MEMBER(pitcher_vert_w);
-	DECLARE_WRITE8_MEMBER(pitcher_horz_w);
-	DECLARE_WRITE8_MEMBER(misc_w);
+	uint8_t input_r();
+	uint8_t scanline_r();
+	uint8_t potsense_r();
+	void potmask_w(uint8_t data);
+	void pitcher_pic_w(uint8_t data);
+	void ball_vert_w(uint8_t data);
+	void ball_horz_w(uint8_t data);
+	void pitcher_vert_w(uint8_t data);
+	void pitcher_horz_w(uint8_t data);
+	void misc_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(lamp_w);
 
 	TILEMAP_MAPPER_MEMBER(get_memory_offset);
@@ -87,6 +92,11 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<f9334_device> m_outlatch;
+	required_device<netlist_mame_logic_input_device> m_bat_sound;
+	required_device<netlist_mame_logic_input_device> m_footstep;
+	required_device<netlist_mame_logic_input_device> m_crowd_sl;
+	required_device<netlist_mame_logic_input_device> m_crowd_on;
+	required_device<netlist_mame_logic_input_device> m_crowd_vl;
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_playfield_ram;
@@ -165,7 +175,7 @@ uint32_t flyball_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	for (int y = bally; y < bally + 2; y++)
 		for (int x = ballx; x < ballx + 2; x++)
 			if (cliprect.contains(x, y))
-				bitmap.pix16(y, x) = 1;
+				bitmap.pix(y, x) = 1;
 
 	return 0;
 }
@@ -239,52 +249,52 @@ TIMER_CALLBACK_MEMBER(flyball_state::quarter_callback)
  *************************************/
 
 /* two physical buttons (start game and stop runner) share the same port bit */
-READ8_MEMBER(flyball_state::input_r)
+uint8_t flyball_state::input_r()
 {
 	return ioport("IN0")->read() & ioport("IN1")->read();
 }
 
-READ8_MEMBER(flyball_state::scanline_r)
+uint8_t flyball_state::scanline_r()
 {
 	return m_screen->vpos() & 0x3f;
 }
 
-READ8_MEMBER(flyball_state::potsense_r)
+uint8_t flyball_state::potsense_r()
 {
 	return m_potsense & ~m_potmask;
 }
 
-WRITE8_MEMBER(flyball_state::potmask_w)
+void flyball_state::potmask_w(uint8_t data)
 {
 	m_potmask |= data & 0xf;
 }
 
-WRITE8_MEMBER(flyball_state::pitcher_pic_w)
+void flyball_state::pitcher_pic_w(uint8_t data)
 {
 	m_pitcher_pic = data & 0xf;
 }
 
-WRITE8_MEMBER(flyball_state::ball_vert_w)
+void flyball_state::ball_vert_w(uint8_t data)
 {
 	m_ball_vert = data;
 }
 
-WRITE8_MEMBER(flyball_state::ball_horz_w)
+void flyball_state::ball_horz_w(uint8_t data)
 {
 	m_ball_horz = data;
 }
 
-WRITE8_MEMBER(flyball_state::pitcher_vert_w)
+void flyball_state::pitcher_vert_w(uint8_t data)
 {
 	m_pitcher_vert = data;
 }
 
-WRITE8_MEMBER(flyball_state::pitcher_horz_w)
+void flyball_state::pitcher_horz_w(uint8_t data)
 {
 	m_pitcher_horz = data;
 }
 
-WRITE8_MEMBER(flyball_state::misc_w)
+void flyball_state::misc_w(offs_t offset, uint8_t data)
 {
 	// address and data lines passed through inverting buffers
 	m_outlatch->write_d0(~offset, ~data);
@@ -317,7 +327,7 @@ void flyball_state::flyball_map(address_map &map)
 	map(0x0900, 0x0900).w(FUNC(flyball_state::potmask_w));
 	map(0x0a00, 0x0a07).w(FUNC(flyball_state::misc_w));
 	map(0x0b00, 0x0b00).r(FUNC(flyball_state::input_r));
-	map(0x0d00, 0x0eff).writeonly().share("playfield_ram");
+	map(0x0d00, 0x0eff).writeonly().share("playfield_ram").nopr();
 	map(0x1000, 0x1fff).rom().region("maincpu", 0);
 }
 
@@ -358,6 +368,12 @@ static INPUT_PORTS_START( flyball )
 	PORT_START("IN1") /* IN5 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0xFE, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("BAT_VOL")
+	PORT_ADJUSTER( 50, "Bat Volume" )  NETLIST_ANALOG_PORT_CHANGED("sound_nl", "bat_volume")
+
+	PORT_START("MAIN_VOL")
+	PORT_ADJUSTER( 50, "Main Volume" )  NETLIST_ANALOG_PORT_CHANGED("sound_nl", "main_volume")
 INPUT_PORTS_END
 
 
@@ -467,18 +483,16 @@ void flyball_state::flyball(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &flyball_state::flyball_map);
 
 	F9334(config, m_outlatch); // F7
-	m_outlatch->q_out_cb<2>().set_nop(); // bat hit
-	m_outlatch->q_out_cb<3>().set_nop(); // crowd soft-loud
-	m_outlatch->q_out_cb<4>().set_nop(); // crowd off-on
-	m_outlatch->q_out_cb<5>().set_nop(); // footstep off-on
-	m_outlatch->q_out_cb<6>().set_nop(); // crowd very loud
+	m_outlatch->q_out_cb<2>().set(m_bat_sound, FUNC(netlist_mame_logic_input_device::write));
+	m_outlatch->q_out_cb<3>().set(m_crowd_sl, FUNC(netlist_mame_logic_input_device::write));
+	m_outlatch->q_out_cb<4>().set(m_crowd_on, FUNC(netlist_mame_logic_input_device::write));
+	m_outlatch->q_out_cb<5>().set(m_footstep, FUNC(netlist_mame_logic_input_device::write));
+	m_outlatch->q_out_cb<6>().set(m_crowd_vl, FUNC(netlist_mame_logic_input_device::write));
 	m_outlatch->q_out_cb<7>().set(FUNC(flyball_state::lamp_w)); // 1 player lamp
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_size(256, 262);
-	m_screen->set_visarea(0, 255, 0, 239);
+	m_screen->set_raw(PIXEL_CLOCK, 384, 0, 256, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(flyball_state::screen_update));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
@@ -487,6 +501,21 @@ void flyball_state::flyball(machine_config &config)
 	PALETTE(config, m_palette, FUNC(flyball_state::flyball_palette), 4);
 
 	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+
+	NETLIST_SOUND(config, "sound_nl", 48000)
+		.set_source(NETLIST_NAME(flyball))
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	NETLIST_LOGIC_INPUT(config, "sound_nl:bat_sound", "BAT_SOUND.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:footstep", "FOOTSTEP.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:crowd_sl", "CROWD_SL.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:crowd_on", "CROWD_ON.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:crowd_vl", "CROWD_VL.IN", 0);
+	NETLIST_ANALOG_INPUT(config, "sound_nl:bat_volume", "R75.DIAL");
+	NETLIST_ANALOG_INPUT(config, "sound_nl:main_volume", "R95.DIAL");
+
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(1.0 / 0.13, -(1.0 / 0.13) * 0.78);
 }
 
 
@@ -547,5 +576,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1976, flyball,  0,       flyball, flyball, flyball_state, empty_init, 0, "Atari", "Flyball (rev 2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1976, flyball1, flyball, flyball, flyball, flyball_state, empty_init, 0, "Atari", "Flyball (rev 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1976, flyball,  0,       flyball, flyball, flyball_state, empty_init, 0, "Atari", "Flyball (rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1976, flyball1, flyball, flyball, flyball, flyball_state, empty_init, 0, "Atari", "Flyball (rev 1)", MACHINE_SUPPORTS_SAVE )

@@ -31,34 +31,34 @@ public:
 	void security_decrypt();
 
 private:
-	DECLARE_WRITE8_MEMBER(p1_w);
-	DECLARE_WRITE8_MEMBER(p3_w);
-	DECLARE_READ8_MEMBER(ext_r);
-	DECLARE_WRITE8_MEMBER(ext_w);
+	void p1_w(uint8_t data);
+	void p3_w(uint8_t data);
+	uint8_t ext_r(offs_t offset);
+	void ext_w(offs_t offset, uint8_t data);
 
 	void i8031_mem(address_map &map);
 	void i8031_ext_mem(address_map &map);
 };
 
-WRITE8_MEMBER(dynamoah_state::p1_w)
+void dynamoah_state::p1_w(uint8_t data)
 {
 	if (data != 0x1f)
 		LOG("%s: P1 = %02X\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(dynamoah_state::p3_w)
+void dynamoah_state::p3_w(uint8_t data)
 {
 	LOG("%s: P3 = %02X\n", machine().describe_context(), data);
 }
 
-READ8_MEMBER(dynamoah_state::ext_r)
+uint8_t dynamoah_state::ext_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 		LOG("%s: RD(%04X)\n", machine().describe_context(), offset);
 	return 0xff;
 }
 
-WRITE8_MEMBER(dynamoah_state::ext_w)
+void dynamoah_state::ext_w(offs_t offset, uint8_t data)
 {
 	LOG("%s: WR(%04X, %02X)\n", machine().describe_context(), offset, data);
 }

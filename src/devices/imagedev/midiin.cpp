@@ -26,7 +26,7 @@ midiin_device::midiin_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, MIDIIN, tag, owner, clock),
 		device_image_interface(mconfig, *this),
 		device_serial_interface(mconfig, *this),
-		m_midi(nullptr),
+		m_midi(),
 		m_timer(nullptr),
 		m_input_cb(*this),
 		m_xmit_read(0),
@@ -43,7 +43,7 @@ void midiin_device::device_start()
 {
 	m_input_cb.resolve_safe();
 	m_timer = timer_alloc(0);
-	m_midi = nullptr;
+	m_midi.reset();
 	m_timer->enable(false);
 }
 
@@ -68,7 +68,7 @@ void midiin_device::device_timer(emu_timer &timer, device_timer_id id, int param
 		uint8_t buf[8192*4];
 		int bytesRead;
 
-		if (m_midi == nullptr) {
+		if (!m_midi) {
 			return;
 		}
 
@@ -91,14 +91,13 @@ void midiin_device::device_timer(emu_timer &timer, device_timer_id id, int param
     call_load
 -------------------------------------------------*/
 
-image_init_result midiin_device::call_load(void)
+image_init_result midiin_device::call_load()
 {
 	m_midi = machine().osd().create_midi_device();
 
 	if (!m_midi->open_input(filename()))
 	{
-		global_free(m_midi);
-		m_midi = nullptr;
+		m_midi.reset();
 		return image_init_result::FAIL;
 	}
 
@@ -111,15 +110,14 @@ image_init_result midiin_device::call_load(void)
     call_unload
 -------------------------------------------------*/
 
-void midiin_device::call_unload(void)
+void midiin_device::call_unload()
 {
 	if (m_midi)
 	{
 		m_midi->close();
-		global_free(m_midi);
 	}
-		m_timer->enable(false);
-		m_midi = nullptr;
+	m_midi.reset();
+	m_timer->enable(false);
 }
 
 void midiin_device::tra_complete()

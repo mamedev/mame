@@ -94,7 +94,7 @@ private:
 
 	// address space configurations
 	const address_space_config      m_space_config;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache m_cache;
 
 	inline uint8_t readbyte(offs_t address);
 	inline void writebyte(offs_t address, uint8_t m_data);

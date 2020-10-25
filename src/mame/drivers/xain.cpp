@@ -205,18 +205,18 @@ TIMER_DEVICE_CALLBACK_MEMBER(xain_state::scanline)
 		m_vblank = 0;
 }
 
-WRITE8_MEMBER(xain_state::cpuA_bankswitch_w)
+void xain_state::cpuA_bankswitch_w(uint8_t data)
 {
 	m_pri = data & 0x7;
 	m_rom_banks[0]->set_entry((data >> 3) & 1);
 }
 
-WRITE8_MEMBER(xain_state::cpuB_bankswitch_w)
+void xain_state::cpuB_bankswitch_w(uint8_t data)
 {
 	m_rom_banks[1]->set_entry(data & 1);
 }
 
-WRITE8_MEMBER(xain_state::main_irq_w)
+void xain_state::main_irq_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -235,12 +235,12 @@ WRITE8_MEMBER(xain_state::main_irq_w)
 	}
 }
 
-WRITE8_MEMBER(xain_state::irqA_assert_w)
+void xain_state::irqA_assert_w(uint8_t data)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(xain_state::irqB_clear_w)
+void xain_state::irqB_clear_w(uint8_t data)
 {
 	m_subcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
@@ -265,7 +265,7 @@ CUSTOM_INPUT_MEMBER(xain_state::mcu_status_r)
 			((m_mcu && (CLEAR_LINE != m_mcu->host_semaphore_r())) ? 0x00 : 0x02);
 }
 
-READ8_MEMBER(xain_state::mcu_comm_reset_r)
+uint8_t xain_state::mcu_comm_reset_r()
 {
 	if (m_mcu.found() && !machine().side_effects_disabled())
 	{
@@ -282,19 +282,19 @@ READ8_MEMBER(xain_state::mcu_comm_reset_r)
 
 ***************************************************************************/
 
-template <unsigned N> WRITE8_MEMBER(xain_state::bgram_w)
+template <unsigned N> void xain_state::bgram_w(offs_t offset, uint8_t data)
 {
 	m_bgram[N][offset] = data;
 	m_bg_tilemaps[N]->mark_tile_dirty(offset & 0x3ff);
 }
 
-template <unsigned N> WRITE8_MEMBER(xain_state::scrollx_w)
+template <unsigned N> void xain_state::scrollx_w(offs_t offset, uint8_t data)
 {
 	m_scrollx[N][offset] = data;
 	m_bg_tilemaps[N]->set_scrollx(0, m_scrollx[N][0] | (m_scrollx[N][1] << 8));
 }
 
-template <unsigned N> WRITE8_MEMBER(xain_state::scrolly_w)
+template <unsigned N> void xain_state::scrolly_w(offs_t offset, uint8_t data)
 {
 	m_scrolly[N][offset] = data;
 	m_bg_tilemaps[N]->set_scrolly(0, m_scrolly[N][0] | (m_scrolly[N][1] << 8));

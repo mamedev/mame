@@ -119,7 +119,7 @@ void cdp1864_device::device_start()
 	initialize_palette();
 
 	// create sound stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
+	m_stream = stream_alloc(0, 1, SAMPLE_RATE_OUTPUT_ADAPTIVE);
 
 	// allocate timers
 	m_int_timer = timer_alloc(TIMER_INT);
@@ -257,36 +257,31 @@ void cdp1864_device::device_timer(emu_timer &timer, device_timer_id id, int para
 //  our sound stream
 //-------------------------------------------------
 
-void cdp1864_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void cdp1864_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	// reset the output stream
-	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
-
-	int16_t signal = m_signal;
-	stream_sample_t *buffer = outputs[0];
-
-	memset( buffer, 0, samples * sizeof(*buffer) );
+	stream_buffer::sample_t signal = m_signal;
+	auto &buffer = outputs[0];
 
 	if (m_aoe)
 	{
 		double frequency = unscaled_clock() / 8 / 4 / (m_latch + 1) / 2;
-		int rate = machine().sample_rate() / 2;
+		int rate = buffer.sample_rate() / 2;
 
 		/* get progress through wave */
 		int incr = m_incr;
 
 		if (signal < 0)
 		{
-			signal = -0x7fff;
+			signal = -1.0;
 		}
 		else
 		{
-			signal = 0x7fff;
+			signal = 1.0;
 		}
 
-		while( samples-- > 0 )
+		for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
 		{
-			*buffer++ = signal;
+			buffer.put(sampindex, signal);
 			incr -= frequency;
 			while( incr < 0 )
 			{
@@ -299,6 +294,8 @@ void cdp1864_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		m_incr = incr;
 		m_signal = signal;
 	}
+	else
+		buffer.fill(0);
 }
 
 
@@ -378,7 +375,7 @@ void cdp1864_device::dma_w(uint8_t data)
 			color = (gdata << 2) | (bdata << 1) | rdata;
 		}
 
-		m_bitmap.pix32(y, sx + x) = m_palette[color];
+		m_bitmap.pix(y, sx + x) = m_palette[color];
 
 		data <<= 1;
 	}

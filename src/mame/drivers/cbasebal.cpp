@@ -32,7 +32,7 @@
  *
  *************************************/
 
-WRITE8_MEMBER(cbasebal_state::cbasebal_bankswitch_w)
+void cbasebal_state::cbasebal_bankswitch_w(uint8_t data)
 {
 	/* bits 0-4 select ROM bank */
 	//logerror("%04x: bankswitch %02x\n", m_maincpu->pc(), data);
@@ -46,40 +46,40 @@ WRITE8_MEMBER(cbasebal_state::cbasebal_bankswitch_w)
 }
 
 
-READ8_MEMBER(cbasebal_state::bankedram_r)
+uint8_t cbasebal_state::bankedram_r(offs_t offset)
 {
 	switch (m_rambank)
 	{
 	case 2:
-		return cbasebal_textram_r(space, offset);   /* VRAM */
+		return cbasebal_textram_r(offset);   /* VRAM */
 	case 1:
 		if (offset < 0x800)
 			return m_palette->basemem().read8(offset);
 		else
 			return 0;
 	default:
-		return cbasebal_scrollram_r(space, offset); /* SCROLL */
+		return cbasebal_scrollram_r(offset); /* SCROLL */
 	}
 }
 
-WRITE8_MEMBER(cbasebal_state::bankedram_w)
+void cbasebal_state::bankedram_w(offs_t offset, uint8_t data)
 {
 	switch (m_rambank)
 	{
 	case 2:
-		cbasebal_textram_w(space, offset, data);
+		cbasebal_textram_w(offset, data);
 		break;
 	case 1:
 		if (offset < 0x800)
 			m_palette->write8(offset, data);
 		break;
 	default:
-		cbasebal_scrollram_w(space, offset, data);
+		cbasebal_scrollram_w(offset, data);
 		break;
 	}
 }
 
-WRITE8_MEMBER(cbasebal_state::cbasebal_coinctrl_w)
+void cbasebal_state::cbasebal_coinctrl_w(uint8_t data)
 {
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x04);
 	machine().bookkeeping().coin_lockout_w(1, ~data & 0x08);

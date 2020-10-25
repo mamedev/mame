@@ -64,8 +64,8 @@ protected:
 	void cpe_set_register(int r, int v);
 	int load_cpe(std::vector<uint8_t> buffer);
 	int load_psf(std::vector<uint8_t> buffer);
-	DECLARE_READ16_MEMBER(parallel_r);
-	DECLARE_WRITE16_MEMBER(parallel_w);
+	uint16_t parallel_r(offs_t offset);
+	void parallel_w(offs_t offset, uint16_t data);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_exe);
 	void cd_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	void cd_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
@@ -416,11 +416,11 @@ int psx1_state::load_psf(std::vector<uint8_t> buffer)
 	return 0;
 }
 
-READ16_MEMBER(psx1_state::parallel_r)
+uint16_t psx1_state::parallel_r(offs_t offset)
 {
 	if (m_parallel->hascard())
 	{
-		uint16_t dat = m_parallel->exp_r(space,offset,mem_mask);
+		uint16_t dat = m_parallel->exp_r(offset);
 		return dat;
 	}
 
@@ -447,11 +447,11 @@ READ16_MEMBER(psx1_state::parallel_r)
 	return 0;
 }
 
-WRITE16_MEMBER(psx1_state::parallel_w)
+void psx1_state::parallel_w(offs_t offset, uint16_t data)
 {
 	if (m_parallel->hascard())
 	{
-		m_parallel->exp_w(space,offset,data, mem_mask);
+		m_parallel->exp_w(offset, data);
 		return;
 	}
 

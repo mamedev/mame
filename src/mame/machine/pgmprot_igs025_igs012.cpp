@@ -107,7 +107,7 @@ static const u8 drgw2_source_data[0x08][0xec] =
 
 void pgm_012_025_state::drgw2_common_init()
 {
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xd80000, 0xd80003, read16_delegate(*m_igs025, FUNC(igs025_device::killbld_igs025_prot_r)), write16_delegate(*m_igs025, FUNC(igs025_device::drgw2_d80000_protection_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xd80000, 0xd80003, read16sm_delegate(*m_igs025, FUNC(igs025_device::killbld_igs025_prot_r)), write16sm_delegate(*m_igs025, FUNC(igs025_device::drgw2_d80000_protection_w)));
 
 	m_igs025->m_kb_source_data = drgw2_source_data;
 
@@ -177,6 +177,21 @@ void pgm_012_025_state::init_drgw2c()
 	mem16[0x1303bc / 2] = 0x4e93;
 	mem16[0x130462 / 2] = 0x4e93;
 	mem16[0x1304f2 / 2] = 0x4e93;
+}
+
+void pgm_012_025_state::init_drgw2c101()
+{
+	u16 *mem16 = (u16 *)memregion("maincpu")->base();
+
+	drgw2_common_init();
+
+	const int region = 0x05;
+	m_igs025->m_kb_region = region;
+	m_igs025->m_kb_game_id = region | (region << 8) | (region << 16) | (region << 24);
+
+	mem16[0x1306e4 / 2] = 0x4e93;
+	mem16[0x13078a / 2] = 0x4e93;
+	mem16[0x13081a / 2] = 0x4e93;
 }
 
 void pgm_012_025_state::init_drgw2j()

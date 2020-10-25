@@ -64,19 +64,19 @@ void docastle_state::docastle_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(docastle_state::docastle_videoram_w)
+void docastle_state::docastle_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_do_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(docastle_state::docastle_colorram_w)
+void docastle_state::docastle_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_do_tilemap->mark_tile_dirty(offset);
 }
 
-READ8_MEMBER(docastle_state::inputs_flipscreen_r)
+uint8_t docastle_state::inputs_flipscreen_r(offs_t offset)
 {
 	// inputs pass through LS244 non-inverting buffer
 	uint8_t buf = (m_inp[1]->read_h() << 4) | m_inp[0]->read_h();
@@ -89,7 +89,7 @@ READ8_MEMBER(docastle_state::inputs_flipscreen_r)
 	return buf;
 }
 
-WRITE8_MEMBER(docastle_state::flipscreen_w)
+void docastle_state::flipscreen_w(offs_t offset, uint8_t data)
 {
 	flip_screen_set(BIT(offset, 7));
 }

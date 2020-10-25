@@ -57,8 +57,8 @@ protected:
 
 private:
 	address_space_config m_program_config;
-	address_space *m_program;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 
 	int m_icount;
 

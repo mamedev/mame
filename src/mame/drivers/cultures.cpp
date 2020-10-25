@@ -68,10 +68,10 @@ public:
 	int      m_irq_enable;
 	int      m_bg1_bank;
 	int      m_bg2_bank;
-	DECLARE_WRITE8_MEMBER(cpu_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(bg0_videoram_w);
-	DECLARE_WRITE8_MEMBER(misc_w);
-	DECLARE_WRITE8_MEMBER(bg_bank_w);
+	void cpu_bankswitch_w(uint8_t data);
+	void bg0_videoram_w(offs_t offset, uint8_t data);
+	void misc_w(uint8_t data);
+	void bg_bank_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
@@ -154,26 +154,26 @@ uint32_t cultures_state::screen_update_cultures(screen_device &screen, bitmap_in
 	return 0;
 }
 
-WRITE8_MEMBER(cultures_state::cpu_bankswitch_w)
+void cultures_state::cpu_bankswitch_w(uint8_t data)
 {
 	m_prgbank->set_entry(data & 0x0f);
 	m_vrambank->set_bank((data & 0x20)>>5);
 }
 
 
-WRITE8_MEMBER(cultures_state::bg0_videoram_w)
+void cultures_state::bg0_videoram_w(offs_t offset, uint8_t data)
 {
 	m_bg0_videoram[offset] = data;
 	m_bg0_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-WRITE8_MEMBER(cultures_state::misc_w)
+void cultures_state::misc_w(uint8_t data)
 {
 	m_okibank->set_entry(data&0x0f);
 	m_irq_enable = data & 0x80;
 }
 
-WRITE8_MEMBER(cultures_state::bg_bank_w)
+void cultures_state::bg_bank_w(uint8_t data)
 {
 	if (m_bg1_bank != (data & 3))
 	{

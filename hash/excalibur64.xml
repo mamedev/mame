@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="excalibur64" description="Excalibur 64 floppies">
+
+	<software name="boot">
+		<description>Boot disk</description>
+		<year>1984</year>
+		<publisher>BGR Computers</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="860416">
+				<rom name="excalibur_cpm_system.dsk" size="860416" crc="a74a850e" sha1="6f66edcc2f22c0f06eca45f576c3b6bda4e9eacb"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

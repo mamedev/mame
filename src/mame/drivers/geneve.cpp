@@ -197,11 +197,11 @@
 #define LOG_READ     (1U<<6)
 #define LOG_READG    (1U<<7)
 #define LOG_WRITE    (1U<<8)
-#define LOG_SETTING  (1U<<9)
+#define LOG_CONFIG   (1U<<9)
 #define LOG_PFM      (1U<<10)
 
 // Minimum log should be settings and warnings
-#define VERBOSE ( LOG_GENERAL | LOG_SETTING | LOG_WARN )
+#define VERBOSE ( LOG_GENERAL | LOG_CONFIG | LOG_WARN )
 
 #include "logmacro.h"
 
@@ -209,6 +209,9 @@
 #define GENEVE_SRAMX_TAG "sramexp"
 #define GENEVE_DRAM_TAG  "dram"
 #define GENEVE_CLOCK_TAG "mm58274c"
+#define GENEVE_SOUNDCHIP_TAG   "soundchip"
+#define GENEVE_TMS9901_TAG     "tms9901"
+#define GENEVE_SCREEN_TAG      "screen"
 
 enum
 {
@@ -233,9 +236,9 @@ public:
 	geneve_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_cpu(*this, "maincpu"),
-		m_tms9901(*this, TI_TMS9901_TAG),
-		m_sound(*this, TI_SOUNDCHIP_TAG),
-		m_video(*this, TI_VDP_TAG),
+		m_tms9901(*this, GENEVE_TMS9901_TAG),
+		m_sound(*this, GENEVE_SOUNDCHIP_TAG),
+		m_video(*this, TIGEN_V9938_TAG),
 		m_rtc(*this, GENEVE_CLOCK_TAG),
 		m_dram(*this, GENEVE_DRAM_TAG),
 		m_sram(*this, GENEVE_SRAM_TAG),
@@ -333,8 +336,8 @@ private:
 	// Memory bus
 	void setaddress_debug(bool debug, offs_t address, uint8_t busctrl);
 	void setaddress(offs_t address, uint8_t busctrl);
-	DECLARE_READ8_MEMBER( memread );
-	DECLARE_WRITE8_MEMBER( memwrite );
+	uint8_t memread(offs_t offset);
+	void memwrite(offs_t offset, uint8_t data);
 
 	void crumap(address_map &map);
 	void memmap(address_map &map);
@@ -381,13 +384,13 @@ void geneve_state::memmap_setaddress(address_map &map)
     The TMS9901 is fully decoded, no mirroring, so we have 32 bits for it,
     and the rest goes to the board (and from there to the PEB)
     TMS9995 has a full 15-bit CRU bit address space (attached to A0-A14)
+
+    We cannot use the map because there is a least one card (sidmaster) that
+    activates itself when no other device is selected.
 */
 void geneve_state::crumap(address_map &map)
 {
 	map(0x0000, 0xffff).rw(FUNC(geneve_state::cruread), FUNC(geneve_state::cruwrite));
-	map(0x1ee0, 0x1eff).w(m_gatearray, FUNC(bus::ti99::internal::geneve_gate_array_device::cru_ctrl_write));
-	map(0x13c0, 0x13cf).w(m_gatearray, FUNC(bus::ti99::internal::geneve_gate_array_device::cru_sstep_write));
-	map(0x0000, 0x003f).rw(m_tms9901, FUNC(tms9901_device::read), FUNC(tms9901_device::write));
 }
 
 static INPUT_PORTS_START(geneve_common)
@@ -443,12 +446,12 @@ INPUT_CHANGED_MEMBER( geneve_state::setgm_changed )
 	{
 	case 1:
 		// Turbo switch. May be changed at any time.
-		LOGMASKED(LOG_SETTING, "Setting turbo flag to %d\n", value);
+		LOGMASKED(LOG_CONFIG, "Setting turbo flag to %d\n", value);
 		m_genmod_decoder->set_turbo(value!=0);
 		break;
 	case 2:
 		// TIMode switch. Causes reset when changed.
-		LOGMASKED(LOG_SETTING, "Setting timode flag to %d\n", value);
+		LOGMASKED(LOG_CONFIG, "Setting timode flag to %d\n", value);
 		m_genmod_decoder->set_timode(value!=0);
 		machine().schedule_hard_reset();
 		break;
@@ -506,7 +509,7 @@ void geneve_state::setaddress_debug(bool debug, offs_t address, uint8_t busctrl)
 	}
 }
 
-READ8_MEMBER( geneve_state::memread )
+uint8_t geneve_state::memread(offs_t offset)
 {
 	uint8_t value = 0;
 	offs_t sramadd;
@@ -617,7 +620,7 @@ READ8_MEMBER( geneve_state::memread )
 	return value;
 }
 
-WRITE8_MEMBER( geneve_state::memwrite )
+void geneve_state::memwrite(offs_t offset, uint8_t data)
 {
 	offs_t sramadd = 0;
 	offs_t dramadd = 0;
@@ -815,18 +818,36 @@ void geneve_state::write_pfm(offs_t offset, uint8_t data)
     CRU handling
 *****************************************************************************/
 
-// TODO: change peribox::cruwrite to make this obsolete
-
 void geneve_state::cruwrite(offs_t offset, uint8_t data)
 {
-	m_peribox->cruwrite(offset << 1, data);
+	offs_t cruaddr = offset << 1;
+
+	// 9901 access: 0000..003e (fully decoded)
+	if ((cruaddr & 0xffc0)==0)
+		m_tms9901->write(offset & 0x1f, data);
+
+	// Gate array: 13c0..13ce (Single step), write only
+	if ((cruaddr & 0xfff0)==0x13c0)
+		m_gatearray->cru_sstep_write(offset, data);
+
+	// Gate array: 1ee0..1efe (mirror of 9995-internal flags), write only
+	if ((cruaddr & 0xffe0)==0x1ee0)
+		m_gatearray->cru_ctrl_write(offset, data);
+
+	// Rest of the system
+	m_peribox->cruwrite(cruaddr, data);
 }
 
 uint8_t geneve_state::cruread(offs_t offset)
 {
+	offs_t cruaddr = offset << 1;
 	uint8_t value = 0;
+	// 9901 access: 0000..003e (fully decoded)
+	if ((cruaddr & 0xffc0)==0)
+		value = m_tms9901->read(offset & 0x3f);
+
 	// Propagate the CRU access to external devices
-	m_peribox->crureadz(offset << 1, &value);
+	m_peribox->crureadz(cruaddr, &value);
 	return value;
 }
 
@@ -1083,7 +1104,7 @@ void geneve_state::machine_reset()
 	// Configuring the VRAM size
 	uint32_t videoram = (ioport("VRAM")->read()!=0)? 0x30000 : 0x20000;
 	m_video->set_vram_size(videoram);
-	LOGMASKED(LOG_SETTING, "Video RAM set to %d KiB\n", videoram / 1024);
+	LOGMASKED(LOG_CONFIG, "Video RAM set to %d KiB\n", videoram / 1024);
 
 	// Check which boot EPROM we are using (or PFM)
 	m_eprom = memregion("maincpu")->base();
@@ -1147,11 +1168,11 @@ void geneve_state::geneve_common(machine_config &config)
 	m_cpu->clkout_cb().set(FUNC(geneve_state::clock_out));
 
 	// Video hardware
-	v99x8_device& video(V9938(config, TI_VDP_TAG, XTAL(21'477'272))); // typical 9938 clock, not verified
+	v99x8_device& video(V9938(config, TIGEN_V9938_TAG, XTAL(21'477'272))); // typical 9938 clock, not verified
 	video.set_vram_size(0x20000);
 	video.int_cb().set(FUNC(geneve_state::int2_from_v9938));
-	video.set_screen(TI_SCREEN_TAG);
-	screen_device& screen(SCREEN(config, TI_SCREEN_TAG, SCREEN_TYPE_RASTER));
+	video.set_screen(GENEVE_SCREEN_TAG);
+	screen_device& screen(SCREEN(config, GENEVE_SCREEN_TAG, SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(21'477'272), \
 		v99x8_device::HTOTAL, \
 		0, \
@@ -1159,7 +1180,7 @@ void geneve_state::geneve_common(machine_config &config)
 		v99x8_device::VTOTAL_NTSC * 2, \
 		v99x8_device::VERTICAL_ADJUST * 2, \
 		v99x8_device::VVISIBLE_NTSC * 2 - 1 - v99x8_device::VERTICAL_ADJUST * 2);
-	screen.set_screen_update(TI_VDP_TAG, FUNC(v99x8_device::screen_update));
+	screen.set_screen_update(TIGEN_V9938_TAG, FUNC(v99x8_device::screen_update));
 
 	// Main board components
 	TMS9901(config, m_tms9901, 0);

@@ -89,7 +89,7 @@ void shangha3_state::video_start()
 
 
 
-WRITE8_MEMBER(shangha3_state::flipscreen_w)
+void shangha3_state::flipscreen_w(uint8_t data)
 {
 	/* bit 7 flips screen, the rest seems to always be set to 0x7e */
 	flip_screen_set(data & 0x80);
@@ -97,13 +97,13 @@ WRITE8_MEMBER(shangha3_state::flipscreen_w)
 	if ((data & 0x7f) != 0x7e) popmessage("flipscreen_w %02x",data);
 }
 
-WRITE16_MEMBER(shangha3_state::gfxlist_addr_w)
+void shangha3_state::gfxlist_addr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_gfxlist_addr);
 }
 
 
-WRITE16_MEMBER(shangha3_state::blitter_go_w)
+void shangha3_state::blitter_go_w(uint16_t data)
 {
 	uint16_t *shangha3_ram = m_ram;
 	bitmap_ind16 &rawbitmap = m_rawbitmap;

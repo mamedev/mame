@@ -92,10 +92,10 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_READ8_MEMBER(blitter_status_r);
-	DECLARE_WRITE8_MEMBER(blitter_cmd_w);
-	DECLARE_WRITE8_MEMBER(sound_latch_w);
-	DECLARE_WRITE8_MEMBER(ball_w);
+	uint8_t blitter_status_r();
+	void blitter_cmd_w(offs_t offset, uint8_t data);
+	void sound_latch_w(uint8_t data);
+	void ball_w(uint8_t data);
 
 	void roul_palette(palette_device &palette) const;
 
@@ -145,7 +145,7 @@ void roul_state::roul_palette(palette_device &palette) const
 	}
 }
 
-READ8_MEMBER(roul_state::blitter_status_r)
+uint8_t roul_state::blitter_status_r()
 {
 /*
 code check bit 6 and bit 7
@@ -157,7 +157,7 @@ bit 6 -> ??? (after unknown blitter command : [80][80][08][02])
 	return machine().rand() & 0x00c0;
 }
 
-WRITE8_MEMBER(roul_state::blitter_cmd_w)
+void roul_state::blitter_cmd_w(offs_t offset, uint8_t data)
 {
 	m_reg[offset] = data;
 	if (offset==2)
@@ -198,13 +198,13 @@ WRITE8_MEMBER(roul_state::blitter_cmd_w)
 
 }
 
-WRITE8_MEMBER(roul_state::sound_latch_w)
+void roul_state::sound_latch_w(uint8_t data)
 {
 	m_soundlatch->write(data & 0xff);
 	m_soundcpu->set_input_line(0, HOLD_LINE);
 }
 
-WRITE8_MEMBER(roul_state::ball_w)
+void roul_state::ball_w(uint8_t data)
 {
 	int lamp = data;
 
@@ -255,10 +255,9 @@ void roul_state::video_start()
 
 uint32_t roul_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int i,j;
-	for (i = 0; i < 256; i++)
-		for (j = 0; j < 256; j++)
-			bitmap.pix16(j, i) = m_videobuf[j * 256 + 255 - i];
+	for (int i = 0; i < 256; i++)
+		for (int j = 0; j < 256; j++)
+			bitmap.pix(j, i) = m_videobuf[j * 256 + 255 - i];
 	return 0;
 }
 

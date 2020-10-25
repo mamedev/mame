@@ -77,41 +77,41 @@ VIDEO_START_MEMBER(slapfght_state, slapfight)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(slapfght_state::videoram_w)
+void slapfght_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_pf1_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(slapfght_state::colorram_w)
+void slapfght_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_pf1_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(slapfght_state::fixram_w)
+void slapfght_state::fixram_w(offs_t offset, uint8_t data)
 {
 	m_fixvideoram[offset] = data;
 	m_fix_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(slapfght_state::fixcol_w)
+void slapfght_state::fixcol_w(offs_t offset, uint8_t data)
 {
 	m_fixcolorram[offset] = data;
 	m_fix_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(slapfght_state::scrollx_lo_w)
+void slapfght_state::scrollx_lo_w(uint8_t data)
 {
 	m_scrollx_lo = data;
 }
 
-WRITE8_MEMBER(slapfght_state::scrollx_hi_w)
+void slapfght_state::scrollx_hi_w(uint8_t data)
 {
 	m_scrollx_hi = data;
 }
 
-WRITE8_MEMBER(slapfght_state::scrolly_w)
+void slapfght_state::scrolly_w(uint8_t data)
 {
 	m_scrolly = data;
 }

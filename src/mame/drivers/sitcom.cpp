@@ -71,13 +71,12 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(update_buttons);
 
 protected:
-	template <unsigned D> DECLARE_WRITE16_MEMBER(update_ds) { m_digits[(D << 2) | offset] = data; }
+	template <unsigned D> void update_ds(offs_t offset, uint16_t data) { m_digits[(D << 2) | offset] = data; }
 	DECLARE_WRITE_LINE_MEMBER(update_rxd)                   { m_rxd = bool(state); }
-	DECLARE_WRITE_LINE_MEMBER(sod_led)                      { output().set_value("sod_led", state); }
 	DECLARE_READ_LINE_MEMBER(sid_line)                      { return m_rxd ? 1 : 0; }
 
-	virtual DECLARE_WRITE8_MEMBER(update_ppi_pa);
-	virtual DECLARE_WRITE8_MEMBER(update_ppi_pb);
+	virtual void update_ppi_pa(uint8_t data);
+	virtual void update_ppi_pb(uint8_t data);
 
 	void sitcom_bank(address_map &map);
 	void sitcom_io(address_map &map);
@@ -109,6 +108,7 @@ public:
 		, m_speed(*this, "SPEED")
 		, m_ppi(*this, "ppi")
 		, m_ds2(*this, "ds2")
+		, m_test_led(*this, "test_led")
 		, m_shutter_timer(nullptr)
 		, m_shutter(false)
 		, m_dac_cs(true)
@@ -123,8 +123,8 @@ public:
 	void sitcomtmr(machine_config &config);
 
 protected:
-	virtual DECLARE_WRITE8_MEMBER(update_ppi_pa) override;
-	virtual DECLARE_WRITE8_MEMBER(update_ppi_pb) override;
+	virtual void update_ppi_pa(uint8_t data) override;
+	virtual void update_ppi_pb(uint8_t data) override;
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -136,6 +136,7 @@ protected:
 	required_ioport                 m_speed;
 	required_device<i8255_device>   m_ppi;
 	required_device<dl1414_device>  m_ds2;
+	output_finder<>                 m_test_led;
 	emu_timer                       *m_shutter_timer;
 
 	bool                            m_shutter;
@@ -224,13 +225,13 @@ void sitcom_state::machine_reset()
 	m_bank->set_bank(0);
 }
 
-WRITE8_MEMBER( sitcom_state::update_ppi_pa )
+void sitcom_state::update_ppi_pa(uint8_t data)
 {
 	for (int i = 0; 8 > i; ++i)
 		m_leds[0][i] = BIT(data, i);
 }
 
-WRITE8_MEMBER( sitcom_state::update_ppi_pb )
+void sitcom_state::update_ppi_pb(uint8_t data)
 {
 	for (int i = 0; 8 > i; ++i)
 		m_leds[1][i] = BIT(data, i);
@@ -250,7 +251,7 @@ INPUT_CHANGED_MEMBER( sitcom_state::update_buttons )
 }
 
 
-WRITE8_MEMBER( sitcom_timer_state::update_ppi_pa )
+void sitcom_timer_state::update_ppi_pa(uint8_t data)
 {
 	if (!m_dac_cs && !m_dac_wr)
 		update_dac(data);
@@ -258,7 +259,7 @@ WRITE8_MEMBER( sitcom_timer_state::update_ppi_pa )
 	m_ds2->data_w(data & 0x7f);
 }
 
-WRITE8_MEMBER( sitcom_timer_state::update_ppi_pb )
+void sitcom_timer_state::update_ppi_pb(uint8_t data)
 {
 	if (!m_dac_cs && !BIT(data, 0))
 		update_dac(m_ppi->pa_r());
@@ -267,7 +268,7 @@ WRITE8_MEMBER( sitcom_timer_state::update_ppi_pb )
 
 	m_ds2->wr_w(BIT(data, 2));
 	m_ds2->addr_w(bitswap<2>(data, 3, 4));
-	output().set_value("test_led", BIT(data, 5));
+	m_test_led = BIT(data, 5);
 }
 
 READ_LINE_MEMBER( sitcom_timer_state::shutter_r )
@@ -317,6 +318,8 @@ void sitcom_timer_state::machine_start()
 {
 	sitcom_state::machine_start();
 
+	m_test_led.resolve();
+
 	m_shutter_timer = timer_alloc(TIMER_SHUTTER);
 
 	save_item(NAME(m_shutter));
@@ -354,7 +357,7 @@ void sitcom_state::sitcom(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sitcom_state::sitcom_mem);
 	m_maincpu->set_addrmap(AS_IO, &sitcom_state::sitcom_io);
 	m_maincpu->in_sid_func().set(FUNC(sitcom_state::sid_line));
-	m_maincpu->out_sod_func().set(FUNC(sitcom_state::sod_led));
+	m_maincpu->out_sod_func().set_output("sod_led");
 
 	ADDRESS_MAP_BANK(config, "bank").set_map(&sitcom_state::sitcom_bank).set_options(ENDIANNESS_LITTLE, 8, 16, 0x8000);
 

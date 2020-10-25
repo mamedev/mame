@@ -307,6 +307,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/aquarius_caq.h,FORMATS["AQUARIUS_CAQ"] = true
+--------------------------------------------------
+
+if (FORMATS["AQUARIUS_CAQ"]~=null  or _OPTIONS["with-tools"]) then
+	files {
+		MAME_DIR.. "src/lib/formats/aquarius_caq.cpp",
+		MAME_DIR.. "src/lib/formats/aquarius_caq.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/asst128_dsk.h,FORMATS["ASST128_DSK"] = true
 --------------------------------------------------
 
@@ -823,6 +835,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/fl1_dsk.h,FORMATS["FL1_DSK"] = true
+--------------------------------------------------
+
+if (FORMATS["FL1_DSK"]~=null  or _OPTIONS["with-tools"]) then
+	files {
+		MAME_DIR.. "src/lib/formats/fl1_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/fl1_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/flex_dsk.h,FORMATS["FLEX_DSK"] = true
 --------------------------------------------------
 
@@ -1195,6 +1219,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/mdos_dsk.h,FORMATS["MDOS_DSK"] = true
+--------------------------------------------------
+
+if (FORMATS["MDOS_DSK"]~=null  or _OPTIONS["with-tools"]) then
+	files {
+		MAME_DIR.. "src/lib/formats/mdos_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/mdos_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/mfm_hd.h,FORMATS["MFM_HD"] = true
 --------------------------------------------------
 
@@ -1384,6 +1420,19 @@ if (FORMATS["IBMXDF_DSK"]~=null  or _OPTIONS["with-tools"]) then
 		MAME_DIR.. "src/lib/formats/ibmxdf_dsk.h",
 	}
 end
+
+--------------------------------------------------
+--
+--@src/lib/formats/p2000t_cas.h,FORMATS["P2000T_CAS"] = true
+--------------------------------------------------
+
+if (FORMATS["P2000T_CAS"]~=null  or _OPTIONS["with-tools"]) then
+	files {
+		MAME_DIR.. "src/lib/formats/p2000t_cas.cpp",
+		MAME_DIR.. "src/lib/formats/p2000t_cas.h",
+	}
+end
+
 
 --------------------------------------------------
 --
@@ -1579,6 +1628,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/sdd_dsk.h,FORMATS["SDD_DSK"] = true
+--------------------------------------------------
+
+if (FORMATS["SDD_DSK"]~=null  or _OPTIONS["with-tools"]) then
+	files {
+		MAME_DIR.. "src/lib/formats/sdd_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/sdd_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/sf7000_dsk.h,FORMATS["SF7000_DSK"] = true
 --------------------------------------------------
 
@@ -1694,6 +1755,18 @@ if (FORMATS["SVI_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/svi_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/svi_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/swd_dsk.h,FORMATS["SWD_DSK"] = true
+--------------------------------------------------
+
+if (FORMATS["SWD_DSK"]~=null  or _OPTIONS["with-tools"]) then
+	files {
+		MAME_DIR.. "src/lib/formats/swd_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/swd_dsk.h",
 	}
 end
 

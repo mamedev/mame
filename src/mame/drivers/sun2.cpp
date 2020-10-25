@@ -174,14 +174,14 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ16_MEMBER( mmu_r );
-	DECLARE_WRITE16_MEMBER( mmu_w );
+	uint16_t mmu_r(offs_t offset, uint16_t mem_mask = ~0);
+	void mmu_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t tl_mmu_r(uint8_t fc, offs_t offset, uint16_t mem_mask);
 	void tl_mmu_w(uint8_t fc, offs_t offset, uint16_t data, uint16_t mem_mask);
-	DECLARE_READ16_MEMBER( video_ctrl_r );
-	DECLARE_WRITE16_MEMBER( video_ctrl_w );
-	DECLARE_READ16_MEMBER( ram_r );
-	DECLARE_WRITE16_MEMBER( ram_w );
+	uint16_t video_ctrl_r();
+	void video_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t ram_r(offs_t offset);
+	void ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t ethernet_r();
 	void ethernet_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(ethernet_int_w);
@@ -212,18 +212,18 @@ private:
 	uint8_t m_ethernet_status;
 };
 
-READ16_MEMBER( sun2_state::ram_r )
+uint16_t sun2_state::ram_r(offs_t offset)
 {
 	if (offset < m_ram_size_words) return m_ram_ptr[offset];
 	return 0xffff;
 }
 
-WRITE16_MEMBER( sun2_state::ram_w )
+void sun2_state::ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset < m_ram_size_words) COMBINE_DATA(&m_ram_ptr[offset]);
 }
 
-READ16_MEMBER( sun2_state::mmu_r )
+uint16_t sun2_state::mmu_r(offs_t offset, uint16_t mem_mask)
 {
 	return tl_mmu_r(m_maincpu->get_fc(), offset, mem_mask);
 }
@@ -360,7 +360,7 @@ uint16_t sun2_state::tl_mmu_r(uint8_t fc, offs_t offset, uint16_t mem_mask)
 	return 0xffff;
 }
 
-WRITE16_MEMBER( sun2_state::mmu_w )
+void sun2_state::mmu_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	tl_mmu_w(m_maincpu->get_fc(), offset, data, mem_mask);
 }
@@ -489,12 +489,12 @@ void sun2_state::tl_mmu_w(uint8_t fc, offs_t offset, uint16_t data, uint16_t mem
 }
 
 // BW2 video control
-READ16_MEMBER( sun2_state::video_ctrl_r )
+uint16_t sun2_state::video_ctrl_r()
 {
 	return m_bw2_ctrl;
 }
 
-WRITE16_MEMBER( sun2_state::video_ctrl_w )
+void sun2_state::video_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//printf("sun2: BW2: %x to video_ctrl\n", data);
 	COMBINE_DATA(&m_bw2_ctrl);
@@ -624,29 +624,26 @@ void sun2_state::mbustype3space_map(address_map &map)
 
 uint32_t sun2_state::bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint32_t *scanline;
-	int x, y;
-	uint8_t pixels;
 	static const uint32_t palette[2] = { 0, 0xffffff };
-	uint8_t *m_vram = (uint8_t *)m_bw2_vram.target();
+	uint8_t const *const m_vram = (uint8_t *)m_bw2_vram.target();
 
 	if (!(m_bw2_ctrl & 0x8000)) return 0;
 
-	for (y = 0; y < 900; y++)
+	for (int y = 0; y < 900; y++)
 	{
-		scanline = &bitmap.pix32(y);
-		for (x = 0; x < 1152/8; x++)
+		uint32_t *scanline = &bitmap.pix(y);
+		for (int x = 0; x < 1152/8; x++)
 		{
-			pixels = m_vram[(y * (1152/8)) + (BYTE_XOR_BE(x))];
+			uint8_t const pixels = m_vram[(y * (1152/8)) + (BYTE_XOR_BE(x))];
 
-			*scanline++ = palette[(pixels>>7)&1];
-			*scanline++ = palette[(pixels>>6)&1];
-			*scanline++ = palette[(pixels>>5)&1];
-			*scanline++ = palette[(pixels>>4)&1];
-			*scanline++ = palette[(pixels>>3)&1];
-			*scanline++ = palette[(pixels>>2)&1];
-			*scanline++ = palette[(pixels>>1)&1];
-			*scanline++ = palette[(pixels&1)];
+			*scanline++ = palette[BIT(pixels, 7)];
+			*scanline++ = palette[BIT(pixels, 6)];
+			*scanline++ = palette[BIT(pixels, 5)];
+			*scanline++ = palette[BIT(pixels, 4)];
+			*scanline++ = palette[BIT(pixels, 3)];
+			*scanline++ = palette[BIT(pixels, 2)];
+			*scanline++ = palette[BIT(pixels, 1)];
+			*scanline++ = palette[BIT(pixels, 0)];
 		}
 	}
 

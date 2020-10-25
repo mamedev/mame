@@ -20,9 +20,6 @@ vt61_cpu_device::vt61_cpu_device(const machine_config &mconfig, const char *tag,
 	, m_program_config("microprogram", ENDIANNESS_LITTLE, 16, 10, -1)
 	, m_memory_config("memory", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_idr_config("IDR", ENDIANNESS_LITTLE, 8, 6, 0)
-	, m_program_cache(nullptr)
-	, m_memory_cache(nullptr)
-	, m_idr_cache(nullptr)
 	, m_pc(0)
 	, m_ac(0)
 	, m_mar(0)
@@ -55,9 +52,9 @@ device_memory_interface::space_config_vector vt61_cpu_device::memory_space_confi
 
 void vt61_cpu_device::device_start()
 {
-	m_program_cache = space(AS_PROGRAM).cache<1, -1, ENDIANNESS_LITTLE>();
-	m_memory_cache = space(AS_DATA).cache<0, 0, ENDIANNESS_LITTLE>();
-	m_idr_cache = space(AS_IDR).cache<0, 0, ENDIANNESS_LITTLE>();
+	space(AS_PROGRAM).cache(m_program_cache);
+	space(AS_DATA).cache(m_memory_cache);
+	space(AS_IDR).cache(m_idr_cache);
 
 	set_icountptr(m_icount);
 

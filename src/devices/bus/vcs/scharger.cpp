@@ -109,7 +109,7 @@ inline uint8_t a26_rom_ss_device::read_byte(uint32_t offset)
 		return 0xff;
 }
 
-READ8_MEMBER(a26_rom_ss_device::read_rom)
+uint8_t a26_rom_ss_device::read_rom(offs_t offset)
 {
 	if (machine().side_effects_disabled())
 		return read_byte(offset);

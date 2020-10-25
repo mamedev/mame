@@ -3,7 +3,7 @@
 /* HNG64 Communication / Network CPU */
 
 // this is driven by a KL5C80A12CFP which is basically a super-charged Z80
-// most of this MMU handling etc. should be moved to the core.
+// MMU handling has been moved to the core; the rest is not implemented yet.
 
 // I believe this CPU is used for network only (the racing games) and not related to the I/O MCU
 
@@ -16,106 +16,17 @@
 #include "includes/hng64.h"
 #include "cpu/z80/kl5c80a12.h"
 
-uint8_t hng64_state::read_comm_data(uint32_t offset)
-{
-	if((offset & 0x10000) == 0)
-		return m_comm_rom[offset & 0xffff];
-
-	if(offset & 0x10000)
-		return m_comm_ram[(offset & 0xffff)];
-
-	printf("%08x\n",offset);
-	return 0xff;
-}
-
-void hng64_state::write_comm_data(uint32_t offset,uint8_t data)
-{
-	if((offset & 0x10000) == 0)
-	{
-		//m_comm_rom[offset];
-		return;
-	}
-	if(offset & 0x10000)
-	{
-		m_comm_ram[offset & 0xffff] = data;
-		return;
-	}
-
-
-	printf("%08x %02x\n",offset,data);
-
-}
-
-READ8_MEMBER(hng64_state::hng64_comm_space_r)
-{
-	if((offset & 0xfc00) == 0) // B0 is fixed at 0-0x3ff
-		return m_comm_rom[offset];
-
-	for(int i=0;i<5;i++)
-	{
-		if(offset >= m_mmub[i] && offset <= m_mmub[i+1]-1)
-			return read_comm_data(m_mmua[i]|offset);
-	}
-
-	return 0xff;
-}
-
-WRITE8_MEMBER(hng64_state::hng64_comm_space_w)
-{
-	if((offset & 0xfc00) == 0) // B0 is fixed at 0-0x3ff
-		return;// m_comm_rom[offset];
-
-	for(int i=0;i<5;i++)
-	{
-		if(offset >= m_mmub[i] && offset <= m_mmub[i+1]-1)
-		{
-			write_comm_data(m_mmua[i]|offset,data);
-			return;
-		}
-	}
-}
-
-READ8_MEMBER(hng64_state::hng64_comm_mmu_r)
-{
-	return m_mmu_regs[offset];
-}
-
-#define MMUA (m_mmu_regs[(offset&~1)+0]>>6)|(m_mmu_regs[(offset&~1)+1]<<2)
-#define MMUB (m_mmu_regs[(offset&~1)+0]&0x3f)
-
-WRITE8_MEMBER(hng64_state::hng64_comm_mmu_w)
-{
-	m_mmu_regs[offset] = data;
-
-	/* cheap: avoid to overwrite read only params*/
-	if((offset & 6) == 6)
-	{
-		m_mmu_regs[6] = m_mmu_regs[6] & 0x3f;
-		m_mmu_regs[7] = 0xf0;
-
-	}
-
-	{
-		m_mmua[offset/2+1] = (m_mmu_regs[(offset&~1)+0]>>6)|(m_mmu_regs[(offset&~1)+1]<<2);
-		m_mmua[offset/2+1]*= 0x400;
-		m_mmub[offset/2+1] = (m_mmu_regs[(offset&~1)+0]&0x3f);
-		m_mmub[offset/2+1]++;
-		m_mmub[offset/2+1]*= 0x400;
-		//printf("%d A %08x B %04x\n",offset/2,m_mmua[offset/2],m_mmub[offset/2]);
-		//printf("A %04x B %02x\n",MMUA,MMUB);
-	}
-}
-
 void hng64_state::hng_comm_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(hng64_state::hng64_comm_space_r), FUNC(hng64_state::hng64_comm_space_w));
+	map(0x00000, 0x7ffff).rom().region("user2", 0);
+	map(0xf0000, 0xfffff).ram();
 }
 
 void hng64_state::hng_comm_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	/* Reserved for the KL5C80 internal hardware */
-	map(0x00, 0x07).rw(FUNC(hng64_state::hng64_comm_mmu_r), FUNC(hng64_state::hng64_comm_mmu_w));
+//  map(0x00, 0x07).rw(FUNC(hng64_state::hng64_comm_mmu_r), FUNC(hng64_state::hng64_comm_mmu_w));
 //  map(0x08, 0x1f).noprw();              /* Reserved */
 //  map(0x20, 0x25).rw(hng64_state::));   /* Timer/Counter B */           /* hng64 writes here */
 //  map(0x27, 0x27).noprw();              /* Reserved */
@@ -137,9 +48,6 @@ void hng64_state::reset_net()
 {
 //  m_comm->pulse_input_line(INPUT_LINE_NMI, attotime::zero); // reset the CPU and let 'er rip
 //  m_comm->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);     // hold on there pardner...
-
-	m_mmub[0] = 0;
-	m_mmub[5] = 0; // rolls back to 0xffff
 }
 
 void hng64_state::hng64_network(machine_config &config)

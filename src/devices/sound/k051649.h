@@ -38,7 +38,7 @@ protected:
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 	// Parameters for a channel
@@ -46,6 +46,7 @@ private:
 	{
 		sound_channel() :
 			counter(0),
+			clock(0),
 			frequency(0),
 			volume(0),
 			key(false)
@@ -53,11 +54,12 @@ private:
 			std::fill(std::begin(waveram), std::end(waveram), 0);
 		}
 
-		u64 counter;
-		int frequency;
-		int volume;
-		bool key;
-		s8 waveram[32];
+		u8 counter;     // address counter for wavetable
+		u32 clock;      // internal clock
+		u16 frequency;  // frequency; result: (input clock / (32 * (frequency + 1)))
+		int volume;     // volume
+		bool key;       // keyon/off
+		s8 waveram[32]; // 32 byte wavetable
 	};
 
 	void make_mixer_table(int voices);
@@ -66,12 +68,11 @@ private:
 
 	/* global sound parameters */
 	sound_stream *m_stream;
-	int m_mclock;
 	int m_rate;
 
 	/* mixer tables and internal buffers */
-	std::unique_ptr<s16[]> m_mixer_table;
-	s16 *m_mixer_lookup;
+	std::vector<stream_buffer::sample_t> m_mixer_table;
+	stream_buffer::sample_t *m_mixer_lookup;
 	std::vector<s16> m_mixer_buffer;
 
 	/* chip registers */

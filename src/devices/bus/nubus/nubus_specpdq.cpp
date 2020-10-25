@@ -114,8 +114,8 @@ void nubus_specpdq_device::device_start()
 
 	m_vram.resize(VRAM_SIZE);
 	m_vram32 = (uint32_t *)&m_vram[0];
-	nubus().install_device(slotspace, slotspace+VRAM_SIZE-1, read32_delegate(*this, FUNC(nubus_specpdq_device::vram_r)), write32_delegate(*this, FUNC(nubus_specpdq_device::vram_w)));
-	nubus().install_device(slotspace+0x400000, slotspace+0xfbffff, read32_delegate(*this, FUNC(nubus_specpdq_device::specpdq_r)), write32_delegate(*this, FUNC(nubus_specpdq_device::specpdq_w)));
+	nubus().install_device(slotspace, slotspace+VRAM_SIZE-1, read32s_delegate(*this, FUNC(nubus_specpdq_device::vram_r)), write32s_delegate(*this, FUNC(nubus_specpdq_device::vram_w)));
+	nubus().install_device(slotspace+0x400000, slotspace+0xfbffff, read32s_delegate(*this, FUNC(nubus_specpdq_device::specpdq_r)), write32s_delegate(*this, FUNC(nubus_specpdq_device::specpdq_w)));
 
 	m_timer = timer_alloc(0, nullptr);
 	m_timer->adjust(screen().time_until_pos(843, 0), 0);
@@ -157,22 +157,18 @@ void nubus_specpdq_device::device_timer(emu_timer &timer, device_timer_id tid, i
 
 uint32_t nubus_specpdq_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint32_t *scanline;
-	int x, y;
-	uint8_t pixels, *vram;
-
 	// first time?  kick off the VBL timer
-	vram = &m_vram[0x9000];
+	uint8_t const *const vram = &m_vram[0x9000];
 
 	switch (m_mode)
 	{
 		case 0: // 1 bpp
-			for (y = 0; y < 844; y++)
+			for (int y = 0; y < 844; y++)
 			{
-				scanline = &bitmap.pix32(y);
-				for (x = 0; x < 1152/8; x++)
+				uint32_t *scanline = &bitmap.pix(y);
+				for (int x = 0; x < 1152/8; x++)
 				{
-					pixels = vram[(y * 512) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram[(y * 512) + (BYTE4_XOR_BE(x))];
 
 					*scanline++ = m_palette_val[(pixels&0x80)];
 					*scanline++ = m_palette_val[((pixels<<1)&0x80)];
@@ -187,12 +183,12 @@ uint32_t nubus_specpdq_device::screen_update(screen_device &screen, bitmap_rgb32
 			break;
 
 		case 1: // 2 bpp
-			for (y = 0; y < 844; y++)
+			for (int y = 0; y < 844; y++)
 			{
-				scanline = &bitmap.pix32(y);
-				for (x = 0; x < 1152/4; x++)
+				uint32_t *scanline = &bitmap.pix(y);
+				for (int x = 0; x < 1152/4; x++)
 				{
-					pixels = vram[(y * 512) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram[(y * 512) + (BYTE4_XOR_BE(x))];
 
 					*scanline++ = m_palette_val[(pixels&0xc0)];
 					*scanline++ = m_palette_val[((pixels<<2)&0xc0)];
@@ -203,13 +199,12 @@ uint32_t nubus_specpdq_device::screen_update(screen_device &screen, bitmap_rgb32
 			break;
 
 		case 2: // 4 bpp
-			for (y = 0; y < 844; y++)
+			for (int y = 0; y < 844; y++)
 			{
-				scanline = &bitmap.pix32(y);
-
-				for (x = 0; x < 1152/2; x++)
+				uint32_t *scanline = &bitmap.pix(y);
+				for (int x = 0; x < 1152/2; x++)
 				{
-					pixels = vram[(y * 1024) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram[(y * 1024) + (BYTE4_XOR_BE(x))];
 
 					*scanline++ = m_palette_val[(pixels&0xf0)];
 					*scanline++ = m_palette_val[((pixels<<4)&0xf0)];
@@ -218,13 +213,12 @@ uint32_t nubus_specpdq_device::screen_update(screen_device &screen, bitmap_rgb32
 			break;
 
 		case 3: // 8 bpp
-			for (y = 0; y < 844; y++)
+			for (int y = 0; y < 844; y++)
 			{
-				scanline = &bitmap.pix32(y);
-
-				for (x = 0; x < 1152; x++)
+				uint32_t *scanline = &bitmap.pix(y);
+				for (int x = 0; x < 1152; x++)
 				{
-					pixels = vram[(y * 1152) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram[(y * 1152) + (BYTE4_XOR_BE(x))];
 					*scanline++ = m_palette_val[pixels];
 				}
 			}
@@ -236,7 +230,7 @@ uint32_t nubus_specpdq_device::screen_update(screen_device &screen, bitmap_rgb32
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
+void nubus_specpdq_device::specpdq_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (offset >= 0xc0000 && offset < 0x100000)
 	{
@@ -489,7 +483,7 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 	}
 }
 
-READ32_MEMBER( nubus_specpdq_device::specpdq_r )
+uint32_t nubus_specpdq_device::specpdq_r(offs_t offset, uint32_t mem_mask)
 {
 //  if (offset != 0xc005c && offset != 0xc005e) logerror("specpdq_r: @ %x (mask %08x  %s)\n", offset, mem_mask, machine().describe_context());
 
@@ -501,13 +495,13 @@ READ32_MEMBER( nubus_specpdq_device::specpdq_r )
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_specpdq_device::vram_w )
+void nubus_specpdq_device::vram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data ^= 0xffffffff;
 	COMBINE_DATA(&m_vram32[offset]);
 }
 
-READ32_MEMBER( nubus_specpdq_device::vram_r )
+uint32_t nubus_specpdq_device::vram_r(offs_t offset, uint32_t mem_mask)
 {
 	return m_vram32[offset] ^ 0xffffffff;
 }

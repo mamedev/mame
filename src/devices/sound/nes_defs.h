@@ -94,7 +94,7 @@ struct apu_t
 		}
 
 		uint8 regs[4]; /* regs[1] unused */
-		int cur_pos = 0;
+		u32 seed = 1;
 		int vbl_length = 0;
 		float phaseacc = 0.0;
 		float output_vol = 0.0;
@@ -146,10 +146,6 @@ struct apu_t
 	static constexpr unsigned WRE3    = 0x13;
 	static constexpr unsigned SMASK   = 0x15;
 	static constexpr unsigned IRQCTRL = 0x17;
-
-	static constexpr unsigned NOISE_LONG     = 0x4000;
-	static constexpr unsigned NOISE_SHORT    = 93;
-
 
 	apu_t()
 	{

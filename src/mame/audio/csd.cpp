@@ -8,7 +8,6 @@
 
 #include "emu.h"
 #include "csd.h"
-#include "sound/volt_reg.h"
 
 
 //**************************************************************************
@@ -48,9 +47,6 @@ void midway_cheap_squeak_deluxe_device::device_add_mconfig(machine_config &confi
 	m_pia->irqb_handler().set(FUNC(midway_cheap_squeak_deluxe_device::irq_w));
 
 	AD7533(config, m_dac, 0).add_route(ALL_OUTPUTS, *this, 1.0);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 //-------------------------------------------------

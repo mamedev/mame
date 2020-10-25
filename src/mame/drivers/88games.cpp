@@ -26,7 +26,7 @@
  *
  *************************************/
 
-READ8_MEMBER(_88games_state::bankedram_r)
+uint8_t _88games_state::bankedram_r(offs_t offset)
 {
 	if (m_videobank)
 		return m_ram[offset];
@@ -39,7 +39,7 @@ READ8_MEMBER(_88games_state::bankedram_r)
 	}
 }
 
-WRITE8_MEMBER(_88games_state::bankedram_w)
+void _88games_state::bankedram_w(offs_t offset, uint8_t data)
 {
 	if (m_videobank)
 		m_ram[offset] = data;
@@ -47,7 +47,7 @@ WRITE8_MEMBER(_88games_state::bankedram_w)
 		m_k051316->write(offset, data);
 }
 
-WRITE8_MEMBER(_88games_state::k88games_5f84_w)
+void _88games_state::k88games_5f84_w(uint8_t data)
 {
 	/* bits 0/1 coin counters */
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
@@ -61,13 +61,13 @@ WRITE8_MEMBER(_88games_state::k88games_5f84_w)
 		popmessage("5f84 = %02x", data);
 }
 
-WRITE8_MEMBER(_88games_state::k88games_sh_irqtrigger_w)
+void _88games_state::k88games_sh_irqtrigger_w(uint8_t data)
 {
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 
-WRITE8_MEMBER(_88games_state::speech_control_w)
+void _88games_state::speech_control_w(uint8_t data)
 {
 	m_speech_chip = BIT(data, 2);
 
@@ -75,13 +75,13 @@ WRITE8_MEMBER(_88games_state::speech_control_w)
 	m_upd7759[m_speech_chip]->start_w(BIT(data, 0));
 }
 
-WRITE8_MEMBER(_88games_state::speech_msg_w)
+void _88games_state::speech_msg_w(uint8_t data)
 {
 	m_upd7759[m_speech_chip]->port_w(data);
 }
 
 /* special handlers to combine 052109 & 051960 */
-READ8_MEMBER(_88games_state::k052109_051960_r)
+uint8_t _88games_state::k052109_051960_r(offs_t offset)
 {
 	if (m_k052109->get_rmrd_line() == CLEAR_LINE)
 	{
@@ -96,7 +96,7 @@ READ8_MEMBER(_88games_state::k052109_051960_r)
 		return m_k052109->read(offset);
 }
 
-WRITE8_MEMBER(_88games_state::k052109_051960_w)
+void _88games_state::k052109_051960_w(offs_t offset, uint8_t data)
 {
 	if (offset >= 0x3800 && offset < 0x3808)
 		m_k051960->k051937_w(offset - 0x3800, data);
@@ -252,7 +252,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-WRITE8_MEMBER( _88games_state::banking_callback )
+void _88games_state::banking_callback(uint8_t data)
 {
 	logerror("%s: bank select %02x\n", machine().describe_context(), data);
 

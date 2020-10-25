@@ -50,9 +50,9 @@ protected:
 
 	void mem_map(address_map &map);
 
-	DECLARE_WRITE8_MEMBER(chip_sel_w);
+	void chip_sel_w(uint8_t data);
 
-	DECLARE_READ16_MEMBER(bank3_r);
+	uint16_t bank3_r(offs_t offset);
 
 	required_device<spg2xx_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -68,6 +68,10 @@ public:
 		: vsmile_base_state(mconfig, type, tag)
 		, m_ctrl(*this, "ctrl%u", 1U)
 		, m_dsw_region(*this, "REGION")
+		, m_redled(*this, "redled%u", 1U)
+		, m_yellowled(*this, "yellowled%u", 1U)
+		, m_blueled(*this, "blueled%u", 1U)
+		, m_greenled(*this, "greenled%u", 1U)
 	{ }
 
 	void vsmile(machine_config &config);
@@ -79,15 +83,15 @@ private:
 
 	void banked_map(address_map &map);
 
-	DECLARE_WRITE8_MEMBER(ctrl_tx_w);
+	void ctrl_tx_w(uint8_t data);
 	template <int Which> DECLARE_WRITE_LINE_MEMBER(ctrl_rts_w);
 
-	DECLARE_READ16_MEMBER(portb_r);
-	DECLARE_WRITE16_MEMBER(portb_w);
-	DECLARE_READ16_MEMBER(portc_r);
-	DECLARE_WRITE16_MEMBER(portc_w);
+	uint16_t portb_r();
+	void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t portc_r();
+	void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_WRITE8_MEMBER(uart_rx);
+	void uart_rx(uint8_t data);
 
 	enum
 	{
@@ -110,6 +114,11 @@ private:
 	required_device_array<vsmile_ctrl_port_device, 2> m_ctrl;
 	required_ioport m_dsw_region;
 
+	output_finder<2> m_redled;
+	output_finder<2> m_yellowled;
+	output_finder<2> m_blueled;
+	output_finder<2> m_greenled;
+
 	bool m_ctrl_rts[2];
 	bool m_ctrl_select[2];
 };
@@ -124,8 +133,8 @@ public:
 	void vsmilem(machine_config &config);
 
 protected:
-	DECLARE_WRITE16_MEMBER(porta_w);
-	DECLARE_READ16_MEMBER(porta_r);
+	void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t porta_r(offs_t offset, uint16_t mem_mask = ~0);
 };
 
 class vsmileb_state : public vsmile_base_state
@@ -162,8 +171,8 @@ private:
 
 	void banked_map(address_map &map);
 
-	DECLARE_READ16_MEMBER(porta_r);
-	DECLARE_READ16_MEMBER(portb_r);
+	uint16_t porta_r();
+	uint16_t portb_r();
 
 	required_ioport m_io_logo;
 

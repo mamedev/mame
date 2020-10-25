@@ -34,7 +34,7 @@ protected:
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 5; }
-	virtual uint32_t execute_max_cycles() const noexcept override { return 131593; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 23+8; } // max opcode + interrupt
 	virtual uint32_t execute_input_lines() const noexcept override { return 0; }
 	virtual void execute_run() override;
 
@@ -58,8 +58,8 @@ private:
 	uint8_t   m_ER;
 	uint8_t   m_SR;
 
-	address_space *m_program;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 	int                 m_icount;
 
 	devcb_write8       m_flag_out_func;

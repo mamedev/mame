@@ -415,9 +415,9 @@ protected:
 
 	// internal stuff
 	int                 m_icount;
-	address_space *     m_program;
-	address_space *     m_io;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
+	memory_access< 3, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
 
 	// opcode/condition tables
 	typedef void (cosmac_device::*ophandler)();

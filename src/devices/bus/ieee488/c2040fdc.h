@@ -34,8 +34,8 @@ public:
 	auto ready_wr_callback() { return m_write_ready.bind(); }
 	auto error_wr_callback() { return m_write_error.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read();
+	void write(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( ds0_w );
 	DECLARE_WRITE_LINE_MEMBER( ds1_w );

@@ -52,7 +52,6 @@ If control Q4 is set, printer data can be read from I0.
 #include "machine/sensorboard.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/pwm.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
@@ -103,8 +102,8 @@ private:
 	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
 
 	// I/O handlers
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void control_w(u8 data);
+	u8 input_r(offs_t offset);
 
 	u8 m_inp_mux;
 };
@@ -124,7 +123,7 @@ void sc12_state::machine_start()
     I/O
 ******************************************************************************/
 
-WRITE8_MEMBER(sc12_state::control_w)
+void sc12_state::control_w(u8 data)
 {
 	// d0-d3: 7442 a0-a3
 	// 7442 0-8: led data, input mux
@@ -141,7 +140,7 @@ WRITE8_MEMBER(sc12_state::control_w)
 	//..
 }
 
-READ8_MEMBER(sc12_state::input_r)
+u8 sc12_state::input_r(offs_t offset)
 {
 	u8 data = 0;
 
@@ -232,7 +231,6 @@ void sc12_state::sc12(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "fidel_scc");

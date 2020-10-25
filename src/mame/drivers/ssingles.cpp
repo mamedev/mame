@@ -185,13 +185,13 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 
-	DECLARE_WRITE8_MEMBER(ssingles_videoram_w);
-	DECLARE_WRITE8_MEMBER(ssingles_colorram_w);
-	DECLARE_READ8_MEMBER(c000_r);
-	DECLARE_READ8_MEMBER(c001_r);
-	DECLARE_WRITE8_MEMBER(c001_w);
-	DECLARE_READ8_MEMBER(atamanot_prot_r);
-	DECLARE_WRITE8_MEMBER(atamanot_prot_w);
+	void ssingles_videoram_w(offs_t offset, uint8_t data);
+	void ssingles_colorram_w(offs_t offset, uint8_t data);
+	uint8_t c000_r();
+	uint8_t c001_r();
+	void c001_w(uint8_t data);
+	uint8_t atamanot_prot_r(offs_t offset);
+	void atamanot_prot_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(atamanot_irq);
 	MC6845_UPDATE_ROW(ssingles_update_row);
@@ -218,20 +218,18 @@ static constexpr rgb_t ssingles_colors[NUM_PENS] =
 
 MC6845_UPDATE_ROW( ssingles_state::ssingles_update_row )
 {
-	uint32_t tile_address;
-	uint16_t cell, palette;
-	uint8_t b0, b1;
-	const uint8_t *gfx = memregion("gfx1")->base();
+	uint8_t const *const gfx = memregion("gfx1")->base();
 
 	for (int cx = 0; cx < x_count; ++cx)
 	{
 		int address = ((ma >> 1) + (cx >> 1)) & 0xff;
 
-		cell = m_videoram[address] + (m_colorram[address] << 8);
+		uint16_t cell = m_videoram[address] + (m_colorram[address] << 8);
 
-		tile_address = ((cell & 0x3ff) << 4) + ra;
-		palette = (cell >> 10) & 0x1c;
+		uint32_t tile_address = ((cell & 0x3ff) << 4) + ra;
+		uint16_t palette = (cell >> 10) & 0x1c;
 
+		uint8_t b0, b1;
 		if (cx & 1)
 		{
 			b0 = gfx[tile_address + 0x0000]; /*  9.bin */
@@ -245,7 +243,7 @@ MC6845_UPDATE_ROW( ssingles_state::ssingles_update_row )
 
 		for (int x = 7; x >= 0; --x)
 		{
-			bitmap.pix32(y, (cx << 3) | x) = m_pens[palette + ((b1 & 1) | ((b0 & 1) << 1))];
+			bitmap.pix(y, (cx << 3) | x) = m_pens[palette + ((b1 & 1) | ((b0 & 1) << 1))];
 			b0 >>= 1;
 			b1 >>= 1;
 		}
@@ -254,20 +252,18 @@ MC6845_UPDATE_ROW( ssingles_state::ssingles_update_row )
 
 MC6845_UPDATE_ROW( ssingles_state::atamanot_update_row )
 {
-	uint32_t tile_address;
-	uint16_t cell, palette;
-	uint8_t b0, b1;
 	const uint8_t *gfx = memregion("gfx1")->base();
 
 	for (int cx = 0; cx < x_count; ++cx)
 	{
 		int address = ((ma >> 1) + (cx >> 1)) & 0xff;
 
-		cell = m_videoram[address] + (m_colorram[address] << 8);
+		uint16_t cell = m_videoram[address] + (m_colorram[address] << 8);
 
-		tile_address = ((cell & 0x1ff) << 4) + ra;
-		palette = (cell >> 10) & 0x1c;
+		uint32_t tile_address = ((cell & 0x1ff) << 4) + ra;
+		uint16_t palette = (cell >> 10) & 0x1c;
 
+		uint8_t b0, b1;
 		if (cx & 1)
 		{
 			b0 = gfx[tile_address + 0x0000]; /*  9.bin */
@@ -281,7 +277,7 @@ MC6845_UPDATE_ROW( ssingles_state::atamanot_update_row )
 
 		for (int x = 7; x >= 0; --x)
 		{
-			bitmap.pix32(y, (cx << 3) | x) = m_pens[palette + ((b1 & 1) | ((b0 & 1) << 1))];
+			bitmap.pix(y, (cx << 3) | x) = m_pens[palette + ((b1 & 1) | ((b0 & 1) << 1))];
 			b0 >>= 1;
 			b1 >>= 1;
 		}
@@ -289,14 +285,14 @@ MC6845_UPDATE_ROW( ssingles_state::atamanot_update_row )
 }
 
 
-WRITE8_MEMBER(ssingles_state::ssingles_videoram_w)
+void ssingles_state::ssingles_videoram_w(offs_t offset, uint8_t data)
 {
 	uint8_t *vram = memregion("vram")->base();
 	vram[offset] = data;
 	m_videoram[offset]=data;
 }
 
-WRITE8_MEMBER(ssingles_state::ssingles_colorram_w)
+void ssingles_state::ssingles_colorram_w(offs_t offset, uint8_t data)
 {
 	uint8_t *cram = memregion("cram")->base();
 	cram[offset] = data;
@@ -311,18 +307,18 @@ void ssingles_state::video_start()
 }
 
 
-READ8_MEMBER(ssingles_state::c000_r)
+uint8_t ssingles_state::c000_r()
 {
 	return m_prot_data;
 }
 
-READ8_MEMBER(ssingles_state::c001_r)
+uint8_t ssingles_state::c001_r()
 {
 	m_prot_data=0xc4;
 	return 0;
 }
 
-WRITE8_MEMBER(ssingles_state::c001_w)
+void ssingles_state::c001_w(uint8_t data)
 {
 	m_prot_data^=data^0x11;
 }
@@ -356,7 +352,7 @@ void ssingles_state::ssingles_map(address_map &map)
 }
 
 
-READ8_MEMBER(ssingles_state::atamanot_prot_r)
+uint8_t ssingles_state::atamanot_prot_r(offs_t offset)
 {
 	static const char prot_id[] = { "PROGRAM BY KOYAMA" };
 
@@ -377,7 +373,7 @@ READ8_MEMBER(ssingles_state::atamanot_prot_r)
 	return 0;
 }
 
-WRITE8_MEMBER(ssingles_state::atamanot_prot_w)
+void ssingles_state::atamanot_prot_w(uint8_t data)
 {
 	m_atamanot_prot_state = data;
 }

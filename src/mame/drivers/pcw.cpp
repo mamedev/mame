@@ -224,12 +224,12 @@ void pcw_state::pcw_map(address_map &map)
 
 
 /* Keyboard is read by the MCU and sent as serial data to the gate array ASIC */
-READ8_MEMBER(pcw_state::pcw_keyboard_r)
+uint8_t pcw_state::pcw_keyboard_r(offs_t offset)
 {
 	return m_iptlines[offset]->read();
 }
 
-READ8_MEMBER(pcw_state::pcw_keyboard_data_r)
+uint8_t pcw_state::pcw_keyboard_data_r(offs_t offset)
 {
 	return m_mcu_keyboard_data[offset];
 }
@@ -246,7 +246,7 @@ void pcw_state::pcw_update_read_memory_block(int block, int bank)
 	if (bank == 3)
 	{
 		/* when upper 16 bytes are accessed use keyboard read handler */
-		space.install_read_handler( block * 0x04000 + 0x3ff0, block * 0x04000 + 0x3fff, read8_delegate(*this, FUNC(pcw_state::pcw_keyboard_data_r)));
+		space.install_read_handler( block * 0x04000 + 0x3ff0, block * 0x04000 + 0x3fff, read8sm_delegate(*this, FUNC(pcw_state::pcw_keyboard_data_r)));
 		LOGMEM("MEM: read block %i -> bank %i\n", block, bank);
 	}
 	else
@@ -355,7 +355,7 @@ int pcw_state::pcw_get_sys_status()
 		| (m_system_status & 0x20);
 }
 
-READ8_MEMBER(pcw_state::pcw_interrupt_counter_r)
+uint8_t pcw_state::pcw_interrupt_counter_r()
 {
 	int data;
 
@@ -373,7 +373,7 @@ READ8_MEMBER(pcw_state::pcw_interrupt_counter_r)
 }
 
 
-WRITE8_MEMBER(pcw_state::pcw_bank_select_w)
+void pcw_state::pcw_bank_select_w(offs_t offset, uint8_t data)
 {
 	LOGBANK("BANK: %2x %x\n", offset, data);
 	m_banks[offset] = data;
@@ -382,7 +382,7 @@ WRITE8_MEMBER(pcw_state::pcw_bank_select_w)
 	LOGBANK("RAM Banks: %02x %02x %02x %02x Lock:%02x",m_banks[0],m_banks[1],m_banks[2],m_banks[3],m_bank_force);
 }
 
-WRITE8_MEMBER(pcw_state::pcw_bank_force_selection_w)
+void pcw_state::pcw_bank_force_selection_w(uint8_t data)
 {
 	m_bank_force = data;
 
@@ -393,7 +393,7 @@ WRITE8_MEMBER(pcw_state::pcw_bank_force_selection_w)
 }
 
 
-WRITE8_MEMBER(pcw_state::pcw_roller_ram_addr_w)
+void pcw_state::pcw_roller_ram_addr_w(uint8_t data)
 {
 	/*
 	Address of roller RAM. b7-5: bank (0-7). b4-1: address / 512. */
@@ -403,19 +403,19 @@ WRITE8_MEMBER(pcw_state::pcw_roller_ram_addr_w)
 	LOGRRAM("Roller-RAM: Address set to 0x%05x\n", m_roller_ram_addr);
 }
 
-WRITE8_MEMBER(pcw_state::pcw_pointer_table_top_scan_w)
+void pcw_state::pcw_pointer_table_top_scan_w(uint8_t data)
 {
 	m_roller_ram_offset = data;
 	LOGRRAM("Roller-RAM: offset set to 0x%05x\n", m_roller_ram_offset);
 }
 
-WRITE8_MEMBER(pcw_state::pcw_vdu_video_control_register_w)
+void pcw_state::pcw_vdu_video_control_register_w(uint8_t data)
 {
 	m_vdu_video_control_register = data;
 	LOGRRAM("Roller-RAM: control reg set to 0x%02x\n", data);
 }
 
-WRITE8_MEMBER(pcw_state::pcw_system_control_w)
+void pcw_state::pcw_system_control_w(uint8_t data)
 {
 	LOGSYS("SYSTEM CONTROL: %d\n", data);
 
@@ -568,7 +568,7 @@ WRITE8_MEMBER(pcw_state::pcw_system_control_w)
 	}
 }
 
-READ8_MEMBER(pcw_state::pcw_system_status_r)
+uint8_t pcw_state::pcw_system_status_r()
 {
 	/* from Jacob Nevins docs */
 	uint8_t ret = pcw_get_sys_status();
@@ -578,7 +578,7 @@ READ8_MEMBER(pcw_state::pcw_system_status_r)
 
 /* read from expansion hardware - additional hardware not part of
 the PCW custom ASIC */
-READ8_MEMBER(pcw_state::pcw_expansion_r)
+uint8_t pcw_state::pcw_expansion_r(offs_t offset)
 {
 	LOGEXP("pcw expansion r: %04x\n", offset+0x080);
 
@@ -627,7 +627,7 @@ READ8_MEMBER(pcw_state::pcw_expansion_r)
 
 /* write to expansion hardware - additional hardware not part of
 the PCW custom ASIC */
-WRITE8_MEMBER(pcw_state::pcw_expansion_w)
+void pcw_state::pcw_expansion_w(offs_t offset, uint8_t data)
 {
 	LOGEXP("pcw expansion w: %04x %02x\n", offset+0x080, data);
 }
@@ -641,7 +641,7 @@ void pcw_state::pcw_printer_fire_pins(uint16_t pins)
 	{
 		line = x % PCW_PRINTER_HEIGHT;
 		if((pins & 0x01) == 0)
-			m_prn_output->pix16(line, m_printer_headpos) = (uint16_t)(pins & 0x01);
+			m_prn_output->pix(line, m_printer_headpos) = (uint16_t)(pins & 0x01);
 		pins >>= 1;
 	}
 //  if(m_printer_headpos < PCW_PRINTER_WIDTH)
@@ -753,20 +753,20 @@ TIMER_CALLBACK_MEMBER(pcw_state::pcw_pins_callback)
 	m_printer_p2 |= 0x40;
 }
 
-READ8_MEMBER(pcw_state::mcu_printer_p1_r)
+uint8_t pcw_state::mcu_printer_p1_r()
 {
 	LOGPRN("PRN: MCU reading data from P1\n");
 	return m_printer_pins & 0x00ff;
 }
 
-WRITE8_MEMBER(pcw_state::mcu_printer_p1_w)
+void pcw_state::mcu_printer_p1_w(uint8_t data)
 {
 	m_printer_pins = (m_printer_pins & 0x0100) | data;
 	LOGPRN("PRN: Print head position = %i", m_printer_headpos);
 	LOGPRN("PRN: MCU writing %02x to P1 [%03x/%03x]\n", data,m_printer_pins, ~m_printer_pins & 0x1ff);
 }
 
-READ8_MEMBER(pcw_state::mcu_printer_p2_r)
+uint8_t pcw_state::mcu_printer_p2_r()
 {
 	uint8_t ret = 0x00;
 	LOGPRN("PRN: MCU reading data from P2\n");
@@ -777,7 +777,7 @@ READ8_MEMBER(pcw_state::mcu_printer_p2_r)
 	return ret;
 }
 
-WRITE8_MEMBER(pcw_state::mcu_printer_p2_w)
+void pcw_state::mcu_printer_p2_w(uint8_t data)
 {
 	LOGPRN("PRN: MCU writing %02x to P2\n", data);
 	m_printer_p2 = data & 0x70;
@@ -862,22 +862,22 @@ void pcw_state::mcu_transmit_serial(uint8_t bit)
 	}
 }
 
-READ8_MEMBER(pcw_state::mcu_kb_scan_r)
+uint8_t pcw_state::mcu_kb_scan_r()
 {
 	return m_kb_scan_row & 0xff;
 }
 
-WRITE8_MEMBER(pcw_state::mcu_kb_scan_w)
+void pcw_state::mcu_kb_scan_w(uint8_t data)
 {
 	m_kb_scan_row = (m_kb_scan_row & 0xff00) | data;
 }
 
-READ8_MEMBER(pcw_state::mcu_kb_scan_high_r)
+uint8_t pcw_state::mcu_kb_scan_high_r()
 {
 	return (m_kb_scan_row & 0xff00) >> 8;
 }
 
-WRITE8_MEMBER(pcw_state::mcu_kb_scan_high_w)
+void pcw_state::mcu_kb_scan_high_w(uint8_t data)
 {
 	if((m_mcu_prev & 0x02) && !(data & 0x02))  // bit is transmitted on high-to-low clock transition
 	{
@@ -896,7 +896,7 @@ WRITE8_MEMBER(pcw_state::mcu_kb_scan_high_w)
 	m_mcu_prev = data;
 }
 
-READ8_MEMBER(pcw_state::mcu_kb_data_r)
+uint8_t pcw_state::mcu_kb_data_r()
 {
 	uint16_t scan_bits = ((m_kb_scan_row & 0xf000) >> 4) | (m_kb_scan_row & 0xff);
 	int x;
@@ -904,7 +904,7 @@ READ8_MEMBER(pcw_state::mcu_kb_data_r)
 	for(x=0;x<12;x++)
 	{
 		if(!(scan_bits & 1))
-			return pcw_keyboard_r(space,x);
+			return pcw_keyboard_r(x);
 		else
 			scan_bits >>= 1;
 	}
@@ -922,7 +922,7 @@ READ_LINE_MEMBER(pcw_state::mcu_kb_t0_r)
 }
 
 /* TODO: Implement parallel port! */
-READ8_MEMBER(pcw_state::pcw9512_parallel_r)
+uint8_t pcw_state::pcw9512_parallel_r(offs_t offset)
 {
 	if (offset==1)
 	{
@@ -934,7 +934,7 @@ READ8_MEMBER(pcw_state::pcw9512_parallel_r)
 }
 
 /* TODO: Implement parallel port! */
-WRITE8_MEMBER(pcw_state::pcw9512_parallel_w)
+void pcw_state::pcw9512_parallel_w(offs_t offset, uint8_t data)
 {
 	LOGPAR("pcw9512 parallel w: offs: %04x data: %02x\n", offset, data);
 }
@@ -1049,7 +1049,7 @@ b0:   f4     exit   del>   =      0      8      6      4      1             f6
       &3FF0  &3FF1  &3FF2  &3FF3  &3FF4  &3FF5  &3FF6  &3FF7  &3FF8  &3FF9  &3FFA
 
 2008-05 FP:
-Small note about atural keyboard: currently,
+Small note about Natural keyboard: currently,
 - "Paste" is mapped to 'F9'
 - "Exit" is mapped to 'F10'
 - "Ptr" is mapped to 'Print Screen'
@@ -1077,7 +1077,7 @@ static INPUT_PORTS_START(pcw)
 
 	PORT_START("LINE1")     /* 0x03ff1 */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Exit") PORT_CODE(KEYCODE_PGDN)       PORT_CHAR(UCHAR_MAMEKEY(F10))
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ptr") PORT_CODE(KEYCODE_END)     PORT_CHAR(UCHAR_MAMEKEY(PRTSCR))
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ptr") //PORT_CODE(KEYCODE_END)     PORT_CHAR(UCHAR_MAMEKEY(PRTSCR))
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Cut") PORT_CODE(KEYCODE_SLASH_PAD)   PORT_CHAR(UCHAR_MAMEKEY(F11))
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Copy") PORT_CODE(KEYCODE_ASTERISK)   PORT_CHAR(UCHAR_MAMEKEY(F12))
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8_PAD)                        PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
@@ -1092,7 +1092,7 @@ static INPUT_PORTS_START(pcw)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE)                        PORT_CHAR('#') PORT_CHAR('>')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_7_PAD)                        PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT(0x40, 0xff, IPT_UNUSED)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_END)                          PORT_CHAR(189) PORT_CHAR('@')   // (½ @) between slash and rshift
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("[+]") PORT_CODE(KEYCODE_F2)          PORT_CHAR(UCHAR_MAMEKEY(PGUP))  // 1st key on the left from 'Spacebar'
 
 	PORT_START("LINE3")     /* 0x03ff3 */

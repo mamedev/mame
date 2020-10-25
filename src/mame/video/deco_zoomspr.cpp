@@ -119,21 +119,20 @@ inline void deco_zoomspr_device::dragngun_drawgfxzoom(
 
 				if( ex>sx )
 				{ /* skip if inner loop doesn't draw anything */
-					int y;
 
 					/* case 1: no alpha */
 					if (alpha == 0xff)
 					{
 						{
-							for( y=sy; y<ey; y++ )
+							for( int y=sy; y<ey; y++ )
 							{
-								const uint8_t *source = code_base + (y_index>>16) * gfx->rowbytes();
-								uint32_t *dest = &temp_bitmap.pix32(y);
-								uint8_t *pri = &pri_bitmap.pix8(y);
+								uint8_t const *const source = code_base + (y_index>>16) * gfx->rowbytes();
+								uint32_t *const dest = &temp_bitmap.pix(y);
+								uint8_t *const pri = &pri_bitmap.pix(y);
 
 
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
+								int x_index = x_index_base;
+								for( int x=sx; x<ex; x++ )
 								{
 									int c = source[x_index>>16];
 									if (c != transparent_color)
@@ -161,16 +160,16 @@ inline void deco_zoomspr_device::dragngun_drawgfxzoom(
 					else
 					{
 						{
-							for( y=sy; y<ey; y++ )
+							for( int y=sy; y<ey; y++ )
 							{
-								const uint8_t *source = code_base + (y_index>>16) * gfx->rowbytes();
-								uint32_t *dest = &temp_bitmap.pix32(y);
-								uint8_t *pri = &pri_bitmap.pix8(y);
-								uint32_t *tmapcolor = &dest_bmp.pix32(y);
+								uint8_t const *const source = code_base + (y_index>>16) * gfx->rowbytes();
+								uint32_t *const dest = &temp_bitmap.pix(y);
+								uint8_t *const pri = &pri_bitmap.pix(y);
+								uint32_t *const tmapcolor = &dest_bmp.pix(y);
 
 
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
+								int x_index = x_index_base;
+								for( int x=sx; x<ex; x++ )
 								{
 									int c = source[x_index>>16];
 									if (c != transparent_color)
@@ -399,12 +398,12 @@ void deco_zoomspr_device::dragngun_draw_sprites( bitmap_rgb32 &bitmap, const rec
 
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		uint32_t *src = &temp_bitmap.pix32(y);
-		uint32_t *dst = &bitmap.pix32(y);
+		uint32_t const *const src = &temp_bitmap.pix(y);
+		uint32_t *const dst = &bitmap.pix(y);
 
 		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
-			uint32_t srcpix = src[x];
+			uint32_t const srcpix = src[x];
 
 			if ((srcpix & 0xff000000) == 0xff000000)
 			{

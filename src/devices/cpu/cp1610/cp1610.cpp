@@ -196,11 +196,11 @@ void cp1610_cpu_device::cp1610_comr(int n)
  ***************************************************/
 void cp1610_cpu_device::cp1610_negr(int n)
 {
-	uint32_t temp;
+	uint16_t temp;
 	CLR_SZOC;
 	temp = (m_r[n] ^ 0xffff) + 1;
 	SET_COV(0,temp,1);
-	m_r[n] = temp&0xffff;
+	m_r[n] = temp;
 	SET_SZ(m_r[n]);
 	m_icount -= 6;
 }
@@ -1643,13 +1643,12 @@ void cp1610_cpu_device::cp1610_sdbd_addi(int d)
  ***************************************************/
 void cp1610_cpu_device::cp1610_sdbd_subat(int r, int d)
 {
-	uint32_t temp;
+	uint16_t temp;
 	CLR_SZOC;
 	temp = cp1610_readmem16(m_r[r]) & 0xff;
 	temp |= (cp1610_readmem16(m_r[r]) << 8);
 	temp = (temp ^ 0xffff) + 1;
 	SET_COV(m_r[d],temp,1);
-	temp &= 0xffff;
 	m_r[d] += temp;
 	SET_SZ(m_r[d]);
 	m_icount -= 14;
@@ -1661,7 +1660,7 @@ void cp1610_cpu_device::cp1610_sdbd_subat(int r, int d)
  ***************************************************/
 void cp1610_cpu_device::cp1610_sdbd_subat_i(int r, int d)
 {
-	uint32_t temp;
+	uint16_t temp;
 	CLR_SZOC;
 	temp = cp1610_readmem16(m_r[r]) & 0xff;
 	m_r[r]++;
@@ -1669,7 +1668,6 @@ void cp1610_cpu_device::cp1610_sdbd_subat_i(int r, int d)
 	m_r[r]++;
 	temp = (temp ^ 0xffff) + 1;
 	SET_COV(m_r[d],temp,1);
-	temp &= 0xffff;
 	m_r[d] += temp;
 	SET_SZ(m_r[d]);
 	m_icount -= 14;
@@ -1681,7 +1679,7 @@ void cp1610_cpu_device::cp1610_sdbd_subat_i(int r, int d)
  ***************************************************/
 void cp1610_cpu_device::cp1610_sdbd_subat_d(int r, int d)
 {
-	uint32_t temp;
+	uint16_t temp;
 	CLR_SZOC;
 	m_r[r]--;
 	temp = cp1610_readmem16(m_r[r]) & 0xff;
@@ -1689,7 +1687,6 @@ void cp1610_cpu_device::cp1610_sdbd_subat_d(int r, int d)
 	temp |= (cp1610_readmem16(m_r[r]) << 8);
 	temp = (temp ^ 0xffff) + 1;
 	SET_COV(m_r[d],temp,1);
-	temp &= 0xffff;
 	m_r[d] += temp;
 	SET_SZ(m_r[d]);
 	m_icount -= 17;
@@ -1702,7 +1699,7 @@ void cp1610_cpu_device::cp1610_sdbd_subat_d(int r, int d)
 void cp1610_cpu_device::cp1610_sdbd_subi(int d)
 {
 	uint16_t addr;
-	uint32_t temp;
+	uint16_t temp;
 	CLR_SZOC;
 	addr = cp1610_readop(m_r[7]) & 0xff;
 	m_r[7]++;
@@ -1711,7 +1708,6 @@ void cp1610_cpu_device::cp1610_sdbd_subi(int d)
 	temp = addr;
 	temp = (temp ^ 0xffff) + 1;
 	SET_COV(m_r[d],temp,1);
-	temp &= 0xffff;
 	m_r[d] += temp;
 	SET_SZ(m_r[d]);
 	m_icount -= 14;
@@ -1723,14 +1719,13 @@ void cp1610_cpu_device::cp1610_sdbd_subi(int d)
  ***************************************************/
 void cp1610_cpu_device::cp1610_sdbd_cmpat(int r, int d)
 {
-	uint32_t temp;
+	uint16_t temp;
 	uint16_t temp2;
 	CLR_SZOC;
 	temp = cp1610_readmem16(m_r[r]) & 0xff;
 	temp |= (cp1610_readmem16(m_r[r]) << 8);
 	temp = (temp ^ 0xffff) + 1;
 	SET_COV(m_r[d],temp,1);
-	temp &= 0xffff;
 	temp2 = m_r[d] + temp;
 	SET_SZ(temp2);
 	m_icount -= 14;
@@ -1742,7 +1737,7 @@ void cp1610_cpu_device::cp1610_sdbd_cmpat(int r, int d)
  ***************************************************/
 void cp1610_cpu_device::cp1610_sdbd_cmpat_i(int r, int d)
 {
-	uint32_t temp;
+	uint16_t temp;
 	uint16_t temp2;
 	CLR_SZOC;
 	temp = cp1610_readmem16(m_r[r]) & 0xff;
@@ -1751,7 +1746,6 @@ void cp1610_cpu_device::cp1610_sdbd_cmpat_i(int r, int d)
 	m_r[r]++;
 	temp = (temp ^ 0xffff) + 1;
 	SET_COV(m_r[d],temp,1);
-	temp &= 0xffff;
 	temp2 = m_r[d] + temp;
 	SET_SZ(temp2);
 	m_icount -= 14;
@@ -1763,7 +1757,7 @@ void cp1610_cpu_device::cp1610_sdbd_cmpat_i(int r, int d)
  ***************************************************/
 void cp1610_cpu_device::cp1610_sdbd_cmpat_d(int r, int d)
 {
-	uint32_t temp;
+	uint16_t temp;
 	uint16_t temp2;
 	CLR_SZOC;
 	m_r[r]--;
@@ -1772,7 +1766,6 @@ void cp1610_cpu_device::cp1610_sdbd_cmpat_d(int r, int d)
 	temp |= (cp1610_readmem16(m_r[r]) << 8);
 	temp = (temp ^ 0xffff) + 1;
 	SET_COV(m_r[d],temp,1);
-	temp &= 0xffff;
 	temp2 = m_r[d] + temp;
 	SET_SZ(temp2);
 	m_icount -= 17;
@@ -1785,7 +1778,7 @@ void cp1610_cpu_device::cp1610_sdbd_cmpat_d(int r, int d)
 void cp1610_cpu_device::cp1610_sdbd_cmpi(int d)
 {
 	uint16_t addr;
-	uint32_t temp;
+	uint16_t temp;
 	uint16_t temp2;
 	CLR_SZOC;
 	addr = cp1610_readop(m_r[7]) & 0xff;
@@ -1795,7 +1788,6 @@ void cp1610_cpu_device::cp1610_sdbd_cmpi(int d)
 	temp = addr;
 	temp = (temp ^ 0xffff) + 1;
 	SET_COV(m_r[d],temp,1);
-	temp &= 0xffff;
 	temp2 = m_r[d] + temp;
 	SET_SZ(temp2);
 	m_icount -= 14;

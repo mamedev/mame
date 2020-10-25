@@ -148,8 +148,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(dreq0_ck_w);
 	DECLARE_WRITE_LINE_MEMBER( epc_dma_hrq_changed );
 	DECLARE_WRITE_LINE_MEMBER( epc_dma8237_out_eop );
-	DECLARE_READ8_MEMBER( epc_dma_read_byte );
-	DECLARE_WRITE8_MEMBER( epc_dma_write_byte );
+	uint8_t epc_dma_read_byte(offs_t offset);
+	void epc_dma_write_byte(offs_t offset, uint8_t data);
 	template <int Channel> uint8_t epc_dma8237_io_r(offs_t offset);
 	template <int Channel> void epc_dma8237_io_w(offs_t offset, uint8_t data);
 	template <int Channel> DECLARE_WRITE_LINE_MEMBER(epc_dack_w);
@@ -164,8 +164,8 @@ private:
 
 	// PPI
 	required_device<i8255_device> m_ppi8255;
-	DECLARE_WRITE8_MEMBER(ppi_portb_w);
-	DECLARE_READ8_MEMBER(ppi_portc_r);
+	void ppi_portb_w(uint8_t data);
+	uint8_t ppi_portc_r();
 	uint8_t m_ppi_portb;
 	required_ioport m_io_dsw;
 	required_ioport m_io_j10;
@@ -695,7 +695,7 @@ WRITE_LINE_MEMBER(epc_state::speaker_ck_w)
  *
  **********************************************************/
 
-READ8_MEMBER( epc_state::ppi_portc_r )
+uint8_t epc_state::ppi_portc_r()
 {
 	uint8_t data;
 
@@ -710,7 +710,7 @@ READ8_MEMBER( epc_state::ppi_portc_r )
 	return data;
 }
 
-WRITE8_MEMBER( epc_state::ppi_portb_w )
+void epc_state::ppi_portb_w(uint8_t data)
 {
 	LOGPPI("PPI Port B write: %02x\n", data);
 	LOGPPI(" PB0 - Enable beeper             : %d\n", (data & 0x01)  ? 1 : 0);
@@ -987,7 +987,7 @@ WRITE_LINE_MEMBER( epc_state::epc_dma_hrq_changed )
 }
 
 
-READ8_MEMBER( epc_state::epc_dma_read_byte )
+uint8_t epc_state::epc_dma_read_byte(offs_t offset)
 {
 	if ((m_dma_active & 0x0f) == 0)
 	{
@@ -999,7 +999,7 @@ READ8_MEMBER( epc_state::epc_dma_read_byte )
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset | u32(m_dma_segment[seg]) << 16);
 }
 
-WRITE8_MEMBER( epc_state::epc_dma_write_byte )
+void epc_state::epc_dma_write_byte(offs_t offset, uint8_t data)
 {
 	if ((m_dma_active & 0x0f) == 0)
 	{

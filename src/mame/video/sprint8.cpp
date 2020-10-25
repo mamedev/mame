@@ -98,7 +98,7 @@ TILE_GET_INFO_MEMBER(sprint8_state::get_tile_info2)
 }
 
 
-WRITE8_MEMBER(sprint8_state::video_ram_w)
+void sprint8_state::video_ram_w(offs_t offset, uint8_t data)
 {
 	m_video_ram[offset] = data;
 	m_tilemap1->mark_tile_dirty(offset);
@@ -172,8 +172,8 @@ WRITE_LINE_MEMBER(sprint8_state::screen_vblank)
 
 		for (int y = visarea.top(); y <= visarea.bottom(); y++)
 		{
-			const uint16_t* p1 = &m_helper1.pix16(y);
-			const uint16_t* p2 = &m_helper2.pix16(y);
+			uint16_t const *const p1 = &m_helper1.pix(y);
+			uint16_t const *const p2 = &m_helper2.pix(y);
 
 			for (int x = visarea.left(); x <= visarea.right(); x++)
 				if (p1[x] != 0x20 && p2[x] == 0x23)

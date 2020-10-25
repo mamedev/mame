@@ -27,8 +27,8 @@ Then press W to save. To load, press L. If it says r at the end, it indicates a 
 #include "machine/timer.h"
 #include "machine/z80pio.h"
 #include "imagedev/cassette.h"
-
 #include "speaker.h"
+#include "video/pwm.h"
 
 #include "pro80.lh"
 
@@ -40,36 +40,36 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_cass(*this, "cassette")
-		, m_io_keyboard(*this, "LINE%u", 0)
-		, m_digits(*this, "digit%u", 0U)
+		, m_io_keyboard(*this, "LINE%u", 0U)
+		, m_display(*this, "display")
 	{ }
 
 	void pro80(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(digit_w);
-	DECLARE_WRITE8_MEMBER(segment_w);
-	DECLARE_READ8_MEMBER(kp_r);
+	void digit_w(u8 data);
+	void segment_w(u8 data);
+	u8 kp_r();
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 
-	void pro80_io(address_map &map);
-	void pro80_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 
-	uint8_t m_digit_sel;
-	uint8_t m_cass_in;
-	uint16_t m_cass_data[4];
-	void machine_reset() override;
-	virtual void machine_start() override { m_digits.resolve(); }
+	u8 m_digit_sel;
+	u8 m_cass_in;
+	u16 m_cass_data[4];
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_ioport_array<6> m_io_keyboard;
-	output_finder<6> m_digits;
+	required_device<pwm_display_device> m_display;
 };
 
 TIMER_DEVICE_CALLBACK_MEMBER( pro80_state::kansas_r )
 {
 	m_cass_data[1]++;
-	uint8_t cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
+	u8 cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
 
 	if (cass_ws != m_cass_data[0])
 	{
@@ -80,7 +80,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( pro80_state::kansas_r )
 	}
 }
 
-WRITE8_MEMBER( pro80_state::digit_w )
+void pro80_state::digit_w(u8 data)
 {
 	// --xx xxxx digit select
 	// -x-- ---- cassette out
@@ -89,21 +89,21 @@ WRITE8_MEMBER( pro80_state::digit_w )
 	m_cass->output( BIT(data, 6) ? -1.0 : +1.0);
 }
 
-WRITE8_MEMBER( pro80_state::segment_w )
+void pro80_state::segment_w(u8 data)
 {
 	if (m_digit_sel)
 	{
 		for (u8 i = 0; i < 6; i++)
 			if (!BIT(m_digit_sel, i))
-				m_digits[i] = data;
+				m_display->matrix(1<<i, data);
 
 		m_digit_sel = 0;
 	}
 }
 
-READ8_MEMBER( pro80_state::kp_r )
+u8 pro80_state::kp_r()
 {
-	uint8_t data = 0x0f;
+	u8 data = 0x0f;
 
 	for (u8 i = 0; i < 6; i++)
 		if (!BIT(m_digit_sel, i))
@@ -115,7 +115,7 @@ READ8_MEMBER( pro80_state::kp_r )
 	return data;
 }
 
-void pro80_state::pro80_mem(address_map &map)
+void pro80_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x03ff).rom();
@@ -123,7 +123,7 @@ void pro80_state::pro80_mem(address_map &map)
 	map(0x1400, 0x17ff).ram(); // 2nd RAM is optional
 }
 
-void pro80_state::pro80_io(address_map &map)
+void pro80_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
@@ -173,15 +173,24 @@ void pro80_state::machine_reset()
 	m_cass_in = 0;
 }
 
+void pro80_state::machine_start()
+{
+	save_item(NAME(m_digit_sel));
+	save_item(NAME(m_cass_in));
+	save_pointer(NAME(m_cass_data) ,4);
+}
+
 void pro80_state::pro80(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(4'000'000) / 2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &pro80_state::pro80_mem);
-	m_maincpu->set_addrmap(AS_IO, &pro80_state::pro80_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pro80_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &pro80_state::io_map);
 
 	/* video hardware */
 	config.set_default_layout(layout_pro80);
+	PWM_DISPLAY(config, m_display).set_size(6, 8);
+	m_display->set_segmask(0x3f, 0xff);
 
 	Z80PIO(config, "pio", XTAL(4'000'000) / 2);
 
@@ -196,7 +205,7 @@ void pro80_state::pro80(machine_config &config)
 
 /* ROM definition */
 ROM_START( pro80 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x0400, "maincpu", 0 )
 	// This rom dump is taken out of manual for this machine
 	ROM_LOAD( "pro80.bin", 0x0000, 0x0400, CRC(1bf6e0a5) SHA1(eb45816337e08ed8c30b589fc24960dc98b94db2))
 ROM_END
@@ -204,4 +213,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY   FULLNAME  FLAGS
-COMP( 1981, pro80, 0,      0,      pro80,   pro80, pro80_state, empty_init, "Protec", "Pro-80", MACHINE_NOT_WORKING )
+COMP( 1981, pro80, 0,      0,      pro80,   pro80, pro80_state, empty_init, "Protec", "Pro-80", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

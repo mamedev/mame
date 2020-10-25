@@ -134,35 +134,35 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
 	DECLARE_WRITE_LINE_MEMBER(ay3600_ako_w);
 
-	DECLARE_READ8_MEMBER(c080_r);
-	DECLARE_WRITE8_MEMBER(c080_w);
-	DECLARE_READ8_MEMBER(c100_r);
-	DECLARE_WRITE8_MEMBER(c100_w);
-	DECLARE_READ8_MEMBER(c800_r);
-	DECLARE_WRITE8_MEMBER(c800_w);
-	DECLARE_READ8_MEMBER(inh_r);
-	DECLARE_WRITE8_MEMBER(inh_w);
+	uint8_t c080_r(offs_t offset);
+	void c080_w(offs_t offset, uint8_t data);
+	uint8_t c100_r(offs_t offset);
+	void c100_w(offs_t offset, uint8_t data);
+	uint8_t c800_r(offs_t offset);
+	void c800_w(offs_t offset, uint8_t data);
+	uint8_t inh_r(offs_t offset);
+	void inh_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(a2bus_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(a2bus_nmi_w);
 	DECLARE_WRITE_LINE_MEMBER(a2bus_inh_w);
 
-	DECLARE_READ8_MEMBER(agat7_membank_r);
-	DECLARE_WRITE8_MEMBER(agat7_membank_w);
-	DECLARE_READ8_MEMBER(agat7_ram_r);
-	DECLARE_WRITE8_MEMBER(agat7_ram_w);
-	DECLARE_READ8_MEMBER(keyb_strobe_r);
-	DECLARE_WRITE8_MEMBER(keyb_strobe_w);
-	DECLARE_READ8_MEMBER(cassette_toggle_r);
-	DECLARE_WRITE8_MEMBER(cassette_toggle_w);
-	DECLARE_READ8_MEMBER(speaker_toggle_r);
-	DECLARE_WRITE8_MEMBER(speaker_toggle_w);
-	DECLARE_READ8_MEMBER(interrupts_on_r);
-	DECLARE_WRITE8_MEMBER(interrupts_on_w);
-	DECLARE_READ8_MEMBER(interrupts_off_r);
-	DECLARE_WRITE8_MEMBER(interrupts_off_w);
-	DECLARE_READ8_MEMBER(flags_r);
-	DECLARE_READ8_MEMBER(controller_strobe_r);
-	DECLARE_WRITE8_MEMBER(controller_strobe_w);
+	uint8_t agat7_membank_r(offs_t offset);
+	void agat7_membank_w(offs_t offset, uint8_t data);
+	uint8_t agat7_ram_r(offs_t offset);
+	void agat7_ram_w(offs_t offset, uint8_t data);
+	uint8_t keyb_strobe_r();
+	void keyb_strobe_w(uint8_t data);
+	uint8_t cassette_toggle_r();
+	void cassette_toggle_w(uint8_t data);
+	uint8_t speaker_toggle_r();
+	void speaker_toggle_w(uint8_t data);
+	uint8_t interrupts_on_r();
+	void interrupts_on_w(uint8_t data);
+	uint8_t interrupts_off_r();
+	void interrupts_off_w(uint8_t data);
+	uint8_t flags_r(offs_t offset);
+	uint8_t controller_strobe_r();
+	void controller_strobe_w(uint8_t data);
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -224,7 +224,7 @@ public:
 	optional_device<agat7video_device> m_video;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_irq);
-	DECLARE_READ8_MEMBER(keyb_data_r);
+	uint8_t keyb_data_r();
 
 	void agat7_map(address_map &map);
 	void inhbank_map(address_map &map);
@@ -248,7 +248,7 @@ public:
 	optional_device<agat9video_device> m_video;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_irq);
-	DECLARE_READ8_MEMBER(keyb_data_r);
+	uint8_t keyb_data_r();
 
 	void agat9_map(address_map &map);
 	void inhbank_map(address_map &map);
@@ -256,16 +256,16 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER(c090_r);
-	DECLARE_WRITE8_MEMBER(c090_w);
-	DECLARE_READ8_MEMBER(c200_r);
-	DECLARE_WRITE8_MEMBER(c200_w);
-	DECLARE_WRITE8_MEMBER(apple_w);
+	uint8_t c090_r(offs_t offset);
+	void c090_w(offs_t offset, uint8_t data);
+	uint8_t c200_r(offs_t offset);
+	void c200_w(offs_t offset, uint8_t data);
+	void apple_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER(agat9_membank_r);
-	DECLARE_WRITE8_MEMBER(agat9_membank_w);
-	DECLARE_READ8_MEMBER(agat9_upperbank_r);
-	DECLARE_WRITE8_MEMBER(agat9_upperbank_w);
+	uint8_t agat9_membank_r(offs_t offset);
+	void agat9_membank_w(offs_t offset, uint8_t data);
+	uint8_t agat9_upperbank_r(offs_t offset);
+	void agat9_upperbank_w(offs_t offset, uint8_t data);
 
 private:
 	int m_agat9_membank[16]; // 8 physical banks, but ram chip has 16 locations
@@ -466,17 +466,17 @@ void agat9_state::machine_reset()
     I/O
 ***************************************************************************/
 
-READ8_MEMBER(agat7_state::keyb_data_r)
+uint8_t agat7_state::keyb_data_r()
 {
 	return m_strobe ? (m_transchar | m_strobe) : 0;
 }
 
-READ8_MEMBER(agat9_state::keyb_data_r)
+uint8_t agat9_state::keyb_data_r()
 {
 	return m_transchar | m_strobe;
 }
 
-READ8_MEMBER(agat_base_state::keyb_strobe_r)
+uint8_t agat_base_state::keyb_strobe_r()
 {
 	// reads any key down, clears strobe
 	uint8_t rv = m_transchar | (m_anykeydown ? 0x80 : 0x00);
@@ -485,63 +485,63 @@ READ8_MEMBER(agat_base_state::keyb_strobe_r)
 	return rv;
 }
 
-WRITE8_MEMBER(agat_base_state::keyb_strobe_w)
+void agat_base_state::keyb_strobe_w(uint8_t data)
 {
 	// clear keyboard latch
 	m_strobe = 0;
 }
 
-READ8_MEMBER(agat_base_state::cassette_toggle_r)
+uint8_t agat_base_state::cassette_toggle_r()
 {
 	if (!machine().side_effects_disabled())
-		cassette_toggle_w(space, offset, 0);
+		cassette_toggle_w(0);
 	return read_floatingbus();
 }
 
-WRITE8_MEMBER(agat_base_state::cassette_toggle_w)
+void agat_base_state::cassette_toggle_w(uint8_t data)
 {
 	m_cassette_state ^= 1;
 	m_cassette->output(m_cassette_state ? 1.0f : -1.0f);
 }
 
-READ8_MEMBER(agat_base_state::speaker_toggle_r)
+uint8_t agat_base_state::speaker_toggle_r()
 {
 	if (!machine().side_effects_disabled())
-		speaker_toggle_w(space, offset, 0);
+		speaker_toggle_w(0);
 	return read_floatingbus();
 }
 
-WRITE8_MEMBER(agat_base_state::speaker_toggle_w)
+void agat_base_state::speaker_toggle_w(uint8_t data)
 {
 	m_speaker_state ^= 1;
 	m_speaker->level_w(m_speaker_state);
 }
 
-READ8_MEMBER(agat_base_state::interrupts_on_r)
+uint8_t agat_base_state::interrupts_on_r()
 {
 	if (!machine().side_effects_disabled())
-		interrupts_on_w(space, offset, 0);
+		interrupts_on_w(0);
 	return read_floatingbus();
 }
 
-WRITE8_MEMBER(agat_base_state::interrupts_on_w)
+void agat_base_state::interrupts_on_w(uint8_t data)
 {
 	m_agat_interrupts = true;
 }
 
-READ8_MEMBER(agat_base_state::interrupts_off_r)
+uint8_t agat_base_state::interrupts_off_r()
 {
 	if (!machine().side_effects_disabled())
-		interrupts_off_w(space, offset, 0);
+		interrupts_off_w(0);
 	return read_floatingbus();
 }
 
-WRITE8_MEMBER(agat_base_state::interrupts_off_w)
+void agat_base_state::interrupts_off_w(uint8_t data)
 {
 	m_agat_interrupts = false;
 }
 
-READ8_MEMBER(agat_base_state::flags_r)
+uint8_t agat_base_state::flags_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -574,14 +574,14 @@ READ8_MEMBER(agat_base_state::flags_r)
 	return 0;
 }
 
-READ8_MEMBER(agat_base_state::controller_strobe_r)
+uint8_t agat_base_state::controller_strobe_r()
 {
 	if (!machine().side_effects_disabled())
-		controller_strobe_w(space, offset, 0);
+		controller_strobe_w(0);
 	return read_floatingbus();
 }
 
-WRITE8_MEMBER(agat_base_state::controller_strobe_w)
+void agat_base_state::controller_strobe_w(uint8_t data)
 {
 	m_joystick_x1_time = machine().time().as_double() + m_x_calibration * m_joy1x->read();
 	m_joystick_y1_time = machine().time().as_double() + m_y_calibration * m_joy1y->read();
@@ -589,7 +589,7 @@ WRITE8_MEMBER(agat_base_state::controller_strobe_w)
 	m_joystick_y2_time = machine().time().as_double() + m_y_calibration * m_joy2y->read();
 }
 
-READ8_MEMBER(agat_base_state::c080_r)
+uint8_t agat_base_state::c080_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -610,7 +610,7 @@ READ8_MEMBER(agat_base_state::c080_r)
 	return read_floatingbus();
 }
 
-WRITE8_MEMBER(agat_base_state::c080_w)
+void agat_base_state::c080_w(offs_t offset, uint8_t data)
 {
 	int slot;
 
@@ -625,7 +625,7 @@ WRITE8_MEMBER(agat_base_state::c080_w)
 	}
 }
 
-READ8_MEMBER(agat_base_state::c100_r)
+uint8_t agat_base_state::c100_r(offs_t offset)
 {
 	int slotnum;
 
@@ -648,7 +648,7 @@ READ8_MEMBER(agat_base_state::c100_r)
 	return read_floatingbus();
 }
 
-WRITE8_MEMBER(agat_base_state::c100_w)
+void agat_base_state::c100_w(offs_t offset, uint8_t data)
 {
 	int slotnum;
 
@@ -667,27 +667,27 @@ WRITE8_MEMBER(agat_base_state::c100_w)
 	}
 }
 
-READ8_MEMBER(agat9_state::c090_r)
+uint8_t agat9_state::c090_r(offs_t offset)
 {
-	return c080_r(space, offset + 0x10);
+	return c080_r(offset + 0x10);
 }
 
-WRITE8_MEMBER(agat9_state::c090_w)
+void agat9_state::c090_w(offs_t offset, uint8_t data)
 {
-	c080_w(space, offset + 0x10, data);
+	c080_w(offset + 0x10, data);
 }
 
-READ8_MEMBER(agat9_state::c200_r)
+uint8_t agat9_state::c200_r(offs_t offset)
 {
-	return c100_r(space, offset + 0x0100);
+	return c100_r(offset + 0x0100);
 }
 
-WRITE8_MEMBER(agat9_state::c200_w)
+void agat9_state::c200_w(offs_t offset, uint8_t data)
 {
-	c100_w(space, offset + 0x0100, data);
+	c100_w(offset + 0x0100, data);
 }
 
-READ8_MEMBER(agat_base_state::c800_r)
+uint8_t agat_base_state::c800_r(offs_t offset)
 {
 	if (offset == 0x7ff)
 	{
@@ -707,7 +707,7 @@ READ8_MEMBER(agat_base_state::c800_r)
 	return read_floatingbus();
 }
 
-WRITE8_MEMBER(agat_base_state::c800_w)
+void agat_base_state::c800_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0x7ff)
 	{
@@ -725,7 +725,7 @@ WRITE8_MEMBER(agat_base_state::c800_w)
 	}
 }
 
-WRITE8_MEMBER(agat9_state::apple_w)
+void agat9_state::apple_w(offs_t offset, uint8_t data)
 {
 	logerror("%s: c0f0_w %04X <- %02X (apple mode set)\n", machine().describe_context(), offset + 0xc0f0, data);
 
@@ -733,7 +733,7 @@ WRITE8_MEMBER(agat9_state::apple_w)
 	m_upperbank->set_bank(5); // XXX get current bank
 }
 
-READ8_MEMBER(agat_base_state::inh_r)
+uint8_t agat_base_state::inh_r(offs_t offset)
 {
 	if (m_inh_slot != -1)
 	{
@@ -744,7 +744,7 @@ READ8_MEMBER(agat_base_state::inh_r)
 	return read_floatingbus();
 }
 
-WRITE8_MEMBER(agat_base_state::inh_w)
+void agat_base_state::inh_w(offs_t offset, uint8_t data)
 {
 	if (m_inh_slot != -1)
 	{
@@ -763,7 +763,7 @@ uint8_t agat_base_state::read_floatingbus()
 
 /* onboard memory banking on Agat-7 */
 
-READ8_MEMBER(agat_base_state::agat7_membank_r)
+uint8_t agat_base_state::agat7_membank_r(offs_t offset)
 {
 	logerror("%s: c0f0_r %04X == %02X\n", machine().describe_context(), offset + 0xc0f0, 0xff);
 
@@ -775,14 +775,14 @@ READ8_MEMBER(agat_base_state::agat7_membank_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(agat_base_state::agat7_membank_w)
+void agat_base_state::agat7_membank_w(offs_t offset, uint8_t data)
 {
 	logerror("%s: c0f0_w %04X <- %02X\n", machine().describe_context(), offset + 0xc0f0, data);
 
 	m_agat7_membank = offset;
 }
 
-READ8_MEMBER(agat_base_state::agat7_ram_r)
+uint8_t agat_base_state::agat7_ram_r(offs_t offset)
 {
 	if (offset < 32768)
 	{
@@ -807,7 +807,7 @@ READ8_MEMBER(agat_base_state::agat7_ram_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(agat_base_state::agat7_ram_w)
+void agat_base_state::agat7_ram_w(offs_t offset, uint8_t data)
 {
 	if (offset < 32768)
 	{
@@ -838,7 +838,7 @@ WRITE8_MEMBER(agat_base_state::agat7_ram_w)
  * and return current mapping mode
  */
 
-READ8_MEMBER(agat9_state::agat9_upperbank_r)
+uint8_t agat9_state::agat9_upperbank_r(offs_t offset)
 {
 	if (machine().side_effects_disabled())
 	{
@@ -901,7 +901,7 @@ READ8_MEMBER(agat9_state::agat9_upperbank_r)
 	return rc;
 }
 
-WRITE8_MEMBER(agat9_state::agat9_upperbank_w)
+void agat9_state::agat9_upperbank_w(offs_t offset, uint8_t data)
 {
 	logerror("%s: c080_w %04X <- %02X: select new mode %d (d000 %s)\n", machine().describe_context(), offset + 0xc080, data,
 		offset & 3, offset & 8 ? "upper" : "lower");
@@ -920,7 +920,7 @@ WRITE8_MEMBER(agat9_state::agat9_upperbank_w)
 	}
 }
 
-READ8_MEMBER(agat9_state::agat9_membank_r)
+uint8_t agat9_state::agat9_membank_r(offs_t offset)
 {
 	u8 data = 0;
 
@@ -931,7 +931,7 @@ READ8_MEMBER(agat9_state::agat9_membank_r)
 	return data;
 }
 
-WRITE8_MEMBER(agat9_state::agat9_membank_w)
+void agat9_state::agat9_membank_w(offs_t offset, uint8_t data)
 {
 	logerror("%s: c100_w %04X <- %02X: bank %d va %04X = page %02d pa %05X (apple %d)\n", machine().describe_context(), offset + 0xc100, data,
 		(offset >> 4), 0x2000 * (offset >> 4), (offset & 15), (offset & 15) * 8192, m_apple);

@@ -29,10 +29,10 @@ public:
 	virtual ~device_apf_cart_interface();
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom) { return 0xff; }
-	virtual DECLARE_READ8_MEMBER(extra_rom) { return 0xff; }
-	virtual DECLARE_READ8_MEMBER(read_ram) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_ram) {}
+	virtual uint8_t read_rom(offs_t offset) { return 0xff; }
+	virtual uint8_t extra_rom(offs_t offset) { return 0xff; }
+	virtual uint8_t read_ram(offs_t offset) { return 0xff; }
+	virtual void write_ram(offs_t offset, uint8_t data) {}
 
 	void rom_alloc(uint32_t size, const char *tag);
 	void ram_alloc(uint32_t size);
@@ -93,10 +93,10 @@ public:
 	void save_ram() { if (m_cart && m_cart->get_ram_size()) m_cart->save_ram(); }
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
-	virtual DECLARE_READ8_MEMBER(extra_rom);
-	virtual DECLARE_READ8_MEMBER(read_ram);
-	virtual DECLARE_WRITE8_MEMBER(write_ram);
+	uint8_t read_rom(offs_t offset);
+	uint8_t extra_rom(offs_t offset);
+	uint8_t read_ram(offs_t offset);
+	void write_ram(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides

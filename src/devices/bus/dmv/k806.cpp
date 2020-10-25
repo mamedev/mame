@@ -154,7 +154,7 @@ void dmv_k806_device::io_write(int ifsel, offs_t offset, uint8_t data)
 	}
 }
 
-READ8_MEMBER( dmv_k806_device::port1_r )
+uint8_t dmv_k806_device::port1_r()
 {
 	// ---- ---x   Left button
 	// ---- --x-   Middle button
@@ -180,7 +180,7 @@ READ_LINE_MEMBER( dmv_k806_device::portt1_r )
 	return BIT(m_jumpers->read(), 7) ? 0 : 1;
 }
 
-WRITE8_MEMBER( dmv_k806_device::port2_w )
+void dmv_k806_device::port2_w(uint8_t data)
 {
 	out_int((data & 1) ? CLEAR_LINE : ASSERT_LINE);
 }

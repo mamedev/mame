@@ -85,11 +85,11 @@ private:
 
 	// I/O handlers
 	void update_display();
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE8_MEMBER(lcd_data_w);
-	DECLARE_WRITE8_MEMBER(leds_w);
-	DECLARE_READ8_MEMBER(input1_r);
-	DECLARE_READ8_MEMBER(input2_r);
+	void control_w(u8 data);
+	void lcd_data_w(u8 data);
+	void leds_w(u8 data);
+	u8 input1_r();
+	u8 input2_r();
 
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
 	void lcd_palette(palette_device &palette) const;
@@ -128,9 +128,9 @@ void diablo_state::machine_start()
 
 void diablo_state::lcd_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, rgb_t(138, 146, 148)); // background
-	palette.set_pen_color(1, rgb_t(51, 42, 43)); // lcd pixel on
-	palette.set_pen_color(2, rgb_t(131, 136, 139)); // lcd pixel off
+	palette.set_pen_color(0, rgb_t(0xff, 0xff, 0xff)); // background
+	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00)); // lcd pixel on
+	palette.set_pen_color(2, rgb_t(0xe8, 0xe8, 0xe8)); // lcd pixel off
 }
 
 HD44780_PIXEL_UPDATE(diablo_state::lcd_pixel_update)
@@ -142,7 +142,7 @@ HD44780_PIXEL_UPDATE(diablo_state::lcd_pixel_update)
 	if (line < 2 && pos < 8)
 	{
 		// internal: (8+8)*1, external: 1*16
-		bitmap.pix16(1 + y, 1 + line*8*6 + pos*6 + x) = state ? 1 : 2;
+		bitmap.pix(1 + y, 1 + line*8*6 + pos*6 + x) = state ? 1 : 2;
 	}
 }
 
@@ -156,7 +156,7 @@ void diablo_state::update_display()
 	m_display->matrix(led_select, m_led_side << 8 | m_led_data);
 }
 
-WRITE8_MEMBER(diablo_state::control_w)
+void diablo_state::control_w(u8 data)
 {
 	// d0: HD44780 E
 	// d1: HD44780 RS
@@ -175,26 +175,26 @@ WRITE8_MEMBER(diablo_state::control_w)
 	update_display();
 }
 
-WRITE8_MEMBER(diablo_state::lcd_data_w)
+void diablo_state::lcd_data_w(u8 data)
 {
 	// d0-d7: HD44780 data
 	m_lcd_data = data;
 }
 
-WRITE8_MEMBER(diablo_state::leds_w)
+void diablo_state::leds_w(u8 data)
 {
 	// d0-d7: chessboard leds
 	m_led_data = data;
 	update_display();
 }
 
-READ8_MEMBER(diablo_state::input1_r)
+u8 diablo_state::input1_r()
 {
 	// d0-d7: multiplexed inputs (chessboard squares)
 	return ~m_board->read_rank(m_inp_mux, true);
 }
 
-READ8_MEMBER(diablo_state::input2_r)
+u8 diablo_state::input2_r()
 {
 	// d0-d2: multiplexed inputs (side panel)
 	// other: ?
@@ -294,21 +294,12 @@ void diablo_state::diablo68k(machine_config &config)
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(1100)); // active for 1.1us
 	TIMER(config, "irq_off").configure_periodic(FUNC(diablo_state::irq_off<M68K_IRQ_IPL1>), irq_period);
 
-	MOS6551(config, m_acia).set_xtal(1.8432_MHz_XTAL);
-	m_acia->irq_handler().set_inputline("maincpu", M68K_IRQ_IPL2);
-	m_acia->rts_handler().set("acia", FUNC(mos6551_device::write_cts));
-	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
-	m_acia->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
-
-	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
-	m_rs232->rxd_handler().set("acia", FUNC(mos6551_device::write_rxd));
-	m_rs232->dsr_handler().set("acia", FUNC(mos6551_device::write_dsr));
-
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(100));
+	m_board->set_nvram_enable(true);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
@@ -332,6 +323,17 @@ void diablo_state::diablo68k(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 32.768_kHz_XTAL/32); // 1024Hz
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
+
+	/* uart (configure after video) */
+	MOS6551(config, m_acia).set_xtal(1.8432_MHz_XTAL);
+	m_acia->irq_handler().set_inputline("maincpu", M68K_IRQ_IPL2);
+	m_acia->rts_handler().set("acia", FUNC(mos6551_device::write_cts));
+	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_acia->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_rs232->rxd_handler().set("acia", FUNC(mos6551_device::write_rxd));
+	m_rs232->dsr_handler().set("acia", FUNC(mos6551_device::write_dsr));
 }
 
 void diablo_state::scorpio68k(machine_config &config)

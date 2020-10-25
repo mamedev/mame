@@ -62,7 +62,7 @@
 #include "emu.h"
 #include "includes/suna16.h"
 
-WRITE16_MEMBER(suna16_state::flipscreen_w)
+void suna16_state::flipscreen_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -72,7 +72,7 @@ WRITE16_MEMBER(suna16_state::flipscreen_w)
 	if (data & ~(1|4))  logerror("CPU#0 PC %06X - Flip screen unknown bits: %04X\n", m_maincpu->pc(), data);
 }
 
-WRITE16_MEMBER(suna16_state::bestbest_flipscreen_w)
+void suna16_state::bestbest_flipscreen_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -98,12 +98,12 @@ void suna16_state::video_start()
 	save_item(NAME(m_color_bank));
 }
 
-READ16_MEMBER(suna16_state::paletteram_r)
+uint16_t suna16_state::paletteram_r(offs_t offset)
 {
 	return m_paletteram[offset + m_color_bank * 256];
 }
 
-WRITE16_MEMBER(suna16_state::paletteram_w)
+void suna16_state::paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset += m_color_bank * 256;
 	data = COMBINE_DATA(&m_paletteram[offset]);

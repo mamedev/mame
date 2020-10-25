@@ -14,9 +14,9 @@ public:
 
 	int draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ32_MEMBER(read);
-	DECLARE_WRITE32_MEMBER(write);
-	DECLARE_WRITE32_MEMBER(fifo_w);
+	uint32_t read(offs_t offset);
+	void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void fifo_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	struct framebuffer
 	{

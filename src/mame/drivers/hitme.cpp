@@ -43,7 +43,7 @@ TILE_GET_INFO_MEMBER(hitme_state::get_hitme_tile_info)
 }
 
 
-WRITE8_MEMBER(hitme_state::hitme_vidram_w)
+void hitme_state::hitme_vidram_w(offs_t offset, uint8_t data)
 {
 	/* mark this tile dirty */
 	m_videoram[offset] = data;
@@ -80,26 +80,26 @@ uint32_t hitme_state::screen_update_hitme(screen_device &screen, bitmap_ind16 &b
 	double dot_freq = 15750 * 336;
 	/* the number of pixels is the duration times the frequency */
 	int width_pixels = width_duration * dot_freq;
-	int x, y, xx, inv;
 	offs_t offs = 0;
 
 	/* start by drawing the tilemap */
 	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* now loop over and invert anything */
-	for (y = 0; y < 19; y++)
+	for (int y = 0; y < 19; y++)
 	{
 		int dy = bitmap.rowpixels();
-		for (inv = x = 0; x < 40; x++, offs++)
+		int inv = 0;
+		for (int x = 0; x < 40; x++, offs++)
 		{
 			/* if the high bit is set, reset the oneshot */
 			if (m_videoram[y * 40 + x] & 0x80)
 				inv = width_pixels;
 
 			/* invert pixels until we run out */
-			for (xx = 0; xx < 8 && inv; xx++, inv--)
+			for (int xx = 0; xx < 8 && inv; xx++, inv--)
 			{
-				uint16_t *dest = &bitmap.pix16(y * 10, x * 8 + xx);
+				uint16_t *const dest = &bitmap.pix(y * 10, x * 8 + xx);
 				dest[0 * dy] ^= 1;
 				dest[1 * dy] ^= 1;
 				dest[2 * dy] ^= 1;
@@ -151,25 +151,25 @@ uint8_t hitme_state::read_port_and_t0_and_hblank( int port )
 }
 
 
-READ8_MEMBER(hitme_state::hitme_port_0_r)
+uint8_t hitme_state::hitme_port_0_r()
 {
 	return read_port_and_t0_and_hblank(0);
 }
 
 
-READ8_MEMBER(hitme_state::hitme_port_1_r)
+uint8_t hitme_state::hitme_port_1_r()
 {
 	return read_port_and_t0(1);
 }
 
 
-READ8_MEMBER(hitme_state::hitme_port_2_r)
+uint8_t hitme_state::hitme_port_2_r()
 {
 	return read_port_and_t0_and_hblank(2);
 }
 
 
-READ8_MEMBER(hitme_state::hitme_port_3_r)
+uint8_t hitme_state::hitme_port_3_r()
 {
 	return read_port_and_t0(3);
 }
@@ -182,7 +182,7 @@ READ8_MEMBER(hitme_state::hitme_port_3_r)
  *
  *************************************/
 
-WRITE8_MEMBER(hitme_state::output_port_0_w)
+void hitme_state::output_port_0_w(uint8_t data)
 {
 	/*
 	    Note: We compute the timeout time on a write here. Unfortunately, the situation is
@@ -200,7 +200,7 @@ WRITE8_MEMBER(hitme_state::output_port_0_w)
 }
 
 
-WRITE8_MEMBER(hitme_state::output_port_1_w)
+void hitme_state::output_port_1_w(uint8_t data)
 {
 	m_discrete->write(HITME_ENABLE_VAL, data);
 	m_discrete->write(HITME_OUT1, 1);

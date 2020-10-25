@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Wilbert Pol, Bartman/Abyss (HD6345)
+// copyright-holders:Wilbert Pol,Nigel Barnes
 /**********************************************************************
 
     Motorola MC6845 and compatible CRT controller emulation
@@ -357,8 +357,6 @@ protected:
 	virtual void device_reset() override;
 };
 
-// HD6345/HD6445 CRTC-II
-// http://bitsavers.informatik.uni-stuttgart.de/pdf/hitachi/_dataBooks/1987_Hitachi_8_16_Bit_Peripheral_LSI_Data_Book.pdf, pp. 99
 class hd6345_device : public hd6845s_device
 {
 public:
@@ -371,16 +369,27 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-};
 
-class ams40041_device : public mc6845_device
-{
-public:
-	ams40041_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	/* register file */
+	uint8_t   m_disp2_pos;            /* 0x12 */
+	uint16_t  m_disp2_start_addr;     /* 0x13/0x14 */
+	uint8_t   m_disp3_pos;            /* 0x15 */
+	uint16_t  m_disp3_start_addr;     /* 0x16/0x17 */
+	uint8_t   m_disp4_pos;            /* 0x18 */
+	uint16_t  m_disp4_start_addr;     /* 0x19/0x1a */
+	uint8_t   m_vert_sync_pos_adj;    /* 0x1b */
+	uint8_t   m_smooth_scroll_ras;    /* 0x1d */
+	uint8_t   m_control1;             /* 0x1e */
+	uint8_t   m_control2;             /* 0x1f */
+	uint8_t   m_control3;             /* 0x20 */
+	uint8_t   m_mem_width_offs;       /* 0x21 */
+	uint8_t   m_cursor2_start_ras;    /* 0x22 */
+	uint8_t   m_cursor2_end_ras;      /* 0x23 */
+	uint16_t  m_cursor2_addr;         /* 0x24/0x25 */
+	uint8_t   m_cursor_width;         /* 0x26 */
+	uint8_t   m_cursor2_width;        /* 0x27 */
 
-protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual uint8_t draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 };
 
 class ams40489_device : public mc6845_device
@@ -481,7 +490,6 @@ DECLARE_DEVICE_TYPE(HD6845S,  hd6845s_device)
 DECLARE_DEVICE_TYPE(SY6545_1, sy6545_1_device)
 DECLARE_DEVICE_TYPE(SY6845E,  sy6845e_device)
 DECLARE_DEVICE_TYPE(HD6345,   hd6345_device)
-DECLARE_DEVICE_TYPE(AMS40041, ams40041_device)
 DECLARE_DEVICE_TYPE(AMS40489, ams40489_device)
 DECLARE_DEVICE_TYPE(MOS8563,  mos8563_device)
 DECLARE_DEVICE_TYPE(MOS8568,  mos8568_device)

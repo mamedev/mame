@@ -10,12 +10,12 @@
         * Rampart (1990) [4 sets]
 
     Known bugs:
-        * P3 trackball doesn't work, maybe it needs some kind of fake input port
+        * none at this time
 
     Note:
         P3 buttons 1 and 2 are mapped twice. THIS IS NOT A BUG!
 
-    bp 548,a0==6c0007 && (d0&ffff)!=0,{print d0&ffff; g}
+    bp 548,a0==6c0007 && (d0&ffff)!=0,{print d0&ffff; g} <- what's this for?
 
 ****************************************************************************
 
@@ -76,7 +76,7 @@ void rampart_state::machine_reset()
  *
  *************************************/
 
-WRITE16_MEMBER(rampart_state::latch_w)
+void rampart_state::latch_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* bit layout in this register:
 
@@ -340,7 +340,7 @@ void rampart_state::rampart(machine_config &config)
 	M68000(config, m_maincpu, MASTER_CLOCK/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &rampart_state::main_map);
 
-	SLAPSTIC(config, m_slapstic_device, 118, true);
+	SLAPSTIC(config, m_slapstic, 118, true);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(rampart_state::scanline_interrupt), m_screen, 0, 32);
 
@@ -508,7 +508,7 @@ void rampart_state::init_rampart()
 	uint8_t *rom = memregion("maincpu")->base();
 
 	memcpy(&rom[0x140000], &rom[0x40000], 0x8000);
-	slapstic_configure(*m_maincpu, 0x140000, 0x438000, memregion("maincpu")->base() + 0x140000);
+	m_slapstic->legacy_configure(*m_maincpu, 0x140000, 0x438000, memregion("maincpu")->base() + 0x140000);
 }
 
 

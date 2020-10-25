@@ -2,7 +2,7 @@
 // copyright-holders:Michael Zapf
 /****************************************************************************
 
-    MESS Driver for TI-99/4 and TI-99/4A Home Computers.
+    MAME Driver for TI-99/4 and TI-99/4A Home Computers.
     TI99/4 info:
 
     Similar to TI99/4a, except for the following:
@@ -15,7 +15,7 @@
     * early TI99/4 prototypes were designed for a tms9985, not a tms9900.
 
     Emulation architecture:
-    (also see datamux.c, peribox.c)
+    (also see datamux.cpp, peribox.cpp)
 
               +---- video (upper 8 bits of databus)
               |
@@ -44,7 +44,6 @@
 #include "machine/tms9901.h"
 #include "imagedev/cassette.h"
 
-#include "bus/ti99/ti99defs.h"
 #include "bus/ti99/internal/datamux.h"
 #include "bus/ti99/gromport/gromport.h"
 #include "bus/ti99/internal/evpcconn.h"
@@ -55,6 +54,10 @@
 
 #include "softlist.h"
 #include "speaker.h"
+
+#define TI99_CONSOLEGROM     "cons_grom"
+#define TI99_TMS9901_TAG     "tms9901"
+#define TI99_SCREEN_TAG      "screen"
 
 // Debugging
 #define LOG_WARN        (1U<<1)   // Warnings
@@ -86,12 +89,12 @@ public:
 		m_int2(0),
 		m_int12(0),
 		m_cpu(*this, "maincpu"),
-		m_tms9901(*this, TI_TMS9901_TAG),
+		m_tms9901(*this, TI99_TMS9901_TAG),
 		m_gromport(*this, TI99_GROMPORT_TAG),
 		m_ioport(*this, TI99_IOPORT_TAG),
 		m_joyport(*this, TI_JOYPORT_TAG),
 		m_datamux(*this, TI99_DATAMUX_TAG),
-		m_video(*this, TI_VDP_TAG),
+		m_video(*this, TI99_VDP_TAG),
 		m_cassette1(*this, "cassette1"),
 		m_cassette2(*this, "cassette2"),
 		m_keyboard(*this, "COL%u", 0U),
@@ -145,8 +148,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( handset_interrupt_in );
 
 	// Connections with the system interface TMS9901
-	DECLARE_READ8_MEMBER(psi_input_4);
-	DECLARE_READ8_MEMBER(psi_input_4a);
+	uint8_t psi_input_4(offs_t offset);
+	uint8_t psi_input_4a(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(keyC0);
 	DECLARE_WRITE_LINE_MEMBER(keyC1);
 	DECLARE_WRITE_LINE_MEMBER(keyC2);
@@ -253,7 +256,6 @@ void ti99_4x_state::memmap_setaddress(address_map &map)
 void ti99_4x_state::crumap(address_map &map)
 {
 	map(0x0000, 0x1fff).rw(FUNC(ti99_4x_state::cruread), FUNC(ti99_4x_state::cruwrite));
-	map(0x0000, 0x003f).mirror(0x03c0).rw(m_tms9901, FUNC(tms9901_device::read), FUNC(tms9901_device::write));
 }
 
 
@@ -281,7 +283,7 @@ static INPUT_PORTS_START(ti99_4)
 		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9 (") PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR('(')
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("O +") PORT_CODE(KEYCODE_O) PORT_CHAR('O') PORT_CHAR('+')
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("K /") PORT_CODE(KEYCODE_K) PORT_CHAR('K') PORT_CHAR('/')
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(", .") PORT_CODE(KEYCODE_STOP) PORT_CHAR(',') PORT_CHAR('.')
+		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(", .") PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR(',')
 
 	PORT_START("COL2")  // col 2
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3 #") PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
@@ -405,12 +407,17 @@ INPUT_PORTS_END
 
 uint8_t ti99_4x_state::cruread(offs_t offset)
 {
-	LOGMASKED(LOG_CRUREAD, "read access to CRU address %04x\n", offset << 1);
 	uint8_t value = 0;
+	LOGMASKED(LOG_CRUREAD, "read access to CRU address %04x\n", offset << 1);
+
+	// Internal 9901
+	// We cannot use the map because devices in the Peribox may want to see the
+	// CRU address on the bus (see sidmaster)
+	if ((offset & 0xfc00)==0)
+		value = m_tms9901->read(offset & 0x3f);
 
 	// Let the gromport (not in the QI version) and the p-box behind the I/O port
 	// decide whether they want to change the value at the CRU address
-
 	if (m_model != MODEL_4QI) m_gromport->crureadz(offset<<1, &value);
 	m_ioport->crureadz(offset<<1, &value);
 
@@ -420,6 +427,13 @@ uint8_t ti99_4x_state::cruread(offs_t offset)
 void ti99_4x_state::cruwrite(offs_t offset, uint8_t data)
 {
 	LOGMASKED(LOG_CRU, "Write access to CRU address %04x\n", offset << 1);
+
+	// Internal 9901
+	// We cannot use the map because device in the Peribox may want to see the
+	// CRU address on the bus (see sidmaster)
+	if ((offset & 0xfc00)==0)
+		m_tms9901->write(offset & 0x3f, data);
+
 	// The QI version does not propagate the CRU signals to the cartridge slot
 	if (m_model != MODEL_4QI) m_gromport->cruwrite(offset<<1, data);
 	m_ioport->cruwrite(offset<<1, data);
@@ -488,7 +502,7 @@ void ti99_4x_state::external_operation(offs_t offset, uint8_t data)
     The typical fix was to insert a diode at the Alphalock key.
 ***************************************************************************/
 
-READ8_MEMBER( ti99_4x_state::psi_input_4)
+uint8_t ti99_4x_state::psi_input_4(offs_t offset)
 {
 	switch (offset)
 	{
@@ -524,7 +538,7 @@ READ8_MEMBER( ti99_4x_state::psi_input_4)
 	}
 }
 
-READ8_MEMBER( ti99_4x_state::psi_input_4a )
+uint8_t ti99_4x_state::psi_input_4a(offs_t offset)
 {
 	int alphabias=0;
 
@@ -948,7 +962,7 @@ void ti99_4x_state::ti99_4(machine_config& config)
 
 	// Sound hardware (not in EVPC variant)
 	SPEAKER(config, "sound_out").front_center();
-	sn94624_device& soundgen(SN94624(config, TI_SOUNDCHIP_TAG, 3579545/8));
+	sn94624_device& soundgen(SN94624(config, TI99_SOUNDCHIP_TAG, 3579545/8));
 	soundgen.ready_cb().set(FUNC(ti99_4x_state::console_ready_sound));
 	soundgen.add_route(ALL_OUTPUTS, "sound_out", 0.75);
 
@@ -967,9 +981,9 @@ void ti99_4x_state::ti99_4_60hz(machine_config &config)
 	m_video->set_vram_size(0x4000);
 	m_video->int_callback().set(FUNC(ti99_4x_state::video_interrupt_in));
 	m_video->gromclk_callback().set(FUNC(ti99_4x_state::gromclk_in));
-	m_video->set_screen(TI_SCREEN_TAG);
+	m_video->set_screen(TI99_SCREEN_TAG);
 
-	SCREEN(config, TI_SCREEN_TAG, SCREEN_TYPE_RASTER);
+	SCREEN(config, TI99_SCREEN_TAG, SCREEN_TYPE_RASTER);
 }
 
 /*
@@ -982,9 +996,9 @@ void ti99_4x_state::ti99_4_50hz(machine_config &config)
 	m_video->set_vram_size(0x4000);
 	m_video->int_callback().set(FUNC(ti99_4x_state::video_interrupt_in));
 	m_video->gromclk_callback().set(FUNC(ti99_4x_state::gromclk_in));
-	m_video->set_screen(TI_SCREEN_TAG);
+	m_video->set_screen(TI99_SCREEN_TAG);
 
-	SCREEN(config, TI_SCREEN_TAG, SCREEN_TYPE_RASTER);
+	SCREEN(config, TI99_SCREEN_TAG, SCREEN_TYPE_RASTER);
 }
 
 /**********************************************************************
@@ -1009,7 +1023,7 @@ void ti99_4x_state::ti99_4a(machine_config& config)
 
 	// Sound hardware (not in EVPC variant)
 	SPEAKER(config, "sound_out").front_center();
-	sn94624_device& soundgen(SN94624(config, TI_SOUNDCHIP_TAG, 3579545/8));
+	sn94624_device& soundgen(SN94624(config, TI99_SOUNDCHIP_TAG, 3579545/8));
 	soundgen.ready_cb().set(FUNC(ti99_4x_state::console_ready_sound));
 	soundgen.add_route(ALL_OUTPUTS, "sound_out", 0.75);
 
@@ -1027,9 +1041,9 @@ void ti99_4x_state::ti99_4a_60hz(machine_config &config)
 	m_video->set_vram_size(0x4000);
 	m_video->int_callback().set(FUNC(ti99_4x_state::video_interrupt_in));
 	m_video->gromclk_callback().set(FUNC(ti99_4x_state::gromclk_in));
-	m_video->set_screen(TI_SCREEN_TAG);
+	m_video->set_screen(TI99_SCREEN_TAG);
 
-	SCREEN(config, TI_SCREEN_TAG, SCREEN_TYPE_RASTER);
+	SCREEN(config, TI99_SCREEN_TAG, SCREEN_TYPE_RASTER);
 }
 
 /*
@@ -1042,9 +1056,9 @@ void ti99_4x_state::ti99_4a_50hz(machine_config &config)
 	m_video->set_vram_size(0x4000);
 	m_video->int_callback().set(FUNC(ti99_4x_state::video_interrupt_in));
 	m_video->gromclk_callback().set(FUNC(ti99_4x_state::gromclk_in));
-	m_video->set_screen(TI_SCREEN_TAG);
+	m_video->set_screen(TI99_SCREEN_TAG);
 
-	SCREEN(config, TI_SCREEN_TAG, SCREEN_TYPE_RASTER);
+	SCREEN(config, TI99_SCREEN_TAG, SCREEN_TYPE_RASTER);
 }
 
 /************************************************************************
@@ -1069,9 +1083,9 @@ void ti99_4x_state::ti99_4qi_60hz(machine_config &config)
 	m_video->set_vram_size(0x4000);
 	m_video->int_callback().set(FUNC(ti99_4x_state::video_interrupt_in));
 	m_video->gromclk_callback().set(FUNC(ti99_4x_state::gromclk_in));
-	m_video->set_screen(TI_SCREEN_TAG);
+	m_video->set_screen(TI99_SCREEN_TAG);
 
-	SCREEN(config, TI_SCREEN_TAG, SCREEN_TYPE_RASTER);
+	SCREEN(config, TI99_SCREEN_TAG, SCREEN_TYPE_RASTER);
 }
 
 /************************************************************************

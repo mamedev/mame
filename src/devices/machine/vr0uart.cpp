@@ -157,12 +157,12 @@ void vr0uart_device::rcv_complete()
  * ---- ---- --x- Stop Bits (1=2 bits, 0=1 Bit)
  * ---- ---- ---x Word Length (1=8 bits, 0=7 bits)
  */
-READ32_MEMBER( vr0uart_device::control_r )
+uint32_t vr0uart_device::control_r()
 {
 	return m_ucon;
 }
 
-WRITE32_MEMBER( vr0uart_device::control_w )
+void vr0uart_device::control_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_ucon);
 	update_serial_config();
@@ -178,7 +178,7 @@ WRITE32_MEMBER( vr0uart_device::control_w )
  * ---- ---- --x- Parity error
  * ---- ---- ---x Overrun Error
  */
-READ32_MEMBER( vr0uart_device::status_r )
+uint32_t vr0uart_device::status_r()
 {
 	uint32_t res = m_ustat;
 	if (!m_urxb_fifo.empty())
@@ -191,13 +191,13 @@ READ32_MEMBER( vr0uart_device::status_r )
 	return res;
 }
 
-WRITE32_MEMBER( vr0uart_device::transmit_buffer_w )
+void vr0uart_device::transmit_buffer_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		tx_send_byte(data & 0xff);
 }
 
-READ32_MEMBER( vr0uart_device::receive_buffer_r )
+uint32_t vr0uart_device::receive_buffer_r(offs_t offset, uint32_t mem_mask)
 {
 	// TODO: unknown value & behaviour attempting to read this on empty FIFO (stall?)
 	uint8_t res = 0;
@@ -208,12 +208,12 @@ READ32_MEMBER( vr0uart_device::receive_buffer_r )
 	return res;
 }
 
-READ32_MEMBER( vr0uart_device::baud_rate_div_r )
+uint32_t vr0uart_device::baud_rate_div_r()
 {
 	return m_ubdr;
 }
 
-WRITE32_MEMBER( vr0uart_device::baud_rate_div_w )
+void vr0uart_device::baud_rate_div_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_ubdr);
 	update_serial_config();

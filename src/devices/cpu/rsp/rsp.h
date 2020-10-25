@@ -218,9 +218,9 @@ private:
 	uint32_t m_ppc;
 	uint32_t m_nextpc;
 
-	address_space *m_program;
 protected:
-	memory_access_cache<2, 0, ENDIANNESS_BIG> *m_pcache;
+	memory_access<32, 2, 0, ENDIANNESS_BIG>::cache m_pcache;
+	memory_access<32, 2, 0, ENDIANNESS_BIG>::specific m_program;
 
 private:
 	std::unique_ptr<cop2>    m_cop2;

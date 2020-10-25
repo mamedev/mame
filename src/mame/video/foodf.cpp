@@ -73,7 +73,7 @@ void foodf_state::foodf_set_flip(int flip)
  *
  *************************************/
 
-WRITE16_MEMBER(foodf_state::foodf_paletteram_w)
+void foodf_state::foodf_paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int newword, r, g, b, bit0, bit1, bit2;
 

@@ -180,6 +180,9 @@ TODO:
 - commsega: the first time you kill a soldier, the music stops. When you die,
   the music restarts and won't stop a second time.
 
+- rallyx: is the playing field area 221 pixels wide like with bosco? Currently
+  kludged with set_scrolldx(3, 3);
+
 - rallyx: Three things in the schematics that I haven't been able to trace:
   WR2, WR3 and RDSTB. Only WR3 is actually used by the game.
 

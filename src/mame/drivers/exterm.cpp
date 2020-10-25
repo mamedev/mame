@@ -69,7 +69,6 @@
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -90,13 +89,13 @@ void exterm_state::machine_start()
  *
  *************************************/
 
-WRITE16_MEMBER(exterm_state::host_data_w)
+void exterm_state::host_data_w(offs_t offset, uint16_t data)
 {
 	m_slave->host_w(offset / 0x0010000, data);
 }
 
 
-READ16_MEMBER(exterm_state::host_data_r)
+uint16_t exterm_state::host_data_r(offs_t offset)
 {
 	return m_slave->host_r(offset / 0x0010000);
 }
@@ -110,7 +109,7 @@ READ16_MEMBER(exterm_state::host_data_r)
  *************************************/
 
 template<uint8_t Which>
-READ16_MEMBER(exterm_state::trackball_port_r)
+uint16_t exterm_state::trackball_port_r()
 {
 	uint16_t port;
 
@@ -143,7 +142,7 @@ READ16_MEMBER(exterm_state::trackball_port_r)
  *
  *************************************/
 
-WRITE16_MEMBER(exterm_state::output_port_0_w)
+void exterm_state::output_port_0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* All the outputs are activated on the rising edge */
 
@@ -171,7 +170,7 @@ WRITE16_MEMBER(exterm_state::output_port_0_w)
 }
 
 
-WRITE8_MEMBER(exterm_state::sound_latch_w)
+void exterm_state::sound_latch_w(uint8_t data)
 {
 	// data is latched independently for both sound CPUs
 	m_soundlatch[0]->write(data);
@@ -194,14 +193,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(exterm_state::master_sound_nmi_callback)
 }
 
 
-WRITE8_MEMBER(exterm_state::ym2151_data_latch_w)
+void exterm_state::ym2151_data_latch_w(uint8_t data)
 {
 	/* bit 7 of the sound control selects which port */
 	m_ym2151->write(m_sound_control >> 7, data);
 }
 
 
-WRITE8_MEMBER(exterm_state::sound_nmi_rate_w)
+void exterm_state::sound_nmi_rate_w(uint8_t data)
 {
 	/* rate is controlled by the value written here */
 	/* this value is latched into up-counters, which are clocked at the */
@@ -211,7 +210,7 @@ WRITE8_MEMBER(exterm_state::sound_nmi_rate_w)
 }
 
 
-READ8_MEMBER(exterm_state::sound_nmi_to_slave_r)
+uint8_t exterm_state::sound_nmi_to_slave_r()
 {
 	/* a read from here triggers an NMI pulse to the slave */
 	m_audioslave->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
@@ -219,7 +218,7 @@ READ8_MEMBER(exterm_state::sound_nmi_to_slave_r)
 }
 
 
-WRITE8_MEMBER(exterm_state::sound_control_w)
+void exterm_state::sound_control_w(uint8_t data)
 {
 /*
     D7 = to S4-15
@@ -416,9 +415,10 @@ void exterm_state::exterm(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	AD7528(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // ad7528j.e2
-	AD7528(config, "dacvol", 0).add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT); // ad7528j.e2
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dacvol", 1.0, DAC_VREF_POS_INPUT);
+	AD7528(config, "dacvol", 0)
+		.set_output_range(0, 1)
+		.add_route(0, "dac", 1.0, DAC_INPUT_RANGE_HI)
+		.add_route(0, "dac", -1.0, DAC_INPUT_RANGE_LO); // ad7528j.e2
 
 	YM2151(config, m_ym2151, 4000000).add_route(ALL_OUTPUTS, "speaker", 1.0);
 }

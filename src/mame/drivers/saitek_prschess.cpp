@@ -27,7 +27,6 @@ TODO:
 #include "cpu/m6502/m6502.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/pwm.h"
 #include "speaker.h"
 
@@ -68,9 +67,9 @@ private:
 
 	// I/O handlers
 	void update_display();
-	DECLARE_WRITE8_MEMBER(leds_w);
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void leds_w(offs_t offset, u8 data);
+	void control_w(u8 data);
+	u8 input_r();
 
 	u8 m_inp_mux = 0;
 	u8 m_led_data[2] = { 0, 0 };
@@ -95,13 +94,13 @@ void prschess_state::update_display()
 	m_display->matrix(1 << m_inp_mux, led_data);
 }
 
-WRITE8_MEMBER(prschess_state::leds_w)
+void prschess_state::leds_w(offs_t offset, u8 data)
 {
 	m_led_data[offset >> 8] = ~data;
 	update_display();
 }
 
-WRITE8_MEMBER(prschess_state::control_w)
+void prschess_state::control_w(u8 data)
 {
 	// d0-d3: input mux, led select
 	m_inp_mux = data & 0xf;
@@ -113,7 +112,7 @@ WRITE8_MEMBER(prschess_state::control_w)
 	// other: ?
 }
 
-READ8_MEMBER(prschess_state::input_r)
+u8 prschess_state::input_r()
 {
 	u8 data = 0;
 
@@ -203,7 +202,6 @@ void prschess_state::prschess(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
 

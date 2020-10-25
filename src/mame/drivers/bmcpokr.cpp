@@ -68,33 +68,33 @@ private:
 
 	// Protection
 	uint16_t m_prot_val;
-	DECLARE_READ16_MEMBER(prot_r);
-	DECLARE_WRITE16_MEMBER(prot_w);
-	DECLARE_READ16_MEMBER(unk_r);
+	uint16_t prot_r();
+	void prot_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t unk_r();
 
 	// I/O
 	uint8_t m_mux;
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_READ16_MEMBER(dsw_r);
-	DECLARE_READ16_MEMBER(mjmaglmp_dsw_r);
-	DECLARE_READ16_MEMBER(mjmaglmp_key_r);
+	void mux_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
+	uint16_t dsw_r();
+	uint16_t mjmaglmp_dsw_r();
+	uint16_t mjmaglmp_key_r();
 
 	// Interrrupts
 	uint8_t m_irq_enable;
-	DECLARE_WRITE8_MEMBER(irq_enable_w);
-	DECLARE_WRITE8_MEMBER(irq_ack_w);
+	void irq_enable_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
+	void irq_ack_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
 	// Video
 	tilemap_t *m_tilemap[2];
 	template<unsigned N> TILE_GET_INFO_MEMBER(get_tile_info);
-	template<unsigned N> DECLARE_WRITE16_MEMBER(videoram_w);
+	template<unsigned N> void videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	std::unique_ptr<bitmap_ind16> m_pixbitmap;
 	void pixbitmap_redraw();
 	uint8_t m_pixpal;
-	DECLARE_WRITE16_MEMBER(pixram_w);
-	DECLARE_WRITE8_MEMBER(pixpal_w);
+	void pixram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void pixpal_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
 
 	virtual void video_start() override;
 	void draw_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer);
@@ -111,7 +111,7 @@ private:
 
 // Tilemaps
 template<unsigned N>
-WRITE16_MEMBER(bmcpokr_state::videoram_w)
+void bmcpokr_state::videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[N][offset]);
 	m_tilemap[N]->mark_tile_dirty(offset);
@@ -143,25 +143,25 @@ void bmcpokr_state::video_start()
 
 // 1024 x 512 bitmap. 4 bits per pixel (every byte encodes 2 pixels) + palette register
 
-WRITE16_MEMBER(bmcpokr_state::pixram_w)
+void bmcpokr_state::pixram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pixram[offset]);
 
-	int x = (offset & 0xff) << 2;
-	int y = (offset >> 8);
+	int const x = (offset & 0xff) << 2;
+	int const y = (offset >> 8);
 
-	uint16_t pixpal = (m_pixpal & 0xf) << 4;
+	uint16_t const pixpal = (m_pixpal & 0xf) << 4;
 
 	uint16_t pen;
 	if (ACCESSING_BITS_8_15)
 	{
-		pen = (data >> 12) & 0xf; m_pixbitmap->pix16(y, x + 0) = pen ? pixpal + pen : 0;
-		pen = (data >>  8) & 0xf; m_pixbitmap->pix16(y, x + 1) = pen ? pixpal + pen : 0;
+		pen = (data >> 12) & 0xf; m_pixbitmap->pix(y, x + 0) = pen ? pixpal + pen : 0;
+		pen = (data >>  8) & 0xf; m_pixbitmap->pix(y, x + 1) = pen ? pixpal + pen : 0;
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		pen = (data >>  4) & 0xf; m_pixbitmap->pix16(y, x + 2) = pen ? pixpal + pen : 0;
-		pen = (data >>  0) & 0xf; m_pixbitmap->pix16(y, x + 3) = pen ? pixpal + pen : 0;
+		pen = (data >>  4) & 0xf; m_pixbitmap->pix(y, x + 2) = pen ? pixpal + pen : 0;
+		pen = (data >>  0) & 0xf; m_pixbitmap->pix(y, x + 3) = pen ? pixpal + pen : 0;
 	}
 }
 
@@ -173,17 +173,17 @@ void bmcpokr_state::pixbitmap_redraw()
 	{
 		for (int x = 0; x < 1024; x += 4)
 		{
-			uint16_t data = m_pixram[offset++];
+			uint16_t const data = m_pixram[offset++];
 			uint16_t pen;
-			pen = (data >> 12) & 0xf; m_pixbitmap->pix16(y, x + 0) = pen ? pixpal + pen : 0;
-			pen = (data >>  8) & 0xf; m_pixbitmap->pix16(y, x + 1) = pen ? pixpal + pen : 0;
-			pen = (data >>  4) & 0xf; m_pixbitmap->pix16(y, x + 2) = pen ? pixpal + pen : 0;
-			pen = (data >>  0) & 0xf; m_pixbitmap->pix16(y, x + 3) = pen ? pixpal + pen : 0;
+			pen = (data >> 12) & 0xf; m_pixbitmap->pix(y, x + 0) = pen ? pixpal + pen : 0;
+			pen = (data >>  8) & 0xf; m_pixbitmap->pix(y, x + 1) = pen ? pixpal + pen : 0;
+			pen = (data >>  4) & 0xf; m_pixbitmap->pix(y, x + 2) = pen ? pixpal + pen : 0;
+			pen = (data >>  0) & 0xf; m_pixbitmap->pix(y, x + 3) = pen ? pixpal + pen : 0;
 		}
 	}
 }
 
-WRITE8_MEMBER(bmcpokr_state::pixpal_w)
+void bmcpokr_state::pixpal_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t old = m_pixpal;
 	if (old != COMBINE_DATA(&m_pixpal))
@@ -288,13 +288,13 @@ uint32_t bmcpokr_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
                                 Protection
 ***************************************************************************/
 
-READ16_MEMBER(bmcpokr_state::unk_r)
+uint16_t bmcpokr_state::unk_r()
 {
 	return machine().rand();
 }
 
 // Hack!
-READ16_MEMBER(bmcpokr_state::prot_r)
+uint16_t bmcpokr_state::prot_r()
 {
 	switch (m_prot_val >> 8)
 	{
@@ -303,7 +303,7 @@ READ16_MEMBER(bmcpokr_state::prot_r)
 	}
 	return 0x00 << 8;
 }
-WRITE16_MEMBER(bmcpokr_state::prot_w)
+void bmcpokr_state::prot_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_prot_val);
 //  logerror("%s: prot val = %04x\n", machine().describe_context(), m_prot_val);
@@ -313,7 +313,7 @@ WRITE16_MEMBER(bmcpokr_state::prot_w)
                                 Memory Maps
 ***************************************************************************/
 
-WRITE8_MEMBER(bmcpokr_state::mux_w)
+void bmcpokr_state::mux_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	COMBINE_DATA(&m_mux);
 	m_hopper->motor_w(BIT(data, 0)); // hopper motor
@@ -324,7 +324,7 @@ WRITE8_MEMBER(bmcpokr_state::mux_w)
 
 //  popmessage("mux %04x", m_mux);
 }
-READ16_MEMBER(bmcpokr_state::dsw_r)
+uint16_t bmcpokr_state::dsw_r()
 {
 	switch ((m_mux >> 5) & 3)
 	{
@@ -343,11 +343,11 @@ READ_LINE_MEMBER(bmcpokr_state::hopper_r)
 	return (m_mux & 0x01) ? m_hopper->line_r() : 1;
 }
 
-WRITE8_MEMBER(bmcpokr_state::irq_enable_w)
+void bmcpokr_state::irq_enable_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	COMBINE_DATA(&m_irq_enable);
 }
-WRITE8_MEMBER(bmcpokr_state::irq_ack_w)
+void bmcpokr_state::irq_ack_w(uint8_t data)
 {
 	for (int i = 1; i < 8; i++)
 	{
@@ -405,7 +405,7 @@ void bmcpokr_state::bmcpokr_mem(address_map &map)
 }
 
 
-READ16_MEMBER(bmcpokr_state::mjmaglmp_dsw_r)
+uint16_t bmcpokr_state::mjmaglmp_dsw_r()
 {
 	switch ((m_mux >> 4) & 7)
 	{
@@ -417,7 +417,7 @@ READ16_MEMBER(bmcpokr_state::mjmaglmp_dsw_r)
 	return 0xff << 8;
 }
 
-READ16_MEMBER(bmcpokr_state::mjmaglmp_key_r)
+uint16_t bmcpokr_state::mjmaglmp_key_r()
 {
 	uint16_t key = 0x3f;
 	switch ((m_mux >> 4) & 7)
@@ -488,7 +488,7 @@ static INPUT_PORTS_START( bmcpokr )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_POKER_HOLD3   ) PORT_CONDITION("DSW4",0x80,EQUALS,0x80) // HOLD 3
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL   ) PORT_CONDITION("DSW4",0x80,EQUALS,0x80) // n.a.            [START, ESC in service mode]
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE   ) PORT_CONDITION("DSW4",0x80,EQUALS,0x80) // SCORE
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_POKER_BET     ) PORT_CONDITION("DSW4",0x80,EQUALS,0x80) // BET             [BET, credit -1]
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_BET    ) PORT_CONDITION("DSW4",0x80,EQUALS,0x80) // BET             [BET, credit -1]
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH,IPT_CUSTOM       ) PORT_READ_LINE_MEMBER(bmcpokr_state, hopper_r)  // HP [HOPPER, credit -100]
 	PORT_SERVICE_NO_TOGGLE( 0x0400, IP_ACTIVE_LOW      ) PORT_CONDITION("DSW4",0x80,EQUALS,0x80) // ACCOUNT         [SERVICE MODE]
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_CONDITION("DSW4",0x80,EQUALS,0x80) // KEY-OUT         [KEY-OUT, no hopper]
@@ -506,7 +506,7 @@ static INPUT_PORTS_START( bmcpokr )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1       ) PORT_PLAYER(1) PORT_CONDITION("DSW4",0x80,EQUALS,0x00) // A1
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL   )                PORT_CONDITION("DSW4",0x80,EQUALS,0x00) // n.a.            [START, ESC in service mode]
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_CONDITION("DSW4",0x80,EQUALS,0x00) // <Left>2 (3rd)
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_POKER_BET     )                PORT_CONDITION("DSW4",0x80,EQUALS,0x00) // <Down>1 (2nd)   [BET, credit -1]
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_BET    )                PORT_CONDITION("DSW4",0x80,EQUALS,0x00) // <Down>1 (2nd)   [BET, credit -1]
 //  PORT_BIT( 0x0200, IP_ACTIVE_HIGH,IPT_CUSTOM       ) PORT_READ_LINE_MEMBER(bmcpokr_state, hopper_r)  // HP [HOPPER, credit -100]
 	PORT_SERVICE_NO_TOGGLE( 0x0400, IP_ACTIVE_LOW      )                PORT_CONDITION("DSW4",0x80,EQUALS,0x00) // A2              [SERVICE MODE]
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )                PORT_CONDITION("DSW4",0x80,EQUALS,0x00) // C2              [KEY-OUT, no hopper]

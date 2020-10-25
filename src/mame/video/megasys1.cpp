@@ -235,28 +235,28 @@ VIDEO_START_MEMBER(megasys1_state,megasys1_z)
 ***************************************************************************/
 
 
-WRITE16_MEMBER(megasys1_state::active_layers_w)
+void megasys1_state::active_layers_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_active_layers);
 	m_screen->update_partial(m_screen->vpos());
 }
 
-WRITE16_MEMBER(megasys1_state::sprite_bank_w)
+void megasys1_state::sprite_bank_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_sprite_bank);
 }
 
-READ16_MEMBER(megasys1_state::sprite_flag_r)
+u16 megasys1_state::sprite_flag_r()
 {
 	return m_sprite_flag;
 }
 
-WRITE16_MEMBER(megasys1_state::sprite_flag_w)
+void megasys1_state::sprite_flag_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_sprite_flag);
 }
 
-WRITE16_MEMBER(megasys1_state::screen_flag_w)
+void megasys1_state::screen_flag_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_screen_flag);
 
@@ -269,39 +269,39 @@ WRITE16_MEMBER(megasys1_state::screen_flag_w)
 	}
 }
 
-WRITE16_MEMBER(megasys1_state::soundlatch_w)
+void megasys1_state::soundlatch_w(u16 data)
 {
 	m_soundlatch[0]->write(data);
 	m_audiocpu->set_input_line(4, HOLD_LINE);
 }
 
-WRITE16_MEMBER(megasys1_state::soundlatch_z_w)
+void megasys1_state::soundlatch_z_w(u16 data)
 {
 	m_soundlatch[0]->write(data & 0xff);
 	m_audiocpu->set_input_line(5, HOLD_LINE);
 }
 
-WRITE16_MEMBER(megasys1_state::soundlatch_c_w)
+void megasys1_state::soundlatch_c_w(u16 data)
 {
 	// Cybattler reads sound latch on irq 2
 	m_soundlatch[0]->write(data);
 	m_audiocpu->set_input_line(2, HOLD_LINE);
 }
 
-WRITE16_MEMBER(megasys1_state::monkelf_scroll0_w)
+void megasys1_state::monkelf_scroll0_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	// code in routine $280 does this. protection?
 	if (offset == 0)
 		data = data - (((data & 0x0f) > 0x0d) ? 0x10 : 0);
-	m_tmap[0]->scroll_w(space, offset, data, mem_mask);
+	m_tmap[0]->scroll_w(offset, data, mem_mask);
 }
 
-WRITE16_MEMBER(megasys1_state::monkelf_scroll1_w)
+void megasys1_state::monkelf_scroll1_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	// code in routine $280 does this. protection?
 	if (offset == 0)
 		data = data - (((data & 0x0f) > 0x0b) ? 0x10 : 0);
-	m_tmap[1]->scroll_w(space, offset, data, mem_mask);
+	m_tmap[1]->scroll_w(offset, data, mem_mask);
 }
 
 
@@ -334,17 +334,17 @@ WRITE16_MEMBER(megasys1_state::monkelf_scroll1_w)
 void megasys1_state::mix_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *decodegfx = m_gfxdecode->gfx(0);
-	u16 colorbase = decodegfx->colorbase();
+	u16 const colorbase = decodegfx->colorbase();
 
 	for (int y = cliprect.min_y;y <= cliprect.max_y;y++)
 	{
-		u16* srcline = &m_sprite_buffer_bitmap.pix16(y);
-		u16* dstline = &bitmap.pix16(y);
-		u8 *prio = &screen.priority().pix8(y);
+		u16 const *const srcline = &m_sprite_buffer_bitmap.pix(y);
+		u16 *const dstline = &bitmap.pix(y);
+		u8 const *const prio = &screen.priority().pix(y);
 
 		for (int x = cliprect.min_x;x <= cliprect.max_x;x++)
 		{
-			u16 pixel = srcline[x];
+			u16 const pixel = srcline[x];
 
 			if ((pixel & 0xf) != 0xf)
 			{
@@ -366,11 +366,11 @@ void megasys1_state::partial_clear_sprite_bitmap(screen_device &screen, bitmap_i
 {
 	for (int y = cliprect.min_y;y <= cliprect.max_y;y++)
 	{
-		u16* srcline = &m_sprite_buffer_bitmap.pix16(y);
+		u16 *const srcline = &m_sprite_buffer_bitmap.pix(y);
 
 		for (int x = cliprect.min_x;x <= cliprect.max_x;x++)
 		{
-			u16 pixel = srcline[x];
+			u16 const pixel = srcline[x];
 			srcline[x] = pixel & 0x7fff; // wipe our 'drawn here' marker otherwise trails will always have priority over new sprites, which is incorrect.
 
 			// guess, very unclear from the video refernece we have, used when removing p47 trails
@@ -397,9 +397,9 @@ inline void megasys1_state::draw_16x16_priority_sprite(screen_device &screen, bi
 
 	for (s32 y = 0; y < 16; y++, sy++, sx-=16)
 	{
-	//  u16 *dest = &bitmap.pix16(sy)+ sx;
-	//  u8 *prio = &screen.priority().pix8(sy) + sx;
-		u16* dest = &m_sprite_buffer_bitmap.pix16(sy)+ sx;
+	//  u16 *const dest = &bitmap.pix(sy)+ sx;
+	//  u8 *const prio = &screen.priority().pix(sy) + sx;
+		u16 *const dest = &m_sprite_buffer_bitmap.pix(sy)+ sx;
 
 		for (s32 x = 0; x < 16; x++, sx++)
 		{

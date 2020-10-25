@@ -83,14 +83,13 @@ private:
 	optional_device<generic_latch_8_device> m_soundlatch;
 
 
-	DECLARE_WRITE8_MEMBER(io_select_w);
-	DECLARE_READ8_MEMBER(io_port_r);
+	void io_select_w(uint8_t data);
+	uint8_t io_port_r();
 	DECLARE_WRITE_LINE_MEMBER(coin_w);
 	DECLARE_WRITE_LINE_MEMBER(audio_reset_w);
-	DECLARE_WRITE8_MEMBER(audio_cmd_w);
+	void audio_cmd_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(audio_trigger_w);
 	DECLARE_WRITE_LINE_MEMBER(r6532_irq);
-	DECLARE_WRITE8_MEMBER(r6532_soundlatch_w);
 	DECLARE_MACHINE_START(gameplan);
 	DECLARE_MACHINE_RESET(gameplan);
 	DECLARE_MACHINE_START(trvquest);
@@ -99,15 +98,15 @@ private:
 	uint32_t screen_update_leprechn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(clear_screen_done_callback);
 	TIMER_CALLBACK_MEMBER(via_irq_delayed);
-	DECLARE_WRITE8_MEMBER(video_data_w);
-	DECLARE_WRITE8_MEMBER(gameplan_video_command_w);
-	DECLARE_WRITE8_MEMBER(leprechn_video_command_w);
-	DECLARE_READ8_MEMBER(leprechn_videoram_r);
+	void video_data_w(uint8_t data);
+	void gameplan_video_command_w(uint8_t data);
+	void leprechn_video_command_w(uint8_t data);
+	uint8_t leprechn_videoram_r();
 	DECLARE_WRITE_LINE_MEMBER(video_command_trigger_w);
 	void gameplan_get_pens( pen_t *pens );
 	void leprechn_get_pens( pen_t *pens );
 	DECLARE_WRITE_LINE_MEMBER(via_irq);
-	DECLARE_READ8_MEMBER(trvquest_question_r);
+	uint8_t trvquest_question_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(trvquest_coin_w);
 	DECLARE_WRITE_LINE_MEMBER(trvquest_misc_w);
 

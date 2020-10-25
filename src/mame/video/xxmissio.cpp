@@ -14,28 +14,28 @@ Video hardware driver by Uki
 #include "includes/xxmissio.h"
 
 
-WRITE8_MEMBER(xxmissio_state::scroll_x_w)
+void xxmissio_state::scroll_x_w(uint8_t data)
 {
 	m_xscroll = data;
 }
-WRITE8_MEMBER(xxmissio_state::scroll_y_w)
+void xxmissio_state::scroll_y_w(uint8_t data)
 {
 	m_yscroll = data;
 }
 
-WRITE8_MEMBER(xxmissio_state::flipscreen_w)
+void xxmissio_state::flipscreen_w(uint8_t data)
 {
 	m_flipscreen = data & 0x01;
 }
 
-WRITE8_MEMBER(xxmissio_state::bgram_w)
+void xxmissio_state::bgram_w(offs_t offset, uint8_t data)
 {
 	int x = (offset + (m_xscroll >> 3)) & 0x1f;
 	offset = (offset & 0x7e0) | x;
 
 	m_bgram[offset] = data;
 }
-READ8_MEMBER(xxmissio_state::bgram_r)
+uint8_t xxmissio_state::bgram_r(offs_t offset)
 {
 	int x = (offset + (m_xscroll >> 3)) & 0x1f;
 	offset = (offset & 0x7e0) | x;

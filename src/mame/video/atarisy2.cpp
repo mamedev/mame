@@ -7,8 +7,6 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "video/atarimo.h"
-#include "includes/slapstic.h"
 #include "includes/atarisy2.h"
 
 
@@ -94,7 +92,7 @@ void atarisy2_state::video_start()
  *
  *************************************/
 
-WRITE16_MEMBER( atarisy2_state::xscroll_w )
+void atarisy2_state::xscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t oldscroll = *m_xscroll;
 	uint16_t newscroll = oldscroll;
@@ -125,7 +123,7 @@ TIMER_CALLBACK_MEMBER(atarisy2_state::reset_yscroll_callback)
 }
 
 
-WRITE16_MEMBER( atarisy2_state::yscroll_w )
+void atarisy2_state::yscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t oldscroll = *m_yscroll;
 	uint16_t newscroll = oldscroll;
@@ -189,7 +187,7 @@ rgb_t atarisy2_state::RRRRGGGGBBBBIIII(uint32_t raw)
  *
  *************************************/
 
-READ16_MEMBER( atarisy2_state::slapstic_r )
+uint16_t atarisy2_state::slapstic_r(address_space &space, offs_t offset)
 {
 	int result = m_slapstic_base[offset];
 	m_slapstic->slapstic_tweak(space, offset);
@@ -200,7 +198,7 @@ READ16_MEMBER( atarisy2_state::slapstic_r )
 }
 
 
-WRITE16_MEMBER( atarisy2_state::slapstic_w )
+void atarisy2_state::slapstic_w(address_space &space, offs_t offset, uint16_t data)
 {
 	m_slapstic->slapstic_tweak(space, offset);
 
@@ -215,7 +213,7 @@ WRITE16_MEMBER( atarisy2_state::slapstic_w )
  *
  *************************************/
 
-WRITE16_MEMBER( atarisy2_state::spriteram_w )
+void atarisy2_state::spriteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* force an update if the link of object 0 is about to change */
 	if (offset == 0x0003)
@@ -250,13 +248,13 @@ uint32_t atarisy2_state::screen_update_atarisy2(screen_device &screen, bitmap_in
 	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->top(); y <= rect->bottom(); y++)
 		{
-			uint16_t *mo = &mobitmap.pix16(y);
-			uint16_t *pf = &bitmap.pix16(y);
-			uint8_t *pri = &priority_bitmap.pix8(y);
+			uint16_t const *const mo = &mobitmap.pix(y);
+			uint16_t *const pf = &bitmap.pix(y);
+			uint8_t const *const pri = &priority_bitmap.pix(y);
 			for (int x = rect->left(); x <= rect->right(); x++)
 				if (mo[x] != 0xffff)
 				{
-					int mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
+					int const mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
 
 					// high priority PF?
 					if ((mopriority + pri[x]) & 2)

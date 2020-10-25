@@ -118,15 +118,15 @@ private:
 	required_device<deco104_device> m_deco104;
 	required_device<decospr_device> m_sprgen;
 
-	DECLARE_READ8_MEMBER(irq_latch_r);
+	uint8_t irq_latch_r();
 	DECLARE_WRITE_LINE_MEMBER(soundlatch_irq_w);
 	uint32_t screen_update_dblewing(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
 
-	READ16_MEMBER( wf_protection_region_0_104_r );
-	WRITE16_MEMBER( wf_protection_region_0_104_w );
+	uint16_t wf_protection_region_0_104_r(offs_t offset);
+	void wf_protection_region_0_104_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void dblewing_map(address_map &map);
 	void decrypted_opcodes_map(address_map &map);
@@ -153,7 +153,7 @@ uint32_t dblewing_state::screen_update_dblewing(screen_device &screen, bitmap_in
 	return 0;
 }
 
-READ16_MEMBER( dblewing_state::wf_protection_region_0_104_r )
+uint16_t dblewing_state::wf_protection_region_0_104_r(offs_t offset)
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
@@ -162,7 +162,7 @@ READ16_MEMBER( dblewing_state::wf_protection_region_0_104_r )
 	return data;
 }
 
-WRITE16_MEMBER( dblewing_state::wf_protection_region_0_104_w )
+void dblewing_state::wf_protection_region_0_104_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
@@ -201,7 +201,7 @@ void dblewing_state::decrypted_opcodes_map(address_map &map)
 	map(0x000000, 0x07ffff).rom().share("decrypted_opcodes");
 }
 
-READ8_MEMBER(dblewing_state::irq_latch_r)
+uint8_t dblewing_state::irq_latch_r()
 {
 	// bit 0: irq type (0 = latch, 1 = ym)
 	return m_soundlatch_pending ? 0 : 1;
@@ -423,13 +423,43 @@ ROM_START( dblewing )
 	ROM_REGION( 0x40000, "oki", 0 ) /* Oki samples */
 	ROM_LOAD( "kp_03-.16h",   0x000000, 0x020000, CRC(5d7f930d) SHA1(ad23aa804ea3ccbd7630ade9b53fc3ea2718a6ec) )
 	ROM_RELOAD(               0x020000, 0x020000 )
+
+	ROM_REGION( 0x600, "plds", 0 )
+	ROM_LOAD( "pal16l8-vg-00.1f",  0x000, 0x117, CRC(8c2849e5) SHA1(72c5142dd78ea7d009229bad9f1a5651eec1e858) )
+	ROM_LOAD( "pal16l8-vg-01.1h",  0x200, 0x117, CRC(04b0bab6) SHA1(6b1ad69506b385eeeac6cb952e166304bf6fbb40) )
+	ROM_LOAD( "pal16r8-vg-02.11b", 0x400, 0x117, NO_DUMP )
+ROM_END
+
+ROM_START( dblewinga )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* DE102 code (encrypted) */
+	ROM_LOAD16_BYTE( "2.3d",    0x000001, 0x040000, CRC(1e6b0653) SHA1(000fbf8bb07688fe1dd16fe8f33c376871f1860f) )
+	ROM_LOAD16_BYTE( "1.5d",    0x000000, 0x040000, CRC(4d537dc9) SHA1(9149e6de11ed9aa1db58c72e4ba6b2b309c6978b) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // sound cpu
+	ROM_LOAD( "kp_02-.10h",   0x000000, 0x010000, CRC(def035fa) SHA1(fd50314e5c94c25df109ee52c0ce701b0ff2140c) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD( "mbe-02.8h",    0x000000, 0x100000, CRC(5a6d3ac5) SHA1(738bb833e2c5d929ac75fe4e69ee0af88197d8a6) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_LOAD( "mbe-00.14a",   0x000000, 0x100000, CRC(e33f5c93) SHA1(720904b54d02dace2310ac6bd07d5ed4bc4fd69c) )
+	ROM_LOAD( "mbe-01.16a",   0x100000, 0x100000, CRC(ef452ad7) SHA1(7fe49123b5c2778e46104eaa3a2104ce09e05705) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Oki samples */
+	ROM_LOAD( "kp_03-.16h",   0x000000, 0x020000, CRC(5d7f930d) SHA1(ad23aa804ea3ccbd7630ade9b53fc3ea2718a6ec) )
+	ROM_RELOAD(               0x020000, 0x020000 )
+
+	ROM_REGION( 0x600, "plds", 0 )
+	ROM_LOAD( "pal16l8-vg-00.1f",  0x000, 0x117, CRC(8c2849e5) SHA1(72c5142dd78ea7d009229bad9f1a5651eec1e858) )
+	ROM_LOAD( "pal16l8-vg-01.1h",  0x200, 0x117, CRC(04b0bab6) SHA1(6b1ad69506b385eeeac6cb952e166304bf6fbb40) )
+	ROM_LOAD( "pal16r8-vg-02.11b", 0x400, 0x117, NO_DUMP )
 ROM_END
 
 /*
 The most noticeable difference with the set below is that it doesn't use checkpoints, but respawns you when you die.
 Checkpoints were more common in Japan, so this is likely to be an export version.
 */
-ROM_START( dblewinga )
+ROM_START( dblewingb )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* DE102 code (encrypted) */
 	ROM_LOAD16_BYTE( "17.3d",    0x000001, 0x040000, CRC(3a7ba822) SHA1(726db048ae3ab45cca45f631ad1f04b5cbc7f741) )
 	ROM_LOAD16_BYTE( "18.5d",    0x000000, 0x040000, CRC(e5f5f004) SHA1(4bd40ef88027554a0328df1cf6f1c9c975a7a73f) )
@@ -447,6 +477,11 @@ ROM_START( dblewinga )
 	ROM_REGION( 0x40000, "oki", 0 ) /* Oki samples */
 	ROM_LOAD( "kp_03-.16h",   0x000000, 0x020000, CRC(5d7f930d) SHA1(ad23aa804ea3ccbd7630ade9b53fc3ea2718a6ec) )
 	ROM_RELOAD(               0x020000, 0x020000 )
+
+	ROM_REGION( 0x600, "plds", 0 )
+	ROM_LOAD( "pal16l8-vg-00.1f",  0x000, 0x117, CRC(8c2849e5) SHA1(72c5142dd78ea7d009229bad9f1a5651eec1e858) )
+	ROM_LOAD( "pal16l8-vg-01.1h",  0x200, 0x117, CRC(04b0bab6) SHA1(6b1ad69506b385eeeac6cb952e166304bf6fbb40) )
+	ROM_LOAD( "pal16r8-vg-02.11b", 0x400, 0x117, NO_DUMP )
 ROM_END
 
 void dblewing_state::init_dblewing()
@@ -458,5 +493,6 @@ void dblewing_state::init_dblewing()
 }
 
 
-GAME( 1993, dblewing,  0,        dblewing, dblewing, dblewing_state, init_dblewing, ROT90, "Mitchell", "Double Wings", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, dblewinga, dblewing, dblewing, dblewing, dblewing_state, init_dblewing, ROT90, "Mitchell", "Double Wings (Asia)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, dblewing,  0,        dblewing, dblewing, dblewing_state, init_dblewing, ROT90, "Mitchell", "Double Wings (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, dblewinga, dblewing, dblewing, dblewing, dblewing_state, init_dblewing, ROT90, "Mitchell", "Double Wings (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, dblewingb, dblewing, dblewing, dblewing, dblewing_state, init_dblewing, ROT90, "Mitchell", "Double Wings (Asia)",  MACHINE_SUPPORTS_SAVE )

@@ -403,14 +403,14 @@ public:
 private:
 	required_device<segaxbd_state> m_subpcb;
 
-	DECLARE_READ16_MEMBER(shareram1_r) {
+	uint16_t shareram1_r(offs_t offset) {
 		if (offset < 0x10) {
 			int address = (rampage1 << 4) + offset;
 			return shareram[address];
 		}
 		return 0xffff;
 	}
-	DECLARE_WRITE16_MEMBER(shareram1_w) {
+	void shareram1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) {
 		if (offset < 0x10) {
 			int address = (rampage1 << 4) + offset;
 			COMBINE_DATA(&shareram[address]);
@@ -418,14 +418,14 @@ private:
 			rampage1 = data & 0x00FF;
 		}
 	}
-	DECLARE_READ16_MEMBER(shareram2_r) {
+	uint16_t shareram2_r(offs_t offset) {
 		if (offset < 0x10) {
 			int address = (rampage2 << 4) + offset;
 			return shareram[address];
 		}
 		return 0xffff;
 	}
-	DECLARE_WRITE16_MEMBER(shareram2_w) {
+	void shareram2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) {
 		if (offset < 0x10) {
 			int address = (rampage2 << 4) + offset;
 			COMBINE_DATA(&shareram[address]);
@@ -494,7 +494,7 @@ uint8_t segaxbd_state::analog_r()
 //  I/O chip
 //-------------------------------------------------
 
-WRITE8_MEMBER(segaxbd_state::pc_0_w)
+void segaxbd_state::pc_0_w(uint8_t data)
 {
 	m_pc_0 = data;
 
@@ -521,7 +521,7 @@ WRITE8_MEMBER(segaxbd_state::pc_0_w)
 //  I/O chip
 //-------------------------------------------------
 
-WRITE8_MEMBER(segaxbd_state::pd_0_w)
+void segaxbd_state::pd_0_w(uint8_t data)
 {
 	// Output port:
 	//  D7: Amplifier mute control (1= sounding, 0= muted)
@@ -537,7 +537,7 @@ WRITE8_MEMBER(segaxbd_state::pd_0_w)
 //  port
 //-------------------------------------------------
 
-WRITE16_MEMBER( segaxbd_state::iocontrol_w )
+void segaxbd_state::iocontrol_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -558,7 +558,7 @@ WRITE16_MEMBER( segaxbd_state::iocontrol_w )
 //  writes to this address for Line of Fire
 //-------------------------------------------------
 
-WRITE16_MEMBER( segaxbd_state::loffire_sync0_w )
+void segaxbd_state::loffire_sync0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_loffire_sync[offset]);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
@@ -570,7 +570,7 @@ WRITE16_MEMBER( segaxbd_state::loffire_sync0_w )
 //  Super Monaco GP
 //-------------------------------------------------
 
-READ16_MEMBER( segaxbd_state::smgp_excs_r )
+uint16_t segaxbd_state::smgp_excs_r(offs_t offset)
 {
 	//logerror("%06X:smgp_excs_r(%04X)\n", m_maincpu->pc(), offset*2);
 	return 0xffff;
@@ -582,7 +582,7 @@ READ16_MEMBER( segaxbd_state::smgp_excs_r )
 //  Super Monaco GP
 //-------------------------------------------------
 
-WRITE16_MEMBER( segaxbd_state::smgp_excs_w )
+void segaxbd_state::smgp_excs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//logerror("%06X:smgp_excs_w(%04X) = %04X & %04X\n", m_maincpu->pc(), offset*2, data, mem_mask);
 }
@@ -671,7 +671,7 @@ void segaxbd_state::generic_iochip0_lamps_w(uint8_t data)
 //  of I/O chip 0 for Afterburner II
 //-------------------------------------------------
 
-READ8_MEMBER(segaxbd_state::aburner2_motor_r)
+uint8_t segaxbd_state::aburner2_motor_r()
 {
 	uint8_t data = m_io0_porta->read() & 0xc0;
 
@@ -685,7 +685,7 @@ READ8_MEMBER(segaxbd_state::aburner2_motor_r)
 //  of I/O chip 0 for Afterburner II
 //-------------------------------------------------
 
-WRITE8_MEMBER(segaxbd_state::aburner2_motor_w)
+void segaxbd_state::aburner2_motor_w(uint8_t data)
 {
 	// TODO
 }
@@ -696,7 +696,7 @@ WRITE8_MEMBER(segaxbd_state::aburner2_motor_w)
 //  I/O chip 0 for Super Monaco GP
 //-------------------------------------------------
 
-READ8_MEMBER(segaxbd_state::smgp_motor_r)
+uint8_t segaxbd_state::smgp_motor_r()
 {
 	uint8_t data = m_io0_porta->read() & 0xc0;
 
@@ -710,7 +710,7 @@ READ8_MEMBER(segaxbd_state::smgp_motor_r)
 //  I/O chip 0 for Super Monaco GP
 //-------------------------------------------------
 
-WRITE8_MEMBER(segaxbd_state::smgp_motor_w)
+void segaxbd_state::smgp_motor_w(uint8_t data)
 {
 	// TODO
 }
@@ -721,7 +721,7 @@ WRITE8_MEMBER(segaxbd_state::smgp_motor_w)
 //  dual-port communications RAM for Royal Ascot
 //-------------------------------------------------
 
-READ8_MEMBER(segaxbd_rascot_state::commram_r)
+uint8_t segaxbd_rascot_state::commram_r(offs_t offset)
 {
 	return m_commram->right_r(m_commram_bank << 3 | offset);
 }
@@ -732,7 +732,7 @@ READ8_MEMBER(segaxbd_rascot_state::commram_r)
 //  dual-port communications RAM for Royal Ascot
 //-------------------------------------------------
 
-WRITE8_MEMBER(segaxbd_rascot_state::commram_w)
+void segaxbd_rascot_state::commram_w(offs_t offset, uint8_t data)
 {
 	m_commram->right_w(m_commram_bank << 3 | offset, data);
 }
@@ -743,7 +743,7 @@ WRITE8_MEMBER(segaxbd_rascot_state::commram_w)
 //  of 8 bytes
 //-------------------------------------------------
 
-WRITE8_MEMBER(segaxbd_rascot_state::commram_bank_w)
+void segaxbd_rascot_state::commram_bank_w(uint8_t data)
 {
 	m_commram_bank = data;
 }
@@ -754,7 +754,7 @@ WRITE8_MEMBER(segaxbd_rascot_state::commram_bank_w)
 //  I/O chip 1 for Last Survivor
 //-------------------------------------------------
 
-READ8_MEMBER(segaxbd_state::lastsurv_port_r)
+uint8_t segaxbd_state::lastsurv_port_r()
 {
 	return m_mux_ports[m_lastsurv_mux].read_safe(0xff);
 }
@@ -765,7 +765,7 @@ READ8_MEMBER(segaxbd_state::lastsurv_port_r)
 //  of I/O chip 0 for Last Survivor
 //-------------------------------------------------
 
-WRITE8_MEMBER(segaxbd_state::lastsurv_muxer_w)
+void segaxbd_state::lastsurv_muxer_w(uint8_t data)
 {
 	machine().sound().system_enable(data & 0x80);
 
@@ -889,7 +889,7 @@ void segaxbd_state::palette_init()
 //  paletteram_w - handle writes to palette RAM
 //-------------------------------------------------
 
-WRITE16_MEMBER( segaxbd_state::paletteram_w )
+void segaxbd_state::paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// compute the number of entries
 	if (m_palette_entries == 0)
@@ -4665,7 +4665,7 @@ void segaxbd_state::install_loffire(void)
 	m_adc_reverse[1] = m_adc_reverse[3] = true;
 
 	// install sync hack on core shared memory
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x29c000, 0x29c011, write16_delegate(*this, FUNC(segaxbd_state::loffire_sync0_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x29c000, 0x29c011, write16s_delegate(*this, FUNC(segaxbd_state::loffire_sync0_w)));
 	m_loffire_sync = m_subram0;
 }
 
@@ -4678,7 +4678,8 @@ void segaxbd_new_state::init_loffire()
 void segaxbd_state::install_smgp(void)
 {
 	// map /EXCS space
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2f0000, 0x2f3fff, read16_delegate(*this, FUNC(segaxbd_state::smgp_excs_r)), write16_delegate(*this, FUNC(segaxbd_state::smgp_excs_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2f0000, 0x2f3fff, read16sm_delegate(*this, FUNC(segaxbd_state::smgp_excs_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x2f0000, 0x2f3fff, write16s_delegate(*this, FUNC(segaxbd_state::smgp_excs_w)));
 }
 
 void segaxbd_new_state::init_smgp()
@@ -4713,8 +4714,10 @@ void segaxbd_new_state_double::init_gprider_double()
 	m_mainpcb->install_gprider();
 	m_subpcb->install_gprider();
 
-	m_mainpcb->m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2F0000, 0x2F003f, read16_delegate(*this, FUNC(segaxbd_new_state_double::shareram1_r)), write16_delegate(*this, FUNC(segaxbd_new_state_double::shareram1_w)));
-	m_subpcb->m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2F0000, 0x2F003f, read16_delegate(*this, FUNC(segaxbd_new_state_double::shareram2_r)), write16_delegate(*this, FUNC(segaxbd_new_state_double::shareram2_w)));
+	m_mainpcb->m_maincpu->space(AS_PROGRAM).install_read_handler(0x2F0000, 0x2F003f, read16sm_delegate(*this, FUNC(segaxbd_new_state_double::shareram1_r)));
+	m_mainpcb->m_maincpu->space(AS_PROGRAM).install_write_handler(0x2F0000, 0x2F003f, write16s_delegate(*this, FUNC(segaxbd_new_state_double::shareram1_w)));
+	m_subpcb->m_maincpu->space(AS_PROGRAM).install_read_handler(0x2F0000, 0x2F003f, read16sm_delegate(*this, FUNC(segaxbd_new_state_double::shareram2_r)));
+	m_subpcb->m_maincpu->space(AS_PROGRAM).install_write_handler(0x2F0000, 0x2F003f, write16s_delegate(*this, FUNC(segaxbd_new_state_double::shareram2_w)));
 }
 
 

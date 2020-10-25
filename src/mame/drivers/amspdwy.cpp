@@ -54,19 +54,19 @@ uint8_t amspdwy_state::amspdwy_wheel_r( int index )
 	return m_wheel_return[index] | ioport(portnames[index])->read();
 }
 
-READ8_MEMBER(amspdwy_state::amspdwy_wheel_0_r)
+uint8_t amspdwy_state::amspdwy_wheel_0_r()
 {
 	// player 1
 	return amspdwy_wheel_r(0);
 }
 
-READ8_MEMBER(amspdwy_state::amspdwy_wheel_1_r)
+uint8_t amspdwy_state::amspdwy_wheel_1_r()
 {
 	// player 2
 	return amspdwy_wheel_r(1);
 }
 
-READ8_MEMBER(amspdwy_state::amspdwy_sound_r)
+uint8_t amspdwy_state::amspdwy_sound_r()
 {
 	return (m_ym2151->status_r() & ~0x30) | ioport("IN0")->read();
 }

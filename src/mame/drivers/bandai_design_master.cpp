@@ -64,8 +64,8 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	DECLARE_READ16_MEMBER(io_p7_r);
-	DECLARE_WRITE16_MEMBER(io_p7_w);
+	uint16_t io_p7_r();
+	void io_p7_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 
@@ -105,12 +105,12 @@ void bdsm_state::mem_map(address_map &map)
 	map(0x8000, 0x895f).ram().share("unkram");
 }
 
-READ16_MEMBER(bdsm_state::io_p7_r)
+uint16_t bdsm_state::io_p7_r()
 {
 	return machine().rand();
 }
 
-WRITE16_MEMBER(bdsm_state::io_p7_w)
+void bdsm_state::io_p7_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s: io_p7_w %04x %04x\n", machine().describe_context(), data, mem_mask);
 }

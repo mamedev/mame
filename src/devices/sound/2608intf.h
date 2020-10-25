@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "dirom.h"
 #include "ay8910.h"
 
 
@@ -12,7 +13,7 @@ struct ssg_callbacks;
 
 
 class ym2608_device : public ay8910_device,
-	public device_rom_interface
+					  public device_rom_interface<21>
 {
 public:
 	ym2608_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -38,7 +39,7 @@ protected:
 	virtual void rom_bank_updated() override;
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	void stream_generate(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	void stream_generate(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs);
 
 private:
 	void irq_handler(int irq);

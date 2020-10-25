@@ -5,7 +5,7 @@
 
 // parent class for handlers which want to tap the access and usually pass it on to another handler
 
-template<int Width, int AddrShift, int Endian> class handler_entry_read_passthrough : public handler_entry_read<Width, AddrShift, Endian>
+template<int Width, int AddrShift, endianness_t Endian> class handler_entry_read_passthrough : public handler_entry_read<Width, AddrShift, Endian>
 {
 public:
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
@@ -26,7 +26,7 @@ protected:
 	handler_entry_read_passthrough(address_space *space, memory_passthrough_handler &mph, handler_entry_read<Width, AddrShift, Endian> *next) : handler_entry_read<Width, AddrShift, Endian>(space, handler_entry::F_PASSTHROUGH), m_mph(mph), m_next(next) { next->ref(); mph.add_handler(this); }
 };
 
-template<int Width, int AddrShift, int Endian> class handler_entry_write_passthrough : public handler_entry_write<Width, AddrShift, Endian>
+template<int Width, int AddrShift, endianness_t Endian> class handler_entry_write_passthrough : public handler_entry_write<Width, AddrShift, Endian>
 {
 public:
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;

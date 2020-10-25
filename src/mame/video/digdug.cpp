@@ -165,13 +165,13 @@ VIDEO_START_MEMBER(digdug_state,digdug)
 
 ***************************************************************************/
 
-WRITE8_MEMBER( digdug_state::digdug_videoram_w )
+void digdug_state::digdug_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(digdug_state::bg_select_w)
+void digdug_state::bg_select_w(uint8_t data)
 {
 	// select background picture
 	if (m_bg_select != (data & 0x03))

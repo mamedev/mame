@@ -6,13 +6,13 @@
 
     Code for emulating the Disto RAM cartridge
 
-	This cartridge came in several forms: 256K, 512K, 768K, and 1024K.
+    This cartridge came in several forms: 256K, 512K, 768K, and 1024K.
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "coco_ram.h"
-#include "cococart.h"
+
 #include "machine/ram.h"
 
 #define STATICRAM_TAG   "static_ram"
@@ -41,19 +41,19 @@ namespace
 	{
 	public:
 		// construction/destruction
-		coco_pak_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+		coco_pak_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 		virtual void device_add_mconfig(machine_config &config) override;
 
 	protected:
 		// device-level overrides
 		virtual void device_start() override;
 		virtual void device_reset() override;
-		virtual DECLARE_WRITE8_MEMBER(scs_write) override;
-		virtual DECLARE_READ8_MEMBER(scs_read) override;
+		virtual void scs_write(offs_t offset, u8 data) override;
+		virtual u8 scs_read(offs_t offset) override;
 
 	private:
 		required_device<ram_device>             m_staticram;
-		int										m_offset;
+		u32                                     m_offset;
 	};
 };
 
@@ -71,7 +71,7 @@ DEFINE_DEVICE_TYPE_PRIVATE(COCO_PAK_RAM, device_cococart_interface, coco_pak_ram
 //  coco_pak_device - constructor
 //-------------------------------------------------
 
-coco_pak_ram_device::coco_pak_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+coco_pak_ram_device::coco_pak_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, COCO_PAK_RAM, tag, owner, clock)
 	, device_cococart_interface(mconfig, *this)
 	, m_staticram(*this, STATICRAM_TAG)
@@ -122,23 +122,23 @@ void coco_pak_ram_device::device_reset()
 //    scs_write
 //-------------------------------------------------
 
-WRITE8_MEMBER(coco_pak_ram_device::scs_write)
+void coco_pak_ram_device::scs_write(offs_t offset, u8 data)
 {
-// 	int idata = data;
+//  int idata = data;
 
-	switch(offset)
+	switch (offset)
 	{
 		case 0:
-			m_offset = ((m_offset & 0xffff00) + data);
+			m_offset = (m_offset & 0xffff00) | u32(data);
 			break;
 		case 1:
-			m_offset = ((m_offset & 0xff00ff) + (data << 8));
+			m_offset = (m_offset & 0xff00ff) | (u32(data) << 8);
 			break;
 		case 2:
-			m_offset = ((m_offset & 0x00ffff) + (data << 16));
+			m_offset = (m_offset & 0x00ffff) | (u32(data) << 16);
 			break;
 		case 3:
-			if( m_offset < BUFFER_SIZE )
+			if (m_offset < BUFFER_SIZE)
 			{
 				m_staticram->write(m_offset, data);
 			}
@@ -154,27 +154,26 @@ WRITE8_MEMBER(coco_pak_ram_device::scs_write)
 //  scs_read
 //-------------------------------------------------
 
-READ8_MEMBER(coco_pak_ram_device::scs_read)
+u8 coco_pak_ram_device::scs_read(offs_t offset)
 {
-	uint8_t data = 0x00;
+	u8 data = 0x00;
 
 	switch (offset)
 	{
 		case 0:
-			data = (m_offset) & 0xff;
+			data = u8(m_offset & 0x00ff);
 			break;
 		case 1:
-			data = (m_offset & 0xff00ff) >> 8;
+			data = u8((m_offset >> 8) & 0x00ff);
 			break;
 		case 2:
-			data = (m_offset & 0xff0000) >> 16;
+			data = u8((m_offset >> 16) & 0x00ff);
 			break;
 		case 3:
-			if( m_offset < BUFFER_SIZE )
+			if (m_offset < BUFFER_SIZE)
 			{
 				data = m_staticram->read(m_offset);
 			}
-
 			break;
 	}
 

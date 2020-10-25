@@ -99,8 +99,9 @@ private:
 	const char *m_sound_region_tag;
 	u16 *m_sound_data;
 
-	address_space *m_program;
-	memory_access_cache<3, -3, ENDIANNESS_BIG> *m_cache;
+	memory_access<9, 3, -3, ENDIANNESS_BIG>::cache m_cache;
+	memory_access<9, 3, -3, ENDIANNESS_BIG>::specific m_program;
+
 	int m_icount;
 
 	bool do_sndjmp(u8 jmp);
@@ -208,8 +209,8 @@ private:
 	u8 m_rc;
 	u8 m_clkcnt;
 
-	address_space *m_program;
-	memory_access_cache<3, -3, ENDIANNESS_BIG> *m_cache;
+	memory_access<9, 3, -3, ENDIANNESS_BIG>::cache m_cache;
+	memory_access<9, 3, -3, ENDIANNESS_BIG>::specific m_program;
 	int m_icount;
 
 	// For the debugger
@@ -325,8 +326,8 @@ private:
 	u32  m_e_stack[32768];   /* Stack DRAM: 32kx20 */
 	u32  m_o_stack[32768];   /* Stack DRAM: 32kx20 */
 
-	address_space *m_program;
-	memory_access_cache<3, -3, ENDIANNESS_BIG> *m_cache;
+	memory_access<9, 3, -3, ENDIANNESS_BIG>::cache m_cache;
+	memory_access<9, 3, -3, ENDIANNESS_BIG>::specific m_program;
 	int m_icount;
 
 	// For the debugger

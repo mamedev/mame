@@ -318,13 +318,11 @@ void firetrk_state::draw_text(bitmap_ind16 &bitmap, const rectangle &cliprect, u
 
 void firetrk_state::check_collision(int which)
 {
-	int y, x;
-
-	for (y = playfield_window.top(); y <= playfield_window.bottom(); y++)
-		for (x = playfield_window.left(); x <= playfield_window.right(); x++)
+	for (int y = playfield_window.top(); y <= playfield_window.bottom(); y++)
+		for (int x = playfield_window.left(); x <= playfield_window.right(); x++)
 		{
-			pen_t a = m_helper1.pix16(y, x);
-			pen_t b = m_helper2.pix16(y, x);
+			pen_t const a = m_helper1.pix(y, x);
+			pen_t const b = m_helper2.pix(y, x);
 
 			if (b != 0xff && (m_color1_mask >> a) & 1)
 				m_crash[which] = 1;

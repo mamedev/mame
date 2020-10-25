@@ -2132,7 +2132,7 @@ X-1414 : Streetracer
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f8" />
 			<dataarea name="rom" size="8192">
-			<rom name="big bird's egg catch (grover's egg catch) (kid's controller) (children's computer workshop) (cx26104) (pal).bin" size="8192" crc="b0555578" sha1="fd9822ec54add04569b629d631182d9deac7184d"/>
+				<rom name="big bird's egg catch (grover's egg catch) (kid's controller) (children's computer workshop) (cx26104) (pal).bin" size="8192" crc="b0555578" sha1="fd9822ec54add04569b629d631182d9deac7184d"/>
 			</dataarea>
 		</part>
 	</software>

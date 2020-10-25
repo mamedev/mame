@@ -273,21 +273,21 @@ void AICADSP::step()
 				ADDR &= 0xFFFF;
 			//ADDR <<= 1;
 			//ADDR += RBP << 13;
-			//MEMVAL = space->read_word(ADDR >> 1);
+			//MEMVAL = space.read_word(ADDR >> 1);
 			ADDR += RBP << 10;
 			if (MRD && (step & 1)) //memory only allowed on odd? DoA inserts NOPs on even
 			{
 				if (NOFL)
-					MEMVAL = cache->read_word(ADDR) << 8;
+					MEMVAL = cache.read_word(ADDR) << 8;
 				else
-					MEMVAL = UNPACK(cache->read_word(ADDR));
+					MEMVAL = UNPACK(cache.read_word(ADDR));
 			}
 			if (MWT && (step&1))
 			{
 				if (NOFL)
-					space->write_word(ADDR, SHIFTED>>8);
+					space.write_word(ADDR, SHIFTED>>8);
 				else
-					space->write_word(ADDR, PACK(SHIFTED));
+					space.write_word(ADDR, PACK(SHIFTED));
 			}
 		}
 

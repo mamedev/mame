@@ -26,9 +26,9 @@ public:
 	// construction/destruction
 	vtech_rtty_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( receive_data_r );
-	DECLARE_WRITE8_MEMBER( transmit_data_w );
-	DECLARE_WRITE8_MEMBER( relay_w );
+	uint8_t receive_data_r();
+	void transmit_data_w(uint8_t data);
+	void relay_w(uint8_t data);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;

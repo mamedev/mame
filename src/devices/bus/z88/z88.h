@@ -72,8 +72,8 @@ public:
 	virtual ~device_z88cart_interface();
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write) { }
+	virtual uint8_t read(offs_t offset) { return 0xff; }
+	virtual void write(offs_t offset, uint8_t data) { }
 	virtual uint8_t* get_cart_base() { return nullptr; }
 	virtual uint32_t get_cart_size() { return 0; }
 
@@ -120,9 +120,9 @@ public:
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(write);
-	virtual uint8_t* get_cart_base();
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+	uint8_t* get_cart_base();
 
 protected:
 	// device-level overrides

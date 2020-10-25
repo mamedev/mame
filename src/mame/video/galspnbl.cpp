@@ -22,7 +22,7 @@ void galspnbl_state::draw_background( bitmap_ind16 &bitmap, const rectangle &cli
 		int const y = offs >> 9;
 		int const x = offs & 0x1ff;
 
-		bitmap.pix16(y, x) = 1024 + (m_bgvideoram[offs] >> 1);
+		bitmap.pix(y, x) = 1024 + (m_bgvideoram[offs] >> 1);
 	}
 }
 
@@ -36,8 +36,8 @@ void galspnbl_state::mix_sprite_layer(screen_device &screen, bitmap_ind16 &bitma
 {
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		uint16_t *dd = &bitmap.pix16(y);
-		uint16_t *sd2 = &m_sprite_bitmap.pix16(y);
+		uint16_t *const dd = &bitmap.pix(y);
+		uint16_t const *const sd2 = &m_sprite_bitmap.pix(y);
 
 		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{

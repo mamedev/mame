@@ -42,8 +42,8 @@ public:
 
 	uint8_t vram_r();
 	void vram_w(uint8_t data);
-	uint8_t reg_r(offs_t offset);
-	void reg_w(offs_t offset, uint8_t data);
+	uint8_t reg_r();
+	void reg_w(uint8_t data);
 	uint8_t initptr_r();
 
 	void interrupt();
@@ -87,8 +87,7 @@ private:
 	uint16_t m_address_regs[8];
 
 	// register interface
-	int m_reg, m_reg2;
-	int m_reg_access_phase;
+	uint8_t m_reg, m_reg2;
 
 	int m_row_col_written;
 	int m_bamp_written;

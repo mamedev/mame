@@ -69,7 +69,7 @@ PS4  J8635      PS4  J8541       PS4  J8648
  *
  *************************************/
 
-READ8_MEMBER(kikikai_state::kiki_ym2203_r)
+uint8_t kikikai_state::kiki_ym2203_r(offs_t offset)
 {
 	u8 result = m_ymsnd->read(offset);
 
@@ -108,7 +108,7 @@ void kikikai_state::sound_map(address_map &map)
 	map(0xc000, 0xc001).r(FUNC(kikikai_state::kiki_ym2203_r)).w(m_ymsnd, FUNC(ym2203_device::write));
 }
 
-WRITE8_MEMBER(kikikai_state::kicknrun_sub_output_w)
+void kikikai_state::kicknrun_sub_output_w(uint8_t data)
 {
 	/*--x- ---- coin lockout 2*/
 	/*---x ---- coin lockout 1*/

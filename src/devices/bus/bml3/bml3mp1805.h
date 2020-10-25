@@ -30,8 +30,8 @@ public:
 	// construction/destruction
 	bml3bus_mp1805_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(bml3_mp1805_r);
-	DECLARE_WRITE8_MEMBER(bml3_mp1805_w);
+	uint8_t bml3_mp1805_r();
+	void bml3_mp1805_w(uint8_t data);
 
 protected:
 	virtual void device_start() override;

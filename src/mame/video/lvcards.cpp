@@ -47,13 +47,13 @@ void lvcards_state::lvcards_palette(palette_device &palette) const//Ever so slig
 	}
 }
 
-WRITE8_MEMBER(lvcards_state::videoram_w)
+void lvcards_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(lvcards_state::colorram_w)
+void lvcards_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);

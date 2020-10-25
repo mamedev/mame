@@ -184,7 +184,7 @@ void namco_06xx_device::ctrl_w(uint8_t data)
 	m_control = data;
 
 	// The upper 3 control bits are the clock divider.
-	if ((m_control & 0xE0) == 0)
+	if ((m_control & 0xe0) == 0)
 	{
 		m_nmi_timer->adjust(attotime::never);
 		set_nmi(CLEAR_LINE);

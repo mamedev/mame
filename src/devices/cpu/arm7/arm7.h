@@ -89,10 +89,12 @@ protected:
 		ARM9_COPRO_ID_PART_ARM946 = 0x946 << 4,
 		ARM9_COPRO_ID_PART_ARM920 = 0x920 << 4,
 		ARM9_COPRO_ID_PART_ARM710 = 0x710 << 4,
+		ARM9_COPRO_ID_PART_PXA250 = 0x200 << 4,
+		ARM9_COPRO_ID_PART_PXA255 = 0x2d0 << 4,
+		ARM9_COPRO_ID_PART_PXA270 = 0x411 << 4,
 		ARM9_COPRO_ID_PART_GENERICARM7 = 0x700 << 4,
 
 		ARM9_COPRO_ID_PXA255_CORE_REV_SHIFT = 10,
-		ARM9_COPRO_ID_PXA255_CORE_GEN_XSCALE = 0x01 << 13,
 
 		ARM9_COPRO_ID_ARCH_V4     = 0x01 << 16,
 		ARM9_COPRO_ID_ARCH_V4T    = 0x02 << 16,
@@ -139,6 +141,8 @@ protected:
 	virtual bool get_t_flag() const override;
 
 	address_space_config m_program_config;
+	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache m_cachele;
+	memory_access<32, 2, 0, ENDIANNESS_BIG>::cache m_cachebe;
 
 	uint32_t m_r[/*NUM_REGS*/37];
 
@@ -244,9 +248,9 @@ protected:
 	virtual uint8_t arm7_cpu_read8(uint32_t addr);
 
 	// Coprocessor support
-	DECLARE_WRITE32_MEMBER( arm7_do_callback );
-	virtual DECLARE_READ32_MEMBER( arm7_rt_r_callback );
-	virtual DECLARE_WRITE32_MEMBER( arm7_rt_w_callback );
+	void arm7_do_callback(uint32_t data);
+	virtual uint32_t arm7_rt_r_callback(offs_t offset);
+	virtual void arm7_rt_w_callback(offs_t offset, uint32_t data);
 	void arm7_dt_r_callback(uint32_t insn, uint32_t *prn);
 	void arm7_dt_w_callback(uint32_t insn, uint32_t *prn);
 
@@ -635,8 +639,8 @@ public:
 	arm946es_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// 946E-S has Protection Unit instead of ARM MMU so CP15 is quite different
-	virtual DECLARE_READ32_MEMBER( arm7_rt_r_callback ) override;
-	virtual DECLARE_WRITE32_MEMBER( arm7_rt_w_callback ) override;
+	virtual uint32_t arm7_rt_r_callback(offs_t offset) override;
+	virtual void arm7_rt_w_callback(offs_t offset, uint32_t data) override;
 
 	virtual void arm7_cpu_write32(uint32_t addr, uint32_t data) override;
 	virtual void arm7_cpu_write16(uint32_t addr, uint16_t data) override;
@@ -675,8 +679,8 @@ public:
 	// construction/destruction
 	arm1176jzf_s_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ32_MEMBER( arm7_rt_r_callback ) override;
-	virtual DECLARE_WRITE32_MEMBER( arm7_rt_w_callback ) override;
+	virtual uint32_t arm7_rt_r_callback(offs_t offset) override;
+	virtual void arm7_rt_w_callback(offs_t offset, uint32_t data) override;
 
 protected:
 	virtual void device_reset() override;
@@ -689,6 +693,13 @@ public:
 	igs036_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
+class pxa250_cpu_device : public arm7_cpu_device
+{
+public:
+	// construction/destruction
+	pxa250_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 class pxa255_cpu_device : public arm7_cpu_device
 {
 public:
@@ -696,6 +707,12 @@ public:
 	pxa255_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
+class pxa270_cpu_device : public arm7_cpu_device
+{
+public:
+	// construction/destruction
+	pxa270_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
 
 class sa1110_cpu_device : public arm7_cpu_device
 {
@@ -714,7 +731,9 @@ DECLARE_DEVICE_TYPE(ARM920T,      arm920t_cpu_device)
 DECLARE_DEVICE_TYPE(ARM946ES,     arm946es_cpu_device)
 DECLARE_DEVICE_TYPE(ARM11,        arm11_cpu_device)
 DECLARE_DEVICE_TYPE(ARM1176JZF_S, arm1176jzf_s_cpu_device)
+DECLARE_DEVICE_TYPE(PXA250,       pxa250_cpu_device)
 DECLARE_DEVICE_TYPE(PXA255,       pxa255_cpu_device)
+DECLARE_DEVICE_TYPE(PXA270,       pxa270_cpu_device)
 DECLARE_DEVICE_TYPE(SA1110,       sa1110_cpu_device)
 DECLARE_DEVICE_TYPE(IGS036,       igs036_cpu_device)
 

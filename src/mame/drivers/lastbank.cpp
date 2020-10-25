@@ -59,11 +59,11 @@ private:
 	uint8_t m_mux_data;
 	uint8_t m_sound_flags;
 
-	DECLARE_WRITE8_MEMBER(output_w);
+	void output_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER(mux_0_r);
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_WRITE8_MEMBER(sound_flags_w);
+	uint8_t mux_0_r();
+	void mux_w(uint8_t data);
+	void sound_flags_w(uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_scanline);
 	void lastbank_audio_io(address_map &map);
@@ -87,7 +87,7 @@ WRITE_LINE_MEMBER(lastbank_state::screen_vblank)
 }
 
 
-READ8_MEMBER(lastbank_state::mux_0_r)
+uint8_t lastbank_state::mux_0_r()
 {
 	const char *const keynames[2][5] = {
 		{"P1_KEY0", "P1_KEY1", "P1_KEY2", "P1_KEY3", "P1_KEY4"},
@@ -106,7 +106,7 @@ READ8_MEMBER(lastbank_state::mux_0_r)
 	return res;
 }
 
-WRITE8_MEMBER(lastbank_state::output_w)
+void lastbank_state::output_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -124,12 +124,12 @@ WRITE8_MEMBER(lastbank_state::output_w)
 	}
 }
 
-WRITE8_MEMBER(lastbank_state::mux_w)
+void lastbank_state::mux_w(uint8_t data)
 {
 	m_mux_data = data;
 }
 
-WRITE8_MEMBER(lastbank_state::sound_flags_w)
+void lastbank_state::sound_flags_w(uint8_t data)
 {
 	m_sound_flags = data;
 	if (!BIT(data, 4))

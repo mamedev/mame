@@ -22,11 +22,11 @@ public:
 	void test_t420(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER( port_l_w );
+	void port_l_w(uint8_t data);
 	required_device<cop400_cpu_device> m_maincpu;
 };
 
-WRITE8_MEMBER( t400_test_suite_state::port_l_w )
+void t400_test_suite_state::port_l_w(uint8_t data)
 {
 //  printf("L: %u\n", data);
 }

@@ -334,7 +334,7 @@ N/C = switch present, but officially unused?
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) // E99, exists but no key above this position
 
 	PORT_START("KBD3") // Row P1-7
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("<") PORT_CODE(KEYCODE_BACKSLASH2) // B00
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("<") PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR('<') PORT_CHAR('>') // B00
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("X") PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X') // B02
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("S") PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S') // C02
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("W") PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W') // D02
@@ -394,7 +394,7 @@ N/C = switch present, but officially unused?
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("KBD9") // Row P2-6
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(",") PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<') // B08
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(",") PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') // B08
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("K") PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K') // C08
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("I") PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I') // D08
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("8") PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('*') // E08
@@ -404,7 +404,7 @@ N/C = switch present, but officially unused?
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("KBD10") // Row P2-9
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(".") PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>') // B09
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(".") PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') // B09
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("L") PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L') // C09
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("O") PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O') // D09
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("9") PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR('(') // E09
@@ -508,24 +508,11 @@ lk201_device::lk201_device(const machine_config &mconfig, const char *tag, devic
 	device_serial_interface(mconfig, *this),
 	m_maincpu(*this, LK201_CPU_TAG),
 	m_speaker(*this, LK201_SPK_TAG),
-	m_kbd0(*this, "KBD0"),
-	m_kbd1(*this, "KBD1"),
-	m_kbd2(*this, "KBD2"),
-	m_kbd3(*this, "KBD3"),
-	m_kbd4(*this, "KBD4"),
-	m_kbd5(*this, "KBD5"),
-	m_kbd6(*this, "KBD6"),
-	m_kbd7(*this, "KBD7"),
-	m_kbd8(*this, "KBD8"),
-	m_kbd9(*this, "KBD9"),
-	m_kbd10(*this, "KBD10"),
-	m_kbd11(*this, "KBD11"),
-	m_kbd12(*this, "KBD12"),
-	m_kbd13(*this, "KBD13"),
-	m_kbd14(*this, "KBD14"),
-	m_kbd15(*this, "KBD15"),
-	m_kbd16(*this, "KBD16"),
-	m_kbd17(*this, "KBD17"),
+	m_kbd(*this, "KBD%u", 0U),
+	m_led_wait(*this, "led_wait"),
+	m_led_compose(*this, "led_compose"),
+	m_led_lock(*this, "led_lock"),
+	m_led_hold(*this, "led_hold"),
 	m_tx_handler(*this)
 {
 }
@@ -540,6 +527,11 @@ void lk201_device::device_start()
 	m_tx_handler.resolve_safe();
 
 	m_beeper = timer_alloc(2);
+
+	m_led_wait.resolve();
+	m_led_compose.resolve();
+	m_led_lock.resolve();
+	m_led_hold.resolve();
 }
 
 
@@ -572,6 +564,12 @@ void lk201_device::device_reset()
 
 	transmit_register_reset();
 	receive_register_reset();
+
+	// GREEN KEYBOARD LEDs (1 = on, 0 = off):
+	m_led_wait = 0;    // led8
+	m_led_compose = 0; // led9
+	m_led_lock = 0;    // led10
+	m_led_hold = 0;    // led11
 }
 
 void lk201_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -733,24 +731,24 @@ void lk201_device::send_port(uint8_t offset, uint8_t olddata)
 			// Check for keyboard read strobe
 			if (((portc & 0x40) == 0) && (olddata & 0x40))
 			{
-				if (porta & 0x1) kbd_data = m_kbd0->read();
-				if (porta & 0x2) kbd_data = m_kbd1->read();
-				if (porta & 0x4) kbd_data = m_kbd2->read();
-				if (porta & 0x8) kbd_data = m_kbd3->read();
-				if (porta & 0x10) kbd_data = m_kbd4->read();
-				if (porta & 0x20) kbd_data = m_kbd5->read();
-				if (porta & 0x40) kbd_data = m_kbd6->read();
-				if (porta & 0x80) kbd_data = m_kbd7->read();
-				if (portb & 0x1) kbd_data = m_kbd8->read();
-				if (portb & 0x2) kbd_data = m_kbd9->read();
-				if (portb & 0x4) kbd_data = m_kbd10->read();
-				if (portb & 0x8) kbd_data = m_kbd11->read();
-				if (portb & 0x10) kbd_data = m_kbd12->read();
-				if (portb & 0x20) kbd_data = m_kbd13->read();
-				if (portb & 0x40) kbd_data = m_kbd14->read();
-				if (portb & 0x80) kbd_data = m_kbd15->read();
-				if (portc & 0x1) kbd_data = m_kbd16->read();
-				if (portc & 0x2) kbd_data = m_kbd17->read();
+				if (porta & 0x1) kbd_data = m_kbd[0]->read();
+				if (porta & 0x2) kbd_data = m_kbd[1]->read();
+				if (porta & 0x4) kbd_data = m_kbd[2]->read();
+				if (porta & 0x8) kbd_data = m_kbd[3]->read();
+				if (porta & 0x10) kbd_data = m_kbd[4]->read();
+				if (porta & 0x20) kbd_data = m_kbd[5]->read();
+				if (porta & 0x40) kbd_data = m_kbd[6]->read();
+				if (porta & 0x80) kbd_data = m_kbd[7]->read();
+				if (portb & 0x1) kbd_data = m_kbd[8]->read();
+				if (portb & 0x2) kbd_data = m_kbd[9]->read();
+				if (portb & 0x4) kbd_data = m_kbd[10]->read();
+				if (portb & 0x8) kbd_data = m_kbd[11]->read();
+				if (portb & 0x10) kbd_data = m_kbd[12]->read();
+				if (portb & 0x20) kbd_data = m_kbd[13]->read();
+				if (portb & 0x40) kbd_data = m_kbd[14]->read();
+				if (portb & 0x80) kbd_data = m_kbd[15]->read();
+				if (portc & 0x1) kbd_data = m_kbd[16]->read();
+				if (portc & 0x2) kbd_data = m_kbd[17]->read();
 			}
 
 			// Check for LED update strobe
@@ -758,10 +756,10 @@ void lk201_device::send_port(uint8_t offset, uint8_t olddata)
 			{
 			if(ddrs[2] != 0x00)
 			{   // Lower nibble contains the LED values (1 = on, 0 = off)
-				machine().output().set_value("led_wait"   , (led_data & 0x1) == 1);
-				machine().output().set_value("led_compose", (led_data & 0x2) == 2);
-				machine().output().set_value("led_lock"   , (led_data & 0x4) == 4);
-				machine().output().set_value("led_hold"   , (led_data & 0x8) == 8);
+				m_led_wait   = (led_data & 0x1) == 1;
+				m_led_compose= (led_data & 0x2) == 2;
+				m_led_lock   = (led_data & 0x4) == 4;
+				m_led_hold   = (led_data & 0x8) == 8;
 			}
 			if (led_data & 0xf0)
 			{

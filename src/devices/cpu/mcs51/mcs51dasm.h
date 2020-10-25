@@ -46,6 +46,10 @@ public:
 	static const mem_info i8xc51gb_names[];
 	static const mem_info ds5002fp_names[];
 	static const mem_info i8xc751_names[];
+	static const mem_info ds80c320_names[];
+	static const mem_info sab80515_names[];
+	static const mem_info sab80c515_names[];
+	static const mem_info rupi44_names[];
 
 	template<typename ...Names> mcs51_disassembler(Names &&... names) : mcs51_disassembler() {
 		add_names(names...);
@@ -124,6 +128,34 @@ class ds5002fp_disassembler : public mcs51_disassembler
 public:
 	ds5002fp_disassembler();
 	virtual ~ds5002fp_disassembler() = default;
+};
+
+class ds80c320_disassembler : public mcs51_disassembler
+{
+public:
+	ds80c320_disassembler();
+	virtual ~ds80c320_disassembler() = default;
+};
+
+class sab80515_disassembler : public mcs51_disassembler
+{
+public:
+	sab80515_disassembler();
+	virtual ~sab80515_disassembler() = default;
+};
+
+class sab80c515_disassembler : public mcs51_disassembler
+{
+public:
+	sab80c515_disassembler();
+	virtual ~sab80c515_disassembler() = default;
+};
+
+class rupi44_disassembler : public mcs51_disassembler
+{
+public:
+	rupi44_disassembler();
+	virtual ~rupi44_disassembler() = default;
 };
 
 

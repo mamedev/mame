@@ -219,34 +219,34 @@ int sat_cart_slot_device::get_cart_type()
  read
  -------------------------------------------------*/
 
-READ32_MEMBER(sat_cart_slot_device::read_rom)
+uint32_t sat_cart_slot_device::read_rom(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_rom(space, offset, mem_mask);
+		return m_cart->read_rom(offset);
 	else
 		return 0xffffffff;
 }
 
-READ32_MEMBER(sat_cart_slot_device::read_ext_dram0)
+uint32_t sat_cart_slot_device::read_ext_dram0(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_ext_dram0(space, offset, mem_mask);
+		return m_cart->read_ext_dram0(offset);
 	else
 		return 0xffffffff;
 }
 
-READ32_MEMBER(sat_cart_slot_device::read_ext_dram1)
+uint32_t sat_cart_slot_device::read_ext_dram1(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_ext_dram1(space, offset, mem_mask);
+		return m_cart->read_ext_dram1(offset);
 	else
 		return 0xffffffff;
 }
 
-READ32_MEMBER(sat_cart_slot_device::read_ext_bram)
+uint32_t sat_cart_slot_device::read_ext_bram(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_ext_bram(space, offset, mem_mask);
+		return m_cart->read_ext_bram(offset);
 	else
 		return 0xffffffff;
 }
@@ -255,20 +255,20 @@ READ32_MEMBER(sat_cart_slot_device::read_ext_bram)
  write
  -------------------------------------------------*/
 
-WRITE32_MEMBER(sat_cart_slot_device::write_ext_dram0)
+void sat_cart_slot_device::write_ext_dram0(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_cart)
-		m_cart->write_ext_dram0(space, offset, data, mem_mask);
+		m_cart->write_ext_dram0(offset, data, mem_mask);
 }
 
-WRITE32_MEMBER(sat_cart_slot_device::write_ext_dram1)
+void sat_cart_slot_device::write_ext_dram1(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_cart)
-		m_cart->write_ext_dram1(space, offset, data, mem_mask);
+		m_cart->write_ext_dram1(offset, data, mem_mask);
 }
 
-WRITE32_MEMBER(sat_cart_slot_device::write_ext_bram)
+void sat_cart_slot_device::write_ext_bram(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_cart)
-		m_cart->write_ext_bram(space, offset, data, mem_mask);
+		m_cart->write_ext_bram(offset, data, mem_mask);
 }

@@ -53,10 +53,10 @@ public:
 		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(fpga_w);
-	DECLARE_WRITE8_MEMBER(port0_w);
-	DECLARE_WRITE8_MEMBER(port2_w);
-	DECLARE_READ8_MEMBER(port2_r);
+	void fpga_w(uint8_t data);
+	void port0_w(uint8_t data);
+	void port2_w(uint8_t data);
+	uint8_t port2_r();
 	void barata(machine_config &config);
 private:
 	unsigned char row_selection;
@@ -274,7 +274,7 @@ void barata_state::fpga_send(unsigned char cmd)
 	}
 }
 
-WRITE8_MEMBER(barata_state::fpga_w)
+void barata_state::fpga_w(uint8_t data)
 {
 	static unsigned char old_data = 0;
 	if (!BIT(old_data, 5) && BIT(data, 5)){
@@ -284,17 +284,17 @@ WRITE8_MEMBER(barata_state::fpga_w)
 	old_data = data;
 }
 
-WRITE8_MEMBER(barata_state::port0_w)
+void barata_state::port0_w(uint8_t data)
 {
 	row_selection = data;
 }
 
-WRITE8_MEMBER(barata_state::port2_w)
+void barata_state::port2_w(uint8_t data)
 {
 	/* why does it write to PORT2 ? */
 }
 
-READ8_MEMBER(barata_state::port2_r)
+uint8_t barata_state::port2_r()
 {
 	if (!BIT(row_selection, 0)) return ioport("PLAYER1_ROW1")->read();
 	if (!BIT(row_selection, 1)) return ioport("PLAYER1_ROW2")->read();

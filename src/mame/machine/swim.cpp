@@ -32,14 +32,14 @@ enum
     DEVICE
 ***************************************************************************/
 
-DEFINE_DEVICE_TYPE(SWIM, swim_device, "swim", "Apple SWIM (Steve Woz Integrated Machine)")
+DEFINE_DEVICE_TYPE(LEGACY_SWIM, swim_device, "swiml", "Apple SWIM (Sander/Woz Integrated Machine) (legacy)")
 
 //-------------------------------------------------
 //  ctor
 //-------------------------------------------------
 
 swim_device::swim_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: applefdc_base_device(APPLEFDC_SWIM, mconfig, SWIM, tag, owner, clock)
+	: applefdc_base_device(APPLEFDC_SWIM, mconfig, LEGACY_SWIM, tag, owner, clock)
 {
 }
 

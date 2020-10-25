@@ -930,26 +930,26 @@ std::string base_md_cart_slot_device::get_default_card_software(get_default_card
  read
  -------------------------------------------------*/
 
-READ16_MEMBER(base_md_cart_slot_device::read)
+uint16_t base_md_cart_slot_device::read(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read(space, offset, mem_mask);
+		return m_cart->read(offset);
 	else
 		return 0xffff;
 }
 
-READ16_MEMBER(base_md_cart_slot_device::read_a13)
+uint16_t base_md_cart_slot_device::read_a13(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_a13(space, offset, mem_mask);
+		return m_cart->read_a13(offset);
 	else
 		return 0xffff;
 }
 
-READ16_MEMBER(base_md_cart_slot_device::read_a15)
+uint16_t base_md_cart_slot_device::read_a15(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_a15(space, offset, mem_mask);
+		return m_cart->read_a15(offset);
 	else
 		return 0xffff;
 }
@@ -959,22 +959,22 @@ READ16_MEMBER(base_md_cart_slot_device::read_a15)
  write
  -------------------------------------------------*/
 
-WRITE16_MEMBER(base_md_cart_slot_device::write)
+void base_md_cart_slot_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_cart)
-		m_cart->write(space, offset, data, mem_mask);
+		m_cart->write(offset, data, mem_mask);
 }
 
-WRITE16_MEMBER(base_md_cart_slot_device::write_a13)
+void base_md_cart_slot_device::write_a13(offs_t offset, uint16_t data)
 {
 	if (m_cart)
-		m_cart->write_a13(space, offset, data, mem_mask);
+		m_cart->write_a13(offset, data);
 }
 
-WRITE16_MEMBER(base_md_cart_slot_device::write_a15)
+void base_md_cart_slot_device::write_a15(offs_t offset, uint16_t data)
 {
 	if (m_cart)
-		m_cart->write_a15(space, offset, data, mem_mask);
+		m_cart->write_a15(offset, data);
 }
 
 /*-------------------------------------------------
@@ -1033,8 +1033,8 @@ void base_md_cart_slot_device::file_logging(uint8_t *ROM8, uint32_t rom_len, uin
 
 	rom_start = (ROM8[0x1a1] << 24 | ROM8[0x1a0] << 16 | ROM8[0x1a3] << 8 | ROM8[0x1a2]);
 	rom_end = (ROM8[0x1a5] << 24 | ROM8[0x1a4] << 16 | ROM8[0x1a7] << 8 | ROM8[0x1a6]);
-	ram_start =  (ROM8[0x1a9] << 24 | ROM8[0x1a8] << 16 | ROM8[0x1ab] << 8 | ROM8[0x1aa]);;
-	ram_end = (ROM8[0x1ad] << 24 | ROM8[0x1ac] << 16 | ROM8[0x1af] << 8 | ROM8[0x1ae]);;
+	ram_start =  (ROM8[0x1a9] << 24 | ROM8[0x1a8] << 16 | ROM8[0x1ab] << 8 | ROM8[0x1aa]);
+	ram_end = (ROM8[0x1ad] << 24 | ROM8[0x1ac] << 16 | ROM8[0x1af] << 8 | ROM8[0x1ae]);
 	if (ROM8[0x1b1] == 'R' && ROM8[0x1b0] == 'A')
 	{
 		valid_sram = true;

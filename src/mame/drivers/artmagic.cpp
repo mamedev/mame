@@ -98,7 +98,7 @@ void artmagic_state::machine_reset()
  *
  *************************************/
 
-WRITE16_MEMBER(artmagic_state::control_w)
+void artmagic_state::control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_control[offset]);
 
@@ -133,7 +133,7 @@ void artmagic_state::device_timer(emu_timer &timer, device_timer_id id, int para
 }
 
 
-READ16_MEMBER(artmagic_state::ultennis_hack_r)
+uint16_t artmagic_state::ultennis_hack_r()
 {
 	/* IRQ5 points to: jsr (a5); rte */
 	uint32_t pc = m_maincpu->pc();
@@ -377,7 +377,7 @@ READ_LINE_MEMBER(artmagic_state::prot_r)
 }
 
 
-WRITE16_MEMBER(artmagic_state::protection_bit_w)
+void artmagic_state::protection_bit_w(offs_t offset, uint16_t data)
 {
 	/* shift in the new bit based on the offset */
 	m_prot_input[m_prot_input_index] <<= 1;
@@ -1157,7 +1157,7 @@ void artmagic_state::init_ultennis()
 	m_protection_handler = &artmagic_state::ultennis_protection;
 
 	/* additional (protection?) hack */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x300000, 0x300001, read16_delegate(*this, FUNC(artmagic_state::ultennis_hack_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x300000, 0x300001, read16smo_delegate(*this, FUNC(artmagic_state::ultennis_hack_r)));
 }
 
 

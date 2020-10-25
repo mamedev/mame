@@ -16,7 +16,9 @@ public:
 		spg2xx_game_state(mconfig, type, tag),
 		m_porta_key_mode(false),
 		m_cart(*this, "cartslot"),
-		m_cart_region(nullptr)
+		m_cart_region(nullptr),
+		m_analog_x(*this, "JOYX"),
+		m_analog_y(*this, "JOYY")
 	{ }
 
 	void jakks_gkr(machine_config &config);
@@ -39,23 +41,29 @@ public:
 	DECLARE_READ_LINE_MEMBER(i2c_gkr_r);
 
 protected:
-	DECLARE_READ16_MEMBER(jakks_porta_r);
-	DECLARE_WRITE16_MEMBER(jakks_porta_w);
-	DECLARE_WRITE16_MEMBER(jakks_portb_w);
+	uint16_t jakks_porta_r();
+	void jakks_porta_w(uint16_t data);
+	void jakks_portb_w(uint16_t data);
 
 private:
 	virtual void machine_start() override;
 
-	DECLARE_READ16_MEMBER(jakks_porta_key_io_r);
+	uint16_t joy_x_read();
+	uint16_t joy_y_read();
 
-	DECLARE_WRITE16_MEMBER(gkr_portc_w);
-	DECLARE_WRITE16_MEMBER(jakks_porta_key_io_w);
+	uint16_t jakks_porta_key_io_r();
+
+	void gkr_portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void jakks_porta_key_io_w(uint16_t data);
 	bool m_porta_key_mode;
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load_gamekey);
 
 	optional_device<jakks_gamekey_slot_device> m_cart;
 	memory_region *m_cart_region;
+
+	optional_ioport m_analog_x;
+	optional_ioport m_analog_y;
 };
 
 READ_LINE_MEMBER(jakks_gkr_state::i2c_gkr_r)
@@ -70,11 +78,11 @@ READ_LINE_MEMBER(jakks_gkr_state::i2c_gkr_r)
 	}
 }
 
-WRITE16_MEMBER(jakks_gkr_state::gkr_portc_w)
+void jakks_gkr_state::gkr_portc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_cart && m_cart->exists())
 	{
-		m_cart->write_cart_seeprom(space,offset,data,mem_mask);
+		m_cart->write_cart_seeprom(offset, data, mem_mask);
 	}
 	else
 	{
@@ -88,23 +96,35 @@ WRITE16_MEMBER(jakks_gkr_state::gkr_portc_w)
 	}
 }
 
-READ16_MEMBER(jakks_gkr_state::jakks_porta_r)
+uint16_t jakks_gkr_state::jakks_porta_r()
 {
 	//logerror("%s: jakks_porta_r\n", machine().describe_context());
 	return m_io_p1->read();
 }
 
-WRITE16_MEMBER(jakks_gkr_state::jakks_porta_w)
+void jakks_gkr_state::jakks_porta_w(uint16_t data)
 {
 	//logerror("%s: jakks_porta_w %04x\n", machine().describe_context(), data);
 }
 
-WRITE16_MEMBER(jakks_gkr_state::jakks_portb_w)
+void jakks_gkr_state::jakks_portb_w(uint16_t data)
 {
 	//logerror("%s: jakks_portb_w %04x\n", machine().describe_context(), data);
 }
 
-READ16_MEMBER(jakks_gkr_state::jakks_porta_key_io_r)
+uint16_t jakks_gkr_state::joy_x_read()
+{
+	const uint16_t data = m_analog_x->read();
+	return data > 0x0fff ? 0x0fff : data;
+}
+
+uint16_t jakks_gkr_state::joy_y_read()
+{
+	const uint16_t data = m_analog_y->read();
+	return data > 0x0fff ? 0x0fff : data;
+}
+
+uint16_t jakks_gkr_state::jakks_porta_key_io_r()
 {
 	//logerror("%s: jakks_porta_key_io_r\n", machine().describe_context());
 	if (m_porta_key_mode == false)
@@ -120,7 +140,7 @@ READ16_MEMBER(jakks_gkr_state::jakks_porta_key_io_r)
 	}
 }
 
-WRITE16_MEMBER(jakks_gkr_state::jakks_porta_key_io_w)
+void jakks_gkr_state::jakks_porta_key_io_w(uint16_t data)
 {
 	logerror("%s: jakks_porta_key_io_w %04x\n", machine().describe_context(), data);
 	// only seen 0xffff and 0x0000 written here.. writes 0xffff before the 2nd part of the port a gamekey check read.
@@ -148,10 +168,10 @@ static INPUT_PORTS_START( jak_sith_i2c )
 	PORT_BIT( 0xfff6, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("JOYX")
-	PORT_BIT(0x0fff, 0x0000, IPT_AD_STICK_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x00,0x0fff)
+	PORT_BIT(0x0fff, 0x0800, IPT_AD_STICK_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x0000,0x0fff)
 
 	PORT_START("JOYY")
-	PORT_BIT(0x0fff, 0x0000, IPT_AD_STICK_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x00,0x0fff)
+	PORT_BIT(0x0fff, 0x0800, IPT_AD_STICK_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x0000,0x0fff)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jak_pooh )
@@ -510,8 +530,10 @@ void jakks_gkr_state::jakks_gkr_sw_i2c(machine_config &config)
 {
 	jakks_gkr_i2c(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jakks_gkr_state::mem_map_1m);
-	m_maincpu->adc_in<0>().set_ioport("JOYX");
-	m_maincpu->adc_in<1>().set_ioport("JOYY");
+	m_maincpu->adc_in<0>().set(FUNC(jakks_gkr_state::joy_x_read));
+	m_maincpu->adc_in<1>().set(FUNC(jakks_gkr_state::joy_x_read));
+	m_maincpu->adc_in<2>().set(FUNC(jakks_gkr_state::joy_y_read));
+	m_maincpu->adc_in<3>().set(FUNC(jakks_gkr_state::joy_y_read));
 	SOFTWARE_LIST(config, "jakks_gamekey_sw").set_original("jakks_gamekey_sw");
 }
 
@@ -520,7 +542,7 @@ void jakks_gkr_state::jakks_gkr_wp(machine_config &config)
 	jakks_gkr(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jakks_gkr_state::mem_map_1m);
 	m_maincpu->adc_in<0>().set_ioport("JOYX");
-	m_maincpu->adc_in<1>().set_ioport("JOYY");
+	m_maincpu->adc_in<2>().set_ioport("JOYY");
 	//SOFTWARE_LIST(config, "jakks_gamekey_wp").set_original("jakks_gamekey_wp"); // NO KEYS RELEASED
 
 	m_maincpu->set_force_no_drc(true); // the Light Tag game seems to hang maybe once every 7 times with the DRC, appears more stable without (could just be chance tho)
@@ -531,7 +553,7 @@ void jakks_gkr_state::jakks_gkr_cb(machine_config &config)
 	jakks_gkr(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jakks_gkr_state::mem_map_1m);
 	m_maincpu->adc_in<0>().set_ioport("JOYX");
-	m_maincpu->adc_in<1>().set_ioport("JOYY");
+	m_maincpu->adc_in<2>().set_ioport("JOYY");
 	//SOFTWARE_LIST(config, "jakks_gamekey_cb").set_original("jakks_gamekey_cb"); // NO KEYS RELEASED
 }
 

@@ -28,6 +28,7 @@ public:
 
 	void mrdo(machine_config &config);
 	void mrlo(machine_config &config);
+	void mrdobl(machine_config &config);
 
 protected:
 	virtual void video_start() override;
@@ -47,12 +48,12 @@ private:
 	tilemap_t *m_fg_tilemap;
 	int       m_flipscreen;
 
-	DECLARE_READ8_MEMBER(mrdo_SECRE_r);
-	DECLARE_WRITE8_MEMBER(mrdo_bgvideoram_w);
-	DECLARE_WRITE8_MEMBER(mrdo_fgvideoram_w);
-	DECLARE_WRITE8_MEMBER(mrdo_scrollx_w);
-	DECLARE_WRITE8_MEMBER(mrdo_scrolly_w);
-	DECLARE_WRITE8_MEMBER(mrdo_flipscreen_w);
+	uint8_t mrdo_SECRE_r();
+	void mrdo_bgvideoram_w(offs_t offset, uint8_t data);
+	void mrdo_fgvideoram_w(offs_t offset, uint8_t data);
+	void mrdo_scrollx_w(uint8_t data);
+	void mrdo_scrolly_w(uint8_t data);
+	void mrdo_flipscreen_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	void mrdo_palette(palette_device &palette) const;

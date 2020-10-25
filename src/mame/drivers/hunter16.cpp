@@ -56,7 +56,7 @@ private:
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	DECLARE_WRITE8_MEMBER(keyboard_w);
+	void keyboard_w(uint8_t data);
 
 	uint8_t m_keydata;
 	uint8_t pt_r();
@@ -169,12 +169,12 @@ void hunter16_state::palette_init_hunter16(palette_device &palette)
 
 MC6845_UPDATE_ROW(hunter16_state::crtc_update_row)
 {
-	uint32_t  *p = &bitmap.pix32(y);
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	uint32_t  *p = &bitmap.pix(y);
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
 	for (int i = 0; i < x_count; i++)
 	{
-		uint16_t offset = (((ma + i) << 1) & 0x1fff) | ((ra & 1) << 13);
+		uint16_t const offset = (((ma + i) << 1) & 0x1fff) | ((ra & 1) << 13);
 		uint8_t data = m_videoram[offset];
 
 		for (int bit = 7; bit >= 0; bit--)
@@ -191,7 +191,7 @@ MC6845_UPDATE_ROW(hunter16_state::crtc_update_row)
 	}
 }
 
-WRITE8_MEMBER(hunter16_state::keyboard_w)
+void hunter16_state::keyboard_w(uint8_t data)
 {
 	m_keydata = data;
 }

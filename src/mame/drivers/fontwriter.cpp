@@ -44,12 +44,12 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(vbl_r)
+	uint8_t vbl_r()
 	{
 		m_vbl ^= 0xff;
 		return m_vbl;
 	}
-	DECLARE_READ8_MEMBER(vbl2_r)
+	uint8_t vbl2_r()
 	{
 		m_vbl2 ^= 0x88;
 		return m_vbl;

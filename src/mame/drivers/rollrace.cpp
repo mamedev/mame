@@ -34,12 +34,12 @@ void rollrace_state::machine_start()
 	save_item(NAME(m_sound_nmi_mask));
 }
 
-READ8_MEMBER(rollrace_state::fake_d800_r)
+uint8_t rollrace_state::fake_d800_r()
 {
 	return 0x51;
 }
 
-WRITE8_MEMBER(rollrace_state::fake_d800_w)
+void rollrace_state::fake_d800_w(uint8_t data)
 {
 /*  logerror("d900: %02X\n",data);*/
 }
@@ -51,7 +51,7 @@ WRITE_LINE_MEMBER(rollrace_state::nmi_mask_w)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(rollrace_state::sound_nmi_mask_w)
+void rollrace_state::sound_nmi_mask_w(uint8_t data)
 {
 	m_sound_nmi_mask = data & 1;
 }

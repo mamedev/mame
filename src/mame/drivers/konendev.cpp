@@ -97,19 +97,19 @@ public:
 	}
 
 private:
-	DECLARE_READ32_MEMBER(mcu2_r);
-	DECLARE_READ32_MEMBER(ifu2_r);
-	DECLARE_READ32_MEMBER(ctrl0_r);
-	DECLARE_READ32_MEMBER(ctrl1_r);
-	DECLARE_READ32_MEMBER(ctrl2_r);
-	DECLARE_READ32_MEMBER(ctrl3_r);
-	DECLARE_WRITE32_MEMBER(eeprom_w);
-	DECLARE_READ32_MEMBER(sound_data_r);
-	DECLARE_WRITE32_MEMBER(sound_data_w);
+	uint32_t mcu2_r(offs_t offset, uint32_t mem_mask = ~0);
+	uint32_t ifu2_r(offs_t offset, uint32_t mem_mask = ~0);
+	uint32_t ctrl0_r();
+	uint32_t ctrl1_r();
+	uint32_t ctrl2_r();
+	uint32_t ctrl3_r();
+	void eeprom_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t sound_data_r();
+	void sound_data_w(uint32_t data);
 
-	DECLARE_READ16_MEMBER(ifu_unk_r);
-	DECLARE_READ16_MEMBER(ifu_dpram_r);
-	DECLARE_WRITE16_MEMBER(ifu_dpram_w);
+	uint16_t ifu_unk_r();
+	uint16_t ifu_dpram_r(offs_t offset);
+	void ifu_dpram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	DECLARE_WRITE_LINE_MEMBER(gcu_interrupt);
 	INTERRUPT_GEN_MEMBER(vbl_interrupt);
@@ -137,7 +137,7 @@ uint32_t konendev_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return m_gcu->draw(screen, bitmap, cliprect);
 }
 
-READ32_MEMBER(konendev_state::mcu2_r)
+uint32_t konendev_state::mcu2_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 
@@ -165,7 +165,7 @@ READ32_MEMBER(konendev_state::mcu2_r)
 	return r;
 }
 
-READ32_MEMBER(konendev_state::ifu2_r)
+uint32_t konendev_state::ifu2_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 
@@ -177,27 +177,27 @@ READ32_MEMBER(konendev_state::ifu2_r)
 	return r;
 }
 
-READ32_MEMBER(konendev_state::ctrl0_r) // doors, switches
+uint32_t konendev_state::ctrl0_r() // doors, switches
 {
 	return ioport("IN1")->read();
 }
 
-READ32_MEMBER(konendev_state::ctrl1_r) // hard meter access, hopper
+uint32_t konendev_state::ctrl1_r() // hard meter access, hopper
 {
 	return ioport("IN2")->read();
 }
 
-READ32_MEMBER(konendev_state::ctrl2_r) // main door optic
+uint32_t konendev_state::ctrl2_r() // main door optic
 {
 	return ioport("IN3")->read();
 }
 
-READ32_MEMBER(konendev_state::ctrl3_r) // buttons
+uint32_t konendev_state::ctrl3_r() // buttons
 {
 	return ioport("IN0")->read();
 }
 
-WRITE32_MEMBER(konendev_state::eeprom_w)
+void konendev_state::eeprom_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -207,12 +207,12 @@ WRITE32_MEMBER(konendev_state::eeprom_w)
 	}
 }
 
-READ32_MEMBER(konendev_state::sound_data_r)
+uint32_t konendev_state::sound_data_r()
 {
 	return 0xffffffff;
 }
 
-WRITE32_MEMBER(konendev_state::sound_data_w)
+void konendev_state::sound_data_w(uint32_t data)
 {
 }
 
@@ -237,17 +237,17 @@ void konendev_state::konendev_map(address_map &map)
 	map(0x7ff00000, 0x7fffffff).rom().region("program", 0);
 }
 
-READ16_MEMBER(konendev_state::ifu_unk_r)
+uint16_t konendev_state::ifu_unk_r()
 {
 	return 0xc3c3;  // H8 program crashes immediately if it doesn't see
 }
 
-READ16_MEMBER(konendev_state::ifu_dpram_r)
+uint16_t konendev_state::ifu_dpram_r(offs_t offset)
 {
 	return m_dpram_base[offset];
 }
 
-WRITE16_MEMBER(konendev_state::ifu_dpram_w)
+void konendev_state::ifu_dpram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_dpram_base[offset]);
 }

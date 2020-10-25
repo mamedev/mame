@@ -417,10 +417,11 @@ void adsp21xx_device::device_start()
 	m_dmovlay_cb.resolve();
 
 	// get our address spaces
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<2, -2, ENDIANNESS_LITTLE>();
-	m_data = &space(AS_DATA);
-	m_io = has_space(AS_IO) ? &space(AS_IO) : nullptr;
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
+	space(AS_DATA).specific(m_data);
+	if(has_space(AS_IO))
+		space(AS_IO).specific(m_io);
 
 	// "core"
 	save_item(NAME(m_core.ax0.u));
@@ -776,37 +777,37 @@ std::unique_ptr<util::disasm_interface> adsp21xx_device::create_disassembler()
 
 inline uint16_t adsp21xx_device::data_read(uint32_t addr)
 {
-	return m_data->read_word(addr);
+	return m_data.read_word(addr);
 }
 
 inline void adsp21xx_device::data_write(uint32_t addr, uint16_t data)
 {
-	m_data->write_word(addr, data);
+	m_data.write_word(addr, data);
 }
 
 inline uint16_t adsp21xx_device::io_read(uint32_t addr)
 {
-	return m_io->read_word(addr);
+	return m_io.read_word(addr);
 }
 
 inline void adsp21xx_device::io_write(uint32_t addr, uint16_t data)
 {
-	m_io->write_word(addr, data);
+	m_io.write_word(addr, data);
 }
 
 inline uint32_t adsp21xx_device::program_read(uint32_t addr)
 {
-	return m_program->read_dword(addr);
+	return m_program.read_dword(addr);
 }
 
 inline void adsp21xx_device::program_write(uint32_t addr, uint32_t data)
 {
-	m_program->write_dword(addr, data & 0xffffff);
+	m_program.write_dword(addr, data & 0xffffff);
 }
 
 inline uint32_t adsp21xx_device::opcode_read()
 {
-	return m_cache->read_dword(m_pc);
+	return m_cache.read_dword(m_pc);
 }
 
 

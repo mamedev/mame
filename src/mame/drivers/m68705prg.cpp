@@ -148,7 +148,7 @@ public:
 	void prg(machine_config &config);
 
 protected:
-	DECLARE_WRITE8_MEMBER(pb_w)
+	void pb_w(u8 data)
 	{
 		// PB4: address counter reset (active high)
 		// PB3: address counter clock (falling edge)

@@ -8,8 +8,7 @@
 /// \file nld_generic_models.h
 ///
 
-#include "netlist/nl_base.h"
-#include "netlist/nl_setup.h"
+#include "nl_base.h"
 
 //
 // Set to 0 to use a linearized diode model in the range exceeding
@@ -45,7 +44,7 @@ namespace analog
 	class generic_capacitor<capacitor_e::VARIABLE_CAPACITY>
 	{
 	public:
-		generic_capacitor(device_t &dev, const pstring &name)
+		generic_capacitor(core_device_t &dev, const pstring &name)
 		: m_h(dev, name + ".m_h", nlconst::zero())
 		, m_c(dev, name + ".m_c", nlconst::zero())
 		, m_v(dev, name + ".m_v", nlconst::zero())
@@ -82,6 +81,11 @@ namespace analog
 			m_h = plib::reciprocal(step);
 			m_c = cap;
 			m_v = v;
+		}
+
+		void restore_state() noexcept
+		{
+			// no state used
 		}
 
 		void setparams(nl_fptype gmin) noexcept { m_gmin = gmin; }
@@ -126,14 +130,14 @@ namespace analog
 		nl_fptype m_gmin;
 	};
 
-#if 1
+#if (NL_USE_BACKWARD_EULER)
 	// Constant model for constant capacitor model
 	// Backward Euler
 	// "Circuit simulation", page 274
 	struct generic_capacitor_const
 	{
 	public:
-		generic_capacitor_const(device_t &dev, const pstring &name)
+		generic_capacitor_const(core_device_t &dev, const pstring &name)
 		: m_gmin(nlconst::zero())
 		{
 			plib::unused_var(dev, name);
@@ -146,6 +150,10 @@ namespace analog
 			const nl_fptype G(cap * h + m_gmin);
 			return { G, - G * v };
 		}
+		void restore_state() noexcept
+		{
+			// this one has no state
+		}
 		void setparams(nl_fptype gmin) noexcept { m_gmin = gmin; }
 	private:
 		nl_fptype m_gmin;
@@ -157,7 +165,7 @@ namespace analog
 	struct generic_capacitor_const
 	{
 	public:
-		generic_capacitor_const(device_t &dev, const pstring &name)
+		generic_capacitor_const(core_device_t &dev, const pstring &name)
 		: m_gmin(nlconst::zero())
 		, m_vn(0)
 		, m_in(0)
@@ -177,8 +185,6 @@ namespace analog
 				m_trn = h;
 				return { G, - G * v };
 			}
-			if (step < 1e-9)
-				printf("Help %e\n", step);
 			const nl_fptype Gn = nlconst::two() * cap * m_trn;
 			const nl_fptype inp1 = Gn * v - (m_in + Gn * m_vn);
 			const nl_fptype G(nlconst::two() * cap * h);
@@ -187,6 +193,10 @@ namespace analog
 			m_vn = v;
 			m_trn = h;
 			return { G + m_gmin, -Ieq };
+		}
+		void restore_state() noexcept
+		{
+			// this one has no state
 		}
 		void setparams(nl_fptype gmin) noexcept { m_gmin = gmin; }
 	private:
@@ -210,7 +220,7 @@ namespace analog
 	class generic_diode
 	{
 	public:
-		generic_diode(device_t &dev, const pstring &name)
+		generic_diode(core_device_t &dev, const pstring &name)
 		: m_Vd(dev, name + ".m_Vd", nlconst::diode_start_voltage())
 		, m_Id(dev, name + ".m_Id", nlconst::zero())
 		, m_G(dev,  name + ".m_G", nlconst::cgminalt())

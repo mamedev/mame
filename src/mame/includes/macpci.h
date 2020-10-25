@@ -122,16 +122,16 @@ private:
 	// this is shared among all video setups with vram
 	uint32_t *m_vram;
 
-	DECLARE_READ16_MEMBER ( mac_via_r );
-	DECLARE_WRITE16_MEMBER ( mac_via_w );
-	DECLARE_READ16_MEMBER ( mac_scc_r );
-	DECLARE_WRITE16_MEMBER ( mac_scc_w );
-	DECLARE_WRITE16_MEMBER ( mac_scc_2_w );
+	uint16_t mac_via_r(offs_t offset);
+	void mac_via_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t mac_scc_r(offs_t offset);
+	void mac_scc_w(offs_t offset, uint16_t data);
+	void mac_scc_2_w(offs_t offset, uint16_t data);
 
-	DECLARE_READ32_MEMBER(mac_read_id);
+	uint32_t mac_read_id();
 
-	DECLARE_READ8_MEMBER(mac_5396_r);
-	DECLARE_WRITE8_MEMBER(mac_5396_w);
+	uint8_t mac_5396_r(offs_t offset);
+	void mac_5396_w(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(irq_539x_1_w);
 	DECLARE_WRITE_LINE_MEMBER(drq_539x_1_w);
@@ -140,11 +140,12 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(cuda_adb_linechange_w);
 
 	// hack functions
-	DECLARE_READ64_MEMBER ( unk1_r );
-	DECLARE_READ64_MEMBER ( unk2_r );
+	uint64_t unk1_r();
+	uint64_t unk2_r(offs_t offset, uint64_t mem_mask = ~0);
 
 	void init_pippin();
 	void pippin_mem(address_map &map);
+	void cdmcu_mem(address_map &map);
 	// wait states for accessing the VIA
 	int m_via_cycles;
 
@@ -154,10 +155,10 @@ private:
 	emu_timer *m_scanline_timer;
 	uint32_t screen_update_pippin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
-	DECLARE_READ8_MEMBER(mac_via_in_a);
-	DECLARE_READ8_MEMBER(mac_via_in_b);
-	DECLARE_WRITE8_MEMBER(mac_via_out_a);
-	DECLARE_WRITE8_MEMBER(mac_via_out_b);
+	uint8_t mac_via_in_a();
+	uint8_t mac_via_in_b();
+	void mac_via_out_a(uint8_t data);
+	void mac_via_out_b(uint8_t data);
 	DECLARE_READ_LINE_MEMBER(mac_adb_via_in_cb2);
 	DECLARE_WRITE_LINE_MEMBER(mac_adb_via_out_cb2);
 	DECLARE_WRITE_LINE_MEMBER(mac_via_irq);

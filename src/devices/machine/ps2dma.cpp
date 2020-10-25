@@ -370,7 +370,7 @@ void ps2_dmac_device::update_interrupts()
 	m_ee->set_input_line(MIPS3_IRQ1, (m_istat & m_imask) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ32_MEMBER(ps2_dmac_device::read)
+uint32_t ps2_dmac_device::read(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t ret = 0;
 	switch (offset)
@@ -405,7 +405,7 @@ READ32_MEMBER(ps2_dmac_device::read)
 	return ret;
 }
 
-WRITE32_MEMBER(ps2_dmac_device::write)
+void ps2_dmac_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -443,7 +443,7 @@ WRITE32_MEMBER(ps2_dmac_device::write)
 	}
 }
 
-READ32_MEMBER(ps2_dmac_device::channel_r)
+uint32_t ps2_dmac_device::channel_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t ret = 0;
 	switch (offset + 0x8000/8)
@@ -602,7 +602,7 @@ READ32_MEMBER(ps2_dmac_device::channel_r)
 	return ret;
 }
 
-WRITE32_MEMBER(ps2_dmac_device::channel_w)
+void ps2_dmac_device::channel_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	static char const *const mode_strings[4] = { "Normal", "Chain", "Interleave", "Undefined" };
 
@@ -765,14 +765,14 @@ WRITE32_MEMBER(ps2_dmac_device::channel_w)
 	}
 }
 
-READ32_MEMBER(ps2_dmac_device::disable_mask_r)
+uint32_t ps2_dmac_device::disable_mask_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t ret = m_disable_mask;
 	logerror("%s: m_disable_mask = %08x & %08x\n", machine().describe_context(), ret, mem_mask);
 	return ret;
 }
 
-WRITE32_MEMBER(ps2_dmac_device::disable_mask_w)
+void ps2_dmac_device::disable_mask_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("%s: m_disable_mask = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 	m_disable_mask = data;

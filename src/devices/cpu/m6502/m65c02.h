@@ -4,7 +4,7 @@
 
     m65c02.h
 
-    MOS Technology 6502, CMOS variant with some additional instructions
+    WDC W65C02, CMOS variant with some additional instructions
     (but not the bitwise ones)
 
 ***************************************************************************/

@@ -391,10 +391,10 @@ public:
 	DECLARE_READ_LINE_MEMBER(vblank_r);
 
 private:
-	DECLARE_WRITE8_MEMBER(missile_w);
-	DECLARE_READ8_MEMBER(missile_r);
-	DECLARE_WRITE8_MEMBER(bootleg_w);
-	DECLARE_READ8_MEMBER(bootleg_r);
+	void missile_w(address_space &space, offs_t offset, uint8_t data);
+	uint8_t missile_r(address_space &space, offs_t offset);
+	void bootleg_w(address_space &space, offs_t offset, uint8_t data);
+	uint8_t bootleg_r(address_space &space, offs_t offset);
 	uint32_t screen_update_missile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	inline int scanline_to_v(int scanline);
@@ -683,24 +683,21 @@ uint8_t missile_state::read_vram(address_space &space, offs_t address)
 
 uint32_t missile_state::screen_update_missile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *videoram = m_videoram;
-	int x, y;
-
 	// draw the bitmap to the screen, looping over Y
-	for (y = cliprect.top(); y <= cliprect.bottom(); y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		uint16_t *dst = &bitmap.pix16(y);
+		uint16_t *const dst = &bitmap.pix(y);
 
-		int effy = m_flipscreen ? ((256+24 - y) & 0xff) : y;
-		uint8_t *src = &videoram[effy * 64];
-		uint8_t *src3 = nullptr;
+		int const effy = m_flipscreen ? ((256+24 - y) & 0xff) : y;
+		uint8_t const *const src = &m_videoram[effy * 64];
+		uint8_t const *src3 = nullptr;
 
 		// compute the base of the 3rd pixel row
 		if (effy >= 224)
-			src3 = &videoram[get_bit3_addr(effy << 8)];
+			src3 = &m_videoram[get_bit3_addr(effy << 8)];
 
 		// loop over X
-		for (x = cliprect.left(); x <= cliprect.right(); x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			uint8_t pix = src[x / 4] >> (x & 3);
 			pix = ((pix >> 2) & 4) | ((pix << 1) & 2);
@@ -723,7 +720,7 @@ uint32_t missile_state::screen_update_missile(screen_device &screen, bitmap_ind1
  *
  *************************************/
 
-WRITE8_MEMBER(missile_state::missile_w)
+void missile_state::missile_w(address_space &space, offs_t offset, uint8_t data)
 {
 	/* if this is a MADSEL cycle, write to video RAM */
 	if (get_madsel())
@@ -782,7 +779,7 @@ WRITE8_MEMBER(missile_state::missile_w)
 }
 
 
-READ8_MEMBER(missile_state::missile_r)
+uint8_t missile_state::missile_r(address_space &space, offs_t offset)
 {
 	uint8_t result = 0xff;
 
@@ -843,7 +840,7 @@ READ8_MEMBER(missile_state::missile_r)
 }
 
 
-WRITE8_MEMBER(missile_state::bootleg_w)
+void missile_state::bootleg_w(address_space &space, offs_t offset, uint8_t data)
 {
 	/* if this is a MADSEL cycle, write to video RAM */
 	if (get_madsel())
@@ -895,7 +892,7 @@ WRITE8_MEMBER(missile_state::bootleg_w)
 }
 
 
-READ8_MEMBER(missile_state::bootleg_r)
+uint8_t missile_state::bootleg_r(address_space &space, offs_t offset)
 {
 	uint8_t result = 0xff;
 

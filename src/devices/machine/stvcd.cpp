@@ -137,7 +137,7 @@ void stvcd_device::io_regs(address_map &map)
 	map(0x90024, 0x90027).mirror(0x08000).rw(FUNC(stvcd_device::cr4_r), FUNC(stvcd_device::cr4_w)).umask32(0xffffffff);
 }
 
-READ32_MEMBER( stvcd_device::datatrns_r )
+u32 stvcd_device::datatrns_r(offs_t offset, uint32_t mem_mask)
 {
 	u32 rv;
 
@@ -161,7 +161,7 @@ READ32_MEMBER( stvcd_device::datatrns_r )
 	return rv;
 }
 
-WRITE32_MEMBER( stvcd_device::datatrns_w )
+void stvcd_device::datatrns_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (mem_mask == 0xffffffff)
 		dataxfer_long_w(data);
@@ -375,7 +375,7 @@ inline u16 stvcd_device::dataxfer_word_r()
 	return rv;
 }
 
-READ16_MEMBER( stvcd_device::hirq_r )
+uint16_t stvcd_device::hirq_r()
 {
 	// TODO: this member must return the register only
 	u16 rv;
@@ -394,25 +394,25 @@ READ16_MEMBER( stvcd_device::hirq_r )
 	return rv;
 }
 
-WRITE16_MEMBER( stvcd_device::hirq_w ) { hirqreg &= data; }
+void stvcd_device::hirq_w(uint16_t data) { hirqreg &= data; }
 
 // TODO: these two are actually never read or written to by host?
-READ16_MEMBER( stvcd_device::hirqmask_r )
+uint16_t stvcd_device::hirqmask_r()
 {
 	printf("RW HIRM: %04x\n", hirqmask);
 	return hirqmask;
 }
 
-WRITE16_MEMBER( stvcd_device::hirqmask_w )
+void stvcd_device::hirqmask_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	printf("WW HIRM: %04x => %04x\n", hirqmask, data);
 	COMBINE_DATA(&hirqmask);
 }
 
-READ16_MEMBER( stvcd_device::cr1_r ) { return cr1; }
-READ16_MEMBER( stvcd_device::cr2_r ) { return cr2; }
-READ16_MEMBER( stvcd_device::cr3_r ) { return cr3; }
-READ16_MEMBER( stvcd_device::cr4_r )
+uint16_t stvcd_device::cr1_r() { return cr1; }
+uint16_t stvcd_device::cr2_r() { return cr2; }
+uint16_t stvcd_device::cr3_r() { return cr3; }
+uint16_t stvcd_device::cr4_r()
 {
 	cmd_pending = 0;
 	cd_stat |= CD_STAT_PERI;
@@ -420,7 +420,7 @@ READ16_MEMBER( stvcd_device::cr4_r )
 }
 
 // TODO: understand how dual-port interface really works out
-WRITE16_MEMBER( stvcd_device::cr1_w )
+void stvcd_device::cr1_w(uint16_t data)
 {
 	cr1 = data;
 	cd_stat &= ~CD_STAT_PERI;
@@ -428,31 +428,31 @@ WRITE16_MEMBER( stvcd_device::cr1_w )
 	m_sh1_timer->adjust(attotime::never);
 }
 
-WRITE16_MEMBER( stvcd_device::cr2_w )
+void stvcd_device::cr2_w(uint16_t data)
 {
 	cr2 = data;
 	cmd_pending |= 2;
 }
 
-WRITE16_MEMBER( stvcd_device::cr3_w )
+void stvcd_device::cr3_w(uint16_t data)
 {
 	cr3 = data;
 	cmd_pending |= 4;
 }
 
-WRITE16_MEMBER( stvcd_device::cr4_w )
+void stvcd_device::cr4_w(uint16_t data)
 {
 	cr4 = data;
 	cmd_pending |= 8;
 	m_sh1_timer->adjust(attotime::from_hz(get_timing_command()));
 }
 
-READ32_MEMBER( stvcd_device::stvcd_r )
+uint32_t stvcd_device::stvcd_r(offs_t offset, uint32_t mem_mask)
 {
 	return this->space().read_dword(offset<<2, mem_mask);
 }
 
-WRITE32_MEMBER( stvcd_device::stvcd_w )
+void stvcd_device::stvcd_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	this->space().write_dword(offset<<2,data, mem_mask);
 }
@@ -882,7 +882,7 @@ void stvcd_device::cmd_seek_disc()
 		if (cr2 >> 8)
 		{
 			cd_stat = CD_STAT_PAUSE;
-			cur_track = cr2>>8;;
+			cur_track = cr2>>8;
 			cd_curfad = cdrom_get_track_start(cdrom, cur_track-1);
 			m_cdda->pause_audio(1);
 			// (index is cr2 low byte)

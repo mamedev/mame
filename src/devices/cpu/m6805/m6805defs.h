@@ -24,53 +24,53 @@ inline void clear_pair(PAIR &p) { p.d = 0; }
 #define SP_DEC  if (--S < SP_LOW) S = SP_MASK
 #define SP_ADJUST(s) (((s) & SP_MASK) | SP_LOW)
 
-inline void m6805_base_device::rm16(u32 addr, PAIR &p)
+template<bool big> inline void m6805_base_device::rm16(u32 addr, PAIR &p)
 {
 	clear_pair(p);
-	p.b.h = rm(addr);
-	p.b.l = rm(addr + 1);
+	p.b.h = rm<big>(addr);
+	p.b.l = rm<big>(addr + 1);
 }
 
-inline void m6805_base_device::pushbyte(u8 b)
+template<bool big> inline void m6805_base_device::pushbyte(u8 b)
 {
-	wm(S, b);
+	wm<big>(S, b);
 	SP_DEC;
 }
 
-inline void m6805_base_device::pushword(PAIR const &p)
+template<bool big> inline void m6805_base_device::pushword(PAIR const &p)
 {
-	pushbyte(p.b.l);
-	pushbyte(p.b.h);
+	pushbyte<big>(p.b.l);
+	pushbyte<big>(p.b.h);
 }
 
-inline void m6805_base_device::pullbyte(u8 &b)
+template<bool big> inline void m6805_base_device::pullbyte(u8 &b)
 {
 	SP_INC;
-	b = rm(S);
+	b = rm<big>(S);
 }
 
-inline void m6805_base_device::pullword(PAIR &p)
+template<bool big> inline void m6805_base_device::pullword(PAIR &p)
 {
 	clear_pair(p);
-	pullbyte(p.b.h);
-	pullbyte(p.b.l);
+	pullbyte<big>(p.b.h);
+	pullbyte<big>(p.b.l);
 }
 
 /* macros to access memory */
-template <typename T> inline void m6805_base_device::immbyte(T &b) { b = rdop_arg(PC++); }
-inline void m6805_base_device::immword(PAIR &w) { w.d = 0; immbyte(w.b.h); immbyte(w.b.l); }
-inline void m6805_base_device::skipbyte() { rdop_arg(PC++); }
+template <bool big, typename T> inline void m6805_base_device::immbyte(T &b) { b = rdop_arg<big>(PC++); }
+template<bool big> inline void m6805_base_device::immword(PAIR &w) { w.d = 0; immbyte<big>(w.b.h); immbyte<big>(w.b.l); }
+template<bool big> inline void m6805_base_device::skipbyte() { rdop_arg<big>(PC++); }
 
 /* for treating an unsigned uint8_t as a signed int16_t */
 #define SIGNED(b) (int16_t(b & 0x80 ? b | 0xff00 : b))
 
 /* Macros for addressing modes */
-#define DIRECT do { EAD=0; immbyte(m_ea.b.l); } while (false)
+#define DIRECT do { EAD=0; immbyte<big>(m_ea.b.l); } while (false)
 #define IMM8 do { EA = PC++; } while (false)
-#define EXTENDED immword(m_ea)
+#define EXTENDED immword<big>(m_ea)
 #define INDEXED do { EA = X; } while (false)
-#define INDEXED1 do { EAD = 0; immbyte(m_ea.b.l); EA += X; } while (false)
-#define INDEXED2 do { immword(m_ea); EA += X;} while (false)
+#define INDEXED1 do { EAD = 0; immbyte<big>(m_ea.b.l); EA += X; } while (false)
+#define INDEXED2 do { immword<big>(m_ea); EA += X;} while (false)
 
 /* macros to set status flags */
 #if defined(SEC)
@@ -97,14 +97,14 @@ inline void m6805_base_device::skipbyte() { rdop_arg(PC++); }
 		case addr_mode::IX1: INDEXED1; break; \
 		case addr_mode::IX2: INDEXED2; break; \
 		} } while (false)
-#define DIRBYTE(b) do { DIRECT; b = rm(EAD); } while (false)
-#define EXTBYTE(b) do { EXTENDED; b = rm(EAD); } while (false)
-#define IDXBYTE(b) do { INDEXED; b = rm(EAD); } while (false)
-#define IDX1BYTE(b) do { INDEXED1; b = rm(EAD); } while (false)
-#define IDX2BYTE(b) do { INDEXED2; b = rm(EAD); } while (false)
+#define DIRBYTE(b) do { DIRECT; b = rm<big>(EAD); } while (false)
+#define EXTBYTE(b) do { EXTENDED; b = rm<big>(EAD); } while (false)
+#define IDXBYTE(b) do { INDEXED; b = rm<big>(EAD); } while (false)
+#define IDX1BYTE(b) do { INDEXED1; b = rm<big>(EAD); } while (false)
+#define IDX2BYTE(b) do { INDEXED2; b = rm<big>(EAD); } while (false)
 #define ARGBYTE(b) \
 		do { switch (M) { \
-		case addr_mode::IM: immbyte(b); break; \
+		case addr_mode::IM: immbyte<big>(b); break; \
 		case addr_mode::DI: DIRBYTE(b); break; \
 		case addr_mode::EX: EXTBYTE(b); break; \
 		case addr_mode::IX: IDXBYTE(b); break; \
@@ -114,6 +114,6 @@ inline void m6805_base_device::skipbyte() { rdop_arg(PC++); }
 		} } while (false)
 
 /* Macros for branch instructions */
-#define BRANCH(f) do { u8 t; immbyte(t); if (bool(f) == bool(C)) PC += SIGNED(t); } while (false)
+#define BRANCH(f) do { u8 t; immbyte<big>(t); if (bool(f) == bool(C)) PC += SIGNED(t); } while (false)
 
 #endif // MAME_CPU_M6805_M6805DEFS_H

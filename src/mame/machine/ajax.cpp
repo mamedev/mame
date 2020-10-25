@@ -33,7 +33,7 @@
     (*) The Coin Counters are handled by the Konami Custom 051550
 */
 
-WRITE8_MEMBER(ajax_state::bankswitch_w)
+void ajax_state::bankswitch_w(uint8_t data)
 {
 	int bank = 0;
 
@@ -77,7 +77,7 @@ WRITE8_MEMBER(ajax_state::bankswitch_w)
         LS393       C20         Dual -ve edge trigger 4-bit Binary Ripple Counter with Resets
 */
 
-WRITE8_MEMBER(ajax_state::lamps_w)
+void ajax_state::lamps_w(uint8_t data)
 {
 	m_lamps[1] = BIT(data, 1);  /* super weapon lamp */
 	m_lamps[2] = BIT(data, 2);  /* power up lamps */
@@ -106,7 +106,7 @@ WRITE8_MEMBER(ajax_state::lamps_w)
     0x01c0  (r) MIO2            Enables DIPSW #3 reading
 */
 
-READ8_MEMBER(ajax_state::ls138_f10_r)
+uint8_t ajax_state::ls138_f10_r(offs_t offset)
 {
 	int data = 0, index;
 	static const char *const portnames[] = { "SYSTEM", "P1", "DSW1", "DSW2" };
@@ -134,7 +134,7 @@ READ8_MEMBER(ajax_state::ls138_f10_r)
 	return data;
 }
 
-WRITE8_MEMBER(ajax_state::ls138_f10_w)
+void ajax_state::ls138_f10_w(offs_t offset, uint8_t data)
 {
 	switch ((offset & 0x01c0) >> 6)
 	{
@@ -153,10 +153,10 @@ WRITE8_MEMBER(ajax_state::ls138_f10_w)
 			m_soundlatch->write(data);
 			break;
 		case 0x03:  /* Bankswitch + coin counters + priority*/
-			bankswitch_w(space, 0, data);
+			bankswitch_w(data);
 			break;
 		case 0x05:  /* Lamps + Joystick vibration + Control panel quaking */
-			lamps_w(space, 0, data);
+			lamps_w(data);
 			break;
 
 		default:
@@ -179,7 +179,7 @@ WRITE8_MEMBER(ajax_state::ls138_f10_w)
     0   SRB0    /
 */
 
-WRITE8_MEMBER(ajax_state::bankswitch_2_w)
+void ajax_state::bankswitch_2_w(uint8_t data)
 {
 	/* enable char ROM reading through the video RAM */
 	m_k052109->set_rmrd_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);

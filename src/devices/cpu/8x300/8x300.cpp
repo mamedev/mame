@@ -14,10 +14,10 @@
 #include "8x300dasm.h"
 #include "debugger.h"
 
-#define FETCHOP(a)         (m_cache->read_word(a))
+#define FETCHOP(a)         (m_cache.read_word(a))
 #define CYCLES(x)          do { m_icount -= (x); } while (0)
-#define READPORT(a)        (m_io->read_byte(a))
-#define WRITEPORT(a,v)     (m_io->write_byte((a), (v)))
+#define READPORT(a)        (m_io.read_byte(a))
+#define WRITEPORT(a,v)     (m_io.write_byte((a), (v)))
 
 #define SRC    ((opcode & 0x1f00) >> 8)
 #define DST    (opcode & 0x001f)
@@ -153,9 +153,9 @@ void n8x300_cpu_device::device_resolve_objects()
 
 void n8x300_cpu_device::device_start()
 {
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<1, -1, ENDIANNESS_BIG>();
-	m_io = &space(AS_IO);
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
+	space(AS_IO).specific(m_io);
 
 	save_item(NAME(m_PC));
 	save_item(NAME(m_AR));

@@ -193,8 +193,6 @@ function cheat.startplugin()
 		return
 	end
 
-	local function is_oneshot(cheat) return cheat.script and not cheat.script.run and not cheat.script.off end
-
 	local function run_if(cheat, func)
 		if func then
 			local stat, err = pcall(func)
@@ -293,7 +291,7 @@ function cheat.startplugin()
 	end
 
 	local function bpset(cheat, dev, addr, func)
-		if is_oneshot(cheat) then
+		if cheat.is_oneshot then
 			error("bpset not permitted in oneshot cheat")
 			return
 		end
@@ -302,7 +300,7 @@ function cheat.startplugin()
 	end
 
 	local function wpset(cheat, dev, space, wptype, addr, len, func)
-		if is_oneshot(cheat) then
+		if cheat.is_oneshot then
 			error("wpset not permitted in oneshot cheat")
 			return
 		end
@@ -333,7 +331,7 @@ function cheat.startplugin()
 	local function input_trans(list)
 		local xlate = { start = {}, stop = {}, last = 0 }
 		local function errout(port, field)
-			cheat.enabled = false
+			cheat:set_enabled(false)
 			error(port .. field .. " not found")
 			return
 		end
@@ -369,7 +367,7 @@ function cheat.startplugin()
 	end
 
 	local function input_run(cheat, list)
-		if not is_oneshot(cheat) then
+		if not cheat.is_oneshot then
 			cheat.enabled = false
 			error("input_run only allowed in one shot cheats")
 			return
@@ -377,6 +375,72 @@ function cheat.startplugin()
 		local _, screen = next(manager:machine().screens)
 		list.begin = screen:frame_number()
 		inputs[#inputs + 1] = list
+	end
+
+	local function param_calc(param)
+		if param.item then
+			if not param.item[param.index] then -- uh oh
+				param.index = 1
+			end
+			param.value = param.item[param.index].value
+			return
+		end
+		param.value = param.min + (param.step * (param.index - 1))
+		if param.value > param.max then
+			param.value = param.max
+		end
+	end
+
+	-- return is current state, ui change
+	local function set_enabled(cheat, state)
+		if cheat.is_oneshot then
+			if state then
+				if cheat.parameter and cheat.script.change and cheat.parameter.index ~= 0 then
+					param_calc(cheat.parameter)
+					cheat.cheat_env.param = cheat.parameter.value
+					cheat.script.change()
+				elseif not cheat.parameter and cheat.script.on then
+					cheat.script.on()
+				end
+			end
+			return false, false
+		end
+		if cheat.enabled == state then
+			return state, false
+		end
+		if not state then
+			cheat.enabled = false
+			run_if(cheat, cheat.script.off)
+			bwpclr(cheat)
+		else
+			cheat.enabled = true
+			run_if(cheat, cheat.script.on)
+		end
+		return state, true
+	end
+
+	-- return is current index, ui change
+	local function set_index(cheat, index)
+		local param = cheat.parameter
+		local oldindex = param.index
+		if (param.index < 0) or (param.index >= param.last) or (param.index == index) then
+			return param.index, false
+		end
+		param.index = index
+		if index == 0 then
+			cheat.cheat_env.param = param.min
+			cheat:set_enabled(false)
+		else
+			if oldindex == 0 then
+				cheat:set_enabled(true)
+			end
+			param_calc(param)
+			cheat.cheat_env.param = param.value
+			if not cheat.is_oneshot then
+				run_if(cheat, cheat.script.change)
+			end
+		end
+		return index, true
 	end
 
 	local function parse_cheat(cheat)
@@ -396,6 +460,9 @@ function cheat.startplugin()
 					{ insert = table.insert,
 						  remove = table.remove } }
 		cheat.enabled = false
+		cheat.set_enabled = set_enabled;
+		cheat.get_enabled = function(cheat) return cheat.enabled end
+		cheat.is_oneshot = cheat.script and not cheat.script.run and not cheat.script.off
 
 		-- verify scripts are valid first
 		if not cheat.script then
@@ -500,6 +567,17 @@ function cheat.startplugin()
 		if not param then
 			return
 		end
+		cheat.set_index = set_index;
+		cheat.set_value = function(cheat, value)
+			local idx = ((value - cheat.parameter.min) / cheat.parameter.step) + 1
+			local chg = false
+			if math.integer(idx) == idx then
+				idx, chg = cheat:set_index(idx)
+			end
+			return cheat.parameter.value, chg
+		end
+		cheat.get_index = function(cheat) return cheat.parameter.index end
+		cheat.get_value = function(cheat) return cheat.parameter.value end
 		param.min = tonumber(param.min) or 0
 		param.max = tonumber(param.max) or #param.item
 		param.step = tonumber(param.step) or 1
@@ -508,7 +586,7 @@ function cheat.startplugin()
 				if not item.value then
 					item.value = (count * param.step) + param.min
 				else
-					item.value = tonumber(item.value)
+				item.value = tonumber(item.value)
 				end
 			end
 			param.last = #param.item
@@ -579,7 +657,7 @@ function cheat.startplugin()
 					end
 					menu[num][2] = ""
 					menu[num][3] = "off"
-				elseif is_oneshot(cheat) then
+				elseif cheat.is_oneshot then
 					menu[num][2] = _("Set")
 					menu[num][3] = 0
 				else
@@ -593,7 +671,7 @@ function cheat.startplugin()
 				end
 			else
 				if cheat.parameter.index == 0 then
-					if is_oneshot(cheat) then
+					if cheat.is_oneshot then
 						menu[num][2] = _("Set")
 					else
 						menu[num][2] = _("Off")
@@ -640,22 +718,12 @@ function cheat.startplugin()
 				hotkeymenu = true
 			elseif index == 3 then
 				for num, cheat in pairs(cheats) do
-					if cheat.enabled then
-						run_if(cheat, cheat.script.off)
-						bwpclr(cheat)
-					end
-					cheat.enabled = false
-					if cheat.parameter then
-						cheat.parameter.value = cheat.parameter.min
-						cheat.parameter.index = 0
-					end
+					cheat:set_enabled(false)
+					cheat:set_index(0)
 				end
 			elseif index == 4 then
 				for num, cheat in pairs(cheats) do
-					if cheat.enabled then
-						run_if(cheat, cheat.script.off)
-						bwpclr(cheat)
-					end
+					cheat:set_enabled(false)
 				end
 				cheats = load_cheats()
 				for num, cheat in pairs(cheats) do
@@ -664,20 +732,6 @@ function cheat.startplugin()
 				load_hotkeys()
 			end
 			return true
-		end
-
-		local function param_calc(param)
-			if param.item then
-				if not param.item[param.index] then -- uh oh
-					param.index = 1
-				end
-				param.value = param.item[param.index].value
-				return
-			end
-			param.value = param.min + (param.step * (param.index - 1))
-			if param.value > param.max then
-				param.value = param.max
-			end
 		end
 
 		local cheat = cheats[index]
@@ -690,72 +744,37 @@ function cheat.startplugin()
 			end
 		elseif event == "left" then
 			if cheat.parameter then
-				local param = cheat.parameter
-				if param.index == 1 then
-					param.index = 0
-					cheat.enabled = false
-					cheat.cheat_env.param = param.min
-					run_if(cheat, cheat.script.off)
-					bwpclr(cheat)
-					return true
-				elseif param.index == 0 then
-					return false
-				end
-				param.index = param.index - 1
-				param_calc(param)
-				cheat.cheat_env.param = param.value
-				if not is_oneshot(cheat) then
-					run_if(cheat, cheat.script.change)
-				end
-				return true
+				local idx, chg = cheat:set_index(cheat:get_index() - 1)
+				return chg
 			else
-				if cheat.enabled and not is_oneshot(cheat) then
-					cheat.enabled = false
-					run_if(cheat, cheat.script.off)
-					bwpclr(cheat)
-					return true
+				if not cheat.is_oneshot then
+					return cheat:set_enabled(false)
 				end
 				return false
 			end
 		elseif event == "right" then
 			if cheat.parameter then
-				local param = cheat.parameter
-				if param.index == 0 then
-					cheat.enabled = true
-					run_if(cheat, cheat.script.on)
-				elseif param.index == param.last then
-					return false
-				end
-				param.index = param.index + 1
-				param_calc(param)
-				cheat.cheat_env.param = param.value
-				if not is_oneshot(cheat) then
-					run_if(cheat, cheat.script.change)
-				end
-				return true
+				local idx, chg = cheat:set_index(cheat:get_index() + 1)
+				return chg
 			else
-				if not cheat.enabled and not is_oneshot(cheat) then
-					cheat.enabled = true
-					run_if(cheat, cheat.script.on)
-					return true
+				if not cheat.is_oneshot then
+					local state, chg = cheat:set_enabled(true)
+					return chg
 				end
 				return false
 			end
 		elseif event == "select" then
-			if is_oneshot(cheat) then
-				if cheat.parameter and cheat.script.change and cheat.parameter.index ~= 0 then
-					param_calc(cheat.parameter)
-					cheat.cheat_env.param = cheat.parameter.value
-					cheat.script.change()
-					local subtext
+			if cheat.is_oneshot then
+				cheat:set_enabled(true)
+				if cheat.parameter and cheat.script.change and cheat:get_index() ~= 0 then
+					local itemtext
 					if cheat.parameter.item then
-						subtext = cheat.parameter.item[cheat.parameter.index]
+						itemtext = cheat.parameter.item[cheat.parameter.index].text
 					else
-						subtext = cheat.parameter.value
+						itemtext = cheat.parameter.value
 					end
-					manager:machine():popmessage(string.format(_("Activated: %s = %s"), cheat.desc, subtext))
+					manager:machine():popmessage(string.format(_("Activated: %s = %s"), cheat.desc, itemtext))
 				elseif not cheat.parameter and cheat.script.on then
-					cheat.script.on()
 					manager:machine():popmessage(string.format(_("Activated: %s"), cheat.desc))
 				end
 			end
@@ -810,7 +829,7 @@ function cheat.startplugin()
 			if cheat.hotkeys and cheat.hotkeys.keys then
 				if manager:machine():input():seq_pressed(cheat.hotkeys.keys) then
 					if not cheat.hotkeys.pressed then
-						if is_oneshot(cheat) then
+						if cheat.is_oneshot then
 							if not run_if(cheat, cheat.script.change) then
 								run_if(cheat, cheat.script.on)
 							end
@@ -886,7 +905,46 @@ function cheat.startplugin()
 	end
 
 	function ce.get(index)
-		return cheats[index]
+		local cheat = cheats[index]
+		if not cheat then
+			return nil
+		end
+		local intf = {
+			get_enabled = function() return cheat:get_enabled() end,
+			set_enabled = function(status) return cheat:set_enabled(status) end,
+			desc = cheat.desc,
+			is_oneshot = cheat.is_oneshot,
+			comment = cheat.comment,
+			get_hotkeys = function() if cheat.hotkeys then return cheat.hotkeys.keys end return nil end,
+			set_hotkeys = function(seq) cheat.hotkeys = { pressed = false, keys = manager:machine():input():seq_clean(seq) } end
+		}
+		if cheat.script then
+			intf.script = {}
+			if cheat.script.on then intf.script.on = true end
+			if cheat.script.off then intf.script.off = true end
+			if cheat.script.run then intf.script.run = true end
+			if cheat.script.change then intf.script.change = true end
+		end
+
+		if cheat.parameter then
+			intf.parameter = {}
+			intf.get_value = function() return cheat:get_value() end
+			intf.set_value = function(value) return cheat:set_value(value) end
+			intf.get_index = function() return cheat:get_index() end
+			intf.set_index = function(index) return cheat:set_index(index) end
+			intf.parameter.min = cheat.parameter.min
+			intf.parameter.max = cheat.parameter.max
+			intf.parameter.step = cheat.parameter.step
+			if cheat.parameter.item then
+				intf.parameter.item = {}
+				for idx, item in pairs(cheat.parameter.item) do
+					intf.parameter.item[idx] = {}
+					intf.parameter.item[idx].text = cheat.parameter.item[idx].text
+					intf.parameter.item[idx].value = cheat.parameter.item[idx].value
+				end
+			end
+		end
+		return intf
 	end
 
 	function ce.list()
@@ -897,7 +955,7 @@ function cheat.startplugin()
 		return list
 	end
 
-	_G.ce = ce
+	_G.emu.plugin.cheat = ce
 
 end
 

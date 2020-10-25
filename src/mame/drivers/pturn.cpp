@@ -125,19 +125,19 @@ private:
 	bool m_nmi_main;
 	bool m_nmi_sub;
 
-	DECLARE_WRITE8_MEMBER(videoram_w);
+	void videoram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(nmi_main_enable_w);
-	DECLARE_WRITE8_MEMBER(nmi_sub_enable_w);
+	void nmi_sub_enable_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
-	DECLARE_WRITE8_MEMBER(bgcolor_w);
-	DECLARE_WRITE8_MEMBER(bg_scrollx_w);
-	DECLARE_WRITE8_MEMBER(fgpalette_w);
-	DECLARE_WRITE8_MEMBER(bg_scrolly_w);
+	void bgcolor_w(uint8_t data);
+	void bg_scrollx_w(uint8_t data);
+	void fgpalette_w(uint8_t data);
+	void bg_scrolly_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(fgbank_w);
 	DECLARE_WRITE_LINE_MEMBER(bgbank_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_w);
-	DECLARE_READ8_MEMBER(custom_r);
+	uint8_t custom_r(offs_t offset);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -240,18 +240,18 @@ uint32_t pturn_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 }
 
 #ifdef UNUSED_FUNCTION
-READ8_MEMBER(pturn_state::protection_r)
+uint8_t pturn_state::protection_r()
 {
 	return 0x66;
 }
 
-READ8_MEMBER(pturn_state::protection2_r)
+uint8_t pturn_state::protection2_r()
 {
 	return 0xfe;
 }
 #endif
 
-WRITE8_MEMBER(pturn_state::videoram_w)
+void pturn_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset]=data;
 	m_fgmap->mark_tile_dirty(offset);
@@ -265,7 +265,7 @@ WRITE_LINE_MEMBER(pturn_state::nmi_main_enable_w)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(pturn_state::nmi_sub_enable_w)
+void pturn_state::nmi_sub_enable_w(uint8_t data)
 {
 	m_nmi_sub = BIT(data, 0);
 	if (!m_nmi_sub)
@@ -282,25 +282,25 @@ WRITE_LINE_MEMBER(pturn_state::coin_counter_2_w)
 	machine().bookkeeping().coin_counter_w(1, state);
 }
 
-WRITE8_MEMBER(pturn_state::bgcolor_w)
+void pturn_state::bgcolor_w(uint8_t data)
 {
 	m_bgcolor=data;
 }
 
-WRITE8_MEMBER(pturn_state::bg_scrollx_w)
+void pturn_state::bg_scrollx_w(uint8_t data)
 {
 	m_bgmap->set_scrolly(0, (data>>5)*32*8);
 	m_bgpalette=data&0x1f;
 	m_bgmap->mark_all_dirty();
 }
 
-WRITE8_MEMBER(pturn_state::fgpalette_w)
+void pturn_state::fgpalette_w(uint8_t data)
 {
 	m_fgpalette=data&0x1f;
 	m_fgmap->mark_all_dirty();
 }
 
-WRITE8_MEMBER(pturn_state::bg_scrolly_w)
+void pturn_state::bg_scrolly_w(uint8_t data)
 {
 	m_bgmap->set_scrollx(0, data);
 }
@@ -323,7 +323,7 @@ WRITE_LINE_MEMBER(pturn_state::flip_w)
 }
 
 
-READ8_MEMBER(pturn_state::custom_r)
+uint8_t pturn_state::custom_r(offs_t offset)
 {
 	int addr = (int)offset + 0xc800;
 

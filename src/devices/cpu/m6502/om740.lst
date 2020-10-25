@@ -113,6 +113,18 @@ jmp_zpi
 	PC = TMP;
 	prefetch();
 
+jsr_zpi
+	TMP2 = read_pc_noinc();
+	read(SP);
+	write(SP, PC>>8);
+	dec_SP();
+	write(SP, PC);
+	dec_SP();
+	TMP = read(TMP2 & 0xff);
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	PC = TMP;
+	prefetch();
+
 reset740
 	P |= F_I; PC = read_arg(0xfffe);
 	PC = set_h(PC, read_arg(0xffff));
@@ -120,7 +132,7 @@ reset740
 	inst_state = -1;
 
 brk740_imp
-	// The 6502 bug when a nmi occurs in a brk is reproduced (case !irq_taken && nmi_state)
+	// The 6502 bug when a nmi occurs in a brk is reproduced (case !irq_taken && nmi_pending)
 	if(irq_taken) {
 		read_pc_noinc();
 	} else {
@@ -132,10 +144,10 @@ brk740_imp
 	dec_SP();
 	write(SP, irq_taken ? P & ~F_B : P);
 	dec_SP();
-	if(nmi_state) {
+	if(nmi_pending) {
 		PC = read_arg(0xfffa);
 		PC = set_h(PC, read_arg(0xfffb));
-		nmi_state = false;
+		nmi_pending = false;
 		standard_irq_callback(NMI_LINE);
 	} else {
 		PC = read_arg(m_irq_vector);
@@ -748,4 +760,10 @@ sbct_zpx
 	TMP2 = read(X);
 	do_sbct(TMP);
 	write(X, TMP2);
+	prefetch();
+
+tst_zpg
+	TMP = read_pc();
+	TMP2 = read(TMP);
+	set_nz(TMP2);
 	prefetch();

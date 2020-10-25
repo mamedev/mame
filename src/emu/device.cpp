@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    device.c
+    device.cpp
 
     Device interface functions.
 
@@ -95,6 +95,8 @@ device_t::device_t(const machine_config &mconfig, device_type type, const char *
 
 	, m_machine_config(mconfig)
 	, m_input_defaults(nullptr)
+	, m_system_bios(0)
+	, m_default_bios(0)
 	, m_default_bios_tag("")
 
 	, m_machine(nullptr)
@@ -199,8 +201,8 @@ ioport_port *device_t::ioport(std::string tag) const
 
 
 //-------------------------------------------------
-//  ioport - return a pointer to the I/O port
-//  object for a given port name
+//  parameter - return a pointer to a given
+//  parameter
 //-------------------------------------------------
 
 std::string device_t::parameter(const char *tag) const
@@ -493,12 +495,12 @@ void device_t::set_machine(running_machine &machine)
 //  list and return status
 //-------------------------------------------------
 
-bool device_t::findit(bool isvalidation) const
+bool device_t::findit(validity_checker *valid) const
 {
 	bool allfound = true;
 	for (finder_base *autodev = m_auto_finder_list; autodev != nullptr; autodev = autodev->next())
 	{
-		if (isvalidation)
+		if (valid)
 		{
 			// sanity checking
 			char const *const tag = autodev->finder_tag();
@@ -515,7 +517,7 @@ bool device_t::findit(bool isvalidation) const
 				continue;
 			}
 		}
-		allfound &= autodev->findit(isvalidation);
+		allfound &= autodev->findit(valid);
 	}
 	return allfound;
 }
@@ -539,7 +541,7 @@ void device_t::resolve_pre_map()
 void device_t::resolve_post_map()
 {
 	// find all the registered post-map objects
-	if (!findit(false))
+	if (!findit(nullptr))
 		throw emu_fatalerror("Missing some required objects, unable to proceed");
 
 	// allow implementation to do additional setup
@@ -810,7 +812,7 @@ void device_t::device_pre_save()
 
 
 //-------------------------------------------------
-//  device_post_load - called after the loading a
+//  device_post_load - called after loading a
 //  saved state, so that registered variables can
 //  be expanded as necessary
 //-------------------------------------------------
@@ -1093,9 +1095,9 @@ void device_interface::interface_pre_save()
 
 
 //-------------------------------------------------
-//  interface_post_load - called after the loading a
+//  interface_post_load - called after loading a
 //  saved state, so that registered variables can
-//  be expaneded as necessary
+//  be expanded as necessary
 //-------------------------------------------------
 
 void device_interface::interface_post_load()

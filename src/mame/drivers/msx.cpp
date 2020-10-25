@@ -533,7 +533,6 @@ PCB Layouts missing
 #include "machine/msx_matsushita.h"
 #include "machine/msx_s1985.h"
 #include "machine/msx_systemflags.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -1369,8 +1368,6 @@ void msx_state::msx(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.1);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	AY8910(config, m_ay8910, 10.738635_MHz_XTAL / 3 / 2);
 	m_ay8910->set_flags(AY8910_SINGLE_OUTPUT);
@@ -1441,8 +1438,6 @@ void msx2_state::msx2(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.1);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	AY8910(config, m_ay8910, 21.477272_MHz_XTAL / 6 / 2);
 	m_ay8910->set_flags(AY8910_SINGLE_OUTPUT);
@@ -1504,8 +1499,6 @@ void msx2_state::msx2p(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.1);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	AY8910(config, m_ay8910, 21.477272_MHz_XTAL / 6 / 2);
 	m_ay8910->set_flags(AY8910_SINGLE_OUTPUT);
@@ -1661,7 +1654,9 @@ ROM_END
 void msx_state::canonv20(machine_config &config)
 {
 	msx1(TMS9929A, config);
+	// XTAL: 1431818(Z80/PSG) + 10.6875(VDP)
 	// YM2149
+	// TMS9929ANL
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 
@@ -3397,7 +3392,8 @@ ROM_END
 void msx_state::hb10p(machine_config &config)
 {
 	msx1(TMS9929A, config);
-	// AY8910/YM2149?
+	// XTAL: 3.579545 + 22.168(VDP)
+	// YM2149 (in S3527 MSX-Engine)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 	// T6950
@@ -5878,6 +5874,7 @@ ROM_END
 void msx2_state::nms8245(machine_config &config)
 {
 	msx2_pal(config);
+	// XTAL: 21328.1 (different from default)
 	// YM2149 (in S-3527 MSX Engine)
 	// FDC: wd2793, 1 3.5" DSDD drive
 	// 2 Cartridge slots

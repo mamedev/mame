@@ -53,8 +53,8 @@ public:
 	cassette_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~cassette_image_device();
 
-	void set_formats(const struct CassetteFormat*  const *formats) { m_formats = formats; }
-	void set_create_opts(const struct CassetteOptions  *create_opts) { m_create_opts = create_opts; }
+	void set_formats(const cassette_image::Format*  const *formats) { m_formats = formats; }
+	void set_create_opts(const cassette_image::Options  *create_opts) { m_create_opts = create_opts; }
 	void set_default_state(cassette_state default_state) { m_default_state = default_state; }
 	void set_interface(const char *interface) { m_interface = interface; }
 
@@ -74,15 +74,25 @@ public:
 	virtual const char *image_interface() const noexcept override { return m_interface; }
 	virtual const char *file_extensions() const noexcept override { return m_extension_list; }
 
+	double input();
+	void output(double value);
+
 	// specific implementation
 	cassette_state get_state() { return m_state; }
 	void set_state(cassette_state state) { change_state(state, cassette_state(~0)); }
 	void change_state(cassette_state state, cassette_state mask);
 
-	double input();
-	void output(double value);
+	// state getters/setters
+	bool is_stopped() { return (m_state & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED; }
+	bool is_playing() { return (m_state & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY; }
+	bool is_recording() { return (m_state & CASSETTE_MASK_UISTATE) == CASSETTE_RECORD; }
 
-	cassette_image *get_image() { return m_cassette; }
+	void set_motor(int state) { change_state(state ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR); } // aka remote control
+	int motor_on() { return ((m_state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED) ? 1 : 0; }
+	void set_speaker(int state) { change_state(state ? CASSETTE_SPEAKER_ENABLED : CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER); }
+	int speaker_on() { return ((m_state & CASSETTE_MASK_SPEAKER) == CASSETTE_SPEAKER_ENABLED) ? 1 : 0; }
+
+	cassette_image *get_image() { return m_cassette.get(); }
 	double get_position();
 	double get_length();
 	void set_speed(double speed);
@@ -92,13 +102,10 @@ public:
 	void seek(double time, int origin);
 
 	// sound stream update overrides
-	void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 	device_sound_interface& set_stereo() { m_stereo = true; return *this; }
 
 protected:
-	bool is_motor_on();
-	void update();
-
 	// device-level overrides
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
@@ -107,23 +114,26 @@ protected:
 	// device_image_interface implementation
 	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
 
+	void update();
+
 private:
-	cassette_image  *m_cassette;
+	cassette_image::ptr m_cassette;
 	cassette_state  m_state;
 	double          m_position;
 	double          m_position_time;
-	int32_t           m_value;
+	int32_t         m_value;
 	int             m_channel;
 	double          m_speed; // speed multiplier for tape speeds other than standard 1.875ips (used in adam driver)
 	int             m_direction; // direction select
 	char            m_extension_list[256];
-	const struct CassetteFormat*    const *m_formats;
-	const struct CassetteOptions    *m_create_opts;
+	const cassette_image::Format*    const *m_formats;
+	const cassette_image::Options    *m_create_opts;
 	cassette_state                  m_default_state;
 	const char *                    m_interface;
 
 	image_init_result internal_load(bool is_create);
 	bool            m_stereo;
+	std::vector<s16> m_samples;
 };
 
 // device type definition

@@ -24,7 +24,7 @@
         KS10071 (custom 3D pixel unit)
         KS10081 (custom 3D texel unit)
 
-    GN678 GFX board (same as in gticlub.c):
+    GN678 GFX board (same as in gticlub.cpp):
     ----------------
         Analog Devices ADSP-21062 SHARC DSP at 36MHz
         Konami K001604 (2D tilemaps + 2x ROZ)
@@ -161,7 +161,7 @@ Jet Wave         - see note -
 Winding Heat     677A12  677A11  677A16  677A15  677A14  677A13
 
 Note: Jet Wave uses the lower board from GTI Club (GN678), and a ZR107(PWB(A)300769A top board.
-Check gticlub.c for details on the bottom board.
+Check drivers/gticlub.cpp for details on the bottom board.
 
 */
 
@@ -208,10 +208,12 @@ public:
 		m_analog1(*this, "ANALOG1"),
 		m_analog2(*this, "ANALOG2"),
 		m_analog3(*this, "ANALOG3"),
+		m_pcb_digit(*this, "pcbdigit%u", 0U),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_generic_paletteram_32(*this, "paletteram"),
-		m_konppc(*this, "konppc") { }
+		m_konppc(*this, "konppc")
+	{ }
 
 	void zr107(machine_config &config);
 
@@ -227,27 +229,26 @@ protected:
 	required_device<k001005_device> m_k001005;
 	required_device<k001006_device> m_k001006_1;
 	required_ioport m_in0, m_in1, m_in2, m_in3, m_in4, m_out4, m_eepromout, m_analog1, m_analog2, m_analog3;
+	output_finder<2> m_pcb_digit;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint32_t> m_generic_paletteram_32;
 	required_device<konppc_device> m_konppc;
 
 	std::unique_ptr<uint32_t[]> m_sharc_dataram;
-	uint8_t m_led_reg0;
-	uint8_t m_led_reg1;
 	int m_ccu_vcth;
 	int m_ccu_vctl;
 	uint8_t m_sound_ctrl;
 	uint8_t m_sound_intck;
 
-	DECLARE_WRITE32_MEMBER(paletteram32_w);
-	DECLARE_READ8_MEMBER(sysreg_r);
-	DECLARE_WRITE8_MEMBER(sysreg_w);
-	DECLARE_READ32_MEMBER(ccu_r);
-	DECLARE_WRITE32_MEMBER(ccu_w);
-	DECLARE_READ32_MEMBER(dsp_dataram_r);
-	DECLARE_WRITE32_MEMBER(dsp_dataram_w);
-	DECLARE_WRITE16_MEMBER(sound_ctrl_w);
+	void paletteram32_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint8_t sysreg_r(offs_t offset);
+	void sysreg_w(offs_t offset, uint8_t data);
+	uint32_t ccu_r(offs_t offset, uint32_t mem_mask = ~0);
+	void ccu_w(uint32_t data);
+	uint32_t dsp_dataram_r(offs_t offset);
+	void dsp_dataram_w(offs_t offset, uint32_t data);
+	void sound_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	WRITE_LINE_MEMBER(vblank);
 	WRITE_LINE_MEMBER(k054539_irq_gen);
@@ -294,7 +295,7 @@ public:
 	void jetwave(machine_config &config);
 
 private:
-	DECLARE_WRITE32_MEMBER(palette_w);
+	void palette_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	void main_memmap(address_map &map);
 
@@ -312,15 +313,13 @@ uint32_t jetwave_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	m_k001005->draw(bitmap, cliprect);
 	m_k001604->draw_front_layer(screen, bitmap, cliprect);
 
-	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
-	draw_7segment_led(bitmap, 9, 3, m_led_reg1);
 	return 0;
 }
 
 
 /*****************************************************************************/
 
-WRITE32_MEMBER(zr107_state::paletteram32_w)
+void zr107_state::paletteram32_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 	data = m_generic_paletteram_32[offset];
@@ -353,14 +352,12 @@ uint32_t midnrun_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	m_k001005->draw(bitmap, cliprect);
 	m_k056832->tilemap_draw(screen, bitmap, cliprect, 0, 0, 0);
 
-	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
-	draw_7segment_led(bitmap, 9, 3, m_led_reg1);
 	return 0;
 }
 
 /******************************************************************/
 
-READ8_MEMBER(zr107_state::sysreg_r)
+uint8_t zr107_state::sysreg_r(offs_t offset)
 {
 	uint32_t r = 0;
 
@@ -383,20 +380,19 @@ READ8_MEMBER(zr107_state::sysreg_r)
 			break;
 		case 5: /* Parallel data port */
 			break;
+		default:
+			break;
 	}
 	return r;
 }
 
-WRITE8_MEMBER(zr107_state::sysreg_w)
+void zr107_state::sysreg_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
-		case 0: /* LED Register 0 */
-			m_led_reg0 = data;
-			break;
-
-		case 1: /* LED Register 1 */
-			m_led_reg1 = data;
+		case 0: /* 7seg LEDs on PCB */
+		case 1:
+			m_pcb_digit[offset] = bitswap<7>(~data,0,1,2,3,4,5,6);
 			break;
 
 		case 2: /* Parallel data register */
@@ -447,10 +443,12 @@ WRITE8_MEMBER(zr107_state::sysreg_w)
 				m_watchdog->watchdog_reset();
 			break;
 
+		default:
+			break;
 	}
 }
 
-READ32_MEMBER(zr107_state::ccu_r)
+uint32_t zr107_state::ccu_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 	switch (offset)
@@ -475,7 +473,7 @@ READ32_MEMBER(zr107_state::ccu_r)
 	return r;
 }
 
-WRITE32_MEMBER(zr107_state::ccu_w)
+void zr107_state::ccu_w(uint32_t data)
 {
 }
 
@@ -483,6 +481,8 @@ WRITE32_MEMBER(zr107_state::ccu_w)
 
 void zr107_state::machine_start()
 {
+	m_pcb_digit.resolve();
+
 	/* set conservative DRC options */
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
@@ -511,7 +511,7 @@ void midnrun_state::main_memmap(address_map &map)
 }
 
 
-WRITE32_MEMBER(jetwave_state::palette_w)
+void jetwave_state::palette_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 	data = m_generic_paletteram_32[offset];
@@ -543,7 +543,7 @@ void jetwave_state::main_memmap(address_map &map)
 
 /**********************************************************************/
 
-WRITE16_MEMBER(zr107_state::sound_ctrl_w)
+void zr107_state::sound_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -568,12 +568,12 @@ void zr107_state::sound_memmap(address_map &map)
 /*****************************************************************************/
 
 
-READ32_MEMBER(zr107_state::dsp_dataram_r)
+uint32_t zr107_state::dsp_dataram_r(offs_t offset)
 {
 	return m_sharc_dataram[offset] & 0xffff;
 }
 
-WRITE32_MEMBER(zr107_state::dsp_dataram_w)
+void zr107_state::dsp_dataram_w(offs_t offset, uint32_t data)
 {
 	m_sharc_dataram[offset] = data;
 }
@@ -777,7 +777,6 @@ void zr107_state::zr107(machine_config &config)
 
 	K001006(config, m_k001006_1, 0);
 	m_k001006_1->set_gfx_region("gfx1");
-	m_k001006_1->set_tex_layout(0);
 
 	K056800(config, m_k056800, XTAL(18'432'000));
 	m_k056800->int_callback().set_inputline(m_audiocpu, M68K_IRQ_1);
@@ -841,7 +840,6 @@ void jetwave_state::jetwave(machine_config &config)
 	// Hook this up when the K001005 separation is understood (seems the load balancing is done on hardware).
 	K001006(config, m_k001006_2, 0);
 	m_k001006_2->set_gfx_region("gfx1");
-	m_k001006_2->set_tex_layout(0);
 
 	m_konppc->set_cbboard_type(konppc_device::CGBOARD_TYPE_GTICLUB);
 }
@@ -851,7 +849,6 @@ void jetwave_state::jetwave(machine_config &config)
 void zr107_state::driver_init()
 {
 	m_sharc_dataram = std::make_unique<uint32_t[]>(0x100000/4);
-	m_led_reg0 = m_led_reg1 = 0x7f;
 	m_ccu_vcth = m_ccu_vctl = 0;
 
 	m_dsp->enable_recompiler();
@@ -874,10 +871,10 @@ ROM_START( midnrun )
 	ROM_LOAD16_BYTE( "477a12.35a", 0x000001, 0x80000, CRC(451d7777) SHA1(0bf280ca475100778bbfd3f023547bf0413fc8b7) )
 
 	ROM_REGION(0x800000, "gfx1", 0) /* Texture data */
-	ROM_LOAD32_BYTE( "477a13.9h", 0x000000, 0x200000, CRC(b1ee901d) SHA1(b1432cb1379b35d99d3f2b7f6409db6f7e88121d) )
-	ROM_LOAD32_BYTE( "477a14.7h", 0x000001, 0x200000, CRC(9ffa8cc5) SHA1(eaa19e26df721bec281444ca1c5ccc9e48df1b0b) )
-	ROM_LOAD32_BYTE( "477a15.5h", 0x000002, 0x200000, CRC(e337fce7) SHA1(c84875f3275efd47273508b340231721f5a631d2) )
-	ROM_LOAD32_BYTE( "477a16.2h", 0x000003, 0x200000, CRC(2c03ee63) SHA1(6b74d340dddf92bb4e4b1e037f003d58c65d8d9b) )
+	ROM_LOAD64_WORD( "477a13.9h", 0x000000, 0x200000, CRC(b1ee901d) SHA1(b1432cb1379b35d99d3f2b7f6409db6f7e88121d) )
+	ROM_LOAD64_WORD( "477a14.7h", 0x000002, 0x200000, CRC(9ffa8cc5) SHA1(eaa19e26df721bec281444ca1c5ccc9e48df1b0b) )
+	ROM_LOAD64_WORD( "477a15.5h", 0x000004, 0x200000, CRC(e337fce7) SHA1(c84875f3275efd47273508b340231721f5a631d2) )
+	ROM_LOAD64_WORD( "477a16.2h", 0x000006, 0x200000, CRC(2c03ee63) SHA1(6b74d340dddf92bb4e4b1e037f003d58c65d8d9b) )
 
 	ROM_REGION(0x600000, "k054539", 0)   /* Sound data */
 	ROM_LOAD( "477a08.5r", 0x000000, 0x200000, CRC(d320dbde) SHA1(eb602cad6ac7c7151c9f29d39b10041d5a354164) )
@@ -900,10 +897,10 @@ ROM_START( midnrunj )
 	ROM_LOAD16_BYTE( "477a12.35a", 0x000001, 0x80000, CRC(451d7777) SHA1(0bf280ca475100778bbfd3f023547bf0413fc8b7) )
 
 	ROM_REGION(0x800000, "gfx1", 0) /* Texture data */
-	ROM_LOAD32_BYTE( "477a13.9h", 0x000000, 0x200000, CRC(b1ee901d) SHA1(b1432cb1379b35d99d3f2b7f6409db6f7e88121d) )
-	ROM_LOAD32_BYTE( "477a14.7h", 0x000001, 0x200000, CRC(9ffa8cc5) SHA1(eaa19e26df721bec281444ca1c5ccc9e48df1b0b) )
-	ROM_LOAD32_BYTE( "477a15.5h", 0x000002, 0x200000, CRC(e337fce7) SHA1(c84875f3275efd47273508b340231721f5a631d2) )
-	ROM_LOAD32_BYTE( "477a16.2h", 0x000003, 0x200000, CRC(2c03ee63) SHA1(6b74d340dddf92bb4e4b1e037f003d58c65d8d9b) )
+	ROM_LOAD64_WORD( "477a13.9h", 0x000000, 0x200000, CRC(b1ee901d) SHA1(b1432cb1379b35d99d3f2b7f6409db6f7e88121d) )
+	ROM_LOAD64_WORD( "477a14.7h", 0x000002, 0x200000, CRC(9ffa8cc5) SHA1(eaa19e26df721bec281444ca1c5ccc9e48df1b0b) )
+	ROM_LOAD64_WORD( "477a15.5h", 0x000004, 0x200000, CRC(e337fce7) SHA1(c84875f3275efd47273508b340231721f5a631d2) )
+	ROM_LOAD64_WORD( "477a16.2h", 0x000006, 0x200000, CRC(2c03ee63) SHA1(6b74d340dddf92bb4e4b1e037f003d58c65d8d9b) )
 
 	ROM_REGION(0x600000, "k054539", 0)   /* Sound data */
 	ROM_LOAD( "477a08.5r", 0x000000, 0x200000, CRC(d320dbde) SHA1(eb602cad6ac7c7151c9f29d39b10041d5a354164) )
@@ -926,12 +923,38 @@ ROM_START( midnruna )
 	ROM_LOAD16_BYTE( "477a12.35a", 0x000001, 0x80000, CRC(451d7777) SHA1(0bf280ca475100778bbfd3f023547bf0413fc8b7) )
 
 	ROM_REGION(0x800000, "gfx1", 0) /* Texture data */
-	ROM_LOAD32_BYTE( "477a13.9h", 0x000000, 0x200000, CRC(b1ee901d) SHA1(b1432cb1379b35d99d3f2b7f6409db6f7e88121d) )
-	ROM_LOAD32_BYTE( "477a14.7h", 0x000001, 0x200000, CRC(9ffa8cc5) SHA1(eaa19e26df721bec281444ca1c5ccc9e48df1b0b) )
-	ROM_LOAD32_BYTE( "477a15.5h", 0x000002, 0x200000, CRC(e337fce7) SHA1(c84875f3275efd47273508b340231721f5a631d2) )
-	ROM_LOAD32_BYTE( "477a16.2h", 0x000003, 0x200000, CRC(2c03ee63) SHA1(6b74d340dddf92bb4e4b1e037f003d58c65d8d9b) )
+	ROM_LOAD64_WORD( "477a13.9h", 0x000000, 0x200000, CRC(b1ee901d) SHA1(b1432cb1379b35d99d3f2b7f6409db6f7e88121d) )
+	ROM_LOAD64_WORD( "477a14.7h", 0x000002, 0x200000, CRC(9ffa8cc5) SHA1(eaa19e26df721bec281444ca1c5ccc9e48df1b0b) )
+	ROM_LOAD64_WORD( "477a15.5h", 0x000004, 0x200000, CRC(e337fce7) SHA1(c84875f3275efd47273508b340231721f5a631d2) )
+	ROM_LOAD64_WORD( "477a16.2h", 0x000006, 0x200000, CRC(2c03ee63) SHA1(6b74d340dddf92bb4e4b1e037f003d58c65d8d9b) )
 
 	ROM_REGION(0x600000, "k054539", 0)   /* Sound data */
+	ROM_LOAD( "477a08.5r", 0x000000, 0x200000, CRC(d320dbde) SHA1(eb602cad6ac7c7151c9f29d39b10041d5a354164) )
+	ROM_LOAD( "477a09.3r", 0x200000, 0x200000, CRC(f431e29f) SHA1(e6082d88f86abb63d02ac34e70873b58f88b0ddc) )
+	ROM_LOAD( "477a10.5n", 0x400000, 0x200000, CRC(8db31bd4) SHA1(d662d3bb6e8b44a01ffa158f5d7425454aad49a3) )
+ROM_END
+
+ROM_START( midnruna2 )
+	ROM_REGION(0x200000, "user1", 0)    // PowerPC program roms
+	ROM_LOAD32_BYTE( "477ab1d01.20u", 0x000003, 0x80000, CRC(3aa31517) SHA1(315d9c3c930493e39bc497ceafa0c4ef6fa64e4d) ) // labeled AB1, but still program version AAA, v1.10 (ASA)
+	ROM_LOAD32_BYTE( "477ab1d02.17u", 0x000002, 0x80000, CRC(c506bd3d) SHA1(d44ed2cb39f0da44f681190132c7603dfca813d9) )
+	ROM_LOAD32_BYTE( "477ab1d03.15u", 0x000001, 0x80000, CRC(53f8e898) SHA1(ba83a60a411bb307cb0e424099716ccf888a4f39) )
+	ROM_LOAD32_BYTE( "477ab1d04.13u", 0x000000, 0x80000, CRC(0eb264b7) SHA1(179a3d58c0f554fd1b283ee3640ce09d5142b288) )
+
+	ROM_REGION(0x20000, "audiocpu", 0)      // M68K program
+	ROM_LOAD16_WORD_SWAP( "477b07.19l", 0x000000, 0x20000, CRC(2d00cf76) SHA1(152bed061c59e29864d735f8beba2a49136f7212) )
+
+	ROM_REGION(0x100000, "k056832", 0) // Tilemap
+	ROM_LOAD16_BYTE( "477a11.35b", 0x000000, 0x80000, CRC(85eef04b) SHA1(02e26d2d4a8b29894370f28d2a49fdf5c7d23f95) )
+	ROM_LOAD16_BYTE( "477a12.35a", 0x000001, 0x80000, CRC(451d7777) SHA1(0bf280ca475100778bbfd3f023547bf0413fc8b7) )
+
+	ROM_REGION(0x800000, "gfx1", 0) // Texture data
+	ROM_LOAD64_WORD( "477a13.9h", 0x000000, 0x200000, CRC(b1ee901d) SHA1(b1432cb1379b35d99d3f2b7f6409db6f7e88121d) )
+	ROM_LOAD64_WORD( "477a14.7h", 0x000002, 0x200000, CRC(9ffa8cc5) SHA1(eaa19e26df721bec281444ca1c5ccc9e48df1b0b) )
+	ROM_LOAD64_WORD( "477a15.5h", 0x000004, 0x200000, CRC(e337fce7) SHA1(c84875f3275efd47273508b340231721f5a631d2) )
+	ROM_LOAD64_WORD( "477a16.2h", 0x000006, 0x200000, CRC(2c03ee63) SHA1(6b74d340dddf92bb4e4b1e037f003d58c65d8d9b) )
+
+	ROM_REGION(0x600000, "k054539", 0)   // Sound data
 	ROM_LOAD( "477a08.5r", 0x000000, 0x200000, CRC(d320dbde) SHA1(eb602cad6ac7c7151c9f29d39b10041d5a354164) )
 	ROM_LOAD( "477a09.3r", 0x200000, 0x200000, CRC(f431e29f) SHA1(e6082d88f86abb63d02ac34e70873b58f88b0ddc) )
 	ROM_LOAD( "477a10.5n", 0x400000, 0x200000, CRC(8db31bd4) SHA1(d662d3bb6e8b44a01ffa158f5d7425454aad49a3) )
@@ -952,10 +975,10 @@ ROM_START( windheat )
 	ROM_LOAD16_BYTE( "677a12.35a", 0x000001, 0x080000, CRC(458f0b1d) SHA1(8e11023c75c80b496dfc62b6645cfedcf2a80db4) )
 
 	ROM_REGION(0x800000, "gfx1", 0) /* Texture data */
-	ROM_LOAD32_BYTE( "677a13.9h", 0x000000, 0x200000, CRC(7937d226) SHA1(c2ba777292c293e31068eeb3a27353ad2595b413) )
-	ROM_LOAD32_BYTE( "677a14.7h", 0x000001, 0x200000, CRC(2568cf41) SHA1(6ed01922943486dafbdc863b76b2036c1fbe5281) )
-	ROM_LOAD32_BYTE( "677a15.5h", 0x000002, 0x200000, CRC(62e2c3dd) SHA1(c9127ed70bdff947c3da2908a08974091615a685) )
-	ROM_LOAD32_BYTE( "677a16.2h", 0x000003, 0x200000, CRC(7cc75539) SHA1(4bd8d88debf7489f30008bd4cbded67cb1a20ab0) )
+	ROM_LOAD64_WORD( "677a13.9h", 0x000000, 0x200000, CRC(7937d226) SHA1(c2ba777292c293e31068eeb3a27353ad2595b413) )
+	ROM_LOAD64_WORD( "677a14.7h", 0x000002, 0x200000, CRC(2568cf41) SHA1(6ed01922943486dafbdc863b76b2036c1fbe5281) )
+	ROM_LOAD64_WORD( "677a15.5h", 0x000004, 0x200000, CRC(62e2c3dd) SHA1(c9127ed70bdff947c3da2908a08974091615a685) )
+	ROM_LOAD64_WORD( "677a16.2h", 0x000006, 0x200000, CRC(7cc75539) SHA1(4bd8d88debf7489f30008bd4cbded67cb1a20ab0) )
 
 	ROM_REGION(0x600000, "k054539", 0)   /* Sound data */
 	ROM_LOAD( "677a08.5r", 0x000000, 0x200000, CRC(bde38850) SHA1(aaf1bdfc25ecdffc1f6076c9c1b2edbe263171d2) )
@@ -978,10 +1001,10 @@ ROM_START( windheatu )
 	ROM_LOAD16_BYTE( "677a12.35a", 0x000001, 0x080000, CRC(458f0b1d) SHA1(8e11023c75c80b496dfc62b6645cfedcf2a80db4) )
 
 	ROM_REGION(0x800000, "gfx1", 0) /* Texture data */
-	ROM_LOAD32_BYTE( "677a13.9h", 0x000000, 0x200000, CRC(7937d226) SHA1(c2ba777292c293e31068eeb3a27353ad2595b413) )
-	ROM_LOAD32_BYTE( "677a14.7h", 0x000001, 0x200000, CRC(2568cf41) SHA1(6ed01922943486dafbdc863b76b2036c1fbe5281) )
-	ROM_LOAD32_BYTE( "677a15.5h", 0x000002, 0x200000, CRC(62e2c3dd) SHA1(c9127ed70bdff947c3da2908a08974091615a685) )
-	ROM_LOAD32_BYTE( "677a16.2h", 0x000003, 0x200000, CRC(7cc75539) SHA1(4bd8d88debf7489f30008bd4cbded67cb1a20ab0) )
+	ROM_LOAD64_WORD( "677a13.9h", 0x000000, 0x200000, CRC(7937d226) SHA1(c2ba777292c293e31068eeb3a27353ad2595b413) )
+	ROM_LOAD64_WORD( "677a14.7h", 0x000002, 0x200000, CRC(2568cf41) SHA1(6ed01922943486dafbdc863b76b2036c1fbe5281) )
+	ROM_LOAD64_WORD( "677a15.5h", 0x000004, 0x200000, CRC(62e2c3dd) SHA1(c9127ed70bdff947c3da2908a08974091615a685) )
+	ROM_LOAD64_WORD( "677a16.2h", 0x000006, 0x200000, CRC(7cc75539) SHA1(4bd8d88debf7489f30008bd4cbded67cb1a20ab0) )
 
 	ROM_REGION(0x600000, "k054539", 0)   /* Sound data */
 	ROM_LOAD( "677a08.5r", 0x000000, 0x200000, CRC(bde38850) SHA1(aaf1bdfc25ecdffc1f6076c9c1b2edbe263171d2) )
@@ -1004,10 +1027,10 @@ ROM_START( windheatj )
 	ROM_LOAD16_BYTE( "677a12.35a", 0x000001, 0x080000, CRC(458f0b1d) SHA1(8e11023c75c80b496dfc62b6645cfedcf2a80db4) )
 
 	ROM_REGION(0x800000, "gfx1", 0) /* Texture data */
-	ROM_LOAD32_BYTE( "677a13.9h", 0x000000, 0x200000, CRC(7937d226) SHA1(c2ba777292c293e31068eeb3a27353ad2595b413) )
-	ROM_LOAD32_BYTE( "677a14.7h", 0x000001, 0x200000, CRC(2568cf41) SHA1(6ed01922943486dafbdc863b76b2036c1fbe5281) )
-	ROM_LOAD32_BYTE( "677a15.5h", 0x000002, 0x200000, CRC(62e2c3dd) SHA1(c9127ed70bdff947c3da2908a08974091615a685) )
-	ROM_LOAD32_BYTE( "677a16.2h", 0x000003, 0x200000, CRC(7cc75539) SHA1(4bd8d88debf7489f30008bd4cbded67cb1a20ab0) )
+	ROM_LOAD64_WORD( "677a13.9h", 0x000000, 0x200000, CRC(7937d226) SHA1(c2ba777292c293e31068eeb3a27353ad2595b413) )
+	ROM_LOAD64_WORD( "677a14.7h", 0x000002, 0x200000, CRC(2568cf41) SHA1(6ed01922943486dafbdc863b76b2036c1fbe5281) )
+	ROM_LOAD64_WORD( "677a15.5h", 0x000004, 0x200000, CRC(62e2c3dd) SHA1(c9127ed70bdff947c3da2908a08974091615a685) )
+	ROM_LOAD64_WORD( "677a16.2h", 0x000006, 0x200000, CRC(7cc75539) SHA1(4bd8d88debf7489f30008bd4cbded67cb1a20ab0) )
 
 	ROM_REGION(0x600000, "k054539", 0)   /* Sound data */
 	ROM_LOAD( "677a08.5r", 0x000000, 0x200000, CRC(bde38850) SHA1(aaf1bdfc25ecdffc1f6076c9c1b2edbe263171d2) )
@@ -1030,10 +1053,10 @@ ROM_START( windheata )
 	ROM_LOAD16_BYTE( "677a12.35a", 0x000001, 0x080000, CRC(458f0b1d) SHA1(8e11023c75c80b496dfc62b6645cfedcf2a80db4) )
 
 	ROM_REGION(0x800000, "gfx1", 0) /* Texture data */
-	ROM_LOAD32_BYTE( "677a13.9h", 0x000000, 0x200000, CRC(7937d226) SHA1(c2ba777292c293e31068eeb3a27353ad2595b413) )
-	ROM_LOAD32_BYTE( "677a14.7h", 0x000001, 0x200000, CRC(2568cf41) SHA1(6ed01922943486dafbdc863b76b2036c1fbe5281) )
-	ROM_LOAD32_BYTE( "677a15.5h", 0x000002, 0x200000, CRC(62e2c3dd) SHA1(c9127ed70bdff947c3da2908a08974091615a685) )
-	ROM_LOAD32_BYTE( "677a16.2h", 0x000003, 0x200000, CRC(7cc75539) SHA1(4bd8d88debf7489f30008bd4cbded67cb1a20ab0) )
+	ROM_LOAD64_WORD( "677a13.9h", 0x000000, 0x200000, CRC(7937d226) SHA1(c2ba777292c293e31068eeb3a27353ad2595b413) )
+	ROM_LOAD64_WORD( "677a14.7h", 0x000002, 0x200000, CRC(2568cf41) SHA1(6ed01922943486dafbdc863b76b2036c1fbe5281) )
+	ROM_LOAD64_WORD( "677a15.5h", 0x000004, 0x200000, CRC(62e2c3dd) SHA1(c9127ed70bdff947c3da2908a08974091615a685) )
+	ROM_LOAD64_WORD( "677a16.2h", 0x000006, 0x200000, CRC(7cc75539) SHA1(4bd8d88debf7489f30008bd4cbded67cb1a20ab0) )
 
 	ROM_REGION(0x600000, "k054539", 0)   /* Sound data */
 	ROM_LOAD( "677a08.5r", 0x000000, 0x200000, CRC(bde38850) SHA1(aaf1bdfc25ecdffc1f6076c9c1b2edbe263171d2) )
@@ -1056,10 +1079,10 @@ ROM_START( jetwave )
 	ROM_LOAD32_WORD_SWAP( "685a06.8u",  0x000002, 0x200000, CRC(fc98c6a5) SHA1(a84583bb7296fa9e0c284b2ac59e2dc7b2689eee) )
 
 	ROM_REGION(0x800000, "gfx1", 0) /* Texture data */
-	ROM_LOAD32_BYTE( "678a13.18d", 0x000000, 0x200000, CRC(ccf75722) SHA1(f48d21dfc4f82adbb4c9c841a809267cfd028a3d) )
-	ROM_LOAD32_BYTE( "678a14.13d", 0x000001, 0x200000, CRC(333a1ab4) SHA1(79df4a98b7871eba4157307a7709da8f8b5da39b) )
-	ROM_LOAD32_BYTE( "678a15.9d",  0x000002, 0x200000, CRC(58b670f8) SHA1(5d4facb00e34de3ad11ed60c19835918a9cf6cb9) )
-	ROM_LOAD32_BYTE( "678a16.4d",  0x000003, 0x200000, CRC(137b9bff) SHA1(5052c1fa30cc1d6affd78f48d483415dca89d10b) )
+	ROM_LOAD64_WORD( "678a13.18d", 0x000000, 0x200000, CRC(ccf75722) SHA1(f48d21dfc4f82adbb4c9c841a809267cfd028a3d) )
+	ROM_LOAD64_WORD( "678a14.13d", 0x000002, 0x200000, CRC(333a1ab4) SHA1(79df4a98b7871eba4157307a7709da8f8b5da39b) )
+	ROM_LOAD64_WORD( "678a15.9d",  0x000004, 0x200000, CRC(58b670f8) SHA1(5d4facb00e34de3ad11ed60c19835918a9cf6cb9) )
+	ROM_LOAD64_WORD( "678a16.4d",  0x000006, 0x200000, CRC(137b9bff) SHA1(5052c1fa30cc1d6affd78f48d483415dca89d10b) )
 
 	ROM_REGION(0x600000, "k054539", 0)   /* Sound data */
 	ROM_LOAD( "678a08.5r", 0x000000, 0x200000, CRC(4aeb61ad) SHA1(ec6872cb2e4776849963f48c1c245ca7697849e0) )
@@ -1082,10 +1105,10 @@ ROM_START( waveshrk )
 	ROM_LOAD32_WORD_SWAP( "685a06.8u",  0x000002, 0x200000, CRC(fc98c6a5) SHA1(a84583bb7296fa9e0c284b2ac59e2dc7b2689eee) )
 
 	ROM_REGION(0x800000, "gfx1", 0) /* Texture data */
-	ROM_LOAD32_BYTE( "678a13.18d", 0x000000, 0x200000, CRC(ccf75722) SHA1(f48d21dfc4f82adbb4c9c841a809267cfd028a3d) )
-	ROM_LOAD32_BYTE( "678a14.13d", 0x000001, 0x200000, CRC(333a1ab4) SHA1(79df4a98b7871eba4157307a7709da8f8b5da39b) )
-	ROM_LOAD32_BYTE( "678a15.9d",  0x000002, 0x200000, CRC(58b670f8) SHA1(5d4facb00e34de3ad11ed60c19835918a9cf6cb9) )
-	ROM_LOAD32_BYTE( "678a16.4d",  0x000003, 0x200000, CRC(137b9bff) SHA1(5052c1fa30cc1d6affd78f48d483415dca89d10b) )
+	ROM_LOAD64_WORD( "678a13.18d", 0x000000, 0x200000, CRC(ccf75722) SHA1(f48d21dfc4f82adbb4c9c841a809267cfd028a3d) )
+	ROM_LOAD64_WORD( "678a14.13d", 0x000002, 0x200000, CRC(333a1ab4) SHA1(79df4a98b7871eba4157307a7709da8f8b5da39b) )
+	ROM_LOAD64_WORD( "678a15.9d",  0x000004, 0x200000, CRC(58b670f8) SHA1(5d4facb00e34de3ad11ed60c19835918a9cf6cb9) )
+	ROM_LOAD64_WORD( "678a16.4d",  0x000006, 0x200000, CRC(137b9bff) SHA1(5052c1fa30cc1d6affd78f48d483415dca89d10b) )
 
 	ROM_REGION(0x600000, "k054539", 0)   /* Sound data */
 	ROM_LOAD( "678a08.5r", 0x000000, 0x200000, CRC(4aeb61ad) SHA1(ec6872cb2e4776849963f48c1c245ca7697849e0) )
@@ -1108,10 +1131,10 @@ ROM_START( jetwavej )
 	ROM_LOAD32_WORD_SWAP( "685a06.8u",  0x000002, 0x200000, CRC(fc98c6a5) SHA1(a84583bb7296fa9e0c284b2ac59e2dc7b2689eee) )
 
 	ROM_REGION(0x800000, "gfx1", 0) /* Texture data */
-	ROM_LOAD32_BYTE( "678a13.18d", 0x000000, 0x200000, CRC(ccf75722) SHA1(f48d21dfc4f82adbb4c9c841a809267cfd028a3d) )
-	ROM_LOAD32_BYTE( "678a14.13d", 0x000001, 0x200000, CRC(333a1ab4) SHA1(79df4a98b7871eba4157307a7709da8f8b5da39b) )
-	ROM_LOAD32_BYTE( "678a15.9d",  0x000002, 0x200000, CRC(58b670f8) SHA1(5d4facb00e34de3ad11ed60c19835918a9cf6cb9) )
-	ROM_LOAD32_BYTE( "678a16.4d",  0x000003, 0x200000, CRC(137b9bff) SHA1(5052c1fa30cc1d6affd78f48d483415dca89d10b) )
+	ROM_LOAD64_WORD( "678a13.18d", 0x000000, 0x200000, CRC(ccf75722) SHA1(f48d21dfc4f82adbb4c9c841a809267cfd028a3d) )
+	ROM_LOAD64_WORD( "678a14.13d", 0x000002, 0x200000, CRC(333a1ab4) SHA1(79df4a98b7871eba4157307a7709da8f8b5da39b) )
+	ROM_LOAD64_WORD( "678a15.9d",  0x000004, 0x200000, CRC(58b670f8) SHA1(5d4facb00e34de3ad11ed60c19835918a9cf6cb9) )
+	ROM_LOAD64_WORD( "678a16.4d",  0x000006, 0x200000, CRC(137b9bff) SHA1(5052c1fa30cc1d6affd78f48d483415dca89d10b) )
 
 	ROM_REGION(0x600000, "k054539", 0)   /* Sound data */
 	ROM_LOAD( "678a08.5r", 0x000000, 0x200000, CRC(4aeb61ad) SHA1(ec6872cb2e4776849963f48c1c245ca7697849e0) )
@@ -1121,13 +1144,14 @@ ROM_END
 
 /*****************************************************************************/
 
-GAME( 1995, midnrun,  0,        midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Midnight Run: Road Fighter 2 (EAA, Euro v1.11)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1995, midnrunj, midnrun,  midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Midnight Run: Road Fighter 2 (JAD, Japan v1.10)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1995, midnruna, midnrun,  midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Midnight Run: Road Fighter 2 (AAA, Asia v1.10)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1996, windheat, 0,        midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Winding Heat (EAA, Euro v2.11)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1996, windheatu,windheat, midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Winding Heat (UBC, USA v2.22)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1996, windheatj,windheat, midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Winding Heat (JAA, Japan v2.11)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1996, windheata,windheat, midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Winding Heat (AAA, Asia v2.11)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1996, jetwave,  0,        jetwave, jetwave,  jetwave_state, driver_init,  ROT0, "Konami", "Jet Wave (EAB, Euro v1.04)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1996, waveshrk, jetwave,  jetwave, jetwave,  jetwave_state, driver_init,  ROT0, "Konami", "Wave Shark (UAB, USA v1.04)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1996, jetwavej, jetwave,  jetwave, jetwave,  jetwave_state, driver_init,  ROT0, "Konami", "Jet Wave (JAB, Japan v1.04)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1995, midnrun,   0,        midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Midnight Run: Road Fighter 2 (EAA, Euro v1.11)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1995, midnrunj,  midnrun,  midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Midnight Run: Road Fighter 2 (JAD, Japan v1.10)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1995, midnruna,  midnrun,  midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Midnight Run: Road Fighter 2 (AAA, Asia v1.10, older sound program)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1995, midnruna2, midnrun,  midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Midnight Run: Road Fighter 2 (AAA, Asia v1.10, newer sound program)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1996, windheat,  0,        midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Winding Heat (EAA, Euro v2.11)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1996, windheatu, windheat, midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Winding Heat (UBC, USA v2.22)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1996, windheatj, windheat, midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Winding Heat (JAA, Japan v2.11)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1996, windheata, windheat, midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Winding Heat (AAA, Asia v2.11)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1996, jetwave,   0,        jetwave, jetwave,  jetwave_state, driver_init,  ROT0, "Konami", "Jet Wave (EAB, Euro v1.04)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1996, waveshrk,  jetwave,  jetwave, jetwave,  jetwave_state, driver_init,  ROT0, "Konami", "Wave Shark (UAB, USA v1.04)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1996, jetwavej,  jetwave,  jetwave, jetwave,  jetwave_state, driver_init,  ROT0, "Konami", "Jet Wave (JAB, Japan v1.04)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )

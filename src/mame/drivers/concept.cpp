@@ -29,6 +29,12 @@
 
     Raphael Nabet, Brett Wyer, 2003-2005
     Major reworking by R. Belmont 2012-2013 resulting in bootable floppies
+
+    ACIA baud rates are 1.36% slower than normal by design. The clock division
+    used as the BRG input for all three is about 1.818 MHz, not the standard
+    1.8432 MHz. The schematics indicate a PCB option to leave the 74LS161 at
+    U212 unpopulated and use a secondary XTAL as the baud rate clock. This
+    XTAL is also specified as 1.818 MHz.
 */
 
 #include "emu.h"
@@ -231,9 +237,7 @@ void concept_state::concept(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* rtc */
-	MM58274C(config, m_mm58274, 32.768_kHz_XTAL);
-	m_mm58274->set_mode24(0); // 12 hour
-	m_mm58274->set_day1(1);   // monday
+	MM58174(config, m_mm58174, 32.768_kHz_XTAL);
 
 	/* via */
 	VIA6522(config, m_via0, 16.364_MHz_XTAL / 16);

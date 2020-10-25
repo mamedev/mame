@@ -50,6 +50,7 @@
 #define VERBOSE ( LOG_GENERAL | LOG_WARN )
 
 #include "logmacro.h"
+#define EVPC_SCREEN_TAG      "screen"
 
 DEFINE_DEVICE_TYPE_NS(TI99_EVPC, bus::ti99::peb, snug_enhanced_video_device, "ti99_evpc", "SNUG Enhanced Video Processor Card")
 
@@ -57,6 +58,7 @@ namespace bus { namespace ti99 { namespace peb {
 
 #define NOVRAM_SIZE 256
 #define EVPC_CRU_BASE 0x1400
+#define SOUNDCHIP_TAG "soundchip"
 
 snug_enhanced_video_device::snug_enhanced_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
 	device_t(mconfig, TI99_EVPC, tag, owner, clock),
@@ -72,14 +74,14 @@ snug_enhanced_video_device::snug_enhanced_video_device(const machine_config &mco
 	m_intlevel(0),
 	m_dsrrom(nullptr),
 	m_novram(nullptr),
-	m_video(*this, TI_VDP_TAG),
-	m_sound(*this, TI_SOUNDCHIP_TAG),
+	m_video(*this, TIGEN_V9938_TAG),
+	m_sound(*this, SOUNDCHIP_TAG),
 	m_colorbus(*this, COLORBUS_TAG),
 	m_console_conn(*this, ":" TI99_EVPC_CONN_TAG)
 {
 }
 
-SETADDRESS_DBIN_MEMBER( snug_enhanced_video_device::setaddress_dbin )
+void snug_enhanced_video_device::setaddress_dbin(offs_t offset, int state)
 {
 	// Do not allow setaddress for the debugger. It will mess up the
 	// setaddress/memory access pairs when the CPU enters wait states.
@@ -149,7 +151,7 @@ void snug_enhanced_video_device::nvram_write(emu_file &file)
     0x5f00 - 0x5fef   NOVRAM
     0x5ff0 - 0x5fff   Palette (5ff0, 5ff2, 5ff4, 5ff6)
 */
-READ8Z_MEMBER(snug_enhanced_video_device::readz)
+void snug_enhanced_video_device::readz(offs_t offset, uint8_t *value)
 {
 	if (m_selected && m_inDsrArea)
 	{
@@ -320,7 +322,7 @@ void snug_enhanced_video_device::write(offs_t offset, uint8_t data)
     7: DIP or NOVRAM
     Logic is inverted
 */
-READ8Z_MEMBER(snug_enhanced_video_device::crureadz)
+void snug_enhanced_video_device::crureadz(offs_t offset, uint8_t *value)
 {
 	if ((offset & 0xff00)==EVPC_CRU_BASE)
 	{
@@ -496,8 +498,8 @@ void snug_enhanced_video_device::device_add_mconfig(machine_config& config)
 	V9938(config, m_video, XTAL(21'477'272)); // typical 9938 clock, not verified
 
 	m_video->int_cb().set(FUNC(snug_enhanced_video_device::video_interrupt_in));
-	m_video->set_screen(TI_SCREEN_TAG);
-	screen_device& screen(SCREEN(config, TI_SCREEN_TAG, SCREEN_TYPE_RASTER));
+	m_video->set_screen(EVPC_SCREEN_TAG);
+	screen_device& screen(SCREEN(config, EVPC_SCREEN_TAG, SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(21'477'272),
 		v99x8_device::HTOTAL,
 		0,
@@ -505,11 +507,11 @@ void snug_enhanced_video_device::device_add_mconfig(machine_config& config)
 		v99x8_device::VTOTAL_NTSC * 2,
 		v99x8_device::VERTICAL_ADJUST * 2,
 		v99x8_device::VVISIBLE_NTSC * 2 - 1 - v99x8_device::VERTICAL_ADJUST * 2);
-	screen.set_screen_update(TI_VDP_TAG, FUNC(v99x8_device::screen_update));
+	screen.set_screen_update(TIGEN_V9938_TAG, FUNC(v99x8_device::screen_update));
 
 	// Sound hardware
 	SPEAKER(config, "sound_out").front_center();
-	sn94624_device& soundgen(SN94624(config, TI_SOUNDCHIP_TAG, 3579545/8));
+	sn94624_device& soundgen(SN94624(config, SOUNDCHIP_TAG, 3579545/8));
 	soundgen.ready_cb().set(FUNC(snug_enhanced_video_device::ready_line));
 	soundgen.add_route(ALL_OUTPUTS, "sound_out", 0.75);
 

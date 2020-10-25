@@ -106,13 +106,13 @@ void fastlane_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(fastlane_state::fastlane_vram1_w)
+void fastlane_state::fastlane_vram1_w(offs_t offset, uint8_t data)
 {
 	m_videoram1[offset] = data;
 	m_layer0->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(fastlane_state::fastlane_vram2_w)
+void fastlane_state::fastlane_vram2_w(offs_t offset, uint8_t data)
 {
 	m_videoram2[offset] = data;
 	m_layer1->mark_tile_dirty(offset & 0x3ff);

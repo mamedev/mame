@@ -41,6 +41,7 @@ colecovision_xin1_cartridge_device::colecovision_xin1_cartridge_device(const mac
 
 void colecovision_xin1_cartridge_device::device_start()
 {
+	save_item(NAME(m_current_offset));
 }
 
 

@@ -112,9 +112,7 @@ protected:
 	uint8_t sci_rdr_r();
 	void sci_tdr_w(uint8_t data);
 
-public: // FIXME: psion.cpp accesses this
 	uint8_t rcr_r();
-protected:
 	void rcr_w(uint8_t data);
 	uint8_t ff_r();
 

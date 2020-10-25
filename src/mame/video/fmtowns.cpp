@@ -130,24 +130,24 @@ void towns_state::towns_crtc_refresh_mode()
 	m_screen->configure(scr.max_x+1,scr.max_y+1,scr,HZ_TO_ATTOSECONDS(60));
 }
 
-READ8_MEMBER( towns_state::towns_gfx_high_r )
+uint8_t towns_state::towns_gfx_high_r(offs_t offset)
 {
 	return m_towns_gfxvram[offset];
 }
 
-WRITE8_MEMBER( towns_state::towns_gfx_high_w )
+void towns_state::towns_gfx_high_w(offs_t offset, uint8_t data)
 {
 	u8 mask = m_vram_mask[offset & 3];
 	u8 mem = m_towns_gfxvram[offset];
 	m_towns_gfxvram[offset] = (mem & ~mask) | (data & mask);
 }
 
-READ8_MEMBER( towns_state::towns_gfx_packed_r )
+uint8_t towns_state::towns_gfx_packed_r(offs_t offset)
 {
 	return m_towns_gfxvram[bitswap<19>(offset,2,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,1,0)];
 }
 
-WRITE8_MEMBER( towns_state::towns_gfx_packed_w )
+void towns_state::towns_gfx_packed_w(offs_t offset, uint8_t data)
 {
 	u8 mask = m_vram_mask[offset & 3];
 	offset = bitswap<19>(offset,2,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,1,0);
@@ -156,7 +156,7 @@ WRITE8_MEMBER( towns_state::towns_gfx_packed_w )
 }
 
 
-READ8_MEMBER( towns_state::towns_gfx_r )
+uint8_t towns_state::towns_gfx_r(offs_t offset)
 {
 	uint8_t ret = 0;
 
@@ -180,7 +180,7 @@ READ8_MEMBER( towns_state::towns_gfx_r )
 	return ret;
 }
 
-WRITE8_MEMBER( towns_state::towns_gfx_w )
+void towns_state::towns_gfx_w(offs_t offset, uint8_t data)
 {
 	if(m_towns_mainmem_enable != 0)
 	{
@@ -265,7 +265,7 @@ void towns_state::towns_update_kanji_offset()
 }
 
 
-READ8_MEMBER( towns_state::towns_video_cff80_r )
+uint8_t towns_state::towns_video_cff80_r(offs_t offset)
 {
 	uint8_t const* const ROM = m_user->base();
 
@@ -308,7 +308,7 @@ READ8_MEMBER( towns_state::towns_video_cff80_r )
 	return 0;
 }
 
-WRITE8_MEMBER( towns_state::towns_video_cff80_w )
+void towns_state::towns_video_cff80_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -318,7 +318,7 @@ WRITE8_MEMBER( towns_state::towns_video_cff80_w )
 		case 0x01:  // read/write plane select (bit 0-3 write, bit 6-7 read)
 			m_video.towns_vram_wplane = data & 0x0f;
 			m_video.towns_vram_rplane = (data & 0xc0) >> 6;
-			towns_update_video_banks(space);
+			towns_update_video_banks();
 			//logerror("VGA: VRAM wplane select = 0x%02x\n",towns_vram_wplane);
 			break;
 		case 0x02:  // display plane (bits 0-2), display page select (bit 4)
@@ -340,29 +340,29 @@ WRITE8_MEMBER( towns_state::towns_video_cff80_w )
 			break;
 		case 0x19:  // ANK CG ROM
 			m_towns_ankcg_enable = data & 0x01;
-			towns_update_video_banks(space);
+			towns_update_video_banks();
 			break;
 		default:
 			logerror("VID: write %08x to invalid or unimplemented memory-mapped port %05x\n",data,0xcff80+offset);
 	}
 }
 
-READ8_MEMBER( towns_state::towns_video_cff80_mem_r )
+uint8_t towns_state::towns_video_cff80_mem_r(offs_t offset)
 {
 	if(m_towns_mainmem_enable != 0)
 		return m_ram->pointer()[offset+0xcff80];
 
-	return towns_video_cff80_r(space,offset);
+	return towns_video_cff80_r(offset);
 }
 
-WRITE8_MEMBER( towns_state::towns_video_cff80_mem_w )
+void towns_state::towns_video_cff80_mem_w(offs_t offset, uint8_t data)
 {
 	if(m_towns_mainmem_enable != 0)
 	{
 		m_ram->pointer()[offset+0xcff80] = data;
 		return;
 	}
-	towns_video_cff80_w(space,offset,data);
+	towns_video_cff80_w(offset,data);
 }
 
 /*
@@ -373,7 +373,7 @@ WRITE8_MEMBER( towns_state::towns_video_cff80_mem_w )
  *      0x44a = shifter register data (8-bit)
  *
  */
-READ8_MEMBER(towns_state::towns_video_440_r)
+uint8_t towns_state::towns_video_440_r(offs_t offset)
 {
 	uint8_t ret = 0;
 	uint16_t xpos,ypos;
@@ -444,7 +444,7 @@ READ8_MEMBER(towns_state::towns_video_440_r)
 	return 0x00;
 }
 
-WRITE8_MEMBER(towns_state::towns_video_440_w)
+void towns_state::towns_video_440_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -492,7 +492,7 @@ WRITE8_MEMBER(towns_state::towns_video_440_w)
 	}
 }
 
-READ8_MEMBER(towns_state::towns_video_5c8_r)
+uint8_t towns_state::towns_video_5c8_r(offs_t offset)
 {
 	//if(LOG_VID) logerror("VID: read port %04x\n",offset+0x5c8);
 	switch(offset)
@@ -509,7 +509,7 @@ READ8_MEMBER(towns_state::towns_video_5c8_r)
 	return 0x00;
 }
 
-WRITE8_MEMBER(towns_state::towns_video_5c8_w)
+void towns_state::towns_video_5c8_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -550,7 +550,7 @@ void towns_state::towns_update_palette()
  * 0xfd92/4/6 - BRG value
  * 0xfd98-9f  - Digital palette registers (FMR-50 compatibility)
  */
-READ8_MEMBER(towns_state::towns_video_fd90_r)
+uint8_t towns_state::towns_video_fd90_r(offs_t offset)
 {
 	uint8_t ret = 0;
 	uint16_t xpos;
@@ -593,7 +593,7 @@ READ8_MEMBER(towns_state::towns_video_fd90_r)
 	return 0x00;
 }
 
-WRITE8_MEMBER(towns_state::towns_video_fd90_w)
+void towns_state::towns_video_fd90_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -630,20 +630,20 @@ WRITE8_MEMBER(towns_state::towns_video_fd90_w)
 	if(LOG_VID) logerror("VID: wrote 0x%02x to port %04x\n",data,offset+0xfd90);
 }
 
-READ8_MEMBER(towns_state::towns_video_ff81_r)
+uint8_t towns_state::towns_video_ff81_r()
 {
 	return ((m_video.towns_vram_rplane << 6) & 0xc0) | m_video.towns_vram_wplane;
 }
 
-WRITE8_MEMBER(towns_state::towns_video_ff81_w)
+void towns_state::towns_video_ff81_w(uint8_t data)
 {
 	m_video.towns_vram_wplane = data & 0x0f;
 	m_video.towns_vram_rplane = (data & 0xc0) >> 6;
-	towns_update_video_banks(space);
+	towns_update_video_banks();
 	logerror("VID: VRAM wplane select (I/O) = 0x%02x\n",m_video.towns_vram_wplane);
 }
 
-READ8_MEMBER(towns_state::towns_video_unknown_r)
+uint8_t towns_state::towns_video_unknown_r()
 {
 	return 0x00;
 }
@@ -658,7 +658,7 @@ READ8_MEMBER(towns_state::towns_video_unknown_r)
  *    0xc8000-0xc8fff: ASCII text (2 bytes each: ISO646 code, then attribute)
  *    0xca000-0xcafff: JIS code
  */
-READ8_MEMBER(towns_state::towns_spriteram_low_r)
+uint8_t towns_state::towns_spriteram_low_r(offs_t offset)
 {
 	uint8_t* RAM = m_ram->pointer();
 	uint8_t* ROM = m_user->base();
@@ -696,7 +696,7 @@ READ8_MEMBER(towns_state::towns_spriteram_low_r)
 	return 0x00;
 }
 
-WRITE8_MEMBER(towns_state::towns_spriteram_low_w)
+void towns_state::towns_spriteram_low_w(offs_t offset, uint8_t data)
 {
 	uint8_t* RAM = m_ram->pointer();
 
@@ -722,12 +722,12 @@ WRITE8_MEMBER(towns_state::towns_spriteram_low_w)
 	}
 }
 
-READ8_MEMBER( towns_state::towns_spriteram_r )
+uint8_t towns_state::towns_spriteram_r(offs_t offset)
 {
 	return m_towns_txtvram[offset];
 }
 
-WRITE8_MEMBER( towns_state::towns_spriteram_w )
+void towns_state::towns_spriteram_w(offs_t offset, uint8_t data)
 {
 	m_towns_txtvram[offset] = data;
 }
@@ -830,7 +830,7 @@ void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x
 
 			voffset = 0;
 			pixel = (m_towns_txtvram[poffset] & 0xf0) >> 4;
-			col = m_towns_txtvram[coffset+(pixel*2)] | (m_towns_txtvram[coffset+(pixel*2)+1] << 8);
+			col = (m_towns_txtvram[coffset+(pixel*2)] | (m_towns_txtvram[coffset+(pixel*2)+1] << 8)) & 0x7fff;
 			if (rotation)
 			{
 				voffset += linesize * (xpos & 0x1ff);  // scanline size in bytes * y pos
@@ -861,7 +861,7 @@ void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x
 						voffset-=2;
 
 				pixel = m_towns_txtvram[poffset] & 0x0f;
-				col = m_towns_txtvram[coffset+(pixel*2)] | (m_towns_txtvram[coffset+(pixel*2)+1] << 8);
+				col = (m_towns_txtvram[coffset+(pixel*2)] | (m_towns_txtvram[coffset+(pixel*2)+1] << 8)) & 0x7fff;
 				if(voffset < 0x20000 && xpos < width && ypos < height && pixel != 0 && voffset > linesize)
 				{
 					m_towns_gfxvram[0x40000+voffset+vbase+1] = (col & 0xff00) >> 8;
@@ -975,13 +975,10 @@ void towns_state::render_sprite_16(uint32_t poffset, uint16_t x, uint16_t y, boo
 void towns_state::draw_sprites(const rectangle* rect)
 {
 	uint16_t sprite_limit = (m_video.towns_sprite_reg[0] | (m_video.towns_sprite_reg[1] << 8)) & 0x3ff;
-	int n;
-	uint16_t x,y,attr,colour;
 	uint16_t xoff = (m_video.towns_sprite_reg[2] | (m_video.towns_sprite_reg[3] << 8)) & 0x1ff;
 	uint16_t yoff = (m_video.towns_sprite_reg[4] | (m_video.towns_sprite_reg[5] << 8)) & 0x1ff;
 	uint32_t poffset,coffset;
 	int linesize = m_video.towns_crtc_reg[24] * 4;
-	bool xflip, yflip, xhalfsize, yhalfsize, rotation;
 
 	if(!(m_video.towns_sprite_reg[1] & 0x80))
 		return;
@@ -998,17 +995,17 @@ void towns_state::draw_sprites(const rectangle* rect)
 	for(int i = linesize; i < 0x20000; i += linesize)
 		memcpy(vram + i, vram, linesize);
 
-	for(n=sprite_limit;n<1024;n++)
+	for(int n=sprite_limit;n<1024;n++)
 	{
-		x = m_towns_txtvram[8*n] | (m_towns_txtvram[8*n+1] << 8);
-		y = m_towns_txtvram[8*n+2] | (m_towns_txtvram[8*n+3] << 8);
-		attr = m_towns_txtvram[8*n+4] | (m_towns_txtvram[8*n+5] << 8);
-		colour = m_towns_txtvram[8*n+6] | (m_towns_txtvram[8*n+7] << 8);
-		xflip = (attr & 0x2000) >> 13;
-		yflip = (attr & 0x1000) >> 12;
-		rotation = (attr & 0x4000) >> 14;
-		xhalfsize = (attr & 0x400) >> 10;
-		yhalfsize = (attr & 0x800) >> 11;
+		uint16_t x = m_towns_txtvram[8*n] | (m_towns_txtvram[8*n+1] << 8);
+		uint16_t y = m_towns_txtvram[8*n+2] | (m_towns_txtvram[8*n+3] << 8);
+		uint16_t attr = m_towns_txtvram[8*n+4] | (m_towns_txtvram[8*n+5] << 8);
+		uint16_t colour = m_towns_txtvram[8*n+6] | (m_towns_txtvram[8*n+7] << 8);
+		bool xflip = (attr & 0x2000) >> 13;
+		bool yflip = (attr & 0x1000) >> 12;
+		bool rotation = (attr & 0x4000) >> 14;
+		bool xhalfsize = (attr & 0x400) >> 10;
+		bool yhalfsize = (attr & 0x800) >> 11;
 
 		if(attr & 0x8000)
 		{
@@ -1053,12 +1050,10 @@ void towns_state::draw_sprites(const rectangle* rect)
 void towns_state::towns_crtc_draw_scan_layer_hicolour(bitmap_rgb32 &bitmap,const rectangle* rect,int layer,int line,int scanline)
 {
 	uint32_t off = 0;
-	int x;
 	uint16_t colour;
 	int hzoom = 1;
 	int linesize;
 	uint32_t scroll;
-	int pixel;
 	int page = 0;
 	bool sphscroll = !(m_video.towns_crtc_reg[28] & (layer ? 0x20 : 0x10));
 
@@ -1111,7 +1106,7 @@ void towns_state::towns_crtc_draw_scan_layer_hicolour(bitmap_rgb32 &bitmap,const
 	off += line * linesize;
 	off &= ~1;
 
-	for(x=rect->min_x;x<rect->max_x;x+=hzoom)
+	for(int x=rect->min_x;x<rect->max_x;x+=hzoom)
 	{
 		int offpage;
 		int curoff;
@@ -1126,10 +1121,10 @@ void towns_state::towns_crtc_draw_scan_layer_hicolour(bitmap_rgb32 &bitmap,const
 			curoff = ((off & 0x7fff8) >> 1) | (off & 3);
 		}
 		colour = (m_towns_gfxvram[curoff+(offpage*0x40000)+1] << 8) | m_towns_gfxvram[curoff+(offpage*0x40000)];
-		if(colour < 0x8000)
+		if(!(m_video.towns_video_reg[0] & 0x10) || (m_video.towns_video_reg[1] & 0x01) != layer || colour < 0x8000)
 		{
-			for (pixel = 0; pixel < hzoom; pixel++)
-				bitmap.pix32(scanline, x+pixel) =
+			for (int pixel = 0; pixel < hzoom; pixel++)
+				bitmap.pix(scanline, x+pixel) =
 					((colour & 0x001f) << 3)
 					| ((colour & 0x7c00) << 1)
 					| ((colour & 0x03e0) << 14);
@@ -1143,12 +1138,10 @@ void towns_state::towns_crtc_draw_scan_layer_hicolour(bitmap_rgb32 &bitmap,const
 void towns_state::towns_crtc_draw_scan_layer_256(bitmap_rgb32 &bitmap,const rectangle* rect,int line,int scanline)
 {
 	int off = 0;
-	int x;
 	uint8_t colour;
 	int hzoom = 1;
 	int linesize;
 	uint32_t scroll;
-	int pixel;
 	int page = 0;
 	bool sphscroll = !(m_video.towns_crtc_reg[28] & 0x10);
 
@@ -1174,12 +1167,12 @@ void towns_state::towns_crtc_draw_scan_layer_256(bitmap_rgb32 &bitmap,const rect
 	off += (subpix >> 1) & ~3;
 	subpix = subpix & 7;
 
-	for(x=rect->min_x;x<rect->max_x;x+=hzoom)
+	for(int x=rect->min_x;x<rect->max_x;x+=hzoom)
 	{
 		off &= 0x3ffff;
 		colour = m_towns_gfxvram[off+(subpix >= 4 ? (subpix & 3)+0x40000 : subpix)];
-		for (pixel = 0; pixel < hzoom; pixel++)
-			bitmap.pix32(scanline, x+pixel) = m_palette->pen(colour);
+		for (int pixel = 0; pixel < hzoom; pixel++)
+			bitmap.pix(scanline, x+pixel) = m_palette->pen(colour);
 		subpix++;
 		if(subpix == 8)
 		{
@@ -1194,12 +1187,8 @@ void towns_state::towns_crtc_draw_scan_layer_256(bitmap_rgb32 &bitmap,const rect
 void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const rectangle* rect,int layer,int line,int scanline)
 {
 	int off = 0;
-	int x;
-	uint8_t colour;
 	int hzoom = 1;
-	int linesize;
 	uint32_t scroll;
-	int pixel;
 	int page = 0;
 	palette_device* pal = m_palette16[layer];
 	bool sphscroll = !(m_video.towns_crtc_reg[28] & (layer ? 0x20 : 0x10));
@@ -1215,6 +1204,7 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 //  if((layer == 1) && (m_video.towns_sprite_reg[1] & 0x80) && (m_video.towns_sprite_page == 1))
 //      off = 0x20000;
 
+	int linesize;
 	if(layer == 0)
 		linesize = m_video.towns_crtc_reg[20] * 4;
 	else
@@ -1249,23 +1239,24 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 
 	off += line * linesize;
 
-	for(x=rect->min_x;x<rect->max_x;x+=hzoom*2)
+	for(int x=rect->min_x;x<rect->max_x;x+=hzoom*2)
 	{
 		if(m_video.towns_video_reg[0] & 0x10)
 			off &= 0x3ffff;  // 2 layers
 		else
 			off &= 0x7ffff;  // 1 layer
+		uint8_t colour;
 		colour = m_towns_gfxvram[off+(layer*0x40000)] >> 4;
 		if(colour != 0 || bottom_layer)
 		{
-			for (pixel = 0; pixel < hzoom; pixel++)
-				bitmap.pix32(scanline, x+hzoom+pixel) = pal->pen(colour);
+			for (int pixel = 0; pixel < hzoom; pixel++)
+				bitmap.pix(scanline, x+hzoom+pixel) = pal->pen(colour);
 		}
 		colour = m_towns_gfxvram[off+(layer*0x40000)] & 0x0f;
 		if(colour != 0 || bottom_layer)
 		{
-			for (pixel = 0; pixel < hzoom; pixel++)
-				bitmap.pix32(scanline, x+pixel) = pal->pen(colour);
+			for (int pixel = 0; pixel < hzoom; pixel++)
+				bitmap.pix(scanline, x+pixel) = pal->pen(colour);
 		}
 		off++;
 		if ((off - (page * 0x20000)) % linesize == 0 && sphscroll)
@@ -1275,7 +1266,6 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 
 void towns_state::towns_crtc_draw_layer(bitmap_rgb32 &bitmap,const rectangle* rect,int layer)
 {
-	int line;
 	int scanline;
 	int bottom;
 	int top;
@@ -1294,7 +1284,7 @@ void towns_state::towns_crtc_draw_layer(bitmap_rgb32 &bitmap,const rectangle* re
 		switch(m_video.towns_video_reg[0] & 0x03)
 		{
 			case 0x01:
-				for(line=top;line<=bottom;line++)
+				for(int line=top;line<=bottom;line++)
 				{
 					do
 					{
@@ -1306,7 +1296,7 @@ void towns_state::towns_crtc_draw_layer(bitmap_rgb32 &bitmap,const rectangle* re
 				}
 				break;
 			case 0x02:
-				for(line=top;line<=bottom;line++)
+				for(int line=top;line<=bottom;line++)
 				{
 					do
 					{
@@ -1318,7 +1308,7 @@ void towns_state::towns_crtc_draw_layer(bitmap_rgb32 &bitmap,const rectangle* re
 				}
 				break;
 			case 0x03:
-				for(line=top;line<=bottom;line++)
+				for(int line=top;line<=bottom;line++)
 				{
 					do
 					{
@@ -1343,7 +1333,7 @@ void towns_state::towns_crtc_draw_layer(bitmap_rgb32 &bitmap,const rectangle* re
 		switch(m_video.towns_video_reg[0] & 0x0c)
 		{
 			case 0x04:
-				for(line=top;line<=bottom;line++)
+				for(int line=top;line<=bottom;line++)
 				{
 					do
 					{
@@ -1355,7 +1345,7 @@ void towns_state::towns_crtc_draw_layer(bitmap_rgb32 &bitmap,const rectangle* re
 				}
 				break;
 			case 0x0c:
-				for(line=top;line<=bottom;line++)
+				for(int line=top;line<=bottom;line++)
 				{
 					do
 					{
@@ -1376,11 +1366,7 @@ void towns_state::render_text_char(uint8_t x, uint8_t y, uint8_t ascii, uint16_t
 	uint32_t vram_addr;
 	uint16_t linesize = m_video.towns_crtc_reg[24] * 4;
 	uint8_t code_h,code_l;
-	uint8_t colour;
-	uint8_t data;
-	uint8_t temp;
 	uint8_t* font_rom = m_user->base();
-	int a,b;
 
 	// all characters are 16 pixels high
 	vram_addr = (x * 4) + (y * (linesize * 16));
@@ -1415,29 +1401,27 @@ void towns_state::render_text_char(uint8_t x, uint8_t y, uint8_t ascii, uint16_t
 								| 0x38000;
 		}
 	}
-	colour = attr & 0x07;
+	uint8_t colour = attr & 0x07;
 	if(attr & 0x20)
 		colour |= 0x08;
 
-	for(a=0;a<16;a++)  // for each scanline
+	for(int a=0;a<16;a++)  // for each scanline
 	{
+		uint8_t data;
 		if((attr & 0xc0) == 0)
 			data = font_rom[0x180000 + rom_addr + a];
+		else if((attr & 0xc0) == 0x80)
+			data = font_rom[0x180000 + rom_addr + (a*2)];
 		else
-		{
-			if((attr & 0xc0) == 0x80)
-				data = font_rom[0x180000 + rom_addr + (a*2)];
-			else
-				data = font_rom[0x180000 + rom_addr + (a*2) + 1];
-		}
+			data = font_rom[0x180000 + rom_addr + (a*2) + 1];
 
 		if(attr & 0x08)
 			data = ~data;  // inverse
 
 		// and finally, put the data in VRAM
-		for(b=0;b<8;b+=2)
+		for(int b=0;b<8;b+=2)
 		{
-			temp = 0;
+			uint8_t temp = 0;
 			if(data & (1<<b))
 				temp |= ((colour & 0x0f) << 4);
 			if(data & (1<<(b+1)))
@@ -1469,11 +1453,11 @@ void towns_state::draw_text_layer()
  *
  *  The video hardware renders text to VRAM layer 1, there is no separate text layer
  */
-	int x,y,c = 0;
+	int c = 0;
 
-	for(y=0;y<40;y++)
+	for(int y=0;y<40;y++)
 	{
-		for(x=0;x<80;x++)
+		for(int x=0;x<80;x++)
 		{
 			render_text_char(x,y,m_towns_txtvram[c],((m_towns_txtvram[c+0x2000] << 8)|(m_towns_txtvram[c+0x2001])),m_towns_txtvram[c+1]);
 			c+=2;

@@ -98,13 +98,13 @@ void kopunch_state::kopunch_io_map(address_map &map)
 
 ********************************************************/
 
-READ8_MEMBER(kopunch_state::sensors1_r)
+uint8_t kopunch_state::sensors1_r()
 {
 	// punch strength low bits
 	return machine().rand();
 }
 
-READ8_MEMBER(kopunch_state::sensors2_r)
+uint8_t kopunch_state::sensors2_r()
 {
 	// d0-d2: punch strength high bits
 	// d3: coin 2
@@ -115,12 +115,12 @@ READ8_MEMBER(kopunch_state::sensors2_r)
 	return (machine().rand() & 0x07) | ioport("SYSTEM")->read();
 }
 
-WRITE8_MEMBER(kopunch_state::lamp_w)
+void kopunch_state::lamp_w(uint8_t data)
 {
 	m_lamp = BIT(~data, 7);
 }
 
-WRITE8_MEMBER(kopunch_state::coin_w)
+void kopunch_state::coin_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, ~data & 0x80);
 	machine().bookkeeping().coin_counter_w(1, ~data & 0x40);

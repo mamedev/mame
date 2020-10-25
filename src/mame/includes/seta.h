@@ -187,7 +187,7 @@ protected:
 	std::unique_ptr<u16[]> m_pairslove_protram_old;
 	std::unique_ptr<u16[]> m_downtown_protection;
 
-	DECLARE_READ16_MEMBER(metafox_protection_r);
+	u16 metafox_protection_r(offs_t offset);
 	void seta_coin_counter_w(u8 data);
 	void seta_coin_lockout_w(u8 data);
 	void seta_vregs_w(u8 data);
@@ -216,12 +216,12 @@ protected:
 	void calibr50_sub_bankswitch_w(u8 data);
 	void calibr50_soundlatch2_w(u8 data);
 	void twineagl_ctrl_w(u8 data);
-	DECLARE_READ16_MEMBER(twineagl_debug_r);
-	DECLARE_READ16_MEMBER(twineagl_200100_r);
-	DECLARE_WRITE16_MEMBER(twineagl_200100_w);
-	DECLARE_READ16_MEMBER(downtown_protection_r);
-	DECLARE_WRITE16_MEMBER(downtown_protection_w);
-	DECLARE_READ16_MEMBER(arbalest_debug_r);
+	u16 twineagl_debug_r();
+	u16 twineagl_200100_r(offs_t offset);
+	void twineagl_200100_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 downtown_protection_r(offs_t offset);
+	void downtown_protection_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 arbalest_debug_r();
 	void magspeed_lights_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u8 dsw1_r();
 	u8 dsw2_r();
@@ -434,8 +434,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
 private:
-	DECLARE_WRITE16_MEMBER(rtc_w);
-	DECLARE_READ16_MEMBER(rtc_r);
+	void rtc_w(u16 data);
+	u16 rtc_r(offs_t offset);
 
 	u16 inputs_r();
 	void mux_w(u16 data);
@@ -443,12 +443,12 @@ private:
 	void pay_w(u8 data);
 	void led_w(u8 data);
 
-	DECLARE_READ16_MEMBER(spritecode_r);
-	DECLARE_WRITE16_MEMBER(spritecode_w);
+	u16 spritecode_r(offs_t offset);
+	void spritecode_w(offs_t offset, u16 data);
 
-	DECLARE_WRITE16_MEMBER(spriteylow_w);
+	void spriteylow_w(offs_t offset, u16 data);
 
-	DECLARE_WRITE16_MEMBER(spritectrl_w);
+	void spritectrl_w(offs_t offset, u16 data);
 
 	DECLARE_MACHINE_START(setaroul);
 	DECLARE_MACHINE_RESET(setaroul);
@@ -504,8 +504,8 @@ public:
 	void init_inttoote();
 
 private:
-	DECLARE_WRITE16_MEMBER(rtc_w);
-	DECLARE_READ16_MEMBER(rtc_r);
+	void rtc_w(u16 data);
+	u16 rtc_r(offs_t offset);
 
 	u16 dsw_r(offs_t offset);
 	u16 comm_r();

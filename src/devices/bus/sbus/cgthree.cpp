@@ -67,12 +67,12 @@ void sbus_cgthree_device::install_device()
 
 uint32_t sbus_cgthree_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const pen_t *pens = m_ramdac->pens();
-	uint8_t *vram = (uint8_t *)&m_vram[0];
+	pen_t const *const pens = m_ramdac->pens();
+	uint8_t const *const vram = (uint8_t *)&m_vram[0];
 
 	for (int y = 0; y < 900; y++)
 	{
-		uint32_t *scanline = &bitmap.pix32(y);
+		uint32_t *scanline = &bitmap.pix(y);
 		for (int x = 0; x < 1152; x++)
 		{
 			const uint8_t pixel = vram[y * 1152 + BYTE4_XOR_BE(x)];
@@ -83,39 +83,39 @@ uint32_t sbus_cgthree_device::screen_update(screen_device &screen, bitmap_rgb32 
 	return 0;
 }
 
-READ32_MEMBER(sbus_cgthree_device::unknown_r)
+uint32_t sbus_cgthree_device::unknown_r(offs_t offset, uint32_t mem_mask)
 {
 	logerror("%s: unknown_r: %08x & %08x\n", machine().describe_context(), offset << 2, mem_mask);
 	return 0;
 }
 
-WRITE32_MEMBER(sbus_cgthree_device::unknown_w)
+void sbus_cgthree_device::unknown_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("%s: unknown_w: %08x = %08x & %08x\n", machine().describe_context(), offset << 2, data, mem_mask);
 }
 
-READ8_MEMBER(sbus_cgthree_device::regs_r)
+uint8_t sbus_cgthree_device::regs_r(offs_t offset)
 {
 	logerror("%s: regs_r: Unimplemented: %08x\n", machine().describe_context(), 0x7ff800 + offset);
 	return 0;
 }
 
-WRITE8_MEMBER(sbus_cgthree_device::regs_w)
+void sbus_cgthree_device::regs_w(offs_t offset, uint8_t data)
 {
 	logerror("%s: regs_w: Unimplemented: %08x = %02x\n", machine().describe_context(), 0x7ff800 + offset, data);
 }
 
-READ32_MEMBER(sbus_cgthree_device::rom_r)
+uint32_t sbus_cgthree_device::rom_r(offs_t offset)
 {
 	return ((uint32_t*)m_rom->base())[offset];
 }
 
-READ32_MEMBER(sbus_cgthree_device::vram_r)
+uint32_t sbus_cgthree_device::vram_r(offs_t offset)
 {
 	return m_vram[offset];
 }
 
-WRITE32_MEMBER(sbus_cgthree_device::vram_w)
+void sbus_cgthree_device::vram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_vram[offset]);
 }

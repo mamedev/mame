@@ -64,7 +64,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	DECLARE_WRITE8_MEMBER(output_w);
+	void output_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	uint8_t m_fg_tilebank;
 	bool m_rowscroll_enable;
@@ -164,7 +164,7 @@ uint32_t metlfrzr_state::screen_update_metlfrzr(screen_device &screen, bitmap_in
 	return 0;
 }
 
-WRITE8_MEMBER(metlfrzr_state::output_w)
+void metlfrzr_state::output_w(uint8_t data)
 {
 	// bit 7: flip screen
 	// bit 6-5: coin lockouts

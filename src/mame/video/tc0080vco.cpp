@@ -603,8 +603,8 @@ void tc0080vco_device::bg0_tilemap_draw(screen_device &screen, bitmap_ind16 &bit
 
 			int x_index = sx - ((m_bgscroll_ram[row_index] << 16));
 
-			u16 *src16 = &srcbitmap.pix16(src_y_index);
-			u8 *tsrc  = &flagsbitmap.pix8(src_y_index);
+			u16 const *src16 = &srcbitmap.pix(src_y_index);
+			u8 const *tsrc = &flagsbitmap.pix(src_y_index);
 			u16 *dst16 = scanline;
 
 			int x_step = zoomx;

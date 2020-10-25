@@ -104,7 +104,7 @@ public:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
-	DECLARE_READ8_MEMBER(semaphore_r);
+	uint8_t semaphore_r();
 
 	void shougi_palette(palette_device &palette) const;
 
@@ -217,7 +217,7 @@ uint32_t shougi_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 			color= ((data1>>x) & 1) | (((data1>>(4+x)) & 1)<<1);
 			data = ((data2>>x) & 1) | (((data2>>(4+x)) & 1)<<1);
 
-			bitmap.pix16(255-sy, 255-(sx*4 + x)) = color*4 + data;
+			bitmap.pix(255-sy, 255-(sx*4 + x)) = color*4 + data;
 		}
 	}
 
@@ -265,7 +265,7 @@ void shougi_state::main_map(address_map &map)
 
 // subcpu side
 
-READ8_MEMBER(shougi_state::semaphore_r)
+uint8_t shougi_state::semaphore_r()
 {
 	// d0: waits for it to be set before handling NMI routine
 	// hmm it must be a signal from maincpu, but what?

@@ -26,6 +26,8 @@
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 #include "bus/rs232/rs232.h"
+#include "bus/fmt_scsi/fmt_scsi.h"
+#include "bus/fmt_scsi/fmt121.h"
 
 #include "formats/fmtowns_dsk.h"
 
@@ -111,6 +113,7 @@ class towns_state : public driver_device
 		, m_dma_1(*this, "dma_1")
 		, m_cdrom(*this, "cdrom")
 		, m_cdda(*this, "cdda")
+		, m_scsi_slot(*this, "scsislot")
 		, m_bank_cb000_r(*this, "bank_cb000_r")
 		, m_bank_cb000_w(*this, "bank_cb000_w")
 		, m_bank_f8000_r(*this, "bank_f8000_r")
@@ -150,6 +153,7 @@ protected:
 	void pcm_mem(address_map &map);
 	void towns16_io(address_map &map);
 	void towns_io(address_map &map);
+	void towns_1g_io(address_map &map);
 	void towns2_io(address_map &map);
 	void townsux_io(address_map &map);
 	void towns_mem(address_map &map);
@@ -167,8 +171,6 @@ protected:
 
 	DECLARE_WRITE_LINE_MEMBER(towns_scsi_irq);
 	DECLARE_WRITE_LINE_MEMBER(towns_scsi_drq);
-	DECLARE_READ16_MEMBER(towns_scsi_dma_r);
-	DECLARE_WRITE16_MEMBER(towns_scsi_dma_w);
 
 private:
 	/* devices */
@@ -187,6 +189,7 @@ private:
 	required_device<upd71071_device> m_dma_1;
 	required_device<cdrom_image_device> m_cdrom;
 	required_device<cdda_device> m_cdda;
+	optional_device<fmt_scsi_slot_device> m_scsi_slot;
 
 	required_memory_bank m_bank_cb000_r;
 	required_memory_bank m_bank_cb000_w;
@@ -279,67 +282,67 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	DECLARE_READ8_MEMBER(towns_system_r);
-	DECLARE_WRITE8_MEMBER(towns_system_w);
-	DECLARE_READ8_MEMBER(towns_intervaltimer2_r);
-	DECLARE_WRITE8_MEMBER(towns_intervaltimer2_w);
-	DECLARE_READ8_MEMBER(towns_sys6c_r);
-	DECLARE_WRITE8_MEMBER(towns_sys6c_w);
-	template<int Chip> DECLARE_READ8_MEMBER(towns_dma_r);
-	template<int Chip> DECLARE_WRITE8_MEMBER(towns_dma_w);
-	DECLARE_READ8_MEMBER(towns_floppy_r);
-	DECLARE_WRITE8_MEMBER(towns_floppy_w);
-	DECLARE_READ8_MEMBER(towns_keyboard_r);
-	DECLARE_WRITE8_MEMBER(towns_keyboard_w);
-	DECLARE_READ8_MEMBER(towns_port60_r);
-	DECLARE_WRITE8_MEMBER(towns_port60_w);
-	DECLARE_READ8_MEMBER(towns_sys5e8_r);
-	DECLARE_WRITE8_MEMBER(towns_sys5e8_w);
-	DECLARE_READ8_MEMBER(towns_sound_ctrl_r);
-	DECLARE_WRITE8_MEMBER(towns_sound_ctrl_w);
-	DECLARE_READ8_MEMBER(towns_padport_r);
-	DECLARE_WRITE8_MEMBER(towns_pad_mask_w);
-	DECLARE_READ8_MEMBER(towns_cmos_low_r);
-	DECLARE_WRITE8_MEMBER(towns_cmos_low_w);
-	DECLARE_READ8_MEMBER(towns_cmos_r);
-	DECLARE_WRITE8_MEMBER(towns_cmos_w);
-	DECLARE_READ8_MEMBER(towns_sys480_r);
-	DECLARE_WRITE8_MEMBER(towns_sys480_w);
-	DECLARE_READ8_MEMBER(towns_video_404_r);
-	DECLARE_WRITE8_MEMBER(towns_video_404_w);
-	DECLARE_READ8_MEMBER(towns_cdrom_r);
-	DECLARE_WRITE8_MEMBER(towns_cdrom_w);
-	DECLARE_READ8_MEMBER(towns_rtc_r);
-	DECLARE_WRITE8_MEMBER(towns_rtc_w);
-	DECLARE_WRITE8_MEMBER(towns_rtc_select_w);
-	DECLARE_READ8_MEMBER(towns_volume_r);
-	DECLARE_WRITE8_MEMBER(towns_volume_w);
-	DECLARE_READ8_MEMBER(unksnd_r);
-	DECLARE_READ8_MEMBER(towns_41ff_r);
+	uint8_t towns_system_r(offs_t offset);
+	void towns_system_w(offs_t offset, uint8_t data);
+	uint8_t towns_intervaltimer2_r(offs_t offset);
+	void towns_intervaltimer2_w(offs_t offset, uint8_t data);
+	uint8_t towns_sys6c_r();
+	void towns_sys6c_w(uint8_t data);
+	template<int Chip> uint8_t towns_dma_r(offs_t offset);
+	template<int Chip> void towns_dma_w(offs_t offset, uint8_t data);
+	uint8_t towns_floppy_r(offs_t offset);
+	void towns_floppy_w(offs_t offset, uint8_t data);
+	uint8_t towns_keyboard_r(offs_t offset);
+	void towns_keyboard_w(offs_t offset, uint8_t data);
+	uint8_t towns_port60_r();
+	void towns_port60_w(uint8_t data);
+	uint8_t towns_sys5e8_r(offs_t offset);
+	void towns_sys5e8_w(offs_t offset, uint8_t data);
+	uint8_t towns_sound_ctrl_r(offs_t offset);
+	void towns_sound_ctrl_w(offs_t offset, uint8_t data);
+	uint8_t towns_padport_r(offs_t offset);
+	void towns_pad_mask_w(uint8_t data);
+	uint8_t towns_cmos_low_r(offs_t offset);
+	void towns_cmos_low_w(offs_t offset, uint8_t data);
+	uint8_t towns_cmos_r(offs_t offset);
+	void towns_cmos_w(offs_t offset, uint8_t data);
+	uint8_t towns_sys480_r();
+	void towns_sys480_w(uint8_t data);
+	uint8_t towns_video_404_r();
+	void towns_video_404_w(uint8_t data);
+	uint8_t towns_cdrom_r(offs_t offset);
+	void towns_cdrom_w(offs_t offset, uint8_t data);
+	uint8_t towns_rtc_r();
+	void towns_rtc_w(uint8_t data);
+	void towns_rtc_select_w(uint8_t data);
+	uint8_t towns_volume_r(offs_t offset);
+	void towns_volume_w(offs_t offset, uint8_t data);
+	uint8_t unksnd_r();
+	uint8_t towns_41ff_r();
 
-	DECLARE_READ8_MEMBER(towns_gfx_high_r);
-	DECLARE_WRITE8_MEMBER(towns_gfx_high_w);
-	DECLARE_READ8_MEMBER(towns_gfx_packed_r);
-	DECLARE_WRITE8_MEMBER(towns_gfx_packed_w);
-	DECLARE_READ8_MEMBER(towns_gfx_r);
-	DECLARE_WRITE8_MEMBER(towns_gfx_w);
-	DECLARE_READ8_MEMBER(towns_video_cff80_r);
-	DECLARE_WRITE8_MEMBER(towns_video_cff80_w);
-	DECLARE_READ8_MEMBER(towns_video_cff80_mem_r);
-	DECLARE_WRITE8_MEMBER(towns_video_cff80_mem_w);
-	DECLARE_READ8_MEMBER(towns_video_440_r);
-	DECLARE_WRITE8_MEMBER(towns_video_440_w);
-	DECLARE_READ8_MEMBER(towns_video_5c8_r);
-	DECLARE_WRITE8_MEMBER(towns_video_5c8_w);
-	DECLARE_READ8_MEMBER(towns_video_fd90_r);
-	DECLARE_WRITE8_MEMBER(towns_video_fd90_w);
-	DECLARE_READ8_MEMBER(towns_video_ff81_r);
-	DECLARE_READ8_MEMBER(towns_video_unknown_r);
-	DECLARE_WRITE8_MEMBER(towns_video_ff81_w);
-	DECLARE_READ8_MEMBER(towns_spriteram_low_r);
-	DECLARE_WRITE8_MEMBER(towns_spriteram_low_w);
-	DECLARE_READ8_MEMBER(towns_spriteram_r);
-	DECLARE_WRITE8_MEMBER(towns_spriteram_w);
+	uint8_t towns_gfx_high_r(offs_t offset);
+	void towns_gfx_high_w(offs_t offset, uint8_t data);
+	uint8_t towns_gfx_packed_r(offs_t offset);
+	void towns_gfx_packed_w(offs_t offset, uint8_t data);
+	uint8_t towns_gfx_r(offs_t offset);
+	void towns_gfx_w(offs_t offset, uint8_t data);
+	uint8_t towns_video_cff80_r(offs_t offset);
+	void towns_video_cff80_w(offs_t offset, uint8_t data);
+	uint8_t towns_video_cff80_mem_r(offs_t offset);
+	void towns_video_cff80_mem_w(offs_t offset, uint8_t data);
+	uint8_t towns_video_440_r(offs_t offset);
+	void towns_video_440_w(offs_t offset, uint8_t data);
+	uint8_t towns_video_5c8_r(offs_t offset);
+	void towns_video_5c8_w(offs_t offset, uint8_t data);
+	uint8_t towns_video_fd90_r(offs_t offset);
+	void towns_video_fd90_w(offs_t offset, uint8_t data);
+	uint8_t towns_video_ff81_r();
+	uint8_t towns_video_unknown_r();
+	void towns_video_ff81_w(uint8_t data);
+	uint8_t towns_spriteram_low_r(offs_t offset);
+	void towns_spriteram_low_w(offs_t offset, uint8_t data);
+	uint8_t towns_spriteram_r(offs_t offset);
+	void towns_spriteram_w(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(mb8877a_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(mb8877a_drq_w);
@@ -349,8 +352,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(towns_rxrdy_irq);
 	DECLARE_WRITE_LINE_MEMBER(towns_txrdy_irq);
 	DECLARE_WRITE_LINE_MEMBER(towns_syndet_irq);
-	DECLARE_READ8_MEMBER(towns_serial_r);
-	DECLARE_WRITE8_MEMBER(towns_serial_w);
+	uint8_t towns_serial_r(offs_t offset);
+	void towns_serial_w(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(rtc_d0_w);
 	DECLARE_WRITE_LINE_MEMBER(rtc_d1_w);
@@ -360,7 +363,7 @@ private:
 
 	RF5C68_SAMPLE_END_CB_MEMBER(towns_pcm_irq);
 
-	void towns_update_video_banks(address_space&);
+	void towns_update_video_banks();
 	void init_serial_rom();
 	void kb_sendcode(uint8_t scancode, int release);
 	uint8_t speaker_get_spk();
@@ -414,7 +417,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(towns_pit_out0_changed);
 	DECLARE_WRITE_LINE_MEMBER(towns_pit_out1_changed);
 	DECLARE_WRITE_LINE_MEMBER(pit2_out1_changed);
-	DECLARE_READ8_MEMBER(get_slave_ack);
+	uint8_t get_slave_ack(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(towns_fm_irq);
 	void towns_crtc_refresh_mode();
 	void towns_update_kanji_offset();
@@ -431,11 +434,11 @@ private:
 	inline uint8_t byte_to_bcd(uint8_t val);
 	inline uint8_t bcd_to_byte(uint8_t val);
 	inline uint32_t msf_to_lbafm(uint32_t val);  // because the CDROM core doesn't provide this;
-	DECLARE_READ16_MEMBER(towns_fdc_dma_r);
-	DECLARE_WRITE16_MEMBER(towns_fdc_dma_w);
+	uint16_t towns_fdc_dma_r();
+	void towns_fdc_dma_w(uint16_t data);
 	void towns_cdrom_set_irq(int line,int state);
 	uint8_t towns_cd_get_track();
-	DECLARE_READ16_MEMBER(towns_cdrom_dma_r);
+	uint16_t towns_cdrom_dma_r();
 };
 
 class towns16_state : public towns_state

@@ -54,13 +54,13 @@ private:
 	required_device<k054321_device> m_k054321;
 	required_device<palette_device> m_palette;
 
-	DECLARE_WRITE8_MEMBER(control2_w);
-	DECLARE_READ8_MEMBER(sound_irq_r);
-	DECLARE_WRITE8_MEMBER(sound_irq_w);
-	DECLARE_WRITE8_MEMBER(le_bankswitch_w);
-	DECLARE_READ8_MEMBER(guns_r);
-	DECLARE_READ8_MEMBER(gunsaux_r);
-	DECLARE_WRITE8_MEMBER(lethalen_palette_control);
+	void control2_w(uint8_t data);
+	uint8_t sound_irq_r();
+	void sound_irq_w(uint8_t data);
+	void le_bankswitch_w(uint8_t data);
+	uint8_t guns_r(offs_t offset);
+	uint8_t gunsaux_r();
+	void lethalen_palette_control(offs_t offset, uint8_t data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

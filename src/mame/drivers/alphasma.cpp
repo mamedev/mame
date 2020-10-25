@@ -55,13 +55,13 @@ protected:
 	void alphasmart_palette(palette_device &palette) const;
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(kb_r);
-	DECLARE_WRITE8_MEMBER(kb_matrixl_w);
-	DECLARE_WRITE8_MEMBER(kb_matrixh_w);
-	DECLARE_READ8_MEMBER(port_a_r);
-	virtual DECLARE_WRITE8_MEMBER(port_a_w);
-	DECLARE_READ8_MEMBER(port_d_r);
-	DECLARE_WRITE8_MEMBER(port_d_w);
+	uint8_t kb_r();
+	void kb_matrixl_w(uint8_t data);
+	void kb_matrixh_w(uint8_t data);
+	uint8_t port_a_r();
+	virtual void port_a_w(uint8_t data);
+	uint8_t port_d_r();
+	void port_d_w(uint8_t data);
 	void update_lcdc(bool lcdc0, bool lcdc1);
 
 	void alphasmart_mem(address_map &map);
@@ -83,9 +83,9 @@ public:
 	void asma2k(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
-	virtual DECLARE_WRITE8_MEMBER(port_a_w) override;
+	uint8_t io_r(offs_t offset);
+	void io_w(offs_t offset, uint8_t data);
+	virtual void port_a_w(uint8_t data) override;
 
 	void asma2k_mem(address_map &map);
 
@@ -97,7 +97,7 @@ INPUT_CHANGED_MEMBER(alphasmart_state::kb_irq)
 	m_maincpu->set_input_line(MC68HC11_IRQ_LINE, HOLD_LINE);
 }
 
-READ8_MEMBER(alphasmart_state::kb_r)
+uint8_t alphasmart_state::kb_r()
 {
 	uint16_t matrix = (m_matrix[1]<<8) | m_matrix[0];
 	uint8_t data = 0xff;
@@ -109,17 +109,17 @@ READ8_MEMBER(alphasmart_state::kb_r)
 	return data;
 }
 
-WRITE8_MEMBER(alphasmart_state::kb_matrixl_w)
+void alphasmart_state::kb_matrixl_w(uint8_t data)
 {
 	m_matrix[0] = data;
 }
 
-WRITE8_MEMBER(alphasmart_state::kb_matrixh_w)
+void alphasmart_state::kb_matrixh_w(uint8_t data)
 {
 	m_matrix[1] = data;
 }
 
-READ8_MEMBER(alphasmart_state::port_a_r)
+uint8_t alphasmart_state::port_a_r()
 {
 	return (m_port_a & 0xfd) | (m_battery_status->read() << 1);
 }
@@ -150,7 +150,7 @@ void alphasmart_state::update_lcdc(bool lcdc0, bool lcdc1)
 	}
 }
 
-WRITE8_MEMBER(alphasmart_state::port_a_w)
+void alphasmart_state::port_a_w(uint8_t data)
 {
 	uint8_t changed = (m_port_a ^ data) & data;
 	update_lcdc(changed & 0x80, changed & 0x20);
@@ -158,12 +158,12 @@ WRITE8_MEMBER(alphasmart_state::port_a_w)
 	m_port_a = data;
 }
 
-READ8_MEMBER(alphasmart_state::port_d_r)
+uint8_t alphasmart_state::port_d_r()
 {
 	return m_port_d;
 }
 
-WRITE8_MEMBER(alphasmart_state::port_d_w)
+void alphasmart_state::port_d_w(uint8_t data)
 {
 	m_port_d = data;
 }
@@ -178,20 +178,20 @@ void alphasmart_state::alphasmart_mem(address_map &map)
 	map(0xc000, 0xc000).w(FUNC(alphasmart_state::kb_matrixl_w));
 }
 
-READ8_MEMBER(asma2k_state::io_r)
+uint8_t asma2k_state::io_r(offs_t offset)
 {
 	if (offset == 0x2000)
-		return kb_r(space, offset);
+		return kb_r();
 
 	//else printf("unknown r: %x\n", offset);
 
 	return 0;
 }
 
-WRITE8_MEMBER(asma2k_state::io_w)
+void asma2k_state::io_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0x2000)
-		kb_matrixh_w(space, offset, data);
+		kb_matrixh_w(data);
 	else if (offset == 0x4000)
 	{
 		uint8_t changed = (m_lcd_ctrl ^ data) & data;
@@ -202,7 +202,7 @@ WRITE8_MEMBER(asma2k_state::io_w)
 	//else printf("unknown w: %x %x\n", offset, data);
 }
 
-WRITE8_MEMBER(asma2k_state::port_a_w)
+void asma2k_state::port_a_w(uint8_t data)
 {
 	if ((m_port_a ^ data) & 0x40)
 	{
@@ -211,7 +211,7 @@ WRITE8_MEMBER(asma2k_state::port_a_w)
 		if (data & 0x40)
 			space.install_readwrite_bank(0x0000, 0x7fff, "rambank");
 		else
-			space.install_readwrite_handler(0x0000, 0x7fff, read8_delegate(*this, FUNC(asma2k_state::io_r)), write8_delegate(*this, FUNC(asma2k_state::io_w)));
+			space.install_readwrite_handler(0x0000, 0x7fff, read8sm_delegate(*this, FUNC(asma2k_state::io_r)), write8sm_delegate(*this, FUNC(asma2k_state::io_w)));
 	}
 
 	m_rambank->set_entry(((data>>4) & 0x03));

@@ -29,40 +29,40 @@ void tank8_state::machine_reset()
 }
 
 
-READ8_MEMBER(tank8_state::collision_r)
+uint8_t tank8_state::collision_r()
 {
 	return m_collision_index;
 }
 
-WRITE8_MEMBER(tank8_state::lockout_w)
+void tank8_state::lockout_w(offs_t offset, uint8_t data)
 {
 	machine().bookkeeping().coin_lockout_w(offset, ~data & 1);
 }
 
 
-WRITE8_MEMBER(tank8_state::int_reset_w)
+void tank8_state::int_reset_w(uint8_t data)
 {
 	m_collision_index &= ~0x3f;
 
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(tank8_state::crash_w)
+void tank8_state::crash_w(uint8_t data)
 {
 	m_discrete->write(TANK8_CRASH_EN, data);
 }
 
-WRITE8_MEMBER(tank8_state::explosion_w)
+void tank8_state::explosion_w(uint8_t data)
 {
 	m_discrete->write(TANK8_EXPLOSION_EN, data);
 }
 
-WRITE8_MEMBER(tank8_state::bugle_w)
+void tank8_state::bugle_w(uint8_t data)
 {
 	m_discrete->write(TANK8_BUGLE_EN, data);
 }
 
-WRITE8_MEMBER(tank8_state::bug_w)
+void tank8_state::bug_w(uint8_t data)
 {
 	/* D0 and D1 determine the on/off time off the square wave */
 	switch(data & 3) {
@@ -86,12 +86,12 @@ WRITE8_MEMBER(tank8_state::bug_w)
 
 }
 
-WRITE8_MEMBER(tank8_state::attract_w)
+void tank8_state::attract_w(uint8_t data)
 {
 	m_discrete->write(TANK8_ATTRACT_EN, data);
 }
 
-WRITE8_MEMBER(tank8_state::motor_w)
+void tank8_state::motor_w(offs_t offset, uint8_t data)
 {
 	m_discrete->write(NODE_RELATIVE(TANK8_MOTOR1_EN, offset), data);
 }

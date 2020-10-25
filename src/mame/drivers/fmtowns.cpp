@@ -321,7 +321,7 @@ void towns_state::init_serial_rom()
 	m_towns_serial_rom[25] = 0x10;
 }
 
-READ8_MEMBER(towns_state::towns_system_r)
+uint8_t towns_state::towns_system_r(offs_t offset)
 {
 	uint8_t ret = 0;
 
@@ -366,7 +366,7 @@ READ8_MEMBER(towns_state::towns_system_r)
 	}
 }
 
-WRITE8_MEMBER(towns_state::towns_system_w)
+void towns_state::towns_system_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -400,7 +400,7 @@ WRITE8_MEMBER(towns_state::towns_system_w)
 	}
 }
 
-WRITE8_MEMBER(towns_state::towns_intervaltimer2_w)
+void towns_state::towns_intervaltimer2_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -418,7 +418,7 @@ WRITE8_MEMBER(towns_state::towns_intervaltimer2_w)
 	}
 }
 
-READ8_MEMBER(towns_state::towns_intervaltimer2_r)
+uint8_t towns_state::towns_intervaltimer2_r(offs_t offset)
 {
 	uint8_t ret = 0;
 
@@ -481,13 +481,13 @@ void towns_state::wait_end()
 	m_maincpu->set_input_line(INPUT_LINE_HALT,CLEAR_LINE);
 }
 
-READ8_MEMBER(towns_state::towns_sys6c_r)
+uint8_t towns_state::towns_sys6c_r()
 {
 	if(LOG_SYS) logerror("SYS: (0x6c) Timer? read\n");
 	return 0x00;
 }
 
-WRITE8_MEMBER(towns_state::towns_sys6c_w)
+void towns_state::towns_sys6c_w(uint8_t data)
 {
 	// halts the CPU for 1 microsecond
 	m_maincpu->set_input_line(INPUT_LINE_HALT,ASSERT_LINE);
@@ -495,14 +495,14 @@ WRITE8_MEMBER(towns_state::towns_sys6c_w)
 }
 
 template<int Chip>
-READ8_MEMBER(towns_state::towns_dma_r)
+uint8_t towns_state::towns_dma_r(offs_t offset)
 {
 	logerror("DMA#%01x: read register %i\n",Chip,offset);
 	return m_dma[Chip]->read(offset);
 }
 
 template<int Chip>
-WRITE8_MEMBER(towns_state::towns_dma_w)
+void towns_state::towns_dma_w(offs_t offset, uint8_t data)
 {
 	logerror("DMA#%01x: wrote 0x%02x to register %i\n",Chip,data,offset);
 	m_dma[Chip]->write(offset, data);
@@ -525,7 +525,7 @@ WRITE_LINE_MEMBER( towns_state::mb8877a_drq_w )
 	m_dma[0]->dmarq(state, 0);
 }
 
-READ8_MEMBER(towns_state::towns_floppy_r)
+uint8_t towns_state::towns_floppy_r(offs_t offset)
 {
 	uint8_t ret;
 
@@ -576,7 +576,7 @@ READ8_MEMBER(towns_state::towns_floppy_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(towns_state::towns_floppy_w)
+void towns_state::towns_floppy_w(offs_t offset, uint8_t data)
 {
 	floppy_image_device* sel[4] = { m_flop[0]->get_device(), m_flop[1]->get_device(), nullptr, nullptr };
 
@@ -656,12 +656,12 @@ WRITE8_MEMBER(towns_state::towns_floppy_w)
 	}
 }
 
-READ16_MEMBER(towns_state::towns_fdc_dma_r)
+uint16_t towns_state::towns_fdc_dma_r()
 {   uint16_t data = m_fdc->data_r();
 	return data;
 }
 
-WRITE16_MEMBER(towns_state::towns_fdc_dma_w)
+void towns_state::towns_fdc_dma_w(uint16_t data)
 {
 	m_fdc->data_w(data);
 }
@@ -748,7 +748,7 @@ void towns_state::poll_keyboard()
 	}
 }
 
-READ8_MEMBER(towns_state::towns_keyboard_r)
+uint8_t towns_state::towns_keyboard_r(offs_t offset)
 {
 	uint8_t ret = 0x00;
 
@@ -775,7 +775,7 @@ READ8_MEMBER(towns_state::towns_keyboard_r)
 	return 0x00;
 }
 
-WRITE8_MEMBER(towns_state::towns_keyboard_w)
+void towns_state::towns_keyboard_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -815,7 +815,7 @@ void towns_state::speaker_set_spkrdata(uint8_t data)
 }
 
 
-READ8_MEMBER(towns_state::towns_port60_r)
+uint8_t towns_state::towns_port60_r()
 {
 	uint8_t val = 0x00;
 
@@ -830,7 +830,7 @@ READ8_MEMBER(towns_state::towns_port60_r)
 	return val;
 }
 
-WRITE8_MEMBER(towns_state::towns_port60_w)
+void towns_state::towns_port60_w(uint8_t data)
 {
 	if(data & 0x80)
 	{
@@ -845,7 +845,7 @@ WRITE8_MEMBER(towns_state::towns_port60_w)
 	//logerror("PIT: wrote 0x%02x to port 0x60\n",data);
 }
 
-READ8_MEMBER(towns_state::towns_sys5e8_r)
+uint8_t towns_state::towns_sys5e8_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -859,7 +859,7 @@ READ8_MEMBER(towns_state::towns_sys5e8_r)
 	return 0x00;
 }
 
-WRITE8_MEMBER(towns_state::towns_sys5e8_w)
+void towns_state::towns_sys5e8_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -878,7 +878,7 @@ WRITE8_MEMBER(towns_state::towns_sys5e8_w)
 // (0x4ea) PCM IRQ mask
 // R/W  -- (0x4eb) PCM IRQ flag
 // W/O  -- (0x4ec) LED control
-READ8_MEMBER(towns_state::towns_sound_ctrl_r)
+uint8_t towns_state::towns_sound_ctrl_r(offs_t offset)
 {
 	uint8_t ret = 0;
 
@@ -912,7 +912,7 @@ READ8_MEMBER(towns_state::towns_sound_ctrl_r)
 	return ret;
 }
 
-WRITE8_MEMBER(towns_state::towns_sound_ctrl_w)
+void towns_state::towns_sound_ctrl_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -931,7 +931,7 @@ void towns_state::mouse_timeout()
 	m_towns_mouse_output = MOUSE_START;  // reset mouse data
 }
 
-READ8_MEMBER(towns_state::towns_padport_r)
+uint8_t towns_state::towns_padport_r(offs_t offset)
 {
 	uint8_t ret = 0x00;
 	uint32_t porttype = m_ctrltype->read();
@@ -1118,7 +1118,7 @@ READ8_MEMBER(towns_state::towns_padport_r)
 	return ret;
 }
 
-WRITE8_MEMBER(towns_state::towns_pad_mask_w)
+void towns_state::towns_pad_mask_w(uint8_t data)
 {
 	uint8_t current_x,current_y;
 	uint32_t type = m_ctrltype->read();
@@ -1198,7 +1198,7 @@ WRITE8_MEMBER(towns_state::towns_pad_mask_w)
 	}
 }
 
-READ8_MEMBER( towns_state::towns_cmos_low_r )
+uint8_t towns_state::towns_cmos_low_r(offs_t offset)
 {
 	if(m_towns_mainmem_enable != 0)
 		return m_ram->pointer()[offset + 0xd8000];
@@ -1209,7 +1209,7 @@ READ8_MEMBER( towns_state::towns_cmos_low_r )
 		return m_nvram16[offset];
 }
 
-WRITE8_MEMBER( towns_state::towns_cmos_low_w )
+void towns_state::towns_cmos_low_w(offs_t offset, uint8_t data)
 {
 	if(m_towns_mainmem_enable != 0)
 		m_ram->pointer()[offset+0xd8000] = data;
@@ -1220,7 +1220,7 @@ WRITE8_MEMBER( towns_state::towns_cmos_low_w )
 			m_nvram16[offset] = data;
 }
 
-READ8_MEMBER( towns_state::towns_cmos_r )
+uint8_t towns_state::towns_cmos_r(offs_t offset)
 {
 	if(m_nvram)
 		return m_nvram[offset];
@@ -1228,7 +1228,7 @@ READ8_MEMBER( towns_state::towns_cmos_r )
 		return m_nvram16[offset];
 }
 
-WRITE8_MEMBER( towns_state::towns_cmos_w )
+void towns_state::towns_cmos_w(offs_t offset, uint8_t data)
 {
 	if(m_nvram)
 		m_nvram[offset] = data;
@@ -1236,7 +1236,7 @@ WRITE8_MEMBER( towns_state::towns_cmos_w )
 		m_nvram16[offset] = data;
 }
 
-void towns_state::towns_update_video_banks(address_space& space)
+void towns_state::towns_update_video_banks()
 {
 	uint8_t* ROM = m_user->base();
 
@@ -1282,7 +1282,7 @@ void towns_state::towns_update_video_banks(address_space& space)
 	}
 }
 
-READ8_MEMBER( towns_state::towns_sys480_r )
+uint8_t towns_state::towns_sys480_r()
 {
 	if(m_towns_system_port & 0x02)
 		return 0x02;
@@ -1290,20 +1290,20 @@ READ8_MEMBER( towns_state::towns_sys480_r )
 		return 0x00;
 }
 
-WRITE8_MEMBER( towns_state::towns_sys480_w )
+void towns_state::towns_sys480_w(uint8_t data)
 {
 	m_towns_system_port = data;
 	m_towns_ram_enable = data & 0x02;
-	towns_update_video_banks(space);
+	towns_update_video_banks();
 }
 
-WRITE8_MEMBER( towns_state::towns_video_404_w )
+void towns_state::towns_video_404_w(uint8_t data)
 {
 	m_towns_mainmem_enable = data & 0x80;
-	towns_update_video_banks(space);
+	towns_update_video_banks();
 }
 
-READ8_MEMBER( towns_state::towns_video_404_r )
+uint8_t towns_state::towns_video_404_r()
 {
 	if(m_towns_mainmem_enable != 0)
 		return 0x80;
@@ -1734,14 +1734,14 @@ void towns_state::towns_cdrom_execute_command(cdrom_image_device* device)
 	}
 }
 
-READ16_MEMBER(towns_state::towns_cdrom_dma_r)
+uint16_t towns_state::towns_cdrom_dma_r()
 {
 	if(m_towns_cd.buffer_ptr >= 2048)
 		return 0x00;
 	return m_towns_cd.buffer[m_towns_cd.buffer_ptr++];
 }
 
-READ8_MEMBER(towns_state::towns_cdrom_r)
+uint8_t towns_state::towns_cdrom_r(offs_t offset)
 {
 	uint32_t addr = 0;
 	uint8_t ret = 0;
@@ -1901,7 +1901,7 @@ READ8_MEMBER(towns_state::towns_cdrom_r)
 	}
 }
 
-WRITE8_MEMBER(towns_state::towns_cdrom_w)
+void towns_state::towns_cdrom_w(offs_t offset, uint8_t data)
 {
 	int x;
 	switch(offset)
@@ -1963,12 +1963,12 @@ WRITE8_MEMBER(towns_state::towns_cdrom_w)
  * 0x70: Data port
  * 0x80: Register select
  */
-READ8_MEMBER(towns_state::towns_rtc_r)
+uint8_t towns_state::towns_rtc_r()
 {
 	return (m_rtc_busy ? 0 : 0x80) | m_rtc_d;
 }
 
-WRITE8_MEMBER(towns_state::towns_rtc_w)
+void towns_state::towns_rtc_w(uint8_t data)
 {
 	m_rtc->d0_w(BIT(data, 0));
 	m_rtc->d1_w(BIT(data, 1));
@@ -1976,7 +1976,7 @@ WRITE8_MEMBER(towns_state::towns_rtc_w)
 	m_rtc->d3_w(BIT(data, 3));
 }
 
-WRITE8_MEMBER(towns_state::towns_rtc_select_w)
+void towns_state::towns_rtc_select_w(uint8_t data)
 {
 	m_rtc->cs1_w(BIT(data, 7));
 	m_rtc->cs2_w(BIT(data, 7));
@@ -2012,16 +2012,6 @@ WRITE_LINE_MEMBER(towns_state::rtc_busy_w)
 }
 
 // SCSI controller - I/O ports 0xc30 and 0xc32
-READ16_MEMBER(towns_state::towns_scsi_dma_r)
-{
-	return m_scsi->fmscsi_data_r();
-}
-
-WRITE16_MEMBER(towns_state::towns_scsi_dma_w)
-{
-	m_scsi->fmscsi_data_w(data & 0xff);
-}
-
 WRITE_LINE_MEMBER(towns_state::towns_scsi_irq)
 {
 	m_pic_slave->ir0_w(state);
@@ -2046,7 +2036,7 @@ WRITE_LINE_MEMBER(towns_state::towns_scsi_drq)
 //         1 = CD-DA right channel
 //         2 = MIC
 //         3 = MODEM
-READ8_MEMBER(towns_state::towns_volume_r)
+uint8_t towns_state::towns_volume_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -2070,7 +2060,7 @@ void towns_state::cdda_db_to_gain(float db)
 	m_cdda->set_output_gain(port, gain);
 }
 
-WRITE8_MEMBER(towns_state::towns_volume_w)
+void towns_state::towns_volume_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -2094,13 +2084,13 @@ WRITE8_MEMBER(towns_state::towns_volume_w)
 	}
 }
 
-READ8_MEMBER(towns_state::unksnd_r)
+uint8_t towns_state::unksnd_r()
 {
 	return 0;
 }
 
 // some unknown ports...
-READ8_MEMBER(towns_state::towns_41ff_r)
+uint8_t towns_state::towns_41ff_r()
 {
 	logerror("I/O port 0x41ff read\n");
 	return 0x01;
@@ -2180,7 +2170,7 @@ WRITE_LINE_MEMBER( towns_state::pit2_out1_changed )
 	m_i8251->write_txc(state);
 }
 
-WRITE8_MEMBER( towns_state::towns_serial_w )
+void towns_state::towns_serial_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -2196,7 +2186,7 @@ WRITE8_MEMBER( towns_state::towns_serial_w )
 	}
 }
 
-READ8_MEMBER( towns_state::towns_serial_r )
+uint8_t towns_state::towns_serial_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -2374,6 +2364,13 @@ void towns_state::towns_io(address_map &map)
 	map(0xff80, 0xffff).rw(FUNC(towns_state::towns_video_cff80_r), FUNC(towns_state::towns_video_cff80_w));
 }
 
+void towns_state::towns_1g_io(address_map &map)
+{
+	// For the first generation FM Towns with a SCSI card slot
+	towns_io(map);
+	map(0x0c30, 0x0c37).rw(m_scsi_slot, FUNC(fmt_scsi_slot_device::read), FUNC(fmt_scsi_slot_device::write)).umask32(0x00ff00ff);
+}
+
 void towns_state::towns2_io(address_map &map)
 {
 	// For FM Towns II models with integrated SCSI controller
@@ -2469,59 +2466,59 @@ static INPUT_PORTS_START( towns )
 	PORT_START( "key1" )  // scancodes 0x00-0x1f
 	PORT_BIT(0x00000001,IP_ACTIVE_HIGH,IPT_UNUSED)
 	PORT_BIT(0x00000002,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("ESC") PORT_CODE(KEYCODE_TILDE) PORT_CHAR(27)
-	PORT_BIT(0x00000004,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("1 ! \xE3\x81\xAC") PORT_CODE(KEYCODE_1) PORT_CHAR('1')
-	PORT_BIT(0x00000008,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("2 \x22 \xE3\x81\xB5") PORT_CODE(KEYCODE_2) PORT_CHAR('2')
-	PORT_BIT(0x00000010,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("3 # \xE3\x81\x82 \xE3\x81\x81") PORT_CODE(KEYCODE_3) PORT_CHAR('3')
-	PORT_BIT(0x00000020,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("4 $ \xE3\x81\x86 \xE3\x81\x85") PORT_CODE(KEYCODE_4) PORT_CHAR('4')
-	PORT_BIT(0x00000040,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("5 % \xE3\x81\x88 \xE3\x81\x87") PORT_CODE(KEYCODE_5) PORT_CHAR('5')
-	PORT_BIT(0x00000080,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("6 & \xE3\x81\x8A \xE3\x81\x89") PORT_CODE(KEYCODE_6) PORT_CHAR('6')
-	PORT_BIT(0x00000100,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("7 ´ \xE3\x82\x84 \xE3\x82\x83") PORT_CODE(KEYCODE_7) PORT_CHAR('7')
-	PORT_BIT(0x00000200,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("8 ( \xE3\x82\x86 \xE3\x82\x85") PORT_CODE(KEYCODE_8) PORT_CHAR('8')
-	PORT_BIT(0x00000400,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("9 ) \xE3\x82\x88 \xE3\x82\x87") PORT_CODE(KEYCODE_9) PORT_CHAR('9')
+	PORT_BIT(0x00000004,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("1 ! \xE3\x81\xAC") PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
+	PORT_BIT(0x00000008,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("2 \x22 \xE3\x81\xB5") PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR(34)
+	PORT_BIT(0x00000010,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("3 # \xE3\x81\x82 \xE3\x81\x81") PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
+	PORT_BIT(0x00000020,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("4 $ \xE3\x81\x86 \xE3\x81\x85") PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
+	PORT_BIT(0x00000040,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("5 % \xE3\x81\x88 \xE3\x81\x87") PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
+	PORT_BIT(0x00000080,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("6 & \xE3\x81\x8A \xE3\x81\x89") PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
+	PORT_BIT(0x00000100,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("7 ´ \xE3\x82\x84 \xE3\x82\x83") PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR(39)
+	PORT_BIT(0x00000200,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("8 ( \xE3\x82\x86 \xE3\x82\x85") PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
+	PORT_BIT(0x00000400,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("9 ) \xE3\x82\x88 \xE3\x82\x87") PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
 	PORT_BIT(0x00000800,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("0 \xE3\x82\x8F \xE3\x82\x92") PORT_CODE(KEYCODE_0) PORT_CHAR('0')
-	PORT_BIT(0x00001000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("- = \xE3\x81\xBB") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-')
+	PORT_BIT(0x00001000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("- = \xE3\x81\xBB") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('=')
 	PORT_BIT(0x00002000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("^ \xE2\x80\xBE \xE3\x81\xB8") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('^')
-	PORT_BIT(0x00004000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("\xEF\xBF\xA5 | -") PORT_CODE(KEYCODE_BACKSLASH)
+	PORT_BIT(0x00004000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("\xEF\xBF\xA5 | -") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR(165) PORT_CHAR('|')
 	PORT_BIT(0x00008000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Backspace") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
 	PORT_BIT(0x00010000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Tab") PORT_CODE(KEYCODE_TAB) PORT_CHAR(9)
-	PORT_BIT(0x00020000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Q \xE3\x81\x9F") PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
-	PORT_BIT(0x00040000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("W \xE3\x81\xA6") PORT_CODE(KEYCODE_W) PORT_CHAR('W')
-	PORT_BIT(0x00080000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("E \xE3\x81\x84") PORT_CODE(KEYCODE_E) PORT_CHAR('E')
-	PORT_BIT(0x00100000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("R \xE3\x81\x99") PORT_CODE(KEYCODE_R) PORT_CHAR('R')
-	PORT_BIT(0x00200000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("T \xE3\x81\x8B") PORT_CODE(KEYCODE_T) PORT_CHAR('T')
-	PORT_BIT(0x00400000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Y \xE3\x82\x93") PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
-	PORT_BIT(0x00800000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("U \xE3\x81\xAA") PORT_CODE(KEYCODE_U) PORT_CHAR('U')
-	PORT_BIT(0x01000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("I \xE3\x81\xAB") PORT_CODE(KEYCODE_I) PORT_CHAR('I')
-	PORT_BIT(0x02000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("O \xE3\x82\x89") PORT_CODE(KEYCODE_O) PORT_CHAR('O')
-	PORT_BIT(0x04000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("P \xE3\x81\x9B") PORT_CODE(KEYCODE_P) PORT_CHAR('P')
-	PORT_BIT(0x08000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("@ ` \xE2\x80\x9D") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('@')
-	PORT_BIT(0x10000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("[ { \xE3\x82\x9C \xE3\x80\x8C") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('[')
-	PORT_BIT(0x20000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(27)
-	PORT_BIT(0x40000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("A \xE3\x81\xA1") PORT_CODE(KEYCODE_A) PORT_CHAR('A')
-	PORT_BIT(0x80000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("S \xE3\x81\xA8") PORT_CODE(KEYCODE_S) PORT_CHAR('S')
+	PORT_BIT(0x00020000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Q \xE3\x81\x9F") PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')
+	PORT_BIT(0x00040000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("W \xE3\x81\xA6") PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')
+	PORT_BIT(0x00080000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("E \xE3\x81\x84") PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')
+	PORT_BIT(0x00100000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("R \xE3\x81\x99") PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R')
+	PORT_BIT(0x00200000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("T \xE3\x81\x8B") PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T')
+	PORT_BIT(0x00400000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Y \xE3\x82\x93") PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')
+	PORT_BIT(0x00800000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("U \xE3\x81\xAA") PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')
+	PORT_BIT(0x01000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("I \xE3\x81\xAB") PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I')
+	PORT_BIT(0x02000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("O \xE3\x82\x89") PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O')
+	PORT_BIT(0x04000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("P \xE3\x81\x9B") PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
+	PORT_BIT(0x08000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("@ ` \xE2\x80\x9D") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('@') PORT_CHAR('`')
+	PORT_BIT(0x10000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("[ { \xE3\x82\x9C \xE3\x80\x8C") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('[') PORT_CHAR('{')
+	PORT_BIT(0x20000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
+	PORT_BIT(0x40000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("A \xE3\x81\xA1") PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')
+	PORT_BIT(0x80000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("S \xE3\x81\xA8") PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')
 
 	PORT_START( "key2" )  // scancodes 0x20-0x3f
-	PORT_BIT(0x00000001,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("D \xE3\x81\x97") PORT_CODE(KEYCODE_D) PORT_CHAR('D')
-	PORT_BIT(0x00000002,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("F \xE3\x81\xAF") PORT_CODE(KEYCODE_F) PORT_CHAR('F')
-	PORT_BIT(0x00000004,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("G \xE3\x81\x8D") PORT_CODE(KEYCODE_G) PORT_CHAR('G')
-	PORT_BIT(0x00000008,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("H \xE3\x81\x8F") PORT_CODE(KEYCODE_H) PORT_CHAR('H')
-	PORT_BIT(0x00000010,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("J \xE3\x81\xBE") PORT_CODE(KEYCODE_J) PORT_CHAR('J')
-	PORT_BIT(0x00000020,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("K \xE3\x81\xAE") PORT_CODE(KEYCODE_K) PORT_CHAR('K')
-	PORT_BIT(0x00000040,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("L \xE3\x82\x8A") PORT_CODE(KEYCODE_L) PORT_CHAR('L')
-	PORT_BIT(0x00000080,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("; + \xE3\x82\x8C") PORT_CODE(KEYCODE_COLON) PORT_CHAR(';')
-	PORT_BIT(0x00000100,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(": * \xE3\x81\x91") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(':')
-	PORT_BIT(0x00000200,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("] } \xE3\x82\x80 \xE3\x80\x8D") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR(']')
-	PORT_BIT(0x00000400,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Z \xE3\x81\xA4 \xE3\x81\xA3") PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
-	PORT_BIT(0x00000800,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("X \xE3\x81\x95") PORT_CODE(KEYCODE_X) PORT_CHAR('X')
-	PORT_BIT(0x00001000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("C \xE3\x81\x9D") PORT_CODE(KEYCODE_C) PORT_CHAR('C')
-	PORT_BIT(0x00002000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("V \xE3\x81\xB2") PORT_CODE(KEYCODE_V) PORT_CHAR('V')
-	PORT_BIT(0x00004000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("B \xE3\x81\x93") PORT_CODE(KEYCODE_B) PORT_CHAR('B')
-	PORT_BIT(0x00008000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("N \xE3\x81\xBF") PORT_CODE(KEYCODE_N) PORT_CHAR('N')
-	PORT_BIT(0x00010000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("M \xE3\x82\x82") PORT_CODE(KEYCODE_M) PORT_CHAR('M')
-	PORT_BIT(0x00020000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(", < \xE3\x81\xAD \xE3\x80\x81") PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',')
-	PORT_BIT(0x00040000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(". > \xE3\x82\x8B \xE3\x80\x82") PORT_CODE(KEYCODE_STOP) PORT_CHAR('.')
-	PORT_BIT(0x00080000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("/ ? \xE3\x82\x81 \xE3\x83\xBB") PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/')
-	PORT_BIT(0x00100000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("\x22 _ \xE3\x82\x8D")
+	PORT_BIT(0x00000001,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("D \xE3\x81\x97") PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D')
+	PORT_BIT(0x00000002,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("F \xE3\x81\xAF") PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F')
+	PORT_BIT(0x00000004,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("G \xE3\x81\x8D") PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G')
+	PORT_BIT(0x00000008,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("H \xE3\x81\x8F") PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')
+	PORT_BIT(0x00000010,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("J \xE3\x81\xBE") PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')
+	PORT_BIT(0x00000020,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("K \xE3\x81\xAE") PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')
+	PORT_BIT(0x00000040,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("L \xE3\x82\x8A") PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L')
+	PORT_BIT(0x00000080,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("; + \xE3\x82\x8C") PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR('+')
+	PORT_BIT(0x00000100,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(": * \xE3\x81\x91") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(':') PORT_CHAR('*')
+	PORT_BIT(0x00000200,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("] } \xE3\x82\x80 \xE3\x80\x8D") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR(']') PORT_CHAR('}')
+	PORT_BIT(0x00000400,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Z \xE3\x81\xA4 \xE3\x81\xA3") PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')
+	PORT_BIT(0x00000800,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("X \xE3\x81\x95") PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')
+	PORT_BIT(0x00001000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("C \xE3\x81\x9D") PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')
+	PORT_BIT(0x00002000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("V \xE3\x81\xB2") PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V')
+	PORT_BIT(0x00004000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("B \xE3\x81\x93") PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B')
+	PORT_BIT(0x00008000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("N \xE3\x81\xBF") PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')
+	PORT_BIT(0x00010000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("M \xE3\x82\x82") PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')
+	PORT_BIT(0x00020000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(", < \xE3\x81\xAD \xE3\x80\x81") PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
+	PORT_BIT(0x00040000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(". > \xE3\x82\x8B \xE3\x80\x82") PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
+	PORT_BIT(0x00080000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("/ ? \xE3\x82\x81 \xE3\x83\xBB") PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
+	PORT_BIT(0x00100000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("\x22 _ \xE3\x82\x8D") PORT_CHAR('"') PORT_CHAR('_')
 	PORT_BIT(0x00200000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
 	PORT_BIT(0x00400000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Tenkey *") PORT_CODE(KEYCODE_ASTERISK)
 	PORT_BIT(0x00800000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Tenkey /") PORT_CODE(KEYCODE_SLASH_PAD)
@@ -2548,13 +2545,13 @@ static INPUT_PORTS_START( towns )
 	PORT_BIT(0x00000400,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Tenkey 000") PORT_CODE(KEYCODE_000_PAD)
 	PORT_BIT(0x00000800,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("\xE5\x89\x8A\xE9\x99\xA4 (Delete) / EL") PORT_CODE(KEYCODE_DEL)
 	PORT_BIT(0x00001000,IP_ACTIVE_HIGH,IPT_UNUSED)
-	PORT_BIT(0x00002000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP)
+	PORT_BIT(0x00002000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
 	PORT_BIT(0x00004000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("HOME") PORT_CODE(KEYCODE_HOME)
-	PORT_BIT(0x00008000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT)
-	PORT_BIT(0x00010000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN)
-	PORT_BIT(0x00020000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT)
+	PORT_BIT(0x00008000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT(0x00010000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT(0x00020000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 	PORT_BIT(0x00040000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LCONTROL)
-	PORT_BIT(0x00080000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT)
+	PORT_BIT(0x00080000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x00100000,IP_ACTIVE_HIGH,IPT_UNUSED)
 	PORT_BIT(0x00200000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("CAP") PORT_CODE(KEYCODE_CAPSLOCK)
 	PORT_BIT(0x00400000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("\xE3\x81\xB2\xE3\x82\x89\xE3\x81\x8C\xE3\x81\xAA (Hiragana) / \xE3\x83\xAD\xE3\x83\xBC\xE3\x83\x9E\xE5\xAD\x97 (Romaji)") PORT_CODE(KEYCODE_RCONTROL)
@@ -2562,23 +2559,23 @@ static INPUT_PORTS_START( towns )
 	PORT_BIT(0x01000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("\xE5\xA4\x89\xE6\x8F\x9B (Conversion)")
 	PORT_BIT(0x02000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("\xE3\x81\x8B\xE3\x81\xAA\xE6\xBC\xA2\xE5\xAD\x97 (Kana Kanji)") PORT_CODE(KEYCODE_RALT)
 	PORT_BIT(0x04000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("\xE3\x82\xAB\xE3\x82\xBF\xE3\x82\xAB\xE3\x83\x8A (Katakana)") PORT_CODE(KEYCODE_RWIN)
-	PORT_BIT(0x08000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF12") PORT_CODE(KEYCODE_F12)
+	PORT_BIT(0x08000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF12") PORT_CODE(KEYCODE_F12) PORT_CHAR(UCHAR_MAMEKEY(F12))
 	PORT_BIT(0x10000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("ALT") PORT_CODE(KEYCODE_LALT)
-	PORT_BIT(0x20000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF1") PORT_CODE(KEYCODE_F1)
-	PORT_BIT(0x40000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF2") PORT_CODE(KEYCODE_F2)
-	PORT_BIT(0x80000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF3") PORT_CODE(KEYCODE_F3)
+	PORT_BIT(0x20000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF1") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))
+	PORT_BIT(0x40000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF2") PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2))
+	PORT_BIT(0x80000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF3") PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F3))
 
 	PORT_START("key4")
-	PORT_BIT(0x00000001,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF4") PORT_CODE(KEYCODE_F4)
-	PORT_BIT(0x00000002,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF5") PORT_CODE(KEYCODE_F5)
-	PORT_BIT(0x00000004,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF6") PORT_CODE(KEYCODE_F6)
-	PORT_BIT(0x00000008,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF7") PORT_CODE(KEYCODE_F7)
-	PORT_BIT(0x00000010,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF8") PORT_CODE(KEYCODE_F8)
-	PORT_BIT(0x00000020,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF9") PORT_CODE(KEYCODE_F9)
-	PORT_BIT(0x00000040,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF10") PORT_CODE(KEYCODE_F10)
+	PORT_BIT(0x00000001,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF4") PORT_CODE(KEYCODE_F4) PORT_CHAR(UCHAR_MAMEKEY(F4))
+	PORT_BIT(0x00000002,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF5") PORT_CODE(KEYCODE_F5) PORT_CHAR(UCHAR_MAMEKEY(F5))
+	PORT_BIT(0x00000004,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF6") PORT_CODE(KEYCODE_F6) PORT_CHAR(UCHAR_MAMEKEY(F6))
+	PORT_BIT(0x00000008,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF7") PORT_CODE(KEYCODE_F7) PORT_CHAR(UCHAR_MAMEKEY(F7))
+	PORT_BIT(0x00000010,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF8") PORT_CODE(KEYCODE_F8) PORT_CHAR(UCHAR_MAMEKEY(F8))
+	PORT_BIT(0x00000020,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF9") PORT_CODE(KEYCODE_F9) PORT_CHAR(UCHAR_MAMEKEY(F9))
+	PORT_BIT(0x00000040,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF10") PORT_CODE(KEYCODE_F10) PORT_CHAR(UCHAR_MAMEKEY(F10))
 	PORT_BIT(0x00000080,IP_ACTIVE_HIGH,IPT_UNUSED)
 	PORT_BIT(0x00000100,IP_ACTIVE_HIGH,IPT_UNUSED)
-	PORT_BIT(0x00000200,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF11") PORT_CODE(KEYCODE_F11)
+	PORT_BIT(0x00000200,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF11") PORT_CODE(KEYCODE_F11) PORT_CHAR(UCHAR_MAMEKEY(F11))
 	PORT_BIT(0x00000400,IP_ACTIVE_HIGH,IPT_UNUSED)
 	PORT_BIT(0x00000800,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("\xE6\xBC\xA2\xE5\xAD\x97\xE8\xBE\x9E\xE6\x9B\xB8 (Kanji Dictionary)")
 	PORT_BIT(0x00001000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("\xE5\x8D\x98\xE8\xAA\x9E\xE6\x8A\xB9\xE6\xB6\x88 (Word Deletion)")
@@ -2752,7 +2749,6 @@ void towns_state::machine_start()
 
 void towns_state::machine_reset()
 {
-	address_space &program = m_maincpu->space(AS_PROGRAM);
 	m_ftimer = 0x00;
 	m_freerun_timer = 0x00;
 	m_nmi_mask = 0x00;
@@ -2761,7 +2757,7 @@ void towns_state::machine_reset()
 	m_towns_mainmem_enable = 0x00;
 	m_towns_system_port = 0x00;
 	m_towns_ram_enable = 0x00;
-	towns_update_video_banks(program);
+	towns_update_video_banks();
 	m_towns_kb_status = 0x18;
 	m_towns_kb_irq1_enable = 0;
 	m_towns_pad_mask = 0x7f;
@@ -2783,7 +2779,7 @@ void towns_state::machine_reset()
 	m_towns_fm_irq_flag = 0;
 }
 
-READ8_MEMBER(towns_state::get_slave_ack)
+uint8_t towns_state::get_slave_ack(offs_t offset)
 {
 	if (offset==7) { // IRQ = 7
 		return m_pic_slave->acknowledge();
@@ -2832,7 +2828,7 @@ void towns_state::towns_base(machine_config &config)
 	/* basic machine hardware */
 	I386(config, m_maincpu, 16000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &towns_state::towns_mem);
-	m_maincpu->set_addrmap(AS_IO, &towns_state::towns_io);
+	m_maincpu->set_addrmap(AS_IO, &towns_state::towns_1g_io);
 	m_maincpu->set_vblank_int("screen", FUNC(towns_state::towns_vsync_irq));
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 	//MCFG_MACHINE_RESET_OVERRIDE(towns_state,towns)
@@ -2961,6 +2957,15 @@ void towns_state::towns(machine_config &config)
 {
 	towns_base(config);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	FMT_SCSI_SLOT(config, m_scsi_slot, fmt_scsi_default_devices, nullptr);
+	m_scsi_slot->irq_handler().set(FUNC(towns_state::towns_scsi_irq));
+	m_scsi_slot->drq_handler().set(FUNC(towns_state::towns_scsi_drq));
+
+	m_dma[0]->dma_read_callback<1>().set(m_scsi_slot, FUNC(fmt_scsi_slot_device::data_read));
+	m_dma[0]->dma_write_callback<1>().set(m_scsi_slot, FUNC(fmt_scsi_slot_device::data_write));
+	m_dma[1]->dma_read_callback<1>().set(m_scsi_slot, FUNC(fmt_scsi_slot_device::data_read));
+	m_dma[1]->dma_write_callback<1>().set(m_scsi_slot, FUNC(fmt_scsi_slot_device::data_write));
 }
 
 void towns16_state::townsux(machine_config &config)
@@ -2985,10 +2990,10 @@ void towns16_state::townsux(machine_config &config)
 	m_scsi->irq_handler().set(FUNC(towns16_state::towns_scsi_irq));
 	m_scsi->drq_handler().set(FUNC(towns16_state::towns_scsi_drq));
 
-	m_dma[0]->dma_read_callback<1>().set(FUNC(towns16_state::towns_scsi_dma_r));
-	m_dma[0]->dma_write_callback<1>().set(FUNC(towns16_state::towns_scsi_dma_w));
-	m_dma[1]->dma_read_callback<1>().set(FUNC(towns16_state::towns_scsi_dma_r));
-	m_dma[1]->dma_write_callback<1>().set(FUNC(towns16_state::towns_scsi_dma_w));
+	m_dma[0]->dma_read_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_r));
+	m_dma[0]->dma_write_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_w));
+	m_dma[1]->dma_read_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_r));
+	m_dma[1]->dma_write_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_w));
 
 	// 2 MB onboard, one SIMM slot with 2-8 MB
 	m_ram->set_default_size("2M").set_extra_options("4M,6M,10M");
@@ -2998,7 +3003,7 @@ void towns16_state::townsux(machine_config &config)
 
 void towns_state::townssj(machine_config &config)
 {
-	towns(config);
+	towns_base(config);
 
 	I486(config.replace(), m_maincpu, 66000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &towns_state::towns_mem);
@@ -3018,13 +3023,15 @@ void towns_state::townssj(machine_config &config)
 	m_scsi->irq_handler().set(FUNC(towns_state::towns_scsi_irq));
 	m_scsi->drq_handler().set(FUNC(towns_state::towns_scsi_drq));
 
-	m_dma[0]->dma_read_callback<1>().set(FUNC(towns_state::towns_scsi_dma_r));
-	m_dma[0]->dma_write_callback<1>().set(FUNC(towns_state::towns_scsi_dma_w));
-	m_dma[1]->dma_read_callback<1>().set(FUNC(towns_state::towns_scsi_dma_r));
-	m_dma[1]->dma_write_callback<1>().set(FUNC(towns_state::towns_scsi_dma_w));
+	m_dma[0]->dma_read_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_r));
+	m_dma[0]->dma_write_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_w));
+	m_dma[1]->dma_read_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_r));
+	m_dma[1]->dma_write_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_w));
 
 	// 4 MB (SJ2/SJ2A) or 8 MB (SJ26/SJ53) onboard, 2 SIMM slots with 4-32 MB each
 	m_ram->set_default_size("8M").set_extra_options("4M,12M,16M,20M,24M,28M,32M,36M,40M,44M,48M,52M,56M,68M,72M");
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 }
 
 void towns_state::townshr(machine_config &config)

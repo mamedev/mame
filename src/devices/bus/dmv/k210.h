@@ -38,12 +38,12 @@ protected:
 	virtual void io_write(int ifsel, offs_t offset, uint8_t data) override;
 
 private:
-	DECLARE_READ8_MEMBER(porta_r);
-	DECLARE_READ8_MEMBER(portb_r);
-	DECLARE_READ8_MEMBER(portc_r);
-	DECLARE_WRITE8_MEMBER(porta_w);
-	DECLARE_WRITE8_MEMBER(portb_w);
-	DECLARE_WRITE8_MEMBER(portc_w);
+	uint8_t porta_r();
+	uint8_t portb_r();
+	uint8_t portc_r();
+	void porta_w(uint8_t data);
+	void portb_w(uint8_t data);
+	void portc_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(cent_ack_w);
 	DECLARE_WRITE_LINE_MEMBER(cent_busy_w);

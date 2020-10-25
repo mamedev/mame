@@ -90,7 +90,6 @@ Graphics: CY37256P160-83AC x 2 (Ultra37000 CPLD family - 160 pin TQFP, 256 Macro
 #include "machine/eepromser.h"
 #include "machine/watchdog.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 
@@ -112,7 +111,7 @@ Graphics: CY37256P160-83AC x 2 (Ultra37000 CPLD family - 160 pin TQFP, 256 Macro
  *
  *************************************/
 
-WRITE8_MEMBER(_20pacgal_state::irqack_w)
+void _20pacgal_state::irqack_w(uint8_t data)
 {
 	m_irq_mask = data & 1;
 
@@ -120,7 +119,7 @@ WRITE8_MEMBER(_20pacgal_state::irqack_w)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(_20pacgal_state::timer_pulse_w)
+void _20pacgal_state::timer_pulse_w(uint8_t data)
 {
 	//printf("timer pulse %02x\n", data);
 }
@@ -131,7 +130,7 @@ WRITE8_MEMBER(_20pacgal_state::timer_pulse_w)
  *
  *************************************/
 
-WRITE8_MEMBER(_20pacgal_state::_20pacgal_coin_counter_w)
+void _20pacgal_state::_20pacgal_coin_counter_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 }
@@ -144,7 +143,7 @@ WRITE8_MEMBER(_20pacgal_state::_20pacgal_coin_counter_w)
  *
  *************************************/
 
-WRITE8_MEMBER(_20pacgal_state::ram_bank_select_w)
+void _20pacgal_state::ram_bank_select_w(uint8_t data)
 {
 	if (m_game_selected != (data & 1))
 	{
@@ -154,7 +153,7 @@ WRITE8_MEMBER(_20pacgal_state::ram_bank_select_w)
 	}
 }
 
-WRITE8_MEMBER(_20pacgal_state::ram_48000_w)
+void _20pacgal_state::ram_48000_w(offs_t offset, uint8_t data)
 {
 	if (m_game_selected)
 	{
@@ -171,17 +170,17 @@ WRITE8_MEMBER(_20pacgal_state::ram_48000_w)
  *
  *************************************/
 
-WRITE8_MEMBER(_20pacgal_state::sprite_gfx_w)
+void _20pacgal_state::sprite_gfx_w(offs_t offset, uint8_t data)
 {
 	m_sprite_gfx_ram[offset] = data;
 }
 
-WRITE8_MEMBER(_20pacgal_state::sprite_ram_w)
+void _20pacgal_state::sprite_ram_w(offs_t offset, uint8_t data)
 {
 	m_sprite_ram[offset] = data;
 }
 
-WRITE8_MEMBER(_20pacgal_state::sprite_lookup_w)
+void _20pacgal_state::sprite_lookup_w(offs_t offset, uint8_t data)
 {
 	m_sprite_color_lookup[offset] = data;
 }
@@ -233,7 +232,7 @@ void _20pacgal_state::_20pacgal_map(address_map &map)
  *
  *************************************/
 
-READ8_MEMBER( _25pacman_state::_25pacman_io_87_r )
+uint8_t _25pacman_state::_25pacman_io_87_r()
 {
 	return 0xff;
 }
@@ -418,9 +417,6 @@ void _20pacgal_state::_20pacgal(machine_config &config)
 	namco.add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void _25pacman_state::_25pacman(machine_config &config)

@@ -102,17 +102,17 @@ TODO:
 #define MCU_CLOCK           (XTAL(12'000'000)/4)
 
 
-WRITE8_MEMBER(lkage_state::lkage_sh_nmi_disable_w)
+void lkage_state::lkage_sh_nmi_disable_w(uint8_t data)
 {
 	m_soundnmi->in_w<1>(0);
 }
 
-WRITE8_MEMBER(lkage_state::lkage_sh_nmi_enable_w)
+void lkage_state::lkage_sh_nmi_enable_w(uint8_t data)
 {
 	m_soundnmi->in_w<1>(1);
 }
 
-READ8_MEMBER(lkage_state::sound_status_r)
+uint8_t lkage_state::sound_status_r()
 {
 	return 0xff;
 }
@@ -155,7 +155,7 @@ void lkage_state::lkage_map_boot(address_map &map)
 }
 
 
-READ8_MEMBER(lkage_state::port_fetch_r)
+uint8_t lkage_state::port_fetch_r(offs_t offset)
 {
 	return memregion("user1")->base()[offset];
 }
@@ -731,6 +731,24 @@ ROM_START( lkageb3 )
 	ROM_LOAD( "a54-10.2",    0x0000, 0x0200, CRC(17dfbd14) SHA1(f8f0b6dfedd4ba108dad43ccc7697ef4ab9cbf86) ) /* unknown */
 ROM_END
 
+ROM_START( lkageb4 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.ic37",      0x0000, 0x8000, CRC(fa20e863) SHA1(0edba6014e8d7cdd7f6ad1bb5eb65338a3a91243) )
+	ROM_LOAD( "2.ic38",      0x8000, 0x8000, CRC(a5bdd3b4) SHA1(4f691ea8b75fae0dd92f827998e97e40791d24b2) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "4.ic54",   0x0000, 0x8000, CRC(541faf9a) SHA1(b142ff3bd198f700697ec06ea92db3109ab5818e) )
+
+	ROM_REGION( 0x4000, "user1", 0 )
+	ROM_LOAD( "a54-03.51",   0x0000, 0x4000, CRC(493e76d8) SHA1(13c6160edd94ba2801fd89bb33bcae3a1e3454ff) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "5.ic84", 0x0000, 0x4000, CRC(0033c06a) SHA1(89964503fc338817c6511fd15942741996b7037a) )
+	ROM_LOAD( "6.ic85", 0x4000, 0x4000, CRC(9f04d9ad) SHA1(3b9a4d30348fd02e5c8ae94655548bd4a02dd65d) )
+	ROM_LOAD( "7.ic86", 0x8000, 0x4000, CRC(b20561a4) SHA1(0d6d83dfae79ea133e37704ca47426b4c978fb36) )
+	ROM_LOAD( "8.ic87", 0xc000, 0x4000, CRC(3ff3b230) SHA1(ffcd964efb0af32b5d7a70305dfda615ea95acbe) )
+ROM_END
+
 /*
 Bygone
 Taito, 1985?
@@ -846,7 +864,7 @@ ROM_START( bygone )
 ROM_END
 
 
-READ8_MEMBER(lkage_state::mcu_status_r)
+uint8_t lkage_state::mcu_status_r()
 {
 	// bit 0 = when 1, MCU is ready to receive data from main CPU
 	// bit 1 = when 1, MCU has sent data to the main CPU
@@ -857,7 +875,7 @@ READ8_MEMBER(lkage_state::mcu_status_r)
 
 // Note: This probably uses another MCU program, which is undumped.
 
-READ8_MEMBER(lkage_state::fake_mcu_r)
+uint8_t lkage_state::fake_mcu_r()
 {
 	int result = 0;
 
@@ -892,12 +910,12 @@ READ8_MEMBER(lkage_state::fake_mcu_r)
 	return result;
 }
 
-WRITE8_MEMBER(lkage_state::fake_mcu_w)
+void lkage_state::fake_mcu_w(uint8_t data)
 {
 	m_mcu_val = data;
 }
 
-READ8_MEMBER(lkage_state::fake_status_r)
+uint8_t lkage_state::fake_status_r()
 {
 	return m_mcu_ready;
 }
@@ -919,4 +937,5 @@ GAME( 1984, lkageoo, lkage, lkage,  lkage,  lkage_state, init_lkage,  ROT0, "Tai
 GAME( 1984, lkageb,  lkage, lkageb, lkageb, lkage_state, init_lkage,  ROT0, "bootleg",           "The Legend of Kage (bootleg set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, lkageb2, lkage, lkageb, lkageb, lkage_state, init_lkage,  ROT0, "bootleg",           "The Legend of Kage (bootleg set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, lkageb3, lkage, lkageb, lkageb, lkage_state, init_lkage,  ROT0, "bootleg",           "The Legend of Kage (bootleg set 3)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkageb4, lkage, lkageb, lkageb, lkage_state, init_lkage,  ROT0, "bootleg",           "The Legend of Kage (bootleg set 4)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, bygone,  0,     lkage,  bygone, lkage_state, init_bygone, ROT0, "Taito Corporation", "Bygone (prototype)",                 MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

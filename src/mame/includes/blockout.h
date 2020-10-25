@@ -41,8 +41,8 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_WRITE_LINE_MEMBER(irq_handler);
-	DECLARE_WRITE16_MEMBER(blockout_irq6_ack_w);
-	DECLARE_WRITE16_MEMBER(blockout_irq5_ack_w);
+	void blockout_irq6_ack_w(uint16_t data);
+	void blockout_irq5_ack_w(uint16_t data);
 	void frontcolor_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u8 videoram_r(offs_t offset);
 	void videoram_w(offs_t offset, u8 data);

@@ -394,10 +394,10 @@ u32 igs011_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 
 #ifdef MAME_DEBUG
 			if ((layer_enable != -1) && (pri_addr == 0xff))
-				bitmap.pix16(y, x) = m_palette->black_pen();
+				bitmap.pix(y, x) = m_palette->black_pen();
 			else
 #endif
-				bitmap.pix16(y, x) = m_layer[l][scr_addr] | (l << 8);
+				bitmap.pix(y, x) = m_layer[l][scr_addr] | (l << 8);
 		}
 	}
 	return 0;
@@ -1215,7 +1215,7 @@ void igs011_state::prot_mem_range_set()
 	sp.install_read_handler (m_prot1_addr + 8, m_prot1_addr + 9, read16smo_delegate(*this, FUNC(igs011_state::igs011_prot1_r)));
 }
 /*
-READ16_MEMBER(igs011_state::igs011_prot_fake_r)
+u16 igs011_state::igs011_prot_fake_r(offs_t offset)
 {
     switch (offset)
     {
@@ -1429,7 +1429,7 @@ void igs011_state::igs012_prot_reset_w(u16 data)
 	m_igs012_prot_mode = 0;
 }
 /*
-READ16_MEMBER(igs011_state::igs012_prot_fake_r)
+u16 igs011_state::igs012_prot_fake_r(offs_t offset)
 {
     switch (offset)
     {

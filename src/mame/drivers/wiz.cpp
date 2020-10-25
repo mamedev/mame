@@ -264,14 +264,14 @@ static DISCRETE_SOUND_START(stinger_discrete)
 
 DISCRETE_SOUND_END
 
-WRITE8_MEMBER(wiz_state::stinger_explosion_w)
+void wiz_state::stinger_explosion_w(uint8_t data)
 {
 	// explosion sound trigger(analog?)
 	m_discrete->write(STINGER_BOOM_EN1, m_dsc1);
 	m_discrete->write(STINGER_BOOM_EN2, m_dsc1^=1);
 }
 
-WRITE8_MEMBER(wiz_state::stinger_shot_w)
+void wiz_state::stinger_shot_w(uint8_t data)
 {
 	// player shot sound trigger(analog?)
 	m_discrete->write(STINGER_SHOT_EN1, m_dsc0);
@@ -286,7 +286,7 @@ WRITE8_MEMBER(wiz_state::stinger_shot_w)
 
 ***************************************************************************/
 
-READ8_MEMBER(wiz_state::wiz_protection_r)
+uint8_t wiz_state::wiz_protection_r()
 {
 	switch (m_colorram2[0])
 	{
@@ -298,12 +298,12 @@ READ8_MEMBER(wiz_state::wiz_protection_r)
 	return m_colorram2[0];
 }
 
-WRITE8_MEMBER(wiz_state::wiz_coin_counter_w)
+void wiz_state::wiz_coin_counter_w(offs_t offset, uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(offset, data & 1);
 }
 
-WRITE8_MEMBER(wiz_state::wiz_main_nmi_mask_w)
+void wiz_state::wiz_main_nmi_mask_w(uint8_t data)
 {
 	m_main_nmi_mask = data & 1;
 }
@@ -359,7 +359,7 @@ void wiz_state::stinger_main_map(address_map &map)
 
 /**************************************************************************/
 
-WRITE8_MEMBER(wiz_state::wiz_sound_nmi_mask_w)
+void wiz_state::wiz_sound_nmi_mask_w(uint8_t data)
 {
 	m_sound_nmi_mask = data & 1;
 }

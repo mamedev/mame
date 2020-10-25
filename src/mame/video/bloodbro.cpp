@@ -77,19 +77,19 @@ void bloodbro_state::video_start()
 
 ***************************************************************************/
 
-WRITE16_MEMBER(bloodbro_state::bgvideoram_w)
+void bloodbro_state::bgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bgvideoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(bloodbro_state::fgvideoram_w)
+void bloodbro_state::fgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fgvideoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(bloodbro_state::txvideoram_w)
+void bloodbro_state::txvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_txvideoram[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);

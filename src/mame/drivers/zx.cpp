@@ -39,7 +39,7 @@
     - h4th and tree4th need their address maps worked out (eg, the stack is set to FB80)
     - lambda/pow3000 joystick, connected in parallel with the 4,R,F,7,U keys, but the directions are unknown.
     - Many games don't work.
-    - sets z80, lambda. pc8300, pow3000 all fail to show text.
+    - sets zx80, lambda. pc8300, pow3000 all fail to show text.
 
 ****************************************************************************/
 

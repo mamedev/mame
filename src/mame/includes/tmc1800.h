@@ -59,9 +59,9 @@ public:
 		, m_vdc(*this, CDP1861_TAG)
 	{ }
 
-	DECLARE_WRITE8_MEMBER( keylatch_w );
-	DECLARE_READ8_MEMBER( dispon_r );
-	DECLARE_WRITE8_MEMBER( dispoff_w );
+	void keylatch_w(uint8_t data);
+	uint8_t dispon_r();
+	void dispoff_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER( clear_r );
 	DECLARE_READ_LINE_MEMBER( ef2_r );
 	DECLARE_READ_LINE_MEMBER( ef3_r );
@@ -94,7 +94,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE8_MEMBER( keylatch_w );
+	void keylatch_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER( clear_r );
 	DECLARE_READ_LINE_MEMBER( ef2_r );
 	DECLARE_READ_LINE_MEMBER( ef3_r );
@@ -124,13 +124,13 @@ public:
 		, m_led(*this, "led1")
 	{ }
 
-	DECLARE_WRITE8_MEMBER( keylatch_w );
-	DECLARE_WRITE8_MEMBER( bankswitch_w );
+	void keylatch_w(uint8_t data);
+	void bankswitch_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER( clear_r );
 	DECLARE_READ_LINE_MEMBER( ef2_r );
 	DECLARE_READ_LINE_MEMBER( ef3_r );
 	DECLARE_WRITE_LINE_MEMBER( q_w );
-	DECLARE_WRITE8_MEMBER( dma_w );
+	void dma_w(offs_t offset, uint8_t data);
 	DECLARE_READ_LINE_MEMBER( rdata_r );
 	DECLARE_READ_LINE_MEMBER( bdata_r );
 	DECLARE_READ_LINE_MEMBER( gdata_r );
@@ -180,8 +180,8 @@ public:
 		TIMER_ID_EF4
 	};
 
-	DECLARE_WRITE8_MEMBER( keylatch_w );
-	DECLARE_WRITE8_MEMBER( bankswitch_w );
+	void keylatch_w(uint8_t data);
+	void bankswitch_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER( clear_r );
 	DECLARE_READ_LINE_MEMBER( ef2_r );
 	DECLARE_READ_LINE_MEMBER( ef3_r );

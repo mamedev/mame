@@ -60,22 +60,22 @@ public:
 	void init_rollfruit();
 
 private:
-	DECLARE_WRITE8_MEMBER(igrosoft_gamble_vid_w);
-	DECLARE_WRITE8_MEMBER(igrosoft_gamble_bank_w);
-	DECLARE_READ8_MEMBER(bankedram_r);
-	DECLARE_WRITE8_MEMBER(bankedram_w);
-	DECLARE_WRITE8_MEMBER(igrosoft_gamble_rambank_w);
-	DECLARE_READ8_MEMBER(ray_r);
-	DECLARE_WRITE8_MEMBER(igrosoft_gamble_hopper_w);
-	DECLARE_WRITE8_MEMBER(rollfr_hopper_w);
-	DECLARE_WRITE8_MEMBER(igrosoft_gamble_lamps1_w);
-	DECLARE_WRITE8_MEMBER(igrosoft_gamble_lamps2_w);
-	DECLARE_WRITE8_MEMBER(igrosoft_gamble_lamps3_w);
-	DECLARE_WRITE8_MEMBER(igrosoft_gamble_counters_w);
-	DECLARE_WRITE8_MEMBER(igrosoft_gamble_f3_w);
-	DECLARE_WRITE8_MEMBER(igrosoft_gamble_dispenable_w);
-	DECLARE_READ8_MEMBER(igrosoft_gamble_timekeeper_r);
-	DECLARE_WRITE8_MEMBER(igrosoft_gamble_timekeeper_w);
+	void igrosoft_gamble_vid_w(offs_t offset, uint8_t data);
+	void igrosoft_gamble_bank_w(uint8_t data);
+	uint8_t bankedram_r(offs_t offset);
+	void bankedram_w(offs_t offset, uint8_t data);
+	void igrosoft_gamble_rambank_w(uint8_t data);
+	uint8_t ray_r();
+	void igrosoft_gamble_hopper_w(uint8_t data);
+	void rollfr_hopper_w(uint8_t data);
+	void igrosoft_gamble_lamps1_w(uint8_t data);
+	void igrosoft_gamble_lamps2_w(uint8_t data);
+	void igrosoft_gamble_lamps3_w(uint8_t data);
+	void igrosoft_gamble_counters_w(uint8_t data);
+	void igrosoft_gamble_f3_w(uint8_t data);
+	void igrosoft_gamble_dispenable_w(uint8_t data);
+	uint8_t igrosoft_gamble_timekeeper_r(offs_t offset);
+	void igrosoft_gamble_timekeeper_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_igrosoft_gamble_tile_info);
 	TILE_GET_INFO_MEMBER(get_igrosoft_gamble_reel_tile_info);
 	uint32_t screen_update_igrosoft_gamble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

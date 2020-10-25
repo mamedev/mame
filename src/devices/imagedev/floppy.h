@@ -154,7 +154,7 @@ protected:
 
 	floppy_image_format_t *input_format;
 	floppy_image_format_t *output_format;
-	floppy_image          *image;
+	std::unique_ptr<floppy_image> image;
 	char                  extension_list[256];
 	floppy_image_format_t *fif_list;
 	emu_timer             *index_timer;
@@ -294,7 +294,7 @@ protected:
 
 private:
 	// device_sound_interface overrides
-	void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 	sound_stream*   m_sound;
 
 	int         m_step_base;

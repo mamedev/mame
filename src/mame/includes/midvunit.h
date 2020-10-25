@@ -61,7 +61,6 @@ public:
 		m_watchdog(*this, "watchdog"),
 		m_palette(*this, "palette"),
 		m_adc(*this, "adc"),
-		m_midway_serial_pic(*this, "serial_pic"),
 		m_midway_serial_pic2(*this, "serial_pic2"),
 		m_midway_ioasic(*this, "ioasic"),
 		m_ata(*this, "ata"),
@@ -131,46 +130,43 @@ private:
 	uint32_t m_wheel_board_u8_latch;
 	uint8_t m_comm_flags;
 	uint16_t m_comm_data;
-	DECLARE_WRITE32_MEMBER(midvunit_dma_queue_w);
-	DECLARE_READ32_MEMBER(midvunit_dma_queue_entries_r);
-	DECLARE_READ32_MEMBER(midvunit_dma_trigger_r);
-	DECLARE_WRITE32_MEMBER(midvunit_page_control_w);
-	DECLARE_READ32_MEMBER(midvunit_page_control_r);
-	DECLARE_WRITE32_MEMBER(midvunit_video_control_w);
-	DECLARE_READ32_MEMBER(midvunit_scanline_r);
-	DECLARE_WRITE32_MEMBER(midvunit_videoram_w);
-	DECLARE_READ32_MEMBER(midvunit_videoram_r);
-	DECLARE_WRITE32_MEMBER(midvunit_paletteram_w);
-	DECLARE_WRITE32_MEMBER(midvunit_textureram_w);
-	DECLARE_READ32_MEMBER(midvunit_textureram_r);
-	DECLARE_READ32_MEMBER(port0_r);
-	DECLARE_READ32_MEMBER(adc_r);
-	DECLARE_WRITE32_MEMBER(adc_w);
-	DECLARE_WRITE32_MEMBER(midvunit_cmos_protect_w);
-	DECLARE_WRITE32_MEMBER(midvunit_cmos_w);
-	DECLARE_READ32_MEMBER(midvunit_cmos_r);
-	DECLARE_WRITE32_MEMBER(midvunit_control_w);
-	DECLARE_WRITE32_MEMBER(crusnwld_control_w);
-	DECLARE_WRITE32_MEMBER(midvunit_sound_w);
-	DECLARE_READ32_MEMBER(tms32031_control_r);
-	DECLARE_WRITE32_MEMBER(tms32031_control_w);
-	DECLARE_READ32_MEMBER(crusnwld_serial_status_r);
-	DECLARE_READ32_MEMBER(crusnwld_serial_data_r);
-	DECLARE_WRITE32_MEMBER(crusnwld_serial_data_w);
-	DECLARE_READ32_MEMBER(bit_data_r);
-	DECLARE_WRITE32_MEMBER(bit_reset_w);
-	DECLARE_READ32_MEMBER(offroadc_serial_status_r);
-	DECLARE_READ32_MEMBER(offroadc_serial_data_r);
-	DECLARE_WRITE32_MEMBER(offroadc_serial_data_w);
-	DECLARE_READ32_MEMBER(midvplus_misc_r);
-	DECLARE_WRITE32_MEMBER(midvplus_misc_w);
-	DECLARE_WRITE8_MEMBER(midvplus_xf1_w);
-	DECLARE_READ32_MEMBER(generic_speedup_r);
-	DECLARE_READ32_MEMBER(midvunit_wheel_board_r);
-	DECLARE_WRITE32_MEMBER(midvunit_wheel_board_w);
-	DECLARE_READ32_MEMBER(midvunit_intcs_r);
-	DECLARE_READ32_MEMBER(midvunit_comcs_r);
-	DECLARE_WRITE32_MEMBER(midvunit_comcs_w);
+	void midvunit_dma_queue_w(uint32_t data);
+	uint32_t midvunit_dma_queue_entries_r();
+	uint32_t midvunit_dma_trigger_r(offs_t offset);
+	void midvunit_page_control_w(uint32_t data);
+	uint32_t midvunit_page_control_r();
+	void midvunit_video_control_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t midvunit_scanline_r();
+	void midvunit_videoram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t midvunit_videoram_r(offs_t offset);
+	void midvunit_paletteram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void midvunit_textureram_w(offs_t offset, uint32_t data);
+	uint32_t midvunit_textureram_r(offs_t offset);
+	uint32_t port0_r();
+	uint32_t adc_r();
+	void adc_w(uint32_t data);
+	void midvunit_cmos_protect_w(uint32_t data);
+	void midvunit_cmos_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t midvunit_cmos_r(offs_t offset);
+	void midvunit_control_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void crusnwld_control_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void midvunit_sound_w(uint32_t data);
+	uint32_t tms32031_control_r(offs_t offset);
+	void tms32031_control_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t crusnwld_serial_status_r();
+	uint32_t crusnwld_serial_data_r();
+	void crusnwld_serial_data_w(uint32_t data);
+	uint32_t bit_data_r(offs_t offset);
+	void bit_reset_w(uint32_t data);
+	uint32_t midvplus_misc_r(offs_t offset);
+	void midvplus_misc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void midvplus_xf1_w(uint8_t data);
+	uint32_t generic_speedup_r(offs_t offset);
+	uint32_t midvunit_wheel_board_r();
+	void midvunit_wheel_board_w(uint32_t data);
+	uint32_t midvunit_intcs_r();
+	uint32_t midvunit_comcs_r(offs_t offset);
+	void midvunit_comcs_w(offs_t offset, uint32_t data);
 	void set_input(const char *s);
 	void init_crusnwld_common(offs_t speedup);
 	void init_crusnusa_common(offs_t speedup);
@@ -184,7 +180,6 @@ private:
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<palette_device> m_palette;
 	optional_device<adc0844_device> m_adc;
-	optional_device<midway_serial_pic_device> m_midway_serial_pic;
 	optional_device<midway_serial_pic2_device> m_midway_serial_pic2;
 	optional_device<midway_ioasic_device> m_midway_ioasic;
 	optional_device<ata_interface_device> m_ata;

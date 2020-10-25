@@ -172,79 +172,78 @@ Double Crown control panel
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
 
-		<bezel element="cpanel">
+		<element ref="cpanel">
 			<bounds left="0" right="4" top="3" bottom="3.34" />
-		</bezel>
+		</element>
 
-		<bezel element="cpanel2">
+		<element ref="cpanel2">
 			<bounds left="0" right="4" top="3" bottom="3.17" />
-		</bezel>
+		</element>
 
 <!-- define lamps -->
 
-		<bezel name="lamp0" element="deal_b">
+		<element name="lamp0" ref="deal_b">
 			<bounds x="3.55" y="3.05" width="0.35" height="0.24" />
-		</bezel>
-		<bezel name="lamp0" element="deal">
+		</element>
+		<element name="lamp0" ref="deal">
 			<bounds x="3.57" y="3.07" width="0.31" height="0.20" />
-		</bezel>
+		</element>
 
 
-		<bezel name="lamp1" element="bet_b">
+		<element name="lamp1" ref="bet_b">
 			<bounds x="3.10" y="3.05" width="0.35" height="0.24" />
-		</bezel>
-		<bezel name="lamp1" element="bet">
+		</element>
+		<element name="lamp1" ref="bet">
 			<bounds x="3.12" y="3.07" width="0.31" height="0.20" />
-		</bezel>
+		</element>
 
 
-		<bezel name="lamp2" element="cancel_b">
+		<element name="lamp2" ref="cancel_b">
 			<bounds x="2.35" y="3.05" width="0.35" height="0.24" />
-		</bezel>
-		<bezel name="lamp2" element="cancel">
+		</element>
+		<element name="lamp2" ref="cancel">
 			<bounds x="2.37" y="3.07" width="0.31" height="0.20" />
-		</bezel>
+		</element>
 
 
-		<bezel name="lamp3" element="hold_b">
+		<element name="lamp3" ref="hold_b">
 			<bounds x="1.90" y="3.05" width="0.35" height="0.24" />
-		</bezel>
-		<bezel name="lamp3" element="hold5">
+		</element>
+		<element name="lamp3" ref="hold5">
 			<bounds x="1.92" y="3.07" width="0.31" height="0.20" />
-		</bezel>
+		</element>
 
 
-		<bezel name="lamp4" element="hold_b">
+		<element name="lamp4" ref="hold_b">
 			<bounds x="1.45" y="3.05" width="0.35" height="0.24" />
-		</bezel>
-		<bezel name="lamp4" element="hold4">
+		</element>
+		<element name="lamp4" ref="hold4">
 			<bounds x="1.47" y="3.07" width="0.31" height="0.20" />
-		</bezel>
+		</element>
 
 
-		<bezel name="lamp5" element="hold_b">
+		<element name="lamp5" ref="hold_b">
 			<bounds x="1.00" y="3.05" width="0.35" height="0.24" />
-		</bezel>
-		<bezel name="lamp5" element="hold3">
+		</element>
+		<element name="lamp5" ref="hold3">
 			<bounds x="1.02" y="3.07" width="0.31" height="0.20" />
-		</bezel>
+		</element>
 
 
-		<bezel name="lamp6" element="hold_b">
+		<element name="lamp6" ref="hold_b">
 			<bounds x="0.55" y="3.05" width="0.35" height="0.24" />
-		</bezel>
-		<bezel name="lamp6" element="hold2">
+		</element>
+		<element name="lamp6" ref="hold2">
 			<bounds x="0.57" y="3.07" width="0.31" height="0.20" />
-		</bezel>
+		</element>
 
 
-		<bezel name="lamp7" element="hold_b">
+		<element name="lamp7" ref="hold_b">
 			<bounds x="0.10" y="3.05" width="0.35" height="0.24" />
-		</bezel>
-		<bezel name="lamp7" element="hold1">
+		</element>
+		<element name="lamp7" ref="hold1">
 			<bounds x="0.12" y="3.07" width="0.31" height="0.20" />
-		</bezel>
-
+		</element>
 
 	</view>
 </mamelayout>

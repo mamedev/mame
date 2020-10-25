@@ -55,12 +55,12 @@ private:
 	required_device<address_map_bank_device> m_1m_bank;
 	required_shared_ptr<uint16_t> m_mainram;
 
-	DECLARE_WRITE16_MEMBER(ctrl_w);
+	void ctrl_w(uint16_t data);
 
 	void k2000_palette(palette_device &palette) const;
 };
 
-WRITE16_MEMBER(k2000_state::ctrl_w)
+void k2000_state::ctrl_w(uint16_t data)
 {
 	data &= 0xff;
 	logerror("%02x to ctrl_w\n", data);

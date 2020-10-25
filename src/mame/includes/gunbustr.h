@@ -66,9 +66,9 @@ private:
 	emu_timer *m_interrupt5_timer;
 
 	void motor_control_w(u32 data);
-	DECLARE_READ32_MEMBER(gun_r);
+	u32 gun_r();
 	void gun_w(u32 data);
-	DECLARE_READ32_MEMBER(main_cycle_r);
+	u32 main_cycle_r();
 	void coin_word_w(u8 data);
 	virtual void video_start() override;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -25,8 +25,8 @@ public:
 	hp98046_io_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~hp98046_io_card_device();
 
-	virtual DECLARE_READ16_MEMBER(reg_r) override;
-	virtual DECLARE_WRITE16_MEMBER(reg_w) override;
+	virtual uint16_t reg_r(address_space &space, offs_t offset) override;
+	virtual void reg_w(address_space &space, offs_t offset, uint16_t data) override;
 
 	virtual bool has_dual_sc() const override;
 
@@ -74,11 +74,11 @@ private:
 
 	void cpu_program_map(address_map &map);
 	void cpu_io_map(address_map &map);
-	DECLARE_READ8_MEMBER(ram_r);
-	DECLARE_READ8_MEMBER(cpu_r);
-	DECLARE_WRITE8_MEMBER(cpu_w);
-	DECLARE_READ8_MEMBER(p1_r);
-	DECLARE_WRITE8_MEMBER(p2_w);
+	uint8_t ram_r(offs_t offset);
+	uint8_t cpu_r(offs_t offset);
+	void cpu_w(offs_t offset, uint8_t data);
+	uint8_t p1_r();
+	void p2_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(sio_int_w);
 	DECLARE_WRITE_LINE_MEMBER(sio_txd_w);
 	DECLARE_WRITE_LINE_MEMBER(rs232_rxd_w);

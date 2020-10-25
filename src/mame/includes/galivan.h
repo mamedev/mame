@@ -61,21 +61,21 @@ private:
 
 	uint8_t        m_shift_scroll; //youmab
 	uint32_t       m_shift_val;
-	DECLARE_WRITE8_MEMBER(galivan_sound_command_w);
-	DECLARE_READ8_MEMBER(soundlatch_clear_r);
-	DECLARE_READ8_MEMBER(IO_port_c0_r);
-	DECLARE_WRITE8_MEMBER(blit_trigger_w);
-	DECLARE_WRITE8_MEMBER(vblank_ack_w);
-	DECLARE_WRITE8_MEMBER(youmab_extra_bank_w);
-	DECLARE_READ8_MEMBER(youmab_8a_r);
-	DECLARE_WRITE8_MEMBER(youmab_81_w);
-	DECLARE_WRITE8_MEMBER(youmab_84_w);
-	DECLARE_WRITE8_MEMBER(youmab_86_w);
-	DECLARE_WRITE8_MEMBER(galivan_videoram_w);
-	DECLARE_WRITE8_MEMBER(galivan_gfxbank_w);
-	DECLARE_WRITE8_MEMBER(ninjemak_gfxbank_w);
-	DECLARE_WRITE8_MEMBER(galivan_scrollx_w);
-	DECLARE_WRITE8_MEMBER(galivan_scrolly_w);
+	void galivan_sound_command_w(uint8_t data);
+	uint8_t soundlatch_clear_r();
+	uint8_t IO_port_c0_r();
+	void blit_trigger_w(uint8_t data);
+	void vblank_ack_w(uint8_t data);
+	void youmab_extra_bank_w(uint8_t data);
+	uint8_t youmab_8a_r();
+	void youmab_81_w(uint8_t data);
+	void youmab_84_w(uint8_t data);
+	void youmab_86_w(uint8_t data);
+	void galivan_videoram_w(offs_t offset, uint8_t data);
+	void galivan_gfxbank_w(uint8_t data);
+	void ninjemak_gfxbank_w(uint8_t data);
+	void galivan_scrollx_w(offs_t offset, uint8_t data);
+	void galivan_scrolly_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(ninjemak_get_bg_tile_info);

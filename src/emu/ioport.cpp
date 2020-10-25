@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    ioport.c
+    ioport.cpp
 
     Input/output port handling.
 
@@ -189,6 +189,7 @@ const struct
 	{ INPUT_STRING_3C_1C, "3 Coins/1 Credit" },
 	{ INPUT_STRING_8C_3C, "8 Coins/3 Credits" },
 	{ INPUT_STRING_4C_2C, "4 Coins/2 Credits" },
+	{ INPUT_STRING_5C_2C, "5 Coins/2 Credits" },
 	{ INPUT_STRING_2C_1C, "2 Coins/1 Credit" },
 	{ INPUT_STRING_5C_3C, "5 Coins/3 Credits" },
 	{ INPUT_STRING_3C_2C, "3 Coins/2 Credits" },
@@ -197,6 +198,7 @@ const struct
 	{ INPUT_STRING_3C_3C, "3 Coins/3 Credits" },
 	{ INPUT_STRING_2C_2C, "2 Coins/2 Credits" },
 	{ INPUT_STRING_1C_1C, "1 Coin/1 Credit" },
+	{ INPUT_STRING_3C_5C, "3 Coins/5 Credits" },
 	{ INPUT_STRING_4C_5C, "4 Coins/5 Credits" },
 	{ INPUT_STRING_3C_4C, "3 Coins/4 Credits" },
 	{ INPUT_STRING_2C_3C, "2 Coins/3 Credits" },
@@ -650,7 +652,10 @@ ioport_field::ioport_field(ioport_port &port, ioport_type type, ioport_value def
 
 void ioport_field::set_value(ioport_value value)
 {
-	m_digital_value = value != 0;
+	if (is_analog())
+		live().analog->set_value(s32(value));
+	else
+		m_digital_value = value != 0;
 }
 
 
@@ -1188,17 +1193,17 @@ void ioport_field::frame_update(ioport_value &result)
 
 
 //-------------------------------------------------
-//  crosshair_position - compute the crosshair
+//  crosshair_read - compute the crosshair
 //  position
 //-------------------------------------------------
 
-void ioport_field::crosshair_position(float &x, float &y, bool &gotx, bool &goty)
+float ioport_field::crosshair_read()
 {
-	double value = m_live->analog->crosshair_read();
+	float value = m_live->analog->crosshair_read();
 
 	// apply the scale and offset
 	if (m_crosshair_scale < 0)
-		value = -(1.0 - value) * m_crosshair_scale;
+		value = -(1.0f - value) * m_crosshair_scale;
 	else
 		value *= m_crosshair_scale;
 	value += m_crosshair_offset;
@@ -1207,29 +1212,7 @@ void ioport_field::crosshair_position(float &x, float &y, bool &gotx, bool &goty
 	if (!m_crosshair_mapper.isnull())
 		value = m_crosshair_mapper(value);
 
-	// handle X axis
-	if (m_crosshair_axis == CROSSHAIR_AXIS_X)
-	{
-		x = value;
-		gotx = true;
-		if (m_crosshair_altaxis != 0)
-		{
-			y = m_crosshair_altaxis;
-			goty = true;
-		}
-	}
-
-	// handle Y axis
-	else
-	{
-		y = value;
-		goty = true;
-		if (m_crosshair_altaxis != 0)
-		{
-			x = m_crosshair_altaxis;
-			gotx = true;
-		}
-	}
+	return value;
 }
 
 
@@ -1299,7 +1282,7 @@ void ioport_field::expand_diplocation(const char *location, std::string &errorbu
 			errorbuf.append(string_format("Switch location '%s' has invalid format!\n", location));
 
 		// allocate a new entry
-		m_diploclist.append(*global_alloc(ioport_diplocation(name.c_str(), swnum, invert)));
+		m_diploclist.append(*new ioport_diplocation(name.c_str(), swnum, invert));
 		entries++;
 
 		// advance to the next item
@@ -1373,7 +1356,7 @@ ioport_field_live::ioport_field_live(ioport_field &field, analog_field *analog)
 	if (field.type_class() == INPUT_CLASS_KEYBOARD && field.specific_name() == nullptr)
 	{
 		// loop through each character on the field
-		for (int which = 0; which < 4; which++)
+		for (int which = 0; which < (1 << (UCHAR_SHIFT_END - UCHAR_SHIFT_BEGIN + 1)); which++)
 		{
 			std::vector<char32_t> const codes = field.keyboard_codes(which);
 			if (codes.empty())
@@ -1635,15 +1618,15 @@ ioport_port_live::ioport_port_live(ioport_port &port)
 		// allocate analog state if it's analog
 		analog_field *analog = nullptr;
 		if (field.is_analog())
-			analog = &analoglist.append(*global_alloc(analog_field(field)));
+			analog = &analoglist.append(*new analog_field(field));
 
 		// allocate a dynamic field for reading
 		if (field.has_dynamic_read())
-			readlist.append(*global_alloc(dynamic_field(field)));
+			readlist.append(*new dynamic_field(field));
 
 		// allocate a dynamic field for writing
 		if (field.has_dynamic_write())
-			writelist.append(*global_alloc(dynamic_field(field)));
+			writelist.append(*new dynamic_field(field));
 
 		// let the field initialize its live state
 		field.init_live_state(analog);
@@ -1711,9 +1694,10 @@ time_t ioport_manager::initialize()
 			if (&port.second->device() == &device)
 			{
 				for (ioport_field &field : port.second->fields())
-					if (field.type_class()==INPUT_CLASS_CONTROLLER)
+					if (field.type_class() == INPUT_CLASS_CONTROLLER)
 					{
-						if (players < field.player() + 1) players = field.player() + 1;
+						if (players < field.player() + 1)
+							players = field.player() + 1;
 						field.set_player(field.player() + player_offset);
 					}
 			}
@@ -1961,30 +1945,6 @@ int ioport_manager::count_players() const noexcept
 
 
 //-------------------------------------------------
-//  crosshair_position - return the extracted
-//  crosshair values for the given player
-//-------------------------------------------------
-
-bool ioport_manager::crosshair_position(int player, float &x, float &y)
-{
-	// read all the lightgun values
-	bool gotx = false, goty = false;
-	for (auto &port : m_portlist)
-		for (ioport_field &field : port.second->fields())
-			if (field.player() == player && field.crosshair_axis() != CROSSHAIR_AXIS_NONE && field.enabled())
-			{
-				field.crosshair_position(x, y, gotx, goty);
-
-				// if we got both, stop
-				if (gotx && goty)
-					break;
-			}
-
-	return (gotx && goty);
-}
-
-
-//-------------------------------------------------
 //  frame_update - core logic for per-frame input
 //  port updating
 //-------------------------------------------------
@@ -1997,7 +1957,7 @@ digital_joystick &ioport_manager::digjoystick(int player, int number)
 			return joystick;
 
 	// create a new one
-	return m_joystick_list.append(*global_alloc(digital_joystick(player, number)));
+	return m_joystick_list.append(*new digital_joystick(player, number));
 }
 
 
@@ -2161,6 +2121,67 @@ void ioport_manager::load_config(config_type cfg_type, util::xml::data_node cons
 		for (input_type_entry &entry : m_typelist)
 			for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 				entry.defseq(seqtype) = entry.seq(seqtype);
+
+	// load keyboard enable/disable state
+	if (cfg_type == config_type::GAME)
+	{
+		std::vector<bool> kbd_enable_set;
+		bool keyboard_enabled = false, missing_enabled = false;
+		for (util::xml::data_node const *kbdnode = parentnode->get_child("keyboard"); kbdnode; kbdnode = kbdnode->get_next_sibling("keyboard"))
+		{
+			char const *const tag = kbdnode->get_attribute_string("tag", nullptr);
+			int const enabled = kbdnode->get_attribute_int("enabled", -1);
+			if (tag && (0 <= enabled))
+			{
+				size_t i;
+				for (i = 0; natkeyboard().keyboard_count() > i; ++i)
+				{
+					if (!strcmp(natkeyboard().keyboard_device(i).tag(), tag))
+					{
+						if (kbd_enable_set.empty())
+							kbd_enable_set.resize(natkeyboard().keyboard_count(), false);
+						kbd_enable_set[i] = true;
+						if (enabled)
+						{
+							if (!natkeyboard().keyboard_is_keypad(i))
+								keyboard_enabled = true;
+							natkeyboard().enable_keyboard(i);
+						}
+						else
+						{
+							natkeyboard().disable_keyboard(i);
+						}
+						break;
+					}
+				}
+				missing_enabled = missing_enabled || (enabled && (natkeyboard().keyboard_count() <= i));
+			}
+		}
+
+		// if keyboard enable configuration was loaded, patch it up for principle of least surprise
+		if (!kbd_enable_set.empty())
+		{
+			for (size_t i = 0; natkeyboard().keyboard_count() > i; ++i)
+			{
+				if (!natkeyboard().keyboard_is_keypad(i))
+				{
+					if (!keyboard_enabled && missing_enabled)
+					{
+						natkeyboard().enable_keyboard(i);
+						keyboard_enabled = true;
+					}
+					else if (!kbd_enable_set[i])
+					{
+						if (keyboard_enabled)
+							natkeyboard().disable_keyboard(i);
+						else
+							natkeyboard().enable_keyboard(i);
+						keyboard_enabled = true;
+					}
+				}
+			}
+		}
+	}
 }
 
 
@@ -2399,6 +2420,14 @@ void ioport_manager::save_default_inputs(util::xml::data_node &parentnode)
 
 void ioport_manager::save_game_inputs(util::xml::data_node &parentnode)
 {
+	// save keyboard enable/disable state
+	for (size_t i = 0; natkeyboard().keyboard_count() > i; ++i)
+	{
+		util::xml::data_node *const kbdnode = parentnode.add_child("keyboard", nullptr);
+		kbdnode->set_attribute("tag", natkeyboard().keyboard_device(i).tag());
+		kbdnode->set_attribute_int("enabled", natkeyboard().keyboard_enabled(i));
+	}
+
 	// iterate over ports
 	for (auto &port : m_portlist)
 		for (ioport_field &field : port.second->fields())
@@ -3052,7 +3081,7 @@ ioport_configurer& ioport_configurer::field_alloc(ioport_type type, ioport_value
 	// append the field
 	if (type != IPT_UNKNOWN && type != IPT_UNUSED)
 		m_curport->m_active |= mask;
-	m_curfield = &m_curport->m_fieldlist.append(*global_alloc(ioport_field(*m_curport, type, defval, mask, string_from_token(name))));
+	m_curfield = &m_curport->m_fieldlist.append(*new ioport_field(*m_curport, type, defval, mask, string_from_token(name)));
 
 	// reset the current setting
 	m_cursetting = nullptr;
@@ -3109,7 +3138,7 @@ ioport_configurer& ioport_configurer::setting_alloc(ioport_value value, const ch
 	if (m_curfield == nullptr)
 		throw emu_fatalerror("alloc_setting called with no active field (value=%X name=%s)\n", value, name);
 
-	m_cursetting = global_alloc(ioport_setting(*m_curfield, value & m_curfield->mask(), string_from_token(name)));
+	m_cursetting = new ioport_setting(*m_curfield, value & m_curfield->mask(), string_from_token(name));
 	// append a new setting
 	m_curfield->m_settinglist.append(*m_cursetting);
 	return *this;
@@ -3232,6 +3261,7 @@ analog_field::analog_field(ioport_field &field)
 		m_accum(0),
 		m_previous(0),
 		m_previousanalog(0),
+		m_prog_analog_value(0),
 		m_minimum(INPUT_ABSOLUTE_MIN),
 		m_maximum(INPUT_ABSOLUTE_MAX),
 		m_center(0),
@@ -3246,7 +3276,8 @@ analog_field::analog_field(ioport_field &field)
 		m_autocenter(false),
 		m_single_scale(false),
 		m_interpolate(false),
-		m_lastdigital(false)
+		m_lastdigital(false),
+		m_was_written(false)
 {
 	// compute the shift amount and number of bits
 	for (ioport_value mask = field.mask(); !(mask & 1); mask >>= 1)
@@ -3486,6 +3517,17 @@ s32 analog_field::apply_settings(s32 value) const
 
 
 //-------------------------------------------------
+//  set_value - take a new value to be used
+//  at next frame update
+//-------------------------------------------------
+
+void analog_field::set_value(s32 value)
+{
+	m_was_written = true;
+	m_prog_analog_value = value;
+}
+
+//-------------------------------------------------
 //  frame_update - update the internals of a
 //  single analog field periodically
 //-------------------------------------------------
@@ -3502,6 +3544,13 @@ void analog_field::frame_update(running_machine &machine)
 	// get the new raw analog value and its type
 	input_item_class itemclass;
 	s32 rawvalue = machine.input().seq_axis_value(m_field.seq(SEQ_TYPE_STANDARD), itemclass);
+
+	// use programmatically set value if avaiable
+	if (m_was_written)
+	{
+		m_was_written = false;
+		rawvalue = m_prog_analog_value;
+	}
 
 	// if we got an absolute input, it overrides everything else
 	if (itemclass == ITEM_CLASS_ABSOLUTE)

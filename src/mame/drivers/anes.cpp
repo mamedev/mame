@@ -40,8 +40,8 @@ public:
 	void anes(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(vram_offset_w);
-	DECLARE_WRITE8_MEMBER(blit_trigger_w);
+	void vram_offset_w(offs_t offset, uint8_t data);
+	void blit_trigger_w(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -58,12 +58,12 @@ uint32_t anes_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	return 0;
 }
 
-WRITE8_MEMBER(anes_state::vram_offset_w)
+void anes_state::vram_offset_w(offs_t offset, uint8_t data)
 {
 	m_vram_offset[offset] = data;
 }
 
-WRITE8_MEMBER(anes_state::blit_trigger_w)
+void anes_state::blit_trigger_w(uint8_t data)
 {
 	/*
 	 operation is:

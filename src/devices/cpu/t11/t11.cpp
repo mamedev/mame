@@ -85,7 +85,7 @@ device_memory_interface::space_config_vector t11_device::memory_space_config() c
 int t11_device::ROPCODE()
 {
 	PC &= 0xfffe;
-	int val = m_cache->read_word(PC);
+	int val = m_cache.read_word(PC);
 	PC += 2;
 	return val;
 }
@@ -93,25 +93,25 @@ int t11_device::ROPCODE()
 
 int t11_device::RBYTE(int addr)
 {
-	return m_program->read_byte(addr);
+	return m_program.read_byte(addr);
 }
 
 
 void t11_device::WBYTE(int addr, int data)
 {
-	m_program->write_byte(addr, data);
+	m_program.write_byte(addr, data);
 }
 
 
 int t11_device::RWORD(int addr)
 {
-	return m_program->read_word(addr & 0xfffe);
+	return m_program.read_word(addr & 0xfffe);
 }
 
 
 void t11_device::WWORD(int addr, int data)
 {
-	m_program->write_word(addr & 0xfffe, data);
+	m_program.write_word(addr & 0xfffe, data);
 }
 
 
@@ -303,10 +303,10 @@ void t11_device::device_start()
 	};
 
 	m_initial_pc = initial_pc[c_initial_mode >> 13];
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<1, 0, ENDIANNESS_LITTLE>();
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
 	m_out_reset_func.resolve_safe();
-	m_in_iack_func.resolve_safe(0377);
+	m_in_iack_func.resolve_safe(0); // default vector (T-11 User's Guide, p. A-11)
 
 	save_item(NAME(m_ppc.w.l));
 	save_item(NAME(m_reg[0].w.l));

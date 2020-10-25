@@ -22,7 +22,7 @@ public:
 
 	virtual void submap(address_map &map) override;
 
-	DECLARE_READ16_MEMBER(actel_id_r);
+	uint16_t actel_id_r();
 
 protected:
 	virtual void device_start() override;

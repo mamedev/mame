@@ -29,7 +29,7 @@
     by TSMC, and ST2204B, fabricated by Hyundai. A PDF document
     describing the differences between these two was once available.
 
-    Reverse-engineered documentation for SS2204's internal registers:
+    Reverse-engineered documentation for ST2204's internal registers:
     http://blog.kevtris.org/blogfiles/Game%20King%20Inside.txt
 
 **********************************************************************/
@@ -42,12 +42,16 @@ DEFINE_DEVICE_TYPE(ST2204, st2204_device, "st2204", "Sitronix ST2204 Integrated 
 
 st2204_device::st2204_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor map)
 	: st2xxx_device(mconfig, type, tag, owner, clock, map, 26, false) // logical; only 23 address lines are brought out
+	, m_dac_callback(*this)
 	, m_tmode{0}
 	, m_tcntr{0}
 	, m_tload{0}
 	, m_timer{0}
 	, m_psg{0}
 	, m_psgc(0)
+	, m_vol(0)
+	, m_dac(0)
+	, m_psg_timer(nullptr)
 	, m_dms(0)
 	, m_dmd(0)
 	, m_dcnth(0)
@@ -64,11 +68,19 @@ st2202_device::st2202_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
+void st2204_device::device_resolve_objects()
+{
+	st2xxx_device::device_resolve_objects();
+
+	m_dac_callback.resolve_safe();
+}
+
 void st2204_device::device_start()
 {
 	std::unique_ptr<mi_st2204> intf = std::make_unique<mi_st2204>();
-	intf->data = &space(AS_DATA);
-	intf->dcache = space(AS_DATA).cache<0, 0, ENDIANNESS_LITTLE>();
+
+	space(AS_DATA).cache(intf->dcache);
+	space(AS_DATA).specific(intf->data);
 	intf->irr_enable = false;
 	intf->irr = 0;
 	intf->prr = 0;
@@ -81,15 +93,19 @@ void st2204_device::device_start()
 
 	m_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2204_device::t0_interrupt), this));
 	m_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2204_device::t1_interrupt), this));
+	m_psg_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2204_device::psg_interrupt), this));
 
 	save_item(NAME(m_tmode));
 	save_item(NAME(m_tcntr));
 	save_item(NAME(m_tload));
 	save_item(NAME(m_psg));
 	save_item(NAME(m_psgc));
+	save_item(NAME(m_vol));
+	save_item(NAME(m_dac));
 	save_item(NAME(m_dms));
 	save_item(NAME(m_dmd));
 	save_item(NAME(m_dcnth));
+	save_item(NAME(intf->dmr));
 
 	mintf = std::move(intf);
 	save_common_registers();
@@ -98,8 +114,8 @@ void st2204_device::device_start()
 	state_add(ST_IRR, "IRR", downcast<mi_st2204 &>(*mintf).irr).mask(0xff);
 	state_add(ST_PRR, "PRR", downcast<mi_st2204 &>(*mintf).prr).mask(0xfff);
 	state_add(ST_DRR, "DRR", downcast<mi_st2204 &>(*mintf).drr).mask(0x7ff);
-	state_add<u16>(ST_IREQ, "IREQ", [this]() { return m_ireq; }, [this](u16 data) { m_ireq = data; update_irq_state(); }).mask(st2xxx_ireq_mask());
-	state_add<u16>(ST_IENA, "IENA", [this]() { return m_iena; }, [this](u16 data) { m_iena = data; update_irq_state(); }).mask(st2xxx_ireq_mask());
+	state_add(ST_IREQ, "IREQ", m_ireq, [this](u16 data) { m_ireq = data; update_irq_state(); }).mask(st2xxx_ireq_mask());
+	state_add(ST_IENA, "IENA", m_iena, [this](u16 data) { m_iena = data; update_irq_state(); }).mask(st2xxx_ireq_mask());
 	for (int i = 0; i < 5; i++)
 	{
 		state_add(ST_PAOUT + i, string_format("P%cOUT", 'A' + i).c_str(), m_pdata[i]);
@@ -112,8 +128,8 @@ void st2204_device::device_start()
 	state_add(ST_PLOUT, "PLOUT", m_pdata[6]);
 	state_add(ST_PCL, "PCL", m_pctrl[6]);
 	state_add(ST_PMCR, "PMCR", m_pmcr);
-	state_add<u8>(ST_PRS, "PRS", [this]() { return m_prs; }, [this](u8 data) { prs_w(data); }).mask(0x60);
-	state_add<u8>(ST_BTEN, "BTEN", [this]() { return m_bten; }, [this](u8 data) { bten_w(data); }).mask(0x1f);
+	state_add(ST_PRS, "PRS", m_prs, [this](u8 data) { prs_w(data); }).mask(0x60);
+	state_add(ST_BTEN, "BTEN", m_bten, [this](u8 data) { bten_w(data); }).mask(0x1f);
 	state_add(ST_BTSR, "BTSR", m_btsr).mask(0x1f);
 	state_add(ST_T0M, "T0M", m_tmode[0]).mask(0x37);
 	state_add(ST_T0C, "T0C", m_tload[0]);
@@ -122,7 +138,9 @@ void st2204_device::device_start()
 	state_add(ST_PSG0, "PSG0", m_psg[0]).mask(0xfff);
 	state_add(ST_PSG1, "PSG1", m_psg[1]).mask(0xfff);
 	state_add(ST_PSGC, "PSGC", m_psgc).mask(0x7f);
-	state_add<u8>(ST_SYS, "SYS", [this]() { return m_sys; }, [this](u8 data) { sys_w(data); });
+	state_add(ST_VOL, "VOL", m_vol);
+	state_add(ST_DAC, "DAC", m_dac);
+	state_add(ST_SYS, "SYS", m_sys, [this](u8 data) { sys_w(data); });
 	state_add(ST_MISC, "MISC", m_misc).mask(st2xxx_misc_mask());
 	state_add(ST_LSSA, "LSSA", m_lssa);
 	state_add(ST_LVPW, "LVPW", m_lvpw);
@@ -134,6 +152,12 @@ void st2204_device::device_start()
 	state_add(ST_LFRA, "LFRA", m_lfra).mask(0x3f);
 	state_add(ST_LAC, "LAC", m_lac).mask(0x1f);
 	state_add(ST_LPWM, "LPWM", m_lpwm).mask(st2xxx_lpwm_mask());
+	state_add(ST_SCTR, "SCTR", m_sctr);
+	state_add(ST_SCKR, "SCKR", m_sckr).mask(0x7f);
+	state_add(ST_SSR, "SSR", m_ssr).mask(0x77);
+	state_add(ST_UCTR, "UCTR", m_uctr).mask(st2xxx_uctr_mask());
+	state_add(ST_USR, "USTR", m_usr).mask(0x7f);
+	state_add(ST_IRCTR, "IRCTR", m_irctr).mask(0xc7);
 	state_add(ST_BCTR, "BCTR", m_bctr).mask(0x87);
 	state_add(ST_BRS, "BRS", m_brs);
 	state_add(ST_BDIV, "BDIV", m_bdiv);
@@ -154,6 +178,13 @@ void st2204_device::device_reset()
 
 	m_psg[0] = m_psg[1] = 0;
 	m_psgc = 0;
+	m_vol = 0;
+	m_dac = 0;
+	m_psg_timer->enable(false);
+	m_dac_callback(0);
+
+	downcast<mi_st2204 &>(*mintf).dmr = 0;
+	// other DMA registers are undefined
 }
 
 const char *st2204_device::st2xxx_irq_name(int i) const
@@ -178,55 +209,55 @@ const char *st2204_device::st2xxx_irq_name(int i) const
 u8 st2204_device::mi_st2204::pread(u16 adr)
 {
 	u16 bank = irq_service && irr_enable ? irr : prr;
-	return data->read_byte(u32(bank ^ 1) << 14 | (adr & 0x3fff));
+	return data.read_byte(u32(bank ^ 1) << 14 | (adr & 0x3fff));
 }
 
 u8 st2204_device::mi_st2204::preadc(u16 adr)
 {
 	u16 bank = irq_service && irr_enable ? irr : prr;
-	return dcache->read_byte(u32(bank ^ 1) << 14 | (adr & 0x3fff));
+	return dcache.read_byte(u32(bank ^ 1) << 14 | (adr & 0x3fff));
 }
 
 void st2204_device::mi_st2204::pwrite(u16 adr, u8 val)
 {
 	u16 bank = irq_service && irr_enable ? irr : prr;
-	data->write_byte(u32(bank ^ 1) << 14 | (adr & 0x3fff), val);
+	data.write_byte(u32(bank ^ 1) << 14 | (adr & 0x3fff), val);
 }
 
 u8 st2204_device::mi_st2204::dread(u16 adr)
 {
-	return data->read_byte(u32(drr) << 15 | (adr & 0x7fff));
+	return data.read_byte(u32(drr) << 15 | (adr & 0x7fff));
 }
 
 u8 st2204_device::mi_st2204::dreadc(u16 adr)
 {
-	return dcache->read_byte(u32(drr) << 15 | (adr & 0x7fff));
+	return dcache.read_byte(u32(drr) << 15 | (adr & 0x7fff));
 }
 
 void st2204_device::mi_st2204::dwrite(u16 adr, u8 val)
 {
-	data->write_byte(u32(drr) << 15 | (adr & 0x7fff), val);
+	data.write_byte(u32(drr) << 15 | (adr & 0x7fff), val);
 }
 
 u8 st2204_device::mi_st2204::read(u16 adr)
 {
-	return program->read_byte(adr);
+	return program.read_byte(adr);
 }
 
 u8 st2204_device::mi_st2204::read_sync(u16 adr)
 {
-	return BIT(adr, 15) ? dreadc(adr) : BIT(adr, 14) ? preadc(adr) : cache->read_byte(adr);
+	return BIT(adr, 15) ? dreadc(adr) : BIT(adr, 14) ? preadc(adr) : cprogram.read_byte(adr);
 }
 
 u8 st2204_device::mi_st2204::read_arg(u16 adr)
 {
-	return BIT(adr, 15) ? dreadc(adr) : BIT(adr, 14) ? preadc(adr) : cache->read_byte(adr);
+	return BIT(adr, 15) ? dreadc(adr) : BIT(adr, 14) ? preadc(adr) : cprogram.read_byte(adr);
 }
 
 u8 st2204_device::mi_st2204::read_dma(u16 adr)
 {
 	if (BIT(adr, 15))
-		return dcache->read_byte(u32(dmr) << 15 | (adr & 0x7fff));
+		return dcache.read_byte(u32(dmr) << 15 | (adr & 0x7fff));
 	else
 		return read(adr);
 }
@@ -238,7 +269,7 @@ u8 st2204_device::mi_st2204::read_vector(u16 adr)
 
 void st2204_device::mi_st2204::write(u16 adr, u8 val)
 {
-	program->write_byte(adr, val);
+	program.write_byte(adr, val);
 }
 
 unsigned st2204_device::st2xxx_bt_divider(int n) const
@@ -248,6 +279,19 @@ unsigned st2204_device::st2xxx_bt_divider(int n) const
 		return 16384 >> ((n & 1) * 2 + (n >> 1) * 5);
 	else
 		return 0;
+}
+
+u32 st2204_device::tclk_pres_div(u8 mode) const
+{
+	assert(mode < 8);
+	if (mode == 0)
+		return 0x10000;
+	else if (mode < 4)
+		return 0x20000 >> (mode * 2);
+	else if (mode == 4)
+		return 0x100;
+	else
+		return 0x8000 >> (mode * 2);
 }
 
 TIMER_CALLBACK_MEMBER(st2204_device::t0_interrupt)
@@ -402,6 +446,41 @@ void st2204_device::st2xxx_tclk_stop()
 	}
 }
 
+TIMER_CALLBACK_MEMBER(st2204_device::psg_interrupt)
+{
+	m_ireq |= 0x002;
+	update_irq_state();
+
+	psg_timer_reload();
+}
+
+void st2204_device::psg_timer_reload()
+{
+	unsigned count;
+	if (BIT(m_psgc, 0))
+		count = (0x40 - BIT(m_psg[1], 6, 6)) * (0x40 - BIT(m_psg[1], 0, 6)) * 64;
+	else if ((m_psgc & 0x0d) == 0x04)
+		count = 0x1000 - m_psg[1];
+	else
+		return;
+
+	if ((m_psgc & 0x70) == 0x40)
+		m_psg_timer->adjust(cycles_to_attotime(count));
+	else if ((m_psgc & 0x70) == 0x70)
+		m_psg_timer->adjust(attotime::from_ticks(count, 32768));
+	else
+		m_psg_timer->adjust(cycles_to_attotime(count << (BIT(m_psgc, 4, 2) + 1)));
+}
+
+u8 st2204_device::psg_r(offs_t offset)
+{
+	// TODO: instantaneous upcount value
+	if (BIT(offset, 0))
+		return (m_psg[offset >> 1] >> 8) | 0xf0;
+	else
+		return m_psg[offset >> 1] & 0x0ff;
+}
+
 void st2204_device::psg_w(offs_t offset, u8 data)
 {
 	if (BIT(offset, 0))
@@ -410,14 +489,39 @@ void st2204_device::psg_w(offs_t offset, u8 data)
 		m_psg[offset >> 1] = data | (m_psg[offset >> 1] & 0xf00);
 }
 
+u8 st2204_device::psgc_r()
+{
+	return m_psgc | 0x80;
+}
+
 void st2204_device::psgc_w(u8 data)
 {
 	m_psgc = data & 0x7f;
+
+	if (!m_psg_timer->enabled())
+		psg_timer_reload();
+}
+
+u8 st2204_device::vol_r()
+{
+	return m_vol;
+}
+
+void st2204_device::vol_w(u8 data)
+{
+	m_vol = data;
+}
+
+u8 st2204_device::dac_r()
+{
+	return m_dac;
 }
 
 void st2204_device::dac_w(u8 data)
 {
-	// TODO
+	// TODO: emulate PSG/PWM more accurately within device
+	m_dac_callback(data);
+	m_dac = data;
 }
 
 unsigned st2204_device::st2xxx_lfr_clocks() const
@@ -501,6 +605,28 @@ void st2204_device::dcnth_w(u8 data)
 	m_dcnth = data & 0x1f;
 }
 
+u8 st2204_device::dmrl_r()
+{
+	return downcast<mi_st2204 &>(*mintf).dmr & 0xff;
+}
+
+void st2204_device::dmrl_w(u8 data)
+{
+	u16 &dmr = downcast<mi_st2204 &>(*mintf).dmr;
+	dmr = (data & m_drr_mask) | (dmr & 0xff00);
+}
+
+u8 st2204_device::dmrh_r()
+{
+	return downcast<mi_st2204 &>(*mintf).dmr >> 8;
+}
+
+void st2204_device::dmrh_w(u8 data)
+{
+	u16 &dmr = downcast<mi_st2204 &>(*mintf).dmr;
+	dmr = ((u16(data) << 8) & m_drr_mask) | (dmr & 0x00ff);
+}
+
 u8 st2204_device::pmem_r(offs_t offset)
 {
 	return downcast<mi_st2204 &>(*mintf).pread(offset);
@@ -532,6 +658,7 @@ void st2204_device::common_map(address_map &map)
 	map(0x0010, 0x0013).w(FUNC(st2204_device::psg_w));
 	map(0x0014, 0x0014).w(FUNC(st2204_device::dac_w));
 	map(0x0016, 0x0016).w(FUNC(st2204_device::psgc_w));
+	map(0x0017, 0x0017).w(FUNC(st2204_device::vol_w));
 	map(0x0020, 0x0020).rw(FUNC(st2204_device::bten_r), FUNC(st2204_device::bten_w));
 	map(0x0021, 0x0021).rw(FUNC(st2204_device::btsr_r), FUNC(st2204_device::btclr_all_w));
 	map(0x0023, 0x0023).rw(FUNC(st2204_device::prs_r), FUNC(st2204_device::prs_w));
@@ -572,6 +699,12 @@ void st2204_device::common_map(address_map &map)
 	map(0x004c, 0x004c).rw(FUNC(st2204_device::pl_r), FUNC(st2204_device::pl_w));
 	// PCL is listed as write-only in ST2202 specification, but DynamiDesk suggests otherwise
 	map(0x004e, 0x004e).rw(FUNC(st2204_device::pcl_r), FUNC(st2204_device::pcl_w));
+	map(0x0052, 0x0052).rw(FUNC(st2204_device::sctr_r), FUNC(st2204_device::sctr_w));
+	map(0x0053, 0x0053).rw(FUNC(st2204_device::sckr_r), FUNC(st2204_device::sckr_w));
+	map(0x0054, 0x0054).rw(FUNC(st2204_device::ssr_r), FUNC(st2204_device::ssr_w));
+	map(0x0060, 0x0060).rw(FUNC(st2204_device::uctr_r), FUNC(st2204_device::uctr_w));
+	map(0x0061, 0x0061).rw(FUNC(st2204_device::usr_r), FUNC(st2204_device::ustr_trg_w));
+	map(0x0062, 0x0062).rw(FUNC(st2204_device::irctr_r), FUNC(st2204_device::irctr_w));
 	map(0x0063, 0x0063).rw(FUNC(st2204_device::bctr_r), FUNC(st2204_device::bctr_w));
 	map(0x0066, 0x0066).rw(FUNC(st2204_device::brs_r), FUNC(st2204_device::brs_w));
 	map(0x0067, 0x0067).rw(FUNC(st2204_device::bdiv_r), FUNC(st2204_device::bdiv_w));
@@ -588,6 +721,11 @@ void st2202_device::int_map(address_map &map)
 void st2204_device::int_map(address_map &map)
 {
 	common_map(map);
+	// PSG registers may or may not be readable on ST2202, but are readable here
+	map(0x0010, 0x0013).r(FUNC(st2204_device::psg_r));
+	map(0x0014, 0x0014).r(FUNC(st2204_device::dac_r));
+	map(0x0016, 0x0016).r(FUNC(st2204_device::psgc_r));
+	map(0x0017, 0x0017).r(FUNC(st2204_device::vol_r));
 	// Source/destination registers are supposedly not readable on ST2202, but may be readable here (count register isn't)
 	map(0x0028, 0x0028).r(FUNC(st2204_device::dmsl_r));
 	map(0x0029, 0x0029).r(FUNC(st2204_device::dmsh_r));

@@ -130,19 +130,19 @@ void naomi_board::dma_advance(uint32_t size)
 	board_advance(size);
 }
 
-WRITE16_MEMBER(naomi_board::rom_offseth_w)
+void naomi_board::rom_offseth_w(uint16_t data)
 {
 	rom_offset = (rom_offset & 0x0000ffff) | (data << 16);
 	pio_ready = false;
 }
 
-WRITE16_MEMBER(naomi_board::rom_offsetl_w)
+void naomi_board::rom_offsetl_w(uint16_t data)
 {
 	rom_offset = (rom_offset & 0xffff0000) | data;
 	pio_ready = false;
 }
 
-READ16_MEMBER(naomi_board::rom_data_r)
+uint16_t naomi_board::rom_data_r()
 {
 	if(!pio_ready) {
 		board_setup_address(rom_offset, false);
@@ -160,7 +160,7 @@ READ16_MEMBER(naomi_board::rom_data_r)
 	return res;
 }
 
-WRITE16_MEMBER(naomi_board::rom_data_w)
+void naomi_board::rom_data_w(uint16_t data)
 {
 	board_write(rom_offset, data);
 
@@ -168,24 +168,24 @@ WRITE16_MEMBER(naomi_board::rom_data_w)
 		rom_offset += 2;
 }
 
-WRITE16_MEMBER(naomi_board::dma_offseth_w)
+void naomi_board::dma_offseth_w(uint16_t data)
 {
 	dma_offset = (dma_offset & 0x0000ffff) | (data << 16);
 	dma_ready = false;
 }
 
-WRITE16_MEMBER(naomi_board::dma_offsetl_w)
+void naomi_board::dma_offsetl_w(uint16_t data)
 {
 	dma_offset = (dma_offset & 0xffff0000) | data;
 	dma_ready = false;
 }
 
-WRITE16_MEMBER(naomi_board::dma_count_w)
+void naomi_board::dma_count_w(uint16_t data)
 {
 	dma_count = data;
 }
 
-WRITE16_MEMBER(naomi_board::boardid_w)
+void naomi_board::boardid_w(uint16_t data)
 {
 	eeprom->write_cs((data >> 2) & 1);
 	eeprom->write_rst((data >> 3) & 1);
@@ -193,12 +193,12 @@ WRITE16_MEMBER(naomi_board::boardid_w)
 	eeprom->write_sda((data >> 0) & 1);
 }
 
-READ16_MEMBER(naomi_board::boardid_r)
+uint16_t naomi_board::boardid_r()
 {
 	return eeprom->read_sda() << 15;
 }
 
-READ16_MEMBER(naomi_board::default_r)
+uint16_t naomi_board::default_r(offs_t offset)
 {
 	logerror("NAOMIBD: unmapped read at %02x\n", offset);
 	return 0xffff;

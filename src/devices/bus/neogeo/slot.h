@@ -93,13 +93,13 @@ public:
 	virtual ~device_neogeo_cart_interface();
 
 	// reading from ROM
-	virtual DECLARE_READ16_MEMBER(rom_r) { return 0xffff; }
-	virtual DECLARE_WRITE16_MEMBER(banksel_w) { }
-	virtual DECLARE_READ16_MEMBER(ram_r) { return 0xffff; }
-	virtual DECLARE_WRITE16_MEMBER(ram_w) { }
-	virtual DECLARE_READ16_MEMBER(protection_r) { return 0xffff; }
-	virtual DECLARE_WRITE16_MEMBER(protection_w) { }
-	virtual DECLARE_READ16_MEMBER(addon_r) { return 0xffff; }
+	virtual uint16_t rom_r(offs_t offset) { return 0xffff; }
+	virtual void banksel_w(uint16_t data) { }
+	virtual uint16_t ram_r(offs_t offset) { return 0xffff; }
+	virtual void ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { }
+	virtual uint16_t protection_r(address_space &space, offs_t offset) { return 0xffff; }
+	virtual void protection_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { }
+	virtual uint16_t addon_r(offs_t offset) { return 0xffff; }
 	virtual uint32_t get_bank_base(uint16_t sel) { return 0; }
 	virtual uint32_t get_special_bank() { return 0; }
 	virtual uint16_t get_helper() { return 0; }
@@ -220,13 +220,13 @@ public:
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	// reading and writing
-	DECLARE_READ16_MEMBER(rom_r);
-	DECLARE_WRITE16_MEMBER(banksel_w);
-	DECLARE_READ16_MEMBER(ram_r);
-	DECLARE_WRITE16_MEMBER(ram_w);
-	DECLARE_READ16_MEMBER(protection_r);
-	DECLARE_WRITE16_MEMBER(protection_w);
-	DECLARE_READ16_MEMBER(addon_r);
+	uint16_t rom_r(offs_t offset);
+	void banksel_w(uint16_t data);
+	uint16_t ram_r(offs_t offset);
+	void ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t protection_r(address_space &space, offs_t offset);
+	void protection_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t addon_r(offs_t offset);
 
 	void set_cart_type(const char *slot);
 	int get_type() { return m_type; }

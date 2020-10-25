@@ -199,13 +199,13 @@ VIDEO_START_MEMBER(omegaf_state,omegaf)
  *
  *************************************/
 
-WRITE8_MEMBER(ninjakd2_state::ninjakd2_bgvideoram_w)
+void ninjakd2_state::ninjakd2_bgvideoram_w(offs_t offset, uint8_t data)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-WRITE8_MEMBER(ninjakd2_state::ninjakd2_fgvideoram_w)
+void ninjakd2_state::ninjakd2_fgvideoram_w(offs_t offset, uint8_t data)
 {
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset >> 1);
@@ -229,12 +229,12 @@ void ninjakd2_state::bg_ctrl(int offset, int data, tilemap_t* tilemap)
 	tilemap->set_scrolly(0, scrolly);
 }
 
-WRITE8_MEMBER(ninjakd2_state::ninjakd2_bg_ctrl_w)
+void ninjakd2_state::ninjakd2_bg_ctrl_w(offs_t offset, uint8_t data)
 {
 	bg_ctrl(offset, data, m_bg_tilemap);
 }
 
-WRITE8_MEMBER(ninjakd2_state::ninjakd2_sprite_overdraw_w)
+void ninjakd2_state::ninjakd2_sprite_overdraw_w(uint8_t data)
 {
 	m_next_sprite_overdraw_enabled = data & 1;
 }
@@ -352,7 +352,7 @@ void ninjakd2_state::erase_sprites( bitmap_ind16 &bitmap)
 		{
 			for (int x = 0; x < m_sprites_bitmap.width(); ++x)
 			{
-				uint16_t* const ptr = &m_sprites_bitmap.pix16(y, x);
+				uint16_t *const ptr = &m_sprites_bitmap.pix(y, x);
 				if ( (*m_stencil_compare_function)(*ptr) ) *ptr = 0xf;
 			}
 		}

@@ -34,13 +34,13 @@ public:
 	DECLARE_READ_LINE_MEMBER(clock_r);
 
 protected:
-	DECLARE_READ8_MEMBER(spacduel_IN3_r);
-	DECLARE_READ8_MEMBER(bwidowp_in_r);
-	DECLARE_WRITE8_MEMBER(bwidow_misc_w);
-	DECLARE_WRITE8_MEMBER(spacduel_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(irq_ack_w);
-	DECLARE_READ8_MEMBER(earom_read);
-	DECLARE_WRITE8_MEMBER(earom_write);
+	uint8_t spacduel_IN3_r(offs_t offset);
+	uint8_t bwidowp_in_r();
+	void bwidow_misc_w(uint8_t data);
+	void spacduel_coin_counter_w(uint8_t data);
+	void irq_ack_w(uint8_t data);
+	uint8_t earom_read();
+	void earom_write(offs_t offset, uint8_t data);
 	void earom_control_w(uint8_t data);
 
 	void bwidow_map(address_map &map);

@@ -76,7 +76,7 @@
 #include "sound/spkrdev.h"
 
 
-static constexpr int16_t default_levels[2] = {0, 32767};
+static constexpr double default_levels[2] = {0.0, 1.0};
 
 // Internal oversampling factor (interm. samples vs stream samples)
 static constexpr int RATE_MULTIPLIER = 4;
@@ -102,7 +102,7 @@ void speaker_sound_device::device_start()
 	int i;
 	double x;
 
-	m_channel = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
+	m_channel = stream_alloc(0, 1, machine().sample_rate());
 
 	m_level = 0;
 	for (i = 0; i < FILTER_LENGTH; i++)
@@ -202,19 +202,19 @@ void speaker_sound_device::device_post_load()
 //-------------------------------------------------
 
 // This can be triggered by the core (based on emulated time) or via level_w().
-void speaker_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void speaker_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *buffer = outputs[0];
-	int volume = m_levels[m_level];
+	auto &buffer = outputs[0];
+	double volume = m_levels[m_level];
 	double filtered_volume;
 	attotime sampled_time = attotime::zero;
 
-	if (samples > 0)
+	if (buffer.samples() > 0)
 	{
 		/* Prepare to update time state */
 		sampled_time = attotime(0, m_channel_sample_period);
-		if (samples > 1)
-			sampled_time *= samples;
+		if (buffer.samples() > 1)
+			sampled_time *= buffer.samples();
 
 		/* Note: since the stream is in the process of being updated,
 		 * stream->sample_time() will return the time before the update! (MAME 0.130)
@@ -222,19 +222,19 @@ void speaker_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 		 */
 	}
 
-	if (samples-- > 0)
+	for (int sampindex = 0; sampindex < buffer.samples(); )
 	{
 		/* Note that first interm. sample may be composed... */
 		filtered_volume = update_interm_samples_get_filtered_volume(volume);
 
 		/* Composite volume is now quantized to the stream resolution */
-		*buffer++ = (stream_sample_t)filtered_volume;
+		buffer.put(sampindex++, filtered_volume);
 
 		/* Any additional samples will be homogeneous, however may need filtering across samples: */
-		while (samples-- > 0)
+		while (sampindex < buffer.samples())
 		{
 			filtered_volume = update_interm_samples_get_filtered_volume(volume);
-			*buffer++ = (stream_sample_t)filtered_volume;
+			buffer.put(sampindex++, filtered_volume);
 		}
 
 		/* Update the time state */
@@ -322,7 +322,7 @@ void speaker_sound_device::update_interm_samples(const attotime &time, int volum
 }
 
 
-double speaker_sound_device::update_interm_samples_get_filtered_volume(int volume)
+double speaker_sound_device::update_interm_samples_get_filtered_volume(double volume)
 {
 	double filtered_volume, tempx;
 
@@ -355,7 +355,7 @@ double speaker_sound_device::update_interm_samples_get_filtered_volume(int volum
 }
 
 
-void speaker_sound_device::finalize_interm_sample(int volume)
+void speaker_sound_device::finalize_interm_sample(double volume)
 {
 	double fraction;
 
@@ -401,7 +401,7 @@ double speaker_sound_device::get_filtered_volume()
 	{
 		if (i >= FILTER_LENGTH) i = 0;
 		filtered_volume += m_composed_volume[i] * m_ampl[c];
-		ampsum += m_ampl[c];
+		ampsum += std::abs(m_ampl[c]);
 	}
 	filtered_volume /= ampsum;
 

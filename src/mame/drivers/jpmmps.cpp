@@ -165,9 +165,9 @@ private:
 	required_device<tms9902_device> m_uart_ic5;
 	required_device<tms9902_device> m_uart_ic10;
 
-	DECLARE_WRITE8_MEMBER(jpmmps_meters_w);
-	DECLARE_WRITE8_MEMBER(jpmmps_psg_buf_w);
-	DECLARE_WRITE8_MEMBER(jpmmps_ic22_portc_w);
+	void jpmmps_meters_w(uint8_t data);
+	void jpmmps_psg_buf_w(uint8_t data);
+	void jpmmps_ic22_portc_w(uint8_t data);
 };
 
 void jpmmps_state::jpmmps_map(address_map &map)
@@ -203,7 +203,7 @@ void jpmmps_state::jpmmps_io_map(address_map &map)
 static INPUT_PORTS_START( jpmmps )
 INPUT_PORTS_END
 
-WRITE8_MEMBER(jpmmps_state::jpmmps_meters_w)
+void jpmmps_state::jpmmps_meters_w(uint8_t data)
 {
 	for (int meter = 0; meter < 8; meter ++)
 	{
@@ -212,12 +212,12 @@ WRITE8_MEMBER(jpmmps_state::jpmmps_meters_w)
 }
 
 
-WRITE8_MEMBER(jpmmps_state::jpmmps_psg_buf_w)
+void jpmmps_state::jpmmps_psg_buf_w(uint8_t data)
 {
 	m_sound_buffer = data;
 }
 
-WRITE8_MEMBER(jpmmps_state::jpmmps_ic22_portc_w)
+void jpmmps_state::jpmmps_ic22_portc_w(uint8_t data)
 {
 	//Handle PSG
 

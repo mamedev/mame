@@ -60,7 +60,7 @@ public:
 class d3d_texture_manager
 {
 public:
-	d3d_texture_manager(): m_renderer(nullptr), m_dynamic_supported(0), m_stretch_supported(0), m_yuv_format(), m_texture_caps(0), m_texture_max_aspect(0), m_texture_max_width(0), m_texture_max_height(0), m_default_texture(nullptr)
+	d3d_texture_manager(): m_renderer(nullptr), m_yuv_format(), m_texture_caps(0), m_texture_max_aspect(0), m_texture_max_width(0), m_texture_max_height(0), m_default_texture(nullptr)
 	{ }
 
 	d3d_texture_manager(renderer_d3d9 *d3d);
@@ -73,9 +73,6 @@ public:
 	texture_info *          find_texinfo(const render_texinfo *texture, uint32_t flags);
 	uint32_t                texture_compute_hash(const render_texinfo *texture, uint32_t flags);
 
-	bool                    is_dynamic_supported() const { return (bool)m_dynamic_supported; }
-	void                    set_dynamic_supported(bool dynamic_supported) { m_dynamic_supported = dynamic_supported; }
-	bool                    is_stretch_supported() const { return (bool)m_stretch_supported; }
 	D3DFORMAT               get_yuv_format() const { return m_yuv_format; }
 
 	DWORD                   get_texture_caps() const { return m_texture_caps; }
@@ -91,8 +88,6 @@ public:
 
 private:
 	renderer_d3d9 *         m_renderer;
-	int                     m_dynamic_supported;        // are dynamic textures supported?
-	int                     m_stretch_supported;        // is StretchRect with point filtering supported?
 	D3DFORMAT               m_yuv_format;               // format to use for YUV textures
 
 	DWORD                   m_texture_caps;             // textureCaps field

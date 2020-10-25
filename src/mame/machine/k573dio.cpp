@@ -159,60 +159,60 @@ void k573dio_device::device_timer(emu_timer &timer, device_timer_id id, int para
 {
 }
 
-READ16_MEMBER(k573dio_device::a00_r)
+uint16_t k573dio_device::a00_r()
 {
 	logerror("%s: a00_r (%s)\n", tag(), machine().describe_context());
 	return 0x0000;
 }
 
-READ16_MEMBER(k573dio_device::a02_r)
+uint16_t k573dio_device::a02_r()
 {
 	logerror("%s: a02_r (%s)\n", tag(), machine().describe_context());
 	return 0x0001;
 }
 
-READ16_MEMBER(k573dio_device::a04_r)
+uint16_t k573dio_device::a04_r()
 {
 	logerror("%s: a04_r (%s)\n", tag(), machine().describe_context());
 	return 0x0000;
 }
 
-READ16_MEMBER(k573dio_device::a06_r)
+uint16_t k573dio_device::a06_r()
 {
 	logerror("%s: a06_r (%s)\n", tag(), machine().describe_context());
 	return 0x0000;
 }
 
-READ16_MEMBER(k573dio_device::a0a_r)
+uint16_t k573dio_device::a0a_r()
 {
 	logerror("%s: a0a_r (%s)\n", tag(), machine().describe_context());
 	return 0x0000;
 }
 
-WRITE16_MEMBER(k573dio_device::a10_w)
+void k573dio_device::a10_w(uint16_t data)
 {
 	logerror("%s: a10_w (%s)\n", tag(), machine().describe_context());
 }
 
-READ16_MEMBER(k573dio_device::ac4_r)
+uint16_t k573dio_device::ac4_r()
 {
 	// What is this?
 	return 0;
 }
 
-READ16_MEMBER(k573dio_device::a80_r)
+uint16_t k573dio_device::a80_r()
 {
 	logerror("%s: a80_r (%s)\n", tag(), machine().describe_context());
 	return 0x1234;
 }
 
-WRITE16_MEMBER(k573dio_device::mpeg_start_adr_high_w)
+void k573dio_device::mpeg_start_adr_high_w(uint16_t data)
 {
 	logerror("FPGA MPEG start address high %04x\n", data);
 	k573fpga->set_mp3_cur_adr((k573fpga->get_mp3_cur_adr() & 0x0000ffff) | (data << 16)); // high
 }
 
-WRITE16_MEMBER(k573dio_device::mpeg_start_adr_low_w)
+void k573dio_device::mpeg_start_adr_low_w(uint16_t data)
 {
 	logerror("FPGA MPEG start address low %04x\n", data);
 	k573fpga->set_mp3_cur_adr((k573fpga->get_mp3_cur_adr() & 0xffff0000) | data); // low
@@ -221,32 +221,32 @@ WRITE16_MEMBER(k573dio_device::mpeg_start_adr_low_w)
 		k573fpga->set_crypto_key3(0);
 }
 
-WRITE16_MEMBER(k573dio_device::mpeg_end_adr_high_w)
+void k573dio_device::mpeg_end_adr_high_w(uint16_t data)
 {
 	logerror("FPGA MPEG end address high %04x\n", data);
 	k573fpga->set_mp3_end_adr((k573fpga->get_mp3_end_adr() & 0x0000ffff) | (data << 16)); // high
 }
 
-WRITE16_MEMBER(k573dio_device::mpeg_end_adr_low_w)
+void k573dio_device::mpeg_end_adr_low_w(uint16_t data)
 {
 	logerror("FPGA MPEG end address low %04x\n", data);
 	k573fpga->set_mp3_end_adr((k573fpga->get_mp3_end_adr() & 0xffff0000) | data); // low
 }
 
-READ16_MEMBER(k573dio_device::mpeg_key_1_r)
+uint16_t k573dio_device::mpeg_key_1_r()
 {
 	// Dance Dance Revolution Solo Bass Mix reads this key before starting songs
 	return crypto_key1;
 }
 
-WRITE16_MEMBER(k573dio_device::mpeg_key_1_w)
+void k573dio_device::mpeg_key_1_w(uint16_t data)
 {
 	logerror("FPGA MPEG key 1/3 %04x\n", data);
 	crypto_key1 = data;
 	k573fpga->set_crypto_key1(data);
 }
 
-READ16_MEMBER(k573dio_device::mas_i2c_r)
+uint16_t k573dio_device::mas_i2c_r()
 {
 	int scl = mas3507d->i2c_scl_r() << 13;
 	int sda = mas3507d->i2c_sda_r() << 12;
@@ -254,13 +254,13 @@ READ16_MEMBER(k573dio_device::mas_i2c_r)
 	return scl | sda;
 }
 
-WRITE16_MEMBER(k573dio_device::mas_i2c_w)
+void k573dio_device::mas_i2c_w(uint16_t data)
 {
 	mas3507d->i2c_scl_w(data & 0x2000);
 	mas3507d->i2c_sda_w(data & 0x1000);
 }
 
-READ16_MEMBER(k573dio_device::mpeg_ctrl_r)
+uint16_t k573dio_device::mpeg_ctrl_r()
 {
 	if (k573fpga->get_mpeg_ctrl() == 0x1000 && !k573fpga->is_playing()) {
 		// Set the FPGA to stop mode so that data won't be sent anymore
@@ -270,101 +270,101 @@ READ16_MEMBER(k573dio_device::mpeg_ctrl_r)
 	return k573fpga->get_mpeg_ctrl();
 }
 
-WRITE16_MEMBER(k573dio_device::mpeg_ctrl_w)
+void k573dio_device::mpeg_ctrl_w(uint16_t data)
 {
 	k573fpga->set_mpeg_ctrl(data);
 }
 
-WRITE16_MEMBER(k573dio_device::ram_write_adr_high_w)
+void k573dio_device::ram_write_adr_high_w(uint16_t data)
 {
 	// read and write address are shared
 	ram_adr = ((ram_adr & 0x0000ffff) | (data << 16)) & 0x1ffffff;
 }
 
-WRITE16_MEMBER(k573dio_device::ram_write_adr_low_w)
+void k573dio_device::ram_write_adr_low_w(uint16_t data)
 {
 	// read and write address are shared
 	ram_adr = ((ram_adr & 0xffff0000) | data) & 0x1ffffff;
 }
 
-READ16_MEMBER(k573dio_device::ram_r)
+uint16_t k573dio_device::ram_r()
 {
 	uint16_t res = ram[(ram_read_adr & 0x1ffffff) >> 1];
 	ram_read_adr += 2;
 	return res;
 }
 
-WRITE16_MEMBER(k573dio_device::ram_w)
+void k573dio_device::ram_w(uint16_t data)
 {
 	ram[(ram_adr & 0x1ffffff) >> 1] = data;
 	ram_adr += 2;
 }
 
-WRITE16_MEMBER(k573dio_device::ram_read_adr_high_w)
+void k573dio_device::ram_read_adr_high_w(uint16_t data)
 {
 	// read and write address are shared
 	ram_read_adr = ((ram_read_adr & 0x0000ffff) | (data << 16)) & 0x1ffffff;
 }
 
-WRITE16_MEMBER(k573dio_device::ram_read_adr_low_w)
+void k573dio_device::ram_read_adr_low_w(uint16_t data)
 {
 	// read and write address are shared
 	ram_read_adr = ((ram_read_adr & 0xffff0000) | data) & 0x1ffffff;
 }
 
-READ16_MEMBER(k573dio_device::mp3_frame_count_high_r)
+uint16_t k573dio_device::mp3_frame_count_high_r()
 {
 	return (mas3507d->get_frame_count() & 0xffff0000) >> 16;
 }
 
-READ16_MEMBER(k573dio_device::mp3_frame_count_low_r)
+uint16_t k573dio_device::mp3_frame_count_low_r()
 {
 	return mas3507d->get_frame_count() & 0x0000ffff;
 }
 
-WRITE16_MEMBER(k573dio_device::output_1_w)
+void k573dio_device::output_1_w(uint16_t data)
 {
 	output(1, data);
 }
 
-WRITE16_MEMBER(k573dio_device::output_0_w)
+void k573dio_device::output_0_w(uint16_t data)
 {
 	output(0, data);
 }
 
-WRITE16_MEMBER(k573dio_device::output_3_w)
+void k573dio_device::output_3_w(uint16_t data)
 {
 	output(3, data);
 }
 
-WRITE16_MEMBER(k573dio_device::output_7_w)
+void k573dio_device::output_7_w(uint16_t data)
 {
 	output(7, data);
 }
 
-WRITE16_MEMBER(k573dio_device::mpeg_key_2_w)
+void k573dio_device::mpeg_key_2_w(uint16_t data)
 {
 	logerror("FPGA MPEG key 2/3 %04x\n", data);
 	k573fpga->set_crypto_key2(data);
 }
 
-WRITE16_MEMBER(k573dio_device::mpeg_key_3_w)
+void k573dio_device::mpeg_key_3_w(uint16_t data)
 {
 	logerror("FPGA MPEG key 3/3 %04x\n", data);
 	k573fpga->set_crypto_key3(data);
 }
 
-READ16_MEMBER(k573dio_device::digital_id_r)
+uint16_t k573dio_device::digital_id_r()
 {
 	return digital_id->read() << 12;
 }
 
-WRITE16_MEMBER(k573dio_device::digital_id_w)
+void k573dio_device::digital_id_w(uint16_t data)
 {
 	digital_id->write( !( ( data >> 12 ) & 1 ) );
 }
 
-READ16_MEMBER(k573dio_device::fpga_status_r)
+uint16_t k573dio_device::fpga_status_r()
 {
 	//logerror("%s: fpga_status_r (%s)\n", tag(), machine().describe_context());
 
@@ -380,27 +380,27 @@ READ16_MEMBER(k573dio_device::fpga_status_r)
 	return 0x8000 | 0x2000 | 0x1000;
 }
 
-WRITE16_MEMBER(k573dio_device::fpga_firmware_w)
+void k573dio_device::fpga_firmware_w(uint16_t data)
 {
 	// Firmware bits in bit 15, always the same firmware
 }
 
-WRITE16_MEMBER(k573dio_device::output_4_w)
+void k573dio_device::output_4_w(uint16_t data)
 {
 	output(4, data);
 }
 
-WRITE16_MEMBER(k573dio_device::output_5_w)
+void k573dio_device::output_5_w(uint16_t data)
 {
 	output(5, data);
 }
 
-WRITE16_MEMBER(k573dio_device::output_2_w)
+void k573dio_device::output_2_w(uint16_t data)
 {
 	output(2, data);
 }
 
-READ16_MEMBER(k573dio_device::mp3_unk_r)
+uint16_t k573dio_device::mp3_unk_r()
 {
 	return 0;
 }

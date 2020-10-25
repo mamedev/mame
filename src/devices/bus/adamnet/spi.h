@@ -46,8 +46,8 @@ protected:
 private:
 	required_device<m6801_cpu_device> m_maincpu;
 
-	DECLARE_READ8_MEMBER( p2_r );
-	DECLARE_WRITE8_MEMBER( p2_w );
+	uint8_t p2_r();
+	void p2_w(uint8_t data);
 
 	void adam_spi_mem(address_map &map);
 };

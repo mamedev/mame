@@ -115,24 +115,24 @@ private:
 	optional_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
 
-	DECLARE_WRITE8_MEMBER( port_write );
-	DECLARE_READ8_MEMBER( port_read );
-	DECLARE_WRITE8_MEMBER( port_write_1b00 );
-	DECLARE_READ8_MEMBER( port_read_1b00 );
+	void port_write(offs_t offset, uint8_t data);
+	uint8_t port_read(offs_t offset);
+	void port_write_1b00(offs_t offset, uint8_t data);
+	uint8_t port_read_1b00(offs_t offset);
 
-	DECLARE_READ8_MEMBER( videoram_read );
-	DECLARE_WRITE8_MEMBER( videoram_write );
+	uint8_t videoram_read(offs_t offset);
+	void videoram_write(offs_t offset, uint8_t data);
 
 	uint8_t hiram[0x1000];
-	DECLARE_READ8_MEMBER( hiram_read );
-	DECLARE_WRITE8_MEMBER( hiram_write );
+	uint8_t hiram_read(offs_t offset);
+	void hiram_write(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( rm380z_portlow_r );
-	DECLARE_WRITE8_MEMBER( rm380z_portlow_w );
-	DECLARE_READ8_MEMBER( rm380z_porthi_r );
-	DECLARE_WRITE8_MEMBER( rm380z_porthi_w );
+	uint8_t rm380z_portlow_r();
+	void rm380z_portlow_w(offs_t offset, uint8_t data);
+	uint8_t rm380z_porthi_r();
+	void rm380z_porthi_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(disk_0_control);
+	void disk_0_control(uint8_t data);
 
 	void keyboard_put(u8 data);
 

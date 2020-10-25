@@ -75,15 +75,15 @@ private:
 	inline void key_down(int state);
 	inline void scan_mouse();
 
-	DECLARE_WRITE8_MEMBER( z2_p1_w );
-	DECLARE_READ8_MEMBER( z2_p2_r );
+	void z2_p1_w(uint8_t data);
+	uint8_t z2_p2_r();
 	DECLARE_READ_LINE_MEMBER( z2_t0_r );
 	DECLARE_READ_LINE_MEMBER( z2_t1_r );
 
-	DECLARE_WRITE8_MEMBER( z2_led_w );
-	DECLARE_READ8_MEMBER( z5_p1_r );
-	DECLARE_WRITE8_MEMBER( z5_p2_w );
-	DECLARE_READ8_MEMBER( z5_t1_r );
+	void z2_led_w(uint8_t data);
+	uint8_t z5_p1_r();
+	void z5_p2_w(uint8_t data);
+	uint8_t z5_t1_r();
 
 	void abc99_z2_io(address_map &map);
 	void abc99_z2_mem(address_map &map);

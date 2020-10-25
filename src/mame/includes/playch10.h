@@ -56,10 +56,10 @@ public:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(up8w_w);
-	DECLARE_READ8_MEMBER(ram_8w_r);
-	DECLARE_WRITE8_MEMBER(ram_8w_w);
-	DECLARE_WRITE8_MEMBER(sprite_dma_w);
-	DECLARE_WRITE8_MEMBER(time_w);
+	uint8_t ram_8w_r(offs_t offset);
+	void ram_8w_w(offs_t offset, uint8_t data);
+	void sprite_dma_w(address_space &space, uint8_t data);
+	void time_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(sdcs_w);
 	DECLARE_WRITE_LINE_MEMBER(cntrl_mask_w);
 	DECLARE_WRITE_LINE_MEMBER(disp_mask_w);
@@ -67,26 +67,26 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
 	DECLARE_WRITE_LINE_MEMBER(dog_di_w);
 	DECLARE_WRITE_LINE_MEMBER(ppu_reset_w);
-	DECLARE_READ8_MEMBER(pc10_detectclr_r);
-	DECLARE_WRITE8_MEMBER(cart_sel_w);
-	DECLARE_READ8_MEMBER(pc10_prot_r);
-	DECLARE_WRITE8_MEMBER(pc10_prot_w);
-	DECLARE_WRITE8_MEMBER(pc10_in0_w);
-	DECLARE_READ8_MEMBER(pc10_in0_r);
-	DECLARE_READ8_MEMBER(pc10_in1_r);
-	DECLARE_WRITE8_MEMBER(pc10_nt_w);
-	DECLARE_READ8_MEMBER(pc10_nt_r);
-	DECLARE_WRITE8_MEMBER(pc10_chr_w);
-	DECLARE_READ8_MEMBER(pc10_chr_r);
-	DECLARE_WRITE8_MEMBER(mmc1_rom_switch_w);
-	DECLARE_WRITE8_MEMBER(aboard_vrom_switch_w);
-	DECLARE_WRITE8_MEMBER(bboard_rom_switch_w);
-	DECLARE_WRITE8_MEMBER(cboard_vrom_switch_w);
-	DECLARE_WRITE8_MEMBER(eboard_rom_switch_w);
-	DECLARE_WRITE8_MEMBER(gboard_rom_switch_w);
-	DECLARE_WRITE8_MEMBER(iboard_rom_switch_w);
-	DECLARE_WRITE8_MEMBER(hboard_rom_switch_w);
-	DECLARE_WRITE8_MEMBER(playch10_videoram_w);
+	uint8_t pc10_detectclr_r();
+	void cart_sel_w(uint8_t data);
+	uint8_t pc10_prot_r();
+	void pc10_prot_w(uint8_t data);
+	void pc10_in0_w(uint8_t data);
+	uint8_t pc10_in0_r();
+	uint8_t pc10_in1_r();
+	void pc10_nt_w(offs_t offset, uint8_t data);
+	uint8_t pc10_nt_r(offs_t offset);
+	void pc10_chr_w(offs_t offset, uint8_t data);
+	uint8_t pc10_chr_r(offs_t offset);
+	void mmc1_rom_switch_w(offs_t offset, uint8_t data);
+	void aboard_vrom_switch_w(uint8_t data);
+	void bboard_rom_switch_w(uint8_t data);
+	void cboard_vrom_switch_w(uint8_t data);
+	void eboard_rom_switch_w(offs_t offset, uint8_t data);
+	void gboard_rom_switch_w(offs_t offset, uint8_t data);
+	void iboard_rom_switch_w(uint8_t data);
+	void hboard_rom_switch_w(offs_t offset, uint8_t data);
+	void playch10_videoram_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 

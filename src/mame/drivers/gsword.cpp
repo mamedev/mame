@@ -153,14 +153,14 @@ So far, the AA-016 and AA-017 MCUs have been dumped successfully.
 
 At least two Great Swordsman boards have been seen with a UVEPROM-based
 D8741A-8 MCU for AA-013 at 9.5A.  This suggests the developers made some
-last-minute change to the code that only the main CPU.
+last-minute change to the code that only affects the main CPU.
 
 It appears that during development, the developers worked with three
 copies of what became the AA-016 MCU.  Protection code was added to the
 I/O MCU program, and this became AA-017.  At this point they intended to
 use two copies of AA-016 for communications, and one AA-017 for I/O.  It
-turned out that some last-minute change was required for the master CPU,
-but it was too late to order new mask ROM MUCs.  This resulted in the
+turned out that some last-minute change was required for the main CPU,
+but it was too late to order new mask ROM MCUs.  This resulted in the
 use of UVEPROM parts for AA-013.
 
 There are problems with sound.  Many effects aren't playing or are cut
@@ -255,9 +255,9 @@ contained within a single page.  The initialisation/self test and mode
 selection, the subroutine for receiving configuration, and an unused
 subroutine for sending a negated program byte to the host are in page 0.
 The subroutines that implement coin handling are in page 1.  There are
-three input handling and protection programs of increasing of increasing
-complexity in page 2 and page 3.  The host selects the input handling
-program to use with the high nybble of the first command.
+three input handling and protection programs of increasing complexity in
+page 2 and page 3.  The host selects the input handling program to use
+with the high nybble of the first command.
 
 The subroutine for receiving configuration from the host is identical to
 the one in the AA-016 MCU besides being shifted to a different address.
@@ -310,11 +310,11 @@ command:
 The MCU keeps an internal credit counter ($2D).  Each time the MCU
 receives a polling command, if the credit counter is non-zero it will be
 decremented and bit 7 of the response will be set; if the credit counter
-is zero, but 7 of the response will be clear.
+is zero, bit 7 of the response will be clear.
 
 After terminating the setup phase, any byte written to the data port
 will cause the MCU to check the coin inputs, update the credit counter
-if necessary, and return the desired data.  A byte written to the
+if necessary, and return the requested data.  A byte written to the
 control port after the setup phase terminates causes the MCU to read a
 byte of program memory from page 2 using the received byte as the
 offset, twos-complement it, return it, and then immediately re-execute
@@ -357,22 +357,22 @@ void gsword_state_base::machine_reset()
 {
 }
 
-WRITE8_MEMBER(gsword_state_base::ay8910_control_port_0_w)
+void gsword_state_base::ay8910_control_port_0_w(u8 data)
 {
 	m_ay0->address_w(data);
 	m_fake8910_0 = data;
 }
-WRITE8_MEMBER(gsword_state_base::ay8910_control_port_1_w)
+void gsword_state_base::ay8910_control_port_1_w(u8 data)
 {
 	m_ay1->address_w(data);
 	m_fake8910_1 = data;
 }
 
-READ8_MEMBER(gsword_state_base::fake_0_r)
+u8 gsword_state_base::fake_0_r()
 {
 	return m_fake8910_0+1;
 }
-READ8_MEMBER(gsword_state_base::fake_1_r)
+u8 gsword_state_base::fake_1_r()
 {
 	return m_fake8910_1+1;
 }
@@ -381,7 +381,7 @@ READ8_MEMBER(gsword_state_base::fake_1_r)
 /* CPU 2 memory hack */
 /* (402E) timeout upcount must be under 0AH                         */
 /* (4004,4005) clear down counter , if (4004,4005)==0 then (402E)=0 */
-READ8_MEMBER(gsword_state::hack_r)
+u8 gsword_state::hack_r(offs_t offset)
 {
 	u8 const data = m_cpu2_ram[offset + 4];
 
@@ -399,7 +399,7 @@ READ8_MEMBER(gsword_state::hack_r)
 	return data;
 }
 
-WRITE8_MEMBER(gsword_state::nmi_set_w)
+void gsword_state::nmi_set_w(u8 data)
 {
 /*  osd_printf_debug("AY write %02X\n",data);*/
 
@@ -434,27 +434,27 @@ WRITE8_MEMBER(gsword_state::nmi_set_w)
 #endif
 }
 
-WRITE8_MEMBER(gsword_state::sound_command_w)
+void gsword_state::sound_command_w(u8 data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-WRITE8_MEMBER(gsword_state::adpcm_data_w)
+void gsword_state::adpcm_data_w(u8 data)
 {
 	m_msm->data_w(data & 0x0f);     // bit 0..3
 	m_msm->reset_w(BIT(data, 5));   // bit 5
 	m_msm->vclk_w(BIT(data, 4));    // bit 4
 }
 
-READ8_MEMBER(gsword_state::mcu2_p1_r)
+u8 gsword_state::mcu2_p1_r()
 {
 	// P10 is tied to P10 on MCU1, P11 is used to drive T1 on MCU1
 	// assume the low bits of DIP switch A aren't connected at all
 	return (m_dsw0->read() & 0xfc) | 0x02 | BIT(m_mcu1_p1, 0);
 }
 
-WRITE8_MEMBER(gsword_state::mcu3_p2_w)
+void gsword_state::mcu3_p2_w(u8 data)
 {
 	machine().bookkeeping().coin_counter_w(0, BIT(~data, 6));
 	machine().bookkeeping().coin_counter_w(1, BIT(~data, 7));
@@ -477,7 +477,7 @@ void gsword_state::init_gsword()
 #endif
 #if 1
 	/* hack for sound protection or time out function */
-	m_subcpu->space(AS_PROGRAM).install_read_handler(0x4004, 0x4005, read8_delegate(*this, FUNC(gsword_state::hack_r)));
+	m_subcpu->space(AS_PROGRAM).install_read_handler(0x4004, 0x4005, read8sm_delegate(*this, FUNC(gsword_state::hack_r)));
 #endif
 }
 
@@ -492,7 +492,7 @@ void gsword_state::init_gsword2()
 #endif
 #if 1
 	/* hack for sound protection or time out function */
-	m_subcpu->space(AS_PROGRAM).install_read_handler(0x4004, 0x4005, read8_delegate(*this, FUNC(gsword_state::hack_r)));
+	m_subcpu->space(AS_PROGRAM).install_read_handler(0x4004, 0x4005, read8sm_delegate(*this, FUNC(gsword_state::hack_r)));
 #endif
 }
 
@@ -516,13 +516,13 @@ void gsword_state::machine_reset()
 }
 
 
-READ8_MEMBER(josvolly_state::mcu1_p1_r)
+u8 josvolly_state::mcu1_p1_r()
 {
 	// the two MCUs appear to have port 1 tied together
 	return m_mcu1_p1 & m_mcu2_p1;
 }
 
-READ8_MEMBER(josvolly_state::mcu1_p2_r)
+u8 josvolly_state::mcu1_p2_r()
 {
 	// p27 needs to float high for the MCU to start in the right mode
 	// p20 and p21 drive the test inputs of the other MCU
@@ -531,29 +531,29 @@ READ8_MEMBER(josvolly_state::mcu1_p2_r)
 	return 0x80U | ioport("DSW1")->read();
 }
 
-READ8_MEMBER(josvolly_state::mcu2_p1_r)
+u8 josvolly_state::mcu2_p1_r()
 {
 	// the two MCUs appear to have port 1 tied together
 	return m_mcu1_p1 & m_mcu2_p1;
 }
 
-READ8_MEMBER(josvolly_state::mcu2_p2_r)
+u8 josvolly_state::mcu2_p2_r()
 {
 	// p27 needs to be tied low for the MCU to start in the right mode
 	return 0x7fU & ioport("DSW2")->read();
 }
 
-WRITE8_MEMBER(josvolly_state::cpu2_nmi_enable_w)
+void josvolly_state::cpu2_nmi_enable_w(u8 data)
 {
 	m_cpu2_nmi_enable = true;
 }
 
-WRITE8_MEMBER(josvolly_state::cpu2_irq_clear_w)
+void josvolly_state::cpu2_irq_clear_w(u8 data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(josvolly_state::mcu1_p1_w)
+void josvolly_state::mcu1_p1_w(u8 data)
 {
 	if (data != m_mcu1_p1)
 	{
@@ -562,7 +562,7 @@ WRITE8_MEMBER(josvolly_state::mcu1_p1_w)
 	}
 }
 
-WRITE8_MEMBER(josvolly_state::mcu1_p2_w)
+void josvolly_state::mcu1_p2_w(u8 data)
 {
 	if (data != m_mcu1_p2)
 	{
@@ -581,7 +581,7 @@ WRITE8_MEMBER(josvolly_state::mcu1_p2_w)
 	}
 }
 
-WRITE8_MEMBER(josvolly_state::mcu2_p1_w)
+void josvolly_state::mcu2_p1_w(u8 data)
 {
 	if (data != m_mcu2_p1)
 	{
@@ -590,7 +590,7 @@ WRITE8_MEMBER(josvolly_state::mcu2_p1_w)
 	}
 }
 
-WRITE8_MEMBER(josvolly_state::mcu2_p2_w)
+void josvolly_state::mcu2_p2_w(u8 data)
 {
 	logerror("mcu2 p2 = 0x%02x\n", data);
 }

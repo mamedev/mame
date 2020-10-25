@@ -66,92 +66,92 @@ public:
 
 	template <typename... T> void set_ftcsr_read_callback(T &&... args) { m_ftcsr_read_cb.set(std::forward<T>(args)...); }
 
-	DECLARE_READ32_MEMBER(sh2_internal_a5);
+	uint32_t sh2_internal_a5();
 
 	// SCI
-	DECLARE_READ8_MEMBER( smr_r );
-	DECLARE_WRITE8_MEMBER( smr_w );
-	DECLARE_READ8_MEMBER( brr_r );
-	DECLARE_WRITE8_MEMBER( brr_w );
-	DECLARE_READ8_MEMBER( scr_r );
-	DECLARE_WRITE8_MEMBER( scr_w );
-	DECLARE_READ8_MEMBER( tdr_r );
-	DECLARE_WRITE8_MEMBER( tdr_w );
-	DECLARE_READ8_MEMBER( ssr_r );
-	DECLARE_WRITE8_MEMBER( ssr_w );
-	DECLARE_READ8_MEMBER( rdr_r );
+	uint8_t smr_r();
+	void smr_w(uint8_t data);
+	uint8_t brr_r();
+	void brr_w(uint8_t data);
+	uint8_t scr_r();
+	void scr_w(uint8_t data);
+	uint8_t tdr_r();
+	void tdr_w(uint8_t data);
+	uint8_t ssr_r();
+	void ssr_w(uint8_t data);
+	uint8_t rdr_r();
 
 	// FRT / FRC
-	DECLARE_READ8_MEMBER( tier_r );
-	DECLARE_WRITE8_MEMBER( tier_w );
-	DECLARE_READ16_MEMBER( frc_r );
-	DECLARE_WRITE16_MEMBER( frc_w );
-	DECLARE_READ8_MEMBER( ftcsr_r );
-	DECLARE_WRITE8_MEMBER( ftcsr_w );
-	DECLARE_READ16_MEMBER( ocra_b_r );
-	DECLARE_WRITE16_MEMBER( ocra_b_w );
-	DECLARE_READ8_MEMBER( frc_tcr_r );
-	DECLARE_WRITE8_MEMBER( frc_tcr_w );
-	DECLARE_READ8_MEMBER( tocr_r );
-	DECLARE_WRITE8_MEMBER( tocr_w );
-	DECLARE_READ16_MEMBER( frc_icr_r );
+	uint8_t tier_r();
+	void tier_w(uint8_t data);
+	uint16_t frc_r();
+	void frc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t ftcsr_r();
+	void ftcsr_w(uint8_t data);
+	uint16_t ocra_b_r();
+	void ocra_b_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t frc_tcr_r();
+	void frc_tcr_w(uint8_t data);
+	uint8_t tocr_r();
+	void tocr_w(uint8_t data);
+	uint16_t frc_icr_r();
 
 	// INTC
-	DECLARE_READ16_MEMBER( ipra_r );
-	DECLARE_WRITE16_MEMBER( ipra_w );
-	DECLARE_READ16_MEMBER( iprb_r );
-	DECLARE_WRITE16_MEMBER( iprb_w );
-	DECLARE_READ16_MEMBER( vcra_r );
-	DECLARE_WRITE16_MEMBER( vcra_w );
-	DECLARE_READ16_MEMBER( vcrb_r );
-	DECLARE_WRITE16_MEMBER( vcrb_w );
-	DECLARE_READ16_MEMBER( vcrc_r );
-	DECLARE_WRITE16_MEMBER( vcrc_w );
-	DECLARE_READ16_MEMBER( vcrd_r );
-	DECLARE_WRITE16_MEMBER( vcrd_w );
-	DECLARE_READ16_MEMBER( vcrwdt_r );
-	DECLARE_WRITE16_MEMBER( vcrwdt_w );
-	DECLARE_READ32_MEMBER( vcrdiv_r );
-	DECLARE_WRITE32_MEMBER( vcrdiv_w );
-	DECLARE_READ16_MEMBER( intc_icr_r );
-	DECLARE_WRITE16_MEMBER( intc_icr_w );
+	uint16_t ipra_r();
+	void ipra_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t iprb_r();
+	void iprb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t vcra_r();
+	void vcra_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t vcrb_r();
+	void vcrb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t vcrc_r();
+	void vcrc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t vcrd_r();
+	void vcrd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t vcrwdt_r();
+	void vcrwdt_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint32_t vcrdiv_r();
+	void vcrdiv_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint16_t intc_icr_r();
+	void intc_icr_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	// DIVU
-	DECLARE_READ32_MEMBER( dvsr_r );
-	DECLARE_WRITE32_MEMBER( dvsr_w );
-	DECLARE_READ32_MEMBER( dvdnt_r );
-	DECLARE_WRITE32_MEMBER( dvdnt_w );
-	DECLARE_READ32_MEMBER( dvdnth_r );
-	DECLARE_WRITE32_MEMBER( dvdnth_w );
-	DECLARE_READ32_MEMBER( dvdntl_r );
-	DECLARE_WRITE32_MEMBER( dvdntl_w );
+	uint32_t dvsr_r();
+	void dvsr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t dvdnt_r();
+	void dvdnt_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t dvdnth_r();
+	void dvdnth_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t dvdntl_r();
+	void dvdntl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_READ32_MEMBER( dvcr_r );
-	DECLARE_WRITE32_MEMBER( dvcr_w );
+	uint32_t dvcr_r();
+	void dvcr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	// DMAC
-	template <int Channel> READ32_MEMBER(vcrdma_r)
+	template <int Channel> uint32_t vcrdma_r()
 	{
 		return m_vcrdma[Channel] & 0x7f;
 	}
 
-	template <int Channel> WRITE32_MEMBER(vcrdma_w)
+	template <int Channel> void vcrdma_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0)
 	{
 		COMBINE_DATA(&m_vcrdma[Channel]);
 		m_irq_vector.dmac[Channel] = m_vcrdma[Channel] & 0x7f;
 		sh2_recalc_irq();
 	}
 
-	template <int Channel> READ8_MEMBER(drcr_r) { return m_dmac[Channel].drcr & 3; }
-	template <int Channel> WRITE8_MEMBER(drcr_w) { m_dmac[Channel].drcr = data & 3; sh2_recalc_irq(); }
-	template <int Channel> READ32_MEMBER(sar_r) { return m_dmac[Channel].sar; }
-	template <int Channel> WRITE32_MEMBER(sar_w) { COMBINE_DATA(&m_dmac[Channel].sar); }
-	template <int Channel> READ32_MEMBER(dar_r) { return m_dmac[Channel].dar; }
-	template <int Channel> WRITE32_MEMBER(dar_w) { COMBINE_DATA(&m_dmac[Channel].dar); }
-	template <int Channel> READ32_MEMBER(dmac_tcr_r) { return m_dmac[Channel].tcr; }
-	template <int Channel> WRITE32_MEMBER(dmac_tcr_w) { COMBINE_DATA(&m_dmac[Channel].tcr); m_dmac[Channel].tcr &= 0xffffff; }
-	template <int Channel> READ32_MEMBER(chcr_r) { return m_dmac[Channel].chcr; }
-	template <int Channel> WRITE32_MEMBER(chcr_w)
+	template <int Channel> uint8_t drcr_r() { return m_dmac[Channel].drcr & 3; }
+	template <int Channel> void drcr_w(uint8_t data) { m_dmac[Channel].drcr = data & 3; sh2_recalc_irq(); }
+	template <int Channel> uint32_t sar_r() { return m_dmac[Channel].sar; }
+	template <int Channel> void sar_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) { COMBINE_DATA(&m_dmac[Channel].sar); }
+	template <int Channel> uint32_t dar_r() { return m_dmac[Channel].dar; }
+	template <int Channel> void dar_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) { COMBINE_DATA(&m_dmac[Channel].dar); }
+	template <int Channel> uint32_t dmac_tcr_r() { return m_dmac[Channel].tcr; }
+	template <int Channel> void dmac_tcr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) { COMBINE_DATA(&m_dmac[Channel].tcr); m_dmac[Channel].tcr &= 0xffffff; }
+	template <int Channel> uint32_t chcr_r() { return m_dmac[Channel].chcr; }
+	template <int Channel> void chcr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0)
 	{
 		uint32_t old;
 		old = m_dmac[Channel].chcr;
@@ -159,8 +159,8 @@ public:
 		m_dmac[Channel].chcr = (data & ~2) | (old & m_dmac[Channel].chcr & 2);
 		sh2_dmac_check(Channel);
 	}
-	READ32_MEMBER( dmaor_r ) { return m_dmaor & 0xf; }
-	WRITE32_MEMBER( dmaor_w )
+	uint32_t dmaor_r() { return m_dmaor & 0xf; }
+	void dmaor_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0)
 	{
 		if(ACCESSING_BITS_0_7)
 		{
@@ -173,32 +173,32 @@ public:
 	}
 
 	// WTC
-	DECLARE_READ16_MEMBER( wtcnt_r );
-	DECLARE_WRITE16_MEMBER( wtcnt_w );
-	DECLARE_READ16_MEMBER( rstcsr_r );
-	DECLARE_WRITE16_MEMBER( rstcsr_w );
+	uint16_t wtcnt_r();
+	void wtcnt_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t rstcsr_r();
+	void rstcsr_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	// misc
-	DECLARE_READ16_MEMBER( fmr_sbycr_r );
-	DECLARE_WRITE16_MEMBER( fmr_sbycr_w );
-	DECLARE_READ8_MEMBER( ccr_r );
-	DECLARE_WRITE8_MEMBER( ccr_w );
+	uint16_t fmr_sbycr_r();
+	void fmr_sbycr_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t ccr_r();
+	void ccr_w(uint8_t data);
 
 	// BSC
-	DECLARE_READ32_MEMBER( bcr1_r );
-	DECLARE_WRITE32_MEMBER( bcr1_w );
-	DECLARE_READ32_MEMBER( bcr2_r );
-	DECLARE_WRITE32_MEMBER( bcr2_w );
-	DECLARE_READ32_MEMBER( wcr_r );
-	DECLARE_WRITE32_MEMBER( wcr_w );
-	DECLARE_READ32_MEMBER( mcr_r );
-	DECLARE_WRITE32_MEMBER( mcr_w );
-	DECLARE_READ32_MEMBER( rtcsr_r );
-	DECLARE_WRITE32_MEMBER( rtcsr_w );
-	DECLARE_READ32_MEMBER( rtcor_r );
-	DECLARE_WRITE32_MEMBER( rtcor_w );
-	DECLARE_READ32_MEMBER( rtcnt_r );
-	DECLARE_WRITE32_MEMBER( rtcnt_w );
+	uint32_t bcr1_r();
+	void bcr1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t bcr2_r();
+	void bcr2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t wcr_r();
+	void wcr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t mcr_r();
+	void mcr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t rtcsr_r();
+	void rtcsr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t rtcor_r();
+	void rtcor_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t rtcnt_r();
+	void rtcnt_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 
 	virtual void set_frt_input(int state) override;
@@ -244,6 +244,8 @@ private:
 	int8_t    m_irq_line_state[17];
 
 	address_space *m_internal;
+
+
 	// SCI
 	uint8_t m_smr = 0, m_brr = 0, m_scr = 0, m_tdr = 0, m_ssr = 0;
 	// FRT / FRC
@@ -366,18 +368,18 @@ public:
 	// construction/destruction
 	sh2a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ32_MEMBER(dma_sar0_r);
-	DECLARE_WRITE32_MEMBER(dma_sar0_w);
-	DECLARE_READ32_MEMBER(dma_dar0_r);
-	DECLARE_WRITE32_MEMBER(dma_dar0_w);
-	DECLARE_READ16_MEMBER(dmaor_r);
-	DECLARE_WRITE16_MEMBER(dmaor_w);
-	DECLARE_READ16_MEMBER(dma_tcr0_r);
-	DECLARE_WRITE16_MEMBER(dma_tcr0_w);
-	DECLARE_READ16_MEMBER(dma_chcr0_r);
-	DECLARE_WRITE16_MEMBER(dma_chcr0_w);
-	DECLARE_READ16_MEMBER(sh7021_r);
-	DECLARE_WRITE16_MEMBER(sh7021_w);
+	uint32_t dma_sar0_r();
+	void dma_sar0_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t dma_dar0_r();
+	void dma_dar0_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint16_t dmaor_r();
+	void dmaor_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t dma_tcr0_r();
+	void dma_tcr0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t dma_chcr0_r();
+	void dma_chcr0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t sh7021_r(offs_t offset);
+	void sh7021_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void sh7032_dma_exec(int ch);
 
 	void sh7021_map(address_map &map);
@@ -400,8 +402,8 @@ public:
 	// construction/destruction
 	sh1_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 
-	DECLARE_READ16_MEMBER(sh7032_r);
-	DECLARE_WRITE16_MEMBER(sh7032_w);
+	uint16_t sh7032_r(offs_t offset);
+	void sh7032_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void sh7032_map(address_map &map);
 private:
 	uint16_t m_sh7032_regs[0x200];

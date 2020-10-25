@@ -35,15 +35,15 @@ public:
 	void tmc2000e(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER( vismac_r );
-	DECLARE_WRITE8_MEMBER( vismac_w );
-	DECLARE_READ8_MEMBER( floppy_r );
-	DECLARE_WRITE8_MEMBER( floppy_w );
-	DECLARE_READ8_MEMBER( ascii_keyboard_r );
-	DECLARE_READ8_MEMBER( io_r );
-	DECLARE_WRITE8_MEMBER( io_w );
-	DECLARE_WRITE8_MEMBER( io_select_w );
-	DECLARE_WRITE8_MEMBER( keyboard_latch_w );
+	uint8_t vismac_r();
+	void vismac_w(uint8_t data);
+	uint8_t floppy_r();
+	void floppy_w(uint8_t data);
+	uint8_t ascii_keyboard_r();
+	uint8_t io_r();
+	void io_w(uint8_t data);
+	void io_select_w(uint8_t data);
+	void keyboard_latch_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER( rdata_r );
 	DECLARE_READ_LINE_MEMBER( bdata_r );
 	DECLARE_READ_LINE_MEMBER( gdata_r );
@@ -51,7 +51,7 @@ private:
 	DECLARE_READ_LINE_MEMBER( ef2_r );
 	DECLARE_READ_LINE_MEMBER( ef3_r );
 	DECLARE_WRITE_LINE_MEMBER( q_w );
-	DECLARE_WRITE8_MEMBER( dma_w );
+	void dma_w(offs_t offset, uint8_t data);
 
 	/* video state */
 	int m_cdp1864_efx;      /* EFx */

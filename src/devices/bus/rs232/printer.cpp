@@ -52,7 +52,7 @@ WRITE_LINE_MEMBER(serial_printer_device::update_serial)
 	set_rcv_rate(rxbaud);
 
 	// TODO: make this configurable
-	output_rxd(0);
+	output_rxd(1);
 	output_dcd(0);
 	output_dsr(0);
 	output_cts(0);

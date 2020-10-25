@@ -45,16 +45,16 @@ protected:
 	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
 	virtual uint8_t read_cnxx(uint8_t offset) override;
 
-	DECLARE_WRITE8_MEMBER(pia_out_a);
-	DECLARE_WRITE8_MEMBER(pia_out_b);
+	void pia_out_a(uint8_t data);
+	void pia_out_b(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pia_irqa_w);
 	DECLARE_WRITE_LINE_MEMBER(pia_irqb_w);
 
-	DECLARE_READ8_MEMBER(mcu_port_a_r);
-	DECLARE_READ8_MEMBER(mcu_port_b_r);
-	DECLARE_WRITE8_MEMBER(mcu_port_a_w);
-	DECLARE_WRITE8_MEMBER(mcu_port_b_w);
-	DECLARE_WRITE8_MEMBER(mcu_port_c_w);
+	uint8_t mcu_port_a_r();
+	uint8_t mcu_port_b_r();
+	void mcu_port_a_w(uint8_t data);
+	void mcu_port_b_w(uint8_t data);
+	void mcu_port_c_w(uint8_t data);
 
 	required_device<pia6821_device> m_pia;
 	required_device<m68705p_device> m_mcu;

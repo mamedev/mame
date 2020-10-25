@@ -32,7 +32,7 @@ public:
 	void stargame(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(rint_w);
+	void rint_w(uint8_t data);
 	DECLARE_MACHINE_RESET(stargame);
 
 	void audiocpu_io(address_map &map);
@@ -86,7 +86,7 @@ void stargame_state::audiocpu_io(address_map &map)
 static INPUT_PORTS_START( stargame )
 INPUT_PORTS_END
 
-WRITE8_MEMBER( stargame_state::rint_w )
+void stargame_state::rint_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }

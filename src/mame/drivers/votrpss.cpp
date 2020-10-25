@@ -389,18 +389,18 @@ public:
 
 private:
 	void kbd_put(u8 data);
-	DECLARE_READ8_MEMBER(ppi_pa_r);
-	DECLARE_READ8_MEMBER(ppi_pb_r);
-	DECLARE_READ8_MEMBER(ppi_pc_r);
-	DECLARE_WRITE8_MEMBER(ppi_pa_w);
-	DECLARE_WRITE8_MEMBER(ppi_pb_w);
-	DECLARE_WRITE8_MEMBER(ppi_pc_w);
+	uint8_t ppi_pa_r();
+	uint8_t ppi_pb_r();
+	uint8_t ppi_pc_r();
+	void ppi_pa_w(uint8_t data);
+	void ppi_pb_w(uint8_t data);
+	void ppi_pc_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
 	DECLARE_WRITE_LINE_MEMBER(write_uart_clock);
 	IRQ_CALLBACK_MEMBER(irq_ack);
 
-	void votrpss_io(address_map &map);
-	void votrpss_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 
 	uint8_t m_term_data;
 	uint8_t m_porta;
@@ -417,7 +417,7 @@ private:
  Address Maps
 ******************************************************************************/
 
-void votrpss_state::votrpss_mem(address_map &map)
+void votrpss_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x3fff).rom(); /* main roms (in potted module) */
@@ -428,7 +428,7 @@ void votrpss_state::votrpss_mem(address_map &map)
 	map(0xe000, 0xffff).noprw(); /* open bus (space for more personality rom, not normally used) */
 }
 
-void votrpss_state::votrpss_io(address_map &map)
+void votrpss_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x03).mirror(0x3c).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -473,6 +473,10 @@ INPUT_PORTS_END
 
 void votrpss_state::machine_start()
 {
+	save_item(NAME(m_term_data));
+	save_item(NAME(m_porta));
+	save_item(NAME(m_portb));
+	save_item(NAME(m_portc));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( votrpss_state::irq_timer )
@@ -486,20 +490,20 @@ IRQ_CALLBACK_MEMBER( votrpss_state::irq_ack )
 	return 0x38;
 }
 
-READ8_MEMBER( votrpss_state::ppi_pa_r )
+uint8_t votrpss_state::ppi_pa_r()
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-READ8_MEMBER( votrpss_state::ppi_pb_r )
+uint8_t votrpss_state::ppi_pb_r()
 {
 	return m_portb;
 }
 
 // Bit 0 controls what happens at interrupt time. See code around 518.
-READ8_MEMBER( votrpss_state::ppi_pc_r )
+uint8_t votrpss_state::ppi_pc_r()
 {
 	uint8_t data = 0;
 
@@ -512,18 +516,18 @@ READ8_MEMBER( votrpss_state::ppi_pc_r )
 	return (m_portc & 0xdb) | data;
 }
 
-WRITE8_MEMBER( votrpss_state::ppi_pa_w )
+void votrpss_state::ppi_pa_w(uint8_t data)
 {
 	m_porta = data;
 }
 
-WRITE8_MEMBER( votrpss_state::ppi_pb_w )
+void votrpss_state::ppi_pb_w(uint8_t data)
 {
 	m_portb = data;
 	m_terminal->write(data&0x7f);
 }
 
-WRITE8_MEMBER( votrpss_state::ppi_pc_w )
+void votrpss_state::ppi_pc_w(uint8_t data)
 {
 	m_portc = data;
 }
@@ -542,8 +546,8 @@ void votrpss_state::votrpss(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(8'000'000)/2);  /* 4.000 MHz, verified */
-	m_maincpu->set_addrmap(AS_PROGRAM, &votrpss_state::votrpss_mem);
-	m_maincpu->set_addrmap(AS_IO, &votrpss_state::votrpss_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &votrpss_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &votrpss_state::io_map);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(votrpss_state::irq_ack));
 
 	/* video hardware */
@@ -621,4 +625,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE    INPUT    CLASS          INIT        COMPANY   FULLNAME                  FLAGS
-COMP( 1982, votrpss, 0,      0,      votrpss,   votrpss, votrpss_state, empty_init, "Votrax", "Personal Speech System", 0 )
+COMP( 1982, votrpss, 0,      0,      votrpss,   votrpss, votrpss_state, empty_init, "Votrax", "Personal Speech System", MACHINE_SUPPORTS_SAVE )

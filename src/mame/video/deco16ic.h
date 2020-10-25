@@ -72,10 +72,10 @@ public:
 
 	void pf_update(const u16 *rowscroll_1_ptr, const u16 *rowscroll_2_ptr);
 
-	template<class _BitmapClass>
-	void tilemap_1_draw_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int flags, u8 priority, u8 pmask = 0xff);
-	template<class _BitmapClass>
-	void tilemap_2_draw_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int flags, u8 priority, u8 pmask = 0xff);
+	template<class BitmapClass>
+	void tilemap_1_draw_common(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int flags, u8 priority, u8 pmask = 0xff);
+	template<class BitmapClass>
+	void tilemap_2_draw_common(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int flags, u8 priority, u8 pmask = 0xff);
 	void tilemap_1_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, u8 priority, u8 pmask = 0xff);
 	void tilemap_1_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flags, u8 priority, u8 pmask = 0xff);
 	void tilemap_2_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, u8 priority, u8 pmask = 0xff);
@@ -101,10 +101,10 @@ public:
 	/* used by nslasher */
 	void set_tilemap_colour_bank(int tmap, int bank);
 
-	template<class _BitmapClass>
+	template<class BitmapClass>
 	void custom_tilemap_draw(
 			screen_device &screen,
-			_BitmapClass &bitmap,
+			BitmapClass &bitmap,
 			const rectangle &cliprect,
 			tilemap_t *tilemap0_8x8,
 			tilemap_t *tilemap0_16x16,

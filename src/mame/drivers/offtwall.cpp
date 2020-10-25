@@ -36,7 +36,7 @@
  *
  *************************************/
 
-WRITE16_MEMBER(offtwall_state::io_latch_w)
+void offtwall_state::io_latch_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* lower byte */
 	if (ACCESSING_BITS_0_7)
@@ -88,7 +88,7 @@ WRITE16_MEMBER(offtwall_state::io_latch_w)
 
 
 
-READ16_MEMBER(offtwall_state::bankswitch_r)
+uint16_t offtwall_state::bankswitch_r(offs_t offset)
 {
 	/* this is the table lookup; the bank is determined by the address that was requested */
 	m_bank_offset = (offset & 3) * 0x1000;
@@ -98,7 +98,7 @@ READ16_MEMBER(offtwall_state::bankswitch_r)
 }
 
 
-READ16_MEMBER(offtwall_state::bankrom_r)
+uint16_t offtwall_state::bankrom_r(address_space &space, offs_t offset)
 {
 	/* this is the banked ROM read */
 	logerror("%06X: %04X\n", m_maincpu->pcbase(), offset);
@@ -138,7 +138,7 @@ READ16_MEMBER(offtwall_state::bankrom_r)
 -------------------------------------------------------------------------*/
 
 
-READ16_MEMBER(offtwall_state::spritecache_count_r)
+uint16_t offtwall_state::spritecache_count_r(offs_t offset)
 {
 	int prevpc = m_maincpu->pcbase();
 
@@ -192,7 +192,7 @@ READ16_MEMBER(offtwall_state::spritecache_count_r)
 
 
 
-READ16_MEMBER(offtwall_state::unknown_verify_r)
+uint16_t offtwall_state::unknown_verify_r(offs_t offset)
 {
 	int prevpc = m_maincpu->pcbase();
 	if (prevpc < 0x5c5e || prevpc > 0xc432)
@@ -445,9 +445,9 @@ ROM_END
 void offtwall_state::init_offtwall()
 {
 	/* install son-of-slapstic workarounds */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fde42, 0x3fde43, read16_delegate(*this, FUNC(offtwall_state::spritecache_count_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x037ec2, 0x037f39, read16_delegate(*this, FUNC(offtwall_state::bankswitch_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fdf1e, 0x3fdf1f, read16_delegate(*this, FUNC(offtwall_state::unknown_verify_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fde42, 0x3fde43, read16sm_delegate(*this, FUNC(offtwall_state::spritecache_count_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x037ec2, 0x037f39, read16sm_delegate(*this, FUNC(offtwall_state::bankswitch_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fdf1e, 0x3fdf1f, read16sm_delegate(*this, FUNC(offtwall_state::unknown_verify_r)));
 	m_spritecache_count = m_mainram + (0x3fde42 - 0x3fd800)/2;
 	m_bankswitch_base = (uint16_t *)(memregion("maincpu")->base() + 0x37ec2);
 	m_unknown_verify_base = m_mainram + (0x3fdf1e - 0x3fd800)/2;
@@ -457,9 +457,9 @@ void offtwall_state::init_offtwall()
 void offtwall_state::init_offtwalc()
 {
 	/* install son-of-slapstic workarounds */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fde42, 0x3fde43, read16_delegate(*this, FUNC(offtwall_state::spritecache_count_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x037eca, 0x037f43, read16_delegate(*this, FUNC(offtwall_state::bankswitch_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fdf24, 0x3fdf25, read16_delegate(*this, FUNC(offtwall_state::unknown_verify_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fde42, 0x3fde43, read16sm_delegate(*this, FUNC(offtwall_state::spritecache_count_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x037eca, 0x037f43, read16sm_delegate(*this, FUNC(offtwall_state::bankswitch_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fdf24, 0x3fdf25, read16sm_delegate(*this, FUNC(offtwall_state::unknown_verify_r)));
 	m_spritecache_count = m_mainram + (0x3fde42 - 0x3fd800)/2;
 	m_bankswitch_base = (uint16_t *)(memregion("maincpu")->base() + 0x37eca);
 	m_unknown_verify_base = m_mainram + (0x3fdf24 - 0x3fd800)/2;

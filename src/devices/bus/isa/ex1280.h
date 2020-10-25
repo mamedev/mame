@@ -35,10 +35,10 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	DECLARE_READ16_MEMBER(vram_r);
-	DECLARE_WRITE16_MEMBER(vram_w);
-	DECLARE_READ16_MEMBER(regs_r);
-	DECLARE_WRITE16_MEMBER(regs_w);
+	uint16_t vram_r(offs_t offset);
+	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t regs_r(offs_t offset, uint16_t mem_mask = ~0);
+	void regs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
 	required_device<tms34010_device> m_cpu;

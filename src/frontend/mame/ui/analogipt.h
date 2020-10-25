@@ -58,6 +58,7 @@ private:
 		float range;
 		float neutral;
 		float origin;
+		u8 shift;
 		bool show_neutral;
 	};
 

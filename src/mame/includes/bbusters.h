@@ -54,10 +54,10 @@ protected:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	template<int Layer, int Gfx> TILE_GET_INFO_MEMBER(get_pf_tile_info);
 
-	DECLARE_WRITE8_MEMBER(sound_cpu_w);
-	DECLARE_WRITE16_MEMBER(video_w);
-	template<int Layer> DECLARE_WRITE16_MEMBER(pf_w);
-	DECLARE_WRITE8_MEMBER(coin_counter_w);
+	void sound_cpu_w(uint8_t data);
+	void video_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	template<int Layer> void pf_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void coin_counter_w(uint8_t data);
 
 	const uint8_t *get_source_ptr(gfx_element *gfx, uint32_t sprite, int dx, int dy, int block);
 	void draw_block(screen_device &screen, bitmap_ind16 &dest,int x,int y,int size,int flipx,int flipy,uint32_t sprite,int color,int bank,int block,int priority);
@@ -83,8 +83,8 @@ protected:
 private:
 	required_shared_ptr<uint16_t> m_eprom_data;
 
-	DECLARE_READ16_MEMBER(eprom_r);
-	DECLARE_WRITE16_MEMBER(three_gun_output_w);
+	uint16_t eprom_r(offs_t offset);
+	void three_gun_output_w(uint16_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void bbusters_map(address_map &map);
@@ -104,8 +104,8 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_WRITE16_MEMBER(two_gun_output_w);
-	DECLARE_READ16_MEMBER(mechatt_gun_r);
+	void two_gun_output_w(uint16_t data);
+	uint16_t mechatt_gun_r(offs_t offset);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void mechatt_map(address_map &map);

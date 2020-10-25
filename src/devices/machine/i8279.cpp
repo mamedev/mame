@@ -79,6 +79,9 @@ that uses this feature.
 //#define VERBOSE 1
 #include "logmacro.h"
 
+// MAME updates inputs frame-by-frame, causing lockout to occur too often
+#define EMULATE_KEY_LOCKOUT 0
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -132,7 +135,9 @@ void i8279_device::device_start()
 	save_item(NAME(m_autoinc));
 	save_item(NAME(m_read_flag));
 	save_item(NAME(m_ctrl_key));
+	save_item(NAME(m_se_mode));
 	save_item(NAME(m_key_down));
+	save_item(NAME(m_debounce));
 }
 
 
@@ -154,7 +159,9 @@ void i8279_device::device_reset()
 	m_read_flag = 0;
 	m_scanner = 0;
 	m_ctrl_key = 1;
-	m_key_down = 0xffff;
+	m_se_mode = 0;
+	m_key_down = 0;
+	m_debounce = 0;
 
 	// from here is confirmed
 	m_cmd[0] = 8;
@@ -198,8 +205,9 @@ void i8279_device::clear_display()
 	// The CF bit (also done by CA)
 	if (m_cmd[6] & 3)
 	{
-		m_status &= 0xc0; // blow away fifo
+		m_status &= 0x80; // blow away fifo
 		m_s_ram_ptr = 0; // reset sensor pointer
+		m_debounce = 0; // reset debounce logic
 		set_irq(0); // reset irq
 	}
 }
@@ -212,36 +220,25 @@ void i8279_device::set_irq(bool state)
 }
 
 
-void i8279_device::new_key(u8 data, bool skey, bool ckey)
-{
-	u8 i, rl, sl;
-	for (i = 0; BIT(data, i); i++) {};
-	rl = i;
-	if (BIT(m_cmd[0], 0))
-	{
-		for (i = 0; !BIT(data, i); i++) {};
-		sl = i;
-	}
-	else
-		sl = m_scanner & 7;
-
-	new_fifo( (ckey << 7) | (skey << 6) | (sl << 3) | rl);
-}
-
-
 void i8279_device::new_fifo(u8 data)
 {
 	// see if already overrun
 	if (BIT(m_status, 5))
 		return;
 
+	// see if special error
+	if (BIT(m_status, 6))
+		return;
+
 	// set overrun flag if full
 	if (BIT(m_status, 3))
 	{
+		LOG("FIFO overrun\n");
 		m_status |= 0x20;
 		return;
 	}
 
+	LOG("FIFO[%d] = %02X\n", m_status & 7, data);
 	m_fifo[m_status & 7] = data;
 
 	// bump fifo size & turn off underrun
@@ -270,16 +267,12 @@ void i8279_device::timer_mainloop()
 	// bit 3 - number of digits to display
 	// bit 4 - left or right entry
 
-	u8 scanner_mask = BIT(m_cmd[0], 0) ? 15 : BIT(m_cmd[0], 3) ? 15 : 7;
+	u8 scanner_mask = BIT(m_cmd[0], 0) ? 3 : BIT(m_cmd[0], 3) ? 15 : 7;
 	bool decoded = BIT(m_cmd[0], 0);
 	u8 kbd_type = (m_cmd[0] & 6) >> 1;
 	bool shift_key = 1;
 	bool ctrl_key = 1;
 	bool strobe_pulse = 0;
-
-	// hack to prevent infinite loops
-	if (decoded && m_scanner == 0)
-		m_scanner = 1;
 
 	// keyboard
 	// type 0 = kbd, 2-key lockout
@@ -303,66 +296,115 @@ void i8279_device::timer_mainloop()
 
 	if ( !m_in_rl_cb.isnull() )
 	{
-		u8 rl = m_in_rl_cb(0);
+		u8 rl = m_in_rl_cb(0) ^ 0xff;     // inverted
+		u8 addr = m_scanner & 7;
+		assert(addr < ARRAY_LENGTH(m_s_ram));
 
 		// see if key still down from last time
-		u16 key_down = ((m_scanner & scanner_mask) << 8) | rl;
-		if (key_down == m_key_down)
-			rl = 0xff;
-		else
-		if ((rl == 0xff) && ((m_scanner & scanner_mask) == m_key_down >> 8))
-			m_key_down = 0xffff;
+		u8 keys_down = rl & ~m_s_ram[addr];
 
 		// now process new key
-		if (rl < 0xff || kbd_type == 2)
+		switch (kbd_type)
 		{
-			m_key_down = key_down;
-			switch (kbd_type)
+		case 0:
+#if EMULATE_KEY_LOCKOUT
+			// 2-key lockout
+			if (keys_down != 0)
 			{
-				case 0:
-				case 1:
-					new_key(rl, shift_key, ctrl_key);
-					break;
-				case 2:
+				for (int i = 0; i < 8; i++)
+				{
+					if (BIT(keys_down, i))
 					{
-						u8 addr = m_scanner &7;
-
-						if (decoded)
-							for (addr=0; !BIT(m_scanner, addr); addr++) {};
-
-						rl ^= 0xff;     // inverted
-						assert(addr < ARRAY_LENGTH(m_s_ram));
-						if (m_s_ram[addr] != rl)
+						if (m_debounce == 0 || m_key_down != (addr << 3 | i))
 						{
-							m_s_ram[addr] = rl;
-
-							// IRQ line goes high if a row change value
-							set_irq(1);
+							m_key_down = addr << 3 | i;
+							m_debounce = 1;
+						}
+						else if (m_debounce++ > 1)
+						{
+							new_fifo((ctrl_key << 7) | (shift_key << 6) | m_key_down);
+							m_s_ram[addr] |= 1 << i;
+							m_debounce = 0;
 						}
 					}
-					break;
-				case 3:
-					if (strobe_pulse) new_fifo(rl);
-					break;
+				}
 			}
+			if ((m_key_down >> 3) == addr && !BIT(rl, m_key_down & 7))
+				m_debounce = 0;
+			m_s_ram[addr] &= rl;
+			break;
+#endif // EMULATE_KEY_LOCKOUT
+
+		case 1:
+			// N-key rollover
+			if (keys_down != 0)
+			{
+				for (int i = 0; i < 8; i++)
+				{
+					if (BIT(keys_down, i))
+					{
+						if (m_debounce == 0)
+						{
+							m_key_down = addr << 3 | i;
+							m_debounce = 1;
+						}
+						else if (m_key_down != (addr << 3 | i))
+						{
+#if EMULATE_KEY_LOCKOUT
+							if (m_se_mode && !BIT(m_status, 6))
+							{
+								m_status |= 0x40;
+								set_irq(1);
+							}
+#endif // EMULATE_KEY_LOCKOUT
+						}
+						else if (m_debounce++ > 1)
+						{
+							new_fifo((ctrl_key << 7) | (shift_key << 6) | m_key_down);
+							m_s_ram[addr] |= 1 << i;
+							m_debounce = 0;
+						}
+					}
+				}
+			}
+			if ((m_key_down >> 3) == addr && !BIT(rl, m_key_down & 7))
+				m_debounce = 0;
+			m_s_ram[addr] &= rl;
+			break;
+
+		case 2:
+			if (keys_down != 0 && !m_se_mode)
+				m_status |= 0x40;
+
+			if (m_s_ram[addr] != rl)
+			{
+				m_s_ram[addr] = rl;
+
+				// IRQ line goes high if a row changes value
+				set_irq(1);
+			}
+			break;
+
+		case 3:
+			if (strobe_pulse)
+				new_fifo(rl);
+			m_s_ram[addr] = rl;
+			break;
 		}
 	}
 
 	// Increment scanline
 
-	if (decoded)
-	{
-		m_scanner<<= 1;
-		if ((m_scanner & 15)==0)
-			m_scanner = 1;
-	}
-	else
-		m_scanner++;
-
-	m_scanner &= 15; // 4-bit port
+	m_scanner = (m_scanner + 1) & (decoded ? 3 : 15);
 
 	if ( !m_out_sl_cb.isnull() )
-		m_out_sl_cb((offs_t)0, m_scanner);
+	{
+		// Active low strobed output in decoded mode
+		if (decoded)
+			m_out_sl_cb((offs_t)0, (1 << m_scanner) ^ 15);
+		else
+			m_out_sl_cb((offs_t)0, m_scanner);
+	}
 
 	// output a digit
 
@@ -506,6 +548,11 @@ void i8279_device::cmd_w(u8 data)
 		case 6:
 			LOG("I8279 clear cmd %x\n", data);
 			clear_display();
+			break;
+		case 7:
+			set_irq(0);
+			m_se_mode = BIT(data, 4);
+			m_status &= 0xbf;
 			break;
 	}
 }

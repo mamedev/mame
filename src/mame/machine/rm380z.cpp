@@ -27,7 +27,7 @@ bit7: 1=map ROM at 0000-0fff/0=RAM
 
 */
 
-WRITE8_MEMBER( rm380z_state::port_write )
+void rm380z_state::port_write(offs_t offset, uint8_t data)
 {
 	switch ( offset )
 	{
@@ -78,7 +78,7 @@ WRITE8_MEMBER( rm380z_state::port_write )
 	}
 }
 
-READ8_MEMBER( rm380z_state::port_read )
+uint8_t rm380z_state::port_read(offs_t offset)
 {
 	uint8_t data = 0xFF;
 
@@ -118,44 +118,42 @@ READ8_MEMBER( rm380z_state::port_read )
 	return data;
 }
 
-WRITE8_MEMBER( rm380z_state::port_write_1b00 )
+void rm380z_state::port_write_1b00(offs_t offset, uint8_t data)
 {
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-	port_write(program,offset+0xfc,data);
+	port_write(offset+0xfc,data);
 }
 
-READ8_MEMBER( rm380z_state::port_read_1b00 )
+uint8_t rm380z_state::port_read_1b00(offs_t offset)
 {
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-	return port_read(program,offset+0xfc);
+	return port_read(offset+0xfc);
 }
 
-READ8_MEMBER( rm380z_state::hiram_read )
+uint8_t rm380z_state::hiram_read(offs_t offset)
 {
 	return hiram[offset];
 }
 
-WRITE8_MEMBER( rm380z_state::hiram_write )
+void rm380z_state::hiram_write(offs_t offset, uint8_t data)
 {
 	hiram[offset]=data;
 }
 
-READ8_MEMBER( rm380z_state::rm380z_portlow_r )
+uint8_t rm380z_state::rm380z_portlow_r()
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER( rm380z_state::rm380z_portlow_w )
+void rm380z_state::rm380z_portlow_w(offs_t offset, uint8_t data)
 {
 	//printf("%s port write [%x] [%x]\n",machine().describe_context().c_str(),offset,data);
 }
 
-READ8_MEMBER( rm380z_state::rm380z_porthi_r )
+uint8_t rm380z_state::rm380z_porthi_r()
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER( rm380z_state::rm380z_porthi_w )
+void rm380z_state::rm380z_porthi_w(offs_t offset, uint8_t data)
 {
 	//printf("port write [%x] [%x]\n",offset+0xc5,data);
 }
@@ -219,7 +217,7 @@ void rm380z_state::keyboard_put(u8 data)
 // at 0x0080 to 0x00FF, then jumps to it if there is no error."
 //
 
-WRITE8_MEMBER( rm380z_state::disk_0_control )
+void rm380z_state::disk_0_control(uint8_t data)
 {
 	floppy_image_device *floppy = nullptr;
 
@@ -305,7 +303,7 @@ void rm380z_state::config_memory_map()
 	else
 	{
 		program.install_rom( 0x0000, 0x0FFF, rom );
-		program.install_readwrite_handler(0x1BFC, 0x1BFF, read8_delegate(*this, FUNC(rm380z_state::port_read_1b00)), write8_delegate(*this, FUNC(rm380z_state::port_write_1b00)));
+		program.install_readwrite_handler(0x1BFC, 0x1BFF, read8sm_delegate(*this, FUNC(rm380z_state::port_read_1b00)), write8sm_delegate(*this, FUNC(rm380z_state::port_write_1b00)));
 		program.install_rom( 0x1C00, 0x1DFF, rom + 0x1400 );
 		program.install_ram( 0x4000, 0xDFFF, m_ram_p );
 	}

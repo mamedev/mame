@@ -24,6 +24,7 @@
       The byte at 0x81 of the EVEN 68k rom appears to be some kind of
       control byte, probably region, or coin / machine type setting.
       Many sets differ only by this byte.
+      Now we have BACTA protocol emulation, see if this is related.
 
       Many sets are probably missing sound roms, however due to the
       varying motherboard configurations (SAA vs. YM, with added UPD)
@@ -33,6 +34,8 @@
 
 #include "emu.h"
 #include "includes/jpmsys5.h"
+
+#include "machine/bacta_datalogger.h"
 
 #include "machine/clock.h"
 #include "machine/input_merger.h"
@@ -74,7 +77,7 @@ WRITE_LINE_MEMBER(jpmsys5v_state::generate_tms34061_interrupt)
 	m_maincpu->set_input_line(INT_TMS34061, state);
 }
 
-WRITE16_MEMBER(jpmsys5v_state::sys5_tms34061_w)
+void jpmsys5v_state::sys5_tms34061_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int func = (offset >> 19) & 3;
 	int row = (offset >> 7) & 0x1ff;
@@ -97,7 +100,7 @@ WRITE16_MEMBER(jpmsys5v_state::sys5_tms34061_w)
 		m_tms34061->write(col | 1, row, func, data & 0xff);
 }
 
-READ16_MEMBER(jpmsys5v_state::sys5_tms34061_r)
+uint16_t jpmsys5v_state::sys5_tms34061_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0;
 	int func = (offset >> 19) & 3;
@@ -123,7 +126,7 @@ READ16_MEMBER(jpmsys5v_state::sys5_tms34061_r)
 	return data;
 }
 
-WRITE16_MEMBER(jpmsys5v_state::ramdac_w)
+void jpmsys5v_state::ramdac_w(offs_t offset, uint16_t data)
 {
 	if (offset == 0)
 	{
@@ -150,8 +153,6 @@ WRITE16_MEMBER(jpmsys5v_state::ramdac_w)
 
 uint32_t jpmsys5v_state::screen_update_jpmsys5v(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int x, y;
-
 	m_tms34061->get_display_state();
 
 	if (m_tms34061->m_display.blanked)
@@ -160,14 +161,14 @@ uint32_t jpmsys5v_state::screen_update_jpmsys5v(screen_device &screen, bitmap_rg
 		return 0;
 	}
 
-	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		uint8_t *src = &m_tms34061->m_display.vram[(m_tms34061->m_display.dispstart & 0xffff)*2 + 256 * y];
-		uint32_t *dest = &bitmap.pix32(y, cliprect.min_x);
+		uint8_t const *const src = &m_tms34061->m_display.vram[(m_tms34061->m_display.dispstart & 0xffff)*2 + 256 * y];
+		uint32_t *dest = &bitmap.pix(y, cliprect.min_x);
 
-		for (x = cliprect.min_x; x <= cliprect.max_x; x +=2)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x +=2)
 		{
-			uint8_t pen = src[(x-cliprect.min_x)>>1];
+			uint8_t const pen = src[(x-cliprect.min_x)>>1];
 
 			/* Draw two 4-bit pixels */
 			*dest++ = m_palette->pen((pen >> 4) & 0xf);
@@ -194,12 +195,12 @@ void jpmsys5_state::sys5_draw_lamps()
  *
  ****************************************/
 
-WRITE16_MEMBER(jpmsys5v_state::rombank_w)
+void jpmsys5v_state::rombank_w(uint16_t data)
 {
 	m_rombank->set_entry(data & 0x1f);
 }
 
-READ16_MEMBER(jpmsys5_state::coins_r)
+uint16_t jpmsys5_state::coins_r(offs_t offset)
 {
 	if (offset == 2)
 		return ioport("COINS")->read() << 8;
@@ -207,22 +208,22 @@ READ16_MEMBER(jpmsys5_state::coins_r)
 		return 0xffff;
 }
 
-WRITE16_MEMBER(jpmsys5_state::coins_w)
+void jpmsys5_state::coins_w(uint16_t data)
 {
 	/* TODO */
 }
 
-READ16_MEMBER(jpmsys5_state::unk_r)
+uint16_t jpmsys5_state::unk_r()
 {
 	return 0xffff;
 }
 
-WRITE16_MEMBER(jpmsys5_state::mux_w)
+void jpmsys5_state::mux_w(offs_t offset, uint16_t data)
 {
 	m_muxram[offset]=data;
 }
 
-READ16_MEMBER(jpmsys5_state::mux_r)
+uint16_t jpmsys5_state::mux_r(offs_t offset)
 {
 	if (offset == 0x81/2)
 		return ioport("DSW")->read();
@@ -230,7 +231,7 @@ READ16_MEMBER(jpmsys5_state::mux_r)
 	return 0xffff;
 }
 
-WRITE16_MEMBER(jpmsys5_state::jpm_upd7759_w)
+void jpmsys5_state::jpm_upd7759_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
@@ -263,7 +264,7 @@ WRITE16_MEMBER(jpmsys5_state::jpm_upd7759_w)
 	}
 }
 
-READ16_MEMBER(jpmsys5_state::jpm_upd7759_r)
+uint16_t jpmsys5_state::jpm_upd7759_r()
 {
 	return 0x14 | m_upd7759->busy_r();
 }
@@ -467,7 +468,7 @@ WRITE_LINE_MEMBER(jpmsys5_state::pia_irq)
 	m_maincpu->set_input_line(INT_6821PIA, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER(jpmsys5_state::u29_porta_r)
+uint8_t jpmsys5_state::u29_porta_r()
 {
 	int meter_bit =0;
 
@@ -485,7 +486,7 @@ READ8_MEMBER(jpmsys5_state::u29_porta_r)
 	return m_direct_port->read() | meter_bit;
 }
 
-WRITE8_MEMBER(jpmsys5_state::u29_portb_w)
+void jpmsys5_state::u29_portb_w(uint8_t data)
 {
 	if (m_meters)
 	{
@@ -590,9 +591,13 @@ void jpmsys5v_state::jpmsys5v(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, "acia_irq").output_handler().set_inputline(m_maincpu, INT_6850ACIA);
 
+	bacta_datalogger_device &bacta(BACTA_DATALOGGER(config, "bacta", 0));
+
 	ACIA6850(config, m_acia6850[0], 0);
-	m_acia6850[0]->txd_handler().set(FUNC(jpmsys5v_state::a0_tx_w));
+	m_acia6850[0]->txd_handler().set("bacta", FUNC(bacta_datalogger_device::write_txd));
 	m_acia6850[0]->irq_handler().set("acia_irq", FUNC(input_merger_device::in_w<0>));
+
+	bacta.rxd_handler().set(m_acia6850[0], FUNC(acia6850_device::write_rxd));
 
 	ACIA6850(config, m_acia6850[1], 0);
 	m_acia6850[1]->txd_handler().set(FUNC(jpmsys5v_state::a1_tx_w));
@@ -602,9 +607,11 @@ void jpmsys5v_state::jpmsys5v(machine_config &config)
 	m_acia6850[2]->txd_handler().set(FUNC(jpmsys5v_state::a2_tx_w));
 	m_acia6850[2]->irq_handler().set("acia_irq", FUNC(input_merger_device::in_w<2>));
 
+	clock_device &bacta_clock(CLOCK(config, "bacta_clock", 19200)); // Gives 1200 baud, but real timer is programmable (location?)
+	bacta_clock.signal_handler().set(m_acia6850[0], FUNC(acia6850_device::write_txc));
+	bacta_clock.signal_handler().append(m_acia6850[0], FUNC(acia6850_device::write_rxc));
+
 	clock_device &acia_clock(CLOCK(config, "acia_clock", 10000)); // What are the correct ACIA clocks ?
-	acia_clock.signal_handler().set(m_acia6850[0], FUNC(acia6850_device::write_txc));
-	acia_clock.signal_handler().append(m_acia6850[0], FUNC(acia6850_device::write_rxc));
 	acia_clock.signal_handler().append(m_acia6850[1], FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append(m_acia6850[1], FUNC(acia6850_device::write_rxc));
 	acia_clock.signal_handler().append(m_acia6850[2], FUNC(acia6850_device::write_txc));
@@ -647,7 +654,7 @@ void jpmsys5v_state::jpmsys5v(machine_config &config)
 	ptm.irq_callback().set(FUNC(jpmsys5v_state::ptm_irq));
 }
 
-READ16_MEMBER(jpmsys5_state::mux_awp_r)
+uint16_t jpmsys5_state::mux_awp_r(offs_t offset)
 {
 	static const char *const portnames[] = { "DSW", "DSW2", "ROTARY", "STROBE0", "STROBE1", "STROBE2", "STROBE3", "STROBE4" };
 
@@ -661,7 +668,7 @@ READ16_MEMBER(jpmsys5_state::mux_awp_r)
 	}
 }
 
-READ16_MEMBER(jpmsys5_state::coins_awp_r)
+uint16_t jpmsys5_state::coins_awp_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -810,21 +817,27 @@ void jpmsys5_state::jpmsys5_ym(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, "acia_irq").output_handler().set_inputline(m_maincpu, INT_6850ACIA);
 
+	bacta_datalogger_device &bacta(BACTA_DATALOGGER(config, "bacta", 0));
+
 	ACIA6850(config, m_acia6850[0], 0);
-	m_acia6850[0]->txd_handler().set(FUNC(jpmsys5_state::a0_tx_w));
+	m_acia6850[0]->txd_handler().set("bacta", FUNC(bacta_datalogger_device::write_txd));
 	m_acia6850[0]->irq_handler().set("acia_irq", FUNC(input_merger_device::in_w<0>));
 
+	bacta.rxd_handler().set(m_acia6850[0], FUNC(acia6850_device::write_rxd));
+
 	ACIA6850(config, m_acia6850[1], 0);
-	m_acia6850[1]->txd_handler().set(FUNC(jpmsys5_state::a1_tx_w));
+	m_acia6850[1]->txd_handler().set(FUNC(jpmsys5v_state::a1_tx_w));
 	m_acia6850[1]->irq_handler().set("acia_irq", FUNC(input_merger_device::in_w<1>));
 
 	ACIA6850(config, m_acia6850[2], 0);
-	m_acia6850[2]->txd_handler().set(FUNC(jpmsys5_state::a2_tx_w));
+	m_acia6850[2]->txd_handler().set(FUNC(jpmsys5v_state::a2_tx_w));
 	m_acia6850[2]->irq_handler().set("acia_irq", FUNC(input_merger_device::in_w<2>));
 
+	clock_device &bacta_clock(CLOCK(config, "bacta_clock", 19200)); // Gives 1200 baud, but real timer is programmable (location?)
+	bacta_clock.signal_handler().set(m_acia6850[0], FUNC(acia6850_device::write_txc));
+	bacta_clock.signal_handler().append(m_acia6850[0], FUNC(acia6850_device::write_rxc));
+
 	clock_device &acia_clock(CLOCK(config, "acia_clock", 10000)); // What are the correct ACIA clocks ?
-	acia_clock.signal_handler().set(m_acia6850[0], FUNC(acia6850_device::write_txc));
-	acia_clock.signal_handler().append(m_acia6850[0], FUNC(acia6850_device::write_rxc));
 	acia_clock.signal_handler().append(m_acia6850[1], FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append(m_acia6850[1], FUNC(acia6850_device::write_rxc));
 	acia_clock.signal_handler().append(m_acia6850[2], FUNC(acia6850_device::write_txc));
@@ -868,21 +881,27 @@ void jpmsys5_state::jpmsys5(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, "acia_irq").output_handler().set_inputline(m_maincpu, INT_6850ACIA);
 
+	bacta_datalogger_device &bacta(BACTA_DATALOGGER(config, "bacta", 0));
+
 	ACIA6850(config, m_acia6850[0], 0);
-	m_acia6850[0]->txd_handler().set(FUNC(jpmsys5_state::a0_tx_w));
+	m_acia6850[0]->txd_handler().set("bacta", FUNC(bacta_datalogger_device::write_txd));
 	m_acia6850[0]->irq_handler().set("acia_irq", FUNC(input_merger_device::in_w<0>));
 
+	bacta.rxd_handler().set(m_acia6850[0], FUNC(acia6850_device::write_rxd));
+
 	ACIA6850(config, m_acia6850[1], 0);
-	m_acia6850[1]->txd_handler().set(FUNC(jpmsys5_state::a1_tx_w));
+	m_acia6850[1]->txd_handler().set(FUNC(jpmsys5v_state::a1_tx_w));
 	m_acia6850[1]->irq_handler().set("acia_irq", FUNC(input_merger_device::in_w<1>));
 
 	ACIA6850(config, m_acia6850[2], 0);
-	m_acia6850[2]->txd_handler().set(FUNC(jpmsys5_state::a2_tx_w));
+	m_acia6850[2]->txd_handler().set(FUNC(jpmsys5v_state::a2_tx_w));
 	m_acia6850[2]->irq_handler().set("acia_irq", FUNC(input_merger_device::in_w<2>));
 
+	clock_device &bacta_clock(CLOCK(config, "bacta_clock", 19200)); // Gives 1200 baud, but real timer is programmable (location?)
+	bacta_clock.signal_handler().set(m_acia6850[0], FUNC(acia6850_device::write_txc));
+	bacta_clock.signal_handler().append(m_acia6850[0], FUNC(acia6850_device::write_rxc));
+
 	clock_device &acia_clock(CLOCK(config, "acia_clock", 10000)); // What are the correct ACIA clocks ?
-	acia_clock.signal_handler().set(m_acia6850[0], FUNC(acia6850_device::write_txc));
-	acia_clock.signal_handler().append(m_acia6850[0], FUNC(acia6850_device::write_rxc));
 	acia_clock.signal_handler().append(m_acia6850[1], FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append(m_acia6850[1], FUNC(acia6850_device::write_rxc));
 	acia_clock.signal_handler().append(m_acia6850[2], FUNC(acia6850_device::write_txc));
@@ -922,6 +941,7 @@ void jpmsys5_state::jpmsys5(machine_config &config)
  *
  *************************************/
 
+
 ROM_START( monopoly )
 	ROM_REGION( 0x300000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "7398.bin", 0x000000, 0x80000, CRC(62c80f20) SHA1(322514f920d6cb48887b624786b52af34bdb8e5f) )
@@ -931,26 +951,15 @@ ROM_START( monopoly )
 	ROM_LOAD16_BYTE( "6670.bin", 0x200000, 0x80000, CRC(66e2a5e1) SHA1(04d4b55d6ad121cdc3592d33e9d953affa24f01a) )
 	ROM_LOAD16_BYTE( "6671.bin", 0x200001, 0x80000, CRC(b2a3cedd) SHA1(e3a5dd028b0769e08a796a96665b31491c3b18ca) )
 
-
-
-	ROM_REGION( 0x300000, "altrevs", 0 )
-	ROM_LOAD16_BYTE( "7400.bin", 0x00001, 0x080000, CRC(d6f1f98c) SHA1(f20c788a31a8fe339aed701866180a3eb16fafb9) )
-
-	// this version doesn't work too well, missing other roms, or just bad?
-	ROM_LOAD16_BYTE( "monov3p1", 0x00000, 0x080000, CRC(a66fc610) SHA1(fddd3b37a6aebf5c402942d26a2fa1fa130326dd) )
-	ROM_LOAD16_BYTE( "monov3p2", 0x00001, 0x080000, CRC(2d629723) SHA1(c5584113e50dc5f636dbcf80e4689d2bbfe98e71) )
-	// mismastched?
-	ROM_LOAD16_BYTE( "monov4p2", 0x00001, 0x080000, CRC(3c2dd9b7) SHA1(01c87584b3599763a0c37040199014c2902dc6f3) )
-
-
 	ROM_REGION( 0x80000, "upd7759", 0 )
 	ROM_LOAD( "6538.bin", 0x00000, 0x40000, CRC(ccdd4ce3) SHA1(dbb24682cea8081a447ca2c53395964fc46e7f56) )
 ROM_END
 
-ROM_START( monopolya )
+
+ROM_START( monopolyd )
 	ROM_REGION( 0x300000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "mono4e1",  0x000000, 0x80000, CRC(0338b165) SHA1(fdc0fcf0fddcf88d593a22885779e8224484e7e4) )
-	ROM_LOAD16_BYTE( "mono4e2",  0x000001, 0x80000, CRC(c8aa21d8) SHA1(257ecf85e1d41b15bb2bbe2157e9d3f72b7e0317) )
+	ROM_LOAD16_BYTE( "7398.bin", 0x000000, 0x80000, CRC(62c80f20) SHA1(322514f920d6cb48887b624786b52af34bdb8e5f) )
+	ROM_LOAD16_BYTE( "7400.bin", 0x000001, 0x80000, CRC(d6f1f98c) SHA1(f20c788a31a8fe339aed701866180a3eb16fafb9) )
 	ROM_LOAD16_BYTE( "6668.bin", 0x100000, 0x80000, CRC(30bf082a) SHA1(29ba67a86e82f0eb4feb816a2031d62028eb11b0) )
 	ROM_LOAD16_BYTE( "6669.bin", 0x100001, 0x80000, CRC(85d38c2d) SHA1(2f1a394df243e5fbbad31507b9074c997c473106) )
 	ROM_LOAD16_BYTE( "6670.bin", 0x200000, 0x80000, CRC(66e2a5e1) SHA1(04d4b55d6ad121cdc3592d33e9d953affa24f01a) )
@@ -960,6 +969,36 @@ ROM_START( monopolya )
 	ROM_LOAD( "6538.bin", 0x00000, 0x40000, CRC(ccdd4ce3) SHA1(dbb24682cea8081a447ca2c53395964fc46e7f56) )
 ROM_END
 
+ROM_START( monopoly4 )
+	ROM_REGION( 0x300000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "mono4e1",  0x000000, 0x80000, CRC(0338b165) SHA1(fdc0fcf0fddcf88d593a22885779e8224484e7e4) )
+	ROM_LOAD16_BYTE( "mono4e2",  0x000001, 0x80000, CRC(c8aa21d8) SHA1(257ecf85e1d41b15bb2bbe2157e9d3f72b7e0317) )
+	ROM_LOAD16_BYTE( "6668.bin", 0x100000, 0x80000, CRC(30bf082a) SHA1(29ba67a86e82f0eb4feb816a2031d62028eb11b0) )
+	ROM_LOAD16_BYTE( "6669.bin", 0x100001, 0x80000, CRC(85d38c2d) SHA1(2f1a394df243e5fbbad31507b9074c997c473106) )
+	ROM_LOAD16_BYTE( "6670.bin", 0x200000, 0x80000, CRC(66e2a5e1) SHA1(04d4b55d6ad121cdc3592d33e9d953affa24f01a) )
+	ROM_LOAD16_BYTE( "6671.bin", 0x200001, 0x80000, CRC(b2a3cedd) SHA1(e3a5dd028b0769e08a796a96665b31491c3b18ca) )
+
+	ROM_REGION( 0x300000, "altrevs", 0 )
+	ROM_LOAD16_BYTE( "monov4p2", 0x000001, 0x80000, CRC(3c2dd9b7) SHA1(01c87584b3599763a0c37040199014c2902dc6f3) ) // mismatched?
+
+	ROM_REGION( 0x80000, "upd7759", 0 )
+	ROM_LOAD( "6538.bin", 0x00000, 0x40000, CRC(ccdd4ce3) SHA1(dbb24682cea8081a447ca2c53395964fc46e7f56) )
+ROM_END
+
+ROM_START( monopoly3 )
+	ROM_REGION( 0x300000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "monov3p1", 0x000000, 0x80000, CRC(a66fc610) SHA1(fddd3b37a6aebf5c402942d26a2fa1fa130326dd) )
+	ROM_LOAD16_BYTE( "monov3p2", 0x000001, 0x80000, CRC(2d629723) SHA1(c5584113e50dc5f636dbcf80e4689d2bbfe98e71) )
+	ROM_LOAD16_BYTE( "6668.bin", 0x100000, 0x80000, CRC(30bf082a) SHA1(29ba67a86e82f0eb4feb816a2031d62028eb11b0) )
+	ROM_LOAD16_BYTE( "6669.bin", 0x100001, 0x80000, CRC(85d38c2d) SHA1(2f1a394df243e5fbbad31507b9074c997c473106) )
+	ROM_LOAD16_BYTE( "6670.bin", 0x200000, 0x80000, CRC(66e2a5e1) SHA1(04d4b55d6ad121cdc3592d33e9d953affa24f01a) )
+	ROM_LOAD16_BYTE( "6671.bin", 0x200001, 0x80000, CRC(b2a3cedd) SHA1(e3a5dd028b0769e08a796a96665b31491c3b18ca) )
+
+	ROM_REGION( 0x80000, "upd7759", 0 )
+	ROM_LOAD( "6538.bin", 0x00000, 0x40000, CRC(ccdd4ce3) SHA1(dbb24682cea8081a447ca2c53395964fc46e7f56) )
+ROM_END
+
+//Monopoly Classic is a non-payout quiz game, where the goal is to earn points from collecting properties.
 
 ROM_START( monoplcl )
 	ROM_REGION( 0x300000, "maincpu", 0 )
@@ -970,13 +1009,18 @@ ROM_START( monoplcl )
 	ROM_LOAD16_BYTE( "6670.bin", 0x200000, 0x80000, CRC(66e2a5e1) SHA1(04d4b55d6ad121cdc3592d33e9d953affa24f01a) )
 	ROM_LOAD16_BYTE( "6671.bin", 0x200001, 0x80000, CRC(b2a3cedd) SHA1(e3a5dd028b0769e08a796a96665b31491c3b18ca) )
 
-	ROM_REGION( 0x300000, "altrevs", 0 )
-	ROM_LOAD16_BYTE( "7403.bin", 0x000001, 0x080000, CRC(95dbacb6) SHA1(bd551ccad95440a669a547092ab126178b0d0bf9) )
+	ROM_REGION( 0x80000, "upd7759", 0 )
+	ROM_LOAD( "6538.bin", 0x00000, 0x40000, CRC(ccdd4ce3) SHA1(dbb24682cea8081a447ca2c53395964fc46e7f56) )
+ROM_END
 
-	ROM_LOAD( "mdlxv1p1", 0x0000, 0x080000, CRC(48ab1691) SHA1(6df2aad02548d5239e3974a11228bc9aad8c9170) )
-	ROM_LOAD( "mdlxv1p2", 0x0000, 0x080000, CRC(107c3e65) SHA1(e298b3a2826f92ba6119348a36bc4735e1799797) )
-	/* p3 missing? */
-	ROM_LOAD( "mdlxv1p4", 0x0000, 0x080000, CRC(e3fd1a27) SHA1(6bba70ff27a6d068febcbdfa1b1f8ff2ef86ef03) )
+ROM_START( monoplcld )
+	ROM_REGION( 0x300000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "7401.bin", 0x000000, 0x80000, CRC(eec11426) SHA1(b732a5a64d3fba676134942768b823d088792a1f) )
+	ROM_LOAD16_BYTE( "7403.bin", 0x000001, 0x80000, CRC(95dbacb6) SHA1(bd551ccad95440a669a547092ab126178b0d0bf9) )
+	ROM_LOAD16_BYTE( "6668.bin", 0x100000, 0x80000, CRC(30bf082a) SHA1(29ba67a86e82f0eb4feb816a2031d62028eb11b0) )
+	ROM_LOAD16_BYTE( "6669.bin", 0x100001, 0x80000, CRC(85d38c2d) SHA1(2f1a394df243e5fbbad31507b9074c997c473106) )
+	ROM_LOAD16_BYTE( "6670.bin", 0x200000, 0x80000, CRC(66e2a5e1) SHA1(04d4b55d6ad121cdc3592d33e9d953affa24f01a) )
+	ROM_LOAD16_BYTE( "6671.bin", 0x200001, 0x80000, CRC(b2a3cedd) SHA1(e3a5dd028b0769e08a796a96665b31491c3b18ca) )
 
 
 	ROM_REGION( 0x80000, "upd7759", 0 )
@@ -992,9 +1036,36 @@ ROM_START( monopldx )
 	ROM_LOAD16_BYTE( "6881.bin", 0x200000, 0x80000, CRC(8418ee17) SHA1(5666b90db00d9e88a37655bb9a714f076e2689d6) )
 	ROM_LOAD16_BYTE( "6882.bin", 0x200001, 0x80000, CRC(400f5fb4) SHA1(80b1d3902fc9f6db24f49055b07bc31c0c74a993) )
 
-	ROM_REGION( 0x300000, "altrevs", 0 )
-	ROM_LOAD16_BYTE( "8441.bin", 0x000001, 0x080000, CRC(d0825af4) SHA1(a7291806893c42a115763e404337976b8c30e9e0) ) // 1 byte change from 8440 (doesn't boot, but might want additional hw)
+	ROM_REGION( 0x80000, "upd7759", 0 )
+	ROM_LOAD( "modl-snd.bin", 0x000000, 0x80000, CRC(f761da41) SHA1(a07d1b4cb7ce7a24b6fb84843543b95c3aec470f) )
+ROM_END
 
+
+ROM_START( monopldxd )
+	ROM_REGION( 0x300000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "8439.bin", 0x000000, 0x80000, CRC(fbd6caa4) SHA1(73e787ae41a0ce44d48a46dd623d5e1351335e3e) )
+	ROM_LOAD16_BYTE( "8441.bin", 0x000001, 0x80000, CRC(d0825af4) SHA1(a7291806893c42a115763e404337976b8c30e9e0) ) // 1 byte change from 8440
+	ROM_LOAD16_BYTE( "6879.bin", 0x100000, 0x80000, CRC(4fbd1222) SHA1(9a9c9e4768c18a6a3e717605d3c88179676b6ad1) )
+	ROM_LOAD16_BYTE( "6880.bin", 0x100001, 0x80000, CRC(0370bf5f) SHA1(a0ed1dbc6aeab02e8229f23f8ba4ff880d31e7a1) )
+	ROM_LOAD16_BYTE( "6881.bin", 0x200000, 0x80000, CRC(8418ee17) SHA1(5666b90db00d9e88a37655bb9a714f076e2689d6) )
+	ROM_LOAD16_BYTE( "6882.bin", 0x200001, 0x80000, CRC(400f5fb4) SHA1(80b1d3902fc9f6db24f49055b07bc31c0c74a993) )
+
+	ROM_REGION( 0x80000, "upd7759", 0 )
+	ROM_LOAD( "modl-snd.bin", 0x000000, 0x80000, CRC(f761da41) SHA1(a07d1b4cb7ce7a24b6fb84843543b95c3aec470f) )
+ROM_END
+
+ROM_START( monopldx1 )
+	ROM_REGION( 0x300000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "mdlxv1p1", 0x000000, 0x80000, CRC(48ab1691) SHA1(6df2aad02548d5239e3974a11228bc9aad8c9170) )
+	ROM_LOAD16_BYTE( "mdlxv1p2", 0x000001, 0x80000, CRC(107c3e65) SHA1(e298b3a2826f92ba6119348a36bc4735e1799797) )
+	ROM_LOAD16_BYTE( "6879.bin", 0x100000, 0x80000, CRC(4fbd1222) SHA1(9a9c9e4768c18a6a3e717605d3c88179676b6ad1) )
+	ROM_LOAD16_BYTE( "6880.bin", 0x100001, 0x80000, CRC(0370bf5f) SHA1(a0ed1dbc6aeab02e8229f23f8ba4ff880d31e7a1) )
+	ROM_LOAD16_BYTE( "6881.bin", 0x200000, 0x80000, CRC(8418ee17) SHA1(5666b90db00d9e88a37655bb9a714f076e2689d6) )
+	ROM_LOAD16_BYTE( "6882.bin", 0x200001, 0x80000, CRC(400f5fb4) SHA1(80b1d3902fc9f6db24f49055b07bc31c0c74a993) )
+
+	ROM_REGION( 0x300000, "altrevs", 0 )
+	/* p3 missing? */
+	ROM_LOAD16_BYTE( "mdlxv1p4", 0x100001, 0x80000, CRC(e3fd1a27) SHA1(6bba70ff27a6d068febcbdfa1b1f8ff2ef86ef03) ) //Doesn't match set?
 
 	ROM_REGION( 0x80000, "upd7759", 0 )
 	ROM_LOAD( "modl-snd.bin", 0x000000, 0x80000, CRC(f761da41) SHA1(a07d1b4cb7ce7a24b6fb84843543b95c3aec470f) )
@@ -1010,13 +1081,14 @@ ROM_START( cashcade )
 ROM_END
 
 
-
-
-
-
 /* Video based titles */
-GAME( 1994, monopoly,     0,          jpmsys5v, monopoly, jpmsys5v_state, empty_init, ROT0, "JPM", "Monopoly (JPM) (SYSTEM5 VIDEO, set 1)",  0 )
-GAME( 1994, monopolya,    monopoly,   jpmsys5v, monopoly, jpmsys5v_state, empty_init, ROT0, "JPM", "Monopoly (JPM) (SYSTEM5 VIDEO, set 2)",  0 )
-GAME( 1995, monoplcl,     monopoly,   jpmsys5v, monopoly, jpmsys5v_state, empty_init, ROT0, "JPM", "Monopoly Classic (JPM) (SYSTEM5 VIDEO)", 0 )
-GAME( 1995, monopldx,     0,          jpmsys5v, monopoly, jpmsys5v_state, empty_init, ROT0, "JPM", "Monopoly Deluxe (JPM) (SYSTEM5 VIDEO)",  0 )
-GAME( 199?, cashcade,     0,          jpmsys5v, monopoly, jpmsys5v_state, empty_init, ROT0, "JPM", "Cashcade (JPM) (SYSTEM5 VIDEO)",         MACHINE_NOT_WORKING|MACHINE_NO_SOUND ) // shows a loading error.. is the set incomplete?
+GAME( 1994, monopoly,     0,          jpmsys5v, monopoly, jpmsys5v_state, empty_init, ROT0, "JPM", "Monopoly (JPM) (Version 4H) (SYSTEM5 VIDEO)",  0 )
+GAME( 1994, monopolyd,    monopoly,   jpmsys5v, monopoly, jpmsys5v_state, empty_init, ROT0, "JPM", "Monopoly (JPM) (Version 4H, Protocol) (SYSTEM5 VIDEO)",  0 )
+GAME( 1994, monopoly4,    monopoly,   jpmsys5v, monopoly, jpmsys5v_state, empty_init, ROT0, "JPM", "Monopoly (JPM) (Version 4) (SYSTEM5 VIDEO)",  0 )
+GAME( 1994, monopoly3,    monopoly,   jpmsys5v, monopoly, jpmsys5v_state, empty_init, ROT0, "JPM", "Monopoly (JPM) (Version 3) (SYSTEM5 VIDEO)",   0 )
+GAME( 1995, monoplcl,     monopoly,   jpmsys5v, monopoly, jpmsys5v_state, empty_init, ROT0, "JPM", "Monopoly Classic (JPM) (Version 5) (SYSTEM5 VIDEO)", 0 )
+GAME( 1995, monoplcld,    monopoly,   jpmsys5v, monopoly, jpmsys5v_state, empty_init, ROT0, "JPM", "Monopoly Classic (JPM) (Version 5, Protocol) (SYSTEM5 VIDEO)", 0 )
+GAME( 1995, monopldx,     0,          jpmsys5v, monopoly, jpmsys5v_state, empty_init, ROT0, "JPM", "Monopoly Deluxe (JPM) (Version 6) (SYSTEM5 VIDEO)",  0 )
+GAME( 1995, monopldxd,    monopldx,   jpmsys5v, monopoly, jpmsys5v_state, empty_init, ROT0, "JPM", "Monopoly Deluxe (JPM) (Version 6, Protocol) (SYSTEM5 VIDEO)", 0 )
+GAME( 1995, monopldx1,    monopldx,   jpmsys5v, monopoly, jpmsys5v_state, empty_init, ROT0, "JPM", "Monopoly Deluxe (JPM) (Version 1) (SYSTEM5 VIDEO)", MACHINE_NOT_WORKING ) // no questions?
+GAME( 199?, cashcade,     0,          jpmsys5v, monopoly, jpmsys5v_state, empty_init, ROT0, "JPM", "Cashcade (JPM) (SYSTEM5 VIDEO)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND ) // shows a loading error.. is the set incomplete?

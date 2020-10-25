@@ -135,13 +135,13 @@ private:
 
 	tilemap_t *m_sc0_tilemap;
 
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_WRITE8_MEMBER(cram_w);
-	DECLARE_READ8_MEMBER(spool99_io_r);
-	DECLARE_READ8_MEMBER(vcarn_io_r);
-	DECLARE_WRITE8_MEMBER(eeprom_resetline_w);
-	DECLARE_WRITE8_MEMBER(eeprom_clockline_w);
-	DECLARE_WRITE8_MEMBER(eeprom_dataline_w);
+	void vram_w(offs_t offset, uint8_t data);
+	void cram_w(offs_t offset, uint8_t data);
+	uint8_t spool99_io_r(offs_t offset);
+	uint8_t vcarn_io_r(offs_t offset);
+	void eeprom_resetline_w(uint8_t data);
+	void eeprom_clockline_w(uint8_t data);
+	void eeprom_dataline_w(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(get_tile_info);
@@ -171,13 +171,13 @@ uint32_t spool99_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-WRITE8_MEMBER(spool99_state::vram_w)
+void spool99_state::vram_w(offs_t offset, uint8_t data)
 {
 	m_vram[offset] = data;
 	m_sc0_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE8_MEMBER(spool99_state::cram_w)
+void spool99_state::cram_w(offs_t offset, uint8_t data)
 {
 	m_cram[offset] = data;
 	m_sc0_tilemap->mark_tile_dirty(offset/2);
@@ -185,7 +185,7 @@ WRITE8_MEMBER(spool99_state::cram_w)
 
 
 
-READ8_MEMBER(spool99_state::spool99_io_r)
+uint8_t spool99_state::spool99_io_r(offs_t offset)
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -218,19 +218,19 @@ READ8_MEMBER(spool99_state::spool99_io_r)
 }
 
 
-WRITE8_MEMBER(spool99_state::eeprom_resetline_w)
+void spool99_state::eeprom_resetline_w(uint8_t data)
 {
 	// reset line asserted: reset.
 	m_eeprom->cs_write((data & 0x01) ? ASSERT_LINE : CLEAR_LINE );
 }
 
-WRITE8_MEMBER(spool99_state::eeprom_clockline_w)
+void spool99_state::eeprom_clockline_w(uint8_t data)
 {
 	// clock line asserted: write latch or select next bit to read
 	m_eeprom->clk_write((data & 0x01) ? ASSERT_LINE : CLEAR_LINE );
 }
 
-WRITE8_MEMBER(spool99_state::eeprom_dataline_w)
+void spool99_state::eeprom_dataline_w(uint8_t data)
 {
 	// latch the bit
 	m_eeprom->di_write(data & 0x01);
@@ -253,7 +253,7 @@ void spool99_state::spool99_map(address_map &map)
 	map(0xf000, 0xffff).ram().w(FUNC(spool99_state::cram_w)).share("cram");
 }
 
-READ8_MEMBER(spool99_state::vcarn_io_r)
+uint8_t spool99_state::vcarn_io_r(offs_t offset)
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 

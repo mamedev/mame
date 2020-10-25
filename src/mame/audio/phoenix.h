@@ -22,7 +22,7 @@ protected:
 	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 	struct c_state
@@ -46,7 +46,7 @@ private:
 	struct n_state      m_noise_state;
 	uint8_t               m_sound_latch_a;
 	sound_stream *      m_channel;
-	std::unique_ptr<uint32_t[]>                m_poly18;
+	std::unique_ptr<uint32_t[]> m_poly18;
 	required_device<discrete_device> m_discrete;
 	required_device<tms36xx_device> m_tms;
 

@@ -98,23 +98,23 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(pit_out0);
 	DECLARE_WRITE_LINE_MEMBER(pit_out1);
 	DECLARE_WRITE_LINE_MEMBER(pit_out2);
-	DECLARE_READ8_MEMBER(crane_limits_r);
-	DECLARE_WRITE8_MEMBER(stepper_w);
-	DECLARE_WRITE8_MEMBER(cp_lamps_w);
-	DECLARE_WRITE8_MEMBER(cp_digits_w);
-	DECLARE_WRITE8_MEMBER(crane_xyz_w);
-	DECLARE_WRITE8_MEMBER(ufo_lamps_w);
+	uint8_t crane_limits_r(offs_t offset);
+	void stepper_w(uint8_t data);
+	void cp_lamps_w(uint8_t data);
+	void cp_digits_w(offs_t offset, uint8_t data);
+	void crane_xyz_w(offs_t offset, uint8_t data);
+	void ufo_lamps_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(ex_crane_limits_r);
-	DECLARE_READ8_MEMBER(ex_crane_open_r);
-	DECLARE_WRITE8_MEMBER(ex_stepper_w);
-	DECLARE_WRITE8_MEMBER(ex_cp_lamps_w);
-	DECLARE_WRITE8_MEMBER(ex_crane_xyz_w);
-	DECLARE_WRITE8_MEMBER(ex_ufo21_lamps1_w);
-	DECLARE_WRITE8_MEMBER(ex_ufo21_lamps2_w);
-	DECLARE_WRITE8_MEMBER(ex_ufo800_lamps_w);
-	DECLARE_READ8_MEMBER(ex_upd_busy_r);
-	DECLARE_WRITE8_MEMBER(ex_upd_start_w);
+	uint8_t ex_crane_limits_r(offs_t offset);
+	uint8_t ex_crane_open_r();
+	void ex_stepper_w(uint8_t data);
+	void ex_cp_lamps_w(uint8_t data);
+	void ex_crane_xyz_w(offs_t offset, uint8_t data);
+	void ex_ufo21_lamps1_w(uint8_t data);
+	void ex_ufo21_lamps2_w(uint8_t data);
+	void ex_ufo800_lamps_w(uint8_t data);
+	uint8_t ex_upd_busy_r();
+	void ex_upd_start_w(uint8_t data);
 
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
@@ -226,7 +226,7 @@ WRITE_LINE_MEMBER(ufo_state::pit_out2)
 
 /* io1 */
 
-READ8_MEMBER(ufo_state::crane_limits_r)
+uint8_t ufo_state::crane_limits_r(offs_t offset)
 {
 	int p = offset & 1;
 	uint8_t ret = 0x7f;
@@ -255,7 +255,7 @@ READ8_MEMBER(ufo_state::crane_limits_r)
 
 /* io2 */
 
-WRITE8_MEMBER(ufo_state::stepper_w)
+void ufo_state::stepper_w(uint8_t data)
 {
 	for (int p = 0; p < 2; p++)
 	{
@@ -289,7 +289,7 @@ WRITE8_MEMBER(ufo_state::stepper_w)
 	m_stepper = data;
 }
 
-WRITE8_MEMBER(ufo_state::cp_lamps_w)
+void ufo_state::cp_lamps_w(uint8_t data)
 {
 	// d0-d3: p1/p2 button lamps
 	// other bits: ?
@@ -297,7 +297,7 @@ WRITE8_MEMBER(ufo_state::cp_lamps_w)
 		m_lamps[i] = BIT(~data, i);
 }
 
-WRITE8_MEMBER(ufo_state::cp_digits_w)
+void ufo_state::cp_digits_w(offs_t offset, uint8_t data)
 {
 	static constexpr uint8_t lut_7448[0x10] =
 			{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
@@ -307,7 +307,7 @@ WRITE8_MEMBER(ufo_state::cp_digits_w)
 	m_digits[offset & 1] = lut_7448[data & 0xf];
 }
 
-WRITE8_MEMBER(ufo_state::crane_xyz_w)
+void ufo_state::crane_xyz_w(offs_t offset, uint8_t data)
 {
 	int p = offset & 1;
 
@@ -325,7 +325,7 @@ WRITE8_MEMBER(ufo_state::crane_xyz_w)
 	m_player[p].motor[2].direction = data & 2;
 }
 
-WRITE8_MEMBER(ufo_state::ufo_lamps_w)
+void ufo_state::ufo_lamps_w(uint8_t data)
 {
 	// d0-d3: ufo leds (2 bits per player)
 	// 3 sets of two red/green leds, each set is wired to the same control 2 bits
@@ -347,7 +347,7 @@ WRITE8_MEMBER(ufo_state::ufo_lamps_w)
 
 /* io1 */
 
-READ8_MEMBER(ufo_state::ex_crane_limits_r)
+uint8_t ufo_state::ex_crane_limits_r(offs_t offset)
 {
 	int p = offset & 1;
 	uint8_t ret = 0xf0;
@@ -370,7 +370,7 @@ READ8_MEMBER(ufo_state::ex_crane_limits_r)
 	return ret;
 }
 
-READ8_MEMBER(ufo_state::ex_crane_open_r)
+uint8_t ufo_state::ex_crane_open_r()
 {
 	// d0-d3: p1, d4-d7: p2
 	uint8_t ret = 0xff;
@@ -390,14 +390,14 @@ READ8_MEMBER(ufo_state::ex_crane_open_r)
 
 /* io2 */
 
-WRITE8_MEMBER(ufo_state::ex_stepper_w)
+void ufo_state::ex_stepper_w(uint8_t data)
 {
 	// stepper motor sequence is: 6 c 9 3 6 c 9 3..
 	// which means d0 and d3 are swapped when compared with UFO board hardware
-	stepper_w(space, offset, bitswap<8>(data,4,6,5,7,0,2,1,3));
+	stepper_w(bitswap<8>(data,4,6,5,7,0,2,1,3));
 }
 
-WRITE8_MEMBER(ufo_state::ex_cp_lamps_w)
+void ufo_state::ex_cp_lamps_w(uint8_t data)
 {
 	// d0,d1,d4,d5: p1/p2 button lamps
 	for (int i = 0; i < 4; i++)
@@ -408,7 +408,7 @@ WRITE8_MEMBER(ufo_state::ex_cp_lamps_w)
 		machine().bookkeeping().coin_counter_w(i, data >> (2 + (i&1) + (i&2) * 2) & 1);
 }
 
-WRITE8_MEMBER(ufo_state::ex_crane_xyz_w)
+void ufo_state::ex_crane_xyz_w(offs_t offset, uint8_t data)
 {
 	int p = offset & 1;
 
@@ -427,7 +427,7 @@ WRITE8_MEMBER(ufo_state::ex_crane_xyz_w)
 	}
 }
 
-WRITE8_MEMBER(ufo_state::ex_ufo800_lamps_w)
+void ufo_state::ex_ufo800_lamps_w(uint8_t data)
 {
 	// d0-d4: 5 red leds on ufo
 	// other bits: ?
@@ -437,7 +437,7 @@ WRITE8_MEMBER(ufo_state::ex_ufo800_lamps_w)
 
 /* 315-5338A */
 
-WRITE8_MEMBER(ufo_state::ex_ufo21_lamps1_w)
+void ufo_state::ex_ufo21_lamps1_w(uint8_t data)
 {
 	// d0: ? (ufo21 reads from it too, but value is discarded)
 	// d1-d6 are the 6 red leds on each ufo
@@ -446,20 +446,20 @@ WRITE8_MEMBER(ufo_state::ex_ufo21_lamps1_w)
 		m_lamps[10 + i] = BIT(data, i);
 }
 
-WRITE8_MEMBER(ufo_state::ex_ufo21_lamps2_w)
+void ufo_state::ex_ufo21_lamps2_w(uint8_t data)
 {
 	for (int i = 1; i < 7; i++)
 		m_lamps[20 + i] = BIT(data, i);
 }
 
-WRITE8_MEMBER(ufo_state::ex_upd_start_w)
+void ufo_state::ex_upd_start_w(uint8_t data)
 {
 	// d0: upd7759c start sample
 	// other bits: unused?
 	m_upd->start_w(~data & 1);
 }
 
-READ8_MEMBER(ufo_state::ex_upd_busy_r)
+uint8_t ufo_state::ex_upd_busy_r()
 {
 	// d0: upd7759c busy
 	// other bits: unused?

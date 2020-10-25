@@ -443,8 +443,8 @@ void seibuspi_state::drawgfx_blend(bitmap_rgb32 &bitmap, const rectangle &clipre
 	// draw
 	for (int y = y1; y <= y2; y++)
 	{
-		u32 *dest = &bitmap.pix32(y);
-		u8 *pri = &primap.pix8(y);
+		u32 *const dest = &bitmap.pix(y);
+		u8 *const pri = &primap.pix(y);
 		int src_i = (py * width) + px;
 		py += yd;
 
@@ -567,9 +567,9 @@ void seibuspi_state::combine_tilemap(bitmap_rgb32 &bitmap, const rectangle &clip
 		if (rowscroll)
 			rx += rowscroll[(y + 19) & yscroll_mask]; // adder value probably not hardcoded but came from CRTC
 
-		u32 *dest = &bitmap.pix32(y);
-		const u16 *src = &pen_bitmap.pix16((y + sy) & yscroll_mask);
-		const u8 *flags = &flags_bitmap.pix8((y + sy) & yscroll_mask);
+		u32 *dest = &bitmap.pix(y);
+		const u16 *src = &pen_bitmap.pix((y + sy) & yscroll_mask);
+		const u8 *flags = &flags_bitmap.pix((y + sy) & yscroll_mask);
 		for (int x = cliprect.min_x + rx; x <= cliprect.max_x + rx; x++)
 		{
 			if (opaque || (flags[x & xscroll_mask] & (TILEMAP_PIXEL_LAYER0 | TILEMAP_PIXEL_LAYER1)))

@@ -6,9 +6,10 @@
 
 **************************************************************************/
 
-
 #include "emu.h"
 #include "includes/dcheese.h"
+
+#include <algorithm>
 
 
 /*************************************
@@ -116,8 +117,8 @@ u32 dcheese_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	/* update the pixels */
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		u16 *dest = &bitmap.pix16(y);
-		u16 *src = &m_dstbitmap->pix16((y + m_blitter_vidparam[0x28/2]) & 0x1ff);
+		u16 *const dest = &bitmap.pix(y);
+		u16 const *const src = &m_dstbitmap->pix((y + m_blitter_vidparam[0x28/2]) & 0x1ff);
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 			dest[x] = src[x];
@@ -137,7 +138,7 @@ void dcheese_state::do_clear()
 {
 	/* clear the requested scanlines */
 	for (int y = m_blitter_vidparam[0x2c/2]; y < m_blitter_vidparam[0x2a/2]; y++)
-		memset(&m_dstbitmap->pix16(y & 0x1ff), 0, DSTBITMAP_WIDTH * 2);
+		std::fill_n(&m_dstbitmap->pix(y & 0x1ff), DSTBITMAP_WIDTH, 0);
 
 	/* signal an IRQ when done (timing is just a guess) */
 	m_signal_irq_timer->adjust(m_screen->scan_period(), 1);
@@ -168,7 +169,7 @@ void dcheese_state::do_blit()
 	/* loop over target rows */
 	for (int y = ystart; y <= yend; y++)
 	{
-		u16 *dst = &m_dstbitmap->pix16(y & 0x1ff);
+		u16 *const dst = &m_dstbitmap->pix(y & 0x1ff);
 
 		/* loop over target columns */
 		for (int x = xstart; x <= xend; x++)
@@ -220,25 +221,25 @@ void dcheese_state::do_blit()
  *
  *************************************/
 
-WRITE16_MEMBER(dcheese_state::blitter_color_w)
+void dcheese_state::blitter_color_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_blitter_color[offset]);
 }
 
 
-WRITE16_MEMBER(dcheese_state::blitter_xparam_w)
+void dcheese_state::blitter_xparam_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_blitter_xparam[offset]);
 }
 
 
-WRITE16_MEMBER(dcheese_state::blitter_yparam_w)
+void dcheese_state::blitter_yparam_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_blitter_yparam[offset]);
 }
 
 
-WRITE16_MEMBER(dcheese_state::blitter_vidparam_w)
+void dcheese_state::blitter_vidparam_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_blitter_vidparam[offset]);
 
@@ -282,14 +283,14 @@ WRITE16_MEMBER(dcheese_state::blitter_vidparam_w)
 }
 
 
-WRITE16_MEMBER(dcheese_state::blitter_unknown_w)
+void dcheese_state::blitter_unknown_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	/* written to just before the blitter command register is written */
 	logerror("%06X:write to %06X = %04X & %04X\n", m_maincpu->pc(), 0x300000 + 2 * offset, data, mem_mask);
 }
 
 
-READ16_MEMBER(dcheese_state::blitter_vidparam_r)
+u16 dcheese_state::blitter_vidparam_r(offs_t offset)
 {
 	/* analog inputs seem to be hooked up here -- might not actually map to blitter */
 	if (offset == 0x02/2)

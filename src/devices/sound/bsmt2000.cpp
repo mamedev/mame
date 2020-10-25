@@ -64,7 +64,7 @@ ROM_END
 bsmt2000_device::bsmt2000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, BSMT2000, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, device_rom_interface(mconfig, *this, 32)
+	, device_rom_interface(mconfig, *this)
 	, m_ready_callback(*this)
 	, m_stream(nullptr)
 	, m_cpu(*this, "bsmt2000")
@@ -175,14 +175,12 @@ void bsmt2000_device::device_timer(emu_timer &timer, device_timer_id id, int par
 //  for our sound stream
 //-------------------------------------------------
 
-void bsmt2000_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void bsmt2000_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	// just fill with current left/right values
-	for (int samp = 0; samp < samples; samp++)
-	{
-		outputs[0][samp] = m_left_data;
-		outputs[1][samp] = m_right_data;
-	}
+	constexpr stream_buffer::sample_t sample_scale = 1.0 / 32768.0;
+	outputs[0].fill(stream_buffer::sample_t(m_left_data) * sample_scale);
+	outputs[1].fill(stream_buffer::sample_t(m_right_data) * sample_scale);
 }
 
 
@@ -236,7 +234,7 @@ void bsmt2000_device::write_data(uint16_t data)
 //  the register select port
 //-------------------------------------------------
 
-READ16_MEMBER( bsmt2000_device::tms_register_r )
+uint16_t bsmt2000_device::tms_register_r()
 {
 	return m_register_select;
 }
@@ -247,7 +245,7 @@ READ16_MEMBER( bsmt2000_device::tms_register_r )
 //  data port
 //-------------------------------------------------
 
-READ16_MEMBER( bsmt2000_device::tms_data_r )
+uint16_t bsmt2000_device::tms_data_r()
 {
 	// also implicitly clear the write pending flag
 	m_write_pending = false;
@@ -262,7 +260,7 @@ READ16_MEMBER( bsmt2000_device::tms_data_r )
 //  selected ROM bank and address
 //-------------------------------------------------
 
-READ16_MEMBER( bsmt2000_device::tms_rom_r )
+uint16_t bsmt2000_device::tms_rom_r()
 {
 	// DSP code expects a 16-bit value with the data in the high byte
 	return (int16_t)(read_byte((m_rom_bank << 16) + m_rom_address) << 8);
@@ -274,7 +272,7 @@ READ16_MEMBER( bsmt2000_device::tms_rom_r )
 //  current ROM bank to access
 //-------------------------------------------------
 
-WRITE16_MEMBER( bsmt2000_device::tms_rom_addr_w )
+void bsmt2000_device::tms_rom_addr_w(uint16_t data)
 {
 	m_rom_address = data;
 }
@@ -285,7 +283,7 @@ WRITE16_MEMBER( bsmt2000_device::tms_rom_addr_w )
 //  access
 //-------------------------------------------------
 
-WRITE16_MEMBER( bsmt2000_device::tms_rom_bank_w )
+void bsmt2000_device::tms_rom_bank_w(uint16_t data)
 {
 	m_rom_bank = data;
 }
@@ -296,7 +294,7 @@ WRITE16_MEMBER( bsmt2000_device::tms_rom_bank_w )
 //  DAC
 //-------------------------------------------------
 
-WRITE16_MEMBER( bsmt2000_device::tms_left_w )
+void bsmt2000_device::tms_left_w(uint16_t data)
 {
 	m_stream->update();
 	m_left_data = data;
@@ -308,7 +306,7 @@ WRITE16_MEMBER( bsmt2000_device::tms_left_w )
 //  channel DAC
 //-------------------------------------------------
 
-WRITE16_MEMBER( bsmt2000_device::tms_right_w )
+void bsmt2000_device::tms_right_w(uint16_t data)
 {
 	m_stream->update();
 	m_right_data = data;

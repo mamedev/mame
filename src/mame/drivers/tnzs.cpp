@@ -19,7 +19,7 @@ Notes:
   Invulnerability isn't possible in 'tnzsop' (level select is stucked to level 6-1).
 
 
-Hardware datails for the newer tnzs board (from pictures):
+Hardware details for the newer tnzs board (from pictures):
 
   Main board
   M6100409A N.ZEALAND STORY (written on label)
@@ -626,7 +626,6 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/11/06
 
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
-#include "sound/volt_reg.h"
 #include "sound/ym2151.h"
 #include "screen.h"
 #include "speaker.h"
@@ -664,7 +663,7 @@ SAMPLES_START_CB_MEMBER(kageki_state::init_samples)
 }
 
 
-READ8_MEMBER(kageki_state::csport_r)
+uint8_t kageki_state::csport_r()
 {
 	int dsw, dsw1, dsw2;
 
@@ -693,7 +692,7 @@ READ8_MEMBER(kageki_state::csport_r)
 	return (dsw & 0xff);
 }
 
-WRITE8_MEMBER(kageki_state::csport_w)
+void kageki_state::csport_w(uint8_t data)
 {
 	char mess[80];
 
@@ -1569,7 +1568,7 @@ void tnzs_mcu_state::tnzs(machine_config &config)
 	tnzs_base(config);
 	I8742(config, m_mcu, 12000000/2);  /* 400KHz ??? - Main board Crystal is 12MHz */
 	m_mcu->p1_in_cb().set(FUNC(tnzs_mcu_state::mcu_port1_r));
-	m_mcu->p2_in_cb().set(FUNC(tnzs_mcu_state::mcu_port2_r));
+	m_mcu->p2_in_cb().set_ioport("IN2");
 	m_mcu->p2_out_cb().set(FUNC(tnzs_mcu_state::mcu_port2_w));
 	m_mcu->t0_in_cb().set_ioport("COIN1");
 	m_mcu->t1_in_cb().set_ioport("COIN2");
@@ -1700,9 +1699,6 @@ void kabukiz_state::kabukiz(machine_config &config)
 	ymsnd.port_b_write_callback().set("dac", FUNC(dac_byte_interface::data_w));
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void jpopnics_state::jpopnics(machine_config &config)

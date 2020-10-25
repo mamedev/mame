@@ -182,8 +182,8 @@ private:
 
 	// address space and cache
 	address_space_config m_space_config;
-	address_space *m_space;
-	memory_access_cache<1, -1, ENDIANNESS_LITTLE> *m_cache;
+	memory_access<16, 1, -1, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<16, 1, -1, ENDIANNESS_LITTLE>::specific m_space;
 
 	// callback objects
 	devcb_read_line m_bps_callback;

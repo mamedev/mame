@@ -65,38 +65,38 @@ TIMER_CALLBACK_MEMBER(z80ne_state::z80ne_cassette_tc)
 	}
 }
 
-
-void z80ne_state::driver_init()
+void z80ne_state::save_state_vars()
 {
-	/* first two entries point to rom on reset */
-	uint8_t *RAM = m_region_z80ne->base();
-	m_bank1->configure_entry(0, &RAM[0x00000]); /* RAM   at 0x0000 */
-	m_bank1->configure_entry(1, &RAM[0x14000]); /* ep382 at 0x0000 */
-	m_bank2->configure_entry(0, &RAM[0x14000]); /* ep382 at 0x8000 */
+	save_item(NAME(m_lx383_scan_counter));
+	save_item(NAME(m_lx383_key));
+	save_item(NAME(m_lx383_downsampler));
+	save_item(NAME(m_lx385_ctrl));
 }
 
-void z80net_state::driver_init()
+void z80ne_state::init_z80ne()
 {
-	z80ne_state::driver_init();
+	save_state_vars();
 }
 
 void z80netf_state::driver_init()
 {
+	save_state_vars();
+
 	/* first two entries point to rom on reset */
-	uint8_t *RAM = m_region_z80ne->base();
-	m_bank1->configure_entry(0, &RAM[0x00000]); /* RAM   at 0x0000-0x03FF */
-	m_bank1->configure_entries(1, 3, &RAM[0x14400], 0x0400); /* ep390, ep1390, ep2390 at 0x0000-0x03FF */
-	m_bank1->configure_entry(4, &RAM[0x14000]); /* ep382 at 0x0000-0x03FF */
-	m_bank1->configure_entry(5, &RAM[0x10000]); /* ep548 at 0x0000-0x03FF */
+	u8 *r = m_ram->pointer();
+	m_bank1->configure_entry(0, r); /* RAM   at 0x0000-0x03FF */
+	m_bank1->configure_entries(1, 3, m_rom+0x4400, 0x0400); /* ep390, ep1390, ep2390 at 0x0000-0x03FF */
+	m_bank1->configure_entry(4, m_rom+0x4000); /* ep382 at 0x0000-0x03FF */
+	m_bank1->configure_entry(5, m_rom); /* ep548 at 0x0000-0x03FF */
 
-	m_bank2->configure_entry(0, &RAM[0x00400]); /* RAM   at 0x0400 */
-	m_bank2->configure_entry(1, &RAM[0x10400]); /* ep548 at 0x0400-0x3FFF */
+	m_bank2->configure_entry(0, r+0x0400); /* RAM   at 0x0400 */
+	m_bank2->configure_entry(1, m_rom+0x0400); /* ep548 at 0x0400-0x3FFF */
 
-	m_bank3->configure_entry(0, &RAM[0x08000]); /* RAM   at 0x8000 */
-	m_bank3->configure_entry(1, &RAM[0x14000]); /* ep382 at 0x8000 */
+	m_bank3->configure_entry(0, r+0x4000); /* RAM   at 0x8000 */
+	m_bank3->configure_entry(1, m_rom+0x4000); /* ep382 at 0x8000 */
 
-	m_bank4->configure_entry(0, &RAM[0x0F000]); /* RAM   at 0xF000 */
-	m_bank4->configure_entries(1, 3, &RAM[0x14400], 0x0400); /* ep390, ep1390, ep2390 at 0xF000 */
+	m_bank4->configure_entry(0, r+0x5000); /* RAM   at 0xF000 */
+	m_bank4->configure_entries(1, 3, m_rom+0x4400, 0x0400); /* ep390, ep1390, ep2390 at 0xF000 */
 
 }
 
@@ -151,10 +151,8 @@ void z80ne_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 	case 0:
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		break;
-	case 1:
-		// switch to RAM bank at address 0x0000
-		m_bank1->set_entry(0);
-		break;
+	default:
+		printf("Invalid timer %d encountered\n",id);
 	}
 }
 
@@ -162,16 +160,6 @@ void z80net_state::reset_lx387()
 {
 	m_lx387_kr2376->set_input_pin( kr2376_device::KR2376_DSII, 0);
 	m_lx387_kr2376->set_input_pin( kr2376_device::KR2376_PII, 0);
-}
-
-void z80ne_state::reset_lx382_banking()
-{
-	/* switch to ROM bank at address 0x0000 */
-	m_bank1->set_entry(1);
-	m_bank2->set_entry(0);  /* ep382 at 0x8000 */
-
-	/* after the first 3 bytes have been read from ROM, switch the RAM back in */
-	m_timer_reset->adjust(m_maincpu->cycles_to_attotime(2));
 }
 
 void z80netf_state::reset_lx390_banking()
@@ -185,8 +173,6 @@ void z80netf_state::reset_lx390_banking()
 		m_bank2->set_entry(0);  /* RAM   at 0x0400 */
 		m_bank3->set_entry(1);  /* ep382 at 0x8000 */
 		m_bank4->set_entry(0);  /* RAM   at 0xF000 */
-		// after the first 3 bytes have been read from ROM, switch the RAM back in
-		m_timer_reset->adjust(m_maincpu->cycles_to_attotime(2));
 		break;
 	case 0x02: /* EP548  16k BASIC */
 		if (VERBOSE)
@@ -271,19 +257,34 @@ void z80ne_state::base_reset()
 	m_uart_clock->set_unscaled_clock(m_cass_data.speed * 16);
 
 	lx385_ctrl_w(0);
-
 }
 
 void z80ne_state::machine_reset()
 {
-	reset_lx382_banking();
 	base_reset();
+
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	program.install_rom(0x0000, 0x03ff, m_rom);   // do it here for F3
+	m_rom_shadow_tap = program.install_read_tap(0x8000, 0x83ff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
+	{
+		if (!machine().side_effects_disabled())
+		{
+			// delete this tap
+			m_rom_shadow_tap->remove();
+
+			// reinstall ram over the rom shadow
+			m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x03ff, m_mram);
+		}
+
+		// return the original data
+		return data;
+	});
 }
 
 void z80net_state::machine_reset()
 {
-	z80ne_state::machine_reset();
 	reset_lx387();
+	z80ne_state::machine_reset();
 }
 
 void z80netb_state::machine_reset()
@@ -297,41 +298,51 @@ void z80netf_state::machine_reset()
 	reset_lx390_banking();
 	base_reset();
 	reset_lx387();
+
+	// basic roms are exempt from memory tap
+	if ((m_io_config->read() & 0x07) != 2)
+	{
+		address_space &program = m_maincpu->space(AS_PROGRAM);
+		m_rom_shadow_tap = program.install_read_tap(0x8000, 0xf3ff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
+		{
+			if (!machine().side_effects_disabled())
+			{
+				// delete this tap
+				m_rom_shadow_tap->remove();
+
+				// reinstall ram over the rom shadow
+				m_bank1->set_entry(0);
+			}
+
+			// return the original data
+			return data;
+		});
+	}
 }
 
 INPUT_CHANGED_MEMBER(z80ne_state::z80ne_reset)
 {
-	uint8_t rst;
-	rst = m_io_rst->read();
+	uint8_t rst = m_io_rst->read();
 
 	if ( ! BIT(rst, 0))
-	{
 		machine().schedule_soft_reset();
-	}
 }
 
 INPUT_CHANGED_MEMBER(z80net_state::z80net_nmi)
 {
-	uint8_t nmi;
-	nmi = m_io_lx387_brk->read();
+	uint8_t nmi = m_io_lx387_brk->read();
 
 	if ( ! BIT(nmi, 0))
-	{
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-	}
 }
 
 void z80ne_state::machine_start()
 {
 	m_timer_nmi = timer_alloc(0);
-	m_timer_reset = timer_alloc(1);
 
 	m_lx383_digits.resolve();
 
 	m_lx385_ctrl = 0x1f;
-	save_item(NAME(m_lx383_scan_counter));
-	save_item(NAME(m_lx383_downsampler));
-	save_item(NAME(m_lx383_key));
 	m_cassette_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z80ne_state::z80ne_cassette_tc), this));
 	m_kbd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z80ne_state::z80ne_kbd_scan), this));
 	m_kbd_timer->adjust(attotime::from_hz(1000), 0, attotime::from_hz(1000));
@@ -348,7 +359,7 @@ void z80netf_state::machine_start()
 ******************************************************************************/
 
 /* LX.383 - LX.384 HEX keyboard and display */
-READ8_MEMBER(z80ne_state::lx383_r)
+uint8_t z80ne_state::lx383_r()
 {
 	/*
 	 * Keyboard scanning
@@ -370,7 +381,7 @@ READ8_MEMBER(z80ne_state::lx383_r)
 	return m_lx383_key[m_lx383_scan_counter];
 }
 
-WRITE8_MEMBER(z80ne_state::lx383_w)
+void z80ne_state::lx383_w(offs_t offset, uint8_t data)
 {
 	/*
 	 * First 8 locations (F0-F7) are mapped to a dual-port 8-byte RAM
@@ -402,7 +413,7 @@ WRITE8_MEMBER(z80ne_state::lx383_w)
 	else
 	{
 		// after writing to port 0xF8 and the first ~M1 cycles strike a NMI for single step execution
-		m_timer_reset->adjust(m_maincpu->cycles_to_attotime(1));
+		m_timer_nmi->adjust(m_maincpu->cycles_to_attotime(1));
 	}
 }
 
@@ -454,7 +465,7 @@ WRITE8_MEMBER(z80ne_state::lx383_w)
     pin 2 for an old PMOS UART.
  *
  */
-READ8_MEMBER(z80ne_state::lx385_ctrl_r)
+uint8_t z80ne_state::lx385_ctrl_r()
 {
 	/* set unused bits high */
 	uint8_t data = 0xc0;
@@ -539,7 +550,7 @@ READ_LINE_MEMBER(z80net_state::lx387_control_r)
 	return BIT(m_io_modifiers->read(), 1);
 }
 
-READ8_MEMBER(z80net_state::lx388_mc6847_videoram_r)
+uint8_t z80net_state::lx388_mc6847_videoram_r(offs_t offset)
 {
 	if (offset == ~0) return 0xff;
 
@@ -553,14 +564,14 @@ READ8_MEMBER(z80net_state::lx388_mc6847_videoram_r)
 	return m_videoram[offset];
 }
 
-READ8_MEMBER(z80net_state::lx387_data_r)
+uint8_t z80net_state::lx387_data_r()
 {
 	uint8_t data = m_lx387_kr2376->data_r() & 0x7f;
 	data |= m_lx387_kr2376->get_output_pin(kr2376_device::KR2376_SO) << 7;
 	return data;
 }
 
-READ8_MEMBER(z80net_state::lx388_read_field_sync)
+uint8_t z80net_state::lx388_read_field_sync()
 {
 	return m_vdg->fs_r() << 7;
 }
@@ -574,7 +585,7 @@ READ8_MEMBER(z80net_state::lx388_read_field_sync)
  *
  */
 
-WRITE8_MEMBER(z80netf_state::lx390_motor_w)
+void z80netf_state::lx390_motor_w(uint8_t data)
 {
 	/* Selection of drive and parameters
 	 A write also causes the selected drive motor to turn on for about 3 seconds.
@@ -590,7 +601,7 @@ WRITE8_MEMBER(z80netf_state::lx390_motor_w)
 
 	floppy_image_device *floppy = nullptr;
 
-	for (int f = 0; f < 4; f++)
+	for (u8 f = 0; f < 4; f++)
 		if (BIT(data, f))
 			floppy = m_floppy[f]->get_device();
 
@@ -613,25 +624,7 @@ WRITE8_MEMBER(z80netf_state::lx390_motor_w)
 	}
 }
 
-READ8_MEMBER(z80netf_state::lx390_reset_bank)
-{
-	offs_t pc;
-
-	/* if PC is not in range, we are under integrated debugger control, DON'T SWAP */
-	pc = m_maincpu->pc();
-	if((pc >= 0xf000) && (pc <=0xffff))
-	{
-		LOG("lx390_reset_bank, reset memory bank 1\n");
-		m_bank1->set_entry(0); /* RAM at 0x0000 (bank 1) */
-	}
-	else
-	{
-		LOG("lx390_reset_bank, bypass because in debugger\n");
-	}
-	return 0xff;
-}
-
-READ8_MEMBER(z80netf_state::lx390_fdc_r)
+uint8_t z80netf_state::lx390_fdc_r(offs_t offset)
 {
 	uint8_t d;
 
@@ -655,7 +648,7 @@ READ8_MEMBER(z80netf_state::lx390_fdc_r)
 		break;
 	case 6:
 		d = 0xff;
-		lx390_reset_bank(space, 0);
+		m_bank1->set_entry(0);
 		break;
 	case 7:
 		d = m_wd1771->data_r() ^ 0xff;
@@ -667,11 +660,9 @@ READ8_MEMBER(z80netf_state::lx390_fdc_r)
 	return d;
 }
 
-WRITE8_MEMBER(z80netf_state::lx390_fdc_w)
+void z80netf_state::lx390_fdc_w(offs_t offset, uint8_t data)
 {
-	uint8_t d;
-
-	d = data;
+	uint8_t d = data;
 	switch(offset)
 	{
 	case 0:
@@ -696,7 +687,7 @@ WRITE8_MEMBER(z80netf_state::lx390_fdc_w)
 		break;
 	case 6:
 		LOG("lx390_fdc_w, motor_w:   %02x\n", d);
-		lx390_motor_w(space, 0, d);
+		lx390_motor_w(d);
 		break;
 	case 7:
 		LOG("lx390_fdc_w, WD17xx data7, force:   %02x\n", d);

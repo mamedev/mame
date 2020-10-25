@@ -27,8 +27,8 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_WRITE16_MEMBER(pass_bg_videoram_w);
-	DECLARE_WRITE16_MEMBER(pass_fg_videoram_w);
+	void pass_bg_videoram_w(offs_t offset, uint16_t data);
+	void pass_fg_videoram_w(offs_t offset, uint16_t data);
 	TILE_GET_INFO_MEMBER(get_pass_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_pass_fg_tile_info);
 

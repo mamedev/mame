@@ -242,42 +242,42 @@ void maple_dc_device::maple_hw_trigger()
 	}
 }
 
-READ32_MEMBER(maple_dc_device::sb_mdstar_r)
+uint32_t maple_dc_device::sb_mdstar_r()
 {
 	return mdstar;
 }
 
-WRITE32_MEMBER(maple_dc_device::sb_mdstar_w)
+void maple_dc_device::sb_mdstar_w(uint32_t data)
 {
 	mdstar = data & ~31;
 }
 
-READ32_MEMBER(maple_dc_device::sb_mden_r)
+uint32_t maple_dc_device::sb_mden_r()
 {
 	return mden;
 }
 
-WRITE32_MEMBER(maple_dc_device::sb_mden_w)
+void maple_dc_device::sb_mden_w(uint32_t data)
 {
 	mden = data & 1;
 }
 
-READ32_MEMBER(maple_dc_device::sb_mdtsel_r)
+uint32_t maple_dc_device::sb_mdtsel_r()
 {
 	return mdtsel;
 }
 
-WRITE32_MEMBER(maple_dc_device::sb_mdtsel_w)
+void maple_dc_device::sb_mdtsel_w(uint32_t data)
 {
 	mdtsel = data & 1;
 }
 
-READ32_MEMBER(maple_dc_device::sb_mdst_r)
+uint32_t maple_dc_device::sb_mdst_r()
 {
 	return dma_state != DMA_IDLE ? 1 : 0;
 }
 
-WRITE32_MEMBER(maple_dc_device::sb_mdst_w)
+void maple_dc_device::sb_mdst_w(uint32_t data)
 {
 	uint32_t old = mdst;
 	mdst = data & 1;
@@ -289,16 +289,16 @@ WRITE32_MEMBER(maple_dc_device::sb_mdst_w)
 	}
 }
 
-READ32_MEMBER(maple_dc_device::sb_msys_r)
+uint32_t maple_dc_device::sb_msys_r()
 {
 	return msys;
 }
 
-WRITE32_MEMBER(maple_dc_device::sb_msys_w)
+void maple_dc_device::sb_msys_w(uint32_t data)
 {
 	msys = data;
 }
 
-WRITE32_MEMBER(maple_dc_device::sb_mdapro_w)
+void maple_dc_device::sb_mdapro_w(uint32_t data)
 {
 }

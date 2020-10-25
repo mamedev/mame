@@ -39,12 +39,12 @@ public:
 	void init_mz80k();
 
 private:
-	DECLARE_READ8_MEMBER(mz80k_strobe_r);
-	DECLARE_WRITE8_MEMBER(mz80k_strobe_w);
-	DECLARE_READ8_MEMBER(mz80k_8255_portb_r);
-	DECLARE_READ8_MEMBER(mz80k_8255_portc_r);
-	DECLARE_WRITE8_MEMBER(mz80k_8255_porta_w);
-	DECLARE_WRITE8_MEMBER(mz80k_8255_portc_w);
+	uint8_t mz80k_strobe_r();
+	void mz80k_strobe_w(uint8_t data);
+	uint8_t mz80k_8255_portb_r();
+	uint8_t mz80k_8255_portc_r();
+	void mz80k_8255_porta_w(uint8_t data);
+	void mz80k_8255_portc_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pit_out0_changed);
 	DECLARE_WRITE_LINE_MEMBER(pit_out2_changed);
 	uint32_t screen_update_mz80k(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

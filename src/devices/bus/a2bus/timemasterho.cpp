@@ -203,12 +203,12 @@ uint8_t a2bus_timemasterho_device::read_c800(uint16_t offset)
 	return m_rom[offset+0xc00];
 }
 
-WRITE8_MEMBER(a2bus_timemasterho_device::pia_out_a)
+void a2bus_timemasterho_device::pia_out_a(uint8_t data)
 {
 	// port A appears to be input only
 }
 
-WRITE8_MEMBER(a2bus_timemasterho_device::pia_out_b)
+void a2bus_timemasterho_device::pia_out_b(uint8_t data)
 {
 	m_msm5832->address_w(data & 0xf);
 	m_msm5832->hold_w((data>>4) & 1 ? ASSERT_LINE : CLEAR_LINE);

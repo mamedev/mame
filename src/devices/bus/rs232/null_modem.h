@@ -52,6 +52,7 @@ private:
 	emu_timer *m_timer_poll;
 	int m_rts;
 	int m_dtr;
+	int m_xoff;
 };
 
 DECLARE_DEVICE_TYPE(NULL_MODEM, null_modem_device)

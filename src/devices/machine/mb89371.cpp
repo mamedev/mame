@@ -22,7 +22,7 @@ void mb89371_device::device_start()
 {
 }
 
-WRITE8_MEMBER(mb89371_device::write)
+void mb89371_device::write(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -37,7 +37,7 @@ WRITE8_MEMBER(mb89371_device::write)
 	logerror("MB89371 unimplemented write @%X = %02X & %02X\n", offset, data, mem_mask);
 }
 
-READ8_MEMBER(mb89371_device::read)
+uint8_t mb89371_device::read(offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{

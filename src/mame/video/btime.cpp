@@ -131,13 +131,13 @@ VIDEO_START_MEMBER(btime_state,bnj)
 	save_item(NAME(*m_background_bitmap));
 }
 
-WRITE8_MEMBER(btime_state::lnc_videoram_w)
+void btime_state::lnc_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_colorram[offset] = *m_lnc_charbank;
 }
 
-READ8_MEMBER(btime_state::btime_mirrorvideoram_r)
+uint8_t btime_state::btime_mirrorvideoram_r(offs_t offset)
 {
 	int x, y;
 
@@ -149,7 +149,7 @@ READ8_MEMBER(btime_state::btime_mirrorvideoram_r)
 	return m_videoram[offset];
 }
 
-READ8_MEMBER(btime_state::btime_mirrorcolorram_r)
+uint8_t btime_state::btime_mirrorcolorram_r(offs_t offset)
 {
 	int x, y;
 
@@ -161,7 +161,7 @@ READ8_MEMBER(btime_state::btime_mirrorcolorram_r)
 	return m_colorram[offset];
 }
 
-WRITE8_MEMBER(btime_state::btime_mirrorvideoram_w)
+void btime_state::btime_mirrorvideoram_w(offs_t offset, uint8_t data)
 {
 	int x, y;
 
@@ -173,7 +173,7 @@ WRITE8_MEMBER(btime_state::btime_mirrorvideoram_w)
 	m_videoram[offset] = data;
 }
 
-WRITE8_MEMBER(btime_state::lnc_mirrorvideoram_w)
+void btime_state::lnc_mirrorvideoram_w(offs_t offset, uint8_t data)
 {
 	int x, y;
 
@@ -182,10 +182,10 @@ WRITE8_MEMBER(btime_state::lnc_mirrorvideoram_w)
 	y = offset % 32;
 	offset = 32 * y + x;
 
-	lnc_videoram_w(space, offset, data);
+	lnc_videoram_w(offset, data);
 }
 
-WRITE8_MEMBER(btime_state::btime_mirrorcolorram_w)
+void btime_state::btime_mirrorcolorram_w(offs_t offset, uint8_t data)
 {
 	int x, y;
 
@@ -197,7 +197,7 @@ WRITE8_MEMBER(btime_state::btime_mirrorcolorram_w)
 	m_colorram[offset] = data;
 }
 
-WRITE8_MEMBER(btime_state::deco_charram_w)
+void btime_state::deco_charram_w(offs_t offset, uint8_t data)
 {
 	if (m_deco_charram[offset] == data)
 		return;
@@ -213,22 +213,22 @@ WRITE8_MEMBER(btime_state::deco_charram_w)
 	m_gfxdecode->gfx(0)->mark_dirty(offset >> 3);
 }
 
-WRITE8_MEMBER(btime_state::bnj_background_w)
+void btime_state::bnj_background_w(offs_t offset, uint8_t data)
 {
 	m_bnj_backgroundram[offset] = data;
 }
 
-WRITE8_MEMBER(btime_state::bnj_scroll1_w)
+void btime_state::bnj_scroll1_w(uint8_t data)
 {
 	m_bnj_scroll1 = data;
 }
 
-WRITE8_MEMBER(btime_state::bnj_scroll2_w)
+void btime_state::bnj_scroll2_w(uint8_t data)
 {
 	m_bnj_scroll2 = data;
 }
 
-WRITE8_MEMBER(btime_state::btime_video_control_w)
+void btime_state::btime_video_control_w(uint8_t data)
 {
 	// Btime video control
 	//
@@ -238,7 +238,7 @@ WRITE8_MEMBER(btime_state::btime_video_control_w)
 	flip_screen_set(data & 0x01);
 }
 
-WRITE8_MEMBER(btime_state::bnj_video_control_w)
+void btime_state::bnj_video_control_w(uint8_t data)
 {
 	/* Bnj/Lnc works a little differently than the btime/eggs (apparently). */
 	/* According to the information at: */
@@ -251,10 +251,10 @@ WRITE8_MEMBER(btime_state::bnj_video_control_w)
 	/* are in upright controls mode. */
 
 	if (ioport("DSW1")->read() & 0x40) /* cocktail mode */
-		btime_video_control_w(space, offset, data);
+		btime_video_control_w(data);
 }
 
-WRITE8_MEMBER(btime_state::zoar_video_control_w)
+void btime_state::zoar_video_control_w(uint8_t data)
 {
 	// Zoar video control
 	//
@@ -268,7 +268,7 @@ WRITE8_MEMBER(btime_state::zoar_video_control_w)
 		flip_screen_set(data & 0x80);
 }
 
-WRITE8_MEMBER(btime_state::disco_video_control_w)
+void btime_state::disco_video_control_w(uint8_t data)
 {
 	m_btime_palette = (data >> 2) & 0x03;
 

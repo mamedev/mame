@@ -12,7 +12,6 @@
 #include "audio/atarisac.h"
 
 #include "cpu/m68000/m68000.h"
-#include "sound/volt_reg.h"
 
 
 //**************************************************************************
@@ -254,7 +253,7 @@ void atari_sac_device::device_add_mconfig(machine_config &config)
 	// TODO: determine exact frequency (controlled by a PAL16R4)
 
 	GENERIC_LATCH_8(config, m_datin);
-	m_datin->data_pending_callback().set_inputline(m_daccpu, M68K_IRQ_4);
+	m_datin->data_pending_callback().set_inputline(m_daccpu, M68K_IRQ_2);
 	m_datin->set_separate_acknowledge(true);
 
 	GENERIC_LATCH_8(config, m_datout);
@@ -272,11 +271,6 @@ void atari_sac_device::device_add_mconfig(machine_config &config)
 	// FIXME: there is actually only one DAC (plus some analog switches)
 	AM6012(config, m_rdac).add_route(ALL_OUTPUTS, *this, 0.5, AUTO_ALLOC_INPUT, 1); // AM6012.6j
 	AM6012(config, m_ldac).add_route(ALL_OUTPUTS, *this, 0.5, AUTO_ALLOC_INPUT, 0); // AM6012.6j
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 

@@ -69,19 +69,19 @@ void gberet_state::gberet_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(gberet_state::gberet_videoram_w)
+void gberet_state::gberet_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(gberet_state::gberet_colorram_w)
+void gberet_state::gberet_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(gberet_state::gberet_scroll_w)
+void gberet_state::gberet_scroll_w(offs_t offset, uint8_t data)
 {
 	int scroll;
 
@@ -91,7 +91,7 @@ WRITE8_MEMBER(gberet_state::gberet_scroll_w)
 	m_bg_tilemap->set_scrollx(offset & 0x1f, scroll);
 }
 
-WRITE8_MEMBER(gberet_state::gberet_sprite_bank_w)
+void gberet_state::gberet_sprite_bank_w(uint8_t data)
 {
 	m_spritebank = data;
 }
@@ -162,7 +162,7 @@ uint32_t gberet_state::screen_update_gberet(screen_device &screen, bitmap_ind16 
 
 /* Green Beret (bootleg) */
 
-WRITE8_MEMBER(gberet_state::gberetb_scroll_w)
+void gberet_state::gberetb_scroll_w(offs_t offset, uint8_t data)
 {
 	int scroll = data;
 

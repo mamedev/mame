@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    render.c
+    render.cpp
 
     Core rendering system.
 
@@ -37,20 +37,22 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "emuopts.h"
 #include "render.h"
+
+#include "emuopts.h"
 #include "rendfont.h"
 #include "rendlay.h"
 #include "rendutil.h"
 #include "config.h"
 #include "drivenum.h"
-#include "xmlfile.h"
+
 #include "ui/uimain.h"
+
+#include "xmlfile.h"
 
 #include <zlib.h>
 
 #include <algorithm>
-#include <functional>
 
 
 
@@ -335,11 +337,10 @@ void render_texture::reset(render_manager &manager, texture_scaler_func scaler, 
 void render_texture::release()
 {
 	// free all scaled versions
-	for (auto & elem : m_scaled)
+	for (auto &elem : m_scaled)
 	{
-		m_manager->invalidate_all(elem.bitmap);
-		global_free(elem.bitmap);
-		elem.bitmap = nullptr;
+		m_manager->invalidate_all(elem.bitmap.get());
+		elem.bitmap.reset();
 		elem.seqid = 0;
 	}
 
@@ -376,12 +377,9 @@ void render_texture::set_bitmap(bitmap_t &bitmap, const rectangle &sbounds, text
 	// invalidate all scaled versions
 	for (auto & elem : m_scaled)
 	{
-		if (elem.bitmap != nullptr)
-		{
-			m_manager->invalidate_all(elem.bitmap);
-			global_free(elem.bitmap);
-		}
-		elem.bitmap = nullptr;
+		if (elem.bitmap)
+			m_manager->invalidate_all(elem.bitmap.get());
+		elem.bitmap.reset();
 		elem.seqid = 0;
 	}
 }
@@ -458,21 +456,21 @@ void render_texture::get_scaled(u32 dwidth, u32 dheight, render_texinfo &texinfo
 
 			// didn't find one -- take the entry with the lowest seqnum
 			for (scalenum = 0; scalenum < ARRAY_LENGTH(m_scaled); scalenum++)
-				if ((lowest == -1 || m_scaled[scalenum].seqid < m_scaled[lowest].seqid) && !primlist.has_reference(m_scaled[scalenum].bitmap))
+				if ((lowest == -1 || m_scaled[scalenum].seqid < m_scaled[lowest].seqid) && !primlist.has_reference(m_scaled[scalenum].bitmap.get()))
 					lowest = scalenum;
 			if (-1 == lowest)
 				throw emu_fatalerror("render_texture::get_scaled: Too many live texture instances!");
 
 			// throw out any existing entries
 			scaled = &m_scaled[lowest];
-			if (scaled->bitmap != nullptr)
+			if (scaled->bitmap)
 			{
-				m_manager->invalidate_all(scaled->bitmap);
-				global_free(scaled->bitmap);
+				m_manager->invalidate_all(scaled->bitmap.get());
+				scaled->bitmap.reset();
 			}
 
 			// allocate a new bitmap
-			scaled->bitmap = global_alloc(bitmap_argb32(dwidth, dheight));
+			scaled->bitmap = std::make_unique<bitmap_argb32>(dwidth, dheight);
 			scaled->seqid = ++m_curseq;
 
 			// let the scaler do the work
@@ -480,8 +478,8 @@ void render_texture::get_scaled(u32 dwidth, u32 dheight, render_texinfo &texinfo
 		}
 
 		// finally fill out the new info
-		primlist.add_reference(scaled->bitmap);
-		texinfo.base = &scaled->bitmap->pix32(0);
+		primlist.add_reference(scaled->bitmap.get());
+		texinfo.base = &scaled->bitmap->pix(0);
 		texinfo.rowpixels = scaled->bitmap->rowpixels();
 		texinfo.width = dwidth;
 		texinfo.height = dheight;
@@ -716,8 +714,8 @@ void render_container::overlay_scale(bitmap_argb32 &dest, bitmap_argb32 &source,
 	// simply replicate the source bitmap over the target
 	for (int y = 0; y < dest.height(); y++)
 	{
-		u32 *src = &source.pix32(y % source.height());
-		u32 *dst = &dest.pix32(y);
+		u32 const *const src = &source.pix(y % source.height());
+		u32 *dst = &dest.pix(y);
 		int sx = 0;
 
 		// loop over columns
@@ -893,7 +891,7 @@ render_target::render_target(render_manager &manager, util::xml::data_node const
 template <typename T> render_target::render_target(render_manager &manager, T &&layout, u32 flags, constructor_impl_t)
 	: m_next(nullptr)
 	, m_manager(manager)
-	, m_curview(nullptr)
+	, m_curview(0U)
 	, m_flags(flags)
 	, m_listindex(0)
 	, m_width(640)
@@ -906,6 +904,7 @@ template <typename T> render_target::render_target(render_manager &manager, T &&
 	, m_maxtexwidth(65536)
 	, m_maxtexheight(65536)
 	, m_transform_container(true)
+	, m_external_artwork(false)
 {
 	// determine the base layer configuration based on options
 	m_base_layerconfig.set_zoom_to_screen(manager.machine().options().artwork_crop());
@@ -948,6 +947,10 @@ template <typename T> render_target::render_target(render_manager &manager, T &&
 
 	// load the layout files
 	load_layout_files(std::forward<T>(layout), flags & RENDER_CREATE_SINGLE_FILE);
+	for (layout_file &file : m_filelist)
+		for (layout_view &view : file.views())
+			if (!(m_flags & RENDER_CREATE_NO_ART) || !view.has_art())
+				m_views.emplace_back(view, view.default_visibility_mask());
 
 	// set the current view to the first one
 	set_view(0);
@@ -1009,13 +1012,13 @@ void render_target::set_bounds(s32 width, s32 height, float pixel_aspect)
 //  a target
 //-------------------------------------------------
 
-void render_target::set_view(int viewindex)
+void render_target::set_view(unsigned viewindex)
 {
-	layout_view *view = view_by_index(viewindex);
-	if (view)
+	if (m_views.size() > viewindex)
 	{
-		m_curview = view;
-		view->recompute(m_layerconfig);
+		m_curview = viewindex;
+		current_view().recompute(visibility_mask(), m_layerconfig.zoom_to_screen());
+		current_view().preload();
 	}
 }
 
@@ -1033,76 +1036,84 @@ void render_target::set_max_texture_size(int maxwidth, int maxheight)
 
 
 //-------------------------------------------------
+//  set_visibility_toggle - show or hide selected
+//  parts of a view
+//-------------------------------------------------
+
+void render_target::set_visibility_toggle(unsigned index, bool enable)
+{
+	assert(visibility_toggles().size() > index);
+	if (enable)
+		m_views[m_curview].second |= u32(1) << index;
+	else
+		m_views[m_curview].second &= ~(u32(1) << index);
+	current_view().recompute(visibility_mask(), m_layerconfig.zoom_to_screen());
+	current_view().preload();
+}
+
+
+//-------------------------------------------------
 //  configured_view - select a view for this
 //  target based on the configuration parameters
 //-------------------------------------------------
 
-int render_target::configured_view(const char *viewname, int targetindex, int numtargets)
+unsigned render_target::configured_view(const char *viewname, int targetindex, int numtargets)
 {
 	layout_view *view = nullptr;
-	int viewindex;
 
 	// auto view just selects the nth view
 	if (strcmp(viewname, "auto") != 0)
 	{
 		// scan for a matching view name
-		size_t viewlen = strlen(viewname);
-		for (view = view_by_index(viewindex = 0); view != nullptr; view = view_by_index(++viewindex))
-			if (core_strnicmp(view->name().c_str(), viewname, viewlen) == 0)
-				break;
+		size_t const viewlen = strlen(viewname);
+		for (unsigned i = 0; !view && (m_views.size() > i); ++i)
+			if (!core_strnicmp(m_views[i].first.get().name().c_str(), viewname, viewlen))
+				view = &m_views[i].first.get();
 	}
 
 	// if we don't have a match, default to the nth view
-	screen_device_iterator iter(m_manager.machine().root_device());
-	int scrcount = iter.count();
-	if (view == nullptr && scrcount > 0)
+	std::vector<std::reference_wrapper<screen_device> > screens;
+	for (screen_device &screen : screen_device_iterator(m_manager.machine().root_device()))
+		screens.push_back(screen);
+	if (!view && !screens.empty())
 	{
 		// if we have enough targets to be one per screen, assign in order
-		if (numtargets >= scrcount)
+		if (numtargets >= screens.size())
 		{
-			int ourindex = index() % scrcount;
-			screen_device *screen = iter.byindex(ourindex);
-			assert(screen != nullptr);
-
 			// find the first view with this screen and this screen only
-			for (view = view_by_index(viewindex = 0); view != nullptr; view = view_by_index(++viewindex))
+			screen_device const &screen = screens[index() % screens.size()];
+			for (unsigned i = 0; !view && (m_views.size() > i); ++i)
 			{
-				auto const &viewscreens = view->screens();
-				if (viewscreens.empty())
+				for (layout_view::item &viewitem : m_views[i].first.get().items())
 				{
-					view = nullptr;
-					break;
+					screen_device const *const viewscreen(viewitem.screen());
+					if (viewscreen == &screen)
+					{
+						view = &m_views[i].first.get();
+					}
+					else if (viewscreen)
+					{
+						view = nullptr;
+						break;
+					}
 				}
-				else if (std::find_if(viewscreens.begin(), viewscreens.end(), [&screen](auto const &scr) { return &scr.get() != screen; }) == viewscreens.end())
-					break;
 			}
 		}
 
 		// otherwise, find the first view that has all the screens
-		if (view == nullptr)
+		if (!view)
 		{
-			for (view = view_by_index(viewindex = 0); view != nullptr; view = view_by_index(++viewindex))
+			for (unsigned i = 0; !view && (m_views.size() > i); ++i)
 			{
-				if (view->screen_count() >= scrcount)
-				{
-					bool screen_missing(false);
-					for (screen_device &screen : iter)
-					{
-						if (!view->has_screen(screen))
-						{
-							screen_missing = true;
-							break;
-						}
-					}
-					if (!screen_missing)
-						break;
-				}
+				layout_view &curview = m_views[i].first;
+				if (std::find_if(screens.begin(), screens.end(), [&curview] (screen_device &screen) { return !curview.has_screen(screen); }) == screens.end())
+					view = &curview;
 			}
 		}
 	}
 
 	// make sure it's a valid view
-	return (view != nullptr) ? view_index(*view) : 0;
+	return view ? view_index(*view) : 0;
 }
 
 
@@ -1110,10 +1121,14 @@ int render_target::configured_view(const char *viewname, int targetindex, int nu
 //  view_name - return the name of the given view
 //-------------------------------------------------
 
-const char *render_target::view_name(int viewindex)
+const char *render_target::view_name(unsigned viewindex)
 {
-	layout_view const *const view = view_by_index(viewindex);
-	return view ? view->name().c_str() : nullptr;
+	return (m_views.size() > viewindex) ? m_views[viewindex].first.get().name().c_str() : nullptr;
+}
+
+layout_view::visibility_toggle_vector const &render_target::visibility_toggles()
+{
+	return current_view().visibility_toggles();
 }
 
 
@@ -1136,7 +1151,7 @@ void render_target::compute_visible_area(s32 target_width, s32 target_height, fl
 			if (m_keepaspect)
 			{
 				// start with the aspect ratio of the square pixel layout
-				width = m_curview->effective_aspect(m_layerconfig);
+				width = current_view().effective_aspect();
 				height = 1.0f;
 
 				// first apply target orientation
@@ -1172,7 +1187,7 @@ void render_target::compute_visible_area(s32 target_width, s32 target_height, fl
 			// get source size and aspect
 			s32 src_width, src_height;
 			compute_minimum_size(src_width, src_height);
-			float src_aspect = m_curview->effective_aspect(m_layerconfig);
+			float src_aspect = current_view().effective_aspect();
 
 			// apply orientation if required
 			if (target_orientation & ORIENTATION_SWAP_XY)
@@ -1241,11 +1256,11 @@ void render_target::compute_minimum_size(s32 &minwidth, s32 &minheight)
 		return;
 	}
 
-	if (!m_curview)
+	if (m_views.empty())
 		throw emu_fatalerror("Mandatory artwork is missing");
 
 	// scan the current view for all screens
-	for (layout_view::item &curitem : m_curview->items())
+	for (layout_view::item &curitem : current_view().items())
 	{
 		if (curitem.screen())
 		{
@@ -1300,8 +1315,8 @@ void render_target::compute_minimum_size(s32 &minwidth, s32 &minheight)
 render_primitive_list &render_target::get_primitives()
 {
 	// remember the base values if this is the first frame
-	if (m_base_view == nullptr)
-		m_base_view = m_curview;
+	if (!m_base_view)
+		m_base_view = &current_view();
 
 	// switch to the next primitive list
 	render_primitive_list &list = m_primlist[m_listindex];
@@ -1325,9 +1340,10 @@ render_primitive_list &render_target::get_primitives()
 	root_xform.orientation = m_orientation;
 	root_xform.no_center = false;
 
-	// iterate over items in the view, but only if we're running
 	if (m_manager.machine().phase() >= machine_phase::RESET)
-		for (layout_view::item &curitem : m_curview->items())
+	{
+		// we're running - iterate over items in the view
+		for (layout_view::item &curitem : current_view().visible_items())
 		{
 			// first apply orientation to the bounds
 			render_bounds bounds = curitem.bounds();
@@ -1340,27 +1356,24 @@ render_primitive_list &render_target::get_primitives()
 			item_xform.yoffs = root_xform.yoffs + bounds.y0 * root_xform.yscale;
 			item_xform.xscale = (bounds.x1 - bounds.x0) * root_xform.xscale;
 			item_xform.yscale = (bounds.y1 - bounds.y0) * root_xform.yscale;
-			item_xform.color.r = curitem.color().r * root_xform.color.r;
-			item_xform.color.g = curitem.color().g * root_xform.color.g;
-			item_xform.color.b = curitem.color().b * root_xform.color.b;
-			item_xform.color.a = curitem.color().a * root_xform.color.a;
+			item_xform.color = curitem.color() * root_xform.color;
 			item_xform.orientation = orientation_add(curitem.orientation(), root_xform.orientation);
 			item_xform.no_center = false;
 
 			// if there is no associated element, it must be a screen element
-			if (curitem.screen() != nullptr)
+			if (curitem.screen())
 				add_container_primitives(list, root_xform, item_xform, curitem.screen()->container(), curitem.blend_mode());
 			else
 				add_element_primitives(list, item_xform, *curitem.element(), curitem.state(), curitem.blend_mode());
 		}
-
-	// if we are not in the running stage, draw an outer box
+	}
 	else
 	{
+		// if we are not in the running stage, draw an outer box
 		render_primitive *prim = list.alloc(render_primitive::QUAD);
-		set_render_bounds_xy(prim->bounds, 0.0f, 0.0f, (float)m_width, (float)m_height);
+		prim->bounds.set_xy(0.0f, 0.0f, (float)m_width, (float)m_height);
 		prim->full_bounds = prim->bounds;
-		set_render_color(&prim->color, 1.0f, 0.1f, 0.1f, 0.1f);
+		prim->color.set(1.0f, 0.1f, 0.1f, 0.1f);
 		prim->texture.base = nullptr;
 		prim->flags = PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA);
 		list.append(*prim);
@@ -1368,9 +1381,9 @@ render_primitive_list &render_target::get_primitives()
 		if (m_width > 1 && m_height > 1)
 		{
 			prim = list.alloc(render_primitive::QUAD);
-			set_render_bounds_xy(prim->bounds, 1.0f, 1.0f, (float)(m_width - 1), (float)(m_height - 1));
+			prim->bounds.set_xy(1.0f, 1.0f, float(m_width - 1), float(m_height - 1));
 			prim->full_bounds = prim->bounds;
-			set_render_color(&prim->color, 1.0f, 0.0f, 0.0f, 0.0f);
+			prim->color.set(1.0f, 0.0f, 0.0f, 0.0f);
 			prim->texture.base = nullptr;
 			prim->flags = PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA);
 			list.append(*prim);
@@ -1426,21 +1439,120 @@ render_primitive_list &render_target::get_primitives()
 
 bool render_target::map_point_container(s32 target_x, s32 target_y, render_container &container, float &container_x, float &container_y)
 {
-	ioport_port *input_port;
-	ioport_value input_mask;
-	return map_point_internal(target_x, target_y, &container, container_x, container_y, input_port, input_mask);
+	std::pair<float, float> target_f(map_point_internal(target_x, target_y));
+
+	// explicitly check for the UI container
+	if (&container == &m_manager.ui_container())
+	{
+		// this hit test went against the UI container
+		if ((target_f.first >= 0.0f) && (target_f.first < 1.0f) && (target_f.second >= 0.0f) && (target_f.second < 1.0f))
+		{
+			// this point was successfully mapped
+			container_x = float(target_x) / m_width;
+			container_y = float(target_y) / m_height;
+			return true;
+		}
+	}
+	else
+	{
+		if (m_orientation & ORIENTATION_FLIP_X)
+			target_f.first = 1.0f - target_f.first;
+		if (m_orientation & ORIENTATION_FLIP_Y)
+			target_f.second = 1.0f - target_f.second;
+		if (m_orientation & ORIENTATION_SWAP_XY)
+			std::swap(target_f.first, target_f.second);
+
+		// try to find the right container
+		auto const &items(current_view().visible_screen_items());
+		auto const found(std::find_if(
+					items.begin(),
+					items.end(),
+					[&container] (layout_view::item &item) { return &item.screen()->container() == &container; }));
+		if (items.end() != found)
+		{
+			layout_view::item &item(*found);
+			render_bounds const bounds(item.bounds());
+			if (bounds.includes(target_f.first, target_f.second))
+			{
+				// point successfully mapped
+				container_x = (target_f.first - bounds.x0) / bounds.width();
+				container_y = (target_f.second - bounds.y0) / bounds.height();
+				return true;
+			}
+		}
+	}
+
+	// default to point not mapped
+	container_x = container_y = -1.0f;
+	return false;
 }
 
 
 //-------------------------------------------------
 //  map_point_input - attempts to map a point on
-//  the specified render_target to the specified
-//  container, if possible
+//  the specified render_target to an input port
+//  field, if possible
 //-------------------------------------------------
 
 bool render_target::map_point_input(s32 target_x, s32 target_y, ioport_port *&input_port, ioport_value &input_mask, float &input_x, float &input_y)
 {
-	return map_point_internal(target_x, target_y, nullptr, input_x, input_y, input_port, input_mask);;
+	std::pair<float, float> target_f(map_point_internal(target_x, target_y));
+	if (m_orientation & ORIENTATION_FLIP_X)
+		target_f.first = 1.0f - target_f.first;
+	if (m_orientation & ORIENTATION_FLIP_Y)
+		target_f.second = 1.0f - target_f.second;
+	if (m_orientation & ORIENTATION_SWAP_XY)
+		std::swap(target_f.first, target_f.second);
+
+	auto const &items(current_view().interactive_items());
+	m_hit_test.resize(items.size() * 2);
+	std::fill(m_hit_test.begin(), m_hit_test.end(), false);
+
+	for (auto const &edge : current_view().interactive_edges_x())
+	{
+		if ((edge.position() > target_f.first) || ((edge.position() == target_f.first) && edge.trailing()))
+			break;
+		else
+			m_hit_test[edge.index()] = !edge.trailing();
+	}
+
+	for (auto const &edge : current_view().interactive_edges_y())
+	{
+		if ((edge.position() > target_f.second) || ((edge.position() == target_f.second) && edge.trailing()))
+			break;
+		else
+			m_hit_test[items.size() + edge.index()] = !edge.trailing();
+	}
+
+	for (unsigned i = 0; items.size() > i; ++i)
+	{
+		if (m_hit_test[i] && m_hit_test[items.size() + i])
+		{
+			layout_view::item &item(items[i]);
+			render_bounds const bounds(item.bounds());
+			if (bounds.includes(target_f.first, target_f.second))
+			{
+				if (item.has_input())
+				{
+					// point successfully mapped
+					std::tie(input_port, input_mask) = item.input_tag_and_mask();
+					input_x = (target_f.first - bounds.x0) / bounds.width();
+					input_y = (target_f.second - bounds.y0) / bounds.height();
+					return true;
+				}
+				else
+				{
+					break;
+				}
+			}
+		}
+	}
+
+	// default to point not mapped
+	input_port = nullptr;
+	input_mask = 0;
+	input_x = input_y = -1.0f;
+	return false;
 }
 
 
@@ -1507,6 +1619,11 @@ void render_target::resolve_tags()
 		for (layout_view &view : file.views())
 		{
 			view.resolve_tags();
+			if (&current_view() == &view)
+			{
+				view.recompute(visibility_mask(), m_layerconfig.zoom_to_screen());
+				view.preload();
+			}
 		}
 	}
 }
@@ -1519,7 +1636,7 @@ void render_target::resolve_tags()
 
 void render_target::update_layer_config()
 {
-	m_curview->recompute(m_layerconfig);
+	current_view().recompute(visibility_mask(), m_layerconfig.zoom_to_screen());
 }
 
 
@@ -1530,7 +1647,7 @@ void render_target::update_layer_config()
 
 void render_target::load_layout_files(const internal_layout *layoutfile, bool singlefile)
 {
-	bool have_artwork  = false;
+	bool have_artwork = false;
 
 	// if there's an explicit file, load that first
 	const std::string &basename = m_manager.machine().basename();
@@ -1544,11 +1661,11 @@ void render_target::load_layout_files(const internal_layout *layoutfile, bool si
 
 void render_target::load_layout_files(util::xml::data_node const &rootnode, bool singlefile)
 {
-	bool have_artwork  = false;
+	bool have_artwork = false;
 
 	// if there's an explicit file, load that first
 	const std::string &basename = m_manager.machine().basename();
-	have_artwork |= load_layout_file(m_manager.machine().root_device(), basename.c_str(), rootnode);
+	have_artwork |= load_layout_file(m_manager.machine().root_device(), rootnode, m_manager.machine().options().art_path(), basename.c_str());
 
 	// if we're only loading this file, we know our final result
 	if (!singlefile)
@@ -1557,32 +1674,31 @@ void render_target::load_layout_files(util::xml::data_node const &rootnode, bool
 
 void render_target::load_additional_layout_files(const char *basename, bool have_artwork)
 {
-	bool have_default  = false;
-	bool have_override = false;
+	m_external_artwork = false;
 
 	// if override_artwork defined, load that and skip artwork other than default
 	const char *const override_art = m_manager.machine().options().override_artwork();
 	if (override_art && *override_art)
 	{
 		if (load_layout_file(override_art, override_art))
-			have_override = true;
+			m_external_artwork = true;
 		else if (load_layout_file(override_art, "default"))
-			have_override = true;
+			m_external_artwork = true;
 	}
 
 	const game_driver &system = m_manager.machine().system();
 
 	// Skip if override_artwork has found artwork
-	if (!have_override)
+	if (!m_external_artwork)
 	{
-
 		// try to load a file based on the driver name
 		if (!load_layout_file(basename, system.name))
-			have_artwork |= load_layout_file(basename, "default");
+			m_external_artwork |= load_layout_file(basename, "default");
 		else
-			have_artwork = true;
+			m_external_artwork = true;
 
 		// if a default view has been specified, use that as a fallback
+		bool have_default = false;
 		if (system.default_layout)
 			have_default |= load_layout_file(nullptr, *system.default_layout);
 		m_manager.machine().config().apply_default_layouts(
@@ -1593,15 +1709,20 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 		int cloneof = driver_list::clone(system);
 		while (0 <= cloneof)
 		{
-			if (!load_layout_file(driver_list::driver(cloneof).name, driver_list::driver(cloneof).name))
-				have_artwork |= load_layout_file(driver_list::driver(cloneof).name, "default");
-			else
-				have_artwork = true;
+			if (!m_external_artwork || driver_list::driver(cloneof).flags & MACHINE_IS_BIOS_ROOT)
+			{
+				if (!load_layout_file(driver_list::driver(cloneof).name, driver_list::driver(cloneof).name))
+					m_external_artwork |= load_layout_file(driver_list::driver(cloneof).name, "default");
+				else
+					m_external_artwork = true;
+			}
 
 			// Check the parent of the parent to cover bios based artwork
 			const game_driver &parent(driver_list::driver(cloneof));
 			cloneof = driver_list::clone(parent);
 		}
+
+		have_artwork |= m_external_artwork;
 
 		// Use fallback artwork if defined and no artwork has been found yet
 		if (!have_artwork)
@@ -1661,10 +1782,21 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 	screen_device_iterator iter(m_manager.machine().root_device());
 	std::vector<screen_info> const screens(std::begin(iter), std::end(iter));
 
+	// need this because views aren't fully set up yet
+	auto const nth_view =
+		[this] (unsigned n) -> layout_view *
+		{
+			for (layout_file &file : m_filelist)
+				for (layout_view &view : file.views())
+					if (!(m_flags & RENDER_CREATE_NO_ART) || !view.has_art())
+						if (n-- == 0)
+							return &view;
+			return nullptr;
+		};
 
 	if (screens.empty()) // ensure the fallback view for systems with no screens is loaded if necessary
 	{
-		if (!view_by_index(0))
+		if (!nth_view(0))
 		{
 			load_layout_file(nullptr, layout_noscreens);
 			if (m_filelist.empty())
@@ -1689,10 +1821,9 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 				throw emu_fatalerror("Couldn't create XML node??");
 			viewnode->set_attribute(
 					"name",
-					util::xml::normalize_string(
-						util::string_format(
-							"Screen %1$u Standard (%2$u:%3$u)",
-							i, screens[i].physical_x(), screens[i].physical_y()).c_str()));
+					util::string_format(
+						"Screen %1$u Standard (%2$u:%3$u)",
+						i, screens[i].physical_x(), screens[i].physical_y()).c_str());
 			util::xml::data_node *const screennode(viewnode->add_child("screen", nullptr));
 			if (!screennode)
 				throw emu_fatalerror("Couldn't create XML node??");
@@ -1716,10 +1847,9 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 					throw emu_fatalerror("Couldn't create XML node??");
 				viewnode->set_attribute(
 						"name",
-						util::xml::normalize_string(
-							util::string_format(
-								"Screen %1$u Pixel Aspect (%2$u:%3$u)",
-								i, screens[i].native_x(), screens[i].native_y()).c_str()));
+						util::string_format(
+							"Screen %1$u Pixel Aspect (%2$u:%3$u)",
+							i, screens[i].native_x(), screens[i].native_y()).c_str());
 				util::xml::data_node *const screennode(viewnode->add_child("screen", nullptr));
 				if (!screennode)
 					throw emu_fatalerror("Couldn't create XML node??");
@@ -1777,22 +1907,19 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 		{
 			need_tiles = true;
 			int viewindex(0);
-			for (layout_view *view = view_by_index(viewindex); need_tiles && view; view = view_by_index(++viewindex))
+			for (layout_view *view = nth_view(viewindex); need_tiles && view; view = nth_view(++viewindex))
 			{
-				if (view->screen_count() >= screens.size())
+				bool screen_missing(false);
+				for (screen_device &screen : iter)
 				{
-					bool screen_missing(false);
-					for (screen_device &screen : iter)
+					if (!view->has_screen(screen))
 					{
-						if (!view->has_screen(screen))
-						{
-							screen_missing = true;
-							break;
-						}
+						screen_missing = true;
+						break;
 					}
-					if (!screen_missing)
-						need_tiles = false;
 				}
+				if (!screen_missing)
+					need_tiles = false;
 			}
 		}
 		if (need_tiles)
@@ -1836,7 +1963,7 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 						util::xml::data_node *viewnode = layoutnode->add_child("view", nullptr);
 						if (!viewnode)
 							throw emu_fatalerror("Couldn't create XML node??");
-						viewnode->set_attribute("name", util::xml::normalize_string(title));
+						viewnode->set_attribute("name", title);
 						float ypos(0.0F);
 						for (unsigned y = 0U; rows > y; ypos += heights[y] + spacing, ++y)
 						{
@@ -1957,7 +2084,7 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 		}
 
 		// try to parse it
-		if (!load_layout_file(m_manager.machine().root_device(), nullptr, *root))
+		if (!load_layout_file(m_manager.machine().root_device(), *root, m_manager.machine().options().art_path(), nullptr))
 			throw emu_fatalerror("Couldn't parse generated layout??");
 	}
 }
@@ -1984,7 +2111,7 @@ bool render_target::load_layout_file(const char *dirname, const internal_layout 
 	zerr = inflateInit(&stream);
 	if (zerr != Z_OK)
 	{
-		fatalerror("could not inflateInit");
+		osd_printf_error("render_target::load_layout_file: zlib initialization error\n");
 		return false;
 	}
 
@@ -2000,23 +2127,21 @@ bool render_target::load_layout_file(const char *dirname, const internal_layout 
 	}
 	else if (zerr != Z_OK)
 	{
-		fatalerror("decompression error\n");
+		osd_printf_error("render_target::load_layout_file: zlib decompression error\n");
+		inflateEnd(&stream);
 		return false;
 	}
 
 	// clean up
 	zerr = inflateEnd(&stream);
 	if (zerr != Z_OK)
-	{
-		fatalerror("inflateEnd error\n");
-		return false;
-	}
+		osd_printf_error("render_target::load_layout_file: zlib cleanup error\n");
 
 	util::xml::file::ptr rootnode(util::xml::file::string_read(reinterpret_cast<char const *>(tempout.get()), nullptr));
 	tempout.reset();
 
 	// if we didn't get a properly-formatted XML file, record a warning and exit
-	if (!load_layout_file(device ? *device : m_manager.machine().root_device(), dirname, *rootnode))
+	if (!load_layout_file(device ? *device : m_manager.machine().root_device(), *rootnode, m_manager.machine().options().art_path(), dirname))
 	{
 		osd_printf_warning("Improperly formatted XML string, ignoring\n");
 		return false;
@@ -2030,28 +2155,39 @@ bool render_target::load_layout_file(const char *dirname, const internal_layout 
 bool render_target::load_layout_file(const char *dirname, const char *filename)
 {
 	// build the path and optionally prepend the directory
-	std::string fname = std::string(filename).append(".lay");
+	std::string fname;
 	if (dirname)
-		fname.insert(0, PATH_SEPARATOR).insert(0, dirname);
+		fname.append(dirname).append(PATH_SEPARATOR);
+	fname.append(filename).append(".lay");
 
-	// attempt to open the file; bail if we can't
-	emu_file layoutfile(m_manager.machine().options().art_path(), OPEN_FLAG_READ);
-	layoutfile.set_restrict_to_mediapath(1);
-	osd_file::error const filerr(layoutfile.open(fname));
-	if (filerr != osd_file::error::NONE)
-		return false;
-
-	// read the file
+	// attempt to open matching files
 	util::xml::parse_options parseopt;
 	util::xml::parse_error parseerr;
 	parseopt.error = &parseerr;
-	util::xml::file::ptr rootnode(util::xml::file::read(layoutfile, &parseopt));
-	if (!rootnode)
+	emu_file layoutfile(m_manager.machine().options().art_path(), OPEN_FLAG_READ);
+	layoutfile.set_restrict_to_mediapath(1);
+	bool result(false);
+	for (osd_file::error filerr = layoutfile.open(fname); osd_file::error::NONE == filerr; filerr = layoutfile.open_next())
 	{
-		if (parseerr.error_message)
+		// read the file and parse as XML
+		util::xml::file::ptr const rootnode(util::xml::file::read(layoutfile, &parseopt));
+		if (rootnode)
+		{
+			// extract directory name from location of layout file
+			std::string artdir(layoutfile.fullpath());
+			auto const dirsep(std::find_if(artdir.rbegin(), artdir.rend(), &util::is_directory_separator));
+			artdir.erase(dirsep.base(), artdir.end());
+
+			// record a warning if we didn't get a properly-formatted XML file
+			if (!load_layout_file(m_manager.machine().root_device(), *rootnode, nullptr, artdir.c_str()))
+				osd_printf_warning("Improperly formatted XML layout file '%s', ignoring\n", filename);
+			else
+				result = true;
+		}
+		else if (parseerr.error_message)
 		{
 			osd_printf_warning(
-					"Error parsing XML file '%s' at line %d column %d: %s, ignoring\n",
+					"Error parsing XML layout file '%s' at line %d column %d: %s, ignoring\n",
 					filename,
 					parseerr.error_line,
 					parseerr.error_column,
@@ -2059,29 +2195,18 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 		}
 		else
 		{
-			osd_printf_warning("Error parsing XML file '%s', ignorning\n", filename);
+			osd_printf_warning("Error parsing XML layout file '%s', ignorning\n", filename);
 		}
-		return false;
 	}
-
-	// if we didn't get a properly-formatted XML file, record a warning and exit
-	if (!load_layout_file(m_manager.machine().root_device(), dirname, *rootnode))
-	{
-		osd_printf_warning("Improperly formatted XML file '%s', ignoring\n", filename);
-		return false;
-	}
-	else
-	{
-		return true;
-	}
+	return result;
 }
 
-bool render_target::load_layout_file(device_t &device, const char *dirname, util::xml::data_node const &rootnode)
+bool render_target::load_layout_file(device_t &device, util::xml::data_node const &rootnode, const char *searchpath, const char *dirname)
 {
 	// parse and catch any errors
 	try
 	{
-		m_filelist.emplace_back(device, rootnode, dirname);
+		m_filelist.emplace_back(device, rootnode, searchpath, dirname);
 	}
 	catch (emu_fatalerror &)
 	{
@@ -2110,7 +2235,7 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 	cliprect.y0 = xform.yoffs;
 	cliprect.x1 = xform.xoffs + xform.xscale;
 	cliprect.y1 = xform.yoffs + xform.yscale;
-	sect_render_bounds(cliprect, m_bounds);
+	cliprect &= m_bounds;
 
 	float root_xoffs = root_xform.xoffs + fabsf(root_xform.xscale - xform.xscale) * 0.5f;
 	float root_yoffs = root_xform.yoffs + fabsf(root_xform.yscale - xform.yscale) * 0.5f;
@@ -2120,7 +2245,7 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 	root_cliprect.y0 = root_yoffs;
 	root_cliprect.x1 = root_xoffs + root_xform.xscale;
 	root_cliprect.y1 = root_yoffs + root_xform.yscale;
-	sect_render_bounds(root_cliprect, m_bounds);
+	root_cliprect &= m_bounds;
 
 	// compute the container transform
 	object_transform container_xform;
@@ -2350,7 +2475,7 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 
 		// allocate a primitive
 		render_primitive *prim = list.alloc(render_primitive::QUAD);
-		set_render_bounds_wh(prim->bounds, xform.xoffs, xform.yoffs, xform.xscale, xform.yscale);
+		prim->bounds.set_wh(xform.xoffs, xform.yoffs, xform.xscale, xform.yscale);
 		prim->full_bounds = prim->bounds;
 		prim->color = container_xform.color;
 		width = render_round_nearest(prim->bounds.x1) - render_round_nearest(prim->bounds.x0);
@@ -2381,15 +2506,13 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 
 void render_target::add_element_primitives(render_primitive_list &list, const object_transform &xform, layout_element &element, int state, int blendmode)
 {
-	// if we're out of range, bail
-	if (state > element.maxstate())
-		return;
+	// limit state range to non-negative values
 	if (state < 0)
 		state = 0;
 
 	// get a pointer to the relevant texture
 	render_texture *texture = element.state_texture(state);
-	if (texture != nullptr)
+	if (texture)
 	{
 		render_primitive *prim = list.alloc(render_primitive::QUAD);
 
@@ -2400,24 +2523,18 @@ void render_target::add_element_primitives(render_primitive_list &list, const ob
 		// compute the bounds
 		s32 width = render_round_nearest(xform.xscale);
 		s32 height = render_round_nearest(xform.yscale);
-		set_render_bounds_wh(prim->bounds, render_round_nearest(xform.xoffs), render_round_nearest(xform.yoffs), (float) width, (float) height);
+		prim->bounds.set_wh(render_round_nearest(xform.xoffs), render_round_nearest(xform.yoffs), float(width), float(height));
 		prim->full_bounds = prim->bounds;
 		if (xform.orientation & ORIENTATION_SWAP_XY)
 			std::swap(width, height);
-		width = std::min(width, m_maxtexwidth);
-		height = std::min(height, m_maxtexheight);
+		width = (std::min)(width, m_maxtexwidth);
+		height = (std::min)(height, m_maxtexheight);
 
 		// get the scaled texture and append it
-
 		texture->get_scaled(width, height, prim->texture, list, prim->flags);
 
 		// compute the clip rect
-		render_bounds cliprect;
-		cliprect.x0 = render_round_nearest(xform.xoffs);
-		cliprect.y0 = render_round_nearest(xform.yoffs);
-		cliprect.x1 = render_round_nearest(xform.xoffs + xform.xscale);
-		cliprect.y1 = render_round_nearest(xform.yoffs + xform.yscale);
-		sect_render_bounds(cliprect, m_bounds);
+		render_bounds cliprect = prim->bounds & m_bounds;
 
 		// determine UV coordinates and apply clipping
 		prim->texcoords = oriented_texcoords[xform.orientation];
@@ -2434,7 +2551,7 @@ void render_target::add_element_primitives(render_primitive_list &list, const ob
 //  mapping points
 //-------------------------------------------------
 
-bool render_target::map_point_internal(s32 target_x, s32 target_y, render_container *container, float &mapped_x, float &mapped_y, ioport_port *&mapped_input_port, ioport_value &mapped_input_mask)
+std::pair<float, float> render_target::map_point_internal(s32 target_x, s32 target_y)
 {
 	// compute the visible width/height
 	s32 viswidth, visheight;
@@ -2442,62 +2559,14 @@ bool render_target::map_point_internal(s32 target_x, s32 target_y, render_contai
 
 	// create a root transform for the target
 	object_transform root_xform;
-	root_xform.xoffs = (float)(m_width - viswidth) / 2;
-	root_xform.yoffs = (float)(m_height - visheight) / 2;
-
-	// default to point not mapped
-	mapped_x = -1.0;
-	mapped_y = -1.0;
-	mapped_input_port = nullptr;
-	mapped_input_mask = 0;
+	root_xform.xoffs = float(m_width - viswidth) / 2;
+	root_xform.yoffs = float(m_height - visheight) / 2;
 
 	// convert target coordinates to float
-	float target_fx = (float)(target_x - root_xform.xoffs) / viswidth;
-	float target_fy = (float)(target_y - root_xform.yoffs) / visheight;
-	if (m_manager.machine().ui().is_menu_active())
-	{
-		target_fx = (float)target_x / m_width;
-		target_fy = (float)target_y / m_height;
-	}
-	// explicitly check for the UI container
-	if (container != nullptr && container == &m_manager.ui_container())
-	{
-		// this hit test went against the UI container
-		if (target_fx >= 0.0f && target_fx < 1.0f && target_fy >= 0.0f && target_fy < 1.0f)
-		{
-			// this point was successfully mapped
-			mapped_x = (float)target_x / m_width;
-			mapped_y = (float)target_y / m_height;
-			return true;
-		}
-		return false;
-	}
-
-	// iterate over items in the view
-	for (layout_view::item &item : m_curview->items())
-	{
-		bool checkit;
-
-		// if we're looking for a particular container, verify that we have the right one
-		if (container != nullptr)
-			checkit = (item.screen() != nullptr && &item.screen()->container() == container);
-
-		// otherwise, assume we're looking for an input
-		else
-			checkit = item.has_input();
-
-		// this target is worth looking at; now check the point
-		if (checkit && target_fx >= item.bounds().x0 && target_fx < item.bounds().x1 && target_fy >= item.bounds().y0 && target_fy < item.bounds().y1)
-		{
-			// point successfully mapped
-			mapped_x = (target_fx - item.bounds().x0) / (item.bounds().x1 - item.bounds().x0);
-			mapped_y = (target_fy - item.bounds().y0) / (item.bounds().y1 - item.bounds().y0);
-			mapped_input_port = item.input_tag_and_mask(mapped_input_mask);
-			return true;
-		}
-	}
-
-	return false;
+	if (!m_manager.machine().ui().is_menu_active())
+		return std::make_pair(float(target_x - root_xform.xoffs) / viswidth, float(target_y - root_xform.yoffs) / visheight);
+	else
+		return std::make_pair(float(target_x) / m_width, float(target_y) / m_height);
 }
 
 
@@ -2506,15 +2575,9 @@ bool render_target::map_point_internal(s32 target_x, s32 target_y, render_contai
 //  view, or nullptr if it doesn't exist
 //-------------------------------------------------
 
-layout_view *render_target::view_by_index(int index)
+layout_view *render_target::view_by_index(unsigned index)
 {
-	// scan the list of views within each layout, skipping those that don't apply
-	for (layout_file &file : m_filelist)
-		for (layout_view &view : file.views())
-			if (!(m_flags & RENDER_CREATE_NO_ART) || !view.has_art())
-				if (index-- == 0)
-					return &view;
-	return nullptr;
+	return (m_views.size() > index) ? &m_views[index].first.get() : nullptr;
 }
 
 
@@ -2525,18 +2588,12 @@ layout_view *render_target::view_by_index(int index)
 
 int render_target::view_index(layout_view &targetview) const
 {
-	// find the first named match
-	int index = 0;
-
-	// scan the list of views within each layout, skipping those that don't apply
-	for (layout_file const &file : m_filelist)
-		for (layout_view const &view : file.views())
-			if (!(m_flags & RENDER_CREATE_NO_ART) || !view.has_art())
-			{
-				if (&targetview == &view)
-					return index;
-				index++;
-			}
+	// return index of view, or zero if not found
+	for (int index = 0; m_views.size() > index; ++index)
+	{
+		if (&m_views[index].first.get() == &targetview)
+			return index;
+	}
 	return 0;
 }
 
@@ -2547,8 +2604,6 @@ int render_target::view_index(layout_view &targetview) const
 
 void render_target::config_load(util::xml::data_node const &targetnode)
 {
-	int tmpint;
-
 	// find the view
 	const char *viewname = targetnode.get_attribute_string("view", nullptr);
 	if (viewname != nullptr)
@@ -2565,23 +2620,23 @@ void render_target::config_load(util::xml::data_node const &targetnode)
 		}
 
 	// modify the artwork config
-	tmpint = targetnode.get_attribute_int("zoom", -1);
-	if (tmpint == 0 || tmpint == 1)
-		set_zoom_to_screen(tmpint);
+	int const zoom = targetnode.get_attribute_int("zoom", -1);
+	if (zoom == 0 || zoom == 1)
+		set_zoom_to_screen(zoom);
 
 	// apply orientation
-	tmpint = targetnode.get_attribute_int("rotate", -1);
-	if (tmpint != -1)
+	int rotate = targetnode.get_attribute_int("rotate", -1);
+	if (rotate != -1)
 	{
-		if (tmpint == 90)
-			tmpint = ROT90;
-		else if (tmpint == 180)
-			tmpint = ROT180;
-		else if (tmpint == 270)
-			tmpint = ROT270;
+		if (rotate == 90)
+			rotate = ROT90;
+		else if (rotate == 180)
+			rotate = ROT180;
+		else if (rotate == 270)
+			rotate = ROT270;
 		else
-			tmpint = ROT0;
-		set_orientation(orientation_add(tmpint, orientation()));
+			rotate = ROT0;
+		set_orientation(orientation_add(rotate, orientation()));
 
 		// apply the opposite orientation to the UI
 		if (is_ui_target())
@@ -2590,8 +2645,47 @@ void render_target::config_load(util::xml::data_node const &targetnode)
 			render_container &ui_container = m_manager.ui_container();
 
 			ui_container.get_user_settings(settings);
-			settings.m_orientation = orientation_add(orientation_reverse(tmpint), settings.m_orientation);
+			settings.m_orientation = orientation_add(orientation_reverse(rotate), settings.m_orientation);
 			ui_container.set_user_settings(settings);
+		}
+	}
+
+	// apply per-view settings
+	for (util::xml::data_node const *viewnode = targetnode.get_child("view"); viewnode; viewnode = viewnode->get_next_sibling("view"))
+	{
+		char const *const viewname = viewnode->get_attribute_string("name", nullptr);
+		if (!viewname)
+			continue;
+
+		auto const view = std::find_if(m_views.begin(), m_views.end(), [viewname] (auto const &x) { return x.first.get().name() == viewname; });
+		if (m_views.end() == view)
+			continue;
+
+		for (util::xml::data_node const *vistogglenode = viewnode->get_child("collection"); vistogglenode; vistogglenode = vistogglenode->get_next_sibling("collection"))
+		{
+			char const *const vistogglename = vistogglenode->get_attribute_string("name", nullptr);
+			if (!vistogglename)
+				continue;
+
+			auto const &vistoggles = view->first.get().visibility_toggles();
+			auto const vistoggle = std::find_if(vistoggles.begin(), vistoggles.end(), [vistogglename] (auto const &x) { return x.name() == vistogglename; });
+			if (vistoggles.end() == vistoggle)
+				continue;
+
+			int const enable = vistogglenode->get_attribute_int("visible", -1);
+			if (0 <= enable)
+			{
+				if (enable)
+					view->second |= u32(1) << std::distance(vistoggles.begin(), vistoggle);
+				else
+					view->second &= ~(u32(1) << std::distance(vistoggles.begin(), vistoggle));
+			}
+		}
+
+		if (&current_view() == &view->first.get())
+		{
+			current_view().recompute(visibility_mask(), m_layerconfig.zoom_to_screen());
+			current_view().preload();
 		}
 	}
 }
@@ -2610,9 +2704,9 @@ bool render_target::config_save(util::xml::data_node &targetnode)
 	targetnode.set_attribute_int("index", index());
 
 	// output the view
-	if (m_curview != m_base_view)
+	if (&current_view() != m_base_view)
 	{
-		targetnode.set_attribute("view", m_curview->name().c_str());
+		targetnode.set_attribute("view", current_view().name().c_str());
 		changed = true;
 	}
 
@@ -2636,6 +2730,33 @@ bool render_target::config_save(util::xml::data_node &targetnode)
 		assert(rotate != 0);
 		targetnode.set_attribute_int("rotate", rotate);
 		changed = true;
+	}
+
+	// output layer configuration
+	for (auto const &view : m_views)
+	{
+		u32 const defvismask = view.first.get().default_visibility_mask();
+		if (defvismask != view.second)
+		{
+			util::xml::data_node *viewnode = nullptr;
+			unsigned i = 0;
+			for (layout_view::visibility_toggle const &toggle : view.first.get().visibility_toggles())
+			{
+				if (BIT(defvismask, i) != BIT(view.second, i))
+				{
+					if (!viewnode)
+					{
+						viewnode = targetnode.add_child("view", nullptr);
+						viewnode->set_attribute("name", view.first.get().name().c_str());
+					}
+					util::xml::data_node *const vistogglenode = viewnode->add_child("collection", nullptr);
+					vistogglenode->set_attribute("name", toggle.name().c_str());
+					vistogglenode->set_attribute_int("visible", BIT(view.second, i));
+					changed = true;
+				}
+				++i;
+			}
+		}
 	}
 
 	return changed;
@@ -2827,9 +2948,9 @@ void render_target::add_clear_extents(render_primitive_list &list)
 			if (x1 - x0 > 0)
 			{
 				render_primitive *prim = list.alloc(render_primitive::QUAD);
-				set_render_bounds_xy(prim->bounds, (float)x0, (float)y0, (float)x1, (float)y1);
+				prim->bounds.set_xy(float(x0), float(y0), float(x1), float(y1));
 				prim->full_bounds = prim->bounds;
-				set_render_color(&prim->color, 1.0f, 0.0f, 0.0f, 0.0f);
+				prim->color.set(1.0f, 0.0f, 0.0f, 0.0f);
 				prim->texture.base = nullptr;
 				prim->flags = PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA);
 				clearlist.append(*prim);
@@ -2883,7 +3004,7 @@ void render_target::add_clear_and_optimize_primitive_list(render_primitive_list 
 				if (PRIMFLAG_GET_BLENDMODE(prim.flags) == BLENDMODE_RGB_MULTIPLY)
 				{
 					// RGB multiply will multiply against 0, leaving nothing
-					set_render_color(&prim.color, 1.0f, 0.0f, 0.0f, 0.0f);
+					prim.color.set(1.0f, 0.0f, 0.0f, 0.0f);
 					prim.texture.base = nullptr;
 					prim.flags = (prim.flags & ~PRIMFLAG_BLENDMODE_MASK) | PRIMFLAG_BLENDMODE(BLENDMODE_NONE);
 				}
@@ -2922,11 +3043,11 @@ done:
 //-------------------------------------------------
 
 render_manager::render_manager(running_machine &machine)
-	: m_machine(machine),
-		m_ui_target(nullptr),
-		m_live_textures(0),
-		m_texture_id(0),
-		m_ui_container(global_alloc(render_container(*this)))
+	: m_machine(machine)
+	, m_ui_target(nullptr)
+	, m_live_textures(0)
+	, m_texture_id(0)
+	, m_ui_container(new render_container(*this))
 {
 	// register callbacks
 	machine.configuration().config_register("video", config_load_delegate(&render_manager::config_load, this), config_save_delegate(&render_manager::config_save, this));
@@ -2963,8 +3084,8 @@ bool render_manager::is_live(screen_device &screen) const
 	{
 		if (!target.hidden())
 		{
-			layout_view const *view = target.current_view();
-			if (view != nullptr && view->has_screen(screen))
+			layout_view const *view = &target.current_view();
+			if (view->has_visible_screen(screen))
 				return true;
 		}
 	}
@@ -3000,12 +3121,12 @@ float render_manager::max_update_rate() const
 
 render_target *render_manager::target_alloc(const internal_layout *layoutfile, u32 flags)
 {
-	return &m_targetlist.append(*global_alloc(render_target(*this, layoutfile, flags)));
+	return &m_targetlist.append(*new render_target(*this, layoutfile, flags));
 }
 
 render_target *render_manager::target_alloc(util::xml::data_node const &layout, u32 flags)
 {
-	return &m_targetlist.append(*global_alloc(render_target(*this, layout, flags)));
+	return &m_targetlist.append(*new render_target(*this, layout, flags));
 }
 
 
@@ -3122,19 +3243,9 @@ void render_manager::texture_free(render_texture *texture)
 //  font_alloc - allocate a new font instance
 //-------------------------------------------------
 
-render_font *render_manager::font_alloc(const char *filename)
+std::unique_ptr<render_font> render_manager::font_alloc(const char *filename)
 {
-	return global_alloc(render_font(*this, filename));
-}
-
-
-//-------------------------------------------------
-//  font_free - release a font instance
-//-------------------------------------------------
-
-void render_manager::font_free(render_font *font)
-{
-	global_free(font);
+	return std::unique_ptr<render_font>(new render_font(*this, filename));
 }
 
 
@@ -3172,7 +3283,7 @@ void render_manager::resolve_tags()
 
 render_container *render_manager::container_alloc(screen_device *screen)
 {
-	auto container = global_alloc(render_container(*this, screen));
+	auto container = new render_container(*this, screen);
 	if (screen != nullptr)
 		m_screen_container_list.append(*container);
 	return container;
@@ -3196,35 +3307,31 @@ void render_manager::container_free(render_container *container)
 
 void render_manager::config_load(config_type cfg_type, util::xml::data_node const *parentnode)
 {
-	// we only care about game files
-	if (cfg_type != config_type::GAME)
-		return;
-
-	// might not have any data
-	if (parentnode == nullptr)
+	// we only care about game files with matching nodes
+	if ((cfg_type != config_type::GAME) || !parentnode)
 		return;
 
 	// check the UI target
 	util::xml::data_node const *const uinode = parentnode->get_child("interface");
-	if (uinode != nullptr)
+	if (uinode)
 	{
-		render_target *target = target_by_index(uinode->get_attribute_int("target", 0));
-		if (target != nullptr)
+		render_target *const target = target_by_index(uinode->get_attribute_int("target", 0));
+		if (target)
 			set_ui_target(*target);
 	}
 
 	// iterate over target nodes
 	for (util::xml::data_node const *targetnode = parentnode->get_child("target"); targetnode; targetnode = targetnode->get_next_sibling("target"))
 	{
-		render_target *target = target_by_index(targetnode->get_attribute_int("index", -1));
-		if (target != nullptr)
+		render_target *const target = target_by_index(targetnode->get_attribute_int("index", -1));
+		if (target)
 			target->config_load(*targetnode);
 	}
 
 	// iterate over screen nodes
 	for (util::xml::data_node const *screennode = parentnode->get_child("screen"); screennode; screennode = screennode->get_next_sibling("screen"))
 	{
-		int index = screennode->get_attribute_int("index", -1);
+		int const index = screennode->get_attribute_int("index", -1);
 		render_container *container = m_screen_container_list.find(index);
 		render_container::user_settings settings;
 
@@ -3278,7 +3385,7 @@ void render_manager::config_save(config_type cfg_type, util::xml::data_node *par
 
 		// create a node
 		util::xml::data_node *const targetnode = parentnode->add_child("target", nullptr);
-		if (targetnode != nullptr && !target->config_save(*targetnode))
+		if (targetnode && !target->config_save(*targetnode))
 			targetnode->delete_node();
 	}
 

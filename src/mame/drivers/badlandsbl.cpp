@@ -76,23 +76,23 @@ uint32_t badlandsbl_state::screen_update_badlandsbl(screen_device &screen, bitma
 }
 
 
-READ16_MEMBER(badlandsbl_state::badlandsb_unk_r)
+uint16_t badlandsbl_state::badlandsb_unk_r()
 {
 	return 0xffff;
 }
 
 // TODO: this prolly mimics audio_io_r/_w in original version
-READ8_MEMBER(badlandsbl_state::bootleg_shared_r)
+uint8_t badlandsbl_state::bootleg_shared_r(offs_t offset)
 {
 	return m_b_sharedram[offset];
 }
 
-WRITE8_MEMBER(badlandsbl_state::bootleg_shared_w)
+void badlandsbl_state::bootleg_shared_w(offs_t offset, uint8_t data)
 {
 	m_b_sharedram[offset] = data;
 }
 
-READ8_MEMBER(badlandsbl_state::sound_response_r)
+uint8_t badlandsbl_state::sound_response_r()
 {
 	m_maincpu->set_input_line(2, CLEAR_LINE);
 	return m_sound_response;
@@ -127,7 +127,7 @@ void badlandsbl_state::bootleg_map(address_map &map)
 	map(0xfff000, 0xffffff).ram();
 }
 
-WRITE8_MEMBER(badlandsbl_state::bootleg_main_irq_w)
+void badlandsbl_state::bootleg_main_irq_w(uint8_t data)
 {
 	m_maincpu->set_input_line(2, ASSERT_LINE);
 	m_sound_response = data;

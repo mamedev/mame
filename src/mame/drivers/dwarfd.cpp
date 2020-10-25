@@ -342,11 +342,11 @@ private:
 	required_region_ptr<uint16_t> m_charmap;
 	required_ioport m_dsw2;
 
-	DECLARE_READ8_MEMBER(dwarfd_ram_r);
-	DECLARE_WRITE8_MEMBER(dwarfd_ram_w);
-	DECLARE_WRITE8_MEMBER(output1_w);
-	DECLARE_WRITE8_MEMBER(output2_w);
-	DECLARE_READ8_MEMBER(qc_b8_r);
+	uint8_t dwarfd_ram_r(offs_t offset);
+	void dwarfd_ram_w(offs_t offset, uint8_t data);
+	void output1_w(uint8_t data);
+	void output2_w(uint8_t data);
+	uint8_t qc_b8_r();
 	DECLARE_WRITE_LINE_MEMBER(dwarfd_sod_callback);
 	DECLARE_WRITE_LINE_MEMBER(drq_w);
 	void dwarfd_palette(palette_device &palette) const;
@@ -361,7 +361,7 @@ private:
 };
 
 
-READ8_MEMBER(dwarfd_state::dwarfd_ram_r)
+uint8_t dwarfd_state::dwarfd_ram_r(offs_t offset)
 {
 	if (m_crt_access == 0)
 	{
@@ -374,12 +374,12 @@ READ8_MEMBER(dwarfd_state::dwarfd_ram_r)
 	}
 }
 
-WRITE8_MEMBER(dwarfd_state::dwarfd_ram_w)
+void dwarfd_state::dwarfd_ram_w(offs_t offset, uint8_t data)
 {
 	m_dw_ram[offset] = data;
 }
 
-WRITE8_MEMBER(dwarfd_state::output1_w)
+void dwarfd_state::output1_w(uint8_t data)
 {
 /*
  bits:
@@ -394,7 +394,7 @@ WRITE8_MEMBER(dwarfd_state::output1_w)
 */
 }
 
-WRITE8_MEMBER(dwarfd_state::output2_w)
+void dwarfd_state::output2_w(uint8_t data)
 {
 /*
  bits:
@@ -410,7 +410,7 @@ WRITE8_MEMBER(dwarfd_state::output2_w)
 }
 
 
-READ8_MEMBER(dwarfd_state::qc_b8_r)
+uint8_t dwarfd_state::qc_b8_r()
 {
 	return machine().rand();
 }
@@ -619,10 +619,10 @@ I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::pesp_display_pixels)
 	{
 		uint8_t pixel = (pixels >> (i * 2)) & 0xf;
 		uint8_t value = (pixel >> 1) | (rvv << 4) | (vsp << 3);
-		bitmap.pix32(y, x + i) = palette[value];
-		bitmap.pix32(y, x + i + 1) = palette[(pixel & 1) ? 0 : value];
+		bitmap.pix(y, x + i) = palette[value];
+		bitmap.pix(y, x + i + 1) = palette[(pixel & 1) ? 0 : value];
 		if(m_back_color)
-			bitmap.pix32(y, x + i - 1) = palette[value];
+			bitmap.pix(y, x + i - 1) = palette[value];
 		m_back_color = pixel & 1;
 	}
 }
@@ -642,10 +642,10 @@ I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::display_pixels)
 	{
 		uint8_t pixel = (pixels >> (i * 2)) & 0xf;
 		uint8_t value = (pixel >> 1) | (rvv << 4) | (vsp << 3);
-		bitmap.pix32(y, x + i) = palette[value];
-		bitmap.pix32(y, x + i + 1) = palette[(pixel & 1) ? 0 : value];
+		bitmap.pix(y, x + i) = palette[value];
+		bitmap.pix(y, x + i + 1) = palette[(pixel & 1) ? 0 : value];
 		if(m_back_color)
-			bitmap.pix32(y, x + i - 1) = palette[value];
+			bitmap.pix(y, x + i - 1) = palette[value];
 		m_back_color = pixel & 1;
 	}
 }
@@ -665,10 +665,10 @@ I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::qc_display_pixels)
 	{
 		uint8_t pixel = (pixels >> (i * 2)) & 0xf;
 		uint8_t value = (pixel >> 1) | (rvv << 4) | (vsp << 3);
-		bitmap.pix32(y, x + i) = palette[value];
-		bitmap.pix32(y, x + i + 1) = palette[(pixel & 1) ? 0 : value];
+		bitmap.pix(y, x + i) = palette[value];
+		bitmap.pix(y, x + i + 1) = palette[(pixel & 1) ? 0 : value];
 		if(m_back_color)
-			bitmap.pix32(y, x + i - 1) = palette[value];
+			bitmap.pix(y, x + i - 1) = palette[value];
 		m_back_color = pixel & 1;
 	}
 }

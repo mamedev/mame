@@ -73,17 +73,17 @@ Notes:
  * a code reflecting the direction (8 angles) from one point to the other.
  */
 
-WRITE8_MEMBER(lwings_state::avengers_adpcm_w)
+void lwings_state::avengers_adpcm_w(uint8_t data)
 {
 	m_adpcm = data;
 }
 
-READ8_MEMBER(lwings_state::avengers_adpcm_r)
+uint8_t lwings_state::avengers_adpcm_r()
 {
 	return m_adpcm;
 }
 
-WRITE8_MEMBER(lwings_state::lwings_bankswitch_w)
+void lwings_state::lwings_bankswitch_w(uint8_t data)
 {
 //  if (data & 0xe0) printf("bankswitch_w %02x\n", data);
 //  Fireball writes 0x20 on startup, maybe reset soundcpu?
@@ -116,7 +116,7 @@ WRITE_LINE_MEMBER(lwings_state::avengers_interrupt)
 }
 
 
-WRITE8_MEMBER(lwings_state::avengers_protection_w)
+void lwings_state::avengers_protection_w(uint8_t data)
 {
 	int pc = m_maincpu->pc();
 
@@ -143,7 +143,7 @@ WRITE8_MEMBER(lwings_state::avengers_protection_w)
 	}
 }
 
-WRITE8_MEMBER(lwings_state::avengers_prot_bank_w)
+void lwings_state::avengers_prot_bank_w(uint8_t data)
 {
 	m_palette_pen = data * 64;
 }
@@ -239,7 +239,7 @@ int lwings_state::avengers_fetch_paldata(  )
 	return result;
 }
 
-READ8_MEMBER(lwings_state::avengers_protection_r)
+uint8_t lwings_state::avengers_protection_r()
 {
 	static const int xpos[8] = { 10, 7,  0, -7, -10, -7,   0,  7 };
 	static const int ypos[8] = {  0, 7, 10,  7,   0, -7, -10, -7 };
@@ -275,14 +275,14 @@ READ8_MEMBER(lwings_state::avengers_protection_r)
 	return best_dir << 5;
 }
 
-READ8_MEMBER(lwings_state::avengers_soundlatch2_r)
+uint8_t lwings_state::avengers_soundlatch2_r()
 {
 	uint8_t data = *m_soundlatch2 | m_soundstate;
 	m_soundstate = 0;
 	return(data);
 }
 
-WRITE8_MEMBER(lwings_state::msm5205_w)
+void lwings_state::msm5205_w(uint8_t data)
 {
 	m_msm->reset_w(BIT(data, 7));
 	m_msm->data_w(data);
@@ -402,7 +402,7 @@ void lwings_state::fball_map(address_map &map)
 
 
 
-WRITE8_MEMBER(lwings_state::fball_oki_bank_w)
+void lwings_state::fball_oki_bank_w(uint8_t data)
 {
 	//printf("fball_oki_bank_w %02x\n", data);
 	membank("samplebank")->set_entry((data >> 1) & 0x7);

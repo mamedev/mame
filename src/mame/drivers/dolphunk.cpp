@@ -2,51 +2,51 @@
 // copyright-holders:Robbbert
 /***************************************************************************
 
-        Dolphin / Dauphin
+Dolphin / Dauphin
 
-        2010-04-08 Skeleton driver.
-        2012-05-20 Fixed keyboard, added notes & speaker [Robbbert]
-        2013-11-03 Added cassette [Robbbert]
+2010-04-08 Skeleton driver.
+2012-05-20 Fixed keyboard, added notes & speaker [Robbbert]
+2013-11-03 Added cassette [Robbbert]
 
-    Minimal Setup:
-        0000-00FF ROM "MO" (74S471)
-        0100-01FF ROM "MONI" (74S471)
-        0200-02FF RAM (2x 2112)
-        18 pushbuttons for programming (0-F, ADR, NXT).
-        4-digit LED display.
+Minimal Setup:
+    0000-00FF ROM "MO" (74S471)
+    0100-01FF ROM "MONI" (74S471)
+    0200-02FF RAM (2x 2112)
+    18 pushbuttons for programming (0-F, ADR, NXT).
+    4-digit LED display.
 
-    Other options:
-        0400-07FF Expansion RAM (8x 2112)
-        0800-08FF Pulse for operation of an optional EPROM programmer
-        0C00-0FFF ROM "MONA" (2708)
-        LEDs connected to all Address and Data Lines
-        LEDs connected to WAIT and FLAG lines.
-        Speaker with a LED wired across it.
-        PAUSE switch.
-        RUN/STOP switch.
-        STEP switch.
-        CLOCK switch.
+Other options:
+    0400-07FF Expansion RAM (8x 2112)
+    0800-08FF Pulse for operation of an optional EPROM programmer
+    0C00-0FFF ROM "MONA" (2708)
+    LEDs connected to all Address and Data Lines
+    LEDs connected to WAIT and FLAG lines.
+    Speaker with a LED wired across it.
+    PAUSE switch.
+    RUN/STOP switch.
+    STEP switch.
+    CLOCK switch.
 
-        Cassette player connected to SENSE and FLAG lines.
+Cassette player connected to SENSE and FLAG lines.
 
-        Keyboard encoder: AY-5-2376 (57 keys)
+Keyboard encoder: AY-5-2376 (57 keys)
 
-        CRT interface: (512 characters on a separate bus)
-        2114 video ram (one half holds the lower 4 data bits, other half the upper bits)
-        74LS175 holds the upper bits for the 74LS472
-        74LS472 Character Generator
+CRT interface: (512 characters on a separate bus)
+    2114 video ram (one half holds the lower 4 data bits, other half the upper bits)
+    74LS175 holds the upper bits for the 74LS472
+    74LS472 Character Generator
 
-        NOTE: a rom is missing, when the ADR button (- key) is pressed,
-        it causes a freeze in nodebug mode, and a crash in debug mode.
-        To see it, start in debug mode. g 6c. In the emulation, press the
-        minus key. The debugger will stop and you can see an instruction
-        referencing location 0100, which is in the missing rom.
+NOTE: a rom is missing, when the ADR button (- key) is pressed,
+      it causes a freeze in nodebug mode, and a crash in debug mode.
+      To see it, start in debug mode. g 6c. In the emulation, press the
+      minus key. The debugger will stop and you can see an instruction
+      referencing location 0100, which is in the missing rom.
 
-        Keys:
-        0-9,A-F hexadecimal numbers
-        UP - (NXT) to enter data and advance to the next address
-        MINUS - (ADR) to change the address to what is shown in the data side
-        Special keys:
+Keys:
+    0-9,A-F hexadecimal numbers
+    UP - (NXT) to enter data and advance to the next address
+    MINUS - (ADR) to change the address to what is shown in the data side
+    Special keys:
         Hold UP, hold 0, release UP, release 0 - execute program at the current address (i.e. 2xx)
         Hold UP, hold 1, release UP, release 1 - execute program at address 0C00 (rom MONA)
         Hold UP, hold 2, release UP, release 2 - play a tune with the keys
@@ -54,28 +54,32 @@
         Hold MINUS, hold any hex key, release MINUS, release other key - execute program
           at the current address-0x100 (i.e. 1xx).
 
-        If you want to scan through other areas of memory (e.g. the roms), alter the
-        data at address 2F9 (high byte) and 2FA (low byte).
+If you want to scan through other areas of memory (e.g. the roms), alter the
+data at address 2F9 (high byte) and 2FA (low byte).
 
-        How to Use:
-        The red digits are the address, and the orange digits are the data.
-        The address range is 200-2FF (the 2 isn't displayed). To select an address,
-        either press the UP key until you get there, or type the address and press
-        minus. The orange digits show the current data at that address. To alter
-        data, just type it in and press UP.
+How to Use:
+    The red digits are the address, and the orange digits are the data.
+    The address range is 200-2FF (the 2 isn't displayed). To select an address,
+    either press the UP key until you get there, or type the address and press
+    minus. The orange digits show the current data at that address. To alter
+    data, just type it in and press UP.
 
-        To play the reflexes game, hold UP, press 1, release UP, release 1.
-        The display will show A--0 (or some random number in the last position).
-        Press any odd-numbered key (B is convenient), and read off the reaction time.
-        After a short delay it will show '--' again, this is the signal to react.
-        It doesn't seem to reset the counters each time around.
+To play the reflexes game, hold UP, press 1, release UP, release 1.
+    The display will show A--0 (or some random number in the last position).
+    Press any odd-numbered key (B is convenient), and read off the reaction time.
+    After a short delay it will show '--' again, this is the signal to react.
+    It doesn't seem to reset the counters each time around.
 
-        TODO:
-        - Find missing roms
-        - Add optional hardware listed above
-        - Cassette is added, but no idea how to operate it.
+Test Paste:
+    Paste this: 11^22^33^44^55^66^77^88^99^00-
+    Now press up-arrow to review the data that was entered.
 
-        Thanks to Amigan site for various documents.
+TODO:
+    - Find missing roms
+    - Add optional hardware listed above
+    - Cassette is added, but no idea how to operate it.
+
+Thanks to Amigan site for various documents.
 
 
 ****************************************************************************/
@@ -86,6 +90,7 @@
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
 #include "speaker.h"
+#include "video/pwm.h"
 
 #include "dolphunk.lh"
 
@@ -98,30 +103,30 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_speaker(*this, "speaker")
 		, m_cass(*this, "cassette")
-		, m_digits(*this, "digit%u", 0U)
+		, m_display(*this, "display")
 	{ }
 
 	void dauphin(machine_config &config);
 
 private:
 	DECLARE_READ_LINE_MEMBER(cass_r);
-	DECLARE_READ8_MEMBER(port07_r);
-	DECLARE_WRITE8_MEMBER(port00_w);
-	DECLARE_WRITE8_MEMBER(port06_w);
+	u8 port07_r();
+	void port00_w(offs_t offset, u8 data);
+	void port06_w(u8 data);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
-	void dauphin_io(address_map &map);
-	void dauphin_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
+	void machine_start() override;
 
-	uint8_t m_cass_data;
-	uint8_t m_last_key;
+	u8 m_cass_data;
+	u8 m_last_key;
 	bool m_cassbit;
 	bool m_cassold;
 	bool m_speaker_state;
-	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<s2650_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cass;
-	output_finder<4> m_digits;
+	required_device<pwm_display_device> m_display;
 };
 
 READ_LINE_MEMBER( dauphin_state::cass_r )
@@ -129,20 +134,20 @@ READ_LINE_MEMBER( dauphin_state::cass_r )
 	return (m_cass->input() > 0.03) ? 1 : 0;
 }
 
-WRITE8_MEMBER( dauphin_state::port00_w )
+void dauphin_state::port00_w(offs_t offset, u8 data)
 {
-	m_digits[offset] = data;
+	m_display->matrix(1<<offset, data);
 }
 
-WRITE8_MEMBER( dauphin_state::port06_w )
+void dauphin_state::port06_w(u8 data)
 {
 	m_speaker_state ^=1;
 	m_speaker->level_w(m_speaker_state);
 }
 
-READ8_MEMBER( dauphin_state::port07_r )
+u8 dauphin_state::port07_r()
 {
-	uint8_t keyin, i, data = 0x40;
+	u8 keyin, i, data = 0x40;
 
 	keyin = ioport("X0")->read();
 	if (keyin != 0xff)
@@ -182,7 +187,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(dauphin_state::kansas_w)
 		m_cass->output(BIT(m_cass_data, 0) ? -1.0 : +1.0); // 2000Hz
 }
 
-void dauphin_state::dauphin_mem(address_map &map)
+void dauphin_state::machine_start()
+{
+	save_item(NAME(m_cass_data));
+	save_item(NAME(m_last_key));
+	save_item(NAME(m_cassbit));
+	save_item(NAME(m_cassold));
+	save_item(NAME(m_speaker_state));
+}
+
+void dauphin_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x01ff).rom();
@@ -190,7 +204,7 @@ void dauphin_state::dauphin_mem(address_map &map)
 	map(0x0c00, 0x0fff).rom();
 }
 
-void dauphin_state::dauphin_io(address_map &map)
+void dauphin_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00, 0x03).w(FUNC(dauphin_state::port00_w)); // 4-led display
@@ -230,13 +244,15 @@ void dauphin_state::dauphin(machine_config &config)
 {
 	/* basic machine hardware */
 	S2650(config, m_maincpu, XTAL(1'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &dauphin_state::dauphin_mem);
-	m_maincpu->set_addrmap(AS_IO, &dauphin_state::dauphin_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dauphin_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &dauphin_state::io_map);
 	m_maincpu->sense_handler().set(FUNC(dauphin_state::cass_r));
 	m_maincpu->flag_handler().set([this] (bool state) { m_cassbit = state; });
 
 	/* video hardware */
 	config.set_default_layout(layout_dolphunk);
+	PWM_DISPLAY(config, m_display).set_size(4, 8);
+	m_display->set_segmask(0x0f, 0xff);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -250,7 +266,7 @@ void dauphin_state::dauphin(machine_config &config)
 
 /* ROM definition */
 ROM_START( dauphin )
-	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "dolphin_mo.rom", 0x0000, 0x0100, CRC(a8811f48) SHA1(233c629dc20fac286c8c1559e461bb0b742a675e) )
 	// This one is used in winarcadia but it is a bad dump, we use the corrected one above
 	//ROM_LOAD( "dolphin_mo.rom", 0x0000, 0x0100, BAD_DUMP CRC(1ac4ac18) SHA1(62a63de6fcd6cd5fcee930d31c73fe603647f06c) )
@@ -267,4 +283,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY              FULLNAME   FLAGS
-COMP( 1979, dauphin, 0,      0,      dauphin, dauphin, dauphin_state, empty_init, "LCD EPFL Stoppani", "Dauphin", 0 )
+COMP( 1979, dauphin, 0,      0,      dauphin, dauphin, dauphin_state, empty_init, "LCD EPFL Stoppani", "Dauphin", MACHINE_SUPPORTS_SAVE )

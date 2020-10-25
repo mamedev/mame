@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino
 /**
- * @file video/djboy.c
+ * @file video/djboy.cpp
  *
  * video hardware for DJ Boy
  */
@@ -9,12 +9,12 @@
 #include "video/kan_pand.h"
 #include "includes/djboy.h"
 
-WRITE8_MEMBER(djboy_state::djboy_scrollx_w)
+void djboy_state::djboy_scrollx_w(uint8_t data)
 {
 	m_scrollx = data;
 }
 
-WRITE8_MEMBER(djboy_state::djboy_scrolly_w)
+void djboy_state::djboy_scrolly_w(uint8_t data)
 {
 	m_scrolly = data;
 }
@@ -31,7 +31,7 @@ TILE_GET_INFO_MEMBER(djboy_state::get_bg_tile_info)
 	tileinfo.set(1, code, color, 0);    /* no flip */
 }
 
-WRITE8_MEMBER(djboy_state::djboy_videoram_w)
+void djboy_state::djboy_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_background->mark_tile_dirty(offset & 0x7ff);
@@ -42,7 +42,7 @@ void djboy_state::video_start()
 	m_background = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(djboy_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
 }
 
-WRITE8_MEMBER(djboy_state::djboy_paletteram_w)
+void djboy_state::djboy_paletteram_w(offs_t offset, uint8_t data)
 {
 	int val;
 

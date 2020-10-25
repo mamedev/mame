@@ -54,18 +54,18 @@ public:
 		m_adpcm_pos(0), m_adpcm_idle(1), m_adpcm_data(0), m_trigger(0)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(input_select_w);
-	DECLARE_READ8_MEMBER(input_p2_r);
-	DECLARE_READ8_MEMBER(input_p1_r);
+	void input_select_w(uint8_t data);
+	uint8_t input_p2_r();
+	uint8_t input_p1_r();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(tile_info);
 
-	DECLARE_WRITE8_MEMBER(adpcm_w);
+	void adpcm_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int_w);
 
 	INTERRUPT_GEN_MEMBER(vblank_int);
-	DECLARE_WRITE8_MEMBER(ctrl_w);
+	void ctrl_w(uint8_t data);
 	void init_chinsan();
 
 	void chinsan(machine_config &config);
@@ -328,7 +328,7 @@ INPUT_PORTS_END
 //  INPUT PORT HANDLING
 //**************************************************************************
 
-WRITE8_MEMBER( chinsan_state::input_select_w )
+void chinsan_state::input_select_w(uint8_t data)
 {
 	// 765-----  unknown
 	// ---43210  input select (shared for player 1 and 2)
@@ -336,7 +336,7 @@ WRITE8_MEMBER( chinsan_state::input_select_w )
 	m_port_select = data;
 }
 
-READ8_MEMBER( chinsan_state::input_p1_r )
+uint8_t chinsan_state::input_p1_r()
 {
 	uint8_t data = 0xff;
 
@@ -349,7 +349,7 @@ READ8_MEMBER( chinsan_state::input_p1_r )
 	return data;
 }
 
-READ8_MEMBER( chinsan_state::input_p2_r )
+uint8_t chinsan_state::input_p2_r()
 {
 	uint8_t data = 0xff;
 
@@ -400,7 +400,7 @@ TILE_GET_INFO_MEMBER( chinsan_state::tile_info )
 //  AUDIO
 //**************************************************************************
 
-WRITE8_MEMBER( chinsan_state::adpcm_w )
+void chinsan_state::adpcm_w(uint8_t data)
 {
 	m_adpcm_pos = data << 8;
 	m_adpcm_idle = 0;
@@ -442,7 +442,7 @@ INTERRUPT_GEN_MEMBER( chinsan_state::vblank_int )
 		device.execute().set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
 }
 
-WRITE8_MEMBER( chinsan_state::ctrl_w )
+void chinsan_state::ctrl_w(uint8_t data)
 {
 	// 76------  rom bank
 	// --5432--  unknown

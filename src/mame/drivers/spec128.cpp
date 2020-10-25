@@ -165,35 +165,28 @@ resulting mess can be seen in the F4 viewer display.
 /****************************************************************************************************/
 /* Spectrum 128 specific functions */
 
-READ8_MEMBER(spectrum_state::spectrum_128_pre_opcode_fetch_r)
+uint8_t spectrum_state::spectrum_128_pre_opcode_fetch_r(offs_t offset)
 {
-	/* this allows expansion devices to act upon opcode fetches from MEM addresses */
-	if (BIT(m_port_7ffd_data, 4))
-	{
-		/* this allows expansion devices to act upon opcode fetches from MEM addresses
-		   for example, interface1 detection fetches requires fetches at 0008 / 0708 to
-		   enable paged ROM and then fetches at 0700 to disable it
-		*/
-		m_exp->pre_opcode_fetch(offset);
-		uint8_t retval = m_maincpu->space(AS_PROGRAM).read_byte(offset);
-		m_exp->post_opcode_fetch(offset);
-		return retval;
-	}
-
-	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
+	/* this allows expansion devices to act upon opcode fetches from MEM addresses
+	   for example, interface1 detection fetches requires fetches at 0008 / 0708 to
+	   enable paged ROM and then fetches at 0700 to disable it
+	*/
+	m_exp->pre_opcode_fetch(offset);
+	uint8_t retval = m_maincpu->space(AS_PROGRAM).read_byte(offset);
+	m_exp->post_opcode_fetch(offset);
+	return retval;
 }
 
-WRITE8_MEMBER( spectrum_state::spectrum_128_bank1_w )
+void spectrum_state::spectrum_128_bank1_w(offs_t offset, uint8_t data)
 {
-	if (m_exp->romcs() && BIT(m_port_7ffd_data, 4))
-		m_exp->mreq_w(offset, data);
+	m_exp->mreq_w(offset, data);
 }
 
-READ8_MEMBER( spectrum_state::spectrum_128_bank1_r )
+uint8_t spectrum_state::spectrum_128_bank1_r(offs_t offset)
 {
 	uint8_t data;
 
-	if (m_exp->romcs() && BIT(m_port_7ffd_data, 4))
+	if (m_exp->romcs())
 	{
 		data = m_exp->mreq_r(offset);
 	}
@@ -208,7 +201,7 @@ READ8_MEMBER( spectrum_state::spectrum_128_bank1_r )
 	return data;
 }
 
-WRITE8_MEMBER(spectrum_state::spectrum_128_port_7ffd_w)
+void spectrum_state::spectrum_128_port_7ffd_w(offs_t offset, uint8_t data)
 {
 	/* D0-D2: RAM page located at 0x0c000-0x0ffff */
 	/* D3 - Screen select (screen 0 in ram page 5, screen 1 in ram page 7 */
@@ -227,6 +220,8 @@ WRITE8_MEMBER(spectrum_state::spectrum_128_port_7ffd_w)
 
 	/* update memory */
 	spectrum_128_update_memory();
+
+	m_exp->iorq_w(offset | 1, data);
 }
 
 void spectrum_state::spectrum_128_update_memory()
@@ -244,7 +239,7 @@ void spectrum_state::spectrum_128_update_memory()
 		m_screen_location = messram + (5<<14);
 }
 
-READ8_MEMBER( spectrum_state::spectrum_128_ula_r )
+uint8_t spectrum_state::spectrum_128_ula_r()
 {
 	int vpos = m_screen->vpos();
 
@@ -255,7 +250,7 @@ void spectrum_state::spectrum_128_io(address_map &map)
 {
 	map(0x0000, 0xffff).rw(m_exp, FUNC(spectrum_expansion_slot_device::iorq_r), FUNC(spectrum_expansion_slot_device::iorq_w));
 	map(0x0000, 0x0000).rw(FUNC(spectrum_state::spectrum_port_fe_r), FUNC(spectrum_state::spectrum_port_fe_w)).select(0xfffe);
-	map(0x0001, 0x0001).w(FUNC(spectrum_state::spectrum_128_port_7ffd_w)).mirror(0x7ffc);   // (A15 | A1) == 0, note: reading from this port does write to it by value from data bus
+	map(0x0001, 0x0001).w(FUNC(spectrum_state::spectrum_128_port_7ffd_w)).select(0x7ffc);   // (A15 | A1) == 0, note: reading from this port does write to it by value from data bus
 	map(0x8000, 0x8000).w("ay8912", FUNC(ay8910_device::data_w)).mirror(0x3ffd);
 	map(0xc000, 0xc000).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)).mirror(0x3ffd);
 	map(0x0001, 0x0001).r(FUNC(spectrum_state::spectrum_128_ula_r)); // .mirror(0xfffe);

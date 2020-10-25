@@ -5,13 +5,10 @@
  *
  */
 
-#include "nld_schmitt.h"
-
-#include "netlist/analog/nlid_twoterm.h"
-#include "netlist/devices/nlid_system.h"
-#include "netlist/nl_base.h"
-#include "netlist/nl_errstr.h"
-#include "netlist/solver/nld_solver.h"
+#include "analog/nlid_twoterm.h"
+#include "nl_base.h"
+#include "nl_errstr.h"
+#include "solver/nld_solver.h"
 
 namespace netlist
 {
@@ -60,17 +57,18 @@ namespace netlist
 		NETLIB_OBJECT(schmitt_trigger)
 		{
 			NETLIB_CONSTRUCTOR(schmitt_trigger)
-				, m_A(*this, "A")
+				, m_A(*this, "A", NETLIB_DELEGATE(input))
 				, m_supply(*this)
 				, m_RVI(*this, "RVI")
 				, m_RVO(*this, "RVO")
-				, m_model(*this, "MODEL", "TTL_7414_GATE")
-				, m_modacc(m_model)
+				, m_stmodel(*this, "STMODEL", "TTL_7414_GATE")
+				, m_modacc(m_stmodel)
 				, m_last_state(*this, "m_last_var", 1)
 			{
-				register_subalias("Q", m_RVO.P());
+				register_subalias("Q", "RVO.1");
 
-				connect(m_A, m_RVI.P());
+				connect("A", "RVI.1");
+				// FIXME: need a symbolic reference from connect as well
 				connect(m_supply.GND(), m_RVI.N());
 				connect(m_supply.GND(), m_RVO.N());
 			}
@@ -85,7 +83,8 @@ namespace netlist
 				m_RVO.set_G_V_I(plib::reciprocal(m_modacc.m_ROL()), m_modacc.m_VOL, nlconst::zero());
 			}
 
-			NETLIB_UPDATEI()
+		private:
+			NETLIB_HANDLERI(input)
 			{
 				const auto va(m_A.Q_Analog() - m_supply.GND().Q_Analog());
 				if (m_last_state)
@@ -112,17 +111,16 @@ namespace netlist
 				}
 			}
 
-		private:
 			analog_input_t m_A;
 			NETLIB_NAME(power_pins) m_supply;
 			analog::NETLIB_SUB(twoterm) m_RVI;
 			analog::NETLIB_SUB(twoterm) m_RVO;
-			param_model_t m_model;
+			param_model_t m_stmodel;
 			schmitt_trigger_model_t m_modacc;
 			state_var<int> m_last_state;
 		};
 
-		NETLIB_DEVICE_IMPL(schmitt_trigger, "SCHMITT_TRIGGER", "MODEL")
+		NETLIB_DEVICE_IMPL(schmitt_trigger, "SCHMITT_TRIGGER", "STMODEL")
 
 	} // namespace devices
 } // namespace netlist

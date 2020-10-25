@@ -39,9 +39,9 @@ public:
 	void pv9234(machine_config &config);
 
 private:
-	DECLARE_WRITE32_MEMBER(debug_w);
-	DECLARE_WRITE32_MEMBER(debug1_w);
-	DECLARE_WRITE32_MEMBER(debug2_w);
+	void debug_w(uint32_t data);
+	void debug1_w(uint32_t data);
+	void debug2_w(uint32_t data);
 
 	uint32_t screen_update_pv9234(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -77,7 +77,7 @@ All printing enabled. Press space bar to toggle on/off.
 Time stamping enabled. Press 't' to turn on/off.
 Press 'o' to toggle printing of MPEG Xport error messages.
 */
-WRITE32_MEMBER( pv9234_state::debug_w )
+void pv9234_state::debug_w(uint32_t data)
 {
 	if (data)
 	{
@@ -86,7 +86,7 @@ WRITE32_MEMBER( pv9234_state::debug_w )
 	}
 }
 
-WRITE32_MEMBER( pv9234_state::debug1_w )
+void pv9234_state::debug1_w(uint32_t data)
 {
 	uint8_t i,j;
 	if (data)
@@ -102,7 +102,7 @@ WRITE32_MEMBER( pv9234_state::debug1_w )
 	}
 }
 
-WRITE32_MEMBER( pv9234_state::debug2_w )
+void pv9234_state::debug2_w(uint32_t data)
 {
 	if (data)
 		logerror("debug2=%02x\n",data); // ignore the huge amount of zeroes here

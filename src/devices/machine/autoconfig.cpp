@@ -120,7 +120,7 @@ void amiga_autoconfig::autoconfig_rom_vector(uint16_t data)
 //  MEMORY INTERFACE
 //**************************************************************************
 
-READ16_MEMBER( amiga_autoconfig::autoconfig_read )
+uint16_t amiga_autoconfig::autoconfig_read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = m_cfg[offset] | 0x0fff;
 
@@ -130,7 +130,7 @@ READ16_MEMBER( amiga_autoconfig::autoconfig_read )
 	return data;
 }
 
-WRITE16_MEMBER( amiga_autoconfig::autoconfig_write )
+void amiga_autoconfig::autoconfig_write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (VERBOSE && !dynamic_cast<device_t *>(this)->machine().side_effects_disabled())
 		space.device().logerror("autoconfig_write %04x @ %02x [mask = %04x]\n", data, offset, mem_mask);

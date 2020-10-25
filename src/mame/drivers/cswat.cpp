@@ -50,10 +50,10 @@ public:
 	uint8_t m_nmi_enabled;
 	tilemap_t *m_tilemap;
 
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(irq_ack_w);
-	DECLARE_READ8_MEMBER(sensors_r);
-	DECLARE_READ8_MEMBER(dipswitch_r);
+	void videoram_w(offs_t offset, uint8_t data);
+	void irq_ack_w(uint8_t data);
+	uint8_t sensors_r();
+	uint8_t dipswitch_r(offs_t offset);
 
 	INTERRUPT_GEN_MEMBER(nmi_handler);
 
@@ -114,26 +114,26 @@ uint32_t cswat_state::screen_update_cswat(screen_device &screen, bitmap_ind16 &b
 
 ***************************************************************************/
 
-WRITE8_MEMBER(cswat_state::videoram_w)
+void cswat_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(cswat_state::irq_ack_w)
+void cswat_state::irq_ack_w(uint8_t data)
 {
 	// clear vblank irq and enable nmi?
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 	m_nmi_enabled = data & 1;
 }
 
-READ8_MEMBER(cswat_state::dipswitch_r)
+uint8_t cswat_state::dipswitch_r(offs_t offset)
 {
 	uint16_t dips = m_dips_inp->read();
 	return offset ? dips >> 8 : dips & 0xff;
 }
 
-READ8_MEMBER(cswat_state::sensors_r)
+uint8_t cswat_state::sensors_r()
 {
 	// ?
 	return machine().rand();

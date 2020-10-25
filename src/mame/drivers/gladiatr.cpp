@@ -170,6 +170,7 @@ Notes:
 - gladiatr and clones start with one credit due to the way MAME initialises
   memory and the dodgy code the bootleg MCUs use to synchronise with the host
   CPUs.  On an F3 reset they randomly start with one credit or no credits.
+- gladiatr and clones don't show player inputs in service mode.
 
 TODO:
 -----
@@ -183,7 +184,7 @@ TODO:
 - YM2203 some sound effects just don't sound correct
 - Audio Filter Switch not hooked up (might solve YM2203 mixing issue)
 - Ports 60,61,80,81 not fully understood yet...
-- The four 8741 dumps come from an unprotected bootleg, we need dumps from
+- Three 8741 dumps come from an unprotected bootleg, we need dumps from
   original boards.
 
 ***************************************************************************/
@@ -210,7 +211,7 @@ MACHINE_RESET_MEMBER(gladiatr_state,gladiator)
 }
 
 /* YM2203 port B handler (output) */
-WRITE8_MEMBER(gladiatr_state::gladiator_int_control_w)
+void gladiatr_state::gladiator_int_control_w(u8 data)
 {
 	/* bit 7   : SSRST = sound reset ? */
 	/* bit 6-1 : N.C.                  */
@@ -227,7 +228,7 @@ WRITE_LINE_MEMBER(gladiatr_state_base::ym_irq)
 }
 
 /*Sound Functions*/
-WRITE8_MEMBER(gladiatr_state::gladiator_adpcm_w)
+void gladiatr_state::gladiator_adpcm_w(u8 data)
 {
 	// bit 6 = bank offset
 	membank("bank2")->set_entry((data & 0x40) ? 1 : 0);
@@ -237,7 +238,7 @@ WRITE8_MEMBER(gladiatr_state::gladiator_adpcm_w)
 	m_msm->vclk_w (BIT(data, 4));   // bit 4
 }
 
-WRITE8_MEMBER(ppking_state::ppking_adpcm_w)
+void ppking_state::ppking_adpcm_w(u8 data)
 {
 	// bit 6 = bank offset
 	//membank("bank2")->set_entry((data & 0x40) ? 1 : 0);
@@ -247,18 +248,18 @@ WRITE8_MEMBER(ppking_state::ppking_adpcm_w)
 	m_msm->vclk_w (BIT(data, 4));   // bit 4
 }
 
-WRITE8_MEMBER(ppking_state::cpu2_irq_ack_w)
+void ppking_state::cpu2_irq_ack_w(u8 data)
 {
 	m_subcpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(gladiatr_state_base::adpcm_command_w)
+void gladiatr_state_base::adpcm_command_w(u8 data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-READ8_MEMBER(gladiatr_state_base::adpcm_command_r)
+u8 gladiatr_state_base::adpcm_command_r()
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return m_soundlatch->read();
@@ -271,7 +272,7 @@ WRITE_LINE_MEMBER(gladiatr_state_base::flipscreen_w)
 
 #if 1
 /* !!!!! patch to IRQ timing for 2nd CPU !!!!! */
-WRITE8_MEMBER(gladiatr_state::gladiatr_irq_patch_w)
+void gladiatr_state::gladiatr_irq_patch_w(u8 data)
 {
 	m_subcpu->set_input_line(0, HOLD_LINE);
 }
@@ -283,22 +284,22 @@ WRITE_LINE_MEMBER(gladiatr_state::tclk_w)
 	m_tclk_val = state != 0;
 }
 
-READ8_MEMBER(gladiatr_state::cctl_p1_r)
+u8 gladiatr_state::cctl_p1_r()
 {
 	return m_cctl_p1 & m_in2->read();
 }
 
-READ8_MEMBER(gladiatr_state::cctl_p2_r)
+u8 gladiatr_state::cctl_p2_r()
 {
 	return m_cctl_p2;
 }
 
-READ8_MEMBER(gladiatr_state::ucpu_p2_r)
+u8 gladiatr_state::ucpu_p2_r()
 {
 	return bitswap<8>(m_dsw1->read(), 0,1,2,3,4,5,6,7);
 }
 
-WRITE8_MEMBER(gladiatr_state::ccpu_p2_w)
+void gladiatr_state::ccpu_p2_w(u8 data)
 {
 	// almost certainly active low (bootleg MCU never uses these outputs, which makes them always high)
 	// coin counters and lockout pass through 4049 inverting buffer at 12L
@@ -318,7 +319,7 @@ READ_LINE_MEMBER(gladiatr_state::ucpu_t1_r)
 	return BIT(m_csnd_p1, 1);
 }
 
-READ8_MEMBER(gladiatr_state::ucpu_p1_r)
+u8 gladiatr_state::ucpu_p1_r()
 {
 	 // p10 connected to corresponding line on other MCU
 	 // p11 connected to t1 on other MCU
@@ -326,7 +327,7 @@ READ8_MEMBER(gladiatr_state::ucpu_p1_r)
 	return m_csnd_p1 |= 0xfe;
 }
 
-WRITE8_MEMBER(gladiatr_state::ucpu_p1_w)
+void gladiatr_state::ucpu_p1_w(u8 data)
 {
 	m_ucpu_p1 = data;
 }
@@ -337,7 +338,7 @@ READ_LINE_MEMBER(gladiatr_state::csnd_t1_r)
 	return BIT(m_ucpu_p1, 1);
 }
 
-READ8_MEMBER(gladiatr_state::csnd_p1_r)
+u8 gladiatr_state::csnd_p1_r()
 {
 	 // p10 connected to corresponding line on other MCU
 	 // p11 connected to t1 on other MCU
@@ -345,12 +346,12 @@ READ8_MEMBER(gladiatr_state::csnd_p1_r)
 	return m_ucpu_p1 |= 0xfe;
 }
 
-WRITE8_MEMBER(gladiatr_state::csnd_p1_w)
+void gladiatr_state::csnd_p1_w(u8 data)
 {
 	m_csnd_p1 = data;
 }
 
-READ8_MEMBER(gladiatr_state::csnd_p2_r)
+u8 gladiatr_state::csnd_p2_r()
 {
 	return bitswap<8>(m_dsw2->read(), 2,3,4,5,6,7,1,0);
 }
@@ -384,7 +385,7 @@ INPUT_CHANGED_MEMBER(gladiatr_state::p2_s2)
 
 
 
-READ8_MEMBER(ppking_state::ppking_f1_r)
+u8 ppking_state::ppking_f1_r()
 {
 	return 0xff;
 }
@@ -403,7 +404,7 @@ READ8_MEMBER(ppking_state::ppking_f1_r)
 inline bool ppking_state::mcu_parity_check()
 {
 	int i;
-	uint8_t res = 0;
+	u8 res = 0;
 
 	for(i=0;i<8;i++)
 	{
@@ -436,7 +437,7 @@ inline void ppking_state::mcu_input_check()
 	}
 }
 
-READ8_MEMBER(ppking_state::ppking_qx0_r)
+u8 ppking_state::ppking_qx0_r(offs_t offset)
 {
 	// status
 	if(offset == 1)
@@ -506,7 +507,7 @@ READ8_MEMBER(ppking_state::ppking_qx0_r)
 	return m_mcu[0].rxd;
 }
 
-WRITE8_MEMBER(ppking_state::ppking_qx0_w)
+void ppking_state::ppking_qx0_w(offs_t offset, u8 data)
 {
 	if(offset == 1)
 	{
@@ -557,7 +558,7 @@ WRITE8_MEMBER(ppking_state::ppking_qx0_w)
 	}
 }
 
-WRITE8_MEMBER(ppking_state::ppking_qx1_w)
+void ppking_state::ppking_qx1_w(offs_t offset, u8 data)
 {
 	if(offset == 1)
 	{
@@ -566,12 +567,12 @@ WRITE8_MEMBER(ppking_state::ppking_qx1_w)
 	}
 }
 
-WRITE8_MEMBER(ppking_state::ppking_qx3_w)
+void ppking_state::ppking_qx3_w(u8 data)
 {
 }
 
 
-READ8_MEMBER(ppking_state::ppking_qx1_r)
+u8 ppking_state::ppking_qx1_r(offs_t offset)
 {
 	// status
 	if(offset == 1)
@@ -583,7 +584,7 @@ READ8_MEMBER(ppking_state::ppking_qx1_r)
 	return m_soundlatch2->read();
 }
 
-READ8_MEMBER(ppking_state::ppking_qx3_r)
+u8 ppking_state::ppking_qx3_r(offs_t offset)
 {
 	if(offset == 1)
 		return 1;
@@ -594,7 +595,7 @@ READ8_MEMBER(ppking_state::ppking_qx3_r)
 // serial communication with another board (COMU in service mode)
 // NMI is used to acquire data from the other board,
 // either sent via 1->0 poll of the 0xc003 port or by reading 0xc0c0 (former more likely)
-READ8_MEMBER(ppking_state::ppking_qxcomu_r)
+u8 ppking_state::ppking_qxcomu_r(offs_t offset)
 {
 	if(offset == 1)
 		return 1;
@@ -602,7 +603,7 @@ READ8_MEMBER(ppking_state::ppking_qxcomu_r)
 	return 0;
 }
 
-WRITE8_MEMBER(ppking_state::ppking_qxcomu_w)
+void ppking_state::ppking_qxcomu_w(u8 data)
 {
 	// ...
 }
@@ -610,7 +611,7 @@ WRITE8_MEMBER(ppking_state::ppking_qxcomu_w)
 MACHINE_RESET_MEMBER(ppking_state, ppking)
 {
 	// yes, it expects to read DSW1 without sending commands first ...
-	m_mcu[0].rxd = (ioport("DSW1")->read() & 0x1f) << 2;;
+	m_mcu[0].rxd = (ioport("DSW1")->read() & 0x1f) << 2;
 	m_mcu[0].rst = 0;
 	m_mcu[0].state = 0;
 }
@@ -1048,7 +1049,7 @@ void gladiatr_state::gladiatr(machine_config &config)
 	m_ucpu->t0_in_cb().set(FUNC(gladiatr_state::tclk_r));
 	m_ucpu->t1_in_cb().set(FUNC(gladiatr_state::ucpu_t1_r));
 
-	I8741A(config, m_csnd, 12_MHz_XTAL/2); /* verified on pcb */
+	I8742(config, m_csnd, 12_MHz_XTAL/2); /* verified on pcb */
 	m_csnd->p1_in_cb().set(FUNC(gladiatr_state::csnd_p1_r));
 	m_csnd->p1_out_cb().set(FUNC(gladiatr_state::csnd_p1_w));
 	m_csnd->p2_in_cb().set(FUNC(gladiatr_state::csnd_p2_r));
@@ -1094,6 +1095,18 @@ void gladiatr_state::gladiatr(machine_config &config)
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.60);
 
 	LS259(config, "filtlatch", 0); // 9R - filters on sound output
+}
+
+void gladiatr_state::greatgur(machine_config &config)
+{
+	gladiatr(config);
+
+	I8741A(config.replace(), m_csnd, 12_MHz_XTAL/2); /* verified on pcb */
+	m_csnd->p1_in_cb().set(FUNC(gladiatr_state::csnd_p1_r));
+	m_csnd->p1_out_cb().set(FUNC(gladiatr_state::csnd_p1_w));
+	m_csnd->p2_in_cb().set(FUNC(gladiatr_state::csnd_p2_r));
+	m_csnd->t0_in_cb().set(FUNC(gladiatr_state::tclk_r));
+	m_csnd->t1_in_cb().set(FUNC(gladiatr_state::csnd_t1_r));
 }
 
 
@@ -1196,8 +1209,8 @@ ROM_START( gladiatr )
 	ROM_REGION( 0x0400, "ucpu", 0 ) /* comms MCU */
 	ROM_LOAD( "aq_006.3a",      0x00000, 0x0400, CRC(3c5ca4c6) SHA1(0d8c2e1c2142ada11e30cfb9a48663386fee9cb8) BAD_DUMP )
 
-	ROM_REGION( 0x0400, "csnd", 0 ) /* comms MCU */
-	ROM_LOAD( "aq_006.6c",      0x00000, 0x0400, CRC(3c5ca4c6) SHA1(0d8c2e1c2142ada11e30cfb9a48663386fee9cb8) BAD_DUMP )
+	ROM_REGION( 0x0800, "csnd", 0 ) /* comms MCU */
+	ROM_LOAD( "aq_007.6c",      0x00000, 0x0800, CRC(f19af04d) SHA1(61105cb905128e5d10b2e97d6201034584eb1ada) )
 ROM_END
 
 ROM_START( ogonsiro )
@@ -1251,8 +1264,8 @@ ROM_START( ogonsiro )
 	ROM_REGION( 0x0400, "ucpu", 0 ) /* comms MCU */
 	ROM_LOAD( "aq_006.3a",      0x00000, 0x0400, CRC(3c5ca4c6) SHA1(0d8c2e1c2142ada11e30cfb9a48663386fee9cb8) BAD_DUMP )
 
-	ROM_REGION( 0x0400, "csnd", 0 ) /* comms MCU */
-	ROM_LOAD( "aq_006.6c",      0x00000, 0x0400, CRC(3c5ca4c6) SHA1(0d8c2e1c2142ada11e30cfb9a48663386fee9cb8) BAD_DUMP )
+	ROM_REGION( 0x0800, "csnd", 0 ) /* comms MCU */
+	ROM_LOAD( "aq_007.6c",      0x00000, 0x0800, CRC(f19af04d) SHA1(61105cb905128e5d10b2e97d6201034584eb1ada) )
 ROM_END
 
 ROM_START( greatgur )
@@ -1361,26 +1374,23 @@ ROM_START( gcastle )
 	ROM_REGION( 0x0400, "ucpu", 0 ) /* comms MCU */
 	ROM_LOAD( "aq_006.3a",      0x00000, 0x0400, CRC(3c5ca4c6) SHA1(0d8c2e1c2142ada11e30cfb9a48663386fee9cb8) BAD_DUMP )
 
-	ROM_REGION( 0x0400, "csnd", 0 ) /* comms MCU */
-	ROM_LOAD( "aq_006.6c",      0x00000, 0x0400, CRC(3c5ca4c6) SHA1(0d8c2e1c2142ada11e30cfb9a48663386fee9cb8) BAD_DUMP )
+	ROM_REGION( 0x0800, "csnd", 0 ) /* comms MCU */
+	ROM_LOAD( "aq_007.6c",      0x00000, 0x0800, CRC(f19af04d) SHA1(61105cb905128e5d10b2e97d6201034584eb1ada) )
 ROM_END
 
 
-void gladiatr_state::swap_block(uint8_t *src1,uint8_t *src2,int len)
+void gladiatr_state::swap_block(u8 *src1, u8 *src2, int len)
 {
-	int i,t;
-
-	for (i = 0;i < len;i++)
+	for (int i = 0; i < len; i++)
 	{
-		t = src1[i];
-		src1[i] = src2[i];
-		src2[i] = t;
+		using std::swap;
+		swap(src1[i], src2[i]);
 	}
 }
 
 void gladiatr_state::init_gladiatr()
 {
-	uint8_t *rom = memregion("gfx2")->base();
+	u8 *rom = memregion("gfx2")->base();
 	// unpack 3bpp graphics
 	for (int j = 3; j >= 0; j--)
 	{
@@ -1432,7 +1442,7 @@ void gladiatr_state::init_gladiatr()
 
 void ppking_state::init_ppking()
 {
-	uint8_t *rom = memregion("gfx2")->base();
+	u8 *rom = memregion("gfx2")->base();
 	// unpack 3bpp graphics
 	for (int i = 0; i < 0x2000; i++)
 	{
@@ -1465,9 +1475,9 @@ void ppking_state::init_ppking()
 }
 
 
-
-GAME( 1985, ppking,   0,        ppking,   ppking,   ppking_state,   init_ppking,   ROT90, "Taito America Corporation", "Ping-Pong King", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN )
-GAME( 1986, gladiatr, 0,        gladiatr, gladiatr, gladiatr_state, init_gladiatr, ROT0,  "Allumer / Taito America Corporation", "Gladiator (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, ogonsiro, gladiatr, gladiatr, gladiatr, gladiatr_state, init_gladiatr, ROT0,  "Allumer / Taito Corporation", "Ougon no Shiro (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, greatgur, gladiatr, gladiatr, gladiatr, gladiatr_state, init_gladiatr, ROT0,  "Allumer / Taito Corporation", "Great Gurianos (Japan?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, gcastle,  gladiatr, gladiatr, gladiatr, gladiatr_state, init_gladiatr, ROT0,  "Allumer / Taito Corporation", "Golden Castle (prototype?)", MACHINE_SUPPORTS_SAVE ) // incomplete dump
+//    year  name      parent    machine   input     class           init           rot    company                                fullname                                         flags
+GAME( 1985, ppking,   0,        ppking,   ppking,   ppking_state,   init_ppking,   ROT90, "Taito America Corporation",           "Ping-Pong King",                                MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN )
+GAME( 1986, gladiatr, 0,        gladiatr, gladiatr, gladiatr_state, init_gladiatr, ROT0,  "Allumer / Taito America Corporation", "Gladiator (US)",                                MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ogonsiro, gladiatr, gladiatr, gladiatr, gladiatr_state, init_gladiatr, ROT0,  "Allumer / Taito Corporation",         "Ougon no Shiro (Japan)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1986, greatgur, gladiatr, greatgur, gladiatr, gladiatr_state, init_gladiatr, ROT0,  "Allumer / Taito Corporation",         "Great Gurianos (Japan?)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1986, gcastle,  gladiatr, gladiatr, gladiatr, gladiatr_state, init_gladiatr, ROT0,  "Allumer / Taito Corporation",         "Golden Castle (prototype?)",                    MACHINE_SUPPORTS_SAVE ) // incomplete dump

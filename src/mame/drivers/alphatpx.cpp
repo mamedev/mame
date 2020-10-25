@@ -112,23 +112,23 @@ protected:
 
 private:
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ_LINE_MEMBER(kbd_matrix_r);
-	DECLARE_WRITE8_MEMBER(kbd_matrix_w);
-	DECLARE_READ8_MEMBER(kbd_port2_r);
-	DECLARE_WRITE8_MEMBER(kbd_port2_w);
+	void kbd_matrix_w(u8 data);
+	u8 kbd_port2_r();
+	void kbd_port2_w(u8 data);
 
-	DECLARE_READ8_MEMBER(fdc_r);
-	DECLARE_WRITE8_MEMBER(fdc_w);
-	DECLARE_READ8_MEMBER(fdc_stat_r);
-	DECLARE_WRITE8_MEMBER(fdc_cmd_w);
+	u8 fdc_r(offs_t offset);
+	void fdc_w(offs_t offset, u8 data);
+	u8 fdc_stat_r();
+	void fdc_cmd_w(u8 data);
 
 	DECLARE_WRITE_LINE_MEMBER(fdcirq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdcdrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdchld_w);
-	DECLARE_WRITE8_MEMBER(beep_w);
-	DECLARE_WRITE8_MEMBER(bank_w);
+	void beep_w(u8 data);
+	void bank_w(u8 data);
 
 	void alphatp2_io(address_map &map);
 	void alphatp2_map(address_map &map);
@@ -142,7 +142,7 @@ private:
 	required_device<beep_device> m_beep;
 	required_ioport_array<16> m_keycols;
 
-	uint8_t m_kbdclk, m_kbdread, m_kbdport2;
+	u8 m_kbdclk, m_kbdread, m_kbdport2;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<u8> m_vram;
 	required_region_ptr<u8> m_gfx;
@@ -184,33 +184,33 @@ protected:
 	virtual void machine_reset() override;
 private:
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ_LINE_MEMBER(kbd_matrix_r);
-	DECLARE_WRITE8_MEMBER(kbd_matrix_w);
-	DECLARE_READ8_MEMBER(kbd_port2_r);
-	DECLARE_WRITE8_MEMBER(kbd_port2_w);
+	void kbd_matrix_w(u8 data);
+	u8 kbd_port2_r();
+	void kbd_port2_w(u8 data);
 
-	DECLARE_READ8_MEMBER(fdc_r);
-	DECLARE_WRITE8_MEMBER(fdc_w);
-	DECLARE_READ8_MEMBER(fdc_stat_r);
-	DECLARE_WRITE8_MEMBER(fdc_cmd_w);
+	u8 fdc_r(offs_t offset);
+	void fdc_w(offs_t offset, u8 data);
+	u8 fdc_stat_r();
+	void fdc_cmd_w(u8 data);
 
 	DECLARE_WRITE_LINE_MEMBER(fdcirq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdcdrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdchld_w);
-	DECLARE_WRITE8_MEMBER(beep_w);
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_READ8_MEMBER(start88_r);
-	DECLARE_READ8_MEMBER(comm85_r);
-	DECLARE_WRITE8_MEMBER(comm85_w);
-	DECLARE_READ8_MEMBER(comm88_r);
-	DECLARE_WRITE8_MEMBER(comm88_w);
-	DECLARE_READ8_MEMBER(gfxext_r);
-	DECLARE_WRITE8_MEMBER(gfxext_w);
-	DECLARE_WRITE8_MEMBER(gfxext1_w);
-	DECLARE_WRITE8_MEMBER(gfxext2_w);
-	DECLARE_WRITE8_MEMBER(gfxext3_w);
+	void beep_w(u8 data);
+	void bank_w(u8 data);
+	u8 start88_r(offs_t offset);
+	u8 comm85_r(offs_t offset);
+	void comm85_w(u8 data);
+	u8 comm88_r(offs_t offset);
+	void comm88_w(u8 data);
+	u8 gfxext_r(offs_t offset);
+	void gfxext_w(offs_t offset, u8 data);
+	void gfxext1_w(u8 data);
+	void gfxext2_w(u8 data);
+	void gfxext3_w(offs_t offset, u8 data);
 
 	u8* vramext_addr_xlate(offs_t offset);
 
@@ -231,7 +231,7 @@ private:
 	required_ioport_array<16> m_keycols;
 	required_ioport m_scncfg;
 
-	uint8_t m_kbdclk, m_kbdread, m_kbdport2;
+	u8 m_kbdclk, m_kbdread, m_kbdport2;
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<u8> m_vram;
@@ -279,7 +279,7 @@ void alphatp_12_state::alphatp2_io(address_map &map)
 }
 
 
-WRITE8_MEMBER(alphatp_12_state::bank_w)
+void alphatp_12_state::bank_w(u8 data)
 {
 	m_bankdev->set_bank(BIT(data, 6));
 }
@@ -339,7 +339,7 @@ void alphatp_34_state::alphatp30_8088_io(address_map &map)
 	map(0xffe9, 0xffea).rw(FUNC(alphatp_34_state::comm85_r), FUNC(alphatp_34_state::comm85_w));
 }
 
-READ8_MEMBER(alphatp_34_state::start88_r)
+u8 alphatp_34_state::start88_r(offs_t offset)
 {
 	if(!offset)
 	{
@@ -355,12 +355,12 @@ READ8_MEMBER(alphatp_34_state::start88_r)
 	return 0;
 }
 
-WRITE8_MEMBER(alphatp_34_state::bank_w)
+void alphatp_34_state::bank_w(u8 data)
 {
 	m_bankdev->set_bank(BIT(data, 6));
 }
 
-READ8_MEMBER(alphatp_34_state::comm88_r)
+u8 alphatp_34_state::comm88_r(offs_t offset)
 {
 	if(!offset)
 		return (m_85_da ? 0 : 1) | (m_88_da ? 0 : 0x80);
@@ -370,7 +370,7 @@ READ8_MEMBER(alphatp_34_state::comm88_r)
 	return m_85_data;
 }
 
-WRITE8_MEMBER(alphatp_34_state::comm88_w)
+void alphatp_34_state::comm88_w(u8 data)
 {
 	m_88_data = data;
 	if(m_pic)
@@ -378,7 +378,7 @@ WRITE8_MEMBER(alphatp_34_state::comm88_w)
 	m_88_da = true;
 }
 
-READ8_MEMBER(alphatp_34_state::comm85_r)
+u8 alphatp_34_state::comm85_r(offs_t offset)
 {
 	if(!offset)
 		return m_88_da ? 0 : 1;
@@ -387,24 +387,24 @@ READ8_MEMBER(alphatp_34_state::comm85_r)
 	return m_88_data;
 }
 
-WRITE8_MEMBER(alphatp_34_state::comm85_w)
+void alphatp_34_state::comm85_w(u8 data)
 {
 	m_85_data = data;
 	m_85_da = true;
 	m_i8088->set_input_line(INPUT_LINE_TEST, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(alphatp_34_state::gfxext1_w)
+void alphatp_34_state::gfxext1_w(u8 data)
 {
 	m_gfxext1 = data;
 }
 
-WRITE8_MEMBER(alphatp_34_state::gfxext2_w)
+void alphatp_34_state::gfxext2_w(u8 data)
 {
 	m_gfxext2 = data;
 }
 
-WRITE8_MEMBER(alphatp_34_state::gfxext3_w)
+void alphatp_34_state::gfxext3_w(offs_t offset, u8 data)
 {
 	u16 mask = 0xff << (offset ? 0 : 8);
 	m_gfxext3 = (m_gfxext3 & mask) | (data << (offset * 8));
@@ -421,7 +421,7 @@ u8* alphatp_34_state::vramext_addr_xlate(offs_t offset)
 		return &m_vramchr[(((((m_gfxext2 & 0x8) << 2) ^ bank) * 48) + (offs - 80)) % (256*12)];
 }
 
-READ8_MEMBER(alphatp_34_state::gfxext_r)
+u8 alphatp_34_state::gfxext_r(offs_t offset)
 {
 	switch(m_gfxext1)
 	{
@@ -433,7 +433,7 @@ READ8_MEMBER(alphatp_34_state::gfxext_r)
 	return 0;
 }
 
-WRITE8_MEMBER(alphatp_34_state::gfxext_w)
+void alphatp_34_state::gfxext_w(offs_t offset, u8 data)
 {
 	switch(m_gfxext1)
 	{
@@ -469,7 +469,7 @@ READ_LINE_MEMBER(alphatp_12_state::kbd_matrix_r)
 	return m_kbdread;
 }
 
-WRITE8_MEMBER(alphatp_12_state::kbd_matrix_w)
+void alphatp_12_state::kbd_matrix_w(u8 data)
 {
 	if ((data & 0x80) && (!m_kbdclk))
 	{
@@ -482,13 +482,13 @@ WRITE8_MEMBER(alphatp_12_state::kbd_matrix_w)
 }
 
 // bit 2 is UPI-41 host IRQ to Z80
-WRITE8_MEMBER(alphatp_12_state::kbd_port2_w)
+void alphatp_12_state::kbd_port2_w(u8 data)
 {
 	m_kbdport2 = data;
 
 }
 
-READ8_MEMBER(alphatp_12_state::kbd_port2_r)
+u8 alphatp_12_state::kbd_port2_r()
 {
 	return m_kbdport2;
 }
@@ -502,7 +502,7 @@ READ_LINE_MEMBER(alphatp_34_state::kbd_matrix_r)
 	return m_kbdread;
 }
 
-WRITE8_MEMBER(alphatp_34_state::kbd_matrix_w)
+void alphatp_34_state::kbd_matrix_w(u8 data)
 {
 	if (data & 0x80)
 	{
@@ -516,13 +516,13 @@ WRITE8_MEMBER(alphatp_34_state::kbd_matrix_w)
 }
 
 // bit 2 is UPI-41 host IRQ to Z80
-WRITE8_MEMBER(alphatp_34_state::kbd_port2_w)
+void alphatp_34_state::kbd_port2_w(u8 data)
 {
 	m_kbdport2 = data;
 
 }
 
-READ8_MEMBER(alphatp_34_state::kbd_port2_r)
+u8 alphatp_34_state::kbd_port2_r()
 {
 	return m_kbdport2;
 }
@@ -595,7 +595,7 @@ PORT_START("COL.3")
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("4")           PORT_CODE(KEYCODE_4)        PORT_CHAR('4')      PORT_CHAR('$')
 
 PORT_START("COL.4")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Z")           PORT_CODE(KEYCODE_Z)        PORT_CHAR('z')      PORT_CHAR('Z')
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Z")           PORT_CODE(KEYCODE_Y)        PORT_CHAR('z')      PORT_CHAR('Z')
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("H")           PORT_CODE(KEYCODE_H)        PORT_CHAR('h')      PORT_CHAR('H')
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("N")           PORT_CODE(KEYCODE_N)        PORT_CHAR('n')      PORT_CHAR('N')
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN)
@@ -607,7 +607,7 @@ PORT_START("COL.5")
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("J")           PORT_CODE(KEYCODE_J)        PORT_CHAR('j')      PORT_CHAR('J')
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("M")           PORT_CODE(KEYCODE_M)        PORT_CHAR('m')      PORT_CHAR('M')
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("UP")          PORT_CODE(KEYCODE_UP)       PORT_CHAR(UCHAR_MAMEKEY(UP))        // 0x89
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Y")           PORT_CODE(KEYCODE_Y)        PORT_CHAR('y')      PORT_CHAR('Y')
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Y")           PORT_CODE(KEYCODE_Z)        PORT_CHAR('y')      PORT_CHAR('Y')
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("6")           PORT_CODE(KEYCODE_6)        PORT_CHAR('6')      PORT_CHAR('&')
 
 PORT_START("COL.6")
@@ -628,27 +628,27 @@ PORT_START("COL.7")
 
 PORT_START("COL.8")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P")           PORT_CODE(KEYCODE_P)        PORT_CHAR('p')      PORT_CHAR('P')
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ö Ö")         PORT_CODE(KEYCODE_COLON)    PORT_CHAR(0x00f6)   PORT_CHAR(0x00d6)
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"ö Ö")       PORT_CODE(KEYCODE_COLON)    PORT_CHAR(0x00f6)   PORT_CHAR(0x00d6)
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("- _")         PORT_CODE(KEYCODE_SLASH)    PORT_CHAR('-')      PORT_CHAR('_')
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("R_CTRL")      PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))  // 44h ->84h clear ?
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ENTER Pad")   PORT_CODE(KEYCODE_ENTER_PAD)PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9")           PORT_CODE(KEYCODE_9)        PORT_CHAR('9')      PORT_CHAR(')')
 
 PORT_START("COL.9")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ü Ü")         PORT_CODE(KEYCODE_OPENBRACE)PORT_CHAR(0x00fc)   PORT_CHAR(0x00dc)
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ä Ä")         PORT_CODE(KEYCODE_QUOTE)    PORT_CHAR(0x00e4)   PORT_CHAR(0x00c4)
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"ü Ü")       PORT_CODE(KEYCODE_OPENBRACE)PORT_CHAR(0x00fc)   PORT_CHAR(0x00dc)
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"ä Ä")       PORT_CODE(KEYCODE_QUOTE)    PORT_CHAR(0x00e4)   PORT_CHAR(0x00c4)
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("R_SHIFT")     PORT_CODE(KEYCODE_RSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0 Pad")       PORT_CODE(KEYCODE_0_PAD)    PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN)
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0")           PORT_CODE(KEYCODE_0)        PORT_CHAR('0')      PORT_CHAR('=')
 
 PORT_START("COL.10")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("+ *")        PORT_CODE(KEYCODE_CLOSEBRACE)PORT_CHAR('+')     PORT_CHAR('*')
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("+ *")         PORT_CODE(KEYCODE_CLOSEBRACE)PORT_CHAR('+')     PORT_CHAR('*')
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("# ^")         PORT_CODE(KEYCODE_BACKSLASH)PORT_CHAR('#')      PORT_CHAR('^')
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("[][]/ESC")    PORT_CODE(KEYCODE_ESC)      PORT_CHAR(UCHAR_MAMEKEY(ESC))           // Esc test this work ?!
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("DEL Pad")     PORT_CODE(KEYCODE_DEL_PAD)  PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN)
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ß ?")         PORT_CODE(KEYCODE_MINUS)    PORT_CHAR(0x00df)   PORT_CHAR('?')      // ß and ?
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"ß ?")       PORT_CODE(KEYCODE_MINUS)    PORT_CHAR(0x00df)   PORT_CHAR('?')      // ß and ?
 
 PORT_START("COL.11")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("TAB")         PORT_CODE(KEYCODE_TAB)      PORT_CHAR('\t')                         // TAB key
@@ -656,7 +656,7 @@ PORT_START("COL.11")
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1 Pad")       PORT_CODE(KEYCODE_1_PAD)    PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("+ Pad")       PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD))
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN)
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("´ `")         PORT_CODE(KEYCODE_EQUALS)   PORT_CHAR(0x00b4)   PORT_CHAR(0x0060)
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"´ `")       PORT_CODE(KEYCODE_EQUALS)   PORT_CHAR(0x00b4,'\'') PORT_CHAR(0x0060)
 
 PORT_START("COL.12")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("7 Pad")       PORT_CODE(KEYCODE_7_PAD)    PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
@@ -769,7 +769,7 @@ PORT_START("COL.3")
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("4")           PORT_CODE(KEYCODE_4)        PORT_CHAR('4')      PORT_CHAR('$')
 
 PORT_START("COL.4")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Z")           PORT_CODE(KEYCODE_Z)        PORT_CHAR('z')      PORT_CHAR('Z')
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Z")           PORT_CODE(KEYCODE_Y)        PORT_CHAR('z')      PORT_CHAR('Z')
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("H")           PORT_CODE(KEYCODE_H)        PORT_CHAR('h')      PORT_CHAR('H')
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("N")           PORT_CODE(KEYCODE_N)        PORT_CHAR('n')      PORT_CHAR('N')
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN)
@@ -781,7 +781,7 @@ PORT_START("COL.5")
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("J")           PORT_CODE(KEYCODE_J)        PORT_CHAR('j')      PORT_CHAR('J')
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("M")           PORT_CODE(KEYCODE_M)        PORT_CHAR('m')      PORT_CHAR('M')
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("UP")          PORT_CODE(KEYCODE_UP)       PORT_CHAR(UCHAR_MAMEKEY(UP))        // 0x89
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Y")           PORT_CODE(KEYCODE_Y)        PORT_CHAR('y')      PORT_CHAR('Y')
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Y")           PORT_CODE(KEYCODE_Z)        PORT_CHAR('y')      PORT_CHAR('Y')
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("6")           PORT_CODE(KEYCODE_6)        PORT_CHAR('6')      PORT_CHAR('&')
 
 PORT_START("COL.6")
@@ -802,27 +802,27 @@ PORT_START("COL.7")
 
 PORT_START("COL.8")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P")           PORT_CODE(KEYCODE_P)        PORT_CHAR('p')      PORT_CHAR('P')
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ö Ö")         PORT_CODE(KEYCODE_COLON)    PORT_CHAR(0x00f6)   PORT_CHAR(0x00d6)
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"ö Ö")       PORT_CODE(KEYCODE_COLON)    PORT_CHAR(0x00f6)   PORT_CHAR(0x00d6)
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("- _")         PORT_CODE(KEYCODE_SLASH)    PORT_CHAR('-')      PORT_CHAR('_')
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("R_CTRL")      PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))  // 44h ->84h clear ?
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ENTER Pad")   PORT_CODE(KEYCODE_ENTER_PAD)PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9")           PORT_CODE(KEYCODE_9)        PORT_CHAR('9')      PORT_CHAR(')')
 
 PORT_START("COL.9")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ü Ü")         PORT_CODE(KEYCODE_OPENBRACE)PORT_CHAR(0x00fc)   PORT_CHAR(0x00dc)
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ä Ä")         PORT_CODE(KEYCODE_QUOTE)    PORT_CHAR(0x00e4)   PORT_CHAR(0x00c4)
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"ü Ü")       PORT_CODE(KEYCODE_OPENBRACE)PORT_CHAR(0x00fc)   PORT_CHAR(0x00dc)
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"ä Ä")       PORT_CODE(KEYCODE_QUOTE)    PORT_CHAR(0x00e4)   PORT_CHAR(0x00c4)
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("R_SHIFT")     PORT_CODE(KEYCODE_RSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0 Pad")       PORT_CODE(KEYCODE_0_PAD)    PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN)
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0")           PORT_CODE(KEYCODE_0)        PORT_CHAR('0')      PORT_CHAR('=')
 
 PORT_START("COL.10")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("+ *")        PORT_CODE(KEYCODE_CLOSEBRACE)PORT_CHAR('+')     PORT_CHAR('*')
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("+ *")         PORT_CODE(KEYCODE_CLOSEBRACE)PORT_CHAR('+')     PORT_CHAR('*')
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("# ^")         PORT_CODE(KEYCODE_BACKSLASH)PORT_CHAR('#')      PORT_CHAR('^')
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("[][]/ESC")    PORT_CODE(KEYCODE_ESC)      PORT_CHAR(UCHAR_MAMEKEY(ESC))           // Esc test this work ?!
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("DEL Pad")     PORT_CODE(KEYCODE_DEL_PAD)  PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN)
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ß ?")         PORT_CODE(KEYCODE_MINUS)    PORT_CHAR(0x00df)   PORT_CHAR('?')      // ß and ?
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"ß ?")       PORT_CODE(KEYCODE_MINUS)    PORT_CHAR(0x00df)   PORT_CHAR('?')      // ß and ?
 
 PORT_START("COL.11")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("TAB")         PORT_CODE(KEYCODE_TAB)      PORT_CHAR('\t')                         // TAB key
@@ -830,7 +830,7 @@ PORT_START("COL.11")
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1 Pad")       PORT_CODE(KEYCODE_1_PAD)    PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("+ Pad")       PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD))
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN)
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("´ `")         PORT_CODE(KEYCODE_EQUALS)   PORT_CHAR(0x00b4)   PORT_CHAR(0x0060)
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"´ `")       PORT_CODE(KEYCODE_EQUALS)   PORT_CHAR(0x00b4,'\'') PORT_CHAR(0x0060)
 
 PORT_START("COL.12")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("7 Pad")       PORT_CODE(KEYCODE_7_PAD)    PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
@@ -901,33 +901,33 @@ static const gfx_layout extcharlayout =
 //  VIDEO - Alphatronic P1, P2, P2S, P2U and Hell 2069
 //**************************************************************************
 
-uint32_t alphatp_12_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 alphatp_12_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const pen_t *pen = m_palette->pens();
-	int start = m_crtc->upscroll_offset();
+	pen_t const *const pen = m_palette->pens();
+	int const start = m_crtc->upscroll_offset();
 	rectangle cursor;
 	m_crtc->cursor_bounds(cursor);
 	for (int y = 0; y < 24; y++)
 	{
-		int vramy = (start + y) % 24;
+		int const vramy = (start + y) % 24;
 		for (int x = 0; x < 80; x++)
 		{
-			uint8_t code = m_vram[(vramy * 128) + x];   // helwie44 must be 128d is 080h physical display-ram step line
+			u8 code = m_vram[(vramy * 128) + x];   // helwie44 must be 128d is 080h physical display-ram step line
 			// draw 12 lines of the character
-			bool cursoren = cursor.contains(x * 8, y * 12);
+			bool const cursoren = cursor.contains(x * 8, y * 12);
 			for (int line = 0; line < 12; line++)
 			{
-				uint8_t data = m_gfx[((code & 0x7f) * 16) + line];
+				u8 data = m_gfx[((code & 0x7f) * 16) + line];
 				if (cursoren)
 					data ^= 0xff;
-				bitmap.pix32(y * 12 + line, x * 8 + 0) = pen[BIT(data, 0) ^ BIT(code, 7)];
-				bitmap.pix32(y * 12 + line, x * 8 + 1) = pen[BIT(data, 1) ^ BIT(code, 7)];
-				bitmap.pix32(y * 12 + line, x * 8 + 2) = pen[BIT(data, 2) ^ BIT(code, 7)];
-				bitmap.pix32(y * 12 + line, x * 8 + 3) = pen[BIT(data, 3) ^ BIT(code, 7)];
-				bitmap.pix32(y * 12 + line, x * 8 + 4) = pen[BIT(data, 4) ^ BIT(code, 7)];
-				bitmap.pix32(y * 12 + line, x * 8 + 5) = pen[BIT(data, 5) ^ BIT(code, 7)];
-				bitmap.pix32(y * 12 + line, x * 8 + 6) = pen[BIT(data, 6) ^ BIT(code, 7)];
-				bitmap.pix32(y * 12 + line, x * 8 + 7) = pen[BIT(data, 7) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 0) = pen[BIT(data, 0) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 1) = pen[BIT(data, 1) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 2) = pen[BIT(data, 2) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 3) = pen[BIT(data, 3) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 4) = pen[BIT(data, 4) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 5) = pen[BIT(data, 5) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 6) = pen[BIT(data, 6) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 7) = pen[BIT(data, 7) ^ BIT(code, 7)];
 			}
 		}
 	}
@@ -943,25 +943,25 @@ static GFXDECODE_START( gfx_alphatp3 )
 	GFXDECODE_ENTRY("gfx", 0, charlayout, 0, 1)
 GFXDECODE_END
 
-uint32_t alphatp_34_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 alphatp_34_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const pen_t *pen = m_palette->pens();
-	int start = m_crtc->upscroll_offset();
+	pen_t const *const pen = m_palette->pens();
+	int const start = m_crtc->upscroll_offset();
 	rectangle cursor;
 	m_crtc->cursor_bounds(cursor);
-	bool scrext = m_scncfg->read() ? true : false;
+	bool const scrext = m_scncfg->read() ? true : false;
 	for (int y = 0; y < 24; y++)
 	{
-		int vramy = (start + y) % 24;
+		int const vramy = (start + y) % 24;
 		for (int x = 0; x < 80; x++)
 		{
-			uint8_t code = m_vram[(vramy * 128) + x];   // helwie44 must be 128d is 080h physical display-ram step line
+			u8 code = m_vram[(vramy * 128) + x];   // helwie44 must be 128d is 080h physical display-ram step line
 			// draw 12 lines of the character
-			bool cursoren = cursor.contains(x * 8, y * 12);
+			bool const cursoren = cursor.contains(x * 8, y * 12);
 			for (int line = 0; line < 12; line++)
 			{
 				u8 data = 0;
-				if(scrext)
+				if (scrext)
 				{
 					offs_t offset = (((vramy * 12) + line) * 80) + x;
 					if(offset < (371 * 80))
@@ -974,14 +974,14 @@ uint32_t alphatp_34_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 					if (cursoren)
 						data ^= 0xff;
 				}
-				bitmap.pix32(y * 12 + line, x * 8 + 0) = pen[BIT(data, 0) ^ BIT(code, 7)];
-				bitmap.pix32(y * 12 + line, x * 8 + 1) = pen[BIT(data, 1) ^ BIT(code, 7)];
-				bitmap.pix32(y * 12 + line, x * 8 + 2) = pen[BIT(data, 2) ^ BIT(code, 7)];
-				bitmap.pix32(y * 12 + line, x * 8 + 3) = pen[BIT(data, 3) ^ BIT(code, 7)];
-				bitmap.pix32(y * 12 + line, x * 8 + 4) = pen[BIT(data, 4) ^ BIT(code, 7)];
-				bitmap.pix32(y * 12 + line, x * 8 + 5) = pen[BIT(data, 5) ^ BIT(code, 7)];
-				bitmap.pix32(y * 12 + line, x * 8 + 6) = pen[BIT(data, 6) ^ BIT(code, 7)];
-				bitmap.pix32(y * 12 + line, x * 8 + 7) = pen[BIT(data, 7) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 0) = pen[BIT(data, 0) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 1) = pen[BIT(data, 1) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 2) = pen[BIT(data, 2) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 3) = pen[BIT(data, 3) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 4) = pen[BIT(data, 4) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 5) = pen[BIT(data, 5) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 6) = pen[BIT(data, 6) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 7) = pen[BIT(data, 7) ^ BIT(code, 7)];
 			}
 		}
 	}
@@ -993,7 +993,7 @@ uint32_t alphatp_34_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 //  SOUND - Alphatronic P1, P2, P2S, P2U and Hell 2069
 //**************************************************************************
 
-WRITE8_MEMBER( alphatp_12_state::beep_w )
+void alphatp_12_state::beep_w(u8 data)
 {
 	m_beep->set_state(data&1);
 }
@@ -1002,7 +1002,7 @@ WRITE8_MEMBER( alphatp_12_state::beep_w )
 //  SOUND - Alphatronic P3, P4, P30 and P40
 //**************************************************************************
 
-WRITE8_MEMBER( alphatp_34_state::beep_w )
+void alphatp_34_state::beep_w(u8 data)
 {
 	m_beep->set_state(data&1);
 }
@@ -1026,9 +1026,9 @@ WRITE_LINE_MEMBER(alphatp_12_state::fdchld_w)
 	m_fdc_hld = state;
 }
 
-READ8_MEMBER(alphatp_12_state::fdc_stat_r)
+u8 alphatp_12_state::fdc_stat_r()
 {
-	uint8_t res = 0;
+	u8 res = 0;
 	floppy_image_device *floppy1,*floppy2;
 	floppy1 = floppy2 = nullptr;
 
@@ -1046,18 +1046,18 @@ READ8_MEMBER(alphatp_12_state::fdc_stat_r)
 	return res;
 }
 
-READ8_MEMBER(alphatp_12_state::fdc_r)
+u8 alphatp_12_state::fdc_r(offs_t offset)
 {
 	return m_fdc->read(offset) ^ 0xff;
 }
 
-WRITE8_MEMBER(alphatp_12_state::fdc_w)
+void alphatp_12_state::fdc_w(offs_t offset, u8 data)
 {
 	m_fdc->write(offset, data ^ 0xff);
 }
 
 
-WRITE8_MEMBER(alphatp_12_state::fdc_cmd_w)
+void alphatp_12_state::fdc_cmd_w(u8 data)
 {
 	floppy_image_device *floppy = nullptr;
 
@@ -1109,9 +1109,9 @@ WRITE_LINE_MEMBER(alphatp_34_state::fdchld_w)
 	m_fdc_hld = state;
 }
 
-READ8_MEMBER(alphatp_34_state::fdc_stat_r)
+u8 alphatp_34_state::fdc_stat_r()
 {
-	uint8_t res = 0;
+	u8 res = 0;
 	floppy_image_device *floppy1 = m_floppy[0]->get_device();
 	floppy_image_device *floppy2 = m_floppy[1]->get_device();
 
@@ -1125,18 +1125,18 @@ READ8_MEMBER(alphatp_34_state::fdc_stat_r)
 	return res;
 }
 
-READ8_MEMBER(alphatp_34_state::fdc_r)
+u8 alphatp_34_state::fdc_r(offs_t offset)
 {
 	return m_fdc->read(offset) ^ 0xff;
 }
 
-WRITE8_MEMBER(alphatp_34_state::fdc_w)
+void alphatp_34_state::fdc_w(offs_t offset, u8 data)
 {
 	m_fdc->write(offset, data ^ 0xff);
 }
 
 
-WRITE8_MEMBER(alphatp_34_state::fdc_cmd_w)
+void alphatp_34_state::fdc_cmd_w(u8 data)
 {
 	floppy_image_device *floppy = nullptr;
 

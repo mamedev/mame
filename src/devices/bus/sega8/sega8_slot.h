@@ -51,16 +51,16 @@ public:
 	virtual ~device_sega8_cart_interface();
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_cart) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_cart) { }
-	virtual DECLARE_WRITE8_MEMBER(write_mapper) { }
+	virtual uint8_t read_cart(offs_t offset) { return 0xff; }
+	virtual void write_cart(offs_t offset, uint8_t data) { }
+	virtual void write_mapper(offs_t offset, uint8_t data) { }
 	virtual int get_lphaser_xoffs() { return m_lphaser_xoffs; }
 	// a few carts (for SG1000) acts as a RAM expansion, taking control of the system RAM in 0xc000-0xffff
-	virtual DECLARE_READ8_MEMBER(read_ram) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_ram) { }
+	virtual uint8_t read_ram(offs_t offset) { return 0xff; }
+	virtual void write_ram(offs_t offset, uint8_t data) { }
 	// the SC3000 has I/OR, I/OW lines connected
-	virtual DECLARE_READ8_MEMBER(read_io) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_io) { }
+	virtual uint8_t read_io(offs_t offset) { return 0xff; }
+	virtual void write_io(offs_t offset, uint8_t data) { }
 
 	void rom_alloc(uint32_t size, const char *tag);
 	void ram_alloc(uint32_t size);
@@ -143,13 +143,13 @@ public:
 	void save_ram() { if (m_cart && m_cart->get_ram_size()) m_cart->save_ram(); }
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_mapper);
-	virtual DECLARE_READ8_MEMBER(read_ram);
-	virtual DECLARE_WRITE8_MEMBER(write_ram);
-	virtual DECLARE_READ8_MEMBER(read_io);
-	virtual DECLARE_WRITE8_MEMBER(write_io);
+	uint8_t read_cart(offs_t offset);
+	void write_cart(offs_t offset, uint8_t data);
+	void write_mapper(offs_t offset, uint8_t data);
+	uint8_t read_ram(offs_t offset);
+	void write_ram(offs_t offset, uint8_t data);
+	uint8_t read_io(offs_t offset);
+	void write_io(offs_t offset, uint8_t data);
 
 	int get_lphaser_xoffs() { return m_cart ? m_cart->get_lphaser_xoffs() : -1; }
 	int get_sms_mode() { return m_cart->get_sms_mode(); }

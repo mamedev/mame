@@ -138,6 +138,9 @@ public:
 	uint8_t* get_nvram_base() { return &m_nvram[0]; }
 	uint32_t get_nvram_size() { return m_nvram.size(); }
 
+	// decrypt data lines
+	virtual void decrypt_rom() { };
+
 protected:
 	device_bbc_rom_interface(const machine_config &mconfig, device_t &device);
 

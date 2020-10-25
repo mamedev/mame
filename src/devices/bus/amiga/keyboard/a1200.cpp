@@ -130,7 +130,7 @@ INPUT_CHANGED_MEMBER(a1200_kbd_device::layout_changed)
 	m_mpu->set_input_line(M68HC05_IRQ_LINE, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
-READ8_MEMBER(a1200_kbd_device::mpu_portb_r)
+u8 a1200_kbd_device::mpu_portb_r()
 {
 	u8 result(m_host_kdat ? 0xff : 0xfe);
 	for (unsigned row = 0; m_rows.size() > row; ++row)
@@ -141,12 +141,12 @@ READ8_MEMBER(a1200_kbd_device::mpu_portb_r)
 	return result;
 }
 
-WRITE8_MEMBER(a1200_kbd_device::mpu_porta_w)
+void a1200_kbd_device::mpu_porta_w(offs_t offset, u8 data, u8 mem_mask)
 {
 	m_row_drive = (m_row_drive & 0xff00) | u16(u8(data | ~mem_mask));
 }
 
-WRITE8_MEMBER(a1200_kbd_device::mpu_portb_w)
+void a1200_kbd_device::mpu_portb_w(offs_t offset, u8 data, u8 mem_mask)
 {
 	u8 const kdat(BIT(data, 0) | BIT(~mem_mask, 0));
 	m_host->kdat_w(kdat ? 1 : 0);
@@ -161,7 +161,7 @@ WRITE8_MEMBER(a1200_kbd_device::mpu_portb_w)
 	}
 }
 
-WRITE8_MEMBER(a1200_kbd_device::mpu_portc_w)
+void a1200_kbd_device::mpu_portc_w(offs_t offset, u8 data, u8 mem_mask)
 {
 	m_row_drive = (m_row_drive & 0x80ff) | (u16(u8(data | ~mem_mask) & 0x7f) << 8);
 	m_led_kbd_caps = BIT(~data, 7);

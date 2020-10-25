@@ -308,7 +308,10 @@ void arm_iomd_device::device_reset()
 
 	m_sound_dma_on = false;
 	for (i=0; i<sounddma_ch_size; i++)
+	{
 		m_sndbuffer_ok[i] = false;
+		m_sndcur_reg[i] = 0;
+	}
 
 	// ...
 }
@@ -339,7 +342,7 @@ void arm_iomd_device::device_timer(emu_timer &timer, device_timer_id id, int par
 //**************************************************************************
 
 // TODO: nINT1
-READ32_MEMBER( arm_iomd_device::iocr_r )
+u32 arm_iomd_device::iocr_r()
 {
 	u8 res = 0;
 
@@ -350,7 +353,7 @@ READ32_MEMBER( arm_iomd_device::iocr_r )
 	return (m_vidc->flyback_r() << 7) | 0x34 | (res & m_iocr_ddr);
 }
 
-WRITE32_MEMBER( arm_iomd_device::iocr_w )
+void arm_iomd_device::iocr_w(u32 data)
 {
 	m_iocr_ddr = (data & 0x0b);
 	m_iocr_write_id_cb(BIT(m_iocr_ddr,3));
@@ -358,7 +361,7 @@ WRITE32_MEMBER( arm_iomd_device::iocr_w )
 	m_iocr_write_od_cb[0](BIT(m_iocr_ddr,0));
 }
 
-READ32_MEMBER( arm_iomd_device::kbddat_r )
+u32 arm_iomd_device::kbddat_r()
 {
 	if (m_kbdc.found())
 		return m_kbdc->data_r();
@@ -367,7 +370,7 @@ READ32_MEMBER( arm_iomd_device::kbddat_r )
 	return 0xff;
 }
 
-READ32_MEMBER( arm_iomd_device::kbdcr_r )
+u32 arm_iomd_device::kbdcr_r()
 {
 	if (m_kbdc.found())
 		return m_kbdc->status_r();
@@ -376,7 +379,7 @@ READ32_MEMBER( arm_iomd_device::kbdcr_r )
 	return 0xff;
 }
 
-WRITE32_MEMBER( arm_iomd_device::kbddat_w )
+void arm_iomd_device::kbddat_w(u32 data)
 {
 	if (m_kbdc.found())
 	{
@@ -387,7 +390,7 @@ WRITE32_MEMBER( arm_iomd_device::kbddat_w )
 	logerror("%s attempted to write %02x on kbddat with no controller\n", this->tag(),data & 0xff);
 }
 
-WRITE32_MEMBER( arm_iomd_device::kbdcr_w )
+void arm_iomd_device::kbdcr_w(u32 data)
 {
 	if (m_kbdc.found())
 	{
@@ -398,23 +401,23 @@ WRITE32_MEMBER( arm_iomd_device::kbdcr_w )
 	logerror("%s attempted to write %02x on kbdcr with no controller\n", this->tag(),data & 0xff);
 }
 
-READ32_MEMBER( arm7500fe_iomd_device::msecr_r )
+u32 arm7500fe_iomd_device::msecr_r()
 {
 	// a7000p wants a TX empty otherwise it outright refuses to boot.
 	return 0x80;
 }
 
-WRITE32_MEMBER( arm7500fe_iomd_device::msecr_w )
+void arm7500fe_iomd_device::msecr_w(u32 data)
 {
 	// ...
 }
 
-READ32_MEMBER( arm7500fe_iomd_device::iolines_r )
+u32 arm7500fe_iomd_device::iolines_r()
 {
 	return m_iolines_read_cb() & m_iolines_ddr;
 }
 
-WRITE32_MEMBER( arm7500fe_iomd_device::iolines_w )
+void arm7500fe_iomd_device::iolines_w(u32 data)
 {
 	m_iolines_ddr = data;
 	m_iolines_write_cb(m_iolines_ddr);
@@ -440,22 +443,22 @@ template <unsigned Which> inline void arm_iomd_device::trigger_irq(u8 irq_type)
 	flush_irq(Which);
 }
 
-template <unsigned Which> READ32_MEMBER( arm_iomd_device::irqst_r )
+template <unsigned Which> u32 arm_iomd_device::irqst_r()
 {
 	return m_irq_status[Which];
 }
 
-template <unsigned Which> READ32_MEMBER( arm_iomd_device::irqrq_r )
+template <unsigned Which> u32 arm_iomd_device::irqrq_r()
 {
 	return m_irq_status[Which] & m_irq_mask[Which];
 }
 
-template <unsigned Which> READ32_MEMBER( arm_iomd_device::irqmsk_r )
+template <unsigned Which> u32 arm_iomd_device::irqmsk_r()
 {
 	return m_irq_mask[Which];
 }
 
-template <unsigned Which> WRITE32_MEMBER( arm_iomd_device::irqrq_w )
+template <unsigned Which> void arm_iomd_device::irqrq_w(u32 data)
 {
 	u8 res = m_irq_status[Which] & ~data;
 	if (Which == IRQA)
@@ -464,7 +467,7 @@ template <unsigned Which> WRITE32_MEMBER( arm_iomd_device::irqrq_w )
 	flush_irq(Which);
 }
 
-template <unsigned Which> WRITE32_MEMBER( arm_iomd_device::irqmsk_w )
+template <unsigned Which> void arm_iomd_device::irqmsk_w(u32 data)
 {
 	m_irq_mask[Which] = data & 0xff;
 	flush_irq(Which);
@@ -476,12 +479,12 @@ inline void arm7500fe_iomd_device::refresh_host_cpu_clocks()
 	m_host_cpu->set_unscaled_clock(this->clock() >> (m_cpuclk_divider == false));
 }
 
-READ32_MEMBER( arm7500fe_iomd_device::clkctl_r )
+u32 arm7500fe_iomd_device::clkctl_r()
 {
 	return (m_cpuclk_divider << 2) | (m_memclk_divider << 1) | (m_ioclk_divider);
 }
 
-WRITE32_MEMBER( arm7500fe_iomd_device::clkctl_w )
+void arm7500fe_iomd_device::clkctl_w(u32 data)
 {
 	m_cpuclk_divider = BIT(data, 2);
 	m_memclk_divider = BIT(data, 1);
@@ -503,33 +506,33 @@ inline void arm_iomd_device::trigger_timer(unsigned Which)
 }
 
 // TODO: live updates aren't really supported here
-template <unsigned Which> READ32_MEMBER( arm_iomd_device::tNlow_r )
+template <unsigned Which> u32 arm_iomd_device::tNlow_r()
 {
 	return m_timer_out[Which] & 0xff;
 }
 
-template <unsigned Which> READ32_MEMBER( arm_iomd_device::tNhigh_r )
+template <unsigned Which> u32 arm_iomd_device::tNhigh_r()
 {
 	return (m_timer_out[Which] >> 8) & 0xff;
 }
 
-template <unsigned Which> WRITE32_MEMBER( arm_iomd_device::tNlow_w )
+template <unsigned Which> void arm_iomd_device::tNlow_w(u32 data)
 {
 	m_timer_in[Which] = (m_timer_in[Which] & 0xff00) | (data & 0xff);
 }
 
-template <unsigned Which> WRITE32_MEMBER( arm_iomd_device::tNhigh_w )
+template <unsigned Which> void arm_iomd_device::tNhigh_w(u32 data)
 {
 	m_timer_in[Which] = (m_timer_in[Which] & 0x00ff) | ((data & 0xff) << 8);
 }
 
-template <unsigned Which> WRITE32_MEMBER( arm_iomd_device::tNgo_w )
+template <unsigned Which> void arm_iomd_device::tNgo_w(u32 data)
 {
 	m_timer_counter[Which] = m_timer_in[Which];
 	trigger_timer(Which);
 }
 
-template <unsigned Which> WRITE32_MEMBER( arm_iomd_device::tNlatch_w )
+template <unsigned Which> void arm_iomd_device::tNlatch_w(u32 data)
 {
 	m_timer_readinc[Which] ^=1;
 	m_timer_out[Which] = m_timer_counter[Which];
@@ -542,28 +545,28 @@ template <unsigned Which> WRITE32_MEMBER( arm_iomd_device::tNlatch_w )
 }
 
 // device identifiers
-template <unsigned Nibble> READ32_MEMBER( arm_iomd_device::id_r )
+template <unsigned Nibble> u32 arm_iomd_device::id_r()
 {
 	return (m_id >> (Nibble*8)) & 0xff;
 }
 
-READ32_MEMBER( arm_iomd_device::version_r )
+u32 arm_iomd_device::version_r()
 {
 	return m_version;
 }
 
-DECLARE_READ32_MEMBER( version_r );
+u32 version_r();
 
 // sound DMA
 
-template <unsigned Which> READ32_MEMBER( arm_iomd_device::sdcur_r ) { return m_sndcur_reg[Which]; }
-template <unsigned Which> WRITE32_MEMBER( arm_iomd_device::sdcur_w ) { COMBINE_DATA(&m_sndcur_reg[Which]); }
-template <unsigned Which> READ32_MEMBER( arm_iomd_device::sdend_r )
+template <unsigned Which> u32 arm_iomd_device::sdcur_r() { return m_sndcur_reg[Which]; }
+template <unsigned Which> void arm_iomd_device::sdcur_w(offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_sndcur_reg[Which]); }
+template <unsigned Which> u32 arm_iomd_device::sdend_r()
 {
 	return (m_sndstop_reg[Which] << 31) | (m_sndlast_reg[Which] << 30) | (m_sndend_reg[Which] & 0x00fffff0);
 }
 
-template <unsigned Which> WRITE32_MEMBER( arm_iomd_device::sdend_w )
+template <unsigned Which> void arm_iomd_device::sdend_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_sndend_reg[Which]);
 	m_sndend_reg[Which] &= 0x00fffff0;
@@ -571,12 +574,12 @@ template <unsigned Which> WRITE32_MEMBER( arm_iomd_device::sdend_w )
 	m_sndlast_reg[Which] = BIT(data, 30);
 }
 
-READ32_MEMBER( arm_iomd_device::sdcr_r )
+u32 arm_iomd_device::sdcr_r()
 {
 	return (m_sound_dma_on << 5) | dmaid_size;
 }
 
-WRITE32_MEMBER( arm_iomd_device::sdcr_w )
+void arm_iomd_device::sdcr_w(u32 data)
 {
 	m_sound_dma_on = BIT(data, 5);
 
@@ -594,18 +597,18 @@ WRITE32_MEMBER( arm_iomd_device::sdcr_w )
 	// TODO: bit 7 resets sound DMA
 }
 
-READ32_MEMBER( arm_iomd_device::sdst_r )
+u32 arm_iomd_device::sdst_r()
 {
 	return (m_snd_overrun << 2) | (m_snd_int << 1) | m_sndcur_buffer;
 }
 
 // video DMA
-READ32_MEMBER( arm_iomd_device::cursinit_r )
+u32 arm_iomd_device::cursinit_r()
 {
 	return m_cursinit;
 }
 
-WRITE32_MEMBER( arm_iomd_device::cursinit_w )
+void arm_iomd_device::cursinit_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_cursinit);
 	m_cursinit &= 0x1ffffff0;
@@ -613,14 +616,14 @@ WRITE32_MEMBER( arm_iomd_device::cursinit_w )
 	m_vidc->set_cursor_enable(m_cursor_enable);
 }
 
-READ32_MEMBER( arm_iomd_device::vidcr_r )
+u32 arm_iomd_device::vidcr_r()
 {
 	// bit 6: DRAM mode
 	// bits 4-0: qword transfer
 	return 0x40 | (m_video_enable << 5) | dmaid_size;
 }
 
-WRITE32_MEMBER( arm_iomd_device::vidcr_w )
+void arm_iomd_device::vidcr_w(u32 data)
 {
 	m_video_enable = BIT(data, 5);
 	if (m_video_enable == false)
@@ -633,23 +636,23 @@ WRITE32_MEMBER( arm_iomd_device::vidcr_w )
 		throw emu_fatalerror("%s VIDCR LCD dual panel mode enabled", this->tag());
 }
 
-READ32_MEMBER( arm_iomd_device::vidend_r )
+u32 arm_iomd_device::vidend_r()
 {
 	return (m_vidend & 0x00fffff0);
 }
 
-WRITE32_MEMBER( arm_iomd_device::vidend_w )
+void arm_iomd_device::vidend_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_vidend);
 	m_vidend &= 0x00fffff0;
 }
 
-READ32_MEMBER( arm_iomd_device::vidinita_r )
+u32 arm_iomd_device::vidinita_r()
 {
 	return (m_vidlast << 30) | (m_videqual << 29) | (m_vidinita & 0x1ffffff0);
 }
 
-WRITE32_MEMBER( arm_iomd_device::vidinita_w )
+void arm_iomd_device::vidinita_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_vidinita);
 	m_vidinita &= 0x1ffffff0;

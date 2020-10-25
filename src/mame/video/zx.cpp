@@ -50,7 +50,7 @@ void zx_state::zx_ula_hsync()
 	recalc_hsync();
 }
 
-WRITE8_MEMBER(zx_state::refresh_w)
+void zx_state::refresh_w(offs_t offset, uint8_t data)
 {
 	if((offset ^ m_prev_refresh) & 0x40)
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, offset & 0x40 ? CLEAR_LINE : ASSERT_LINE);
@@ -67,7 +67,7 @@ WRITE8_MEMBER(zx_state::refresh_w)
 		if(m_ula_char_buffer & 0x80)
 			pixels = ~pixels;
 		if(x < 384-8 && y < 311) {
-			uint16_t *dest = &m_bitmap_render->pix16(y, x);
+			uint16_t *dest = &m_bitmap_render->pix(y, x);
 			for(int i=0; i<8; i++)
 				*dest++ |= pixels & (0x80 >> i) ? 1 : 0;
 		}
@@ -92,7 +92,7 @@ void zx_state::recalc_hsync()
 	m_ula_hsync->adjust(m_maincpu->cycles_to_attotime(delta));
 }
 
-READ8_MEMBER(zx_state::ula_low_r)
+uint8_t zx_state::ula_low_r(offs_t offset)
 {
 	uint8_t cdata = m_program->read_byte(offset);
 	if(machine().side_effects_disabled())
@@ -110,7 +110,7 @@ READ8_MEMBER(zx_state::ula_low_r)
 	return cdata;
 }
 
-READ8_MEMBER(zx_state::ula_high_r)
+uint8_t zx_state::ula_high_r(offs_t offset)
 {
 	uint8_t cdata = m_program->read_byte(offset);
 

@@ -66,22 +66,22 @@ ekara_rom_i2c_24lc02_gc0010_device::ekara_rom_i2c_24lc02_gc0010_device(const mac
 
 // plain
 
-READ8_MEMBER(ekara_rom_plain_device::read_cart)
+uint8_t ekara_rom_plain_device::read_cart(offs_t offset)
 {
-	return read_rom(space, offset, mem_mask);
+	return read_rom(offset);
 }
 
-READ8_MEMBER(ekara_rom_plain_device::read_rom)
+uint8_t ekara_rom_plain_device::read_rom(offs_t offset)
 {
 	return m_rom[offset & (m_rom_size-1)];
 }
 
-WRITE8_MEMBER(ekara_rom_plain_device::write_cart)
+void ekara_rom_plain_device::write_cart(offs_t offset, uint8_t data)
 {
-	write_rom(space, offset, data, mem_mask);
+	write_rom(offset, data);
 }
 
-WRITE8_MEMBER(ekara_rom_plain_device::write_rom)
+void ekara_rom_plain_device::write_rom(offs_t offset, uint8_t data)
 {
 	logerror("ekara_rom_plain_device::write_rom %08x %02x\n", offset, data);
 }
@@ -98,30 +98,30 @@ bool ekara_rom_i2c_base_device::is_write_access_not_rom(void)
 	return (m_buscontrol[0] & 0x08) ? true : false;
 }
 
-WRITE8_MEMBER(ekara_rom_i2c_base_device::write_bus_control)
+void ekara_rom_i2c_base_device::write_bus_control(offs_t offset, uint8_t data)
 {
 	logerror("ekara_rom_i2c_base_device::write_bus_control %08x %02x\n", offset, data);
 	m_buscontrol[offset] = data;
 }
 
-WRITE8_MEMBER(ekara_rom_i2c_base_device::write_rom)
+void ekara_rom_i2c_base_device::write_rom(offs_t offset, uint8_t data)
 {
 	logerror("ekara_rom_i2c_base_device::write_rom %08x %02x\n", offset, data);
 }
 
-READ8_MEMBER(ekara_rom_i2c_base_device::read_rom)
+uint8_t ekara_rom_i2c_base_device::read_rom(offs_t offset)
 {
 	return m_rom[offset & (m_rom_size - 1)];
 }
 
-READ8_MEMBER(ekara_rom_i2c_base_device::read_extra)
+uint8_t ekara_rom_i2c_base_device::read_extra(offs_t offset)
 {
 	logerror("ekara_rom_i2c_base_device::read_extra %08x\n", offset);
 
 	return (m_i2cmem->read_sda() & 1) ? 0xff : 0x00;
 }
 
-WRITE8_MEMBER(ekara_rom_i2c_base_device::write_extra)
+void ekara_rom_i2c_base_device::write_extra(offs_t offset, uint8_t data)
 {
 	logerror("ekara_rom_i2c_base_device::write_extra %08x %02x\n", offset, data);
 
@@ -177,12 +177,12 @@ bool ekara_rom_i2c_24lc02_gc0010_device::is_write_access_not_rom(void)
 	return false;
 }
 
-READ8_MEMBER(ekara_rom_i2c_24lc02_gc0010_device::read_extra)
+uint8_t ekara_rom_i2c_24lc02_gc0010_device::read_extra(offs_t offset)
 {
 	return 0;
 }
 
-WRITE8_MEMBER(ekara_rom_i2c_24lc02_gc0010_device::write_extra)
+void ekara_rom_i2c_24lc02_gc0010_device::write_extra(offs_t offset, uint8_t data)
 {
 }
 

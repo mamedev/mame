@@ -74,8 +74,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( motor0_w );
 	DECLARE_WRITE_LINE_MEMBER( motor1_w );
 
-	DECLARE_READ8_MEMBER( ls259_r );
-	DECLARE_READ8_MEMBER( pia_pa_r );
+	uint8_t ls259_r(offs_t offset);
+	uint8_t pia_pa_r();
 	DECLARE_WRITE_LINE_MEMBER( pia_cb2_w );
 	DECLARE_WRITE_LINE_MEMBER( pit_out2_w );
 	DECLARE_READ_LINE_MEMBER( ay3600_shift_r );

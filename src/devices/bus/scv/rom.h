@@ -18,7 +18,7 @@ public:
 	scv_rom8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_cart) override;
+	virtual uint8_t read_cart(offs_t offset) override;
 
 protected:
 	scv_rom8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -37,7 +37,7 @@ public:
 	scv_rom16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_cart) override;
+	virtual uint8_t read_cart(offs_t offset) override;
 };
 
 
@@ -50,7 +50,7 @@ public:
 	scv_rom32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_cart) override;
+	virtual uint8_t read_cart(offs_t offset) override;
 };
 
 
@@ -63,9 +63,9 @@ public:
 	scv_rom32ram8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_cart) override;
-	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
-	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
+	virtual uint8_t read_cart(offs_t offset) override;
+	virtual void write_cart(offs_t offset, uint8_t data) override;
+	virtual void write_bank(uint8_t data) override;
 
 protected:
 	// device-level overrides
@@ -90,8 +90,8 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_cart) override;
-	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
+	virtual uint8_t read_cart(offs_t offset) override;
+	virtual void write_bank(uint8_t data) override;
 
 private:
 	uint8_t m_bank_base;
@@ -107,8 +107,8 @@ public:
 	scv_rom128_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_cart) override;
-	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
+	virtual uint8_t read_cart(offs_t offset) override;
+	virtual void write_bank(uint8_t data) override;
 
 protected:
 	// device-level overrides
@@ -129,9 +129,9 @@ public:
 	scv_rom128ram4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_cart) override;
-	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
-	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
+	virtual uint8_t read_cart(offs_t offset) override;
+	virtual void write_cart(offs_t offset, uint8_t data) override;
+	virtual void write_bank(uint8_t data) override;
 
 protected:
 	// device-level overrides

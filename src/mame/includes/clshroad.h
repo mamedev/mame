@@ -40,12 +40,12 @@ public:
 	tilemap_t *m_tilemap_0b;
 	tilemap_t *m_tilemap_1;
 
-	DECLARE_READ8_MEMBER(input_r);
+	uint8_t input_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(main_irq_mask_w);
 	DECLARE_WRITE_LINE_MEMBER(sound_irq_mask_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
-	DECLARE_WRITE8_MEMBER(vram_0_w);
-	DECLARE_WRITE8_MEMBER(vram_1_w);
+	void vram_0_w(offs_t offset, uint8_t data);
+	void vram_1_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_tile_info_0a);
 	TILE_GET_INFO_MEMBER(get_tile_info_0b);

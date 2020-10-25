@@ -30,7 +30,7 @@ private:
 	static const device_timer_id TIMER_CTRL_POLL = 0;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	DECLARE_WRITE16_MEMBER(vii_portb_w);
+	void vii_portb_w(uint16_t data);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load_vii);
 
@@ -60,7 +60,7 @@ void vii_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 	}
 }
 
-WRITE16_MEMBER(vii_state::vii_portb_w)
+void vii_state::vii_portb_w(uint16_t data)
 {
 	switch_bank(((data & 0x80) >> 7) | ((data & 0x20) >> 4));
 }

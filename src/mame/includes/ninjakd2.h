@@ -41,13 +41,13 @@ public:
 	void init_bootleg();
 
 protected:
-	DECLARE_WRITE8_MEMBER(ninjakd2_bgvideoram_w);
-	DECLARE_WRITE8_MEMBER(ninjakd2_fgvideoram_w);
-	DECLARE_WRITE8_MEMBER(ninjakd2_bg_ctrl_w);
-	DECLARE_WRITE8_MEMBER(ninjakd2_sprite_overdraw_w);
+	void ninjakd2_bgvideoram_w(offs_t offset, uint8_t data);
+	void ninjakd2_fgvideoram_w(offs_t offset, uint8_t data);
+	void ninjakd2_bg_ctrl_w(offs_t offset, uint8_t data);
+	void ninjakd2_sprite_overdraw_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(ninjakd2_bankselect_w);
-	DECLARE_WRITE8_MEMBER(ninjakd2_soundreset_w);
+	void ninjakd2_bankselect_w(uint8_t data);
+	void ninjakd2_soundreset_w(uint8_t data);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
@@ -66,7 +66,7 @@ protected:
 
 	void video_init_common();
 
-	DECLARE_WRITE8_MEMBER(ninjakd2_pcm_play_w);
+	void ninjakd2_pcm_play_w(uint8_t data);
 	SAMPLES_START_CB_MEMBER(ninjakd2_init_samples);
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -142,10 +142,10 @@ public:
 	void init_robokidj();
 
 protected:
-	template<int Layer> DECLARE_READ8_MEMBER(robokid_bg_videoram_r);
-	template<int Layer> DECLARE_WRITE8_MEMBER(robokid_bg_videoram_w);
-	template<int Layer> DECLARE_WRITE8_MEMBER(robokid_bg_ctrl_w);
-	template<int Layer> DECLARE_WRITE8_MEMBER(robokid_bg_bank_w);
+	template<int Layer> uint8_t robokid_bg_videoram_r(offs_t offset);
+	template<int Layer> void robokid_bg_videoram_w(offs_t offset, uint8_t data);
+	template<int Layer> void robokid_bg_ctrl_w(offs_t offset, uint8_t data);
+	template<int Layer> void robokid_bg_bank_w(uint8_t data);
 	tilemap_t* m_robokid_tilemap[3];
 
 	void video_init_banked(uint32_t vram_alloc_size);
@@ -155,7 +155,7 @@ protected:
 	void robokid_main_cpu(address_map &map);
 
 private:
-	DECLARE_READ8_MEMBER(motion_error_verbose_r);
+	uint8_t motion_error_verbose_r();
 
 	DECLARE_VIDEO_START(robokid);
 	uint32_t screen_update_robokid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -181,9 +181,9 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_READ8_MEMBER(unk_r);
-	DECLARE_READ8_MEMBER(io_protection_r);
-	DECLARE_WRITE8_MEMBER(io_protection_w);
+	uint8_t unk_r();
+	uint8_t io_protection_r(offs_t offset);
+	void io_protection_w(offs_t offset, uint8_t data);
 
 	void omegaf_main_cpu(address_map &map);
 

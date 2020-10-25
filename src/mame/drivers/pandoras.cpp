@@ -34,7 +34,6 @@ Boards:
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -65,7 +64,7 @@ WRITE_LINE_MEMBER(pandoras_state::cpub_irq_enable_w)
 	m_irq_enable_b = state;
 }
 
-WRITE8_MEMBER(pandoras_state::pandoras_cpua_irqtrigger_w)
+void pandoras_state::pandoras_cpua_irqtrigger_w(uint8_t data)
 {
 	if (!m_firq_old_data_a && data)
 		m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
@@ -73,7 +72,7 @@ WRITE8_MEMBER(pandoras_state::pandoras_cpua_irqtrigger_w)
 	m_firq_old_data_a = data;
 }
 
-WRITE8_MEMBER(pandoras_state::pandoras_cpub_irqtrigger_w)
+void pandoras_state::pandoras_cpub_irqtrigger_w(uint8_t data)
 {
 	if (!m_firq_old_data_b && data)
 		m_subcpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
@@ -81,12 +80,12 @@ WRITE8_MEMBER(pandoras_state::pandoras_cpub_irqtrigger_w)
 	m_firq_old_data_b = data;
 }
 
-WRITE8_MEMBER(pandoras_state::pandoras_i8039_irqtrigger_w)
+void pandoras_state::pandoras_i8039_irqtrigger_w(uint8_t data)
 {
 	m_mcu->set_input_line(0, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(pandoras_state::i8039_irqen_and_status_w)
+void pandoras_state::i8039_irqen_and_status_w(uint8_t data)
 {
 	/* bit 7 enables IRQ */
 	if ((data & 0x80) == 0)
@@ -96,7 +95,7 @@ WRITE8_MEMBER(pandoras_state::i8039_irqen_and_status_w)
 	m_i8039_status = (data & 0x20) >> 5;
 }
 
-WRITE8_MEMBER(pandoras_state::pandoras_z80_irqtrigger_w)
+void pandoras_state::pandoras_z80_irqtrigger_w(uint8_t data)
 {
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
@@ -295,12 +294,12 @@ void pandoras_state::machine_reset()
 	m_i8039_status = 0;
 }
 
-READ8_MEMBER(pandoras_state::pandoras_portA_r)
+uint8_t pandoras_state::pandoras_portA_r()
 {
 	return m_i8039_status;
 }
 
-READ8_MEMBER(pandoras_state::pandoras_portB_r)
+uint8_t pandoras_state::pandoras_portB_r()
 {
 	return (m_audiocpu->total_cycles() / 512) & 0x0f;
 }
@@ -361,9 +360,6 @@ void pandoras_state::pandoras(machine_config &config)
 	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.4);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.12); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 

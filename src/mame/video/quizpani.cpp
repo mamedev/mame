@@ -36,19 +36,19 @@ TILE_GET_INFO_MEMBER(quizpani_state::txt_tile_info)
 			0);
 }
 
-WRITE16_MEMBER(quizpani_state::bg_videoram_w)
+void quizpani_state::bg_videoram_w(offs_t offset, uint16_t data)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(quizpani_state::txt_videoram_w)
+void quizpani_state::txt_videoram_w(offs_t offset, uint16_t data)
 {
 	m_txt_videoram[offset] = data;
 	m_txt_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(quizpani_state::tilesbank_w)
+void quizpani_state::tilesbank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{

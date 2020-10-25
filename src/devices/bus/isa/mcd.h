@@ -33,10 +33,10 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	DECLARE_READ8_MEMBER(data_r);
-	DECLARE_READ8_MEMBER(flag_r);
-	DECLARE_WRITE8_MEMBER(cmd_w);
-	DECLARE_WRITE8_MEMBER(reset_w);
+	uint8_t data_r();
+	uint8_t flag_r();
+	void cmd_w(uint8_t data);
+	void reset_w(uint8_t data);
 
 	void map(address_map &map);
 

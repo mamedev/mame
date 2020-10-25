@@ -39,8 +39,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	DECLARE_READ8_MEMBER(wd1770_state_r);
-	DECLARE_WRITE8_MEMBER(wd1770_control_w);
+	uint8_t wd1770_state_r();
+	void wd1770_control_w(uint8_t data);
 
 	required_device<wd_fdc_device_base> m_fdc;
 	required_device_array<floppy_connector, 3> m_floppy;

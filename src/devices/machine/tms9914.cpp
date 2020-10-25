@@ -507,6 +507,9 @@ void tms9914_device::device_reset()
 	m_reg_parallel_p = 0;
 	m_reg_2nd_parallel_p = 0;
 
+	m_reg_ulpa = false;
+	std::fill(std::begin(m_ext_signals), std::end(m_ext_signals), false);
+
 	do_swrst();
 	update_fsm();
 	update_int();

@@ -13,24 +13,29 @@
 #include "machine/6522via.h"
 #include "machine/74259.h"
 #include "machine/adc0808.h"
-#include "machine/atarigen.h"
 #include "machine/gen_latch.h"
 #include "machine/input_merger.h"
+#include "machine/slapstic.h"
 #include "machine/timer.h"
 #include "sound/tms5220.h"
 #include "sound/ym2151.h"
 #include "video/atarimo.h"
 #include "emupal.h"
+#include "screen.h"
 #include "tilemap.h"
 
-class atarisy1_state : public atarigen_state
+class atarisy1_state : public driver_device
 {
 public:
 	atarisy1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: atarigen_state(mconfig, type, tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
 		, m_soundlatch(*this, "soundlatch")
 		, m_mainlatch(*this, "mainlatch")
+		, m_slapstic(*this, "slapstic")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
 		, m_mob(*this, "mob")
 		, m_palette(*this, "palette")
 		, m_adc(*this, "adc")
@@ -65,10 +70,14 @@ protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
+	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_mainlatch;
+	required_device<atari_slapstic_device> m_slapstic;
 
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
 	required_device<atari_motion_objects_device> m_mob;
 	required_device<palette_device> m_palette;
 
@@ -126,12 +135,12 @@ protected:
 	virtual void update_timers(int scanline);
 	void decode_gfx(uint16_t *pflookup, uint16_t *molookup);
 	int get_bank(uint8_t prom1, uint8_t prom2, int bpp);
-	DECLARE_READ16_MEMBER( atarisy1_int3state_r );
-	DECLARE_WRITE16_MEMBER( atarisy1_spriteram_w );
+	uint16_t atarisy1_int3state_r();
+	void atarisy1_spriteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void bankselect_w(uint8_t data);
-	DECLARE_WRITE16_MEMBER( atarisy1_xscroll_w );
-	DECLARE_WRITE16_MEMBER( atarisy1_yscroll_w );
-	DECLARE_WRITE16_MEMBER( atarisy1_priority_w );
+	void atarisy1_xscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void atarisy1_yscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void atarisy1_priority_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	static const atari_motion_objects_config s_mob_config;
 	void add_adc(machine_config &config);

@@ -71,24 +71,24 @@ protected:
 
 private:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
-	DECLARE_WRITE8_MEMBER(port_ff_w);
-	DECLARE_WRITE8_MEMBER(lnw80_fe_w);
-	DECLARE_WRITE8_MEMBER(sys80_fe_w);
-	DECLARE_WRITE8_MEMBER(sys80_f8_w);
-	DECLARE_WRITE8_MEMBER(port_ea_w);
-	DECLARE_WRITE8_MEMBER(port_e8_w);
-	DECLARE_READ8_MEMBER(lnw80_fe_r);
-	DECLARE_READ8_MEMBER(port_ff_r);
-	DECLARE_READ8_MEMBER(sys80_f9_r);
-	DECLARE_READ8_MEMBER(port_ea_r);
-	DECLARE_READ8_MEMBER(port_e8_r);
-	DECLARE_READ8_MEMBER(irq_status_r);
-	DECLARE_READ8_MEMBER(printer_r);
-	DECLARE_WRITE8_MEMBER(printer_w);
-	DECLARE_WRITE8_MEMBER(cassunit_w);
-	DECLARE_WRITE8_MEMBER(motor_w);
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_READ8_MEMBER(wd179x_r);
+	void port_ff_w(uint8_t data);
+	void lnw80_fe_w(uint8_t data);
+	void sys80_fe_w(uint8_t data);
+	void sys80_f8_w(uint8_t data);
+	void port_ea_w(uint8_t data);
+	void port_e8_w(uint8_t data);
+	uint8_t lnw80_fe_r();
+	uint8_t port_ff_r();
+	uint8_t sys80_f9_r();
+	uint8_t port_ea_r();
+	uint8_t port_e8_r();
+	uint8_t irq_status_r();
+	uint8_t printer_r();
+	void printer_w(uint8_t data);
+	void cassunit_w(uint8_t data);
+	void motor_w(uint8_t data);
+	uint8_t keyboard_r(offs_t offset);
+	uint8_t wd179x_r();
 
 	INTERRUPT_GEN_MEMBER(rtc_interrupt);
 	INTERRUPT_GEN_MEMBER(fdc_interrupt);

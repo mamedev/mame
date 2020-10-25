@@ -142,8 +142,8 @@ public:
 	// construction/destruction
 	isa8_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(pc_hdc_r);
-	DECLARE_WRITE8_MEMBER(pc_hdc_w);
+	uint8_t pc_hdc_r(offs_t offset);
+	void pc_hdc_w(offs_t offset, uint8_t data);
 	required_device<xt_hdc_device> m_hdc;
 
 protected:

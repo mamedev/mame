@@ -41,8 +41,8 @@ private:
 	bool m_bEnabled;
 	bool m_FirstZ80Boot;
 
-	DECLARE_READ8_MEMBER( dma_r );
-	DECLARE_WRITE8_MEMBER( dma_w );
+	uint8_t dma_r(offs_t offset);
+	void dma_w(offs_t offset, uint8_t data);
 
 	void z80_mem(address_map &map);
 };

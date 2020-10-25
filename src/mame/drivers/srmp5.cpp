@@ -108,27 +108,27 @@ private:
 #ifdef DEBUG_CHAR
 	std::unique_ptr<uint8_t[]> m_tileduty;
 #endif
-	DECLARE_WRITE32_MEMBER(bank_w);
-	DECLARE_READ32_MEMBER(tileram_r);
-	DECLARE_WRITE32_MEMBER(tileram_w);
-	DECLARE_READ32_MEMBER(spr_r);
-	DECLARE_WRITE32_MEMBER(spr_w);
-	DECLARE_READ32_MEMBER(chrrom_r);
-	DECLARE_WRITE32_MEMBER(input_select_w);
-	DECLARE_READ32_MEMBER(srmp5_inputs_r);
-	DECLARE_WRITE32_MEMBER(cmd1_w);
-	DECLARE_WRITE32_MEMBER(cmd2_w);
-	DECLARE_READ32_MEMBER(cmd_stat32_r);
-	DECLARE_READ32_MEMBER(srmp5_vidregs_r);
-	DECLARE_WRITE32_MEMBER(srmp5_vidregs_w);
-	DECLARE_READ32_MEMBER(irq_ack_clear);
-	DECLARE_READ8_MEMBER(cmd1_r);
-	DECLARE_READ8_MEMBER(cmd2_r);
-	DECLARE_READ8_MEMBER(cmd_stat8_r);
+	void bank_w(uint32_t data);
+	uint32_t tileram_r(offs_t offset);
+	void tileram_w(offs_t offset, uint32_t data);
+	uint32_t spr_r(offs_t offset);
+	void spr_w(offs_t offset, uint32_t data);
+	uint32_t chrrom_r(offs_t offset);
+	void input_select_w(uint32_t data);
+	uint32_t srmp5_inputs_r();
+	void cmd1_w(uint32_t data);
+	void cmd2_w(uint32_t data);
+	uint32_t cmd_stat32_r();
+	uint32_t srmp5_vidregs_r(offs_t offset);
+	void srmp5_vidregs_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t irq_ack_clear();
+	uint8_t cmd1_r();
+	uint8_t cmd2_r();
+	uint8_t cmd_stat8_r();
 	virtual void machine_start() override;
 	uint32_t screen_update_srmp5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE8_MEMBER(st0016_rom_bank_w);
+	void st0016_rom_bank_w(uint8_t data);
 	void srmp5_mem(address_map &map);
 	void st0016_io(address_map &map);
 	void st0016_mem(address_map &map);
@@ -137,7 +137,7 @@ private:
 
 uint32_t srmp5_state::screen_update_srmp5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int x,y,address,xs,xs2,ys,ys2,height,width,xw,yw,xb,yb,sizex,sizey;
+	int address,height,width,sizex,sizey;
 	uint16_t *sprite_list=m_sprram.get();
 	uint16_t *sprite_list_end=&m_sprram[0x4000]; //guess
 	uint8_t *pixels=(uint8_t *)m_tileram.get();
@@ -152,22 +152,22 @@ uint32_t srmp5_state::screen_update_srmp5(screen_device &screen, bitmap_rgb32 &b
 	{
 		// 16x16 tile
 		uint16_t *map = &sprram[0x2000];
-		for(yw = 0; yw < tile_height; yw++)
+		for(int yw = 0; yw < tile_height; yw++)
 		{
-			for(xw = 0; xw < tile_width; xw++)
+			for(int xw = 0; xw < tile_width; xw++)
 			{
 				uint16_t tile = map[yw * 128 + xw * 2];
 				if(tile >= 0x2000) continue;
 
 				address = tile * SPRITE_DATA_GRANULARITY;
-				for(y = 0; y < 16; y++)
+				for(int y = 0; y < 16; y++)
 				{
-					for(x = 0; x < 16; x++)
+					for(int x = 0; x < 16; x++)
 					{
 						uint8_t pen = pixels[BYTE_XOR_LE(address)];
 						if(pen)
 						{
-							bitmap.pix32(yw * 16 + y, xw * 16 + x) = pens[pen];
+							bitmap.pix(yw * 16 + y, xw * 16 + x) = pens[pen];
 						}
 						address++;
 					}
@@ -191,8 +191,8 @@ uint32_t srmp5_state::screen_update_srmp5(screen_device &screen, bitmap_rgb32 &b
 			global_y=(int16_t)sprite_list[SPRITE_GLOBAL_Y];
 			while(sublist_length)
 			{
-				x=(int16_t)sprite_sublist[SPRITE_LOCAL_X]+global_x;
-				y=(int16_t)sprite_sublist[SPRITE_LOCAL_Y]+global_y;
+				int x=(int16_t)sprite_sublist[SPRITE_LOCAL_X]+global_x;
+				int y=(int16_t)sprite_sublist[SPRITE_LOCAL_Y]+global_y;
 				width =(sprite_sublist[SPRITE_SIZE]>> 4)&0xf;
 				height=(sprite_sublist[SPRITE_SIZE]>>12)&0xf;
 
@@ -201,24 +201,24 @@ uint32_t srmp5_state::screen_update_srmp5(screen_device &screen, bitmap_rgb32 &b
 
 				address=(sprite_sublist[SPRITE_TILE] & ~(sprite_sublist[SPRITE_SIZE] >> 11 & 7))*SPRITE_DATA_GRANULARITY;
 				y -= (height + 1) * (sizey + 1)-1;
-				for(xw=0;xw<=width;xw++)
+				for(int xw=0;xw<=width;xw++)
 				{
-					xb = (sprite_sublist[SPRITE_PALETTE] & 0x8000) ? (width-xw)*(sizex+1)+x: xw*(sizex+1)+x;
-					for(yw=0;yw<=height;yw++)
+					int xb = (sprite_sublist[SPRITE_PALETTE] & 0x8000) ? (width-xw)*(sizex+1)+x: xw*(sizex+1)+x;
+					for(int yw=0;yw<=height;yw++)
 					{
-						yb = yw*(sizey+1)+y;
-						for(ys=0;ys<=sizey;ys++)
+						int yb = yw*(sizey+1)+y;
+						for(int ys=0;ys<=sizey;ys++)
 						{
-							ys2 = (sprite_sublist[SPRITE_PALETTE] & 0x4000) ? ys : (sizey - ys);
-							for(xs=0;xs<=sizex;xs++)
+							int ys2 = (sprite_sublist[SPRITE_PALETTE] & 0x4000) ? ys : (sizey - ys);
+							for(int xs=0;xs<=sizex;xs++)
 							{
 								uint8_t pen=pixels[BYTE_XOR_LE(address)&(0x100000-1)];
-								xs2 = (sprite_sublist[SPRITE_PALETTE] & 0x8000) ? (sizex - xs) : xs;
+								int xs2 = (sprite_sublist[SPRITE_PALETTE] & 0x8000) ? (sizex - xs) : xs;
 								if(pen)
 								{
 									if(cliprect.contains(xb+xs2, yb+ys2))
 									{
-										bitmap.pix32(yb+ys2, xb+xs2) = pens[pen+((sprite_sublist[SPRITE_PALETTE]&0xff)<<8)];
+										bitmap.pix(yb+ys2, xb+xs2) = pens[pen+((sprite_sublist[SPRITE_PALETTE]&0xff)<<8)];
 									}
 								}
 								++address;
@@ -235,8 +235,7 @@ uint32_t srmp5_state::screen_update_srmp5(screen_device &screen, bitmap_rgb32 &b
 
 #ifdef DEBUG_CHAR
 	{
-		int i;
-		for(i = 0; i < 0x2000; i++)
+		for(int i = 0; i < 0x2000; i++)
 		{
 			if (m_tileduty[i] == 1)
 			{
@@ -267,17 +266,17 @@ void srmp5_state::machine_start()
 	save_item(NAME(m_vidregs));
 }
 
-WRITE32_MEMBER(srmp5_state::bank_w)
+void srmp5_state::bank_w(uint32_t data)
 {
 	m_chrbank = ((data & 0xf0) >> 4) * (0x100000 / sizeof(uint16_t));
 }
 
-READ32_MEMBER(srmp5_state::tileram_r)
+uint32_t srmp5_state::tileram_r(offs_t offset)
 {
 	return m_tileram[offset];
 }
 
-WRITE32_MEMBER(srmp5_state::tileram_w)
+void srmp5_state::tileram_w(offs_t offset, uint32_t data)
 {
 	m_tileram[offset] = data & 0xFFFF; //lower 16bit only
 #ifdef DEBUG_CHAR
@@ -285,27 +284,27 @@ WRITE32_MEMBER(srmp5_state::tileram_w)
 #endif
 }
 
-READ32_MEMBER(srmp5_state::spr_r)
+uint32_t srmp5_state::spr_r(offs_t offset)
 {
 	return m_sprram[offset];
 }
 
-WRITE32_MEMBER(srmp5_state::spr_w)
+void srmp5_state::spr_w(offs_t offset, uint32_t data)
 {
 	m_sprram[offset] = data & 0xFFFF; //lower 16bit only
 }
 
-READ32_MEMBER(srmp5_state::chrrom_r)
+uint32_t srmp5_state::chrrom_r(offs_t offset)
 {
 	return m_chrrom[m_chrbank + offset]; // lower 16bit only
 }
 
-WRITE32_MEMBER(srmp5_state::input_select_w)
+void srmp5_state::input_select_w(uint32_t data)
 {
 	m_input_select = data & 0x0F;
 }
 
-READ32_MEMBER(srmp5_state::srmp5_inputs_r)
+uint32_t srmp5_state::srmp5_inputs_r()
 {
 	uint32_t ret = 0;
 
@@ -329,38 +328,38 @@ READ32_MEMBER(srmp5_state::srmp5_inputs_r)
 }
 
 //almost all cmds are sound related
-WRITE32_MEMBER(srmp5_state::cmd1_w)
+void srmp5_state::cmd1_w(uint32_t data)
 {
 	m_cmd1 = data & 0xFF;
 	logerror("cmd1_w %08X\n", data);
 }
 
-WRITE32_MEMBER(srmp5_state::cmd2_w)
+void srmp5_state::cmd2_w(uint32_t data)
 {
 	m_cmd2 = data & 0xFF;
 	m_cmd_stat = 5;
 	logerror("cmd2_w %08X\n", data);
 }
 
-READ32_MEMBER(srmp5_state::cmd_stat32_r)
+uint32_t srmp5_state::cmd_stat32_r()
 {
 	return m_cmd_stat;
 }
 
-READ32_MEMBER(srmp5_state::srmp5_vidregs_r)
+uint32_t srmp5_state::srmp5_vidregs_r(offs_t offset)
 {
 	logerror("vidregs read  %08X %08X\n", offset << 2, m_vidregs[offset]);
 	return m_vidregs[offset];
 }
 
-WRITE32_MEMBER(srmp5_state::srmp5_vidregs_w)
+void srmp5_state::srmp5_vidregs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_vidregs[offset]);
 	if(offset != 0x10C / 4)
 		logerror("vidregs write %08X %08X\n", offset << 2, m_vidregs[offset]);
 }
 
-READ32_MEMBER(srmp5_state::irq_ack_clear)
+uint32_t srmp5_state::irq_ack_clear()
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ4, CLEAR_LINE);
 	return 0;
@@ -406,24 +405,24 @@ void srmp5_state::st0016_mem(address_map &map)
 	map(0xf000, 0xffff).ram();
 }
 
-READ8_MEMBER(srmp5_state::cmd1_r)
+uint8_t srmp5_state::cmd1_r()
 {
 	m_cmd_stat = 0;
 	return m_cmd1;
 }
 
-READ8_MEMBER(srmp5_state::cmd2_r)
+uint8_t srmp5_state::cmd2_r()
 {
 	return m_cmd2;
 }
 
-READ8_MEMBER(srmp5_state::cmd_stat8_r)
+uint8_t srmp5_state::cmd_stat8_r()
 {
 	return m_cmd_stat;
 }
 
 // common rombank? should go in machine/st0016 with larger address space exposed?
-WRITE8_MEMBER(srmp5_state::st0016_rom_bank_w)
+void srmp5_state::st0016_rom_bank_w(uint8_t data)
 {
 	m_soundbank->set_entry(data);
 }

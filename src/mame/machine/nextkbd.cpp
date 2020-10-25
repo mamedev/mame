@@ -161,37 +161,37 @@ bool nextkbd_device::fifo_empty() const
 	return !fifo_size;
 }
 
-READ8_MEMBER( nextkbd_device::status_snd_r )
+uint8_t nextkbd_device::status_snd_r()
 {
 	logerror("status_snd_r %02x %s\n", ctrl_snd, machine().describe_context());
 	return ctrl_snd;
 }
 
-READ8_MEMBER( nextkbd_device::status_kms_r )
+uint8_t nextkbd_device::status_kms_r()
 {
 	logerror("status_kms_r %02x %s\n", ctrl_kms, machine().describe_context());
 	return ctrl_kms;
 }
 
-READ8_MEMBER( nextkbd_device::status_dma_r )
+uint8_t nextkbd_device::status_dma_r()
 {
 	logerror("status_dma_r %02x %s\n", ctrl_dma, machine().describe_context());
 	return ctrl_dma;
 }
 
-READ8_MEMBER( nextkbd_device::status_cmd_r )
+uint8_t nextkbd_device::status_cmd_r()
 {
 	logerror("status_cmd_r %02x %s\n", ctrl_cmd, machine().describe_context());
 	return ctrl_cmd;
 }
 
-READ32_MEMBER( nextkbd_device::cdata_r )
+uint32_t nextkbd_device::cdata_r(offs_t offset, uint32_t mem_mask)
 {
 	logerror("cdata_r %08x @ %08x %s\n", cdata, mem_mask, machine().describe_context());
 	return cdata;
 }
 
-READ32_MEMBER( nextkbd_device::kmdata_r )
+uint32_t nextkbd_device::kmdata_r(offs_t offset, uint32_t mem_mask)
 {
 	uint8_t old = ctrl_kms;
 	ctrl_kms &= ~(C_KBD_INTERRUPT|C_KBD_DATA);
@@ -201,7 +201,7 @@ READ32_MEMBER( nextkbd_device::kmdata_r )
 	return kmdata;
 }
 
-WRITE8_MEMBER( nextkbd_device::ctrl_snd_w )
+void nextkbd_device::ctrl_snd_w(uint8_t data)
 {
 	uint8_t old = ctrl_snd;
 	ctrl_snd = (ctrl_snd & ~C_SOUND_WMASK) | (data & C_SOUND_WMASK);
@@ -210,7 +210,7 @@ WRITE8_MEMBER( nextkbd_device::ctrl_snd_w )
 	logerror("ctrl_snd_w %02x | %02x %s\n", ctrl_snd, diff, machine().describe_context());
 }
 
-WRITE8_MEMBER( nextkbd_device::ctrl_kms_w )
+void nextkbd_device::ctrl_kms_w(uint8_t data)
 {
 	uint8_t old = ctrl_kms;
 	ctrl_kms = (ctrl_kms & ~C_KMS_WMASK) | (data & C_KMS_WMASK);
@@ -219,7 +219,7 @@ WRITE8_MEMBER( nextkbd_device::ctrl_kms_w )
 	logerror("ctrl_kms_w %02x | %02x %s\n", ctrl_kms, diff, machine().describe_context());
 }
 
-WRITE8_MEMBER( nextkbd_device::ctrl_dma_w )
+void nextkbd_device::ctrl_dma_w(uint8_t data)
 {
 	uint8_t old = ctrl_dma;
 	ctrl_dma = (ctrl_dma & ~C_WMASK) | (data & C_WMASK);
@@ -228,20 +228,20 @@ WRITE8_MEMBER( nextkbd_device::ctrl_dma_w )
 	logerror("ctrl_dma_w %02x | %02x %s\n", ctrl_dma, diff, machine().describe_context());
 }
 
-WRITE8_MEMBER( nextkbd_device::ctrl_cmd_w )
+void nextkbd_device::ctrl_cmd_w(uint8_t data)
 {
 	ctrl_cmd = data;
 	logerror("ctrl_cmd_w %02x %s\n", ctrl_cmd, machine().describe_context());
 }
 
-WRITE32_MEMBER( nextkbd_device::cdata_w )
+void nextkbd_device::cdata_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&cdata);
 	logerror("cdata_w %08x @ %08x %s\n", data, mem_mask, machine().describe_context());
 	handle_command();
 }
 
-WRITE32_MEMBER( nextkbd_device::kmdata_w )
+void nextkbd_device::kmdata_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("kmdata_w %08x @ %08x %s\n", data, mem_mask, machine().describe_context());
 }

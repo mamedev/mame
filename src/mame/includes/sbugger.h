@@ -30,8 +30,8 @@ private:
 
 	tilemap_t *m_tilemap;
 
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(videoram_attr_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void videoram_attr_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 

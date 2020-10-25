@@ -10,6 +10,9 @@
 #include "pds30_cb264.h"
 #include "screen.h"
 
+#include <algorithm>
+
+
 #define CB264SE30_SCREEN_NAME "cb264_screen"
 #define CB264SE30_ROM_REGION  "cb264_rom"
 
@@ -90,8 +93,8 @@ void nubus_cb264se30_device::device_start()
 	m_vram.resize(VRAM_SIZE);
 	m_vram32 = (uint32_t *)&m_vram[0];
 
-	nubus().install_device(slotspace, slotspace+VRAM_SIZE-1, read32_delegate(*this, FUNC(nubus_cb264se30_device::vram_r)), write32_delegate(*this, FUNC(nubus_cb264se30_device::vram_w)));
-	nubus().install_device(slotspace+0xf00000, slotspace+0xfeffff, read32_delegate(*this, FUNC(nubus_cb264se30_device::cb264se30_r)), write32_delegate(*this, FUNC(nubus_cb264se30_device::cb264se30_w)));
+	nubus().install_device(slotspace, slotspace+VRAM_SIZE-1, read32s_delegate(*this, FUNC(nubus_cb264se30_device::vram_r)), write32s_delegate(*this, FUNC(nubus_cb264se30_device::vram_w)));
+	nubus().install_device(slotspace+0xf00000, slotspace+0xfeffff, read32s_delegate(*this, FUNC(nubus_cb264se30_device::cb264se30_r)), write32s_delegate(*this, FUNC(nubus_cb264se30_device::cb264se30_w)));
 
 	m_timer = timer_alloc(0, nullptr);
 	m_timer->adjust(screen().time_until_pos(479, 0), 0);
@@ -133,21 +136,17 @@ void nubus_cb264se30_device::device_timer(emu_timer &timer, device_timer_id tid,
 
 uint32_t nubus_cb264se30_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint32_t *scanline;
-	int x, y;
-	uint8_t pixels, *vram;
-
-	vram = &m_vram[8*1024];
+	uint8_t const *const vram = &m_vram[8*1024];
 
 	switch (m_mode)
 	{
 		case 0: // 1 bpp?
-			for (y = 0; y < 480; y++)
+			for (int y = 0; y < 480; y++)
 			{
-				scanline = &bitmap.pix32(y);
-				for (x = 0; x < 640/8; x++)
+				uint32_t *scanline = &bitmap.pix(y);
+				for (int x = 0; x < 640/8; x++)
 				{
-					pixels = vram[(y * 1024) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram[(y * 1024) + (BYTE4_XOR_BE(x))];
 
 					*scanline++ = m_palette[(pixels&0x80)];
 					*scanline++ = m_palette[((pixels<<1)&0x80)];
@@ -162,12 +161,12 @@ uint32_t nubus_cb264se30_device::screen_update(screen_device &screen, bitmap_rgb
 			break;
 
 		case 1: // 2 bpp
-			for (y = 0; y < 480; y++)
+			for (int y = 0; y < 480; y++)
 			{
-				scanline = &bitmap.pix32(y);
-				for (x = 0; x < 640/4; x++)
+				uint32_t *scanline = &bitmap.pix(y);
+				for (int x = 0; x < 640/4; x++)
 				{
-					pixels = vram[(y * 1024) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram[(y * 1024) + (BYTE4_XOR_BE(x))];
 
 					*scanline++ = m_palette[(pixels&0xc0)];
 					*scanline++ = m_palette[((pixels<<2)&0xc0)];
@@ -178,13 +177,12 @@ uint32_t nubus_cb264se30_device::screen_update(screen_device &screen, bitmap_rgb
 			break;
 
 		case 2: // 4 bpp
-			for (y = 0; y < 480; y++)
+			for (int y = 0; y < 480; y++)
 			{
-				scanline = &bitmap.pix32(y);
-
-				for (x = 0; x < 640/2; x++)
+				uint32_t *scanline = &bitmap.pix(y);
+				for (int x = 0; x < 640/2; x++)
 				{
-					pixels = vram[(y * 1024) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram[(y * 1024) + (BYTE4_XOR_BE(x))];
 
 					*scanline++ = m_palette[(pixels&0xf0)];
 					*scanline++ = m_palette[((pixels&0x0f)<<4)];
@@ -193,13 +191,12 @@ uint32_t nubus_cb264se30_device::screen_update(screen_device &screen, bitmap_rgb
 			break;
 
 		case 3: // 8 bpp
-			for (y = 0; y < 480; y++)
+			for (int y = 0; y < 480; y++)
 			{
-				scanline = &bitmap.pix32(y);
-
-				for (x = 0; x < 640; x++)
+				uint32_t *scanline = &bitmap.pix(y);
+				for (int x = 0; x < 640; x++)
 				{
-					pixels = vram[(y * 1024) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram[(y * 1024) + (BYTE4_XOR_BE(x))];
 					*scanline++ = m_palette[pixels];
 				}
 			}
@@ -207,17 +204,11 @@ uint32_t nubus_cb264se30_device::screen_update(screen_device &screen, bitmap_rgb
 
 		case 4: // 24 bpp
 			{
-				uint32_t *vram32 = (uint32_t *)&m_vram[0];
-				uint32_t *base;
+				uint32_t const *const vram32 = (uint32_t *)&m_vram[0];
 
-				for (y = 0; y < 480; y++)
+				for (int y = 0; y < 480; y++)
 				{
-					scanline = &bitmap.pix32(y);
-					base = &vram32[y * 1024];
-					for (x = 0; x < 640; x++)
-					{
-						*scanline++ = *base++;
-					}
+					std::copy_n(&vram32[y * 1024], 640, &bitmap.pix(y));
 				}
 			}
 			break;
@@ -228,7 +219,7 @@ uint32_t nubus_cb264se30_device::screen_update(screen_device &screen, bitmap_rgb
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_cb264se30_device::cb264se30_w )
+void nubus_cb264se30_device::cb264se30_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -300,17 +291,17 @@ WRITE32_MEMBER( nubus_cb264se30_device::cb264se30_w )
 	}
 }
 
-READ32_MEMBER( nubus_cb264se30_device::cb264se30_r )
+uint32_t nubus_cb264se30_device::cb264se30_r(offs_t offset, uint32_t mem_mask)
 {
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_cb264se30_device::vram_w )
+void nubus_cb264se30_device::vram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_vram32[offset]);
 }
 
-READ32_MEMBER( nubus_cb264se30_device::vram_r )
+uint32_t nubus_cb264se30_device::vram_r(offs_t offset, uint32_t mem_mask)
 {
 	return m_vram32[offset];
 }

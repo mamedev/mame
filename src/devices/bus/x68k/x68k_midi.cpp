@@ -40,19 +40,19 @@ x68k_midi_device::x68k_midi_device(const machine_config &mconfig, const char *ta
 void x68k_midi_device::device_start()
 {
 	m_slot = dynamic_cast<x68k_expansion_slot_device *>(owner());
-	m_slot->space().install_readwrite_handler(0xeafa00,0xeafa0f, read8_delegate(*this, FUNC(x68k_midi_device::x68k_midi_reg_r)), write8_delegate(*this, FUNC(x68k_midi_device::x68k_midi_reg_w)), 0x00ff00ff);
+	m_slot->space().install_readwrite_handler(0xeafa00,0xeafa0f, read8sm_delegate(*this, FUNC(x68k_midi_device::x68k_midi_reg_r)), write8sm_delegate(*this, FUNC(x68k_midi_device::x68k_midi_reg_w)), 0x00ff00ff);
 }
 
 void x68k_midi_device::device_reset()
 {
 }
 
-READ8_MEMBER(x68k_midi_device::x68k_midi_reg_r)
+uint8_t x68k_midi_device::x68k_midi_reg_r(offs_t offset)
 {
 	return m_midi->read(offset);
 }
 
-WRITE8_MEMBER(x68k_midi_device::x68k_midi_reg_w)
+void x68k_midi_device::x68k_midi_reg_w(offs_t offset, uint8_t data)
 {
 	m_midi->write(offset, data);
 }

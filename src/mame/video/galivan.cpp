@@ -237,14 +237,14 @@ VIDEO_START_MEMBER(galivan_state,ninjemak)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(galivan_state::galivan_videoram_w)
+void galivan_state::galivan_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 /* Written through port 40 */
-WRITE8_MEMBER(galivan_state::galivan_gfxbank_w)
+void galivan_state::galivan_gfxbank_w(uint8_t data)
 {
 	/* bits 0 and 1 coin counters */
 	machine().bookkeeping().coin_counter_w(0,data & 1);
@@ -259,7 +259,7 @@ WRITE8_MEMBER(galivan_state::galivan_gfxbank_w)
 	/*  logerror("%s port 40 = %02x\n", machine().describe_context(), data); */
 }
 
-WRITE8_MEMBER(galivan_state::ninjemak_gfxbank_w)
+void galivan_state::ninjemak_gfxbank_w(uint8_t data)
 {
 	/* bits 0 and 1 coin counters */
 	machine().bookkeeping().coin_counter_w(0,data & 1);
@@ -295,7 +295,7 @@ WRITE8_MEMBER(galivan_state::ninjemak_gfxbank_w)
 
 
 /* Written through port 41-42 */
-WRITE8_MEMBER(galivan_state::galivan_scrollx_w)
+void galivan_state::galivan_scrollx_w(offs_t offset, uint8_t data)
 {
 	if (offset == 1)
 	{
@@ -305,7 +305,7 @@ WRITE8_MEMBER(galivan_state::galivan_scrollx_w)
 }
 
 /* Written through port 43-44 */
-WRITE8_MEMBER(galivan_state::galivan_scrolly_w)
+void galivan_state::galivan_scrolly_w(offs_t offset, uint8_t data)
 {
 	m_galivan_scrolly[offset] = data;
 }

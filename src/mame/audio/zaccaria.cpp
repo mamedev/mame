@@ -8,7 +8,6 @@
 #include "machine/clock.h"
 #include "machine/rescap.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 
 
 //**************************************************************************
@@ -438,9 +437,6 @@ void zac1b11142_audio_device::device_add_mconfig(machine_config &config)
 
 	//MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.30, AUTO_ALLOC_INPUT, 0); // mc1408.1f
 	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "sound_nl", 1.0, 7); // mc1408.1f
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	// There is no xtal, the clock is obtained from a RC oscillator as shown in the TMS5220 datasheet (R=100kOhm C=22pF)
 	// 162kHz measured on pin 3 20 minutes after power on, clock would then be 162.3*4=649.2kHz
@@ -472,14 +468,14 @@ void zac1b11142_audio_device::device_add_mconfig(machine_config &config)
 	 * The 5200 output is a current source providing between 0 and 1.5mA.
 	 * This is explained in detail in the datasheet.
 	 */
-	NETLIST_STREAM_INPUT(config, "sound_nl:cin6", 6, "I_SP.I").set_mult_offset(750e-6 / 16384.0, 750e-6);
+	NETLIST_STREAM_INPUT(config, "sound_nl:cin6", 6, "I_SP.I").set_mult_offset(2.0 * 750e-6, 750e-6);
 	/* DAC
 	 * The 1408 output is a current sink providing between 0 and 2.0mA.
 	 * This is explained in detail in the datasheet.
 	 */
-	NETLIST_STREAM_INPUT(config, "sound_nl:cin7", 7, "I_DAC.I").set_mult_offset(1e-3 / 32768.0, 1e-3);
+	NETLIST_STREAM_INPUT(config, "sound_nl:cin7", 7, "I_DAC.I").set_mult_offset(1e-3, 1e-3);
 
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "C7.2").set_mult_offset(3000.0 * 10.0, 0.0); // FIXME: no clue what numbers to use here
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "C7.2").set_mult_offset(3000.0 * 10.0 / 32768.0, 0.0); // FIXME: no clue what numbers to use here
 
 	// Potentiometers
 	NETLIST_ANALOG_INPUT(config, "sound_nl:pot1", "P1.DIAL");

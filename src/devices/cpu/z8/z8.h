@@ -74,10 +74,10 @@ private:
 	address_space_config m_data_config;
 	address_space_config m_register_config;
 
-	address_space *m_program;
-	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache;
-	address_space *m_data;
-	address_space *m_regs;
+	memory_access<16, 0, 0, ENDIANNESS_BIG>::cache m_cache;
+	memory_access<16, 0, 0, ENDIANNESS_BIG>::specific m_program;
+	memory_access<16, 0, 0, ENDIANNESS_BIG>::specific m_data;
+	memory_access< 8, 0, 0, ENDIANNESS_BIG>::specific m_regs;
 
 	// callbacks
 	devcb_read8::array<4> m_input_cb;
@@ -191,9 +191,9 @@ private:
 	inline uint8_t fetch();
 	inline uint8_t fetch_opcode();
 	inline uint16_t fetch_word();
-	inline uint8_t register_read(uint8_t offset) { return m_regs->read_byte(offset); }
+	inline uint8_t register_read(uint8_t offset) { return m_regs.read_byte(offset); }
 	inline uint16_t register_pair_read(uint8_t offset);
-	inline void register_write(uint8_t offset, uint8_t data) { m_regs->write_byte(offset, data); }
+	inline void register_write(uint8_t offset, uint8_t data) { m_regs.write_byte(offset, data); }
 	inline void register_pair_write(uint8_t offset, uint16_t data);
 	inline uint8_t get_working_register(int offset) const;
 	inline uint8_t get_register(uint8_t offset) const;
@@ -205,10 +205,10 @@ private:
 	inline void set_flag(uint8_t flag, int state);
 	inline void clear(uint8_t dst);
 	inline void load(uint8_t dst, uint8_t src);
-	inline void load_from_memory(address_space &space);
-	inline void load_to_memory(address_space &space);
-	inline void load_from_memory_autoinc(address_space &space);
-	inline void load_to_memory_autoinc(address_space &space);
+	inline void load_from_memory(memory_access<16, 0, 0, ENDIANNESS_BIG>::specific &space);
+	inline void load_to_memory(memory_access<16, 0, 0, ENDIANNESS_BIG>::specific &space);
+	inline void load_from_memory_autoinc(memory_access<16, 0, 0, ENDIANNESS_BIG>::specific &space);
+	inline void load_to_memory_autoinc(memory_access<16, 0, 0, ENDIANNESS_BIG>::specific &space);
 	inline void pop(uint8_t dst);
 	inline void push(uint8_t src);
 	inline void add_carry(uint8_t dst, uint8_t src);
@@ -428,6 +428,13 @@ protected:
 };
 
 
+class z86e02_device : public z8_device
+{
+public:
+	z86e02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
 // Zilog Z8601
 DECLARE_DEVICE_TYPE(Z8601, z8601_device)
 
@@ -445,5 +452,8 @@ DECLARE_DEVICE_TYPE(Z8681, z8681_device)
 
 // Zilog Z8682 ROMless (boot to 0812H)
 DECLARE_DEVICE_TYPE(Z8682, z8682_device)
+
+// Zilog Z86E02
+DECLARE_DEVICE_TYPE(Z86E02, z86e02_device)
 
 #endif // MAME_CPU_Z8_Z8_H

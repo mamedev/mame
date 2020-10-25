@@ -52,7 +52,7 @@ static const uint8_t TZX_HEADER[8] = { 'Z','X','T','a','p','e','!',0x1a };
   Initialized by tzx_cas_get_wave_size, used (and cleaned up) by tzx_cas_fill_wave
  */
 
-static int16_t    wave_data = 0;
+static int16_t    wave_data = 0; // FIXME: global variables prevent multiple instances
 static int  block_count = 0;
 static uint8_t**  blocks = nullptr;
 static float t_scale = 1;  /* for scaling T-states to the 4MHz CPC */
@@ -831,7 +831,7 @@ static int tap_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes )
 	return size;
 }
 
-static const struct CassetteLegacyWaveFiller tzx_legacy_fill_wave =
+static const cassette_image::LegacyWaveFiller tzx_legacy_fill_wave =
 {
 	tzx_cas_fill_wave,          /* fill_wave */
 	-1,                         /* chunk_size */
@@ -842,7 +842,7 @@ static const struct CassetteLegacyWaveFiller tzx_legacy_fill_wave =
 	0                           /* trailer_samples */
 };
 
-static const struct CassetteLegacyWaveFiller tap_legacy_fill_wave =
+static const cassette_image::LegacyWaveFiller tap_legacy_fill_wave =
 {
 	tap_cas_fill_wave,          /* fill_wave */
 	-1,                         /* chunk_size */
@@ -853,7 +853,7 @@ static const struct CassetteLegacyWaveFiller tap_legacy_fill_wave =
 	0                           /* trailer_samples */
 };
 
-static const struct CassetteLegacyWaveFiller cdt_legacy_fill_wave =
+static const cassette_image::LegacyWaveFiller cdt_legacy_fill_wave =
 {
 	cdt_cas_fill_wave,          /* fill_wave */
 	-1,                         /* chunk_size */
@@ -864,24 +864,24 @@ static const struct CassetteLegacyWaveFiller cdt_legacy_fill_wave =
 	0                           /* trailer_samples */
 };
 
-static cassette_image::error tzx_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts )
+static cassette_image::error tzx_cassette_identify( cassette_image *cassette, cassette_image::Options *opts )
 {
-	return cassette_legacy_identify(cassette, opts, &tzx_legacy_fill_wave);
+	return cassette->legacy_identify(opts, &tzx_legacy_fill_wave);
 }
 
-static cassette_image::error tap_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts )
+static cassette_image::error tap_cassette_identify( cassette_image *cassette, cassette_image::Options *opts )
 {
-	return cassette_legacy_identify(cassette, opts, &tap_legacy_fill_wave);
+	return cassette->legacy_identify(opts, &tap_legacy_fill_wave);
 }
 
-static cassette_image::error cdt_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts )
+static cassette_image::error cdt_cassette_identify( cassette_image *cassette, cassette_image::Options *opts )
 {
-	return cassette_legacy_identify(cassette, opts, &cdt_legacy_fill_wave);
+	return cassette->legacy_identify(opts, &cdt_legacy_fill_wave);
 }
 
 static cassette_image::error tzx_cassette_load( cassette_image *cassette )
 {
-	cassette_image::error err = cassette_legacy_construct(cassette, &tzx_legacy_fill_wave);
+	cassette_image::error err = cassette->legacy_construct(&tzx_legacy_fill_wave);
 	free(blocks);
 	blocks = nullptr;
 	return err;
@@ -889,18 +889,18 @@ static cassette_image::error tzx_cassette_load( cassette_image *cassette )
 
 static cassette_image::error tap_cassette_load( cassette_image *cassette )
 {
-	return cassette_legacy_construct(cassette, &tap_legacy_fill_wave);
+	return cassette->legacy_construct(&tap_legacy_fill_wave);
 }
 
 static cassette_image::error cdt_cassette_load( cassette_image *cassette )
 {
-	cassette_image::error err = cassette_legacy_construct(cassette, &cdt_legacy_fill_wave);
+	cassette_image::error err = cassette->legacy_construct(&cdt_legacy_fill_wave);
 	free(blocks);
 	blocks = nullptr;
 	return err;
 }
 
-const struct CassetteFormat tzx_cassette_format =
+const cassette_image::Format tzx_cassette_format =
 {
 	"tzx",
 	tzx_cassette_identify,
@@ -908,7 +908,7 @@ const struct CassetteFormat tzx_cassette_format =
 	nullptr
 };
 
-static const struct CassetteFormat tap_cassette_format =
+static const cassette_image::Format tap_cassette_format =
 {
 	"tap,blk",
 	tap_cassette_identify,
@@ -916,7 +916,7 @@ static const struct CassetteFormat tap_cassette_format =
 	nullptr
 };
 
-static const struct CassetteFormat cdt_cassette_format =
+static const cassette_image::Format cdt_cassette_format =
 {
 	"cdt",
 	cdt_cassette_identify,

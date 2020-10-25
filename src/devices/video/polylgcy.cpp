@@ -300,7 +300,7 @@ static inline polygon_info *allocate_polygon(legacy_poly_manager *poly, int miny
 #endif
 	}
 #if KEEP_STATISTICS
-	poly->polygon_max = MAX(poly->polygon_max, poly->polygon_next + 1);
+	poly->polygon_max = std::max(poly->polygon_max, poly->polygon_next + 1);
 #endif
 	return poly->polygon[poly->polygon_next++];
 }
@@ -373,9 +373,9 @@ void poly_free(legacy_poly_manager *poly)
 	else
 		printf("Total pixels   = %d\n", (uint32_t)poly->pixels);
 	printf("Conflicts:  %d resolved, %d total\n", resolved, conflicts);
-	printf("Units:      %5d used, %5d allocated, %5d waits, %4d bytes each, %7d total\n", poly->unit_max, poly->unit_count, poly->unit_waits, poly->unit_size, poly->unit_count * poly->unit_size);
-	printf("Polygons:   %5d used, %5d allocated, %5d waits, %4d bytes each, %7d total\n", poly->polygon_max, poly->polygon_count, poly->polygon_waits, poly->polygon_size, poly->polygon_count * poly->polygon_size);
-	printf("Extra data: %5d used, %5d allocated, %5d waits, %4d bytes each, %7d total\n", poly->extra_max, poly->extra_count, poly->extra_waits, poly->extra_size, poly->extra_count * poly->extra_size);
+	printf("Units:      %5d used, %5d allocated, %5d waits, %4d bytes each, %7d total\n", poly->unit_max, poly->unit_count, poly->unit_waits, (u32) poly->unit_size, poly->unit_count * (u32) poly->unit_size);
+	printf("Polygons:   %5d used, %5d allocated, %5d waits, %4d bytes each, %7d total\n", poly->polygon_max, poly->polygon_count, poly->polygon_waits, (u32) poly->polygon_size, poly->polygon_count * (u32) poly->polygon_size);
+	printf("Extra data: %5d used, %5d allocated, %5d waits, %4d bytes each, %7d total\n", poly->extra_max, poly->extra_count, poly->extra_waits, (u32) poly->extra_size, poly->extra_count * (u32) poly->extra_size);
 }
 #endif
 
@@ -452,7 +452,7 @@ void *poly_get_extra_data(legacy_poly_manager *poly)
 
 	/* return a pointer to the extra data for the next item */
 #if KEEP_STATISTICS
-	poly->extra_max = MAX(poly->extra_max, poly->extra_next + 1);
+	poly->extra_max = std::max(poly->extra_max, poly->extra_next + 1);
 #endif
 	return poly->extra[poly->extra_next++];
 }
@@ -596,7 +596,7 @@ uint32_t poly_render_triangle(legacy_poly_manager *poly, void *dest, const recta
 		}
 	}
 #if KEEP_STATISTICS
-	poly->unit_max = MAX(poly->unit_max, poly->unit_next);
+	poly->unit_max = std::max(poly->unit_max, poly->unit_next);
 #endif
 
 	/* compute parameter starting points and deltas */
@@ -740,7 +740,7 @@ uint32_t poly_render_triangle_custom(legacy_poly_manager *poly, void *dest, cons
 		}
 	}
 #if KEEP_STATISTICS
-	poly->unit_max = MAX(poly->unit_max, poly->unit_next);
+	poly->unit_max = std::max(poly->unit_max, poly->unit_next);
 #endif
 
 	/* enqueue the work items */
@@ -965,7 +965,7 @@ uint32_t poly_render_quad(legacy_poly_manager *poly, void *dest, const rectangle
 		}
 	}
 #if KEEP_STATISTICS
-	poly->unit_max = MAX(poly->unit_max, poly->unit_next);
+	poly->unit_max = std::max(poly->unit_max, poly->unit_next);
 #endif
 
 	/* enqueue the work items */
@@ -1197,7 +1197,7 @@ uint32_t poly_render_polygon(legacy_poly_manager *poly, void *dest, const rectan
 		}
 	}
 #if KEEP_STATISTICS
-	poly->unit_max = MAX(poly->unit_max, poly->unit_next);
+	poly->unit_max = std::max(poly->unit_max, poly->unit_next);
 #endif
 
 	/* enqueue the work items */

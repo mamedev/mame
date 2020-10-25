@@ -48,7 +48,7 @@ void atarig1_state::video_int_ack_w(uint16_t data)
  *
  *************************************/
 
-WRITE16_MEMBER(atarig1_state::mo_command_w)
+void atarig1_state::mo_command_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_mo_command);
 	m_rle->command_write((data == 0 && m_is_pitfight) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
@@ -62,14 +62,14 @@ WRITE16_MEMBER(atarig1_state::mo_command_w)
  *
  *************************************/
 
-WRITE16_MEMBER(atarig1_state::a2d_select_w)
+void atarig1_state::a2d_select_w(offs_t offset, uint16_t data)
 {
 	if (m_adc.found())
 		m_adc->address_offset_start_w(offset, 0);
 }
 
 
-READ16_MEMBER(atarig1_state::a2d_data_r)
+uint16_t atarig1_state::a2d_data_r()
 {
 	if (m_adc.found())
 		return m_adc->data_r() << 8;
@@ -113,7 +113,7 @@ void atarig1_state::device_post_load()
 }
 
 
-READ16_MEMBER(atarig1_state::pitfightb_cheap_slapstic_r)
+uint16_t atarig1_state::pitfightb_cheap_slapstic_r(offs_t offset)
 {
 	int result = m_bslapstic_base[offset & 0xfff];
 
@@ -143,7 +143,7 @@ READ16_MEMBER(atarig1_state::pitfightb_cheap_slapstic_r)
 void atarig1_state::pitfightb_cheap_slapstic_init()
 {
 	/* install a read handler */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x038000, 0x03ffff, read16_delegate(*this, FUNC(atarig1_state::pitfightb_cheap_slapstic_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x038000, 0x03ffff, read16sm_delegate(*this, FUNC(atarig1_state::pitfightb_cheap_slapstic_r)));
 	m_bslapstic_base = (uint16_t *)(memregion("maincpu")->base() + 0x38000);
 
 	/* allocate memory for a copy of bank 0 */
@@ -1327,7 +1327,7 @@ ROM_END
 
 void atarig1_state::init_hydra()
 {
-	slapstic_configure(*m_maincpu, 0x078000, 0, memregion("maincpu")->base() + 0x78000);
+	m_slapstic->legacy_configure(*m_maincpu, 0x078000, 0, memregion("maincpu")->base() + 0x78000);
 	m_is_pitfight = false;
 }
 
@@ -1338,7 +1338,7 @@ void atarig1_state::init_hydrap()
 
 void atarig1_state::init_pitfight()
 {
-	slapstic_configure(*m_maincpu, 0x038000, 0, memregion("maincpu")->base() + 0x38000);
+	m_slapstic->legacy_configure(*m_maincpu, 0x038000, 0, memregion("maincpu")->base() + 0x38000);
 	m_is_pitfight = true;
 }
 

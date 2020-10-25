@@ -148,7 +148,7 @@ HD44780_PIXEL_UPDATE(fb01_state::fb01_pixel_update)
 {
 	if ( pos < 8 && line < 2 )
 	{
-		bitmap.pix16(y, line*6*8 + pos*6 + x) = state;
+		bitmap.pix(y, line*6*8 + pos*6 + x) = state;
 	}
 }
 

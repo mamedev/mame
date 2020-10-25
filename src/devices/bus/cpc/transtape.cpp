@@ -63,8 +63,8 @@ void cpc_transtape_device::device_start()
 
 	m_ram = make_unique_clear<uint8_t[]>(0x2000);
 
-	m_space->install_write_handler(0xfbf0,0xfbf0, write8_delegate(*this, FUNC(cpc_transtape_device::output_w)));
-	m_space->install_read_handler(0xfbff,0xfbff, read8_delegate(*this, FUNC(cpc_transtape_device::input_r)));
+	m_space->install_write_handler(0xfbf0,0xfbf0, write8smo_delegate(*this, FUNC(cpc_transtape_device::output_w)));
+	m_space->install_read_handler(0xfbff,0xfbff, read8smo_delegate(*this, FUNC(cpc_transtape_device::input_r)));
 }
 
 //-------------------------------------------------
@@ -117,17 +117,17 @@ INPUT_CHANGED_MEMBER(cpc_transtape_device::button_black_w)
 	}
 }
 
-READ8_MEMBER(cpc_transtape_device::input_r)
+uint8_t cpc_transtape_device::input_r()
 {
 	// TODO
 	return 0x80;
 }
 
-WRITE8_MEMBER(cpc_transtape_device::output_w)
+void cpc_transtape_device::output_w(uint8_t data)
 {
 	// TODO
 	m_output = data;
-	m_slot->rom_select(space,0,get_rom_bank());  // trigger rethink
+	m_slot->rom_select(get_rom_bank());  // trigger rethink
 }
 
 void cpc_transtape_device::set_mapping(uint8_t type)

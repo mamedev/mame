@@ -348,8 +348,8 @@
 #define LOG_EXTRA 0
 #define LOG_IOT_EXTRA 0
 
-#define READ_PDP_18BIT(A) ((signed)m_program->read_dword((A)<<2))
-#define WRITE_PDP_18BIT(A,V) (m_program->write_dword((A)<<2,(V)))
+#define READ_PDP_18BIT(A) ((signed)m_program->read_dword(A))
+#define WRITE_PDP_18BIT(A,V) (m_program->write_dword((A),(V)))
 
 
 #define PC      m_pc
@@ -378,12 +378,16 @@
 #define PREVIOUS_PC     ((PC & ADDRESS_EXTENSION_MASK) | ((PC-1) & BASE_ADDRESS_MASK))
 
 
-DEFINE_DEVICE_TYPE(PDP1, pdp1_device, "pdp1_cpu", "DEC PDP1")
+DEFINE_DEVICE_TYPE(PDP1, pdp1_device, "pdp1_cpu", "DEC PDP-1 Central Processor")
 
 
 pdp1_device::pdp1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, PDP1, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_BIG, 32, 18, 0)
+	, m_program_config("program", ENDIANNESS_BIG, 32, 18, -2) // data is actually 18 bits wide
+	, m_extern_iot(*this)
+	, m_io_sc_callback(*this)
+	, m_program(nullptr)
+	, m_reset_param(nullptr)
 {
 	m_program_config.m_is_octal = true;
 }
@@ -405,16 +409,9 @@ void pdp1_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-		memset(&read_binary_word, 0, sizeof(read_binary_word));
-		memset(&io_sc_callback, 0, sizeof(io_sc_callback));
 		extend_support = 0;
 		hw_mul_div = 0;
 		type_20_sbs = 0;
-
-		for (auto & elem : extern_iot)
-		{
-			memset(&elem, 0, sizeof(elem));
-		}
 	}
 }
 
@@ -495,34 +492,6 @@ void pdp1_device::execute_set_input(int irqline, int state)
 }
 
 
-static void null_iot(device_t *device, int op2, int nac, int mb, int *io, int ac)
-{
-	pdp1_device *pdp1 = dynamic_cast<pdp1_device*>(device);
-
-	pdp1->pdp1_null_iot(op2, nac, mb, io, ac);
-}
-
-static void lem_eem_iot(device_t *device, int op2, int nac, int mb, int *io, int ac)
-{
-	pdp1_device *pdp1 = dynamic_cast<pdp1_device*>(device);
-
-	pdp1->pdp1_lem_eem_iot(op2, nac, mb, io, ac);
-}
-
-static void sbs_iot(device_t *device, int op2, int nac, int mb, int *io, int ac)
-{
-	pdp1_device *pdp1 = dynamic_cast<pdp1_device*>(device);
-
-	pdp1->pdp1_sbs_iot(op2, nac, mb, io, ac);
-}
-
-static void type_20_sbs_iot(device_t *device, int op2, int nac, int mb, int *io, int ac)
-{
-	pdp1_device *pdp1 = dynamic_cast<pdp1_device*>(device);
-
-	pdp1->pdp1_type_20_sbs_iot(op2, nac, mb, io, ac);
-}
-
 void pdp1_device::device_start()
 {
 	int i;
@@ -569,12 +538,11 @@ void pdp1_device::device_start()
 	/* set up params and callbacks */
 	for (i=0; i<64; i++)
 	{
-		m_extern_iot[i] = (extern_iot[i])
-										? extern_iot[i]
-										: null_iot;
+		m_extern_iot[i].resolve();
+		if (m_extern_iot[i].isnull())
+			m_extern_iot[i] = iot_delegate(*this, FUNC(pdp1_device::null_iot));
 	}
-	m_read_binary_word = read_binary_word;
-	m_io_sc_callback = io_sc_callback;
+	m_io_sc_callback.resolve();
 	m_extend_support = extend_support;
 	m_hw_mul_div = hw_mul_div;
 	m_type_20_sbs = type_20_sbs;
@@ -599,13 +567,13 @@ void pdp1_device::device_start()
 
 	if (m_extend_support)
 	{
-		m_extern_iot[074] = lem_eem_iot;
+		m_extern_iot[074] = iot_delegate(*this, FUNC(pdp1_device::lem_eem_iot));
 	}
-	m_extern_iot[054] = m_extern_iot[055] = m_extern_iot[056] = sbs_iot;
+	m_extern_iot[054] = m_extern_iot[055] = m_extern_iot[056] = iot_delegate(*this, FUNC(pdp1_device::sbs_iot));
 	if (m_type_20_sbs)
 	{
 		m_extern_iot[050] = m_extern_iot[051] = m_extern_iot[052] = m_extern_iot[053]
-				= type_20_sbs_iot;
+				= iot_delegate(*this, FUNC(pdp1_device::type_20_sbs_iot));
 	}
 
 	state_add( PDP1_PC,        "PC", m_pc).formatstr("%06O");
@@ -796,9 +764,6 @@ void pdp1_device::execute_run()
 {
 	do
 	{
-		debugger_instruction_hook(PC);
-
-
 		/* ioh should be cleared at the end of the instruction cycle, and ios at the
 		start of next instruction cycle, but who cares? */
 		if (m_ioh && m_ios)
@@ -808,15 +773,19 @@ void pdp1_device::execute_run()
 
 
 		if ((! m_run) && (! m_rim))
+		{
+			debugger_instruction_hook(PC);
 			m_icount = 0;   /* if processor is stopped, just burn cycles */
+		}
 		else if (m_rim)
 		{
 			switch (m_rim_step)
 			{
 			case 0:
 				/* read first word as instruction */
-				if (m_read_binary_word)
-					(*m_read_binary_word)(this);        /* data will be transferred to IO register */
+				MB = 0;
+				/* data will be transferred to IO register in response to RPB */
+				m_extern_iot[2](2, 1, MB, IO, AC);
 				m_rim_step = 1;
 				m_ios = 0;
 				break;
@@ -860,8 +829,8 @@ void pdp1_device::execute_run()
 
 			case 2:
 				/* read second word as data */
-				if (m_read_binary_word)
-					(*m_read_binary_word)(this);        /* data will be transferred to IO register */
+				/* data will be transferred to IO register in response to RPB */
+				m_extern_iot[2](2, 1, MB, IO, AC);
 				m_rim_step = 3;
 				m_ios = 0;
 				break;
@@ -940,6 +909,7 @@ void pdp1_device::execute_run()
 
 				if (! m_cycle)
 				{   /* no instruction in progress: time to fetch a new instruction, I guess */
+					debugger_instruction_hook(PC);
 					MB = READ_PDP_18BIT(MA = PC);
 					INCREMENT_PC;
 					IR = MB >> 13;      /* basic opcode */
@@ -1564,7 +1534,7 @@ void pdp1_device::execute_instruction()
 		{   /* IOT with IO wait */
 			if (m_ioc)
 			{   /* the iot command line is pulsed only if ioc is asserted */
-				(*m_extern_iot[MB & 0000077])(this, MB & 0000077, (MB & 0004000) == 0, MB, &IO, AC);
+				m_extern_iot[MB & 0000077](MB & 0000077, (MB & 0004000) == 0, MB, IO, AC);
 
 				m_ioh = 1;  /* enable io wait */
 
@@ -1587,7 +1557,7 @@ void pdp1_device::execute_instruction()
 		}
 		else
 		{   /* IOT with no IO wait */
-			(*m_extern_iot[MB & 0000077])(this, MB & 0000077, (MB & 0004000) != 0, MB, &IO, AC);
+			m_extern_iot[MB & 0000077](MB & 0000077, (MB & 0004000) != 0, MB, IO, AC);
 		}
 		break;
 	case OPR:       /* Operate Instruction Group */
@@ -1639,7 +1609,7 @@ no_fetch:
 /*
     Handle unimplemented IOT
 */
-void pdp1_device::pdp1_null_iot(int op2, int nac, int mb, int *io, int ac)
+void pdp1_device::null_iot(int op2, int nac, int mb, int &io, int ac)
 {
 	/* Note that the dummy IOT 0 is used to wait for the completion pulse
 	generated by the a pending IOT (IOT with completion pulse but no IO wait) */
@@ -1661,7 +1631,7 @@ void pdp1_device::pdp1_null_iot(int op2, int nac, int mb, int *io, int ac)
 
     IOT 74: LEM/EEM
 */
-void pdp1_device::pdp1_lem_eem_iot(int op2, int nac, int mb, int *io, int ac)
+void pdp1_device::lem_eem_iot(int op2, int nac, int mb, int &io, int ac)
 {
 	if (! m_extend_support) /* extend mode supported? */
 	{
@@ -1684,7 +1654,7 @@ void pdp1_device::pdp1_lem_eem_iot(int op2, int nac, int mb, int *io, int ac)
     IOT 55: esm
     IOT 56: cbs
 */
-void pdp1_device::pdp1_sbs_iot(int op2, int nac, int mb, int *io, int ac)
+void pdp1_device::sbs_iot(int op2, int nac, int mb, int &io, int ac)
 {
 	switch (op2)
 	{
@@ -1727,7 +1697,7 @@ void pdp1_device::pdp1_sbs_iot(int op2, int nac, int mb, int *io, int ac)
     IOT 52: isb
     IOT 53: cac
 */
-void pdp1_device::pdp1_type_20_sbs_iot(int op2, int nac, int mb, int *io, int ac)
+void pdp1_device::type_20_sbs_iot(int op2, int nac, int mb, int &io, int ac)
 {
 	int channel, mask;
 	if (! m_type_20_sbs)    /* type 20 sequence break system supported? */
@@ -1820,6 +1790,6 @@ void pdp1_device::pulse_start_clear()
 	field_interrupt();
 
 	/* now, we kindly ask IO devices to reset, too */
-	if (m_io_sc_callback)
-		(*m_io_sc_callback)(this);
+	if (!m_io_sc_callback.isnull())
+		m_io_sc_callback();
 }

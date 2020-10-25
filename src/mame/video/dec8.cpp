@@ -46,37 +46,37 @@ sprites.
 #include "emu.h"
 #include "includes/dec8.h"
 
-WRITE8_MEMBER(dec8_state::dec8_bg_data_w)
+void dec8_state::dec8_bg_data_w(offs_t offset, uint8_t data)
 {
 	m_bg_data[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-READ8_MEMBER(dec8_state::dec8_bg_data_r)
+uint8_t dec8_state::dec8_bg_data_r(offs_t offset)
 {
 	return m_bg_data[offset];
 }
 
 
-WRITE8_MEMBER(dec8_state::dec8_videoram_w)
+void dec8_state::dec8_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_fix_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(dec8_state::srdarwin_videoram_w)
+void dec8_state::srdarwin_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_fix_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(dec8_state::dec8_scroll2_w)
+void dec8_state::dec8_scroll2_w(offs_t offset, uint8_t data)
 {
 	m_scroll2[offset] = data;
 }
 
-WRITE8_MEMBER(dec8_state::srdarwin_control_w)
+void dec8_state::srdarwin_control_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -91,7 +91,7 @@ WRITE8_MEMBER(dec8_state::srdarwin_control_w)
 	}
 }
 
-WRITE8_MEMBER(dec8_state::lastmisn_control_w)
+void dec8_state::lastmisn_control_w(uint8_t data)
 {
 	/*
 	    Bit 0x0f - ROM bank switch.
@@ -111,7 +111,7 @@ WRITE8_MEMBER(dec8_state::lastmisn_control_w)
 		m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(dec8_state::shackled_control_w)
+void dec8_state::shackled_control_w(uint8_t data)
 {
 	/* Bottom 4 bits - bank switch, Bits 4 & 5 - Scroll MSBs */
 	m_mainbank->set_entry(data & 0x0f);
@@ -120,17 +120,17 @@ WRITE8_MEMBER(dec8_state::shackled_control_w)
 	m_scroll2[2] = (data >> 6) & 1;
 }
 
-WRITE8_MEMBER(dec8_state::lastmisn_scrollx_w)
+void dec8_state::lastmisn_scrollx_w(uint8_t data)
 {
 	m_scroll2[1] = data;
 }
 
-WRITE8_MEMBER(dec8_state::lastmisn_scrolly_w)
+void dec8_state::lastmisn_scrolly_w(uint8_t data)
 {
 	m_scroll2[3] = data;
 }
 
-WRITE8_MEMBER(dec8_state::gondo_scroll_w)
+void dec8_state::gondo_scroll_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{

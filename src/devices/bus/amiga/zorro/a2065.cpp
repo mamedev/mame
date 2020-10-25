@@ -90,14 +90,16 @@ void a2065_device::autoconfig_base_address(offs_t address)
 			write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffff);
 
 	// install access to lance registers
-	m_slot->space().install_readwrite_handler(address + 0x4000, address + 0x4003,
-			read16_delegate(*m_lance, FUNC(am7990_device::regs_r)),
-			write16_delegate(*m_lance, FUNC(am7990_device::regs_w)), 0xffff);
+	m_slot->space().install_read_handler(address + 0x4000, address + 0x4003,
+			read16m_delegate(*m_lance, FUNC(am7990_device::regs_r)), 0xffff);
+	m_slot->space().install_write_handler(address + 0x4000, address + 0x4003,
+			write16sm_delegate(*m_lance, FUNC(am7990_device::regs_w)), 0xffff);
 
 	// install access to onboard ram (32k)
-	m_slot->space().install_readwrite_handler(address + 0x8000, address + 0x8000 + 0x7fff,
-			read16_delegate(*this, FUNC(a2065_device::host_ram_r)),
-			write16_delegate(*this, FUNC(a2065_device::host_ram_w)), 0xffff);
+	m_slot->space().install_read_handler(address + 0x8000, address + 0x8000 + 0x7fff,
+			read16sm_delegate(*this, FUNC(a2065_device::host_ram_r)), 0xffff);
+	m_slot->space().install_write_handler(address + 0x8000, address + 0x8000 + 0x7fff,
+			write16s_delegate(*this, FUNC(a2065_device::host_ram_w)), 0xffff);
 
 	// we're done
 	m_slot->cfgout_w(0);
@@ -130,26 +132,26 @@ WRITE_LINE_MEMBER( a2065_device::cfgin_w )
 	}
 }
 
-READ16_MEMBER( a2065_device::host_ram_r )
+uint16_t a2065_device::host_ram_r(offs_t offset)
 {
 	// logerror("host read offset %04x\n", offset);
 	return m_ram[offset & 0x3fff];
 }
 
-WRITE16_MEMBER( a2065_device::host_ram_w )
+void a2065_device::host_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// logerror("host write %04x = %04x\n", offset, data);
 	COMBINE_DATA(&m_ram[offset]);
 }
 
-READ16_MEMBER( a2065_device::lance_ram_r )
+uint16_t a2065_device::lance_ram_r(offs_t offset)
 {
 	offset = (offset >> 1) & 0x3fff;
 	// logerror("lance read offset %04x\n", offset);
 	return m_ram[offset];
 }
 
-WRITE16_MEMBER( a2065_device::lance_ram_w )
+void a2065_device::lance_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset = (offset >> 1) & 0x3fff;
 	// logerror("lance write %04x = %04x\n", offset, data);

@@ -104,6 +104,7 @@ private:
 	void write(u8 size, offs_t offs, u64 data);
 	bool read(u8 size, offs_t offs, extFloat80_t &data);
 	bool read_chunk(offs_t address, int chunknum, u64 &chunkdata);
+	void generate_row(debug_view_char *destmin, debug_view_char *destmax, debug_view_char *destrow, offs_t address);
 
 	// internal state
 	debug_view_expression m_expression;         // expression describing the start address

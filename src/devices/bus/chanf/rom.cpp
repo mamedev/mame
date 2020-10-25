@@ -145,7 +145,7 @@ void chanf_multi_final_device::device_reset()
  mapper specific handlers
  -------------------------------------------------*/
 
-READ8_MEMBER(chanf_rom_device::read_rom)
+uint8_t chanf_rom_device::read_rom(offs_t offset)
 {
 	if (offset < m_rom_size)
 		return m_rom[offset];
@@ -212,7 +212,7 @@ void chanf_rom_device::common_write_3853(uint32_t offset, uint8_t data)
 		m_ram[offset] = data;
 }
 
-READ8_MEMBER(chanf_multi_old_device::read_rom)
+uint8_t chanf_multi_old_device::read_rom(offs_t offset)
 {
 	if (offset < 0x2000)
 		return m_rom[offset + m_base_bank * 0x2000];
@@ -220,13 +220,13 @@ READ8_MEMBER(chanf_multi_old_device::read_rom)
 		return 0xff;
 }
 
-WRITE8_MEMBER(chanf_multi_old_device::write_bank)
+void chanf_multi_old_device::write_bank(uint8_t data)
 {
 	//printf("0x%x\n", data);
 	m_base_bank = data & 0x1f;
 }
 
-READ8_MEMBER(chanf_multi_final_device::read_rom)
+uint8_t chanf_multi_final_device::read_rom(offs_t offset)
 {
 	if (offset < 0x2000)
 		return m_rom[offset + (m_base_bank * 0x2000) + (m_half_bank * 0x1000)];
@@ -234,7 +234,7 @@ READ8_MEMBER(chanf_multi_final_device::read_rom)
 		return 0xff;
 }
 
-WRITE8_MEMBER(chanf_multi_final_device::write_bank)
+void chanf_multi_final_device::write_bank(uint8_t data)
 {
 	//printf("0x%x\n", data);
 	m_base_bank = data & 0x1f;

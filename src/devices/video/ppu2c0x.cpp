@@ -30,51 +30,21 @@
 
 #include "screen.h"
 
-
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
-
-/* default monochromatic colortable */
-static const pen_t default_colortable_mono[] =
-{
-	0,1,2,3,
-	0,1,2,3,
-	0,1,2,3,
-	0,1,2,3,
-	0,1,2,3,
-	0,1,2,3,
-	0,1,2,3,
-	0,1,2,3,
-};
-
-/* default colortable */
-static const pen_t default_colortable[] =
-{
-	0,1,2,3,
-	0,5,6,7,
-	0,9,10,11,
-	0,13,14,15,
-	0,17,18,19,
-	0,21,22,23,
-	0,25,26,27,
-	0,29,30,31,
-};
-
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
 // devices
-DEFINE_DEVICE_TYPE(PPU_2C02,    ppu2c02_device,    "ppu2c02",    "2C02 PPU")
-DEFINE_DEVICE_TYPE(PPU_2C03B,   ppu2c03b_device,   "ppu2c03b",   "2C03B PPC")
-DEFINE_DEVICE_TYPE(PPU_2C04,    ppu2c04_device,    "ppu2c04",    "2C04 PPU")
-DEFINE_DEVICE_TYPE(PPU_2C07,    ppu2c07_device,    "ppu2c07",    "2C07 PPU")
-DEFINE_DEVICE_TYPE(PPU_PALC,    ppupalc_device,    "ppupalc",    "Generic PAL Clone PPU")
-DEFINE_DEVICE_TYPE(PPU_2C05_01, ppu2c05_01_device, "ppu2c05_01", "2C05_01 PPU")
-DEFINE_DEVICE_TYPE(PPU_2C05_02, ppu2c05_02_device, "ppu2c05_02", "2C05_02 PPU")
-DEFINE_DEVICE_TYPE(PPU_2C05_03, ppu2c05_03_device, "ppu2c05_03", "2C05_03 PPU")
-DEFINE_DEVICE_TYPE(PPU_2C05_04, ppu2c05_04_device, "ppu2c05_04", "2C05_04 PPU")
+DEFINE_DEVICE_TYPE(PPU_2C02,    ppu2c02_device,       "ppu2c02",    "2C02 PPU")
+DEFINE_DEVICE_TYPE(PPU_2C03B,   ppu2c03b_device,      "ppu2c03b",   "2C03B PPC")
+DEFINE_DEVICE_TYPE(PPU_2C04,    ppu2c04_device,       "ppu2c04",    "2C04 PPU")
+DEFINE_DEVICE_TYPE(PPU_2C07,    ppu2c07_device,       "ppu2c07",    "2C07 PPU")
+DEFINE_DEVICE_TYPE(PPU_PALC,    ppupalc_device,       "ppupalc",    "Generic PAL Clone PPU")
+DEFINE_DEVICE_TYPE(PPU_2C05_01, ppu2c05_01_device,    "ppu2c05_01", "2C05_01 PPU")
+DEFINE_DEVICE_TYPE(PPU_2C05_02, ppu2c05_02_device,    "ppu2c05_02", "2C05_02 PPU")
+DEFINE_DEVICE_TYPE(PPU_2C05_03, ppu2c05_03_device,    "ppu2c05_03", "2C05_03 PPU")
+DEFINE_DEVICE_TYPE(PPU_2C05_04, ppu2c05_04_device,    "ppu2c05_04", "2C05_04 PPU")
+DEFINE_DEVICE_TYPE(PPU_2C04C,   ppu2c04_clone_device, "ppu2c04c",   "2C04 Clone PPU")
 
 
 // default address map
@@ -119,7 +89,6 @@ ppu2c0x_device::ppu2c0x_device(const machine_config& mconfig, device_type type, 
 	device_t(mconfig, type, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
-	device_palette_interface(mconfig, *this),
 	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, internal_map),
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_scanline(0),  // reset the scanline count
@@ -131,6 +100,7 @@ ppu2c0x_device::ppu2c0x_device(const machine_config& mconfig, device_type type, 
 	m_back_color(0),
 	m_refresh_data(0),
 	m_x_fine(0),
+	m_toggle(0),
 	m_tilecount(0),
 	m_latch(*this),
 	m_scanline_callback_proc(*this),
@@ -138,7 +108,6 @@ ppu2c0x_device::ppu2c0x_device(const machine_config& mconfig, device_type type, 
 	m_vidaccess_callback_proc(*this),
 	m_int_callback(*this),
 	m_refresh_latch(0),
-	m_toggle(0),
 	m_add(1),
 	m_videomem_addr(0),
 	m_data_latch(0),
@@ -229,12 +198,23 @@ ppu2c05_04_device::ppu2c05_04_device(const machine_config& mconfig, const char* 
 	m_security_value = 0x1b;
 }
 
+// Vs. Unisystem (Super Mario Bros. bootlegs)
+ppu2c04_clone_device::ppu2c04_clone_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+	ppu2c0x_device(mconfig, PPU_2C04C, tag, owner, clock),
+	m_palette_data(*this, "palette", 0x100)
+{
+	m_scanlines_per_frame = VS_CLONE_SCANLINES_PER_FRAME;
+	m_vblank_first_scanline = VBLANK_FIRST_SCANLINE_VS_CLONE;
+
+	// background and sprites are always enabled; monochrome and color emphasis aren't supported
+	m_regs[PPU_CONTROL1] = ~(PPU_CONTROL1_COLOR_EMPHASIS | PPU_CONTROL1_DISPLAY_MONO);
+}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void ppu2c0x_device::device_start()
+void ppu2c0x_device::start_nopalram()
 {
 	// bind our handler
 	m_int_callback.resolve_safe();
@@ -252,25 +232,8 @@ void ppu2c0x_device::device_start()
 	/* allocate a screen bitmap, videomem and spriteram, a dirtychar array and the monochromatic colortable */
 	m_bitmap = std::make_unique<bitmap_rgb32>(VISIBLE_SCREEN_WIDTH, VISIBLE_SCREEN_HEIGHT);
 	m_spriteram = make_unique_clear<uint8_t[]>(SPRITERAM_SIZE);
-	m_colortable = std::make_unique<pen_t[]>(ARRAY_LENGTH(default_colortable));
-	m_colortable_mono = std::make_unique<pen_t[]>(ARRAY_LENGTH(default_colortable_mono));
 
-	m_palette_ram.resize(0x20);
-
-	for (int i = 0; i < 0x20; i++)
-		m_palette_ram[i] = 0x00;
-
-	/* initialize the color tables */
-	for (int i = 0; i < ARRAY_LENGTH(default_colortable_mono); i++)
-	{
-		/* monochromatic table */
-		m_colortable_mono[i] = default_colortable_mono[i];
-
-		/* color table */
-		m_colortable[i] = default_colortable[i];
-	}
-
-	init_palette();
+	init_palette_tables();
 
 	// register for state saving
 	save_item(NAME(m_scanline));
@@ -289,13 +252,43 @@ void ppu2c0x_device::device_start()
 	save_item(NAME(m_scanlines_per_frame));
 	save_item(NAME(m_vblank_first_scanline));
 	save_item(NAME(m_regs));
-	save_item(NAME(m_palette_ram));
 	save_item(NAME(m_draw_phase));
 	save_item(NAME(m_tilecount));
 	save_pointer(NAME(m_spriteram), SPRITERAM_SIZE);
-	save_pointer(NAME(m_colortable), ARRAY_LENGTH(default_colortable));
-	save_pointer(NAME(m_colortable_mono), ARRAY_LENGTH(default_colortable_mono));
+
 	save_item(NAME(*m_bitmap));
+}
+
+void ppu2c0x_device::device_start()
+{
+	start_nopalram();
+
+	m_palette_ram.resize(0x20);
+
+	for (int i = 0; i < 0x20; i++)
+		m_palette_ram[i] = 0x00;
+
+	save_item(NAME(m_palette_ram));
+}
+
+void ppu2c04_clone_device::device_start()
+{
+	ppu2c0x_device::device_start();
+
+	/* this PPU clone draws sprites into a frame buffer before displaying them,
+	causing sprite rendering to be one frame behind tile/background rendering
+	(mainly noticeable during scrolling)
+	to simulate that, we can just have a secondary OAM buffer and swap them
+	at the end of each frame.
+
+	(theoretically this can cause the wrong sprite tiles to be drawn for
+	one frame after changing CHR banks, but the Vs. SMB bootlegs that use
+	this clone hardware don't actually have CHR bank switching anyway.
+	also generally affects PPU-side read timings involving the OAM, but
+	this still doesn't seem to matter for Vs. SMB specifically)
+	*/
+	m_spritebuf = make_unique_clear<uint8_t[]>(SPRITERAM_SIZE);
+	save_pointer(NAME(m_spritebuf), SPRITERAM_SIZE);
 }
 
 //**************************************************************************
@@ -332,12 +325,49 @@ inline void ppu2c0x_device::writebyte(offs_t address, uint8_t data)
  *
  *************************************/
 
-void ppu2c0x_device::init_palette()
+void ppu2c0x_device::apply_color_emphasis_and_clamp(bool is_pal_or_dendy, int color_emphasis, double& R, double& G, double& B)
 {
-	init_palette(false);
+	if (is_pal_or_dendy) // PAL machines swap the colour emphasis bits, this means the red/blue highlighting on rampart tally bar doesn't look as good
+	{
+		color_emphasis = bitswap<3>(color_emphasis, 2, 0, 1);
+	}
+
+	double r_mod = 0.0;
+	double g_mod = 0.0;
+	double b_mod = 0.0;
+
+	switch (color_emphasis)
+	{
+	case 0: r_mod = 1.0;  g_mod = 1.0;  b_mod = 1.0;  break;
+	case 1: r_mod = 1.24; g_mod = .915; b_mod = .743; break;
+	case 2: r_mod = .794; g_mod = 1.09; b_mod = .882; break;
+	case 3: r_mod = .905; g_mod = 1.03; b_mod = 1.28; break;
+	case 4: r_mod = .741; g_mod = .987; b_mod = 1.0;  break;
+	case 5: r_mod = 1.02; g_mod = .908; b_mod = .979; break;
+	case 6: r_mod = 1.02; g_mod = .98;  b_mod = .653; break;
+	case 7: r_mod = .75;  g_mod = .75;  b_mod = .75;  break;
+	}
+
+	R = R * r_mod;
+	G = G * g_mod;
+	B = B * b_mod;
+
+	/* Clipping, in case of saturation */
+	if (R < 0)
+		R = 0;
+	if (R > 255)
+		R = 255;
+	if (G < 0)
+		G = 0;
+	if (G > 255)
+		G = 255;
+	if (B < 0)
+		B = 0;
+	if (B > 255)
+		B = 255;
 }
 
-rgb_t ppu2c0x_device::nespal_to_RGB(int color_intensity, int color_num)
+rgb_t ppu2c0x_device::nespal_to_RGB(int color_intensity, int color_num, int color_emphasis, bool is_pal_or_dendy)
 {
 	const double tint = 0.22; /* adjust to taste */
 	const double hue = 287.0;
@@ -390,25 +420,15 @@ rgb_t ppu2c0x_device::nespal_to_RGB(int color_intensity, int color_num)
 	double G = (y - (Kb * Ku * u + Kr * Kv * v) / (1 - Kb - Kr)) * 255.0;
 	double B = (y + Ku * u) * 255.0;
 
-	/* Clipping, in case of saturation */
-	if (R < 0)
-		R = 0;
-	if (R > 255)
-		R = 255;
-	if (G < 0)
-		G = 0;
-	if (G > 255)
-		G = 255;
-	if (B < 0)
-		B = 0;
-	if (B > 255)
-		B = 255;
+	apply_color_emphasis_and_clamp(is_pal_or_dendy, color_emphasis, R, G, B);
 
 	return rgb_t(floor(R + .5), floor(G + .5), floor(B + .5));
 }
 
-void ppu2c0x_device::init_palette(bool indirect)
+void ppu2c0x_device::init_palette_tables()
 {
+	bool is_pal = m_scanlines_per_frame != NTSC_SCANLINES_PER_FRAME;
+
 	/* This routine builds a palette using a transformation from */
 	/* the YUV (Y, B-Y, R-Y) to the RGB color space */
 
@@ -421,45 +441,23 @@ void ppu2c0x_device::init_palette(bool indirect)
 	/* Loop through the emphasis modes (8 total) */
 	for (int color_emphasis = 0; color_emphasis < 8; color_emphasis++)
 	{
-		/*
-		double r_mod = 0.0;
-		double g_mod = 0.0;
-		double b_mod = 0.0;
-
-		switch (color_emphasis)
-		{
-		    case 0: r_mod = 1.0;  g_mod = 1.0;  b_mod = 1.0;  break;
-		    case 1: r_mod = 1.24; g_mod = .915; b_mod = .743; break;
-		    case 2: r_mod = .794; g_mod = 1.09; b_mod = .882; break;
-		    case 3: r_mod = .905; g_mod = 1.03; b_mod = 1.28; break;
-		    case 4: r_mod = .741; g_mod = .987; b_mod = 1.0;  break;
-		    case 5: r_mod = 1.02; g_mod = .908; b_mod = .979; break;
-		    case 6: r_mod = 1.02; g_mod = .98;  b_mod = .653; break;
-		    case 7: r_mod = .75;  g_mod = .75;  b_mod = .75;  break;
-		}
-		*/
-
 		/* loop through the 4 intensities */
 		for (int color_intensity = 0; color_intensity < 4; color_intensity++)
 		{
 			/* loop through the 16 colors */
 			for (int color_num = 0; color_num < 16; color_num++)
 			{
-				rgb_t col = nespal_to_RGB(color_intensity, color_num);
+				rgb_t col = nespal_to_RGB(color_intensity, color_num, color_emphasis, is_pal);
 
-				/* Round, and set the value */
-				if (indirect)
-					set_indirect_color(entry++, col);
-				else
-					set_pen_color(entry++, col);
+				m_nespens[entry] = (uint32_t)col;
+				entry++;
+
 			}
 		}
 	}
-
-	/* color tables are modified at run-time, and are initialized on 'ppu2c0x_reset' */
 }
 
-void ppu2c0x_rgb_device::init_palette()
+void ppu2c0x_rgb_device::init_palette_tables()
 {
 	/* Loop through the emphasis modes (8 total) */
 	int entry = 0;
@@ -471,26 +469,31 @@ void ppu2c0x_rgb_device::init_palette()
 			int G = ((color_emphasis & 2) ? 7 : m_palette_data[color_num * 3 + 1]);
 			int B = ((color_emphasis & 4) ? 7 : m_palette_data[color_num * 3 + 2]);
 
-			set_pen_color(entry++, pal3bit(R), pal3bit(G), pal3bit(B));
+			m_nespens[entry] = (pal3bit(R)<<16) | (pal3bit(G)<<8) | pal3bit(B);
+
+			//set_pen_color(entry++, pal3bit(R), pal3bit(G), pal3bit(B));
+			entry++;
 		}
 	}
-
-	/* color tables are modified at run-time, and are initialized on 'ppu2c0x_reset' */
 }
 
-#if 0
-/* the charlayout we use for the chargen */
-static const gfx_layout ppu_charlayout =
+void ppu2c04_clone_device::init_palette_tables()
 {
-	8, 8,   /* 8*8 characters */
-	0,
-	2,      /* 2 bits per pixel */
-	{ 8*8, 0 }, /* the two bitplanes are separated */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	16*8    /* every char takes 16 consecutive bytes */
-};
-#endif
+	/* clone HW doesn't use color emphasis bits.
+	   however, it does have two separate palettes: colors 0-63 for background, and 64-127 for sprites
+	   (although the tile and sprite colors are identical in the Vs. SMB bootleg ROMs)
+	*/
+	for (int color_num = 0; color_num < 64*2; color_num++)
+	{
+		/* A7 line on palette ROMs is always high, color bits are in reverse order */
+		u8 color = m_palette_data[color_num | 0x80];
+		int R = bitswap<3>(color, 0, 1, 2);
+		int G = bitswap<3>(color, 3, 4, 5);
+		int B = bitswap<2>(color, 6, 7);
+
+		m_nespens[color_num] = (pal3bit(R) << 16) | (pal3bit(G) << 8) | pal2bit(B);
+	}
+}
 
 /*************************************
  *
@@ -609,24 +612,34 @@ void ppu2c0x_device::shift_tile_plane_data(uint8_t& pix)
 	m_planebuf[1] = m_planebuf[1] << 1;
 }
 
-void ppu2c0x_device::draw_tile_pixel(uint8_t pix, int color, pen_t back_pen, uint32_t*& dest, const pen_t* color_table)
+void ppu2c0x_device::draw_tile_pixel(uint8_t pix, int color, uint32_t back_pen, uint32_t*& dest)
 {
-	pen_t pen;
+	uint32_t usepen;
 
 	if (pix)
 	{
-		const pen_t* paldata = &color_table[4 * color];
-		pen = this->pen(paldata[pix]);
+		uint8_t pen = ((4 * color) + pix) & 0x1f;
+		uint16_t palval = m_palette_ram[pen];
+
+		if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
+			palval &= 0x30;
+
+		// apply colour emphasis
+		palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 1);
+
+		usepen = m_nespens[palval];
 	}
 	else
 	{
-		pen = back_pen;
+		usepen = m_nespens[back_pen];
 	}
 
-	*dest = pen;
+
+
+	*dest = usepen;
 }
 
-void ppu2c0x_device::draw_tile(uint8_t* line_priority, int color_byte, int color_bits, int address, int start_x, pen_t back_pen, uint32_t*& dest, const pen_t* color_table)
+void ppu2c0x_device::draw_tile(uint8_t* line_priority, int color_byte, int color_bits, int address, int start_x, uint32_t back_pen, uint32_t*& dest)
 {
 	int color = (((color_byte >> color_bits) & 0x03));
 
@@ -640,7 +653,7 @@ void ppu2c0x_device::draw_tile(uint8_t* line_priority, int color_byte, int color
 
 		if ((start_x + i) >= 0 && (start_x + i) < VISIBLE_SCREEN_WIDTH)
 		{
-			draw_tile_pixel(pix, color, back_pen, dest, color_table);
+			draw_tile_pixel(pix, color, back_pen, dest);
 
 			// priority marking
 			if (pix)
@@ -659,24 +672,6 @@ void ppu2c0x_device::draw_background(uint8_t* line_priority)
 {
 	bitmap_rgb32& bitmap = *m_bitmap;
 
-	uint8_t color_mask;
-	const pen_t* color_table;
-
-	/* setup the color mask and colortable to use */
-	if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
-	{
-		color_mask = 0xf0;
-		color_table = m_colortable_mono.get();
-	}
-	else
-	{
-		color_mask = 0xff;
-		color_table = m_colortable.get();
-	}
-
-	/* cache the background pen */
-	pen_t back_pen = pen(m_back_color & color_mask);
-
 	/* determine where in the nametable to start drawing from */
 	/* based on the current scanline and scroll regs */
 	uint8_t  scroll_x_coarse = m_refresh_data & 0x001f;
@@ -691,7 +686,7 @@ void ppu2c0x_device::draw_background(uint8_t* line_priority)
 
 	/* set up dest */
 	int start_x = (m_x_fine ^ 0x07) - 7;
-	uint32_t* dest = &bitmap.pix32(m_scanline, start_x);
+	uint32_t* dest = &bitmap.pix(m_scanline, start_x);
 
 	m_tilecount = 0;
 
@@ -730,7 +725,7 @@ void ppu2c0x_device::draw_background(uint8_t* line_priority)
 			// plus something that accounts for y
 			address += scroll_y_fine;
 
-			draw_tile(line_priority, color_byte, color_bits, address, start_x, back_pen, dest, color_table);
+			draw_tile(line_priority, color_byte, color_bits, address, start_x, m_back_color, dest);
 
 			start_x += 8;
 
@@ -748,13 +743,29 @@ void ppu2c0x_device::draw_background(uint8_t* line_priority)
 	/* if the left 8 pixels for the background are off, blank 'em */
 	if (!(m_regs[PPU_CONTROL1] & PPU_CONTROL1_BACKGROUND_L8))
 	{
-		dest = &bitmap.pix32(m_scanline);
+		dest = &bitmap.pix(m_scanline);
 		for (int i = 0; i < 8; i++)
 		{
-			*(dest++) = back_pen;
+			draw_back_pen(dest, m_back_color);
+			dest++;
+
 			line_priority[i] ^= 0x02;
 		}
 	}
+}
+
+void ppu2c04_clone_device::draw_background(uint8_t* line_priority)
+{
+	// nametable selection is ignored below the hardwired scroll split position
+	if (m_scanline < 31)
+		m_refresh_data &= ~0x0c00;
+
+	ppu2c0x_device::draw_background(line_priority);
+}
+
+void ppu2c0x_device::draw_back_pen(uint32_t* dst, int back_pen)
+{
+	*dst = m_nespens[back_pen];
 }
 
 void ppu2c0x_device::draw_background_pen()
@@ -762,14 +773,11 @@ void ppu2c0x_device::draw_background_pen()
 	bitmap_rgb32& bitmap = *m_bitmap;
 
 	/* setup the color mask and colortable to use */
-	uint8_t color_mask = (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO) ? 0xf0 : 0xff;
-
-	/* cache the background pen */
-	pen_t back_pen = pen(m_back_color & color_mask);
+	uint8_t color_mask = (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO) ? 0x30 : 0x3f;
 
 	// Fill this scanline with the background pen.
 	for (int i = 0; i < bitmap.width(); i++)
-		bitmap.pix32(m_scanline, i) = back_pen;
+		draw_back_pen(&bitmap.pix(m_scanline, i), m_back_color & color_mask);
 }
 
 void ppu2c0x_device::read_sprite_plane_data(int address)
@@ -796,8 +804,27 @@ void ppu2c0x_device::make_sprite_pixel_data(uint8_t& pixel_data, int flipx)
 
 void ppu2c0x_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_rgb32& bitmap)
 {
-	const pen_t* paldata = &m_colortable[4 * color];
-	bitmap.pix32(m_scanline, sprite_xpos + pixel) = pen(paldata[pixel_data]);
+	uint16_t palval = m_palette_ram[((4 * color) | pixel_data) & 0x1f];
+
+	if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
+		palval &= 0x30;
+
+	// apply colour emphasis
+	palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 1);
+
+	uint32_t pix = m_nespens[palval];
+	bitmap.pix(m_scanline, sprite_xpos + pixel) = pix;
+}
+
+void ppu2c04_clone_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_rgb32 &bitmap)
+{
+	/* clone PPU clips sprites at the screen edges */
+	if ((sprite_xpos + pixel < 8) || (sprite_xpos + pixel) >= (VISIBLE_SCREEN_WIDTH - 6))
+		return;
+
+	uint16_t palval = m_palette_ram[((4 * color) | pixel_data) & 0x1f];
+	uint32_t pix = m_nespens[palval | 0x40];
+	bitmap.pix(m_scanline, sprite_xpos + pixel) = pix;
 }
 
 void ppu2c0x_device::read_extra_sprite_bits(int sprite_index)
@@ -996,6 +1023,19 @@ void ppu2c0x_device::draw_sprites(uint8_t* line_priority)
 	}
 }
 
+void ppu2c04_clone_device::draw_sprites(uint8_t *line_priority)
+{
+	ppu2c0x_device::draw_sprites(line_priority);
+
+	if (m_scanline == BOTTOM_VISIBLE_SCANLINE)
+	{
+		/* this frame's sprite buffer is cleared after being displayed
+		and the other one that was filled this frame will be displayed next frame */
+		m_spriteram.swap(m_spritebuf);
+		memset(m_spritebuf.get(), 0, SPRITERAM_SIZE);
+	}
+}
+
 /*************************************
  *
  *  Scanline Rendering and Update
@@ -1074,12 +1114,14 @@ void ppu2c0x_device::update_visible_enabled_scanline()
 void ppu2c0x_device::update_visible_disabled_scanline()
 {
 	bitmap_rgb32& bitmap = *m_bitmap;
-	pen_t back_pen;
+	uint32_t back_pen;
 
 	/* setup the color mask and colortable to use */
-	uint8_t color_mask = (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO) ? 0xf0 : 0xff;
+	uint8_t color_mask = (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO) ? 0x30 : 0x3f;
 
-	back_pen = pen(m_back_color & color_mask);
+	uint16_t palval = m_back_color & color_mask;
+
+	back_pen = palval;
 
 	if (m_paletteram_in_ppuspace)
 	{
@@ -1092,13 +1134,13 @@ void ppu2c0x_device::update_visible_disabled_scanline()
 			// pen. Micro Machines makes use of this feature.
 			int pen_num = m_palette_ram[(m_videomem_addr & 0x03) ? (m_videomem_addr & 0x1f) : 0];
 
-			back_pen = pen(pen_num);
+			back_pen = pen_num;
 		}
 	}
 
 	// Fill this scanline with the background pen.
 	for (int i = 0; i < bitmap.width(); i++)
-		bitmap.pix32(m_scanline, i) = back_pen;
+		draw_back_pen(&bitmap.pix(m_scanline, i), back_pen);
 }
 
 void ppu2c0x_device::update_visible_scanline()
@@ -1135,29 +1177,20 @@ void ppu2c0x_device::update_scanline()
 
 void ppu2c0x_device::palette_write(offs_t offset, uint8_t data)
 {
-	int color_emphasis = (m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) * 2;
-
 	// palette RAM is only 6 bits wide
 	data &= 0x3f;
 
-	// transparent pens are mirrored!
 	if (offset & 0x3)
 	{
+		// regular pens, no mirroring
 		m_palette_ram[offset & 0x1f] = data;
-		m_colortable[offset & 0x1f] = data + color_emphasis;
-		m_colortable_mono[offset & 0x1f] = (data & 0xf0) + color_emphasis;
 	}
 	else
 	{
-		int i;
+		// transparent pens are mirrored!
 		if (0 == (offset & 0xf))
 		{
 			m_back_color = data;
-			for (i = 0; i < 32; i += 4)
-			{
-				m_colortable[i] = data + color_emphasis;
-				m_colortable_mono[i] = (data & 0xf0) + color_emphasis;
-			}
 		}
 		m_palette_ram[offset & 0xf] = m_palette_ram[(offset & 0xf) + 0x10] = data;
 	}
@@ -1235,6 +1268,23 @@ uint8_t ppu2c0x_device::read(offs_t offset)
 	return m_data_latch;
 }
 
+uint8_t ppu2c04_clone_device::read(offs_t offset)
+{
+	switch (offset & 7)
+	{
+	case PPU_STATUS: /* 2 */
+		// $2002 on this clone only contains the sprite 0 hit flag,
+		// and it's hardwired to trigger after a specific scanline, not based on actual sprite positions
+		if (m_scanline < 31 || m_scanline >= (m_vblank_first_scanline - 1))
+			return ~PPU_STATUS_SPRITE0_HIT;
+		return 0xff;
+
+	case PPU_SPRITE_DATA: /* 4 */
+		return m_spritebuf[m_regs[PPU_SPRITE_ADDRESS]];
+	}
+
+	return ppu2c0x_device::read(offset);
+}
 
 /*************************************
  *
@@ -1279,18 +1329,6 @@ void ppu2c0x_device::write(offs_t offset, uint8_t data)
 		break;
 
 	case PPU_CONTROL1: /* 1 */
-		/* if color intensity has changed, change all the color tables to reflect them */
-		if ((data & PPU_CONTROL1_COLOR_EMPHASIS) != (m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS))
-		{
-			int i;
-			for (i = 0; i <= 0x1f; i++)
-			{
-				uint8_t oldColor = m_palette_ram[i];
-
-				m_colortable[i] = oldColor + (data & PPU_CONTROL1_COLOR_EMPHASIS) * 2;
-			}
-		}
-
 		//logerror("control1 write: %02x (scanline: %d)\n", data, m_scanline);
 		m_regs[PPU_CONTROL1] = data;
 		break;
@@ -1384,6 +1422,49 @@ void ppu2c0x_device::write(offs_t offset, uint8_t data)
 	}
 
 	m_data_latch = data;
+}
+
+void ppu2c04_clone_device::write(offs_t offset, uint8_t data)
+{
+	switch (offset & 7)
+	{
+	case PPU_CONTROL0: /* 0 */
+		data &= (0x01 | PPU_CONTROL0_INC | PPU_CONTROL0_NMI); /* other bits of $2000 are ignored by this clone */
+		data |= PPU_CONTROL0_CHR_SELECT;
+		break;
+
+	case PPU_CONTROL1: /* 1 */
+	case PPU_SPRITE_ADDRESS: /* 3 */
+		return; /* $2001 and $2003 do nothing on this clone */
+
+	case PPU_SPRITE_DATA: /* 4 */
+		m_spritebuf[m_regs[PPU_SPRITE_ADDRESS]] = data;
+		m_regs[PPU_SPRITE_ADDRESS] = (m_regs[PPU_SPRITE_ADDRESS] + 1) & 0xff;
+		return;
+
+	case PPU_SCROLL: /* 5 */
+		if (m_toggle)
+			data = 0; /* no vertical scroll */
+		break;
+
+	case PPU_ADDRESS: /* 6 */
+		/* $2006 doesn't affect scroll latching */
+		if (m_toggle)
+		{
+			/* second write */
+			set_vram_dest((get_vram_dest() & 0xff00) | data);
+		}
+		else
+		{
+			/* first write */
+			set_vram_dest((get_vram_dest() & 0x00ff) | (data << 8));
+		}
+
+		m_toggle ^= 1;
+		return;
+	}
+
+	ppu2c0x_device::write(offset, data);
 }
 
 uint16_t ppu2c0x_device::get_vram_dest()

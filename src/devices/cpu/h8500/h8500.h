@@ -50,7 +50,7 @@ private:
 	address_space_config m_program_config;
 	address_space_config m_ram_config;
 	address_space *m_program;
-	memory_access_cache<1, 0, ENDIANNESS_BIG> *m_ram_cache;
+	memory_access<11, 1, 0, ENDIANNESS_BIG>::cache m_ram_cache;
 
 	// internal registers
 	u16 m_pc;

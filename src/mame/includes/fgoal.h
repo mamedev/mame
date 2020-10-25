@@ -61,21 +61,21 @@ private:
 	int        m_prev_coin;
 	emu_timer  *m_interrupt_timer;
 
-	DECLARE_READ8_MEMBER(analog_r);
-	DECLARE_READ8_MEMBER(nmi_reset_r);
-	DECLARE_READ8_MEMBER(irq_reset_r);
-	DECLARE_READ8_MEMBER(row_r);
-	DECLARE_WRITE8_MEMBER(row_w);
-	DECLARE_WRITE8_MEMBER(col_w);
-	DECLARE_READ8_MEMBER(address_hi_r);
-	DECLARE_READ8_MEMBER(address_lo_r);
-	DECLARE_READ8_MEMBER(shifter_r);
-	DECLARE_READ8_MEMBER(shifter_reverse_r);
-	DECLARE_WRITE8_MEMBER(sound1_w);
-	DECLARE_WRITE8_MEMBER(sound2_w);
-	DECLARE_WRITE8_MEMBER(color_w);
-	DECLARE_WRITE8_MEMBER(ypos_w);
-	DECLARE_WRITE8_MEMBER(xpos_w);
+	uint8_t analog_r();
+	uint8_t nmi_reset_r();
+	uint8_t irq_reset_r();
+	uint8_t row_r();
+	void row_w(uint8_t data);
+	void col_w(uint8_t data);
+	uint8_t address_hi_r();
+	uint8_t address_lo_r();
+	uint8_t shifter_r();
+	uint8_t shifter_reverse_r();
+	void sound1_w(uint8_t data);
+	void sound2_w(uint8_t data);
+	void color_w(uint8_t data);
+	void ypos_w(uint8_t data);
+	void xpos_w(uint8_t data);
 
 	TIMER_CALLBACK_MEMBER(interrupt_callback);
 

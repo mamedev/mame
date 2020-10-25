@@ -32,10 +32,10 @@
 
   PCB specs:
 
-  Sikscreened: 'PCB Ver 1.5'
-  Sikscreened: 'SIELCON GAMES'
-  Sikscreened: 'Copyright 1996'
-  Sikscreened: 'MADE IN ARGENTINA'
+  Silkscreened: 'PCB Ver 1.5'
+  Silkscreened: 'SIELCON GAMES'
+  Silkscreened: 'Copyright 1996'
+  Silkscreened: 'MADE IN ARGENTINA'
 
   1x Unknown sanded PLCC68 IC (identified as Zilog Z180).
   1x unknown sanded DIL24 IC labeled PLD-01.
@@ -244,7 +244,7 @@
   '---------'                 '---------'                               '---------'
 
 
-  TOUCH = For iButton inplementation. Not present in the current PCBs.
+  TOUCH = For iButton implementation. Not present in the current PCBs.
 
 
 *********************************************************************
@@ -276,7 +276,6 @@
 #include "machine/i8255.h"
 #include "video/v9938.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 #include "luckybal.lh"
@@ -304,15 +303,18 @@ public:
 	void init_luckybala();
 	void init_luckybald();
 
+protected:
+	virtual void machine_start() override;
+
 private:
-	DECLARE_WRITE8_MEMBER(z180_trdr_w);
-	DECLARE_WRITE8_MEMBER(port90_bitswap_w);
-	DECLARE_READ8_MEMBER(ppi_bitswap_r);
-	DECLARE_WRITE8_MEMBER(ppi_bitswap_w);
-	DECLARE_WRITE8_MEMBER(output_port_a_w);
-	DECLARE_WRITE8_MEMBER(output_port_b_w);
-	DECLARE_READ8_MEMBER(input_port_c_r);
-	DECLARE_WRITE8_MEMBER(output_port_c_w);
+	void z180_trdr_w(uint8_t data);
+	void port90_bitswap_w(uint8_t data);
+	uint8_t ppi_bitswap_r(offs_t offset);
+	void ppi_bitswap_w(offs_t offset, uint8_t data);
+	void output_port_a_w(uint8_t data);
+	void output_port_b_w(uint8_t data);
+	uint8_t input_port_c_r();
+	void output_port_c_w(uint8_t data);
 
 	uint8_t m_trdr;
 	uint8_t m_led_on = 0;
@@ -329,9 +331,17 @@ private:
 	void main_io(address_map &map);
 	void main_map(address_map &map);
 
-	virtual void machine_start() override { m_lamps.resolve(); }
 	output_finder<38> m_lamps;
 };
+
+
+void luckybal_state::machine_start()
+{
+	m_lamps.resolve();
+
+	save_item(NAME(m_trdr));
+	save_item(NAME(m_led_on));
+}
 
 
 /**************************************
@@ -349,9 +359,9 @@ void luckybal_state::main_io(address_map &map)
 {
 	map.global_mask(0xff);
 
-	map(0x00, 0x0a).nopr().nopw();;  // Z180 Internal registers.
+	map(0x00, 0x0a).nopr().nopw();  // Z180 Internal registers.
 	map(0x0b, 0x0b).nopr().w(FUNC(luckybal_state::z180_trdr_w));
-	map(0x0c, 0x3f).nopr().nopw();;  // Z180 Internal registers.
+	map(0x0c, 0x3f).nopr().nopw();  // Z180 Internal registers.
 
 	map(0x90, 0x90).w(FUNC(luckybal_state::port90_bitswap_w));
 	map(0xc0, 0xc3).rw(FUNC(luckybal_state::ppi_bitswap_r), FUNC(luckybal_state::ppi_bitswap_w));
@@ -381,28 +391,28 @@ M_MAP     EQU  90H    ; [A]= Bank to select (BIT6=MEM, BIT7=EN_NMI)
 /**************************************
 *            R/W handlers             *
 **************************************/
-WRITE8_MEMBER(luckybal_state::z180_trdr_w)
+void luckybal_state::z180_trdr_w(uint8_t data)
 {
 	m_trdr = data;
 }
 
-WRITE8_MEMBER(luckybal_state::port90_bitswap_w)
+void luckybal_state::port90_bitswap_w(uint8_t data)
 {
 	data = bitswap<8>(data, 6, 7, 4, 5, 2, 3, 0, 1);
 	membank("bank1")->set_entry(data & 0x3f);
 }
 
-READ8_MEMBER(luckybal_state::ppi_bitswap_r)
+uint8_t luckybal_state::ppi_bitswap_r(offs_t offset)
 {
 	return bitswap<8>(m_ppi->read(offset), 6, 7, 4, 5, 2, 3, 0, 1);
 }
 
-WRITE8_MEMBER(luckybal_state::ppi_bitswap_w)
+void luckybal_state::ppi_bitswap_w(offs_t offset, uint8_t data)
 {
 	m_ppi->write(offset, bitswap<8>(data, 6, 7, 4, 5, 2, 3, 0, 1));
 }
 
-WRITE8_MEMBER(luckybal_state::output_port_a_w)
+void luckybal_state::output_port_a_w(uint8_t data)
 {
 	if (m_trdr & 0x80)
 	{
@@ -417,7 +427,7 @@ WRITE8_MEMBER(luckybal_state::output_port_a_w)
 	m_dac->write(data);
 }
 
-WRITE8_MEMBER(luckybal_state::output_port_b_w)
+void luckybal_state::output_port_b_w(uint8_t data)
 {
 	for (int n = 0; n < 3; n++)
 		if (!BIT(data, n + 3))
@@ -425,7 +435,7 @@ WRITE8_MEMBER(luckybal_state::output_port_b_w)
 
 }
 
-READ8_MEMBER(luckybal_state::input_port_c_r)
+uint8_t luckybal_state::input_port_c_r()
 {
 	uint8_t mux_player, sel_line, bit5, bit6, bit7, ret;
 	sel_line = m_ppi->pb_r() & 0x7f;
@@ -448,9 +458,9 @@ READ8_MEMBER(luckybal_state::input_port_c_r)
 	return ret;
 }
 
-WRITE8_MEMBER(luckybal_state::output_port_c_w)
+void luckybal_state::output_port_c_w(uint8_t data)
 {
-/*  Writes 0xF0/0xF1 constantly at the begining... like a watchdog.
+/*  Writes 0xF0/0xF1 constantly at the beginning... like a watchdog.
     After a while, just stop (when roulette LEDs are transmitted).
 */
 }
@@ -567,7 +577,7 @@ INPUT_PORTS_END
 
 void luckybal_state::luckybal(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	Z80180(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &luckybal_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &luckybal_state::main_io);
@@ -584,22 +594,19 @@ void luckybal_state::luckybal(machine_config &config)
 
 	CD4099(config, "latch3", 0);
 
-	/* nvram */
+	// nvram
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	/* video hardware */
+	// video hardware
 	v9938_device &v9938(V9938(config, "v9938", VID_CLOCK));
 	v9938.set_screen_ntsc("screen");
 	v9938.set_vram_size(VDP_MEM);
 	v9938.int_cb().set_inputline("maincpu", 0);
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC08(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 

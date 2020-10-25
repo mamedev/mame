@@ -94,8 +94,8 @@ private:
 	void srollnd_map(address_map &map);
 
 	// simulation
-	DECLARE_READ16_MEMBER(srollnd_share_sim_r);
-	DECLARE_WRITE16_MEMBER(srollnd_share_sim_w);
+	u16 srollnd_share_sim_r(offs_t offset, u16 mem_mask = ~0);
+	void srollnd_share_sim_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	u32 m_snowboard_latch;
 

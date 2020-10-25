@@ -35,7 +35,6 @@ ie15_cpu_device::ie15_cpu_device(const machine_config &mconfig, const char *tag,
 	: cpu_device(mconfig, IE15_CPU, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 14)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8), m_A(0), m_CF(0), m_ZF(0), m_RF(0), m_flags(0)
-	, m_program(nullptr), m_io(nullptr), m_cache(nullptr)
 {
 	// set our instruction counter
 	set_icountptr(m_icount);
@@ -48,9 +47,9 @@ ie15_cpu_device::ie15_cpu_device(const machine_config &mconfig, const char *tag,
 void ie15_cpu_device::device_start()
 {
 	// find address spaces
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
-	m_io = &space(AS_IO);
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
+	space(AS_IO).specific(m_io);
 
 	// save state
 	save_item(NAME(m_PC));
@@ -322,7 +321,7 @@ inline void ie15_cpu_device::execute_one(int opcode)
 			if (opcode == 0x67)
 				m_A = 255;
 			else
-				m_A = m_io->read_byte(opcode & 15);
+				m_A = m_io.read_byte(opcode & 15);
 			update_flags(m_A);
 			break;
 		case 0xf0:  // ota
@@ -332,7 +331,7 @@ inline void ie15_cpu_device::execute_one(int opcode)
 			else if (opcode == 0xff)
 				m_RF = 0;
 			else
-				m_io->write_byte(opcode & 15, m_A);
+				m_io.write_byte(opcode & 15, m_A);
 //          m_CF = 0;
 			break;
 		case 0xc0:  // cfl, sfl
@@ -344,7 +343,7 @@ inline void ie15_cpu_device::execute_one(int opcode)
 					m_CF = 0;
 					break;
 				default:
-					m_io->write_byte(020 | (opcode & 7), BIT(opcode, 3));
+					m_io.write_byte(020 | (opcode & 7), BIT(opcode, 3));
 					break;
 			}
 			break;
@@ -362,7 +361,7 @@ inline void ie15_cpu_device::execute_one(int opcode)
 					tmp = 0;
 					break;
 				default:
-					tmp = m_io->read_byte(020 | tmp);
+					tmp = m_io.read_byte(020 | tmp);
 					break;
 
 			}
@@ -406,14 +405,14 @@ inline void ie15_cpu_device::execute_one(int opcode)
 
 inline uint8_t ie15_cpu_device::rop()
 {
-	uint8_t retVal = m_cache->read_byte(m_PC.w.l);
+	uint8_t retVal = m_cache.read_byte(m_PC.w.l);
 	m_PC.w.l = (m_PC.w.l + 1) & 0x0fff;
 	return retVal;
 }
 
 inline uint8_t ie15_cpu_device::arg()
 {
-	uint8_t retVal = m_cache->read_byte(m_PC.w.l);
+	uint8_t retVal = m_cache.read_byte(m_PC.w.l);
 	return retVal;
 }
 

@@ -143,7 +143,7 @@ WRITE_LINE_MEMBER( a8sio_device::proceed_w )
 	m_out_proceed_cb(state);
 }
 
-WRITE8_MEMBER( a8sio_device::audio_in_w )
+void a8sio_device::audio_in_w(uint8_t data)
 {
 	m_out_audio_in_cb(data);
 }

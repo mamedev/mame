@@ -143,9 +143,8 @@ private:
 	uint8_t   m_picRAMmask;
 	int     m_inst_cycles;
 
-	address_space *m_program;
-	memory_access_cache<1, -1, ENDIANNESS_LITTLE> *m_cache;
-	address_space *m_data;
+	memory_access<11, 1, -1, ENDIANNESS_LITTLE>::cache m_program;
+	memory_access< 7, 0,  0, ENDIANNESS_LITTLE>::specific m_data;
 
 	// i/o handlers
 	devcb_read8 m_read_a;

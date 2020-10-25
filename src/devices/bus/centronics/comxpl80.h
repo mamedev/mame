@@ -63,10 +63,10 @@ private:
 
 	uint8_t m_data;
 
-	DECLARE_WRITE8_MEMBER( pa_w );
-	DECLARE_WRITE8_MEMBER( pb_w );
-	DECLARE_WRITE8_MEMBER( pc_w );
-	DECLARE_READ8_MEMBER( pd_r );
+	void pa_w(uint8_t data);
+	void pb_w(uint8_t data);
+	void pc_w(uint8_t data);
+	uint8_t pd_r();
 };
 
 

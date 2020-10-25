@@ -394,7 +394,7 @@ WRITE_LINE_MEMBER(slapfght_state::sound_reset_w)
 		m_sound_nmi_enabled = false;
 }
 
-READ8_MEMBER(slapfght_state::vblank_r)
+uint8_t slapfght_state::vblank_r()
 {
 	return m_screen->vblank() ? 1 : 0;
 }
@@ -441,7 +441,7 @@ INTERRUPT_GEN_MEMBER(slapfght_state::sound_nmi)
 		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-WRITE8_MEMBER(slapfght_state::sound_nmi_enable_w)
+void slapfght_state::sound_nmi_enable_w(offs_t offset, uint8_t data)
 {
 	m_sound_nmi_enabled = offset ? false : true;
 }

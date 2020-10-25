@@ -161,9 +161,9 @@ protected:
 
 	virtual void machine_start() override;
 
-	DECLARE_WRITE16_MEMBER(btc_trackball_w);
-	DECLARE_READ16_MEMBER(tokimeki_serial_r);
-	DECLARE_WRITE16_MEMBER(tokimeki_serial_w);
+	void btc_trackball_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t tokimeki_serial_r();
+	void tokimeki_serial_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void scsi_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	void scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 
@@ -194,8 +194,8 @@ public:
 private:
 	virtual void machine_start() override;
 
-	DECLARE_READ16_MEMBER(flash_r);
-	DECLARE_WRITE16_MEMBER(flash_w);
+	uint16_t flash_r(offs_t offset);
+	void flash_w(offs_t offset, uint16_t data);
 
 	void simpbowl_map(address_map &map);
 
@@ -391,13 +391,13 @@ void konamigv_state::konamigv(machine_config &config)
 
 static INPUT_PORTS_START( konamigv )
 	PORT_START("P1")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_8WAY
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_8WAY
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_8WAY
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_START1 )
@@ -455,7 +455,7 @@ INPUT_PORTS_END
 
 /* Simpsons Bowling */
 
-READ16_MEMBER(simpbowl_state::flash_r)
+uint16_t simpbowl_state::flash_r(offs_t offset)
 {
 	if (offset == 4)   // set odd address
 	{
@@ -477,7 +477,7 @@ READ16_MEMBER(simpbowl_state::flash_r)
 	return 0;
 }
 
-WRITE16_MEMBER(simpbowl_state::flash_w)
+void simpbowl_state::flash_w(offs_t offset, uint16_t data)
 {
 	int chip;
 
@@ -534,7 +534,7 @@ INPUT_PORTS_END
 
 /* Beat the Champ */
 
-WRITE16_MEMBER(konamigv_state::btc_trackball_w)
+void konamigv_state::btc_trackball_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  osd_printf_debug( "w %08x %08x %08x %08x\n", m_maincpu->pc(), offset, data, mem_mask );
 
@@ -580,7 +580,7 @@ INPUT_PORTS_END
 
 /* Tokimeki Memorial games - have a mouse and printer and who knows what else */
 
-READ16_MEMBER(konamigv_state::tokimeki_serial_r)
+uint16_t konamigv_state::tokimeki_serial_r()
 {
 	// bits checked: 0x80 and 0x20 for periodic status (800b6968 and 800b69e0 in tmoshs)
 	// 0x08 for reading the serial device (8005e624)
@@ -588,7 +588,7 @@ READ16_MEMBER(konamigv_state::tokimeki_serial_r)
 	return 0xffff;
 }
 
-WRITE16_MEMBER(konamigv_state::tokimeki_serial_w)
+void konamigv_state::tokimeki_serial_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	    serial EEPROM-like device here: when mem_mask == 0x000000ff only,
@@ -677,19 +677,42 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( weddingr )
 	PORT_INCLUDE( konamigv )
 
+	// Control Type must match selection in service mode (no sense line to detect control panel type)
+	// Buttons 2 and 3 are shown in service mode, but not used by the game
+	// Button 1-3 inputs are read in service mode even when 4 Buttons is selected, but they could confuse users
+
+	PORT_START("CFG")
+	PORT_CONFNAME( 0x01, 0x01, "Control Type" )
+	PORT_CONFSETTING(    0x01, "4 Buttons" )
+	PORT_CONFSETTING(    0x00, "Joystick and Button" )
+
 	PORT_MODIFY("P1")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("Answer 3/Zoom In")
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("Answer 4/Zoom Out")
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("Answer 1/Pan Left")
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("Answer 2/Pan Right")
-	PORT_BIT( 0x00000070, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Answer 3/Zoom In")   PORT_CONDITION("CFG", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 Answer 4/Zoom Out")  PORT_CONDITION("CFG", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Answer 1/Pan Left")  PORT_CONDITION("CFG", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Answer 2/Pan Right") PORT_CONDITION("CFG", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x00000070, IP_ACTIVE_LOW, IPT_UNKNOWN )                                                   PORT_CONDITION("CFG", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)                    PORT_CONDITION("CFG", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_8WAY PORT_PLAYER(1)                    PORT_CONDITION("CFG", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_8WAY PORT_PLAYER(1)                    PORT_CONDITION("CFG", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_8WAY PORT_PLAYER(1)                    PORT_CONDITION("CFG", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 )                 PORT_PLAYER(1)                    PORT_CONDITION("CFG", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2 )                 PORT_PLAYER(1)                    PORT_CONDITION("CFG", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON3 )                 PORT_PLAYER(1)                    PORT_CONDITION("CFG", 0x01, EQUALS, 0x00)
 
 	PORT_MODIFY("P2")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("Answer 3/Zoom In")
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("Answer 4/Zoom Out")
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("Answer 1/Pan Left")
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("Answer 2/Pan Right")
-	PORT_BIT( 0x00000070, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Answer 3/Zoom In")   PORT_CONDITION("CFG", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 Answer 4/Zoom Out")  PORT_CONDITION("CFG", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Answer 1/Pan Left")  PORT_CONDITION("CFG", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Answer 2/Pan Right") PORT_CONDITION("CFG", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x00000070, IP_ACTIVE_LOW, IPT_UNKNOWN )                                                   PORT_CONDITION("CFG", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)                    PORT_CONDITION("CFG", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_8WAY PORT_PLAYER(2)                    PORT_CONDITION("CFG", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_8WAY PORT_PLAYER(2)                    PORT_CONDITION("CFG", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_8WAY PORT_PLAYER(2)                    PORT_CONDITION("CFG", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 )                 PORT_PLAYER(2)                    PORT_CONDITION("CFG", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2 )                 PORT_PLAYER(2)                    PORT_CONDITION("CFG", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON3 )                 PORT_PLAYER(2)                    PORT_CONDITION("CFG", 0x01, EQUALS, 0x00)
 
 	PORT_MODIFY("P3_P4")
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNKNOWN )

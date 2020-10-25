@@ -2062,34 +2062,34 @@ void sh34_base_device::device_start()
 	m_io = &space(AS_IO);
 	if (m_program->endianness() == ENDIANNESS_LITTLE)
 	{
-		auto cache = m_program->cache<3, 0, ENDIANNESS_LITTLE>();
-		m_pr16 = [cache](offs_t address) -> u16 { return cache->read_word(address); };
+		m_program->cache(m_cache64le);
+		m_pr16 = [this](offs_t address) -> u16 { return m_cache64le.read_word(address); };
 		if (ENDIANNESS_NATIVE != ENDIANNESS_LITTLE)
-			m_prptr = [cache](offs_t address) -> const void * {
-				const u16 *ptr = static_cast<u16 *>(cache->read_ptr(address & ~7));
+			m_prptr = [this](offs_t address) -> const void * {
+				const u16 *ptr = static_cast<u16 *>(m_cache64le.read_ptr(address & ~7));
 				ptr += (~address >> 1) & 3;
 				return ptr;
 			};
 		else
-			m_prptr = [cache](offs_t address) -> const void * {
-				const u16 *ptr = static_cast<u16 *>(cache->read_ptr(address & ~7));
+			m_prptr = [this](offs_t address) -> const void * {
+				const u16 *ptr = static_cast<u16 *>(m_cache64le.read_ptr(address & ~7));
 				ptr += (address >> 1) & 3;
 				return ptr;
 			};
 	}
 	else
 	{
-		auto cache = m_program->cache<3, 0, ENDIANNESS_BIG>();
-		m_pr16 = [cache](offs_t address) -> u16 { return cache->read_word(address); };
+		m_program->cache(m_cache64be);
+		m_pr16 = [this](offs_t address) -> u16 { return m_cache64be.read_word(address); };
 		if (ENDIANNESS_NATIVE != ENDIANNESS_BIG)
-			m_prptr = [cache](offs_t address) -> const void * {
-				const u16 *ptr = static_cast<u16 *>(cache->read_ptr(address & ~7));
+			m_prptr = [this](offs_t address) -> const void * {
+				const u16 *ptr = static_cast<u16 *>(m_cache64be.read_ptr(address & ~7));
 				ptr += (~address >> 1) & 3;
 				return ptr;
 			};
 		else
-			m_prptr = [cache](offs_t address) -> const void * {
-				const u16 *ptr = static_cast<u16 *>(cache->read_ptr(address & ~7));
+			m_prptr = [this](offs_t address) -> const void * {
+				const u16 *ptr = static_cast<u16 *>(m_cache64be.read_ptr(address & ~7));
 				ptr += (address >> 1) & 3;
 				return ptr;
 			};

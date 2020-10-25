@@ -57,36 +57,31 @@ public:
 	sys2900_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_rom(*this, "maincpu")
+		, m_ram(*this, "mainram")
 	{ }
 
 	void sys2900(machine_config &config);
 
-	void init_sys2900();
-
 private:
-	enum
-	{
-		TIMER_BOOT
-	};
 	uint32_t screen_update_sys2900(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
 	virtual void machine_reset() override;
-	virtual void video_start() override;
-	required_device<cpu_device> m_maincpu;
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void machine_start() override;
+	memory_passthrough_handler *m_rom_shadow_tap;
+	required_device<z80_device> m_maincpu;
+	required_region_ptr<u8> m_rom;
+	required_shared_ptr<u8> m_ram;
 };
 
 
 void sys2900_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x07ff).bankrw("boot");
-	map(0x0800, 0xefff).ram();
-	map(0xf000, 0xf7ff).rom();
-	map(0xf800, 0xffff).ram();
+	map(0x0000, 0xffff).ram().share("mainram");
+	map(0xf000, 0xf7ff).rom().region("maincpu", 0);
 }
 
 void sys2900_state::io_map(address_map &map)
@@ -96,7 +91,7 @@ void sys2900_state::io_map(address_map &map)
 	map(0x20, 0x23).rw("sio1", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 	map(0x24, 0x27).rw("pio", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0x28, 0x2b).rw("sio2", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
-	map(0x2c, 0x2f).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x2c, 0x2f).rw("ctc", FUNC(z80ctc_device::read),     FUNC(z80ctc_device::write));
 	map(0x80, 0x83); // unknown device, disk related?
 	map(0xa0, 0xaf); // unknown device
 	map(0xc0, 0xc3); // unknown device
@@ -106,33 +101,27 @@ void sys2900_state::io_map(address_map &map)
 static INPUT_PORTS_START( sys2900 )
 INPUT_PORTS_END
 
-
-void sys2900_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch (id)
-	{
-	case TIMER_BOOT:
-		/* after the first 4 bytes have been read from ROM, switch the ram back in */
-		membank("boot")->set_entry(0);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in sys2900_state::device_timer");
-	}
-}
-
 void sys2900_state::machine_reset()
 {
-	membank("boot")->set_entry(1);
-	timer_set(attotime::from_usec(5), TIMER_BOOT);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	program.install_rom(0x0000, 0x07ff, m_rom);   // do it here for F3
+	m_rom_shadow_tap = program.install_read_tap(0xf000, 0xf7ff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
+	{
+		if (!machine().side_effects_disabled())
+		{
+			// delete this tap
+			m_rom_shadow_tap->remove();
+
+			// reinstall ram over the rom shadow
+			m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x07ff, m_ram);
+		}
+
+		// return the original data
+		return data;
+	});
 }
 
-void sys2900_state::init_sys2900()
-{
-	uint8_t *RAM = memregion("maincpu")->base();
-	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xf000);
-}
-
-void sys2900_state::video_start()
+void sys2900_state::machine_start()
 {
 }
 
@@ -167,11 +156,11 @@ void sys2900_state::sys2900(machine_config &config)
 
 /* ROM definition */
 ROM_START( sys2900 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "104401cpc.bin", 0xf000, 0x0800, CRC(6c8848bc) SHA1(890e0578e5cb0e3433b4b173e5ed71d72a92af26)) // label says BE 5 1/4 107701
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "104401cpc.bin", 0x0000, 0x0800, CRC(6c8848bc) SHA1(890e0578e5cb0e3433b4b173e5ed71d72a92af26)) // label says BE 5 1/4 107701
 ROM_END
 
 /* Driver */
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY          FULLNAME       FLAGS
-COMP( 1981, sys2900, 0,      0,      sys2900, sys2900, sys2900_state, init_sys2900, "Systems Group", "System 2900", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1981, sys2900, 0,      0,      sys2900, sys2900, sys2900_state, empty_init, "Systems Group", "System 2900", MACHINE_IS_SKELETON | MACHINE_SUPPORTS_SAVE )

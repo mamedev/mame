@@ -10,6 +10,7 @@ Driver by David Haywood
 TODO:
  - what is the 'BIOS' ROM for? it appears to be data tables and is very different between games but we don't map it anywhere
  - convert tilemaps to devices?
+ - quizmoon title gfx/sound in attract mode is incorrect? reference: https://youtu.be/925rRv2JG50
 
  68020 interrupts
  lev 1 : 0x64 : 0000 084c - unknown..
@@ -290,22 +291,25 @@ Notes:
 #include "sound/es5506.h"
 #include "speaker.h"
 
+#include <algorithm>
+
 
 /*** VARIOUS READ / WRITE HANDLERS *******************************************/
 
-READ32_MEMBER(macrossp_state::macrossp_soundstatus_r)
+uint32_t macrossp_state::macrossp_soundstatus_r()
 {
 	//  logerror("%08x read soundstatus\n", m_maincpu->pc());
 
 	/* bit 1 is sound status */
 	/* bit 0 unknown - it is expected to toggle, vblank? */
 
-	m_snd_toggle ^= 1;
+	if (!machine().side_effects_disabled())
+		m_snd_toggle ^= 1;
 
 	return (m_sndpending << 1) | m_snd_toggle;
 }
 
-WRITE32_MEMBER(macrossp_state::macrossp_soundcmd_w)
+void macrossp_state::macrossp_soundcmd_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_16_31)
 	{
@@ -318,14 +322,15 @@ WRITE32_MEMBER(macrossp_state::macrossp_soundcmd_w)
 	}
 }
 
-READ16_MEMBER(macrossp_state::macrossp_soundcmd_r)
+uint16_t macrossp_state::macrossp_soundcmd_r()
 {
 	//  logerror("%06x read soundcmd\n",m_audiocpu->pc());
-	m_sndpending = 0;
+	if (!machine().side_effects_disabled())
+		m_sndpending = 0;
 	return m_soundlatch->read();
 }
 
-WRITE16_MEMBER(macrossp_state::palette_fade_w)
+void macrossp_state::palette_fade_w(uint16_t data)
 {
 	// 0xff is written a few times on startup
 	if (data >> 8 != 0xff)
@@ -380,6 +385,16 @@ void macrossp_state::macrossp_sound_map(address_map &map)
 	map(0x200000, 0x207fff).ram();
 	map(0x400000, 0x40007f).rw("ensoniq", FUNC(es5506_device::read), FUNC(es5506_device::write)).umask16(0x00ff);
 	map(0x600000, 0x600001).r(FUNC(macrossp_state::macrossp_soundcmd_r));
+}
+
+void macrossp_state::macrossp_es5506_bank1_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom().region("ensoniq.0", 0x400000);
+}
+
+void macrossp_state::macrossp_es5506_bank3_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom().region("ensoniq.2", 0x400000);
 }
 
 /*** INPUT PORTS *************************************************************/
@@ -571,9 +586,7 @@ void macrossp_state::macrossp(machine_config &config)
 
 	es5506_device &ensoniq(ES5506(config, "ensoniq", 32_MHz_XTAL/2));    /* 16 MHz */
 	ensoniq.set_region0("ensoniq.0");
-	ensoniq.set_region1("ensoniq.1");
-	ensoniq.set_region2("ensoniq.2");
-	ensoniq.set_region3("ensoniq.3");
+	ensoniq.set_addrmap(1, &macrossp_state::macrossp_es5506_bank1_map);
 	ensoniq.set_channels(1);
 	ensoniq.irq_cb().set(FUNC(macrossp_state::irqhandler));
 	ensoniq.add_route(0, "lspeaker", 0.1);
@@ -584,8 +597,11 @@ void macrossp_state::quizmoon(machine_config &config)
 {
 	macrossp(config);
 	m_screen->set_visarea(0, 24*16-1, 0*8, 14*16-1);
-}
 
+	es5506_device *ensoniq = subdevice<es5506_device>("ensoniq");
+	ensoniq->set_region2("ensoniq.2");
+	ensoniq->set_addrmap(3, &macrossp_state::macrossp_es5506_bank3_map);
+}
 
 
 /*** ROM LOADING *************************************************************/
@@ -627,9 +643,6 @@ ROM_START( macrossp )
 
 	ROM_REGION16_BE( 0x800000, "ensoniq.0", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "bp964a.u24", 0x000000, 0x400000, CRC(93f90336) SHA1(75daa2f8cedc732cf5ef98254f61748c94b94aea) )
-
-	ROM_REGION16_BE( 0x400000, "ensoniq.1", 0 )
-	ROM_COPY( "ensoniq.0", 0x400000, 0x000000, 0x400000 )
 
 	ROM_REGION( 0x0600, "plds", 0 )
 	ROM_LOAD( "u8.u8",     0x0000, 0x0117, CRC(99bd3cc1) SHA1(b0d3ac93cb5d2857cf9c184c7a2b4afa0211d588) ) /* unprotected GAL16V8B */
@@ -677,20 +690,14 @@ ROM_START( quizmoon )
 	ROM_LOAD16_BYTE( "u26.bin", 0x0000000, 0x0400000, CRC(6c8f30d4) SHA1(7e215589e4a52cbce7f2bb31b333f874a9f83d00) )
 	ROM_LOAD16_BYTE( "u24.bin", 0x0000001, 0x0400000, CRC(5b12d0b1) SHA1(c5ddff2053148a1da0710a10f48689bf5c736ae4) )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.1", 0 )
-	ROM_COPY( "ensoniq.0", 0x400000, 0x000000, 0x400000 )
-
 	ROM_REGION16_BE( 0x800000, "ensoniq.2", 0 )
 	ROM_LOAD16_BYTE( "u27.bin", 0x0000000, 0x0400000, CRC(bd75d165) SHA1(2da770d15c812cbfdb4e3048d320071edffccfa1) )
 	ROM_LOAD16_BYTE( "u25.bin", 0x0000001, 0x0400000, CRC(3b9689bc) SHA1(0857c3d3e9810f9468f7c17f8b795825c55a9f08) )
-
-	ROM_REGION16_BE( 0x400000, "ensoniq.3", 0 )
-	ROM_COPY( "ensoniq.2", 0x400000, 0x000000, 0x400000 )
 ROM_END
 
 
 
-WRITE32_MEMBER(macrossp_state::macrossp_speedup_w)
+void macrossp_state::macrossp_speedup_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 /*
 PC :00018104 018104: addq.w  #1, $f1015a.l
@@ -703,7 +710,7 @@ PC :00018110 018110: beq     18104
 }
 
 #ifdef UNUSED_FUNCTION
-WRITE32_MEMBER(macrossp_state::quizmoon_speedup_w)
+void macrossp_state::quizmoon_speedup_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_mainram[0x00020 / 4]);
 	if (m_maincpu->pc() == 0x1cc) m_maincpu->spin_until_interrupt();
@@ -712,13 +719,13 @@ WRITE32_MEMBER(macrossp_state::quizmoon_speedup_w)
 
 void macrossp_state::init_macrossp()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xf10158, 0xf1015b, write32_delegate(*this, FUNC(macrossp_state::macrossp_speedup_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xf10158, 0xf1015b, write32s_delegate(*this, FUNC(macrossp_state::macrossp_speedup_w)));
 }
 
 void macrossp_state::init_quizmoon()
 {
 #ifdef UNUSED_FUNCTION
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xf00020, 0xf00023, write32_delegate(*this, FUNC(macrossp_state::quizmoon_speedup_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xf00020, 0xf00023, write32s_delegate(*this, FUNC(macrossp_state::quizmoon_speedup_w)));
 #endif
 }
 

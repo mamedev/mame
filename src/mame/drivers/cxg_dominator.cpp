@@ -24,7 +24,6 @@ This engine was also used in the newer Mephisto Modena.
 #include "machine/nvram.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/pwm.h"
 #include "video/lc7582.h"
 #include "speaker.h"
@@ -71,10 +70,10 @@ private:
 	void main_map(address_map &map);
 
 	// I/O handlers
-	DECLARE_WRITE64_MEMBER(lcd_s_w);
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE8_MEMBER(leds_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void lcd_s_w(offs_t offset, u64 data);
+	void control_w(u8 data);
+	void leds_w(offs_t offset, u8 data);
+	u8 input_r(offs_t offset);
 };
 
 void dominator_state::machine_start()
@@ -91,7 +90,7 @@ void dominator_state::machine_start()
 
 // LC7582 LCD
 
-WRITE64_MEMBER(dominator_state::lcd_s_w)
+void dominator_state::lcd_s_w(offs_t offset, u64 data)
 {
 	u8 d[4];
 
@@ -115,7 +114,7 @@ WRITE64_MEMBER(dominator_state::lcd_s_w)
 
 // TTL
 
-WRITE8_MEMBER(dominator_state::control_w)
+void dominator_state::control_w(u8 data)
 {
 	// d0: LC7582 DATA
 	// d1: LC7582 CLK
@@ -128,13 +127,13 @@ WRITE8_MEMBER(dominator_state::control_w)
 	m_dac->write(BIT(data, 3));
 }
 
-WRITE8_MEMBER(dominator_state::leds_w)
+void dominator_state::leds_w(offs_t offset, u8 data)
 {
 	// led data
 	m_display->matrix(1 << offset, data);
 }
 
-READ8_MEMBER(dominator_state::input_r)
+u8 dominator_state::input_r(offs_t offset)
 {
 	u8 data = 0;
 
@@ -204,8 +203,8 @@ void dominator_state::dominator(machine_config &config)
 	R65C02(config, m_maincpu, 4_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &dominator_state::main_map);
 
-	const attotime irq_period = attotime::from_hz(4_MHz_XTAL / 0x2000); // from 4020
-	m_maincpu->set_periodic_int(FUNC(dominator_state::nmi_line_pulse), irq_period);
+	const attotime nmi_period = attotime::from_hz(4_MHz_XTAL / 0x2000); // from 4020
+	m_maincpu->set_periodic_int(FUNC(dominator_state::nmi_line_pulse), nmi_period);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -223,7 +222,6 @@ void dominator_state::dominator(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
 

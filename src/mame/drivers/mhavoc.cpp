@@ -35,6 +35,10 @@
             or
     A Tempest-like spinner on upgrades
 
+    All PCB pics point to this game using the 136002-125 PROM.
+    Page 4-30 of the operation manual states 6c is 136002-125, too.
+    However MAME had it using the 036408-01 PROM.
+    They have identical contents, anyway.
 
     Memory Map for Major Havoc
 
@@ -207,7 +211,7 @@ Address: 543210
          |\----- pokey chip number MSB
          \------ pokey A3
 */
-READ8_MEMBER(mhavoc_state::quad_pokeyn_r)
+uint8_t mhavoc_state::quad_pokeyn_r(offs_t offset)
 {
 	int pokey_num = (offset >> 3) & ~0x04;
 	int control = (offset & 0x20) >> 2;
@@ -216,7 +220,7 @@ READ8_MEMBER(mhavoc_state::quad_pokeyn_r)
 	return m_pokey[pokey_num]->read(pokey_reg);
 }
 
-WRITE8_MEMBER(mhavoc_state::quad_pokeyn_w)
+void mhavoc_state::quad_pokeyn_w(offs_t offset, uint8_t data)
 {
 	int pokey_num = (offset >> 3) & ~0x04;
 	int control = (offset & 0x20) >> 2;
@@ -239,7 +243,7 @@ Address: 43210
          |\---- pokey chip number
          \----- pokey A3
 */
-READ8_MEMBER(mhavoc_state::dual_pokey_r)
+uint8_t mhavoc_state::dual_pokey_r(offs_t offset)
 {
 	int pokey_num = (offset >> 3) & 0x01;
 	int control = (offset & 0x10) >> 1;
@@ -249,7 +253,7 @@ READ8_MEMBER(mhavoc_state::dual_pokey_r)
 }
 
 
-WRITE8_MEMBER(mhavoc_state::dual_pokey_w)
+void mhavoc_state::dual_pokey_w(offs_t offset, uint8_t data)
 {
 	int pokey_num = (offset >> 3) & 0x01;
 	int control = (offset & 0x10) >> 1;
@@ -642,7 +646,7 @@ ROM_START( mhavoc )
 
 	/* AVG PROM */
 	ROM_REGION( 0x100, "avg:prom", 0 )
-	ROM_LOAD( "036408-01.b1",   0x0000, 0x0100, BAD_DUMP CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
+	ROM_LOAD( "136002-125.6c",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 ROM_END
 
 
@@ -673,7 +677,7 @@ ROM_START( mhavoc2 )
 
 	/* AVG PROM */
 	ROM_REGION( 0x100, "avg:prom", 0 )
-	ROM_LOAD( "036408-01.b1",   0x0000, 0x0100, BAD_DUMP CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
+	ROM_LOAD( "136002-125.6c",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 ROM_END
 
 
@@ -704,7 +708,7 @@ ROM_START( mhavocrv )
 
 	/* AVG PROM */
 	ROM_REGION( 0x100, "avg:prom", 0 )
-	ROM_LOAD( "036408-01.b1",   0x0000, 0x0100, BAD_DUMP CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
+	ROM_LOAD( "136002-125.6c",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 ROM_END
 
 
@@ -735,7 +739,7 @@ ROM_START( mhavocp )
 
 	/* AVG PROM */
 	ROM_REGION( 0x100, "avg:prom", 0 )
-	ROM_LOAD( "036408-01.b1",   0x0000, 0x0100, BAD_DUMP CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
+	ROM_LOAD( "136002-125.6c",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 ROM_END
 
 
@@ -763,7 +767,7 @@ ROM_START( alphaone )
 
 	/* AVG PROM */
 	ROM_REGION( 0x100, "avg:prom", 0 )
-	ROM_LOAD( "036408-01.b1",   0x0000, 0x0100, BAD_DUMP CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
+	ROM_LOAD( "136002-125.6c",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 ROM_END
 
 
@@ -791,7 +795,7 @@ ROM_START( alphaonea )
 
 	/* AVG PROM */
 	ROM_REGION( 0x100, "avg:prom", 0 )
-	ROM_LOAD( "136002-125.6c",   0x0000, 0x0100, BAD_DUMP CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
+	ROM_LOAD( "136002-125.6c",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 ROM_END
 
 

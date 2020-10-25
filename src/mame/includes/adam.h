@@ -69,22 +69,22 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( mreq_r );
-	DECLARE_WRITE8_MEMBER( mreq_w );
-	DECLARE_READ8_MEMBER( iorq_r );
-	DECLARE_WRITE8_MEMBER( iorq_w );
+	uint8_t mreq_r(offs_t offset);
+	void mreq_w(offs_t offset, uint8_t data);
+	uint8_t iorq_r(offs_t offset);
+	void iorq_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( adamnet_r );
-	DECLARE_WRITE8_MEMBER( adamnet_w );
-	DECLARE_READ8_MEMBER( mioc_r );
-	DECLARE_WRITE8_MEMBER( mioc_w );
+	uint8_t adamnet_r();
+	void adamnet_w(uint8_t data);
+	uint8_t mioc_r();
+	void mioc_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER( m6801_p1_w );
-	DECLARE_READ8_MEMBER( m6801_p2_r );
-	DECLARE_WRITE8_MEMBER( m6801_p2_w );
-	DECLARE_READ8_MEMBER( m6801_p3_r );
-	DECLARE_WRITE8_MEMBER( m6801_p3_w );
-	DECLARE_WRITE8_MEMBER( m6801_p4_w );
+	void m6801_p1_w(uint8_t data);
+	uint8_t m6801_p2_r();
+	void m6801_p2_w(uint8_t data);
+	uint8_t m6801_p3_r();
+	void m6801_p3_w(uint8_t data);
+	void m6801_p4_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( vdc_int_w );
 

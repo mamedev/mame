@@ -58,7 +58,7 @@ void adam_digital_data_pack_device::adam_ddp_mem(address_map &map)
 	map(0xf800, 0xffff).rom().region(M6801_TAG, 0);
 }
 
-static const struct CassetteOptions adam_cassette_options =
+static const cassette_image::Options adam_cassette_options =
 {
 	2,      /* channels */
 	16,     /* bits per sample */
@@ -140,7 +140,7 @@ void adam_digital_data_pack_device::adamnet_reset_w(int state)
 //  p1_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( adam_digital_data_pack_device::p1_w )
+void adam_digital_data_pack_device::p1_w(uint8_t data)
 {
 	/*
 
@@ -185,7 +185,7 @@ WRITE8_MEMBER( adam_digital_data_pack_device::p1_w )
 //  p2_r -
 //-------------------------------------------------
 
-READ8_MEMBER( adam_digital_data_pack_device::p2_r )
+uint8_t adam_digital_data_pack_device::p2_r()
 {
 	/*
 
@@ -217,7 +217,7 @@ READ8_MEMBER( adam_digital_data_pack_device::p2_r )
 //  p2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( adam_digital_data_pack_device::p2_w )
+void adam_digital_data_pack_device::p2_w(uint8_t data)
 {
 	/*
 
@@ -252,7 +252,7 @@ WRITE8_MEMBER( adam_digital_data_pack_device::p2_w )
 //  p4_r -
 //-------------------------------------------------
 
-READ8_MEMBER( adam_digital_data_pack_device::p4_r )
+uint8_t adam_digital_data_pack_device::p4_r()
 {
 	/*
 

@@ -71,15 +71,15 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	READ16_MEMBER(sentx_porta_r);
-	READ16_MEMBER(sentx_portb_r);
-	READ16_MEMBER(sentx_portc_r);
+	uint16_t sentx_porta_r();
+	uint16_t sentx_portb_r();
+	uint16_t sentx_portc_r();
 
-	virtual DECLARE_WRITE16_MEMBER(porta_w) override;
-	virtual DECLARE_WRITE16_MEMBER(portb_w) override;
-	virtual DECLARE_WRITE16_MEMBER(portc_w) override;
+	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+	virtual void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+	virtual void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
-	DECLARE_WRITE8_MEMBER(sentx_tx_w);
+	void sentx_tx_w(uint8_t data);
 
 	uint8_t m_lcd_card1[6];
 	uint8_t m_lcd_card2[6];
@@ -378,7 +378,7 @@ void sentx6p_state::controller_send_data(int which)
 	}
 }
 
-READ16_MEMBER(sentx6p_state::sentx_porta_r)
+uint16_t sentx6p_state::sentx_porta_r()
 {
 	int select_bits = (m_porta_data >> 8) & 0x3f;
 	//logerror("%s: sentx_porta_r (with controller select bits %02x)\n", machine().describe_context(), select_bits);
@@ -433,29 +433,29 @@ READ16_MEMBER(sentx6p_state::sentx_porta_r)
 	return ret;
 }
 
-READ16_MEMBER(sentx6p_state::sentx_portb_r)
+uint16_t sentx6p_state::sentx_portb_r()
 {
 	return m_io_p2->read();
 }
 
-READ16_MEMBER(sentx6p_state::sentx_portc_r)
+uint16_t sentx6p_state::sentx_portc_r()
 {
 	return m_io_p3->read();
 }
 
-WRITE16_MEMBER(sentx6p_state::porta_w)
+void sentx6p_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s: sentx_porta_w %04x\n", machine().describe_context(), data);
 
 	COMBINE_DATA(&m_porta_data);
 }
 
-WRITE16_MEMBER(sentx6p_state::portb_w)
+void sentx6p_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s: sentx_portb_w %04x\n", machine().describe_context(), data);
 }
 
-WRITE16_MEMBER(sentx6p_state::portc_w)
+void sentx6p_state::portc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s: sentx_portc_w %04x\n", machine().describe_context(), data);
 }
@@ -596,7 +596,7 @@ void sentx6p_state::set_controller_led(uint8_t value, int select_bits)
 	}
 }
 
-WRITE8_MEMBER(sentx6p_state::sentx_tx_w)
+void sentx6p_state::sentx_tx_w(uint8_t data)
 {
 	int select_bits = (m_porta_data >> 8) & 0x3f;
 

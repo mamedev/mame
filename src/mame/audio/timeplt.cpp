@@ -34,7 +34,6 @@ locomotn_audio_device::locomotn_audio_device(const machine_config &mconfig, cons
 
 timeplt_audio_device::timeplt_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, device_sound_interface(mconfig, *this)
 	, m_soundcpu(*this, "tpsound")
 	, m_soundlatch(*this, "soundlatch")
 	, m_filter_0(*this, "filter.0.%u", 0)
@@ -225,14 +224,4 @@ void locomotn_audio_device::device_add_mconfig(machine_config &config)
 
 	/* basic machine hardware */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &locomotn_audio_device::locomotn_sound_map);
-}
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void timeplt_audio_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }

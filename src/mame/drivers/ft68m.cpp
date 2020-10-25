@@ -32,7 +32,7 @@ public:
 	void ft68m(machine_config &config);
 
 private:
-	DECLARE_READ16_MEMBER(switches_r);
+	uint16_t switches_r();
 
 	void mem_map(address_map &map);
 
@@ -44,7 +44,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 };
 
-READ16_MEMBER( ft68m_state::switches_r )
+uint16_t ft68m_state::switches_r()
 {
 	return 0x7c00; // bypass self test
 }
@@ -133,4 +133,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT   CLASS        INIT        COMPANY               FULLNAME  FLAGS
-COMP( 198?, ft68m, 0,      0,      ft68m,   ft68m,  ft68m_state, empty_init, "Forward Technology", "FT-68M", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 198?, ft68m, 0,      0,      ft68m,   ft68m,  ft68m_state, empty_init, "Forward Technology", "FT-68M", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

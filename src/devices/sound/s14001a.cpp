@@ -226,13 +226,43 @@ ALLOW_SAVE_TYPE(s14001a_device::states); // allow save_item on a non-fundamental
 
 void s14001a_device::device_start()
 {
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() ? clock() : machine().sample_rate());
+	m_stream = stream_alloc(0, 1, clock() ? clock() : machine().sample_rate());
 
 	// resolve callbacks
 	m_ext_read_handler.resolve();
 	m_bsy_handler.resolve();
 
-	// note: zerofill is done already by MAME core
+	// zero-fill
+	m_bPhase1 = false;
+	m_uStateP1 = m_uStateP2 = states::IDLE;
+	m_uDAR13To05P1 = 0;
+	m_uDAR13To05P2 = 0;
+	m_uDAR04To00P1 = 0;
+	m_uDAR04To00P2 = 0;
+	m_uCWARP1 = 0;
+	m_uCWARP2 = 0;
+	m_bStopP1 = false;
+	m_bStopP2 = false;
+	m_bVoicedP1 = false;
+	m_bVoicedP2 = false;
+	m_bSilenceP1 = false;
+	m_bSilenceP2 = false;
+	m_uLengthP1 = 0;
+	m_uLengthP2 = 0;
+	m_uXRepeatP1 = 0;
+	m_uXRepeatP2 = 0;
+	m_uDeltaOldP1 = 0;
+	m_uDeltaOldP2 = 0;
+	m_bDAR04To00CarryP2 = false;
+	m_bPPQCarryP2 = false;
+	m_bRepeatCarryP2 = false;
+	m_bLengthCarryP2 = false;
+	m_RomAddrP1 = 0;
+	m_uRomAddrP2 = 0;
+	m_bBusyP1 = false;
+	m_bStart = false;
+	m_uWord = 0;
+
 	ClearStatistics();
 	m_uOutputP1 = m_uOutputP2 = 7;
 
@@ -284,13 +314,13 @@ void s14001a_device::device_start()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void s14001a_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void s14001a_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	for (int i = 0; i < samples; i++)
+	for (int i = 0; i < outputs[0].samples(); i++)
 	{
 		Clock();
 		int16_t sample = m_uOutputP2 - 7; // range -7..8
-		outputs[0][i] = sample * 0xf00;
+		outputs[0].put_int(i, sample, 8);
 	}
 }
 

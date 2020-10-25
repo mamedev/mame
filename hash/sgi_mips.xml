@@ -3,9 +3,21 @@
 <!--
 license:CC0
 -->
-<softwarelist name="sgi_mips" description="Sgi MIPS/IRIX software">
+<softwarelist name="sgi_mips" description="SGI MIPS/IRIX software">
 
 	<!-- Apps and utilities -->
+
+	<software name="adv_vis_4_2">
+		<description>Alias|Wavefront Advanced Visualizer 4.2</description>
+		<year>199?</year>
+		<publisher>Alias|Wavefront</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: unknown -->
+			<diskarea name="cdrom">
+				<disk name="alias_wavefront_advanced_visualizer_4_2" sha1="1f048130f8df40cceb15dddc276f973ab96819fc" />
+			</diskarea>
+		</part>
+	</software>
 
 	<software name="barco_7_2">
 		<description>Barco Creator 7.2</description>
@@ -47,6 +59,42 @@ license:CC0
 			<!-- Origin: private dump -->
 			<diskarea name="cdrom">
 				<disk name="common_desktop_environment_4_3" sha1="5d365a5dbaef2a2a2303136325a2bf27340ad267" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="chalice_1_5_12">
+		<description>Chalice 1.5.12</description>
+		<year>1998</year>
+		<publisher>Silicon Grail</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: unknown -->
+			<diskarea name="cdrom">
+				<disk name="chalice_1_5_12" sha1="e747549772d3947582d2a66b70760376b97a5753" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="chalice_1_6_1">
+		<description>Chalice 1.6.1</description>
+		<year>1999</year>
+		<publisher>Silicon Grail</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: unknown -->
+			<diskarea name="cdrom">
+				<disk name="chalice_1_6_1" sha1="2cd47e3686be21b2a8dbdf08c69d6ab3622ef8a7" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="chalice_2_0">
+		<description>Chalice 2.0</description>
+		<year>2000</year>
+		<publisher>Silicon Grail</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: unknown, reconstructed from a tarball -->
+			<diskarea name="cdrom">
+				<disk name="chalice_2_0" sha1="188b9180acdc7714b45b8ea1d62c914b407788ef" status="baddump" />
 			</diskarea>
 		</part>
 	</software>
@@ -116,12 +164,26 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="deskse_1_0">
+		<description>Desktop Special Edition 1.0</description>
+		<year>1995</year> <!-- 8/95 -->
+		<publisher>Silicon Graphics</publisher>
+		<info name="version" value="1.0" />
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0410-001"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="Desktop_Special_Edition_1_0" sha1="4ed0c83fd7d53112da5e3ec210d767cf3d29f41b" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="deskse_1_1">
 		<description>Desktop Special Edition 1.1</description>
 		<year>1995</year> <!-- 11/95 -->
 		<publisher>Silicon Graphics</publisher>
 		<part name="cdrom" interface="cdrom">
-			<feature name="part_number" value="813-0410-002"/>
+			<feature name="part_number" value="812-0410-002"/>
 			<!-- Origin: private dump -->
 			<diskarea name="cdrom">
 				<disk name="desktop_special_edition_1_1" sha1="4f740d11eb60da5fadcd4a3003aca88ff81d7ae3" />
@@ -169,6 +231,18 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="effect_6_1_3">
+		<description>Discreet Effect 6.1.3</description>
+		<year>2000</year> <!-- 03/00 -->
+		<publisher>Discreet</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: unknown -->
+			<diskarea name="cdrom">
+				<disk name="discreet_effect_6_1_3_irix" sha1="869b62d2f9042034601ce4b08ff7113af564941c" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="enldsm_1_1">
 		<description>ENlightenDSM 1.1 for UNIX and NT</description>
 		<year>1998</year> <!-- 7/98 -->
@@ -195,12 +269,26 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="eurlang_1_1">
+		<description>European Language Module 1.1</description>
+		<year>1993</year> <!-- 10/93 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0241-001"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="european_language_module_1_1" sha1="0fb2bcfd2796d24baf4328bc12bce8571f992253" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="eurlang_1_2">
 		<description>European Language Module 1.2</description>
 		<year>1994</year> <!-- 05/94 -->
 		<publisher>Silicon Graphics</publisher>
 		<part name="cdrom" interface="cdrom">
-			<feature name="part_number" value="812-0739-003"/>
+			<!-- Also distributed with P/N 812-0739-003 and identical contents -->
+			<feature name="part_number" value="812-0241-002"/>
 			<!-- Origin: private dump -->
 			<diskarea name="cdrom">
 				<disk name="european_language_module_1_2" sha1="ae869fd7623d2624b569b365239cfa173788a481" />
@@ -218,6 +306,70 @@ license:CC0
 			<diskarea name="cdrom">
 				<!-- Dumped with Plextor, without C2 errors -->
 				<disk name="European_Language_Module_1_3" sha1="9d4ef603308722130a8bf548f1e227c842690885" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="eurlang_1_3_1">
+		<description>European Language Module 1.3.1</description>
+		<year>1995</year> <!-- 9/95 -->
+		<publisher>Silicon Graphics</publisher>
+		<info name="version" value="1.3.1" />
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0241-004"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="European_Language_Module_1_3_1" sha1="9c4931ef0d3030ed4998f2992c6c3a70338136f7" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="flame_4_0_2">
+		<description>Discreet Flame 4.0.2</description>
+		<year>1996</year>
+		<publisher>Discreet Logic</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="TODO"/>
+			<!-- Origin: unknown -->
+			<diskarea name="cdrom">
+				<disk name="flame402" sha1="ce03c782b5947c2f4795f8dde63687da1567e15f" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="flame_7_6">
+		<description>Discreet Flame 7.6</description>
+		<year>2002</year>
+		<publisher>Discreet Logic</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: unixfiles.org -->
+			<diskarea name="cdrom">
+				<disk name="flame7_6" sha1="c27275a052bf56c720f31d20c21ef66e0a016426" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="framemaker_5_0">
+		<description>Adobe FrameMaker 5 and Adobe Frame Developer's Kit</description>
+		<year>1996</year> <!-- 5/96 -->
+		<publisher>Adobe</publisher>
+		<info name="version" value="5.0" />
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: archive.org -->
+			<diskarea name="cdrom">
+				<disk name="frame_products" sha1="270cad068d237e69684a82b036eaae26ff861ebb" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="framemaker_5_5_6">
+		<description>Adobe FrameMaker 5.5.6</description>
+		<year>1998</year>
+		<publisher>Adobe</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: unixfiles.org, reconstructed from a tarball -->
+			<diskarea name="cdrom">
+				<disk name="framemaker_5_5_6" sha1="19c77eeec5858303113dfc69512fed5fa56602c9" status="baddump" />
 			</diskarea>
 		</part>
 	</software>
@@ -388,6 +540,30 @@ license:CC0
 			<!-- Origin: BitSavers -->
 			<diskarea name="cdrom">
 				<disk name="812_0136_003_iris_inventor_1_1_2_sep93" sha1="86d22528711db9bf209627324dd5a0e7ce2d6d37" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="mathematica_5_2">
+		<description>Mathematica 5.2</description>
+		<year>2005</year>
+		<publisher>Wolfram</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: archive.org -->
+			<diskarea name="cdrom">
+				<disk name="mathematica_5_2_all_unix" sha1="fffc51ad8bf28c68c64ca834e52f8bcbd3423b0a" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="maya_comp_5_5">
+		<description>Alias|Wavefront Maya Composer 5.5</description>
+		<year>1999</year>
+		<publisher>Alias|Wavefront</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: unknown -->
+			<diskarea name="cdrom">
+				<disk name="alias_wavefront_maya_composer5_5" sha1="2443df75803449d3d5603beebf4536ab79a1a401" />
 			</diskarea>
 		</part>
 	</software>
@@ -592,7 +768,7 @@ license:CC0
 	<software name="o2oobe_2_4">
 		<description>O2 Out of Box Experience 2.4 for IRIX 6.5 and later</description>
 		<year>2000</year> <!-- 02/00 -->
-		<publisher>Silicon Graphics</publisher>
+		<publisher>SGI</publisher>
 		<part name="cdrom" interface="cdrom">
 			<feature name="part_number" value="812-0782-003"/>
 			<!-- Origin: jrra.zone -->
@@ -615,15 +791,41 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="onc3nfs_1">
+		<description>ONC3/NFS for IRIX 6.2 Version 1</description>
+		<year>1996</year> <!-- 03/96 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0305-004"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="onc3_nfs_for_irix_6_2_version_1" sha1="e2e85307864dff08189d5271fbc66b2ae3fae954" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="onc3nfs_ind">
+		<description>ONC3/NFS for IRIX 6.2 with Indigo2 IMPACT 10000 Version 1</description>
+		<year>1996</year> <!-- 06/96 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0305-005"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="onc3_nfs_for_irix_6_2_with_indigo2_impact_10000_version_1" sha1="49171c4968606047af96fbce7fbde5f685c8d130" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="onc3nfs_1_2">
-		<description>NFS/ONC3 for IRIX 6.2 Version 1.2</description>
+		<description>ONC3/NFS for IRIX 6.2 Version 1.2</description>
 		<year>1996</year> <!-- 08/96 -->
 		<publisher>Silicon Graphics</publisher>
 		<part name="cdrom" interface="cdrom">
-			<feature name="part_number" value="813-0305-006"/>
+			<feature name="part_number" value="812-0305-006"/>
 			<!-- Origin: jrra.zone -->
 			<diskarea name="cdrom">
-				<disk name="nfs_onc3_for_irix_6_2_version_1_2" sha1="86f44b190dbbe8b8a55f6a8250e7a9d42905b70a" />
+				<disk name="onc3_nfs_for_irix_6_2_version_1_2" sha1="86f44b190dbbe8b8a55f6a8250e7a9d42905b70a" />
 			</diskarea>
 		</part>
 	</software>
@@ -757,6 +959,72 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="power_anim_7_51">
+		<description>Alias|Wavefront PowerAnimator 7.51</description>
+		<year>1996</year> <!-- 10/96 -->
+		<publisher>Alias|Wavefront</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: unknown -->
+			<diskarea name="cdrom">
+				<disk name="alias_wavefront_poweranimator_7_51_oct_1996" sha1="1065292902536290278d1d9571501def43806256" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="power_anim_8_2">
+		<description>Alias|Wavefront PowerAnimator 8.2</description>
+		<year>1997</year> <!-- 07/97 -->
+		<publisher>Alias|Wavefront</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<!-- Origin: unknown -->
+			<diskarea name="cdrom">
+				<disk name="v08_2_irix_cd_1_of_2" sha1="77fd71891480f826ae455543d0a9f9583c9de00b" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<!-- Origin: unknown -->
+			<diskarea name="cdrom">
+				<disk name="v08_2_irix_cd_2_of_2" sha1="2927c3aa5d7bd74709fa465401b11dab2ff7f723" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="prisms_6_4">
+		<description>PRISMS 6.4</description>
+		<year>1997</year>
+		<publisher>Side Effects Software</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: unknown -->
+			<diskarea name="cdrom">
+				<disk name="prisms_6_4" sha1="dc777c86168394b44f71dcbaaf2a8c15932a971f" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="rayz_2_2">
+		<description>RAYZ 2.2</description>
+		<year>2002</year>
+		<publisher>Silicon Grail</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: unknown -->
+			<diskarea name="cdrom">
+				<disk name="rayz_2_2" sha1="f53cab16b7bed7a89abe46a9595ac9b068f4b1f9" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="rayz_2_2_12">
+		<description>RAYZ 2.2.12</description>
+		<year>200?</year>
+		<publisher>Silicon Grail</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: unknown, reconstructed from a tarball -->
+			<diskarea name="cdrom">
+				<disk name="rayz_2_2_12" sha1="0c33586e0b0fa86742d8a47b1292fddcc17c22e9" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="samba_2_0_0">
 		<description>Samba 2.0.0 for IRIX for IRIX 6.5 and later</description>
 		<year>1998</year> <!-- 12/98 -->
@@ -773,7 +1041,7 @@ license:CC0
 	<software name="sgi_demos_6_5_12">
 		<description>Silicon Graphics General and Platform Demos 6.5.12</description>
 		<year>2001</year> <!-- 05/01 -->
-		<publisher>Silicon Graphics</publisher>
+		<publisher>SGI</publisher>
 		<part name="cdrom1" interface="cdrom">
 			<feature name="part_number" value="812-1066-002"/>
 			<feature name="part_id" value="Silicon Graphics General and Platform Demos 6.5.12 (1 of 2)"/>
@@ -832,6 +1100,36 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="sybyl_7_2">
+		<description>Tripos SYBYL 7.2</description>
+		<year>2006</year>
+		<publisher>Tripos, Inc.</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<!-- Origin: unixfiles.org -->
+			<diskarea name="cdrom">
+				<disk name="sybyl_7_2_cd1" sha1="4ee395eeeca2dfa3f0ff42e1f4973e49e9a7cbf7" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<!-- Origin: unixfiles.org -->
+			<diskarea name="cdrom">
+				<disk name="sybyl_7_2_cd2" sha1="91f4e7fad5acab29847beaafa5bc10d6366bda1b" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<!-- Origin: unixfiles.org -->
+			<diskarea name="cdrom">
+				<disk name="sybyl_7_2_cd3" sha1="c073cf3042b4816bff033cb76cd08983b8d9cf0d" />
+			</diskarea>
+		</part>
+		<part name="cdrom4" interface="cdrom">
+			<!-- Origin: unixfiles.org; modified image, needs redump from an original -->
+			<diskarea name="cdrom">
+				<disk name="sybyl_7_2_cd4_pr" sha1="e158700f39cd7f61ddb15fa8f8d9ac6983a418a1" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="1600sw_doc">
 		<description>Silicon Graphics 1600SW Flat Panel Monitor Owner's Manual</description>
 		<year>1999</year> <!-- 08/99 -->
@@ -848,7 +1146,7 @@ license:CC0
 	<software name="multilink_doc">
 		<description>Silicon Graphics MultiLink Adapter Documentation</description>
 		<year>2000</year> <!-- 05/00 -->
-		<publisher>Silicon Graphics</publisher>
+		<publisher>SGI</publisher>
 		<part name="cdrom" interface="cdrom">
 			<feature name="part_number" value="812-0811-001"/>
 			<!-- Origin: BitSavers -->
@@ -1102,6 +1400,45 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="dev_toolbox_42">
+		<description>Developer Toolbox 4.2</description>
+		<year>1994</year> <!-- 08/94 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: nixzone.nl -->
+			<diskarea name="cdrom">
+				<disk name="devtoolbox42" sha1="9b85e8d9d35635794408a8ce7d168af96e14bc47" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dev_toolbox_61">
+		<description>Developer Toolbox 6.1</description>
+		<year>1996</year> <!-- 09/96 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="Developer Toolbox 6.1 (CD 0)" />
+			<!-- Origin: nixzone.nl -->
+			<diskarea name="cdrom">
+				<disk name="devtoolbox61-0" sha1="191db2ed342be4f514e9be29e8793fbc5718bf77" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="Developer Toolbox 6.1 (CD 1)" />
+			<!-- Origin: nixzone.nl -->
+			<diskarea name="cdrom">
+				<disk name="devtoolbox61-1" sha1="c978ecf1333446424d952646d95ce52b2c20496e" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_id" value="Developer Toolbox 6.1 (CD 2)" />
+			<!-- Origin: nixzone.nl -->
+			<diskarea name="cdrom">
+				<disk name="devtoolbox61-2" sha1="928cfe53e856de90a554fe1b82594b119b7b255c" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="dmdo_1_1">
 		<description>Digital Media Dev Option 1.1</description>
 		<year>1993</year> <!-- 03/93 -->
@@ -1216,6 +1553,19 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="ido_5_2">
+		<description>IRIS Development Option 5.2</description>
+		<year>1994</year> <!-- 03/94 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0129-004"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="iris_development_option_5_2" sha1="b011702ba853d744e047dcf28091a75a06fcf972" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="ido_5_3">
 		<description>IRIS Development Option 5.3</description>
 		<year>1994</year> <!-- 11/94 -->
@@ -1234,10 +1584,23 @@ license:CC0
 		<year>1996</year> <!-- 03/96 -->
 		<publisher>Silicon Graphics</publisher>
 		<part name="cdrom" interface="cdrom">
-			<feature name="part_number" value="	812-0478-001"/>
+			<feature name="part_number" value="812-0478-001"/>
 			<!-- Origin: jrra.zone -->
 			<diskarea name="cdrom">
 				<disk name="iris_development_option_6_2" sha1="eabaa5238a3515f1c71d693efc2781b4d1675cf9" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="f77_4_0_1">
+		<description>FORTRAN 77 Compiler 4.0.1</description>
+		<year>1994</year> <!-- 03/94 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0132-005"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="fortran_77_compiler_4_0_1" sha1="1d214d44deb8d68833e334628e333a54f7ce7c04" />
 			</diskarea>
 		</part>
 	</software>
@@ -1364,6 +1727,19 @@ license:CC0
 
 	<!-- Hot Mix -->
 
+	<software name="hotmix_1">
+		<description>Hot Mix Volume 1</description>
+		<year>1992</year>
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-8101-001"/>
+			<!-- Origin: nixzone.nl -->
+			<diskarea name="cdrom">
+				<disk name="hot_mix_1" sha1="3d55993a7ebf9b9d607edda155ac90e78f8c8e09" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="hotmix_4">
 		<description>Hot Mix 4</description>
 		<year>1993</year>
@@ -1373,6 +1749,32 @@ license:CC0
 			<!-- Origin: archive.org -->
 			<diskarea name="cdrom">
 				<disk name="hot_mix_4" sha1="02568e80964b4954ff58b690e6471570a4142614" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hotmix_5">
+		<description>Hot Mix 5</description>
+		<year>1993</year>
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-8101-005"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="hot_mix_5" sha1="06e221fda5bb09c0ffcd23cbffa73cc1b503a980" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hotmix_7">
+		<description>Hot Mix 7</description>
+		<year>1994</year>
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-8101-007"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="hot_mix_7" sha1="cd2af0d9d29c288c85c3308ec5c2a6cc25b698cc" />
 			</diskarea>
 		</part>
 	</software>
@@ -1390,28 +1792,106 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="hotmix_9">
+		<description>Hot Mix Volume 9</description>
+		<year>1994</year>
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-8101-009"/>
+			<!-- Origin: nixzone.nl -->
+			<diskarea name="cdrom">
+				<disk name="hot_mix_9" sha1="0cac323851e8502eee63283e737d541bf806fa09" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hotmix_10">
+		<description>Hot Mix Volume 10</description>
+		<year>1995</year>
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-8101-010"/>
+			<!-- Origin: nixzone.nl -->
+			<diskarea name="cdrom">
+				<disk name="hot_mix_10" sha1="97b2604f21474fa376c94ca66f6e465e730e7123" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="hotmix_11">
 		<description>Hot Mix Volume 11</description>
-		<year>1994</year>
+		<year>1995</year>
 		<publisher>Silicon Graphics</publisher>
 		<part name="cdrom" interface="cdrom">
 			<feature name="part_number" value="812-8101-011"/>
 			<!-- Origin: private dump -->
 			<diskarea name="cdrom">
-				<disk name="hot_mix_volume_11" sha1="ee725db3a52ff482e03b7806889763619f584859" />
+				<disk name="hot_mix_volume_11" sha1="fa371c5dd27f8ba4235e4200299d08b210491788" />
 			</diskarea>
 		</part>
 	</software>
 
 	<software name="hotmix_12">
 		<description>Hot Mix Volume 12</description>
-		<year>1994</year>
+		<year>1995</year>
 		<publisher>Silicon Graphics</publisher>
 		<part name="cdrom" interface="cdrom">
 			<feature name="part_number" value="812-8101-012"/>
 			<!-- Origin: private dump -->
 			<diskarea name="cdrom">
-				<disk name="hot_mix_volume_12" sha1="ee725db3a52ff482e03b7806889763619f584859" />
+				<disk name="hot_mix_volume_12" sha1="34f76d048973a2b4a7ae8471420f87ab2ac4d762" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hotmix_13">
+		<description>Hot Mix Volume 13</description>
+		<year>1996</year>
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="814-8101-013"/>
+			<!-- Origin: nixzone.nl -->
+			<diskarea name="cdrom">
+				<disk name="hot_mix_13" sha1="36360aac69a12728b6716d5f584768db5fad1400" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hotmix_14">
+		<description>Hot Mix Volume 14</description>
+		<year>1996</year>
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0544-003"/>
+			<!-- Origin: nixzone.nl -->
+			<diskarea name="cdrom">
+				<disk name="hot_mix_14" sha1="3e3a962260923f58edafd3052b9133789057998c" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hotmix_15">
+		<description>Hot Mix Volume 15</description>
+		<year>1996</year>
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0544-004"/>
+			<!-- Origin: nixzone.nl -->
+			<diskarea name="cdrom">
+				<disk name="hot_mix_15" sha1="173163f1366fd729d80857f097fd0b9c1f8778f4" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hotmix_16">
+		<description>Hot Mix Volume 16</description>
+		<year>1997</year>
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0544-005"/>
+			<!-- Origin: nixzone.nl -->
+			<diskarea name="cdrom">
+				<disk name="hot_mix_16" sha1="47b4d2ad094d204d726c3d9fb2a181e11af7422f" />
 			</diskarea>
 		</part>
 	</software>
@@ -1469,17 +1949,31 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- IndyZone -->
+	<!-- IndiZone -->
 
-	<software name="indizone">
-		<description>IndiZone</description>
+	<software name="indizone_1">
+		<description>IndiZone 1.0</description>
+		<year>1993</year>
+		<publisher>Silicon Graphics</publisher>
+		<info name="version" value="1.0" />
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-8102-001"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="indizone_1" sha1="1ea7db165ddba9f91e6ad46c9c12ab842a366c5c" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="indizone_1_1">
+		<description>IndiZone 1.1</description>
 		<year>1993</year>
 		<publisher>Silicon Graphics</publisher>
 		<info name="version" value="1.1" />
 		<part name="cdrom" interface="cdrom">
 			<!-- Origin: archive.org; reconstructed from a tarball, needs redump -->
 			<diskarea name="cdrom">
-				<disk name="indizone" sha1="a534bba52ce0eff4be54e8a7d2603dc1295763b4" />
+				<disk name="indizone_1_1" sha1="a534bba52ce0eff4be54e8a7d2603dc1295763b4" status="baddump" />
 			</diskarea>
 		</part>
 	</software>
@@ -1561,11 +2055,138 @@ license:CC0
 		<description>SupportFolio 10/96</description>
 		<year>1996</year> <!-- 10/96 -->
 		<publisher>Silicon Graphics</publisher>
-		<part name="cdrom" interface="cdrom">
+		<info name="version" value="1.2" /> <!-- as printed on the CDs -->
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_number" value="812-0508-003"/>
+			<feature name="part_id" value="SupportFolio Information Resources 10/96"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="supportfolio_information_resources_10_96" sha1="d01876973667216e044bb8a959f6530575fdd70e" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
 			<feature name="part_number" value="812-0603-001"/>
+			<feature name="part_id" value="SupportFolio IRIX 6.2 Patches 10/96"/>
 			<!-- Origin: private dump -->
 			<diskarea name="cdrom">
 				<disk name="supportfolio_irix_6_2_patches_10_96" sha1="55209bec451eb43fa27e8c65fe90d4b2c3157b73" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_number" value="812-0604-001"/>
+			<feature name="part_id" value="SupportFolio IRIX 5.3/6.1 Patches 10/96"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="supportfolio_irix_5_3_and_6_1_patches_10_96" sha1="0f1d18a85a85fc97cfc69aaf8f6d1a8f8b500d71" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sfolio_2_97">
+		<description>SupportFolio 2/97</description>
+		<year>1997</year> <!-- 2/97 -->
+		<publisher>Silicon Graphics</publisher>
+		<info name="version" value="1.3" /> <!-- as printed on the CDs -->
+		<!-- CD 1 "SupportFolio Information Resources 2/97" missing -->
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_number" value="812-0603-002"/>
+			<feature name="part_id" value="SupportFolio IRIX 6.2 Patches 2/97"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="supportfolio_irix_6_2_patches_2_97" sha1="4687cdc28d14a4d59a1887a6873119805a1c64aa" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_number" value="812-0638-001"/>
+			<feature name="part_id" value="SupportFolio IRIX 5.3/6.3/6.4 Patches 2/97"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="supportfolio_irix_5_3_6_3_and_6_4_patches_2_97" sha1="42eefd43f7377ae1e2a0d318b8118a67ae56b2df" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sfolio_4_97">
+		<description>SupportFolio 4/97</description>
+		<year>1997</year> <!-- 4/97 -->
+		<publisher>Silicon Graphics</publisher>
+		<!-- CD 1 "SupportFolio Information Resources 4/97" missing -->
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_number" value="812-0603-003" />
+			<feature name="part_id" value="SupportFolio IRIX 6.2 Patches 4/97"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="supportfolio_irix_6_2_patches_4_97" sha1="36a7630cc2b50cdbf059a3d167a04eb4d3aec6d2" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_number" value="812-0638-002"/>
+			<feature name="part_id" value="SupportFolio IRIX 5.3/6.3/6.4 Patches 4/97"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="supportfolio_irix_5_3_6_3_and_6_4_patches_4_97" sha1="b33cc43486fe375d126b8e39178f69072b0310d3" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sadvantage_11_93">
+		<description>Support Advantage Int'l 11/93</description>
+		<year>1993</year> <!-- 11/93 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-4015-001"/>
+			<diskarea name="cdrom">
+				<!-- Origin: private dump -->
+				<disk name="support_advantage_intl_11_93" sha1="36324701f84531b965046a17ed7aebfa4e8bf7ca" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sadvantage_3_94">
+		<description>Support Advantage Int'l 3/94</description>
+		<year>1994</year> <!-- 3/94 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-4015-002"/>
+			<diskarea name="cdrom">
+				<!-- Origin: private dump -->
+				<disk name="support_advantage_intl_3_94" sha1="3079331e1f47f6d9537d1a1dcda9c00ad3a6b0af" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sadvantage_10_94">
+		<description>Support Advantage 10/94</description>
+		<year>1994</year> <!-- 10/94 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-4024-001"/>
+			<feature name="part_id" value="Support Advantage Support Libraries 10/94"/>
+			<diskarea name="cdrom">
+				<!-- Origin: private dump -->
+				<disk name="Support_Advantage_Support_Libraries_10_94" sha1="643371e46dffed73f1d493a623d920233d79c5b1" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sadvantage_6_95">
+		<description>Support Advantage 6/95</description>
+		<year>1995</year> <!-- 6/95 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_number" value="812-4024-004"/>
+			<feature name="part_id" value="Support Advantage Support Libraries 6/95"/>
+			<diskarea name="cdrom">
+				<!-- Origin: private dump -->
+				<disk name="Support_Advantage_Support_Libraries_6_95" sha1="e24c4af01b54bf1a6ccae6a6291df53b116ffbcd" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_number" value="812-0290-004"/>
+			<feature name="part_id" value="Support Advantage IRIX Patches 6/95"/>
+			<diskarea name="cdrom">
+				<!-- Origin: private dump -->
+				<disk name="Support_Advantage_IRIX_Patches_6_95" sha1="e458a0076039d4fb1fe2cc5f6475670a86025087" />
 			</diskarea>
 		</part>
 	</software>
@@ -1681,19 +2302,6 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="apps_6_5_aug_01">
-		<description>IRIX 6.5 Applications August 2001</description>
-		<year>2001</year> <!-- 08/01 -->
-		<publisher>Silicon Graphics</publisher>
-		<part name="cdrom" interface="cdrom">
-			<feature name="part_number" value="812-0877-012"/>
-			<!-- Origin: private dump -->
-			<diskarea name="cdrom">
-				<disk name="irix_6_5_13_applications_august_2001" sha1="a73ae9f7d0c5e42b948580463c8bc2c741c9629a" />
-			</diskarea>
-		</part>
-	</software>
-
 	<!-- IRIX patches (loose CDs) -->
 
 	<software name="patch_sg0000466">
@@ -1731,6 +2339,19 @@ license:CC0
 			<!-- Origin: BitSavers -->
 			<diskarea name="cdrom">
 				<disk name="812_0238_001_irix_patch_5_1_1_1_sep1993" sha1="769fef8f67a42049541eb1f9e8357e7e769377a2" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="patch_5_1_1_2">
+		<description>IRIX Patch 5.1.1.2</description>
+		<year>1993</year> <!-- 11/93 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0238-002"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="irix_patch_5_1_1_2" sha1="29092ce7dd4682393e1ac0d2ffbbd8d0f9a6e90b" />
 			</diskarea>
 		</part>
 	</software>
@@ -2009,7 +2630,7 @@ license:CC0
 		<year>1993</year> <!-- 09/93 -->
 		<publisher>Silicon Graphics</publisher>
 		<part name="cdrom" interface="cdrom">
-			<feature name="part_number" value="	812-0232-002"/>
+			<feature name="part_number" value="812-0232-002"/>
 			<!-- Origin: jrra.zone -->
 			<diskarea name="cdrom">
 				<disk name="indy_irix_5_1_1" sha1="e041bee239367f926ce0cef0d16830bdbe49ea01" />
@@ -2044,6 +2665,19 @@ license:CC0
 	</software>
 
 	<software name="irix_5_2_a" cloneof="irix_5_2">
+		<description>IRIX 5.2 for Indy R4600PC and Challenge SX</description>
+		<year>1994</year> <!-- 04/94 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0279-001"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="irix_5_2_for_indy_r4600pc_and_challenge_sx" sha1="972cffffe22668cf2383a335718afd3083cb5965" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="irix_5_2_b" cloneof="irix_5_2">
 		<description>IRIX 5.2 for Indy R4600SC/XZ and Presenter</description>
 		<year>1994</year> <!-- 08/94 -->
 		<publisher>Silicon Graphics</publisher>
@@ -2052,6 +2686,19 @@ license:CC0
 			<!-- Origin: private dump -->
 			<diskarea name="cdrom">
 				<disk name="irix_5_2_for_indy_r4600sc_xz_and_presenter" sha1="5f81496d2291e80d8d0bd5b0c470725fc6214ab4" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="irix_5_2_patches">
+		<description>IRIX 5.2 Patches</description>
+		<year>1994</year> <!-- 06/94 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0290-001"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="irix_5_2_patches" sha1="fb7e6b45f0cc96d40f9e2634882345f4846bfb60" />
 			</diskarea>
 		</part>
 	</software>
@@ -2074,6 +2721,7 @@ license:CC0
 		<year>1995</year> <!-- 02/95 -->
 		<publisher>Silicon Graphics</publisher>
 		<part name="cdrom" interface="cdrom">
+			<!-- Also distributed as IRIX 5.3 for Indy R4000, R4400, R4600 100-200 MHz with P/N 812-0336-002 and identical contents -->
 			<feature name="part_number" value="812-0336-001"/>
 			<!-- Origin: BitSavers -->
 			<diskarea name="cdrom">
@@ -2104,19 +2752,6 @@ license:CC0
 			<!-- Origin: jrra.zone -->
 			<diskarea name="cdrom">
 				<disk name="irix_5_3_for_indy_including_r5000" sha1="99361caca3d5b8211d57f4244adeff570fce4805" />
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="irix_5_3_d" cloneof="irix_5_3">
-		<description>IRIX 5.3 for Indy R4000, R4400, R4600 (100-200 MHz)</description>
-		<year>1995</year> <!-- 08/95 -->
-		<publisher>Silicon Graphics</publisher>
-		<part name="cdrom" interface="cdrom">
-			<feature name="part_number" value="812-0336-002"/>
-			<!-- Origin: jrra.zone -->
-			<diskarea name="cdrom">
-				<disk name="irix_5_3_for_indy" sha1="dcc05e3637e4ab20c4fceb43bded2f1f2bd64518" />
 			</diskarea>
 		</part>
 	</software>
@@ -2153,7 +2788,7 @@ license:CC0
 		<publisher>Silicon Graphics</publisher>
 		<part name="cdrom1" interface="cdrom">
 			<feature name="part_number" value="812-0469-001"/>
-				<feature name="part_id" value="IRIX 6.2 part 1 of 2"/>
+			<feature name="part_id" value="IRIX 6.2 part 1 of 2"/>
 			<!-- Origin: private dump. Verified SHA1 against a Plextor dump without C2 errors -->
 			<diskarea name="cdrom">
 				<disk name="irix_6_2_part_1_of_2" sha1="714ad598cde6a48132005e4728e7e7d18fdbbb1b" />
@@ -2168,7 +2803,7 @@ license:CC0
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="irix_6_2_a" cloneof="irix_6_2">
 		<description>IRIX 6.2 with Indigo IMPACT 10000</description>
 		<year>1996</year>
@@ -2247,7 +2882,7 @@ license:CC0
 		</part>
 		<part name="cdrom4" interface="cdrom">
 			<feature name="part_number" value="812-0747-001"/>
-			<feature name="part_id" value="	IRIX 6.5 Beta Applications"/>
+			<feature name="part_id" value="IRIX 6.5 Beta Applications"/>
 			<!-- Origin: jrra.zone -->
 			<diskarea name="cdrom">
 				<disk name="irix_6_5_beta_applications" sha1="6640a6b668de811d681bb8b17c16a44d67529c33" />
@@ -2279,7 +2914,7 @@ license:CC0
 		</part>
 		<part name="cdrom8" interface="cdrom">
 			<feature name="part_number" value="812-0753-001"/>
-			<feature name="part_id" value="	IRIX 6.5 Beta O2 Demos"/>
+			<feature name="part_id" value="IRIX 6.5 Beta O2 Demos"/>
 			<!-- Origin: jrra.zone -->
 			<diskarea name="cdrom">
 				<disk name="irix_6_5_beta_o2_demos" sha1="c954caa735d92dcf4a6aba620c8d7ad44cf3b0bb" />
@@ -2537,6 +3172,15 @@ license:CC0
 				<disk name="IRIX_6_5_Applications_August_1999" sha1="1191d01b5111a12ea16f9599f26671a121d8ad04" />
 			</diskarea>
 		</part>
+		<part name="cdrom4" interface="cdrom">
+			<feature name="part_number" value="812-0779-005"/>
+			<feature name="part_id" value="IRIX 6.5.5 Base Documentation August 1999"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_5_base_documentation" sha1="378c206d4496b24c9e30163a33a43e93b77865ef" />
+			</diskarea>
+		</part>
+
 	</software>
 
 	<software name="irix_6_5_6">
@@ -2596,7 +3240,7 @@ license:CC0
 	<software name="irix_6_5_7">
 		<description>IRIX 6.5.7</description>
 		<year>2000</year> <!-- 02/00 -->
-		<publisher>Silicon Graphics</publisher>
+		<publisher>SGI</publisher>
 		<part name="cdrom1" interface="cdrom">
 			<feature name="part_number" value="812-0818-007"/>
 			<feature name="part_id" value="IRIX 6.5.7 Installation Tools and Overlays (1 of 2) February 2000"/>
@@ -2622,6 +3266,14 @@ license:CC0
 			</diskarea>
 		</part>
 		<part name="cdrom4" interface="cdrom">
+			<feature name="part_number" value="812-0779-007"/>
+			<feature name="part_id" value="IRIX 6.5.7 Base Documentation"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_7_base_documentation" sha1="844a704bc1cf303e918c4647da3da8d80011e637" />
+			</diskarea>
+		</part>
+		<part name="cdrom5" interface="cdrom">
 			<feature name="part_number" value="812-0773-007"/>
 			<feature name="part_id" value="Freeware (part 1 of 2) February 2000"/>
 			<!-- Origin: jrra.zone -->
@@ -2629,7 +3281,7 @@ license:CC0
 				<disk name="freeware_feb_2000_part_1_of_2" sha1="7cca55c9c29bc6107f70f59179594fb47b13a446" />
 			</diskarea>
 		</part>
-		<part name="cdrom5" interface="cdrom">
+		<part name="cdrom6" interface="cdrom">
 			<feature name="part_number" value="812-0964-007"/>
 			<feature name="part_id" value="Freeware (part 2 of 2) February 2000"/>
 			<!-- Origin: jrra.zone -->
@@ -2637,13 +3289,12 @@ license:CC0
 				<disk name="freeware_feb_2000_part_2_of_2" sha1="db18616335a417e8960704ca159a01873b0319cb" />
 			</diskarea>
 		</part>
-
 	</software>
 
 	<software name="irix_6_5_8">
 		<description>IRIX 6.5.8</description>
 		<year>2000</year> <!-- 05/00 -->
-		<publisher>Silicon Graphics</publisher>
+		<publisher>SGI</publisher>
 		<part name="cdrom1" interface="cdrom">
 			<feature name="part_number" value="812-0818-008"/>
 			<feature name="part_id" value="IRIX 6.5.8 Installation Tools and Overlays (1 of 3) May 2000"/>
@@ -2697,7 +3348,7 @@ license:CC0
 	<software name="irix_6_5_9">
 		<description>IRIX 6.5.9</description>
 		<year>2000</year> <!-- 08/00 -->
-		<publisher>Silicon Graphics</publisher>
+		<publisher>SGI</publisher>
 		<part name="cdrom1" interface="cdrom">
 			<feature name="part_number" value="812-0818-009"/>
 			<feature name="part_id" value="IRIX 6.5.9 Installation Tools and Overlays (1 of 3) August 2000"/>
@@ -2759,7 +3410,7 @@ license:CC0
 	<software name="irix_6_5_10">
 		<description>IRIX 6.5.10</description>
 		<year>2000</year> <!-- 11/00 -->
-		<publisher>Silicon Graphics</publisher>
+		<publisher>SGI</publisher>
 		<part name="cdrom1" interface="cdrom">
 			<feature name="part_number" value="812-0818-010"/>
 			<feature name="part_id" value="IRIX 6.5.10 Installation Tools and Overlays (1 of 3)"/>
@@ -2786,10 +3437,78 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="irix_6_5_11">
+		<description>IRIX 6.5.11</description>
+		<year>2001</year> <!-- 02/01 -->
+		<publisher>SGI</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_number" value="812-0818-011"/>
+			<feature name="part_id" value="IRIX 6.5.11 Installation Tools and Overlays (1 of 3)"/>
+			<!-- Origin: fsck.technology -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_11_installation_tools_and_overlays_feb_2001__1of3__812_0818_011" sha1="2848a40bdcc783829e4e110b273edbc2a9808cca" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_number" value="812-0819-011"/>
+			<feature name="part_id" value="IRIX 6.5.11 Overlays (2 of 3)"/>
+			<!-- Origin: fsck.technology -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_11_overlays_feb_2001__2of3__812_0819_011" sha1="02d2064bfa6cc497eb375dd5cd6acbe827850d27" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_number" value="812-0817-011"/>
+			<feature name="part_id" value="IRIX 6.5.11 Overlays (3 of 3)"/>
+			<!-- Origin: fsck.technology -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_11_overlays_feb_2001__3of3__812_0817_011" sha1="33b53f68a571d38966970b1b8a70b242fbcc8688" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="irix_6_5_12">
+		<description>IRIX 6.5.12</description>
+		<year>2001</year> <!-- 05/01 -->
+		<publisher>SGI</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_number" value="812-0818-012"/>
+			<feature name="part_id" value="IRIX 6.5.12 Installation Tools and Overlays (1 of 3)"/>
+			<!-- Origin: fsck.technology -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_12_install_and_overlays_1of3" sha1="8cf028f27e0fc6662d12a595fb1a040d3bcb9af2" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_number" value="812-0819-012"/>
+			<feature name="part_id" value="IRIX 6.5.12 Overlays (2 of 3)"/>
+			<!-- Origin: fsck.technology -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_12_overlays_2of3" sha1="04d777a2252e86273784c22461d1a08c2fe20e08" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_number" value="812-0817-012"/>
+			<feature name="part_id" value="IRIX 6.5.12 Overlays (3 of 3)"/>
+			<!-- Origin: fsck.technology -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_12_overlays_3of3" sha1="f9d8a42fc5f27f78602bb5bea980b0bc07db3520" />
+			</diskarea>
+		</part>
+		<part name="cdrom4" interface="cdrom">
+			<feature name="part_number" value="812-0877-011"/>
+			<feature name="part_id" value="IRIX 6.5 Applications May 2001"/>
+			<!-- Origin: fsck.technology -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_12_apps" sha1="1ea1b1ef707fc4f3a3f240d1567fb5960cfe79d1" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="irix_6_5_13">
 		<description>IRIX 6.5.13</description>
 		<year>2001</year> <!-- 08/01 -->
-		<publisher>Silicon Graphics</publisher>
+		<publisher>SGI</publisher>
 		<part name="cdrom1" interface="cdrom">
 			<feature name="part_number" value="812-0818-013"/>
 			<feature name="part_id" value="IRIX 6.5.13 Installation Tools and Overlays (1 of 3) August 2001"/>
@@ -2824,10 +3543,40 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="irix_6_5_14">
+		<description>IRIX 6.5.14</description>
+		<year>2001</year> <!-- 11/01 -->
+		<publisher>SGI</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_number" value="812-0818-014"/>
+			<feature name="part_id" value="IRIX 6.5.14 Installation Tools and Overlays (1 of 3)"/>
+			<!-- Origin: fsck.technology -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_14_installation_tools_and_overlays_nov_2001__1of3__812_0818_014" sha1="404a3ff74d1ff22ed046b5fde63d14c967a748d2" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_number" value="812-0819-014"/>
+			<feature name="part_id" value="IRIX 6.5.14 Overlays (2 of 3)"/>
+			<!-- Origin: fsck.technology -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_14_overlays_nov_2001__2of3__812_0819_014" sha1="2e99eebfc27080ad4157b19e09bb7390ae3dd189" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_number" value="812-0817-014"/>
+			<feature name="part_id" value="IRIX 6.5.14 Overlays (3 of 3)"/>
+			<!-- Origin: fsck.technology -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_14_overlays_nov_2001__3of3__812_0817_014" sha1="f03be4d6a53743681e296739a84aa6ba615995b0" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="irix_6_5_15">
 		<description>IRIX 6.5.15</description>
 		<year>2002</year> <!-- 02/02 -->
-		<publisher>Silicon Graphics</publisher>
+		<publisher>SGI</publisher>
 		<part name="cdrom1" interface="cdrom">
 			<feature name="part_number" value="812-0818-015"/>
 			<feature name="part_id" value="IRIX 6.5.15 Installation Tools and Overlays (1 of 4)"/>
@@ -2860,12 +3609,266 @@ license:CC0
 				<disk name="irix_6_5_15_overlays_4" sha1="8bde51d4c91d20c3a848fffd9c71a542c6edae00" />
 			</diskarea>
 		</part>
+		<part name="cdrom5" interface="cdrom">
+			<feature name="part_id" value="IRIX 6.5.15 Base Documentation"/>
+			<feature name="part_number" value="812-0779-015"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_15_base_documentation" sha1="ab62455565265f1aec72910588e84ce60521384b" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="irix_6_5_16">
+		<description>IRIX 6.5.16</description>
+		<year>2002</year> <!-- 05/2002 -->
+		<publisher>SGI</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_number" value="812-0818-016"/>
+			<feature name="part_id" value="IRIX 6.5.16 Installation Tools and Overlays (1 of 4)"/>
+			<!-- Origin: fsck.technology -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_16_installation_tools_and_overlays_may_2002__1of4__812_0818_016" sha1="e02eb72233dac56151825db21ab8e5d48a248fa5" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_number" value="812-0819-016"/>
+			<feature name="part_id" value="IRIX 6.5.16 Overlays (2 of 4)"/>
+			<!-- Origin: fsck.technology -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_16_overlays_may_2002__2of4__812_0819_016" sha1="bb229ccd84ef3f186e9ab7bdd2e72bf496ad6e23" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_number" value="812-0817-016"/>
+			<feature name="part_id" value="IRIX 6.5.16 Overlays (3 of 4)"/>
+			<!-- Origin: fsck.technology -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_16_overlays_may_2002__3of4__812_0817_016" sha1="f546f4f45a36d088e59a4470d94547449c9a04f1" />
+			</diskarea>
+		</part>
+		<part name="cdrom4" interface="cdrom">
+			<feature name="part_number" value="812-1123-016"/>
+			<feature name="part_id" value="IRIX 6.5.16 Overlays (4 of 4)"/>
+			<!-- Origin: fsck.technology -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_16_overlays_may_2002__4of4__812_1123_016" sha1="9b14c32f307994378db12f7925ed48995ae918ec" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="irix_6_5_17">
+		<description>IRIX 6.5.17</description>
+		<year>2002</year> <!-- 08/02 -->
+		<publisher>SGI</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_number" value="812-0818-017"/>
+			<feature name="part_id" value="IRIX 6.5.17 Installation Tools and Overlays (1 of 4)"/>
+			<!-- Origin: fsck.technology -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_17_installation_tools_and_overlays_aug_2002__1of4__812_0818_017" sha1="a890b3082e9c252b6afd7c316fe869607a410034" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_number" value="812-0819-017"/>
+			<feature name="part_id" value="IRIX 6.5.17 Overlays (2 of 4)"/>
+			<!-- Origin: fsck.technology -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_17_overlays_aug_2002__2of4__812_0819_017" sha1="5965521457db2ccdf78188f31bca34fbd5076556" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_number" value="812-0817-017"/>
+			<feature name="part_id" value="IRIX 6.5.17 Overlays (3 of 4)"/>
+			<!-- Origin: fsck.technology -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_17_overlays_aug_2002__3of4__812_0817_017" sha1="33b6d8f55eb884441e2a5c0ccab2cab6a9a3c8d7" />
+			</diskarea>
+		</part>
+		<part name="cdrom4" interface="cdrom">
+			<feature name="part_number" value="812-1123-017"/>
+			<feature name="part_id" value="IRIX 6.5.17 Overlays (4 of 4)"/>
+			<!-- Origin: fsck.technology -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_17_overlays_aug_2002__4of4__812_1123_017" sha1="5a164e0772c4b3d19d845b9b93cc18848596550a" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="irix_6_5_18">
+		<description>IRIX 6.5.18</description>
+		<year>2002</year> <!-- 11/02 -->
+		<publisher>SGI</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_number" value="812-0818-018"/>
+			<feature name="part_id" value="IRIX 6.5.18 Installation Tools and Overlays (1 of 4)"/>
+			<!-- Origin: fsck.technology -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_18_installation_tools_and_overlays__1_of_4__november_2002" sha1="11e7b11e3ab2acacf4cbda483390727e0afb5801" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_number" value="812-0819-018"/>
+			<feature name="part_id" value="IRIX 6.5.18 Overlays (2 of 4)"/>
+			<!-- Origin: fsck.technology -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_18_overlays__2_of_4__november_2002" sha1="67e08552bd7c9cb3df861c58e81ce6678375057b" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_number" value="812-0817-018"/>
+			<feature name="part_id" value="IRIX 6.5.18 Overlays (3 of 4)"/>
+			<!-- Origin: fsck.technology -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_18_overlays__3_of_4__november_2002" sha1="7938d31777f0db8dbe886de399155517a69f9883" />
+			</diskarea>
+		</part>
+		<part name="cdrom4" interface="cdrom">
+			<feature name="part_number" value="812-1123-018"/>
+			<feature name="part_id" value="IRIX 6.5.18 Overlays (4 of 4)"/>
+			<!-- Origin: fsck.technology -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_18_overlays__4_of_4__november_2002" sha1="a97d2f6a4be90546e0c33de7756f9b17c9f8bd70" />
+			</diskarea>
+		</part>
+		<part name="cdrom5" interface="cdrom">
+			<feature name="part_number" value="812-0877-018"/>
+			<feature name="part_id" value="IRIX 6.5 Applications November 2002"/>
+			<!-- Origin: fsck.technology -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_applications_november_2002" sha1="4e8a58554df07c511e30438be779185c59786226" />
+			</diskarea>
+		</part>
+		<part name="cdrom6" interface="cdrom">
+			<feature name="part_number" value="812-0779-018"/>
+			<feature name="part_id" value="IRIX 6.5.18 Base Documentation"/>
+			<!-- Origin: fsck.technology -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_18_base_documentation_november_2002" sha1="83b0fbb5a2b1c5b9f41d4c8093a91dd08d478d09" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="irix_6_5_19">
+		<description>IRIX 6.5.19</description>
+		<year>2003</year> <!-- 02/03 -->
+		<publisher>SGI</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_number" value="812-0818-019"/>
+			<feature name="part_id" value="IRIX 6.5.19 Installation Tools and Overlays (1 of 4)"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_19_installation_tools_and_overlays_1_of_4" sha1="bf125d76296927cc6f24fd2ea3b806de9a992ad2" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_number" value="812-0819-019"/>
+			<feature name="part_id" value="IRIX 6.5.19 Overlays (2 of 4)"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_19_overlays_2_of_4" sha1="42b99d8667f199f74600585f5ba334cd7da98034" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_number" value="812-0817-019"/>
+			<feature name="part_id" value="IRIX 6.5.19 Overlays (3 of 4)"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_19_overlays_3_of_4" sha1="8ee7979cfac23a76f3414ebbee22357efbc31c75" />
+			</diskarea>
+		</part>
+		<part name="cdrom4" interface="cdrom">
+			<feature name="part_number" value="812-1123-019"/>
+			<feature name="part_id" value="IRIX 6.5.19 Overlays (4 of 4)"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_19_overlays_4_of_4" sha1="4ed9a9590c6916c19bbce488b2deb8fb3c4bf9b9" />
+			</diskarea>
+		</part>
+		<part name="cdrom5" interface="cdrom">
+			<feature name="part_number" value="812-0779-019"/>
+			<feature name="part_id" value="IRIX 6.5.19 Base Documentation"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_19_base_documentation" sha1="32337db1b3894207cb826f37d8d6a79b0f7aee5a" />
+			</diskarea>
+		</part>
+		<part name="cdrom6" interface="cdrom">
+			<feature name="part_number" value="812-0773-019"/>
+			<feature name="part_id" value="Freeware (part 1 of 4)"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="freeware_part_1_of_4" sha1="9a875278a0a3bae9883cd69306fd75abf1ca412c" />
+			</diskarea>
+		</part>
+		<part name="cdrom7" interface="cdrom">
+			<feature name="part_number" value="812-0964-019"/>
+			<feature name="part_id" value="Freeware (part 2 of 4)"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="freeware_part_2_of_4" sha1="60933e32cd3b2f2da8aa49c5070a05082c8e9d2f" />
+			</diskarea>
+		</part>
+		<part name="cdrom8" interface="cdrom">
+			<feature name="part_number" value="812-1085-019"/>
+			<feature name="part_id" value="Freeware (part 3 of 4)"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="freeware_part_3_of_4" sha1="fcb1d992b26d7e19952dfaffac076c319af1f508" />
+			</diskarea>
+		</part>
+		<part name="cdrom9" interface="cdrom">
+			<feature name="part_number" value="812-1137-019"/>
+			<feature name="part_id" value="Freeware (part 4 of 4)"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="freeware_part_4_of_4" sha1="c270b7181a080f44f4384d2d28c042a476fac8f4" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="irix_6_5_21">
+		<description>IRIX 6.5.21</description>
+		<year>2003</year> <!-- 08/03 -->
+		<publisher>SGI</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_number" value="812-0818-021"/>
+			<feature name="part_id" value="IRIX 6.5.21 Installation Tools and Overlays (1 of 4)"/>
+			<!-- Origin: fsck.technology -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_21_installation_tools_and_overlays_aug_2003__1of4__812_0818_021" sha1="d4c3797985f30c84f49e89ea6c0e6e6a544a942e" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_number" value="812-0819-021"/>
+			<feature name="part_id" value="IRIX 6.5.21 Overlays (2 of 4)"/>
+			<!-- Origin: fsck.technology -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_21_overlays_aug_2003__2of4__812_0819_021" sha1="c3d9ade779c298d2bea185fdd63c366799127b0b" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_number" value="812-0817-021"/>
+			<feature name="part_id" value="IRIX 6.5.21 Overlays (3 of 4)"/>
+			<!-- Origin: fsck.technology -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_21_overlays_aug_2003__3of4__812_0817_021" sha1="c85dbeb8a40da2afcf52de54c46ea45609d8fb9e" />
+			</diskarea>
+		</part>
+		<part name="cdrom4" interface="cdrom">
+			<feature name="part_number" value="812-1123-021"/>
+			<feature name="part_id" value="IRIX 6.5.21 Overlays (4 of 4)"/>
+			<!-- Origin: fsck.technology -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_21_overlays_aug_2003__4of4__812_1123_021" sha1="c2e6f1e8f72dbf2880dd4e5b31df46e00fb8c4ee" />
+			</diskarea>
+		</part>
 	</software>
 
 	<software name="irix_6_5_22">
 		<description>IRIX 6.5.22</description>
 		<year>2003</year> <!-- 11/03 -->
-		<publisher>Silicon Graphics</publisher>
+		<publisher>SGI</publisher>
 		<part name="cdrom1" interface="cdrom">
 			<feature name="part_number" value="812-0818-022"/>
 			<feature name="part_id" value="IRIX 6.5.22 Installation Tools and Overlays 1 of 3"/>
@@ -2891,7 +3894,7 @@ license:CC0
 			</diskarea>
 		</part>
 		<part name="cdrom4" interface="cdrom">
-			<feature name="part_number" value="812-0877-022	"/>
+			<feature name="part_number" value="812-0877-022 "/>
 			<feature name="part_id" value="IRIX 6.5 Applications November 2003"/>
 			<!-- Origin: archive.org -->
 			<diskarea name="cdrom">
@@ -2900,10 +3903,40 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="irix_6_5_23">
+		<description>IRIX 6.5.23</description>
+		<year>2004</year> <!-- 02/04 -->
+		<publisher>SGI</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_number" value="812-0818-023"/>
+			<feature name="part_id" value="IRIX 6.5.23 Installation Tools and Overlays (1 of 3)"/>
+			<!-- Origin: fsck.technology -->
+			<diskarea name="cdrom">
+				<disk name="install_1" sha1="2a47acdb7bedf3ccc844358384dec71829d6aefd" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_number" value="812-0819-023"/>
+			<feature name="part_id" value="IRIX 6.5.23 Overlays (2 of 3)"/>
+			<!-- Origin: fsck.technology -->
+			<diskarea name="cdrom">
+				<disk name="install_2" sha1="70e2f097fd0fe797f59c2efaa3bef7dc18932127" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_number" value="812-0817-023"/>
+			<feature name="part_id" value="IRIX 6.5.23 Overlays (3 of 3)"/>
+			<!-- Origin: fsck.technology -->
+			<diskarea name="cdrom">
+				<disk name="install_3" sha1="08c8141b485195672501158de9995cf5a8156e30" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="irix_6_5_26">
 		<description>IRIX 6.5.26</description>
 		<year>2004</year> <!-- 11/04 -->
-		<publisher>Silicon Graphics</publisher>
+		<publisher>SGI</publisher>
 		<part name="cdrom1" interface="cdrom">
 			<feature name="part_number" value="812-0818-026"/>
 			<feature name="part_id" value="IRIX 6.5.26 Installation Tools and Overlays (1 of 3)"/>
@@ -2946,10 +3979,70 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="irix_6_5_27">
+		<description>IRIX 6.5.27</description>
+		<year>2005</year> <!-- 02/05 -->
+		<publisher>SGI</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_number" value="812-0818-027"/>
+			<feature name="part_id" value="IRIX 6.5.27 Installation Tools and Overlays (1 of 3)"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_27_installation_tools_and_overlays_1_of_3" sha1="7da18d1b279f41d1d7c2792894fdaaa6bb2e12bb" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_number" value="812-0819-027"/>
+			<feature name="part_id" value="IRIX 6.5.27 Overlays (2 of 3)"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_27_overlays_2_of_3" sha1="68d8cbcc0a101c6ff9acffe51269cc360a0f682d" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_number" value="812-0817-027"/>
+			<feature name="part_id" value="IRIX 6.5.27 Overlays (3 of 3)"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_27_overlays_3_of_3" sha1="abb8417de35fdc84ea59b932a90e623e1dc21629" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="irix_6_5_28">
+		<description>IRIX 6.5.28</description>
+		<year>2005</year> <!-- 08/05 -->
+		<publisher>SGI</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_number" value="812-0818-028"/>
+			<feature name="part_id" value="RIX 6.5.28 Installation Tools and Overlays (1 of 3)"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_28_installation_tools_and_overlays_1_of_3" sha1="3c057a4f0a40e87eb622420b7caf4ac597127d1c" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_number" value="812-0819-028"/>
+			<feature name="part_id" value="IRIX 6.5.28 Overlays (2 of 3)"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_28_overlays_2_of_3" sha1="07d49d85359a67ad82979ae35c765cbae14e731b" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_number" value="812-0817-028"/>
+			<feature name="part_id" value="IRIX 6.5.28 Overlays (3 of 3)"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_28_overlays_3_of_3" sha1="13fd947241b8a01efaeeac965e42add12f00fa7e" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="irix_6_5_29">
 		<description>IRIX 6.5.29</description>
 		<year>2006</year> <!-- 02/06 -->
-		<publisher>Silicon Graphics</publisher>
+		<publisher>SGI</publisher>
 		<part name="cdrom1" interface="cdrom">
 			<feature name="part_number" value="812-0818-029"/>
 			<feature name="part_id" value="IRIX 6.5.29 Installation Tools and Overlays 1 of 3 February 06"/>
@@ -3003,7 +4096,7 @@ license:CC0
 	<software name="irix_6_5_30">
 		<description>IRIX 6.5.30</description>
 		<year>2006</year> <!-- 08/06 -->
-		<publisher>Silicon Graphics</publisher>
+		<publisher>SGI</publisher>
 		<part name="cdrom1" interface="cdrom">
 			<feature name="part_number" value="812-0818-030"/>
 			<feature name="part_id" value="IRIX 6.5.30 Installation Tools and Overlays (1 of 3)"/>
@@ -3042,6 +4135,168 @@ license:CC0
 			<!-- Origin: archive.org -->
 			<diskarea name="cdrom">
 				<disk name="complementary_applications" sha1="c609b24ae9973894509e753a039665371733c572" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- NetBSD -->
+
+	<software name="netbsd_1_6_2">
+		<description>NetBSD 1.6.2</description>
+		<year>2004</year> <!-- 10/04 -->
+		<publisher>The NetBSD Project</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="NetBSD 1.6.2 CD sgimipscd"/>
+			<!-- Origin: netbsd.org -->
+			<diskarea name="cdrom">
+				<disk name="sgimipscd" sha1="dd58f16cda1510a59ec64b02e6fb0b6b308587ad" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="NetBSD 1.6.2 CD sourcecd"/>
+			<!-- Origin: netbsd.org -->
+			<diskarea name="cdrom">
+				<disk name="sourcecd" sha1="a542d0b3397632c125c279e4b50df0fa431b5fd9" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="netbsd_2_0">
+		<description>NetBSD 2.0</description>
+		<year>2004</year> <!-- 12/04 -->
+		<publisher>The NetBSD Project</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="NetBSD 2.0 CD sgimipscd"/>
+			<!-- Origin: netbsd.org -->
+			<diskarea name="cdrom">
+				<disk name="sgimipscd" sha1="d8960cfffc55d87f8e83074346e0f670b7a7f024" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="NetBSD 2.0 CD sourcecd"/>
+			<!-- Origin: netbsd.org -->
+			<diskarea name="cdrom">
+				<disk name="sourcecd" sha1="073ceaa3db068938e11a4893fcec81ce533e1016" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="netbsd_2_0_2">
+		<description>NetBSD 2.0.2</description>
+		<year>2005</year> <!-- 04/05 -->
+		<publisher>The NetBSD Project</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="NetBSD 2.0.2 CD sgimipscd"/>
+			<!-- Origin: netbsd.org -->
+			<diskarea name="cdrom">
+				<disk name="sgimipscd" sha1="45b78a683010aa75476ca987e48fa469b4cfa127" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="NetBSD 2.0.2 CD sourcecd"/>
+			<!-- Origin: netbsd.org -->
+			<diskarea name="cdrom">
+				<disk name="sourcecd" sha1="e74be0fe637d4ddc8e5bbe818d6c3876fce2f6ae" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="netbsd_2_1">
+		<description>NetBSD 2.1</description>
+		<year>2005</year> <!-- 10/04 -->
+		<publisher>The NetBSD Project</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="NetBSD 2.1 CD sgimipscd"/>
+			<!-- Origin: netbsd.org -->
+			<diskarea name="cdrom">
+				<disk name="sgimipscd" sha1="dd160526c51fc4976639a5ca872b6a38f8da9088" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="NetBSD 2.1 CD sourcecd"/>
+			<!-- Origin: netbsd.org -->
+			<diskarea name="cdrom">
+				<disk name="sourcecd" sha1="9c1dd6ae595aa44f68b21b574e4ede12ad23a6b1" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="netbsd_3_0">
+		<description>NetBSD 3.0</description>
+		<year>2005</year> <!-- 12/05 -->
+		<publisher>The NetBSD Project</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="NetBSD 3.0 sgimipscd"/>
+			<!-- Origin: netbsd.org -->
+			<diskarea name="cdrom">
+				<disk name="sgimipscd_3_0" sha1="ce20c8a04f2013bf826bad0535931082535d564e" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="NetBSD 3.0 sourcecd"/>
+			<!-- Origin: netbsd.org -->
+			<diskarea name="cdrom">
+				<disk name="sourcecd_3_0" sha1="9ab700a635e1816a8f1120b915b97875299686c7" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="netbsd_3_0_1">
+		<description>NetBSD 3.0.1</description>
+		<year>2006</year> <!-- 07/06 -->
+		<publisher>The NetBSD Project</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="NetBSD 3.0.1 sgimipscd"/>
+			<!-- Origin: netbsd.org -->
+			<diskarea name="cdrom">
+				<disk name="sgimipscd_3_0_1" sha1="8c9fbcdfe31006d19c43cf1afdafa6a0926f868a" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="NetBSD 3.0.1 sourcecd"/>
+			<!-- Origin: netbsd.org -->
+			<diskarea name="cdrom">
+				<disk name="sourcecd_3_0_1" sha1="476c37f1154169a1443a82baf4cf5cde6847f1e1" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="netbsd_3_0_2">
+		<description>NetBSD 3.0.2</description>
+		<year>2006</year> <!-- 11/06 -->
+		<publisher>The NetBSD Project</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="NetBSD 3.0.2 sgimipscd"/>
+			<!-- Origin: netbsd.org -->
+			<diskarea name="cdrom">
+				<disk name="sgimipscd_3_0_2" sha1="8785e73b09d99ee9eab7a6821c61fd6154ad1f0c" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="NetBSD 3.0.2 sourcecd"/>
+			<!-- Origin: netbsd.org -->
+			<diskarea name="cdrom">
+				<disk name="sourcecd_3_0_2" sha1="86038dcdfeb5a4ad74c83a7cf0d37e2bfbc2e9f2" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="netbsd_3_1">
+		<description>NetBSD 3.1</description>
+		<year>2006</year> <!-- 11/06 -->
+		<publisher>The NetBSD Project</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="NetBSD 3.1 sgimipscd"/>
+			<!-- Origin: netbsd.org -->
+			<diskarea name="cdrom">
+				<disk name="sgimipscd_3_1" sha1="0258964ef25771d5c0107612be4190081568d689" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="NetBSD 3.1 sourcecd"/>
+			<!-- Origin: netbsd.org -->
+			<diskarea name="cdrom">
+				<disk name="sourcecd_3_1" sha1="55c55fe766674c84ba7db132f5e05cabc77ee5b0" />
 			</diskarea>
 		</part>
 	</software>

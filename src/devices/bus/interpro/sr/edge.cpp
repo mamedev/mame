@@ -763,7 +763,7 @@ u32 edge2plus_framebuffer_device_base::screen_update(screen_device &screen, bitm
 	return 0;
 }
 
-WRITE32_MEMBER(edge1_device_base::control_w)
+void edge1_device_base::control_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	// clear interrupt
 	if (m_control & HOLDA_INT_H && !(data & HOLDA_INT_H))
@@ -799,7 +799,7 @@ WRITE_LINE_MEMBER(edge1_device_base::holda)
 		m_status &= ~DSP_1_HOLDA_H;
 }
 
-WRITE32_MEMBER(edge2plus_processor_device_base::control_w)
+void edge2plus_processor_device_base::control_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_control);
 
@@ -841,7 +841,7 @@ void edge2plus_processor_device_base::dsp1_map(address_map &map)
 }
 
 
-WRITE32_MEMBER(edge2plus_framebuffer_device_base::lut_select_w)
+void edge2plus_framebuffer_device_base::lut_select_w(u32 data)
 {
 	LOG("select ramdac %d\n", data);
 
@@ -865,12 +865,12 @@ WRITE_LINE_MEMBER(edge1_device_base::scc_irq)
 	irq0(state);
 }
 
-READ32_MEMBER(edge1_device_base::reg0_r)
+u32 edge1_device_base::reg0_r()
 {
 	return ((m_reg0 & ~VBLANK) | (m_screen->vblank() ? VBLANK : 0));
 }
 
-WRITE32_MEMBER(edge1_device_base::kernel_w)
+void edge1_device_base::kernel_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_kernel);
 
@@ -887,14 +887,14 @@ WRITE_LINE_MEMBER(edge2plus_processor_device_base::scc_irq)
 	irq0(state);
 }
 
-WRITE32_MEMBER(edge2plus_processor_device_base::kernel_w)
+void edge2plus_processor_device_base::kernel_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_kernel);
 
 	m_status |= KREG_IN_FULL;  // FIXME: what clears this?
 }
 
-READ32_MEMBER(edge2plus_processor_device_base::reg0_r)
+u32 edge2plus_processor_device_base::reg0_r()
 {
 	LOG("reg0_r vblank %d\n", m_screen->vblank());
 

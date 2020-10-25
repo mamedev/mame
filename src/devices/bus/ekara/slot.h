@@ -30,18 +30,18 @@ public:
 	virtual ~device_ekara_cart_interface();
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_cart) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_cart) { }
+	virtual uint8_t read_cart(offs_t offset) { return 0xff; }
+	virtual void write_cart(offs_t offset, uint8_t data) { }
 
-	virtual DECLARE_READ8_MEMBER(read_extra) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_extra) { }
+	virtual uint8_t read_extra(offs_t offset) { return 0xff; }
+	virtual void write_extra(offs_t offset, uint8_t data) { }
 
 	virtual DECLARE_WRITE_LINE_MEMBER(write_sda) { }
 	virtual DECLARE_WRITE_LINE_MEMBER(write_scl) { }
 	//virtual DECLARE_WRITE_LINE_MEMBER( write_wc )
 	virtual DECLARE_READ_LINE_MEMBER( read_sda ) { return 0; }
 
-	virtual DECLARE_WRITE8_MEMBER(write_bus_control) { }
+	virtual void write_bus_control(offs_t offset, uint8_t data) { }
 
 	virtual bool is_read_access_not_rom(void) { return false; }
 	virtual bool is_write_access_not_rom(void) { return false; }
@@ -100,21 +100,21 @@ public:
 	static int get_cart_type(const uint8_t *ROM, uint32_t len);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_cart);
+	uint8_t read_cart(offs_t offset);
+	void write_cart(offs_t offset, uint8_t data);
 
-	virtual DECLARE_READ8_MEMBER(read_extra);
-	virtual DECLARE_WRITE8_MEMBER(write_extra);
+	uint8_t read_extra(offs_t offset);
+	void write_extra(offs_t offset, uint8_t data);
 
-	virtual DECLARE_WRITE_LINE_MEMBER(write_sda);
-	virtual DECLARE_WRITE_LINE_MEMBER(write_scl);
-	//virtual DECLARE_WRITE_LINE_MEMBER( write_wc );
-	virtual DECLARE_READ_LINE_MEMBER( read_sda );
+	DECLARE_WRITE_LINE_MEMBER(write_sda);
+	DECLARE_WRITE_LINE_MEMBER(write_scl);
+	//DECLARE_WRITE_LINE_MEMBER( write_wc );
+	DECLARE_READ_LINE_MEMBER( read_sda );
 
-	virtual DECLARE_WRITE8_MEMBER(write_bus_control);
+	void write_bus_control(offs_t offset, uint8_t data);
 
-	virtual bool is_read_access_not_rom(void);
-	virtual bool is_write_access_not_rom(void);
+	bool is_read_access_not_rom(void);
+	bool is_write_access_not_rom(void);
 
 	bool has_cart() { return m_cart ? true : false; }
 

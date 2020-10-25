@@ -163,147 +163,147 @@ void i82439hx_host_device::map_extra(uint64_t memory_window_start, uint64_t memo
 }
 
 
-READ8_MEMBER (i82439hx_host_device::header_type_r)
+uint8_t i82439hx_host_device::header_type_r()
 {
 	return 0x00; // from datasheet
 }
 
-READ8_MEMBER (i82439hx_host_device::pcon_r)
+uint8_t i82439hx_host_device::pcon_r()
 {
 	return pcon;
 }
 
-WRITE8_MEMBER(i82439hx_host_device::pcon_w)
+void i82439hx_host_device::pcon_w(uint8_t data)
 {
 	pcon = data;
 	logerror("pcon = %02x\n", pcon);
 }
 
-READ8_MEMBER (i82439hx_host_device::cc_r)
+uint8_t i82439hx_host_device::cc_r()
 {
 	return cc;
 }
 
-WRITE8_MEMBER(i82439hx_host_device::cc_w)
+void i82439hx_host_device::cc_w(uint8_t data)
 {
 	cc = data;
 	logerror("cc = %02x\n", cc);
 }
 
-READ8_MEMBER (i82439hx_host_device::dramec_r)
+uint8_t i82439hx_host_device::dramec_r()
 {
 	return dramec;
 }
 
-WRITE8_MEMBER(i82439hx_host_device::dramec_w)
+void i82439hx_host_device::dramec_w(uint8_t data)
 {
 	dramec = data;
 	logerror("dramec = %02x\n", dramec);
 }
 
-READ8_MEMBER (i82439hx_host_device::dramc_r)
+uint8_t i82439hx_host_device::dramc_r()
 {
 	return dramc;
 }
 
-WRITE8_MEMBER(i82439hx_host_device::dramc_w)
+void i82439hx_host_device::dramc_w(uint8_t data)
 {
 	dramc = data;
 	logerror("dramc = %02x\n", dramc);
 	remap_cb();
 }
 
-READ8_MEMBER (i82439hx_host_device::dramt_r)
+uint8_t i82439hx_host_device::dramt_r()
 {
 	return dramt;
 }
 
-WRITE8_MEMBER(i82439hx_host_device::dramt_w)
+void i82439hx_host_device::dramt_w(uint8_t data)
 {
 	dramt = data;
 	logerror("dramt = %02x\n", dramt);
 }
 
-READ8_MEMBER (i82439hx_host_device::pam_r)
+uint8_t i82439hx_host_device::pam_r(offs_t offset)
 {
 	return pam[offset - 1];
 }
 
-WRITE8_MEMBER(i82439hx_host_device::pam_w)
+void i82439hx_host_device::pam_w(offs_t offset, uint8_t data)
 {
 	pam[offset - 1] = data;
 	logerror("pam[%d] = %02x\n", offset - 1, pam[offset - 1]);
 	remap_cb();
 }
 
-READ8_MEMBER (i82439hx_host_device::drb_r)
+uint8_t i82439hx_host_device::drb_r(offs_t offset)
 {
 	return drb[offset];
 }
 
-WRITE8_MEMBER(i82439hx_host_device::drb_w)
+void i82439hx_host_device::drb_w(offs_t offset, uint8_t data)
 {
 	drb[offset] = data;
 	logerror("drb[%d] = %02x\n", offset, drb[offset]);
 }
 
-READ8_MEMBER (i82439hx_host_device::drt_r)
+uint8_t i82439hx_host_device::drt_r()
 {
 	return drt;
 }
 
-WRITE8_MEMBER(i82439hx_host_device::drt_w)
+void i82439hx_host_device::drt_w(uint8_t data)
 {
 	drt = data;
 	logerror("drt = %02x\n", drt);
 }
 
-READ8_MEMBER (i82439hx_host_device::drat_r)
+uint8_t i82439hx_host_device::drat_r()
 {
 	return drat;
 }
 
-WRITE8_MEMBER(i82439hx_host_device::drat_w)
+void i82439hx_host_device::drat_w(uint8_t data)
 {
 	drat = data;
 	logerror("drat = %02x\n", drat);
 }
 
-READ8_MEMBER (i82439hx_host_device::smram_r)
+uint8_t i82439hx_host_device::smram_r()
 {
 	return smram;
 }
 
-WRITE8_MEMBER(i82439hx_host_device::smram_w)
+void i82439hx_host_device::smram_w(uint8_t data)
 {
 	smram = data;
 	logerror("smram = %02x\n", smram);
 	remap_cb();
 }
 
-READ8_MEMBER (i82439hx_host_device::errcmd_r)
+uint8_t i82439hx_host_device::errcmd_r()
 {
 	return errcmd;
 }
 
-WRITE8_MEMBER(i82439hx_host_device::errcmd_w)
+void i82439hx_host_device::errcmd_w(uint8_t data)
 {
 	errcmd = data;
 	logerror("errcmd = %02x\n", errcmd);
 }
 
-READ8_MEMBER (i82439hx_host_device::errsts_r)
+uint8_t i82439hx_host_device::errsts_r()
 {
 	return errsts;
 }
 
-WRITE8_MEMBER(i82439hx_host_device::errsts_w)
+void i82439hx_host_device::errsts_w(uint8_t data)
 {
 	errsts = data;
 	logerror("errsts = %02x\n", errsts);
 }
 
-READ8_MEMBER (i82439hx_host_device::errsyn_r)
+uint8_t i82439hx_host_device::errsyn_r()
 {
 	return errsyn;
 }

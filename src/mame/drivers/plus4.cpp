@@ -75,7 +75,7 @@ public:
 
 	void plus4(machine_config &config);
 
-	DECLARE_WRITE8_MEMBER( cpu_w );
+	void cpu_w(uint8_t data);
 
 protected:
 	required_device<m7501_device> m_maincpu;
@@ -102,15 +102,15 @@ protected:
 	virtual void machine_reset() override;
 
 	void bankswitch(offs_t offset, int phi0, int mux, int ras, int *scs, int *phi2, int *user, int *_6551, int *addr_clk, int *keyport, int *kernal);
-	uint8_t read_memory(address_space &space, offs_t offset, int ba, int scs, int phi2, int user, int _6551, int addr_clk, int keyport, int kernal);
+	uint8_t read_memory(offs_t offset, int ba, int scs, int phi2, int user, int _6551, int addr_clk, int keyport, int kernal);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( ted_videoram_r );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+	uint8_t ted_videoram_r(offs_t offset);
 
-	DECLARE_READ8_MEMBER( cpu_r );
+	uint8_t cpu_r();
 
-	DECLARE_READ8_MEMBER( ted_k_r );
+	uint8_t ted_k_r(offs_t offset);
 
 	DECLARE_WRITE_LINE_MEMBER( write_kb0 ) { if (state) m_kb |= 1; else m_kb &= ~1; }
 	DECLARE_WRITE_LINE_MEMBER( write_kb1 ) { if (state) m_kb |= 2; else m_kb &= ~2; }
@@ -165,7 +165,7 @@ public:
 	void plus4n(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER( cpu_r );
+	uint8_t cpu_r();
 };
 
 
@@ -271,10 +271,10 @@ void plus4_state::bankswitch(offs_t offset, int phi0, int mux, int ras, int *scs
 //  read_memory -
 //-------------------------------------------------
 
-uint8_t plus4_state::read_memory(address_space &space, offs_t offset, int ba, int scs, int phi2, int user, int _6551, int addr_clk, int keyport, int kernal)
+uint8_t plus4_state::read_memory(offs_t offset, int ba, int scs, int phi2, int user, int _6551, int addr_clk, int keyport, int kernal)
 {
 	int cs0 = 1, cs1 = 1, c1l = 1, c1h = 1, c2l = 1, c2h = 1;
-	uint8_t data = m_ted->read(space, offset, cs0, cs1);
+	uint8_t data = m_ted->read(offset, cs0, cs1);
 
 	//logerror("offset %04x user %u 6551 %u addr_clk %u keyport %u kernal %u cs0 %u cs1 %u\n", offset,user,_6551,addr_clk,keyport,kernal,cs0,cs1);
 
@@ -378,14 +378,14 @@ uint8_t plus4_state::read_memory(address_space &space, offs_t offset, int ba, in
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( plus4_state::read )
+uint8_t plus4_state::read(offs_t offset)
 {
 	int phi0 = 1, mux = 0, ras = 0, ba = 1;
 	int scs, phi2, user, _6551, addr_clk, keyport, kernal;
 
 	bankswitch(offset, phi0, mux, ras, &scs, &phi2, &user, &_6551, &addr_clk, &keyport, &kernal);
 
-	return read_memory(space, offset, ba, scs, phi2, user, _6551, addr_clk, keyport, kernal);
+	return read_memory(offset, ba, scs, phi2, user, _6551, addr_clk, keyport, kernal);
 }
 
 
@@ -393,7 +393,7 @@ READ8_MEMBER( plus4_state::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( plus4_state::write )
+void plus4_state::write(offs_t offset, uint8_t data)
 {
 	int scs, phi2, user, _6551, addr_clk, keyport, kernal;
 	int phi0 = 1, mux = 0, ras = 0, ba = 1;
@@ -401,7 +401,7 @@ WRITE8_MEMBER( plus4_state::write )
 
 	bankswitch(offset, phi0, mux, ras, &scs, &phi2, &user, &_6551, &addr_clk, &keyport, &kernal);
 
-	m_ted->write(space, offset, data, cs0, cs1);
+	m_ted->write(offset, data, cs0, cs1);
 
 	//logerror("write offset %04x data %02x user %u 6551 %u addr_clk %u keyport %u kernal %u cs0 %u cs1 %u\n", offset,data,user,_6551,addr_clk,keyport,kernal,cs0,cs1);
 
@@ -438,14 +438,14 @@ WRITE8_MEMBER( plus4_state::write )
 //  ted_videoram_r -
 //-------------------------------------------------
 
-READ8_MEMBER( plus4_state::ted_videoram_r )
+uint8_t plus4_state::ted_videoram_r(offs_t offset)
 {
 	int phi0 = 1, mux = 0, ras = 1, ba = 0;
 	int scs, phi2, user, _6551, addr_clk, keyport, kernal;
 
 	bankswitch(offset, phi0, mux, ras, &scs, &phi2, &user, &_6551, &addr_clk, &keyport, &kernal);
 
-	return read_memory(space, offset, ba, scs, phi2, user, _6551, addr_clk, keyport, kernal);
+	return read_memory(offset, ba, scs, phi2, user, _6551, addr_clk, keyport, kernal);
 }
 
 
@@ -489,13 +489,13 @@ static INPUT_PORTS_START( plus4 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F3)                                    PORT_CHAR(UCHAR_MAMEKEY(F3)) PORT_CHAR(UCHAR_MAMEKEY(F6))
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2)                                    PORT_CHAR(UCHAR_MAMEKEY(F2)) PORT_CHAR(UCHAR_MAMEKEY(F5))
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F1)                                    PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_CHAR(UCHAR_MAMEKEY(F4))
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("HELP f7") PORT_CODE(KEYCODE_F4)               PORT_CHAR(UCHAR_MAMEKEY(F8)) PORT_CHAR(UCHAR_MAMEKEY(F7))
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("HELP F7") PORT_CODE(KEYCODE_F4)               PORT_CHAR(UCHAR_MAMEKEY(F8)) PORT_CHAR(UCHAR_MAMEKEY(F7))
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE)                            PORT_CHAR(0xA3)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Return") PORT_CODE(KEYCODE_ENTER)             PORT_CHAR(13)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("INST DEL") PORT_CODE(KEYCODE_BACKSPACE)       PORT_CHAR(8) PORT_CHAR(UCHAR_MAMEKEY(INSERT))
 
 	PORT_START( "ROW1" )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Shift (Left & Right)") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Shift (Left & Right)") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E)         PORT_CHAR('E')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S)         PORT_CHAR('S')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z)         PORT_CHAR('Z')
@@ -529,7 +529,7 @@ static INPUT_PORTS_START( plus4 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O)         PORT_CHAR('O')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K)         PORT_CHAR('K')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M)         PORT_CHAR('M')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("0  \xE2\x86\x91") PORT_CODE(KEYCODE_0)        PORT_CHAR('0') PORT_CHAR(0x2191)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("0  \xE2\x86\x91") PORT_CODE(KEYCODE_0)        PORT_CHAR('0') PORT_CHAR('^')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J)         PORT_CHAR('J')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I)         PORT_CHAR('I')
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9)         PORT_CHAR('9') PORT_CHAR(')')
@@ -546,13 +546,13 @@ static INPUT_PORTS_START( plus4 )
 
 	PORT_START( "ROW6" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH)                             PORT_CHAR('/') PORT_CHAR('?')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS)                                 PORT_CHAR('+')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("=  Pi  \xE2\x86\x90") PORT_CODE(KEYCODE_BACKSLASH2)   PORT_CHAR('=') PORT_CHAR(0x03C0) PORT_CHAR(0x2190)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ESC)                                   PORT_CHAR(UCHAR_MAMEKEY(ESC))
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RIGHT)                                 PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS)                             PORT_CHAR('+')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("=  Pi  \xE2\x86\x90") PORT_CODE(KEYCODE_BACKSLASH)   PORT_CHAR('=') PORT_CHAR(0x03C0) PORT_CHAR(0x2190)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ESC)                               PORT_CHAR(UCHAR_MAMEKEY(ESC))
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RIGHT)                             PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE)                             PORT_CHAR(';') PORT_CHAR(']')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_INSERT)                                PORT_CHAR('*')
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LEFT)                                  PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_INSERT)                            PORT_CHAR('*')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LEFT)                              PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 
 	PORT_START( "ROW7" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RUN STOP") PORT_CODE(KEYCODE_HOME)
@@ -560,8 +560,8 @@ static INPUT_PORTS_START( plus4 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CBM") PORT_CODE(KEYCODE_LALT)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SPACE)                             PORT_CHAR(' ')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2)                                 PORT_CHAR('2') PORT_CHAR('"')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TAB)                               PORT_CHAR(UCHAR_SHIFT_2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Home Clear") PORT_CODE(KEYCODE_DEL)           PORT_CHAR(UCHAR_MAMEKEY(HOME))
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Control") PORT_CODE(KEYCODE_TAB)          PORT_CHAR(UCHAR_SHIFT_2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Home Clear") PORT_CODE(KEYCODE_DEL)       PORT_CHAR(UCHAR_MAMEKEY(HOME))
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1)                                 PORT_CHAR('1') PORT_CHAR('!')
 
 	PORT_START( "LOCK" )
@@ -582,7 +582,7 @@ static INPUT_PORTS_START( c16 )
 
 	PORT_MODIFY( "ROW5" )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("-") PORT_CODE(KEYCODE_MINUS)                  PORT_CHAR('-')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2)                            PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_UP)                                    PORT_CHAR(UCHAR_MAMEKEY(UP))
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP)                                  PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 
 	PORT_MODIFY( "ROW6" )
@@ -603,7 +603,7 @@ INPUT_PORTS_END
 //  M6510_INTERFACE( cpu_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( plus4_state::cpu_r )
+uint8_t plus4_state::cpu_r()
 {
 	/*
 
@@ -634,7 +634,7 @@ READ8_MEMBER( plus4_state::cpu_r )
 	return data;
 }
 
-READ8_MEMBER( c16_state::cpu_r )
+uint8_t c16_state::cpu_r()
 {
 	/*
 
@@ -665,7 +665,7 @@ READ8_MEMBER( c16_state::cpu_r )
 	return data;
 }
 
-WRITE8_MEMBER( plus4_state::cpu_w )
+void plus4_state::cpu_w(uint8_t data)
 {
 	/*
 
@@ -705,7 +705,7 @@ WRITE8_MEMBER( plus4_state::cpu_w )
 //  ted7360_interface ted_intf
 //-------------------------------------------------
 
-READ8_MEMBER( plus4_state::ted_k_r )
+uint8_t plus4_state::ted_k_r(offs_t offset)
 {
 	/*
 

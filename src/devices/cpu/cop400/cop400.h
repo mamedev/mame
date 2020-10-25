@@ -184,9 +184,8 @@ protected:
 	bool m_has_counter;
 	bool m_has_inil;
 
-	address_space *m_program;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
-	address_space *m_data;
+	memory_access<11, 0, 0, ENDIANNESS_LITTLE>::cache m_program;
+	memory_access< 7, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
 
 	uint8_t m_featuremask;
 
@@ -265,7 +264,7 @@ protected:
 
 	uint8_t get_flags() const;
 	void set_flags(uint8_t flags);
-	uint8_t get_m() const;
+	uint8_t get_m();
 	void set_m(uint8_t m);
 
 	void illegal(uint8_t operand);

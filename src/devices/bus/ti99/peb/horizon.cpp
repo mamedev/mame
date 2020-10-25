@@ -121,24 +121,22 @@ void horizon_ramdisk_device::nvram_read(emu_file &file)
 	int size = 2097152*(1 << ioport("HORIZONSIZE")->read());
 
 	// NVRAM plus ROS
-	uint8_t* buffer = global_alloc_array_clear<uint8_t>(MAXSIZE + ROSSIZE);
+	auto buffer = make_unique_clear<uint8_t []>(MAXSIZE + ROSSIZE);
 
 	memset(m_nvram->pointer(), 0,  size);
 	memset(m_ros->pointer(), 0, ROSSIZE);
 
 	// We assume the last 8K is ROS
-	int filesize = file.read(buffer, MAXSIZE+ROSSIZE);
+	int filesize = file.read(&buffer[0], MAXSIZE+ROSSIZE);
 	int nvramsize = filesize - ROSSIZE;
 
 	// If there is a reasonable size
 	if (nvramsize >= 0)
 	{
 		// Copy from buffer to NVRAM and ROS
-		memcpy(m_nvram->pointer(), buffer, nvramsize);
-		memcpy(m_ros->pointer(), buffer + nvramsize, ROSSIZE);
+		memcpy(m_nvram->pointer(), &buffer[0], nvramsize);
+		memcpy(m_ros->pointer(), &buffer[nvramsize], ROSSIZE);
 	}
-
-	global_free_array(buffer);
 }
 
 //-------------------------------------------------
@@ -150,14 +148,14 @@ void horizon_ramdisk_device::nvram_write(emu_file &file)
 {
 	int nvramsize = 2097152*(1 << ioport("HORIZONSIZE")->read());
 
-	uint8_t* buffer = global_alloc_array_clear<uint8_t>(nvramsize + ROSSIZE);
-	memcpy(buffer, m_nvram->pointer(), nvramsize);
-	memcpy(buffer + nvramsize, m_ros->pointer(), ROSSIZE);
+	auto buffer = make_unique_clear<uint8_t []>(nvramsize + ROSSIZE);
+	memcpy(&buffer[0], m_nvram->pointer(), nvramsize);
+	memcpy(&buffer[nvramsize], m_ros->pointer(), ROSSIZE);
 
-	file.write(buffer, nvramsize + ROSSIZE);
+	file.write(buffer.get(), nvramsize + ROSSIZE);
 }
 
-READ8Z_MEMBER(horizon_ramdisk_device::readz)
+void horizon_ramdisk_device::readz(offs_t offset, uint8_t *value)
 {
 	// 32K expansion
 	// According to the manual, "this memory is not affected by the HIDE switch"
@@ -289,7 +287,7 @@ void horizon_ramdisk_device::write(offs_t offset, uint8_t data)
 	}
 }
 
-READ8Z_MEMBER(horizon_ramdisk_device::crureadz)
+void horizon_ramdisk_device::crureadz(offs_t offset, uint8_t *value)
 {
 	// There is no CRU read operation for the Horizon.
 	return;

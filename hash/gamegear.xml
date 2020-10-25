@@ -7037,9 +7037,8 @@ a certain item) -->
 		</part>
 	</software>
 
-	<!-- Alt. Title: Shinobi II - The Silent Fury (Euro/USA Box?) -->
 	<software name="shinobi2">
-		<description>The GG Shinobi II (World)</description>
+		<description>The GG Shinobi II - The Silent Fury (World)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2402, G-3315 (JPN)"/>

@@ -23,10 +23,10 @@ public:
 	// construction/destruction
 	cpc_ddi1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER(motor_w);
-	DECLARE_WRITE8_MEMBER(fdc_w);
-	DECLARE_READ8_MEMBER(fdc_r);
-	DECLARE_WRITE8_MEMBER(rombank_w);
+	void motor_w(offs_t offset, uint8_t data);
+	void fdc_w(offs_t offset, uint8_t data);
+	uint8_t fdc_r(offs_t offset);
+	void rombank_w(uint8_t data);
 
 protected:
 	// device-level overrides

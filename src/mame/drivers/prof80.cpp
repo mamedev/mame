@@ -94,15 +94,9 @@ WRITE_LINE_MEMBER(prof80_state::select_w)
 }
 
 
-WRITE_LINE_MEMBER(prof80_state::resf_w)
-{
-	if (state)
-		m_fdc->soft_reset();
-}
-
-
 WRITE_LINE_MEMBER(prof80_state::mini_w)
 {
+	m_fdc->set_unscaled_clock(16_MHz_XTAL / (state ? 4 : 2));
 }
 
 
@@ -123,7 +117,7 @@ WRITE_LINE_MEMBER(prof80_state::mstop_w)
 //  flr_w - flag register
 //-------------------------------------------------
 
-WRITE8_MEMBER( prof80_state::flr_w )
+void prof80_state::flr_w(uint8_t data)
 {
 	/*
 
@@ -149,7 +143,7 @@ WRITE8_MEMBER( prof80_state::flr_w )
 //  status_r -
 //-------------------------------------------------
 
-READ8_MEMBER( prof80_state::status_r )
+uint8_t prof80_state::status_r()
 {
 	/*
 
@@ -186,7 +180,7 @@ READ8_MEMBER( prof80_state::status_r )
 //  status2_r -
 //-------------------------------------------------
 
-READ8_MEMBER( prof80_state::status2_r )
+uint8_t prof80_state::status2_r()
 {
 	/*
 
@@ -241,7 +235,7 @@ READ8_MEMBER( prof80_state::status2_r )
 
 // UNIO
 /*
-WRITE8_MEMBER( prof80_state::unio_ctrl_w )
+void prof80_state::unio_ctrl_w(uint8_t data)
 {
 //  int flag = BIT(data, 0);
     int flad = (data >> 1) & 0x07;
@@ -453,7 +447,7 @@ void prof80_state::machine_start()
 void prof80_state::prof80(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, XTAL(6'000'000));
+	Z80(config, m_maincpu, 6_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &prof80_state::prof80_mem);
 	m_maincpu->set_addrmap(AS_IO, &prof80_state::prof80_io);
 
@@ -465,7 +459,7 @@ void prof80_state::prof80(machine_config &config)
 	UPD1990A(config, m_rtc);
 
 	// FDC
-	UPD765A(config, m_fdc, 8'000'000, true, true);
+	UPD765A(config, m_fdc, 16_MHz_XTAL / 2, true, true); // clocked through FDC9229B
 	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", prof80_floppies, "525qd", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, UPD765_TAG ":1", prof80_floppies, "525qd", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, UPD765_TAG ":2", prof80_floppies, nullptr, floppy_image_device::default_floppy_formats);
@@ -483,7 +477,7 @@ void prof80_state::prof80(machine_config &config)
 	m_flra->q_out_cb<6>().set(FUNC(prof80_state::motor_w)); // _MOTOR
 	m_flra->q_out_cb<7>().set(FUNC(prof80_state::select_w)); // SELECT
 	LS259(config, m_flrb);
-	m_flrb->q_out_cb<0>().set(FUNC(prof80_state::resf_w)); // RESF
+	m_flrb->q_out_cb<0>().set(m_fdc, FUNC(upd765a_device::reset_w)); // RESF
 	m_flrb->q_out_cb<1>().set(FUNC(prof80_state::mini_w)); // MINI
 	m_flrb->q_out_cb<2>().set(m_rs232a, FUNC(rs232_port_device::write_rts)); // _RTS
 	m_flrb->q_out_cb<3>().set(m_rs232a, FUNC(rs232_port_device::write_txd)); // TX

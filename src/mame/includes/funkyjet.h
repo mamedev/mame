@@ -44,8 +44,8 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ16_MEMBER( funkyjet_protection_region_0_146_r );
-	DECLARE_WRITE16_MEMBER( funkyjet_protection_region_0_146_w );
+	uint16_t funkyjet_protection_region_0_146_r(offs_t offset);
+	void funkyjet_protection_region_0_146_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void funkyjet_map(address_map &map);
 	void sound_map(address_map &map);
 };

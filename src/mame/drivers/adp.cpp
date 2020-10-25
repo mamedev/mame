@@ -203,8 +203,8 @@ private:
 	uint8_t m_mux_data;
 
 	/* devices */
-	DECLARE_READ16_MEMBER(input_r);
-	DECLARE_WRITE16_MEMBER(input_w);
+	uint16_t input_r();
+	void input_w(uint16_t data);
 	DECLARE_MACHINE_START(skattv);
 	DECLARE_MACHINE_RESET(skattv);
 	void adp_palette(palette_device &device) const;
@@ -281,7 +281,7 @@ void adp_state::fstation_palette(palette_device &palette) const
 		palette.set_pen_color(i, rgb_t(pal3bit(i>>5), pal3bit(i>>2), pal2bit(i>>0)));
 }
 
-READ16_MEMBER(adp_state::input_r)
+uint16_t adp_state::input_r()
 {
 	uint16_t data = 0xffff;
 
@@ -290,7 +290,7 @@ READ16_MEMBER(adp_state::input_r)
 	return data;
 }
 
-WRITE16_MEMBER(adp_state::input_w)
+void adp_state::input_w(uint16_t data)
 {
 	m_mux_data++;
 	m_mux_data &= 0x0f;

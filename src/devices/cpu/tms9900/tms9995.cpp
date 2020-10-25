@@ -194,8 +194,6 @@ enum
 
 void tms9995_device::device_start()
 {
-	// TODO: Restore save state suport
-
 	m_prgspace = &space(AS_PROGRAM);
 	m_setaddr = has_space(AS_SETADDRESS) ? &space(AS_SETADDRESS) : nullptr;
 	m_cru = &space(AS_IO);
@@ -216,9 +214,13 @@ void tms9995_device::device_start()
 	m_nmi_active = false;
 	m_int_overflow = false;
 
+	m_reset = false;
+
 	m_idle_state = false;
 
 	m_source_value = 0;
+
+	m_index = 0;
 
 	// add the states for the debugger
 	for (int i=0; i < 20; i++)
@@ -242,7 +244,7 @@ void tms9995_device::device_start()
 	save_item(NAME(PC));
 	save_item(NAME(ST));
 	// save_item(NAME(PC_debug)); // only for debugger output
-	save_pointer(NAME(m_onchip_memory),256);
+	save_item(NAME(m_onchip_memory));
 	save_item(NAME(m_idle_state));
 	save_item(NAME(m_nmi_state));
 	save_item(NAME(m_hold_state));
@@ -285,7 +287,7 @@ void tms9995_device::device_start()
 	save_item(NAME(m_cru_address));
 	save_item(NAME(m_cru_value));
 	save_item(NAME(m_cru_first_read));
-	save_pointer(NAME(m_flag),16);
+	save_item(NAME(m_flag));
 	save_item(NAME(IR));
 	save_item(NAME(m_pre_IR));
 	save_item(NAME(m_command));

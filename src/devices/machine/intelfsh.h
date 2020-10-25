@@ -17,10 +17,11 @@ public:
 	{
 		// 8-bit variants
 		FLASH_INTEL_28F016S5 = 0x0800,
-		FLASH_FUJITSU_29F160T,
+		FLASH_FUJITSU_29F160TE,
 		FLASH_FUJITSU_29F016A,
-		FLASH_FUJITSU_29DL16X,
+		FLASH_FUJITSU_29DL164BD,
 		FLASH_FUJITSU_29LV002TC,
+		FLASH_FUJITSU_29LV800B,
 		FLASH_ATMEL_29C010,
 		FLASH_AMD_29F010,
 		FLASH_AMD_29F040,
@@ -29,6 +30,7 @@ public:
 		FLASH_AMD_29F800T,
 		FLASH_AMD_29F800B_16BIT,
 		FLASH_AMD_29LV200T,
+		FLASH_CAT28F020,
 		FLASH_SHARP_LH28F016S,
 		FLASH_SHARP_LH28F016S_16BIT,
 		FLASH_INTEL_E28F008SA,
@@ -87,6 +89,7 @@ protected:
 	bool                     m_sector_is_4k;
 	bool                     m_sector_is_16k;
 	bool                     m_top_boot_sector;
+	bool                     m_bot_boot_sector;
 	uint8_t                    m_page_size;
 
 	// internal state
@@ -146,10 +149,10 @@ public:
 	intel_28f016s5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
-class fujitsu_29f160t_device : public intelfsh8_device
+class fujitsu_29f160te_device : public intelfsh8_device
 {
 public:
-	fujitsu_29f160t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	fujitsu_29f160te_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 class fujitsu_29f016a_device : public intelfsh8_device
@@ -158,16 +161,22 @@ public:
 	fujitsu_29f016a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
-class fujitsu_29dl16x_device : public intelfsh8_device
+class fujitsu_29dl164bd_device : public intelfsh8_device
 {
 public:
-	fujitsu_29dl16x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	fujitsu_29dl164bd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 class fujitsu_29lv002tc_device : public intelfsh8_device
 {
 public:
 	fujitsu_29lv002tc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
+class fujitsu_29lv800b_device : public intelfsh16_device
+{
+public:
+	fujitsu_29lv800b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 class atmel_29c010_device : public intelfsh8_device
@@ -357,6 +366,12 @@ public:
 	atmel_49f4096_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
+class cat28f020_device : public intelfsh8_device
+{
+public:
+	cat28f020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
 
 // device type definition
 DECLARE_DEVICE_TYPE(INTEL_28F016S5,        intel_28f016s5_device)
@@ -370,10 +385,11 @@ DECLARE_DEVICE_TYPE(AMD_29F400T,           amd_29f400t_device)
 DECLARE_DEVICE_TYPE(AMD_29F800T,           amd_29f800t_device)
 DECLARE_DEVICE_TYPE(AMD_29F800B_16BIT,     amd_29f800b_16bit_device)
 DECLARE_DEVICE_TYPE(AMD_29LV200T,          amd_29lv200t_device)
-DECLARE_DEVICE_TYPE(FUJITSU_29F160T,       fujitsu_29f160t_device)
+DECLARE_DEVICE_TYPE(FUJITSU_29F160TE,      fujitsu_29f160te_device)
 DECLARE_DEVICE_TYPE(FUJITSU_29F016A,       fujitsu_29f016a_device)
-DECLARE_DEVICE_TYPE(FUJITSU_29DL16X,       fujitsu_29dl16x_device)
+DECLARE_DEVICE_TYPE(FUJITSU_29DL164BD,     fujitsu_29dl164bd_device)
 DECLARE_DEVICE_TYPE(FUJITSU_29LV002TC,     fujitsu_29lv002tc_device)
+DECLARE_DEVICE_TYPE(FUJITSU_29LV800B,      fujitsu_29lv800b_device)
 DECLARE_DEVICE_TYPE(INTEL_E28F400B,        intel_e28f400b_device)
 DECLARE_DEVICE_TYPE(MACRONIX_29L001MC,     macronix_29l001mc_device)
 DECLARE_DEVICE_TYPE(MACRONIX_29LV160TMC,   macronix_29lv160tmc_device)
@@ -397,5 +413,6 @@ DECLARE_DEVICE_TYPE(INTEL_28F320J3D,       intel_28f320j3d_device)
 DECLARE_DEVICE_TYPE(INTEL_28F320J5,        intel_28f320j5_device)
 DECLARE_DEVICE_TYPE(SST_39VF400A,          sst_39vf400a_device)
 DECLARE_DEVICE_TYPE(ATMEL_49F4096,         atmel_49f4096_device)
+DECLARE_DEVICE_TYPE(CAT28F020,             cat28f020_device)
 
 #endif // MAME_MACHINE_INTELFSH_H

@@ -51,23 +51,23 @@ public:
 		, m_debug_serial(*this, "debug_serial")
 	{ }
 
-	DECLARE_WRITE16_MEMBER(serflash_w);
-	DECLARE_READ16_MEMBER(clock_r);
-	DECLARE_WRITE16_MEMBER(clock_w);
-	DECLARE_READ16_MEMBER(xtclock_r);
-	DECLARE_WRITE16_MEMBER(xtclock_w);
-	DECLARE_READ16_MEMBER(xtpower_r);
-	DECLARE_READ16_MEMBER(adc1_r);
-	DECLARE_READ16_MEMBER(adc2_r);
-	DECLARE_READ16_MEMBER(port0_r);
+	void serflash_w(uint16_t data);
+	uint16_t clock_r();
+	void clock_w(uint16_t data);
+	uint16_t xtclock_r();
+	void xtclock_w(uint16_t data);
+	uint16_t xtpower_r();
+	uint16_t adc1_r();
+	uint16_t adc2_r();
+	uint16_t port0_r();
 
-	DECLARE_READ16_MEMBER(cybiko_lcd_r);
-	DECLARE_WRITE16_MEMBER(cybiko_lcd_w);
-	DECLARE_READ16_MEMBER(cybikov1_key_r);
-	DECLARE_READ16_MEMBER(cybikov2_key_r);
-	DECLARE_READ16_MEMBER(cybikoxt_key_r);
-	DECLARE_WRITE16_MEMBER(cybiko_usb_w);
-	int cybiko_key_r( offs_t offset, int mem_mask);
+	uint16_t cybiko_lcd_r(offs_t offset, uint16_t mem_mask = ~0);
+	void cybiko_lcd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t cybikov1_key_r(offs_t offset, uint16_t mem_mask = ~0);
+	uint16_t cybikov2_key_r(offs_t offset, uint16_t mem_mask = ~0);
+	uint16_t cybikoxt_key_r(offs_t offset, uint16_t mem_mask = ~0);
+	void cybiko_usb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	int cybiko_key_r(offs_t offset, int mem_mask);
 
 	required_device<h8_device> m_maincpu;
 	required_device<hd66421_device> m_crtc;

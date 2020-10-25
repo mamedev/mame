@@ -2,7 +2,7 @@
 // copyright-holders:Brad Oliver,Fabio Priuli
 /***************************************************************************
 
-  nes.c
+  nes.cpp
 
   Driver file to handle emulation of the Nintendo Entertainment System (Famicom).
 
@@ -20,7 +20,7 @@
 #include "speaker.h"
 
 
-WRITE8_MEMBER(nes_state::nes_vh_sprite_dma_w)
+void nes_state::nes_vh_sprite_dma_w(address_space &space, uint8_t data)
 {
 	m_ppu->spriteram_dma(space, data);
 }

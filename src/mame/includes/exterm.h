@@ -59,15 +59,15 @@ private:
 	uint8_t m_sound_control;
 	uint16_t m_last;
 
-	DECLARE_WRITE16_MEMBER(host_data_w);
-	DECLARE_READ16_MEMBER(host_data_r);
-	template<uint8_t Which> DECLARE_READ16_MEMBER(trackball_port_r);
-	DECLARE_WRITE16_MEMBER(output_port_0_w);
-	DECLARE_WRITE8_MEMBER(sound_latch_w);
-	DECLARE_WRITE8_MEMBER(sound_nmi_rate_w);
-	DECLARE_READ8_MEMBER(sound_nmi_to_slave_r);
-	DECLARE_WRITE8_MEMBER(sound_control_w);
-	DECLARE_WRITE8_MEMBER(ym2151_data_latch_w);
+	void host_data_w(offs_t offset, uint16_t data);
+	uint16_t host_data_r(offs_t offset);
+	template<uint8_t Which> uint16_t trackball_port_r();
+	void output_port_0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sound_latch_w(uint8_t data);
+	void sound_nmi_rate_w(uint8_t data);
+	uint8_t sound_nmi_to_slave_r();
+	void sound_control_w(uint8_t data);
+	void ym2151_data_latch_w(uint8_t data);
 	void exterm_palette(palette_device &palette) const;
 	TIMER_DEVICE_CALLBACK_MEMBER(master_sound_nmi_callback);
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_update);

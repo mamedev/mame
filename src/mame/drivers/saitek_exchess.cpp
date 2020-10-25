@@ -14,10 +14,12 @@ Hardware notes:
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/f8/f8.h"
 #include "machine/f3853.h"
 #include "video/hlcd0538.h"
 #include "video/pwm.h"
+
 #include "screen.h"
 
 // internal artwork
@@ -56,9 +58,11 @@ private:
 	output_finder<> m_battery;
 	required_ioport_array<4> m_inputs;
 
+	// address maps
 	void main_map(address_map &map);
 	void main_io(address_map &map);
 
+	// I/O handlers
 	template<int N> void lcd_output_w(u64 data);
 	void lcd_data_w(u8 data);
 
@@ -119,7 +123,7 @@ void exchess_state::lcd_data_w(u8 data)
 template<int N>
 void exchess_state::ram_address_w(u8 data)
 {
-	// P00-P17: RAM A0-A7
+	// P00-P07: RAM A0-A7
 	// P10-P11: RAM A8-A9
 	// P12: RAM CE
 	m_ram_address[N] = data;
@@ -237,7 +241,7 @@ void exchess_state::exchess(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
-	screen.set_size(1020, 1080);
+	screen.set_size(1020/1.5, 1080/1.5);
 	screen.set_visarea_full();
 }
 

@@ -12,13 +12,13 @@
 #include "includes/mustache.h"
 
 
-WRITE8_MEMBER(mustache_state::videoram_w)
+void mustache_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(mustache_state::video_control_w)
+void mustache_state::video_control_w(uint8_t data)
 {
 	/* It is assumed that screen flipping is controlled by both
 	   hardware (via a DIP switch, labeled "Hard SW" on the
@@ -33,7 +33,7 @@ WRITE8_MEMBER(mustache_state::video_control_w)
 	}
 }
 
-WRITE8_MEMBER(mustache_state::scroll_w)
+void mustache_state::scroll_w(uint8_t data)
 {
 	m_bg_tilemap->set_scrollx(0, 0x100 - data);
 	m_bg_tilemap->set_scrollx(1, 0x100 - data);

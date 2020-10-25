@@ -32,13 +32,13 @@
 ///  current source. This is suitable to model voltage sources, current sources,
 ///  resistors, capacitors, inductances and diodes.
 ///
-////
+//
 
-#include "netlist/nl_base.h"
-#include "netlist/nl_setup.h"
-#include "netlist/plib/pfunction.h"
-#include "netlist/solver/nld_solver.h"
+#include "../nl_setup.h"
+#include "nl_base.h"
 #include "nld_generic_models.h"
+#include "plib/pfunction.h"
+#include "solver/nld_solver.h"
 
 // -----------------------------------------------------------------------------
 // Implementation
@@ -54,7 +54,7 @@ namespace analog
 	// -----------------------------------------------------------------------------
 
 	template <class C>
-	inline core_device_t &bselect(bool b, C &d1, core_device_t &d2)
+	static inline core_device_t &bselect(bool b, C &d1, core_device_t &d2)
 	{
 		auto *h = dynamic_cast<core_device_t *>(&d1);
 		return b ? *h : d2;
@@ -68,32 +68,39 @@ namespace analog
 		return d2;
 	}
 
-	NETLIB_OBJECT(twoterm)
+	NETLIB_BASE_OBJECT(twoterm)
 	{
-		// FIXME locate use case of owned = true and eliminate them if possible
-		NETLIB_CONSTRUCTOR_EX(twoterm, bool terminals_owned = false)
-		, m_P(bselect(terminals_owned, owner, *this), (terminals_owned ? name + "." : "") + "1", &m_N)
-		, m_N(bselect(terminals_owned, owner, *this), (terminals_owned ? name + "." : "") + "2", &m_P)
+		NETLIB_CONSTRUCTOR(twoterm)
+		, m_P(*this, "1", &m_N, NETLIB_DELEGATE(termhandler))
+		, m_N(*this, "2", &m_P, NETLIB_DELEGATE(termhandler))
+		{
+		}
+		//NETLIB_CONSTRUCTOR_EX(twoterm, nldelegate owner_delegate)
+		template <class C>
+		NETLIB_NAME(twoterm)(C &owner, const pstring &name, nldelegate owner_delegate) \
+				: base_type(owner, name)
+		, m_P(owner, name + ".1", &m_N, owner_delegate)
+		, m_N(owner, name + ".2", &m_P, owner_delegate)
 		{
 		}
 
 		//NETLIB_UPDATE_TERMINALSI() { }
-		//NETLIB_RESETI() { }
+		//NETLIB_RESETI() {}
 
 	public:
 
-		NETLIB_UPDATEI();
+		NETLIB_HANDLERI(termhandler);
 
 		solver::matrix_solver_t *solver() const noexcept;
 
 		void solve_now() const;
 
 		template <typename F>
-		void change_state(F f, netlist_time delay = netlist_time::quantum()) const
+		void change_state(F f) const
 		{
 			auto *solv(solver());
 			if (solv)
-				solv->change_state(f, delay);
+				solv->change_state(f);
 		}
 
 		void set_G_V_I(nl_fptype G, nl_fptype V, nl_fptype I) const noexcept
@@ -124,6 +131,14 @@ namespace analog
 			//               GO,  GT,     I
 			m_P.set_go_gt_I(a12, a11, rhs1);
 			m_N.set_go_gt_I(a21, a22, rhs2);
+		}
+
+		void clear_mat() const noexcept
+		{
+			const auto z = nlconst::zero();
+			//               GO,  GT,     I
+			m_P.set_go_gt_I(z, z, z);
+			m_N.set_go_gt_I(z, z, z);
 		}
 
 		/// \brief Get a const reference to the m_P terminal
@@ -171,7 +186,7 @@ namespace analog
 
 	NETLIB_OBJECT_DERIVED(R_base, twoterm)
 	{
-		NETLIB_CONSTRUCTOR_DERIVED(R_base, twoterm)
+		NETLIB_CONSTRUCTOR(R_base)
 		{
 		}
 
@@ -188,7 +203,7 @@ namespace analog
 					-G,  G, nlconst::zero());
 		}
 
-		NETLIB_RESETI();
+		//NETLIB_RESETI();
 
 	protected:
 		//NETLIB_UPDATEI();
@@ -197,7 +212,7 @@ namespace analog
 
 	NETLIB_OBJECT_DERIVED(R, R_base)
 	{
-		NETLIB_CONSTRUCTOR_DERIVED(R, R_base)
+		NETLIB_CONSTRUCTOR(R)
 		, m_R(*this, "R", nlconst::magic(1e9))
 		{
 		}
@@ -205,7 +220,6 @@ namespace analog
 
 	protected:
 
-		//NETLIB_UPDATEI() { }
 		NETLIB_RESETI()
 		{
 			set_R(std::max(m_R(), exec().gmin()));
@@ -231,7 +245,7 @@ namespace analog
 	// nld_POT
 	// -----------------------------------------------------------------------------
 
-	NETLIB_OBJECT(POT)
+	NETLIB_BASE_OBJECT(POT)
 	{
 		NETLIB_CONSTRUCTOR(POT)
 		, m_R1(*this, "_R1")
@@ -263,7 +277,7 @@ namespace analog
 		param_logic_t m_Reverse;
 	};
 
-	NETLIB_OBJECT(POT2)
+	NETLIB_BASE_OBJECT(POT2)
 	{
 		NETLIB_CONSTRUCTOR(POT2)
 		, m_R1(*this, "_R1")
@@ -297,7 +311,7 @@ namespace analog
 	NETLIB_OBJECT_DERIVED(C, twoterm)
 	{
 	public:
-		NETLIB_CONSTRUCTOR_DERIVED(C, twoterm)
+		NETLIB_CONSTRUCTOR(C)
 		, m_C(*this, "C", nlconst::magic(1e-6))
 		, m_cap(*this, "m_cap")
 		{
@@ -306,12 +320,17 @@ namespace analog
 		NETLIB_IS_TIMESTEP(true)
 		NETLIB_TIMESTEPI()
 		{
-			// G, Ieq
-			const auto res(m_cap.timestep(m_C(), deltaV(), step));
-			const nl_fptype G = res.first;
-			const nl_fptype I = res.second;
-			set_mat( G, -G, -I,
-					-G,  G,  I);
+			if (ts_type == timestep_type::FORWARD)
+			{
+				// G, Ieq
+				const auto res(m_cap.timestep(m_C(), deltaV(), step));
+				const nl_fptype G = res.first;
+				const nl_fptype I = res.second;
+				set_mat( G, -G, -I,
+						-G,  G,  I);
+			}
+			else
+				m_cap.restore_state();
 		}
 
 		NETLIB_RESETI()
@@ -398,11 +417,13 @@ namespace analog
 	NETLIB_OBJECT_DERIVED(L, twoterm)
 	{
 	public:
-		NETLIB_CONSTRUCTOR_DERIVED(L, twoterm)
+		NETLIB_CONSTRUCTOR(L)
 		, m_L(*this, "L", nlconst::magic(1e-6))
 		, m_gmin(nlconst::zero())
-		, m_G(nlconst::zero())
-		, m_I(nlconst::zero())
+		, m_G(*this, "m_G", nlconst::zero())
+		, m_I(*this, "m_I", nlconst::zero())
+		, m_last_I(*this, "m_last_I", nlconst::zero())
+		, m_last_G(*this, "m_last_G", nlconst::zero())
 		{
 			//register_term("1", m_P);
 			//register_term("2", m_N);
@@ -420,8 +441,10 @@ namespace analog
 		param_fp_t m_L;
 
 		nl_fptype m_gmin;
-		nl_fptype m_G;
-		nl_fptype m_I;
+		state_var<nl_fptype> m_G;
+		state_var<nl_fptype> m_I;
+		state_var<nl_fptype> m_last_I;
+		state_var<nl_fptype> m_last_G;
 	};
 
 	/// \brief Class representing the diode model paramers.
@@ -486,8 +509,9 @@ namespace analog
 	NETLIB_OBJECT_DERIVED(D, twoterm)
 	{
 	public:
-		NETLIB_CONSTRUCTOR_DERIVED_EX(D, twoterm, const pstring &model = "D")
+		NETLIB_CONSTRUCTOR_EX(D, const pstring &model = "D")
 		, m_model(*this, "MODEL", model)
+		, m_modacc(m_model)
 		, m_D(*this, "m_D")
 		{
 			register_subalias("A", P());
@@ -504,6 +528,7 @@ namespace analog
 
 	private:
 		param_model_t m_model;
+		diode_model_t m_modacc;
 		generic_diode<diode_e::BIPOLAR> m_D;
 	};
 
@@ -514,8 +539,9 @@ namespace analog
 	NETLIB_OBJECT_DERIVED(Z, twoterm)
 	{
 	public:
-		NETLIB_CONSTRUCTOR_DERIVED_EX(Z, twoterm, const pstring &model = "D")
+		NETLIB_CONSTRUCTOR_EX(Z, const pstring &model = "D")
 		, m_model(*this, "MODEL", model)
+		, m_modacc(m_model)
 		, m_D(*this, "m_D")
 		, m_R(*this, "m_R")
 		{
@@ -533,6 +559,7 @@ namespace analog
 
 	private:
 		param_model_t m_model;
+		zdiode_model_t m_modacc;
 		generic_diode<diode_e::BIPOLAR> m_D;
 		// REVERSE diode
 		generic_diode<diode_e::BIPOLAR> m_R;
@@ -547,7 +574,7 @@ namespace analog
 	NETLIB_OBJECT_DERIVED(VS, twoterm)
 	{
 	public:
-		NETLIB_CONSTRUCTOR_DERIVED(VS, twoterm)
+		NETLIB_CONSTRUCTOR(VS)
 		, m_t(*this, "m_t", nlconst::zero())
 		, m_R(*this, "RI", nlconst::magic(0.1))
 		, m_V(*this, "V", nlconst::zero())
@@ -557,19 +584,24 @@ namespace analog
 		{
 			register_subalias("P", P());
 			register_subalias("N", N());
-			if (m_func() != "")
+			if (!m_func().empty())
 				m_compiled->compile(m_func(), std::vector<pstring>({{pstring("T")}}));
 		}
 
-		NETLIB_IS_TIMESTEP(m_func() != "")
+		NETLIB_IS_TIMESTEP(!m_func().empty())
 
 		NETLIB_TIMESTEPI()
 		{
-			m_t += step;
-			m_funcparam[0] = m_t;
-			this->set_G_V_I(plib::reciprocal(m_R()),
-					m_compiled->evaluate(m_funcparam),
-					nlconst::zero());
+			if (ts_type == timestep_type::FORWARD)
+			{
+				m_t += step;
+				m_funcparam[0] = m_t;
+				this->set_G_V_I(plib::reciprocal(m_R()),
+						m_compiled->evaluate(m_funcparam),
+						nlconst::zero());
+			}
+			else
+				m_t -= step; // only need to restore state, will be called again
 		}
 
 	protected:
@@ -596,28 +628,33 @@ namespace analog
 	NETLIB_OBJECT_DERIVED(CS, twoterm)
 	{
 	public:
-		NETLIB_CONSTRUCTOR_DERIVED(CS, twoterm)
+		NETLIB_CONSTRUCTOR(CS)
 		, m_t(*this, "m_t", nlconst::zero())
 		, m_I(*this, "I", nlconst::one())
 		, m_func(*this,"FUNC", "")
 		, m_compiled(*this, "m_compiled")
 		, m_funcparam({nlconst::zero()})
 		{
-			register_subalias("P", P());
-			register_subalias("N", N());
-			if (m_func() != "")
+			register_subalias("P", "1");
+			register_subalias("N", "2");
+			if (!m_func().empty())
 				m_compiled->compile(m_func(), std::vector<pstring>({{pstring("T")}}));
 		}
 
-		NETLIB_IS_TIMESTEP(m_func() != "")
+		NETLIB_IS_TIMESTEP(!m_func().empty())
 		NETLIB_TIMESTEPI()
 		{
-			m_t += step;
-			m_funcparam[0] = m_t;
-			const nl_fptype I = m_compiled->evaluate(m_funcparam);
-			const auto zero(nlconst::zero());
-			set_mat(zero, zero, -I,
-					zero, zero,  I);
+			if (ts_type == timestep_type::FORWARD)
+			{
+				m_t += step;
+				m_funcparam[0] = m_t;
+				const nl_fptype I = m_compiled->evaluate(m_funcparam);
+				const auto zero(nlconst::zero());
+				set_mat(zero, zero, -I,
+						zero, zero,  I);
+			}
+			else
+				m_t -= step;
 		}
 
 	protected:

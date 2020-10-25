@@ -34,28 +34,28 @@ public:
 
 private:
 	// common
-	DECLARE_WRITE16_MEMBER(soundlatch_w);
-	DECLARE_READ16_MEMBER(paletteram_r);
-	DECLARE_WRITE16_MEMBER(paletteram_w);
-	DECLARE_WRITE16_MEMBER(flipscreen_w);
+	void soundlatch_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t paletteram_r(offs_t offset);
+	void paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void flipscreen_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	// bestbest specific
-	DECLARE_WRITE16_MEMBER(bestbest_flipscreen_w);
-	DECLARE_WRITE16_MEMBER(bestbest_coin_w);
-	DECLARE_READ8_MEMBER(bestbest_prot_r);
-	DECLARE_WRITE8_MEMBER(bestbest_prot_w);
-	DECLARE_WRITE8_MEMBER(bestbest_ay8910_port_a_w);
+	void bestbest_flipscreen_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void bestbest_coin_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t bestbest_prot_r();
+	void bestbest_prot_w(uint8_t data);
+	void bestbest_ay8910_port_a_w(uint8_t data);
 
 	// bssoccer specific
-	DECLARE_WRITE16_MEMBER(bssoccer_leds_w);
-	DECLARE_WRITE8_MEMBER(bssoccer_pcm_1_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(bssoccer_pcm_2_bankswitch_w);
+	void bssoccer_leds_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void bssoccer_pcm_1_bankswitch_w(uint8_t data);
+	void bssoccer_pcm_2_bankswitch_w(uint8_t data);
 
 	// uballoon specific
-	DECLARE_WRITE16_MEMBER(uballoon_leds_w);
-	DECLARE_WRITE8_MEMBER(uballoon_pcm_1_bankswitch_w);
-	DECLARE_READ8_MEMBER(uballoon_prot_r);
-	DECLARE_WRITE8_MEMBER(uballoon_prot_w);
+	void uballoon_leds_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void uballoon_pcm_1_bankswitch_w(uint8_t data);
+	uint8_t uballoon_prot_r(offs_t offset);
+	void uballoon_prot_w(offs_t offset, uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(bssoccer_interrupt);
 

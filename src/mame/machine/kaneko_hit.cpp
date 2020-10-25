@@ -106,26 +106,26 @@ void kaneko_hit_device::device_reset()
 }
 
 
-READ16_MEMBER(kaneko_hit_device::kaneko_hit_r)
+uint16_t kaneko_hit_device::kaneko_hit_r(offs_t offset)
 {
 	switch (m_hittype)
 	{
-		case 0: return kaneko_hit_type0_r(space,offset,mem_mask);
-		case 1: return kaneko_hit_type1_r(space,offset,mem_mask);
-		case 2: return kaneko_hit_type2_r(space,offset,mem_mask);
+		case 0: return kaneko_hit_type0_r(offset);
+		case 1: return kaneko_hit_type1_r(offset);
+		case 2: return kaneko_hit_type2_r(offset);
 
 		default:
 			fatalerror("kaneko_hit_r called, but m_hittype not set\n");
 	}
 }
 
-WRITE16_MEMBER(kaneko_hit_device::kaneko_hit_w)
+void kaneko_hit_device::kaneko_hit_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (m_hittype)
 	{
-		case 0: kaneko_hit_type0_w(space,offset,data, mem_mask); break;
-		case 1: kaneko_hit_type1_w(space,offset,data, mem_mask); break;
-		case 2: kaneko_hit_type2_w(space,offset,data, mem_mask); break;
+		case 0: kaneko_hit_type0_w(offset,data, mem_mask); break;
+		case 1: kaneko_hit_type1_w(offset,data, mem_mask); break;
+		case 2: kaneko_hit_type2_w(offset,data, mem_mask); break;
 
 		default:
 			fatalerror("kaneko_hit_r called, but m_hittype not set\n");
@@ -139,7 +139,7 @@ WRITE16_MEMBER(kaneko_hit_device::kaneko_hit_w)
  bonkadv
 *********************************************************************/
 
-READ16_MEMBER(kaneko_hit_device::kaneko_hit_type0_r)
+uint16_t kaneko_hit_device::kaneko_hit_type0_r(offs_t offset)
 {
 	calc1_hit_t &hit = m_hit;
 	uint16_t data = 0;
@@ -193,7 +193,7 @@ READ16_MEMBER(kaneko_hit_device::kaneko_hit_type0_r)
 	return 0;
 }
 
-WRITE16_MEMBER(kaneko_hit_device::kaneko_hit_type0_w)
+void kaneko_hit_device::kaneko_hit_type0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	calc1_hit_t &hit = m_hit;
 	data &= mem_mask;
@@ -224,7 +224,7 @@ WRITE16_MEMBER(kaneko_hit_device::kaneko_hit_type0_w)
  bloorwar
 *********************************************************************/
 
-READ16_MEMBER(kaneko_hit_device::kaneko_hit_type1_r)
+uint16_t kaneko_hit_device::kaneko_hit_type1_r(offs_t offset)
 {
 	calc1_hit_t &hit = m_hit;
 	uint16_t data = 0;
@@ -286,7 +286,7 @@ READ16_MEMBER(kaneko_hit_device::kaneko_hit_type1_r)
 	return 0;
 }
 
-WRITE16_MEMBER(kaneko_hit_device::kaneko_hit_type1_w)
+void kaneko_hit_device::kaneko_hit_type1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	calc1_hit_t &hit = m_hit;
 	data &= mem_mask;
@@ -358,7 +358,7 @@ int16_t kaneko_hit_device::calc_compute_y(calc1_hit_t &hit)
 *********************************************************************/
 
 
-WRITE16_MEMBER(kaneko_hit_device::kaneko_hit_type2_w)
+void kaneko_hit_device::kaneko_hit_type2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	calc3_hit_t &hit3 = m_hit3;
 	data &= mem_mask;
@@ -426,7 +426,7 @@ WRITE16_MEMBER(kaneko_hit_device::kaneko_hit_type2_w)
 }
 
 
-READ16_MEMBER(kaneko_hit_device::kaneko_hit_type2_r)
+uint16_t kaneko_hit_device::kaneko_hit_type2_r(offs_t offset)
 {
 	calc3_hit_t &hit3 = m_hit3;
 	int idx=offset*4;

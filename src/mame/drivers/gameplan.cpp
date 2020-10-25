@@ -91,7 +91,7 @@ TODO:
  *
  *************************************/
 
-WRITE8_MEMBER(gameplan_state::io_select_w)
+void gameplan_state::io_select_w(uint8_t data)
 {
 	switch (data)
 	{
@@ -105,7 +105,7 @@ WRITE8_MEMBER(gameplan_state::io_select_w)
 }
 
 
-READ8_MEMBER(gameplan_state::io_port_r)
+uint8_t gameplan_state::io_port_r()
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3", "DSW0", "DSW1" };
 
@@ -138,7 +138,7 @@ WRITE_LINE_MEMBER(gameplan_state::audio_reset_w)
 }
 
 
-WRITE8_MEMBER(gameplan_state::audio_cmd_w)
+void gameplan_state::audio_cmd_w(uint8_t data)
 {
 	m_riot->porta_in_set(data, 0x7f);
 }
@@ -164,11 +164,6 @@ WRITE_LINE_MEMBER(gameplan_state::r6532_irq)
 		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
 }
 
-
-WRITE8_MEMBER(gameplan_state::r6532_soundlatch_w)
-{
-	m_soundlatch->write(data);
-}
 
 
 /*************************************
@@ -967,7 +962,7 @@ void gameplan_state::gameplan(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &gameplan_state::gameplan_audio_map);
 
 	RIOT6532(config, m_riot, GAMEPLAN_AUDIO_CPU_CLOCK);
-	m_riot->out_pb_callback().set(FUNC(gameplan_state::r6532_soundlatch_w));
+	m_riot->out_pb_callback().set(m_soundlatch, FUNC(generic_latch_8_device::write));
 	m_riot->irq_callback().set(FUNC(gameplan_state::r6532_irq));
 
 	/* video hardware */

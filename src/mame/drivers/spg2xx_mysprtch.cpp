@@ -27,7 +27,7 @@ protected:
 
 	void mem_map_mysprtch(address_map& map);
 
-	virtual DECLARE_WRITE16_MEMBER(porta_w) override;
+	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask) override;
 
 	int m_romsize;
 
@@ -36,7 +36,7 @@ protected:
 	int m_bank_enabled;
 
 private:
-	DECLARE_READ16_MEMBER(mysprtch_rom_r);
+	uint16_t mysprtch_rom_r(offs_t offset);
 	required_region_ptr<uint16_t> m_romregion;
 };
 
@@ -49,7 +49,7 @@ public:
 
 protected:
 	virtual void machine_reset() override;
-	virtual DECLARE_WRITE16_MEMBER(porta_w) override;
+	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask) override;
 
 private:
 };
@@ -61,7 +61,7 @@ void spg2xx_game_mysprt_plus_state::device_post_load()
 }
 
 
-READ16_MEMBER(spg2xx_game_mysprt_plus_state::mysprtch_rom_r)
+uint16_t spg2xx_game_mysprt_plus_state::mysprtch_rom_r(offs_t offset)
 {
 	// due to granularity of rom bank this manual method is safer
 	return m_romregion[(offset + (m_mysprtch_rombase * 0x200000)) & (m_romsize-1)];
@@ -243,7 +243,7 @@ static INPUT_PORTS_START( mgt20in1 ) // this seems to expect rotated controls by
 INPUT_PORTS_END
 
 
-WRITE16_MEMBER(spg2xx_game_mysprt_orig_state::porta_w)
+void spg2xx_game_mysprt_orig_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// this seems like nice clean logic, based on writes and how the port direction is set,
 	// mysprtch and mysptqvc work fine with this logic, but mysprtcp is more problematic, especially in test mode, see other function
@@ -301,7 +301,7 @@ WRITE16_MEMBER(spg2xx_game_mysprt_orig_state::porta_w)
 
 
 
-WRITE16_MEMBER(spg2xx_game_mysprt_plus_state::porta_w)
+void spg2xx_game_mysprt_plus_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// this is very ugly guesswork based on use and testmode
 	// what is even more problematic here is that mysprtcp has mem_mask as 0x0000, ie all ports are set to INPUT mode?! so we can't use mem_mask to

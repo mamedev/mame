@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "includes/ddragon3.h"
 
-WRITE16_MEMBER(ddragon3_state::ddragon3_scroll_w)
+void ddragon3_state::ddragon3_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -27,7 +27,7 @@ WRITE16_MEMBER(ddragon3_state::ddragon3_scroll_w)
 	}
 }
 
-READ16_MEMBER(ddragon3_state::ddragon3_scroll_r)
+uint16_t ddragon3_state::ddragon3_scroll_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -55,7 +55,7 @@ TILE_GET_INFO_MEMBER(ddragon3_state::get_bg_tile_info)
 
 
 
-WRITE16_MEMBER(ddragon3_state::ddragon3_bg_videoram_w)
+void ddragon3_state::ddragon3_bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg_videoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -84,7 +84,7 @@ TILE_GET_INFO_MEMBER(ddragon3_state::get_fg_tile_info)
 
 
 
-WRITE16_MEMBER(ddragon3_state::ddragon3_fg_videoram_w)
+void ddragon3_state::ddragon3_fg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fg_videoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
@@ -110,7 +110,7 @@ TILE_GET_INFO_MEMBER(wwfwfest_state::get_fg0_tile_info)
 			0);
 }
 
-WRITE16_MEMBER(wwfwfest_state::wwfwfest_fg0_videoram_w)
+void wwfwfest_state::wwfwfest_fg0_videoram_w(offs_t offset, uint16_t data)
 {
 	/* Videoram is 8 bit, upper & lower byte writes end up in the same place due to m68k byte smearing */
 	m_fg0_videoram[offset]=data&0xff;

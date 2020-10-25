@@ -42,7 +42,7 @@ ROM_END
 qsound_hle_device::qsound_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, QSOUND_HLE, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, device_rom_interface(mconfig, *this, 24)
+	, device_rom_interface(mconfig, *this)
 	, m_stream(nullptr)
 	, m_dsp_rom(*this, "dsp")
 	, m_data_latch(0)
@@ -161,17 +161,13 @@ void qsound_hle_device::device_reset()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void qsound_hle_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void qsound_hle_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	// Clear the buffers
-	std::fill_n(outputs[0], samples, 0);
-	std::fill_n(outputs[1], samples, 0);
-
-	for (int i = 0; i < samples; i ++)
+	for (int i = 0; i < outputs[0].samples(); i ++)
 	{
 		update_sample();
-		outputs[0][i] = m_out[0];
-		outputs[1][i] = m_out[1];
+		outputs[0].put_int(i, m_out[0], 32768);
+		outputs[1].put_int(i, m_out[1], 32768);
 	}
 }
 

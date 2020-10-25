@@ -178,7 +178,7 @@ floppy_image_device::floppy_image_device(const machine_config &mconfig, device_t
 		device_image_interface(mconfig, *this),
 		input_format(nullptr),
 		output_format(nullptr),
-		image(nullptr),
+		image(),
 		fif_list(nullptr),
 		index_timer(nullptr),
 		tracks(0),
@@ -307,7 +307,7 @@ void floppy_image_device::commit_image()
 	if (err != osd_file::error::NONE)
 		popmessage("Error, unable to truncate image: %d", int(err));
 
-	output_format->save(&io, image);
+	output_format->save(&io, image.get());
 }
 
 //-------------------------------------------------
@@ -459,7 +459,7 @@ image_init_result floppy_image_device::call_load()
 	io.filler = 0xff;
 	int best = 0;
 	floppy_image_format_t *best_format = nullptr;
-	for(floppy_image_format_t *format = fif_list; format; format = format->next) {
+	for (floppy_image_format_t *format = fif_list; format; format = format->next) {
 		int score = format->identify(&io, form_factor);
 		if(score > best) {
 			best = score;
@@ -467,18 +467,15 @@ image_init_result floppy_image_device::call_load()
 		}
 	}
 
-	if(!best_format)
-	{
+	if (!best_format) {
 		seterror(IMAGE_ERROR_INVALIDIMAGE, "Unable to identify the image format");
 		return image_init_result::FAIL;
 	}
 
-	image = global_alloc(floppy_image(tracks, sides, form_factor));
-	if (!best_format->load(&io, form_factor, image))
-	{
+	image = std::make_unique<floppy_image>(tracks, sides, form_factor);
+	if (!best_format->load(&io, form_factor, image.get())) {
 		seterror(IMAGE_ERROR_UNSUPPORTED, "Incompatible image format or corrupted data");
-		global_free(image);
-		image = nullptr;
+		image.reset();
 		return image_init_result::FAIL;
 	}
 	output_format = is_readonly() ? nullptr : best_format;
@@ -501,8 +498,7 @@ void floppy_image_device::call_unload()
 	if (image) {
 		if(image_dirty)
 			commit_image();
-		global_free(image);
-		image = nullptr;
+		image.reset();
 	}
 
 	wpt = 1; // disk sleeve is covering the sensor
@@ -526,7 +522,7 @@ void floppy_image_device::call_unload()
 
 image_init_result floppy_image_device::call_create(int format_type, util::option_resolution *format_options)
 {
-	image = global_alloc(floppy_image(tracks, sides, form_factor));
+	image = std::make_unique<floppy_image>(tracks, sides, form_factor);
 	output_format = nullptr;
 
 	// search for a suitable format based on the extension
@@ -1248,7 +1244,7 @@ void floppy_sound_device::device_start()
 	// If we don't have all samples, don't allocate a stream or access sample data.
 	if (m_loaded)
 	{
-		m_sound = machine().sound().stream_alloc(*this, 0, 1, clock()); // per-floppy stream
+		m_sound = stream_alloc(0, 1, clock()); // per-floppy stream
 	}
 	register_for_save_states();
 }
@@ -1372,18 +1368,18 @@ void floppy_sound_device::step(int zone)
 //  sound_stream_update - update the sound stream
 //-------------------------------------------------
 
-void floppy_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void floppy_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	// We are using only one stream, unlike the parent class
 	// Also, there is no need for interpolation, as we only expect
 	// one sample rate of 44100 for all samples
 
 	int16_t out;
-	stream_sample_t *samplebuffer = outputs[0];
+	auto &samplebuffer = outputs[0];
 	int idx = 0;
 	int sampleend = 0;
 
-	while (samples-- > 0)
+	for (int sampindex = 0; sampindex < samplebuffer.samples(); sampindex++)
 	{
 		out = 0;
 
@@ -1477,7 +1473,7 @@ void floppy_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 		}
 
 		// Write to the stream buffer
-		*(samplebuffer++) = out;
+		samplebuffer.put_int(sampindex, out, 32768);
 	}
 }
 

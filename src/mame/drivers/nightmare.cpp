@@ -240,8 +240,8 @@ protected:
 	DECLARE_READ_LINE_MEMBER( ef1_r );
 	DECLARE_READ_LINE_MEMBER( ef2_r );
 	DECLARE_WRITE_LINE_MEMBER( q_w );
-	DECLARE_WRITE8_MEMBER( ic10_w );
-	DECLARE_WRITE8_MEMBER( unkout_w );
+	void ic10_w(uint8_t data);
+	void unkout_w(uint8_t data);
 
 	void nightmare_map(address_map &map);
 	void nightmare_io_map(address_map &map);
@@ -316,7 +316,7 @@ READ_LINE_MEMBER( nightmare_state::ef2_r )
 }
 
 
-WRITE8_MEMBER( nightmare_state::ic10_w )
+void nightmare_state::ic10_w(uint8_t data)
 {
   /*
     7 - EEPROM Di
@@ -334,7 +334,7 @@ WRITE8_MEMBER( nightmare_state::ic10_w )
 }
 
 
-WRITE8_MEMBER( nightmare_state::unkout_w )
+void nightmare_state::unkout_w(uint8_t data)
 {
   // J3
 }
@@ -369,9 +369,9 @@ uint32_t nightmare_state::screen_update_nightmare(screen_device &screen, bitmap_
 	// combine two buffers (additive?)
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		uint32_t *const bitmap1 = &m_vdc2->get_bitmap().pix32(y);
-		uint32_t *const bitmap2 = &m_vdc->get_bitmap().pix32(y);
-		uint32_t *dst = &bitmap.pix32(y);
+		uint32_t const *const bitmap1 = &m_vdc2->get_bitmap().pix(y);
+		uint32_t const *const bitmap2 = &m_vdc->get_bitmap().pix(y);
+		uint32_t *const dst = &bitmap.pix(y);
 
 		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
@@ -379,9 +379,9 @@ uint32_t nightmare_state::screen_update_nightmare(screen_device &screen, bitmap_
 			uint32_t p2 = bitmap2[x];
 			uint32_t result = 0;
 
-			for(int shift=0; shift<32;shift+=8)
+			for (int shift=0; shift<32;shift+=8)
 			{
-				uint32_t data = ((p2>>shift)&0xff)+((p1>>shift)&0xff);
+				uint32_t const data = ((p2>>shift)&0xff)+((p1>>shift)&0xff);
 				result|=((data>0xff)?0xff:data)<<shift;
 			}
 			dst[x]=result;

@@ -37,9 +37,9 @@ private:
 
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;
-	DECLARE_WRITE8_MEMBER(higemaru_videoram_w);
-	DECLARE_WRITE8_MEMBER(higemaru_colorram_w);
-	DECLARE_WRITE8_MEMBER(higemaru_c800_w);
+	void higemaru_videoram_w(offs_t offset, uint8_t data);
+	void higemaru_colorram_w(offs_t offset, uint8_t data);
+	void higemaru_c800_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
 	void higemaru_palette(palette_device &palette) const;

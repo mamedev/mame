@@ -84,28 +84,28 @@ protected:
 		FIFO_ENET_XMIT
 	};
 
-	DECLARE_READ32_MEMBER(enet_r);
-	DECLARE_WRITE32_MEMBER(enet_w);
-	DECLARE_READ32_MEMBER(hd_enet_r);
-	DECLARE_WRITE32_MEMBER(hd_enet_w);
-	template <uint32_t index> DECLARE_READ32_MEMBER(hd_r);
-	template <uint32_t index> DECLARE_WRITE32_MEMBER(hd_w);
-	template <fifo_type_t Type> DECLARE_READ32_MEMBER(fifo_r);
-	template <fifo_type_t Type> DECLARE_WRITE32_MEMBER(fifo_w);
-	DECLARE_READ32_MEMBER(intstat_r);
+	uint32_t enet_r(offs_t offset, uint32_t mem_mask = ~0);
+	void enet_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t hd_enet_r(offs_t offset, uint32_t mem_mask = ~0);
+	void hd_enet_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	template <uint32_t index> uint32_t hd_r(offs_t offset, uint32_t mem_mask = ~0);
+	template <uint32_t index> void hd_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	template <fifo_type_t Type> uint32_t fifo_r(offs_t offset);
+	template <fifo_type_t Type> void fifo_w(offs_t offset, uint32_t data);
+	uint32_t intstat_r();
 	uint32_t misc_r();
 	void misc_w(uint32_t data);
 	uint32_t eeprom_r();
 	void eeprom_w(uint32_t data);
 	uint32_t pio_data_r(offs_t offset);
 	void pio_data_w(offs_t offset, uint32_t data);
-	DECLARE_READ32_MEMBER(pbusdma_r);
-	DECLARE_WRITE32_MEMBER(pbusdma_w);
+	uint32_t pbusdma_r(offs_t offset, uint32_t mem_mask = ~0);
+	void pbusdma_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_READ32_MEMBER(dma_config_r);
-	DECLARE_WRITE32_MEMBER(dma_config_w);
-	DECLARE_READ32_MEMBER(pio_config_r);
-	DECLARE_WRITE32_MEMBER(pio_config_w);
+	uint32_t dma_config_r(offs_t offset, uint32_t mem_mask = ~0);
+	void dma_config_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t pio_config_r(offs_t offset, uint32_t mem_mask = ~0);
+	void pio_config_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t bbram_r(offs_t offset);
 	void bbram_w(offs_t offset, uint32_t data);
 

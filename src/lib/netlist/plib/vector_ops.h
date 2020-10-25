@@ -11,6 +11,7 @@
 ///
 ///
 #include "pconfig.h"
+#include "pgsl.h"
 #include "pmath.h"
 
 #include <algorithm>
@@ -27,75 +28,76 @@
 namespace plib
 {
 	template<typename VT, typename T>
-	void vec_set_scalar(const std::size_t n, VT &v, T && scalar) noexcept
+	void vec_set_scalar(VT &v, T && scalar) noexcept
 	{
+		const std::size_t n(v.size());
 		const typename std::remove_reference<decltype(v[0])>::type s(std::forward<T>(scalar));
 		for ( std::size_t i = 0; i < n; i++ )
 			v[i] = s;
 	}
 
 	template<typename VT, typename VS>
-	void vec_set(const std::size_t n, VT &v, const VS & source) noexcept
+	void vec_set(VT &v, const VS & source) noexcept
 	{
+		const std::size_t n(v.size());
+		gsl_Expects(n <= source.size());
 		for ( std::size_t i = 0; i < n; i++ )
 			v[i] = source[i];
 	}
 
 	template<typename T, typename V1, typename V2>
-	T vec_mult(const std::size_t n, const V1 & v1, const V2 & v2 ) noexcept
+	T vec_mult(const V1 & v1, const V2 & v2 ) noexcept
 	{
-		using b8 = std::array<T, 8>; // NOLINT
-		PALIGNAS_VECTOROPT() b8 value = {0};
+		const std::size_t n(v1.size());
+		gsl_Expects(n <= v2.size());
+		T ret(plib::constants<T>::zero());
 		for (std::size_t i = 0; i < n ; i++ )
 		{
-			value[i & 7] += v1[i] * v2[i]; // NOLINT
+			ret += v1[i] * v2[i]; // NOLINT
 		}
-		return value[0] + value[1] + value[2] + value[3] + value[4] + value[5] + value[6] + value[7]; // NOLINT
+		return ret;
 	}
 
 	template<typename T, typename VT>
-	T vec_mult2(const std::size_t n, const VT &v) noexcept
+	T vec_mult2(const VT &v) noexcept
 	{
-		using b8 = std::array<T, 8>;
-		PALIGNAS_VECTOROPT() b8 value = {0};
+		const std::size_t n(v.size());
+		T ret(plib::constants<T>::zero());
 		for (std::size_t i = 0; i < n ; i++ )
 		{
-			value[i & 7] += v[i] * v[i];
+			ret += v[i] * v[i];
 		}
-		return value[0] + value[1] + value[2] + value[3] + value[4] + value[5] + value[6] + value[7];
+		return ret;
 	}
 
 	template<typename T, typename VT>
-	T vec_sum(const std::size_t n, const VT &v) noexcept
+	T vec_sum(const VT &v) noexcept
 	{
-		if (n<8)
+		const std::size_t n(v.size());
+		T ret(plib::constants<T>::zero());
+		for (std::size_t i = 0; i < n ; i++ )
 		{
-			T value(0);
-			for (std::size_t i = 0; i < n ; i++ )
-				value += v[i];
-
-			return value;
+			ret += v[i];
 		}
 
-		using b8 = std::array<T, 8>;
-		PALIGNAS_VECTOROPT() b8 value = {0};
-		for (std::size_t i = 0; i < n ; i++ )
-			value[i & 7] += v[i];
-
-		return ((value[0] + value[1]) + (value[2] + value[3])) + ((value[4] + value[5]) + (value[6] + value[7]));
+		return ret;
 	}
 
 	template<typename VV, typename T, typename VR>
-	void vec_mult_scalar(const std::size_t n, VR & result, const VV & v, T && scalar) noexcept
+	void vec_mult_scalar(VR & result, const VV & v, T && scalar) noexcept
 	{
+		const std::size_t n(result.size());
+		gsl_Expects(n <= v.size());
 		const typename std::remove_reference<decltype(v[0])>::type s(std::forward<T>(scalar));
 		for ( std::size_t i = 0; i < n; i++ )
 			result[i] = s * v[i];
 	}
 
 	template<typename VR, typename VV, typename T>
-	void vec_add_mult_scalar(const std::size_t n, VR & result, const VV & v, T && scalar) noexcept
+	void vec_add_mult_scalar(VR & result, const VV & v, T && scalar) noexcept
 	{
+		const std::size_t n(result.size());
+		gsl_Expects(n <= v.size());
 		const typename std::remove_reference<decltype(v[0])>::type s(std::forward<T>(scalar));
 		for ( std::size_t i = 0; i < n; i++ )
 			result[i] += s * v[i];
@@ -109,31 +111,38 @@ namespace plib
 	}
 
 	template<typename R, typename V>
-	void vec_add_ip(const std::size_t n, R & result, const V & v) noexcept
+	void vec_add_ip(R & result, const V & v) noexcept
 	{
+		const std::size_t n(result.size());
+		gsl_Expects(n <= v.size());
 		for ( std::size_t i = 0; i < n; i++ )
 			result[i] += v[i];
 	}
 
 	template<typename VR, typename V1, typename V2>
-	void vec_sub(const std::size_t n, VR & result, const V1 &v1, const V2 & v2) noexcept
+	void vec_sub(VR & result, const V1 &v1, const V2 & v2) noexcept
 	{
+		const std::size_t n(result.size());
+		gsl_Expects(n <= v1.size());
+		gsl_Expects(n <= v2.size());
 		for ( std::size_t i = 0; i < n; i++ )
 			result[i] = v1[i] - v2[i];
 	}
 
 	template<typename V, typename T>
-	void vec_scale(const std::size_t n, V & v, T &&scalar) noexcept
+	void vec_scale(V & v, T &&scalar) noexcept
 	{
+		const std::size_t n(v.size());
 		const typename std::remove_reference<decltype(v[0])>::type s(std::forward<T>(scalar));
 		for ( std::size_t i = 0; i < n; i++ )
 			v[i] *= s;
 	}
 
 	template<typename T, typename V>
-	T vec_maxabs(const std::size_t n, const V & v) noexcept
+	T vec_maxabs(const V & v) noexcept
 	{
-		T ret = 0.0;
+		const std::size_t n(v.size());
+		T ret(plib::constants<T>::zero());
 		for ( std::size_t i = 0; i < n; i++ )
 			ret = std::max(ret, plib::abs(v[i]));
 

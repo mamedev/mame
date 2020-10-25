@@ -265,31 +265,25 @@ public:
 	void spc1500(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(psga_r);
-	DECLARE_READ8_MEMBER(porta_r);
+	uint8_t psga_r();
+	uint8_t porta_r();
 	DECLARE_WRITE_LINE_MEMBER( centronics_busy_w ) { m_centronics_busy = state; }
-	DECLARE_READ8_MEMBER(mc6845_videoram_r);
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(palet_w);
-	DECLARE_WRITE8_MEMBER(priority_w);
-	DECLARE_WRITE8_MEMBER(pcg_w);
-	DECLARE_WRITE8_MEMBER(pcgg_w);
-	DECLARE_WRITE8_MEMBER(pcgb_w);
-	DECLARE_WRITE8_MEMBER(pcgr_w);
-	DECLARE_READ8_MEMBER(pcg_r);
-	DECLARE_READ8_MEMBER(pcgg_r);
-	DECLARE_READ8_MEMBER(pcgb_r);
-	DECLARE_READ8_MEMBER(pcgr_r);
-	DECLARE_WRITE8_MEMBER(crtc_w);
-	DECLARE_READ8_MEMBER(crtc_r);
-	DECLARE_WRITE8_MEMBER(romsel);
-	DECLARE_WRITE8_MEMBER(ramsel);
-	DECLARE_WRITE8_MEMBER(portb_w);
-	DECLARE_WRITE8_MEMBER(psgb_w);
-	DECLARE_WRITE8_MEMBER(portc_w);
-	DECLARE_READ8_MEMBER(portb_r);
-	DECLARE_WRITE8_MEMBER(double_w);
-	DECLARE_READ8_MEMBER(io_r);
+	uint8_t mc6845_videoram_r(offs_t offset);
+	uint8_t keyboard_r(offs_t offset);
+	void palet_w(offs_t offset, uint8_t data);
+	void priority_w(uint8_t data);
+	void pcg_w(offs_t offset, uint8_t data);
+	uint8_t pcg_r(offs_t offset);
+	void crtc_w(offs_t offset, uint8_t data);
+	uint8_t crtc_r(offs_t offset);
+	void romsel(uint8_t data);
+	void ramsel(uint8_t data);
+	void portb_w(uint8_t data);
+	void psgb_w(uint8_t data);
+	void portc_w(uint8_t data);
+	uint8_t portb_r();
+	void double_w(offs_t offset, uint8_t data);
+	uint8_t io_r(offs_t offset);
 	void spc_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(spc);
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -303,8 +297,7 @@ private:
 	uint8_t m_ipl;
 	uint8_t m_palet[3];
 	uint8_t m_paltbl[8];
-	uint16_t m_page;
-	uint8_t m_pcg_char, m_pcg_attr, m_char_change, m_pcg_char0;
+	uint8_t m_pcg_char, m_pcg_attr, m_char_change;
 	uint16_t m_pcg_offset[3];
 	int m_char_count;
 	attotime m_time;
@@ -336,7 +329,7 @@ private:
 	void get_pcg_addr();
 };
 
-READ8_MEMBER( spc1500_state::keyboard_r )
+uint8_t spc1500_state::keyboard_r(offs_t offset)
 {
 	offset &= 0xf;
 
@@ -346,7 +339,7 @@ READ8_MEMBER( spc1500_state::keyboard_r )
 		return 0xff;
 }
 
-WRITE8_MEMBER( spc1500_state::romsel)
+void spc1500_state::romsel(uint8_t data)
 {
 	m_romsel = 1;
 	if (m_ipl)
@@ -355,18 +348,18 @@ WRITE8_MEMBER( spc1500_state::romsel)
 		membank("bank1")->set_entry(1);
 }
 
-WRITE8_MEMBER( spc1500_state::ramsel)
+void spc1500_state::ramsel(uint8_t data)
 {
 	m_romsel = 0;
 	membank("bank1")->set_entry(2);
 }
 
-WRITE8_MEMBER( spc1500_state::portb_w)
+void spc1500_state::portb_w(uint8_t data)
 {
 //  m_ipl = data & (1 << 1);
 }
 
-WRITE8_MEMBER( spc1500_state::psgb_w)
+void spc1500_state::psgb_w(uint8_t data)
 {
 	int elapsed_time = m_timer->elapsed().as_attoseconds()/ATTOSECONDS_PER_MICROSECOND;
 	if (m_ipl != ((data>>1)&1))
@@ -383,7 +376,7 @@ WRITE8_MEMBER( spc1500_state::psgb_w)
 	m_motor = BIT(data, 7);
 }
 
-WRITE8_MEMBER( spc1500_state::portc_w)
+void spc1500_state::portc_w(uint8_t data)
 {
 	m_cass->output(BIT(data, 0) ? -1.0 : 1.0);
 	m_centronics->write_strobe(BIT(data, 7));
@@ -392,7 +385,7 @@ WRITE8_MEMBER( spc1500_state::portc_w)
 	m_vdg->set_unscaled_clock(VDP_CLOCK/(BIT(data, 2) ? 48 : 24));
 }
 
-READ8_MEMBER( spc1500_state::portb_r)
+uint8_t spc1500_state::portb_r()
 {
 	uint8_t data = 0;
 	data |= ((m_cass->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED || ((m_cass->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED));
@@ -403,7 +396,7 @@ READ8_MEMBER( spc1500_state::portb_r)
 	return data;
 }
 
-WRITE8_MEMBER( spc1500_state::crtc_w)
+void spc1500_state::crtc_w(offs_t offset, uint8_t data)
 {
 	static int m_crtc_index;
 	if((offset & 1) == 0)
@@ -418,7 +411,7 @@ WRITE8_MEMBER( spc1500_state::crtc_w)
 	}
 }
 
-READ8_MEMBER( spc1500_state::crtc_r)
+uint8_t spc1500_state::crtc_r(offs_t offset)
 {
 	if (offset & 1)
 	{
@@ -461,7 +454,7 @@ void spc1500_state::get_pcg_addr()
 	}
 }
 
-WRITE8_MEMBER( spc1500_state::pcg_w)
+void spc1500_state::pcg_w(offs_t offset, uint8_t data)
 {
 	int reg = (offset>>8)-0x15;
 	get_pcg_addr();
@@ -473,7 +466,7 @@ WRITE8_MEMBER( spc1500_state::pcg_w)
 		m_pcg_offset[reg]++;
 }
 
-READ8_MEMBER( spc1500_state::pcg_r)
+uint8_t spc1500_state::pcg_r(offs_t offset)
 {
 	int reg = (offset>>8)-0x15;
 	uint8_t data = 0;
@@ -492,12 +485,12 @@ READ8_MEMBER( spc1500_state::pcg_r)
 	return data;
 }
 
-WRITE8_MEMBER( spc1500_state::priority_w)
+void spc1500_state::priority_w(uint8_t data)
 {
 	m_priority = data;
 }
 
-WRITE8_MEMBER( spc1500_state::palet_w)
+void spc1500_state::palet_w(offs_t offset, uint8_t data)
 {
 	m_palet[(offset>>8)&0x0f] = data;
 	for(int i=1, j=0; i < 0x100; i<<=1, j++)
@@ -530,36 +523,29 @@ MC6845_RECONFIGURE(spc1500_state::crtc_reconfig)
 
 MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 {
-	uint8_t han2;
-	uint8_t *pf;
+	uint8_t const *pf;
 	uint16_t hfnt;
-	int i;
-	int j;
-	int h1, h2, h3;
-	uint32_t  *p = &bitmap.pix32(y);
+	uint32_t *p = &bitmap.pix(y);
 
 	unsigned char cho[] ={1,1,1,1,1,1,1,1,0,0,1,1,1,3,5,5,0,0,5,3,3,5,5,5,0,0,3,3,5,1};
 	unsigned char jong[]={0,0,0,1,1,1,1,1,0,0,1,1,1,2,2,2,0,0,2,2,2,2,2,2,0,0,2,2,1,1};
-	bool inv = false;
 	char hs = (m_crtc_vreg[0x9] < 15 ? 3 : 4);
 	int n = y & (m_crtc_vreg[0x9]);
 	bool ln400 = (hs == 4 && m_crtc_vreg[0x4] > 20);
-	uint8_t *vram = &m_p_videoram[0] + (m_crtc_vreg[12] << 8) + m_crtc_vreg[13];
-	for (i = 0; i < x_count; i++)
+	uint8_t const *const vram = &m_p_videoram[0] + (m_crtc_vreg[12] << 8) + m_crtc_vreg[13];
+	for (int i = 0; i < x_count; i++)
 	{
-		uint8_t *pp = &vram[0x2000+((y>>hs)*x_count+(((y)&7)<<11))+i+(((hs==4)&&(y&8))?0x400:0)];
-		uint8_t *pv = &vram[(y>>hs)*x_count + i];
+		uint8_t const *const pp = &vram[0x2000+((y>>hs)*x_count+(((y)&7)<<11))+i+(((hs==4)&&(y&8))?0x400:0)];
+		uint8_t const *const pv = &vram[(y>>hs)*x_count + i];
 		uint8_t ascii = *(pv+0x1000);
 		uint8_t attr = *pv;
-		inv = (attr & 0x8 ? true : false);
+		bool inv = (attr & 0x8 ? true : false);
 		uint8_t color = attr & 0x7;
 		uint8_t pixelb = *(pp+0);
 		uint8_t pixelr = *(pp+0x4000);
 		uint8_t pixelg = *(pp+0x8000);
 		bool nopalet = ((m_palet[0] | m_palet[1] | m_palet[2])==0 || ln400);
 		uint8_t pen = (nopalet ? color : m_paltbl[color]);
-		uint8_t pixelpen = 0;
-		uint8_t pixel = 0;
 		if (hs == 4 && (ascii & 0x80))
 		{
 			uint16_t wpixelb = (pixelb << 8) + (*(pp+1));
@@ -567,10 +553,10 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 			uint16_t wpixelg = (pixelg << 8) + (*(pp+0x8001));
 			if (ascii != 0xfa)
 			{
-				han2 = *(pv+0x1001);
-				h1 = (ascii>>2)&0x1f;
-				h2 = ((ascii<<3)|(han2>>5))&0x1f;
-				h3 = (han2)&0x1f;
+				uint8_t han2 = *(pv+0x1001);
+				int h1 = (ascii>>2)&0x1f;
+				int h2 = ((ascii<<3)|(han2>>5))&0x1f;
+				int h3 = (han2)&0x1f;
 				pf = &m_font[0x2000+(h1 * 32) + (cho[h2] + (h3 != 0) -1) * 16 * 2 * 32 + n];
 				hfnt = (*pf << 8) | (*(pf+16));
 				pf = &m_font[0x4000+(h2 * 32) + (h3 == 0 ? 0 : 1) * 16 * 2 * 32 + n];
@@ -585,26 +571,26 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 				hfnt = (*pf << 8) | (*(pf+16));
 			}
 			hfnt = (inv ? 0xffff - hfnt : hfnt);
-			for (j = 0x8000; j > 0; j>>=1)
+			for (int j = 0x8000; j > 0; j>>=1)
 			{
-				pixel = ((wpixelg&j ? 4:0 )|(wpixelr&j? 2:0)|(wpixelb&j ? 1:0));
-				pixelpen = (nopalet ? pixel : m_paltbl[pixel]);
+				uint8_t pixel = ((wpixelg&j ? 4:0 )|(wpixelr&j? 2:0)|(wpixelb&j ? 1:0));
+				uint8_t pixelpen = (nopalet ? pixel : m_paltbl[pixel]);
 				*p++ = m_palette->pen(((hfnt & j) || (m_priority & (1<<pixel))) ? pixelpen : pen);
 			}
 			i++;
 		}
 		else if (attr & 0x20)
 		{
-			uint8_t *pa = &m_pcgram[(ascii*(m_crtc_vreg[0x9]+1))+n];
+			uint8_t const *pa = &m_pcgram[(ascii*(m_crtc_vreg[0x9]+1))+n];
 			uint8_t b = *pa;
 			uint8_t r = *(pa+0x800);
 			uint8_t g = *(pa+0x1000);
-			for (j = 0x80; j > 0; j>>=1)
+			for (int j = 0x80; j > 0; j>>=1)
 			{
-				pixel = ((g & j)?4:0)|((r & j)?2:0)|((b & j)?1:0);
+				uint8_t pixel = ((g & j)?4:0)|((r & j)?2:0)|((b & j)?1:0);
 				pen = (pixel == 7 ? color : pixel);
 				pixel = (pixelg&j ? 4 : 0)|(pixelr&j ? 2:0)|(pixelb&j ? 1:0 );
-				pixelpen = (nopalet ? pixel : m_paltbl[pixel]);
+				uint8_t pixelpen = (nopalet ? pixel : m_paltbl[pixel]);
 				*p++ = m_palette->pen((m_priority & (1<<pixel)) ? pixelpen : pen);
 			}
 		}
@@ -616,10 +602,10 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 				fnt = 0xff;
 			}
 			fnt = (inv ? 0xff - fnt : fnt);
-			for (j = 0x80; j > 0; j>>=1)
+			for (int j = 0x80; j > 0; j>>=1)
 			{
-				pixel = ((pixelg&j) ? 4 : 0)|(pixelr&j ? 2:0)|(pixelb&j ? 1:0 );
-				pixelpen = (nopalet ? pixel : m_paltbl[pixel]);
+				uint8_t pixel = ((pixelg&j) ? 4 : 0)|(pixelr&j ? 2:0)|(pixelb&j ? 1:0 );
+				uint8_t pixelpen = (nopalet ? pixel : m_paltbl[pixel]);
 				if (ascii == 0 && attr == 0 && !inv)
 					*p++ = m_palette->pen(pixelpen);
 				else
@@ -629,7 +615,7 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 	}
 }
 
-WRITE8_MEMBER( spc1500_state::double_w)
+void spc1500_state::double_w(offs_t offset, uint8_t data)
 {
 	if (m_double_mode)
 	{
@@ -641,16 +627,16 @@ WRITE8_MEMBER( spc1500_state::double_w)
 	else
 	{
 		if (offset < 0x1000) {} else
-		if (offset < 0x1300) { palet_w(space, offset, data); } else
-		if (offset < 0x1400) { priority_w(space, offset, data); } else
-		if (offset < 0x1800) { pcg_w(space, offset, data); } else
-		if (offset < 0x1900) { crtc_w(space, offset, data); } else
+		if (offset < 0x1300) { palet_w(offset, data); } else
+		if (offset < 0x1400) { priority_w(data); } else
+		if (offset < 0x1800) { pcg_w(offset, data); } else
+		if (offset < 0x1900) { crtc_w(offset, data); } else
 		if (offset < 0x1a00) {} else
 		if (offset < 0x1b00) { m_pio->write(offset, data); } else
 		if (offset < 0x1c00) { m_sound->data_w(data);} else
 		if (offset < 0x1d00) { m_sound->address_w(data);} else
-		if (offset < 0x1e00) { romsel(space, offset, data);} else
-		if (offset < 0x1f00) { ramsel(space, offset, data);} else
+		if (offset < 0x1e00) { romsel(data);} else
+		if (offset < 0x1f00) { ramsel(data);} else
 		if (offset < 0x2000) {} else
 		if (offset < 0x10000)
 		{
@@ -665,14 +651,14 @@ WRITE8_MEMBER( spc1500_state::double_w)
 	}
 }
 
-READ8_MEMBER( spc1500_state::io_r)
+uint8_t spc1500_state::io_r(offs_t offset)
 {
 	m_double_mode = false;
 	if (offset < 0x1000) {} else
 	if (offset < 0x1400) {} else
-	if (offset < 0x1800) { return pcg_r(space, offset); } else
-	if (offset < 0x1900) { return crtc_r(space, offset); } else
-	if (offset < 0x1a00) { return keyboard_r(space, offset); } else
+	if (offset < 0x1800) { return pcg_r(offset); } else
+	if (offset < 0x1900) { return crtc_r(offset); } else
+	if (offset < 0x1a00) { return keyboard_r(offset); } else
 	if (offset < 0x1b00) { return m_pio->read(offset); } else
 	if (offset < 0x1c00) { return m_sound->data_r(); } else
 	if (offset < 0x2000) {} else
@@ -720,7 +706,7 @@ static INPUT_PORTS_START( spc1500 )
 
 	PORT_START("LINE.1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("= +") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_CHAR('+')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Return") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C') PORT_CHAR(0x03)
@@ -730,7 +716,7 @@ static INPUT_PORTS_START( spc1500 )
 
 	PORT_START("LINE.2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Caps") PORT_CODE(KEYCODE_CAPSLOCK)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z') PORT_CHAR(0x1a)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("] }") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}') PORT_CHAR(0x1d)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("V") PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V') PORT_CHAR(0x16)
@@ -739,8 +725,8 @@ static INPUT_PORTS_START( spc1500 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2 @") PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('@')
 
 	PORT_START("LINE.3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Backspace") PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_INSERT) PORT_CHAR(UCHAR_MAMEKEY(INSERT))
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_UP)  PORT_CODE(KEYCODE_UP)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Backspace") PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_INSERT) PORT_CHAR(8) PORT_CHAR(UCHAR_MAMEKEY(INSERT))
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_UP)  PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ESC") PORT_CODE(KEYCODE_ESC) PORT_CHAR(0x1b)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("` ~") PORT_CODE(KEYCODE_TILDE) PORT_CHAR('`') PORT_CHAR('~')
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B') PORT_CHAR(0x02)
@@ -750,7 +736,7 @@ static INPUT_PORTS_START( spc1500 )
 
 	PORT_START("LINE.4")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Del Ins") PORT_CODE(KEYCODE_DEL_PAD) PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD)) PORT_CHAR(8)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Tab") PORT_CODE(KEYCODE_TAB) PORT_CHAR('\t')
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Home") PORT_CODE(KEYCODE_HOME)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("N") PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N') PORT_CHAR(0x0e)
@@ -854,12 +840,12 @@ void spc1500_state::machine_reset()
 	m_char_count = 0;
 }
 
-READ8_MEMBER(spc1500_state::mc6845_videoram_r)
+uint8_t spc1500_state::mc6845_videoram_r(offs_t offset)
 {
 	return m_p_videoram[offset];
 }
 
-READ8_MEMBER( spc1500_state::psga_r )
+uint8_t spc1500_state::psga_r()
 {
 	uint8_t data = 0;
 	data |= (BIT(m_dipsw->read(),1)<<4) | (BIT(m_dipsw->read(),2)<<7);
@@ -867,7 +853,7 @@ READ8_MEMBER( spc1500_state::psga_r )
 	return data;
 }
 
-READ8_MEMBER( spc1500_state::porta_r )
+uint8_t spc1500_state::porta_r()
 {
 	uint8_t data = 0x3f;
 	data |= (m_cass->input() > 0.0038) ? 0x80 : 0;

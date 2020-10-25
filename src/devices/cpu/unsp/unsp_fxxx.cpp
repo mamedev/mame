@@ -9,6 +9,8 @@
 
 #include "unspdasm.h"
 
+#include <climits>
+
 #define LOG_UNSP_MULS            (1U << 1)
 
 #define VERBOSE             (0)
@@ -107,54 +109,71 @@ inline void unsp_device::execute_fxxx_001_group(uint16_t op)
 
 		if (d)
 		{
+			const uint32_t addr = imm16 | (get_ds() << 16);
+			const uint16_t orig = read16(addr);
+
+			// manual seems to indicate that the zero flag always gets changed based on original value
+			// even for opcodes other than tstb
+			m_core->m_r[REG_SR] &= ~UNSP_Z;
+			m_core->m_r[REG_SR] |= BIT(orig, offset) ? 0 : UNSP_Z;
+
 			switch (bitop)
 			{
 			case 0x0: // tstb
-				logerror("tstb ds:[%04x],%d\n", imm16, offset);
-				unimplemented_opcode(op);
+			{
+				// handled above
 				break;
-
-			case 0x1: // setb
-				logerror("setb ds:[%04x],%d\n", imm16, offset);
-				unimplemented_opcode(op);
+			}
+			case 0x1: // setb    (bkrankp uses this)
+			{
+				write16(addr, orig | (1 << offset));
 				break;
-
+			}
 			case 0x2: // clrb
-				logerror("clrb ds:[%04x],%d\n", imm16, offset);
-				unimplemented_opcode(op);
+			{
+				write16(addr, orig & ~(1 << offset));
 				break;
+			}
 
 			case 0x3: // invb
-				logerror("invb ds:[%04x],%d\n", imm16, offset);
-				unimplemented_opcode(op);
+			{
+				write16(addr, orig ^ (1 << offset));
 				break;
+			}
 			}
 		}
 		else
 		{
+			const uint16_t orig =  read16(imm16);
+
+			// manual seems to indicate that the zero flag always gets changed based on original value
+			// even for opcodes other than tstb
+			m_core->m_r[REG_SR] &= ~UNSP_Z;
+			m_core->m_r[REG_SR] |= BIT(orig, offset) ? 0 : UNSP_Z;
+
 			switch (bitop)
 			{
 			case 0x0: // tstb
-				logerror("tstb [%04x],%d\n", imm16, offset);
-				unimplemented_opcode(op);
+			{
+				// handled above
 				break;
-
+			}
 			case 0x1: // setb    (bkrankp uses this)
 			{
-				uint16_t temp = read16(imm16);
-				temp |= (1 << offset);
-				write16(imm16, temp);
+				write16(imm16, orig | (1 << offset));
 				break;
 			}
 			case 0x2: // clrb
-				logerror("clrb [%04x],%d\n", imm16, offset);
-				unimplemented_opcode(op);
+			{
+				write16(imm16, orig & ~(1 << offset));
 				break;
+			}
 
 			case 0x3: // invb
-				logerror("invb [%04x],%d\n", imm16, offset);
-				unimplemented_opcode(op);
+			{
+				write16(imm16, orig ^ (1 << offset));
 				break;
+			}
 			}
 		}
 
@@ -248,6 +267,35 @@ inline void unsp_device::execute_fxxx_100_group(uint16_t op)
 	return;
 }
 
+void unsp_12_device::execute_divq(uint16_t op)
+{
+	if (m_core->m_divq_bit == UINT_MAX)
+	{
+		m_core->m_divq_bit = 15;
+		m_core->m_divq_dividend = (m_core->m_r[REG_R4] << 16) | m_core->m_r[REG_R3];
+		m_core->m_divq_divisor = m_core->m_r[REG_R2];
+		m_core->m_divq_a = 0;
+	}
+	m_core->m_aq = BIT(m_core->m_divq_a, 31);
+	if (m_core->m_aq)
+	{
+		m_core->m_divq_a += m_core->m_divq_a + BIT(m_core->m_divq_dividend, 15) + m_core->m_divq_divisor;
+	}
+	else
+	{
+		m_core->m_divq_a += m_core->m_divq_a + BIT(m_core->m_divq_dividend, 15) - m_core->m_divq_divisor;
+	}
+	m_core->m_divq_dividend <<= 1;
+	m_core->m_divq_dividend++;
+	m_core->m_divq_dividend ^= BIT(m_core->m_divq_a, 31);
+	m_core->m_r[REG_R3] = (uint16_t)m_core->m_divq_dividend;
+	m_core->m_divq_bit--;
+}
+
+bool unsp_12_device::op_is_divq(const uint16_t op)
+{
+	return (op & 0xf163) == 0xf163;
+}
 
 void unsp_12_device::execute_fxxx_101_group(uint16_t op)
 {
@@ -336,8 +384,7 @@ void unsp_12_device::execute_fxxx_101_group(uint16_t op)
 	case 0xf16b: case 0xf36b: case 0xf56b: case 0xf76b: case 0xf96b: case 0xfb6b: case 0xfd6b: case 0xff6b:
 	case 0xf173: case 0xf373: case 0xf573: case 0xf773: case 0xf973: case 0xfb73: case 0xfd73: case 0xff73:
 	case 0xf17b: case 0xf37b: case 0xf57b: case 0xf77b: case 0xf97b: case 0xfb7b: case 0xfd7b: case 0xff7b:
-		logerror("divq mr, r2\n");
-		unimplemented_opcode(op);
+		execute_divq(op);
 		return;
 
 	case 0xf164: case 0xf364: case 0xf564: case 0xf764: case 0xf964: case 0xfb64: case 0xfd64: case 0xff64:
@@ -349,7 +396,7 @@ void unsp_12_device::execute_fxxx_101_group(uint16_t op)
 
 		if (r4 & 0x8000)
 		{
-			// r2 undefined (code will check for this and avoid calculations
+			m_core->m_r[REG_R2] = count_leading_ones(0xffff0000 | r4) - 17;
 		}
 		else
 		{

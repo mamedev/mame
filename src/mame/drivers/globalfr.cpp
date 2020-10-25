@@ -38,14 +38,14 @@ private:
 
 // serial vfd
 
-	DECLARE_WRITE16_MEMBER(vfd_w);
+	void vfd_w(uint16_t data);
 
 	void globalfr_map(address_map &map);
 };
 
 /******************************************************************************/
 
-WRITE16_MEMBER(globalfr_state::vfd_w)
+void globalfr_state::vfd_w(uint16_t data)
 {
 //  m_vfd->(data & 0x20) need to find reset
 	{

@@ -145,15 +145,15 @@ public:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(keyb_interrupt);
-	DECLARE_WRITE8_MEMBER(sn74259_w) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset & 0x07, offset & 0x08 ? 1 : 0); }
-	DECLARE_WRITE8_MEMBER(ap5_w) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset, data); }
-	DECLARE_READ8_MEMBER(ap5_r) { LOGIO("%s() %02x = %02x\n", FUNCNAME, offset, 1); return 1; }
-	DECLARE_WRITE8_MEMBER(wkb_w) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset, data); }
-	DECLARE_WRITE8_MEMBER(sn74299_w) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset, data); }
-	DECLARE_READ8_MEMBER(sn74299_r) { LOGIO("%s() %02x = %02x\n", FUNCNAME, offset, 1); return 1; }
-	DECLARE_WRITE8_MEMBER(txen_w) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset, data); }
-	DECLARE_WRITE8_MEMBER(kbd_reset_w) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset, data); }
-	DECLARE_WRITE8_MEMBER(dreq_w) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset, data); }
+	void sn74259_w(offs_t offset, uint8_t data) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset & 0x07, offset & 0x08 ? 1 : 0); }
+	void ap5_w(offs_t offset, uint8_t data) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset, data); }
+	uint8_t ap5_r(offs_t offset) { LOGIO("%s() %02x = %02x\n", FUNCNAME, offset, 1); return 1; }
+	void wkb_w(offs_t offset, uint8_t data) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset, data); }
+	void sn74299_w(offs_t offset, uint8_t data) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset, data); }
+	uint8_t sn74299_r(offs_t offset) { LOGIO("%s() %02x = %02x\n", FUNCNAME, offset, 1); return 1; }
+	void txen_w(offs_t offset, uint8_t data) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset, data); }
+	void kbd_reset_w(offs_t offset, uint8_t data) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset, data); }
+	void dreq_w(offs_t offset, uint8_t data) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset, data); }
 	void kron180_iomap(address_map &map);
 	void kron180_mem(address_map &map);
 
@@ -218,36 +218,31 @@ void kron180_state::kron180_iomap(address_map &map)
 
 /* Input ports */
 static INPUT_PORTS_START (kron180)
-	PORT_INCLUDE(pc_keyboard)
 INPUT_PORTS_END
 
 /* Video TODO: find and understand the char table within main rom */
 uint32_t kron180_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x, y;
-	int vramad;
-	uint8_t *chardata;
-	uint8_t charcode;
-
 	LOGSCREEN("%s()\n", FUNCNAME);
-	vramad = 0;
+	int vramad = 0;
 	for (int row = 0; row < 25 * 8; row += 8)
 	{
+		uint8_t charcode;
 		for (int col = 0; col < 80 * 8; col += 8)
 		{
 			/* look up the character data */
 			charcode = m_vram[vramad];
 			if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN("\n %c at X=%d Y=%d: ", charcode, col, row);
-			chardata = &m_chargen[(charcode * 8) + 8];
+			uint8_t const *chardata = &m_chargen[(charcode * 8) + 8];
 			/* plot the character */
-			for (y = 0; y < 8; y++)
+			for (int y = 0; y < 8; y++)
 			{
 				chardata--;
 				if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN("\n  %02x: ", *chardata);
-				for (x = 0; x < 8; x++)
+				for (int x = 0; x < 8; x++)
 				{
 					if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN(" %02x: ", *chardata);
-					bitmap.pix16(row + (8 - y), col + (8 - x)) = (*chardata & (1 << x)) ? 1 : 0;
+					bitmap.pix(row + (8 - y), col + (8 - x)) = (*chardata & (1 << x)) ? 1 : 0;
 				}
 			}
 			vramad += 2;
@@ -261,7 +256,7 @@ uint32_t kron180_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 /* Interrupt Handling */
 #if 0
-WRITE8_MEMBER(kron180_state::irq0_ack_w)
+void kron180_state::irq0_ack_w(uint8_t data)
 {
 	m_irq0_ack = data;
 	if ((data & 1) == 1)

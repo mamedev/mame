@@ -22,10 +22,10 @@ public:
 	auto intl_callback() { return m_intl_callback.bind(); }
 
 	uint8_t get_videoctrl() { return m_video_control; }
-	DECLARE_WRITE16_MEMBER( ctrl_w );
-	DECLARE_WRITE16_MEMBER( word_w );
-	DECLARE_READ16_MEMBER( framebuffer_word_r );
-	DECLARE_WRITE16_MEMBER( framebuffer_word_w );
+	void ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t framebuffer_word_r(offs_t offset);
+	void framebuffer_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, int plane);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_framebuffer( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );

@@ -143,18 +143,18 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
 
 private:
-	DECLARE_READ8_MEMBER(unk_f700_r);
-	DECLARE_READ8_MEMBER(unk_f760_r);
-	DECLARE_READ8_MEMBER(in0_r);
-	DECLARE_WRITE8_MEMBER(bank1_w);
-	DECLARE_WRITE8_MEMBER(palette_bank_w);
-	DECLARE_WRITE8_MEMBER(audiocpu_cmd_irq_w);
-	DECLARE_WRITE8_MEMBER(audiocpu_irq_ack_w);
-	DECLARE_WRITE8_MEMBER(hopper_w);
-	DECLARE_WRITE8_MEMBER(lamps1_w);
-	DECLARE_WRITE8_MEMBER(lamps2_w);
-	DECLARE_WRITE8_MEMBER(tower_lamps_w);
-	DECLARE_WRITE8_MEMBER(coin_enable_w);
+	uint8_t unk_f700_r();
+	uint8_t unk_f760_r();
+	uint8_t in0_r();
+	void bank1_w(uint8_t data);
+	void palette_bank_w(uint8_t data);
+	void audiocpu_cmd_irq_w(uint8_t data);
+	void audiocpu_irq_ack_w(uint8_t data);
+	void hopper_w(uint8_t data);
+	void lamps1_w(offs_t offset, uint8_t data);
+	void lamps2_w(offs_t offset, uint8_t data);
+	void tower_lamps_w(offs_t offset, uint8_t data);
+	void coin_enable_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(ptm2_irq);
 	void audiocpu_irq_update();
 
@@ -195,17 +195,17 @@ WRITE_LINE_MEMBER(sigmab52_state::ptm2_irq)
 	audiocpu_irq_update();
 }
 
-READ8_MEMBER(sigmab52_state::unk_f700_r)
+uint8_t sigmab52_state::unk_f700_r()
 {
 	return 0x7f;
 }
 
-READ8_MEMBER(sigmab52_state::unk_f760_r)
+uint8_t sigmab52_state::unk_f760_r()
 {
 	return 0x80;    // used for test the sound CPU
 }
 
-READ8_MEMBER(sigmab52_state::in0_r)
+uint8_t sigmab52_state::in0_r()
 {
 	uint8_t data = 0xff;
 
@@ -246,43 +246,43 @@ READ8_MEMBER(sigmab52_state::in0_r)
 	return data;
 }
 
-WRITE8_MEMBER(sigmab52_state::bank1_w)
+void sigmab52_state::bank1_w(uint8_t data)
 {
 	m_bank1->set_entry(BIT(data, 7));
 }
 
-WRITE8_MEMBER(sigmab52_state::hopper_w)
+void sigmab52_state::hopper_w(uint8_t data)
 {
 	m_hopper_start_cycles = data & 0x01 ? m_maincpu->total_cycles() : 0;
 }
 
-WRITE8_MEMBER(sigmab52_state::lamps1_w)
+void sigmab52_state::lamps1_w(offs_t offset, uint8_t data)
 {
 	m_lamps[offset] = data & 1;
 }
 
-WRITE8_MEMBER(sigmab52_state::lamps2_w)
+void sigmab52_state::lamps2_w(offs_t offset, uint8_t data)
 {
 	m_lamps[6 + offset] = data & 1;
 }
 
-WRITE8_MEMBER(sigmab52_state::tower_lamps_w)
+void sigmab52_state::tower_lamps_w(offs_t offset, uint8_t data)
 {
 	m_towerlamps[offset] = data & 1;
 }
 
-WRITE8_MEMBER(sigmab52_state::coin_enable_w)
+void sigmab52_state::coin_enable_w(uint8_t data)
 {
 	machine().bookkeeping().coin_lockout_w(0, data & 0x01 ? 0 : 1);
 }
 
-WRITE8_MEMBER(sigmab52_state::audiocpu_cmd_irq_w)
+void sigmab52_state::audiocpu_cmd_irq_w(uint8_t data)
 {
 	m_audiocpu_cmd_irq = ASSERT_LINE;
 	audiocpu_irq_update();
 }
 
-WRITE8_MEMBER(sigmab52_state::audiocpu_irq_ack_w)
+void sigmab52_state::audiocpu_irq_ack_w(uint8_t data)
 {
 	if (data & 0x01)
 	{
@@ -291,7 +291,7 @@ WRITE8_MEMBER(sigmab52_state::audiocpu_irq_ack_w)
 	}
 }
 
-WRITE8_MEMBER(sigmab52_state::palette_bank_w)
+void sigmab52_state::palette_bank_w(uint8_t data)
 {
 	int bank = data & 0x0f;
 
@@ -394,34 +394,34 @@ static INPUT_PORTS_START( jwildb52 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
 
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON2 )        PORT_CONDITION("DSW1", 0x50, EQUALS, 0x00)  PORT_NAME("Double")
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 )        PORT_CONDITION("DSW1", 0x50, EQUALS, 0x00)  PORT_NAME("Deal / Draw")
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 )        PORT_CONDITION("DSW1", 0x50, EQUALS, 0x00)  PORT_NAME("Max Bet")
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_POKER_BET )      PORT_CONDITION("DSW1", 0x50, EQUALS, 0x00)  PORT_NAME("One Bet")
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )    PORT_CONDITION("DSW1", 0x50, EQUALS, 0x00)  PORT_NAME("Double")
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )    PORT_CONDITION("DSW1", 0x50, EQUALS, 0x00)  PORT_NAME("Deal / Draw")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON1 )        PORT_CONDITION("DSW1", 0x50, EQUALS, 0x00)  PORT_NAME("Max Bet")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_GAMBLE_BET )     PORT_CONDITION("DSW1", 0x50, EQUALS, 0x00)  PORT_NAME("One Bet")
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  PORT_CONDITION("DSW1", 0x50, EQUALS, 0x00)  PORT_NAME("Collect / Payout")
 
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_POKER_CANCEL )   PORT_CONDITION("DSW1", 0x50, EQUALS, 0x10)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 )        PORT_CONDITION("DSW1", 0x50, EQUALS, 0x10)  PORT_NAME("Deal / Draw")
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 )        PORT_CONDITION("DSW1", 0x50, EQUALS, 0x10)  PORT_NAME("Max Bet")
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_POKER_BET )      PORT_CONDITION("DSW1", 0x50, EQUALS, 0x10)  PORT_NAME("One Bet")
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )    PORT_CONDITION("DSW1", 0x50, EQUALS, 0x10)  PORT_NAME("Deal / Draw")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON1 )        PORT_CONDITION("DSW1", 0x50, EQUALS, 0x10)  PORT_NAME("Max Bet")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_GAMBLE_BET )     PORT_CONDITION("DSW1", 0x50, EQUALS, 0x10)  PORT_NAME("One Bet")
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  PORT_CONDITION("DSW1", 0x50, EQUALS, 0x10)
 
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON3 )        PORT_CONDITION("DSW1", 0x50, EQUALS, 0x40)  PORT_NAME("Double")
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 )        PORT_CONDITION("DSW1", 0x50, EQUALS, 0x40)  PORT_NAME("Deal")
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 )        PORT_CONDITION("DSW1", 0x50, EQUALS, 0x40)  PORT_NAME("Draw")
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )    PORT_CONDITION("DSW1", 0x50, EQUALS, 0x40)  PORT_NAME("Double")
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_START1 )         PORT_CONDITION("DSW1", 0x50, EQUALS, 0x40)  PORT_NAME("Deal")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )    PORT_CONDITION("DSW1", 0x50, EQUALS, 0x40)  PORT_NAME("Draw")
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_POKER_CANCEL )   PORT_CONDITION("DSW1", 0x50, EQUALS, 0x40)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 )        PORT_CONDITION("DSW1", 0x50, EQUALS, 0x40)  PORT_NAME("Collect")
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )    PORT_CONDITION("DSW1", 0x50, EQUALS, 0x40)  PORT_NAME("Collect")
 
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )         PORT_CONDITION("DSW1", 0x50, EQUALS, 0x50)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 )        PORT_CONDITION("DSW1", 0x50, EQUALS, 0x50)  PORT_NAME("Deal")
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 )        PORT_CONDITION("DSW1", 0x50, EQUALS, 0x50)  PORT_NAME("Draw")
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_POKER_CANCEL  )  PORT_CONDITION("DSW1", 0x50, EQUALS, 0x50)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_START1 )         PORT_CONDITION("DSW1", 0x50, EQUALS, 0x50)  PORT_NAME("Deal")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )    PORT_CONDITION("DSW1", 0x50, EQUALS, 0x50)  PORT_NAME("Draw")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_POKER_CANCEL )   PORT_CONDITION("DSW1", 0x50, EQUALS, 0x50)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )         PORT_CONDITION("DSW1", 0x50, EQUALS, 0x50)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Meter")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) PORT_NAME("Reset")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_T) PORT_NAME("Last")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR ) PORT_NAME("Machine Door")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )
@@ -542,9 +542,9 @@ static INPUT_PORTS_START( s8waysfc )
 
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x07ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 )        PORT_NAME("Start")
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 )        PORT_NAME("Max Bet")
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON1 )        PORT_NAME("Max Bet")
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_GAMBLE_BET )     PORT_NAME("One Bet")
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  PORT_NAME("Collect / Payout")
 INPUT_PORTS_END

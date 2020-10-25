@@ -55,10 +55,10 @@ public:
 
 	void machine_reset() override;
 
-	DECLARE_WRITE8_MEMBER(pioiii_w);
-	DECLARE_READ8_MEMBER(pioiii_r);
-	DECLARE_WRITE8_MEMBER(pio_w);
-	DECLARE_READ8_MEMBER(pio_r);
+	void pioiii_w(offs_t offset, u8 data);
+	u8 pioiii_r(offs_t offset);
+	void pio_w(offs_t offset, u8 data);
+	u8 pio_r(offs_t offset);
 
 	void compc(machine_config &config);
 	void pc10iii(machine_config &config);
@@ -76,7 +76,7 @@ void compc_state::machine_reset()
 	m_dips = 0;
 }
 
-WRITE8_MEMBER(compc_state::pio_w)
+void compc_state::pio_w(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
@@ -92,7 +92,7 @@ WRITE8_MEMBER(compc_state::pio_w)
 }
 
 
-READ8_MEMBER(compc_state::pio_r)
+u8 compc_state::pio_r(offs_t offset)
 {
 	int data = 0;
 	switch (offset)
@@ -121,7 +121,7 @@ READ8_MEMBER(compc_state::pio_r)
 	return data;
 }
 
-WRITE8_MEMBER(compc_state::pioiii_w)
+void compc_state::pioiii_w(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
@@ -140,7 +140,7 @@ WRITE8_MEMBER(compc_state::pioiii_w)
 }
 
 
-READ8_MEMBER(compc_state::pioiii_r)
+u8 compc_state::pioiii_r(offs_t offset)
 {
 	int data = 0;
 	switch (offset)
@@ -170,8 +170,6 @@ static INPUT_PORTS_START(compciii)
 	PORT_DIPSETTING(    0x10, "Color 40x25" )
 	PORT_DIPSETTING(    0x20, "Color 80x25" )
 	PORT_DIPSETTING(    0x30, "Monochrome" )
-
-	PORT_INCLUDE(pc_keyboard)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(compc)
@@ -197,8 +195,6 @@ static INPUT_PORTS_START(compc)
 	PORT_DIPNAME( 0x01, 0x01, "Boot from floppy")
 	PORT_DIPSETTING(    0x01, DEF_STR(Yes) )
 	PORT_DIPSETTING(    0x00, DEF_STR(No) )
-
-	PORT_INCLUDE(pc_keyboard)
 INPUT_PORTS_END
 
 void compc_state::compc_map(address_map &map)

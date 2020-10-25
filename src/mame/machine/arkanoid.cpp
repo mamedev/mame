@@ -91,7 +91,7 @@ TO DO (2006.09.12) :
 
 
 /* Kludge for some bootlegs that read this address */
-READ8_MEMBER(arkanoid_state::arkanoid_bootleg_f000_r)
+uint8_t arkanoid_state::arkanoid_bootleg_f000_r()
 {
 	uint8_t arkanoid_bootleg_val = 0x00;
 
@@ -133,7 +133,7 @@ READ8_MEMBER(arkanoid_state::arkanoid_bootleg_f000_r)
 }
 
 /* Kludge for some bootlegs that read this address */
-READ8_MEMBER(arkanoid_state::arkanoid_bootleg_f002_r)
+uint8_t arkanoid_state::arkanoid_bootleg_f002_r()
 {
 	uint8_t arkanoid_bootleg_val = 0x00;
 
@@ -220,7 +220,7 @@ READ8_MEMBER(arkanoid_state::arkanoid_bootleg_f002_r)
 }
 
 /* Kludge for some bootlegs that write this address */
-WRITE8_MEMBER(arkanoid_state::arkanoid_bootleg_d018_w)
+void arkanoid_state::arkanoid_bootleg_d018_w(uint8_t data)
 {
 	m_bootleg_cmd = 0x00;
 
@@ -475,14 +475,14 @@ WRITE8_MEMBER(arkanoid_state::arkanoid_bootleg_d018_w)
 }
 
 #ifdef UNUSED_CODE
-READ8_MEMBER(arkanoid_state::block2_bootleg_f000_r)
+uint8_t arkanoid_state::block2_bootleg_f000_r()
 {
 	return m_bootleg_cmd;
 }
 #endif
 
 /* Kludge for some bootlegs that read this address */
-READ8_MEMBER(arkanoid_state::arkanoid_bootleg_d008_r)
+uint8_t arkanoid_state::arkanoid_bootleg_d008_r()
 {
 	uint8_t arkanoid_bootleg_d008_bit[8];
 	uint8_t arkanoid_bootleg_d008_val;

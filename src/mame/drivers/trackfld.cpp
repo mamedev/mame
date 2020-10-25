@@ -191,7 +191,6 @@ MAIN BOARD:
 #include "machine/konami1.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 
@@ -210,7 +209,7 @@ WRITE_LINE_MEMBER(trackfld_state::coin_counter_2_w)
 	machine().bookkeeping().coin_counter_w(1, state);
 }
 
-WRITE8_MEMBER(trackfld_state::questions_bank_w)
+void trackfld_state::questions_bank_w(uint8_t data)
 {
 	for (int i = 0; i < 8; i++)
 	{
@@ -259,7 +258,7 @@ WRITE_LINE_MEMBER(trackfld_state::nmi_mask_w)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-READ8_MEMBER(trackfld_state::trackfld_speech_r)
+uint8_t trackfld_state::trackfld_speech_r()
 {
 	if (m_vlm->bsy())
 		return 1;
@@ -267,7 +266,7 @@ READ8_MEMBER(trackfld_state::trackfld_speech_r)
 		return 0;
 }
 
-WRITE8_MEMBER(trackfld_state::trackfld_VLM5030_control_w)
+void trackfld_state::trackfld_VLM5030_control_w(uint8_t data)
 {
 	/* bit 0 is latch direction */
 	m_vlm->st((data >> 1) & 1);
@@ -387,9 +386,9 @@ void trackfld_state::wizzquiz_map(address_map &map)
 }
 
 
-READ8_MEMBER(trackfld_state::trackfld_SN76496_r)
+uint8_t trackfld_state::trackfld_SN76496_r()
 {
-	konami_SN76496_w(space, 0, 0);
+	konami_SN76496_w(0);
 	return 0xff; // ?
 }
 
@@ -943,9 +942,6 @@ void trackfld_state::trackfld(machine_config &config)
 	TRACKFLD_AUDIO(config, m_soundbrd, 0, m_audiocpu, m_vlm);
 
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // ls374.8e + r34-r47(20k) + r35-r53(10k) + r54(20k) + upc324.8f
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	SN76496(config, m_sn, SOUND_CLOCK/8);
 	m_sn->add_route(ALL_OUTPUTS, "speaker", 1.0);
@@ -1018,9 +1014,6 @@ void trackfld_state::yieartf(machine_config &config)
 	TRACKFLD_AUDIO(config, m_soundbrd, 0, finder_base::DUMMY_TAG, m_vlm);
 
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // ls374.8e + r34-r47(20k) + r35-r53(10k) + r54(20k) + upc324.8f
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	SN76496(config, m_sn, MASTER_CLOCK/6/2);
 	m_sn->add_route(ALL_OUTPUTS, "speaker", 1.0);
@@ -1058,7 +1051,7 @@ void trackfld_state::hyprolyb(machine_config &config)
 {
 	trackfld(config);
 
-	m_audiocpu->set_addrmap(AS_PROGRAM, address_map_constructor(&std::remove_pointer_t<decltype(this)>::hyprolyb_sound_map, tag(), this));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &trackfld_state::hyprolyb_sound_map);
 
 	MCFG_MACHINE_START_OVERRIDE(trackfld_state,trackfld)
 	MCFG_MACHINE_RESET_OVERRIDE(trackfld_state,trackfld)
@@ -1657,7 +1650,7 @@ void trackfld_state::init_atlantol()
 
 	downcast<konami1_device &>(*m_maincpu).set_encryption_boundary(0x6000);
 
-	space.install_write_handler(0x0800, 0x0800, write8_delegate(*this, FUNC(trackfld_state::atlantol_gfxbank_w)));
+	space.install_write_handler(0x0800, 0x0800, write8smo_delegate(*this, FUNC(trackfld_state::atlantol_gfxbank_w)));
 	space.nop_write(0x1000, 0x1000);
 
 	/* unmapped areas read as ROM */
@@ -1727,4 +1720,4 @@ GAME( 1985, wizzquiza,  wizzquiz, wizzquiz,  wizzquiz, trackfld_state, init_wizz
 
 GAME( 1987, reaktor,    0,        reaktor,   reaktor,  trackfld_state, empty_init,      ROT90, "Zilec",                                "Reaktor (Track & Field conversion)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, yieartf,    yiear,    yieartf,   yieartf,  trackfld_state, empty_init,      ROT0,  "Konami",                               "Yie Ar Kung-Fu (GX361 conversion)", MACHINE_SUPPORTS_SAVE ) // the conversion looks of bootleg quality, but the code is clearly a very different revision to either original hardware set...
+GAME( 1985, yieartf,    yiear,    yieartf,   yieartf,  trackfld_state, empty_init,      ROT0,  "bootleg",                              "Yie Ar Kung-Fu (bootleg GX361 conversion)", MACHINE_SUPPORTS_SAVE ) // the conversion looks of bootleg quality, but the code is clearly a very different revision to either original hardware set...

@@ -387,7 +387,7 @@ TIMER_CALLBACK_MEMBER(x68k_crtc_device::vblank_irq)
  *    Operation Port bits are cleared automatically when the requested
  *    operation is completed.
  */
-WRITE16_MEMBER(x68k_crtc_device::crtc_w)
+void x68k_crtc_device::crtc_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (offset < 0x24)
 		COMBINE_DATA(&m_reg[offset]);
@@ -472,7 +472,7 @@ WRITE16_MEMBER(x68k_crtc_device::crtc_w)
 //  LOG("%s CRTC: Wrote %04x to CRTC register %i\n",machine().describe_context(), data, offset);
 }
 
-READ16_MEMBER(x68k_crtc_device::crtc_r)
+u16 x68k_crtc_device::crtc_r(offs_t offset)
 {
 	if (offset < 24)
 	{
@@ -503,7 +503,7 @@ READ16_MEMBER(x68k_crtc_device::crtc_r)
 	return 0xffff;
 }
 
-WRITE16_MEMBER(x68k_crtc_device::gvram_w)
+void x68k_crtc_device::gvram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 //  int xloc,yloc,pageoffset;
 	/*
@@ -569,7 +569,7 @@ WRITE16_MEMBER(x68k_crtc_device::gvram_w)
 	}
 }
 
-WRITE16_MEMBER(x68k_crtc_device::tvram_w)
+void x68k_crtc_device::tvram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	u16 text_mask = ~(m_reg[23]) & mem_mask;
 
@@ -597,7 +597,7 @@ WRITE16_MEMBER(x68k_crtc_device::tvram_w)
 	}
 }
 
-READ16_MEMBER(x68k_crtc_device::gvram_r)
+u16 x68k_crtc_device::gvram_r(offs_t offset)
 {
 	u16 ret = 0;
 
@@ -638,7 +638,7 @@ READ16_MEMBER(x68k_crtc_device::gvram_r)
 	return ret;
 }
 
-READ16_MEMBER(x68k_crtc_device::tvram_r)
+u16 x68k_crtc_device::tvram_r(offs_t offset)
 {
-	return m_tvram_read_callback(offset, mem_mask);
+	return m_tvram_read_callback(offset);
 }

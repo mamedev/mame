@@ -61,12 +61,12 @@ public:
 
 	uint16_t m_mux_data;
 
-	DECLARE_READ16_MEMBER(csplayh5_mux_r);
-	DECLARE_WRITE16_MEMBER(csplayh5_mux_w);
-	DECLARE_WRITE16_MEMBER(tmp68301_parallel_port_w);
+	uint16_t csplayh5_mux_r();
+	void csplayh5_mux_w(uint16_t data);
+	void tmp68301_parallel_port_w(uint16_t data);
 
 	#if USE_H8
-	DECLARE_READ16_MEMBER(test_r);
+	uint16_t test_r();
 	DECLARE_WRITE_LINE_MEMBER(ide_irq);
 	#endif
 
@@ -108,7 +108,7 @@ public:
 
 
 
-READ16_MEMBER(csplayh5_state::csplayh5_mux_r)
+uint16_t csplayh5_state::csplayh5_mux_r()
 {
 	for(int i=0;i<5;i++)
 	{
@@ -121,7 +121,7 @@ READ16_MEMBER(csplayh5_state::csplayh5_mux_r)
 	return 0xffff;
 }
 
-WRITE16_MEMBER(csplayh5_state::csplayh5_mux_w)
+void csplayh5_state::csplayh5_mux_w(uint16_t data)
 {
 	m_mux_data = (~data & 0x1f);
 }
@@ -143,7 +143,7 @@ void csplayh5_state::csplayh5_map(address_map &map)
 }
 
 #if USE_H8
-READ16_MEMBER(csplayh5_state::test_r)
+uint16_t csplayh5_state::test_r()
 {
 	return machine().rand();
 }
@@ -342,7 +342,7 @@ WRITE_LINE_MEMBER(csplayh5_state::ide_irq)
 }
 #endif
 
-WRITE16_MEMBER(csplayh5_state::tmp68301_parallel_port_w)
+void csplayh5_state::tmp68301_parallel_port_w(uint16_t data)
 {
 	/*
 	    -x-- ---- used during ROM check, h8 reset assert?

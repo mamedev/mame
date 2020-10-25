@@ -105,7 +105,7 @@ static INPUT_PORTS_START( c900 )
 INPUT_PORTS_END
 
 /* F4 Character Displayer */
-static const gfx_layout c900_charlayout =
+static const gfx_layout charlayout =
 {
 	8, 16,                   /* 8 x 16 characters */
 	256,                    /* 256 characters */
@@ -119,7 +119,7 @@ static const gfx_layout c900_charlayout =
 };
 
 static GFXDECODE_START( gfx_c900 )
-	GFXDECODE_ENTRY( "chargen", 0x0000, c900_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, charlayout, 0, 1 )
 GFXDECODE_END
 
 void c900_state::c900(machine_config &config)
@@ -168,4 +168,4 @@ ROM_START( c900 )
 ROM_END
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY      FULLNAME         FLAGS */
-COMP( 1985, c900, 0,      0,      c900,    c900,  c900_state, empty_init, "Commodore", "Commodore 900", MACHINE_IS_SKELETON )
+COMP( 1985, c900, 0,      0,      c900,    c900,  c900_state, empty_init, "Commodore", "Commodore 900", MACHINE_IS_SKELETON | MACHINE_SUPPORTS_SAVE )

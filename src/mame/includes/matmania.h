@@ -67,10 +67,10 @@ private:
 	std::unique_ptr<bitmap_ind16> m_tmpbitmap;
 	std::unique_ptr<bitmap_ind16> m_tmpbitmap2;
 
-	DECLARE_READ8_MEMBER(maniach_mcu_status_r);
-	DECLARE_WRITE8_MEMBER(matmania_sh_command_w);
-	DECLARE_WRITE8_MEMBER(maniach_sh_command_w);
-	DECLARE_WRITE8_MEMBER(matmania_paletteram_w);
+	uint8_t maniach_mcu_status_r();
+	void matmania_sh_command_w(uint8_t data);
+	void maniach_sh_command_w(uint8_t data);
+	void matmania_paletteram_w(offs_t offset, uint8_t data);
 	void matmania_palette(palette_device &palette) const;
 	uint32_t screen_update_matmania(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_maniach(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -34,10 +34,10 @@ protected:
 
 	// tvcexp_interface overrides
 	virtual uint8_t id_r() override { return 0x02; } // ID_A to GND, ID_B to VCC
-	virtual DECLARE_READ8_MEMBER(read) override;
-	virtual DECLARE_WRITE8_MEMBER(write) override;
-	virtual DECLARE_READ8_MEMBER(io_read) override;
-	virtual DECLARE_WRITE8_MEMBER(io_write) override;
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
+	virtual uint8_t io_read(offs_t offset) override;
+	virtual void io_write(offs_t offset, uint8_t data) override;
 
 private:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );

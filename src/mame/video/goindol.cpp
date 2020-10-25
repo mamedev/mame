@@ -60,13 +60,13 @@ void goindol_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(goindol_state::goindol_fg_videoram_w)
+void goindol_state::goindol_fg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(goindol_state::goindol_bg_videoram_w)
+void goindol_state::goindol_bg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);

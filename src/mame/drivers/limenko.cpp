@@ -102,10 +102,10 @@ private:
 	void fg_videoram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void spriteram_buffer_w(u32 data);
 
-	DECLARE_READ32_MEMBER(dynabomb_speedup_r);
-	DECLARE_READ32_MEMBER(legendoh_speedup_r);
-	DECLARE_READ32_MEMBER(sb2003_speedup_r);
-	DECLARE_READ32_MEMBER(spotty_speedup_r);
+	u32 dynabomb_speedup_r();
+	u32 legendoh_speedup_r();
+	u32 sb2003_speedup_r();
+	u32 spotty_speedup_r();
 
 	void qs1000_p1_w(u8 data);
 	void qs1000_p2_w(u8 data);
@@ -375,9 +375,9 @@ void limenko_state::draw_single_sprite(bitmap_ind16 &dest_bmp,const rectangle &c
 	{ // skip if inner loop doesn't draw anything
 		for (int y = sy; y < ey; y++)
 		{
-			const u8 *source = source_base + y_index * width;
-			u16 *dest = &dest_bmp.pix16(y);
-			u8 *pri = &m_sprites_bitmap_pri.pix8(y);
+			u8 const *const source = source_base + y_index * width;
+			u16 *const dest = &dest_bmp.pix(y);
+			u8 *const pri = &m_sprites_bitmap_pri.pix(y);
 			int x_index = x_index_base;
 			for (int x = sx; x < ex; x++)
 			{
@@ -452,10 +452,10 @@ void limenko_state::copy_sprites(bitmap_ind16 &bitmap, bitmap_ind16 &sprites_bit
 {
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		u16 *source = &sprites_bitmap.pix16(y);
-		u16 *dest = &bitmap.pix16(y);
-		u8 *dest_pri = &priority_bitmap.pix8(y);
-		u8 *source_pri = &m_sprites_bitmap_pri.pix8(y);
+		u16 const *const source = &sprites_bitmap.pix(y);
+		u16 *const dest = &bitmap.pix(y);
+		u8 const *const dest_pri = &priority_bitmap.pix(y);
+		u8 const *const source_pri = &m_sprites_bitmap_pri.pix(y);
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
@@ -1028,7 +1028,7 @@ ROM_END
 
 
 
-READ32_MEMBER(limenko_state::dynabomb_speedup_r)
+u32 limenko_state::dynabomb_speedup_r()
 {
 	if (m_maincpu->pc() == 0xc25b8)
 	{
@@ -1038,7 +1038,7 @@ READ32_MEMBER(limenko_state::dynabomb_speedup_r)
 	return m_mainram[0xe2784/4];
 }
 
-READ32_MEMBER(limenko_state::legendoh_speedup_r)
+u32 limenko_state::legendoh_speedup_r()
 {
 	if (m_maincpu->pc() == 0x23e32)
 	{
@@ -1048,7 +1048,7 @@ READ32_MEMBER(limenko_state::legendoh_speedup_r)
 	return m_mainram[0x32ab0/4];
 }
 
-READ32_MEMBER(limenko_state::sb2003_speedup_r)
+u32 limenko_state::sb2003_speedup_r()
 {
 	if (m_maincpu->pc() == 0x26da4)
 	{
@@ -1058,7 +1058,7 @@ READ32_MEMBER(limenko_state::sb2003_speedup_r)
 	return m_mainram[0x135800/4];
 }
 
-READ32_MEMBER(limenko_state::spotty_speedup_r)
+u32 limenko_state::spotty_speedup_r()
 {
 	if (m_maincpu->pc() == 0x8560)
 	{
@@ -1079,21 +1079,21 @@ void limenko_state::init_common()
 
 void limenko_state::init_dynabomb()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xe2784, 0xe2787, read32_delegate(*this, FUNC(limenko_state::dynabomb_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xe2784, 0xe2787, read32smo_delegate(*this, FUNC(limenko_state::dynabomb_speedup_r)));
 
 	init_common();
 }
 
 void limenko_state::init_legendoh()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x32ab0, 0x32ab3, read32_delegate(*this, FUNC(limenko_state::legendoh_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x32ab0, 0x32ab3, read32smo_delegate(*this, FUNC(limenko_state::legendoh_speedup_r)));
 
 	init_common();
 }
 
 void limenko_state::init_sb2003()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x135800, 0x135803, read32_delegate(*this, FUNC(limenko_state::sb2003_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x135800, 0x135803, read32smo_delegate(*this, FUNC(limenko_state::sb2003_speedup_r)));
 
 	init_common();
 }
@@ -1113,7 +1113,7 @@ void limenko_state::init_spotty()
 		dst[x+2] = (src[x+1]&0x0f) >> 0;
 	}
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6626c, 0x6626f, read32_delegate(*this, FUNC(limenko_state::spotty_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6626c, 0x6626f, read32smo_delegate(*this, FUNC(limenko_state::spotty_speedup_r)));
 
 	m_spriteram_bit = 1;
 

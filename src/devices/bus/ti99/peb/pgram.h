@@ -31,8 +31,8 @@ class pgram_device : public device_t, public device_ti99_peribox_card_interface
 public:
 	pgram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	void write(offs_t offset, uint8_t data) override;
-	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_READ8Z_MEMBER(crureadz) override { };
+	void readz(offs_t offset, uint8_t *value) override;
+	void crureadz(offs_t offset, uint8_t *value) override { };
 	void cruwrite(offs_t offset, uint8_t data) override;
 	DECLARE_INPUT_CHANGED_MEMBER( sw1_changed );
 	DECLARE_INPUT_CHANGED_MEMBER( sw2_changed );
@@ -63,8 +63,8 @@ private:
 	required_device<ttl74161_device> m_count3;
 
 	// Methods
-	DECLARE_READ8Z_MEMBER(gram_read);
-	DECLARE_READ8Z_MEMBER(dsr_ram_read);
+	void gram_read(offs_t offset, uint8_t *value);
+	void dsr_ram_read(offs_t offset, uint8_t *value);
 
 	void gram_write(offs_t offset, uint8_t data);
 	void dsr_ram_write(offs_t offset, uint8_t data);

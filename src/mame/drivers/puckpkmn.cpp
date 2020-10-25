@@ -259,12 +259,12 @@ void md_boot_state::jzth_map(address_map &map)
 	map(0x710000, 0x710001).rw(FUNC(md_boot_state::bl_710000_r), FUNC(md_boot_state::bl_710000_w)); // protection, will erase the VDP address causing writes to 0 unless this returns 0xe
 }
 
-READ16_MEMBER(md_boot_state::puckpkmna_70001c_r)
+uint16_t md_boot_state::puckpkmna_70001c_r()
 {
 	return 0x0e;
 }
 
-READ16_MEMBER(md_boot_state::puckpkmna_4b2476_r)
+uint16_t md_boot_state::puckpkmna_4b2476_r()
 {
 	if (!strcmp(machine().system().name, "puckpkmnb")) return 0x3100;
 

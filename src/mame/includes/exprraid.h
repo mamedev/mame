@@ -63,17 +63,17 @@ private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	DECLARE_WRITE8_MEMBER(exprraid_int_clear_w);
-	DECLARE_READ8_MEMBER(exprraid_prot_status_r);
-	DECLARE_READ8_MEMBER(exprraid_prot_data_r);
-	DECLARE_WRITE8_MEMBER(exprraid_prot_data_w);
-	DECLARE_READ8_MEMBER(vblank_r);
-	DECLARE_WRITE8_MEMBER(exprraid_videoram_w);
-	DECLARE_WRITE8_MEMBER(exprraid_colorram_w);
-	DECLARE_WRITE8_MEMBER(exprraid_flipscreen_w);
-	DECLARE_WRITE8_MEMBER(exprraid_bgselect_w);
-	DECLARE_WRITE8_MEMBER(exprraid_scrollx_w);
-	DECLARE_WRITE8_MEMBER(exprraid_scrolly_w);
+	void exprraid_int_clear_w(uint8_t data);
+	uint8_t exprraid_prot_status_r();
+	uint8_t exprraid_prot_data_r();
+	void exprraid_prot_data_w(uint8_t data);
+	uint8_t vblank_r();
+	void exprraid_videoram_w(offs_t offset, uint8_t data);
+	void exprraid_colorram_w(offs_t offset, uint8_t data);
+	void exprraid_flipscreen_w(uint8_t data);
+	void exprraid_bgselect_w(offs_t offset, uint8_t data);
+	void exprraid_scrollx_w(offs_t offset, uint8_t data);
+	void exprraid_scrolly_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);

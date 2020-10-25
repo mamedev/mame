@@ -35,56 +35,56 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank);
 
-	DECLARE_WRITE16_MEMBER(spg110_201c_w);
-	DECLARE_WRITE16_MEMBER(spg110_2020_w);
+	void spg110_201c_w(uint16_t data);
+	void spg110_2020_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_WRITE16_MEMBER(spg110_2028_w);
-	DECLARE_WRITE16_MEMBER(spg110_2029_w);
+	void spg110_2028_w(uint16_t data);
+	void spg110_2029_w(uint16_t data);
 
-	DECLARE_READ16_MEMBER(spg110_2028_r);
-	DECLARE_READ16_MEMBER(spg110_2029_r);
+	uint16_t spg110_2028_r();
+	uint16_t spg110_2029_r();
 
-	DECLARE_WRITE16_MEMBER(spg110_2031_w);
-	DECLARE_WRITE16_MEMBER(spg110_2032_w);
-	DECLARE_WRITE16_MEMBER(spg110_2033_w);
-	DECLARE_WRITE16_MEMBER(spg110_2034_w);
-	DECLARE_WRITE16_MEMBER(spg110_2035_w);
-	DECLARE_WRITE16_MEMBER(spg110_2036_w);
-	DECLARE_WRITE16_MEMBER(spg110_2037_w);
-	DECLARE_WRITE16_MEMBER(spg110_2039_w);
+	void spg110_2031_w(uint16_t data);
+	void spg110_2032_w(uint16_t data);
+	void spg110_2033_w(uint16_t data);
+	void spg110_2034_w(uint16_t data);
+	void spg110_2035_w(uint16_t data);
+	void spg110_2036_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void spg110_2037_w(uint16_t data);
+	void spg110_2039_w(uint16_t data);
 
-	DECLARE_WRITE16_MEMBER(spg110_203c_w);
-	DECLARE_WRITE16_MEMBER(spg110_203d_w);
+	void spg110_203c_w(uint16_t data);
+	void spg110_203d_w(uint16_t data);
 
-	DECLARE_WRITE16_MEMBER(spg110_2042_w);
+	void spg110_2042_w(uint16_t data);
 
-	DECLARE_WRITE16_MEMBER(spg110_2045_w);
+	void spg110_2045_w(uint16_t data);
 
-	DECLARE_WRITE16_MEMBER(spg110_205x_w);
+	void spg110_205x_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 
-	DECLARE_READ16_MEMBER(spg110_2037_r);
-	DECLARE_READ16_MEMBER(spg110_2042_r);
+	uint16_t spg110_2037_r();
+	uint16_t spg110_2042_r();
 
-	DECLARE_WRITE16_MEMBER(dma_dst_w);
-	DECLARE_WRITE16_MEMBER(dma_unk_2061_w);
-	DECLARE_WRITE16_MEMBER(dma_len_trigger_w);
-	DECLARE_WRITE16_MEMBER(spg110_2063_w);
-	DECLARE_WRITE16_MEMBER(dma_dst_step_w);
-	DECLARE_WRITE16_MEMBER(dma_src_w);
-	DECLARE_WRITE16_MEMBER(dma_unk_2067_w);
-	DECLARE_WRITE16_MEMBER(dma_src_step_w);
+	void dma_dst_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void dma_unk_2061_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void dma_len_trigger_w(uint16_t data);
+	void spg110_2063_w(uint16_t data);
+	void dma_dst_step_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void dma_src_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void dma_unk_2067_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void dma_src_step_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER(dma_len_status_r);
-	DECLARE_READ16_MEMBER(spg110_2063_r);
+	uint16_t dma_len_status_r();
+	uint16_t spg110_2063_r();
 
-	DECLARE_READ16_MEMBER(dma_manual_r);
-	DECLARE_WRITE16_MEMBER(dma_manual_w);
+	uint16_t dma_manual_r();
+	void dma_manual_w(uint16_t data);
 
-	DECLARE_READ16_MEMBER(tmap0_regs_r);
-	DECLARE_READ16_MEMBER(tmap1_regs_r);
-	DECLARE_WRITE16_MEMBER(tmap0_regs_w);
-	DECLARE_WRITE16_MEMBER(tmap1_regs_w);
+	uint16_t tmap0_regs_r(offs_t offset);
+	uint16_t tmap1_regs_r(offs_t offset);
+	void tmap0_regs_w(offs_t offset, uint16_t data);
+	void tmap1_regs_w(offs_t offset, uint16_t data);
 
 	auto write_video_irq_callback() { return m_video_irq_cb.bind(); };
 
@@ -131,7 +131,7 @@ private:
 	required_shared_ptr<uint16_t> m_sprattr1;
 	required_shared_ptr<uint16_t> m_sprattr2;
 
-	DECLARE_WRITE16_MEMBER(palette_w);
+	void palette_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	uint16_t tmap0_regs[0x6];
 	uint16_t tmap1_regs[0x6];

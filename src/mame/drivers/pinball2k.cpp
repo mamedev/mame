@@ -83,20 +83,20 @@ private:
 
 	uint32_t m_cx5510_regs[256/4];
 
-	DECLARE_READ32_MEMBER(disp_ctrl_r);
-	DECLARE_WRITE32_MEMBER(disp_ctrl_w);
-	DECLARE_READ32_MEMBER(memory_ctrl_r);
-	DECLARE_WRITE32_MEMBER(memory_ctrl_w);
-	DECLARE_READ32_MEMBER(biu_ctrl_r);
-	DECLARE_WRITE32_MEMBER(biu_ctrl_w);
-	DECLARE_READ32_MEMBER(parallel_port_r);
-	DECLARE_WRITE32_MEMBER(parallel_port_w);
-	DECLARE_READ8_MEMBER(io20_r);
-	DECLARE_WRITE8_MEMBER(io20_w);
-	DECLARE_READ32_MEMBER(port400_r);
-	DECLARE_WRITE32_MEMBER(port400_w);
-	DECLARE_READ32_MEMBER(port800_r);
-	DECLARE_WRITE32_MEMBER(port800_w);
+	uint32_t disp_ctrl_r(offs_t offset);
+	void disp_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t memory_ctrl_r(offs_t offset);
+	void memory_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t biu_ctrl_r(offs_t offset);
+	void biu_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t parallel_port_r();
+	void parallel_port_w(uint32_t data);
+	uint8_t io20_r(offs_t offset);
+	void io20_w(offs_t offset, uint8_t data);
+	uint32_t port400_r();
+	void port400_w(uint32_t data);
+	uint32_t port800_r();
+	void port800_w(uint32_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -165,19 +165,17 @@ void pinball2k_state::video_start()
 
 void pinball2k_state::draw_char(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx, int ch, int att, int x, int y)
 {
-	int i,j;
-	const uint8_t *dp;
 	int index = 0;
-	const pen_t *pens = m_palette->pens();
+	pen_t const *const pens = m_palette->pens();
 
-	dp = gfx->get_data(ch);
+	uint8_t const *const dp = gfx->get_data(ch);
 
-	for (j=y; j < y+8; j++)
+	for (int j=y; j < y+8; j++)
 	{
-		uint32_t *p = &bitmap.pix32(j);
-		for (i=x; i < x+8; i++)
+		uint32_t *const p = &bitmap.pix(j);
+		for (int i=x; i < x+8; i++)
 		{
-			uint8_t pen = dp[index++];
+			uint8_t const pen = dp[index++];
 			if (pen)
 				p[i] = pens[gfx->colorbase() + (att & 0xf)];
 			else
@@ -191,7 +189,6 @@ void pinball2k_state::draw_char(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 
 void pinball2k_state::draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int i, j;
 	int width, height;
 	int line_delta = (m_disp_ctrl_reg[DC_LINE_DELTA] & 0x3ff) * 4;
 
@@ -218,14 +215,14 @@ void pinball2k_state::draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &cl
 
 	if (m_disp_ctrl_reg[DC_OUTPUT_CFG] & 0x1)        // 8-bit mode
 	{
-		uint8_t *framebuf = (uint8_t*)&m_vram[m_disp_ctrl_reg[DC_FB_ST_OFFSET]/4];
-		uint8_t *pal = m_pal;
+		uint8_t const *const framebuf = (uint8_t*)&m_vram[m_disp_ctrl_reg[DC_FB_ST_OFFSET]/4];
+		uint8_t const *const pal = m_pal;
 
-		for (j=0; j < m_frame_height; j++)
+		for (int j=0; j < m_frame_height; j++)
 		{
-			uint32_t *p = &bitmap.pix32(j);
-			uint8_t *si = &framebuf[j * line_delta];
-			for (i=0; i < m_frame_width; i++)
+			uint32_t *const p = &bitmap.pix(j);
+			uint8_t const *si = &framebuf[j * line_delta];
+			for (int i=0; i < m_frame_width; i++)
 			{
 				int c = *si++;
 				int r = pal[(c*3)+0] << 2;
@@ -238,16 +235,16 @@ void pinball2k_state::draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &cl
 	}
 	else            // 16-bit
 	{
-		uint16_t *framebuf = (uint16_t*)&m_vram[m_disp_ctrl_reg[DC_FB_ST_OFFSET]/4];
+		uint16_t const *const framebuf = (uint16_t*)&m_vram[m_disp_ctrl_reg[DC_FB_ST_OFFSET]/4];
 
 		// RGB 5-6-5 mode
 		if ((m_disp_ctrl_reg[DC_OUTPUT_CFG] & 0x2) == 0)
 		{
-			for (j=0; j < m_frame_height; j++)
+			for (int j=0; j < m_frame_height; j++)
 			{
-				uint32_t *p = &bitmap.pix32(j);
-				uint16_t *si = &framebuf[j * (line_delta/2)];
-				for (i=0; i < m_frame_width; i++)
+				uint32_t *const p = &bitmap.pix(j);
+				uint16_t const *si = &framebuf[j * (line_delta/2)];
+				for (int i=0; i < m_frame_width; i++)
 				{
 					uint16_t c = *si++;
 					int r = ((c >> 11) & 0x1f) << 3;
@@ -261,11 +258,11 @@ void pinball2k_state::draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &cl
 		// RGB 5-5-5 mode
 		else
 		{
-			for (j=0; j < m_frame_height; j++)
+			for (int j=0; j < m_frame_height; j++)
 			{
-				uint32_t *p = &bitmap.pix32(j);
-				uint16_t *si = &framebuf[j * (line_delta/2)];
-				for (i=0; i < m_frame_width; i++)
+				uint32_t *const p = &bitmap.pix(j);
+				uint16_t const *si = &framebuf[j * (line_delta/2)];
+				for (int i=0; i < m_frame_width; i++)
 				{
 					uint16_t c = *si++;
 					int r = ((c >> 10) & 0x1f) << 3;
@@ -281,14 +278,13 @@ void pinball2k_state::draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &cl
 
 void pinball2k_state::draw_cga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int i, j;
 	gfx_element *gfx = m_gfxdecode->gfx(0);
-	uint32_t *cga = m_cga_ram;
+	uint32_t const *const cga = m_cga_ram;
 	int index = 0;
 
-	for (j=0; j < 25; j++)
+	for (int j=0; j < 25; j++)
 	{
-		for (i=0; i < 80; i+=2)
+		for (int i=0; i < 80; i+=2)
 		{
 			int att0 = (cga[index] >> 8) & 0xff;
 			int ch0 = (cga[index] >> 0) & 0xff;
@@ -315,7 +311,7 @@ uint32_t pinball2k_state::screen_update_mediagx(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-READ32_MEMBER(pinball2k_state::disp_ctrl_r)
+uint32_t pinball2k_state::disp_ctrl_r(offs_t offset)
 {
 	uint32_t r = m_disp_ctrl_reg[offset];
 
@@ -332,19 +328,19 @@ READ32_MEMBER(pinball2k_state::disp_ctrl_r)
 	return r;
 }
 
-WRITE32_MEMBER(pinball2k_state::disp_ctrl_w)
+void pinball2k_state::disp_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  printf("disp_ctrl_w %08X, %08X, %08X\n", data, offset*4, mem_mask);
 	COMBINE_DATA(m_disp_ctrl_reg + offset);
 }
 
 
-READ32_MEMBER(pinball2k_state::memory_ctrl_r)
+uint32_t pinball2k_state::memory_ctrl_r(offs_t offset)
 {
 	return m_memory_ctrl_reg[offset];
 }
 
-WRITE32_MEMBER(pinball2k_state::memory_ctrl_w)
+void pinball2k_state::memory_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  printf("memory_ctrl_w %08X, %08X, %08X\n", data, offset*4, mem_mask);
 	if (offset == 0x20/4)
@@ -378,7 +374,7 @@ WRITE32_MEMBER(pinball2k_state::memory_ctrl_w)
 
 
 
-READ32_MEMBER(pinball2k_state::biu_ctrl_r)
+uint32_t pinball2k_state::biu_ctrl_r(offs_t offset)
 {
 	if (offset == 0)
 	{
@@ -387,7 +383,7 @@ READ32_MEMBER(pinball2k_state::biu_ctrl_r)
 	return m_biu_ctrl_reg[offset];
 }
 
-WRITE32_MEMBER(pinball2k_state::biu_ctrl_w)
+void pinball2k_state::biu_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//osd_printf_debug("biu_ctrl_w %08X, %08X, %08X\n", data, offset, mem_mask);
 	COMBINE_DATA(m_biu_ctrl_reg + offset);
@@ -399,12 +395,12 @@ WRITE32_MEMBER(pinball2k_state::biu_ctrl_w)
 }
 
 #ifdef UNUSED_FUNCTION
-WRITE32_MEMBER(pinball2k_state::bios_ram_w)
+void pinball2k_state::bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 }
 #endif
 
-READ8_MEMBER(pinball2k_state::io20_r)
+uint8_t pinball2k_state::io20_r(offs_t offset)
 {
 	uint8_t r = 0;
 
@@ -419,7 +415,7 @@ READ8_MEMBER(pinball2k_state::io20_r)
 	return r;
 }
 
-WRITE8_MEMBER(pinball2k_state::io20_w)
+void pinball2k_state::io20_w(offs_t offset, uint8_t data)
 {
 	// 0x22, 0x23, Cyrix configuration registers
 	if (offset == 0x00)
@@ -432,32 +428,32 @@ WRITE8_MEMBER(pinball2k_state::io20_w)
 	}
 }
 
-READ32_MEMBER(pinball2k_state::port400_r)
+uint32_t pinball2k_state::port400_r()
 {
 	return 0x8000;
 }
 
-WRITE32_MEMBER(pinball2k_state::port400_w)
+void pinball2k_state::port400_w(uint32_t data)
 {
 }
 
-READ32_MEMBER(pinball2k_state::port800_r)
+uint32_t pinball2k_state::port800_r()
 {
 	return 0x80;
 }
 
-WRITE32_MEMBER(pinball2k_state::port800_w)
+void pinball2k_state::port800_w(uint32_t data)
 {
 }
 
-READ32_MEMBER(pinball2k_state::parallel_port_r)
+uint32_t pinball2k_state::parallel_port_r()
 {
 	uint32_t r = 0;
 
 	return r;
 }
 
-WRITE32_MEMBER(pinball2k_state::parallel_port_w)
+void pinball2k_state::parallel_port_w(uint32_t data)
 {
 }
 

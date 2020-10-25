@@ -105,7 +105,7 @@ Stephh's notes (based on the game Z80 code and some tests) :
 #include "pbactiont.lh"
 
 
-WRITE8_MEMBER(pbaction_state::pbaction_sh_command_w)
+void pbaction_state::pbaction_sh_command_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_soundcommand_timer->adjust(attotime::zero, 0);
@@ -117,7 +117,7 @@ TIMER_CALLBACK_MEMBER(pbaction_state::sound_trigger)
 	m_ctc->trg0(1);
 }
 
-WRITE8_MEMBER(pbaction_state::nmi_mask_w)
+void pbaction_state::nmi_mask_w(uint8_t data)
 {
 	m_nmi_mask = data & 1;
 	if (!m_nmi_mask)
@@ -150,14 +150,14 @@ void pbaction_state::decrypted_opcodes_map(address_map &map)
 }
 
 
-READ8_MEMBER(pbaction_state::sound_data_r)
+uint8_t pbaction_state::sound_data_r()
 {
 	if (!machine().side_effects_disabled())
 		m_audiocpu->set_input_line(0, CLEAR_LINE);
 	return m_soundlatch->read();
 }
 
-WRITE8_MEMBER(pbaction_state::sound_irq_ack_w)
+void pbaction_state::sound_irq_ack_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(0, CLEAR_LINE);
 	machine().scheduler().synchronize();
@@ -203,7 +203,7 @@ WRITE_LINE_MEMBER(pbaction_tecfri_state::sub8001_w)
 	}
 }
 
-WRITE8_MEMBER(pbaction_tecfri_state::sub8008_w)
+void pbaction_tecfri_state::sub8008_w(uint8_t data)
 {
 	if (data != 0x00)
 	{
@@ -233,23 +233,23 @@ WRITE8_MEMBER(pbaction_tecfri_state::sub8008_w)
 	}
 }
 
-WRITE8_MEMBER(pbaction_tecfri_state::subtomain_w)
+void pbaction_tecfri_state::subtomain_w(uint8_t data)
 {
 	//m_subtomainlatch->write(data); // where does this go if it can't go to maincpu?
 }
 
-READ8_MEMBER(pbaction_tecfri_state::maintosub_r)
+uint8_t pbaction_tecfri_state::maintosub_r()
 {
 	return m_maintosublatch->read();
 }
 
-READ8_MEMBER(pbaction_tecfri_state::subcpu_r)
+uint8_t pbaction_tecfri_state::subcpu_r()
 {
 	return 0x00; // other values stop the flippers from working? are there different inputs from the custom cabinet in here somehow?
 //  return m_subtomainlatch->read();
 }
 
-WRITE8_MEMBER(pbaction_tecfri_state::subcpu_w)
+void pbaction_tecfri_state::subcpu_w(uint8_t data)
 {
 	m_maintosublatch->write(data);
 	m_subcommand_timer->adjust(attotime::zero, 0);
@@ -682,7 +682,7 @@ ROM_START( pbactiont )
 	ROM_LOAD( "b-f7.bin",     0x04000, 0x2000, CRC(af6e9817) SHA1(56f47d25761b3850c49a3a81b5ea35f12bd77b14) )
 ROM_END
 
-READ8_MEMBER(pbaction_state::pbaction2_prot_kludge_r)
+uint8_t pbaction_state::pbaction2_prot_kludge_r()
 {
 	/* on startup, the game expect this location to NOT act as RAM */
 	if (m_maincpu->pc() == 0xab80)
@@ -700,7 +700,7 @@ void pbaction_state::init_pbaction2()
 		rom[i] = bitswap<8>(rom[i], 7,6,5,4,1,2,3,0);
 
 	// install a protection (?) workaround
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xc000, read8_delegate(*this, FUNC(pbaction_state::pbaction2_prot_kludge_r)) );
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xc000, read8smo_delegate(*this, FUNC(pbaction_state::pbaction2_prot_kludge_r)) );
 }
 
 

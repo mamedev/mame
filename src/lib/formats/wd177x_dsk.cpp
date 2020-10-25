@@ -10,8 +10,6 @@
 
 #include "formats/wd177x_dsk.h"
 
-#include "emucore.h" // emu_fatalerror
-
 
 wd177x_format::wd177x_format(const format *_formats)
 {
@@ -228,8 +226,10 @@ bool wd177x_format::load(io_generic *io, uint32_t form_factor, floppy_image *ima
 
 			int total_size = 200000000/tf.cell_size;
 			int remaining_size = total_size - current_size;
-			if(remaining_size < 0)
-				throw emu_fatalerror("wd177x_format: Incorrect track layout, max_size=%d, current_size=%d", total_size, current_size);
+			if(remaining_size < 0) {
+				osd_printf_error("wd177x_format: Incorrect track layout, max_size=%d, current_size=%d\n", total_size, current_size);
+				return false;
+			}
 
 			// Fixup the end gap
 			desc[end_gap_index].p2 = remaining_size / 16;
@@ -460,7 +460,12 @@ void wd177x_format::check_compatibility(floppy_image *image, std::vector<int> &c
 						}
 						ns++;
 					}
-				if(ns != tf.sector_count)
+
+				if(ns > tf.sector_count)
+					goto fail;
+
+				// Be permissive of some missing sectors in later tracks
+				if(ns < tf.sector_count && track < 2)
 					goto fail;
 			}
 		}
