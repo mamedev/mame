@@ -2460,7 +2460,7 @@ void namcos22_state::init_tables()
 
 	// init pointrom
 	m_pointrom_size = memregion("pointrom")->bytes()/3;
-	m_pointrom = auto_alloc_array(machine(), s32, m_pointrom_size);
+	m_pointrom = std::make_unique<s32[]>(m_pointrom_size);
 	u8* pointrom_low = memregion("pointrom")->base();
 	u8* pointrom_mid = pointrom_low + m_pointrom_size;
 	u8* pointrom_high = pointrom_mid + m_pointrom_size;

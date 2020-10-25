@@ -466,7 +466,7 @@ protected:
 	unsigned m_LitSurfaceCount;
 	unsigned m_LitSurfaceIndex;
 	int m_pointrom_size;
-	s32 *m_pointrom;
+	std::unique_ptr<s32[]> m_pointrom;
 	std::unique_ptr<u8[]> m_dirtypal;
 	std::unique_ptr<bitmap_ind16> m_mix_bitmap;
 	tilemap_t *m_bgtilemap;
