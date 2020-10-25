@@ -24,7 +24,7 @@ public:
 		m_screen(*this, "screen"),
 		m_spirom(*this, "spi")
 	{ }
-	
+
 	void generalplus_gpl_unknown(machine_config &config);
 
 private:

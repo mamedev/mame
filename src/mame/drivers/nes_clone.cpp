@@ -534,8 +534,8 @@ void nes_clone_afbm7800_state::update_banks()
 		/* not correct? desert falcon
 		if (m_extraregs[0] & 0x80)
 		{
-			bankmask = 0x0f;
-			outerchrbank = (m_extraregs[0] & 0x38) << 1;
+		    bankmask = 0x0f;
+		    outerchrbank = (m_extraregs[0] & 0x38) << 1;
 		}
 		else
 		*/

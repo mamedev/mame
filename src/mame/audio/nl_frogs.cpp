@@ -52,14 +52,14 @@ NETLIST_START(frogs)
 	PARAM(Solver.DYNAMIC_TS, 1)
 	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 4e-6)
 
-    TTL_INPUT(I_SOUND_0, 0)
-    TTL_INPUT(I_SOUND_1, 0)
-    TTL_INPUT(I_SOUND_2, 0)
-    TTL_INPUT(I_SOUND_3, 0)
-    TTL_INPUT(I_SOUND_4, 0)
-    TTL_INPUT(I_SOUND_5, 0)
-    TTL_INPUT(I_SOUND_6, 0)
-    TTL_INPUT(I_SOUND_7, 0)
+	TTL_INPUT(I_SOUND_0, 0)
+	TTL_INPUT(I_SOUND_1, 0)
+	TTL_INPUT(I_SOUND_2, 0)
+	TTL_INPUT(I_SOUND_3, 0)
+	TTL_INPUT(I_SOUND_4, 0)
+	TTL_INPUT(I_SOUND_5, 0)
+	TTL_INPUT(I_SOUND_6, 0)
+	TTL_INPUT(I_SOUND_7, 0)
 
 	NET_C(GND, I_SOUND_0.GND, I_SOUND_1.GND, I_SOUND_2.GND, I_SOUND_3.GND, I_SOUND_4.GND, I_SOUND_5.GND, I_SOUND_6.GND, I_SOUND_7.GND)
 	NET_C(I_V5, I_SOUND_0.VCC, I_SOUND_1.VCC, I_SOUND_2.VCC, I_SOUND_3.VCC, I_SOUND_4.VCC, I_SOUND_5.VCC, I_SOUND_6.VCC, I_SOUND_7.VCC)
@@ -75,95 +75,95 @@ NETLIST_START(frogs)
 	ANALOG_INPUT(I_V12, 12)
 	ANALOG_INPUT(I_VM12, -12)
 
-	RES(R1, RES_K(3.3))		// SPLASH
-	RES(R2, RES_K(3.3))		// SPLASH
-	RES(R3, RES_K(3.3))		// CAPTURE
-	RES(R4, RES_K(3.3))		// CAPTURE
-	RES(R5, RES_K(3.3))		// TONGUE
-	RES(R6, RES_K(3.3))		// TONGUE
-	RES(R7, RES_K(3.3))		// HOP
-	RES(R8, RES_K(3.3))		// HOP
-	RES(R9, RES_K(3.3))		// JUMP
-	RES(R10, RES_K(3.3))	// JUMP
-	RES(R11, RES_K(3.3))	// FLY
-	RES(R12, RES_K(10))		// FLY
-	RES(R13, RES_K(10))		// SPLASH
-	RES(R14, RES_K(4.7))	// SPLASH
-	RES(R15, RES_K(100))	// SPLASH
-	RES(R16, RES_K(4.7))	// CAPTURE
-	RES(R17, RES_K(330))	// CAPTURE
-	RES(R18, RES_K(4.7))	// TONGUE
-	RES(R19, RES_K(100))	// TONGUE
-	RES(R20, RES_K(4.7))	// HOP
-	RES(R21, RES_K(3.3))	// HOP
-	RES(R22, RES_K(4.7))	// JUMP
-	RES(R23, RES_K(150))	// JUMP
-	RES(R24, RES_K(4.7))	// FLY
-	RES(R25, RES_K(22))		// SPLASH
-	RES(R26, 51)			// HOP
-	RES(R27, RES_K(10))		// FLY
-	RES(R28, RES_K(22))		// TONGUE
-	RES(R29, RES_K(100))	// TONGUE
-	RES(R30, RES_K(470))	// HOP
-	RES(R31, 220)			// HOP
-	RES(R32, RES_K(33))		// HOP (mislabelled R22)
-	RES(R33, 330)			// JUMP
-	RES(R34, 820)			// JUMP
-	RES(R35, RES_K(100))	// FLY
-	RES(R36, RES_K(2.2))	// FLY
-	RES(R37, RES_K(2.2))	// SPLASH
-	RES(R38, RES_K(10))		// SPLASH
-	RES(R39, RES_K(10))		// SPLASH
-	RES(R40, RES_K(68))		// CAPTURE
-	RES(R41, RES_K(4.7))	// CAPTURE
-	RES(R42, RES_K(1))		// TONGUE
-	RES(R43, RES_K(82))		// HOP
-	RES(R44, RES_K(3.3))	// FLY
-	RES(R45, RES_K(100))	// FLY
-	RES(R46, RES_K(3.3))	// FLY
-	POT(R47, RES_K(50))		// SPLASH
-	RES(R48, RES_K(47))		// CAPTURE
-	RES(R49, RES_K(3.3))	// CAPTURE
-	RES(R50, RES_K(100))	// CAPTURE
-	RES(R51, RES_K(39))		// TONGUE
-	RES(R52, 51)			// HOP
+	RES(R1, RES_K(3.3))     // SPLASH
+	RES(R2, RES_K(3.3))     // SPLASH
+	RES(R3, RES_K(3.3))     // CAPTURE
+	RES(R4, RES_K(3.3))     // CAPTURE
+	RES(R5, RES_K(3.3))     // TONGUE
+	RES(R6, RES_K(3.3))     // TONGUE
+	RES(R7, RES_K(3.3))     // HOP
+	RES(R8, RES_K(3.3))     // HOP
+	RES(R9, RES_K(3.3))     // JUMP
+	RES(R10, RES_K(3.3))    // JUMP
+	RES(R11, RES_K(3.3))    // FLY
+	RES(R12, RES_K(10))     // FLY
+	RES(R13, RES_K(10))     // SPLASH
+	RES(R14, RES_K(4.7))    // SPLASH
+	RES(R15, RES_K(100))    // SPLASH
+	RES(R16, RES_K(4.7))    // CAPTURE
+	RES(R17, RES_K(330))    // CAPTURE
+	RES(R18, RES_K(4.7))    // TONGUE
+	RES(R19, RES_K(100))    // TONGUE
+	RES(R20, RES_K(4.7))    // HOP
+	RES(R21, RES_K(3.3))    // HOP
+	RES(R22, RES_K(4.7))    // JUMP
+	RES(R23, RES_K(150))    // JUMP
+	RES(R24, RES_K(4.7))    // FLY
+	RES(R25, RES_K(22))     // SPLASH
+	RES(R26, 51)            // HOP
+	RES(R27, RES_K(10))     // FLY
+	RES(R28, RES_K(22))     // TONGUE
+	RES(R29, RES_K(100))    // TONGUE
+	RES(R30, RES_K(470))    // HOP
+	RES(R31, 220)           // HOP
+	RES(R32, RES_K(33))     // HOP (mislabelled R22)
+	RES(R33, 330)           // JUMP
+	RES(R34, 820)           // JUMP
+	RES(R35, RES_K(100))    // FLY
+	RES(R36, RES_K(2.2))    // FLY
+	RES(R37, RES_K(2.2))    // SPLASH
+	RES(R38, RES_K(10))     // SPLASH
+	RES(R39, RES_K(10))     // SPLASH
+	RES(R40, RES_K(68))     // CAPTURE
+	RES(R41, RES_K(4.7))    // CAPTURE
+	RES(R42, RES_K(1))      // TONGUE
+	RES(R43, RES_K(82))     // HOP
+	RES(R44, RES_K(3.3))    // FLY
+	RES(R45, RES_K(100))    // FLY
+	RES(R46, RES_K(3.3))    // FLY
+	POT(R47, RES_K(50))     // SPLASH
+	RES(R48, RES_K(47))     // CAPTURE
+	RES(R49, RES_K(3.3))    // CAPTURE
+	RES(R50, RES_K(100))    // CAPTURE
+	RES(R51, RES_K(39))     // TONGUE
+	RES(R52, 51)            // HOP
 	RES(R53, RES_K(62))
-	RES(R54, 470)			// JUMP
-	RES(R55, RES_K(22))		// JUMP
-	RES(R56, RES_M(2.2))	// JUMP
+	RES(R54, 470)           // JUMP
+	RES(R55, RES_K(22))     // JUMP
+	RES(R56, RES_M(2.2))    // JUMP
 	RES(R57, RES_K(22))
 	RES(R58, RES_K(22))
-	RES(R59, RES_K(3.3))	// FLY
-//	RES(R60, RES_K(10))		-- final amp
-	RES(R61, RES_K(100))	// SPLASH
-	RES(R62, RES_K(47))		// SPLASH
-	RES(R63, RES_K(33))		// SPLASH
-	RES(R64, RES_K(820))	// CAPTURE
-	RES(R65, RES_K(150))	// CAPTURE
-	RES(R66, 51)			// CAPTURE
-	RES(R67, 51)			// CAPTURE
-	RES(R68, RES_K(1))		// JUMP
-	RES(R69, RES_K(82))		// JUMP
-	RES(R70, 51)			// JUMP
-	RES(R71, RES_K(4.7))	// JUMP
-	RES(R72, RES_K(27))		// FLY
-	RES(R73, RES_K(10))		// FLY
-	RES(R74, RES_K(1))		// FLY
-	RES(R75, RES_K(10))		// JUMP
-	RES(R76, RES_K(10))		// JUMP
-	RES(R77, 560)			// JUMP
-	RES(R78, RES_K(10))		// JUMP
-	RES(R79, RES_K(10))		// JUMP
-	RES(R80, RES_K(39))		// FLY
-	RES(R81, RES_K(100))	// FLY
-	RES(R82, RES_K(10))		// FLY
-	RES(R83, RES_K(100))	// JUMP
-	RES(R84, RES_K(1))		// JUMP
-	RES(R85, RES_K(10))		// JUMP
-	RES(R86, RES_K(1))		// FLY
-	RES(R87, RES_K(100))	// FLY
-	RES(R88, RES_K(82))		// FLY
-	RES(R90, RES_K(56))		// MIXER
+	RES(R59, RES_K(3.3))    // FLY
+//  RES(R60, RES_K(10))     -- final amp
+	RES(R61, RES_K(100))    // SPLASH
+	RES(R62, RES_K(47))     // SPLASH
+	RES(R63, RES_K(33))     // SPLASH
+	RES(R64, RES_K(820))    // CAPTURE
+	RES(R65, RES_K(150))    // CAPTURE
+	RES(R66, 51)            // CAPTURE
+	RES(R67, 51)            // CAPTURE
+	RES(R68, RES_K(1))      // JUMP
+	RES(R69, RES_K(82))     // JUMP
+	RES(R70, 51)            // JUMP
+	RES(R71, RES_K(4.7))    // JUMP
+	RES(R72, RES_K(27))     // FLY
+	RES(R73, RES_K(10))     // FLY
+	RES(R74, RES_K(1))      // FLY
+	RES(R75, RES_K(10))     // JUMP
+	RES(R76, RES_K(10))     // JUMP
+	RES(R77, 560)           // JUMP
+	RES(R78, RES_K(10))     // JUMP
+	RES(R79, RES_K(10))     // JUMP
+	RES(R80, RES_K(39))     // FLY
+	RES(R81, RES_K(100))    // FLY
+	RES(R82, RES_K(10))     // FLY
+	RES(R83, RES_K(100))    // JUMP
+	RES(R84, RES_K(1))      // JUMP
+	RES(R85, RES_K(10))     // JUMP
+	RES(R86, RES_K(1))      // FLY
+	RES(R87, RES_K(100))    // FLY
+	RES(R88, RES_K(82))     // FLY
+	RES(R90, RES_K(56))     // MIXER
 	POT(R91, RES_K(100))
 	POT(R92, RES_M(1))
 	POT(R93, RES_M(1))
@@ -171,8 +171,8 @@ NETLIST_START(frogs)
 	POT(R95, RES_M(1))
 	POT(R96, RES_K(50))
 
-//	CAP(C1, CAP_U(10))
-//	CAP(C2, CAP_U(10))
+//  CAP(C1, CAP_U(10))
+//  CAP(C2, CAP_U(10))
 	CAP(C3, CAP_U(0.047))
 	CAP(C4, CAP_U(1))
 	CAP(C5, CAP_U(1))
@@ -204,8 +204,8 @@ NETLIST_START(frogs)
 	CAP(C31, CAP_U(0.47))
 	CAP(C32, CAP_U(0.47))
 	CAP(C33, CAP_U(0.05))
-//	CAP(C34, CAP_U(0.05))	-- final amp
-//	CAP(C35, CAP_U(0.05))	-- final amp
+//  CAP(C34, CAP_U(0.05))   -- final amp
+//  CAP(C35, CAP_U(0.05))   -- final amp
 	CAP(C36, CAP_U(0.05))
 	CAP(C37, CAP_U(0.05))
 	CAP(C38, CAP_U(0.05))
@@ -228,7 +228,7 @@ NETLIST_START(frogs)
 	CAP(C55, CAP_U(0.05))
 	CAP(C56, CAP_U(0.05))
 	CAP(C57, CAP_U(2.2))
-//	CAP(C58, CAP_U(0.1))	-- final amp
+//  CAP(C58, CAP_U(0.1))    -- final amp
 	CAP(C59, CAP_U(0.05))
 	CAP(C60, CAP_U(0.05))
 	CAP(C61, CAP_U(0.05))
@@ -288,19 +288,19 @@ NETLIST_START(frogs)
 	NE555_DIP(U5)           // Timer
 	NE555_DIP(U6)           // Timer
 	NE555_DIP(U7)           // Timer
-	LM741_DIP(U8)			// Op. Amp.
+	LM741_DIP(U8)           // Op. Amp.
 	NE555_DIP(U9)           // Timer
-	LM741_DIP(U10)			// Op. Amp.
-	LM741_DIP(U11)			// Op. Amp.
+	LM741_DIP(U10)          // Op. Amp.
+	LM741_DIP(U11)          // Op. Amp.
 	NE555_DIP(U12)          // Timer
-//	LM741_DIP(U13)			// Op. Amp. -- final amp
-	LM741_DIP(U14)			// Op. Amp.
+//  LM741_DIP(U13)          // Op. Amp. -- final amp
+	LM741_DIP(U14)          // Op. Amp.
 	NE555_DIP(U15)          // Timer
-	LM741_DIP(U16)			// Op. Amp.
-	LM741_DIP(U17)			// Op. Amp.
-	LM741_DIP(U18)			// Op. Amp.
+	LM741_DIP(U16)          // Op. Amp.
+	LM741_DIP(U17)          // Op. Amp.
+	LM741_DIP(U18)          // Op. Amp.
 	NE555_DIP(U19)          // Timer
-	LM741_DIP(U20)			// Op. Amp.
+	LM741_DIP(U20)          // Op. Amp.
 
 	//
 	// JUMP
@@ -366,9 +366,9 @@ NETLIST_START(frogs)
 	NET_C(Q4.C, R18.1, U4.2)
 	NET_C(C13.2, U4.5)
 	NET_C(C5.1, U4.7, U4.6, R19.1, R29.1)
-	RES(RU4, RES_K(100))	// netlist doesn't like unconnected
-	NET_C(RU4.1, U4.3)		// 555 outputs, so run it through
-	NET_C(RU4.2, GND)		// a 100k resistor to ground
+	RES(RU4, RES_K(100))    // netlist doesn't like unconnected
+	NET_C(RU4.1, U4.3)      // 555 outputs, so run it through
+	NET_C(RU4.2, GND)       // a 100k resistor to ground
 	NET_C(R29.2, Q11.B)
 	NET_C(Q11.E, Q12.B)
 	NET_C(Q12.E, R51.2)
@@ -376,9 +376,9 @@ NETLIST_START(frogs)
 	NET_C(Q13.E, R42.1)
 	NET_C(Q13.C, C49.2, U15.2, U15.6, U15.7, C50.1)
 	NET_C(U15.5, C41.2)
-	RES(RU15, RES_K(100))	// netlist doesn't like unconnected
-	NET_C(RU15.1, U15.3)	// 555 outputs, so run it through
-	NET_C(RU15.2, GND)		// a 100k resistor to ground
+	RES(RU15, RES_K(100))   // netlist doesn't like unconnected
+	NET_C(RU15.1, U15.3)    // 555 outputs, so run it through
+	NET_C(RU15.2, GND)      // a 100k resistor to ground
 	ALIAS(ZIP, C50.2)
 
 	//

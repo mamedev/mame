@@ -148,10 +148,10 @@ Notes:
      8PIN_JVS  - Common JVS Power Connectors (on other side of the PCB)
      6PIN_JVS  /
 
-	TODO:
-		More undumped games for Python/2?
-		Python 2 is based on consumer PS2, can be derived with ps2sony.cpp?
-		Everything
+    TODO:
+        More undumped games for Python/2?
+        Python 2 is based on consumer PS2, can be derived with ps2sony.cpp?
+        Everything
 
 ***************************************************************************/
 

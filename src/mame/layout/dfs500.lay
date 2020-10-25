@@ -414,11 +414,11 @@ license:CC0
 		<element name="LD77" ref="multi_color_button"><!-- 3 --><bounds x="169" y="560"  width="43" height="43" /></element>
 		<element name="LD78" ref="multi_color_button"><!-- 4 --><bounds x="214" y="560"  width="43" height="43" /></element>
 		<element name="LD79" ref="multi_color_button"><!-- INT VIDEO --><bounds x="259" y="560"  width="43" height="43" /></element>
-<!-- TODO:	<text string="VTR A"><color red="0.1" green="0.1" blue="0.1" /><bounds x="..." y="..."  width="..." height="..." /></text> -->
-<!-- TODO:	<text string="VTR B"><color red="0.1" green="0.1" blue="0.1" /><bounds x="..." y="..."  width="..." height="..." /></text> -->
-<!-- TODO:	<text string="3"><color red="0.1" green="0.1" blue="0.1" /><bounds x="..." y="..."  width="..." height="..." /></text> -->
-<!-- TODO:	<text string="4"><color red="0.1" green="0.1" blue="0.1" /><bounds x="..." y="..."  width="..." height="..." /></text> -->
-<!-- TODO:	<text string="INT VIDEO"><color red="0.1" green="0.1" blue="0.1" /><bounds x="..." y="..."  width="..." height="..." /></text> -->
+<!-- TODO:  <text string="VTR A"><color red="0.1" green="0.1" blue="0.1" /><bounds x="..." y="..."  width="..." height="..." /></text> -->
+<!-- TODO:  <text string="VTR B"><color red="0.1" green="0.1" blue="0.1" /><bounds x="..." y="..."  width="..." height="..." /></text> -->
+<!-- TODO:  <text string="3"><color red="0.1" green="0.1" blue="0.1" /><bounds x="..." y="..."  width="..." height="..." /></text> -->
+<!-- TODO:  <text string="4"><color red="0.1" green="0.1" blue="0.1" /><bounds x="..." y="..."  width="..." height="..." /></text> -->
+<!-- TODO:  <text string="INT VIDEO"><color red="0.1" green="0.1" blue="0.1" /><bounds x="..." y="..."  width="..." height="..." /></text> -->
 
 		<!-- Foreground -->
 		<element name="LD70" ref="multi_color_button"><!-- VTR A --><bounds x="75" y="663"  width="43" height="43" /></element>
@@ -426,11 +426,11 @@ license:CC0
 		<element name="LD72" ref="multi_color_button"><!-- 3 --><bounds x="165" y="663"  width="43" height="43" /></element>
 		<element name="LD73" ref="multi_color_button"><!-- 4 --><bounds x="210" y="663"  width="43" height="43" /></element>
 		<element name="LD74" ref="multi_color_button"><!-- INT VIDEO --><bounds x="255" y="663"  width="43" height="43" /></element>
-<!-- TODO:	<text string="VTR A"><color red="0.1" green="0.1" blue="0.1" /><bounds x="..." y="..."  width="..." height="..." /></text> -->
-<!-- TODO:	<text string="VTR B"><color red="0.1" green="0.1" blue="0.1" /><bounds x="..." y="..."  width="..." height="..." /></text> -->
-<!-- TODO:	<text string="3"><color red="0.1" green="0.1" blue="0.1" /><bounds x="..." y="..."  width="..." height="..." /></text> -->
-<!-- TODO:	<text string="4"><color red="0.1" green="0.1" blue="0.1" /><bounds x="..." y="..."  width="..." height="..." /></text> -->
-<!-- TODO:	<text string="INT VIDEO"><color red="0.1" green="0.1" blue="0.1" /><bounds x="..." y="..."  width="..." height="..." /></text> -->
+<!-- TODO:  <text string="VTR A"><color red="0.1" green="0.1" blue="0.1" /><bounds x="..." y="..."  width="..." height="..." /></text> -->
+<!-- TODO:  <text string="VTR B"><color red="0.1" green="0.1" blue="0.1" /><bounds x="..." y="..."  width="..." height="..." /></text> -->
+<!-- TODO:  <text string="3"><color red="0.1" green="0.1" blue="0.1" /><bounds x="..." y="..."  width="..." height="..." /></text> -->
+<!-- TODO:  <text string="4"><color red="0.1" green="0.1" blue="0.1" /><bounds x="..." y="..."  width="..." height="..." /></text> -->
+<!-- TODO:  <text string="INT VIDEO"><color red="0.1" green="0.1" blue="0.1" /><bounds x="..." y="..."  width="..." height="..." /></text> -->
 
 		<!-- Int Video -->
 		<element name="LD82" ref="int_video_col_bkgd"><bounds x="321" y="578" width="52" height="12" /></element>

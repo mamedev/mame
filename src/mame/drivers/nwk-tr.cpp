@@ -187,9 +187,9 @@ MADE IN JAPAN
 |------------------------|
 This pcb is the same as the A version but with one added chip:
       2G       - XICOR X76F041 Secure SerialFlash (SOIC8)
-	  
-	             Note: This chip is also present on *some* Hornet games on the GN715 CPU board at location 
-	             30C. The chip refreshes game and region specific serial data to the Timekeeper RAM if the 
+
+                 Note: This chip is also present on *some* Hornet games on the GN715 CPU board at location
+                 30C. The chip refreshes game and region specific serial data to the Timekeeper RAM if the
                  region ID matches the timekeeper. Because Racing Jam 2 and Thrill Drive came in a conversion
                  kit for Racing Jam, the two former games will first boot with a "backup data error" because
                  because of the timekeeper used for the incorrect game. Pressing the test switch then sets the
@@ -642,7 +642,7 @@ void nwktr_state::lanc2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	}
 	if (offset == 4)
 	{
-		// TODO: The data below would normally be present on the serialflash at 2G. 
+		// TODO: The data below would normally be present on the serialflash at 2G.
 
 		if (core_stricmp(machine().system().name, "thrilld") == 0 ||
 			core_stricmp(machine().system().name, "thrilldb") == 0 ||
@@ -984,7 +984,7 @@ void nwktr_state::init_racingj()
 {
 	m_konppc->set_cgboard_texture_bank(0, "bank5", memregion("user5")->base());
 	m_konppc->set_cgboard_texture_bank(0, "bank6", memregion("user6")->base()); // for some reason, additional CG roms are located on the slave CG board...
-	
+
 	init_nwktr();
 }
 
@@ -1009,7 +1009,7 @@ ROM_START(racingj)
 	ROM_REGION32_BE(0x800000, "user5", 0) // Master CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "676a13.8x",  0x000000, 0x400000, CRC(29077763) SHA1(ee087ca0d41966ca0fd10727055bb1dcd05a0873) )
 	ROM_LOAD32_WORD_SWAP( "676a14.16x", 0x000002, 0x400000, CRC(50a7e3c0) SHA1(7468a66111a3ddf7c043cd400fa175cae5f65632) )
-	
+
 	ROM_REGION32_BE(0x800000, "user6", 0) // Slave CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "676a13.8x",  0x000000, 0x400000, CRC(29077763) SHA1(ee087ca0d41966ca0fd10727055bb1dcd05a0873) )
 	ROM_LOAD32_WORD_SWAP( "676a14.16x", 0x000002, 0x400000, CRC(50a7e3c0) SHA1(7468a66111a3ddf7c043cd400fa175cae5f65632) )
@@ -1037,7 +1037,7 @@ ROM_START(racingj2)
 	ROM_REGION32_BE(0x800000, "user5", 0) // Master CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "888a13.8x",  0x000000, 0x400000, CRC(2292f530) SHA1(0f4d1332708fd5366a065e0a928cc9610558b42d) )
 	ROM_LOAD32_WORD_SWAP( "888a14.16x", 0x000002, 0x400000, CRC(6a834a26) SHA1(d1fbd7ae6afd05f0edac4efde12a5a45aa2bc7df) )
-	
+
 	ROM_REGION32_BE(0x800000, "user6", 0) // Slave CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "888a13.8x",  0x000000, 0x400000, CRC(2292f530) SHA1(0f4d1332708fd5366a065e0a928cc9610558b42d) )
 	ROM_LOAD32_WORD_SWAP( "888a14.16x", 0x000002, 0x400000, CRC(6a834a26) SHA1(d1fbd7ae6afd05f0edac4efde12a5a45aa2bc7df) )
@@ -1048,7 +1048,7 @@ ROM_START(racingj2)
 	ROM_REGION16_LE(0x1000000, "rfsnd", 0) // PCM sample roms
 	ROM_LOAD( "888a09.16p",   0x000000, 0x400000, CRC(11e2fed2) SHA1(24b8a367b59fedb62c56f066342f2fa87b135fc5) )
 	ROM_LOAD( "888a10.14p",   0x400000, 0x400000, CRC(328ce610) SHA1(dbbc779a1890c53298c0db129d496df048929496) )
-	
+
 	ROM_REGION( 0x0000084, "laneeprom", 0 )
 	ROM_LOAD( "ge888ea.2g",   0x000000, 0x000084, NO_DUMP )
 
@@ -1068,7 +1068,7 @@ ROM_START(racingj2j)
 	ROM_REGION32_BE(0x800000, "user5", 0) // Master CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "888a13.8x",  0x000000, 0x400000, CRC(2292f530) SHA1(0f4d1332708fd5366a065e0a928cc9610558b42d) )
 	ROM_LOAD32_WORD_SWAP( "888a14.16x", 0x000002, 0x400000, CRC(6a834a26) SHA1(d1fbd7ae6afd05f0edac4efde12a5a45aa2bc7df) )
-	
+
 	ROM_REGION32_BE(0x800000, "user6", 0) // Slave CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "888a13.8x",  0x000000, 0x400000, CRC(2292f530) SHA1(0f4d1332708fd5366a065e0a928cc9610558b42d) )
 	ROM_LOAD32_WORD_SWAP( "888a14.16x", 0x000002, 0x400000, CRC(6a834a26) SHA1(d1fbd7ae6afd05f0edac4efde12a5a45aa2bc7df) )

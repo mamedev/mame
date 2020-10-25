@@ -24,8 +24,8 @@ static const cassette_image::Modulation aquarius_caq_modulation =
 	cassette_image::MODULATION_SINEWAVE,
 	900.0 - 300, 900.0, 900.0 + 300,
 	1800.0 - 600, 1800.0, 1800.0 + 600
-	
-	
+
+
 };
 
 /*-------------------------------------------------

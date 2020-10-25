@@ -141,7 +141,8 @@ INPUT_CHANGED_MEMBER(a2bus_pic_device::x_char_width)
 
 u8 a2bus_pic_device::read_c0nx(u8 offset)
 {
-	LOG("Read C0n%01X\n", offset);
+	if (!machine().side_effects_disabled())
+		LOG("Read C0n%01X\n", offset);
 
 	switch (offset & 0x07U)
 	{
@@ -156,11 +157,13 @@ u8 a2bus_pic_device::read_c0nx(u8 offset)
 		break;
 
 	case 6U:
-		enable_irq();
+		if (!machine().side_effects_disabled())
+			enable_irq();
 		break;
 
 	case 7U:
-		reset_mode();
+		if (!machine().side_effects_disabled())
+			reset_mode();
 		break;
 	}
 

@@ -395,8 +395,8 @@ NETLIST_START(boxingb)
 	Q_2N3906(Q26)           // PNP
 //  Q_2N6292(Q27)           // PNP -- part of final amp (not emulated)
 //  Q_2N6107(Q28)           // NPN -- part of final amp (not emulated)
-//	Q_2N5210(Q29)           // NPN -- not used
-//	Q_2N5210(Q30)           // NPN -- not used
+//  Q_2N5210(Q29)           // NPN -- not used
+//  Q_2N5210(Q30)           // NPN -- not used
 	Q_2N3906(Q31)           // PNP
 	Q_2N3906(Q32)           // PNP
 	Q_2N3906(Q33)           // PNP

@@ -155,14 +155,14 @@ ROM_START( rfsantafeg )
 	*/
 	ROM_LOAD("pic_luces_superior_11125c_2f05c0_pic18f4480-i-p.u2",            0x01800, 0x0800, NO_DUMP ) // 16K Flash
 
-        /*
+		/*
 	PCB coinage (monedero-billetero-hopper) R.F. 53452303
 	-PIC18F448-I/P
 	-ULN2803A
 	-Xtal 12.000 MHz
 	-PCA82C251
 	-3xHC573A
-	-74HC238D 
+	-74HC238D
 	*/
 	ROM_LOAD("pic_monedero_billetero_hopper_09482b_0eda_pic18f448-i-p.u2",    0x02000, 0x0800, NO_DUMP ) // 16K Flash
 

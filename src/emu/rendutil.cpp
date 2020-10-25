@@ -942,7 +942,7 @@ ru_imgformat render_detect_image(util::core_file &file)
 		jpeg_destroy_decompress(&cinfo);
 		file.seek(0, SEEK_SET);
 	}
-	
+
 	// Microsoft DIB: check for valid header
 	util::msdib_error const msdib = util::msdib_verify_header(file);
 	file.seek(0, SEEK_SET);

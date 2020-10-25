@@ -5,7 +5,7 @@
 
     Continuously Variable Slope Demodulator standalone chip emulator:
     Harris HC-55516 (sometimes labeled HCI-55516 or HC1-55516)
-	Harris HC-55532 (sometimes labeled HCI-55532 or HC1-55532) [preliminary]
+    Harris HC-55532 (sometimes labeled HCI-55532 or HC1-55532) [preliminary]
     Motorola MC-3417/MC-34115
     Motorola MC-3418
     TODO: research HC-55536 and HC-55564 differences vs HC-55516 (better auto-zeroing, and removal of the encoder offset compensation DAC?)
@@ -82,8 +82,8 @@ void cvsd_device_base::device_reset()
 //-------------------------------------------------
 /*void cvsd_device_base::device_clock_changed()
 {
-	// do nothing.
-	//m_stream->set_sample_rate(clock());
+    // do nothing.
+    //m_stream->set_sample_rate(clock());
 }*/
 
 READ_LINE_MEMBER( cvsd_device_base::clock_r )
@@ -107,7 +107,7 @@ WRITE_LINE_MEMBER( cvsd_device_base::digin_w )
 // the following encode related functions don't do anything yet, don't call them.
 /*void cvsd_device_base::audio_in_w(int16_t data)
 {
-	assert(0);
+    assert(0);
 }*/
 
 WRITE_LINE_MEMBER( cvsd_device_base::dec_encq_w )
@@ -365,16 +365,16 @@ void hc55516_device::sound_stream_update(sound_stream &stream, std::vector<read_
 	auto &buffer = outputs[0];
 
 /*
-	if (!is_external_oscillator())
-	{
-		// track how many samples we've updated without a clock; if it's been more than 1/32 of a second, output silence
-		m_samples_generated += buffer.samples();
-		if (m_samples_generated > SAMPLE_RATE / 32)
-		{
-			m_samples_generated = SAMPLE_RATE;
-			m_next_sample = 0;
-		}
-	}
+    if (!is_external_oscillator())
+    {
+        // track how many samples we've updated without a clock; if it's been more than 1/32 of a second, output silence
+        m_samples_generated += buffer.samples();
+        if (m_samples_generated > SAMPLE_RATE / 32)
+        {
+            m_samples_generated = SAMPLE_RATE;
+            m_next_sample = 0;
+        }
+    }
 */
 
 	if (is_external_oscillator())

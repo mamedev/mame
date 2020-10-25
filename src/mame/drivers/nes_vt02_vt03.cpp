@@ -319,7 +319,7 @@ void nes_vt_swap_op_d5_d6_state::vt_external_space_map_senwld_512kbyte(address_m
 void nes_vt_state::vt_external_space_map_1mbyte_majkon(address_map &map)
 {
 	map(0x0000000, 0x00fffff).mirror(0x1f00000).r(FUNC(nes_vt_state::vt_rom_r));
-	map(0x1400000, 0x1401fff).ram(); // rush'n attack writes to chr space, after setting the program and character outer bank to a mirror, is the correct way to handle it?	
+	map(0x1400000, 0x1401fff).ram(); // rush'n attack writes to chr space, after setting the program and character outer bank to a mirror, is the correct way to handle it?
 }
 
 template <uint8_t NUM> uint8_t nes_vt_base_state::extrain_r()

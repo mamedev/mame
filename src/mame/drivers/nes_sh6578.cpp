@@ -740,7 +740,7 @@ CONS( 200?, ablwikid,    0,  0,  nes_sh6578_pal, nes_sh6578, nes_sh6578_abl_wiki
 CONS( 2001?, ts_handy11,  0,  0,  nes_sh6578,     nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Techno Source / JungleTac", "Handy Boy 11-in-1 (TV Play Power)", MACHINE_NOT_WORKING ) // possibly newer than 2001
 
 // from a blue coloured unit, a yellow one exists, is it the same?
-CONS( 2004?, vsmaxx15,    0,  0,  nes_sh6578, nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Senario / JungleTac", "Vs Maxx 15-in-1", MACHINE_NOT_WORKING ) 
+CONS( 2004?, vsmaxx15,    0,  0,  nes_sh6578, nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Senario / JungleTac", "Vs Maxx 15-in-1", MACHINE_NOT_WORKING )
 
 // This is from the blue coloured unit with the 1p/2p slider (does it do anything / get read anywhere?)
 // A version of the 25-in-1 on VT hardware also exists, with the downgraded version of Big Racing & removed copyrights etc. (probably the purple tinted version without the 1p/2p slider)

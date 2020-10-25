@@ -970,7 +970,7 @@ void sunplus_gcm394_base_device::base_internal_map(address_map &map)
 	map(0x0078b2, 0x0078b2).rw(FUNC(sunplus_gcm394_base_device::unkarea_78b2_r), FUNC(sunplus_gcm394_base_device::unkarea_78b2_w));  // 78b2 TimeBase C Control Register (P_TimeBaseC_Ctrl)
 
 	map(0x0078b8, 0x0078b8).w(FUNC(sunplus_gcm394_base_device::unkarea_78b8_w));  // 78b8 TimeBase Counter Reset Register  (P_TimeBase_Reset)
-	
+
 	map(0x0078c0, 0x0078c0).r(FUNC(sunplus_gcm394_base_device::unkarea_78c0_r)); // beijuehh
 
 	map(0x0078d0, 0x0078d0).r(FUNC(sunplus_gcm394_base_device::unkarea_78d0_r)); // jak_s500

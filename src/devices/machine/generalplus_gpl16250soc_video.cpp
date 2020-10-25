@@ -1050,8 +1050,8 @@ void gcm394_base_video_device::palette_w(offs_t offset, uint16_t data)
 	{
 		LOGMASKED(LOG_GCM394_VIDEO_PALETTE,"palette writes with m_703a_palettebank %04x\n", m_703a_palettebank);
 	}
-	
-	
+
+
 	offset |= (m_703a_palettebank & 0x000c) << 6;
 	m_paletteram[offset] = data;
 
@@ -1060,7 +1060,7 @@ void gcm394_base_video_device::palette_w(offs_t offset, uint16_t data)
 		(((data >> 10) & 0x1f)<<3),
 		(((data >> 5)  & 0x1f)<<3),
 		(((data >> 0)  & 0x1f)<<3)));
-	
+
 }
 
 uint16_t gcm394_base_video_device::palette_r(offs_t offset)

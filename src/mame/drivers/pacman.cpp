@@ -1739,13 +1739,13 @@ static INPUT_PORTS_START( mschamp )
 INPUT_PORTS_END
 
 /* Pacman Club inputs are similar to Ms. Pac-Man, except:
-	- P1/P2 joystick inputs are multiplexed via $5004/5005 to allow 2P simultaneous play in "double command" mode
-	- no rack test switch
-	- different service mode inputs (bit 3 of DSW1 enables the test screen, bit 4 of IN1 just resets the game)
-	- different bonus life values and only two lives options
-	- difficulty switch is read, but has no effect. instead, higher difficulty is enabled in double command mode
-	- free play mode is bugged; game is supposed to set up pointers to $5080/50c0 in RAM for later,
-	  but this only happens during the attract mode, which is skipped over if free play is enabled
+    - P1/P2 joystick inputs are multiplexed via $5004/5005 to allow 2P simultaneous play in "double command" mode
+    - no rack test switch
+    - different service mode inputs (bit 3 of DSW1 enables the test screen, bit 4 of IN1 just resets the game)
+    - different bonus life values and only two lives options
+    - difficulty switch is read, but has no effect. instead, higher difficulty is enabled in double command mode
+    - free play mode is bugged; game is supposed to set up pointers to $5080/50c0 in RAM for later,
+      but this only happens during the attract mode, which is skipped over if free play is enabled
 */
 static INPUT_PORTS_START( clubpacm )
 	PORT_START("IN0")
