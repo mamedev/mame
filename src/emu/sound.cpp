@@ -532,7 +532,7 @@ read_stream_view sound_stream_input::update(attotime start, attotime end)
 		m_resampler_source->set_end_time(end);
 
 	// update the source, returning a view of the needed output over the start and end times
-	return source.stream().update_view(start, end, source.index()).apply_gain(m_gain * m_user_gain * m_native_source->gain());
+	return source.stream().update_view(start, end, source.index()).apply_gain(m_gain * m_user_gain * source.gain());
 }
 
 
