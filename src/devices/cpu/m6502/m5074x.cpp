@@ -500,6 +500,7 @@ void m50753_device::m50753_map(address_map &map)
 {
 	map(0x0000, 0x00bf).ram();
 	map(0x00e0, 0x00eb).rw(FUNC(m50753_device::ports_r), FUNC(m50753_device::ports_w));
+	map(0x00ee, 0x00ee).r(FUNC(m50753_device::in_r));
 	map(0x00ef, 0x00ef).r(FUNC(m50753_device::ad_r));
 	map(0x00f2, 0x00f2).w(FUNC(m50753_device::ad_control_w));
 	map(0x00f3, 0x00f3).rw(FUNC(m50753_device::ad_control_r), FUNC(m50753_device::ad_control_w));
@@ -516,6 +517,7 @@ m50753_device::m50753_device(const machine_config &mconfig, const char *tag, dev
 m50753_device::m50753_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	m5074x_device(mconfig, type, tag, owner, clock, 16, address_map_constructor(FUNC(m50753_device::m50753_map), this)),
 	m_ad_in(*this),
+	m_in_p(*this),
 	m_ad_control(0),
 	m_pwm_enabled(false)
 {
@@ -526,6 +528,7 @@ void m50753_device::device_start()
 	m5074x_device::device_start();
 
 	m_ad_in.resolve_all_safe(0);
+	m_in_p.resolve_safe(0);
 
 	save_item(NAME(m_ad_control));
 	save_item(NAME(m_pwm_enabled));
@@ -537,6 +540,11 @@ void m50753_device::device_reset()
 
 	m_ad_control = 0;
 	m_pwm_enabled = false;
+}
+
+uint8_t m50753_device::in_r()
+{
+	return m_in_p();
 }
 
 uint8_t m50753_device::ad_r()

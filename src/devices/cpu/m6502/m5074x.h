@@ -117,6 +117,8 @@ public:
 
 	template <std::size_t Bit> auto ad_in() { return m_ad_in[Bit].bind(); }
 
+	auto read_in_p() { return m_in_p.bind(); }
+
 protected:
 	m50753_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -130,6 +132,7 @@ private:
 	void m50753_map(address_map &map);
 
 	uint8_t ad_r();
+	uint8_t in_r();
 	void ad_start_w(uint8_t data);
 	uint8_t ad_control_r();
 	void ad_control_w(uint8_t data);
@@ -137,6 +140,7 @@ private:
 	void pwm_control_w(uint8_t data);
 
 	devcb_read8::array<8> m_ad_in;
+	devcb_read8 m_in_p;
 
 	uint8_t m_ad_control;
 	bool m_pwm_enabled;
