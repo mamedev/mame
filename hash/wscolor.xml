@@ -518,11 +518,10 @@ See the wswan software list for the full game list.
 			<feature name="u2" value="GIZA" />
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
+			<feature name="x1" value="32K" />
 			<feature name="slot" value="ws_sram" />
 			<feature name="rtc" value="yes" />
 			<dataarea name="rom" size="2097152">
-				<!-- 32K00 at X1 -->
-				<!-- U5 -->
 				<rom name="mh16m134b.u3" size="2097152" crc="93e19f13" sha1="66b4bd15ef67dc324736a1cc78d6aca335f03389" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -1137,14 +1136,10 @@ See the wswan software list for the full game list.
 			<feature name="u2" value="GIZA" />
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="CY62256VLL SRAM" />
+			<feature name="x1" value="32K" />
 			<feature name="slot" value="ws_sram" />
 			<feature name="rtc" value="yes" />
 			<dataarea name="rom" size="2097152">
-				<!-- U5 -->
-				<!-- 32K0 at X1 -->
-				<!-- or -->
-				<!-- U5 -->
-				<!-- 32K at X1 -->
 				<rom name="mh16m256s183c.u3" size="2097152" crc="0c23d551" sha1="b4fbea1a2c50d8566685f72820b360af4b54f82f" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
@@ -1194,7 +1189,7 @@ See the wswan software list for the full game list.
 	<software name="jsilver1" cloneof="jsilver">
 		<!-- WSC only -->
 		<description>Judgement Silversword - Rebirth Edition (Rev. SC21)</description>
-		<year>2004</year>
+		<year>2005</year>
 		<publisher>Qute</publisher>
 		<info name="release" value="20040205"/>
 		<part name="cart" interface="wswan_cart">
@@ -1299,6 +1294,7 @@ See the wswan software list for the full game list.
 		</part>
 	</software>
 
+	<!-- Needs flash emulated -->
 	<software name="mamamit" supported="no">
 		<!-- WSC only -->
 		<description>mama Mitte'</description>
@@ -1669,9 +1665,7 @@ See the wswan software list for the full game list.
 		</part>
 	</software>
 
-  <!-- off by 1 during intro scroll? -->
-	<!-- code flow breaks down during 2nd battle, lots of gfx problems -->
-	<software name="riviera" supported="partial">
+	<software name="riviera">
 		<!-- WSC only -->
 		<description>Riviera - Yakusoku no Chi Riviera</description>
 		<year>2002</year>
@@ -2063,6 +2057,7 @@ See the wswan software list for the full game list.
 		</part>
 	</software>
 
+	<!-- bad background graphics during game play -->
 	<software name="sorobang" supported="partial">
 		<!-- WSC -->
 		<description>Sorobang (Rev 1)</description>
