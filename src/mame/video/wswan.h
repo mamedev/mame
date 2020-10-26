@@ -32,8 +32,8 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	uint8_t vram_r(offs_t offset);
-	void vram_w(offs_t offset, uint8_t data);
+	uint16_t vram_r(offs_t offset, uint16_t mem_mask);
+	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	uint8_t reg_r(offs_t offset);
 	void reg_w(offs_t offset, uint8_t data);
 
@@ -121,14 +121,18 @@ protected:
 	devcb_write8 m_icons_cb;
 
 	// timer IDs
-	static const device_timer_id TIMER_SCANLINE = 0;
+	static constexpr device_timer_id TIMER_SCANLINE = 0;
 
 	// interrupt flags
 	// these are the same as the wswan.h ones
-	static const uint8_t WSWAN_VIDEO_IFLAG_LCMP   = 0x10;
-	static const uint8_t WSWAN_VIDEO_IFLAG_VBLTMR = 0x20;
-	static const uint8_t WSWAN_VIDEO_IFLAG_VBL    = 0x40;
-	static const uint8_t WSWAN_VIDEO_IFLAG_HBLTMR = 0x80;
+	static constexpr uint8_t WSWAN_VIDEO_IFLAG_LCMP   = 0x10;
+	static constexpr uint8_t WSWAN_VIDEO_IFLAG_VBLTMR = 0x20;
+	static constexpr uint8_t WSWAN_VIDEO_IFLAG_VBL    = 0x40;
+	static constexpr uint8_t WSWAN_VIDEO_IFLAG_HBLTMR = 0x80;
+
+	static constexpr size_t WS_VRAM_SIZE = 0x4000;
+	static constexpr size_t WSC_VRAM_SIZE = 0x10000;
+	static constexpr size_t WSC_VRAM_PALETTE = 0xfe00;
 };
 
 DECLARE_DEVICE_TYPE(WSWAN_VIDEO, wswan_video_device)

@@ -120,7 +120,7 @@ protected:
 	required_ioport m_buttons;
 	output_finder<6> m_icons;
 
-	u8 bios_r(offs_t offset);
+	u16 bios_r(offs_t offset, u16 mem_mask);
 	u8 port_r(offs_t offset);
 	void port_w(offs_t offset, u8 data);
 
@@ -203,7 +203,7 @@ void wswan_state::io_map(address_map &map)
 
 void wswan_state::snd_map(address_map &map)
 {
-	map(0x00000, 0x03fff).r(m_vdp, FUNC(wswan_video_device::vram_r));
+//	map(0x00000, 0x03fff).r(m_vdp, FUNC(wswan_video_device::vram_r));
 }
 
 
@@ -271,7 +271,7 @@ void wswan_state::wswan(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &wswan_state::io_map);
 	m_maincpu->vector_cb().set(FUNC(wswan_state::get_vector));
 
-	WSWAN_VIDEO(config, m_vdp, 0);
+	WSWAN_VIDEO(config, m_vdp, 3.072_MHz_XTAL);
 	m_vdp->set_screen("screen");
 	m_vdp->set_vdp_type(wswan_video_device::VDP_TYPE_WSWAN);
 	m_vdp->set_irq_callback(FUNC(wswan_state::set_irq_line));
@@ -440,9 +440,9 @@ void wswan_state::common_start()
 	if (m_cart->exists())
 	{
 		// ROM
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x20000, 0x2ffff, read8sm_delegate(*m_cart, FUNC(ws_cart_slot_device::read_rom20)));
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x30000, 0x3ffff, read8sm_delegate(*m_cart, FUNC(ws_cart_slot_device::read_rom30)));
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x40000, 0xeffff, read8sm_delegate(*m_cart, FUNC(ws_cart_slot_device::read_rom40)));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x20000, 0x2ffff, read16s_delegate(*m_cart, FUNC(ws_cart_slot_device::read_rom20)));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x30000, 0x3ffff, read16s_delegate(*m_cart, FUNC(ws_cart_slot_device::read_rom30)));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x40000, 0xeffff, read16s_delegate(*m_cart, FUNC(ws_cart_slot_device::read_rom40)));
 
 		// SRAM
 		if (m_cart->get_type() == WS_SRAM || m_cart->get_type() == WWITCH)
@@ -486,12 +486,14 @@ void wswan_state::machine_reset()
 }
 
 
-u8 wswan_state::bios_r(offs_t offset)
+u16 wswan_state::bios_r(offs_t offset, u16 mem_mask)
 {
 	if (!m_bios_disabled)
-		return m_region_maincpu->base()[offset & (m_region_maincpu->bytes() - 1)];
+//		return m_region_maincpu->base()[offset & (m_region_maincpu->bytes() - 1)];
+		return m_region_maincpu->as_u16(offset & ((m_region_maincpu->bytes() >> 1) - 1));
 	else
-		return m_cart->read_rom40(offset + 0xb0000);
+//		return m_cart->read_rom40(offset + 0xb0000);
+		return m_cart->read_rom40(offset + (0xb0000 >> 1), mem_mask);
 }
 
 
@@ -740,10 +742,10 @@ void wswan_state::port_w(offs_t offset, u8 data)
 		case 0x9E:  // WSC volume setting (0, 1, 2, 3)
 			break;
 		case 0xa0:  // Hardware type/system control
-			// Bit 0   - Enable cartridge slot and/or disable bios
+			// Bit 0   - Disable bios
 			// Bit 1   - Hardware type: 0 = WS, 1 = WSC
-			// Bit 2   - Unknown, written during boot
-			// Bit 3   - Unknown, written during boot
+			// Bit 2   - External bus width
+			// Bit 3   - Cart ROM cycles (0 = 3 cycles, 1 = 1 cycle)
 			// Bit 4-6 - Unknown
 			// Bit 7   - Unknown, read during boot
 			if ((data & 0x01) && !m_bios_disabled)

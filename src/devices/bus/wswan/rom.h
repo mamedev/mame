@@ -16,9 +16,9 @@ public:
 	ws_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// reading and writing
-	virtual u8 read_rom20(offs_t offset) override;
-	virtual u8 read_rom30(offs_t offset) override;
-	virtual u8 read_rom40(offs_t offset) override;
+	virtual u16 read_rom20(offs_t offset, u16 mem_mask) override;
+	virtual u16 read_rom30(offs_t offset, u16 mem_mask) override;
+	virtual u16 read_rom40(offs_t offset, u16 mem_mask) override;
 	virtual u8 read_io(offs_t offset) override;
 	virtual void write_io(offs_t offset, u8 data) override;
 

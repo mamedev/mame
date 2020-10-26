@@ -107,8 +107,11 @@ void ws_rom_device::device_start()
 void ws_rom_device::device_reset()
 {
 	m_base20 = ((0xff & m_bank_mask) << 16) & (m_rom_size - 1);
+	m_base20 >>= 1;
 	m_base30 = ((0xff & m_bank_mask) << 16) & (m_rom_size - 1);
+	m_base30 >>= 1;
 	m_base40 = (((0xf0 & m_bank_mask) | 4) << 16) & (m_rom_size - 1);
+	m_base40 >>= 1;
 
 	memset(m_io_regs, 0xff, sizeof(m_io_regs));
 
@@ -240,22 +243,22 @@ void ws_rom_device::device_timer(emu_timer &timer, device_timer_id id, int param
  mapper specific handlers
  -------------------------------------------------*/
 
-u8 ws_rom_device::read_rom20(offs_t offset)
+u16 ws_rom_device::read_rom20(offs_t offset, u16 mem_mask)
 {
 	return m_rom[offset + m_base20];
 }
 
 
-u8 ws_rom_device::read_rom30(offs_t offset)
+u16 ws_rom_device::read_rom30(offs_t offset, u16 mem_mask)
 {
 	return m_rom[offset + m_base30];
 }
 
 
-u8 ws_rom_device::read_rom40(offs_t offset)
+u16 ws_rom_device::read_rom40(offs_t offset, u16 mem_mask)
 {
 	// we still need to mask in some cases, e.g. when game is 512K
-	return m_rom[(offset + m_base40) & (m_rom_size - 1)];
+	return m_rom[(offset + m_base40) & ((m_rom_size >> 1) - 1)];
 }
 
 
@@ -294,15 +297,18 @@ void ws_rom_device::write_io(offs_t offset, u8 data)
 	switch (offset)
 	{
 		case 0x00:
-			// Bit 0-3 - ROM bank base register for segments 3-15
+			// Bit 0-3 - ROM bank base register for segments 4-15
 			// Bit 4-7 - Unknown
 			m_base40 = (((((data & 0x0f) << 4) | 4) & m_bank_mask) << 16) & (m_rom_size - 1);
+			m_base40 >>= 1;
 			break;
 		case 0x02: // ROM bank for segment 2 (0x20000 - 0x2ffff)
 			m_base20 = ((data & m_bank_mask) << 16) & (m_rom_size - 1);
+			m_base20 >>= 1;
 			break;
 		case 0x03: // ROM bank for segment 3 (0x30000 - 0x3ffff)
 			m_base30 = ((data & m_bank_mask) << 16) & (m_rom_size - 1);
+			m_base30 >>= 1;
 			break;
 		case 0x0a:  // RTC Command
 					// Bit 0-4 - RTC command

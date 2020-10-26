@@ -93,9 +93,9 @@ public:
 	virtual ~device_ws_cart_interface();
 
 	// reading and writing
-	virtual u8 read_rom20(offs_t offset) { return 0xff; }
-	virtual u8 read_rom30(offs_t offset) { return 0xff; }
-	virtual u8 read_rom40(offs_t offset) { return 0xff; }
+	virtual u16 read_rom20(offs_t offset, u16 mem_mask) { return 0xffff; }
+	virtual u16 read_rom30(offs_t offset, u16 mem_mask) { return 0xffff; }
+	virtual u16 read_rom40(offs_t offset, u16 mem_mask) { return 0xffff; }
 	virtual u8 read_ram(offs_t offset) { return 0xff; }
 	virtual void write_ram(offs_t offset, uint8_t data) {}
 	virtual u8 read_io(offs_t offset) { return 0xff; }
@@ -103,7 +103,7 @@ public:
 
 	void rom_alloc(u32 size, const char *tag);
 	void nvram_alloc(u32 size);
-	uint8_t* get_rom_base() { return m_rom; }
+	uint16_t* get_rom_base() { return m_rom; }
 	uint8_t* get_nvram_base() { return &m_nvram[0]; }
 	uint32_t get_rom_size() { return m_rom_size; }
 	uint32_t get_nvram_size() { return m_nvram.size(); }
@@ -115,7 +115,7 @@ protected:
 	device_ws_cart_interface(const machine_config &mconfig, device_t &device);
 
 	// internal state
-	u8 *m_rom;
+	u16 *m_rom;
 	u32 m_rom_size;
 	std::vector<u8> m_nvram;
 	u32 m_nvram_size;
@@ -168,9 +168,9 @@ public:
 	void save_nvram()   { if (m_cart && m_cart->get_nvram_size()) m_cart->save_nvram(); }
 
 	// reading and writing
-	virtual u8 read_rom20(offs_t offset);
-	virtual u8 read_rom30(offs_t offset);
-	virtual u8 read_rom40(offs_t offset);
+	virtual u16 read_rom20(offs_t offset, u16 mem_mask);
+	virtual u16 read_rom30(offs_t offset, u16 mem_mask);
+	virtual u16 read_rom40(offs_t offset, u16 mem_mask);
 	virtual u8 read_ram(offs_t offset);
 	virtual void write_ram(offs_t offset, u8 data);
 	virtual u8 read_io(offs_t offset);

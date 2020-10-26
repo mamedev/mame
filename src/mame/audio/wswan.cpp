@@ -54,7 +54,7 @@ wswan_sound_device::wswan_sound_device(const machine_config &mconfig, const char
 {
 }
 
-constexpr int clk_div = 64;
+static constexpr int clk_div = 64;
 
 //-------------------------------------------------
 //  device_start - device-specific startup

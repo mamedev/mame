@@ -52,7 +52,7 @@ void device_ws_cart_interface::rom_alloc(u32 size, const char *tag)
 {
 	if (m_rom == nullptr)
 	{
-		m_rom = device().machine().memory().region_alloc(std::string(tag).append(WSSLOT_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
+		m_rom = (u16 *)device().machine().memory().region_alloc(std::string(tag).append(WSSLOT_ROM_REGION_TAG).c_str(), size, 2, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
 		m_bank_mask = ((m_rom_size >> 16) - 1);
 	}
@@ -160,7 +160,7 @@ image_init_result ws_cart_slot_device::call_load()
 		u32 nvram_size = 0;
 
 		m_cart->rom_alloc(size, tag());
-		ROM = m_cart->get_rom_base();
+		ROM = (u8 *)m_cart->get_rom_base();
 
 		if (!loaded_through_softlist())
 			fread(ROM, size);
@@ -303,36 +303,36 @@ std::string ws_cart_slot_device::get_default_card_software(get_default_card_soft
  read_rom20
  -------------------------------------------------*/
 
-u8 ws_cart_slot_device::read_rom20(offs_t offset)
+u16 ws_cart_slot_device::read_rom20(offs_t offset, u16 mem_mask)
 {
 	if (m_cart)
-		return m_cart->read_rom20(offset);
+		return m_cart->read_rom20(offset, mem_mask);
 	else
-		return 0xff;
+		return 0xffff;
 }
 
 /*-------------------------------------------------
  read_rom30
  -------------------------------------------------*/
 
-u8 ws_cart_slot_device::read_rom30(offs_t offset)
+u16 ws_cart_slot_device::read_rom30(offs_t offset, u16 mem_mask)
 {
 	if (m_cart)
-		return m_cart->read_rom30(offset);
+		return m_cart->read_rom30(offset, mem_mask);
 	else
-		return 0xff;
+		return 0xffff;
 }
 
 /*-------------------------------------------------
  read_rom40
  -------------------------------------------------*/
 
-u8 ws_cart_slot_device::read_rom40(offs_t offset)
+u16 ws_cart_slot_device::read_rom40(offs_t offset, u16 mem_mask)
 {
 	if (m_cart)
-		return m_cart->read_rom40(offset);
+		return m_cart->read_rom40(offset, mem_mask);
 	else
-		return 0xff;
+		return 0xffff;
 }
 
 /*-------------------------------------------------

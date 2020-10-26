@@ -92,7 +92,7 @@ void wswan_video_device::device_start()
 	screen().register_screen_bitmap(m_bitmap);
 
 	m_timer = timer_alloc(TIMER_SCANLINE);
-	m_timer->adjust(attotime::from_ticks(256, 3072000), 0, attotime::from_ticks(256, 3072000));
+	m_timer->adjust(attotime::from_ticks(256, clock()), 0, attotime::from_ticks(256, clock()));
 
 	// bind callbacks
 	m_set_irq_cb.resolve();
@@ -100,16 +100,16 @@ void wswan_video_device::device_start()
 
 	if (m_vdp_type == VDP_TYPE_WSC)
 	{
-		m_vram.resize(0x10000);
-		memset(&m_vram[0], 0, 0x10000);
-		m_palette_vram = &m_vram[0xfe00];
+		m_vram.resize(WSC_VRAM_SIZE);
+		m_palette_vram = &m_vram[WSC_VRAM_PALETTE];
 	}
 	else
 	{
-		m_vram.resize(0x4000);
-		memset(&m_vram[0], 0, 0x4000);
+		m_vram.resize(WS_VRAM_SIZE);
 		m_palette_vram = &m_vram[0];
 	}
+
+	std::fill(std::begin(m_vram), std::end(m_vram), 0);
 
 	common_save();
 
@@ -147,7 +147,7 @@ void wswan_video_device::device_reset()
 	m_window_sprites_enable = 0;
 	m_window_fg_mode = 0;
 	m_bg_control = 0;
-	m_current_line = 145;  // Randomly chosen, beginning of VBlank period to give cart some time to boot up
+	m_current_line = 0;
 	m_line_compare = 0;
 	m_sprite_table_address = 0;
 	m_sprite_first = 0;
@@ -179,11 +179,12 @@ void wswan_video_device::device_reset()
 	m_timer_vblank_enable = 0;
 	m_timer_vblank_mode = 0;
 	m_timer_vblank_reload = 0;
-	m_timer_vblank_count = 0;      /* Vertical blank timer counter value */
+	m_timer_vblank_count = 0;
 
-	memset(m_sprite_table_buffer, 0, sizeof(m_sprite_table_buffer));
-	memset(m_main_palette, 0, sizeof(m_main_palette));
-	memcpy(m_regs, vdp_regs_init, 256);
+	std::fill(std::begin(m_sprite_table_buffer), std::end(m_sprite_table_buffer), 0);
+	std::fill(std::begin(m_main_palette), std::end(m_main_palette), 0);
+	std::copy(std::begin(vdp_regs_init), std::end(vdp_regs_init), std::begin(m_regs));
+
 	for (int i = 0; i < 0x20; i++)
 		m_palette_port[i] = m_regs[i + 0x20];
 
@@ -307,13 +308,7 @@ void wswan_video_device::draw_background()
 				{
 					if (col)
 					{
-						if (m_color_mode)
-							m_bitmap.pix(m_current_line, x_offset) = m_pal[tile_palette][col];
-						else
-						{
-							/* Hmmmm, what should we do here... Is this correct?? */
-							m_bitmap.pix(m_current_line, x_offset) = m_pal[tile_palette][col];
-						}
+						m_bitmap.pix(m_current_line, x_offset) = m_pal[tile_palette][col];
 					}
 				}
 				else
@@ -416,12 +411,7 @@ void wswan_video_device::draw_foreground_0()
 				{
 					if (col)
 					{
-//                      if (m_color_mode) {
 						m_bitmap.pix(m_current_line, x_offset) = m_pal[tile_palette][col];
-//                      } else {
-//                          /* Hmmmm, what should we do here... Is this correct?? */
-//                          m_bitmap.pix(m_current_line, x_offset) = m_pal[tile_palette][col];
-//                      }
 					}
 				}
 				else
@@ -525,11 +515,7 @@ void wswan_video_device::draw_foreground_2()
 				{
 					if (col)
 					{
-						if (m_color_mode)
-							m_bitmap.pix(m_current_line, x_offset) = m_pal[tile_palette][col];
-						else
-							/* Hmmmm, what should we do here... Is this correct?? */
-							m_bitmap.pix(m_current_line, x_offset) = m_pal[tile_palette][col];
+						m_bitmap.pix(m_current_line, x_offset) = m_pal[tile_palette][col];
 					}
 				}
 				else
@@ -632,11 +618,7 @@ void wswan_video_device::draw_foreground_3()
 				{
 					if (col)
 					{
-						if (m_color_mode)
-							m_bitmap.pix(m_current_line, x_offset) = m_pal[tile_palette][col];
-						else
-							/* Hmmmm, what should we do here... Is this correct?? */
-							m_bitmap.pix(m_current_line, x_offset) = m_pal[tile_palette][col];
+						m_bitmap.pix(m_current_line, x_offset) = m_pal[tile_palette][col];
 					}
 				}
 				else
@@ -775,11 +757,7 @@ void wswan_video_device::handle_sprites(int mask)
 					{
 						if (col)
 						{
-							if (m_color_mode)
-								m_bitmap.pix(m_current_line, x_offset) = m_pal[tile_palette][col];
-							else
-								/* Hmmmm, what should we do here... Is this correct?? */
-								m_bitmap.pix(m_current_line, x_offset) = m_pal[tile_palette][col];
+							m_bitmap.pix(m_current_line, x_offset) = m_pal[tile_palette][col];
 						}
 					}
 					else
@@ -1214,12 +1192,15 @@ void wswan_video_device::scanline_interrupt()
 }
 
 
-uint8_t wswan_video_device::vram_r(offs_t offset)
+uint16_t wswan_video_device::vram_r(offs_t offset, uint16_t mem_mask)
 {
-	return m_vram[offset];
+	return m_vram[offset << 1] | (m_vram[(offset << 1) + 1] << 8);
 }
 
-void wswan_video_device::vram_w(offs_t offset, uint8_t data)
+void wswan_video_device::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_vram[offset] = data;
+	if (ACCESSING_BITS_0_7)
+		m_vram[offset << 1] = data;
+	if (ACCESSING_BITS_8_15)
+		m_vram[(offset << 1) + 1] = data >> 8;
 }
