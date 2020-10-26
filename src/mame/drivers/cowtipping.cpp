@@ -96,7 +96,7 @@ ROM_START( cowtipp )
 	// empty space at u6
 
 	ROM_REGION( 0x1000, "pic", 0 )
-	// Protected, but the first byte is freely readable. Contains the text "Copyright 2004 Cosmodog, Ltd."
+	// Protected, but the first Kbyte is freely readable. Contains the text "Copyright 2004 Cosmodog, Ltd."
 	// A full dump is needed
 	ROM_LOAD( "56_pic12c508-04p.u3", 0x000, 0x0400, BAD_DUMP CRC(e21e4c05) SHA1(fd9394f7f7a5064297ca1755be80c17020276695) )
 ROM_END
@@ -107,7 +107,7 @@ ROM_START( cowtippa )
 	// empty space at u6
 
 	ROM_REGION( 0x1000, "pic", 0 )
-	// Protected, but the first byte is freely readable. Contains the text "Copyright 2004 Cosmodog, Ltd."
+	// Protected, but the first Kbyte is freely readable. Contains the text "Copyright 2004 Cosmodog, Ltd."
 	// A full dump is needed
 	ROM_LOAD( "56_pic12c508-04p.u3", 0x000, 0x0400, BAD_DUMP CRC(e21e4c05) SHA1(fd9394f7f7a5064297ca1755be80c17020276695) )
 ROM_END
