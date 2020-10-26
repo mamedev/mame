@@ -8,8 +8,20 @@ RAM: 256MB DDR 333
 PCB: Intel 865G + Intel Extreme Graphics 2 + Intel FW82801FR
 I/O: Cypress AN2131SC (12.000 MHz xtal) + Winbond W83627HF + Realtek RTL8101L
 BIOS: 03/11/2009-I865G-6A79AD4EC-00 (Pm49FL004T-33JC)
-Dongle: USB
+Dongle: GNT FNW USB Token
 Sound: C-Media CMI9761A
+
+The GNT FNW USB Token is RSA capable (2048 bits) cryptographic token (http://www.softidea.sk/doc/gnt_datasheet_en.pdf) which supports also
+AES (128 bits), DES, 3DES, SHA-1, secure random number generation, etc. It has 34,5 KB of secured user memory for storing keys, and since
+it performs the cryptographic operations internally, they cannot be extracted.
+On its default configuration for Photo Play, the PKCS#11 API is disabled (it supports also a propietary low level API), and contains the
+following memory map:
+-RSA slots: 10
+-MEM1: 53568 Bytes, read protected, write protected.
+-MEM2:  4096 Bytes, free read, write with PIN1 or PIN2.
+-MEM3:  1024 Bytes, free read, write only with PIN2.
+
+A single wrong login attempt locks the token.
 */
 
 #include "emu.h"
