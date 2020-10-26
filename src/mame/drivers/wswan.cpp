@@ -159,7 +159,7 @@ protected:
 };
 
 
-static const uint8_t ws_portram_init[256] =
+static const u8 ws_portram_init[256] =
 {
 	0x00, 0x00, 0x00/*?*/, 0xbb, 0x00, 0x00, 0x00, 0x26, 0xfe, 0xde, 0xf9, 0xfb, 0xdb, 0xd7, 0x7f, 0xf5,
 	0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x9e, 0x9b, 0x00, 0x00, 0x00, 0x00, 0x99, 0xfd, 0xb7, 0xdf,
@@ -203,7 +203,7 @@ void wswan_state::io_map(address_map &map)
 
 void wswan_state::snd_map(address_map &map)
 {
-//	map(0x00000, 0x03fff).r(m_vdp, FUNC(wswan_video_device::vram_r));
+	map(0x00000, 0x03fff).r(m_vdp, FUNC(wswan_video_device::vram_r));
 }
 
 
@@ -236,7 +236,7 @@ void wswan_state::palette(palette_device &palette) const
 {
 	for (int i = 0; i < 16; i++)
 	{
-		uint8_t const shade = i * (256 / 16);
+		u8 const shade = i * (256 / 16);
 		palette.set_pen_color(15 - i, shade, shade, shade);
 	}
 }
@@ -830,7 +830,7 @@ void wswan_state::port_w(offs_t offset, u8 data)
 				m_internal_eeprom[addr + 1] = m_ws_portram[0xbb];
 				data |= 0x02;
 			}
-			else if ( data & 0x10 )
+			else if (data & 0x10)
 			{
 				u16 addr = get_internal_eeprom_address();
 				m_ws_portram[0xba] = m_internal_eeprom[addr];

@@ -155,12 +155,9 @@ void wswan_sound_device::device_reset()
 
 int wswan_sound_device::fetch_sample(int channel, int offset)
 {
-	uint8_t b = read_byte(m_sample_address + ((channel & 3) << 4) + ((offset & 0x1f) >> 1));
+	uint16_t w = read_word(m_sample_address + ((channel & 3) << 4) + ((offset >> 1) & 0x0e));
 
-	if (offset & 1)
-		return b >> 4;
-	else
-		return b & 0xf;
+	return (w >> ((offset & 0x03) * 4)) & 0x0f;
 }
 
 //-------------------------------------------------
@@ -169,17 +166,15 @@ int wswan_sound_device::fetch_sample(int channel, int offset)
 
 void wswan_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	s32 sample, left, right;
-
 	auto &outputl = outputs[0];
 	auto &outputr = outputs[1];
 	for (int sampindex = 0; sampindex < outputl.samples(); sampindex++)
 	{
-		left = right = 0;
+		s32 left = 0, right = 0;
 
-		if ( m_audio1.on )
+		if (m_audio1.on)
 		{
-			sample = m_audio1.signal;
+			s32 sample = m_audio1.signal;
 			m_audio1.pos += clk_div;
 			if (m_audio1.pos >= m_audio1.period)
 			{
@@ -190,9 +185,9 @@ void wswan_sound_device::sound_stream_update(sound_stream &stream, std::vector<r
 			right += m_audio1.vol_right * sample;
 		}
 
-		if ( m_audio2.on )
+		if (m_audio2.on)
 		{
-			if ( m_audio2_voice )
+			if (m_audio2_voice)
 			{
 				uint8_t voice_data = m_audio2.vol_left << 4 | m_audio2.vol_right;
 				left += voice_data * (m_master_volume & 0x0f);
@@ -200,7 +195,7 @@ void wswan_sound_device::sound_stream_update(sound_stream &stream, std::vector<r
 			}
 			else
 			{
-				sample = m_audio2.signal;
+				s32 sample = m_audio2.signal;
 				m_audio2.pos += clk_div;
 				if (m_audio2.pos >= m_audio2.period)
 				{
@@ -212,19 +207,19 @@ void wswan_sound_device::sound_stream_update(sound_stream &stream, std::vector<r
 			}
 		}
 
-		if ( m_audio3.on )
+		if (m_audio3.on)
 		{
-			sample = m_audio3.signal;
+			s32 sample = m_audio3.signal;
 			m_audio3.pos += clk_div;
 			if (m_audio3.pos >= m_audio3.period)
 			{
 				m_audio3.pos -= m_audio3.period;
 				m_audio3.signal = fetch_sample(2, m_audio3.offset++);
 			}
-			if ( m_audio3_sweep && m_sweep_time )
+			if (m_audio3_sweep && m_sweep_time)
 			{
 				m_sweep_count += clk_div;
-				if ( m_sweep_count >= m_sweep_time )
+				if (m_sweep_count >= m_sweep_time)
 				{
 					m_sweep_count -= m_sweep_time;
 					m_audio3.freq += m_sweep_step;
@@ -236,9 +231,9 @@ void wswan_sound_device::sound_stream_update(sound_stream &stream, std::vector<r
 			right += m_audio3.vol_right * sample;
 		}
 
-		if ( m_audio4.on )
+		if (m_audio4.on)
 		{
-			sample = m_audio4.signal;
+			s32 sample = m_audio4.signal;
 			m_audio4.pos += clk_div;
 			if (m_audio4.pos >= m_audio4.period)
 			{
@@ -274,12 +269,13 @@ void wswan_sound_device::sound_stream_update(sound_stream &stream, std::vector<r
 }
 
 
-void wswan_sound_device::wswan_ch_set_freq( CHAN *ch, uint16_t freq )
+void wswan_sound_device::wswan_ch_set_freq(CHAN *ch, uint16_t freq)
 {
 	freq &= 0x7ff;  // docs say freq is 11bits and a few games (Morita Shougi, World Stadium + others) write 0x800 causing a divide by 0 crash
 	ch->freq = freq;
 	ch->period = 2048 - freq;
 }
+
 
 u8 wswan_sound_device::port_r(offs_t offset)
 {
