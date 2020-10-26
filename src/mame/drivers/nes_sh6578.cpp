@@ -726,7 +726,7 @@ ROM_END
 
 ROM_START( dgun806 )
 	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD( "dgpnpdgu806as29lv160be_000422c4.BIN", 0x00000, 0x200000, CRC(576d6caf) SHA1(fdfa4712e6ed66d2af41ccfbfbf870cd01f7b0f7) )
+	ROM_LOAD( "dgpnpdgu806as29lv160be_000422c4.bin", 0x00000, 0x200000, CRC(576d6caf) SHA1(fdfa4712e6ed66d2af41ccfbfbf870cd01f7b0f7) )
 ROM_END
 
 
@@ -750,8 +750,9 @@ CONS( 2004?, vsmaxx15,    0,  0,  nes_sh6578, nes_sh6578, nes_sh6578_state, init
 
 // This is from the blue coloured unit with the 1p/2p slider (does it do anything / get read anywhere?)
 // A version of the 25-in-1 on VT hardware also exists, with the downgraded version of Big Racing & removed copyrights etc. (probably the purple tinted version without the 1p/2p slider)
-CONS( 2004?, vsmaxx25,    0,  0,  nes_sh6578, nes_sh6578, nes_sh6578_max10in1_state, init_nes_sh6578, "Senario / JungleTac", "Vs Maxx 25-in-1", MACHINE_NOT_WORKING )
+CONS( 2004?, vsmaxx25,    0,  0,  nes_sh6578, nes_sh6578, nes_sh6578_max10in1_state, init_nes_sh6578, "Senario / JungleTac", "Vs Maxx 25-in-1 (SH6578 hardware)", MACHINE_NOT_WORKING )
 
+// DGUN-806 on sticker on battery compartment. DreamGear had some other products with the same pad type but different DGUN numbers on the packaging, is the ROM the same?
 CONS( 2004?, dgun806,    0,  0,  nes_sh6578, nes_sh6578, nes_sh6578_max10in1_state, init_nes_sh6578, "dreamGEAR", "Plug 'N' Play 25-in-1 (DGUN-806)", MACHINE_NOT_WORKING )
 
 

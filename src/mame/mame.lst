@@ -19371,6 +19371,9 @@ lckydraw                        // (c) 1979 Mirco
 @source:lcmate2.cpp
 lcmate2                         //
 
+@source:leapfrog_iquest.cpp
+iquest
+
 @source:leapfrog_leappad.cpp
 leappad                         // (c) 2001 LeapFrog / Knowledge Kids Enterprises, Inc.
 leappadca                       // (c) 2004 LeapFrog

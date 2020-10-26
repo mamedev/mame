@@ -2762,6 +2762,7 @@ createMESSProjects(_target, _subtarget, "leapfrog")
 files {
 	MAME_DIR .. "src/mame/drivers/leapster.cpp",
 	MAME_DIR .. "src/mame/drivers/leapfrog_leappad.cpp",
+	MAME_DIR .. "src/mame/drivers/leapfrog_iquest.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "lsi")
