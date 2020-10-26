@@ -1095,7 +1095,7 @@ GAME( 1997, coh3002t,  0,        coh3002t,       coh3002t,     taitogn_state, em
 GAME( 1998, chaoshea,  coh3002t, coh3002t_t1,    coh3002t,     taitogn_state, empty_init, ROT0,   "Taito", "Chaos Heat (V2.09O 1998/10/02 17:00)", MACHINE_IMPERFECT_SOUND )
 GAME( 1998, chaosheaj, chaoshea, coh3002t_t1,    coh3002t,     taitogn_state, empty_init, ROT0,   "Taito", "Chaos Heat (V2.08J 1998/09/25 17:00)", MACHINE_IMPERFECT_SOUND )
 GAME( 1998, raycris,   coh3002t, coh3002t_t1,    coh3002t,     taitogn_state, empty_init, ROT0,   "Taito", "Ray Crisis (V2.03O 1998/11/15 15:43)", MACHINE_IMPERFECT_SOUND )
-GAME( 1998, raycrisj,  coh3002t, coh3002t_t1,    coh3002t,     taitogn_state, empty_init, ROT0,   "Taito", "Ray Crisis (V2.03J 1998/11/15 15:43)", MACHINE_IMPERFECT_SOUND )
+GAME( 1998, raycrisj,  raycris,  coh3002t_t1,    coh3002t,     taitogn_state, empty_init, ROT0,   "Taito", "Ray Crisis (V2.03J 1998/11/15 15:43)", MACHINE_IMPERFECT_SOUND )
 GAME( 1999, spuzbobl,  coh3002t, coh3002t_t2,    coh3002t,     taitogn_state, empty_init, ROT0,   "Taito", "Super Puzzle Bobble (V2.05O 1999/2/24 18:00)", MACHINE_IMPERFECT_SOUND )
 GAME( 1999, spuzboblj, spuzbobl, coh3002t_t2,    coh3002t,     taitogn_state, empty_init, ROT0,   "Taito", "Super Puzzle Bobble (V2.04J 1999/2/27 02:10)", MACHINE_IMPERFECT_SOUND )
 GAME( 1999, gobyrc,    coh3002t, coh3002t_t2,    gobyrc,       taitogn_state, empty_init, ROT0,   "Taito", "Go By RC (V2.03O 1999/05/25 13:31)", MACHINE_IMPERFECT_SOUND )
