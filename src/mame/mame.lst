@@ -22268,9 +22268,18 @@ rad_sf2p                        // (c)2004 Radica
 rad_gen1                        // (c)2004 Radica
 rad_gen2                        // (c)2004 Radica
 rad_md1
+rad_md2
 rad_ssoc                        // (c)2004 Radica
 rad_sonic
+rad_sonicp
 rad_orun
+
+@source:megadriv_sunplus_hybrid.cpp
+reactmd
+
+@source:megadriv_vt_hybrid.cpp
+sarc110
+sarc110a
 
 @source:megaphx.cpp
 megaphx                         // (c) 1991 Dinamic / Inder
@@ -32203,6 +32212,7 @@ afbm7800
 dnce2000
 vtvppong
 papsudok
+nytsudo
 
 @source:nes_sh6578.cpp
 bandgpad
@@ -32215,6 +32225,7 @@ maxx6in1
 max10in1
 vsmaxx25
 vsmaxx15
+dgun806
 
 @source:nes_vt02_vt03.cpp
 vdogdeme
@@ -32229,6 +32240,7 @@ sporzbx
 sporztn
 wldsoctv
 mc_dgear
+sudo6in1
 sudopptv
 megapad
 ablmini
@@ -32240,7 +32252,9 @@ majkon
 majgnc
 vsmaxx17
 polmega
+vsmax25v
 dgun851
+dgun853
 silv35
 vsmaxxvd
 vsmaxx77
@@ -32254,8 +32268,6 @@ zdog
 pjoyn50
 pjoys30
 pjoys60
-sarc110
-sarc110a
 mc_110cb
 mc_138cb
 cbrs8
@@ -38340,7 +38352,6 @@ ddmmeg12
 @source:spg2xx_zone.cpp
 wirels60                        // Wireless 60
 zone40                          // Zone 40
-reactmd
 itvg49
 zone60                          // Zone 60
 zone100                         //

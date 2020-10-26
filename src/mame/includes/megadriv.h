@@ -52,6 +52,7 @@ public:
 		m_scan_timer(*this, "md_scan_timer"),
 		m_vdp(*this,"gen_vdp"),
 		m_megadrive_ram(*this,"megadrive_ram"),
+		m_screen(*this,"megadriv"),
 		m_io_reset(*this, "RESET"),
 		m_megadrive_io_read_data_port_ptr(*this),
 		m_megadrive_io_write_data_port_ptr(*this)
@@ -63,6 +64,7 @@ public:
 	optional_device<timer_device> m_scan_timer;
 	required_device<sega315_5313_device> m_vdp;
 	optional_shared_ptr<uint16_t> m_megadrive_ram;
+	optional_device<screen_device> m_screen;
 
 	optional_ioport m_io_reset;
 	ioport_port *m_io_pad_3b[4];

@@ -547,6 +547,8 @@ mdisk.cpp
 mdt60.cpp
 megadriv.cpp
 megadriv_rad.cpp
+megadriv_sunplus_hybrid.cpp
+megadriv_vt_hybrid.cpp
 mekd1.cpp
 mekd2.cpp
 mekd3.cpp
