@@ -284,8 +284,6 @@ void md_boot_state::puckpkmn(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &md_boot_state::puckpkmn_map);
 
-	MCFG_MACHINE_START_OVERRIDE(md_boot_state, md_bootleg)
-
 	config.device_remove("genesis_snd_z80");
 
 	okim6295_device &oki(OKIM6295(config, "oki", XTAL(4'000'000) / 4, okim6295_device::PIN7_HIGH));
