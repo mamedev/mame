@@ -90,8 +90,8 @@ dio16_98543_device::dio16_98543_device(const machine_config &mconfig, device_typ
 	m_nereid(*this, "nereid"),
 	m_space_config("vram", ENDIANNESS_BIG, 8, 19, 0, address_map_constructor(FUNC(dio16_98543_device::map), this)),
 	m_rom(*this, HP98543_ROM_REGION),
-	m_vram(*this, "vram")
-
+	m_vram(*this, "vram"),
+	m_intreg(0)
 {
 }
 
@@ -99,7 +99,6 @@ void dio16_98543_device::device_start()
 {
 	save_item(NAME(m_intreg));
 	save_item(NAME(m_ints));
-	m_intreg = 0;
 
 	dio().install_memory(
 			0x200000, 0x27ffff,
@@ -122,6 +121,7 @@ void dio16_98543_device::device_start()
 
 void dio16_98543_device::device_reset()
 {
+	m_intreg = 0;
 }
 
 uint16_t dio16_98543_device::rom_r(offs_t offset)
