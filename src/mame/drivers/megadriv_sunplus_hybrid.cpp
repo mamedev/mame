@@ -28,7 +28,6 @@ public:
 	{}
 
 	// Mega Drive part
-	DECLARE_MACHINE_START(megadriv_sunplus);
 	uint16_t read(offs_t offset);
 	void megadriv_sunplus_pal(machine_config &config);
 	void megadriv_sunplus_map(address_map &map);

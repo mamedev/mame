@@ -27,7 +27,6 @@ public:
 	{}
 
 	// Mega Drive part
-	DECLARE_MACHINE_START(megadriv_vt0203);
 	uint16_t read(offs_t offset);
 	void megadriv_vt0203_pal(machine_config &config);
 	void megadriv_vt0203_map(address_map &map);

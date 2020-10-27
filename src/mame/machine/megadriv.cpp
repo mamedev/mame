@@ -908,9 +908,6 @@ void md_base_state::md_ntsc(machine_config &config)
 	m_z80snd->set_addrmap(AS_IO, &md_base_state::megadriv_z80_io_map);
 	/* IRQ handled via the timers */
 
-	//MCFG_MACHINE_START_OVERRIDE(md_base_state,megadriv)
-	//MCFG_MACHINE_RESET_OVERRIDE(md_base_state,megadriv)
-
 	megadriv_timers(config);
 
 	SEGA315_5313(config, m_vdp, MASTER_CLOCK_NTSC, m_maincpu);
@@ -972,9 +969,6 @@ void md_base_state::md_pal(machine_config &config)
 	m_z80snd->set_addrmap(AS_PROGRAM, &md_base_state::megadriv_z80_map);
 	m_z80snd->set_addrmap(AS_IO, &md_base_state::megadriv_z80_io_map);
 	/* IRQ handled via the timers */
-
-	//MCFG_MACHINE_START_OVERRIDE(md_base_state,megadriv)
-	//MCFG_MACHINE_RESET_OVERRIDE(md_base_state,megadriv)
 
 	megadriv_timers(config);
 
