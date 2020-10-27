@@ -22,7 +22,7 @@ public:
 	megadriv_sunplus_state(const machine_config &mconfig, device_type type, const char *tag)
 		// Mega Drive part
 		: md_base_state(mconfig, type, tag),
-		m_md_is_running(false),
+		m_md_is_running(true),
 		m_bank(0),
 		m_rom(*this, "maincpu")
 	{}
@@ -105,9 +105,6 @@ void megadriv_sunplus_state::machine_start()
 
 	m_vdp->stop_timers();
 	save_item(NAME(m_bank));
-
-	m_screen->set_screen_update(FUNC(megadriv_sunplus_state::screen_update_hybrid)); 
-	m_screen->screen_vblank().set(FUNC(megadriv_sunplus_state::screen_vblank_hybrid)); 
 }
 
 void megadriv_sunplus_state::machine_reset()
@@ -141,6 +138,9 @@ void megadriv_sunplus_state::megadriv_sunplus_pal(machine_config &config)
 {
 	md_pal(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &megadriv_sunplus_state::megadriv_sunplus_map);
+
+	m_screen->set_screen_update(FUNC(megadriv_sunplus_state::screen_update_hybrid)); 
+	m_screen->screen_vblank().set(FUNC(megadriv_sunplus_state::screen_vblank_hybrid)); 
 }
 
 
