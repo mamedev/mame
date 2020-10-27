@@ -7,7 +7,7 @@
 	Preliminary emulation core by cam900
 
     Nintendo DS Sound has 16 sound channel and 2 sound capture channels.
-    basically each souhd channel has ADPCM/8 or 16 bit linear PCM
+    basically each sound channel has ADPCM/8 or 16 bit linear PCM
     playback, with PSG (channel 8-13) or Noise (channel 14-15).
 
     TODO:
@@ -34,16 +34,16 @@ static const s8 adpcm_index_table[8] =
 
 static const u16 adpcm_diff_table[89] =
 {
-	0x0007, 0x0008, 0x0009, 0x000A, 0x000B, 0x000C, 0x000D, 0x000E, 0x0010,
-	0x0011, 0x0013, 0x0015, 0x0017, 0x0019, 0x001C, 0x001F, 0x0022, 0x0025,
-	0x0029, 0x002D, 0x0032, 0x0037, 0x003C, 0x0042, 0x0049, 0x0050, 0x0058,
-	0x0061, 0x006B, 0x0076, 0x0082, 0x008F, 0x009D, 0x00AD, 0x00BE, 0x00D1,
-	0x00E6, 0x00FD, 0x0117, 0x0133, 0x0151, 0x0173, 0x0198, 0x01C1, 0x01EE,
-	0x0220, 0x0256, 0x0292, 0x02D4, 0x031C, 0x036C, 0x03C3, 0x0424, 0x048E,
-	0x0502, 0x0583, 0x0610, 0x06AB, 0x0756, 0x0812, 0x08E0, 0x09C3, 0x0ABD,
-	0x0BD0, 0x0CFF, 0x0E4C, 0x0FBA, 0x114C, 0x1307, 0x14EE, 0x1706, 0x1954,
-	0x1BDC, 0x1EA5, 0x21B6, 0x2515, 0x28CA, 0x2CDF, 0x315B, 0x364B, 0x3BB9,
-	0x41B2, 0x4844, 0x4F7E, 0x5771, 0x602F, 0x69CE, 0x7462, 0x7FFF
+	0x0007, 0x0008, 0x0009, 0x000a, 0x000b, 0x000c, 0x000d, 0x000e, 0x0010,
+	0x0011, 0x0013, 0x0015, 0x0017, 0x0019, 0x001c, 0x001f, 0x0022, 0x0025,
+	0x0029, 0x002d, 0x0032, 0x0037, 0x003c, 0x0042, 0x0049, 0x0050, 0x0058,
+	0x0061, 0x006b, 0x0076, 0x0082, 0x008f, 0x009d, 0x00ad, 0x00be, 0x00d1,
+	0x00e6, 0x00fd, 0x0117, 0x0133, 0x0151, 0x0173, 0x0198, 0x01c1, 0x01ee,
+	0x0220, 0x0256, 0x0292, 0x02d4, 0x031c, 0x036c, 0x03c3, 0x0424, 0x048e,
+	0x0502, 0x0583, 0x0610, 0x06ab, 0x0756, 0x0812, 0x08e0, 0x09c3, 0x0abd,
+	0x0bd0, 0x0cff, 0x0e4c, 0x0fba, 0x114c, 0x1307, 0x14ee, 0x1706, 0x1954,
+	0x1bdc, 0x1ea5, 0x21b6, 0x2515, 0x28ca, 0x2cdf, 0x315b, 0x364b, 0x3bb9,
+	0x41b2, 0x4844, 0x4f7e, 0x5771, 0x602f, 0x69ce, 0x7462, 0x7fff
 };
 
 // actually 0x04000400-0x0400051f in ARM7
@@ -202,69 +202,69 @@ void nds_sound_device::sound_stream_update(sound_stream &stream, std::vector<rea
 	outputs[1].fill(0);
 	for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
 	{
-		if (enable())
+		if (!enable())
+			return;
+
+		// mix outputs
+		int lmix = 0, rmix = 0;
+		for (int i = 0; i < 16; i++)
 		{
-			// mix outputs
-			int lmix = 0, rmix = 0;
-			for (int i = 0; i < 16; i++)
-			{
-				channel_t *channel = &m_channel[i];
-				channel->update();
-				// bypass mixer
-				if (((i == 1) && (!mix_ch1())) || ((i == 3) && (!mix_ch3())))
-					continue;
+			channel_t *channel = &m_channel[i];
+			channel->update();
+			// bypass mixer
+			if (((i == 1) && (!mix_ch1())) || ((i == 3) && (!mix_ch3())))
+				continue;
 
-				lmix += channel->loutput;
-				rmix += channel->routput;
-			}
-
-			// send mixer output to capture
-			m_capture[0].update(lmix);
-			m_capture[1].update(rmix);
-
-			// select left/right output source
-			switch (lout_from())
-			{
-			case 0: // left mixer
-				break;
-			case 1: // channel 1
-				lmix = m_channel[1].loutput;
-				break;
-			case 2: // channel 3
-				lmix = m_channel[3].loutput;
-				break;
-			case 3: // channel 1 + 3
-				lmix = m_channel[1].loutput + m_channel[3].loutput;
-				break;
-			}
-
-			switch (rout_from())
-			{
-			case 0: // right mixer
-				break;
-			case 1: // channel 1
-				rmix = m_channel[1].routput;
-				break;
-			case 2: // channel 3
-				rmix = m_channel[3].routput;
-				break;
-			case 3: // channel 1 + 3
-				rmix = m_channel[1].routput + m_channel[3].routput;
-				break;
-			}
-
-			// adjust master volume
-			lmix = (lmix * mvol()) >> 13;
-			rmix = (rmix * mvol()) >> 13;
-
-			// add bias and clip output
-			lmix = std::max<int>(0, std::min<int>(0x3ff, (lmix + (m_bias & 0x3ff))));
-			rmix = std::max<int>(0, std::min<int>(0x3ff, (rmix + (m_bias & 0x3ff))));
-
-			// set output
-			outputs[0].put_int_clamp(sampindex, lmix, 0x3ff);
-			outputs[1].put_int_clamp(sampindex, rmix, 0x3ff);
+			lmix += channel->loutput;
+			rmix += channel->routput;
 		}
+
+		// send mixer output to capture
+		m_capture[0].update(lmix);
+		m_capture[1].update(rmix);
+
+		// select left/right output source
+		switch (lout_from())
+		{
+		case 0: // left mixer
+			break;
+		case 1: // channel 1
+			lmix = m_channel[1].loutput;
+			break;
+		case 2: // channel 3
+			lmix = m_channel[3].loutput;
+			break;
+		case 3: // channel 1 + 3
+			lmix = m_channel[1].loutput + m_channel[3].loutput;
+			break;
+		}
+
+		switch (rout_from())
+		{
+		case 0: // right mixer
+			break;
+		case 1: // channel 1
+			rmix = m_channel[1].routput;
+			break;
+		case 2: // channel 3
+			rmix = m_channel[3].routput;
+			break;
+		case 3: // channel 1 + 3
+			rmix = m_channel[1].routput + m_channel[3].routput;
+			break;
+		}
+
+		// adjust master volume
+		lmix = (lmix * mvol()) >> 13;
+		rmix = (rmix * mvol()) >> 13;
+
+		// add bias and clip output
+		lmix = std::max<int>(0, std::min<int>(0x3ff, (lmix + (m_bias & 0x3ff))));
+		rmix = std::max<int>(0, std::min<int>(0x3ff, (rmix + (m_bias & 0x3ff))));
+
+		// set output
+		outputs[0].put_int_clamp(sampindex, lmix, 0x3ff);
+		outputs[1].put_int_clamp(sampindex, rmix, 0x3ff);
 	}
 }
 
@@ -342,7 +342,7 @@ void nds_sound_device::channel_t::keyon()
 		playing = true;
 		delay = format() == 2 ? 11 : 3; // 3 (11 for ADPCM) delay for playing sample
 		cur_bitaddr = cur_addr = 0;
-		cur_state = format() == 2 ? STATE_ADPCM_LOAD : (loopstart == 0 ? STATE_POST_LOOP : STATE_PRE_LOOP);
+		cur_state = (format() == 2) ? STATE_ADPCM_LOAD : ((loopstart == 0) ? STATE_POST_LOOP : STATE_PRE_LOOP);
 		counter = 0x10000;
 		sample = 0;
 		lfsr_out = 0x7fff;
@@ -395,7 +395,7 @@ void nds_sound_device::channel_t::fetch()
 		case 3: // PSG or Noise
 			sample = 0;
 			if (psg) // psg
-				sample = duty() == 7 ? -0x8000 : cur_bitaddr < (7 - duty()) ? -0x8000 : 0x7fff;
+				sample = (duty() == 7) ? -0x8000 : ((cur_bitaddr < (7 - duty())) ? -0x8000 : 0x7fff);
 			else if (noise) // noise
 				sample = lfsr_out;
 			break;

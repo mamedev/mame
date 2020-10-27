@@ -77,21 +77,21 @@ private:
 		const u8 voldiv_shift[4] = {0, 1, 2, 4};
 
 		// control bits
-		inline int volume() const { return BIT(control, 0, 7); } // global volume
-		inline u32 voldiv() const { return voldiv_shift[BIT(control, 8, 2)]; } // volume shift
-		inline bool hold() const  { return BIT(control, 15); } // hold bit
-		inline u32 pan() const    { return BIT(control, 16, 7); } // panning (0...127, 0 = left, 127 = right, 64 = half)
-		inline u32 duty() const   { return BIT(control, 24, 3); } // PSG duty
-		inline u32 repeat() const { return BIT(control, 27, 2); } // Repeat mode (Manual, Loop infinitely, One-shot)
-		inline u32 format() const { return BIT(control, 29, 2); } // Sound Format (PCM8, PCM16, ADPCM, PSG/Noise when exists)
-		inline bool busy() const  { return BIT(control, 31); } // Busy flag
+		int volume() const { return BIT(control, 0, 7); } // global volume
+		u32 voldiv() const { return voldiv_shift[BIT(control, 8, 2)]; } // volume shift
+		bool hold() const  { return BIT(control, 15); } // hold bit
+		u32 pan() const    { return BIT(control, 16, 7); } // panning (0...127, 0 = left, 127 = right, 64 = half)
+		u32 duty() const   { return BIT(control, 24, 3); } // PSG duty
+		u32 repeat() const { return BIT(control, 27, 2); } // Repeat mode (Manual, Loop infinitely, One-shot)
+		u32 format() const { return BIT(control, 29, 2); } // Sound Format (PCM8, PCM16, ADPCM, PSG/Noise when exists)
+		bool busy() const  { return BIT(control, 31); } // Busy flag
 
 		// calculated values
-		inline int lvol() const   { return (pan() == 0x7f) ? 0 : 128 - pan(); } // calculated left volume
-		inline int rvol() const   { return (pan() == 0x7f) ? 128 : pan(); } // calculated right volume
+		int lvol() const   { return (pan() == 0x7f) ? 0 : 128 - pan(); } // calculated left volume
+		int rvol() const   { return (pan() == 0x7f) ? 128 : pan(); } // calculated right volume
 
 		// calculated address
-		inline u32 addr() const { return (sourceaddr & ~3) + (cur_bitaddr >> 3) + (cur_state == STATE_POST_LOOP ? ((loopstart + cur_addr) << 2) : (cur_addr << 2)); }
+		u32 addr() const { return (sourceaddr & ~3) + (cur_bitaddr >> 3) + (cur_state == STATE_POST_LOOP ? ((loopstart + cur_addr) << 2) : (cur_addr << 2)); }
 
 		void keyon();
 		void keyoff();
@@ -136,17 +136,17 @@ private:
 	{
 		// inline constants
 		// control bits
-		inline bool addmode() const    { return BIT(control, 0); } // Add mode (add channel 1/3 output with channel 0/2)
-		inline bool get_source() const { return BIT(control, 1); } // Select source (left or right mixer, channel 0/2)
-		inline bool repeat() const     { return BIT(control, 2); } // repeat flag
-		inline bool format() const     { return BIT(control, 3); } // store format (PCM16, PCM8)
-		inline bool busy() const       { return BIT(control, 7); } // busy flag
+		bool addmode() const    { return BIT(control, 0); } // Add mode (add channel 1/3 output with channel 0/2)
+		bool get_source() const { return BIT(control, 1); } // Select source (left or right mixer, channel 0/2)
+		bool repeat() const     { return BIT(control, 2); } // repeat flag
+		bool format() const     { return BIT(control, 3); } // store format (PCM16, PCM8)
+		bool busy() const       { return BIT(control, 7); } // busy flag
 
 		// FIFO offset mask
-		inline u32 fifo_mask() const   { return format() ? 7 : 3; }
+		u32 fifo_mask() const   { return format() ? 7 : 3; }
 
 		// calculated address
-		inline u32 waddr() const { return (dstaddr & ~3) + (cur_waddr << 2); }
+		u32 waddr() const { return (dstaddr & ~3) + (cur_waddr << 2); }
 
 		void capture_on();
 		void capture_off();
