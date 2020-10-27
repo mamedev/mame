@@ -17,6 +17,8 @@
 #include "emu.h"
 #include "includes/nds.h"
 
+#include "speaker.h"
+
 #define VERBOSE_LEVEL   (0)
 
 // Measured value from GBATEK.  Actual crystal unknown.
@@ -589,6 +591,7 @@ void nds_state::nds_arm7_map(address_map &map)
 	map(0x03000000, 0x03007fff).mirror(0x007f8000).m(m_arm7wrambnk, FUNC(address_map_bank_device::amap32));
 	map(0x03800000, 0x0380ffff).ram().mirror(0x007f0000).share("arm7ram");
 	map(0x04000000, 0x0410ffff).rw(FUNC(nds_state::arm7_io_r), FUNC(nds_state::arm7_io_w));
+	map(0x04000400, 0x0400051f).m(m_nds_sound, FUNC(nds_sound_device::amap));
 }
 
 void nds_state::nds_arm9_map(address_map &map)
@@ -982,6 +985,16 @@ void nds_state::nds(machine_config &config)
 	// WRAM
 	ADDRESS_MAP_BANK(config, "nds7wram").set_map(&nds_state::nds7_wram_map).set_options(ENDIANNESS_LITTLE, 32, 32, 0x8000);
 	ADDRESS_MAP_BANK(config, "nds9wram").set_map(&nds_state::nds9_wram_map).set_options(ENDIANNESS_LITTLE, 32, 32, 0x8000);
+
+	// internal speakers
+	SPEAKER(config, "lspeaker", 0).front_left();
+	SPEAKER(config, "rspeaker", 0).front_right();
+
+	// sound hardware
+	NDS_SOUND(config, m_nds_sound, MASTER_CLOCK);
+	m_nds_sound->set_addrmap(0, &nds_state::nds_arm7_map); // shared bus?
+	m_nds_sound->add_route(0, "lspeaker", 1.0);
+	m_nds_sound->add_route(1, "rspeaker", 1.0);
 }
 
 /* Help identifying the region and revisions of the set would be greatly appreciated! */
