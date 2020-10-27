@@ -58,8 +58,12 @@ dio16_98644_device::dio16_98644_device(const machine_config &mconfig, const char
 dio16_98644_device::dio16_98644_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_dio16_card_interface(mconfig, *this),
-	m_uart(*this, INS8250_TAG),
-	m_switches{*this, "switches"}
+	m_uart{*this, INS8250_TAG},
+	m_switches{*this, "switches"},
+	m_installed_io{false},
+	m_control{0},
+	m_loopback{false},
+	m_data{0}
 {
 }
 
@@ -165,6 +169,8 @@ void dio16_98644_device::device_reset()
 				write16sm_delegate(*this, FUNC(dio16_98644_device::io_w)));
 		m_installed_io = true;
 	}
+	m_data = 0;
+	m_control = 0;
 }
 
 uint16_t dio16_98644_device::io_r(offs_t offset)
