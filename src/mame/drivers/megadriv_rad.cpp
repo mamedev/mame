@@ -104,7 +104,7 @@ INPUT_PORTS_END
 
 MACHINE_START_MEMBER(megadriv_radica_state, megadriv_radica_6button)
 {
-	MACHINE_START_CALL_MEMBER(megadriv);
+	md_base_state::machine_start();
 	m_vdp->stop_timers();
 
 	m_io_pad_6b[0] = ioport("EXTRA1");
@@ -121,7 +121,7 @@ MACHINE_START_MEMBER(megadriv_radica_state, megadriv_radica_6button)
 
 MACHINE_START_MEMBER(megadriv_radica_state, megadriv_radica_3button)
 {
-	MACHINE_START_CALL_MEMBER(megadriv);
+	md_base_state::machine_start();
 	m_vdp->stop_timers();
 	save_item(NAME(m_bank));
 }
@@ -129,7 +129,7 @@ MACHINE_START_MEMBER(megadriv_radica_state, megadriv_radica_3button)
 MACHINE_RESET_MEMBER(megadriv_radica_state, megadriv_radica)
 {
 	m_bank = 0;
-	MACHINE_RESET_CALL_MEMBER(megadriv);
+	md_base_state::machine_reset();
 }
 
 void megadriv_radica_state::megadriv_radica_3button_ntsc(machine_config &config)

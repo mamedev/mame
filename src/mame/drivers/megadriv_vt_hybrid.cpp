@@ -97,10 +97,9 @@ INPUT_PORTS_END
 
 void megadriv_vt0203_state::machine_start()
 {
-	printf("machine_start\n");
+	logerror("megadriv_vt0203_state::machine_start\n");
+	md_base_state::machine_start();
 
-	// Mega Drive part
-	MACHINE_START_CALL_MEMBER(megadriv); // legacy call type for MD base code
 	m_vdp->stop_timers();
 	save_item(NAME(m_bank));
 
@@ -110,8 +109,8 @@ void megadriv_vt0203_state::machine_start()
 
 void megadriv_vt0203_state::machine_reset()
 {
-	printf("machine_reset\n");
-	MACHINE_RESET_CALL_MEMBER(megadriv); // legacy call type for MD base code
+	logerror("megadriv_vt0203_state::machine_reset\n");
+	md_base_state::machine_reset();
 }
 
 uint32_t megadriv_vt0203_state::screen_update_hybrid(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

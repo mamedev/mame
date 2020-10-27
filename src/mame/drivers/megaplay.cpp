@@ -653,7 +653,7 @@ MACHINE_RESET_MEMBER(mplay_state,megaplay)
 	m_bios_mode = MP_ROM;
 	m_bios_bank_addr = 0;
 	m_readpos = 1;
-	MACHINE_RESET_CALL_MEMBER(megadriv);
+	md_base_state::machine_reset();
 }
 
 void mplay_state::megaplay(machine_config &config)

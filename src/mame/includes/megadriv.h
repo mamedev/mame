@@ -131,8 +131,7 @@ public:
 
 	void megadriv_stop_scanline_timer();
 
-	DECLARE_MACHINE_START( megadriv );
-	DECLARE_MACHINE_RESET( megadriv );
+
 	DECLARE_VIDEO_START( megadriv );
 	uint32_t screen_update_megadriv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_megadriv);
@@ -150,6 +149,10 @@ public:
 	void megadriv_map(address_map &map);
 	void megadriv_z80_io_map(address_map &map);
 	void megadriv_z80_map(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 };
 
 class md_cons_state : public md_base_state
@@ -183,7 +186,6 @@ public:
 	DECLARE_MACHINE_START( md_common );     // setup ioport_port
 	DECLARE_MACHINE_START( ms_megadriv );   // setup ioport_port + install cartslot handlers
 	DECLARE_MACHINE_START( ms_megacd );     // setup ioport_port + dma delay for cd
-	DECLARE_MACHINE_RESET( ms_megadriv );
 
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_console);
 
@@ -215,6 +217,10 @@ public:
 	void genesis_scd(machine_config &config);
 	void genesis2_scd(machine_config &config);
 	void genesis_tmss(machine_config &config);
+
+protected:
+	//virtual void machine_start() override;
+	virtual void machine_reset() override;
 };
 
 #endif // MAME_INCLUDES_MEGADRIV_H

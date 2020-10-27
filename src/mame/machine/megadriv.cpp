@@ -789,7 +789,7 @@ VIDEO_START_MEMBER(md_base_state,megadriv)
 {
 }
 
-MACHINE_START_MEMBER(md_base_state,megadriv)
+void md_base_state::machine_start()
 {
 	m_io_pad_3b[0] = ioport("PAD1");
 	m_io_pad_3b[1] = ioport("PAD2");
@@ -802,7 +802,7 @@ MACHINE_START_MEMBER(md_base_state,megadriv)
 	save_item(NAME(m_megadrive_io_tx_regs));
 }
 
-MACHINE_RESET_MEMBER(md_base_state,megadriv)
+void md_base_state::machine_reset()
 {
 	/* default state of z80 = reset, with bus */
 	osd_printf_debug("Resetting Megadrive / Genesis\n");
@@ -908,8 +908,8 @@ void md_base_state::md_ntsc(machine_config &config)
 	m_z80snd->set_addrmap(AS_IO, &md_base_state::megadriv_z80_io_map);
 	/* IRQ handled via the timers */
 
-	MCFG_MACHINE_START_OVERRIDE(md_base_state,megadriv)
-	MCFG_MACHINE_RESET_OVERRIDE(md_base_state,megadriv)
+	//MCFG_MACHINE_START_OVERRIDE(md_base_state,megadriv)
+	//MCFG_MACHINE_RESET_OVERRIDE(md_base_state,megadriv)
 
 	megadriv_timers(config);
 
@@ -973,8 +973,8 @@ void md_base_state::md_pal(machine_config &config)
 	m_z80snd->set_addrmap(AS_IO, &md_base_state::megadriv_z80_io_map);
 	/* IRQ handled via the timers */
 
-	MCFG_MACHINE_START_OVERRIDE(md_base_state,megadriv)
-	MCFG_MACHINE_RESET_OVERRIDE(md_base_state,megadriv)
+	//MCFG_MACHINE_START_OVERRIDE(md_base_state,megadriv)
+	//MCFG_MACHINE_RESET_OVERRIDE(md_base_state,megadriv)
 
 	megadriv_timers(config);
 

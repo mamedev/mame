@@ -352,9 +352,17 @@ MACHINE_START_MEMBER(md_cons_state, ms_megadriv)
 	{
 		install_cartslot();
 	}
-
-
 }
+
+void md_cons_state::machine_reset()
+{
+	md_base_state::machine_reset();
+
+	// if the system has a 32x, pause the extra CPUs until they are actually turned on
+	if (m_32x)
+		m_32x->pause_cpu();
+}
+
 
 MACHINE_START_MEMBER(md_cons_state, ms_megacd)
 {
@@ -363,15 +371,6 @@ MACHINE_START_MEMBER(md_cons_state, ms_megacd)
 	// the segaCD introduces some kind of DMA 'lag', which we have to compensate for,
 	// at least when reading wordram? we might need to check what mode we're in the DMA...
 	m_vdp->set_dma_delay(2);
-}
-
-MACHINE_RESET_MEMBER(md_cons_state, ms_megadriv)
-{
-	MACHINE_RESET_CALL_MEMBER( megadriv );
-
-	// if the system has a 32x, pause the extra CPUs until they are actually turned on
-	if (m_32x)
-		m_32x->pause_cpu();
 }
 
 // same as screen_eof_megadriv but with addition of 32x and SegaCD/MegaCD pieces
@@ -403,7 +402,6 @@ void md_cons_state::ms_megadriv(machine_config &config)
 	md_ntsc(config);
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megadriv)
-	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
@@ -416,7 +414,6 @@ void md_cons_state::ms_megadpal(machine_config &config)
 	md_pal(config);
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megadriv)
-	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
@@ -429,7 +426,6 @@ void md_cons_state::ms_megadriv2(machine_config &config)
 	md2_ntsc(config);
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megadriv)
-	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
@@ -448,7 +444,6 @@ void md_cons_state::dcat16_megadriv(machine_config &config)
 	dcat16_megadriv_base(config);
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, md_common)
-	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, megadriv)
 
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
@@ -648,7 +643,6 @@ void md_cons_state::genesis_32x(machine_config &config)
 	md_ntsc(config);
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, md_common)
-	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
 	m_vdp->set_md_32x_scanline(FUNC(md_cons_state::_32x_scanline_callback));
 	m_vdp->set_md_32x_scanline_helper(FUNC(md_cons_state::_32x_scanline_helper_callback));
@@ -683,7 +677,6 @@ void md_cons_state::mdj_32x(machine_config &config)
 	md_ntsc(config);
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, md_common)
-	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
 	m_vdp->set_md_32x_scanline(FUNC(md_cons_state::_32x_scanline_callback));
 	m_vdp->set_md_32x_scanline_helper(FUNC(md_cons_state::_32x_scanline_helper_callback));
@@ -718,7 +711,6 @@ void md_cons_state::md_32x(machine_config &config)
 	md_pal(config);
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, md_common)
-	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
 	m_vdp->set_md_32x_scanline(FUNC(md_cons_state::_32x_scanline_callback));
 	m_vdp->set_md_32x_scanline_helper(FUNC(md_cons_state::_32x_scanline_helper_callback));
@@ -785,7 +777,6 @@ void md_cons_state::genesis_scd(machine_config &config)
 	md_ntsc(config);
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)
-	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
@@ -806,7 +797,6 @@ void md_cons_state::genesis2_scd(machine_config &config)
 	md2_ntsc(config);
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)
-	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
@@ -827,7 +817,6 @@ void md_cons_state::md_scd(machine_config &config)
 	md_pal(config);
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)
-	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
@@ -848,7 +837,6 @@ void md_cons_state::md2_scd(machine_config &config)
 	md2_pal(config);
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)
-	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
@@ -869,7 +857,6 @@ void md_cons_state::mdj_scd(machine_config &config)
 	md_ntsc(config);
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)
-	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
@@ -890,7 +877,6 @@ void md_cons_state::md2j_scd(machine_config &config)
 	md2_ntsc(config);
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)
-	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 

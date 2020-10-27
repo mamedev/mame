@@ -647,7 +647,7 @@ WRITE_LINE_MEMBER(mtech_state::screen_vblank_main)
 MACHINE_RESET_MEMBER(mtech_state, megatech)
 {
 	m_mt_bank_addr = 0;
-	MACHINE_RESET_CALL_MEMBER(megadriv);
+	md_base_state::machine_reset();
 
 	std::string region_tag;
 	if (m_cart1->get_rom_size() > 0)

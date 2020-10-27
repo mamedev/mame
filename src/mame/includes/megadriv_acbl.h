@@ -47,7 +47,12 @@ private:
 	uint16_t puckpkmna_70001c_r();
 	uint16_t puckpkmna_4b2476_r();
 
-	DECLARE_MACHINE_START(md_bootleg) { MACHINE_START_CALL_MEMBER(megadriv); m_vdp->stop_timers(); }
+	DECLARE_MACHINE_START(md_bootleg)
+	{
+		md_base_state::machine_start();
+		m_vdp->stop_timers();
+	}
+
 	DECLARE_MACHINE_START(md_6button);
 
 	void jzth_map(address_map &map);
