@@ -144,6 +144,7 @@ public:
 	void md_pal(machine_config &config);
 	void md2_pal(machine_config &config);
 	void md_bootleg(machine_config &config);
+
 	void dcat16_megadriv_base(machine_config &config);
 	void dcat16_megadriv_map(address_map &map);
 	void megadriv_map(address_map &map);
@@ -183,10 +184,6 @@ public:
 	uint8_t mess_md_io_read_data_port(offs_t offset);
 	void mess_md_io_write_data_port(offs_t offset, uint16_t data);
 
-	DECLARE_MACHINE_START( md_common );     // setup ioport_port
-	DECLARE_MACHINE_START( ms_megadriv );   // setup ioport_port + install cartslot handlers
-	DECLARE_MACHINE_START( ms_megacd );     // setup ioport_port + dma delay for cd
-
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_console);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( _32x_cart );
@@ -199,28 +196,56 @@ public:
 	void install_tmss();
 	uint16_t tmss_r(offs_t offset);
 	void tmss_swap_w(uint16_t data);
-	void genesis_32x_scd(machine_config &config);
-	void mdj_32x_scd(machine_config &config);
-	void ms_megadpal(machine_config &config);
 	void dcat16_megadriv_base(machine_config &config);
 	void dcat16_megadriv(machine_config &config);
-	void md_32x_scd(machine_config &config);
-	void mdj_32x(machine_config &config);
-	void ms_megadriv(machine_config &config);
-	void ms_megadriv2(machine_config &config);
-	void mdj_scd(machine_config &config);
-	void md2j_scd(machine_config &config);
+
 	void md_32x(machine_config &config);
 	void genesis_32x(machine_config &config);
-	void md_scd(machine_config &config);
-	void md2_scd(machine_config &config);
-	void genesis_scd(machine_config &config);
-	void genesis2_scd(machine_config &config);
-	void genesis_tmss(machine_config &config);
+	void mdj_32x(machine_config &config);
 
 protected:
-	//virtual void machine_start() override;
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
+};
+
+class md_cons_slot_state : public md_cons_state
+{
+public:
+	md_cons_slot_state(const machine_config &mconfig, device_type type, const char *tag) :
+		md_cons_state(mconfig, type, tag)
+	{ }
+
+	void ms_megadpal(machine_config &config);
+	void ms_megadriv(machine_config &config);
+	void ms_megadriv2(machine_config &config);
+
+	void genesis_tmss(machine_config &config);
+
+
+protected:
+	virtual void machine_start() override;
+};
+
+class md_cons_cd_state : public md_cons_state
+{
+public:
+	md_cons_cd_state(const machine_config &mconfig, device_type type, const char *tag) :
+		md_cons_state(mconfig, type, tag)
+	{ }
+
+	void genesis_scd(machine_config &config);
+	void genesis2_scd(machine_config &config);
+	void md_scd(machine_config &config);
+	void md2_scd(machine_config &config);
+	void mdj_scd(machine_config &config);
+
+	void mdj_32x_scd(machine_config &config);
+	void md2j_scd(machine_config &config);
+	void genesis_32x_scd(machine_config &config);
+	void md_32x_scd(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
 };
 
 #endif // MAME_INCLUDES_MEGADRIV_H
