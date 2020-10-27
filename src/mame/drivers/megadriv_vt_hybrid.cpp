@@ -136,7 +136,10 @@ void megadriv_vt0203_state::megadriv_vt0203_pal(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &megadriv_vt0203_state::megadriv_vt0203_map);
 
 	m_screen->set_screen_update(FUNC(megadriv_vt0203_state::screen_update_hybrid)); 
-	m_screen->screen_vblank().set(FUNC(megadriv_vt0203_state::screen_vblank_hybrid)); 
+	m_screen->screen_vblank().set(FUNC(megadriv_vt0203_state::screen_vblank_hybrid));
+
+	// TODO: add the VT part, this might require refactoring of the VT stuff as the SoC currently contains the screen
+	//       but instead we'll need to use a shared screen that is reconfigured depending on which part is enabled
 }
 
 
