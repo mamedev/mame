@@ -78,7 +78,8 @@ dio16_98544_device::dio16_98544_device(const machine_config &mconfig, device_typ
 	m_topcat(*this, "topcat"),
 	m_space_config("vram", ENDIANNESS_BIG, 8, 20, 0, address_map_constructor(FUNC(dio16_98544_device::map), this)),
 	m_rom(*this, HP98544_ROM_REGION),
-	m_vram(*this, "vram")
+	m_vram(*this, "vram"),
+	m_intreg(0)
 {
 }
 
@@ -119,6 +120,7 @@ void dio16_98544_device::device_start()
 
 void dio16_98544_device::device_reset()
 {
+	m_intreg = 0;
 }
 
 uint16_t dio16_98544_device::rom_r(offs_t offset)
