@@ -108,7 +108,18 @@ human_interface_device::human_interface_device(const machine_config &mconfig, de
 	m_sound(*this, "sn76494"),
 	m_tms9914(*this, "tms9914"),
 	m_rtc(*this, "rtc"),
-	m_ieee488(*this, IEEE488_TAG)
+	m_ieee488(*this, IEEE488_TAG),
+	m_hil_read(false),
+	m_kbd_nmi(false),
+	m_gpib_irq_line(false),
+	m_gpib_dma_line(false),
+	m_old_latch_enable(false),
+	m_gpib_dma_enable(false),
+	m_hil_data(0),
+	m_latch_data(0),
+	m_rtc_data(0),
+	m_ppoll_sc(0),
+	m_ppoll_mask(0)
 {
 }
 
@@ -137,11 +148,17 @@ void human_interface_device::device_start()
 
 void human_interface_device::device_reset()
 {
-	m_ppoll_sc = 0;
-	m_gpib_irq_line = false;
+	m_hil_read = false;
 	m_kbd_nmi = false;
-	m_old_latch_enable = true;
+	m_gpib_irq_line = false;
+	m_gpib_dma_line = false;
 	m_gpib_dma_enable = false;
+	m_old_latch_enable = true;
+	m_ppoll_sc = 0;
+	m_hil_data = 0;
+	m_latch_data = 0;
+	m_rtc_data = 0;
+	m_ppoll_mask = 0;
 	m_rtc->cs1_w(ASSERT_LINE);
 	m_rtc->cs2_w(CLEAR_LINE);
 	m_rtc->write_w(CLEAR_LINE);

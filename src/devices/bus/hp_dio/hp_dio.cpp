@@ -105,6 +105,9 @@ dio16_device::dio16_device(const machine_config &mconfig, const char *tag, devic
 dio16_device::dio16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_prgspace(*this, finder_base::DUMMY_TAG, -1),
+	m_bus_index{0},
+	m_irq{0},
+	m_dmar{0},
 	m_irq1_out_cb(*this),
 	m_irq2_out_cb(*this),
 	m_irq3_out_cb(*this),

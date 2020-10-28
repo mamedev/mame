@@ -122,7 +122,7 @@ private:
 		bool word;
 	} m_regs[2];
 
-	bool dmar[2];
+	bool m_dmar[2];
 };
 
 } } // namespace bus::hp_dio
