@@ -90,6 +90,9 @@ protected:
 	static constexpr u32 INTERNAL_EEPROM_SIZE = 1024;   // 16kbit on WSC
 	static constexpr u32 INTERNAL_EEPROM_SIZE_WS = 64;  // 1kbit on WS
 
+	// Labeled 12.3FXA on wonderswan color pcb
+	static constexpr XTAL X1 = 12.288_MHz_XTAL;
+
 	enum enum_system { TYPE_WSWAN=0, TYPE_WSC };
 
 	struct sound_dma_t
@@ -245,12 +248,12 @@ static void wswan_cart(device_slot_interface &device)
 void wswan_state::wswan(machine_config &config)
 {
 	// Basic machine hardware
-	V30MZ(config, m_maincpu, 3.072_MHz_XTAL);
+	V30MZ(config, m_maincpu, X1 / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &wswan_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &wswan_state::io_map);
 	m_maincpu->vector_cb().set(FUNC(wswan_state::get_vector));
 
-	WSWAN_VIDEO(config, m_vdp, 3.072_MHz_XTAL);
+	WSWAN_VIDEO(config, m_vdp, X1 / 4);
 	m_vdp->set_screen("screen");
 	m_vdp->set_vdp_type(wswan_video_device::VDP_TYPE_WSWAN);
 	m_vdp->set_irq_callback(FUNC(wswan_state::set_irq_line));
@@ -259,7 +262,7 @@ void wswan_state::wswan(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_screen_update("vdp", FUNC(wswan_video_device::screen_update));
-	screen.set_raw(3.072_MHz_XTAL, 256, 0, wswan_video_device::WSWAN_X_PIXELS, 159, 0, wswan_video_device::WSWAN_Y_PIXELS);
+	screen.set_raw(X1 / 4, 256, 0, wswan_video_device::WSWAN_X_PIXELS, 159, 0, wswan_video_device::WSWAN_Y_PIXELS);
 	screen.set_palette("palette");
 
 	config.set_default_layout(layout_wswan);
@@ -274,13 +277,13 @@ void wswan_state::wswan(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	WSWAN_SND(config, m_sound, 3.072_MHz_XTAL);
+	WSWAN_SND(config, m_sound, X1 / 4);
 	m_sound->set_addrmap(0, &wswan_state::snd_map);
 	m_sound->add_route(0, "lspeaker", 0.50);
 	m_sound->add_route(1, "rspeaker", 0.50);
 
 	// cartridge
-	WS_CART_SLOT(config, m_cart, 3.072_MHz_XTAL / 8, wswan_cart, nullptr);
+	WS_CART_SLOT(config, m_cart, X1 / 32, wswan_cart, nullptr);
 
 	// software lists
 	SOFTWARE_LIST(config, "cart_list").set_original("wswan");
