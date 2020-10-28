@@ -109,13 +109,6 @@ void xtide_device::write(offs_t offset, uint8_t data)
 	}
 }
 
-uint8_t xtide_device::eeprom_read(offs_t offset)
-{
-	address_space &space = m_isa->memspace();
-
-	return m_eeprom->read(space, offset);
-}
-
 WRITE_LINE_MEMBER(xtide_device::ide_interrupt)
 {
 	switch (m_irq_number)
@@ -329,7 +322,7 @@ void xtide_device::device_reset()
 	int io_address      = ((ioport("IO_ADDRESS")->read() & 0x0F) * 0x20) + 0x200;
 	m_irq_number        = (ioport("IRQ")->read() & 0x07);
 
-	m_isa->install_memory(base_address, base_address + 0x1fff, read8sm_delegate(*this, FUNC(xtide_device::eeprom_read)), write8sm_delegate(*m_eeprom, FUNC(eeprom_parallel_28xx_device::write)));
+	m_isa->install_memory(base_address, base_address + 0x1fff, read8m_delegate(*m_eeprom, FUNC(eeprom_parallel_28xx_device::read)), write8sm_delegate(*m_eeprom, FUNC(eeprom_parallel_28xx_device::write)));
 	m_isa->install_device(io_address, io_address + 0xf, read8sm_delegate(*this, FUNC(xtide_device::read)), write8sm_delegate(*this, FUNC(xtide_device::write)));
 
 	//logerror("xtide_device::device_reset(), bios_base=0x%5X to 0x%5X, I/O=0x%3X, IRQ=%d\n",base_address,base_address + (16*1024)  -1 ,io_address,irq);
