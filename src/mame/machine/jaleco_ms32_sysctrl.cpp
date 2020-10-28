@@ -158,7 +158,10 @@ void jaleco_ms32_sysctrl_device::flush_prg_timer()
 		step = attotime::from_nsec(500000) * m_timer.interval;
 	}
 	else
+	{
 		step = attotime::never;
+		m_prg_timer_cb(0);
+	}
 	m_timer.prg_irq->adjust(step);
 }
 
