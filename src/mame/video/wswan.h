@@ -111,7 +111,7 @@ protected:
 
 	std::vector<u16> m_vram;
 	u16 *m_palette_vram;
-	u8 m_palette_port[0x20];
+	u16 m_palette_port[0x10];
 	int m_pal[16][16];
 	u8 m_regs[256];
 
