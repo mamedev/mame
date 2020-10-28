@@ -88,7 +88,8 @@ void ms32_state::video_start()
 
 	// tp2m32 doesn't set the brightness registers so we need sensible defaults
 	m_brt[0] = m_brt[1] = 0xffff;
-
+	m_sprite_ctrl[0x10/4] = 0x8000;
+	
 	save_pointer(NAME(m_sprram_buffer), size);
 	save_item(NAME(m_irqreq));
 	save_item(NAME(m_temp_bitmap_tilemaps));
@@ -164,18 +165,17 @@ void ms32_state::ms32_brightness_w(offs_t offset, u32 data, u32 mem_mask)
 /* SPRITES based on tetrisp2 for now, readd priority bits later */
 void ms32_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, const rectangle &cliprect, u16 *sprram_top)
 {
-	const u32 sprite_size = 0x10000;
-	u16  *source =   sprram_top;
-	u16  *finish =   sprram_top + (sprite_size - 0x10);
+	const size_t sprite_tail = (0x20000 - 0x10) / 2;
+	u16  *source = sprram_top;
+	u16  *finish = sprram_top + sprite_tail;
 	// TODO: sprite control 0x10 also uses bits 0-11 for sprite start address? 
 	// akiss uses it for double buffer animations, flips between 0 and 0x800 (and is ugly for latter)
 	const bool reverseorder = (m_sprite_ctrl[0x10/4] & 0x8000) == 0x0000;
-//	popmessage("%08x %d",m_sprite_ctrl[0x10/4], reverseorder);
 
 	if (reverseorder == true)
 	{
-		source  = sprram_top + (sprite_size - 0x10);
-		finish  = sprram_top;
+		source = sprram_top + sprite_tail;
+		finish = sprram_top;
 	}
 
 	for (;reverseorder ? (source>=finish) : (source<finish); reverseorder ? (source-=8) : (source+=8))

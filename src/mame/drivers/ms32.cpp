@@ -534,12 +534,6 @@ u32 ms32_state::sound_result_r()
 	return m_to_main^0xff;
 }
 
-void ms32_state::sound_reset_w(u32 data)
-{
-	if(data) m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero); // 0 too ?
-}
-
-
 
 
 /********** MEMORY MAP **********/
@@ -699,15 +693,7 @@ void ms32_state::ms32_map(address_map &map)
 	map(0xfcc00004, 0xfcc00007).portr("INPUTS");
 	map(0xfcc00010, 0xfcc00013).portr("DSW");
 	// System Registers
-	map(0xfce00000, 0xfce00037).m(m_sysctrl, FUNC(jaleco_ms32_sysctrl_device::amap)).umask32(0x0000ffff);
-//	map(0xfce00000, 0xfce0002f).w(FUNC(ms32_state::crtc_w));   					// flip screen + CRTC setup
-//	map(0xfce00030, 0xfce00033) 												// timer irq control
-//	map(0xfce00034, 0xfce00037).nopw(); 										// timer irq trigger (ack?)
-	map(0xfce00038, 0xfce0003b).w(FUNC(ms32_state::sound_reset_w));
-//	map(0xfce0003c, 0xfce0003f) 												// ???
-//	map(0xfce00048, 0xfce0004f)													// sound comms bidirectional acks?
-	map(0xfce00050, 0xfce00053).nopw();											// watchdog
-//	map(0xfce00058, 0xfce0005f)													// irq control?
+	map(0xfce00000, 0xfce0005f).m(m_sysctrl, FUNC(jaleco_ms32_sysctrl_device::amap)).umask32(0x0000ffff);
 	map(0xfce00200, 0xfce0027f).ram().share("sprite_ctrl");
 	map(0xfce00280, 0xfce0028f).w(FUNC(ms32_state::ms32_brightness_w)); 		// global brightness control
 //	map(0xfce00400, 0xfce0045f)													// ROZ0 control registers
@@ -1657,25 +1643,28 @@ void ms32_state::irq_raise(int level)
 	m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
-/* TODO: fix this arrangement (derived from old deprecat lib) */
-TIMER_DEVICE_CALLBACK_MEMBER(ms32_state::ms32_interrupt)
+WRITE_LINE_MEMBER(ms32_state::timer_irq_w)
 {
-	int scanline = param;
-	// vblank irq
-	if(scanline == 224)
+	if (state)
+		irq_raise(0);
+}
+
+WRITE_LINE_MEMBER(ms32_state::vblank_irq_w)
+{
+	if (state)
 		irq_raise(10);
-	// TODO: really a 30Hz interrupt
-	if(scanline == 0)
+}
+
+WRITE_LINE_MEMBER(ms32_state::field_irq_w)
+{
+	if (state)
 		irq_raise(9);
-	/* hayaosi1 needs at least 12 IRQ 0 per frame to work (see code at FFE02289) <- hayaosi1 is a megasys1 game ... -AS
-	   kirarast needs it too, at least 8 per frame, but waits for a variable amount
-	   suchie2 needs ?? per frame (otherwise it hangs when you lose)
-	   in different points. Could this be a raster interrupt?
-	   Other games using it but not needing it to work:
-	   desertwr
-	   p47aces
-	   */
-	if( (scanline % 8) == 0 && scanline <= 224 ) irq_raise(0);
+}
+
+WRITE_LINE_MEMBER(ms32_state::sound_reset_line_w)
+{
+	if (state)
+		m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 
@@ -1754,7 +1743,7 @@ void ms32_state::ms32(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ms32_state::ms32_map);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(ms32_state::irq_callback));
 
-	TIMER(config, "scantimer").configure_scanline(FUNC(ms32_state::ms32_interrupt), "screen", 0, 1);
+//	TIMER(config, "scantimer").configure_scanline(FUNC(jaleco_ms32_sysctrl_device::scanline_cb), "screen", 0, 1);
 
 	Z80(config, m_audiocpu, 8000000); // Z0840008PSC, Clock from notes (40MHz / 5 or 48MHz / 6?)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ms32_state::ms32_sound_map);
@@ -1763,6 +1752,10 @@ void ms32_state::ms32(machine_config &config)
 
 	JALECO_MS32_SYSCTRL(config, m_sysctrl, XTAL(48'000'000));
 	m_sysctrl->flip_screen_cb().set(FUNC(ms32_state::flipscreen_w));
+	m_sysctrl->vblank_cb().set(FUNC(ms32_state::vblank_irq_w));
+	m_sysctrl->field_cb().set(FUNC(ms32_state::field_irq_w));
+	m_sysctrl->prg_timer_cb().set(FUNC(ms32_state::timer_irq_w));
+	m_sysctrl->sound_reset_cb().set(FUNC(ms32_state::sound_reset_line_w));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1796,7 +1789,6 @@ void ms32_state::ms32(machine_config &config)
 void ms32_state::f1superb(machine_config &config)
 {
 	ms32(config);
-	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &ms32_state::f1superb_map);
 
 	m_gfxdecode->set_info(gfx_f1superb);

@@ -131,6 +131,9 @@ public:
 
 private:
 
+	TIMER_DEVICE_CALLBACK_MEMBER(ms32_interrupt);
+	void sound_reset_w(u32 data);
+
 	tilemap_t *m_ms32_tx_tilemap[2];
 	tilemap_t *m_ms32_bg_tilemap[2];
 	tilemap_t *m_ms32_roz_tilemap[2];
@@ -786,6 +789,35 @@ void bnstars_state::bnstars_sound_map(address_map &map)
 	map(0x4000, 0x7fff).ram();
 	map(0x8000, 0xbfff).bankr("z80bank1");
 	map(0xc000, 0xffff).bankr("z80bank2");
+}
+
+// TODO: legacy fn, use sysctrl instead
+TIMER_DEVICE_CALLBACK_MEMBER(bnstars_state::ms32_interrupt)
+{
+	int scanline = param;
+	// vblank irq
+	if(scanline == 224)
+		irq_raise(10);
+	
+	// 30 Hz irq
+	// TODO: unknown vertical position where this happens
+	if(scanline == 0 && m_screen->frame_number() & 1)
+		irq_raise(9);
+	/* hayaosi1 needs at least 12 IRQ 0 per frame to work (see code at FFE02289) <- hayaosi1 is a megasys1 game ... -AS
+	   kirarast needs it too, at least 8 per frame, but waits for a variable amount
+	   suchie2 needs ?? per frame (otherwise it hangs when you lose)
+	   in different points. Could this be a raster interrupt?
+	   Other games using it but not needing it to work:
+	   desertwr
+	   p47aces
+	   */
+	if( (scanline % 8) == 0 && scanline <= 224 ) irq_raise(0);
+}
+
+// TODO: legacy fn, use sysctrl instead
+void bnstars_state::sound_reset_w(u32 data)
+{
+	if(data) m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero); // 0 too ?
 }
 
 

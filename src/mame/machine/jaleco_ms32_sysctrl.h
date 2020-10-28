@@ -15,12 +15,6 @@ Jaleco MS32 System Control Unit
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -39,7 +33,10 @@ public:
 //	u16 read(offs_t offset, u16 mem_mask = ~0);
 	void amap(address_map &map);
 	auto flip_screen_cb() { return m_flip_screen_cb.bind(); }
-
+	auto vblank_cb() { return m_vblank_cb.bind(); }
+	auto field_cb() { return m_field_cb.bind(); }
+	auto prg_timer_cb() { return m_prg_timer_cb.bind(); }
+	auto sound_reset_cb() { return m_sound_reset_cb.bind(); }
 
 protected:
 	// device-level overrides
@@ -48,6 +45,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 //	virtual space_config_vector memory_space_config() const override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 //	const address_space_config m_space_config;
 //	void io_map(address_map &map);
@@ -63,9 +61,18 @@ private:
 	void vbp_w(u16 data);
 	void vfp_w(u16 data);
 	void timer_interval_w(u16 data);
+	void sound_reset_w(u16 data);
+	void vblank_ack_w(u16 data);
+	void field_ack_w(u16 data);
+	void timer_ack_w(u16 data);
 
 	devcb_write_line m_flip_screen_cb;
-	u8 m_dotclock;
+	devcb_write_line m_vblank_cb;
+	devcb_write_line m_field_cb;
+	devcb_write_line m_prg_timer_cb;
+	devcb_write_line m_sound_reset_cb;
+	u8 m_dotclock_setting;
+	inline u32 get_dotclock_frequency();
 	bool m_flip_screen_state;
 	inline u16 clamp_to_12bits_neg(u16 raw_data);
 	struct {
@@ -75,7 +82,21 @@ private:
 	struct {
 		bool irq_enable;
 		u16 interval;
+		emu_timer *prg_irq;
 	}m_timer;
+	
+	emu_timer *m_vblank_timer;
+	emu_timer *m_field_timer;
+	enum timer_id
+	{
+		VBLANK_TIMER,
+		FIELD_TIMER,
+		PRG_TIMER
+	};
+
+	inline void flush_prg_timer();
+	inline void flush_vblank_timer();
+	inline void flush_field_timer();
 };
 
 

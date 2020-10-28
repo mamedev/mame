@@ -62,7 +62,6 @@ protected:
 
 	void configure_banks();
 
-	TIMER_DEVICE_CALLBACK_MEMBER(ms32_interrupt);
 	void ms32_snd_bank_w(u8 data);
 
 	u8 latch_r();
@@ -81,8 +80,16 @@ protected:
 	optional_device<generic_latch_8_device> m_soundlatch;
 	optional_shared_ptr<u32> m_sprite_ctrl;
 
-private:
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
+	DECLARE_WRITE_LINE_MEMBER(timer_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(field_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(sound_reset_line_w);
+	void irq_raise(int level);
+
 	optional_device<screen_device> m_screen;
+
+private:
 	optional_shared_ptr<u32> m_mainram;
 	optional_shared_ptr<u32> m_roz_ctrl;
 	optional_shared_ptr<u32> m_tx_scroll;
@@ -150,9 +157,7 @@ private:
 	DECLARE_VIDEO_START(f1superb);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
-	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	void irq_init();
-	void irq_raise(int level);
 	void update_color(int color);
 	void draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, const rectangle &cliprect, u16 *sprram_top);
 	void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect,int priority);
