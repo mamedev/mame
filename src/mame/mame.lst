@@ -42071,6 +42071,9 @@ tshoot                          // (c) 1984
 zero                            // bootleg
 zero2                           // bootleg
 
+@source:winbingo.cpp
+wbingo06
+
 @source:wink.cpp
 wink                            // (c) 1985 Midcoin
 winka                           // (c) 1985 Midcoin
