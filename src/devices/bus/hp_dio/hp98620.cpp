@@ -30,7 +30,7 @@ dio16_98620_device::dio16_98620_device(const machine_config &mconfig, device_typ
 	m_control{0},
 	m_data{0},
 	m_irq_state{false},
-	m_regs {0},
+	m_regs {{0}},
 	m_dmar {false}
 {
 }
