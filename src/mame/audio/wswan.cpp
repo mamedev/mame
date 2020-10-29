@@ -122,7 +122,7 @@ void wswan_sound_device::device_reset()
 
 int wswan_sound_device::fetch_sample(int channel, int offset)
 {
-	uint16_t w = read_word(m_sample_address + ((channel & 3) << 4) + ((offset >> 1) & 0x0e));
+	u16 w = read_word(m_sample_address + ((channel & 3) << 4) + ((offset >> 1) & 0x0e));
 
 	return (w >> ((offset & 0x03) * 4)) & 0x0f;
 }
@@ -156,7 +156,7 @@ void wswan_sound_device::sound_stream_update(sound_stream &stream, std::vector<r
 		{
 			if (m_audio2_voice)
 			{
-				uint8_t voice_data = m_audio[1].vol_left << 4 | m_audio[1].vol_right;
+				u8 voice_data = m_audio[1].vol_left << 4 | m_audio[1].vol_right;
 				left += voice_data * (m_master_volume & 0x0f);
 				right += voice_data * (m_master_volume & 0x0f);
 			}
@@ -241,13 +241,10 @@ u16 wswan_sound_device::port_r(offs_t offset, u16 mem_mask)
 	m_channel->update();
 	switch (offset) {
 		case 0x80 / 2:
-			return m_audio[0].freq;
 		case 0x82 / 2:
-			return m_audio[1].freq;
 		case 0x84 / 2:
-			return m_audio[2].freq;
 		case 0x86 / 2:
-			return m_audio[3].freq;
+			return m_audio[offset & 0x03].freq;
 		case 0x88 / 2:
 			return (m_audio[0].vol_left << 4) | m_audio[0].vol_right |
 				(m_audio[1].vol_left << 12) | (m_audio[1].vol_right << 8);
@@ -285,27 +282,12 @@ void wswan_sound_device::port_w(offs_t offset, u16 data, u16 mem_mask)
 	switch (offset)
 	{
 		case 0x80 / 2:              // Audio 1 freq
-			COMBINE_DATA(&m_audio[0].freq);
-			m_audio[0].freq &= 0x7ff;
-			m_audio[0].period = 2048 - m_audio[0].freq;
-			break;
-
 		case 0x82 / 2:              // Audio 2 freq
-			COMBINE_DATA(&m_audio[1].freq);
-			m_audio[1].freq &= 0x7ff;
-			m_audio[1].period = 2048 - m_audio[1].freq;
-			break;
-
 		case 0x84 / 2:              // Audio 3 freq
-			COMBINE_DATA(&m_audio[2].freq);
-			m_audio[2].freq &= 0x7ff;
-			m_audio[2].period = 2048 - m_audio[2].freq;
-			break;
-
 		case 0x86 / 2:              // Audio 4 freq
-			COMBINE_DATA(&m_audio[3].freq);
-			m_audio[3].freq &= 0x7ff;
-			m_audio[3].period = 2048 - m_audio[3].freq;
+			COMBINE_DATA(&m_audio[offset & 0x03].freq);
+			m_audio[offset & 0x03].freq &= 0x7ff;
+			m_audio[offset & 0x03].period = 2048 - m_audio[offset & 0x03].freq;
 			break;
 
 		case 0x88 / 2:
@@ -367,7 +349,7 @@ void wswan_sound_device::port_w(offs_t offset, u16 data, u16 mem_mask)
 			break;
 
 		case 0x90 / 2:
-			// Audio control */
+			// Audio control
 			if (ACCESSING_BITS_0_7)
 			{
 				m_audio[0].on = BIT(data, 0);

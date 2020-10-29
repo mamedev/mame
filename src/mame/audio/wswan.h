@@ -1,11 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
-/*****************************************************************************
- *
- * includes/wswan.h
- *
- ****************************************************************************/
-
 #ifndef MAME_AUDIO_WSWAN_H
 #define MAME_AUDIO_WSWAN_H
 
