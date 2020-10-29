@@ -146,7 +146,7 @@ void wswan_video_device::device_reset()
 	m_layer_bg_scroll_y = 0;
 	m_layer_fg_scroll_x = 0;
 	m_layer_fg_scroll_y = 0;
-	m_lcd_control = 0x01;
+	m_lcd_control = 0;
 	m_color_mode = 0;
 	m_colors_16 = 0;
 	m_tile_packed = 0;
@@ -819,40 +819,20 @@ u32 wswan_video_device::screen_update(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-u8 wswan_video_device::reg_r(offs_t offset)
+u16 wswan_video_device::reg_r(offs_t offset, u16 mem_mask)
 {
-	u8 value = m_regs[offset];
-
-	if (offset >= 0x20 && offset < 0x40)
-	{
-		if (offset & 1)
-			return m_palette_port[(offset >> 1) & 0x0f] >> 8;
-		else
-			return m_palette_port[(offset >> 1) & 0x0f];
-	}
+	u16 value = m_regs[offset];
 
 	switch (offset)
 	{
-		case 0x01:
-			value = m_bg_control;
+		case 0x02/2:
+			value = (value & 0xff00) | m_current_line;
 			break;
-		case 0x02:
-			value = m_current_line;
+		case 0xa8/2:
+			value = m_timer_hblank_count;
 			break;
-		case 0x14:
-			value = m_lcd_control;
-			break;
-		case 0xa8:
-			value = m_timer_hblank_count & 0xff;
-			break;
-		case 0xa9:
-			value = m_timer_hblank_count >> 8;
-			break;
-		case 0xaa:
-			value = m_timer_vblank_count & 0xff;
-			break;
-		case 0xab:
-			value = m_timer_vblank_count >> 8;
+		case 0xaa/2:
+			value = m_timer_vblank_count;
 			break;
 	}
 
@@ -860,28 +840,11 @@ u8 wswan_video_device::reg_r(offs_t offset)
 }
 
 
-void wswan_video_device::reg_w(offs_t offset, u8 data)
+void wswan_video_device::reg_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	if (offset >= 0x20 && offset < 0x40)
-	{
-		// 0x20-0x3f tile/sprite palette settings
-		// even offs
-		//   Bit 0-3 - Palette (offs & 0x1f)/2 index 0
-		//   Bit 4-7 - Palette (offs & 0x1f)/2 index 1
-		// odd offs
-		//   Bit 0-3 - Palette (offs & 0x1f)/2 index 2
-		//   Bit 4-7 - Palette (offs & 0x1f)/2 index 3
-		u8 pal_index = (offset >> 1) & 0x0f;
-		if (offset & 1)
-			m_palette_port[pal_index] = (m_palette_port[pal_index] & 0x00ff) | (data << 8);
-		else
-			m_palette_port[pal_index] = (m_palette_port[pal_index] & 0xff00) | data;
-		return;
-	}
-
 	switch (offset)
 	{
-		case 0x00:  // Display control
+		case 0x00 / 2:  // Display control
 					// Bit 0   - Background layer enable
 					// Bit 1   - Foreground layer enable
 					// Bit 2   - Sprites enable
@@ -892,226 +855,266 @@ void wswan_video_device::reg_w(offs_t offset, u8 data)
 					//      10 - Foreground layer is displayed only inside foreground window area
 					//      11 - Foreground layer is displayed outside foreground window area
 					// Bit 6-7 - Unknown
-			m_layer_bg_enable = data & 0x1;
-			m_layer_fg_enable = (data & 0x2) >> 1;
-			m_sprites_enable = (data & 0x4) >> 2;
-			m_window_sprites_enable = (data & 0x8) >> 3;
-			m_window_fg_mode = (data & 0x30) >> 4;
-			break;
-		case 0x01:  // Background colour
-					// In 16 colour mode:
-					//   Bit 0-3 - Palette index
-					//   Bit 4-7 - Palette number
-					// Otherwise:
-					//   Bit 0-2 - Main palette index
-					//   Bit 3-7 - Unknown
-			m_bg_control = data;
-			break;
-		case 0x02:  // Current scanline (Most likely read-only)
-			logerror("Write to current scanline! Current value: %d  Data to write: %d\n", m_current_line, data);
-			// Returning so we don't overwrite the value here, not that it really matters
-			return;
-		case 0x03:  // Line compare
-			m_line_compare = data;
-			logerror("Write to line compare: %d\n", data);
-			break;
-		case 0x04:  // Sprite table base address
-					// Bit 0-5 - Determine sprite table base address 0 0xxxxxx0 00000000
-					// Bit 6-7 - Unknown
-			m_sprite_table_address = (data & 0x3f) << 8;
-			break;
-		case 0x05:  // First sprite number (the one we start drawing with)
-			m_sprite_first_latch = data;
-			if (data) logerror("non-zero first sprite %d\n", data);
-			break;
-		case 0x06:  // Number of sprites to draw
-			m_sprite_count_latch = data;
-			break;
-		case 0x07:  // Background/Foreground table base addresses
-					// Bit 0-2 - Determine background table base address 00xxx000 00000000
-					// Bit 3   - Unknown
-					// Bit 4-6 - Determine foreground table base address 00xxx000 00000000
-					// Bit 7   - Unknown
-			m_layer_bg_address = (data & 0x7) << 10;
-			m_layer_fg_address = (data & 0x70) << 6;
-			break;
-		case 0x08:  // Left coordinate of foreground window
-			m_window_fg_left = data;
-			break;
-		case 0x09:  // Top coordinate of foreground window
-			m_window_fg_top = data;
-			break;
-		case 0x0a:  // Right coordinate of foreground window
-			m_window_fg_right = data;
-			break;
-		case 0x0b:  // Bottom coordinate of foreground window
-			m_window_fg_bottom = data;
-			break;
-		case 0x0c:  // Left coordinate of sprite window
-			m_window_sprites_left = data;
-			break;
-		case 0x0d:  // Top coordinate of sprite window
-			m_window_sprites_top = data;
-			break;
-		case 0x0e:  // Right coordinate of sprite window
-			m_window_sprites_right = data;
-			break;
-		case 0x0f:  // Bottom coordinate of sprite window
-			m_window_sprites_bottom = data;
-			break;
-		case 0x10:  // Background layer X scroll
-			m_layer_bg_scroll_x = data;
-			break;
-		case 0x11:  // Background layer Y scroll
-			m_layer_bg_scroll_y = data;
-			break;
-		case 0x12:  // Foreground layer X scroll
-			m_layer_fg_scroll_x = data;
-			break;
-		case 0x13:  // Foreground layer Y scroll
-			m_layer_fg_scroll_y = data;
-			break;
-		case 0x14:  // LCD control
-					// Bit 0   - LCD enable
-					// Bit 1   - WSC only, brightness low/high
-					// Bit 2-7 - Unknown
-			m_lcd_control = data;
-			break;
-		case 0x15:  // LCD icons
-					// Bit 0   - LCD sleep icon enable
-					// Bit 1   - Vertical position icon enable
-					// Bit 2   - Horizontal position icon enable
-					// Bit 3   - Dot 1 icon enable
-					// Bit 4   - Dot 2 icon enable
-					// Bit 5   - Dot 3 icon enable
-					// Bit 6-7 - Unknown
-			m_icons_cb(data);
-			break;
-		case 0x1c:  // Palette colors 0 and 1
-					// Bit 0-3 - Gray tone setting for main palette index 0
-					// Bit 4-7 - Gray tone setting for main palette index 1
-			if (m_vdp_type == VDP_TYPE_WSC)
+			if (ACCESSING_BITS_0_7)
 			{
-				int i = 15 - (data & 0x0f);
-				int j = 15 - ((data & 0xf0) >> 4);
-				m_main_palette[0] = (i << 8) | (i << 4) | i;
-				m_main_palette[1] = (j << 8) | (j << 4) | j;
+				m_layer_bg_enable = data & 0x1;
+				m_layer_fg_enable = (data & 0x2) >> 1;
+				m_sprites_enable = (data & 0x4) >> 2;
+				m_window_sprites_enable = (data & 0x8) >> 3;
+				m_window_fg_mode = (data & 0x30) >> 4;
 			}
-			else
+			// Background colour
+			// In 16 colour mode:
+			//   Bit 0-3 - Palette index
+			//   Bit 4-7 - Palette number
+			// Otherwise:
+			//   Bit 0-2 - Main palette index
+			//   Bit 3-7 - Unknown
+			if (ACCESSING_BITS_8_15)
+				m_bg_control = data >> 8;
+			break;
+		case 0x02 / 2:
+			// Current scanline (read-only)
+			if (ACCESSING_BITS_0_7)
+				logerror("Write to current scanline! Current value: %d  Data to write: %d\n", m_current_line, data);
+			// Line compare
+			if (ACCESSING_BITS_8_15)
+				m_line_compare = data >> 8;
+			break;
+		case 0x04 / 2:
+			// Sprite table base address
+			// Bit 0-5 - Determine sprite table base address 0 0xxxxxx0 00000000
+			// Bit 6-7 - Unknown
+			if (ACCESSING_BITS_0_7)
 			{
-				m_main_palette[0] = data & 0x0f;
-				m_main_palette[1] = (data & 0xf0) >> 4;
+				if (m_vdp_type == VDP_TYPE_WSC && !m_color_mode)
+					m_sprite_table_address = (data & 0x3f) << 8;
+				else
+					m_sprite_table_address = (data & 0x1f) << 8;
+			}
+			// First sprite number (the one we start drawing with)
+			if (ACCESSING_BITS_8_15)
+				m_sprite_first_latch = data >> 8;
+			break;
+		case 0x06 / 2:
+			// Number of sprites to draw
+			if (ACCESSING_BITS_0_7)
+				m_sprite_count_latch = data & 0xff;
+			// Background/Foreground table base addresses
+			// Bit 8-10  - Determine background table base address 00xxx000 00000000 (in bytes)
+			// Bit 11    - Unknown
+			// Bit 12-14 - Determine foreground table base address 00xxx000 00000000 (in bytes)
+			// Bit 15    - Unknown
+			if (ACCESSING_BITS_8_15)
+			{
+				m_layer_bg_address = (data & 0x0700) << 2;
+				m_layer_fg_address = (data & 0x7000) >> 2;
 			}
 			break;
-		case 0x1d:  // Palette colors 2 and 3
-					// Bit 0-3 - Gray tone setting for main palette index 2
-					// Bit 4-7 - Gray tone setting for main palette index 3
-			if (m_vdp_type == VDP_TYPE_WSC)
+		case 0x08 / 2:
+			// Left coordinate of foreground window
+			if (ACCESSING_BITS_0_7)
+				m_window_fg_left = data & 0xff;
+			// Top coordinate of foreground window
+			if (ACCESSING_BITS_8_15)
+				m_window_fg_top = data >> 8;
+			break;
+		case 0x0a / 2:
+			// Right coordinate of foreground window
+			if (ACCESSING_BITS_0_7)
+				m_window_fg_right = data & 0xff;
+			// Bottom coordinate of foreground window
+			if (ACCESSING_BITS_8_15)
+				m_window_fg_bottom = data >> 8;
+			break;
+		case 0x0c / 2:
+			// Left coordinate of sprite window
+			if (ACCESSING_BITS_0_7)
+				m_window_sprites_left = data & 0xff;
+			// Top coordinate of sprite window
+			if (ACCESSING_BITS_8_15)
+				m_window_sprites_top = data >> 8;
+			break;
+		case 0x0e / 2:
+			// Right coordinate of sprite window
+			if (ACCESSING_BITS_0_7)
+				m_window_sprites_right = data & 0xff;
+			// Bottom coordinate of sprite window
+			if (ACCESSING_BITS_8_15)
+				m_window_sprites_bottom = data >> 8;
+			break;
+		case 0x10 / 2:
+			// Background layer X scroll
+			if (ACCESSING_BITS_0_7)
+				m_layer_bg_scroll_x = data & 0xff;
+			// Background layer Y scroll
+			if (ACCESSING_BITS_8_15)
+				m_layer_bg_scroll_y = data >> 8;
+			break;
+		case 0x12 / 2:
+			// Foreground layer X scroll
+			if (ACCESSING_BITS_0_7)
+				m_layer_fg_scroll_x = data & 0xff;
+			// Foreground layer Y scroll
+			if (ACCESSING_BITS_8_15)
+				m_layer_fg_scroll_y = data >> 8;
+			break;
+		case 0x14 / 2:
+			// LCD control
+			// Bit 0   - LCD enable
+			// Bit 1   - WSC only, brightness low/high
+			// Bit 2-7 - Unknown
+			if (ACCESSING_BITS_0_7)
+				m_lcd_control = data & 0xff;
+			// LCD icons
+			// Bit 8     - LCD sleep icon enable
+			// Bit 9     - Vertical position icon enable
+			// Bit 10    - Horizontal position icon enable
+			// Bit 11    - Dot 1 icon enable
+			// Bit 12    - Dot 2 icon enable
+			// Bit 13    - Dot 3 icon enable
+			// Bit 14-15 - Unknown
+			if (ACCESSING_BITS_8_15)
+				m_icons_cb(data >> 8);
+			break;
+		case 0x1c / 2:
+			// Palette colors 0 and 1
+			// Bit 0-3 - Gray tone setting for main palette index 0
+			// Bit 4-7 - Gray tone setting for main palette index 1
+			if (ACCESSING_BITS_0_7)
 			{
-				int i = 15 - (data & 0x0f);
-				int j = 15 - ((data & 0xf0) >> 4);
-				m_main_palette[2] = (i << 8) | (i << 4) | i;
-				m_main_palette[3] = (j << 8) | (j << 4) | j;
+				if (m_vdp_type == VDP_TYPE_WSC)
+				{
+					int i = 15 - (data & 0x0f);
+					int j = 15 - ((data >> 4) & 0x0f);
+					m_main_palette[0] = (i << 8) | (i << 4) | i;
+					m_main_palette[1] = (j << 8) | (j << 4) | j;
+				}
+				else
+				{
+					m_main_palette[0] = data & 0x0f;
+					m_main_palette[1] = (data >> 4) & 0x0f;
+				}
 			}
-			else
+			// Palette colors 2 and 3
+			// Bit  8-11 - Gray tone setting for main palette index 2
+			// Bit 12-15 - Gray tone setting for main palette index 3
+			if (ACCESSING_BITS_8_15)
 			{
-				m_main_palette[2] = data & 0x0f;
-				m_main_palette[3] = (data & 0xf0) >> 4;
+				if (m_vdp_type == VDP_TYPE_WSC)
+				{
+					int i = 15 - (data >> 8) & 0x0f;
+					int j = 15 - (data >> 12) & 0x0f;
+					m_main_palette[2] = (i << 8) | (i << 4) | i;
+					m_main_palette[3] = (j << 8) | (j << 4) | j;
+				}
+				else
+				{
+					m_main_palette[2] = (data >> 8) & 0x0f;
+					m_main_palette[3] = (data >> 12) & 0x0f;
+				}
 			}
 			break;
-		case 0x1e:  // Palette colors 4 and 5
-					// Bit 0-3 - Gray tone setting for main palette index 4
-					// Bit 4-7 - Gray tone setting for main palette index 5
-			if (m_vdp_type == VDP_TYPE_WSC)
+		case 0x1e / 2:
+			// Palette colors 4 and 5
+			// Bit 0-3 - Gray tone setting for main palette index 4
+			// Bit 4-7 - Gray tone setting for main palette index 5
+			if (ACCESSING_BITS_0_7)
 			{
-				int i = 15 - (data & 0x0f);
-				int j = 15 - ((data & 0xf0) >> 4);
-				m_main_palette[4] = (i << 8) | (i << 4) | i;
-				m_main_palette[5] = (j << 8) | (j << 4) | j;
+				if (m_vdp_type == VDP_TYPE_WSC)
+				{
+					int i = 15 - (data & 0x0f);
+					int j = 15 - ((data >> 4) & 0x0f);
+					m_main_palette[4] = (i << 8) | (i << 4) | i;
+					m_main_palette[5] = (j << 8) | (j << 4) | j;
+				}
+				else
+				{
+					m_main_palette[4] = data & 0x0f;
+					m_main_palette[5] = (data >> 4) & 0x0f;
+				}
 			}
-			else
+			// Palette colors 6 and 7
+			// Bit 0-3 - Gray tone setting for main palette index 6
+			// Bit 4-7 - Gray tone setting for main palette index 7
+			if (ACCESSING_BITS_8_15)
 			{
-				m_main_palette[4] = data & 0x0f;
-				m_main_palette[5] = (data & 0xf0) >> 4;
-			}
-			break;
-		case 0x1f:  // Palette colors 6 and 7
-					// Bit 0-3 - Gray tone setting for main palette index 6
-					// Bit 4-7 - Gray tone setting for main palette index 7
-			if (m_vdp_type == VDP_TYPE_WSC)
-			{
-				int i = 15 - (data & 0x0f);
-				int j = 15 - ((data & 0xf0) >> 4);
-				m_main_palette[6] = (i << 8) | (i << 4) | i;
-				m_main_palette[7] = (j << 8) | (j << 4) | j;
-			}
-			else
-			{
-				m_main_palette[6] = data & 0x0f;
-				m_main_palette[7] = (data & 0xf0) >> 4;
-			}
-			break;
-		case 0x60:  // Video mode
-					// Bit 0-4 - Unknown
-					// Bit 5   - Packed mode 0 = not packed mode, 1 = packed mode
-					// Bit 6   - 4/16 colour mode select: 0 = 4 colour mode, 1 = 16 colour mode
-					// Bit 7   - monochrome/colour mode select: 0 = monochrome mode, 1 = colour mode
-			/*
-			 * 111  - packed, 16 color, use 4000/8000, color
-			 * 110  - not packed, 16 color, use 4000/8000, color
-			 * 101  - packed, 4 color, use 2000, color
-			 * 100  - not packed, 4 color, use 2000, color
-			 * 011  - packed, 16 color, use 4000/8000, monochrome
-			 * 010  - not packed, 16 color , use 4000/8000, monochrome
-			 * 001  - packed, 4 color, use 2000, monochrome
-			 * 000  - not packed, 4 color, use 2000, monochrome - Regular WS monochrome
-			 */
-			if (m_vdp_type == VDP_TYPE_WSC)
-			{
-				m_color_mode = data & 0x80;
-				m_colors_16 = data & 0x40;
-				m_tile_packed = data & 0x20;
+				if (m_vdp_type == VDP_TYPE_WSC)
+				{
+					int i = 15 - ((data >> 8) & 0x0f);
+					int j = 15 - ((data >> 12) & 0x0f);
+					m_main_palette[6] = (i << 8) | (i << 4) | i;
+					m_main_palette[7] = (j << 8) | (j << 4) | j;
+				}
+				else
+				{
+					m_main_palette[6] = (data >> 8) & 0x0f;
+					m_main_palette[7] = (data >> 12) & 0x0f;
+				}
 			}
 			break;
-		case 0xa2:  // Timer control
-					// Bit 0   - HBlank Timer enable
-					// Bit 1   - HBlank Timer mode: 0 = one shot, 1 = auto reset
-					// Bit 2   - VBlank Timer(1/75s) enable
-					// Bit 3   - VBlank Timer mode: 0 = one shot, 1 = auto reset
-					// Bit 4-7 - Unknown
-			m_timer_hblank_enable = BIT(data, 0);
-			m_timer_hblank_mode =   BIT(data, 1);
-			m_timer_vblank_enable = BIT(data, 2);
-			m_timer_vblank_mode =   BIT(data, 3);
+		case 0x20 / 2: case 0x22 / 2: case 0x24 / 2: case 0x26 / 2:
+		case 0x28 / 2: case 0x2a / 2: case 0x2c / 2: case 0x2e / 2:
+		case 0x30 / 2: case 0x32 / 2: case 0x34 / 2: case 0x36 / 2:
+		case 0x38 / 2: case 0x3a / 2: case 0x3c / 2: case 0x3e / 2:
+			// 0x20-0x3f tile/sprite palette settings
+			//   Bit  0- 3 - Palette (offs & 0x1f)/2 index 0
+			//   Bit  4- 7 - Palette (offs & 0x1f)/2 index 1
+			//   Bit  8-11 - Palette (offs & 0x1f)/2 index 2
+			//   Bit 12-15 - Palette (offs & 0x1f)/2 index 3
+			data &= 0x7777;
+			COMBINE_DATA(&m_palette_port[offset & 0x0f]);
 			break;
-		case 0xa4:  // HBlank timer frequency reload value (bits 0-7)
-			m_timer_hblank_reload &= 0xff00;
-			m_timer_hblank_reload += data;
+		case 0x60 / 2:
+			// Video mode
+			// Bit 0-4 - Unknown
+			// Bit 5   - Packed mode 0 = not packed mode, 1 = packed mode
+			// Bit 6   - 4/16 colour mode select: 0 = 4 colour mode, 1 = 16 colour mode
+			// Bit 7   - monochrome/colour mode select: 0 = monochrome mode, 1 = colour mode
+			//   111  - packed, 16 color, use 4000/8000, color
+			//   110  - not packed, 16 color, use 4000/8000, color
+			//   101  - packed, 4 color, use 2000, color
+			//   100  - not packed, 4 color, use 2000, color
+			//   011  - packed, 16 color, use 4000/8000, monochrome
+			//   010  - not packed, 16 color , use 4000/8000, monochrome
+			//   001  - packed, 4 color, use 2000, monochrome
+			//   000  - not packed, 4 color, use 2000, monochrome - Regular WS monochrome
+			if (ACCESSING_BITS_0_7)
+			{
+				if (m_vdp_type == VDP_TYPE_WSC)
+				{
+					m_color_mode = data & 0x80;
+					m_colors_16 = data & 0x40;
+					m_tile_packed = data & 0x20;
+				}
+			}
+			break;
+		case 0xa2 / 2:
+			// Timer control
+			// Bit 0   - HBlank Timer enable
+			// Bit 1   - HBlank Timer mode: 0 = one shot, 1 = auto reset
+			// Bit 2   - VBlank Timer(1/75s) enable
+			// Bit 3   - VBlank Timer mode: 0 = one shot, 1 = auto reset
+			// Bit 4-7 - Unknown
+			if (ACCESSING_BITS_0_7)
+			{
+				m_timer_hblank_enable = BIT(data, 0);
+				m_timer_hblank_mode =   BIT(data, 1);
+				m_timer_vblank_enable = BIT(data, 2);
+				m_timer_vblank_mode =   BIT(data, 3);
+			}
+			break;
+		case 0xa4 / 2:  // HBlank timer frequency reload value
+			COMBINE_DATA(&m_timer_hblank_reload);
 			m_timer_hblank_count = m_timer_hblank_reload;
 			break;
-		case 0xa5:  // HBlank timer frequency reload value (bits 8-15)
-			m_timer_hblank_reload &= 0xff;
-			m_timer_hblank_reload += data << 8;
-			m_timer_hblank_count = m_timer_hblank_reload;
-			break;
-		case 0xa6:  // VBlank timer frequency reload value (bits 0-7)
-			m_timer_vblank_reload &= 0xff00;
-			m_timer_vblank_reload += data;
+		case 0xa6 / 2:  // VBlank timer frequency reload value
+			COMBINE_DATA(&m_timer_vblank_reload);
 			m_timer_vblank_count = m_timer_vblank_reload;
-			break;
-		case 0xa7:  // VBlank timer frequency reload value (bits 8-15)
-			m_timer_vblank_reload &= 0xff;
-			m_timer_vblank_reload += data << 8;
-			m_timer_vblank_count = m_timer_vblank_reload;
-			break;
-		case 0xa8:  // HBlank counter (bits 0-7)
-		case 0xa9:  // HBlank counter (bits 8-15)
-		case 0xaa:  // VBlank counter (bits 0-7)
-		case 0xab:  // VBlank counter (bits 8-15)
 			break;
 	}
 
-	m_regs[offset] = data;
+	COMBINE_DATA(&m_regs[offset & 0x7f]);
 }
 
 
@@ -1124,7 +1127,6 @@ void wswan_video_device::scanline_interrupt()
 	if (m_timer_hblank_enable && m_timer_hblank_reload != 0)
 	{
 		m_timer_hblank_count--;
-		logerror("timer_hblank_count: %X\n", m_timer_hblank_count);
 		if (m_timer_hblank_count == 0)
 		{
 			if (m_timer_hblank_mode)
@@ -1132,7 +1134,6 @@ void wswan_video_device::scanline_interrupt()
 			else
 				m_timer_hblank_reload = 0;
 
-			logerror( "triggering hbltmr interrupt\n" );
 			m_set_irq_cb(WSWAN_VIDEO_IFLAG_HBLTMR);
 		}
 	}
@@ -1143,7 +1144,7 @@ void wswan_video_device::scanline_interrupt()
 	if (m_current_line == 144) // buffer sprite table
 	{
 		memcpy(m_sprite_table_buffer, &m_vram[m_sprite_table_address], 512);
-		m_sprite_first = m_sprite_first_latch; // always zero?
+		m_sprite_first = m_sprite_first_latch;
 		m_sprite_count = m_sprite_count_latch;
 	}
 
@@ -1154,7 +1155,6 @@ void wswan_video_device::scanline_interrupt()
 		if (m_timer_vblank_enable && m_timer_vblank_reload != 0)
 		{
 			m_timer_vblank_count--;
-			logerror("timer_vblank_count: %X\n", m_timer_vblank_count);
 			if (m_timer_vblank_count == 0)
 			{
 				if (m_timer_vblank_mode)
@@ -1162,7 +1162,6 @@ void wswan_video_device::scanline_interrupt()
 				else
 					m_timer_vblank_reload = 0;
 
-				logerror("triggering vbltmr interrupt\n");
 				m_set_irq_cb(WSWAN_VIDEO_IFLAG_VBLTMR);
 			}
 		}

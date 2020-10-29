@@ -34,8 +34,8 @@ public:
 
 	u16 vram_r(offs_t offset, u16 mem_mask);
 	void vram_w(offs_t offset, u16 data, u16 mem_mask);
-	u8 reg_r(offs_t offset);
-	void reg_w(offs_t offset, u8 data);
+	u16 reg_r(offs_t offset, u16 mem_mesk);
+	void reg_w(offs_t offset, u16 data, u16 mem_mask);
 
 	auto icons_cb() { return m_icons_cb.bind(); }
 
@@ -113,7 +113,7 @@ protected:
 	u16 *m_palette_vram;
 	u16 m_palette_port[0x10];
 	int m_pal[16][16];
-	u8 m_regs[256];
+	u16 m_regs[128];
 
 	irq_cb_delegate m_set_irq_cb;
 	dmasnd_cb_delegate m_snd_dma_cb;

@@ -189,7 +189,7 @@ void wswan_state::snd_map(address_map &map)
 }
 
 
-static INPUT_PORTS_START( wswan )
+static INPUT_PORTS_START(wswan)
 	PORT_START("CURSX")
 	PORT_BIT( 0x8, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_NAME("X4 - Left")
 	PORT_BIT( 0x4, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_NAME("X3 - Down")
@@ -209,7 +209,7 @@ static INPUT_PORTS_START( wswan )
 INPUT_PORTS_END
 
 
-static GFXDECODE_START( gfx_wswan )
+static GFXDECODE_START(gfx_wswan)
 GFXDECODE_END
 
 
@@ -481,8 +481,13 @@ u8 wswan_state::port_r(offs_t offset)
 {
 	u8 value = m_ws_portram[offset];
 
-	if (offset < 0x40 || (offset >= 0xa1 && offset < 0xb0))
-		return m_vdp->reg_r(offset);
+	if (offset < 0x40 || (offset > 0xa1 && offset < 0xb0))
+	{
+		if (offset & 0x01)
+			return m_vdp->reg_r(offset >> 1, 0xff00) >> 8;
+		else
+			return m_vdp->reg_r(offset >> 1, 0x00ff);
+	}
 	if (offset >= 0x80 && offset <= 0x9f)
 		return m_sound->port_r(offset);
 
@@ -507,7 +512,7 @@ u8 wswan_state::port_r(offs_t offset)
 			value = m_sound_dma.enable;
 			break;
 		case 0x60:
-			value = m_vdp->reg_r(offset);
+			value = m_vdp->reg_r(offset >> 1, 0x00ff);
 			break;
 		case 0xa0:      // Hardware type
 			// Bit 0 - Disable/enable Bios
@@ -588,9 +593,12 @@ u8 wswan_state::port_r(offs_t offset)
 
 void wswan_state::port_w(offs_t offset, u8 data)
 {
-	if (offset < 0x40 || (offset >= 0xa1 && offset < 0xb0))
+	if (offset < 0x40 || (offset > 0xa1 && offset < 0xb0))
 	{
-		m_vdp->reg_w(offset, data);
+		if (offset & 0x01)
+			m_vdp->reg_w(offset >> 1, data << 8, 0xff00);
+		else
+			m_vdp->reg_w(offset >> 1, data, 0x00ff);
 		return;
 	}
 
@@ -661,7 +669,7 @@ void wswan_state::port_w(offs_t offset, u8 data)
 			m_sound_dma.enable = data;
 			break;
 		case 0x60:
-			m_vdp->reg_w(offset, data);
+			m_vdp->reg_w(offset >> 1, data, 0x00ff);
 			break;
 		case 0x80:  // Audio 1 freq (lo)
 		case 0x81:  // Audio 1 freq (hi)
