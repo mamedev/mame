@@ -1347,6 +1347,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"tasc",
 		"tatung",
 		"teamconc",
+		"tectoy",
 		"tektroni",
 		"telenova",
 		"telercas",
