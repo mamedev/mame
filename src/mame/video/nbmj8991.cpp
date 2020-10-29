@@ -131,20 +131,18 @@ void nbmj8991_state::clut_w(offs_t offset, uint8_t data)
 ******************************************************************************/
 void nbmj8991_state::vramflip()
 {
-	int x, y;
-	uint8_t color1, color2;
 	int width = m_screen->width();
 	int height = m_screen->height();
 
 	if (m_flipscreen == m_flipscreen_old) return;
 
-	for (y = 0; y < height / 2; y++)
+	for (int y = 0; y < height / 2; y++)
 	{
-		for (x = 0; x < width / 2; x++)
+		for (int x = 0; x < width / 2; x++)
 		{
 			// rotate 180 degrees (   0,   0) - ( 511, 511)
-			color1 = m_videoram[(y * width) + x];
-			color2 = m_videoram[(((height - 1) - y) * width) + (((width / 2) - 1) - x)];
+			uint8_t color1 = m_videoram[(y * width) + x];
+			uint8_t color2 = m_videoram[(((height - 1) - y) * width) + (((width / 2) - 1) - x)];
 			m_videoram[(y * width) + x] = color2;
 			m_videoram[(((height - 1) - y) * width) + (((width / 2) - 1) - x)] = color1;
 			// rotate 180 degrees ( 512,   0) - (1023, 511)
@@ -162,7 +160,7 @@ void nbmj8991_state::vramflip()
 void nbmj8991_state::update_pixel(int x, int y)
 {
 	uint8_t color = m_videoram[(y * m_screen->width()) + x];
-	m_tmpbitmap.pix16(y, x) = color;
+	m_tmpbitmap.pix(y, x) = color;
 }
 
 void nbmj8991_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)

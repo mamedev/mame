@@ -144,13 +144,21 @@ namespace netlist
 		pstring get_initial_param_val(const pstring &name, const pstring &def) const;
 
 		void register_term(detail::core_terminal_t &term);
-		void register_term(terminal_t &term, terminal_t &other_term);
+		void register_term(terminal_t &term, terminal_t *other_term, const std::array<terminal_t *, 2> &splitter_terms);
 
-		// called from net_splitter
+		// called from matrix_solver_t::get_connected_net
+		// returns the terminal being part of a two terminal device.
 		terminal_t *get_connected_terminal(const terminal_t &term) const noexcept
 		{
 			auto ret(m_connected_terminals.find(&term));
-			return (ret != m_connected_terminals.end()) ? ret->second : nullptr;
+			return (ret != m_connected_terminals.end()) ? ret->second[0] : nullptr;
+		}
+
+		// called from net_splitter
+		const std::array<terminal_t *, 4> *get_connected_terminals(const terminal_t &term) const noexcept
+		{
+			auto ret(m_connected_terminals.find(&term));
+			return (ret != m_connected_terminals.end()) ? &ret->second : nullptr;
 		}
 
 		// get family -> truthtable
@@ -223,7 +231,9 @@ namespace netlist
 
 		// FIXME: can be cleared before run
 		std::unordered_map<pstring, detail::core_terminal_t *> m_terminals;
-		std::unordered_map<const terminal_t *, terminal_t *>   m_connected_terminals;
+		// FIXME: Limited to 3 additional terminals
+		std::unordered_map<const terminal_t *,
+			std::array<terminal_t *, 4>>   m_connected_terminals;
 		std::unordered_map<pstring, param_ref_t>               m_params;
 		std::unordered_map<const detail::core_terminal_t *,
 			devices::nld_base_proxy *>                         m_proxies;
@@ -294,8 +304,9 @@ namespace netlist
 	{
 	public:
 
-		explicit source_pattern_t(const pstring &pat)
+		explicit source_pattern_t(const pstring &pat, bool force_lowercase)
 		: m_pattern(pat)
+		, m_force_lowercase(force_lowercase)
 		{
 		}
 
@@ -304,6 +315,7 @@ namespace netlist
 
 	private:
 		pstring m_pattern;
+		bool m_force_lowercase;
 	};
 
 	class source_mem_t : public source_netlist_t

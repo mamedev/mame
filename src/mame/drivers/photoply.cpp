@@ -225,50 +225,7 @@ void photoply_state::photoply_io(address_map &map)
 
 }
 
-#define AT_KEYB_HELPER(bit, text, key1) \
-	PORT_BIT( bit, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME(text) PORT_CODE(key1)
-
 static INPUT_PORTS_START( photoply )
-	PORT_START("pc_keyboard_0")
-	PORT_BIT ( 0x0001, 0x0000, IPT_UNUSED ) // Unused scancode 0
-	AT_KEYB_HELPER( 0x0002, "Esc",               KEYCODE_Q     ) // Esc       01  81
-	AT_KEYB_HELPER( 0x0004, "1",                 KEYCODE_1     )
-	AT_KEYB_HELPER( 0x0008, "2",                 KEYCODE_2     )
-	AT_KEYB_HELPER( 0x0010, "3",                 KEYCODE_3     )
-	AT_KEYB_HELPER( 0x0020, "4",                 KEYCODE_4     )
-	AT_KEYB_HELPER( 0x0040, "5",                 KEYCODE_5     )
-	AT_KEYB_HELPER( 0x0080, "6",                 KEYCODE_6     )
-	AT_KEYB_HELPER( 0x0100, "7",                 KEYCODE_7     )
-	AT_KEYB_HELPER( 0x0200, "8",                 KEYCODE_8     )
-	AT_KEYB_HELPER( 0x0400, "9",                 KEYCODE_9     )
-	AT_KEYB_HELPER( 0x0800, "0",                 KEYCODE_0     )
-
-	PORT_START("pc_keyboard_1")
-	AT_KEYB_HELPER( 0x0020, "Y",                 KEYCODE_Y     ) // Y         15  95
-	AT_KEYB_HELPER( 0x1000, "Enter",             KEYCODE_ENTER ) // Enter     1C  9C
-
-	PORT_START("pc_keyboard_2")
-
-	PORT_START("pc_keyboard_3")
-	AT_KEYB_HELPER( 0x0002, "N",                 KEYCODE_N     ) // N         31  B1
-	AT_KEYB_HELPER( 0x0800, "F1",                KEYCODE_F1    ) // F1        3B  BB
-	AT_KEYB_HELPER( 0x1000, "F2",                KEYCODE_F2    )
-	AT_KEYB_HELPER( 0x4000, "F4",                KEYCODE_F4    )
-
-	PORT_START("pc_keyboard_4")
-
-	PORT_START("pc_keyboard_5")
-
-	PORT_START("pc_keyboard_6")
-	AT_KEYB_HELPER( 0x0040, "(MF2)Cursor Up",    KEYCODE_UP    ) // Up         67  e7
-	AT_KEYB_HELPER( 0x0080, "(MF2)Page Up",      KEYCODE_PGUP  ) // Page Up    68  e8
-	AT_KEYB_HELPER( 0x0100, "(MF2)Cursor Left",  KEYCODE_LEFT  ) // Left       69  e9
-	AT_KEYB_HELPER( 0x0200, "(MF2)Cursor Right", KEYCODE_RIGHT ) // Right      6a  ea
-	AT_KEYB_HELPER( 0x0800, "(MF2)Cursor Down",  KEYCODE_DOWN  ) // Down       6c  ec
-	AT_KEYB_HELPER( 0x1000, "(MF2)Page Down",    KEYCODE_PGDN  ) // Page Down  6d  ed
-	AT_KEYB_HELPER( 0x4000, "Del",               KEYCODE_A     ) // Delete     6f  ef
-
-	PORT_START("pc_keyboard_7")
 INPUT_PORTS_END
 
 void photoply_state::machine_start()

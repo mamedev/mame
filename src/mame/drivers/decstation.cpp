@@ -171,17 +171,14 @@ void decstation_state::video_start()
 
 uint32_t decstation_state::kn01_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint32_t *scanline;
-	int x, y;
-	uint8_t pixels;
-	uint8_t *vram = (uint8_t *)m_kn01vram.target();
+	uint8_t const *const vram = (uint8_t *)m_kn01vram.target();
 
-	for (y = 0; y < 864; y++)
+	for (int y = 0; y < 864; y++)
 	{
-		scanline = &bitmap.pix32(y);
-		for (x = 0; x < 1024; x++)
+		uint32_t *scanline = &bitmap.pix(y);
+		for (int x = 0; x < 1024; x++)
 		{
-			pixels = vram[(y * 1024) + x];
+			uint8_t const pixels = vram[(y * 1024) + x];
 			*scanline++ = m_palette[pixels];
 		}
 	}

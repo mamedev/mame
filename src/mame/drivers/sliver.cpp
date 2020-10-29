@@ -169,21 +169,19 @@ void sliver_state::plot_pixel_rgb(int x, int y, uint32_t r, uint32_t g, uint32_t
 	if (y < 0 || x < 0 || x > 383 || y > 255)
 		return;
 
-	m_bitmap_bg.pix32(y, x) = r | (g<<8) | (b<<16);
+	m_bitmap_bg.pix(y, x) = r | (g<<8) | (b<<16);
 }
 
 void sliver_state::plot_pixel_pal(int x, int y, int addr)
 {
-	uint32_t r,g,b;
-
 	if (y < 0 || x < 0 || x > 383 || y > 255)
 		return;
 
-	b=(m_colorram[addr] << 2) | (m_colorram[addr] & 0x3);
-	g=(m_colorram[addr+0x100] << 2) | (m_colorram[addr+0x100] & 3);
-	r=(m_colorram[addr+0x200] << 2) | (m_colorram[addr+0x200] & 3);
+	uint32_t b=(m_colorram[addr] << 2) | (m_colorram[addr] & 0x3);
+	uint32_t g=(m_colorram[addr+0x100] << 2) | (m_colorram[addr+0x100] & 3);
+	uint32_t r=(m_colorram[addr+0x200] << 2) | (m_colorram[addr+0x200] & 3);
 
-	m_bitmap_fg.pix32(y, x) = r | (g<<8) | (b<<16);
+	m_bitmap_fg.pix(y, x) = r | (g<<8) | (b<<16);
 }
 
 void sliver_state::fifo_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)

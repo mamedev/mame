@@ -88,27 +88,21 @@ void triplhnt_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		rect &= cliprect;
 
 		/* check for collisions and copy sprite */
-
+		for (int x = rect.left(); x <= rect.right(); x++)
 		{
-			int x;
-			int y;
-
-			for (x = rect.left(); x <= rect.right(); x++)
+			for (int y = rect.top(); y <= rect.bottom(); y++)
 			{
-				for (y = rect.top(); y <= rect.bottom(); y++)
+				pen_t const a = m_helper.pix(y, x);
+				pen_t const b = bitmap.pix(y, x);
+
+				if (a == 2 && b == 7)
 				{
-					pen_t a = m_helper.pix16(y, x);
-					pen_t b = bitmap.pix16(y, x);
-
-					if (a == 2 && b == 7)
-					{
-						hit_code = j;
-						hit_line = y;
-					}
-
-					if (a != 1)
-						bitmap.pix16(y, x) = a;
+					hit_code = j;
+					hit_line = y;
 				}
+
+				if (a != 1)
+					bitmap.pix(y, x) = a;
 			}
 		}
 	}

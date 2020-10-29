@@ -158,7 +158,7 @@ void sknsspr_device::skns_sprite_kludge(int x, int y)
 #define z_draw_pixel()              \
 	u8 val = src[xs >> 16];           \
 	if(val)                 \
-		bitmap.pix16(yd>>16, xd>>16) = val + colour;
+		bitmap.pix(yd>>16, xd>>16) = val + colour;
 
 #define z_x_dst(op)         \
 	old = xd;                   \
@@ -474,81 +474,72 @@ void sknsspr_device::skns_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cl
 					sx >>= 6;
 					sy >>= 6;
 					if (!xflip && !yflip) {
-						int xx,yy;
-
-						for (xx = 0; xx<xsize; xx++)
+						for (int xx = 0; xx<xsize; xx++)
 						{
 							if ((sx+xx < (cliprect.max_x+1)) && (sx+xx >= cliprect.min_x))
 							{
-								for (yy = 0; yy<ysize; yy++)
+								for (int yy = 0; yy<ysize; yy++)
 								{
 									if ((sy+yy < (cliprect.max_y+1)) && (sy+yy >= cliprect.min_y))
 									{
-										int pix;
-										pix = m_decodebuffer[xsize*yy+xx];
+										int const pix = m_decodebuffer[xsize*yy+xx];
 										if (pix)
-											bitmap.pix16(sy+yy, sx+xx) = pix+ NewColour; // change later
+											bitmap.pix(sy+yy, sx+xx) = pix+ NewColour; // change later
 									}
 								}
 							}
 						}
 					} else if (!xflip && yflip) {
-						int xx,yy;
 						sy -= ysize;
 
-						for (xx = 0; xx<xsize; xx++)
+						for (int xx = 0; xx<xsize; xx++)
 						{
 							if ((sx+xx < (cliprect.max_x+1)) && (sx+xx >= cliprect.min_x))
 							{
-								for (yy = 0; yy<ysize; yy++)
+								for (int yy = 0; yy<ysize; yy++)
 								{
 									if ((sy+(ysize-1-yy) < (cliprect.max_y+1)) && (sy+(ysize-1-yy) >= cliprect.min_y))
 									{
-										int pix;
-										pix = m_decodebuffer[xsize*yy+xx];
+										int const pix = m_decodebuffer[xsize*yy+xx];
 										if (pix)
-											bitmap.pix16(sy+(ysize-1-yy), sx+xx) = pix+ NewColour; // change later
+											bitmap.pix(sy+(ysize-1-yy), sx+xx) = pix+ NewColour; // change later
 									}
 								}
 							}
 						}
 					} else if (xflip && !yflip) {
-						int xx,yy;
 						sx -= xsize;
 
-						for (xx = 0; xx<xsize; xx++)
+						for (int xx = 0; xx<xsize; xx++)
 						{
 							if ( (sx+(xsize-1-xx) < (cliprect.max_x+1)) && (sx+(xsize-1-xx) >= cliprect.min_x))
 							{
-								for (yy = 0; yy<ysize; yy++)
+								for (int yy = 0; yy<ysize; yy++)
 								{
 									if ((sy+yy < (cliprect.max_y+1)) && (sy+yy >= cliprect.min_y))
 									{
-										int pix;
-										pix = m_decodebuffer[xsize*yy+xx];
+										int const pix = m_decodebuffer[xsize*yy+xx];
 										if (pix)
-											bitmap.pix16(sy+yy, sx+(xsize-1-xx)) = pix+ NewColour; // change later
+											bitmap.pix(sy+yy, sx+(xsize-1-xx)) = pix+ NewColour; // change later
 									}
 								}
 							}
 						}
 					} else if (xflip && yflip) {
-						int xx,yy;
 						sx -= xsize;
 						sy -= ysize;
 
-						for (xx = 0; xx<xsize; xx++)
+						for (int xx = 0; xx<xsize; xx++)
 						{
 							if ((sx+(xsize-1-xx) < (cliprect.max_x+1)) && (sx+(xsize-1-xx) >= cliprect.min_x))
 							{
-								for (yy = 0; yy<ysize; yy++)
+								for (int yy = 0; yy<ysize; yy++)
 								{
 									if ((sy+(ysize-1-yy) < (cliprect.max_y+1)) && (sy+(ysize-1-yy) >= cliprect.min_y))
 									{
-										int pix;
-										pix = m_decodebuffer[xsize*yy+xx];
+										int const pix = m_decodebuffer[xsize*yy+xx];
 										if (pix)
-											bitmap.pix16(sy+(ysize-1-yy), sx+(xsize-1-xx)) = pix+ NewColour; // change later
+											bitmap.pix(sy+(ysize-1-yy), sx+(xsize-1-xx)) = pix+ NewColour; // change later
 									}
 								}
 							}

@@ -162,7 +162,7 @@ void output_win32::exit()
 	{
 		registered_client *temp = m_clientlist;
 		m_clientlist = temp->next;
-		global_free(temp);
+		delete temp;
 	}
 
 	// broadcast a shutdown message
@@ -266,7 +266,7 @@ LRESULT output_win32::register_client(HWND hwnd, LPARAM id)
 		}
 
 	// add us to the end
-	*client = global_alloc(registered_client);
+	*client = new registered_client;
 	(*client)->next = nullptr;
 	(*client)->id = id;
 	(*client)->hwnd = hwnd;
@@ -293,7 +293,7 @@ LRESULT output_win32::unregister_client(HWND hwnd, LPARAM id)
 		{
 			registered_client *temp = *client;
 			*client = (*client)->next;
-			global_free(temp);
+			delete temp;
 			found = true;
 			break;
 		}

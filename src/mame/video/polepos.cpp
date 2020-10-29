@@ -416,7 +416,7 @@ void polepos_state::zoom_sprite(bitmap_ind16 &bitmap,int big,
 					int pen = src[offs/2 ^ flipx];
 
 					if (!((transmask >> pen) & 1))
-						bitmap.pix16(yy, xx) = pen + coloroffs;
+						bitmap.pix(yy, xx) = pen + coloroffs;
 				}
 				offs++;
 

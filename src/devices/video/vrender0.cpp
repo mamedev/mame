@@ -716,7 +716,7 @@ uint32_t vr0video_device::screen_update(screen_device &screen, bitmap_ind16 &bit
 
 	uint32_t const dx = cliprect.left();
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
-		std::copy_n(&m_DisplayDest[(y * 1024) + dx], width, &bitmap.pix16(y, dx));
+		std::copy_n(&m_DisplayDest[(y * 1024) + dx], width, &bitmap.pix(y, dx));
 
 	return 0;
 }

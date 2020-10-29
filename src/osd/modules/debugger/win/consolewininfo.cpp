@@ -30,10 +30,10 @@ consolewin_info::consolewin_info(debugger_windows_interface &debugger) :
 		goto cleanup;
 
 	// create the views
-	m_views[1].reset(global_alloc(debugview_info(debugger, *this, window(), DVT_STATE)));
+	m_views[1].reset(new debugview_info(debugger, *this, window(), DVT_STATE));
 	if (!m_views[1]->is_valid())
 		goto cleanup;
-	m_views[2].reset(global_alloc(debugview_info(debugger, *this, window(), DVT_CONSOLE)));
+	m_views[2].reset(new debugview_info(debugger, *this, window(), DVT_CONSOLE));
 	if (!m_views[2]->is_valid())
 		goto cleanup;
 

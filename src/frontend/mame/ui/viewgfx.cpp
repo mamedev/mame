@@ -994,18 +994,16 @@ static void gfxset_draw_item(running_machine &machine, gfx_element &gfx, int ind
 {
 	int width = (rotate & ORIENTATION_SWAP_XY) ? gfx.height() : gfx.width();
 	int height = (rotate & ORIENTATION_SWAP_XY) ? gfx.width() : gfx.height();
-	const rgb_t *palette = dpalette->palette()->entry_list_raw() + gfx.colorbase() + color * gfx.granularity();
-
-	int x, y;
+	rgb_t const *const palette = dpalette->palette()->entry_list_raw() + gfx.colorbase() + color * gfx.granularity();
 
 	// loop over rows in the cell
-	for (y = 0; y < height; y++)
+	for (int y = 0; y < height; y++)
 	{
-		uint32_t *dest = &bitmap.pix32(dsty + y, dstx);
+		uint32_t *dest = &bitmap.pix(dsty + y, dstx);
 		const uint8_t *src = gfx.get_data(index);
 
 		// loop over columns in the cell
-		for (x = 0; x < width; x++)
+		for (int x = 0; x < width; x++)
 		{
 			int effx = x, effy = y;
 			const uint8_t *s;

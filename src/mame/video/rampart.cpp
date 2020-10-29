@@ -76,8 +76,8 @@ uint32_t rampart_state::screen_update_rampart(screen_device &screen, bitmap_ind1
 	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->top(); y <= rect->bottom(); y++)
 		{
-			uint16_t *mo = &mobitmap.pix16(y);
-			uint16_t *pf = &bitmap.pix16(y);
+			uint16_t const *const mo = &mobitmap.pix(y);
+			uint16_t *const pf = &bitmap.pix(y);
 			for (int x = rect->left(); x <= rect->right(); x++)
 				if (mo[x] != 0xffff)
 				{
@@ -101,13 +101,13 @@ void rampart_state::rampart_bitmap_render(bitmap_ind16 &bitmap, const rectangle 
 	/* update any dirty scanlines */
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		const uint16_t *src = &m_bitmap[256 * y];
-		uint16_t *dst = &bitmap.pix16(y);
+		uint16_t const *const src = &m_bitmap[256 * y];
+		uint16_t *const dst = &bitmap.pix(y);
 
 		/* regenerate the line */
 		for (int x = cliprect.left() & ~1; x <= cliprect.right(); x += 2)
 		{
-			int bits = src[(x - 8) / 2];
+			int const bits = src[(x - 8) / 2];
 			dst[x + 0] = bits >> 8;
 			dst[x + 1] = bits & 0xff;
 		}

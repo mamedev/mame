@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Aaron Giles,Vas Crabb
 /***************************************************************************
 
     natkeyboard.cpp
@@ -11,6 +11,9 @@
 #include "emu.h"
 #include "natkeyboard.h"
 #include "emuopts.h"
+
+#include <algorithm>
+#include <cstring>
 
 
 //**************************************************************************
@@ -317,9 +320,11 @@ const char_info charinfo[] =
 
 natural_keyboard::natural_keyboard(running_machine &machine)
 	: m_machine(machine)
+	, m_have_charkeys(false)
 	, m_in_use(false)
 	, m_bufbegin(0)
 	, m_bufend(0)
+	, m_current_code(nullptr)
 	, m_fieldnum(0)
 	, m_status_keydown(false)
 	, m_last_cr(false)
@@ -330,8 +335,8 @@ natural_keyboard::natural_keyboard(running_machine &machine)
 	, m_charqueue_empty()
 {
 	// try building a list of keycodes; if none are available, don't bother
-	build_codes(machine.ioport());
-	if (!m_keycode_map.empty())
+	build_codes();
+	if (!m_keyboards.empty())
 	{
 		m_buffer.resize(KEY_BUFFER_SIZE);
 		m_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(natural_keyboard::timer), this));
@@ -350,6 +355,7 @@ natural_keyboard::natural_keyboard(running_machine &machine)
 void natural_keyboard::configure(ioport_queue_chars_delegate queue_chars, ioport_accept_char_delegate accept_char, ioport_charqueue_empty_delegate charqueue_empty)
 {
 	// set the callbacks
+	assert(m_timer != nullptr);
 	m_queue_chars = std::move(queue_chars);
 	m_accept_char = std::move(accept_char);
 	m_charqueue_empty = std::move(charqueue_empty);
@@ -370,16 +376,18 @@ void natural_keyboard::set_in_use(bool usage)
 		machine().options().set_value(OPTION_NATURAL_KEYBOARD, usage, OPTION_PRIORITY_CMDLINE);
 
 		// lock out (or unlock) all keyboard inputs
-		for (auto &port : machine().ioport().ports())
-			for (ioport_field &field : port.second->fields())
-				if (field.type() == IPT_KEYBOARD)
-				{
-					field.live().lockout = usage;
+		for (kbd_dev_info &devinfo : m_keyboards)
+		{
+			for (ioport_field &field : devinfo.keyfields)
+			{
+				bool const is_keyboard(field.type() == IPT_KEYBOARD);
+				field.live().lockout = !devinfo.enabled || (is_keyboard && usage);
 
-					// clear pressed status when going out of use
-					if (!usage)
-						field.set_value(0);
-				}
+				// clear pressed status when going out of use
+				if (is_keyboard && !usage)
+					field.set_value(0);
+			}
+		}
 	}
 }
 
@@ -413,19 +421,24 @@ void natural_keyboard::post_char(char32_t ch, bool normalize_crlf)
 		machine().logerror("natural_keyboard::post_char(): code=%i (%s) field.name='%s'\n", int(ch), unicode_to_string(ch).c_str(), (code != nullptr && code->field[0] != nullptr) ? code->field[0]->name() : "<null>");
 	}
 
-	// can we post this key in the queue directly?
 	if (can_post_directly(ch))
+	{
+		// can post this key in the queue directly
 		internal_post(ch);
-
-	// can we post this key with an alternate representation?
+	}
 	else if (can_post_alternate(ch))
 	{
-		const char_info *info = char_info::find(ch);
+		// can post this key with an alternate representation
+		char_info const *const info = char_info::find(ch);
 		assert(info != nullptr && info->alternate != nullptr);
-		const char *altstring = info->alternate;
-		while (*altstring != 0)
+		char const *altstring = info->alternate;
+		unsigned remain(std::strlen(altstring));
+		while (remain)
 		{
-			altstring += uchar_from_utf8(&ch, altstring, strlen(altstring));
+			int const used(uchar_from_utf8(&ch, altstring, remain));
+			assert(0 < used);
+			altstring += used;
+			remain -= used;
 			internal_post(ch);
 		}
 	}
@@ -601,15 +614,62 @@ void natural_keyboard::paste()
 //  chars
 //-------------------------------------------------
 
-void natural_keyboard::build_codes(ioport_manager &manager)
+void natural_keyboard::build_codes()
 {
-	// find all shift keys
-	unsigned mask = 0;
-	std::array<ioport_field *, SHIFT_COUNT> shift;
-	std::fill(std::begin(shift), std::end(shift), nullptr);
+	ioport_manager &manager(machine().ioport());
+
+	// find all the devices with keyboard or keypad inputs
 	for (auto const &port : manager.ports())
 	{
+		auto devinfo(
+				std::find_if(
+					m_keyboards.begin(),
+					m_keyboards.end(),
+					[&port] (kbd_dev_info const &info)
+					{
+						return &port.second->device() == &info.device.get();
+					}));
 		for (ioport_field &field : port.second->fields())
+		{
+			bool const is_keyboard(field.type() == IPT_KEYBOARD);
+			if (is_keyboard || (field.type() == IPT_KEYPAD))
+			{
+				if (m_keyboards.end() == devinfo)
+					devinfo = m_keyboards.emplace(devinfo, port.second->device());
+				devinfo->keyfields.emplace_back(field);
+				if (is_keyboard)
+					devinfo->keyboard = true;
+				else
+					devinfo->keypad = true;
+			}
+		}
+	}
+	std::sort(
+			std::begin(m_keyboards),
+			std::end(m_keyboards),
+			[] (kbd_dev_info const &l, kbd_dev_info const &r)
+			{
+				return 0 > std::strcmp(l.device.get().tag(), r.device.get().tag());
+			});
+
+	// set up key mappings for each keyboard
+	std::array<ioport_field *, SHIFT_COUNT> shift;
+	unsigned mask;
+	bool have_keyboard(false);
+	for (kbd_dev_info &devinfo : m_keyboards)
+	{
+		if (LOG_NATURAL_KEYBOARD)
+			machine().logerror("natural_keyboard: building codes for %s... (%u fields)\n", devinfo.device.get().tag(), devinfo.keyfields.size());
+
+		// enable all pure keypads and the first keyboard
+		if (!devinfo.keyboard || !have_keyboard)
+			devinfo.enabled = true;
+		have_keyboard = have_keyboard || devinfo.keyboard;
+
+		// find all shift keys
+		std::fill(std::begin(shift), std::end(shift), nullptr);
+		mask = 0;
+		for (ioport_field &field : devinfo.keyfields)
 		{
 			if (field.type() == IPT_KEYBOARD)
 			{
@@ -620,17 +680,17 @@ void natural_keyboard::build_codes(ioport_manager &manager)
 					{
 						mask |= 1U << (code - UCHAR_SHIFT_BEGIN);
 						shift[code - UCHAR_SHIFT_BEGIN] = &field;
+						if (LOG_NATURAL_KEYBOARD)
+							machine().logerror("natural_keyboard: UCHAR_SHIFT_%d found\n", code - UCHAR_SHIFT_BEGIN + 1);
 					}
 				}
 			}
 		}
-	}
 
-	// iterate over ports and fields
-	for (auto const &port : manager.ports())
-	{
-		for (ioport_field &field : port.second->fields())
+		// iterate over keyboard/keypad fields
+		for (ioport_field &field : devinfo.keyfields)
 		{
+			field.live().lockout = !devinfo.enabled;
 			if (field.type() == IPT_KEYBOARD)
 			{
 				// iterate over all shift states
@@ -644,13 +704,14 @@ void natural_keyboard::build_codes(ioport_manager &manager)
 						{
 							if (((code < UCHAR_SHIFT_BEGIN) || (code > UCHAR_SHIFT_END)) && (code != 0))
 							{
-								keycode_map::iterator const found(m_keycode_map.find(code));
+								m_have_charkeys = true;
+								keycode_map::iterator const found(devinfo.codemap.find(code));
 								keycode_map_entry newcode;
 								std::fill(std::begin(newcode.field), std::end(newcode.field), nullptr);
 								newcode.shift = curshift;
 								newcode.condition = field.condition();
 
-								unsigned fieldnum = 0;
+								unsigned fieldnum(0);
 								for (unsigned i = 0, bits = curshift; (i < SHIFT_COUNT) && bits; ++i, bits >>= 1)
 								{
 									if (BIT(bits, 0))
@@ -658,11 +719,11 @@ void natural_keyboard::build_codes(ioport_manager &manager)
 								}
 
 								newcode.field[fieldnum] = &field;
-								if (m_keycode_map.end() == found)
+								if (devinfo.codemap.end() == found)
 								{
 									keycode_map_entries entries;
 									entries.emplace_back(newcode);
-									m_keycode_map.emplace(code, std::move(entries));
+									devinfo.codemap.emplace(code, std::move(entries));
 								}
 								else
 									found->second.emplace_back(newcode);
@@ -670,7 +731,7 @@ void natural_keyboard::build_codes(ioport_manager &manager)
 								if (LOG_NATURAL_KEYBOARD)
 								{
 									machine().logerror("natural_keyboard: code=%u (%s) port=%p field.name='%s'\n",
-										code, unicode_to_string(code), (void *)&port, field.name());
+											code, unicode_to_string(code), (void *)&field.port(), field.name());
 								}
 							}
 						}
@@ -678,15 +739,31 @@ void natural_keyboard::build_codes(ioport_manager &manager)
 				}
 			}
 		}
-	}
 
-	// sort mapping entries by shift state
-	for (auto &mapping : m_keycode_map)
+		// sort mapping entries by shift state
+		for (auto &mapping : devinfo.codemap)
+		{
+			std::sort(
+					mapping.second.begin(),
+					mapping.second.end(),
+					[] (keycode_map_entry const &x, keycode_map_entry const &y) { return x.shift < y.shift; });
+		}
+	}
+}
+
+
+//-------------------------------------------------
+//  set_keyboard_enabled - enable or disable a
+//  device with key inputs
+//-------------------------------------------------
+
+void natural_keyboard::set_keyboard_enabled(size_t n, bool enable)
+{
+	if (enable != m_keyboards[n].enabled)
 	{
-		std::sort(
-				mapping.second.begin(),
-				mapping.second.end(),
-				[] (keycode_map_entry const &x, keycode_map_entry const &y) { return x.shift < y.shift; });
+		m_keyboards[n].enabled = enable;
+		for (ioport_field &field : m_keyboards[n].keyfields)
+			field.live().lockout = !enable || ((field.type() == IPT_KEYBOARD) && in_use());
 	}
 }
 
@@ -801,13 +878,15 @@ void natural_keyboard::timer(void *ptr, int param)
 		// the driver does not have a queue_chars handler
 
 		// loop through this character's component codes
-		const keycode_map_entry *const code = find_code(m_buffer[m_bufbegin]);
+		if (!m_fieldnum)
+			m_current_code = find_code(m_buffer[m_bufbegin]);
 		bool advance;
-		if (code)
+		if (m_current_code)
 		{
+			keycode_map_entry const code(*m_current_code);
 			do
 			{
-				ioport_field *const field = code->field[m_fieldnum];
+				ioport_field *const field = code.field[m_fieldnum];
 				if (field)
 				{
 					// special handling for toggle fields
@@ -817,8 +896,8 @@ void natural_keyboard::timer(void *ptr, int param)
 						field->set_value(!field->digital_value());
 				}
 			}
-			while (code->field[m_fieldnum] && (++m_fieldnum < code->field.size()) && m_status_keydown);
-			advance = (m_fieldnum >= code->field.size()) || !code->field[m_fieldnum];
+			while (code.field[m_fieldnum] && (++m_fieldnum < code.field.size()) && m_status_keydown);
+			advance = (m_fieldnum >= code.field.size()) || !code.field[m_fieldnum];
 		}
 		else
 		{
@@ -888,13 +967,20 @@ std::string natural_keyboard::unicode_to_string(char32_t ch) const
 
 const natural_keyboard::keycode_map_entry *natural_keyboard::find_code(char32_t ch) const
 {
-	keycode_map::const_iterator const found(m_keycode_map.find(ch));
-	if (m_keycode_map.end() == found)
-		return nullptr;
-	for (keycode_map_entry const &entry : found->second)
+	for (kbd_dev_info const &devinfo : m_keyboards)
 	{
-		if (entry.condition.eval())
-			return &entry;
+		if (devinfo.enabled)
+		{
+			keycode_map::const_iterator const found(devinfo.codemap.find(ch));
+			if (devinfo.codemap.end() != found)
+			{
+				for (keycode_map_entry const &entry : found->second)
+				{
+					if (entry.condition.eval())
+						return &entry;
+				}
+			}
+		}
 	}
 	return nullptr;
 }
@@ -908,25 +994,43 @@ void natural_keyboard::dump(std::ostream &str) const
 {
 	constexpr size_t left_column_width = 24;
 
-	// loop through all codes
-	bool first(true);
-	for (auto &code : m_keycode_map)
+	// loop through all devices
+	bool firstdev(true);
+	for (kbd_dev_info const &devinfo : m_keyboards)
 	{
-		// describe the character code
-		std::string const description(string_format("%08X (%s) ", code.first, unicode_to_string(code.first)));
-
-		// pad with spaces
-		util::stream_format(str, "%-*s", left_column_width, description);
-
-		for (auto &entry : code.second)
-		{
-			// identify the keys used
-			for (std::size_t field = 0; (entry.field.size() > field) && entry.field[field]; ++field)
-				util::stream_format(str, "%s'%s'", first ? "" : ", ", entry.field[field]->name());
-
-			// carriage return
+		if (!firstdev)
 			str << '\n';
-			first = false;
+		util::stream_format(
+				str,
+				"%s(%s) - %s%s%s %sabled\n",
+				devinfo.device.get().type().shortname(),
+				devinfo.device.get().tag(),
+				devinfo.keyboard ? "keyboard" : "",
+				(devinfo.keyboard && devinfo.keypad) ? "/" : "",
+				devinfo.keypad ? "keypad" : "",
+				devinfo.enabled ? "en" : "dis");
+		firstdev = false;
+
+		// loop through all codes
+		bool firstkey(true);
+		for (auto &code : devinfo.codemap)
+		{
+			// describe the character code
+			std::string const description(string_format("%08X (%s) ", code.first, unicode_to_string(code.first)));
+
+			// pad with spaces
+			util::stream_format(str, "%-*s", left_column_width, description);
+
+			for (auto &entry : code.second)
+			{
+				// identify the keys used
+				for (std::size_t field = 0; (entry.field.size() > field) && entry.field[field]; ++field)
+					util::stream_format(str, "%s'%s'", firstkey ? "" : ", ", entry.field[field]->name());
+
+				// carriage return
+				str << '\n';
+				firstkey = false;
+			}
 		}
 	}
 }

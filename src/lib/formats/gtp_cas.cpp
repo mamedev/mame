@@ -6,9 +6,9 @@
 
     Miodrag Milanovic
 */
-#include <cassert>
-
 #include "gtp_cas.h"
+
+#include <cassert>
 
 
 #define GTP_WAV_FREQUENCY   44100
@@ -20,7 +20,7 @@
 #define GTP_BLOCK_TURBO     0x01
 #define GTP_BLOCK_NAME      0x10
 
-static int16_t    wave_data;
+static int16_t    wave_data; // FIXME: global variable prevent multiple instances
 static int16_t    len;
 
 #define PULSE_WIDTH     30
@@ -164,7 +164,7 @@ static int gtp_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes ) {
 
 
 
-static const struct CassetteLegacyWaveFiller gtp_legacy_fill_wave = {
+static const cassette_image::LegacyWaveFiller gtp_legacy_fill_wave = {
 	gtp_cas_fill_wave,          /* fill_wave */
 	-1,                 /* chunk_size */
 	0,                  /* chunk_samples */
@@ -176,19 +176,19 @@ static const struct CassetteLegacyWaveFiller gtp_legacy_fill_wave = {
 
 
 
-static cassette_image::error gtp_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) {
-	return cassette_legacy_identify( cassette, opts, &gtp_legacy_fill_wave );
+static cassette_image::error gtp_cassette_identify( cassette_image *cassette, cassette_image::Options *opts ) {
+	return cassette->legacy_identify( opts, &gtp_legacy_fill_wave );
 }
 
 
 
 static cassette_image::error gtp_cassette_load( cassette_image *cassette ) {
-	return cassette_legacy_construct( cassette, &gtp_legacy_fill_wave );
+	return cassette->legacy_construct( &gtp_legacy_fill_wave );
 }
 
 
 
-static const struct CassetteFormat gtp_cassette_format = {
+static const cassette_image::Format gtp_cassette_format = {
 	"gtp",
 	gtp_cassette_identify,
 	gtp_cassette_load,

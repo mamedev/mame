@@ -123,7 +123,7 @@ WRITE_LINE_MEMBER(spectrum_state::screen_vblank_spectrum)
 
 inline void spectrum_state::spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color)
 {
-	bitmap.pix16(y, x) = (uint16_t)color;
+	bitmap.pix(y, x) = (uint16_t)color;
 }
 
 uint32_t spectrum_state::screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -235,7 +235,7 @@ void spectrum_state::spectrum_UpdateScreenBitmap(bool eof)
 			{
 				// this can/must be optimised
 				if ((scrx & 7) == 0) {
-					uint16_t *bm = &m_screen_bitmap.pix16(m_previous_screen_y, m_previous_screen_x);
+					uint16_t *bm = &m_screen_bitmap.pix(m_previous_screen_y, m_previous_screen_x);
 					uint8_t attr = *(m_screen_location + ((scry & 0xF8) << 2) + (scrx >> 3) + 0x1800);
 					uint8_t scr = *(m_screen_location + ((scry & 7) << 8) + ((scry & 0x38) << 2) + ((scry & 0xC0) << 5) + (scrx >> 3));
 					uint16_t ink = (attr & 0x07) + ((attr >> 3) & 0x08);
@@ -284,7 +284,7 @@ void spectrum_state::spectrum_UpdateBorderBitmap()
 
 		do
 		{
-			m_border_bitmap.pix16(m_previous_border_y, m_previous_border_x) = border;
+			m_border_bitmap.pix(m_previous_border_y, m_previous_border_x) = border;
 
 			m_previous_border_x += 1;
 

@@ -95,20 +95,20 @@ uint32_t malzak_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 		for (int x = cliprect.min_x; x <= cliprect.max_x; ++x)
 		{
 			int sx = x / 2;
-			int s2636_pix_0 = s2636_0_bitmap.pix16(sy, sx);
-			int s2636_pix_1 = s2636_1_bitmap.pix16(sy, sx);
-			rgb_t trom_pix = m_trom_bitmap->pix32(y, x);
-			rgb_t play_pix = m_playfield_bitmap->pix32(sy, sx);
+			int s2636_pix_0 = s2636_0_bitmap.pix(sy, sx);
+			int s2636_pix_1 = s2636_1_bitmap.pix(sy, sx);
+			rgb_t trom_pix = m_trom_bitmap->pix(y, x);
+			rgb_t play_pix = m_playfield_bitmap->pix(sy, sx);
 
 			// SAA5050 > s2636[1] > s2636[0] > playfield
 			if (trom_pix != rgb_t::black())
-				bitmap.pix32(y, x) = trom_pix;
+				bitmap.pix(y, x) = trom_pix;
 			else if (S2636_IS_PIXEL_DRAWN(s2636_pix_1))
-				bitmap.pix32(y, x) = palette[S2636_PIXEL_COLOR(s2636_pix_1)];
+				bitmap.pix(y, x) = palette[S2636_PIXEL_COLOR(s2636_pix_1)];
 			else if (S2636_IS_PIXEL_DRAWN(s2636_pix_0))
-				bitmap.pix32(y, x) = palette[S2636_PIXEL_COLOR(s2636_pix_0)];
+				bitmap.pix(y, x) = palette[S2636_PIXEL_COLOR(s2636_pix_0)];
 			else
-				bitmap.pix32(y, x) = play_pix;
+				bitmap.pix(y, x) = play_pix;
 		}
 	}
 

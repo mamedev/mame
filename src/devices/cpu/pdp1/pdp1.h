@@ -33,8 +33,7 @@ struct pdp1_reset_param_t
 #define IOT_NO_COMPLETION_PULSE -1
 
 
-class pdp1_device : public cpu_device
-					, public pdp1_reset_param_t
+class pdp1_device : public cpu_device, public pdp1_reset_param_t
 {
 public:
 	typedef device_delegate<void (int op2, int nac, int mb, int &io, int ac)> iot_delegate;

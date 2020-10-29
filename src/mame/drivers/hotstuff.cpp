@@ -40,11 +40,10 @@ void hotstuff_state::video_start()
 
 uint32_t hotstuff_state::screen_update_hotstuff(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int yyy,xxx;
 	uint16_t row_palette_data[0x10];
 	rgb_t row_palette_data_as_rgb32_pen_data[0x10];
 
-	yyy=512;xxx=512*2;
+	int yyy=512, xxx=512*2;
 
 	int count = 0;
 	for (int y = 0; y < yyy; y++)
@@ -61,13 +60,13 @@ uint32_t hotstuff_state::screen_update_hotstuff(screen_device &screen, bitmap_rg
 
 		for (int x = 0; x < xxx; )
 		{
-			bitmap.pix32(y, x) = row_palette_data_as_rgb32_pen_data[(m_bitmapram[count] &0xf000)>>12];
+			bitmap.pix(y, x) = row_palette_data_as_rgb32_pen_data[(m_bitmapram[count] &0xf000)>>12];
 			x++;
-			bitmap.pix32(y, x) = row_palette_data_as_rgb32_pen_data[(m_bitmapram[count] &0x0f00)>>8];
+			bitmap.pix(y, x) = row_palette_data_as_rgb32_pen_data[(m_bitmapram[count] &0x0f00)>>8];
 			x++;
-			bitmap.pix32(y, x) = row_palette_data_as_rgb32_pen_data[(m_bitmapram[count] &0x00f0)>>4];
+			bitmap.pix(y, x) = row_palette_data_as_rgb32_pen_data[(m_bitmapram[count] &0x00f0)>>4];
 			x++;
-			bitmap.pix32(y, x) = row_palette_data_as_rgb32_pen_data[(m_bitmapram[count] &0x000f)>>0];
+			bitmap.pix(y, x) = row_palette_data_as_rgb32_pen_data[(m_bitmapram[count] &0x000f)>>0];
 			x++;
 
 			count++;

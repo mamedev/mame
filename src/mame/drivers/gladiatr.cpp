@@ -170,6 +170,7 @@ Notes:
 - gladiatr and clones start with one credit due to the way MAME initialises
   memory and the dodgy code the bootleg MCUs use to synchronise with the host
   CPUs.  On an F3 reset they randomly start with one credit or no credits.
+- gladiatr and clones don't show player inputs in service mode.
 
 TODO:
 -----
@@ -183,7 +184,7 @@ TODO:
 - YM2203 some sound effects just don't sound correct
 - Audio Filter Switch not hooked up (might solve YM2203 mixing issue)
 - Ports 60,61,80,81 not fully understood yet...
-- The four 8741 dumps come from an unprotected bootleg, we need dumps from
+- Three 8741 dumps come from an unprotected bootleg, we need dumps from
   original boards.
 
 ***************************************************************************/
@@ -1048,7 +1049,7 @@ void gladiatr_state::gladiatr(machine_config &config)
 	m_ucpu->t0_in_cb().set(FUNC(gladiatr_state::tclk_r));
 	m_ucpu->t1_in_cb().set(FUNC(gladiatr_state::ucpu_t1_r));
 
-	I8741A(config, m_csnd, 12_MHz_XTAL/2); /* verified on pcb */
+	I8742(config, m_csnd, 12_MHz_XTAL/2); /* verified on pcb */
 	m_csnd->p1_in_cb().set(FUNC(gladiatr_state::csnd_p1_r));
 	m_csnd->p1_out_cb().set(FUNC(gladiatr_state::csnd_p1_w));
 	m_csnd->p2_in_cb().set(FUNC(gladiatr_state::csnd_p2_r));
@@ -1094,6 +1095,18 @@ void gladiatr_state::gladiatr(machine_config &config)
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.60);
 
 	LS259(config, "filtlatch", 0); // 9R - filters on sound output
+}
+
+void gladiatr_state::greatgur(machine_config &config)
+{
+	gladiatr(config);
+
+	I8741A(config.replace(), m_csnd, 12_MHz_XTAL/2); /* verified on pcb */
+	m_csnd->p1_in_cb().set(FUNC(gladiatr_state::csnd_p1_r));
+	m_csnd->p1_out_cb().set(FUNC(gladiatr_state::csnd_p1_w));
+	m_csnd->p2_in_cb().set(FUNC(gladiatr_state::csnd_p2_r));
+	m_csnd->t0_in_cb().set(FUNC(gladiatr_state::tclk_r));
+	m_csnd->t1_in_cb().set(FUNC(gladiatr_state::csnd_t1_r));
 }
 
 
@@ -1196,8 +1209,8 @@ ROM_START( gladiatr )
 	ROM_REGION( 0x0400, "ucpu", 0 ) /* comms MCU */
 	ROM_LOAD( "aq_006.3a",      0x00000, 0x0400, CRC(3c5ca4c6) SHA1(0d8c2e1c2142ada11e30cfb9a48663386fee9cb8) BAD_DUMP )
 
-	ROM_REGION( 0x0400, "csnd", 0 ) /* comms MCU */
-	ROM_LOAD( "aq_006.6c",      0x00000, 0x0400, CRC(3c5ca4c6) SHA1(0d8c2e1c2142ada11e30cfb9a48663386fee9cb8) BAD_DUMP )
+	ROM_REGION( 0x0800, "csnd", 0 ) /* comms MCU */
+	ROM_LOAD( "aq_007.6c",      0x00000, 0x0800, CRC(f19af04d) SHA1(61105cb905128e5d10b2e97d6201034584eb1ada) )
 ROM_END
 
 ROM_START( ogonsiro )
@@ -1251,8 +1264,8 @@ ROM_START( ogonsiro )
 	ROM_REGION( 0x0400, "ucpu", 0 ) /* comms MCU */
 	ROM_LOAD( "aq_006.3a",      0x00000, 0x0400, CRC(3c5ca4c6) SHA1(0d8c2e1c2142ada11e30cfb9a48663386fee9cb8) BAD_DUMP )
 
-	ROM_REGION( 0x0400, "csnd", 0 ) /* comms MCU */
-	ROM_LOAD( "aq_006.6c",      0x00000, 0x0400, CRC(3c5ca4c6) SHA1(0d8c2e1c2142ada11e30cfb9a48663386fee9cb8) BAD_DUMP )
+	ROM_REGION( 0x0800, "csnd", 0 ) /* comms MCU */
+	ROM_LOAD( "aq_007.6c",      0x00000, 0x0800, CRC(f19af04d) SHA1(61105cb905128e5d10b2e97d6201034584eb1ada) )
 ROM_END
 
 ROM_START( greatgur )
@@ -1361,20 +1374,17 @@ ROM_START( gcastle )
 	ROM_REGION( 0x0400, "ucpu", 0 ) /* comms MCU */
 	ROM_LOAD( "aq_006.3a",      0x00000, 0x0400, CRC(3c5ca4c6) SHA1(0d8c2e1c2142ada11e30cfb9a48663386fee9cb8) BAD_DUMP )
 
-	ROM_REGION( 0x0400, "csnd", 0 ) /* comms MCU */
-	ROM_LOAD( "aq_006.6c",      0x00000, 0x0400, CRC(3c5ca4c6) SHA1(0d8c2e1c2142ada11e30cfb9a48663386fee9cb8) BAD_DUMP )
+	ROM_REGION( 0x0800, "csnd", 0 ) /* comms MCU */
+	ROM_LOAD( "aq_007.6c",      0x00000, 0x0800, CRC(f19af04d) SHA1(61105cb905128e5d10b2e97d6201034584eb1ada) )
 ROM_END
 
 
-void gladiatr_state::swap_block(u8 *src1,u8 *src2,int len)
+void gladiatr_state::swap_block(u8 *src1, u8 *src2, int len)
 {
-	int i,t;
-
-	for (i = 0;i < len;i++)
+	for (int i = 0; i < len; i++)
 	{
-		t = src1[i];
-		src1[i] = src2[i];
-		src2[i] = t;
+		using std::swap;
+		swap(src1[i], src2[i]);
 	}
 }
 
@@ -1465,9 +1475,9 @@ void ppking_state::init_ppking()
 }
 
 
-
-GAME( 1985, ppking,   0,        ppking,   ppking,   ppking_state,   init_ppking,   ROT90, "Taito America Corporation", "Ping-Pong King", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN )
-GAME( 1986, gladiatr, 0,        gladiatr, gladiatr, gladiatr_state, init_gladiatr, ROT0,  "Allumer / Taito America Corporation", "Gladiator (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, ogonsiro, gladiatr, gladiatr, gladiatr, gladiatr_state, init_gladiatr, ROT0,  "Allumer / Taito Corporation", "Ougon no Shiro (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, greatgur, gladiatr, gladiatr, gladiatr, gladiatr_state, init_gladiatr, ROT0,  "Allumer / Taito Corporation", "Great Gurianos (Japan?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, gcastle,  gladiatr, gladiatr, gladiatr, gladiatr_state, init_gladiatr, ROT0,  "Allumer / Taito Corporation", "Golden Castle (prototype?)", MACHINE_SUPPORTS_SAVE ) // incomplete dump
+//    year  name      parent    machine   input     class           init           rot    company                                fullname                                         flags
+GAME( 1985, ppking,   0,        ppking,   ppking,   ppking_state,   init_ppking,   ROT90, "Taito America Corporation",           "Ping-Pong King",                                MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN )
+GAME( 1986, gladiatr, 0,        gladiatr, gladiatr, gladiatr_state, init_gladiatr, ROT0,  "Allumer / Taito America Corporation", "Gladiator (US)",                                MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ogonsiro, gladiatr, gladiatr, gladiatr, gladiatr_state, init_gladiatr, ROT0,  "Allumer / Taito Corporation",         "Ougon no Shiro (Japan)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1986, greatgur, gladiatr, greatgur, gladiatr, gladiatr_state, init_gladiatr, ROT0,  "Allumer / Taito Corporation",         "Great Gurianos (Japan?)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1986, gcastle,  gladiatr, gladiatr, gladiatr, gladiatr_state, init_gladiatr, ROT0,  "Allumer / Taito Corporation",         "Golden Castle (prototype?)",                    MACHINE_SUPPORTS_SAVE ) // incomplete dump

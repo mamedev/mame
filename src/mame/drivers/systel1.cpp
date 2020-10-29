@@ -108,7 +108,7 @@ I8275_DRAW_CHARACTER_MEMBER(systel1_state::draw_character)
 
 	for (int i = 0; i < 7; i++)
 	{
-		bitmap.pix32(y, x + i) = BIT(dots, 7) ? rgb_t::white() : rgb_t::black();
+		bitmap.pix(y, x + i) = BIT(dots, 7) ? rgb_t::white() : rgb_t::black();
 		dots <<= 1;
 	}
 }

@@ -266,7 +266,7 @@ u32 orao_state::screen_update_orao(screen_device &screen, bitmap_ind16 &bitmap, 
 			u8 code = m_vram[addr++];
 			for (u8 b = 0; b < 8; b++)
 			{
-				bitmap.pix16(y, horpos++) =  (code >> b) & 0x01;
+				bitmap.pix(y, horpos++) =  (code >> b) & 0x01;
 			}
 		}
 	}

@@ -184,7 +184,7 @@ void piggypas_state::machine_reset()
 HD44780_PIXEL_UPDATE(piggypas_state::piggypas_pixel_update)
 {
 	if (pos < 8)
-		bitmap.pix16(y, (line * 8 + pos) * 6 + x) = state;
+		bitmap.pix(y, (line * 8 + pos) * 6 + x) = state;
 }
 
 void piggypas_state::piggypas(machine_config &config)

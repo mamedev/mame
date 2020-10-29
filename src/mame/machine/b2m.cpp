@@ -280,17 +280,14 @@ void b2m_state::machine_reset()
 
 uint32_t b2m_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t code1;
-	uint8_t code2;
-	uint8_t col;
-	int y, x, b;
-	uint8_t *ram = m_ram->pointer();
+	u8 const *const ram = m_ram->pointer();
 
-	for (x = 0; x < 48; x++)
+	for (int x = 0; x < 48; x++)
 	{
-		for (y = 0; y < 256; y++)
+		for (int y = 0; y < 256; y++)
 		{
-			u16 t = x*256 + ((y + m_video_scroll) & 0xff);
+			u16 const t = x*256 + ((y + m_video_scroll) & 0xff);
+			u8 code1, code2;
 			if (m_video_page==0)
 			{
 				code1 = ram[0x11000 + t];
@@ -301,10 +298,10 @@ uint32_t b2m_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 				code1 = ram[0x19000 + t];
 				code2 = ram[0x1d000 + t];
 			}
-			for (b = 7; b >= 0; b--)
+			for (int b = 7; b >= 0; b--)
 			{
-				col = (BIT(code2, b)<<1) + BIT(code1, b);
-				bitmap.pix16(y, x*8+b) =  col;
+				u8 const col = (BIT(code2, b)<<1) + BIT(code1, b);
+				bitmap.pix(y, x*8+b) =  col;
 			}
 		}
 	}

@@ -304,9 +304,9 @@ void kaneko16_sprite_device::draw_sprites_custom(const rectangle &clip,gfx_eleme
 	{ /* skip if inner loop doesn't draw anything */
 		for (int y = sy; y < ey; y++)
 		{
-			const u8 *source = source_base + y_index * gfx->rowbytes();
-			u16 *dest = &m_sprites_bitmap.pix16(y);
-			u8 *pri = &m_sprites_maskmap.pix8(y);
+			u8 const *const source = source_base + y_index * gfx->rowbytes();
+			u16 *const dest = &m_sprites_bitmap.pix(y);
+			u8 *const pri = &m_sprites_maskmap.pix(y);
 
 			int x_index = x_index_base;
 			for (int x = sx; x < ex; x++)
@@ -549,18 +549,15 @@ void kaneko16_sprite_device::copybitmap(bitmap_rgb32 &bitmap, const rectangle &c
 template<class BitmapClass>
 void kaneko16_sprite_device::copybitmap_common(BitmapClass &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap)
 {
-	const pen_t *pal = gfx(0)->palette().pens();
+	pen_t const *const pal = gfx(0)->palette().pens();
 
-	typename BitmapClass::pixel_t *dstbitmap;
-	int rgb;
-	if (sizeof(*dstbitmap) == 2) rgb = 0;
-	else rgb = 1;
+	constexpr bool rgb = sizeof(typename BitmapClass::pixel_t) != 2;
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		dstbitmap = &bitmap.pix(y);
-		u8 *dstprimap = &priority_bitmap.pix8(y);
-		u16* srcbitmap = &m_sprites_bitmap.pix16(y);
+		typename BitmapClass::pixel_t *const dstbitmap = &bitmap.pix(y);
+		u8 *const dstprimap = &priority_bitmap.pix(y);
+		u16 *const srcbitmap = &m_sprites_bitmap.pix(y);
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{

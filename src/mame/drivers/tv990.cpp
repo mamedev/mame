@@ -194,51 +194,43 @@ void tv990_state::tvi1111_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint32_t tv990_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint32_t *scanline;
-	int x, y;
-	uint8_t pixels, pixels2;
-	uint16_t *vram = (uint16_t *)m_vram.target();
-	uint8_t *fontram = (uint8_t *)m_fontram.target();
-	uint16_t *curchar;
-	uint8_t *fontptr;
-	int miny = cliprect.min_y / m_rowh;
-	int maxy = cliprect.max_y / m_rowh;
+	uint16_t const *const vram = (uint16_t *)m_vram.target();
+	uint8_t const *const fontram = (uint8_t *)m_fontram.target();
+	int const miny = cliprect.min_y / m_rowh;
+	int const maxy = cliprect.max_y / m_rowh;
 
 	bitmap.fill(0, cliprect);
 
-	for (y = miny; y <= maxy; y++)
+	for (int y = miny; y <= maxy; y++)
 	{
-		int i;
-		for(i = 7; i >= 0; i--)
+		for(int i = 7; i >= 0; i--)
 		{
 			if(!BIT(tvi1111_regs[0x1f], i))
 				continue;
 
-			int starty = tvi1111_regs[i + 0x40] >> 8;
-			int endy = tvi1111_regs[i + 0x40] & 0xff;
+			int const starty = tvi1111_regs[i + 0x40] >> 8;
+			int const endy = tvi1111_regs[i + 0x40] & 0xff;
 			if((y < starty) || (y >= endy))
 				continue;
 
-			uint16_t row_offset = tvi1111_regs[i + 0x50];
-			curchar = &vram[row_offset];
+			uint16_t const row_offset = tvi1111_regs[i + 0x50];
+			uint16_t const *curchar = &vram[row_offset];
 			int minx = tvi1111_regs[i + 0x30] >> 8;
 			int maxx = tvi1111_regs[i + 0x30] & 0xff;
 
 			if(maxx > m_width)
 				maxx = m_width;
 
-			uint16_t cursor_x = tvi1111_regs[0x16] - row_offset;
+			uint16_t const cursor_x = tvi1111_regs[0x16] - row_offset;
 
-			for (x = minx; x < maxx; x++)
+			for (int x = minx; x < maxx; x++)
 			{
 				uint8_t chr = curchar[x - minx] >> 8;
 				uint8_t attr = curchar[x - minx] & 0xff;
 				if((attr & 2) && (m_screen->frame_number() & 32)) // blink rate?
 					continue;
 
-				fontptr = (uint8_t *)&fontram[(chr + (attr & 0x40 ? 256 : 0)) * 64];
-
-				uint32_t palette[2];
+				uint8_t const *fontptr = &fontram[(chr + (attr & 0x40 ? 256 : 0)) * 64];
 
 				if (BIT(tvi1111_regs[0x1b], 0) && x == cursor_x)
 				{
@@ -253,6 +245,7 @@ uint32_t tv990_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 						attr ^= attrchg;
 				}
 
+				uint32_t palette[2];
 				if (attr & 0x4) // inverse video?
 				{
 					palette[1] = m_palette->pen(0);
@@ -266,32 +259,32 @@ uint32_t tv990_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 				for (int chary = 0; chary < m_rowh; chary++)
 				{
-					scanline = &bitmap.pix32((y*m_rowh)+chary, (x*16));
+					uint32_t *scanline = &bitmap.pix((y*m_rowh)+chary, (x*16));
 
-					pixels = *fontptr++;
-					pixels2 = *fontptr++;
+					uint8_t pixels = *fontptr++;
+					uint8_t pixels2 = *fontptr++;
 					if((attr & 0x8) && (chary == m_rowh - 1))
 					{
 						pixels = 0xff;
 						pixels2 = 0xff;
 					}
 
-					*scanline++ = palette[(pixels>>7)&1];
-					*scanline++ = palette[(pixels2>>7)&1];
-					*scanline++ = palette[(pixels>>6)&1];
-					*scanline++ = palette[(pixels2>>6)&1];
-					*scanline++ = palette[(pixels>>5)&1];
-					*scanline++ = palette[(pixels2>>5)&1];
-					*scanline++ = palette[(pixels>>4)&1];
-					*scanline++ = palette[(pixels2>>4)&1];
-					*scanline++ = palette[(pixels>>3)&1];
-					*scanline++ = palette[(pixels2>>3)&1];
-					*scanline++ = palette[(pixels>>2)&1];
-					*scanline++ = palette[(pixels2>>2)&1];
-					*scanline++ = palette[(pixels>>1)&1];
-					*scanline++ = palette[(pixels2>>1)&1];
-					*scanline++ = palette[(pixels&1)];
-					*scanline++ = palette[(pixels2&1)];
+					*scanline++ = palette[BIT(pixels, 7)];
+					*scanline++ = palette[BIT(pixels2, 7)];
+					*scanline++ = palette[BIT(pixels, 6)];
+					*scanline++ = palette[BIT(pixels2, 6)];
+					*scanline++ = palette[BIT(pixels, 5)];
+					*scanline++ = palette[BIT(pixels2, 5)];
+					*scanline++ = palette[BIT(pixels, 4)];
+					*scanline++ = palette[BIT(pixels2, 4)];
+					*scanline++ = palette[BIT(pixels, 3)];
+					*scanline++ = palette[BIT(pixels2, 3)];
+					*scanline++ = palette[BIT(pixels, 2)];
+					*scanline++ = palette[BIT(pixels2, 2)];
+					*scanline++ = palette[BIT(pixels, 1)];
+					*scanline++ = palette[BIT(pixels2, 1)];
+					*scanline++ = palette[BIT(pixels, 0)];
+					*scanline++ = palette[BIT(pixels2, 0)];
 				}
 			}
 		}
@@ -331,7 +324,6 @@ void tv990_state::tv990_mem(address_map &map)
 
 /* Input ports */
 static INPUT_PORTS_START( tv990 )
-	PORT_INCLUDE( at_keyboard )
 	PORT_START("Screen")
 	PORT_CONFNAME( 0x30, 0x00, "Color") PORT_CHANGED_MEMBER(DEVICE_SELF, tv990_state, color, 0)
 	PORT_CONFSETTING(    0x00, "Green")

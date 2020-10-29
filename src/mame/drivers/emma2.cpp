@@ -204,7 +204,7 @@ void emma2_state::emma2(machine_config &config)
 	m_pia->writepa_handler().set(FUNC(emma2_state::segment_w));
 	m_pia->writepb_handler().set(FUNC(emma2_state::digit_w));
 	m_pia->readpb_handler().set(FUNC(emma2_state::keyboard_r));
-	m_pia->ca2_handler().set([this] (bool state) { output().set_value("led0", state); });
+	m_pia->ca2_handler().set_output("led0");
 	m_pia->irqa_handler().set_inputline(m_maincpu, m6502_device::IRQ_LINE);
 	m_pia->irqb_handler().set_inputline(m_maincpu, m6502_device::IRQ_LINE);
 

@@ -13,7 +13,6 @@
 #include "cpu/gigatron/gigatron.h"
 #include "screen.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 #include "gigatron.lh"
@@ -103,7 +102,7 @@ void gigatron_state::video_start()
 
 void gigatron_state::video_reset()
 {
-	uint32_t *dest = &m_bitmap_render->pix32(0, 0);
+	uint32_t *dest = &m_bitmap_render->pix(0, 0);
 	for(uint32_t i = 0; i < 640*480; i++)
 		*dest++ = 0;
 }
@@ -138,7 +137,7 @@ void gigatron_state::port_out(uint8_t data)
 		uint8_t r = (out << 6) & 0xC0;
 		uint8_t g = (out << 4) & 0xC0;
 		uint8_t b = (out << 2) & 0xC0;
-		uint32_t *dest = &m_bitmap_render->pix32(m_row, m_col);
+		uint32_t *dest = &m_bitmap_render->pix(m_row, m_col);
 		for(uint8_t i = 0; i < 4; i++)
 			*dest++ = b|(g<<8)|(r<<16);
 	}
@@ -230,6 +229,10 @@ void gigatron_state::gigatron(machine_config &config)
 {
 	config.set_default_layout(layout_gigatron);
 
+	/* sound hardware */
+	SPEAKER(config, "speaker").front_center();
+	DAC_4BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
+
 	GTRON(config, m_maincpu, MAIN_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gigatron_state::prog_map);
 	m_maincpu->set_addrmap(AS_DATA, &gigatron_state::data_map);
@@ -243,19 +246,12 @@ void gigatron_state::gigatron(machine_config &config)
 	m_screen.set_size(640, 480);
 	m_screen.set_visarea(0, 640-1, 0, 480-1);
 	m_screen.set_screen_update(FUNC(gigatron_state::screen_update));
-
-	/* sound hardware */
-	SPEAKER(config, "speaker").front_center();
-	DAC_4BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 ROM_START( gigatron )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS(0, "v5a", "Gigatron ROM v5a")
-	ROMX_LOAD( "gigrom5a.rom",  0x0000, 0x20000, CRC(DCC071A6) SHA1(F82059BA0227FF48E4C687B90C8445DA30213EE2),ROM_BIOS(0))
+	ROMX_LOAD( "gigrom5a.rom",  0x0000, 0x20000, CRC(dcc071a6) SHA1(f82059ba0227ff48e4c687b90c8445da30213ee2),ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v4", "Gigatron ROM v4")
 	ROMX_LOAD( "gigrom4.rom",  0x0000, 0x20000, CRC(78995109) SHA1(2395fc48e64099836111f5aeca39ddbf4650ea4e),ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "v3", "Gigatron ROM v3")

@@ -34,7 +34,7 @@ private:
 	uint32_t screen_update_ssem(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	inline uint32_t reverse(uint32_t v);
-	void strlower(char *buf);
+	std::string read_line(device_image_interface *image);
 
 	void ssem_map(address_map &map);
 
@@ -437,9 +437,8 @@ void ssem_state::glyph_print(bitmap_rgb32 &bitmap, int32_t x, int32_t y, Format 
 			int32_t line = 0;
 			for(line = 0; line < 8; line++)
 			{
-				uint32_t *d = &bitmap.pix32(y + line);
-				int32_t bit = 0;
-				for(bit = 0; bit < 8; bit++)
+				uint32_t *const d = &bitmap.pix(y + line);
+				for(uint32_t bit = 0; bit < 8; bit++)
 				{
 					if(char_glyphs[cur][line] & (1 << (7 - bit)))
 					{
@@ -516,20 +515,27 @@ uint32_t ssem_state::screen_update_ssem(screen_device &screen, bitmap_rgb32 &bit
 * Image helper functions                             *
 \****************************************************/
 
-void ssem_state::strlower(char *buf)
+std::string ssem_state::read_line(device_image_interface *image)
 {
-	if(buf)
+	std::string holder;
+	for (u8 i = 0; i < 100; i++)
 	{
-		int i = 0;
-		for(i = 0; i < strlen(buf); i++)
+		char c = image->fgetc();
+		// convert opcode to lower case
+		if (c >= 'A' && c <= 'Z')
+			c += 32;
+		if (c >= 32)
+			holder.push_back(c);
+		else
 		{
-			if(buf[i] >= 'A' && buf[i] <= 'Z')
-			{
-				buf[i] |= 0x20;
-			}
+			c = image->fgetc(); // skip LF
+			break;
 		}
 	}
+	holder.push_back(0);
+	return holder;
 }
+
 
 /****************************************************\
 * Image loading                                      *
@@ -538,80 +544,101 @@ void ssem_state::strlower(char *buf)
 QUICKLOAD_LOAD_MEMBER(ssem_state::quickload_cb)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	char image_line[100] = { 0 };
-	char token_buf[100] = { 0 };
-	int num_lines = 0;
+	std::string buffer;
+	u32 num_lines = 0;
 
-	image.fgets(image_line, 99);
-	sscanf(image_line, "%d", &num_lines);
-
-	if (num_lines)
+	std::string image_line = read_line(&image);
+	if (image_line.empty())
 	{
-		for (int i = 0; i < num_lines; i++)
+		image.message("No data in line 1");
+		return image_init_result::FAIL;
+	}
+
+	sscanf(image_line.c_str(), "%d", &num_lines);  //num_lines = std::stoul(image_line);
+
+	if (num_lines < 1)
+	{
+		image.message("No data to process");
+		return image_init_result::FAIL;
+	}
+
+	for (u32 i = 0; i < num_lines; i++)
+	{
+		u32 line = 0, word = 0;
+		image_line = read_line(&image);
+		u32 length = image_line.length();
+
+		if (length < 9)
 		{
-			uint32_t line = 0;
-			image.fgets(image_line, 99);
-
-			// Isolate and convert 4-digit decimal address
-			memcpy(token_buf, image_line, 4);
-			token_buf[4] = '\0';
-			sscanf(token_buf, "%04u", &line);
-
-			if (image.is_filetype("snp"))
-			{
-				uint32_t word = 0;
-
-				// Parse a line such as: 0000:00000110101001000100000100000100
-				for (int b = 0; b < 32; b++)
-				{
-					if (image_line[5 + b] == '1')
-						word |= 1 << (31 - b);
-				}
-
-				space.write_byte((line << 2) + 0, (word >> 24) & 0x000000ff);
-				space.write_byte((line << 2) + 1, (word >> 16) & 0x000000ff);
-				space.write_byte((line << 2) + 2, (word >>  8) & 0x000000ff);
-				space.write_byte((line << 2) + 3, (word >>  0) & 0x000000ff);
-			}
-			else if (image.is_filetype("asm"))
-			{
-				char op_buf[4] = { 0 };
-				int32_t value = 0;
-				uint32_t unsigned_value = 0;
-				uint32_t word = 0;
-
-				// Isolate the opcode and convert to lower-case
-				memcpy(op_buf, image_line + 5, 3);
-				op_buf[3] = '\0';
-				strlower(op_buf);
-
-				// Isolate the value
-				sscanf(image_line + 9, "%d", &value);
-				unsigned_value = reverse((uint32_t)value);
-
-				if (!core_stricmp(op_buf, "num"))
-					word = unsigned_value;
-				else if (!core_stricmp(op_buf, "jmp"))
-					word = 0x00000000 | unsigned_value ;
-				else if (!core_stricmp(op_buf, "jrp"))
-					word = 0x00040000 | unsigned_value;
-				else if (!core_stricmp(op_buf, "ldn"))
-					word = 0x00020000 | unsigned_value;
-				else if (!core_stricmp(op_buf, "sto"))
-					word = 0x00060000 | unsigned_value;
-				else if (!core_stricmp(op_buf, "sub"))
-					word = 0x00010000 | unsigned_value;
-				else if (!core_stricmp(op_buf, "cmp"))
-					word = 0x00030000 | unsigned_value;
-				else if (!core_stricmp(op_buf, "stp"))
-					word = 0x00070000 | unsigned_value;
-
-				space.write_byte((line << 2) + 0, (word >> 24) & 0x000000ff);
-				space.write_byte((line << 2) + 1, (word >> 16) & 0x000000ff);
-				space.write_byte((line << 2) + 2, (word >>  8) & 0x000000ff);
-				space.write_byte((line << 2) + 3, (word >>  0) & 0x000000ff);
-			}
+			image.message("Bad data (%s) in line %d",image_line.c_str(),i+2);
+			return image_init_result::FAIL;
 		}
+
+		// Isolate and convert 4-digit decimal address
+		buffer = image_line.substr(0, 4);
+		sscanf(buffer.c_str(), "%04u", &line);
+
+		if (image.is_filetype("snp"))
+		{
+			if (length < 38)
+			{
+				image.message("Bad data (%s) in line %d",image_line.c_str(),i+2);
+				return image_init_result::FAIL;
+			}
+
+			// Parse a line such as: 0000:00000110101001000100000100000100
+			for (u8 b = 0; b < 32; b++)
+				if (image_line[5 + b] == '1')
+					word |= 1 << (31 - b);
+		}
+		else
+		if (image.is_filetype("asm"))
+		{
+			int32_t value = 0;
+			uint32_t unsigned_value = 0;
+
+			// Isolate the value
+			if (length > 8)
+			{
+				buffer = image_line.substr(9);
+				sscanf(buffer.c_str(), "%d", &value);
+				unsigned_value = reverse((uint32_t)value);
+			}
+
+			// Isolate the opcode
+			buffer = image_line.substr(5, 3);
+
+			if (buffer == "num")
+				word = unsigned_value;
+			else
+			if (buffer == "jmp")
+				word = 0x00000000 | unsigned_value ;
+			else
+			if (buffer == "jrp")
+				word = 0x00040000 | unsigned_value;
+			else
+			if (buffer == "ldn")
+				word = 0x00020000 | unsigned_value;
+			else
+			if (buffer == "sto")
+				word = 0x00060000 | unsigned_value;
+			else
+			if (buffer == "sub")
+				word = 0x00010000 | unsigned_value;
+			else
+			if (buffer == "cmp")
+				word = 0x00030000 | unsigned_value;
+			else
+			if (buffer == "stp")
+				word = 0x00070000 | unsigned_value;
+			else
+				logerror("Unknown opcode (%s) in line %d\n",buffer,i+2);
+		}
+
+		space.write_byte((line << 2) + 0, BIT(word, 24, 8));
+		space.write_byte((line << 2) + 1, BIT(word, 16, 8));
+		space.write_byte((line << 2) + 2, BIT(word, 8,  8));
+		space.write_byte((line << 2) + 3, BIT(word, 0,  8));
 	}
 
 	return image_init_result::PASS;
@@ -648,7 +675,10 @@ void ssem_state::ssem(machine_config &config)
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* quickload */
-	QUICKLOAD(config, "quickload", "snp,asm").set_load_callback(FUNC(ssem_state::quickload_cb));
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "snp,asm", attotime::from_seconds(1)));
+	quickload.set_load_callback(FUNC(ssem_state::quickload_cb));
+	quickload.set_interface("ssemquik");
+	SOFTWARE_LIST(config, "quik_list").set_original("ssem_quik");
 }
 
 

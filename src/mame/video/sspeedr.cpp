@@ -126,11 +126,11 @@ void sspeedr_state::draw_track(bitmap_ind16 &bitmap)
 
 			if (counter_x & 2)
 			{
-				bitmap.pix16(y, x) = m_track[offset] / 16;
+				bitmap.pix(y, x) = m_track[offset] / 16;
 			}
 			else
 			{
-				bitmap.pix16(y, x) = m_track[offset] % 16;
+				bitmap.pix(y, x) = m_track[offset] % 16;
 			}
 		}
 
@@ -138,7 +138,7 @@ void sspeedr_state::draw_track(bitmap_ind16 &bitmap)
 
 		for (; y < 128 + m_track_vert[1]; y++)
 		{
-			bitmap.pix16(y, x) = flag ? 15 : 0;
+			bitmap.pix(y, x) = flag ? 15 : 0;
 		}
 
 		// lower landscape
@@ -154,11 +154,11 @@ void sspeedr_state::draw_track(bitmap_ind16 &bitmap)
 
 			if (counter_x & 2)
 			{
-				bitmap.pix16(y, x) = m_track[offset] / 16;
+				bitmap.pix(y, x) = m_track[offset] / 16;
 			}
 			else
 			{
-				bitmap.pix16(y, x) = m_track[offset] % 16;
+				bitmap.pix(y, x) = m_track[offset] % 16;
 			}
 		}
 	}

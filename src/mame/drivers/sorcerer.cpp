@@ -391,22 +391,20 @@ GFXDECODE_END
 uint32_t sorcerer_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	address_space& program = m_maincpu->space(AS_PROGRAM);
-	uint8_t y,ra,chr,gfx;
-	uint16_t sy=0,ma=0xf080,x;
-	uint16_t *p;
+	uint16_t sy=0,ma=0xf080;
 
-	for (y = 0; y < 30; y++)
+	for (uint8_t y = 0; y < 30; y++)
 	{
-		for (ra = 0; ra < 8; ra++)
+		for (uint8_t ra = 0; ra < 8; ra++)
 		{
-			p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix(sy++);
 
-			for (x = ma; x < ma+64; x++)
+			for (uint16_t x = ma; x < ma+64; x++)
 			{
-				chr = program.read_byte(x);
+				uint8_t const chr = program.read_byte(x);
 
 				/* get pattern of pixels for that character scanline */
-				gfx = program.read_byte(0xf800 | (chr<<3) | ra);
+				uint8_t const gfx = program.read_byte(0xf800 | (chr<<3) | ra);
 
 				/* Display a scanline of a character */
 				*p++ = BIT(gfx, 7);

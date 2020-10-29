@@ -8,9 +8,9 @@
 /// \file gmres.h
 ///
 
-#include "pmatrix_cr.h"
 #include "parray.h"
 #include "pconfig.h"
+#include "pmatrix_cr.h"
 #include "vector_ops.h"
 
 #include <algorithm>

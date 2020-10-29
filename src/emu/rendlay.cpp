@@ -17,6 +17,7 @@
 #include "rendutil.h"
 #include "video/rgbutil.h"
 
+#include "nanosvg.h"
 #include "vecstream.h"
 #include "xmlfile.h"
 
@@ -27,6 +28,7 @@
 #include <cstdio>
 #include <cstring>
 #include <iomanip>
+#include <limits>
 #include <locale>
 #include <sstream>
 #include <stdexcept>
@@ -36,8 +38,10 @@
 
 #define LOG_GROUP_BOUNDS_RESOLUTION (1U << 1)
 #define LOG_INTERACTIVE_ITEMS       (1U << 2)
+#define LOG_DISK_DRAW               (1U << 3)
+#define LOG_IMAGE_LOAD              (1U << 4)
 
-//#define VERBOSE (LOG_GROUP_BOUNDS_RESOLUTION | LOG_INTERACTIVE_ITEMS)
+//#define VERBOSE (LOG_GROUP_BOUNDS_RESOLUTION | LOG_INTERACTIVE_ITEMS | LOG_DISK_DRAW | LOG_IMAGE_LOAD)
 #define LOG_OUTPUT_FUNC osd_printf_verbose
 #include "logmacro.h"
 
@@ -77,8 +81,6 @@ enum
 	LINE_CAP_END = 2
 };
 
-std::locale const f_portable_locale("C");
-
 constexpr layout_group::transform identity_transform{{ {{ 1.0F, 0.0F, 0.0F }}, {{ 0.0F, 1.0F, 0.0F }}, {{ 0.0F, 0.0F, 1.0F }} }};
 
 
@@ -96,9 +98,27 @@ inline void render_bounds_transform(render_bounds &bounds, layout_group::transfo
 			(bounds.x1 * trans[1][0]) + (bounds.y1 * trans[1][1]) + trans[1][2] };
 }
 
-constexpr render_color render_color_multiply(render_color const &x, render_color const &y)
+inline void alpha_blend(u32 &dest, u32 a, u32 r, u32 g, u32 b, u32 inva)
 {
-	return render_color{ x.a * y.a, x.r * y.r, x.g * y.g, x.b * y.b };
+	rgb_t const dpix(dest);
+	u32 const da(dpix.a());
+	u32 const finala((a * 255) + (da * inva));
+	u32 const finalr(r + (u32(dpix.r()) * da * inva));
+	u32 const finalg(g + (u32(dpix.g()) * da * inva));
+	u32 const finalb(b + (u32(dpix.b()) * da * inva));
+	dest = rgb_t(finala / 255, finalr / finala, finalg / finala, finalb / finala);
+}
+
+inline void alpha_blend(u32 &dest, render_color const &c, float fill)
+{
+	u32 const a(c.a * fill * 255.0F);
+	if (a)
+	{
+		u32 const r(u32(c.r * (255.0F * 255.0F)) * a);
+		u32 const g(u32(c.g * (255.0F * 255.0F)) * a);
+		u32 const b(u32(c.b * (255.0F * 255.0F)) * a);
+		alpha_blend(dest, a, r, g, b, 255 - a);
+	}
 }
 
 
@@ -213,7 +233,7 @@ private:
 					if (m_text_valid && !m_float_valid)
 					{
 						std::istringstream stream(m_text);
-						stream.imbue(f_portable_locale);
+						stream.imbue(std::locale::classic());
 						if (m_text[0] == '$')
 						{
 							stream.get();
@@ -249,7 +269,7 @@ private:
 					if (m_text_valid && !m_int_valid && !m_float_valid)
 					{
 						std::istringstream stream(m_text);
-						stream.imbue(f_portable_locale);
+						stream.imbue(std::locale::classic());
 						if (m_text[0] == '$')
 						{
 							stream.get();
@@ -308,7 +328,7 @@ private:
 					if (m_text_valid && !m_int_valid)
 					{
 						std::istringstream stream(m_text);
-						stream.imbue(f_portable_locale);
+						stream.imbue(std::locale::classic());
 						if (m_text[0] == '$')
 						{
 							stream.get();
@@ -530,7 +550,7 @@ private:
 	int parse_int(char const *begin, char const *end, int defvalue)
 	{
 		std::istringstream stream;
-		stream.imbue(f_portable_locale);
+		stream.imbue(std::locale::classic());
 		int result;
 		if (begin[0] == '$')
 		{
@@ -584,25 +604,37 @@ private:
 
 	entry_vector m_entries;
 	util::ovectorstream m_buffer;
+	std::shared_ptr<NSVGrasterizer> const m_svg_rasterizer;
 	device_t &m_device;
+	char const *const m_search_path;
+	char const *const m_directory_name;
 	layout_environment *const m_next = nullptr;
 	bool m_cached = false;
 
 public:
-	explicit layout_environment(device_t &device)
-		: m_device(device)
+	layout_environment(device_t &device, char const *searchpath, char const *dirname)
+		: m_svg_rasterizer(nsvgCreateRasterizer(), util::nsvg_deleter())
+		, m_device(device)
+		, m_search_path(searchpath)
+		, m_directory_name(dirname)
 	{
 	}
 	explicit layout_environment(layout_environment &next)
-		: m_device(next.m_device)
+		: m_svg_rasterizer(next.m_svg_rasterizer)
+		, m_device(next.m_device)
+		, m_search_path(next.m_search_path)
+		, m_directory_name(next.m_directory_name)
 		, m_next(&next)
 	{
 	}
 	layout_environment(layout_environment const &) = delete;
 
-	device_t &device() { return m_device; }
-	running_machine &machine() { return device().machine(); }
-	bool is_root_device() { return &device() == &machine().root_device(); }
+	device_t &device() const { return m_device; }
+	running_machine &machine() const { return device().machine(); }
+	bool is_root_device() const { return &device() == &machine().root_device(); }
+	char const *search_path() const { return m_search_path; }
+	char const *directory_name() const { return m_directory_name; }
+	std::shared_ptr<NSVGrasterizer> const &svg_rasterizer() const { return m_svg_rasterizer; }
 
 	void set_parameter(std::string &&name, std::string &&value)
 	{
@@ -660,7 +692,7 @@ public:
 				unsigned const decprefix((expanded.first[0] == '#') ? 1U : 0U);
 				bool const floatchars(std::find_if(expanded.first, expanded.second, [] (char ch) { return ('.' == ch) || ('e' == ch) || ('E' == ch); }) != expanded.second);
 				std::istringstream stream(std::string(expanded.first + hexprefix + decprefix, expanded.second));
-				stream.imbue(f_portable_locale);
+				stream.imbue(std::locale::classic());
 				if (!hexprefix && !decprefix && floatchars)
 				{
 					stream >> floatincrement;
@@ -767,7 +799,7 @@ public:
 		// similar to what XML nodes do
 		std::pair<char const *, char const *> const expanded(expand(attrib));
 		std::istringstream stream(std::string(expanded.first, expanded.second));
-		stream.imbue(f_portable_locale);
+		stream.imbue(std::locale::classic());
 		float result;
 		return (stream >> result) ? result : defvalue;
 	}
@@ -791,34 +823,44 @@ public:
 
 	void parse_bounds(util::xml::data_node const *node, render_bounds &result)
 	{
-		// default to unit rectangle
 		if (!node)
 		{
+			// default to unit rectangle
 			result.x0 = result.y0 = 0.0F;
 			result.x1 = result.y1 = 1.0F;
 		}
 		else
 		{
-			// parse attributes
+			// horizontal position/size
 			if (node->has_attribute("left"))
 			{
-				// left/right/top/bottom format
 				result.x0 = get_attribute_float(*node, "left", 0.0F);
 				result.x1 = get_attribute_float(*node, "right", 1.0F);
-				result.y0 = get_attribute_float(*node, "top", 0.0F);
-				result.y1 = get_attribute_float(*node, "bottom", 1.0F);
-			}
-			else if (node->has_attribute("x"))
-			{
-				// x/y/width/height format
-				result.x0 = get_attribute_float(*node, "x", 0.0F);
-				result.x1 = result.x0 + get_attribute_float(*node, "width", 1.0F);
-				result.y0 = get_attribute_float(*node, "y", 0.0F);
-				result.y1 = result.y0 + get_attribute_float(*node, "height", 1.0F);
 			}
 			else
 			{
-				throw layout_syntax_error("bounds element requires either left or x attribute");
+				float const width = get_attribute_float(*node, "width", 1.0F);
+				if (node->has_attribute("xc"))
+					result.x0 = get_attribute_float(*node, "xc", 0.0F) - (width / 2.0F);
+				else
+					result.x0 = get_attribute_float(*node, "x", 0.0F);
+				result.x1 = result.x0 + width;
+			}
+
+			// vertical position/size
+			if (node->has_attribute("top"))
+			{
+				result.y0 = get_attribute_float(*node, "top", 0.0F);
+				result.y1 = get_attribute_float(*node, "bottom", 1.0F);
+			}
+			else
+			{
+				float const height = get_attribute_float(*node, "height", 1.0F);
+				if (node->has_attribute("yc"))
+					result.y0 = get_attribute_float(*node, "yc", 0.0F) - (height / 2.0F);
+				else
+					result.y0 = get_attribute_float(*node, "y", 0.0F);
+				result.y1 = result.y0 + height;
 			}
 
 			// check for errors
@@ -911,6 +953,175 @@ public:
 } } } // namespace emu::render::detail
 
 
+namespace {
+
+bool add_bounds_step(emu::render::detail::layout_environment &env, emu::render::detail::bounds_vector &steps, util::xml::data_node const &node)
+{
+	int const state(env.get_attribute_int(node, "state", 0));
+	auto const pos(
+			std::lower_bound(
+				steps.begin(),
+				steps.end(),
+				state,
+				[] (emu::render::detail::bounds_step const &lhs, int rhs) { return lhs.state < rhs; }));
+	if ((steps.end() != pos) && (state == pos->state))
+		return false;
+
+	auto &ins(*steps.emplace(pos, emu::render::detail::bounds_step{ state, { 0.0F, 0.0F, 0.0F, 0.0F }, { 0.0F, 0.0F, 0.0F, 0.0F } }));
+	env.parse_bounds(&node, ins.bounds);
+	return true;
+}
+
+void set_bounds_deltas(emu::render::detail::bounds_vector &steps)
+{
+	if (steps.empty())
+	{
+		steps.emplace_back(emu::render::detail::bounds_step{ 0, { 0.0F, 0.0F, 1.0F, 1.0F }, { 0.0F, 0.0F, 0.0F, 0.0F } });
+	}
+	else
+	{
+		auto i(steps.begin());
+		auto j(i);
+		while (steps.end() != ++j)
+		{
+			assert(j->state > i->state);
+
+			i->delta.x0 = (j->bounds.x0 - i->bounds.x0) / (j->state - i->state);
+			i->delta.x1 = (j->bounds.x1 - i->bounds.x1) / (j->state - i->state);
+			i->delta.y0 = (j->bounds.y0 - i->bounds.y0) / (j->state - i->state);
+			i->delta.y1 = (j->bounds.y1 - i->bounds.y1) / (j->state - i->state);
+
+			i = j;
+		}
+	}
+}
+
+void normalize_bounds(emu::render::detail::bounds_vector &steps, float x0, float y0, float xoffs, float yoffs, float xscale, float yscale)
+{
+	auto i(steps.begin());
+	i->bounds.x0 = x0 + (i->bounds.x0 - xoffs) * xscale;
+	i->bounds.x1 = x0 + (i->bounds.x1 - xoffs) * xscale;
+	i->bounds.y0 = y0 + (i->bounds.y0 - yoffs) * yscale;
+	i->bounds.y1 = y0 + (i->bounds.y1 - yoffs) * yscale;
+
+	auto j(i);
+	while (steps.end() != ++j)
+	{
+		j->bounds.x0 = x0 + (j->bounds.x0 - xoffs) * xscale;
+		j->bounds.x1 = x0 + (j->bounds.x1 - xoffs) * xscale;
+		j->bounds.y0 = y0 + (j->bounds.y0 - yoffs) * yscale;
+		j->bounds.y1 = y0 + (j->bounds.y1 - yoffs) * yscale;
+
+		i->delta.x0 = (j->bounds.x0 - i->bounds.x0) / (j->state - i->state);
+		i->delta.x1 = (j->bounds.x1 - i->bounds.x1) / (j->state - i->state);
+		i->delta.y0 = (j->bounds.y0 - i->bounds.y0) / (j->state - i->state);
+		i->delta.y1 = (j->bounds.y1 - i->bounds.y1) / (j->state - i->state);
+
+		i = j;
+	}
+}
+
+render_bounds accumulate_bounds(emu::render::detail::bounds_vector const &steps)
+{
+	auto i(steps.begin());
+	render_bounds result(i->bounds);
+	while (steps.end() != ++i)
+		result |= i->bounds;
+	return result;
+}
+
+inline render_bounds interpolate_bounds(emu::render::detail::bounds_vector const &steps, int state)
+{
+	auto pos(
+			std::lower_bound(
+				steps.begin(),
+				steps.end(),
+				state,
+				[] (emu::render::detail::bounds_step const &lhs, int rhs) { return lhs.state < rhs; }));
+	if (steps.begin() == pos)
+	{
+		return pos->bounds;
+	}
+	else
+	{
+		--pos;
+		render_bounds result(pos->bounds);
+		result.x0 += pos->delta.x0 * (state - pos->state);
+		result.x1 += pos->delta.x1 * (state - pos->state);
+		result.y0 += pos->delta.y0 * (state - pos->state);
+		result.y1 += pos->delta.y1 * (state - pos->state);
+		return result;
+	}
+}
+
+
+bool add_color_step(emu::render::detail::layout_environment &env, emu::render::detail::color_vector &steps, util::xml::data_node const &node)
+{
+	int const state(env.get_attribute_int(node, "state", 0));
+	auto const pos(
+			std::lower_bound(
+				steps.begin(),
+				steps.end(),
+				state,
+				[] (emu::render::detail::color_step const &lhs, int rhs) { return lhs.state < rhs; }));
+	if ((steps.end() != pos) && (state == pos->state))
+		return false;
+
+	steps.emplace(pos, emu::render::detail::color_step{ state, env.parse_color(&node), { 0.0F, 0.0F, 0.0F, 0.0F } });
+	return true;
+}
+
+void set_color_deltas(emu::render::detail::color_vector &steps)
+{
+	if (steps.empty())
+	{
+		steps.emplace_back(emu::render::detail::color_step{ 0, { 1.0F, 1.0F, 1.0F, 1.0F }, { 0.0F, 0.0F, 0.0F, 0.0F } });
+	}
+	else
+	{
+		auto i(steps.begin());
+		auto j(i);
+		while (steps.end() != ++j)
+		{
+			assert(j->state > i->state);
+
+			i->delta.a = (j->color.a - i->color.a) / (j->state - i->state);
+			i->delta.r = (j->color.r - i->color.r) / (j->state - i->state);
+			i->delta.g = (j->color.g - i->color.g) / (j->state - i->state);
+			i->delta.b = (j->color.b - i->color.b) / (j->state - i->state);
+
+			i = j;
+		}
+	}
+}
+
+inline render_color interpolate_color(emu::render::detail::color_vector const &steps, int state)
+{
+	auto pos(
+			std::lower_bound(
+				steps.begin(),
+				steps.end(),
+				state,
+				[] (emu::render::detail::color_step const &lhs, int rhs) { return lhs.state < rhs; }));
+	if (steps.begin() == pos)
+	{
+		return pos->color;
+	}
+	else
+	{
+		--pos;
+		render_color result(pos->color);
+		result.a += pos->delta.a * (state - pos->state);
+		result.r += pos->delta.r * (state - pos->state);
+		result.g += pos->delta.g * (state - pos->state);
+		result.b += pos->delta.b * (state - pos->state);
+		return result;
+	}
+}
+
+} // anonymous namespace
+
+
 
 //**************************************************************************
 //  LAYOUT ELEMENT
@@ -938,7 +1149,7 @@ layout_element::make_component_map const layout_element::s_make_component{
 //  layout_element - constructor
 //-------------------------------------------------
 
-layout_element::layout_element(environment &env, util::xml::data_node const &elemnode, const char *dirname)
+layout_element::layout_element(environment &env, util::xml::data_node const &elemnode)
 	: m_machine(env.machine())
 	, m_defstate(env.get_attribute_int(elemnode, "defstate", -1))
 	, m_statemask(0)
@@ -954,13 +1165,13 @@ layout_element::layout_element(environment &env, util::xml::data_node const &ele
 			throw layout_syntax_error(util::string_format("unknown element component %s", compnode->get_name()));
 
 		// insert the new component into the list
-		component const &newcomp(**m_complist.emplace(m_complist.end(), make_func->second(env, *compnode, dirname)));
+		component const &newcomp(**m_complist.emplace(m_complist.end(), make_func->second(env, *compnode)));
 
 		// accumulate bounds
 		if (first)
 			bounds = newcomp.overall_bounds();
 		else
-			union_render_bounds(bounds, newcomp.overall_bounds());
+			bounds |= newcomp.overall_bounds();
 		first = false;
 
 		// determine the maximum state
@@ -1123,7 +1334,7 @@ void layout_group::resolve_bounds(environment &env, group_map &groupmap, std::ve
 	seen.push_back(this);
 	if (!m_bounds_resolved)
 	{
-		set_render_bounds_xy(m_bounds, 0.0F, 0.0F, 1.0F, 1.0F);
+		m_bounds.set_xy(0.0F, 0.0F, 1.0F, 1.0F);
 		environment local(env);
 		bool empty(true);
 		resolve_bounds(local, m_groupnode, groupmap, seen, empty, false, false, true);
@@ -1177,11 +1388,22 @@ void layout_group::resolve_bounds(
 				!strcmp(itemnode->get_name(), "marquee"))
 		{
 			render_bounds itembounds;
-			env.parse_bounds(itemnode->get_child("bounds"), itembounds);
+			util::xml::data_node const *boundsnode = itemnode->get_child("bounds");
+			env.parse_bounds(boundsnode, itembounds);
+			while (boundsnode)
+			{
+				boundsnode = boundsnode->get_next_sibling("bounds");
+				if (boundsnode)
+				{
+					render_bounds b;
+					env.parse_bounds(boundsnode, b);
+					itembounds |= b;
+				}
+			}
 			if (empty)
 				m_bounds = itembounds;
 			else
-				union_render_bounds(m_bounds, itembounds);
+				m_bounds |= itembounds;
 			empty = false;
 			LOGMASKED(LOG_GROUP_BOUNDS_RESOLUTION, "Accumulate item bounds (%s %s %s %s) -> (%s %s %s %s)\n",
 					itembounds.x0, itembounds.y0, itembounds.x1, itembounds.y1,
@@ -1197,7 +1419,7 @@ void layout_group::resolve_bounds(
 				if (empty)
 					m_bounds = itembounds;
 				else
-					union_render_bounds(m_bounds, itembounds);
+					m_bounds |= itembounds;
 				empty = false;
 				LOGMASKED(LOG_GROUP_BOUNDS_RESOLUTION, "Accumulate group '%s' reference explicit bounds (%s %s %s %s) -> (%s %s %s %s)\n",
 						itemnode->get_attribute_string("ref", ""),
@@ -1225,7 +1447,7 @@ void layout_group::resolve_bounds(
 				if (empty)
 					m_bounds = itembounds;
 				else
-					union_render_bounds(m_bounds, itembounds);
+					m_bounds |= itembounds;
 				empty = false;
 				unresolved = false;
 				LOGMASKED(LOG_GROUP_BOUNDS_RESOLUTION, "Accumulate group '%s' reference computed bounds (%s %s %s %s) -> (%s %s %s %s)\n",
@@ -1302,6 +1524,18 @@ render_texture *layout_element::state_texture(int state)
 
 
 //-------------------------------------------------
+//  preload - perform expensive loading upfront
+//  for all components
+//-------------------------------------------------
+
+void layout_element::preload()
+{
+	for (component::ptr const &curcomp : m_complist)
+		curcomp->preload(machine());
+}
+
+
+//-------------------------------------------------
 //  element_scale - scale an element by rendering
 //  all the components at the appropriate
 //  resolution
@@ -1311,23 +1545,11 @@ void layout_element::element_scale(bitmap_argb32 &dest, bitmap_argb32 &source, c
 {
 	texture const &elemtex(*reinterpret_cast<texture const *>(param));
 
-	// iterate over components that are part of the current state
+	// draw components that are visible in the current state
 	for (auto const &curcomp : elemtex.m_element->m_complist)
 	{
 		if ((elemtex.m_state & curcomp->statemask()) == curcomp->stateval())
-		{
-			// get the local scaled bounds
-			render_bounds const compbounds(curcomp->bounds(elemtex.m_state));
-			rectangle bounds(
-					render_round_nearest(compbounds.x0 * dest.width()),
-					render_round_nearest(compbounds.x1 * dest.width()),
-					render_round_nearest(compbounds.y0 * dest.height()),
-					render_round_nearest(compbounds.y1 * dest.height()));
-			bounds &= dest.cliprect();
-
-			// based on the component type, add to the texture
-			curcomp->draw(elemtex.m_element->machine(), dest, bounds, elemtex.m_state);
-		}
+			curcomp->draw(elemtex.m_element->machine(), dest, elemtex.m_state);
 	}
 }
 
@@ -1337,58 +1559,46 @@ class layout_element::image_component : public component
 {
 public:
 	// construction/destruction
-	image_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
-		: component(env, compnode, dirname)
-		, m_dirname(dirname ? dirname : "")
+	image_component(environment &env, util::xml::data_node const &compnode)
+		: component(env, compnode)
+		, m_rasterizer(env.svg_rasterizer())
+		, m_searchpath(env.search_path() ? env.search_path() : "")
+		, m_dirname(env.directory_name() ? env.directory_name() : "")
 		, m_imagefile(env.get_attribute_string(compnode, "file", ""))
 		, m_alphafile(env.get_attribute_string(compnode, "alphafile", ""))
+		, m_data(get_data(compnode))
 	{
 	}
 
-protected:
 	// overrides
-	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
+	virtual void preload(running_machine &machine) override
 	{
-		if (!m_bitmap.valid())
-			load_bitmap(machine);
+		if (!m_bitmap.valid() && !m_svg)
+			load_image(machine);
+	}
 
+protected:
+	virtual void draw_aligned(running_machine &machine, bitmap_argb32 &dest, rectangle const &bounds, int state) override
+	{
+		if (!m_bitmap.valid() && !m_svg)
+			load_image(machine);
+
+		if (m_bitmap.valid())
+			draw_bitmap(dest, bounds, state);
+		else if (m_svg)
+			draw_svg(dest, bounds, state);
+	}
+
+private:
+	// internal helpers
+	void draw_bitmap(bitmap_argb32 &dest, rectangle const &bounds, int state)
+	{
 		render_color const c(color(state));
 		if (m_hasalpha || (1.0F > c.a))
 		{
 			bitmap_argb32 tempbitmap(dest.width(), dest.height());
 			render_resample_argb_bitmap_hq(tempbitmap, m_bitmap, c);
-			for (s32 y0 = 0, y1 = bounds.top(); bounds.bottom() >= y1; ++y0, ++y1)
-			{
-				u32 const *src(&tempbitmap.pix(y0, 0));
-				u32 *dst(&dest.pix(y1, bounds.left()));
-				for (s32 x1 = bounds.left(); bounds.right() >= x1; ++x1, ++src, ++dst)
-				{
-					rgb_t const a(*src);
-					u32 const aa(a.a());
-					if (255 == aa)
-					{
-						*dst = *src;
-					}
-					else if (aa)
-					{
-						rgb_t const b(*dst);
-						u32 const ba(b.a());
-						if (ba)
-						{
-							u32 const ca((aa * 255) + (ba * (255 - aa)));
-							*dst = rgb_t(
-									u8(ca / 255),
-									u8(((a.r() * aa * 255) + (b.r() * ba * (255 - aa))) / ca),
-									u8(((a.g() * aa * 255) + (b.g() * ba * (255 - aa))) / ca),
-									u8(((a.b() * aa * 255) + (b.b() * ba * (255 - aa))) / ca));
-						}
-						else
-						{
-							*dst = *src;
-						}
-					}
-				}
-			}
+			alpha_blend(tempbitmap, dest, bounds);
 		}
 		else
 		{
@@ -1397,57 +1607,362 @@ protected:
 		}
 	}
 
-private:
-	// internal helpers
-	void load_bitmap(running_machine &machine)
+	void draw_svg(bitmap_argb32 &dest, rectangle const &bounds, int state)
 	{
-		emu_file file(machine.options().art_path(), OPEN_FLAG_READ);
+		// rasterise into a temporary bitmap
+		float const xscale(bounds.width() / m_svg->width);
+		float const yscale(bounds.height() / m_svg->height);
+		float const drawscale((std::max)(xscale, yscale));
+		bitmap_argb32 tempbitmap(int(m_svg->width * drawscale), int(m_svg->height * drawscale));
+		nsvgRasterize(
+				m_rasterizer.get(),
+				m_svg.get(),
+				0, 0, drawscale,
+				reinterpret_cast<unsigned char *>(&tempbitmap.pix(0)),
+				tempbitmap.width(), tempbitmap.height(),
+				tempbitmap.rowbytes());
 
-		ru_imgformat const format = render_detect_image(file, m_dirname.c_str(), m_imagefile.c_str());
-		switch (format)
+		// correct colour format and multiply by state colour
+		bool havealpha(false);
+		render_color const c(color(state));
+		for (s32 y = 0; tempbitmap.height() > y; ++y)
 		{
-		case RENDUTIL_IMGFORMAT_ERROR:
-			break;
+			u32 *dst(&tempbitmap.pix(y));
+			for (s32 x = 0; tempbitmap.width() > x; ++x, ++dst)
+			{
+				u8 const *const src(reinterpret_cast<u8 const *>(dst));
+				rgb_t const d(
+						u8((float(src[3]) * c.a) + 0.5),
+						u8((float(src[0]) * c.r) + 0.5),
+						u8((float(src[1]) * c.g) + 0.5),
+						u8((float(src[2]) * c.b) + 0.5));
+				*dst = d;
+				havealpha = havealpha || (d.a() < 255U);
+			}
+		}
 
-		case RENDUTIL_IMGFORMAT_PNG:
-			// load the basic bitmap
-			m_hasalpha = render_load_png(m_bitmap, file, m_dirname.c_str(), m_imagefile.c_str());
-			break;
+		// find most efficient way to insert it in the target bitmap
+		if (!havealpha)
+		{
+			if ((tempbitmap.width() == bounds.width()) && (tempbitmap.height() == bounds.height()))
+			{
+				for (s32 y = 0; tempbitmap.height() > y; ++y)
+					std::copy_n(&tempbitmap.pix(y), bounds.width(), &dest.pix(y + bounds.top(), bounds.left()));
+			}
+			else
+			{
+				bitmap_argb32 destsub(dest, bounds);
+				render_resample_argb_bitmap_hq(destsub, tempbitmap, render_color{ 1.0F, 1.0F, 1.0F, 1.0F });
+			}
+		}
+		else if ((tempbitmap.width() == bounds.width()) && (tempbitmap.height() == bounds.height()))
+		{
+			alpha_blend(tempbitmap, dest, bounds);
+		}
+		else
+		{
+			bitmap_argb32 scaled(bounds.width(), bounds.height());
+			render_resample_argb_bitmap_hq(scaled, tempbitmap, render_color{ 1.0F, 1.0F, 1.0F, 1.0F });
+			tempbitmap.reset();
+			alpha_blend(scaled, dest, bounds);
+		}
+	}
 
-		default:
-			// try JPG
-			render_load_jpeg(m_bitmap, file, m_dirname.c_str(), m_imagefile.c_str());
-			break;
+	void alpha_blend(bitmap_argb32 const &srcbitmap, bitmap_argb32 &dstbitmap, rectangle const &bounds)
+	{
+		for (s32 y0 = 0, y1 = bounds.top(); bounds.bottom() >= y1; ++y0, ++y1)
+		{
+			u32 const *src(&srcbitmap.pix(y0, 0));
+			u32 *dst(&dstbitmap.pix(y1, bounds.left()));
+			for (s32 x1 = bounds.left(); bounds.right() >= x1; ++x1, ++src, ++dst)
+			{
+				rgb_t const a(*src);
+				u32 const aa(a.a());
+				if (255 == aa)
+				{
+					*dst = *src;
+				}
+				else if (aa)
+				{
+					rgb_t const b(*dst);
+					u32 const ba(b.a());
+					if (ba)
+					{
+						u32 const ca((aa * 255) + (ba * (255 - aa)));
+						*dst = rgb_t(
+								u8(ca / 255),
+								u8(((a.r() * aa * 255) + (b.r() * ba * (255 - aa))) / ca),
+								u8(((a.g() * aa * 255) + (b.g() * ba * (255 - aa))) / ca),
+								u8(((a.b() * aa * 255) + (b.b() * ba * (255 - aa))) / ca));
+					}
+					else
+					{
+						*dst = *src;
+					}
+				}
+			}
+		}
+	}
+
+	void load_image(running_machine &machine)
+	{
+		// if we have a filename, go with that
+		emu_file file(m_searchpath.empty() ? m_dirname : m_searchpath, OPEN_FLAG_READ);
+		if (!m_imagefile.empty())
+		{
+			std::string filename;
+			if (!m_searchpath.empty())
+				filename = m_dirname;
+			if (!filename.empty() && !util::is_directory_separator(filename[filename.size() - 1]))
+				filename.append(PATH_SEPARATOR);
+			filename.append(m_imagefile);
+			LOGMASKED(LOG_IMAGE_LOAD, "Image component attempt to load image file '%s'\n", filename);
+			osd_file::error const imgerr = file.open(filename);
+			if (osd_file::error::NONE == imgerr)
+			{
+				if (!load_bitmap(file))
+				{
+					LOGMASKED(LOG_IMAGE_LOAD, "Image component will attempt to parse file as SVG\n");
+					load_svg(file);
+				}
+				file.close();
+			}
+			else
+			{
+				LOGMASKED(LOG_IMAGE_LOAD, "Image component unable to open image file '%s'\n", filename);
+			}
+		}
+		else if (!m_data.empty())
+		{
+			load_image_data();
 		}
 
 		// load the alpha bitmap if specified
-		if (m_bitmap.valid() && !m_alphafile.empty())
-			render_load_png(m_bitmap, file, m_dirname.c_str(), m_alphafile.c_str(), true);
+		if (!m_alphafile.empty())
+		{
+			if (m_bitmap.valid())
+			{
+				std::string filename;
+				if (!m_searchpath.empty())
+					filename = m_dirname;
+				if (!filename.empty() && !util::is_directory_separator(filename[filename.size() - 1]))
+					filename.append(PATH_SEPARATOR);
+				filename.append(m_alphafile);
+				LOGMASKED(LOG_IMAGE_LOAD, "Image component attempt to load alpha channel from file '%s'\n", filename);
+				osd_file::error const alferr = file.open(filename);
+				if (osd_file::error::NONE == alferr)
+				{
+					// TODO: no way to detect corner case where we had alpha from the image but the alpha PNG makes it entirely opaque
+					if (render_load_png(m_bitmap, file, true))
+						m_hasalpha = true;
+					file.close();
+				}
+				else
+				{
+					LOGMASKED(LOG_IMAGE_LOAD, "Image component unable to open alpha channel file '%s'\n", filename);
+				}
+			}
+			else if (m_svg)
+			{
+				osd_printf_warning("Component alpha channel file '%s' ignored for SVG image '%s'\n", m_alphafile, m_imagefile);
+			}
+		}
 
-		// if we can't load the bitmap, allocate a dummy one and report an error
-		if (!m_bitmap.valid())
+		// if we can't load an image, allocate a dummy one and report an error
+		if (!m_bitmap.valid() && !m_svg)
 		{
 			// draw some stripes in the bitmap
 			m_bitmap.allocate(100, 100);
 			m_bitmap.fill(0);
 			for (int step = 0; step < 100; step += 25)
 				for (int line = 0; line < 100; line++)
-					m_bitmap.pix32((step + line) % 100, line % 100) = rgb_t(0xff,0xff,0xff,0xff);
+					m_bitmap.pix((step + line) % 100, line % 100) = rgb_t(0xff,0xff,0xff,0xff);
 
 			// log an error
 			if (m_alphafile.empty())
-				osd_printf_warning("Unable to load component bitmap '%s'\n", m_imagefile);
+				osd_printf_warning("Unable to load component image '%s'\n", m_imagefile);
 			else
-				osd_printf_warning("Unable to load component bitmap '%s'/'%s'\n", m_imagefile, m_alphafile);
+				osd_printf_warning("Unable to load component image '%s'/'%s'\n", m_imagefile, m_alphafile);
+		}
+
+		// clear out this stuff in case it's large
+		if (!m_svg)
+			m_rasterizer.reset();
+		m_searchpath.clear();
+		m_dirname.clear();
+		m_imagefile.clear();
+		m_alphafile.clear();
+		m_data.clear();
+	}
+
+	void load_image_data()
+	{
+		// in-place Base64 decode
+		static constexpr char base64chars[] =
+				"\t\n\v\f\r +/0123456789"
+				"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+				"abcdefghijklmnopqrstuvwxyz";
+		static constexpr char base64tail[] =
+				"\t\n\v\f\r =";
+		std::string::size_type const tail(m_data.find_first_not_of(base64chars));
+		std::string::size_type const end(m_data.find_first_not_of(base64tail, tail));
+		if (std::string::npos == end)
+		{
+			LOGMASKED(LOG_IMAGE_LOAD, "Image component decoding Base64 image data\n");
+			char *dst(&m_data[0]);
+			unsigned trailing(0U);
+			for (std::string::size_type i = 0U; (m_data.size() > i) && ('=' != m_data[i]); ++i)
+			{
+				u8 sym;
+				if (('A' <= m_data[i]) && ('Z' >= m_data[i]))
+					sym = m_data[i] - 'A';
+				else if (('a' <= m_data[i]) && ('z' >= m_data[i]))
+					sym = m_data[i] - 'a' + 26;
+				else if (('0' <= m_data[i]) && ('9' >= m_data[i]))
+					sym = m_data[i] - '0' + 52;
+				else if ('+' == m_data[i])
+					sym = 62;
+				else if ('/' == m_data[i])
+					sym = 63;
+				else
+					continue;
+				if (trailing)
+					*dst |= (sym << 2) >> trailing;
+				else
+					*dst = sym << 2;
+				if (trailing >= 2U)
+					++dst;
+				trailing = (trailing + 6U) & 7U;
+				if (trailing)
+					*dst = sym << (8U - trailing);
+			}
+			m_data.resize(dst - &m_data[0]);
+		}
+
+		// make a file wrapper for the data and see if it looks like a bitmap
+		util::core_file::ptr file;
+		osd_file::error const filerr(util::core_file::open_ram(m_data.c_str(), m_data.size(), OPEN_FLAG_READ, file));
+		bool const bitmapdata((osd_file::error::NONE == filerr) && file && load_bitmap(*file));
+		file.reset();
+
+		// if it didn't look like a bitmap, see if it looks like it might be XML and hence SVG
+		if (!bitmapdata)
+		{
+			bool const utf16be((0xfe == u8(m_data[0])) && (0xff == u8(m_data[1])));
+			bool const utf16le((0xff == u8(m_data[0])) && (0xfe == u8(m_data[1])));
+			bool const utf8((0xef == u8(m_data[0])) && (0xbb == u8(m_data[1])) && (0xbf == u8(m_data[2])));
+			std::string::size_type const found(m_data.find_first_not_of("\t\n\v\f\r "));
+			bool const xmltag((std::string::npos != found) && ('<' == m_data[found]));
+			if (utf16be || utf16le || utf8 || xmltag)
+			{
+				LOGMASKED(LOG_IMAGE_LOAD, "Image component will attempt to parse data as SVG\n");
+				parse_svg(&m_data[0]);
+			}
 		}
 	}
 
+	bool load_bitmap(util::core_file &file)
+	{
+		ru_imgformat const format = render_detect_image(file);
+		switch (format)
+		{
+		case RENDUTIL_IMGFORMAT_ERROR:
+			LOGMASKED(LOG_IMAGE_LOAD, "Image component error detecting image file format\n");
+			return false;
+
+		case RENDUTIL_IMGFORMAT_PNG:
+			LOGMASKED(LOG_IMAGE_LOAD, "Image component detected PNG file format\n");
+			m_hasalpha = render_load_png(m_bitmap, file);
+			return true;
+
+		case RENDUTIL_IMGFORMAT_JPEG:
+			LOGMASKED(LOG_IMAGE_LOAD, "Image component detected JPEG file format\n");
+			render_load_jpeg(m_bitmap, file);
+			return true;
+
+		case RENDUTIL_IMGFORMAT_MSDIB:
+			LOGMASKED(LOG_IMAGE_LOAD, "Image component detected Microsoft DIB file format\n");
+			render_load_msdib(m_bitmap, file);
+			return true;
+
+		default:
+			LOGMASKED(LOG_IMAGE_LOAD, "Image component failed to detect bitmap file format\n");
+			return false;
+		}
+	}
+
+	void load_svg(util::core_file &file)
+	{
+		u64 len(file.size());
+		if ((std::numeric_limits<size_t>::max() - 1) < len)
+		{
+			osd_printf_warning("Component image '%s' is too large to read into memory\n", m_imagefile);
+			return;
+		}
+		std::unique_ptr<char []> svgbuf(new (std::nothrow) char [size_t(len) + 1]);
+		if (!svgbuf)
+		{
+			osd_printf_warning("Error allocating memory to read component image '%s'\n", m_imagefile);
+			return;
+		}
+		svgbuf[len] = '\0';
+		for (char *ptr = svgbuf.get(); len; )
+		{
+			u32 const block(u32(std::min<u64>(std::numeric_limits<u32>::max(), len)));
+			u32 const read(file.read(ptr, block));
+			if (!read)
+			{
+				osd_printf_warning("Error reading component image '%s'\n", m_imagefile);
+				return;
+			}
+			ptr += read;
+			len -= read;
+		}
+		parse_svg(svgbuf.get());
+	}
+
+	void parse_svg(char *svgdata)
+	{
+		if (!m_rasterizer)
+		{
+			osd_printf_warning("No SVG rasteriser available, won't attempt to parse component image '%s' as SVG\n", m_imagefile);
+			return;
+		}
+		m_svg.reset(nsvgParse(svgdata, "px", 72));
+		if (!m_svg)
+		{
+			osd_printf_warning("Failed to parse component image '%s' as SVG\n", m_imagefile);
+			return;
+		}
+		if ((0.0F >= m_svg->width) || (0.0F >= m_svg->height))
+		{
+			osd_printf_warning("Parsing component image '%s' as SVG produced empty image\n", m_imagefile);
+			m_svg.reset();
+			return;
+		}
+	}
+
+	static std::string get_data(util::xml::data_node const &compnode)
+	{
+		util::xml::data_node const *datanode(compnode.get_child("data"));
+		if (datanode && datanode->get_value())
+			return datanode->get_value();
+		else
+			return "";
+	}
+
 	// internal state
-	bitmap_argb32       m_bitmap;                   // source bitmap for images
-	std::string const   m_dirname;                  // directory name of image file (for lazy loading)
-	std::string const   m_imagefile;                // name of the image file (for lazy loading)
-	std::string const   m_alphafile;                // name of the alpha file (for lazy loading)
-	bool                m_hasalpha = false;         // is there any alpha component present?
+	util::nsvg_image_ptr            m_svg;              // parsed SVG image
+	std::shared_ptr<NSVGrasterizer> m_rasterizer;       // SVG rasteriser
+	bitmap_argb32                   m_bitmap;           // source bitmap for images
+	bool                            m_hasalpha = false; // is there any alpha component present?
+
+	// cold state
+	std::string                     m_searchpath;       // asset search path (for lazy loading)
+	std::string                     m_dirname;          // directory name of image file (for lazy loading)
+	std::string                     m_imagefile;        // name of the image file (for lazy loading)
+	std::string                     m_alphafile;        // name of the alpha file (for lazy loading)
+	std::string                     m_data;             // embedded image data
 };
 
 
@@ -1456,14 +1971,14 @@ class layout_element::rect_component : public component
 {
 public:
 	// construction/destruction
-	rect_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
-		: component(env, compnode, dirname)
+	rect_component(environment &env, util::xml::data_node const &compnode)
+		: component(env, compnode)
 	{
 	}
 
 protected:
 	// overrides
-	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
+	virtual void draw_aligned(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
 		render_color const c(color(state));
 		if (1.0f <= c.a)
@@ -1478,9 +1993,9 @@ protected:
 		{
 			// compute premultiplied colors
 			u32 const a(c.a * 255.0F);
-			u32 const r(c.r * c.a * (255.0F * 255.0F));
-			u32 const g(c.g * c.a * (255.0F * 255.0F));
-			u32 const b(c.b * c.a * (255.0F * 255.0F));
+			u32 const r(u32(c.r * (255.0F * 255.0F)) * a);
+			u32 const g(u32(c.g * (255.0F * 255.0F)) * a);
+			u32 const b(u32(c.b * (255.0F * 255.0F)) * a);
 			u32 const inva(255 - a);
 
 			// we're translucent, add in the destination pixel contribution
@@ -1488,16 +2003,7 @@ protected:
 			{
 				u32 *dst(&dest.pix(y, bounds.left()));
 				for (u32 x = bounds.left(); x <= bounds.right(); ++x, ++dst)
-				{
-					rgb_t const dpix(*dst);
-					u32 const finala((a * 255) + (dpix.a() * inva));
-					u32 const finalr(r + (dpix.r() * inva));
-					u32 const finalg(g + (dpix.g() * inva));
-					u32 const finalb(b + (dpix.b() * inva));
-
-					// store the target pixel, dividing the RGBA values by the overall scale factor
-					*dst = rgb_t(finala / 255, finalr / finala, finalg / finala, finalb / finala);
-				}
+					alpha_blend(*dst, a, r, g, b, inva);
 			}
 		}
 	}
@@ -1509,65 +2015,266 @@ class layout_element::disk_component : public component
 {
 public:
 	// construction/destruction
-	disk_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
-		: component(env, compnode, dirname)
+	disk_component(environment &env, util::xml::data_node const &compnode)
+		: component(env, compnode)
 	{
 	}
 
-protected:
 	// overrides
-	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
+	virtual void draw(running_machine &machine, bitmap_argb32 &dest, int state) override
 	{
-		// compute premultiplied colors
+		// compute premultiplied color
 		render_color const c(color(state));
 		u32 const f(rgb_t(u8(c.r * 255), u8(c.g * 255), u8(c.b * 255)));
 		u32 const a(c.a * 255.0F);
-		u32 const r(c.r * c.a * (255.0F * 255.0F));
-		u32 const g(c.g * c.a * (255.0F * 255.0F));
-		u32 const b(c.b * c.a * (255.0F * 255.0F));
+		u32 const r(c.r * c.a * (255.0F * 255.0F * 255.0F));
+		u32 const g(c.g * c.a * (255.0F * 255.0F * 255.0F));
+		u32 const b(c.b * c.a * (255.0F * 255.0F * 255.0F));
 		u32 const inva(255 - a);
+		if (!a)
+			return;
 
-		// find the center
-		float const xcenter = float(bounds.xcenter());
-		float const ycenter = float(bounds.ycenter());
-		float const xradius = float(bounds.width()) * 0.5F;
-		float const yradius = float(bounds.height()) * 0.5F;
-		float const ooyradius2 = 1.0F / (yradius * yradius);
+		// calculate the position and size
+		render_bounds const curbounds = bounds(state);
+		float const xcenter = (curbounds.x0 + curbounds.x1) * float(dest.width()) * 0.5F;
+		float const ycenter = (curbounds.y0 + curbounds.y1) * float(dest.height()) * 0.5F;
+		float const xradius = curbounds.width() * float(dest.width()) * 0.5F;
+		float const yradius = curbounds.height() * float(dest.height()) * 0.5F;
+		s32 const miny = s32(curbounds.y0 * float(dest.height()));
+		s32 const maxy = s32(std::ceil(curbounds.y1 * float(dest.height()))) - 1;
+		LOGMASKED(LOG_DISK_DRAW, "Draw disk: bounds (%s %s %s %s); (((x - %s) ** 2) / (%s ** 2) + ((y - %s) ** 2) / (%s ** 2)) = 1; rows [%s %s]\n",
+				curbounds.x0, curbounds.y0, curbounds.x1, curbounds.y1, xcenter, xradius, ycenter, yradius, miny, maxy);
 
-		// iterate over y
-		for (u32 y = bounds.top(); y <= bounds.bottom(); ++y)
+		if (miny == maxy)
 		{
-			// compute left/right coordinates
-			float const ycoord = ycenter - (float(y) + 0.5F);
-			float const xval = xradius * sqrtf(1.0F - (ycoord * ycoord) * ooyradius2);
-
-			s32 const left = s32(xcenter - xval + 0.5F);
-			s32 const right = s32(xcenter + xval + 0.5F);
-
-			// draw this scanline
-			if (255 <= a)
+			// fits in a single row of pixels - integrate entire area of ellipse
+			float const scale = xradius * yradius * 0.5F;
+			s32 const minx = s32(curbounds.x0 * float(dest.width()));
+			s32 const maxx = s32(std::ceil(curbounds.x1 * float(dest.width()))) - 1;
+			float x1 = (float(minx) - xcenter) / xradius;
+			u32 *dst = &dest.pix(miny, minx);
+			for (s32 x = minx; maxx >= x; ++x, ++dst)
 			{
-				// optimise opaque pixels
-				std::fill_n(&dest.pix(y, left), right - left, f);
-			}
-			else if (a)
-			{
-				u32 *dst(&dest.pix(y, bounds.left()));
-				for (u32 x = left; x < right; ++x, ++dst)
-				{
-					// we're translucent, add in the destination pixel contribution
-					rgb_t const dpix(*dst);
-					u32 const finala((a * 255) + (dpix.a() * inva));
-					u32 const finalr(r + (dpix.r() * inva));
-					u32 const finalg(g + (dpix.g() * inva));
-					u32 const finalb(b + (dpix.b() * inva));
-
-					// store the target pixel, dividing the RGBA values by the overall scale factor
-					*dst = rgb_t(finala / 255, finalr / finala, finalg / finala, finalb / finala);
-				}
+				float const x0 = x1;
+				x1 = (float(x + 1) - xcenter) / xradius;
+				float const val = integral((std::max)(x0, -1.0F), (std::min)(x1, 1.0F)) * scale;
+				alpha_blend(*dst, c, val);
 			}
 		}
+		else
+		{
+			float const scale = xradius * yradius * 0.25F;
+			float const ooyradius2 = 1.0F / (yradius * yradius);
+			auto const draw_edge_row =
+					[&dest, &c, &curbounds, xcenter, xradius, scale, ooyradius2] (s32 row, float ycoord, bool cross_axis)
+					{
+						float const xval = xradius * std::sqrt((std::max)(1.0F - (ycoord * ycoord) * ooyradius2, 0.0F));
+						float const l = xcenter - xval;
+						float const r = xcenter + xval;
+						if (!cross_axis)
+						{
+							s32 minx = s32(l);
+							s32 maxx = s32(std::ceil(r)) - 1;
+							float x1 = float(minx) - xcenter;
+							u32 *dst = &dest.pix(row, minx);
+							for (s32 x = minx; maxx >= x; ++x, ++dst)
+							{
+								float const x0 = x1;
+								x1 = float(x + 1) - xcenter;
+								float val = integral((std::max)(x0, -xval) / xradius, (std::min)(x1, xval) / xradius) * scale;
+								val -= ((std::min)(float(x + 1), r) - (std::max)(float(x), l)) * ycoord;
+								alpha_blend(*dst, c, val);
+							}
+						}
+						else
+						{
+							s32 const minx = s32(curbounds.x0 * float(dest.width()));
+							s32 const maxx = s32(std::ceil(curbounds.x1 * float(dest.width()))) - 1;
+							float x1 = (float(minx) - xcenter) / xradius;
+							u32 *dst = &dest.pix(row, minx);
+							for (s32 x = minx; maxx >= x; ++x, ++dst)
+							{
+								float const x0 = x1;
+								x1 = (float(x + 1) - xcenter) / xradius;
+								float val = integral((std::max)(x0, -1.0F), (std::min)(x1, 1.0F));
+								if (float(x + 1) <= l)
+									val += integral((std::max)(x0, -1.0F), x1);
+								else if (float(x) <= l)
+									val += integral((std::max)(x0, -1.0F), -xval / xradius);
+								if (float(x) >= r)
+									val += integral(x0, (std::min)(x1, 1.0F));
+								else if (float(x + 1) >= r)
+									val += integral(xval / xradius, (std::min)(x1, 1.0F));
+								val *= scale;
+								val -= (std::max)(((std::min)(float(x + 1), r) - (std::max)(float(x), l)), 0.0F) * ycoord;
+								alpha_blend(*dst, c, val);
+							}
+						}
+					};
+
+			// draw the top row - in a thin ellipse it may extend below the axis
+			draw_edge_row(miny, ycenter - float(miny + 1), float(miny + 1) > ycenter);
+
+			// draw rows above the axis
+			s32 y = miny + 1;
+			float ycoord1 = ycenter - float(y);
+			float xval1 = std::sqrt((std::max)(1.0F - (ycoord1 * ycoord1) * ooyradius2, 0.0F));
+			float l1 = xcenter - (xval1 * xradius);
+			float r1 = xcenter + (xval1 * xradius);
+			for ( ; (maxy > y) && (float(y + 1) <= ycenter); ++y)
+			{
+				float const xval0 = xval1;
+				float const l0 = l1;
+				float const r0 = r1;
+				ycoord1 = ycenter - float(y + 1);
+				xval1 = std::sqrt((std::max)(1.0F - (ycoord1 * ycoord1) * ooyradius2, 0.0F));
+				l1 = xcenter - (xval1 * xradius);
+				r1 = xcenter + (xval1 * xradius);
+				s32 minx = int(l1);
+				s32 maxx = int(std::ceil(r1)) - 1;
+				u32 *dst = &dest.pix(y, minx);
+				for (s32 x = minx; maxx >= x; ++x, ++dst)
+				{
+					if ((float(x) >= l0) && (float(x + 1) <= r0))
+					{
+						if (255 <= a)
+							*dst = f;
+						else
+							alpha_blend(*dst, a, r, g, b, inva);
+					}
+					else
+					{
+						float val = 0.0F;
+						if (float(x + 1) <= l0)
+							val += integral((std::max)((float(x) - xcenter) / xradius, -xval1), (float(x + 1) - xcenter) / xradius);
+						else if (float(x) <= l0)
+							val += integral((std::max)((float(x) - xcenter) / xradius, -xval1), -xval0);
+						else if (float(x) >= r0)
+							val += integral((float(x) - xcenter) / xradius, (std::min)((float(x + 1) - xcenter) / xradius, xval1));
+						else if (float(x + 1) >= r0)
+							val += integral(xval0, (std::min)((float(x + 1) - xcenter) / xradius, xval1));
+						val *= scale;
+						if (float(x) <= l0)
+							val -= ((std::min)(float(x + 1), l0) - (std::max)(float(x), l1)) * ycoord1;
+						else if (float(x + 1) >= r0)
+							val -= ((std::min)(float(x + 1), r1) - (std::max)(float(x), r0)) * ycoord1;
+						val += (std::max)((std::min)(float(x + 1), r0) - (std::max)(float(x), l0), 0.0F);
+						alpha_blend(*dst, c, val);
+					}
+				}
+			}
+
+			// row spanning the axis
+			if ((maxy > y) && (float(y) < ycenter))
+			{
+				float const xval0 = xval1;
+				float const l0 = l1;
+				float const r0 = r1;
+				ycoord1 = float(y + 1) - ycenter;
+				xval1 = std::sqrt((std::max)(1.0F - (ycoord1 * ycoord1) * ooyradius2, 0.0F));
+				l1 = xcenter - (xval1 * xradius);
+				r1 = xcenter + (xval1 * xradius);
+				s32 const minx = int(curbounds.x0 * float(dest.width()));
+				s32 const maxx = int(std::ceil(curbounds.x1 * float(dest.width()))) - 1;
+				u32 *dst = &dest.pix(y, minx);
+				for (s32 x = minx; maxx >= x; ++x, ++dst)
+				{
+					if ((float(x) >= (std::max)(l0, l1)) && (float(x + 1) <= (std::min)(r0, r1)))
+					{
+						if (255 <= a)
+							*dst = f;
+						else
+							alpha_blend(*dst, a, r, g, b, inva);
+					}
+					else
+					{
+						float val = 0.0F;
+						if (float(x + 1) <= l0)
+							val += integral((xcenter - float(x + 1)) / xradius, (std::min)((xcenter - float(x)) / xradius, 1.0F));
+						else if (float(x) <= l0)
+							val += integral(xval0, (std::min)((xcenter - float(x)) / xradius, 1.0F));
+						else if (float(x) >= r0)
+							val += integral((float(x) - xcenter) / xradius, (std::min)((float(x + 1) - xcenter) / xradius, 1.0F));
+						else if (float(x + 1) >= r0)
+							val += integral(xval0, (std::min)((float(x + 1) - xcenter) / xradius, 1.0F));
+						if (float(x + 1) <= l1)
+							val += integral((xcenter - float(x + 1)) / xradius, (std::min)((xcenter - float(x)) / xradius, 1.0F));
+						else if (float(x) <= l1)
+							val += integral(xval1, (std::min)((xcenter - float(x)) / xradius, 1.0F));
+						else if (float(x) >= r1)
+							val += integral((float(x) - xcenter) / xradius, (std::min)((float(x + 1) - xcenter) / xradius, 1.0F));
+						else if (float(x + 1) >= r1)
+							val += integral(xval1, (std::min)((float(x + 1) - xcenter) / xradius, 1.0F));
+						val *= scale;
+						val += (std::max)(((std::min)(float(x + 1), r0) - (std::max)(float(x), l0)), 0.0F) * (ycenter - float(y));
+						val += (std::max)(((std::min)(float(x + 1), r1) - (std::max)(float(x), l1)), 0.0F) * (float(y + 1) - ycenter);
+						alpha_blend(*dst, c, val);
+					}
+				}
+				++y;
+			}
+
+			// draw rows below the axis
+			for ( ; maxy > y; ++y)
+			{
+				float const ycoord0 = ycoord1;
+				float const xval0 = xval1;
+				float const l0 = l1;
+				float const r0 = r1;
+				ycoord1 = float(y + 1) - ycenter;
+				xval1 = std::sqrt((std::max)(1.0F - (ycoord1 * ycoord1) * ooyradius2, 0.0F));
+				l1 = xcenter - (xval1 * xradius);
+				r1 = xcenter + (xval1 * xradius);
+				s32 minx = int(l0);
+				s32 maxx = int(std::ceil(r0)) - 1;
+				u32 *dst = &dest.pix(y, minx);
+				for (s32 x = minx; maxx >= x; ++x, ++dst)
+				{
+					if ((float(x) >= l1) && (float(x + 1) <= r1))
+					{
+						if (255 <= a)
+							*dst = f;
+						else
+							alpha_blend(*dst, a, r, g, b, inva);
+					}
+					else
+					{
+						float val = 0.0F;
+						if (float(x + 1) <= l1)
+							val += integral((std::max)((float(x) - xcenter) / xradius, -xval0), (float(x + 1) - xcenter) / xradius);
+						else if (float(x) <= l1)
+							val += integral((std::max)((float(x) - xcenter) / xradius, -xval0), -xval1);
+						else if (float(x) >= r1)
+							val += integral((float(x) - xcenter) / xradius, (std::min)((float(x + 1) - xcenter) / xradius, xval0));
+						else if (float(x + 1) >= r1)
+							val += integral(xval1, (std::min)((float(x + 1) - xcenter) / xradius, xval0));
+						val *= scale;
+						if (float(x) <= l1)
+							val -= ((std::min)(float(x + 1), l1) - (std::max)(float(x), l0)) * ycoord0;
+						else if (float(x + 1) >= r1)
+							val -= ((std::min)(float(x + 1), r0) - (std::max)(float(x), r1)) * ycoord0;
+						val += (std::max)((std::min)(float(x + 1), r1) - (std::max)(float(x), l1), 0.0F);
+						alpha_blend(*dst, c, val);
+					}
+				}
+			}
+
+			// last row is an inversion of the first
+			draw_edge_row(maxy, float(maxy) - ycenter, float(maxy) < ycenter);
+		}
 	}
+
+private:
+	static float integral(float x0, float x1)
+	{
+		return integral(x1) - integral(x0);
+	}
+
+	static float integral(float x)
+	{
+		float const u(2.0F * std::asin(x));
+		return u + std::sin(u);
+	};
 };
 
 
@@ -1576,8 +2283,8 @@ class layout_element::text_component : public component
 {
 public:
 	// construction/destruction
-	text_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
-		: component(env, compnode, dirname)
+	text_component(environment &env, util::xml::data_node const &compnode)
+		: component(env, compnode)
 	{
 		m_string = env.get_attribute_string(compnode, "string", "");
 		m_textalign = env.get_attribute_int(compnode, "align", 0);
@@ -1585,11 +2292,10 @@ public:
 
 protected:
 	// overrides
-	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
+	virtual void draw_aligned(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
-		render_font *font = machine.render().font_alloc("default");
+		auto font = machine.render().font_alloc("default");
 		draw_text(*font, dest, bounds, m_string.c_str(), m_textalign, color(state));
-		machine.render().font_free(font);
 	}
 
 private:
@@ -1604,8 +2310,8 @@ class layout_element::led7seg_component : public component
 {
 public:
 	// construction/destruction
-	led7seg_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
-		: component(env, compnode, dirname)
+	led7seg_component(environment &env, util::xml::data_node const &compnode)
+		: component(env, compnode)
 	{
 	}
 
@@ -1613,7 +2319,7 @@ protected:
 	// overrides
 	virtual int maxstate() const override { return 255; }
 
-	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
+	virtual void draw_aligned(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
 		rgb_t const onpen = rgb_t(0xff, 0xff, 0xff, 0xff);
 		rgb_t const offpen = rgb_t(0x20, 0xff, 0xff, 0xff);
@@ -1666,8 +2372,8 @@ class layout_element::led8seg_gts1_component : public component
 {
 public:
 	// construction/destruction
-	led8seg_gts1_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
-		: component(env, compnode, dirname)
+	led8seg_gts1_component(environment &env, util::xml::data_node const &compnode)
+		: component(env, compnode)
 	{
 	}
 
@@ -1675,7 +2381,7 @@ protected:
 	// overrides
 	virtual int maxstate() const override { return 255; }
 
-	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
+	virtual void draw_aligned(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
 		rgb_t const onpen = rgb_t(0xff, 0xff, 0xff, 0xff);
 		rgb_t const offpen = rgb_t(0x20, 0xff, 0xff, 0xff);
@@ -1734,8 +2440,8 @@ class layout_element::led14seg_component : public component
 {
 public:
 	// construction/destruction
-	led14seg_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
-		: component(env, compnode, dirname)
+	led14seg_component(environment &env, util::xml::data_node const &compnode)
+		: component(env, compnode)
 	{
 	}
 
@@ -1743,7 +2449,7 @@ protected:
 	// overrides
 	virtual int maxstate() const override { return 16383; }
 
-	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
+	virtual void draw_aligned(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
 		rgb_t const onpen = rgb_t(0xff, 0xff, 0xff, 0xff);
 		rgb_t const offpen = rgb_t(0x20, 0xff, 0xff, 0xff);
@@ -1846,8 +2552,8 @@ class layout_element::led16seg_component : public component
 {
 public:
 	// construction/destruction
-	led16seg_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
-		: component(env, compnode, dirname)
+	led16seg_component(environment &env, util::xml::data_node const &compnode)
+		: component(env, compnode)
 	{
 	}
 
@@ -1855,7 +2561,7 @@ protected:
 	// overrides
 	virtual int maxstate() const override { return 65535; }
 
-	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
+	virtual void draw_aligned(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
 		const rgb_t onpen = rgb_t(0xff, 0xff, 0xff, 0xff);
 		const rgb_t offpen = rgb_t(0x20, 0xff, 0xff, 0xff);
@@ -1968,8 +2674,8 @@ class layout_element::led14segsc_component : public component
 {
 public:
 	// construction/destruction
-	led14segsc_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
-		: component(env, compnode, dirname)
+	led14segsc_component(environment &env, util::xml::data_node const &compnode)
+		: component(env, compnode)
 	{
 	}
 
@@ -1977,7 +2683,7 @@ protected:
 	// overrides
 	virtual int maxstate() const override { return 65535; }
 
-	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
+	virtual void draw_aligned(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
 		rgb_t const onpen = rgb_t(0xff, 0xff, 0xff, 0xff);
 		rgb_t const offpen = rgb_t(0x20, 0xff, 0xff, 0xff);
@@ -2091,8 +2797,8 @@ class layout_element::led16segsc_component : public component
 {
 public:
 	// construction/destruction
-	led16segsc_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
-		: component(env, compnode, dirname)
+	led16segsc_component(environment &env, util::xml::data_node const &compnode)
+		: component(env, compnode)
 	{
 	}
 
@@ -2100,7 +2806,7 @@ protected:
 	// overrides
 	virtual int maxstate() const override { return 262143; }
 
-	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
+	virtual void draw_aligned(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
 		rgb_t const onpen = rgb_t(0xff, 0xff, 0xff, 0xff);
 		rgb_t const offpen = rgb_t(0x20, 0xff, 0xff, 0xff);
@@ -2223,8 +2929,8 @@ class layout_element::dotmatrix_component : public component
 {
 public:
 	// construction/destruction
-	dotmatrix_component(int dots, environment &env, util::xml::data_node const &compnode, const char *dirname)
-		: component(env, compnode, dirname)
+	dotmatrix_component(int dots, environment &env, util::xml::data_node const &compnode)
+		: component(env, compnode)
 		, m_dots(dots)
 	{
 	}
@@ -2233,7 +2939,7 @@ protected:
 	// overrides
 	virtual int maxstate() const override { return (1 << m_dots) - 1; }
 
-	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
+	virtual void draw_aligned(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
 		const rgb_t onpen = rgb_t(0xff, 0xff, 0xff, 0xff);
 		const rgb_t offpen = rgb_t(0xff, 0x20, 0x20, 0x20);
@@ -2264,8 +2970,8 @@ class layout_element::simplecounter_component : public component
 {
 public:
 	// construction/destruction
-	simplecounter_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
-		: component(env, compnode, dirname)
+	simplecounter_component(environment &env, util::xml::data_node const &compnode)
+		: component(env, compnode)
 		, m_digits(env.get_attribute_int(compnode, "digits", 2))
 		, m_textalign(env.get_attribute_int(compnode, "align", 0))
 		, m_maxstate(env.get_attribute_int(compnode, "maxstate", 999))
@@ -2276,11 +2982,10 @@ protected:
 	// overrides
 	virtual int maxstate() const override { return m_maxstate; }
 
-	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
+	virtual void draw_aligned(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
-		render_font *const font = machine.render().font_alloc("default");
+		auto font = machine.render().font_alloc("default");
 		draw_text(*font, dest, bounds, string_format("%0*d", m_digits, state).c_str(), m_textalign, color(state));
-		machine.render().font_free(font);
 	}
 
 private:
@@ -2298,49 +3003,30 @@ class layout_element::reel_component : public component
 
 public:
 	// construction/destruction
-	reel_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
-		: component(env, compnode, dirname)
+	reel_component(environment &env, util::xml::data_node const &compnode)
+		: component(env, compnode)
+		, m_searchpath(env.search_path() ? env.search_path() : "")
+		, m_dirname(env.directory_name() ? env.directory_name() : "")
 	{
-		for (auto & elem : m_hasalpha)
-			elem = false;
-
 		std::string symbollist = env.get_attribute_string(compnode, "symbollist", "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15");
 
 		// split out position names from string and figure out our number of symbols
-		int location;
 		m_numstops = 0;
-		location=symbollist.find(',');
-		while (location!=-1)
+		for (std::string::size_type location = symbollist.find(','); std::string::npos != location; location = symbollist.find(','))
 		{
-			m_stopnames[m_numstops] = symbollist;
-			m_stopnames[m_numstops] = m_stopnames[m_numstops].substr(0, location);
-			symbollist = symbollist.substr(location+1, symbollist.length()-(location-1));
+			m_stopnames[m_numstops] = symbollist.substr(0, location);
+			symbollist.erase(0, location + 1);
 			m_numstops++;
-			location=symbollist.find(',');
 		}
 		m_stopnames[m_numstops++] = symbollist;
 
-		// careful, dirname is nullptr if we're coming from internal layout, and our string assignment doesn't like that
-		if (dirname != nullptr)
-			m_dirname = dirname;
-
-		for (int i=0;i<m_numstops;i++)
+		for (int i = 0; i < m_numstops; i++)
 		{
-			location=m_stopnames[i].find(':');
-			if (location!=-1)
+			std::string::size_type const location = m_stopnames[i].find(':');
+			if (location != std::string::npos)
 			{
-				m_imagefile[i] = m_stopnames[i];
-				m_stopnames[i] = m_stopnames[i].substr(0, location);
-				m_imagefile[i] = m_imagefile[i].substr(location+1, m_imagefile[i].length()-(location-1));
-
-				//m_alphafile[i] =
-				m_file[i] = std::make_unique<emu_file>(env.machine().options().art_path(), OPEN_FLAG_READ);
-			}
-			else
-			{
-				//m_imagefile[i] = 0;
-				//m_alphafile[i] = 0;
-				m_file[i].reset();
+				m_imagefile[i] = m_stopnames[i].substr(location + 1);
+				m_stopnames[i].erase(location);
 			}
 		}
 
@@ -2350,10 +3036,21 @@ public:
 		m_beltreel = env.get_attribute_int(compnode, "beltreel", 0);
 	}
 
-protected:
 	// overrides
+	virtual void preload(running_machine &machine) override
+	{
+		for (int i = 0; i < m_numstops; i++)
+		{
+			if (!m_imagefile[i].empty() && !m_bitmap[i].valid())
+				load_reel_bitmap(i);
+		}
+
+	}
+
+protected:
 	virtual int maxstate() const override { return 65535; }
-	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
+
+	virtual void draw_aligned(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
 		if (m_beltreel)
 		{
@@ -2374,16 +3071,12 @@ protected:
 		u32 const b = c.b * 255.0f;
 		u32 const a = c.a * 255.0f;
 
-		// get the width of the string
-		render_font *font = machine.render().font_alloc("default");
-		float aspect = 1.0f;
-		s32 width;
-
 		int curry = 0;
 		int num_shown = m_numsymbolsvisible;
 
 		int ourheight = bounds.height();
 
+		auto font = machine.render().font_alloc("default");
 		for (int fruit = 0;fruit<m_numstops;fruit++)
 		{
 			int basey;
@@ -2408,47 +3101,31 @@ protected:
 			// only render the symbol / text if it's actually in view because the code is SLOW
 			if ((endpos >= bounds.top()) && (basey <= bounds.bottom()))
 			{
-				while (1)
-				{
-					width = font->string_width(ourheight / num_shown, aspect, m_stopnames[fruit].c_str());
-					if (width < bounds.width())
-						break;
-					aspect *= 0.9f;
-				}
+				if (!m_imagefile[fruit].empty() && !m_bitmap[fruit].valid())
+					load_reel_bitmap(fruit);
 
-				s32 curx;
-				curx = bounds.left() + (bounds.width() - width) / 2;
-
-				if (m_file[fruit])
-					if (!m_bitmap[fruit].valid())
-						load_reel_bitmap(fruit);
-
-				if (m_file[fruit]) // render gfx
+				if (m_bitmap[fruit].valid()) // render gfx
 				{
 					bitmap_argb32 tempbitmap2(dest.width(), ourheight/num_shown);
+					render_resample_argb_bitmap_hq(tempbitmap2, m_bitmap[fruit], c);
 
-					if (m_bitmap[fruit].valid())
+					for (int y = 0; y < ourheight/num_shown; y++)
 					{
-						render_resample_argb_bitmap_hq(tempbitmap2, m_bitmap[fruit], c);
+						int effy = basey + y;
 
-						for (int y = 0; y < ourheight/num_shown; y++)
+						if (effy >= bounds.top() && effy <= bounds.bottom())
 						{
-							int effy = basey + y;
-
-							if (effy >= bounds.top() && effy <= bounds.bottom())
+							u32 const *const src = &tempbitmap2.pix(y);
+							u32 *const d = &dest.pix(effy);
+							for (int x = 0; x < dest.width(); x++)
 							{
-								u32 *src = &tempbitmap2.pix32(y);
-								u32 *d = &dest.pix32(effy);
-								for (int x = 0; x < dest.width(); x++)
+								int effx = x;
+								if (effx >= bounds.left() && effx <= bounds.right())
 								{
-									int effx = x;
-									if (effx >= bounds.left() && effx <= bounds.right())
+									u32 spix = rgb_t(src[x]).a();
+									if (spix != 0)
 									{
-										u32 spix = rgb_t(src[x]).a();
-										if (spix != 0)
-										{
-											d[effx] = src[x];
-										}
+										d[effx] = src[x];
 									}
 								}
 							}
@@ -2464,6 +3141,20 @@ protected:
 					const char *ends = origs + strlen(origs);
 					const char *s = origs;
 					char32_t schar;
+
+					// get the width of the string
+					float aspect = 1.0f;
+					s32 width;
+
+					while (1)
+					{
+						width = font->string_width(ourheight / num_shown, aspect, m_stopnames[fruit].c_str());
+						if (width < bounds.width())
+							break;
+						aspect *= 0.9f;
+					}
+
+					s32 curx = bounds.left() + (bounds.width() - width) / 2;
 
 					// loop over characters
 					while (*s != 0)
@@ -2484,8 +3175,8 @@ protected:
 
 							if (effy >= bounds.top() && effy <= bounds.bottom())
 							{
-								u32 *src = &tempbitmap.pix32(y);
-								u32 *d = &dest.pix32(effy);
+								u32 const *const src = &tempbitmap.pix(y);
+								u32 *const d = &dest.pix(effy);
 								for (int x = 0; x < chbounds.width(); x++)
 								{
 									int effx = curx + x + chbounds.left();
@@ -2517,7 +3208,6 @@ protected:
 		}
 
 		// free the temporary bitmap and font
-		machine.render().font_free(font);
 	}
 
 private:
@@ -2536,15 +3226,12 @@ private:
 		u32 const b = c.b * 255.0f;
 		u32 const a = c.a * 255.0f;
 
-		// get the width of the string
-		render_font *font = machine.render().font_alloc("default");
-		float aspect = 1.0f;
-		s32 width;
 		int currx = 0;
 		int num_shown = m_numsymbolsvisible;
 
 		int ourwidth = bounds.width();
 
+		auto font = machine.render().font_alloc("default");
 		for (int fruit = 0;fruit<m_numstops;fruit++)
 		{
 			int basex;
@@ -2568,56 +3255,53 @@ private:
 			// only render the symbol / text if it's actually in view because the code is SLOW
 			if ((endpos >= bounds.left()) && (basex <= bounds.right()))
 			{
-				while (1)
-				{
-					width = font->string_width(dest.height(), aspect, m_stopnames[fruit].c_str());
-					if (width < bounds.width())
-						break;
-					aspect *= 0.9f;
-				}
+				if (!m_imagefile[fruit].empty() && !m_bitmap[fruit].valid())
+					load_reel_bitmap(fruit);
 
-				s32 curx;
-				curx = bounds.left();
-
-				if (m_file[fruit])
-					if (!m_bitmap[fruit].valid())
-						load_reel_bitmap(fruit);
-
-				if (m_file[fruit]) // render gfx
+				if (m_bitmap[fruit].valid()) // render gfx
 				{
 					bitmap_argb32 tempbitmap2(ourwidth/num_shown, dest.height());
+					render_resample_argb_bitmap_hq(tempbitmap2, m_bitmap[fruit], c);
 
-					if (m_bitmap[fruit].valid())
+					for (int y = 0; y < dest.height(); y++)
 					{
-						render_resample_argb_bitmap_hq(tempbitmap2, m_bitmap[fruit], c);
+						int effy = y;
 
-						for (int y = 0; y < dest.height(); y++)
+						if (effy >= bounds.top() && effy <= bounds.bottom())
 						{
-							int effy = y;
-
-							if (effy >= bounds.top() && effy <= bounds.bottom())
+							u32 const *const src = &tempbitmap2.pix(y);
+							u32 *const d = &dest.pix(effy);
+							for (int x = 0; x < ourwidth/num_shown; x++)
 							{
-								u32 *src = &tempbitmap2.pix32(y);
-								u32 *d = &dest.pix32(effy);
-								for (int x = 0; x < ourwidth/num_shown; x++)
+								int effx = basex + x;
+								if (effx >= bounds.left() && effx <= bounds.right())
 								{
-									int effx = basex + x;
-									if (effx >= bounds.left() && effx <= bounds.right())
+									u32 spix = rgb_t(src[x]).a();
+									if (spix != 0)
 									{
-										u32 spix = rgb_t(src[x]).a();
-										if (spix != 0)
-										{
-											d[effx] = src[x];
-										}
+										d[effx] = src[x];
 									}
 								}
 							}
-
 						}
+
 					}
 				}
 				else // render text (fallback)
 				{
+					// get the width of the string
+					float aspect = 1.0f;
+					s32 width;
+					while (1)
+					{
+						width = font->string_width(dest.height(), aspect, m_stopnames[fruit].c_str());
+						if (width < bounds.width())
+							break;
+						aspect *= 0.9f;
+					}
+
+					s32 curx = bounds.left();
+
 					// allocate a temporary bitmap
 					bitmap_argb32 tempbitmap(dest.width(), dest.height());
 
@@ -2645,8 +3329,8 @@ private:
 
 							if (effy >= bounds.top() && effy <= bounds.bottom())
 							{
-								u32 *src = &tempbitmap.pix32(y);
-								u32 *d = &dest.pix32(effy);
+								u32 const *const src = &tempbitmap.pix(y);
+								u32 *const d = &dest.pix(effy);
 								for (int x = 0; x < chbounds.width(); x++)
 								{
 									int effx = basex + curx + x;
@@ -2678,35 +3362,33 @@ private:
 		}
 
 		// free the temporary bitmap and font
-		machine.render().font_free(font);
 	}
 
 	void load_reel_bitmap(int number)
 	{
-		// load the basic bitmap
-		assert(m_file != nullptr);
-		/*m_hasalpha[number] = */ render_load_png(m_bitmap[number], *m_file[number], m_dirname.c_str(), m_imagefile[number].c_str());
+		emu_file file(m_searchpath.empty() ? m_dirname : m_searchpath, OPEN_FLAG_READ);
+		std::string filename;
+		if (!m_searchpath.empty())
+			filename = m_dirname;
+		if (!filename.empty() && !util::is_directory_separator(filename[filename.size() - 1]))
+			filename.append(PATH_SEPARATOR);
+		filename.append(m_imagefile[number]);
 
-		// load the alpha bitmap if specified
-		//if (m_bitmap[number].valid() && m_alphafile[number])
-		//  render_load_png(m_bitmap[number], *m_file[number], m_dirname, m_alphafile[number], true);
+		// load the basic bitmap
+		if (file.open(filename) == osd_file::error::NONE)
+			render_load_png(m_bitmap[number], file);
 
 		// if we can't load the bitmap just use text rendering
 		if (!m_bitmap[number].valid())
-		{
-			// fallback to text rendering
-			m_file[number].reset();
-		}
+			m_imagefile[number].clear();
 
 	}
 
 	// internal state
 	bitmap_argb32       m_bitmap[MAX_BITMAPS];      // source bitmap for images
+	std::string         m_searchpath;               // asset search path (for lazy loading)
 	std::string         m_dirname;                  // directory name of image file (for lazy loading)
-	std::unique_ptr<emu_file> m_file[MAX_BITMAPS];        // file object for reading image/alpha files
 	std::string         m_imagefile[MAX_BITMAPS];   // name of the image file (for lazy loading)
-	std::string         m_alphafile[MAX_BITMAPS];   // name of the alpha file (for lazy loading)
-	bool                m_hasalpha[MAX_BITMAPS];    // is there any alpha component present?
 
 	// basically made up of multiple text strings / gfx
 	int                 m_numstops;
@@ -2723,9 +3405,9 @@ private:
 //-------------------------------------------------
 
 template <typename T>
-layout_element::component::ptr layout_element::make_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
+layout_element::component::ptr layout_element::make_component(environment &env, util::xml::data_node const &compnode)
 {
-	return std::make_unique<T>(env, compnode, dirname);
+	return std::make_unique<T>(env, compnode);
 }
 
 
@@ -2735,9 +3417,9 @@ layout_element::component::ptr layout_element::make_component(environment &env, 
 //-------------------------------------------------
 
 template <int D>
-layout_element::component::ptr layout_element::make_dotmatrix_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
+layout_element::component::ptr layout_element::make_dotmatrix_component(environment &env, util::xml::data_node const &compnode)
 {
-	return std::make_unique<dotmatrix_component>(D, env, compnode, dirname);
+	return std::make_unique<dotmatrix_component>(D, env, compnode);
 }
 
 
@@ -2798,7 +3480,7 @@ layout_element::texture &layout_element::texture::operator=(texture &&that)
 //  component - constructor
 //-------------------------------------------------
 
-layout_element::component::component(environment &env, util::xml::data_node const &compnode, const char *dirname)
+layout_element::component::component(environment &env, util::xml::data_node const &compnode)
 	: m_statemask(env.get_attribute_int(compnode, "statemask", env.get_attribute_string(compnode, "state", "")[0] ? ~0 : 0))
 	, m_stateval(env.get_attribute_int(compnode, "state", m_statemask) & m_statemask)
 {
@@ -2806,84 +3488,37 @@ layout_element::component::component(environment &env, util::xml::data_node cons
 	{
 		if (!strcmp(child->get_name(), "bounds"))
 		{
-			int const state(env.get_attribute_int(*child, "state", 0));
-			auto const pos(
-					std::lower_bound(
-						m_bounds.begin(),
-						m_bounds.end(),
-						state,
-						[] (bounds_step const &lhs, int rhs) { return lhs.state < rhs; }));
-			if ((m_bounds.end() != pos) && (state == pos->state))
+			if (!add_bounds_step(env, m_bounds, *child))
 			{
 				throw layout_syntax_error(
 						util::string_format(
-							"%s component has duplicate bounds for state %d",
-							compnode.get_name(),
-							state));
+							"%s component has duplicate bounds for state",
+							compnode.get_name()));
 			}
-			bounds_step &ins(*m_bounds.emplace(pos, bounds_step{ state, { 0.0F, 0.0F, 0.0F, 0.0F }, { 0.0F, 0.0F, 0.0F, 0.0F } }));
-			env.parse_bounds(child, ins.bounds);
 		}
 		else if (!strcmp(child->get_name(), "color"))
 		{
-			int const state(env.get_attribute_int(*child, "state", 0));
-			auto const pos(
-					std::lower_bound(
-						m_color.begin(),
-						m_color.end(),
-						state,
-						[] (color_step const &lhs, int rhs) { return lhs.state < rhs; }));
-			if ((m_color.end() != pos) && (state == pos->state))
+			if (!add_color_step(env, m_color, *child))
 			{
 				throw layout_syntax_error(
 						util::string_format(
-							"%s component has duplicate color for state %d",
-							compnode.get_name(),
-							state));
+							"%s component has duplicate color for state",
+							compnode.get_name()));
 			}
-			m_color.emplace(pos, color_step{ state, env.parse_color(child), { 0.0F, 0.0F, 0.0F, 0.0F } });
 		}
 	}
-	if (m_bounds.empty())
-	{
-		m_bounds.emplace_back(bounds_step{ 0, { 0.0F, 0.0F, 1.0F, 1.0F }, { 0.0F, 0.0F, 0.0F, 0.0F } });
-	}
-	else
-	{
-		auto i(m_bounds.begin());
-		auto j(i);
-		while (m_bounds.end() != ++j)
-		{
-			assert(j->state > i->state);
+	set_bounds_deltas(m_bounds);
+	set_color_deltas(m_color);
+}
 
-			i->delta.x0 = (j->bounds.x0 - i->bounds.x0) / (j->state - i->state);
-			i->delta.x1 = (j->bounds.x1 - i->bounds.x1) / (j->state - i->state);
-			i->delta.y0 = (j->bounds.y0 - i->bounds.y0) / (j->state - i->state);
-			i->delta.y1 = (j->bounds.y1 - i->bounds.y1) / (j->state - i->state);
 
-			i = j;
-		}
-	}
-	if (m_color.empty())
-	{
-		m_color.emplace_back(color_step{ 0, { 1.0F, 1.0F, 1.0F, 1.0F }, { 0.0F, 0.0F, 0.0F, 0.0F } });
-	}
-	else
-	{
-		auto i(m_color.begin());
-		auto j(i);
-		while (m_color.end() != ++j)
-		{
-			assert(j->state > i->state);
+//-------------------------------------------------
+//  normalize_bounds - normalize component bounds
+//-------------------------------------------------
 
-			i->delta.a = (j->color.a - i->color.a) / (j->state - i->state);
-			i->delta.r = (j->color.r - i->color.r) / (j->state - i->state);
-			i->delta.g = (j->color.g - i->color.g) / (j->state - i->state);
-			i->delta.b = (j->color.b - i->color.b) / (j->state - i->state);
-
-			i = j;
-		}
-	}
+void layout_element::component::normalize_bounds(float xoffs, float yoffs, float xscale, float yscale)
+{
+	::normalize_bounds(m_bounds, 0.0F, 0.0F, xoffs, yoffs, xscale, yscale);
 }
 
 
@@ -2936,11 +3571,7 @@ std::pair<int, bool> layout_element::component::statewrap() const
 
 render_bounds layout_element::component::overall_bounds() const
 {
-	auto i(m_bounds.begin());
-	render_bounds result(i->bounds);
-	while (m_bounds.end() != ++i)
-		union_render_bounds(result, i->bounds);
-	return result;
+	return accumulate_bounds(m_bounds);
 }
 
 
@@ -2950,26 +3581,7 @@ render_bounds layout_element::component::overall_bounds() const
 
 render_bounds layout_element::component::bounds(int state) const
 {
-	auto pos(
-			std::lower_bound(
-				m_bounds.begin(),
-				m_bounds.end(),
-				state,
-				[] (bounds_step const &lhs, int rhs) { return lhs.state < rhs; }));
-	if (m_bounds.begin() == pos)
-	{
-		return pos->bounds;
-	}
-	else
-	{
-		--pos;
-		render_bounds result(pos->bounds);
-		result.x0 += pos->delta.x0 * (state - pos->state);
-		result.x1 += pos->delta.x1 * (state - pos->state);
-		result.y0 += pos->delta.y0 * (state - pos->state);
-		result.y1 += pos->delta.y1 * (state - pos->state);
-		return result;
-	}
+	return interpolate_bounds(m_bounds, state);
 }
 
 
@@ -2979,56 +3591,54 @@ render_bounds layout_element::component::bounds(int state) const
 
 render_color layout_element::component::color(int state) const
 {
-	auto pos(
-			std::lower_bound(
-				m_color.begin(),
-				m_color.end(),
-				state,
-				[] (color_step const &lhs, int rhs) { return lhs.state < rhs; }));
-	if (m_color.begin() == pos)
-	{
-		return pos->color;
-	}
-	else
-	{
-		--pos;
-		render_color result(pos->color);
-		result.a += pos->delta.a * (state - pos->state);
-		result.r += pos->delta.r * (state - pos->state);
-		result.g += pos->delta.g * (state - pos->state);
-		result.b += pos->delta.b * (state - pos->state);
-		return result;
-	}
+	return interpolate_color(m_color, state);
 }
 
 
 //-------------------------------------------------
-//  normalize_bounds - normalize component bounds
+//  preload - perform expensive operations upfront
 //-------------------------------------------------
 
-void layout_element::component::normalize_bounds(float xoffs, float yoffs, float xscale, float yscale)
+void layout_element::component::preload(running_machine &machine)
 {
-	auto i(m_bounds.begin());
-	i->bounds.x0 = (i->bounds.x0 - xoffs) * xscale;
-	i->bounds.x1 = (i->bounds.x1 - xoffs) * xscale;
-	i->bounds.y0 = (i->bounds.y0 - yoffs) * yscale;
-	i->bounds.y1 = (i->bounds.y1 - yoffs) * yscale;
+}
 
-	auto j(i);
-	while (m_bounds.end() != ++j)
-	{
-		j->bounds.x0 = (j->bounds.x0 - xoffs) * xscale;
-		j->bounds.x1 = (j->bounds.x1 - xoffs) * xscale;
-		j->bounds.y0 = (j->bounds.y0 - yoffs) * yscale;
-		j->bounds.y1 = (j->bounds.y1 - yoffs) * yscale;
 
-		i->delta.x0 = (j->bounds.x0 - i->bounds.x0) / (j->state - i->state);
-		i->delta.x1 = (j->bounds.x1 - i->bounds.x1) / (j->state - i->state);
-		i->delta.y0 = (j->bounds.y0 - i->bounds.y0) / (j->state - i->state);
-		i->delta.y1 = (j->bounds.y1 - i->bounds.y1) / (j->state - i->state);
+//-------------------------------------------------
+//  draw - draw element to texture for a given
+//  state
+//-------------------------------------------------
 
-		i = j;
-	}
+void layout_element::component::draw(running_machine &machine, bitmap_argb32 &dest, int state)
+{
+	// get the local scaled bounds
+	render_bounds const curbounds(bounds(state));
+	rectangle pixelbounds(
+			s32(curbounds.x0 * float(dest.width()) + 0.5F),
+			s32(floorf(curbounds.x1 * float(dest.width()) - 0.5F)),
+			s32(curbounds.y0 * float(dest.height()) + 0.5F),
+			s32(floorf(curbounds.y1 * float(dest.height()) - 0.5F)));
+
+	// based on the component type, add to the texture
+	if (!pixelbounds.empty())
+		draw_aligned(machine, dest, pixelbounds, state);
+}
+
+
+void layout_element::component::draw_aligned(running_machine &machine, bitmap_argb32 &dest, rectangle const &bounds, int state)
+{
+	// derived classes must override one form or other
+	throw false;
+}
+
+
+//-------------------------------------------------
+//  maxstate - maximum state drawn differently
+//-------------------------------------------------
+
+int layout_element::component::maxstate() const
+{
+	return -1;
 }
 
 
@@ -3109,8 +3719,8 @@ void layout_element::component::draw_text(
 			int effy = bounds.top() + y;
 			if (effy >= bounds.top() && effy <= bounds.bottom())
 			{
-				u32 *src = &tempbitmap.pix32(y);
-				u32 *d = &dest.pix32(effy);
+				u32 const *const src = &tempbitmap.pix(y);
+				u32 *const d = &dest.pix(effy);
 				for (int x = 0; x < chbounds.width(); x++)
 				{
 					int effx = curx + x + chbounds.left();
@@ -3149,8 +3759,8 @@ void layout_element::component::draw_segment_horizontal_caps(bitmap_argb32 &dest
 	// loop over the width of the segment
 	for (int y = 0; y < width / 2; y++)
 	{
-		u32 *d0 = &dest.pix32(midy - y);
-		u32 *d1 = &dest.pix32(midy + y);
+		u32 *const d0 = &dest.pix(midy - y);
+		u32 *const d1 = &dest.pix(midy + y);
 		int ty = (y < width / 8) ? width / 8 : y;
 
 		// loop over the length of the segment
@@ -3182,8 +3792,8 @@ void layout_element::component::draw_segment_vertical_caps(bitmap_argb32 &dest, 
 	// loop over the width of the segment
 	for (int x = 0; x < width / 2; x++)
 	{
-		u32 *d0 = &dest.pix32(0, midx - x);
-		u32 *d1 = &dest.pix32(0, midx + x);
+		u32 *const d0 = &dest.pix(0, midx - x);
+		u32 *const d1 = &dest.pix(0, midx + x);
 		int tx = (x < width / 8) ? width / 8 : x;
 
 		// loop over the length of the segment
@@ -3219,7 +3829,7 @@ void layout_element::component::draw_segment_diagonal_1(bitmap_argb32 &dest, int
 	for (int x = minx; x < maxx; x++)
 		if (x >= 0 && x < dest.width())
 		{
-			u32 *d = &dest.pix32(0, x);
+			u32 *const d = &dest.pix(0, x);
 			int step = (x - minx) * ratio;
 
 			for (int y = maxy - width - step; y < maxy - step; y++)
@@ -3244,7 +3854,7 @@ void layout_element::component::draw_segment_diagonal_2(bitmap_argb32 &dest, int
 	for (int x = minx; x < maxx; x++)
 		if (x >= 0 && x < dest.width())
 		{
-			u32 *d = &dest.pix32(0, x);
+			u32 *const d = &dest.pix(0, x);
 			int step = (x - minx) * ratio;
 
 			for (int y = miny + step; y < miny + step + width; y++)
@@ -3267,8 +3877,8 @@ void layout_element::component::draw_segment_decimal(bitmap_argb32 &dest, int mi
 	// iterate over y
 	for (u32 y = 0; y <= width; y++)
 	{
-		u32 *d0 = &dest.pix32(midy - y);
-		u32 *d1 = &dest.pix32(midy + y);
+		u32 *const d0 = &dest.pix(midy - y);
+		u32 *const d1 = &dest.pix(midy + y);
 		float xval = width * sqrt(1.0f - (float)(y * y) * ooradius2);
 		s32 left, right;
 
@@ -3296,7 +3906,7 @@ void layout_element::component::draw_segment_comma(bitmap_argb32 &dest, int minx
 	// draw line
 	for (int x = minx; x < maxx; x++)
 	{
-		u32 *d = &dest.pix32(0, x);
+		u32 *const d = &dest.pix(0, x);
 		int step = (x - minx) * ratio;
 
 		for (int y = maxy; y < maxy  - width - step; y--)
@@ -3313,7 +3923,7 @@ void layout_element::component::apply_skew(bitmap_argb32 &dest, int skewwidth)
 {
 	for (int y = 0; y < dest.height(); y++)
 	{
-		u32 *destrow = &dest.pix32(y);
+		u32 *const destrow = &dest.pix(y);
 		int offs = skewwidth * (dest.height() - y) / dest.height();
 		for (int x = dest.width() - skewwidth - 1; x >= 0; x--)
 			destrow[x + offs] = destrow[x];
@@ -3450,7 +4060,18 @@ layout_view::~layout_view()
 //  the given screen
 //-------------------------------------------------
 
-bool layout_view::has_screen(screen_device &screen) const
+bool layout_view::has_screen(screen_device &screen)
+{
+	return std::find_if(m_items.begin(), m_items.end(), [&screen] (auto &itm) { return itm.screen() == &screen; }) != m_items.end();
+}
+
+
+//-------------------------------------------------
+//  has_visible_screen - return true if this view
+//  has the given screen visble
+//-------------------------------------------------
+
+bool layout_view::has_visible_screen(screen_device &screen) const
 {
 	return std::find_if(m_screens.begin(), m_screens.end(), [&screen] (auto const &scr) { return &scr.get() == &screen; }) != m_screens.end();
 }
@@ -3466,6 +4087,7 @@ void layout_view::recompute(u32 visibility_mask, bool zoom_to_screen)
 	// reset the bounds and collected active items
 	render_bounds scrbounds{ 0.0f, 0.0f, 0.0f, 0.0f };
 	m_bounds = scrbounds;
+	m_visible_items.clear();
 	m_screen_items.clear();
 	m_interactive_items.clear();
 	m_interactive_edges_x.clear();
@@ -3479,20 +4101,23 @@ void layout_view::recompute(u32 visibility_mask, bool zoom_to_screen)
 	{
 		if ((visibility_mask & curitem.visibility_mask()) == curitem.visibility_mask())
 		{
+			render_bounds const rawbounds = accumulate_bounds(curitem.m_rawbounds);
+
 			// accumulate bounds
+			m_visible_items.emplace_back(curitem);
 			if (first)
-				m_bounds = curitem.m_rawbounds;
+				m_bounds = rawbounds;
 			else
-				union_render_bounds(m_bounds, curitem.m_rawbounds);
+				m_bounds |= rawbounds;
 			first = false;
 
 			// accumulate visible screens and their bounds bounds
 			if (curitem.screen())
 			{
 				if (scrfirst)
-					scrbounds = curitem.m_rawbounds;
+					scrbounds = rawbounds;
 				else
-					union_render_bounds(scrbounds, curitem.m_rawbounds);
+					scrbounds |= rawbounds;
 				scrfirst = false;
 
 				// accumulate active screens
@@ -3537,10 +4162,8 @@ void layout_view::recompute(u32 visibility_mask, bool zoom_to_screen)
 	// normalize all the item bounds
 	for (item &curitem : items())
 	{
-		curitem.m_bounds.x0 = target_bounds.x0 + (curitem.m_rawbounds.x0 - xoffs) * xscale;
-		curitem.m_bounds.x1 = target_bounds.x0 + (curitem.m_rawbounds.x1 - xoffs) * xscale;
-		curitem.m_bounds.y0 = target_bounds.y0 + (curitem.m_rawbounds.y0 - yoffs) * yscale;
-		curitem.m_bounds.y1 = target_bounds.y0 + (curitem.m_rawbounds.y1 - yoffs) * yscale;
+		curitem.m_bounds = curitem.m_rawbounds;
+		normalize_bounds(curitem.m_bounds, target_bounds.x0, target_bounds.y0, xoffs, yoffs, xscale, yscale);
 	}
 
 	// sort edges of interactive items
@@ -3551,12 +4174,13 @@ void layout_view::recompute(u32 visibility_mask, bool zoom_to_screen)
 	for (unsigned i = 0; m_interactive_items.size() > i; ++i)
 	{
 		item &curitem(m_interactive_items[i]);
+		render_bounds const curbounds(accumulate_bounds(curitem.m_bounds));
 		LOGMASKED(LOG_INTERACTIVE_ITEMS, "%u: (%s %s %s %s) hasinput=%s clickthrough=%s\n",
-				i, curitem.bounds().x0, curitem.bounds().y0, curitem.bounds().x1, curitem.bounds().y1, curitem.has_input(), curitem.clickthrough());
-		m_interactive_edges_x.emplace_back(i, curitem.bounds().x0, false);
-		m_interactive_edges_x.emplace_back(i, curitem.bounds().x1, true);
-		m_interactive_edges_y.emplace_back(i, curitem.bounds().y0, false);
-		m_interactive_edges_y.emplace_back(i, curitem.bounds().y1, true);
+				i, curbounds.x0, curbounds.y0, curbounds.x1, curbounds.y1, curitem.has_input(), curitem.clickthrough());
+		m_interactive_edges_x.emplace_back(i, curbounds.x0, false);
+		m_interactive_edges_x.emplace_back(i, curbounds.x1, true);
+		m_interactive_edges_y.emplace_back(i, curbounds.y0, false);
+		m_interactive_edges_y.emplace_back(i, curbounds.y1, true);
 	}
 	std::sort(m_interactive_edges_x.begin(), m_interactive_edges_x.end());
 	std::sort(m_interactive_edges_y.begin(), m_interactive_edges_y.end());
@@ -3567,6 +4191,20 @@ void layout_view::recompute(u32 visibility_mask, bool zoom_to_screen)
 			LOGMASKED(LOG_INTERACTIVE_ITEMS, "x=%s %c%u\n", e.position(), e.trailing() ? ']' : '[', e.index());
 		for (edge const &e : m_interactive_edges_y)
 			LOGMASKED(LOG_INTERACTIVE_ITEMS, "y=%s %c%u\n", e.position(), e.trailing() ? ']' : '[', e.index());
+	}
+}
+
+//-------------------------------------------------
+//  preload - perform expensive loading upfront
+//  for visible elements
+//-------------------------------------------------
+
+void layout_view::preload()
+{
+	for (item &curitem : m_visible_items)
+	{
+		if (curitem.element())
+			curitem.element()->preload();
 	}
 }
 
@@ -3703,7 +4341,7 @@ void layout_view::add_items(
 					groupmap,
 					orientation_add(grouporient, orientation),
 					grouptrans,
-					render_color_multiply(env.parse_color(itemnode->get_child("color")), color),
+					env.parse_color(itemnode->get_child("color")) * color,
 					false,
 					false,
 					true);
@@ -3786,19 +4424,25 @@ layout_view::item::item(
 		render_color const &color)
 	: m_element(find_element(env, itemnode, elemmap))
 	, m_output(env.device(), env.get_attribute_string(itemnode, "name", ""))
+	, m_animoutput(env.device(), make_animoutput_tag(env, itemnode))
 	, m_have_output(env.get_attribute_string(itemnode, "name", "")[0])
+	, m_have_animoutput(!make_animoutput_tag(env, itemnode).empty())
+	, m_animinput_port(nullptr)
+	, m_animmask(make_animmask(env, itemnode))
+	, m_animshift(get_state_shift(m_animmask))
 	, m_input_port(nullptr)
 	, m_input_field(nullptr)
 	, m_input_mask(env.get_attribute_int(itemnode, "inputmask", 0))
-	, m_input_shift(get_input_shift(m_input_mask))
+	, m_input_shift(get_state_shift(m_input_mask))
 	, m_input_raw(env.get_attribute_bool(itemnode, "inputraw", 0))
 	, m_clickthrough(env.get_attribute_bool(itemnode, "clickthrough", "yes"))
 	, m_screen(nullptr)
 	, m_orientation(orientation_add(env.parse_orientation(itemnode.get_child("orientation")), orientation))
-	, m_color(render_color_multiply(env.parse_color(itemnode.get_child("color")), color))
+	, m_color(make_color(env, itemnode, color))
 	, m_blend_mode(get_blend_mode(env, itemnode))
 	, m_visibility_mask(env.visibility_mask())
 	, m_input_tag(make_input_tag(env, itemnode))
+	, m_animinput_tag(make_animinput_tag(env, itemnode))
 	, m_rawbounds(make_bounds(env, itemnode, trans))
 	, m_has_clickthrough(env.get_attribute_string(itemnode, "clickthrough", "")[0])
 {
@@ -3839,13 +4483,28 @@ layout_view::item::~item()
 
 
 //-------------------------------------------------
-//  screen_container - retrieve screen container
+//  bounds - get bounds for current state
 //-------------------------------------------------
 
-
-render_container *layout_view::item::screen_container(running_machine &machine) const
+render_bounds layout_view::item::bounds() const
 {
-	return (m_screen != nullptr) ? &m_screen->container() : nullptr;
+	if (m_bounds.size() == 1U)
+		return m_bounds.front().bounds;
+	else
+		return interpolate_bounds(m_bounds, animation_state());
+}
+
+
+//-------------------------------------------------
+//  color - get color for current state
+//-------------------------------------------------
+
+render_color layout_view::item::color() const
+{
+	if (m_color.size() == 1U)
+		return m_color.front().color;
+	else
+		return interpolate_color(m_color, animation_state());
 }
 
 
@@ -3895,6 +4554,12 @@ void layout_view::item::resolve_tags()
 			m_output = m_element->default_state();
 	}
 
+	if (m_have_animoutput)
+		m_animoutput.resolve();
+
+	if (!m_animinput_tag.empty())
+		m_animinput_port = m_element->machine().root_device().ioport(m_animinput_tag);
+
 	if (!m_input_tag.empty())
 	{
 		m_input_port = m_element->machine().root_device().ioport(m_input_tag);
@@ -3923,6 +4588,21 @@ void layout_view::item::resolve_tags()
 //  find_element - find element definition
 //---------------------------------------------
 
+inline int layout_view::item::animation_state() const
+{
+	if (m_have_animoutput)
+		return (s32(m_animoutput) & m_animmask) >> m_animshift;
+	else if (m_animinput_port)
+		return (m_animinput_port->read() & m_animmask) >> m_animshift;
+	else
+		return state();
+}
+
+
+//---------------------------------------------
+//  find_element - find element definition
+//---------------------------------------------
+
 layout_element *layout_view::item::find_element(view_environment &env, util::xml::data_node const &itemnode, element_map &elemmap)
 {
 	char const *const name(env.get_attribute_string(itemnode, !strcmp(itemnode.get_name(), "element") ? "ref" : "element", nullptr));
@@ -3942,19 +4622,105 @@ layout_element *layout_view::item::find_element(view_environment &env, util::xml
 //  make_bounds - get transformed bounds
 //---------------------------------------------
 
-render_bounds layout_view::item::make_bounds(
+layout_view::item::bounds_vector layout_view::item::make_bounds(
 		view_environment &env,
 		util::xml::data_node const &itemnode,
 		layout_group::transform const &trans)
 {
-	render_bounds bounds;
-	env.parse_bounds(itemnode.get_child("bounds"), bounds);
-	render_bounds_transform(bounds, trans);
-	if (bounds.x0 > bounds.x1)
-		std::swap(bounds.x0, bounds.x1);
-	if (bounds.y0 > bounds.y1)
-		std::swap(bounds.y0, bounds.y1);
-	return bounds;
+	bounds_vector result;
+	for (util::xml::data_node const *bounds = itemnode.get_child("bounds"); bounds; bounds = bounds->get_next_sibling("bounds"))
+	{
+		if (!add_bounds_step(env, result, *bounds))
+		{
+			throw layout_syntax_error(
+					util::string_format(
+						"%s item has duplicate bounds for state",
+						itemnode.get_name()));
+		}
+	}
+	for (emu::render::detail::bounds_step &step : result)
+	{
+		render_bounds_transform(step.bounds, trans);
+		if (step.bounds.x0 > step.bounds.x1)
+			std::swap(step.bounds.x0, step.bounds.x1);
+		if (step.bounds.y0 > step.bounds.y1)
+			std::swap(step.bounds.y0, step.bounds.y1);
+	}
+	set_bounds_deltas(result);
+	return result;
+}
+
+
+//---------------------------------------------
+//  make_color - get color inflection points
+//---------------------------------------------
+
+layout_view::item::color_vector layout_view::item::make_color(
+		view_environment &env,
+		util::xml::data_node const &itemnode,
+		render_color const &mult)
+{
+	color_vector result;
+	for (util::xml::data_node const *color = itemnode.get_child("color"); color; color = color->get_next_sibling("color"))
+	{
+		if (!add_color_step(env, result, *color))
+		{
+			throw layout_syntax_error(
+					util::string_format(
+						"%s item has duplicate color for state",
+						itemnode.get_name()));
+		}
+	}
+	if (result.empty())
+	{
+		result.emplace_back(emu::render::detail::color_step{ 0, mult, { 0.0F, 0.0F, 0.0F, 0.0F } });
+	}
+	else
+	{
+		for (emu::render::detail::color_step &step : result)
+			step.color *= mult;
+		set_color_deltas(result);
+	}
+	return result;
+}
+
+
+//---------------------------------------------
+//  make_animoutput_tag - get animation output
+//  tag
+//---------------------------------------------
+
+std::string layout_view::item::make_animoutput_tag(view_environment &env, util::xml::data_node const &itemnode)
+{
+	util::xml::data_node const *const animate(itemnode.get_child("animate"));
+	if (animate)
+		return env.get_attribute_string(*animate, "name", "");
+	else
+		return std::string();
+}
+
+
+//---------------------------------------------
+//  make_animmask - get animation state mask
+//---------------------------------------------
+
+ioport_value layout_view::item::make_animmask(view_environment &env, util::xml::data_node const &itemnode)
+{
+	util::xml::data_node const *const animate(itemnode.get_child("animate"));
+	return animate ? env.get_attribute_int(*animate, "mask", ~ioport_value(0)) : ~ioport_value(0);
+}
+
+
+//---------------------------------------------
+//  make_animinput_tag - get absolute tag for
+//  animation input
+//---------------------------------------------
+
+std::string layout_view::item::make_animinput_tag(view_environment &env, util::xml::data_node const &itemnode)
+{
+	util::xml::data_node const *const animate(itemnode.get_child("animate"));
+	char const *tag(animate ? env.get_attribute_string(*animate, "inputtag", nullptr) : nullptr);
+	return tag ? env.device().subtag(tag) : std::string();
 }
 
 
@@ -4002,10 +4768,10 @@ int layout_view::item::get_blend_mode(view_environment &env, util::xml::data_nod
 
 
 //---------------------------------------------
-//  get_input_shift - shift to right-align LSB
+//  get_state_shift - shift to right-align LSB
 //---------------------------------------------
 
-unsigned layout_view::item::get_input_shift(ioport_value mask)
+unsigned layout_view::item::get_state_shift(ioport_value mask)
 {
 	unsigned result(0U);
 	while (mask && !BIT(mask, 0))
@@ -4043,13 +4809,17 @@ layout_view::visibility_toggle::visibility_toggle(std::string &&name, u32 mask)
 //  layout_file - constructor
 //-------------------------------------------------
 
-layout_file::layout_file(device_t &device, util::xml::data_node const &rootnode, char const *dirname)
+layout_file::layout_file(
+		device_t &device,
+		util::xml::data_node const &rootnode,
+		char const *searchpath,
+		char const *dirname)
 	: m_elemmap()
 	, m_viewlist()
 {
 	try
 	{
-		environment env(device);
+		environment env(device, searchpath, dirname);
 
 		// find the layout node
 		util::xml::data_node const *const mamelayoutnode = rootnode.get_child("mamelayout");
@@ -4063,7 +4833,7 @@ layout_file::layout_file(device_t &device, util::xml::data_node const &rootnode,
 
 		// parse all the parameters, elements and groups
 		group_map groupmap;
-		add_elements(dirname, env, *mamelayoutnode, groupmap, false, true);
+		add_elements(env, *mamelayoutnode, groupmap, false, true);
 
 		// parse all the views
 		for (util::xml::data_node const *viewnode = mamelayoutnode->get_child("view"); viewnode != nullptr; viewnode = viewnode->get_next_sibling("view"))
@@ -4100,7 +4870,6 @@ layout_file::~layout_file()
 
 
 void layout_file::add_elements(
-		char const *dirname,
 		environment &env,
 		util::xml::data_node const &parentnode,
 		group_map &groupmap,
@@ -4121,7 +4890,7 @@ void layout_file::add_elements(
 			char const *const name(env.get_attribute_string(*childnode, "name", nullptr));
 			if (!name)
 				throw layout_syntax_error("element lacks name attribute");
-			if (!m_elemmap.emplace(std::piecewise_construct, std::forward_as_tuple(name), std::forward_as_tuple(env, *childnode, dirname)).second)
+			if (!m_elemmap.emplace(std::piecewise_construct, std::forward_as_tuple(name), std::forward_as_tuple(env, *childnode)).second)
 				throw layout_syntax_error(util::string_format("duplicate element name %s", name));
 		}
 		else if (!strcmp(childnode->get_name(), "group"))
@@ -4140,7 +4909,7 @@ void layout_file::add_elements(
 			environment local(env);
 			for (int i = 0; count > i; ++i)
 			{
-				add_elements(dirname, local, *childnode, groupmap, true, !i);
+				add_elements(local, *childnode, groupmap, true, !i);
 				local.increment_parameters();
 			}
 		}

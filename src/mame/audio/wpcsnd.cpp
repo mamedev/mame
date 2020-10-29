@@ -43,7 +43,6 @@
 #include "emu.h"
 #include "wpcsnd.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -113,9 +112,6 @@ void wpcsnd_device::device_add_mconfig(machine_config &config)
 	m_ym2151->add_route(ALL_OUTPUTS, *this, 0.25);
 
 	AD7524(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.25);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	HC55516(config, m_hc55516, 0).add_route(ALL_OUTPUTS, *this, 0.5);
 }

@@ -61,14 +61,10 @@ public:
 		m_lcdc(*this, "hd44780"),
 		m_cassette(*this, "cassette"),
 		m_maincpu(*this, "maincpu"),
-		m_col1(*this, "COL1"),
-		m_col2(*this, "COL2"),
-		m_col3(*this, "COL3"),
-		m_col4(*this, "COL4"),
-		m_col5(*this, "COL5"),
-		m_col6(*this, "COL6"),
+		m_col(*this, "COL%u", 1U),
 		m_select(*this, "SELECT"),
 		m_digit(*this, "digit%u", 0U),
+		m_pattern(*this, "pattern"),
 		m_track_led(*this, "track_led%u", 1U),
 		m_patt_led(*this, "patt_led"),
 		m_song_led(*this, "song_led"),
@@ -168,14 +164,10 @@ private:
 	optional_device<cassette_image_device> m_cassette;
 	required_device<mcs51_cpu_device> m_maincpu;
 
-	required_ioport m_col1;
-	required_ioport m_col2;
-	required_ioport m_col3;
-	required_ioport m_col4;
-	required_ioport m_col5;
-	required_ioport m_col6;
+	required_ioport_array<6> m_col;
 	optional_ioport m_select;
 	output_finder<5> m_digit;
+	output_finder<> m_pattern;
 	output_finder<8> m_track_led;
 	output_finder<> m_patt_led;
 	output_finder<> m_song_led;

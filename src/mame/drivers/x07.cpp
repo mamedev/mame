@@ -1094,9 +1094,9 @@ uint32_t x07_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 				for(int y = 0; y < 8; y++)
 					for (int x=0; x<6; x++)
 						if(m_cursor.on && m_blink && m_cursor.x == px && m_cursor.y == py)
-							bitmap.pix16(py * 8 + y, px * 6 + x) = (y == 7) ? 1: 0;
+							bitmap.pix(py * 8 + y, px * 6 + x) = (y == 7) ? 1: 0;
 						else
-							bitmap.pix16(py * 8 + y, px * 6 + x) = m_lcd_map[py * 8 + y][px * 6 + x]? 1: 0;
+							bitmap.pix(py * 8 + y, px * 6 + x) = m_lcd_map[py * 8 + y][px * 6 + x]? 1: 0;
 
 	}
 

@@ -75,7 +75,7 @@ draw_roz_helper_block(const struct roz_param *rozInfo, int destx, int desty,
 	int end_incrx = rozInfo->incyx - (width * rozInfo->incxx);
 	int end_incry = rozInfo->incyy - (width * rozInfo->incxy);
 
-	uint16_t *dest = &destbitmap.pix16(desty, destx);
+	uint16_t *dest = &destbitmap.pix(desty, destx);
 	int dest_rowinc = destbitmap.rowpixels() - width;
 
 	while (desty < desty_end)
@@ -96,9 +96,9 @@ draw_roz_helper_block(const struct roz_param *rozInfo, int destx, int desty,
 				goto L_SkipPixel;
 			}
 
-			if (flagsbitmap.pix8(ypos, xpos) & TILEMAP_PIXEL_LAYER0)
+			if (flagsbitmap.pix(ypos, xpos) & TILEMAP_PIXEL_LAYER0)
 			{
-				*dest = srcbitmap.pix16(ypos, xpos) + rozInfo->color;
+				*dest = srcbitmap.pix(ypos, xpos) + rozInfo->color;
 			}
 
 		L_SkipPixel:

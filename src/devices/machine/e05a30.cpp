@@ -56,6 +56,7 @@ void e05a30_device::device_start()
 	save_item(NAME(m_printhead));
 	save_item(NAME(m_pf_stepper));
 	save_item(NAME(m_cr_stepper));
+	save_item(NAME(m_c000_shift_register));
 }
 
 //-------------------------------------------------
@@ -167,6 +168,22 @@ void e05a30_device::write(offs_t offset, uint8_t data)
 	LOG("%s: e05a30_w([0xC0%02x]): %02x\n", machine().describe_context(), offset, data);
 
 	switch (offset) {
+		/* The documentation on the e05a30 in the LX-810/850 Technical Manual
+		 * is incomplete. There are instances of writing 0 to c000, so it is a guess
+		 * that writing to c000 will clear the shift register. */
+	case 0x00:
+		m_c000_shift_register = 0;
+		break;
+		/* A similar Epson Gate Array, the e05a03 has a 24 bit shift
+		 * register documented in the LX-800 Technical Manual (p.48).
+		 * It is a guess that c001,c002, and c003 are the high, middle, and low bytes
+		 * of a 24 bit shift register. */
+	case 0x01:
+	case 0x02:
+	case 0x03:
+		m_c000_shift_register &= ~(uint32_t (0xff) << ((3-offset)*8));
+		m_c000_shift_register |=  (uint32_t (data) << ((3-offset)*8));
+		break;
 	case 0x04:
 		m_centronics_nack = BIT(data,5);
 		m_centronics_busy = BIT(data,0);
@@ -197,6 +214,12 @@ uint8_t e05a30_device::read(offs_t offset)
 	LOG("%s: e05a30_r([0xC0%02x]): ", machine().describe_context(), offset);
 
 	switch (offset) {
+	case 0x00:
+		result = BIT(m_c000_shift_register, 23) << 7;
+		if (!machine().side_effects_disabled()) {
+			m_c000_shift_register = (m_c000_shift_register << 1) & 0xffffff;
+		}
+		break;
 	case 0x02:
 		result = m_centronics_data_latched << 7;
 		break;

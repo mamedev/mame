@@ -172,7 +172,7 @@ void taitoair_state::fill_slope(bitmap_ind16 &bitmap, const rectangle &cliprect,
 
 				while (xx1 <= xx2)
 				{
-					bitmap.pix16(y1, xx1) = base_color + grad_col;
+					bitmap.pix(y1, xx1) = base_color + grad_col;
 					xx1++;
 				}
 			}

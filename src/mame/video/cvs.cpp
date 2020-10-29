@@ -135,13 +135,12 @@ VIDEO_START_MEMBER(cvs_state,cvs)
 uint32_t cvs_state::screen_update_cvs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	static const int ram_based_char_start_indices[] = { 0xe0, 0xc0, 0x100, 0x80 };
-	offs_t offs;
 	int scroll[8];
 
 	set_pens();
 
 	/* draw the background */
-	for (offs = 0; offs < 0x0400; offs++)
+	for (offs_t offs = 0; offs < 0x0400; offs++)
 	{
 		int collision_color = 0x100;
 		uint8_t code = m_video_ram[offs];
@@ -194,63 +193,56 @@ uint32_t cvs_state::screen_update_cvs(screen_device &screen, bitmap_ind16 &bitma
 	bitmap_ind16 const &s2636_2_bitmap = m_s2636[2]->update(cliprect);
 
 	/* Bullet Hardware */
-	for (offs = 8; offs < 256; offs++ )
+	for (offs_t offs = 8; offs < 256; offs++ )
 	{
 		if (m_bullet_ram[offs] != 0)
 		{
-			int ct;
-			for (ct = 0; ct < 4; ct++)
+			for (int ct = 0; ct < 4; ct++)
 			{
 				int bx = 255 - 7 - m_bullet_ram[offs] - ct;
 
 				/* Bullet/Object Collision */
-				if ((s2636_0_bitmap.pix16(offs, bx) != 0) ||
-					(s2636_1_bitmap.pix16(offs, bx) != 0) ||
-					(s2636_2_bitmap.pix16(offs, bx) != 0))
+				if ((s2636_0_bitmap.pix(offs, bx) != 0) ||
+					(s2636_1_bitmap.pix(offs, bx) != 0) ||
+					(s2636_2_bitmap.pix(offs, bx) != 0))
 					m_collision_register |= 0x08;
 
 				/* Bullet/Background Collision */
-				if (m_palette->pen_indirect(m_scrolled_collision_background.pix16(offs, bx)))
+				if (m_palette->pen_indirect(m_scrolled_collision_background.pix(offs, bx)))
 					m_collision_register |= 0x80;
 
-				bitmap.pix16(offs, bx) = BULLET_STAR_PEN;
+				bitmap.pix(offs, bx) = BULLET_STAR_PEN;
 			}
 		}
 	}
 
 
 	/* mix and copy the S2636 images into the main bitmap, also check for collision */
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		int y;
-
-		for (y = cliprect.top(); y <= cliprect.bottom(); y++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
-			int x;
+			int pixel0 = s2636_0_bitmap.pix(y, x);
+			int pixel1 = s2636_1_bitmap.pix(y, x);
+			int pixel2 = s2636_2_bitmap.pix(y, x);
 
-			for (x = cliprect.left(); x <= cliprect.right(); x++)
+			int pixel = pixel0 | pixel1 | pixel2;
+
+			if (S2636_IS_PIXEL_DRAWN(pixel))
 			{
-				int pixel0 = s2636_0_bitmap.pix16(y, x);
-				int pixel1 = s2636_1_bitmap.pix16(y, x);
-				int pixel2 = s2636_2_bitmap.pix16(y, x);
+				bitmap.pix(y, x) = SPRITE_PEN_BASE + S2636_PIXEL_COLOR(pixel);
 
-				int pixel = pixel0 | pixel1 | pixel2;
+				/* S2636 vs. S2636 collision detection */
+				if (S2636_IS_PIXEL_DRAWN(pixel0) && S2636_IS_PIXEL_DRAWN(pixel1)) m_collision_register |= 0x01;
+				if (S2636_IS_PIXEL_DRAWN(pixel1) && S2636_IS_PIXEL_DRAWN(pixel2)) m_collision_register |= 0x02;
+				if (S2636_IS_PIXEL_DRAWN(pixel0) && S2636_IS_PIXEL_DRAWN(pixel2)) m_collision_register |= 0x04;
 
-				if (S2636_IS_PIXEL_DRAWN(pixel))
+				/* S2636 vs. background collision detection */
+				if (m_palette->pen_indirect(m_scrolled_collision_background.pix(y, x)))
 				{
-					bitmap.pix16(y, x) = SPRITE_PEN_BASE + S2636_PIXEL_COLOR(pixel);
-
-					/* S2636 vs. S2636 collision detection */
-					if (S2636_IS_PIXEL_DRAWN(pixel0) && S2636_IS_PIXEL_DRAWN(pixel1)) m_collision_register |= 0x01;
-					if (S2636_IS_PIXEL_DRAWN(pixel1) && S2636_IS_PIXEL_DRAWN(pixel2)) m_collision_register |= 0x02;
-					if (S2636_IS_PIXEL_DRAWN(pixel0) && S2636_IS_PIXEL_DRAWN(pixel2)) m_collision_register |= 0x04;
-
-					/* S2636 vs. background collision detection */
-					if (m_palette->pen_indirect(m_scrolled_collision_background.pix16(y, x)))
-					{
-						if (S2636_IS_PIXEL_DRAWN(pixel0)) m_collision_register |= 0x10;
-						if (S2636_IS_PIXEL_DRAWN(pixel1)) m_collision_register |= 0x20;
-						if (S2636_IS_PIXEL_DRAWN(pixel2)) m_collision_register |= 0x40;
-					}
+					if (S2636_IS_PIXEL_DRAWN(pixel0)) m_collision_register |= 0x10;
+					if (S2636_IS_PIXEL_DRAWN(pixel1)) m_collision_register |= 0x20;
+					if (S2636_IS_PIXEL_DRAWN(pixel2)) m_collision_register |= 0x40;
 				}
 			}
 		}
@@ -275,21 +267,18 @@ void cvs_state::cvs_scroll_stars(  )
 void cvs_state::cvs_init_stars(  )
 {
 	int generator = 0;
-	int x, y;
 
 	/* precalculate the star background */
 
 	m_total_stars = 0;
 
-	for (y = 255; y >= 0; y--)
+	for (int y = 255; y >= 0; y--)
 	{
-		for (x = 511; x >= 0; x--)
+		for (int x = 511; x >= 0; x--)
 		{
-			int bit1, bit2;
-
 			generator <<= 1;
-			bit1 = (~generator >> 17) & 1;
-			bit2 = (generator >> 5) & 1;
+			int const bit1 = (~generator >> 17) & 1;
+			int const bit2 = (generator >> 5) & 1;
 
 			if (bit1 ^ bit2)
 				generator |= 1;
@@ -328,8 +317,8 @@ void cvs_state::cvs_update_stars(bitmap_ind16 &bitmap, const rectangle &cliprect
 				y = ~y;
 
 			if ((y >= cliprect.top()) && (y <= cliprect.bottom()) &&
-				(update_always || (m_palette->pen_indirect(bitmap.pix16(y, x)) == 0)))
-				bitmap.pix16(y, x) = star_pen;
+				(update_always || (m_palette->pen_indirect(bitmap.pix(y, x)) == 0)))
+				bitmap.pix(y, x) = star_pen;
 		}
 	}
 }

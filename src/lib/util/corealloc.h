@@ -8,54 +8,24 @@
 
 ***************************************************************************/
 
-#pragma once
-
 #ifndef MAME_LIB_UTIL_COREALLOC_H
 #define MAME_LIB_UTIL_COREALLOC_H
 
+#pragma once
+
 #include "osdcore.h"
 
-#include <cstdlib>
-
 #include <cstddef>
+#include <cstdlib>
 #include <cstring>
-#include <new>
 #include <memory>
+#include <new>
 #include <type_traits>
 #include <utility>
 
 
 
-//**************************************************************************
-//  MACROS
-//**************************************************************************
-
-// global allocation helpers -- use these instead of new and delete
-#define global_alloc(Type)                          new Type
-#define global_alloc_array(Type, Num)               new Type[Num]
-#define global_free(Ptr)                            do { delete Ptr; } while (0)
-#define global_free_array(Ptr)                      do { delete[] Ptr; } while (0)
-
-
-
-template<typename T, typename... Params>
-inline T* global_alloc_clear(Params &&... args)
-{
-	void *const ptr = ::operator new(sizeof(T)); // allocate memory
-	std::memset(ptr, 0, sizeof(T));
-	return new(ptr) T(std::forward<Params>(args)...);
-}
-
-template<typename T>
-inline T* global_alloc_array_clear(std::size_t num)
-{
-	auto const size = sizeof(T) * num;
-	void *const ptr = new unsigned char[size]; // allocate memory
-	std::memset(ptr, 0, size);
-	return new(ptr) T[num]();
-}
-
-
+// global allocation helpers
 
 template<typename Tp> struct MakeUniqClearT { typedef std::unique_ptr<Tp> single_object; };
 

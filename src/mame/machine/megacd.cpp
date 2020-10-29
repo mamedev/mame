@@ -336,6 +336,8 @@ sega_segacd_device::sega_segacd_device(const machine_config &mconfig, device_typ
 	, m_prgram(*this, "prgram")
 	, m_dataram(*this, "dataram")
 	, m_font_bits(*this, "font_bits")
+	, m_red_led(*this, "red_led")
+	, m_green_led(*this, "green_led")
 {
 }
 
@@ -1274,10 +1276,8 @@ void sega_segacd_device::segacd_sub_led_ready_w(offs_t offset, uint16_t data, ui
 		segacd_redled = (data >> 8)&1;
 		segacd_greenled = (data >> 9)&1;
 
-		machine().output().set_value("red_led",segacd_redled ^ 1);
-		machine().output().set_value("green_led",segacd_greenled ^ 1);
-
-		//popmessage("%02x %02x",segacd_greenled,segacd_redled);
+		m_red_led = segacd_redled ^ 1;
+		m_green_led = segacd_greenled ^ 1;
 	}
 }
 
@@ -1473,7 +1473,7 @@ inline uint8_t sega_segacd_device::read_pixel_from_stampmap(bitmap_ind16* srcbit
     if (x >= srcbitmap->width) return 0;
     if (y >= srcbitmap->height) return 0;
 
-    uint16_t* cacheptr = &srcbitmap->pix16(y, x);
+    uint16_t* cacheptr = &srcbitmap->pix(y, x);
 
     return cacheptr[0] & 0xf;
 */
@@ -1730,6 +1730,9 @@ void sega_segacd_device::device_start()
 	subdevice<nvram_device>("backupram")->set_base(&m_backupram[0], 0x2000);
 
 	segacd_4meg_prgbank = 0;
+
+	m_red_led.resolve();
+	m_green_led.resolve();
 
 	space.unmap_readwrite        (0x020000,0x3fffff);
 

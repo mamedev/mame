@@ -614,6 +614,7 @@ pdp1_readtape_image_device::pdp1_readtape_image_device(const machine_config &mco
 	, device_image_interface(mconfig, *this)
 	, m_maincpu(*this, "^maincpu")
 	, m_st_ptr(*this)
+	, m_timer(nullptr)
 {
 }
 
@@ -637,6 +638,7 @@ pdp1_punchtape_image_device::pdp1_punchtape_image_device(const machine_config &m
 	, device_image_interface(mconfig, *this)
 	, m_maincpu(*this, "^maincpu")
 	, m_st_ptp(*this)
+	, m_timer(nullptr)
 {
 }
 
@@ -661,6 +663,7 @@ pdp1_typewriter_device::pdp1_typewriter_device(const machine_config &mconfig, co
 	, m_twr(*this, "^TWR.%u", 0)
 	, m_st_tyo(*this)
 	, m_st_tyi(*this)
+	, m_tyo_timer(nullptr)
 {
 }
 
@@ -673,6 +676,8 @@ void pdp1_typewriter_device::device_resolve_objects()
 void pdp1_typewriter_device::device_start()
 {
 	m_tyo_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pdp1_typewriter_device::tyo_callback),this));
+
+	m_color = m_pos = m_case_shift = 0;
 }
 
 
@@ -1764,7 +1769,7 @@ void pdp1_state::pdp1(machine_config &config)
 	/* external iot handlers.  00, 50 to 56 and 74 are internal to the cpu core. */
 	/* I put a ? when the source is the handbook, since a) I have used the maintenance manual
 	as the primary source (as it goes more into details) b) the handbook and the maintenance
-	manual occasionnally contradict each other. */
+	manual occasionally contradict each other. */
 	/*  (iot)       rpa         rpb         tyo         tyi         ppa         ppb         dpy */
 	/*              spacewar                                                                 */
 	/*                          lag                                             glf?/jsp?   gpl?/gpr?/gcf? */

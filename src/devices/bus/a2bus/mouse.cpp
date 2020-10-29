@@ -299,17 +299,15 @@ void a2bus_mouse_device::mcu_port_c_w(uint8_t data)
 
 template <unsigned AXIS, u8 DIR, u8 CLK> void a2bus_mouse_device::update_axis()
 {
-	// read the axis
+	// read the axis and check for changes
 	const int new_m = m_mousexy[AXIS]->read();
-
-	// did it change?
 	int diff = new_m - m_last[AXIS];
 
 	// check for wrap
 	if (diff > 0x80)
-		diff = 0x100 - diff;
-	if  (diff < -0x80)
-		diff = -0x100 - diff;
+		diff -= 0x100;
+	else if (diff < -0x80)
+		diff += 0x100;
 
 	m_count[AXIS] += diff;
 	m_last[AXIS] = new_m;

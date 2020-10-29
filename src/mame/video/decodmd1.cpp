@@ -261,37 +261,35 @@ void decodmd_type1_device::device_reset()
 uint32_t decodmd_type1_device::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	uint8_t ptr = 0;
-	uint8_t x,y,dot;
-	uint32_t data1,data2,data3,data4;
-	uint32_t col;
 
 	if(m_frameswap)
 		ptr = 0x80;
 
-	for(y=0;y<16;y++)  // scanline
+	for(uint8_t y=0;y<16;y++)  // scanline
 	{
-		for(x=0;x<128;x+=64)
+		for(uint8_t x=0;x<128;x+=64)
 		{
-			data1 = m_pixels[ptr];
-			data2 = m_pixels[ptr+1];
-			data3 = m_pixels[ptr+2];
-			data4 = m_pixels[ptr+3];
-			for(dot=0;dot<64;dot+=2)
+			uint32_t data1 = m_pixels[ptr];
+			uint32_t data2 = m_pixels[ptr+1];
+			uint32_t data3 = m_pixels[ptr+2];
+			uint32_t data4 = m_pixels[ptr+3];
+			for(uint8_t dot=0;dot<64;dot+=2)
 			{
+				uint32_t col;
 				if((data1 & 0x01) != (data3 & 0x01))
 					col = rgb_t(0x7f,0x55,0x00);
 				else if (data1 & 0x01) // both are the same, so either high intensity or none at all
 					col = rgb_t(0xff,0xaa,0x00);
 				else
 					col = rgb_t::black();
-				bitmap.pix32(y,x+dot) = col;
+				bitmap.pix(y,x+dot) = col;
 				if((data2 & 0x01) != (data4 & 0x01))
 					col = rgb_t(0x7f,0x55,0x00);
 				else if (data2 & 0x01) // both are the same, so either high intensity or none at all
 					col = rgb_t(0xff,0xaa,0x00);
 				else
 					col = rgb_t::black();
-				bitmap.pix32(y,x+dot+1) = col;
+				bitmap.pix(y,x+dot+1) = col;
 				data1 >>= 1;
 				data2 >>= 1;
 				data3 >>= 1;

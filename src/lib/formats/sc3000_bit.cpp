@@ -7,10 +7,10 @@
     Cassette code for Sega SC-3000 *.bit files
 
 *********************************************************************/
+#include "sc3000_bit.h"
 
 #include <cassert>
 
-#include "sc3000_bit.h"
 
 /***************************************************************************
     PARAMETERS
@@ -26,9 +26,9 @@
     CassetteModulation sc3000_bit_modulation
 -------------------------------------------------*/
 
-static const struct CassetteModulation sc3000_bit_modulation =
+static const cassette_image::Modulation sc3000_bit_modulation =
 {
-	CASSETTE_MODULATION_SINEWAVE,
+	cassette_image::MODULATION_SINEWAVE,
 	1200.0 - 300, 1200.0, 1200.0 + 300,
 	2400.0 - 600, 2400.0, 2400.0 + 600
 };
@@ -37,9 +37,9 @@ static const struct CassetteModulation sc3000_bit_modulation =
     sc3000_bit_identify - identify cassette
 -------------------------------------------------*/
 
-static cassette_image::error sc3000_bit_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error sc3000_bit_identify(cassette_image *cassette, cassette_image::Options *opts)
 {
-	return cassette_modulation_identify( cassette, &sc3000_bit_modulation, opts);
+	return cassette->modulation_identify(sc3000_bit_modulation, opts);
 }
 
 /*-------------------------------------------------
@@ -48,7 +48,7 @@ static cassette_image::error sc3000_bit_identify(cassette_image *cassette, struc
 
 #define MODULATE(_value) \
 	for (int i = 0; i < (_value ? 2 : 1); i++) { \
-		err = cassette_put_modulated_data_bit(cassette, 0, time_index, _value, &sc3000_bit_modulation, &time_displacement);\
+		err = cassette->put_modulated_data_bit(0, time_index, _value, sc3000_bit_modulation, &time_displacement);\
 		if (err != cassette_image::error::SUCCESS) return err;\
 		time_index += time_displacement;\
 	}
@@ -56,7 +56,7 @@ static cassette_image::error sc3000_bit_identify(cassette_image *cassette, struc
 static cassette_image::error sc3000_bit_load(cassette_image *cassette)
 {
 	cassette_image::error err;
-	uint64_t image_size = cassette_image_size(cassette);
+	uint64_t image_size = cassette->image_size();
 	uint64_t image_pos = 0;
 	double time_index = 0.0;
 	double time_displacement;
@@ -64,7 +64,7 @@ static cassette_image::error sc3000_bit_load(cassette_image *cassette)
 
 	while (image_pos < image_size)
 	{
-		cassette_image_read(cassette, &data, image_pos, 1);
+		cassette->image_read(&data, image_pos, 1);
 
 		switch (data)
 		{
@@ -77,7 +77,7 @@ static cassette_image::error sc3000_bit_load(cassette_image *cassette)
 			break;
 
 		case ' ':
-			err = cassette_put_sample( cassette, 0, time_index, 1/1200.0, 0);
+			err = cassette->put_sample(0, time_index, 1/1200.0, 0);
 			if (err != cassette_image::error::SUCCESS) return err;
 			time_index += 1/1200.0;
 			break;
@@ -93,7 +93,7 @@ static cassette_image::error sc3000_bit_load(cassette_image *cassette)
     CassetteFormat sc3000_bit_cassette_format
 -------------------------------------------------*/
 
-const struct CassetteFormat sc3000_bit_format =
+const cassette_image::Format sc3000_bit_format =
 {
 	"bit",
 	sc3000_bit_identify,

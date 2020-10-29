@@ -183,11 +183,11 @@ SCN2672_DRAW_CHARACTER_MEMBER(pp_state::display_char)
 
 	for (int i = 0; i < 7; i++)
 	{
-		bitmap.pix32(y, x++) = BIT(dots, 7) ? fg : rgb_t::black();
+		bitmap.pix(y, x++) = BIT(dots, 7) ? fg : rgb_t::black();
 		dots <<= 1;
 	}
 	if (!BIT(m_mode, 6))
-		bitmap.pix32(y, x++) = BIT(dots, 7) ? fg : rgb_t::black();
+		bitmap.pix(y, x++) = BIT(dots, 7) ? fg : rgb_t::black();
 }
 
 

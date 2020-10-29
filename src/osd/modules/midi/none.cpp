@@ -17,8 +17,7 @@ class none_module : public osd_module, public midi_module
 {
 public:
 
-	none_module()
-	: osd_module(OSD_MIDI_PROVIDER, "pm"), midi_module()
+	none_module() : osd_module(OSD_MIDI_PROVIDER, "pm"), midi_module()
 	{
 	}
 	virtual ~none_module() { }
@@ -26,7 +25,7 @@ public:
 	virtual int init(const osd_options &options) override;
 	virtual void exit() override;
 
-	virtual osd_midi_device *create_midi_device() override;
+	virtual std::unique_ptr<osd_midi_device> create_midi_device() override;
 	virtual void list_midi_devices() override;
 };
 
@@ -43,9 +42,9 @@ public:
 	virtual void write(uint8_t data) override;
 };
 
-osd_midi_device *none_module::create_midi_device()
+std::unique_ptr<osd_midi_device> none_module::create_midi_device()
 {
-	return global_alloc(osd_midi_device_none());
+	return std::make_unique<osd_midi_device_none>();
 }
 
 

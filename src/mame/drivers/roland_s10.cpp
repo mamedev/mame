@@ -90,13 +90,13 @@ private:
 HD44780_PIXEL_UPDATE(roland_s10_state::lcd_pixel_update)
 {
 	if (x < 5 && y < 8 && line < 2 && pos < 8)
-		bitmap.pix16(y, (line * 8 + pos) * 6 + x) = state;
+		bitmap.pix(y, (line * 8 + pos) * 6 + x) = state;
 }
 
 HD44780_PIXEL_UPDATE(roland_s220_state::lcd_pixel_update)
 {
 	if (x < 5 && y < 8 && line < 2 && pos < 16)
-		bitmap.pix16(line * 8 + y, pos * 6 + x) = state;
+		bitmap.pix(line * 8 + y, pos * 6 + x) = state;
 }
 
 u8 roland_s10_state::qdd_r(offs_t offset)

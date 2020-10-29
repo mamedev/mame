@@ -56,7 +56,43 @@
 
 #include "emu.h"
 
-#include "includes/jazz.h"
+#include "cpu/mips/r4000.h"
+
+ // memory
+#include "machine/ram.h"
+#include "machine/nvram.h"
+#include "machine/28fxxx.h"
+
+// various hardware
+#include "machine/mct_adr.h"
+#include "machine/dp83932c.h"
+#include "machine/mc146818.h"
+#include "machine/ins8250.h"
+#include "machine/ncr5390.h"
+#include "machine/upd765.h"
+#include "machine/at_keybc.h"
+#include "machine/pc_lpt.h"
+#include "machine/i82357.h"
+
+// video
+#include "screen.h"
+#include "video/ims_cvc.h"
+
+// audio
+#include "sound/spkrdev.h"
+#include "speaker.h"
+
+// busses and connectors
+#include "machine/nscsi_bus.h"
+#include "bus/nscsi/cd.h"
+#include "bus/nscsi/hd.h"
+#include "bus/rs232/rs232.h"
+#include "bus/pc_kbd/pc_kbdc.h"
+#include "bus/pc_kbd/keyboards.h"
+
+#include "imagedev/floppy.h"
+#include "formats/pc_dsk.h"
+#include "softlist.h"
 
 #include "debugger.h"
 
@@ -64,6 +100,83 @@
 
 #define VERBOSE 0
 #include "logmacro.h"
+
+namespace {
+
+class jazz_state : public driver_device
+{
+public:
+	jazz_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_cpu(*this, "cpu")
+		, m_ram(*this, "ram")
+		, m_vram(*this, "vram")
+		, m_mct_adr(*this, "mct_adr")
+		, m_scsibus(*this, "scsi")
+		, m_scsi(*this, "scsi:7:ncr53c94")
+		, m_fdc(*this, "fdc")
+		, m_rtc(*this, "rtc")
+		, m_nvram(*this, "nvram")
+		, m_flash(*this, "flash")
+		, m_kbdc(*this, "kbdc")
+		, m_net(*this, "net")
+		, m_screen(*this, "screen")
+		, m_cvc(*this, "g364")
+		, m_ace(*this, "ace%u", 0)
+		, m_lpt(*this, "lpt")
+		, m_isp(*this, "isp")
+		, m_buzzer(*this, "buzzer")
+		, m_softlist(*this, "softlist")
+		, m_led(*this, "led0")
+	{
+	}
+
+protected:
+	// driver_device overrides
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	// address maps
+	void cpu_map(address_map &map);
+	void mct_map(address_map &map);
+
+	// machine config
+	void jazz(machine_config &config);
+
+	void led_w(u8 data);
+
+public:
+	void mmr4000be(machine_config &config);
+	void mmr4000le(machine_config &config);
+
+	void init_common();
+
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
+
+protected:
+	// devices
+	required_device<r4000_device> m_cpu;
+	required_device<ram_device> m_ram;
+	required_device<ram_device> m_vram;
+	required_device<mct_adr_device> m_mct_adr;
+	required_device<nscsi_bus_device> m_scsibus;
+	required_device<ncr53c94_device> m_scsi;
+	required_device<n82077aa_device> m_fdc;
+	required_device<mc146818_device> m_rtc;
+	required_device<nvram_device> m_nvram;
+	required_device<amd_28f020_device> m_flash;
+	required_device<ps2_keyboard_controller_device> m_kbdc;
+	required_device<dp83932c_device> m_net;
+	required_device<screen_device> m_screen;
+	required_device<g364_device> m_cvc;
+	required_device_array<ns16550_device, 2> m_ace;
+	required_device<pc_lpt_device> m_lpt;
+	required_device<i82357_device> m_isp;
+	required_device<speaker_sound_device> m_buzzer;
+	required_device<software_list_device> m_softlist;
+
+	output_finder<> m_led;
+};
 
 void jazz_state::machine_start()
 {
@@ -394,6 +507,8 @@ ROM_START(mmr4000le)
 	// MIPS G364 (5MHz video clock, part number 09-00176)
 	ROM_LOAD64_BYTE("mips_g364.bin", 0x000000, 0x020000, CRC(be6a726e) SHA1(225c198f6a7f8445dac3de052ecceecbb5be6bc7) BAD_DUMP)
 ROM_END
+
+}
 
 /*   YEAR   NAME       PARENT  COMPAT  MACHINE    INPUT  CLASS       INIT         COMPANY  FULLNAME             FLAGS */
 COMP(1992,  mmr4000be, 0,      0,      mmr4000be, 0,     jazz_state, init_common, "MIPS",  "Magnum R4000 (be)", MACHINE_NO_SOUND)

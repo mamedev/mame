@@ -87,7 +87,6 @@ TODO :  This is a partially working driver.  Most of the memory maps for
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/mc6845.h"
 #include "video/tlc34076.h"
 #include "rendlay.h"
@@ -173,20 +172,18 @@ uint32_t vcombat_state::update_screen(screen_device &screen, bitmap_rgb32 &bitma
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		int x;
 		int src_addr = 256/2 * y;
 		const uint16_t *m68k_src = &m68k_buf[src_addr];
 		const uint16_t *i860_src = &i860_buf[src_addr];
-		uint32_t *dst = &bitmap.pix32(y, cliprect.min_x);
+		uint32_t *dst = &bitmap.pix(y, cliprect.min_x);
 
-		for (x = cliprect.min_x; x <= cliprect.max_x; x += 2)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x += 2)
 		{
-			int i;
 			uint16_t m68k_pix = *m68k_src++;
 			uint16_t i860_pix = *i860_src++;
 
 			/* Draw two pixels */
-			for (i = 0; i < 2; ++i)
+			for (int i = 0; i < 2; ++i)
 			{
 				/* Vcombat's screen renders 'flopped' - very likely because VR headset displays may reflect off mirrors.
 				Shadfgtr isn't flopped, so it's not a constant feature of the hardware. */
@@ -602,9 +599,6 @@ void vcombat_state::vcombat(machine_config &config)
 
 	SPEAKER(config, "speaker").front_center();
 	DAC_10BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 
@@ -638,9 +632,6 @@ void vcombat_state::shadfgtr(machine_config &config)
 
 	SPEAKER(config, "speaker").front_center();
 	DAC_10BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 

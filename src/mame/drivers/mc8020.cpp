@@ -263,20 +263,20 @@ static const uint8_t prom[] = {
 
 uint32_t mc8020_state::screen_update_mc8020(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y,ra,chr,gfx;
-	uint16_t sy=0,ma=0,x;
+	u16 sy=0,ma=0;
 
-	for(y = 0; y < 8; y++ )
+	for (u8 y = 0; y < 8; y++ )
 	{
-		for (ra = 0; ra < 16; ra++)
+		for (u8 ra = 0; ra < 16; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			u16 *p = &bitmap.pix(sy++);
 
-			for (x = ma; x < ma + 32; x++)
+			for (u16 x = ma; x < ma + 32; x++)
 			{
+				u8 gfx;
 				if (ra > 3 && ra < 12)
 				{
-					chr = m_p_videoram[x];
+					u8 chr = m_p_videoram[x];
 					gfx = prom[(chr<<3) | (ra-4)];
 				}
 				else

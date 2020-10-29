@@ -259,7 +259,7 @@ MC6845_UPDATE_ROW( tv950_state::crtc_update_row )
 	else
 		m_attr_screen = m_attr_row;
 
-	uint32_t *p = &bitmap.pix32(m_row);
+	uint32_t *p = &bitmap.pix(m_row);
 	rgb_t fg(255,255,255,255);
 	rgb_t bg(0,0,0,0);
 

@@ -507,7 +507,6 @@ void mappy_state::phozon_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cli
 uint32_t mappy_state::screen_update_superpac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap_ind16 &sprite_bitmap = m_sprite_bitmap;
-	int x,y;
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES,0);
 
@@ -519,14 +518,14 @@ uint32_t mappy_state::screen_update_superpac(screen_device &screen, bitmap_ind16
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 1,0);
 
 	/* sprite color 0/1 still has priority over that (ghost eyes in Pac 'n Pal) */
-	for (y = 0;y < sprite_bitmap.height();y++)
+	for (int y = 0;y < sprite_bitmap.height();y++)
 	{
-		for (x = 0;x < sprite_bitmap.width();x++)
+		for (int x = 0;x < sprite_bitmap.width();x++)
 		{
-			int spr_entry = sprite_bitmap.pix16(y, x);
+			int spr_entry = sprite_bitmap.pix(y, x);
 			int spr_pen = m_palette->pen_indirect(spr_entry);
 			if (spr_pen == 0 || spr_pen == 1)
-				bitmap.pix16(y, x) = spr_entry;
+				bitmap.pix(y, x) = spr_entry;
 		}
 	}
 	return 0;

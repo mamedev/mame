@@ -29,6 +29,7 @@
 
 #include "video/mc6845.h"
 
+#include "machine/timer.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -83,11 +84,6 @@ public:
 	void init_mbee256()  { m_features = 0x2d; };
 
 private:
-	enum
-	{
-		TIMER_MBEE_NEWKB
-	};
-
 	void port04_w(uint8_t data);
 	void port06_w(uint8_t data);
 	uint8_t port07_r();
@@ -118,7 +114,7 @@ private:
 	void standard_palette(palette_device &palette) const;
 	void premium_palette(palette_device &palette) const;
 	uint32_t screen_update_mbee(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(timer_newkb);
+	TIMER_DEVICE_CALLBACK_MEMBER(newkb_timer);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_bee);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_bin);
 	WRITE_LINE_MEMBER(rtc_irq_w);
@@ -173,7 +169,6 @@ private:
 	void setup_banks(uint8_t data, bool first_time, uint8_t b_mask);
 	void oldkb_scan(uint16_t param);
 	void oldkb_matrix_r(uint16_t offs);
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
 	required_device<cassette_image_device> m_cassette;

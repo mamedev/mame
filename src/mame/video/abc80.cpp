@@ -128,7 +128,7 @@ void abc80_state::draw_scanline(bitmap_rgb32 &bitmap, int y)
 			color ^= (cursor & m_blink);
 			color &= blank;
 
-			bitmap.pix32(y, x) = m_palette->pen(color);
+			bitmap.pix(y, x) = m_palette->pen(color);
 
 			data <<= 1;
 		}

@@ -81,7 +81,7 @@ void bgfx_chain::process(chain_manager::screen_prim &prim, int view, int screen,
 	screen_device_iterator screen_iterator(window.machine().root_device());
 	screen_device* screen_device = screen_iterator.byindex(screen);
 
-	uint16_t screen_count(window.target()->current_view().screen_count());
+	uint16_t screen_count(window.target()->current_view().visible_screen_count());
 	uint16_t screen_width = prim.m_quad_width;
 	uint16_t screen_height = prim.m_quad_height;
 	uint32_t rotation_type =

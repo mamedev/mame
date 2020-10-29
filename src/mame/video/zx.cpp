@@ -67,7 +67,7 @@ void zx_state::refresh_w(offs_t offset, uint8_t data)
 		if(m_ula_char_buffer & 0x80)
 			pixels = ~pixels;
 		if(x < 384-8 && y < 311) {
-			uint16_t *dest = &m_bitmap_render->pix16(y, x);
+			uint16_t *dest = &m_bitmap_render->pix(y, x);
 			for(int i=0; i<8; i++)
 				*dest++ |= pixels & (0x80 >> i) ? 1 : 0;
 		}

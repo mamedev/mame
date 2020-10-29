@@ -146,6 +146,12 @@ void nsm_state::nsm(machine_config &config)
 /*-------------------------------------------------------------------
 / Cosmic Flash (1985)
 /-------------------------------------------------------------------*/
+ROM_START(cosflnsm)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("ic602.bin", 0x0000, 0x2000, CRC(1ce79cd7) SHA1(d5caf6d4323cc43a9c4379b51630190bf5799202))
+	ROM_LOAD("ic603.bin", 0x2000, 0x2000, CRC(538de9f8) SHA1(c64942ffa600a2a7a37b986e1a346d351d0b65eb))
+	ROM_LOAD("ic604.bin", 0x4000, 0x2000, CRC(4b52e5d7) SHA1(1547bb7a06ff0bdf55c635b2f4e57b7d93a191ee))
+ROM_END
 
 /*-------------------------------------------------------------------
 / Hot Fire Birds (1985)
@@ -164,5 +170,13 @@ ROM_END
 /*-------------------------------------------------------------------
 / The Games (1985)
 /-------------------------------------------------------------------*/
+ROM_START(gamesnsm)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("151595-602.bin", 0x0000, 0x2000, CRC(18f3e309) SHA1(f587d40ddf128f4e040e660c054e98cbebad99c7))
+	ROM_LOAD("151596-603.bin", 0x2000, 0x2000, CRC(fdf1b48b) SHA1(fd63ef5e49aa4b84b10972e118bd54219d680d36))
+	ROM_LOAD("151597-604.bin", 0x4000, 0x2000, CRC(5c8a3547) SHA1(843a56012227a61ff068bc1e14baf090d4a95fe1))
+ROM_END
 
-GAME(1985,  firebird,  0,  nsm,  nsm, nsm_state, empty_init, ROT0, "NSM", "Hot Fire Birds", MACHINE_NOT_WORKING | MACHINE_MECHANICAL)
+GAME(1985,  cosflnsm,  0,  nsm,  nsm, nsm_state, empty_init, ROT0, "NSM", "Cosmic Flash (NSM)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL)
+GAME(1985,  firebird,  0,  nsm,  nsm, nsm_state, empty_init, ROT0, "NSM", "Hot Fire Birds",     MACHINE_NOT_WORKING | MACHINE_MECHANICAL)
+GAME(1985,  gamesnsm,  0,  nsm,  nsm, nsm_state, empty_init, ROT0, "NSM", "The Games (NSM)",    MACHINE_NOT_WORKING | MACHINE_MECHANICAL)

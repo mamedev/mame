@@ -329,16 +329,16 @@ void video_manager::save_snapshot(screen_device *screen, emu_file &file)
 	// add two text entries describing the image
 	std::string text1 = std::string(emulator_info::get_appname()).append(" ").append(emulator_info::get_build_version());
 	std::string text2 = std::string(machine().system().manufacturer).append(" ").append(machine().system().type.fullname());
-	png_info pnginfo;
+	util::png_info pnginfo;
 	pnginfo.add_text("Software", text1.c_str());
 	pnginfo.add_text("System", text2.c_str());
 
 	// now do the actual work
 	const rgb_t *palette = (screen != nullptr && screen->has_palette()) ? screen->palette().palette()->entry_list_adjusted() : nullptr;
 	int entries = (screen != nullptr && screen->has_palette()) ? screen->palette().entries() : 0;
-	png_error error = png_write_bitmap(file, &pnginfo, m_snap_bitmap, entries, palette);
-	if (error != PNGERR_NONE)
-		osd_printf_error("Error generating PNG for snapshot: png_error = %d\n", error);
+	util::png_error error = util::png_write_bitmap(file, &pnginfo, m_snap_bitmap, entries, palette);
+	if (error != util::png_error::NONE)
+		osd_printf_error("Error generating PNG for snapshot: png_error = %d\n", std::underlying_type_t<util::png_error>(error));
 }
 
 
@@ -1075,9 +1075,9 @@ void video_manager::create_snapshot_bitmap(screen_device *screen)
 	render_primitive_list &primlist = m_snap_target->get_primitives();
 	primlist.acquire_lock();
 	if (machine().options().snap_bilinear())
-		snap_renderer_bilinear::draw_primitives(primlist, &m_snap_bitmap.pix32(0), width, height, m_snap_bitmap.rowpixels());
+		snap_renderer_bilinear::draw_primitives(primlist, &m_snap_bitmap.pix(0), width, height, m_snap_bitmap.rowpixels());
 	else
-		snap_renderer::draw_primitives(primlist, &m_snap_bitmap.pix32(0), width, height, m_snap_bitmap.rowpixels());
+		snap_renderer::draw_primitives(primlist, &m_snap_bitmap.pix(0), width, height, m_snap_bitmap.rowpixels());
 	primlist.release_lock();
 }
 

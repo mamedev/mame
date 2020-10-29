@@ -246,12 +246,12 @@ void hp48_state::update_annunciators()
 	   bit 7: master enable
 	*/
 	int markers = HP48_IO_8(0xb);
-	output().set_value( "lshift0",   (markers & 0x81) == 0x81 );
-	output().set_value( "rshift0",   (markers & 0x82) == 0x82 );
-	output().set_value( "alpha0",    (markers & 0x84) == 0x84 );
-	output().set_value( "alert0",    (markers & 0x88) == 0x88 );
-	output().set_value( "busy0",     (markers & 0x90) == 0x90 );
-	output().set_value( "transmit0", (markers & 0xb0) == 0xb0 );
+	m_lshift0   = (markers & 0x81) == 0x81;
+	m_rshift0   = (markers & 0x82) == 0x82;
+	m_alpha0    = (markers & 0x84) == 0x84;
+	m_alert0    = (markers & 0x88) == 0x88;
+	m_busy0     = (markers & 0x90) == 0x90;
+	m_transmit0 = (markers & 0xb0) == 0xb0;
 }
 
 
@@ -994,6 +994,13 @@ void hp48_state::base_machine_start(hp48_models model)
 	/* 1ms keyboard polling */
 	m_kbd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hp48_state::kbd_cb), this));
 	m_kbd_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
+
+	m_lshift0.resolve();
+	m_rshift0.resolve();
+	m_alpha0.resolve();
+	m_alert0.resolve();
+	m_busy0.resolve();
+	m_transmit0.resolve();
 
 	/* save state */
 	save_item(NAME(m_out));

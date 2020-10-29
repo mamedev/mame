@@ -515,55 +515,37 @@ inline void mos6566_device::draw_background()
 
 inline void mos6566_device::draw_mono( uint16_t p, uint8_t c0, uint8_t c1 )
 {
-	uint8_t c[2];
+	uint8_t const c[2] = { c0, c1 };
 	uint8_t data = m_gfx_data;
 
-	c[0] = c0;
-	c[1] = c1;
-
-	m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + 7) = PALETTE_MOS[c[data & 1]];
-	m_fore_coll_buf[p + 7] = data & 1; data >>= 1;
-	m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + 6) = PALETTE_MOS[c[data & 1]];
-	m_fore_coll_buf[p + 6] = data & 1; data >>= 1;
-	m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + 5) = PALETTE_MOS[c[data & 1]];
-	m_fore_coll_buf[p + 5] = data & 1; data >>= 1;
-	m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + 4) = PALETTE_MOS[c[data & 1]];
-	m_fore_coll_buf[p + 4] = data & 1; data >>= 1;
-	m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + 3) = PALETTE_MOS[c[data & 1]];
-	m_fore_coll_buf[p + 3] = data & 1; data >>= 1;
-	m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + 2) = PALETTE_MOS[c[data & 1]];
-	m_fore_coll_buf[p + 2] = data & 1; data >>= 1;
-	m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + 1) = PALETTE_MOS[c[data & 1]];
-	m_fore_coll_buf[p + 1] = data & 1; data >>= 1;
-	m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + 0) = PALETTE_MOS[c[data]];
-	m_fore_coll_buf[p + 0] = data & 1;
+	for (unsigned i = 0; i < 8; i++)
+	{
+		m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + 7 - i) = PALETTE_MOS[c[data & 1]];
+		m_fore_coll_buf[p + 7 - i] = data & 1;
+		data >>= 1;
+	}
 }
 
 inline void mos6566_device::draw_multi( uint16_t p, uint8_t c0, uint8_t c1, uint8_t c2, uint8_t c3 )
 {
-	uint8_t c[4];
+	uint8_t const c[4] = { c0, c1, c2, c3 };
 	uint8_t data = m_gfx_data;
 
-	c[0] = c0;
-	c[1] = c1;
-	c[2] = c2;
-	c[3] = c3;
-
-	m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + 7) = PALETTE_MOS[c[data & 3]];
+	m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + 7) = PALETTE_MOS[c[data & 3]];
 	m_fore_coll_buf[p + 7] = data & 2;
-	m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + 6) = PALETTE_MOS[c[data & 3]];
+	m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + 6) = PALETTE_MOS[c[data & 3]];
 	m_fore_coll_buf[p + 6] = data & 2; data >>= 2;
-	m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + 5) = PALETTE_MOS[c[data & 3]];
+	m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + 5) = PALETTE_MOS[c[data & 3]];
 	m_fore_coll_buf[p + 5] = data & 2;
-	m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + 4) = PALETTE_MOS[c[data & 3]];
+	m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + 4) = PALETTE_MOS[c[data & 3]];
 	m_fore_coll_buf[p + 4] = data & 2; data >>= 2;
-	m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + 3) = PALETTE_MOS[c[data & 3]];
+	m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + 3) = PALETTE_MOS[c[data & 3]];
 	m_fore_coll_buf[p + 3] = data & 2;
-	m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + 2) = PALETTE_MOS[c[data & 3]];
+	m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + 2) = PALETTE_MOS[c[data & 3]];
 	m_fore_coll_buf[p + 2] = data & 2; data >>= 2;
-	m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + 1) = PALETTE_MOS[c[data]];
+	m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + 1) = PALETTE_MOS[c[data]];
 	m_fore_coll_buf[p + 1] = data & 2;
-	m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + 0) = PALETTE_MOS[c[data]];
+	m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + 0) = PALETTE_MOS[c[data]];
 	m_fore_coll_buf[p + 0] = data & 2;
 }
 
@@ -2078,57 +2060,23 @@ void mos6566_device::draw_graphics()
 				draw_mono(p, tmp_col, m_color_data & 0x0f);
 				break;
 			case 5:
-				m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + 7) = PALETTE_MOS[0];
-				m_fore_coll_buf[p + 7] = 0;
-				m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + 6) = PALETTE_MOS[0];
-				m_fore_coll_buf[p + 6] = 0;
-				m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + 5) = PALETTE_MOS[0];
-				m_fore_coll_buf[p + 5] = 0;
-				m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + 4) = PALETTE_MOS[0];
-				m_fore_coll_buf[p + 4] = 0;
-				m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + 3) = PALETTE_MOS[0];
-				m_fore_coll_buf[p + 3] = 0;
-				m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + 2) = PALETTE_MOS[0];
-				m_fore_coll_buf[p + 2] = 0;
-				m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + 1) = PALETTE_MOS[0];
-				m_fore_coll_buf[p + 1] = 0;
-				m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + 0) = PALETTE_MOS[0];
-				m_fore_coll_buf[p + 0] = 0;
-				break;
 			case 6:
-				m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + 7) = PALETTE_MOS[0];
-				m_fore_coll_buf[p + 7] = 0;
-				m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + 6) = PALETTE_MOS[0];
-				m_fore_coll_buf[p + 6] = 0;
-				m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + 5) = PALETTE_MOS[0];
-				m_fore_coll_buf[p + 5] = 0;
-				m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + 4) = PALETTE_MOS[0];
-				m_fore_coll_buf[p + 4] = 0;
-				m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + 3) = PALETTE_MOS[0];
-				m_fore_coll_buf[p + 3] = 0;
-				m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + 2) = PALETTE_MOS[0];
-				m_fore_coll_buf[p + 2] = 0;
-				m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + 1) = PALETTE_MOS[0];
-				m_fore_coll_buf[p + 1] = 0;
-				m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + 0) = PALETTE_MOS[0];
-				m_fore_coll_buf[p + 0] = 0;
-				break;
 			case 7:
-				m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + 7) = PALETTE_MOS[0];
+				m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + 7) = PALETTE_MOS[0];
 				m_fore_coll_buf[p + 7] = 0;
-				m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + 6) = PALETTE_MOS[0];
+				m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + 6) = PALETTE_MOS[0];
 				m_fore_coll_buf[p + 6] = 0;
-				m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + 5) = PALETTE_MOS[0];
+				m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + 5) = PALETTE_MOS[0];
 				m_fore_coll_buf[p + 5] = 0;
-				m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + 4) = PALETTE_MOS[0];
+				m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + 4) = PALETTE_MOS[0];
 				m_fore_coll_buf[p + 4] = 0;
-				m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + 3) = PALETTE_MOS[0];
+				m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + 3) = PALETTE_MOS[0];
 				m_fore_coll_buf[p + 3] = 0;
-				m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + 2) = PALETTE_MOS[0];
+				m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + 2) = PALETTE_MOS[0];
 				m_fore_coll_buf[p + 2] = 0;
-				m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + 1) = PALETTE_MOS[0];
+				m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + 1) = PALETTE_MOS[0];
 				m_fore_coll_buf[p + 1] = 0;
-				m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + 0) = PALETTE_MOS[0];
+				m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + 0) = PALETTE_MOS[0];
 				m_fore_coll_buf[p + 0] = 0;
 				break;
 		}
@@ -2203,12 +2151,12 @@ void mos6566_device::draw_sprites()
 							if (SPRITE_PRIORITY(snum))
 							{
 								if (m_fore_coll_buf[p + i] == 0)
-									m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + i) = PALETTE_MOS[col];
+									m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + i) = PALETTE_MOS[col];
 								m_spr_coll_buf[p + i] = sbit;
 							}
 							else
 							{
-								m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + i) = PALETTE_MOS[col];
+								m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + i) = PALETTE_MOS[col];
 								m_spr_coll_buf[p + i] = sbit;
 							}
 						}
@@ -2251,12 +2199,12 @@ void mos6566_device::draw_sprites()
 							if (SPRITE_PRIORITY(snum))
 							{
 								if (m_fore_coll_buf[p + i] == 0)
-									m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + i) = PALETTE_MOS[col];
+									m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + i) = PALETTE_MOS[col];
 								m_spr_coll_buf[p + i] = sbit;
 							}
 							else
 							{
-								m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + i) = PALETTE_MOS[col];
+								m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + i) = PALETTE_MOS[col];
 								m_spr_coll_buf[p + i] = sbit;
 							}
 						}
@@ -2282,12 +2230,12 @@ void mos6566_device::draw_sprites()
 								if (SPRITE_PRIORITY(snum))
 								{
 									if (m_fore_coll_buf[p + i] == 0)
-										m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + i) = PALETTE_MOS[color];
+										m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + i) = PALETTE_MOS[color];
 									m_spr_coll_buf[p + i] = sbit;
 								}
 								else
 								{
-									m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + i) = PALETTE_MOS[color];
+									m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + i) = PALETTE_MOS[color];
 									m_spr_coll_buf[p + i] = sbit;
 								}
 							}
@@ -2308,12 +2256,12 @@ void mos6566_device::draw_sprites()
 								if (SPRITE_PRIORITY(snum))
 								{
 									if (m_fore_coll_buf[p + i] == 0)
-										m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + i) = PALETTE_MOS[color];
+										m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + i) = PALETTE_MOS[color];
 									m_spr_coll_buf[p + i] = sbit;
 								}
 								else
 								{
-									m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + i) = PALETTE_MOS[color];
+									m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + i) = PALETTE_MOS[color];
 									m_spr_coll_buf[p + i] = sbit;
 								}
 							}
@@ -2363,12 +2311,12 @@ void mos6566_device::draw_sprites()
 							if (SPRITE_PRIORITY(snum))
 							{
 								if (m_fore_coll_buf[p + i] == 0)
-									m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + i) = PALETTE_MOS[col];
+									m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + i) = PALETTE_MOS[col];
 								m_spr_coll_buf[p + i] = sbit;
 							}
 							else
 							{
-								m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + i) = PALETTE_MOS[col];
+								m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + i) = PALETTE_MOS[col];
 								m_spr_coll_buf[p + i] = sbit;
 							}
 						}
@@ -2393,12 +2341,12 @@ void mos6566_device::draw_sprites()
 								if (SPRITE_PRIORITY(snum))
 								{
 									if (m_fore_coll_buf[p + i] == 0)
-										m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + i) = PALETTE_MOS[color];
+										m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + i) = PALETTE_MOS[color];
 									m_spr_coll_buf[p + i] = sbit;
 								}
 								else
 								{
-									m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + i) = PALETTE_MOS[color];
+									m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + i) = PALETTE_MOS[color];
 									m_spr_coll_buf[p + i] = sbit;
 								}
 							}

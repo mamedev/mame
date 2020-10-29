@@ -370,7 +370,7 @@ void k057714_device::draw_frame(int frame, bitmap_ind16 &bitmap, const rectangle
 
 	for (int j = 0; j < height; j++)
 	{
-		uint16_t *d = &bitmap.pix16(j + m_frame[frame].y, m_frame[frame].x);
+		uint16_t *const d = &bitmap.pix(j + m_frame[frame].y, m_frame[frame].x);
 		int li = (j * fb_pitch);
 		for (int i = 0; i < width; i++)
 		{

@@ -707,8 +707,8 @@ inline void cps3_state::cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle 
 					{
 						for (int y = sy; y < ey; y++)
 						{
-							const u8 *source = source_base + (y_index>>16) * gfx->rowbytes();
-							u32 *dest = &dest_bmp.pix32(y);
+							u8 const *const source = source_base + (y_index>>16) * gfx->rowbytes();
+							u32 *const dest = &dest_bmp.pix(y);
 
 							int x_index = x_index_base;
 							for (int x = sx; x < ex; x++)
@@ -723,8 +723,8 @@ inline void cps3_state::cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle 
 					{
 						for (int y = sy; y < ey; y++)
 						{
-							const u8 *source = source_base + (y_index>>16) * gfx->rowbytes();
-							u32 *dest = &dest_bmp.pix32(y);
+							u8 const *const source = source_base + (y_index>>16) * gfx->rowbytes();
+							u32 *const dest = &dest_bmp.pix(y);
 
 							int x_index = x_index_base;
 							for (int x = sx; x < ex; x++)
@@ -740,8 +740,8 @@ inline void cps3_state::cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle 
 					{
 						for (int y = sy; y < ey; y++)
 						{
-							const u8 *source = source_base + (y_index>>16) * gfx->rowbytes();
-							u32 *dest = &dest_bmp.pix32(y);
+							u8 const *const source = source_base + (y_index>>16) * gfx->rowbytes();
+							u32 *const dest = &dest_bmp.pix(y);
 
 							int x_index = x_index_base;
 							for (int x = sx; x < ex; x++)
@@ -757,8 +757,8 @@ inline void cps3_state::cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle 
 					{
 						for (int y = sy; y < ey; y++)
 						{
-							const u8 *source = source_base + (y_index>>16) * gfx->rowbytes();
-							u32 *dest = &dest_bmp.pix32(y);
+							u8 const *const source = source_base + (y_index>>16) * gfx->rowbytes();
+							u32 *const dest = &dest_bmp.pix(y);
 
 							int x_index = x_index_base;
 							for (int x = sx; x < ex; x++)
@@ -1288,8 +1288,8 @@ u32 cps3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 		/* copy render bitmap without zoom */
 		for (u32 rendery = cliprect.top(); rendery <= cliprect.bottom(); rendery++)
 		{
-			u32* dstbitmap = &bitmap.pix32(rendery);
-			u32* srcbitmap = &m_renderbuffer_bitmap.pix32(rendery);
+			u32 *const dstbitmap = &bitmap.pix(rendery);
+			u32 const *const srcbitmap = &m_renderbuffer_bitmap.pix(rendery);
 
 			for (u32 renderx = cliprect.left(); renderx <= cliprect.right(); renderx++)
 			{
@@ -1303,8 +1303,8 @@ u32 cps3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 		u32 srcy = cliprect.top() * fszy;
 		for (u32 rendery = cliprect.top(); rendery <= cliprect.bottom(); rendery++)
 		{
-			u32* dstbitmap = &bitmap.pix32(rendery);
-			u32* srcbitmap = &m_renderbuffer_bitmap.pix32(srcy >> 16);
+			u32 *const dstbitmap = &bitmap.pix(rendery);
+			u32 const *const srcbitmap = &m_renderbuffer_bitmap.pix(srcy >> 16);
 			u32 srcx = cliprect.left() * fszx;
 
 			for (u32 renderx = cliprect.left(); renderx <= cliprect.right(); renderx++)

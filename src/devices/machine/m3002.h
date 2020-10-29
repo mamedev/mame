@@ -37,6 +37,8 @@ public:
 	// device type constructor
 	m3002_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	auto irq_out() { return m_irq_callback.bind(); }
+
 	// 4-bit read/write handlers
 	u8 read();
 	void write(u8 data);

@@ -146,7 +146,7 @@ namespace devices
 		, m_CLK(*this, "CLK", NETLIB_DELEGATE(clk))
 		, m_clk_old(*this, "m_clk_old", false)
 		, m_Q(*this, {"Q1", "Q2", "Q3", "Q4"})
-		, m_CO(*this, "CO", 0)
+		, m_CO(*this, "CO", false)
 		, m_cnt(*this, "m_cnt", 0)
 		, m_power_pins(*this)
 		{

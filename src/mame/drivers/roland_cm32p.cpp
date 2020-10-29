@@ -333,20 +333,19 @@ cm32p_state::cm32p_state(const machine_config &mconfig, device_type type, const 
 // screen update function from Roland D-110
 uint32_t cm32p_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	u8 y,ra,gfx;
-	uint16_t sy=0,x;
-	const u8 *data = lcd->render();
+	u16 sy=0;
+	u8 const *const data = lcd->render();
 	bitmap.fill(0);
 
-	for (y = 0; y < 2; y++)
+	for (u8 y = 0; y < 2; y++)
 	{
-		for (ra = 0; ra < 9; ra++)
+		for (u8 ra = 0; ra < 9; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			u16 *p = &bitmap.pix(sy++);
 
-			for (x = 0; x < 16; x++)
+			for (u16 x = 0; x < 16; x++)
 			{
-				gfx = 0;
+				u8 gfx = 0;
 				if (ra < 8)
 					gfx = data[x*16 + y*640 + ra];
 

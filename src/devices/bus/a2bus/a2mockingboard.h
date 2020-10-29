@@ -97,6 +97,8 @@ protected:
 	required_device<ay8913_device> m_ay4;
 
 private:
+	void set_clocks();
+
 	bool m_native;
 };
 

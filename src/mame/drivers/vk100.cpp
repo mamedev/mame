@@ -179,7 +179,14 @@ public:
 		//m_sync_timer(nullptr),
 
 		m_capsshift(*this, "CAPSSHIFT"),
-		m_dipsw(*this, "SWITCHES")
+		m_dipsw(*this, "SWITCHES"),
+		m_online_led(*this, "online_led"),
+		m_local_led(*this, "local_led"),
+		m_noscroll_led(*this, "noscroll_led"),
+		m_basic_led(*this, "basic_led"),
+		m_hardcopy_led(*this, "hardcopy_led"),
+		m_l1_led(*this, "l1_led"),
+		m_l2_led(*this, "l2_led")
 	{
 	}
 
@@ -203,6 +210,14 @@ private:
 
 	required_ioport m_capsshift;
 	required_ioport m_dipsw;
+
+	output_finder<> m_online_led;
+	output_finder<> m_local_led;
+	output_finder<> m_noscroll_led;
+	output_finder<> m_basic_led;
+	output_finder<> m_hardcopy_led;
+	output_finder<> m_l1_led;
+	output_finder<> m_l2_led;
 
 	uint8_t* m_vram;
 	uint8_t* m_trans;
@@ -556,13 +571,13 @@ void vk100_state::vgEX(offs_t offset, uint8_t data)
 /* port 0x68: "KBDW" d7 is beeper, d6 is keyclick, d5-d0 are keyboard LEDS */
 void vk100_state::KBDW(uint8_t data)
 {
-	output().set_value("online_led",BIT(data, 5) ? 1 : 0);
-	output().set_value("local_led", BIT(data, 5) ? 0 : 1);
-	output().set_value("noscroll_led",BIT(data, 4) ? 1 : 0);
-	output().set_value("basic_led", BIT(data, 3) ? 1 : 0);
-	output().set_value("hardcopy_led", BIT(data, 2) ? 1 : 0);
-	output().set_value("l1_led", BIT(data, 1) ? 1 : 0);
-	output().set_value("l2_led", BIT(data, 0) ? 1 : 0);
+	m_online_led = BIT(data, 5) ? 1 : 0;
+	m_local_led = BIT(data, 5) ? 0 : 1;
+	m_noscroll_led = BIT(data, 4) ? 1 : 0;
+	m_basic_led = BIT(data, 3) ? 1 : 0;
+	m_hardcopy_led = BIT(data, 2) ? 1 : 0;
+	m_l1_led = BIT(data, 1) ? 1 : 0;
+	m_l2_led = BIT(data, 0) ? 1 : 0;
 #ifdef LED_VERBOSE
 	if (BIT(data, 6)) logerror("kb keyclick bit 6 set: not emulated yet (multivibrator)!\n");
 #endif
@@ -923,13 +938,21 @@ INPUT_PORTS_END
 
 void vk100_state::machine_start()
 {
-	output().set_value("online_led",1);
-	output().set_value("local_led", 0);
-	output().set_value("noscroll_led",1);
-	output().set_value("basic_led", 1);
-	output().set_value("hardcopy_led", 1);
-	output().set_value("l1_led", 1);
-	output().set_value("l2_led", 1);
+	m_online_led.resolve();
+	m_local_led.resolve();
+	m_noscroll_led.resolve();
+	m_basic_led.resolve();
+	m_hardcopy_led.resolve();
+	m_l1_led.resolve();
+	m_l2_led.resolve();
+
+	m_online_led = 1;
+	m_local_led = 0;
+	m_noscroll_led = 1;
+	m_basic_led = 1;
+	m_hardcopy_led = 1;
+	m_l1_led = 1;
+	m_l2_led = 1;
 	m_vsync = 0;
 	m_dir_a6 = 1;
 	m_cout = 0;
@@ -1025,7 +1048,7 @@ MC6845_UPDATE_ROW( vk100_state::crtc_update_row )
 		// display a 12-bit wide chunk
 		for (int j = 0; j < 12; j++)
 		{
-			bitmap.pix32(y, (12*i)+j) = (((block&(0x0001<<j))?1:0)^(m_vgSOPS&1))?fgColor:bgColor;
+			bitmap.pix(y, (12*i)+j) = (((block&(0x0001<<j))?1:0)^(m_vgSOPS&1))?fgColor:bgColor;
 		}
 	}
 }

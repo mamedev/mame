@@ -77,7 +77,7 @@ MC6845_UPDATE_ROW( vic20_video_pak_device::crtc_update_row )
 			int x = (column * 8) + bit;
 			int color = BIT(data, 7) && de;
 
-			bitmap.pix32(vbp + y, hbp + x) = pen[color];
+			bitmap.pix(vbp + y, hbp + x) = pen[color];
 
 			data <<= 1;
 		}

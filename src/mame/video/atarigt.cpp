@@ -486,9 +486,6 @@ uint32_t atarigt_state::screen_update_atarigt(screen_device &screen, bitmap_rgb3
 {
 	bitmap_ind16 &mo_bitmap = m_rle->vram(0);
 	bitmap_ind16 &tm_bitmap = m_rle->vram(1);
-	uint16_t *cram, *tram;
-	int color_latch;
-	int x, y;
 
 	/* draw the playfield */
 	m_playfield_tilemap->draw(screen, m_pf_bitmap, cliprect, 0, 0);
@@ -497,32 +494,31 @@ uint32_t atarigt_state::screen_update_atarigt(screen_device &screen, bitmap_rgb3
 	m_alpha_tilemap->draw(screen, m_an_bitmap, cliprect, 0, 0);
 
 	/* cache pointers */
-	color_latch = m_colorram[0x30000>>1];
-	cram = (uint16_t *)&m_colorram[0x00000>>1] + ((color_latch & 0x08) << 10);
-	tram = (uint16_t *)&m_colorram[0x20000>>1] + ((color_latch & 0x30) << 8);
-	const pen_t *mram = &m_palette->pens()[(color_latch & 0xc0) << 7];
+	int const color_latch = m_colorram[0x30000>>1];
+	uint16_t const *const cram = (uint16_t *)&m_colorram[0x00000>>1] + ((color_latch & 0x08) << 10);
+	uint16_t const *const tram = (uint16_t *)&m_colorram[0x20000>>1] + ((color_latch & 0x30) << 8);
+	pen_t const *const mram = &m_palette->pens()[(color_latch & 0xc0) << 7];
 
 	/* now do the nasty blend */
-	for (y = cliprect.top(); y <= cliprect.bottom(); y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		uint16_t *an = &m_an_bitmap.pix16(y);
-		uint16_t *pf = &m_pf_bitmap.pix16(y);
-		uint16_t *mo = &mo_bitmap.pix16(y);
-		uint16_t *tm = &tm_bitmap.pix16(y);
-		uint32_t *dst = &bitmap.pix32(y);
+		uint16_t const *const an = &m_an_bitmap.pix(y);
+		uint16_t const *const pf = &m_pf_bitmap.pix(y);
+		uint16_t const *const mo = &mo_bitmap.pix(y);
+		uint16_t const *const tm = &tm_bitmap.pix(y);
+		uint32_t *const dst = &bitmap.pix(y);
 
 		/* Primal Rage: no TRAM, slightly different priorities */
 		if (m_is_primrage)
 		{
-			for (x = cliprect.left(); x <= cliprect.right(); x++)
+			for (int x = cliprect.left(); x <= cliprect.right(); x++)
 			{
 				uint8_t pfpri = (pf[x] >> 10) & 7;
 				uint8_t mopri = mo[x] >> ATARIRLE_PRIORITY_SHIFT;
 				uint8_t mgep = (mopri >= pfpri) && !(pfpri & 4);
-				uint16_t cra;
-				uint32_t rgb;
 
 				/* compute CRA -- unlike T-Mek, MVID11 enforces MO priority and is ignored */
+				uint16_t cra;
 				if (an[x] & 0x8f)
 					cra = an[x] & 0xff;
 				else if ((mo[x] & 0x3f) && ((mo[x] & 0x800) || mgep || !(pf[x] & 0x3f)))
@@ -532,6 +528,7 @@ uint32_t atarigt_state::screen_update_atarigt(screen_device &screen, bitmap_rgb3
 				cra = cram[cra];
 
 				/* compute the result */
+				uint32_t rgb;
 				rgb  = mram[((cra >> 10) & 0x01f)] & 0xff0000;
 				rgb |= mram[((cra >>  5) & 0x01f)] & 0x00ff00;
 				rgb |= mram[((cra >>  0) & 0x01f)] & 0x0000ff;
@@ -548,16 +545,14 @@ uint32_t atarigt_state::screen_update_atarigt(screen_device &screen, bitmap_rgb3
 		/* T-Mek: full TRAM and all effects */
 		else
 		{
-			for (x = cliprect.left(); x <= cliprect.right(); x++)
+			for (int x = cliprect.left(); x <= cliprect.right(); x++)
 			{
-				uint8_t pfpri = (pf[x] >> 10) & 7;
-				uint8_t mopri = mo[x] >> ATARIRLE_PRIORITY_SHIFT;
-				uint8_t mgep = (mopri >= pfpri) && !(pfpri & 4);
-				int no_tra = 0, no_cra = 0;
-				uint16_t cra, tra, mra;
-				uint32_t rgb;
+				uint8_t const pfpri = (pf[x] >> 10) & 7;
+				uint8_t const mopri = mo[x] >> ATARIRLE_PRIORITY_SHIFT;
+				uint8_t const mgep = (mopri >= pfpri) && !(pfpri & 4);
 
 				/* compute CRA/TRA */
+				uint16_t cra, tra;
 				if (an[x] & 0x8f)
 				{
 					cra = an[x] & 0xff;
@@ -577,9 +572,10 @@ uint32_t atarigt_state::screen_update_atarigt(screen_device &screen, bitmap_rgb3
 				tra = tram[tra];
 
 				/* compute MRA */
-				mra = (tm[x] & 0xe00) << 1;
+				uint16_t const mra = (tm[x] & 0xe00) << 1;
 
 				/* turn off CRA/TRA as appropriate */
+				int no_tra = 0, no_cra = 0;
 				if (!(pf[x] & 0x1000) && (tra & 0x8000))
 					no_cra = 1;
 				if (!(!(cra & 0x8000) && (!(pf[x] & 0x1000) || !(pf[x] & 0x3f))))
@@ -590,6 +586,7 @@ uint32_t atarigt_state::screen_update_atarigt(screen_device &screen, bitmap_rgb3
 					tra = 0;
 
 				/* compute the result */
+				uint32_t rgb;
 				rgb  = mram[mra | ((cra >> 10) & 0x01f) | ((tra >> 5) & 0x3e0)] & 0xff0000;
 				rgb |= mram[mra | ((cra >>  5) & 0x01f) | ((tra >> 0) & 0x3e0)] & 0x00ff00;
 				rgb |= mram[mra | ((cra >>  0) & 0x01f) | ((tra << 5) & 0x3e0)] & 0x0000ff;

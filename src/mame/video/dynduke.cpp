@@ -164,9 +164,6 @@ void dynduke_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clipr
 {
 	/* The transparency / palette handling on the background layer is very strange */
 	bitmap_ind16 &bm = m_bg_layer->pixmap();
-	int scrolly, scrollx;
-	int x,y;
-
 	/* if we're disabled, don't draw */
 	if (!m_back_enable)
 	{
@@ -174,8 +171,8 @@ void dynduke_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clipr
 		return;
 	}
 
-	scrolly = ((m_scroll_ram[0x01]&0x30)<<4)+((m_scroll_ram[0x02]&0x7f)<<1)+((m_scroll_ram[0x02]&0x80)>>7);
-	scrollx = ((m_scroll_ram[0x09]&0x30)<<4)+((m_scroll_ram[0x0a]&0x7f)<<1)+((m_scroll_ram[0x0a]&0x80)>>7);
+	int scrolly = ((m_scroll_ram[0x01]&0x30)<<4)+((m_scroll_ram[0x02]&0x7f)<<1)+((m_scroll_ram[0x02]&0x80)>>7);
+	int scrollx = ((m_scroll_ram[0x09]&0x30)<<4)+((m_scroll_ram[0x0a]&0x7f)<<1)+((m_scroll_ram[0x0a]&0x80)>>7);
 
 	if (flip_screen())
 	{
@@ -183,14 +180,14 @@ void dynduke_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clipr
 		scrollx = 256 - scrollx;
 	}
 
-	for (y=0;y<256;y++)
+	for (int y=0;y<256;y++)
 	{
 		int realy = (y + scrolly) & 0x1ff;
-		uint16_t *src = &bm.pix16(realy);
-		uint16_t *dst = &bitmap.pix16(y);
+		uint16_t const *const src = &bm.pix(realy);
+		uint16_t *const dst = &bitmap.pix(y);
 
 
-		for (x=0;x<256;x++)
+		for (int x=0;x<256;x++)
 		{
 			int realx = (x + scrollx) & 0x1ff;
 			uint16_t srcdat = src[realx];

@@ -532,7 +532,7 @@ read_stream_view sound_stream_input::update(attotime start, attotime end)
 		m_resampler_source->set_end_time(end);
 
 	// update the source, returning a view of the needed output over the start and end times
-	return source.stream().update_view(start, end, source.index()).apply_gain(m_gain * m_user_gain * m_native_source->gain());
+	return source.stream().update_view(start, end, source.index()).apply_gain(m_gain * m_user_gain * source.gain());
 }
 
 
@@ -578,12 +578,10 @@ sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output
 	m_resampling_disabled((flags & STREAM_DISABLE_INPUT_RESAMPLING) != 0),
 	m_sync_timer(nullptr),
 	m_input(inputs),
-	m_input_array(inputs),
 	m_input_view(inputs),
 	m_empty_buffer(100),
 	m_output_base(output_base),
 	m_output(outputs),
-	m_output_array(outputs),
 	m_output_view(outputs)
 {
 	sound_assert(outputs > 0);
@@ -597,6 +595,7 @@ sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output
 	// create a unique tag for saving
 	std::string state_tag = string_format("%d", m_device.machine().sound().unique_id());
 	auto &save = m_device.machine().save();
+	save.save_item(&m_device, "stream.sample_rate", state_tag.c_str(), 0, NAME(m_sample_rate));
 	save.register_postload(save_prepost_delegate(FUNC(sound_stream::postload), this));
 
 	// initialize all inputs
@@ -628,21 +627,7 @@ sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output
 
 
 //-------------------------------------------------
-//  sound_stream - constructor with old-style
-//  callback
-//-------------------------------------------------
-
-sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output_base, u32 sample_rate, stream_update_legacy_delegate callback, sound_stream_flags flags) :
-	sound_stream(device, inputs, outputs, output_base, sample_rate, flags)
-{
-	m_callback = std::move(callback);
-	m_callback_ex = stream_update_delegate(&sound_stream::stream_update_legacy, this);
-}
-
-
-//-------------------------------------------------
-//  sound_stream - constructor with new-style
-//  callback
+//  sound_stream - constructor
 //-------------------------------------------------
 
 sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output_base, u32 sample_rate, stream_update_delegate callback, sound_stream_flags flags) :
@@ -760,6 +745,7 @@ read_stream_view sound_stream::update_view(attotime start, attotime end, u32 out
 					m_input_view[inputnum] = m_input[inputnum].update(update_start, end);
 				else
 					m_input_view[inputnum] = empty_view(update_start, end);
+				sound_assert(m_input_view[inputnum].samples() > 0);
 				sound_assert(m_resampling_disabled || m_input_view[inputnum].sample_rate() == m_sample_rate);
 			}
 
@@ -847,7 +833,7 @@ void sound_stream::apply_sample_rate_changes(u32 updatenum, u32 downstream_rate)
 #if (SOUND_DEBUG)
 void sound_stream::print_graph_recursive(int indent, int index)
 {
-	osd_printf_info("%c %*s%s Ch.%d @ %d\n", m_callback.isnull() ? ' ' : '!', indent, "", name().c_str(), index + m_output_base, sample_rate());
+	osd_printf_info("%*s%s Ch.%d @ %d\n", indent, "", name().c_str(), index + m_output_base, sample_rate());
 	for (int index = 0; index < m_input.size(); index++)
 		if (m_input[index].valid())
 		{
@@ -920,57 +906,6 @@ void sound_stream::sync_update(void *, s32)
 {
 	update();
 	reprime_sync_timer();
-}
-
-
-//-------------------------------------------------
-//  stream_update_legacy - new-style callback which
-//  forwards on to the old-style traditional
-//  callback, converting to/from floats
-//-------------------------------------------------
-
-void sound_stream::stream_update_legacy(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
-{
-	// temporary buffer to hold stream_sample_t inputs and outputs
-	stream_sample_t temp_buffer[1024];
-	int chunksize = ARRAY_LENGTH(temp_buffer) / (inputs.size() + outputs.size());
-	int chunknum = 0;
-
-	// create the arrays to pass to the callback
-	stream_sample_t **inputptr = m_input.empty() ? nullptr : &m_input_array[0];
-	stream_sample_t **outputptr = &m_output_array[0];
-	for (unsigned int inputnum = 0; inputnum < inputs.size(); inputnum++)
-		inputptr[inputnum] = &temp_buffer[chunksize * chunknum++];
-	for (unsigned int outputnum = 0; outputnum < m_output.size(); outputnum++)
-		outputptr[outputnum] = &temp_buffer[chunksize * chunknum++];
-
-	// loop until all chunks done
-	for (int baseindex = 0; baseindex < outputs[0].samples(); baseindex += chunksize)
-	{
-		// determine the number of samples to process this time
-		int cursamples = outputs[0].samples() - baseindex;
-		if (cursamples > chunksize)
-			cursamples = chunksize;
-
-		// copy in the input data
-		for (unsigned int inputnum = 0; inputnum < inputs.size(); inputnum++)
-		{
-			stream_sample_t *dest = inputptr[inputnum];
-			for (int index = 0; index < cursamples; index++)
-				dest[index] = stream_sample_t(inputs[inputnum].get(baseindex + index) * stream_buffer::sample_t(32768.0));
-		}
-
-		// run the callback
-		m_callback(*this, inputptr, outputptr, cursamples);
-
-		// copy out the output data
-		for (unsigned int outputnum = 0; outputnum < m_output.size(); outputnum++)
-		{
-			stream_sample_t *src = outputptr[outputnum];
-			for (int index = 0; index < cursamples; index++)
-				outputs[outputnum].put(baseindex + index, stream_buffer::sample_t(src[index]) * stream_buffer::sample_t(1.0 / 32768.0));
-		}
-	}
 }
 
 
@@ -1196,23 +1131,6 @@ sound_manager::sound_manager(running_machine &machine) :
 
 sound_manager::~sound_manager()
 {
-}
-
-
-//-------------------------------------------------
-//  stream_alloc_legacy - allocate a new stream
-//-------------------------------------------------
-
-sound_stream *sound_manager::stream_alloc_legacy(device_t &device, u32 inputs, u32 outputs, u32 sample_rate, stream_update_legacy_delegate callback)
-{
-	// determine output base
-	u32 output_base = 0;
-	for (auto &stream : m_stream_list)
-		if (&stream->device() == &device)
-			output_base += stream->output_count();
-
-	m_stream_list.push_back(std::make_unique<sound_stream>(device, inputs, outputs, output_base, sample_rate, callback));
-	return m_stream_list.back().get();
 }
 
 

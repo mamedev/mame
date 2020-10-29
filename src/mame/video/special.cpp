@@ -21,7 +21,7 @@ uint32_t special_state::screen_update_special(screen_device &screen, bitmap_ind1
 		{
 			uint8_t const code = m_vram[y + x*256];
 			for (int b = 7; b >= 0; b--)
-				bitmap.pix16(y, x*8+(7-b)) = BIT(code, b);
+				bitmap.pix(y, x*8+(7-b)) = BIT(code, b);
 		}
 	}
 	return 0;
@@ -35,7 +35,7 @@ uint32_t special_state::screen_update_specialp(screen_device &screen, bitmap_ind
 		{
 			uint8_t const code = m_vram[y + x*256];
 			for (int b = 7; b >= 0; b--)
-				bitmap.pix16(y, x*8+(7-b)) = BIT(code, b);
+				bitmap.pix(y, x*8+(7-b)) = BIT(code, b);
 		}
 	}
 	return 0;
@@ -75,7 +75,7 @@ uint32_t special_state::screen_update_specimx(screen_device &screen, bitmap_ind1
 			uint8_t const code = m_ram->pointer()[0x9000 + y + x*256];
 			uint8_t const color = m_specimx_colorram[y + x*256];
 			for (int b = 7; b >= 0; b--)
-				bitmap.pix16(y, x*8+(7-b)) = (BIT(code, b) ? (color >> 4) : color) & 0x0f;
+				bitmap.pix(y, x*8+(7-b)) = (BIT(code, b) ? (color >> 4) : color) & 0x0f;
 		}
 	}
 	return 0;
@@ -100,25 +100,21 @@ void special_state::erik_palette(palette_device &palette) const
 
 uint32_t special_state::screen_update_erik(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t code1, code2, color1, color2;
-	int y, x, b;
-	uint8_t *erik_video_ram_p1, *erik_video_ram_p2;
+	uint8_t const *const erik_video_ram_p1 = m_ram->pointer() + 0x9000;
+	uint8_t const *const erik_video_ram_p2 = m_ram->pointer() + 0xd000;
 
-	erik_video_ram_p1 = m_ram->pointer() + 0x9000;
-	erik_video_ram_p2 = m_ram->pointer() + 0xd000;
-
-	for (x = 0; x < 48; x++)
+	for (int x = 0; x < 48; x++)
 	{
-		for (y = 0; y < 256; y++)
+		for (int y = 0; y < 256; y++)
 		{
-			code1  = erik_video_ram_p1[y + x*256];
-			code2  = erik_video_ram_p2[y + x*256];
+			uint8_t code1  = erik_video_ram_p1[y + x*256];
+			uint8_t code2  = erik_video_ram_p2[y + x*256];
 
-			for (b = 7; b >= 0; b--)
+			for (int b = 7; b >= 0; b--)
 			{
-				color1 = ((code1 >> b) & 0x01)==0 ? m_erik_background : m_erik_color_1;
-				color2 = ((code2 >> b) & 0x01)==0 ? m_erik_background : m_erik_color_2;
-				bitmap.pix16(y, x*8+(7-b)) =  color1 | color2;
+				uint8_t color1 = ((code1 >> b) & 0x01)==0 ? m_erik_background : m_erik_color_1;
+				uint8_t color2 = ((code2 >> b) & 0x01)==0 ? m_erik_background : m_erik_color_2;
+				bitmap.pix(y, x*8+(7-b)) =  color1 | color2;
 			}
 		}
 	}

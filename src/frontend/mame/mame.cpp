@@ -10,38 +10,44 @@
 
 #include "emu.h"
 #include "mame.h"
-#include "emuopts.h"
-#include "mameopts.h"
-#include "pluginopts.h"
-#include "osdepend.h"
-#include "validity.h"
-#include "clifront.h"
-#include "luaengine.h"
-#include <ctime>
-#include "ui/ui.h"
+
+#include "ui/inifile.h"
 #include "ui/selgame.h"
 #include "ui/simpleselgame.h"
+#include "ui/ui.h"
+
 #include "cheat.h"
-#include "ui/inifile.h"
+#include "clifront.h"
+#include "emuopts.h"
+#include "luaengine.h"
+#include "mameopts.h"
+#include "pluginopts.h"
+#include "validity.h"
+
 #include "xmlfile.h"
+
+#include "osdepend.h"
+
+#include <ctime>
+
 
 //**************************************************************************
 //  MACHINE MANAGER
 //**************************************************************************
 
-mame_machine_manager* mame_machine_manager::m_manager = nullptr;
+mame_machine_manager *mame_machine_manager::s_manager = nullptr;
 
 mame_machine_manager* mame_machine_manager::instance(emu_options &options, osd_interface &osd)
 {
-	if (!m_manager)
-		m_manager = global_alloc(mame_machine_manager(options, osd));
+	if (!s_manager)
+		s_manager = new mame_machine_manager(options, osd);
 
-	return m_manager;
+	return s_manager;
 }
 
 mame_machine_manager* mame_machine_manager::instance()
 {
-	return m_manager;
+	return s_manager;
 }
 
 //-------------------------------------------------
@@ -51,7 +57,7 @@ mame_machine_manager* mame_machine_manager::instance()
 mame_machine_manager::mame_machine_manager(emu_options &options,osd_interface &osd) :
 	machine_manager(options, osd),
 	m_plugins(std::make_unique<plugin_options>()),
-	m_lua(global_alloc(lua_engine)),
+	m_lua(std::make_unique<lua_engine>()),
 	m_new_driver_pending(nullptr),
 	m_firstrun(true),
 	m_autoboot_timer(nullptr)
@@ -65,8 +71,8 @@ mame_machine_manager::mame_machine_manager(emu_options &options,osd_interface &o
 
 mame_machine_manager::~mame_machine_manager()
 {
-	global_free(m_lua);
-	m_manager = nullptr;
+	m_lua.reset();
+	s_manager = nullptr;
 }
 
 

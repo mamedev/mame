@@ -275,12 +275,12 @@ uint32_t guab_state::screen_update_guab(screen_device &screen, bitmap_ind16 &bit
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		uint8_t *src = &m_tms34061->m_display.vram[256 * y];
-		uint16_t *dest = &bitmap.pix16(y);
+		uint8_t const *const src = &m_tms34061->m_display.vram[256 * y];
+		uint16_t *dest = &bitmap.pix(y);
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x += 2)
 		{
-			uint8_t pen = src[x >> 1];
+			uint8_t const pen = src[x >> 1];
 
 			/* Draw two 4-bit pixels */
 			*dest++ = m_palette->pen(pen >> 4);

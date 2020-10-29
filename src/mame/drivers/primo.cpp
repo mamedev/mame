@@ -244,7 +244,7 @@ static INPUT_PORTS_START( primo )
 		PORT_CONFSETTING(   0x01, DEF_STR( Off ) )
 INPUT_PORTS_END
 
-static const struct CassetteOptions primo_cassette_options = {
+static const cassette_image::Options primo_cassette_options = {
 	1,      /* channels */
 	16,     /* bits per sample */
 	22050   /* sample frequency */

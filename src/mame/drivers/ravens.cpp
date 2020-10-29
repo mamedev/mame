@@ -103,18 +103,25 @@ class ravens_state : public ravens_base
 public:
 	ravens_state(const machine_config &mconfig, device_type type, const char *tag)
 		: ravens_base(mconfig, type, tag)
+		, m_io_keyboard(*this, "X%u", 0U)
 		, m_digits(*this, "digit%u", 0U)
+		, m_leds(*this, "led%u", 0U)
 	{ }
 
 	void ravens(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
-	virtual void machine_start() override { m_digits.resolve(); }
 	void io_map(address_map &map);
 	u8 port17_r();
 	void display_w(offs_t offset, u8 data);
 	void leds_w(u8 data);
+
+	required_ioport_array<3> m_io_keyboard;
 	output_finder<7> m_digits;
+	output_finder<8> m_leds;
 };
 
 class ravens2_state : public ravens_base
@@ -127,9 +134,11 @@ public:
 
 	void ravens2(machine_config &config);
 
-private:
+protected:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
+
+private:
 	void io_map(address_map &map);
 	void kbd_put(u8 data);
 	u8 port07_r();
@@ -150,6 +159,12 @@ READ_LINE_MEMBER( ravens_base::cass_r )
 	return (m_cass->input() > 0.03) ? 1 : 0;
 }
 
+void ravens_state::machine_start()
+{
+	m_digits.resolve();
+	m_leds.resolve();
+}
+
 void ravens_state::display_w(offs_t offset, u8 data)
 {
 	m_digits[offset] = data;
@@ -157,18 +172,15 @@ void ravens_state::display_w(offs_t offset, u8 data)
 
 void ravens_state::leds_w(u8 data)
 {
-	char ledname[8];
 	for (int i = 0; i < 8; i++)
-	{
-		sprintf(ledname,"led%d",i);
-		output().set_value(ledname, !BIT(data, i));
-	}
+		m_leds[i] = !BIT(data, i);
 }
 
 u8 ravens2_state::port07_r()
 {
 	u8 ret = m_term_in;
-	m_term_in = 0x80;
+	if (!machine().side_effects_disabled())
+		m_term_in = 0x80;
 	return ret;
 }
 
@@ -176,19 +188,19 @@ u8 ravens_state::port17_r()
 {
 	u8 keyin, i;
 
-	keyin = ioport("X0")->read();
+	keyin = m_io_keyboard[0]->read();
 	if (keyin != 0xff)
 		for (i = 0; i < 8; i++)
 			if (BIT(~keyin, i))
 				return i | 0x80;
 
-	keyin = ioport("X1")->read();
+	keyin = m_io_keyboard[1]->read();
 	if (keyin != 0xff)
 		for (i = 0; i < 8; i++)
 			if (BIT(~keyin, i))
 				return i | 0x88;
 
-	keyin = ioport("X2")->read();
+	keyin = m_io_keyboard[2]->read();
 	if (!BIT(keyin, 0))
 		m_maincpu->reset();
 	if (keyin != 0xff)

@@ -37,7 +37,6 @@ TODO:
 #include "imagedev/cassette.h"
 #include "machine/ins8154.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 #include "video/pwm.h"
 
@@ -211,10 +210,6 @@ void mk14_state::mk14(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
 	ZN425E(config, "dac8", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // Ferranti ZN425E
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac8", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac8", -1.0, DAC_VREF_NEG_INPUT);
 
 	/* devices */
 	ins8154_device &ic8(INS8154(config, "ic8"));

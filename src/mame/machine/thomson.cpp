@@ -96,7 +96,7 @@ int thomson_state::to7_get_cassette()
 			/* we simply count sign changes... */
 			int k, chg;
 			int8_t data[40];
-			cassette_get_samples( cass, 0, pos, TO7_BIT_LENGTH * 15. / 14., 40, 1, data, 0 );
+			cass->get_samples( 0, pos, TO7_BIT_LENGTH * 15. / 14., 40, 1, data, 0 );
 
 			for ( k = 1, chg = 0; k < 40; k++ )
 			{
@@ -177,7 +177,7 @@ int thomson_state::mo5_get_cassette()
 		if ( (state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED )
 			return 1;
 
-		cassette_get_sample( cass, 0, pos, 0, &hbit );
+		cass->get_sample( 0, pos, 0, &hbit );
 		hbit = hbit >= 0;
 
 		VLOG (( "$%04x %f mo5_get_cassette: state=$%X pos=%f hbitpos=%i hbit=%i\n",
@@ -244,15 +244,6 @@ void thomson_state::thom_irq_reset()
 */
 
 
-
-/* ------------ LED ------------ */
-
-
-
-void thomson_state::thom_set_caps_led( int led )
-{
-	output().set_value( "led0", led );
-}
 
 /* ------------ 6850 defines ------------ */
 
@@ -391,7 +382,7 @@ uint8_t thomson_state::to7_cartridge_r(offs_t offset)
 void thomson_state::to7_timer_port_out(uint8_t data)
 {
 	thom_set_mode_point( data & 1 );          /* bit 0: video bank switch */
-	thom_set_caps_led( (data & 8) ? 1 : 0 ) ; /* bit 3: keyboard led */
+	m_caps_led = (data & 8) ? 1 : 0; /* bit 3: keyboard led */
 	thom_set_border_color( ((data & 0x10) ? 1 : 0) |           /* bits 4-6: border color */
 							((data & 0x20) ? 2 : 0) |
 							((data & 0x40) ? 4 : 0) );
@@ -1129,7 +1120,7 @@ void thomson_state::to770_sys_portb_out(uint8_t data)
 void thomson_state::to770_timer_port_out(uint8_t data)
 {
 	thom_set_mode_point( data & 1 );          /* bit 0: video bank switch */
-	thom_set_caps_led( (data & 8) ? 1 : 0 ) ; /* bit 3: keyboard led */
+	m_caps_led = (data & 8) ? 1 : 0; /* bit 3: keyboard led */
 	thom_set_border_color( ((data & 0x10) ? 1 : 0) |          /* 4-bit border color */
 							((data & 0x20) ? 2 : 0) |
 							((data & 0x40) ? 4 : 0) |
@@ -2176,7 +2167,7 @@ void thomson_state::to9_kbd_w(offs_t offset, uint8_t data)
 			logerror( "$%04x %f to9_kbd_w: unknown kbd command %02X\n", m_maincpu->pc(), machine().time().as_double(), data );
 		}
 
-		thom_set_caps_led( !m_to9_kbd_caps );
+		m_caps_led = !m_to9_kbd_caps;
 
 		LOG(( "$%04x %f to9_kbd_w: kbd command %02X (caps=%i, pad=%i, periph=%i)\n",
 				m_maincpu->pc(), machine().time().as_double(), data,
@@ -2297,7 +2288,7 @@ int thomson_state::to9_kbd_get_key()
 
 		m_to9_kbd_last_key = key;
 		m_to9_kbd_caps = !m_to9_kbd_caps;
-		thom_set_caps_led( !m_to9_kbd_caps );
+		m_caps_led = !m_to9_kbd_caps;
 		return 0;
 	}
 	else
@@ -2412,7 +2403,7 @@ void thomson_state::to9_kbd_reset()
 	m_to9_kbd_periph = 0;
 	m_to9_kbd_pad = 0;
 	m_to9_kbd_byte_count = 0;
-	thom_set_caps_led( !m_to9_kbd_caps );
+	m_caps_led = !m_to9_kbd_caps;
 	m_to9_kbd_key_count = 0;
 	m_to9_kbd_last_key = 0xff;
 	to9_kbd_update_irq();
@@ -2679,7 +2670,7 @@ int thomson_state::to8_kbd_get_key()
 		m_to8_kbd_caps = !m_to8_kbd_caps;
 		if ( m_to8_kbd_caps )
 			key |= 0x080; /* auto-shift */
-		thom_set_caps_led( !m_to8_kbd_caps );
+		m_caps_led = !m_to8_kbd_caps;
 		return key;
 	}
 	else if ( key == m_to8_kbd_last_key )
@@ -2827,7 +2818,7 @@ void thomson_state::to8_kbd_set_ack( int data )
 					m_to8_kbd_caps = 0;
 				}
 			}
-			thom_set_caps_led( !m_to8_kbd_caps );
+			m_caps_led = !m_to8_kbd_caps;
 		}
 		else
 		{
@@ -2867,7 +2858,7 @@ void thomson_state::to8_kbd_reset()
 	m_to8_kbd_data = 0;
 	m_to8_kbd_ack = 1;
 	m_to8_kbd_caps = 1;
-	thom_set_caps_led( !m_to8_kbd_caps );
+	m_caps_led = !m_to8_kbd_caps;
 	to8_kbd_timer_func();
 }
 
@@ -4141,7 +4132,7 @@ void thomson_state::mo6_sys_porta_out(uint8_t data)
 {
 	thom_set_mode_point( data & 1 );                /* bit 0: video bank switch */
 	m_to7_game_mute = data & 4;                       /* bit 2: sound mute */
-	thom_set_caps_led( (data & 16) ? 0 : 1 ) ;      /* bit 4: keyboard led */
+	m_caps_led = (data & 16) ? 0 : 1;      /* bit 4: keyboard led */
 	mo5_set_cassette( (data & 0x40) ? 1 : 0 );     /* bit 6: cassette output */
 	mo6_update_cart_bank();                  /* bit 5: rom bank */
 	to7_game_sound_update();

@@ -194,29 +194,32 @@ namespace plib {
 			struct guard_t
 			{
 				guard_t() = delete;
-				explicit guard_t(timer &m) noexcept : m_m(m) { m_m.m_time -= T::start(); }
-				~guard_t() noexcept { m_m.m_time += T::stop(); ++m_m.m_count; }
+				explicit constexpr guard_t(timer &m) noexcept : m_m(&m) { m_m->m_time -= T::start(); }
+				~guard_t() noexcept { m_m->m_time += T::stop(); ++m_m->m_count; }
 
-				PCOPYASSIGNMOVE(guard_t, default)
+				constexpr guard_t(const guard_t &) = default;
+				constexpr guard_t &operator=(const guard_t &) = default;
+				constexpr guard_t(guard_t &&) noexcept = default;
+				constexpr guard_t &operator=(guard_t &&) noexcept = default;
 
 			private:
-				timer &m_m;
+				timer *m_m;
 			};
 
-			timer() : m_time(0), m_count(0) { }
+			constexpr timer() : m_time(0), m_count(0) { }
 
-			type operator()() const { return m_time; }
+			constexpr type operator()() const { return m_time; }
 
 			void reset() noexcept { m_time = 0; m_count = 0; }
-			type average() const noexcept { return (m_count == 0) ? 0 : m_time / m_count; }
-			type total() const noexcept { return m_time; }
-			ctype count() const noexcept { return m_count; }
+			constexpr type average() const noexcept { return (m_count == 0) ? 0 : m_time / m_count; }
+			constexpr type total() const noexcept { return m_time; }
+			constexpr ctype count() const noexcept { return m_count; }
 
 			template <typename S>
-			S as_seconds() const noexcept { return narrow_cast<S>(total())
+			constexpr S as_seconds() const noexcept { return narrow_cast<S>(total())
 					/ narrow_cast<S>(T::per_second()); }
 
-			guard_t guard() noexcept { return guard_t(*this); }
+			constexpr guard_t guard() noexcept { return guard_t(*this); }
 
 			// pause must be followed by cont(inue)
 			void stop() noexcept { m_time += T::stop(); }
@@ -236,8 +239,13 @@ namespace plib {
 
 			struct guard_t
 			{
-				guard_t() = default;
-				PCOPYASSIGNMOVE(guard_t, default)
+				constexpr guard_t() = default;
+
+				constexpr guard_t(const guard_t &) = default;
+				constexpr guard_t &operator=(const guard_t &) = default;
+				constexpr guard_t(guard_t &&) noexcept = default;
+				constexpr guard_t &operator=(guard_t &&) noexcept = default;
+
 				// using default constructor will trigger warning on
 				// unused local variable.
 
@@ -251,7 +259,7 @@ namespace plib {
 			constexpr type total() const noexcept { return 0; }
 			constexpr ctype count() const noexcept { return 0; }
 			template <typename S>
-			S as_seconds() const noexcept { return narrow_cast<S>(0); }
+			constexpr S as_seconds() const noexcept { return narrow_cast<S>(0); }
 			constexpr static bool enabled = false;
 			guard_t guard() { return guard_t(); }
 		};

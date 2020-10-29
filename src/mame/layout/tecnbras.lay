@@ -4,9 +4,45 @@ license:CC0
 -->
 <mamelayout version="2">
 	<element name="dotmatrix5dot">
-	<dotmatrix5dot>
-		<color red="1.0" green="0" blue="0" />
-	</dotmatrix5dot>
+		<rect>
+			<bounds x="-0.05" width="5.55" y="-0.05" height="1.1" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+		<disk state="0" statemask="0x01">
+			<bounds x="0.0" />
+			<color red="0.125" green="0.125" blue="0.125" />
+		</disk>
+		<disk state="0" statemask="0x02">
+			<bounds x="1.1" />
+			<color red="0.125" green="0.125" blue="0.125" />
+		</disk>
+		<disk state="0" statemask="0x04">
+			<bounds x="2.2" />
+			<color red="0.125" green="0.125" blue="0.125" />
+		</disk>
+		<disk state="0" statemask="0x08">
+			<bounds x="3.3" />
+			<color red="0.125" green="0.125" blue="0.125" />
+		</disk>
+		<disk state="0" statemask="0x10">
+			<bounds x="4.4" />
+			<color red="0.125" green="0.125" blue="0.125" />
+		</disk>
+		<disk statemask="0x01">
+			<bounds x="0.0" />
+		</disk>
+		<disk statemask="0x02">
+			<bounds x="1.1" />
+		</disk>
+		<disk statemask="0x04">
+			<bounds x="2.2" />
+		</disk>
+		<disk statemask="0x08">
+			<bounds x="3.3" />
+		</disk>
+		<disk statemask="0x10">
+			<bounds x="4.4" />
+		</disk>
 	</element>
 	<element name="background">
 		<rect>
@@ -18,299 +54,17 @@ license:CC0
 		<element ref="background">
 			<bounds left="00" top="00" right="70" bottom="7" />
 		</element>
-	<element name="dmd_0" ref="dotmatrix5dot" state="0">
-		<bounds x="0" y="0" width="5" height="1" />
-	</element>
-	<element name="dmd_1" ref="dotmatrix5dot" state="0">
-		<bounds x="0" y="1" width="5" height="1" />
-	</element>
-	<element name="dmd_2" ref="dotmatrix5dot" state="0">
-		<bounds x="0" y="2" width="5" height="1" />
-	</element>
-	<element name="dmd_3" ref="dotmatrix5dot" state="0">
-		<bounds x="0" y="3" width="5" height="1" />
-	</element>
-	<element name="dmd_4" ref="dotmatrix5dot" state="0">
-		<bounds x="0" y="4" width="5" height="1" />
-	</element>
-	<element name="dmd_5" ref="dotmatrix5dot" state="0">
-		<bounds x="0" y="5" width="5" height="1" />
-	</element>
-	<element name="dmd_6" ref="dotmatrix5dot" state="0">
-		<bounds x="0" y="6" width="5" height="1" />
-	</element>
-	<element name="dmd_7" ref="dotmatrix5dot" state="0">
-		<bounds x="5" y="0" width="5" height="1" />
-	</element>
-	<element name="dmd_8" ref="dotmatrix5dot" state="0">
-		<bounds x="5" y="1" width="5" height="1" />
-	</element>
-	<element name="dmd_9" ref="dotmatrix5dot" state="0">
-		<bounds x="5" y="2" width="5" height="1" />
-	</element>
-	<element name="dmd_10" ref="dotmatrix5dot" state="0">
-		<bounds x="5" y="3" width="5" height="1" />
-	</element>
-	<element name="dmd_11" ref="dotmatrix5dot" state="0">
-		<bounds x="5" y="4" width="5" height="1" />
-	</element>
-	<element name="dmd_12" ref="dotmatrix5dot" state="0">
-		<bounds x="5" y="5" width="5" height="1" />
-	</element>
-	<element name="dmd_13" ref="dotmatrix5dot" state="0">
-		<bounds x="5" y="6" width="5" height="1" />
-	</element>
-	<element name="dmd_14" ref="dotmatrix5dot" state="0">
-		<bounds x="10" y="0" width="5" height="1" />
-	</element>
-	<element name="dmd_15" ref="dotmatrix5dot" state="0">
-		<bounds x="10" y="1" width="5" height="1" />
-	</element>
-	<element name="dmd_16" ref="dotmatrix5dot" state="0">
-		<bounds x="10" y="2" width="5" height="1" />
-	</element>
-	<element name="dmd_17" ref="dotmatrix5dot" state="0">
-		<bounds x="10" y="3" width="5" height="1" />
-	</element>
-	<element name="dmd_18" ref="dotmatrix5dot" state="0">
-		<bounds x="10" y="4" width="5" height="1" />
-	</element>
-	<element name="dmd_19" ref="dotmatrix5dot" state="0">
-		<bounds x="10" y="5" width="5" height="1" />
-	</element>
-	<element name="dmd_20" ref="dotmatrix5dot" state="0">
-		<bounds x="10" y="6" width="5" height="1" />
-	</element>
-	<element name="dmd_21" ref="dotmatrix5dot" state="0">
-		<bounds x="15" y="0" width="5" height="1" />
-	</element>
-	<element name="dmd_22" ref="dotmatrix5dot" state="0">
-		<bounds x="15" y="1" width="5" height="1" />
-	</element>
-	<element name="dmd_23" ref="dotmatrix5dot" state="0">
-		<bounds x="15" y="2" width="5" height="1" />
-	</element>
-	<element name="dmd_24" ref="dotmatrix5dot" state="0">
-		<bounds x="15" y="3" width="5" height="1" />
-	</element>
-	<element name="dmd_25" ref="dotmatrix5dot" state="0">
-		<bounds x="15" y="4" width="5" height="1" />
-	</element>
-	<element name="dmd_26" ref="dotmatrix5dot" state="0">
-		<bounds x="15" y="5" width="5" height="1" />
-	</element>
-	<element name="dmd_27" ref="dotmatrix5dot" state="0">
-		<bounds x="15" y="6" width="5" height="1" />
-	</element>
-	<element name="dmd_28" ref="dotmatrix5dot" state="0">
-		<bounds x="20" y="0" width="5" height="1" />
-	</element>
-	<element name="dmd_29" ref="dotmatrix5dot" state="0">
-		<bounds x="20" y="1" width="5" height="1" />
-	</element>
-	<element name="dmd_30" ref="dotmatrix5dot" state="0">
-		<bounds x="20" y="2" width="5" height="1" />
-	</element>
-	<element name="dmd_31" ref="dotmatrix5dot" state="0">
-		<bounds x="20" y="3" width="5" height="1" />
-	</element>
-	<element name="dmd_32" ref="dotmatrix5dot" state="0">
-		<bounds x="20" y="4" width="5" height="1" />
-	</element>
-	<element name="dmd_33" ref="dotmatrix5dot" state="0">
-		<bounds x="20" y="5" width="5" height="1" />
-	</element>
-	<element name="dmd_34" ref="dotmatrix5dot" state="0">
-		<bounds x="20" y="6" width="5" height="1" />
-	</element>
-	<element name="dmd_35" ref="dotmatrix5dot" state="0">
-		<bounds x="25" y="0" width="5" height="1" />
-	</element>
-	<element name="dmd_36" ref="dotmatrix5dot" state="0">
-		<bounds x="25" y="1" width="5" height="1" />
-	</element>
-	<element name="dmd_37" ref="dotmatrix5dot" state="0">
-		<bounds x="25" y="2" width="5" height="1" />
-	</element>
-	<element name="dmd_38" ref="dotmatrix5dot" state="0">
-		<bounds x="25" y="3" width="5" height="1" />
-	</element>
-	<element name="dmd_39" ref="dotmatrix5dot" state="0">
-		<bounds x="25" y="4" width="5" height="1" />
-	</element>
-	<element name="dmd_40" ref="dotmatrix5dot" state="0">
-		<bounds x="25" y="5" width="5" height="1" />
-	</element>
-	<element name="dmd_41" ref="dotmatrix5dot" state="0">
-		<bounds x="25" y="6" width="5" height="1" />
-	</element>
-	<element name="dmd_42" ref="dotmatrix5dot" state="0">
-		<bounds x="30" y="0" width="5" height="1" />
-	</element>
-	<element name="dmd_43" ref="dotmatrix5dot" state="0">
-		<bounds x="30" y="1" width="5" height="1" />
-	</element>
-	<element name="dmd_44" ref="dotmatrix5dot" state="0">
-		<bounds x="30" y="2" width="5" height="1" />
-	</element>
-	<element name="dmd_45" ref="dotmatrix5dot" state="0">
-		<bounds x="30" y="3" width="5" height="1" />
-	</element>
-	<element name="dmd_46" ref="dotmatrix5dot" state="0">
-		<bounds x="30" y="4" width="5" height="1" />
-	</element>
-	<element name="dmd_47" ref="dotmatrix5dot" state="0">
-		<bounds x="30" y="5" width="5" height="1" />
-	</element>
-	<element name="dmd_48" ref="dotmatrix5dot" state="0">
-		<bounds x="30" y="6" width="5" height="1" />
-	</element>
-	<element name="dmd_49" ref="dotmatrix5dot" state="0">
-		<bounds x="35" y="0" width="5" height="1" />
-	</element>
-	<element name="dmd_50" ref="dotmatrix5dot" state="0">
-		<bounds x="35" y="1" width="5" height="1" />
-	</element>
-	<element name="dmd_51" ref="dotmatrix5dot" state="0">
-		<bounds x="35" y="2" width="5" height="1" />
-	</element>
-	<element name="dmd_52" ref="dotmatrix5dot" state="0">
-		<bounds x="35" y="3" width="5" height="1" />
-	</element>
-	<element name="dmd_53" ref="dotmatrix5dot" state="0">
-		<bounds x="35" y="4" width="5" height="1" />
-	</element>
-	<element name="dmd_54" ref="dotmatrix5dot" state="0">
-		<bounds x="35" y="5" width="5" height="1" />
-	</element>
-	<element name="dmd_55" ref="dotmatrix5dot" state="0">
-		<bounds x="35" y="6" width="5" height="1" />
-	</element>
-	<element name="dmd_56" ref="dotmatrix5dot" state="0">
-		<bounds x="40" y="0" width="5" height="1" />
-	</element>
-	<element name="dmd_57" ref="dotmatrix5dot" state="0">
-		<bounds x="40" y="1" width="5" height="1" />
-	</element>
-	<element name="dmd_58" ref="dotmatrix5dot" state="0">
-		<bounds x="40" y="2" width="5" height="1" />
-	</element>
-	<element name="dmd_59" ref="dotmatrix5dot" state="0">
-		<bounds x="40" y="3" width="5" height="1" />
-	</element>
-	<element name="dmd_60" ref="dotmatrix5dot" state="0">
-		<bounds x="40" y="4" width="5" height="1" />
-	</element>
-	<element name="dmd_61" ref="dotmatrix5dot" state="0">
-		<bounds x="40" y="5" width="5" height="1" />
-	</element>
-	<element name="dmd_62" ref="dotmatrix5dot" state="0">
-		<bounds x="40" y="6" width="5" height="1" />
-	</element>
-	<element name="dmd_63" ref="dotmatrix5dot" state="0">
-		<bounds x="45" y="0" width="5" height="1" />
-	</element>
-	<element name="dmd_64" ref="dotmatrix5dot" state="0">
-		<bounds x="45" y="1" width="5" height="1" />
-	</element>
-	<element name="dmd_65" ref="dotmatrix5dot" state="0">
-		<bounds x="45" y="2" width="5" height="1" />
-	</element>
-	<element name="dmd_66" ref="dotmatrix5dot" state="0">
-		<bounds x="45" y="3" width="5" height="1" />
-	</element>
-	<element name="dmd_67" ref="dotmatrix5dot" state="0">
-		<bounds x="45" y="4" width="5" height="1" />
-	</element>
-	<element name="dmd_68" ref="dotmatrix5dot" state="0">
-		<bounds x="45" y="5" width="5" height="1" />
-	</element>
-	<element name="dmd_69" ref="dotmatrix5dot" state="0">
-		<bounds x="45" y="6" width="5" height="1" />
-	</element>
-	<element name="dmd_70" ref="dotmatrix5dot" state="0">
-		<bounds x="50" y="0" width="5" height="1" />
-	</element>
-	<element name="dmd_71" ref="dotmatrix5dot" state="0">
-		<bounds x="50" y="1" width="5" height="1" />
-	</element>
-	<element name="dmd_72" ref="dotmatrix5dot" state="0">
-		<bounds x="50" y="2" width="5" height="1" />
-	</element>
-	<element name="dmd_73" ref="dotmatrix5dot" state="0">
-		<bounds x="50" y="3" width="5" height="1" />
-	</element>
-	<element name="dmd_74" ref="dotmatrix5dot" state="0">
-		<bounds x="50" y="4" width="5" height="1" />
-	</element>
-	<element name="dmd_75" ref="dotmatrix5dot" state="0">
-		<bounds x="50" y="5" width="5" height="1" />
-	</element>
-	<element name="dmd_76" ref="dotmatrix5dot" state="0">
-		<bounds x="50" y="6" width="5" height="1" />
-	</element>
-	<element name="dmd_77" ref="dotmatrix5dot" state="0">
-		<bounds x="55" y="0" width="5" height="1" />
-	</element>
-	<element name="dmd_78" ref="dotmatrix5dot" state="0">
-		<bounds x="55" y="1" width="5" height="1" />
-	</element>
-	<element name="dmd_79" ref="dotmatrix5dot" state="0">
-		<bounds x="55" y="2" width="5" height="1" />
-	</element>
-	<element name="dmd_80" ref="dotmatrix5dot" state="0">
-		<bounds x="55" y="3" width="5" height="1" />
-	</element>
-	<element name="dmd_81" ref="dotmatrix5dot" state="0">
-		<bounds x="55" y="4" width="5" height="1" />
-	</element>
-	<element name="dmd_82" ref="dotmatrix5dot" state="0">
-		<bounds x="55" y="5" width="5" height="1" />
-	</element>
-	<element name="dmd_83" ref="dotmatrix5dot" state="0">
-		<bounds x="55" y="6" width="5" height="1" />
-	</element>
-	<element name="dmd_84" ref="dotmatrix5dot" state="0">
-		<bounds x="60" y="0" width="5" height="1" />
-	</element>
-	<element name="dmd_85" ref="dotmatrix5dot" state="0">
-		<bounds x="60" y="1" width="5" height="1" />
-	</element>
-	<element name="dmd_86" ref="dotmatrix5dot" state="0">
-		<bounds x="60" y="2" width="5" height="1" />
-	</element>
-	<element name="dmd_87" ref="dotmatrix5dot" state="0">
-		<bounds x="60" y="3" width="5" height="1" />
-	</element>
-	<element name="dmd_88" ref="dotmatrix5dot" state="0">
-		<bounds x="60" y="4" width="5" height="1" />
-	</element>
-	<element name="dmd_89" ref="dotmatrix5dot" state="0">
-		<bounds x="60" y="5" width="5" height="1" />
-	</element>
-	<element name="dmd_90" ref="dotmatrix5dot" state="0">
-		<bounds x="60" y="6" width="5" height="1" />
-	</element>
-	<element name="dmd_91" ref="dotmatrix5dot" state="0">
-		<bounds x="65" y="0" width="5" height="1" />
-	</element>
-	<element name="dmd_92" ref="dotmatrix5dot" state="0">
-		<bounds x="65" y="1" width="5" height="1" />
-	</element>
-	<element name="dmd_93" ref="dotmatrix5dot" state="0">
-		<bounds x="65" y="2" width="5" height="1" />
-	</element>
-	<element name="dmd_94" ref="dotmatrix5dot" state="0">
-		<bounds x="65" y="3" width="5" height="1" />
-	</element>
-	<element name="dmd_95" ref="dotmatrix5dot" state="0">
-		<bounds x="65" y="4" width="5" height="1" />
-	</element>
-	<element name="dmd_96" ref="dotmatrix5dot" state="0">
-		<bounds x="65" y="5" width="5" height="1" />
-	</element>
-	<element name="dmd_97" ref="dotmatrix5dot" state="0">
-		<bounds x="65" y="6" width="5" height="1" />
-	</element>
+		<repeat count="14">
+			<param name="char" start="0" increment="7" />
+			<param name="x" start="0" increment="5" />
+			<repeat count="7">
+				<param name="n" start="~char~" increment="1" />
+				<param name="y" start="0" increment="1" />
+				<element name="dmd_~n~" ref="dotmatrix5dot" state="0">
+					<bounds x="~x~" y="~y~" width="5" height="1" />
+					<color red="1.0" green="0.0" blue="0.0" />
+				</element>
+			</repeat>
+		</repeat>
 	</view>
 </mamelayout>

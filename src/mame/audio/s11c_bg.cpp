@@ -216,7 +216,6 @@
 
 #include "emu.h"
 #include "s11c_bg.h"
-#include "sound/volt_reg.h"
 
 
 DEFINE_DEVICE_TYPE(S11C_BG, s11c_bg_device, "s11c_bg", "Williams System 11C Background Audio Board") // D-11581-20xx or D-11581-400xx or A-13971-50003
@@ -232,6 +231,8 @@ s11c_bg_device::s11c_bg_device(const machine_config &mconfig, const char *tag, d
 	, m_dac(*this, "dac")
 	, m_ym2151(*this, "ym2151")
 	, m_cvsd(*this, "hc55516")
+	, m_cvsd_filter(*this, "cvsd_filter")
+	, m_cvsd_filter2(*this, "cvsd_filter2")
 	, m_pia40(*this, "pia40")
 	, m_cpubank(*this, "bgbank")
 	, m_cb2_cb(*this)
@@ -248,6 +249,8 @@ s11c_bg_device::s11c_bg_device(const machine_config &mconfig, device_type type, 
 	, m_dac(*this, "dac")
 	, m_ym2151(*this, "ym2151")
 	, m_cvsd(*this, "hc55516")
+	, m_cvsd_filter(*this, "cvsd_filter")
+	, m_cvsd_filter2(*this, "cvsd_filter2")
 	, m_pia40(*this, "pia40")
 	, m_cpubank(*this, "bgbank")
 	, m_cb2_cb(*this)
@@ -365,9 +368,6 @@ void s11c_bg_device::s11_bg_base(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(50));
 
 	MC1408(config, m_dac, 0);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	PIA6821(config, m_pia40, 0);
 	m_pia40->writepa_handler().set("dac", FUNC(dac_byte_interface::data_w));
@@ -390,7 +390,18 @@ void s11c_bg_device::s11_bg_ym(machine_config &config)
 // add a CVSD chip for boards which have it
 void s11c_bg_device::s11_bg_cvsd(machine_config &config)
 {
-	HC55516(config, m_cvsd, 0);
+	// m_cvsd_filter is the first 'half' of U18(MC1458), with R32, R30, R29, no capacitor to ground(!?!) and C9, output feeding the second half
+	// m_cvsd_filter2 is the second 'half' of U18(MC1458), with R20, R15, R19, C10 and C7, output feeding the final mixer
+	// Note that the (intended 1800uf according to Sinistar/System 6) capacitor
+	// to ground for m_cvsd_filter is COMPLETELY MISSING, and hence this
+	// filter section behaves very oddly under simulation, retaining a
+	// gain but having a first-order falloff response!
+	// This was presumably a design error, and not intended, given the
+	// strange filter response. We emulate this weird circuit as it existed.
+	FILTER_BIQUAD(config, m_cvsd_filter2).opamp_mfb_lowpass_setup(RES_K(27), RES_K(15), RES_K(27), CAP_P(4700), CAP_P(1200));
+	FILTER_BIQUAD(config, m_cvsd_filter).opamp_mfb_lowpass_setup(RES_K(43), RES_K(36), RES_K(180), CAP_P(0), CAP_P(180)); // note the first capacitor is 0pf meaning it doesn't exist
+	m_cvsd_filter->add_route(ALL_OUTPUTS, m_cvsd_filter2, 1.0);
+	HC55516(config, m_cvsd, 0).add_route(ALL_OUTPUTS, m_cvsd_filter, 1.0/4.0); // to prevent massive clipping issues, we divide the signal by 4 here before going into the filters, then multiply it by 4 after it comes out the other end
 }
 
 
@@ -405,11 +416,13 @@ void s11c_bg_device::device_add_mconfig(machine_config &config)
 	// 1/resistance * 57990 is 4.460769, 2.8895, 2.8895, 11.62124
 	// the sum of the previous 4 values is 21.88101; 100/21.88101 = 4.570173
 	// the 4 (1/r)*rtotal numbers * 4.570173 are 20.38649, 13.25122, 13.25122 and 53.11108 respectively
-	// NOTE: audio passthrough from the mainboard is 4.7kohm
-	m_dac->add_route(ALL_OUTPUTS, *this, 0.2038); // 13Kohm
-	m_ym2151->add_route(1, *this, 0.1325); // 20kohm
-	m_ym2151->add_route(0, *this, 0.1325); // 20kohm
-	m_cvsd->add_route(ALL_OUTPUTS, *this, 0.5311); // 4.99kohm
+	// NOTE: Multiply all numbers here or the final output by 1/0.6395 = 1.5638 to get the relative
+	// volume values if there is no audio input used at all
+	// audio passthrough resistor from the mainboard input is 4.7kohm, 0.3605 in files sending audio into this device
+	m_dac->add_route(ALL_OUTPUTS, *this, 0.1304); // 13Kohm
+	m_ym2151->add_route(1, *this, 0.08473); // 20kohm
+	m_ym2151->add_route(0, *this, 0.08473); // 20kohm
+	m_cvsd_filter2->add_route(ALL_OUTPUTS, *this, 0.3396*4.0); // 4.99kohm
 }
 
 // D-11581 (without the W10/W11 jumpers)
@@ -423,11 +436,13 @@ void s11_bg_device::device_add_mconfig(machine_config &config)
 	// 1/resistance * 57990 is 4.9666, 3.129, 3.129, 6.2705
 	// the sum of the previous 4 values is 17.49521; 100/17.49521 = 5.715851
 	// the 4 (1/r)*rtotal numbers * 5.715851 are 28.38873, 17.8849, 17.8849, and 35.84148 respectively
-	// NOTE: audio passthrough from the mainboard is 2.2kohm
-	m_dac->add_route(ALL_OUTPUTS, *this, 0.2839); // 6.3Kohm
-	m_ym2151->add_route(1, *this, 0.1788); // 10kohm
-	m_ym2151->add_route(0, *this, 0.1788); // 10kohm
-	m_cvsd->add_route(ALL_OUTPUTS, *this, 0.3584); // 4.99kohm
+	// NOTE: Multiply all numbers here or the final output by 1/0.5516 = 1.8129 to get the relative
+	// volume values correct if there is no audio input used at all
+	// NOTE: audio passthrough from the mainboard is 2.2kohm, 0.4484 in files sending audio into this device
+	m_dac->add_route(ALL_OUTPUTS, *this, 0.1566); // 6.3Kohm
+	m_ym2151->add_route(1, *this, 0.0987); // 10kohm
+	m_ym2151->add_route(0, *this, 0.0987); // 10kohm
+	m_cvsd_filter2->add_route(ALL_OUTPUTS, *this, 0.1977*4.0); // 4.99kohm
 }
 
 // D-11297 or D-11298
@@ -441,11 +456,13 @@ void s11_obg_device::device_add_mconfig(machine_config &config)
 	// 1/resistance * 40000 is 4.0, 4.0, 4.0, 4.0
 	// the sum of the previous 4 values is 16.0; 100/16 = 6.25
 	// the 4 (1/r)*rtotal numbers * 6.25 are 25.0, 25.0, 25.0, 25.0 respectively
-	// NOTE: audio passthrough from the mainboard is 2.2kohm
-	m_dac->add_route(ALL_OUTPUTS, *this, 0.25); // 10Kohm
-	m_ym2151->add_route(1, *this, 0.25); // 10kohm
-	m_ym2151->add_route(0, *this, 0.25); // 10kohm
-	m_cvsd->add_route(ALL_OUTPUTS, *this, 0.25); // 10kohm
+	// NOTE: Multiply all numbers here or the final output by 1/0.468 = 2.1368 to get the relative
+	// volume values correct if there is no audio input used at all
+	// NOTE: audio passthrough from the mainboard is 2.2kohm, 0.5319 in files sending audio into this device
+	m_dac->add_route(ALL_OUTPUTS, *this, 0.1170); // 10Kohm
+	m_ym2151->add_route(1, *this, 0.1170); // 10kohm
+	m_ym2151->add_route(0, *this, 0.1170); // 10kohm
+	m_cvsd_filter2->add_route(ALL_OUTPUTS, *this, 0.1170*4.0); // 10kohm
 }
 
 // D-11197
@@ -459,10 +476,12 @@ void s11_bgm_device::device_add_mconfig(machine_config &config)
 	// 1/resistance * 40000 is 4.0, 4.0, 4.0, 4.0
 	// the sum of the previous 4 values is 16.0; 100/16 = 6.25
 	// the 4 (1/r)*rtotal numbers * 6.25 are 25.0, 25.0, 25.0, 25.0 respectively
-	// NOTE: audio passthrough from the mainboard is 2.2kohm
-	m_dac->add_route(ALL_OUTPUTS, *this, 0.25); // 10Kohm
-	m_ym2151->add_route(1, *this, 0.25); // 10kohm
-	m_ym2151->add_route(0, *this, 0.25); // 10kohm
+	// NOTE: Multiply all numbers here or the final output by 1/0.468 = 2.1368 to get the relative
+	// volume values correct if there is no audio input used at all
+	// NOTE: audio passthrough from the mainboard is 2.2kohm, 0.5319 in files sending audio into this device
+	m_dac->add_route(ALL_OUTPUTS, *this, 0.1170); // 10Kohm
+	m_ym2151->add_route(1, *this, 0.1170); // 10kohm
+	m_ym2151->add_route(0, *this, 0.1170); // 10kohm
 	// interestingly, there is no cvsd, but a fourth 10k resistor here, but it is tied to ground. this makes the board quieter than it would otherwise be, presumably.
 }
 
@@ -473,8 +492,8 @@ void s11_bgs_device::device_add_mconfig(machine_config &config)
 	m_cpu->set_addrmap(AS_PROGRAM, &s11c_bg_device::s11c_bgs_map);
 	// volume mixer stuff
 	// the sum of all resistances is 10k + 10k = 20k
-	// NOTE: audio passthrough from the mainboard is 10k
-	m_dac->add_route(ALL_OUTPUTS, *this, 1.00); // 10Kohm
+	// NOTE: audio passthrough from the mainboard is 10k, 0.50 in files sending audio to this device
+	m_dac->add_route(ALL_OUTPUTS, *this, 0.50); // 10Kohm
 }
 
 void s11c_bg_device::device_start()

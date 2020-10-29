@@ -137,16 +137,14 @@ void gamecstl_state::video_start()
 
 void gamecstl_state::draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, int ch, int att, int x, int y)
 {
-	int i,j;
-	const uint8_t *dp;
 	int index = 0;
-	dp = gfx->get_data(ch);
+	uint8_t const *const dp = gfx->get_data(ch);
 
-	for (j=y; j < y+8; j++)
+	for (int j=y; j < y+8; j++)
 	{
-		uint16_t *p = &bitmap.pix16(j);
+		uint16_t *const p = &bitmap.pix(j);
 
-		for (i=x; i < x+8; i++)
+		for (int i=x; i < x+8; i++)
 		{
 			uint8_t pen = dp[index++];
 			if (pen)
@@ -159,16 +157,15 @@ void gamecstl_state::draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 
 uint32_t gamecstl_state::screen_update_gamecstl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int i, j;
 	gfx_element *gfx = m_gfxdecode->gfx(0);
-	uint32_t *cga = m_cga_ram;
+	uint32_t const *const cga = m_cga_ram;
 	int index = 0;
 
 	bitmap.fill(0, cliprect);
 
-	for (j=0; j < 25; j++)
+	for (int j=0; j < 25; j++)
 	{
-		for (i=0; i < 80; i+=2)
+		for (int i=0; i < 80; i+=2)
 		{
 			int att0 = (cga[index] >> 8) & 0xff;
 			int ch0 = (cga[index] >> 0) & 0xff;
@@ -401,38 +398,7 @@ static GFXDECODE_START( gfx_cga )
 	GFXDECODE_ENTRY( "gfx1", 0x1800, CGA_charlayout,              0, 256 )   /* Font 3*/
 GFXDECODE_END
 
-#define AT_KEYB_HELPER(bit, text, key1) \
-	PORT_BIT( bit, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME(text) PORT_CODE(key1)
-
 static INPUT_PORTS_START(gamecstl)
-	PORT_START("pc_keyboard_0")
-	PORT_BIT ( 0x0001, 0x0000, IPT_UNUSED )     /* unused scancode 0 */
-	AT_KEYB_HELPER( 0x0002, "Esc",          KEYCODE_Q           ) /* Esc                         01  81 */
-
-	PORT_START("pc_keyboard_1")
-	AT_KEYB_HELPER( 0x0020, "Y",            KEYCODE_Y           ) /* Y                           15  95 */
-	AT_KEYB_HELPER( 0x1000, "Enter",        KEYCODE_ENTER       ) /* Enter                       1C  9C */
-
-	PORT_START("pc_keyboard_2")
-
-	PORT_START("pc_keyboard_3")
-	AT_KEYB_HELPER( 0x0002, "N",            KEYCODE_N           ) /* N                           31  B1 */
-	AT_KEYB_HELPER( 0x0800, "F1",           KEYCODE_S           ) /* F1                          3B  BB */
-
-	PORT_START("pc_keyboard_4")
-
-	PORT_START("pc_keyboard_5")
-
-	PORT_START("pc_keyboard_6")
-	AT_KEYB_HELPER( 0x0040, "(MF2)Cursor Up",       KEYCODE_UP          ) /* Up                          67  e7 */
-	AT_KEYB_HELPER( 0x0080, "(MF2)Page Up",         KEYCODE_PGUP        ) /* Page Up                     68  e8 */
-	AT_KEYB_HELPER( 0x0100, "(MF2)Cursor Left",     KEYCODE_LEFT        ) /* Left                        69  e9 */
-	AT_KEYB_HELPER( 0x0200, "(MF2)Cursor Right",    KEYCODE_RIGHT       ) /* Right                       6a  ea */
-	AT_KEYB_HELPER( 0x0800, "(MF2)Cursor Down",     KEYCODE_DOWN        ) /* Down                        6c  ec */
-	AT_KEYB_HELPER( 0x1000, "(MF2)Page Down",       KEYCODE_PGDN        ) /* Page Down                   6d  ed */
-	AT_KEYB_HELPER( 0x4000, "Del",                  KEYCODE_A           ) /* Delete                      6f  ef */
-
-	PORT_START("pc_keyboard_7")
 INPUT_PORTS_END
 
 void gamecstl_state::machine_start()

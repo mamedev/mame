@@ -227,7 +227,7 @@ static int mbee_tap_calculate_size_in_samples(const uint8_t *bytes, int length)
 	return mbee_handle_tap(nullptr, bytes);
 }
 
-static const struct CassetteLegacyWaveFiller mbee_tap_config =
+static const cassette_image::LegacyWaveFiller mbee_tap_config =
 {
 	mbee_tap_fill_wave,                 /* fill_wave */
 	-1,                                     /* chunk_size */
@@ -238,17 +238,17 @@ static const struct CassetteLegacyWaveFiller mbee_tap_config =
 	0                                       /* trailer_samples */
 };
 
-static cassette_image::error mbee_tap_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error mbee_tap_identify(cassette_image *cassette, cassette_image::Options *opts)
 {
-	return cassette_legacy_identify(cassette, opts, &mbee_tap_config);
+	return cassette->legacy_identify(opts, &mbee_tap_config);
 }
 
 static cassette_image::error mbee_tap_load(cassette_image *cassette)
 {
-	return cassette_legacy_construct(cassette, &mbee_tap_config);
+	return cassette->legacy_construct(&mbee_tap_config);
 }
 
-static const struct CassetteFormat mbee_tap_image_format =
+static const cassette_image::Format mbee_tap_image_format =
 {
 	"tap",
 	mbee_tap_identify,

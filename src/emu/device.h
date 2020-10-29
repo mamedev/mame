@@ -205,7 +205,7 @@ private:
 	template <typename DeviceClass>
 	static std::unique_ptr<device_t> create_device(device_type_impl_base const &type, machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	{
-		return make_unique_clear<DeviceClass>(mconfig, tag, owner, clock);
+		return std::make_unique<DeviceClass>(mconfig, tag, owner, clock);
 	}
 
 	template <typename DriverClass>
@@ -298,7 +298,7 @@ public:
 	template <typename... Params>
 	std::unique_ptr<DeviceClass> create(machine_config &mconfig, char const *tag, device_t *owner, Params &&... args) const
 	{
-		return make_unique_clear<DeviceClass>(mconfig, tag, owner, std::forward<Params>(args)...);
+		return std::make_unique<DeviceClass>(mconfig, tag, owner, std::forward<Params>(args)...);
 	}
 
 	template <typename... Params> DeviceClass &operator()(machine_config &mconfig, char const *tag, Params &&... args) const;

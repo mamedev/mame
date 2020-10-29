@@ -77,7 +77,7 @@ void buggychl_state::draw_sky( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	for (int y = 0; y < 256; y++)
 		for (int x = 0; x < 256; x++)
-			bitmap.pix16(y, x) = 128 + x / 2;
+			bitmap.pix(y, x) = 128 + x / 2;
 }
 
 
@@ -158,28 +158,21 @@ void buggychl_state::draw_fg( bitmap_ind16 &bitmap, const rectangle &cliprect )
 
 void buggychl_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	int offs;
-	const uint8_t *gfx;
-
 	g_profiler.start(PROFILER_USER1);
 
-	gfx = memregion("gfx2")->base();
-	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
+	uint8_t const *const gfx = memregion("gfx2")->base();
+	for (int offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
-		int sx, sy, flipy, zoom, ch, x, px, y;
-		const uint8_t *lookup;
-		const uint8_t *zoomx_rom, *zoomy_rom;
+		int sx = m_spriteram[offs + 3] - ((m_spriteram[offs + 2] & 0x80) << 1);
+		int sy = 256 - 64 - m_spriteram[offs] + ((m_spriteram[offs + 1] & 0x80) << 1);
+		int flipy = m_spriteram[offs + 1] & 0x40;
+		int zoom = m_spriteram[offs + 1] & 0x3f;
+		uint8_t const *const zoomy_rom = gfx + (zoom << 6);
+		uint8_t const *const zoomx_rom = gfx + 0x2000 + (zoom << 3);
 
-		sx = m_spriteram[offs + 3] - ((m_spriteram[offs + 2] & 0x80) << 1);
-		sy = 256 - 64 - m_spriteram[offs] + ((m_spriteram[offs + 1] & 0x80) << 1);
-		flipy = m_spriteram[offs + 1] & 0x40;
-		zoom = m_spriteram[offs + 1] & 0x3f;
-		zoomy_rom = gfx + (zoom << 6);
-		zoomx_rom = gfx + 0x2000 + (zoom << 3);
+		uint8_t const *const lookup = m_sprite_lookup + ((m_spriteram[offs + 2] & 0x7f) << 6);
 
-		lookup = m_sprite_lookup + ((m_spriteram[offs + 2] & 0x7f) << 6);
-
-		for (y = 0; y < 64; y++)
+		for (int y = 0; y < 64; y++)
 		{
 			int dy = flip_screen_y() ? (255 - sy - y) : (sy + y);
 
@@ -192,26 +185,23 @@ void buggychl_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 				if (flipy)
 					base_pos ^= 0x38;
 
-				px = 0;
-				for (ch = 0; ch < 4; ch++)
+				int px = 0;
+				for (int ch = 0; ch < 4; ch++)
 				{
-					int pos, code, realflipy;
-					const uint8_t *pendata;
-
-					pos = base_pos + 2 * ch;
-					code = 8 * (lookup[pos] | ((lookup[pos + 1] & 0x07) << 8));
-					realflipy = (lookup[pos + 1] & 0x80) ? !flipy : flipy;
+					int pos = base_pos + 2 * ch;
+					int code = 8 * (lookup[pos] | ((lookup[pos + 1] & 0x07) << 8));
+					int realflipy = (lookup[pos + 1] & 0x80) ? !flipy : flipy;
 					code += (realflipy ? (charline ^ 7) : charline);
-					pendata = m_gfxdecode->gfx(1)->get_data(code);
+					uint8_t const *const pendata = m_gfxdecode->gfx(1)->get_data(code);
 
-					for (x = 0; x < 16; x++)
+					for (int x = 0; x < 16; x++)
 					{
 						int col = pendata[x];
 						if (col)
 						{
 							int dx = flip_screen_x() ? (255 - sx - px) : (sx + px);
 							if ((dx & ~0xff) == 0)
-								bitmap.pix16(dy, dx) = m_sprite_color_base + col;
+								bitmap.pix(dy, dx) = m_sprite_color_base + col;
 						}
 
 						/* the following line is almost certainly wrong */

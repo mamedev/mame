@@ -1068,8 +1068,8 @@ void dpb7000_state::device_timer(emu_timer &timer, device_timer_id id, int param
 
 MC6845_UPDATE_ROW(dpb7000_state::crtc_update_row)
 {
-	const pen_t *pen = m_palette->pens();
-	const uint8_t *char_rom = m_vdu_char_rom->base();
+	const pen_t *const pen = m_palette->pens();
+	const uint8_t *const char_rom = m_vdu_char_rom->base();
 
 	for (int column = 0; column < x_count; column++)
 	{
@@ -1087,7 +1087,7 @@ MC6845_UPDATE_ROW(dpb7000_state::crtc_update_row)
 			int x = (column * 8) + bit;
 			int color = BIT(data, 7) && de;
 
-			bitmap.pix32(y, x) = pen[color];
+			bitmap.pix(y, x) = pen[color];
 
 			data <<= 1;
 		}
@@ -2396,9 +2396,9 @@ uint32_t dpb7000_state::store_screen_update(screen_device &screen, bitmap_rgb32 
 {
 	for (int py = 0; py < 768; py++)
 	{
-		uint8_t *src_lum = &m_framestore_lum[StoreNum][py * 800];
-		uint8_t *src_chr = &m_framestore_chr[StoreNum][py * 800];
-		uint32_t *dst = &bitmap.pix32(py);
+		const uint8_t *src_lum = &m_framestore_lum[StoreNum][py * 800];
+		const uint8_t *src_chr = &m_framestore_chr[StoreNum][py * 800];
+		uint32_t *dst = &bitmap.pix(py);
 		for (int px = 0; px < 800; px++)
 		{
 			const uint32_t u = *src_chr++ << 16;
@@ -2412,9 +2412,9 @@ uint32_t dpb7000_state::store_screen_update(screen_device &screen, bitmap_rgb32 
 	{
 		for (int py = 512; py < 768; py++)
 		{
-			uint8_t *src_lum = &m_brushstore_lum[(py - 512) * 256];
-			uint8_t *src_chr = &m_brushstore_chr[(py - 512) * 256];
-			uint32_t *dst = &bitmap.pix32(py);
+			const uint8_t *src_lum = &m_brushstore_lum[(py - 512) * 256];
+			const uint8_t *src_chr = &m_brushstore_chr[(py - 512) * 256];
+			uint32_t *dst = &bitmap.pix(py);
 			for (int px = 0; px < 256; px += 2)
 			{
 				const uint32_t u = *src_chr++ << 16;

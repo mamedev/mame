@@ -232,7 +232,7 @@ void redclash_state::draw_bullets( bitmap_ind16 &bitmap, const rectangle &clipre
 		}
 
 		if (cliprect.contains(sx, sy))
-			bitmap.pix16(sy, sx) = 0x19;
+			bitmap.pix(sy, sx) = 0x19;
 	}
 }
 

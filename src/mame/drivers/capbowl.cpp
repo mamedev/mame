@@ -95,7 +95,6 @@
 #include "cpu/m6809/m6809.h"
 #include "sound/2203intf.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 #define MASTER_CLOCK        XTAL(8'000'000)
@@ -362,9 +361,6 @@ void capbowl_state::capbowl(machine_config &config)
 	ymsnd.add_route(3, "speaker", 0.75);
 
 	DAC0832(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 

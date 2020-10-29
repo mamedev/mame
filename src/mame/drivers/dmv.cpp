@@ -315,17 +315,17 @@ UPD7220_DISPLAY_PIXELS_MEMBER( dmv_state::hgdc_display_pixels )
 
 		for(int xi=0; xi<16; xi++)
 		{
-			int r = ((red   >> xi) & 1) ? 255 : 0;
-			int g = ((green >> xi) & 1) ? 255 : 0;
-			int b = ((blue  >> xi) & 1) ? 255 : 0;
+			int r = BIT(red,   xi) ? 255 : 0;
+			int g = BIT(green, xi) ? 255 : 0;
+			int b = BIT(blue,  xi) ? 255 : 0;
 
 			if (bitmap.cliprect().contains(x + xi, y))
-				bitmap.pix32(y, x + xi) = rgb_t(r, g, b);
+				bitmap.pix(y, x + xi) = rgb_t(r, g, b);
 		}
 	}
 	else
 	{
-		const rgb_t *palette = m_palette->palette()->entry_list_raw();
+		rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
 		// 32KB videoram
 		uint16_t gfx = m_video_ram[(address & 0xffff) >> 1];
@@ -333,7 +333,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( dmv_state::hgdc_display_pixels )
 		for(int xi=0;xi<16;xi++)
 		{
 			if (bitmap.cliprect().contains(x + xi, y))
-				bitmap.pix32(y, x + xi) = ((gfx >> xi) & 1) ? palette[2] : palette[0];
+				bitmap.pix(y, x + xi) = ((gfx >> xi) & 1) ? palette[2] : palette[0];
 		}
 	}
 }
@@ -367,18 +367,17 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( dmv_state::hgdc_draw_text )
 
 			for( int xi = 0; xi < 8; xi++)
 			{
-				int res_x,res_y;
 				int pen = (tile_data >> xi) & 1 ? 1 : 0;
 
-				res_x = x * 8 + xi;
-				res_y = y + yi;
+				int res_x = x * 8 + xi;
+				int res_y = y + yi;
 
 				if(!m_screen->visible_area().contains(res_x, res_y))
 					continue;
 
 				if(yi >= 16) { pen = 0; }
 
-				bitmap.pix32(res_y, res_x) = pen ? fg : bg;
+				bitmap.pix(res_y, res_x) = pen ? fg : bg;
 			}
 		}
 	}

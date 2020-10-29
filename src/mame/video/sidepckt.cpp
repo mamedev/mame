@@ -77,6 +77,8 @@ void sidepckt_state::video_start()
 	m_bg_tilemap->set_transmask(1,0x01,0xfe); /* split type 1 has pen 0 transparent in front half */
 
 	machine().tilemap().set_flip_all(TILEMAP_FLIPX);
+
+	save_item(NAME(m_scroll_y));
 }
 
 

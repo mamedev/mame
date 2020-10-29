@@ -113,18 +113,11 @@ void special_state::specimx_portc_w(uint8_t data)
 	m_dac->write(BIT(data, 5)); //beeper
 }
 
-void special_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_DEVICE_CALLBACK_MEMBER(special_state::pit_timer)
 {
-	switch (id)
-	{
-	case TIMER_PIT8253_GATES:
-		m_pit->write_gate0(0);
-		m_pit->write_gate1(0);
-		m_pit->write_gate2(0);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in special_state::device_timer");
-	}
+	m_pit->write_gate0(0);
+	m_pit->write_gate1(0);
+	m_pit->write_gate2(0);
 }
 
 
@@ -325,7 +318,7 @@ void special_state::machine_reset()
 	{
 		m_specimx_color = 0xF0;  // default for -bios 1/2, since they don't have colour
 		specimx_set_bank(2, 0); // Initial load ROM disk
-		timer_set(attotime::zero, TIMER_PIT8253_GATES);
+		m_pit_timer->adjust(attotime::zero);
 	}
 }
 

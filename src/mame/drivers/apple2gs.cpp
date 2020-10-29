@@ -71,45 +71,46 @@
 #include "machine/apple2common.h"
 //#include "machine/apple2host.h"
 
+#include "bus/a2bus/4play.h"
+#include "bus/a2bus/a2alfam2.h"
+#include "bus/a2bus/a2applicard.h"
+#include "bus/a2bus/a2arcadebd.h"
 #include "bus/a2bus/a2bus.h"
-#include "bus/a2bus/ramcard16k.h"
-#include "bus/a2bus/a2diskiing.h"
-#include "bus/a2bus/a2mockingboard.h"
 #include "bus/a2bus/a2cffa.h"
-#include "bus/a2bus/a2memexp.h"
-#include "bus/a2bus/a2scsi.h"
+#include "bus/a2bus/a2corvus.h"
+#include "bus/a2bus/a2diskiing.h"
+#include "bus/a2bus/a2dx1.h"
+#include "bus/a2bus/a2echoii.h"
 #include "bus/a2bus/a2hsscsi.h"
-#include "bus/a2bus/cmsscsi.h"
-#include "bus/a2bus/a2thunderclock.h"
+#include "bus/a2bus/a2mcms.h"
+#include "bus/a2bus/a2memexp.h"
+#include "bus/a2bus/a2midi.h"
+#include "bus/a2bus/a2mockingboard.h"
+#include "bus/a2bus/a2pic.h"
+#include "bus/a2bus/a2sam.h"
+#include "bus/a2bus/a2scsi.h"
 #include "bus/a2bus/a2softcard.h"
-#include "bus/a2bus/a2videoterm.h"
 #include "bus/a2bus/a2ssc.h"
 #include "bus/a2bus/a2swyft.h"
 #include "bus/a2bus/a2themill.h"
-#include "bus/a2bus/a2sam.h"
-#include "bus/a2bus/a2alfam2.h"
-#include "bus/a2bus/laser128.h"
-#include "bus/a2bus/a2echoii.h"
-#include "bus/a2bus/a2arcadebd.h"
-#include "bus/a2bus/a2midi.h"
-#include "bus/a2bus/a2zipdrive.h"
-#include "bus/a2bus/a2applicard.h"
+#include "bus/a2bus/a2thunderclock.h"
 #include "bus/a2bus/a2ultraterm.h"
-#include "bus/a2bus/a2pic.h"
-#include "bus/a2bus/a2corvus.h"
-#include "bus/a2bus/a2mcms.h"
-#include "bus/a2bus/a2dx1.h"
-#include "bus/a2bus/timemasterho.h"
-#include "bus/a2bus/mouse.h"
-#include "bus/a2bus/ezcgi.h"
+#include "bus/a2bus/a2videoterm.h"
 #include "bus/a2bus/a2vulcan.h"
-#include "bus/a2bus/4play.h"
-//#include "bus/a2bus/pc_xporter.h"
+#include "bus/a2bus/a2zipdrive.h"
 #include "bus/a2bus/byte8251.h"
+#include "bus/a2bus/cmsscsi.h"
+#include "bus/a2bus/ezcgi.h"
+#include "bus/a2bus/grapplerplus.h"
 //#include "bus/a2bus/hostram.h"
+#include "bus/a2bus/laser128.h"
+#include "bus/a2bus/mouse.h"
+//#include "bus/a2bus/pc_xporter.h"
+#include "bus/a2bus/ramcard16k.h"
 //#include "bus/a2bus/ramfast.h"
-#include "bus/a2bus/uthernet.h"
 #include "bus/a2bus/sider.h"
+#include "bus/a2bus/timemasterho.h"
+#include "bus/a2bus/uthernet.h"
 
 #include "bus/a2gameio/gameio.h"
 
@@ -783,6 +784,14 @@ WRITE_LINE_MEMBER(apple2gs_state::ay3600_data_ready_w)
 	{
 		uint8_t *decode = m_kbdrom->base();
 		uint16_t trans;
+
+		// if the user presses a valid key to start the driver from the info screen,
+		// we will see that key.  ignore keys in the first 25,000 cycles (in my tests,
+		// the unwanted key shows up at 17030 cycles)
+		if (m_maincpu->total_cycles() < 25000)
+		{
+			return;
+		}
 
 		m_lastchar = m_ay3600->b_r();
 
@@ -4585,6 +4594,7 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("uthernet", A2BUS_UTHERNET);  /* A2RetroSystems Uthernet card */
 	device.option_add("sider2", A2BUS_SIDER2); /* Advanced Tech Systems / First Class Peripherals Sider 2 SASI card */
 	device.option_add("sider1", A2BUS_SIDER1); /* Advanced Tech Systems / First Class Peripherals Sider 1 SASI card */
+	device.option_add("grapplerplus", A2BUS_GRAPPLERPLUS); /* Orange Micro Grappler+ Printer Interface card */
 }
 
 void apple2gs_state::apple2gs(machine_config &config)
@@ -4798,7 +4808,7 @@ void apple2gs_state::apple2gsr1(machine_config &config)
 ***************************************************************************/
 ROM_START(apple2gs)
 	// M50740/50741 ADB MCU inside the IIgs system unit
-	ROM_REGION(0x1000,M5074X_INTERNAL_ROM(A2GS_ADBMCU_TAG),0)
+	ROM_REGION(0x1000, A2GS_ADBMCU_TAG, 0)
 	ROM_LOAD( "341s0632-2.bin", 0x000000, 0x001000, CRC(e1c11fb0) SHA1(141d18c36a617ab9dce668445440d34354be0672) )
 
 	// i8048 microcontroller inside the IIgs ADB Standard Keyboard
@@ -4826,7 +4836,7 @@ ROM_START(apple2gs)
 ROM_END
 
 ROM_START(apple2gsr3p)
-	ROM_REGION(0x1000,M5074X_INTERNAL_ROM(A2GS_ADBMCU_TAG),0)
+	ROM_REGION(0x1000, A2GS_ADBMCU_TAG, 0)
 	ROM_LOAD( "341s0632-2.bin", 0x000000, 0x001000, CRC(e1c11fb0) SHA1(141d18c36a617ab9dce668445440d34354be0672) )
 
 	ROM_REGION(0x400, "kmcu", 0)
@@ -4846,7 +4856,7 @@ ROM_START(apple2gsr3p)
 ROM_END
 
 ROM_START(apple2gsr1)
-	ROM_REGION(0xc00,M5074X_INTERNAL_ROM(A2GS_ADBMCU_TAG),0)
+	ROM_REGION(0xc00, A2GS_ADBMCU_TAG, 0)
 	ROM_LOAD( "341s0345.bin", 0x000000, 0x000c00, CRC(48cd5779) SHA1(97e421f5247c00a0ca34cd08b6209df573101480) )
 
 	ROM_REGION(0x400, "kmcu", 0)
@@ -4865,7 +4875,7 @@ ROM_START(apple2gsr1)
 ROM_END
 
 ROM_START(apple2gsr0)
-	ROM_REGION(0xc00,M5074X_INTERNAL_ROM(A2GS_ADBMCU_TAG),0)
+	ROM_REGION(0xc00, A2GS_ADBMCU_TAG, 0)
 	ROM_LOAD( "341s0345.bin", 0x000000, 0x000c00, CRC(48cd5779) SHA1(97e421f5247c00a0ca34cd08b6209df573101480) )
 
 	ROM_REGION(0x400, "kmcu", 0)
@@ -4884,7 +4894,7 @@ ROM_START(apple2gsr0)
 ROM_END
 
 ROM_START(apple2gsr0p)  // 6/19/1986 Cortland prototype
-	ROM_REGION(0xc00,M5074X_INTERNAL_ROM(A2GS_ADBMCU_TAG),0)
+	ROM_REGION(0xc00, A2GS_ADBMCU_TAG, 0)
 	ROM_LOAD( "341s0345.bin", 0x000000, 0x000c00, CRC(48cd5779) SHA1(97e421f5247c00a0ca34cd08b6209df573101480) )
 
 	ROM_REGION(0x400, "kmcu", 0)
@@ -4903,7 +4913,7 @@ ROM_START(apple2gsr0p)  // 6/19/1986 Cortland prototype
 ROM_END
 
 ROM_START(apple2gsr0p2)  // 3/10/1986 Cortland prototype, boots as "Apple //'ing - Alpha 2.0"
-	ROM_REGION(0xc00,M5074X_INTERNAL_ROM(A2GS_ADBMCU_TAG),0)
+	ROM_REGION(0xc00, A2GS_ADBMCU_TAG, 0)
 	ROM_LOAD( "341s0345.bin", 0x000000, 0x000c00, CRC(48cd5779) SHA1(97e421f5247c00a0ca34cd08b6209df573101480) )
 
 	ROM_REGION(0x400, "kmcu", 0)

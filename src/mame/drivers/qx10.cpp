@@ -173,9 +173,8 @@ private:
 
 UPD7220_DISPLAY_PIXELS_MEMBER( qx10_state::hgdc_display_pixels )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	int xi,gfx[3];
-	uint8_t pen;
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	int gfx[3];
 
 	if(m_color_mode)
 	{
@@ -190,13 +189,14 @@ UPD7220_DISPLAY_PIXELS_MEMBER( qx10_state::hgdc_display_pixels )
 		gfx[2] = 0;
 	}
 
-	for(xi=0;xi<16;xi++)
+	for(int xi=0;xi<16;xi++)
 	{
+		uint8_t pen;
 		pen = ((gfx[0] >> xi) & 1) ? 1 : 0;
 		pen|= ((gfx[1] >> xi) & 1) ? 2 : 0;
 		pen|= ((gfx[2] >> xi) & 1) ? 4 : 0;
 
-		bitmap.pix32(y, x + xi) = palette[pen];
+		bitmap.pix(y, x + xi) = palette[pen];
 	}
 }
 
@@ -239,7 +239,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( qx10_state::hgdc_draw_text )
 					pen = ((tile_data >> xi) & 1) ? color : 0;
 
 				if(pen)
-					bitmap.pix32(res_y, res_x) = palette[pen];
+					bitmap.pix(res_y, res_x) = palette[pen];
 			}
 		}
 	}

@@ -41,7 +41,6 @@ private:
 	required_device<picture_image_device> m_picture;
 	int m_x, m_y, m_an1, m_an2, m_an3, m_level;
 	u8 m_a2_bitmap[280*192];
-	bitmap_argb32 *m_bitmap;
 };
 
 // device type declaration

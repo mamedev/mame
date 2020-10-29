@@ -117,30 +117,26 @@ void nubus_laserview_device::device_reset()
 
 uint32_t nubus_laserview_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint32_t *scanline;
-	int x, y;
-	uint8_t pixels;
-
 	if (!m_vbl_disable)
 	{
 		raise_slot_irq();
 	}
 
-	for (y = 0; y < 600; y++)
+	for (int y = 0; y < 600; y++)
 	{
-		scanline = &bitmap.pix32(y);
-		for (x = 0; x < 832/8; x++)
+		uint32_t *scanline = &bitmap.pix(y);
+		for (int x = 0; x < 832/8; x++)
 		{
-			pixels = m_vram[(y * 104) + (BYTE4_XOR_BE(x)) + 0x20];
+			uint8_t const pixels = m_vram[(y * 104) + (BYTE4_XOR_BE(x)) + 0x20];
 
-			*scanline++ = m_palette[(pixels>>7)&1];
-			*scanline++ = m_palette[(pixels>>6)&1];
-			*scanline++ = m_palette[(pixels>>5)&1];
-			*scanline++ = m_palette[(pixels>>4)&1];
-			*scanline++ = m_palette[(pixels>>3)&1];
-			*scanline++ = m_palette[(pixels>>2)&1];
-			*scanline++ = m_palette[(pixels>>1)&1];
-			*scanline++ = m_palette[(pixels&1)];
+			*scanline++ = m_palette[BIT(pixels, 7)];
+			*scanline++ = m_palette[BIT(pixels, 6)];
+			*scanline++ = m_palette[BIT(pixels, 5)];
+			*scanline++ = m_palette[BIT(pixels, 4)];
+			*scanline++ = m_palette[BIT(pixels, 3)];
+			*scanline++ = m_palette[BIT(pixels, 2)];
+			*scanline++ = m_palette[BIT(pixels, 1)];
+			*scanline++ = m_palette[BIT(pixels, 0)];
 		}
 	}
 

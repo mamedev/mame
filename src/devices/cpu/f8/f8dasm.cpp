@@ -17,33 +17,22 @@ offs_t f8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 {
 	offs_t base_pc = pc;
 	uint8_t op = opcodes.r8(pc++);
+	offs_t flags = SUPPORTED;
 
 	switch( op )
 	{
 	/* opcode  bitmask */
 	case 0x00: /* 0000 0000 */
-		util::stream_format(stream, "LR   A,KU");
-		break;
 	case 0x01: /* 0000 0001 */
-		util::stream_format(stream, "LR   A,KL");
-		break;
 	case 0x02: /* 0000 0010 */
-		util::stream_format(stream, "LR   A,QU");
-		break;
 	case 0x03: /* 0000 0011 */
-		util::stream_format(stream, "LR   A,QL");
+		util::stream_format(stream, "LR   A,%s", rname[op + 12]);
 		break;
 	case 0x04: /* 0000 0100 */
-		util::stream_format(stream, "LR   KU,A");
-		break;
 	case 0x05: /* 0000 0101 */
-		util::stream_format(stream, "LR   KL,A");
-		break;
 	case 0x06: /* 0000 0110 */
-		util::stream_format(stream, "LR   QU,A");
-		break;
 	case 0x07: /* 0000 0111 */
-		util::stream_format(stream, "LR   QL,A");
+		util::stream_format(stream, "LR   %s,A", rname[(op - 0x04) + 12]);
 		break;
 
 	case 0x08: /* 0000 1000 */
@@ -60,7 +49,8 @@ offs_t f8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 		break;
 
 	case 0x0c: /* 0000 1100 */
-		util::stream_format(stream, "PK") ;
+		util::stream_format(stream, "PK");
+		flags |= STEP_OUT;
 		break;
 	case 0x0d: /* 0000 1101 */
 		util::stream_format(stream, "LR   P0,Q");
@@ -109,6 +99,7 @@ offs_t f8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 		break;
 	case 0x1c: /* 0001 1100 */
 		util::stream_format(stream, "POP");
+		flags |= STEP_OUT;
 		break;
 	case 0x1d: /* 0001 1101 */
 		util::stream_format(stream, "LR   W,J");
@@ -120,39 +111,40 @@ offs_t f8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 		util::stream_format(stream, "INC");
 		break;
 	case 0x20: /* 0010 0000 */
-		util::stream_format(stream, "LI   $%02X", opcodes.r8(pc++));
+		util::stream_format(stream, "LI   H'%02X'", opcodes.r8(pc++));
 		break;
 	case 0x21: /* 0010 0001 */
-		util::stream_format(stream, "NI   $%02X", opcodes.r8(pc++));
+		util::stream_format(stream, "NI   H'%02X'", opcodes.r8(pc++));
 		break;
 	case 0x22: /* 0010 0010 */
-		util::stream_format(stream, "OI   $%02X", opcodes.r8(pc++));
+		util::stream_format(stream, "OI   H'%02X'", opcodes.r8(pc++));
 		break;
 	case 0x23: /* 0010 0011 */
-		util::stream_format(stream, "XI   $%02X", opcodes.r8(pc++));
+		util::stream_format(stream, "XI   H'%02X'", opcodes.r8(pc++));
 		break;
 	case 0x24: /* 0010 0100 */
-		util::stream_format(stream, "AI   $%02X", opcodes.r8(pc++));
+		util::stream_format(stream, "AI   H'%02X'", opcodes.r8(pc++));
 		break;
 	case 0x25: /* 0010 0101 */
-		util::stream_format(stream, "CI   $%02X", opcodes.r8(pc++));
+		util::stream_format(stream, "CI   H'%02X'", opcodes.r8(pc++));
 		break;
 	case 0x26: /* 0010 0110 */
-		util::stream_format(stream, "IN   $%02X", opcodes.r8(pc++));
+		util::stream_format(stream, "IN   H'%02X'", opcodes.r8(pc++));
 		break;
 	case 0x27: /* 0010 0111 */
-		util::stream_format(stream, "OUT  $%02X", opcodes.r8(pc++));
+		util::stream_format(stream, "OUT  H'%02X'", opcodes.r8(pc++));
 		break;
 	case 0x28: /* 0010 1000 */
-		util::stream_format(stream, "PI   $%04X", opcodes.r16(pc));
+		util::stream_format(stream, "PI   H'%04X'", opcodes.r16(pc));
 		pc += 2;
+		flags |= STEP_OVER;
 		break;
 	case 0x29: /* 0010 1001 */
-		util::stream_format(stream, "JMP  $%04X", opcodes.r16(pc));
+		util::stream_format(stream, "JMP  H'%04X'", opcodes.r16(pc));
 		pc += 2;
 		break;
 	case 0x2a: /* 0010 1010 */
-		util::stream_format(stream, "DCI  $%04X", opcodes.r16(pc));
+		util::stream_format(stream, "DCI  H'%04X'", opcodes.r16(pc));
 		pc += 2;
 		break;
 	case 0x2b: /* 0010 1011 */
@@ -161,11 +153,9 @@ offs_t f8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 	case 0x2c: /* 0010 1100 */
 		util::stream_format(stream, "XDC");
 		break;
-	case 0x2d: /* 0010 1101 */
-	case 0x2e: /* 0010 1110 */
-	case 0x2f: /* 0010 1111 */
-		util::stream_format(stream, "???  $%02X",op);
-		break;
+	/* case 0x2d: 0010 1101 */
+	/* case 0x2e: 0010 1110 */
+	/* case 0x2f: 0010 1111 */
 
 	case 0x30: /* 0011 0000 */
 	case 0x31: /* 0011 0001 */
@@ -179,20 +169,18 @@ offs_t f8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 	case 0x39: /* 0011 1001 */
 	case 0x3a: /* 0011 1010 */
 	case 0x3b: /* 0011 1011 */
-		util::stream_format(stream, "DS   %s",rname[op & 15]);
+		util::stream_format(stream, "DS   %s", rname[op & 15]);
 		break;
 	case 0x3c: /* 0011 1100 */
-		util::stream_format(stream, "DS   (IS)");
+		util::stream_format(stream, "DS   S");
 		break;
 	case 0x3d: /* 0011 1101 */
-		util::stream_format(stream, "DS   (IS++)");
+		util::stream_format(stream, "DS   I");
 		break;
 	case 0x3e: /* 0011 1110 */
-		util::stream_format(stream, "DS   (IS--)");
+		util::stream_format(stream, "DS   D");
 		break;
-	case 0x3f: /* 0011 1111 */
-		util::stream_format(stream, "???  $%02X",op);
-		break;
+	/* case 0x3f: 0011 1111 */
 
 	case 0x40: /* 0100 0000 */
 	case 0x41: /* 0100 0001 */
@@ -206,20 +194,18 @@ offs_t f8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 	case 0x49: /* 0100 1001 */
 	case 0x4a: /* 0100 1010 */
 	case 0x4b: /* 0100 1011 */
-		util::stream_format(stream, "LR   A,%s",rname[op & 15]);
+		util::stream_format(stream, "LR   A,%s", rname[op & 15]);
 		break;
 	case 0x4c: /* 0100 1100 */
-		util::stream_format(stream, "LR   A,(IS)");
+		util::stream_format(stream, "LR   A,S");
 		break;
 	case 0x4d: /* 0100 1101 */
-		util::stream_format(stream, "LR   A,(IS++)");
+		util::stream_format(stream, "LR   A,I");
 		break;
 	case 0x4e: /* 0100 1110 */
-		util::stream_format(stream, "LR   A,(IS--)");
+		util::stream_format(stream, "LR   A,D");
 		break;
-	case 0x4f: /* 0100 1111 */
-		util::stream_format(stream, "???  $%02X",op);
-		break;
+	/* case 0x4f: 0100 1111 */
 
 	case 0x50: /* 0101 0000 */
 	case 0x51: /* 0101 0001 */
@@ -233,20 +219,18 @@ offs_t f8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 	case 0x59: /* 0101 1001 */
 	case 0x5a: /* 0101 1010 */
 	case 0x5b: /* 0101 1011 */
-		util::stream_format(stream, "LR   %s,A",rname[op & 15]);
+		util::stream_format(stream, "LR   %s,A", rname[op & 15]);
 		break;
 	case 0x5c: /* 0101 1100 */
-		util::stream_format(stream, "LR   (IS),A");
+		util::stream_format(stream, "LR   S,A");
 		break;
 	case 0x5d: /* 0101 1101 */
-		util::stream_format(stream, "LR   (IS++),A");
+		util::stream_format(stream, "LR   I,A");
 		break;
 	case 0x5e: /* 0101 1110 */
-		util::stream_format(stream, "LR   (IS--),A");
+		util::stream_format(stream, "LR   D,A");
 		break;
-	case 0x5f: /* 0101 1111 */
-		util::stream_format(stream, "???  $%02X",op);
-		break;
+	/* case 0x5f: 0101 1111 */
 
 	case 0x60: /* 0110 0000 */
 	case 0x61: /* 0110 0001 */
@@ -256,7 +240,7 @@ offs_t f8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 	case 0x65: /* 0110 0101 */
 	case 0x66: /* 0110 0110 */
 	case 0x67: /* 0110 0111 */
-		util::stream_format(stream, "LISU $%02X", op & 0x07);
+		util::stream_format(stream, "LISU %d", op & 0x07);
 		break;
 	case 0x68: /* 0110 1000 */
 	case 0x69: /* 0110 1001 */
@@ -266,7 +250,7 @@ offs_t f8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 	case 0x6d: /* 0110 1101 */
 	case 0x6e: /* 0110 1110 */
 	case 0x6f: /* 0110 1111 */
-		util::stream_format(stream, "LISL $%02X", op & 0x07);
+		util::stream_format(stream, "LISL %d", op & 0x07);
 		break;
 
 	case 0x70: /* 0111 0000 */
@@ -285,27 +269,27 @@ offs_t f8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 	case 0x7d: /* 0111 1101 */
 	case 0x7e: /* 0111 1110 */
 	case 0x7f: /* 0111 1111 */
-		util::stream_format(stream, "LIS  $%02X", op & 0x0f);
+		util::stream_format(stream, "LIS  H'%02X'", op & 0x0f);
 		break;
 
 	case 0x81: /* 1000 0001 */
 	case 0x85: /* 1000 0101 */
-		util::stream_format(stream, "BP   $%04X", base_pc + (int8_t)opcodes.r8(pc++) + 1);
+		util::stream_format(stream, "BP   H'%04X'", base_pc + (int8_t)opcodes.r8(pc++) + 1);
 		break;
 
 	case 0x82: /* 1000 0010 */
-		util::stream_format(stream, "BC   $%04X", base_pc + (int8_t)opcodes.r8(pc++) + 1);
+		util::stream_format(stream, "BC   H'%04X'", base_pc + (int8_t)opcodes.r8(pc++) + 1);
 		break;
 
 	case 0x84: /* 1000 0100 */
-		util::stream_format(stream, "BZ   $%04X", base_pc + (int8_t)opcodes.r8(pc++) + 1);
+		util::stream_format(stream, "BZ   H'%04X'", base_pc + (int8_t)opcodes.r8(pc++) + 1);
 		break;
 
 	case 0x80: /* 1000 0000 */
 	case 0x83: /* 1000 0011 */
 	case 0x86: /* 1000 0110 */
 	case 0x87: /* 1000 0111 */
-		util::stream_format(stream, "BT   $%02X,$%04X", op & 0x07, base_pc + (int8_t)opcodes.r8(pc++) + 1);
+		util::stream_format(stream, "BT   H'%02X',H'%04X'", op & 0x07, base_pc + (int8_t)opcodes.r8(pc++) + 1);
 		break;
 
 	case 0x88: /* 1000 1000 */
@@ -337,28 +321,28 @@ offs_t f8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 		break;
 
 	case 0x8f: /* 1000 1111 */
-		util::stream_format(stream, "BR7  $%04X", base_pc + (int8_t)opcodes.r8(pc++) + 1);
+		util::stream_format(stream, "BR7  H'%04X'", base_pc + (int8_t)opcodes.r8(pc++) + 1);
 		break;
 
 	case 0x90: /* 1001 0000 */
-		util::stream_format(stream, "BR   $%04X", base_pc + (int8_t)opcodes.r8(pc++) + 1);
+		util::stream_format(stream, "BR   H'%04X'", base_pc + (int8_t)opcodes.r8(pc++) + 1);
 		break;
 
 	case 0x91: /* 1001 0001 */
 	case 0x95: /* 1001 0101 */
-		util::stream_format(stream, "BM   $%04X", base_pc + (int8_t)opcodes.r8(pc++) + 1);
+		util::stream_format(stream, "BM   H'%04X'", base_pc + (int8_t)opcodes.r8(pc++) + 1);
 		break;
 
 	case 0x92: /* 1001 0010 */
-		util::stream_format(stream, "BNC  $%04X", base_pc + (int8_t)opcodes.r8(pc++) + 1);
+		util::stream_format(stream, "BNC  H'%04X'", base_pc + (int8_t)opcodes.r8(pc++) + 1);
 		break;
 
 	case 0x94: /* 1001 0100 */
-		util::stream_format(stream, "BNZ  $%04X", base_pc + (int8_t)opcodes.r8(pc++) + 1);
+		util::stream_format(stream, "BNZ  H'%04X'", base_pc + (int8_t)opcodes.r8(pc++) + 1);
 		break;
 
 	case 0x98: /* 1001 1000 */
-		util::stream_format(stream, "BNO  $%04X", base_pc + (int8_t)opcodes.r8(pc++) + 1);
+		util::stream_format(stream, "BNO  H'%04X'", base_pc + (int8_t)opcodes.r8(pc++) + 1);
 		break;
 
 	case 0x93: /* 1001 0011 */
@@ -371,18 +355,16 @@ offs_t f8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 	case 0x9d: /* 1001 1101 */
 	case 0x9e: /* 1001 1110 */
 	case 0x9f: /* 1001 1111 */
-		util::stream_format(stream, "BF   $%02X,$%04X", op & 0x0f, base_pc + (int8_t)opcodes.r8(pc++) + 1);
+		util::stream_format(stream, "BF   H'%02X',H'%04X'", op & 0x0f, base_pc + (int8_t)opcodes.r8(pc++) + 1);
 		break;
 
 	case 0xa0: /* 1010 0000 */
 	case 0xa1: /* 1010 0001 */
-		util::stream_format(stream, "INS  $%02X", (unsigned) (int8_t) (op & 0x0F));
+		util::stream_format(stream, "INS  %d", op & 0x0f);
 		break;
 
-	case 0xa2: /* 1010 0010 */
-	case 0xa3: /* 1010 0011 */
-		util::stream_format(stream, "???  $%02X", op);
-		break;
+	/* case 0xa2: 1010 0010 */
+	/* case 0xa3: 1010 0011 */
 
 	case 0xa4: /* 1010 0100 */
 	case 0xa5: /* 1010 0101 */
@@ -396,18 +378,16 @@ offs_t f8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 	case 0xad: /* 1010 1101 */
 	case 0xae: /* 1010 1110 */
 	case 0xaf: /* 1010 1111 */
-		util::stream_format(stream, "INS  $%02X", (int8_t) op & 0x0f);
+		util::stream_format(stream, "INS  H'%02X'", op & 0x0f);
 		break;
 
 	case 0xb0: /* 1011 0000 */
 	case 0xb1: /* 1011 0001 */
-		util::stream_format(stream, "OUTS $%02X", (int8_t) op & 0x0f);
+		util::stream_format(stream, "OUTS %d", op & 0x0f);
 		break;
 
-	case 0xb2: /* 1011 0010 */
-	case 0xb3: /* 1011 0011 */
-		util::stream_format(stream, "???  $%02X", op);
-		break;
+	/* case 0xb2: 1011 0010 */
+	/* case 0xb3: 1011 0011 */
 
 	case 0xb4: /* 1011 0100 */
 	case 0xb5: /* 1011 0101 */
@@ -421,7 +401,7 @@ offs_t f8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 	case 0xbd: /* 1011 1101 */
 	case 0xbe: /* 1011 1110 */
 	case 0xbf: /* 1011 1111 */
-		util::stream_format(stream, "OUTS $%02X", (unsigned) (int8_t) op & 0x0f);
+		util::stream_format(stream, "OUTS H'%02X'", op & 0x0f);
 		break;
 
 	case 0xc0: /* 1100 0000 */
@@ -439,17 +419,15 @@ offs_t f8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 		util::stream_format(stream, "AS   %s", rname[op & 15]);
 		break;
 	case 0xcc: /* 1100 1100 */
-		util::stream_format(stream, "AS   (IS)");
+		util::stream_format(stream, "AS   S");
 		break;
 	case 0xcd: /* 1100 1101 */
-		util::stream_format(stream, "AS   (IS++)");
+		util::stream_format(stream, "AS   I");
 		break;
 	case 0xce: /* 1100 1110 */
-		util::stream_format(stream, "AS   (IS--)");
+		util::stream_format(stream, "AS   D");
 		break;
-	case 0xcf: /* 1100 1111 */
-		util::stream_format(stream, "???  $%02X", op);
-		break;
+	/* case 0xcf: 1100 1111 */
 
 	case 0xd0: /* 1101 0000 */
 	case 0xd1: /* 1101 0001 */
@@ -466,17 +444,15 @@ offs_t f8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 		util::stream_format(stream, "ASD  %s", rname[op & 15]);
 		break;
 	case 0xdc: /* 1101 1100 */
-		util::stream_format(stream, "ASD  (IS)");
+		util::stream_format(stream, "ASD  S");
 		break;
 	case 0xdd: /* 1101 1101 */
-		util::stream_format(stream, "ASD  (IS++)");
+		util::stream_format(stream, "ASD  I");
 		break;
 	case 0xde: /* 1101 1110 */
-		util::stream_format(stream, "ASD  (IS--)");
+		util::stream_format(stream, "ASD  D");
 		break;
-	case 0xdf: /* 1101 1111 */
-		util::stream_format(stream, "???  $%02X", op);
-		break;
+	/* case 0xdf: 1101 1111 */
 
 	case 0xe0: /* 1110 0000 */
 	case 0xe1: /* 1110 0001 */
@@ -493,17 +469,15 @@ offs_t f8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 		util::stream_format(stream, "XS   %s", rname[op & 15]);
 		break;
 	case 0xec: /* 1110 1100 */
-		util::stream_format(stream, "XS   (IS)");
+		util::stream_format(stream, "XS   S");
 		break;
 	case 0xed: /* 1110 1101 */
-		util::stream_format(stream, "XS   (IS++)");
+		util::stream_format(stream, "XS   I");
 		break;
 	case 0xee: /* 1110 1110 */
-		util::stream_format(stream, "XS   (IS--)");
+		util::stream_format(stream, "XS   D");
 		break;
-	case 0xef: /* 1110 1111 */
-		util::stream_format(stream, "???  $%02X", op);
-		break;
+	/* case 0xef: 1110 1111 */
 
 
 	case 0xf0: /* 1111 0000 */
@@ -521,18 +495,21 @@ offs_t f8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 		util::stream_format(stream, "NS   %s", rname[op & 15]);
 		break;
 	case 0xfc: /* 1111 1100 */
-		util::stream_format(stream, "NS   (IS)");
+		util::stream_format(stream, "NS   S");
 		break;
 	case 0xfd: /* 1111 1101 */
-		util::stream_format(stream, "NS   (IS++)");
+		util::stream_format(stream, "NS   I");
 		break;
 	case 0xfe: /* 1111 1110 */
-		util::stream_format(stream, "NS   (IS--)");
+		util::stream_format(stream, "NS   D");
 		break;
-	case 0xff: /* 1111 1111 */
-		util::stream_format(stream, "???  $%02X", op);
+	/* case 0xff: 1111 1111 */
+
+
+	default:
+		util::stream_format(stream, "DC   H'%02X' (?)", op);
 		break;
 	}
 
-	return pc - base_pc;
+	return (pc - base_pc) | flags;
 }

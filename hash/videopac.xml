@@ -20,22 +20,18 @@ TODO:
 Undumped (or dumped but not public):
 - Spaans          (spanish to dutch translator)
 - Crazy Horses
-- Des Chiffres et des Lettres
 - misc. homebrew cartridges
 
 Protos:
 - Bastion         youtube.com/watch?v=cFdmgs4r7_E
 - Catburglar      youtube.com/watch?v=DDsWDFxy0oE
 - Himalaya        youtube.com/watch?v=L_lvOs6EnA4
-- SoundTool       youtube.com/watch?v=7JYn6B7rxqw
 - Terrahawks      youtube.com/watch?v=AXk7OSA6NGg
 
 http://www.ozyr.com/rene/PICS/protos.jpg
-- Sherlock Holmes Consulting Detective (programmed by Ed Friedman, most likely dumped and hoarded)
 - Back Gammon
 - Freedom Fighters
 - K.C.'s Crazy Chase
-- Killer Bees (also 10/12/82 (silent version), and 11/12/82 builds exist)
 - Handicap I (?)
 - Frogger
 - Robot City
@@ -53,14 +49,9 @@ Unreleased, possibly no prototypes exist:
 
 Undumped Odyssey³/G7400 prototypes:
 
-USA:
-- TMS2764
-- Freedom Fighters
-- Pick Axe Pete
-
 http://www.ozyr.com/rene/PICS/protos.jpg
+- Pick Axe Pete
 - Modem Program
-- Attack of the Time Lord
 - Requins [Shark Hunter]
 - monsternet dedicated g7400 840209 [Norseman]
 - 58+ Air Battle
@@ -189,6 +180,18 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
+	<software name="linguaduc"><!-- not a consumer product, communication aid for the handicapped -->
+		<description>Linguaduc (Europe, prototype)</description>
+		<year>198?</year>
+		<publisher>Carba</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="0x800">
+				<rom name="pr_linguaduc.bin" size="0x800" crc="bd623665" sha1="d33dedd4b880f0cb655faa2396ab05c619799269" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="newscast">
 		<description>Newscaster (Europe)</description>
 		<year>1980</year>
@@ -228,7 +231,19 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="testcart">
+	<software name="soundtool"><!-- not a consumer product, developer sound tool -->
+		<description>Sound Tool (Europe)</description>
+		<year>198?</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="0x800">
+				<rom name="soundtool.bin" size="0x800" crc="3e454bbe" sha1="976bbac3557e6daa262439645511e280b7c740fe" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="testcart"><!-- not a consumer product, factory test rom -->
 		<description>Service Test Cartridge (Europe)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
@@ -737,7 +752,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x1000">
-				<rom name="jo_chez-maxime.bin" size="0x1000" crc="0f46cf66" sha1="cd58d267fe5bab82f5dab01dbb08d5adf0053108" />
+				<rom name="jo_vxt_a08.bin" size="0x1000" crc="0f46cf66" sha1="cd58d267fe5bab82f5dab01dbb08d5adf0053108" />
 			</dataarea>
 		</part>
 	</software>
@@ -803,7 +818,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="conquest">
+	<software name="conquest"><!-- board game -->
 		<description>Conquest of the World (Europe, US)</description>
 		<year>1981</year>
 		<publisher>Philips</publisher>
@@ -947,6 +962,18 @@ Official VP+ upgaded versions (simply adds a background picture):
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x800">
 				<rom name="br_16.bin" size="0x800" crc="b1109a09" sha1="e15f778efeb95530f8108854b14c404cf63f213a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chifflet">
+		<description>Des Chiffres et des Lettres (France)</description>
+		<year>198?</year>
+		<publisher>Brandt</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="jo_jft_d03.bin" size="0x2000" crc="248bf33e" sha1="5c86921225b93d87bfd63bc13dd22dddab4e8826" />
 			</dataarea>
 		</part>
 	</software>
@@ -1231,6 +1258,32 @@ Official VP+ upgaded versions (simply adds a background picture):
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x2000">
 				<rom name="o2_47.bin" size="0x2000" crc="b096654e" sha1="b446a2730aefafe71394dbb9850d43c5cf01d367" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beesp" cloneof="bees">
+		<description>Killer Bees! (US, prototype, set 1)</description>
+		<year>1982</year>
+		<publisher>Philips</publisher>
+		<info name="programmer" value="Robert S. Harris" />
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="0x1000">
+				<rom name="o2_47_pr.bin" size="0x1000" crc="f308018d" sha1="15880a92e42258776801fdae4239f3e529662913" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beespa" cloneof="bees">
+		<description>Killer Bees! (US, prototype, set 2)</description>
+		<year>1982</year>
+		<publisher>Philips</publisher>
+		<info name="programmer" value="Robert S. Harris" />
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="0x1000">
+				<rom name="o2_47_pr_alt.bin" size="0x1000" crc="9bec21c2" sha1="5f38cdc587091cb149364d20d508e800c860d82d" />
 			</dataarea>
 		</part>
 	</software>
@@ -1825,7 +1878,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x1000">
-				<rom name="jo_syracuse.bin" size="0x1000" crc="280d08f4" sha1="37aa11cbf0a32ece89d1d2c500b74660830377df" />
+				<rom name="jo_vxt_a07.bin" size="0x1000" crc="280d08f4" sha1="37aa11cbf0a32ece89d1d2c500b74660830377df" />
 			</dataarea>
 		</part>
 	</software>
@@ -1853,6 +1906,18 @@ Official VP+ upgaded versions (simply adds a background picture):
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x800">
 				<rom name="vp_12_f.bin" size="0x800" crc="ad89f799" sha1="2a55d179acfd9fe31b5f8f0ed0e2379b584f7c8a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sherlock"><!-- board game -->
+		<description>The Adventures of Sherlock Holmes (US, prototype)</description>
+		<year>198?</year>
+		<publisher>Magnavox</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="pr_sherlock.bin" size="0x2000" crc="245dd6a5" sha1="3046caec84ea4b4b5c84ff7e3d1fd38231367f94" />
 			</dataarea>
 		</part>
 	</software>
@@ -1907,7 +1972,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="quest">
+	<software name="quest"><!-- board game -->
 		<description>The Quest for the Rings (Europe, US)</description>
 		<year>1981</year>
 		<publisher>Philips</publisher>
@@ -1921,7 +1986,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="laquete" cloneof="quest">
+	<software name="laquete" cloneof="quest"><!-- board game -->
 		<description>La Quête des Anneux (France)</description>
 		<year>1982</year>
 		<publisher>Radiola</publisher>
@@ -2032,7 +2097,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 			<feature name="slot" value="o2_rom" />
 			<feature name="b_pin" value="1" />
 			<dataarea name="rom" size="0x2000">
-				<rom name="jo_basket-bowling_pl.bin" size="0x2000" crc="b5fb1416" sha1="c341ed24346546b75de2ab24af1a9223ca2d1aac" />
+				<rom name="jo_jfa_e03.bin" size="0x2000" crc="b5fb1416" sha1="c341ed24346546b75de2ab24af1a9223ca2d1aac" />
 			</dataarea>
 		</part>
 	</software>
@@ -2060,7 +2125,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 			<feature name="slot" value="o2_rom" />
 			<feature name="b_pin" value="1" />
 			<dataarea name="rom" size="0x2000">
-				<rom name="jo_billard_pl.bin" size="0x2000" crc="4cec1404" sha1="004ea921b691db6b310f5b51c495df9b86be3aa8" />
+				<rom name="jo_jxa_d03.bin" size="0x2000" crc="4cec1404" sha1="004ea921b691db6b310f5b51c495df9b86be3aa8" />
 			</dataarea>
 		</part>
 	</software>
@@ -2139,7 +2204,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 			<feature name="slot" value="o2_rom" />
 			<feature name="b_pin" value="1" />
 			<dataarea name="rom" size="0x2000">
-				<rom name="jo_demon-attack_pl.bin" size="0x2000" crc="50af9d45" sha1="cfd1337c8d5a40f2f4e1ab49158a8963764919da" />
+				<rom name="jo_jxt_c07.bin" size="0x2000" crc="50af9d45" sha1="cfd1337c8d5a40f2f4e1ab49158a8963764919da" />
 			</dataarea>
 		</part>
 	</software>
@@ -2152,7 +2217,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 			<feature name="slot" value="o2_rom" />
 			<feature name="b_pin" value="1" />
 			<dataarea name="rom" size="0x2000">
-				<rom name="jo_exojet_pl.bin" size="0x2000" crc="cfca6f39" sha1="8aafcd055a2ef45c3d85804c8a3ea04d9a9732ab" />
+				<rom name="jo_jxt_c05.bin" size="0x2000" crc="cfca6f39" sha1="8aafcd055a2ef45c3d85804c8a3ea04d9a9732ab" />
 			</dataarea>
 		</part>
 	</software>
@@ -2165,7 +2230,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 			<feature name="slot" value="o2_rom" />
 			<feature name="b_pin" value="1" />
 			<dataarea name="rom" size="0x2000">
-				<rom name="jo_flipper_pl.bin" size="0x2000" crc="ac5c74e6" sha1="215439c1044b93888b71bd6a210ebfda93d97c22" />
+				<rom name="jo_jfa_d01.bin" size="0x2000" crc="ac5c74e6" sha1="215439c1044b93888b71bd6a210ebfda93d97c22" />
 			</dataarea>
 		</part>
 	</software>
@@ -2230,7 +2295,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 			<feature name="slot" value="o2_rom" />
 			<feature name="b_pin" value="1" />
 			<dataarea name="rom" size="0x2000">
-				<rom name="jo_le-tresor-englouti_pl.bin" size="0x2000" crc="b2f0f0b4" sha1="c0fcaef6a18026e0acc04c3d48443d768043cb03" />
+				<rom name="jo_jft_a10.bin" size="0x2000" crc="b2f0f0b4" sha1="c0fcaef6a18026e0acc04c3d48443d768043cb03" />
 			</dataarea>
 		</part>
 	</software>
@@ -2399,7 +2464,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 			<feature name="slot" value="o2_rom" />
 			<feature name="b_pin" value="1" />
 			<dataarea name="rom" size="0x2000">
-				<rom name="jo_moto-crash_pl.bin" size="0x2000" crc="68560dc7" sha1="f6de2f95e5cf4849a4d7071b1a470c3ef0634e5f" />
+				<rom name="jo_jxt_e05.bin" size="0x2000" crc="68560dc7" sha1="f6de2f95e5cf4849a4d7071b1a470c3ef0634e5f" />
 			</dataarea>
 		</part>
 	</software>
@@ -2436,8 +2501,21 @@ Official VP+ upgaded versions (simply adds a background picture):
 
 <!-- Odyssey³ prototypes, they won't work properly on European VP+ consoles -->
 
+	<software name="timelordpl" cloneof="timelord">
+		<description>Attack of the Timelord! (US, plus, prototype)</description>
+		<year>1983</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<feature name="b_pin" value="1" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="o3_45.bin" size="0x2000" crc="5bbb30c8" sha1="29d999b9e7c59d16e5e68d833f28dbc86f062d1f" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="baseballpl" cloneof="baseball">
-		<description>Baseball (US, plus, prototype)</description>
+		<description>Baseball! (US, plus, prototype)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
 		<part name="cart" interface="odyssey_cart">
@@ -2458,6 +2536,45 @@ Official VP+ upgaded versions (simply adds a background picture):
 			<feature name="b_pin" value="1" />
 			<dataarea name="rom" size="0x2000">
 				<rom name="o3_flash.bin" size="0x2000" crc="e8e985d4" sha1="2fc340ae3dfe656becde77857618e7c4f27d6dfe" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="freedomplu" cloneof="freedom">
+		<description>Freedom Fighters! (US, plus, prototype)</description>
+		<year>1983</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<feature name="b_pin" value="1" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="o3_36.bin" size="0x2000" crc="3150a9bf" sha1="e1f78160d273a19f4c322423bc28a566fa668e71" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beesplu" cloneof="bees">
+		<description>Killer Bees! (US, plus, prototype)</description>
+		<year>1983</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<feature name="b_pin" value="1" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="o3_47.bin" size="0x2000" crc="3026e732" sha1="a944e7d6c5c8924dcbd9ef08e0f74b4bca1177c3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="terminal">
+		<description>Terminal Program (US, prototype)</description>
+		<year>1983</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<feature name="b_pin" value="1" />
+			<dataarea name="rom" size="0x800">
+				<rom name="o3_terminal.bin" size="0x800" crc="e5d2cf23" sha1="3e6e4f407a8f37636336029950acf7d46253e50a" />
 			</dataarea>
 		</part>
 	</software>
@@ -2492,7 +2609,6 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<!-- NTSC Cartridge dumped from a 39SF010 flashrom (1MB) and actual data (2KB) data is repeated to fill space and matches publicly posted rom from author -->
 	<software name="deathrac">
 		<description>Death Race (US)</description>
 		<year>2014</year>
@@ -2501,7 +2617,8 @@ Official VP+ upgaded versions (simply adds a background picture):
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x800">
-				<rom name="drace_rc04.ntsc.bin" size="0x800" crc="91a767de" sha1="26a044c68ff08f574f6649b731b82caca8c0e797" />
+				<!-- 39SF010 flashrom (1MB), actual data (2KB) is repeated to fill space and matches publicly posted rom from author -->
+				<rom name="drace_rc04_ntsc.bin" size="0x800" crc="91a767de" sha1="26a044c68ff08f574f6649b731b82caca8c0e797" />
 			</dataarea>
 		</part>
 	</software>
@@ -2514,7 +2631,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x800">
-				<rom name="drace_rc04.pal.bin" size="0x800" crc="0ca8c961" sha1="3918d6c2c324fba55e8b90acc8d38e540e4ec5c6" />
+				<rom name="drace_rc04_pal.bin" size="0x800" crc="0ca8c961" sha1="3918d6c2c324fba55e8b90acc8d38e540e4ec5c6" />
 			</dataarea>
 		</part>
 	</software>

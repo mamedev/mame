@@ -1703,7 +1703,6 @@ uint8_t ddenlovr_state::ddenlovr_gfxrom_r()
 
 void ddenlovr_state::copylayer(bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer)
 {
-	int x,y;
 	int scrollx = m_ddenlovr_scroll[layer / 4 * 8 + (layer % 4) + 0];
 	int scrolly = m_ddenlovr_scroll[layer / 4 * 8 + (layer % 4) + 4];
 
@@ -1720,15 +1719,15 @@ void ddenlovr_state::copylayer(bitmap_rgb32 &bitmap, const rectangle &cliprect, 
 
 	if (((m_ddenlovr_layer_enable2 << 4) | m_ddenlovr_layer_enable) & (1 << layer))
 	{
-		for (y = cliprect.top(); y <= cliprect.bottom(); y++)
+		for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 		{
-			for (x = cliprect.left(); x <= cliprect.right(); x++)
+			for (int x = cliprect.left(); x <= cliprect.right(); x++)
 			{
 				int pen = m_ddenlovr_pixmap[layer][512 * ((y + scrolly) & 0x1ff) + ((x + scrollx) & 0x1ff)];
 				if ((pen & transmask) != transpen)
 				{
 					pen &= penmask;
-					bitmap.pix32(y, x) = pens[pen];
+					bitmap.pix(y, x) = pens[pen];
 				}
 			}
 		}
@@ -4283,18 +4282,16 @@ VIDEO_START_MEMBER(htengoku_state,htengoku)
 
 uint32_t htengoku_state::screen_update_htengoku(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int layer, x, y;
-
 	// render the layers, one by one, "dynax.c" style. Then convert the pixmaps to "ddenlovr.c"
 	// format and let screen_update_ddenlovr() do the final compositing (priorities + palettes)
-	for (layer = 0; layer < 4; layer++)
+	for (int layer = 0; layer < 4; layer++)
 	{
 		m_htengoku_layer.fill(0, cliprect);
 		hanamai_copylayer(m_htengoku_layer, cliprect, layer);
 
-		for (y = 0; y < 256; y++)
-			for (x = 0; x < 512; x++)
-				m_ddenlovr_pixmap[3 - layer][y * 512 + x] = (uint8_t)(m_htengoku_layer.pix16(y, x));
+		for (int y = 0; y < 256; y++)
+			for (int x = 0; x < 512; x++)
+				m_ddenlovr_pixmap[3 - layer][y * 512 + x] = uint8_t(m_htengoku_layer.pix(y, x));
 	}
 
 	return screen_update_ddenlovr(screen, bitmap, cliprect);

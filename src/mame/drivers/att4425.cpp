@@ -131,26 +131,26 @@ void att4425_state::video_start()
 
 uint32_t att4425_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y, ra, gfx, fg, bg, chr, attr;
-	uint16_t sy = 0, ma, x, ca;
+	uint16_t sy = 0;
 
-	fg = 2;
-	bg = 0;
+	uint8_t fg = 2;
+	uint8_t bg = 0;
 
-	for (y = 0; y < 27; y++)
+	for (uint8_t y = 0; y < 27; y++)
 	{
-		ma = 0x7e9c + 4 * (81 - 27 + y);
+		uint16_t ma = 0x7e9c + 4 * (81 - 27 + y);
 		ma = (m_p_videoram[ma] << 8) + m_p_videoram[ma + 1] - 0x8000;
 
-		for (ra = 0; ra < 13; ra++)
+		for (uint8_t ra = 0; ra < 13; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix(sy++);
 
-			for (x = ma; x < ma + 160; x += 2)
+			for (uint16_t x = ma; x < ma + 160; x += 2)
 			{
-				chr = m_p_videoram[x + 1];
-				attr = m_p_videoram[x];
-				ca = (chr << 4) & 0x7f0;
+				uint8_t const chr = m_p_videoram[x + 1];
+				uint8_t const attr = m_p_videoram[x];
+				uint16_t ca = (chr << 4) & 0x7f0;
+				uint8_t gfx;
 
 				// font 2
 				if (attr & 0x01)
@@ -178,9 +178,8 @@ uint32_t att4425_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 				/* Display a scanline of a character */
 				for (int i = 7; i >= 0; i--)
-				{
 					*p++ = BIT(gfx, i) ? fg : bg;
-				}
+
 				*p++ = bg;
 			}
 		}

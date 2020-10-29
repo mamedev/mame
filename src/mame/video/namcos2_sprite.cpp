@@ -117,9 +117,9 @@ void namcos2_sprite_device::zdrawgfxzoom(
 					{
 						for (int y = sy; y < ey; y++)
 						{
-							const u8 *source = source_base + (y_index>>16) * gfx->rowbytes();
-							u16 *dest = &dest_bmp.pix16(y);
-							u8 *pri = &priority_bitmap.pix8(y);
+							u8 const *const source = source_base + (y_index>>16) * gfx->rowbytes();
+							u16 *const dest = &dest_bmp.pix(y);
+							u8 *const pri = &priority_bitmap.pix(y);
 							int x_index = x_index_base;
 							/* this code was previously shared with the c355 where this was needed
 							if (m_palxor)

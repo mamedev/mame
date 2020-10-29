@@ -338,6 +338,7 @@ kaypro_10_keyboard_device::kaypro_10_keyboard_device(
 	, m_bell(*this, "bell")
 	, m_matrix(*this, "ROW.%X", 0)
 	, m_modifiers(*this, "MOD")
+	, m_led_caps_lock(*this, "led_caps_lock")
 	, m_rxd_cb(*this)
 	, m_txd(1U)
 	, m_bus(0U)
@@ -372,6 +373,7 @@ ioport_constructor kaypro_10_keyboard_device::device_input_ports() const
 void kaypro_10_keyboard_device::device_start()
 {
 	m_rxd_cb.resolve_safe();
+	m_led_caps_lock.resolve();
 
 	save_item(NAME(m_txd));
 	save_item(NAME(m_bus));
@@ -424,6 +426,6 @@ uint8_t kaypro_10_keyboard_device::bus_r()
 void kaypro_10_keyboard_device::bus_w(uint8_t data)
 {
 	if (BIT(m_bus ^ data, 4))
-		machine().output().set_value("led_caps_lock", BIT(data, 4));
+		m_led_caps_lock = BIT(data, 4);
 	m_bus = data;
 }

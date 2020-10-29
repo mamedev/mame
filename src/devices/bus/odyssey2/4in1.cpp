@@ -22,7 +22,7 @@ DEFINE_DEVICE_TYPE(O2_ROM_4IN1, o2_4in1_device, "o2_4in1", "Odyssey 2 Videopac 4
 //  o2_4in1_device - constructor
 //-------------------------------------------------
 
-o2_4in1_device::o2_4in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+o2_4in1_device::o2_4in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, O2_ROM_4IN1, tag, owner, clock),
 	device_o2_cart_interface(mconfig, *this)
 { }

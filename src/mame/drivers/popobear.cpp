@@ -343,7 +343,7 @@ void popobear_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 						// colours on game over screen are still wrong without the weird param kludge above
 						if (pix&0x3f)
 						{
-							bitmap.pix16(y_draw, x_draw) = m_palette->pen(((pix+(add_it))&0xff)+0x100);
+							bitmap.pix(y_draw, x_draw) = m_palette->pen(((pix+(add_it))&0xff)+0x100);
 						}
 					}
 

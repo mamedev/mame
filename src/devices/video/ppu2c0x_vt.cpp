@@ -364,7 +364,7 @@ void ppu_vt03_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, u
 		if (!is16pix)
 		{
 			uint8_t pen = pixel_data + (4 * color);
-			draw_tile_pixel_inner(pen, &bitmap.pix32(m_scanline, sprite_xpos + pixel));
+			draw_tile_pixel_inner(pen, &bitmap.pix(m_scanline, sprite_xpos + pixel));
 		}
 		else
 		{
@@ -374,13 +374,13 @@ void ppu_vt03_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, u
 			if ((pixel_data & 0x03) != 0)
 			{
 				uint8_t pen = (pixel_data & 0x03) + (4 * color);
-				draw_tile_pixel_inner(pen, &bitmap.pix32(m_scanline, sprite_xpos + pixel));
+				draw_tile_pixel_inner(pen, &bitmap.pix(m_scanline, sprite_xpos + pixel));
 			}
 
 			if (((pixel_data >> 5) & 0x03) != 0)
 			{
 				uint8_t pen = ((pixel_data >> 5) & 0x03) + (4 * color);
-				draw_tile_pixel_inner(pen, &bitmap.pix32(m_scanline, sprite_xpos + pixel + 8));
+				draw_tile_pixel_inner(pen, &bitmap.pix(m_scanline, sprite_xpos + pixel + 8));
 			}
 			//ppu2c0x_device::draw_sprite_pixel(sprite_xpos, color, pixel, pixel_data & 0x03, bitmap);
 			//ppu2c0x_device::draw_sprite_pixel(sprite_xpos, color, pixel + 8, (pixel_data >> 5) & 0x03, bitmap);
@@ -435,7 +435,18 @@ void ppu_vt03_device::shift_tile_plane_data(uint8_t& pix)
 
 void ppu_vt03_device::draw_back_pen(uint32_t* dst, int back_pen)
 {
-	draw_tile_pixel_inner(back_pen, dst);
+	if (m_201x_regs[0] & 0x80)
+	{
+		// is the back_pen always just pen 0 in VT modes? (using last data written to a transparent pen as per NES logic doesn't work as writes are split across 2 bytes)
+		draw_tile_pixel_inner(0, dst);
+	}
+	else
+	{
+		// in normal modes we still have the data from the palette writes as the 'backpen' so treat it as before
+		uint32_t pix;
+		pix = m_nespens[back_pen & 0x1ff];
+		*dst = pix;
+	}
 }
 
 

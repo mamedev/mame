@@ -78,7 +78,6 @@
 #include "cpu/tms7000/tms7000.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/hd44780.h"
 
 #include "emupal.h"
@@ -226,7 +225,7 @@ HD44780_PIXEL_UPDATE(cc40_state::cc40_pixel_update)
 	{
 		// internal: 2*16, external: 1*31
 		if (y == 7) y++; // the cursor is slightly below the character
-		bitmap.pix16(1 + y, 1 + line*16*6 + pos*6 + x) = state ? 1 : 2;
+		bitmap.pix(1 + y, 1 + line*16*6 + pos*6 + x) = state ? 1 : 2;
 	}
 }
 
@@ -614,7 +613,6 @@ void cc40_state::cc40(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.25);
-	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "cc40_cart", "bin,rom,256").set_device_load(FUNC(cc40_state::cart_load));

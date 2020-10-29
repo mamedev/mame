@@ -173,17 +173,6 @@ void mac_state::field_interrupts()
 			take_interrupt = 1;
 		}
 	}
-	else if ((m_model == MODEL_MAC_PORTABLE) || (m_model == MODEL_MAC_PB100))
-	{
-		if ((m_scc_interrupt) || (m_asc_interrupt))
-		{
-			take_interrupt = 2;
-		}
-		else if (m_via_interrupt)
-		{
-			take_interrupt = 1;
-		}
-	}
 	else if ((m_model < MODEL_MAC_POWERMAC_6100) && (m_model != MODEL_MAC_IIFX))
 	{
 		if (m_scc_interrupt)
@@ -250,11 +239,6 @@ WRITE_LINE_MEMBER(mac_state::mac_asc_irq)
 			m_rbv_regs[3] &= ~0x10;
 			rbv_recalc_irqs();
 		}
-	}
-	else if ((m_model == MODEL_MAC_PORTABLE) || (m_model == MODEL_MAC_PB100))
-	{
-//      m_asc_interrupt = state;
-//      field_interrupts();
 	}
 	else if ((m_model >= MODEL_MAC_II) && (m_model != MODEL_MAC_IIFX))
 	{
@@ -422,7 +406,7 @@ void mac_state::set_memory_overlay(int overlay)
 				mac_install_memory(0x40000000, 0x4007ffff, memory_size, memory_data, is_rom, "bank2");
 			}
 		}
-		else if ((m_model == MODEL_MAC_PORTABLE) || (m_model == MODEL_MAC_PB100) || (m_model == MODEL_MAC_IIFX))
+		else if (m_model == MODEL_MAC_IIFX)
 		{
 			address_space& space = m_maincpu->space(AS_PROGRAM);
 			space.unmap_write(0x000000, 0x9fffff);
@@ -633,20 +617,6 @@ WRITE_LINE_MEMBER(mac_state::mac_scsi_irq)
         mac->m_scsi_interrupt = state;
         mac->field_interrupts();
     }*/
-}
-
-WRITE_LINE_MEMBER(mac_state::irq_539x_1_w)
-{
-	if (state)  // make sure a CB1 transition occurs
-	{
-		m_via2->write_cb2(0);
-		m_via2->write_cb2(1);
-	}
-}
-
-WRITE_LINE_MEMBER(mac_state::drq_539x_1_w)
-{
-	m_dafb_scsi1_drq = state;
 }
 
 /* *************************************************************************
@@ -1080,7 +1050,7 @@ uint8_t mac_state::mac_via2_in_a()
 {
 	uint8_t result;
 
-	if ((m_model == MODEL_MAC_QUADRA_700) || (m_model == MODEL_MAC_QUADRA_900) || (m_model == MODEL_MAC_QUADRA_950))
+	if ((m_model == MODEL_MAC_QUADRA_900) || (m_model == MODEL_MAC_QUADRA_950))
 	{
 		result = 0x80 | m_nubus_irq_state;
 	}
@@ -1440,8 +1410,7 @@ void mac_state::mac_driver_init(model_t model)
 	memset(m_ram->pointer(), 0, m_ram->size());
 
 	if ((model == MODEL_MAC_SE) || (model == MODEL_MAC_CLASSIC) || (model == MODEL_MAC_CLASSIC_II) || (model == MODEL_MAC_LC) || (model == MODEL_MAC_COLOR_CLASSIC) || (model >= MODEL_MAC_LC_475 && model <= MODEL_MAC_LC_580) ||
-		(model == MODEL_MAC_LC_II) || (model == MODEL_MAC_LC_III) || (model == MODEL_MAC_LC_III_PLUS) || ((m_model >= MODEL_MAC_II) && (m_model <= MODEL_MAC_SE30)) ||
-		(model == MODEL_MAC_PORTABLE) || (model == MODEL_MAC_PB100))
+		(model == MODEL_MAC_LC_II) || (model == MODEL_MAC_LC_III) || (model == MODEL_MAC_LC_III_PLUS) || ((m_model >= MODEL_MAC_II) && (m_model <= MODEL_MAC_SE30)))
 	{
 		m_overlay_timeout = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac_state::overlay_timeout_func),this));
 	}
@@ -1475,15 +1444,9 @@ MAC_DRIVER_INIT(maclrcclassic, MODEL_MAC_COLOR_CLASSIC)
 MAC_DRIVER_INIT(macpm6100, MODEL_MAC_POWERMAC_6100)
 MAC_DRIVER_INIT(macpm7100, MODEL_MAC_POWERMAC_7100)
 MAC_DRIVER_INIT(macpm8100, MODEL_MAC_POWERMAC_8100)
-MAC_DRIVER_INIT(macprtb, MODEL_MAC_PORTABLE)
-MAC_DRIVER_INIT(macpb100, MODEL_MAC_PB100)
-MAC_DRIVER_INIT(macpb140, MODEL_MAC_PB140)
-MAC_DRIVER_INIT(macpb160, MODEL_MAC_PB160)
 MAC_DRIVER_INIT(maciivx, MODEL_MAC_IIVX)
 MAC_DRIVER_INIT(maciivi, MODEL_MAC_IIVI)
 MAC_DRIVER_INIT(maciifx, MODEL_MAC_IIFX)
-MAC_DRIVER_INIT(macpd210, MODEL_MAC_PBDUO_210)
-MAC_DRIVER_INIT(macquadra700, MODEL_MAC_QUADRA_700)
 MAC_DRIVER_INIT(maciicx, MODEL_MAC_IICX)
 MAC_DRIVER_INIT(maciifdhd, MODEL_MAC_II_FDHD)
 MAC_DRIVER_INIT(maciix, MODEL_MAC_IIX)
@@ -1493,12 +1456,6 @@ void mac_state::nubus_slot_interrupt(uint8_t slot, uint32_t state)
 {
 	static const uint8_t masks[8] = { 0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80 };
 	uint8_t mask = 0x3f;
-
-	// quadra 700/900/950 use the top 2 bits of the interrupt register for ethernet and video
-	if ((m_model == MODEL_MAC_QUADRA_700) || (m_model == MODEL_MAC_QUADRA_900) || (m_model == MODEL_MAC_QUADRA_950))
-	{
-		mask = 0xff;
-	}
 
 	slot -= 9;
 

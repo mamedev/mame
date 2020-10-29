@@ -15,6 +15,8 @@
 #include "cpu/i386/i386.h"
 #include "screen.h"
 
+namespace {
+
 class chameleonrx1_state : public driver_device
 {
 public:
@@ -25,12 +27,14 @@ public:
 
 	void chameleonrx1(machine_config &config);
 
-private:
-	required_device<cpu_device> m_maincpu;
-
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void chameleonrx1_map(address_map &map);
 };
@@ -82,12 +86,14 @@ void chameleonrx1_state::chameleonrx1(machine_config &config)
 ***************************************************************************/
 
 ROM_START( chamrx1 )
-	ROM_REGION(0x40000, "bios", 0) \
+	ROM_REGION(0x40000, "bios", 0)
 	ROM_LOAD("p45m6_1010_c728_gm_u5_sst49lf002a.u26", 0x00000, 0x40000, CRC(2dd3d3eb) SHA1(5bf639442807cc1aa2ad910817a2e8d2a80e7226) )
 
-	DISK_REGION( "ide:0:hdd:image" ) // S/N: 0488J1FW313240 LBA 117,304,992
+	DISK_REGION( "ide:0:hdd:image" ) // Samsung SP6003H/OMD Rev.A. LBA 117,304,992 60GB PUMA
 	DISK_IMAGE( "chamrx1", 0, SHA1(01da428b8aa347222856afbdfe9dbc083ae2171c) )
 ROM_END
+
+} // Anonymous namespace
 
 
 GAME( 2003, chamrx1,  0,   chameleonrx1, chameleonrx1, chameleonrx1_state, empty_init, ROT0, "Digital Sunnil (Covielsa license)", "Chameleon RX-1",  MACHINE_IS_SKELETON )

@@ -10,7 +10,6 @@
 
 #include "bitmap.h"
 
-#include <algorithm>
 #include <cassert>
 #include <new>
 
@@ -360,7 +359,7 @@ void bitmap_t::wrap(void *base, int width, int height, int rowpixels)
  * @param   subrect The subrect.
  */
 
-void bitmap_t::wrap(const bitmap_t &source, const rectangle &subrect)
+void bitmap_t::wrap(bitmap_t &source, const rectangle &subrect)
 {
 	assert(m_format == source.m_format);
 	assert(m_bpp == source.m_bpp);
@@ -406,7 +405,7 @@ void bitmap_t::set_palette(palette_t *palette)
 }
 
 /**
- * @fn  void bitmap_t::fill(uint32_t color, const rectangle &cliprect)
+ * @fn  void bitmap_t::fill(uint64_t color, const rectangle &bounds)
  *
  * @brief   -------------------------------------------------
  *            fill -- fill a bitmap with a solid color
@@ -416,10 +415,10 @@ void bitmap_t::set_palette(palette_t *palette)
  * @param   cliprect    The cliprect.
  */
 
-void bitmap_t::fill(uint32_t color, const rectangle &cliprect)
+void bitmap_t::fill(uint64_t color, const rectangle &bounds)
 {
 	// if we have a cliprect, intersect with that
-	rectangle fill(cliprect);
+	rectangle fill(bounds);
 	fill &= m_cliprect;
 	if (!fill.empty())
 	{
@@ -448,3 +447,13 @@ void bitmap_t::fill(uint32_t color, const rectangle &cliprect)
 		}
 	}
 }
+
+
+//**************************************************************************
+//  EXPLICIT TEMPLATE INSTANTIATIONS
+//**************************************************************************
+
+template class bitmap_specific<uint8_t>;
+template class bitmap_specific<uint16_t>;
+template class bitmap_specific<uint32_t>;
+template class bitmap_specific<uint64_t>;

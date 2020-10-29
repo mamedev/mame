@@ -100,12 +100,12 @@ public:
 	template <typename T, typename... Params>
 	static void stack_push(Params &&... args)
 	{
-		stack_push(std::unique_ptr<menu>(global_alloc_clear<T>(std::forward<Params>(args)...)));
+		stack_push(std::unique_ptr<menu>(make_unique_clear<T>(std::forward<Params>(args)...)));
 	}
 	template <typename T, typename... Params>
 	static void stack_push_special_main(Params &&... args)
 	{
-		std::unique_ptr<menu> ptr(global_alloc_clear<T>(std::forward<Params>(args)...));
+		std::unique_ptr<menu> ptr(make_unique_clear<T>(std::forward<Params>(args)...));
 		ptr->set_special_main_menu(true);
 		stack_push(std::move(ptr));
 	}

@@ -80,26 +80,26 @@ uint32_t hitme_state::screen_update_hitme(screen_device &screen, bitmap_ind16 &b
 	double dot_freq = 15750 * 336;
 	/* the number of pixels is the duration times the frequency */
 	int width_pixels = width_duration * dot_freq;
-	int x, y, xx, inv;
 	offs_t offs = 0;
 
 	/* start by drawing the tilemap */
 	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* now loop over and invert anything */
-	for (y = 0; y < 19; y++)
+	for (int y = 0; y < 19; y++)
 	{
 		int dy = bitmap.rowpixels();
-		for (inv = x = 0; x < 40; x++, offs++)
+		int inv = 0;
+		for (int x = 0; x < 40; x++, offs++)
 		{
 			/* if the high bit is set, reset the oneshot */
 			if (m_videoram[y * 40 + x] & 0x80)
 				inv = width_pixels;
 
 			/* invert pixels until we run out */
-			for (xx = 0; xx < 8 && inv; xx++, inv--)
+			for (int xx = 0; xx < 8 && inv; xx++, inv--)
 			{
-				uint16_t *dest = &bitmap.pix16(y * 10, x * 8 + xx);
+				uint16_t *const dest = &bitmap.pix(y * 10, x * 8 + xx);
 				dest[0 * dy] ^= 1;
 				dest[1 * dy] ^= 1;
 				dest[2 * dy] ^= 1;

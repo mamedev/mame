@@ -76,7 +76,6 @@
 #include "machine/rescap.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/mc6845.h"
 
 #include "emupal.h"
@@ -316,7 +315,7 @@ MC6845_UPDATE_ROW( nyny_state::crtc_update_row )
 			else
 				color = bit2 ? color2 : 0;
 
-			bitmap.pix32(y, x) = m_palette->pen_color(color);
+			bitmap.pix(y, x) = m_palette->pen_color(color);
 
 			x += 1;
 		}
@@ -342,7 +341,7 @@ MC6845_END_UPDATE( nyny_state::crtc_end_update )
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			/* check if the star status */
-			if (m_star_enable && (bitmap.pix32(y, x) == m_palette->pen_color(0)) &&
+			if (m_star_enable && (bitmap.pix(y, x) == m_palette->pen_color(0)) &&
 				((m_star_shift_reg & 0x80ff) == 0x00ff) &&
 				(((y & 0x01) ^ m_flipscreen) ^ (((x & 0x08) >> 3) ^ m_flipscreen)))
 			{
@@ -350,7 +349,7 @@ MC6845_END_UPDATE( nyny_state::crtc_end_update )
 								((m_star_shift_reg & 0x0400) >>  9) |    /* G */
 								((m_star_shift_reg & 0x1000) >> 10);     /* B */
 
-				bitmap.pix32(y, x) = m_palette->pen_color(color);
+				bitmap.pix(y, x) = m_palette->pen_color(color);
 			}
 
 			if (delay_counter == 0)
@@ -667,9 +666,6 @@ void nyny_state::nyny(machine_config &config)
 	AY8910(config, "ay3", AUDIO_CPU_2_CLOCK).add_route(ALL_OUTPUTS, "speaker", 0.03);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 

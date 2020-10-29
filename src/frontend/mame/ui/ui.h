@@ -271,7 +271,7 @@ private:
 	using device_feature_set = std::set<std::pair<std::string, std::string> >;
 
 	// instance variables
-	render_font *           m_font;
+	std::unique_ptr<render_font> m_font;
 	handler_callback_func   m_handler_callback;
 	ui_callback_type        m_handler_callback_type;
 	uint32_t                m_handler_param;

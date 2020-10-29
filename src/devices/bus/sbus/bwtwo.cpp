@@ -10,6 +10,9 @@
 #include "bwtwo.h"
 #include "screen.h"
 
+#include <algorithm>
+
+
 DEFINE_DEVICE_TYPE(SBUS_BWTWO, sbus_bwtwo_device, "bwtwo", "Sun bwtwo SBus Video")
 
 void sbus_bwtwo_device::mem_map(address_map &map)
@@ -72,14 +75,14 @@ void sbus_bwtwo_device::install_device()
 
 uint32_t sbus_bwtwo_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *line = &m_vram[0];
+	uint8_t const *line = &m_vram[0];
 
 	for (int y = 0; y < 900; y++)
 	{
-		uint32_t *scanline = &bitmap.pix32(y);
+		uint32_t *scanline = &bitmap.pix(y);
 		for (int x = 0; x < 1152/8; x++)
 		{
-			memcpy(scanline, m_mono_lut[*line], sizeof(uint32_t) * 8);
+			std::copy_n(m_mono_lut[*line], 8, scanline);
 			line++;
 			scanline += 8;
 		}

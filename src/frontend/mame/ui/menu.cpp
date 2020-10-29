@@ -92,10 +92,17 @@ menu::global_state::global_state(running_machine &machine, ui_options const &opt
 	{
 		m_bgrnd_bitmap = std::make_unique<bitmap_argb32>(0, 0);
 		emu_file backgroundfile(".", OPEN_FLAG_READ);
-		render_load_jpeg(*m_bgrnd_bitmap, backgroundfile, nullptr, "background.jpg");
+		if (backgroundfile.open("background.jpg") == osd_file::error::NONE)
+		{
+			render_load_jpeg(*m_bgrnd_bitmap, backgroundfile);
+			backgroundfile.close();
+		}
 
-		if (!m_bgrnd_bitmap->valid())
-			render_load_png(*m_bgrnd_bitmap, backgroundfile, nullptr, "background.png");
+		if (!m_bgrnd_bitmap->valid() && (backgroundfile.open("background.png") == osd_file::error::NONE))
+		{
+			render_load_png(*m_bgrnd_bitmap, backgroundfile);
+			backgroundfile.close();
+		}
 
 		if (m_bgrnd_bitmap->valid())
 			m_bgrnd_texture->set_bitmap(*m_bgrnd_bitmap, m_bgrnd_bitmap->cliprect(), TEXFORMAT_ARGB32);
@@ -904,110 +911,110 @@ void menu::handle_events(uint32_t flags, event &ev)
 	{
 		switch (local_menu_event.event_type)
 		{
-			// if we are hovering over a valid item, select it with a single click
-			case ui_event::MOUSE_DOWN:
-				if (custom_mouse_down())
-					return;
+		// if we are hovering over a valid item, select it with a single click
+		case ui_event::type::MOUSE_DOWN:
+			if (custom_mouse_down())
+				return;
 
-				if ((flags & PROCESS_ONLYCHAR) == 0)
-				{
-					if (m_hover >= 0 && m_hover < m_items.size())
-						m_selected = m_hover;
-					else if (m_hover == HOVER_ARROW_UP)
-					{
-						if ((flags & FLAG_UI_DATS) != 0)
-						{
-							top_line -= m_visible_items - (last_item_visible() ? 1 : 0);
-							return;
-						}
-						m_selected -= m_visible_items;
-						if (m_selected < 0)
-							m_selected = 0;
-						top_line -= m_visible_items - (last_item_visible() ? 1 : 0);
-					}
-					else if (m_hover == HOVER_ARROW_DOWN)
-					{
-						if ((flags & FLAG_UI_DATS) != 0)
-						{
-							top_line += m_visible_lines - 2;
-							return;
-						}
-						m_selected += m_visible_lines - 2 + is_first_selected();
-						if (m_selected > m_items.size() - 1)
-							m_selected = m_items.size() - 1;
-						top_line += m_visible_lines - 2;
-					}
-				}
-				break;
-
-			// if we are hovering over a valid item, fake a UI_SELECT with a double-click
-			case ui_event::MOUSE_DOUBLE_CLICK:
-				if (!(flags & PROCESS_ONLYCHAR) && m_hover >= 0 && m_hover < m_items.size())
-				{
+			if ((flags & PROCESS_ONLYCHAR) == 0)
+			{
+				if (m_hover >= 0 && m_hover < m_items.size())
 					m_selected = m_hover;
-					ev.iptkey = IPT_UI_SELECT;
-					if (is_last_selected())
-					{
-						ev.iptkey = IPT_UI_CANCEL;
-						stack_pop();
-					}
-					stop = true;
-				}
-				break;
-
-			// caught scroll event
-			case ui_event::MOUSE_WHEEL:
-				if (!(flags & PROCESS_ONLYCHAR))
+				else if (m_hover == HOVER_ARROW_UP)
 				{
-					if (local_menu_event.zdelta > 0)
+					if ((flags & FLAG_UI_DATS) != 0)
 					{
-						if ((flags & FLAG_UI_DATS) != 0)
-						{
-							top_line -= local_menu_event.num_lines;
-							return;
-						}
-						if (is_first_selected())
-							select_last_item();
-						else
-						{
-							m_selected -= local_menu_event.num_lines;
-							validate_selection(-1);
-						}
-						top_line -= (m_selected <= top_line && top_line != 0);
-						if (m_selected <= top_line && m_visible_items != m_visible_lines)
-							top_line -= local_menu_event.num_lines;
+						top_line -= m_visible_items - (last_item_visible() ? 1 : 0);
+						return;
 					}
+					m_selected -= m_visible_items;
+					if (m_selected < 0)
+						m_selected = 0;
+					top_line -= m_visible_items - (last_item_visible() ? 1 : 0);
+				}
+				else if (m_hover == HOVER_ARROW_DOWN)
+				{
+					if ((flags & FLAG_UI_DATS) != 0)
+					{
+						top_line += m_visible_lines - 2;
+						return;
+					}
+					m_selected += m_visible_lines - 2 + is_first_selected();
+					if (m_selected > m_items.size() - 1)
+						m_selected = m_items.size() - 1;
+					top_line += m_visible_lines - 2;
+				}
+			}
+			break;
+
+		// if we are hovering over a valid item, fake a UI_SELECT with a double-click
+		case ui_event::type::MOUSE_DOUBLE_CLICK:
+			if (!(flags & PROCESS_ONLYCHAR) && m_hover >= 0 && m_hover < m_items.size())
+			{
+				m_selected = m_hover;
+				ev.iptkey = IPT_UI_SELECT;
+				if (is_last_selected())
+				{
+					ev.iptkey = IPT_UI_CANCEL;
+					stack_pop();
+				}
+				stop = true;
+			}
+			break;
+
+		// caught scroll event
+		case ui_event::type::MOUSE_WHEEL:
+			if (!(flags & PROCESS_ONLYCHAR))
+			{
+				if (local_menu_event.zdelta > 0)
+				{
+					if ((flags & FLAG_UI_DATS) != 0)
+					{
+						top_line -= local_menu_event.num_lines;
+						return;
+					}
+					if (is_first_selected())
+						select_last_item();
 					else
 					{
-						if ((flags & FLAG_UI_DATS))
-						{
-							top_line += local_menu_event.num_lines;
-							return;
-						}
-						if (is_last_selected())
-							select_first_item();
-						else
-						{
-							m_selected += local_menu_event.num_lines;
-							validate_selection(1);
-						}
-						top_line += (m_selected >= top_line + m_visible_items + (top_line != 0));
-						if (m_selected >= (top_line + m_visible_items + (top_line != 0)))
-							top_line += local_menu_event.num_lines;
+						m_selected -= local_menu_event.num_lines;
+						validate_selection(-1);
 					}
+					top_line -= (m_selected <= top_line && top_line != 0);
+					if (m_selected <= top_line && m_visible_items != m_visible_lines)
+						top_line -= local_menu_event.num_lines;
 				}
-				break;
+				else
+				{
+					if ((flags & FLAG_UI_DATS))
+					{
+						top_line += local_menu_event.num_lines;
+						return;
+					}
+					if (is_last_selected())
+						select_first_item();
+					else
+					{
+						m_selected += local_menu_event.num_lines;
+						validate_selection(1);
+					}
+					top_line += (m_selected >= top_line + m_visible_items + (top_line != 0));
+					if (m_selected >= (top_line + m_visible_items + (top_line != 0)))
+						top_line += local_menu_event.num_lines;
+				}
+			}
+			break;
 
-			// translate CHAR events into specials
-			case ui_event::IME_CHAR:
-				ev.iptkey = IPT_SPECIAL;
-				ev.unichar = local_menu_event.ch;
-				stop = true;
-				break;
+		// translate CHAR events into specials
+		case ui_event::type::IME_CHAR:
+			ev.iptkey = IPT_SPECIAL;
+			ev.unichar = local_menu_event.ch;
+			stop = true;
+			break;
 
-			// ignore everything else
-			default:
-				break;
+		// ignore everything else
+		default:
+			break;
 		}
 	}
 }
@@ -1234,7 +1241,7 @@ uint32_t menu::ui_handler(render_container &container, mame_ui_manager &mui)
 
 	// if we have no menus stacked up, start with the main menu
 	if (!state->topmost_menu<menu>())
-		state->stack_push(std::unique_ptr<menu>(global_alloc_clear<menu_main>(mui, container)));
+		state->stack_push(std::unique_ptr<menu>(make_unique_clear<menu_main>(mui, container)));
 
 	// update the menu state
 	if (state->topmost_menu<menu>())

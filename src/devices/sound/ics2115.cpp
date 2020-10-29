@@ -443,7 +443,7 @@ void ics2115_device::sound_stream_update(sound_stream &stream, std::vector<read_
 /*
 #ifdef ICS2115_DEBUG
         u32 curaddr = ((voice.osc.saddr << 20) & 0xffffff) | (voice.osc.acc >> 12);
-        stream_sample_t sample = get_sample(voice);
+        s32 sample = get_sample(voice);
         logerror("[%06x=%04x]", curaddr, (s16)sample);
 #endif
 */

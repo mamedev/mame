@@ -141,7 +141,7 @@ void menu_video_options::handle()
 
 	// process the menu
 	event const *const menu_event(process(0));
-	if (menu_event && menu_event->itemref)
+	if (menu_event && uintptr_t(menu_event->itemref))
 	{
 		switch (reinterpret_cast<uintptr_t>(menu_event->itemref))
 		{

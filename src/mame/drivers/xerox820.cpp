@@ -229,7 +229,7 @@ static INPUT_PORTS_START( xerox820 )
 	// inputs defined in machine/keyboard.c
 INPUT_PORTS_END
 
-TIMER_CALLBACK_MEMBER( bigboard_state::bigboard_beepoff )
+TIMER_DEVICE_CALLBACK_MEMBER(bigboard_state::beep_timer)
 {
 	m_beeper->set_state(0);
 }
@@ -322,7 +322,7 @@ void bigboard_state::kbpio_pa_w(uint8_t data)
 	/* beeper on bigboard */
 	if (BIT(data, 5) & (!m_bit5))
 	{
-		machine().scheduler().timer_set(attotime::from_msec(40), timer_expired_delegate(FUNC(bigboard_state::bigboard_beepoff),this));
+		m_beep_timer->adjust(attotime::from_msec(40));
 		m_beeper->set_state(1);
 	}
 	m_bit5 = BIT(data, 5);
@@ -480,25 +480,25 @@ WRITE_LINE_MEMBER( xerox820_state::fdc_drq_w )
 
 uint32_t xerox820_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y,ra,chr,gfx;
-	uint16_t sy=0,ma=(m_scroll + 1) * 0x80,x;
-	const pen_t *pen=m_palette->pens();
+	uint16_t sy=0,ma=(m_scroll + 1) * 0x80;
+	pen_t const *const pen=m_palette->pens();
 
 	m_framecnt++;
 
-	for (y = 0; y < 24; y++)
+	for (uint8_t y = 0; y < 24; y++)
 	{
 		if (ma > 0xb80) ma = 0;
 
-		for (ra = 0; ra < 10; ra++)
+		for (uint8_t ra = 0; ra < 10; ra++)
 		{
-			uint32_t *p = &bitmap.pix32(sy++);
+			uint32_t *p = &bitmap.pix(sy++);
 
-			for (x = ma; x < ma + 80; x++)
+			for (uint16_t x = ma; x < ma + 80; x++)
 			{
+				uint8_t gfx;
 				if (ra < 8)
 				{
-					chr = m_video_ram[x & XEROX820_VIDEORAM_MASK] ^ 0x80;
+					uint8_t chr = m_video_ram[x & XEROX820_VIDEORAM_MASK] ^ 0x80;
 
 					/* Take care of flashing characters */
 					if ((chr < 0x80) && (m_framecnt & 0x08))
@@ -510,14 +510,14 @@ uint32_t xerox820_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 				else
 					gfx = 0xff;
 
-			/* Display a scanline of a character (7 pixels) */
-			*p++ = pen[0];
-			*p++ = pen[BIT(gfx, 4) ^ 1];
-			*p++ = pen[BIT(gfx, 3) ^ 1];
-			*p++ = pen[BIT(gfx, 2) ^ 1];
-			*p++ = pen[BIT(gfx, 1) ^ 1];
-			*p++ = pen[BIT(gfx, 0) ^ 1];
-			*p++ = pen[0];
+				/* Display a scanline of a character (7 pixels) */
+				*p++ = pen[0];
+				*p++ = pen[BIT(gfx, 4) ^ 1];
+				*p++ = pen[BIT(gfx, 3) ^ 1];
+				*p++ = pen[BIT(gfx, 2) ^ 1];
+				*p++ = pen[BIT(gfx, 1) ^ 1];
+				*p++ = pen[BIT(gfx, 0) ^ 1];
+				*p++ = pen[0];
 			}
 		}
 		ma+=128;
@@ -696,6 +696,7 @@ void bigboard_state::bigboard(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 950).add_route(ALL_OUTPUTS, "mono", 1.00); /* bigboard only */
+	TIMER(config, m_beep_timer).configure_generic(FUNC(bigboard_state::beep_timer));
 }
 
 void xerox820ii_state::xerox820ii(machine_config &config)

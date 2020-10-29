@@ -96,9 +96,9 @@ uint32_t advision_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		for (int y = 0; y < 128; y+=2)
 		{
 			if (*led > 0)
-				bitmap.pix16(30 + y, 85 + x) = --(*led);
+				bitmap.pix(30 + y, 85 + x) = --(*led);
 			else
-				bitmap.pix16(30 + y, 85 + x) = 0;
+				bitmap.pix(30 + y, 85 + x) = 0;
 
 			led += 256;
 		}

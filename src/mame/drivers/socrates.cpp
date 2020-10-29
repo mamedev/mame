@@ -809,36 +809,33 @@ void socrates_state::video_start()
 
 uint32_t socrates_state::screen_update_socrates(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	static const uint8_t fixedcolors[8] =
-	{
-	0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0xF7
-	};
-	uint8_t *videoram = m_vram_reg->base();
-	int x, y, colidx, color;
+	static const uint8_t fixedcolors[8] = {
+			0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0xF7 };
+	uint8_t const *const videoram = m_vram_reg->base();
 	int lineoffset = 0; // if display ever tries to display data at 0xfxxx, offset line displayed by 0x1000
-	for (y = 0; y < 228; y++)
+	for (int y = 0; y < 228; y++)
 	{
 		if ((((y+m_scroll_offset)*128)&0xffff) >= 0xf000) lineoffset = 0x1000; // see comment above
-		for (x = 0; x < 264; x++)
+		for (int x = 0; x < 264; x++)
 		{
+			int color;
 			if (x < 256)
 			{
-				colidx =videoram[(((y+m_scroll_offset)*128)+(x>>1)+lineoffset)&0xffff];
+				int colidx =videoram[(((y+m_scroll_offset)*128)+(x>>1)+lineoffset)&0xffff];
 				if (x&1) colidx >>=4;
 				colidx &= 0xF;
 				if (colidx > 7) color=videoram[0xF000+(colidx<<8)+((y+m_scroll_offset)&0xFF)];
 				else color=fixedcolors[colidx];
-				bitmap.pix16(y, x) = color;
 			}
 			else
 			{
-				colidx = videoram[(((y+m_scroll_offset)*128)+(127)+lineoffset)&0xffff];
+				int colidx = videoram[(((y+m_scroll_offset)*128)+(127)+lineoffset)&0xffff];
 				colidx >>=4;
 				colidx &= 0xF;
 				if (colidx > 7) color=videoram[0xF000+(colidx<<8)+((y+m_scroll_offset)&0xFF)];
 				else color=fixedcolors[colidx];
-				bitmap.pix16(y, x) = color;
 			}
+			bitmap.pix(y, x) = color;
 		}
 	}
 	return 0;
@@ -898,7 +895,7 @@ uint32_t iqunlimz_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 			for(int b=0; b<2; b++)
 			{
-				bitmap.pix16(y, x*2 + b) = get_color(data & 0x0f, y);
+				bitmap.pix(y, x*2 + b) = get_color(data & 0x0f, y);
 				data >>= 4;
 			}
 		}
@@ -932,7 +929,7 @@ uint32_t iqunlimz_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 					for (int cx=0; cx<6; cx++)
 					{
 						int px = 8 + x*6 + cx;
-						bitmap.pix16(py, px) = BIT(data, 7) ? col1 : col0;
+						bitmap.pix(py, px) = BIT(data, 7) ? col1 : col0;
 						data <<= 1;
 					}
 				}

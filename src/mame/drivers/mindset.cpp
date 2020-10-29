@@ -8,7 +8,6 @@
 #include "machine/upd765.h"
 #include "formats/pc_dsk.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "machine/ins8250.h"
 #include "bus/rs232/rs232.h"
 
@@ -250,9 +249,6 @@ void mindset_sound_module::device_add_mconfig(machine_config &config)
 
 	SPEAKER(config, "rspeaker").front_right();
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, m_dac,  1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, m_dac, -1.0, DAC_VREF_NEG_INPUT);
 }
 
 
@@ -751,12 +747,12 @@ u32 mindset_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 
 	if(ibm_mode) {
 		if(large_pixels) {
-			static int palind[4] = { 0, 1, 4, 5 };
+			static int const palind[4] = { 0, 1, 4, 5 };
 			for(int field=0; field<2; field++) {
 				for(u32 yy=0; yy<2; yy++) {
 					const u16 *src = bank + 4096*yy;
 					for(u32 y=yy; y<200; y+=2) {
-						u32 *dest = &bitmap.pix32(2*y+field+dy, dx);
+						u32 *dest = &bitmap.pix(2*y+field+dy, dx);
 						for(u32 x=0; x<320; x+=8) {
 							u16 sv = sw(*src++);
 							for(u32 xx=0; xx<8; xx++) {
@@ -770,12 +766,12 @@ u32 mindset_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 			}
 			return 0;
 		} else {
-			static int palind[4] = { 0, 4 };
+			static int const palind[2] = { 0, 4 };
 			for(int field=0; field<2; field++) {
 				for(u32 yy=0; yy<2; yy++) {
 					const u16 *src = bank + 4096*yy;
 					for(u32 y=yy; y<200; y+=2) {
-						u32 *dest = &bitmap.pix32(2*y+field+dy, dx);
+						u32 *dest = &bitmap.pix(2*y+field+dy, dx);
 						for(u32 x=0; x<640; x+=16) {
 							u16 sv = sw(*src++);
 							for(u32 xx=0; xx<16; xx++) {
@@ -795,8 +791,8 @@ u32 mindset_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 				case 0: {
 					const u16 *src = bank;
 					for(u32 y=0; y<200; y++) {
-						u32 *dest0 = &bitmap.pix32(2*y+dy, dx);
-						u32 *dest1 = &bitmap.pix32(2*y+1+dy, dx);
+						u32 *dest0 = &bitmap.pix(2*y+dy, dx);
+						u32 *dest1 = &bitmap.pix(2*y+1+dy, dx);
 						for(u32 x=0; x<320; x+=4) {
 							u16 sv = sw(*src++);
 							for(u32 xx=0; xx<4; xx++) {
@@ -811,11 +807,11 @@ u32 mindset_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 					return 0;
 				}
 				case 1: {
-					static int palind[4] = { 0, 1, 4, 5 };
+					static int const palind[4] = { 0, 1, 4, 5 };
 					const u16 *src = bank;
 					for(u32 y=0; y<200; y++) {
-						u32 *dest0 = &bitmap.pix32(2*y+dy, dx);
-						u32 *dest1 = &bitmap.pix32(2*y+1+dy, dx);
+						u32 *dest0 = &bitmap.pix(2*y+dy, dx);
+						u32 *dest1 = &bitmap.pix(2*y+1+dy, dx);
 						for(u32 x=0; x<320; x+=8) {
 							u16 sv = sw(*src++);
 							for(u32 xx=0; xx<8; xx++) {
@@ -832,8 +828,8 @@ u32 mindset_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 				case 2: {
 					const u16 *src = bank;
 					for(u32 y=0; y<200; y++) {
-						u32 *dest0 = &bitmap.pix32(2*y+dy, dx);
-						u32 *dest1 = &bitmap.pix32(2*y+1+dy, dx);
+						u32 *dest0 = &bitmap.pix(2*y+dy, dx);
+						u32 *dest1 = &bitmap.pix(2*y+1+dy, dx);
 						for(u32 x=0; x<320; x+=16) {
 							u16 sv = sw(*src++);
 							for(u32 xx=0; xx<16; xx++) {
@@ -853,7 +849,7 @@ u32 mindset_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 				case 0: {
 					const u16 *src = bank;
 					for(u32 y=0; y<400; y++) {
-						u32 *dest = &bitmap.pix32(y+dy, dx);
+						u32 *dest = &bitmap.pix(y+dy, dx);
 						for(u32 x=0; x<320; x+=4) {
 							u16 sv = sw(*src++);
 							for(u32 xx=0; xx<4; xx++) {
@@ -866,10 +862,10 @@ u32 mindset_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 					return 0;
 				}
 				case 1: {
-					static int palind[4] = { 0, 1, 4, 5 };
+					static int const palind[4] = { 0, 1, 4, 5 };
 					const u16 *src = bank;
 					for(u32 y=0; y<400; y++) {
-						u32 *dest = &bitmap.pix32(y+dy, dx);
+						u32 *dest = &bitmap.pix(y+dy, dx);
 						for(u32 x=0; x<320; x+=8) {
 							u16 sv = sw(*src++);
 							for(u32 xx=0; xx<8; xx++) {
@@ -887,11 +883,11 @@ u32 mindset_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 			if(!interleave) {
 				switch(pixels_per_byte_order) {
 				case 0: {
-					static int palind[4] = { 0, 4, 8, 12 };
+					static int const palind[4] = { 0, 4, 8, 12 };
 					const u16 *src = bank;
 					for(u32 y=0; y<200; y++) {
-						u32 *dest0 = &bitmap.pix32(2*y+dy, dx);
-						u32 *dest1 = &bitmap.pix32(2*y+1+dy, dx);
+						u32 *dest0 = &bitmap.pix(2*y+dy, dx);
+						u32 *dest1 = &bitmap.pix(2*y+1+dy, dx);
 						for(u32 x=0; x<640; x+=8) {
 							u16 sv = sw(*src++);
 							for(u32 xx=0; xx<8; xx++) {
@@ -904,11 +900,11 @@ u32 mindset_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 					return 0;
 				}
 				case 1: {
-					static int palind[4] = { 0, 4 };
+					static int const palind[2] = { 0, 4 };
 					const u16 *src = bank;
 					for(u32 y=0; y<200; y++) {
-						u32 *dest0 = &bitmap.pix32(2*y+dy, dx);
-						u32 *dest1 = &bitmap.pix32(2*y+1+dy, dx);
+						u32 *dest0 = &bitmap.pix(2*y+dy, dx);
+						u32 *dest1 = &bitmap.pix(2*y+1+dy, dx);
 						for(u32 x=0; x<640; x+=16) {
 							u16 sv = sw(*src++);
 							for(u32 xx=0; xx<16; xx++) {
@@ -922,10 +918,10 @@ u32 mindset_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 				}
 				}
 			} else {
-				static int palind[4] = { 0, 4 };
+				static int const palind[2] = { 0, 4 };
 				const u16 *src = bank;
 				for(u32 y=0; y<400; y++) {
-					u32 *dest = &bitmap.pix32(y+dy, dx);
+					u32 *dest = &bitmap.pix(y+dy, dx);
 					for(u32 x=0; x<640; x+=16) {
 						u16 sv = sw(*src++);
 						for(u32 xx=0; xx<16; xx++) {
@@ -1359,9 +1355,6 @@ void mindset_state::mindset(machine_config &config)
 
 	SPEAKER(config, "lspeaker").front_left();
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, m_dac,  1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, m_dac, -1.0, DAC_VREF_NEG_INPUT);
 
 	MINDSET_MODULE(config, "m0", mindset_modules, "stereo", false);
 	MINDSET_MODULE(config, "m1", mindset_modules, "rs232", false);

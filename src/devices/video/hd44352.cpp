@@ -152,7 +152,7 @@ uint32_t hd44352_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 							uint8_t d = compute_newval((m_cursor_status>>5) & 0x07, m_video_ram[a][py*16*cw + px*cw + c + m_scroll * 48], m_cursor[c]);
 							for (int b=0; b<8; b++)
 							{
-								bitmap.pix16(py*8 + b, a*cw*16 + px*cw + c) = BIT(d, 7-b);
+								bitmap.pix(py*8 + b, a*cw*16 + px*cw + c) = BIT(d, 7-b);
 							}
 						}
 					}
@@ -163,7 +163,7 @@ uint32_t hd44352_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 							uint8_t d = m_video_ram[a][py*16*cw + px*cw + c + m_scroll * 48];
 							for (int b=0; b<8; b++)
 							{
-								bitmap.pix16(py*8 + b, a*cw*16 + px*cw + c) = BIT(d, 7-b);
+								bitmap.pix(py*8 + b, a*cw*16 + px*cw + c) = BIT(d, 7-b);
 							}
 						}
 					}

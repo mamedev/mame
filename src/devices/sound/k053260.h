@@ -79,7 +79,7 @@ private:
 		inline void update_pan_volume();
 		inline void key_on();
 		inline void key_off();
-		inline void play(stream_sample_t *outputs);
+		inline void play(s32 *outputs);
 		inline bool playing() { return m_playing; }
 		inline u8 read_rom(bool side_effects);
 

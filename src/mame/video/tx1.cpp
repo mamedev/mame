@@ -7,10 +7,10 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "render.h"
+#include "includes/tx1.h"
+
 #include "video/resnet.h"
 #include "cpu/i86/i86.h"
-#include "includes/tx1.h"
 
 
 #define OBJ_FRAC    16
@@ -1123,14 +1123,13 @@ WRITE_LINE_MEMBER(tx1_state::screen_vblank_tx1)
 
 void tx1_state::tx1_combine_layers(bitmap_ind16 &bitmap, int screen)
 {
-	int x, y;
-	uint8_t *chr_pal = &m_proms[0x900];
+	uint8_t const *const chr_pal = &m_proms[0x900];
 
 	int x_offset = screen * 256;
 
-	for (y = 0; y < 240; ++y)
+	for (int y = 0; y < 240; ++y)
 	{
-		uint16_t *bmp_addr = &bitmap.pix16(y);
+		uint16_t *bmp_addr = &bitmap.pix(y);
 
 		uint32_t bmp_offset = y * 768 + x_offset;
 
@@ -1138,7 +1137,7 @@ void tx1_state::tx1_combine_layers(bitmap_ind16 &bitmap, int screen)
 		uint8_t *rod_addr = m_rod_bmp.get() + bmp_offset;
 		uint8_t *obj_addr = m_obj_bmp.get() + bmp_offset;
 
-		for (x = 0; x < 256; ++x)
+		for (int x = 0; x < 256; ++x)
 		{
 			uint8_t out_val;
 			uint32_t char_val = chr_addr[x];
@@ -2918,10 +2917,9 @@ void tx1_state::buggyboy_scolst_w(uint16_t data)
 
 void tx1_state::bb_combine_layers(bitmap_ind16 &bitmap, int screen)
 {
-	uint8_t *chr_pal = &m_proms[0x400];
+	uint8_t const *const chr_pal = &m_proms[0x400];
 	uint32_t bmp_stride;
 	uint32_t x_offset;
-	uint32_t y;
 
 	if (screen < 0)
 	{
@@ -2934,10 +2932,8 @@ void tx1_state::bb_combine_layers(bitmap_ind16 &bitmap, int screen)
 		x_offset = 256 * screen;
 	}
 
-	for (y = 0; y < 240; ++y)
+	for (uint32_t y = 0; y < 240; ++y)
 	{
-		uint32_t x;
-
 		uint32_t bmp_offset = y * bmp_stride + x_offset;
 
 		uint8_t *chr_addr = m_chr_bmp.get() + bmp_offset;
@@ -2947,9 +2943,9 @@ void tx1_state::bb_combine_layers(bitmap_ind16 &bitmap, int screen)
 		uint32_t sky_en = BIT(m_vregs.sky, 7);
 		uint32_t sky_val = (((m_vregs.sky & 0x7f) + y) >> 2) & 0x3f;
 
-		uint16_t *bmp_addr = &bitmap.pix16(y);
+		uint16_t *bmp_addr = &bitmap.pix(y);
 
-		for (x = 0; x < 256; ++x)
+		for (uint32_t x = 0; x < 256; ++x)
 		{
 			uint32_t out_val;
 

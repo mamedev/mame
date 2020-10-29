@@ -1178,7 +1178,7 @@ TIMER_CALLBACK_MEMBER(scn2674_device::scanline_timer)
 	}
 
 	if (!m_display_enabled)
-		std::fill_n(&m_bitmap.pix32(m_linecounter), m_character_per_row * m_hpixels_per_column, rgb_t::black());
+		std::fill_n(&m_bitmap.pix(m_linecounter), m_character_per_row * m_hpixels_per_column, rgb_t::black());
 
 	if (m_gfx_enabled || (charrow == (m_scanline_per_char_row - 1)))
 		m_address = address;

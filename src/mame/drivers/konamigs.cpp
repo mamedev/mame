@@ -746,7 +746,7 @@ u32 gsan_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 					if (!m_bg16bit)
 						col = get_color(col);
 				}
-				bitmap.pix32(y, x) = pal565(col, 11, 5, 0);
+				bitmap.pix(y, x) = pal565(col, 11, 5, 0);
 			}
 	}
 	else

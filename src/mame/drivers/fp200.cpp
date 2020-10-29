@@ -135,20 +135,16 @@ uint32_t fp200_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 
 			if(m_lcd.attr[x/8+yoffs*20] == 0x60 || m_lcd.attr[x/8+yoffs*20] == 0x50)
 			{
-				uint8_t vram,pix;
-
-				vram = m_lcd.vram[x/8+yoffs*20];
-				pix = ((m_chargen[vram*8+(x & 7)]) >> (7-(yoffs & 7))) & 1;
-				bitmap.pix16(y,x) = pix;
+				uint8_t const vram = m_lcd.vram[x/8+yoffs*20];
+				uint8_t const pix = ((m_chargen[vram*8+(x & 7)]) >> (7-(yoffs & 7))) & 1;
+				bitmap.pix(y,x) = pix;
 			}
 			/*
 			else if(m_lcd.attr[x/8+yoffs*20] == 0x40)
 			{
-			    uint8_t vram,pix;
-
-			    vram = m_lcd.vram[x/8+yoffs*20];
-			    pix = (vram) >> (7-(yoffs & 7)) & 1;
-			    bitmap.pix16(y,x) = pix;
+			    uint8_t const vram = m_lcd.vram[x/8+yoffs*20];
+			    uint8_t const pix = (vram) >> (7-(yoffs & 7)) & 1;
+			    bitmap.pix(y,x) = pix;
 			}*/
 		}
 	}
@@ -166,19 +162,15 @@ uint32_t fp200_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 
 			if(m_lcd.attr[x/8+yoffs*20] == 0x60 || m_lcd.attr[x/8+yoffs*20] == 0x50)
 			{
-				uint8_t vram,pix;
-
-				vram = m_lcd.vram[x/8+yoffs*20];
-				pix = ((m_chargen[vram*8+(x & 7)]) >> (7-(yoffs & 7))) & 1;
-				bitmap.pix16(y,x) = pix;
+				uint8_t const vram = m_lcd.vram[x/8+yoffs*20];
+				uint8_t const pix = ((m_chargen[vram*8+(x & 7)]) >> (7-(yoffs & 7))) & 1;
+				bitmap.pix(y,x) = pix;
 			}
 			/*else if(m_lcd.attr[x/8+yoffs*20] == 0x40)
 			{
-			    uint8_t vram,pix;
-
-			    vram = m_lcd.vram[x/8+yoffs*20];
-			    pix = (vram) >> (7-(yoffs & 7)) & 1;
-			    bitmap.pix16(y,x) = pix;
+			    uint8_t const vram = m_lcd.vram[x/8+yoffs*20];
+			    uint8_t const pix = (vram) >> (7-(yoffs & 7)) & 1;
+			    bitmap.pix(y,x) = pix;
 			}*/
 		}
 	}

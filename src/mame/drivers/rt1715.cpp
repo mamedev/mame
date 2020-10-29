@@ -424,7 +424,7 @@ WRITE_LINE_MEMBER(rt1715_state::crtc_drq_w)
 
 I8275_DRAW_CHARACTER_MEMBER(rt1715_state::crtc_display_pixels)
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	u8 gfx = (lten) ? 0xff : 0;
 
 	if (!vsp)
@@ -434,7 +434,7 @@ I8275_DRAW_CHARACTER_MEMBER(rt1715_state::crtc_display_pixels)
 		gfx ^= 0xff;
 
 	for (u8 i=0; i<8; i++)
-		bitmap.pix32(y, x + i) = palette[BIT(gfx, 7-i) ? (hlgt ? 2 : 1) : 0];
+		bitmap.pix(y, x + i) = palette[BIT(gfx, 7-i) ? (hlgt ? 2 : 1) : 0];
 }
 
 /* F4 Character Displayer */

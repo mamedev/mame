@@ -164,7 +164,7 @@ static uint32_t const mouse_bitmap[32*32] =
 
 mame_ui_manager::mame_ui_manager(running_machine &machine)
 	: ui_manager(machine)
-	, m_font(nullptr)
+	, m_font()
 	, m_handler_callback(nullptr)
 	, m_handler_callback_type(ui_callback_type::GENERAL)
 	, m_handler_param(0)
@@ -216,7 +216,7 @@ void mame_ui_manager::init()
 			config_save_delegate(&mame_ui_manager::config_save, this));
 
 	// create mouse bitmap
-	uint32_t *dst = &m_mouse_bitmap.pix32(0);
+	uint32_t *dst = &m_mouse_bitmap.pix(0);
 	memcpy(dst,mouse_bitmap,32*32*sizeof(uint32_t));
 	m_mouse_arrow_texture = machine().render().texture_alloc();
 	m_mouse_arrow_texture->set_bitmap(m_mouse_bitmap, m_mouse_bitmap.cliprect(), TEXFORMAT_ARGB32);
@@ -244,11 +244,7 @@ void mame_ui_manager::exit()
 	m_mouse_arrow_texture = nullptr;
 
 	// free the font
-	if (m_font != nullptr)
-	{
-		machine().render().font_free(m_font);
-		m_font = nullptr;
-	}
+	m_font.reset();
 }
 
 
@@ -639,9 +635,9 @@ void mame_ui_manager::update_and_render(render_container &container)
 render_font *mame_ui_manager::get_font()
 {
 	// allocate the font and messagebox string
-	if (m_font == nullptr)
+	if (!m_font)
 		m_font = machine().render().font_alloc(machine().options().ui_font());
-	return m_font;
+	return m_font.get();
 }
 
 
@@ -1007,7 +1003,7 @@ void mame_ui_manager::process_natural_keyboard()
 	while (machine().ui_input().pop_event(&event))
 	{
 		// if this was a UI_EVENT_CHAR event, post it
-		if (event.event_type == ui_event::IME_CHAR)
+		if (event.event_type == ui_event::type::IME_CHAR)
 			machine().ioport().natkeyboard().post_char(event.ch);
 	}
 
@@ -1486,7 +1482,7 @@ std::vector<ui::menu_item>& mame_ui_manager::get_slider_list(void)
 
 std::unique_ptr<slider_state> mame_ui_manager::slider_alloc(int id, const char *title, int32_t minval, int32_t defval, int32_t maxval, int32_t incval, void *arg)
 {
-	auto state = make_unique_clear<slider_state>();
+	auto state = std::make_unique<slider_state>();
 
 	state->minval = minval;
 	state->defval = defval;

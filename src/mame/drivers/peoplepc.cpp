@@ -114,17 +114,16 @@ static const gfx_layout peoplepc_charlayout =
 
 MC6845_UPDATE_ROW(peoplepc_state::update_row)
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	int i, j;
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
-	for(i = 0; i < x_count; i++)
+	for(int i = 0; i < x_count; i++)
 	{
 		if(BIT(m_p7c, 1))
 		{
 			uint16_t data = m_gvram[((((ma / 40) * 16) + ra) * 64) + i];
 
-			for(j = 15; j >= 0; j--)
-				bitmap.pix32(y, (i * 16) + j) = palette[BIT(data, j)];
+			for(int j = 15; j >= 0; j--)
+				bitmap.pix(y, (i * 16) + j) = palette[BIT(data, j)];
 		}
 		else
 		{
@@ -134,8 +133,8 @@ MC6845_UPDATE_ROW(peoplepc_state::update_row)
 				chr ^= 0xff;
 			if(((data & 0x800) && (ra > 14)) || (i == cursor_x))
 				chr = 0xff;
-			for(j = 0; j < 8; j++)
-				bitmap.pix32(y, (i * 8) + j) = palette[BIT(chr, j)];
+			for(int j = 0; j < 8; j++)
+				bitmap.pix(y, (i * 8) + j) = palette[BIT(chr, j)];
 		}
 	}
 }

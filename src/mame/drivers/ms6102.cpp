@@ -183,7 +183,7 @@ u8 ms6102_state::memory_read_byte(offs_t offset)
 
 I8275_DRAW_CHARACTER_MEMBER(ms6102_state::display_pixels)
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	u8 gfx = (lten) ? 0xff : 0;
 	if (!vsp)
 		gfx = m_p_chargen[linecount | (charcode << 4)];
@@ -192,7 +192,7 @@ I8275_DRAW_CHARACTER_MEMBER(ms6102_state::display_pixels)
 		gfx ^= 0xff;
 
 	for(u8 i=0; i<8; i++)
-		bitmap.pix32(y, x + i) = palette[BIT(gfx, 7-i) ? (hlgt ? 2 : 1) : 0];
+		bitmap.pix(y, x + i) = palette[BIT(gfx, 7-i) ? (hlgt ? 2 : 1) : 0];
 }
 
 I8275_DRAW_CHARACTER_MEMBER(ms6102_state::display_attr) // TODO: attributes

@@ -191,7 +191,6 @@ MAIN BOARD:
 #include "machine/konami1.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 
@@ -943,9 +942,6 @@ void trackfld_state::trackfld(machine_config &config)
 	TRACKFLD_AUDIO(config, m_soundbrd, 0, m_audiocpu, m_vlm);
 
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // ls374.8e + r34-r47(20k) + r35-r53(10k) + r54(20k) + upc324.8f
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	SN76496(config, m_sn, SOUND_CLOCK/8);
 	m_sn->add_route(ALL_OUTPUTS, "speaker", 1.0);
@@ -1018,9 +1014,6 @@ void trackfld_state::yieartf(machine_config &config)
 	TRACKFLD_AUDIO(config, m_soundbrd, 0, finder_base::DUMMY_TAG, m_vlm);
 
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // ls374.8e + r34-r47(20k) + r35-r53(10k) + r54(20k) + upc324.8f
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	SN76496(config, m_sn, MASTER_CLOCK/6/2);
 	m_sn->add_route(ALL_OUTPUTS, "speaker", 1.0);

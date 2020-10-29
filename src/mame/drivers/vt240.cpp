@@ -201,10 +201,7 @@ READ_LINE_MEMBER(vt240_state::i8085_sid_r)
 
 UPD7220_DISPLAY_PIXELS_MEMBER( vt240_state::hgdc_draw )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-
-	int xi, gfx1, gfx2;
-	uint8_t vom;
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
 	if(!BIT(m_reg0, 7))
 	{
@@ -212,14 +209,14 @@ UPD7220_DISPLAY_PIXELS_MEMBER( vt240_state::hgdc_draw )
 		vram_w((0x20000 + address) >> 1, 0);
 	}
 
-	gfx1 = m_video_ram[(address & 0x7fff) >> 1];
-	gfx2 = m_video_ram[((address & 0x7fff) + 0x8000) >> 1];
+	int const gfx1 = m_video_ram[(address & 0x7fff) >> 1];
+	int const gfx2 = m_video_ram[((address & 0x7fff) + 0x8000) >> 1];
 
-	bool color = m_monitor->read() ? true : false;
-	for(xi=0;xi<16;xi++)
+	bool const color = m_monitor->read() ? true : false;
+	for(int xi=0;xi<16;xi++)
 	{
-		vom = BIT(gfx1, xi) | (BIT(gfx2, xi) << 1) | ((m_reg0 & 3) << 2);
-		bitmap.pix32(y, x + xi) = palette[color ? (vom + 16) : vom];
+		uint8_t const vom = BIT(gfx1, xi) | (BIT(gfx2, xi) << 1) | ((m_reg0 & 3) << 2);
+		bitmap.pix(y, x + xi) = palette[color ? (vom + 16) : vom];
 	}
 }
 

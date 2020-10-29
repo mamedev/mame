@@ -192,7 +192,11 @@ chd_error do_open_disk(const emu_options &options, std::initializer_list<std::re
 
 const rom_entry *rom_first_region(const device_t &device)
 {
-	const rom_entry *romp = &device.rom_region_vector().front();
+	return rom_first_region(&device.rom_region_vector().front());
+}
+
+const rom_entry *rom_first_region(const rom_entry *romp)
+{
 	while (ROMENTRY_ISPARAMETER(romp) || ROMENTRY_ISSYSTEM_BIOS(romp) || ROMENTRY_ISDEFAULT_BIOS(romp))
 		romp++;
 	return !ROMENTRY_ISEND(romp) ? romp : nullptr;
@@ -1418,6 +1422,17 @@ void rom_load_manager::process_region_list()
 
 rom_load_manager::rom_load_manager(running_machine &machine)
 	: m_machine(machine)
+	, m_warnings(0)
+	, m_knownbad(0)
+	, m_errors(0)
+	, m_romsloaded(0)
+	, m_romstotal(0)
+	, m_romsloadedsize(0)
+	, m_romstotalsize(0)
+	, m_chd_list()
+	, m_region(nullptr)
+	, m_errorstring()
+	, m_softwarningstring()
 {
 	// figure out which BIOS we are using
 	std::map<std::string, std::string> card_bios;

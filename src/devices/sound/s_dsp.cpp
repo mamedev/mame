@@ -1074,7 +1074,7 @@ void s_dsp_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 		dsp_update(mix);
 
 		/* Update the buffers */
-		outputs[0].put_int(i, (stream_sample_t)mix[0], 32768);
-		outputs[1].put_int(i, (stream_sample_t)mix[1], 32768);
+		outputs[0].put_int(i, (s32)mix[0], 32768);
+		outputs[1].put_int(i, (s32)mix[1], 32768);
 	}
 }

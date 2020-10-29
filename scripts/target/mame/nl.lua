@@ -54,7 +54,6 @@ SOUNDS["UPD7759"] = true
 SOUNDS["YM2151"] = true
 SOUNDS["YM2413"] = true
 SOUNDS["BEEP"] = true
-SOUNDS["VOLT_REG"] = true
 SOUNDS["SPEAKER"] = true
 SOUNDS["DIGITALKER"] = true
 SOUNDS["SN76477"] = true
@@ -287,6 +286,28 @@ files{
 	MAME_DIR .. "src/mame/drivers/palestra.cpp",
 	MAME_DIR .. "src/mame/machine/nl_palestra.cpp",
 	MAME_DIR .. "src/mame/machine/nl_palestra.h",
+
+	MAME_DIR .. "src/mame/drivers/vicdual.cpp",
+	MAME_DIR .. "src/mame/includes/vicdual.h",
+	MAME_DIR .. "src/mame/audio/vicdual.cpp",
+	MAME_DIR .. "src/mame/audio/vicdual.h",
+	MAME_DIR .. "src/mame/audio/nl_brdrline.cpp",
+	MAME_DIR .. "src/mame/audio/nl_brdrline.h",
+	MAME_DIR .. "src/mame/audio/nl_frogs.cpp",
+	MAME_DIR .. "src/mame/audio/nl_frogs.h",
+	MAME_DIR .. "src/mame/audio/vicdual-97271p.cpp",
+	MAME_DIR .. "src/mame/audio/vicdual-97271p.h",
+	MAME_DIR .. "src/mame/video/vicdual.cpp",
+	MAME_DIR .. "src/mame/video/vicdual-97269pb.cpp",
+	MAME_DIR .. "src/mame/video/vicdual-97269pb.h",
+	MAME_DIR .. "src/mame/audio/carnival.cpp",
+	MAME_DIR .. "src/mame/audio/carnival.h",
+	MAME_DIR .. "src/mame/audio/depthch.cpp",
+	MAME_DIR .. "src/mame/audio/depthch.h",
+	MAME_DIR .. "src/mame/audio/invinco.cpp",
+	MAME_DIR .. "src/mame/audio/invinco.h",
+	MAME_DIR .. "src/mame/audio/pulsar.cpp",
+	MAME_DIR .. "src/mame/audio/pulsar.h",
 
 	MAME_DIR .. "src/mame/machine/segacrpt_device.cpp",
 	MAME_DIR .. "src/mame/machine/segacrpt_device.h",

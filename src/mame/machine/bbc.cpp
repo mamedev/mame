@@ -850,16 +850,6 @@ WRITE_LINE_MEMBER(bbc_state::kbd_enable_w)
 	}
 }
 
-WRITE_LINE_MEMBER(bbc_state::capslock_led_w)
-{
-	output().set_value("capslock_led", state);
-}
-
-WRITE_LINE_MEMBER(bbc_state::shiftlock_led_w)
-{
-	output().set_value("shiftlock_led", state);
-}
-
 
 void bbc_state::mc146818_set()
 {
@@ -1211,7 +1201,7 @@ void bbc_state::cassette_motor(bool motor_state)
 		m_cass_out_phase = 0;
 		m_cass_out_samples_to_go = 4;
 	}
-	output().set_value("motor_led", !motor_state);
+	m_motor_led = !motor_state;
 }
 
 
@@ -1627,17 +1617,7 @@ void bbc_state::machine_start()
 {
 	setup_device_roms();
 
-	/* register save states */
-	save_item(NAME(m_vula_ctrl));
-	save_item(NAME(m_vula_palette));
-	save_item(NAME(m_vula_palette_lookup));
-	save_item(STRUCT_MEMBER(m_vnula, palette_mode));
-	save_item(STRUCT_MEMBER(m_vnula, horiz_offset));
-	save_item(STRUCT_MEMBER(m_vnula, left_blank));
-	save_item(STRUCT_MEMBER(m_vnula, disable));
-	save_item(STRUCT_MEMBER(m_vnula, flash));
-	save_item(STRUCT_MEMBER(m_vnula, palette_byte));
-	save_item(STRUCT_MEMBER(m_vnula, palette_write));
+	m_motor_led.resolve();
 }
 
 void bbc_state::machine_reset()
@@ -1657,6 +1637,8 @@ void bbc_state::machine_reset()
 void bbcbp_state::machine_start()
 {
 	setup_device_roms();
+
+	m_motor_led.resolve();
 }
 
 void bbcbp_state::machine_reset()
@@ -1672,7 +1654,10 @@ void bbcm_state::machine_start()
 {
 	setup_device_roms();
 
-	output().set_value("power_led", 0);
+	m_motor_led.resolve();
+	m_power_led.resolve();
+
+	m_power_led = 0;
 }
 
 void bbcm_state::machine_reset()

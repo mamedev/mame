@@ -1400,6 +1400,45 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="dev_toolbox_42">
+		<description>Developer Toolbox 4.2</description>
+		<year>1994</year> <!-- 08/94 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: nixzone.nl -->
+			<diskarea name="cdrom">
+				<disk name="devtoolbox42" sha1="9b85e8d9d35635794408a8ce7d168af96e14bc47" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dev_toolbox_61">
+		<description>Developer Toolbox 6.1</description>
+		<year>1996</year> <!-- 09/96 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="Developer Toolbox 6.1 (CD 0)" />
+			<!-- Origin: nixzone.nl -->
+			<diskarea name="cdrom">
+				<disk name="devtoolbox61-0" sha1="191db2ed342be4f514e9be29e8793fbc5718bf77" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="Developer Toolbox 6.1 (CD 1)" />
+			<!-- Origin: nixzone.nl -->
+			<diskarea name="cdrom">
+				<disk name="devtoolbox61-1" sha1="c978ecf1333446424d952646d95ce52b2c20496e" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_id" value="Developer Toolbox 6.1 (CD 2)" />
+			<!-- Origin: nixzone.nl -->
+			<diskarea name="cdrom">
+				<disk name="devtoolbox61-2" sha1="928cfe53e856de90a554fe1b82594b119b7b255c" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="dmdo_1_1">
 		<description>Digital Media Dev Option 1.1</description>
 		<year>1993</year> <!-- 03/93 -->
@@ -1688,6 +1727,19 @@ license:CC0
 
 	<!-- Hot Mix -->
 
+	<software name="hotmix_1">
+		<description>Hot Mix Volume 1</description>
+		<year>1992</year>
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-8101-001"/>
+			<!-- Origin: nixzone.nl -->
+			<diskarea name="cdrom">
+				<disk name="hot_mix_1" sha1="3d55993a7ebf9b9d607edda155ac90e78f8c8e09" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="hotmix_4">
 		<description>Hot Mix 4</description>
 		<year>1993</year>
@@ -1740,9 +1792,35 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="hotmix_9">
+		<description>Hot Mix Volume 9</description>
+		<year>1994</year>
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-8101-009"/>
+			<!-- Origin: nixzone.nl -->
+			<diskarea name="cdrom">
+				<disk name="hot_mix_9" sha1="0cac323851e8502eee63283e737d541bf806fa09" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hotmix_10">
+		<description>Hot Mix Volume 10</description>
+		<year>1995</year>
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-8101-010"/>
+			<!-- Origin: nixzone.nl -->
+			<diskarea name="cdrom">
+				<disk name="hot_mix_10" sha1="97b2604f21474fa376c94ca66f6e465e730e7123" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="hotmix_11">
 		<description>Hot Mix Volume 11</description>
-		<year>1994</year>
+		<year>1995</year>
 		<publisher>Silicon Graphics</publisher>
 		<part name="cdrom" interface="cdrom">
 			<feature name="part_number" value="812-8101-011"/>
@@ -1755,13 +1833,65 @@ license:CC0
 
 	<software name="hotmix_12">
 		<description>Hot Mix Volume 12</description>
-		<year>1994</year>
+		<year>1995</year>
 		<publisher>Silicon Graphics</publisher>
 		<part name="cdrom" interface="cdrom">
 			<feature name="part_number" value="812-8101-012"/>
 			<!-- Origin: private dump -->
 			<diskarea name="cdrom">
 				<disk name="hot_mix_volume_12" sha1="34f76d048973a2b4a7ae8471420f87ab2ac4d762" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hotmix_13">
+		<description>Hot Mix Volume 13</description>
+		<year>1996</year>
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="814-8101-013"/>
+			<!-- Origin: nixzone.nl -->
+			<diskarea name="cdrom">
+				<disk name="hot_mix_13" sha1="36360aac69a12728b6716d5f584768db5fad1400" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hotmix_14">
+		<description>Hot Mix Volume 14</description>
+		<year>1996</year>
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0544-003"/>
+			<!-- Origin: nixzone.nl -->
+			<diskarea name="cdrom">
+				<disk name="hot_mix_14" sha1="3e3a962260923f58edafd3052b9133789057998c" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hotmix_15">
+		<description>Hot Mix Volume 15</description>
+		<year>1996</year>
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0544-004"/>
+			<!-- Origin: nixzone.nl -->
+			<diskarea name="cdrom">
+				<disk name="hot_mix_15" sha1="173163f1366fd729d80857f097fd0b9c1f8778f4" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hotmix_16">
+		<description>Hot Mix Volume 16</description>
+		<year>1997</year>
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0544-005"/>
+			<!-- Origin: nixzone.nl -->
+			<diskarea name="cdrom">
+				<disk name="hot_mix_16" sha1="47b4d2ad094d204d726c3d9fb2a181e11af7422f" />
 			</diskarea>
 		</part>
 	</software>

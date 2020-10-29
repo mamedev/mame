@@ -307,11 +307,11 @@ void wswan_video_device::draw_background()
 					if (col)
 					{
 						if (m_color_mode)
-							m_bitmap.pix16(m_current_line, x_offset) = m_pal[tile_palette][col];
+							m_bitmap.pix(m_current_line, x_offset) = m_pal[tile_palette][col];
 						else
 						{
 							/* Hmmmm, what should we do here... Is this correct?? */
-							m_bitmap.pix16(m_current_line, x_offset) = m_pal[tile_palette][col];
+							m_bitmap.pix(m_current_line, x_offset) = m_pal[tile_palette][col];
 						}
 					}
 				}
@@ -320,9 +320,9 @@ void wswan_video_device::draw_background()
 					if (col || !(tile_palette & 4))
 					{
 						if (m_color_mode)
-							m_bitmap.pix16(m_current_line, x_offset) = m_pal[tile_palette][col];
+							m_bitmap.pix(m_current_line, x_offset) = m_pal[tile_palette][col];
 						else
-							m_bitmap.pix16(m_current_line, x_offset) = m_main_palette[m_pal[tile_palette][col]];
+							m_bitmap.pix(m_current_line, x_offset) = m_main_palette[m_pal[tile_palette][col]];
 					}
 				}
 			}
@@ -416,10 +416,10 @@ void wswan_video_device::draw_foreground_0()
 					if (col)
 					{
 //                      if (m_color_mode) {
-						m_bitmap.pix16(m_current_line, x_offset) = m_pal[tile_palette][col];
+						m_bitmap.pix(m_current_line, x_offset) = m_pal[tile_palette][col];
 //                      } else {
 //                          /* Hmmmm, what should we do here... Is this correct?? */
-//                          m_bitmap.pix16(m_current_line, x_offset) = m_pal[tile_palette][col];
+//                          m_bitmap.pix(m_current_line, x_offset) = m_pal[tile_palette][col];
 //                      }
 					}
 				}
@@ -428,9 +428,9 @@ void wswan_video_device::draw_foreground_0()
 					if (col || !(tile_palette & 4))
 					{
 						if (m_color_mode)
-							m_bitmap.pix16(m_current_line, x_offset) = m_pal[tile_palette][col];
+							m_bitmap.pix(m_current_line, x_offset) = m_pal[tile_palette][col];
 						else
-							m_bitmap.pix16(m_current_line, x_offset) = m_main_palette[m_pal[tile_palette][col]];
+							m_bitmap.pix(m_current_line, x_offset) = m_main_palette[m_pal[tile_palette][col]];
 					}
 				}
 			}
@@ -525,10 +525,10 @@ void wswan_video_device::draw_foreground_2()
 					if (col)
 					{
 						if (m_color_mode)
-							m_bitmap.pix16(m_current_line, x_offset) = m_pal[tile_palette][col];
+							m_bitmap.pix(m_current_line, x_offset) = m_pal[tile_palette][col];
 						else
 							/* Hmmmm, what should we do here... Is this correct?? */
-							m_bitmap.pix16(m_current_line, x_offset) = m_pal[tile_palette][col];
+							m_bitmap.pix(m_current_line, x_offset) = m_pal[tile_palette][col];
 					}
 				}
 				else
@@ -536,9 +536,9 @@ void wswan_video_device::draw_foreground_2()
 					if (col || !(tile_palette & 4))
 					{
 						if (m_color_mode)
-							m_bitmap.pix16(m_current_line, x_offset) = m_pal[tile_palette][col];
+							m_bitmap.pix(m_current_line, x_offset) = m_pal[tile_palette][col];
 						else
-							m_bitmap.pix16(m_current_line, x_offset) = m_main_palette[m_pal[tile_palette][col]];
+							m_bitmap.pix(m_current_line, x_offset) = m_main_palette[m_pal[tile_palette][col]];
 					}
 				}
 			}
@@ -632,10 +632,10 @@ void wswan_video_device::draw_foreground_3()
 					if (col)
 					{
 						if (m_color_mode)
-							m_bitmap.pix16(m_current_line, x_offset) = m_pal[tile_palette][col];
+							m_bitmap.pix(m_current_line, x_offset) = m_pal[tile_palette][col];
 						else
 							/* Hmmmm, what should we do here... Is this correct?? */
-							m_bitmap.pix16(m_current_line, x_offset) = m_pal[tile_palette][col];
+							m_bitmap.pix(m_current_line, x_offset) = m_pal[tile_palette][col];
 					}
 				}
 				else
@@ -643,9 +643,9 @@ void wswan_video_device::draw_foreground_3()
 					if (col || !(tile_palette & 4))
 					{
 						if (m_color_mode)
-							m_bitmap.pix16(m_current_line, x_offset) = m_pal[tile_palette][col];
+							m_bitmap.pix(m_current_line, x_offset) = m_pal[tile_palette][col];
 						else
-							m_bitmap.pix16(m_current_line, x_offset) = m_main_palette[m_pal[tile_palette][col]];
+							m_bitmap.pix(m_current_line, x_offset) = m_main_palette[m_pal[tile_palette][col]];
 					}
 				}
 			}
@@ -775,10 +775,10 @@ void wswan_video_device::handle_sprites(int mask)
 						if (col)
 						{
 							if (m_color_mode)
-								m_bitmap.pix16(m_current_line, x_offset) = m_pal[tile_palette][col];
+								m_bitmap.pix(m_current_line, x_offset) = m_pal[tile_palette][col];
 							else
 								/* Hmmmm, what should we do here... Is this correct?? */
-								m_bitmap.pix16(m_current_line, x_offset) = m_pal[tile_palette][col];
+								m_bitmap.pix(m_current_line, x_offset) = m_pal[tile_palette][col];
 						}
 					}
 					else
@@ -786,9 +786,9 @@ void wswan_video_device::handle_sprites(int mask)
 						if (col || !(tile_palette & 4))
 						{
 							if (m_color_mode)
-								m_bitmap.pix16(m_current_line, x_offset) = m_pal[tile_palette][col];
+								m_bitmap.pix(m_current_line, x_offset) = m_pal[tile_palette][col];
 							else
-								m_bitmap.pix16(m_current_line, x_offset) = m_main_palette[m_pal[tile_palette][col]];
+								m_bitmap.pix(m_current_line, x_offset) = m_main_palette[m_pal[tile_palette][col]];
 						}
 					}
 				}

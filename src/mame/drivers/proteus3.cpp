@@ -300,26 +300,24 @@ WRITE_LINE_MEMBER( proteus3_state::ca2_w )
 
 u32 proteus3_state::screen_update_proteus3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	u8 y,ra,chr,gfx;
-	u16 sy=0,ma=0,x;
+	u16 sy=0,ma=0;
 	m_flashcnt++;
 
-	for(y = 0; y < 16; y++ )
+	for (u8 y = 0; y < 16; y++ )
 	{
-		for (ra = 0; ra < 12; ra++)
+		for (u8 ra = 0; ra < 12; ra++)
 		{
-			u16 *p = &bitmap.pix16(sy++);
+			u16 *p = &bitmap.pix(sy++);
 
-			for (x = ma; x < ma + 64; x++)
+			for (u16 x = ma; x < ma + 64; x++)
 			{
-				gfx = 0;
+				u8 gfx = 0;
 				if (ra < 8)
 				{
-					chr = m_vram[x]; // get char in videoram
+					u8 chr = m_vram[x]; // get char in videoram
 					gfx = m_p_chargen[(chr<<3) | ra]; // get dot pattern in chargen
 				}
-				else
-				if ((ra == 9) && (m_curs_pos == x) && BIT(m_flashcnt, 4))
+				else if ((ra == 9) && (m_curs_pos == x) && BIT(m_flashcnt, 4))
 					gfx = 0xff;
 
 				/* Display a scanline of a character */

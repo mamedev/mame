@@ -2530,11 +2530,11 @@ void saturn_state::stv_vdp2_drawgfxzoom(
 				{
 					for( y=sy; y<ey; y++ )
 					{
-						const uint8_t *source = source_base + (y_index>>16) * gfx->rowbytes();
-						uint32_t *dest = &dest_bmp.pix32(y);
+						uint8_t const *const source = source_base + (y_index>>16) * gfx->rowbytes();
+						uint32_t *const dest = &dest_bmp.pix(y);
 
-						int x, x_index = x_index_base;
-						for( x=sx; x<ex; x++ )
+						int x_index = x_index_base;
+						for( int x=sx; x<ex; x++ )
 						{
 							if(stv_vdp2_window_process(x,y))
 							{
@@ -2552,11 +2552,11 @@ void saturn_state::stv_vdp2_drawgfxzoom(
 				{
 					for( y=sy; y<ey; y++ )
 					{
-						const uint8_t *source = source_base + (y_index>>16) * gfx->rowbytes();
-						uint32_t *dest = &dest_bmp.pix32(y);
+						uint8_t const *const source = source_base + (y_index>>16) * gfx->rowbytes();
+						uint32_t *const dest = &dest_bmp.pix(y);
 
-						int x, x_index = x_index_base;
-						for( x=sx; x<ex; x++ )
+						int x_index = x_index_base;
+						for( int x=sx; x<ex; x++ )
 						{
 							if(stv_vdp2_window_process(x,y))
 							{
@@ -2574,11 +2574,11 @@ void saturn_state::stv_vdp2_drawgfxzoom(
 				{
 					for( y=sy; y<ey; y++ )
 					{
-						const uint8_t *source = source_base + (y_index>>16) * gfx->rowbytes();
-						uint32_t *dest = &dest_bmp.pix32(y);
+						uint8_t const *const source = source_base + (y_index>>16) * gfx->rowbytes();
+						uint32_t *const dest = &dest_bmp.pix(y);
 
-						int x, x_index = x_index_base;
-						for( x=sx; x<ex; x++ )
+						int x_index = x_index_base;
+						for( int x=sx; x<ex; x++ )
 						{
 							if(stv_vdp2_window_process(x,y))
 							{
@@ -2716,17 +2716,16 @@ void saturn_state::stv_vdp2_drawgfxzoom_rgb555(
 				{
 					for( y=sy; y<ey; y++ )
 					{
-						const uint8_t *source = gfxdata + (y_index>>16)*16;
-						uint32_t *dest = &dest_bmp.pix32(y);
-						int r,g,b,data;
+						uint8_t const *const source = gfxdata + (y_index>>16)*16;
+						uint32_t *const dest = &dest_bmp.pix(y);
 
-						int x, x_index = x_index_base;
-						for( x=sx; x<ex; x++ )
+						int x_index = x_index_base;
+						for( int x=sx; x<ex; x++ )
 						{
-							data = (source[(x_index>>16)*2] << 8) | source[(x_index>>16)*2+1];
-							b = pal5bit((data & 0x7c00) >> 10);
-							g = pal5bit((data & 0x03e0) >> 5);
-							r = pal5bit( data & 0x001f);
+							int data = (source[(x_index>>16)*2] << 8) | source[(x_index>>16)*2+1];
+							int b = pal5bit((data & 0x7c00) >> 10);
+							int g = pal5bit((data & 0x03e0) >> 5);
+							int r = pal5bit( data & 0x001f);
 							if(stv2_current_tilemap.fade_control & 1)
 								stv_vdp2_compute_color_offset(&r,&g,&b,stv2_current_tilemap.fade_control & 2);
 
@@ -2743,17 +2742,16 @@ void saturn_state::stv_vdp2_drawgfxzoom_rgb555(
 				{
 					for( y=sy; y<ey; y++ )
 					{
-						const uint8_t *source = gfxdata + (y_index>>16)*16;
-						uint32_t *dest = &dest_bmp.pix32(y);
-						int r,g,b,data;
+						uint8_t const *const source = gfxdata + (y_index>>16)*16;
+						uint32_t *const dest = &dest_bmp.pix(y);
 
-						int x, x_index = x_index_base;
-						for( x=sx; x<ex; x++ )
+						int x_index = x_index_base;
+						for( int x=sx; x<ex; x++ )
 						{
-							data = (source[(x_index*2+0)>>16]<<0)|(source[(x_index*2+1)>>16]<<8);
-							b = pal5bit((data & 0x7c00) >> 10);
-							g = pal5bit((data & 0x03e0) >> 5);
-							r = pal5bit( data & 0x001f);
+							int data = (source[(x_index*2+0)>>16]<<0)|(source[(x_index*2+1)>>16]<<8);
+							int b = pal5bit((data & 0x7c00) >> 10);
+							int g = pal5bit((data & 0x03e0) >> 5);
+							int r = pal5bit( data & 0x001f);
 							if(stv2_current_tilemap.fade_control & 1)
 								stv_vdp2_compute_color_offset(&r,&g,&b,stv2_current_tilemap.fade_control & 2);
 
@@ -2770,17 +2768,16 @@ void saturn_state::stv_vdp2_drawgfxzoom_rgb555(
 				{
 					for( y=sy; y<ey; y++ )
 					{
-						const uint8_t *source = gfxdata + (y_index>>16)*16;
-						uint32_t *dest = &dest_bmp.pix32(y);
-						int r,g,b,data;
+						uint8_t const *const source = gfxdata + (y_index>>16)*16;
+						uint32_t *const dest = &dest_bmp.pix(y);
 
-						int x, x_index = x_index_base;
-						for( x=sx; x<ex; x++ )
+						int x_index = x_index_base;
+						for( int x=sx; x<ex; x++ )
 						{
-							data = (source[(x_index>>16)*2] << 8) | source[(x_index>>16)*2+1];
-							b = pal5bit((data & 0x7c00) >> 10);
-							g = pal5bit((data & 0x03e0) >> 5);
-							r = pal5bit( data & 0x001f);
+							int data = (source[(x_index>>16)*2] << 8) | source[(x_index>>16)*2+1];
+							int b = pal5bit((data & 0x7c00) >> 10);
+							int g = pal5bit((data & 0x03e0) >> 5);
+							int r = pal5bit( data & 0x001f);
 							if(stv2_current_tilemap.fade_control & 1)
 								stv_vdp2_compute_color_offset(&r,&g,&b,stv2_current_tilemap.fade_control & 2);
 
@@ -2877,21 +2874,18 @@ void saturn_state::stv_vdp2_drawgfx_rgb555( bitmap_rgb32 &dest_bmp, const rectan
 
 			for( y=sy; y<ey; y++ )
 			{
-				const uint8_t *source = gfxdata + (y_index>>16)*16;
-				uint32_t *dest = &dest_bmp.pix32(y);
-				uint16_t data;
+				uint8_t const *const source = gfxdata + (y_index>>16)*16;
+				uint32_t *const dest = &dest_bmp.pix(y);
 
-				int x, x_index = x_index_base;
-				for( x=sx; x<ex; x++ )
+				int x_index = x_index_base;
+				for( int x=sx; x<ex; x++ )
 				{
-					int r,g,b;
-
-					data = (source[(x_index>>16)*2] << 8) | source[(x_index>>16)*2+1];
+					uint16_t data = (source[(x_index>>16)*2] << 8) | source[(x_index>>16)*2+1];
 					if ((data & 0x8000) || (transparency & STV_TRANSPARENCY_NONE))
 					{
-						b = pal5bit((data & 0x7c00) >> 10);
-						g = pal5bit((data & 0x03e0) >> 5);
-						r = pal5bit( data & 0x001f);
+						int b = pal5bit((data & 0x7c00) >> 10);
+						int g = pal5bit((data & 0x03e0) >> 5);
+						int r = pal5bit( data & 0x001f);
 						if(stv2_current_tilemap.fade_control & 1)
 							stv_vdp2_compute_color_offset(&r,&g,&b,stv2_current_tilemap.fade_control & 2);
 
@@ -2986,26 +2980,21 @@ void saturn_state::stv_vdp2_drawgfx_rgb888( bitmap_rgb32 &dest_bmp, const rectan
 
 		if( ex>sx )
 		{ /* skip if inner loop doesn't draw anything */
-			int y;
-
-			for( y=sy; y<ey; y++ )
+			for( int y=sy; y<ey; y++ )
 			{
-				const uint8_t *source = gfxdata + (y_index>>16)*32;
-				uint32_t *dest = &dest_bmp.pix32(y);
-				uint32_t data;
+				uint8_t const *const source = gfxdata + (y_index>>16)*32;
+				uint32_t *const dest = &dest_bmp.pix(y);
 
-				int x, x_index = x_index_base;
+				int x_index = x_index_base;
 
-				for( x=sx; x<ex; x++ )
+				for( int x=sx; x<ex; x++ )
 				{
-					int r,g,b;
-
-					data = (source[(x_index>>16)*4+0] << 24) | (source[(x_index>>16)*4+1] << 16) | (source[(x_index>>16)*4+2] << 8) | (source[(x_index>>16)*4+3] << 0);
+					uint32_t data = (source[(x_index>>16)*4+0] << 24) | (source[(x_index>>16)*4+1] << 16) | (source[(x_index>>16)*4+2] << 8) | (source[(x_index>>16)*4+3] << 0);
 					if ((data & 0x80000000) || (transparency & STV_TRANSPARENCY_NONE))
 					{
-						b = (data & 0xff0000) >> 16;
-						g = (data & 0x00ff00) >> 8;
-						r = (data & 0x0000ff);
+						int b = (data & 0xff0000) >> 16;
+						int g = (data & 0x00ff00) >> 8;
+						int r = (data & 0x0000ff);
 
 						if(stv2_current_tilemap.fade_control & 1)
 							stv_vdp2_compute_color_offset(&r,&g,&b,stv2_current_tilemap.fade_control & 2);
@@ -3078,27 +3067,23 @@ void saturn_state::stv_vdp2_drawgfx_alpha(bitmap_rgb32 &dest_bmp,const rectangle
 	/* skip if inner loop doesn't draw anything */
 	if (ex > sx)
 	{
-		int x, y;
-
+		for (int y = sy; y < ey; y++)
 		{
-			for (y = sy; y < ey; y++)
+			uint8_t const *const source = source_base + y_index*gfx->rowbytes();
+			uint32_t *const dest = &dest_bmp.pix(y);
+			int x_index = x_index_base;
+			for (int x = sx; x < ex; x++)
 			{
-				const uint8_t *source = source_base + y_index*gfx->rowbytes();
-				uint32_t *dest = &dest_bmp.pix32(y);
-				int x_index = x_index_base;
-				for (x = sx; x < ex; x++)
+				if(stv_vdp2_window_process(x,y))
 				{
-					if(stv_vdp2_window_process(x,y))
-					{
-						int c = (source[x_index]);
-						if ((transparency & STV_TRANSPARENCY_NONE) || (c != 0))
-							dest[x] = alpha_blend_r32( dest[x], pal[c], alpha );
-					}
-
-					x_index += xinc;
+					int c = (source[x_index]);
+					if ((transparency & STV_TRANSPARENCY_NONE) || (c != 0))
+						dest[x] = alpha_blend_r32( dest[x], pal[c], alpha );
 				}
-				y_index += yinc;
+
+				x_index += xinc;
 			}
+			y_index += yinc;
 		}
 	}
 }
@@ -3155,27 +3140,23 @@ void saturn_state::stv_vdp2_drawgfx_transpen(bitmap_rgb32 &dest_bmp,const rectan
 	/* skip if inner loop doesn't draw anything */
 	if (ex > sx)
 	{
-		int x, y;
-
+		for (int y = sy; y < ey; y++)
 		{
-			for (y = sy; y < ey; y++)
+			uint8_t const *const source = source_base + y_index*gfx->rowbytes();
+			uint32_t *const dest = &dest_bmp.pix(y);
+			int x_index = x_index_base;
+			for (int x = sx; x < ex; x++)
 			{
-				const uint8_t *source = source_base + y_index*gfx->rowbytes();
-				uint32_t *dest = &dest_bmp.pix32(y);
-				int x_index = x_index_base;
-				for (x = sx; x < ex; x++)
+				if(stv_vdp2_window_process(x,y))
 				{
-					if(stv_vdp2_window_process(x,y))
-					{
-						int c = (source[x_index]);
-						if ((transparency & STV_TRANSPARENCY_NONE) || (c != 0))
-							dest[x] = pal[c];
-					}
-
-					x_index += xinc;
+					int c = (source[x_index]);
+					if ((transparency & STV_TRANSPARENCY_NONE) || (c != 0))
+						dest[x] = pal[c];
 				}
-				y_index += yinc;
+
+				x_index += xinc;
 			}
+			y_index += yinc;
 		}
 	}
 }
@@ -3227,9 +3208,9 @@ void saturn_state::draw_4bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &clipr
 				dot_data += pal_bank;
 
 				if ( stv2_current_tilemap.colour_calculation_enabled == 0 )
-					bitmap.pix32(ydst, xdst) = m_palette->pen(dot_data);
+					bitmap.pix(ydst, xdst) = m_palette->pen(dot_data);
 				else
-					bitmap.pix32(ydst, xdst) = alpha_blend_r32(bitmap.pix32(ydst, xdst), m_palette->pen(dot_data), stv2_current_tilemap.alpha);
+					bitmap.pix(ydst, xdst) = alpha_blend_r32(bitmap.pix(ydst, xdst), m_palette->pen(dot_data), stv2_current_tilemap.alpha);
 			}
 		}
 	}
@@ -3287,9 +3268,9 @@ void saturn_state::draw_8bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &clipr
 				dot_data += pal_bank;
 
 				if ( stv2_current_tilemap.colour_calculation_enabled == 0 )
-					bitmap.pix32(ydst, xdst) = m_palette->pen(dot_data);
+					bitmap.pix(ydst, xdst) = m_palette->pen(dot_data);
 				else
-					bitmap.pix32(ydst, xdst) = alpha_blend_r32(bitmap.pix32(ydst, xdst), m_palette->pen(dot_data), stv2_current_tilemap.alpha);
+					bitmap.pix(ydst, xdst) = alpha_blend_r32(bitmap.pix(ydst, xdst), m_palette->pen(dot_data), stv2_current_tilemap.alpha);
 			}
 		}
 	}
@@ -3344,9 +3325,9 @@ void saturn_state::draw_11bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &clip
 				dot_data += pal_bank;
 
 				if ( stv2_current_tilemap.colour_calculation_enabled == 0 )
-					bitmap.pix32(ydst, xdst) = m_palette->pen(dot_data);
+					bitmap.pix(ydst, xdst) = m_palette->pen(dot_data);
 				else
-					bitmap.pix32(ydst, xdst) = alpha_blend_r32(bitmap.pix32(ydst, xdst), m_palette->pen(dot_data), stv2_current_tilemap.alpha);
+					bitmap.pix(ydst, xdst) = alpha_blend_r32(bitmap.pix(ydst, xdst), m_palette->pen(dot_data), stv2_current_tilemap.alpha);
 			}
 		}
 	}
@@ -3403,9 +3384,9 @@ void saturn_state::draw_rgb15_bitmap(bitmap_rgb32 &bitmap, const rectangle &clip
 					stv_vdp2_compute_color_offset(&r,&g,&b,stv2_current_tilemap.fade_control & 2);
 
 				if ( stv2_current_tilemap.colour_calculation_enabled == 0 )
-					bitmap.pix32(ydst, xdst) = rgb_t(r, g, b);
+					bitmap.pix(ydst, xdst) = rgb_t(r, g, b);
 				else
-					bitmap.pix32(ydst, xdst) = alpha_blend_r32( bitmap.pix32(ydst, xdst), rgb_t(r, g, b), stv2_current_tilemap.alpha );
+					bitmap.pix(ydst, xdst) = alpha_blend_r32( bitmap.pix(ydst, xdst), rgb_t(r, g, b), stv2_current_tilemap.alpha );
 			}
 		}
 	}
@@ -3461,9 +3442,9 @@ void saturn_state::draw_rgb32_bitmap(bitmap_rgb32 &bitmap, const rectangle &clip
 					stv_vdp2_compute_color_offset(&r,&g,&b,stv2_current_tilemap.fade_control & 2);
 
 				if ( stv2_current_tilemap.colour_calculation_enabled == 0 )
-					bitmap.pix32(ydst, xdst) = rgb_t(r, g, b);
+					bitmap.pix(ydst, xdst) = rgb_t(r, g, b);
 				else
-					bitmap.pix32(ydst, xdst) = alpha_blend_r32( bitmap.pix32(ydst, xdst), rgb_t(r, g, b), stv2_current_tilemap.alpha );
+					bitmap.pix(ydst, xdst) = alpha_blend_r32( bitmap.pix(ydst, xdst), rgb_t(r, g, b), stv2_current_tilemap.alpha );
 			}
 		}
 	}
@@ -4354,9 +4335,9 @@ void saturn_state::stv_vdp2_draw_line(bitmap_rgb32 &bitmap, const rectangle &cli
 				uint16_t pen;
 
 				pen = (gfxdata[base_offs+0]<<8)|gfxdata[base_offs+1];
-				pix = bitmap.pix32(y, x);
+				pix = bitmap.pix(y, x);
 
-				bitmap.pix32(y, x) = add_blend_r32(m_palette->pen(pen & 0x7ff),pix);
+				bitmap.pix(y, x) = add_blend_r32(m_palette->pen(pen & 0x7ff),pix);
 			}
 		}
 	}
@@ -4364,12 +4345,8 @@ void saturn_state::stv_vdp2_draw_line(bitmap_rgb32 &bitmap, const rectangle &cli
 
 void saturn_state::stv_vdp2_draw_mosaic(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t is_roz)
 {
-	int x,y,xi,yi;
-	uint8_t h_size,v_size;
-	uint32_t pix;
-
-	h_size = STV_VDP2_MZSZH+1;
-	v_size = STV_VDP2_MZSZV+1;
+	uint8_t h_size = STV_VDP2_MZSZH+1;
+	uint8_t v_size = STV_VDP2_MZSZV+1;
 
 	if(is_roz)
 		v_size = 1;
@@ -4380,15 +4357,15 @@ void saturn_state::stv_vdp2_draw_mosaic(bitmap_rgb32 &bitmap, const rectangle &c
 	if(STV_VDP2_LSMD == 3)
 		v_size <<= 1;
 
-	for(y=cliprect.top();y<=cliprect.bottom();y+=v_size)
+	for(int y=cliprect.top();y<=cliprect.bottom();y+=v_size)
 	{
-		for(x=cliprect.left();x<=cliprect.right();x+=h_size)
+		for(int x=cliprect.left();x<=cliprect.right();x+=h_size)
 		{
-			pix = bitmap.pix32(y, x);
+			uint32_t pix = bitmap.pix(y, x);
 
-			for(yi=0;yi<v_size;yi++)
-				for(xi=0;xi<h_size;xi++)
-					bitmap.pix32(y+yi, x+xi) = pix;
+			for(int yi=0;yi<v_size;yi++)
+				for(int xi=0;xi<h_size;xi++)
+					bitmap.pix(y+yi, x+xi) = pix;
 		}
 	}
 }
@@ -4726,7 +4703,7 @@ void saturn_state::stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap,
 		//dx  = (RP.A * RP.dx) + (RP.B * RP.dy);
 		//dy  = (RP.D * RP.dx) + (RP.E * RP.dy);
 
-		line = &bitmap.pix32(vcnt);
+		line = &bitmap.pix(vcnt);
 
 		// TODO: nuke this spaghetti code
 		if ( !use_coeff_table || RP.dkax == 0 )
@@ -4814,7 +4791,7 @@ void saturn_state::stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap,
 						continue;
 				}
 
-				pix = roz_bitmap.pix32(y & planerenderedsizey, x & planerenderedsizex);
+				pix = roz_bitmap.pix(y & planerenderedsizey, x & planerenderedsizex);
 				if (stv2_current_tilemap.transparency & STV_TRANSPARENCY_ALPHA)
 				{
 					if ((stv2_current_tilemap.transparency & STV_TRANSPARENCY_NONE) || (pix & 0xffffff))
@@ -4918,7 +4895,7 @@ void saturn_state::stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap,
 
 				if ( x & clipxmask || y & clipymask ) continue;
 
-				pix = roz_bitmap.pix32(y & planerenderedsizey, x & planerenderedsizex);
+				pix = roz_bitmap.pix(y & planerenderedsizey, x & planerenderedsizex);
 				if (stv2_current_tilemap.transparency & STV_TRANSPARENCY_ALPHA)
 				{
 					if ((stv2_current_tilemap.transparency & STV_TRANSPARENCY_NONE) || (pix & 0xffffff))
@@ -5753,12 +5730,9 @@ void saturn_state::stv_vdp2_draw_RBG0(bitmap_rgb32 &bitmap, const rectangle &cli
 
 void saturn_state::stv_vdp2_draw_back(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int x,y;
-	uint8_t* gfxdata = m_vdp2.gfx_decode.get();
-	uint32_t base_offs,base_mask;
-	uint8_t interlace;
+	uint8_t const *const gfxdata = m_vdp2.gfx_decode.get();
 
-	interlace = (STV_VDP2_LSMD == 3)+1;
+	uint8_t interlace = (STV_VDP2_LSMD == 3)+1;
 
 //  popmessage("Back screen %08x %08x %08x",STV_VDP2_BDCLMD,STV_VDP2_BKCLMD,STV_VDP2_BKTA);
 
@@ -5767,27 +5741,24 @@ void saturn_state::stv_vdp2_draw_back(bitmap_rgb32 &bitmap, const rectangle &cli
 		bitmap.fill(m_palette->black_pen(), cliprect);
 	else
 	{
-		base_mask = STV_VDP2_VRAMSZ ? 0x7ffff : 0x3ffff;
+		uint32_t base_mask = STV_VDP2_VRAMSZ ? 0x7ffff : 0x3ffff;
 
-		for(y=cliprect.top();y<=cliprect.bottom();y++)
+		for(int y=cliprect.top();y<=cliprect.bottom();y++)
 		{
-			base_offs = ((STV_VDP2_BKTA ) & base_mask) << 1;
+			uint32_t base_offs = ((STV_VDP2_BKTA ) & base_mask) << 1;
 			if(STV_VDP2_BKCLMD)
 				base_offs += ((y / interlace) << 1);
 
-			for(x=cliprect.left();x<=cliprect.right();x++)
+			for(int x=cliprect.left();x<=cliprect.right();x++)
 			{
-				int r,g,b;
-				uint16_t dot;
-
-				dot = (gfxdata[base_offs+0]<<8)|gfxdata[base_offs+1];
-				b = pal5bit((dot & 0x7c00) >> 10);
-				g = pal5bit((dot & 0x03e0) >> 5);
-				r = pal5bit( dot & 0x001f);
+				uint16_t dot = (gfxdata[base_offs+0]<<8)|gfxdata[base_offs+1];
+				int b = pal5bit((dot & 0x7c00) >> 10);
+				int g = pal5bit((dot & 0x03e0) >> 5);
+				int r = pal5bit( dot & 0x001f);
 				if(STV_VDP2_BKCOEN)
 					stv_vdp2_compute_color_offset( &r, &g, &b, STV_VDP2_BKCOSL );
 
-				bitmap.pix32(y, x) = rgb_t(r, g, b);
+				bitmap.pix(y, x) = rgb_t(r, g, b);
 			}
 		}
 	}
@@ -6737,7 +6708,7 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 						continue;
 
 				framebuffer_line = m_vdp1.framebuffer_display_lines[y];
-				bitmap_line = &bitmap.pix32(y);
+				bitmap_line = &bitmap.pix(y);
 
 				for ( x = cliprect.left(); x <= cliprect.right(); x++ )
 				{
@@ -6830,7 +6801,7 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 						continue;
 
 				framebuffer_line = m_vdp1.framebuffer_display_lines[y];
-				bitmap_line = &bitmap.pix32(y);
+				bitmap_line = &bitmap.pix(y);
 
 				for ( x = cliprect.left(); x <= cliprect.right(); x++ )
 				{
@@ -6941,12 +6912,12 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 			framebuffer_line = m_vdp1.framebuffer_display_lines[y];
 			if ( interlace_framebuffer == 0 )
 			{
-				bitmap_line = &bitmap.pix32(y);
+				bitmap_line = &bitmap.pix(y);
 			}
 			else
 			{
-				bitmap_line = &bitmap.pix32(2*y);
-				bitmap_line2 = &bitmap.pix32(2*y + 1);
+				bitmap_line = &bitmap.pix(2*y);
+				bitmap_line2 = &bitmap.pix(2*y + 1);
 			}
 
 			for ( x = cliprect.left(); x <= cliprect.right() /(double_x+1) ; x++ )

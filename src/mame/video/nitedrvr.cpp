@@ -16,7 +16,7 @@ void nitedrvr_state::draw_box(bitmap_ind16 &bitmap, const rectangle &cliprect, i
 	{
 		for (int x = bx; x < ex; x++)
 			if (cliprect.contains(x, y))
-				bitmap.pix16(y, x) = 1;
+				bitmap.pix(y, x) = 1;
 	}
 }
 

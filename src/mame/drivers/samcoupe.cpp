@@ -383,15 +383,15 @@ uint32_t samcoupe_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 void samcoupe_state::draw_mode4_line(int y, int hpos)
 {
 	/* get start address */
-	uint8_t *vram = m_videoram + ((y - SAM_BORDER_TOP) * 128) + ((hpos - SAM_BORDER_LEFT) / 4);
+	uint8_t const *vram = m_videoram + ((y - SAM_BORDER_TOP) * 128) + ((hpos - SAM_BORDER_LEFT) / 4);
 
 	for (int i = 0; i < (SAM_BLOCK*2)/4; i++)
 	{
 		/* draw 2 pixels (doublewidth) */
-		m_bitmap.pix16(y, hpos + i * 4 + 0) = m_clut[(*vram >> 4) & 0x0f];
-		m_bitmap.pix16(y, hpos + i * 4 + 1) = m_clut[(*vram >> 4) & 0x0f];
-		m_bitmap.pix16(y, hpos + i * 4 + 2) = m_clut[(*vram >> 0) & 0x0f];
-		m_bitmap.pix16(y, hpos + i * 4 + 3) = m_clut[(*vram >> 0) & 0x0f];
+		m_bitmap.pix(y, hpos + i * 4 + 0) = m_clut[(*vram >> 4) & 0x0f];
+		m_bitmap.pix(y, hpos + i * 4 + 1) = m_clut[(*vram >> 4) & 0x0f];
+		m_bitmap.pix(y, hpos + i * 4 + 2) = m_clut[(*vram >> 0) & 0x0f];
+		m_bitmap.pix(y, hpos + i * 4 + 3) = m_clut[(*vram >> 0) & 0x0f];
 
 		/* move to next address */
 		vram++;
@@ -405,15 +405,15 @@ void samcoupe_state::draw_mode4_line(int y, int hpos)
 void samcoupe_state::draw_mode3_line(int y, int hpos)
 {
 	/* get start address */
-	uint8_t *vram = m_videoram + ((y - SAM_BORDER_TOP) * 128) + ((hpos - SAM_BORDER_LEFT) / 4);
+	uint8_t const *vram = m_videoram + ((y - SAM_BORDER_TOP) * 128) + ((hpos - SAM_BORDER_LEFT) / 4);
 
 	for (int i = 0; i < (SAM_BLOCK*2)/4; i++)
 	{
 		/* draw 4 pixels */
-		m_bitmap.pix16(y, hpos + i * 4 + 0) = m_clut[(*vram >> 6) & 0x03];
-		m_bitmap.pix16(y, hpos + i * 4 + 1) = m_clut[(*vram >> 4) & 0x03];
-		m_bitmap.pix16(y, hpos + i * 4 + 2) = m_clut[(*vram >> 2) & 0x03];
-		m_bitmap.pix16(y, hpos + i * 4 + 3) = m_clut[(*vram >> 0) & 0x03];
+		m_bitmap.pix(y, hpos + i * 4 + 0) = m_clut[(*vram >> 6) & 0x03];
+		m_bitmap.pix(y, hpos + i * 4 + 1) = m_clut[(*vram >> 4) & 0x03];
+		m_bitmap.pix(y, hpos + i * 4 + 2) = m_clut[(*vram >> 2) & 0x03];
+		m_bitmap.pix(y, hpos + i * 4 + 3) = m_clut[(*vram >> 0) & 0x03];
 
 		/* move to next address */
 		vram++;
@@ -433,8 +433,8 @@ void samcoupe_state::draw_mode12_block(bitmap_ind16 &bitmap, int vpos, int hpos,
 	/* draw block of 8 pixels (doubled to 16) */
 	for (int i = 0; i < SAM_BLOCK; i++)
 	{
-		bitmap.pix16(vpos, hpos + i*2 + 0) = BIT(mask, 7 - i) ? ink : pap;
-		bitmap.pix16(vpos, hpos + i*2 + 1) = BIT(mask, 7 - i) ? ink : pap;
+		bitmap.pix(vpos, hpos + i*2 + 0) = BIT(mask, 7 - i) ? ink : pap;
+		bitmap.pix(vpos, hpos + i*2 + 1) = BIT(mask, 7 - i) ? ink : pap;
 	}
 }
 

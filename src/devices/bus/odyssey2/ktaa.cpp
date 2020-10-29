@@ -18,7 +18,7 @@ DEFINE_DEVICE_TYPE(O2_ROM_KTAA, o2_ktaa_device, "o2_ktaa", "Odyssey 2 Homebrew K
 //  o2_ktaa_device - constructor
 //-------------------------------------------------
 
-o2_ktaa_device::o2_ktaa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+o2_ktaa_device::o2_ktaa_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, O2_ROM_KTAA, tag, owner, clock),
 	device_o2_cart_interface(mconfig, *this)
 { }

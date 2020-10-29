@@ -118,7 +118,7 @@ uint32_t esh_state::screen_update_esh(screen_device &screen, bitmap_rgb32 &bitma
 
 				for(int yi=0;yi<8;yi++)
 					for(int xi=0;xi<8;xi++)
-						bitmap.pix32(yi+chary*8, xi+charx*8) = m_palette->pen(palIndex * 8 + pal_bank * 0x100);
+						bitmap.pix(yi+chary*8, xi+charx*8) = m_palette->pen(palIndex * 8 + pal_bank * 0x100);
 
 				continue;
 			}

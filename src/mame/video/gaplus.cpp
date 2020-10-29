@@ -262,7 +262,7 @@ void gaplus_base_state::starfield_render(bitmap_ind16 &bitmap)
 
 		if (x >= 0 && x < width && y >= 0 && y < height)
 		{
-			bitmap.pix16(y, x) = m_stars[i].col;
+			bitmap.pix(y, x) = m_stars[i].col;
 		}
 	}
 }

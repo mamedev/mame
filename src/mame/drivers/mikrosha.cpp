@@ -190,7 +190,7 @@ I8275_DRAW_CHARACTER_MEMBER(mikrosha_state::display_pixels)
 		pixels ^= 0xff;
 
 	for(int i=0;i<6;i++)
-		bitmap.pix32(y, x + i) = palette[(pixels >> (5-i)) & 1 ? (hlgt ? 2 : 1) : 0];
+		bitmap.pix(y, x + i) = palette[(pixels >> (5-i)) & 1 ? (hlgt ? 2 : 1) : 0];
 }
 
 /* F4 Character Displayer */

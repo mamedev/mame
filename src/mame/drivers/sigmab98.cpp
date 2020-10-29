@@ -528,8 +528,8 @@ void sigmab98_base_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cl
 		dstdyy /= 2;
 
 		// Transform the source image while drawing to the screen
-		uint16_t *src = &m_sprite_bitmap->pix16(0);
-		uint16_t *dst = &bitmap.pix16(0);
+		uint16_t const *const src = &m_sprite_bitmap->pix(0);
+		uint16_t *const dst = &bitmap.pix(0);
 
 		int src_rowpixels = m_sprite_bitmap->rowpixels();
 		int dst_rowpixels = bitmap.rowpixels();

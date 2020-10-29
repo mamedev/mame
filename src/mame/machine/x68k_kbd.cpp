@@ -9,6 +9,13 @@
 x68k_keyboard_device::x68k_keyboard_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
 	: buffered_rs232_device(mconfig, X68K_KEYBOARD, tag, owner, 0)
 	, device_matrix_keyboard_interface(mconfig, *this, "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8", "LINE9", "LINEA", "LINEB", "LINEC", "LINED", "LINEE")
+	, m_led_kana(*this, "key_led_kana")
+	, m_led_romaji(*this, "key_led_romaji")
+	, m_led_code(*this, "key_led_code")
+	, m_led_caps(*this, "key_led_caps")
+	, m_led_insert(*this, "key_led_insert")
+	, m_led_hiragana(*this, "key_led_hiragana")
+	, m_led_fullsize(*this, "key_led_fullsize")
 {
 }
 
@@ -49,13 +56,13 @@ void x68k_keyboard_device::received_byte(uint8_t data)
 
 	if (data & 0x80)  // LED status
 	{
-		machine().output().set_value("key_led_kana", data & 0x01);
-		machine().output().set_value("key_led_romaji", data & 0x02);
-		machine().output().set_value("key_led_code", data & 0x04);
-		machine().output().set_value("key_led_caps", data & 0x08);
-		machine().output().set_value("key_led_insert", data & 0x10);
-		machine().output().set_value("key_led_hiragana", data & 0x20);
-		machine().output().set_value("key_led_fullsize", data & 0x40);
+		m_led_kana = BIT(data, 0);
+		m_led_romaji = BIT(data, 1);
+		m_led_code = BIT(data, 2);
+		m_led_caps = BIT(data, 3);
+		m_led_insert = BIT(data, 4);
+		m_led_hiragana = BIT(data, 5);
+		m_led_fullsize = BIT(data, 6);
 		logerror("KB: LED status set to %02x\n", data & 0x7f);
 	}
 
@@ -266,6 +273,14 @@ void x68k_keyboard_device::device_start()
 {
 	buffered_rs232_device::device_start();
 
+	m_led_kana.resolve();
+	m_led_romaji.resolve();
+	m_led_code.resolve();
+	m_led_caps.resolve();
+	m_led_insert.resolve();
+	m_led_hiragana.resolve();
+	m_led_fullsize.resolve();
+
 	save_item(NAME(m_delay));
 	save_item(NAME(m_repeat));
 	save_item(NAME(m_enabled));
@@ -293,6 +308,14 @@ void x68k_keyboard_device::device_reset()
 	output_dsr(0);
 	output_cts(0);
 	output_rxd(1);
+
+	m_led_kana = 1;
+	m_led_romaji = 1;
+	m_led_code = 1;
+	m_led_caps = 1;
+	m_led_insert = 1;
+	m_led_hiragana = 1;
+	m_led_fullsize = 1;
 }
 
 

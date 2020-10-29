@@ -362,31 +362,41 @@ NETLIST_START(boxingb)
 	Q_2N3906(Q3)            // PNP
 	Q_2N3906(Q4)            // PNP
 	Q_2N3904(Q5)            // NPN
+#if !(HLE_CHIRPING_VCO)
 	Q_2N3904(Q6)            // NPN
+#endif
 	Q_2N3906(Q7)            // PNP
 	Q_2N3904(Q8)            // NPN
+#if !(HLE_DYING_BUG_VCO)
 	Q_2N3904(Q9)            // NPN
+#endif
 	Q_2N3906(Q10)           // PNP
 	Q_2N3904(Q11)           // NPN
+#if !(HLE_CRACKING_VCO)
 	Q_2N3904(Q12)           // NPN
+#endif
 	Q_2N3906(Q13)           // PNP
 	Q_2N3904(Q14)           // NPN
+#if !(HLE_BEETLE_VCO)
 	Q_2N3904(Q15)           // NPN
+#endif
 	Q_2N3906(Q16)           // PNP
 	Q_2N3904(Q17)           // NPN
 	Q_2N3906(Q18)           // PNP
 	Q_2N3906(Q19)           // PNP
 	Q_2N3906(Q20)           // PNP
 	Q_2N3904(Q21)           // NPN
+#if !(HLE_CANNON_VCO)
 	Q_2N3904(Q22)           // NPN
+#endif
 	Q_2N3906(Q23)           // PNP
 	Q_2N3906(Q24)           // PNP
 	Q_2N3906(Q25)           // PNP
 	Q_2N3906(Q26)           // PNP
 //  Q_2N6292(Q27)           // PNP -- part of final amp (not emulated)
 //  Q_2N6107(Q28)           // NPN -- part of final amp (not emulated)
-	Q_2N5210(Q29)           // NPN
-	Q_2N5210(Q30)           // NPN
+//  Q_2N5210(Q29)           // NPN -- not used
+//  Q_2N5210(Q30)           // NPN -- not used
 	Q_2N3906(Q31)           // PNP
 	Q_2N3906(Q32)           // PNP
 	Q_2N3906(Q33)           // PNP
@@ -1171,7 +1181,7 @@ NETLIST_START(boxingb)
 	//    R2 = 0.97985: HP = (0.0000369937*A0*A0*A0*A0) - (0.000849582*A0*A0*A0) - (0.00300315*A0*A0) + (0.185593*A0) - 1.090973
 	//    R2 = 0.24613: HP = (-0.000199982*A0*A0*A0*A0*A0) + (0.0134882*A0*A0*A0*A0) - (0.362557*A0*A0*A0) + (4.857498*A0*A0) - (32.45284*A0) + 86.5278
 	//
-	VARCLOCK(BOUNCECLK, 1, "max(0.000001,min(0.1,((0.00115078*A0*A0*A0) - (0.0435380*A0*A0) + (0.550407*A0) - 2.321385))")
+	VARCLOCK(BOUNCECLK, 1, "max(0.000001,min(0.1,((0.00115078*A0*A0*A0) - (0.0435380*A0*A0) + (0.550407*A0) - 2.321385)))")
 	NET_C(BOUNCECLK.GND, GND)
 	NET_C(BOUNCECLK.VCC, I_V5)
 	NET_C(BOUNCECLK.A0, C39.2)

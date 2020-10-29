@@ -135,7 +135,6 @@
 
 #include "emu.h"
 #include "includes/ssv.h"
-#include "render.h"
 
 
 void ssv_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int gfx, uint32_t code, uint32_t color, int flipx, int flipy, int base_sx, int base_sy, int shadow, int realline, int line)
@@ -171,7 +170,7 @@ void ssv_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, in
 		const uint8_t gfxbppmask = BPP_MASK_TABLE[gfx & 0x07].gfx_mask;
 		const uint8_t gfxshift = BPP_MASK_TABLE[gfx & 0x07].gfx_shift;
 
-		uint16_t *dest = &bitmap.pix16(realline);
+		uint16_t *const dest = &bitmap.pix(realline);
 
 		const int x0 = flipx ? (base_sx + gfxelement->width() - 1) : base_sx;
 		const int x1 = flipx ? (base_sx - 1) : (x0 + gfxelement->width());

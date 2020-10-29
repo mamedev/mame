@@ -362,7 +362,7 @@ uint32_t svision_state::screen_update_svision(screen_device &screen, bitmap_ind1
 		{
 			const int start_x = 3 - (m_reg[XPOS] & 3);
 			const int end_x = std::min(163, m_reg[XSIZE] | 3);
-			uint16_t *line = &bitmap.pix16(y, start_x);
+			uint16_t *line = &bitmap.pix(y, start_x);
 			for (int x = start_x, i = 0; x < end_x; x+=4, i++)
 			{
 				uint8_t b = m_videoram[j+i];
@@ -394,7 +394,7 @@ uint32_t svision_state::screen_update_tvlink(screen_device &screen, bitmap_rgb32
 		{
 			const int start_x = 3 - (m_reg[XPOS] & 3);
 			const int end_x = std::min(163, m_reg[XSIZE] | 3);
-			uint32_t *line = &bitmap.pix32(y, start_x);
+			uint32_t *line = &bitmap.pix(y, start_x);
 			for (int x = start_x, i = 0; x < end_x; x += 4, i++)
 			{
 				uint8_t b = m_videoram[j + i];

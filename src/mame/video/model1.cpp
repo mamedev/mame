@@ -91,7 +91,7 @@ void model1_state::view_t::project_point_direct(point_t *p) const
 
 void model1_state::draw_hline(bitmap_rgb32 &bitmap, int x1, int x2, int y, int color)
 {
-	uint32_t *base = &bitmap.pix32(y);
+	uint32_t *const base = &bitmap.pix(y);
 	while(x1 <= x2)
 	{
 		base[x1] = color;
@@ -101,7 +101,7 @@ void model1_state::draw_hline(bitmap_rgb32 &bitmap, int x1, int x2, int y, int c
 
 void model1_state::draw_hline_moired(bitmap_rgb32 &bitmap, int x1, int x2, int y, int color)
 {
-	uint32_t *base = &bitmap.pix32(y);
+	uint32_t *const base = &bitmap.pix(y);
 	while(x1 <= x2)
 	{
 		if((x1^y) & 1)
@@ -407,7 +407,7 @@ void model1_state::draw_line(bitmap_rgb32 &bitmap, model1_state::view_t *view, i
 	{
 		if (x >= view->x1 && x <= view->x2 && y >= view->y1 && y <= view->y2)
 		{
-			bitmap.pix32(y, x) = color;
+			bitmap.pix(y, x) = color;
 		}
 		x += s1x;
 		y += s1y;
@@ -421,7 +421,7 @@ void model1_state::draw_line(bitmap_rgb32 &bitmap, model1_state::view_t *view, i
 	}
 	if (x >= view->x1 && x <= view->x2 && y >= view->y1 && y <= view->y2)
 	{
-		bitmap.pix16(y, x) = color;
+		bitmap.pix(y, x) = color;
 	}
 }
 #endif
@@ -1573,9 +1573,9 @@ void model1_state::video_start()
 
 	m_poly_ram = make_unique_clear<uint32_t[]>(0x400000);
 	m_tgp_ram = make_unique_clear<uint16_t[]>(0x100000-0x40000);
-	m_pointdb = make_unique_clear<model1_state::point_t[]>(1000000*2);
-	m_quaddb  = make_unique_clear<model1_state::quad_t[]>(1000000);
-	m_quadind = make_unique_clear<model1_state::quad_t *[]>(1000000);
+	m_pointdb = std::make_unique<point_t[]>(1000000*2);
+	m_quaddb  = std::make_unique<quad_t[]>(1000000);
+	m_quadind = make_unique_clear<quad_t *[]>(1000000);
 
 	m_pointpt = &m_pointdb[0];
 	m_quadpt = &m_quaddb[0];

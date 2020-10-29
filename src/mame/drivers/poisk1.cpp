@@ -323,15 +323,13 @@ void p1_state::set_palette_luts(void)
 
 POISK1_UPDATE_ROW(p1_state::cga_gfx_2bpp_update_row)
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint32_t *p = &bitmap.pix32(ra);
-	uint16_t odd, offset;
-	int i;
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint32_t *p = &bitmap.pix(ra);
 
 	if (ra == 0) LOG("cga_gfx_2bpp_update_row\n");
-	odd = (ra & 1) << 13;
-	offset = (ma & 0x1fff) | odd;
-	for (i = 0; i < stride; i++)
+	uint16_t odd = (ra & 1) << 13;
+	uint16_t offset = (ma & 0x1fff) | odd;
+	for (int i = 0; i < stride; i++)
 	{
 		uint8_t data = videoram[ offset++ ];
 
@@ -350,16 +348,14 @@ POISK1_UPDATE_ROW(p1_state::cga_gfx_2bpp_update_row)
 
 POISK1_UPDATE_ROW(p1_state::cga_gfx_1bpp_update_row)
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint32_t *p = &bitmap.pix32(ra);
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint32_t *p = &bitmap.pix(ra);
 	uint8_t fg = 15, bg = BG_COLOR(m_video.color_select_68);
-	uint16_t odd, offset;
-	int i;
 
 	if (ra == 0) LOG("cga_gfx_1bpp_update_row bg %d\n", bg);
-	odd = (ra & 1) << 13;
-	offset = (ma & 0x1fff) | odd;
-	for (i = 0; i < stride; i++)
+	uint16_t odd = (ra & 1) << 13;
+	uint16_t offset = (ma & 0x1fff) | odd;
+	for (int i = 0; i < stride; i++)
 	{
 		uint8_t data = videoram[ offset++ ];
 
@@ -382,20 +378,18 @@ POISK1_UPDATE_ROW(p1_state::cga_gfx_1bpp_update_row)
 
 POISK1_UPDATE_ROW(p1_state::poisk1_gfx_1bpp_update_row)
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint32_t *p = &bitmap.pix32(ra);
-	uint8_t fg, bg = BG_COLOR(m_video.color_select_68);
-	uint16_t odd, offset;
-	int i;
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint32_t *p = &bitmap.pix(ra);
+	uint8_t bg = BG_COLOR(m_video.color_select_68);
 
 	if (ra == 0) LOG("poisk1_gfx_1bpp_update_row bg %d\n", bg);
-	odd = (ra & 1) << 13;
-	offset = (ma & 0x1fff) | odd;
-	for (i = 0; i < stride; i++)
+	uint16_t odd = (ra & 1) << 13;
+	uint16_t offset = (ma & 0x1fff) | odd;
+	for (int i = 0; i < stride; i++)
 	{
 		uint8_t data = videoram[ offset++ ];
 
-		fg = (data & 0x80) ? ( (m_video.color_select_68 & 0x20) ? 10 : 11 ) : 15; // XXX
+		uint8_t fg = (data & 0x80) ? ( (m_video.color_select_68 & 0x20) ? 10 : 11 ) : 15; // XXX
 		*p = palette[bg]; p++;
 		*p = palette[( data & 0x40 ) ? fg : bg ]; p++;
 		*p = palette[( data & 0x20 ) ? fg : bg ]; p++;

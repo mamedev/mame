@@ -44,6 +44,7 @@ public:
 	void init_platoon();
 	void init_rbibb();
 	void init_vsdual();
+	void init_bootleg();
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -99,15 +100,17 @@ private:
 	DECLARE_MACHINE_RESET(vsnes);
 	DECLARE_MACHINE_START(vsdual);
 	DECLARE_MACHINE_RESET(vsdual);
+	DECLARE_MACHINE_START(bootleg);
 	void v_set_videorom_bank(  int start, int count, int vrom_start_bank );
 	void mapper4_set_prg(  );
 	void mapper4_set_chr(  );
 	void mapper4_irq( int scanline, int vblank, int blanked );
 
-	uint8_t vsnes_bootleg_z80_latch_r();
 	void bootleg_sound_write(offs_t offset, uint8_t data);
 	uint8_t vsnes_bootleg_z80_data_r();
-	uint8_t vsnes_bootleg_z80_address_r();
+	uint8_t vsnes_bootleg_z80_address_r(offs_t offset);
+	void vsnes_bootleg_scanline(int scanline, int vblank, int blanked);
+	uint8_t vsnes_bootleg_ppudata();
 
 	void vsnes_bootleg_z80_map(address_map &map);
 	void vsnes_cpu1_bootleg_map(address_map &map);
@@ -122,6 +125,7 @@ private:
 	std::unique_ptr<uint8_t[]> m_vram;
 	uint8_t* m_vrom[2];
 	std::unique_ptr<uint8_t[]> m_nt_ram[2];
+	memory_bank* m_bank_vrom[8];
 	uint8_t* m_nt_page[2][4];
 	uint32_t m_vrom_size[2];
 	int m_vrom_banks;
@@ -146,4 +150,5 @@ private:
 
 	uint8_t m_bootleg_sound_offset;
 	uint8_t m_bootleg_sound_data;
+	int m_bootleg_latched_scanline;
 };

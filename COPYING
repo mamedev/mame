@@ -154,9 +154,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 Expat
-Copyright (c) 1998, 1999, 2000 Thai Open Source Software Center Ltd
-and Clark Cooper
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Expat maintainers
+Copyright (c) 1998-2000 Thai Open Source Software Center Ltd and
+Clark Cooper
+Copyright (c) 2001-2019 Expat maintainers
 
 Lua - a powerful, fast, lightweight, embeddable scripting language
 Copyright (c) 1994-2017 Lua.org, PUC-Rio

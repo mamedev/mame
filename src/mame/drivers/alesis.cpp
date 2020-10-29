@@ -27,18 +27,9 @@ uint8_t alesis_state::kb_r()
 {
 	uint8_t data = 0xff;
 
-	if (!(m_kb_matrix & 0x01))
-		data &= m_col1->read();
-	if (!(m_kb_matrix & 0x02))
-		data &= m_col2->read();
-	if (!(m_kb_matrix & 0x04))
-		data &= m_col3->read();
-	if (!(m_kb_matrix & 0x08))
-		data &= m_col4->read();
-	if (!(m_kb_matrix & 0x10))
-		data &= m_col5->read();
-	if (!(m_kb_matrix & 0x20))
-		data &= m_col6->read();
+	for (int i = 0; i < 6; i++)
+		if (!BIT(m_kb_matrix, i))
+			data &= m_col[i]->read();
 
 	return data;
 }
@@ -338,6 +329,7 @@ void alesis_state::alesis_palette(palette_device &palette) const
 void alesis_state::machine_start()
 {
 	m_digit.resolve();
+	m_pattern.resolve();
 	m_track_led.resolve();
 	m_patt_led.resolve();
 	m_song_led.resolve();
@@ -411,7 +403,7 @@ HD44780_PIXEL_UPDATE(alesis_state::sr16_pixel_update)
 	if (line == 1 && pos >= 6 && pos < 8)  // last 2 characters of the second line are used to control the LCD symbols
 		update_lcd_symbols(bitmap, pos, y, x, state);
 	else if (pos < 8)
-		bitmap.pix16(line*9 + y, pos*6 + x) = state;
+		bitmap.pix(line*9 + y, pos*6 + x) = state;
 }
 
 void alesis_state::hr16(machine_config &config)

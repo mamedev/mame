@@ -210,7 +210,7 @@ u32 ncd16_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rect
 {
 	for (unsigned y = 0; y < 1024; y++)
 	{
-		u32 *scanline = &bitmap.pix32(y);
+		u32 *scanline = &bitmap.pix(y);
 		for (unsigned x = 0; x < 1024 / 8; x++)
 		{
 			u8 const pixels = m_vram->read(BYTE_XOR_BE(y * (1024 / 8) + x));
@@ -227,7 +227,7 @@ u32 ncd17c_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rec
 {
 	for (unsigned y = 0; y < 768; y++)
 	{
-		u32 *scanline = &bitmap.pix32(y);
+		u32 *scanline = &bitmap.pix(y);
 		for (unsigned x = 0; x < 1024; x++)
 		{
 			u8 const pixels = m_vram->read((y * 1024) + BYTE4_XOR_BE(x));
@@ -242,7 +242,7 @@ u32 ncd19_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rect
 {
 	for (unsigned y = 0; y < 1024; y++)
 	{
-		u32 *scanline = &bitmap.pix32(y);
+		u32 *scanline = &bitmap.pix(y);
 		for (unsigned x = 0; x < 1280/8; x++)
 		{
 			u8 const pixels = m_vram->read((y * (2048/8)) + BYTE4_XOR_BE(x));

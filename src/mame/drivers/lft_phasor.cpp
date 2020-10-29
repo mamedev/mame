@@ -9,7 +9,6 @@
 #include "emu.h"
 #include "cpu/avr8/avr8.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
 #include "emupal.h"
 #include "speaker.h"
@@ -186,7 +185,7 @@ uint32_t lft_phasor_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 	const pen_t *pens = m_palette->pens();
 	for(int y = 0; y < 313; y++)
 	{
-		uint32_t *dst = &bitmap.pix32(y);
+		uint32_t *dst = &bitmap.pix(y);
 		uint8_t *src = &m_samples[y * 1135];
 		for(int x = 0; x < 1135; x++)
 		{
@@ -248,9 +247,6 @@ void lft_phasor_state::phasor(machine_config &config)
 	m_screen->set_screen_update(FUNC(lft_phasor_state::screen_update));
 
 	SPEAKER(config, "avr8").front_center();
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, m_dac, 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, m_dac, -1.0, DAC_VREF_NEG_INPUT);
 
 	DAC_6BIT_R2R(config, m_dac, 0).add_route(0, "avr8", 0.5);
 }

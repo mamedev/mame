@@ -105,12 +105,9 @@ namespace plib {
 		{
 		}
 
-		// osx clang doesn't like COPYASSIGNMOVE(parray, default)
-		// it will generate some weird error messages about move assignment
-		// constructor having a different noexcept status.
-
 		parray(const parray &rhs) : m_a(rhs.m_a), m_size(rhs.m_size) {}
 		parray(parray &&rhs) noexcept : m_a(std::move(rhs.m_a)), m_size(std::move(rhs.m_size)) {}
+
 		parray &operator=(const parray &rhs) noexcept // NOLINT(bugprone-unhandled-self-assignment, cert-oop54-cpp)
 		{
 			if (this == &rhs)
@@ -135,11 +132,11 @@ namespace plib {
 
 		constexpr reference operator[](size_type i) noexcept
 		{
-			return data()[i];
+			return m_a[i];
 		}
 		constexpr const_reference operator[](size_type i) const noexcept
 		{
-			return data()[i];
+			return m_a[i];
 		}
 
 		pointer data() noexcept { return m_a.data(); }
@@ -157,6 +154,7 @@ namespace plib {
 	public:
 
 		using size_type = std::size_t;
+		using base_type = parray<parray<FT, SIZE2>, SIZE1>;
 
 		parray2D(size_type size1, size_type size2)
 		: parray<parray<FT, SIZE2>, SIZE1>(size1)
@@ -168,7 +166,10 @@ namespace plib {
 			}
 		}
 
-		PCOPYASSIGNMOVE(parray2D, default)
+		parray2D(const parray2D &) = default;
+		parray2D &operator=(const parray2D &) = default;
+		parray2D(parray2D &&) noexcept(std::is_nothrow_move_constructible<base_type>::value) = default;
+		parray2D &operator=(parray2D &&) noexcept(std::is_nothrow_move_assignable<base_type>::value) = default;
 
 		~parray2D() noexcept = default;
 

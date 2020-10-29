@@ -490,7 +490,7 @@ uint32_t cmi_state::screen_update_cmi2x(screen_device &screen, bitmap_rgb32 &bit
 	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
 		uint8_t *src = &m_video_ram[(512/8) * ((y + y_scroll) & 0xff)];
-		uint32_t *dest = &bitmap.pix32(y, cliprect.min_x);
+		uint32_t *dest = &bitmap.pix(y, cliprect.min_x);
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x += 8)
 		{
@@ -507,7 +507,7 @@ uint32_t cmi_state::screen_update_cmi2x(screen_device &screen, bitmap_rgb32 &bit
 	if (m_lp_touch_port->read() && BIT(m_q219_pia->b_output(), 1))
 	{
 		/* Invert target pixel */
-		bitmap.pix32(m_lp_y_port->read(), m_lp_x_port->read()) ^= 0x00ffffff;
+		bitmap.pix(m_lp_y_port->read(), m_lp_x_port->read()) ^= 0x00ffffff;
 	}
 
 
@@ -2048,6 +2048,14 @@ void cmi_state::machine_reset()
 	m_m6809_bs_hack_cnt[0] = 0;
 	m_m6809_bs_hack_cnt[1] = 0;
 
+	//m_midi_ptm[0]->set_g1(1); // /G1 has unknown source, "TIMER 1A /GATE" per schematic
+	m_midi_ptm[0]->set_g2(0); // /G2 and /G3 wired to ground per schematic
+	m_midi_ptm[0]->set_g3(0);
+
+	m_midi_ptm[1]->set_g1(0); // /G1, /G2, and /G3 wired to ground per schematic
+	m_midi_ptm[1]->set_g2(0);
+	m_midi_ptm[1]->set_g3(0);
+
 	memset(m_map_sel, 0, 16);
 
 	for (int i = 0; i < 4; i++)
@@ -2229,17 +2237,11 @@ void cmi_state::cmi2x(machine_config &config)
 
 	PTM6840(config, m_midi_ptm[0], 0);
 	m_midi_ptm[0]->set_external_clocks(0, 384000, 0); // C1 is 0, C2 is 384kHz per schematic block diagram, C3 is CLICK SYNC IN
-	//m_midi_ptm[0]->set_g1(1); // /G1 has unknown source, "TIMER 1A /GATE" per schematic
-	m_midi_ptm[0]->set_g2(0); // /G2 and /G3 wired to ground per schematic
-	m_midi_ptm[0]->set_g3(0);
 	//m_midi_ptm[0]->o1_callback().set(FUNC(cmi_state::midi_ptm0_c1_w)); // TIMER 1A O/P per schematic
 	//m_midi_ptm[0]->o2_callback().set(FUNC(cmi_state::midi_ptm0_c2_w)); // CLK 2 per schematic
 	m_midi_ptm[0]->o3_callback().set(FUNC(cmi_state::midi_ptm0_c3_w));
 
 	PTM6840(config, m_midi_ptm[1], 0); // entirely clocked by PTM 0
-	m_midi_ptm[1]->set_g1(0); // /G1, /G2, and /G3 wired to ground per schematic
-	m_midi_ptm[1]->set_g2(0);
-	m_midi_ptm[1]->set_g3(0);
 	//m_midi_ptm[1]->o1_callback().set(FUNC(cmi_state::midi_sync_out_1_w)); // SYNC OUT 1 per schematic
 	//m_midi_ptm[1]->o2_callback().set(FUNC(cmi_state::midi_sync_out_2_w)); // SYNC OUT 2 per schematic
 	//m_midi_ptm[1]->o3_callback().set(FUNC(cmi_state::midi_sync_out_3_w)); // SYNC OUT 3 per schematic

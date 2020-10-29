@@ -1302,7 +1302,7 @@ uint32_t newport_base_device::screen_update(screen_device &device, bitmap_rgb32 
 	/* loop over rows and copy to the destination */
 	for (int y = cliprect.min_y, sy = y_start; y <= cliprect.max_y && sy < y_end; y++, sy++)
 	{
-		uint32_t *dest = &bitmap.pix32(y, cliprect.min_x);
+		uint32_t *dest = &bitmap.pix(y, cliprect.min_x);
 		const uint32_t *src_rgbci = m_rb2->rgbci(y);
 		const uint32_t *src_cidaux = m_rb2->cidaux(y);
 

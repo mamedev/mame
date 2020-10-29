@@ -34,7 +34,7 @@ void usgames_state::charram_w(offs_t offset, uint8_t data)
 
 MC6845_UPDATE_ROW(usgames_state::update_row)
 {
-	uint32_t *pix = &bitmap.pix32(y);
+	uint32_t *pix = &bitmap.pix(y);
 	ra &= 0x07;
 
 	for (int x = 0; x < x_count; x++)

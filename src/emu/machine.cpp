@@ -199,7 +199,7 @@ void running_machine::start()
 	m_soft_reset_timer = m_scheduler.timer_alloc(timer_expired_delegate(FUNC(running_machine::soft_reset), this));
 
 	// initialize UI input
-	m_ui_input = make_unique_clear<ui_input_manager>(*this);
+	m_ui_input = std::make_unique<ui_input_manager>(*this);
 
 	// init the osd layer
 	m_manager.osd().init(*this);
@@ -230,7 +230,7 @@ void running_machine::start()
 	// needs rom bases), and finally initialize CPUs (which needs
 	// complete address spaces).  These operations must proceed in this
 	// order
-	m_rom_load = make_unique_clear<rom_load_manager>(*this);
+	m_rom_load = std::make_unique<rom_load_manager>(*this);
 	m_memory.initialize();
 
 	// save the random seed or save states might be broken in drivers that use the rand() method
@@ -239,7 +239,7 @@ void running_machine::start()
 	// initialize image devices
 	m_image = std::make_unique<image_manager>(*this);
 	m_tilemap = std::make_unique<tilemap_manager>(*this);
-	m_crosshair = make_unique_clear<crosshair_manager>(*this);
+	m_crosshair = std::make_unique<crosshair_manager>(*this);
 	m_network = std::make_unique<network_manager>(*this);
 
 	// initialize the debugger

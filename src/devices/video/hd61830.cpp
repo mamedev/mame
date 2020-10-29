@@ -360,9 +360,9 @@ uint16_t hd61830_device::draw_scanline(bitmap_ind16 &bitmap, const rectangle &cl
 			if(y >= 0 && y < bitmap.height())
 			{
 				if(((sx * m_hp) + x) >= 0 && ((sx * m_hp) + x) < bitmap.width())
-					bitmap.pix16(y, (sx * m_hp) + x) = BIT(data1, x);
+					bitmap.pix(y, (sx * m_hp) + x) = BIT(data1, x);
 				if(((sx * m_hp) + x + m_hp) >= 0 && ((sx * m_hp) + x + m_hp) < bitmap.width())
-					bitmap.pix16(y, (sx * m_hp) + x + m_hp) = BIT(data2, x);
+					bitmap.pix(y, (sx * m_hp) + x + m_hp) = BIT(data2, x);
 			}
 		}
 	}
@@ -454,7 +454,7 @@ void hd61830_device::draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 			}
 
 			if (sy < screen().height() && sx < screen().width())
-				bitmap.pix16(sy, sx) = pixel;
+				bitmap.pix(sy, sx) = pixel;
 		}
 	}
 }

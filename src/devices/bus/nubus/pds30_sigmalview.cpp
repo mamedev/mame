@@ -132,18 +132,14 @@ void nubus_lview_device::device_timer(emu_timer &timer, device_timer_id tid, int
 
 uint32_t nubus_lview_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint32_t *scanline;
-	int x, y;
-	uint8_t pixels, *vram;
+	uint8_t const *const vram = &m_vram[0x20];
 
-	vram = &m_vram[0x20];
-
-	for (y = 0; y < 600; y++)
+	for (int y = 0; y < 600; y++)
 	{
-		scanline = &bitmap.pix32(y);
-		for (x = 0; x < 832/8; x++)
+		uint32_t *scanline = &bitmap.pix(y);
+		for (int x = 0; x < 832/8; x++)
 		{
-			pixels = vram[(y * (832/8)) + (BYTE4_XOR_BE(x))];
+			uint8_t const pixels = vram[(y * (832/8)) + (BYTE4_XOR_BE(x))];
 
 			*scanline++ = m_palette[(pixels&0x80)];
 			*scanline++ = m_palette[((pixels<<1)&0x80)];

@@ -41,41 +41,24 @@ specimx_sound_device::specimx_sound_device(const machine_config &mconfig, const 
 void specimx_sound_device::device_start()
 {
 	m_specimx_input[0] = m_specimx_input[1] = m_specimx_input[2] = 0;
-	m_mixer_channel = stream_alloc_legacy(0, 1, machine().sample_rate());
+	m_mixer_channel = stream_alloc(0, 1, machine().sample_rate());
 }
 
 
 //-------------------------------------------------
-//  sound_stream_update_legacy - handle a stream update
+//  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void specimx_sound_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void specimx_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	int16_t channel_0_signal;
-	int16_t channel_1_signal;
-	int16_t channel_2_signal;
+	auto &sample_left = outputs[0];
 
-	stream_sample_t *sample_left = outputs[0];
+	stream_buffer::sample_t channel_0_signal = m_specimx_input[0] ? 0.1 : -0.1;
+	stream_buffer::sample_t channel_1_signal = m_specimx_input[1] ? 0.1 : -0.1;
+	stream_buffer::sample_t channel_2_signal = m_specimx_input[2] ? 0.1 : -0.1;
+	stream_buffer::sample_t sum = channel_0_signal + channel_1_signal + channel_2_signal;
 
-	channel_0_signal = m_specimx_input[0] ? 3000 : -3000;
-	channel_1_signal = m_specimx_input[1] ? 3000 : -3000;
-	channel_2_signal = m_specimx_input[2] ? 3000 : -3000;
-
-	while (samples--)
-	{
-		*sample_left = 0;
-
-		/* music channel 0 */
-		*sample_left += channel_0_signal;
-
-		/* music channel 1 */
-		*sample_left += channel_1_signal;
-
-		/* music channel 2 */
-		*sample_left += channel_2_signal;
-
-		sample_left++;
-	}
+	sample_left.fill(sum);
 }
 
 

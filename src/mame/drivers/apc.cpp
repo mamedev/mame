@@ -207,51 +207,38 @@ UPD7220_DISPLAY_PIXELS_MEMBER( apc_state::hgdc_display_pixels )
 
 UPD7220_DRAW_TEXT_LINE_MEMBER( apc_state::hgdc_draw_text )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	int xi,yi,yi_trans;
-	int x;
-	uint8_t char_size;
-//  uint8_t interlace_on;
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
 //  if(m_video_ff[DISPLAY_REG] == 0) //screen is off
 //      return;
 
-//  interlace_on = m_video_reg[2] == 0x10; /* TODO: correct? */
-	char_size = 19;
+//  uint8_t interlace_on = m_video_reg[2] == 0x10; /* TODO: correct? */
+	uint8_t char_size = 19;
 
-	for(x=0;x<pitch;x++)
+	for(int x=0;x<pitch;x++)
 	{
-		uint8_t tile_data;
-		uint8_t u_line, o_line, v_line, reverse, blink;
-		uint8_t color;
-		uint8_t tile,attr,pen;
-		uint32_t tile_addr;
-		uint8_t tile_sel;
+//      uint32_t tile_addr = addr+(x*(m_video_ff[WIDTH40_REG]+1));
+		uint32_t tile_addr = addr+(x*(1));
 
-//      tile_addr = addr+(x*(m_video_ff[WIDTH40_REG]+1));
-		tile_addr = addr+(x*(1));
+		uint8_t tile = (m_video_ram_1[((tile_addr*2) & 0x1fff) >> 1] >> 8) & 0x00ff;
+		uint8_t tile_sel = m_video_ram_1[((tile_addr*2) & 0x1fff) >> 1] & 0x00ff;
+		uint8_t attr = (m_video_ram_1[((tile_addr*2 & 0x1fff) | 0x2000) >> 1] & 0x00ff);
 
-		tile = (m_video_ram_1[((tile_addr*2) & 0x1fff) >> 1] >> 8) & 0x00ff;
-		tile_sel = m_video_ram_1[((tile_addr*2) & 0x1fff) >> 1] & 0x00ff;
-		attr = (m_video_ram_1[((tile_addr*2 & 0x1fff) | 0x2000) >> 1] & 0x00ff);
-
-		u_line = attr & 0x01;
-		o_line = attr & 0x02;
-		v_line = attr & 0x04;
-		blink  = attr & 0x08;
-		reverse = attr & 0x10;
+		uint8_t u_line = attr & 0x01;
+		uint8_t o_line = attr & 0x02;
+		uint8_t v_line = attr & 0x04;
+		uint8_t blink  = attr & 0x08;
+		uint8_t reverse = attr & 0x10;
 //      secret= (attr & 1) ^ 1;
-		color = (attr & 0xe0) >> 5;
+		uint8_t color = (attr & 0xe0) >> 5;
 
-		for(yi=0;yi<lr;yi++)
+		for(int yi=0;yi<lr;yi++)
 		{
-			yi_trans = (yi==0)?lr-1:yi-1;
-			for(xi=0;xi<8;xi++)
+			int yi_trans = (yi==0)?lr-1:yi-1;
+			for(int xi=0;xi<8;xi++)
 			{
-				int res_x,res_y;
-
-				res_x = (x*8+xi);
-				res_y = y+yi;
+				int res_x = (x*8+xi);
+				int res_y = y+yi;
 
 				if(!m_screen->visible_area().contains(res_x, res_y))
 					continue;
@@ -272,6 +259,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( apc_state::hgdc_draw_text )
 
 				Data bus: 76543210 = pixels, in left->01234567->right order
 				*/
+				uint8_t tile_data;
 				if(tile_sel == 0x89)// Aux character RAM select TODO: correct triggering?
 				{
 					if(yi & 0x10)
@@ -291,13 +279,14 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( apc_state::hgdc_draw_text )
 				if(cursor_on && cursor_addr == tile_addr && m_screen->frame_number() & 0x10)
 					tile_data^=0xff;
 
+				uint8_t pen;
 				if(yi >= char_size)
 					pen = 0;
 				else
 					pen = (tile_data >> (xi) & 1) ? color : 0;
 
 				if(pen)
-					bitmap.pix32(res_y, res_x) = palette[pen];
+					bitmap.pix(res_y, res_x) = palette[pen];
 			}
 		}
 	}

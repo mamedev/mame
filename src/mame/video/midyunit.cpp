@@ -557,13 +557,12 @@ TIMER_CALLBACK_MEMBER(midyunit_state::autoerase_line)
 
 TMS340X0_SCANLINE_IND16_CB_MEMBER(midyunit_state::scanline_update)
 {
-	uint16_t *src = &m_local_videoram[(params->rowaddr << 9) & 0x3fe00];
-	uint16_t *dest = &bitmap.pix16(scanline);
+	uint16_t const *const src = &m_local_videoram[(params->rowaddr << 9) & 0x3fe00];
+	uint16_t *const dest = &bitmap.pix(scanline);
 	int coladdr = params->coladdr << 1;
-	int x;
 
 	/* adjust the display address to account for ignored bits */
-	for (x = params->heblnk; x < params->hsblnk; x++)
+	for (int x = params->heblnk; x < params->hsblnk; x++)
 		dest[x] = m_pen_map[src[coladdr++ & 0x1ff]];
 
 	/* handle autoerase on the previous line */

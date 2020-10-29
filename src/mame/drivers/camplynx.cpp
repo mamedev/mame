@@ -164,7 +164,6 @@
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/mc6845.h"
 #include "machine/ram.h"
 #include "emupal.h"
@@ -748,9 +747,8 @@ void camplynx_state::machine_reset()
 
 MC6845_UPDATE_ROW( camplynx_state::lynx48k_update_row )
 {
-	u8 r,g,b,x;
-	uint32_t green_bank, *p = &bitmap.pix32(y);
-	uint16_t mem = ((ma << 2) + (ra << 5)) & 0x1fff;
+	uint32_t green_bank, *p = &bitmap.pix(y);
+	uint16_t const mem = ((ma << 2) + (ra << 5)) & 0x1fff;
 
 	// determine green bank
 	if (BIT(m_port80, 4))
@@ -758,11 +756,11 @@ MC6845_UPDATE_ROW( camplynx_state::lynx48k_update_row )
 	else
 		green_bank = 0x3c000 + mem; // normal green
 
-	for (x = 0; x < x_count; x++)
+	for (u8 x = 0; x < x_count; x++)
 	{
-		r = m_p_ram[0x2c000 + mem + x];
-		b = m_p_ram[0x28000 + mem + x];
-		g = m_p_ram[green_bank + x];
+		u8 const r = m_p_ram[0x2c000 + mem + x];
+		u8 const b = m_p_ram[0x28000 + mem + x];
+		u8 const g = m_p_ram[green_bank + x];
 
 		*p++ = m_palette->pen_color((BIT(b, 7) << 2) | (BIT(g, 7) << 1) | (BIT(r, 7)));
 		*p++ = m_palette->pen_color((BIT(b, 6) << 2) | (BIT(g, 6) << 1) | (BIT(r, 6)));
@@ -777,20 +775,20 @@ MC6845_UPDATE_ROW( camplynx_state::lynx48k_update_row )
 
 MC6845_UPDATE_ROW( camplynx_state::lynx128k_update_row )
 {
-	u8 r,g,b,x;
-	uint32_t green_bank, *p = &bitmap.pix32(y);
-	uint16_t mem = ((ma << 2) + (ra << 6)) & 0x3fff;
+	uint32_t green_bank, *p = &bitmap.pix(y);
+	uint16_t const mem = ((ma << 2) + (ra << 6)) & 0x3fff;
+
 	// determine green bank
 	if (BIT(m_port80, 4))
-		green_bank = 0x2c000+mem; // alt green
+		green_bank = 0x2c000 + mem; // alt green
 	else
-		green_bank = 0x28000+mem; // normal green
+		green_bank = 0x28000 + mem; // normal green
 
-	for (x = 0; x < x_count; x++)
+	for (u8 x = 0; x < x_count; x++)
 	{
-		r = m_p_ram[0x20000+mem+x];
-		b = m_p_ram[0x24000+mem+x];
-		g = m_p_ram[green_bank+x];
+		u8 const r = m_p_ram[0x20000 + mem + x];
+		u8 const b = m_p_ram[0x24000 + mem + x];
+		u8 const g = m_p_ram[green_bank + x];
 
 		*p++ = m_palette->pen_color((BIT(b, 7) << 2) | (BIT(g, 7) << 1) | (BIT(r, 7)));
 		*p++ = m_palette->pen_color((BIT(b, 6) << 2) | (BIT(g, 6) << 1) | (BIT(r, 6)));
@@ -863,7 +861,6 @@ void camplynx_state::lynx_common(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_6BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.375); // unknown DAC
-	VOLTAGE_REGULATOR(config, "vref").add_route(0, m_dac, 1.0, DAC_VREF_POS_INPUT).add_route(0, m_dac, -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void camplynx_state::lynx_disk(machine_config &config)

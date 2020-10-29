@@ -103,7 +103,6 @@ c0   8 data bits, Rx disabled
 #include "machine/z80scc.h"
 #include "machine/macadb.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "bus/macpds/pds_tpdfpd.h"
 
 #include "formats/ap_dsk35.h"
@@ -246,11 +245,8 @@ private:
 	uint32_t m_overlay;
 
 	int m_irq_count, m_ca1_data, m_ca2_data;
-	int m_mouse_bit_x;
-	int m_mouse_bit_y;
-	int last_mx, last_my;
-	int count_x, count_y;
-	int m_last_was_x;
+	uint8_t m_mouse_bit[2], m_mouse_last[2];
+	int16_t m_mouse_last_m[2], m_mouse_count[2];
 	int m_screen_buffer;
 	emu_timer *m_scan_timer;
 	emu_timer *m_hblank_timer;
@@ -288,13 +284,10 @@ void mac128_state::machine_start()
 	save_item(NAME(m_irq_count));
 	save_item(NAME(m_ca1_data));
 	save_item(NAME(m_ca2_data));
-	save_item(NAME(m_mouse_bit_x));
-	save_item(NAME(m_mouse_bit_y));
-	save_item(NAME(last_mx));
-	save_item(NAME(last_my));
-	save_item(NAME(count_x));
-	save_item(NAME(count_y));
-	save_item(NAME(m_last_was_x));
+	save_item(NAME(m_mouse_bit));
+	save_item(NAME(m_mouse_last));
+	save_item(NAME(m_mouse_last_m));
+	save_item(NAME(m_mouse_count));
 	save_item(NAME(m_screen_buffer));
 	save_item(NAME(m_scc_interrupt));
 	save_item(NAME(m_via_interrupt));
@@ -306,6 +299,9 @@ void mac128_state::machine_start()
 	save_item(NAME(m_adb_irq_pending));
 	save_item(NAME(m_drive_select));
 	save_item(NAME(m_scsiirq_enable));
+
+	m_mouse_bit[0] = m_mouse_bit[1] = 0;
+	m_mouse_last[0] = m_mouse_last[1] = 0;
 }
 
 void mac128_state::machine_reset()
@@ -314,7 +310,6 @@ void mac128_state::machine_reset()
 	m_last_taken_interrupt = -1;
 	m_overlay = 1;
 	m_screen_buffer = 1;
-	m_mouse_bit_x = m_mouse_bit_y = 0;
 	m_last_taken_interrupt = 0;
 	m_snd_enable = false;
 	m_main_buffer = true;
@@ -518,137 +513,32 @@ void mac128_state::macplus_scsi_w(offs_t offset, uint16_t data, uint16_t mem_mas
 
 void mac128_state::scc_mouse_irq(int x, int y)
 {
-	static int lasty = 0;
-	static int lastx = 0;
-
 	// DCD lines are active low in hardware but active high to software
-	if (x && y)
+	if (x)
 	{
-		if (m_last_was_x)
+		m_scc->dcda_w(m_mouse_last[0] ? 1 : 0);
+		if (x < 0)
 		{
-			if(x == 2)
-			{
-				if(lastx)
-				{
-					m_scc->dcda_w(1);
-					m_mouse_bit_x = 0;
-				}
-				else
-				{
-					m_scc->dcda_w(0);
-					m_mouse_bit_x = 1;
-				}
-			}
-			else
-			{
-				if(lastx)
-				{
-					m_scc->dcda_w(1);
-					m_mouse_bit_x = 1;
-				}
-				else
-				{
-					m_scc->dcda_w(0);
-					m_mouse_bit_x = 0;
-				}
-			}
-			lastx = !lastx;
+			m_mouse_bit[0] = m_mouse_last[0] ? 0 : 1;
 		}
 		else
 		{
-			if(y == 2)
-			{
-				if(lasty)
-				{
-					m_scc->dcdb_w(1);
-					m_mouse_bit_y = 0;
-				}
-				else
-				{
-					m_scc->dcdb_w(0);
-					m_mouse_bit_y = 1;
-				}
-			}
-			else
-			{
-				if(lasty)
-				{
-					m_scc->dcdb_w(1);
-					m_mouse_bit_y = 1;
-				}
-				else
-				{
-					m_scc->dcdb_w(0);
-					m_mouse_bit_y = 0;
-				}
-			}
-			lasty = !lasty;
+			m_mouse_bit[0] = m_mouse_last[0] ? 1 : 0;
 		}
-
-		m_last_was_x ^= 1;
+		m_mouse_last[0] = !m_mouse_last[0];
 	}
-	else
+	if (y)
 	{
-		if (x)
+		m_scc->dcdb_w(m_mouse_last[1] ? 1 : 0);
+		if (y < 0)
 		{
-			if(x == 2)
-			{
-				if(lastx)
-				{
-					m_scc->dcda_w(1);
-					m_mouse_bit_x = 0;
-				}
-				else
-				{
-					m_scc->dcda_w(0);
-					m_mouse_bit_x = 1;
-				}
-			}
-			else
-			{
-				if(lastx)
-				{
-					m_scc->dcda_w(1);
-					m_mouse_bit_x = 1;
-				}
-				else
-				{
-					m_scc->dcda_w(0);
-					m_mouse_bit_x = 0;
-				}
-			}
-			lastx = !lastx;
+			m_mouse_bit[1] = m_mouse_last[1] ? 0 : 1;
 		}
 		else
 		{
-			if(y == 2)
-			{
-				if(lasty)
-				{
-					m_scc->dcdb_w(1);
-					m_mouse_bit_y = 0;
-				}
-				else
-				{
-					m_scc->dcdb_w(0);
-					m_mouse_bit_y = 1;
-				}
-			}
-			else
-			{
-				if(lasty)
-				{
-					m_scc->dcdb_w(1);
-					m_mouse_bit_y = 1;
-				}
-				else
-				{
-					m_scc->dcdb_w(0);
-					m_mouse_bit_y = 0;
-				}
-			}
-			lasty = !lasty;
+			m_mouse_bit[1] = m_mouse_last[1] ? 1 : 0;
 		}
+		m_mouse_last[1] = !m_mouse_last[1];
 	}
 }
 
@@ -748,12 +638,9 @@ uint8_t mac128_state::mac_via_in_b()
 {
 	int val = 0x40;
 
-	if (m_mouse_bit_y)  /* Mouse Y2 */
-		val |= 0x20;
-	if (m_mouse_bit_x)  /* Mouse X2 */
-		val |= 0x10;
-	if ((m_mouse0->read() & 0x01) == 0)
-		val |= 0x08;
+	val |= m_mouse_bit[1] << 5; // Mouse Y2
+	val |= m_mouse_bit[0] << 4; // Mouse X2
+	val |= BIT(~m_mouse0->read(), 0) << 3;
 
 	val |= m_rtc->data_r();
 
@@ -849,79 +736,66 @@ void mac128_state::mac_via_out_b_se(uint8_t data)
 
 void mac128_state::mouse_callback()
 {
-	int     new_mx, new_my;
-	int     x_needs_update = 0, y_needs_update = 0;
-
-	new_mx = m_mouse1->read();
-	new_my = m_mouse2->read();
-
-	/* see if it moved in the x coord */
-	if (new_mx != last_mx)
+	// see if it moved in the x coord
+	const int new_mx = m_mouse1->read();
+	if (new_mx != m_mouse_last_m[0])
 	{
-		int     diff = new_mx - last_mx;
+		int diff = new_mx - m_mouse_last_m[0];
 
-		/* check for wrap */
+		// check for wrap
 		if (diff > 0x80)
-			diff = 0x100-diff;
-		if  (diff < -0x80)
-			diff = -0x100-diff;
+			diff -= 0x100;
+		else if (diff < -0x80)
+			diff += 0x100;
 
-		count_x += diff;
-
-		last_mx = new_mx;
+		m_mouse_count[0] += diff;
+		m_mouse_last_m[0] = new_mx;
 	}
-	/* see if it moved in the y coord */
-	if (new_my != last_my)
-	{
-		int     diff = new_my - last_my;
 
-		/* check for wrap */
+	// see if it moved in the y coord
+	const int new_my = m_mouse2->read();
+	if (new_my != m_mouse_last_m[1])
+	{
+		int diff = new_my - m_mouse_last_m[1];
+
+		// check for wrap
 		if (diff > 0x80)
-			diff = 0x100-diff;
-		if  (diff < -0x80)
-			diff = -0x100-diff;
+			diff -= 0x100;
+		else if (diff < -0x80)
+			diff += 0x100;
 
-		count_y += diff;
-
-		last_my = new_my;
+		m_mouse_count[1] += diff;
+		m_mouse_last_m[1] = new_my;
 	}
 
-	/* update any remaining count and then return */
-	if (count_x)
+	// update any remaining count and then return
+	int x_needs_update = 0;
+	if (m_mouse_count[0] < 0)
 	{
-		if (count_x < 0)
-		{
-			count_x++;
-			m_mouse_bit_x = 0;
-			x_needs_update = 2;
-		}
-		else
-		{
-			count_x--;
-			m_mouse_bit_x = 1;
-			x_needs_update = 1;
-		}
+		m_mouse_count[0]++;
+		x_needs_update = -1;
 	}
-	else if (count_y)
+	else if (m_mouse_count[0])
 	{
-		if (count_y < 0)
-		{
-			count_y++;
-			m_mouse_bit_y = 1;
-			y_needs_update = 1;
-		}
-		else
-		{
-			count_y--;
-			m_mouse_bit_y = 0;
-			y_needs_update = 2;
-		}
+		m_mouse_count[0]--;
+		x_needs_update = 1;
+	}
+	int y_needs_update = 0;
+	if (m_mouse_count[1] < 0)
+	{
+		m_mouse_count[1]++;
+		y_needs_update = 1;
+	}
+	else if (m_mouse_count[1])
+	{
+		m_mouse_count[1]--;
+		y_needs_update = -1;
 	}
 
 	if (x_needs_update || y_needs_update)
 	{
-		/* assert Port B External Interrupt on the SCC */
-		scc_mouse_irq(x_needs_update, y_needs_update );
+		// assert Port B External Interrupt on the SCC
+		scc_mouse_irq(x_needs_update, y_needs_update);
 	}
 }
 
@@ -938,23 +812,17 @@ void mac128_state::mac_driver_init(mac128model_t model)
 
 uint32_t mac128_state::screen_update_mac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint32_t video_base;
-	const uint16_t *video_ram;
-	uint16_t word;
-	uint16_t *line;
-	int y, x, b;
+	uint32_t const video_base = m_ram_size - (m_screen_buffer ? MAC_MAIN_SCREEN_BUF_OFFSET : MAC_ALT_SCREEN_BUF_OFFSET);
+	uint16_t const *video_ram = (const uint16_t *) (m_ram_ptr + video_base);
 
-	video_base = m_ram_size - (m_screen_buffer ? MAC_MAIN_SCREEN_BUF_OFFSET : MAC_ALT_SCREEN_BUF_OFFSET);
-	video_ram = (const uint16_t *) (m_ram_ptr + video_base);
-
-	for (y = 0; y < MAC_V_VIS; y++)
+	for (int y = 0; y < MAC_V_VIS; y++)
 	{
-		line = &bitmap.pix16(y);
+		uint16_t *const line = &bitmap.pix(y);
 
-		for (x = 0; x < MAC_H_VIS; x += 16)
+		for (int x = 0; x < MAC_H_VIS; x += 16)
 		{
-			word = *(video_ram++);
-			for (b = 0; b < 16; b++)
+			uint16_t const word = *(video_ram++);
+			for (int b = 0; b < 16; b++)
 			{
 				line[x + b] = (word >> (15 - b)) & 0x0001;
 			}
@@ -1063,9 +931,6 @@ void mac128_state::mac512ke(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_8BIT_PWM(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // 2 x ls161
-	voltage_regulator_device &vreg(VOLTAGE_REGULATOR(config, "vref"));
-	vreg.add_route(0, DAC_TAG, 1.0, DAC_VREF_POS_INPUT);
-	vreg.add_route(0, DAC_TAG, -1.0, DAC_VREF_NEG_INPUT);
 
 	/* devices */
 	RTC3430042(config, m_rtc, 32.768_kHz_XTAL);
@@ -1170,10 +1035,10 @@ static INPUT_PORTS_START( macplus )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Button") PORT_CODE(MOUSECODE_BUTTON1)
 
 	PORT_START("MOUSE1") /* Mouse - X AXIS */
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0)
 
 	PORT_START("MOUSE2") /* Mouse - Y AXIS */
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( macadb )

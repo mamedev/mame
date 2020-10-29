@@ -20,6 +20,7 @@
 #include "ui/starimg.ipp"
 #include "ui/toolbar.ipp"
 
+#include "audit.h"
 #include "cheat.h"
 #include "mame.h"
 #include "mameopts.h"
@@ -93,6 +94,62 @@ char const *const hover_msg[] = {
 	__("Export displayed list to file"),
 	__("Show DATs view"),
 };
+
+
+void load_image(bitmap_argb32 &bitmap, emu_file &file, std::string const &base)
+{
+	if (file.open(base + ".png") == osd_file::error::NONE)
+	{
+		render_load_png(bitmap, file);
+		file.close();
+	}
+
+	if (!bitmap.valid() && (file.open(base + ".jpg") == osd_file::error::NONE))
+	{
+		render_load_jpeg(bitmap, file);
+		file.close();
+	}
+
+	if (!bitmap.valid() && (file.open(base + ".bmp") == osd_file::error::NONE))
+	{
+		render_load_msdib(bitmap, file);
+		file.close();
+	}
+}
+
+
+void load_driver_image(bitmap_argb32 &bitmap, emu_file &file, game_driver const &driver)
+{
+	// try to load snapshot first from saved "0000.png" file
+	std::string fullname = driver.name;
+	load_image(bitmap, file, fullname + PATH_SEPARATOR + "0000");
+
+	// if fail, attempt to load from standard file
+	if (!bitmap.valid())
+		load_image(bitmap, file, fullname);
+
+	// if fail again, attempt to load from parent file
+	if (!bitmap.valid())
+	{
+		// ignore BIOS sets
+		bool isclone = strcmp(driver.parent, "0") != 0;
+		if (isclone)
+		{
+			int const cx = driver_list::find(driver.parent);
+			if ((0 <= cx) && (driver_list::driver(cx).flags & machine_flags::IS_BIOS_ROOT))
+				isclone = false;
+		}
+
+		if (isclone)
+		{
+			fullname = driver.parent;
+			load_image(bitmap, file, fullname + PATH_SEPARATOR + "0000");
+
+			if (!bitmap.valid())
+				load_image(bitmap, file, fullname);
+		}
+	}
+}
 
 } // anonymous namespace
 
@@ -392,9 +449,9 @@ menu_select_launch::cache::cache(running_machine &machine)
 	// create a texture for snapshot
 	m_snapx_texture.reset(render.texture_alloc(render_texture::hq_scale));
 
-	std::memcpy(&m_no_avail_bitmap.pix32(0), no_avail_bmp, 256 * 256 * sizeof(uint32_t));
+	std::memcpy(&m_no_avail_bitmap.pix(0), no_avail_bmp, 256 * 256 * sizeof(uint32_t));
 
-	std::memcpy(&m_star_bitmap.pix32(0), favorite_star_bmp, 32 * 32 * sizeof(uint32_t));
+	std::memcpy(&m_star_bitmap.pix(0), favorite_star_bmp, 32 * 32 * sizeof(uint32_t));
 	m_star_texture.reset(render.texture_alloc());
 	m_star_texture->set_bitmap(m_star_bitmap, m_star_bitmap.cliprect(), TEXFORMAT_ARGB32);
 
@@ -410,7 +467,7 @@ menu_select_launch::cache::cache(running_machine &machine)
 		m_toolbar_texture.emplace_back(render.texture_alloc(), render);
 		m_sw_toolbar_texture.emplace_back(render.texture_alloc(), render);
 
-		std::memcpy(&m_toolbar_bitmap.back().pix32(0), toolbar_bitmap_bmp[i], 32 * 32 * sizeof(uint32_t));
+		std::memcpy(&m_toolbar_bitmap.back().pix(0), toolbar_bitmap_bmp[i], 32 * 32 * sizeof(uint32_t));
 		if (m_toolbar_bitmap.back().valid())
 			m_toolbar_texture.back()->set_bitmap(m_toolbar_bitmap.back(), m_toolbar_bitmap.back().cliprect(), TEXFORMAT_ARGB32);
 		else
@@ -418,7 +475,7 @@ menu_select_launch::cache::cache(running_machine &machine)
 
 		if ((i == 0U) || (i == 2U))
 		{
-			std::memcpy(&m_sw_toolbar_bitmap.back().pix32(0), toolbar_bitmap_bmp[i], 32 * 32 * sizeof(uint32_t));
+			std::memcpy(&m_sw_toolbar_bitmap.back().pix(0), toolbar_bitmap_bmp[i], 32 * 32 * sizeof(uint32_t));
 			if (m_sw_toolbar_bitmap.back().valid())
 				m_sw_toolbar_texture.back()->set_bitmap(m_sw_toolbar_bitmap.back(), m_sw_toolbar_bitmap.back().cliprect(), TEXFORMAT_ARGB32);
 			else
@@ -1147,7 +1204,7 @@ bool menu_select_launch::scale_icon(bitmap_argb32 &&src, texture_and_bitmap &dst
 		dst.bitmap.allocate(max_width, max_height);
 		for (int y = 0; tmp.height() > y; ++y)
 			for (int x = 0; tmp.width() > x; ++x)
-				dst.bitmap.pix32(y, x) = tmp.pix32(y, x);
+				dst.bitmap.pix(y, x) = tmp.pix(y, x);
 		dst.texture->set_bitmap(dst.bitmap, dst.bitmap.cliprect(), TEXFORMAT_ARGB32);
 		return true;
 	}
@@ -1604,7 +1661,7 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 		switch (local_menu_event.event_type)
 		{
 		// if we are hovering over a valid item, select it with a single click
-		case ui_event::MOUSE_DOWN:
+		case ui_event::type::MOUSE_DOWN:
 			if (m_ui_error)
 			{
 				ev.iptkey = IPT_OTHER;
@@ -1704,7 +1761,7 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 			break;
 
 		// if we are hovering over a valid item, fake a UI_SELECT with a double-click
-		case ui_event::MOUSE_DOUBLE_CLICK:
+		case ui_event::type::MOUSE_DOUBLE_CLICK:
 			if (hover() >= 0 && hover() < item_count())
 			{
 				set_selected_index(hover());
@@ -1720,7 +1777,7 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 			break;
 
 		// caught scroll event
-		case ui_event::MOUSE_WHEEL:
+		case ui_event::type::MOUSE_WHEEL:
 			if (hover() >= 0 && hover() < item_count() - skip_main_items - 1)
 			{
 				if (local_menu_event.zdelta > 0)
@@ -1750,7 +1807,7 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 			break;
 
 		// translate CHAR events into specials
-		case ui_event::IME_CHAR:
+		case ui_event::type::IME_CHAR:
 			if (exclusive_input_pressed(ev.iptkey, IPT_UI_FOCUS_NEXT, 0) || exclusive_input_pressed(ev.iptkey, IPT_UI_FOCUS_PREV, 0))
 			{
 				stop = true;
@@ -1767,7 +1824,7 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 			}
 			break;
 
-		case ui_event::MOUSE_RDOWN:
+		case ui_event::type::MOUSE_RDOWN:
 			if (hover() >= 0 && hover() < item_count() - skip_main_items - 1)
 			{
 				set_selected_index(hover());
@@ -1790,18 +1847,18 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 		{
 			switch (machine().ui_input().peek_event_type())
 			{
-			case ui_event::MOUSE_DOWN:
-			case ui_event::MOUSE_RDOWN:
-			case ui_event::MOUSE_DOUBLE_CLICK:
-			case ui_event::MOUSE_WHEEL:
+			case ui_event::type::MOUSE_DOWN:
+			case ui_event::type::MOUSE_RDOWN:
+			case ui_event::type::MOUSE_DOUBLE_CLICK:
+			case ui_event::type::MOUSE_WHEEL:
 				stop = true;
 				break;
-			case ui_event::NONE:
-			case ui_event::MOUSE_MOVE:
-			case ui_event::MOUSE_LEAVE:
-			case ui_event::MOUSE_UP:
-			case ui_event::MOUSE_RUP:
-			case ui_event::IME_CHAR:
+			case ui_event::type::NONE:
+			case ui_event::type::MOUSE_MOVE:
+			case ui_event::type::MOUSE_LEAVE:
+			case ui_event::type::MOUSE_UP:
+			case ui_event::type::MOUSE_RUP:
+			case ui_event::type::IME_CHAR:
 				break;
 			}
 		}
@@ -2225,41 +2282,16 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 			if (software->startempty == 1)
 			{
 				// Load driver snapshot
-				std::string fullname = std::string(software->driver->name) + ".png";
-				render_load_png(tmp_bitmap, snapfile, nullptr, fullname.c_str());
-
-				if (!tmp_bitmap.valid())
-				{
-					fullname.assign(software->driver->name).append(".jpg");
-					render_load_jpeg(tmp_bitmap, snapfile, nullptr, fullname.c_str());
-				}
+				load_driver_image(tmp_bitmap, snapfile, *software->driver);
 			}
 			else
 			{
 				// First attempt from name list
-				std::string pathname = software->listname;
-				std::string fullname = software->shortname + ".png";
-				render_load_png(tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
+				load_image(tmp_bitmap, snapfile, software->listname + PATH_SEPARATOR + software->shortname);
 
+				// Second attempt from driver name + part name
 				if (!tmp_bitmap.valid())
-				{
-					fullname.assign(software->shortname).append(".jpg");
-					render_load_jpeg(tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
-				}
-
-				if (!tmp_bitmap.valid())
-				{
-					// Second attempt from driver name + part name
-					pathname.assign(software->driver->name).append(software->part);
-					fullname.assign(software->shortname).append(".png");
-					render_load_png(tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
-
-					if (!tmp_bitmap.valid())
-					{
-						fullname.assign(software->shortname).append(".jpg");
-						render_load_jpeg(tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
-					}
-				}
+					load_image(tmp_bitmap, snapfile, software->driver->name + software->part + PATH_SEPARATOR + software->shortname);
 			}
 
 			m_cache->set_snapx_software(software);
@@ -2284,51 +2316,7 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 		{
 			emu_file snapfile(searchstr, OPEN_FLAG_READ);
 			bitmap_argb32 tmp_bitmap;
-
-			// try to load snapshot first from saved "0000.png" file
-			std::string fullname(driver->name);
-			render_load_png(tmp_bitmap, snapfile, fullname.c_str(), "0000.png");
-
-			if (!tmp_bitmap.valid())
-				render_load_jpeg(tmp_bitmap, snapfile, fullname.c_str(), "0000.jpg");
-
-			// if fail, attemp to load from standard file
-			if (!tmp_bitmap.valid())
-			{
-				fullname.assign(driver->name).append(".png");
-				render_load_png(tmp_bitmap, snapfile, nullptr, fullname.c_str());
-
-				if (!tmp_bitmap.valid())
-				{
-					fullname.assign(driver->name).append(".jpg");
-					render_load_jpeg(tmp_bitmap, snapfile, nullptr, fullname.c_str());
-				}
-			}
-
-			// if fail again, attemp to load from parent file
-			if (!tmp_bitmap.valid())
-			{
-				// set clone status
-				bool cloneof = strcmp(driver->parent, "0");
-				if (cloneof)
-				{
-					int cx = driver_list::find(driver->parent);
-					if ((cx >= 0) && (driver_list::driver(cx).flags & machine_flags::IS_BIOS_ROOT))
-						cloneof = false;
-				}
-
-				if (cloneof)
-				{
-					fullname.assign(driver->parent).append(".png");
-					render_load_png(tmp_bitmap, snapfile, nullptr, fullname.c_str());
-
-					if (!tmp_bitmap.valid())
-					{
-						fullname.assign(driver->parent).append(".jpg");
-						render_load_jpeg(tmp_bitmap, snapfile, nullptr, fullname.c_str());
-					}
-				}
-			}
+			load_driver_image(tmp_bitmap, snapfile, *driver);
 
 			m_cache->set_snapx_driver(driver);
 			m_switch_image = false;
@@ -2412,7 +2400,7 @@ void menu_select_launch::arts_render_images(bitmap_argb32 &&tmp_bitmap, float or
 		for (int x = 0; x < 256; x++)
 		{
 			for (int y = 0; y < 256; y++)
-				tmp_bitmap.pix32(y, x) = src.pix32(y, x);
+				tmp_bitmap.pix(y, x) = src.pix(y, x);
 		}
 		no_available = true;
 	}
@@ -2475,7 +2463,7 @@ void menu_select_launch::arts_render_images(bitmap_argb32 &&tmp_bitmap, float or
 
 		for (int x = 0; x < dest_xPixel; x++)
 			for (int y = 0; y < dest_yPixel; y++)
-				snapx_bitmap.pix32(y + y1, x + x1) = dest_bitmap.pix32(y, x);
+				snapx_bitmap.pix(y + y1, x + x1) = dest_bitmap.pix(y, x);
 
 		// apply bitmap
 		m_cache->snapx_texture()->set_bitmap(snapx_bitmap, snapx_bitmap.cliprect(), TEXFORMAT_ARGB32);
@@ -2505,6 +2493,20 @@ void menu_select_launch::draw_snapx(float origx1, float origy1, float origx2, fl
 		// apply texture
 		container().add_quad(x1, y1, x2, y2, rgb_t::white(), m_cache->snapx_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 	}
+}
+
+
+std::string menu_select_launch::make_audit_fail_text(bool found, media_auditor const &auditor)
+{
+	std::ostringstream str;
+	str << _("The selected machine is missing one or more required ROM or CHD images. Please select a different machine.\n\n");
+	if (found)
+	{
+		auditor.summarize(nullptr, &str);
+		str << "\n";
+	}
+	str << _("Press any key to continue.");
+	return str.str();
 }
 
 

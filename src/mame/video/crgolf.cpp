@@ -68,13 +68,9 @@ uint32_t crgolf_state::screen_update_crgolf(screen_device &screen, bitmap_ind16 
 {
 	int flip = m_screen_flip;
 
-	offs_t offs;
-
 	/* for each byte in the video RAM */
-	for (offs = 0; offs < VIDEORAM_SIZE / 3; offs++)
+	for (offs_t offs = 0; offs < VIDEORAM_SIZE / 3; offs++)
 	{
-		int i;
-
 		uint8_t y = (offs & 0x1fe0) >> 5;
 		uint8_t x = (offs & 0x001f) << 3;
 
@@ -92,7 +88,7 @@ uint32_t crgolf_state::screen_update_crgolf(screen_device &screen, bitmap_ind16 
 		}
 
 		/* for each pixel in the byte */
-		for (i = 0; i < 8; i++)
+		for (int i = 0; i < 8; i++)
 		{
 			offs_t color;
 			uint8_t data_b = 0;
@@ -114,7 +110,7 @@ uint32_t crgolf_state::screen_update_crgolf(screen_device &screen, bitmap_ind16 
 			if (m_color_select)
 				color = color | 0x10;
 
-			bitmap.pix16(y, x) = color;
+			bitmap.pix(y, x) = color;
 
 			/* next pixel */
 			data_a0 = data_a0 << 1;

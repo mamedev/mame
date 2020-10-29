@@ -469,10 +469,10 @@ void sol20_state::io_map(address_map &map)
 /* Input ports */
 static INPUT_PORTS_START( sol20 )
 	PORT_START("ARROWS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("S1")
@@ -650,8 +650,7 @@ u32 sol20_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, cons
 // any character with bit 7 set will blink. With DPMON, do DA C000 C2FF to see what happens
 	u16 which = (m_iop_config->read() & 2) << 10;
 	u8 s1 = m_iop_s1->read();
-	u8 y,ra,chr,gfx;
-	u16 sy=0,ma,x,inv;
+	u16 sy=0;
 	u8 polarity = (s1 & 8) ? 0xff : 0;
 
 	bool cursor_inv = false;
@@ -660,18 +659,18 @@ u32 sol20_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 	m_framecnt++;
 
-	ma = m_sol20_fe << 6; // scroll register
+	u16 ma = m_sol20_fe << 6; // scroll register
 
-	for (y = 0; y < 16; y++)
+	for (u8 y = 0; y < 16; y++)
 	{
-		for (ra = 0; ra < 13; ra++)
+		for (u8 ra = 0; ra < 13; ra++)
 		{
-			u16 *p = &bitmap.pix16(sy++);
+			u16 *p = &bitmap.pix(sy++);
 
-			for (x = ma; x < ma + 64; x++)
+			for (u16 x = ma; x < ma + 64; x++)
 			{
-				inv = polarity;
-				chr = m_vram[x & 0x3ff];
+				u16 inv = polarity;
+				u8 chr = m_vram[x & 0x3ff];
 
 				// cursor
 				if (BIT(chr, 7) && cursor_inv)
@@ -679,10 +678,10 @@ u32 sol20_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 				chr &= 0x7f;
 
+				u8 gfx;
 				if ((ra == 0) || ((s1 & 4) && (chr < 0x20)))
 					gfx = inv;
-				else
-				if ((chr==0x2C) || (chr==0x3B) || (chr==0x67) || (chr==0x6A) || (chr==0x70) || (chr==0x71) || (chr==0x79))
+				else if ((chr==0x2C) || (chr==0x3B) || (chr==0x67) || (chr==0x6A) || (chr==0x70) || (chr==0x71) || (chr==0x79))
 				{
 					if (ra < 4)
 						gfx = inv;

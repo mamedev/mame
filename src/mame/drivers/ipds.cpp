@@ -92,8 +92,7 @@ void ipds_state::machine_reset()
 
 I8275_DRAW_CHARACTER_MEMBER( ipds_state::crtc_display_pixels )
 {
-	int i;
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	uint8_t *charmap = memregion("chargen")->base();
 	uint8_t pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 
@@ -106,8 +105,8 @@ I8275_DRAW_CHARACTER_MEMBER( ipds_state::crtc_display_pixels )
 	if (rvv)
 		pixels ^= 0xff;
 
-	for(i=0;i<6;i++)
-		bitmap.pix32(y, x + i) = palette[(pixels >> (5-i)) & 1 ? (hlgt ? 2 : 1) : 0];
+	for(int i=0;i<6;i++)
+		bitmap.pix(y, x + i) = palette[(pixels >> (5-i)) & 1 ? (hlgt ? 2 : 1) : 0];
 }
 
 /* F4 Character Displayer */

@@ -20,8 +20,11 @@
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
+#include "machine/nvram.h"
 #include "machine/z80scc.h"
 #include "machine/informer_213_kbd.h"
+#include "bus/rs232/rs232.h"
+#include "bus/rs232/printer.h"
 #include "sound/beep.h"
 #include "emupal.h"
 #include "screen.h"
@@ -38,10 +41,12 @@ public:
 	informer_213_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_nvram(*this, "nvram%u", 0U),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_scc(*this, "scc"),
 		m_beep(*this, "beep"),
+		m_nvram_bank(*this, "banked"),
 		m_vram(*this, "vram"),
 		m_aram(*this, "aram"),
 		m_chargen(*this, "chargen")
@@ -55,10 +60,12 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device_array<nvram_device, 2> m_nvram;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<scc8530_device> m_scc;
 	required_device<beep_device> m_beep;
+	required_memory_bank m_nvram_bank;
 	required_shared_ptr<uint8_t> m_vram;
 	required_shared_ptr<uint8_t> m_aram;
 	required_region_ptr<uint8_t> m_chargen;
@@ -75,13 +82,12 @@ private:
 	void cursor_end_w(uint8_t data);
 	void screen_ctrl_w(uint8_t data);
 
-	uint8_t unk_42_r();
-	void unk_42_w(uint8_t data);
-
 	void bell_w(uint8_t data);
 
 	void kbd_int_w(int state);
-	uint8_t vector_r();
+	uint8_t firq_vector_r();
+
+	std::unique_ptr<uint8_t[]> m_banked_ram;
 
 	uint16_t m_vram_start_addr;
 	uint16_t m_vram_end_addr;
@@ -90,8 +96,7 @@ private:
 	uint8_t m_cursor_end;
 	uint16_t m_cursor_addr;
 	uint8_t m_screen_ctrl;
-	uint8_t m_unk_42;
-	uint8_t m_vector;
+	uint8_t m_firq_vector;
 };
 
 
@@ -109,15 +114,16 @@ void informer_213_state::mem_map(address_map &map)
 	map(0x000e, 0x000e).unmapr().w(FUNC(informer_213_state::cursor_end_w));
 	map(0x000f, 0x0010).unmapr().w(FUNC(informer_213_state::cursor_addr_w));
 	map(0x0021, 0x0021).w(FUNC(informer_213_state::screen_ctrl_w));
-	map(0x0042, 0x0042).rw(FUNC(informer_213_state::unk_42_r), FUNC(informer_213_state::unk_42_w));
+	map(0x0040, 0x0043).rw(m_scc, FUNC(scc85c30_device::ab_dc_r), FUNC(scc85c30_device::ab_dc_w));
 	map(0x0060, 0x0060).w(FUNC(informer_213_state::bell_w));
-	map(0x0100, 0x1fff).ram();
-	map(0x2000, 0x3fff).ram();
-	map(0x4000, 0x5fff).ram();
+	map(0x0100, 0x03ff).ram().share("nvram0"); // might not be all nvram
+	map(0x0400, 0x07ff).bankrw("banked"); // unknown size, data written 0x540 to 0x749
+	map(0x0800, 0x5fff).ram();
 	map(0x6000, 0x6fff).ram().share("vram");
 	map(0x7000, 0x7fff).ram().share("aram");
 	map(0x8000, 0xffff).rom().region("maincpu", 0);
-	map(0xfff7, 0xfff7).r(FUNC(informer_213_state::vector_r));
+	map(0xfff7, 0xfff7).r(FUNC(informer_213_state::firq_vector_r));
+	map(0xfff9, 0xfff9).lr8(NAME([this] () { return m_scc->m1_r(); })); // irq vector
 }
 
 
@@ -196,12 +202,12 @@ uint32_t informer_213_state::screen_update(screen_device &screen, bitmap_rgb32 &
 							data = 0xff;
 
 				// 6 pixels of the character
-				bitmap.pix32(y * 9 + i, x * 6 + 0) = BIT(data, 7) ? rgb_t::white() : rgb_t::black();
-				bitmap.pix32(y * 9 + i, x * 6 + 1) = BIT(data, 6) ? rgb_t::white() : rgb_t::black();
-				bitmap.pix32(y * 9 + i, x * 6 + 2) = BIT(data, 5) ? rgb_t::white() : rgb_t::black();
-				bitmap.pix32(y * 9 + i, x * 6 + 3) = BIT(data, 4) ? rgb_t::white() : rgb_t::black();
-				bitmap.pix32(y * 9 + i, x * 6 + 4) = BIT(data, 3) ? rgb_t::white() : rgb_t::black();
-				bitmap.pix32(y * 9 + i, x * 6 + 5) = BIT(data, 2) ? rgb_t::white() : rgb_t::black();
+				bitmap.pix(y * 9 + i, x * 6 + 0) = BIT(data, 7) ? rgb_t::white() : rgb_t::black();
+				bitmap.pix(y * 9 + i, x * 6 + 1) = BIT(data, 6) ? rgb_t::white() : rgb_t::black();
+				bitmap.pix(y * 9 + i, x * 6 + 2) = BIT(data, 5) ? rgb_t::white() : rgb_t::black();
+				bitmap.pix(y * 9 + i, x * 6 + 3) = BIT(data, 4) ? rgb_t::white() : rgb_t::black();
+				bitmap.pix(y * 9 + i, x * 6 + 4) = BIT(data, 3) ? rgb_t::white() : rgb_t::black();
+				bitmap.pix(y * 9 + i, x * 6 + 5) = BIT(data, 2) ? rgb_t::white() : rgb_t::black();
 			}
 		}
 	}
@@ -291,8 +297,11 @@ void informer_213_state::vblank_w(int state)
 {
 	if (state)
 	{
-		m_vector = 0x10;
+		// real source if this interrupt is unknown, deactivated for now
+#if 0
+		m_firq_vector = 0x10;
 		m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
+#endif
 	}
 }
 
@@ -316,58 +325,52 @@ GFXDECODE_END
 //  MACHINE EMULATION
 //**************************************************************************
 
-uint8_t informer_213_state::unk_42_r()
-{
-	logerror("unk_42_r\n");
-	return m_unk_42 | 4;
-}
-
-void informer_213_state::unk_42_w(uint8_t data)
-{
-	logerror("unk_42_w: %02x\n", data);
-	m_unk_42 = data;
-}
-
 void informer_213_state::bell_w(uint8_t data)
 {
 	logerror("bell_w: %02x\n", data);
 
-	// 76543---  unknown
+	// 7654----  unknown
+	// ----3---  ram bank
 	// -----2--  beeper
 	// ------10  unknown
 
 	m_beep->set_state(BIT(data, 2));
+	m_nvram_bank->set_entry(BIT(data, 3));
 }
 
 void informer_213_state::kbd_int_w(int state)
 {
-	m_vector = 0x14;
+	m_firq_vector = 0x14;
 	m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
-uint8_t informer_213_state::vector_r()
+uint8_t informer_213_state::firq_vector_r()
 {
-	uint8_t tmp = m_vector;
-	m_vector = 0x00;
+	uint8_t tmp = m_firq_vector;
+	m_firq_vector = 0x00;
 
 	return tmp;
 }
 
 void informer_213_state::machine_start()
 {
+	m_banked_ram = make_unique_clear<uint8_t[]>(0x800);
+	membank("banked")->configure_entries(0, 2, m_banked_ram.get(), 0x400);
+
+	m_nvram[1]->set_base(m_banked_ram.get(), 0x800);
+
 	// register for save states
 	save_item(NAME(m_vram_start_addr));
 	save_item(NAME(m_vram_start_addr2));
 	save_item(NAME(m_vram_end_addr));
 	save_item(NAME(m_cursor_addr));
 	save_item(NAME(m_screen_ctrl));
-	save_item(NAME(m_unk_42));
-	save_item(NAME(m_vector));
+	save_item(NAME(m_firq_vector));
 }
 
 void informer_213_state::machine_reset()
 {
-	m_vector = 0x00;
+	m_firq_vector = 0x00;
 }
 
 
@@ -375,12 +378,32 @@ void informer_213_state::machine_reset()
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
+void in213_printer_devices(device_slot_interface &device)
+{
+	device.option_add("printer", SERIAL_PRINTER);
+}
+
 void informer_213_state::informer_213(machine_config &config)
 {
 	MC6809(config, m_maincpu, 18.432_MHz_XTAL / 4); // unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &informer_213_state::mem_map);
 
-	SCC8530N(config, m_scc, 0); // unknown clock
+	NVRAM(config, m_nvram[0], nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, m_nvram[1], nvram_device::DEFAULT_ALL_0);
+
+	SCC8530N(config, m_scc, 18.432_MHz_XTAL / 5);
+	m_scc->out_txda_callback().set("host", FUNC(rs232_port_device::write_txd));
+	m_scc->out_dtra_callback().set("host", FUNC(rs232_port_device::write_dtr));
+	m_scc->out_rtsa_callback().set("host", FUNC(rs232_port_device::write_rts));
+	m_scc->out_txdb_callback().set("printer", FUNC(rs232_port_device::write_txd));
+	m_scc->out_int_callback().set_inputline(m_maincpu, M6809_IRQ_LINE);
+
+	rs232_port_device &rs232_host(RS232_PORT(config, "host", default_rs232_devices, nullptr));
+	rs232_host.rxd_handler().set(m_scc, FUNC(scc85c30_device::rxa_w));
+	rs232_host.dcd_handler().set(m_scc, FUNC(scc85c30_device::dcda_w));
+	rs232_host.cts_handler().set(m_scc, FUNC(scc85c30_device::ctsa_w));
+
+	RS232_PORT(config, "printer", in213_printer_devices, nullptr);
 
 	// video
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);

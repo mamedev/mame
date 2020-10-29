@@ -572,15 +572,13 @@ uint32_t tubep_state::screen_update_tubep(screen_device &screen, bitmap_ind16 &b
 
 	pen_t pen_base = 32; //change it later
 
-	uint32_t v;
 	uint8_t *text_gfx_base = memregion("gfx1")->base();
 	uint8_t *romBxx = memregion("user1")->base() + 0x2000*m_background_romsel;
 
 	/* logerror(" update: from DISP=%i y_min=%3i y_max=%3i\n", DISP_, cliprect.min_y, cliprect.max_y+1); */
 
-	for (v = cliprect.min_y; v <= cliprect.max_y; v++)  /* only for current scanline */
+	for (uint32_t v = cliprect.min_y; v <= cliprect.max_y; v++)  /* only for current scanline */
 	{
-		uint32_t h;
 		uint32_t sp_data0=0,sp_data1=0,sp_data2=0;
 
 		// It appears there is a 1 pixel delay when renderer switches from background to sprite/text,
@@ -588,7 +586,7 @@ uint32_t tubep_state::screen_update_tubep(screen_device &screen, bitmap_ind16 &b
 		// See the gameplay video on the PCB. https://www.youtube.com/watch?v=xxONzbUOOsw
 		bool prev_text_or_sprite_pixel = true;
 
-		for (h = 0*8; h < 32*8; h++)
+		for (uint32_t h = 0*8; h < 32*8; h++)
 		{
 			bool draw_text_or_sprite_pixel = false;
 
@@ -606,7 +604,7 @@ uint32_t tubep_state::screen_update_tubep(screen_device &screen, bitmap_ind16 &b
 
 			if (text_gfx_data & (0x80 >> (h & 0x07)))
 			{
-				bitmap.pix16(v, h) = (m_textram[text_offs + 1] & 0x0f) | m_color_A4;
+				bitmap.pix(v, h) = (m_textram[text_offs + 1] & 0x0f) | m_color_A4;
 				draw_text_or_sprite_pixel = true;
 			}
 			else
@@ -652,12 +650,12 @@ uint32_t tubep_state::screen_update_tubep(screen_device &screen, bitmap_ind16 &b
 					draw_text_or_sprite_pixel = true;
 				}
 
-				bitmap.pix16(v, h) = pen_base + bg_data*64 + romB_data_h;
+				bitmap.pix(v, h) = pen_base + bg_data*64 + romB_data_h;
 			}
 
 			// text and sprite drop shadow
 			if (draw_text_or_sprite_pixel && !prev_text_or_sprite_pixel && h > 0)
-				bitmap.pix16(v, h - 1) = 0x0;
+				bitmap.pix(v, h - 1) = 0x0;
 			prev_text_or_sprite_pixel = draw_text_or_sprite_pixel;
 		}
 	}
@@ -744,7 +742,6 @@ uint32_t tubep_state::screen_update_rjammer(screen_device &screen, bitmap_ind16 
 {
 	int DISP_ = m_DISP^1;
 
-	uint32_t v;
 	uint8_t *text_gfx_base = memregion("gfx1")->base();
 	uint8_t *rom13D  = memregion("user1")->base();
 	uint8_t *rom11BD = rom13D+0x1000;
@@ -754,9 +751,8 @@ uint32_t tubep_state::screen_update_rjammer(screen_device &screen, bitmap_ind16 
 	/* especially read from ROM19C can be done once per 8 pixels*/
 	/* and the data could be bitswapped beforehand */
 
-	for (v = cliprect.min_y; v <= cliprect.max_y; v++)  /* only for current scanline */
+	for (uint32_t v = cliprect.min_y; v <= cliprect.max_y; v++)  /* only for current scanline */
 	{
-		uint32_t h;
 		uint32_t sp_data0=0,sp_data1=0,sp_data2=0;
 		uint8_t pal14h4_pin19;
 		uint8_t pal14h4_pin18;
@@ -769,7 +765,7 @@ uint32_t tubep_state::screen_update_rjammer(screen_device &screen, bitmap_ind16 
 		pal14h4_pin13 = (rom19C[addr] >> ((v&7)^7) ) &1;
 		pal14h4_pin19 = (ram_data>>13) & 1;
 
-		for (h = 0*8; h < 32*8; h++)
+		for (uint32_t h = 0*8; h < 32*8; h++)
 		{
 			offs_t text_offs;
 			uint8_t text_code;
@@ -784,7 +780,7 @@ uint32_t tubep_state::screen_update_rjammer(screen_device &screen, bitmap_ind16 
 			text_gfx_data = text_gfx_base[(text_code << 3) | (v & 0x07)];
 
 			if (text_gfx_data & (0x80 >> (h & 0x07)))
-				bitmap.pix16(v, h) = 0x10 | (m_textram[text_offs + 1] & 0x0f);
+				bitmap.pix(v, h) = 0x10 | (m_textram[text_offs + 1] & 0x0f);
 			else
 			{
 				uint32_t sp_data;
@@ -795,7 +791,7 @@ uint32_t tubep_state::screen_update_rjammer(screen_device &screen, bitmap_ind16 
 					sp_data = sp_data1;
 
 				if (sp_data != 0x0f)
-					bitmap.pix16(v, h) = 0x00 + sp_data;
+					bitmap.pix(v, h) = 0x00 + sp_data;
 				else
 				{
 					uint32_t bg_data;
@@ -848,7 +844,7 @@ uint32_t tubep_state::screen_update_rjammer(screen_device &screen, bitmap_ind16 
 					color_bank =  (pal14h4_pin13 & ((bg_data&0x08)>>3) & ((bg_data&0x04)>>2) & (((bg_data&0x02)>>1)^1) &  (bg_data&0x01)    )
 								| (pal14h4_pin18 & ((bg_data&0x08)>>3) & ((bg_data&0x04)>>2) &  ((bg_data&0x02)>>1)    & ((bg_data&0x01)^1) )
 								| (pal14h4_pin19);
-					bitmap.pix16(v, h) = 0x20 + color_bank*0x10 + bg_data;
+					bitmap.pix(v, h) = 0x20 + color_bank*0x10 + bg_data;
 				}
 			}
 		}

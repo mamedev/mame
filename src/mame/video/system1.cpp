@@ -419,7 +419,7 @@ void system1_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		/* iterate over all rows of the sprite */
 		for (int y = top; y < bottom; y++)
 		{
-			u16 *destbase = &bitmap.pix16(y);
+			u16 *const destbase = &bitmap.pix(y);
 
 			/* advance by the row counter */
 			srcaddr += stride;
@@ -515,16 +515,14 @@ void system1_state::video_update_common(screen_device &screen, bitmap_ind16 &bit
 	/* iterate over rows */
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		const u16 *fgbase = &fgpixmap.pix16(y & 0xff);
-		const u16 *sprbase = &m_sprite_bitmap.pix16(y & 0xff);
-		u16 *dstbase = &bitmap.pix16(y);
+		const u16 *const fgbase = &fgpixmap.pix(y & 0xff);
+		const u16 *const sprbase = &m_sprite_bitmap.pix(y & 0xff);
+		u16 *const dstbase = &bitmap.pix(y);
 		const int bgy = (y + bgyscroll) & 0x1ff;
 		const int bgxscroll = bgrowscroll[y >> 3 & 0x1f];
-		const u16 *bgbase[2];
 
 		/* get the base of the left and right pixmaps for the effective background Y */
-		bgbase[0] = &bgpixmaps[(bgy >> 8) * 2 + 0]->pix16(bgy & 0xff);
-		bgbase[1] = &bgpixmaps[(bgy >> 8) * 2 + 1]->pix16(bgy & 0xff);
+		const u16 *const bgbase[2] = { &bgpixmaps[(bgy >> 8) * 2 + 0]->pix(bgy & 0xff), &bgpixmaps[(bgy >> 8) * 2 + 1]->pix(bgy & 0xff) };
 
 		/* iterate over pixels */
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)

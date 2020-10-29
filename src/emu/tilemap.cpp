@@ -860,8 +860,8 @@ u8 tilemap_t::tile_draw(const u8 *pendata, u32 x0, u32 y0, u32 palette_base, u8 
 	u8 andmask = ~0, ormask = 0;
 	for (u16 ty = 0; ty < m_tileheight; ty++)
 	{
-		u16 *pixptr = &m_pixmap.pix16(y0, x0);
-		u8 *flagsptr = &m_flagsmap.pix8(y0, x0);
+		u16 *pixptr = &m_pixmap.pix(y0, x0);
+		u8 *flagsptr = &m_flagsmap.pix(y0, x0);
 
 		// pre-advance to the next row
 		y0 += dy0;
@@ -913,7 +913,7 @@ u8 tilemap_t::tile_apply_bitmask(const u8 *maskdata, u32 x0, u32 y0, u8 category
 	for (u16 ty = 0; ty < m_tileheight; ty++)
 	{
 		// pre-advance to the next row
-		u8 *flagsptr = &m_flagsmap.pix8(y0, x0);
+		u8 *flagsptr = &m_flagsmap.pix(y0, x0);
 		y0 += dy0;
 
 		// anywhere the bitmask is 0 should be transparent
@@ -1182,7 +1182,7 @@ void tilemap_t::draw_instance(screen_device &screen, _BitmapClass &dest, const b
 
 	// look up priority and destination base addresses for y1
 	bitmap_ind8 &priority_bitmap = *blit.priority;
-	u8 *priority_baseaddr = &priority_bitmap.pix8(y1, xpos);
+	u8 *priority_baseaddr = &priority_bitmap.pix(y1, xpos);
 	typename _BitmapClass::pixel_t *dest_baseaddr = nullptr;
 	int dest_rowpixels = 0;
 	if (dest.valid())
@@ -1198,8 +1198,8 @@ void tilemap_t::draw_instance(screen_device &screen, _BitmapClass &dest, const b
 	y2 -= ypos;
 
 	// get tilemap pixels
-	const u16 *source_baseaddr = &m_pixmap.pix16(y1);
-	const u8 *mask_baseaddr = &m_flagsmap.pix8(y1);
+	const u16 *source_baseaddr = &m_pixmap.pix(y1);
+	const u8 *mask_baseaddr = &m_flagsmap.pix(y1);
 
 	// get start/stop columns, rounding outward
 	int mincol = x1 / m_tilewidth;
@@ -1396,9 +1396,9 @@ void tilemap_t::draw_roz_core(screen_device &screen, _BitmapClass &destbitmap, c
 				u32 cy = starty >> 16;
 
 				// get source and priority pointers
-				u8 *pri = (priority != 0xff00) ? &priority_bitmap.pix8(sy, sx) : nullptr;
-				const u16 *src = &m_pixmap.pix16(cy);
-				const u8 *maskptr = &m_flagsmap.pix8(cy);
+				u8 *pri = (priority != 0xff00) ? &priority_bitmap.pix(sy, sx) : nullptr;
+				const u16 *src = &m_pixmap.pix(cy);
+				const u8 *maskptr = &m_flagsmap.pix(cy);
 				typename _BitmapClass::pixel_t *dest = &destbitmap.pix(sy, sx);
 
 				// loop over columns
@@ -1440,15 +1440,15 @@ void tilemap_t::draw_roz_core(screen_device &screen, _BitmapClass &destbitmap, c
 
 			// get dest and priority pointers
 			typename _BitmapClass::pixel_t *dest = &destbitmap.pix(sy, sx);
-			u8 *pri = (priority != 0xff00) ? &priority_bitmap.pix8(sy, sx) : nullptr;
+			u8 *pri = (priority != 0xff00) ? &priority_bitmap.pix(sy, sx) : nullptr;
 
 			// loop over columns
 			while (x <= ex)
 			{
 				// plot if we match the mask
-				if ((m_flagsmap.pix8((cy >> 16) & ymask, (cx >> 16) & xmask) & mask) == value)
+				if ((m_flagsmap.pix((cy >> 16) & ymask, (cx >> 16) & xmask) & mask) == value)
 				{
-					ROZ_PLOT_PIXEL(m_pixmap.pix16((cy >> 16) & ymask, (cx >> 16) & xmask));
+					ROZ_PLOT_PIXEL(m_pixmap.pix((cy >> 16) & ymask, (cx >> 16) & xmask));
 					if (priority != 0xff00)
 						*pri = (*pri & (priority >> 8)) | priority;
 				}
@@ -1482,16 +1482,16 @@ void tilemap_t::draw_roz_core(screen_device &screen, _BitmapClass &destbitmap, c
 
 			// get dest and priority pointers
 			typename _BitmapClass::pixel_t *dest = &destbitmap.pix(sy, sx);
-			u8 *pri = (priority != 0xff00) ? &priority_bitmap.pix8(sy, sx) : nullptr;
+			u8 *pri = (priority != 0xff00) ? &priority_bitmap.pix(sy, sx) : nullptr;
 
 			// loop over columns
 			while (x <= ex)
 			{
 				// plot if we're within the bitmap and we match the mask
 				if (cx < widthshifted && cy < heightshifted)
-					if ((m_flagsmap.pix8(cy >> 16, cx >> 16) & mask) == value)
+					if ((m_flagsmap.pix(cy >> 16, cx >> 16) & mask) == value)
 					{
-						ROZ_PLOT_PIXEL(m_pixmap.pix16(cy >> 16, cx >> 16));
+						ROZ_PLOT_PIXEL(m_pixmap.pix(cy >> 16, cx >> 16));
 						if (priority != 0xff00)
 							*pri = (*pri & (priority >> 8)) | priority;
 					}
@@ -1611,14 +1611,14 @@ tilemap_manager::~tilemap_manager()
 tilemap_t &tilemap_manager::create(device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, u16 tilewidth, u16 tileheight, u32 cols, u32 rows, tilemap_t *allocated)
 {
 	if (!allocated)
-		allocated = global_alloc(tilemap_t)(machine().root_device());
+		allocated = new tilemap_t(machine().root_device());
 	return m_tilemap_list.append(allocated->init(*this, decoder, tile_get_info, mapper, tilewidth, tileheight, cols, rows));
 }
 
 tilemap_t &tilemap_manager::create(device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_standard_mapper mapper, u16 tilewidth, u16 tileheight, u32 cols, u32 rows, tilemap_t *allocated)
 {
 	if (!allocated)
-		allocated = global_alloc(tilemap_t)(machine().root_device());
+		allocated = new tilemap_t(machine().root_device());
 	return m_tilemap_list.append(allocated->init(*this, decoder, tile_get_info, mapper, tilewidth, tileheight, cols, rows));
 }
 

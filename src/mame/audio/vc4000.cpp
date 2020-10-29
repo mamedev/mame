@@ -31,26 +31,22 @@ vc4000_sound_device::vc4000_sound_device(const machine_config &mconfig, const ch
 
 void vc4000_sound_device::device_start()
 {
-	m_channel = stream_alloc_legacy(0, 1, machine().sample_rate());
+	m_channel = stream_alloc(0, 1, machine().sample_rate());
 }
 
 
 //-------------------------------------------------
-//  sound_stream_update_legacy - handle a stream update
+//  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void vc4000_sound_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void vc4000_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	int i;
-	stream_sample_t *buffer = outputs[0];
+	auto &buffer = outputs[0];
 
-	for (i = 0; i < samples; i++, buffer++)
+	for (i = 0; i < buffer.samples(); i++)
 	{
-		*buffer = 0;
-		if (m_reg[0] && m_pos <= m_size / 2)
-		{
-			*buffer = 0x7fff;
-		}
+		buffer.put(i, (m_reg[0] && m_pos <= m_size / 2) ? 1.0 : 0.0);
 		if (m_pos <= m_size)
 			m_pos++;
 		if (m_pos > m_size)

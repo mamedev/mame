@@ -9,10 +9,10 @@
 #define PFMTLOG_H_
 
 #include "penum.h"
+#include "pgsl.h"
 #include "ppmf.h"
 #include "pstring.h"
 #include "ptypes.h"
-#include "pgsl.h"
 
 #include <limits>
 #include <locale>
@@ -451,7 +451,7 @@ namespace plib {
 			fatal(logger)
 		{}
 
-		PCOPYASSIGNMOVE(plog_base, default)
+		PCOPYASSIGNMOVE(plog_base, delete)
 		virtual ~plog_base() noexcept = default;
 
 		plog_channel<plog_level::DEBUG, debug_enabled> debug;

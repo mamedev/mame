@@ -496,7 +496,7 @@ void k053247_device::zdrawgfxzoom32GP(
 	pal_base  = palette().pens() + m_gfx->colorbase() + (color % m_gfx->colors()) * granularity;
 	shd_base  = palette().shadow_table();
 
-	dst_ptr   = &bitmap.pix32(0);
+	dst_ptr   = &bitmap.pix(0);
 	dst_pitch = bitmap.rowpixels();
 	dst_minx  = cliprect.min_x;
 	dst_maxx  = cliprect.max_x;

@@ -155,7 +155,7 @@ uint32_t mstation_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 				// columns are inverted (right to left)
 				int col = ((x < 20) ? 19 : 59) - x;
 
-				bitmap.pix16(y, col*8 + b)= BIT(data, 0);
+				bitmap.pix(y, col*8 + b)= BIT(data, 0);
 				data >>= 1;
 			}
 		}
@@ -164,7 +164,7 @@ uint32_t mstation_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 //***************************************************************************
 //  Bankswitch
-//***************************************************************************/
+//***************************************************************************
 
 uint8_t mstation_state::bank1_r(offs_t offset)
 {

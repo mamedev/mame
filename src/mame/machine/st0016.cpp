@@ -511,7 +511,7 @@ void st0016_cpu_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 
 							if (!flipy) { drawypos = ypos + yloop; }
 							else { drawypos = (ypos + 8 - 1) - yloop; }
-							destline = &bitmap.pix16(drawypos);
+							destline = &bitmap.pix(drawypos);
 
 							for (xloop = 0; xloop<8; xloop++)
 							{
@@ -654,7 +654,7 @@ void st0016_cpu_device::draw_bgmap(bitmap_ind16 &bitmap, const rectangle &clipre
 
 							if (!flipy) { drawypos = ypos + yloop; }
 							else { drawypos = (ypos + 8 - 1) - yloop; }
-							destline = &bitmap.pix16(drawypos);
+							destline = &bitmap.pix(drawypos);
 
 							for (xloop = 0; xloop<8; xloop++)
 							{

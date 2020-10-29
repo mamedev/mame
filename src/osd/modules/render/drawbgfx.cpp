@@ -957,7 +957,7 @@ void renderer_bgfx::update_recording()
 	int i = 0;
 	for (int y = 0; y < m_avi_bitmap.height(); y++)
 	{
-		uint32_t *dst = &m_avi_bitmap.pix32(y);
+		uint32_t *dst = &m_avi_bitmap.pix(y);
 
 		for (int x = 0; x < m_avi_bitmap.width(); x++)
 		{

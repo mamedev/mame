@@ -218,13 +218,13 @@ uint32_t toobin_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 	/* draw and merge the MO */
 	bitmap_ind16 &mobitmap = m_mob->bitmap();
-	const pen_t *palette = m_palette->pens();
+	pen_t const *const palette = m_palette->pens();
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		uint32_t *dest = &bitmap.pix32(y);
-		uint16_t *mo = &mobitmap.pix16(y);
-		uint16_t *pf = &m_pfbitmap.pix16(y);
-		uint8_t *pri = &priority_bitmap.pix8(y);
+		uint32_t *const dest = &bitmap.pix(y);
+		uint16_t const *const mo = &mobitmap.pix(y);
+		uint16_t const *const pf = &m_pfbitmap.pix(y);
+		uint8_t const *const pri = &priority_bitmap.pix(y);
 		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			uint16_t pix = pf[x];

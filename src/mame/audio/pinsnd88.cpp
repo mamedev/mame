@@ -104,7 +104,6 @@
 
 #include "emu.h"
 #include "pinsnd88.h"
-#include "sound/volt_reg.h"
 
 
 DEFINE_DEVICE_TYPE(PINSND88, pinsnd88_device, "pinsnd88", "Williams Pin Sound '88 Audio Board")
@@ -221,9 +220,6 @@ void pinsnd88_device::device_add_mconfig(machine_config &config)
 
 	// TODO: analog filters and "volume" controls for the two channels
 	AD7224(config, m_dac, 0);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 	m_dac->add_route(ALL_OUTPUTS, *this, 0.41/2.0, AUTO_ALLOC_INPUT, 0); // 470K
 	m_dac->add_route(ALL_OUTPUTS, *this, 0.5/2.0, AUTO_ALLOC_INPUT, 1); // 330K
 

@@ -224,18 +224,20 @@ uint8_t hexbus_device::read(int dir)
 hexbus_chained_device::hexbus_chained_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock):
 	device_t(mconfig, type, tag, owner, clock),
 	device_hexbus_interface(mconfig, *this),
+	m_hexbus_outbound(nullptr),
 	m_enabled(false),
 	m_myvalue(0xff)
 {
 	m_hexbus_inbound = dynamic_cast<hexbus_device *>(owner);
 }
 
-void hexbus_chained_device::device_start()
+void hexbus_chained_device::device_resolve_objects()
 {
-	m_hexbus_outbound = static_cast<hexbus_device*>(subdevice("hexbus"));
+	m_hexbus_outbound = dynamic_cast<hexbus_device *>(subdevice("hexbus"));
 
 	// Establish callback for inbound propagations
-	m_hexbus_outbound->set_chain_element(this);
+	if (m_hexbus_outbound != nullptr)
+		m_hexbus_outbound->set_chain_element(this);
 }
 
 /*

@@ -20,10 +20,10 @@ STA: This format has not been investigated yet, but is assumed to
 IPL: This seems a quickload format containing RAM dump, not a real tape
 
 ********************************************************************/
+#include "spc1000_cas.h"
 
 #include <cassert>
 
-#include "spc1000_cas.h"
 
 #define WAVEENTRY_LOW  -32768
 #define WAVEENTRY_HIGH  32767
@@ -31,7 +31,7 @@ IPL: This seems a quickload format containing RAM dump, not a real tape
 #define SPC1000_WAV_FREQUENCY   17000
 
 // image size
-static int spc1000_image_size;
+static int spc1000_image_size; // FIXME: global variable prevents multiple instances
 
 static int spc1000_put_samples(int16_t *buffer, int sample_pos, int count, int level)
 {
@@ -125,7 +125,7 @@ static int spc1000_cas_calculate_size_in_samples(const uint8_t *bytes, int lengt
 
 
 // TAP
-static const struct CassetteLegacyWaveFiller spc1000_tap_legacy_fill_wave =
+static const cassette_image::LegacyWaveFiller spc1000_tap_legacy_fill_wave =
 {
 	spc1000_tap_fill_wave,                 /* fill_wave */
 	-1,                                     /* chunk_size */
@@ -136,17 +136,17 @@ static const struct CassetteLegacyWaveFiller spc1000_tap_legacy_fill_wave =
 	0                                       /* trailer_samples */
 };
 
-static cassette_image::error spc1000_tap_cassette_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error spc1000_tap_cassette_identify(cassette_image *cassette, cassette_image::Options *opts)
 {
-	return cassette_legacy_identify(cassette, opts, &spc1000_tap_legacy_fill_wave);
+	return cassette->legacy_identify(opts, &spc1000_tap_legacy_fill_wave);
 }
 
 static cassette_image::error spc1000_tap_cassette_load(cassette_image *cassette)
 {
-	return cassette_legacy_construct(cassette, &spc1000_tap_legacy_fill_wave);
+	return cassette->legacy_construct(&spc1000_tap_legacy_fill_wave);
 }
 
-static const struct CassetteFormat spc1000_tap_cassette_image_format =
+static const cassette_image::Format spc1000_tap_cassette_image_format =
 {
 	"tap",
 	spc1000_tap_cassette_identify,
@@ -156,7 +156,7 @@ static const struct CassetteFormat spc1000_tap_cassette_image_format =
 
 
 // CAS
-static const struct CassetteLegacyWaveFiller spc1000_cas_legacy_fill_wave =
+static const cassette_image::LegacyWaveFiller spc1000_cas_legacy_fill_wave =
 {
 	spc1000_cas_fill_wave,                 /* fill_wave */
 	-1,                                     /* chunk_size */
@@ -167,17 +167,17 @@ static const struct CassetteLegacyWaveFiller spc1000_cas_legacy_fill_wave =
 	0                                       /* trailer_samples */
 };
 
-static cassette_image::error spc1000_cas_cassette_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error spc1000_cas_cassette_identify(cassette_image *cassette, cassette_image::Options *opts)
 {
-	return cassette_legacy_identify(cassette, opts, &spc1000_cas_legacy_fill_wave);
+	return cassette->legacy_identify(opts, &spc1000_cas_legacy_fill_wave);
 }
 
 static cassette_image::error spc1000_cas_cassette_load(cassette_image *cassette)
 {
-	return cassette_legacy_construct(cassette, &spc1000_cas_legacy_fill_wave);
+	return cassette->legacy_construct(&spc1000_cas_legacy_fill_wave);
 }
 
-static const struct CassetteFormat spc1000_cas_cassette_image_format =
+static const cassette_image::Format spc1000_cas_cassette_image_format =
 {
 	"cas",
 	spc1000_cas_cassette_identify,

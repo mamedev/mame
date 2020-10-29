@@ -7,16 +7,17 @@
     Text functionality for MAME's crude user interface
 
 ***************************************************************************/
+#ifndef MAME_FRONTEND_UI_TEXT_H
+#define MAME_FRONTEND_UI_TEXT_H
 
 #pragma once
 
-#ifndef MAME_FRONTEND_UI_TEXT_H
-#define MAME_FRONTEND_UI_TEXT_H
 
 class render_font;
 class render_container;
 
 namespace ui {
+
 /***************************************************************************
 TYPE DEFINITIONS
 ***************************************************************************/

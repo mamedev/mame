@@ -67,11 +67,11 @@ uint32_t dkmb_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	int count = 0;
 	for (int y = 0; y < 256; y++)
 	{
-		uint32_t* dst = &bitmap.pix32(y);
+		uint32_t *const dst = &bitmap.pix(y);
 
 		for (int x = 0; x < 1024 / 2; x++)
 		{
-			uint64_t val = m_framebuffer[count];
+			uint64_t const val = m_framebuffer[count];
 
 			dst[(x * 2) + 0] = (val >> 32) & 0x00ffffff;
 			dst[(x * 2) + 1] = (val >> 0)  & 0x00ffffff;

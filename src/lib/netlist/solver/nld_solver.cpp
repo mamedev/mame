@@ -4,6 +4,7 @@
 
 #include "nl_factory.h"
 #include "core/setup.h"
+#include "nl_errstr.h"
 #include "nl_setup.h" // FIXME: only needed for splitter code
 #include "nld_matrix_solver.h"
 #include "nld_ms_direct.h"
@@ -33,7 +34,7 @@ namespace devices
 
 	NETLIB_RESET(solver)
 	{
-		if (exec().use_stats())
+		if (exec().stats_enabled())
 			m_fb_step.set_delegate(NETLIB_DELEGATE(fb_step<true>));
 		for (auto &s : m_mat_solvers)
 			s->reset();
@@ -277,20 +278,20 @@ namespace devices
 
 	struct net_splitter
 	{
-		void run(netlist_state_t &netlist)
+		void run(netlist_state_t &nlstate)
 		{
-			for (auto & net : netlist.nets())
+			for (auto & net : nlstate.nets())
 			{
-				netlist.log().verbose("processing {1}", net->name());
-				if (!net->is_rail_net() && net->has_connections())
+				nlstate.log().verbose("processing {1}", net->name());
+				if (!net->is_rail_net() && !nlstate.core_terms(*net).empty())
 				{
-					netlist.log().verbose("   ==> not a rail net");
+					nlstate.log().verbose("   ==> not a rail net");
 					// Must be an analog net
 					auto &n = dynamic_cast<analog_net_t &>(*net);
 					if (!already_processed(n))
 					{
 						groupspre.emplace_back(NETLIB_NAME(solver)::net_list_t());
-						process_net(netlist, n);
+						process_net(nlstate, n);
 					}
 				}
 			}
@@ -343,27 +344,31 @@ namespace devices
 		}
 
 		// NOLINTNEXTLINE(misc-no-recursion)
-		void process_net(netlist_state_t &netlist, analog_net_t &n)
+		void process_net(netlist_state_t &nlstate, analog_net_t &n)
 		{
 			// ignore empty nets. FIXME: print a warning message
-			netlist.log().verbose("Net {}", n.name());
-			if (n.has_connections())
+			nlstate.log().verbose("Net {}", n.name());
+			if (!nlstate.core_terms(n).empty())
 			{
 				// add the net
 				groupspre.back().push_back(&n);
 				// process all terminals connected to this net
-				for (auto &term : n.core_terms())
+				for (auto &term : nlstate.core_terms(n))
 				{
-					netlist.log().verbose("Term {} {}", term->name(), static_cast<int>(term->type()));
+					nlstate.log().verbose("Term {} {}", term->name(), static_cast<int>(term->type()));
 					// only process analog terminals
 					if (term->is_type(detail::terminal_type::TERMINAL))
 					{
 						auto &pt = dynamic_cast<terminal_t &>(*term);
 						// check the connected terminal
-						analog_net_t &connected_net = netlist.setup().get_connected_terminal(pt)->net();
-						netlist.log().verbose("  Connected net {}", connected_net.name());
-						if (!check_if_processed_and_join(connected_net))
-							process_net(netlist, connected_net);
+						const auto *const connected_terminals = nlstate.setup().get_connected_terminals(pt);
+						for (auto ct = connected_terminals->begin(); *ct != nullptr; ct++)
+						{
+							analog_net_t &connected_net = (*ct)->net();
+							nlstate.log().verbose("  Connected net {}", connected_net.name());
+							if (!check_if_processed_and_join(connected_net))
+								process_net(nlstate, connected_net);
+						}
 					}
 				}
 			}
@@ -380,9 +385,55 @@ namespace devices
 		net_splitter splitter;
 
 		splitter.run(state());
+		log().verbose("Found {1} net groups in {2} nets\n", splitter.groups.size(), state().nets().size());
+
+		int num_errors = 0;
+
+		log().verbose("checking net consistency  ...");
+		for (const auto &grp : splitter.groups)
+		{
+			int railterms = 0;
+			pstring nets_in_grp;
+			for (const auto &n : grp)
+			{
+				nets_in_grp += (n->name() + " ");
+				if (!n->is_analog())
+				{
+					state().log().error(ME_SOLVER_CONSISTENCY_NOT_ANALOG_NET(n->name()));
+					num_errors++;
+				}
+				if (n->is_rail_net())
+				{
+					state().log().error(ME_SOLVER_CONSISTENCY_RAIL_NET(n->name()));
+					num_errors++;
+				}
+				for (const auto &t : state().core_terms(*n))
+				{
+					if (!t->has_net())
+					{
+						state().log().error(ME_SOLVER_TERMINAL_NO_NET(t->name()));
+						num_errors++;
+					}
+					else
+					{
+						auto *otherterm = dynamic_cast<terminal_t *>(t);
+						if (otherterm != nullptr)
+							if (state().setup().get_connected_terminal(*otherterm)->net().is_rail_net())
+								railterms++;
+					}
+				}
+			}
+			if (railterms == 0)
+			{
+				state().log().error(ME_SOLVER_NO_RAIL_TERMINAL(nets_in_grp));
+				num_errors++;
+			}
+		}
+		if (num_errors > 0)
+			throw nl_exception(MF_SOLVER_CONSISTENCY_ERRORS(num_errors));
+
 
 		// setup the solvers
-		log().verbose("Found {1} net groups in {2} nets\n", splitter.groups.size(), state().nets().size());
 		for (auto & grp : splitter.groups)
 		{
 			solver_ptr ms;
@@ -421,9 +472,9 @@ namespace devices
 			for (auto &n : grp)
 			{
 				log().verbose("Net {1}", n->name());
-				for (const auto &pcore : n->core_terms())
+				for (const auto &t : state().core_terms(*n))
 				{
-					log().verbose("   {1}", pcore->name());
+					log().verbose("   {1}", t->name());
 				}
 			}
 

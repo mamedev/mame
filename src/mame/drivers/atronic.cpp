@@ -423,8 +423,8 @@ TMS340X0_FROM_SHIFTREG_CB_MEMBER(atronic_state::from_shiftreg)
 TMS340X0_SCANLINE_RGB32_CB_MEMBER(atronic_state::scanline_update)
 {
 	uint32_t fulladdr = ((params->rowaddr << 16) | params->coladdr) >> 5;
-	uint32_t* bg0_base = &m_vidram[(fulladdr & 0x7fe00)]; // this probably isn't screen ram, but some temp gfx are copied on startup
-	uint32_t* dst = &bitmap.pix32(scanline);
+	uint32_t const *const bg0_base = &m_vidram[(fulladdr & 0x7fe00)]; // this probably isn't screen ram, but some temp gfx are copied on startup
+	uint32_t *const dst = &bitmap.pix(scanline);
 	int coladdr = fulladdr & 0x1ff;
 	const pen_t *pens = m_palette->pens();
 

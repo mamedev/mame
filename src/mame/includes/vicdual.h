@@ -13,8 +13,8 @@
 #include "sound/dac.h"
 #include "sound/discrete.h"
 #include "sound/samples.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
+#include "audio/vicdual.h"
 #include "audio/vicdual-97271p.h"
 #include "video/vicdual-97269pb.h"
 
@@ -29,6 +29,7 @@ public:
 		m_coinstate_timer(*this, "coinstate"),
 		m_nsub_coinage_timer(*this, "nsub_coin"),
 		m_screen(*this, "screen"),
+		m_vicdual_sound(*this, "vicdual_sound"),
 		m_proms(*this, "proms"),
 		m_videoram(*this, "videoram"),
 		m_characterram(*this, "characterram"),
@@ -49,7 +50,6 @@ public:
 	void headonn(machine_config &config);
 	void invho2(machine_config &config);
 	void frogs(machine_config &config);
-	void frogs_audio(machine_config &config);
 	void headons(machine_config &config);
 	void invinco(machine_config &config);
 	void invinco_audio(machine_config &config);
@@ -61,7 +61,6 @@ public:
 	void headon2bw(machine_config &config);
 	void safari(machine_config &config);
 	void brdrline(machine_config &config);
-	void brdrline_audio(machine_config &config);
 	void samurai(machine_config &config);
 	void sspaceat(machine_config &config);
 	void digger(machine_config &config);
@@ -69,8 +68,6 @@ public:
 	void depthch_audio(machine_config &config);
 	void carhntds(machine_config &config);
 	void alphaho(machine_config &config);
-	void tranqgun(machine_config &config);
-	void tranqgun_audio(machine_config &config);
 
 	DECLARE_READ_LINE_MEMBER(coin_status_r);
 	DECLARE_READ_LINE_MEMBER(get_64v);
@@ -88,6 +85,7 @@ protected:
 	required_device<timer_device> m_coinstate_timer;
 	optional_device<timer_device> m_nsub_coinage_timer;
 	required_device<screen_device> m_screen;
+	optional_device<vicdual_audio_device_base> m_vicdual_sound;
 	optional_memory_region m_proms;
 
 	required_shared_ptr<uint8_t> m_videoram;
@@ -134,7 +132,6 @@ protected:
 	void carhntds_io_w(offs_t offset, uint8_t data);
 	void sspacaho_io_w(offs_t offset, uint8_t data);
 	void headonn_io_w(offs_t offset, uint8_t data);
-	void tranqgun_io_w(offs_t offset, uint8_t data);
 	void spacetrk_io_w(offs_t offset, uint8_t data);
 	void brdrline_io_w(offs_t offset, uint8_t data);
 	void pulsar_io_w(offs_t offset, uint8_t data);
@@ -146,12 +143,8 @@ protected:
 	void invinco_io_w(offs_t offset, uint8_t data);
 
 	/*----------- defined in audio/vicdual.cpp -----------*/
-	void frogs_audio_w(uint8_t data);
 	void headon_audio_w(uint8_t data);
 	void invho2_audio_w(uint8_t data);
-	void brdrline_audio_w(uint8_t data);
-	void brdrline_audio_aux_w(uint8_t data);
-	TIMER_CALLBACK_MEMBER( frogs_croak_callback );
 
 	/*----------- defined in audio/depthch.cpp -----------*/
 	void depthch_audio_w(uint8_t data);
@@ -163,13 +156,9 @@ protected:
 	void pulsar_audio_1_w(uint8_t data);
 	void pulsar_audio_2_w(uint8_t data);
 
-	/*----------- defined in audio/tranqgun.cpp -----------*/
-	void tranqgun_audio_w(uint8_t data);
-
 	TIMER_DEVICE_CALLBACK_MEMBER(clear_coin_status);
 
 	DECLARE_MACHINE_START(samurai);
-	DECLARE_MACHINE_START(frogs_audio);
 
 	virtual void machine_start() override;
 
@@ -207,9 +196,33 @@ protected:
 	void spacetrk_io_map(address_map &map);
 	void sspacaho_io_map(address_map &map);
 	void sspaceat_io_map(address_map &map);
-	void tranqgun_io_map(address_map &map);
 	void vicdual_dualgame_map(address_map &map);
 };
+
+class tranqgun_state : public vicdual_state
+{
+public:
+	tranqgun_state(const machine_config &mconfig, device_type type, const char *tag) :
+		vicdual_state(mconfig, type, tag)
+	{ }
+
+	void tranqgun(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	void tranqgun_io_map(address_map &map);
+	void tranqgun_io_w(offs_t offset, uint8_t data);
+
+	uint8_t tranqgun_prot_r(offs_t offset);
+	void tranqgun_prot_w(offs_t offset, uint8_t data);
+
+	void tranqgun_dualgame_map(address_map &map);
+
+	uint8_t m_tranqgun_prot_return;
+};
+
 
 class nsub_state : public vicdual_state
 {
@@ -252,8 +265,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_psg(*this, "psg"),
 		m_pit(*this, "pit"),
-		m_dac(*this, "dac%u", 0),
-		m_vref(*this, "vref%u", 0)
+		m_dac(*this, "dac%u", 0)
 	{ }
 
 	void carnival(machine_config &config);
@@ -270,7 +282,6 @@ protected:
 	optional_device<ay8910_device> m_psg;
 	optional_device<pit8253_device> m_pit;
 	optional_device_array<dac_bit_interface, 3> m_dac;
-	optional_device_array<voltage_regulator_device, 3> m_vref;
 
 	void carnival_io_map(address_map &map);
 	void mboard_map(address_map &map);

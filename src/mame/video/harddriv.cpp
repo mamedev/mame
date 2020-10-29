@@ -409,15 +409,13 @@ static void display_speedups(void)
 
 TMS340X0_SCANLINE_IND16_CB_MEMBER(harddriv_state::scanline_driver)
 {
-	uint8_t *vram_base = &m_gsp_vram[(params->rowaddr << 12) & m_vram_mask];
+	if (!m_gsp_vram) return;
+	uint8_t const *const vram_base = &m_gsp_vram[(params->rowaddr << 12) & m_vram_mask];
 
-	if (!vram_base) return;
-
-	uint16_t *dest = &bitmap.pix16(scanline);
+	uint16_t *const dest = &bitmap.pix(scanline);
 	int coladdr = (params->yoffset << 9) + ((params->coladdr & 0xff) << 4) - 15 + (m_gfx_finescroll & 0x0f);
-	int x;
 
-	for (x = params->heblnk; x < params->hsblnk; x++)
+	for (int x = params->heblnk; x < params->hsblnk; x++)
 		dest[x] = m_gfx_palettebank * 256 + vram_base[BYTE_XOR_LE(coladdr++ & 0xfff)];
 
 	if (scanline == screen.visible_area().bottom())
@@ -427,15 +425,13 @@ TMS340X0_SCANLINE_IND16_CB_MEMBER(harddriv_state::scanline_driver)
 
 TMS340X0_SCANLINE_IND16_CB_MEMBER(harddriv_state::scanline_multisync)
 {
-	uint8_t *vram_base = &m_gsp_vram[(params->rowaddr << 11) & m_vram_mask];
+	if (!m_gsp_vram) return;
+	uint8_t const *const vram_base = &m_gsp_vram[(params->rowaddr << 11) & m_vram_mask];
 
-	if (!vram_base) return;
-
-	uint16_t *dest = &bitmap.pix16(scanline);
+	uint16_t *const dest = &bitmap.pix(scanline);
 	int coladdr = (params->yoffset << 9) + ((params->coladdr & 0xff) << 3) - 7 + (m_gfx_finescroll & 0x07);
-	int x;
 
-	for (x = params->heblnk; x < params->hsblnk; x++)
+	for (int x = params->heblnk; x < params->hsblnk; x++)
 		dest[x] = m_gfx_palettebank * 256 + vram_base[BYTE_XOR_LE(coladdr++ & 0x7ff)];
 
 	if (scanline == screen.visible_area().bottom())

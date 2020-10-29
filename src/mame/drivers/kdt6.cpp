@@ -54,14 +54,14 @@ public:
 		m_gfx(*this, "gfx"),
 		m_rtc(*this, "rtc"),
 		m_fdc(*this, "fdc"),
-		m_floppy0(*this, "fdc:0"),
-		m_floppy1(*this, "fdc:1"),
+		m_floppy(*this, "fdc:%u", 0U),
 		m_beeper(*this, "beeper"),
 		m_beep_timer(*this, "beep_timer"),
 		m_centronics(*this, "centronics"),
 		m_dip_s2(*this, "S2"),
 		m_keyboard(*this, "kbd"),
 		m_rs232b(*this, "rs232b"),
+		m_drive_led(*this, "drive%u_led", 0U),
 		m_sasi_dma(false),
 		m_dma_map(0),
 		m_status0(0), m_status1(0), m_status2(0),
@@ -69,6 +69,10 @@ public:
 	{ }
 
 	void psi98(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(busreq_w);
@@ -113,9 +117,6 @@ private:
 	void psi98_io(address_map &map);
 	void psi98_mem(address_map &map);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
 	required_device<z80_device> m_cpu;
 	required_device<z80dma_device> m_dma;
 	required_device<z80sio_device> m_sio;
@@ -126,14 +127,14 @@ private:
 	required_region_ptr<u8> m_gfx;
 	required_device<upd1990a_device> m_rtc;
 	required_device<upd765a_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<beep_device> m_beeper;
 	required_device<timer_device> m_beep_timer;
 	required_device<centronics_device> m_centronics;
 	required_ioport m_dip_s2;
 	required_device<psi_keyboard_bus_device> m_keyboard;
 	required_device<rs232_port_device> m_rs232b;
+	output_finder<2> m_drive_led;
 
 	std::unique_ptr<uint8_t[]> m_ram;
 	std::unique_ptr<uint16_t[]> m_vram; // 10-bit
@@ -244,12 +245,12 @@ WRITE_LINE_MEMBER( kdt6_state::fdc_drq_w )
 
 void kdt6_state::drive0_led_cb(floppy_image_device *floppy, int state)
 {
-	machine().output().set_value("drive0_led", state);
+	m_drive_led[0] = state;
 }
 
 void kdt6_state::drive1_led_cb(floppy_image_device *floppy, int state)
 {
-	machine().output().set_value("drive1_led", state);
+	m_drive_led[1] = state;
 }
 
 
@@ -297,7 +298,7 @@ uint32_t kdt6_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 MC6845_UPDATE_ROW( kdt6_state::crtc_update_row )
 {
-	const pen_t *pen = m_palette->pens();
+	pen_t const *const pen = m_palette->pens();
 
 	for (int i = 0; i < x_count; i++)
 	{
@@ -314,7 +315,7 @@ MC6845_UPDATE_ROW( kdt6_state::crtc_update_row )
 			for (int x = 0; x < 8; x++)
 			{
 				int color = BIT(data, 7 - x);
-				bitmap.pix32(y, x + i*8) = pen[blink ? 0 : (color ^ inverse)];
+				bitmap.pix(y, x + i*8) = pen[blink ? 0 : (color ^ inverse)];
 			}
 		}
 		else
@@ -324,7 +325,7 @@ MC6845_UPDATE_ROW( kdt6_state::crtc_update_row )
 
 			// draw 8 pixels of the cell
 			for (int x = 0; x < 8; x++)
-				bitmap.pix32(y, x + i*8) = pen[BIT(data, 7 - x)];
+				bitmap.pix(y, x + i*8) = pen[BIT(data, 7 - x)];
 		}
 	}
 }
@@ -498,10 +499,9 @@ void kdt6_state::status0_w(uint8_t data)
 		m_beep_timer->adjust(attotime::from_msec(250)); // timing unknown
 	}
 
-	if (m_floppy0->get_device())
-		m_floppy0->get_device()->mon_w(BIT(data, 7) ? 0 : 1);
-	if (m_floppy1->get_device())
-		m_floppy1->get_device()->mon_w(BIT(data, 7) ? 0 : 1);
+	for (auto &floppy : m_floppy)
+		if (floppy->get_device())
+			floppy->get_device()->mon_w(BIT(data, 7) ? 0 : 1);
 
 	m_status0 = data;
 }
@@ -567,6 +567,8 @@ void kdt6_state::status2_w(uint8_t data)
 
 void kdt6_state::machine_start()
 {
+	m_drive_led.resolve();
+
 	// 256 kb ram, 64 kb vram (and two dummy regions for invalid pages)
 	m_ram = std::make_unique<uint8_t[]>(0x40000);
 	m_vram = std::make_unique<uint16_t[]>(0x10000);
@@ -579,10 +581,10 @@ void kdt6_state::machine_start()
 
 	m_fdc->set_rate(250000);
 
-	if (m_floppy0->get_device())
-		m_floppy0->get_device()->setup_led_cb(floppy_image_device::led_cb(&kdt6_state::drive0_led_cb, this));
-	if (m_floppy1->get_device())
-		m_floppy1->get_device()->setup_led_cb(floppy_image_device::led_cb(&kdt6_state::drive1_led_cb, this));
+	if (m_floppy[0]->get_device())
+		m_floppy[0]->get_device()->setup_led_cb(floppy_image_device::led_cb(&kdt6_state::drive0_led_cb, this));
+	if (m_floppy[1]->get_device())
+		m_floppy[1]->get_device()->setup_led_cb(floppy_image_device::led_cb(&kdt6_state::drive1_led_cb, this));
 
 	// register for save states
 	save_pointer(NAME(m_ram), 0x40000);

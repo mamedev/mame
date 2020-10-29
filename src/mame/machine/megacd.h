@@ -123,6 +123,9 @@ protected:
 	required_shared_ptr<uint16_t> m_dataram;
 	required_shared_ptr<uint16_t> m_font_bits;
 
+	output_finder<> m_red_led;
+	output_finder<> m_green_led;
+
 	// can't use a memshare because it's 8-bit RAM in a 16-bit address space
 	std::vector<uint8_t> m_backupram;
 

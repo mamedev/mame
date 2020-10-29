@@ -32,12 +32,27 @@ public:
 		, m_lcd_data(*this, "lcd_data")
 		, m_keyboard(*this, "KEY.%u", 0)
 		, m_io_on(*this, "ON")
+		, m_busy(*this, "BUSY")
+		, m_shift(*this, "SHIFT")
+		, m_sml(*this, "SML")
+		, m_small(*this, "SMALL")
+		, m_iii(*this, "III")
+		, m_ii(*this, "II")
+		, m_i(*this, "I")
+		, m_def(*this, "DEF")
+		, m_de(*this, "DE")
+		, m_g(*this, "G")
+		, m_rad(*this, "RAD")
+		, m_reserve(*this, "RESERVE")
+		, m_pro(*this, "PRO")
+		, m_run(*this, "RUN")
 	{
 	}
 
 	void pc1500(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 private:
@@ -47,6 +62,21 @@ private:
 	required_shared_ptr<uint8_t> m_lcd_data;
 	required_ioport_array<8> m_keyboard;
 	required_ioport m_io_on;
+
+	output_finder<> m_busy;
+	output_finder<> m_shift;
+	output_finder<> m_sml;
+	output_finder<> m_small;
+	output_finder<> m_iii;
+	output_finder<> m_ii;
+	output_finder<> m_i;
+	output_finder<> m_def;
+	output_finder<> m_de;
+	output_finder<> m_g;
+	output_finder<> m_rad;
+	output_finder<> m_reserve;
+	output_finder<> m_pro;
+	output_finder<> m_run;
 
 	uint8_t m_kb_matrix;
 
@@ -107,28 +137,46 @@ uint32_t pc1500_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 			for (int b=0; b<8; b++)
 			{
 				if(b<4)
-					bitmap.pix16(b + 4 * (BIT( a, 0)), (a>>1) + 0x00 + 0x27*p) = BIT(data, b);
+					bitmap.pix(b + 4 * (BIT( a, 0)), (a>>1) + 0x00 + 0x27*p) = BIT(data, b);
 				else
-					bitmap.pix16(b - 4 * (BIT(~a, 0)), (a>>1) + 0x4e + 0x27*p) = BIT(data, b);
+					bitmap.pix(b - 4 * (BIT(~a, 0)), (a>>1) + 0x4e + 0x27*p) = BIT(data, b);
 			}
 		}
 
-	output().set_value("BUSY",  BIT(m_lcd_data[0x4e], 0));
-	output().set_value("SHIFT", BIT(m_lcd_data[0x4e], 1));
-	output().set_value("SML",   BIT(m_lcd_data[0x4e], 2));
-	output().set_value("SMALL", BIT(m_lcd_data[0x4e], 3));
-	output().set_value("III",   BIT(m_lcd_data[0x4e], 4));
-	output().set_value("II",    BIT(m_lcd_data[0x4e], 5));
-	output().set_value("I",     BIT(m_lcd_data[0x4e], 6));
-	output().set_value("DEF",   BIT(m_lcd_data[0x4e], 7));
-	output().set_value("DE",    BIT(m_lcd_data[0x4f], 0));
-	output().set_value("G",     BIT(m_lcd_data[0x4f], 1));
-	output().set_value("RAD",   BIT(m_lcd_data[0x4f], 2));
-	output().set_value("RESERVE", BIT(m_lcd_data[0x4f], 4));
-	output().set_value("PRO",   BIT(m_lcd_data[0x4f], 5));
-	output().set_value("RUN",   BIT(m_lcd_data[0x4f], 6));
+	m_busy =  BIT(m_lcd_data[0x4e], 0);
+	m_shift = BIT(m_lcd_data[0x4e], 1);
+	m_sml =   BIT(m_lcd_data[0x4e], 2);
+	m_small = BIT(m_lcd_data[0x4e], 3);
+	m_iii =   BIT(m_lcd_data[0x4e], 4);
+	m_ii =    BIT(m_lcd_data[0x4e], 5);
+	m_i =     BIT(m_lcd_data[0x4e], 6);
+	m_def =   BIT(m_lcd_data[0x4e], 7);
+	m_de =    BIT(m_lcd_data[0x4f], 0);
+	m_g =     BIT(m_lcd_data[0x4f], 1);
+	m_rad =   BIT(m_lcd_data[0x4f], 2);
+	m_reserve = BIT(m_lcd_data[0x4f], 4);
+	m_pro =   BIT(m_lcd_data[0x4f], 5);
+	m_run =   BIT(m_lcd_data[0x4f], 6);
 
 	return 0;
+}
+
+void pc1500_state::machine_start()
+{
+	m_busy.resolve();
+	m_shift.resolve();
+	m_sml.resolve();
+	m_small.resolve();
+	m_iii.resolve();
+	m_ii.resolve();
+	m_i.resolve();
+	m_def.resolve();
+	m_de.resolve();
+	m_g.resolve();
+	m_rad.resolve();
+	m_reserve.resolve();
+	m_pro.resolve();
+	m_run.resolve();
 }
 
 void pc1500_state::machine_reset()

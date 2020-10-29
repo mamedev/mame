@@ -285,14 +285,14 @@ template <unsigned N> void alfaskop4110_state::irq_w(int state)
 /* Simplified chargen, no attributes or special formats/features yet  */
 MC6845_UPDATE_ROW( alfaskop4110_state::crtc_update_row )
 {
-	offs_t base = ma + 0x4000;
-	u32 *px = &bitmap.pix32(y);
+	offs_t const base = ma + 0x4000;
+	u32 *px = &bitmap.pix(y);
 
 	for (int i = 0; i < x_count; i++)
 	{
 		u8 chr = m_vram[(base + i) & 0x07ff] & 0x7f;
-		rgb_t bg = rgb_t::white();
-		rgb_t fg = rgb_t::black();
+		rgb_t const bg = rgb_t::white();
+		rgb_t const fg = rgb_t::black();
 
 		u8 dots = m_chargen[chr * 16 + ra];
 

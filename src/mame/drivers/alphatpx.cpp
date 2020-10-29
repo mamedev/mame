@@ -903,31 +903,31 @@ static const gfx_layout extcharlayout =
 
 u32 alphatp_12_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const pen_t *pen = m_palette->pens();
-	int start = m_crtc->upscroll_offset();
+	pen_t const *const pen = m_palette->pens();
+	int const start = m_crtc->upscroll_offset();
 	rectangle cursor;
 	m_crtc->cursor_bounds(cursor);
 	for (int y = 0; y < 24; y++)
 	{
-		int vramy = (start + y) % 24;
+		int const vramy = (start + y) % 24;
 		for (int x = 0; x < 80; x++)
 		{
 			u8 code = m_vram[(vramy * 128) + x];   // helwie44 must be 128d is 080h physical display-ram step line
 			// draw 12 lines of the character
-			bool cursoren = cursor.contains(x * 8, y * 12);
+			bool const cursoren = cursor.contains(x * 8, y * 12);
 			for (int line = 0; line < 12; line++)
 			{
 				u8 data = m_gfx[((code & 0x7f) * 16) + line];
 				if (cursoren)
 					data ^= 0xff;
-				bitmap.pix32(y * 12 + line, x * 8 + 0) = pen[BIT(data, 0) ^ BIT(code, 7)];
-				bitmap.pix32(y * 12 + line, x * 8 + 1) = pen[BIT(data, 1) ^ BIT(code, 7)];
-				bitmap.pix32(y * 12 + line, x * 8 + 2) = pen[BIT(data, 2) ^ BIT(code, 7)];
-				bitmap.pix32(y * 12 + line, x * 8 + 3) = pen[BIT(data, 3) ^ BIT(code, 7)];
-				bitmap.pix32(y * 12 + line, x * 8 + 4) = pen[BIT(data, 4) ^ BIT(code, 7)];
-				bitmap.pix32(y * 12 + line, x * 8 + 5) = pen[BIT(data, 5) ^ BIT(code, 7)];
-				bitmap.pix32(y * 12 + line, x * 8 + 6) = pen[BIT(data, 6) ^ BIT(code, 7)];
-				bitmap.pix32(y * 12 + line, x * 8 + 7) = pen[BIT(data, 7) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 0) = pen[BIT(data, 0) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 1) = pen[BIT(data, 1) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 2) = pen[BIT(data, 2) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 3) = pen[BIT(data, 3) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 4) = pen[BIT(data, 4) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 5) = pen[BIT(data, 5) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 6) = pen[BIT(data, 6) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 7) = pen[BIT(data, 7) ^ BIT(code, 7)];
 			}
 		}
 	}
@@ -945,23 +945,23 @@ GFXDECODE_END
 
 u32 alphatp_34_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const pen_t *pen = m_palette->pens();
-	int start = m_crtc->upscroll_offset();
+	pen_t const *const pen = m_palette->pens();
+	int const start = m_crtc->upscroll_offset();
 	rectangle cursor;
 	m_crtc->cursor_bounds(cursor);
-	bool scrext = m_scncfg->read() ? true : false;
+	bool const scrext = m_scncfg->read() ? true : false;
 	for (int y = 0; y < 24; y++)
 	{
-		int vramy = (start + y) % 24;
+		int const vramy = (start + y) % 24;
 		for (int x = 0; x < 80; x++)
 		{
 			u8 code = m_vram[(vramy * 128) + x];   // helwie44 must be 128d is 080h physical display-ram step line
 			// draw 12 lines of the character
-			bool cursoren = cursor.contains(x * 8, y * 12);
+			bool const cursoren = cursor.contains(x * 8, y * 12);
 			for (int line = 0; line < 12; line++)
 			{
 				u8 data = 0;
-				if(scrext)
+				if (scrext)
 				{
 					offs_t offset = (((vramy * 12) + line) * 80) + x;
 					if(offset < (371 * 80))
@@ -974,14 +974,14 @@ u32 alphatp_34_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 					if (cursoren)
 						data ^= 0xff;
 				}
-				bitmap.pix32(y * 12 + line, x * 8 + 0) = pen[BIT(data, 0) ^ BIT(code, 7)];
-				bitmap.pix32(y * 12 + line, x * 8 + 1) = pen[BIT(data, 1) ^ BIT(code, 7)];
-				bitmap.pix32(y * 12 + line, x * 8 + 2) = pen[BIT(data, 2) ^ BIT(code, 7)];
-				bitmap.pix32(y * 12 + line, x * 8 + 3) = pen[BIT(data, 3) ^ BIT(code, 7)];
-				bitmap.pix32(y * 12 + line, x * 8 + 4) = pen[BIT(data, 4) ^ BIT(code, 7)];
-				bitmap.pix32(y * 12 + line, x * 8 + 5) = pen[BIT(data, 5) ^ BIT(code, 7)];
-				bitmap.pix32(y * 12 + line, x * 8 + 6) = pen[BIT(data, 6) ^ BIT(code, 7)];
-				bitmap.pix32(y * 12 + line, x * 8 + 7) = pen[BIT(data, 7) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 0) = pen[BIT(data, 0) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 1) = pen[BIT(data, 1) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 2) = pen[BIT(data, 2) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 3) = pen[BIT(data, 3) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 4) = pen[BIT(data, 4) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 5) = pen[BIT(data, 5) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 6) = pen[BIT(data, 6) ^ BIT(code, 7)];
+				bitmap.pix(y * 12 + line, x * 8 + 7) = pen[BIT(data, 7) ^ BIT(code, 7)];
 			}
 		}
 	}

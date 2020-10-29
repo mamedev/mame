@@ -70,7 +70,7 @@ uint32_t unkpoker_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	{
 		for (uint8_t ra = 0; ra < 8; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix(sy++);
 
 			for (uint16_t x = 0; x < 32; x++)
 			{

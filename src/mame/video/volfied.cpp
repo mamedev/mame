@@ -113,7 +113,7 @@ void volfied_state::refresh_pixel_layer( bitmap_ind16 &bitmap )
 			else
 				color |= p[x] & 0xf;
 
-			bitmap.pix16(y, x - 1) = color;
+			bitmap.pix(y, x - 1) = color;
 		}
 
 		p += 512;

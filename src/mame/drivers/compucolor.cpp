@@ -284,12 +284,12 @@ uint32_t compucolor2_state::screen_update(screen_device &screen, bitmap_rgb32 &b
 
 			uint8_t data = m_char_rom->base()[char_offs];
 
-			rgb_t fg = m_palette->pen_color(attr & 0x07);
-			rgb_t bg = m_palette->pen_color((attr >> 3) & 0x07);
+			rgb_t const fg = m_palette->pen_color(attr & 0x07);
+			rgb_t const bg = m_palette->pen_color((attr >> 3) & 0x07);
 
 			for (int x = 0; x < 6; x++)
 			{
-				bitmap.pix32(y, (sx * 6) + x) = BIT(data, 7) ? fg : bg;
+				bitmap.pix(y, (sx * 6) + x) = BIT(data, 7) ? fg : bg;
 
 				data <<= 1;
 			}

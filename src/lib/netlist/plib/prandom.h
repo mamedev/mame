@@ -101,7 +101,7 @@ namespace plib
 		}
 
 	private:
-		void twist()
+		void twist() noexcept
 		{
 			const T lowest_w(~T(0) >> (sizeof(T)*8 - w));
 			const T lower_mask((T(1) << r) - 1); // That is, the binary number of r 1's
@@ -121,10 +121,10 @@ namespace plib
 	};
 
 	template <typename FT, typename T>
-	FT normalize_uniform(T &p, FT m = constants<FT>::one(), FT b = constants<FT>::zero())
+	FT normalize_uniform(T &p, FT m = constants<FT>::one(), FT b = constants<FT>::zero()) noexcept
 	{
-		const auto mmin(narrow_cast<FT>(p.min()));
-		const auto mmax(narrow_cast<FT>(p.max()));
+		constexpr const auto mmin(narrow_cast<FT>(T::min()));
+		constexpr const auto mmax(narrow_cast<FT>(T::max()));
 		// -> 0 to a
 		return (narrow_cast<FT>(p())- mmin) / (mmax - mmin) * m - b;
 	}

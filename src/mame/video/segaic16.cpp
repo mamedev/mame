@@ -1539,23 +1539,22 @@ void segaic16_video_device::rotate_draw(int which, bitmap_ind16 &bitmap, const r
 	int32_t dxx = (info->buffer[0x3f6] << 16) | info->buffer[0x3f7];
 	int32_t dxy = (info->buffer[0x3f8] << 16) | info->buffer[0x3f9];
 	int32_t dyx = (info->buffer[0x3fa] << 16) | info->buffer[0x3fb];
-	int x, y;
 
 	/* advance forward based on the clip rect */
 	currx += dxx * (cliprect.min_x + 27) + dxy * cliprect.min_y;
 	curry += dyx * (cliprect.min_x + 27) + dyy * cliprect.min_y;
 
 	/* loop over screen Y coordinates */
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint16_t *dest = &bitmap.pix16(y);
-		uint16_t *src = &srcbitmap.pix16(0);
-		uint8_t *pri = &priority_bitmap.pix8(y);
+		uint16_t *dest = &bitmap.pix(y);
+		uint16_t const *const src = &srcbitmap.pix(0);
+		uint8_t *pri = &priority_bitmap.pix(y);
 		int32_t tx = currx;
 		int32_t ty = curry;
 
 		/* loop over screen X coordinates */
-		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			/* fetch the pixel from the source bitmap */
 			int sx = (tx >> 14) & 0x1ff;

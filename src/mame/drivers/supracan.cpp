@@ -553,8 +553,8 @@ void supracan_state::draw_sprite_tile(bitmap_ind16 &dst, bitmap_ind8 &priomap, c
 	for (int y = dsty; y <= dstendy; y++)
 	{
 		const uint8_t *srcp = &src_data[srcx];
-		uint8_t *priop = &priomap.pix8(y, dstx);
-		uint16_t *dstp = &dst.pix16(y, dstx);
+		uint8_t *priop = &priomap.pix(y, dstx);
+		uint16_t *dstp = &dst.pix(y, dstx);
 		for (int x = dstx; x <= dstendx; x++)
 		{
 			const uint32_t srcdata = *srcp;
@@ -627,7 +627,7 @@ void supracan_state::draw_sprite_tile_mask(bitmap_ind8 &dst, const rectangle &cl
 	for (int y = dsty; y <= dstendy; y++)
 	{
 		const uint8_t *srcp = &src_data[srcx];
-		uint8_t *dstp = &dst.pix8(y, dstx);
+		uint8_t *dstp = &dst.pix(y, dstx);
 		for (int x = dstx; x <= dstendx; x++)
 		{
 			if (*srcp)
@@ -697,9 +697,9 @@ void supracan_state::draw_sprite_tile_masked(bitmap_ind16 &dst, bitmap_ind8 &mas
 	for (int y = dsty; y <= dstendy; y++)
 	{
 		const uint8_t *srcp = &src_data[srcx];
-		uint16_t *dstp = &dst.pix16(y, dstx);
-		uint8_t *priop = &priomap.pix8(y, dstx);
-		uint8_t *maskp = &mask.pix8(y, dstx);
+		uint16_t *dstp = &dst.pix(y, dstx);
+		uint8_t *priop = &priomap.pix(y, dstx);
+		uint8_t *maskp = &mask.pix(y, dstx);
 		for (int x = dstx; x <= dstendx; x++)
 		{
 			const uint32_t srcdata = *srcp;
@@ -838,8 +838,8 @@ void supracan_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &maskmap, bi
 			uint32_t delta = (1 << 17) / xscale;
 			for (int sy = 0; sy < ysize * 8; sy++)
 			{
-				uint16_t *src = &sprite_bitmap->pix16(sy);
-				uint16_t *dst = &bitmap.pix16(y + sy);
+				uint16_t *src = &sprite_bitmap->pix(sy);
+				uint16_t *dst = &bitmap.pix(y + sy);
 				uint32_t dx = x << 16;
 				for (int sx = 0; sx < xsize * 8; sx++)
 				{
@@ -897,7 +897,7 @@ void supracan_state::draw_roz_layer(bitmap_ind16 &bitmap, const rectangle &clipr
 			uint32_t cy = starty;
 
 			/* get dest and priority pointers */
-			uint16_t *dest = &bitmap.pix16(sy, sx);
+			uint16_t *dest = &bitmap.pix(sy, sx);
 
 			/* loop over columns */
 			while (x <= ex)
@@ -909,7 +909,7 @@ void supracan_state::draw_roz_layer(bitmap_ind16 &bitmap, const rectangle &clipr
 					{
 						int scroll = 0; // scrollram[(cx>>16)&0x3ff]);
 
-						uint16_t data = &srcbitmap.pix16(((cy >> 16) - scroll) & ymask, (cx >> 16) & xmask)[0];
+						uint16_t data = &srcbitmap.pix(((cy >> 16) - scroll) & ymask, (cx >> 16) & xmask)[0];
 
 						if ((data & transmask) != 0)
 							dest[0] = data;
@@ -918,7 +918,7 @@ void supracan_state::draw_roz_layer(bitmap_ind16 &bitmap, const rectangle &clipr
 					#endif
 					{
 						int scroll = 0;//scrollram[(cy>>16)&0x3ff]);
-						uint16_t data =  srcbitmap.pix16((cy >> 16) & ymask, ((cx >> 16) - scroll) & xmask);
+						uint16_t data =  srcbitmap.pix((cy >> 16) & ymask, ((cx >> 16) - scroll) & xmask);
 
 						if ((data & transmask) != 0)
 							*dest = data;
@@ -1059,8 +1059,8 @@ uint32_t supracan_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 						for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 						{
-							// these will have to change to pix32 etc. once alpha blending is supported
-							uint16_t* screen = &bitmap.pix16(y);
+							// these will have to change to uint32_t* etc. once alpha blending is supported
+							uint16_t* screen = &bitmap.pix(y);
 
 							int actualy = y & mosaic_mask;
 							int realy = actualy + scrolly;
@@ -1069,8 +1069,8 @@ uint32_t supracan_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 								if (scrolly + y < 0 || scrolly + y > ((ysize * 8) - 1))
 									continue;
 
-							uint16_t* src = &src_bitmap.pix16(realy & ((ysize * 8) - 1));
-							uint8_t* priop = &m_prio_bitmap.pix8(y);
+							uint16_t* src = &src_bitmap.pix(realy & ((ysize * 8) - 1));
+							uint8_t* priop = &m_prio_bitmap.pix(y);
 
 							for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 							{
@@ -1163,9 +1163,9 @@ uint32_t supracan_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	{
 		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-			uint16_t* dstp = &bitmap.pix16(y);
-			uint8_t* priop = &m_prio_bitmap.pix8(y);
-			uint16_t* spritep = &m_sprite_final_bitmap.pix16(y);
+			uint16_t* dstp = &bitmap.pix(y);
+			uint8_t* priop = &m_prio_bitmap.pix(y);
+			uint16_t* spritep = &m_sprite_final_bitmap.pix(y);
 
 			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{

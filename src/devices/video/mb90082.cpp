@@ -207,44 +207,37 @@ void mb90082_device::write(uint8_t data)
 
 uint32_t mb90082_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int x,y;
-	uint8_t *pcg = memregion("mb90082")->base();
-	uint16_t tile,attr;
-	uint8_t bg_r,bg_g,bg_b;
+	uint8_t const *const pcg = memregion("mb90082")->base();
 
 	/* TODO: there's probably a way to control the brightness in this */
-	bg_b = m_uc & 1 ? 0xdf : 0;
-	bg_g = m_uc & 2 ? 0xdf : 0;
-	bg_r = m_uc & 4 ? 0xdf : 0;
+	uint8_t const bg_b = m_uc & 1 ? 0xdf : 0;
+	uint8_t const bg_g = m_uc & 2 ? 0xdf : 0;
+	uint8_t const bg_r = m_uc & 4 ? 0xdf : 0;
 	bitmap.fill(rgb_t(0xff,bg_r,bg_g,bg_b),cliprect);
 
-	for(y=0;y<12;y++)
+	for(int y=0;y<12;y++)
 	{
-		for(x=0;x<24;x++)
+		for(int x=0;x<24;x++)
 		{
-			int xi,yi;
-
-			tile = read_word(x+y*24);
-			attr = read_word((x+y*24)|0x200);
+			uint16_t tile = read_word(x+y*24);
+			uint16_t attr = read_word((x+y*24)|0x200);
 
 			/* TODO: charset hook-up is obviously WRONG so following mustn't be trusted at all */
-			for(yi=0;yi<16;yi++)
+			for(int yi=0;yi<16;yi++)
 			{
-				for(xi=0;xi<16;xi++)
+				for(int xi=0;xi<16;xi++)
 				{
-					uint8_t pix;
-					uint8_t color = (attr & 0x70) >> 4;
-					uint8_t r,g,b;
+					uint8_t const color = (attr & 0x70) >> 4;
 
-					pix = (pcg[(tile*8)+(yi >> 1)] >> (7-(xi >> 1))) & 1;
+					uint8_t const pix = (pcg[(tile*8)+(yi >> 1)] >> (7-(xi >> 1))) & 1;
 
 					/* TODO: check this */
-					b = (color & 1) ? 0xff : 0;
-					g = (color & 2) ? 0xff : 0;
-					r = (color & 4) ? 0xff : 0;
+					uint8_t const b = (color & 1) ? 0xff : 0;
+					uint8_t const g = (color & 2) ? 0xff : 0;
+					uint8_t const r = (color & 4) ? 0xff : 0;
 
 					if(tile != 0xff && pix != 0)
-						bitmap.pix32(y*16+yi,x*16+xi) = r << 16 | g << 8 | b;
+						bitmap.pix(y*16+yi,x*16+xi) = r << 16 | g << 8 | b;
 				}
 			}
 		}

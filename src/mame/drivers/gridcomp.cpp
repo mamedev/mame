@@ -246,18 +246,15 @@ uint8_t gridcomp_state::grid_dma_r(offs_t offset)
 
 uint32_t gridcomp_state::screen_update_generic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int px)
 {
-	int x, y, offset;
-	uint16_t gfx, *p;
-
-	for (y = 0; y < 240; y++)
+	for (int y = 0; y < 240; y++)
 	{
-		p = &bitmap.pix16(y);
+		uint16_t *p = &bitmap.pix(y);
 
-		offset = y * (px / 16);
+		int const offset = y * (px / 16);
 
-		for (x = offset; x < offset + px / 16; x++)
+		for (int x = offset; x < offset + px / 16; x++)
 		{
-			gfx = m_videoram[x];
+			uint16_t const gfx = m_videoram[x];
 
 			for (int i = 15; i >= 0; i--)
 			{

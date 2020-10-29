@@ -69,8 +69,10 @@ public:
 		m_speaker(*this, "speaker"),
 		m_sio(*this, "sio"),
 		m_rs232(*this, "rs232"),
-		m_caps1(*this, "capsule1"), m_caps2(*this, "capsule2"),
-		m_caps1_rom(nullptr), m_caps2_rom(nullptr),
+		m_caps(*this, "capsule%u", 0U),
+		m_dips(*this, "dips"),
+		m_leds(*this, "led_%u", 0U),
+		m_caps_rom{nullptr, nullptr},
 		m_ctrl1(0), m_icrb(0), m_bankr(0),
 		m_isr(0), m_ier(0), m_sior(0xbf),
 		m_frc_value(0), m_frc_latch(0),
@@ -188,7 +190,7 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER( serial_rx_w );
 	void txd_w(int data);
 
-	void install_rom_capsule(address_space &space, int size, memory_region *mem);
+	void install_rom_capsule(address_space &space, int size, uint8_t *mem);
 
 	// internal devices
 	required_device<cpu_device> m_z80;
@@ -200,11 +202,11 @@ protected:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<epson_sio_device> m_sio;
 	required_device<rs232_port_device> m_rs232;
-	required_device<generic_slot_device> m_caps1;
-	required_device<generic_slot_device> m_caps2;
+	required_device_array<generic_slot_device, 2> m_caps;
+	required_ioport m_dips;
+	output_finder<3> m_leds;
 
-	memory_region *m_caps1_rom;
-	memory_region *m_caps2_rom;
+	uint8_t *m_caps_rom[2];
 
 	// gapnit register
 	uint8_t m_ctrl1;
@@ -504,18 +506,18 @@ uint8_t px4_state::str_r()
 }
 
 // helper function to map rom capsules
-void px4_state::install_rom_capsule(address_space &space, int size, memory_region *mem)
+void px4_state::install_rom_capsule(address_space &space, int size, uint8_t *mem)
 {
 	// ram, part 1
 	space.install_ram(0x0000, 0xdfff - size, m_ram->pointer());
 
 	// actual rom data, part 1
 	if (mem)
-		space.install_rom(0xe000 - size, 0xffff, mem->base() + (size - 0x2000));
+		space.install_rom(0xe000 - size, 0xffff, mem + (size - 0x2000));
 
 	// rom data, part 2
 	if (mem && size != 0x2000)
-		space.install_rom(0x10000 - size, 0xdfff, mem->base());
+		space.install_rom(0x10000 - size, 0xdfff, mem);
 
 	// ram, continued
 	space.install_ram(0xe000, 0xffff, m_ram->pointer() + 0xe000);
@@ -545,12 +547,12 @@ void px4_state::bankr_w(uint8_t data)
 		space_program.install_ram(0x0000, 0xffff, m_ram->pointer());
 		break;
 
-	case 0x08: install_rom_capsule(space_program, 0x2000, m_caps1_rom); break;
-	case 0x09: install_rom_capsule(space_program, 0x4000, m_caps1_rom); break;
-	case 0x0a: install_rom_capsule(space_program, 0x8000, m_caps1_rom); break;
-	case 0x0c: install_rom_capsule(space_program, 0x2000, m_caps2_rom); break;
-	case 0x0d: install_rom_capsule(space_program, 0x4000, m_caps2_rom); break;
-	case 0x0e: install_rom_capsule(space_program, 0x8000, m_caps2_rom); break;
+	case 0x08: install_rom_capsule(space_program, 0x2000, m_caps_rom[0]); break;
+	case 0x09: install_rom_capsule(space_program, 0x4000, m_caps_rom[0]); break;
+	case 0x0a: install_rom_capsule(space_program, 0x8000, m_caps_rom[0]); break;
+	case 0x0c: install_rom_capsule(space_program, 0x2000, m_caps_rom[1]); break;
+	case 0x0d: install_rom_capsule(space_program, 0x4000, m_caps_rom[1]); break;
+	case 0x0e: install_rom_capsule(space_program, 0x8000, m_caps_rom[1]); break;
 
 	default:
 		if (VERBOSE)
@@ -727,7 +729,7 @@ void px4_state::sior_w(uint8_t data)
 		case 0x0a:
 			if (VERBOSE)
 				logerror("7508 cmd: DIP Switch Read\n");
-			m_sior = ioport("dips")->read();
+			m_sior = m_dips->read();
 			break;
 
 		case 0x0b: if (VERBOSE) logerror("7508 cmd: Stop Key Interrupt disable\n"); break;
@@ -1052,9 +1054,9 @@ void px4_state::ioctlr_w(uint8_t data)
 
 	// bit 3, cartridge reset
 
-	output().set_value("led_0", BIT(data, 4)); // caps lock
-	output().set_value("led_1", BIT(data, 5)); // num lock
-	output().set_value("led_2", BIT(data, 6)); // "led 2"
+	m_leds[0] = BIT(data, 4); // caps lock
+	m_leds[1] = BIT(data, 5); // num lock
+	m_leds[2] = BIT(data, 6); // "led 2"
 
 	m_speaker->level_w(BIT(data, 7));
 }
@@ -1177,26 +1179,24 @@ uint32_t px4_state::screen_update_px4(screen_device &screen, bitmap_ind16 &bitma
 	// display enabled?
 	if (BIT(m_yoff, 7))
 	{
-		int y, x;
-
 		// get vram start address
-		uint8_t *vram = &m_ram->pointer()[(m_vadr & 0xf8) << 8];
+		uint8_t const *vram = &m_ram->pointer()[(m_vadr & 0xf8) << 8];
 
-		for (y = 0; y < 64; y++)
+		for (int y = 0; y < 64; y++)
 		{
 			// adjust against y-offset
 			uint8_t row = (y - (m_yoff & 0x3f)) & 0x3f;
 
-			for (x = 0; x < 240/8; x++)
+			for (int x = 0; x < 240/8; x++)
 			{
-				bitmap.pix16(row, x * 8 + 0) = BIT(*vram, 7);
-				bitmap.pix16(row, x * 8 + 1) = BIT(*vram, 6);
-				bitmap.pix16(row, x * 8 + 2) = BIT(*vram, 5);
-				bitmap.pix16(row, x * 8 + 3) = BIT(*vram, 4);
-				bitmap.pix16(row, x * 8 + 4) = BIT(*vram, 3);
-				bitmap.pix16(row, x * 8 + 5) = BIT(*vram, 2);
-				bitmap.pix16(row, x * 8 + 6) = BIT(*vram, 1);
-				bitmap.pix16(row, x * 8 + 7) = BIT(*vram, 0);
+				bitmap.pix(row, x * 8 + 0) = BIT(*vram, 7);
+				bitmap.pix(row, x * 8 + 1) = BIT(*vram, 6);
+				bitmap.pix(row, x * 8 + 2) = BIT(*vram, 5);
+				bitmap.pix(row, x * 8 + 3) = BIT(*vram, 4);
+				bitmap.pix(row, x * 8 + 4) = BIT(*vram, 3);
+				bitmap.pix(row, x * 8 + 5) = BIT(*vram, 2);
+				bitmap.pix(row, x * 8 + 6) = BIT(*vram, 1);
+				bitmap.pix(row, x * 8 + 7) = BIT(*vram, 0);
 
 				vram++;
 			}
@@ -1236,9 +1236,10 @@ void px4p_state::init_px4p()
 
 void px4_state::machine_start()
 {
-	std::string region_tag;
-	m_caps1_rom = memregion(region_tag.assign(m_caps1->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
-	m_caps2_rom = memregion(region_tag.assign(m_caps2->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+	m_leds.resolve();
+
+	for (int i = 0; i < 2; i++)
+		m_caps_rom[i] = m_caps[i]->get_rom_base();
 
 	m_nvram->set_base(m_ram->pointer(), 0x10000);
 
@@ -1543,8 +1544,8 @@ void px4_state::px4(machine_config &config)
 	m_rs232->cts_handler().set(FUNC(px4_state::rs232_cts_w));
 
 	// rom capsules
-	GENERIC_CARTSLOT(config, m_caps1, generic_plain_slot, "px4_cart");
-	GENERIC_CARTSLOT(config, m_caps2, generic_plain_slot, "px4_cart");
+	GENERIC_CARTSLOT(config, m_caps[0], generic_plain_slot, "px4_cart");
+	GENERIC_CARTSLOT(config, m_caps[1], generic_plain_slot, "px4_cart");
 
 	// software list
 	SOFTWARE_LIST(config, "cart_list").set_original("px4_cart");

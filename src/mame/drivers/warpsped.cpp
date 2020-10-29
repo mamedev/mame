@@ -171,7 +171,7 @@ static void draw_circle_line(bitmap_ind16 &bitmap, int x, int y, int l, int colo
 {
 	if (y >= 0 && y <= bitmap.height() - 1)
 	{
-		uint16_t* pLine = &bitmap.pix16(y);
+		uint16_t *const pLine = &bitmap.pix(y);
 
 		int h1 = x - l;
 		int h2 = x + l;

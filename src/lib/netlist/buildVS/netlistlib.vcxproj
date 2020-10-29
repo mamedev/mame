@@ -114,7 +114,7 @@
     <ClCompile Include="..\analog\nlid_fourterm.cpp" />
     <ClCompile Include="..\analog\nlid_twoterm.cpp" />
     <ClCompile Include="..\devices\net_lib.cpp" />
-    <ClCompile Include="..\devices\nld_2102A.cpp" />
+    <ClCompile Include="..\devices\nld_2102a.cpp" />
     <ClCompile Include="..\devices\nld_4006.cpp" />
     <ClCompile Include="..\devices\nld_4017.cpp" />
     <ClCompile Include="..\devices\nld_4029.cpp" />
@@ -160,8 +160,8 @@
     <ClCompile Include="..\devices\nld_7490.cpp" />
     <ClCompile Include="..\devices\nld_7493.cpp" />
     <ClCompile Include="..\devices\nld_74ls629.cpp" />
-    <ClCompile Include="..\devices\nld_82S115.cpp" />
-    <ClCompile Include="..\devices\nld_82S16.cpp" />
+    <ClCompile Include="..\devices\nld_82s115.cpp" />
+    <ClCompile Include="..\devices\nld_82s16.cpp" />
     <ClCompile Include="..\devices\nld_9310.cpp" />
     <ClCompile Include="..\devices\nld_9316.cpp" />
     <ClCompile Include="..\devices\nld_9322.cpp" />
@@ -179,9 +179,9 @@
     <ClCompile Include="..\devices\nlid_truthtable.cpp" />
     <ClCompile Include="..\generated\nlm_modules_lib.cpp" />
     <ClCompile Include="..\generated\static_solvers.cpp" />
-    <ClCompile Include="..\macro\modules\nlmod_ICL8038_DIP.cpp" />
-    <ClCompile Include="..\macro\modules\nlmod_NE556_DIP.cpp" />
-    <ClCompile Include="..\macro\modules\nlmod_RTEST.cpp" />
+    <ClCompile Include="..\macro\modules\nlmod_icl8038_dip.cpp" />
+    <ClCompile Include="..\macro\modules\nlmod_ne556_dip.cpp" />
+    <ClCompile Include="..\macro\modules\nlmod_rtest.cpp" />
     <ClCompile Include="..\macro\nlm_base_lib.cpp" />
     <ClCompile Include="..\macro\nlm_cd4xxx_lib.cpp" />
     <ClCompile Include="..\macro\nlm_opamp_lib.cpp" />

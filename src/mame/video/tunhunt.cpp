@@ -223,10 +223,10 @@ void tunhunt_state::draw_motion_object(bitmap_ind16 &bitmap, const rectangle &cl
 			const int color = ((span_data >> 6) & 0x3) ^ 0x3;
 			int count = (span_data & 0x1f) + 1;
 			while (count-- && x < 256)
-				tmpbitmap.pix16(line, x++) = color;
+				tmpbitmap.pix(line, x++) = color;
 		}
 		while (x < 256)
-			tmpbitmap.pix16(line, x++) = 0;
+			tmpbitmap.pix(line, x++) = 0;
 	}
 
 	int scaley;
@@ -303,7 +303,7 @@ void tunhunt_state::draw_box(bitmap_ind16 &bitmap, const rectangle &cliprect)
 					}
 				}
 				if (x >= cliprect.left() && x <= cliprect.right())
-					bitmap.pix16(0xff-y, x) = color;
+					bitmap.pix(0xff-y, x) = color;
 			}
 	}
 }

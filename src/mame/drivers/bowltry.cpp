@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood
 /************************************************************************************************************
 
-    Bowling Try
+    Bowling Try!
 
     (c)200? Atlus
 
@@ -30,7 +30,9 @@
 
 #include "emu.h"
 #include "cpu/h8/h83008.h"
+#include "sound/tt5665.h"
 #include "screen.h"
+#include "speaker.h"
 
 #define HACK_ENABLED 0
 
@@ -82,11 +84,13 @@ void bowltry_state::bowltry_map(address_map &map)
 	map.unmap_value_high();
 	map(0x000000, 0x07ffff).rom().region("maincpu", 0);
 	map(0x080000, 0x083fff).ram();
+	//map(0x200000, 0x200003).noprw();
+	//map(0x240000, 0x240001).noprw();
+	//map(0x400000, 0x400005).noprw();
 	map(0x600000, 0x60ffff).ram();
 #if HACK_ENABLED
 	map(0x60e090, 0x60e093).rw(FUNC(bowltry_state::hack_r), FUNC(bowltry_state::hack_w));
 #endif
-
 }
 
 static INPUT_PORTS_START( bowltry )
@@ -116,6 +120,9 @@ void bowltry_state::bowltry(machine_config &config)
 	//PALETTE(config, "palette").set_entries(65536);
 
 	/* tt5665 sound */
+	SPEAKER(config, "speaker").front_center();
+
+	TT5665(config, "tt5665", 16000000/4, tt5665_device::ss_state::SS_HIGH, 0).add_route(1, "speaker", 1.0); // guessed, needs to verification
 }
 
 ROM_START( bowltry )
@@ -131,4 +138,4 @@ ROM_START( bowltry )
 ROM_END
 
 
-GAME( 200?, bowltry, 0, bowltry, bowltry, bowltry_state, empty_init, ROT0, "Atlus", "Bowling Try", MACHINE_IS_SKELETON )
+GAME( 200?, bowltry, 0, bowltry, bowltry, bowltry_state, empty_init, ROT0, "Atlus", "Bowling Try!", MACHINE_IS_SKELETON )

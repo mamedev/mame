@@ -139,41 +139,37 @@ void nubus_xceed30hr_device::device_timer(emu_timer &timer, device_timer_id tid,
 
 uint32_t nubus_xceed30hr_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint32_t *scanline;
-	int x, y;
-	uint8_t pixels, *vram;
-
-	vram = &m_vram[1024];
+	uint8_t const *const vram = &m_vram[1024];
 
 	switch (m_mode)
 	{
 		case 0: // 1 bpp?
-			for (y = 0; y < 480; y++)
+			for (int y = 0; y < 480; y++)
 			{
-				scanline = &bitmap.pix32(y);
-				for (x = 0; x < 640/8; x++)
+				uint32_t *scanline = &bitmap.pix(y);
+				for (int x = 0; x < 640/8; x++)
 				{
-					pixels = vram[(y * 1024) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram[(y * 1024) + (BYTE4_XOR_BE(x))];
 
-					*scanline++ = m_palette[(pixels>>7)&1];
-					*scanline++ = m_palette[(pixels>>6)&1];
-					*scanline++ = m_palette[(pixels>>5)&1];
-					*scanline++ = m_palette[(pixels>>4)&1];
-					*scanline++ = m_palette[(pixels>>3)&1];
-					*scanline++ = m_palette[(pixels>>2)&1];
-					*scanline++ = m_palette[(pixels>>1)&1];
-					*scanline++ = m_palette[pixels&1];
+					*scanline++ = m_palette[BIT(pixels, 7)];
+					*scanline++ = m_palette[BIT(pixels, 6)];
+					*scanline++ = m_palette[BIT(pixels, 5)];
+					*scanline++ = m_palette[BIT(pixels, 4)];
+					*scanline++ = m_palette[BIT(pixels, 3)];
+					*scanline++ = m_palette[BIT(pixels, 2)];
+					*scanline++ = m_palette[BIT(pixels, 1)];
+					*scanline++ = m_palette[BIT(pixels, 0)];
 				}
 			}
 			break;
 
 		case 1: // 2 bpp
-			for (y = 0; y < 480; y++)
+			for (int y = 0; y < 480; y++)
 			{
-				scanline = &bitmap.pix32(y);
-				for (x = 0; x < 640/4; x++)
+				uint32_t *scanline = &bitmap.pix(y);
+				for (int x = 0; x < 640/4; x++)
 				{
-					pixels = vram[(y * 1024) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram[(y * 1024) + (BYTE4_XOR_BE(x))];
 
 					*scanline++ = m_palette[((pixels>>6)&3)];
 					*scanline++ = m_palette[((pixels>>4)&3)];
@@ -184,13 +180,12 @@ uint32_t nubus_xceed30hr_device::screen_update(screen_device &screen, bitmap_rgb
 			break;
 
 		case 2: // 4 bpp
-			for (y = 0; y < 480; y++)
+			for (int y = 0; y < 480; y++)
 			{
-				scanline = &bitmap.pix32(y);
-
-				for (x = 0; x < 640/2; x++)
+				uint32_t *scanline = &bitmap.pix(y);
+				for (int x = 0; x < 640/2; x++)
 				{
-					pixels = vram[(y * 1024) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram[(y * 1024) + (BYTE4_XOR_BE(x))];
 
 					*scanline++ = m_palette[(pixels>>4)];
 					*scanline++ = m_palette[(pixels&0xf)];
@@ -199,13 +194,12 @@ uint32_t nubus_xceed30hr_device::screen_update(screen_device &screen, bitmap_rgb
 			break;
 
 		case 3: // 8 bpp
-			for (y = 0; y < 480; y++)
+			for (int y = 0; y < 480; y++)
 			{
-				scanline = &bitmap.pix32(y);
-
-				for (x = 0; x < 640; x++)
+				uint32_t *scanline = &bitmap.pix(y);
+				for (int x = 0; x < 640; x++)
 				{
-					pixels = vram[(y * 1024) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram[(y * 1024) + (BYTE4_XOR_BE(x))];
 					*scanline++ = m_palette[pixels];
 				}
 			}

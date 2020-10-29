@@ -45,7 +45,6 @@ Limit for help/undo (matta):
 #include "machine/i8243.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/mc6845.h"
 
 #include "emupal.h"
@@ -132,9 +131,9 @@ private:
 
 MC6845_UPDATE_ROW( othello_state::crtc_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
-	const uint8_t *gfx = memregion("gfx")->base();
+	uint8_t const *const gfx = memregion("gfx")->base();
 
 	for(int cx = 0; cx < x_count; ++cx)
 	{
@@ -143,7 +142,7 @@ MC6845_UPDATE_ROW( othello_state::crtc_update_row )
 
 		for(int x = 0; x < TILE_WIDTH; ++x)
 		{
-			bitmap.pix32(y, (cx * TILE_WIDTH + x) ^ 1) = palette[tmp & 0x0f];
+			bitmap.pix(y, (cx * TILE_WIDTH + x) ^ 1) = palette[tmp & 0x0f];
 			tmp >>= 4;
 		}
 	}
@@ -434,9 +433,6 @@ void othello_state::othello(machine_config &config)
 	AY8910(config, m_ay[1], 2000000).add_route(ALL_OUTPUTS, "speaker", 0.15);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.3); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 ROM_START( othello )

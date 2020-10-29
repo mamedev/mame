@@ -8,11 +8,10 @@
 
 *********************************************************************/
 
+#include "wavfile.h"
+
 #include <cstdio>
 #include <cassert>
-
-#include "wavfile.h"
-#include "cassimg.h"
 
 static const char magic1[4] = { 'R', 'I', 'F', 'F' };
 static const char magic2[4] = { 'W', 'A', 'V', 'E' };
@@ -57,7 +56,7 @@ static void put_leuint16(void *ptr, uint16_t value)
 
 
 
-static cassette_image::error wavfile_process(cassette_image *cassette, struct CassetteOptions *opts,
+static cassette_image::error wavfile_process(cassette_image *cassette, cassette_image::Options *opts,
 	bool read_waveform)
 {
 	uint8_t file_header[12];
@@ -76,7 +75,7 @@ static cassette_image::error wavfile_process(cassette_image *cassette, struct Ca
 	int waveform_flags = 0;
 
 	/* read header */
-	cassette_image_read(cassette, file_header, 0, sizeof(file_header));
+	cassette->image_read(file_header, 0, sizeof(file_header));
 	offset = sizeof(file_header);
 
 	/* check magic numbers */
@@ -87,13 +86,13 @@ static cassette_image::error wavfile_process(cassette_image *cassette, struct Ca
 
 	/* read and sanity check size */
 	stated_size = get_leuint32(&file_header[4]) + 8;
-	file_size = cassette_image_size(cassette);
+	file_size = cassette->image_size();
 	if (stated_size > file_size)
 		stated_size = (uint32_t) file_size;
 
 	while(offset < stated_size)
 	{
-		cassette_image_read(cassette, tag_header, offset, sizeof(tag_header));
+		cassette->image_read(tag_header, offset, sizeof(tag_header));
 		tag_size = get_leuint32(&tag_header[4]);
 		offset += sizeof(tag_header);
 
@@ -104,7 +103,7 @@ static cassette_image::error wavfile_process(cassette_image *cassette, struct Ca
 				return cassette_image::error::INVALID_IMAGE;
 			format_specified = true;
 
-			cassette_image_read(cassette, format_tag, offset, sizeof(format_tag));
+			cassette->image_read(format_tag, offset, sizeof(format_tag));
 
 			format_type             = get_leuint16(&format_tag[0]);
 			opts->channels          = get_leuint16(&format_tag[2]);
@@ -121,13 +120,13 @@ static cassette_image::error wavfile_process(cassette_image *cassette, struct Ca
 			switch(opts->bits_per_sample)
 			{
 				case 8:
-					waveform_flags = CASSETTE_WAVEFORM_8BIT | CASSETTE_WAVEFORM_UNSIGNED;   // 8-bits wav are stored unsigned
+					waveform_flags = cassette_image::WAVEFORM_8BIT | cassette_image::WAVEFORM_UNSIGNED;   // 8-bits wav are stored unsigned
 					break;
 				case 16:
-					waveform_flags = CASSETTE_WAVEFORM_16BITLE;
+					waveform_flags = cassette_image::WAVEFORM_16BITLE;
 					break;
 				case 32:
-					waveform_flags = CASSETTE_WAVEFORM_32BITLE;
+					waveform_flags = cassette_image::WAVEFORM_32BITLE;
 					break;
 				default:
 					return cassette_image::error::INVALID_IMAGE;
@@ -142,7 +141,7 @@ static cassette_image::error wavfile_process(cassette_image *cassette, struct Ca
 			if (read_waveform)
 			{
 				tag_samples = tag_size / (opts->bits_per_sample / 8) / opts->channels;
-				cassette_read_samples(cassette, opts->channels, 0.0, tag_samples / ((double) opts->sample_frequency),
+				cassette->read_samples(opts->channels, 0.0, tag_samples / ((double) opts->sample_frequency),
 					tag_samples, offset, waveform_flags);
 			}
 		}
@@ -158,7 +157,7 @@ static cassette_image::error wavfile_process(cassette_image *cassette, struct Ca
 
 
 
-static cassette_image::error wavfile_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error wavfile_identify(cassette_image *cassette, cassette_image::Options *opts)
 {
 	return wavfile_process(cassette, opts, false);
 }
@@ -167,14 +166,14 @@ static cassette_image::error wavfile_identify(cassette_image *cassette, struct C
 
 static cassette_image::error wavfile_load(cassette_image *cassette)
 {
-	struct CassetteOptions opts;
+	cassette_image::Options opts;
 	memset(&opts, 0, sizeof(opts));
 	return wavfile_process(cassette, &opts, true);
 }
 
 
 
-static cassette_image::error wavfile_save(cassette_image *cassette, const struct CassetteInfo *info)
+static cassette_image::error wavfile_save(cassette_image *cassette, const cassette_image::Info *info)
 {
 	cassette_image::error err;
 	uint8_t consolidated_header[12 + 8 + 16 + 8];
@@ -187,7 +186,7 @@ static cassette_image::error wavfile_save(cassette_image *cassette, const struct
 	uint16_t bits_per_sample;
 	uint32_t data_size;
 	size_t bytes_per_sample = 2;
-	int waveform_flags = CASSETTE_WAVEFORM_16BITLE;
+	int waveform_flags = cassette_image::WAVEFORM_16BITLE;
 	uint16_t block_align;
 
 	bits_per_sample = (uint16_t) (bytes_per_sample * 8);
@@ -216,10 +215,10 @@ static cassette_image::error wavfile_save(cassette_image *cassette, const struct
 	put_leuint32(&data_tag_header[4],   data_size);
 
 	/* write consolidated header */
-	cassette_image_write(cassette, consolidated_header, 0, sizeof(consolidated_header));
+	cassette->image_write(consolidated_header, 0, sizeof(consolidated_header));
 
 	/* write out the actual data */
-	err = cassette_write_samples(cassette, info->channels, 0.0, info->sample_count
+	err = cassette->write_samples(info->channels, 0.0, info->sample_count
 		/ (double) info->sample_frequency, info->sample_count, sizeof(consolidated_header),
 		waveform_flags);
 	if (err != cassette_image::error::SUCCESS)
@@ -230,7 +229,7 @@ static cassette_image::error wavfile_save(cassette_image *cassette, const struct
 
 
 
-const struct CassetteFormat wavfile_format =
+const cassette_image::Format cassette_image::wavfile_format =
 {
 	"wav",
 	wavfile_identify,
@@ -264,7 +263,7 @@ void wavfile_testload(const char *fname)
 	if (!f)
 		return;
 
-	if (cassette_open(f, &stdio_ioprocs, &wavfile_format, CASSETTE_FLAG_READONLY, &cassette))
+	if (cassette_open(f, &stdio_ioprocs, &wavfile_format, cassette_image::FLAG_READONLY, &cassette))
 	{
 		fclose(f);
 		return;

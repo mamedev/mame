@@ -77,7 +77,7 @@ void rd100_state::machine_reset()
 HD44780_PIXEL_UPDATE(rd100_state::pixel_update)
 {
 	if (pos < 16)
-		bitmap.pix16(line * 8 + y, pos * 6 + x) = state;
+		bitmap.pix(line * 8 + y, pos * 6 + x) = state;
 }
 
 uint8_t rd100_state::keys_r()

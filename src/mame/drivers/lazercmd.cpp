@@ -235,7 +235,6 @@
 
 #include "emu.h"
 #include "includes/lazercmd.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -656,11 +655,6 @@ void lazercmd_state::lazercmd(machine_config &config)
 	DAC_1BIT(config, m_dac1, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
 	DAC_1BIT(config, m_dac2, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
 	DAC_1BIT(config, m_dac3, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac0", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac3", 1.0, DAC_VREF_POS_INPUT);
 }
 
 
@@ -692,9 +686,6 @@ void lazercmd_state::medlanes(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac2, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
 	DAC_1BIT(config, m_dac3, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac3", 1.0, DAC_VREF_POS_INPUT);
 }
 
 
@@ -726,9 +717,6 @@ void lazercmd_state::bbonk(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac2, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
 	DAC_1BIT(config, m_dac3, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac3", 1.0, DAC_VREF_POS_INPUT);
 }
 
 /***************************************************************************

@@ -71,20 +71,20 @@ private:
 
 u32 bmjr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	u8 y,ra,chr,gfx,fg=4;
-	u16 sy=0,ma=0x100,x;
-	u8 inv = (m_xor_display) ? 0xff : 0;
+	u8 fg=4;
+	u16 sy=0,ma=0x100;
+	u8 const inv = (m_xor_display) ? 0xff : 0;
 
-	for(y = 0; y < 24; y++ )
+	for(u8 y = 0; y < 24; y++ )
 	{
-		for (ra = 0; ra < 8; ra++)
+		for (u8 ra = 0; ra < 8; ra++)
 		{
-			u16 *p = &bitmap.pix16(sy++);
+			u16 *p = &bitmap.pix(sy++);
 
-			for (x = ma; x < ma + 32; x++)
+			for (u16 x = ma; x < ma + 32; x++)
 			{
-				chr = m_p_wram[x];
-				gfx = m_p_chargen[(chr<<3) | ra] ^ inv;
+				u8 const chr = m_p_wram[x];
+				u8 const gfx = m_p_chargen[(chr<<3) | ra] ^ inv;
 
 				/* Display a scanline of a character */
 				*p++ = BIT(gfx, 7) ? fg : 0;

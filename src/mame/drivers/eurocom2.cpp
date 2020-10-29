@@ -302,19 +302,16 @@ uint8_t waveterm_state::waveterm_adc()
 
 uint32_t eurocom2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x, y, offset, page;
-	uint16_t gfx, *p;
+	int const page = (m_vico[0] & 3) << 14;
 
-	page = (m_vico[0] & 3) << 14;
-
-	for (y = 0; y < VC_DISP_VERT; y++)
+	for (int y = 0; y < VC_DISP_VERT; y++)
 	{
-		offset = (VC_DISP_HORZ / 8) * ((m_vico[1] + y) % VC_DISP_VERT);
-		p = &m_tmpbmp.pix16(y);
+		int const offset = (VC_DISP_HORZ / 8) * ((m_vico[1] + y) % VC_DISP_VERT);
+		uint16_t *p = &m_tmpbmp.pix(y);
 
-		for (x = offset; x < offset + VC_DISP_HORZ / 8; x++)
+		for (int x = offset; x < offset + VC_DISP_HORZ / 8; x++)
 		{
-			gfx = m_p_videoram[page + x];
+			uint16_t const gfx = m_p_videoram[page + x];
 
 			for (int i = 7; i >= 0; i--)
 			{

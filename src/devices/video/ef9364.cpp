@@ -178,30 +178,27 @@ void ef9364_device::draw_border(uint16_t line)
 
 uint32_t ef9364_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int x,y,r;
-	unsigned char c;
-
-	for( r = 0 ; r < NB_OF_ROWS ; r++ )
+	for( int r = 0 ; r < NB_OF_ROWS ; r++ )
 	{
-		for( y = 0 ; y < 8 ; y++ )
+		for( int y = 0 ; y < 8 ; y++ )
 		{
-			for( x = 0 ; x < NB_OF_COLUMNS * 8 ; x++ )
+			for( int x = 0 ; x < NB_OF_COLUMNS * 8 ; x++ )
 			{
 				if( ( ( x >> 3 ) != x_curs_pos )   ||  ( r != y_curs_pos ) || !cursor_state)
 				{
-					c = m_textram->read_byte( ( r * NB_OF_COLUMNS ) + ( x>>3 ) );
+					unsigned char c = m_textram->read_byte( ( r * NB_OF_COLUMNS ) + ( x>>3 ) );
 
 					if( m_charset[((c&0x7F)<<3) + y] & (0x80>>(x&7)) )
-						m_screen_out.pix32((r*12)+y, x) = palette[1];
+						m_screen_out.pix((r*12)+y, x) = palette[1];
 					else
-						m_screen_out.pix32((r*12)+y, x) = palette[0];
+						m_screen_out.pix((r*12)+y, x) = palette[0];
 				}
 				else
 				{
 					if(y != 7)
-						m_screen_out.pix32((r*12)+y, x) = palette[0];
+						m_screen_out.pix((r*12)+y, x) = palette[0];
 					else
-						m_screen_out.pix32((r*12)+y, x) = palette[1];
+						m_screen_out.pix((r*12)+y, x) = palette[1];
 				}
 			}
 		}

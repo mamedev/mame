@@ -30,7 +30,7 @@ DEFINE_DEVICE_TYPE(O2_ROM_HOMECOMP, o2_homecomp_device, "o2_homecomp", "Odyssey 
 //  o2_homecomp_device - constructor
 //-------------------------------------------------
 
-o2_homecomp_device::o2_homecomp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+o2_homecomp_device::o2_homecomp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, O2_ROM_HOMECOMP, tag, owner, clock),
 	device_o2_cart_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu"),

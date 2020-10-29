@@ -889,7 +889,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_q(const char *buf)
 		if ( !hex_decode(&data, buf, strlen(buf) / 2) )
 			return REPLY_ENN;
 		std::string command(data.begin(), data.end());
-		text_buffer *textbuf = m_debugger_console->get_console_textbuf();
+		text_buffer &textbuf = m_debugger_console->get_console_textbuf();
 		text_buffer_clear(textbuf);
 		m_debugger_console->execute_command(command, false);
 		uint32_t nlines = text_buffer_num_lines(textbuf);

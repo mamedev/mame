@@ -401,7 +401,7 @@ double speaker_sound_device::get_filtered_volume()
 	{
 		if (i >= FILTER_LENGTH) i = 0;
 		filtered_volume += m_composed_volume[i] * m_ampl[c];
-		ampsum += m_ampl[c];
+		ampsum += std::abs(m_ampl[c]);
 	}
 	filtered_volume /= ampsum;
 

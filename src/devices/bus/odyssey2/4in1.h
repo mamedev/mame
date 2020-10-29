@@ -21,7 +21,7 @@ class o2_4in1_device : public device_t,
 {
 public:
 	// construction/destruction
-	o2_4in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	o2_4in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	// device-level overrides

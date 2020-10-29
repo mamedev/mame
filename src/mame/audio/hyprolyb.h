@@ -8,7 +8,7 @@
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
 
-class hyprolyb_adpcm_device : public device_t, public device_sound_interface
+class hyprolyb_adpcm_device : public device_t
 {
 public:
 	hyprolyb_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -26,9 +26,6 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-
-	// sound stream update overrides
-	virtual void sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples) override;
 
 	private:
 	// internal state

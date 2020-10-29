@@ -437,24 +437,20 @@ void playmark_state::bigtwinb_draw_sprites( screen_device &screen, bitmap_ind16 
 
 void playmark_state::draw_bitmap( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	int x, y, count;
-	int color;
-	uint8_t *pri;
-
-	count = 0;
-	for (y = 0; y < 512; y++)
+	int count = 0;
+	for (int y = 0; y < 512; y++)
 	{
-		for (x = 0; x < 512; x++)
+		for (int x = 0; x < 512; x++)
 		{
-			color = m_bgvideoram[count] & 0xff;
+			int const color = m_bgvideoram[count] & 0xff;
 
 			if (color)
 			{
 				if (m_bg_full_size)
 				{
-					bitmap.pix16((y + m_bgscrolly) & 0x1ff, (x + m_bgscrollx) & 0x1ff) = 0x100 + color;
+					bitmap.pix((y + m_bgscrolly) & 0x1ff, (x + m_bgscrollx) & 0x1ff) = 0x100 + color;
 
-					pri = &screen.priority().pix8((y + m_bgscrolly) & 0x1ff);
+					uint8_t *const pri = &screen.priority().pix((y + m_bgscrolly) & 0x1ff);
 					pri[(x + m_bgscrollx) & 0x1ff] |= 2;
 				}
 				else
@@ -462,9 +458,9 @@ void playmark_state::draw_bitmap( screen_device &screen, bitmap_ind16 &bitmap, c
 					/* 50% size */
 					if(!(x % 2) && !(y % 2))
 					{
-						bitmap.pix16((y / 2 + m_bgscrolly) & 0x1ff, (x / 2 + m_bgscrollx) & 0x1ff) = 0x100 + color;
+						bitmap.pix((y / 2 + m_bgscrolly) & 0x1ff, (x / 2 + m_bgscrollx) & 0x1ff) = 0x100 + color;
 
-						pri = &screen.priority().pix8((y / 2 + m_bgscrolly) & 0x1ff);
+						uint8_t *const pri = &screen.priority().pix((y / 2 + m_bgscrolly) & 0x1ff);
 						pri[(x / 2 + m_bgscrollx) & 0x1ff] |= 2;
 					}
 				}

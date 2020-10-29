@@ -130,9 +130,11 @@ pic16c5x_device::pic16c5x_device(const machine_config &mconfig, device_type type
 					   , ( ( program_width == 9 ) ? address_map_constructor(FUNC(pic16c5x_device::rom_9), this): ( ( program_width == 10 ) ? address_map_constructor(FUNC(pic16c5x_device::rom_10), this) : address_map_constructor(FUNC(pic16c5x_device::rom_11), this) )))
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, data_width, 0
 					, ( ( data_width == 5 ) ? address_map_constructor(FUNC(pic16c5x_device::ram_5), this) : address_map_constructor(FUNC(pic16c5x_device::ram_7), this) ) )
+	, m_internalram(nullptr)
 	, m_reset_vector((program_width == 9) ? 0x1ff : ((program_width == 10) ? 0x3ff : 0x7ff))
 	, m_picmodel(picmodel)
 	, m_temp_config(0)
+	, m_rtcc(0)
 	, m_picRAMmask((data_width == 5) ? 0x1f : 0x7f)
 	, m_read_a(*this)
 	, m_read_b(*this)

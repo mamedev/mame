@@ -220,18 +220,14 @@ uint8_t mermaid_state::collision_check( rectangle& rect )
 {
 	uint8_t data = 0;
 
-	int x;
-	int y;
-
-	for (y = rect.top(); y <= rect.bottom(); y++)
-		for (x = rect.left(); x <= rect.right(); x++)
+	for (int y = rect.top(); y <= rect.bottom(); y++)
+		for (int x = rect.left(); x <= rect.right(); x++)
 		{
-			uint16_t a = m_palette->pen_indirect(m_helper.pix16(y, x)) & 0x3f;
-			uint16_t b = m_palette->pen_indirect(m_helper2.pix16(y, x)) & 0x3f;
+			uint16_t const a = m_palette->pen_indirect(m_helper.pix(y, x)) & 0x3f;
+			uint16_t const b = m_palette->pen_indirect(m_helper2.pix(y, x)) & 0x3f;
 
-			if (b)
-				if (a)
-					data |= 0x01;
+			if (b && a)
+				data |= 0x01;
 		}
 
 	return data;

@@ -266,16 +266,16 @@ uint32_t bosco_state::screen_update_bosco(screen_device &screen, bitmap_ind16 &b
 		{
 			for (int x = 63; x >= 0; x--)
 			{
-				bitmap.pix16(y, x + 3) = bitmap.pix16(y, x);
-				bitmap.pix16(y, x) = m_palette->black_pen();
+				bitmap.pix(y, x + 3) = bitmap.pix(y, x);
+				bitmap.pix(y, x) = m_palette->black_pen();
 			}
 		}
 		else
 		{
 			for (int x = 224; x < 288; x++)
 			{
-				bitmap.pix16(y, x - 3) = bitmap.pix16(y, x);
-				bitmap.pix16(y, x) = m_palette->black_pen();
+				bitmap.pix(y, x - 3) = bitmap.pix(y, x);
+				bitmap.pix(y, x) = m_palette->black_pen();
 			}
 		}
 	}

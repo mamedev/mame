@@ -1177,8 +1177,8 @@ int k056832_device::update_linemap( screen_device &screen, BitmapClass &bitmap, 
 			{
 				tile_data tileinfo = {0};
 
-				dst_ptr = &pixmap->pix16(line);
-				xpr_ptr = &xprmap.pix8(line);
+				dst_ptr = &pixmap->pix(line);
+				xpr_ptr = &xprmap.pix(line);
 
 				if (!all_dirty)
 				{
@@ -2106,8 +2106,8 @@ int k056832_device::altK056832_update_linemap(screen_device &screen, bitmap_rgb3
 			{
 				tile_data tileinfo = {0};
 
-				dst_ptr = &pixmap->pix16(line);
-				xpr_ptr = &xprmap.pix8(line);
+				dst_ptr = &pixmap->pix(line);
+				xpr_ptr = &xprmap.pix(line);
 
 				if (!all_dirty)
 				{

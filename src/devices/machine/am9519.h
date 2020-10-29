@@ -32,7 +32,7 @@
 class am9519_device : public device_t
 {
 public:
-	am9519_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	am9519_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	auto out_int_callback() { return m_out_int_func.bind(); }
 

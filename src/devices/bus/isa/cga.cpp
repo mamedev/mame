@@ -469,47 +469,43 @@ isa8_cga_superimpose_device::isa8_cga_superimpose_device(const machine_config &m
 template<bool blink, bool si, bool comp, bool alt, int width>
 MC6845_UPDATE_ROW( isa8_cga_device::cga_text )
 {
-	uint8_t *videoram = &m_vram[m_start_offset];
-	uint32_t  *p = &bitmap.pix32(y);
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	int i;
+	uint8_t const *const videoram = &m_vram[m_start_offset];
+	uint32_t *p = &bitmap.pix(y);
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
-	if ( y == 0 ) CGA_LOG(1,"cga_text_8",("\n"));
-	for ( i = 0; i < x_count; i++ )
+	if (y == 0) CGA_LOG(1,"cga_text_8",("\n"));
+	for (int i = 0; i < x_count; i++)
 	{
-		uint16_t offset = ( ( ma + i ) << 1 ) & 0x3fff;
-		uint8_t chr = videoram[ offset ];
-		uint8_t attr = videoram[ offset +1 ];
-		uint8_t data = m_chr_gen[ chr * width + ra ];
+		uint16_t const offset = ((ma + i) << 1) & 0x3fff;
+		uint8_t const chr = videoram[offset];
+		uint8_t const attr = videoram[offset +1];
+		uint8_t data = m_chr_gen[chr * width + ra];
 		uint16_t fg, bg;
-		uint8_t xi;
 
-		if ( comp )
+		if (comp)
 		{
-			fg = 0x10 + ( attr & 0x0F );
-			bg = alt ? 0 : ( 0x10 + ( ( attr >> 4 ) & 0x07 ) );
+			fg = 0x10 + (attr & 0x0f);
+			bg = alt ? 0 : (0x10 + ((attr >> 4) & 0x07));
 		}
 		else
 		{
 			fg = attr & 0x0F;
-			bg = alt ? 0 : ( ( attr >> 4 ) & ( blink ? 0x07 : 0x0f ) );
+			bg = alt ? 0 : ((attr >> 4) & (blink ? 0x07 : 0x0f));
 		}
 
-		if ( ( i == cursor_x ) && ( m_framecnt & 0x08 ) )
-			data = 0xFF;
-		else if ( blink && ( attr & 0x80 ) && ( m_framecnt & 0x10 ) )
+		if ((i == cursor_x) && (m_framecnt & 0x08))
+			data = 0xff;
+		else if (blink && (attr & 0x80) && (m_framecnt & 0x10))
 		{
 			data = 0x00;
-			bg = ( attr >> 4 ) & 0x07;
+			bg = (attr >> 4) & 0x07;
 		}
 
-		for(xi=0;xi<8;xi++)
+		for (int xi = 0; xi < 8; xi++)
 		{
-			uint8_t pen_data, dot;
-
-			dot = (data & (1 << (7-xi)));
-			pen_data = dot ? fg : bg;
-			if(!si || (pen_data || dot))
+			uint8_t const dot = (data & (1 << (7 - xi)));
+			uint8_t const pen_data = dot ? fg : bg;
+			if (!si || (pen_data || dot))
 				*p = palette[pen_data];
 			p++;
 		}
@@ -521,28 +517,29 @@ MC6845_UPDATE_ROW( isa8_cga_device::cga_text )
 
 MC6845_UPDATE_ROW( isa8_cga_device::cga_gfx_4bppl_update_row )
 {
-	uint8_t *videoram = &m_vram[m_start_offset];
-	uint32_t  *p = &bitmap.pix32(y);
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	int i;
+	uint8_t const *const videoram = &m_vram[m_start_offset];
+	uint32_t *p = &bitmap.pix(y);
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
-	if ( y == 0 ) CGA_LOG(1,"cga_gfx_4bppl_update_row",("\n"));
-	for ( i = 0; i < x_count; i++ )
+	if (y == 0) CGA_LOG(1,"cga_gfx_4bppl_update_row",("\n"));
+	for (int i = 0; i < x_count; i++)
 	{
-		uint16_t offset = ( ( ( ma + i ) << 1 ) & 0x1fff ) | ( ( y & 1 ) << 13 );
-		uint8_t data = videoram[ offset ];
+		uint16_t const offset = (((ma + i) << 1) & 0x1fff) | ((y & 1) << 13);
+		uint8_t data;
 
-		*p = palette[data >> 4]; p++;
-		*p = palette[data >> 4]; p++;
-		*p = palette[data & 0x0F]; p++;
-		*p = palette[data & 0x0F]; p++;
+		data = videoram[offset];
 
-		data = videoram[ offset + 1 ];
+		*p++ = palette[data >> 4];
+		*p++ = palette[data >> 4];
+		*p++ = palette[data & 0x0f];
+		*p++ = palette[data & 0x0f];
 
-		*p = palette[data >> 4]; p++;
-		*p = palette[data >> 4]; p++;
-		*p = palette[data & 0x0F]; p++;
-		*p = palette[data & 0x0F]; p++;
+		data = videoram[offset + 1];
+
+		*p++ = palette[data >> 4];
+		*p++ = palette[data >> 4];
+		*p++ = palette[data & 0x0f];
+		*p++ = palette[data & 0x0f];
 	}
 }
 
@@ -580,37 +577,37 @@ static const uint8_t yc_lut[16][8] =
 
 MC6845_UPDATE_ROW( isa8_cga_device::cga_gfx_4bpph_update_row )
 {
-	uint8_t *videoram = &m_vram[m_start_offset];
-	uint32_t  *p = &bitmap.pix32(y);
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	int i;
+	uint8_t const *const videoram = &m_vram[m_start_offset];
+	uint32_t *p = &bitmap.pix(y);
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
-	if ( y == 0 ) CGA_LOG(1,"cga_gfx_4bpph_update_row",("\n"));
-
-	for ( i = 0; i < x_count; i++ )
+	if (y == 0) CGA_LOG(1,"cga_gfx_4bpph_update_row",("\n"));
+	for (int i = 0; i < x_count; i++)
 	{
-		uint16_t offset = ( ( ( ma + i ) << 1 ) & 0x1fff ) | ( ( y & 1 ) << 13 );
-		uint8_t data = videoram[ offset ];
+		uint16_t const offset = (((ma + i) << 1) & 0x1fff) | ((y & 1) << 13);
+		uint8_t data;
 
-		*p = palette[data >> 4]; p++;
-		*p = palette[data >> 4]; p++;
-		*p = palette[data >> 4]; p++;
-		*p = palette[data >> 4]; p++;
-		*p = palette[data & 0x0F]; p++;
-		*p = palette[data & 0x0F]; p++;
-		*p = palette[data & 0x0F]; p++;
-		*p = palette[data & 0x0F]; p++;
+		data = videoram[offset];
 
-		data = videoram[ offset + 1 ];
+		*p++ = palette[data >> 4];
+		*p++ = palette[data >> 4];
+		*p++ = palette[data >> 4];
+		*p++ = palette[data >> 4];
+		*p++ = palette[data & 0x0f];
+		*p++ = palette[data & 0x0f];
+		*p++ = palette[data & 0x0f];
+		*p++ = palette[data & 0x0f];
 
-		*p = palette[data >> 4]; p++;
-		*p = palette[data >> 4]; p++;
-		*p = palette[data >> 4]; p++;
-		*p = palette[data >> 4]; p++;
-		*p = palette[data & 0x0F]; p++;
-		*p = palette[data & 0x0F]; p++;
-		*p = palette[data & 0x0F]; p++;
-		*p = palette[data & 0x0F]; p++;
+		data = videoram[offset + 1];
+
+		*p++ = palette[data >> 4];
+		*p++ = palette[data >> 4];
+		*p++ = palette[data >> 4];
+		*p++ = palette[data >> 4];
+		*p++ = palette[data & 0x0f];
+		*p++ = palette[data & 0x0f];
+		*p++ = palette[data & 0x0f];
+		*p++ = palette[data & 0x0f];
 	}
 }
 
@@ -623,28 +620,29 @@ MC6845_UPDATE_ROW( isa8_cga_device::cga_gfx_4bpph_update_row )
 
 MC6845_UPDATE_ROW( isa8_cga_device::cga_gfx_2bpp_update_row )
 {
-	uint8_t *videoram = &m_vram[m_start_offset];
-	uint32_t  *p = &bitmap.pix32(y);
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	int i;
+	uint8_t const *const videoram = &m_vram[m_start_offset];
+	uint32_t *p = &bitmap.pix(y);
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
-	if ( y == 0 ) CGA_LOG(1,"cga_gfx_2bpp_update_row",("\n"));
-	for ( i = 0; i < x_count; i++ )
+	if (y == 0) CGA_LOG(1,"cga_gfx_2bpp_update_row",("\n"));
+	for (int i = 0; i < x_count; i++)
 	{
-		uint16_t offset = ( ( ( ma + i ) << 1 ) & 0x1fff ) | ( ( ra & 1 ) << 13 );
-		uint8_t data = videoram[ offset ];
+		uint16_t const offset = (((ma + i) << 1) & 0x1fff) | ((ra & 1) << 13);
+		uint8_t data;
 
-		*p = palette[m_palette_lut_2bpp[ ( data >> 6 ) & 0x03 ]]; p++;
-		*p = palette[m_palette_lut_2bpp[ ( data >> 4 ) & 0x03 ]]; p++;
-		*p = palette[m_palette_lut_2bpp[ ( data >> 2 ) & 0x03 ]]; p++;
-		*p = palette[m_palette_lut_2bpp[   data        & 0x03 ]]; p++;
+		data = videoram[offset];
 
-		data = videoram[ offset+1 ];
+		*p++ = palette[m_palette_lut_2bpp[(data >> 6) & 0x03]];
+		*p++ = palette[m_palette_lut_2bpp[(data >> 4) & 0x03]];
+		*p++ = palette[m_palette_lut_2bpp[(data >> 2) & 0x03]];
+		*p++ = palette[m_palette_lut_2bpp[ data       & 0x03]];
 
-		*p = palette[m_palette_lut_2bpp[ ( data >> 6 ) & 0x03 ]]; p++;
-		*p = palette[m_palette_lut_2bpp[ ( data >> 4 ) & 0x03 ]]; p++;
-		*p = palette[m_palette_lut_2bpp[ ( data >> 2 ) & 0x03 ]]; p++;
-		*p = palette[m_palette_lut_2bpp[   data        & 0x03 ]]; p++;
+		data = videoram[offset + 1];
+
+		*p++ = palette[m_palette_lut_2bpp[(data >> 6) & 0x03]];
+		*p++ = palette[m_palette_lut_2bpp[(data >> 4) & 0x03]];
+		*p++ = palette[m_palette_lut_2bpp[(data >> 2) & 0x03]];
+		*p++ = palette[m_palette_lut_2bpp[ data       & 0x03]];
 	}
 }
 
@@ -658,37 +656,38 @@ MC6845_UPDATE_ROW( isa8_cga_device::cga_gfx_2bpp_update_row )
 
 MC6845_UPDATE_ROW( isa8_cga_device::cga_gfx_1bpp_update_row )
 {
-	uint8_t *videoram = &m_vram[m_start_offset];
-	uint32_t  *p = &bitmap.pix32(y);
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint8_t   fg = m_color_select & 0x0F;
-	int i;
+	uint8_t const *const videoram = &m_vram[m_start_offset];
+	uint32_t *p = &bitmap.pix(y);
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint8_t const fg = m_color_select & 0x0f;
 
-	if ( y == 0 ) CGA_LOG(1,"cga_gfx_1bpp_update_row",("\n"));
-	for ( i = 0; i < x_count; i++ )
+	if (y == 0) CGA_LOG(1,"cga_gfx_1bpp_update_row",("\n"));
+	for (int i = 0; i < x_count; i++)
 	{
-		uint16_t offset = ( ( ( ma + i ) << 1 ) & 0x1fff ) | ( ( ra & 1 ) << 13 );
-		uint8_t data = videoram[ offset ];
+		uint16_t const offset = (((ma + i) << 1) & 0x1fff) | ((ra & 1) << 13);
+		uint8_t data;
 
-		*p = palette[( data & 0x80 ) ? fg : 0]; p++;
-		*p = palette[( data & 0x40 ) ? fg : 0]; p++;
-		*p = palette[( data & 0x20 ) ? fg : 0]; p++;
-		*p = palette[( data & 0x10 ) ? fg : 0]; p++;
-		*p = palette[( data & 0x08 ) ? fg : 0]; p++;
-		*p = palette[( data & 0x04 ) ? fg : 0]; p++;
-		*p = palette[( data & 0x02 ) ? fg : 0]; p++;
-		*p = palette[( data & 0x01 ) ? fg : 0]; p++;
+		data = videoram[offset];
 
-		data = videoram[ offset + 1 ];
+		*p++ = palette[(data & 0x80) ? fg : 0];
+		*p++ = palette[(data & 0x40) ? fg : 0];
+		*p++ = palette[(data & 0x20) ? fg : 0];
+		*p++ = palette[(data & 0x10) ? fg : 0];
+		*p++ = palette[(data & 0x08) ? fg : 0];
+		*p++ = palette[(data & 0x04) ? fg : 0];
+		*p++ = palette[(data & 0x02) ? fg : 0];
+		*p++ = palette[(data & 0x01) ? fg : 0];
 
-		*p = palette[( data & 0x80 ) ? fg : 0]; p++;
-		*p = palette[( data & 0x40 ) ? fg : 0]; p++;
-		*p = palette[( data & 0x20 ) ? fg : 0]; p++;
-		*p = palette[( data & 0x10 ) ? fg : 0]; p++;
-		*p = palette[( data & 0x08 ) ? fg : 0]; p++;
-		*p = palette[( data & 0x04 ) ? fg : 0]; p++;
-		*p = palette[( data & 0x02 ) ? fg : 0]; p++;
-		*p = palette[( data & 0x01 ) ? fg : 0]; p++;
+		data = videoram[offset + 1];
+
+		*p++ = palette[(data & 0x80) ? fg : 0];
+		*p++ = palette[(data & 0x40) ? fg : 0];
+		*p++ = palette[(data & 0x20) ? fg : 0];
+		*p++ = palette[(data & 0x10) ? fg : 0];
+		*p++ = palette[(data & 0x08) ? fg : 0];
+		*p++ = palette[(data & 0x04) ? fg : 0];
+		*p++ = palette[(data & 0x02) ? fg : 0];
+		*p++ = palette[(data & 0x01) ? fg : 0];
 	}
 }
 
@@ -961,205 +960,200 @@ void isa8_cga_device::io_write(offs_t offset, uint8_t data)
 //          proc = cga_pgfx_4bpp;
 //
 
-//static inline void pgfx_plot_unit_4bpp(bitmap_ind16 &bitmap,
-//                           int x, int y, int offs)
-//{
-//  int color, values[2];
-//  int i;
-//
-//  if (cga.plantronics & 0x40)
-//  {
-//      values[0] = videoram[offs | 0x4000];
-//      values[1] = videoram[offs];
-//  }
-//  else
-//  {
-//      values[0] = videoram[offs];
-//      values[1] = videoram[offs | 0x4000];
-//  }
-//  for (i=3; i>=0; i--)
-//  {
-//      color = ((values[0] & 0x3) << 1) |
-//          ((values[1] & 2)   >> 1) |
-//          ((values[1] & 1)   << 3);
-//      bitmap.pix16(y, x+i) = Machine->pens[color];
-//      values[0]>>=2;
-//      values[1]>>=2;
-//  }
-//}
-//
-//
-//
+#if 0
+static inline void pgfx_plot_unit_4bpp(bitmap_ind16 &bitmap, int x, int y, int offs)
+{
+	int values[2];
+
+	if (cga.plantronics & 0x40)
+	{
+		values[0] = videoram[offs | 0x4000];
+		values[1] = videoram[offs];
+	}
+	else
+	{
+		values[0] = videoram[offs];
+		values[1] = videoram[offs | 0x4000];
+	}
+	for (int i = 3; i >= 0; i--)
+	{
+		int const color =
+				((values[0] & 0x3) << 1) |
+				((values[1] & 2)   >> 1) |
+				((values[1] & 1)   << 3);
+		bitmap.pix(y, x + i) = Machine->pens[color];
+		values[0] >>= 2;
+		values[1] >>= 2;
+	}
+}
+#endif
+
+
 ///***************************************************************************
 //  Draw graphics mode with 640x200 pixels (default) with 2 bits/pixel.
 //  Even scanlines are from CGA_base + 0x0000, odd from CGA_base + 0x2000
 //  Second plane at CGA_base + 0x4000 / 0x6000
-//***************************************************************************/
-//
-//static void cga_pgfx_4bpp(bitmap_ind16 &bitmap, struct mscrtc6845 *crtc)
-//{
-//  int i, sx, sy, sh;
-//  int offs = mscrtc6845_get_start(crtc)*2;
-//  int lines = mscrtc6845_get_char_lines(crtc);
-//  int height = mscrtc6845_get_char_height(crtc);
-//  int columns = mscrtc6845_get_char_columns(crtc)*2;
-//
-//  for (sy=0; sy<lines; sy++,offs=(offs+columns)&0x1fff)
-//  {
-//      for (sh=0; sh<height; sh++, offs|=0x2000)
-//      {
-//          // char line 0 used as a12 line in graphic mode
-//          if (!(sh & 1))
-//          {
-//              for (i=offs, sx=0; sx<columns; sx++, i=(i+1)&0x1fff)
-//              {
-//                  pgfx_plot_unit_4bpp(bitmap, sx*4, sy*height+sh, i);
-//              }
-//          }
-//          else
-//          {
-//              for (i=offs|0x2000, sx=0; sx<columns; sx++, i=((i+1)&0x1fff)|0x2000)
-//              {
-//                  pgfx_plot_unit_4bpp(bitmap, sx*4, sy*height+sh, i);
-//              }
-//          }
-//      }
-//  }
-//}
-//
-//
-//
-//static inline void pgfx_plot_unit_2bpp(bitmap_ind16 &bitmap,
-//                   int x, int y, const uint16_t *palette, int offs)
-//{
-//  int i;
-//  uint8_t bmap[2], values[2];
-//  uint16_t *dest;
-//
-//  if (cga.plantronics & 0x40)
-//  {
-//      values[0] = videoram[offs];
-//      values[1] = videoram[offs | 0x4000];
-//  }
-//  else
-//  {
-//      values[0] = videoram[offs | 0x4000];
-//      values[1] = videoram[offs];
-//  }
-//  bmap[0] = bmap[1] = 0;
-//  for (i=3; i>=0; i--)
-//  {
-//      bmap[0] = bmap[0] << 1; if (values[0] & 0x80) bmap[0] |= 1;
-//      bmap[0] = bmap[0] << 1; if (values[1] & 0x80) bmap[0] |= 1;
-//      bmap[1] = bmap[1] << 1; if (values[0] & 0x08) bmap[1] |= 1;
-//      bmap[1] = bmap[1] << 1; if (values[1] & 0x08) bmap[1] |= 1;
-//      values[0] = values[0] << 1;
-//      values[1] = values[1] << 1;
-//  }
-//
-//  dest = &bitmap.pix16(y, x);
-//  *(dest++) = palette[(bmap[0] >> 6) & 0x03];
-//  *(dest++) = palette[(bmap[0] >> 4) & 0x03];
-//  *(dest++) = palette[(bmap[0] >> 2) & 0x03];
-//  *(dest++) = palette[(bmap[0] >> 0) & 0x03];
-//  *(dest++) = palette[(bmap[1] >> 6) & 0x03];
-//  *(dest++) = palette[(bmap[1] >> 4) & 0x03];
-//  *(dest++) = palette[(bmap[1] >> 2) & 0x03];
-//  *(dest++) = palette[(bmap[1] >> 0) & 0x03];
-//}
-//
-//
-//
+//****************************************************************************
+
+#if 0
+static void cga_pgfx_4bpp(bitmap_ind16 &bitmap, struct mscrtc6845 *crtc)
+{
+	int offs = mscrtc6845_get_start(crtc) * 2;
+	int const lines = mscrtc6845_get_char_lines(crtc);
+	int const height = mscrtc6845_get_char_height(crtc);
+	int columns = mscrtc6845_get_char_columns(crtc) * 2;
+
+	for (int sy = 0; sy < lines; sy++, offs = (offs + columns) & 0x1fff)
+	{
+		for (int sh = 0; sh < height; sh++, offs |= 0x2000)
+		{
+			// char line 0 used as a12 line in graphic mode
+			if (!(sh & 1))
+			{
+				for (int i = offs, sx = 0; sx < columns; sx++, i = (i + 1) & 0x1fff)
+				{
+					pgfx_plot_unit_4bpp(bitmap, sx * 4, sy * height + sh, i);
+				}
+			}
+			else
+			{
+				for (int i = offs | 0x2000, sx = 0; sx < columns; sx++, i = ((i + 1) & 0x1fff) | 0x2000)
+				{
+					pgfx_plot_unit_4bpp(bitmap, sx * 4, sy * height + sh, i);
+				}
+			}
+		}
+	}
+}
+#endif
+
+
+#if 0
+static inline void pgfx_plot_unit_2bpp(bitmap_ind16 &bitmap, int x, int y, const uint16_t *palette, int offs)
+{
+	uint8_t values[2];
+	if (cga.plantronics & 0x40)
+	{
+		values[0] = videoram[offs];
+		values[1] = videoram[offs | 0x4000];
+	}
+	else
+	{
+		values[0] = videoram[offs | 0x4000];
+		values[1] = videoram[offs];
+	}
+	uint8_t bmap[2] = { 0, 0 };
+	for (int i = 3; i >= 0; i--)
+	{
+		bmap[0] = (bmap[0] << 1) | BIT(values[0], 7);
+		bmap[0] = (bmap[0] << 1) | BIT(values[1], 7);
+		bmap[1] = (bmap[1] << 1) | BIT(values[0], 3);
+		bmap[1] = (bmap[1] << 1) | BIT(values[1], 3);
+		values[0] <<= 1;
+		values[1] <<= 1;
+	}
+
+	uint16_t *dest = &bitmap.pix(y, x);
+	*dest++ = palette[(bmap[0] >> 6) & 0x03];
+	*dest++ = palette[(bmap[0] >> 4) & 0x03];
+	*dest++ = palette[(bmap[0] >> 2) & 0x03];
+	*dest++ = palette[(bmap[0] >> 0) & 0x03];
+	*dest++ = palette[(bmap[1] >> 6) & 0x03];
+	*dest++ = palette[(bmap[1] >> 4) & 0x03];
+	*dest++ = palette[(bmap[1] >> 2) & 0x03];
+	*dest++ = palette[(bmap[1] >> 0) & 0x03];
+}
+#endif
+
+
 ///***************************************************************************
 //  Draw graphics mode with 320x200 pixels (default) with 2 bits/pixel.
 //  Even scanlines are from CGA_base + 0x0000, odd from CGA_base + 0x2000
 //  cga fetches 2 byte per mscrtc6845 access (not modeled here)!
-//***************************************************************************/
-//
-//static void cga_pgfx_2bpp(bitmap_ind16 &bitmap, struct mscrtc6845 *crtc)
-//{
-//  int i, sx, sy, sh;
-//  int offs = mscrtc6845_get_start(crtc)*2;
-//  int lines = mscrtc6845_get_char_lines(crtc);
-//  int height = mscrtc6845_get_char_height(crtc);
-//  int columns = mscrtc6845_get_char_columns(crtc)*2;
-//  int colorset = cga.color_select & 0x3F;
-//  const uint16_t *palette;
-//
-//  /* Most chipsets use bit 2 of the mode control register to
-//   * access a third palette. But not consistently. */
-//  pc_cga_check_palette();
-//  switch(CGA_CHIPSET)
-//  {
-//      /* The IBM Professional Graphics Controller behaves like
-//       * the PC1512, btw. */
-//      case CGA_CHIPSET_PC1512:
-//      if ((colorset < 32) && (cga.mode_control & 4)) colorset += 64;
-//      break;
-//
-//      case CGA_CHIPSET_IBM:
-//      case CGA_CHIPSET_PC200:
-//      case CGA_CHIPSET_ATI:
-//      case CGA_CHIPSET_PARADISE:
-//      if (cga.mode_control & 4) colorset = (colorset & 0x1F) + 64;
-//      break;
-//  }
-//
-//
-//  /* The fact that our palette is located in cga_colortable is a vestigial
-//   * aspect from when we were doing that ugly trick where drawgfx() would
-//   * handle graphics drawing.  Truthfully, we should probably be using
-//   * palette_set_color_rgb() here and not doing the palette lookup in the loop
-//   */
-//  palette = &cga_colortable[256*2 + 16*2] + colorset * 4;
-//
-//  for (sy=0; sy<lines; sy++,offs=(offs+columns)&0x1fff) {
-//
-//      for (sh=0; sh<height; sh++)
-//      {
-//          if (!(sh&1)) { // char line 0 used as a12 line in graphic mode
-//              for (i=offs, sx=0; sx<columns; sx++, i=(i+1)&0x1fff)
-//              {
-//                  pgfx_plot_unit_2bpp(bitmap, sx*8, sy*height+sh, palette, i);
-//              }
-//          }
-//          else
-//          {
-//              for (i=offs|0x2000, sx=0; sx<columns; sx++, i=((i+1)&0x1fff)|0x2000)
-//              {
-//                  pgfx_plot_unit_2bpp(bitmap, sx*8, sy*height+sh, palette, i);
-//              }
-//          }
-//      }
-//  }
-//}
+//****************************************************************************
+
+#if 0
+static void cga_pgfx_2bpp(bitmap_ind16 &bitmap, struct mscrtc6845 *crtc)
+{
+	int offs = mscrtc6845_get_start(crtc) * 2;
+	int const lines = mscrtc6845_get_char_lines(crtc);
+	int const height = mscrtc6845_get_char_height(crtc);
+	int const columns = mscrtc6845_get_char_columns(crtc) * 2;
+
+	/* Most chipsets use bit 2 of the mode control register to access a third palette. But not consistently. */
+	int colorset = cga.color_select & 0x3f;
+	pc_cga_check_palette();
+	switch (CGA_CHIPSET)
+	{
+		/* The IBM Professional Graphics Controller behaves like the PC1512, btw. */
+		case CGA_CHIPSET_PC1512:
+			if ((colorset < 32) && (cga.mode_control & 4)) colorset += 64;
+			break;
+
+		case CGA_CHIPSET_IBM:
+		case CGA_CHIPSET_PC200:
+		case CGA_CHIPSET_ATI:
+		case CGA_CHIPSET_PARADISE:
+			if (cga.mode_control & 4) colorset = (colorset & 0x1f) + 64;
+			break;
+	}
+
+	/* The fact that our palette is located in cga_colortable is a vestigial
+	 * aspect from when we were doing that ugly trick where drawgfx() would
+	 * handle graphics drawing.  Truthfully, we should probably be using
+	 * palette_set_color_rgb() here and not doing the palette lookup in the loop
+	 */
+	uint16_t const *const palette = &cga_colortable[256*2 + 16*2] + colorset * 4;
+
+	for (int sy = 0; sy < lines; sy++, offs = (offs + columns) & 0x1fff)
+	{
+
+		for (int sh = 0; sh < height; sh++)
+		{
+			if (!(sh & 1)) // char line 0 used as a12 line in graphic mode
+			{
+				for (int i = offs, sx = 0; sx < columns; sx++, i = (i + 1) & 0x1fff)
+				{
+					pgfx_plot_unit_2bpp(bitmap, sx * 8, sy * height + sh, palette, i);
+				}
+			}
+			else
+			{
+				for (int i = offs | 0x2000, sx = 0; sx < columns; sx++, i= ((i + 1) & 0x1fff) | 0x2000)
+				{
+					pgfx_plot_unit_2bpp(bitmap, sx * 8, sy * height + sh, palette, i);
+				}
+			}
+		}
+	}
+}
+#endif
 
 
 MC6845_UPDATE_ROW( isa8_cga_pc1512_device::pc1512_gfx_4bpp_update_row )
 {
-	uint8_t *videoram = &m_vram[m_start_offset];
-	uint32_t  *p = &bitmap.pix32(y);
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint16_t  offset_base = ra << 13;
-	int j;
+	uint8_t const *const videoram = &m_vram[m_start_offset];
+	uint32_t *p = &bitmap.pix(y);
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint16_t const offset_base = ra << 13;
 
-	if ( y == 0 ) CGA_LOG(1,"pc1512_gfx_4bpp_update_row",("\n"));
-	for ( j = 0; j < x_count; j++ )
+	if (y == 0) CGA_LOG(1,"pc1512_gfx_4bpp_update_row",("\n"));
+	for (int j = 0; j < x_count; j++)
 	{
-		uint16_t offset = offset_base | ( ( ma + j ) & 0x1FFF );
-		uint16_t i = ( m_color_select & 8 ) ? videoram[ isa8_cga_pc1512_device::vram_offset[3] | offset ] << 3 : 0;
-		uint16_t r = ( m_color_select & 4 ) ? videoram[ isa8_cga_pc1512_device::vram_offset[2] | offset ] << 2 : 0;
-		uint16_t g = ( m_color_select & 2 ) ? videoram[ isa8_cga_pc1512_device::vram_offset[1] | offset ] << 1 : 0;
-		uint16_t b = ( m_color_select & 1 ) ? videoram[ isa8_cga_pc1512_device::vram_offset[0] | offset ]      : 0;
+		uint16_t const offset = offset_base | ((ma + j) & 0x1fff);
+		uint16_t const i = (m_color_select & 8) ? videoram[isa8_cga_pc1512_device::vram_offset[3] | offset] << 3 : 0;
+		uint16_t const r = (m_color_select & 4) ? videoram[isa8_cga_pc1512_device::vram_offset[2] | offset] << 2 : 0;
+		uint16_t const g = (m_color_select & 2) ? videoram[isa8_cga_pc1512_device::vram_offset[1] | offset] << 1 : 0;
+		uint16_t const b = (m_color_select & 1) ? videoram[isa8_cga_pc1512_device::vram_offset[0] | offset]      : 0;
 
-		*p = palette[( ( i & 0x400 ) | ( r & 0x200 ) | ( g & 0x100 ) | ( b & 0x80 ) ) >> 7]; p++;
-		*p = palette[( ( i & 0x200 ) | ( r & 0x100 ) | ( g & 0x080 ) | ( b & 0x40 ) ) >> 6]; p++;
-		*p = palette[( ( i & 0x100 ) | ( r & 0x080 ) | ( g & 0x040 ) | ( b & 0x20 ) ) >> 5]; p++;
-		*p = palette[( ( i & 0x080 ) | ( r & 0x040 ) | ( g & 0x020 ) | ( b & 0x10 ) ) >> 4]; p++;
-		*p = palette[( ( i & 0x040 ) | ( r & 0x020 ) | ( g & 0x010 ) | ( b & 0x08 ) ) >> 3]; p++;
-		*p = palette[( ( i & 0x020 ) | ( r & 0x010 ) | ( g & 0x008 ) | ( b & 0x04 ) ) >> 2]; p++;
-		*p = palette[( ( i & 0x010 ) | ( r & 0x008 ) | ( g & 0x004 ) | ( b & 0x02 ) ) >> 1]; p++;
-		*p = palette[  ( i & 0x008 ) | ( r & 0x004 ) | ( g & 0x002 ) | ( b & 0x01 )       ]; p++;
+		*p++ = palette[((i & 0x400) | (r & 0x200) | (g & 0x100) | (b & 0x80) ) >> 7];
+		*p++ = palette[((i & 0x200) | (r & 0x100) | (g & 0x080) | (b & 0x40) ) >> 6];
+		*p++ = palette[((i & 0x100) | (r & 0x080) | (g & 0x040) | (b & 0x20) ) >> 5];
+		*p++ = palette[((i & 0x080) | (r & 0x040) | (g & 0x020) | (b & 0x10) ) >> 4];
+		*p++ = palette[((i & 0x040) | (r & 0x020) | (g & 0x010) | (b & 0x08) ) >> 3];
+		*p++ = palette[((i & 0x020) | (r & 0x010) | (g & 0x008) | (b & 0x04) ) >> 2];
+		*p++ = palette[((i & 0x010) | (r & 0x008) | (g & 0x004) | (b & 0x02) ) >> 1];
+		*p++ = palette[ (i & 0x008) | (r & 0x004) | (g & 0x002) | (b & 0x01)       ];
 	}
 }
 
@@ -1500,31 +1494,38 @@ void isa8_wyse700_device::device_reset()
 
 uint32_t isa8_wyse700_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if (m_control & 0x08) {
-		const rgb_t *palette = m_palette->palette()->entry_list_raw();
-		uint8_t fg = m_color_select & 0x0F;
+	if (m_control & 0x08)
+	{
+		rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+		uint8_t const fg = m_color_select & 0x0F;
 		uint32_t addr = 0;
-		for (int y = 0; y < 800; y++) {
-			uint8_t *src = &m_vram[addr];
+		for (int y = 0; y < 800; y++)
+		{
+			uint8_t const *src = &m_vram[addr];
 
-			if (y & 1) {
+			if (y & 1)
+			{
 				src += 0x10000;
 				addr += 160;
 			}
 
-			for (int x = 0; x < (1280 / 8); x++) {
+			for (int x = 0; x < (1280 / 8); x++)
+			{
 				uint8_t val = src[x];
 
-				for (int i = 0; i < 8; i++) {
-					bitmap.pix32(y,x*8+i) = (val & 0x80) ? palette[fg] : palette[0x00];
+				for (int i = 0; i < 8; i++)
+				{
+					bitmap.pix(y, x * 8 + i) = (val & 0x80) ? palette[fg] : palette[0x00];
 					val <<= 1;
 				}
 			}
 		}
-	} else {
+		return 0;
+	}
+	else
+	{
 		return isa8_cga_device::screen_update(screen, bitmap, cliprect);
 	}
-	return 0;
 }
 
 
@@ -1837,7 +1838,7 @@ uint8_t isa8_cga_m24_device::io_read(offs_t offset)
 
 MC6845_UPDATE_ROW(isa8_cga_m24_device::crtc_update_row)
 {
-	if(m_mode2 & 1)
+	if (m_mode2 & 1)
 	{
 		m24_gfx_1bpp_m24_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
 		return;
@@ -1847,7 +1848,7 @@ MC6845_UPDATE_ROW(isa8_cga_m24_device::crtc_update_row)
 		return;
 
 	y = m_y;
-	if(m_y >= bitmap.height())
+	if (m_y >= bitmap.height())
 		return;
 
 	switch (m_update_row_type)
@@ -1885,37 +1886,38 @@ MC6845_UPDATE_ROW(isa8_cga_m24_device::crtc_update_row)
 
 MC6845_UPDATE_ROW( isa8_cga_m24_device::m24_gfx_1bpp_m24_update_row )
 {
-	uint8_t *videoram = &m_vram[m_start_offset];
-	uint32_t  *p = &bitmap.pix32(y);
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint8_t   fg = m_color_select & 0x0F;
-	int i;
+	uint8_t const *const videoram = &m_vram[m_start_offset];
+	uint32_t *p = &bitmap.pix(y);
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint8_t const fg = m_color_select & 0x0f;
 
-	if ( y == 0 ) CGA_LOG(1,"m24_gfx_1bpp_m24_update_row",("\n"));
-	for ( i = 0; i < x_count; i++ )
+	if (y == 0) CGA_LOG(1,"m24_gfx_1bpp_m24_update_row",("\n"));
+	for (int i = 0; i < x_count; i++)
 	{
-		uint16_t offset = ( ( ( ma + i ) << 1 ) & 0x1fff ) | ( ( ra & 3 ) << 13 );
-		uint8_t data = videoram[ offset ];
+		uint16_t const offset = (((ma + i) << 1 ) & 0x1fff) | ((ra & 3) << 13);
+		uint8_t data;
 
-		*p = palette[( data & 0x80 ) ? fg : 0]; p++;
-		*p = palette[( data & 0x40 ) ? fg : 0]; p++;
-		*p = palette[( data & 0x20 ) ? fg : 0]; p++;
-		*p = palette[( data & 0x10 ) ? fg : 0]; p++;
-		*p = palette[( data & 0x08 ) ? fg : 0]; p++;
-		*p = palette[( data & 0x04 ) ? fg : 0]; p++;
-		*p = palette[( data & 0x02 ) ? fg : 0]; p++;
-		*p = palette[( data & 0x01 ) ? fg : 0]; p++;
+		data = videoram[offset];
 
-		data = videoram[ offset + 1 ];
+		*p++ = palette[(data & 0x80) ? fg : 0];
+		*p++ = palette[(data & 0x40) ? fg : 0];
+		*p++ = palette[(data & 0x20) ? fg : 0];
+		*p++ = palette[(data & 0x10) ? fg : 0];
+		*p++ = palette[(data & 0x08) ? fg : 0];
+		*p++ = palette[(data & 0x04) ? fg : 0];
+		*p++ = palette[(data & 0x02) ? fg : 0];
+		*p++ = palette[(data & 0x01) ? fg : 0];
 
-		*p = palette[( data & 0x80 ) ? fg : 0]; p++;
-		*p = palette[( data & 0x40 ) ? fg : 0]; p++;
-		*p = palette[( data & 0x20 ) ? fg : 0]; p++;
-		*p = palette[( data & 0x10 ) ? fg : 0]; p++;
-		*p = palette[( data & 0x08 ) ? fg : 0]; p++;
-		*p = palette[( data & 0x04 ) ? fg : 0]; p++;
-		*p = palette[( data & 0x02 ) ? fg : 0]; p++;
-		*p = palette[( data & 0x01 ) ? fg : 0]; p++;
+		data = videoram[offset + 1];
+
+		*p++ = palette[(data & 0x80) ? fg : 0];
+		*p++ = palette[(data & 0x40) ? fg : 0];
+		*p++ = palette[(data & 0x20) ? fg : 0];
+		*p++ = palette[(data & 0x10) ? fg : 0];
+		*p++ = palette[(data & 0x08) ? fg : 0];
+		*p++ = palette[(data & 0x04) ? fg : 0];
+		*p++ = palette[(data & 0x02) ? fg : 0];
+		*p++ = palette[(data & 0x01) ? fg : 0];
 	}
 }
 

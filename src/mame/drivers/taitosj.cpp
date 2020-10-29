@@ -1842,8 +1842,8 @@ void taitosj_state::nomcu(machine_config &config)
 
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.15); // 30k r-2r network
 	DISCRETE(config, m_dacvol, taitosj_dacvol_discrete);
-	m_dacvol->add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	m_dacvol->add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+	m_dacvol->add_route(0, "dac", 1.0, DAC_INPUT_RANGE_HI);
+	m_dacvol->add_route(0, "dac", -1.0, DAC_INPUT_RANGE_LO);
 }
 
 

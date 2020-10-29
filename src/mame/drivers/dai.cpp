@@ -212,7 +212,6 @@ void dai_state::dai(machine_config &config)
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_dai);
 	PALETTE(config, m_palette, FUNC(dai_state::dai_palette), ARRAY_LENGTH(s_palette));
 
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER(config, "lspeaker").front_left();
@@ -230,6 +229,7 @@ void dai_state::dai(machine_config &config)
 	m_tms5501->int_callback().set_inputline("maincpu", I8085_INTR_LINE);
 	m_tms5501->xi_callback().set(FUNC(dai_state::keyboard_r));
 	m_tms5501->xo_callback().set(FUNC(dai_state::keyboard_w));
+	TIMER(config, m_tms_timer).configure_generic(FUNC(dai_state::tms_timer));
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cass_list").set_original("dai_cass");

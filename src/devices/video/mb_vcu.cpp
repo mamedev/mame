@@ -526,36 +526,33 @@ void mb_vcu_device::vbank_clear_w(uint8_t data)
 
 uint32_t mb_vcu_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int x,y;
-	uint8_t dot;
-
 	bitmap.fill(m_palette->pen(0x100),cliprect);
 
-	for(y=0;y<256;y++)
+	for(int y=0;y<256;y++)
 	{
-		for(x=0;x<256;x++)
+		for(int x=0;x<256;x++)
 		{
-			dot = read_byte((x >> 0)|(y<<8)|1<<16|(m_vbank ^ 1)<<18);
+			uint8_t dot = read_byte((x >> 0)|(y<<8)|1<<16|(m_vbank ^ 1)<<18);
 			//if(dot != 0xf)
 			{
 				dot|= m_vregs[1] << 4;
 
-				bitmap.pix32(y,x) = m_palette->pen(dot);
+				bitmap.pix(y,x) = m_palette->pen(dot);
 			}
 		}
 	}
 
-	for(y=0;y<256;y++)
+	for(int y=0;y<256;y++)
 	{
-		for(x=0;x<256;x++)
+		for(int x=0;x<256;x++)
 		{
-			dot = read_byte((x >> 0)|(y<<8)|0<<16|(m_vbank ^ 1)<<18);
+			uint8_t dot = read_byte((x >> 0)|(y<<8)|0<<16|(m_vbank ^ 1)<<18);
 
 			if(dot != 0xf)
 			{
 				dot|= m_vregs[1] << 4;
 
-				bitmap.pix32(y,x) = m_palette->pen(dot);
+				bitmap.pix(y,x) = m_palette->pen(dot);
 			}
 		}
 	}

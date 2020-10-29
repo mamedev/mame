@@ -305,6 +305,8 @@ uint8_t bq4847_device::read(offs_t address)
 		set_register(reg_flags, 0xff, false);
 		m_interrupt_cb(intrq_r());
 	}
+	else
+		if (regnum == reg_unused) value = 0;  // Reg 15 is locked to 0 in BQ4847
 
 	LOGMASKED(LOG_REG, "Reg %d -> %02x\n", regnum, value);
 

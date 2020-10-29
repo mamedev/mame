@@ -43,26 +43,26 @@ gridlee_sound_device::gridlee_sound_device(const machine_config &mconfig, const 
 void gridlee_sound_device::device_start()
 {
 	/* allocate the stream */
-	m_stream = stream_alloc_legacy(0, 1, machine().sample_rate());
+	m_stream = stream_alloc(0, 1, machine().sample_rate());
 
 	m_freq_to_step = (double)(1 << 24) / (double)machine().sample_rate();
 }
 
 
 //-------------------------------------------------
-//  sound_stream_update_legacy - handle a stream update
+//  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void gridlee_sound_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void gridlee_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *buffer = outputs[0];
+	auto &buffer = outputs[0];
 
 	/* loop over samples */
-	while (samples--)
+	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
 	{
 		/* tone channel */
 		m_tone_fraction += m_tone_step;
-		*buffer++ = (m_tone_fraction & 0x0800000) ? (m_tone_volume << 6) : 0;
+		buffer.put_int(sampindex, (m_tone_fraction & 0x0800000) ? m_tone_volume : 0, 32768 >> 6);
 	}
 }
 

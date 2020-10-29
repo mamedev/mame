@@ -200,8 +200,8 @@ constexpr unsigned LP_XOFFSET = 5;  // x-offset of LP (due to delay in hit recog
 class hp9845_state : public driver_device
 {
 public:
-	hp9845_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag)
+	hp9845_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
 	{ }
 
 	void hp9845a(machine_config &config);
@@ -428,6 +428,9 @@ hp9845_base_state::hp9845_base_state(const machine_config &mconfig, device_type 
 	m_io_slot(*this, "slot%u", 0U),
 	m_ram(*this, RAM_TAG),
 	m_softkeys(*this, "Softkey%u", 0U),
+	m_shift_lock_led(*this, "shift_lock_led"),
+	m_prt_all_led(*this, "prt_all_led"),
+	m_auto_st_led(*this, "auto_st_led"),
 	m_chargen(*this, "chargen")
 {
 }
@@ -442,6 +445,10 @@ void hp9845_base_state::setup_ram_block(unsigned block , unsigned offset)
 void hp9845_base_state::machine_start()
 {
 	m_softkeys.resolve();
+	m_shift_lock_led.resolve();
+	m_prt_all_led.resolve();
+	m_auto_st_led.resolve();
+
 	m_screen->register_screen_bitmap(m_bitmap);
 
 	// setup RAM dynamically for -ramsize
@@ -719,21 +726,21 @@ INPUT_CHANGED_MEMBER(hp9845_base_state::togglekey_changed)
 		{
 			bool state = m_io_shiftlock->read();
 			popmessage("SHIFT LOCK %s", state ? "ON" : "OFF");
-			output().set_value("shift_lock_led" , state);
+			m_shift_lock_led = state;
 		}
 		break;
 	case 1: // Prt all
 		{
 			bool state = BIT(m_io_key[0]->read(), 1);
 			popmessage("PRT ALL %s", state ? "ON" : "OFF");
-			output().set_value("prt_all_led" , state);
+			m_prt_all_led = state;
 		}
 		break;
 	case 2: // Auto st
 		{
 			bool state = BIT(m_io_key[0]->read(), 17);
 			popmessage("AUTO ST %s", state ? "ON" : "OFF");
-			output().set_value("auto_st_led" , state);
+			m_auto_st_led = state;
 		}
 		break;
 	}
@@ -1032,7 +1039,7 @@ void hp9845b_state::video_render_buff(unsigned video_scanline , unsigned line_in
 	if (m_video_blanked) {
 		// Blank scanline
 		for (unsigned i = 0; i < VIDEO_HBSTART; i++) {
-			m_bitmap.pix32(video_scanline , i) = pen[ PEN_BLACK ];
+			m_bitmap.pix(video_scanline , i) = pen[ PEN_BLACK ];
 		}
 	} else {
 		bool cursor_line = line_in_row == 12;
@@ -1065,7 +1072,7 @@ void hp9845b_state::video_render_buff(unsigned video_scanline , unsigned line_in
 			for (unsigned j = 0; j < 9; j++) {
 				bool pixel = (pixels & (1U << j)) != 0;
 
-				m_bitmap.pix32(video_scanline , i * 9 + j) = pen[ pixel ? PEN_ALPHA : PEN_BLACK ];
+				m_bitmap.pix(video_scanline , i * 9 + j) = pen[ pixel ? PEN_ALPHA : PEN_BLACK ];
 			}
 		}
 	}
@@ -1105,7 +1112,7 @@ void hp9845b_state::graphic_video_render(unsigned video_scanline)
 				// Normal pixel
 				pixel = (word & mask) != 0 ? PEN_GRAPHIC : PEN_BLACK;
 			}
-			m_bitmap.pix32(video_scanline - GVIDEO_VBEND , x++) = pen[ pixel ];
+			m_bitmap.pix(video_scanline - GVIDEO_VBEND , x++) = pen[ pixel ];
 		}
 	}
 }
@@ -1693,15 +1700,15 @@ void hp9845ct_base_state::render_lp_cursor(unsigned video_scanline , unsigned pe
 	const pen_t &pen = m_palette->pen(pen_idx);
 	if (!yc) {
 		if (m_gv_lp_cursor_x < VIDEO_TOT_HPIXELS) {
-			m_bitmap.pix32(video_scanline , m_gv_lp_cursor_x) = pen;
+			m_bitmap.pix(video_scanline , m_gv_lp_cursor_x) = pen;
 		}
 	} else if (m_gv_lp_cursor_fs) {
 		for (unsigned x = 0; x < VIDEO_TOT_HPIXELS; x++) {
-			m_bitmap.pix32(video_scanline , x) = pen;
+			m_bitmap.pix(video_scanline , x) = pen;
 		}
 	} else {
 		for (unsigned x = std::max(0 , (int)m_gv_lp_cursor_x - 24); x <= (m_gv_lp_cursor_x + 25) && x < VIDEO_TOT_HPIXELS; x++) {
-			m_bitmap.pix32(video_scanline , x) = pen;
+			m_bitmap.pix(video_scanline , x) = pen;
 		}
 	}
 }
@@ -2216,15 +2223,15 @@ void hp9845c_state::video_render_buff(unsigned video_scanline , unsigned line_in
 	if (m_video_blanked || !m_alpha_sel) {
 		// Blank scanline
 		for (unsigned i = 0; i < VIDEO_770_ALPHA_L_LIM; i++) {
-			m_bitmap.pix32(video_scanline , i) = pen[ pen_alpha(0) ];
+			m_bitmap.pix(video_scanline , i) = pen[ pen_alpha(0) ];
 		}
 		if (!m_graphic_sel) {
 			for (unsigned i = VIDEO_770_ALPHA_L_LIM; i < VIDEO_770_ALPHA_R_LIM; i++) {
-				m_bitmap.pix32(video_scanline , i) = pen[ pen_alpha(0) ];
+				m_bitmap.pix(video_scanline , i) = pen[ pen_alpha(0) ];
 			}
 		}
 		for (unsigned i = VIDEO_770_ALPHA_R_LIM; i < VIDEO_TOT_HPIXELS; i++) {
-			m_bitmap.pix32(video_scanline , i) = pen[ pen_alpha(0) ];
+			m_bitmap.pix(video_scanline , i) = pen[ pen_alpha(0) ];
 		}
 	} else {
 		bool cursor_line = line_in_row == 12;
@@ -2272,11 +2279,11 @@ void hp9845c_state::video_render_buff(unsigned video_scanline , unsigned line_in
 				if (m_graphic_sel && x >= VIDEO_770_ALPHA_L_LIM && x < VIDEO_770_ALPHA_R_LIM) {
 					// alpha overlays graphics (non-dominating)
 					if (pixel) {
-						m_bitmap.pix32(video_scanline , x) = pen[ pen_alpha(color) ];
+						m_bitmap.pix(video_scanline , x) = pen[ pen_alpha(color) ];
 					}
 				} else {
 					// Graphics disabled or alpha-only zone
-					m_bitmap.pix32(video_scanline , x) = pen[ pixel ? pen_alpha(color) : pen_alpha(0) ];
+					m_bitmap.pix(video_scanline , x) = pen[ pixel ? pen_alpha(color) : pen_alpha(0) ];
 				}
 			}
 		}
@@ -2347,7 +2354,7 @@ void hp9845c_state::graphic_video_render(unsigned video_scanline)
 				// Normal pixel
 				pixel = pen_graphic(((word0 & mask) ? pen0 : 0) | ((word1 & mask) ? pen1 : 0) | ((word2 & mask) ? pen2 : 0));
 			}
-			m_bitmap.pix32(video_scanline , VIDEO_770_ALPHA_L_LIM + x++) = pen[ pixel ];
+			m_bitmap.pix(video_scanline , VIDEO_770_ALPHA_L_LIM + x++) = pen[ pixel ];
 		}
 	}
 }
@@ -2914,15 +2921,15 @@ void hp9845t_state::video_render_buff(unsigned video_scanline , unsigned line_in
 	if (m_video_blanked || !m_alpha_sel) {
 		// Blank scanline
 		for (unsigned i = 0; i < VIDEO_780_ALPHA_L_LIM; i++) {
-			m_bitmap.pix32(video_scanline , i) = pen[ PEN_BLACK ];
+			m_bitmap.pix(video_scanline , i) = pen[ PEN_BLACK ];
 		}
 		if (!m_graphic_sel) {
 			for (unsigned i = VIDEO_780_ALPHA_L_LIM; i < VIDEO_780_ALPHA_R_LIM; i++) {
-				m_bitmap.pix32(video_scanline , i) = pen[ PEN_BLACK ];
+				m_bitmap.pix(video_scanline , i) = pen[ PEN_BLACK ];
 			}
 		}
 		for (unsigned i = VIDEO_780_ALPHA_R_LIM; i < VIDEO_TOT_HPIXELS; i++) {
-			m_bitmap.pix32(video_scanline , i) = pen[ PEN_BLACK ];
+			m_bitmap.pix(video_scanline , i) = pen[ PEN_BLACK ];
 		}
 	} else {
 		bool cursor_line = line_in_row == 12;
@@ -2974,11 +2981,11 @@ void hp9845t_state::video_render_buff(unsigned video_scanline , unsigned line_in
 				if (m_graphic_sel && x >= VIDEO_780_ALPHA_L_LIM && x < VIDEO_780_ALPHA_R_LIM) {
 					// alpha overlays graphics (non-dominating)
 					if (pixel) {
-						m_bitmap.pix32(video_scanline , x) = pen[ PEN_ALPHA ];
+						m_bitmap.pix(video_scanline , x) = pen[ PEN_ALPHA ];
 					}
 				} else {
 					// Graphics disabled or alpha-only zone
-					m_bitmap.pix32(video_scanline , x) = pen[ pixel ? PEN_ALPHA : PEN_BLACK ];
+					m_bitmap.pix(video_scanline , x) = pen[ pixel ? PEN_ALPHA : PEN_BLACK ];
 				}
 			}
 		}
@@ -3042,7 +3049,7 @@ void hp9845t_state::graphic_video_render(unsigned video_scanline)
 				else
 					pixel = word & mask ? PEN_GRAPHIC : PEN_BLACK;
 			}
-			m_bitmap.pix32(video_scanline , VIDEO_780_ALPHA_L_LIM + x++) = pen[ pixel ];
+			m_bitmap.pix(video_scanline , VIDEO_780_ALPHA_L_LIM + x++) = pen[ pixel ];
 		}
 	}
 }
