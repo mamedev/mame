@@ -26,10 +26,13 @@ public:
 		, m_playfield_tilemap(*this, "playfield")
 		, m_mob(*this, "mob")
 		, m_p1(*this, "P1")
+		, m_audiocpu(*this, "audiocpu")
 	{ }
 
 	void klax(machine_config &config);
 	void klax5bl(machine_config &config);
+
+	void init_bootleg();
 
 private:
 	virtual void machine_reset() override;
@@ -54,6 +57,13 @@ private:
 	required_device<atari_motion_objects_device> m_mob;
 
 	required_ioport m_p1;
+
+	// bootleg hardware
+	uint8_t audio_ram_r(offs_t offset);
+	void audio_ram_w(offs_t offset, uint8_t data);
+
+	optional_device<cpu_device> m_audiocpu;
+	std::unique_ptr<uint8_t[]> m_audio_ram;
 
 	static const atari_motion_objects_config s_mob_config;
 };

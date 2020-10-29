@@ -93,14 +93,12 @@ void klax_state::klax5bl_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x0e0000, 0x0e0fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
-	map(0x1f0000, 0x1fffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 	map(0x260000, 0x260001).portr("P1").w(FUNC(klax_state::latch_w));
 	map(0x260002, 0x260003).portr("P2");
+	map(0x260004, 0x260005).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 	map(0x260006, 0x260007).w(FUNC(klax_state::interrupt_ack_w));
-//  map(0x270001, 0x270001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // no OKI here
-	map(0x2e0000, 0x2e0001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x3e0000, 0x3e07ff).rw("palette", FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0xff00).share("palette");
-	map(0x3f0000, 0x3f0f7f).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
+	map(0x3f0000, 0x3f0eff).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
 	map(0x3f0f80, 0x3f0fff).ram().share("mob:slip");
 	map(0x3f1000, 0x3f1fff).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16_ext)).share("playfield_ext");
 	map(0x3f2000, 0x3f27ff).ram().share("mob");
@@ -223,7 +221,13 @@ void klax_state::klax(machine_config &config)
 
 void klax_state::bootleg_sound_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rom();
+	map(0x0000, 0x0fff).rom();
+	map(0x1000, 0x1fff).nopw(); // ?
+	map(0x2801, 0x2801).nopw(); // MSM 1 data
+	map(0x2802, 0x2802).nopw(); // MSM 2 data
+	map(0x3000, 0x3000).nopw(); // ROM bank sel. at 0x8000?
+	map(0x3800, 0x3800).nopw(); // MSM 1 & 2 reset?
+	map(0x4f80, 0x4fff).ram();
 }
 
 void klax_state::klax5bl(machine_config &config)
@@ -233,9 +237,11 @@ void klax_state::klax5bl(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &klax_state::klax5bl_map);
 
 	config.device_remove("oki"); // no 6295 here
+	config.device_remove("watchdog");
+	config.device_remove("scantimer"); // ?
 
-	z80_device &audiocpu(Z80(config, "audiocpu", 6000000)); /* ? */
-	audiocpu.set_addrmap(AS_PROGRAM, &klax_state::bootleg_sound_map);
+	Z80(config, m_audiocpu, 14.318181_MHz_XTAL / 2); /* ? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &klax_state::bootleg_sound_map);
 
 	m_gfxdecode->set_info(gfx_klax5bl);
 
@@ -245,6 +251,25 @@ void klax_state::klax5bl(machine_config &config)
 //  msm.vck_legacy_callback().set(FUNC(klax_state::m5205_int1));    /* interrupt function */
 //  msm.set_prescaler_selector(msm5205_device::MSM5205_S96_4B);     /* 4KHz 4-bit */
 //  msm.add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+uint8_t klax_state::audio_ram_r(offs_t offset)
+{
+	return m_audio_ram[offset ^ 1];
+}
+
+void klax_state::audio_ram_w(offs_t offset, uint8_t data)
+{
+	m_audio_ram[offset ^ 1] = data;
+}
+
+void klax_state::init_bootleg()
+{
+	// RAM shared between main and audio CPU
+	m_audio_ram = std::make_unique<uint8_t[]>(0x80);
+	m_maincpu->space(AS_PROGRAM).install_ram(0x3f0f00, 0x3f0f7f, m_audio_ram.get());
+	m_audiocpu->space(AS_PROGRAM).install_read_handler(0x4f00, 0x4f7f, read8sm_delegate(*this, FUNC(klax_state::audio_ram_r)));
+	m_audiocpu->space(AS_PROGRAM).install_write_handler(0x4f00, 0x4f7f, write8sm_delegate(*this, FUNC(klax_state::audio_ram_w)));
 }
 
 /*************************************
@@ -324,10 +349,10 @@ ROM_START( klax5bl ) // derived from 'klax5' set
 	ROM_LOAD( "4.bin", 0x10000, 0x10000, CRC(a245e005) SHA1(8843edfa9deec405f491647d40007d0a38c25262) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
-	ROM_LOAD32_BYTE( "9.bin",  0x00000, 0x10000, CRC(ebe4bd96) SHA1(31f941e39aeaed6a64b35827df4d234cd641b47d) )
-	ROM_LOAD32_BYTE( "10.bin", 0x00001, 0x10000, CRC(e7ad1cbd) SHA1(4b37cbe5d3168e532b00e8e34e7b8cf6d69e3487) )
-	ROM_LOAD32_BYTE( "11.bin", 0x00002, 0x10000, CRC(ef7712fd) SHA1(9308b37a8b024837b32d10e358a5205fdc582214) )
-	ROM_LOAD32_BYTE( "12.bin", 0x00003, 0x10000, CRC(1e0c1262) SHA1(960d61b9751276e4d0dbfd3f07cadc1329079abc) )
+	ROM_LOAD32_BYTE( "11.bin", 0x00000, 0x10000, CRC(ef7712fd) SHA1(9308b37a8b024837b32d10e358a5205fdc582214) )
+	ROM_LOAD32_BYTE( "12.bin", 0x00001, 0x10000, CRC(1e0c1262) SHA1(960d61b9751276e4d0dbfd3f07cadc1329079abc) )
+	ROM_LOAD32_BYTE( "9.bin",  0x00002, 0x10000, CRC(ebe4bd96) SHA1(31f941e39aeaed6a64b35827df4d234cd641b47d) )
+	ROM_LOAD32_BYTE( "10.bin", 0x00003, 0x10000, CRC(e7ad1cbd) SHA1(4b37cbe5d3168e532b00e8e34e7b8cf6d69e3487) )
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "7.bin", 0x00000, 0x10000, CRC(5c551e92) SHA1(cbff8fc4f4d370b6db2b4953ecbedd249916b891) )
@@ -346,10 +371,10 @@ ROM_START( klax5bl2 ) // derived from 'klax5' set, closer than klax5bl
 	ROM_LOAD( "5.ic23", 0x10000, 0x10000, CRC(a245e005) SHA1(8843edfa9deec405f491647d40007d0a38c25262) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
-	ROM_LOAD32_BYTE( "8.ic116",  0x00000, 0x10000, CRC(ebe4bd96) SHA1(31f941e39aeaed6a64b35827df4d234cd641b47d) )
-	ROM_LOAD32_BYTE( "7.ic117",  0x00001, 0x10000, CRC(3b79c0d3) SHA1(f6910f2526e1d92eae260b5eb73b1672db891f4b) )
-	ROM_LOAD32_BYTE( "12.ic134", 0x00002, 0x10000, CRC(ef7712fd) SHA1(9308b37a8b024837b32d10e358a5205fdc582214) )
-	ROM_LOAD32_BYTE( "11.ic135", 0x00003, 0x10000, CRC(c2d8ce0c) SHA1(6b2f3c3f5f238dc00501646230dc8787dd862ed4) )
+	ROM_LOAD32_BYTE( "12.ic134", 0x00000, 0x10000, CRC(ef7712fd) SHA1(9308b37a8b024837b32d10e358a5205fdc582214) )
+	ROM_LOAD32_BYTE( "11.ic135", 0x00001, 0x10000, CRC(c2d8ce0c) SHA1(6b2f3c3f5f238dc00501646230dc8787dd862ed4) )
+	ROM_LOAD32_BYTE( "8.ic116",  0x00002, 0x10000, CRC(ebe4bd96) SHA1(31f941e39aeaed6a64b35827df4d234cd641b47d) )
+	ROM_LOAD32_BYTE( "7.ic117",  0x00003, 0x10000, CRC(3b79c0d3) SHA1(f6910f2526e1d92eae260b5eb73b1672db891f4b) )
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "10.ic101", 0x00000, 0x10000, CRC(5c551e92) SHA1(cbff8fc4f4d370b6db2b4953ecbedd249916b891) )
@@ -374,10 +399,10 @@ ROM_START( klax5bl3 ) // almost identical to klax5bl2, only the first audiocpu R
 	ROM_LOAD( "5.ic23", 0x10000, 0x10000, CRC(a245e005) SHA1(8843edfa9deec405f491647d40007d0a38c25262) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
-	ROM_LOAD32_BYTE( "8.ic116",  0x00000, 0x10000, CRC(ebe4bd96) SHA1(31f941e39aeaed6a64b35827df4d234cd641b47d) )
-	ROM_LOAD32_BYTE( "7.ic117",  0x00001, 0x10000, CRC(3b79c0d3) SHA1(f6910f2526e1d92eae260b5eb73b1672db891f4b) )
-	ROM_LOAD32_BYTE( "12.ic134", 0x00002, 0x10000, CRC(ef7712fd) SHA1(9308b37a8b024837b32d10e358a5205fdc582214) )
-	ROM_LOAD32_BYTE( "11.ic135", 0x00003, 0x10000, CRC(c2d8ce0c) SHA1(6b2f3c3f5f238dc00501646230dc8787dd862ed4) )
+	ROM_LOAD32_BYTE( "12.ic134", 0x00000, 0x10000, CRC(ef7712fd) SHA1(9308b37a8b024837b32d10e358a5205fdc582214) )
+	ROM_LOAD32_BYTE( "11.ic135", 0x00001, 0x10000, CRC(c2d8ce0c) SHA1(6b2f3c3f5f238dc00501646230dc8787dd862ed4) )
+	ROM_LOAD32_BYTE( "8.ic116",  0x00002, 0x10000, CRC(ebe4bd96) SHA1(31f941e39aeaed6a64b35827df4d234cd641b47d) )
+	ROM_LOAD32_BYTE( "7.ic117",  0x00003, 0x10000, CRC(3b79c0d3) SHA1(f6910f2526e1d92eae260b5eb73b1672db891f4b) )
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "10.ic101", 0x00000, 0x10000, CRC(5c551e92) SHA1(cbff8fc4f4d370b6db2b4953ecbedd249916b891) )
@@ -524,6 +549,6 @@ GAME( 1989, klaxj4,   klax, klax,    klax, klax_state, empty_init, ROT0, "Atari 
 GAME( 1989, klaxj3,   klax, klax,    klax, klax_state, empty_init, ROT0, "Atari Games",        "Klax (Japan, version 3)", 0 )
 GAME( 1989, klaxd2,   klax, klax,    klax, klax_state, empty_init, ROT0, "Atari Games",        "Klax (Germany, version 2)", 0 )
 
-GAME( 1989, klax5bl,  klax, klax5bl, klax, klax_state, empty_init, ROT0, "bootleg",            "Klax (version 5, bootleg set 1)", MACHINE_NOT_WORKING )
-GAME( 1989, klax5bl2, klax, klax5bl, klax, klax_state, empty_init, ROT0, "bootleg",            "Klax (version 5, bootleg set 2)", MACHINE_NOT_WORKING )
-GAME( 1989, klax5bl3, klax, klax5bl, klax, klax_state, empty_init, ROT0, "bootleg (Playmark)", "Klax (version 5, bootleg set 3)", MACHINE_NOT_WORKING )
+GAME( 1989, klax5bl,  klax, klax5bl, klax, klax_state, init_bootleg, ROT0, "bootleg",            "Klax (version 5, bootleg set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+GAME( 1989, klax5bl2, klax, klax5bl, klax, klax_state, init_bootleg, ROT0, "bootleg",            "Klax (version 5, bootleg set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+GAME( 1989, klax5bl3, klax, klax5bl, klax, klax_state, init_bootleg, ROT0, "bootleg (Playmark)", "Klax (version 5, bootleg set 3)", MACHINE_NOT_WORKING )
