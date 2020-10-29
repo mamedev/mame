@@ -26,8 +26,8 @@ class wswan_sound_device : public device_t,
 public:
 	wswan_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	void port_w(offs_t offset, uint8_t data);
-	u8 port_r(offs_t offset);
+	void port_w(offs_t offset, u16 data, u16 mem_mask);
+	u16 port_r(offs_t offset, u16 mem_mask);
 
 protected:
 	struct CHAN
@@ -63,14 +63,10 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
-	void wswan_ch_set_freq(CHAN *ch, u16 freq);
 	int fetch_sample(int channel, int offset);
 
 	sound_stream *m_channel;
-	CHAN m_audio1;     /* Audio channel 1 */
-	CHAN m_audio2;     /* Audio channel 2 */
-	CHAN m_audio3;     /* Audio channel 3 */
-	CHAN m_audio4;     /* Audio channel 4 */
+	CHAN m_audio[4];
 	s8   m_sweep_step;
 	u32  m_sweep_time;
 	u32  m_sweep_count;

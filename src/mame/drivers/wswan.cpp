@@ -489,7 +489,12 @@ u8 wswan_state::port_r(offs_t offset)
 			return m_vdp->reg_r(offset >> 1, 0x00ff);
 	}
 	if (offset >= 0x80 && offset <= 0x9f)
-		return m_sound->port_r(offset);
+	{
+		if (offset & 0x01)
+			return m_sound->port_r(offset >> 1, 0xff00) >> 8;
+		else
+			return m_sound->port_r(offset >> 1, 0x00ff);
+	}
 
 	switch (offset)
 	{
@@ -722,7 +727,10 @@ void wswan_state::port_w(offs_t offset, u8 data)
 		case 0x94:  // Master volume
 			// Bit 0-3 - Master volume
 			// Bit 4-7 - Unknown
-			m_sound->port_w(offset, data);
+			if (offset & 0x01)
+				m_sound->port_w(offset >> 1, data << 8, 0xff00);
+			else
+				m_sound->port_w(offset >> 1, data, 0x00ff);
 			break;
 		case 0x9E:  // WSC volume setting (0, 1, 2, 3)
 			break;
