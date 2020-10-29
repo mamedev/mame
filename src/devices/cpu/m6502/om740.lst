@@ -126,16 +126,15 @@ rrf_zpg
 	prefetch();
 
 bra_rel
-	TMP = read_pc();
-	read_pc_noinc();
-	if(page_changing(PC, int8_t(TMP))) {
-		read_arg(set_l(PC, PC+int8_t(TMP)));
-	}
+	TMP = read_pc_noinc();
+	read_arg(set_l(PC, PC+1));
+	PC++;
+	read_arg(set_l(PC, PC+int8_t(TMP)));
 	PC += int8_t(TMP);
 	prefetch();
 
 jmp_zpi
-	TMP2 = read_pc();
+	TMP2 = read_pc_noinc();
 	TMP = read(TMP2 & 0xff);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	PC = TMP;
@@ -359,6 +358,7 @@ andt_zpx
 com_zpg
 	TMP = read_pc();
 	TMP2 = read(TMP);
+	read(TMP);
 	TMP2 ^= 0xff;
 	set_nz(TMP2);
 	write(TMP, TMP2);
