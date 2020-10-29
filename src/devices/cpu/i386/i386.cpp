@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Ville Linde, Barry Rodewald, Carl, Philip Bennett
+// copyright-holders:Ville Linde, Barry Rodewald, Carl, Philip Bennett, Felipe Sanches
 /*
     Intel 386 emulator
 
@@ -24,8 +24,6 @@
 #include "x87priv.h"
 #include "cycles.h"
 #include "i386ops.h"
-#include "machine/pit8253.h"
-#include "machine/ins8250.h"
 
 #include "debugger.h"
 #include "debug/debugcpu.h"
@@ -72,25 +70,21 @@ i386sx_device::i386sx_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-
-const address_space_config *i386ex_device::memory_space_config(address_spacenum spacenum) const
+i386ex_device::i386ex_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i386_device(mconfig, I386EX, tag, owner, clock, 16, 26, 16)
+        , m_io_config("io", ENDIANNESS_LITTLE, 16, 16, 0)
+	, m_uart0(*this, "uart0")
+	, m_uart1(*this, "uart1")
+	, m_pit(*this, "pit")
+	, m_pic_master(*this, "pic_master")
+	, m_pic_slave(*this, "pic_slave")
 {
-        switch (spacenum)
-        {
-                case AS_IO: return &m_io_space_config;
-                default: return i386_device::memory_space_config(spacenum);
-        }
 }
 
-/*************************************************************
- *
- * pic8259 configuration
- *
- *************************************************************/
-READ8_MEMBER( i386EX_device::get_slave_ack )
+uint8_t i386ex_device::get_slave_ack(offs_t offset)
 {
         if (offset==2) // IRQ = 2
-                return m_pic8259_slave->acknowledge();
+                return m_pic_slave->acknowledge();
 
         return 0x00;
 }
@@ -109,15 +103,15 @@ READ8_MEMBER( i386EX_device::get_slave_ack )
 // 1: 1 = SIO1-Baud-CLK-IN = SERCLK
 // 0: 1 = SIO0-Baud-CLK-IN = SERCLK
 
-WRITE16_MEMBER( i386EX_device::set_clock_prescaler )
+void i386ex_device::set_clock_prescaler(offs_t offset, uint16_t data)
 {
 #define CLK2 48000000
 //TODO: use CLK2 value from the CPU configured master clock value.
-        uint32 PSCLK = CLK2/((data & 0x1ff) + 2);
+        uint32_t PSCLK = CLK2/((data & 0x1ff) + 2);
 	logerror("Setting clock prescaler: PSCLK = %f MHz\n", float(PSCLK)/1000000);
 }
 
-WRITE16_MEMBER( i386EX_device::set_pin_configuration )
+void i386ex_device::set_pin_configuration(offs_t offset, uint16_t data)
 {
 	//This register selects which signals are multiplexed to the
 	// multi-funcion pins of the CPU package.
@@ -152,12 +146,12 @@ WRITE16_MEMBER( i386EX_device::set_pin_configuration )
 		 (BIT(data, 6) ? "REFRESH#" : "CS6#"));
 }
 
-READ16_MEMBER( i386EX_device::get_interrupt_configuration )
+uint16_t i386ex_device::get_interrupt_configuration(offs_t offset)
 {
 	return m_INTCFG;
 }
 
-WRITE16_MEMBER( i386EX_device::set_interrupt_configuration )
+void i386ex_device::set_interrupt_configuration(offs_t offset, uint16_t data)
 {
         //This register selects the configuration of the Interrupt Controller Unit
         //This driver is currently hardcoded to the settings used by VMP3700, as indicated below:
@@ -186,86 +180,32 @@ WRITE16_MEMBER( i386EX_device::set_interrupt_configuration )
 }
 
 
-WRITE16_MEMBER( i386EX_device::set_dma_configuration )
+void i386ex_device::set_dma_configuration(offs_t offset, uint16_t data)
 {
         //This register selects the configuration of the DMA Controller Unit
 
         //TODO: Implement handling the signals identified below:
         logerror("Setting DMACFG: %02X\n", data);
-/*                 "\t: %s\n"
-                 "\t: %s\n"
-                 "\t: %s\n"
-                 "\t: %s\n"
-                 "\t: %s\n"
-                 "\t: %s\n"
-                 "\t: %s\n",
-                 "\t: %s\n",
-                 data,
-                 (BIT(data, 7) ? "1" : "0"),
-                 (BIT(data, 6) ? "1" : "0"),
-                 (BIT(data, 5) ? "1" : "0"),
-                 (BIT(data, 4) ? "1" : "0"),
-                 (BIT(data, 3) ? "1" : "0"),
-                 (BIT(data, 2) ? "1" : "0"),
-                 (BIT(data, 1) ? "1" : "0"),
-                 (BIT(data, 0) ? "1" : "0"));
-*/
 }
 
-WRITE16_MEMBER( i386EX_device::set_timer_configuration )
+void i386ex_device::set_timer_configuration(offs_t offset, uint16_t data)
 {
         //This register selects the configuration of the Timer Controller Unit
 
         //TODO: Implement handling the signals identified below:
         logerror("Setting TMRCFG: %02X\n", data);
-/*                 "\t: %s\n"
-                 "\t: %s\n"
-                 "\t: %s\n"
-                 "\t: %s\n"
-                 "\t: %s\n"
-                 "\t: %s\n"
-                 "\t: %s\n",
-                 "\t: %s\n",
-                 data,
-                 (BIT(data, 7) ? "1" : "0"),
-                 (BIT(data, 6) ? "1" : "0"),
-                 (BIT(data, 5) ? "1" : "0"),
-                 (BIT(data, 4) ? "1" : "0"),
-                 (BIT(data, 3) ? "1" : "0"),
-                 (BIT(data, 2) ? "1" : "0"),
-                 (BIT(data, 1) ? "1" : "0"),
-                 (BIT(data, 0) ? "1" : "0"));
-*/
 }
 
-WRITE16_MEMBER( i386EX_device::set_serial_io_configuration )
+void i386ex_device::set_serial_io_configuration(offs_t offset, uint16_t data)
 {
         //This register selects the configuration of the Serial I/O Controller Unit
 
         //TODO: Implement handling the signals identified below:
         logerror("Setting SIOCFG: %02X\n", data);
-/*                 "\t: %s\n"
-                 "\t: %s\n"
-                 "\t: %s\n"
-                 "\t: %s\n"
-                 "\t: %s\n"
-                 "\t: %s\n"
-                 "\t: %s\n",
-                 "\t: %s\n",
-                 data,
-                 (BIT(data, 7) ? "1" : "0"),
-                 (BIT(data, 6) ? "1" : "0"),
-                 (BIT(data, 5) ? "1" : "0"),
-                 (BIT(data, 4) ? "1" : "0"),
-                 (BIT(data, 3) ? "1" : "0"),
-                 (BIT(data, 2) ? "1" : "0"),
-                 (BIT(data, 1) ? "1" : "0"),
-                 (BIT(data, 0) ? "1" : "0"));
-*/
 }
 
 
-WRITE16_MEMBER( i386EX_device::chip_select_unit_w )
+void i386ex_device::chip_select_unit_w(offs_t offset, uint16_t data)
 {
 	// Chip Select Unit
 	// TODO: The memory map is currently hardcoded in the VMP3700 driver
@@ -290,35 +230,36 @@ WRITE16_MEMBER( i386EX_device::chip_select_unit_w )
 	}
 }
 
-ADDRESS_MAP_START( io_map, AS_IO, 16, i386EX_device )
-//        AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", am9517a_device, read, write, 0xffff)
-        AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_master", pic8259_device, read, write, 0xffff)
-        AM_RANGE(0x0022, 0x0023) AM_NOP // TODO: Implement-me: Setup Extended I/O
-        AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8254_device, read, write, 0xffff)
-        AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_device, read, write, 0xffff)
-//        AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("dma8237_2", am9517a_device, read, write, 0x00ff)
-	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("uart1", ns16450_device, ins8250_r, ins8250_w, 0x00ff) //Asynchronous Serial I/O Channel 0 (COM2)
-	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("uart0", ns16450_device, ins8250_r, ins8250_w, 0x00ff) //Asynchronous Serial I/O Channel 0 (COM1)
-        AM_RANGE(0xf020, 0xf03f) AM_DEVREADWRITE8("pic8259_master", pic8259_device, read, write, 0xffff)
-        AM_RANGE(0xf040, 0xf05f) AM_DEVREADWRITE8("pit8254", pit8254_device, read, write, 0xffff)
-        AM_RANGE(0xf0a0, 0xf0bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_device, read, write, 0xffff)
-        AM_RANGE(0xf400, 0xf43f) AM_WRITE(chip_select_unit_w) //TODO: read ?
-        //AM_RANGE(0xf480, 0xf48b) AM_NOP // TODO: Implement-me: Synchrounous Serial Unit
-        //AM_RANGE(0xf4a0, 0xf4a7) AM_NOP // TODO: Implement-me: Refresh Control Unit
-        //AM_RANGE(0xf4c0, 0xf4cb) AM_NOP // TODO: Implement-me: Watchdot Timer Unit
-	AM_RANGE(0xf4f8, 0xf4ff) AM_DEVREADWRITE8("uart0", ns16450_device, ins8250_r, ins8250_w, 0x00ff) //Asynchronous Serial I/O Channel 0 (COM1)
-        //AM_RANGE(0xf800, 0xf803) AM_NOP // TODO: Implement-me: Power Management
-        AM_RANGE(0xf804, 0xf805) AM_WRITE(set_clock_prescaler)
-        //AM_RANGE(0xf820, 0xf825) AM_NOP // TODO: Device Configuration Registers (move here code from vmp3700 driver.)
-        AM_RANGE(0xf826, 0xf827) AM_WRITE(set_pin_configuration)//(TODO: READ)
-        AM_RANGE(0xf830, 0xf831) AM_WRITE(set_dma_configuration) // DMA Configuration Register (TODO: READ)
-        AM_RANGE(0xf832, 0xf833) AM_READWRITE(get_interrupt_configuration, set_interrupt_configuration) // Interrupt Configuration Register
-        AM_RANGE(0xf834, 0xf835) AM_WRITE(set_timer_configuration) // Timer Configuration Register (TODO: READ)
-        AM_RANGE(0xf836, 0xf837) AM_WRITE(set_serial_io_configuration) // SIO and SSIO Configuration Register(TODO: READ)
-        //AM_RANGE(0xf860, 0xf875) AM_NOP // TODO: Parallel I/O Ports (move here code from vmp3700 driver.)
-	AM_RANGE(0xf8f8, 0xf8ff) AM_DEVREADWRITE8("uart1", ns16450_device, ins8250_r, ins8250_w, 0x00ff) //Asynchronous Serial I/O Channel 1 (COM2)
-//        AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("dma8237_2", am9517a_device, read, write, 0x00ff)
-ADDRESS_MAP_END
+void i386ex_device::io_map(address_map &map)
+{
+//	map(0x0000, 0x001f).rw("dma8237_1", FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask16(0xffff);
+        map(0x0020, 0x003f).rw("pic_master", FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0xffff);
+        map(0x0022, 0x0023).noprw(); // TODO: Implement-me: Setup Extended I/O
+        map(0x0040, 0x005f).rw("pit", FUNC(pit8254_device::read), FUNC(pit8254_device::write)).umask16(0xffff);
+        map(0x00a0, 0x00bf).rw("pic_slave", FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0xffff);
+//	map(0x00c0, 0x00df).rw("dma8237_2", FUNC(am9517a_device::read), FUNC(am9517a_device::write).umask16(0x00ff);
+	map(0x02f8, 0x02ff).rw("uart1", FUNC(ns16450_device::ins8250_r), FUNC(ns16450_device::ins8250_w)).umask16(0x00ff); //Asynchronous Serial I/O Channel 0 (COM2)
+	map(0x03f8, 0x03ff).rw("uart0", FUNC(ns16450_device::ins8250_r), FUNC(ns16450_device::ins8250_w)).umask16(0x00ff); //Asynchronous Serial I/O Channel 0 (COM1)
+        map(0xf020, 0xf03f).rw("pic_master", FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0xffff);
+        map(0xf040, 0xf05f).rw("pit", FUNC(pit8254_device::read), FUNC(pit8254_device::write)).umask16(0xffff);
+        map(0xf0a0, 0xf0bf).rw("pic_slave", FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0xffff);
+        map(0xf400, 0xf43f).w(FUNC(i386ex_device::chip_select_unit_w)); //TODO: read ?
+//	map(0xf480, 0xf48b).noprw(); // TODO: Implement-me: Synchrounous Serial Unit
+//	map(0xf4a0, 0xf4a7).noprw(); // TODO: Implement-me: Refresh Control Unit
+//	map(0xf4c0, 0xf4cb).noprw(); // TODO: Implement-me: Watchdot Timer Unit
+	map(0xf4f8, 0xf4ff).rw("uart0", FUNC(ns16450_device::ins8250_r), FUNC(ns16450_device::ins8250_w)).umask16(0x00ff); //Asynchronous Serial I/O Channel 0 (COM1)
+//	map(0xf800, 0xf803).noprw(); // TODO: Implement-me: Power Management
+        map(0xf804, 0xf805).w(FUNC(i386ex_device::set_clock_prescaler));
+//	map(0xf820, 0xf825).noprw(); // TODO: Device Configuration Registers (move here code from vmp3700 driver.)
+        map(0xf826, 0xf827).w(FUNC(i386ex_device::set_pin_configuration)); //(TODO: READ)
+        map(0xf830, 0xf831).w(FUNC(i386ex_device::set_dma_configuration)); // DMA Configuration Register (TODO: READ)
+        map(0xf832, 0xf833).rw(FUNC(i386ex_device::get_interrupt_configuration), FUNC(i386ex_device::set_interrupt_configuration)); // Interrupt Configuration Register
+        map(0xf834, 0xf835).w(FUNC(i386ex_device::set_timer_configuration)); // Timer Configuration Register (TODO: READ)
+        map(0xf836, 0xf837).w(FUNC(i386ex_device::set_serial_io_configuration)); // SIO and SSIO Configuration Register(TODO: READ)
+//	map(0xf860, 0xf875).noprw(); // TODO: Parallel I/O Ports (move here code from vmp3700 driver.)
+	map(0xf8f8, 0xf8ff).rw("uart1", FUNC(ns16450_device::ins8250_r), FUNC(ns16450_device::ins8250_w)).umask16(0x00ff); //Asynchronous Serial I/O Channel 1 (COM2)
+//	map(0x00c0, 0x00df).rw("dma8237_2", FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask16(0x00ff);
+}
 
 
 // Serial port setup:
@@ -348,25 +289,33 @@ ADDRESS_MAP_END
 //  500kHz / 16 = 31250 baud
 //  1 stop-bit, 8bit, no parity.
 
-static MACHINE_CONFIG_FRAGMENT( i386ex )
-	// Asynch Serial I/O ports:
-	MCFG_DEVICE_ADD("uart0", NS16450, DERIVED_CLOCK(1, 2))
-	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE("pic8259_master", pic8259_device, ir4_w)) //UART0 interrupt. TODO: (mux:SIOINT0/INT9)
-	MCFG_DEVICE_ADD("uart1", NS16450, DERIVED_CLOCK(1, 2)/0x18) // <-- hardcoded value based on vmp3700 boot code
-	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE("pic8259_master", pic8259_device, ir3_w)) //UART1 interrupt. TODO: (mux:SIOINT1/INT8)
+
+// machine configs
+void i386ex_device::device_add_mconfig(machine_config &config)
+{	// Asynch Serial I/O ports:
+	NS16450(config, m_uart0, DERIVED_CLOCK(1, 2));
+	m_uart0->out_int_callback().set(m_pic_master, FUNC(pic8259_device::ir4_w)); // TODO: (mux:SIOINT0/INT9)
+
+	NS16450(config, m_uart1, DERIVED_CLOCK(1, 2) / 0x18); // FIXME: hardcoded value based on vmp3700 boot code
+	m_uart1->out_int_callback().set(m_pic_master, FUNC(pic8259_device::ir3_w)); // TODO: (mux:SIOINT1/INT8)
 
 	// Programmable Interval Timer:
-	MCFG_DEVICE_ADD("pit8254", PIT8254, 0)
-	MCFG_PIT8253_CLK0(DERIVED_CLOCK(1, 2))
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259_master", pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(DERIVED_CLOCK(1, 2))
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("pic8259_slave", pic8259_device, ir2_w))
-	MCFG_PIT8253_CLK2(DERIVED_CLOCK(1, 2))
-	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("pic8259_slave", pic8259_device, ir3_w))
+	PIT8254(config, m_pit, 0);
+	m_pit->set_clk<0>(DERIVED_CLOCK(1, 2));
+	m_pit->set_clk<1>(DERIVED_CLOCK(1, 2));
+	m_pit->set_clk<2>(DERIVED_CLOCK(1, 2));
+	m_pit->out_handler<0>().set(m_pic_master, FUNC(pic8259_device::ir0_w));
+	m_pit->out_handler<1>().set(m_pic_slave, FUNC(pic8259_device::ir2_w));
+	m_pit->out_handler<2>().set(m_pic_slave, FUNC(pic8259_device::ir3_w));
 
 	// Programmable Interrupt Controllers:
-        MCFG_PIC8259_ADD( "pic8259_master", INPUTLINE(DEVICE_SELF, 0), VCC, READ8(i386EX_device, get_slave_ack) )
-        MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir2_w), GND, NOOP)
+	PIC8259(config, m_pic_master, 0);
+	// FIXME: INPUTLINE(DEVICE_SELF, 0), VCC, 
+	m_pic_master->read_slave_ack_callback().set(FUNC(i386ex_device::get_slave_ack));
+        
+	PIC8259(config, m_pic_slave, 0);
+	m_pic_slave->out_int_callback().set(m_pic_master, FUNC(pic8259_device::ir2_w));
+	// FIXME: GND, NOOP);
 
         //TODO: (mux:Vss/INT0) DEVWRITELINE("pic8259_master", pic8259_device, ir1_w)
         //TODO: (mux:Vss/INT1) DEVWRITELINE("pic8259_master", pic8259_device, ir5_w)
@@ -379,18 +328,6 @@ static MACHINE_CONFIG_FRAGMENT( i386ex )
         //TODO: (mux:Vss/INT6/DMAINT) DEVWRITELINE("pic8259_slave", pic8259_device, ir5_w)
         //TODO: (mux:Vss/INT7) DEVWRITELINE("pic8259_slave", pic8259_device, ir6_w)
         //TODO: WDTOUT DEVWRITELINE("pic8259_slave", pic8259_device, ir7_w)
-MACHINE_CONFIG_END
-
-machine_config_constructor i386EX_device::device_mconfig_additions() const
-{
-        return MACHINE_CONFIG_NAME( i386ex );
-}
-
-i386EX_device::i386EX_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i386_device(mconfig, I386EX, "I386EX", tag, owner, clock, "i386ex", __FILE__, 16, 26, 16)
-        , m_io_space_config( "io", ENDIANNESS_LITTLE, 16, 16, 0, ADDRESS_MAP_NAME( io_map ) ) 
-	, m_pic8259_slave(*this, "pic8259_slave")
-{
 }
 
 i486_device::i486_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -462,36 +399,13 @@ pentium4_device::pentium4_device(const machine_config &mconfig, const char *tag,
 	// 128 dtlb, 64 itlb
 	set_vtlb_dynamic_entries(196);
 }
-
-/*************************************************************
- *
- * pic8259 configuration
- *
- *************************************************************/
-READ8_MEMBER( i386EX_device::get_slave_ack )
-{
-        if (offset==2) // IRQ = 2
-                return m_pic8259_slave->acknowledge();
-
-        return 0x00;
-}
-
-static MACHINE_CONFIG_FRAGMENT( i386ex )
-        MCFG_PIC8259_ADD( "pic8259_master", INPUTLINE(DEVICE_SELF, 0), VCC, READ8(i386EX_device, get_slave_ack) )
-        MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir2_w), GND, NOOP)
-MACHINE_CONFIG_END
-
-machine_config_constructor i386EX_device::device_mconfig_additions() const
-{
-        return MACHINE_CONFIG_NAME( i386ex );
-}
-
+ 
 device_memory_interface::space_config_vector i386_device::memory_space_config() const
 {
-	return space_config_vector {
-		std::make_pair(AS_PROGRAM, &m_program_config),
-		std::make_pair(AS_IO,      &m_io_config)
-	};
+       return space_config_vector {
+               std::make_pair(AS_PROGRAM, &m_program_config),
+               std::make_pair(AS_IO,      &m_io_config)
+       };
 }
 
 int i386_parity_table[256];
@@ -2835,7 +2749,7 @@ void i386_device::device_reset()
 	CHANGE_PC(m_eip);
 }
 
-void i386EX_device::device_reset()
+void i386ex_device::device_reset()
 {
 	zero_state();
 
