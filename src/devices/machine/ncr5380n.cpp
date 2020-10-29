@@ -286,6 +286,9 @@ void ncr5380n_device::mode_w(u8 data)
 			m_tcmd &= ~TC_LBS;
 
 		set_drq(false);
+
+		// clear ACK
+		scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
 	}
 
 	// start/stop arbitration
@@ -366,7 +369,7 @@ void ncr5380n_device::sds_w(u8 data)
 
 	if (m_mode & MODE_DMA)
 	{
-		m_state = DMA_OUT_REQ;
+		m_state = DMA_OUT_DRQ;
 		m_state_timer->adjust(attotime::zero);
 	}
 }
@@ -502,25 +505,26 @@ int ncr5380n_device::state_step()
 		}
 		break;
 
+	case DMA_OUT_DRQ:
+		m_state = DMA_OUT_REQ;
+		set_drq(true);
+
+		delay = -1;
+		break;
 	case DMA_OUT_REQ:
 		if (ctrl & S_REQ)
 		{
 			if ((ctrl & S_PHASE_MASK) == (m_tcmd & TC_PHASE))
 			{
-				m_state = DMA_OUT_DRQ;
-				set_drq(true);
+				LOGMASKED(LOG_DMA, "dma out: 0x%02x\n", m_odata);
+
+				m_state = DMA_OUT_ACK;
+
+				// assert data and ACK
+				scsi_bus->data_w(scsi_refid, m_odata);
+				scsi_bus->ctrl_w(scsi_refid, S_ACK, S_ACK);
 			}
-
-			delay = -1;
 		}
-		break;
-	case DMA_OUT_DRQ:
-		LOGMASKED(LOG_DMA, "dma out: 0x%02x\n", m_odata);
-		m_state = DMA_OUT_ACK;
-
-		// assert data and ACK
-		scsi_bus->data_w(scsi_refid, m_odata);
-		scsi_bus->ctrl_w(scsi_refid, S_ACK, S_ACK);
 		break;
 	case DMA_OUT_ACK:
 		if (!(ctrl & S_REQ))
@@ -533,7 +537,7 @@ int ncr5380n_device::state_step()
 					m_tcmd |= TC_LBS;
 			}
 			else
-				m_state = DMA_OUT_REQ;
+				m_state = DMA_OUT_DRQ;
 
 			// clear data and ACK
 			scsi_bus->data_w(scsi_refid, 0);
