@@ -1044,12 +1044,12 @@ retro_window_info::retro_window_info(
 	m_prescale = video_config.prescale;
 
 	m_windowed_dim = osd_dim(config->width, config->height);
-	m_original_mode = global_alloc(RETRO_DM_Wrapper);
+	m_original_mode = new RETRO_DM_Wrapper;
 }
 
 retro_window_info::~retro_window_info()
 {
-	global_free(m_original_mode);
+	delete m_original_mode;
 }
 
 //============================================================

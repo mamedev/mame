@@ -267,9 +267,9 @@ int mame_machine_manager::execute()
 
 #if defined(__LIBRETRO__)
 
-		retro_global_config= global_alloc(machine_config(*system, m_options));
+		retro_global_config = new machine_config(*system, m_options);
 
-	        retro_global_machine=global_alloc(running_machine(*retro_global_config, *this));
+		retro_global_machine = new running_machine(*retro_global_config, *this);
 
 		set_machine(&(*retro_global_machine));
 
@@ -343,10 +343,10 @@ void mame_machine_manager::mmchange()
  
 void free_machineconfig(){
 
-		global_free(retro_global_machine);
-		global_free(retro_global_config);
+	delete retro_global_machine;
+	delete retro_global_config;
 
-		retro_manager->set_machine(nullptr);
+	retro_manager->set_machine(nullptr);
 }
 
 extern void free_man();
@@ -378,8 +378,8 @@ void retro_main_loop()
 		else{ 
 			RLOOP=0;
 			
-			global_free(retro_global_machine);
-			global_free(retro_global_config);
+			delete retro_global_machine;
+			delete retro_global_config;
 			retro_manager->set_machine(nullptr);
 
 			printf("exit scope, restart empty driver\n");

@@ -214,7 +214,7 @@ void retro_execute(){
 void free_man(){
 
 	util::archive_file::cache_clear();
-	global_free(retro_manager);
+	retro_manager->reset();
 }
 #endif
 
