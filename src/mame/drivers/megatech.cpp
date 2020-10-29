@@ -114,6 +114,9 @@ public:
 	void init_mt_crt();
 	void init_mt_slot();
 
+protected:
+	virtual void machine_reset() override;
+
 private:
 
 	void megatech(machine_config &config);
@@ -137,7 +140,6 @@ private:
 	uint8_t sms_ioport_dd_r();
 	void mt_sms_standard_rom_bank_w(address_space &space, offs_t offset, uint8_t data);
 
-	DECLARE_MACHINE_RESET(megatech);
 
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, int gameno);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( mt_cart1 ) { return load_cart(image, m_cart1, 0); }
@@ -644,10 +646,10 @@ WRITE_LINE_MEMBER(mtech_state::screen_vblank_main)
 		screen_vblank_megadriv(state);
 }
 
-MACHINE_RESET_MEMBER(mtech_state, megatech)
+void mtech_state::machine_reset()
 {
 	m_mt_bank_addr = 0;
-	MACHINE_RESET_CALL_MEMBER(megadriv);
+	md_base_state::machine_reset();
 
 	std::string region_tag;
 	if (m_cart1->get_rom_size() > 0)
@@ -701,8 +703,6 @@ void mtech_state::megatech(machine_config &config)
 	io2.out_portd_cb().set(FUNC(mtech_state::bios_portd_w));
 	io2.in_porte_cb().set(FUNC(mtech_state::bios_porte_r));
 	io2.out_porte_cb().set(FUNC(mtech_state::bios_porte_w));
-
-	MCFG_MACHINE_RESET_OVERRIDE(mtech_state, megatech)
 
 	config.set_default_layout(layout_dualhovu);
 

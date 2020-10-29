@@ -102,9 +102,9 @@ static INPUT_PORTS_START( megadriv_radica_6button )
 INPUT_PORTS_END
 
 
-MACHINE_START_MEMBER(megadriv_radica_state, megadriv_radica_6button)
+void megadriv_radica_6button_state::machine_start()
 {
-	MACHINE_START_CALL_MEMBER(megadriv);
+	md_base_state::machine_start();
 	m_vdp->stop_timers();
 
 	m_io_pad_6b[0] = ioport("EXTRA1");
@@ -119,85 +119,87 @@ MACHINE_START_MEMBER(megadriv_radica_state, megadriv_radica_6button)
 	save_item(NAME(m_bank));
 }
 
-MACHINE_START_MEMBER(megadriv_radica_state, megadriv_radica_3button)
+void megadriv_radica_3button_state::machine_start()
 {
-	MACHINE_START_CALL_MEMBER(megadriv);
+	md_base_state::machine_start();
 	m_vdp->stop_timers();
 	save_item(NAME(m_bank));
 }
 
-MACHINE_RESET_MEMBER(megadriv_radica_state, megadriv_radica)
+void megadriv_radica_3button_state::machine_reset()
 {
 	m_bank = 0;
-	MACHINE_RESET_CALL_MEMBER(megadriv);
+	md_base_state::machine_reset();
 }
 
-void megadriv_radica_state::megadriv_radica_3button_ntsc(machine_config &config)
+void megadriv_radica_3button_state::megadriv_radica_3button_ntsc(machine_config &config)
 {
 	md_ntsc(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &megadriv_radica_state::megadriv_radica_map);
-	MCFG_MACHINE_START_OVERRIDE(megadriv_radica_state, megadriv_radica_3button)
-	MCFG_MACHINE_RESET_OVERRIDE(megadriv_radica_state, megadriv_radica)
 }
 
-void megadriv_radica_state::megadriv_radica_3button_pal(machine_config &config)
+void megadriv_radica_3button_state::megadriv_radica_3button_pal(machine_config &config)
 {
 	md_pal(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &megadriv_radica_state::megadriv_radica_map);
-	MCFG_MACHINE_START_OVERRIDE(megadriv_radica_state, megadriv_radica_3button)
-	MCFG_MACHINE_RESET_OVERRIDE(megadriv_radica_state, megadriv_radica)
 }
 
-void megadriv_radica_state::megadriv_radica_6button_pal(machine_config &config)
+void megadriv_radica_6button_state::megadriv_radica_6button_pal(machine_config &config)
 {
 	md_pal(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &megadriv_radica_state::megadriv_radica_map);
-	MCFG_MACHINE_START_OVERRIDE(megadriv_radica_state, megadriv_radica_6button)
-	MCFG_MACHINE_RESET_OVERRIDE(megadriv_radica_state, megadriv_radica)
 }
 
-void megadriv_radica_state::megadriv_radica_6button_ntsc(machine_config &config)
+void megadriv_radica_6button_state::megadriv_radica_6button_ntsc(machine_config &config)
 {
 	md_ntsc(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &megadriv_radica_state::megadriv_radica_map);
-	MCFG_MACHINE_START_OVERRIDE(megadriv_radica_state, megadriv_radica_6button)
-	MCFG_MACHINE_RESET_OVERRIDE(megadriv_radica_state, megadriv_radica)
 }
 
 
 ROM_START( rad_sf2 )
 	ROM_REGION( 0x400000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "genesis2player.bin", 0x000000, 0x400000, CRC(a4426df8) SHA1(091f2a95ebd091141de5bcb83562c6087708cb32) )
+	ROM_LOAD16_WORD_SWAP( "radica_megadrive_streetfighter2_usa.bin", 0x000000, 0x400000, CRC(a4426df8) SHA1(091f2a95ebd091141de5bcb83562c6087708cb32) )
 ROM_END
 
 ROM_START( rad_sf2p )
 	ROM_REGION( 0x400000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "radicasf.bin", 0x000000, 0x400000,  CRC(868afb44) SHA1(f4339e36272c18b1d49aa4095127ed18e0961df6) )
+	ROM_LOAD16_WORD_SWAP( "radica_megadrive_streetfighter2_uk.bin", 0x000000, 0x400000,  CRC(868afb44) SHA1(f4339e36272c18b1d49aa4095127ed18e0961df6) )
 ROM_END
 
 ROM_START( rad_gen1 )
 	ROM_REGION( 0x400000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "radicav1.bin", 0x000000, 0x400000,  CRC(3b4c8438) SHA1(5ed9c053f9ebc8d4bf571d57e562cf347585d158) )
+	ROM_LOAD16_WORD_SWAP( "radica_megadrive_vol1_blue_usa.bin", 0x000000, 0x400000,  CRC(3b4c8438) SHA1(5ed9c053f9ebc8d4bf571d57e562cf347585d158) )
 ROM_END
 
 ROM_START( rad_md1 )
 	ROM_REGION( 0x400000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "radica.bin", 0x000000, 0x400000, CRC(85867db1) SHA1(ddc596e2e68dc872bc0679a2de7a295b4c6d6b8e) )
+	ROM_LOAD16_WORD_SWAP( "radica_megadrive_vol1_blue_europe.bin", 0x000000, 0x400000, CRC(85867db1) SHA1(ddc596e2e68dc872bc0679a2de7a295b4c6d6b8e) )
 ROM_END
 
 ROM_START( rad_gen2 )
 	ROM_REGION( 0x400000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "genesisred.bin", 0x000000, 0x400000, CRC(7c1a0f0e) SHA1(a6441f75a4cd48f1563aeafdfbdde00202d4067c) )
+	ROM_LOAD16_WORD_SWAP( "radica_genesis_vol2_red_usa.bin", 0x000000, 0x400000, CRC(7c1a0f0e) SHA1(a6441f75a4cd48f1563aeafdfbdde00202d4067c) )
+ROM_END
+
+ROM_START( rad_md2 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "radica_megadrive_vol2_red_uk.bin", 0x000000, 0x400000, CRC(b68fd025) SHA1(b8f9c505653d6dd2b62840f078f828360faf8abc) )
 ROM_END
 
 ROM_START( rad_ssoc )
 	ROM_REGION( 0x400000, "maincpu", 0 )
-	ROM_LOAD( "sensiblesoccer.bin", 0x000000, 0x400000,  CRC(b8745ab3) SHA1(0ab3f26e5ffd288e5a3a5db676951b9095299eb0) ) // should be byteswapped?
+	ROM_LOAD( "radica_sensiblesoccer_uk.bin", 0x000000, 0x400000,  CRC(b8745ab3) SHA1(0ab3f26e5ffd288e5a3a5db676951b9095299eb0) ) // should be byteswapped?
 ROM_END
 
 ROM_START( rad_sonic )
 	ROM_REGION( 0x400000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "supersonicgold.bin", 0x000000, 0x400000, CRC(853c9140) SHA1(cf70a9cdd3be4d8d1b6195698db3a941f4908791) )
+	ROM_LOAD16_WORD_SWAP( "radica_supersonicgold_usa.bin", 0x000000, 0x400000, CRC(853c9140) SHA1(cf70a9cdd3be4d8d1b6195698db3a941f4908791) )
+ROM_END
+
+ROM_START( rad_sonicp )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "radica_supersonicgold_uk.bin", 0x000000, 0x400000, CRC(ed774018) SHA1(cc2f7183e128c947463e3a43a0184b835ea16db8) )
 ROM_END
 
 // once byteswapped this matches "outrun 2019 (usa) (beta).bin  megadriv:outr2019up Out Run 2019 (USA, Prototype)"
@@ -208,7 +210,7 @@ ROM_START( rad_orun )
 ROM_END
 
 
-void megadriv_radica_state::init_megadriv_radica_6button_pal()
+void megadriv_radica_6button_state::init_megadriv_radica_6button_pal()
 {
 	init_megadrie();
 	// 6 button game, so overwrite 3 button io handlers
@@ -216,7 +218,7 @@ void megadriv_radica_state::init_megadriv_radica_6button_pal()
 	m_megadrive_io_write_data_port_ptr = write16sm_delegate(*this, FUNC(md_base_state::megadrive_io_write_data_port_6button));
 }
 
-void megadriv_radica_state::init_megadriv_radica_6button_ntsc()
+void megadriv_radica_6button_state::init_megadriv_radica_6button_ntsc()
 {
 	init_megadriv();
 	// 6 button game, so overwrite 3 button io handlers
@@ -224,19 +226,31 @@ void megadriv_radica_state::init_megadriv_radica_6button_ntsc()
 	m_megadrive_io_write_data_port_ptr = write16sm_delegate(*this, FUNC(md_base_state::megadrive_io_write_data_port_6button));
 }
 
+// US versions show 'Genesis' on the menu,    show a www.radicagames.com splash screen, and use NTSC versions of the ROMs, sometimes region locked
+// EU versions show 'Mega Drive' on the menu, show a www.radicagames.com splash screen, and use PAL versions of the ROMs, sometimes region locked
+// UK versions show "Mega Drive' on the menu, show a www.radicauk.com splash screen,    and use PAL versions of the ROMs, sometimes region locked
 
-CONS( 2004, rad_gen1,  0,        0, megadriv_radica_3button_ntsc, megadriv_radica_3button_1player, megadriv_radica_state, init_megadriv,                    "Radica / Sega",                     "Genesis Collection Volume 1 (Radica, Arcade Legends) (USA)", 0)
-CONS( 2004, rad_md1,   rad_gen1, 0, megadriv_radica_3button_pal,  megadriv_radica_3button_1player, megadriv_radica_state, init_megadrie,                    "Radica / Sega",                     "Mega Drive Collection Volume 1 (Radica, Arcade Legends) (Europe)", 0)
 
-CONS( 2004, rad_gen2,  0,        0, megadriv_radica_3button_ntsc, megadriv_radica_3button_1player, megadriv_radica_state, init_megadriv,                    "Radica / Sega",                     "Genesis Collection Volume 2 (Radica, Arcade Legends) (USA)", 0)
+CONS( 2004, rad_gen1,  0,        0, megadriv_radica_3button_ntsc, megadriv_radica_3button_1player, megadriv_radica_3button_state, init_megadriv,                    "Radica / Sega",                     "Genesis Collection Volume 1 (Radica, Arcade Legends) (USA)", 0)
+CONS( 2004, rad_md1,   rad_gen1, 0, megadriv_radica_3button_pal,  megadriv_radica_3button_1player, megadriv_radica_3button_state, init_megadrie,                    "Radica / Sega",                     "Mega Drive Collection Volume 1 (Radica, Arcade Legends) (Europe)", 0)
+// A UK version exists, showing the Radica UK boot screen
+
+CONS( 2004, rad_gen2,  0,        0, megadriv_radica_3button_ntsc, megadriv_radica_3button_1player, megadriv_radica_3button_state, init_megadriv,                    "Radica / Sega",                     "Genesis Collection Volume 2 (Radica, Arcade Legends) (USA)", 0)
+CONS( 2004, rad_md2,   rad_gen2, 0, megadriv_radica_3button_pal,  megadriv_radica_3button_1player, megadriv_radica_3button_state, init_megadrie,                    "Radica / Sega",                     "Mega Drive Collection Volume 2 (Radica, Arcade Legends) (UK)", 0)
+// is there a Europe version with Radica Games boot screen and Mega Drive text?
 
 // box calls this Volume 3
-CONS( 2004, rad_sonic, 0,        0, megadriv_radica_3button_ntsc, megadriv_radica_3button_1player, megadriv_radica_state, init_megadriv,                    "Radica / Sega",                     "Super Sonic Gold (Radica Plug & Play) (USA)", 0)
+CONS( 2004, rad_sonic, 0,        0, megadriv_radica_3button_ntsc, megadriv_radica_3button_1player, megadriv_radica_3button_state, init_megadriv,                    "Radica / Sega",                     "Super Sonic Gold (Radica Plug & Play) (USA)", 0)
+CONS( 2004, rad_sonicp,rad_sonic,0, megadriv_radica_3button_pal,  megadriv_radica_3button_1player, megadriv_radica_3button_state, init_megadrie,                    "Radica / Sega",                     "Super Sonic Gold (Radica Plug & Play) (UK)", 0)
+// is there a Europe version with Radica Games boot screen and Mega Drive text?
 
-CONS( 2004, rad_sf2,   0,        0, megadriv_radica_6button_ntsc, megadriv_radica_6button,         megadriv_radica_state, init_megadriv_radica_6button_ntsc,"Radica / Capcom / Sega",            "Street Fighter II: Special Champion Edition [Ghouls'n Ghosts] (Radica, Arcade Legends) (USA)", 0)
-CONS( 2004, rad_sf2p,  rad_sf2,  0, megadriv_radica_6button_pal,  megadriv_radica_6button,         megadriv_radica_state, init_megadriv_radica_6button_pal, "Radica / Capcom / Sega",            "Street Fighter II: Special Champion Edition [Ghouls'n Ghosts] (Radica, Arcade Legends) (Europe)", 0)
+CONS( 2004, rad_sf2,   0,        0, megadriv_radica_6button_ntsc, megadriv_radica_6button,         megadriv_radica_6button_state, init_megadriv_radica_6button_ntsc,"Radica / Capcom / Sega",            "Street Fighter II: Special Champion Edition [Ghouls'n Ghosts] (Radica, Arcade Legends) (USA)", 0)
+CONS( 2004, rad_sf2p,  rad_sf2,  0, megadriv_radica_6button_pal,  megadriv_radica_6button,         megadriv_radica_6button_state, init_megadriv_radica_6button_pal, "Radica / Capcom / Sega",            "Street Fighter II: Special Champion Edition [Ghouls'n Ghosts] (Radica, Arcade Legends) (UK)", 0)
+// is there a Europe version with Radica Games boot screen and Mega Drive text?
 
 // still branded as Arcade Legends even if none of these were ever arcade games, European exclusive
-CONS( 2004, rad_ssoc,  0,        0, megadriv_radica_3button_pal,  megadriv_radica_3button,         megadriv_radica_state, init_megadrie,                    "Radica / Sensible Software / Sega", "Sensible Soccer plus [Cannon Fodder, Mega lo Mania] (Radica, Arcade Legends) (Europe)", 0)
+CONS( 2004, rad_ssoc,  0,        0, megadriv_radica_3button_pal,  megadriv_radica_3button,         megadriv_radica_3button_state, init_megadrie,                    "Radica / Sensible Software / Sega", "Sensible Soccer plus [Cannon Fodder, Mega lo Mania] (Radica, Arcade Legends) (UK)", 0)
+// is there a Europe version with Radica Games boot screen and Mega Drive text?
 
-CONS( 2004, rad_orun,  0,        0, megadriv_radica_3button_pal,  megadriv_radica_3button_1player, megadriv_radica_state, init_megadrie,                    "Radica / Sega",                     "Out Run 2019 (Radica Plug & Play, Europe)", 0)
+// not region locked, no Radica logos, uncertain if other regions would differ
+CONS( 2004, rad_orun,  0,        0, megadriv_radica_3button_pal,  megadriv_radica_3button_1player, megadriv_radica_3button_state, init_megadrie,                    "Radica / Sega",                     "Out Run 2019 (Radica Plug & Play, UK)", 0)

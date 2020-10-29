@@ -963,6 +963,12 @@ ROM_START( papsudok )
 	ROM_LOAD( "sudoku2.bin", 0x00000, 0x80000, CRC(d1ffcc1e) SHA1(2010e60933a08d0b9271ef37f338758aacba6d2d) )
 ROM_END
 
+ROM_START( nytsudo )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "nytsudoku.bin", 0x00000, 0x80000, CRC(9aab1977) SHA1(6948f34d67204287418cdf79f1ca0fa0c26670e3) )
+ROM_END
+
+
 ROM_START( pjoypj001 )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "powerjoy_pj001_lh28f008sc_89a6.bin", 0x00000, 0x100000, CRC(e655e0aa) SHA1(c96d3422e26451c366fee2151fedccb95014cbc7) )
@@ -1005,7 +1011,8 @@ CONS( 200?, dnce2000, 0, 0, nes_clone_dnce2000, dnce2000, nes_clone_dnce2000_sta
 // Alt. version was released with 'New York Times' titlescreen
 CONS( 200?, papsudok,     0,  0,  nes_clone_suduko, papsudok, nes_clone_suduko_state, init_sudoku, "Nice Code", "Plug and Play Sudoku Game (NES based)", 0 ) // plays, but unclear how 'save' feature is meant to work, is it meant to save after shutdown or not? no obvious writes
 
-CONS( 200?, vtvppong,  0,  0,  nes_clone_vtvppong,    nes_clone, nes_clone_vtvppong_state, init_vtvppong, "<unknown>", "Virtual TV Ping Pong", MACHINE_NOT_WORKING )
+CONS( 200?, nytsudo,      0,  0,  nes_clone_suduko, papsudok, nes_clone_suduko_state, init_sudoku, "Excalibur / Nice Code", "The New York Times Sudoku", 0 ) // based on the above
 
+CONS( 200?, vtvppong,  0,  0,  nes_clone_vtvppong,    nes_clone, nes_clone_vtvppong_state, init_vtvppong, "<unknown>", "Virtual TV Ping Pong", MACHINE_NOT_WORKING )
 
 CONS( 200?, pjoypj001, 0, 0, nes_clone, nes_clone, nes_clone_state, init_nes_clone, "Trump Grand", "PowerJoy (PJ001, NES based plug & play)", MACHINE_NOT_WORKING )
