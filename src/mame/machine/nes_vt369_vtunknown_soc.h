@@ -10,6 +10,7 @@
 #include "sound/nes_apu_vt.h"
 #include "machine/m6502_vtscr.h"
 #include "machine/m6502_swap_op_d5_d6.h"
+#include "machine/vt1682_alu.h"
 #include "video/ppu2c0x_vt.h"
 #include "screen.h"
 #include "speaker.h"
@@ -28,8 +29,7 @@ protected:
 	uint8_t vt03_41bx_r(offs_t offset);
 	void vt03_41bx_w(offs_t offset, uint8_t data);
 
-	uint8_t vt03_413x_r(offs_t offset);
-	void vt03_413x_w(offs_t offset, uint8_t data);
+	required_device<vrt_vt1682_alu_device> m_alu;
 
 	uint8_t vt03_414f_r();
 
@@ -39,6 +39,8 @@ protected:
 	uint8_t vt03_48ax_r(offs_t offset);
 
 	uint8_t m_413x[8]; // CY only?
+
+	void vt369_soundcpu_control_w(offs_t offset, uint8_t data);
 };
 
 class nes_vtunknown_soc_bt_device : public nes_vt09_soc_device

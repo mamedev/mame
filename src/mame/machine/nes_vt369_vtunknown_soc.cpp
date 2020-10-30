@@ -17,7 +17,8 @@ DEFINE_DEVICE_TYPE(NES_VTUNKNOWN_SOC_FA, nes_vtunknown_soc_fa_device, "nes_vtunk
 
 
 nes_vtunknown_soc_cy_device::nes_vtunknown_soc_cy_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
-	nes_vt09_soc_device(mconfig, NES_VTUNKNOWN_SOC_CY, tag, owner, clock)
+	nes_vt09_soc_device(mconfig, NES_VTUNKNOWN_SOC_CY, tag, owner, clock),
+	m_alu(*this, "alu")
 {
 }
 
@@ -61,17 +62,70 @@ void nes_vtunknown_soc_cy_device::device_add_mconfig(machine_config& config)
 {
 	nes_vt02_vt03_soc_device::device_add_mconfig(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vtunknown_soc_cy_device::nes_vt_cy_map);
+
+	VT_VT1682_ALU(config, m_alu, 0);
+
 }
+
+void nes_vtunknown_soc_cy_device::vt369_soundcpu_control_w(offs_t offset, uint8_t data)
+{
+	printf("%s: write to sound cpu control reg (reset etc.) %02x\n", machine().describe_context().c_str(), data);
+}
+
 
 void nes_vtunknown_soc_cy_device::nes_vt_cy_map(address_map &map)
 {
-	nes_vt_4k_ram_map(map);
-	map(0x41b0, 0x41bf).r(FUNC(nes_vtunknown_soc_cy_device::vt03_41bx_r)).w(FUNC(nes_vtunknown_soc_cy_device::vt03_41bx_w));
-	map(0x4130, 0x4136).r(FUNC(nes_vtunknown_soc_cy_device::vt03_413x_r)).w(FUNC(nes_vtunknown_soc_cy_device::vt03_413x_w));
+	map(0x0000, 0x1fff).ram(); // 8k RAM?
+
+	// ddrdismx relies on the mirroring, later SoCs have different mirroring?
+	map(0x2000, 0x2007).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));                      // standard PPU registers
+	map(0x2010, 0x201f).rw(m_ppu, FUNC(ppu_vt03_device::read_extended), FUNC(ppu_vt03_device::write_extended));  //  extra VT PPU registers
+
+	map(0x4000, 0x4013).rw(m_apu, FUNC(nesapu_device::read), FUNC(nesapu_device::write));
+
+	map(0x4014, 0x4014).r(FUNC(nes_vtunknown_soc_cy_device::psg1_4014_r)).w(FUNC(nes_vtunknown_soc_cy_device::vt_dma_w));
+	map(0x4015, 0x4015).rw(FUNC(nes_vtunknown_soc_cy_device::psg1_4015_r), FUNC(nes_vtunknown_soc_cy_device::psg1_4015_w)); // PSG status / first control register
+	map(0x4016, 0x4016).rw(FUNC(nes_vtunknown_soc_cy_device::in0_r), FUNC(nes_vtunknown_soc_cy_device::in0_w));
+	map(0x4017, 0x4017).r(FUNC(nes_vtunknown_soc_cy_device::in1_r)).w(FUNC(nes_vtunknown_soc_cy_device::psg1_4017_w));
+
+	map(0x4034, 0x4034).w(FUNC(nes_vtunknown_soc_cy_device::vt03_4034_w));
+
+	map(0x4100, 0x410b).r(FUNC(nes_vtunknown_soc_cy_device::vt03_410x_r)).w(FUNC(nes_vtunknown_soc_cy_device::vt03_410x_w));
+	// 0x410c unused
+	map(0x410d, 0x410d).w(FUNC(nes_vtunknown_soc_cy_device::extra_io_control_w));
+	map(0x410e, 0x410e).rw(FUNC(nes_vtunknown_soc_cy_device::extrain_01_r), FUNC(nes_vtunknown_soc_cy_device::extraout_01_w));
+	map(0x410f, 0x410f).rw(FUNC(nes_vtunknown_soc_cy_device::extrain_23_r), FUNC(nes_vtunknown_soc_cy_device::extraout_23_w));
+	// 0x4114 RS232 timer (low)
+	// 0x4115 RS232 timer (high)
+	// 0x4116 unused
+	// 0x4117 unused
+	// 0x4118 unused
+	map(0x4119, 0x4119).r(FUNC(nes_vtunknown_soc_cy_device::rs232flags_region_r));
+	// 0x411a RS232 TX data
+	// 0x411b RS232 RX data
+
+	map(0x4130, 0x4130).rw(m_alu, FUNC(vrt_vt1682_alu_device::alu_out_1_r), FUNC(vrt_vt1682_alu_device::alu_oprand_1_w));
+	map(0x4131, 0x4131).rw(m_alu, FUNC(vrt_vt1682_alu_device::alu_out_2_r), FUNC(vrt_vt1682_alu_device::alu_oprand_2_w));
+	map(0x4132, 0x4132).rw(m_alu, FUNC(vrt_vt1682_alu_device::alu_out_3_r), FUNC(vrt_vt1682_alu_device::alu_oprand_3_w));
+	map(0x4133, 0x4133).rw(m_alu, FUNC(vrt_vt1682_alu_device::alu_out_4_r), FUNC(vrt_vt1682_alu_device::alu_oprand_4_w));
+	map(0x4134, 0x4134).rw(m_alu, FUNC(vrt_vt1682_alu_device::alu_out_5_r), FUNC(vrt_vt1682_alu_device::alu_oprand_5_mult_w));
+	map(0x4135, 0x4135).rw(m_alu, FUNC(vrt_vt1682_alu_device::alu_out_6_r), FUNC(vrt_vt1682_alu_device::alu_oprand_6_mult_w));
+	map(0x4136, 0x4136).w(m_alu, FUNC(vrt_vt1682_alu_device::alu_oprand_5_div_w));
+	map(0x4137, 0x4137).w(m_alu, FUNC(vrt_vt1682_alu_device::alu_oprand_6_div_w));
+
 	map(0x414f, 0x414f).r(FUNC(nes_vtunknown_soc_cy_device::vt03_414f_r));
 	map(0x415c, 0x415c).r(FUNC(nes_vtunknown_soc_cy_device::vt03_415c_r));
 
-	map(0x48a0, 0x48af).r(FUNC(nes_vtunknown_soc_cy_device::vt03_48ax_r)).w(FUNC(nes_vtunknown_soc_cy_device::vt03_48ax_w));
+	map(0x4162, 0x4162).w(FUNC(nes_vtunknown_soc_cy_device::vt369_soundcpu_control_w));
+
+	map(0x41b0, 0x41bf).r(FUNC(nes_vtunknown_soc_cy_device::vt03_41bx_r)).w(FUNC(nes_vtunknown_soc_cy_device::vt03_41bx_w));
+
+//	map(0x48a0, 0x48af).r(FUNC(nes_vtunknown_soc_cy_device::vt03_48ax_r)).w(FUNC(nes_vtunknown_soc_cy_device::vt03_48ax_w));
+	map(0x4800, 0x4fff).ram().share("soundram");
+
+	map(0x8000, 0xffff).rw(FUNC(nes_vtunknown_soc_cy_device::external_space_read), FUNC(nes_vtunknown_soc_cy_device::external_space_write));
+	//map(0x6000, 0x7fff).ram();
+
 }
 
 void nes_vtunknown_soc_cy_device::device_start()
@@ -97,37 +151,6 @@ void nes_vtunknown_soc_cy_device::vt03_41bx_w(offs_t offset, uint8_t data)
 	logerror("vt03_41bx_w %02x %02x\n", offset, data);
 }
 
-uint8_t nes_vtunknown_soc_cy_device::vt03_413x_r(offs_t offset)
-{
-	logerror("vt03_413x_r %02x\n", offset);
-	return m_413x[offset];
-}
-
-void nes_vtunknown_soc_cy_device::vt03_413x_w(offs_t offset, uint8_t data)
-{
-	logerror("vt03_413x_w %02x %02x\n", offset, data);
-	// VT168 style ALU ??
-	m_413x[offset] = data;
-	if (offset == 0x5)
-	{
-		uint32_t res = uint32_t((m_413x[5] << 8) | m_413x[4]) * uint32_t((m_413x[1] << 8) | m_413x[0]);
-		m_413x[0] = res & 0xFF;
-		m_413x[1] = (res >> 8) & 0xFF;
-		m_413x[2] = (res >> 16) & 0xFF;
-		m_413x[3] = (res >> 24) & 0xFF;
-		m_413x[6] = 0x00;
-
-	}
-	else if (offset == 0x6)
-	{
-		/*uint32_t res = uint32_t((m_413x[5] << 8) | m_413x[4]) * uint32_t((m_413x[1] << 8) | m_413x[0]);
-		m_413x[0] = res & 0xFF;
-		m_413x[1] = (res >> 8) & 0xFF;
-		m_413x[2] = (res >> 16) & 0xFF;
-		m_413x[3] = (res >> 24) & 0xFF;*/
-		m_413x[6] = 0x00;
-	}
-}
 
 uint8_t nes_vtunknown_soc_cy_device::vt03_414f_r()
 {
