@@ -1529,8 +1529,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<year>1994</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<info name="alt_title" value="ワールド・オブ・ジーン" />
-		<info name="usage" value="Requires 4 MB RAM"/>
-		<info name="usage" value="This disk combines MM4 and MM5 into a single game. Requires both CDs and a save disk from either game. Boot TownsOS 2.1 and run the icon on drive A to install." />
+		<info name="usage" value="This disk combines MM4 and MM5 into a single game. Requires 4 MB RAM, both CDs and a save disk from either game. Boot TownsOS 2.1 and run the icon on drive A to install." />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="might and magic - world of xeen (install disk).hdm" size="1261568" crc="42475067" sha1="f4a7c497b185f707ed2bf7077801adfcd20b5278"/>
