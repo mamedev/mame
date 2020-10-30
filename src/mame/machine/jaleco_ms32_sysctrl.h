@@ -1,10 +1,10 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese
-/***************************************************************************
+// copyright-holders:Angelo Salese, Alex Marshall
+/******************************************************************************
 
 Jaleco MS32 System Control Unit
 
-***************************************************************************/
+******************************************************************************/
 
 #ifndef MAME_MACHINE_JALECO_MS32_SYSCTRL_H
 #define MAME_MACHINE_JALECO_MS32_SYSCTRL_H
@@ -14,14 +14,13 @@ Jaleco MS32 System Control Unit
 #include "screen.h"
 
 
-//**************************************************************************
+//*****************************************************************************
 //  TYPE DEFINITIONS
-//**************************************************************************
+//*****************************************************************************
 
 // ======================> jaleco_ms32_sysctrl_device
 
 class jaleco_ms32_sysctrl_device : public device_t,
-								   //public device_memory_interface,
 								   public device_video_interface
 {
 public:
@@ -29,8 +28,6 @@ public:
 	jaleco_ms32_sysctrl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
-//	void write(offs_t offset, u16 data, u16 mem_mask = ~0);
-//	u16 read(offs_t offset, u16 mem_mask = ~0);
 	void amap(address_map &map);
 	auto flip_screen_cb() { return m_flip_screen_cb.bind(); }
 	auto vblank_cb() { return m_vblank_cb.bind(); }
@@ -44,11 +41,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-//	virtual space_config_vector memory_space_config() const override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-//	const address_space_config m_space_config;
-//	void io_map(address_map &map);
 	
 private:
 	void control_w(u16 data);

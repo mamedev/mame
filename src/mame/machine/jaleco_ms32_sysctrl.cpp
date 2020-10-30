@@ -1,40 +1,50 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese
-/***************************************************************************
+// copyright-holders:Angelo Salese, Alex Marshall
+/******************************************************************************
 
 	Jaleco MS32 System Control Unit
 
 	A simple system controller for late 90s Jaleco HWs
+	
 	Known features: 
 	- CRTC & screen(s?) control;
 	- dot clock control;
-	- reset/irq lines;
+	- irq/reset controller;
 	- programmable timer;
 	- watchdog;
 	
 	First use in MS32, then their later (?) 68k revision. 
 
 	TODO:
+	- pinpoint exact timing generation (free counter or based on host screen 
+	  beams)
+	- interface with multiple screens is a mystery, cfr. dual screen bnstars,
+	  stepping stage HW;
+	- network irq?
 	- actual chip name;
-	- several unknowns on the Stepping Stage era HW interface, 
-	  namely how the CRTC setup works.
 
-***************************************************************************/
+	BTANBs:
+	- in p47aces v1.0 (p47acesa) code messes up the programmable irq timer 
+	  setup, causing SFX overloads by using Spitfire ship with 30 Hz autofire 
+	  and shooting at point blank range over walls/enemies. 
+	  This has been fixed in v1.1
+
+*******************************************************************************/
 
 #include "emu.h"
 #include "jaleco_ms32_sysctrl.h"
 
-//**************************************************************************
+//*****************************************************************************
 //  GLOBAL VARIABLES
-//**************************************************************************
+//*****************************************************************************
 
 // device type definition
 DEFINE_DEVICE_TYPE(JALECO_MS32_SYSCTRL, jaleco_ms32_sysctrl_device, "jaleco_ms32_sysctrl", "Jaleco MS32 System Control Unit")
 
 
-//**************************************************************************
+//*****************************************************************************
 //  LIVE DEVICE
-//**************************************************************************
+//*****************************************************************************
 
 //-------------------------------------------------
 //  jaleco_ms32_sysctrl_device - constructor
@@ -42,9 +52,7 @@ DEFINE_DEVICE_TYPE(JALECO_MS32_SYSCTRL, jaleco_ms32_sysctrl_device, "jaleco_ms32
 
 jaleco_ms32_sysctrl_device::jaleco_ms32_sysctrl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, JALECO_MS32_SYSCTRL, tag, owner, clock)
-//	, device_memory_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
-//	, m_space_config("regs", ENDIANNESS_NATIVE, 16, 6, -1, address_map_constructor(FUNC(jaleco_ms32_sysctrl_device::io_map), this))
 	, m_flip_screen_cb(*this)
 	, m_vblank_cb(*this)
 	, m_field_cb(*this)
@@ -52,14 +60,6 @@ jaleco_ms32_sysctrl_device::jaleco_ms32_sysctrl_device(const machine_config &mco
 	, m_sound_reset_cb(*this)
 {
 }
-
-/*
-device_memory_interface::space_config_vector jaleco_ms32_sysctrl_device::memory_space_config() const
-{
-	return space_config_vector {
-		std::make_pair(AS_IO, &m_space_config)
-	};
-}*/
 
 void jaleco_ms32_sysctrl_device::amap(address_map& map)
 {
@@ -76,7 +76,7 @@ void jaleco_ms32_sysctrl_device::amap(address_map& map)
 	map(0x18, 0x19).w(FUNC(jaleco_ms32_sysctrl_device::timer_interval_w));
 	map(0x1a, 0x1b).w(FUNC(jaleco_ms32_sysctrl_device::timer_ack_w));
 	map(0x1c, 0x1d).w(FUNC(jaleco_ms32_sysctrl_device::sound_reset_w));
-//	map(0x1e, 0x1f).w // ???
+//	map(0x1e, 0x1f).w // unknown reset signal
 //	map(0x24, 0x27).w // sound comms bidirectional acks?
 	map(0x28, 0x29).nopw(); // watchdog
 	map(0x2c, 0x2d).w(FUNC(jaleco_ms32_sysctrl_device::field_ack_w));
@@ -154,7 +154,7 @@ void jaleco_ms32_sysctrl_device::flush_prg_timer()
 	{
 		//const u16 htotal = m_crtc.horz_blank + m_crtc.horz_display;
 		// TODO: unknown actual timings, with interval = 2 it should fire an irq every 16 scanlines in p47aces v1.1
-		// (excluding times where it is disabled) -> ~1000 Hz?
+		//       (excluding times where it is disabled) -> ~1000 Hz?
 		step = attotime::from_nsec(500000) * m_timer.interval;
 	}
 	else
@@ -197,23 +197,9 @@ void jaleco_ms32_sysctrl_device::device_timer(emu_timer &timer, device_timer_id 
 	}
 }
 
-//**************************************************************************
+//*****************************************************************************
 //  READ/WRITE HANDLERS
-//**************************************************************************
-
-/*u16 jaleco_ms32_sysctrl_device::read(offs_t offset, u16 mem_mask)
-{
-	return this->space(AS_IO).read_word(offset, mem_mask);
-}
-
-void jaleco_ms32_sysctrl_device::write(offs_t offset, u16 data, u16 mem_mask)
-{
-	this->space(AS_IO).write_word(offset, data, mem_mask);
-}*/
-
-// =================
-// CRTC
-// =================
+//*****************************************************************************
 
 inline u16 jaleco_ms32_sysctrl_device::clamp_to_12bits_neg(u16 raw_data)
 {
@@ -221,6 +207,10 @@ inline u16 jaleco_ms32_sysctrl_device::clamp_to_12bits_neg(u16 raw_data)
 	// TODO: nndmseal sets up bit 12, reason?
 	return 0x1000 - (raw_data & 0xfff);
 }
+
+// ============================================================================
+// CRTC
+// ============================================================================
 
 inline u32 jaleco_ms32_sysctrl_device::get_dotclock_frequency()
 {
@@ -260,10 +250,11 @@ void jaleco_ms32_sysctrl_device::control_w(u16 data)
 		m_flip_screen_state = current_flip;
 		m_flip_screen_cb(m_flip_screen_state ? ASSERT_LINE : CLEAR_LINE);
 	}
+	if (data & 0xf4)
+		logerror("%s: enabled unknown bit in control_w %02x\n", this->tag(), data & 0xf4);
+	
 	m_timer.irq_enable = bool(BIT(data, 3));
 	flush_prg_timer();
-//	if (m_timer_irq_enable)
-//		printf("%d\n",m_timer_irq_enable);
 }
 
 void jaleco_ms32_sysctrl_device::hblank_w(u16 data)
@@ -310,9 +301,9 @@ void jaleco_ms32_sysctrl_device::vfp_w(u16 data)
 	logerror("%s: VSYNC front porch %d\n", this->tag(), clamp_to_12bits_neg(data));
 }
 
-// =================
+// ============================================================================
 // Timer
-// =================
+// ============================================================================
 
 void jaleco_ms32_sysctrl_device::timer_interval_w(u16 data)
 {
@@ -325,9 +316,9 @@ void jaleco_ms32_sysctrl_device::timer_ack_w(u16 data)
 	m_prg_timer_cb(0);
 }
 
-// =================
+// ============================================================================
 // ACK lines
-// =================
+// ============================================================================
 
 void jaleco_ms32_sysctrl_device::sound_reset_w(u16 data)
 {
