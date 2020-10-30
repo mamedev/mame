@@ -119,6 +119,8 @@ OSC:    12.000MHz
 #include "tilemap.h"
 
 
+namespace {
+
 class jalmah_state : public driver_device
 {
 public:
@@ -271,6 +273,7 @@ Video Hardware start
 
 void jalmah_state::video_start()
 {
+	m_tile_bank = 0;
 	// ...
 }
 
@@ -1057,6 +1060,11 @@ void jalmah_state::machine_start()
 	const int okimax = (memregion("oki")->bytes() - 0x40000) / 0x20000;
 	m_okibank->configure_entries(0,okimax,memregion("oki")->base() + 0x40000,0x20000);
 
+	m_prg_prot = 0;
+	m_oki_rom = 0;
+	m_oki_bank = 0;
+	m_oki_za = 0;
+
 	save_item(NAME(m_respcount));
 	save_item(NAME(m_test_mode));
 	save_item(NAME(m_prg_prot));
@@ -1743,6 +1751,8 @@ void jalmah_state::init_suchiesp()
 
 	m_mcu_prg = SUCHIESP_MCU;
 }
+
+} // Anonymous namespace
 
 /*First version of the MCU*/
 GAME( 1989, urashima, 0, urashima,  urashima, urashima_state, init_urashima, ROT0, "UPL",          "Otogizoushi Urashima Mahjong (Japan)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
