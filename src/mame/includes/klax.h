@@ -11,6 +11,7 @@
 #pragma once
 
 #include "machine/timer.h"
+#include "sound/msm5205.h"
 #include "video/atarimo.h"
 #include "screen.h"
 #include "tilemap.h"
@@ -27,6 +28,8 @@ public:
 		, m_mob(*this, "mob")
 		, m_p1(*this, "P1")
 		, m_audiocpu(*this, "audiocpu")
+		, m_msm(*this, "msm%u", 1)
+		, m_rombank(*this, "rombank")
 	{ }
 
 	void klax(machine_config &config);
@@ -59,11 +62,21 @@ private:
 	required_ioport m_p1;
 
 	// bootleg hardware
+	DECLARE_MACHINE_START(klax5bl);
+
+	void m5205_int1(int state);
+
 	uint8_t audio_ram_r(offs_t offset);
 	void audio_ram_w(offs_t offset, uint8_t data);
+	void audio_sample_w(offs_t offset, uint8_t data);
+	void audio_ctrl_w(uint8_t data);
 
 	optional_device<cpu_device> m_audiocpu;
+	optional_device_array<msm5205_device, 2> m_msm;
+	optional_memory_bank m_rombank;
 	std::unique_ptr<uint8_t[]> m_audio_ram;
+	uint8_t m_audio_sample[2];
+	bool m_audio_nibble;
 
 	static const atari_motion_objects_config s_mob_config;
 };
