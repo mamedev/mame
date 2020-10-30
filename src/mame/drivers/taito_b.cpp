@@ -1521,6 +1521,15 @@ static INPUT_PORTS_START( ryujin )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+
+	PORT_START("IN3")
+	PORT_BIT(  0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	
+	PORT_START("IN4")
+	PORT_BIT(  0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	
+	PORT_START("IN5")
+	PORT_BIT(  0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sbm )
@@ -2418,7 +2427,7 @@ void taitob_state::viofight(machine_config &config)
 }
 
 
-void taitob_state::silentd(machine_config &config)
+void taitob_state::silentd(machine_config &config) /* ET910000B PCB */
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 24_MHz_XTAL / 2);   /* 12 MHz */
@@ -2472,7 +2481,7 @@ void taitob_state::silentd(machine_config &config)
 }
 
 
-void taitob_state::selfeena(machine_config &config)
+void taitob_state::selfeena(machine_config &config) /* ET910000A PCB */
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 24_MHz_XTAL / 2);   /* 12 MHz */
@@ -2535,58 +2544,6 @@ void taitob_state::ryujin_patch(void)
 }
 #endif
 
-void taitob_state::ryujin(machine_config &config)
-{
-	/* basic machine hardware */
-	M68000(config, m_maincpu, 24_MHz_XTAL / 2);   /* 12 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &taitob_state::selfeena_map);
-
-	Z80(config, m_audiocpu, 16_MHz_XTAL / 4);  /* 4 MHz */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
-
-	config.set_maximum_quantum(attotime::from_hz(600));
-
-	TC0220IOC(config, m_tc0220ioc, 0);
-	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
-	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
-	m_tc0220ioc->read_2_callback().set_ioport("IN0");
-	m_tc0220ioc->read_3_callback().set_ioport("IN1");
-	m_tc0220ioc->write_4_callback().set(FUNC(taitob_state::player_12_coin_ctrl_w));
-	m_tc0220ioc->read_7_callback().set_ioport("IN2");
-
-	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(64*8, 32*8);
-	m_screen->set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
-	m_screen->set_screen_update(FUNC(taitob_state::screen_update_taitob));
-	m_screen->set_palette(m_palette);
-
-	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 4096);
-
-	TC0180VCU(config, m_tc0180vcu, 27.164_MHz_XTAL / 4);
-	m_tc0180vcu->set_fb_colorbase(0x10);
-	m_tc0180vcu->set_bg_colorbase(0x30);
-	m_tc0180vcu->set_fg_colorbase(0x20);
-	m_tc0180vcu->set_tx_colorbase(0x00);
-	m_tc0180vcu->set_palette(m_palette);
-	m_tc0180vcu->inth_callback().set_inputline(m_maincpu, M68K_IRQ_6, HOLD_LINE);
-	m_tc0180vcu->intl_callback().set_inputline(m_maincpu, M68K_IRQ_4, HOLD_LINE);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-
-	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16_MHz_XTAL / 2));  /* 8 MHz */
-	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "mono", 0.25);
-	ymsnd.add_route(1, "mono", 1.0);
-	ymsnd.add_route(2, "mono", 1.0);
-
-	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
-	tc0140syt.set_master_tag(m_maincpu);
-	tc0140syt.set_slave_tag(m_audiocpu);
-}
 
 #if 0
 void taitob_state::sbm_patch(void)
@@ -3427,22 +3384,44 @@ ROM_START( selfeena ) /* Silkscreened PCB number ET910000A */
 	ROM_LOAD( "se-06.11", 0x00000, 0x80000, CRC(80d5e772) SHA1(bee4982a3d65210ff86495e36a0b656934b00c7d) )
 ROM_END
 
-ROM_START( ryujin ) /* Silkscreened PCB number ET910000A */
+ROM_START( ryujin ) /* Silkscreened PCB number ET910000B */
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 256k for 68000 code */
-	ROM_LOAD16_BYTE( "ruj02.27", 0x00000, 0x20000, CRC(0d223aee) SHA1(33f5498a650b244c5a4a22415408a269da597abf) )
-	ROM_LOAD16_BYTE( "ruj01.26", 0x00001, 0x20000, CRC(c6bcdd1e) SHA1(d8620995ad1bc256eab4ed7e1c549e8b6ec5c3fb) )
-	ROM_LOAD16_BYTE( "ruj04.29", 0x40000, 0x20000, CRC(0c153cab) SHA1(16fac3863c1394c9f41173174a4aca20cded6278) )
-	ROM_LOAD16_BYTE( "ruj03.28", 0x40001, 0x20000, CRC(7695f89c) SHA1(755eb7ef40da190d55de80ee5e0e0a537c22e5f1) )
+	ROM_LOAD16_BYTE( "rjn_02.ic32", 0x00000, 0x20000, CRC(5fd353d5) SHA1(76c5e173f5945f9d69f805961ffc190f4f1532d7) ) /* Yes!, these were labeled RJN 02 & RJN 01 (unlike the rest labeled RUJ xx) */
+	ROM_LOAD16_BYTE( "rjn_01.ic10", 0x00001, 0x20000, CRC(f775e4b6) SHA1(1b85b217daf4784e35e0beb088bee229244f1207) )
+	ROM_LOAD16_BYTE( "ruj_04.ic31", 0x40000, 0x20000, CRC(0c153cab) SHA1(16fac3863c1394c9f41173174a4aca20cded6278) ) /* ET910000B PCB uses different IC locations */
+	ROM_LOAD16_BYTE( "ruj_03.ic9",  0x40001, 0x20000, CRC(7695f89c) SHA1(755eb7ef40da190d55de80ee5e0e0a537c22e5f1) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64k for Z80 code */
-	ROM_LOAD( "ruj05.39",0x00000, 0x10000, CRC(95270b16) SHA1(c1ad76268679cf198e9f1514360f280b73e49ab5) )
+	ROM_LOAD( "ruj_05.ic15",0x00000, 0x10000, CRC(95270b16) SHA1(c1ad76268679cf198e9f1514360f280b73e49ab5) )
 
 	ROM_REGION( 0x200000, "tc0180vcu", 0 )
-	ROM_LOAD( "ryujin07.2", 0x000000, 0x100000, CRC(34f50980) SHA1(432384bd283389bca17611602eb310726c9d78a4) )
-	ROM_LOAD( "ryujin06.1", 0x100000, 0x100000, CRC(1b85ff34) SHA1(5ad259e6f7aa4a0c08975da73bf41400495f2e61) )
+	ROM_LOAD( "ryujin-07.ic28", 0x000000, 0x100000, CRC(34f50980) SHA1(432384bd283389bca17611602eb310726c9d78a4) )
+	ROM_LOAD( "ryujin-06.ic39", 0x100000, 0x100000, CRC(1b85ff34) SHA1(5ad259e6f7aa4a0c08975da73bf41400495f2e61) )
 
 	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
-	ROM_LOAD( "ryujin08.11", 0x00000, 0x80000, CRC(480d040d) SHA1(50add2f304ef34f7f45f25a2a2cf0568d58259ad) )
+	ROM_LOAD( "ryujin-08.ic1", 0x00000, 0x80000, CRC(480d040d) SHA1(50add2f304ef34f7f45f25a2a2cf0568d58259ad) )
+
+	ROM_REGION( 0x00400, "plds", 0 )
+	ROM_LOAD( "pal16l8b-east-07.ic46", 0x0000, 0x0104, CRC(0cb80f64) SHA1(53c38fc795d05277172391d7994c96d8c66b49c4) )
+	ROM_LOAD( "pal16l8b-east-08.ic47", 0x0200, 0x0104, CRC(bdce045f) SHA1(cc67b2afa1b57345a4b91f5fafd99cae5286827a) )
+ROM_END
+
+ROM_START( ryujina ) /* Silkscreened PCB number ET910000A */
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* 256k for 68000 code */
+	ROM_LOAD16_BYTE( "ruj_02.27", 0x00000, 0x20000, CRC(0d223aee) SHA1(33f5498a650b244c5a4a22415408a269da597abf) )
+	ROM_LOAD16_BYTE( "ruj_01.26", 0x00001, 0x20000, CRC(c6bcdd1e) SHA1(d8620995ad1bc256eab4ed7e1c549e8b6ec5c3fb) )
+	ROM_LOAD16_BYTE( "ruj_04.29", 0x40000, 0x20000, CRC(0c153cab) SHA1(16fac3863c1394c9f41173174a4aca20cded6278) )
+	ROM_LOAD16_BYTE( "ruj_03.28", 0x40001, 0x20000, CRC(7695f89c) SHA1(755eb7ef40da190d55de80ee5e0e0a537c22e5f1) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64k for Z80 code */
+	ROM_LOAD( "ruj_05.39",0x00000, 0x10000, CRC(95270b16) SHA1(c1ad76268679cf198e9f1514360f280b73e49ab5) )
+
+	ROM_REGION( 0x200000, "tc0180vcu", 0 )
+	ROM_LOAD( "ryujin-07.2", 0x000000, 0x100000, CRC(34f50980) SHA1(432384bd283389bca17611602eb310726c9d78a4) )
+	ROM_LOAD( "ryujin-06.1", 0x100000, 0x100000, CRC(1b85ff34) SHA1(5ad259e6f7aa4a0c08975da73bf41400495f2e61) )
+
+	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_LOAD( "ryujin-08.11", 0x00000, 0x80000, CRC(480d040d) SHA1(50add2f304ef34f7f45f25a2a2cf0568d58259ad) )
 ROM_END
 
 ROM_START( sbm )
@@ -3573,7 +3552,8 @@ GAME( 1992, silentd,  0,       silentd,  silentd,   taitob_state, init_taito_b, 
 GAME( 1992, silentdj, silentd, silentd,  silentdj,  taitob_state, init_taito_b, ROT0,   "Taito Corporation",         "Silent Dragon (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, silentdu, silentd, silentd,  silentdu,  taitob_state, init_taito_b, ROT0,   "Taito America Corporation", "Silent Dragon (US)",    MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, ryujin,   0,       ryujin,   ryujin,    taitob_state, init_taito_b, ROT270, "Taito Corporation", "Ryu Jin (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, ryujin,   0,       silentd,  ryujin,    taitob_state, init_taito_b, ROT270, "Taito Corporation", "Ryu Jin (Japan, ET910000B PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, ryujina,  ryujin,  selfeena, ryujin,    taitob_state, init_taito_b, ROT270, "Taito Corporation", "Ryu Jin (Japan, ET910000A PCB)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1993, qzshowby, 0,       qzshowby, qzshowby,  taitob_state, init_taito_b, ROT0,   "Taito Corporation", "Quiz Sekai wa SHOW by shobai (Japan)", MACHINE_SUPPORTS_SAVE )
 

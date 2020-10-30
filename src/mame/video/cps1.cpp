@@ -29,6 +29,7 @@ Forgotten Worlds (USA, B-Board 88618B-2, Rev. AA)                  88618B-2   LW
 Forgotten Worlds (USA, B-Board 88618B-2, Rev. C)                   88618B-2   LWCHR            LWIO  None         CPS-B-01  DL-0411-10001  N/A
 Forgotten Worlds (USA, B-Board 88618B-2, Rev. E)                   88618B-2   LWCHR            LWIO  None         CPS-B-01  DL-0411-10001  N/A
 Forgotten Worlds (USA, B-Board 88621B-2, Rev. C)                   88621B-2   LW621            LWIO  None         CPS-B-01  DL-0411-10001  N/A
+Forgotten Worlds (Japan)                                           88618B-2   LWCHR            LWIO  None         CPS-B-01  DL-0411-10001  N/A
 Lost Worlds (Japan Old Ver.)                                       88618B-2   LWCHR            LWIO  None         CPS-B-01  DL-0411-10001  N/A
 Lost Worlds (Japan)                                                88618B-2   LWCHR            LWIO  None         CPS-B-01  DL-0411-10001  N/A
 
@@ -1685,6 +1686,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"forgottnuc",  CPS_B_01,     mapper_LWCHR },
 	{"forgottnua",  CPS_B_01,     mapper_LWCHR },
 	{"forgottnuaa", CPS_B_01,     mapper_LWCHR },
+	{"forgottnj",   CPS_B_01,     mapper_LWCHR },
 	{"lostwrld",    CPS_B_01,     mapper_LWCHR },
 	{"lostwrldo",   CPS_B_01,     mapper_LWCHR },
 	{"ghouls",      CPS_B_01,     mapper_DM620 },
