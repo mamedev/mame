@@ -7,10 +7,10 @@
     driver by Aaron Giles
 
     Games supported:
-        * Klax (1989) [6 original sets + 2 bootleg sets]
+        * Klax (1989) [6 original sets + 3 bootleg sets]
 
     Known bugs:
-        * Bootleg sets don't work
+        * Bootleg set 3 doesn't work
 
 ****************************************************************************
 
@@ -53,7 +53,7 @@ void klax_state::interrupt_ack_w(u16 data)
 }
 
 
-void klax_state::m5205_int1(int state)
+void klax_bootleg_state::m5205_int1(int state)
 {
 	if (state && !m_audio_nibble)
 	{
@@ -82,7 +82,7 @@ void klax_state::machine_reset()
 {
 }
 
-MACHINE_START_MEMBER(klax_state, klax5bl)
+MACHINE_START_MEMBER(klax_bootleg_state, klax5bl)
 {
 	m_rombank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x8000);
 
@@ -114,14 +114,14 @@ void klax_state::klax_map(address_map &map)
 	map(0x3f2800, 0x3f3fff).ram();
 }
 
-void klax_state::klax5bl_map(address_map &map)
+void klax_bootleg_state::klax5bl_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x0e0000, 0x0e0fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
-	map(0x260000, 0x260001).portr("P1").w(FUNC(klax_state::latch_w));
+	map(0x260000, 0x260001).portr("P1").w(FUNC(klax_bootleg_state::latch_w));
 	map(0x260002, 0x260003).portr("P2");
 	map(0x260004, 0x260005).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
-	map(0x260006, 0x260007).w(FUNC(klax_state::interrupt_ack_w));
+	map(0x260006, 0x260007).w(FUNC(klax_bootleg_state::interrupt_ack_w));
 	map(0x3e0000, 0x3e07ff).rw("palette", FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0xff00).share("palette");
 	map(0x3f0000, 0x3f0eff).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
 	map(0x3f0f80, 0x3f0fff).ram().share("mob:slip");
@@ -207,17 +207,13 @@ GFXDECODE_END
  *
  *************************************/
 
-void klax_state::klax(machine_config &config)
+void klax_state::klax_base(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 14.318181_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &klax_state::klax_map);
 
-	TIMER(config, "scantimer").configure_scanline(FUNC(klax_state::scanline_update), m_screen, 0, 32);
-
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
-
-	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_klax);
@@ -240,41 +236,46 @@ void klax_state::klax(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-
-	OKIM6295(config, "oki", 14.318181_MHz_XTAL/4/4, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-void klax_state::bootleg_sound_map(address_map &map)
+void klax_state::klax(machine_config &config)
+{
+	klax_base(config);
+
+	TIMER(config, "scantimer").configure_scanline(FUNC(klax_state::scanline_update), m_screen, 0, 32);
+
+	WATCHDOG_TIMER(config, "watchdog");
+
+	OKIM6295(config, "oki", 14.318181_MHz_XTAL / 4 / 4, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
+void klax_bootleg_state::bootleg_sound_map(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
 	map(0x1000, 0x1fff).nopw(); // ?
-	map(0x2800, 0x28ff).w(FUNC(klax_state::audio_sample_w));
-	map(0x3000, 0x3000).w(FUNC(klax_state::audio_ctrl_w));
+	map(0x2800, 0x28ff).w(FUNC(klax_bootleg_state::audio_sample_w));
+	map(0x3000, 0x3000).w(FUNC(klax_bootleg_state::audio_ctrl_w));
 	map(0x3800, 0x3800).nopw(); // ?
 	map(0x4f80, 0x4fff).ram();
 	map(0x8000, 0xffff).bankr("rombank");
 }
 
-void klax_state::klax5bl(machine_config &config)
+void klax_bootleg_state::klax5bl(machine_config &config)
 {
-	klax(config);
+	klax_base(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &klax_state::klax5bl_map);
-
-	config.device_remove("oki"); // no 6295 here
-	config.device_remove("watchdog");
-	config.device_remove("scantimer");
+	m_maincpu->set_addrmap(AS_PROGRAM, &klax_bootleg_state::klax5bl_map);
 
 	Z80(config, m_audiocpu, 14.318181_MHz_XTAL / 2); /* ? */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &klax_state::bootleg_sound_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &klax_bootleg_state::bootleg_sound_map);
 
-	MCFG_MACHINE_START_OVERRIDE(klax_state, klax5bl)
+	MCFG_MACHINE_START_OVERRIDE(klax_bootleg_state, klax5bl)
 
 	m_mob->set_origin(8, 7); // sprites are offset in bootlegs
 	m_gfxdecode->set_info(gfx_klax5bl);
 
 	MSM5205(config, m_msm[0], 384000);
-	m_msm[0]->vck_callback().set(FUNC(klax_state::m5205_int1));
+	m_msm[0]->vck_callback().set(FUNC(klax_bootleg_state::m5205_int1));
 	m_msm[0]->set_prescaler_selector(msm5205_device::S64_4B); /* ? */
 	m_msm[0]->add_route(ALL_OUTPUTS, "mono", 1.00);
 
@@ -283,23 +284,23 @@ void klax_state::klax5bl(machine_config &config)
 	m_msm[1]->add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
-uint8_t klax_state::audio_ram_r(offs_t offset)
+uint8_t klax_bootleg_state::audio_ram_r(offs_t offset)
 {
 	return m_audio_ram[offset ^ 1];
 }
 
-void klax_state::audio_ram_w(offs_t offset, uint8_t data)
+void klax_bootleg_state::audio_ram_w(offs_t offset, uint8_t data)
 {
 	m_audio_ram[offset ^ 1] = data;
 }
 
-void klax_state::audio_sample_w(offs_t offset, uint8_t data)
+void klax_bootleg_state::audio_sample_w(offs_t offset, uint8_t data)
 {
 	if (offset & 2) m_audio_sample[0] = data;
 	if (offset & 1) m_audio_sample[1] = data;
 }
 
-void klax_state::audio_ctrl_w(uint8_t data)
+void klax_bootleg_state::audio_ctrl_w(uint8_t data)
 {
 	m_rombank->set_entry(data & 3);
 
@@ -311,13 +312,13 @@ void klax_state::audio_ctrl_w(uint8_t data)
 	m_msm[1]->set_output_gain(ALL_OUTPUTS, gain[(data & 0xc0) >> 6]);
 }
 
-void klax_state::init_bootleg()
+void klax_bootleg_state::init_klax5bl()
 {
 	// RAM shared between main and audio CPU
 	m_audio_ram = std::make_unique<uint8_t[]>(0x80);
 	m_maincpu->space(AS_PROGRAM).install_ram(0x3f0f00, 0x3f0f7f, m_audio_ram.get());
-	m_audiocpu->space(AS_PROGRAM).install_read_handler(0x4f00, 0x4f7f, read8sm_delegate(*this, FUNC(klax_state::audio_ram_r)));
-	m_audiocpu->space(AS_PROGRAM).install_write_handler(0x4f00, 0x4f7f, write8sm_delegate(*this, FUNC(klax_state::audio_ram_w)));
+	m_audiocpu->space(AS_PROGRAM).install_read_handler(0x4f00, 0x4f7f, read8sm_delegate(*this, FUNC(klax_bootleg_state::audio_ram_r)));
+	m_audiocpu->space(AS_PROGRAM).install_write_handler(0x4f00, 0x4f7f, write8sm_delegate(*this, FUNC(klax_bootleg_state::audio_ram_w)));
 }
 
 /*************************************
@@ -590,13 +591,13 @@ ROM_END
  *
  *************************************/
 
-GAME( 1989, klax,     0,    klax,    klax, klax_state, empty_init, ROT0, "Atari Games",        "Klax (version 6)", 0 )
-GAME( 1989, klax5,    klax, klax,    klax, klax_state, empty_init, ROT0, "Atari Games",        "Klax (version 5)", 0 )
-GAME( 1989, klax4,    klax, klax,    klax, klax_state, empty_init, ROT0, "Atari Games",        "Klax (version 4)", 0 )
-GAME( 1989, klaxj4,   klax, klax,    klax, klax_state, empty_init, ROT0, "Atari Games",        "Klax (Japan, version 4)", 0 )
-GAME( 1989, klaxj3,   klax, klax,    klax, klax_state, empty_init, ROT0, "Atari Games",        "Klax (Japan, version 3)", 0 )
-GAME( 1989, klaxd2,   klax, klax,    klax, klax_state, empty_init, ROT0, "Atari Games",        "Klax (Germany, version 2)", 0 )
+GAME( 1989, klax,     0,    klax,    klax, klax_state,         empty_init,   ROT0, "Atari Games",        "Klax (version 6)", 0 )
+GAME( 1989, klax5,    klax, klax,    klax, klax_state,         empty_init,   ROT0, "Atari Games",        "Klax (version 5)", 0 )
+GAME( 1989, klax4,    klax, klax,    klax, klax_state,         empty_init,   ROT0, "Atari Games",        "Klax (version 4)", 0 )
+GAME( 1989, klaxj4,   klax, klax,    klax, klax_state,         empty_init,   ROT0, "Atari Games",        "Klax (Japan, version 4)", 0 )
+GAME( 1989, klaxj3,   klax, klax,    klax, klax_state,         empty_init,   ROT0, "Atari Games",        "Klax (Japan, version 3)", 0 )
+GAME( 1989, klaxd2,   klax, klax,    klax, klax_state,         empty_init,   ROT0, "Atari Games",        "Klax (Germany, version 2)", 0 )
 
-GAME( 1989, klax5bl,  klax, klax5bl, klax, klax_state, init_bootleg, ROT0, "bootleg",            "Klax (version 5, bootleg set 1)", 0 )
-GAME( 1989, klax5bl2, klax, klax5bl, klax, klax_state, init_bootleg, ROT0, "bootleg",            "Klax (version 5, bootleg set 2)", 0 )
-GAME( 1989, klax5bl3, klax, klax5bl, klax, klax_state, init_bootleg, ROT0, "bootleg (Playmark)", "Klax (version 5, bootleg set 3)", MACHINE_NOT_WORKING ) /* encrypted Z80 opcodes */
+GAME( 1989, klax5bl,  klax, klax5bl, klax, klax_bootleg_state, init_klax5bl, ROT0, "bootleg",            "Klax (version 5, bootleg set 1)", 0 )
+GAME( 1989, klax5bl2, klax, klax5bl, klax, klax_bootleg_state, init_klax5bl, ROT0, "bootleg",            "Klax (version 5, bootleg set 2)", 0 )
+GAME( 1989, klax5bl3, klax, klax5bl, klax, klax_bootleg_state, init_klax5bl, ROT0, "bootleg (Playmark)", "Klax (version 5, bootleg set 3)", MACHINE_NOT_WORKING ) /* encrypted Z80 opcodes */
