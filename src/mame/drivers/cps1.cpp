@@ -971,24 +971,27 @@ static INPUT_PORTS_START( forgottnj ) // Where's the Demo Sound????
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSWC")                                  // The manual only mentions two DIP switch banks.
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "DIP-C:1" )
-	PORT_DIPNAME( 0x02, 0x02, "Slow Motion" )                    PORT_DIPLOCATION("DIP-C:2")
+	PORT_DIPNAME( 0x01, 0x01, "Slow Motion" )           PORT_DIPLOCATION("DIP-C:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Slowest Motion" )        PORT_DIPLOCATION("DIP-C:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DIP-C:3" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DIP-C:4" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DIP-C:5" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DIP-C:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DIP-C:7" )
-	PORT_DIPNAME( 0x80, 0x80, "Freeze" )                    PORT_DIPLOCATION("DIP-C:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0xc0, 0xc0, "Freeze" )                    PORT_DIPLOCATION("DIP-C:7,8")
+	PORT_DIPSETTING(    0xc0, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) ) // Gs only takes effect when Freeze is ON
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, "On with Alignment Character" ) // Shows a column of "G" on the leftside of the screen
 
 	PORT_START("DSWA") // DSW banks A & B in reverse order?
 	CPS1_DIFFICULTY_1( "DIP-A" ) // Not verified, going by other sets
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DIP-A:4" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DIP-A:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DIP-A:6" )         // Check code at 0x00111c (0x00112c in 'lostwrld')
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DIP-A:6" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DIP-A:7" )
 	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "DIP-A:8" )
 
@@ -998,7 +1001,7 @@ static INPUT_PORTS_START( forgottnj ) // Where's the Demo Sound????
 	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x06, "2 Coins / 2 Credits" ) // Must insert 2 coins to get a credits, but credits come in 2s
+	PORT_DIPSETTING(    0x06, "2 Coins / 2 Credits" ) // Must insert 2 coins to get a credit, but credits come in 2s
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_6C ) )
@@ -1007,7 +1010,7 @@ static INPUT_PORTS_START( forgottnj ) // Where's the Demo Sound????
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x38, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x30, "2 Coins / 2 Credits" ) // Must insert 2 coins to get a credits, but credits come in 2s
+	PORT_DIPSETTING(    0x30, "2 Coins / 2 Credits" ) // Must insert 2 coins to get a credit, but credits come in 2s
 	PORT_DIPSETTING(    0x28, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_6C ) )
@@ -4087,7 +4090,7 @@ ROM_START( forgottnuaa ) /* 1 byte difference to parent set. Region byte or poin
 ROM_END
 
 /* B-Board 88618B-2 */
-ROM_START( forgottnj ) /* comes from a PCB with a very early serial number:  LW00022 */
+ROM_START( forgottnj ) // comes from a PCB with a very early serial number:  LW00022
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "11.14f",         0x00000, 0x20000, CRC(c9a6b319) SHA1(152f65658af6333f10a0608a90330e1cc074d1b2) )
 	ROM_LOAD16_BYTE( "15.14g",         0x00001, 0x20000, CRC(524f920e) SHA1(9c3ad6c8009ff55f81cc859c2e47fa6d6ede112b) )
@@ -4109,11 +4112,11 @@ ROM_START( forgottnj ) /* comes from a PCB with a very early serial number:  LW0
 	ROM_COPY( "gfx", 0x200000, 0x000000, 0x8000 )
 
 	ROM_REGION( 0x18000, "audiocpu", 0 )
-	ROM_LOAD( "00.14a", 0x00000, 0x08000, CRC(59df2a63) SHA1(dfe1fffc7a17179a80a2ae623e93b30a7d6df20d) )    // == lwu_00.14a
+	ROM_LOAD( "00.14a", 0x00000, 0x08000, CRC(3bc962ea) SHA1(d61240a4512c4b27a9d89758e05aeebef6326fec) )
 	ROM_CONTINUE(       0x10000, 0x08000 )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
-	ROM_LOAD( "lw-03u.14c", 0x00000, 0x20000, CRC(807d051f) SHA1(720e4733787b9b11f4d1cdce0892b69475802844) ) /* these 2 were mask ROMs */
+	ROM_LOAD( "lw-03u.14c", 0x00000, 0x20000, CRC(807d051f) SHA1(720e4733787b9b11f4d1cdce0892b69475802844) ) // these 2 were mask ROMs
 	ROM_LOAD( "lw-04u.13c", 0x20000, 0x20000, CRC(e6cd098e) SHA1(667f6e5736f76a1c4c450c4e2035574ea89d7910) )
 
 	ROM_REGION( 0x0200, "aboardplds", 0 )
