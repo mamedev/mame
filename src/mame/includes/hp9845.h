@@ -89,7 +89,7 @@ protected:
 	typedef struct {
 		uint8_t chars[ 80 ];
 		uint8_t attrs[ 80 ];
-		bool full;
+		bool full = 0;
 	} video_buffer_t;
 
 	bitmap_rgb32 m_bitmap;

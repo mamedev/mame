@@ -673,6 +673,8 @@ void ti99_8_state::driver_reset()
 
 	// m_gromport->set_grom_base(0x9800, 0xfff1);
 
+	m_keyboard_column = 0;
+
 	// Clear INT1 and INT2 latch
 	m_int1 = CLEAR_LINE;
 	m_int2 = CLEAR_LINE;

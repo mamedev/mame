@@ -142,7 +142,6 @@ public:
 	void init_ebases();
 	void init_gorf();
 	void init_astrocde();
-	virtual void video_start() override;
 	void astrocade_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(profpac);
 	void profpac_palette(palette_device &palette) const;
@@ -156,7 +155,6 @@ public:
 	inline void increment_dest(uint8_t curwidth);
 	void execute_blit();
 	void init_sparklestar();
-	virtual void machine_start() override;
 
 	void votrax_speech_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER( votrax_speech_status_r );
@@ -183,7 +181,10 @@ public:
 	void seawolf2_map(address_map &map);
 	void spacezap_map(address_map &map);
 	void wow_map(address_map &map);
+
 protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 

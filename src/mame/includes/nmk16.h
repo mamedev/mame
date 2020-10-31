@@ -125,7 +125,7 @@ protected:
 	std::unique_ptr<u16[]> m_spriteram_old2;
 	int m_bgbank;
 	int m_bioship_background_bank;
-	tilemap_t *m_bg_tilemap[2];
+	tilemap_t *m_bg_tilemap[2] = {nullptr,nullptr};
 	tilemap_t *m_tx_tilemap;
 	int m_mustang_bg_xscroll;
 	u8 m_scroll[2][4];

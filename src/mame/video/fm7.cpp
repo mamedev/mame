@@ -1403,6 +1403,8 @@ void fm7_state::fm7_console_ram_banked_w(offs_t offset, uint8_t data)
 
 void fm7_state::video_start()
 {
+	m_video.sub_busy = 0;
+	m_video.sub_halt = 0;
 	m_video.vram_access = 0;
 	m_video.crt_enable = 0;
 	m_video.vram_offset = 0x0000;
@@ -1411,11 +1413,14 @@ void fm7_state::video_start()
 	m_video.multi_page = 0;
 	m_video.subrom = 0;
 	m_video.cgrom = 0;
+	m_video.modestatus = 0;
 	m_video.fine_offset = 0;
 	m_video.nmi_mask = 0;
 	m_video.active_video_page = 0;
 	m_video.display_video_page = 0;
 	m_video.vsync_flag = 0;
+
+	m_alu.command = 0;
 }
 
 uint32_t fm7_state::screen_update_fm7(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
