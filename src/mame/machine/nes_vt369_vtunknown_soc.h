@@ -15,14 +15,15 @@
 #include "screen.h"
 #include "speaker.h"
 
-class nes_vtunknown_soc_cy_device : public nes_vt09_soc_device
+class nes_vt369_soc_device : public nes_vt09_soc_device
 {
 public:
-	nes_vtunknown_soc_cy_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	nes_vt369_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config& config) override;
 	void device_start() override;
+	void device_reset() override;
 
 	void nes_vt369_map(address_map& map);
 
@@ -44,7 +45,10 @@ protected:
 	void vt369_relative_w(offs_t offset, uint8_t data);
 
 private:
+	void vt369_sound_map(address_map &map);
+
 	required_device<vrt_vt1682_alu_device> m_alu;
+	required_device<cpu_device> m_soundcpu;
 	uint8_t m_relative[2];
 	std::vector<u8> m_6000_ram;
 	uint8_t m_bank6000;
@@ -64,13 +68,13 @@ protected:
 	void vt03_412c_extbank_w(uint8_t data);
 };
 
-class nes_vt369_soc_device : public nes_vt09_soc_device
+class nes_vt369_alt_soc_device : public nes_vt09_soc_device
 {
 public:
-	nes_vt369_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	nes_vt369_alt_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 
 protected:
-	nes_vt369_soc_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock);
+	nes_vt369_alt_soc_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock);
 
 	virtual void device_add_mconfig(machine_config& config) override;
 
@@ -113,9 +117,9 @@ protected:
 };
 
 
-DECLARE_DEVICE_TYPE(NES_VTUNKNOWN_SOC_CY, nes_vtunknown_soc_cy_device)
+DECLARE_DEVICE_TYPE(NES_VTUNKNOWN_SOC_CY, nes_vt369_soc_device)
 DECLARE_DEVICE_TYPE(NES_VTUNKNOWN_SOC_BT, nes_vtunknown_soc_bt_device)
-DECLARE_DEVICE_TYPE(NES_VT369_SOC, nes_vt369_soc_device)
+DECLARE_DEVICE_TYPE(NES_VT369_SOC, nes_vt369_alt_soc_device)
 
 DECLARE_DEVICE_TYPE(NES_VTUNKNOWN_SOC_DG, nes_vtunknown_soc_dg_device)
 DECLARE_DEVICE_TYPE(NES_VTUNKNOWN_SOC_FA, nes_vtunknown_soc_fa_device)
