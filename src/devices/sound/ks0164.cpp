@@ -286,7 +286,7 @@ void ks0164_device::voice_w(offs_t offset, u16 data, u16 mem_mask)
 		if(m_cpu->pc() < 0x5f94 || m_cpu->pc() > 0x5fc0)
 			logerror("voice %02x.%02x = %04x @ %04x (%04x)\n", m_voice_select & 0x1f, offset, m_sregs[m_voice_select & 0x1f][offset], mem_mask, m_cpu->pc());
 	if(offset == 0 && (data & 1) && !(old & 1))
-		logerror("keyon %02x mode=%04x (%s %c %c %c) cur=%02x%04x.%04x loop=%02x%04x.%04x end=%02x%04x.%04x pitch=%04x 10=%02x/%02x:%02x/%02x 14=%03x/%03x:%03x/%03x 18=%04x/%04x c=%04x   %04x %04x %04x %04x %04x  %04x %04x %04x %04x %04x\n",
+		logerror("keyon %02x mode=%04x (%s %c %c %c) cur=%02x%04x.%04x loop=%02x%04x.%04x end=%02x%04x.%04x pitch=%02x.%03x 10=%02x/%02x:%02x/%02x 14=%03x/%03x:%03x/%03x 18=%04x/%04x c=%04x   %04x %04x %04x %04x %04x  %04x %04x %04x %04x %04x\n",
 				 m_voice_select,
 
 				 m_sregs[m_voice_select & 0x1f][0x00],
@@ -308,7 +308,8 @@ void ks0164_device::voice_w(offs_t offset, u16 data, u16 mem_mask)
 				 m_sregs[m_voice_select & 0x1f][0x0e],
 				 m_sregs[m_voice_select & 0x1f][0x0f],
 
-				 m_sregs[m_voice_select & 0x1f][0x08], // pitch
+				 m_sregs[m_voice_select & 0x1f][0x08] & 0x1f, // pitch
+				 m_sregs[m_voice_select & 0x1f][0x08] >> 5,
 
 				 m_sregs[m_voice_select & 0x1f][0x10] >> 9,
 				 m_sregs[m_voice_select & 0x1f][0x12] >> 9,
@@ -431,9 +432,10 @@ void ks0164_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 		for(int voice = 0; voice < 0x20; voice++) {
 			u16 *regs = m_sregs[voice];
 			if(regs[0] & 0x0001) {
-				u64 current = (u64(regs[1]) << 32) | (regs[2] << 16) | regs[3];
 
-				if(current & 0xc00000000000)
+				u64 current = (u64(regs[1]) << 32) | (u64(regs[2]) << 16) | regs[3];
+
+				if(current & 0xc000000000)
 					continue;
 
 				u32 adr = current >> 16;
@@ -456,8 +458,14 @@ void ks0164_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 				}
 
 				s16 samp = samp0 + (((samp1 - samp0) * (current & 0xffff)) >> 16);
-				current += regs[8];
-				u64 end = (u64(regs[0xd]) << 32) | (regs[0xe] << 16) | regs[0xf];
+				u32 step = 0x10000 | (regs[8] & ~0x1f);
+				u32 shift = regs[8] & 0x1f;
+				if(shift > 0x10)
+					step >>= 0x20 - shift;
+				else if(shift)
+					step <<= shift;
+				current += step;
+				u64 end = (u64(regs[0xd]) << 32) | (u64(regs[0xe]) << 16) | regs[0xf];
 				if(current >= end) {
 					// Is there a loop enabled flag?
 					u64 loop = (u64(regs[9]) << 32) | (regs[0xa] << 16) | regs[0xb];
