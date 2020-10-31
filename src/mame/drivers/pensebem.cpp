@@ -129,10 +129,14 @@ public:
 private:
 	void prg_map(address_map &map);
 	void data_map(address_map &map);
-	void io_map(address_map &map);
+
+	uint8_t port_b_r();
+	void port_b_w(uint8_t data);
+	void port_c_w(uint8_t data);
+	void port_d_w(uint8_t data);
+	void port_e_w(uint8_t data);
+
 	void update_display();
-	uint8_t port_r(offs_t offset);
-	void port_w(offs_t offset, uint8_t value);
 
 	uint8_t m_port_b;
 	uint8_t m_port_c;
@@ -151,54 +155,57 @@ protected:
 
 void pensebem2017_state::machine_start()
 {
+	save_item(NAME(m_port_b));
+	save_item(NAME(m_port_c));
+	save_item(NAME(m_port_d));
+	save_item(NAME(m_port_e));
 }
 
-uint8_t pensebem2017_state::port_r(offs_t offset)
+void pensebem2017_state::machine_reset()
 {
-	uint8_t value;
+	m_port_b = 0;
+	m_port_c = 0;
+	m_port_d = 0;
+	m_port_e = 0;
+}
+
+uint8_t pensebem2017_state::port_b_r()
+{
+	uint8_t value = m_port_b & 0xc3;
 	int bit;
-
-	switch(offset)
+	for (bit=0; bit<8; bit++)
 	{
-		case AVR8_IO_PORTB:
-			value = m_port_b & 0xc3;
-			for (bit=0; bit<8; bit++)
-			{
-				if (bit < 2 && !BIT(m_port_e, bit)) break;
-				if (bit >= 2 && !BIT(m_port_d, bit)) break;
-			}
-			if (BIT(m_keyb_rows[0]->read(), bit)) value |= (1 << 5);
-			if (BIT(m_keyb_rows[1]->read(), bit)) value |= (1 << 3);
-			if (BIT(m_keyb_rows[2]->read(), bit)) value |= (1 << 2);
-			if (BIT(m_keyb_rows[3]->read(), bit)) value |= (1 << 4);
-			return value;
-		default:
-			return 0xff;
+		if (bit < 2 && !BIT(m_port_e, bit)) break;
+		if (bit >= 2 && !BIT(m_port_d, bit)) break;
 	}
+	if (BIT(m_keyb_rows[0]->read(), bit)) value |= (1 << 5);
+	if (BIT(m_keyb_rows[1]->read(), bit)) value |= (1 << 3);
+	if (BIT(m_keyb_rows[2]->read(), bit)) value |= (1 << 2);
+	if (BIT(m_keyb_rows[3]->read(), bit)) value |= (1 << 4);
+	return value;
 }
 
-void pensebem2017_state::port_w(offs_t offset, uint8_t data)
+void pensebem2017_state::port_b_w(uint8_t data) // buzzer + keyboard select rows
 {
-	switch(offset)
-	{
-		case AVR8_IO_PORTB: // buzzer + keyboard_select_rows
-			m_port_b = data;
-			m_dac->write(BIT(data, 1));
-			break;
-		case AVR8_IO_PORTC: // display
-			m_port_c = data;
-			update_display();
-			break;
-		case AVR8_IO_PORTD: // display
-			m_port_d = data;
-			break;
-		case AVR8_IO_PORTE: // display
-			m_port_e = data;
-			update_display();
-			break;
-		default:
-			break;
-	}
+	m_port_b = data;
+	m_dac->write(BIT(data, 1));
+}
+
+void pensebem2017_state::port_c_w(uint8_t data) // display
+{
+	m_port_c = data;
+	update_display();
+}
+
+void pensebem2017_state::port_d_w(uint8_t data) // display
+{
+	m_port_d = data;
+}
+
+void pensebem2017_state::port_e_w(uint8_t data) // display
+{
+	m_port_e = data;
+	update_display();
 }
 
 void pensebem2017_state::update_display()
@@ -218,11 +225,6 @@ void pensebem2017_state::data_map(address_map &map)
 {
 	map(0x0000, 0x03ff).ram(); /* ATMEGA168PB Internal 1024 bytes of SRAM */
 	map(0x0400, 0xffff).ram(); /* Some additional SRAM ? This is likely an exagerated amount ! */
-}
-
-void pensebem2017_state::io_map(address_map &map)
-{
-	map(AVR8_IO_PORTA, AVR8_IO_PORTE).rw(FUNC(pensebem2017_state::port_r), FUNC(pensebem2017_state::port_w));
 }
 
 static INPUT_PORTS_START( pensebem2017 )
@@ -267,26 +269,22 @@ static INPUT_PORTS_START( pensebem2017 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("5") PORT_CODE(KEYCODE_5)
 INPUT_PORTS_END
 
-void pensebem2017_state::machine_reset()
-{
-	m_port_b = 0;
-	m_port_c = 0;
-	m_port_d = 0;
-	m_port_e = 0;
-}
-
 void pensebem2017_state::pensebem2017(machine_config &config)
 {
 	/* CPU */
 	ATMEGA168(config, m_maincpu, 16_MHz_XTAL); /* Actual chip is an Atmel ATMEGA168PB */
 	m_maincpu->set_addrmap(AS_PROGRAM, &pensebem2017_state::prg_map);
 	m_maincpu->set_addrmap(AS_DATA, &pensebem2017_state::data_map);
-	m_maincpu->set_addrmap(AS_IO, &pensebem2017_state::io_map);
 	m_maincpu->set_eeprom_tag("eeprom");
 	m_maincpu->set_low_fuses(0xf7);
 	m_maincpu->set_high_fuses(0xdd);
 	m_maincpu->set_extended_fuses(0xf9);
 	m_maincpu->set_lock_bits(0x0f);
+	m_maincpu->gpio_in<AVR8_IO_PORTB>().set(FUNC(pensebem2017_state::port_b_r));
+	m_maincpu->gpio_out<AVR8_IO_PORTB>().set(FUNC(pensebem2017_state::port_b_w));
+	m_maincpu->gpio_out<AVR8_IO_PORTC>().set(FUNC(pensebem2017_state::port_c_w));
+	m_maincpu->gpio_out<AVR8_IO_PORTD>().set(FUNC(pensebem2017_state::port_d_w));
+	m_maincpu->gpio_out<AVR8_IO_PORTE>().set(FUNC(pensebem2017_state::port_e_w));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
