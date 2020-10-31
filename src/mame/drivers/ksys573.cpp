@@ -593,11 +593,11 @@ private:
 	uint32_t m_stage_mask;
 	struct
 	{
-		int DO;
-		int clk;
-		int shift;
-		int state;
-		int bit;
+		int DO = 0;
+		int clk = 0;
+		int shift = 0;
+		int state = 0;
+		int bit = 0;
 	} m_stage_state[ 2 ];
 
 	int m_serial_lamp_bits;

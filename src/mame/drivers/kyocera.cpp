@@ -1280,8 +1280,10 @@ void trsm100_state::machine_start()
 
 void tandy200_state::machine_start()
 {
-	std::string region_tag;
-	m_opt_region = memregion(region_tag.assign(m_opt_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+	m_opt_region = memregion(std::string(m_opt_cart->tag()) + GENERIC_ROM_REGION_TAG);
+
+	m_bank = 0;
+	m_tp = 0;
 
 	/* configure ROM banking */
 	membank("bank1")->configure_entry(0, m_rom->base());

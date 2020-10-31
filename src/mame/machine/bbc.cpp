@@ -1618,6 +1618,12 @@ void bbc_state::machine_start()
 	setup_device_roms();
 
 	m_motor_led.resolve();
+
+	m_romsel = 0;
+	m_adlc_irq = 0;
+	m_bus_nmi = 0;
+	m_fdc_irq = 0;
+	m_fdc_drq = 0;
 }
 
 void bbc_state::machine_reset()
@@ -1636,9 +1642,7 @@ void bbc_state::machine_reset()
 
 void bbcbp_state::machine_start()
 {
-	setup_device_roms();
-
-	m_motor_led.resolve();
+	bbc_state::machine_start();
 }
 
 void bbcbp_state::machine_reset()
@@ -1652,9 +1656,8 @@ void bbcbp_state::machine_reset()
 
 void bbcm_state::machine_start()
 {
-	setup_device_roms();
+	bbc_state::machine_start();
 
-	m_motor_led.resolve();
 	m_power_led.resolve();
 
 	m_power_led = 0;

@@ -29,6 +29,7 @@ void zx_state::machine_reset()
 	m_prev_refresh = 0xff;
 
 	m_vsync_active = false;
+	m_hsync_active = false;
 	m_base_vsync_clock = 0;
 	m_ypos = 0;
 

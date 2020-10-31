@@ -70,6 +70,9 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(countryc_trackball_y);
 	template <int Mask> DECLARE_CUSTOM_INPUT_MEMBER(snk_bonus_r);
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
