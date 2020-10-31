@@ -339,44 +339,44 @@ u16 ws_cart_slot_device::read_rom40(offs_t offset, u16 mem_mask)
  read_ram
  -------------------------------------------------*/
 
-u8 ws_cart_slot_device::read_ram(offs_t offset)
+u16 ws_cart_slot_device::read_ram(offs_t offset, u16 mem_mask)
 {
 	if (m_cart)
-		return m_cart->read_ram(offset);
+		return m_cart->read_ram(offset, mem_mask);
 	else
-		return 0xff;
+		return 0xffff;
 }
 
 /*-------------------------------------------------
  write_ram
  -------------------------------------------------*/
 
-void ws_cart_slot_device::write_ram(offs_t offset, u8 data)
+void ws_cart_slot_device::write_ram(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (m_cart)
-		m_cart->write_ram(offset, data);
+		m_cart->write_ram(offset, data, mem_mask);
 }
 
 /*-------------------------------------------------
  read_io
  -------------------------------------------------*/
 
-u8 ws_cart_slot_device::read_io(offs_t offset)
+u16 ws_cart_slot_device::read_io(offs_t offset, u16 mem_mask)
 {
 	if (m_cart)
-		return m_cart->read_io(offset);
+		return m_cart->read_io(offset & 0x07, mem_mask);
 	else
-		return 0xff;
+		return 0xffff;
 }
 
 /*-------------------------------------------------
  write_io
  -------------------------------------------------*/
 
-void ws_cart_slot_device::write_io(offs_t offset, u8 data)
+void ws_cart_slot_device::write_io(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (m_cart)
-		m_cart->write_io(offset, data);
+		m_cart->write_io(offset & 0x07, data, mem_mask);
 }
 
 

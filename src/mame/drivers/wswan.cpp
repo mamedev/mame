@@ -429,8 +429,8 @@ void wswan_state::common_start()
 		// SRAM
 		if (m_cart->get_type() == WS_SRAM || m_cart->get_type() == WWITCH)
 		{
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0x10000, 0x1ffff, read8sm_delegate(*m_cart, FUNC(ws_cart_slot_device::read_ram)));
-			m_maincpu->space(AS_PROGRAM).install_write_handler(0x10000, 0x1ffff, write8sm_delegate(*m_cart, FUNC(ws_cart_slot_device::write_ram)));
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x10000, 0x1ffff, read16s_delegate(*m_cart, FUNC(ws_cart_slot_device::read_ram)));
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0x10000, 0x1ffff, write16s_delegate(*m_cart, FUNC(ws_cart_slot_device::write_ram)));
 		}
 	}
 }
@@ -589,7 +589,10 @@ u8 wswan_state::port_r(offs_t offset)
 		case 0xcd:
 		case 0xce:
 		case 0xcf:
-			return m_cart->read_io(offset & 0x0f);
+			if (offset & 0x01)
+				return m_cart->read_io(offset >> 1, 0xff00) >> 8;
+			else
+				return m_cart->read_io(offset >> 1, 0x00ff);
 	}
 
 	return value;
@@ -832,7 +835,7 @@ void wswan_state::port_w(offs_t offset, u8 data)
 			}
 			else
 			{
-				logerror( "Unsupported internal EEPROM command: %X\n", data );
+				logerror("Unsupported internal EEPROM command: %X\n", data);
 			}
 			break;
 		case 0xc0:  // ROM bank $40000-$fffff
@@ -851,10 +854,13 @@ void wswan_state::port_w(offs_t offset, u8 data)
 		case 0xcd:
 		case 0xce:
 		case 0xcf:
-			m_cart->write_io(offset & 0x0f, data);
+			if (offset & 0x01)
+				m_cart->write_io(offset >> 1, data << 8, 0xff00);
+			else
+				m_cart->write_io(offset >> 1, data, 0x00ff);
 			break;
 		default:
-			logerror( "Write to unsupported port: %X - %X\n", offset, data );
+			logerror("Write to unsupported port: %X - %X\n", offset, data);
 			break;
 	}
 

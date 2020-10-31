@@ -19,8 +19,8 @@ public:
 	virtual u16 read_rom20(offs_t offset, u16 mem_mask) override;
 	virtual u16 read_rom30(offs_t offset, u16 mem_mask) override;
 	virtual u16 read_rom40(offs_t offset, u16 mem_mask) override;
-	virtual u8 read_io(offs_t offset) override;
-	virtual void write_io(offs_t offset, u8 data) override;
+	virtual u16 read_io(offs_t offset, u16 mem_mask) override;
+	virtual void write_io(offs_t offset, u16 data, u16 mem_mask) override;
 
 protected:
 	static constexpr device_timer_id TIMER_RTC = 0;
@@ -32,7 +32,7 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	u8 m_io_regs[0x10];
+	u16 m_io_regs[8];
 	u32 m_base20, m_base30, m_base40;
 
 	// RTC
@@ -59,9 +59,9 @@ public:
 	ws_rom_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// reading and writing
-	virtual u8 read_ram(offs_t offset) override;
-	virtual void write_ram(offs_t offset, u8 data) override;
-	virtual void write_io(offs_t offset, u8 data) override;
+	virtual u16 read_ram(offs_t offset, u16 mem_mask) override;
+	virtual void write_ram(offs_t offset, u16 data, u16 mem_mask) override;
+	virtual void write_io(offs_t offset, u16 data, u16 mem_mask) override;
 
 protected:
 	ws_rom_sram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
@@ -84,8 +84,8 @@ public:
 	ws_rom_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// reading and writing
-	virtual u8 read_io(offs_t offset) override;
-	virtual void write_io(offs_t offset, u8 data) override;
+	virtual u16 read_io(offs_t offset, u16 mem_mask) override;
+	virtual void write_io(offs_t offset, u16 data, u16 mem_mask) override;
 
 protected:
 	// device-level overrides
@@ -108,8 +108,8 @@ public:
 	ws_wwitch_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// reading and writing
-	virtual u8 read_ram(offs_t offset) override;
-	virtual void write_ram(offs_t offset, u8 data) override;
+	virtual u16 read_ram(offs_t offset, u16 mem_mask) override;
+	virtual void write_ram(offs_t offset, u16 data, u16 mem_mask) override;
 
 protected:
 	// device-level overrides

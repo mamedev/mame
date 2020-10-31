@@ -262,29 +262,33 @@ u16 ws_rom_device::read_rom40(offs_t offset, u16 mem_mask)
 }
 
 
-u8 ws_rom_device::read_io(offs_t offset)
+u16 ws_rom_device::read_io(offs_t offset, u16 mem_mask)
 {
-	u8 value = m_io_regs[offset];
+	u16 value = m_io_regs[offset];
 
 	switch (offset)
 	{
-		case 0x0b:      // RTC data
+		case 0x0a / 2:
 			if (!m_has_rtc)
 				break;
 
-			if (m_io_regs[0x0a] == 0x95 && (m_rtc_index < 7))
+			// RTC data
+			if (ACCESSING_BITS_8_15)
 			{
-				switch (m_rtc_index)
+				if ((m_io_regs[0x0a / 2] & 0xff) == 0x95 && (m_rtc_index < 7))
 				{
-					case 0: value = m_rtc_year; break;
-					case 1: value = m_rtc_month; break;
-					case 2: value = m_rtc_day; break;
-					case 3: value = m_rtc_day_of_week; break;
-					case 4: value = m_rtc_hour; break;
-					case 5: value = m_rtc_minute; break;
-					case 6: value = m_rtc_second; break;
+					switch (m_rtc_index)
+					{
+						case 0: value = (value & 0xff) | (m_rtc_year << 8); break;
+						case 1: value = (value & 0xff) | (m_rtc_month << 8); break;
+						case 2: value = (value & 0xff) | (m_rtc_day << 8); break;
+						case 3: value = (value & 0xff) | (m_rtc_day_of_week << 8); break;
+						case 4: value = (value & 0xff) | (m_rtc_hour << 8); break;
+						case 5: value = (value & 0xff) | (m_rtc_minute << 8); break;
+						case 6: value = (value & 0xff) | (m_rtc_second << 8); break;
+					}
+					m_rtc_index++;
 				}
-				m_rtc_index++;
 			}
 			break;
 	}
@@ -292,147 +296,166 @@ u8 ws_rom_device::read_io(offs_t offset)
 	return value;
 }
 
-void ws_rom_device::write_io(offs_t offset, u8 data)
+void ws_rom_device::write_io(offs_t offset, u16 data, u16 mem_mask)
 {
 	switch (offset)
 	{
-		case 0x00:
+		case 0x00 / 2:
 			// Bit 0-3 - ROM bank base register for segments 4-15
 			// Bit 4-7 - Unknown
-			m_base40 = (((((data & 0x0f) << 4) | 4) & m_bank_mask) << 16) & (m_rom_size - 1);
-			m_base40 >>= 1;
-			break;
-		case 0x02: // ROM bank for segment 2 (0x20000 - 0x2ffff)
-			m_base20 = ((data & m_bank_mask) << 16) & (m_rom_size - 1);
-			m_base20 >>= 1;
-			break;
-		case 0x03: // ROM bank for segment 3 (0x30000 - 0x3ffff)
-			m_base30 = ((data & m_bank_mask) << 16) & (m_rom_size - 1);
-			m_base30 >>= 1;
-			break;
-		case 0x0a:  // RTC Command
-					// Bit 0-4 - RTC command
-					//   10000 - Reset
-					//   10010 - Write timer settings (alarm)
-					//   10011 - Read timer settings (alarm)
-					//   10100 - Set time/date
-					//   10101 - Get time/date
-					// Bit 5-6 - Unknown
-					// Bit 7   - Command done (read only)
-			if (!m_has_rtc)
-				break;
-
-			switch (data)
+			if (ACCESSING_BITS_0_7)
 			{
-				case 0x10:  // Reset
-					m_rtc_index = 8;
-					m_rtc_year = 0;
-					m_rtc_month = 1;
-					m_rtc_day = 1;
-					m_rtc_day_of_week = 0;
-					m_rtc_hour = 0;
-					m_rtc_minute = 0;
-					m_rtc_second = 0;
-					m_rtc_setting = 0xff;
-					data |= 0x80;
-					break;
-				case 0x12:  // Write Timer Settings (Alarm)
-					m_rtc_index = 8;
-					m_rtc_setting = m_io_regs[0x0b];
-					data |= 0x80;
-					break;
-				case 0x13:  // Read Timer Settings (Alarm)
-					m_rtc_index = 8;
-					m_io_regs[0x0b] = m_rtc_setting;
-					data |= 0x80;
-					break;
-				case 0x14:  // Set Time/Date
-					m_rtc_year = m_io_regs[0x0b];
-					m_rtc_index = 1;
-					data |= 0x80;
-					break;
-				case 0x15:  // Get Time/Date
-					m_rtc_index = 0;
-					data |= 0x80;
-					m_io_regs[0x0b] = m_rtc_year;
-					break;
-				default:
-					logerror( "Unknown RTC command (%X) requested\n", data);
+				m_base40 = (((((data & 0x0f) << 4) | 4) & m_bank_mask) << 16) & (m_rom_size - 1);
+				m_base40 >>= 1;
 			}
 			break;
-		case 0x0b:  // RTC Data
+		case 0x02 / 2:
+			// ROM bank for segment 2 (0x20000 - 0x2ffff)
+			if (ACCESSING_BITS_0_7)
+			{
+				m_base20 = (((data & 0xff) & m_bank_mask) << 16) & (m_rom_size - 1);
+				m_base20 >>= 1;
+			}
+			// ROM bank for segment 3 (0x30000 - 0x3ffff)
+			if (ACCESSING_BITS_8_15)
+			{
+				m_base30 = (((data >> 8) & m_bank_mask) << 16) & (m_rom_size - 1);
+				m_base30 >>= 1;
+			}
+			break;
+		case 0x0a / 2:
 			if (!m_has_rtc)
 				break;
-
-			if (m_io_regs[0x0a] == 0x94 && m_rtc_index < 7)
+			// RTC Command
+			// Bit 0-4 - RTC command
+			//   10000 - Reset
+			//   10010 - Write timer settings (alarm)
+			//   10011 - Read timer settings (alarm)
+			//   10100 - Set time/date
+			//   10101 - Get time/date
+			// Bit 5-6 - Unknown
+			// Bit 7   - Command done (read only)
+			if (ACCESSING_BITS_0_7)
 			{
-				switch (m_rtc_index)
+				switch (data & 0xff)
 				{
-					case 0: m_rtc_year = data; break;
-					case 1: m_rtc_month = data; break;
-					case 2: m_rtc_day = data; break;
-					case 3: m_rtc_day_of_week = data; break;
-					case 4: m_rtc_hour = data; break;
-					case 5: m_rtc_minute = data; break;
-					case 6: m_rtc_second = data; break;
+					case 0x10:  // Reset
+						m_rtc_index = 8;
+						m_rtc_year = 0;
+						m_rtc_month = 1;
+						m_rtc_day = 1;
+						m_rtc_day_of_week = 0;
+						m_rtc_hour = 0;
+						m_rtc_minute = 0;
+						m_rtc_second = 0;
+						m_rtc_setting = 0xff;
+						data |= 0x80;
+						break;
+					case 0x12:  // Write Timer Settings (Alarm)
+						m_rtc_index = 8;
+						m_rtc_setting = m_io_regs[0x0a / 2] >> 8;
+						data |= 0x80;
+						break;
+					case 0x13:  // Read Timer Settings (Alarm)
+						m_rtc_index = 8;
+						m_io_regs[0x0a / 2] = (m_io_regs[0x0a / 2] & 0x00ff) | (m_rtc_setting << 8);
+						data |= 0x80;
+						break;
+					case 0x14:  // Set Time/Date
+						m_rtc_year = m_io_regs[0x0a / 2] >> 8;
+						m_rtc_index = 1;
+						data |= 0x80;
+						break;
+					case 0x15:  // Get Time/Date
+						m_rtc_index = 0;
+						data |= 0x80;
+						m_io_regs[0x0a / 2] = (m_io_regs[0x0a / 2] & 0x00ff) | (m_rtc_year << 8);
+						break;
+					default:
+						logerror( "Unknown RTC command (%X) requested\n", data & 0xff);
 				}
-				m_rtc_index++;
+			}
+			// RTC Data
+			if (ACCESSING_BITS_8_15)
+			{
+				if ((m_io_regs[0x0a / 2] & 0xff) == 0x94 && m_rtc_index < 7)
+				{
+					switch (m_rtc_index)
+					{
+						case 0: m_rtc_year = data >> 8; break;
+						case 1: m_rtc_month = data >> 8; break;
+						case 2: m_rtc_day = data >> 8; break;
+						case 3: m_rtc_day_of_week = data >> 8; break;
+						case 4: m_rtc_hour = data >> 8; break;
+						case 5: m_rtc_minute = data >> 8; break;
+						case 6: m_rtc_second = data >> 8; break;
+					}
+					m_rtc_index++;
+				}
 			}
 			break;
 	}
 
-	m_io_regs[offset] = data;
+	COMBINE_DATA(&m_io_regs[offset]);
 }
 
-u8 ws_rom_sram_device::read_ram(offs_t offset)
+u16 ws_rom_sram_device::read_ram(offs_t offset, u16 mem_mask)
 {
-	return m_nvram[(m_nvram_base + offset) & (m_nvram_size - 1)];
+	u32 nvram_address = (m_nvram_base + (offset << 1)) & (m_nvram_size - 1);
+	return m_nvram[nvram_address] | (m_nvram[nvram_address + 1] << 8);
 }
 
-void ws_rom_sram_device::write_ram(offs_t offset, u8 data)
+void ws_rom_sram_device::write_ram(offs_t offset, u16 data, u16 mem_mask)
 {
-	m_nvram[(m_nvram_base + offset) & (m_nvram_size - 1)] = data;
+	u32 nvram_address = (m_nvram_base + (offset << 1)) & (m_nvram_size - 1);
+	if (ACCESSING_BITS_0_7)
+		m_nvram[nvram_address] = data & 0xff;
+	if (ACCESSING_BITS_8_15)
+		m_nvram[nvram_address + 1] = data >> 8;
 }
 
-void ws_rom_sram_device::write_io(offs_t offset, u8 data)
+void ws_rom_sram_device::write_io(offs_t offset, u16 data, u16 mem_mask)
 {
 	switch (offset)
 	{
-		case 0x01:  // SRAM bank to select
-			m_nvram_base = (data * 0x10000) & (m_nvram.size() -  1);
+		case 0x00 / 2:
+			// SRAM bank to select
+			if (ACCESSING_BITS_8_15)
+			{
+				m_nvram_base = ((data >> 8) * 0x10000) & (m_nvram.size() -  1);
+			}
 		default:
-			ws_rom_device::write_io(offset, data);
+			ws_rom_device::write_io(offset, data, mem_mask);
 			break;
 	}
 }
 
 
-u8 ws_rom_eeprom_device::read_io(offs_t offset)
+u16 ws_rom_eeprom_device::read_io(offs_t offset, u16 mem_mask)
 {
-	u8 value = m_io_regs[offset];
+	u16 value = m_io_regs[offset];
 
 	switch (offset)
 	{
-		case 0x04:
-		case 0x05:
-		case 0x06:
-		case 0x07:
-		case 0x08:
+		case 0x04 / 2:
+		case 0x06 / 2:
+		case 0x08 / 2:
 			// EEPROM reads, taken from regs
 			break;
 		default:
-			value = ws_rom_device::read_io(offset);
+			value = ws_rom_device::read_io(offset, mem_mask);
 			break;
 	}
 
 	return value;
 }
 
-void ws_rom_eeprom_device::write_io(offs_t offset, u8 data)
+void ws_rom_eeprom_device::write_io(offs_t offset, u16 data, u16 mem_mask)
 {
 	switch (offset)
 	{
-		case 0x06:  /* EEPROM address lower bits port/EEPROM address and command port
+		case 0x06 / 2:
+			/* EEPROM address lower bits port/EEPROM address and command port
 		             1KBit EEPROM:
 		             Bit 0-5 - EEPROM address bit 1-6
 		             Bit 6-7 - Command
@@ -447,27 +470,28 @@ void ws_rom_eeprom_device::write_io(offs_t offset, u8 data)
 		             16KBit EEPROM:
 		             Bit 0-7 - EEPROM address bit 1-8
 		             */
-			switch (m_eeprom_mode)
+			if (ACCESSING_BITS_0_7)
 			{
-				case EEPROM_1K:
+				switch (m_eeprom_mode)
+				{
+					case EEPROM_1K:
 						m_eeprom_address = data & 0x3f;
-						m_eeprom_command = data >> 4;
-					if ((m_eeprom_command & 0x0c) != 0x00)
-						m_eeprom_command = m_eeprom_command & 0x0c;
-					break;
+						m_eeprom_command = (data >> 4) & 0x0f;
+						if ((m_eeprom_command & 0x0c) != 0x00)
+							m_eeprom_command = m_eeprom_command & 0x0c;
+						break;
 
-				case EEPROM_8K:
-				case EEPROM_16K:
-					m_eeprom_address = (m_eeprom_address & 0xff00) | data;
-					break;
+					case EEPROM_8K:
+					case EEPROM_16K:
+						m_eeprom_address = (m_eeprom_address & 0xff00) | (data & 0xff);
+						break;
 
-				default:
-					logerror( "Write EEPROM address/register register C6 for unsupported EEPROM type\n" );
-					break;
+					default:
+						logerror( "Write EEPROM address/register register C6 for unsupported EEPROM type\n" );
+						break;
+				}
 			}
-			break;
-
-		case 0x07:  /* EEPROM higher bits/command bits port
+			/* EEPROM higher bits/command bits port
 		             1KBit EEPROM:
 		             Bit 0   - Start
 		             Bit 1-7 - Unknown
@@ -485,35 +509,39 @@ void ws_rom_eeprom_device::write_io(offs_t offset, u8 data)
 		             Bit 4   - Start
 		             Bit 5-7 - Unknown
 		             */
-			switch (m_eeprom_mode)
+			if (ACCESSING_BITS_8_15)
 			{
-				case EEPROM_1K:
-					m_eeprom_start = data & 0x01;
-					break;
+				switch (m_eeprom_mode)
+				{
+					case EEPROM_1K:
+						m_eeprom_start = (data >> 8) & 0x01;
+						break;
 
-				case EEPROM_8K:
-					m_eeprom_address = ((data & 0x01) << 8) | (m_eeprom_address & 0xff);
-					m_eeprom_command = data & 0x0f;
-					if ((m_eeprom_command & 0x0c) != 0x00)
-						m_eeprom_command = m_eeprom_command & 0x0c;
-					m_eeprom_start = (data >> 4) & 0x01;
-					break;
+					case EEPROM_8K:
+						m_eeprom_address = (data & 0x0100) | (m_eeprom_address & 0xff);
+						m_eeprom_command = (data >> 8) & 0x0f;
+						if ((m_eeprom_command & 0x0c) != 0x00)
+							m_eeprom_command = m_eeprom_command & 0x0c;
+						m_eeprom_start = (data >> 12) & 0x01;
+						break;
 
-				case EEPROM_16K:
-					m_eeprom_address = ((data & 0x03) << 8) | (m_eeprom_address & 0xff);
-					m_eeprom_command = data & 0x0f;
-					if ((m_eeprom_command & 0x0c) != 0x00)
-						m_eeprom_command = m_eeprom_command & 0x0c;
-					m_eeprom_start = (data >> 4) & 0x01;
-					break;
+					case EEPROM_16K:
+						m_eeprom_address = (data & 0x0300) | (m_eeprom_address & 0xff);
+						m_eeprom_command = (data >> 8) & 0x0f;
+						if ((m_eeprom_command & 0x0c) != 0x00)
+							m_eeprom_command = m_eeprom_command & 0x0c;
+						m_eeprom_start = (data >> 12) & 0x01;
+						break;
 
-				default:
-					logerror( "Write EEPROM address/command register C7 for unsupported EEPROM type\n" );
-				break;
+					default:
+						logerror( "Write EEPROM address/command register C7 for unsupported EEPROM type\n" );
+					break;
+				}
 			}
 			break;
 
-		case 0x08:  /* EEPROM command
+		case 0x08 / 2:
+			/* EEPROM command
 		             Bit 0   - Read complete (read only)
 		             Bit 1   - Write complete (read only)
 		             Bit 2-3 - Unknown
@@ -522,63 +550,66 @@ void ws_rom_eeprom_device::write_io(offs_t offset, u8 data)
 		             Bit 6   - Protect
 		             Bit 7   - Initialize
 		             */
-			if (data & 0x80)    // Initialize
-				logerror("Unsupported EEPROM command 'Initialize'\n");
-
-			if (data & 0x40)    // Protect
+			if (ACCESSING_BITS_0_7)
 			{
-				switch (m_eeprom_command)
-				{
-					case 0x00:
-						m_eeprom_write_enabled = 0;
-						data |= 0x02;
-						break;
-					case 0x03:
-						m_eeprom_write_enabled = 1;
-						data |= 0x02;
-						break;
-					default:
-						logerror("Unsupported 'Protect' command %X\n", m_eeprom_command);
-						break;
-				}
-			}
+				if (data & 0x80)    // Initialize
+					logerror("Unsupported EEPROM command 'Initialize'\n");
 
-			if (data & 0x20)    // Write
-			{
-				if (m_eeprom_write_enabled)
+				if (data & 0x40)    // Protect
 				{
 					switch (m_eeprom_command)
 					{
-						case 0x04:
-							m_nvram[(m_eeprom_address << 1) + 1] = m_io_regs[0x04];
-							m_nvram[m_eeprom_address << 1] = m_io_regs[0x05];
+						case 0x00:
+							m_eeprom_write_enabled = 0;
+							data |= 0x02;
+							break;
+						case 0x03:
+							m_eeprom_write_enabled = 1;
 							data |= 0x02;
 							break;
 						default:
-							logerror("Unsupported 'Write' command %X\n", m_eeprom_command);
+							logerror("Unsupported 'Protect' command %X\n", m_eeprom_command);
 							break;
 					}
 				}
-			}
 
-			if (data & 0x10)    // Read
-			{
-				m_io_regs[0x04] = m_nvram[(m_eeprom_address << 1) + 1];
-				m_io_regs[0x05] = m_nvram[m_eeprom_address << 1];
-				data |= 0x01;
+				if (data & 0x20)    // Write
+				{
+					if (m_eeprom_write_enabled)
+					{
+						switch (m_eeprom_command)
+						{
+							case 0x04:
+								m_nvram[(m_eeprom_address << 1) + 1] = m_io_regs[0x04 / 2] & 0xff;
+								m_nvram[m_eeprom_address << 1] = m_io_regs[0x04 / 2] >> 8;
+								data |= 0x02;
+								break;
+							default:
+								logerror("Unsupported 'Write' command %X\n", m_eeprom_command);
+								break;
+						}
+					}
+				}
+
+				if (data & 0x10)    // Read
+				{
+					m_io_regs[0x04] = m_nvram[(m_eeprom_address << 1) + 1];
+					m_io_regs[0x05] = m_nvram[m_eeprom_address << 1];
+					data |= 0x01;
+				}
 			}
 			break;
 
 		default:
-			ws_rom_device::write_io(offset, data);
+			ws_rom_device::write_io(offset, data, mem_mask);
 			break;
 	}
 
-	m_io_regs[offset] = data;
+	COMBINE_DATA(&m_io_regs[offset]);
 }
 
 
-u8 ws_wwitch_device::read_ram(offs_t offset)
+u16 ws_wwitch_device::read_ram(offs_t offset, u16 mem_mask)
 {
 	if (m_flash_mode == COMMAND_MODE)
 	{
@@ -604,30 +635,30 @@ u8 ws_wwitch_device::read_ram(offs_t offset)
 	}
 	if (m_io_regs[0x01] >= 8 && m_io_regs[0x01] < 16)
 	{
-		return m_rom[((m_io_regs[0x01] * 0x10000) | offset)  & (m_rom_size - 1)];
+		return m_rom[((m_io_regs[0x01] * 0x8000) | offset) & (m_rom_size - 1)];
 	}
 	if (m_io_regs[0x01] < 8)
 	{
-		return ws_rom_sram_device::read_ram(offset);
+		return ws_rom_sram_device::read_ram(offset, mem_mask);
 	}
 	else
 	{
-		return 0xff;
+		return 0xffff;
 	}
 }
 
 
-void ws_wwitch_device::write_ram(offs_t offset, u8 data)
+void ws_wwitch_device::write_ram(offs_t offset, u16 data, u16 mem_mask)
 {
-	if (m_flash_seq == 0 && offset == 0xaaa && data == 0xaa)
+	if (m_flash_seq == 0 && offset == (0xaaa >> 1) && ACCESSING_BITS_0_7 && data == 0xaa)
 	{
 		m_flash_seq = 1;
 	}
-	else if (m_flash_seq == 1 && offset == 0x555 && data == 0x55)
+	else if (m_flash_seq == 1 && offset == (0x555 >> 1) && ACCESSING_BITS_8_15 && data == 0x55)
 	{
 		m_flash_seq = 2;
 	}
-	else if (m_flash_seq == 2 && offset == 0xaaa)
+	else if (m_flash_seq == 2 && offset == (0xaaa >> 1) && ACCESSING_BITS_0_7)
 	{
 		switch (data)
 		{
@@ -647,10 +678,10 @@ void ws_wwitch_device::write_ram(offs_t offset, u8 data)
 			{
 				if ((m_io_regs[0x01] & 0x07) < 7)
 				{
-						u32 block_base = (m_io_regs[0x01] & 0x07) << 16;
-						for (u32 address = 0; address < 0x10000; address++)
+						u32 block_base = (m_io_regs[0x01] & 0x07) << 15;
+						for (u32 address = 0; address < 0x8000; address++)
 						{
-							m_rom[(block_base | address) & (m_rom_size - 1)] = 0xff;
+							m_rom[(block_base | address) & (m_rom_size - 1)] = 0xffff;
 						}
 				}
 
@@ -671,7 +702,11 @@ void ws_wwitch_device::write_ram(offs_t offset, u8 data)
 		if (m_write_flash)
 		{
 				// perform write
-				m_rom[((m_io_regs[0x01] * 0x10000) | offset) & (m_rom_size - 1)] &= data;
+				if (!ACCESSING_BITS_0_7)
+					data |= 0xff;
+				if (!ACCESSING_BITS_8_15)
+					data |= 0xff00;
+				m_rom[((m_io_regs[0x01] * 0x8000) | offset) & (m_rom_size - 1)] &= data;
 				m_flash_status = (m_flash_status & 0x7f) | ((data ^ 0x80) & 0x80);
 				m_writing_flash = true;
 				m_flash_count = 0;
@@ -709,6 +744,6 @@ void ws_wwitch_device::write_ram(offs_t offset, u8 data)
 	}
 	else if (m_io_regs[0x01] < 8)
 	{
-		ws_rom_sram_device::write_ram(offset, data);
+		ws_rom_sram_device::write_ram(offset, data, mem_mask);
 	}
 }
