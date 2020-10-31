@@ -345,6 +345,7 @@ VIDEOS["NT7534"] = true
 VIDEOS["HD44102"] = true
 VIDEOS["HD44352"] = true
 VIDEOS["HD44780"] = true
+VIDEOS["HD61202"] = true
 VIDEOS["HD61603"] = true
 VIDEOS["HD61830"] = true
 --VIDEOS["HD63484"] = true
