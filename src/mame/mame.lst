@@ -1469,7 +1469,9 @@ aquarium                        // (c) 1996 Excellent System
 aquariumj                       // (c) 1996 Excellent System
 
 @source:aquarius.cpp
-aquarius                        // 1983 Aquarius
+aquarius                        // 1983 Aquarius (NTSC)
+aquariusp                       // 1983 Aquarius (PAL)
+aquarius2                       // 1984 Aquarius II
 
 @source:arabian.cpp
 arabian                         // TVG13 (c) 1983 Sun Electronics

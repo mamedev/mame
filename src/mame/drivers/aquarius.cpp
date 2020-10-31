@@ -7,12 +7,9 @@
 
     TODO:
 
-    - proper video timings
-    - PAL mode
     - floppy support (I/O 0xe6-0xe7 = drive 1, 0xea-0xeb = drive 2)
     - modem
     - "old" version of BASIC ROM
-    - Aquarius II
 
 Dick Smith catalog numbers, taken from advertisements:
 
@@ -31,20 +28,6 @@ X-6026 : Roll of paper for the printer
 
 #include "softlist.h"
 #include "speaker.h"
-
-
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
-
-#define XTAL1   8866000
-#define XTAL2   7.15909_MHz_XTAL
-
-
-/***************************************************************************
-    GLOBAL VARIABLES
-***************************************************************************/
-
 
 
 /***************************************************************************
@@ -373,7 +356,7 @@ void aquarius_state::cfg_ram16(device_t* device)
 void aquarius_state::aquarius(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL2 / 2);
+	Z80(config, m_maincpu, 7.15909_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &aquarius_state::aquarius_mem);
 	m_maincpu->set_addrmap(AS_IO, &aquarius_state::aquarius_io);
 	m_maincpu->set_vblank_int("screen", FUNC(aquarius_state::irq0_line_hold));
@@ -382,15 +365,12 @@ void aquarius_state::aquarius(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2800));
-	m_screen->set_size(40 * 8, 25 * 8);
-	m_screen->set_visarea(0, 40 * 8 - 1, 0 * 8, 25 * 8 - 1);
+	m_screen->set_raw(7.15909_MHz_XTAL, 456, 0, 320, 262, 0, 200);
 	m_screen->set_screen_update(FUNC(aquarius_state::screen_update_aquarius));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_aquarius);
-	TEA1002(config, m_tea1002, XTAL(8'867'238));
+	TEA1002(config, m_tea1002, 7.15909_MHz_XTAL);
 	PALETTE(config, m_palette, FUNC(aquarius_state::aquarius_palette), 512, 16);
 
 	/* sound hardware */
@@ -419,6 +399,14 @@ void aquarius_state::aquarius(machine_config &config)
 	SOFTWARE_LIST(config, "cass_list").set_original("aquarius_cass");
 }
 
+void aquarius_state::aquariusp(machine_config &config)
+{
+	aquarius(config);
+
+	m_screen->set_raw(7.15909_MHz_XTAL, 456, 0, 320, 312, 0, 200);
+
+	m_tea1002->set_unscaled_clock(8.867238_MHz_XTAL);
+}
 
 /***************************************************************************
     ROM DEFINITIONS
@@ -428,11 +416,25 @@ ROM_START( aquarius )
 	ROM_REGION(0x3000, "maincpu", ROMREGION_ERASE00)
 
 	/* basic rom */
-	ROM_DEFAULT_BIOS("rev2")
-	ROM_SYSTEM_BIOS(0, "rev2", "Revision 2")
-	ROMX_LOAD("aq2.u2", 0x0000, 0x2000, CRC(a2d15bcf) SHA1(ca6ef55e9ead41453efbf5062d6a60285e9661a6), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS(1, "rev1", "Revision 1")
-	ROMX_LOAD("aq1.u2", 0x0000, 0x2000, NO_DUMP, ROM_BIOS(1))
+	ROM_DEFAULT_BIOS("s2")
+	ROM_SYSTEM_BIOS(0, "s2", "S2")
+	ROMX_LOAD("aq_s2.u2", 0x0000, 0x2000, CRC(5cfa5b42) SHA1(02c8ee11e911d1aa346812492d14284b6870cb3e), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "s1", "S1")
+	ROMX_LOAD("aq.u2", 0x0000, 0x2000, NO_DUMP, ROM_BIOS(1))
+
+	/* charrom */
+	ROM_REGION(0x0800, "gfx1", 0)
+	ROM_LOAD("aq2.u5", 0x0000, 0x0800, CRC(e117f57c) SHA1(3588c0267c67dfbbda615bcf8dc3d3a5c5bd815a))
+ROM_END
+
+#define rom_aquariusp rom_aquarius
+
+ROM_START( aquarius2 )
+	ROM_REGION(0x3000, "maincpu", ROMREGION_ERASE00)
+
+	/* extended basic rom */
+	ROM_LOAD("aq2_1.rom", 0x0000, 0x2000, CRC(5cfa5b42) SHA1(02c8ee11e911d1aa346812492d14284b6870cb3e))
+	ROM_LOAD("aq2_2.rom", 0x2000, 0x1000, CRC(c95117c6) SHA1(6ee8571a93b9b371dfdd26334ae886a69c5b3daf))
 
 	/* charrom */
 	ROM_REGION(0x0800, "gfx1", 0)
@@ -444,6 +446,7 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT           COMPANY   FULLNAME           FLAGS
-COMP( 1983, aquarius, 0,        0,      aquarius, aquarius, aquarius_state, init_aquarius, "Mattel", "Aquarius (NTSC)", 0 )
-//COMP( 1984, aquariu2, aquarius, 0,      aquarius, aquarius, aquarius_state, empty_init,    "Mattel", "Aquarius II",     MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT     CLASS           INIT        COMPANY    FULLNAME           FLAGS
+COMP( 1983, aquarius,  0,        0,      aquarius,  aquarius, aquarius_state, empty_init, "Mattel",  "Aquarius (NTSC)", 0 )
+COMP( 1983, aquariusp, aquarius, 0,      aquariusp, aquarius, aquarius_state, empty_init, "Mattel",  "Aquarius (PAL)",  0 )
+COMP( 1984, aquarius2, aquarius, 0,      aquarius,  aquarius, aquarius_state, empty_init, "Radofin", "Aquarius II",     0 )

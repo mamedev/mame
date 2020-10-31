@@ -49,6 +49,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(aquarius_reset);
 
 	void aquarius(machine_config &config);
+	void aquariusp(machine_config &config);
 
 	static void cfg_ram16(device_t* device);
 
