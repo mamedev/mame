@@ -61,7 +61,7 @@ nes_vtunknown_soc_fa_device::nes_vtunknown_soc_fa_device(const machine_config& m
 void nes_vtunknown_soc_cy_device::device_add_mconfig(machine_config& config)
 {
 	nes_vt02_vt03_soc_device::device_add_mconfig(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vtunknown_soc_cy_device::nes_vt_cy_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vtunknown_soc_cy_device::nes_vt369_map);
 
 	VT_VT1682_ALU(config, m_alu, 0);
 
@@ -79,7 +79,7 @@ void nes_vtunknown_soc_cy_device::vt369_relative_w(offs_t offset, uint8_t data)
 }
 
 
-void nes_vtunknown_soc_cy_device::nes_vt_cy_map(address_map &map)
+void nes_vtunknown_soc_cy_device::nes_vt369_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram(); // 8k RAM?
 
@@ -132,7 +132,7 @@ void nes_vtunknown_soc_cy_device::nes_vt_cy_map(address_map &map)
 	map(0x41b0, 0x41bf).r(FUNC(nes_vtunknown_soc_cy_device::vt369_41bx_r)).w(FUNC(nes_vtunknown_soc_cy_device::vt369_41bx_w));
 
 //	map(0x48a0, 0x48af).r(FUNC(nes_vtunknown_soc_cy_device::vt369_48ax_r)).w(FUNC(nes_vtunknown_soc_cy_device::vt369_48ax_w));
-	map(0x4800, 0x4fff).ram().share("soundram"); // should be, but some sets aren't uploading anything, do they rely on an internal ROM?
+	map(0x4800, 0x4fff).ram().share("soundram"); // sound program for 2nd CPU is uploaded here, but some sets aren't uploading anything, do they rely on an internal ROM? other DMA? possibility to map ROM?
 
 	map(0x6000, 0x7fff).r(FUNC(nes_vtunknown_soc_cy_device::vt369_6000_r)).w(FUNC(nes_vtunknown_soc_cy_device::vt369_6000_w));
 
@@ -151,17 +151,35 @@ void nes_vtunknown_soc_cy_device::vt369_4112_bank6000_select_w(offs_t offset, ui
 {
 	logerror("set bank at 0x6000 to %02x\n", data);
 	m_bank6000 = data;
+
+	// 0x3c = 0x78000
 }
 
 
 uint8_t nes_vtunknown_soc_cy_device::vt369_6000_r(offs_t offset)
 {
-	return m_6000_ram[offset];
+	if (m_bank6000_enable & 0x40)
+	{
+		address_space& spc = this->space(AS_PROGRAM);
+		int address = (m_bank6000 * 0x2000) + (offset & 0x1fff);
+		return spc.read_byte(address);
+	}
+	else
+	{
+		return m_6000_ram[offset];
+	}
 }
 
 void nes_vtunknown_soc_cy_device::vt369_6000_w(offs_t offset, uint8_t data)
 {
-	m_6000_ram[offset] = data;
+	if (m_bank6000_enable & 0x40)
+	{
+		logerror("%s: write to 0x6xxx with ROM enabled? %04x %02x\n", machine().describe_context(), offset, data);
+	}
+	else
+	{
+		m_6000_ram[offset] = data;
+	}
 }
 
 

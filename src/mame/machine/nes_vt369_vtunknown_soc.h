@@ -24,7 +24,7 @@ protected:
 	virtual void device_add_mconfig(machine_config& config) override;
 	void device_start() override;
 
-	void nes_vt_cy_map(address_map& map);
+	void nes_vt369_map(address_map& map);
 
 	uint8_t vt369_41bx_r(offs_t offset);
 	void vt369_41bx_w(offs_t offset, uint8_t data);

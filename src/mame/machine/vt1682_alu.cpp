@@ -328,7 +328,7 @@ void vrt_vt1682_alu_device::alu_oprand_6_div_w(uint8_t data)
 	m_alu_oprand_div[1] = data;
 
 	uint32_t param1 = (m_alu_oprand[3] << 24) | (m_alu_oprand[2] << 16) | (m_alu_oprand[1] << 8) | m_alu_oprand[0];
-	// sources say the mult registers areu sed here, but that makes little sense?
+	// sources say the mult registers are used here, but that makes little sense?
 	uint32_t param2 = (m_alu_oprand_div[1] << 8) | m_alu_oprand_div[0];
 
 	if (param2 != 0)
