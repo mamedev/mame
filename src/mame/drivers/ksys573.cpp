@@ -834,6 +834,7 @@ void ksys573_state::driver_start()
 
 	m_n_security_control = 0;
 	m_control = 0;
+	m_h8_index = 0;
 
 	save_item( NAME( m_n_security_control ) );
 	save_item( NAME( m_control ) );
