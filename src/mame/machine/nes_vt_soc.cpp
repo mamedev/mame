@@ -938,7 +938,7 @@ void nes_vt02_vt03_soc_device::do_dma(uint8_t data, bool has_ntsc_bug)
 
 void nes_vt02_vt03_soc_device::vt03_4034_w(uint8_t data)
 {
-	logerror("vt03_4034_w %02x\n", data);
+	logerror("vt03_4034_w %02x (2nd APU DMA)\n", data);
 	m_vdma_ctrl = data;
 }
 
@@ -1068,13 +1068,13 @@ void nes_vt02_vt03_soc_device::nes_vt_map(address_map &map)
 
 	map(0x4000, 0x4013).rw(m_apu, FUNC(nesapu_device::read), FUNC(nesapu_device::write));
 
-
 	map(0x4014, 0x4014).r(FUNC(nes_vt02_vt03_soc_device::psg1_4014_r)).w(FUNC(nes_vt02_vt03_soc_device::vt_dma_w));
 	map(0x4015, 0x4015).rw(FUNC(nes_vt02_vt03_soc_device::psg1_4015_r), FUNC(nes_vt02_vt03_soc_device::psg1_4015_w)); // PSG status / first control register
 	map(0x4016, 0x4016).rw(FUNC(nes_vt02_vt03_soc_device::in0_r), FUNC(nes_vt02_vt03_soc_device::in0_w));
 	map(0x4017, 0x4017).r(FUNC(nes_vt02_vt03_soc_device::in1_r)).w(FUNC(nes_vt02_vt03_soc_device::psg1_4017_w));
 
-	map(0x4034, 0x4034).w(FUNC(nes_vt02_vt03_soc_device::vt03_4034_w));
+
+	map(0x4034, 0x4034).w(FUNC(nes_vt02_vt03_soc_device::vt03_4034_w)); // secondary DMA
 
 	map(0x4100, 0x410b).r(FUNC(nes_vt02_vt03_soc_device::vt03_410x_r)).w(FUNC(nes_vt02_vt03_soc_device::vt03_410x_w));
 	// 0x410c unused

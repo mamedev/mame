@@ -26,21 +26,29 @@ protected:
 
 	void nes_vt_cy_map(address_map& map);
 
-	uint8_t vt03_41bx_r(offs_t offset);
-	void vt03_41bx_w(offs_t offset, uint8_t data);
+	uint8_t vt369_41bx_r(offs_t offset);
+	void vt369_41bx_w(offs_t offset, uint8_t data);
 
-	required_device<vrt_vt1682_alu_device> m_alu;
+	uint8_t vt369_414f_r();
+	uint8_t vt369_415c_r();
 
-	uint8_t vt03_414f_r();
+	void vt369_48ax_w(offs_t offset, uint8_t data);
+	uint8_t vt369_48ax_r(offs_t offset);
 
-	uint8_t vt03_415c_r();
-
-	void vt03_48ax_w(offs_t offset, uint8_t data);
-	uint8_t vt03_48ax_r(offs_t offset);
-
-	uint8_t m_413x[8]; // CY only?
+	uint8_t vt369_6000_r(offs_t offset);
+	void vt369_6000_w(offs_t offset, uint8_t data);
 
 	void vt369_soundcpu_control_w(offs_t offset, uint8_t data);
+	void vt369_4112_bank6000_select_w(offs_t offset, uint8_t data);
+	void vt369_411c_bank6000_enable_w(offs_t offset, uint8_t data);
+	void vt369_relative_w(offs_t offset, uint8_t data);
+
+private:
+	required_device<vrt_vt1682_alu_device> m_alu;
+	uint8_t m_relative[2];
+	std::vector<u8> m_6000_ram;
+	uint8_t m_bank6000;
+	uint8_t m_bank6000_enable;
 };
 
 class nes_vtunknown_soc_bt_device : public nes_vt09_soc_device

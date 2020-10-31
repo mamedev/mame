@@ -72,6 +72,12 @@ void nes_vtunknown_soc_cy_device::vt369_soundcpu_control_w(offs_t offset, uint8_
 	printf("%s: write to sound cpu control reg (reset etc.) %02x\n", machine().describe_context().c_str(), data);
 }
 
+void nes_vtunknown_soc_cy_device::vt369_relative_w(offs_t offset, uint8_t data)
+{
+	printf("%s: vt369_relative_w %02x %02x\n", machine().describe_context().c_str(), offset,  data);
+	m_relative[offset] = data;
+}
+
 
 void nes_vtunknown_soc_cy_device::nes_vt_cy_map(address_map &map)
 {
@@ -88,13 +94,16 @@ void nes_vtunknown_soc_cy_device::nes_vt_cy_map(address_map &map)
 	map(0x4016, 0x4016).rw(FUNC(nes_vtunknown_soc_cy_device::in0_r), FUNC(nes_vtunknown_soc_cy_device::in0_w));
 	map(0x4017, 0x4017).r(FUNC(nes_vtunknown_soc_cy_device::in1_r)).w(FUNC(nes_vtunknown_soc_cy_device::psg1_4017_w));
 
-	map(0x4034, 0x4034).w(FUNC(nes_vtunknown_soc_cy_device::vt03_4034_w));
+	map(0x4034, 0x4034).w(FUNC(nes_vtunknown_soc_cy_device::vt03_4034_w));  // secondary DMA
 
 	map(0x4100, 0x410b).r(FUNC(nes_vtunknown_soc_cy_device::vt03_410x_r)).w(FUNC(nes_vtunknown_soc_cy_device::vt03_410x_w));
 	// 0x410c unused
 	map(0x410d, 0x410d).w(FUNC(nes_vtunknown_soc_cy_device::extra_io_control_w));
 	map(0x410e, 0x410e).rw(FUNC(nes_vtunknown_soc_cy_device::extrain_01_r), FUNC(nes_vtunknown_soc_cy_device::extraout_01_w));
 	map(0x410f, 0x410f).rw(FUNC(nes_vtunknown_soc_cy_device::extrain_23_r), FUNC(nes_vtunknown_soc_cy_device::extraout_23_w));
+
+	map(0x4112, 0x4112).w(FUNC(nes_vtunknown_soc_cy_device::vt369_4112_bank6000_select_w));
+
 	// 0x4114 RS232 timer (low)
 	// 0x4115 RS232 timer (high)
 	// 0x4116 unused
@@ -103,6 +112,7 @@ void nes_vtunknown_soc_cy_device::nes_vt_cy_map(address_map &map)
 	map(0x4119, 0x4119).r(FUNC(nes_vtunknown_soc_cy_device::rs232flags_region_r));
 	// 0x411a RS232 TX data
 	// 0x411b RS232 RX data
+	map(0x411c, 0x411c).w(FUNC(nes_vtunknown_soc_cy_device::vt369_411c_bank6000_enable_w));
 
 	map(0x4130, 0x4130).rw(m_alu, FUNC(vrt_vt1682_alu_device::alu_out_1_r), FUNC(vrt_vt1682_alu_device::alu_oprand_1_w));
 	map(0x4131, 0x4131).rw(m_alu, FUNC(vrt_vt1682_alu_device::alu_out_2_r), FUNC(vrt_vt1682_alu_device::alu_oprand_2_w));
@@ -113,29 +123,65 @@ void nes_vtunknown_soc_cy_device::nes_vt_cy_map(address_map &map)
 	map(0x4136, 0x4136).w(m_alu, FUNC(vrt_vt1682_alu_device::alu_oprand_5_div_w));
 	map(0x4137, 0x4137).w(m_alu, FUNC(vrt_vt1682_alu_device::alu_oprand_6_div_w));
 
-	map(0x414f, 0x414f).r(FUNC(nes_vtunknown_soc_cy_device::vt03_414f_r));
-	map(0x415c, 0x415c).r(FUNC(nes_vtunknown_soc_cy_device::vt03_415c_r));
+	map(0x414f, 0x414f).r(FUNC(nes_vtunknown_soc_cy_device::vt369_414f_r));
+	map(0x415c, 0x415c).r(FUNC(nes_vtunknown_soc_cy_device::vt369_415c_r));
 
+	map(0x4160, 0x4161).w(FUNC(nes_vtunknown_soc_cy_device::vt369_relative_w));
 	map(0x4162, 0x4162).w(FUNC(nes_vtunknown_soc_cy_device::vt369_soundcpu_control_w));
 
-	map(0x41b0, 0x41bf).r(FUNC(nes_vtunknown_soc_cy_device::vt03_41bx_r)).w(FUNC(nes_vtunknown_soc_cy_device::vt03_41bx_w));
+	map(0x41b0, 0x41bf).r(FUNC(nes_vtunknown_soc_cy_device::vt369_41bx_r)).w(FUNC(nes_vtunknown_soc_cy_device::vt369_41bx_w));
 
-//	map(0x48a0, 0x48af).r(FUNC(nes_vtunknown_soc_cy_device::vt03_48ax_r)).w(FUNC(nes_vtunknown_soc_cy_device::vt03_48ax_w));
-	map(0x4800, 0x4fff).ram().share("soundram");
+//	map(0x48a0, 0x48af).r(FUNC(nes_vtunknown_soc_cy_device::vt369_48ax_r)).w(FUNC(nes_vtunknown_soc_cy_device::vt369_48ax_w));
+	map(0x4800, 0x4fff).ram().share("soundram"); // should be, but some sets aren't uploading anything, do they rely on an internal ROM?
+
+	map(0x6000, 0x7fff).r(FUNC(nes_vtunknown_soc_cy_device::vt369_6000_r)).w(FUNC(nes_vtunknown_soc_cy_device::vt369_6000_w));
 
 	map(0x8000, 0xffff).rw(FUNC(nes_vtunknown_soc_cy_device::external_space_read), FUNC(nes_vtunknown_soc_cy_device::external_space_write));
-	//map(0x6000, 0x7fff).ram();
 
 }
+
+void nes_vtunknown_soc_cy_device::vt369_411c_bank6000_enable_w(offs_t offset, uint8_t data)
+{
+	logerror("enable bank at 0x6000 (%02x)\n", data);
+	m_bank6000_enable = data;
+}
+
+
+void nes_vtunknown_soc_cy_device::vt369_4112_bank6000_select_w(offs_t offset, uint8_t data)
+{
+	logerror("set bank at 0x6000 to %02x\n", data);
+	m_bank6000 = data;
+}
+
+
+uint8_t nes_vtunknown_soc_cy_device::vt369_6000_r(offs_t offset)
+{
+	return m_6000_ram[offset];
+}
+
+void nes_vtunknown_soc_cy_device::vt369_6000_w(offs_t offset, uint8_t data)
+{
+	m_6000_ram[offset] = data;
+}
+
 
 void nes_vtunknown_soc_cy_device::device_start()
 {
 	nes_vt02_vt03_soc_device::device_start();
-	save_item(NAME(m_413x));
+
+	m_6000_ram.resize(0x2000);
+	m_bank6000 = 0;
+	m_bank6000_enable = 0;
+	m_relative[0] = m_relative[1] = 0x00;
+
+	save_item(NAME(m_6000_ram));
+	save_item(NAME(m_bank6000));
+	save_item(NAME(m_bank6000_enable));
+	save_item(NAME(m_relative));
 }
 
 
-uint8_t nes_vtunknown_soc_cy_device::vt03_41bx_r(offs_t offset)
+uint8_t nes_vtunknown_soc_cy_device::vt369_41bx_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -146,29 +192,29 @@ uint8_t nes_vtunknown_soc_cy_device::vt03_41bx_r(offs_t offset)
 	}
 }
 
-void nes_vtunknown_soc_cy_device::vt03_41bx_w(offs_t offset, uint8_t data)
+void nes_vtunknown_soc_cy_device::vt369_41bx_w(offs_t offset, uint8_t data)
 {
-	logerror("vt03_41bx_w %02x %02x\n", offset, data);
+	logerror("vt369_41bx_w %02x %02x\n", offset, data);
 }
 
 
-uint8_t nes_vtunknown_soc_cy_device::vt03_414f_r()
-{
-	return 0xff;
-}
-
-uint8_t nes_vtunknown_soc_cy_device::vt03_415c_r()
+uint8_t nes_vtunknown_soc_cy_device::vt369_414f_r()
 {
 	return 0xff;
 }
 
-
-void nes_vtunknown_soc_cy_device::vt03_48ax_w(offs_t offset, uint8_t data)
+uint8_t nes_vtunknown_soc_cy_device::vt369_415c_r()
 {
-	logerror("vt03_48ax_w %02x %02x\n", offset, data);
+	return 0xff;
 }
 
-uint8_t nes_vtunknown_soc_cy_device::vt03_48ax_r(offs_t offset)
+
+void nes_vtunknown_soc_cy_device::vt369_48ax_w(offs_t offset, uint8_t data)
+{
+	logerror("vt369_48ax_w %02x %02x\n", offset, data);
+}
+
+uint8_t nes_vtunknown_soc_cy_device::vt369_48ax_r(offs_t offset)
 {
 	switch (offset)
 	{
