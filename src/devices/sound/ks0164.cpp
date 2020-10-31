@@ -13,6 +13,8 @@ ks0164_device::ks0164_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, KS0164, tag, owner, clock),
 	  device_sound_interface(mconfig, *this),
 	  device_memory_interface(mconfig, *this),
+	  device_serial_interface(mconfig, *this),
+	  m_midi_tx(*this),
 	  m_mem_region(*this, DEVICE_SELF),
 	  m_cpu(*this, "cpu"),
 	  m_mem_config("mem", ENDIANNESS_BIG, 16, 23)
@@ -54,6 +56,11 @@ void ks0164_device::device_start()
 	space().cache(m_mem_cache);
 	m_timer = timer_alloc(0);
 
+	m_midi_tx.resolve_safe();
+
+	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
+	set_rate(clock(), 542);
+
 	save_item(NAME(m_bank1_base));
 	save_item(NAME(m_bank1_select));
 	save_item(NAME(m_bank2_base));
@@ -85,6 +92,8 @@ void ks0164_device::device_reset()
 	m_mpu_in = 0x00;
 	m_mpu_out = 0x00;
 	m_mpu_status = 0x00;
+	m_midi_in = 0x00;
+	m_midi_in_active = false;
 
 	m_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
 }
@@ -95,6 +104,50 @@ void ks0164_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	if(m_irqen_76 & 0x40)
 		m_cpu->set_input_line(14, ASSERT_LINE);
 }
+
+void ks0164_device::tra_complete()
+{
+	logerror("transmit done\n");
+}
+
+void ks0164_device::rcv_complete()
+{
+	receive_register_extract();
+	m_midi_in = get_received_char();
+	m_midi_in_active = true;
+	m_cpu->set_input_line(6, ASSERT_LINE);
+
+	logerror("recieved %02x\n", m_midi_in);
+}
+
+void ks0164_device::tra_callback()
+{
+	m_midi_tx(transmit_register_get_data_bit());
+}
+
+u8 ks0164_device::midi_r()
+{
+	m_midi_in_active = false;
+	m_cpu->set_input_line(6, CLEAR_LINE);
+	return m_midi_in;
+}
+
+void ks0164_device::midi_w(u8 data)
+{
+	logerror("want to transmit %02x\n", data);
+}
+
+u8 ks0164_device::midi_status_r()
+{
+	// transmit done/tx empty on bit 1
+	return m_midi_in_active ? 1 : 0;
+}
+
+void ks0164_device::midi_status_w(u8 data)
+{
+	logerror("midi status_w %02x\n", data);
+}
+
 
 void ks0164_device::mpuin_set(bool control, u8 data)
 {
@@ -289,6 +342,7 @@ u8 ks0164_device::irqen_76_r()
 	return m_irqen_76;
 }
 
+// alternates 1e/5e
 void ks0164_device::irqen_76_w(u8 data)
 {
 	m_irqen_76 = data;
@@ -300,7 +354,7 @@ void ks0164_device::irqen_76_w(u8 data)
 		m_cpu->set_input_line(14, CLEAR_LINE);
 	}
 
-	//  logerror("irqen_76 = %02x (%04x)\n", m_irqen_76, m_cpu->pc());
+	//	logerror("irqen_76 = %02x (%04x)\n", m_irqen_76, m_cpu->pc());
 }
 
 u8 ks0164_device::irqen_77_r()
@@ -348,6 +402,8 @@ void ks0164_device::cpu_map(address_map &map)
 
 	map(0x0068, 0x0068).rw(FUNC(ks0164_device::mpu401_r), FUNC(ks0164_device::mpu401_w));
 	map(0x0069, 0x0069).rw(FUNC(ks0164_device::mpu401_istatus_r), FUNC(ks0164_device::mpu401_istatus_w));
+	map(0x006c, 0x006c).rw(FUNC(ks0164_device::midi_r), FUNC(ks0164_device::midi_w));
+	map(0x006d, 0x006d).rw(FUNC(ks0164_device::midi_status_r), FUNC(ks0164_device::midi_status_w));
 
 	map(0x0076, 0x0076).rw(FUNC(ks0164_device::irqen_76_r), FUNC(ks0164_device::irqen_76_w));
 	map(0x0077, 0x0077).rw(FUNC(ks0164_device::irqen_77_r), FUNC(ks0164_device::irqen_77_w));
