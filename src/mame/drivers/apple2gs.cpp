@@ -86,6 +86,7 @@
 #include "bus/a2bus/a2memexp.h"
 #include "bus/a2bus/a2midi.h"
 #include "bus/a2bus/a2mockingboard.h"
+#include "bus/a2bus/a2parprn.h"
 #include "bus/a2bus/a2pic.h"
 #include "bus/a2bus/a2sam.h"
 #include "bus/a2bus/a2scsi.h"
@@ -4572,7 +4573,9 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("ultraterm", A2BUS_ULTRATERM);    /* Videx UltraTerm (original) */
 	device.option_add("ultratermenh", A2BUS_ULTRATERMENH);    /* Videx UltraTerm (enhanced //e) */
 	device.option_add("aevm80", A2BUS_AEVIEWMASTER80);    /* Applied Engineering ViewMaster 80 */
-	device.option_add("parallel", A2BUS_PIC);   /* Apple Parallel Interface Card */
+	device.option_add("parprn", A2BUS_PARPRN);   /* Apple II Parallel Printer Interface Card */
+	device.option_add("parallel", A2BUS_PIC);   /* Apple II Parallel Interface Card */
+	device.option_add("grapplerplus", A2BUS_GRAPPLERPLUS); /* Orange Micro Grappler+ Printer Interface card */
 	device.option_add("corvus", A2BUS_CORVUS);  /* Corvus flat-cable HDD interface (see notes in a2corvus.c) */
 	device.option_add("mcms1", A2BUS_MCMS1);  /* Mountain Computer Music System, card 1 of 2 */
 	device.option_add("mcms2", A2BUS_MCMS2);  /* Mountain Computer Music System, card 2 of 2.  must be in card 1's slot + 1! */
@@ -4594,7 +4597,6 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("uthernet", A2BUS_UTHERNET);  /* A2RetroSystems Uthernet card */
 	device.option_add("sider2", A2BUS_SIDER2); /* Advanced Tech Systems / First Class Peripherals Sider 2 SASI card */
 	device.option_add("sider1", A2BUS_SIDER1); /* Advanced Tech Systems / First Class Peripherals Sider 1 SASI card */
-	device.option_add("grapplerplus", A2BUS_GRAPPLERPLUS); /* Orange Micro Grappler+ Printer Interface card */
 }
 
 void apple2gs_state::apple2gs(machine_config &config)
