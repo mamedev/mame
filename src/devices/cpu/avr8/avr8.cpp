@@ -1430,7 +1430,7 @@ inline void avr8_device::timer1_tick()
 
 			if (m_timer1_count == m_ocr1[reg])
 			{
-				if (reg == 0)
+				if (reg == AVR8_REG_A)
 				{
 					m_timer1_count = 0;
 					increment = 0;
@@ -1442,58 +1442,10 @@ inline void avr8_device::timer1_tick()
 					break;
 
 				case 1: /* Toggle OC1A on compare match */
-					if (reg == 0)
+					if (reg == AVR8_REG_A)
 					{
 						LOGMASKED(LOG_TIMER1, "%s: timer1: Toggle OC1%c on match\n", machine().describe_context());
-						write_gpio(AVR8_IO_PORTB, read_gpio(AVR8_REGIDX_PORTB) ^ (2 << reg));
-					}
-					break;
-
-				case 2: /* Clear OC1A/B on compare match */
-					LOGMASKED(LOG_TIMER1, "%s: timer1: Clear OC1%c on match\n", machine().describe_context(), reg ? 'B' : 'A');
-					write_gpio(AVR8_IO_PORTB, read_gpio(AVR8_REGIDX_PORTB) & ~(2 << reg));
-					break;
-
-				case 3: /* Set OC1A/B on compare match */
-					LOGMASKED(LOG_TIMER1, "%s: timer1: Set OC1%c on match\n", machine().describe_context(), reg ? 'B' : 'A');
-					write_gpio(AVR8_IO_PORTB, read_gpio(AVR8_REGIDX_PORTB) | (2 << reg));
-					break;
-				}
-
-				m_r[AVR8_REGIDX_TIFR1] |= s_ocf1[reg];
-				update_interrupt(s_int1[reg]);
-			}
-			else if (m_timer1_count == 0)
-			{
-				if (reg == 0)
-				{
-					m_r[AVR8_REGIDX_TIFR1] &= ~AVR8_TIFR1_TOV1_MASK;
-					update_interrupt(AVR8_INTIDX_TOV1);
-				}
-			}
-			break;
-
-		case WGM1_FAST_PWM_OCR:
-			if (m_timer1_count == m_ocr1[reg])
-			{
-				if (reg == 0)
-				{
-					m_r[AVR8_REGIDX_TIFR1] |= AVR8_TIFR1_TOV1_MASK;
-					update_interrupt(AVR8_INTIDX_TOV1);
-					m_timer1_count = 0;
-					increment = 0;
-				}
-
-				switch (m_timer1_compare_mode[reg] & 3)
-				{
-				case 0: /* Normal Operation; OC1A/B disconnected */
-					break;
-
-				case 1: /* Toggle OC1A on compare match */
-					if (reg == 0)
-					{
-						LOGMASKED(LOG_TIMER1, "%s: timer1: Toggle OC1%c on match\n", machine().describe_context());
-						write_gpio(AVR8_IO_PORTB, m_r[AVR8_REGIDX_PORTB] ^ (2 << reg));
+						write_gpio(AVR8_IO_PORTB, m_r[AVR8_REGIDX_PORTB] ^ 2);
 					}
 					break;
 
@@ -1513,7 +1465,55 @@ inline void avr8_device::timer1_tick()
 			}
 			else if (m_timer1_count == 0)
 			{
-				if (reg == 0)
+				if (reg == AVR8_REG_A)
+				{
+					m_r[AVR8_REGIDX_TIFR1] &= ~AVR8_TIFR1_TOV1_MASK;
+					update_interrupt(AVR8_INTIDX_TOV1);
+				}
+			}
+			break;
+
+		case WGM1_FAST_PWM_OCR:
+			if (m_timer1_count == m_ocr1[reg])
+			{
+				if (reg == AVR8_REG_A)
+				{
+					m_r[AVR8_REGIDX_TIFR1] |= AVR8_TIFR1_TOV1_MASK;
+					update_interrupt(AVR8_INTIDX_TOV1);
+					m_timer1_count = 0;
+					increment = 0;
+				}
+
+				switch (m_timer1_compare_mode[reg] & 3)
+				{
+				case 0: /* Normal Operation; OC1A/B disconnected */
+					break;
+
+				case 1: /* Toggle OC1A on compare match */
+					if (reg == AVR8_REG_A)
+					{
+						LOGMASKED(LOG_TIMER1, "%s: timer1: Toggle OC1%c on match\n", machine().describe_context());
+						write_gpio(AVR8_IO_PORTB, m_r[AVR8_REGIDX_PORTB] ^ 2);
+					}
+					break;
+
+				case 2: /* Clear OC1A/B on compare match */
+					LOGMASKED(LOG_TIMER1, "%s: timer1: Clear OC1%c on match\n", machine().describe_context(), reg ? 'B' : 'A');
+					write_gpio(AVR8_IO_PORTB, m_r[AVR8_REGIDX_PORTB] & ~(2 << reg));
+					break;
+
+				case 3: /* Set OC1A/B on compare match */
+					LOGMASKED(LOG_TIMER1, "%s: timer1: Set OC1%c on match\n", machine().describe_context(), reg ? 'B' : 'A');
+					write_gpio(AVR8_IO_PORTB, m_r[AVR8_REGIDX_PORTB] | (2 << reg));
+					break;
+				}
+
+				m_r[AVR8_REGIDX_TIFR1] |= s_ocf1[reg];
+				update_interrupt(s_int1[reg]);
+			}
+			else if (m_timer1_count == 0)
+			{
+				if (reg == AVR8_REG_A)
 				{
 					m_r[AVR8_REGIDX_TIFR1] &= ~AVR8_TIFR1_TOV1_MASK;
 					update_interrupt(AVR8_INTIDX_TOV1);
@@ -1525,10 +1525,10 @@ inline void avr8_device::timer1_tick()
 					break;
 
 				case 1: /* Toggle OC1A at BOTTOM*/
-					if (reg == 0)
+					if (reg == AVR8_REG_A)
 					{
 						LOGMASKED(LOG_TIMER1, "%s: timer1: Toggle OC1A at BOTTOM\n", machine().describe_context());
-						write_gpio(AVR8_IO_PORTB, m_r[AVR8_REGIDX_PORTB] ^ (2 << reg));
+						write_gpio(AVR8_IO_PORTB, m_r[AVR8_REGIDX_PORTB] ^ 2);
 					}
 					break;
 
@@ -1554,10 +1554,10 @@ inline void avr8_device::timer1_tick()
 					break;
 
 				case 1: /* Toggle OC1A on compare match */
-					if (reg == 0)
+					if (reg == AVR8_REG_A)
 					{
 						LOGMASKED(LOG_TIMER1, "%s: timer1: Toggle OC1%c on match\n", machine().describe_context());
-						write_gpio(AVR8_IO_PORTB, m_r[AVR8_REGIDX_PORTB] ^ (2 << reg));
+						write_gpio(AVR8_IO_PORTB, m_r[AVR8_REGIDX_PORTB] ^ 2);
 					}
 					break;
 
@@ -1577,7 +1577,7 @@ inline void avr8_device::timer1_tick()
 			}
 			else if (m_timer1_count == 0)
 			{
-				if (reg == 0)
+				if (reg == AVR8_REG_A)
 				{
 					m_r[AVR8_REGIDX_TIFR1] &= ~AVR8_TIFR1_TOV1_MASK;
 					update_interrupt(AVR8_INTIDX_TOV1);
@@ -1589,10 +1589,10 @@ inline void avr8_device::timer1_tick()
 					break;
 
 				case 1: /* Toggle OC1A at BOTTOM*/
-					if (reg == 0)
+					if (reg == AVR8_REG_A)
 					{
 						LOGMASKED(LOG_TIMER1, "%s: timer1: Toggle OC1A at BOTTOM\n", machine().describe_context());
-						write_gpio(AVR8_IO_PORTB, m_r[AVR8_REGIDX_PORTB] ^ (2 << reg));
+						write_gpio(AVR8_IO_PORTB, m_r[AVR8_REGIDX_PORTB] ^ 2);
 					}
 					break;
 
@@ -1790,7 +1790,7 @@ void avr8_device::timer2_tick()
 			break;
 
 		case WGM02_FAST_PWM:
-			if (reg == 0)
+			if (reg == AVR8_REG_A)
 			{
 				if (count >= m_r[AVR8_REGIDX_OCR2A])
 				{
@@ -1817,7 +1817,7 @@ void avr8_device::timer2_tick()
 		case WGM02_FAST_PWM_CMP:
 			if (count == ocr2[reg])
 			{
-				if (reg == 0)
+				if (reg == AVR8_REG_A)
 				{
 					m_r[AVR8_REGIDX_TIFR2] |= AVR8_TIFR2_TOV2_MASK;
 					count = 0;
@@ -1828,7 +1828,7 @@ void avr8_device::timer2_tick()
 			}
 			else if (count == 0)
 			{
-				if (reg == 0)
+				if (reg == AVR8_REG_A)
 				{
 					m_r[AVR8_REGIDX_TIFR2] &= ~AVR8_TIFR2_TOV2_MASK;
 				}
