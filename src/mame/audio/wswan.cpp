@@ -80,6 +80,7 @@ void wswan_sound_device::device_start()
 	save_item(NAME(m_external_speaker));
 	save_item(NAME(m_noise_shift));
 	save_item(NAME(m_master_volume));
+	save_item(NAME(m_system_volume));
 
 	for (int i = 0; i < 4; i++)
 	{
@@ -271,6 +272,8 @@ u16 wswan_sound_device::port_r(offs_t offset, u16 mem_mask)
 			return m_noise_shift;
 		case 0x94 / 2:
 			return m_master_volume;
+		case 0x9e / 2:
+			return m_system_volume;
 	}
 	return 0;
 }
@@ -377,9 +380,12 @@ void wswan_sound_device::port_w(offs_t offset, u16 data, u16 mem_mask)
 
 		case 0x94 / 2:              // Master volume
 			if (ACCESSING_BITS_0_7)
-			{
 				m_master_volume = data & 0xff;
-			}
+			break;
+
+		case 0x9e / 2:              // WSC volume setting (0, 1, 2, 3) (TODO)
+			if (ACCESSING_BITS_0_7)
+				m_system_volume = data & 0x03;
 			break;
 	}
 }

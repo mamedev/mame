@@ -109,13 +109,28 @@ protected:
 	required_device<wswan_sound_device> m_sound;
 	required_device<ws_cart_slot_device> m_cart;
 
-	u8 m_ws_portram[256];
+	u16 m_ws_portram[128];
 	u8 m_internal_eeprom[INTERNAL_EEPROM_SIZE * 2];
 	u8 m_system_type;
 	sound_dma_t m_sound_dma;
+	u16 m_dma_source_offset;
+	u16 m_dma_source_segment;
+	u16 m_dma_destination;
+	u16 m_dma_length;
+	u16 m_dma_control;
 	u8 m_bios_disabled;
 	u8 m_rotate;
 	u32 m_vector;
+	u8 m_sys_control;
+	u8 m_irq_vector_base;
+	u8 m_serial_data;
+	u8 m_serial_control;
+	u8 m_irq_enable;
+	u8 m_irq_active;
+	u16 m_internal_eeprom_data;
+	u16 m_internal_eeprom_address;
+	u8 m_internal_eeprom_command;
+	u8 m_keypad;
 
 	required_memory_region m_region_maincpu;
 	required_ioport m_cursx;
@@ -124,8 +139,8 @@ protected:
 	output_finder<6> m_icons;
 
 	u16 bios_r(offs_t offset, u16 mem_mask);
-	u8 port_r(offs_t offset);
-	void port_w(offs_t offset, u8 data);
+	u16 port_r(offs_t offset, u16 mem_mask);
+	void port_w(offs_t offset, u16 data, u16 mem_mask);
 
 	void set_irq_line(int irq);
 	void dma_sound_cb();
@@ -314,58 +329,56 @@ void wscolor_state::wscolor(machine_config &config)
 
 void wswan_state::handle_irqs()
 {
-	if (m_ws_portram[0xb2] & m_ws_portram[0xb6] & WSWAN_IFLAG_HBLTMR)
+	bool set_irq_line = false;
+	if (m_irq_enable & m_irq_active & WSWAN_IFLAG_HBLTMR)
 	{
-		m_vector = m_ws_portram[0xb0] + WSWAN_INT_HBLTMR;
-		m_maincpu->set_input_line(0, ASSERT_LINE);
+		m_vector = m_irq_vector_base + WSWAN_INT_HBLTMR;
+		set_irq_line = true;
 	}
-	else if (m_ws_portram[0xb2] & m_ws_portram[0xb6] & WSWAN_IFLAG_VBL)
+	else if (m_irq_enable & m_irq_active & WSWAN_IFLAG_VBL)
 	{
-		m_vector = m_ws_portram[0xb0] + WSWAN_INT_VBL;
-		m_maincpu->set_input_line(0, ASSERT_LINE);
+		m_vector = m_irq_vector_base + WSWAN_INT_VBL;
+		set_irq_line = true;
 	}
-	else if (m_ws_portram[0xb2] & m_ws_portram[0xb6] & WSWAN_IFLAG_VBLTMR)
+	else if (m_irq_enable & m_irq_active & WSWAN_IFLAG_VBLTMR)
 	{
-		m_vector = m_ws_portram[0xb0] + WSWAN_INT_VBLTMR;
-		m_maincpu->set_input_line(0, ASSERT_LINE);
+		m_vector = m_irq_vector_base + WSWAN_INT_VBLTMR;
+		set_irq_line = true;
 	}
-	else if (m_ws_portram[0xb2] & m_ws_portram[0xb6] & WSWAN_IFLAG_LCMP)
+	else if (m_irq_enable & m_irq_active & WSWAN_IFLAG_LCMP)
 	{
-		m_vector = m_ws_portram[0xb0] + WSWAN_INT_LCMP;
-		m_maincpu->set_input_line(0, ASSERT_LINE);
+		m_vector = m_irq_vector_base + WSWAN_INT_LCMP;
+		set_irq_line = true;
 	}
-	else if (m_ws_portram[0xb2] & m_ws_portram[0xb6] & WSWAN_IFLAG_SRX)
+	else if (m_irq_enable & m_irq_active & WSWAN_IFLAG_SRX)
 	{
-		m_vector = m_ws_portram[0xb0] + WSWAN_INT_SRX;
-		m_maincpu->set_input_line(0, ASSERT_LINE);
+		m_vector = m_irq_vector_base + WSWAN_INT_SRX;
+		set_irq_line = true;
 	}
-	else if (m_ws_portram[0xb2] & m_ws_portram[0xb6] & WSWAN_IFLAG_RTC)
+	else if (m_irq_enable & m_irq_active & WSWAN_IFLAG_RTC)
 	{
-		m_vector = m_ws_portram[0xb0] + WSWAN_INT_RTC;
-		m_maincpu->set_input_line(0, ASSERT_LINE);
+		m_vector = m_irq_vector_base + WSWAN_INT_RTC;
+		set_irq_line = true;
 	}
-	else if (m_ws_portram[0xb2] & m_ws_portram[0xb6] & WSWAN_IFLAG_KEY)
+	else if (m_irq_enable & m_irq_active & WSWAN_IFLAG_KEY)
 	{
-		m_vector = m_ws_portram[0xb0] + WSWAN_INT_KEY;
-		m_maincpu->set_input_line(0, ASSERT_LINE);
+		m_vector = m_irq_vector_base + WSWAN_INT_KEY;
+		set_irq_line = true;
 	}
-	else if (m_ws_portram[0xb2] & m_ws_portram[0xb6] & WSWAN_IFLAG_STX)
+	else if (m_irq_enable & m_irq_active & WSWAN_IFLAG_STX)
 	{
-		m_vector = m_ws_portram[0xb0] + WSWAN_INT_STX;
-		m_maincpu->set_input_line(0, ASSERT_LINE);
+		m_vector = m_irq_vector_base + WSWAN_INT_STX;
+		set_irq_line = true;
 	}
-	else
-	{
-		m_maincpu->set_input_line(0, CLEAR_LINE);
-	}
+	m_maincpu->set_input_line(0, set_irq_line ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 void wswan_state::set_irq_line(int irq)
 {
-	if (m_ws_portram[0xb2] & irq)
+	if (m_irq_enable & irq)
 	{
-		m_ws_portram[0xb6] |= irq;
+		m_irq_active |= irq;
 		handle_irqs();
 	}
 }
@@ -377,7 +390,7 @@ void wswan_state::dma_sound_cb()
 	{
 		address_space &space = m_maincpu->space(AS_PROGRAM);
 		/* TODO: Output sound DMA byte */
-		port_w(0x89, space.read_byte(m_sound_dma.source));
+		port_w(0x88 > 2, space.read_byte(m_sound_dma.source) << 8, 0xff00);
 		m_sound_dma.size--;
 		m_sound_dma.source = (m_sound_dma.source + 1) & 0x0fffff;
 		if (m_sound_dma.size == 0)
@@ -390,7 +403,7 @@ void wswan_state::dma_sound_cb()
 
 void wswan_state::clear_irq_line(int irq)
 {
-	m_ws_portram[0xb6] &= ~irq;
+	m_irq_active &= ~irq;
 	handle_irqs();
 }
 
@@ -407,6 +420,22 @@ void wswan_state::register_save()
 	save_item(NAME(m_sound_dma.enable));
 	save_item(NAME(m_vector));
 
+	save_item(NAME(m_dma_source_offset));
+	save_item(NAME(m_dma_source_segment));
+	save_item(NAME(m_dma_destination));
+	save_item(NAME(m_dma_length));
+	save_item(NAME(m_dma_control));
+	save_item(NAME(m_sys_control));
+	save_item(NAME(m_irq_vector_base));
+	save_item(NAME(m_serial_data));
+	save_item(NAME(m_serial_control));
+	save_item(NAME(m_irq_enable));
+	save_item(NAME(m_irq_active));
+	save_item(NAME(m_internal_eeprom_data));
+	save_item(NAME(m_internal_eeprom_address));
+	save_item(NAME(m_internal_eeprom_command));
+	save_item(NAME(m_keypad));
+
 	if (m_cart->exists())
 		m_cart->save_nvram();
 }
@@ -417,7 +446,6 @@ void wswan_state::common_start()
 	register_save();
 
 	m_icons.resolve();
-	m_vector = 0;
 
 	if (m_cart->exists())
 	{
@@ -458,6 +486,16 @@ void wswan_state::machine_reset()
 
 	m_rotate = 0;
 
+	m_vector = 0;
+	m_irq_vector_base = 0;
+	m_serial_control = 0;
+	m_irq_enable = 0;
+	m_irq_active = 0;
+	m_internal_eeprom_data = 0;
+	m_internal_eeprom_address = 0;
+	m_internal_eeprom_command = 0;
+	m_sys_control = (m_system_type == TYPE_WSC) ? 2 : 0;
+
 	/* Intialize ports */
 	std::fill(std::begin(m_ws_portram), std::end(m_ws_portram), 0);
 
@@ -477,81 +515,80 @@ u16 wswan_state::bios_r(offs_t offset, u16 mem_mask)
 }
 
 
-u8 wswan_state::port_r(offs_t offset)
+u16 wswan_state::port_r(offs_t offset, u16 mem_mask)
 {
-	u8 value = m_ws_portram[offset];
+	u16 value = m_ws_portram[offset];
 
-	if (offset < 0x40 || (offset > 0xa1 && offset < 0xb0))
+	if (offset < 0x40 / 2 || (offset > 0xa0 / 2 && offset < 0xb0 / 2))
 	{
-		if (offset & 0x01)
-			return m_vdp->reg_r(offset >> 1, 0xff00) >> 8;
-		else
-			return m_vdp->reg_r(offset >> 1, 0x00ff);
+		return m_vdp->reg_r(offset, mem_mask);
 	}
-	if (offset >= 0x80 && offset <= 0x9f)
+	if (offset >= 0x80 / 2 && offset <= 0x9f / 2)
 	{
-		if (offset & 0x01)
-			return m_sound->port_r(offset >> 1, 0xff00) >> 8;
-		else
-			return m_sound->port_r(offset >> 1, 0x00ff);
+		return m_sound->port_r(offset, mem_mask);
 	}
 
 	switch (offset)
 	{
-		case 0x4a:      // Sound DMA source address (low)
-			value = m_sound_dma.source & 0xff;
-			break;
-		case 0x4b:      // Sound DMA source address (high)
-			value = (m_sound_dma.source >> 8) & 0xff;
-			break;
-		case 0x4c:      // Sound DMA source memory segment
-			value = (m_sound_dma.source >> 16) & 0xff;
-			break;
-		case 0x4e:      // Sound DMA transfer size (low)
-			value = m_sound_dma.size & 0xff;
-			break;
-		case 0x4f:      // Sound DMA transfer size (high)
-			value = (m_sound_dma.size >> 8) & 0xff;
-			break;
-		case 0x52:      // Sound DMA start/stop
-			value = m_sound_dma.enable;
-			break;
-		case 0x60:
-			value = m_vdp->reg_r(offset >> 1, 0x00ff);
-			break;
-		case 0xa0:      // Hardware type
+		case 0x40 / 2:  // DMA source address
+			return m_dma_source_offset;
+		case 0x42 / 2:  // DMA source bank/segment
+			return m_dma_source_segment;
+		case 0x44 / 2:  // DMA destination address
+			return m_dma_destination;
+		case 0x46 / 2:  // DMA size (in bytes)
+			return m_dma_length;
+		case 0x48 / 2:  // DMA control
+			return m_dma_control;
+		case 0x4a / 2:
+			// Sound DMA source address
+			return m_sound_dma.source & 0xffff;
+		case 0x4c / 2:
+			// Sound DMA source memory segment
+			return (m_sound_dma.source >> 16) & 0xffff;
+		case 0x4e / 2:
+			// Sound DMA transfer size
+			return m_sound_dma.size;
+		case 0x52 / 2:
+			// Sound DMA start/stop
+			return m_sound_dma.enable;
+		case 0x60 / 2:
+			return m_vdp->reg_r(offset, mem_mask);
+		case 0xa0 / 2:
+			// Hardware type
 			// Bit 0 - Disable/enable Bios
 			// Bit 1 - Determine mono/color
 			// Bit 2 - Unknown, used to determine color/crystal
 			// Bit 3 - Unknown
 			// Bit 7 - Checked during start up, expects bit 7 set (part of cart unlock sequence?)
-			value = value & ~ 0x02;
-			if (m_system_type == TYPE_WSC)
-				value |= 2;
-			value |= 0x80;
-			break;
-		case 0xb5:  // Read controls
-			// Bit 0-3 - Current state of input lines (read-only)
-			// Bit 4-6 - Select line of inputs to read
-			// 001 - Read Y cursors
-			// 010 - Read X cursors
-			// 100 - Read START,A,B buttons
-			// Bit 7   - Unknown
-			value = value & 0xf0;
-			switch (value)
+			return m_sys_control | 0x80;
+		case 0xb0 / 2:
+			return m_irq_vector_base | (m_serial_data << 8);
+		case 0xb2 / 2:
+			return m_irq_enable | (m_serial_control << 8);
+		case 0xb4 / 2:
+		  // Read controls
+			// Bit 8-11  - Current state of input lines (read-only)
+			// Bit 12-14 - Select line of inputs to read
+			//       001 - Read Y cursors
+			//       010 - Read X cursors
+			//       100 - Read START,A,B buttons
+			// Bit 15    - Unknown
+			value = (m_keypad << 8) & 0xf0ff;
+			switch (m_keypad & 0x70)
 			{
 			case 0x10:  // Read Y cursors: Y1 - Y2 - Y3 - Y4
 				{
 					u8 input = m_cursy->read();
 					if (m_rotate) // reorient controls if the console is rotated
 					{
-						if (input & 0x01) value |= 0x02;
-						if (input & 0x02) value |= 0x04;
-						if (input & 0x04) value |= 0x08;
-						if (input & 0x08) value |= 0x01;
+						if (input & 0x01) value |= 0x0200;
+						if (input & 0x02) value |= 0x0400;
+						if (input & 0x04) value |= 0x0800;
+						if (input & 0x08) value |= 0x0100;
 					}
 					else
-						value = value | input;
+						value = value | (input << 8);
 				}
 				break;
 			case 0x20:  // Read X cursors: X1 - X2 - X3 - X4
@@ -559,156 +596,154 @@ u8 wswan_state::port_r(offs_t offset)
 					u8 input = m_cursx->read();
 					if (m_rotate) // reorient controls if the console is rotated
 					{
-						if (input & 0x01) value |= 0x02;
-						if (input & 0x02) value |= 0x04;
-						if (input & 0x04) value |= 0x08;
-						if (input & 0x08) value |= 0x01;
+						if (input & 0x01) value |= 0x0200;
+						if (input & 0x02) value |= 0x0400;
+						if (input & 0x04) value |= 0x0800;
+						if (input & 0x08) value |= 0x0100;
 					}
 					else
-						value = value | input;
+						value = value | (input << 8);
 				}
 				break;
 			case 0x40:  // Read buttons: START - A - B
-				value = value | m_buttons->read();
+				value = value | (m_buttons->read() << 8);
 				break;
 			}
-			break;
-		case 0xc0:
-		case 0xc1:
-		case 0xc2:
-		case 0xc3:
-		case 0xc4:  // Cartridge EEPROM data
-		case 0xc5:  // Cartridge EEPROM data
-		case 0xc6:
-		case 0xc7:
-		case 0xc8:
-		case 0xc9:
-		case 0xca:
-		case 0xcb:  // RTC data
-		case 0xcc:
-		case 0xcd:
-		case 0xce:
-		case 0xcf:
-			if (offset & 0x01)
-				return m_cart->read_io(offset >> 1, 0xff00) >> 8;
-			else
-				return m_cart->read_io(offset >> 1, 0x00ff);
+			return value;
+		case 0xb6 / 2:
+			return m_irq_active;
+		case 0xba / 2:
+			return m_internal_eeprom_data;
+		case 0xbc / 2:
+			return m_internal_eeprom_address;
+		case 0xbe / 2:
+			return m_internal_eeprom_command;
+		case 0xc0 / 2:
+		case 0xc2 / 2:
+		case 0xc4 / 2:  // Cartridge EEPROM data
+		case 0xc6 / 2:
+		case 0xc8 / 2:
+		case 0xca / 2:  // RTC command & data
+		case 0xcc / 2:
+		case 0xce / 2:
+			return m_cart->read_io(offset, mem_mask);
 	}
 
 	return value;
 }
 
 
-void wswan_state::port_w(offs_t offset, u8 data)
+void wswan_state::port_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	if (offset < 0x40 || (offset > 0xa1 && offset < 0xb0))
+	if (offset < 0x40 / 2 || (offset > 0xa0 / 2 && offset < 0xb0 / 2))
 	{
-		if (offset & 0x01)
-			m_vdp->reg_w(offset >> 1, data << 8, 0xff00);
-		else
-			m_vdp->reg_w(offset >> 1, data, 0x00ff);
+		m_vdp->reg_w(offset, data, mem_mask);
 		return;
 	}
 
 	switch (offset)
 	{
-		case 0x40:  // DMA source address (low)
-		case 0x41:  // DMA source address (high)
-		case 0x42:  // DMA source bank
-		case 0x44:  // DMA destination address (low)
-		case 0x45:  // DMA destination address (high)
-		case 0x46:  // Size of copied data (low)
-		case 0x47:  // Size of copied data (high)
+		case 0x40 / 2:  // DMA source address
+			COMBINE_DATA(&m_dma_source_offset);
+			m_dma_source_offset &= 0xfffe;
 			break;
-		case 0x48:  // DMA control
+		case 0x42 / 2:  // DMA source bank/segment
+			COMBINE_DATA(&m_dma_source_segment);
+			m_dma_source_segment &= 0x000f;
+			break;
+		case 0x44 / 2:  // DMA destination address
+			COMBINE_DATA(&m_dma_destination);
+			m_dma_destination &= 0xfffe;
+			break;
+		case 0x46 / 2:  // DMA size (in bytes)
+			COMBINE_DATA(&m_dma_length);
+			break;
+		case 0x48 / 2:  // DMA control
 			// Bit 0-6 - Unknown
 			// Bit 7   - DMA stop/start
-			if (data & 0x80)
+			if (ACCESSING_BITS_0_7)
 			{
-				address_space &mem = m_maincpu->space(AS_PROGRAM);
-				u32 src = m_ws_portram[0x40] + (m_ws_portram[0x41] << 8) + (m_ws_portram[0x42] << 16);
-				u32 dst = m_ws_portram[0x44] + (m_ws_portram[0x45] << 8);
-				u16 length = m_ws_portram[0x46] + (m_ws_portram[0x47] << 8);
-				if (length)
-					m_maincpu->adjust_icount(-(5 + length));
-				for ( ; length > 0; length--)
+				if (data & 0x80)
 				{
-					mem.write_byte(dst, mem.read_byte(src));
-					src++;
-					dst++;
+					address_space &mem = m_maincpu->space(AS_PROGRAM);
+					u32 src = m_dma_source_offset | (m_dma_source_segment << 16);
+					u32 dst = m_dma_destination;
+					u16 length = m_dma_length;
+					if (length)
+						m_maincpu->adjust_icount(-(5 + length));
+					for ( ; length > 0; length -= 2)
+					{
+						mem.write_word(dst, mem.read_word(src));
+						src += 2;
+						dst += 2;
+					}
+					m_dma_source_offset = src & 0xffff;
+					m_dma_source_segment = src >> 16;
+					m_dma_destination = dst & 0xffff;
+					m_dma_length = length & 0xffff;
+					data &= 0x7f;
+					m_dma_control = data;
 				}
-#ifdef MAME_DEBUG
-				logerror("DMA  src:%X dst:%X length:%d\n", src, dst, length);
-#endif
-				m_ws_portram[0x40] = src & 0xff;
-				m_ws_portram[0x41] = (src >> 8) & 0xff;
-				m_ws_portram[0x44] = dst & 0xff;
-				m_ws_portram[0x45] = (dst >> 8) & 0xff;
-				m_ws_portram[0x46] = length & 0xff;
-				m_ws_portram[0x47] = (length >> 8) & 0xff;
-				data &= 0x7f;
 			}
 			break;
-		case 0x4a:  // Sound DMA source address (low)
-			m_sound_dma.source = (m_sound_dma.source & 0x0fff00) | data;
+		case 0x4a / 2:
+			// Sound DMA source address (low)
+			if (ACCESSING_BITS_0_7)
+				m_sound_dma.source = (m_sound_dma.source & 0x0fff00) | (data & 0xff);
+			// Sound DMA source address (high)
+			if (ACCESSING_BITS_8_15)
+				m_sound_dma.source = (m_sound_dma.source & 0x0f00ff) | (data & 0xff00);
 			break;
-		case 0x4b:  // Sound DMA source address (high)
-			m_sound_dma.source = (m_sound_dma.source & 0x0f00ff) | (data << 8);
-			break;
-		case 0x4c:  // Sound DMA source memory segment
+		case 0x4c / 2:
+			// Sound DMA source memory segment
 			// Bit 0-3 - Sound DMA source address segment
 			// Bit 4-7 - Unknown
-			m_sound_dma.source = (m_sound_dma.source & 0xffff) | ((data & 0x0f) << 16);
+			if (ACCESSING_BITS_0_7)
+				m_sound_dma.source = (m_sound_dma.source & 0xffff) | ((data & 0x0f) << 16);
 			break;
-		case 0x4d:  // Unknown
+		case 0x4e / 2:
+			// Sound DMA transfer size
+			COMBINE_DATA(&m_sound_dma.size);
 			break;
-		case 0x4e:  // Sound DMA transfer size (low)
-			m_sound_dma.size = (m_sound_dma.size & 0xff00) | data;
-			break;
-		case 0x4f:  // Sound DMA transfer size (high)
-			m_sound_dma.size = (m_sound_dma.size & 0xff) | (data << 8);
-			break;
-		case 0x50:  // Unknown
-		case 0x51:  // Unknown
-			break;
-		case 0x52:  // Sound DMA start/stop
+		case 0x52 / 2:
+			// Sound DMA start/stop
 			// Bit 0-6 - Unknown
 			// Bit 7   - Sound DMA stop/start
-			m_sound_dma.enable = data;
+			if (ACCESSING_BITS_0_7)
+				m_sound_dma.enable = data & 0xff;
 			break;
-		case 0x60:
-			m_vdp->reg_w(offset >> 1, data, 0x00ff);
+		case 0x60 / 2:
+			m_vdp->reg_w(offset, data, mem_mask);
 			break;
-		case 0x80:  // Audio 1 freq (lo)
-		case 0x81:  // Audio 1 freq (hi)
-		case 0x82:  // Audio 2 freq (lo)
-		case 0x83:  // Audio 2 freq (hi)
-		case 0x84:  // Audio 3 freq (lo)
-		case 0x85:  // Audio 3 freq (hi)
-		case 0x86:  // Audio 4 freq (lo)
-		case 0x87:  // Audio 4 freq (hi)
-		case 0x88:  // Audio 1 volume
+		case 0x80 / 2:  // Audio 1 freq
+		case 0x82 / 2:  // Audio 2 freq
+		case 0x84 / 2:  // Audio 3 freq
+		case 0x86 / 2:  // Audio 4 freq
+		case 0x88 / 2:
+			// Audio 1 volume
 			// Bit 0-3 - Right volume audio channel 1
 			// Bit 4-7 - Left volume audio channel 1
-		case 0x89:  // Audio 2 volume
-			// Bit 0-3 - Right volume audio channel 2
-			// Bit 4-7 - Left volume audio channel 2
-		case 0x8a:  // Audio 3 volume
+			// Audio 2 volume
+			// Bit 8-11  - Right volume audio channel 2
+			// Bit 12-15 - Left volume audio channel 2
+		case 0x8a / 2:
+			// Audio 3 volume
 			// Bit 0-3 - Right volume audio channel 3
 			// Bit 4-7 - Left volume audio channel 3
-		case 0x8b:  // Audio 4 volume
-			// Bit 0-3 - Right volume audio channel 4
-			// Bit 4-7 - Left volume audio channel 4
-		case 0x8c:  // Sweep step
-		case 0x8d:  // Sweep time
-		case 0x8e:  // Noise control
+			// Audio 4 volume
+			// Bit 8-11  - Right volume audio channel 4
+			// Bit 12-15 - Left volume audio channel 4
+		case 0x8c / 2:  // Sweep step / sweep time
+		case 0x8e / 2:
+			// Noise control
 			// Bit 0-2 - Noise generator type
 			// Bit 3   - Reset
 			// Bit 4   - Enable
 			// Bit 5-7 - Unknown
-		case 0x8f:  // Sample location
-			// Bit 0-7 - Sample address location 0 00xxxxxx xx000000
-		case 0x90:  // Audio control
+			// Sample location
+			// Bit 8-15 - Sample address location 0 00xxxxxx xx000000
+		case 0x90 / 2:
+			// Audio control
 			// Bit 0   - Audio 1 enable
 			// Bit 1   - Audio 2 enable
 			// Bit 2   - Audio 3 enable
@@ -717,42 +752,50 @@ void wswan_state::port_w(offs_t offset, u8 data)
 			// Bit 5   - Audio 2 voice mode enable
 			// Bit 6   - Audio 3 sweep mode enable
 			// Bit 7   - Audio 4 noise mode enable
-		case 0x91:  // Audio output
-			// Bit 0   - Mono select
-			// Bit 1-2 - Output volume
-			// Bit 3   - External stereo
-			// Bit 4-6 - Unknown
-			// Bit 7   - External speaker (Read-only, set by hardware)
-		case 0x92:  // Noise counter shift register (lo)
-		case 0x93:  // Noise counter shift register (hi)
-			// Bit 0-6 - Noise counter shift register bit 8-14
-			// bit 7   - Unknown
-		case 0x94:  // Master volume
+			// Audio output
+			// Bit 8     - Mono select
+			// Bit 9-10  - Output volume
+			// Bit 11    - External stereo
+			// Bit 12-14 - Unknown
+			// Bit 15    - External speaker (Read-only, set by hardware)
+		case 0x92 / 2:  // Noise counter shift register
+		case 0x94 / 2:
+			// Master volume
 			// Bit 0-3 - Master volume
 			// Bit 4-7 - Unknown
-			if (offset & 0x01)
-				m_sound->port_w(offset >> 1, data << 8, 0xff00);
-			else
-				m_sound->port_w(offset >> 1, data, 0x00ff);
+		case 0x9e / 2:  // WSC volume setting (0, 1, 2, 3) (TODO)
+			m_sound->port_w(offset, data, mem_mask);
 			break;
-		case 0x9E:  // WSC volume setting (0, 1, 2, 3)
-			break;
-		case 0xa0:  // Hardware type/system control
+		case 0xa0 / 2:
+			// Hardware type/system control
 			// Bit 0   - Disable bios
 			// Bit 1   - Hardware type: 0 = WS, 1 = WSC
 			// Bit 2   - External bus width
 			// Bit 3   - Cart ROM cycles (0 = 3 cycles, 1 = 1 cycle)
 			// Bit 4-6 - Unknown
 			// Bit 7   - Unknown, read during boot
-			if ((data & 0x01) && !m_bios_disabled)
-				m_bios_disabled = 1;
+			if (ACCESSING_BITS_0_7)
+			{
+				m_sys_control = (data & 0xfd) | ((m_system_type == TYPE_WSC) ? 2 : 0);
+				if ((data & 0x01) && !m_bios_disabled)
+				{
+					m_bios_disabled = 1;
+					if (m_cart->exists())
+						m_maincpu->space(AS_PROGRAM).install_read_handler(0x40000, 0xfffff, read16s_delegate(*m_cart, FUNC(ws_cart_slot_device::read_rom40)));
+				}
+			}
 			break;
 
-		case 0xb0:  // Interrupt base vector
+		case 0xb0 / 2:
+			// Interrupt base vector
+			if (ACCESSING_BITS_0_7)
+				m_irq_vector_base = data & 0xff;
+			// Serial data (bit 8-15)
+			if (ACCESSING_BITS_8_15)
+				m_serial_data = data >> 8;
 			break;
-		case 0xb1:  // Communication byte
-			break;
-		case 0xb2:  // Interrupt enable
+		case 0xb2 / 2:
+			// Interrupt enable
 			// Bit 0   - Serial transmit interrupt enable
 			// Bit 1   - Key press interrupt enable
 			// Bit 2   - RTC alarm interrupt enable
@@ -761,35 +804,39 @@ void wswan_state::port_w(offs_t offset, u8 data)
 			// Bit 5   - VBlank timer interrupt enable
 			// Bit 6   - VBlank interrupt enable
 			// Bit 7   - HBlank timer interrupt enable
-			break;
-		case 0xb3:  // serial communication control
-			// Bit 0   - Receive complete
-			// Bit 1   - Error
-			// Bit 2   - Send complete
-			// Bit 3-4 - Unknown
-			// Bit 5   - Send data interrupt generation
-			// Bit 6   - Connection speed: 0 = 9600 bps, 1 = 38400 bps
-			// Bit 7   - Receive data interrupt generation
-			m_ws_portram[0xb1] = 0xff;
-			if (data & 0x80)
+			if (ACCESSING_BITS_0_7)
+				m_irq_enable = data & 0xff;
+			// serial communication control
+			// Bit 8     - Receive complete
+			// Bit 9     - Error
+			// Bit 10    - Send complete
+			// Bit 11-12 - Unknown
+			// Bit 13    - Send data interrupt generation
+			// Bit 14    - Connection speed: 0 = 9600 bps, 1 = 38400 bps
+			// Bit 15    - Receive data interrupt generation
+			if (ACCESSING_BITS_8_15)
 			{
-				//              m_ws_portram[0xb1] = 0x00;
-				data |= 0x04;
+				m_serial_data = 0xff;
+				m_serial_control = data >> 8;
+				if (m_serial_control & 0x80)
+				{
+					//              m_serial_data = 0x00;
+					m_serial_control |= 0x04;
+				}
+				if (m_serial_control & 0x20)
+				{
+					//              m_serial_control |= 0x01;
+				}
 			}
-			if (data & 0x20)
+			break;
+		case 0xb4 / 2:
+			if (ACCESSING_BITS_8_15)
 			{
-				//              data |= 0x01;
+				m_keypad = (data & 0xf0ff) >> 8;
 			}
 			break;
-		case 0xb5:  // Read controls
-			// Bit 0-3 - Current state of input lines (read-only)
-			// Bit 4-6 - Select line of inputs to read
-			// 001 - Read Y cursors
-			// 010 - Read X cursors
-			// 100 - Read START,A,B buttons
-			// Bit 7   - Unknown
-			break;
-		case 0xb6:  // Interrupt acknowledge
+		case 0xb6 / 2:
+			// Interrupt acknowledge
 			// Bit 0   - Serial transmit interrupt acknowledge
 			// Bit 1   - Key press interrupt acknowledge
 			// Bit 2   - RTC alarm interrupt acknowledge
@@ -798,20 +845,23 @@ void wswan_state::port_w(offs_t offset, u8 data)
 			// Bit 5   - VBlank timer interrupt acknowledge
 			// Bit 6   - VBlank interrupt acknowledge
 			// Bit 7   - HBlank timer interrupt acknowledge
-			clear_irq_line(data);
-			data = m_ws_portram[0xb6];
+			if (ACCESSING_BITS_0_7)
+			{
+				clear_irq_line(data & 0xff);
+				data = m_irq_active;
+			}
 			break;
-		case 0xba:  // Internal EEPROM data (low)
-		case 0xbb:  // Internal EEPROM data (high)
+		case 0xba / 2:  // Internal EEPROM data
+			COMBINE_DATA(&m_internal_eeprom_data);
 			break;
-		case 0xbc:  // Internal EEPROM address (low)
+		case 0xbc / 2:  // Internal EEPROM address
 			// (WS) Bit 0-5 = Internal EEPROM address
-			// (WSC) Bit 0-7 - Internal EEPROM address bit 1-8
-		case 0xbd:  // Internal EEPROM address (high)
-			// (WSC) Bit 0   - Internal EEPROM address bit 9(?)
-			// Bit 1-7 - Unknown
+			// (WSC) Bit 0-8 - Internal EEPROM address bit 1-9
+			// Bit 9-15 - Unknown
+			COMBINE_DATA(&m_internal_eeprom_address);
 			break;
-		case 0xbe:  // Internal EEPROM command/status
+		case 0xbe / 2:
+			// Internal EEPROM command/status
 			// Bit 0   - Read complete (read only)
 			// Bit 1   - Write complete (read only)
 			// Bit 2-3 - Unknown
@@ -819,45 +869,37 @@ void wswan_state::port_w(offs_t offset, u8 data)
 			// Bit 5   - Write
 			// Bit 6   - Protect
 			// Bit 7   - Initialize
-			if (data & 0x20)
+			if (ACCESSING_BITS_0_7)
 			{
-				u16 addr = get_internal_eeprom_address();
-				m_internal_eeprom[addr] = m_ws_portram[0xba];
-				m_internal_eeprom[addr + 1] = m_ws_portram[0xbb];
-				data |= 0x02;
-			}
-			else if (data & 0x10)
-			{
-				u16 addr = get_internal_eeprom_address();
-				m_ws_portram[0xba] = m_internal_eeprom[addr];
-				m_ws_portram[0xbb] = m_internal_eeprom[addr + 1];
-				data |= 0x01;
-			}
-			else
-			{
-				logerror("Unsupported internal EEPROM command: %X\n", data);
+				m_internal_eeprom_command = data & 0xfc;
+				if (m_internal_eeprom_command & 0x20)
+				{
+					u16 addr = get_internal_eeprom_address();
+					m_internal_eeprom[addr] = m_internal_eeprom_data & 0xff;
+					m_internal_eeprom[addr + 1] = m_internal_eeprom_data >> 8;
+					m_internal_eeprom_command |= 0x02;
+				}
+				else if (m_internal_eeprom_command & 0x10)
+				{
+					u16 addr = get_internal_eeprom_address();
+					m_internal_eeprom_data = m_internal_eeprom[addr] | (m_internal_eeprom[addr + 1] << 8);
+					m_internal_eeprom_command |= 0x01;
+				}
+				else
+				{
+					logerror("Unsupported internal EEPROM command: %X\n", data);
+				}
 			}
 			break;
-		case 0xc0:  // ROM bank $40000-$fffff
-		case 0xc1:  // SRAM bank
-		case 0xc2:  // ROM bank $20000-$2ffff
-		case 0xc3:  // ROM bank $30000-$3ffff
-		case 0xc4:
-		case 0xc5:
-		case 0xc6:  // EEPROM address / command
-		case 0xc7:  // EEPROM address / command
-		case 0xc8:  // EEPROM command
-		case 0xc9:
-		case 0xca:  // RTC command
-		case 0xcb:  // RTC data
-		case 0xcc:
-		case 0xcd:
-		case 0xce:
-		case 0xcf:
-			if (offset & 0x01)
-				m_cart->write_io(offset >> 1, data << 8, 0xff00);
-			else
-				m_cart->write_io(offset >> 1, data, 0x00ff);
+		case 0xc0 / 2:  // ROM bank $40000-$fffff and SRAM bank
+		case 0xc2 / 2:  // ROM bank $20000-$2ffff and ROM bank $30000-$3ffff
+		case 0xc4 / 2:
+		case 0xc6 / 2:  // EEPROM address / command
+		case 0xc8 / 2:  // EEPROM command
+		case 0xca / 2:  // RTC command and RTC data
+		case 0xcc / 2:
+		case 0xce / 2:
+			m_cart->write_io(offset, data, mem_mask);
 			break;
 		default:
 			logerror("Write to unsupported port: %X - %X\n", offset, data);
@@ -865,7 +907,7 @@ void wswan_state::port_w(offs_t offset, u8 data)
 	}
 
 	// Update the port value
-	m_ws_portram[offset] = data;
+	COMBINE_DATA(&m_ws_portram[offset]);
 }
 
 
@@ -899,12 +941,12 @@ void wswan_state::set_rotate_view() {
 
 
 u16 wswan_state::get_internal_eeprom_address() {
-	return (m_ws_portram[0xbc] & 0x3f) << 1;
+	return (m_internal_eeprom_address & 0x3f) << 1;
 }
 
 
 u16 wscolor_state::get_internal_eeprom_address() {
-	return (((m_ws_portram[0xbd] << 8) | m_ws_portram[0xbc]) & 0x1FF) << 1;
+	return (m_internal_eeprom_address & 0x1ff) << 1;
 }
 
 /***************************************************************************

@@ -78,6 +78,7 @@ private:
 	u8   m_external_speaker;
 	u16  m_noise_shift;
 	u8   m_master_volume;
+	u8   m_system_volume;
 };
 
 DECLARE_DEVICE_TYPE(WSWAN_SND, wswan_sound_device)
