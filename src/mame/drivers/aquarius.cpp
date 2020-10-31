@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Nathan Woods
+// copyright-holders:Nathan Woods,Nigel Barnes
 /***************************************************************************
 
     Mattel Aquarius
@@ -7,10 +7,6 @@
 
     TODO:
 
-    - slot interface for cartridges
-    - hand controllers
-    - scramble RAM also
-    - memory mapper
     - proper video timings
     - PAL mode
     - floppy support (I/O 0xe6-0xe7 = drive 1, 0xea-0xeb = drive 2)
@@ -109,6 +105,7 @@ uint8_t aquarius_state::vsync_r()
 */
 void aquarius_state::mapper_w(uint8_t data)
 {
+	m_mapper->set_bank(BIT(data, 0));
 }
 
 
@@ -119,18 +116,19 @@ void aquarius_state::mapper_w(uint8_t data)
 */
 uint8_t aquarius_state::printer_r()
 {
-	return 1; /* ready */
+	return m_printer->cts_r(); /* ready */
 }
 
 
 /*
     This is a single bit I/O at D0, it will perform as a serial output
     port under software control. Since timing is done by software the
-    baudrate is variable. In BASIC this is a 1200 baud printer port for
+    baud rate is variable. In BASIC this is a 1200 baud printer port for
     the 40 column thermal printer.
 */
 void aquarius_state::printer_w(uint8_t data)
 {
+	m_printer->write_txd(BIT(data, 0));
 }
 
 
@@ -149,14 +147,14 @@ uint8_t aquarius_state::keyboard_r(offs_t offset)
 {
 	uint8_t result = 0xff;
 
-	if (!BIT(offset,  8)) result &= m_y0->read();
-	if (!BIT(offset,  9)) result &= m_y1->read();
-	if (!BIT(offset, 10)) result &= m_y2->read();
-	if (!BIT(offset, 11)) result &= m_y3->read();
-	if (!BIT(offset, 12)) result &= m_y4->read();
-	if (!BIT(offset, 13)) result &= m_y5->read();
-	if (!BIT(offset, 14)) result &= m_y6->read();
-	if (!BIT(offset, 15)) result &= m_y7->read();
+	if (!BIT(offset,  8)) result &= m_y[0]->read();
+	if (!BIT(offset,  9)) result &= m_y[1]->read();
+	if (!BIT(offset, 10)) result &= m_y[2]->read();
+	if (!BIT(offset, 11)) result &= m_y[3]->read();
+	if (!BIT(offset, 12)) result &= m_y[4]->read();
+	if (!BIT(offset, 13)) result &= m_y[5]->read();
+	if (!BIT(offset, 14)) result &= m_y[6]->read();
+	if (!BIT(offset, 15)) result &= m_y[7]->read();
 
 	return result;
 }
@@ -185,30 +183,20 @@ void aquarius_state::scrambler_w(uint8_t data)
 	m_scrambler = data;
 }
 
-uint8_t aquarius_state::cartridge_r(offs_t offset)
-{
-	uint8_t data = 0;
-	if (m_cart->exists())
-		data = m_cart->read_rom(offset);
-
-	return data ^ m_scrambler;
-}
-
 
 /***************************************************************************
     DRIVER INIT
 ***************************************************************************/
 
-void aquarius_state::init_aquarius()
+void aquarius_state::machine_start()
 {
-	/* install expansion memory if available */
-	if (m_ram->size() > 0x1000)
-	{
-		address_space &space = m_maincpu->space(AS_PROGRAM);
+	save_item(NAME(m_scrambler));
+}
 
-		space.install_readwrite_bank(0x4000, 0x4000 + m_ram->size() - 0x1000 - 1, "bank1");
-		membank("bank1")->set_base(m_ram->pointer());
-	}
+void aquarius_state::machine_reset()
+{
+	/* reset memory mapper after power up */
+	m_mapper->set_bank(0);
 }
 
 
@@ -218,19 +206,31 @@ void aquarius_state::init_aquarius()
 
 void aquarius_state::aquarius_mem(address_map &map)
 {
-	map(0x0000, 0x1fff).rom();
-	map(0x3000, 0x33ff).ram().w(FUNC(aquarius_state::aquarius_videoram_w)).share("videoram");
-	map(0x3400, 0x37ff).ram().w(FUNC(aquarius_state::aquarius_colorram_w)).share("colorram");
-	map(0x3800, 0x3fff).ram();
-	map(0x4000, 0xbfff).noprw(); /* expansion ram */
-	map(0xc000, 0xffff).r(FUNC(aquarius_state::cartridge_r));
+	map(0x0000, 0xffff).m(m_mapper, FUNC(address_map_bank_device::amap8));
+}
+
+void aquarius_state::aquarius_map(address_map &map)
+{
+	/* Normal mode */
+	map(0x00000, 0x02fff).rom().region("maincpu", 0);
+	map(0x03000, 0x033ff).ram().w(FUNC(aquarius_state::aquarius_videoram_w)).share("videoram");
+	map(0x03400, 0x037ff).ram().w(FUNC(aquarius_state::aquarius_colorram_w)).share("colorram");
+	map(0x03800, 0x03fff).ram();
+	map(0x04000, 0x0bfff).lrw8(NAME([this](offs_t offset) { return m_exp->mreq_r(offset) ^ m_scrambler; }), NAME([this](offs_t offset, u8 data) { m_exp->mreq_w(offset, data ^ m_scrambler); }));
+	map(0x0c000, 0x0ffff).lrw8(NAME([this](offs_t offset) { return m_exp->mreq_ce_r(offset) ^ m_scrambler; }), NAME([this](offs_t offset, u8 data) { m_exp->mreq_ce_w(offset, data ^ m_scrambler); }));
+	/* CP/M mode */
+	map(0x10000, 0x13fff).lrw8(NAME([this](offs_t offset) { return m_exp->mreq_ce_r(offset) ^ m_scrambler; }), NAME([this](offs_t offset, u8 data) { m_exp->mreq_ce_w(offset, data ^ m_scrambler); }));
+	map(0x14000, 0x1bfff).lrw8(NAME([this](offs_t offset) { return m_exp->mreq_r(offset) ^ m_scrambler; }), NAME([this](offs_t offset, u8 data) { m_exp->mreq_w(offset, data ^ m_scrambler); }));
+	map(0x1c000, 0x1efff).rom().region("maincpu", 0);
+	map(0x1f000, 0x1f3ff).ram().w(FUNC(aquarius_state::aquarius_videoram_w)).share("videoram");
+	map(0x1f400, 0x1f7ff).ram().w(FUNC(aquarius_state::aquarius_colorram_w)).share("colorram");
+	map(0x1f800, 0x1ffff).ram();
 }
 
 void aquarius_state::aquarius_io(address_map &map)
 {
+	map(0x00, 0xff).mirror(0xff00).rw(m_exp, FUNC(aquarius_cartridge_slot_device::iorq_r), FUNC(aquarius_cartridge_slot_device::iorq_w));
 //  map(0x7e, 0x7f).mirror(0xff00).rw(FUNC(aquarius_state::modem_r), FUNC(aquarius_state::modem_w));
-	map(0xf6, 0xf6).mirror(0xff00).rw("ay8910", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
-	map(0xf7, 0xf7).mirror(0xff00).w("ay8910", FUNC(ay8910_device::address_w));
 	map(0xfc, 0xfc).mirror(0xff00).rw(FUNC(aquarius_state::cassette_r), FUNC(aquarius_state::cassette_w));
 	map(0xfd, 0xfd).mirror(0xff00).rw(FUNC(aquarius_state::vsync_r), FUNC(aquarius_state::mapper_w));
 	map(0xfe, 0xfe).mirror(0xff00).rw(FUNC(aquarius_state::printer_r), FUNC(aquarius_state::printer_w));
@@ -323,12 +323,6 @@ static INPUT_PORTS_START( aquarius )
 
 	PORT_START("RESET")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RST") PORT_CODE(KEYCODE_F10) PORT_CHANGED_MEMBER(DEVICE_SELF, aquarius_state, aquarius_reset, 0)
-
-	PORT_START("LEFT")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("RIGHT")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
@@ -355,6 +349,24 @@ GFXDECODE_END
 
 
 /***************************************************************************
+    DEVICE CONFIGURATION
+***************************************************************************/
+
+static DEVICE_INPUT_DEFAULTS_START(printer)
+	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD", 0xff, RS232_BAUD_1200)
+	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_1200)
+	DEVICE_INPUT_DEFAULTS("RS232_STARTBITS", 0xff, RS232_STARTBITS_1)
+	DEVICE_INPUT_DEFAULTS("RS232_DATABITS", 0xff, RS232_DATABITS_8)
+	DEVICE_INPUT_DEFAULTS("RS232_PARITY", 0xff, RS232_PARITY_NONE)
+	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_2)
+DEVICE_INPUT_DEFAULTS_END
+
+void aquarius_state::cfg_ram16(device_t* device)
+{
+	device->subdevice<aquarius_cartridge_slot_device>("exp2")->set_default_option("ram16");
+}
+
+/***************************************************************************
     MACHINE DRIVERS
 ***************************************************************************/
 
@@ -365,6 +377,8 @@ void aquarius_state::aquarius(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &aquarius_state::aquarius_mem);
 	m_maincpu->set_addrmap(AS_IO, &aquarius_state::aquarius_io);
 	m_maincpu->set_vblank_int("screen", FUNC(aquarius_state::irq0_line_hold));
+
+	ADDRESS_MAP_BANK(config, m_mapper).set_map(&aquarius_state::aquarius_map).set_options(ENDIANNESS_LITTLE, 8, 17, 0x10000);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -383,12 +397,6 @@ void aquarius_state::aquarius(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	/* mini expander */
-	ay8910_device &ay8910(AY8910(config, "ay8910", XTAL(3'579'545)/2)); // ??? AY-3-8914
-	ay8910.port_a_read_callback().set_ioport("RIGHT");
-	ay8910.port_b_read_callback().set_ioport("LEFT");
-	ay8910.add_route(ALL_OUTPUTS, "mono", 0.25);
-
 	/* cassette */
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
@@ -396,11 +404,15 @@ void aquarius_state::aquarius(machine_config &config)
 	m_cassette->set_formats(aquarius_cassette_formats);
 	m_cassette->set_interface("aquarius_cass");
 
-	/* cartridge */
-	GENERIC_CARTSLOT(config, m_cart, generic_linear_slot, "aquarius_cart");
+	/* printer */
+	RS232_PORT(config, m_printer, default_rs232_devices, "printer");
+	m_printer->set_option_device_input_defaults("printer", DEVICE_INPUT_DEFAULTS_NAME(printer));
 
-	/* internal ram */
-	RAM(config, RAM_TAG).set_default_size("20K").set_extra_options("4K,8K,36K");
+	/* cartridge */
+	AQUARIUS_CARTRIDGE_SLOT(config, m_exp, 7.15909_MHz_XTAL / 2, aquarius_cartridge_devices, "mini");
+	m_exp->set_option_machine_config("mini", cfg_ram16);
+	m_exp->irq_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_exp->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("aquarius_cart");
@@ -413,7 +425,7 @@ void aquarius_state::aquarius(machine_config &config)
 ***************************************************************************/
 
 ROM_START( aquarius )
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x3000, "maincpu", ROMREGION_ERASE00)
 
 	/* basic rom */
 	ROM_DEFAULT_BIOS("rev2")
@@ -423,8 +435,8 @@ ROM_START( aquarius )
 	ROMX_LOAD("aq1.u2", 0x0000, 0x2000, NO_DUMP, ROM_BIOS(1))
 
 	/* charrom */
-	ROM_REGION(0x800, "gfx1", 0)
-	ROM_LOAD("aq2.u5", 0x000, 0x800, CRC(e117f57c) SHA1(3588c0267c67dfbbda615bcf8dc3d3a5c5bd815a))
+	ROM_REGION(0x0800, "gfx1", 0)
+	ROM_LOAD("aq2.u5", 0x0000, 0x0800, CRC(e117f57c) SHA1(3588c0267c67dfbbda615bcf8dc3d3a5c5bd815a))
 ROM_END
 
 
