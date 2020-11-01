@@ -40,7 +40,6 @@ public:
 	void wecleman(machine_config &config);
 
 	void init_wecleman();
-	void init_hotchase();
 
 	DECLARE_READ_LINE_MEMBER(hotchase_sound_status_r);
 
@@ -100,37 +99,26 @@ protected:
 	void blitter_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t multiply_r();
 	void multiply_w(offs_t offset, uint8_t data);
-	void hotchase_sound_control_w(offs_t offset, uint8_t data);
+
 	void wecleman_txtram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void wecleman_pageram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void wecleman_videostatus_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void wecleman_K00723216_bank_w(uint8_t data);
 	void wecleman_volume_callback(uint8_t data);
-	template<int Chip> uint8_t hotchase_k007232_r(offs_t offset);
-	template<int Chip> void hotchase_k007232_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(wecleman_get_txt_tile_info);
 	TILE_GET_INFO_MEMBER(wecleman_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(wecleman_get_fg_tile_info);
 
 	uint32_t screen_update_wecleman(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(hotchase_sound_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(wecleman_scanline);
-	TIMER_DEVICE_CALLBACK_MEMBER(hotchase_scanline);
 	void draw_cloud(bitmap_rgb32 &bitmap,gfx_element *gfx,uint16_t *tm_base,int x0,int y0,int xcount,int ycount,int scrollx,int scrolly,int tmw_l2,int tmh_l2,int alpha,int pal_offset);
 	void wecleman_unpack_sprites();
 	void bitswap(uint8_t *src,size_t len,int _14,int _13,int _12,int _11,int _10,int _f,int _e,int _d,int _c,int _b,int _a,int _9,int _8,int _7,int _6,int _5,int _4,int _3,int _2,int _1,int _0);
-	void hotchase_sprite_decode( int num16_banks, int bank_size );
 	void get_sprite_info();
 	void sortsprite(int *idx_array, int *key_array, int size);
 	void wecleman_draw_road(bitmap_rgb32 &bitmap, const rectangle &cliprect, int priority);
-	void hotchase_draw_road(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	K051316_CB_MEMBER(hotchase_zoom_callback_1);
-	K051316_CB_MEMBER(hotchase_zoom_callback_2);
-
-	void hotchase_sound_hs_w(uint8_t data);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -181,6 +169,8 @@ public:
 
 	void hotchase(machine_config &config);
 
+	void init_hotchase();
+
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -188,11 +178,27 @@ protected:
 
 private:
 	uint32_t screen_update_hotchase(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void hotchase_draw_road(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	K051316_CB_MEMBER(hotchase_zoom_callback_1);
+	K051316_CB_MEMBER(hotchase_zoom_callback_2);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(hotchase_scanline);
+
+	void hotchase_sound_control_w(offs_t offset, uint8_t data);
+	void hotchase_sound_hs_w(uint8_t data);
+	template<int Chip> uint8_t hotchase_k007232_r(offs_t offset);
+	template<int Chip> void hotchase_k007232_w(offs_t offset, uint8_t data);
+
+	INTERRUPT_GEN_MEMBER(hotchase_sound_timer);
+
+	void hotchase_sprite_decode( int num16_banks, int bank_size );
 
 	void hotchase_map(address_map &map);
 	void hotchase_sound_map(address_map &map);
 	void hotchase_sub_map(address_map &map);
-
 };
 
 #endif // MAME_INCLUDES_WECLEMAN_H

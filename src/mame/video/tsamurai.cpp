@@ -19,7 +19,6 @@ TILE_GET_INFO_MEMBER(tsamurai_state::get_bg_tile_info)
 	uint8_t attributes = m_bg_videoram[2*tile_index+1];
 	int tile_number = m_bg_videoram[2*tile_index];
 	tile_number += (( attributes & 0xc0 ) >> 6 ) * 256;  /* legacy */
-	tile_number += (( attributes & 0x20 ) >> 5 ) * 1024; /* Mission 660 add-on*/
 	tileinfo.set(0,
 			tile_number,
 			attributes & 0x1f,
@@ -27,6 +26,27 @@ TILE_GET_INFO_MEMBER(tsamurai_state::get_bg_tile_info)
 }
 
 TILE_GET_INFO_MEMBER(tsamurai_state::get_fg_tile_info)
+{
+	int tile_number = m_videoram[tile_index];
+	if (m_textbank1 & 0x01) tile_number += 256; /* legacy */
+	tileinfo.set(1,
+			tile_number,
+			m_colorram[((tile_index&0x1f)*2)+1] & 0x1f,
+			0);
+}
+
+TILE_GET_INFO_MEMBER(m660_state::get_bg_tile_info)
+{
+	uint8_t attributes = m_bg_videoram[2*tile_index+1];
+	int tile_number = m_bg_videoram[2*tile_index];
+	tile_number += (( attributes & 0xc0 ) >> 6 ) * 256;  /* legacy */
+	tileinfo.set(0,
+			tile_number,
+			attributes & 0x1f,
+			0);
+}
+
+TILE_GET_INFO_MEMBER(m660_state::get_fg_tile_info)
 {
 	int tile_number = m_videoram[tile_index];
 	if (m_textbank1 & 0x01) tile_number += 256; /* legacy */

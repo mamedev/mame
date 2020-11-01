@@ -665,7 +665,7 @@ void wecleman_state::wecleman_sound_map(address_map &map)
                         Hot Chase Sound CPU Handlers
 ***************************************************************************/
 
-void wecleman_state::hotchase_sound_control_w(offs_t offset, uint8_t data)
+void hotchase_state::hotchase_sound_control_w(offs_t offset, uint8_t data)
 {
 //  int reg[8];
 
@@ -712,7 +712,7 @@ void wecleman_state::hotchase_sound_control_w(offs_t offset, uint8_t data)
 	}
 }
 
-void wecleman_state::hotchase_sound_hs_w(uint8_t data)
+void hotchase_state::hotchase_sound_hs_w(uint8_t data)
 {
 	m_hotchase_sound_hs = true;
 }
@@ -720,13 +720,13 @@ void wecleman_state::hotchase_sound_hs_w(uint8_t data)
 /* Read and write handlers for one K007232 chip:
    even and odd register are mapped swapped */
 template<int Chip>
-uint8_t wecleman_state::hotchase_k007232_r(offs_t offset)
+uint8_t hotchase_state::hotchase_k007232_r(offs_t offset)
 {
 	return m_k007232[Chip]->read(offset ^ 1);
 }
 
 template<int Chip>
-void wecleman_state::hotchase_k007232_w(offs_t offset, uint8_t data)
+void hotchase_state::hotchase_k007232_w(offs_t offset, uint8_t data)
 {
 	m_k007232[Chip]->write(offset ^ 1, data);
 }
@@ -734,9 +734,9 @@ void wecleman_state::hotchase_k007232_w(offs_t offset, uint8_t data)
 void hotchase_state::hotchase_sound_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x1000, 0x100d).rw(FUNC(hotchase_state::hotchase_k007232_r<0>), FUNC(wecleman_state::hotchase_k007232_w<0>));   // 3 x K007232
-	map(0x2000, 0x200d).rw(FUNC(hotchase_state::hotchase_k007232_r<1>), FUNC(wecleman_state::hotchase_k007232_w<1>));
-	map(0x3000, 0x300d).rw(FUNC(hotchase_state::hotchase_k007232_r<2>), FUNC(wecleman_state::hotchase_k007232_w<2>));
+	map(0x1000, 0x100d).rw(FUNC(hotchase_state::hotchase_k007232_r<0>), FUNC(hotchase_state::hotchase_k007232_w<0>));   // 3 x K007232
+	map(0x2000, 0x200d).rw(FUNC(hotchase_state::hotchase_k007232_r<1>), FUNC(hotchase_state::hotchase_k007232_w<1>));
+	map(0x3000, 0x300d).rw(FUNC(hotchase_state::hotchase_k007232_r<2>), FUNC(hotchase_state::hotchase_k007232_w<2>));
 	map(0x4000, 0x4007).w(FUNC(hotchase_state::hotchase_sound_control_w)); // Sound volume, banking, etc.
 	map(0x5000, 0x5000).nopw();   // 0 at start of IRQ service, 1 at end (irq mask?)
 	map(0x6000, 0x6000).r("soundlatch", FUNC(generic_latch_8_device::read)); // From main CPU (Read on IRQ)
@@ -1031,7 +1031,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(wecleman_state::wecleman_scanline)
 		m_maincpu->set_input_line(5, HOLD_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(wecleman_state::hotchase_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(hotchase_state::hotchase_scanline)
 {
 	int scanline = param;
 
@@ -1099,7 +1099,7 @@ void wecleman_state::wecleman(machine_config &config)
                         Hot Chase Hardware Definitions
 ***************************************************************************/
 
-INTERRUPT_GEN_MEMBER(wecleman_state::hotchase_sound_timer)
+INTERRUPT_GEN_MEMBER(hotchase_state::hotchase_sound_timer)
 {
 	device.execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
@@ -1680,7 +1680,7 @@ ROM_END
     in a ROM module definition.  This routine unpacks each sprite nibble
     into a byte, doubling the memory consumption. */
 
-void wecleman_state::hotchase_sprite_decode( int num16_banks, int bank_size )
+void hotchase_state::hotchase_sprite_decode( int num16_banks, int bank_size )
 {
 	uint8_t *base;
 	int i;
@@ -1727,7 +1727,7 @@ void wecleman_state::hotchase_sprite_decode( int num16_banks, int bank_size )
 }
 
 /* Unpack sprites data and do some patching */
-void wecleman_state::init_hotchase()
+void hotchase_state::init_hotchase()
 {
 //  uint16_t *RAM1 = (uint16_t) memregion("maincpu")->base(); /* Main CPU patches */
 //  RAM[0x1140/2] = 0x0015; RAM[0x195c/2] = 0x601A; // faster self test

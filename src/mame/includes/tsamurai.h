@@ -54,7 +54,7 @@ protected:
 	uint8_t sound_command1_r();
 	uint8_t sound_command2_r();
 
-	// tsamurai specific
+	// tsamurai/the26thz specific
 	uint8_t tsamurai_unknown_d803_r();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -90,11 +90,8 @@ protected:
 	int m_sound_command1;
 	int m_sound_command2;
 
-	//m660 specific
-	int m_textbank2; // used in the tile_get_info functions even if only set by m660
-
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	virtual TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 };
 
@@ -153,6 +150,9 @@ protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
+	virtual TILE_GET_INFO_MEMBER(get_bg_tile_info) override;
+	virtual TILE_GET_INFO_MEMBER(get_fg_tile_info) override;
+
 private:
 
 	// m660 specific
@@ -168,6 +168,8 @@ private:
 	void sound3_m660_map(address_map &map);
 	void z80_m660_io_map(address_map &map);
 
+	//m660 specific
+	int m_textbank2;
 	int m_sound_command3;
 };
 
