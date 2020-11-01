@@ -131,8 +131,6 @@ public:
 
 	void megadriv_stop_scanline_timer();
 
-
-	DECLARE_VIDEO_START( megadriv );
 	uint32_t screen_update_megadriv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_megadriv);
 
@@ -154,6 +152,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	virtual void video_start() override;
 };
 
 class md_cons_state : public md_base_state

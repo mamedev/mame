@@ -785,8 +785,9 @@ uint32_t md_base_state::screen_update_megadriv(screen_device &screen, bitmap_rgb
 
 /*****************************************************************************************/
 
-VIDEO_START_MEMBER(md_base_state,megadriv)
+void md_base_state::video_start()
 {
+	// nothing?
 }
 
 void md_base_state::machine_start()
@@ -928,8 +929,6 @@ void md_base_state::md_ntsc(machine_config &config)
 	m_screen->set_screen_update(FUNC(md_base_state::screen_update_megadriv)); /* Copies a bitmap */
 	m_screen->screen_vblank().set(FUNC(md_base_state::screen_vblank_megadriv)); /* Used to Sync the timing */
 
-	MCFG_VIDEO_START_OVERRIDE(md_base_state, megadriv)
-
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -989,8 +988,6 @@ void md_base_state::md_pal(machine_config &config)
 	m_screen->set_visarea(0, 32*8-1, 0, 28*8-1);
 	m_screen->set_screen_update(FUNC(md_base_state::screen_update_megadriv)); /* Copies a bitmap */
 	m_screen->screen_vblank().set(FUNC(md_base_state::screen_vblank_megadriv)); /* Used to Sync the timing */
-
-	MCFG_VIDEO_START_OVERRIDE(md_base_state, megadriv)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
