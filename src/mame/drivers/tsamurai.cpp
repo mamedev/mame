@@ -51,6 +51,12 @@ the "America" release.
 
 void tsamurai_state::machine_start()
 {
+	m_textbank1 = 0;
+	m_nmi_enabled = 0;
+
+	m_sound_command1 = 0;
+	m_sound_command2 = 0;
+
 	save_item(NAME(m_sound_command1));
 	save_item(NAME(m_sound_command2));
 	save_item(NAME(m_nmi_enabled));

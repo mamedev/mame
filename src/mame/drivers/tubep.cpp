@@ -374,16 +374,16 @@ void tubep_state::nsc_map(address_map &map)
  *
  *************************************/
 
-void tubep_state::rjammer_main_map(address_map &map)
+void rjammer_state::rjammer_main_map(address_map &map)
 {
 	map(0x0000, 0x9fff).rom();
 	map(0xa000, 0xa7ff).ram();                                 /* MB8416 SRAM on daughterboard on main PCB (there are two SRAMs, this is the one on the left) */
-	map(0xc000, 0xc7ff).w(FUNC(tubep_state::tubep_textram_w)).share("textram");/* RAM on GFX PCB @B13 */
+	map(0xc000, 0xc7ff).w(FUNC(rjammer_state::tubep_textram_w)).share("textram");/* RAM on GFX PCB @B13 */
 	map(0xe000, 0xe7ff).ram().share("share1");                      /* MB8416 SRAM on daughterboard (the one on the right) */
 }
 
 
-void tubep_state::rjammer_main_portmap(address_map &map)
+void rjammer_state::rjammer_main_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("DSW2");   /* a bug in game code (during attract mode) */
@@ -394,12 +394,12 @@ void tubep_state::rjammer_main_portmap(address_map &map)
 	map(0xc0, 0xc0).portr("P2");
 
 	map(0xd0, 0xd7).w("mainlatch", FUNC(ls259_device::write_d0));
-	map(0xe0, 0xe0).w(FUNC(tubep_state::main_cpu_irq_line_clear_w));    /* clear IRQ interrupt */
+	map(0xe0, 0xe0).w(FUNC(rjammer_state::main_cpu_irq_line_clear_w));    /* clear IRQ interrupt */
 	map(0xf0, 0xf0).w("soundlatch", FUNC(generic_latch_8_device::write));
 }
 
 
-void tubep_state::rjammer_second_map(address_map &map)
+void rjammer_state::rjammer_second_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0xa000, 0xa7ff).ram();                         /* M5M5117P @21G */
@@ -409,11 +409,11 @@ void tubep_state::rjammer_second_map(address_map &map)
 }
 
 
-void tubep_state::rjammer_second_portmap(address_map &map)
+void rjammer_state::rjammer_second_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xb0, 0xb0).w(FUNC(tubep_state::rjammer_background_page_w));
-	map(0xd0, 0xd0).w(FUNC(tubep_state::rjammer_background_LS377_w));
+	map(0xb0, 0xb0).w(FUNC(rjammer_state::rjammer_background_page_w));
+	map(0xd0, 0xd0).w(FUNC(rjammer_state::rjammer_background_LS377_w));
 }
 
 
@@ -499,7 +499,7 @@ void rjammer_state::machine_reset()
  *
  *************************************/
 
-void tubep_state::rjammer_voice_startstop_w(uint8_t data)
+void rjammer_state::rjammer_voice_startstop_w(uint8_t data)
 {
 	/* bit 0 of data selects voice start/stop (reset pin on MSM5205)*/
 	// 0 -stop; 1-start
@@ -509,7 +509,7 @@ void tubep_state::rjammer_voice_startstop_w(uint8_t data)
 }
 
 
-void tubep_state::rjammer_voice_frequency_select_w(uint8_t data)
+void rjammer_state::rjammer_voice_frequency_select_w(uint8_t data)
 {
 	/* bit 0 of data selects voice frequency on MSM5205 */
 	// 0 -4 KHz; 1- 8KHz
@@ -520,7 +520,7 @@ void tubep_state::rjammer_voice_frequency_select_w(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(tubep_state::rjammer_adpcm_vck)
+WRITE_LINE_MEMBER(rjammer_state::rjammer_adpcm_vck)
 {
 	m_ls74 = (m_ls74 + 1) & 1;
 
@@ -537,7 +537,7 @@ WRITE_LINE_MEMBER(tubep_state::rjammer_adpcm_vck)
 }
 
 
-void tubep_state::rjammer_voice_input_w(uint8_t data)
+void rjammer_state::rjammer_voice_input_w(uint8_t data)
 {
 	/* 8 bits of adpcm data for MSM5205 */
 	/* need to buffer the data, and switch two nibbles on two following interrupts*/
@@ -554,7 +554,7 @@ void tubep_state::rjammer_voice_input_w(uint8_t data)
 }
 
 
-void tubep_state::rjammer_voice_intensity_control_w(uint8_t data)
+void rjammer_state::rjammer_voice_intensity_control_w(uint8_t data)
 {
 	/* 4 LSB bits select the intensity (analog circuit that alters the output from MSM5205) */
 	/* need to buffer the data */
@@ -562,24 +562,24 @@ void tubep_state::rjammer_voice_intensity_control_w(uint8_t data)
 }
 
 
-void tubep_state::rjammer_sound_map(address_map &map)
+void rjammer_state::rjammer_sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0xe000, 0xe7ff).ram();     /* M5M5117P (M58125P @2C on schematics) */
 }
 
 
-void tubep_state::rjammer_sound_portmap(address_map &map)
+void rjammer_state::rjammer_sound_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0x10, 0x10).w(FUNC(tubep_state::rjammer_voice_startstop_w));
-	map(0x18, 0x18).w(FUNC(tubep_state::rjammer_voice_frequency_select_w));
-	map(0x80, 0x80).w(FUNC(tubep_state::rjammer_voice_input_w));
+	map(0x10, 0x10).w(FUNC(rjammer_state::rjammer_voice_startstop_w));
+	map(0x18, 0x18).w(FUNC(rjammer_state::rjammer_voice_frequency_select_w));
+	map(0x80, 0x80).w(FUNC(rjammer_state::rjammer_voice_input_w));
 	map(0x90, 0x91).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0x92, 0x93).w("ay2", FUNC(ay8910_device::address_data_w));
 	map(0x94, 0x95).w("ay3", FUNC(ay8910_device::address_data_w));
-	map(0x96, 0x96).w(FUNC(tubep_state::rjammer_voice_intensity_control_w));
+	map(0x96, 0x96).w(FUNC(rjammer_state::rjammer_voice_intensity_control_w));
 }
 
 

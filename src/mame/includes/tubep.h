@@ -25,8 +25,7 @@ public:
 		m_screen(*this, "screen"),
 		m_textram(*this, "textram"),
 		m_backgroundram(*this, "backgroundram"),
-		m_sprite_colorsharedram(*this, "sprite_color"),
-		m_rjammer_backgroundram(*this, "rjammer_bgram")
+		m_sprite_colorsharedram(*this, "sprite_color")
 	{ }
 
 	void tubepb(machine_config &config);
@@ -53,7 +52,6 @@ protected:
 	required_shared_ptr<uint8_t> m_textram;
 	optional_shared_ptr<uint8_t> m_backgroundram;
 	required_shared_ptr<uint8_t> m_sprite_colorsharedram;
-	optional_shared_ptr<uint8_t> m_rjammer_backgroundram;
 
 	uint8_t m_ls74;
 	uint8_t m_ls377;
@@ -89,8 +87,6 @@ protected:
 	void second_cpu_irq_line_clear_w(uint8_t data);
 	uint8_t tubep_soundlatch_r();
 	uint8_t tubep_sound_irq_ack();
-	void rjammer_voice_input_w(uint8_t data);
-	void rjammer_voice_intensity_control_w(uint8_t data);
 	void tubep_textram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(screen_flip_w);
 	DECLARE_WRITE_LINE_MEMBER(background_romselect_w);
@@ -98,10 +94,7 @@ protected:
 	void tubep_background_a000_w(uint8_t data);
 	void tubep_background_c000_w(uint8_t data);
 	void tubep_sprite_control_w(offs_t offset, uint8_t data);
-	void rjammer_background_LS377_w(uint8_t data);
-	void rjammer_background_page_w(uint8_t data);
-	void rjammer_voice_startstop_w(uint8_t data);
-	void rjammer_voice_frequency_select_w(uint8_t data);
+
 	void ay8910_portA_0_w(uint8_t data);
 	void ay8910_portB_0_w(uint8_t data);
 	void ay8910_portA_1_w(uint8_t data);
@@ -111,23 +104,15 @@ protected:
 	virtual void video_start() override;
 	virtual void video_reset() override;
 	void tubep_palette(palette_device &palette);
-	void rjammer_palette(palette_device &palette) const;
 	uint32_t screen_update_tubep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_rjammer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(tubep_scanline_callback);
-	TIMER_CALLBACK_MEMBER(rjammer_scanline_callback);
+	TIMER_CALLBACK_MEMBER(rjammer_scanline_callback); // called from common device_timer function so can't be moved out of here yet
 	void draw_sprite();
 	void tubep_vblank_end();
 	void tubep_setup_save_state();
-	DECLARE_WRITE_LINE_MEMBER(rjammer_adpcm_vck);
 
 	void nsc_map(address_map &map);
-	void rjammer_main_map(address_map &map);
-	void rjammer_main_portmap(address_map &map);
-	void rjammer_second_map(address_map &map);
-	void rjammer_second_portmap(address_map &map);
-	void rjammer_sound_map(address_map &map);
-	void rjammer_sound_portmap(address_map &map);
+
 	void tubep_main_map(address_map &map);
 	void tubep_main_portmap(address_map &map);
 	void tubep_second_map(address_map &map);
@@ -142,7 +127,8 @@ class rjammer_state : public tubep_state
 {
 public:
 	rjammer_state(const machine_config &mconfig, device_type type, const char *tag) :
-		tubep_state(mconfig, type, tag)
+		tubep_state(mconfig, type, tag),
+		m_rjammer_backgroundram(*this, "rjammer_bgram")
 	{ }
 
 	void rjammer(machine_config &config);
@@ -151,6 +137,30 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+private:
+
+	void rjammer_background_LS377_w(uint8_t data);
+	void rjammer_background_page_w(uint8_t data);
+	void rjammer_voice_startstop_w(uint8_t data);
+	void rjammer_voice_frequency_select_w(uint8_t data);
+
+	void rjammer_voice_input_w(uint8_t data);
+	void rjammer_voice_intensity_control_w(uint8_t data);
+
+	DECLARE_WRITE_LINE_MEMBER(rjammer_adpcm_vck);
+
+	uint32_t screen_update_rjammer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void rjammer_palette(palette_device &palette) const;
+
+	void rjammer_main_map(address_map &map);
+	void rjammer_main_portmap(address_map &map);
+	void rjammer_second_map(address_map &map);
+	void rjammer_second_portmap(address_map &map);
+	void rjammer_sound_map(address_map &map);
+	void rjammer_sound_portmap(address_map &map);
+
+	optional_shared_ptr<uint8_t> m_rjammer_backgroundram;
 };
 
 #endif // MAME_INCLUDES_TUBEP_H

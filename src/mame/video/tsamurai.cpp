@@ -54,6 +54,7 @@ void tsamurai_state::video_start()
 	m_background->set_transparent_pen(0);
 	m_foreground->set_transparent_pen(0);
 
+	m_bgcolor = 0;
 	save_item(NAME(m_bgcolor));
 
 }
@@ -62,6 +63,7 @@ void m660_state::video_start()
 {
 	tsamurai_state::video_start();
 
+	m_textbank2 = 0;
 	save_item(NAME(m_textbank2));
 }
 
