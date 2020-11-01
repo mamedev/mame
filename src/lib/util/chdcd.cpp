@@ -36,6 +36,11 @@
 #define TOKENIZE i = tokenize( linebuffer, i, sizeof(linebuffer), token, sizeof(token) );
 
 
+enum gdi_area {
+	SINGLE_DENSITY,
+	HIGH_DENSITY
+};
+
 
 /***************************************************************************
     GLOBAL VARIABLES
@@ -817,7 +822,7 @@ static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc &outtoc, chdcd_
 	#if 1
 	for(i=0; i < numtracks; i++)
 	{
-		printf("%s %d %d %d (true %d)\n", outinfo.track[i].fname.c_str(), outtoc.tracks[i].frames, outtoc.tracks[i].padframes, outtoc.tracks[i].physframeofs, outtoc.tracks[i].frames - outtoc.tracks[i].padframes);
+		printf("%s frames %d padframes %d physframeofs %d (true %d)\n", outinfo.track[i].fname.c_str(), outtoc.tracks[i].frames, outtoc.tracks[i].padframes, outtoc.tracks[i].physframeofs, outtoc.tracks[i].frames - outtoc.tracks[i].padframes);
 	}
 	#endif
 
@@ -1162,18 +1167,15 @@ bool chdcd_is_gdicue(const char *tocfname)
 	while (!feof(infile))
 	{
 		fgets(linebuffer, 511, infile);
-		printf("linebuffer = %s\n", linebuffer);
 
 		/* if EOF didn't hit, keep going */
 		if (!feof(infile))
 		{
 			if (!strncmp(linebuffer, "REM SINGLE-DENSITY AREA", 23)) {
-				printf("matched single-density!\n");
 				has_rem_singledensity = true;
 			}
 
 			if (!strncmp(linebuffer, "REM HIGH-DENSITY AREA", 21)) {
-				printf("matched high-density!\n");
 				has_rem_highdensity = true;
 			}
 		}
@@ -1203,7 +1205,6 @@ bool chdcd_is_gdicue(const char *tocfname)
  * generic multi-cue format its only purpose is Dreamcast GDI dumps.
  */
 
-
 chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
 {
 	FILE *infile;
@@ -1212,7 +1213,7 @@ chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_trac
 	std::string lastfname;
 	uint32_t wavlen, wavoffs;
 	std::string path = std::string(tocfname);
-	//uint32_t gdicue_offs = 0;	// change this to 45150 when we see REM HIGH-DENSITY AREA
+	enum gdi_area current_area = SINGLE_DENSITY;
 
 	infile = fopen(tocfname, "rt");
 	path = get_file_path(path);
@@ -1238,15 +1239,15 @@ chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_trac
 		/* if EOF didn't hit, keep going */
 		if (!feof(infile))
 		{
-			/* standard-density area starts LBA = 0 */
-			if (!strcmp(linebuffer, "REM SINGLE-DENSITY AREA")) {
-				//gdicue_offs = 0;
+			/* single-density area starts LBA = 0 */
+			if (!strncmp(linebuffer, "REM SINGLE-DENSITY AREA", 23)) {
+				current_area = SINGLE_DENSITY;
 				continue;
 			}
 
 			/* high-density area starts LBA = 45150 */
-			if (!strcmp(linebuffer, "REM HIGH-DENSITY AREA")) {
-				//gdicue_offs = 45150;
+			if (!strncmp(linebuffer, "REM HIGH-DENSITY AREA", 21)) {
+				current_area = HIGH_DENSITY;
 				continue;
 			}
 
@@ -1317,12 +1318,13 @@ chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_trac
 				outtoc.tracks[trknum].pgsub = CD_SUB_NONE;
 				outtoc.tracks[trknum].pregap = 0;
 				outtoc.tracks[trknum].padframes = 0;
+				outtoc.tracks[trknum].multicuearea = current_area;
 				outinfo.track[trknum].idx0offs = -1;
 				outinfo.track[trknum].idx1offs = 0;
 
 				outinfo.track[trknum].fname.assign(lastfname); // default filename to the last one
 
-//              printf("trk %d: fname %s offset %d\n", trknum, outinfo.track[trknum].fname.c_str(), outinfo.track[trknum].offset);
+		                printf("trk %d: fname %s offset %d area %d\n", trknum, outinfo.track[trknum].fname.c_str(), outinfo.track[trknum].offset, outtoc.tracks[trknum].multicuearea);
 
 				cdrom_convert_type_string_to_track_info(token, &outtoc.tracks[trknum]);
 				if (outtoc.tracks[trknum].datasize == 0)
@@ -1496,15 +1498,55 @@ chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_trac
 				}
 			}
 		}
-		//printf("trk %d: %d frames @ offset %d\n", trknum+1, outtoc.tracks[trknum].frames, outinfo.track[trknum].offset);
+		// 3
+		// 1     0 4 2352 "Crazy Taxi (USA) (Track 1).bin" 0
+		// 2   450 0 2352 "Crazy Taxi (USA) (Track 2).bin" 0
+		// 3 45000 4 2352 "Crazy Taxi (USA) (Track 3).bin" 0
+		// Crazy Taxi (USA) (Track 1).bin frames 450 padframes 0 physframeofs 0 (true 450)
+		// Crazy Taxi (USA) (Track 2).bin frames 44550 padframes 43874 physframeofs 450 (true 676)
+		// Crazy Taxi (USA) (Track 3).bin frames 504150 padframes 0 physframeofs 45000 (true 504150)
+		// Metadata:     Tag='CHGD'  Index=0  Length=96 bytes
+		//               TRACK:1 TYPE:MODE1_RAW SUBTYPE:NONE FRAMES:450 PAD:0 PREGAP:0 PGTYPE:MODE1 PGSUB:NONE POSTGAP:0.
+		// Metadata:     Tag='CHGD'  Index=1  Length=98 bytes
+		//               TRACK:2 TYPE:AUDIO SUBTYPE:NONE FRAMES:44550 PAD:43874 PREGAP:0 PGTYPE:MODE1 PGSUB:NONE POSTGAP:0.
+		// Metadata:     Tag='CHGD'  Index=2  Length=99 bytes
+		//               TRACK:3 TYPE:MODE1_RAW SUBTYPE:NONE FRAMES:504150 PAD:0 PREGAP:0 PGTYPE:MODE1 PGSUB:NONE POSTGAP:0.
+		if (trknum != 0)
+		{
+			if (outtoc.tracks[trknum].multicuearea == HIGH_DENSITY && outtoc.tracks[trknum-1].multicuearea == SINGLE_DENSITY) {
+				outtoc.tracks[trknum].physframeofs = 45000;
+			} else {
+				outtoc.tracks[trknum].physframeofs = outtoc.tracks[trknum-1].physframeofs + outtoc.tracks[trknum-1].frames;
+			}
+
+			int dif=outtoc.tracks[trknum].physframeofs-(outtoc.tracks[trknum-1].frames+outtoc.tracks[trknum-1].physframeofs);
+			outtoc.tracks[trknum-1].frames += dif;
+			outtoc.tracks[trknum-1].padframes = dif;
+
+			// flycast only works when these are zeroed
+			outtoc.tracks[trknum-1].pregap = 0;
+			outtoc.tracks[trknum-1].pgtype = 0;
+
+		}
 	}
 
-	#if 0
-	for(i=0; i < numtracks; i++)
+#if 1
+	for (trknum = 0; trknum < outtoc.numtrks; trknum++)
 	{
-		printf("%s %d %d %d (true %d)\n", outinfo.track[i].fname.c_str(), outtoc.tracks[i].frames, outtoc.tracks[i].padframes, outtoc.tracks[i].physframeofs, outtoc.tracks[i].frames - outtoc.tracks[i].padframes);
+		printf("trk %d: %d frames @ offset %d, pad=%d, area=%d, phys=%d, pre=%d, post=%d, idx0=%d, idx1=%d, (true %d)\n",
+			trknum+1,
+			outtoc.tracks[trknum].frames,
+			outinfo.track[trknum].offset,
+			outtoc.tracks[trknum].padframes,
+			outtoc.tracks[trknum].multicuearea,
+			outtoc.tracks[trknum].physframeofs,
+			outtoc.tracks[trknum].pregap,
+			outtoc.tracks[trknum].postgap,
+			outinfo.track[trknum].idx0offs,
+			outinfo.track[trknum].idx1offs,
+			outtoc.tracks[trknum].frames - outtoc.tracks[trknum].padframes);
 	}
-	#endif
+#endif
 
 	/* close the input TOC */
 

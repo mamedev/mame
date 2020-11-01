@@ -87,6 +87,9 @@ struct cdrom_track_info
 	uint32_t logframeofs; /* logical frame of actual track data - offset by pregap size if pregap not physically present */
 	uint32_t physframeofs; /* physical frame of actual track data in CHD data */
 	uint32_t chdframeofs; /* frame number this track starts at on the CHD */
+
+	/* fields used in multi-cue GDI */
+	uint32_t multicuearea;
 };
 
 
