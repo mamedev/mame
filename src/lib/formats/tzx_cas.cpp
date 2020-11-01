@@ -1,3 +1,4 @@
+
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
 /*
@@ -18,6 +19,7 @@ TODO:
         case 0x28:  Select Block
         case 0x2A:  Stop Tape if in 48K Mode
         case 0x2B:  Set signal level
+		case 0x4B:	Kansas City Standard
         case 0x5A:  Merge Block
     Add support for the deprecated block types? Only if there is some image which need them:
         case 0x16:  C64 ROM type data block
@@ -182,6 +184,10 @@ static void tzx_cas_get_blocks( const uint8_t *casdata, int caslen )
 			datasize = casdata[pos] + (casdata[pos + 1] << 8) + (casdata[pos + 2] << 16);
 			pos += 3 + datasize;
 			break;
+		case 0x4B:
+			datasize = casdata[pos] + (casdata[pos + 1] << 8) + (casdata[pos + 2] << 16) + (casdata[pos + 3] << 24)-12;
+			pos += 4 + datasize + 12;
+			break;
 		case 0x5A:
 			pos += 9;
 			break;
@@ -290,6 +296,96 @@ static int tzx_cas_handle_block( int16_t **buffer, const uint8_t *bytes, int pau
 	}
 	return size;
 }
+
+static int tsx_msx_handle_block( int16_t **buffer, const uint8_t *bytes, int pause, int data_size, int pilot, int pilot_length, int bitcfg, int bytecfg, int bit0, int bit1)
+{
+	int pilot_samples = tcycles_to_samplecount(pilot);
+	int bit0_samples = tcycles_to_samplecount(bit0);
+	int bit1_samples = tcycles_to_samplecount(bit1);
+	int data_index;
+	int size = 0;
+	int bit1_pulsos = (bitcfg & 0b00001111);
+	int bit0_pulsos = (bitcfg & 0b11110000) >> 4;
+	int valarranque = (bytecfg & 0b00100000) >> 5;
+	int bitsarranque = (bytecfg & 0b11000000) >> 6;
+	int valparada = (bytecfg & 0b00000100) >> 2;
+	int bitsparada = (bytecfg & 0b00011000) >> 3;
+	
+
+	/* Uncomment this to include into error.log a fully detailed analysis of each block */
+//  LOG_FORMATS("tzx_cas_block_size: pilot_length = %d, pilot_samples = %d, sync1_samples = %d, sync2_samples = %d, bit0_samples = %d, bit1_samples = %d\n", pilot_length, pilot_samples, sync1_samples, sync2_samples, bit0_samples, bit1_samples);
+
+	/* PILOT */
+	for ( ; pilot_length > 0; pilot_length--)
+	{
+		tzx_output_wave(buffer, pilot_samples);
+		size += pilot_samples;
+		toggle_wave_data();
+	}
+	
+	
+		/* data */
+	int bits_arranque = (valarranque & 0x01) ? bit1_samples : bit0_samples;
+	int bits_parada = (valparada & 0x01) ? bit1_samples : bit0_samples;
+	int multiarranque = bitsarranque * ((valarranque & 0x01) ? bit1_pulsos : bit0_pulsos)/2;
+	int multiparada = bitsparada* ((valparada & 0x01) ? bit1_pulsos : bit0_pulsos) / 2;
+	for (data_index = 0; data_index < data_size; data_index++)
+	{
+		uint8_t byte = bytes[data_index];
+		//int bits_to_go = (data_index == (data_size - 1)) ? bits_in_last_byte : 8;
+		
+		
+		
+		for (int arranque = 0; arranque < multiarranque; arranque++)
+		{
+			tzx_output_wave(buffer, bits_arranque);
+			size += bits_arranque;
+			toggle_wave_data();
+			tzx_output_wave(buffer, bits_arranque);
+			size += bits_arranque;
+			toggle_wave_data();
+		}
+		
+		int bits_to_go = 8;
+		for (;bits_to_go > 0; (byte>>=1) , bits_to_go--)
+		{
+			int bit_samples = (byte & 0x01) ? bit1_samples : bit0_samples;
+			for (int pulsos = 0; pulsos < ((byte & 0x01) ? bit1_pulsos : bit0_pulsos)/2; pulsos++)
+			{
+				tzx_output_wave(buffer, bit_samples);
+				size += bit_samples;
+				toggle_wave_data();
+				tzx_output_wave(buffer, bit_samples);
+				size += bit_samples;
+				toggle_wave_data();
+			}
+			
+			
+		}
+		for (int parada = 0; parada < multiparada; parada++)
+		{
+			tzx_output_wave(buffer, bits_parada);
+			size += bits_parada;
+			toggle_wave_data();
+			tzx_output_wave(buffer, bits_parada);
+			size += bits_parada;
+			toggle_wave_data();
+		}
+	}
+	/* pause */
+	if (pause > 0)
+	{
+		size += pause_one_millisec(buffer);
+
+		int rest_pause_samples = millisec_to_samplecount(pause - 1);
+
+		wave_data = WAVE_LOW;
+		tzx_output_wave(buffer, rest_pause_samples);
+		size += rest_pause_samples;
+	}
+	return size;
+}
+
 
 static int tzx_handle_direct(int16_t **buffer, const uint8_t *bytes, int pause, int data_size, int tstates, int bits_in_last_byte)
 {
@@ -514,6 +610,7 @@ static int tzx_cas_do_work( int16_t **buffer )
 		int text_size, total_size, i;
 		int pilot, pilot_length, sync1, sync2;
 		int bit0, bit1, bits_in_last_byte;
+		int bitcfg, bytecfg;
 		uint8_t *cur_block = blocks[current_block];
 		uint8_t block_type = cur_block[0];
 		uint16_t tstates = 0;
@@ -649,6 +746,18 @@ static int tzx_cas_do_work( int16_t **buffer )
 			for (data_size = 0; data_size < text_size; data_size++)
 				LOG_FORMATS("%c", cur_block[15 + data_size]);
 			LOG_FORMATS("\n");
+			current_block++;
+			break;
+		case 0x4B:   /* Kansas City */
+			data_size = cur_block[1] + (cur_block[2] << 8) + (cur_block[3] << 16) + (cur_block[4] << 24)-12;
+			pause_time= cur_block[5] + (cur_block[6] << 8);
+			pilot = cur_block[7] + (cur_block[8] << 8);
+			pilot_length = cur_block[9] + (cur_block[10] << 8);
+			bit0 = cur_block[11] + (cur_block[12] << 8);
+			bit1 = cur_block[13] + (cur_block[14] << 8);
+			bitcfg = cur_block[15];
+			bytecfg = cur_block[16];
+			size += tsx_msx_handle_block(buffer, &cur_block[0x11],pause_time, data_size, pilot, pilot_length, bitcfg, bytecfg, bit0, bit1);
 			current_block++;
 			break;
 		case 0x5A:  /* "Glue" Block */
@@ -796,6 +905,17 @@ static int cdt_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes )
 	return size;
 }
 
+static int tsx_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes )
+{
+	int16_t *p = buffer;
+	int size = 0;
+	t_scale = (50 / 35);
+	size = tzx_cas_do_work(&p);
+	return size;
+}
+
+
+
 static int tap_cas_to_wav_size( const uint8_t *casdata, int caslen )
 {
 	int size = 0;
@@ -864,6 +984,17 @@ static const cassette_image::LegacyWaveFiller cdt_legacy_fill_wave =
 	0                           /* trailer_samples */
 };
 
+static const cassette_image::LegacyWaveFiller tsx_legacy_fill_wave =
+{
+	tsx_cas_fill_wave,          /* fill_wave */
+	-1,                         /* chunk_size */
+	0,                          /* chunk_samples */
+	tzx_cas_to_wav_size,        /* chunk_sample_calc */
+	TZX_WAV_FREQUENCY,          /* sample_frequency */
+	0,                          /* header_samples */
+	0                           /* trailer_samples */
+};
+
 static cassette_image::error tzx_cassette_identify( cassette_image *cassette, cassette_image::Options *opts )
 {
 	return cassette->legacy_identify(opts, &tzx_legacy_fill_wave);
@@ -878,6 +1009,12 @@ static cassette_image::error cdt_cassette_identify( cassette_image *cassette, ca
 {
 	return cassette->legacy_identify(opts, &cdt_legacy_fill_wave);
 }
+
+static cassette_image::error tsx_cassette_identify( cassette_image *cassette, cassette_image::Options *opts )
+{
+	return cassette->legacy_identify(opts, &tsx_legacy_fill_wave);
+}
+
 
 static cassette_image::error tzx_cassette_load( cassette_image *cassette )
 {
@@ -895,6 +1032,13 @@ static cassette_image::error tap_cassette_load( cassette_image *cassette )
 static cassette_image::error cdt_cassette_load( cassette_image *cassette )
 {
 	cassette_image::error err = cassette->legacy_construct(&cdt_legacy_fill_wave);
+	free(blocks);
+	blocks = nullptr;
+	return err;
+}
+static cassette_image::error tsx_cassette_load( cassette_image *cassette )
+{
+	cassette_image::error err = cassette->legacy_construct(&tsx_legacy_fill_wave);
 	free(blocks);
 	blocks = nullptr;
 	return err;
@@ -923,6 +1067,13 @@ static const cassette_image::Format cdt_cassette_format =
 	cdt_cassette_load,
 	nullptr
 };
+static const cassette_image::Format tsx_cassette_format =
+{
+	"tsx",
+	tsx_cassette_identify,
+	tsx_cassette_load,
+	nullptr
+};
 
 CASSETTE_FORMATLIST_START(tzx_cassette_formats)
 	CASSETTE_FORMAT(tzx_cassette_format)
@@ -931,4 +1082,8 @@ CASSETTE_FORMATLIST_END
 
 CASSETTE_FORMATLIST_START(cdt_cassette_formats)
 	CASSETTE_FORMAT(cdt_cassette_format)
+CASSETTE_FORMATLIST_END
+
+CASSETTE_FORMATLIST_START(tsx_cassette_formats)
+	CASSETTE_FORMAT(tsx_cassette_format)
 CASSETTE_FORMATLIST_END
