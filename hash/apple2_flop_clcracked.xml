@@ -37383,4 +37383,47 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="bezare">
+		<description>Bezare (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Southwest Data Systems</publisher>
+		<info name="release" value="2020-10-31"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="bezare (4am crack).dsk" size="143360" crc="e03e5a8b" sha1="b5ef6e3431817b420075af0b2e766dcd8214a628"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="artsians">
+		<description>Artesians (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>RenoSoft</publisher>
+		<info name="release" value="2020-10-31"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="artesians (4am crack).dsk" size="143360" crc="582275f9" sha1="d2343fae43e5dbe38a5e4dd40bd913cfc476b74b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="goblins">
+		<description>Goblins (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Highlands Computer Services</publisher>
+		<!-- Please refer to the following website for more details on the
+		history of this particular disk:
+		https://web.archive.org/web/http://gue.cgwmuseum.org/galleries/index.php?pub=5&item=27&id=2&key=0
+		-->
+
+		<info name="release" value="2020-10-31"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="goblins (4am crack).dsk" size="143360" crc="17805a8d" sha1="b220a7388039b4047eabc6f5aac9128f29bd7cfa"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

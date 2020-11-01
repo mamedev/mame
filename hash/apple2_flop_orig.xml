@@ -15655,4 +15655,19 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="g1985v2">
+		<description>Germany 1985 (Version 2.0)</description>
+		<year>1982</year>
+		<publisher>Strategic Simulations</publisher>
+		<info name="release" value="2020-10-29"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234775">
+				<rom name="germany 1985 v2.0.woz" size="234775" crc="85a4ff9d" sha1="daf67f5de2cce689f9692b3d92c5e80dc6668a12"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
