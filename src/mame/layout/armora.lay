@@ -55,10 +55,10 @@ license:CC0
 		</screen>
 
 		<element ref="transmission" blend="multiply">
-			<bounds xc="0" yc="0" width="4.1" height="3.075" />
+			<bounds xc="0" yc="-0.004" width="4.04" height="3.03" />
 		</element>
 		<element ref="reflection" blend="add">
-			<bounds xc="0" yc="0" width="4.1" height="3.075" />
+			<bounds xc="0" yc="-0.004" width="4.04" height="3.03" />
 		</element>
 	</view>
 </mamelayout>

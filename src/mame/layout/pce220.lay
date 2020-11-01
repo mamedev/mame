@@ -33,7 +33,7 @@
 			<color red="0.541" green="0.573" blue="0.580"/>
 		</rect>
 		<!-- 小 -->
-		<text string="KO">
+		<text string="SHO">
 			<color state="0" red="0.514" green="0.533" blue="0.545"/>
 			<color state="1" red="0.200" green="0.165" blue="0.169"/>
 		</text>
