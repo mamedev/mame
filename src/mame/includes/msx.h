@@ -22,6 +22,7 @@
 #include "video/tms9928a.h"
 #include "imagedev/cassette.h"
 #include "formats/fmsx_cas.h"
+#include "formats/tzx_cas.h"
 #include "formats/msx_dsk.h"
 #include "hashfile.h"
 #include "machine/wd_fdc.h"
