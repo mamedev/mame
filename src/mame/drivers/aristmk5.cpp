@@ -2235,6 +2235,7 @@ void aristmk5_state::machine_start()
 	m_nvram->set_base(m_sram->base(), m_sram->bytes());
 
 	archimedes_init();
+	m_coin_start_cycles = 0ULL;
 
 	m_mk5_2KHz_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aristmk5_state::mk5_2KHz_callback),this));
 	m_mk5_VSYNC_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aristmk5_state::mk5_VSYNC_callback),this));
