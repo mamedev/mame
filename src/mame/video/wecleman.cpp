@@ -838,7 +838,7 @@ void wecleman_state::wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w(offs_t offset
                             Initializations
 ***************************************************************************/
 
-VIDEO_START_MEMBER(wecleman_state,wecleman)
+void wecleman_state::video_start()
 {
 	/*
 	    Sprite banking - each bank is 0x20000 bytes (we support 0x40 bank codes)
@@ -940,7 +940,7 @@ K051316_CB_MEMBER(wecleman_state::hotchase_zoom_callback_2)
 }
 
 
-VIDEO_START_MEMBER(wecleman_state,hotchase)
+void hotchase_state::video_start()
 {
 	/*
 	    Sprite banking - each bank is 0x20000 bytes (we support 0x40 bank codes)
@@ -1062,7 +1062,7 @@ uint32_t wecleman_state::screen_update_wecleman(screen_device &screen, bitmap_rg
                                 Hot Chase
 ***************************************************************************/
 
-uint32_t wecleman_state::screen_update_hotchase(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t hotchase_state::screen_update_hotchase(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bool video_on = (m_irqctrl & 0x40) ? true : false;
 

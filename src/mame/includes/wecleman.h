@@ -37,7 +37,6 @@ public:
 		, m_led(*this, "led%u", 0U)
 	{ }
 
-	void hotchase(machine_config &config);
 	void wecleman(machine_config &config);
 
 	void init_wecleman();
@@ -45,7 +44,11 @@ public:
 
 	DECLARE_READ_LINE_MEMBER(hotchase_sound_status_r);
 
-private:
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 	enum
 	{
 		WECLEMAN_ID = 0,
@@ -112,16 +115,7 @@ private:
 	TILE_GET_INFO_MEMBER(wecleman_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(wecleman_get_fg_tile_info);
 
-	DECLARE_MACHINE_START(wecleman);
-	DECLARE_MACHINE_RESET(wecleman);
-	DECLARE_VIDEO_START(wecleman);
-
-	DECLARE_MACHINE_START(hotchase);
-	DECLARE_MACHINE_RESET(hotchase);
-	DECLARE_VIDEO_START(hotchase);
-
 	uint32_t screen_update_wecleman(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_hotchase(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(hotchase_sound_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(wecleman_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(hotchase_scanline);
@@ -149,9 +143,6 @@ private:
 
 	output_finder<1> m_led;
 
-	void hotchase_map(address_map &map);
-	void hotchase_sound_map(address_map &map);
-	void hotchase_sub_map(address_map &map);
 	void wecleman_map(address_map &map);
 	void wecleman_sound_map(address_map &map);
 	void wecleman_sub_map(address_map &map);
@@ -178,6 +169,30 @@ private:
 
 	std::unique_ptr<sprite_t []> m_sprite_list;
 	sprite_t **m_spr_ptr_list;
+};
+
+class hotchase_state : public wecleman_state
+{
+public:
+	hotchase_state(const machine_config &mconfig, device_type type, const char* tag)
+		: wecleman_state(mconfig, type, tag)
+	{
+	}
+
+	void hotchase(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	uint32_t screen_update_hotchase(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void hotchase_map(address_map &map);
+	void hotchase_sound_map(address_map &map);
+	void hotchase_sub_map(address_map &map);
+
 };
 
 #endif // MAME_INCLUDES_WECLEMAN_H
