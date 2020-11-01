@@ -1129,6 +1129,356 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 	return CHDERR_NONE;
 }
 
+/*---------------------------------------------------------------------------------------
+    chdcd_is_gdicue - determine if CUE contains Redump multi-CUE format for Dreamcast GDI
+----------------------------------------------------------------------------------------*/
+
+/**
+ * Dreamcast GDI has two images on one disc, STANDARD-DENSITY and HIGH-DENSITY. 
+ *
+ * Redump stores both images in a single .cue with a REM comment separating the images.
+ * This multi-cue format replaces the old flawed .gdi format.
+ *
+ *    http://forum.redump.org/topic/19969/done-sega-dreamcast-multicue-gdi/
+ *
+ * This function looks for strings "REM SINGLE-DENSITY AREA" & "REM HIGH-DENSITY AREA"
+ * indicating the Redump multi-cue format and therefore a Dreamcast GDI disc.
+ */
+
+bool chdcd_is_gdicue(const char *tocfname) 
+{
+	FILE *infile;
+	bool has_rem_singledensity = false;
+	bool has_rem_highdensity = false;
+	std::string path = std::string(tocfname);
+
+	infile = fopen(tocfname, "rt");
+	path = get_file_path(path);
+	if (infile == (FILE *)nullptr)
+	{
+		return CHDERR_FILE_NOT_FOUND;
+	}
+
+	while (!feof(infile))
+	{
+		fgets(linebuffer, 511, infile);
+
+		if (strcmp(linebuffer, "REM SINGLE-DENSITY AREA"))
+			has_rem_singledensity = true;
+
+		if (strcmp(linebuffer, "REM HIGH-DENSITY AREA"))
+			has_rem_highdensity = true;
+	}
+
+	fclose(infile);
+
+	return hash_rem_singledensity && has_rem_highdensity;
+}
+
+/*-----------------------------------------------------------------
+    chdcd_parse_gdicue - parse a Redump multi-CUE for Dreamcast GDI
+------------------------------------------------------------------*/
+
+/**
+ * @fn  chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
+ *
+ * @brief   Chdcd parse cue.
+ *
+ * @param   tocfname        The tocfname.
+ * @param [in,out]  outtoc  The outtoc.
+ * @param [in,out]  outinfo The outinfo.
+ *
+ * @return  A chd_error.
+ *
+ * NB: Redump assumes STANDARD-DENSITY starts at 0 LBA and HIGH-DENSITY starts at 45150 LBA. This is *NOT* a
+ * generic multi-cue format its only purpose is Dreamcast GDI dumps.
+ */
+
+
+chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
+{
+	FILE *infile;
+	int i, trknum;
+	static char token[512];
+	std::string lastfname;
+	uint32_t wavlen, wavoffs;
+	std::string path = std::string(tocfname);
+	uint32_t gdicue_offs = 0;	// change this to 45150 when we see REM HIGH-DENSITY AREA
+
+	infile = fopen(tocfname, "rt");
+	path = get_file_path(path);
+	if (infile == (FILE *)nullptr)
+	{
+		return CHDERR_FILE_NOT_FOUND;
+	}
+
+	/* clear structures */
+	memset(&outtoc, 0, sizeof(outtoc));
+	outinfo.reset();
+
+	trknum = -1;
+	wavoffs = wavlen = 0;
+
+	while (!feof(infile))
+	{
+		/* get the next line */
+		fgets(linebuffer, 511, infile);
+
+		/* if EOF didn't hit, keep going */
+		if (!feof(infile))
+		{
+			i = 0;
+
+			TOKENIZE
+
+			if (!strcmp(token, "FILE"))
+			{
+				/* found the data file for a track */
+				TOKENIZE
+
+				/* keep the filename */
+				lastfname.assign(path).append(token);
+
+				/* get the file type */
+				TOKENIZE
+
+				if (!strcmp(token, "BINARY"))
+				{
+					outinfo.track[trknum+1].swap = false;
+				}
+				else if (!strcmp(token, "MOTOROLA"))
+				{
+					outinfo.track[trknum+1].swap = true;
+				}
+				else if (!strcmp(token, "WAVE"))
+				{
+					wavlen = parse_wav_sample(lastfname.c_str(), &wavoffs);
+					if (!wavlen)
+					{
+						fclose(infile);
+						printf("ERROR: couldn't read [%s] or not a valid .WAV\n", lastfname.c_str());
+						return CHDERR_INVALID_DATA;
+					}
+				}
+				else
+				{
+					fclose(infile);
+					printf("ERROR: Unhandled track type %s\n", token);
+					return CHDERR_UNSUPPORTED_FORMAT;
+				}
+			}
+			else if (!strcmp(token, "TRACK"))
+			{
+				/* get the track number */
+				TOKENIZE
+				trknum = strtoul(token, nullptr, 10) - 1;
+
+				/* next token on the line is the track type */
+				TOKENIZE
+
+				if (wavlen != 0)
+				{
+					outtoc.tracks[trknum].trktype = CD_TRACK_AUDIO;
+					outtoc.tracks[trknum].frames = wavlen/2352;
+					outinfo.track[trknum].offset = wavoffs;
+					wavoffs = wavlen = 0;
+				}
+				else
+				{
+					outtoc.tracks[trknum].trktype = CD_TRACK_MODE1;
+					outtoc.tracks[trknum].datasize = 0;
+					outinfo.track[trknum].offset = 0;
+				}
+				outtoc.tracks[trknum].subtype = CD_SUB_NONE;
+				outtoc.tracks[trknum].subsize = 0;
+				outtoc.tracks[trknum].pgsub = CD_SUB_NONE;
+				outtoc.tracks[trknum].pregap = 0;
+				outtoc.tracks[trknum].padframes = 0;
+				outinfo.track[trknum].idx0offs = -1;
+				outinfo.track[trknum].idx1offs = 0;
+
+				outinfo.track[trknum].fname.assign(lastfname); // default filename to the last one
+
+//              printf("trk %d: fname %s offset %d\n", trknum, outinfo.track[trknum].fname.c_str(), outinfo.track[trknum].offset);
+
+				cdrom_convert_type_string_to_track_info(token, &outtoc.tracks[trknum]);
+				if (outtoc.tracks[trknum].datasize == 0)
+				{
+					fclose(infile);
+					printf("ERROR: Unknown track type [%s].  Contact MAMEDEV.\n", token);
+					return CHDERR_UNSUPPORTED_FORMAT;
+				}
+
+				/* next (optional) token on the line is the subcode type */
+				TOKENIZE
+
+				cdrom_convert_subtype_string_to_track_info(token, &outtoc.tracks[trknum]);
+			}
+			else if (!strcmp(token, "INDEX"))   /* only in bin/cue files */
+			{
+				int idx, frames;
+
+				/* get index number */
+				TOKENIZE
+				idx = strtoul(token, nullptr, 10);
+
+				/* get index */
+				TOKENIZE
+				frames = msf_to_frames( token );
+
+				if (idx == 0)
+				{
+					outinfo.track[trknum].idx0offs = frames;
+				}
+				else if (idx == 1)
+				{
+					outinfo.track[trknum].idx1offs = frames;
+					if ((outtoc.tracks[trknum].pregap == 0) && (outinfo.track[trknum].idx0offs != -1))
+					{
+						outtoc.tracks[trknum].pregap = frames - outinfo.track[trknum].idx0offs;
+						outtoc.tracks[trknum].pgtype = outtoc.tracks[trknum].trktype;
+						switch (outtoc.tracks[trknum].pgtype)
+						{
+							case CD_TRACK_MODE1:
+							case CD_TRACK_MODE2_FORM1:
+								outtoc.tracks[trknum].pgdatasize = 2048;
+								break;
+
+							case CD_TRACK_MODE1_RAW:
+							case CD_TRACK_MODE2_RAW:
+							case CD_TRACK_AUDIO:
+								outtoc.tracks[trknum].pgdatasize = 2352;
+								break;
+
+							case CD_TRACK_MODE2:
+							case CD_TRACK_MODE2_FORM_MIX:
+								outtoc.tracks[trknum].pgdatasize = 2336;
+								break;
+
+							case CD_TRACK_MODE2_FORM2:
+								outtoc.tracks[trknum].pgdatasize = 2324;
+								break;
+						}
+					}
+					else    // pregap sectors not in file, but we're always using idx0ofs for track length calc now
+					{
+						outinfo.track[trknum].idx0offs = frames;
+					}
+				}
+			}
+			else if (!strcmp(token, "PREGAP"))
+			{
+				int frames;
+
+				/* get index */
+				TOKENIZE
+				frames = msf_to_frames( token );
+
+				outtoc.tracks[trknum].pregap = frames;
+			}
+			else if (!strcmp(token, "POSTGAP"))
+			{
+				int frames;
+
+				/* get index */
+				TOKENIZE
+				frames = msf_to_frames( token );
+
+				outtoc.tracks[trknum].postgap = frames;
+			}
+		}
+	}
+
+	/* close the input CUE */
+	fclose(infile);
+
+	/* store the number of tracks found */
+	outtoc.numtrks = trknum + 1;
+
+	/* now go over the files again and set the lengths */
+	for (trknum = 0; trknum < outtoc.numtrks; trknum++)
+	{
+		uint64_t tlen = 0;
+
+		// this is true for cue/bin and cue/iso, and we need it for cue/wav since .WAV is little-endian
+		if (outtoc.tracks[trknum].trktype == CD_TRACK_AUDIO)
+		{
+			outinfo.track[trknum].swap = true;
+		}
+
+		// don't do this for .WAV tracks, we already have their length and offset filled out
+		if (outinfo.track[trknum].offset == 0)
+		{
+			// is this the last track?
+			if (trknum == (outtoc.numtrks-1))
+			{
+				/* if we have the same filename as the last track, do it that way */
+				if (trknum != 0 && (outinfo.track[trknum].fname.compare(outinfo.track[trknum-1].fname)==0))
+				{
+					tlen = get_file_size(outinfo.track[trknum].fname.c_str());
+					if (tlen == 0)
+					{
+						printf("ERROR: couldn't find bin file [%s]\n", outinfo.track[trknum-1].fname.c_str());
+						return CHDERR_FILE_NOT_FOUND;
+					}
+					outinfo.track[trknum].offset = outinfo.track[trknum-1].offset + outtoc.tracks[trknum-1].frames * (outtoc.tracks[trknum-1].datasize + outtoc.tracks[trknum-1].subsize);
+					outtoc.tracks[trknum].frames = (tlen - outinfo.track[trknum].offset) / (outtoc.tracks[trknum].datasize + outtoc.tracks[trknum].subsize);
+				}
+				else    /* data files are different */
+				{
+					tlen = get_file_size(outinfo.track[trknum].fname.c_str());
+					if (tlen == 0)
+					{
+						printf("ERROR: couldn't find bin file [%s]\n", outinfo.track[trknum-1].fname.c_str());
+						return CHDERR_FILE_NOT_FOUND;
+					}
+					tlen /= (outtoc.tracks[trknum].datasize + outtoc.tracks[trknum].subsize);
+					outtoc.tracks[trknum].frames = tlen;
+					outinfo.track[trknum].offset = 0;
+				}
+			}
+			else
+			{
+				/* if we have the same filename as the next track, do it that way */
+				if (outinfo.track[trknum].fname.compare(outinfo.track[trknum+1].fname)==0)
+				{
+					outtoc.tracks[trknum].frames = outinfo.track[trknum+1].idx0offs - outinfo.track[trknum].idx0offs;
+
+					if (trknum == 0)    // track 0 offset is 0
+					{
+						outinfo.track[trknum].offset = 0;
+					}
+					else
+					{
+						outinfo.track[trknum].offset = outinfo.track[trknum-1].offset + outtoc.tracks[trknum-1].frames * (outtoc.tracks[trknum-1].datasize + outtoc.tracks[trknum-1].subsize);
+					}
+
+					if (!outtoc.tracks[trknum].frames)
+					{
+						printf("ERROR: unable to determine size of track %d, missing INDEX 01 markers?\n", trknum+1);
+						return CHDERR_INVALID_DATA;
+					}
+				}
+				else    /* data files are different */
+				{
+					tlen = get_file_size(outinfo.track[trknum].fname.c_str());
+					if (tlen == 0)
+					{
+						printf("ERROR: couldn't find bin file [%s]\n", outinfo.track[trknum].fname.c_str());
+						return CHDERR_FILE_NOT_FOUND;
+					}
+					tlen /= (outtoc.tracks[trknum].datasize + outtoc.tracks[trknum].subsize);
+					outtoc.tracks[trknum].frames = tlen;
+					outinfo.track[trknum].offset = 0;
+				}
+			}
+		}
+		//printf("trk %d: %d frames @ offset %d\n", trknum+1, outtoc.tracks[trknum].frames, outinfo.track[trknum].offset);
+	}
+
+	return CHDERR_NONE;
+}
+
 /*-------------------------------------------------
     chdcd_parse_toc - parse a CDRDAO format TOC file
 -------------------------------------------------*/
@@ -1165,7 +1515,10 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 
 	if (strstr(tocftemp,".cue"))
 	{
-		return chdcd_parse_cue(tocfname, outtoc, outinfo);
+		if (chdcd_is_gdicue(tocfname)) { 
+			return chdcd_parse_gdicue(tocfname, outtoc, outinfo);
+		else
+			return chdcd_parse_cue(tocfname, outtoc, outinfo);
 	}
 
 	if (strstr(tocftemp,".nrg"))
