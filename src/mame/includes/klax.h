@@ -65,29 +65,28 @@ public:
 		, m_audiocpu(*this, "audiocpu")
 		, m_msm(*this, "msm%u", 1)
 		, m_rombank(*this, "rombank")
+		, m_audio_ram(*this, "audioram")
 	{ }
 
 	void klax5bl(machine_config &config);
 
-	void init_klax5bl();
-
 private:
-	DECLARE_MACHINE_START(klax5bl);
+	virtual void machine_start() override;
 
 	void m5205_int1(int state);
 
 	void bootleg_sound_map(address_map &map);
 	void klax5bl_map(address_map &map);
 
-	uint8_t audio_ram_r(offs_t offset);
-	void audio_ram_w(offs_t offset, uint8_t data);
+	uint16_t audio_ram_r(offs_t offset);
+	void audio_ram_w(offs_t offset, uint16_t data);
 	void audio_sample_w(offs_t offset, uint8_t data);
 	void audio_ctrl_w(uint8_t data);
 
 	required_device<cpu_device> m_audiocpu;
 	required_device_array<msm5205_device, 2> m_msm;
 	required_memory_bank m_rombank;
-	std::unique_ptr<uint8_t[]> m_audio_ram;
+	required_shared_ptr<uint8_t> m_audio_ram;
 	uint8_t m_audio_sample[2];
 	bool m_audio_nibble;
 };
