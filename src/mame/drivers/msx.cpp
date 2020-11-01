@@ -1390,7 +1390,7 @@ void msx_state::msx(machine_config &config)
 
 	/* cassette */
 	CASSETTE(config, m_cassette);
-	m_cassette->set_formats(fmsx_cassette_formats);
+	m_cassette->set_formats(tsx_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY);
 	m_cassette->add_route(ALL_OUTPUTS, "speaker", 0.05);
 	m_cassette->set_interface("msx_cass");
@@ -1460,7 +1460,7 @@ void msx2_state::msx2(machine_config &config)
 
 	/* cassette */
 	CASSETTE(config, m_cassette);
-	m_cassette->set_formats(fmsx_cassette_formats);
+	m_cassette->set_formats(tsx_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY);
 	m_cassette->add_route(ALL_OUTPUTS, "speaker", 0.05);
 	m_cassette->set_interface("msx_cass");
@@ -1521,7 +1521,7 @@ void msx2_state::msx2p(machine_config &config)
 
 	/* cassette */
 	CASSETTE(config, m_cassette);
-	m_cassette->set_formats(fmsx_cassette_formats);
+	m_cassette->set_formats(tsx_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY);
 	m_cassette->add_route(ALL_OUTPUTS, "speaker", 0.05);
 	m_cassette->set_interface("msx_cass");
@@ -8891,3 +8891,8 @@ COMP(19??, hbf9sp,     0,        0,     hbf9sp,     msx2jp,   msx2_state, empty_
 /* Temporary placeholders, Turbo-R hardware is not supported yet */
 COMP(19??, fsa1gt,     0,        0,     fsa1gt,     msx2jp,   msx2_state, empty_init, "Panasonic", "FS-A1GT (MSX Turbo-R)", MACHINE_NOT_WORKING)
 COMP(19??, fsa1st,     0,        0,     fsa1st,     msx2jp,   msx2_state, empty_init, "Panasonic", "FS-A1ST (MSX Turbo-R)", MACHINE_NOT_WORKING)
+
+//CASSETTE_FORMATLIST_START(msx_cassette_formats)
+//	CASSETTE_FORMAT(fmsx_cas::fmsx_cas_format)
+//	CASSETTE_FORMAT(tsx_cas_format)
+//CASSETTE_FORMATLIST_END
