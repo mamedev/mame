@@ -819,10 +819,10 @@ static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc &outtoc, chdcd_
 		}
 	}
 
-	#if 1
+	#if 0
 	for(i=0; i < numtracks; i++)
 	{
-		printf("%s frames %d padframes %d physframeofs %d (true %d)\n", outinfo.track[i].fname.c_str(), outtoc.tracks[i].frames, outtoc.tracks[i].padframes, outtoc.tracks[i].physframeofs, outtoc.tracks[i].frames - outtoc.tracks[i].padframes);
+		printf("%s %d %d %d (true %d)\n", outinfo.track[i].fname.c_str(), outtoc.tracks[i].frames, outtoc.tracks[i].padframes, outtoc.tracks[i].physframeofs, outtoc.tracks[i].frames - outtoc.tracks[i].padframes);
 	}
 	#endif
 
@@ -1139,7 +1139,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 ----------------------------------------------------------------------------------------*/
 
 /**
- * Dreamcast GDI has two images on one disc, STANDARD-DENSITY and HIGH-DENSITY. 
+ * Dreamcast GDI has two images on one disc, SINGLE-DENSITY and HIGH-DENSITY. 
  *
  * Redump stores both images in a single .cue with a REM comment separating the images.
  * This multi-cue format replaces the old flawed .gdi format.
@@ -1201,7 +1201,7 @@ bool chdcd_is_gdicue(const char *tocfname)
  *
  * @return  A chd_error.
  *
- * NB: Redump assumes STANDARD-DENSITY starts at 0 LBA and HIGH-DENSITY starts at 45150 LBA. This is *NOT* a
+ * NB: Redump assumes SINGLE-DENSITY starts at 0 LBA and HIGH-DENSITY starts at 45150 LBA. This is *NOT* a
  * generic multi-cue format its only purpose is Dreamcast GDI dumps.
  */
 
@@ -1324,7 +1324,9 @@ chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_trac
 
 				outinfo.track[trknum].fname.assign(lastfname); // default filename to the last one
 
+#if 0
 		                printf("trk %d: fname %s offset %d area %d\n", trknum, outinfo.track[trknum].fname.c_str(), outinfo.track[trknum].offset, outtoc.tracks[trknum].multicuearea);
+#endif
 
 				cdrom_convert_type_string_to_track_info(token, &outtoc.tracks[trknum]);
 				if (outtoc.tracks[trknum].datasize == 0)
@@ -1530,7 +1532,7 @@ chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_trac
 		}
 	}
 
-#if 1
+#if 0
 	for (trknum = 0; trknum < outtoc.numtrks; trknum++)
 	{
 		printf("trk %d: %d frames @ offset %d, pad=%d, area=%d, phys=%d, pre=%d, post=%d, idx0=%d, idx1=%d, (true %d)\n",
