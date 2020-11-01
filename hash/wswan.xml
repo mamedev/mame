@@ -290,10 +290,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m256s033a.u3" size="1048576" crc="425eb893" sha1="06447c248afce04c4f4a1c3b5f7a4ab6f383c94b" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x2000">
+			<dataarea name="sram" size="0x2000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -312,10 +312,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m256s060a.u3" size="1048576" crc="04366d92" sha1="1578669c1fcf59ab5f5e603c6a65121d7ae209b1" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x2000">
+			<dataarea name="sram" size="0x2000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -334,10 +334,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="LP62S256AV SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="16" endianness="little">
 				<rom name="mh16m256s076a.u3" size="2097152" crc="392dd813" sha1="821bb81917445b63ac663c706ab4ce27de28543f" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x2000">
+			<dataarea name="sram" size="0x2000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -356,10 +356,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="16777216">
+			<dataarea name="rom" size="16777216" width="16" endianness="little">
 				<rom name="mh128m256s016a.u3" size="16777216" crc="324622c9" sha1="544e76133fa53fc0ae5e00e3465b9cf634f14fd0" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -377,10 +377,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
-			<dataarea name="rom" size="4194304">
+			<dataarea name="rom" size="4194304" width="16" endianness="little">
 				<rom name="mh32m16e062a.u3" size="4194304" crc="b25a0635" sha1="35eea568f756bacf533bb9aaad7e3239ba00e411" offset="000000" />
 			</dataarea>
-			<dataarea name="eeprom" size="0x800">
+			<dataarea name="eeprom" size="0x800" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -398,7 +398,7 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u2" value="empty" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_rom" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m0e038a.u3" size="1048576" crc="0cb57376" sha1="a88882426bf435416616191902a26b2b066f2491" offset="000000" />
 			</dataarea>
 		</part>
@@ -418,10 +418,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="16" endianness="little">
 				<rom name="mh16m256s061a.u3" size="2097152" crc="7f3a14c0" sha1="39e9a897b681b2c326b052827d7c534f22290286" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -440,10 +440,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="16" endianness="little">
 				<rom name="mh16m256s031a.u3" size="2097152" crc="27b3cc18" sha1="e212bba4fac51bbfcf440966da0e67b1686dcfc5" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -462,10 +462,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="16" endianness="little">
 				<rom name="mh16m256s027a.u3" size="2097152" crc="aa53971d" sha1="f7a65e95a8e97f35ec2419897ad96af1e1d49676" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -484,10 +484,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="16" endianness="little">
 				<rom name="mh16m256s017a.u3" size="2097152" crc="ccaa4853" sha1="3b62fd2841602f1077270848ab7a3aad58712ee9" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -506,10 +506,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="UM62S256AV SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="16" endianness="little">
 				<rom name="mh16m256s009a.u3" size="2097152" crc="a607a350" sha1="a8c4f423429a8683cfebd05370ea122613349033" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -528,10 +528,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m256s083a.u3" size="1048576" crc="7fff2520" sha1="eb538b82c5516fae8ce38778e41fb118aa5c830f" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -550,10 +550,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="CY62256VLL SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="16" endianness="little">
 				<rom name="mh16m256s064a.u3" size="2097152" crc="56e2c069" sha1="c4436a59fd830ba6af2d63462f71e1ab1cfa3212" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x2000">
+			<dataarea name="sram" size="0x2000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -572,10 +572,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="CY62256VLL SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="4194304">
+			<dataarea name="rom" size="4194304" width="16" endianness="little">
 				<rom name="mh32m256s065a.u3" size="4194304" crc="4e8909d1" sha1="db9b3308336b59aeff7bd173d687953a37739381" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -593,7 +593,7 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u2" value="empty" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_rom" />
-			<dataarea name="rom" size="4194304">
+			<dataarea name="rom" size="4194304" width="16" endianness="little">
 				<rom name="mh32m0e048a.u3" size="4194304" crc="af9d8f42" sha1="c07f776ac4374b648d1a49efd9d6fcd0db2ac1fa" offset="000000" />
 			</dataarea>
 		</part>
@@ -612,7 +612,7 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u2" value="empty" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_rom" />
-			<dataarea name="rom" size="4194304">
+			<dataarea name="rom" size="4194304" width="16" endianness="little">
 				<rom name="mh32m0e005a.u3" size="4194304" crc="b62e5dd0" sha1="d3da0ae529c6f78162682141154a95879f288ca7" offset="000000" />
 			</dataarea>
 		</part>
@@ -632,10 +632,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="W242580 SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="16" endianness="little">
 				<rom name="mh16m256s126b.u3" size="2097152" crc="6ededaf8" sha1="44a5502b70ea75926b87377e3f634c8093bc574a" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -654,10 +654,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="16" endianness="little">
 				<rom name="mh16m256s117b.u3" size="2097152" crc="56ce1bc5" sha1="521754084afc6321ae329421b9d2ab0f0cac8c70" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -676,10 +676,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="16" endianness="little">
 				<rom name="mh16m256s097b.u3" size="2097152" crc="6e9dd148" sha1="9db54826c2887dea07aac774bd15e092596e37af" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -698,10 +698,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="CY62256VLL SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="16" endianness="little">
 				<rom name="mh16m256s066a.u3" size="2097152" crc="fc6946f0" sha1="c49bd00c95bca49a183d59f85e81815efb1a2fb9" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -720,10 +720,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="W242580 SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="16" endianness="little">
 				<rom name="mh16m256s067a.u3" size="2097152" crc="42ad238b" sha1="0b54cc1d350ab92c42ce8214784389b994562bf6" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -741,10 +741,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="16" endianness="little">
 				<rom name="m5m29ft160avp.u3" size="2097152" crc="7e03e8da" sha1="" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -765,10 +765,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="16" endianness="little">
 				<rom name="mh16m256s006a.u3" size="2097152" crc="ab59de2e" sha1="ecea24db6e65254ab4d6e312de0eb951c7df716f" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -786,10 +786,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="16" endianness="little">
 				<rom name="mh16m256s141b.u3" size="2097152" crc="94ea6ffc" sha1="5cc59ec1687fe83ec5fb048d3dfc37849747df34" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -808,10 +808,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="16" endianness="little">
 				<rom name="mh16m256s107b.u3" size="2097152" crc="b5e675ae" sha1="c622f6742ca3f0129fc12dce0a1c17d292388ffb" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x2000">
+			<dataarea name="sram" size="0x2000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -830,10 +830,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m256s075a.u3" size="1048576" crc="89e7d950" sha1="3d5a1ed77e721908eb1145aaedef17c0ee6355ae" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -851,10 +851,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m1e073a.u3" size="1048576" crc="b1caec06" sha1="83e190af2e25fbb3e93b1d5835c52fe6f1d279ce" offset="000000" />
 			</dataarea>
-			<dataarea name="eeprom" size="0x80">
+			<dataarea name="eeprom" size="0x80" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -872,10 +872,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m1e049a.u3" size="1048576" crc="4e467626" sha1="f79451034b6d844f0e10c825306bbc26f26a5466" offset="000000" />
 			</dataarea>
-			<dataarea name="eeprom" size="0x80">
+			<dataarea name="eeprom" size="0x80" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -894,10 +894,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="16" endianness="little">
 				<rom name="mh16m256s040a.u3" size="2097152" crc="bf8d9212" sha1="ae31488cee1c91f383efbe3083b4abec092dda36" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -915,10 +915,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="16" endianness="little">
 				<rom name="mh16m1e069a.u3" size="2097152" crc="8922dd0b" sha1="f26b0215c49e04cb8ef6f031b627dff6a49d2015" offset="000000" />
 			</dataarea>
-			<dataarea name="eeprom" size="0x80">
+			<dataarea name="eeprom" size="0x80" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -937,10 +937,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m256s086a.u3" size="1048576" crc="a1fb16fc" sha1="f8f077da30f227f3793e97c7f1d656559f08b9d4" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -958,10 +958,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m16e094b.u3" size="1048576" crc="ce2f1a1d" sha1="cfcb14be6d2f1dbffdfcefb8c8d83b4f39bc102b" offset="000000" />
 			</dataarea>
-			<dataarea name="eeprom" size="0x800">
+			<dataarea name="eeprom" size="0x800" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -980,10 +980,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="W242580 SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="4194304">
+			<dataarea name="rom" size="4194304" width="16" endianness="little">
 				<rom name="mh32m256s120b.u3" size="4194304" crc="f246a68e" sha1="fbb745b016cc710ff6f82ec3091a181415d8de61" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -1001,7 +1001,7 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u2" value="empty" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_rom" />
-			<dataarea name="rom" size="524288">
+			<dataarea name="rom" size="524288" width="16" endianness="little">
 				<rom name="mh4m0e012a.u3" size="524288" crc="a193458c" sha1="cbf6455e89b20a000b6121e5c485be1a20d1f726" offset="000000" />
 			</dataarea>
 		</part>
@@ -1020,7 +1020,7 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u2" value="empty" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_rom" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m0e108b.u3" size="1048576" crc="4aed3911" sha1="837528b9d95e309f7b1e8c4ffd46ca3e2b68a5a3" offset="000000" />
 			</dataarea>
 		</part>
@@ -1040,10 +1040,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m256s080a.u3" size="1048576" crc="a9f11523" sha1="0931ddec058eefb32a68a1752716ed2ba68b78bf" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -1061,10 +1061,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m8e014a.u3" size="1048576" crc="00137e86" sha1="af3fe9da3f5ee0f5a7b06b0440223db88fcb3bf2" offset="000000" />
 			</dataarea>
-			<dataarea name="eeprom" size="0x400">
+			<dataarea name="eeprom" size="0x400" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -1083,10 +1083,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="LP62S256AV SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="16" endianness="little">
 				<rom name="mh16m256s041a.u3" size="2097152" crc="53b9fef8" sha1="2688ca67ac31ce3d5c3523b0e11cad55e70fa257" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -1103,10 +1103,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u1" value="BANDAI 2001" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m16e001a.u3" size="1048576" crc="a1656bbb" sha1="ee4b777f029bac9561e60c19407d08360e733822" offset="000000" />
 			</dataarea>
-			<dataarea name="eeprom" size="0x800">
+			<dataarea name="eeprom" size="0x800" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -1125,10 +1125,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m256s081a.u3" size="1048576" crc="4b22270d" sha1="1eda3327eb9b5a5844a95ac789f71b669f4cb6a7" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -1146,7 +1146,7 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="ic2" value="ROM" />
 			<feature name="ic3" value="74HCT373A" />
 			<feature name="slot" value="ws_rom" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="handy sonar-2.ic2" size="1048576" crc="d4188811" sha1="a1691ef96097c409b56c77f1d4c731fbfb3f386b" offset="000000" />
 			</dataarea>
 		</part>
@@ -1165,7 +1165,7 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="ic2" value="ROM" />
 			<feature name="ic3" value="74HCT373A" />
 			<feature name="slot" value="ws_rom" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="handy sonar-1.ic2" size="1048576" crc="2ab9852d" sha1="70d65a936ee1dfc2b89c543312c205285d955efb" offset="000000" />
 			</dataarea>
 		</part>
@@ -1186,10 +1186,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="LP62S256AV SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="16" endianness="little">
 				<rom name="mh16m256s079a.u3" size="2097152" crc="f75ce82c" sha1="ecbaf210f92c75a55df9dff4777ea364596ae0c9" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x2000">
+			<dataarea name="sram" size="0x2000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -1208,10 +1208,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="CY62256VLL SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="16" endianness="little">
 				<rom name="mh16m256s052a.u3" size="2097152" crc="aa525c04" sha1="1f42c5694a798de8ff3c68f63dfc7395be1669a5" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x2000">
+			<dataarea name="sram" size="0x2000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -1229,10 +1229,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
-			<dataarea name="rom" size="4194304">
+			<dataarea name="rom" size="4194304" width="16" endianness="little">
 				<rom name="mh32m16e116b.u3" size="4194304" crc="70aa800e" sha1="57b4278fc5812f52413ca65f45225922d4f2ec3d" offset="000000" />
 			</dataarea>
-			<dataarea name="eeprom" size="0x800">
+			<dataarea name="eeprom" size="0x800" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -1250,10 +1250,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
-			<dataarea name="rom" size="4194304">
+			<dataarea name="rom" size="4194304" width="16" endianness="little">
 				<rom name="mh32m16e105b.u3" size="4194304" crc="bd6fc68a" sha1="43d985b31848e1ae58d07231da80ee7aa8d3f686" offset="000000" />
 			</dataarea>
-			<dataarea name="eeprom" size="0x800">
+			<dataarea name="eeprom" size="0x800" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -1271,10 +1271,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="16" endianness="little">
 				<rom name="mh16m16e090a.u3" size="2097152" crc="ca3f0b00" sha1="38f708a4c0c4fcec0cf4d6ce051d1ff76466d617" offset="000000" />
 			</dataarea>
-			<dataarea name="eeprom" size="0x800">
+			<dataarea name="eeprom" size="0x800" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -1293,10 +1293,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="LP62S256AV SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m256s046a.u3" size="1048576" crc="4d103236" sha1="b40fbc7b72921c9ac31330831c0f77e4133ec7d6" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x2000">
+			<dataarea name="sram" size="0x2000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -1315,10 +1315,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="CY62256VLL SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m256s045a.u3" size="1048576" crc="517f962e" sha1="12d26522665cb8ecb3178bc242d984deae438e5c" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -1337,10 +1337,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="CY62256VLL SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="16" endianness="little">
 				<rom name="mh16m256s058a.u3" size="2097152" crc="3b4c60c6" sha1="9ef89b6fe68c5a06d34344e8c783ec24114ad959" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x2000">
+			<dataarea name="sram" size="0x2000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -1359,10 +1359,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m256s024a.u3" size="1048576" crc="80c6ef12" sha1="207a3ceb9a09eabca6e455deeb7035e7e04c9795" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x2000">
+			<dataarea name="sram" size="0x2000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -1381,10 +1381,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="CY62256VLL SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="16" endianness="little">
 				<rom name="mh16m256s019a.u3" size="2097152" crc="4c48624c" sha1="52b154a3e36d01357649a9f7f614139ce6cc46b8" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x2000">
+			<dataarea name="sram" size="0x2000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -1403,10 +1403,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m256s057a.u3" size="1048576" crc="ecfbcb1d" sha1="a309a430fbbed6c42f41d8ccaf4aba82e96d6a7b" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -1425,10 +1425,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m256s088a.u3" size="1048576" crc="9e0854e2" sha1="9fdf3f5821f2a4488139525fe49e87b23de4571f" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -1447,10 +1447,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="16" endianness="little">
 				<rom name="mh16m256s025a.u3" size="2097152" crc="cccaf8a1" sha1="d524da01f2bfad92c2fa080950229955a3030ef2" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -1468,10 +1468,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m16e099b.u3" size="1048576" crc="21279e82" sha1="847f51592f181aa68061900700149b86cdba651b" offset="000000" />
 			</dataarea>
-			<dataarea name="eeprom" size="0x800">
+			<dataarea name="eeprom" size="0x800" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -1490,10 +1490,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="4194304">
+			<dataarea name="rom" size="4194304" width="16" endianness="little">
 				<rom name="mh32m256s093a.u3" size="4194304" crc="62d419cd" sha1="211e051db3fd4d7ae1ea143e043f87cfbcec5f1c" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -1512,7 +1512,7 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u2" value="empty" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_rom" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m0e051a.u3" size="1048576" crc="637ada93" sha1="a25944969068ee495254f94c2c48dfffcb66ce8d" offset="000000" />
 			</dataarea>
 		</part>
@@ -1532,10 +1532,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="LP62S256AV SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m256s028a.u3" size="1048576" crc="e7e7fd4c" sha1="281079b22cb213ee4dda5c304b5b5be028130929" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -1554,10 +1554,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="LP62S256AV SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m256s003a.u3" size="1048576" crc="c2ed122e" sha1="748ca335d39515a6650352449972684be749052a" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -1576,10 +1576,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="16" endianness="little">
 				<rom name="mh16m256s039a.u3" size="2097152" crc="00b31fbb" sha1="5eaeab859e5f647fac354dad285a311387ea126b" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -1598,10 +1598,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m256s043a.u3" size="1048576" crc="92fbf7fb" sha1="8f3f97be31f3bd0e6922ab7795aa6f04bc5cfe2a" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -1620,10 +1620,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="16" endianness="little">
 				<rom name="mh16m256s113b.u3" size="2097152" crc="e226863b" sha1="e5684789e81f9d739010db575022a12a448b5509" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -1642,10 +1642,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="LP62S256AV SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m256s020a.u3" size="1048576" crc="12fb8b28" sha1="509e5748e5efdfb56093c78ae886153dd1838215" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -1664,10 +1664,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="LP62S256AV SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m256s021a.u3" size="1048576" crc="2b40745d" sha1="315061e4739e947175d6ad7f006498cd61a33f8c" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -1685,7 +1685,7 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u2" value="empty" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_rom" />
-			<dataarea name="rom" size="524288">
+			<dataarea name="rom" size="524288" width="16" endianness="little">
 				<rom name="mh4m0e054a.u3" size="524288" crc="9baac7bb" sha1="c7230ef709f6ceaef9a220541c8cdc05c0cd549f" offset="000000" />
 			</dataarea>
 		</part>
@@ -1705,10 +1705,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="LP62S256AV SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m256s047a.u3" size="1048576" crc="90f7e6d6" sha1="32013a7a745a3aa2fd63cc9427c5e1f2635655ed" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x2000">
+			<dataarea name="sram" size="0x2000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -1727,10 +1727,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m256s036a.u3" size="1048576" crc="44b3e67c" sha1="4eefc5a51008c2ab33e8d04064ec9bdcbc03d036" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -1748,10 +1748,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV4000STC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="16" endianness="little">
 				<rom name="mh16m4ms109b.u3" size="2097152" crc="80de367d" sha1="92d4a6ff6f2b1152d8935025f38f910155e5d709" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x10000">
+			<dataarea name="sram" size="0x10000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -1770,10 +1770,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m256s095b.u3" size="1048576" crc="eb995e86" sha1="e88e659cc04fc08a04b8c881f62fe086c5cdab06" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x2000">
+			<dataarea name="sram" size="0x2000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -1792,10 +1792,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="CY62256VLL SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m256s070a.u3" size="1048576" crc="d675c265" sha1="3ce41c90cfc1d53a89ade2c88e0b16cdc92c0268" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -1814,10 +1814,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="16" endianness="little">
 				<rom name="mh16m256s089a.u3" size="2097152" crc="a3ead689" sha1="dc94e17a942acfdc1eb0c38d91bf72460a4bb8f9" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -1835,10 +1835,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m16e059a.u3" size="1048576" crc="4ed8820c" sha1="b358c65bae818c4b3de6bf668d16c311534036c2" offset="000000" />
 			</dataarea>
-			<dataarea name="eeprom" size="0x800">
+			<dataarea name="eeprom" size="0x800" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -1856,10 +1856,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m16e015a.u3" size="1048576" crc="b5dbcf12" sha1="6a479ee45e69cd3d6cc6cdda5a60eff3077953b0" offset="000000" />
 			</dataarea>
-			<dataarea name="eeprom" size="0x800">
+			<dataarea name="eeprom" size="0x800" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -1878,10 +1878,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m256s004a.u3" size="1048576" crc="04531734" sha1="785ebb7528f5268e1a1fc10dffbe95ccf6d39560" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -1899,10 +1899,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
-			<dataarea name="rom" size="524288">
+			<dataarea name="rom" size="524288" width="16" endianness="little">
 				<rom name="mh4m16e074a.u3" size="524288" crc="631bd97a" sha1="0f73d3112b1184f74e728cf1252ffbee6a146fa6" offset="000000" />
 			</dataarea>
-			<dataarea name="eeprom" size="0x800">
+			<dataarea name="eeprom" size="0x800" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -1920,10 +1920,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m16e112b.u3" size="1048576" crc="f2e362b8" sha1="99c831c27c478064e3d3fa8f9f089cc28f0e946f" offset="000000" />
 			</dataarea>
-			<dataarea name="eeprom" size="0x800">
+			<dataarea name="eeprom" size="0x800" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -1941,10 +1941,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
-			<dataarea name="rom" size="524288">
+			<dataarea name="rom" size="524288" width="16" endianness="little">
 				<rom name="mh8m1e034a.u3" size="524288" crc="302499b9" sha1="5e7dabb66b0ca580481aa79ee8b8a5b0c6ce6592" offset="000000" />
 			</dataarea>
-			<dataarea name="eeprom" size="0x80">
+			<dataarea name="eeprom" size="0x80" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -1963,10 +1963,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="16" endianness="little">
 				<rom name="mh16m256s101b.u3" size="2097152" crc="35361250" sha1="fb8d0f4e58a4192989ec71eb6e392d182aaa3eec" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -1984,7 +1984,7 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u2" value="empty" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_rom" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m0e002a.u3" size="1048576" crc="5a41a7ba" sha1="d72c1221c2ce3e281a0ee288a3d079aa8e1b714b" offset="000000" />
 			</dataarea>
 		</part>
@@ -2004,10 +2004,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="16" endianness="little">
 				<rom name="mh16m256s110b.u3" size="2097152" crc="8f8608ad" sha1="759deb79a3fc3befed705d7264e4b88adbadacc7" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -2025,10 +2025,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
-			<dataarea name="rom" size="4194304">
+			<dataarea name="rom" size="4194304" width="16" endianness="little">
 				<rom name="mh32m16e119b.u3" size="4194304" crc="14adbd4b" sha1="9896d93c97381dc06b6f044de6c9bd112ca0c94b" offset="000000" />
 			</dataarea>
-			<dataarea name="eeprom" size="0x800">
+			<dataarea name="eeprom" size="0x800" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -2047,12 +2047,12 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u4" value="ROM (on PTS-0120)" />
 			<feature name="u5" value="ROM (on PTS-0120)" />
 			<feature name="slot" value="ws_eeprom" />
-			<dataarea name="rom" size="4194304">
+			<dataarea name="rom" size="4194304" width="16" endianness="little">
 				<!-- these roms are a simple split of mh32m16e119b.u3. Need to be verified -->
 				<rom name="mh16m16e114b.u4" size="2097152" crc="1bed45b0" sha1="46eff2164d8fccac161b0fd1cde8098e3bc08fd6" offset="000000" status="baddump" />
 				<rom name="mh16m16e115b.u5" size="2097152" crc="baeb4a36" sha1="d5d8220dadc41e5dbaa13ac188d642dacbed68c3" offset="2097152" status="baddump" />
 			</dataarea>
-			<dataarea name="eeprom" size="0x800">
+			<dataarea name="eeprom" size="0x800" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -2071,10 +2071,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="4194304">
+			<dataarea name="rom" size="4194304" width="16" endianness="little">
 				<rom name="mh32m256s098b.u3" size="4194304" crc="782877bc" sha1="e6911e5bb0a742ba299e05b20ee81f2faa4854a5" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -2093,10 +2093,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="CY62256VLL SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="4194304">
+			<dataarea name="rom" size="4194304" width="16" endianness="little">
 				<rom name="mh32m256s124b.u3" size="4194304" crc="ecbb46de" sha1="6014ac0b8978e710f26c9cc41180cdf788584743" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -2115,10 +2115,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM (epoxy blob)" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="4194304">
+			<dataarea name="rom" size="4194304" width="16" endianness="little">
 				<rom name="138.u3" size="4194304" crc="0b0f8981" sha1="d24d8cea57c5c487e877eaa523eefb0dd184556d" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -2137,10 +2137,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="16" endianness="little">
 				<rom name="mh16m256s037a.u3" size="2097152" crc="7021d54f" sha1="e93d58ab5819992e54223f5d1c4d5aeb6983d6a3" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -2159,10 +2159,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="16" endianness="little">
 				<rom name="mh16m256s029a.u3" size="2097152" crc="7572e478" sha1="c4a21084bff1f2a63784fe7d11e046f305ad310a" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -2181,10 +2181,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="16" endianness="little">
 				<rom name="mh16m256s023a.u3" size="2097152" crc="8a8c5aa8" sha1="a957111681951eb6a971a6b4f75bca7f89b29628" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -2209,10 +2209,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<feature name="rtc" value="yes" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m256s118b.u3" size="1048576" crc="6adf0e32" sha1="4d4d4a3fde6b1dbbc8f008fbd035fb59624dfba7" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -2237,10 +2237,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
 			<feature name="rtc" value="yes" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m256s127b.u3" size="1048576" crc="be6be690" sha1="2117ed92e8cb4ae61868535f1d4d16851b480890" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -2259,10 +2259,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="CY62256VLL SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="16" endianness="little">
 				<rom name="mh16m256s055a.u3" size="2097152" crc="cd206a9e" sha1="9f8829aa8ea523e8370cbb2acd2acce056bb7958" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -2281,10 +2281,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="524288">
+			<dataarea name="rom" size="524288" width="16" endianness="little">
 				<rom name="mh4m256s010a.u3" size="524288" crc="e385ee88" sha1="d064b94f31b15564c9a3dbd3a68690244ea043ac" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -2303,10 +2303,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m256s096b.u3" size="1048576" crc="440b2630" sha1="3e7492478059d142a6a41b40219eba0c688a8e3f" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -2325,10 +2325,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="16" endianness="little">
 				<rom name="mh16m256s026a.u3" size="2097152" crc="ae83f873" sha1="ae54a1f8916a2d37a1e0c82c5a9b5d8fe0eeae51" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -2342,10 +2342,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 		<info name="alt_title" value="SDガンダム エモーショナルジャム"/>
 		<part name="cart" interface="wswan_cart">
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="16" endianness="little">
 				<rom name="swj-ban006.bin" size="2097152" crc="adfc3048" sha1="b3b4cf8e996c2a1fb149074725dc4b07922b3133" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -2364,10 +2364,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="LP62S256AV SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m256s077a.u3" size="1048576" crc="21eb4c59" sha1="e6899de5b53f73c8978e3330dca0f2daaf95f140" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -2386,10 +2386,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="LP62S256AV SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="16" endianness="little">
 				<rom name="mh16m256s078a.u3" size="2097152" crc="21eb4c59" sha1="80eff574c75c2168fd0991c0efd16f9a9cadc24c" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -2408,10 +2408,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="4194304">
+			<dataarea name="rom" size="4194304" width="16" endianness="little">
 				<rom name="mh32m256s111b.u3" size="4194304" crc="e4eb3ab1" sha1="5e5db8b066e1b41c5c12a2d4ffa97b73ed6c3f03" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -2430,10 +2430,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="16" endianness="little">
 				<rom name="mh16m256s087a.u3" size="2097152" crc="07a3dd46" sha1="fc8b0b9b7efeac54812e7ae54153b7ae0cb9c12f" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -2451,10 +2451,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m1e092a.u3" size="1048576" crc="301436ac" sha1="708288e70b3186f6c0ef07acaef1b50fe6b7ab22" offset="000000" />
 			</dataarea>
-			<dataarea name="eeprom" size="0x80">
+			<dataarea name="eeprom" size="0x80" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -2473,10 +2473,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="LP62S256AV SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="524288">
+			<dataarea name="rom" size="524288" width="16" endianness="little">
 				<rom name="mh4m256s013a.u3" size="524288" crc="1c489351" sha1="d64b9b2d567d1cea5960f64e5bdf83d4514446da" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -2494,10 +2494,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m1e007a.u3" size="1048576" crc="5b76f901" sha1="7324c5939b8b64858c96bd9726f5b5c483a11e22" offset="000000" />
 			</dataarea>
-			<dataarea name="eeprom" size="0x80">
+			<dataarea name="eeprom" size="0x80" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -2516,10 +2516,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="LP62S256AV SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m256s053a.u3" size="1048576" crc="3ad194eb" sha1="0bc88b0affa97225e22c531306e9930ddb8f8905" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -2537,7 +2537,7 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u2" value="empty" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_rom" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m0e063a.u3" size="1048576" crc="8655269e" sha1="4a756dab81e0101475dc2e5494270f3df7dac1e6" offset="000000" />
 			</dataarea>
 		</part>
@@ -2556,10 +2556,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m1e102b.u3" size="1048576" crc="352a570d" sha1="9a087b0e6031e7e5e6d133ac82fecb8faa30816a" offset="000000" />
 			</dataarea>
-			<dataarea name="eeprom" size="0x80">
+			<dataarea name="eeprom" size="0x80" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -2577,7 +2577,7 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u2" value="empty" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_rom" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m0e044a.u3" size="1048576" crc="1263da65" sha1="435f207cce79ad6ac5b564e8a37e0d4395bd3739" offset="000000" />
 			</dataarea>
 		</part>
@@ -2597,10 +2597,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="CY62256VLL SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="16" endianness="little">
 				<rom name="mh16m256s071a.u3" size="2097152" crc="f016dfe1" sha1="e461762566d529d1b103f119da50353902d180d7" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -2618,7 +2618,7 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u2" value="empty" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_rom" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m0e022a.u3" size="1048576" crc="8d83014f" sha1="54dd6e3fe81a8a384a0ffdd7a39211a5de9174c7" offset="000000" />
 			</dataarea>
 		</part>
@@ -2638,10 +2638,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="4194304">
+			<dataarea name="rom" size="4194304" width="16" endianness="little">
 				<rom name="mh32m256s100b.u3" size="4194304" crc="1860b655" sha1="672cfc0e4547b2721d11b67476391b6e6cca81ae" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -2660,10 +2660,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m1ms084a.u3" size="1048576" crc="50b7a742" sha1="be4559d6f48d7cb9550c8776f877c5c9cda0efa1" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x20000">
+			<dataarea name="sram" size="0x20000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -2682,10 +2682,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="16" endianness="little">
 				<rom name="mh16m256s085a.u3" size="2097152" crc="8b74f59a" sha1="2f35d250b8ddeb98ca3a2704a4ad85713f4c71b0" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -2704,10 +2704,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m256s030a.u3" size="1048576" crc="e7c608e5" sha1="96a9ce5e56dc0c9648027ad4454e6f35e88d9a07" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x2000">
+			<dataarea name="sram" size="0x2000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -2726,10 +2726,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="4194304">
+			<dataarea name="rom" size="4194304" width="16" endianness="little">
 				<rom name="mh32m256s042a.u3" size="4194304" crc="ef5b6b82" sha1="7148d750f12b5da9a0efd99f5a5a7ccadecbdf60" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -2747,10 +2747,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
-			<dataarea name="rom" size="4194304">
+			<dataarea name="rom" size="4194304" width="16" endianness="little">
 				<rom name="mh32m1e072a.u3" size="4194304" crc="6f304dca" sha1="65c4c6aaa36328bba5d56419af59af5d3420ed78" offset="000000" />
 			</dataarea>
-			<dataarea name="eeprom" size="0x80">
+			<dataarea name="eeprom" size="0x80" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -2769,10 +2769,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m256s103b.u3" size="1048576" crc="7da6acb9" sha1="ad77d2e8429d5ed926d514d926050086f4edbeee" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -2791,10 +2791,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="CY62256VLL SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="8388608">
+			<dataarea name="rom" size="8388608" width="16" endianness="little">
 				<rom name="mh64m125b.u3" size="8388608" crc="91117d1b" sha1="866c67737a4fbb5f09a0b13bbdb89397bcab1f55" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -2812,10 +2812,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m16e068a.u3" size="1048576" crc="a5643aa3" sha1="9622c65c939f05a9dfae288919ec5bd15c348f14" offset="000000" />
 			</dataarea>
-			<dataarea name="eeprom" size="0x800">
+			<dataarea name="eeprom" size="0x800" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -2833,7 +2833,7 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u2" value="empty" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_rom" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m0e104b.u3" size="1048576" crc="64aaf392" sha1="b25ff8fc79168e439ba913a2cea6195094be9ac2" offset="000000" />
 			</dataarea>
 		</part>
@@ -2852,7 +2852,7 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u2" value="empty" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_rom" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m0e032a.u3" size="1048576" crc="c283ec5f" sha1="9313e6d7090e91cca0304dc450b2f2f87329ae7a" offset="000000" />
 			</dataarea>
 		</part>
@@ -2871,10 +2871,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
-			<dataarea name="rom" size="4194304">
+			<dataarea name="rom" size="4194304" width="16" endianness="little">
 				<rom name="mh32m16e056a.u3" size="4194304" crc="0d5171f0" sha1="858f1f57b5522a1701cc8a0abae43cec948e26a6" offset="000000" />
 			</dataarea>
-			<dataarea name="eeprom" size="0x800">
+			<dataarea name="eeprom" size="0x800" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -2892,7 +2892,7 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u2" value="empty" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_rom" />
-			<dataarea name="rom" size="524288">
+			<dataarea name="rom" size="524288" width="16" endianness="little">
 				<rom name="mh4m0e011a.u3" size="524288" crc="86b56511" sha1="4f739292d11a45490851eaf40c0a7081824ad75a" offset="000000" />
 			</dataarea>
 		</part>
@@ -2911,10 +2911,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u2" value="EEPROM" />
 			<feature name="u3" value="ROM" />
 			<feature name="slot" value="ws_eeprom" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="16" endianness="little">
 				<rom name="mh16m1e082a.u3" size="2097152" crc="812020ef" sha1="4c8166e0632bdb8c098d586a7b1522ed7b63b5f7" offset="000000" />
 			</dataarea>
-			<dataarea name="eeprom" size="0x80">
+			<dataarea name="eeprom" size="0x80" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -2933,10 +2933,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="4194304">
+			<dataarea name="rom" size="4194304" width="16" endianness="little">
 				<rom name="mh32m256s035a.u3" size="4194304" crc="8fc9e145" sha1="cfb877f0988920c8fe4da5cdd7583197799df621" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x8000">
+			<dataarea name="sram" size="0x8000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -2955,10 +2955,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="LP62S256AV SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m256s050a.u3" size="1048576" crc="e252919d" sha1="bb138765346d9f4d77615444d090b1328a59818a" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x2000">
+			<dataarea name="sram" size="0x2000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -2977,10 +2977,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u3" value="ROM" />
 			<feature name="u4" value="BS62LV256TC SRAM" />
 			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="1048576" width="16" endianness="little">
 				<rom name="mh8m256s008a.u3" size="1048576" crc="23bc0309" sha1="cb9454a8277bb2a7d5a6e3b4ddc84194fcbb1231" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x2000">
+			<dataarea name="sram" size="0x2000" width="16" endianness="little">
 			</dataarea>
 		</part>
 	</software>
