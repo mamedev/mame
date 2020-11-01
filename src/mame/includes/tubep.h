@@ -31,9 +31,11 @@ public:
 
 	void tubepb(machine_config &config);
 	void tubep(machine_config &config);
-	void rjammer(machine_config &config);
 
-private:
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	enum
 	{
 		TIMER_TUBEP_SCANLINE,
@@ -106,13 +108,9 @@ private:
 	void ay8910_portB_1_w(uint8_t data);
 	void ay8910_portA_2_w(uint8_t data);
 	void ay8910_portB_2_w(uint8_t data);
-	DECLARE_MACHINE_START(tubep);
-	DECLARE_MACHINE_RESET(tubep);
 	virtual void video_start() override;
 	virtual void video_reset() override;
 	void tubep_palette(palette_device &palette);
-	DECLARE_MACHINE_START(rjammer);
-	DECLARE_MACHINE_RESET(rjammer);
 	void rjammer_palette(palette_device &palette) const;
 	uint32_t screen_update_tubep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_rjammer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -138,6 +136,21 @@ private:
 	void tubep_sound_portmap(address_map &map);
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+};
+
+class rjammer_state : public tubep_state
+{
+public:
+	rjammer_state(const machine_config &mconfig, device_type type, const char *tag) :
+		tubep_state(mconfig, type, tag)
+	{ }
+
+	void rjammer(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 };
 
 #endif // MAME_INCLUDES_TUBEP_H
