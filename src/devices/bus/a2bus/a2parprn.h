@@ -20,6 +20,7 @@
         *spare, SP1-SP5 brought out to pads for wire mods
 
     DIP jumper B1:
+
            no connection  NC   1  16  B   acknowledge latch clock
            no connection  NC   2  15  D   printer ready 1
         synchronised ACK   Y   3  14  C   printer ready 2
@@ -34,7 +35,7 @@
     microsecond may be ignored.  This limitation is not emulated.
 
     The card completely ignores the R/W line.  The PROM driver uses
-    and indexed write to access the C0nX region.  This produces a
+    an indexed write to access the C0nX region.  This produces a
     spurious read, causing data to be latched and triggering a
     delayed strobe pulse.  This is why the delay is important – the
     write needs to happen on the cycle immediately following the

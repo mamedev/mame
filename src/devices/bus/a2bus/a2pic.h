@@ -36,11 +36,11 @@
 
     This card has significant flaws:
     * The strobe pulse begins on the same rising edge of the phase 1
-      clock as the data is latched.  The parallel load input ito the
-      strobe time counter (6A) is delayed slightly, but the load
-      happens on the rising phase 1 clock edge.  This could glitch
-      on a real printer.  MAME always sets the data outputs before
-      starting the strobe pulse.
+      clock as the data is latched.  The parallel load enable input
+      to the strobe time counter (6A) is delayed slightly, but the
+      load happens on the rising phase 1 clock edge.  This could
+      glitch on a real printer.  MAME always sets the data outputs
+      before starting the strobe pulse.
     * Acknowledge is ignored while the strobe output is active.  If
       the printer acknowledges the data before the end of the strobe
       pulse, the card will miss it and wait forever.
