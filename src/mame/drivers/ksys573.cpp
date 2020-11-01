@@ -593,11 +593,11 @@ private:
 	uint32_t m_stage_mask;
 	struct
 	{
-		int DO;
-		int clk;
-		int shift;
-		int state;
-		int bit;
+		int DO = 0;
+		int clk = 0;
+		int shift = 0;
+		int state = 0;
+		int bit = 0;
 	} m_stage_state[ 2 ];
 
 	int m_serial_lamp_bits;
@@ -834,6 +834,7 @@ void ksys573_state::driver_start()
 
 	m_n_security_control = 0;
 	m_control = 0;
+	m_h8_index = 0;
 
 	save_item( NAME( m_n_security_control ) );
 	save_item( NAME( m_control ) );

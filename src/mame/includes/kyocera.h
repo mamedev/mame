@@ -198,6 +198,9 @@ public:
 
 	void tandy200(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<rp5c01_device> m_rtc;
@@ -212,7 +215,6 @@ private:
 	required_memory_region m_rom;
 	required_ioport_array<9> m_y;
 
-	virtual void machine_start() override;
 	memory_region *m_opt_region;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

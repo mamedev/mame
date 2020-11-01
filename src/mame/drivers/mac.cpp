@@ -814,35 +814,6 @@ void mac_state::add_asc(machine_config &config, asc_device::asc_type type)
 	m_asc->add_route(1, "rspeaker", 1.0);
 }
 
-void mac_state::add_pb1xx_screen(machine_config &config)
-{
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60.15);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1260));
-	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	m_screen->set_size(700, 480);
-	m_screen->set_visarea(0, 639, 0, 399);
-	m_screen->set_palette(m_palette);
-}
-
-void mac_state::add_pb1xx_vias(machine_config &config)
-{
-	VIA6522(config, m_via1, 783360);
-	m_via1->readpa_handler().set(FUNC(mac_state::mac_via_in_a));
-	m_via1->readpb_handler().set(FUNC(mac_state::mac_via_in_b_via2pmu));
-	m_via1->writepa_handler().set(FUNC(mac_state::mac_via_out_a));
-	m_via1->writepb_handler().set(FUNC(mac_state::mac_via_out_b_via2pmu));
-	m_via1->cb2_handler().set(FUNC(mac_state::mac_adb_via_out_cb2));
-	m_via1->irq_handler().set(FUNC(mac_state::mac_via_irq));
-
-	VIA6522(config, m_via2, 783360);
-	m_via2->readpa_handler().set(FUNC(mac_state::mac_via2_in_a_pmu));
-	m_via2->readpb_handler().set(FUNC(mac_state::mac_via2_in_b_pmu));
-	m_via2->writepa_handler().set(FUNC(mac_state::mac_via2_out_a_pmu));
-	m_via2->writepb_handler().set(FUNC(mac_state::mac_via2_out_b_pmu));
-	m_via2->irq_handler().set(FUNC(mac_state::mac_via2_irq));
-}
-
 void mac_state::add_nubus(machine_config &config, bool bank1, bool bank2)
 {
 	nubus_device &nubus(NUBUS(config, "nubus", 0));

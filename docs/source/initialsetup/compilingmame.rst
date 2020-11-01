@@ -101,8 +101,9 @@ with MSYS2 and the **pacman** package manager.
   ``mingw-w64-i686-python``.
 * For debugging you may want to install ``gdb``.
 * To link using the LLVM linker (generally much faster than the GNU linker),
-  you'll need ``mingw-w64-x86_64-lld`` for 64-bit builds, or
-  ``mingw-w64-i686-lld`` for 32-bit builds.
+  you'll need ``mingw-w64-x86_64-lld`` and ``mingw-w64-x86_64-libc++`` for
+  64-bit builds, or ``mingw-w64-i686-lld`` and ``mingw-w64-i686-libc++`` for
+  32-bit builds.
 * To build against the portable SDL interfaces, you'll need
   ``mingw-w64-x86_64-SDL2`` and ``mingw-w64-x86_64-SDL2_ttf`` for 64-bit builds,
   or ``mingw-w64-i686-SDL2`` and ``mingw-w64-i686-SDL2_ttf`` for 32-bit builds.

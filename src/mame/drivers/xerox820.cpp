@@ -537,6 +537,8 @@ void xerox820_state::machine_start()
 	save_item(NAME(m_fdc_drq));
 	save_item(NAME(m_8n5));
 	save_item(NAME(m_400_460));
+
+	m_ncset2 = 0;
 }
 
 void xerox820_state::machine_reset()

@@ -2,9 +2,11 @@
 // copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
-        Busicom 141-PF
+Busicom 141-PF
 
-        04/08/2009 Initial driver by Miodrag Milanovic
+2009-08-04 Initial driver by Miodrag Milanovic
+
+Multiply and divide work; addition and subtraction do not.
 
 ****************************************************************************/
 
@@ -219,6 +221,7 @@ void busicom_state::machine_start()
 
 void busicom_state::machine_reset()
 {
+	m_timer = 0;
 	m_drum_index = 0;
 	m_keyboard_shifter = 0;
 	m_printer_shifter = 0;
@@ -265,4 +268,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY                          FULLNAME          FLAGS
-COMP( 1974, busicom, 0,      0,      busicom, busicom, busicom_state, empty_init, "Business Computer Corporation", "Busicom 141-PF", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1974, busicom, 0,      0,      busicom, busicom, busicom_state, empty_init, "Business Computer Corporation", "Busicom 141-PF", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

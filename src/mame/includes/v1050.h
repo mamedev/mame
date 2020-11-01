@@ -94,6 +94,8 @@ public:
 		m_attr_ram(*this, "attr_ram"),
 		m_int_mask(0),
 		m_int_state(0),
+		m_fdc_irq(0),
+		m_fdc_drq(0),
 		m_rtc_ppi_pa(0),
 		m_rtc_ppi_pc(0)
 	{

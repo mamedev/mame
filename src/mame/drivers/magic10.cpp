@@ -1033,6 +1033,28 @@ ROM_START( magic102 )
 	ROM_LOAD( "7.u32",        0x00000, 0x40000, CRC(47804af7) SHA1(602dc0361869b52532e2adcb0de3cbdd042761b3) )
 ROM_END
 
+ROM_START( magic102a )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "2.b3.u3", 0x00000, 0x20000, CRC(a2bf7d5b) SHA1(72f5c73ab7c7c44ed81ecfb88bcc8f4c7146c619) )
+	ROM_LOAD16_BYTE( "3.b3.u2", 0x00001, 0x20000, CRC(97b4defe) SHA1(ebd63b1e589708d10a3c04e4ecd73161cc3aa386) )
+
+	ROM_REGION( 0x10000, "mcu", 0 ) // h8/330 HD6473308cp10 with internal ROM
+	ROM_LOAD( "mcu", 0x00000, 0x10000, NO_DUMP )
+
+	ROM_REGION( 0x80000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "7.u35", 0x00000, 0x20000, CRC(82cef471) SHA1(c9649e295336863c713ddf5615f0e8cacdf218e7) )
+	ROM_LOAD( "6.u36", 0x20000, 0x20000, CRC(dc064229) SHA1(511af9036dbd0f3c6f668d46e4971ee0bcaaf816) )
+	ROM_LOAD( "5.u37", 0x40000, 0x20000, CRC(efe2f609) SHA1(e18be34f3b67669a8852b88bda6ba85227470cc1) )
+	ROM_LOAD( "4.u38", 0x60000, 0x20000, CRC(b2febd06) SHA1(a57879c89d240ab4287e285d8a50afb3fe903376) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) // ADPCM samples
+	ROM_LOAD( "1.2.u32", 0x00000, 0x40000, CRC(47804af7) SHA1(602dc0361869b52532e2adcb0de3cbdd042761b3) )
+
+	ROM_REGION( 0x0400, "plds", 0 ) // PLDs
+	ROM_LOAD( "gal22cv10.u22", 0x0000, 0x02dd, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u54",  0x02dd, 0x0117, NO_DUMP )
+ROM_END
+
 /*
   Super Pool (ver. 1.2)
 
@@ -1661,16 +1683,17 @@ void magic10_state::init_altaten()
 ******************************/
 
 //     YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT           ROT   COMPANY                 FULLNAME                          FLAGS                 LAYOUT
-GAMEL( 1995, magic10,  0,        magic10,  magic10,  magic10_state, init_magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.55)",        0,                    layout_sgsafari )
-GAMEL( 1995, magic10a, magic10,  magic10,  magic10,  magic10_state, init_magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.54)",        0,                    layout_sgsafari )
-GAMEL( 1995, magic10b, magic10,  magic10a, magic10,  magic10_state, init_magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.45)",        0,                    layout_sgsafari )
-GAMEL( 1995, magic10c, magic10,  magic10a, magic10,  magic10_state, init_magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.15)",        0,                    layout_sgsafari )
-GAME(  1997, magic102, 0,        magic102, magic102, magic10_state, init_magic102, ROT0, "ABM Games",            "Magic's 10 2 (ver. 1.1)",        MACHINE_NOT_WORKING )
-GAME(  1998, suprpool, 0,        magic102, magic102, magic10_state, init_suprpool, ROT0, "ABM Games",            "Super Pool (ver. 1.2)",          MACHINE_NOT_WORKING )
-GAME(  1996, hotslot,  0,        hotslot,  hotslot,  magic10_state, init_hotslot,  ROT0, "ABM Games",            "Hot Slot (ver. 05.01)",          MACHINE_NOT_WORKING )
-GAME(  1999, mcolors,  0,        magic102, magic102, magic10_state, init_magic102, ROT0, "ABM Games",            "Magic Colors (ver. 1.7a)",       MACHINE_NOT_WORKING )
-GAME(  1999, mcolorsa, mcolors,  magic102, magic102, magic10_state, init_magic102, ROT0, "ABM Games",            "Magic Colors (ver. 1.6)",        MACHINE_NOT_WORKING )
-GAMEL( 1996, sgsafari, 0,        sgsafari, sgsafari, magic10_state, init_sgsafari, ROT0, "New Impeuropex Corp.", "Super Gran Safari (ver. 3.11)",  0,                    layout_sgsafari )
-GAMEL( 1995, musicsrt, 0,        magic10a, musicsrt, magic10_state, init_magic10,  ROT0, "ABM Games",            "Music Sort (ver. 2.02)", 0,                            layout_musicsrt )
-GAME(  1998, lunaprk,  0,        magic102, magic102, magic10_state, init_suprpool, ROT0, "ABM Games",            "Luna Park (ver. 1.2)",           MACHINE_NOT_WORKING )
-GAME(  1999, altaten,  0,        magic102, magic102, magic10_state, init_altaten,  ROT0, "<unknown>",            "Alta Tensione (ver. 2.01a)",     MACHINE_NOT_WORKING )
+GAMEL( 1995, magic10,   0,        magic10,  magic10,  magic10_state, init_magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.55)",        0,                    layout_sgsafari )
+GAMEL( 1995, magic10a,  magic10,  magic10,  magic10,  magic10_state, init_magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.54)",        0,                    layout_sgsafari )
+GAMEL( 1995, magic10b,  magic10,  magic10a, magic10,  magic10_state, init_magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.45)",        0,                    layout_sgsafari )
+GAMEL( 1995, magic10c,  magic10,  magic10a, magic10,  magic10_state, init_magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.15)",        0,                    layout_sgsafari )
+GAME(  1997, magic102,  0,        magic102, magic102, magic10_state, init_magic102, ROT0, "ABM Games",            "Magic's 10 2 (ver. 1.1)",        MACHINE_NOT_WORKING )
+GAME(  1997, magic102a, magic102, magic102, magic102, magic10_state, init_magic102, ROT0, "ABM Games",            "Magic's 10 2 (ver. BETA3)",      MACHINE_NOT_WORKING )
+GAME(  1998, suprpool,  0,        magic102, magic102, magic10_state, init_suprpool, ROT0, "ABM Games",            "Super Pool (ver. 1.2)",          MACHINE_NOT_WORKING )
+GAME(  1996, hotslot,   0,        hotslot,  hotslot,  magic10_state, init_hotslot,  ROT0, "ABM Games",            "Hot Slot (ver. 05.01)",          MACHINE_NOT_WORKING )
+GAME(  1999, mcolors,   0,        magic102, magic102, magic10_state, init_magic102, ROT0, "ABM Games",            "Magic Colors (ver. 1.7a)",       MACHINE_NOT_WORKING )
+GAME(  1999, mcolorsa,  mcolors,  magic102, magic102, magic10_state, init_magic102, ROT0, "ABM Games",            "Magic Colors (ver. 1.6)",        MACHINE_NOT_WORKING )
+GAMEL( 1996, sgsafari,  0,        sgsafari, sgsafari, magic10_state, init_sgsafari, ROT0, "New Impeuropex Corp.", "Super Gran Safari (ver. 3.11)",  0,                    layout_sgsafari )
+GAMEL( 1995, musicsrt,  0,        magic10a, musicsrt, magic10_state, init_magic10,  ROT0, "ABM Games",            "Music Sort (ver. 2.02)", 0,                            layout_musicsrt )
+GAME(  1998, lunaprk,   0,        magic102, magic102, magic10_state, init_suprpool, ROT0, "ABM Games",            "Luna Park (ver. 1.2)",           MACHINE_NOT_WORKING )
+GAME(  1999, altaten,   0,        magic102, magic102, magic10_state, init_altaten,  ROT0, "<unknown>",            "Alta Tensione (ver. 2.01a)",     MACHINE_NOT_WORKING )

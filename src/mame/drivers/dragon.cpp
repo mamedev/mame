@@ -23,17 +23,18 @@
 #include "imagedev/floppy.h"
 #include "bus/rs232/rs232.h"
 
+#include "bus/coco/coco_gmc.h"
+#include "bus/coco/coco_orch90.h"
+#include "bus/coco/coco_pak.h"
+#include "bus/coco/coco_psg.h"
+#include "bus/coco/coco_ram.h"
+#include "bus/coco/coco_ssc.h"
+#include "bus/coco/coco_stecomp.h"
 #include "bus/coco/dragon_amtor.h"
 #include "bus/coco/dragon_fdc.h"
 #include "bus/coco/dragon_jcbsnd.h"
 #include "bus/coco/dragon_jcbspch.h"
 #include "bus/coco/dragon_sprites.h"
-#include "bus/coco/coco_pak.h"
-#include "bus/coco/coco_ssc.h"
-#include "bus/coco/coco_ram.h"
-#include "bus/coco/coco_orch90.h"
-#include "bus/coco/coco_gmc.h"
-#include "bus/coco/coco_psg.h"
 
 
 //**************************************************************************
@@ -205,19 +206,20 @@ INPUT_PORTS_END
 
 void dragon_cart(device_slot_interface &device)
 {
+	device.option_add_internal("amtor", DRAGON_AMTOR);
+	device.option_add("ccpsg", COCO_PSG);
 	device.option_add("dragon_fdc", DRAGON_FDC);
-	device.option_add("premier_fdc", PREMIER_FDC);
-	device.option_add("sdtandy_fdc", SDTANDY_FDC);
+	device.option_add("gmc", COCO_PAK_GMC);
 	device.option_add("jcbsnd", DRAGON_JCBSND);
 	device.option_add("jcbspch", DRAGON_JCBSPCH);
+	device.option_add("orch90", COCO_ORCH90);
+	device.option_add("pak", COCO_PAK);
+	device.option_add("premier_fdc", PREMIER_FDC);
+	device.option_add("ram", COCO_PAK_RAM);
+	device.option_add("sdtandy_fdc", SDTANDY_FDC);
 	device.option_add("sprites", DRAGON_SPRITES);
 	device.option_add("ssc", COCO_SSC);
-	device.option_add("ram", COCO_PAK_RAM);
-	device.option_add("orch90", COCO_ORCH90);
-	device.option_add("gmc", COCO_PAK_GMC);
-	device.option_add("pak", COCO_PAK);
-	device.option_add("ccpsg", COCO_PSG);
-	device.option_add_internal("amtor", DRAGON_AMTOR);
+	device.option_add("stecomp", COCO_STEREO_COMPOSER);
 }
 
 FLOPPY_FORMATS_MEMBER( dragon_alpha_state::dragon_formats )

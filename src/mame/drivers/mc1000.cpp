@@ -39,6 +39,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 #define SCREEN_TAG      "screen"
 #define Z80_TAG         "u13"
 #define AY8910_TAG      "u21"
@@ -109,8 +111,8 @@ private:
 
 	/* memory state */
 	int m_rom0000;
-	int m_mc6845_bank;
-	int m_mc6847_bank;
+	uint8_t m_mc6845_bank;
+	uint8_t m_mc6847_bank;
 
 	/* keyboard state */
 	int m_keylatch;
@@ -458,6 +460,8 @@ void mc1000_state::machine_start()
 	membank("bank1")->set_entry(1);
 
 	m_rom0000 = 1;
+	m_mc6845_bank = 0;
+	m_mc6847_bank = 0;
 
 	membank("bank2")->configure_entry(0, m_banked_ram.get() + 0x2000);
 	membank("bank2")->configure_entry(1, m_mc6845_video_ram);
@@ -602,6 +606,8 @@ ROM_START( mc1000 )
 	ROM_LOAD( "mc1000.ic17", 0x0000, 0x2000, CRC(8e78d80d) SHA1(9480270e67a5db2e7de8bc5c8b9e0bb210d4142b) )
 	ROM_LOAD( "mc1000.ic12", 0x2000, 0x2000, CRC(750c95f0) SHA1(fd766f5ea4481ef7fd4df92cf7d8397cc2b5a6c4) )
 ROM_END
+
+} // Anonymous namespace
 
 
 /* System Drivers */

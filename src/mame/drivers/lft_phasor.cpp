@@ -37,12 +37,11 @@ protected:
 
 	void prg_map(address_map &map);
 	void data_map(address_map &map);
-	void io_map(address_map &map);
-
-	uint8_t port_r(offs_t offset);
-	void port_w(offs_t offset, uint8_t data);
 
 	void init_palette(palette_device &palette) const;
+
+	void port_b_w(uint8_t data);
+
 	void video_update();
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -51,17 +50,7 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	enum port : uint8_t
-	{
-		PORT_A,
-		PORT_B,
-		PORT_C,
-		PORT_D,
-
-		PORT_COUNT
-	};
-
-	uint8_t m_ports[PORT_COUNT];
+	uint8_t m_gpio_b;
 
 	uint64_t m_last_cycles;
 	uint64_t m_frame_start_cycle;
@@ -73,36 +62,6 @@ protected:
 	uint32_t m_sample_y;
 	std::unique_ptr<uint8_t[]> m_samples;
 };
-
-//**************************************************************************
-//  GPIO
-//**************************************************************************
-
-uint8_t lft_phasor_state::port_r(offs_t offset)
-{
-	return m_ports[offset];
-}
-
-void lft_phasor_state::port_w(offs_t offset, uint8_t data)
-{
-	m_ports[offset] = data;
-
-	switch (offset)
-	{
-	case AVR8_IO_PORTB:
-		video_update();
-		break;
-
-	case AVR8_IO_PORTC:
-		m_dac->write(data & 0x3f);
-		break;
-
-	case AVR8_IO_PORTD:
-		//video_update();
-		m_latched_sample = data;
-		break;
-	}
-}
 
 //**************************************************************************
 //  MEMORY
@@ -118,9 +77,14 @@ void lft_phasor_state::data_map(address_map &map)
 	map(0x0100, 0x04ff).ram();
 }
 
-void lft_phasor_state::io_map(address_map &map)
+//**************************************************************************
+//  GPIO
+//**************************************************************************
+
+void lft_phasor_state::port_b_w(uint8_t data)
 {
-	map(AVR8_IO_PORTA, AVR8_IO_PORTD).rw(FUNC(lft_phasor_state::port_r), FUNC(lft_phasor_state::port_w));
+	m_gpio_b = data;
+	video_update();
 }
 
 //**************************************************************************
@@ -168,7 +132,7 @@ void lft_phasor_state::video_update()
 
 	if (m_last_cycles < cycles && !m_in_blanking)
 	{
-		const uint8_t shift = (m_ports[PORT_B] & 4);
+		const uint8_t shift = (m_gpio_b & 4);
 		uint32_t sample_pix = m_sample_y * 1135 + m_sample_x;
 		for (uint64_t idx = m_last_cycles; idx < cycles && sample_pix < SAMPLES_PER_FRAME; idx++)
 		{
@@ -206,7 +170,7 @@ void lft_phasor_state::machine_start()
 {
 	m_samples = std::make_unique<uint8_t[]>(SAMPLES_PER_FRAME);
 
-	save_item(NAME(m_ports));
+	save_item(NAME(m_gpio_b));
 	save_item(NAME(m_last_cycles));
 	save_item(NAME(m_frame_start_cycle));
 
@@ -220,7 +184,7 @@ void lft_phasor_state::machine_start()
 
 void lft_phasor_state::machine_reset()
 {
-	memset(m_ports, 0, PORT_COUNT);
+	m_gpio_b = 0;
 
 	m_frame_start_cycle = 0;
 	m_last_cycles = 0;
@@ -238,8 +202,11 @@ void lft_phasor_state::phasor(machine_config &config)
 	ATMEGA88(config, m_maincpu, MASTER_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &lft_phasor_state::prg_map);
 	m_maincpu->set_addrmap(AS_DATA, &lft_phasor_state::data_map);
-	m_maincpu->set_addrmap(AS_IO, &lft_phasor_state::io_map);
 	m_maincpu->set_eeprom_tag("eeprom");
+	m_maincpu->gpio_in<AVR8_IO_PORTB>().set([this]() { return m_gpio_b; });
+	m_maincpu->gpio_out<AVR8_IO_PORTB>().set(FUNC(lft_phasor_state::port_b_w));
+	m_maincpu->gpio_out<AVR8_IO_PORTC>().set([this](uint8_t data) { m_dac->write(data & 0x3f); });
+	m_maincpu->gpio_out<AVR8_IO_PORTD>().set([this](uint8_t data) { m_latched_sample = data; });
 
 	PALETTE(config, m_palette, FUNC(lft_phasor_state::init_palette), 0x10);
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

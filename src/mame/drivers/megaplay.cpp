@@ -59,6 +59,9 @@ public:
 	DECLARE_READ_LINE_MEMBER(start1_r);
 	DECLARE_READ_LINE_MEMBER(start2_r);
 
+protected:
+	virtual void machine_reset() override;
+
 private:
 
 	uint16_t extra_ram_r(offs_t offset);
@@ -81,7 +84,6 @@ private:
 	uint8_t vdp1_count_r(offs_t offset);
 
 	DECLARE_VIDEO_START(megplay);
-	DECLARE_MACHINE_RESET(megaplay);
 	uint32_t screen_update_megplay(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void megaplay_bios_io_map(address_map &map);
@@ -648,12 +650,12 @@ uint32_t mplay_state::screen_update_megplay(screen_device &screen, bitmap_rgb32 
 	return 0;
 }
 
-MACHINE_RESET_MEMBER(mplay_state,megaplay)
+void mplay_state::machine_reset()
 {
 	m_bios_mode = MP_ROM;
 	m_bios_bank_addr = 0;
 	m_readpos = 1;
-	MACHINE_RESET_CALL_MEMBER(megadriv);
+	md_base_state::machine_reset();
 }
 
 void mplay_state::megaplay(machine_config &config)
@@ -1016,7 +1018,7 @@ didn't have original Sega part numbers it's probably a converted TWC cart
 /* 06 */ GAME( 1993, mp_bio,   megaplay, megaplay, mp_bio,   mplay_state, init_megaplay, ROT0, "Sega", "Bio-hazard Battle (Mega Play)",       MACHINE_IMPERFECT_GRAPHICS )
 /* 07 */ GAME( 1993, mp_soni2, megaplay, megaplay, mp_soni2, mplay_state, init_megaplay, ROT0, "Sega", "Sonic The Hedgehog 2 (Mega Play)",    MACHINE_IMPERFECT_GRAPHICS )
 /* 08 - Columns 3? see below */
-/* 09 */ GAME( 1993, mp_shnb3, megaplay, megaplay, mp_shnb3, mplay_state, init_megaplay, ROT0, "Sega", "Shinobi III (Mega Play)",             MACHINE_IMPERFECT_GRAPHICS )
+/* 09 */ GAME( 1993, mp_shnb3, megaplay, megaplay, mp_shnb3, mplay_state, init_megaplay, ROT0, "Sega", "Shinobi III (Mega Play)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 /* 10 */ GAME( 1993, mp_gunhe, megaplay, megaplay, mp_gunhe, mplay_state, init_megaplay, ROT0, "Sega", "Gunstar Heroes (Mega Play)",          MACHINE_IMPERFECT_GRAPHICS )
 /* 11 */ GAME( 1993, mp_mazin, megaplay, megaplay, mp_mazin, mplay_state, init_megaplay, ROT0, "Sega", "Mazin Wars / Mazin Saga (Mega Play)", MACHINE_IMPERFECT_GRAPHICS )
 

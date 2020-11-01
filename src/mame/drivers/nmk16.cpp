@@ -5273,6 +5273,7 @@ void nmk16_state::init_tharrier()
 	m_okibank[0]->configure_entries(0, 4, memregion("oki1")->base() + 0x20000, 0x20000);
 	m_okibank[1]->configure_entries(0, 4, memregion("oki2")->base() + 0x20000, 0x20000);
 	save_item(NAME(m_prot_count));
+	m_prot_count = 0;
 }
 
 void nmk16_state::init_hachamf_prot()

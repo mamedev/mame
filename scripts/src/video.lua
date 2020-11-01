@@ -353,6 +353,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/hd61202.h,VIDEOS["HD61202"] = true
+--------------------------------------------------
+
+if (VIDEOS["HD61202"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/hd61202.cpp",
+		MAME_DIR .. "src/devices/video/hd61202.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/hd61603.h,VIDEOS["HD61603"] = true
 --------------------------------------------------
 

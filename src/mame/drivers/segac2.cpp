@@ -89,6 +89,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 #define XL1_CLOCK           XTAL(640'000)
 #define XL2_CLOCK           XTAL(53'693'175)
 
@@ -107,6 +109,7 @@ public:
 		, m_paletteram(*this, "paletteram")
 		, m_upd_region(*this, "upd")
 		, m_prot_func(*this)
+		, m_sound_banks(0)
 		, m_upd7759(*this, "upd")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
@@ -2623,6 +2626,7 @@ void segac2_state::init_pclubjv5()
 }
 
 
+} // Anonymous namespace
 
 /******************************************************************************
     Game Drivers

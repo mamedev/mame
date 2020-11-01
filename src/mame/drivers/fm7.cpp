@@ -1875,6 +1875,7 @@ void fm7_state::init_fm7()
 	m_subtimer = timer_alloc(TIMER_FM7_SUBTIMER_IRQ);
 	m_keyboard_timer = timer_alloc(TIMER_FM7_KEYBOARD_POLL);
 	m_fm77av_vsync_timer = timer_alloc(TIMER_FM77AV_VSYNC);
+	m_init_rom_en = 0;
 }
 
 MACHINE_START_MEMBER(fm7_state,fm7)

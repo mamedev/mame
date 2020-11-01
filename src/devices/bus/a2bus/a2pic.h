@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
-/*********************************************************************
+/***********************************************************************
 
     Apple II Parallel Interface Card (670-0021)
 
@@ -34,7 +34,18 @@
 
         *wired to 500ns strobe but connector hole is blocked
 
-*********************************************************************/
+    This card has significant flaws:
+    * The strobe pulse begins on the same rising edge of the phase 1
+      clock as the data is latched.  The parallel load enable input
+      to the strobe time counter (6A) is delayed slightly, but the
+      load happens on the rising phase 1 clock edge.  This could
+      glitch on a real printer.  MAME always sets the data outputs
+      before starting the strobe pulse.
+    * Acknowledge is ignored while the strobe output is active.  If
+      the printer acknowledges the data before the end of the strobe
+      pulse, the card will miss it and wait forever.
+
+***********************************************************************/
 #ifndef MAME_BUS_A2BUS_A2PIC_H
 #define MAME_BUS_A2BUS_A2PIC_H
 

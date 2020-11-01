@@ -787,16 +787,6 @@ uint8_t mac_state::mac_via_in_a()
 	}
 }
 
-uint8_t mac_state::mac_via_in_a_pmu()
-{
-//  printf("%s VIA1 IN_A\n", machine().describe_context().c_str());
-
-	#if LOG_ADB
-//  printf("Read PM data %x\n", m_pm_data_recv);
-	#endif
-	return m_macadb->get_pm_data_recv();
-}
-
 uint8_t mac_state::mac_via_in_b()
 {
 	int val = 0;
@@ -858,32 +848,6 @@ uint8_t mac_state::mac_via_in_b_ii()
 	return val;
 }
 
-uint8_t mac_state::mac_via_in_b_via2pmu()
-{
-	int val = 0;
-	// TODO: is this valid for VIA2 PMU machines?
-	/* video beam in display (! VBLANK && ! HBLANK basically) */
-
-	if (m_screen->vpos() >= MAC_V_VIS)
-		val |= 0x40;
-
-
-//  printf("%s VIA1 IN_B = %02x\n", machine().describe_context().c_str(), val);
-
-	return val;
-}
-
-uint8_t mac_state::mac_via_in_b_pmu()
-{
-	int val = 0;
-//  printf("Read VIA B: PM_ACK %x\n", m_pm_ack);
-	val = 0x80 | 0x04 | m_macadb->get_pm_ack();   // SCC wait/request (bit 2 must be set at 900c1a or startup tests always fail)
-
-//  printf("%s VIA1 IN_B = %02x\n", machine().describe_context().c_str(), val);
-
-	return val;
-}
-
 void mac_state::mac_via_out_a(uint8_t data)
 {
 //  printf("%s VIA1 OUT A: %02x\n", machine().describe_context().c_str(), data);
@@ -891,16 +855,6 @@ void mac_state::mac_via_out_a(uint8_t data)
 	set_scc_waitrequest((data & 0x80) >> 7);
 	m_screen_buffer = (data & 0x40) >> 6;
 	sony_set_sel_line(m_fdc.target(), (data & 0x20) >> 5);
-}
-
-void mac_state::mac_via_out_a_pmu(uint8_t data)
-{
-//  printf("%s VIA1 OUT A: %02x\n", machine().describe_context().c_str(), data);
-
-	#if LOG_ADB
-//  printf("%02x to PM\n", data);
-	#endif
-	m_macadb->set_pm_data_send(data);
 }
 
 void mac_state::mac_via_out_b(uint8_t data)
@@ -954,19 +908,6 @@ void mac_state::mac_via_out_b_cdadb(uint8_t data)
 	#endif
 	m_cuda->set_byteack((data&0x10) ? 1 : 0);
 	m_cuda->set_tip((data&0x20) ? 1 : 0);
-}
-
-void mac_state::mac_via_out_b_via2pmu(uint8_t data)
-{
-//  printf("%s VIA1 OUT B: %02x\n", machine().describe_context().c_str(), data);
-}
-
-void mac_state::mac_via_out_b_pmu(uint8_t data)
-{
-//  printf("%s VIA1 OUT B: %02x\n", machine().describe_context().c_str(), data);
-
-	sony_set_sel_line(m_fdc.target(), (data & 0x20) >> 5);
-	m_macadb->pmu_req_w(data & 1);
 }
 
 WRITE_LINE_MEMBER(mac_state::mac_via_irq)
@@ -1062,11 +1003,6 @@ uint8_t mac_state::mac_via2_in_a()
 	return result;
 }
 
-uint8_t mac_state::mac_via2_in_a_pmu()
-{
-	return m_macadb->get_pm_data_recv();
-}
-
 uint8_t mac_state::mac_via2_in_b()
 {
 //  logerror("%s VIA2 IN B\n", machine().describe_context());
@@ -1084,29 +1020,9 @@ uint8_t mac_state::mac_via2_in_b()
 	return 0xcf;        // indicate no NuBus transaction error
 }
 
-uint8_t mac_state::mac_via2_in_b_pmu()
-{
-//  logerror("%s VIA2 IN B\n", machine().describe_context());
-
-	if (m_macadb->get_pm_ack() == 2)
-	{
-		return 0xcf;
-	}
-	else
-	{
-		return 0xcd;
-	}
-}
-
 void mac_state::mac_via2_out_a(uint8_t data)
 {
 //  logerror("%s VIA2 OUT A: %02x\n", machine().describe_context(), data);
-}
-
-void mac_state::mac_via2_out_a_pmu(uint8_t data)
-{
-//  logerror("%s VIA2 OUT A: %02x\n", machine().describe_context(), data);
-	m_macadb->set_pm_data_send(data);
 }
 
 void mac_state::mac_via2_out_b(uint8_t data)
@@ -1121,12 +1037,6 @@ void mac_state::mac_via2_out_b(uint8_t data)
 		m68000_base_device *m68k = downcast<m68000_base_device *>(m_maincpu.target());
 		m68k->set_hmmu_enable((data & 0x8) ? M68K_HMMU_DISABLE : M68K_HMMU_ENABLE_II);
 	}
-}
-
-void mac_state::mac_via2_out_b_pmu(uint8_t data)
-{
-//  logerror("%s VIA2 OUT B PMU: %02x\n", machine().describe_context(), data);
-	m_macadb->pmu_req_w((data>>2) & 1);
 }
 
 // This signal is generated internally on RBV, V8, Sonora, VASP, Eagle, etc.

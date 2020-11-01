@@ -526,6 +526,7 @@ void nbmj8891_state::video_start()
 	memset(m_videoram1.get(), 0xff, (width * height * sizeof(uint8_t)));
 	m_gfxdraw_mode = 1;
 	m_screen_refresh = 1;
+	m_blitter_src_addr = 0;
 
 	common_save_state();
 	save_pointer(NAME(m_videoram1), width * height);

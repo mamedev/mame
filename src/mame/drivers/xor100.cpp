@@ -443,6 +443,7 @@ void xor100_state::machine_start()
 	int banks = m_ram->size() / 0x10000;
 	uint8_t *ram = m_ram->pointer();
 	uint8_t *rom = m_rom->base();
+	m_bank = 0;
 
 	/* setup memory banking */
 	membank("bank1")->configure_entries(1, banks, ram, 0x10000);

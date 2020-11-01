@@ -5124,6 +5124,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/vpoker.cpp",
 	MAME_DIR .. "src/mame/drivers/vroulet.cpp",
 	MAME_DIR .. "src/mame/drivers/wildpkr.cpp",
+	MAME_DIR .. "src/mame/drivers/winbingo.cpp",
 	MAME_DIR .. "src/mame/drivers/wms.cpp",
 	MAME_DIR .. "src/mame/drivers/xtom3d.cpp",
 	MAME_DIR .. "src/mame/drivers/xyonix.cpp",

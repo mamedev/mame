@@ -36,6 +36,9 @@ void advision_state::machine_start()
 	m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x0000, 0x03ff, "bank1");
 	m_bank1->set_entry(0);
 
+	m_sound_d = 0;
+	m_sound_g = 0;
+
 	/* allocate external RAM */
 	m_ext_ram.resize(0x400);
 	save_item(NAME(m_ext_ram));

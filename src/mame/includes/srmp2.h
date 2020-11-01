@@ -41,10 +41,10 @@ private:
 	required_region_ptr<uint8_t> m_adpcm_rom;
 	optional_memory_bank m_mainbank;
 
-	int m_color_bank;
-	int m_gfx_bank;
-	int m_adpcm_bank;
-	int m_adpcm_data;
+	uint8_t m_color_bank;
+	uint8_t m_gfx_bank;
+	uint8_t m_adpcm_bank;
+	uint8_t m_adpcm_data;
 	uint32_t m_adpcm_sptr;
 	uint32_t m_adpcm_eptr;
 	iox_t m_iox;

@@ -498,6 +498,7 @@ lb186.cpp
 lbpc.cpp
 lc80.cpp
 lcmate2.cpp
+leapfrog_iquest.cpp
 leapfrog_leappad.cpp
 leapster.cpp
 learnwin.cpp
@@ -547,6 +548,8 @@ mdisk.cpp
 mdt60.cpp
 megadriv.cpp
 megadriv_rad.cpp
+megadriv_sunplus_hybrid.cpp
+megadriv_vt_hybrid.cpp
 mekd1.cpp
 mekd2.cpp
 mekd3.cpp
@@ -733,6 +736,7 @@ pdt3100.cpp
 pecom.cpp
 pegasus.cpp
 pencil2.cpp
+pensebem.cpp
 pentagon.cpp
 peoplepc.cpp
 perq.cpp

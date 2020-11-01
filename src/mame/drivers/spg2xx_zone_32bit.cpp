@@ -479,6 +479,8 @@ void zon32bit_state::machine_start()
 {
 	spg2xx_game_state::machine_start();
 
+	m_basebank = 0;
+
 	save_item(NAME(m_porta_dat));
 	save_item(NAME(m_portb_dat));
 	save_item(NAME(m_portc_dat));

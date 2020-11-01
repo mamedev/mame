@@ -24,9 +24,13 @@ dio16_98620_device::dio16_98620_device(const machine_config &mconfig, const char
 }
 
 dio16_98620_device::dio16_98620_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, type, tag, owner, clock),
-	device_dio32_card_interface(mconfig, *this),
-	m_irq_state(false)
+	device_t{mconfig, type, tag, owner, clock},
+	device_dio32_card_interface{mconfig, *this},
+	m_installed_io{false},
+	m_control{0},
+	m_data{0},
+	m_irq_state{false},
+	m_dmar {false}
 {
 }
 
@@ -52,7 +56,7 @@ void dio16_98620_device::device_start()
 	save_item(NAME(m_control));
 	save_item(NAME(m_data));
 	save_item(NAME(m_irq_state));
-	save_item(NAME(dmar));
+	save_item(NAME(m_dmar));
 }
 
 void dio16_98620_device::device_reset()
@@ -213,7 +217,7 @@ void dio16_98620_device::update_ctrl(const int channel, const uint16_t data, con
 		m_regs[channel].subcount = m_regs[channel].tsz-1;
 		m_regs[channel].armed = true;
 		m_regs[channel].irq = false;
-		if (dmar[channel])
+		if (m_dmar[channel])
 			dma_transfer(channel);
 
 	}
@@ -354,7 +358,7 @@ void dio16_98620_device::dma_transfer(int channel)
 WRITE_LINE_MEMBER(dio16_98620_device::dmar0_in)
 {
 	LOG("%s: %d\n", __FUNCTION__, state);
-	dmar[0] = state;
+	m_dmar[0] = state;
 	if (!state)
 		return;
 
@@ -364,7 +368,7 @@ WRITE_LINE_MEMBER(dio16_98620_device::dmar0_in)
 WRITE_LINE_MEMBER(dio16_98620_device::dmar1_in)
 {
 	LOG("%s: %d\n", __FUNCTION__, state);
-	dmar[1] = state;
+	m_dmar[1] = state;
 
 	if (!state)
 		return;
