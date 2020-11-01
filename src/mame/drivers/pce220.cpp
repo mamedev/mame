@@ -214,7 +214,7 @@ HD61202_UPDATE_CB(pce220_state::hd61202_update)
 
 	static const uint16_t lcd_symbol_bits[] =
 	{
-		//BUSY  CAPS  KANA  SYO   2ndF   DE     G     RAD    CONST   M     E     BATT   RUN    PRO    CASL   TEXT   STAT   PRINT
+		//BUSY  CAPS  KANA  SHO   2ndF   DE     G     RAD    CONST   M     E     BATT   RUN    PRO    CASL   TEXT   STAT   PRINT
 		480,    481,  482,  483,  484,  2534,  2533,  2532,  2531, 2530,  2529,  2528,  2022,  2021,  2020,  2019,  4069,  4070
 	};
 
@@ -245,7 +245,7 @@ HD61202_UPDATE_CB(pcg815_state::hd61202_1_update)
 
 	static const uint16_t lcd_symbol_bits[] =
 	{
-		//BUSY  CAPS   KANA   SYO    2ndF    DE     G     RAD    CONST   M      E     BATT   RUN   PRO   CASL  TEXT  STAT  PRINT
+		//BUSY  CAPS   KANA   SHO    2ndF    DE     G     RAD    CONST   M      E     BATT   RUN   PRO   CASL  TEXT  STAT  PRINT
 		504,    2555,  2553,  2552,  2556,  3068,  3067,  3066,  2554,  3065,  1529,  3576,  505,  506,  507,  510,  509,  3064
 	};
 
@@ -311,7 +311,7 @@ SED1560_UPDATE_CB(pcg850v_state::sed1560_update)
 
 	static const uint16_t lcd_symbol_bits[] =
 	{
-		//BUSY   BATT   RUN    PRO    TEXT   CASL   STAT   2ndF    M     CAPS   KANA   SYO     DE     G     RAD    CONST  PRINT
+		//BUSY   BATT   RUN    PRO    TEXT   CASL   STAT   2ndF    M     CAPS   KANA   SHO     DE     G     RAD    CONST  PRINT
 		7798,    7799,  1153,  1155,  1158,  2483,  3808,  3813,  3815,  5138,  5143,  6465,  6468,  6470,  7792,  7795,  7796,
 	};
 

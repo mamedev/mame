@@ -28,12 +28,12 @@
 			<color state="1" red="0.200" green="0.165" blue="0.169"/>
 		</text>
 	</element>
-	<element name="syo">
+	<element name="sho">
 		<rect>
 			<color red="0.541" green="0.573" blue="0.580"/>
 		</rect>
-		<!-- ⼩ -->
-		<text string="SYO">
+		<!-- 小 -->
+		<text string="SHO">
 			<color state="0" red="0.514" green="0.533" blue="0.545"/>
 			<color state="1" red="0.200" green="0.165" blue="0.169"/>
 		</text>
@@ -187,7 +187,7 @@
 		<element ref="m"     name="sym.8">  <bounds x="163"   y="21.5" width="2.5" height="4.5"/> </element>
 		<element ref="caps"  name="sym.9">  <bounds x="154"   y="26.2" width="8"   height="4.5"/> </element>
 		<element ref="kana"  name="sym.10"> <bounds x="154"   y="31.0" width="6"   height="4.5"/> </element>
-		<element ref="syo"   name="sym.11"> <bounds x="161"   y="31.0" width="4"   height="4.5"/> </element>
+		<element ref="sho"   name="sym.11"> <bounds x="161"   y="31.0" width="4"   height="4.5"/> </element>
 		<element ref="de"    name="sym.12"> <bounds x="154"   y="35.7" width="3.5" height="4.5"/> </element>
 		<element ref="g"     name="sym.13"> <bounds x="157.5" y="35.7" width="1.8" height="4.5"/> </element>
 		<element ref="rad"   name="sym.14"> <bounds x="159.3" y="35.7" width="6.5" height="4.5"/> </element>
