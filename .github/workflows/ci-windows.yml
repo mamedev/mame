@@ -12,7 +12,6 @@ jobs:
     steps:
     - uses: msys2/setup-msys2@v2
       with:
-        update: true
         install: git make mingw-w64-x86_64-gcc mingw-w64-x86_64-python mingw-w64-x86_64-lld mingw-w64-x86_64-libc++
     - uses: actions/checkout@master
     - name: Build
@@ -33,7 +32,6 @@ jobs:
     steps:
     - uses: msys2/setup-msys2@v2
       with:
-        update: true
         install: git make mingw-w64-x86_64-gcc mingw-w64-x86_64-python
     - uses: actions/checkout@master
     - name: Add msbuild to PATH
