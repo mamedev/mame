@@ -70,9 +70,10 @@ public:
 
 	void klax5bl(machine_config &config);
 
-private:
+protected:
 	virtual void machine_start() override;
 
+private:
 	void m5205_int1(int state);
 
 	void bootleg_sound_map(address_map &map);

@@ -88,6 +88,9 @@ void klax_bootleg_state::machine_start()
 
 	m_audio_sample[0] = m_audio_sample[1] = 0x00;
 	m_audio_nibble = 0;
+
+	save_pointer(NAME(m_audio_sample), 2);
+	save_item(NAME(m_audio_nibble));
 }
 
 /*************************************
@@ -274,7 +277,7 @@ void klax_bootleg_state::klax5bl(machine_config &config)
 	m_mob->set_origin(8, 7); // sprites are offset in bootlegs
 	m_gfxdecode->set_info(gfx_klax5bl);
 
-	MSM5205(config, m_msm[0], 384000);
+	MSM5205(config, m_msm[0], 384000); // clock speed / prescaler not verified
 	m_msm[0]->vck_callback().set(FUNC(klax_bootleg_state::m5205_int1));
 	m_msm[0]->set_prescaler_selector(msm5205_device::S64_4B); /* ? */
 	m_msm[0]->add_route(ALL_OUTPUTS, "mono", 1.00);
@@ -408,7 +411,7 @@ ROM_START( klax5bl2 ) // derived from 'klax5' set, closer than klax5bl
 	ROM_LOAD16_BYTE( "2.ic12", 0x20001, 0x10000, CRC(adbe33a8) SHA1(c6c4f9ea5224169dbf4dda1062954563ebab18d4) )
 
 	ROM_REGION( 0x40000, "audiocpu", 0 )
-	ROM_LOAD( "6.ic22", 0x00000, 0x10000, CRC(edd4c42c) SHA1(22f992615afa24a7a671ed2f5cf08f25965d5b3a) )
+	ROM_LOAD( "6.ic22", 0x00000, 0x10000, CRC(edd4c42c) SHA1(22f992615afa24a7a671ed2f5cf08f25965d5b3a) ) // likely a bad dump of "3.bin" from klax5bl
 	ROM_LOAD( "5.ic23", 0x10000, 0x10000, CRC(a245e005) SHA1(8843edfa9deec405f491647d40007d0a38c25262) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
@@ -583,13 +586,13 @@ ROM_END
  *
  *************************************/
 
-GAME( 1989, klax,     0,    klax,    klax, klax_state,         empty_init, ROT0, "Atari Games",        "Klax (version 6)", 0 )
-GAME( 1989, klax5,    klax, klax,    klax, klax_state,         empty_init, ROT0, "Atari Games",        "Klax (version 5)", 0 )
-GAME( 1989, klax4,    klax, klax,    klax, klax_state,         empty_init, ROT0, "Atari Games",        "Klax (version 4)", 0 )
-GAME( 1989, klaxj4,   klax, klax,    klax, klax_state,         empty_init, ROT0, "Atari Games",        "Klax (Japan, version 4)", 0 )
-GAME( 1989, klaxj3,   klax, klax,    klax, klax_state,         empty_init, ROT0, "Atari Games",        "Klax (Japan, version 3)", 0 )
-GAME( 1989, klaxd2,   klax, klax,    klax, klax_state,         empty_init, ROT0, "Atari Games",        "Klax (Germany, version 2)", 0 )
+GAME( 1989, klax,     0,    klax,    klax, klax_state,         empty_init, ROT0, "Atari Games",        "Klax (version 6)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, klax5,    klax, klax,    klax, klax_state,         empty_init, ROT0, "Atari Games",        "Klax (version 5)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, klax4,    klax, klax,    klax, klax_state,         empty_init, ROT0, "Atari Games",        "Klax (version 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, klaxj4,   klax, klax,    klax, klax_state,         empty_init, ROT0, "Atari Games",        "Klax (Japan, version 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, klaxj3,   klax, klax,    klax, klax_state,         empty_init, ROT0, "Atari Games",        "Klax (Japan, version 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, klaxd2,   klax, klax,    klax, klax_state,         empty_init, ROT0, "Atari Games",        "Klax (Germany, version 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, klax5bl,  klax, klax5bl, klax, klax_bootleg_state, empty_init, ROT0, "bootleg",            "Klax (version 5, bootleg set 1)", 0 )
-GAME( 1989, klax5bl2, klax, klax5bl, klax, klax_bootleg_state, empty_init, ROT0, "bootleg",            "Klax (version 5, bootleg set 2)", 0 )
-GAME( 1989, klax5bl3, klax, klax5bl, klax, klax_bootleg_state, empty_init, ROT0, "bootleg (Playmark)", "Klax (version 5, bootleg set 3)", MACHINE_NOT_WORKING ) /* encrypted Z80 opcodes */
+GAME( 1989, klax5bl,  klax, klax5bl, klax, klax_bootleg_state, empty_init, ROT0, "bootleg",            "Klax (version 5, bootleg set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, klax5bl2, klax, klax5bl, klax, klax_bootleg_state, empty_init, ROT0, "bootleg",            "Klax (version 5, bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, klax5bl3, klax, klax5bl, klax, klax_bootleg_state, empty_init, ROT0, "bootleg (Playmark)", "Klax (version 5, bootleg set 3)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* encrypted Z80 opcodes */
