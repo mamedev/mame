@@ -1171,13 +1171,8 @@ bool chdcd_is_gdicue(const char *tocfname)
 		/* if EOF didn't hit, keep going */
 		if (!feof(infile))
 		{
-			if (!strncmp(linebuffer, "REM SINGLE-DENSITY AREA", 23)) {
-				has_rem_singledensity = true;
-			}
-
-			if (!strncmp(linebuffer, "REM HIGH-DENSITY AREA", 21)) {
-				has_rem_highdensity = true;
-			}
+			has_rem_singledensity = has_rem_singledensity || !strncmp(linebuffer, "REM SINGLE-DENSITY AREA", 23);
+			has_rem_highdensity = has_rem_highdensity || !strncmp(linebuffer, "REM HIGH-DENSITY AREA", 21);
 		}
 	}
 
@@ -1252,13 +1247,15 @@ chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_trac
 		if (!feof(infile))
 		{
 			/* single-density area starts LBA = 0 */
-			if (!strncmp(linebuffer, "REM SINGLE-DENSITY AREA", 23)) {
+			if (!strncmp(linebuffer, "REM SINGLE-DENSITY AREA", 23))
+			{
 				current_area = SINGLE_DENSITY;
 				continue;
 			}
 
 			/* high-density area starts LBA = 45000 */
-			if (!strncmp(linebuffer, "REM HIGH-DENSITY AREA", 21)) {
+			if (!strncmp(linebuffer, "REM HIGH-DENSITY AREA", 21))
+			{
 				current_area = HIGH_DENSITY;
 				continue;
 			}
@@ -1559,8 +1556,6 @@ chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_trac
 			outtoc.tracks[trknum].frames - outtoc.tracks[trknum].padframes);
 	}
 #endif
-
-	/* close the input TOC */
 
 	return CHDERR_NONE;
 }
