@@ -440,7 +440,8 @@ See the wswan software list for the full game list.
 
 	<software name="digitbt">
 		<!-- WSC only -->
-		<description>Digimon Tamers - Brave Tamer (Rev 1)</description>
+		<!-- Rev 1 -->
+		<description>Digimon Tamers - Brave Tamer</description>
 		<year>2001</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SWJ-BANC1D"/>
@@ -506,7 +507,8 @@ See the wswan software list for the full game list.
 
 	<software name="dokodem3">
 		<!-- WSC -->
-		<description>Dokodemo Hamster 3 - Odekake Saffron (Rev 2)</description>
+		<!-- Rev 2 -->
+		<description>Dokodemo Hamster 3 - Odekake Saffron</description>
 		<year>2000</year>
 		<publisher>BEC</publisher>
 		<info name="serial" value="SWJ-BECC01"/>
@@ -731,7 +733,8 @@ See the wswan software list for the full game list.
 
 	<software name="gmsayuki">
 		<!-- WSC only -->
-		<description>Gensou Maden Saiyuuki Retribution - Hi no Ataru Basho de (Rev 2)</description>
+		<!-- Rev 2 -->
+		<description>Gensou Maden Saiyuuki Retribution - Hi no Ataru Basho de</description>
 		<year>2001</year>
 		<publisher>Movic ~ Soeishinsha</publisher>
 		<info name="serial" value="SWJ-SESC01"/>
@@ -963,6 +966,7 @@ See the wswan software list for the full game list.
   -->
 	<software name="hanjuher" supported="no">
 		<!-- WSC only -->
+		<!-- Rev 1 -->
 		<description>Hanjuku Hero - Ah, Sekai yo Hanjuku Nare...!! (Rev 1)</description>
 		<year>2002</year>
 		<publisher>Square</publisher>
@@ -1250,7 +1254,8 @@ See the wswan software list for the full game list.
 
 	<software name="kurupara">
 		<!-- WSC only -->
-		<description>Kurupara! (Rev 1)</description>
+		<!-- Rev 1 -->
+		<description>Kurupara!</description>
 		<year>2001</year>
 		<publisher>Tom Create</publisher>
 		<info name="serial" value="SWJ-TMCC01"/>
@@ -1780,7 +1785,8 @@ See the wswan software list for the full game list.
 
 	<software name="rockmnxn">
 		<!-- WSC only, Rated "Everyone" -->
-		<description>Rockman EXE - N1 Battle (Rev 1)</description>
+		<!-- Rev 1 -->
+		<description>Rockman EXE - N1 Battle</description>
 		<year>2003</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="SWJ-CPCC01"/>
@@ -1942,7 +1948,7 @@ See the wswan software list for the full game list.
 
 	<software name="sdgundg2">
 		<!-- WSC only -->
-		<description>SD Gundam G-Generation - Mono-Eye Gundams</description>
+		<description>SD Gundam G-Generation - Mono-Eye Gundams (Rev 0)</description>
 		<year>2002</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SWJ-BANC2F"/>
@@ -2058,7 +2064,8 @@ See the wswan software list for the full game list.
 	<!-- bad background graphics during game play -->
 	<software name="sorobang" supported="partial">
 		<!-- WSC -->
-		<description>Sorobang (Rev 1)</description>
+		<!-- Rev 1 -->
+		<description>Sorobang</description>
 		<year>2000</year>
 		<publisher>Kaga Tech</publisher>
 		<info name="serial" value="SWJ-KGTC09"/>
