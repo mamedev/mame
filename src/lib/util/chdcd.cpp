@@ -1523,11 +1523,11 @@ chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_trac
 			outtoc.tracks[trknum-1].frames += dif;
 			outtoc.tracks[trknum-1].padframes = dif;
 
-			// flycast only works when these are zeroed
-			outtoc.tracks[trknum-1].pregap = 0;
-			outtoc.tracks[trknum-1].pgtype = 0;
-
 		}
+
+		// flycast only works when these are zeroed
+		outtoc.tracks[trknum].pregap = 0;
+		outtoc.tracks[trknum].pgtype = 0;
 	}
 
 #if 0
