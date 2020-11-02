@@ -24,11 +24,6 @@ Nintendo VS UniSystem and DualSystem - (c) 1984 Nintendo of America
 /* Prototypes for mapping board components to PPU bus */
 
 
-
-
-
-static const char * const chr_banknames[] = { "bank2", "bank3", "bank4", "bank5", "bank6", "bank7", "bank8", "bank9" };
-
 /*************************************
  *
  *  Input Ports
