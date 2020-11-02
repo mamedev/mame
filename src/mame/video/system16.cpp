@@ -399,6 +399,12 @@ VIDEO_START_MEMBER(segas1x_bootleg_state,system16)
 
 	m_refreshenable = 1;
 
+	for (int i = 0; i < 2; i++)
+	{
+		std::fill(std::begin(m_bg_page[i]), std::end(m_bg_page[i]), 0);
+		std::fill(std::begin(m_fg_page[i]), std::end(m_fg_page[i]), 0);
+	}
+
 	/* common defaults */
 	m_tilebank_switch = 0x1000;
 

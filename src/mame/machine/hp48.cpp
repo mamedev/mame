@@ -897,6 +897,9 @@ void hp48_state::init_hp48()
 		m_modules[i].write    = write8sm_delegate(*this);
 		m_modules[i].data     = nullptr;
 		m_modules[i].isnop    = 0;
+		m_modules[i].state    = 0;
+		m_modules[i].base    = 0;
+		m_modules[i].mask    = 0;
 	}
 	m_rom = nullptr;
 }
@@ -905,6 +908,7 @@ void hp48_state::machine_reset()
 {
 	LOG(("hp48: machine reset called\n"));
 	m_bank_switch = 0;
+	m_cur_screen = 0;
 	reset_modules();
 	update_annunciators();
 }
