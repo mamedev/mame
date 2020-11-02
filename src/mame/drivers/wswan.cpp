@@ -17,14 +17,10 @@
     configuration menu.
 
   Known issues/TODOs:
-  - Add support for noise sound.
-  - Add support for voice sound.
-  - Add support for enveloped sound.
   - Perform video DMA at proper timing.
   - Add (real/proper) RTC support.
   - Fix wonderwitch
     - Make the flash rom changes save.
-	- Change the address maps to 16bit
 
 ***************************************************************************/
 
@@ -837,14 +833,14 @@ void wswan_state::port_w(offs_t offset, u16 data, u16 mem_mask)
 			break;
 		case 0xb6 / 2:
 			// Interrupt acknowledge
-			// Bit 0   - Serial transmit interrupt acknowledge
-			// Bit 1   - Key press interrupt acknowledge
-			// Bit 2   - RTC alarm interrupt acknowledge
-			// Bit 3   - Serial receive interrupt acknowledge
-			// Bit 4   - Drawing line detection interrupt acknowledge
-			// Bit 5   - VBlank timer interrupt acknowledge
-			// Bit 6   - VBlank interrupt acknowledge
-			// Bit 7   - HBlank timer interrupt acknowledge
+			// Bit 0 - Serial transmit interrupt acknowledge
+			// Bit 1 - Key press interrupt acknowledge
+			// Bit 2 - RTC alarm interrupt acknowledge
+			// Bit 3 - Serial receive interrupt acknowledge
+			// Bit 4 - Drawing line detection interrupt acknowledge
+			// Bit 5 - VBlank timer interrupt acknowledge
+			// Bit 6 - VBlank interrupt acknowledge
+			// Bit 7 - HBlank timer interrupt acknowledge
 			if (ACCESSING_BITS_0_7)
 			{
 				clear_irq_line(data & 0xff);
@@ -855,7 +851,7 @@ void wswan_state::port_w(offs_t offset, u16 data, u16 mem_mask)
 			COMBINE_DATA(&m_internal_eeprom_data);
 			break;
 		case 0xbc / 2:  // Internal EEPROM address
-			// (WS) Bit 0-5 = Internal EEPROM address
+			// (WS) Bit 0-5 - Internal EEPROM address
 			// (WSC) Bit 0-8 - Internal EEPROM address bit 1-9
 			// Bit 9-15 - Unknown
 			COMBINE_DATA(&m_internal_eeprom_address);
@@ -902,7 +898,7 @@ void wswan_state::port_w(offs_t offset, u16 data, u16 mem_mask)
 			m_cart->write_io(offset, data, mem_mask);
 			break;
 		default:
-			logerror("Write to unsupported port: %X - %X\n", offset, data);
+			logerror("%06x: Write to unsupported port: %x - %x\n", pc(), offset, data);
 			break;
 	}
 

@@ -157,7 +157,7 @@ void wswan_sound_device::sound_stream_update(sound_stream &stream, std::vector<r
 		{
 			if (m_audio2_voice)
 			{
-				u8 voice_data = m_audio[1].vol_left << 4 | m_audio[1].vol_right;
+				u8 voice_data = (m_audio[1].vol_left << 4) | m_audio[1].vol_right;
 				left += voice_data * (m_master_volume & 0x0f);
 				right += voice_data * (m_master_volume & 0x0f);
 			}

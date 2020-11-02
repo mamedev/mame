@@ -8,9 +8,8 @@
  Wilbert Pol
 
  TODO:
-   - remove the redundant parts of m_regs
    - split the Color VDP from the Mono VDP
-     - Add support for WSC high/low contrast (register 14, bit 1)
+   - Add support for WSC high/low contrast (register 14, bit 1)
 
  ***************************************************************************/
 
@@ -821,19 +820,16 @@ u32 wswan_video_device::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 u16 wswan_video_device::reg_r(offs_t offset, u16 mem_mask)
 {
-	u16 value = m_regs[offset];
+	u16 value = m_regs[offset & 0x7f];
 
 	switch (offset)
 	{
-		case 0x02/2:
-			value = (value & 0xff00) | m_current_line;
-			break;
-		case 0xa8/2:
-			value = m_timer_hblank_count;
-			break;
-		case 0xaa/2:
-			value = m_timer_vblank_count;
-			break;
+		case 0x02 / 2:
+			return (value & 0xff00) | m_current_line;
+		case 0xa8 / 2:
+			return m_timer_hblank_count;
+		case 0xaa / 2:
+			return m_timer_vblank_count;
 	}
 
 	return value;
@@ -844,17 +840,18 @@ void wswan_video_device::reg_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	switch (offset)
 	{
-		case 0x00 / 2:  // Display control
-					// Bit 0   - Background layer enable
-					// Bit 1   - Foreground layer enable
-					// Bit 2   - Sprites enable
-					// Bit 3   - Sprite window enable
-					// Bit 4-5 - Foreground window configuration
-					//      00 - Foreground layer is displayed inside and outside foreground window area
-					//      01 - Unknown
-					//      10 - Foreground layer is displayed only inside foreground window area
-					//      11 - Foreground layer is displayed outside foreground window area
-					// Bit 6-7 - Unknown
+		case 0x00 / 2:
+			// Display control
+			// Bit 0   - Background layer enable
+			// Bit 1   - Foreground layer enable
+			// Bit 2   - Sprites enable
+			// Bit 3   - Sprite window enable
+			// Bit 4-5 - Foreground window configuration
+			//      00 - Foreground layer is displayed inside and outside foreground window area
+			//      01 - Unknown
+			//      10 - Foreground layer is displayed only inside foreground window area
+			//      11 - Foreground layer is displayed outside foreground window area
+			// Bit 6-7 - Unknown
 			if (ACCESSING_BITS_0_7)
 			{
 				m_layer_bg_enable = data & 0x1;
@@ -1071,14 +1068,14 @@ void wswan_video_device::reg_w(offs_t offset, u16 data, u16 mem_mask)
 			// Bit 5   - Packed mode 0 = not packed mode, 1 = packed mode
 			// Bit 6   - 4/16 colour mode select: 0 = 4 colour mode, 1 = 16 colour mode
 			// Bit 7   - monochrome/colour mode select: 0 = monochrome mode, 1 = colour mode
-			//   111  - packed, 16 color, use 4000/8000, color
-			//   110  - not packed, 16 color, use 4000/8000, color
-			//   101  - packed, 4 color, use 2000, color
-			//   100  - not packed, 4 color, use 2000, color
-			//   011  - packed, 16 color, use 4000/8000, monochrome
-			//   010  - not packed, 16 color , use 4000/8000, monochrome
-			//   001  - packed, 4 color, use 2000, monochrome
-			//   000  - not packed, 4 color, use 2000, monochrome - Regular WS monochrome
+			//    111  - packed, 16 color, use 4000/8000, color
+			//    110  - not packed, 16 color, use 4000/8000, color
+			//    101  - packed, 4 color, use 2000, color
+			//    100  - not packed, 4 color, use 2000, color
+			//    011  - packed, 16 color, use 4000/8000, monochrome
+			//    010  - not packed, 16 color , use 4000/8000, monochrome
+			//    001  - packed, 4 color, use 2000, monochrome
+			//    000  - not packed, 4 color, use 2000, monochrome - Regular WS monochrome
 			if (ACCESSING_BITS_0_7)
 			{
 				if (m_vdp_type == VDP_TYPE_WSC)
