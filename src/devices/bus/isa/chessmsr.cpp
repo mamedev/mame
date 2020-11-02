@@ -53,7 +53,7 @@ void isa8_chessmsr_device::device_start()
 	// allocate maximum RAM beforehand
 	const u32 maxram = 1 << 21;
 	m_ram = std::make_unique<u32[]>(maxram / 4);
-	save_pointer(NAME(m_ram.get()), maxram / 4);
+	save_pointer(NAME(m_ram), maxram / 4);
 }
 
 
