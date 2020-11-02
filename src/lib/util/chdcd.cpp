@@ -1201,8 +1201,8 @@ bool chdcd_is_gdicue(const char *tocfname)
  *
  * @return  A chd_error.
  *
- * NB: Redump assumes SINGLE-DENSITY starts at 0 LBA and HIGH-DENSITY starts at 45150 LBA. This is *NOT* a
- * generic multi-cue format its only purpose is Dreamcast GDI dumps.
+ * Redump assumes SINGLE-DENSITY starts at 0 LBA and HIGH-DENSITY starts at 45000 LBA. This is *NOT* a generic
+ * multi-cue format its only purpose is Dreamcast GDI dumps. 
  */
 
 chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
@@ -1245,7 +1245,7 @@ chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_trac
 				continue;
 			}
 
-			/* high-density area starts LBA = 45150 */
+			/* high-density area starts LBA = 45000 */
 			if (!strncmp(linebuffer, "REM HIGH-DENSITY AREA", 21)) {
 				current_area = HIGH_DENSITY;
 				continue;
@@ -1500,19 +1500,17 @@ chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_trac
 				}
 			}
 		}
-		// 3
-		// 1     0 4 2352 "Crazy Taxi (USA) (Track 1).bin" 0
-		// 2   450 0 2352 "Crazy Taxi (USA) (Track 2).bin" 0
-		// 3 45000 4 2352 "Crazy Taxi (USA) (Track 3).bin" 0
-		// Crazy Taxi (USA) (Track 1).bin frames 450 padframes 0 physframeofs 0 (true 450)
-		// Crazy Taxi (USA) (Track 2).bin frames 44550 padframes 43874 physframeofs 450 (true 676)
-		// Crazy Taxi (USA) (Track 3).bin frames 504150 padframes 0 physframeofs 45000 (true 504150)
-		// Metadata:     Tag='CHGD'  Index=0  Length=96 bytes
-		//               TRACK:1 TYPE:MODE1_RAW SUBTYPE:NONE FRAMES:450 PAD:0 PREGAP:0 PGTYPE:MODE1 PGSUB:NONE POSTGAP:0.
-		// Metadata:     Tag='CHGD'  Index=1  Length=98 bytes
-		//               TRACK:2 TYPE:AUDIO SUBTYPE:NONE FRAMES:44550 PAD:43874 PREGAP:0 PGTYPE:MODE1 PGSUB:NONE POSTGAP:0.
-		// Metadata:     Tag='CHGD'  Index=2  Length=99 bytes
-		//               TRACK:3 TYPE:MODE1_RAW SUBTYPE:NONE FRAMES:504150 PAD:0 PREGAP:0 PGTYPE:MODE1 PGSUB:NONE POSTGAP:0.
+
+		/*
+		 * This is the special handling for Dreamcast GDI
+		 *
+		 * - high density image always starts at physical offset 45000
+		 * - last track of single density image is padded out
+		 * - physical offset is stored for every track
+		 * - pregap and pgtype is zeroed
+		 *
+		 * I think this last step is wrong but it's what chdcd_parse_gdi does and flycast expects it
+		 */
 		if (trknum != 0)
 		{
 			if (outtoc.tracks[trknum].multicuearea == HIGH_DENSITY && outtoc.tracks[trknum-1].multicuearea == SINGLE_DENSITY) {
