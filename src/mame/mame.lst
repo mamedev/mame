@@ -22281,6 +22281,7 @@ rad_ssoc                        // (c)2004 Radica
 rad_sonic
 rad_sonicp
 rad_orun
+msi_sf2
 
 @source:megadriv_sunplus_hybrid.cpp
 reactmd
