@@ -69,7 +69,7 @@ public:
 		m_from(*this, "from"),
 		m_rom(*this, M8502_TAG),
 		m_charom(*this, "charom"),
-		m_color_ram(*this, "color_ram"),
+		m_color_ram(*this, "color_ram", 0x800, ENDIANNESS_LITTLE),
 		m_row(*this, "ROW%u", 0),
 		m_k(*this, "K%u", 0),
 		m_lock(*this, "LOCK"),
@@ -113,7 +113,7 @@ public:
 	required_device<generic_slot_device> m_from;
 	required_memory_region m_rom;
 	required_memory_region m_charom;
-	optional_shared_ptr<uint8_t> m_color_ram;
+	memory_share_creator<uint8_t> m_color_ram;
 	required_ioport_array<8> m_row;
 	required_ioport_array<3> m_k;
 	required_ioport m_lock;
@@ -1565,9 +1565,6 @@ void c128d81_iec_devices(device_slot_interface &device)
 
 void c128_state::machine_start()
 {
-	// allocate memory
-	m_color_ram.allocate(0x800);
-
 	// initialize memory
 	uint8_t data = 0xff;
 

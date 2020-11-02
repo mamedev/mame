@@ -243,13 +243,13 @@ void isa8_epc_mda_device::device_reset()
 	if (m_installed == false)
 	{
 		m_isa->install_device(0x3b0, 0x3bf, read8sm_delegate(*this, FUNC(isa8_epc_mda_device::io_read)), write8sm_delegate(*this, FUNC(isa8_epc_mda_device::io_write)));
-		m_isa->install_bank(0xb0000, 0xb7fff, "bank_epc", &m_videoram[0]); // Monochrome emulation mode VRAM address
+		m_isa->install_bank(0xb0000, 0xb7fff, &m_videoram[0]); // Monochrome emulation mode VRAM address
 
 		// This check allows a color monitor adapter to be installed at this address range if color emulation is disabled
 		if (m_color_mode & 1)
 		{
 			m_isa->install_device(0x3d0, 0x3df, read8sm_delegate(*this, FUNC(isa8_epc_mda_device::io_read)), write8sm_delegate(*this, FUNC(isa8_epc_mda_device::io_write)));
-			m_isa->install_bank(0xb8000, 0xbffff, "bank_epc", &m_videoram[0]); // Color emulation mode VRAM address, but same 32KB areas as there are only this amount on the board
+			m_isa->install_bank(0xb8000, 0xbffff, &m_videoram[0]); // Color emulation mode VRAM address, but same 32KB areas as there are only this amount on the board
 		}
 		m_installed = true;
 	}

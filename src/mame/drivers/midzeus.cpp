@@ -764,7 +764,7 @@ void midzeus2_state::zeus2_map(address_map &map)
 	map(0x9f0000, 0x9f7fff).rw(FUNC(midzeus2_state::zeus2_timekeeper_r), FUNC(midzeus2_state::zeus2_timekeeper_w));
 	map(0x9f8000, 0x9f8000).w(FUNC(midzeus2_state::cmos_protect_w));
 	map(0xa00000, 0xbfffff).rom().region("user1", 0);
-	map(0xc00000, 0xffffff).bankr("bank1").region("user2", 0);
+	map(0xc00000, 0xffffff).bankr("bank1");
 }
 
 /*

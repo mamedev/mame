@@ -26,7 +26,7 @@ public:
 	atarigt_state(const machine_config &mconfig, device_type type, const char *tag) :
 		atarigen_state(mconfig, type, tag),
 		m_palette(*this, "palette"),
-		m_colorram(*this, "colorram", 32),
+		m_colorram(*this, "colorram"),
 		m_adc(*this, "adc"),
 		m_playfield_tilemap(*this, "playfield"),
 		m_alpha_tilemap(*this, "alpha"),

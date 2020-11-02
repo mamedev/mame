@@ -945,7 +945,7 @@ void rmnimbus_state::nimbus_bank_memory()
 			map_base=(ramsel==0x07) ? map_blocks[map_blockno] : &map_blocks[map_blockno][block_ofs*1024];
 
 			membank(bank)->set_base(map_base);
-			space.install_readwrite_bank(memmap[blockno].start, memmap[blockno].end, bank);
+			space.install_readwrite_bank(memmap[blockno].start, memmap[blockno].end, membank(bank));
 			//if(LOG_RAM) logerror(", base=%X\n",(int)map_base);
 		}
 		else

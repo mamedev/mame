@@ -638,12 +638,10 @@ void hp48_state::apply_modules()
 		int bank_hi = (m_bank_switch >> 1) & 15;
 		LOG(("hp48_state::apply_modules: low ROM bank is %i\n", bank_lo));
 		LOG(("hp48_state::apply_modules: high ROM bank is %i\n", bank_hi));
-		space.install_read_bank(0x00000, 0x3ffff, 0x80000, "bank5");
-		space.install_read_bank(0x40000, 0x7ffff, 0x80000, "bank6");
 		if (m_rom)
 		{
-			membank("bank5")->set_base(m_rom + bank_lo * 0x40000);
-			membank("bank6")->set_base(m_rom + bank_hi * 0x40000);
+			space.install_rom(0x00000, 0x3ffff, 0x80000, m_rom + bank_lo * 0x40000);
+			space.install_rom(0x40000, 0x7ffff, 0x80000, m_rom + bank_hi * 0x40000);
 		}
 	}
 	else if (HP48_G_SERIES)
@@ -662,27 +660,22 @@ void hp48_state::apply_modules()
 			/* A19 */
 			LOG(("hp48_state::apply_modules: A19 enabled, NCE3 disabled\n"));
 			nce3_enable = 0;
-			space.install_read_bank(0, 0xfffff, "bank5");
+			if (m_rom)
+				space.install_rom(0, 0xfffff, m_rom);
 		}
 		else
 		{
 			/* NCE3 */
 			nce3_enable = m_bank_switch >> 6;
 			LOG(("hp48_apply_modules: A19 disabled, NCE3 %s\n", nce3_enable ? "enabled" : "disabled"));
-			space.install_read_bank(0, 0x7ffff, 0x80000, "bank5");
-		}
-		if (m_rom)
-		{
-			membank("bank5")->set_base(m_rom);
+			if (m_rom)
+				space.install_rom(0, 0x7ffff, 0x80000, m_rom);
 		}
 	}
 	else
 	{
-		space.install_read_bank(0, 0x7ffff, 0x80000, "bank5");
 		if (m_rom)
-		{
-			membank("bank5")->set_base(m_rom);
-		}
+			space.install_rom(0, 0x7ffff, 0x80000, m_rom);
 	}
 
 
@@ -695,8 +688,6 @@ void hp48_state::apply_modules()
 		uint32_t off_mask = m_modules[i].off_mask;
 		uint32_t mirror = nselect_mask & ~off_mask;
 		uint32_t end = base + (off_mask & nselect_mask);
-		char bank[10];
-		sprintf(bank,"bank%d",i);
 
 		if (m_modules[i].state != HP48_MODULE_CONFIGURED) continue;
 		if ((i == 4) && !nce3_enable) continue;
@@ -710,7 +701,7 @@ void hp48_state::apply_modules()
 
 		if (m_modules[i].data)
 		{
-			space.install_read_bank(base, end, mirror, bank);
+			space.install_rom(base, end, mirror, m_modules[i].data);
 		}
 		else
 		{
@@ -728,7 +719,7 @@ void hp48_state::apply_modules()
 		{
 			if (m_modules[i].data)
 			{
-				space.install_write_bank(base, end, mirror, bank);
+				space.install_writeonly(base, end, mirror, m_modules[i].data);
 			}
 			else
 			{
@@ -740,11 +731,6 @@ void hp48_state::apply_modules()
 		}
 
 		LOG(("hp48_apply_modules: module %s configured at %05x-%05x, mirror %05x\n", hp48_module_names[i], base, end, mirror));
-
-		if (m_modules[i].data)
-		{
-			membank(bank)->set_base(m_modules[i].data);
-		}
 
 		if (i == 0)
 		{

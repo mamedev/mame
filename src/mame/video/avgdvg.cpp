@@ -1426,8 +1426,8 @@ void dvg_device::device_start()
 
 avgdvg_device::avgdvg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, m_vectorram(*this, "vectorram", 0)
-	, m_colorram(*this, "colorram", 0)
+	, m_vectorram(*this, "vectorram")
+	, m_colorram(*this, "colorram")
 	, m_prom(*this, "prom")
 	, m_vector(*this, finder_base::DUMMY_TAG)
 {

@@ -47,6 +47,8 @@ private:
 	required_memory_region m_dos_rom;
 	required_device<i8271_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
+
+	u8 m_ram[0x800 + 0x400];
 };
 
 

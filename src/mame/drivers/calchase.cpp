@@ -407,7 +407,7 @@ void calchase_state::calchase_map(address_map &map)
 {
 	map(0x00000000, 0x0009ffff).ram();
 	map(0x000a0000, 0x000bffff).rw("vga", FUNC(trident_vga_device::mem_r), FUNC(trident_vga_device::mem_w)); // VGA VRAM
-	map(0x000c0000, 0x000c7fff).ram().region("video_bios", 0);
+	map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0);
 	map(0x000c8000, 0x000cffff).noprw();
 	//map(0x000d0000, 0x000d0003).ram();  // XYLINX - Sincronus serial communication
 	map(0x000d0004, 0x000d0005).r(FUNC(calchase_state::calchase_iocard1_r));

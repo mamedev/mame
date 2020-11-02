@@ -625,7 +625,7 @@ void spdball_state::main_map(address_map &map)
 void blaster_state::main_map(address_map &map)
 {
 	map(0x0000, 0x3fff).bankr("mainbank").writeonly().share("videoram");
-	map(0x4000, 0x8fff).bankr("blaster_bankb").writeonly();
+	map(0x4000, 0x8fff).bankr("blaster_bankb").writeonly().share("bankb");
 	map(0x9000, 0xbaff).ram();
 	map(0xbb00, 0xbbff).ram().share("blaster_pal0");
 	map(0xbc00, 0xbcff).ram().share("blaster_scan");

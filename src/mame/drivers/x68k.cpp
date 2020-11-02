@@ -1520,8 +1520,7 @@ void x68k_state::machine_start()
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	// install RAM handlers
 	m_spriteram = (uint16_t*)(memregion("user1")->base());
-	space.install_readwrite_bank(0x000000,m_ram->size()-1,"bank1");
-	membank("bank1")->set_base(m_ram->pointer());
+	space.install_ram(0x000000,m_ram->size()-1,m_ram->pointer());
 
 	// start mouse timer
 	m_mouse_timer->adjust(attotime::zero, 0, attotime::from_msec(1));  // a guess for now

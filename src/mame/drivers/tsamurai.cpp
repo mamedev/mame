@@ -355,9 +355,9 @@ void tsamurai_state::vsgongf_map(address_map &map)
 	map(0xe400, 0xe43f).ram().share("spriteram");
 	map(0xe440, 0xe47b).ram();
 	map(0xe800, 0xe800).w(FUNC(tsamurai_state::vsgongf_sound_command_w));
-	map(0xec00, 0xec06).writeonly();
+	map(0xec00, 0xec06).nopw();
 	map(0xf000, 0xf000).w(FUNC(tsamurai_state::vsgongf_color_w));
-	map(0xf400, 0xf400).writeonly(); /* vreg? always 0 */
+	map(0xf400, 0xf400).nopw(); /* vreg? always 0 */
 	map(0xf800, 0xf800).portr("P1");
 	map(0xf801, 0xf801).portr("P2");
 	map(0xf802, 0xf802).portr("SYSTEM");

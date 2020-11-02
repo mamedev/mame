@@ -173,7 +173,6 @@ void dgn_beta_state::dgnbeta_map(address_map &map)
 	map(0xFE00, 0xFE0F).rw(FUNC(dgn_beta_state::dgn_beta_page_r), FUNC(dgn_beta_state::dgn_beta_page_w));
 	map(0xfe10, 0xfEff).noprw();
 	map(0xFF00, 0xFFFF).bankrw("bank17");
-
 }
 
 

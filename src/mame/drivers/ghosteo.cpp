@@ -97,6 +97,7 @@ public:
 		, m_soundlatch(*this, "soundlatch")
 		, m_system_memory(*this, "systememory")
 		, m_flash(*this, "flash")
+		, m_qs1000_bank(*this, "qs1000_bank")
 	{
 	}
 
@@ -115,6 +116,7 @@ private:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_shared_ptr<uint32_t> m_system_memory;
 	required_region_ptr<uint8_t> m_flash;
+	memory_bank_creator m_qs1000_bank;
 
 	int m_security_count;
 	uint32_t m_bballoon_port[20];
@@ -182,7 +184,7 @@ void ghosteo_state::qs1000_p3_w(uint8_t data)
 	// ...x .... - ?
 	// ..x. .... - /IRQ clear
 
-	membank("qs1000:bank")->set_entry(data & 0x07);
+	m_qs1000_bank->set_entry(data & 0x07);
 
 	if (!BIT(data, 5))
 		m_soundlatch->acknowledge_w();
@@ -594,8 +596,8 @@ uint32_t ghosteo_state::bballoon_speedup_r(offs_t offset, uint32_t mem_mask)
 void ghosteo_state::machine_start()
 {
 	// Set up the QS1000 program ROM banking, taking care not to overlap the internal RAM
-	m_qs1000->cpu().space(AS_IO).install_read_bank(0x0100, 0xffff, "bank");
-	membank("qs1000:bank")->configure_entries(0, 8, memregion("qs1000:cpu")->base()+0x100, 0x10000);
+	m_qs1000->cpu().space(AS_IO).install_read_bank(0x0100, 0xffff, m_qs1000_bank);
+	m_qs1000_bank->configure_entries(0, 8, memregion("qs1000:cpu")->base()+0x100, 0x10000);
 }
 
 void ghosteo_state::machine_reset()

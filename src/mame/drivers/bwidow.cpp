@@ -407,7 +407,7 @@ void bwidow_state::irq_ack_w(uint8_t data)
 void bwidow_state::bwidow_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x2000, 0x27ff).ram().share("avg:vectorram").region("maincpu", 0x2000);
+	map(0x2000, 0x27ff).ram().share("avg:vectorram");
 	map(0x2800, 0x5fff).rom();
 	map(0x6000, 0x67ff).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x6800, 0x6fff).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
@@ -436,7 +436,7 @@ void bwidow_state::bwidowp_map(address_map &map)
 	map(0x2800, 0x2800).w("avg", FUNC(avg_device::reset_w));
 	map(0x3000, 0x3000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x3800, 0x3800).w(FUNC(bwidow_state::bwidow_misc_w)); /* coin counters, leds */
-	map(0x4000, 0x47ff).ram().share("avg:vectorram").region("maincpu", 0x4000);
+	map(0x4000, 0x47ff).ram().share("avg:vectorram");
 	map(0x4800, 0x6fff).rom();
 	map(0x6000, 0x6000).w(FUNC(bwidow_state::irq_ack_w)); /* interrupt acknowledge */
 	map(0x8000, 0x803f).w(FUNC(bwidow_state::earom_write));
@@ -462,7 +462,7 @@ void bwidow_state::spacduel_map(address_map &map)
 	map(0x0f00, 0x0f3f).w(FUNC(bwidow_state::earom_write));
 	map(0x1000, 0x10ff).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x1400, 0x14ff).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
-	map(0x2000, 0x27ff).ram().share("avg:vectorram").region("maincpu", 0x2000);
+	map(0x2000, 0x27ff).ram().share("avg:vectorram");
 	map(0x2800, 0x3fff).rom();
 	map(0x4000, 0xffff).rom();
 }

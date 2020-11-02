@@ -525,7 +525,7 @@ void chinagat_state::main_map(address_map &map)
 	map(0x2800, 0x2fff).ram().w(FUNC(chinagat_state::ddragon_bgvideoram_w)).share("bgvideoram");
 	map(0x3000, 0x317f).w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x3400, 0x357f).w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
-	map(0x3800, 0x397f).bankw("bank3").share("spriteram");
+	map(0x3800, 0x397f).ram().share("spriteram");
 	map(0x3e00, 0x3e04).w(FUNC(chinagat_state::interrupt_w));
 	map(0x3e06, 0x3e06).writeonly().share("scrolly_lo");
 	map(0x3e07, 0x3e07).writeonly().share("scrollx_lo");

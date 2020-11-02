@@ -573,7 +573,7 @@ void dec8_state::cobra_map(address_map &map)
 	map(0x2000, 0x27ff).ram().w(FUNC(dec8_state::dec8_videoram_w)).share("videoram");
 	map(0x2800, 0x2fff).ram().share("spriteram");
 	map(0x3000, 0x31ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
-	map(0x3200, 0x37ff).writeonly(); /* Unused */
+	map(0x3200, 0x37ff).nopw(); /* Unused */
 	map(0x3800, 0x3800).portr("IN0");    /* Player 1 */
 	map(0x3801, 0x3801).portr("IN1");    /* Player 2 */
 	map(0x3802, 0x3802).portr("DSW0");   /* Dip 1 */

@@ -729,9 +729,9 @@ void nwktr_state::nwktr_map(address_map &map)
 	map(0x7d030000, 0x7d03000f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
 	map(0x7d040000, 0x7d04ffff).rw(FUNC(nwktr_state::lanc1_r), FUNC(nwktr_state::lanc1_w));
 	map(0x7d050000, 0x7d05ffff).rw(FUNC(nwktr_state::lanc2_r), FUNC(nwktr_state::lanc2_w));
-	map(0x7e000000, 0x7e7fffff).rom().region("user2", 0); // Data ROM
-	map(0x7f000000, 0x7f1fffff).rom().share("share2");
-	map(0x7fe00000, 0x7fffffff).rom().region("user1", 0).share("share2"); // Program ROM
+	map(0x7e000000, 0x7e7fffff).rom().region("user2", 0);   /* Data ROM */
+	map(0x7f000000, 0x7f1fffff).rom().region("user1", 0);
+	map(0x7fe00000, 0x7fffffff).rom().region("user1", 0);    /* Program ROM */
 }
 
 /*****************************************************************************/

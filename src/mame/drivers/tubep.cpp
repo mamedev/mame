@@ -193,7 +193,7 @@ void tubep_state::tubep_second_map(address_map &map)
 	map(0xc000, 0xc000).w(FUNC(tubep_state::tubep_background_c000_w));
 	map(0xe000, 0xe7ff).ram().share("share1");                              /* 6116 #1 */
 	map(0xe800, 0xebff).writeonly().share("backgroundram"); /* row of 8 x 2147 RAMs on main PCB */
-	map(0xf000, 0xf3ff).writeonly().share("sprite_color");                      /* sprites color lookup table */
+	map(0xf000, 0xf3ff).lw8([this](offs_t off, u8 data) { m_sprite_colorsharedram[off] = data; }, "sc_w"); /* sprites color lookup table */
 	map(0xf800, 0xffff).ram().share("share2");                                  /* program copies here part of shared ram ?? */
 }
 

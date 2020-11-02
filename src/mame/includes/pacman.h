@@ -44,6 +44,7 @@ protected:
 	void bigbucks_map(address_map &map);
 	void bigbucks_portmap(address_map &map);
 	void birdiy_map(address_map &map);
+	void cannonbp_map(address_map &map);
 	void crushs_map(address_map &map);
 	void crushs_portmap(address_map &map);
 	void dremshpr_map(address_map &map);
@@ -164,7 +165,6 @@ public:
 	void init_ponpoko();
 	void init_eyes();
 	void init_woodpek();
-	void init_cannonbp();
 	void init_jumpshot();
 	void init_mspacii();
 	void init_pacplus();
@@ -208,6 +208,7 @@ private:
 
 public:
 	void birdiy(machine_config &config);
+	void cannonbp(machine_config &config);
 	void rocktrv2(machine_config &config);
 	void mspacman(machine_config &config);
 	void dremshpr(machine_config &config);

@@ -25,7 +25,7 @@ public:
 		, m_palette(*this, "palette")
 		, m_spriteram(*this, "spriteram")
 		, m_soundlatch(*this, "soundlatch")
-		, m_text_videoram(*this, "text_videoram", 0)
+		, m_text_videoram(*this, "text_videoram")
 		, m_spr_pal_clut(*this, "spr_pal_clut")
 		, m_fg_videoram(*this, "fg_videoram")
 		, m_bg_videoram(*this, "bg_videoram")

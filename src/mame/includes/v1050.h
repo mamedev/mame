@@ -91,7 +91,7 @@ public:
 		m_sasi_ctrl_in(*this, "scsi_ctrl_in"),
 		m_rom(*this, Z80_TAG),
 		m_video_ram(*this, "video_ram"),
-		m_attr_ram(*this, "attr_ram"),
+		m_attr_ram(*this, "attr_ram", V1050_VIDEORAM_SIZE, ENDIANNESS_LITTLE),
 		m_int_mask(0),
 		m_int_state(0),
 		m_fdc_irq(0),
@@ -199,7 +199,7 @@ private:
 	required_device<input_buffer_device> m_sasi_ctrl_in;
 	required_memory_region m_rom;
 	required_shared_ptr<uint8_t> m_video_ram;
-	optional_shared_ptr<uint8_t> m_attr_ram;
+	memory_share_creator<uint8_t> m_attr_ram;
 
 	// interrupt state
 	uint8_t m_int_mask;           // interrupt mask

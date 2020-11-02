@@ -172,7 +172,7 @@ p1_fdc_device::p1_fdc_device(const machine_config &mconfig, const char *tag, dev
 void p1_fdc_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_rom(this, 0xe0000, 0xe07ff, "XXX", "p1_fdc");
+	m_isa->install_rom(this, 0xe0000, 0xe07ff, "p1_fdc");
 	m_isa->install_device(0x00c0, 0x00c3, read8sm_delegate(*m_fdc, FUNC(fd1793_device::read)), write8sm_delegate(*m_fdc, FUNC(fd1793_device::write)));
 	m_isa->install_device(0x00c4, 0x00c7, read8sm_delegate(*this, FUNC(p1_fdc_device::p1_fdc_r)), write8sm_delegate(*this, FUNC(p1_fdc_device::p1_fdc_w)));
 }

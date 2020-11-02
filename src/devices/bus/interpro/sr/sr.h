@@ -75,7 +75,7 @@ public:
 		offs_t end = start + (CBUS_SIZE - 1);
 
 		// install the idprom region
-		read32_delegate idprom_r(*this, [idprom] (address_space &space, offs_t offset, u32 mem_mask) { return idprom->as_u32(offset); }, idprom->name());
+		read32sm_delegate idprom_r(*this, [idprom] (offs_t offset) { return idprom->as_u32(offset); }, idprom->name().c_str());
 		m_main_space->install_read_handler(start, start | 0x7f, idprom_r);
 		m_io_space->install_read_handler(start, start | 0x7f, idprom_r);
 
@@ -171,7 +171,7 @@ public:
 		offs_t end = start + (SRX_SIZE - 1);
 
 		// install the idprom region
-		read32_delegate idprom_r(*this, [idprom] (address_space &space, offs_t offset, u32 mem_mask) { return idprom->as_u32(offset); }, idprom->name());
+		read32sm_delegate idprom_r(*this, [idprom] (offs_t offset) { return idprom->as_u32(offset); }, idprom->name().c_str());
 		m_main_space->install_read_handler(start | 0x7f80, start | 0x7fff, idprom_r);
 		m_io_space->install_read_handler(start | 0x7f80, start | 0x7fff, idprom_r);
 

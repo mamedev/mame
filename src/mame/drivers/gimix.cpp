@@ -520,7 +520,7 @@ void gimix_state::machine_start()
 	{
 		for (int bank = 0; bank < 16; bank++)
 		{
-			m_bank[bank]->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
+			m_bank[bank]->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,membank("upper_ram"));
 		}
 	}
 	m_floppy0->get_device()->set_rpm(300);

@@ -404,7 +404,7 @@ void opwolf_state::opwolf_map(address_map &map)
 	map(0x3e0000, 0x3e0000).w("ciu", FUNC(pc060ha_device::master_port_w));
 	map(0x3e0002, 0x3e0002).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
 	map(0xc00000, 0xc0ffff).rw(m_pc080sn, FUNC(pc080sn_device::word_r), FUNC(pc080sn_device::word_w));
-	map(0xc10000, 0xc1ffff).writeonly();                   /* error in init code (?) */
+	map(0xc10000, 0xc1ffff).nopw();                   /* error in init code (?) */
 	map(0xc20000, 0xc20003).w(m_pc080sn, FUNC(pc080sn_device::yscroll_word_w));
 	map(0xc40000, 0xc40003).w(m_pc080sn, FUNC(pc080sn_device::xscroll_word_w));
 	map(0xc50000, 0xc50003).w(m_pc080sn, FUNC(pc080sn_device::ctrl_word_w));
@@ -427,7 +427,7 @@ void opwolf_state::opwolfb_map(address_map &map)
 	map(0x3e0000, 0x3e0000).w("ciu", FUNC(pc060ha_device::master_port_w));
 	map(0x3e0002, 0x3e0002).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
 	map(0xc00000, 0xc0ffff).rw(m_pc080sn, FUNC(pc080sn_device::word_r), FUNC(pc080sn_device::word_w));
-	map(0xc10000, 0xc1ffff).writeonly();                   /* error in init code (?) */
+	map(0xc10000, 0xc1ffff).nopw();                   /* error in init code (?) */
 	map(0xc20000, 0xc20003).w(m_pc080sn, FUNC(pc080sn_device::yscroll_word_w));
 	map(0xc40000, 0xc40003).w(m_pc080sn, FUNC(pc080sn_device::xscroll_word_w));
 	map(0xc50000, 0xc50003).w(m_pc080sn, FUNC(pc080sn_device::ctrl_word_w));
@@ -449,7 +449,7 @@ void opwolf_state::opwolfp_map(address_map &map)
 	map(0x3e0000, 0x3e0000).w("ciu", FUNC(pc060ha_device::master_port_w));
 	map(0x3e0002, 0x3e0002).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
 	map(0xc00000, 0xc0ffff).rw(m_pc080sn, FUNC(pc080sn_device::word_r), FUNC(pc080sn_device::word_w));
-	map(0xc10000, 0xc1ffff).writeonly();                   /* error in init code (?) */
+	map(0xc10000, 0xc1ffff).nopw();                   /* error in init code (?) */
 	map(0xc20000, 0xc20003).w(m_pc080sn, FUNC(pc080sn_device::yscroll_word_w));
 	map(0xc40000, 0xc40003).w(m_pc080sn, FUNC(pc080sn_device::xscroll_word_w));
 	map(0xc50000, 0xc50003).w(m_pc080sn, FUNC(pc080sn_device::ctrl_word_w));

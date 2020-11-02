@@ -155,7 +155,7 @@ void pinsnd88_device::pinsnd88_map(address_map &map)
 	map(0x3400, 0x3400).mirror(0x03ff).r(m_inputlatch, FUNC(generic_latch_8_device::read));
 	map(0x3800, 0x3800).mirror(0x03ff).w(FUNC(pinsnd88_device::bgbank_w));
 	map(0x3c00, 0x3c00).mirror(0x03ff).w(FUNC(pinsnd88_device::sync_w));
-	map(0x4000, 0xbfff).bankr("bank").region("cpu", 0); // banked rom
+	map(0x4000, 0xbfff).bankr("bank"); // banked rom
 	map(0xc000, 0xffff).rom().region("cpu",0x3c000); // fixed bank
 }
 

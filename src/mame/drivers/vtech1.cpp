@@ -65,7 +65,8 @@ class vtech1_state : public driver_device
 public:
 	vtech1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_vram(*this, "videoram")
+		, m_vram(*this, "videoram", 0x2000, ENDIANNESS_LITTLE)
+		, m_bank(*this, "bank")
 		, m_maincpu(*this, "maincpu")
 		, m_crtc(*this, "crtc")
 		, m_speaker(*this, "speaker")
@@ -102,7 +103,8 @@ private:
 	static const uint8_t VZ_BASIC = 0xf0;
 	static const uint8_t VZ_MCODE = 0xf1;
 
-	required_shared_ptr<uint8_t> m_vram;
+	memory_share_creator<uint8_t> m_vram;
+	memory_bank_creator m_bank;
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6847_base_device> m_crtc;
 	required_device<speaker_sound_device> m_speaker;
@@ -248,7 +250,7 @@ void vtech1_state::latch_w(uint8_t data)
 
 void vtech1_state::video_bank_w(uint8_t data)
 {
-	membank("bank4")->set_entry(data & 0x03);
+	m_bank->set_entry(data & 0x03);
 }
 
 
@@ -274,11 +276,10 @@ uint8_t vtech1_state::mc6847_videoram_r(offs_t offset)
 void vtech1_state::init_vtech1h()
 {
 	// the SHRG mod replaces the standard videoram chip with an 8k chip
-	m_vram.allocate(0x2000);
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x7000, 0x77ff, "bank4");
-	membank("bank4")->configure_entries(0, 4, m_vram, 0x800);
-	membank("bank4")->set_entry(0);
+	m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x7000, 0x77ff, m_bank);
+	m_bank->configure_entries(0, 4, m_vram, 0x800);
+	m_bank->set_entry(0);
 }
 
 

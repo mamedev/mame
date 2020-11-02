@@ -651,7 +651,9 @@ void playch10_state::init_pcdboard()
 void playch10_state::init_pcdboard_2()
 {
 	/* extra ram at $6000-$7fff */
-	m_cartcpu->space(AS_PROGRAM).install_ram(0x6000, 0x7fff);
+	m_extra_ram = std::make_unique<uint8_t[]>(0x2000);
+	save_pointer(NAME(m_extra_ram), 0x2000);
+	m_cartcpu->space(AS_PROGRAM).install_ram(0x6000, 0x7fff, m_extra_ram.get());
 
 	/* common init */
 	init_pcdboard();
@@ -752,7 +754,9 @@ void playch10_state::init_pceboard()
 	m_ppu->set_latch(*this, FUNC(playch10_state::mapper9_latch));
 
 	/* nvram at $6000-$6fff */
-	m_cartcpu->space(AS_PROGRAM).install_ram(0x6000, 0x6fff);
+	m_extra_ram = std::make_unique<uint8_t[]>(0x1000);
+	save_pointer(NAME(m_extra_ram), 0x1000);
+	m_cartcpu->space(AS_PROGRAM).install_ram(0x6000, 0x6fff, m_extra_ram.get());
 
 	/* common init */
 	init_playch10();
@@ -787,7 +791,9 @@ void playch10_state::init_pcfboard()
 void playch10_state::init_pcfboard_2()
 {
 	/* extra ram at $6000-$6fff */
-	m_cartcpu->space(AS_PROGRAM).install_ram(0x6000, 0x6fff);
+	m_extra_ram = std::make_unique<uint8_t[]>(0x1000);
+	save_pointer(NAME(m_extra_ram), 0x1000);
+	m_cartcpu->space(AS_PROGRAM).install_ram(0x6000, 0x6fff, m_extra_ram.get());
 
 	m_vram = nullptr;
 
@@ -963,7 +969,9 @@ void playch10_state::init_pcgboard()
 	m_cartcpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8sm_delegate(*this, FUNC(playch10_state::gboard_rom_switch_w)));
 
 	/* extra ram at $6000-$7fff */
-	m_cartcpu->space(AS_PROGRAM).install_ram(0x6000, 0x7fff);
+	m_extra_ram = std::make_unique<uint8_t[]>(0x2000);
+	save_pointer(NAME(m_extra_ram), 0x2000);
+	m_cartcpu->space(AS_PROGRAM).install_ram(0x6000, 0x7fff, m_extra_ram.get());
 
 	m_gboard_banks[0] = 0x1e;
 	m_gboard_banks[1] = 0x1f;
@@ -1084,7 +1092,9 @@ void playch10_state::init_pchboard()
 	m_cartcpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8sm_delegate(*this, FUNC(playch10_state::hboard_rom_switch_w)));
 
 	/* extra ram at $6000-$7fff */
-	m_cartcpu->space(AS_PROGRAM).install_ram(0x6000, 0x7fff);
+	m_extra_ram = std::make_unique<uint8_t[]>(0x2000);
+	save_pointer(NAME(m_extra_ram), 0x2000);
+	m_cartcpu->space(AS_PROGRAM).install_ram(0x6000, 0x7fff, m_extra_ram.get());
 
 	m_gboard_banks[0] = 0x1e;
 	m_gboard_banks[1] = 0x1f;
@@ -1113,7 +1123,9 @@ void playch10_state::init_pckboard()
 	m_mmc1_rom_mask = 0x0f;
 
 	/* extra ram at $6000-$7fff */
-	m_cartcpu->space(AS_PROGRAM).install_ram(0x6000, 0x7fff);
+	m_extra_ram = std::make_unique<uint8_t[]>(0x2000);
+	save_pointer(NAME(m_extra_ram), 0x2000);
+	m_cartcpu->space(AS_PROGRAM).install_ram(0x6000, 0x7fff, m_extra_ram.get());
 
 	/* Roms are banked at $8000 to $bfff */
 	m_cartcpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8sm_delegate(*this, FUNC(playch10_state::mmc1_rom_switch_w)));

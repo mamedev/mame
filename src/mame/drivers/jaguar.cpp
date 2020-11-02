@@ -1960,7 +1960,7 @@ image_init_result jaguar_state::quickload_cb(device_image_interface &image, cons
 	{
 		memset(m_shared_ram, 0, 0x200000);
 		image.fseek(0, SEEK_SET);
-		image.fread( &memregion("maincpu")->base()[start-skip], quickload_size);
+		image.fread( &m_shared_ram[(start-skip)/4], quickload_size);
 		quickload_begin = start;
 		fix_endian(&memregion("maincpu")->base()[(start-skip)&0xfffffc], quickload_size);
 	}

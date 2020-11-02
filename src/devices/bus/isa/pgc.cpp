@@ -71,8 +71,6 @@ ROM_START( pgc )
 	ROMX_LOAD("pgc_u44.bin", 0x00000, 0x8000, CRC(71280241) SHA1(7042ccd4ebd03f576a256a433b8aa38d1b4fefa8), ROM_BIOS(1))
 	ROMX_LOAD("pgc_u43.bin", 0x08000, 0x8000, CRC(923f5ea3) SHA1(2b2a55d64b20d3a613b00c51443105aa03eca5d6), ROM_BIOS(1))
 
-	ROM_REGION(0x800, "commarea", ROMREGION_ERASE00)
-
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD("pgc_u27.bin", 0x0000, 0x1000, CRC(6be256cc) SHA1(deb1195886268dcddce10459911e020f7a9f74f7))
 ROM_END
@@ -113,7 +111,7 @@ void isa8_pgc_device::pgc_map(address_map &map)
 	map(0x08000, 0x0ffff).rom().region("maincpu", 0x8000);
 	map(0x10000, 0x1001f).rw(FUNC(isa8_pgc_device::stateparam_r), FUNC(isa8_pgc_device::stateparam_w));
 //  map(0x18000, 0x18fff).ram();   // ??
-	map(0x28000, 0x287ff).ram().region("commarea", 0).mirror(0x800);
+	map(0x28000, 0x287ff).ram().share("commarea").mirror(0x800);
 	map(0x32001, 0x32001).nopw();
 	map(0x32020, 0x3203f).w(FUNC(isa8_pgc_device::accel_w));
 	map(0x3c000, 0x3c001).r(FUNC(isa8_pgc_device::init_r));
@@ -210,7 +208,8 @@ isa8_pgc_device::isa8_pgc_device(const machine_config &mconfig, device_type type
 	m_cpu(*this, "maincpu"),
 	m_screen(*this, PGC_SCREEN_NAME),
 	m_palette(*this, "palette"),
-	m_commarea(nullptr), m_vram(nullptr), m_eram(nullptr)
+	m_commarea(*this, "commarea"),
+	m_vram(nullptr), m_eram(nullptr)
 {
 }
 
@@ -246,11 +245,10 @@ void isa8_pgc_device::device_reset()
 	memset(m_lut, 0, sizeof(m_lut));
 	m_accel = 0;
 
-	m_commarea = memregion("commarea")->base();
 	if (BIT(ioport("DSW")->read(), 1))
-		m_isa->install_bank(0xc6400, 0xc67ff, "commarea", m_commarea);
+		m_isa->install_bank(0xc6400, 0xc67ff, m_commarea);
 	else
-		m_isa->install_bank(0xc6000, 0xc63ff, "commarea", m_commarea);
+		m_isa->install_bank(0xc6000, 0xc63ff, m_commarea);
 }
 
 //
@@ -389,8 +387,7 @@ uint8_t isa8_pgc_device::init_r()
 		space.unmap_read(0xf8000, 0xfffff);
 
 		LOG("INIT: mapping emulator RAM\n");
-		space.install_readwrite_bank(0xf8000, 0xfffff, "eram");
-		membank("eram")->set_base(m_eram.get());
+		space.install_ram(0xf8000, 0xfffff, m_eram.get());
 
 		LOG("INIT: mapping LUT\n");
 		space.install_write_handler(0xf8400, 0xf85ff, write8sm_delegate(*this, FUNC(isa8_pgc_device::lut_w)));

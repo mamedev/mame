@@ -3813,8 +3813,6 @@ void subsino_state::init_stbsub()
 
 	for (uint8_t reel = 0; reel < 3; reel++)
 	{
-		m_reel_scroll[reel].allocate(0x40);
-
 		m_reel_attr[reel] = std::make_unique<uint8_t[]>(0x200);
 
 		save_pointer(NAME(m_reel_attr[reel]), 0x200, reel);
@@ -3829,8 +3827,6 @@ void subsino_state::init_stisub()
 
 	for (uint8_t reel = 0; reel < 3; reel++)
 	{
-		m_reel_scroll[reel].allocate(0x40);
-
 		m_reel_attr[reel] = std::make_unique<uint8_t[]>(0x200);
 
 		save_pointer(NAME(m_reel_attr[reel]), 0x200, reel);
@@ -3849,8 +3845,6 @@ void subsino_state::init_tesorone()
 
 	for (uint8_t reel = 0; reel < 3; reel++)
 	{
-		m_reel_scroll[reel].allocate(0x40);
-
 		m_reel_attr[reel] = std::make_unique<uint8_t[]>(0x200);
 
 		save_pointer(NAME(m_reel_attr[reel]), 0x200, reel);
@@ -3869,8 +3863,6 @@ void subsino_state::init_tesorone230()
 
 	for (uint8_t reel = 0; reel < 3; reel++)
 	{
-		m_reel_scroll[reel].allocate(0x40);
-
 		m_reel_attr[reel] = std::make_unique<uint8_t[]>(0x200);
 
 		save_pointer(NAME(m_reel_attr[reel]), 0x200, reel);
@@ -3882,8 +3874,6 @@ void subsino_state::init_mtrainnv()
 {
 	for (uint8_t reel = 0; reel < 3; reel++)
 	{
-		m_reel_scroll[reel].allocate(0x40);
-
 		m_reel_attr[reel] = std::make_unique<uint8_t[]>(0x200);
 
 		save_pointer(NAME(m_reel_attr[reel]), 0x200, reel);

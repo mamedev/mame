@@ -88,8 +88,8 @@ void nubus_laserview_device::device_start()
 //  printf("[laserview %p] slotspace = %x\n", this, slotspace);
 
 	m_vram.resize(VRAM_SIZE);
-	install_bank(slotspace, slotspace+VRAM_SIZE-1, "bank_laserview", &m_vram[0]);
-	install_bank(slotspace+0x900000, slotspace+0x900000+VRAM_SIZE-1, "bank_laserview2", &m_vram[0]);
+	install_bank(slotspace, slotspace+VRAM_SIZE-1, &m_vram[0]);
+	install_bank(slotspace+0x900000, slotspace+0x900000+VRAM_SIZE-1, &m_vram[0]);
 
 	nubus().install_device(slotspace+0xB0000, slotspace+0xBFFFF, read32s_delegate(*this, FUNC(nubus_laserview_device::regs_r)), write32s_delegate(*this, FUNC(nubus_laserview_device::regs_w)));
 }

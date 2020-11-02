@@ -72,7 +72,7 @@ void isa16_svga_cirrus_device::device_start()
 {
 	set_isa_device();
 
-	m_isa->install_rom(this, 0xc0000, 0xc7fff, "svga", "dm_clgd5430");
+	m_isa->install_rom(this, 0xc0000, 0xc7fff, "dm_clgd5430");
 
 	m_isa->install_device(0x03b0, 0x03bf, read8sm_delegate(*m_vga, FUNC(cirrus_gd5430_device::port_03b0_r)), write8sm_delegate(*m_vga, FUNC(cirrus_gd5430_device::port_03b0_w)));
 	m_isa->install_device(0x03c0, 0x03cf, read8sm_delegate(*m_vga, FUNC(cirrus_gd5430_device::port_03c0_r)), write8sm_delegate(*m_vga, FUNC(cirrus_gd5430_device::port_03c0_w)));
@@ -150,7 +150,7 @@ void isa16_svga_cirrus_gd542x_device::device_start()
 {
 	set_isa_device();
 
-	m_isa->install_rom(this, 0xc0000, 0xc7fff, "svga", "clgd542x");
+	m_isa->install_rom(this, 0xc0000, 0xc7fff, "clgd542x");
 
 	m_isa->install_device(0x03b0, 0x03bf, read8sm_delegate(*m_vga, FUNC(cirrus_gd5428_device::port_03b0_r)), write8sm_delegate(*m_vga, FUNC(cirrus_gd5428_device::port_03b0_w)));
 	m_isa->install_device(0x03c0, 0x03cf, read8sm_delegate(*m_vga, FUNC(cirrus_gd5428_device::port_03c0_r)), write8sm_delegate(*m_vga, FUNC(cirrus_gd5428_device::port_03c0_w)));

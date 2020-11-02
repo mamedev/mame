@@ -136,8 +136,7 @@ void ec184x_state::memboard_w(offs_t offset, uint8_t data)
 		for (int i = 0; i < 4; i++)
 			m_memory.enable[i] &= 0xfb;
 		// enable read access
-		membank("bank10")->set_base(m_ram->pointer() + offset * EC1841_MEMBOARD_SIZE);
-		program.install_read_bank(0, EC1841_MEMBOARD_SIZE - 1, "bank10");
+		program.install_rom(0, EC1841_MEMBOARD_SIZE - 1, m_ram->pointer() + offset * EC1841_MEMBOARD_SIZE);
 		LOG("ec1841_memboard_w map_read(%d)\n", offset);
 	}
 
@@ -146,8 +145,7 @@ void ec184x_state::memboard_w(offs_t offset, uint8_t data)
 		for (int i = 0; i < 4; i++)
 			m_memory.enable[i] &= 0xf7;
 		// enable write access
-		membank("bank20")->set_base(m_ram->pointer() + offset * EC1841_MEMBOARD_SIZE);
-		program.install_write_bank(0, EC1841_MEMBOARD_SIZE - 1, "bank20");
+		program.install_writeonly(0, EC1841_MEMBOARD_SIZE - 1, m_ram->pointer() + offset * EC1841_MEMBOARD_SIZE);
 		LOG("ec1841_memboard_w map_write(%d)\n", offset);
 	}
 
@@ -158,8 +156,7 @@ void ec184x_state::init_ec1840()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
-	program.install_readwrite_bank(0, m_ram->size()-1, "bank10");
-	membank("bank10")->set_base(m_ram->pointer());
+	program.install_ram(0, m_ram->size()-1, m_ram->pointer());
 }
 
 void ec184x_state::init_ec1841()
@@ -169,20 +166,13 @@ void ec184x_state::init_ec1841()
 	m_memory.boards = m_ram->size() / EC1841_MEMBOARD_SIZE;
 	if (m_memory.boards > 4) m_memory.boards = 4;
 
-	program.install_read_bank(0,  EC1841_MEMBOARD_SIZE-1, "bank10");
-	program.install_write_bank(0, EC1841_MEMBOARD_SIZE-1, "bank20");
-
-	membank("bank10")->set_base(m_ram->pointer());
-	membank("bank20")->set_base(m_ram->pointer());
+	program.install_ram(0,  EC1841_MEMBOARD_SIZE-1, m_ram->pointer());
 
 	// 640K configuration is special -- 512K board mapped at 0 + 128K board mapped at 512K
 	// XXX verify this was actually the case
 	if (m_ram->size() == 640 * 1024)
 	{
-		program.install_read_bank(EC1841_MEMBOARD_SIZE, m_ram->size() - 1, "bank11");
-		program.install_write_bank(EC1841_MEMBOARD_SIZE, m_ram->size() - 1, "bank21");
-		membank("bank11")->set_base(m_ram->pointer() + EC1841_MEMBOARD_SIZE);
-		membank("bank21")->set_base(m_ram->pointer() + EC1841_MEMBOARD_SIZE);
+		program.install_ram(EC1841_MEMBOARD_SIZE, m_ram->size() - 1, m_ram->pointer() + EC1841_MEMBOARD_SIZE);
 	}
 }
 

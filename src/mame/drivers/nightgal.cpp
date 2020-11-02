@@ -417,8 +417,8 @@ void nightgal_state::sexygal_audionmi_w(uint8_t data)
 void nightgal_state::sweetgal_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x807f).ram().share("sound_ram");
-	map(0xe000, 0xefff).rw(FUNC(nightgal_state::royalqn_comm_r), FUNC(nightgal_state::royalqn_comm_w)).share("comms_ram");
+	map(0x8000, 0x807f).lrw8([this](offs_t off) { return m_sound_ram[off]; }, "snd_r", [this](offs_t off, u8 data) { m_sound_ram[off] = data; }, "snd_w");
+	map(0xe000, 0xefff).rw(FUNC(nightgal_state::royalqn_comm_r), FUNC(nightgal_state::royalqn_comm_w));
 	map(0xf000, 0xffff).ram();
 }
 

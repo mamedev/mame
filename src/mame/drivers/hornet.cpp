@@ -784,8 +784,8 @@ void hornet_state::hornet_map(address_map &map)
 	map(0x7d020000, 0x7d021fff).rw("m48t58", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write));  /* M48T58Y RTC/NVRAM */
 	map(0x7d030000, 0x7d03000f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
 	map(0x7e000000, 0x7e7fffff).rom().region("user2", 0);       /* Data ROM */
-	map(0x7f000000, 0x7f3fffff).rom().share("share2");
-	map(0x7fc00000, 0x7fffffff).rom().region("user1", 0).share("share2");    /* Program ROM */
+	map(0x7f000000, 0x7f3fffff).rom().region("user1", 0);
+	map(0x7fc00000, 0x7fffffff).rom().region("user1", 0);    /* Program ROM */
 }
 
 void hornet_state::terabrst_map(address_map &map)

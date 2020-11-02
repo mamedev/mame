@@ -88,7 +88,6 @@ public:
 	dgn_beta_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_mc6845(*this, "crtc"),
-		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_dmacpu(*this, DMACPU_TAG),
 		m_ram(*this, RAM_TAG),
@@ -127,7 +126,6 @@ private:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	required_device<mc6845_device> m_mc6845;
-	required_shared_ptr<uint8_t> m_videoram;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_dmacpu;
 	required_device<ram_device> m_ram;

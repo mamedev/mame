@@ -142,8 +142,8 @@ private:
 	void fast_gatea20(int state);
 	void keyboard_gatea20(int state);
 
-	void update_read_region(int index, const char *region, offs_t start, offs_t end);
-	void update_write_region(int index, const char *region, offs_t start, offs_t end);
+	void update_read_region(int index, offs_t start, offs_t end);
+	void update_write_region(int index, offs_t start, offs_t end);
 	void update_read_regions();
 	void update_write_regions();
 

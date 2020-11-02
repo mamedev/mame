@@ -41,8 +41,8 @@ protected:
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override { }
-	virtual void nvram_read(emu_file &file) override { if (m_nvram != nullptr) { file.read(m_nvram, m_nvram.bytes()); } }
-	virtual void nvram_write(emu_file &file) override { if (m_nvram != nullptr) { file.write(m_nvram, m_nvram.bytes()); } }
+	virtual void nvram_read(emu_file &file) override { if (m_nvram != nullptr) { file.read(m_nvram, m_nvram.share()->bytes()); } }
+	virtual void nvram_write(emu_file &file) override { if (m_nvram != nullptr) { file.write(m_nvram, m_nvram.share()->bytes()); } }
 
 	// device_abcbus_interface overrides
 	virtual void abcbus_cs(uint8_t data) override { m_bus->write_cs(data); }
@@ -61,7 +61,7 @@ private:
 	required_memory_region m_rom_1;
 	required_memory_region m_rom_2;
 	required_memory_region m_prom;
-	optional_shared_ptr<uint8_t> m_nvram;
+	memory_share_creator<uint8_t> m_nvram;
 	uint8_t m_rom_bank;
 	uint8_t m_prom_bank;
 };

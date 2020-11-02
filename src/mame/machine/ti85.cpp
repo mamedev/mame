@@ -141,7 +141,7 @@ void ti85_state::ti8x_update_bank(address_space &space, uint8_t bank, uint8_t *b
 	membank(tag[bank&3])->set_base(base + (0x4000 * page));
 
 	if (is_ram)
-		space.install_write_bank(bank * 0x4000, bank * 0x4000 + 0x3fff, tag[bank&3]);
+		space.install_write_bank(bank * 0x4000, bank * 0x4000 + 0x3fff, membank(tag[bank&3]));
 	else
 		space.nop_write(bank * 0x4000, bank * 0x4000 + 0x3fff);
 }

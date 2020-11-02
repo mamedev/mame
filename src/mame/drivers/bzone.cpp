@@ -348,8 +348,18 @@ void bzone_state::bzone_map(address_map &map)
 	map(0x1820, 0x182f).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x1840, 0x1840).w(FUNC(bzone_state::bzone_sounds_w));
 	map(0x1860, 0x187f).w(m_mathbox, FUNC(mathbox_device::go_w));
-	map(0x2000, 0x2fff).ram().share("avg:vectorram").region("maincpu", 0x2000);
+	map(0x2000, 0x2fff).ram().share("avg:vectorram");
 	map(0x3000, 0x7fff).rom();
+}
+
+void bzone_state::bradley_map(address_map &map)
+{
+	bzone_map(map);
+	map(0x0400, 0x07ff).ram();
+	map(0x1808, 0x1808).portr("1808");
+	map(0x1809, 0x1809).portr("1809");
+	map(0x180a, 0x180a).r(FUNC(bzone_state::analog_data_r));
+	map(0x1848, 0x1850).w(FUNC(bzone_state::analog_select_w));
 }
 
 void redbaron_state::redbaron_map(address_map &map)
@@ -373,7 +383,7 @@ void redbaron_state::redbaron_map(address_map &map)
 	map(0x1810, 0x181f).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x1820, 0x185f).rw(FUNC(redbaron_state::earom_read), FUNC(redbaron_state::earom_write));
 	map(0x1860, 0x187f).nopr().w("mathbox", FUNC(mathbox_device::go_w));
-	map(0x2000, 0x2fff).ram().share("avg:vectorram").region("maincpu", 0x2000);
+	map(0x2000, 0x2fff).ram().share("avg:vectorram");
 	map(0x3000, 0x7fff).rom();
 }
 
@@ -598,6 +608,12 @@ void bzone_state::bzone(machine_config &config)
 
 	/* sound hardware */
 	bzone_audio(config);
+}
+
+void bzone_state::bradley(machine_config &config)
+{
+	bzone(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bzone_state::bradley_map);
 }
 
 void redbaron_state::redbaron(machine_config &config)
@@ -890,18 +906,6 @@ void bzone_state::analog_select_w(offs_t offset, uint8_t data)
 }
 
 
-void bzone_state::init_bradley()
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_ram(0x400, 0x7ff);
-	space.install_read_port(0x1808, 0x1808, "1808");
-	space.install_read_port(0x1809, 0x1809, "1809");
-	space.install_read_handler(0x180a, 0x180a, read8smo_delegate(*this, FUNC(bzone_state::analog_data_r)));
-	space.install_write_handler(0x1848, 0x1850, write8sm_delegate(*this, FUNC(bzone_state::analog_select_w)));
-}
-
-
-
 /*************************************
  *
  *  Game drivers
@@ -911,6 +915,6 @@ void bzone_state::init_bradley()
 GAMEL(1980, bzone,     0,        bzone,    bzone,    bzone_state,    empty_init,   ROT0, "Atari", "Battle Zone (rev 2)",          MACHINE_SUPPORTS_SAVE, layout_bzone )
 GAMEL(1980, bzonea,    bzone,    bzone,    bzone,    bzone_state,    empty_init,   ROT0, "Atari", "Battle Zone (rev 1)",          MACHINE_SUPPORTS_SAVE, layout_bzone )
 GAMEL(1980, bzonec,    bzone,    bzone,    bzone,    bzone_state,    empty_init,   ROT0, "Atari", "Battle Zone (cocktail)",       MACHINE_SUPPORTS_SAVE|MACHINE_NO_COCKTAIL, layout_bzone )
-GAME( 1980, bradley,   0,        bzone,    bradley,  bzone_state,    init_bradley, ROT0, "Atari", "Bradley Trainer",              MACHINE_SUPPORTS_SAVE )
+GAME( 1980, bradley,   0,        bradley,  bradley,  bzone_state,    empty_init,  ROT0, "Atari", "Bradley Trainer",              MACHINE_SUPPORTS_SAVE )
 GAMEL(1980, redbaron,  0,        redbaron, redbaron, redbaron_state, empty_init,   ROT0, "Atari", "Red Baron (Revised Hardware)", MACHINE_SUPPORTS_SAVE, layout_redbaron )
 GAMEL(1980, redbarona, redbaron, redbaron, redbaron, redbaron_state, empty_init,   ROT0, "Atari", "Red Baron",                    MACHINE_SUPPORTS_SAVE, layout_redbaron )

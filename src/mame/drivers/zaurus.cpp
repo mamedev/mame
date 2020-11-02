@@ -1476,7 +1476,7 @@ private:
 
 void zaurus_sa_state::main_map(address_map &map)
 {
-	map(0x00000000, 0x00ffffff).ram().region("firmware", 0);
+	map(0x00000000, 0x00ffffff).rom().region("firmware", 0);
 	map(0x90020000, 0x9002001f).rw(m_sa_periphs, FUNC(sa1110_periphs_device::power_r), FUNC(sa1110_periphs_device::power_w));
 	map(0x90050000, 0x90050023).rw(m_sa_periphs, FUNC(sa1110_periphs_device::intc_r), FUNC(sa1110_periphs_device::intc_w));
 	map(0xc0000000, 0xc07fffff).ram().share("ram");
@@ -1484,7 +1484,7 @@ void zaurus_sa_state::main_map(address_map &map)
 
 void zaurus_pxa_state::main_map(address_map &map)
 {
-	map(0x00000000, 0x001fffff).ram().region("firmware", 0);
+	map(0x00000000, 0x001fffff).rom().region("firmware", 0);
 	map(0x40000000, 0x400002ff).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::dma_r), FUNC(pxa255_periphs_device::dma_w));
 	map(0x40400000, 0x40400083).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::i2s_r), FUNC(pxa255_periphs_device::i2s_w));
 	map(0x40900000, 0x4090000f).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::rtc_r), FUNC(pxa255_periphs_device::rtc_w));

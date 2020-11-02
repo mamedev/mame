@@ -1148,18 +1148,33 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 			osd_printf_error("In %s memory range %x-%x, mirror %x touches a select bit (%x)\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, entry.m_addrmirror, entry.m_addrmirror & entry.m_addrselect);
 
 		// if this is a program space, auto-assign implicit ROM entries
-		if (entry.m_read.m_type == AMH_ROM && entry.m_region == nullptr)
+		if (entry.m_read.m_type == AMH_ROM && entry.m_region == nullptr && spacenum == AS_PROGRAM && entry.m_share == nullptr)
 		{
 			entry.m_region = m_device->tag();
 			entry.m_rgnoffs = entry.m_addrstart;
 		}
 
+		// detect conflicts between region and share
+		if (entry.m_region && entry.m_share)
+			osd_printf_error("%s space memory map entry %X-%X has both .region() and .share()\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend);
+
+
+		// Detect inaccesible memory.  Region automapping is handled before
+		if (entry.m_read.m_type == AMH_ROM && entry.m_write.m_type != AMH_RAM &&
+			!entry.m_share && !entry.m_region)
+			osd_printf_error("%s space memory map entry %X-%X has .rom() but no .region() or .share()\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend);
+		if (entry.m_read.m_type != AMH_RAM && entry.m_write.m_type == AMH_RAM &&
+			!entry.m_share)
+			osd_printf_error("%s space memory map entry %X-%X has .writeonly() but no .share()\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend);
+
 		// if this entry references a memory region, validate it
-		if (entry.m_region != nullptr && entry.m_share == nullptr)
+		if (entry.m_region != nullptr)
 		{
 			// address map entries that reference regions but are NOPs are pointless
-			if (entry.m_read.m_type == AMH_NONE && entry.m_write.m_type == AMH_NONE)
-				osd_printf_error("%s space references memory region %s, but is noprw()\n", spaceconfig.m_name, entry.m_region);
+			if (entry.m_read.m_type != AMH_ROM && entry.m_read.m_type != AMH_RAM)
+				osd_printf_error("%s space memory map entry %X-%X references memory region %s, but can't read it\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, entry.m_region);
+			if (entry.m_write.m_type == AMH_RAM)
+				osd_printf_error("%s space memory map entry %X-%X references memory region %s, but wants to write to it\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, entry.m_region);
 
 			// make sure we can resolve the full path to the region
 			bool found = false;

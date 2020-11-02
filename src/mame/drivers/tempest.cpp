@@ -488,7 +488,7 @@ void tempest_state::main_map(address_map &map)
 	map(0x0c00, 0x0c00).portr("IN0");
 	map(0x0d00, 0x0d00).portr("DSW1");
 	map(0x0e00, 0x0e00).portr("DSW2");
-	map(0x2000, 0x2fff).ram().share("avg:vectorram").region("maincpu", 0x2000);
+	map(0x2000, 0x2fff).ram().share("avg:vectorram");
 	map(0x3000, 0x3fff).rom();
 	map(0x4000, 0x4000).w(FUNC(tempest_state::tempest_coin_w));
 	map(0x4800, 0x4800).w(m_avg, FUNC(avg_tempest_device::go_w));

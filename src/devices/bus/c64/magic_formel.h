@@ -51,7 +51,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( pia_cb2_w );
 
 	required_device<pia6821_device> m_pia;
-	optional_shared_ptr<uint8_t> m_ram;
+	memory_share_creator<uint8_t> m_ram;
 
 	uint8_t m_rom_bank;
 	uint8_t m_ram_bank;

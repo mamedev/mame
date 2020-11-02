@@ -359,7 +359,7 @@ void dgpix_state::mem_map(address_map &map)
 	map(0x40000000, 0x4003ffff).rw(FUNC(dgpix_state::vram_r), FUNC(dgpix_state::vram_w));
 	map(0xe0000000, 0xe1ffffff).rw(FUNC(dgpix_state::flash_r), FUNC(dgpix_state::flash_w));
 	map(0xe2000000, 0xe3ffffff).rw(FUNC(dgpix_state::flash_r), FUNC(dgpix_state::flash_w));
-	map(0xffc00000, 0xffffffff).rom().region("flash", 0x1c00000).share("nvram");
+	map(0xffc00000, 0xffffffff).rom().region("flash", 0x1c00000);
 }
 
 void dgpix_state::io_map(address_map &map)

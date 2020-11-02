@@ -25,7 +25,8 @@ public:
 		m_soundram(*this, "soundram"),
 		m_digitalker(*this, "digitalker"),
 		m_soundlatch(*this, "soundlatch"),
-		m_dial(*this, "DIAL")
+		m_dial(*this, "DIAL"),
+		m_cavelon_bank_object(*this, "cavelon_bank")
 	{
 	}
 
@@ -38,6 +39,8 @@ public:
 	optional_device<generic_latch_8_device> m_soundlatch;
 
 	optional_ioport m_dial;
+
+	memory_bank_creator m_cavelon_bank_object;
 
 	DECLARE_CUSTOM_INPUT_MEMBER(darkplnt_dial_r);
 	template <int Mask> DECLARE_READ_LINE_MEMBER(ckongs_coinage_r);

@@ -97,7 +97,7 @@ public:
 	void set_xscroll(int xscroll) { m_xscroll = xscroll & m_bitmapxmask; }
 	void set_yscroll(int yscroll) { m_yscroll = yscroll & m_bitmapymask; }
 	void set_scroll(int xscroll, int yscroll) { set_xscroll(xscroll); set_yscroll(yscroll); }
-	void set_slipram(uint16_t *ram) { m_slipram.set_target(ram, 2); }
+	void set_slipram(uint16_t *ram) { m_slipram = ram; }
 
 	// rendering
 	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
@@ -201,21 +201,22 @@ private:
 
 	// live state
 	emu_timer *             m_force_update_timer;   // timer for forced updating
-	uint32_t                  m_bank;               // current bank number
-	uint32_t                  m_xscroll;            // xscroll offset
-	uint32_t                  m_yscroll;            // yscroll offset
+	uint32_t                m_bank;               // current bank number
+	uint32_t                m_xscroll;            // xscroll offset
+	uint32_t                m_yscroll;            // yscroll offset
 
 	// arrays
-	optional_shared_ptr<uint16_t> m_slipram;    // pointer to the SLIP RAM
+	uint16_t *              m_slipram;    // pointer to the SLIP RAM
+	optional_shared_ptr<u16> m_slipramshare;
 	std::vector<uint32_t>   m_codelookup;       // lookup table for codes
 	std::vector<uint8_t>    m_colorlookup;       // lookup table for colors
 	std::vector<uint8_t>    m_gfxlookup;         // lookup table for graphics
 
-	uint16_t                  m_activelist[MAX_PER_BANK*4]; // active list
-	uint16_t *                m_activelast;           // last entry in the active list
+	uint16_t                m_activelist[MAX_PER_BANK*4]; // active list
+	uint16_t *              m_activelast;           // last entry in the active list
 
-	uint32_t                  m_last_xpos;          // (during processing) the previous X position
-	uint32_t                  m_next_xpos;          // (during processing) the next X position
+	uint32_t                m_last_xpos;          // (during processing) the previous X position
+	uint32_t                m_next_xpos;          // (during processing) the next X position
 	required_device<gfxdecode_device> m_gfxdecode;
 };
 

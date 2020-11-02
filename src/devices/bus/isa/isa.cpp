@@ -356,10 +356,9 @@ template void isa8_device::install_space<read8smo_delegate, write8sm_delegate >(
 template void isa8_device::install_space<read8smo_delegate, write8mo_delegate >(int spacenum, offs_t start, offs_t end, read8smo_delegate rhandler, write8mo_delegate whandler);
 template void isa8_device::install_space<read8smo_delegate, write8smo_delegate>(int spacenum, offs_t start, offs_t end, read8smo_delegate rhandler, write8smo_delegate whandler);
 
-void isa8_device::install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data)
+void isa8_device::install_bank(offs_t start, offs_t end, uint8_t *data)
 {
-	m_memspace->install_readwrite_bank(start, end, 0, tag );
-	machine().root_device().membank(m_memspace->device().siblingtag(tag).c_str())->set_base(data);
+	m_memspace->install_ram(start, end, data);
 }
 
 void isa8_device::unmap_bank(offs_t start, offs_t end)
@@ -367,16 +366,15 @@ void isa8_device::unmap_bank(offs_t start, offs_t end)
 	m_memspace->unmap_readwrite(start, end);
 }
 
-void isa8_device::install_rom(device_t *dev, offs_t start, offs_t end, const char *tag, const char *region)
+void isa8_device::install_rom(device_t *dev, offs_t start, offs_t end, const char *region)
 {
 	if (machine().root_device().memregion("isa")) {
 		uint8_t *src = dev->memregion(region)->base();
 		uint8_t *dest = machine().root_device().memregion("isa")->base() + start - 0xc0000;
 		memcpy(dest,src, end - start + 1);
 	} else {
-		m_memspace->install_read_bank(start, end, 0, tag);
+		m_memspace->install_rom(start, end, machine().root_device().memregion(dev->subtag(region).c_str())->base());
 		m_memspace->unmap_write(start, end);
-		machine().root_device().membank(m_memspace->device().siblingtag(tag).c_str())->set_base(machine().root_device().memregion(dev->subtag(region).c_str())->base());
 	}
 }
 

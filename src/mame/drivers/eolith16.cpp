@@ -28,7 +28,7 @@ public:
 	eolith16_state(const machine_config &mconfig, device_type type, const char *tag)
 		: eolith_state(mconfig, type, tag)
 		, m_special_io(*this, "SPECIAL")
-		, m_vram(*this, "vram", 16)
+		, m_vram(*this, "vram")
 		, m_vrambank(*this, "vrambank")
 	{
 	}

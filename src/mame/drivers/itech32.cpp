@@ -632,13 +632,13 @@ u16 drivedge_state::gas_r()
 
 u16 itech32_state::wcbowl_prot_result_r()
 {
-	return m_main_ram[0x111d/2];
+	return m_nvram[0x111d/2];
 }
 
 
 u8 itech32_state::itech020_prot_result_r()
 {
-	u32 result = ((u32 *)m_main_ram.target())[m_itech020_prot_address >> 2];
+	u32 result = ((u32 *)m_nvram.target())[m_itech020_prot_address >> 2];
 	result >>= (~m_itech020_prot_address & 3) * 8;
 	return result & 0xff;
 }
@@ -850,7 +850,7 @@ u32 drivedge_state::tms2_speedup_r(address_space &space)
 void itech32_state::nvram_init(nvram_device &nvram, void *base, size_t length)
 {
 	// if nvram is the main RAM, don't overwrite exception vectors
-	int start = (base == m_main_ram) ? 0x80 : 0x00;
+	int start = (base == m_nvram) ? 0x80 : 0x00;
 	for (int i = start; i < length; i++)
 		((u8 *)base)[i] = machine().rand();
 }
@@ -860,7 +860,7 @@ void drivedge_state::nvram_init(nvram_device &nvram, void *base, size_t length)
 	itech32_state::nvram_init(nvram, base, length);
 
 	// due to accessing uninitialized RAM, we need this hack
-	((u32 *)m_main_ram.target())[0x2ce4/4] = 0x0000001e;
+	((u32 *)m_nvram.target())[0x2ce4/4] = 0x0000001e;
 }
 
 /*************************************
@@ -885,7 +885,7 @@ void itech32_state::timekill_map(address_map &map)
 	map(0x080000, 0x08007f).rw(FUNC(itech32_state::video_r), FUNC(itech32_state::video_w)).share("video");
 	map(0x0a0000, 0x0a0001).w(FUNC(itech32_state::int1_ack_w));
 	map(0x0c0000, 0x0c7fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x100000, 0x17ffff).rom().region("user1", 0).share("main_rom");
+	map(0x100000, 0x17ffff).rom().region("user1", 0);
 }
 
 
@@ -906,7 +906,7 @@ void itech32_state::bloodstm_map(address_map &map)
 	map(0x580000, 0x59ffff).ram().w(FUNC(itech32_state::bloodstm_paletteram_w)).share("palette");
 	map(0x700001, 0x700001).w(FUNC(itech32_state::bloodstm_plane_w));
 	map(0x780000, 0x780001).portr("EXTRA");
-	map(0x800000, 0x87ffff).mirror(0x780000).rom().region("user1", 0).share("main_rom");
+	map(0x800000, 0x87ffff).mirror(0x780000).rom().region("user1", 0);
 }
 
 
@@ -920,7 +920,7 @@ u32 itech32_state::test1_r(offs_t offset, u32 mem_mask)
 	if (ACCESSING_BITS_16_23 && !m_written[0x100 + offset*4+1]) logerror("%06X:read from uninitialized memory %04X\n", m_maincpu->pc(), 0x100 + offset*4+1);
 	if (ACCESSING_BITS_8_15 && !m_written[0x100 + offset*4+2]) logerror("%06X:read from uninitialized memory %04X\n", m_maincpu->pc(), 0x100 + offset*4+2);
 	if (ACCESSING_BITS_0_7 && !m_written[0x100 + offset*4+3]) logerror("%06X:read from uninitialized memory %04X\n", m_maincpu->pc(), 0x100 + offset*4+3);
-	return ((u32 *)m_main_ram)[0x100/4 + offset];
+	return ((u32 *)m_nvram)[0x100/4 + offset];
 }
 
 void itech32_state::test1_w(offs_t offset, u32 data, u32 mem_mask)
@@ -929,7 +929,7 @@ void itech32_state::test1_w(offs_t offset, u32 data, u32 mem_mask)
 	if (ACCESSING_BITS_16_23) m_written[0x100 + offset*4+1] = 1;
 	if (ACCESSING_BITS_8_15) m_written[0x100 + offset*4+2] = 1;
 	if (ACCESSING_BITS_0_7) m_written[0x100 + offset*4+3] = 1;
-	COMBINE_DATA(&((u32 *)m_main_ram)[0x100/4 + offset]);
+	COMBINE_DATA(&((u32 *)m_nvram)[0x100/4 + offset]);
 }
 
 u32 itech32_state::test2_r(offs_t offset, u32 mem_mask)
@@ -938,7 +938,7 @@ u32 itech32_state::test2_r(offs_t offset, u32 mem_mask)
 	if (ACCESSING_BITS_16_23 && !m_written[0xc00 + offset*4+1]) logerror("%06X:read from uninitialized memory %04X\n", m_maincpu->pc(), 0xc00 + offset*4+1);
 	if (ACCESSING_BITS_8_15 && !m_written[0xc00 + offset*4+2]) logerror("%06X:read from uninitialized memory %04X\n", m_maincpu->pc(), 0xc00 + offset*4+2);
 	if (ACCESSING_BITS_0_7 && !m_written[0xc00 + offset*4+3]) logerror("%06X:read from uninitialized memory %04X\n", m_maincpu->pc(), 0xc00 + offset*4+3);
-	return ((u32 *)m_main_ram)[0xc00/4 + offset];
+	return ((u32 *)m_nvram)[0xc00/4 + offset];
 }
 
 void itech32_state::test2_w(offs_t offset, u32 data, u32 mem_mask)
@@ -947,7 +947,7 @@ void itech32_state::test2_w(offs_t offset, u32 data, u32 mem_mask)
 	if (ACCESSING_BITS_16_23) m_written[0xc00 + offset*4+1] = 1;
 	if (ACCESSING_BITS_8_15) m_written[0xc00 + offset*4+2] = 1;
 	if (ACCESSING_BITS_0_7) m_written[0xc00 + offset*4+3] = 1;
-	COMBINE_DATA(&((u32 *)m_main_ram)[0xc00/4 + offset]);
+	COMBINE_DATA(&((u32 *)m_nvram)[0xc00/4 + offset]);
 }
 #endif
 
@@ -978,7 +978,7 @@ map(0x000c00, 0x007fff).mirror(0x40000).rw(FUNC(itech32_state::test2_r), FUNC(it
 	map(0x280000, 0x280fff).ram().w(FUNC(drivedge_state::tms1_68k_ram_w)).share("tms1_ram");
 	map(0x300000, 0x300fff).ram().w(FUNC(drivedge_state::tms2_68k_ram_w)).share("tms2_ram");
 	map(0x380000, 0x380003).nopw(); // .w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x600000, 0x607fff).rom().region("user1", 0).share("main_rom");
+	map(0x600000, 0x607fff).rom().region("user1", 0);
 }
 
 void drivedge_state::tms1_map(address_map &map)
@@ -1017,7 +1017,7 @@ void itech32_state::itech020_map(address_map &map)
 	map(0x680000, 0x680003).nopw();
 /* ! */ map(0x680800, 0x68083f).readonly().nopw(); /* Serial DUART Channel A/B & Top LED sign - To Do! */
 	map(0x700002, 0x700002).w(FUNC(itech32_state::itech020_plane_w));
-	map(0x800000, 0xbfffff).rom().region("user1", 0).share("main_rom");
+	map(0x800000, 0xbfffff).rom().region("user1", 0);
 }
 
 void shoottv_state::shoottv_map(address_map &map)
@@ -4629,9 +4629,7 @@ ROM_END
 
 void itech32_state::init_program_rom()
 {
-	if (m_main_ram == nullptr)
-		m_main_ram.set_target(m_nvram, m_nvram.bytes());
-	memcpy(m_main_ram, m_main_rom, 0x80);
+	memcpy(m_nvram, m_main_rom, 0x80);
 }
 
 

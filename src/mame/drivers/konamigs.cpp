@@ -59,9 +59,9 @@ public:
 		, m_rtc_r(*this, "RTCR")
 		, m_rtc_w(*this, "RTCW")
 		, m_dipsw_r(*this, "DSW")
-		, m_vram(*this, "vram", 0)
-		, m_gpuregs(*this, "gpu_regs", 0)
-		, m_ymzram(*this, "ymz_ram", 0)
+		, m_vram(*this, "vram")
+		, m_gpuregs(*this, "gpu_regs")
+		, m_ymzram(*this, "ymz_ram")
 		, m_screen(*this, "screen")
 		, m_hopper(*this, "hopper")
 	{ }

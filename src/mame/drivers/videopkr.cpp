@@ -956,10 +956,10 @@ void videopkr_state::i8751_io_port(address_map &map)
 {
 	map(0x0000, 0x0fff).ram(); // NVRAM?
 	map(0x8000, 0x8000).noprw(); // ???
-	map(0x9000, 0x9000).writeonly(); // ???
+	map(0x9000, 0x9000).nopw(); // ???
 	map(0xa000, 0xbfff).ram(); // video RAM?
 	map(0xc000, 0xc003).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xf000, 0xf000).writeonly(); // ???
+	map(0xf000, 0xf000).nopw(); // ???
 }
 
 void videopkr_state::i8039_sound_mem(address_map &map)

@@ -594,7 +594,7 @@ void hp3478a_state::i8039_io(address_map &map)
 void hp3478a_state::io_bank(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x000, 0x0ff).ram().region("nvram", 0).share("nvram").w(FUNC(hp3478a_state::nvwrite));
+	map(0x000, 0x0ff).ram().share("nvram").w(FUNC(hp3478a_state::nvwrite));
 	map(0x100, 0x107).ram().share("gpibregs");  //XXX TODO : connect to i8291.cpp
 	map(0x200, 0x2ff).portr("DIP");
 }
@@ -714,9 +714,6 @@ void hp3478a_state::hp3478a(machine_config &config)
 ROM_START( hp3478a )
 	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD("rom_dc118.bin", 0, 0x2000, CRC(10097ced) SHA1(bd665cf7e07e63f825b2353c8322ed8a4376b3bd))  //main CPU ROM, can match other datecodes too
-
-	ROM_REGION( 0x100, "nvram", 0 ) /* Calibration RAM, battery-backed */
-	ROM_LOAD( "calram.bin", 0, 0x100, NO_DUMP)
 ROM_END
 
 /******************************************************************************

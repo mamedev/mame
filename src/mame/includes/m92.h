@@ -47,7 +47,7 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_upd71059c(*this, "upd71059c"),
-		m_eeprom(*this, "eeprom", 16),
+		m_eeprom(*this, "eeprom"),
 		m_mainbank(*this, "mainbank")
 	{ }
 

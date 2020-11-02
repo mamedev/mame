@@ -156,9 +156,9 @@ void lviv_state::io_w(offs_t offset, uint8_t data)
 
 		m_startup_mem_map = 0;
 
-		cpuspace.install_write_bank(0x0000, 0x3fff, "bank1");
-		cpuspace.install_write_bank(0x4000, 0x7fff, "bank2");
-		cpuspace.install_write_bank(0x8000, 0xbfff, "bank3");
+		cpuspace.install_write_bank(0x0000, 0x3fff, m_bank[0]);
+		cpuspace.install_write_bank(0x4000, 0x7fff, m_bank[1]);
+		cpuspace.install_write_bank(0x8000, 0xbfff, m_bank[2]);
 		cpuspace.unmap_write(0xC000, 0xffff);
 
 		m_bank[0]->set_base(ram);

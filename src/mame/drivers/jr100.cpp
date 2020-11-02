@@ -73,7 +73,7 @@ public:
 		, m_ram(*this, "ram")
 		, m_pcg(*this, "pcg")
 		, m_vram(*this, "vram")
-		, m_rom(*this, "rom")
+		, m_rom(*this, "maincpu")
 		, m_via(*this, "via")
 		, m_cassette(*this, "cassette")
 		, m_speaker(*this, "speaker")
@@ -104,7 +104,7 @@ private:
 	required_shared_ptr<uint8_t> m_ram;
 	required_shared_ptr<uint8_t> m_pcg;
 	required_shared_ptr<uint8_t> m_vram;
-	required_shared_ptr<uint8_t> m_rom;
+	required_region_ptr<uint8_t> m_rom;
 	required_device<via6522_device> m_via;
 	required_device<cassette_image_device> m_cassette;
 	required_device<speaker_sound_device> m_speaker;
@@ -128,7 +128,7 @@ void jr100_state::mem_map(address_map &map)
 	//map(0xcc00, 0xcfff).;   expansion i/o
 	//map(0xd000, 0xd7ff).rom();   expansion rom for printer control
 	//map(0xd800, 0xdfff).rom();   expansion rom
-	map(0xe000, 0xffff).rom().share("rom").region("maincpu",0);
+	map(0xe000, 0xffff).rom().region("maincpu", 0);
 }
 
 // Input ports - names in [ ] are screen actions; otherwise the text is literally printed onscreen

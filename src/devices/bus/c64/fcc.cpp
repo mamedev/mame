@@ -97,6 +97,7 @@ c64_final_chesscard_device::c64_final_chesscard_device(const machine_config &mco
 
 void c64_final_chesscard_device::device_start()
 {
+	m_nvram = std::make_unique<uint8_t[]>(0x2000);
 	// state saving
 	save_item(NAME(m_bank));
 	save_item(NAME(m_hidden));

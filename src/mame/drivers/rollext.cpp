@@ -521,7 +521,7 @@ void rollext_state::memmap(address_map &map)
 	map(0xa0000000, 0xa00000ff).rw(FUNC(rollext_state::a0000000_r), FUNC(rollext_state::a0000000_w));
 	map(0xb0000000, 0xb0000007).r(FUNC(rollext_state::b0000000_r));
 	map(0xc0000000, 0xc03fffff).rom().region("rom1", 0);
-	map(0xff000000, 0xffffffff).ram().region("rom0", 0);
+	map(0xff000000, 0xffffffff).rom().region("rom0", 0);
 }
 
 

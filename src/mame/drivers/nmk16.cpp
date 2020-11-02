@@ -1162,7 +1162,7 @@ void nmk16_state::gunnail_map(address_map &map)
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x08c000, 0x08c1ff).writeonly().share("scrollram");
 	map(0x08c200, 0x08c3ff).writeonly().share("scrollramy");
-	map(0x08c400, 0x08c7ff).writeonly();   // unknown
+	map(0x08c400, 0x08c7ff).nopw();   // unknown
 	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share("bgvideoram0");
 	map(0x09c000, 0x09cfff).mirror(0x001000).ram().w(FUNC(nmk16_state::txvideoram_w)).share("txvideoram");
 	map(0x0f0000, 0x0fffff).ram().share("mainram");
@@ -1183,7 +1183,7 @@ void nmk16_state::gunnailb_map(address_map &map)
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x08c000, 0x08c1ff).writeonly().share("scrollram");
 	map(0x08c200, 0x08c3ff).writeonly().share("scrollramy");
-	map(0x08c400, 0x08c7ff).writeonly();   // unknown
+	map(0x08c400, 0x08c7ff).nopw();   // unknown
 	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share("bgvideoram0");
 	map(0x09c000, 0x09cfff).mirror(0x001000).ram().w(FUNC(nmk16_state::txvideoram_w)).share("txvideoram");
 	map(0x0f0000, 0x0fffff).ram().share("mainram");

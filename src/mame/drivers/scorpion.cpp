@@ -216,7 +216,7 @@ MACHINE_RESET_MEMBER(scorpion_state,scorpion)
 	m_p_ram = memregion("maincpu")->base();
 
 	m_ram_0000 = nullptr;
-	m_program->install_read_bank(0x0000, 0x3fff, "bank1");
+	m_program->install_read_bank(0x0000, 0x3fff, m_bank1);
 	m_program->install_write_handler(0x0000, 0x3fff, write8sm_delegate(*this, FUNC(scorpion_state::scorpion_0000_w)));
 
 	m_beta->disable();

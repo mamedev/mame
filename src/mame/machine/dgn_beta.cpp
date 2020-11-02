@@ -214,7 +214,6 @@ void dgn_beta_state::UpdateBanks(int first, int last)
 //
 void dgn_beta_state::SetDefaultTask()
 {
-//  uint8_t *videoram = m_videoram;
 	int     Idx;
 
 	LOG_DEFAULT_TASK(("SetDefaultTask()\n"));
@@ -917,8 +916,6 @@ void dgn_beta_state::machine_reset()
 
 	m_DMA_NMI_LAST = 0x80;       /* start with DMA NMI inactive, as pulled up */
 //  DMA_NMI = CLEAR_LINE;       /* start with DMA NMI inactive */
-
-	m_videoram.set_target(m_ram->pointer(),m_videoram.bytes());     /* Point video ram at the start of physical ram */
 
 	m_wd2797_written=0;
 

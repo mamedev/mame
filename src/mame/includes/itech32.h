@@ -42,10 +42,9 @@ public:
 		m_timekeeper(*this, "m48t02"),
 		m_soundlatch(*this, "soundlatch"),
 		m_soundlatch2(*this, "soundlatch2"),
-		m_main_ram(*this, "main_ram", 0),
-		m_nvram(*this, "nvram", 0),
-		m_video(*this, "video", 0),
-		m_main_rom(*this, "main_rom", 0),
+		m_nvram(*this, "nvram"),
+		m_video(*this, "video"),
+		m_main_rom(*this, "maincpu"),
 		m_grom(*this, "gfx1"),
 		m_soundbank(*this, "soundbank")
 	{ }
@@ -89,10 +88,9 @@ protected:
 	required_device<generic_latch_8_device> m_soundlatch;
 	optional_device<generic_latch_8_device> m_soundlatch2;
 
-	optional_shared_ptr<u16> m_main_ram;
 	optional_shared_ptr<u16> m_nvram;
 	optional_shared_ptr<u16> m_video;
-	optional_shared_ptr<u16> m_main_rom;
+	optional_region_ptr<u16> m_main_rom;
 
 	required_region_ptr<u8> m_grom;
 	required_memory_bank m_soundbank;
@@ -274,7 +272,7 @@ public:
 		m_dips(*this, "DIPS"),
 		m_gun_x(*this, "GUNX%u", 1U),
 		m_gun_y(*this, "GUNY%u", 1U),
-		m_nvram_b(*this, "nvram_b", 0),
+		m_nvram_b(*this, "nvram_b"),
 		m_gun_timer(nullptr)
 	{ }
 

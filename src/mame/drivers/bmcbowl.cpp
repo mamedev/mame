@@ -122,7 +122,7 @@ public:
 	bmcbowl_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_stats_ram(*this, "nvram", 16),
+		m_stats_ram(*this, "nvram"),
 		m_vid1(*this, "vid1"),
 		m_vid2(*this, "vid2"),
 		m_palette(*this, "palette"),

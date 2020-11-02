@@ -20,7 +20,7 @@ public:
 		m_palette(*this, "palette"),
 		m_audiocpu(*this, "audiocpu"),
 		m_vlatch(*this, "vlatch%u", 1U),
-		m_videoram(*this, "videoram", 8)
+		m_videoram(*this, "videoram")
 	{ }
 
 	void efdt(machine_config &config);

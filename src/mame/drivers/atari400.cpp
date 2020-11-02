@@ -328,9 +328,6 @@ private:
 	required_device<pia6821_device> m_pia;
 	optional_device<dac_bit_interface> m_dac;
 	required_memory_region m_region_maincpu;
-	memory_bank *m_0000 = nullptr;
-	memory_bank *m_8000 = nullptr;
-	memory_bank *m_a000 = nullptr;
 	optional_device<a800_cart_slot_device> m_cart;
 	optional_device<a800_cart_slot_device> m_cart2;
 
@@ -1739,35 +1736,17 @@ void a400_state::setup_ram(int bank, uint32_t size)
 	{
 	case 0: // 0x0000-0x7fff
 		ram_top = std::min(size, uint32_t(0x8000)) - 1;
-		m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x0000, ram_top, "0000");
-		m_0000 = membank("0000");
-		m_0000->set_base(m_ram->pointer());
+		m_maincpu->space(AS_PROGRAM).install_ram(0x0000, ram_top, m_ram->pointer());
 		break;
 	case 1: // 0x8000-0x9fff
 		ram_top = std::min(size, uint32_t(0xa000)) - 1;
 		if (ram_top > 0x8000)
-		{
-			m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x8000, ram_top, "8000");
-			m_8000 = membank("8000");
-			m_8000->set_base(m_ram->pointer() + 0x8000);
-		}
-		else
-		{
-			m_8000 = nullptr;
-		}
+			m_maincpu->space(AS_PROGRAM).install_ram(0x8000, ram_top, m_ram->pointer() + 0x8000);
 		break;
 	case 2: // 0xa000-0xbfff
 		ram_top = std::min(size, uint32_t(0xc000)) - 1;
 		if (ram_top > 0xa000)
-		{
-			m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0xa000, ram_top, "a000");
-			m_a000 = membank("a000");
-			m_a000->set_base(m_ram->pointer() + 0xa000);
-		}
-		else
-		{
-			m_a000 = nullptr;
-		}
+			m_maincpu->space(AS_PROGRAM).install_ram(0xa000, ram_top, m_ram->pointer() + 0xa000);
 		break;
 	}
 }

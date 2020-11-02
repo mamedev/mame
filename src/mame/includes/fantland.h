@@ -21,8 +21,8 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
-		m_spriteram(*this, "spriteram", 0),
-		m_spriteram2(*this, "spriteram2", 0),
+		m_spriteram(*this, "spriteram"),
+		m_spriteram2(*this, "spriteram2"),
 		m_wheel(*this, "WHEEL%u", 0U)
 	{ }
 
