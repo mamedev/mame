@@ -28,6 +28,7 @@ public:
 	fm7_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_shared_ram(*this, "shared_ram"),
+		m_a15_ram(*this, "a15_ram"),
 		m_vectors(*this, "vectors"),
 		m_maincpu(*this, "maincpu"),
 		m_sub(*this, "sub"),
@@ -41,8 +42,8 @@ public:
 		m_floppy0(*this, "fdc:0"),
 		m_floppy1(*this, "fdc:1"),
 		m_floppy(nullptr),
-		m_ram_ptr(*this, "maincpu"),
 		m_rom_ptr(*this, "init"),
+		m_btrom_ptr(*this, "boot"),
 		m_basic_ptr(*this, "fbasic"),
 		m_kanji(*this, "kanji1"),
 		m_kb_ports(*this, "key%u", 1),
@@ -61,17 +62,6 @@ public:
 	void init_fm7();
 
 protected:
-	enum
-	{
-		TIMER_FM7_BEEPER_OFF,
-		TIMER_FM77AV_ENCODER_ACK,
-		TIMER_FM7_IRQ,
-		TIMER_FM7_SUBTIMER_IRQ,
-		TIMER_FM7_KEYBOARD_POLL,
-		TIMER_FM77AV_ALU_TASK_END,
-		TIMER_FM77AV_VSYNC
-	};
-
 	// Interrupt flags
 	enum : uint8_t
 	{
@@ -216,10 +206,12 @@ protected:
 	void fm8_mem(address_map &map);
 
 	optional_shared_ptr<uint8_t> m_shared_ram;
+	optional_shared_ptr<uint8_t> m_a15_ram;
 	required_shared_ptr<uint8_t> m_vectors;
 
 	uint8_t           m_irq_flags;
 	uint8_t           m_irq_mask;
+	emu_timer*      m_beeper_off_timer;
 	emu_timer*      m_timer;
 	emu_timer*      m_subtimer;
 	emu_timer*      m_keyboard_timer;
@@ -273,8 +265,8 @@ protected:
 	required_device<floppy_connector> m_floppy1;
 	floppy_image_device *m_floppy;
 
-	optional_region_ptr<uint8_t> m_ram_ptr;
 	optional_region_ptr<uint8_t> m_rom_ptr;
+	optional_region_ptr<uint8_t> m_btrom_ptr;
 	optional_region_ptr<uint8_t> m_basic_ptr;
 
 	void main_irq_set_flag(uint8_t flag);
@@ -295,8 +287,6 @@ protected:
 	required_ioport m_dsw;
 	required_device<palette_device> m_palette;
 	optional_device<palette_device> m_av_palette;
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 class fm77_state : public fm7_state
@@ -306,7 +296,10 @@ public:
 		fm7_state(mconfig, type, tag),
 		m_avbank(*this, "av_bank%u", 1),
 		m_ym(*this, "ym"),
-		m_boot_ram(*this, "boot_ram")
+		m_boot_ram(*this, "boot_ram"),
+		m_extended_ram(*this, "extended_ram"),
+		m_fbasic_bank_ram(*this, "fbasic_bank_w"),
+		m_init_bank_ram(*this, "init_bank_w")
 	{
 	}
 
@@ -335,7 +328,6 @@ protected:
 	};
 
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	DECLARE_MACHINE_START(fm77av);
 
@@ -347,35 +339,6 @@ protected:
 
 	DECLARE_WRITE_LINE_MEMBER(av_fmirq);
 
-	void vram_banked_w(offs_t offset, uint8_t data);
-	uint8_t vram0_r(offs_t offset);
-	uint8_t vram1_r(offs_t offset);
-	uint8_t vram2_r(offs_t offset);
-	uint8_t vram3_r(offs_t offset);
-	uint8_t vram4_r(offs_t offset);
-	uint8_t vram5_r(offs_t offset);
-	uint8_t vram6_r(offs_t offset);
-	uint8_t vram7_r(offs_t offset);
-	uint8_t vram8_r(offs_t offset);
-	uint8_t vram9_r(offs_t offset);
-	uint8_t vramA_r(offs_t offset);
-	uint8_t vramB_r(offs_t offset);
-	void vram0_w(offs_t offset, uint8_t data);
-	void vram1_w(offs_t offset, uint8_t data);
-	void vram2_w(offs_t offset, uint8_t data);
-	void vram3_w(offs_t offset, uint8_t data);
-	void vram4_w(offs_t offset, uint8_t data);
-	void vram5_w(offs_t offset, uint8_t data);
-	void vram6_w(offs_t offset, uint8_t data);
-	void vram7_w(offs_t offset, uint8_t data);
-	void vram8_w(offs_t offset, uint8_t data);
-	void vram9_w(offs_t offset, uint8_t data);
-	void vramA_w(offs_t offset, uint8_t data);
-	void vramB_w(offs_t offset, uint8_t data);
-	uint8_t console_ram_banked_r(offs_t offset);
-	void console_ram_banked_w(offs_t offset, uint8_t data);
-	uint8_t sub_ram_ports_banked_r(offs_t offset);
-	void sub_ram_ports_banked_w(offs_t offset, uint8_t data);
 	void av_analog_palette_w(offs_t offset, uint8_t data);
 	uint8_t av_video_flags_r();
 	void av_video_flags_w(uint8_t data);
@@ -396,7 +359,7 @@ protected:
 
 	uint8_t mmr_r(offs_t offset);
 	void mmr_w(address_space &space, offs_t offset, uint8_t data);
-	void fm7_update_bank(address_space &space, int bank, uint8_t physical);
+	void fm7_update_bank(int bank, uint8_t physical);
 	virtual void fm7_mmr_refresh(address_space &space) override;
 
 	void alu_mask_write(uint32_t offset, int bank, uint8_t dat);
@@ -419,11 +382,16 @@ protected:
 	required_device_array<address_map_bank_device, 16> m_avbank;
 	optional_device<ym2203_device> m_ym;
 	required_shared_ptr<uint8_t> m_boot_ram;
+	required_shared_ptr<uint8_t> m_extended_ram;
+	required_shared_ptr<uint8_t> m_fbasic_bank_ram;
+	required_shared_ptr<uint8_t> m_init_bank_ram;
 
 	fm7_encoder_t   m_encoder;
 	fm7_mmr_t       m_mmr;
 
-	emu_timer*                  m_vsync_timer;
+	emu_timer *m_encoder_ack_timer;
+	emu_timer *m_alu_task_end_timer;
+	emu_timer *m_vsync_timer;
 
 	uint8_t           m_fm77av_ym_irq;
 };
