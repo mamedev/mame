@@ -898,7 +898,7 @@ void wswan_state::port_w(offs_t offset, u16 data, u16 mem_mask)
 			m_cart->write_io(offset, data, mem_mask);
 			break;
 		default:
-			logerror("%06x: Write to unsupported port: %x - %x\n", pc(), offset, data);
+			logerror("Write to unsupported port: %x - %x\n", offset, data);
 			break;
 	}
 

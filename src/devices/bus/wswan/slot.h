@@ -162,8 +162,8 @@ public:
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	int get_type() { return m_type; }
-	int get_cart_type(const uint8_t *ROM, u32 len, u32 &nvram_len) const;
-	void internal_header_logging(uint8_t *ROM, u32 offs, u32 len);
+	int get_cart_type(const u16 *ROM, u32 len, u32 &nvram_len) const;
+	void internal_header_logging(const u16 *ROM, u32 offs, u32 len);
 
 	void save_nvram()   { if (m_cart && m_cart->get_nvram_size()) m_cart->save_nvram(); }
 

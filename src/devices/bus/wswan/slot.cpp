@@ -155,12 +155,12 @@ image_init_result ws_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		u8 *ROM;
+		u16 *ROM;
 		u32 size = !loaded_through_softlist() ? length() : get_software_region_length("rom");
 		u32 nvram_size = 0;
 
 		m_cart->rom_alloc(size, tag());
-		ROM = (u8 *)m_cart->get_rom_base();
+		ROM = m_cart->get_rom_base();
 
 		if (!loaded_through_softlist())
 			fread(ROM, size);
@@ -169,11 +169,10 @@ image_init_result ws_cart_slot_device::call_load()
 
 		if (!loaded_through_softlist())
 		{
-			int chunks = size / 0x10000;
 			// get cart type and nvram length
 			m_type = get_cart_type(ROM, size, nvram_size);
 
-			if (ROM[(chunks - 1) * 0x10000 + 0xfffd])
+			if (ROM[(size >> 1) - 2] & 0xff00)
 				m_cart->set_has_rtc(true);
 		}
 		else
@@ -223,12 +222,11 @@ void ws_cart_slot_device::call_unload()
  get cart type from cart file
  -------------------------------------------------*/
 
-int ws_cart_slot_device::get_cart_type(const uint8_t *ROM, u32 len, u32 &nvram_len) const
+int ws_cart_slot_device::get_cart_type(const u16 *ROM, u32 len, u32 &nvram_len) const
 {
-	int chunks = len / 0x10000;
 	int type = WS_STD;
 
-	switch (ROM[(chunks - 1) * 0x10000 + 0xfffb])
+	switch (ROM[(len >> 1) - 3] >> 8)
 	{
 		case 0x00:
 			break;
@@ -265,8 +263,7 @@ int ws_cart_slot_device::get_cart_type(const uint8_t *ROM, u32 len, u32 &nvram_l
 			nvram_len = 0x800;
 			break;
 		default:
-			printf("Unknown RAM size [0x%X]\n", ROM[(chunks - 1) * 0x10000 + 0xfffb]);
-			logerror("Unknown RAM size [0x%X]\n", ROM[(chunks - 1) * 0x10000 + 0xfffb]);
+			logerror("Unknown RAM size [0x%X]\n", ROM[(len >> 1) - 3] >> 8);
 			break;
 	}
 
@@ -283,7 +280,7 @@ std::string ws_cart_slot_device::get_default_card_software(get_default_card_soft
 	{
 		const char *slot_string;
 		u32 size = hook.image_file()->size();
-		std::vector<u8> rom(size);
+		std::vector<u16> rom(size);
 		int type;
 		u32 nvram;
 
@@ -389,36 +386,37 @@ static const char *const sram_str[] = { "none", "64Kbit SRAM", "256Kbit SRAM", "
 static const char *const eeprom_str[] = { "none", "1Kbit EEPROM", "16Kbit EEPROM", "Unknown", "Unknown", "8Kbit EEPROM" };
 static const char *const romsize_str[] = { "Unknown", "Unknown", "4Mbit", "8Mbit", "16Mbit", "Unknown", "32Mbit", "Unknown", "64Mbit", "128Mbit" };
 
-void ws_cart_slot_device::internal_header_logging(u8 *ROM, u32 offs, u32 len)
+void ws_cart_slot_device::internal_header_logging(const u16 *ROM, u32 offs, u32 len)
 {
-	int sum = 0, banks = len / 0x10000;
-	u8 romsize, ramtype, ramsize;
-	romsize = ROM[offs + 0xfffa];
-	ramtype = (ROM[offs + 0xfffb] & 0xf0) ? 1 : 0;  // 1 = EEPROM, 0 = SRAM
-	ramsize = ramtype ? ((ROM[offs + 0xfffb] & 0xf0) >> 4) : (ROM[offs + 0xfffb] & 0x0f);
-
+	const int banks = len / 0x10000;
+	const int words = len >> 1;
+	const u8 romsize = ROM[words - 3] & 0xff;
+	const u8 ramtype = (ROM[words - 3] & 0xf000) ? 1 : 0;  // 1 = EEPROM, 0 = SRAM
+	const u8 ramsize = ramtype ? (((ROM[words - 3] >> 8) & 0xf0) >> 4) : ((ROM[words - 3] >> 8) & 0x0f);
+	u16 sum = 0;
 
 	logerror( "ROM DETAILS\n" );
 	logerror( "===========\n\n" );
-	logerror("\tDeveloper ID: %X\n", ROM[offs + 0xfff6]);
-	logerror("\tMinimum system: %s\n", ROM[offs + 0xfff7] ? "WonderSwan Color" : "WonderSwan");
-	logerror("\tCart ID: %X\n", ROM[offs + 0xfff8]);
+	logerror("\tDeveloper ID: %X\n", ROM[words - 5] & 0xff);
+	logerror("\tMinimum system: %s\n", ROM[words - 5] & 0xff00 ? "WonderSwan Color" : "WonderSwan");
+	logerror("\tCart ID: %X\n", ROM[words - 4] & 0xff);
 	logerror("\tROM size: %s\n", romsize_str[romsize]);
 	if (ramtype)
 		logerror("\tEEPROM size: %s\n", (ramsize < 6) ? eeprom_str[ramsize] : "Unknown");
 	else
 		logerror("\tSRAM size: %s\n", (ramsize < 6) ? sram_str[ramsize] : "Unknown");
-	logerror("\tFeatures: %X\n", ROM[offs + 0xfffc]);
-	logerror("\tRTC: %s\n", ROM[offs + 0xfffd] ? "yes" : "no");
+	logerror("\tFeatures: %X\n", ROM[words - 2] & 0xff);
+	logerror("\tRTC: %s\n", (ROM[words - 2] & 0xff00) ? "yes" : "no");
 	for (int i = 0; i < banks; i++)
 	{
-		for (int count = 0; count < 0x10000; count++)
+		for (int count = 0; count < 0x8000; count++)
 		{
-			sum += ROM[(i * 0x10000) + count];
+			sum += ROM[i * 0x8000 + count] & 0xff;
+			sum += ROM[i * 0x8000 + count] >> 8;
 		}
 	}
-	sum -= ROM[offs + 0xffff];
-	sum -= ROM[offs + 0xfffe];
+	sum -= ROM[words - 1] & 0xff;
+	sum -= ROM[words - 1] >> 8;
 	sum &= 0xffff;
-	logerror("\tChecksum: %.2X%.2X (calculated: %04X)\n", ROM[offs + 0xffff], ROM[offs + 0xfffe], sum);
+	logerror("\tChecksum: %04X (calculated: %04X)\n", ROM[words - 1], sum);
 }

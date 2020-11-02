@@ -3255,7 +3255,6 @@ void v30mz_cpu_device::execute_run()
 				break;
 
 			case 0xf4: // i_hlt
-				logerror("%s: %06x: HALT\n", tag(), pc());
 				m_icount = 0;
 				break;
 
