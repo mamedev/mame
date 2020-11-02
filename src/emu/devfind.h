@@ -753,9 +753,10 @@ template <unsigned Count, bool Required> using memory_bank_array_finder = object
 template <unsigned Count> using optional_memory_bank_array = memory_bank_array_finder<Count, false>;
 template <unsigned Count> using required_memory_bank_array = memory_bank_array_finder<Count, true>;
 
+
 /// \brief Memory bank creator
 ///
-/// Creates a memory bank or picks up an existing one.
+/// Creates a memory bank or finds an existing one.
 class memory_bank_creator : finder_base
 {
 public:
@@ -792,10 +793,11 @@ protected:
 
 template <unsigned Count> using memory_bank_array_creator = object_array_finder<memory_bank_creator, Count>;
 
-/// \brief Memory share creator
+
+/// \brief Memory share creator template
 ///
-/// Creates a memory share or picks up an existing one.
-template<typename uX> class memory_share_creator : finder_base
+/// Creates a memory share or finds an existing one.
+template <typename PointerType> class memory_share_creator : finder_base
 {
 public:
 	memory_share_creator(device_t &base, char const *tag, size_t bytes, endianness_t endianness);
@@ -803,17 +805,17 @@ public:
 
 	/// \brief Get pointer to the share object
 	/// \return Pointer to share object.
-	memory_share *share() const { return m_target; }
+	memory_share *target() const { return m_target; }
 
-	/// \brief Get pointer to the share object backing ram
-	/// \return Pointer to the ram.
-	uX *ptr() const { return reinterpret_cast<uX *>(m_target->ptr()); }
+	/// \brief Get pointer to the share object backing RAM
+	/// \return Pointer to the RAM.
+	PointerType *ptr() const { return reinterpret_cast<PointerType *>(m_target->ptr()); }
 
 	/// \brief Cast-to-pointer operator
 	///
-	/// Allows implicit casting to a pointer to the target bank object.
+	/// Allows implicit casting to a pointer to the target backing RAM.
 	/// \return Pointer to target bank object
-	operator uX *() const { return reinterpret_cast<uX *>(m_target->ptr()); }
+	operator PointerType *() const { return reinterpret_cast<PointerType *>(m_target->ptr()); }
 
 	/// \brief Pointer member access operator
 	///
@@ -841,6 +843,7 @@ protected:
 	const size_t       m_bytes;                // size of the shared region in bytes
 	const endianness_t m_endianness;           // endianness of the memory
 };
+
 
 /// \brief I/O port finder template
 ///
@@ -1238,6 +1241,16 @@ extern template class shared_ptr_finder<s32, false>;
 extern template class shared_ptr_finder<s32, true>;
 extern template class shared_ptr_finder<s64, false>;
 extern template class shared_ptr_finder<s64, true>;
+
+extern template class memory_share_creator<u8>;
+extern template class memory_share_creator<u16>;
+extern template class memory_share_creator<u32>;
+extern template class memory_share_creator<u64>;
+
+extern template class memory_share_creator<s8>;
+extern template class memory_share_creator<s16>;
+extern template class memory_share_creator<s32>;
+extern template class memory_share_creator<s64>;
 
 #endif // MAME_EMU_DEVFIND_H
 /// \}

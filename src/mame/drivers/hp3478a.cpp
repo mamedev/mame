@@ -713,7 +713,10 @@ void hp3478a_state::hp3478a(machine_config &config)
 ******************************************************************************/
 ROM_START( hp3478a )
 	ROM_REGION( 0x2000, "maincpu", 0 )
-	ROM_LOAD("rom_dc118.bin", 0, 0x2000, CRC(10097ced) SHA1(bd665cf7e07e63f825b2353c8322ed8a4376b3bd))  //main CPU ROM, can match other datecodes too
+	ROM_LOAD("rom_dc118.bin", 0, 0x2000, CRC(10097ced) SHA1(bd665cf7e07e63f825b2353c8322ed8a4376b3bd))  // main CPU ROM, can match other datecodes too
+
+	ROM_REGION( 0x100, "nvram", 0 ) // default data for battery-backed Calibration RAM
+	ROM_LOAD( "calram.bin", 0, 0x100, NO_DUMP)
 ROM_END
 
 /******************************************************************************

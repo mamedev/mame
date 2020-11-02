@@ -71,9 +71,7 @@ image_init_result portfolio_memory_card_slot_device::call_load()
 	if (m_card)
 	{
 		if (!loaded_through_softlist())
-		{
 			fread(m_card->m_rom, length());
-		}
 		else
 			load_software_region("rom", m_card->m_rom);
 	}

@@ -73,13 +73,13 @@ void *finder_base::find_memregion(u8 width, size_t &length, bool required) const
 	if (region->bytewidth() != width)
 	{
 		if (required)
-			osd_printf_warning("Region '%s' found but is width %d, not %d as requested\n", m_tag, region->bitwidth(), width*8);
+			osd_printf_warning("Region '%s' found but is width %d, not %d as requested\n", m_tag, region->bitwidth(), width * 8);
 		length = 0;
 		return nullptr;
 	}
 
 	// return results
-	length = region->bytes()/width;
+	length = region->bytes() / width;
 	return region->base();
 }
 
@@ -316,6 +316,7 @@ bool ioport_finder<Required>::findit(validity_checker *valid)
 }
 
 
+
 //**************************************************************************
 //  ADDRESS SPACE FINDER
 //**************************************************************************
@@ -342,6 +343,7 @@ bool address_space_finder<Required>::findit(validity_checker *valid)
 }
 
 
+
 //**************************************************************************
 //  MEMORY BANK CREATOR
 //**************************************************************************
@@ -353,14 +355,12 @@ bool memory_bank_creator::findit(validity_checker *valid)
 
 	device_t &dev = m_base.get();
 	memory_manager &manager = dev.machine().memory();
-	std::string tag = dev.subtag(m_tag);
-	memory_bank *bank = manager.bank_find(tag);
-	if (bank)
-		m_target = bank;
-	else
-		m_target = manager.bank_alloc(dev, tag);
+	std::string const tag = dev.subtag(m_tag);
+	memory_bank *const bank = manager.bank_find(tag);
+	m_target = bank ? bank : manager.bank_alloc(dev, tag);
 	return true;
 }
+
 
 void memory_bank_creator::end_configuration()
 {
@@ -368,31 +368,35 @@ void memory_bank_creator::end_configuration()
 }
 
 
+
 //**************************************************************************
 //  MEMORY SHARE CREATOR
 //**************************************************************************
 
-template<typename uX> memory_share_creator<uX>::memory_share_creator(device_t &base, char const *tag, size_t bytes, endianness_t endianness)
+template <typename PointerType>
+memory_share_creator<PointerType>::memory_share_creator(device_t &base, char const *tag, size_t bytes, endianness_t endianness)
 	: finder_base(base, tag)
-	, m_width(sizeof(uX)*8)
+	, m_width(sizeof(PointerType) * 8)
 	, m_bytes(bytes)
 	, m_endianness(endianness)
 {
 }
 
-template<typename uX> bool memory_share_creator<uX>::findit(validity_checker *valid)
+
+template <typename PointerType>
+bool memory_share_creator<PointerType>::findit(validity_checker *valid)
 {
 	if (valid)
 		return true;
 
 	device_t &dev = m_base.get();
 	memory_manager &manager = dev.machine().memory();
-	std::string tag = dev.subtag(m_tag);
-	memory_share *share = manager.share_find(tag);
+	std::string const tag = dev.subtag(m_tag);
+	memory_share *const share = manager.share_find(tag);
 	if (share)
 	{
 		m_target = share;
-		std::string result = share->compare(m_width, m_bytes, m_endianness);
+		std::string const result = share->compare(m_width, m_bytes, m_endianness);
 		if (!result.empty())
 		{
 			osd_printf_error("%s\n", result);
@@ -400,11 +404,15 @@ template<typename uX> bool memory_share_creator<uX>::findit(validity_checker *va
 		}
 	}
 	else
+	{
 		m_target = manager.share_alloc(dev, tag, m_width, m_bytes, m_endianness);
+	}
 	return true;
 }
 
-template<typename uX> void memory_share_creator<uX>::end_configuration()
+
+template <typename PointerType>
+void memory_share_creator<PointerType>::end_configuration()
 {
 	m_target = nullptr;
 }
@@ -489,7 +497,13 @@ template class shared_ptr_finder<s32, false>;
 template class shared_ptr_finder<s32, true>;
 template class shared_ptr_finder<s64, false>;
 template class shared_ptr_finder<s64, true>;
+
 template class memory_share_creator<u8>;
 template class memory_share_creator<u16>;
 template class memory_share_creator<u32>;
 template class memory_share_creator<u64>;
+
+template class memory_share_creator<s8>;
+template class memory_share_creator<s16>;
+template class memory_share_creator<s32>;
+template class memory_share_creator<s64>;

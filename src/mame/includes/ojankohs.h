@@ -18,6 +18,16 @@
 class ojankohs_state : public driver_device
 {
 public:
+	ojankohs_state(const machine_config &mconfig, device_type type, const char *tag) :
+		ojankohs_state(mconfig, type, tag, 0x1000, 0x800)
+	{ }
+
+	void ojankohs(machine_config &config);
+	void ccasino(machine_config &config);
+	void ojankoc(machine_config &config);
+	void ojankoy(machine_config &config);
+
+protected:
 	ojankohs_state(const machine_config &mconfig, device_type type, const char *tag, uint32_t vramsize, uint32_t pramsize) :
 		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram", vramsize, ENDIANNESS_LITTLE),
@@ -37,16 +47,6 @@ public:
 		m_dsw3(*this, "dsw3"), m_dsw4(*this, "dsw4")
 	{ }
 
-	ojankohs_state(const machine_config &mconfig, device_type type, const char *tag) :
-		ojankohs_state(mconfig, type, tag, 0x1000, 0x800)
-	{ }
-
-	void ojankohs(machine_config &config);
-	void ccasino(machine_config &config);
-	void ojankoc(machine_config &config);
-	void ojankoy(machine_config &config);
-
-protected:
 	virtual void machine_reset() override;
 
 private:

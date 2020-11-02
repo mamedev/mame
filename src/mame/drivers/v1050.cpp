@@ -983,7 +983,7 @@ void v1050_state::machine_start()
 	program.install_readwrite_bank(0x2000, 0x3fff, membank("bank2"));
 	membank("bank2")->configure_entries(0, 2, ram + 0x2000, 0x10000);
 	membank("bank2")->configure_entry(2, ram + 0x1e000);
-	
+
 	program.install_readwrite_bank(0x4000, 0x7fff, membank("bank3"));
 	membank("bank3")->configure_entries(0, 2, ram + 0x4000, 0x10000);
 

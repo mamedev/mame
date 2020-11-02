@@ -89,7 +89,7 @@ void klax_bootleg_state::machine_start()
 	m_audio_sample[0] = m_audio_sample[1] = 0x00;
 	m_audio_nibble = 0;
 
-	save_pointer(NAME(m_audio_sample), 2);
+	save_item(NAME(m_audio_sample));
 	save_item(NAME(m_audio_nibble));
 }
 

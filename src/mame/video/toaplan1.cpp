@@ -233,8 +233,8 @@ void toaplan1_rallybik_state::video_start()
 	create_tilemaps();
 	vram_alloc();
 
-	m_buffered_spriteram = make_unique_clear<u16[]>(m_spriteram.share()->bytes() / 2);
-	save_pointer(NAME(m_buffered_spriteram), m_spriteram.share()->bytes() / 2);
+	m_buffered_spriteram = make_unique_clear<u16[]>(m_spriteram.bytes() / 2);
+	save_pointer(NAME(m_buffered_spriteram), m_spriteram.bytes() / 2);
 
 	m_tilemap[0]->set_scrolldx(-0x00d - 6, -0x80 + 6);
 	m_tilemap[1]->set_scrolldx(-0x00d - 4, -0x80 + 4);
@@ -771,7 +771,7 @@ void toaplan1_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, c
 	u16 *size   = (u16 *)m_buffered_spritesizeram.get();
 	int fcu_flipscreen = m_fcu_flipscreen;
 
-	for (int offs = m_spriteram.share()->bytes() / 2 - 4; offs >= 0; offs -= 4)
+	for (int offs = m_spriteram.bytes() / 2 - 4; offs >= 0; offs -= 4)
 	{
 		if (!(source[offs] & 0x8000))
 		{
@@ -839,7 +839,7 @@ u32 toaplan1_rallybik_state::screen_update(screen_device &screen, bitmap_rgb32 &
 {
 	log_vram();
 
-	m_spritegen->draw_sprites_to_tempbitmap(cliprect, m_buffered_spriteram.get(),  m_spriteram.share()->bytes());
+	m_spritegen->draw_sprites_to_tempbitmap(cliprect, m_buffered_spriteram.get(),  m_spriteram.bytes());
 
 	// first draw everything, including "disabled" tiles and priority 0
 	m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES, 0);
@@ -895,7 +895,7 @@ WRITE_LINE_MEMBER(toaplan1_rallybik_state::screen_vblank)
 	// rising edge
 	if (state)
 	{
-		memcpy(m_buffered_spriteram.get(), m_spriteram, m_spriteram.share()->bytes());
+		memcpy(m_buffered_spriteram.get(), m_spriteram, m_spriteram.bytes());
 		interrupt();
 	}
 }
@@ -905,7 +905,7 @@ WRITE_LINE_MEMBER(toaplan1_state::screen_vblank)
 	// rising edge
 	if (state)
 	{
-		memcpy(m_buffered_spriteram.get(), m_spriteram, m_spriteram.share()->bytes());
+		memcpy(m_buffered_spriteram.get(), m_spriteram, m_spriteram.bytes());
 		memcpy(m_buffered_spritesizeram.get(), m_spritesizeram.get(), TOAPLAN1_SPRITESIZERAM_SIZE);
 		interrupt();
 	}
@@ -916,7 +916,7 @@ WRITE_LINE_MEMBER(toaplan1_samesame_state::screen_vblank)
 	// rising edge
 	if (state)
 	{
-		memcpy(m_buffered_spriteram.get(), m_spriteram, m_spriteram.share()->bytes());
+		memcpy(m_buffered_spriteram.get(), m_spriteram, m_spriteram.bytes());
 		memcpy(m_buffered_spritesizeram.get(), m_spritesizeram.get(), TOAPLAN1_SPRITESIZERAM_SIZE);
 		interrupt();
 		m_maincpu->set_input_line(M68K_IRQ_2, HOLD_LINE);   /* Frame done */

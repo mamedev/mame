@@ -67,7 +67,6 @@ public:
 		: amiga_state(mconfig, type, tag)
 		, m_bios_region(*this, "user2")
 		, m_rom_board(*this, "user3")
-
 	{
 	}
 
@@ -90,9 +89,13 @@ public:
 	void init_dlta();
 	void init_argh();
 
-	void arcadia_multibios_change_game(uint16_t data);
 	template <int Coin> DECLARE_CUSTOM_INPUT_MEMBER(coin_counter_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_changed_callback);
+
+protected:
+	virtual void machine_reset() override;
+
+	void arcadia_multibios_change_game(uint16_t data);
 	void arcadia_cia_0_portb_w(uint8_t data);
 
 private:
@@ -102,8 +105,6 @@ private:
 	void arcadia_map(address_map &map);
 	void argh_map(address_map &map);
 	void overlay_512kb_map(address_map &map);
-
-	virtual void machine_reset() override;
 
 	optional_memory_region m_bios_region, m_rom_board;
 

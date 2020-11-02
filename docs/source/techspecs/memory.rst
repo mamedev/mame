@@ -57,7 +57,7 @@ Memory banks are zones that indirect memory access, giving the
 possibility to dynamically and efficiently change where a zone
 actually points to.
 
-Memory regions are read-only memory zones in which roms are loaded.
+Memory regions are read-only memory zones in which ROMs are loaded.
 
 All of these have names allowing to access them.
 
@@ -100,8 +100,8 @@ object.
 
 A memory share can be created if it doesn't exist in a memory map
 through that creator class.  If it already exists it is just
-retrieved.  That class behaves like a pointer but also has the share()
-method to get th memory_share object and the bytes(), endianness(),
+retrieved.  That class behaves like a pointer but also has the target()
+method to get the memory_share object and the bytes(), endianness(),
 bitwidth() and bytewidth() methods for share information.
 
 | memory_share \*memshare(string tag) const;
@@ -304,11 +304,11 @@ both for the current entry.
 4.3.3 Lambda function
 '''''''''''''''''''''
 
-| (...).lr{8,16,32,64}(FUNC([...](address_space &space, offs_t offset, uNN mem_mask) -> uNN { ... }))
+| (...).lr{8,16,32,64}(NAME([...](address_space &space, offs_t offset, uNN mem_mask) -> uNN { ... }))
 | (...).lr{8,16,32,64}([...](address_space &space, offs_t offset, uNN mem_mask) -> uNN { ... }, "name")
-| (...).lw{8,16,32,64}(FUNC([...](address_space &space, offs_t offset, uNN data, uNN mem_mask) -> void { ... }))
+| (...).lw{8,16,32,64}(NAME([...](address_space &space, offs_t offset, uNN data, uNN mem_mask) -> void { ... }))
 | (...).lw{8,16,32,64}([...](address_space &space, offs_t offset, uNN data, uNN mem_mask) -> void { ... }, "name")
-| (...).lrw{8,16,32,64}(FUNC(read), FUNC(write))
+| (...).lrw{8,16,32,64}(NAME(read), NAME(write))
 | (...).lrw{8,16,32,64}(read, "name_r", write, "name_w")
 
 Sets a lambda called on read, write or both.  The lambda prototype can
@@ -324,22 +324,22 @@ number is the data width of the access, e.g. the NN.
 | (...).writeonly()
 | (...).ram()
 
-Selects the range to access a memory zone as readonly, writeonly or
-readwrite respectively.  Specific handle qualifiers allow to tell
+Selects the range to access a memory zone as read-only, write-only or
+read/write respectively.  Specific handle qualifiers allow to tell
 where this memory zone should be.  There are two cases when no
 qualifier is acceptable:
 
-* ram() gives an anonymous ram zone not accessibles outside of the
+* ram() gives an anonymous ram zone not accessible outside of the
   address space.  
 
 * rom() when the memory map is used in an AS_PROGRAM
-  space of a (cpu) device which names is also the name of a region.
+  space of a (CPU) device which names is also the name of a region.
   Then the memory zone points to that region at the offset
   corresponding to the start of the zone.
 
 | (...).rom().region("name", offset)
 
-The region qualifier allows to make a readonly zone point to the
+The region qualifier allows to make a read-only zone point to the
 contents of a given region at a given offset.
 
 | (...).rom().share("name")
@@ -485,7 +485,7 @@ The parameter is that trigger width (would be 16 in the 68000 case).
 
 A series of methods allow to change the bus decoding of an address
 space on the fly.  They're powerful but have some issues:
-* changing the mappings repeateadly can be slow
+* changing the mappings repeatedly can be slow
 * the address space state is not saved in the saved states, so it has to be rebuilt after state load
 * they can be hidden anywhere rather that be grouped in an address map, which can be less readable
 
@@ -538,8 +538,8 @@ Note that as all delegates they can also wrap lambdas.
 | space.install_readwrite_handler(addrstart, addrend, addrmask, addrmirror, addrselect, read_delegate, write_delegate, *unitmask*, *cswidth*)
 
 These six methods allow to install delegate-wrapped handlers in a live
-address space. either plain of with mask, mirror and select.  In the
-readwrite case both delegates must be of the same flavor (smo stuff)
+address space. Either plain or with mask, mirror and select.  In the
+read/write case both delegates must be of the same flavor (smo stuff)
 to avoid a combinatorial explosion of method types.
 
 5.3 Direct memory range mapping
@@ -553,7 +553,7 @@ to avoid a combinatorial explosion of method types.
 | space.install_ram(addrstart, addrend, addrmirror, void \*pointer)
 
 Installs a memory block in an address space, with or without mirror.
-rom is readonly, ram is read/write, writeonly is write only.  The
+rom is read-only, ram is read/write, writeonly is write-only.  The
 pointer must be non-null, this method will not allocate the memory.
 
 5.4 Bank mapping

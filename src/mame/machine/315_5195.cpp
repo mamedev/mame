@@ -564,7 +564,7 @@ void *sega_315_5195_mapper_device::decrypt_bank::set(offs_t start, offs_t end, o
 	m_start = start;
 	m_end = end;
 	m_rgnoffs = rgnoffs;
-	m_srcptr = static_cast<u8 *>(src);
+	m_srcptr = reinterpret_cast<u8 *>(src);
 
 	// configure the fd1094 cache
 	if (m_fd1094_cache != nullptr)

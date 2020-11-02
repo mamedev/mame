@@ -906,8 +906,6 @@ memory_manager::memory_manager(running_machine &machine)
 
 memory_manager::~memory_manager()
 {
-	for(void *ptr : m_datablocks)
-		free(ptr);
 }
 
 //-------------------------------------------------
@@ -1036,10 +1034,9 @@ void memory_manager::initialize()
 
 void *memory_manager::allocate_memory(device_t &dev, int spacenum, std::string name, u8 width, size_t bytes)
 {
-	void *ptr = malloc(bytes);
+	void *const ptr = m_datablocks.emplace(m_datablocks.end(), malloc(bytes))->get();
 	memset(ptr, 0, bytes);
-	m_datablocks.push_back(ptr);
-	machine().save().save_memory(&dev, "memory", dev.tag(), spacenum, name.c_str(), ptr, width/8, (u32)bytes / (width/8));
+	machine().save().save_memory(&dev, "memory", dev.tag(), spacenum, name.c_str(), ptr, width/8, u32(bytes) / (width/8));
 	return ptr;
 }
 
@@ -1709,8 +1706,8 @@ void address_space::populate_map_entry(const address_map_entry &entry, read_or_w
 				install_bank_generic(entry.m_addrstart, entry.m_addrend, entry.m_addrmirror,
 									 (readorwrite == read_or_write::READ) ? bank : nullptr,
 									 (readorwrite == read_or_write::WRITE) ? bank : nullptr);
-			break;
 			}
+			break;
 
 		case AMH_DEVICE_SUBMAP:
 			throw emu_fatalerror("Internal mapping error: leftover mapping of '%s'.\n", data.m_tag);

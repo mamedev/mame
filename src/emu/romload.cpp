@@ -1278,7 +1278,7 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 			machine().memory().region_free(memregion->name());
 		}
 
-		/* remember the base and length */
+		// remember the base and length
 		m_region = machine().memory().region_alloc(regiontag, regionlength, width, endianness);
 		LOG("Allocated %X bytes @ %p\n", m_region->bytes(), m_region->base());
 

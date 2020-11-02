@@ -92,7 +92,6 @@ private:
 class jtces40_state : public jtc_state
 {
 public:
-	using jtc_state::jtc_state;
 	jtces40_state(const machine_config &mconfig, device_type type, const char *tag)
 		: jtc_state(mconfig, type, tag)
 		, m_video_ram_40(*this, "videoram40", JTC_ES40_VIDEORAM_SIZE, ENDIANNESS_BIG)

@@ -1787,10 +1787,12 @@ public:
 	void region_free(std::string name);
 
 private:
+	struct stdlib_deleter { void operator()(void *p) const { free(p); } };
+
 	// internal state
 	running_machine &           m_machine;              // reference to the machine
 
-	std::vector<void *>                                              m_datablocks;           // list of memory blocks to free on exit
+	std::vector<std::unique_ptr<void, stdlib_deleter>>               m_datablocks;           // list of memory blocks to free on exit
 	std::unordered_map<std::string, std::unique_ptr<memory_bank>>    m_banklist;             // data gathered for each bank
 	std::unordered_map<std::string, std::unique_ptr<memory_share>>   m_sharelist;            // map for share lookups
 	std::unordered_map<std::string, std::unique_ptr<memory_region>>  m_regionlist;           // list of memory regions
