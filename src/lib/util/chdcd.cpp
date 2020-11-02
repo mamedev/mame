@@ -1203,6 +1203,18 @@ bool chdcd_is_gdicue(const char *tocfname)
  *
  * Redump assumes SINGLE-DENSITY starts at 0 LBA and HIGH-DENSITY starts at 45000 LBA. This is *NOT* a generic
  * multi-cue format its only purpose is Dreamcast GDI dumps. 
+ *
+ * Notes: I'm fairly sure the proper HD start should be 45150 aka 10:02:00. Not 45000 as stated above. However
+ * the old .gdi files in circulation consistently used 45000. This has created an ecosystem of toolchains and
+ * emulators that generate and expect 45000. Using 45150 is tempting but will break compatibility right across
+ * the board. I'm adopting the strategy of behaving identically to .gdi for now.
+ *
+ * Notes: The .gdi format didn't store pregap information. This meant chdman generated .chd files with pregap
+ * and pgtype zeroed out, there was no other choice. Unfortunately now the entire ecosystem of frontends and
+ * emulators which rely on checksums only recognise .chd files with zeroed out pregaps and pgtypes. The brand
+ * new .bin/.cue format does correctly store pregap information and it's even correctly calculated here. But
+ * I can't push that to the .chd without breaking compatibility. So again I'm taking the strategy of behaving
+ * identically to .gdi for now which means zeroing out the pregap and pgtype, as painful as that is.
  */
 
 chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
