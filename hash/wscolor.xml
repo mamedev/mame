@@ -967,7 +967,7 @@ See the wswan software list for the full game list.
 	<software name="hanjuher" supported="no">
 		<!-- WSC only -->
 		<!-- Rev 1 -->
-		<description>Hanjuku Hero - Ah, Sekai yo Hanjuku Nare...!! (Rev 1)</description>
+		<description>Hanjuku Hero - Ah, Sekai yo Hanjuku Nare...!!</description>
 		<year>2002</year>
 		<publisher>Square</publisher>
 		<info name="serial" value="SWJ-SQRC06"/>
