@@ -42677,6 +42677,9 @@ yiear2                          // GX407 (c) 1985
 @source:ymdx11.cpp
 dx11                            //
 
+@source:ymmu5.cpp
+mu5                             // 1994 MU-5
+
 @source:ymmu50.cpp
 mu50                            // 1995 MU-50
 
