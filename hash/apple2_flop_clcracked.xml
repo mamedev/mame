@@ -37426,4 +37426,30 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="coscom">
+		<description>Cosmic Combat (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Highlands Computer Services</publisher>
+		<info name="release" value="2020-11-01"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="cosmic combat (4am crack).dsk" size="143360" crc="aefa46a5" sha1="65fb92082ea477ee1f5288448fcd62dd45f8510e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vortex">
+		<description>Vortex (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Datamost</publisher>
+		<info name="release" value="2020-11-01"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="vortex (4am crack).dsk" size="143360" crc="f82bc31a" sha1="3ee47a454af5b10a923ccb3d37488e967985808d"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
