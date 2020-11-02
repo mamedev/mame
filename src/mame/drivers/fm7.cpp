@@ -1823,6 +1823,7 @@ void fm7_state::machine_reset()
 			membank("bank1")->set_base(&m_basic_ptr[0]);
 		}
 	}
+
 	m_key_delay = 700;  // 700ms on FM-7
 	m_key_repeat = 70;  // 70ms on FM-7
 	m_break_flag = 0;
@@ -1831,6 +1832,7 @@ void fm7_state::machine_reset()
 	m_psg_data = 0;
 	m_fdc_side = 0;
 	m_fdc_drive = 0;
+
 	// set boot mode (FM-7 only, AV and later has boot RAM instead)
 	if(m_type == SYS_FM7)
 	{
@@ -2181,7 +2183,7 @@ ROM_START( fmnew7 )
 ROM_END
 
 ROM_START( fm7 )
-	ROM_REGION( 0x8000, "maincpu", 0 ) // at 0x7ba5 there is the ID string 0300820920, meaning it's v3.00 from 1982/09/20
+	ROM_REGION( 0x8000, "fbasic", 0 ) // at 0x7ba5 there is the ID string 0300820920, meaning it's v3.00 from 1982/09/20
 	ROM_LOAD( "fbasic300.rom", 0x0000,  0x7c00, CRC(87c98494) SHA1(d7e3603b0a2442c7632dad45f9704d9ad71968f5) BAD_DUMP ) // last 1K is inaccessible
 
 	ROM_REGION( 0x10000, "sub", 0 )
