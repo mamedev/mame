@@ -49,6 +49,11 @@ void isa8_chessmsr_device::device_start()
 	save_item(NAME(m_installed));
 	save_item(NAME(m_suspended));
 	save_item(NAME(m_ram_offset));
+
+	// allocate maximum RAM beforehand
+	const u32 maxram = 1 << 21;
+	m_ram = std::make_unique<u32[]>(maxram / 4);
+	save_pointer(NAME(m_ram.get()), maxram / 4);
 }
 
 
@@ -69,8 +74,6 @@ void isa8_chessmsr_device::device_reset()
 
 		// install RAM
 		u32 ramsize = 1 << ioport("RAM")->read();
-		m_ram = std::make_unique<u32[]>(ramsize / 4);
-		save_pointer(NAME(m_ram.get()), ramsize/4);
 		m_maincpu->space(AS_PROGRAM).install_ram(0, ramsize - 1, m_ram.get());
 
 		m_installed = true;
