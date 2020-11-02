@@ -747,7 +747,7 @@ void wecleman_state::draw_cloud(bitmap_rgb32 &bitmap,
 
 ------------------------------------------------------------------------*/
 
-void wecleman_state::hotchase_draw_road(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void hotchase_state::hotchase_draw_road(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 /* Referred to what's in the ROMs */
 #define XSIZE 512
@@ -809,7 +809,7 @@ void wecleman_state::wecleman_videostatus_w(offs_t offset, uint16_t data, uint16
 	}
 }
 
-void wecleman_state::hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void hotchase_state::hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int newword, r, g, b;
 
@@ -838,7 +838,7 @@ void wecleman_state::wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w(offs_t offset
                             Initializations
 ***************************************************************************/
 
-VIDEO_START_MEMBER(wecleman_state,wecleman)
+void wecleman_state::video_start()
 {
 	/*
 	    Sprite banking - each bank is 0x20000 bytes (we support 0x40 bank codes)
@@ -928,19 +928,19 @@ VIDEO_START_MEMBER(wecleman_state,wecleman)
 
 //  Callbacks for the K051316
 
-K051316_CB_MEMBER(wecleman_state::hotchase_zoom_callback_1)
+K051316_CB_MEMBER(hotchase_state::hotchase_zoom_callback_1)
 {
 	*code |= (*color & 0x03) << 8;
 	*color = (*color & 0xfc) >> 2;
 }
 
-K051316_CB_MEMBER(wecleman_state::hotchase_zoom_callback_2)
+K051316_CB_MEMBER(hotchase_state::hotchase_zoom_callback_2)
 {
 	*color = ((*color & 0x3f) << 1) | ((*code & 0x80) >> 7);
 }
 
 
-VIDEO_START_MEMBER(wecleman_state,hotchase)
+void hotchase_state::video_start()
 {
 	/*
 	    Sprite banking - each bank is 0x20000 bytes (we support 0x40 bank codes)
@@ -1062,7 +1062,7 @@ uint32_t wecleman_state::screen_update_wecleman(screen_device &screen, bitmap_rg
                                 Hot Chase
 ***************************************************************************/
 
-uint32_t wecleman_state::screen_update_hotchase(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t hotchase_state::screen_update_hotchase(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bool video_on = (m_irqctrl & 0x40) ? true : false;
 

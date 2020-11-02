@@ -101,6 +101,24 @@ static INPUT_PORTS_START( megadriv_radica_6button )
 	PORT_START("UNK")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( megadriv_msi_6button )
+	PORT_INCLUDE( megadriv_radica_3button )
+
+	PORT_START("EXTRA1")    /* Extra buttons for Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("EXTRA2") // no 2nd pad
+	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("PAD2") // no 2nd pad
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0")
+	PORT_START("UNK")
+INPUT_PORTS_END
 
 void megadriv_radica_6button_state::machine_start()
 {
@@ -209,6 +227,15 @@ ROM_START( rad_orun )
 	ROM_LOAD16_WORD_SWAP( "outrun.bin", 0x000000, 0x100000, CRC(4fd6d653) SHA1(57f0e4550ff883e4bb7857caef2c893c21f80b42) )
 ROM_END
 
+ROM_START( msi_sf2 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	// The first part of the ROM seems to be a boot ROM for the enhanced MD clone menus, even if it does nothing here
+	// and is probably leftover from one of the multigame systems, hacked to only launch one game. We should emulate it...
+	// .. but the game ROM starts at 0xc8000 so we can cheat for now
+	ROM_LOAD16_WORD_SWAP( "29lv320.bin", 0x000000, 0xc8000, CRC(465b12f0) SHA1(7a058f6feb4f08f56ae0f7369c2ca9a9fe2ed40e) )
+	ROM_CONTINUE(0x00000,0x338000) 
+ROM_END
+
 
 void megadriv_radica_6button_state::init_megadriv_radica_6button_pal()
 {
@@ -254,3 +281,7 @@ CONS( 2004, rad_ssoc,  0,        0, megadriv_radica_3button_pal,  megadriv_radic
 
 // not region locked, no Radica logos, uncertain if other regions would differ
 CONS( 2004, rad_orun,  0,        0, megadriv_radica_3button_pal,  megadriv_radica_3button_1player, megadriv_radica_3button_state, init_megadrie,                    "Radica / Sega",                     "Out Run 2019 (Radica Plug & Play, UK)", 0)
+
+// From a European unit but NTSC? - code is hacked from original USA Genesis game with region check still intact? (does the clone hardware always identify as such? or does the bypassed boot code skip the check?)
+// TODO: move out of here eventually once the enhanced MD part is emulated rather than bypassed (it's probably the same as the 145-in-1 multigame unit, but modified to only include this single game)
+CONS( 2018, msi_sf2,   0,        0, megadriv_radica_6button_ntsc, megadriv_msi_6button,         megadriv_radica_6button_state, init_megadriv_radica_6button_ntsc,    "MSI / Capcom / Sega",            "Street Fighter II: Special Champion Edition (MSI Plug & Play) (Europe)", 0)
