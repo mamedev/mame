@@ -765,3 +765,6 @@ CONS( 1997, bandggcn,    0,  0,  nes_sh6578,     nes_sh6578, nes_sh6578_state, i
 
 CONS( 200?, cpatrolm,    0,  0,  nes_sh6578_pal, nes_sh6578, nes_sh6578_state, init_nes_sh6578, "TimeTop", "City Patrolman", MACHINE_NOT_WORKING )
 
+// Super Moto 3 https://youtu.be/DR5Y_r6C_qk - has JungleTac copyrights intact, and appears to have the SH6578 versions of the games
+
+// Handy Max 15-in-1 https://youtu.be/jQTUHj1cP-k - has JungleTac copyrights intact, and appears to have the SH6578 versions of the games
