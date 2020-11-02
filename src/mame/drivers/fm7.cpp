@@ -1430,7 +1430,7 @@ void fm11_state::fm11_x86_io(address_map &map)
 void fm7_state::fm16_mem(address_map &map)
 {
 	map(0x00000, 0xfbfff).ram();
-	map(0xfc000, 0xfffff).rom(); // IPL
+	map(0xfc000, 0xfffff).rom().region("ipl", 0); // IPL
 }
 
 void fm7_state::fm16_io(address_map &map)
@@ -2275,8 +2275,8 @@ ROM_START( fm11 )
 ROM_END
 
 ROM_START( fm16beta )
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "ipl.rom", 0xfc000, 0x4000, CRC(25f618ea) SHA1(9c27d6ad283260e071d64a1bfca16f7d3ad61f96) )
+	ROM_REGION16_LE( 0x4000, "ipl", 0 )
+	ROM_LOAD( "ipl.rom", 0x0000, 0x4000, CRC(25f618ea) SHA1(9c27d6ad283260e071d64a1bfca16f7d3ad61f96) )
 
 //  ROM_REGION( 0x10000, "subsys", 0 )
 

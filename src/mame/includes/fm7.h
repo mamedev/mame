@@ -207,7 +207,7 @@ protected:
 
 	optional_shared_ptr<uint8_t> m_shared_ram;
 	optional_shared_ptr<uint8_t> m_a15_ram;
-	required_shared_ptr<uint8_t> m_vectors;
+	optional_shared_ptr<uint8_t> m_vectors;
 
 	uint8_t           m_irq_flags;
 	uint8_t           m_irq_mask;
