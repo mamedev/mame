@@ -14898,6 +14898,7 @@ jak_dchp
 jak_ddhp
 jak_prhp
 zippity
+zippityuk
 
 @source:geneve.cpp
 geneve                          // 1987 Myarc Geneve 9640
@@ -38336,6 +38337,7 @@ sentx6pd
 
 @source:spg2xx_shredmjr.cpp
 taikeegr                        //
+rockstar
 shredmjr                        //
 guitarst
 guitarstp

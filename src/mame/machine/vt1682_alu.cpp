@@ -283,9 +283,7 @@ void vrt_vt1682_alu_device::alu_oprand_6_mult_w(uint8_t data)
 	m_alu_out[1] = (result >> 8) & 0xff;
 	m_alu_out[2] = (result >> 16) & 0xff;
 	m_alu_out[3] = (result >> 24) & 0xff;
-	// 4/5 untouched?
-	m_alu_out[6] = 0x00;
-	m_alu_out[7] = 0x00;
+	// 4/5 untouched? or set to 0?
 }
 
 
@@ -345,8 +343,5 @@ void vrt_vt1682_alu_device::alu_oprand_6_div_w(uint8_t data)
 
 		m_alu_out[4] = remainder & 0xff;
 		m_alu_out[5] = (remainder >> 8) & 0xff;
-
-		m_alu_out[6] = 0x00;
-		m_alu_out[7] = 0x00;
 	}
 }
