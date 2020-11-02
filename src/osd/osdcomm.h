@@ -54,6 +54,17 @@
 #define RESTRICT
 #endif
 
+/* fallthrough placeholder */
+#if __cplusplus == 201703L
+#define FALLTHROUGH             [[fallthrough]];
+#elif defined(__clang__) && __clang__ == 1 && (__clang_major__ >= 4 || (__clang_major__ == 3 && __clang_minor__ >= 9))
+#define FALLTHROUGH             [[clang::fallthrough]];
+#elif defined(__GNUC__) && __GNUC__ >= 7
+#define FALLTHROUGH             [[gnu::fallthrough]];
+#else
+#define FALLTHROUGH
+#endif
+
 
 
 /***************************************************************************
