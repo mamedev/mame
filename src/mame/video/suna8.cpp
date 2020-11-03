@@ -404,7 +404,7 @@ void suna8_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 void suna8_state::draw_text_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int start, int end, int ypos, bool write_mask)
 {
-	uint8_t *spriteram = m_spriteram ? m_spriteram : m_banked_spriteram;
+	uint8_t *spriteram = m_spriteram ? m_spriteram.target() : m_banked_spriteram.target();
 
 	int max_x = m_screen->width() - 8;
 	int max_y = m_screen->height() - 8;

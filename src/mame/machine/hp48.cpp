@@ -892,14 +892,14 @@ void hp48_state::init_hp48()
 	LOG(( "hp48: driver init called\n" ));
 	for (int i = 0; i < 6; i++)
 	{
-		m_modules[i].off_mask = 0x00fff;  /* 2 KB */
+		m_modules[i].off_mask = 0x00fff;  // 2 KB
 		m_modules[i].read     = read8sm_delegate(*this);
 		m_modules[i].write    = write8sm_delegate(*this);
 		m_modules[i].data     = nullptr;
 		m_modules[i].isnop    = 0;
 		m_modules[i].state    = 0;
-		m_modules[i].base    = 0;
-		m_modules[i].mask    = 0;
+		m_modules[i].base     = 0;
+		m_modules[i].mask     = 0;
 	}
 	m_rom = nullptr;
 }

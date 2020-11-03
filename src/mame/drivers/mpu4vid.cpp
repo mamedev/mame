@@ -510,7 +510,15 @@ void mpu4vid_state::video_start()
 	assert(m_gfx_index != MAX_GFX_ELEMENTS);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(m_gfx_index+0, std::make_unique<gfx_element>(m_palette, mpu4_vid_char_8x8_layout, reinterpret_cast<uint8_t *>(m_vid_vidram.ptr()), NATIVE_ENDIAN_VALUE_LE_BE(8,0), m_palette->entries() / 16, 0));
+	m_gfxdecode->set_gfx(
+			m_gfx_index+0,
+			std::make_unique<gfx_element>(
+				m_palette,
+				mpu4_vid_char_8x8_layout,
+				reinterpret_cast<uint8_t *>(m_vid_vidram.target()),
+				NATIVE_ENDIAN_VALUE_LE_BE(8,0),
+				m_palette->entries() / 16,
+				0));
 }
 
 EF9369_COLOR_UPDATE( mpu4vid_state::ef9369_color_update )
