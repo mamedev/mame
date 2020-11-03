@@ -22,7 +22,9 @@ public:
 	mu5_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_ymw258(*this, "ymw258")
+		m_ymw258(*this, "ymw258"),
+		m_key(*this, "S%c", 'A'),
+		m_matrixsel(0)
 	{ }
 
 	void mu5(machine_config &config);
@@ -30,15 +32,43 @@ public:
 private:
 	required_device<h83002_device> m_maincpu;
 	required_device<multipcm_device> m_ymw258;
+	required_ioport_array<6> m_key;
+
 	void mu5_map(address_map &map);
+	void mu5_io_map(address_map &map);
 	void ymw258_map(address_map &map);
+
+	u8 m_matrixsel;
+	u8 matrix_r()
+	{
+		s8 row = 00;
+
+		switch (m_matrixsel ^ 0x3f)
+		{
+			case 0x01: row = 0; break;
+			case 0x02: row = 1; break;
+			case 0x04: row = 2; break;
+			case 0x08: row = 3; break;
+			case 0x10: row = 4; break;
+			case 0x20: row = 5; break;
+		}
+
+		return m_key[row]->read();
+	}
 };
 
 void mu5_state::mu5_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom().region("maincpu", 0);
 	map(0x200000, 0x21ffff).ram();
-	map(0x400000, 0x400007).rw(m_ymw258, FUNC(multipcm_device::read), FUNC(multipcm_device::write)).umask16(0xff00);
+	map(0x400000, 0x400007).rw(m_ymw258, FUNC(multipcm_device::read), FUNC(multipcm_device::write)).umask16(0xffff);
+}
+
+void mu5_state::mu5_io_map(address_map &map)
+{
+	map(h8_device::PORT_4, h8_device::PORT_4).lr8(NAME([this]() -> u8 { return m_matrixsel; }));
+	map(h8_device::PORT_4, h8_device::PORT_4).lw8(NAME([this](u8 data) { m_matrixsel = data; }));
+	map(h8_device::PORT_7, h8_device::PORT_7).r(FUNC(mu5_state::matrix_r));
 }
 
 void mu5_state::ymw258_map(address_map &map)
@@ -46,7 +76,51 @@ void mu5_state::ymw258_map(address_map &map)
 	map(0x000000, 0x1fffff).rom();
 }
 
-static INPUT_PORTS_START( mu5 )
+static INPUT_PORTS_START(mu5)
+	PORT_START("SA")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Part Down") PORT_CODE(KEYCODE_Z)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Part Up") PORT_CODE(KEYCODE_X)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Value Down") PORT_CODE(KEYCODE_C)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Value Up") PORT_CODE(KEYCODE_V)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Mute") PORT_CODE(KEYCODE_B)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Exit") PORT_CODE(KEYCODE_N)
+
+	PORT_START("SB")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("0") PORT_CODE(KEYCODE_0)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("9") PORT_CODE(KEYCODE_9)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("8") PORT_CODE(KEYCODE_8)
+
+	PORT_START("SC")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("7") PORT_CODE(KEYCODE_7)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("6") PORT_CODE(KEYCODE_6)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("5") PORT_CODE(KEYCODE_5)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("4") PORT_CODE(KEYCODE_4)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("3") PORT_CODE(KEYCODE_3)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("2") PORT_CODE(KEYCODE_2)
+
+	PORT_START("SD")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("1") PORT_CODE(KEYCODE_1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Octave Up") PORT_CODE(KEYCODE_LEFT)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Octave Down") PORT_CODE(KEYCODE_RIGHT)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Mstr Tune") PORT_CODE(KEYCODE_4)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Trns Pose") PORT_CODE(KEYCODE_3)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Mute Lock") PORT_CODE(KEYCODE_2)
+
+	PORT_START("SE")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Velo City") PORT_CODE(KEYCODE_Q)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Locl Ctrl") PORT_CODE(KEYCODE_W)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dump Out") PORT_CODE(KEYCODE_E)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Init All") PORT_CODE(KEYCODE_R)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Vol") PORT_CODE(KEYCODE_T)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Pan") PORT_CODE(KEYCODE_Y)
+
+	PORT_START("SF")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("MIDI Ch") PORT_CODE(KEYCODE_U)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Note Shft") PORT_CODE(KEYCODE_I)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Part Tune") PORT_CODE(KEYCODE_O)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Bend Rnge") PORT_CODE(KEYCODE_P)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("+/-") PORT_CODE(KEYCODE_EQUALS)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER)
 INPUT_PORTS_END
 
 void mu5_state::mu5(machine_config &config)
@@ -54,6 +128,7 @@ void mu5_state::mu5(machine_config &config)
 	/* basic machine hardware */
 	H83002(config, m_maincpu, 10_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mu5_state::mu5_map);
+	m_maincpu->set_addrmap(AS_IO, &mu5_state::mu5_io_map);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
