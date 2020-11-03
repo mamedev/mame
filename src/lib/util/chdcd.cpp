@@ -1511,7 +1511,7 @@ chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_trac
 #if 1
 	for (trknum = 0; trknum < outtoc.numtrks; trknum++)
 	{
-		printf("trk %d: %d frames @ offset %d, pad=%d, area=%d, phys=%d, pre=%d, post=%d, idx0=%d, idx1=%d, (true %d)\n",
+		printf("trk %d: %d frames @ offset %d, pad=%d, area=%d, phys=%d, pregap=%d, pgtype=%d, idx0=%d, idx1=%d, (true %d)\n",
 			trknum+1,
 			outtoc.tracks[trknum].frames,
 			outinfo.track[trknum].offset,
@@ -1519,7 +1519,7 @@ chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_trac
 			outtoc.tracks[trknum].multicuearea,
 			outtoc.tracks[trknum].physframeofs,
 			outtoc.tracks[trknum].pregap,
-			outtoc.tracks[trknum].postgap,
+			outtoc.tracks[trknum].pgtype,
 			outinfo.track[trknum].idx0offs,
 			outinfo.track[trknum].idx1offs,
 			outtoc.tracks[trknum].frames - outtoc.tracks[trknum].padframes);
@@ -1538,9 +1538,15 @@ chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_trac
 			outtoc.tracks[outtoc.numtrks-2].frames += 225; 		// final 75 frames of AUDIO are in pregap of DATA track
 			outtoc.tracks[outtoc.numtrks-2].padframes += 150;
 
+			// workaround for audio read across split bin
+			// redump .bin has 150 frame pregap, which will be skipped
+			// last 75 frames are in the data track, the routine only reads audio track
+			// workaround is to shift the audio left 1 second, capturing 1 second of pregap in the audio
+			outinfo.track[outtoc.numtrks-2].offset -= 75 * (outtoc.tracks[trknum-2].datasize + outtoc.tracks[trknum-2].subsize);
+
 			// skip the pregap when reading the DATA .bin
 			outtoc.tracks[outtoc.numtrks-1].frames -= 225;
-			outinfo.track[outtoc.numtrks-1].offset += 225;
+			outinfo.track[outtoc.numtrks-1].offset += 225 * (outtoc.tracks[outtoc.numtrks-1].datasize + outtoc.tracks[outtoc.numtrks-1].subsize);
 
 			// now strip redundant pregap from last track
 			outtoc.tracks[outtoc.numtrks-1].pregap = 0;
@@ -1560,9 +1566,9 @@ chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_trac
 			outtoc.tracks[trknum-1].frames += outtoc.tracks[trknum].pregap;
 			outtoc.tracks[trknum-1].padframes += outtoc.tracks[trknum].pregap;
 
-			// skip the pregap when reading the AUDIO .bin
+			// skip the pregap when reading the AUDIO .bin, all Redump audio tracks have 150 frames pregap
 			outtoc.tracks[trknum].frames -= outtoc.tracks[trknum].pregap;
-			outinfo.track[trknum].offset += outtoc.tracks[trknum].pregap;
+			outinfo.track[trknum].offset += outtoc.tracks[trknum].pregap * (outtoc.tracks[trknum-1].datasize + outtoc.tracks[trknum-1].subsize);
 
 			// now strip redundant pregap from current track
 			outtoc.tracks[trknum].pregap = 0;
@@ -1591,7 +1597,7 @@ chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_trac
 #if 1
 	for (trknum = 0; trknum < outtoc.numtrks; trknum++)
 	{
-		printf("trk %d: %d frames @ offset %d, pad=%d, area=%d, phys=%d, pre=%d, post=%d, idx0=%d, idx1=%d, (true %d)\n",
+		printf("trk %d: %d frames @ offset %d, pad=%d, area=%d, phys=%d, pregap=%d, pgtype=%d, idx0=%d, idx1=%d, (true %d)\n",
 			trknum+1,
 			outtoc.tracks[trknum].frames,
 			outinfo.track[trknum].offset,
@@ -1599,7 +1605,7 @@ chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_trac
 			outtoc.tracks[trknum].multicuearea,
 			outtoc.tracks[trknum].physframeofs,
 			outtoc.tracks[trknum].pregap,
-			outtoc.tracks[trknum].postgap,
+			outtoc.tracks[trknum].pgtype,
 			outinfo.track[trknum].idx0offs,
 			outinfo.track[trknum].idx1offs,
 			outtoc.tracks[trknum].frames - outtoc.tracks[trknum].padframes);
