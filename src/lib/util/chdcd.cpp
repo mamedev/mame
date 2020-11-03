@@ -1568,7 +1568,7 @@ chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_trac
 
 			// skip the pregap when reading the AUDIO .bin, all Redump audio tracks have 150 frames pregap
 			outtoc.tracks[trknum].frames -= outtoc.tracks[trknum].pregap;
-			outinfo.track[trknum].offset += outtoc.tracks[trknum].pregap * (outtoc.tracks[trknum-1].datasize + outtoc.tracks[trknum-1].subsize);
+			outinfo.track[trknum].offset += outtoc.tracks[trknum].pregap * (outtoc.tracks[trknum].datasize + outtoc.tracks[trknum].subsize);
 
 			// now strip redundant pregap from current track
 			outtoc.tracks[trknum].pregap = 0;
