@@ -97,7 +97,6 @@ private:
 	inline void flush_prg_timer();
 };
 
-
 // device type definition
 DECLARE_DEVICE_TYPE(JALECO_MS32_SYSCTRL, jaleco_ms32_sysctrl_device)
 

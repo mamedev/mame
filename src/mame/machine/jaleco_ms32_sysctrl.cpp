@@ -91,7 +91,7 @@ void jaleco_ms32_sysctrl_device::amap(address_map& map)
 void jaleco_ms32_sysctrl_device::device_add_mconfig(machine_config &config)
 {
 	// TODO: how to read from actual screen tag? ":screen" is ugly ugly ugly
-	TIMER(config, "scantimer").configure_scanline(FUNC(jaleco_ms32_sysctrl_device::scanline_cb), ":screen", 0, 1); 
+	TIMER(config, "scantimer").configure_scanline(FUNC(jaleco_ms32_sysctrl_device::scanline_cb), m_screen, 0, 1); 
 
 	// TODO: watchdog
 }
