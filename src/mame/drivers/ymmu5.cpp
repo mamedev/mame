@@ -41,7 +41,7 @@ private:
 	u8 m_matrixsel;
 	u8 matrix_r()
 	{
-		s8 row = 00;
+		s8 row = 0;
 
 		switch (m_matrixsel ^ 0x3f)
 		{
