@@ -445,6 +445,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(centiped_state::generate_interrupt)
 
 MACHINE_START_MEMBER(centiped_state,centiped)
 {
+	m_prg_bank = 0;
+
 	save_item(NAME(m_oldpos));
 	save_item(NAME(m_sign));
 	save_item(NAME(m_dsw_select));
@@ -455,7 +457,6 @@ MACHINE_START_MEMBER(centiped_state,centiped)
 MACHINE_RESET_MEMBER(centiped_state,centiped)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
-	m_prg_bank = 0;
 
 	if (m_earom.found())
 		earom_control_w(0);
@@ -822,34 +823,56 @@ void centiped_state::milliped_map(address_map &map)
  - PALCE22V10H-25PC/4
  - 74LS245
  - 2*8KB gfx roms, on a separate smaller daughterboard
-
- TODO: centiped does not work yet, the game reconfigures the memorymap
 */
 
 void centiped_state::multiped_map(address_map &map)
 {
+	map(0x0000, 0x7fff).mirror(0x8000).bankr("rombank");
 	map(0x0000, 0x03ff).ram();
-	map(0x0400, 0x040f).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x0400, 0x07ff).rw(FUNC(centiped_state::multiped_0xxx_r), FUNC(centiped_state::multiped_0xxx_w));
 	map(0x0800, 0x080f).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x1000, 0x13bf).ram().w(FUNC(centiped_state::centiped_videoram_w)).share("videoram");
 	map(0x13c0, 0x13ff).ram().share("spriteram");
-	map(0x2000, 0x2000).r(FUNC(centiped_state::centiped_IN0_r));
-	map(0x2001, 0x2001).r(FUNC(centiped_state::milliped_IN1_r));
-	map(0x2010, 0x2010).r(FUNC(centiped_state::milliped_IN2_r));
-	map(0x2011, 0x2011).portr("IN3");
-	map(0x2030, 0x2030).nopr();
-	map(0x2480, 0x249f).w(FUNC(centiped_state::milliped_paletteram_w)).share("paletteram");
-	map(0x2500, 0x2507).w("outlatch", FUNC(ls259_device::write_d7));
-	map(0x2600, 0x2600).w(FUNC(centiped_state::irq_ack_w));
-	map(0x2680, 0x2680).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x2700, 0x2700).nopw();
-	map(0x2780, 0x27bf).nopw();
-	map(0x4000, 0x5fff).rom();
-	map(0x6000, 0x7fff).mirror(0x8000).rom();
-	map(0x8000, 0xbfff).rom();
+	map(0x1400, 0x140f).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x2000, 0x3fff).r(FUNC(centiped_state::multiped_2xxx_r));
+	map(0x2480, 0x249f).mirror(0x8000).w(FUNC(centiped_state::milliped_paletteram_w)).share("paletteram");
+	map(0x2500, 0x2507).mirror(0x8000).w("outlatch", FUNC(ls259_device::write_d7));
+	map(0x2600, 0x2600).mirror(0x8000).w(FUNC(centiped_state::irq_ack_w));
+	map(0x2680, 0x2680).mirror(0x8000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x2700, 0x2700).mirror(0x8000).nopw();
+	map(0x2780, 0x27bf).mirror(0x8000).nopw();
+	map(0xa000, 0xa000).r(FUNC(centiped_state::centiped_IN0_r));
+	map(0xa001, 0xa001).r(FUNC(centiped_state::milliped_IN1_r));
+	map(0xa010, 0xa010).r(FUNC(centiped_state::milliped_IN2_r));
+	map(0xa011, 0xa011).portr("IN3");
+	map(0xa030, 0xa030).nopr();
 	map(0xd000, 0xd7ff).w(FUNC(centiped_state::multiped_eeprom_w));
 	map(0xd800, 0xd800).mirror(0x03ff).rw(FUNC(centiped_state::multiped_eeprom_r), FUNC(centiped_state::multiped_prgbank_w));
 	map(0xdc00, 0xdc00).mirror(0x03ff).w(FUNC(centiped_state::multiped_gfxbank_w));
+}
+
+uint8_t centiped_state::multiped_0xxx_r(offs_t offset)
+{
+	if (!m_prg_bank)
+		return m_maincpu->space(AS_PROGRAM).read_byte(0x1400 | offset);
+	else
+		return m_maincpu->space(AS_PROGRAM).read_byte(0x1000 | offset);
+}
+
+void centiped_state::multiped_0xxx_w(offs_t offset, uint8_t data)
+{
+	if (!m_prg_bank)
+		m_maincpu->space(AS_PROGRAM).write_byte(0x1400 | offset, data);
+	else
+		m_maincpu->space(AS_PROGRAM).write_byte(0x1000 | offset, data);
+}
+
+uint8_t centiped_state::multiped_2xxx_r(offs_t offset)
+{
+	if (!m_prg_bank)
+		return m_maincpu->space(AS_PROGRAM).read_byte(0xa000 | offset);
+	else
+		return ((uint8_t*)m_rombank->base())[0x2000 | offset];
 }
 
 uint8_t centiped_state::multiped_eeprom_r()
@@ -886,8 +909,7 @@ void centiped_state::multiped_prgbank_w(uint8_t data)
 	{
 		m_prg_bank = bank;
 		multiped_gfxbank_w(m_gfx_bank << 6);
-
-		// TODO: prg bankswitch and alt memory map layout for centiped
+		m_rombank->set_entry(bank);
 	}
 }
 
@@ -1756,7 +1778,7 @@ void centiped_state::centiped_base(machine_config &config)
 	m_outlatch->q_out_cb<3>().set_output("led0").invert(); // LED 1
 	m_outlatch->q_out_cb<4>().set_output("led1").invert(); // LED 2
 
-	WATCHDOG_TIMER(config, "watchdog");
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8);
 
 	/* timer */
 	TIMER(config, "32v").configure_scanline(FUNC(centiped_state::generate_interrupt), "screen", 0, 16);
@@ -2216,7 +2238,7 @@ ROM_END
 
 
 ROM_START( multiped )
-	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) // banked, decrypted rom goes here
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) // banked, decrypted rom goes here
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD("cm_12a.bin", 0x00000, 0x10000, CRC(8248d42c) SHA1(613f449de99659714abdf86d1be4d9d68f624da2) )
@@ -2307,11 +2329,9 @@ void centiped_state::init_multiped()
 
 	// descramble rom and put in maincpu region
 	for (int i = 0; i < 0x10000; i++)
-		dest[0x10000 + (i ^ (~i << 4 & 0x1000) ^ (~i >> 3 & 0x400))] = bitswap<8>(src[bitswap<16>(i,15,14,13,1,8,11,4,7,10,5,6,9,12,0,3,2)],0,2,1,3,4,5,6,7);
+		dest[(i ^ (~i << 4 & 0x1000) ^ (~i >> 3 & 0x400))] = bitswap<8>(src[bitswap<16>(i, 15, 14, 13, 1, 8, 11, 4, 7, 10, 5, 6, 9, 12, 0, 3, 2)], 0, 2, 1, 3, 4, 5, 6, 7);
 
-	// (this can be removed when prg bankswitch is implemented)
-	memmove(dest+0x0000, dest+0x10000, 0x8000);
-	memmove(dest+0x8000, dest+0x10000, 0x8000);
+	m_rombank->configure_entries(0, 2, dest, 0x8000);
 }
 
 
@@ -2337,7 +2357,7 @@ GAME( 1980, magworm,   centiped, magworm,   magworm,   centiped_state, empty_ini
 GAME( 1980, magworma,  centiped, magworm,   magworm,   centiped_state, empty_init,    ROT270, "bootleg", "Magic Worm (bootleg of Centipede, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1982, milliped,  0,        milliped,  milliped,  centiped_state, empty_init,    ROT270, "Atari", "Millipede", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, millipdd,  milliped, milliped,  milliped,  centiped_state, empty_init,    ROT270, "hack (Two-Bit Score)", "Millipede Dux (hack)", MACHINE_SUPPORTS_SAVE )
-GAME( 2002, multiped,  0,        multiped,  multiped,  centiped_state, init_multiped, ROT270, "hack (Braze Technologies)", "Multipede (Centipede/Millipede multigame kit)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, multiped,  0,        multiped,  multiped,  centiped_state, init_multiped, ROT270, "hack (Braze Technologies)", "Multipede (Centipede/Millipede multigame kit)", MACHINE_SUPPORTS_SAVE )
 
 // other Atari games
 GAME( 1980, warlords,  0,        warlords,  warlords,  centiped_state, empty_init,    ROT0,   "Atari", "Warlords", MACHINE_SUPPORTS_SAVE )

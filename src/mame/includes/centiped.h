@@ -36,7 +36,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_aysnd(*this, "aysnd")
+		m_aysnd(*this, "aysnd"),
+		m_rombank(*this, "rombank")
 	{ }
 
 	void centiped_base(machine_config &config);
@@ -69,6 +70,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_device<ay8910_device> m_aysnd;
+	optional_memory_bank m_rombank;
 
 	uint8_t m_oldpos[4];
 	uint8_t m_sign[4];
@@ -102,6 +104,9 @@ private:
 	uint8_t caterplr_unknown_r();
 	void caterplr_AY8910_w(offs_t offset, uint8_t data);
 	uint8_t caterplr_AY8910_r(offs_t offset);
+	uint8_t multiped_0xxx_r(offs_t offset);
+	void multiped_0xxx_w(offs_t offset, uint8_t data);
+	uint8_t multiped_2xxx_r(offs_t offset);
 	uint8_t multiped_eeprom_r();
 	void multiped_eeprom_w(offs_t offset, uint8_t data);
 	void multiped_prgbank_w(uint8_t data);
