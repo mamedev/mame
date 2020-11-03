@@ -460,6 +460,8 @@ void bw12_state::machine_start()
 
 void bw12_state::machine_reset()
 {
+	m_key_stb = 0;
+	m_key_shift = 0;
 }
 
 static void bw12_floppies(device_slot_interface &device)

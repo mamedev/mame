@@ -301,6 +301,13 @@ void model2_tgp_state::machine_reset()
 	m_copro_tgp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
+void model2o_gtx_state::machine_reset()
+{
+	model2_tgp_state::machine_reset();
+
+	m_gtx_state = 0;
+}
+
 void model2a_state::machine_reset()
 {
 	model2_tgp_state::machine_reset();
@@ -318,6 +325,9 @@ void model2b_state::machine_reset()
 	m_copro_adsp->set_input_line(SHARC_INPUT_FLAG0, ASSERT_LINE);
 	// clear FIFOOUT buffer full flag on SHARC
 	m_copro_adsp->set_input_line(SHARC_INPUT_FLAG1, CLEAR_LINE);
+
+	m_iop_data = 0;
+	m_iop_write_num = 0;
 }
 
 void model2c_state::machine_reset()
