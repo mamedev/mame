@@ -1510,36 +1510,63 @@ chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_trac
 			}
 		}
 
+		printf("trk %d: %d frames @ offset %d, pad=%d, area=%d, phys=%d, pre=%d, post=%d, idx0=%d, idx1=%d, (true %d)\n",
+			trknum+1,
+			outtoc.tracks[trknum].frames,
+			outinfo.track[trknum].offset,
+			outtoc.tracks[trknum].padframes,
+			outtoc.tracks[trknum].multicuearea,
+			outtoc.tracks[trknum].physframeofs,
+			outtoc.tracks[trknum].pregap,
+			outtoc.tracks[trknum].postgap,
+			outinfo.track[trknum].idx0offs,
+			outinfo.track[trknum].idx1offs,
+			outtoc.tracks[trknum].frames - outtoc.tracks[trknum].padframes);
+
 		/*
-		 * This is the special handling for Dreamcast GDI
+		 * This is the special handling for Dreamcast GDI discs
 		 *
-		 * - high density image always starts at physical offset 45000
+		 * - high density image always starts at LBA 45000
 		 * - last track of single density image is padded out
 		 * - physical offset is stored for every track
-		 * - pregap and pgtype is zeroed
+		 * - pregap is zeroed and previous track is padded accordingly
 		 *
-		 * I think this last step is wrong but it's what chdcd_parse_gdi does and flycast expects it
+		 * This last step is required to match TOSEC layout because Redump dumps pregaps and TOSEC does not
 		 */
 		if (trknum != 0)
 		{
-			if (outtoc.tracks[trknum].multicuearea == HIGH_DENSITY && outtoc.tracks[trknum-1].multicuearea == SINGLE_DENSITY) {
-				outtoc.tracks[trknum].physframeofs = 45000;
-			} else {
-				outtoc.tracks[trknum].physframeofs = outtoc.tracks[trknum-1].physframeofs + outtoc.tracks[trknum-1].frames;
+			// Redump AUDIO tracks includes pregap, TOSEC strips pregap, resize tracks to match TOSEC layout
+			if (outtoc.tracks[trknum].pgtype == CD_TRACK_AUDIO)
+			{
+				// pad the previous track so LBA doesn't change
+				outtoc.tracks[trknum-1].frames += outtoc.tracks[trknum].pregap;
+				outtoc.tracks[trknum-1].padframes += outtoc.tracks[trknum].pregap;
+
+				// skip the pregap when reading the AUDIO .bin
+				outtoc.tracks[trknum].frames -= outtoc.tracks[trknum].pregap;
+				outinfo.track[trknum].offset += outtoc.tracks[trknum].pregap;
+
+				// now strip redundant pregap from current track
+				outtoc.tracks[trknum].pregap = 0;
+				outtoc.tracks[trknum].pgtype = 0;
 			}
 
-			int dif=outtoc.tracks[trknum].physframeofs-(outtoc.tracks[trknum-1].frames+outtoc.tracks[trknum-1].physframeofs);
-			outtoc.tracks[trknum-1].frames += dif;
-			outtoc.tracks[trknum-1].padframes = dif;
-
+			// LBA 45000 for first track of HIGH-DENSITY area, last track in SINGLE-DENSITY area is padded
+			if (outtoc.tracks[trknum].multicuearea == HIGH_DENSITY && outtoc.tracks[trknum-1].multicuearea == SINGLE_DENSITY)
+			{
+				outtoc.tracks[trknum].physframeofs = 45000;
+				int dif=outtoc.tracks[trknum].physframeofs-(outtoc.tracks[trknum-1].frames+outtoc.tracks[trknum-1].physframeofs);
+				outtoc.tracks[trknum-1].frames += dif;
+				outtoc.tracks[trknum-1].padframes = dif;
+			}
+			else
+			{
+				outtoc.tracks[trknum].physframeofs = outtoc.tracks[trknum-1].physframeofs + outtoc.tracks[trknum-1].frames;
+			}
 		}
-
-		// flycast only works when these are zeroed
-		outtoc.tracks[trknum].pregap = 0;
-		outtoc.tracks[trknum].pgtype = 0;
 	}
 
-#if 0
+#if 1
 	for (trknum = 0; trknum < outtoc.numtrks; trknum++)
 	{
 		printf("trk %d: %d frames @ offset %d, pad=%d, area=%d, phys=%d, pre=%d, post=%d, idx0=%d, idx1=%d, (true %d)\n",
