@@ -1000,8 +1000,8 @@ void wswan_video_device::reg_w(offs_t offset, u16 data, u16 mem_mask)
 			{
 				if (m_vdp_type == VDP_TYPE_WSC)
 				{
-					int i = 15 - (data >> 8) & 0x0f;
-					int j = 15 - (data >> 12) & 0x0f;
+					int i = 15 - ((data >> 8) & 0x0f);
+					int j = 15 - ((data >> 12) & 0x0f);
 					m_main_palette[2] = (i << 8) | (i << 4) | i;
 					m_main_palette[3] = (j << 8) | (j << 4) | j;
 				}

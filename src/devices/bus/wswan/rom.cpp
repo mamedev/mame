@@ -102,16 +102,15 @@ void ws_rom_device::device_start()
 	save_item(NAME(m_rtc_minute));
 	save_item(NAME(m_rtc_second));
 	save_item(NAME(m_rtc_index));
+	save_item(NAME(m_rom_mask));
 }
 
 void ws_rom_device::device_reset()
 {
-	m_base20 = ((0xff & m_bank_mask) << 16) & (m_rom_size - 1);
-	m_base20 >>= 1;
-	m_base30 = ((0xff & m_bank_mask) << 16) & (m_rom_size - 1);
-	m_base30 >>= 1;
-	m_base40 = (((0xf0 & m_bank_mask) | 4) << 16) & (m_rom_size - 1);
-	m_base40 >>= 1;
+	m_rom_mask = (m_rom_size >> 1) - 1;
+	m_base20 = ((0xff & m_bank_mask) << 15) & m_rom_mask;
+	m_base30 = ((0xff & m_bank_mask) << 15) & m_rom_mask;
+	m_base40 = (((0xf0 & m_bank_mask) | 4) << 15) & m_rom_mask;
 
 	memset(m_io_regs, 0xff, sizeof(m_io_regs));
 
@@ -258,7 +257,7 @@ u16 ws_rom_device::read_rom30(offs_t offset, u16 mem_mask)
 u16 ws_rom_device::read_rom40(offs_t offset, u16 mem_mask)
 {
 	// we still need to mask in some cases, e.g. when game is 512K
-	return m_rom[(offset + m_base40) & ((m_rom_size >> 1) - 1)];
+	return m_rom[(offset + m_base40) & m_rom_mask];
 }
 
 
@@ -305,22 +304,19 @@ void ws_rom_device::write_io(offs_t offset, u16 data, u16 mem_mask)
 			// Bit 4-7 - Unknown
 			if (ACCESSING_BITS_0_7)
 			{
-				m_base40 = (((((data & 0x0f) << 4) | 4) & m_bank_mask) << 16) & (m_rom_size - 1);
-				m_base40 >>= 1;
+				m_base40 = (((((data & 0x0f) << 4) | 4) & m_bank_mask) << 15) & m_rom_mask;
 			}
 			break;
 		case 0x02 / 2:
 			// ROM bank for segment 2 (0x20000 - 0x2ffff)
 			if (ACCESSING_BITS_0_7)
 			{
-				m_base20 = (((data & 0xff) & m_bank_mask) << 16) & (m_rom_size - 1);
-				m_base20 >>= 1;
+				m_base20 = (((data & 0xff) & m_bank_mask) << 15) & m_rom_mask;
 			}
 			// ROM bank for segment 3 (0x30000 - 0x3ffff)
 			if (ACCESSING_BITS_8_15)
 			{
-				m_base30 = (((data >> 8) & m_bank_mask) << 16) & (m_rom_size - 1);
-				m_base30 >>= 1;
+				m_base30 = (((data >> 8) & m_bank_mask) << 15) & m_rom_mask;
 			}
 			break;
 		case 0x0a / 2:
@@ -635,7 +631,7 @@ u16 ws_wwitch_device::read_ram(offs_t offset, u16 mem_mask)
 	}
 	if (m_io_regs[0x01] >= 8 && m_io_regs[0x01] < 16)
 	{
-		return m_rom[((m_io_regs[0x01] * 0x8000) | offset) & (m_rom_size - 1)];
+		return m_rom[((m_io_regs[0x01] * 0x8000) | offset) & m_rom_mask];
 	}
 	if (m_io_regs[0x01] < 8)
 	{
@@ -681,7 +677,7 @@ void ws_wwitch_device::write_ram(offs_t offset, u16 data, u16 mem_mask)
 						u32 block_base = (m_io_regs[0x01] & 0x07) << 15;
 						for (u32 address = 0; address < 0x8000; address++)
 						{
-							m_rom[(block_base | address) & (m_rom_size - 1)] = 0xffff;
+							m_rom[(block_base | address) & m_rom_mask] = 0xffff;
 						}
 				}
 
@@ -706,7 +702,7 @@ void ws_wwitch_device::write_ram(offs_t offset, u16 data, u16 mem_mask)
 					data |= 0xff;
 				if (!ACCESSING_BITS_8_15)
 					data |= 0xff00;
-				m_rom[((m_io_regs[0x01] * 0x8000) | offset) & (m_rom_size - 1)] &= data;
+				m_rom[((m_io_regs[0x01] * 0x8000) | offset) & m_rom_mask] &= data;
 				m_flash_status = (m_flash_status & 0x7f) | ((data ^ 0x80) & 0x80);
 				m_writing_flash = true;
 				m_flash_count = 0;

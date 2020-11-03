@@ -34,6 +34,7 @@ protected:
 
 	u16 m_io_regs[8];
 	u32 m_base20, m_base30, m_base40;
+	u32 m_rom_mask;
 
 	// RTC
 	u8   m_rtc_setting;    /* Timer setting byte */
