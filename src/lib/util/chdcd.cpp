@@ -41,6 +41,14 @@ enum gdi_area {
 	HIGH_DENSITY
 };
 
+enum gdi_pattern {
+	TYPE_UNKNOWN = 0,
+	TYPE_I,
+	TYPE_II,
+	TYPE_III,
+	TYPE_III_SPLIT
+};
+
 
 /***************************************************************************
     GLOBAL VARIABLES
@@ -1218,6 +1226,7 @@ chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_trac
 	uint32_t wavlen, wavoffs;
 	std::string path = std::string(tocfname);
 	enum gdi_area current_area = SINGLE_DENSITY;
+	enum gdi_pattern disc_pattern = TYPE_UNKNOWN;
 
 	infile = fopen(tocfname, "rt");
 	path = get_file_path(path);
@@ -1527,53 +1536,74 @@ chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_trac
 #endif
 
 	/*
-	 * Pattern III - last two tracks are split and need special attention
+	 * Dreamcast patterns are identified by track types and number of tracks
 	 */
-	if (outtoc.numtrks > 4)
+	if (outtoc.numtrks > 4 && outtoc.tracks[outtoc.numtrks-1].pgtype == CD_TRACK_MODE1_RAW)
 	{
-		// last track is DATA, previous track is AUDIO, this is a split-data-track Pattern III
-		if (outtoc.tracks[outtoc.numtrks-2].pgtype == CD_TRACK_AUDIO && outtoc.tracks[outtoc.numtrks-1].pgtype != CD_TRACK_AUDIO && outtoc.tracks[outtoc.numtrks-1].pregap == 225)
-		{
-			// pad the previous track as per Pattern III
-			outtoc.tracks[outtoc.numtrks-2].frames += 225; 		// final 75 frames of AUDIO are in pregap of DATA track
-			outtoc.tracks[outtoc.numtrks-2].padframes += 150;
-
-			// workaround for audio read across split bin
-			// redump .bin has 150 frame pregap, which will be skipped
-			// last 75 frames are in the data track, the routine only reads audio track
-			// workaround is to shift the audio left 1 second, capturing 1 second of pregap in the audio
-			outinfo.track[outtoc.numtrks-2].offset -= 75 * (outtoc.tracks[trknum-2].datasize + outtoc.tracks[trknum-2].subsize);
-
-			// skip the pregap when reading the DATA .bin
-			outtoc.tracks[outtoc.numtrks-1].frames -= 225;
-			outinfo.track[outtoc.numtrks-1].offset += 225 * (outtoc.tracks[outtoc.numtrks-1].datasize + outtoc.tracks[outtoc.numtrks-1].subsize);
-
-			// now strip redundant pregap from last track
-			outtoc.tracks[outtoc.numtrks-1].pregap = 0;
-			outtoc.tracks[outtoc.numtrks-1].pgtype = 0;
-		}
+		if (outtoc.tracks[outtoc.numtrks-2].pgtype == CD_TRACK_AUDIO)
+			disc_pattern = TYPE_III_SPLIT;
+		else
+			disc_pattern = TYPE_III;
+	}
+	else if (outtoc.numtrks > 3)
+	{
+		if (outtoc.tracks[outtoc.numtrks-1].pgtype == CD_TRACK_AUDIO)
+			disc_pattern = TYPE_II;
+		else
+			disc_pattern = TYPE_III;
+	}
+	else if (outtoc.numtrks == 3)
+	{
+		disc_pattern = TYPE_I;
 	}
 
 	/*
-	 * Pattern I + II + III - resize audio tracks to match TOSEC layout
+	 * Strip pregaps from Redump AUDIO tracks and correct the LBA to match TOSEC layout
 	 */
 	for (trknum = 1; trknum < outtoc.numtrks; trknum++)
 	{
-		// Redump AUDIO tracks includes pregap, TOSEC strips pregap, resize tracks to match TOSEC layout
 		if (outtoc.tracks[trknum].pgtype == CD_TRACK_AUDIO)
 		{
-			// pad the previous track so LBA doesn't change
+			// pad previous track to match TOSEC layout
+			// TBD: do we pad consecutive AUDIO tracks?
 			outtoc.tracks[trknum-1].frames += outtoc.tracks[trknum].pregap;
 			outtoc.tracks[trknum-1].padframes += outtoc.tracks[trknum].pregap;
 
-			// skip the pregap when reading the AUDIO .bin, all Redump audio tracks have 150 frames pregap
+			// skip the pregap when reading the AUDIO .bin
 			outtoc.tracks[trknum].frames -= outtoc.tracks[trknum].pregap;
-			outinfo.track[trknum].offset += outtoc.tracks[trknum].pregap * (outtoc.tracks[trknum].datasize + outtoc.tracks[trknum].subsize);
+			outinfo.track[trknum].offset += outtoc.tracks[trknum].pregap * (outtoc.tracks[trknum].datasize+outtoc.tracks[trknum].subsize);
 
 			// now strip redundant pregap from current track
 			outtoc.tracks[trknum].pregap = 0;
 			outtoc.tracks[trknum].pgtype = 0;
 		}
+	}
+
+	/*
+	 * Special handling for TYPE_III_SPLIT, final 75 frames of AUDIO is split over two tracks
+	 */
+	if (disc_pattern == TYPE_III_SPLIT)
+	{
+		uint32_t trk_audio = outtoc.numtrks-2;
+		uint32_t trk_data = outtoc.numtrks-1;
+
+		assert(outtoc.tracks[trk_data].pregap == 225);
+
+		// pad the previous track as per Pattern III
+		outtoc.tracks[trk_audio].frames += 225;
+		outtoc.tracks[trk_audio].padframes += 150;
+
+		// workaround for audio read across split bin, which doesn't work with read_cd
+		// TBD: perhaps modify read_cd to automatically read 75 frames from next track
+		outinfo.track[trk_audio].offset -= 75 * (outtoc.tracks[trk_audio].datasize+outtoc.tracks[trk_audio].subsize);
+
+		// skip the pregap when reading the DATA .bin
+		outtoc.tracks[trk_data].frames -= 225;
+		outinfo.track[trk_data].offset += 225 * (outtoc.tracks[trk_data].datasize+outtoc.tracks[trk_data].subsize);
+
+		// now strip redundant pregap from last track
+		outtoc.tracks[trk_data].pregap = 0;
+		outtoc.tracks[trk_data].pgtype = 0;
 	}
 
 	/*
