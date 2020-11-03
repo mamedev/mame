@@ -66,7 +66,7 @@ protected:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	// memory pointers
-	required_shared_ptr<u8> m_text_videoram;
+	required_shared_ptr<u16> m_text_videoram;
 	required_shared_ptr<u16> m_spr_pal_clut;
 	required_shared_ptr<u16> m_fg_videoram;
 	required_shared_ptr<u16> m_bg_videoram;

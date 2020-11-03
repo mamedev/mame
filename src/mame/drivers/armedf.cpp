@@ -348,7 +348,7 @@ Notes:
 void armedf_state::terraf_io_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (data & 0x4000 && ((m_vreg & 0x4000) == 0)) //0 -> 1 transition
-		m_nb1414m4->exec((m_text_videoram[0] << 8) | (m_text_videoram[1] & 0xff),m_text_videoram.target(),m_fg_scrollx,m_fg_scrolly,m_tx_tilemap);
+		m_nb1414m4->exec(m_text_videoram[0],(u8 *)m_text_videoram.target(),m_fg_scrollx,m_fg_scrolly,m_tx_tilemap);
 
 	COMBINE_DATA(&m_vreg);
 
@@ -654,7 +654,10 @@ void armedf_state::cclimbr2_soundmap(address_map &map)
 
 void armedf_state::blitter_txram_w(offs_t offset, u8 data)
 {
-	m_text_videoram[offset] = data;
+	if(offset & 1)
+		m_text_videoram[offset >> 1] = ((m_text_videoram[offset]) & 0xff00) | data;
+	else
+		m_text_videoram[offset >> 1] = ((m_text_videoram[offset]) & 0x00ff) | (data << 8);
 	if (offset < 0x1000)
 		m_tx_tilemap->mark_tile_dirty(offset & 0x7ff);
 }

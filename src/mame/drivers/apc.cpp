@@ -116,7 +116,7 @@ private:
 	required_device_array<floppy_connector, 2> m_fdc_connector;
 	required_device<am9517a_device> m_dmac;
 	required_device<pit8253_device> m_pit;
-	required_shared_ptr<uint8_t> m_aux_pcg;
+	required_shared_ptr<uint16_t> m_aux_pcg;
 	uint8_t *m_char_rom;
 
 	required_device<speaker_device> m_speaker;
