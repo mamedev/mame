@@ -12,7 +12,7 @@ Jaleco MS32 System Control Unit
 #pragma once
 
 #include "screen.h"
-
+#include "machine/timer.h"
 
 //*****************************************************************************
 //  TYPE DEFINITIONS
@@ -20,12 +20,18 @@ Jaleco MS32 System Control Unit
 
 // ======================> jaleco_ms32_sysctrl_device
 
-class jaleco_ms32_sysctrl_device : public device_t,
-								   public device_video_interface
+class jaleco_ms32_sysctrl_device : public device_t
 {
 public:
 	// construction/destruction
-	jaleco_ms32_sysctrl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	jaleco_ms32_sysctrl_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&screen_tag)
+		: jaleco_ms32_sysctrl_device(mconfig, tag, owner, clock)
+	{
+		m_screen.set_tag(std::forward<T>(screen_tag));
+	}
+
+	jaleco_ms32_sysctrl_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// I/O operations
 	void amap(address_map &map);
@@ -34,16 +40,21 @@ public:
 	auto field_cb() { return m_field_cb.bind(); }
 	auto prg_timer_cb() { return m_prg_timer_cb.bind(); }
 	auto sound_reset_cb() { return m_sound_reset_cb.bind(); }
+//	template <typename T> void set_screen(T &&screen_tag) { m_screen.set_tag(std::forward<T>(screen_tag)); printf("xxx"); }
 
 protected:
 	// device-level overrides
 	//virtual void device_validity_check(validity_checker &valid) const override;
+	virtual void device_resolve_objects() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
+
 private:
+	required_device<screen_device> m_screen;
+
 	void control_w(u16 data);
 	void hblank_w(u16 data);
 	void hdisplay_w(u16 data);
@@ -78,18 +89,12 @@ private:
 		emu_timer *prg_irq;
 	}m_timer;
 	
-	emu_timer *m_vblank_timer;
-	emu_timer *m_field_timer;
 	enum timer_id
 	{
-		VBLANK_TIMER,
-		FIELD_TIMER,
 		PRG_TIMER
 	};
 
 	inline void flush_prg_timer();
-	inline void flush_vblank_timer();
-	inline void flush_field_timer();
 };
 
 

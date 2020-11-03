@@ -88,7 +88,6 @@ protected:
 	void irq_raise(int level);
 
 	optional_device<screen_device> m_screen;
-
 private:
 	optional_shared_ptr<u32> m_mainram;
 	optional_shared_ptr<u32> m_roz_ctrl;

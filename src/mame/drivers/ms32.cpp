@@ -1743,14 +1743,12 @@ void ms32_state::ms32(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ms32_state::ms32_map);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(ms32_state::irq_callback));
 
-//	TIMER(config, "scantimer").configure_scanline(FUNC(jaleco_ms32_sysctrl_device::scanline_cb), "screen", 0, 1);
-
 	Z80(config, m_audiocpu, 8000000); // Z0840008PSC, Clock from notes (40MHz / 5 or 48MHz / 6?)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ms32_state::ms32_sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(60000));
 
-	JALECO_MS32_SYSCTRL(config, m_sysctrl, XTAL(48'000'000));
+	JALECO_MS32_SYSCTRL(config, m_sysctrl, XTAL(48'000'000), m_screen);
 	m_sysctrl->flip_screen_cb().set(FUNC(ms32_state::flipscreen_w));
 	m_sysctrl->vblank_cb().set(FUNC(ms32_state::vblank_irq_w));
 	m_sysctrl->field_cb().set(FUNC(ms32_state::field_irq_w));

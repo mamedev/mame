@@ -52,7 +52,7 @@ DEFINE_DEVICE_TYPE(JALECO_MS32_SYSCTRL, jaleco_ms32_sysctrl_device, "jaleco_ms32
 
 jaleco_ms32_sysctrl_device::jaleco_ms32_sysctrl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, JALECO_MS32_SYSCTRL, tag, owner, clock)
-	, device_video_interface(mconfig, *this)
+	, m_screen(*this, finder_base::DUMMY_TAG)
 	, m_flip_screen_cb(*this)
 	, m_vblank_cb(*this)
 	, m_field_cb(*this)
@@ -90,8 +90,10 @@ void jaleco_ms32_sysctrl_device::amap(address_map& map)
 
 void jaleco_ms32_sysctrl_device::device_add_mconfig(machine_config &config)
 {
-	//DEVICE(config, ...);
-	// TODO: at least watchdog sub
+	// TODO: how to read from actual screen tag? ":screen" is ugly ugly ugly
+	TIMER(config, "scantimer").configure_scanline(FUNC(jaleco_ms32_sysctrl_device::scanline_cb), ":screen", 0, 1); 
+
+	// TODO: watchdog
 }
 
 
@@ -99,14 +101,17 @@ void jaleco_ms32_sysctrl_device::device_add_mconfig(machine_config &config)
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void jaleco_ms32_sysctrl_device::device_start()
+void jaleco_ms32_sysctrl_device::device_resolve_objects()
 {
 	m_flip_screen_cb.resolve();
 	m_vblank_cb.resolve();
 	m_field_cb.resolve();
 	m_prg_timer_cb.resolve();
 	m_sound_reset_cb.resolve();
+}
 
+void jaleco_ms32_sysctrl_device::device_start()
+{
 	save_item(NAME(m_dotclock_setting));
 	save_item(NAME(m_crtc.horz_blank));
 	save_item(NAME(m_crtc.horz_display));
@@ -116,8 +121,6 @@ void jaleco_ms32_sysctrl_device::device_start()
 	save_item(NAME(m_timer.irq_enable));
 	
 	m_timer.prg_irq = timer_alloc(PRG_TIMER);
-	m_vblank_timer = timer_alloc(VBLANK_TIMER);
-	m_field_timer = timer_alloc(FIELD_TIMER);
 }
 
 
@@ -135,20 +138,10 @@ void jaleco_ms32_sysctrl_device::device_reset()
 	m_timer.irq_enable = false;
 	m_timer.interval = 1;
 	flush_prg_timer();
-	m_vblank_timer->adjust(attotime::never);
-	m_field_timer->adjust(attotime::never);
 }
 
 void jaleco_ms32_sysctrl_device::flush_prg_timer()
 {
-	/* hayaosi1 needs at least 12 IRQ 0 per frame to work (see code at FFE02289) <- hayaosi1 is a megasys1 game ... -AS
-	   kirarast needs it too, at least 8 per frame, but waits for a variable amount
-	   suchie2 needs ?? per frame (otherwise it hangs when you lose)
-	   in different points. Could this be a raster interrupt?
-	   Other games using it but not needing it to work:
-	   desertwr
-	   p47aces
-	*/
 	attotime step;
 	if (m_timer.irq_enable == true)
 	{
@@ -165,31 +158,10 @@ void jaleco_ms32_sysctrl_device::flush_prg_timer()
 	m_timer.prg_irq->adjust(step);
 }
 
-void jaleco_ms32_sysctrl_device::flush_vblank_timer()
-{
-	m_vblank_timer->adjust(screen().time_until_pos(m_crtc.vert_display));	
-}
-
-void jaleco_ms32_sysctrl_device::flush_field_timer()
-{
-	// 30 Hz irq
-	// TODO: unknown vertical position where this happens
-	m_field_timer->adjust(screen().time_until_pos(0));
-}
-
 void jaleco_ms32_sysctrl_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{
-		case VBLANK_TIMER:
-			m_vblank_cb(1);
-			flush_vblank_timer();
-			break;
-		case FIELD_TIMER:
-			if (screen().frame_number() & 1)
-				m_field_cb(1);
-			flush_field_timer();
-			break;
 		case PRG_TIMER:
 			m_prg_timer_cb(1);
 			flush_prg_timer();
@@ -225,9 +197,7 @@ inline void jaleco_ms32_sysctrl_device::crtc_refresh_screen_params()
 	const u16 vtotal = m_crtc.vert_blank + m_crtc.vert_display;
 	const attoseconds_t refresh = HZ_TO_ATTOSECONDS(get_dotclock_frequency()) * htotal * vtotal;
 	visarea.set(0, m_crtc.horz_display - 1, 0, m_crtc.vert_display - 1);
-	screen().configure(htotal, vtotal, visarea, refresh);
-	flush_vblank_timer();
-	flush_field_timer();
+	m_screen->configure(htotal, vtotal, visarea, refresh);
 }
 
 void jaleco_ms32_sysctrl_device::control_w(u16 data)
@@ -334,4 +304,16 @@ void jaleco_ms32_sysctrl_device::vblank_ack_w(u16 data)
 void jaleco_ms32_sysctrl_device::field_ack_w(u16 data)
 {
 	m_field_cb(0);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(jaleco_ms32_sysctrl_device::scanline_cb)
+{
+	int scanline = param;
+	if (scanline == m_crtc.vert_display)
+		m_vblank_cb(1);
+
+	// 30 Hz irq
+	// TODO: unknown vertical position where this happens
+	if (scanline == 0 && m_screen->frame_number() & 1)
+		m_field_cb(1);	
 }
