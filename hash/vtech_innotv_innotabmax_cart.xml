@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+
+<!-- These contain FAT32 filesystems -->
+
+<!-- Grey coloured 'pack-in' cartridge contains no ROM, only 2 pins bridged -->
+
+<softwarelist name="vtech_innotv_innotabmax_cart" description="VTech InnoTV / InnoTAB MAX cartridges">
+
+	<software name="pawpatrl" supported="no">
+		<description>Paw Patrol - Pups Save a UFO! (80-274103 UK)</description>
+		<year>2015</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vtech_innotv_innotabmax_cart">
+			<dataarea name="rom" size="0x11000000">
+				<rom name="TC58NVG1S3HTA00.u1" size="0x11000000" crc="4b7a801c" sha1="818e5261b37ef01f4dab26392db60563c602a14c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dcgcr" supported="no">
+		<description>DC Comics - Gotham City Robots (80-274803 UK)</description>
+		<year>2015</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vtech_innotv_innotabmax_cart">
+			<dataarea name="rom" size="0x11000000">
+				<rom name="TC58NVG1S3HTA00.u1" size="0x11000000" crc="b259c996" sha1="5d8382e31fa5555ec31d2f35864db1368e8501c3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="finddory" supported="no">
+		<description>Finding Dory (80-274903 UK)</description>
+		<year>2015</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vtech_innotv_innotabmax_cart">
+			<dataarea name="rom" size="0x11000000">
+				<rom name="TC58NVG1S3HTA00.u1" size="0x11000000" crc="9f8e1d8b" sha1="c0dc79f8b9e723150b76afb8439d4531871c2128" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="liongrd" supported="no">
+		<description>The Lion Guard (80-275203 UK)</description>
+		<year>2015</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vtech_innotv_innotabmax_cart">
+			<dataarea name="rom" size="0x11000000">
+				<rom name="TC58NVG1S3HTA00.u1" size="0x11000000" crc="3363c8c4" sha1="e5bd3b709eaa0a03743ce4e4df6482c35e8abb75" />
+			</dataarea>
+		</part>
+	</software>
+	
+</softwarelist>

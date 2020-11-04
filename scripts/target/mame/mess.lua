@@ -4219,6 +4219,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/vsmileb.cpp",
 	MAME_DIR .. "src/mame/drivers/clickstart.cpp",
 	MAME_DIR .. "src/mame/drivers/storio.cpp",
+	MAME_DIR .. "src/mame/drivers/innotv_innotabmax.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "wang")

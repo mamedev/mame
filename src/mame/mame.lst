@@ -16777,6 +16777,9 @@ in207376                        // Informer 207/376
 in213                           // Informer 213
 in213ae                         // Informer 213 AE
 
+@source:innotv_innotabmax.cpp
+innotv
+
 @source:instantm.cpp
 instantm                        //
 
