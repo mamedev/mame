@@ -1550,6 +1550,7 @@ void x68k_state::machine_start()
 	m_ioc.irqstatus = 0;
 	m_mouse.irqactive = false;
 	m_current_ipl = 0;
+	m_adpcm.rate = 0;
 }
 
 void x68k_state::driver_init()

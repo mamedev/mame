@@ -271,11 +271,6 @@ register. So what is controlling priority.
 
 ***************************************************************************/
 
-/* Define clocks based on actual OSC on the PCB */
-
-#define CPU_CLOCK       (XTAL(16'000'000) / 2)    /* clock for 68000 */
-#define SOUND_CPU_CLOCK     (XTAL(8'000'000) / 2)     /* clock for Z80 sound CPU */
-
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
@@ -291,6 +286,13 @@ register. So what is controlling priority.
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
+/* Define clocks based on actual OSC on the PCB */
+
+#define CPU_CLOCK       (XTAL(16'000'000) / 2)    /* clock for 68000 */
+#define SOUND_CPU_CLOCK     (XTAL(8'000'000) / 2)     /* clock for Z80 sound CPU */
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -326,6 +328,7 @@ public:
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	uint16_t cchip_r(offs_t offset);
@@ -341,7 +344,6 @@ private:
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(cchip_irq_clear_cb);
 
-	DECLARE_MACHINE_RESET(opwolf);
 	void opwolf_colpri_cb(u32 &sprite_colbank, u32 &pri_mask, u16 sprite_ctrl);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void opwolf_msm5205_vck(msm5205_device *device, int chip);
@@ -847,7 +849,7 @@ void opwolf_state::machine_start()
 	save_item(NAME(m_adpcm_end));
 }
 
-MACHINE_RESET_MEMBER(opwolf_state,opwolf)
+void opwolf_state::machine_reset()
 {
 	m_adpcm_b[0] = m_adpcm_b[1] = 0;
 	m_adpcm_c[0] = m_adpcm_c[1] = 0;
@@ -909,8 +911,6 @@ void opwolf_state::opwolf(machine_config &config)
 	TIMER(config, "cchip_irq_clear").configure_generic(FUNC(opwolf_state::cchip_irq_clear_cb));
 
 	config.set_maximum_quantum(attotime::from_hz(600));  /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
-
-	MCFG_MACHINE_RESET_OVERRIDE(opwolf_state,opwolf)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1227,6 +1227,8 @@ ROM_START( opwolfb )
 	ROM_LOAD16_BYTE( "opwlfb.23",   0x40001, 0x10000, CRC(a874c703) SHA1(c9d6074265f5d5028c69c81eaba29fa178943341) )
 	ROM_LOAD16_BYTE( "opwlfb.22",   0x60001, 0x10000, CRC(9228481f) SHA1(8160f919f5e6a347c915a2bd7488b488fe2401bc) )
 ROM_END
+
+} // Anonymous namespace
 
 
 //**************************************************************************

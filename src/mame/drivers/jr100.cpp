@@ -65,6 +65,8 @@ TODO:
 #include "speaker.h"
 
 
+namespace {
+
 class jr100_state : public driver_device
 {
 public:
@@ -80,16 +82,19 @@ public:
 		, m_region_maincpu(*this, "maincpu")
 		, m_io_keyboard(*this, "LINE%u", 0)
 		, m_maincpu(*this, "maincpu")
+		, m_sound_timer(nullptr)
 	{ }
 
 	void jr100(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	uint8_t m_keyboard_line;
 	bool m_use_pcg;
 	bool m_pb7;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	uint32_t screen_update_jr100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(sound_tick);
 	uint8_t pb_r();
@@ -421,6 +426,9 @@ ROM_START( jr100u )
 	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD( "jr100u.ic5", 0x0000, 0x2000, CRC(f589dd8d) SHA1(78a51f2ae055bf4dc1b0887a6277f5dbbd8ba512))
 ROM_END
+
+} // Anonymous namespace
+
 
 /* Driver */
 

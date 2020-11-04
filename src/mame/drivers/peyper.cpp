@@ -42,6 +42,8 @@ ToDo:
 
 #include "peyper.lh"
 
+namespace {
+
 class peyper_state : public genpin_class
 {
 public:
@@ -60,6 +62,10 @@ public:
 
 	void peyper(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	uint8_t sw_r();
 	void col_w(uint8_t data);
@@ -71,9 +77,6 @@ private:
 	void p1b_w(uint8_t data) { } // more lamps
 	void p2a_w(uint8_t data) { } // more lamps
 	void p2b_w(uint8_t data) { } // more lamps
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	void peyper_io(address_map &map);
 	void peyper_map(address_map &map);
@@ -588,6 +591,9 @@ void peyper_state::machine_start()
 {
 	genpin_class::machine_start();
 
+	m_digit = 0;
+	std::fill(std::begin(m_disp_layout), std::end(m_disp_layout), 0);
+
 	m_leds.resolve();
 	m_dpl.resolve();
 
@@ -881,6 +887,8 @@ ROM_START(lancelot)
 	ROM_REGION(0x20000, "sound2", 0)
 	ROM_LOAD("snd_u5.bin", 0x00000, 0x20000, CRC(bf141441) SHA1(630b852bb3bba0fcdae13ae548b1e9810bc64d7d))
 ROM_END
+
+} // Anonymous namespace
 
 GAME( 1985, odin,     0,        peyper,   odin_dlx, peyper_state, init_odin,    ROT0, "Peyper",     "Odin",                     MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 GAME( 1985, odin_dlx, 0,        peyper,   odin_dlx, peyper_state, init_odin,    ROT0, "Sonic",      "Odin De Luxe",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

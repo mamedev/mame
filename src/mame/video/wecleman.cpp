@@ -866,6 +866,8 @@ void wecleman_state::video_start()
 	m_cloud_ds = 0;
 	m_cloud_visible = 0;
 	m_black_pen = m_palette->black_pen();
+	std::fill(std::begin(m_bgpage), std::end(m_bgpage), 0);
+	std::fill(std::begin(m_fgpage), std::end(m_fgpage), 0);
 
 	m_rgb_half     =   (uint16_t*)(buffer + 0x00000);
 	m_t32x32pm     =        (int*)(buffer + 0x10020);
@@ -963,6 +965,8 @@ void hotchase_state::video_start()
 	m_spr_offsx = -0xc0;
 	m_spr_offsy = 0;
 	m_black_pen = m_palette->black_pen();
+	std::fill(std::begin(m_bgpage), std::end(m_bgpage), 0);
+	std::fill(std::begin(m_fgpage), std::end(m_fgpage), 0);
 
 	m_spr_ptr_list = (sprite_t **)buffer;
 
