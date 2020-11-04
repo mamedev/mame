@@ -18,8 +18,10 @@
 	TODO:
 	- pinpoint exact timing generation (free counter or based on host screen 
 	  beams)
-	- interface with multiple screens is a mystery, cfr. dual screen bnstars,
-	  stepping stage HW;
+	- interface with multiple screens is a mystery, 
+	  cfr. dual screen bnstars, stepping stage HW. 
+	  Most likely former effectively controls both screens in demux while 
+	  latter has no way to set the other screen(s)?
 	- network irq?
 	- actual chip name;
 
@@ -76,7 +78,7 @@ void jaleco_ms32_sysctrl_device::amap(address_map& map)
 	map(0x18, 0x19).w(FUNC(jaleco_ms32_sysctrl_device::timer_interval_w));
 	map(0x1a, 0x1b).w(FUNC(jaleco_ms32_sysctrl_device::timer_ack_w));
 	map(0x1c, 0x1d).w(FUNC(jaleco_ms32_sysctrl_device::sound_reset_w));
-//	map(0x1e, 0x1f).w // unknown reset signal
+	map(0x1e, 0x1f).w(FUNC(jaleco_ms32_sysctrl_device::irq_ack_w));
 //	map(0x24, 0x27).w // sound comms bidirectional acks?
 	map(0x28, 0x29).nopw(); // watchdog
 	map(0x2c, 0x2d).w(FUNC(jaleco_ms32_sysctrl_device::field_ack_w));
@@ -138,6 +140,9 @@ void jaleco_ms32_sysctrl_device::device_reset()
 	m_timer.irq_enable = false;
 	m_timer.interval = 1;
 	flush_prg_timer();
+	// put flipping in a default state
+	m_flip_screen_state = false;
+	m_flip_screen_cb(0);
 }
 
 void jaleco_ms32_sysctrl_device::flush_prg_timer()
@@ -303,6 +308,15 @@ void jaleco_ms32_sysctrl_device::vblank_ack_w(u16 data)
 
 void jaleco_ms32_sysctrl_device::field_ack_w(u16 data)
 {
+	m_field_cb(0);
+}
+
+void jaleco_ms32_sysctrl_device::irq_ack_w(u16 data)
+{
+	// guess: 68k games calls this in vblank routine instead of 
+	// the designated line, maybe it's a 68k version difference 
+	// or maybe this is right
+	m_vblank_cb(0);
 	m_field_cb(0);
 }
 

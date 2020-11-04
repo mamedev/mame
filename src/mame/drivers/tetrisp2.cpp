@@ -65,51 +65,6 @@ stepstag:
 #include "stepstag.lh"
 
 
-/***************************************************************************
-
-
-                              System Registers
-
-
-***************************************************************************/
-
-void tetrisp2_state::tetrisp2_systemregs_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_systemregs[offset] = data;
-	}
-}
-
-#define ROCKN_TIMER_BASE attotime::from_nsec(500000)
-
-void tetrisp2_state::rockn_systemregs_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_systemregs[offset] = data;
-		if (offset == 0x0c)
-		{
-			attotime timer = ROCKN_TIMER_BASE * (4096 - data);
-			m_rockn_timer_l4->adjust(timer, 0, timer);
-		}
-	}
-}
-
-
-void tetrisp2_state::rocknms_sub_systemregs_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_rocknms_sub_systemregs[offset] = data;
-		if (offset == 0x0c)
-		{
-			attotime timer = ROCKN_TIMER_BASE * (4096 - data);
-			m_rockn_timer_sub_l4->adjust(timer, 0, timer);
-		}
-	}
-}
-
 
 /***************************************************************************
 
@@ -182,6 +137,7 @@ u16 tetrisp2_state::rockn_soundvolume_r()
 void tetrisp2_state::rockn_soundvolume_w(u16 data)
 {
 	m_rockn_soundvolume = data;
+	// TODO: unemulated
 }
 
 
@@ -263,23 +219,23 @@ u16 tetrisp2_state::rockn_nvram_r(offs_t offset)
 ***************************************************************************/
 
 
-u16 tetrisp2_state::rocknms_main2sub_r()
+u16 rocknms_state::rocknms_main2sub_r()
 {
 	return m_rocknms_main2sub;
 }
 
-void tetrisp2_state::rocknms_main2sub_w(offs_t offset, u16 data, u16 mem_mask)
+void rocknms_state::rocknms_main2sub_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_rocknms_main2sub = (data ^ 0xffff);
 }
 
-CUSTOM_INPUT_MEMBER(tetrisp2_state::rocknms_main2sub_status_r)
+CUSTOM_INPUT_MEMBER(rocknms_state::rocknms_main2sub_status_r)
 {
-	return  m_rocknms_sub2main & 0x0003;
+	return m_rocknms_sub2main & 0x0003;
 }
 
-void tetrisp2_state::rocknms_sub2main_w(offs_t offset, u16 data, u16 mem_mask)
+void rocknms_state::rocknms_sub2main_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_rocknms_sub2main = (data ^ 0xffff);
@@ -324,7 +280,7 @@ void tetrisp2_state::tetrisp2_map(address_map &map)
 	map(0xb40010, 0xb4001b).writeonly().share("scroll_bg");                     // Background Scrolling
 	map(0xb4003e, 0xb4003f).nopw();                                                    // scr_size
 	map(0xb60000, 0xb6002f).writeonly().share("rotregs");                       // Rotation Registers
-	map(0xba0000, 0xba001f).w(FUNC(tetrisp2_state::tetrisp2_systemregs_w));                                // system param
+	map(0xba0000, 0xba001f).m(m_sysctrl, FUNC(jaleco_ms32_sysctrl_device::amap));
 	map(0xbe0000, 0xbe0001).nopr();                                                     // INT-level1 dummy read
 	map(0xbe0002, 0xbe0003).portr("PLAYERS");                                        // Inputs
 	map(0xbe0004, 0xbe0005).r(FUNC(tetrisp2_state::tetrisp2_ip_1_word_r));                                  // Inputs & protection
@@ -389,7 +345,7 @@ void tetrisp2_state::nndmseal_map(address_map &map)
 
 	map(0xb80000, 0xb80001).w(FUNC(tetrisp2_state::nndmseal_sound_bank_w));
 
-	map(0xba0000, 0xba001f).w(FUNC(tetrisp2_state::rockn_systemregs_w));   // system param
+	map(0xba0000, 0xba001f).m(m_sysctrl, FUNC(jaleco_ms32_sysctrl_device::amap));
 
 	map(0xbe0000, 0xbe0001).nopr(); // INT-level1 dummy read
 	map(0xbe0002, 0xbe0003).portr("BUTTONS");   // Inputs
@@ -425,7 +381,7 @@ void tetrisp2_state::rockn1_map(address_map &map)
 	map(0xb40010, 0xb4001b).writeonly().share("scroll_bg");                     // Background Scrolling
 	map(0xb4003e, 0xb4003f).nopw();                                                    // scr_size
 	map(0xb60000, 0xb6002f).writeonly().share("rotregs");                       // Rotation Registers
-	map(0xba0000, 0xba001f).w(FUNC(tetrisp2_state::rockn_systemregs_w));                                   // system param
+	map(0xba0000, 0xba001f).m(m_sysctrl, FUNC(jaleco_ms32_sysctrl_device::amap));
 	map(0xbe0000, 0xbe0001).nopr();                                                     // INT-level1 dummy read
 	map(0xbe0002, 0xbe0003).portr("PLAYERS");                                        // Inputs
 	map(0xbe0004, 0xbe0005).portr("SYSTEM");                                         // Inputs
@@ -458,7 +414,7 @@ void tetrisp2_state::rockn2_map(address_map &map)
 	map(0xb40010, 0xb4001b).writeonly().share("scroll_bg");                 // Background Scrolling
 	map(0xb4003e, 0xb4003f).nopw();                                                    // scr_size
 	map(0xb60000, 0xb6002f).writeonly().share("rotregs");                   // Rotation Registers
-	map(0xba0000, 0xba001f).w(FUNC(tetrisp2_state::rockn_systemregs_w));                                   // system param
+	map(0xba0000, 0xba001f).m(m_sysctrl, FUNC(jaleco_ms32_sysctrl_device::amap));
 	map(0xbe0000, 0xbe0001).nopr();                                                     // INT-level1 dummy read
 	map(0xbe0002, 0xbe0003).portr("PLAYERS");                                        // Inputs
 	map(0xbe0004, 0xbe0005).portr("SYSTEM");                                         // Inputs
@@ -467,32 +423,32 @@ void tetrisp2_state::rockn2_map(address_map &map)
 }
 
 
-void tetrisp2_state::rocknms_main_map(address_map &map)
+void rocknms_state::rocknms_main_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();                                                         // ROM
 	map(0x100000, 0x103fff).ram().share("spriteram");           // Object RAM
 	map(0x104000, 0x107fff).ram();                                                         // Spare Object RAM
 	map(0x108000, 0x10ffff).ram();                                                         // Work RAM
-	map(0x200000, 0x23ffff).rw(FUNC(tetrisp2_state::tetrisp2_priority_r), FUNC(tetrisp2_state::tetrisp2_priority_w));
-	map(0x300000, 0x31ffff).ram().w(FUNC(tetrisp2_state::tetrisp2_palette_w)).share("paletteram");        // Palette
+	map(0x200000, 0x23ffff).rw(FUNC(rocknms_state::tetrisp2_priority_r), FUNC(rocknms_state::tetrisp2_priority_w));
+	map(0x300000, 0x31ffff).ram().w(FUNC(rocknms_state::tetrisp2_palette_w)).share("paletteram");        // Palette
 //  map(0x500000, 0x50ffff).ram();                                                         // Line
-	map(0x600000, 0x60ffff).ram().w(FUNC(tetrisp2_state::tetrisp2_vram_rot_w)).share("vram_rot"); // Rotation
-	map(0x800000, 0x803fff).ram().w(FUNC(tetrisp2_state::tetrisp2_vram_fg_w)).share("vram_fg");   // Foreground
-	map(0x804000, 0x807fff).ram().w(FUNC(tetrisp2_state::tetrisp2_vram_bg_w)).share("vram_bg");   // Background
+	map(0x600000, 0x60ffff).ram().w(FUNC(rocknms_state::tetrisp2_vram_rot_w)).share("vram_rot"); // Rotation
+	map(0x800000, 0x803fff).ram().w(FUNC(rocknms_state::tetrisp2_vram_fg_w)).share("vram_fg");   // Foreground
+	map(0x804000, 0x807fff).ram().w(FUNC(rocknms_state::tetrisp2_vram_bg_w)).share("vram_bg");   // Background
 //  map(0x808000, 0x809fff).ram();                                                         // ???
-	map(0x900000, 0x903fff).r(FUNC(tetrisp2_state::rockn_nvram_r)).w(FUNC(tetrisp2_state::tetrisp2_nvram_w)).share("nvram");    // NVRAM
-	map(0xa30000, 0xa30001).rw(FUNC(tetrisp2_state::rockn_soundvolume_r), FUNC(tetrisp2_state::rockn_soundvolume_w));         // Sound Volume
+	map(0x900000, 0x903fff).r(FUNC(rocknms_state::rockn_nvram_r)).w(FUNC(rocknms_state::tetrisp2_nvram_w)).share("nvram");    // NVRAM
+	map(0xa30000, 0xa30001).rw(FUNC(rocknms_state::rockn_soundvolume_r), FUNC(rocknms_state::rockn_soundvolume_w));         // Sound Volume
 	map(0xa40000, 0xa40003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0x00ff);   // Sound
-	map(0xa44000, 0xa44001).rw(FUNC(tetrisp2_state::rockn_adpcmbank_r), FUNC(tetrisp2_state::rockn_adpcmbank_w));             // Sound Bank
+	map(0xa44000, 0xa44001).rw(FUNC(rocknms_state::rockn_adpcmbank_r), FUNC(rocknms_state::rockn_adpcmbank_w));             // Sound Bank
 	map(0xa48000, 0xa48001).nopw();                                                    // YMZ280 Reset
-	map(0xa00000, 0xa00001).w(FUNC(tetrisp2_state::rocknms_main2sub_w));                                   // MAIN -> SUB Communication
-	map(0xb00000, 0xb00001).w(FUNC(tetrisp2_state::tetrisp2_coincounter_w));                               // Coin Counter
+	map(0xa00000, 0xa00001).w(FUNC(rocknms_state::rocknms_main2sub_w));                                   // MAIN -> SUB Communication
+	map(0xb00000, 0xb00001).w(FUNC(rocknms_state::tetrisp2_coincounter_w));                               // Coin Counter
 	map(0xb20000, 0xb20001).nopw();                                                    // ???
 	map(0xb40000, 0xb4000b).writeonly().share("scroll_fg");                     // Foreground Scrolling
 	map(0xb40010, 0xb4001b).writeonly().share("scroll_bg");                     // Background Scrolling
 	map(0xb4003e, 0xb4003f).nopw();                                                    // scr_size
 	map(0xb60000, 0xb6002f).writeonly().share("rotregs");                       // Rotation Registers
-	map(0xba0000, 0xba001f).w(FUNC(tetrisp2_state::rockn_systemregs_w));                                   // system param
+	map(0xba0000, 0xba001f).m(m_sysctrl, FUNC(jaleco_ms32_sysctrl_device::amap));
 	map(0xbe0000, 0xbe0001).nopr();                                                     // INT-level1 dummy read
 	map(0xbe0002, 0xbe0003).portr("PLAYERS");
 	map(0xbe0004, 0xbe0005).portr("SYSTEM");                                         // Inputs
@@ -501,33 +457,33 @@ void tetrisp2_state::rocknms_main_map(address_map &map)
 }
 
 
-void tetrisp2_state::rocknms_sub_map(address_map &map)
+void rocknms_state::rocknms_sub_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();                                                         // ROM
 	map(0x100000, 0x103fff).ram().share("spriteram2");      // Object RAM
 	map(0x104000, 0x107fff).ram();                                                         // Spare Object RAM
 	map(0x108000, 0x10ffff).ram();                                                         // Work RAM
-	map(0x200000, 0x23ffff).ram().w(FUNC(tetrisp2_state::rocknms_sub_priority_w)).share("sub_priority"); // Priority
-	map(0x300000, 0x31ffff).ram().w(FUNC(tetrisp2_state::rocknms_sub_palette_w)).share("sub_paletteram");    // Palette
+	map(0x200000, 0x23ffff).ram().w(FUNC(rocknms_state::rocknms_sub_priority_w)).share("sub_priority"); // Priority
+	map(0x300000, 0x31ffff).ram().w(FUNC(rocknms_state::rocknms_sub_palette_w)).share("sub_paletteram");    // Palette
 //  map(0x500000, 0x50ffff).ram();                                                         // Line
-	map(0x600000, 0x60ffff).ram().w(FUNC(tetrisp2_state::rocknms_sub_vram_rot_w)).share("sub_vram_rot"); // Rotation
-	map(0x800000, 0x803fff).ram().w(FUNC(tetrisp2_state::rocknms_sub_vram_fg_w)).share("sub_vram_fg"); // Foreground
-	map(0x804000, 0x807fff).ram().w(FUNC(tetrisp2_state::rocknms_sub_vram_bg_w)).share("sub_vram_bg"); // Background
+	map(0x600000, 0x60ffff).ram().w(FUNC(rocknms_state::rocknms_sub_vram_rot_w)).share("sub_vram_rot"); // Rotation
+	map(0x800000, 0x803fff).ram().w(FUNC(rocknms_state::rocknms_sub_vram_fg_w)).share("sub_vram_fg"); // Foreground
+	map(0x804000, 0x807fff).ram().w(FUNC(rocknms_state::rocknms_sub_vram_bg_w)).share("sub_vram_bg"); // Background
 //  map(0x808000, 0x809fff).ram();                                                         // ???
 	map(0x900000, 0x907fff).ram();                                                         // NVRAM
-	map(0xa30000, 0xa30001).w(FUNC(tetrisp2_state::rockn_soundvolume_w));                                  // Sound Volume
+	map(0xa30000, 0xa30001).w(FUNC(rocknms_state::rockn_soundvolume_w));                                  // Sound Volume
 	map(0xa40000, 0xa40003).w("ymz", FUNC(ymz280b_device::write)).umask16(0x00ff);             // Sound
-	map(0xa44000, 0xa44001).w(FUNC(tetrisp2_state::rockn_adpcmbank_w));                                    // Sound Bank
+	map(0xa44000, 0xa44001).w(FUNC(rocknms_state::rockn_adpcmbank_w));                                    // Sound Bank
 	map(0xa48000, 0xa48001).nopw();                                                    // YMZ280 Reset
-	map(0xb00000, 0xb00001).w(FUNC(tetrisp2_state::rocknms_sub2main_w));                                   // MAIN <- SUB Communication
+	map(0xb00000, 0xb00001).w(FUNC(rocknms_state::rocknms_sub2main_w));                                   // MAIN <- SUB Communication
 	map(0xb20000, 0xb20001).nopw();                                                    // ???
 	map(0xb40000, 0xb4000b).writeonly().share("sub_scroll_fg");                 // Foreground Scrolling
 	map(0xb40010, 0xb4001b).writeonly().share("sub_scroll_bg");                 // Background Scrolling
 	map(0xb4003e, 0xb4003f).nopw();                                                    // scr_size
 	map(0xb60000, 0xb6002f).writeonly().share("sub_rotregs");                       // Rotation Registers
-	map(0xba0000, 0xba001f).w(FUNC(tetrisp2_state::rocknms_sub_systemregs_w));                             // system param
+	map(0xba0000, 0xba001f).m(m_sub_sysctrl, FUNC(jaleco_ms32_sysctrl_device::amap));
 //  map(0xbe0000, 0xbe0001).nopr();                                                     // INT-level1 dummy read
-	map(0xbe0002, 0xbe0003).rw(FUNC(tetrisp2_state::rocknms_main2sub_r), FUNC(tetrisp2_state::rocknms_sub2main_w));           // MAIN <-> SUB Communication
+	map(0xbe0002, 0xbe0003).rw(FUNC(rocknms_state::rocknms_main2sub_r), FUNC(rocknms_state::rocknms_sub2main_w));           // MAIN <-> SUB Communication
 	map(0xbe000a, 0xbe000b).r("watchdog", FUNC(watchdog_timer_device::reset16_r));       // Watchdog
 }
 
@@ -681,7 +637,7 @@ void stepstag_state::stepstag_map(address_map &map)
 	map(0xb40010, 0xb4001b).writeonly().share("scroll_bg");                             // Background Scrolling
 	map(0xb4003e, 0xb4003f).ram();                                                         // scr_size
 	map(0xb60000, 0xb6002f).writeonly().share("rotregs");                               // Rotation Registers
-	map(0xba0000, 0xba001f).w(FUNC(stepstag_state::rockn_systemregs_w));                                   // System param
+	map(0xba0000, 0xba001f).m(m_sysctrl, FUNC(jaleco_ms32_sysctrl_device::amap));
 	map(0xbe0000, 0xbe0001).nopr();                                                     // INT-level1 dummy read
 	map(0xbe0002, 0xbe0003).portr("BUTTONS");                                        // Inputs
 	map(0xbe0004, 0xbe0005).r(FUNC(stepstag_state::stepstag_coins_r));                                      // Inputs & protection
@@ -1081,7 +1037,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( rocknms )
 	PORT_START("PLAYERS")   // IN0 - $be0002.w
-	PORT_BIT( 0x0003, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(tetrisp2_state, rocknms_main2sub_status_r) // MAIN -> SUB Communication
+	PORT_BIT( 0x0003, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(rocknms_state, rocknms_main2sub_status_r) // MAIN -> SUB Communication
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
@@ -1593,41 +1549,11 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-TIMER_CALLBACK_MEMBER(tetrisp2_state::rockn_timer_level4_callback)
-{
-	m_maincpu->set_input_line(4, HOLD_LINE);
-}
-
-TIMER_CALLBACK_MEMBER(tetrisp2_state::rockn_timer_sub_level4_callback)
-{
-	m_subcpu->set_input_line(4, HOLD_LINE);
-}
-
-
-TIMER_CALLBACK_MEMBER(tetrisp2_state::rockn_timer_level1_callback)
-{
-	m_maincpu->set_input_line(1, HOLD_LINE);
-}
-
-TIMER_CALLBACK_MEMBER(tetrisp2_state::rockn_timer_sub_level1_callback)
-{
-	m_subcpu->set_input_line(1, HOLD_LINE);
-}
-
 void tetrisp2_state::init_rockn_timer()
 {
-	m_rockn_timer_l1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tetrisp2_state::rockn_timer_level1_callback),this));
-	m_rockn_timer_l4 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tetrisp2_state::rockn_timer_level4_callback),this));
-
-	m_rockn_timer_l1->adjust(attotime::from_msec(32), 0, attotime::from_msec(32));
-
-	save_item(NAME(m_systemregs));
-	save_item(NAME(m_rocknms_sub_systemregs));
 	save_item(NAME(m_rockn_protectdata));
 	save_item(NAME(m_rockn_adpcmbank));
 	save_item(NAME(m_rockn_soundvolume));
-	save_item(NAME(m_rocknms_main2sub));
-	save_item(NAME(m_rocknms_sub2main));
 }
 
 void tetrisp2_state::init_rockn()
@@ -1648,17 +1574,12 @@ void tetrisp2_state::init_rockn2()
 	m_rockn_protectdata = 2;
 }
 
-void tetrisp2_state::init_rocknms()
+void rocknms_state::init_rocknms()
 {
 	init_rockn_timer();
-
-	m_rockn_timer_sub_l1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tetrisp2_state::rockn_timer_sub_level1_callback),this));
-	m_rockn_timer_sub_l4 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tetrisp2_state::rockn_timer_sub_level4_callback),this));
-
-	m_rockn_timer_sub_l1->adjust(attotime::from_msec(32), 0, attotime::from_msec(32));
-
 	m_rockn_protectdata = 3;
-
+	save_item(NAME(m_rocknms_main2sub));
+	save_item(NAME(m_rocknms_sub2main));
 }
 
 void tetrisp2_state::init_rockn3()
@@ -1673,23 +1594,52 @@ void stepstag_state::init_stepstag()
 	m_rockn_protectdata = 1;    // unused?
 }
 
+WRITE_LINE_MEMBER(tetrisp2_state::field_irq_w)
+{
+	// irq1 is valid on all games but tetrisp2, but always masked by SR?
+	m_maincpu->set_input_line(1, (state) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(tetrisp2_state::vblank_irq_w)
+{
+	m_maincpu->set_input_line(2, (state) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(tetrisp2_state::timer_irq_w)
+{
+	m_maincpu->set_input_line(4, (state) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(tetrisp2_state::sound_reset_line_w)
+{
+	logerror("%s: sound_reset_line_w %d but no CPU to reset?\n", machine().describe_context(), state);
+}
+
+void tetrisp2_state::setup_main_sysctrl(machine_config &config, const XTAL clock)
+{
+	JALECO_MS32_SYSCTRL(config, m_sysctrl, clock, m_screen);
+	m_sysctrl->flip_screen_cb().set(FUNC(tetrisp2_state::flipscreen_w));
+	m_sysctrl->vblank_cb().set(FUNC(tetrisp2_state::vblank_irq_w));
+	m_sysctrl->field_cb().set(FUNC(tetrisp2_state::field_irq_w));
+	m_sysctrl->prg_timer_cb().set(FUNC(tetrisp2_state::timer_irq_w));
+	m_sysctrl->sound_reset_cb().set(FUNC(tetrisp2_state::sound_reset_line_w));
+}
 
 void tetrisp2_state::tetrisp2(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 12_MHz_XTAL); // 12MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &tetrisp2_state::tetrisp2_map);
-	m_maincpu->set_vblank_int("screen", FUNC(tetrisp2_state::irq2_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8);    /* guess */
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(48'000'000)/8, 384, 0, 320, 263, 0, 224); // default CRTC setup
-	screen.set_screen_update(FUNC(tetrisp2_state::screen_update_tetrisp2));
-	screen.set_palette(m_palette);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(XTAL(48'000'000)/8, 384, 0, 320, 263, 0, 224); // default CRTC setup
+	m_screen->set_screen_update(FUNC(tetrisp2_state::screen_update_tetrisp2));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tetrisp2);
 	PALETTE(config, m_palette).set_entries(0x8000);
@@ -1698,6 +1648,8 @@ void tetrisp2_state::tetrisp2(machine_config &config)
 	m_sprite->set_palette(m_palette);
 	m_sprite->set_color_base(0);
 	m_sprite->set_color_entries(16);
+
+	setup_main_sysctrl(config, XTAL(48'000'000));
 
 	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,tetrisp2)
 
@@ -1716,19 +1668,18 @@ void tetrisp2_state::nndmseal(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(12'000'000)); // 12MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &tetrisp2_state::nndmseal_map);
-	m_maincpu->set_vblank_int("screen", FUNC(tetrisp2_state::irq2_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// An odd one: it uses the faster dot clock divider setting
 	// but they replaced the xtal to a OSC1(42.9545MHz) (so with these settings it reaches ~60 Hz)
-    screen.set_raw(XTAL(42'954'545)/6, 455, 0, 384, 262, 0, 240);
-	screen.set_screen_update(FUNC(tetrisp2_state::screen_update_tetrisp2));
-	screen.set_palette(m_palette);
+    m_screen->set_raw(XTAL(42'954'545)/6, 455, 0, 384, 262, 0, 240);
+	m_screen->set_screen_update(FUNC(tetrisp2_state::screen_update_tetrisp2));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tetrisp2);
 	PALETTE(config, m_palette).set_entries(0x8000);
@@ -1737,6 +1688,8 @@ void tetrisp2_state::nndmseal(machine_config &config)
 	m_sprite->set_palette(m_palette);
 	m_sprite->set_color_base(0);
 	m_sprite->set_color_entries(16);
+	
+	setup_main_sysctrl(config, XTAL(42'954'545));
 
 	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,nndmseal)  // bg layer offset
 
@@ -1752,17 +1705,16 @@ void tetrisp2_state::rockn(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(12'000'000)); // 12MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &tetrisp2_state::rockn1_map);
-	m_maincpu->set_vblank_int("screen", FUNC(tetrisp2_state::irq2_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-    screen.set_raw(XTAL(48'000'000)/8, 384, 0, 320, 263, 0, 224);
-	screen.set_screen_update(FUNC(tetrisp2_state::screen_update_rockntread));
-	screen.set_palette(m_palette);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+    m_screen->set_raw(XTAL(48'000'000)/8, 384, 0, 320, 263, 0, 224);
+	m_screen->set_screen_update(FUNC(tetrisp2_state::screen_update_rockntread));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tetrisp2);
 	PALETTE(config, m_palette).set_entries(0x8000);
@@ -1771,6 +1723,8 @@ void tetrisp2_state::rockn(machine_config &config)
 	m_sprite->set_palette(m_palette);
 	m_sprite->set_color_base(0);
 	m_sprite->set_color_entries(16);
+
+	setup_main_sysctrl(config, XTAL(48'000'000));
 
 	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,rockntread)
 
@@ -1789,18 +1743,17 @@ void tetrisp2_state::rockn2(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(12'000'000)); // 12MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &tetrisp2_state::rockn2_map);
-	m_maincpu->set_vblank_int("screen", FUNC(tetrisp2_state::irq2_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// TODO: during POST it sets up a vertical size of 487, is it trying to setup an interlace setting?
-    screen.set_raw(XTAL(48'000'000)/8, 384, 0, 320, 263, 0, 224);
-	screen.set_screen_update(FUNC(tetrisp2_state::screen_update_rockntread));
-	screen.set_palette(m_palette);
+    m_screen->set_raw(XTAL(48'000'000)/8, 384, 0, 320, 263, 0, 224);
+	m_screen->set_screen_update(FUNC(tetrisp2_state::screen_update_rockntread));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tetrisp2);
 	PALETTE(config, m_palette).set_entries(0x8000);
@@ -1809,6 +1762,8 @@ void tetrisp2_state::rockn2(machine_config &config)
 	m_sprite->set_palette(m_palette);
 	m_sprite->set_color_base(0);
 	m_sprite->set_color_entries(16);
+
+	setup_main_sysctrl(config, XTAL(48'000'000));
 
 	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,rockntread)
 
@@ -1821,17 +1776,39 @@ void tetrisp2_state::rockn2(machine_config &config)
 	ymz.add_route(1, "rspeaker", 1.0);
 }
 
+WRITE_LINE_MEMBER(rocknms_state::sub_flipscreen_w)
+{
+	// ...
+}
 
-void tetrisp2_state::rocknms(machine_config &config)
+WRITE_LINE_MEMBER(rocknms_state::sub_field_irq_w)
+{
+	m_subcpu->set_input_line(1, (state) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(rocknms_state::sub_vblank_irq_w)
+{
+	m_subcpu->set_input_line(2, (state) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(rocknms_state::sub_timer_irq_w)
+{
+	m_subcpu->set_input_line(4, (state) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(rocknms_state::sub_sound_reset_line_w)
+{
+	logerror("%s: sound_reset_line_w %d on sub CPU but no CPU to reset?\n", machine().describe_context(), state);
+}
+
+void rocknms_state::rocknms(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(12'000'000)); // 12MHz
-	m_maincpu->set_addrmap(AS_PROGRAM, &tetrisp2_state::rocknms_main_map);
-	m_maincpu->set_vblank_int("lscreen", FUNC(tetrisp2_state::irq2_line_hold));
+	m_maincpu->set_addrmap(AS_PROGRAM, &rocknms_state::rocknms_main_map);
 
 	M68000(config, m_subcpu, XTAL(12'000'000)); // 12MHz
-	m_subcpu->set_addrmap(AS_PROGRAM, &tetrisp2_state::rocknms_sub_map);
-	m_subcpu->set_vblank_int("lscreen", FUNC(tetrisp2_state::irq2_line_hold));
+	m_subcpu->set_addrmap(AS_PROGRAM, &rocknms_state::rocknms_sub_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -1857,18 +1834,27 @@ void tetrisp2_state::rocknms(machine_config &config)
 
 	config.set_default_layout(layout_rocknms);
 
-	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
-	lscreen.set_orientation(ROT0);
-	lscreen.set_raw(XTAL(48'000'000)/8, 384, 0, 320, 263, 0, 224);
-	lscreen.set_screen_update(FUNC(tetrisp2_state::screen_update_rocknms_left));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_orientation(ROT0);
+	m_screen->set_raw(XTAL(48'000'000)/8, 384, 0, 320, 263, 0, 224);
+	m_screen->set_screen_update(FUNC(rocknms_state::screen_update_rocknms_left));
 
-	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
-	rscreen.set_orientation(ROT270);
-	rscreen.set_raw(XTAL(48'000'000)/8, 384, 0, 320, 263, 0, 224);
-	rscreen.set_screen_update(FUNC(tetrisp2_state::screen_update_rocknms_right));
+	SCREEN(config, m_sub_screen, SCREEN_TYPE_RASTER);
+	m_sub_screen->set_orientation(ROT270);
+	m_sub_screen->set_raw(XTAL(48'000'000)/8, 384, 0, 320, 263, 0, 224);
+	m_sub_screen->set_screen_update(FUNC(rocknms_state::screen_update_rocknms_right));
 
-	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,rocknms)
+	setup_main_sysctrl(config, XTAL(48'000'000));
+	
+	JALECO_MS32_SYSCTRL(config, m_sub_sysctrl, XTAL(48'000'000), m_sub_screen);
+	m_sub_sysctrl->flip_screen_cb().set(FUNC(rocknms_state::sub_flipscreen_w));
+	m_sub_sysctrl->vblank_cb().set(FUNC(rocknms_state::sub_vblank_irq_w));
+	m_sub_sysctrl->field_cb().set(FUNC(rocknms_state::sub_field_irq_w));
+	m_sub_sysctrl->prg_timer_cb().set(FUNC(rocknms_state::sub_timer_irq_w));
+	m_sub_sysctrl->sound_reset_cb().set(FUNC(rocknms_state::sub_sound_reset_line_w));
 
+	MCFG_VIDEO_START_OVERRIDE(rocknms_state,rocknms)
+	
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -1883,7 +1869,6 @@ void stepstag_state::stepstag(machine_config &config)
 {
 	M68000(config, m_maincpu, XTAL(12'000'000)); // 12MHz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &stepstag_state::stepstag_map);
-	m_maincpu->set_vblank_int("mscreen", FUNC(tetrisp2_state::irq2_line_hold)); // lev 4 triggered by system timer
 
 	M68000(config, m_subcpu, 16000000); //??
 	m_subcpu->set_addrmap(AS_PROGRAM, &stepstag_state::stepstag_sub_map);
@@ -1910,14 +1895,14 @@ void stepstag_state::stepstag(machine_config &config)
 	lscreen.set_screen_update(FUNC(stepstag_state::screen_update_stepstag_left));
 //  lscreen.set_palette(m_vj_palette_l));
 
-	screen_device &mscreen(SCREEN(config, "mscreen", SCREEN_TYPE_RASTER));
-	mscreen.set_orientation(ROT0);
-	mscreen.set_refresh_hz(60);
-	mscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	mscreen.set_size(0x160, 0xf0);
-	mscreen.set_visarea(0, 0x160-1, 0, 0xf0-1);
-	mscreen.set_screen_update(FUNC(stepstag_state::screen_update_stepstag_mid));
-//  mscreen.set_palette(m_vj_palette_m));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_orientation(ROT0);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(0x160, 0xf0);
+	m_screen->set_visarea(0, 0x160-1, 0, 0xf0-1);
+	m_screen->set_screen_update(FUNC(stepstag_state::screen_update_stepstag_mid));
+//  m_screen->set_palette(m_vj_palette_m));
 
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
 	rscreen.set_orientation(ROT270);
@@ -1959,6 +1944,8 @@ void stepstag_state::stepstag(machine_config &config)
 	m_vj_sprite_r->set_color_base(0);
 	m_vj_sprite_r->set_color_entries(0x80);
 
+	setup_main_sysctrl(config, XTAL(48'000'000));
+
 	config.set_default_layout(layout_stepstag);
 
 	// sound hardware
@@ -1976,7 +1963,6 @@ void stepstag_state::vjdash(machine_config &config)    // 4 Screens
 {
 	M68000(config, m_maincpu, XTAL(12'000'000)); // 12MHz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &stepstag_state::vjdash_map);
-	m_maincpu->set_vblank_int("screen", FUNC(tetrisp2_state::irq2_line_hold)); // lev 4 triggered by system timer
 
 	M68000(config, m_subcpu, 16000000); //??
 	m_subcpu->set_addrmap(AS_PROGRAM, &stepstag_state::stepstag_sub_map);
@@ -1988,11 +1974,11 @@ void stepstag_state::vjdash(machine_config &config)    // 4 Screens
 
 	// video hardware
 	// same as stepstag, we assume that this screen is effectively connected to the system CRTC
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-    screen.set_raw(XTAL(48'000'000)/8, 384, 0, 320, 263, 0, 224);
-	screen.set_screen_update(FUNC(stepstag_state::screen_update_stepstag_main));
-//  screen.set_screen_update(FUNC(tetrisp2_state::screen_update_rockntread));
-	screen.set_palette(m_palette);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+    m_screen->set_raw(XTAL(48'000'000)/8, 384, 0, 320, 263, 0, 224);
+	m_screen->set_screen_update(FUNC(stepstag_state::screen_update_stepstag_main));
+//  m_screen->set_screen_update(FUNC(tetrisp2_state::screen_update_rockntread));
+	m_screen->set_palette(m_palette);
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	lscreen.set_refresh_hz(30);
@@ -2048,6 +2034,8 @@ void stepstag_state::vjdash(machine_config &config)    // 4 Screens
 	m_vj_sprite_r->set_palette(m_vj_palette_r);
 	m_vj_sprite_r->set_color_base(0);
 	m_vj_sprite_r->set_color_entries(0x80);
+
+	setup_main_sysctrl(config, XTAL(48'000'000));
 
 	config.set_default_layout(layout_vjdash);
 
@@ -2899,14 +2887,14 @@ GAME( 1997, nndmseala, nndmseal, nndmseal, nndmseal,  tetrisp2_state, init_rockn
 GAME( 1999, rockn,     0,        rockn,    rockn,     tetrisp2_state, init_rockn,   ROT270, "Jaleco",         "Rock'n Tread (Japan)",            MACHINE_SUPPORTS_SAVE )
 GAME( 1999, rockna,    rockn,    rockn,    rockn,     tetrisp2_state, init_rockn1,  ROT270, "Jaleco",         "Rock'n Tread (Japan, alternate)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, rockn2,    0,        rockn2,   rockn,     tetrisp2_state, init_rockn2,  ROT270, "Jaleco",         "Rock'n Tread 2 (Japan)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1999, rocknms,   0,        rocknms,  rocknms,   tetrisp2_state, init_rocknms, ROT0,   "Jaleco",         "Rock'n MegaSession (Japan)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, rocknms,   0,        rocknms,  rocknms,   rocknms_state,  init_rocknms, ROT0,   "Jaleco",         "Rock'n MegaSession (Japan)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, rockn3,    0,        rockn2,   rockn,     tetrisp2_state, init_rockn3,  ROT270, "Jaleco",         "Rock'n 3 (Japan)",                MACHINE_SUPPORTS_SAVE )
 GAME( 2000, rockn4,    0,        rockn2,   rockn,     tetrisp2_state, init_rockn3,  ROT270, "Jaleco / PCCWJ", "Rock'n 4 (Japan, prototype)",     MACHINE_SUPPORTS_SAVE )
 
 // Undumped:
 // - Stepping Stage <- the original Game
 // - Stepping Stage 2 Supreme
-// Dumped (partly):
+// Dumped (partially):
 GAME( 1999, vjdash,    0,        vjdash,   vjdash,    stepstag_state, init_stepstag, ROT0,   "Jaleco",         "VJ Visual & Music Slap",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 GAME( 1999, stepstag,  0,        stepstag, stepstag,  stepstag_state, init_stepstag, ROT0,   "Jaleco",         "Stepping Stage Special",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 GAME( 1999, step3,     0,        stepstag, stepstag,  stepstag_state, init_stepstag, ROT0,   "Jaleco",         "Stepping 3 Superior",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

@@ -69,6 +69,7 @@ private:
 	void vblank_ack_w(u16 data);
 	void field_ack_w(u16 data);
 	void timer_ack_w(u16 data);
+	void irq_ack_w(u16 data);
 
 	devcb_write_line m_flip_screen_cb;
 	devcb_write_line m_vblank_cb;
