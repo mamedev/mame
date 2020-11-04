@@ -1562,10 +1562,10 @@ chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_trac
 	 */
 	for (trknum = 1; trknum < outtoc.numtrks; trknum++)
 	{
-		u_int32_t prev_pregap = outtoc.tracks[trknum-1].pregap;
-		u_int32_t prev_offset = prev_pregap * (outtoc.tracks[trknum-1].datasize + outtoc.tracks[trknum-1].subsize);
-		u_int32_t this_pregap = outtoc.tracks[trknum].pregap;
-		u_int32_t this_offset = this_pregap * (outtoc.tracks[trknum].datasize + outtoc.tracks[trknum].subsize);
+		uint32_t prev_pregap = outtoc.tracks[trknum-1].pregap;
+		uint32_t prev_offset = prev_pregap * (outtoc.tracks[trknum-1].datasize + outtoc.tracks[trknum-1].subsize);
+		uint32_t this_pregap = outtoc.tracks[trknum].pregap;
+		uint32_t this_offset = this_pregap * (outtoc.tracks[trknum].datasize + outtoc.tracks[trknum].subsize);
 
 		if (outtoc.tracks[trknum-1].pgtype != CD_TRACK_AUDIO)
 		{
