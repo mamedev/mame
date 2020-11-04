@@ -13,10 +13,20 @@
    on the box, this is done through a download code rather than the cartridge
    being compatible.
 
-   System ROM still needs dumping (and any internal area if it exists)
-
    This file exists so that the Software List has a place to hook up to for
    the time being.
+
+   InnoTV details
+
+   Rockchip RK3168 (Main CPU / SoC)
+   Rockchip RK616 ('Partner Chip for Rockchip mobile application processor'
+   2x EtronTech EM6GE16EWXD-12H (RAM)
+   Ricoh RC5T619 (Power Management)
+   MicroSDHC 8GB card in internal slot
+   Realtek RTL8188EU (Wireless)
+
+   There don't appear to be any ROM / SPI / NAND devicesonboard, so must either
+   boot directly from the SD, or have some boot program internal to the SoC
 
 *******************************************************************************/
 
@@ -101,7 +111,7 @@ void vtech_innotv_innotabmax_state::main_map(address_map &map)
 
 void vtech_innotv_innotabmax_state::vtech_innotv_innotabmax(machine_config &config)
 {
-	ARM9(config, m_maincpu, 240000000); // unknown core / frequency, but almost certainly ARM based
+	ARM9(config, m_maincpu, 240000000); // unknown core type / frequency, but confirmed as ARM based
 	m_maincpu->set_addrmap(AS_PROGRAM, &vtech_innotv_innotabmax_state::main_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -119,8 +129,8 @@ void vtech_innotv_innotabmax_state::vtech_innotv_innotabmax(machine_config &conf
 }
 
 ROM_START( innotv )
-	ROM_REGION( 0x10800000, "internalnand", ROMREGION_ERASEFF )
-	ROM_LOAD( "internalnand.bin", 0x000000, 0x10800000, NO_DUMP ) // unknown type / size
+	DISK_REGION( "internalsd" )
+	DISK_IMAGE( "8gb_sdhc_internal", 0, SHA1(443a0a9cc830387317d3218955b72295ee5a88eb) )
 ROM_END
 
 CONS( 2015, innotv,      0,         0,      vtech_innotv_innotabmax,    vtech_innotv_innotabmax,  vtech_innotv_innotabmax_state,  empty_init, "VTech", "InnoTV", MACHINE_IS_SKELETON )
