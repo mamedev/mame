@@ -123,6 +123,7 @@ void menu_slot_devices::record_current_options()
 		{
 			// get the slot option
 			const slot_option &opt(machine().options().slot_option(slot.slot_name()));
+
 			// and record the value in our local cache
 			m_slot_options[slot.slot_name()] = opt.specified_value();
 		}
