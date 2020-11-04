@@ -28,6 +28,33 @@
    There don't appear to be any ROM / SPI / NAND devicesonboard, so must either
    boot directly from the SD, or have some boot program internal to the SoC
 
+   The following pinout was used for the InnoTV / InnoTab MAX cartridges
+
+	+---------------------+
+	|                     |--+
+	|                     |--| I/O8
+	|                     |--| I/O7
+	|  +---------------+  |--| I/O6
+	|  |||||||||||||||||  |--| I/O5
+	|  |               |  |--| ?
+	|  |     NAND      |  |--| I/O1
+	|  |               |  |--| I/O2
+	|  |               |  |--| I/O3
+	|  |               |  |--| I/O4
+	|  |TC58NVG1S3HTA00|  |--| GND
+	|  |               |  |--| GND
+	|  |               |  |--| CLE
+	|  |               |  |--| ALE
+	|  |               |  |--| WE
+	|  |               |  |--| WP
+	|  |               |  |--| VCC
+	|  |||||||||||||||||  |--| VCC
+	|  +---------------+  |--| CE
+	|                     |--| RE
+	|                     |--| RY/BY
+	|                     |--+
+	+---------------------+
+
 *******************************************************************************/
 
 #include "emu.h"
