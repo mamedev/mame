@@ -1454,7 +1454,7 @@ void lua_engine::initialize()
 			return table;
 		}));
 
-	machine_type.set("slotoptions", [this](running_machine &r, bool full, std::string delim) {
+	machine_type.set("slot_options", [this](running_machine &r, bool full, std::string delim) {
 			std::string result;
 			if (delim.compare(std::string(""))==0) delim = std::string("\n");
 			for (device_slot_interface &slot : slot_interface_iterator(r.root_device()))
@@ -1468,14 +1468,12 @@ void lua_engine::initialize()
 						{
 						result += (std::string("-")+std::string(slot.slot_name())+" "+
 									value.c_str() +
-//									std::string("\n"));
 									delim);
 						}
 						else
 						{
 							result += (std::string("-")+std::string(slot.slot_name())+" "+
 										"\"\""+
-//										std::string("\n"));
 										delim);
 						}
 					}
@@ -1486,7 +1484,6 @@ void lua_engine::initialize()
 						{
 							result += (std::string("-")+std::string(slot.slot_name())+" "+
 										specified_value.c_str()+
-//										std::string("\n"));
 										delim);
 						}
 					}
@@ -1494,23 +1491,6 @@ void lua_engine::initialize()
 			}
 			return result;
 		});
-
-
-	machine_type.set("slotoptionsfull", sol::property([this](running_machine &r) {
-			std::string result;
-			for (device_slot_interface &slot : slot_interface_iterator(r.root_device()))
-			{
-				if (slot.has_selectable_options())
-				{
-					{
-						result += (std::string("-")+std::string(slot.slot_name()) + " " +
-									machine().options().slot_option(slot.slot_name()).value().c_str() +
-									std::string("\n"));
-					}
-				}
-			}
-			return result;
-		}));
 
 	machine_type.set("images", sol::property([this](running_machine &r) {
 			sol::table image_table = sol().create_table();
