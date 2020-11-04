@@ -924,8 +924,8 @@ void naomi_gdrom_board::device_start()
 		} else {
 			// use extracted pic data
 			// printf("This PIC key hasn't been converted to a proper PIC binary yet!\n");
-			memcpy(name, picdata+33, 7);
-			memcpy(name+7, picdata+25, 7);
+			memcpy(name, &picdata[33], 7);
+			memcpy(name+7, &picdata[25], 7);
 
 			key = ((uint64_t(picdata[0x31]) << 56) |
 					(uint64_t(picdata[0x32]) << 48) |

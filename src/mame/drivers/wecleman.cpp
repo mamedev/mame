@@ -317,7 +317,7 @@ uint16_t wecleman_state::wecleman_protection_r()
 void wecleman_state::wecleman_protection_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 2) m_prot_state = data & 0x2000;
-	if (!m_prot_state) COMBINE_DATA(m_protection_ram + offset);
+	if (!m_prot_state) COMBINE_DATA(&m_protection_ram[offset]);
 }
 
 

@@ -1800,13 +1800,13 @@ void fm7_state::machine_reset()
 	{
 		m_init_rom_en = true;
 		// last part of Initiate ROM is visible at the end of RAM too (interrupt vectors)
-		memcpy(&m_vectors[0], m_rom_ptr + 0x1ff0, 16);
+		memcpy(&m_vectors[0], &m_rom_ptr[0x1ff0], 16);
 	}
 	else if (m_type == SYS_FM11)
 	{
 		m_init_rom_en = true;
 		// last part of Initiate ROM is visible at the end of RAM too (interrupt vectors)
-		memcpy(&m_vectors[0], m_rom_ptr + 0x0ff0, 16);
+		memcpy(&m_vectors[0], &m_rom_ptr[0x0ff0], 16);
 	}
 	else
 		m_init_rom_en = false;

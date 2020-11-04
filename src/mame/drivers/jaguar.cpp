@@ -2494,7 +2494,7 @@ void jaguar_state::init_area51a()
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa02030, 0xa02033, write32s_delegate(*this, FUNC(jaguar_state::area51_main_speedup_w)));
-	m_main_speedup = m_mainram + 0x2030/4;
+	m_main_speedup = &m_mainram[0x2030/4];
 #endif
 }
 
@@ -2507,7 +2507,7 @@ void jaguar_state::init_area51()
 	/* install speedup for main CPU */
 	m_main_speedup_max_cycles = 120;
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x100062e8, 0x100062eb, read32smo_delegate(*this, FUNC(jaguar_state::cojagr3k_main_speedup_r)));
-	m_main_speedup = m_mainram + 0x62e8/4;
+	m_main_speedup = &m_mainram[0x62e8/4];
 #endif
 }
 
@@ -2539,7 +2539,7 @@ void jaguar_state::init_area51mx()
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa19550, 0xa19557, write32s_delegate(*this, FUNC(jaguar_state::area51mx_main_speedup_w)));
-	m_main_speedup = m_mainram + 0x19550/4;
+	m_main_speedup = &m_mainram[0x19550/4];
 #endif
 }
 
@@ -2556,7 +2556,7 @@ void jaguar_state::init_a51mxr3k()
 	/* install speedup for main CPU */
 	m_main_speedup_max_cycles = 120;
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x10006f0c, 0x10006f0f, read32smo_delegate(*this, FUNC(jaguar_state::cojagr3k_main_speedup_r)));
-	m_main_speedup = m_mainram + 0x6f0c/4;
+	m_main_speedup = &m_mainram[0x6f0c/4];
 #endif
 }
 
@@ -2570,7 +2570,7 @@ void jaguar_state::init_fishfren()
 	/* install speedup for main CPU */
 	m_main_speedup_max_cycles = 200;
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x10021b60, 0x10021b63, read32smo_delegate(*this, FUNC(jaguar_state::cojagr3k_main_speedup_r)));
-	m_main_speedup = m_mainram + 0x21b60/4;
+	m_main_speedup = &m_mainram[0x21b60/4];
 #endif
 }
 

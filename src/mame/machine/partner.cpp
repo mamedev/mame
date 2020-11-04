@@ -344,7 +344,7 @@ void partner_state::mem_page_w(u8 data)
 I8275_DRAW_CHARACTER_MEMBER(partner_state::display_pixels)
 {
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
-	u8 const *const charmap = m_chargen + 0x400 * (gpa * 2 + hlgt);
+	u8 const *const charmap = &m_chargen[0x400 * (gpa * 2 + hlgt)];
 	u8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 	if (vsp)
 		pixels = 0;
