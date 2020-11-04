@@ -5235,7 +5235,7 @@ void harddriv_state::init_strtdriv()
 
 	/* set up protection hacks */
 	m_gsp->space(AS_PROGRAM).install_write_handler(0xfff960a0, 0xfff960af, write16smo_delegate(*this, FUNC(harddriv_state::hdgsp_protection_w)));
-	m_gsp_protection = (uint16_t *)(m_gsp_vram + ((0xfff960a0 - 0xffc00000) >> 3));
+	m_gsp_protection = (uint16_t *)&m_gsp_vram[(0xfff960a0 - 0xffc00000) >> 3];
 
 	/* set up adsp speedup handlers */
 	m_adsp->space(AS_DATA).install_read_handler(0x1fff, 0x1fff, read16smo_delegate(*this, FUNC(harddriv_state::hdadsp_speedup_r)));
@@ -5258,12 +5258,12 @@ void harddriv_state::init_hdrivair()
 	/* synchronization */
 	m_dsp32->space(AS_PROGRAM).install_write_handler(0x613c00, 0x613c03, write32s_delegate(*this, FUNC(harddriv_state::rddsp32_sync0_w)));
 	m_dsp32->space(AS_PROGRAM).install_write_handler(0x613e00, 0x613e03, write32s_delegate(*this, FUNC(harddriv_state::rddsp32_sync1_w)));
-	m_rddsp32_sync[0] = m_dsp32_ram + ((0x613c00 - 0x600000) >> 2);
-	m_rddsp32_sync[1] = m_dsp32_ram + ((0x613e00 - 0x600000) >> 2);
+	m_rddsp32_sync[0] = &m_dsp32_ram[(0x613c00 - 0x600000) >> 2];
+	m_rddsp32_sync[1] = &m_dsp32_ram[(0x613e00 - 0x600000) >> 2];
 
 	/* set up protection hacks */
 	m_gsp->space(AS_PROGRAM).install_write_handler(0xfff960a0, 0xfff960af, write16smo_delegate(*this, FUNC(harddriv_state::hdgsp_protection_w)));
-	m_gsp_protection = (uint16_t *)(m_gsp_vram + ((0xfff960a0 - 0xffc00000) >> 3));
+	m_gsp_protection = (uint16_t *)&m_gsp_vram[(0xfff960a0 - 0xffc00000) >> 3];
 
 	/* set up adsp speedup handlers */
 	m_adsp->space(AS_DATA).install_read_handler(0x1fff, 0x1fff, read16smo_delegate(*this, FUNC(harddriv_state::hdadsp_speedup_r)));
@@ -5286,12 +5286,12 @@ void harddriv_state::init_hdrivairp()
 	/* synchronization */
 	m_dsp32->space(AS_PROGRAM).install_write_handler(0x613c00, 0x613c03, write32s_delegate(*this, FUNC(harddriv_state::rddsp32_sync0_w)));
 	m_dsp32->space(AS_PROGRAM).install_write_handler(0x613e00, 0x613e03, write32s_delegate(*this, FUNC(harddriv_state::rddsp32_sync1_w)));
-	m_rddsp32_sync[0] = m_dsp32_ram + ((0x613c00 - 0x600000) >> 2);
-	m_rddsp32_sync[1] = m_dsp32_ram + ((0x613e00 - 0x600000) >> 2);
+	m_rddsp32_sync[0] = &m_dsp32_ram[(0x613c00 - 0x600000) >> 2];
+	m_rddsp32_sync[1] = &m_dsp32_ram[(0x613e00 - 0x600000) >> 2];
 
 	/* set up protection hacks */
 	m_gsp->space(AS_PROGRAM).install_write_handler(0xfff916c0, 0xfff916cf, write16smo_delegate(*this, FUNC(harddriv_state::hdgsp_protection_w)));
-	m_gsp_protection = (uint16_t *)(m_gsp_vram + ((0xfff916c0 - 0xffc00000) >> 3));
+	m_gsp_protection = (uint16_t *)&m_gsp_vram[(0xfff916c0 - 0xffc00000) >> 3];
 
 	/* set up adsp speedup handlers */
 	m_adsp->space(AS_DATA).install_read_handler(0x1fff, 0x1fff, read16smo_delegate(*this, FUNC(harddriv_state::hdadsp_speedup_r)));

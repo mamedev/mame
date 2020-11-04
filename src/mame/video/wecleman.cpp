@@ -1029,7 +1029,7 @@ uint32_t wecleman_state::screen_update_wecleman(screen_device &screen, bitmap_rg
 
 		if (video_on)
 		{
-			draw_cloud(bitmap, m_gfxdecode->gfx(0), m_pageram + 0x1800, BMP_PAD, BMP_PAD, 41, 20, cloud_sx, cloud_sy, 6, 5, m_cloud_blend/BLEND_STEPS, 0);
+			draw_cloud(bitmap, m_gfxdecode->gfx(0), &m_pageram[0x1800], BMP_PAD, BMP_PAD, 41, 20, cloud_sx, cloud_sy, 6, 5, m_cloud_blend/BLEND_STEPS, 0);
 		}
 
 		m_cloud_blend += m_cloud_ds;

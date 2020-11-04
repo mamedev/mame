@@ -2523,7 +2523,7 @@ void jaguar_state::init_maxforce()
 	/* install speedup for main CPU */
 	m_main_speedup_max_cycles = 120;
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000865c, 0x1000865f, read32smo_delegate(*this, FUNC(jaguar_state::cojagr3k_main_speedup_r)));
-	m_main_speedup = m_mainram + 0x865c/4;
+	m_main_speedup = &m_mainram[0x865c/4];
 #endif
 }
 
@@ -2584,10 +2584,10 @@ void jaguar_state::init_freeze_common(offs_t main_speedup_addr)
 	m_main_speedup_max_cycles = 200;
 	if (main_speedup_addr != 0) {
 		m_maincpu->space(AS_PROGRAM).install_read_handler(main_speedup_addr, main_speedup_addr + 3, read32smo_delegate(*this, FUNC(jaguar_state::cojagr3k_main_speedup_r)));
-		m_main_speedup = m_mainram + (main_speedup_addr - 0x10000000)/4;
+		m_main_speedup = &m_mainram[(main_speedup_addr - 0x10000000)/4];
 	}
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0400d900, 0x0400d900 + 3, read32smo_delegate(*this, FUNC(jaguar_state::main_gpu_wait_r)));
-	m_main_gpu_wait = m_shared_ram + 0xd900/4;
+	m_main_gpu_wait = &m_shared_ram[0xd900/4];
 #endif
 }
 
@@ -2607,8 +2607,8 @@ void jaguar_state::init_vcircle()
 	/* install speedup for main CPU */
 	m_main_speedup_max_cycles = 50;
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x12005b34, 0x12005b37, read32smo_delegate(*this, FUNC(jaguar_state::cojagr3k_main_speedup_r)));
-	m_main_speedup = m_mainram + 0x5b34/4;
-	m_main_speedup = m_mainram2 + 0x5b34/4;
+	m_main_speedup = &m_mainram[0x5b34/4];
+	m_main_speedup = &m_mainram2[0x5b34/4]; // FIXME: overwriting immediately after assigning?
 #endif
 }
 

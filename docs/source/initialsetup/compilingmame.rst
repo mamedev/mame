@@ -134,7 +134,7 @@ once::
     pacman -S mingw-w64-i686-qt5
 
 You could use these commands to install the current version of the
-mame-essentials package and add the MAME package repository to yur pacman
+mame-essentials package and add the MAME package repository to your pacman
 configuration::
 
     curl -O "https://repo.mamedev.org/x86_64/mame-essentials-1.0.6-1-x86_64.pkg.tar.xz"
@@ -175,11 +175,10 @@ work best in an MSYS2 terminal, while MinGW tools work best in a Microsoft
 command prompt.
 
 The most obvious symptom of this is that arrow keys don’t work in interactive
-programs don’t work if you run them in the wrong kind of terminal.  If you run
-MinGW gdb or python from an MSYS2 terminal window, command history won’t work
-and it may not be possible to interrupt an attached program with gdb.  Similarly
-it may be very difficult to edit using MSYS2 vim in a Microsoft command prompt
-window.
+programs if you run them in the wrong kind of terminal.  If you run MinGW gdb or
+python from an MSYS2 terminal window, command history won’t work and it may not
+be possible to interrupt an attached program with gdb.  Similarly it may be very
+difficult to edit using MSYS2 vim in a Microsoft command prompt window.
 
 MAME is built using the MinGW compilers, so the MinGW directories are included
 earlier in the ``PATH`` for the build environments.  If you want to use an

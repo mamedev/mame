@@ -7,26 +7,25 @@ note, the led16seg renderer is hardcoded to have OFF segments darker than ON, wh
 TODO : fix that ? not sure if possible
 -->
 <mamelayout version="2">
-	<element name="vfd"><led16segsc><color red="0.8" green="0.8" blue="0.8" /></led16segsc></element>
+	<element name="vfd"><led16segsc><color red="0.19" green="0.20" blue="0.22" /></led16segsc></element>
 
 	<!-- set text for 12 annunciators -->
-	<element name="ann0"><text string="SRQ"></text></element>
-	<element name="ann1"><text string="LSTN"/></element>
-	<element name="ann2"><text string="TLK"/></element>
-	<element name="ann3"><text string="RMT"/></element>
-	<element name="ann4"><text string="MATH"/></element>
-	<element name="ann5"><text string="AZ OFF"/></element>
-	<element name="ann6"><text string="2Ω"></text></element>
-	<element name="ann7"><text string="4Ω"/></element>
-	<element name="ann8"><text string="M RNG"/></element>
-	<element name="ann9"><text string="S TRG"/></element>
-	<element name="ann10"><text string="CAL"/></element>
-	<element name="ann11"><text string="SHIFT"/></element>
-
+	<element name="ann0"><text string="SRQ" /></element>
+	<element name="ann1"><text string="LSTN" /></element>
+	<element name="ann2"><text string="TLK" /></element>
+	<element name="ann3"><text string="RMT" /></element>
+	<element name="ann4"><text string="MATH" /></element>
+	<element name="ann5"><text string="AZ OFF" /></element>
+	<element name="ann6"><text string="2Ω" /></element>
+	<element name="ann7"><text string="4Ω" /></element>
+	<element name="ann8"><text string="M RNG" /></element>
+	<element name="ann9"><text string="S TRG" /></element>
+	<element name="ann10"><text string="CAL" /></element>
+	<element name="ann11"><text string="SHIFT" /></element>
 
 
 	<element name="front"><rect><color red="0.6" green="0.63" blue="0.65" /></rect></element>
-	<element name="vfd_back"><rect><color red="0.29" green="0.33" blue="0.32" /></rect></element>
+	<element name="vfd_back"><rect><color red="0.46" green="0.44" blue="0.35" /></rect></element>
 	<element name="button_digit_back"><rect><color red="0.75" green="0.75" blue="0.75" /></rect></element>
 
 	<element name="hl" defstate="0">
@@ -123,8 +122,8 @@ TODO : fix that ? not sure if possible
 			<param name="ann_xpos" start="9" increment="9" />
 			<element name="ann~ann_i~" ref="ann~ann_i~">
 				<bounds x="~ann_xpos~" y="24" width="8" height="3" />
-				<color state="0" alpha="0.1" red="1.0" green="1.0" blue="1.0" />
-				<color state="1" red="1.0" green="1.0" blue="1.0" />
+				<color state="0" red="0.19" green="0.20" blue="0.22" alpha="0.13" />
+				<color state="1" red="0.19" green="0.20" blue="0.22" />
 			</element>
 		</repeat>
 

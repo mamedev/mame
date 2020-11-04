@@ -101,6 +101,8 @@ private:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	virtual void video_start() override;
+	virtual void video_reset() override;
 
 	uint32_t screen_update_dafb(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t dafb_r(offs_t offset, uint32_t mem_mask = ~0);
@@ -111,8 +113,6 @@ private:
 
 	TIMER_CALLBACK_MEMBER(dafb_vbl_tick);
 	TIMER_CALLBACK_MEMBER(dafb_cursor_tick);
-	DECLARE_VIDEO_START(macdafb);
-	DECLARE_VIDEO_RESET(macdafb);
 
 	u32 *m_ram_ptr, *m_rom_ptr;
 	u32 m_ram_mask, m_ram_size, m_rom_size;
@@ -335,7 +335,7 @@ TIMER_CALLBACK_MEMBER(macquadra_state::dafb_cursor_tick)
 	m_cursor_timer->adjust(m_screen->time_until_pos(m_cursor_line, 0), 0);
 }
 
-VIDEO_START_MEMBER(macquadra_state,macdafb)
+void macquadra_state::video_start() // DAFB
 {
 	m_vbl_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(macquadra_state::dafb_vbl_tick),this));
 	m_cursor_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(macquadra_state::dafb_cursor_tick),this));
@@ -344,7 +344,7 @@ VIDEO_START_MEMBER(macquadra_state,macdafb)
 	m_cursor_timer->adjust(attotime::never);
 }
 
-VIDEO_RESET_MEMBER(macquadra_state,macdafb)
+void macquadra_state::video_reset() // DAFB
 {
 	m_dafb_count = 0;
 	m_dafb_clutoffs = 0;
@@ -900,9 +900,6 @@ void macquadra_state::macqd700(machine_config &config)
 	m_screen->set_size(1152, 870);
 	m_screen->set_visarea(0, 1152-1, 0, 870-1);
 	m_screen->set_screen_update(FUNC(macquadra_state::screen_update_dafb));
-
-	MCFG_VIDEO_START_OVERRIDE(macquadra_state,macdafb)
-	MCFG_VIDEO_RESET_OVERRIDE(macquadra_state,macdafb)
 
 	PALETTE(config, m_palette).set_entries(256);
 
