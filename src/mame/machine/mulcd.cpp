@@ -34,6 +34,7 @@ mulcd_device::mulcd_device(const machine_config &mconfig, const char *tag, devic
 void mulcd_device::device_start()
 {
 	m_outputs.resolve();
+	m_led_outputs.resolve();
 }
 
 void mulcd_device::device_reset()
