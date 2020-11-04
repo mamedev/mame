@@ -1558,52 +1558,59 @@ chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_trac
 	}
 
 	/*
-	 * Strip pregaps from Redump AUDIO tracks and correct the LBA to match TOSEC layout
+	 * Strip pregaps from Redump tracks and adjust the LBA offset to match TOSEC layout
 	 */
 	for (trknum = 1; trknum < outtoc.numtrks; trknum++)
 	{
-		if (outtoc.tracks[trknum].pgtype == CD_TRACK_AUDIO)
+		u_int32_t prev_pregap = outtoc.tracks[trknum-1].pregap;
+		u_int32_t prev_offset = prev_pregap * (outtoc.tracks[trknum-1].datasize + outtoc.tracks[trknum-1].subsize);
+		u_int32_t this_pregap = outtoc.tracks[trknum].pregap;
+		u_int32_t this_offset = this_pregap * (outtoc.tracks[trknum].datasize + outtoc.tracks[trknum].subsize);
+
+		if (outtoc.tracks[trknum-1].pgtype != CD_TRACK_AUDIO)
 		{
-			// pad previous track to match TOSEC layout
-			// TBD: do we pad consecutive AUDIO tracks?
-			outtoc.tracks[trknum-1].frames += outtoc.tracks[trknum].pregap;
-			outtoc.tracks[trknum-1].padframes += outtoc.tracks[trknum].pregap;
+			// pad previous DATA track to match TOSEC layout
+			outtoc.tracks[trknum-1].frames += this_pregap;
+			outtoc.tracks[trknum-1].padframes += this_pregap;
+		}
 
-			// skip the pregap when reading the AUDIO .bin
-			outtoc.tracks[trknum].frames -= outtoc.tracks[trknum].pregap;
-			outinfo.track[trknum].offset += outtoc.tracks[trknum].pregap * (outtoc.tracks[trknum].datasize+outtoc.tracks[trknum].subsize);
+		if (outtoc.tracks[trknum-1].pgtype == CD_TRACK_AUDIO && outtoc.tracks[trknum].pgtype == CD_TRACK_AUDIO)
+		{
+			// shift previous AUDIO track to match TOSEC layout
+			outinfo.track[trknum-1].offset += prev_offset;
+			outinfo.track[trknum-1].offset = 0;	// workaround for split-bin issue
+		}
 
-			// now strip redundant pregap from current track
-			outtoc.tracks[trknum].pregap = 0;
-			outtoc.tracks[trknum].pgtype = 0;
+		if (outtoc.tracks[trknum-1].pgtype == CD_TRACK_AUDIO && outtoc.tracks[trknum].pgtype != CD_TRACK_AUDIO)
+		{
+			// shrink previous AUDIO track to match TOSEC layout
+			outtoc.tracks[trknum-1].frames -= prev_pregap;
+			outinfo.track[trknum-1].offset += prev_offset;
+		}
+
+		if (outtoc.tracks[trknum].pgtype == CD_TRACK_AUDIO && trknum == outtoc.numtrks-1)
+		{
+			// shrink final AUDIO track to match TOSEC layout
+			outtoc.tracks[trknum].frames -= this_pregap;
+			outinfo.track[trknum].offset += this_offset;
 		}
 	}
 
 	/*
-	 * Special handling for TYPE_III_SPLIT, final 75 frames of AUDIO is split over two tracks
+	 * Special handling for TYPE_III_SPLIT, pregap in last track contains 75 frames audio and 150 frames data
 	 */
 	if (disc_pattern == TYPE_III_SPLIT)
 	{
-		uint32_t trk_audio = outtoc.numtrks-2;
-		uint32_t trk_data = outtoc.numtrks-1;
+		assert(outtoc.tracks[outtoc.numtrks-1].pregap == 225);
 
-		assert(outtoc.tracks[trk_data].pregap == 225);
+		// grow the AUDIO track into DATA track by 75 frames as per Pattern III
+		outtoc.tracks[outtoc.numtrks-2].frames += 225;
+		outtoc.tracks[outtoc.numtrks-2].padframes += 150;
+		outinfo.track[outtoc.numtrks-2].offset = 0;	// workaround for split-bin issue
 
-		// pad the previous track as per Pattern III
-		outtoc.tracks[trk_audio].frames += 225;
-		outtoc.tracks[trk_audio].padframes += 150;
-
-		// workaround for audio read across split bin, which doesn't work with read_cd
-		// TBD: perhaps modify read_cd to automatically read 75 frames from next track
-		outinfo.track[trk_audio].offset -= 75 * (outtoc.tracks[trk_audio].datasize+outtoc.tracks[trk_audio].subsize);
-
-		// skip the pregap when reading the DATA .bin
-		outtoc.tracks[trk_data].frames -= 225;
-		outinfo.track[trk_data].offset += 225 * (outtoc.tracks[trk_data].datasize+outtoc.tracks[trk_data].subsize);
-
-		// now strip redundant pregap from last track
-		outtoc.tracks[trk_data].pregap = 0;
-		outtoc.tracks[trk_data].pgtype = 0;
+		// skip the pregap when reading the DATA track
+		outtoc.tracks[outtoc.numtrks-1].frames -= 225;
+		outinfo.track[outtoc.numtrks-1].offset += 225 * (outtoc.tracks[outtoc.numtrks-1].datasize+outtoc.tracks[outtoc.numtrks-1].subsize);
 	}
 
 	/*
@@ -1622,6 +1629,10 @@ chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_trac
 		{
 			outtoc.tracks[trknum].physframeofs = outtoc.tracks[trknum-1].physframeofs + outtoc.tracks[trknum-1].frames;
 		}
+
+		// no longer need the pregap info, zeroed out to match TOSEC layout
+		outtoc.tracks[trknum].pregap = 0;
+		outtoc.tracks[trknum].pgtype = 0;
 	}
 
 #if 1
