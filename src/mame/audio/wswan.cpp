@@ -81,18 +81,14 @@ void wswan_sound_device::device_start()
 	save_item(NAME(m_noise_shift));
 	save_item(NAME(m_master_volume));
 	save_item(NAME(m_system_volume));
-
-	for (int i = 0; i < 4; i++)
-	{
-		save_item(NAME(m_audio[i].freq), i);
-		save_item(NAME(m_audio[i].period), i);
-		save_item(NAME(m_audio[i].pos), i);
-		save_item(NAME(m_audio[i].vol_left), i);
-		save_item(NAME(m_audio[i].vol_right), i);
-		save_item(NAME(m_audio[i].on), i);
-		save_item(NAME(m_audio[i].offset), i);
-		save_item(NAME(m_audio[i].signal), i);
-	}
+	save_item(STRUCT_MEMBER(m_audio, freq));
+	save_item(STRUCT_MEMBER(m_audio, period));
+	save_item(STRUCT_MEMBER(m_audio, pos));
+	save_item(STRUCT_MEMBER(m_audio, vol_left));
+	save_item(STRUCT_MEMBER(m_audio, vol_right));
+	save_item(STRUCT_MEMBER(m_audio, on));
+	save_item(STRUCT_MEMBER(m_audio, offset));
+	save_item(STRUCT_MEMBER(m_audio, signal));
 }
 
 void wswan_sound_device::device_clock_changed()
