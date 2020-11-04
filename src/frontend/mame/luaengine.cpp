@@ -1466,15 +1466,11 @@ void lua_engine::initialize()
 						std::string value = machine().options().slot_option(slot.slot_name()).value();
 						if (value.compare(std::string("")) != 0)
 						{
-						result += std::string("-") + std::string(slot.slot_name()) + " " +
-									value.c_str() +
-									delim;
+							result += "-" + std::string(slot.slot_name()) + " " + value + delim;
 						}
 						else
 						{
-							result += std::string("-") + std::string(slot.slot_name()) + " " +
-										"\"\"" +
-										delim;
+							result += "-" + std::string(slot.slot_name()) + " " + "\"\"" + delim;
 						}
 					}
 					else  // not full list, just specified values
@@ -1482,9 +1478,7 @@ void lua_engine::initialize()
 						std::string specified_value = machine().options().slot_option(slot.slot_name()).specified_value();
 						if (specified_value.compare(std::string("")) != 0)
 						{
-							result += std::string("-") + std::string(slot.slot_name()) + " " +
-										specified_value.c_str() +
-										delim;
+							result += "-" + std::string(slot.slot_name()) + " " + specified_value + delim;
 						}
 					}
 				}
