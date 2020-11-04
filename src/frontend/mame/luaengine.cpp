@@ -1454,7 +1454,7 @@ void lua_engine::initialize()
 			return table;
 		}));
 
-	machine_type.set("slot_options", [this](running_machine &r, bool full, std::string delim) {
+	machine_type.set("slot_options_list", [this](running_machine &r, bool full, std::string delim) {
 			std::string result;
 			if (delim.compare(std::string(""))==0) delim = std::string("\n");
 			for (device_slot_interface &slot : slot_interface_iterator(r.root_device()))
@@ -1466,15 +1466,15 @@ void lua_engine::initialize()
 						std::string value = machine().options().slot_option(slot.slot_name()).value();
 						if (value.compare(std::string("")) != 0)
 						{
-						result += (std::string("-")+std::string(slot.slot_name())+" "+
+						result += std::string("-") + std::string(slot.slot_name()) + " " +
 									value.c_str() +
-									delim);
+									delim;
 						}
 						else
 						{
-							result += (std::string("-")+std::string(slot.slot_name())+" "+
-										"\"\""+
-										delim);
+							result += std::string("-") + std::string(slot.slot_name()) + " " +
+										"\"\"" +
+										delim;
 						}
 					}
 					else  // not full list, just specified values
@@ -1482,9 +1482,9 @@ void lua_engine::initialize()
 						std::string specified_value = machine().options().slot_option(slot.slot_name()).specified_value();
 						if (specified_value.compare(std::string("")) != 0)
 						{
-							result += (std::string("-")+std::string(slot.slot_name())+" "+
-										specified_value.c_str()+
-										delim);
+							result += std::string("-") + std::string(slot.slot_name()) + " " +
+										specified_value.c_str() +
+										delim;
 						}
 					}
 				}
