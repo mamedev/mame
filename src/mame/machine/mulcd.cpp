@@ -7,6 +7,8 @@
 #include "emu.h"
 #include "mulcd.h"
 
+#include "mulcd.lh"
+
 DEFINE_DEVICE_TYPE(MULCD, mulcd_device, "mulcd", "Yamaha MU/VL70/FS1R common LCD")
 
 ROM_START( mulcd )
@@ -27,6 +29,7 @@ mulcd_device::mulcd_device(const machine_config &mconfig, const char *tag, devic
 	device_t(mconfig, MULCD, tag, owner, clock),
 	m_lcd(*this, "hd44780"),
 	m_outputs(*this, "%03x.%d.%d", 0U, 0U, 0U),
+	m_contrast(*this, "contrast"),
 	m_led_outputs(*this, "LED%d", 0U)
 {
 }
@@ -34,23 +37,24 @@ mulcd_device::mulcd_device(const machine_config &mconfig, const char *tag, devic
 void mulcd_device::device_start()
 {
 	m_outputs.resolve();
+	m_contrast.resolve();
 	m_led_outputs.resolve();
 }
 
 void mulcd_device::device_reset()
 {
-	m_contrast = 1.0;
-	m_leds = 0;
+	set_contrast(0);
+	set_leds(0);
 }
 
-void mulcd_device::set_contrast(float contrast)
+void mulcd_device::set_contrast(u8 contrast)
 {
+	// 0 to 7
 	m_contrast = contrast;
 }
 
 void mulcd_device::set_leds(u8 leds)
 {
-	m_leds = leds;
 	for(int x=0; x != 6; x++)
 		m_led_outputs[x] = (leds >> x) & 1;
 }
@@ -77,9 +81,10 @@ void mulcd_device::device_add_mconfig(machine_config &config)
 	m_lcd->set_lcd_size(4, 20);
 
 	auto &screen = SCREEN(config, "screen", SCREEN_TYPE_SVG);
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate, asynchronous updating anyway */
-	screen.set_size(900, 272);
+	screen.set_refresh_hz(60);
+	screen.set_size(1920/1.5, 580/1.5);
 	screen.set_visarea_full();
 	screen.screen_vblank().set(FUNC(mulcd_device::render_w));
+
+	config.set_default_layout(layout_mulcd);
 }

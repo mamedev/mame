@@ -17,7 +17,7 @@ class mulcd_device : public device_t
 public:
 	mulcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	void set_contrast(float contrast);
+	void set_contrast(u8 contrast);
 	void set_leds(u8 leds);
 	u8 data_read() { return m_lcd->data_r(); }
 	u8 control_read() { return m_lcd->control_r(); }
@@ -33,10 +33,8 @@ protected:
 private:
 	required_device<hd44780_device> m_lcd;
 	output_finder<64, 8, 5> m_outputs;
+	output_finder<> m_contrast;
 	output_finder<6> m_led_outputs;
-
-	float m_contrast;
-	u8 m_leds;
 
 	DECLARE_WRITE_LINE_MEMBER(render_w);
 };
