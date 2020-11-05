@@ -90,6 +90,8 @@ void mu5_state::mu5_io_map(address_map &map)
 	map(h8_device::PORT_6, h8_device::PORT_6).rw(FUNC(mu5_state::lcd_ctrl_r), FUNC(mu5_state::lcd_ctrl_w));
 	map(h8_device::PORT_7, h8_device::PORT_7).r(FUNC(mu5_state::matrix_r));
 	map(h8_device::PORT_B, h8_device::PORT_B).rw(FUNC(mu5_state::lcd_data_r), FUNC(mu5_state::lcd_data_w));
+
+	map(h8_device::ADC_7, h8_device::ADC_7).lr8(NAME([]() -> u8 { return 0xff; }));	// battery level
 }
 
 void mu5_state::ymw258_map(address_map &map)
