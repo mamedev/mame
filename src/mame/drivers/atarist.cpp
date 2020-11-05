@@ -1941,9 +1941,9 @@ void ste_state::machine_start()
 	m_mfp->i5_w(1);
 	m_mfp->i7_w(1);
 
-	m_shifter_base=0;
-	m_shifter_ofs=0;
-	m_shifter_mode=0;
+	m_shifter_base = 0;
+	m_shifter_ofs = 0;
+	m_shifter_mode = 0;
 }
 
 

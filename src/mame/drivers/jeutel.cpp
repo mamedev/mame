@@ -28,6 +28,8 @@ ToDo:
 #include "jeutel.lh"
 
 
+namespace {
+
 class jeutel_state : public genpin_class
 {
 public:
@@ -41,6 +43,10 @@ public:
 
 	void init_jeutel();
 	void jeutel(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); m_digit = 0; }
 
 private:
 	uint8_t portb_r();
@@ -57,8 +63,7 @@ private:
 	bool m_timer_a;
 	uint8_t m_sndcmd;
 	uint8_t m_digit;
-	virtual void machine_reset() override;
-	virtual void machine_start() override { m_digits.resolve(); }
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_cpu2;
 	required_device<tms5110_device> m_tms;
@@ -257,6 +262,9 @@ void jeutel_state::jeutel(machine_config &config)
 
 	TIMER(config, "timer_a").configure_periodic(FUNC(jeutel_state::timer_a), attotime::from_hz(120));
 }
+
+} // Anonymous namespace
+
 
 /*--------------------------------
 / Le King
