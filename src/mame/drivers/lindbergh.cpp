@@ -119,7 +119,7 @@ MJ4 Evolution                                 ?                 ?               
 OutRun 2 Special Tours (EXPORT)               253-5508-0452     317-0452-COM    ?
 OutRun 2 SP SDX                               ?                 ?               DVP-0015A
 Primeval Hunt                                 253-5508-0512     317-0512-COM   ^DVP-0048A
-Psy-Phi										 ?				   ?			   ?
+Psy-Phi										  ?				 	?			 	?
 R-Tuned: Ultimate Street Racing               ?                 ?               DVP-0060
 Rambo (EXPORT)                                253-5508-0540    ^317-0540-COM   ^DVP-0069
 SEGA Network Casino Club Ver. 2               ?                 ?               DVP-0053
