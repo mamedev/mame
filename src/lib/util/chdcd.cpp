@@ -1517,24 +1517,6 @@ chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_trac
 		}
 	}
 
-#if 1
-	for (trknum = 0; trknum < outtoc.numtrks; trknum++)
-	{
-		printf("trk %d: %d frames @ offset %d, pad=%d, area=%d, phys=%d, pregap=%d, pgtype=%d, idx0=%d, idx1=%d, (true %d)\n",
-			trknum+1,
-			outtoc.tracks[trknum].frames,
-			outinfo.track[trknum].offset,
-			outtoc.tracks[trknum].padframes,
-			outtoc.tracks[trknum].multicuearea,
-			outtoc.tracks[trknum].physframeofs,
-			outtoc.tracks[trknum].pregap,
-			outtoc.tracks[trknum].pgtype,
-			outinfo.track[trknum].idx0offs,
-			outinfo.track[trknum].idx1offs,
-			outtoc.tracks[trknum].frames - outtoc.tracks[trknum].padframes);
-	}
-#endif
-
 	/*
 	 * Dreamcast patterns are identified by track types and number of tracks
 	 */
@@ -1578,7 +1560,7 @@ chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_trac
 		{
 			// shift previous AUDIO track to match TOSEC layout
 			outinfo.track[trknum-1].offset += prev_offset;
-			outinfo.track[trknum-1].offset = 0;	// workaround for split-bin issue
+			outtoc.tracks[trknum-1].splitframes += prev_pregap;
 		}
 
 		if (outtoc.tracks[trknum-1].pgtype == CD_TRACK_AUDIO && outtoc.tracks[trknum].pgtype != CD_TRACK_AUDIO)
@@ -1606,7 +1588,8 @@ chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_trac
 		// grow the AUDIO track into DATA track by 75 frames as per Pattern III
 		outtoc.tracks[outtoc.numtrks-2].frames += 225;
 		outtoc.tracks[outtoc.numtrks-2].padframes += 150;
-		outinfo.track[outtoc.numtrks-2].offset = 0;	// workaround for split-bin issue
+		outinfo.track[outtoc.numtrks-2].offset = 150 * (outtoc.tracks[outtoc.numtrks-2].datasize+outtoc.tracks[outtoc.numtrks-2].subsize);
+		outtoc.tracks[outtoc.numtrks-2].splitframes = 75;
 
 		// skip the pregap when reading the DATA track
 		outtoc.tracks[outtoc.numtrks-1].frames -= 225;
@@ -1635,14 +1618,15 @@ chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_trac
 		outtoc.tracks[trknum].pgtype = 0;
 	}
 
-#if 1
+#if 0
 	for (trknum = 0; trknum < outtoc.numtrks; trknum++)
 	{
-		printf("trk %d: %d frames @ offset %d, pad=%d, area=%d, phys=%d, pregap=%d, pgtype=%d, idx0=%d, idx1=%d, (true %d)\n",
+		printf("trk %d: %d frames @ offset %d, pad=%d, split=%d, area=%d, phys=%d, pregap=%d, pgtype=%d, idx0=%d, idx1=%d, (true %d)\n",
 			trknum+1,
 			outtoc.tracks[trknum].frames,
 			outinfo.track[trknum].offset,
 			outtoc.tracks[trknum].padframes,
+			outtoc.tracks[trknum].splitframes,
 			outtoc.tracks[trknum].multicuearea,
 			outtoc.tracks[trknum].physframeofs,
 			outtoc.tracks[trknum].pregap,
