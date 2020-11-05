@@ -141,10 +141,10 @@ ioport_constructor spectrum_mface1_device::device_input_ports() const
 ROM_START(mface1)
 	ROM_REGION(0x2000, "rom", 0)
 	ROM_DEFAULT_BIOS("mu21e7")
-    ROM_SYSTEM_BIOS(0, "mu12cb", "MU12 CB")  // Very early version, 2KB RAM, page out port 0x5F
-    ROMX_LOAD("mf1_12_cb.rom", 0x0000, 0x2000, CRC(c88fbf9f) SHA1(c3018d1b495b8bc0a135038db0987de7091c9d4c), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(0, "mu12cb", "MU12 CB")  // Very early version, 2KB RAM, page out port 0x5F
+	ROMX_LOAD("mf1_12_cb.rom", 0x0000, 0x2000, CRC(c88fbf9f) SHA1(c3018d1b495b8bc0a135038db0987de7091c9d4c), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "mu2023", "MU 2.0 23")  // pokes only (no toolkit), page out port 0x5F
-    ROMX_LOAD("mf1_20_23.rom", 0x0000, 0x2000, CRC(d4ae8953) SHA1(b442eb634a72fb63f1ccbbd0021a7a581152888d), ROM_BIOS(1))
+	ROMX_LOAD("mf1_20_23.rom", 0x0000, 0x2000, CRC(d4ae8953) SHA1(b442eb634a72fb63f1ccbbd0021a7a581152888d), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "mu20fe", "MU 2.0 FE")  // pokes only (no toolkit)
 	ROMX_LOAD("mf1_20_fe.rom", 0x0000, 0x2000, CRC(fa1b8b0d) SHA1(20cd508b0143166558a7238c7a9ccfbe37b90b0d), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(3, "mu2167", "MU 2.1 67")  // Kempston Disc support, no Beta support
