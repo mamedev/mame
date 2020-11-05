@@ -80,6 +80,7 @@ protected:
 
 	void nes_vt_hh_map(address_map& map);
 
+	uint8_t extra_rom_r();
 	uint8_t vthh_414a_r();
 	void vtfp_411d_w(uint8_t data);
 };

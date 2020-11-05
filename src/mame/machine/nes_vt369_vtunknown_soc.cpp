@@ -299,6 +299,13 @@ uint8_t nes_vt369_alt_soc_device::vthh_414a_r()
 	return 0x80;
 }
 
+uint8_t nes_vt369_alt_soc_device::extra_rom_r()
+{
+	// this reads from the 'extra ROM' area (serial style protocol) and code is copied on gtct885 to e00 in RAM, jumps to it at EDF9: jsr $0e1c
+	return machine().rand();
+}
+
+
 void nes_vt369_alt_soc_device::nes_vt_hh_map(address_map &map)
 {
 	nes_vt02_vt03_soc_device::nes_vt_map(map);
@@ -307,13 +314,13 @@ void nes_vt369_alt_soc_device::nes_vt_hh_map(address_map &map)
 
 	map(0x414a, 0x414a).r(FUNC(nes_vt369_alt_soc_device::vthh_414a_r));
 	map(0x411d, 0x411d).w(FUNC(nes_vt369_alt_soc_device::vtfp_411d_w));
+
+	map(0x4153, 0x4153).r(FUNC(nes_vt369_alt_soc_device::extra_rom_r)); // extra SPI? / SEEPROM port?
 }
 
 
 void nes_vt369_alt_swap_d5_d6_soc_device::encryption_4169_w(uint8_t data)
 {
-
-
 	if (data == 0x01)
 		downcast<n2a03_core_swap_op_d5_d6 &>(*m_maincpu).set_encryption_state(false);
 	else if (data == 0x00)

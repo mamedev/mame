@@ -740,6 +740,27 @@ ROM_START( dgun2577 )
 	ROM_LOAD( "blackarcade_dump_dreambook-my_arcade.bin", 0x00000, 0x800000, CRC(9b95b912) SHA1(573c938a0f1acca8f3b75900fd0185bfe28d4fa5) )
 ROM_END
 
+ROM_START( lxcyber )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "lexibook_dump_correct.bin", 0x00000, 0x800000, CRC(74b71846) SHA1(e7dcfa7c53cc7d30678763c6e60f7a3250768849) )
+ROM_END
+
+ROM_START( gtct885 )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "ct-885 g25q64c.bin", 0x00000, 0x800000, CRC(a5b2b568) SHA1(79de79364fa731e421627ec68e3bfa9d311aa7fc) )
+
+	ROM_REGION( 0x100, "extra", 0 ) // additional 8-pin chip (maybe SEEPROM? or PROM?)
+	ROM_LOAD( "mystery chip.bin", 0x00000, 0x100, CRC(8173c1c2) SHA1(7521a4676166a81a79209638491026b2d8e32895) )
+ROM_END
+
+ROM_START( rd5_240 )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "red5.bin", 0x00000, 0x800000, CRC(0e564e73) SHA1(c29a927c830ab3876e9b63e2d41bef962c05518f) )
+
+	ROM_REGION( 0x100, "extra", 0 ) // additional 8-pin chip (maybe SEEPROM? or PROM?)
+	ROM_LOAD( "mystery chip.bin", 0x00000, 0x100, NO_DUMP )
+ROM_END
+
 ROM_START( myarccn )
 	ROM_REGION( 0x100000, "mainrom", 0 )
 	ROM_LOAD( "my_arcade_caveman_ninja.bin", 0x00000, 0x100000, CRC(dcc5590c) SHA1(a734cb9c81e58346ff5fa934347d7cb24a32cb39) )
@@ -892,8 +913,14 @@ CONS( 200?, lpgm240,    0,        0,  nes_vt369_vtunknown_hh_swap_8mb,        ne
 CONS( 200?, tup240,     lpgm240,  0,  nes_vt369_vtunknown_hh_swap_8mb,        nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Thumbs Up", "Thumbs Up 240-in-1 Mini Arcade Machine", MACHINE_NOT_WORKING )
 
 // VT369, but doesn't use most features
-CONS( 201?, unkra200,   mc_tv200, 0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "200 in 1 Retro Arcade", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 201?, dgun2577,   mc_tv200, 0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "DreamGear", "My Arcade Retro Machine 200-in-1 (DGUN-2577)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, unkra200,   mc_tv200, 0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>",    "200 in 1 Retro Arcade", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, dgun2577,   mc_tv200, 0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "DreamGear",    "My Arcade Retro Machine 200-in-1 (DGUN-2577)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, lxcyber,    mc_tv200, 0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Lexibook",     "Cyber Arcade 200-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+ // menu is protected with code from extra ROM
+CONS( 201?, gtct885,    mc_tv200, 0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Gaming Tech",  "Gaming Tech CT-885", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+ // similar to above, but with 40 extra games, menu is protected with code from extra ROM (although RTS opcodes seem to work)
+CONS( 201?, rd5_240,    0,        0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Red5",         "Mini Arcade Machine 240-in-1 (Red5)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
 
 // VT369, but doesn't use most features
 CONS( 201?, myarccn,   0, 0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "DreamGear", "My Arcade Caveman Ninja", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
