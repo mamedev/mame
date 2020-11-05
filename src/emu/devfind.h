@@ -836,6 +836,44 @@ protected:
 template <unsigned Count> using memory_bank_array_creator = object_array_finder<memory_bank_creator, Count>;
 
 
+/// \brief Base class for optional I/O port finders
+///
+/// Adds helpers for to test whether the I/O port was found, and to read
+/// the port value or return a default if the I/O port was not found.
+template <>
+class object_finder_base<ioport_port, false> : public object_finder_common_base<ioport_port, false>
+{
+public:
+	/// \brief Read I/O port if found or return default value
+	///
+	/// If the I/O port was found, this reads a value from the I/O port
+	/// and returns it.  If the I/O port was not found, the default
+	/// value (supplied as a parameter) is returned.
+	/// \param [in] defval Value to return if I/O port was not found.
+	/// \return Value read from I/O port if found, or supplied default
+	///   value otherwise.
+	ioport_value read_safe(ioport_value defval) { return this->m_target ? this->m_target->read() : defval; }
+
+	/// \brief Return whether target has been found
+	///
+	/// Works on the assumption that the target object pointer will
+	/// be non-null if the target has been found, and null
+	/// otherwise.
+	/// \return True if object has been found, or false otherwise.
+	bool found() const { return this->m_target != nullptr; }
+
+	/// \brief Cast-to-Boolean operator
+	///
+	/// Allows truth tests to test whether it's safe to dereference
+	/// the object, similar to pointers and various C++ standard
+	/// library objects.
+	/// \return True if safe to dereference, or false otherwise.
+	explicit operator bool() const { return this->m_target != nullptr; }
+
+	using object_finder_common_base<ioport_port, false>::object_finder_common_base;
+};
+
+
 /// \brief I/O port finder template
 ///
 /// Template argument is whether the I/O port is required.  It is a
@@ -853,16 +891,6 @@ public:
 	///   it is the caller's responsibility to ensure this pointer
 	///   remains valid until resolution time.
 	ioport_finder(device_t &base, char const *tag);
-
-	/// \brief Read I/O port if found or return default value
-	///
-	/// If the I/O port was found, this reads a value from the I/O port
-	/// and returns it.  If the I/O port was not found, the default
-	/// value (supplied as a parameter) is returned.
-	/// \param [in] defval Value to return if I/O port was not found.
-	/// \return Value read from I/O port if found, or supplied default
-	///   value otherwise.
-	ioport_value read_safe(ioport_value defval) { return this->m_target ? this->m_target->read() : defval; }
 
 private:
 	/// \brief Find I/O port

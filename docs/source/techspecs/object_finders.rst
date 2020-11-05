@@ -43,8 +43,8 @@ memory_bank_creator
     optional version, because the target object will always be found or
     created.
 required_ioport, optional_ioport
-    Finds and I/O port from a device’s input port definitions.  The target is
-    the ``ioport_port`` object.
+    Finds an I/O port from a device’s input port definitions.  The target is the
+    ``ioport_port`` object.
 required_address_space, optional_address_space
     Finds a device’s address space.  The target is the ``address_space`` object.
 required_region_ptr<PointerType>, optional_region_ptr<PointerType>
@@ -200,5 +200,238 @@ much the same way as pointers::
         return m_prom[offset];
     }
 
-For convenience, object finders that target the base addresses of memory regions
+For convenience, object finders that target the base pointer of memory regions
 and shares can be indexed like arrays.
+
+
+Connections between devices
+---------------------------
+
+Devices need to be connected together within a system.  For example the Sun SBus
+device needs access to the host CPU and address space.  Here’s how we declare
+the object finders in the device class (with all distractions removed)::
+
+    DECLARE_DEVICE_TYPE(SBUS, sbus_device)
+
+    class sbus_device : public device_t, public device_memory_interface
+    {
+        template <typename T, typename U>
+        sbus_device(
+                machine_config const &mconfig, char const *tag, device_t *owner, u32 clock,
+                T &&cpu_tag,
+                U &&space_tag, int space_num) :
+            sbus_device(mconfig, tag, owner, clock)
+        {
+            set_cpu(std::forward<T>(cpu_tag));
+            set_type1space(std::forward<U>(space_tag), space_num);
+        }
+
+        sbus_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+            device_t(mconfig, type, tag, owner, clock),
+            device_memory_interface(mconfig, *this),
+            m_maincpu(*this, finder_base::DUMMY_TAG),
+            m_type1space(*this, finder_base::DUMMY_TAG, -1)
+        {
+        }
+
+        template <typename T> void set_cpu(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
+        template <typename T> void set_type1space(T &&tag, int num) { m_type1space.set_tag(std::forward<T>(tag), num); }
+
+    protected:
+        required_device<sparc_base_device> m_maincpu;
+        required_address_space m_type1space;
+    };
+
+There are several things to take note of here:
+
+* Object finder members are declared for the things the device needs to access.
+* The device doesn’t know how it will fit into a larger system, the object
+  finders are constructed with dummy arguments.
+* Configuration member functions are provided to set the tag for the host CPU,
+  and the tag and index for the type 1 address space.
+* In addition to the standard device constructor, a constructor with additional
+  parameters for setting the CPU and type 1 address space is provided.
+
+The constant ``finder_base::DUMMY_TAG`` is guaranteed to be invalid and will not
+resolve to an object.  This makes it easy to detect incomplete configuration and
+report an error.  Address spaces are numbered from zero, so a negative address
+space number is invalid.
+
+The member functions for configuring object finders take a universal reference
+to a tag-like object (templated type with ``&&`` qualifier), as well as any
+other parameters needed by the specific type of object finder.  An address space
+finder needs an address space number in addition to a tag-like object.
+
+So what’s a tag-like object?  Three things are supported:
+
+* A C string pointer (``char const *``) representing a tag relative to the
+  device being configured.  Note that the object finder will not copy the
+  string.  The caller must ensure it remains valid until resolution and/or
+  validation is complete.
+* Another object finder.  The object finder will take on its current target.
+* For device finders, a reference to an instance of the target device type,
+  setting the target to that device.  Note that this will not work if the device
+  is subsequently replaced in the machine configuration.  It’s most often used
+  with ``*this``.
+
+The additional constructor that sets initial configuration delegates to the
+standard constructor and then calls the configuration member functions.  It’s
+purely for convenience.
+
+When we want to instantiate this device and hook it up, we do this::
+
+    SPARCV7(config, m_maincpu, 20'000'000);
+
+    ADDRESS_MAP_BANK(config, m_type1space);
+
+    SBUS(config, m_sbus, 20'000'000);
+    m_sbus->set_cpu(m_maincpu);
+    m_sbus->set_type1space(m_type1space, 0);
+
+We supply the same object finders to instantiate the CPU and address space
+devices, and to configure the SBus device.
+
+Note that we could also use literal C strings to configure the SBus device, at
+the cost of needing to update the tags in multiple places if they change::
+
+    SBUS(config, m_sbus, 20'000'000);
+    m_sbus->set_cpu("maincpu");
+    m_sbus->set_type1space("type1", 0);
+
+If we want to use the convenience constructor, we just supply additional
+arguments when instantiating the device::
+
+    SBUS(config, m_sbus, 20'000'000, m_maincpu, m_type1space, 0);
+
+
+Object finder arrays
+--------------------
+
+Many systems have multiple similar devices, I/O ports or other resources that
+can be logically organised as an array.  To simplify these use cases, object
+finder array types are provided.  The object finder array type names have
+``_array`` added to them:
+
++------------------------+------------------------------+
+| required_device        | required_device_array        |
++------------------------+------------------------------+
+| optional_device        | optional_device_array        |
++------------------------+------------------------------+
+| required_memory_region | required_memory_region_array |
++------------------------+------------------------------+
+| optional_memory_region | optional_memory_region_array |
++------------------------+------------------------------+
+| required_memory_bank   | required_memory_bank_array   |
++------------------------+------------------------------+
+| optional_memory_bank   | optional_memory_bank_array   |
++------------------------+------------------------------+
+| memory_bank_creator    | memory_bank_array_creator    |
++------------------------+------------------------------+
+| required_ioport        | required_ioport_array        |
++------------------------+------------------------------+
+| optional_ioport        | optional_ioport_array        |
++------------------------+------------------------------+
+| required_address_space | required_address_space_array |
++------------------------+------------------------------+
+| optional_address_space | optional_address_space_array |
++------------------------+------------------------------+
+| required_region_ptr    | required_region_ptr_array    |
++------------------------+------------------------------+
+| optional_region_ptr    | optional_region_ptr_array    |
++------------------------+------------------------------+
+| required_shared_ptr    | required_shared_ptr_array    |
++------------------------+------------------------------+
+| optional_shared_ptr    | optional_shared_ptr_array    |
++------------------------+------------------------------+
+
+A common case for an object array finder is a key matrix::
+
+    class keyboard_base : public device_t, public device_mac_keyboard_interface
+    {
+    protected:
+        keyboard_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock) :
+            device_t(mconfig, type, tag, owner, clock),
+            device_mac_keyboard_interface(mconfig, *this),
+            m_rows(*this, "ROW%u", 0U)
+        {
+        }
+
+        u8 bus_r()
+        {
+            u8 result(0xffU);
+            for (unsigned i = 0U; m_rows.size() > i; ++i)
+            {
+                if (!BIT(m_row_drive, i))
+                    result &= m_rows[i]->read();
+            }
+            return result;
+        }
+
+        required_ioport_array<10> m_rows;
+    };
+
+Constructing an object finder array is similar to constructing an object finder,
+except that rather than just a tag you supply a tag format string and index
+offset.  In this case, the tags of the I/O ports in the array will be ``ROW0``,
+``ROW1``, ``ROW2``, … ``ROW9``.  Note that the object finder array allocates
+dynamic storage for the tags, which remain valid until destruction.
+
+The object finder array is used in much the same way as a ``std::array`` of the
+underlying object finder type.  It supports indexing, iterators, and range-based
+``for`` loops.
+
+Because an index offset is specified, the tags don’t need to use zero-based
+indices.  It’s common to use one-based indexing like this::
+
+    class dooyong_state : public driver_device
+    {
+    protected:
+        dooyong_state(machine_config const &mconfig, device_type type, char const *tag) :
+            driver_device(mconfig, type, tag),
+            m_bg(*this, "bg%u", 1U),
+            m_fg(*this, "fg%u", 1U)
+        {
+        }
+
+        optional_device_array<dooyong_rom_tilemap_device, 2> m_bg;
+        optional_device_array<dooyong_rom_tilemap_device, 2> m_fg;
+    };
+
+This causes ``m_bg`` to find devices with tags ``bg1`` and ``bg2``, while
+``m_fg`` finds devices with tags ``fg1`` and ``fg2``.  Note that the indexes
+into the object finder arrays are still zero-based like any other C array.
+
+It’s also possible to other format conversions, like hexadecimal (``%x`` and
+``%X``) or character (``%c``)::
+
+    class eurit_state : public driver_device
+    {
+    public:
+        eurit_state(machine_config const &mconfig, device_type type, char const *tag) :
+            driver_device(mconfig, type, tag),
+            m_keys(*this, "KEY%c", 'A')
+        {
+        }
+
+    private:
+        required_ioport_array<5> m_keys;
+    };
+
+In this case, the key matrix ports use tags ``KEYA``, ``KEYB``, ``KEYC``,
+``KEYD`` and ``KEYE``.
+
+When the tags don’t follow a simple ascending sequence, you can supply a
+brace-enclosed initialiser list of tags::
+
+    class seabattl_state : public driver_device
+    {
+    public:
+        seabattl_state(machine_config const &mconfig, device_type type, char const *tag) :
+            driver_device(mconfig, type, tag),
+            m_digits(*this, { "sc_thousand", "sc_hundred", "sc_half", "sc_unity", "tm_half", "tm_unity" })
+        {
+        }
+
+    private:
+        required_device_array<dm9368_device, 6> m_digits;
+    };
