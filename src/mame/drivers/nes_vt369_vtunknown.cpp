@@ -105,19 +105,6 @@ protected:
 	required_device<nes_vt02_vt03_soc_device> m_soc;
 };
 
-
-class nes_vt369_vtunknown_swap_op_d5_d6_state : public nes_vt369_vtunknown_state
-{
-public:
-	nes_vt369_vtunknown_swap_op_d5_d6_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt369_vtunknown_state(mconfig, type, tag)
-	{ }
-
-	void nes_vt369_vtunknown_vh2009_8mb(machine_config& config);
-protected:
-};
-
-
 class nes_vt369_vtunknown_cy_state : public nes_vt369_vtunknown_state
 {
 public:
@@ -173,6 +160,8 @@ public:
 	void nes_vt369_vtunknown_hh(machine_config& config);
 	void nes_vt369_vtunknown_hh_4mb(machine_config& config);
 	void nes_vt369_vtunknown_hh_8mb(machine_config& config);
+
+	void nes_vt369_vtunknown_hh_swap_8mb(machine_config& config);
 
 	void nes_vt369_vtunknown_unk(machine_config& config);
 	void nes_vt369_vtunknown_unk_1mb(machine_config& config);
@@ -470,6 +459,19 @@ void nes_vt369_vtunknown_unk_state::nes_vt369_vtunknown_hh(machine_config &confi
 	m_soc->force_bad_dma();
 }
 
+void nes_vt369_vtunknown_unk_state::nes_vt369_vtunknown_hh_swap_8mb(machine_config &config)
+{
+	nes_vt369_vtunknown_4k_ram(config);
+
+	NES_VT369_SOC_SWAP(config.replace(), m_soc, NTSC_APU_CLOCK);
+	configure_soc(m_soc);
+
+	m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB);
+	m_soc->force_bad_dma();
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt369_vtunknown_unk_state::vt_external_space_map_8mbyte);
+}
+
+
 void nes_vt369_vtunknown_unk_state::nes_vt369_vtunknown_hh_8mb(machine_config& config)
 {
 	nes_vt369_vtunknown_hh(config);
@@ -560,19 +562,6 @@ void nes_vt369_vtunknown_dg_fapocket_state::nes_vt369_vtunknown_fa_4x16mb(machin
 	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_read_412c_callback().set(FUNC(nes_vt369_vtunknown_dg_fapocket_state::fapocket_412c_r));
 	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_write_412c_callback().set(FUNC(nes_vt369_vtunknown_dg_fapocket_state::fapocket_412c_w));
 }
-
-
-void nes_vt369_vtunknown_swap_op_d5_d6_state::nes_vt369_vtunknown_vh2009_8mb(machine_config& config)
-{
-	NES_VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
-
-	NES_VT02_VT03_SOC_SCRAMBLE(config.replace(), m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
-
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt369_vtunknown_swap_op_d5_d6_state::vt_external_space_map_8mbyte);
-}
-
 
 static INPUT_PORTS_START( nes_vt369_vtunknown_fa )
 	PORT_INCLUDE(nes_vt369_vtunknown)
@@ -830,6 +819,10 @@ CONS( 201?, mc_cb280,   0,        0,  nes_vt369_vtunknown_hh_4mb, nes_vt369_vtun
 // Plays intro music but then crashes. same hardware as SY-88x but uses more features
 CONS( 2016, mog_m320,   0,        0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "MOGIS",    "MOGIS M320 246 in 1 Handheld", MACHINE_NOT_WORKING )
 
+// VT369, but doesn't use most features
+CONS( 200?, lpgm240,    0,        0,  nes_vt369_vtunknown_hh_swap_8mb,        nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "Let's Play! Game Machine 240 in 1", MACHINE_NOT_WORKING ) // mini 'retro-arcade' style cabinet
+CONS( 200?, tup240,     lpgm240,  0,  nes_vt369_vtunknown_hh_swap_8mb,        nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Thumbs Up", "Thumbs Up 240-in-1 Mini Arcade Machine", MACHINE_NOT_WORKING )
+
 /****************************************************************************************************************
 
     Things below seem on heavily enhanced hardware of unknown VT type
@@ -893,9 +886,6 @@ CONS( 2017, rtvgc300fz,0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknow
 CONS( 201?, denv150,   0,        0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init, "Denver", "Denver Game Console GMP-240C 150-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 201?, egame150,  denv150,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init, "<unknown>", "E-Game! 150-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
-// uncertain, uses SPI ROM
-CONS( 200?, lpgm240,    0,        0,  nes_vt369_vtunknown_vh2009_8mb,        nes_vt369_vtunknown, nes_vt369_vtunknown_swap_op_d5_d6_state, empty_init, "<unknown>", "Let's Play! Game Machine 240 in 1", MACHINE_NOT_WORKING ) // mini 'retro-arcade' style cabinet
-CONS( 200?, tup240,     lpgm240,  0,  nes_vt369_vtunknown_vh2009_8mb,        nes_vt369_vtunknown, nes_vt369_vtunknown_swap_op_d5_d6_state, empty_init, "Thumbs Up!", "Thumbs Up! 240-in-1 Mini Arcade Machine", MACHINE_NOT_WORKING )
 
 // uncertain, uses SPI ROM
 CONS( 2017, otrail,     0,        0,  nes_vt369_vtunknown_unk_1mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Basic Fun", "The Oregon Trail", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
