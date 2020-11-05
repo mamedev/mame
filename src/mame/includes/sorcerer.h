@@ -60,8 +60,6 @@ public:
 		, m_centronics(*this, "centronics")
 		, m_cart(*this, "cartslot")
 		, m_ram(*this, RAM_TAG)
-		, m_vram(*this, "vram")
-		, m_cram(*this, "cram")
 		, m_dma(*this, "dma")
 		, m_fdc3(*this, "fdc3")
 		, m_fdc4(*this, "fdc4")
@@ -127,8 +125,6 @@ protected:
 	required_device<centronics_device> m_centronics;
 	optional_device<generic_slot_device> m_cart;
 	required_device<ram_device> m_ram;
-	required_shared_ptr<u8> m_vram;
-	required_shared_ptr<u8> m_cram;
 	optional_device<z80dma_device> m_dma;
 	optional_device<fd1793_device> m_fdc3;
 	optional_device<wd2793_device> m_fdc4;
