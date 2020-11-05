@@ -160,6 +160,7 @@ public:
 	void nes_vt369_vtunknown_hh(machine_config& config);
 	void nes_vt369_vtunknown_hh_4mb(machine_config& config);
 	void nes_vt369_vtunknown_hh_8mb(machine_config& config);
+	void nes_vt369_vtunknown_hh_16mb(machine_config& config);
 
 	void nes_vt369_vtunknown_hh_swap_8mb(machine_config& config);
 
@@ -478,6 +479,12 @@ void nes_vt369_vtunknown_unk_state::nes_vt369_vtunknown_hh_8mb(machine_config& c
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt369_vtunknown_unk_state::vt_external_space_map_8mbyte);
 }
 
+void nes_vt369_vtunknown_unk_state::nes_vt369_vtunknown_hh_16mb(machine_config& config)
+{
+	nes_vt369_vtunknown_hh(config);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt369_vtunknown_unk_state::vt_external_space_map_16mbyte);
+}
+
 void nes_vt369_vtunknown_unk_state::nes_vt369_vtunknown_hh_4mb(machine_config& config)
 {
 	nes_vt369_vtunknown_hh(config);
@@ -769,6 +776,22 @@ ROM_START( myarccn )
 	ROM_LOAD( "internal.bin", 0x0000, 0x1000, CRC(da5850f0) SHA1(39d674d965818922aad5993e9499170d3ebc43bf) ) 
 ROM_END
 
+ROM_START( hkb502 )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "red console.bin", 0x00000, 0x400000, CRC(e4766383) SHA1(64b0c20592f38928b3a639fa42b468ff09664808) )
+
+	ROM_REGION( 0x1000, "internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
+	ROM_LOAD( "internal.bin", 0x0000, 0x1000, CRC(da5850f0) SHA1(39d674d965818922aad5993e9499170d3ebc43bf) ) 
+ROM_END
+
+ROM_START( hkb502a )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "hkb-502.bin", 0x00000, 0x400000, CRC(970f54d2) SHA1(b45df00d85a2e29fe9418563927584a048db94b3) )
+
+	ROM_REGION( 0x1000, "internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
+	ROM_LOAD( "internal.bin", 0x0000, 0x1000, CRC(da5850f0) SHA1(39d674d965818922aad5993e9499170d3ebc43bf) ) 
+ROM_END
+
 ROM_START( denv150 )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
 	ROM_LOAD( "denver150in1.bin", 0x00000, 0x1000000, CRC(6b3819d7) SHA1(b0039945ce44a52ea224ab736d5f3c6980409b5d) ) // 2nd half is blank
@@ -778,6 +801,12 @@ ROM_START( egame150 )
 	ROM_REGION( 0x800000, "mainrom", 0 )
 	ROM_LOAD( "rom.bin", 0x00000, 0x800000, CRC(113819d7) SHA1(b0039945ce44a52ea224ab736d5f3c6980409b5d) )
 ROM_END
+
+ROM_START( retro400 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "retro fc 400-in-1.bin", 0x00000, 0x1000000, CRC(4bf9991b) SHA1(ce9cac61cfc950d832d47afc76eb6c1488eeb2ca) )
+ROM_END
+
 
 ROM_START( mog_m320 )
 	ROM_REGION( 0x800000, "mainrom", 0 )
@@ -921,6 +950,8 @@ CONS( 201?, gtct885,    mc_tv200, 0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtun
  // similar to above, but with 40 extra games, menu is protected with code from extra ROM (although RTS opcodes seem to work)
 CONS( 201?, rd5_240,    0,        0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Red5",         "Mini Arcade Machine 240-in-1 (Red5)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
+CONS( 201?, hkb502,   0,      0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "HKB-502 268-in-1 (set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, hkb502a,  hkb502, 0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "HKB-502 268-in-1 (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // VT369, but doesn't use most features
 CONS( 201?, myarccn,   0, 0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "DreamGear", "My Arcade Caveman Ninja", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
@@ -928,6 +959,9 @@ CONS( 201?, myarccn,   0, 0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, n
 // confirmed VT369, uses more features (including sound CPU)
 CONS( 201?, denv150,   0,        0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init, "Denver", "Denver Game Console GMP-240C 150-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 201?, egame150,  denv150,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init, "<unknown>", "E-Game! 150-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
+// doesn't use most features
+CONS( 201?, retro400,  0,        0,  nes_vt369_vtunknown_hh_16mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "Retro FC 400-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // uncertain, uses SPI ROM so probably VT369
 CONS( 2017, otrail,     0,        0,  nes_vt369_vtunknown_unk_1mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Basic Fun", "The Oregon Trail", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
