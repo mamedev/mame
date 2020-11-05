@@ -676,7 +676,19 @@ ROM_END
 ROM_START( lpgm240 )
 	ROM_REGION( 0x800000, "mainrom", 0 )
 	ROM_LOAD( "w25q64jv.u1", 0x00000, 0x800000, CRC(b973e65b) SHA1(36ff137068ea56b4679c2db386ac0067de0a9eaf) )
+
+	ROM_REGION( 0x1000, "internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
+	ROM_LOAD( "internal.bin", 0x0000, 0x1000, CRC(57c9cea9) SHA1(4f338e5ef87a66601014ad726cfefefbc20dc4be) ) 
 ROM_END
+
+ROM_START( tup240 )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "mini_arcade240.bin", 0x00000, 0x800000, CRC(d4b4bf6c) SHA1(9cf4557e27bc8659079c62abdd22a311e1843047) )
+
+	ROM_REGION( 0x1000, "internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
+	ROM_LOAD( "internal.bin", 0x0000, 0x1000, CRC(57c9cea9) SHA1(4f338e5ef87a66601014ad726cfefefbc20dc4be) ) 
+ROM_END
+
 
 ROM_START( sy889 )
 	ROM_REGION( 0x800000, "mainrom", 0 )
@@ -719,10 +731,28 @@ ROM_START( unkra200 ) // "Winbond 25Q64FVSIG 1324" SPI ROM
 	ROM_LOAD( "retro_machine_rom", 0x00000, 0x800000, CRC(0e824aa7) SHA1(957e98868559ecc22b3fa42c76692417b76bf132) )
 ROM_END
 
+ROM_START( dgun2577 )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "blackarcade_dump_dreambook-my_arcade.bin", 0x00000, 0x800000, CRC(9b95b912) SHA1(573c938a0f1acca8f3b75900fd0185bfe28d4fa5) )
+ROM_END
+
+ROM_START( myarccn )
+	ROM_REGION( 0x100000, "mainrom", 0 )
+	ROM_LOAD( "my_arcade_caveman_ninja.bin", 0x00000, 0x100000, CRC(dcc5590c) SHA1(a734cb9c81e58346ff5fa934347d7cb24a32cb39) )
+
+	ROM_REGION( 0x1000, "internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
+	ROM_LOAD( "internal.bin", 0x0000, 0x1000, CRC(da5850f0) SHA1(39d674d965818922aad5993e9499170d3ebc43bf) ) 
+ROM_END
+
 
 ROM_START( denv150 )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
 	ROM_LOAD( "denver150in1.bin", 0x00000, 0x1000000, CRC(6b3819d7) SHA1(b0039945ce44a52ea224ab736d5f3c6980409b5d) ) // 2nd half is blank
+ROM_END
+
+ROM_START( egame150 )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "rom.bin", 0x00000, 0x800000, CRC(113819d7) SHA1(b0039945ce44a52ea224ab736d5f3c6980409b5d) )
 ROM_END
 
 ROM_START( mog_m320 )
@@ -749,6 +779,11 @@ ROM_START( zonefusn )
 	ROM_LOAD( "fusion.bin", 0x00000, 0x1000000, CRC(240bf970) SHA1(1b82d95a252c08e52fb8da6320276574a30b60db) )
 ROM_END
 
+ROM_START( gcs2mgp )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "gcs2_v4.u3", 0x00000, 0x1000000, CRC(3b5be765) SHA1(c54f1a732d638b0ee582ca822715c9d3a3af5ef3) )
+ROM_END
+
 void nes_vt369_vtunknown_state::init_lxcmcypp()
 {
 	int size = memregion("mainrom")->bytes()/2;
@@ -770,7 +805,11 @@ CONS( 201?, mc_hh210,   0,        0,  nes_vt369_vtunknown_4k_ram_16mb, nes_vt369
 // First half of games don't work, probably bad dump
 CONS( 201?, dvnimbus,   0,        0,  nes_vt369_vtunknown_unk_16mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "DVTech Nimbus 176 in 1", MACHINE_NOT_WORKING )
  // probably another Thumbs Up product? cursor doesn't work unless nes_vt369_vtunknown_hh machine is used? possibly newer than VT02 as it runs from an SPI ROM, might just not use enhanced features.  Some minor game name changes to above (eg Smackdown just becomes Wrestling)
-CONS( 201?, unkra200,   mc_tv200, 0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "200 in 1 Retro Arcade", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, unkra200,   mc_tv200, 0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "200 in 1 Retro Arcade", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, dgun2577,   mc_tv200, 0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "DreamGear", "My Arcade Retro Machine 200-in-1 (DGUN-2577)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 201?, myarccn,   0, 0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "DreamGear", "My Arcade Caveman Ninja", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
 
 // is this vt09 or vt32?
 // Use DIP switch to select console or cartridge, as cartridge is fake and just toggles a ROM high address bit
@@ -851,18 +890,26 @@ CONS( 2017, rtvgc300fz,0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknow
 */
 
 // confirmed VT369
-CONS( 201?, denv150,   0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init, "Denver", "Denver Game Console GMP-240C 150-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, denv150,   0,        0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init, "Denver", "Denver Game Console GMP-240C 150-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, egame150,  denv150,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init, "<unknown>", "E-Game! 150-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // uncertain, uses SPI ROM
-CONS( 200?, lpgm240,    0,  0,  nes_vt369_vtunknown_vh2009_8mb,        nes_vt369_vtunknown, nes_vt369_vtunknown_swap_op_d5_d6_state, empty_init, "<unknown>", "Let's Play! Game Machine 240 in 1", MACHINE_NOT_WORKING ) // mini 'retro-arcade' style cabinet
+CONS( 200?, lpgm240,    0,        0,  nes_vt369_vtunknown_vh2009_8mb,        nes_vt369_vtunknown, nes_vt369_vtunknown_swap_op_d5_d6_state, empty_init, "<unknown>", "Let's Play! Game Machine 240 in 1", MACHINE_NOT_WORKING ) // mini 'retro-arcade' style cabinet
+CONS( 200?, tup240,     lpgm240,  0,  nes_vt369_vtunknown_vh2009_8mb,        nes_vt369_vtunknown, nes_vt369_vtunknown_swap_op_d5_d6_state, empty_init, "Thumbs Up!", "Thumbs Up! 240-in-1 Mini Arcade Machine", MACHINE_NOT_WORKING )
 
-// incertain, uses SPI ROM
+// uncertain, uses SPI ROM
 CONS( 2017, otrail,     0,        0,  nes_vt369_vtunknown_unk_1mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Basic Fun", "The Oregon Trail", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
+// uncertain, NOT SPI ROM
+CONS( 200?, zonefusn,  0,         0,  nes_vt369_vtunknown_fp_16mb,     nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Ultimate Products / Jungle's Soft", "Zone Fusion",  MACHINE_NOT_WORKING )
+
+// NOT SPI roms, start with '6a' 
 
 // uncertain, intial code isn't valid? scrambled?
 CONS( 201?, red5mam,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init, "Red5", "Mini Arcade Machine (Red5)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
 // uncertain, very similar to red5mam
 CONS( 2016, dgun2593,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init, "dreamGEAR", "My Arcade Retro Arcade Machine - 300 Handheld Video Games (DGUN-2593)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
+// similar, starts with a '6a' ror a opcode which is presumably encrypted / extended, then normal looking code, then unknown instructions
+CONS( 200?, gcs2mgp,   0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init, "Jungle's Soft", "Mini Game Player 48-in-1",  MACHINE_NOT_WORKING )
 
-// uncertain, NOT SPI ROM
-CONS( 200?, zonefusn,  0,         0,  nes_vt369_vtunknown_fp_16mb,     nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Ultimate Products / Jungle's Soft", "Zone Fusion",  MACHINE_NOT_WORKING )
+
