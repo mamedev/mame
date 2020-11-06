@@ -3840,6 +3840,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs017_state::iqblocka_interrupt)
 
 MACHINE_RESET_MEMBER(igs017_state,iqblocka)
 {
+	machine_reset();
 	m_input_select = 0;
 }
 
