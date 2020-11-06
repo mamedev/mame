@@ -26636,7 +26636,7 @@ license:CC0
 	</software>
 
 	<software name="stellar7">
-		<description>Stellar 7 (cleanly cracked)</description>
+		<description>Stellar 7 (Penguin Software) (cleanly cracked)</description>
 		<year>1983</year>
 		<publisher>Penguin Software</publisher>
 		<info name="release" value="2016-11-22"/>
@@ -37325,7 +37325,7 @@ license:CC0
 	</software>
 
 	<software name="ootopss">
-		<description>Oo-Topos (Sentient Software) (cleanly cracked)</description>
+		<description>Oo-Topos (Sentient Software release) (cleanly cracked)</description>
 		<year>1981</year>
 		<publisher>Sentient Software</publisher>
 		<info name="release" value="2020-10-17"/>
@@ -37448,6 +37448,92 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="vortex (4am crack).dsk" size="143360" crc="f82bc31a" sha1="3ee47a454af5b10a923ccb3d37488e967985808d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="camptril">
+		<description>Campaign Trilogy (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Synergistic Software</publisher>
+		<info name="release" value="2020-11-02"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="campaign trilogy (4am crack) side a.dsk" size="143360" crc="2ac785e6" sha1="c377255bc975d5039739a79adcc87da3a23ff5ae"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="campaign trilogy (4am crack) side b.dsk" size="143360" crc="37137e35" sha1="3cbbfaa18e5ce4786d5ffaf53f58820156ce2276"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionshar">
+		<description>The Lion's Share (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Davka Corporation</publisher>
+		<info name="release" value="2020-11-02"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the lion's share (4am crack) side a.dsk" size="143360" crc="96d41c64" sha1="7d6fc61b0ab879cf0d6d773c1acb559228ef81c1"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the lion's share (4am crack) side b.dsk" size="143360" crc="3c32d295" sha1="7bb2a4bae042f400c52a1953dd47d01c4c6ba25f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stel7sec">
+		<description>Stellar 7 (Software Entertainment Company release) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Software Entertainment Company</publisher>
+
+		<info name="release" value="2020-11-02"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="stellar 7 (software entertainment company) (4am crack).dsk" size="143360" crc="4068c80b" sha1="0e4ef0b16c1122bc03f8479f6b76112dbf12a721"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suprcube">
+		<description>SuperCube (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>Software Alternatives</publisher>
+		<info name="release" value="2020-11-03"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="supercube (4am crack).dsk" size="143360" crc="7169e89f" sha1="0e3f259cf84dc08388831dec228b5ef4147ab1bc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kukulcan">
+		<description>Kukulcan (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>American Eagle</publisher>
+		<info name="release" value="2020-11-03"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="kukulcan (4am crack) side a.dsk" size="143360" crc="f0c9ac1e" sha1="fc61acd2fe5c65b704fc2ea5582351c703d8c5a7"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="kukulcan (4am crack) side b.dsk" size="143360" crc="12414c30" sha1="3a5850edff0d9f549d80404c1287f1af2f81d623"/>
 			</dataarea>
 		</part>
 	</software>
