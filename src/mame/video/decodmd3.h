@@ -43,7 +43,7 @@ protected:
 private:
 	required_device<cpu_device> m_cpu;
 	required_device<mc6845_device> m_mc6845;
-	required_device<ram_device> m_ram;
+	required_shared_ptr<uint8_t> m_ram;
 	required_memory_bank m_rambank;
 	required_memory_bank m_rombank;
 

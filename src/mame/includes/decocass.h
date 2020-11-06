@@ -55,6 +55,7 @@ public:
 	}
 
 	void decocass(machine_config &config);
+	void decocrom(machine_config &config);
 
 	void init_decocass();
 	void init_decocrom();
