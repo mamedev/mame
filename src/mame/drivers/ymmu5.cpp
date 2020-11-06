@@ -76,7 +76,7 @@ void mu5_state::mu5_io_map(address_map &map)
 	map(h8_device::PORT_7, h8_device::PORT_7).r(FUNC(mu5_state::matrix_r));
 	map(h8_device::PORT_B, h8_device::PORT_B).rw(FUNC(mu5_state::lcd_data_r), FUNC(mu5_state::lcd_data_w));
 
-	map(h8_device::ADC_7, h8_device::ADC_7).lr8(NAME([]() -> u8 { return 0xff; }));	// battery level
+	map(h8_device::ADC_7, h8_device::ADC_7).lr8(NAME([]() -> u8 { return 0xff; })); // battery level
 }
 
 void mu5_state::ymw258_map(address_map &map)
@@ -194,9 +194,9 @@ static INPUT_PORTS_START(mu5)
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("1") PORT_CODE(KEYCODE_1)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Octave Up") PORT_CODE(KEYCODE_LEFT)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Octave Down") PORT_CODE(KEYCODE_RIGHT)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Mstr Tune") PORT_CODE(KEYCODE_4)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Trns Pose") PORT_CODE(KEYCODE_3)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Mute Lock") PORT_CODE(KEYCODE_2)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Mstr Tune") PORT_CODE(KEYCODE_A)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Trns Pose") PORT_CODE(KEYCODE_S)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Mute Lock") PORT_CODE(KEYCODE_D)
 
 	PORT_START("SE")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Velo City") PORT_CODE(KEYCODE_Q)
