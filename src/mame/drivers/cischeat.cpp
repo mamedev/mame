@@ -893,7 +893,7 @@ void captflag_state::oki2_map(address_map &map)
 void cischeat_state::bigrun_map2(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();                                                 // ROM
-	map(0x040000, 0x047fff).ram().share("share1");                              // Shared RAM (with Main CPU)
+	map(0x040000, 0x043fff).ram().share("share1");                              // Shared RAM (with Main CPU)
 	map(0x080000, 0x0807ff).ram().share("roadram.0");   // Road RAM
 	map(0x0c0000, 0x0c3fff).ram();                                                 // RAM
 }
@@ -901,7 +901,7 @@ void cischeat_state::bigrun_map2(address_map &map)
 void cischeat_state::bigrun_map3(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();                                                 // ROM
-	map(0x040000, 0x047fff).ram().share("share2");                              // Shared RAM (with Main CPU)
+	map(0x040000, 0x043fff).ram().share("share2");                              // Shared RAM (with Main CPU)
 	map(0x080000, 0x0807ff).ram().share("roadram.1");   // Road RAM
 	map(0x0c0000, 0x0c3fff).ram();                                                 // RAM
 }
@@ -940,7 +940,7 @@ void cischeat_state::cischeat_map3(address_map &map)
 void cischeat_state::f1gpstar_map2(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();                                                 // ROM
-	map(0x080000, 0x0807ff).ram().share("share1");                              // Shared RAM (with Main CPU)
+	map(0x080000, 0x087fff).ram().share("share1");                              // Shared RAM (with Main CPU)
 	map(0x100000, 0x1007ff).ram().share("roadram.0");   // Road RAM
 	map(0x180000, 0x183fff).ram();                                                 // RAM
 	map(0x200000, 0x200001).nopw();                                            // watchdog
@@ -949,7 +949,7 @@ void cischeat_state::f1gpstar_map2(address_map &map)
 void cischeat_state::f1gpstar_map3(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();                                                 // ROM
-	map(0x080000, 0x0807ff).ram().share("share2");                              // Shared RAM (with Main CPU)
+	map(0x080000, 0x087fff).ram().share("share2");                              // Shared RAM (with Main CPU)
 	map(0x100000, 0x1007ff).ram().share("roadram.1");   // Road RAM
 	map(0x180000, 0x183fff).ram();                                                 // RAM
 	map(0x200000, 0x200001).nopw();                                            // watchdog
