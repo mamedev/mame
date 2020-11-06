@@ -32,7 +32,6 @@ public:
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
-	void setup_main_sysctrl(machine_config &config, const XTAL clock);
 	void rockn2(machine_config &config);
 	void tetrisp2(machine_config &config);
 	void nndmseal(machine_config &config);
@@ -47,6 +46,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_rot);
 
 protected:
+	void setup_main_sysctrl(machine_config &config, const XTAL clock);
+	void setup_main_sprite(machine_config &config, const XTAL clock);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_WRITE_LINE_MEMBER(timer_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq_w);
@@ -243,7 +244,7 @@ private:
 	TILE_GET_INFO_MEMBER(stepstag_get_tile_info_fg);
 	u32 screen_update_stepstag_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	u32 screen_update_stepstag_mid(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	u32 screen_update_stepstag_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_stepstag_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	u32 screen_update_stepstag_main(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 //  inline int mypal(int x);
 
@@ -252,7 +253,7 @@ private:
 	void vjdash_map(address_map &map);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(field_cb);
-	void setup_non_sysctrl_screen(machine_config &config, screen_device *screen);
+	void setup_non_sysctrl_screen(machine_config &config, screen_device *screen, const XTAL xtal);
 
 	required_device<cpu_device> m_subcpu;
 	optional_device<ms32_sprite_device> m_vj_sprite_l;

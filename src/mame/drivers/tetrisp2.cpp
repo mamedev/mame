@@ -1625,6 +1625,15 @@ void tetrisp2_state::setup_main_sysctrl(machine_config &config, const XTAL clock
 	m_sysctrl->sound_reset_cb().set(FUNC(tetrisp2_state::sound_reset_line_w));
 }
 
+void tetrisp2_state::setup_main_sprite(machine_config &config, const XTAL clock)
+{
+	JALECO_MEGASYSTEM32_SPRITE(config, m_sprite, clock);
+	m_sprite->set_palette(m_palette);
+	m_sprite->set_color_base(0);
+	m_sprite->set_color_entries(16);
+	m_sprite->set_zoom(false);
+}
+
 void tetrisp2_state::tetrisp2(machine_config &config)
 {
 	/* basic machine hardware */
@@ -1636,19 +1645,16 @@ void tetrisp2_state::tetrisp2(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8);    /* guess */
 
 	/* video hardware */
+	constexpr XTAL pixel_clock = XTAL(48'000'000)/8;
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(XTAL(48'000'000)/8, 384, 0, 320, 263, 0, 224); // default CRTC setup
+	m_screen->set_raw(pixel_clock, 384, 0, 320, 263, 0, 224); // default CRTC setup
 	m_screen->set_screen_update(FUNC(tetrisp2_state::screen_update_tetrisp2));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tetrisp2);
 	PALETTE(config, m_palette).set_entries(0x8000);
 
-	JALECO_MEGASYSTEM32_SPRITE(config, m_sprite, XTAL(48'000'000)); // 48MHz for video?
-	m_sprite->set_palette(m_palette);
-	m_sprite->set_color_base(0);
-	m_sprite->set_color_entries(16);
-
+	setup_main_sprite(config, pixel_clock);
 	setup_main_sysctrl(config, XTAL(48'000'000));
 
 	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,tetrisp2)
@@ -1674,21 +1680,18 @@ void tetrisp2_state::nndmseal(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// An odd one: it uses the faster dot clock divider setting
-	// but they replaced the xtal to a OSC1(42.9545MHz) (so with these settings it reaches ~60 Hz)
-    m_screen->set_raw(XTAL(42'954'545)/6, 455, 0, 384, 262, 0, 240);
+	// but they replaced the xtal to a OSC1(42.9545MHz), I guess they compensated to not go out of ~60 Hz
+	constexpr XTAL pixel_clock = XTAL(42'954'545)/6;
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+    m_screen->set_raw(pixel_clock, 455, 0, 384, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(tetrisp2_state::screen_update_tetrisp2));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tetrisp2);
 	PALETTE(config, m_palette).set_entries(0x8000);
 
-	JALECO_MEGASYSTEM32_SPRITE(config, m_sprite, XTAL(42'954'545)/6);
-	m_sprite->set_palette(m_palette);
-	m_sprite->set_color_base(0);
-	m_sprite->set_color_entries(16);
-	
+	setup_main_sprite(config, pixel_clock);
 	setup_main_sysctrl(config, XTAL(42'954'545));
 
 	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,nndmseal)  // bg layer offset
@@ -1711,19 +1714,16 @@ void tetrisp2_state::rockn(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
+	constexpr XTAL pixel_clock = XTAL(48'000'000)/8;
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-    m_screen->set_raw(XTAL(48'000'000)/8, 384, 0, 320, 263, 0, 224);
+    m_screen->set_raw(pixel_clock, 384, 0, 320, 263, 0, 224);
 	m_screen->set_screen_update(FUNC(tetrisp2_state::screen_update_rockntread));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tetrisp2);
 	PALETTE(config, m_palette).set_entries(0x8000);
 
-	JALECO_MEGASYSTEM32_SPRITE(config, m_sprite, XTAL(48'000'000/8)); // 48MHz for video?
-	m_sprite->set_palette(m_palette);
-	m_sprite->set_color_base(0);
-	m_sprite->set_color_entries(16);
-
+	setup_main_sprite(config, pixel_clock);
 	setup_main_sysctrl(config, XTAL(48'000'000));
 
 	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,rockntread)
@@ -1749,20 +1749,17 @@ void tetrisp2_state::rockn2(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
+	constexpr XTAL pixel_clock = XTAL(48'000'000)/8;
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// TODO: during POST it sets up a vertical size of 487, is it trying to setup an interlace setting?
-    m_screen->set_raw(XTAL(48'000'000)/8, 384, 0, 320, 263, 0, 224);
+    m_screen->set_raw(pixel_clock, 384, 0, 320, 263, 0, 224);
 	m_screen->set_screen_update(FUNC(tetrisp2_state::screen_update_rockntread));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tetrisp2);
 	PALETTE(config, m_palette).set_entries(0x8000);
 
-	JALECO_MEGASYSTEM32_SPRITE(config, m_sprite, XTAL(48'000'000)/8); // 48MHz for video?
-	m_sprite->set_palette(m_palette);
-	m_sprite->set_color_base(0);
-	m_sprite->set_color_entries(16);
-
+	setup_main_sprite(config, pixel_clock);
 	setup_main_sysctrl(config, XTAL(48'000'000));
 
 	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,rockntread)
@@ -1774,11 +1771,6 @@ void tetrisp2_state::rockn2(machine_config &config)
 	ymz280b_device &ymz(YMZ280B(config, "ymz", XTAL(16'934'400))); // 16.9344MHz
 	ymz.add_route(0, "lspeaker", 1.0);
 	ymz.add_route(1, "rspeaker", 1.0);
-}
-
-WRITE_LINE_MEMBER(rocknms_state::sub_flipscreen_w)
-{
-	// ...
 }
 
 WRITE_LINE_MEMBER(rocknms_state::sub_field_irq_w)
@@ -1816,33 +1808,32 @@ void rocknms_state::rocknms(machine_config &config)
 
 	/* video hardware */
 
+	config.set_default_layout(layout_rocknms);
+	
+	constexpr XTAL pixel_clock = XTAL(48'000'000)/8;
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_orientation(ROT0);
+	m_screen->set_raw(pixel_clock, 384, 0, 320, 263, 0, 224);
+	m_screen->set_screen_update(FUNC(rocknms_state::screen_update_rocknms_left));
+
+	SCREEN(config, m_sub_screen, SCREEN_TYPE_RASTER);
+	m_sub_screen->set_orientation(ROT270);
+	m_sub_screen->set_raw(pixel_clock, 384, 0, 320, 263, 0, 224);
+	m_sub_screen->set_screen_update(FUNC(rocknms_state::screen_update_rocknms_right));
+
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tetrisp2);
 	PALETTE(config, m_palette).set_entries(0x8000);
 
 	GFXDECODE(config, m_sub_gfxdecode, m_sub_palette, gfx_rocknms_sub);
 	PALETTE(config, m_sub_palette).set_entries(0x8000);
 
-	JALECO_MEGASYSTEM32_SPRITE(config, m_sprite, XTAL(48'000'000)/8); // 48MHz for video?
-	m_sprite->set_palette(m_palette);
-	m_sprite->set_color_base(0);
-	m_sprite->set_color_entries(16);
+	setup_main_sprite(config, pixel_clock);
 
-	JALECO_MEGASYSTEM32_SPRITE(config, m_rocknms_sub_sprite, XTAL(48'000'000)/8); // 48MHz for video?
+	JALECO_MEGASYSTEM32_SPRITE(config, m_rocknms_sub_sprite, pixel_clock); // 48MHz for video?
 	m_rocknms_sub_sprite->set_palette(m_sub_palette);
 	m_rocknms_sub_sprite->set_color_base(0);
 	m_rocknms_sub_sprite->set_color_entries(16);
-
-	config.set_default_layout(layout_rocknms);
-
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_orientation(ROT0);
-	m_screen->set_raw(XTAL(48'000'000)/8, 384, 0, 320, 263, 0, 224);
-	m_screen->set_screen_update(FUNC(rocknms_state::screen_update_rocknms_left));
-
-	SCREEN(config, m_sub_screen, SCREEN_TYPE_RASTER);
-	m_sub_screen->set_orientation(ROT270);
-	m_sub_screen->set_raw(XTAL(48'000'000)/8, 384, 0, 320, 263, 0, 224);
-	m_sub_screen->set_screen_update(FUNC(rocknms_state::screen_update_rocknms_right));
+	m_rocknms_sub_sprite->set_zoom(false);
 
 	setup_main_sysctrl(config, XTAL(48'000'000));
 	
@@ -1872,12 +1863,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(stepstag_state::field_cb)
 	m_subcpu->set_input_line(4, HOLD_LINE);
 }
 
-void stepstag_state::setup_non_sysctrl_screen(machine_config &config, screen_device *screen)
+void stepstag_state::setup_non_sysctrl_screen(machine_config &config, screen_device *screen, const XTAL xtal)
 {
 	// TODO: unknown clock and parameters
-	// assume there's a 42.954 MHz like nndmseal to compensate the higher res
-	// I seriously doubt 
-	screen->set_raw(XTAL(42'954'545)/6, 455, 0, 352, 262, 0, 240);
+	// assume there's a 42.954 MHz/6 like nndmseal to compensate the higher res
+	screen->set_raw(xtal/6, 455, 0, 352, 262, 0, 240);
 }
 
 void stepstag_state::stepstag(machine_config &config)
@@ -1885,7 +1875,10 @@ void stepstag_state::stepstag(machine_config &config)
 	M68000(config, m_maincpu, XTAL(12'000'000)); // unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &stepstag_state::stepstag_map);
 
-	M68000(config, m_subcpu, XTAL(42'954'545)/3); // unknown
+	constexpr XTAL subxtal = XTAL(42'954'545); // unknown	
+	constexpr XTAL sub_pixel_clock = subxtal/6;
+
+	M68000(config, m_subcpu, subxtal/3);
 	m_subcpu->set_addrmap(AS_PROGRAM, &stepstag_state::stepstag_sub_map);
 	TIMER(config, "field_timer").configure_periodic(FUNC(stepstag_state::field_cb), attotime::from_hz(30));
 
@@ -1898,26 +1891,26 @@ void stepstag_state::stepstag(machine_config &config)
 	// this screen arrangement is weird:
 	// it writes a regular 320x224 screen setup to the CRTC but none of these matches a 352 width, 
 	// we are either missing a bit from the config regs or those writes are null and 
-	// these screens are driven by something else ...
+	// these screens are driven by something else.
+	// Also note: main 68k tilemap/sprite/palette aren't even displayed with this arrangement,
+	// even tho usage is minimal (POST/test mode), maybe just a left-over ...
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	lscreen.set_orientation(ROT270);
-	setup_non_sysctrl_screen(config, &lscreen);
+	setup_non_sysctrl_screen(config, &lscreen, subxtal);
 	lscreen.set_screen_update(FUNC(stepstag_state::screen_update_stepstag_left));
-//  lscreen.set_palette(m_vj_palette_l));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_orientation(ROT0);
+	// TODO: connected to the non sysctrl CRTC anyway?
 	m_screen->set_raw(XTAL(48'000'000)/8, 384, 0, 320, 263, 0, 224);
 	m_screen->set_screen_update(FUNC(stepstag_state::screen_update_stepstag_mid));
-//  m_screen->set_palette(m_vj_palette_m));
 
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
 	rscreen.set_orientation(ROT270);
-	setup_non_sysctrl_screen(config, &rscreen);
+	setup_non_sysctrl_screen(config, &rscreen, subxtal);
 	rscreen.set_screen_update(FUNC(stepstag_state::screen_update_stepstag_right));
-	rscreen.set_palette(m_vj_palette_r);
 
-	MCFG_VIDEO_START_OVERRIDE(stepstag_state, stepstag )
+	MCFG_VIDEO_START_OVERRIDE(stepstag_state, stepstag)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tetrisp2);
 	PALETTE(config, m_palette).set_entries(0x8000);
 
@@ -1929,24 +1922,31 @@ void stepstag_state::stepstag(machine_config &config)
 	m_sprite->set_palette(m_palette);
 	m_sprite->set_color_base(0);
 	m_sprite->set_color_entries(16);
+	m_sprite->set_zoom(false);
 
 	// (left screen, vertical in stepping stage)
-	JALECO_MEGASYSTEM32_SPRITE(config, m_vj_sprite_l, XTAL(48'000'000)/8); // unknown
+	JALECO_MEGASYSTEM32_SPRITE(config, m_vj_sprite_l, sub_pixel_clock); // unknown
 	m_vj_sprite_l->set_palette(m_vj_palette_l);
 	m_vj_sprite_l->set_color_base(0);
 	m_vj_sprite_l->set_color_entries(0x80);
+	m_vj_sprite_l->set_zoom(false);
+	m_vj_sprite_l->set_yuv(true);
 
 	// (mid screen, horizontal)
-	JALECO_MEGASYSTEM32_SPRITE(config, m_vj_sprite_m, XTAL(48'000'000)/8); // unknown
+	JALECO_MEGASYSTEM32_SPRITE(config, m_vj_sprite_m, sub_pixel_clock); // unknown
 	m_vj_sprite_m->set_palette(m_vj_palette_m);
 	m_vj_sprite_m->set_color_base(0);
 	m_vj_sprite_m->set_color_entries(0x80);
+	m_vj_sprite_m->set_zoom(false);
+	m_vj_sprite_m->set_yuv(true);
 
 	// (right screens, vertical in stepping stage)
-	JALECO_MEGASYSTEM32_SPRITE(config, m_vj_sprite_r, XTAL(48'000'000)/8); // unknown
+	JALECO_MEGASYSTEM32_SPRITE(config, m_vj_sprite_r, sub_pixel_clock); // unknown
 	m_vj_sprite_r->set_palette(m_vj_palette_r);
 	m_vj_sprite_r->set_color_base(0);
 	m_vj_sprite_r->set_color_entries(0x80);
+	m_vj_sprite_r->set_zoom(false);
+	m_vj_sprite_r->set_yuv(true);
 
 	setup_main_sysctrl(config, XTAL(48'000'000));
 
@@ -1958,7 +1958,7 @@ void stepstag_state::stepstag(machine_config &config)
 
 	GENERIC_LATCH_16(config, m_soundlatch);
 
-	ymz280b_device &ymz(YMZ280B(config, "ymz", XTAL(42'954'545)/3)); // unknown
+	ymz280b_device &ymz(YMZ280B(config, "ymz", subxtal/3)); // unknown
 	ymz.add_route(0, "lspeaker", 1.0);
 	ymz.add_route(1, "rspeaker", 1.0);
 }
@@ -1968,7 +1968,11 @@ void stepstag_state::vjdash(machine_config &config)    // 4 Screens
 	M68000(config, m_maincpu, XTAL(12'000'000)); // 12MHz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &stepstag_state::vjdash_map);
 
-	M68000(config, m_subcpu, XTAL(42'954'545)/3); // unknown
+	constexpr XTAL subxtal = XTAL(42'954'545); // unknown
+	constexpr XTAL main_pixel_clock = XTAL(48'000'000)/8;
+	constexpr XTAL sub_pixel_clock = subxtal/6;
+	
+	M68000(config, m_subcpu, subxtal/3);
 	m_subcpu->set_addrmap(AS_PROGRAM, &stepstag_state::stepstag_sub_map);
 	TIMER(config, "field_timer").configure_periodic(FUNC(stepstag_state::field_cb), attotime::from_hz(30));
 
@@ -1979,25 +1983,21 @@ void stepstag_state::vjdash(machine_config &config)    // 4 Screens
 	// video hardware
 	// same as stepstag, we assume that this screen is effectively connected to the system CRTC
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-    m_screen->set_raw(XTAL(48'000'000)/8, 384, 0, 320, 263, 0, 224);
+    m_screen->set_raw(main_pixel_clock, 384, 0, 320, 263, 0, 224);
 	m_screen->set_screen_update(FUNC(stepstag_state::screen_update_stepstag_main));
-//  m_screen->set_screen_update(FUNC(tetrisp2_state::screen_update_rockntread));
 	m_screen->set_palette(m_palette);
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
-	setup_non_sysctrl_screen(config, &lscreen);
+	setup_non_sysctrl_screen(config, &lscreen, subxtal);
 	lscreen.set_screen_update(FUNC(stepstag_state::screen_update_stepstag_left));
-//  lscreen.set_palette(m_vj_palette_l);
 
 	screen_device &mscreen(SCREEN(config, "mscreen", SCREEN_TYPE_RASTER));
-	setup_non_sysctrl_screen(config, &mscreen);
+	setup_non_sysctrl_screen(config, &mscreen, subxtal);
 	mscreen.set_screen_update(FUNC(stepstag_state::screen_update_stepstag_mid));
-//  mscreen.set_palette(m_vj_palette_m);
 
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
-	setup_non_sysctrl_screen(config, &rscreen);
+	setup_non_sysctrl_screen(config, &rscreen, subxtal);
 	rscreen.set_screen_update(FUNC(stepstag_state::screen_update_stepstag_right));
-	rscreen.set_palette(m_vj_palette_r);
 
 	MCFG_VIDEO_START_OVERRIDE(stepstag_state, stepstag )
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tetrisp2);
@@ -2007,30 +2007,33 @@ void stepstag_state::vjdash(machine_config &config)    // 4 Screens
 	PALETTE(config, m_vj_palette_m).set_entries(0x8000);
 	PALETTE(config, m_vj_palette_r).set_entries(0x8000);
 
-	JALECO_MEGASYSTEM32_SPRITE(config, m_sprite, XTAL(48'000'000)/8); // unknown
+	JALECO_MEGASYSTEM32_SPRITE(config, m_sprite, main_pixel_clock); // unknown
 	m_sprite->set_palette(m_palette);
 	m_sprite->set_color_base(0);
 	m_sprite->set_color_entries(16);
 
 	// (left screen, vertical in stepping stage)
-	JALECO_MEGASYSTEM32_SPRITE(config, m_vj_sprite_l, XTAL(48'000'000)/8); // unknown
+	JALECO_MEGASYSTEM32_SPRITE(config, m_vj_sprite_l, sub_pixel_clock); // unknown
 	m_vj_sprite_l->set_palette(m_vj_palette_l);
 	m_vj_sprite_l->set_color_base(0);
 	m_vj_sprite_l->set_color_entries(0x80);
+	m_vj_sprite_l->set_zoom(false);
 
 	// (mid screen, horizontal)
-	JALECO_MEGASYSTEM32_SPRITE(config, m_vj_sprite_m, XTAL(48'000'000)/8); // unknown
+	JALECO_MEGASYSTEM32_SPRITE(config, m_vj_sprite_m, sub_pixel_clock); // unknown
 	m_vj_sprite_m->set_palette(m_vj_palette_m);
 	m_vj_sprite_m->set_color_base(0);
 	m_vj_sprite_m->set_color_entries(0x80);
+	m_vj_sprite_m->set_zoom(false);
 
 	// (right screens, vertical in stepping stage)
-	JALECO_MEGASYSTEM32_SPRITE(config, m_vj_sprite_r, XTAL(48'000'000)/8); // unknown
+	JALECO_MEGASYSTEM32_SPRITE(config, m_vj_sprite_r, sub_pixel_clock); // unknown
 	m_vj_sprite_r->set_palette(m_vj_palette_r);
 	m_vj_sprite_r->set_color_base(0);
 	m_vj_sprite_r->set_color_entries(0x80);
+	m_vj_sprite_r->set_zoom(false);
 
-	setup_main_sysctrl(config, XTAL(48'000'000));
+	setup_main_sysctrl(config, XTAL(48'000'000)); // unknown
 
 	config.set_default_layout(layout_vjdash);
 
@@ -2040,7 +2043,7 @@ void stepstag_state::vjdash(machine_config &config)    // 4 Screens
 
 	GENERIC_LATCH_16(config, m_soundlatch);
 
-	ymz280b_device &ymz(YMZ280B(config, "ymz", XTAL(42'954'545)/3)); // unknown
+	ymz280b_device &ymz(YMZ280B(config, "ymz", subxtal/3)); // unknown
 	ymz.add_route(0, "lspeaker", 1.0);
 	ymz.add_route(1, "rspeaker", 1.0);
 }

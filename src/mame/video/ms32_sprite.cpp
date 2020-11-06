@@ -44,6 +44,8 @@ ms32_sprite_device::ms32_sprite_device(const machine_config &mconfig, const char
 	, device_gfx_interface(mconfig, *this, nullptr)
 	, m_color_base(0)
 	, m_color_entries(0x10)
+	, m_has_zoom(true)
+	, m_has_yuv(false)
 {
 }
 
@@ -101,7 +103,7 @@ void ms32_sprite_device::device_start()
 	gfx(0)->set_colors(m_color_entries);
 }
 
-void ms32_sprite_device::extract_parameters(bool has_zoom, bool is_yuv, const u16 *ram, bool &disable, u8 &pri, bool &flipx, bool &flipy, u32 &code, u32 &color, u8 &tx, u8 &ty, u16 &srcwidth, u16 &srcheight, s32 &sx, s32 &sy, u16 &incx, u16 &incy)
+void ms32_sprite_device::extract_parameters(const u16 *ram, bool &disable, u8 &pri, bool &flipx, bool &flipy, u32 &code, u32 &color, u8 &tx, u8 &ty, u16 &srcwidth, u16 &srcheight, s32 &sx, s32 &sy, u16 &incx, u16 &incy)
 {
 	const u16 attr =   ram[0];
 	pri            = ( attr & 0x00f0);
@@ -116,7 +118,7 @@ void ms32_sprite_device::extract_parameters(bool has_zoom, bool is_yuv, const u1
 
 	code           =   (color & 0x0fff);
 	// encoded to first word when YUV sprites are used
-	if (is_yuv)
+	if (m_has_yuv)
 		color      =   (attr & 0x7f00) >> 8;
 	else
 		color      =   (color >> 12) & 0xf;
@@ -128,7 +130,7 @@ void ms32_sprite_device::extract_parameters(bool has_zoom, bool is_yuv, const u1
 	sx             =   (ram[5] & 0x3ff) - (ram[5] & 0x400);
 	sy             =   (ram[4] & 0x1ff) - (ram[4] & 0x200);
 
-	if (has_zoom)
+	if (m_has_zoom)
 	{
 		incx       =   (ram[6] & 0xffff);
 		incy       =   (ram[7] & 0xffff);

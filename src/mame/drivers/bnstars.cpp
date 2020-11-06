@@ -429,7 +429,7 @@ void ms32_bnstars_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitma
 		u16 xzoom, yzoom;
 		u32 pri_mask = 0;
 
-		m_sprite->extract_parameters(true, false, source, disable, pri, flipx, flipy, code, color, tx, ty, xsize, ysize, sx, sy, xzoom, yzoom);
+		m_sprite->extract_parameters(source, disable, pri, flipx, flipy, code, color, tx, ty, xsize, ysize, sx, sy, xzoom, yzoom);
 
 		if (disable || !xzoom || !yzoom)
 			continue;

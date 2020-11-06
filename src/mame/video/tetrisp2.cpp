@@ -46,6 +46,11 @@ WRITE_LINE_MEMBER(tetrisp2_state::flipscreen_w)
 	m_rot_ofsy = state ? 0x04df : 0x400;
 }
 
+WRITE_LINE_MEMBER(rocknms_state::sub_flipscreen_w)
+{
+	// ...
+}
+
 /***************************************************************************
 
 
@@ -322,7 +327,7 @@ VIDEO_START_MEMBER(rocknms_state,rocknms)
 */
 template<class BitmapClass>
 static void tetrisp2_draw_sprites(BitmapClass &bitmap, bitmap_ind8 &bitmap_pri, const rectangle &cliprect, u8* priority_ram,
-									u16 *sprram_top, size_t sprram_size, ms32_sprite_device *chip, bool is_yuv)
+									u16 *sprram_top, size_t sprram_size, ms32_sprite_device *chip)
 {
 	u16  *source =   sprram_top;
 	u16  *finish =   sprram_top + (sprram_size - 0x10) / 2;
@@ -338,7 +343,7 @@ static void tetrisp2_draw_sprites(BitmapClass &bitmap, bitmap_ind8 &bitmap_pri, 
 		s32 sx, sy;
 		u16 xzoom, yzoom;
 
-		chip->extract_parameters(false, is_yuv, source, disable, pri, flipx, flipy, code, color, tx, ty, xsize, ysize, sx, sy, xzoom, yzoom);
+		chip->extract_parameters(source, disable, pri, flipx, flipy, code, color, tx, ty, xsize, ysize, sx, sy, xzoom, yzoom);
 
 		if (disable || !xzoom || !yzoom)
 			continue;
@@ -435,7 +440,7 @@ u32 tetrisp2_state::screen_update_tetrisp2(screen_device &screen, bitmap_ind16 &
 		m_tilemap_fg->draw(screen, bitmap, cliprect, 0, 1 << 2);
 
 	tetrisp2_draw_sprites(bitmap, screen.priority(), cliprect, m_priority.get(),
-							m_spriteram, m_spriteram.bytes(), m_sprite, false);
+							m_spriteram, m_spriteram.bytes(), m_sprite);
 	return 0;
 }
 
@@ -497,7 +502,7 @@ u32 tetrisp2_state::screen_update_rockntread(screen_device &screen, bitmap_ind16
 		m_tilemap_fg->draw(screen, bitmap, cliprect, 0, 1 << 2);
 
 	tetrisp2_draw_sprites(bitmap, screen.priority(), cliprect, m_priority.get(),
-							m_spriteram, m_spriteram.bytes(), m_sprite, false);
+							m_spriteram, m_spriteram.bytes(), m_sprite);
 	return 0;
 }
 
@@ -559,7 +564,7 @@ u32 rocknms_state::screen_update_rocknms_left(screen_device &screen, bitmap_rgb3
 		m_tilemap_sub_fg->draw(screen, bitmap, cliprect, 0, 1 << 2);
 
 	tetrisp2_draw_sprites(bitmap, screen.priority(), cliprect, m_priority.get(),
-							m_spriteram2, m_spriteram2.bytes(), m_rocknms_sub_sprite, false);
+							m_spriteram2, m_spriteram2.bytes(), m_rocknms_sub_sprite);
 
 	return 0;
 }
@@ -620,7 +625,7 @@ u32 rocknms_state::screen_update_rocknms_right(screen_device &screen, bitmap_rgb
 		m_tilemap_fg->draw(screen, bitmap, cliprect, 0, 1 << 2);
 
 	tetrisp2_draw_sprites(bitmap, screen.priority(), cliprect, m_priority.get(),
-							m_spriteram, m_spriteram.bytes(), m_sprite, false);
+							m_spriteram, m_spriteram.bytes(), m_sprite);
 
 	return 0;
 }
@@ -666,7 +671,7 @@ u32 stepstag_state::screen_update_stepstag_left(screen_device &screen, bitmap_rg
 
 	tetrisp2_draw_sprites(
 			bitmap, screen.priority(), cliprect, m_priority.get(),
-			m_spriteram1, m_spriteram1.bytes(), m_vj_sprite_l, true);
+			m_spriteram1, m_spriteram1.bytes(), m_vj_sprite_l);
 
 	return 0;
 }
@@ -678,7 +683,7 @@ u32 stepstag_state::screen_update_stepstag_mid(screen_device &screen, bitmap_rgb
 
 	tetrisp2_draw_sprites(
 			bitmap, screen.priority(), cliprect, m_priority.get(),
-			m_spriteram2, m_spriteram2.bytes(), m_vj_sprite_m, true);
+			m_spriteram2, m_spriteram2.bytes(), m_vj_sprite_m);
 
 //  m_tilemap_rot->draw(screen, bitmap, cliprect, 0, 1 << 1);
 //  m_tilemap_bg->draw(screen, bitmap, cliprect, 0, 1 << 0);
@@ -687,15 +692,14 @@ u32 stepstag_state::screen_update_stepstag_mid(screen_device &screen, bitmap_rgb
 	return 0;
 }
 
-u32 stepstag_state::screen_update_stepstag_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 stepstag_state::screen_update_stepstag_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	// TODO: doesn't like pen 0?
-	bitmap.fill(m_vj_palette_r->black_pen(), cliprect);
+	bitmap.fill(0, cliprect);
 	screen.priority().fill(0);
 
 	tetrisp2_draw_sprites(
 			bitmap, screen.priority(), cliprect, m_priority.get(),
-			m_spriteram3, m_spriteram3.bytes(), m_vj_sprite_r, true);
+			m_spriteram3, m_spriteram3.bytes(), m_vj_sprite_r);
 
 	return 0;
 }
@@ -755,7 +759,7 @@ u32 stepstag_state::screen_update_stepstag_main(screen_device &screen, bitmap_in
 
 	tetrisp2_draw_sprites(
 			bitmap, screen.priority(), cliprect, m_priority.get(),
-			m_spriteram, m_spriteram.bytes(), m_sprite, false);
+			m_spriteram, m_spriteram.bytes(), m_sprite);
 
 	return 0;
 }
