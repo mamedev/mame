@@ -16,18 +16,22 @@
 	First use in MS32, then their later (?) 68k revision. 
 
 	TODO:
-	- pinpoint exact timing generation (free counter or based on host screen 
-	  beams)
+	- pinpoint exact timing generation for programmable irq
+	  (free counter or based on host screen beams)
 	- interface with multiple screens is a mystery, 
 	  cfr. dual screen bnstars, stepping stage HW. 
 	  Most likely former effectively controls both screens in demux while 
 	  latter has no way to set the other screen(s)?
-	- network irq?
+	- watchdog timing;
+	- upper address line seems unconnected by 68k,
+	  and is it a mystery how watchdog is supposed to route here and assuming
+	  it is and not actually disabled by pin.
+	- network/COPROs irq connections, specifically for f1superb;
 	- actual chip name;
 
 	BTANBs:
-	- in p47aces v1.0 (p47acesa) code messes up the programmable irq timer 
-	  setup, causing SFX overloads by using Spitfire ship with 30 Hz autofire 
+	- in p47aces v1.0 (p47acesa) code messes up the prg irq timer setup, 
+	  causing SFX overloads by using Spitfire ship with 30 Hz autofire 
 	  and shooting at point blank range over walls/enemies. 
 	  This has been fixed in v1.1
 
@@ -80,7 +84,7 @@ void jaleco_ms32_sysctrl_device::amap(address_map& map)
 	map(0x1c, 0x1d).w(FUNC(jaleco_ms32_sysctrl_device::sound_reset_w));
 	map(0x1e, 0x1f).w(FUNC(jaleco_ms32_sysctrl_device::irq_ack_w));
 //	map(0x24, 0x27).w // sound comms bidirectional acks?
-	map(0x28, 0x29).nopw(); // watchdog
+	map(0x28, 0x29).nopw(); // watchdog on MS32
 	map(0x2c, 0x2d).w(FUNC(jaleco_ms32_sysctrl_device::field_ack_w));
 	map(0x2e, 0x2f).w(FUNC(jaleco_ms32_sysctrl_device::vblank_ack_w));
 }
@@ -92,7 +96,6 @@ void jaleco_ms32_sysctrl_device::amap(address_map& map)
 
 void jaleco_ms32_sysctrl_device::device_add_mconfig(machine_config &config)
 {
-	// TODO: how to read from actual screen tag? ":screen" is ugly ugly ugly
 	TIMER(config, "scantimer").configure_scanline(FUNC(jaleco_ms32_sysctrl_device::scanline_cb), m_screen, 0, 1); 
 
 	// TODO: watchdog
@@ -202,14 +205,15 @@ inline void jaleco_ms32_sysctrl_device::crtc_refresh_screen_params()
 	const u16 vtotal = m_crtc.vert_blank + m_crtc.vert_display;
 	const attoseconds_t refresh = HZ_TO_ATTOSECONDS(get_dotclock_frequency()) * htotal * vtotal;
 	visarea.set(0, m_crtc.horz_display - 1, 0, m_crtc.vert_display - 1);
+	logerror("%s: CRTC setup total: %d x %d display: %d x %d\n", this->tag(), htotal, vtotal, m_crtc.horz_display, m_crtc.vert_display);
 	m_screen->configure(htotal, vtotal, visarea, refresh);
 }
 
 void jaleco_ms32_sysctrl_device::control_w(u16 data)
 {
 	/* 
-	 * ---- x--- programmable irq timer enable (1->0 in P47 Aces)
-	 * ---- -x-- used by f1superb, network irq enable?
+	 * ---- x--- programmable irq timer enable
+	 * ---- -x-- used by f1superb, stepstag
 	 * ---- --x- flip screen
 	 * ---- ---x dotclock select (1) 8 MHz (0) 6 MHz
 	 */

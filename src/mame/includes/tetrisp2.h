@@ -251,6 +251,9 @@ private:
 	void stepstag_sub_map(address_map &map);
 	void vjdash_map(address_map &map);
 
+	TIMER_DEVICE_CALLBACK_MEMBER(field_cb);
+	void setup_non_sysctrl_screen(machine_config &config, screen_device *screen);
+
 	required_device<cpu_device> m_subcpu;
 	optional_device<ms32_sprite_device> m_vj_sprite_l;
 	optional_device<ms32_sprite_device> m_vj_sprite_m;

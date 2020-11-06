@@ -1657,7 +1657,7 @@ void tetrisp2_state::tetrisp2(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ymz280b_device &ymz(YMZ280B(config, "ymz", 16.9344_MHz_XTAL)); // 16.9344MHz
+	ymz280b_device &ymz(YMZ280B(config, "ymz", XTAL(16'934'400))); // 16.9344MHz
 	ymz.add_route(0, "lspeaker", 1.0);
 	ymz.add_route(1, "rspeaker", 1.0);
 }
@@ -1864,16 +1864,29 @@ void rocknms_state::rocknms(machine_config &config)
 	ymz.add_route(1, "rspeaker", 1.0);
 }
 
+TIMER_DEVICE_CALLBACK_MEMBER(stepstag_state::field_cb)
+{
+	// TODO: pinpoint the exact source, translate to configure_scanline if necessary
+	// irq 4 is definitely a 30 Hz-ish here as well,
+	// except we have a multi-screen arrangement setup and no way to pinpoint source
+	m_subcpu->set_input_line(4, HOLD_LINE);
+}
+
+void stepstag_state::setup_non_sysctrl_screen(machine_config &config, screen_device *screen)
+{
+	// TODO: unknown clock and parameters
+	// assume there's a 42.954 MHz like nndmseal to compensate the higher res
+	screen->set_raw(XTAL(42'954'545)/6, 455, 0, 352, 262, 0, 240);
+}
 
 void stepstag_state::stepstag(machine_config &config)
 {
 	M68000(config, m_maincpu, XTAL(12'000'000)); // 12MHz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &stepstag_state::stepstag_map);
 
-	M68000(config, m_subcpu, 16000000); //??
+	M68000(config, m_subcpu, XTAL(16'934'400)); // 16.934MHz?
 	m_subcpu->set_addrmap(AS_PROGRAM, &stepstag_state::stepstag_sub_map);
-	// TODO: this is more likely a 30 Hz signal given the screen hacks below
-	m_subcpu->set_vblank_int("lscreen", FUNC(tetrisp2_state::irq4_line_hold)); // lev 6 triggered by main CPU
+	TIMER(config, "field_timer").configure_periodic(FUNC(stepstag_state::field_cb), attotime::from_hz(30));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -1887,29 +1900,19 @@ void stepstag_state::stepstag(machine_config &config)
 	// these screens are driven by something else ...
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	lscreen.set_orientation(ROT270);
-//  lscreen.set_raw(12288000*2, 768, 0, 496, 264*2,0,480);
-	lscreen.set_refresh_hz(30);
-	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	lscreen.set_size(0x160, 0xf0);
-	lscreen.set_visarea(0, 0x160-1, 0, 0xf0-1);
+	setup_non_sysctrl_screen(config, &lscreen);
 	lscreen.set_screen_update(FUNC(stepstag_state::screen_update_stepstag_left));
 //  lscreen.set_palette(m_vj_palette_l));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_orientation(ROT0);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(0x160, 0xf0);
-	m_screen->set_visarea(0, 0x160-1, 0, 0xf0-1);
+	m_screen->set_raw(XTAL(48'000'000)/8, 384, 0, 320, 263, 0, 224);
 	m_screen->set_screen_update(FUNC(stepstag_state::screen_update_stepstag_mid));
 //  m_screen->set_palette(m_vj_palette_m));
 
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
 	rscreen.set_orientation(ROT270);
-	rscreen.set_refresh_hz(30);
-	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	rscreen.set_size(0x160, 0xf0);
-	rscreen.set_visarea(0, 0x160-1, 0, 0xf0-1);
+	setup_non_sysctrl_screen(config, &rscreen);
 	rscreen.set_screen_update(FUNC(stepstag_state::screen_update_stepstag_right));
 	rscreen.set_palette(m_vj_palette_r);
 
@@ -1966,7 +1969,7 @@ void stepstag_state::vjdash(machine_config &config)    // 4 Screens
 
 	M68000(config, m_subcpu, 16000000); //??
 	m_subcpu->set_addrmap(AS_PROGRAM, &stepstag_state::stepstag_sub_map);
-	m_subcpu->set_vblank_int("mscreen", FUNC(tetrisp2_state::irq4_line_hold)); // lev 6 triggered by main CPU
+	TIMER(config, "field_timer").configure_periodic(FUNC(stepstag_state::field_cb), attotime::from_hz(30));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -1981,26 +1984,17 @@ void stepstag_state::vjdash(machine_config &config)    // 4 Screens
 	m_screen->set_palette(m_palette);
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
-	lscreen.set_refresh_hz(30);
-	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	lscreen.set_size(0x160, 0xf0);
-	lscreen.set_visarea(0, 0x160-1, 0, 0xf0-1);
+	setup_non_sysctrl_screen(config, &lscreen);
 	lscreen.set_screen_update(FUNC(stepstag_state::screen_update_stepstag_left));
 //  lscreen.set_palette(m_vj_palette_l);
 
 	screen_device &mscreen(SCREEN(config, "mscreen", SCREEN_TYPE_RASTER));
-	mscreen.set_refresh_hz(30);
-	mscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	mscreen.set_size(0x160, 0xf0);
-	mscreen.set_visarea(0, 0x160-1, 0, 0xf0-1);
+	setup_non_sysctrl_screen(config, &mscreen);
 	mscreen.set_screen_update(FUNC(stepstag_state::screen_update_stepstag_mid));
 //  mscreen.set_palette(m_vj_palette_m);
 
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
-	rscreen.set_refresh_hz(30);
-	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	rscreen.set_size(0x160, 0xf0);
-	rscreen.set_visarea(0, 0x160-1, 0, 0xf0-1);
+	setup_non_sysctrl_screen(config, &rscreen);
 	rscreen.set_screen_update(FUNC(stepstag_state::screen_update_stepstag_right));
 	rscreen.set_palette(m_vj_palette_r);
 
