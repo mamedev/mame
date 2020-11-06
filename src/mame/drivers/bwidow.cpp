@@ -407,21 +407,21 @@ void bwidow_state::irq_ack_w(uint8_t data)
 void bwidow_state::bwidow_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x2000, 0x27ff).ram().share("avg:vectorram");
-	map(0x2800, 0x5fff).rom();
+	map(0x2000, 0x27ff).ram(); // vector RAM
+	map(0x2800, 0x5fff).rom(); // vector ROM
 	map(0x6000, 0x67ff).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x6800, 0x6fff).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x7000, 0x7000).r(FUNC(bwidow_state::earom_read));
 	map(0x7800, 0x7800).portr("IN0");
 	map(0x8000, 0x8000).portr("IN3");
 	map(0x8800, 0x8800).portr("IN4");
-	map(0x8800, 0x8800).w(FUNC(bwidow_state::bwidow_misc_w)); /* coin counters, leds */
+	map(0x8800, 0x8800).w(FUNC(bwidow_state::bwidow_misc_w)); // coin counters, LEDs
 	map(0x8840, 0x8840).w("avg", FUNC(avg_device::go_w));
 	map(0x8880, 0x8880).w("avg", FUNC(avg_device::reset_w));
-	map(0x88c0, 0x88c0).w(FUNC(bwidow_state::irq_ack_w)); /* interrupt acknowledge */
+	map(0x88c0, 0x88c0).w(FUNC(bwidow_state::irq_ack_w)); // interrupt acknowledge
 	map(0x8900, 0x8900).w(FUNC(bwidow_state::earom_control_w));
 	map(0x8940, 0x897f).w(FUNC(bwidow_state::earom_write));
-	map(0x8980, 0x89ed).nopw(); /* watchdog clear */
+	map(0x8980, 0x89ed).nopw(); // watchdog clear
 	map(0x9000, 0xffff).rom();
 }
 
@@ -435,14 +435,14 @@ void bwidow_state::bwidowp_map(address_map &map)
 	map(0x2000, 0x2000).w("avg", FUNC(avg_device::go_w));
 	map(0x2800, 0x2800).w("avg", FUNC(avg_device::reset_w));
 	map(0x3000, 0x3000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x3800, 0x3800).w(FUNC(bwidow_state::bwidow_misc_w)); /* coin counters, leds */
-	map(0x4000, 0x47ff).ram().share("avg:vectorram");
-	map(0x4800, 0x6fff).rom();
-	map(0x6000, 0x6000).w(FUNC(bwidow_state::irq_ack_w)); /* interrupt acknowledge */
+	map(0x3800, 0x3800).w(FUNC(bwidow_state::bwidow_misc_w)); // coin counters, LEDs
+	map(0x4000, 0x47ff).ram(); // vector RAM
+	map(0x4800, 0x6fff).rom(); // vector ROM
+	map(0x6000, 0x6000).w(FUNC(bwidow_state::irq_ack_w)); // interrupt acknowledge
 	map(0x8000, 0x803f).w(FUNC(bwidow_state::earom_write));
 	map(0x8800, 0x8800).w(FUNC(bwidow_state::earom_control_w));
 	map(0x9000, 0x9000).r(FUNC(bwidow_state::earom_read));
-	map(0x9800, 0x9800).nopw(); /* ? written once at startup */
+	map(0x9800, 0x9800).nopw(); // ? written once at startup
 	map(0xa000, 0xffff).rom();
 }
 
@@ -450,20 +450,20 @@ void bwidow_state::spacduel_map(address_map &map)
 {
 	map(0x0000, 0x03ff).ram();
 	map(0x0800, 0x0800).portr("IN0");
-	map(0x0900, 0x0907).r(FUNC(bwidow_state::spacduel_IN3_r));    /* IN1 */
-	map(0x0905, 0x0906).nopw(); /* ignore? */
+	map(0x0900, 0x0907).r(FUNC(bwidow_state::spacduel_IN3_r)); // IN1
+	map(0x0905, 0x0906).nopw(); // ignore?
 	map(0x0a00, 0x0a00).r(FUNC(bwidow_state::earom_read));
-	map(0x0c00, 0x0c00).w(FUNC(bwidow_state::spacduel_coin_counter_w)); /* coin out */
+	map(0x0c00, 0x0c00).w(FUNC(bwidow_state::spacduel_coin_counter_w)); // coin out
 	map(0x0c80, 0x0c80).w("avg", FUNC(avg_device::go_w));
-	map(0x0d00, 0x0d00).nopw(); /* watchdog clear */
+	map(0x0d00, 0x0d00).nopw(); // watchdog clear
 	map(0x0d80, 0x0d80).w("avg", FUNC(avg_device::reset_w));
-	map(0x0e00, 0x0e00).w(FUNC(bwidow_state::irq_ack_w)); /* interrupt acknowledge */
+	map(0x0e00, 0x0e00).w(FUNC(bwidow_state::irq_ack_w)); // interrupt acknowledge
 	map(0x0e80, 0x0e80).w(FUNC(bwidow_state::earom_control_w));
 	map(0x0f00, 0x0f3f).w(FUNC(bwidow_state::earom_write));
 	map(0x1000, 0x10ff).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x1400, 0x14ff).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
-	map(0x2000, 0x27ff).ram().share("avg:vectorram");
-	map(0x2800, 0x3fff).rom();
+	map(0x2000, 0x27ff).ram(); // vector RAM
+	map(0x2800, 0x3fff).rom(); // vector ROM
 	map(0x4000, 0xffff).rom();
 }
 
@@ -781,7 +781,8 @@ void bwidow_state::bwidow(machine_config &config)
 	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
 
 	avg_device &avg(AVG(config, "avg", 0));
-	avg.set_vector_tag("vector");
+	avg.set_vector("vector");
+	avg.set_memory(m_maincpu, AS_PROGRAM, 0x2000);
 
 	/* sound hardware */
 	bwidow_audio(config);
@@ -792,6 +793,8 @@ void bwidow_state::bwidowp(machine_config &config)
 {
 	bwidow(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &bwidow_state::bwidowp_map);
+
+	subdevice<avg_device>("avg")->set_memory(m_maincpu, AS_PROGRAM, 0x4000);
 
 	WATCHDOG_TIMER(config, "watchdog");
 }
