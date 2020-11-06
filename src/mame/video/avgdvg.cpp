@@ -754,7 +754,7 @@ void avg_tempest_device::vggo() // tempest_vggo
 
 int avg_mhavoc_device::handler_1() //  mhavoc_latch1
 {
-	// * Major Havoc just has ymin clipping
+	// Major Havoc just has ymin clipping
 
 	if (!m_lst)
 		vg_add_clip(0, m_ypos, m_xmax << 16, m_ymax << 16);

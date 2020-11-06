@@ -43,6 +43,7 @@
 #include "speaker.h"
 
 
+namespace {
 
 class tomcat_state : public driver_device
 {
@@ -394,5 +395,7 @@ ROM_START( tomcat )
 	ROM_REGION( 0x100, "avg:prom", 0 )
 	ROM_LOAD( "136021-105.1l",   0x0000, 0x0100, CRC(82fc3eb2) SHA1(184231c7baef598294860a7d2b8a23798c5c7da6) ) /* AVG PROM */
 ROM_END
+
+} // anonymous namespace
 
 GAME( 1985, tomcat, 0,        tomcat, tomcat, tomcat_state, empty_init, ROT0, "Atari", "TomCat (prototype)", MACHINE_SUPPORTS_SAVE )
