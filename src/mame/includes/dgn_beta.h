@@ -104,24 +104,6 @@ public:
 
 	void dgnbeta(machine_config &config);
 
-	void dgnbeta_ram_b0_w(offs_t offset, uint8_t data);
-	void dgnbeta_ram_b1_w(offs_t offset, uint8_t data);
-	void dgnbeta_ram_b2_w(offs_t offset, uint8_t data);
-	void dgnbeta_ram_b3_w(offs_t offset, uint8_t data);
-	void dgnbeta_ram_b4_w(offs_t offset, uint8_t data);
-	void dgnbeta_ram_b5_w(offs_t offset, uint8_t data);
-	void dgnbeta_ram_b6_w(offs_t offset, uint8_t data);
-	void dgnbeta_ram_b7_w(offs_t offset, uint8_t data);
-	void dgnbeta_ram_b8_w(offs_t offset, uint8_t data);
-	void dgnbeta_ram_b9_w(offs_t offset, uint8_t data);
-	void dgnbeta_ram_bA_w(offs_t offset, uint8_t data);
-	void dgnbeta_ram_bB_w(offs_t offset, uint8_t data);
-	void dgnbeta_ram_bC_w(offs_t offset, uint8_t data);
-	void dgnbeta_ram_bD_w(offs_t offset, uint8_t data);
-	void dgnbeta_ram_bE_w(offs_t offset, uint8_t data);
-	void dgnbeta_ram_bF_w(offs_t offset, uint8_t data);
-	void dgnbeta_ram_bG_w(offs_t offset, uint8_t data);
-
 private:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 

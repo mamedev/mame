@@ -339,16 +339,16 @@ void bzone_state::bzone_map(address_map &map)
 	map(0x0a00, 0x0a00).portr("DSW0");
 	map(0x0c00, 0x0c00).portr("DSW1");
 	map(0x1000, 0x1000).w(FUNC(bzone_state::bzone_coin_counter_w));
-	map(0x1200, 0x1200).w("avg", FUNC(avg_bzone_device::go_w));
+	map(0x1200, 0x1200).w("avg", FUNC(avg_device::go_w));
 	map(0x1400, 0x1400).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x1600, 0x1600).w("avg", FUNC(avg_bzone_device::reset_w));
+	map(0x1600, 0x1600).w("avg", FUNC(avg_device::reset_w));
 	map(0x1800, 0x1800).r(m_mathbox, FUNC(mathbox_device::status_r));
 	map(0x1810, 0x1810).r(m_mathbox, FUNC(mathbox_device::lo_r));
 	map(0x1818, 0x1818).r(m_mathbox, FUNC(mathbox_device::hi_r));
 	map(0x1820, 0x182f).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x1840, 0x1840).w(FUNC(bzone_state::bzone_sounds_w));
 	map(0x1860, 0x187f).w(m_mathbox, FUNC(mathbox_device::go_w));
-	map(0x2000, 0x2fff).ram().share("avg:vectorram");
+	map(0x2000, 0x2fff).ram();
 	map(0x3000, 0x7fff).rom();
 }
 
@@ -370,9 +370,9 @@ void redbaron_state::redbaron_map(address_map &map)
 	map(0x0a00, 0x0a00).portr("DSW0");
 	map(0x0c00, 0x0c00).portr("DSW1");
 	map(0x1000, 0x1000).nopw();        /* coin out - Manual states this is "Coin Counter" */
-	map(0x1200, 0x1200).w("avg", FUNC(avg_bzone_device::go_w));
+	map(0x1200, 0x1200).w("avg", FUNC(avg_device::go_w));
 	map(0x1400, 0x1400).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x1600, 0x1600).w("avg", FUNC(avg_bzone_device::reset_w));
+	map(0x1600, 0x1600).w("avg", FUNC(avg_device::reset_w));
 	map(0x1800, 0x1800).r("mathbox", FUNC(mathbox_device::status_r));
 	map(0x1802, 0x1802).portr("IN4");
 	map(0x1804, 0x1804).r("mathbox", FUNC(mathbox_device::lo_r));
@@ -383,7 +383,7 @@ void redbaron_state::redbaron_map(address_map &map)
 	map(0x1810, 0x181f).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x1820, 0x185f).rw(FUNC(redbaron_state::earom_read), FUNC(redbaron_state::earom_write));
 	map(0x1860, 0x187f).nopr().w("mathbox", FUNC(mathbox_device::go_w));
-	map(0x2000, 0x2fff).ram().share("avg:vectorram");
+	map(0x2000, 0x2fff).ram();
 	map(0x3000, 0x7fff).rom();
 }
 
@@ -404,7 +404,7 @@ void redbaron_state::redbaron_map(address_map &map)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Diagnostic Step") \
 	/* bit 6 is the VG HALT bit. We set it to "low" */\
 	/* per default (busy vector processor). */\
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("avg", avg_bzone_device, done_r)\
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("avg", avg_device, done_r)\
 	/* bit 7 is tied to a 3kHz clock */\
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(bzone_state, clock_r)
 
@@ -596,7 +596,8 @@ void bzone_state::bzone_base(machine_config &config)
 	m_screen->set_screen_update("vector", FUNC(vector_device::screen_update));
 
 	avg_device &avg(AVG_BZONE(config, "avg", 0));
-	avg.set_vector_tag("vector");
+	avg.set_vector("vector");
+	avg.set_memory(m_maincpu, AS_PROGRAM, 0x2000);
 
 	/* Drivers */
 	MATHBOX(config, m_mathbox, 0);

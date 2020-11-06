@@ -285,12 +285,12 @@ INPUT_PORTS_END
 
 uint8_t maxaflex_state::pia_pa_r()
 {
-	return atari_input_disabled() ? 0xff : m_joy01.read_safe(0);
+	return atari_input_disabled() ? 0xff : m_joy01->read();
 }
 
 uint8_t maxaflex_state::pia_pb_r()
 {
-	return atari_input_disabled() ? 0xff : m_joy23.read_safe(0);
+	return atari_input_disabled() ? 0xff : m_joy23->read();
 }
 
 

@@ -7199,6 +7199,9 @@ void gmgalax_state::init_gmgalax()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
+	m_stars_enabled = 0;
+	std::fill(std::begin(m_gfxbank), std::end(m_gfxbank), 0);
+
 	/* video extensions */
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, &gmgalax_state::gmgalax_extend_tile_info, &gmgalax_state::gmgalax_extend_sprite_info);
 

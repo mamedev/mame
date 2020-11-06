@@ -58,22 +58,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(render_w);
 
 	u8 m_matrixsel;
-	u8 matrix_r()
-	{
-		s8 row = 0;
-
-		switch (m_matrixsel ^ 0x3f)
-		{
-			case 0x01: row = 0; break;
-			case 0x02: row = 1; break;
-			case 0x04: row = 2; break;
-			case 0x08: row = 3; break;
-			case 0x10: row = 4; break;
-			case 0x20: row = 5; break;
-		}
-
-		return m_key[row]->read();
-	}
+	u8 matrix_r();
 };
 
 void mu5_state::mu5_map(address_map &map)
@@ -91,7 +76,7 @@ void mu5_state::mu5_io_map(address_map &map)
 	map(h8_device::PORT_7, h8_device::PORT_7).r(FUNC(mu5_state::matrix_r));
 	map(h8_device::PORT_B, h8_device::PORT_B).rw(FUNC(mu5_state::lcd_data_r), FUNC(mu5_state::lcd_data_w));
 
-	map(h8_device::ADC_7, h8_device::ADC_7).lr8(NAME([]() -> u8 { return 0xff; }));	// battery level
+	map(h8_device::ADC_7, h8_device::ADC_7).lr8(NAME([]() -> u8 { return 0xff; })); // battery level
 }
 
 void mu5_state::ymw258_map(address_map &map)
@@ -113,6 +98,17 @@ void mu5_state::machine_reset()
 	m_lcd_ctrl = 0;
 	m_lcd_data = 0;
 	m_matrixsel = 0;
+}
+
+u8 mu5_state::matrix_r()
+{
+	u8 data = 0x3f;
+
+	for (int i = 0; i < 6; i++)
+		if (!BIT(m_matrixsel, i))
+			data &= m_key[i]->read();
+
+	return data;
 }
 
 void mu5_state::lcd_ctrl_w(u16 data)
@@ -184,6 +180,7 @@ static INPUT_PORTS_START(mu5)
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("0") PORT_CODE(KEYCODE_0)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("9") PORT_CODE(KEYCODE_9)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("8") PORT_CODE(KEYCODE_8)
+	PORT_BIT(0x38, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("SC")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("7") PORT_CODE(KEYCODE_7)
@@ -197,9 +194,9 @@ static INPUT_PORTS_START(mu5)
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("1") PORT_CODE(KEYCODE_1)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Octave Up") PORT_CODE(KEYCODE_LEFT)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Octave Down") PORT_CODE(KEYCODE_RIGHT)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Mstr Tune") PORT_CODE(KEYCODE_4)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Trns Pose") PORT_CODE(KEYCODE_3)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Mute Lock") PORT_CODE(KEYCODE_2)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Mstr Tune") PORT_CODE(KEYCODE_A)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Trns Pose") PORT_CODE(KEYCODE_S)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Mute Lock") PORT_CODE(KEYCODE_D)
 
 	PORT_START("SE")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Velo City") PORT_CODE(KEYCODE_Q)

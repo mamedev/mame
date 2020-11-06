@@ -85,6 +85,9 @@ DEBUG TRICKS:
 #include "softlist.h"
 #include "tilemap.h"
 
+
+namespace {
+
 #define DRAW_DEBUG_ROZ          (0)
 
 #define DRAW_DEBUG_UNK_SPRITE   (0)
@@ -131,11 +134,12 @@ public:
 
 	void supracan(machine_config &config);
 
-private:
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
+private:
 	void supracan_mem(address_map &map);
 	void supracan_sound_mem(address_map &map);
 
@@ -1974,6 +1978,10 @@ void supracan_state::machine_reset()
 
 	m_video_timer->adjust(m_screen->time_until_pos(0, 0));
 	m_irq_mask = 0;
+
+	m_roz_base_addr = 0;
+	m_roz_mode = 0;
+	std::fill(std::begin(m_tilemap_base_addr), std::end(m_tilemap_base_addr), 0);
 }
 
 /* gfxdecode is retained for reference purposes but not otherwise used by the driver */
@@ -2093,6 +2101,9 @@ void supracan_state::supracan(machine_config &config)
 
 ROM_START( supracan )
 ROM_END
+
+} // Anonymous namespace
+
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     STATE           INIT        COMPANY                  FULLNAME        FLAGS */
 CONS( 1995, supracan, 0,      0,      supracan, supracan, supracan_state, empty_init, "Funtech Entertainment", "Super A'Can",  MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

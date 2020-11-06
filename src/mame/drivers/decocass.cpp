@@ -1008,6 +1008,12 @@ void decocass_state::decocass(machine_config &config)
 	AY8910(config, "ay2", HCLK2).add_route(ALL_OUTPUTS, "mono", 0.40);
 }
 
+void decocass_state::decocrom(machine_config &config)
+{
+	decocass(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &decocass_state::decocrom_map);
+}
+
 
 void decocass_type1_state::ctsttape(machine_config &config)
 {
@@ -1140,7 +1146,7 @@ void decocass_type1_state::cluckypo(machine_config &config)
 
 void decocass_type1_state::ctisland(machine_config &config)
 {
-	decocass(config);
+	decocrom(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,ctisland)
@@ -1148,7 +1154,7 @@ void decocass_type1_state::ctisland(machine_config &config)
 
 void decocass_type1_state::ctisland3(machine_config &config)
 {
-	decocass(config);
+	decocrom(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,ctisland3)
@@ -1156,7 +1162,7 @@ void decocass_type1_state::ctisland3(machine_config &config)
 
 void decocass_type1_state::cexplore(machine_config &config)
 {
-	decocass(config);
+	decocrom(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cexplore)

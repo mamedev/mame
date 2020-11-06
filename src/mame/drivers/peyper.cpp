@@ -53,7 +53,9 @@ public:
 		, m_switch(*this, "SWITCH.%u", 0)
 		, m_leds(*this, "led_%u", 1U)
 		, m_dpl(*this, "dpl_%u", 0U)
-	{ }
+	{
+		std::fill(std::begin(m_disp_layout), std::end(m_disp_layout), 0);
+	}
 
 	template <int Mask> DECLARE_CUSTOM_INPUT_MEMBER(wolfman_replay_hs_r);
 	void init_peyper();
@@ -592,7 +594,6 @@ void peyper_state::machine_start()
 	genpin_class::machine_start();
 
 	m_digit = 0;
-	std::fill(std::begin(m_disp_layout), std::end(m_disp_layout), 0);
 
 	m_leds.resolve();
 	m_dpl.resolve();
@@ -902,4 +903,4 @@ GAME( 1986, nemesisp, 0,        peyper,   wolfman,  peyper_state, init_wolfman, 
 GAME( 1987, odisea,   0,        peyper,   odisea,   peyper_state, init_wolfman, ROT0, "Peyper",     "Odisea Paris-Dakar",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 GAME( 1988, hangonp,  0,        peyper,   sonstwar, peyper_state, init_peyper,  ROT0, "Sonic",      "Hang-On (Sonic)",          MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // inputs to be checked
 GAME( 1985, ator,     0,        peyper,   sonstwar, peyper_state, init_peyper,  ROT0, "Video Dens", "Ator",                     MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // initial program ROM missing; no manual found
-GAME( 1994, lancelot, 0,        peyper,   sonstwar, peyper_state, empty_init,   ROT0,  "Peyper",    "Sir Lancelot",             MACHINE_IS_SKELETON_MECHANICAL) // different hardware (see top of file)
+GAME( 1994, lancelot, 0,        peyper,   sonstwar, peyper_state, empty_init,   ROT0, "Peyper",     "Sir Lancelot",             MACHINE_IS_SKELETON_MECHANICAL) // different hardware (see top of file)

@@ -28,9 +28,9 @@ public:
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_fuukivid(*this, "fuukivid")
-		, m_spriteram(*this, "spriteram")
+		, m_spriteram(*this, "spriteram", 0x2000, ENDIANNESS_BIG)
 		, m_vram(*this, "vram.%u", 0)
-		, m_vregs(*this, "vregs")
+		, m_vregs(*this, "vregs", 0x20, ENDIANNESS_BIG)
 		, m_priority(*this, "priority")
 		, m_tilebank(*this, "tilebank")
 		, m_shared_ram(*this, "shared_ram")
@@ -59,9 +59,9 @@ private:
 	required_device<fuukivid_device> m_fuukivid;
 
 	/* memory pointers */
-	required_shared_ptr<u16> m_spriteram;
+	memory_share_creator<u16> m_spriteram;
 	required_shared_ptr_array<u32, 4> m_vram;
-	required_shared_ptr<u16> m_vregs;
+	memory_share_creator<u16> m_vregs;
 	required_shared_ptr<u32> m_priority;
 	required_shared_ptr<u32> m_tilebank;
 	required_shared_ptr<u8> m_shared_ram;

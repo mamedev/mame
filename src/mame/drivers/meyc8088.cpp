@@ -244,10 +244,10 @@ uint8_t meyc8088_state::input_r()
 	uint8_t ret = 0xff;
 
 	// multiplexed switch inputs
-	if (~m_common & 1) ret &= m_switches[0].read_safe(0); // bit switches
-	if (~m_common & 2) ret &= m_switches[1].read_safe(0); // control switches
-	if (~m_common & 4) ret &= m_switches[2].read_safe(0); // light switches
-	if (~m_common & 8) ret &= m_switches[3].read_safe(0); // light switches
+	if (~m_common & 1) ret &= m_switches[0]->read(); // bit switches
+	if (~m_common & 2) ret &= m_switches[1]->read(); // control switches
+	if (~m_common & 4) ret &= m_switches[2]->read(); // light switches
+	if (~m_common & 8) ret &= m_switches[3]->read(); // light switches
 
 	return ret;
 }

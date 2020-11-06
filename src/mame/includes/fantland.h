@@ -21,8 +21,8 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
-		m_spriteram(*this, "spriteram"),
-		m_spriteram2(*this, "spriteram2"),
+		m_spriteram(*this, "spriteram", 0x2800, ENDIANNESS_LITTLE),
+		m_spriteram2(*this, "spriteram2", 0x10000, ENDIANNESS_LITTLE),
 		m_wheel(*this, "WHEEL%u", 0U)
 	{ }
 
@@ -45,8 +45,8 @@ protected:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	/* memory pointers */
-	required_shared_ptr<uint8_t> m_spriteram;
-	required_shared_ptr<uint8_t> m_spriteram2;
+	memory_share_creator<uint8_t> m_spriteram;
+	memory_share_creator<uint8_t> m_spriteram2;
 
 	optional_ioport_array<2> m_wheel;
 

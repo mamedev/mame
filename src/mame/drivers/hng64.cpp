@@ -1775,6 +1775,8 @@ void hng64_state::machine_start()
 		m_videoregs[i] = 0xdeadbeef;
 	}
 
+	m_irq_pending = 0;
+
 	m_3dfifo_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hng64_state::hng64_3dfifo_processed), this));
 	m_comhack_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hng64_state::comhack_callback), this));
 
