@@ -1876,15 +1876,16 @@ void stepstag_state::setup_non_sysctrl_screen(machine_config &config, screen_dev
 {
 	// TODO: unknown clock and parameters
 	// assume there's a 42.954 MHz like nndmseal to compensate the higher res
+	// I seriously doubt 
 	screen->set_raw(XTAL(42'954'545)/6, 455, 0, 352, 262, 0, 240);
 }
 
 void stepstag_state::stepstag(machine_config &config)
 {
-	M68000(config, m_maincpu, XTAL(12'000'000)); // 12MHz?
+	M68000(config, m_maincpu, XTAL(12'000'000)); // unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &stepstag_state::stepstag_map);
 
-	M68000(config, m_subcpu, XTAL(16'934'400)); // 16.934MHz?
+	M68000(config, m_subcpu, XTAL(42'954'545)/3); // unknown
 	m_subcpu->set_addrmap(AS_PROGRAM, &stepstag_state::stepstag_sub_map);
 	TIMER(config, "field_timer").configure_periodic(FUNC(stepstag_state::field_cb), attotime::from_hz(30));
 
@@ -1957,7 +1958,7 @@ void stepstag_state::stepstag(machine_config &config)
 
 	GENERIC_LATCH_16(config, m_soundlatch);
 
-	ymz280b_device &ymz(YMZ280B(config, "ymz", XTAL(16'934'400))); // 16.9344MHz
+	ymz280b_device &ymz(YMZ280B(config, "ymz", XTAL(42'954'545)/3)); // unknown
 	ymz.add_route(0, "lspeaker", 1.0);
 	ymz.add_route(1, "rspeaker", 1.0);
 }
@@ -1967,7 +1968,7 @@ void stepstag_state::vjdash(machine_config &config)    // 4 Screens
 	M68000(config, m_maincpu, XTAL(12'000'000)); // 12MHz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &stepstag_state::vjdash_map);
 
-	M68000(config, m_subcpu, 16000000); //??
+	M68000(config, m_subcpu, XTAL(42'954'545)/3); // unknown
 	m_subcpu->set_addrmap(AS_PROGRAM, &stepstag_state::stepstag_sub_map);
 	TIMER(config, "field_timer").configure_periodic(FUNC(stepstag_state::field_cb), attotime::from_hz(30));
 
@@ -2039,7 +2040,7 @@ void stepstag_state::vjdash(machine_config &config)    // 4 Screens
 
 	GENERIC_LATCH_16(config, m_soundlatch);
 
-	ymz280b_device &ymz(YMZ280B(config, "ymz", XTAL(16'934'400))); // 16.9344MHz
+	ymz280b_device &ymz(YMZ280B(config, "ymz", XTAL(42'954'545)/3)); // unknown
 	ymz.add_route(0, "lspeaker", 1.0);
 	ymz.add_route(1, "rspeaker", 1.0);
 }
