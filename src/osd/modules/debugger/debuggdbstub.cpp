@@ -286,6 +286,26 @@ static const gdb_register_map gdb_register_map_m6502 =
 	}
 };
 
+
+//-------------------------------------------------------------------------
+static const gdb_register_map gdb_register_map_m6809 =
+{
+	"m6809",
+	"mame.m6809",
+	{
+		{ "A",  "a",   false, TYPE_INT },
+		{ "B",  "b",   false, TYPE_INT },
+		{ "D",  "d",   false, TYPE_INT },
+		{ "X",  "x",   false, TYPE_INT },
+		{ "Y",  "y",   false, TYPE_INT },
+		{ "U",  "u",   true,  TYPE_DATA_POINTER },
+		{ "PC", "pc",  true,  TYPE_CODE_POINTER },
+		{ "S",  "s",   true,  TYPE_DATA_POINTER },
+		{ "CC", "cc",  false, TYPE_INT }, // TODO describe bitfield
+		{ "DP", "dp",  false, TYPE_INT },
+	}
+};
+
 //-------------------------------------------------------------------------
 static const std::map<std::string, const gdb_register_map &> gdb_register_maps = {
 	{ "i486",       gdb_register_map_i486 },
@@ -295,6 +315,7 @@ static const std::map<std::string, const gdb_register_map &> gdb_register_maps =
 	{ "m68020pmmu", gdb_register_map_m68020pmmu },
 	{ "z80",        gdb_register_map_z80 },
 	{ "m6502",      gdb_register_map_m6502 },
+	{ "m6809",      gdb_register_map_m6809 },
 };
 
 //-------------------------------------------------------------------------
