@@ -9,19 +9,19 @@
     used by:
     ms32.cpp
     bnstars.cpp (Dual screen configuration)
-    tetrisp2.cpp (Slightly different - no zoom, etc)
+    tetrisp2.cpp (Slightly different - no zoom, stepstag with YUV)
 
     Sprite format (16 byte per each sprite):
     Offset Bits              Description
            fedcba98 76543210
-    00     -xxxxxxx -------- Palette Select (some hardwares with YUV color format)
+    00     -xxxxxxx -------- stepstage only: Palette Select for YUV format
            -------- xxxx---- Priority
            -------- -----x-- Visible
            -------- ------x- Flip Y
            -------- -------x Flip X
     02     xxxxxxxx -------- Source Y offset (1 pixel each)
            -------- xxxxxxxx Source X offset (1 pixel each)
-    04     xxxx---- -------- Palette Select (most of hardwares)
+    04     xxxx---- -------- Palette Select (normal)
            ----xxxx xxxxxxxx Source Texture Select (each texture is 256 x 256 pixels)
     06     xxxxxxxx -------- Source Width - 1 (1 pixel each)
            -------- xxxxxxxx Source Height - 1 (1 pixel each)

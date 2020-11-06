@@ -166,8 +166,8 @@ void ms32_state::ms32_brightness_w(offs_t offset, u32 data, u32 mem_mask)
 void ms32_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, const rectangle &cliprect, u16 *sprram_top)
 {
 	const size_t sprite_tail = (0x20000 - 0x10) / 2;
-	u16  *source = sprram_top;
-	u16  *finish = sprram_top + sprite_tail;
+	u16 *source = sprram_top;
+	u16 *finish = sprram_top + sprite_tail;
 	// TODO: sprite control 0x10 also uses bits 0-11 for sprite start address? 
 	// akiss uses it for double buffer animations, flips between 0 and 0x800 (and is ugly for latter)
 	const bool reverseorder = (m_sprite_ctrl[0x10/4] & 0x8000) == 0x0000;

@@ -254,7 +254,7 @@ void ms32_bnstars_state::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, c
 
 	if (m_ms32_roz_ctrl[chip][0x5c/4] & 1)   /* "super" mode */
 	{
-		printf("no lineram!\n");
+		throw emu_fatalerror("Super mode in bnstars1?");
 		return;
 		/*
 		rectangle my_clip;
@@ -365,57 +365,19 @@ void ms32_bnstars_state::ms32_roz1_ram_w(offs_t offset, u16 data, u16 mem_mask)
 	m_ms32_roz_tilemap[1]->mark_tile_dirty(offset/2);
 }
 
-
-/* SPRITES based on tetrisp2 for now, readd priority bits later */
+// TODO: merge with ms32_state, fix priority
 void ms32_bnstars_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u16 *sprram_top)
 {
-/***************************************************************************
-
-
-                                Sprites Drawing
-
-    Offset:     Bits:                   Meaning:
-
-    0.w         fedc ba98 ---- ----
-                ---- ---- 7654 ----     Priority
-                ---- ---- ---- 3---
-                ---- ---- ---- -2--     Draw this sprite
-                ---- ---- ---- --1-     Flip Y
-                ---- ---- ---- ---0     Flip X
-
-    1.w         fedc ba98 ---- ----     Tile's Y position in the tile page (*)
-                ---- ---- 7654 3210     Tile's X position in the tile page (*)
-
-    2.w         fedc ---- ---- ----     Color
-                ---- ba98 7654 3210     Tile Page (32x32 tiles = 256x256 pixels each)
-
-    3.w         fedc ba98 ---- ----     Y Size - 1 (*)
-                ---- ---- 7654 3210     X Size - 1 (*)
-
-    4.w         fedc ba-- ---- ----
-                ---- --98 7654 3210     Y (Signed)
-
-    5.w         fedc b--- ---- ----
-                ---- -a98 7654 3210     X (Signed)
-
-    6.w         fedc ba98 7654 3210     Zoom Y
-
-    7.w         fedc ba98 7654 3210     Zoom X
-
-(*) 1 pixel granularity
-
-***************************************************************************/
-	const u32 sprite_size = 0x10000;
+	const size_t sprite_tail = (0x20000 - 0x10) / 2;
 	u16 *source = sprram_top;
-	u16 *finish = sprram_top + (sprite_size - 0x10);
+	u16 *finish = sprram_top + sprite_tail;
 	const bool reverseorder = (m_sprite_ctrl[0x10/4] & 0x8000) == 0x0000;
 
 	if (reverseorder == true)
 	{
-		source  = sprram_top + (sprite_size - 0x10);
-		finish  = sprram_top;
+		source = sprram_top + sprite_tail;
+		finish = sprram_top;
 	}
-
 
 	for (;reverseorder ? (source>=finish) : (source<finish); reverseorder ? (source-=8) : (source+=8))
 	{
@@ -448,7 +410,6 @@ void ms32_bnstars_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitma
 		}*/
 
 		pri >>= 4;
-		/* TODO: priority handling is completely wrong, but better than nothing */
 		if (pri == 0x0)
 			pri_mask = 0x00;
 		else if (pri <= 0xd)
@@ -491,6 +452,7 @@ void ms32_bnstars_state::video_start()
 
 u32 ms32_bnstars_state::screen_update_bnstars_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	printf("start left\n");
 	screen.priority().fill(0, cliprect);
 
 	bitmap.fill(0, cliprect);   /* bg color */
@@ -530,6 +492,107 @@ u32 ms32_bnstars_state::screen_update_bnstars_right(screen_device &screen, bitma
 
 	return 0;
 }
+
+
+
+template <int P>
+CUSTOM_INPUT_MEMBER(ms32_bnstars_state::mahjong_ctrl_r)
+{
+	required_ioport_array<4> &keys = (P == 0) ? m_p1_keys : m_p2_keys;
+
+	switch (m_bnstars1_mahjong_select & 0x2080)
+	{
+		default:
+			logerror("unk bnstars1_r %08x\n",m_bnstars1_mahjong_select);
+			return 0xff;
+
+		case 0x0000:
+			return keys[0]->read();
+
+		case 0x0080:
+			return keys[1]->read();
+
+		case 0x2000:
+			return keys[2]->read();
+
+		case 0x2080:
+			return keys[3]->read();
+	}
+}
+
+void ms32_bnstars_state::bnstars1_mahjong_select_w(u32 data)
+{
+	m_bnstars1_mahjong_select = data;
+//  printf("%08x\n",m_bnstars1_mahjong_select);
+}
+
+void ms32_bnstars_state::bnstars_map(address_map &map)
+{
+	// TODO: derive from base memory map
+	map(0x00000000, 0x001fffff).rom();
+
+	map(0xfc800000, 0xfc800003).w(FUNC(ms32_bnstars_state::sound_command_w));
+
+	map(0xfcc00004, 0xfcc00007).portr("P1");
+	map(0xfcc00008, 0xfcc0000b).portr("P2");
+	map(0xfcc00010, 0xfcc00013).portr("DSW");
+
+	map(0xfce00000, 0xfce0005f).m(m_sysctrl, FUNC(jaleco_ms32_sysctrl_device::amap)).umask32(0x0000ffff);
+	map(0xfce00200, 0xfce0027f).ram().share("sprite_ctrl");
+	map(0xfce00400, 0xfce0045f).writeonly().share("roz_ctrl.0");
+	map(0xfce00700, 0xfce0075f).writeonly().share("roz_ctrl.1"); // guess
+	map(0xfce00a00, 0xfce00a17).writeonly().share("tx0_scroll");
+	map(0xfce00a20, 0xfce00a37).writeonly().share("bg0_scroll");
+	map(0xfce00c00, 0xfce00c17).writeonly().share("tx1_scroll");
+	map(0xfce00c20, 0xfce00c37).writeonly().share("bg1_scroll");
+
+	map(0xfce00e00, 0xfce00e03).w(FUNC(ms32_bnstars_state::bnstars1_mahjong_select_w)); // ?
+
+	map(0xfd000000, 0xfd000003).r(FUNC(ms32_bnstars_state::sound_result_r));
+
+	/* wrote together */
+	map(0xfd040000, 0xfd047fff).ram(); // priority ram
+	map(0xfd080000, 0xfd087fff).ram();
+	map(0xfd200000, 0xfd237fff).rw("palette2", FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette2");
+	map(0xfd400000, 0xfd437fff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
+	map(0xfe000000, 0xfe01ffff).lr16(
+		NAME([this] (offs_t offset) -> u16 { return m_ms32_roz1_ram[offset]; })).w(FUNC(ms32_bnstars_state::ms32_roz1_ram_w)).umask32(0x0000ffff);
+	map(0xfe400000, 0xfe41ffff).lr16(
+		NAME([this] (offs_t offset) -> u16 { return m_ms32_roz0_ram[offset]; })).w(FUNC(ms32_bnstars_state::ms32_roz0_ram_w)).umask32(0x0000ffff);
+	// TODO: ms32_state should internalize sprite RAM interfaces, also NOP to $ffffxxxx
+	map(0xfe800000, 0xfe81ffff).lrw16(
+		NAME([this] (offs_t offset) -> u16 { return m_objectram_left[offset]; }),
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_objectram_left[offset]); })).umask32(0x0000ffff);
+	map(0xfe820000, 0xfe83ffff).lrw16(
+		NAME([this] (offs_t offset) -> u16 { return m_objectram_right[offset]; }),
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_objectram_right[offset]); })).umask32(0x0000ffff);
+	map(0xfea00000, 0xfea07fff).lr16(
+		NAME([this] (offs_t offset) -> u16 { return m_ms32_tx1_ram[offset]; })).w(FUNC(ms32_bnstars_state::ms32_tx1_ram_w)).umask32(0x0000ffff);
+	map(0xfea08000, 0xfea0ffff).lr16(
+		NAME([this] (offs_t offset) -> u16 { return m_ms32_bg1_ram[offset]; })).w(FUNC(ms32_bnstars_state::ms32_bg1_ram_w)).umask32(0x0000ffff);
+	map(0xfec00000, 0xfec07fff).lr16(
+		NAME([this] (offs_t offset) -> u16 { return m_ms32_tx0_ram[offset]; })).w(FUNC(ms32_bnstars_state::ms32_tx0_ram_w)).umask32(0x0000ffff);
+	map(0xfec08000, 0xfec0ffff).lr16(
+		NAME([this] (offs_t offset) -> u16 { return m_ms32_bg0_ram[offset]; })).w(FUNC(ms32_bnstars_state::ms32_bg0_ram_w)).umask32(0x0000ffff);
+
+	map(0xfee00000, 0xfee1ffff).ram();
+	map(0xffe00000, 0xffffffff).rom().region("maincpu", 0);
+}
+
+void ms32_bnstars_state::bnstars_sound_map(address_map &map)
+{
+	map(0x0000, 0x3eff).rom();
+	map(0x3f00, 0x3f0f).rw("ymf2", FUNC(ymf271_device::read), FUNC(ymf271_device::write));
+	map(0x3f10, 0x3f10).rw(FUNC(ms32_bnstars_state::latch_r), FUNC(ms32_bnstars_state::to_main_w));
+	map(0x3f20, 0x3f2f).rw("ymf1", FUNC(ymf271_device::read), FUNC(ymf271_device::write));
+	map(0x3f40, 0x3f40).nopw();   /* YMF271 pin 4 (bit 1) , YMF271 pin 39 (bit 4) */
+	map(0x3f70, 0x3f70).nopw();   // watchdog? banking? very noisy
+	map(0x3f80, 0x3f80).w(FUNC(ms32_bnstars_state::ms32_snd_bank_w));
+	map(0x4000, 0x7fff).ram();
+	map(0x8000, 0xbfff).bankr("z80bank1");
+	map(0xc000, 0xffff).bankr("z80bank2");
+}
+
 
 static INPUT_PORTS_START( bnstars )
 	PORT_START("P1")
@@ -676,7 +739,6 @@ static INPUT_PORTS_START( bnstars )
 	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNUSED )   // Unused?
 INPUT_PORTS_END
 
-
 static GFXLAYOUT_RAW( bglayout, 16, 16, 16*8, 16*16*8 )
 static GFXLAYOUT_RAW( txlayout, 8, 8, 8*8, 8*8*8 )
 
@@ -689,106 +751,6 @@ static GFXDECODE_START( gfx_bnstars )
 	GFXDECODE_ENTRY( "gfx6", 0, bglayout,     0x1000, 0x10 ) /* Bg scr2 */
 	GFXDECODE_ENTRY( "gfx7", 0, txlayout,     0x6000, 0x10 ) /* Tx scr2 */
 GFXDECODE_END
-
-template <int P>
-CUSTOM_INPUT_MEMBER(ms32_bnstars_state::mahjong_ctrl_r)
-{
-	required_ioport_array<4> &keys = (P == 0) ? m_p1_keys : m_p2_keys;
-
-	switch (m_bnstars1_mahjong_select & 0x2080)
-	{
-		default:
-			printf("unk bnstars1_r %08x\n",m_bnstars1_mahjong_select);
-			return 0xff;
-
-		case 0x0000:
-			return keys[0]->read();
-
-		case 0x0080:
-			return keys[1]->read();
-
-		case 0x2000:
-			return keys[2]->read();
-
-		case 0x2080:
-			return keys[3]->read();
-	}
-}
-
-void ms32_bnstars_state::bnstars1_mahjong_select_w(u32 data)
-{
-	m_bnstars1_mahjong_select = data;
-//  printf("%08x\n",m_bnstars1_mahjong_select);
-}
-
-
-void ms32_bnstars_state::bnstars_map(address_map &map)
-{
-	// TODO: derive from base memory map
-	map(0x00000000, 0x001fffff).rom();
-
-	map(0xfc800000, 0xfc800003).w(FUNC(ms32_bnstars_state::sound_command_w));
-
-	map(0xfcc00004, 0xfcc00007).portr("P1");
-	map(0xfcc00008, 0xfcc0000b).portr("P2");
-	map(0xfcc00010, 0xfcc00013).portr("DSW");
-
-	map(0xfce00000, 0xfce0005f).m(m_sysctrl, FUNC(jaleco_ms32_sysctrl_device::amap)).umask32(0x0000ffff);
-	map(0xfce00200, 0xfce0027f).ram().share("sprite_ctrl");
-	map(0xfce00400, 0xfce0045f).writeonly().share("roz_ctrl.0");
-	map(0xfce00700, 0xfce0075f).writeonly().share("roz_ctrl.1"); // guess
-	map(0xfce00a00, 0xfce00a17).writeonly().share("tx0_scroll");
-	map(0xfce00a20, 0xfce00a37).writeonly().share("bg0_scroll");
-	map(0xfce00c00, 0xfce00c17).writeonly().share("tx1_scroll");
-	map(0xfce00c20, 0xfce00c37).writeonly().share("bg1_scroll");
-
-	map(0xfce00e00, 0xfce00e03).w(FUNC(ms32_bnstars_state::bnstars1_mahjong_select_w)); // ?
-
-	map(0xfd000000, 0xfd000003).r(FUNC(ms32_bnstars_state::sound_result_r));
-
-
-	/* wrote together */
-	map(0xfd040000, 0xfd047fff).ram(); // priority ram
-	map(0xfd080000, 0xfd087fff).ram();
-	map(0xfd200000, 0xfd237fff).rw("palette2", FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette2");
-	map(0xfd400000, 0xfd437fff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
-	map(0xfe000000, 0xfe01ffff).lr16(
-		NAME([this] (offs_t offset) -> u16 { return m_ms32_roz1_ram[offset]; })).w(FUNC(bnstars_state::ms32_roz1_ram_w)).umask32(0x0000ffff);
-	map(0xfe400000, 0xfe41ffff).lr16(
-		NAME([this] (offs_t offset) -> u16 { return m_ms32_roz0_ram[offset]; })).w(FUNC(bnstars_state::ms32_roz0_ram_w)).umask32(0x0000ffff);
-	// TODO: sprite chip interfaces should be internalized, also NOP to $ffffxxxx
-	map(0xfe800000, 0xfe81ffff).lrw16(
-		NAME([this] (offs_t offset) -> u16 { return m_objectram_left[offset]; }),
-		NAME([this] (offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_objectram_left[offset]); })).umask32(0x0000ffff);
-	map(0xfe820000, 0xfe83ffff).lrw16(
-		NAME([this] (offs_t offset) -> u16 { return m_objectram_right[offset]; }),
-		NAME([this] (offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_objectram_right[offset]); })).umask32(0x0000ffff);
-	map(0xfea00000, 0xfea07fff).lr16(
-		NAME([this] (offs_t offset) -> u16 { return m_ms32_tx1_ram[offset]; })).w(FUNC(bnstars_state::ms32_tx1_ram_w)).umask32(0x0000ffff);
-	map(0xfea08000, 0xfea0ffff).lr16(
-		NAME([this] (offs_t offset) -> u16 { return m_ms32_bg1_ram[offset]; })).w(FUNC(bnstars_state::ms32_bg1_ram_w)).umask32(0x0000ffff);
-	map(0xfec00000, 0xfec07fff).lr16(
-		NAME([this] (offs_t offset) -> u16 { return m_ms32_tx0_ram[offset]; })).w(FUNC(bnstars_state::ms32_tx0_ram_w)).umask32(0x0000ffff);
-	map(0xfec08000, 0xfec0ffff).lr16(
-		NAME([this] (offs_t offset) -> u16 { return m_ms32_bg0_ram[offset]; })).w(FUNC(bnstars_state::ms32_bg0_ram_w)).umask32(0x0000ffff);
-
-	map(0xfee00000, 0xfee1ffff).ram();
-	map(0xffe00000, 0xffffffff).rom().region("maincpu", 0);
-}
-
-void ms32_bnstars_state::bnstars_sound_map(address_map &map)
-{
-	map(0x0000, 0x3eff).rom();
-	map(0x3f00, 0x3f0f).rw("ymf2", FUNC(ymf271_device::read), FUNC(ymf271_device::write));
-	map(0x3f10, 0x3f10).rw(FUNC(ms32_bnstars_state::latch_r), FUNC(ms32_bnstars_state::to_main_w));
-	map(0x3f20, 0x3f2f).rw("ymf1", FUNC(ymf271_device::read), FUNC(ymf271_device::write));
-	map(0x3f40, 0x3f40).nopw();   /* YMF271 pin 4 (bit 1) , YMF271 pin 39 (bit 4) */
-	map(0x3f70, 0x3f70).nopw();   // watchdog? banking? very noisy
-	map(0x3f80, 0x3f80).w(FUNC(ms32_bnstars_state::ms32_snd_bank_w));
-	map(0x4000, 0x7fff).ram();
-	map(0x8000, 0xbfff).bankr("z80bank1");
-	map(0xc000, 0xffff).bankr("z80bank2");
-}
 
 void ms32_bnstars_state::bnstars(machine_config &config)
 {
