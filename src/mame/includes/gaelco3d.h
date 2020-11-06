@@ -102,7 +102,7 @@ private:
 	};
 
 	required_shared_ptr<uint32_t> m_adsp_ram_base;
-	required_shared_ptr<uint16_t> m_m68k_ram_base;
+	required_shared_ptr<uint32_t> m_m68k_ram_base;
 	required_shared_ptr<uint16_t> m_adsp_control_regs;
 	required_shared_ptr<uint16_t> m_adsp_fastram_base;
 	required_device<cpu_device> m_maincpu;
