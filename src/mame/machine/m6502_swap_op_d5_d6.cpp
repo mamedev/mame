@@ -9,8 +9,8 @@
     Seen on die marked VH2009, used on polmega, silv35
     these are N2A03 derived CPUs used on VTxx systems
 
-	VT1682 systems with this scrambling currently derive from M6502 type
-	but this might be incorrect
+    VT1682 systems with this scrambling currently derive from M6502 type
+    but this might be incorrect
 
 ***************************************************************************/
 

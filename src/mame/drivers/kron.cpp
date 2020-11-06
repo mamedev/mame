@@ -218,7 +218,6 @@ void kron180_state::kron180_iomap(address_map &map)
 
 /* Input ports */
 static INPUT_PORTS_START (kron180)
-	PORT_INCLUDE(pc_keyboard)
 INPUT_PORTS_END
 
 /* Video TODO: find and understand the char table within main rom */

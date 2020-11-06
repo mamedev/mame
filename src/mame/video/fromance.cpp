@@ -327,7 +327,7 @@ uint32_t fromance_state::screen_update_pipedrm(screen_device &screen, bitmap_ind
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
-	m_spr_old->turbofrc_draw_sprites((uint16_t*)sram, m_spriteram.bytes(), 0, bitmap, cliprect, screen.priority(), 0);
-	m_spr_old->turbofrc_draw_sprites((uint16_t*)sram, m_spriteram.bytes(), 0, bitmap, cliprect, screen.priority(), 1);
+	m_spr_old->turbofrc_draw_sprites((uint16_t*)sram, m_spriteram_size, 0, bitmap, cliprect, screen.priority(), 0);
+	m_spr_old->turbofrc_draw_sprites((uint16_t*)sram, m_spriteram_size, 0, bitmap, cliprect, screen.priority(), 1);
 	return 0;
 }

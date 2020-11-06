@@ -43,6 +43,7 @@ seb_bac
 clb_biz
 	TMP = read_pc();
 	TMP2 = read(TMP);
+	read(TMP);
 	TMP2 = do_clb(TMP2, (IR>>5) & 7);
 	write(TMP, TMP2);
 	prefetch();
@@ -50,6 +51,7 @@ clb_biz
 seb_biz
 	TMP = read_pc();
 	TMP2 = read(TMP);
+	read(TMP);
 	TMP2 = do_seb(TMP2, (IR>>5) & 7);
 	write(TMP, TMP2);
 	prefetch();
@@ -57,57 +59,94 @@ seb_biz
 bbc_bzr
 	TMP = read_pc();
 	TMP2 = read(TMP);
-	TMP = read_pc();
 	read_pc_noinc();
 	if(!(TMP2 & (1 << ((IR>>5) & 7)))) {
+		TMP = read_pc_noinc();
+		read_arg(set_l(PC, PC+1));
+		PC++;
+		read_arg(set_l(PC, PC+int8_t(TMP)));
 		PC += int8_t(TMP);
+	} else {
+		read_pc();
 	}
 	prefetch();
 
 bbs_bzr
 	TMP = read_pc();
 	TMP2 = read(TMP);
-	TMP = read_pc();
 	read_pc_noinc();
 	if(TMP2 & (1 << ((IR>>5) & 7))) {
+		TMP = read_pc_noinc();
+		read_arg(set_l(PC, PC+1));
+		PC++;
+		read_arg(set_l(PC, PC+int8_t(TMP)));
 		PC += int8_t(TMP);
+	} else {
+		read_pc();
 	}
 	prefetch();
 
 bbc_bar
-	TMP = read_pc();
+	read_pc_noinc();
 	read_pc_noinc();
 	if(!(A & (1 << ((IR>>5) & 7)))) {
+		TMP = read_pc_noinc();
+		read_arg(set_l(PC, PC+1));
+		PC++;
+		read_arg(set_l(PC, PC+int8_t(TMP)));
 		PC += int8_t(TMP);
+	} else {
+		read_pc();
 	}
 	prefetch();
 
 bbs_bar
-	TMP = read_pc();
+	read_pc_noinc();
 	read_pc_noinc();
 	if(A & (1 << ((IR>>5) & 7))) {
+		TMP = read_pc_noinc();
+		read_arg(set_l(PC, PC+1));
+		PC++;
+		read_arg(set_l(PC, PC+int8_t(TMP)));
 		PC += int8_t(TMP);
+	} else {
+		read_pc();
 	}
 	prefetch();
 
 rrf_zpg
 	TMP = read_pc();
 	TMP2 = read(TMP);
+	read(TMP);
+	read(TMP);
+	read(TMP);
+	read(TMP);
 	TMP2 = do_rrf(TMP2);
 	write(TMP, TMP2);
 	prefetch();
 
 bra_rel
-	TMP = read_pc();
-	read_pc_noinc();
-	if(page_changing(PC, int8_t(TMP))) {
-		read_arg(set_l(PC, PC+int8_t(TMP)));
-	}
+	TMP = read_pc_noinc();
+	read_arg(set_l(PC, PC+1));
+	PC++;
+	read_arg(set_l(PC, PC+int8_t(TMP)));
 	PC += int8_t(TMP);
 	prefetch();
 
 jmp_zpi
-	TMP2 = read_pc();
+	TMP2 = read_pc_noinc();
+	TMP = read(TMP2 & 0xff);
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	PC = TMP;
+	prefetch();
+
+jsr_zpi
+	TMP2 = read_pc_noinc();
+	read(SP);
+	write(SP, PC>>8);
+	dec_SP();
+	write(SP, PC);
+	dec_SP();
 	TMP = read(TMP2 & 0xff);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	PC = TMP;
@@ -319,6 +358,7 @@ andt_zpx
 com_zpg
 	TMP = read_pc();
 	TMP2 = read(TMP);
+	read(TMP);
 	TMP2 ^= 0xff;
 	set_nz(TMP2);
 	write(TMP, TMP2);
@@ -748,4 +788,10 @@ sbct_zpx
 	TMP2 = read(X);
 	do_sbct(TMP);
 	write(X, TMP2);
+	prefetch();
+
+tst_zpg
+	TMP = read_pc();
+	TMP2 = read(TMP);
+	set_nz(TMP2);
 	prefetch();

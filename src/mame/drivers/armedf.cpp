@@ -323,7 +323,6 @@ Notes:
 #include "sound/3526intf.h"
 #include "sound/3812intf.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 #define LEGION_HACK 0
@@ -349,7 +348,7 @@ Notes:
 void armedf_state::terraf_io_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (data & 0x4000 && ((m_vreg & 0x4000) == 0)) //0 -> 1 transition
-		m_nb1414m4->exec((m_text_videoram[0] << 8) | (m_text_videoram[1] & 0xff),m_text_videoram.target(),m_fg_scrollx,m_fg_scrolly,m_tx_tilemap);
+		m_nb1414m4->exec(m_text_videoram[0],(u8 *)m_text_videoram.target(),m_fg_scrollx,m_fg_scrolly,m_tx_tilemap);
 
 	COMBINE_DATA(&m_vreg);
 
@@ -655,7 +654,10 @@ void armedf_state::cclimbr2_soundmap(address_map &map)
 
 void armedf_state::blitter_txram_w(offs_t offset, u8 data)
 {
-	m_text_videoram[offset] = data;
+	if(offset & 1)
+		m_text_videoram[offset >> 1] = ((m_text_videoram[offset]) & 0xff00) | data;
+	else
+		m_text_videoram[offset >> 1] = ((m_text_videoram[offset]) & 0x00ff) | (data << 8);
 	if (offset < 0x1000)
 		m_tx_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
@@ -1120,9 +1122,6 @@ void armedf_state::sound_config(machine_config &config)
 
 	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.8); // 10-pin SIP with 74HC374P latch
 	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.8); // 10-pin SIP with 74HC374P latch
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void armedf_state::terraf(machine_config &config)
@@ -1167,9 +1166,6 @@ void armedf_state::terrafjb(machine_config &config)
 
 	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.8); // unknown DAC
 	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.8); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void armedf_state::terrafb(machine_config &config)
@@ -1218,9 +1214,6 @@ void armedf_state::armedf(machine_config &config)
 
 	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
 	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void armedf_state::cclimbr2(machine_config &config)
@@ -1248,9 +1241,6 @@ void armedf_state::cclimbr2(machine_config &config)
 
 	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.8); // unknown DAC
 	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.8); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void armedf_state::legion_common(machine_config &config)
@@ -1272,9 +1262,6 @@ void armedf_state::legion_common(machine_config &config)
 
 	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.8); // 10-pin SIP with 74HC374P latch
 	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.8); // 10-pin SIP with 74HC374P latch
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void armedf_state::legion(machine_config &config)

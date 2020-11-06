@@ -17,7 +17,6 @@
 #include "sound/3812intf.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "sound/ym2413.h"
 #include "machine/74259.h"
 #include "machine/gen_latch.h"

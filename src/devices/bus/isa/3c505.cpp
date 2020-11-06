@@ -280,7 +280,7 @@ void isa16_3c505_device::device_reset()
 			offs_t const rom_base = (m_romopts->read() & 0xfe) << 12;
 
 			if (m_isa->is_option_rom_space_available(rom_base, 0x2000))
-				m_isa->install_rom(this, rom_base, rom_base | 0x01fff, "host", "host");
+				m_isa->install_rom(this, rom_base, rom_base | 0x01fff, "host");
 		}
 
 		m_isa->set_dma_channel(m_isa_drq, this, true);

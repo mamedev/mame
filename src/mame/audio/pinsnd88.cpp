@@ -104,7 +104,6 @@
 
 #include "emu.h"
 #include "pinsnd88.h"
-#include "sound/volt_reg.h"
 
 
 DEFINE_DEVICE_TYPE(PINSND88, pinsnd88_device, "pinsnd88", "Williams Pin Sound '88 Audio Board")
@@ -156,7 +155,7 @@ void pinsnd88_device::pinsnd88_map(address_map &map)
 	map(0x3400, 0x3400).mirror(0x03ff).r(m_inputlatch, FUNC(generic_latch_8_device::read));
 	map(0x3800, 0x3800).mirror(0x03ff).w(FUNC(pinsnd88_device::bgbank_w));
 	map(0x3c00, 0x3c00).mirror(0x03ff).w(FUNC(pinsnd88_device::sync_w));
-	map(0x4000, 0xbfff).bankr("bank").region("cpu", 0); // banked rom
+	map(0x4000, 0xbfff).bankr("bank"); // banked rom
 	map(0xc000, 0xffff).rom().region("cpu",0x3c000); // fixed bank
 }
 
@@ -221,9 +220,6 @@ void pinsnd88_device::device_add_mconfig(machine_config &config)
 
 	// TODO: analog filters and "volume" controls for the two channels
 	AD7224(config, m_dac, 0);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 	m_dac->add_route(ALL_OUTPUTS, *this, 0.41/2.0, AUTO_ALLOC_INPUT, 0); // 470K
 	m_dac->add_route(ALL_OUTPUTS, *this, 0.5/2.0, AUTO_ALLOC_INPUT, 1); // 330K
 

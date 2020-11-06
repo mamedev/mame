@@ -54,7 +54,6 @@ SOUNDS["UPD7759"] = true
 SOUNDS["YM2151"] = true
 SOUNDS["YM2413"] = true
 SOUNDS["BEEP"] = true
-SOUNDS["VOLT_REG"] = true
 SOUNDS["SPEAKER"] = true
 SOUNDS["DIGITALKER"] = true
 SOUNDS["SN76477"] = true
@@ -294,6 +293,8 @@ files{
 	MAME_DIR .. "src/mame/audio/vicdual.h",
 	MAME_DIR .. "src/mame/audio/nl_brdrline.cpp",
 	MAME_DIR .. "src/mame/audio/nl_brdrline.h",
+	MAME_DIR .. "src/mame/audio/nl_frogs.cpp",
+	MAME_DIR .. "src/mame/audio/nl_frogs.h",
 	MAME_DIR .. "src/mame/audio/vicdual-97271p.cpp",
 	MAME_DIR .. "src/mame/audio/vicdual-97271p.h",
 	MAME_DIR .. "src/mame/video/vicdual.cpp",
@@ -307,8 +308,6 @@ files{
 	MAME_DIR .. "src/mame/audio/invinco.h",
 	MAME_DIR .. "src/mame/audio/pulsar.cpp",
 	MAME_DIR .. "src/mame/audio/pulsar.h",
-	MAME_DIR .. "src/mame/audio/tranqgun.cpp",
-	MAME_DIR .. "src/mame/audio/tranqgun.h",
 
 	MAME_DIR .. "src/mame/machine/segacrpt_device.cpp",
 	MAME_DIR .. "src/mame/machine/segacrpt_device.h",

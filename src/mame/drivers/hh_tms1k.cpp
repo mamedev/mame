@@ -811,14 +811,34 @@ class bcheetah_state : public hh_tms1k_state
 {
 public:
 	bcheetah_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_tms1k_state(mconfig, type, tag)
+		hh_tms1k_state(mconfig, type, tag),
+		m_motor1(*this, "motor1"),
+		m_motor2_left(*this, "motor2_left"),
+		m_motor2_right(*this, "motor2_right")
 	{ }
 
+	void bcheetah(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void bcheetah(machine_config &config);
+
+	output_finder<> m_motor1;
+	output_finder<> m_motor2_left;
+	output_finder<> m_motor2_right;
 };
+
+void bcheetah_state::machine_start()
+{
+	hh_tms1k_state::machine_start();
+	m_motor1.resolve();
+	m_motor2_left.resolve();
+	m_motor2_right.resolve();
+}
 
 // handlers
 
@@ -835,9 +855,9 @@ void bcheetah_state::write_o(u16 data)
 	// O0: front motor steer left
 	// O2: front motor steer right
 	// O3: GND, other: N/C
-	output().set_value("motor1", data >> 1 & 1);
-	output().set_value("motor2_left", data & 1);
-	output().set_value("motor2_right", data >> 2 & 1);
+	m_motor1 = data >> 1 & 1;
+	m_motor2_left = data & 1;
+	m_motor2_right = data >> 2 & 1;
 }
 
 u8 bcheetah_state::read_k()
@@ -7315,9 +7335,20 @@ class bigtrak_state : public hh_tms1k_state
 {
 public:
 	bigtrak_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_tms1k_state(mconfig, type, tag)
+		hh_tms1k_state(mconfig, type, tag),
+		m_left_motor_forward(*this, "left_motor_forward"),
+		m_left_motor_reverse(*this, "left_motor_reverse"),
+		m_right_motor_forward(*this, "right_motor_forward"),
+		m_right_motor_reverse(*this, "right_motor_reverse"),
+		m_ext_out(*this, "ext_out")
 	{ }
 
+	void bigtrak(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
@@ -7325,15 +7356,23 @@ public:
 	int m_gearbox_pos;
 	bool sensor_state() { return m_gearbox_pos < 0 && m_display->element_on(0, 0); }
 	TIMER_DEVICE_CALLBACK_MEMBER(gearbox_sim_tick);
-	void bigtrak(machine_config &config);
 
-protected:
-	virtual void machine_start() override;
+	output_finder<> m_left_motor_forward;
+	output_finder<> m_left_motor_reverse;
+	output_finder<> m_right_motor_forward;
+	output_finder<> m_right_motor_reverse;
+	output_finder<> m_ext_out;
 };
 
 void bigtrak_state::machine_start()
 {
 	hh_tms1k_state::machine_start();
+
+	m_left_motor_forward.resolve();
+	m_left_motor_reverse.resolve();
+	m_right_motor_forward.resolve();
+	m_right_motor_reverse.resolve();
+	m_ext_out.resolve();
 
 	// zerofill/register for savestates
 	m_gearbox_pos = 0;
@@ -7377,11 +7416,11 @@ void bigtrak_state::write_o(u16 data)
 	// O4: right motor reverse
 	// O5: ext out
 	// O6: N/C
-	output().set_value("left_motor_forward", data >> 1 & 1);
-	output().set_value("left_motor_reverse", data >> 2 & 1);
-	output().set_value("right_motor_forward", data >> 3 & 1);
-	output().set_value("right_motor_reverse", data >> 4 & 1);
-	output().set_value("ext_out", data >> 5 & 1);
+	m_left_motor_forward = data >> 1 & 1;
+	m_left_motor_reverse = data >> 2 & 1;
+	m_right_motor_forward = data >> 3 & 1;
+	m_right_motor_reverse = data >> 4 & 1;
+	m_ext_out = data >> 5 & 1;
 
 	// O0,O7(,R10)(tied together): speaker out
 	m_speaker->level_w((data & 1) | (data >> 6 & 2) | (m_r >> 8 & 4));
@@ -7513,11 +7552,24 @@ class mbdtower_state : public hh_tms1k_state
 {
 public:
 	mbdtower_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_tms1k_state(mconfig, type, tag)
+		hh_tms1k_state(mconfig, type, tag),
+		m_motor_pos_out(*this, "motor_pos"),
+		m_card_pos_out(*this, "card_pos"),
+		m_motor_on_out(*this, "motor_on")
 	{ }
 
+	void mbdtower(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
 	void update_display();
 	bool sensor_led_on() { return m_display->element_on(0, 0); }
+
+	output_finder<> m_motor_pos_out;
+	output_finder<> m_card_pos_out;
+	output_finder<> m_motor_on_out;
 
 	int m_motor_pos;
 	int m_motor_pos_prev;
@@ -7530,15 +7582,15 @@ public:
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void mbdtower(machine_config &config);
-
-protected:
-	virtual void machine_start() override;
 };
 
 void mbdtower_state::machine_start()
 {
 	hh_tms1k_state::machine_start();
+
+	m_motor_pos_out.resolve();
+	m_card_pos_out.resolve();
+	m_motor_on_out.resolve();
 
 	// zerofill
 	m_motor_pos = 0;
@@ -7582,7 +7634,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mbdtower_state::motor_sim_tick)
 
 	// on change, output info
 	if (m_motor_pos != m_motor_pos_prev)
-		output().set_value("motor_pos", 100 * (m_motor_pos / (float)0x80));
+		m_motor_pos_out = 100 * (m_motor_pos / (float)0x80);
 
 	/* 3 display cards per hole, like this:
 
@@ -7594,7 +7646,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mbdtower_state::motor_sim_tick)
 	*/
 	int card_pos = m_motor_pos >> 4 & 7;
 	if (card_pos != (m_motor_pos_prev >> 4 & 7))
-		output().set_value("card_pos", card_pos);
+		m_card_pos_out = card_pos;
 
 	m_motor_pos_prev = m_motor_pos;
 }
@@ -7625,7 +7677,7 @@ void mbdtower_state::write_r(u16 data)
 
 	// R9: motor on
 	if ((m_r ^ data) & 0x200)
-		output().set_value("motor_on", data >> 9 & 1);
+		m_motor_on_out = data >> 9 & 1;
 	if (data & 0x200)
 		m_motor_on = true;
 

@@ -129,11 +129,10 @@ void a1bus_device::install_device(offs_t start, offs_t end, read8sm_delegate rha
 	m_space->install_readwrite_handler(start, end, rhandler, whandler);
 }
 
-void a1bus_device::install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data)
+void a1bus_device::install_bank(offs_t start, offs_t end, uint8_t *data)
 {
 //  printf("install_bank: %s @ %x->%x\n", tag, start, end);
-	m_space->install_readwrite_bank(start, end, tag);
-	machine().root_device().membank(siblingtag(tag).c_str())->set_base(data);
+	m_space->install_ram(start, end, data);
 }
 
 // interrupt request from a1bus card
@@ -195,7 +194,7 @@ void device_a1bus_card_interface::install_device(offs_t start, offs_t end, read8
 	m_a1bus->install_device(start, end, rhandler, whandler);
 }
 
-void device_a1bus_card_interface::install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data)
+void device_a1bus_card_interface::install_bank(offs_t start, offs_t end, uint8_t *data)
 {
-	m_a1bus->install_bank(start, end, tag, data);
+	m_a1bus->install_bank(start, end, data);
 }

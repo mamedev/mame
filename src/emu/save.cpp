@@ -196,7 +196,7 @@ void save_manager::save_memory(device_t *device, const char *module, const char 
 		totalname = string_format("%s/%X/%s", module, index, name);
 
 	// insert us into the list
-	m_entry_list.emplace_back(std::make_unique<state_entry>(val, totalname.c_str(), device, module, tag ? tag : "", index, valsize, valcount, blockcount, stride));
+	m_entry_list.emplace_back(std::make_unique<state_entry>(val, totalname, device, module, tag ? tag : "", index, valsize, valcount, blockcount, stride));
 }
 
 
@@ -961,7 +961,7 @@ void rewinder::report_error(save_error error, rewind_operation operation)
 //  state_entry - constructor
 //-------------------------------------------------
 
-save_manager::state_entry::state_entry(void *data, const char *name, device_t *device, const char *module, const char *tag, int index, u8 size, u32 valcount, u32 blockcount, u32 stride)
+save_manager::state_entry::state_entry(void *data, std::string name, device_t *device, std::string module, std::string tag, int index, u8 size, u32 valcount, u32 blockcount, u32 stride)
 	: m_data(data)
 	, m_name(name)
 	, m_device(device)

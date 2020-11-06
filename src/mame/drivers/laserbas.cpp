@@ -64,7 +64,6 @@ expected: 43 FB CC 9A D4 23 6C 01 3E  <- From ROM 4
 #include "machine/pit8253.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/mc6845.h"
 #include "emupal.h"
 #include "screen.h"
@@ -412,13 +411,6 @@ void laserbas_state::laserbas(machine_config &config)
 	DAC_4BIT_R2R(config, m_dac[3], 0).add_route(ALL_OUTPUTS, "speaker", 0.16);
 	DAC_4BIT_R2R(config, m_dac[4], 0).add_route(ALL_OUTPUTS, "speaker", 0.16);
 	DAC_4BIT_R2R(config, m_dac[5], 0).add_route(ALL_OUTPUTS, "speaker", 0.16);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac3", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac3", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac4", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac4", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac5", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac5", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac6", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac6", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 /*

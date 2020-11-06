@@ -109,7 +109,6 @@ val (hex):  27  20  22  04  26  00  20  20  00  07  00  00  80  00  00  00  ns  
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/mc6845.h"
 #include "emupal.h"
 #include "screen.h"
@@ -274,8 +273,6 @@ void murogem_state::murogem(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.375);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
 

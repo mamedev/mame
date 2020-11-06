@@ -1153,9 +1153,14 @@
 	</element>
 
 	<element name="dotmatrixdot">
-		<dotmatrixdot>
-			<color red="1.0" green="0.12" blue="0.12" />
-		</dotmatrixdot>
+		<rect>
+			<color red="0" green="0" blue="0" />
+			<bounds left="-0.05" top="-0.05" right="1.05" bottom="1.05" />
+		</rect>
+		<disk>
+			<color state="1" red="1.0" green="1.0" blue="1.0" />
+			<color state="0" red="0.125" green="0.125" blue="0.125" />
+		</disk>
 	</element>
 	<group name="dmd">
 		<repeat count="21">
@@ -1166,6 +1171,7 @@
 				<param name="x" start="0" increment="1" />
 				<element name="dotmatrix~n~" ref="dotmatrixdot" state="0">
 					<bounds x="~x~" y="~y~" width="1" height="1" />
+					<color red="1.0" green="0.12" blue="0.12" />
 				</element>
 			</repeat>
 		</repeat>

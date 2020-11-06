@@ -370,6 +370,8 @@ brdrline                        // (c) 1980 Sega
 brdrlinet                       // (c) 1981 Sega
 brdrlins                        // Sidam bootleg
 starrkr                         // (c) 1981 Sega
+tranqgun                        // 413-428 (c) 1980 Sega
+frogs                           // 112-119 [1978 Gremlin?]
 
 @source:zaxxon.cpp
 congo                           // 605-5167 (c) 1983 (2 board stack)

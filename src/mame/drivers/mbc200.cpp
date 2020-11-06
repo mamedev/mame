@@ -166,8 +166,8 @@ void mbc200_state::main_io(address_map &map)
 void mbc200_state::sub_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x2fff).rom();
-	map(0x3000, 0x7fff).ram();
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x7fff).ram();
 	map(0x8000, 0xffff).ram().share("vram");
 }
 

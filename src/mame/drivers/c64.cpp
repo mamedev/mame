@@ -64,7 +64,7 @@ public:
 		m_user(*this, PET_USER_PORT_TAG),
 		m_ram(*this, RAM_TAG),
 		m_cassette(*this, PET_DATASSETTE_PORT_TAG),
-		m_color_ram(*this, "color_ram"),
+		m_color_ram(*this, "color_ram", 0x400, ENDIANNESS_LITTLE),
 		m_row(*this, "ROW%u", 0),
 		m_lock(*this, "LOCK"),
 		m_loram(1),
@@ -93,7 +93,7 @@ public:
 	required_device<pet_user_port_device> m_user;
 	required_device<ram_device> m_ram;
 	optional_device<pet_datassette_port_device> m_cassette;
-	optional_shared_ptr<uint8_t> m_color_ram;
+	memory_share_creator<uint8_t> m_color_ram;
 	optional_ioport_array<8> m_row;
 	optional_ioport m_lock;
 
@@ -1409,9 +1409,6 @@ void c64_state::machine_start()
 	}
 	m_charom = memregion("charom")->base();
 
-	// allocate memory
-	m_color_ram.allocate(0x400);
-
 	// initialize memory
 	uint8_t data = 0xff;
 
@@ -1563,9 +1560,8 @@ void c64_state::ntsc(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10").set_filter("NTSC");
 	SOFTWARE_LIST(config, "cart_list_c64").set_original("c64_cart").set_filter("NTSC");
 	SOFTWARE_LIST(config, "cass_list").set_original("c64_cass").set_filter("NTSC");
-	// disk softlist split into originals, cleanly cracked, and misc (homebrew and defaced cracks)
+	// disk softlist split into originals and misc (homebrew and cracks)
 	SOFTWARE_LIST(config, "flop525_orig").set_original("c64_flop_orig").set_filter("NTSC");
-	SOFTWARE_LIST(config, "flop525_clean").set_compatible("c64_flop_clcracked").set_filter("NTSC");
 	SOFTWARE_LIST(config, "flop525_misc").set_compatible("c64_flop_misc").set_filter("NTSC");
 
 	// internal ram
@@ -1737,9 +1733,8 @@ void c64_state::pal(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10").set_filter("PAL");
 	SOFTWARE_LIST(config, "cart_list_c64").set_original("c64_cart").set_filter("PAL");
 	SOFTWARE_LIST(config, "cass_list").set_original("c64_cass").set_filter("PAL");
-	// disk softlist split into originals, cleanly cracked, and misc (homebrew and defaced cracks)
+	// disk softlist split into originals and misc (homebrew and cracks)
 	SOFTWARE_LIST(config, "flop525_orig").set_original("c64_flop_orig").set_filter("PAL");
-	SOFTWARE_LIST(config, "flop525_clean").set_compatible("c64_flop_clcracked").set_filter("PAL");
 	SOFTWARE_LIST(config, "flop525_misc").set_compatible("c64_flop_misc").set_filter("PAL");
 
 	// internal ram

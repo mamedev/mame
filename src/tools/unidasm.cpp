@@ -73,6 +73,7 @@ using util::BIT;
 #include "cpu/ie15/ie15dasm.h"
 #include "cpu/jaguar/jagdasm.h"
 #include "cpu/ks0164/ks0164d.h"
+#include "cpu/lc57/lc57d.h"
 #include "cpu/lc58/lc58d.h"
 #include "cpu/lc8670/lc8670dsm.h"
 #include "cpu/lh5801/5801dasm.h"
@@ -110,6 +111,7 @@ using util::BIT;
 #include "cpu/mips/mips1dsm.h"
 #include "cpu/mn1880/mn1880d.h"
 #include "cpu/mn10200/mn102dis.h"
+#include "cpu/msm65x2/msm65x2d.h"
 #include "cpu/nanoprocessor/nanoprocessor_dasm.h"
 #include "cpu/nec/necdasm.h"
 #include "cpu/ns32000/ns32000dasm.h"
@@ -435,6 +437,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "jaguargpu",       be,  0, []() -> util::disasm_interface * { return new jaguar_disassembler(jaguar_disassembler::variant::GPU); } },
 	{ "konami",          be,  0, []() -> util::disasm_interface * { return new konami_disassembler; } },
 	{ "ks0164",          be,  0, []() -> util::disasm_interface * { return new ks0164_disassembler; } },
+	{ "lc57",            be,  0, []() -> util::disasm_interface * { return new lc57_disassembler; } },
 	{ "lc58",            be, -1, []() -> util::disasm_interface * { return new lc58_disassembler; } },
 	{ "lc8670",          be,  0, []() -> util::disasm_interface * { return new lc8670_disassembler; } },
 	{ "lh5801",          le,  0, []() -> util::disasm_interface * { return new lh5801_disassembler; } },
@@ -478,6 +481,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "mn10200",         le,  0, []() -> util::disasm_interface * { return new mn10200_disassembler; } },
 	{ "mn1870",          be,  0, []() -> util::disasm_interface * { return new mn1870_disassembler; } },
 	{ "mn1880",          be,  0, []() -> util::disasm_interface * { return new mn1880_disassembler; } },
+	{ "msm65x2",         le,  0, []() -> util::disasm_interface * { return new msm65x2_disassembler; } },
 	{ "nanoprocessor",   le,  0, []() -> util::disasm_interface * { return new hp_nanoprocessor_disassembler; } },
 	{ "nec",             le,  0, []() -> util::disasm_interface * { return new nec_disassembler(&nec_unidasm); } },
 	{ "ns32000",         le,  0, []() -> util::disasm_interface * { return new ns32000_disassembler; } },

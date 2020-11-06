@@ -283,10 +283,7 @@ void leapster_state::machine_start()
 
 	if (m_cart_rom)
 	{
-		address_space &space = m_maincpu->space(AS_PROGRAM);
-
-		space.install_readwrite_bank(0x80000000, 0x807fffff, "cartrom");
-		membank("cartrom")->set_base(m_cart_rom->base());
+		m_maincpu->space(AS_PROGRAM).install_rom(0x80000000, 0x807fffff, m_cart_rom->base());
 	}
 }
 

@@ -32,7 +32,7 @@ public:
 	gaelco3d_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_adsp_ram_base(*this, "adsp_ram_base")
-		, m_m68k_ram_base(*this, "m68k_ram_base", 0)
+		, m_m68k_ram_base(*this, "m68k_ram_base")
 		, m_adsp_control_regs(*this, "adsp_regs")
 		, m_adsp_fastram_base(*this, "adsp_fastram")
 		, m_maincpu(*this, "maincpu")

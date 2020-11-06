@@ -21,9 +21,10 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_hardhead_ip(*this, "hardhead_ip"),
+		m_banked_spriteram(*this, "banked_spriteram", 0x8000, ENDIANNESS_LITTLE),
 		m_spriteram(*this, "spriteram"),
 		m_wram(*this, "wram"),
-		m_banked_paletteram(*this, "paletteram"),
+		m_banked_paletteram(*this, "paletteram", 0x400, ENDIANNESS_LITTLE),
 		m_audiocpu(*this, "audiocpu"),
 		m_samples(*this, "samples"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -171,9 +172,10 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<uint8_t> m_hardhead_ip;
+	memory_share_creator<uint8_t> m_banked_spriteram;
 	optional_shared_ptr<uint8_t> m_spriteram;
 	optional_shared_ptr<uint8_t> m_wram;
-	optional_shared_ptr<uint8_t> m_banked_paletteram;
+	memory_share_creator<uint8_t> m_banked_paletteram;
 	required_device<cpu_device> m_audiocpu;
 	optional_device<samples_device> m_samples;
 	required_device<gfxdecode_device> m_gfxdecode;

@@ -164,6 +164,7 @@ void bbc_1mhzbus_devices(device_slot_interface &device)
 	device.option_add("cc500",      BBC_CC500);           /* CTS Colour Card 500 */
 	//device.option_add("prisma3",    BBC_PRISMA3);         /* PRISMA-3 - Millipede 1989 */
 	device.option_add("sprite",     BBC_SPRITE);          /* Logotron Sprite Board */
+	device.option_add_internal("cfa3000opt", CFA3000_OPT);/* Henson CFA 3000 Option Board */
 }
 
 void bbcm_1mhzbus_devices(device_slot_interface &device)

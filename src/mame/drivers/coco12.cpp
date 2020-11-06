@@ -34,15 +34,15 @@
 #include "bus/coco/coco_orch90.h"
 #include "bus/coco/coco_pak.h"
 #include "bus/coco/coco_psg.h"
+#include "bus/coco/coco_ram.h"
 #include "bus/coco/coco_rs232.h"
 #include "bus/coco/coco_ssc.h"
-#include "bus/coco/coco_ram.h"
+#include "bus/coco/coco_stecomp.h"
 #include "bus/coco/coco_t4426.h"
 
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6809/hd6309.h"
 #include "imagedev/cassette.h"
-#include "sound/volt_reg.h"
 
 #include "softlist.h"
 #include "speaker.h"
@@ -406,22 +406,23 @@ INPUT_PORTS_END
 
 void coco_cart(device_slot_interface &device)
 {
-	device.option_add("fdc", COCO_FDC);
-	device.option_add("fdcv11", COCO_FDC_V11);
+	device.option_add("banked_16k", COCO_PAK_BANKED);
 	device.option_add("cc2hdb1", COCO2_HDB1);
 	device.option_add("cc3hdb1", COCO3_HDB1);
-	device.option_add("cp450_fdc", CP450_FDC);
-	device.option_add("cd6809_fdc", CD6809_FDC);
-	device.option_add("rs232", COCO_RS232);
-	device.option_add("dcmodem", COCO_DCMODEM);
-	device.option_add("orch90", COCO_ORCH90);
-	device.option_add("ssc", COCO_SSC);
-	device.option_add("ram", COCO_PAK_RAM);
-	device.option_add("games_master", COCO_PAK_GMC);
-	device.option_add("banked_16k", COCO_PAK_BANKED);
-	device.option_add("pak", COCO_PAK);
-	device.option_add("multi", COCO_MULTIPAK);
 	device.option_add("ccpsg", COCO_PSG);
+	device.option_add("cd6809_fdc", CD6809_FDC);
+	device.option_add("cp450_fdc", CP450_FDC);
+	device.option_add("dcmodem", COCO_DCMODEM);
+	device.option_add("fdc", COCO_FDC);
+	device.option_add("fdcv11", COCO_FDC_V11);
+	device.option_add("games_master", COCO_PAK_GMC);
+	device.option_add("multi", COCO_MULTIPAK);
+	device.option_add("orch90", COCO_ORCH90);
+	device.option_add("pak", COCO_PAK);
+	device.option_add("ram", COCO_PAK_RAM);
+	device.option_add("rs232", COCO_RS232);
+	device.option_add("ssc", COCO_SSC);
+	device.option_add("stecomp", COCO_STEREO_COMPOSER);
 }
 
 //-------------------------------------------------
@@ -443,12 +444,9 @@ void coco_state::coco_sound(machine_config &config)
 
 	// 6-bit D/A: R10-15 = 10K, 20K, 40.2K, 80.6K, 162K, 324K (according to parts list); output also controls joysticks
 	DAC_6BIT_BINARY_WEIGHTED(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.125);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "sbs", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "sbs", -1.0, DAC_VREF_NEG_INPUT);
 
 	// Single-bit sound: R22 = 10K
-	DAC_1BIT(config, "sbs", 0).add_route(ALL_OUTPUTS, "speaker", 0.125);
+	DAC_1BIT(config, "sbs", 0).set_output_range(-1, 1).add_route(ALL_OUTPUTS, "speaker", 0.125);
 }
 
 

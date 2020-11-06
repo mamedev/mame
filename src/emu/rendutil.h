@@ -13,7 +13,7 @@
 
 #pragma once
 
-#include "render.h"
+#include "rendertypes.h"
 
 #include <cmath>
 
@@ -23,6 +23,8 @@
 enum ru_imgformat
 {
 	RENDUTIL_IMGFORMAT_PNG,
+	RENDUTIL_IMGFORMAT_JPEG,
+	RENDUTIL_IMGFORMAT_MSDIB,
 
 	RENDUTIL_IMGFORMAT_UNKNOWN,
 	RENDUTIL_IMGFORMAT_ERROR
@@ -40,9 +42,10 @@ void render_resample_argb_bitmap_hq(bitmap_argb32 &dest, bitmap_argb32 &source, 
 bool render_clip_line(render_bounds *bounds, const render_bounds *clip);
 bool render_clip_quad(render_bounds *bounds, const render_bounds *clip, render_quad_texuv *texcoords);
 void render_line_to_quad(const render_bounds *bounds, float width, float length_extension, render_bounds *bounds0, render_bounds *bounds1);
-void render_load_jpeg(bitmap_argb32 &bitmap, emu_file &file, const char *dirname, const char *filename);
-bool render_load_png(bitmap_argb32 &bitmap, emu_file &file, const char *dirname, const char *filename, bool load_as_alpha_to_existing = false);
-ru_imgformat render_detect_image(emu_file &file, const char *dirname, const char *filename);
+void render_load_msdib(bitmap_argb32 &bitmap, util::core_file &file);
+void render_load_jpeg(bitmap_argb32 &bitmap, util::core_file &file);
+bool render_load_png(bitmap_argb32 &bitmap, util::core_file &file, bool load_as_alpha_to_existing = false);
+ru_imgformat render_detect_image(util::core_file &file);
 
 
 
@@ -57,76 +60,7 @@ ru_imgformat render_detect_image(emu_file &file, const char *dirname, const char
 
 static inline float render_round_nearest(float f)
 {
-	return floor(f + 0.5f);
-}
-
-
-/*-------------------------------------------------
-    set_render_bounds_xy - cleaner way to set the
-    bounds
--------------------------------------------------*/
-
-static inline void set_render_bounds_xy(render_bounds &bounds, float x0, float y0, float x1, float y1)
-{
-	bounds.x0 = x0;
-	bounds.y0 = y0;
-	bounds.x1 = x1;
-	bounds.y1 = y1;
-}
-
-
-/*-------------------------------------------------
-    set_render_bounds_wh - cleaner way to set the
-    bounds
--------------------------------------------------*/
-
-static inline void set_render_bounds_wh(render_bounds &bounds, float x0, float y0, float width, float height)
-{
-	bounds.x0 = x0;
-	bounds.y0 = y0;
-	bounds.x1 = x0 + width;
-	bounds.y1 = y0 + height;
-}
-
-
-/*-------------------------------------------------
-    sect_render_bounds - compute the intersection
-    of two render_bounds
--------------------------------------------------*/
-
-static inline void sect_render_bounds(render_bounds &dest, const render_bounds &src)
-{
-	dest.x0 = (std::max)(dest.x0, src.x0);
-	dest.x1 = (std::min)(dest.x1, src.x1);
-	dest.y0 = (std::max)(dest.y0, src.y0);
-	dest.y1 = (std::min)(dest.y1, src.y1);
-}
-
-
-/*-------------------------------------------------
-    union_render_bounds - compute the union of two
-    render_bounds
--------------------------------------------------*/
-
-static inline void union_render_bounds(render_bounds &dest, const render_bounds &src)
-{
-	dest.x0 = (std::min)(dest.x0, src.x0);
-	dest.x1 = (std::max)(dest.x1, src.x1);
-	dest.y0 = (std::min)(dest.y0, src.y0);
-	dest.y1 = (std::max)(dest.y1, src.y1);
-}
-
-
-/*-------------------------------------------------
-    set_render_color - cleaner way to set a color
--------------------------------------------------*/
-
-static inline void set_render_color(render_color *color, float a, float r, float g, float b)
-{
-	color->a = a;
-	color->r = r;
-	color->g = g;
-	color->b = b;
+	return floorf(f + 0.5f);
 }
 
 
@@ -212,6 +146,5 @@ static inline u8 apply_brightness_contrast_gamma(u8 src, float brightness, float
 	float result = apply_brightness_contrast_gamma_fp(srcval, brightness, contrast, gamma);
 	return u8(result * 255.0f);
 }
-
 
 #endif // MAME_EMU_RENDUTIL_H

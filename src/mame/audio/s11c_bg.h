@@ -13,7 +13,9 @@
 
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
+#include "machine/rescap.h"
 #include "sound/dac.h"
+#include "sound/flt_biquad.h"
 #include "sound/hc55516.h"
 #include "sound/ym2151.h"
 
@@ -63,6 +65,8 @@ protected:
 	required_device<mc1408_device> m_dac;
 	optional_device<ym2151_device> m_ym2151;
 	optional_device<hc55516_device> m_cvsd;
+	optional_device<filter_biquad_device> m_cvsd_filter;
+	optional_device<filter_biquad_device> m_cvsd_filter2;
 	required_device<pia6821_device> m_pia40;
 	required_memory_bank m_cpubank;
 

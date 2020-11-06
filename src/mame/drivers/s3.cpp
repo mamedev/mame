@@ -44,11 +44,12 @@ ToDo:
 #include "machine/6821pia.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 #include "s3.lh"
 
+
+namespace {
 
 class s3_state : public genpin_class
 {
@@ -71,6 +72,9 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
+
+protected:
+	virtual void machine_start() override { m_digits.resolve(); m_strobe = 0; }
 
 private:
 	uint8_t sound_r();
@@ -105,7 +109,6 @@ private:
 	uint8_t m_switch_col;
 	bool m_data_ok;
 	bool m_chimes;
-	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	required_device<pia6821_device> m_pia22;
@@ -506,9 +509,6 @@ void s3_state::s3a(machine_config &config)
 
 	SPEAKER(config, "speaker").front_center();
 	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	PIA6821(config, m_pias, 0);
 	m_pias->readpb_handler().set(FUNC(s3_state::sound_r));
@@ -605,6 +605,8 @@ ROM_START(pkrno_l1)
 	ROM_REGION(0x0800, "audioroms", 0)
 	ROM_LOAD("488_s0_pokerino.716",   0x0000, 0x0800, CRC(5de02e62) SHA1(f838439a731511a264e508a576ae7193d9fed1af))
 ROM_END
+
+} // Anonymous namespace
 
 GAME( 1977, httip_l1, 0, s3,  s3, s3_state, empty_init, ROT0, "Williams", "Hot Tip (L-1)",          MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 GAME( 1977, lucky_l1, 0, s3,  s3, s3_state, empty_init, ROT0, "Williams", "Lucky Seven (L-1)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

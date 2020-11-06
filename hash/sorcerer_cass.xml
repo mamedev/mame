@@ -133,7 +133,7 @@ Compiled by Robbbert
 		<info name="usage" value="In Basic, BYE then LOG" />
 		<part name="cass" interface="sorcerer_cass">
 			<dataarea name="cass" size="12103836">
-				<rom name="salvo.wav" size="12103836" crc="07925abd" sha1="cde6fa8c9da41eee8db6c7c936f9bb61c5591ae6" />
+				<rom name="milen.wav" size="12103836" crc="07925abd" sha1="cde6fa8c9da41eee8db6c7c936f9bb61c5591ae6" />
 			</dataarea>
 		</part>
 	</software>
@@ -1220,6 +1220,229 @@ Compiled by Robbbert
 		<part name="cass" interface="sorcerer_cass">
 			<dataarea name="cass" size="17570860">
 				<rom name="starf.wav" size="17570860" crc="72ba90c4" sha1="89c992b2a132b2b6eecabfe180d5b5becd2f5de1" />
+			</dataarea>
+		</part>
+	</software>
+	<!-- Added 2020-10-08 -->
+	<software name="atc1">
+		<description>Air Traffic Controller (Mt Purscent)</description>
+		<year>19??</year>
+		<publisher>Creative Computing</publisher>
+		<info name="developer" value="David Mannering"/>
+		<info name="usage" value="Boot to Monitor, LOG" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="0x230d90">
+				<rom name="atc1.wav" size="0x230d90" crc="a519090b" sha1="655f751500c08977b26a50199e06ab212342619d" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="arith">
+		<description>Arithmetic CAI</description>
+		<year>1981</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Peter Aird"/>
+		<info name="usage" value="In Basic, CLOAD then RUN" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="0xda8814">
+				<rom name="arith.wav" size="0xda8814" crc="711c3429" sha1="f6f740d5ddd2d25c7a32bf2b821674ace16990fd" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="aster">
+		<description>Asteroids</description>
+		<year>1980</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="J.T.Staley"/>
+		<info name="usage" value="Boot to Monitor, LOG" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="0x76f3f2">
+				<rom name="aster.wav" size="0x76f3f2" crc="3b2732fd" sha1="feac5acbb5298ba67d6cdd300c199e0beb841f65" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="biochart">
+		<description>Biochart</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="In Basic, CLOAD then RUN" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="0x6123de">
+				<rom name="biochart.wav" size="0x6123de" crc="bc4e0723" sha1="bb9302bdda3365ff3269caecd0ea233ff763c826" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="biorhythm">
+		<description>Bio-Rhythm</description>
+		<year>19??</year>
+		<publisher>Micro Software</publisher>
+		<info name="usage" value="In Basic, CLOAD then RUN" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="0x5ac182">
+				<rom name="biorhythm.wav" size="0x5ac182" crc="bbe0f0ce" sha1="1709c4fa65b5f9c7b887cf1d63c3f3b6d6383bd1" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="blackj">
+		<description>Black Jack</description>
+		<year>1979</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="J.T.Staley"/>
+		<info name="usage" value="In Basic, CLOAD then RUN" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="0x7c0ecc">
+				<rom name="blackj.wav" size="0x7c0ecc" crc="1591a2c8" sha1="36ae79e27299cc694d6562c7c3d97d7189d645b5" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="cadas">
+		<description>Cassette Disk database system</description>
+		<year>1981</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Jim Stafford"/>
+		<info name="usage" value="In Basic, CLOAD then RUN" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="0x602f6a">
+				<rom name="cadas.wav" size="0x602f6a" crc="8ee689bd" sha1="5c6bc70ec8a79aea00ca6e3ec9efe2bc82f05c69" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="com48">
+		<description>Basic Compiler v1.21</description>
+		<year>1982</year>
+		<publisher>System Software</publisher>
+		<info name="usage" value="Boot to Monitor, LOG" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="0x11fff26">
+				<rom name="com48.wav" size="0x11fff26" crc="db015584" sha1="593ee5afa5ac1721955e35af38e7f1152831c963" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="dybug">
+		<description>DYBUG2</description>
+		<year>1981</year>
+		<publisher>Global Software Network</publisher>
+		<info name="developer" value="M. E. Sevior"/>
+		<info name="usage" value="Boot to Monitor, LOG" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="0x3ad9d4">
+				<rom name="dybug2.wav" size="0x3ad9d4" crc="35471c94" sha1="b951c8ccbd3ac509fcb89916820dcce414e14cfb" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="flip">
+		<description>Flip</description>
+		<year>1979</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="J.T.Staley"/>
+		<info name="usage" value="In Basic, CLOAD then RUN. To pass, press Enter." />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="0x82aa64">
+				<rom name="flip.wav" size="0x82aa64" crc="e750993a" sha1="4cf9b56e226727935e8eb887c10434decc48a9d7" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="homerun">
+		<description>Home Run</description>
+		<year>1979</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="J.T.Staley"/>
+		<info name="usage" value="In Basic, CLOAD then RUN" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="0x80084c">
+				<rom name="homerun.wav" size="0x80084c" crc="e64c9407" sha1="b9f7f1f31e9bfdaf23ff54437459db815dd496ac" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="wumpus">
+		<description>Hunt the Wumpus</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Duncan Craven"/>
+		<info name="usage" value="In Basic, CLOAD then RUN" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="0x277880">
+				<rom name="wumpus.wav" size="0x277880" crc="122511b8" sha1="03a1478b5e845550b0b3daf24a5ab6d05cf9c786" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="kalid">
+		<description>Kaleidoscope</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="In Basic, CLOAD then RUN" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="0x191144">
+				<rom name="kalid.wav" size="0x191144" crc="d075ae97" sha1="08ace76909a0d4c26642c1533cfcdb4a33ed5de7" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="ldg">
+		<description>Lost Dutchman's Gold</description>
+		<year>1981</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="In Basic, CLOAD then RUN" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="0xbeb07c">
+				<rom name="ldg.wav" size="0xbeb07c" crc="4e57455f" sha1="badcea2a991543dda5bbac0be0f69a5650657fda" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="robot">
+		<description>Robot Attack (ported from TRS-80)</description>
+		<year>1981</year>
+		<publisher>Big Five Software</publisher>
+		<info name="developer" value="Bill Hogue and Jeff Konyu"/>
+		<info name="usage" value="Boot to Monitor, LOG. Esc+F5 to escape from demo. Esc to skip the intro. 1 or 2 to start. Arrows to move, F and arrow to fire." />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="0xd7442c">
+				<rom name="robot.wav" size="0xd7442c" crc="2edd199f" sha1="3916a5a96c57766bcee9aa56a08abe5c2ba8ee57" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="apatrol">
+		<description>Armored Patrol</description>
+		<year>1981</year>
+		<publisher>Adventure International</publisher>
+		<info name="developer" value="Wayne Westmoreland and Terry Gilman"/>
+		<info name="usage" value="Boot to Monitor, LOG. Z=left .=right, space=fire" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="0xd0742c">
+				<rom name="tank.wav" size="0xd0742c" crc="db36467d" sha1="3b590f470de8f0cc7d604f0b07ddf2bd8290aed8" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="mmind">
+		<description>Mastermind</description>
+		<year>1979</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="M. S. Warden"/>
+		<info name="usage" value="In Basic, CLOAD then RUN" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="0xa11572">
+				<rom name="mastermind.wav" size="0xa11572" crc="53bc223b" sha1="0b248697fd362de954cb282307e7293c2f5a3d0a" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="dterm">
+		<description>The Sorcerer Dumb Terminal</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Boot to Monitor, LOG" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="0x215dd6">
+				<rom name="dterm.wav" size="0x215dd6" crc="9d2cc9eb" sha1="e04df986039b804ae1589376fb89ca62d1684e90" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="invad2">
+		<description>Sorcerer Invaders (alt)</description>
+		<year>1980</year>
+		<publisher>System Software</publisher>
+		<info name="developer" value="Martin Seymor"/>
+		<info name="usage" value="In Basic, CLOAD then RUN" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="0x697a50">
+				<rom name="invad2.wav" size="0x697a50" crc="b450ddfd" sha1="54555ec44b57c30fbdcd637d6b5ff2cf61403eca" />
 			</dataarea>
 		</part>
 	</software>

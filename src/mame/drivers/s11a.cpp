@@ -26,7 +26,6 @@ Note: To start a game, certain switches need to be activated.  You must first pr
 #include "includes/s11a.h"
 
 #include "cpu/m6809/m6809.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 #include "s11a.lh"
@@ -218,13 +217,22 @@ void s11a_state::s11a_base(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &s11_state::s11_audio_map);
 	INPUT_MERGER_ANY_HIGH(config, m_audioirq).output_handler().set_inputline(m_audiocpu, M6802_IRQ_LINE);
 
-	SPEAKER(config, "speaker").front_center();
-	MC1408(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, m_dac, 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, m_dac, -1.0, DAC_VREF_NEG_INPUT);
+	MC1408(config, m_dac, 0);
 
-	SPEAKER(config, "speech").front_center();
-	HC55516(config, m_hc55516, 0).add_route(ALL_OUTPUTS, "speech", 0.50);
+	// common CVSD filter for system 11 and 11a, this is also the same filter circuit as Sinistar/System 6 uses,
+	// and is ALMOST the same filter from the s11 bg sound boards, see /mame/audio/s11c_bg.cpp
+	// The CVSD filter has a large gain, about 4.6x
+	// The filter is boosting the ~5vpp audio signal from the CVSD chip to a ~23vpp (really ~17vpp) theoretical audio signal that the s11
+	// mainboard outputs on its volume control-repurposed-as-audio-out connector.
+	// In reality, the S11 mainboard outputs audio at a virtual ground level between +5v and -12v (so, 17VPP balanced around -7VDC), but since
+	// the CVSD chip's internal DAC can only output between a bit over +0x180/-0x180 out of 0x200, the most voltage it can ever output is
+	// between (assuming 0x1ff is 5VDC and 0x300 is 0VDC) a max of 4.375VDC and a min of 0.625VDC, i.e. 3.75VPP centered on 2.5VDC.
+	// In reality, the range is likely less than that.
+	// This means multiplying a 3.75VPP signal by 4.6 is 17.25VPP, which is almost exactly the expected 17V (12v+5v) VPP the output should have.
+	FILTER_BIQUAD(config, m_cvsd_filter2).opamp_mfb_lowpass_setup(RES_K(27), RES_K(15), RES_K(27), CAP_P(4700), CAP_P(1200));
+	FILTER_BIQUAD(config, m_cvsd_filter).opamp_mfb_lowpass_setup(RES_K(43), RES_K(36), RES_K(180), CAP_P(1800), CAP_P(180));
+	m_cvsd_filter->add_route(ALL_OUTPUTS, m_cvsd_filter2, 1.0);
+	HC55516(config, m_hc55516, 0).add_route(ALL_OUTPUTS, m_cvsd_filter, 1.0);
 
 	PIA6821(config, m_pias, 0);
 	m_pias->readpa_handler().set(FUNC(s11_state::sound_r));
@@ -241,24 +249,28 @@ void s11a_state::s11a(machine_config &config)
 {
 	s11a_base(config);
 	/* Add the background music card */
-	SPEAKER(config, "bgspk").front_center();
 	S11_BG(config, m_bg);
+	m_dac->add_route(ALL_OUTPUTS, m_bg, 0.4484/2.0);
+	m_cvsd_filter2->add_route(ALL_OUTPUTS, m_bg, 0.4484/2.0);
 	m_pia34->ca2_handler().set(m_bg, FUNC(s11_bg_device::resetq_w));
 	m_bg->pb_cb().set(m_pia34, FUNC(pia6821_device::portb_w));
 	m_bg->cb2_cb().set(m_pia34, FUNC(pia6821_device::cb1_w));
-	m_bg->add_route(ALL_OUTPUTS, "bgspk", 1.0);
+	SPEAKER(config, "speaker").front_center();
+	m_bg->add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
 void s11a_state::s11a_obg(machine_config &config)
 {
 	s11a_base(config);
 	/* Add the older-style background music card */
-	SPEAKER(config, "bgspk").front_center();
 	S11_OBG(config, m_bg);
+	m_dac->add_route(ALL_OUTPUTS, m_bg, 0.5319/2.0);
+	m_cvsd_filter2->add_route(ALL_OUTPUTS, m_bg, 0.5319/2.0);
 	m_pia34->ca2_handler().set(m_bg, FUNC(s11_obg_device::resetq_w));
 	m_bg->pb_cb().set(m_pia34, FUNC(pia6821_device::portb_w));
 	m_bg->cb2_cb().set(m_pia34, FUNC(pia6821_device::cb1_w));
-	m_bg->add_route(ALL_OUTPUTS, "bgspk", 1.0);
+	SPEAKER(config, "speaker").front_center();
+	m_bg->add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
 /*------------------------

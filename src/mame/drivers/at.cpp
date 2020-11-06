@@ -442,9 +442,7 @@ void at_state::init_at_common(int xmsbase)
 	if (m_ram->size() > xmsbase)
 	{
 		offs_t ram_limit = 0x100000 + m_ram->size() - xmsbase;
-		space.install_read_bank(0x100000,  ram_limit - 1, "bank1");
-		space.install_write_bank(0x100000,  ram_limit - 1, "bank1");
-		membank("bank1")->set_base(m_ram->pointer() + xmsbase);
+		space.install_ram(0x100000,  ram_limit - 1, m_ram->pointer() + xmsbase);
 	}
 }
 
@@ -463,8 +461,7 @@ void at_vrom_fix_state::machine_start()
 	at_state::machine_start();
 
 	address_space& space = m_maincpu->space(AS_PROGRAM);
-	space.install_read_bank(0xc0000, 0xcffff, "vrom_bank");
-	membank("vrom_bank")->set_base(machine().root_device().memregion("bios")->base());
+	space.install_rom(0xc0000, 0xcffff, machine().root_device().memregion("bios")->base());
 }
 
 void at_state::cfg_single_1200K(device_t *device)
@@ -4334,7 +4331,7 @@ ROM_END
 // 40-040A-001291-00101111-111192-OP495SLC-0 / 486DX-OP-WBq-25/33/50-K2-ZZ
 ROM_START( nat48pv )
 	ROM_REGION32_LE(0x20000, "bios", 0)
-	ROM_LOAD( "amibios_aa5312581.bin", 0x10000, 0x10000, CRC(8A788C79) SHA1(050972B7A369A463D6654EC52C0804002E9BCB37))
+	ROM_LOAD( "amibios_aa5312581.bin", 0x10000, 0x10000, CRC(8a788c79) SHA1(050972b7a369a463d6654ec52c0804002e9bcb37))
 ROM_END
 
 

@@ -55,7 +55,7 @@ void fruitpc_state::fruitpc_map(address_map &map)
 	map(0x00000000, 0x0009ffff).ram();
 	map(0x000a0000, 0x000bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w)); // VGA VRAM
 	map(0x000c0000, 0x000dffff).rom().region("bios", 0);
-	map(0x000e0000, 0x000fffff).ram().region("bios", 0);
+	map(0x000e0000, 0x000fffff).rom().region("bios", 0);
 	map(0x00100000, 0x008fffff).ram();  // 8MB RAM
 	map(0x02000000, 0x28ffffff).noprw();
 	map(0xfffe0000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */

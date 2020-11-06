@@ -664,7 +664,6 @@ TODO:
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "sound/sn76496.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -1240,7 +1239,7 @@ INPUT_CHANGED_MEMBER(gmgalax_state::game_changed)
 	m_selected_game = newval;
 
 	/* select the bank and graphics bank based on it */
-	membank("bank1")->set_entry(m_selected_game);
+	m_bank1->set_entry(m_selected_game);
 	galaxian_gfxbank_w(0, m_selected_game);
 
 	/* reset the stars */
@@ -1268,7 +1267,7 @@ CUSTOM_INPUT_MEMBER(gmgalax_state::port_r)
 void galaxian_state::zigzag_bankswap_w(uint8_t data)
 {
 	/* Zig Zag can swap ROMs 2 and 3 as a form of copy protection */
-	membank("bank1")->set_entry(data & 1);
+	m_bank1->set_entry(data & 1);
 	membank("bank2")->set_entry(~data & 1);
 }
 
@@ -6455,9 +6454,6 @@ void galaxian_state::kingball(machine_config &config)
 
 	/* sound hardware */
 	DAC_4BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.53); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 
@@ -6683,9 +6679,6 @@ void galaxian_state::sfx(machine_config &config)
 
 	/* DAC for the sample player */
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // 16-pin IC (not identified by schematics)
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 
@@ -7206,12 +7199,15 @@ void gmgalax_state::init_gmgalax()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
+	m_stars_enabled = 0;
+	std::fill(std::begin(m_gfxbank), std::end(m_gfxbank), 0);
+
 	/* video extensions */
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, &gmgalax_state::gmgalax_extend_tile_info, &gmgalax_state::gmgalax_extend_sprite_info);
 
 	/* ROM is banked */
-	space.install_read_bank(0x0000, 0x3fff, "bank1");
-	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x4000);
+	space.install_read_bank(0x0000, 0x3fff, m_bank1);
+	m_bank1->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x4000);
 
 	/* callback when the game select is toggled */
 	game_changed(*machine().ioport().ports().begin()->second->fields().first(), 0, 0, 0);
@@ -7259,8 +7255,8 @@ void galaxian_state::init_victoryc()
 
 void galaxian_state::init_fourplay()
 {
-	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
-	membank("bank1")->set_entry(0);
+	m_bank1->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
+	m_bank1->set_entry(0);
 
 	/* video extensions */
 	common_init(NULL, NULL, &galaxian_state::pisces_extend_tile_info, &galaxian_state::pisces_extend_sprite_info);
@@ -7268,8 +7264,8 @@ void galaxian_state::init_fourplay()
 
 void galaxian_state::init_videight()
 {
-	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);
-	membank("bank1")->set_entry(0);
+	m_bank1->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);
+	m_bank1->set_entry(0);
 
 	/* video extensions */
 	common_init(NULL, NULL, &galaxian_state::videight_extend_tile_info, &galaxian_state::videight_extend_sprite_info);
@@ -7432,7 +7428,7 @@ void galaxian_state::init_zigzag()
 	m_numspritegens = 2;
 
 	/* make ROMs 2 & 3 swappable */
-	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x2000, 0x1000);
+	m_bank1->configure_entries(0, 2, memregion("maincpu")->base() + 0x2000, 0x1000);
 	membank("bank2")->configure_entries(0, 2, memregion("maincpu")->base() + 0x2000, 0x1000);
 
 	/* handler for doing the swaps */
@@ -7727,8 +7723,8 @@ void galaxian_state::init_sfx()
 	m_sfx_tilemap = true;
 
 	/* sound board has space for extra ROM */
-	m_audiocpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x3fff, "bank1");
-	membank("bank1")->set_base(memregion("audiocpu")->base());
+	m_audiocpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x3fff, m_bank1);
+	m_bank1->set_base(memregion("audiocpu")->base());
 }
 
 
@@ -12113,6 +12109,32 @@ ROM_START( ncentury )
 	ROM_LOAD( "prom", 0x0000, 0x0020, BAD_DUMP CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
 ROM_END
 
+// the following set was dumped from two different blisters, no PCB available. Contents were the same.
+// It's most similar to scramblebb, but has some changes in the first two program ROMs similar to ncentury
+ROM_START( scramblebun )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "s1", 0x0000, 0x0800, CRC(2609efdc) SHA1(5916cd0d734bd15d5b2db2ef4379a098dee4c580) )
+	ROM_LOAD( "s2", 0x0800, 0x0800, CRC(b82ac737) SHA1(45e50fe66e2fb26232383c4403c4bea9a83b2cd8) )
+	ROM_LOAD( "s3", 0x1000, 0x0800, CRC(eec265ee) SHA1(29b6cf6b93220414eb58cddeba591dc8813c4935) )
+	ROM_LOAD( "34", 0x1800, 0x0800, CRC(dd380a22) SHA1(125e713a58cc5f2c1e38f67dad29f8c985ce5a8b) )
+	ROM_LOAD( "35", 0x2000, 0x0800, CRC(92980e72) SHA1(7e0605b461ace534f8f91028bb82968ecd907ca1) )
+	ROM_LOAD( "36", 0x2800, 0x0800, CRC(9fd96374) SHA1(c8456dd8a012353a023a2d3fa5d508e49c36ace8) )
+	ROM_LOAD( "37", 0x3000, 0x0800, CRC(88ac07a0) SHA1(c57061db5984b472039356bf84a050b5b66e3813) )
+	ROM_LOAD( "38", 0x3800, 0x0800, CRC(75232e09) SHA1(b0da201bf05c63031cdbe9f7059e3c710557f33d) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // not dumped for this set
+	ROM_LOAD( "1.5c", 0x0000, 0x0800, BAD_DUMP CRC(be037cf6) SHA1(f28e5ead496e70beaada24775aa58bd5d75f2d25) )
+	ROM_LOAD( "2.5d", 0x0800, 0x0800, BAD_DUMP CRC(de7912da) SHA1(8558b4eff5d7e63029b325edef9914feda5834c3) )
+	ROM_LOAD( "3.5e", 0x1000, 0x0800, BAD_DUMP CRC(ba2fa933) SHA1(1f976d8595706730e29f93027e7ab4620075c078) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "c2", 0x0000, 0x0800, CRC(4708845b) SHA1(a8b1ad19a95a9d35050a2ab7194cc96fc5afcdc9) )
+	ROM_LOAD( "c1", 0x0800, 0x0800, CRC(11fd2887) SHA1(69844e48bb4d372cac7ae83c953df573c7ecbb7f) )
+
+	ROM_REGION( 0x0020, "proms", 0 ) // not dumped for this set
+	ROM_LOAD( "c01s.6e", 0x0000, 0x0020, BAD_DUMP CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
+ROM_END
+
 ROM_START( scramblebb ) // no PCB, just eproms...
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1",      0x0000, 0x0800, CRC(8ba174c4) SHA1(9ff48669054e4f55a19cb2d317a9d7a5e400e86c) )
@@ -13427,6 +13449,7 @@ GAME( 1981, offensiv,    scramble, scramble,   scramble,   galaxian_state, init_
 GAME( 1981, ncentury,    scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Petaco S.A.)",              "New Century (Spanish bootleg of Scramble)",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // irq isn't enabled correctly
 GAME( 1981, scrammr,     scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Model Racing)",             "Scramble (Model Racing, Italian bootleg)",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // irq isn't enabled correctly
 GAME( 1981, scramblebb,  scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg?",                           "Scramble (bootleg?)",                                       MACHINE_SUPPORTS_SAVE )
+GAME( 1981, scramblebun, scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg",                            "Scramble (unknown bootleg)",                                MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // irq isn't enabled correctly
 GAME( 1981, kamikazesp,  scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Euromatic S.A.)",           "Kamikaze (Euromatic S.A., Spanish bootleg of Scramble)",    MACHINE_SUPPORTS_SAVE )
 GAME( 198?, bomber,      scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Alca)",                     "Bomber (bootleg of Scramble)",                              MACHINE_SUPPORTS_SAVE )
 

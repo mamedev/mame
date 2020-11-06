@@ -47,7 +47,6 @@ SOUNDS["RF5C68"] = true
 SOUNDS["SAA1099"] = true
 SOUNDS["SCSP"] = true
 SOUNDS["DAC"] = true
-SOUNDS["VOLT_REG"] = true
 SOUNDS["SEGAPCM"] = true
 SOUNDS["SN76496"] = true
 SOUNDS["UPD7759"] = true
@@ -125,6 +124,7 @@ function createProjects_mame_virtual(_target, _subtarget)
 	createVirtualProjects(_target, _subtarget, "virtual")
 	files {
 		MAME_DIR .. "src/mame/drivers/vgmplay.cpp",
+		MAME_DIR .. "src/mame/drivers/wavesynth.cpp",
 		MAME_DIR .. "src/mame/drivers/ldplayer.cpp",
 		MAME_DIR .. "src/mame/machine/mega32x.cpp",
 		MAME_DIR .. "src/mame/machine/mega32x.h",

@@ -35,6 +35,10 @@
             or
     A Tempest-like spinner on upgrades
 
+    All PCB pics point to this game using the 136002-125 PROM.
+    Page 4-30 of the operation manual states 6c is 136002-125, too.
+    However MAME had it using the 036408-01 PROM.
+    They have identical contents, anyway.
 
     Memory Map for Major Havoc
 
@@ -284,7 +288,7 @@ void mhavoc_state::alpha_map(address_map &map)
 	map(0x17c0, 0x17c0).w(FUNC(mhavoc_state::mhavoc_gamma_w));           /* Gamma Communication Write Port */
 	map(0x1800, 0x1fff).ram();                             /* Shared Beta Ram */
 	map(0x2000, 0x3fff).bankr("bank2");                        /* Paged Program ROM (32K) */
-	map(0x4000, 0x4fff).ram().share("avg:vectorram").region("alpha", 0x4000);    /* Vector Generator RAM */
+	map(0x4000, 0x4fff).ram().share("avg:vectorram");    /* Vector Generator RAM */
 	map(0x5000, 0x7fff).rom();                             /* Vector ROM */
 	map(0x8000, 0xffff).rom();                 /* Program ROM (32K) */
 }
@@ -363,7 +367,7 @@ void mhavoc_state::alphaone_map(address_map &map)
 	map(0x10e0, 0x10ff).nopr().writeonly().share("avg:colorram");  /* ColorRAM */
 	map(0x1800, 0x18ff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write));   /* EEROM */
 	map(0x2000, 0x3fff).bankr("bank2");                        /* Paged Program ROM (32K) */
-	map(0x4000, 0x4fff).ram().share("avg:vectorram").region("alpha", 0x4000); /* Vector Generator RAM */
+	map(0x4000, 0x4fff).ram().share("avg:vectorram"); /* Vector Generator RAM */
 	map(0x5000, 0x7fff).rom();                             /* Vector ROM */
 	map(0x8000, 0xffff).rom();                             /* Program ROM (32K) */
 }
@@ -642,7 +646,7 @@ ROM_START( mhavoc )
 
 	/* AVG PROM */
 	ROM_REGION( 0x100, "avg:prom", 0 )
-	ROM_LOAD( "036408-01.b1",   0x0000, 0x0100, BAD_DUMP CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
+	ROM_LOAD( "136002-125.6c",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 ROM_END
 
 
@@ -673,7 +677,7 @@ ROM_START( mhavoc2 )
 
 	/* AVG PROM */
 	ROM_REGION( 0x100, "avg:prom", 0 )
-	ROM_LOAD( "036408-01.b1",   0x0000, 0x0100, BAD_DUMP CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
+	ROM_LOAD( "136002-125.6c",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 ROM_END
 
 
@@ -704,7 +708,7 @@ ROM_START( mhavocrv )
 
 	/* AVG PROM */
 	ROM_REGION( 0x100, "avg:prom", 0 )
-	ROM_LOAD( "036408-01.b1",   0x0000, 0x0100, BAD_DUMP CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
+	ROM_LOAD( "136002-125.6c",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 ROM_END
 
 
@@ -735,7 +739,7 @@ ROM_START( mhavocp )
 
 	/* AVG PROM */
 	ROM_REGION( 0x100, "avg:prom", 0 )
-	ROM_LOAD( "036408-01.b1",   0x0000, 0x0100, BAD_DUMP CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
+	ROM_LOAD( "136002-125.6c",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 ROM_END
 
 
@@ -763,7 +767,7 @@ ROM_START( alphaone )
 
 	/* AVG PROM */
 	ROM_REGION( 0x100, "avg:prom", 0 )
-	ROM_LOAD( "036408-01.b1",   0x0000, 0x0100, BAD_DUMP CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
+	ROM_LOAD( "136002-125.6c",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 ROM_END
 
 
@@ -791,7 +795,7 @@ ROM_START( alphaonea )
 
 	/* AVG PROM */
 	ROM_REGION( 0x100, "avg:prom", 0 )
-	ROM_LOAD( "136002-125.6c",   0x0000, 0x0100, BAD_DUMP CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
+	ROM_LOAD( "136002-125.6c",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 ROM_END
 
 

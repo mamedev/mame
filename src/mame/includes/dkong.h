@@ -134,6 +134,8 @@ public:
 		, m_palette(*this, "palette")
 		, m_z80dma(*this, "z80dma")
 		, m_dma8257(*this, "dma8257")
+		, m_bank1(*this, "bank1")
+		, m_bank2(*this, "bank2")
 	{
 	}
 
@@ -255,6 +257,8 @@ private:
 	required_device<palette_device> m_palette;
 	optional_device<z80dma_device> m_z80dma;
 	optional_device<i8257_device> m_dma8257;
+	memory_bank_creator m_bank1;
+	memory_bank_creator m_bank2;
 
 	/* radarscp_scanline */
 	int m_counter;

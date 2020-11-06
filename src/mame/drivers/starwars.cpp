@@ -127,7 +127,7 @@ void starwars_state::esb_slapstic_w(address_space &space, offs_t offset, uint8_t
 
 void starwars_state::main_map(address_map &map)
 {
-	map(0x0000, 0x2fff).ram().share("avg:vectorram").region("maincpu", 0);
+	map(0x0000, 0x2fff).ram().share("avg:vectorram");
 	map(0x3000, 0x3fff).rom();                             /* vector_rom */
 	map(0x4300, 0x431f).portr("IN0");
 	map(0x4320, 0x433f).portr("IN1");

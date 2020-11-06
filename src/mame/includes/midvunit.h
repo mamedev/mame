@@ -49,7 +49,7 @@ class midvunit_state : public driver_device
 public:
 	midvunit_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram", 32),
+		m_videoram(*this, "videoram"),
 		m_textureram(*this, "textureram"),
 		m_screen(*this, "screen"),
 		m_nvram(*this, "nvram"),

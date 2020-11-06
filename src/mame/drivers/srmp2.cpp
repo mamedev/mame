@@ -66,7 +66,6 @@ Note:
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
-#include "sound/msm5205.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -79,6 +78,9 @@ Note:
 
 void srmp2_state::machine_start()
 {
+	m_adpcm_sptr = 0;
+	m_adpcm_eptr = 0;
+
 	save_item(NAME(m_adpcm_bank));
 	save_item(NAME(m_adpcm_data));
 	save_item(NAME(m_adpcm_sptr));

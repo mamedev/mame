@@ -22,7 +22,6 @@
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -1552,9 +1551,6 @@ void bship82_state::bship82(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	DAC_4BIT_BINARY_WEIGHTED_SIGN_MAGNITUDE(config, "dac").add_route(ALL_OUTPUTS, "mono", 0.125); // see above
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 // roms
@@ -1790,9 +1786,6 @@ void vidchal_state::vidchal(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	DAC_4BIT_BINARY_WEIGHTED_SIGN_MAGNITUDE(config, "dac").add_route(ALL_OUTPUTS, "mono", 0.125); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 // roms

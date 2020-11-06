@@ -205,6 +205,9 @@
 #include "hyprdriv.lh"
 #include "sfrush.lh"
 
+
+namespace {
+
 /*************************************
  *
  *  Debugging constants
@@ -493,6 +496,7 @@ void seattle_state::machine_reset()
 	m_wheel_force = 0;
 	m_wheel_offset = 0;
 	m_wheel_calibrated = false;
+	m_ethernet_irq_num = 0;
 	// reset either the DCS2 board or the CAGE board
 	if (m_dcs != nullptr)
 	{
@@ -2810,6 +2814,7 @@ void seattle_state::init_hyprdriv()
 }
 
 
+} // Anonymous namespace
 
 /*************************************
  *

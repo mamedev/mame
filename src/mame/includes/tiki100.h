@@ -61,7 +61,7 @@ public:
 		m_exp(*this, "tiki100bus"),
 		m_rom(*this, Z80_TAG),
 		m_prom(*this, "u4"),
-		m_video_ram(*this, "video_ram"),
+		m_video_ram(*this, "video_ram", TIKI100_VIDEORAM_SIZE, ENDIANNESS_LITTLE),
 		m_y(*this, "Y%u", 1),
 		m_st_io(*this, "ST"),
 		m_palette(*this, "palette"),
@@ -125,7 +125,7 @@ private:
 	required_device<tiki100_bus_device> m_exp;
 	required_memory_region m_rom;
 	required_memory_region m_prom;
-	optional_shared_ptr<uint8_t> m_video_ram;
+	memory_share_creator<uint8_t> m_video_ram;
 	required_ioport_array<13> m_y;
 	required_ioport m_st_io;
 	required_device<palette_device> m_palette;

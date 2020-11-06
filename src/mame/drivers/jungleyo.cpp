@@ -56,11 +56,13 @@ public:
 
 	void jungleyo(machine_config &config);
 
+	void init_jungleyo();
+
 protected:
 	virtual void video_start() override;
 
 private:
-	/* video-related */
+	// video-related
 	uint32_t screen_update_jungleyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void jungleyo_map(address_map &map);
@@ -148,11 +150,11 @@ void jungleyo_state::jungleyo(machine_config &config)
 
 
 ROM_START( jungleyo )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 Code */ // encrypted?
-	ROM_LOAD16_BYTE( "jungle_=record=_rom3_vi3.02.u15", 0x00001, 0x20000, CRC(7c9f431e) SHA1(fb3f90c4fe59c938f36b30c5fa3af227031e7d7a) )
-	ROM_LOAD16_BYTE( "jungle_=record=_rom2_vi3.02.u14", 0x00000, 0x20000, CRC(f6a71260) SHA1(8e48cbb9d701ad968540244396820359afe97c28) )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code, encrypted
+	ROM_LOAD16_BYTE( "jungle_=record=_rom3_vi3.02.u15", 0x00000, 0x20000, CRC(7c9f431e) SHA1(fb3f90c4fe59c938f36b30c5fa3af227031e7d7a) )
+	ROM_LOAD16_BYTE( "jungle_=record=_rom2_vi3.02.u14", 0x00001, 0x20000, CRC(f6a71260) SHA1(8e48cbb9d701ad968540244396820359afe97c28) )
 
-	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x040000, "oki", 0 )
 	ROM_LOAD( "jungle_rom1.u99", 0x00000, 0x40000, CRC(05ef5b85) SHA1(ca7584646271c6adc7880eca5cf43a412340c522) )
 
 	ROM_REGION( 0x80000, "reelgfx", 0 )
@@ -166,4 +168,22 @@ ROM_START( jungleyo )
 ROM_END
 
 
-GAME( 1999, jungleyo, 0, jungleyo, jungleyo, jungleyo_state, empty_init, ROT0, "Yonshi", "Jungle (VI3.02)", MACHINE_NOT_WORKING )
+void jungleyo_state::init_jungleyo() // TODO: just a start, gives correct (?) strings at 0x2000-0x2fff, 0x7000-0x9000 and 0xc000-0xd000 ranges. From 0x10000 onwards needs something different
+{
+	uint16_t *src = (uint16_t *)memregion("maincpu")->base();
+
+	for (int i = 0x00000; i < 0x40000 / 2; i++)
+		src[i] = bitswap<16>(src[i] ^ 0x00ff, 8, 10, 15, 11, 9, 14, 12, 13, 6, 4, 2, 7, 3, 0, 1, 5); // TODO: possibly the bitswap and XOR are applied per byte and not per word, verify when more is discovered
+
+	/*char filename[256];
+	sprintf(filename,"p_decrypted_%s", machine().system().name);
+	FILE *fp = fopen(filename, "w+b");
+	if (fp)
+	{
+	    fwrite(src, 0x40000, 1, fp);
+	    fclose(fp);
+	}*/
+}
+
+
+GAME( 1999, jungleyo, 0, jungleyo, jungleyo, jungleyo_state, init_jungleyo, ROT0, "Yonshi", "Jungle (VI3.02)", MACHINE_NOT_WORKING ) // version 3.02 built on 2001/02/09, there's copyright both for Yonshi and Global in strings

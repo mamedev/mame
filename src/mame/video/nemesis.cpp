@@ -183,7 +183,7 @@ void nemesis_state::create_palette_lookups()
 
 void nemesis_state::nemesis_palette_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA(m_paletteram + offset);
+	COMBINE_DATA(&m_paletteram[offset]);
 	data = m_paletteram[offset];
 
 	int r = (data >> 0) & 0x1f;

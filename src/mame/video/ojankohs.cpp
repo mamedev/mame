@@ -248,29 +248,21 @@ void ojankohs_state::ojankoc_videoram_w(offs_t offset, uint8_t data)
 VIDEO_START_MEMBER(ojankohs_state,ojankohs)
 {
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ojankohs_state::ojankohs_get_tile_info)), TILEMAP_SCAN_ROWS,  8, 4, 64, 64);
-//  m_videoram = std::make_unique<uint8_t[]>(0x1000);
-//  m_colorram = std::make_unique<uint8_t[]>(0x1000);
-//  m_paletteram = std::make_unique<uint8_t[]>(0x800);
 }
 
 VIDEO_START_MEMBER(ojankohs_state,ojankoy)
 {
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ojankohs_state::ojankoy_get_tile_info)), TILEMAP_SCAN_ROWS,  8, 4, 64, 64);
-//  m_videoram = std::make_unique<uint8_t[]>(0x2000);
-//  m_colorram = std::make_unique<uint8_t[]>(0x1000);
 }
 
 VIDEO_START_MEMBER(ojankohs_state,ccasino)
 {
 	VIDEO_START_CALL_MEMBER(ojankoy);
-	m_paletteram.allocate(0x800);
 }
 
 VIDEO_START_MEMBER(ojankohs_state,ojankoc)
 {
 	m_screen->register_screen_bitmap(m_tmpbitmap);
-	m_videoram.allocate(0x8000);
-	m_paletteram.allocate(0x20);
 
 	save_item(NAME(m_tmpbitmap));
 }

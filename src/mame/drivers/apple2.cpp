@@ -54,6 +54,7 @@ II Plus: RAM options reduced to 16/32/48 KB.
 
 #include "sound/spkrdev.h"
 
+#include "bus/a2bus/4play.h"
 #include "bus/a2bus/a2alfam2.h"
 #include "bus/a2bus/a2applicard.h"
 #include "bus/a2bus/a2arcadebd.h"
@@ -63,10 +64,12 @@ II Plus: RAM options reduced to 16/32/48 KB.
 #include "bus/a2bus/a2diskiing.h"
 #include "bus/a2bus/a2dx1.h"
 #include "bus/a2bus/a2echoii.h"
+#include "bus/a2bus/a2iwm.h"
 #include "bus/a2bus/a2mcms.h"
 #include "bus/a2bus/a2memexp.h"
 #include "bus/a2bus/a2midi.h"
 #include "bus/a2bus/a2mockingboard.h"
+#include "bus/a2bus/a2parprn.h"
 #include "bus/a2bus/a2pic.h"
 #include "bus/a2bus/a2sam.h"
 #include "bus/a2bus/a2scsi.h"
@@ -78,19 +81,18 @@ II Plus: RAM options reduced to 16/32/48 KB.
 #include "bus/a2bus/a2ultraterm.h"
 #include "bus/a2bus/a2videoterm.h"
 #include "bus/a2bus/a2zipdrive.h"
+#include "bus/a2bus/byte8251.h"
+#include "bus/a2bus/computereyes2.h"
 #include "bus/a2bus/ezcgi.h"
+#include "bus/a2bus/grapplerplus.h"
 #include "bus/a2bus/laser128.h"
 #include "bus/a2bus/mouse.h"
 #include "bus/a2bus/ramcard128k.h"
 #include "bus/a2bus/ramcard16k.h"
-#include "bus/a2bus/timemasterho.h"
-#include "bus/a2bus/ssprite.h"
 #include "bus/a2bus/ssbapple.h"
-#include "bus/a2bus/4play.h"
-#include "bus/a2bus/computereyes2.h"
+#include "bus/a2bus/ssprite.h"
+#include "bus/a2bus/timemasterho.h"
 #include "bus/a2bus/transwarp.h"
-#include "bus/a2bus/byte8251.h"
-#include "bus/a2bus/a2iwm.h"
 
 #include "bus/a2gameio/gameio.h"
 
@@ -803,14 +805,11 @@ void apple2_state::inh_w(offs_t offset, uint8_t data)
 	}
 }
 
-// floating bus code from old machine/apple2: needs to be reworked based on real beam position to enable e.g. Bob Bishop's screen splitter
+// floating bus code from old machine/apple2: now works reasonably well with French Touch and Deater "vapor lock" stuff
 uint8_t apple2_state::read_floatingbus()
 {
 	enum
 	{
-		// scanner types
-		kScannerNone = 0, kScannerApple2, kScannerApple2e,
-
 		// scanner constants
 		kHBurstClock      =    53, // clock when Color Burst starts
 		kHBurstClocks     =     4, // clocks per Color Burst duration
@@ -855,8 +854,7 @@ uint8_t apple2_state::read_floatingbus()
 	// ScanCycles = ScanLines * kHClocks;
 
 	// calculate horizontal scanning state
-	//
-	h_clock = (i + kHPEClock) % kHClocks; // which horizontal scanning clock
+	h_clock = (i + 63) % kHClocks; // which horizontal scanning clock
 	h_state = kHClock0State + h_clock; // H state bits
 	if (h_clock >= kHPresetClock) // check for horizontal preset
 	{
@@ -922,15 +920,14 @@ uint8_t apple2_state::read_floatingbus()
 	{
 		// N: text, so no higher address bits unless Apple ][, not Apple //e
 		//
-		if ((1) && // Apple ][? // FIX: check for Apple ][? (FB is most useful in old games)
-			(kHPEClock <= h_clock) && // Y: HBL?
+		if ((kHPEClock <= h_clock) && // Y: HBL?
 			(h_clock <= (kHClocks - 1)))
 		{
 			address |= 1 << 12; // Y: a12 (add $1000 to address!)
 		}
 	}
 
-	return m_ram_ptr[address % m_ram_size]; // FIX: this seems to work, but is it right!?
+	return m_ram_ptr[address % m_ram_size];
 }
 
 /***************************************************************************
@@ -1063,6 +1060,15 @@ WRITE_LINE_MEMBER(apple2_state::ay3600_data_ready_w)
 	if (state == ASSERT_LINE)
 	{
 		int mod = 0;
+
+		// if the user presses a valid key to start the driver from the info screen,
+		// we will see that key.  ignore keys in the first 25,000 cycles (in my tests,
+		// the unwanted key shows up at 17030 cycles)
+		if (m_maincpu->total_cycles() < 25000)
+		{
+			return;
+		}
+
 		m_lastchar = m_ay3600->b_r();
 
 		mod = (m_kbspecial->read() & 0x06) ? 0x01 : 0x00;
@@ -1303,7 +1309,9 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("ultraterm", A2BUS_ULTRATERM);    /* Videx UltraTerm (original) */
 	device.option_add("ultratermenh", A2BUS_ULTRATERMENH);    /* Videx UltraTerm (enhanced //e) */
 	device.option_add("aevm80", A2BUS_AEVIEWMASTER80);    /* Applied Engineering ViewMaster 80 */
-	device.option_add("parallel", A2BUS_PIC);   /* Apple Parallel Interface Card */
+	device.option_add("parprn", A2BUS_PARPRN);   /* Apple II Parallel Printer Interface Card */
+	device.option_add("parallel", A2BUS_PIC);   /* Apple II Parallel Interface Card */
+	device.option_add("grapplerplus", A2BUS_GRAPPLERPLUS); /* Orange Micro Grappler+ Printer Interface card */
 	device.option_add("corvus", A2BUS_CORVUS);  /* Corvus flat-cable HDD interface (see notes in a2corvus.c) */
 	device.option_add("mcms1", A2BUS_MCMS1);  /* Mountain Computer Music System, card 1 of 2 */
 	device.option_add("mcms2", A2BUS_MCMS2);  /* Mountain Computer Music System, card 2 of 2.  must be in card 1's slot + 1! */
@@ -1344,7 +1352,7 @@ void apple2_state::apple2_common(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, A2_SPEAKER_TAG).add_route(ALL_OUTPUTS, "mono", 0.5);
+	SPEAKER_SOUND(config, A2_SPEAKER_TAG).add_route(ALL_OUTPUTS, "mono", 0.4);
 
 	/* /INH banking */
 	ADDRESS_MAP_BANK(config, A2_UPPERBANK_TAG).set_map(&apple2_state::inhbank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x3000);

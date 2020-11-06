@@ -35,9 +35,9 @@ public:
 
 		m_x1_bank(*this, "x1_bank_%u", 1U),
 		m_nvram(*this, "nvram"),
-		m_spriteram(*this, "spriteram", 0),
-		m_tileram(*this, "tileram", 0),
-		m_vregs(*this, "vregs", 0),
+		m_spriteram(*this, "spriteram"),
+		m_tileram(*this, "tileram"),
+		m_vregs(*this, "vregs"),
 		m_leds(*this, "led%u", 0U),
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
@@ -217,7 +217,7 @@ public:
 	staraudi_state(const machine_config &mconfig, device_type type, const char *tag) :
 		seta2_state(mconfig, type, tag),
 		m_rtc(*this, "rtc"),
-		m_rgbram(*this, "rgbram", 0)
+		m_rgbram(*this, "rgbram")
 	{
 	}
 	static constexpr feature_type unemulated_features() { return feature::CAMERA | feature::PRINTER; }

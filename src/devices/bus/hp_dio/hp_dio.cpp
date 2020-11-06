@@ -105,6 +105,9 @@ dio16_device::dio16_device(const machine_config &mconfig, const char *tag, devic
 dio16_device::dio16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_prgspace(*this, finder_base::DUMMY_TAG, -1),
+	m_bus_index{0},
+	m_irq{0},
+	m_dmar{0},
 	m_irq1_out_cb(*this),
 	m_irq2_out_cb(*this),
 	m_irq3_out_cb(*this),
@@ -270,10 +273,9 @@ template void dio16_device::install_memory<read16_delegate,    write16_delegate 
 template void dio16_device::install_memory<read16s_delegate,   write16s_delegate  >(offs_t start, offs_t end, read16s_delegate rhandler,   write16s_delegate whandler);
 template void dio16_device::install_memory<read16sm_delegate,  write16sm_delegate >(offs_t start, offs_t end, read16sm_delegate rhandler,  write16sm_delegate whandler);
 
-void dio16_device::install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data)
+void dio16_device::install_bank(offs_t start, offs_t end, uint8_t *data)
 {
-	m_prgspace->install_readwrite_bank(start, end, 0, tag);
-	machine().root_device().membank(m_prgspace->device().siblingtag(tag).c_str())->set_base(data);
+	m_prgspace->install_ram(start, end, data);
 }
 
 void dio16_device::unmap_bank(offs_t start, offs_t end)
@@ -281,10 +283,9 @@ void dio16_device::unmap_bank(offs_t start, offs_t end)
 	m_prgspace->unmap_readwrite(start, end);
 }
 
-void dio16_device::install_rom(offs_t start, offs_t end, const char *tag, uint8_t *data)
+void dio16_device::install_rom(offs_t start, offs_t end, uint8_t *data)
 {
-	m_prgspace->install_read_bank(start, end, 0, tag);
-	machine().root_device().membank(m_prgspace->device().siblingtag(tag).c_str())->set_base(data);
+	m_prgspace->install_rom(start, end, data);
 }
 
 void dio16_device::unmap_rom(offs_t start, offs_t end)

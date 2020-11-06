@@ -6,9 +6,17 @@ Updated by Dan Boris, 2000-04-03
 Rewrite in progress, Dirk Best, 2007-07-31
 Updated by Robbbert 2019-04-14
 
+Since 0.226, if you want to use the TTY, you must do these things:
+- Use the KB/TTY dipswitch to choose TTY
+- Use the TAB menu to choose "Keyboard Mode"
+- Make sure that both keyboards are "Enabled"
+- Quit to save the settings, then restart
+- Press DELETE to start using the terminal
+- For subsequent runs, just press DELETE to get started.
+
 ToDo:
-    - Implement punchtape reader/writer
-    - Front panel Run/Step switch (switch S2)
+- Implement punchtape reader/writer
+- Front panel Run/Step switch (switch S2)
 
 
 ******************************************************************************/

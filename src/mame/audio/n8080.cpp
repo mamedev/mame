@@ -8,7 +8,6 @@
 
 #include "emu.h"
 #include "includes/n8080.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 
@@ -474,8 +473,6 @@ void spacefev_state::spacefev_sound(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	DAC_1BIT(config, m_n8080_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.15);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "n8080_dac", 1.0, DAC_VREF_POS_INPUT);
 
 	SN76477(config, m_sn);
 	m_sn->set_noise_params(RES_K(36), RES_K(150), CAP_N(1));
@@ -508,8 +505,6 @@ void sheriff_state::sheriff_sound(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	DAC_1BIT(config, m_n8080_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.15);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "n8080_dac", 1.0, DAC_VREF_POS_INPUT);
 
 	SN76477(config, m_sn);
 	m_sn->set_noise_params(RES_K(36), RES_K(100), CAP_N(1));
@@ -545,7 +540,4 @@ void helifire_state::helifire_sound(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.15); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "helifire_dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "helifire_dac", -1.0, DAC_VREF_NEG_INPUT);
 }

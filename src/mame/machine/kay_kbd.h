@@ -39,6 +39,7 @@ private:
 	required_device<speaker_sound_device>   m_bell;
 	required_ioport_array<16>               m_matrix;
 	required_ioport                         m_modifiers;
+	output_finder<>                         m_led_caps_lock;
 	devcb_write_line                        m_rxd_cb;
 
 	std::uint8_t        m_txd;

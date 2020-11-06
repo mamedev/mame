@@ -41,11 +41,7 @@ Need a schematic so that the fdc could be repaired.
 /* Address maps */
 void b2m_state::b2m_mem(address_map &map)
 {
-	map(0x0000, 0x27ff).bankrw("bank1");
-	map(0x2800, 0x2fff).bankrw("bank2");
-	map(0x3000, 0x6fff).bankrw("bank3");
-	map(0x7000, 0xdfff).bankrw("bank4");
-	map(0xe000, 0xffff).bankrw("bank5");
+	// Dynamic, set with b2m_set_bank
 }
 
 void b2m_state::b2m_io(address_map &map)
@@ -279,9 +275,9 @@ ROM_START( b2m )
 ROM_END
 
 ROM_START( b2mrom )
-	ROM_REGION( 0x12000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "bios2.rom",  0x00000, 0x2000, CRC(c22a98b7) SHA1(7de91e653bf4b191ded62cf21532578268e4a2c1) )
-	ROM_LOAD( "ramdos.sys", 0x02000, 0x60c0, CRC(91ed6df0) SHA1(4fd040f2647a6b7930c330c75560a035027d0606) )
+	ROM_REGION( 0x80c0, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "bios2.rom",  0x0000, 0x2000, CRC(c22a98b7) SHA1(7de91e653bf4b191ded62cf21532578268e4a2c1) )
+	ROM_LOAD( "ramdos.sys", 0x2000, 0x60c0, CRC(91ed6df0) SHA1(4fd040f2647a6b7930c330c75560a035027d0606) )
 ROM_END
 
 

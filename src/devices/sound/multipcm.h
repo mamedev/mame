@@ -95,6 +95,7 @@ private:
 		envelope_gen_t m_envelope_gen;
 		lfo_t m_pitch_lfo; // Pitch lfo
 		lfo_t m_amplitude_lfo; // AM lfo
+		uint8_t m_format;
 	};
 
 	// internal state

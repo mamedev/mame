@@ -566,8 +566,8 @@ void naomi_gdrom_board::sh4_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).mirror(0xa0000000).rom().region("bios", 0);
 	map(0x04000000, 0x040000ff).rw(m_315_6154, FUNC(sega_315_6154_device::registers_r), FUNC(sega_315_6154_device::registers_w));
-	map(0x0c000000, 0x0cffffff).ram().share("pci:sh4sdram");
-	map(0x10000000, 0x103fffff).ram().share("pci:6154sdram");
+	map(0x0c000000, 0x0cffffff).ram();
+	map(0x10000000, 0x103fffff).rw(FUNC(naomi_gdrom_board::shared_6154_sdram_r), FUNC(naomi_gdrom_board::shared_6154_sdram_w));
 	map(0x14000000, 0x17ffffff).rw(m_315_6154, FUNC(sega_315_6154_device::aperture_r<0>), FUNC(sega_315_6154_device::aperture_w<0>));
 	map(0x18000000, 0x1bffffff).rw(m_315_6154, FUNC(sega_315_6154_device::aperture_r<1>), FUNC(sega_315_6154_device::aperture_w<1>));
 	map.unmap_value_high();
@@ -592,8 +592,8 @@ void naomi_gdrom_board::pci_map(address_map &map)
 	map(0x0000002c, 0x0000002f).rw(t, FUNC(naomi_gdrom_board::sh4_sdramconfig_r), FUNC(naomi_gdrom_board::sh4_sdramconfig_w));
 	map(0x00000030, 0x00000033).rw(t, FUNC(naomi_gdrom_board::sh4_des_keyl_r), FUNC(naomi_gdrom_board::sh4_des_keyl_w));
 	map(0x00000034, 0x00000037).rw(t, FUNC(naomi_gdrom_board::sh4_des_keyh_r), FUNC(naomi_gdrom_board::sh4_des_keyh_w));
-	map(0x70000000, 0x70ffffff).ram().share("sh4sdram");
-	map(0x78000000, 0x783fffff).ram().share("6154sdram");
+	map(0x70000000, 0x70ffffff).rw(t, FUNC(naomi_gdrom_board::shared_sh4_sdram_r), FUNC(naomi_gdrom_board::shared_sh4_sdram_w));
+	map(0x78000000, 0x783fffff).ram();
 }
 
 void naomi_gdrom_board::dimm_command_w(uint16_t data)
@@ -776,6 +776,26 @@ uint32_t naomi_gdrom_board::sh4_des_keyh_r()
 	return (uint32_t)(dimm_des_key >> 32);
 }
 
+uint64_t naomi_gdrom_board::shared_6154_sdram_r(offs_t offset)
+{
+	return space_6154->read_qword(0x78000000 + (offset << 3));
+}
+
+void naomi_gdrom_board::shared_6154_sdram_w(offs_t offset, uint64_t data, uint64_t mem_mask)
+{
+	space_6154->write_qword(0x78000000 + (offset << 3), data, mem_mask);
+}
+
+uint32_t naomi_gdrom_board::shared_sh4_sdram_r(offs_t offset)
+{
+	return space_sh4->read_dword(0x0c000000 + (offset << 2));
+}
+
+void naomi_gdrom_board::shared_sh4_sdram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	space_sh4->write_dword(0x0c000000 + (offset << 2), data, mem_mask);
+}
+
 uint64_t naomi_gdrom_board::i2cmem_dimm_r()
 {
 	uint8_t ret;
@@ -924,8 +944,8 @@ void naomi_gdrom_board::device_start()
 		} else {
 			// use extracted pic data
 			// printf("This PIC key hasn't been converted to a proper PIC binary yet!\n");
-			memcpy(name, picdata+33, 7);
-			memcpy(name+7, picdata+25, 7);
+			memcpy(name, &picdata[33], 7);
+			memcpy(name+7, &picdata[25], 7);
 
 			key = ((uint64_t(picdata[0x31]) << 56) |
 					(uint64_t(picdata[0x32]) << 48) |
@@ -1019,6 +1039,9 @@ void naomi_gdrom_board::device_start()
 		if(!dimm_data)
 			throw emu_fatalerror("GDROM: Could not find the file to decrypt.");
 	}
+
+	space_sh4 = &m_maincpu->space(AS_PROGRAM);
+	space_6154 = &m_315_6154->space(sega_315_6154_device::AS_PCI_MEMORY);
 
 	save_item(NAME(dimm_cur_address));
 	save_item(NAME(picbus));

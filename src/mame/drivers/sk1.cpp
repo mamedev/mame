@@ -203,7 +203,19 @@ ROM_START(sk1)
 	ROM_LOAD("sk1.lsi2", 0x0000, 0x8000, CRC(d615963c) SHA1(0dbf2d1c4c776f1a1c35dd2be4d6ca03882afd4c))
 ROM_END
 
+ROM_START(sk10)
+	ROM_REGION(0x8000, "lsi2", 0) // µPD23C256EAC-070
+	ROM_LOAD("casio_sk10.bin", 0x0000, 0x8000, CRC(5945b619) SHA1(929e906bfa0fcd99a8398b37ec62d0512299065c))
+ROM_END
+
+ROM_START(sk2)
+	ROM_REGION(0x8000, "lsi2", 0) // µPD23C256EAC-093
+	ROM_LOAD("casio_sk2.bin", 0x0000, 0x8000, CRC(f47e421d) SHA1(50785ffd09bb2effcc9f48de466b624fd59f1317))
+ROM_END
+
 } // anonymous namespace
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME  FLAGS
 SYST( 1985, sk1,  0,      0,      sk1,     sk1,   sk1_state, empty_init, "Casio", "SK-1",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+SYST( 1987, sk10, 0,      0,      sk1,     sk1,   sk1_state, empty_init, "Casio", "SK-10",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+SYST( 1988, sk2,  0,      0,      sk1,     sk1,   sk1_state, empty_init, "Casio", "SK-2",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

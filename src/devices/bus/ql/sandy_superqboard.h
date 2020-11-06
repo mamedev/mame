@@ -74,7 +74,7 @@ private:
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_latch;
 	required_memory_region m_rom;
-	optional_shared_ptr<uint8_t> m_ram;
+	memory_share_creator<uint8_t> m_ram;
 	optional_ioport m_buttons;
 
 	int m_ram_size;

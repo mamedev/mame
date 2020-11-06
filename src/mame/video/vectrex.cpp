@@ -123,8 +123,6 @@ TIMER_CALLBACK_MEMBER(vectrex_base_state::vectrex_refresh)
 
 uint32_t vectrex_base_state::screen_update_vectrex(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int i;
-
 	vectrex_configuration();
 
 	/* start black */
@@ -133,7 +131,7 @@ uint32_t vectrex_base_state::screen_update_vectrex(screen_device &screen, bitmap
 						m_points[m_display_start].col,
 						0);
 
-	for (i = m_display_start; i != m_display_end; i = (i + 1) % NVECT)
+	for (int i = m_display_start; i != m_display_end; i = (i + 1) % NVECT)
 	{
 		m_vector->add_point(m_points[i].x,
 							m_points[i].y,
@@ -245,6 +243,14 @@ void vectrex_base_state::video_start()
 	vector_add_point_function = &vectrex_base_state::vectrex_add_point;
 
 	m_refresh = timer_alloc(TIMER_VECTREX_REFRESH);
+
+	m_display_start = 0;
+	m_display_end = 0;
+	m_reset_refresh = 0;
+	m_blank = 0;
+	m_ramp = 0;
+	std::fill(std::begin(m_analog), std::end(m_analog), 0);
+	m_point_index = 0;
 }
 
 void vectrex_state::video_start()

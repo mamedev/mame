@@ -26,7 +26,7 @@ public:
 		m_scrollram(*this, "scrollram"),
 		m_bgram(*this, "bgram"),
 		m_soundbank(*this, "soundbank"),
-		m_spritebank(*this, "spritebank", 0)
+		m_spritebank(*this, "spritebank")
 	{ }
 
 	void taotaido(machine_config &config);

@@ -24,7 +24,7 @@
  *   bit 6: Sub-CPU cancel IRQ
  */
 
-uint8_t fm7_state::fm7_subintf_r()
+uint8_t fm7_state::subintf_r()
 {
 	uint8_t ret = 0x00;
 
@@ -37,7 +37,7 @@ uint8_t fm7_state::fm7_subintf_r()
 	return ret;
 }
 
-void fm7_state::fm7_subintf_w(uint8_t data)
+void fm7_state::subintf_w(uint8_t data)
 {
 	m_video.sub_halt = data & 0x80;
 	if(data & 0x80)
@@ -49,14 +49,14 @@ void fm7_state::fm7_subintf_w(uint8_t data)
 	//popmessage("Sub CPU Interface write: %02x\n",data);
 }
 
-uint8_t fm7_state::fm7_sub_busyflag_r()
+uint8_t fm7_state::sub_busyflag_r()
 {
 	if(m_video.sub_halt == 0)
 		m_video.sub_busy = 0x00;
 	return 0x00;
 }
 
-void fm7_state::fm7_sub_busyflag_w(uint8_t data)
+void fm7_state::sub_busyflag_w(uint8_t data)
 {
 	m_video.sub_busy = 0x80;
 }
@@ -65,7 +65,7 @@ void fm7_state::fm7_sub_busyflag_w(uint8_t data)
  * Sub-CPU port 0xd402
  *   Read-only: Acknowledge Cancel IRQ
  */
-uint8_t fm7_state::fm7_cancel_ack()
+uint8_t fm7_state::cancel_ack()
 {
 	m_sub->set_input_line(M6809_IRQ_LINE,CLEAR_LINE);
 	return 0x00;
@@ -74,7 +74,7 @@ uint8_t fm7_state::fm7_cancel_ack()
 /*
  * Reading from 0xd404 (sub-CPU) causes an "Attention" FIRQ on the main CPU
  */
-uint8_t fm7_state::fm7_attn_irq_r()
+uint8_t fm7_state::attn_irq_r()
 {
 	m_video.attn_irq = 1;
 	m_maincpu->set_input_line(M6809_FIRQ_LINE,ASSERT_LINE);
@@ -87,23 +87,23 @@ uint8_t fm7_state::fm7_attn_irq_r()
  *  On read, enables VRAM access
  *  On write, disables VRAM access
  */
-uint8_t fm7_state::fm7_vram_access_r()
+uint8_t fm7_state::vram_access_r()
 {
 	m_video.vram_access = 1;
 	return 0xff;
 }
 
-void fm7_state::fm7_vram_access_w(uint8_t data)
+void fm7_state::vram_access_w(uint8_t data)
 {
 	m_video.vram_access = 0;
 }
 
-TIMER_CALLBACK_MEMBER(fm7_state::fm77av_alu_task_end)
+TIMER_CALLBACK_MEMBER(fm77_state::av_alu_task_end)
 {
 	m_alu.busy = 0;
 }
 
-void fm7_state::fm7_alu_mask_write(uint32_t offset, int bank, uint8_t dat)
+void fm77_state::alu_mask_write(uint32_t offset, int bank, uint8_t dat)
 {
 	uint8_t temp;
 	int page = 0;
@@ -132,7 +132,7 @@ void fm7_state::fm7_alu_mask_write(uint32_t offset, int bank, uint8_t dat)
 	m_video_ram[(offset & 0x3fff) + (bank * 0x4000) + (page * 0xc000)] = temp | dat;
 }
 
-void fm7_state::fm7_alu_function_compare(uint32_t offset)
+void fm77_state::alu_function_compare(uint32_t offset)
 {
 	// COMPARE - compares which colors match those in the compare registers
 	// can be used on its own, or when bit 6 of the command register is high.
@@ -187,7 +187,7 @@ void fm7_state::fm7_alu_function_compare(uint32_t offset)
 	m_alu.compare_data = dat;
 }
 
-void fm7_state::fm7_alu_function_pset(uint32_t offset)
+void fm77_state::alu_function_pset(uint32_t offset)
 {
 	// PSET - simply sets the pixels to the selected logical colour
 	int x;
@@ -196,7 +196,7 @@ void fm7_state::fm7_alu_function_pset(uint32_t offset)
 	uint8_t mask;
 
 	if(m_alu.command & 0x40)
-		fm7_alu_function_compare(offset);
+		alu_function_compare(offset);
 
 	if(offset >= 0xc000)
 	{
@@ -219,12 +219,12 @@ void fm7_state::fm7_alu_function_pset(uint32_t offset)
 			dat &= ~m_alu.mask;
 			dat |= mask;
 
-			fm7_alu_mask_write(offset,x,dat);
+			alu_mask_write(offset,x,dat);
 		}
 	}
 }
 
-void fm7_state::fm7_alu_function_or(uint32_t offset)
+void fm77_state::alu_function_or(uint32_t offset)
 {
 	int x;
 	uint8_t dat;
@@ -232,7 +232,7 @@ void fm7_state::fm7_alu_function_or(uint32_t offset)
 	uint8_t mask;
 
 	if(m_alu.command & 0x40)
-		fm7_alu_function_compare(offset);
+		alu_function_compare(offset);
 
 	if(offset >= 0xc000)
 	{
@@ -258,12 +258,12 @@ void fm7_state::fm7_alu_function_or(uint32_t offset)
 			dat &= ~m_alu.mask;
 			dat |= mask;
 
-			fm7_alu_mask_write(offset,x,dat);
+			alu_mask_write(offset,x,dat);
 		}
 	}
 }
 
-void fm7_state::fm7_alu_function_and(uint32_t offset)
+void fm77_state::alu_function_and(uint32_t offset)
 {
 	int x;
 	uint8_t dat;
@@ -271,7 +271,7 @@ void fm7_state::fm7_alu_function_and(uint32_t offset)
 	uint8_t mask;
 
 	if(m_alu.command & 0x40)
-		fm7_alu_function_compare(offset);
+		alu_function_compare(offset);
 
 	if(offset >= 0xc000)
 	{
@@ -297,12 +297,12 @@ void fm7_state::fm7_alu_function_and(uint32_t offset)
 			dat &= ~m_alu.mask;
 			dat |= mask;
 
-			fm7_alu_mask_write(offset,x,dat);
+			alu_mask_write(offset,x,dat);
 		}
 	}
 }
 
-void fm7_state::fm7_alu_function_xor(uint32_t offset)
+void fm77_state::alu_function_xor(uint32_t offset)
 {
 	int x;
 	uint8_t dat;
@@ -310,7 +310,7 @@ void fm7_state::fm7_alu_function_xor(uint32_t offset)
 	uint8_t mask;
 
 	if(m_alu.command & 0x40)
-		fm7_alu_function_compare(offset);
+		alu_function_compare(offset);
 
 	if(offset >= 0xc000)
 	{
@@ -336,12 +336,12 @@ void fm7_state::fm7_alu_function_xor(uint32_t offset)
 			dat &= ~m_alu.mask;
 			dat |= mask;
 
-			fm7_alu_mask_write(offset,x,dat);
+			alu_mask_write(offset,x,dat);
 		}
 	}
 }
 
-void fm7_state::fm7_alu_function_not(uint32_t offset)
+void fm77_state::alu_function_not(uint32_t offset)
 {
 	int x;
 	uint8_t dat;
@@ -349,7 +349,7 @@ void fm7_state::fm7_alu_function_not(uint32_t offset)
 	uint8_t mask;
 
 	if(m_alu.command & 0x40)
-		fm7_alu_function_compare(offset);
+		alu_function_compare(offset);
 
 	if(offset >= 0xc000)
 	{
@@ -375,12 +375,12 @@ void fm7_state::fm7_alu_function_not(uint32_t offset)
 			dat &= ~m_alu.mask;
 			dat |= mask;
 
-			fm7_alu_mask_write(offset,x,dat);
+			alu_mask_write(offset,x,dat);
 		}
 	}
 }
 
-void fm7_state::fm7_alu_function_invalid(uint32_t offset)
+void fm77_state::alu_function_invalid(uint32_t offset)
 {
 	// Invalid function, still does something though (used by Laydock)
 	int x;
@@ -389,7 +389,7 @@ void fm7_state::fm7_alu_function_invalid(uint32_t offset)
 	uint8_t mask;
 
 	if(m_alu.command & 0x40)
-		fm7_alu_function_compare(offset);
+		alu_function_compare(offset);
 
 	if(offset >= 0xc000)
 	{
@@ -407,12 +407,12 @@ void fm7_state::fm7_alu_function_invalid(uint32_t offset)
 
 			dat = mask & m_alu.mask;
 
-			fm7_alu_mask_write(offset,x,dat);
+			alu_mask_write(offset,x,dat);
 		}
 	}
 }
 
-void fm7_state::fm7_alu_function_tilepaint(uint32_t offset)
+void fm77_state::alu_function_tilepaint(uint32_t offset)
 {
 	// TILEPAINT - writes to VRAM based on the tilepaint colour registers
 	int x;
@@ -421,7 +421,7 @@ void fm7_state::fm7_alu_function_tilepaint(uint32_t offset)
 	uint8_t mask;
 
 	if(m_alu.command & 0x40)
-		fm7_alu_function_compare(offset);
+		alu_function_compare(offset);
 
 	if(offset >= 0xc000)
 	{
@@ -451,43 +451,43 @@ void fm7_state::fm7_alu_function_tilepaint(uint32_t offset)
 			mask = (m_video_ram[(offset & 0x3fff) + (x * 0x4000) + (page * 0xc000)]) & m_alu.mask;
 			dat |= mask;
 
-			fm7_alu_mask_write(offset,x,dat);
+			alu_mask_write(offset,x,dat);
 		}
 	}
 }
 
-void fm7_state::fm7_alu_function(uint32_t offset)
+void fm77_state::fm7_alu_function(uint32_t offset)
 {
 	switch(m_alu.command & 0x07)
 	{
 		case 0x00: // PSET
-			fm7_alu_function_pset(offset);
+			alu_function_pset(offset);
 			break;
 		case 0x02: // OR
-			fm7_alu_function_or(offset);
+			alu_function_or(offset);
 			break;
 		case 0x03: // AND
-			fm7_alu_function_and(offset);
+			alu_function_and(offset);
 			break;
 		case 0x04: // XOR
-			fm7_alu_function_xor(offset);
+			alu_function_xor(offset);
 			break;
 		case 0x05: // NOT
-			fm7_alu_function_not(offset);
+			alu_function_not(offset);
 			break;
 		case 0x06: // TILEPAINT
-			fm7_alu_function_tilepaint(offset);
+			alu_function_tilepaint(offset);
 			break;
 		case 0x07: // COMPARE
-			fm7_alu_function_compare(offset);
+			alu_function_compare(offset);
 			break;
 		case 0x01:
 		default:
-			fm7_alu_function_invalid(offset);
+			alu_function_invalid(offset);
 	}
 }
 
-uint32_t fm7_state::fm7_line_set_pixel(int x, int y)
+uint32_t fm77_state::av_line_set_pixel(int x, int y)
 {
 	uint32_t addr;
 	static const uint8_t pixel_mask[8] = {0x7f, 0xbf, 0xdf, 0xef, 0xf7, 0xfb, 0xfd, 0xfe };
@@ -515,7 +515,7 @@ uint32_t fm7_state::fm7_line_set_pixel(int x, int y)
 	return addr;
 }
 
-void fm7_state::fm77av_line_draw()
+void fm77_state::av_line_draw()
 {
 	int x1 = m_alu.x0;
 	int x2 = m_alu.x1;
@@ -541,7 +541,7 @@ void fm7_state::fm77av_line_draw()
 
 	for(;;)
 	{
-		fm7_line_set_pixel(x1, y1);
+		av_line_set_pixel(x1, y1);
 		byte_count++;
 
 		if(x1 == x2 && y1 == y2)
@@ -562,10 +562,10 @@ void fm7_state::fm77av_line_draw()
 
 	// set timer to disable busy flag
 	// 1/16 us for each byte changed
-	timer_set(attotime::from_usec(byte_count/16), TIMER_FM77AV_ALU_TASK_END);
+	m_alu_task_end_timer->adjust(attotime::from_usec(byte_count/16));
 }
 
-uint8_t fm7_state::fm7_vram_r(offs_t offset)
+uint8_t fm7_state::vram_r(offs_t offset)
 {
 	int offs;
 	uint16_t page = 0x0000;
@@ -602,7 +602,7 @@ uint8_t fm7_state::fm7_vram_r(offs_t offset)
 	return m_video_ram[offs + page];
 }
 
-void fm7_state::fm7_vram_w(offs_t offset, uint8_t data)
+void fm7_state::vram_w(offs_t offset, uint8_t data)
 {
 	int offs;
 	uint16_t page = 0x0000;
@@ -641,205 +641,19 @@ void fm7_state::fm7_vram_w(offs_t offset, uint8_t data)
 		m_video_ram[offs+page] = data;
 }
 
-// not pretty, but it should work.
-void fm7_state::fm7_vram_banked_w(offs_t offset, uint8_t data)
-{
-	int offs;
-	uint16_t page = 0x0000;
-
-	if(!m_video.sub_halt)  // no access if sub CPU is not halted.
-		return;
-
-	if(m_video.active_video_page != 0)
-		page = 0xc000;
-
-	if(offset < 0x4000 && (m_video.multi_page & 0x01))
-		return;
-	if((offset < 0x8000 && offset >=0x4000) && (m_video.multi_page & 0x02))
-		return;
-	if((offset < 0xc000 && offset >=0x8000) && (m_video.multi_page & 0x04))
-		return;
-
-	if(m_alu.command & 0x80) // ALU active
-	{
-		fm7_alu_function(offset+page);
-		return;
-	}
-
-	if(m_video.modestatus & 0x40)
-	{
-		if(m_video.active_video_page != 0)
-			offs = (offset & 0xe000) | ((offset + m_video.vram_offset2) & 0x1fff);
-		else
-			offs = (offset & 0xe000) | ((offset + m_video.vram_offset) & 0x1fff);
-	}
-	else
-	{
-		if(m_video.active_video_page != 0)
-			offs = (offset & 0xc000) | ((offset + m_video.vram_offset2) & 0x3fff);
-		else
-			offs = (offset & 0xc000) | ((offset + m_video.vram_offset) & 0x3fff);
-	}
-	m_video_ram[offs+page] = data;
-}
-
-uint8_t fm7_state::fm7_vram0_r(offs_t offset)
-{
-	if(!m_video.sub_halt)  // no access if sub CPU is not halted.
-		return 0xff;
-	return fm7_vram_r(offset);
-}
-
-uint8_t fm7_state::fm7_vram1_r(offs_t offset)
-{
-	if(!m_video.sub_halt)  // no access if sub CPU is not halted.
-		return 0xff;
-	return fm7_vram_r(offset+0x1000);
-}
-
-uint8_t fm7_state::fm7_vram2_r(offs_t offset)
-{
-	if(!m_video.sub_halt)  // no access if sub CPU is not halted.
-		return 0xff;
-	return fm7_vram_r(offset+0x2000);
-}
-
-uint8_t fm7_state::fm7_vram3_r(offs_t offset)
-{
-	if(!m_video.sub_halt)  // no access if sub CPU is not halted.
-		return 0xff;
-	return fm7_vram_r(offset+0x3000);
-}
-
-uint8_t fm7_state::fm7_vram4_r(offs_t offset)
-{
-	if(!m_video.sub_halt)  // no access if sub CPU is not halted.
-		return 0xff;
-	return fm7_vram_r(offset+0x4000);
-}
-
-uint8_t fm7_state::fm7_vram5_r(offs_t offset)
-{
-	if(!m_video.sub_halt)  // no access if sub CPU is not halted.
-		return 0xff;
-	return fm7_vram_r(offset+0x5000);
-}
-
-uint8_t fm7_state::fm7_vram6_r(offs_t offset)
-{
-	if(!m_video.sub_halt)  // no access if sub CPU is not halted.
-		return 0xff;
-	return fm7_vram_r(offset+0x6000);
-}
-
-uint8_t fm7_state::fm7_vram7_r(offs_t offset)
-{
-	if(!m_video.sub_halt)  // no access if sub CPU is not halted.
-		return 0xff;
-	return fm7_vram_r(offset+0x7000);
-}
-
-uint8_t fm7_state::fm7_vram8_r(offs_t offset)
-{
-	if(!m_video.sub_halt)  // no access if sub CPU is not halted.
-		return 0xff;
-	return fm7_vram_r(offset+0x8000);
-}
-
-uint8_t fm7_state::fm7_vram9_r(offs_t offset)
-{
-	if(!m_video.sub_halt)  // no access if sub CPU is not halted.
-		return 0xff;
-	return fm7_vram_r(offset+0x9000);
-}
-
-uint8_t fm7_state::fm7_vramA_r(offs_t offset)
-{
-	if(!m_video.sub_halt)  // no access if sub CPU is not halted.
-		return 0xff;
-	return fm7_vram_r(offset+0xa000);
-}
-
-uint8_t fm7_state::fm7_vramB_r(offs_t offset)
-{
-	if(!m_video.sub_halt)  // no access if sub CPU is not halted.
-		return 0xff;
-	return fm7_vram_r(offset+0xb000);
-}
-
-void fm7_state::fm7_vram0_w(offs_t offset, uint8_t data)
-{
-	fm7_vram_banked_w(offset,data);
-}
-
-void fm7_state::fm7_vram1_w(offs_t offset, uint8_t data)
-{
-	fm7_vram_banked_w(offset+0x1000,data);
-}
-
-void fm7_state::fm7_vram2_w(offs_t offset, uint8_t data)
-{
-	fm7_vram_banked_w(offset+0x2000,data);
-}
-
-void fm7_state::fm7_vram3_w(offs_t offset, uint8_t data)
-{
-	fm7_vram_banked_w(offset+0x3000,data);
-}
-
-void fm7_state::fm7_vram4_w(offs_t offset, uint8_t data)
-{
-	fm7_vram_banked_w(offset+0x4000,data);
-}
-
-void fm7_state::fm7_vram5_w(offs_t offset, uint8_t data)
-{
-	fm7_vram_banked_w(offset+0x5000,data);
-}
-
-void fm7_state::fm7_vram6_w(offs_t offset, uint8_t data)
-{
-	fm7_vram_banked_w(offset+0x6000,data);
-}
-
-void fm7_state::fm7_vram7_w(offs_t offset, uint8_t data)
-{
-	fm7_vram_banked_w(offset+0x7000,data);
-}
-
-void fm7_state::fm7_vram8_w(offs_t offset, uint8_t data)
-{
-	fm7_vram_banked_w(offset+0x8000,data);
-}
-
-void fm7_state::fm7_vram9_w(offs_t offset, uint8_t data)
-{
-	fm7_vram_banked_w(offset+0x9000,data);
-}
-
-void fm7_state::fm7_vramA_w(offs_t offset, uint8_t data)
-{
-	fm7_vram_banked_w(offset+0xa000,data);
-}
-
-void fm7_state::fm7_vramB_w(offs_t offset, uint8_t data)
-{
-	fm7_vram_banked_w(offset+0xb000,data);
-}
-
 /*
  *  Sub CPU: I/O port 0xd408
  *
  *  On read, enables the CRT display
  *  On write, disables the CRT display
  */
-uint8_t fm7_state::fm7_crt_r()
+uint8_t fm7_state::crt_r()
 {
 	m_video.crt_enable = 1;
 	return 0xff;
 }
 
-void fm7_state::fm7_crt_w(uint8_t data)
+void fm7_state::crt_w(uint8_t data)
 {
 	m_video.crt_enable = 0;
 }
@@ -850,7 +664,7 @@ void fm7_state::fm7_crt_w(uint8_t data)
  *  0xd40e: bits 0-6 - offset in bytes (high byte) (bit 6 is used for 400 line video only)
  *  0xd40f: bits 0-7 - offset in bytes (low byte)
  */
-void fm7_state::fm7_vram_offset_w(offs_t offset, uint8_t data)
+void fm7_state::vram_offset_w(offs_t offset, uint8_t data)
 {
 	uint16_t new_offset = 0;
 
@@ -898,7 +712,7 @@ void fm7_state::fm7_vram_offset_w(offs_t offset, uint8_t data)
  *  bits 6-4: VRAM planes to display (G,R,B) (1=disable)
  *  bits 2-0: VRAM CPU access (G,R,B) (1=disable)
  */
-void fm7_state::fm7_multipage_w(uint8_t data)
+void fm7_state::multipage_w(uint8_t data)
 {
 	m_video.multi_page = data & 0x77;
 }
@@ -911,12 +725,12 @@ void fm7_state::fm7_multipage_w(uint8_t data)
  *  bit 1 = Red
  *  bit 0 = Blue
  */
-uint8_t fm7_state::fm7_palette_r(offs_t offset)
+uint8_t fm7_state::palette_r(offs_t offset)
 {
 	return m_video.fm7_pal[offset];
 }
 
-void fm7_state::fm7_palette_w(offs_t offset, uint8_t data)
+void fm7_state::palette_w(offs_t offset, uint8_t data)
 {
 	m_palette->set_pen_color(offset, rgb_t(pal1bit(data >> 1), pal1bit(data >> 2), pal1bit(data >> 0)));
 	m_video.fm7_pal[offset] = data & 0x07;
@@ -933,7 +747,7 @@ void fm7_state::fm7_palette_w(offs_t offset, uint8_t data)
  *  fd33: red level (4 bits)
  *  fd34: green level (4 bits)
  */
-void fm7_state::fm77av_analog_palette_w(offs_t offset, uint8_t data)
+void fm77_state::av_analog_palette_w(offs_t offset, uint8_t data)
 {
 	int val;
 
@@ -974,7 +788,7 @@ void fm7_state::fm77av_analog_palette_w(offs_t offset, uint8_t data)
  *             bit 6 - display VRAM page
  *             bit 7 - NMI mask register (1=mask)
  */
-uint8_t fm7_state::fm77av_video_flags_r()
+uint8_t fm77_state::av_video_flags_r()
 {
 	uint8_t ret = 0xff;
 
@@ -993,7 +807,7 @@ uint8_t fm7_state::fm77av_video_flags_r()
 	return ret;
 }
 
-void fm7_state::fm77av_video_flags_w(uint8_t data)
+void fm77_state::av_video_flags_w(uint8_t data)
 {
 	uint8_t* RAM = memregion("subsyscg")->base();
 
@@ -1012,7 +826,7 @@ void fm7_state::fm77av_video_flags_w(uint8_t data)
  *  bit 1 (R/O) - DISPTMG status (0=blank)
  *  bit 0 (R/O) - VSync status (1=sync?)
  */
-uint8_t fm7_state::fm77av_sub_modestatus_r()
+uint8_t fm77_state::av_sub_modestatus_r()
 {
 	uint8_t ret = 0x00;
 
@@ -1028,7 +842,7 @@ uint8_t fm7_state::fm77av_sub_modestatus_r()
 	return ret;
 }
 
-void fm7_state::fm77av_sub_modestatus_w(uint8_t data)
+void fm77_state::av_sub_modestatus_w(uint8_t data)
 {
 	m_video.modestatus = data & 0x40;
 	if(data & 0x40)
@@ -1050,7 +864,7 @@ void fm7_state::fm77av_sub_modestatus_w(uint8_t data)
  *  bits 1 and 0 select which subsys ROM to be banked into sub CPU space
  *  on the FM-77AV40 and later, bit 2 can also selected to bank in sub monitor RAM.
  */
-void fm7_state::fm77av_sub_bank_w(uint8_t data)
+void fm77_state::av_sub_bank_w(uint8_t data)
 {
 //  uint8_t* RAM = memregion("sub")->base();
 	uint8_t* ROM;
@@ -1122,7 +936,7 @@ void fm7_state::fm77av_sub_bank_w(uint8_t data)
  *  0xd428-29(W): Line X1 (High-Low, X9-X0)
  *  0xd42a-2b(W): Line Y1 (High-Low, Y8-Y0)
  */
-uint8_t fm7_state::fm77av_alu_r(offs_t offset)
+uint8_t fm77_state::av_alu_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -1147,7 +961,7 @@ uint8_t fm7_state::fm77av_alu_r(offs_t offset)
 	}
 }
 
-void fm7_state::fm77av_alu_w(offs_t offset, uint8_t data)
+void fm77_state::av_alu_w(offs_t offset, uint8_t data)
 {
 	uint16_t dat;
 
@@ -1251,7 +1065,7 @@ void fm7_state::fm77av_alu_w(offs_t offset, uint8_t data)
 			dat = (m_alu.y1 & 0xff00) | data;
 			m_alu.y1 = dat;
 			// draw line
-			fm77av_line_draw();
+			av_line_draw();
 //          logerror("ALU: write to Y1 (low) register - %02x (%04x)\n",data,m_alu.y1);
 			break;
 		default:
@@ -1259,150 +1073,24 @@ void fm7_state::fm77av_alu_w(offs_t offset, uint8_t data)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(fm7_state::fm77av_vsync)
+TIMER_CALLBACK_MEMBER(fm77_state::av_vsync)
 {
 	if(param == 0)  // start of vsync
 	{
 		m_video.vsync_flag = 1;
-		m_fm77av_vsync_timer->adjust(attotime::from_usec(510),1);  // VSync length for 200 line modes = 0.51ms
+		m_vsync_timer->adjust(attotime::from_usec(510),1);  // VSync length for 200 line modes = 0.51ms
 	}
 	else
 	{
 		m_video.vsync_flag = 0;
-		m_fm77av_vsync_timer->adjust(m_screen->time_until_vblank_end());
+		m_vsync_timer->adjust(m_screen->time_until_vblank_end());
 	}
-}
-
-// called when banked into main CPU space by the MMR, available only if sub CPU is halted
-uint8_t fm7_state::fm7_sub_ram_ports_banked_r(offs_t offset)
-{
-	uint8_t* RAM = memregion("maincpu")->base();
-	uint8_t* ROM;
-
-	if(!m_video.sub_halt)
-		return 0xff;
-
-	if(offset < 0x380)  // work RAM
-		return RAM[0x1d000+offset];
-	if(offset >= 0x380 && offset < 0x400) // shared RAM
-		return m_shared_ram[offset-0x380];
-	if(offset >= 0x500 && offset < 0x800) // work RAM
-		return RAM[0x1d000+offset];
-	if(offset > 0x800) // CGROM
-	{
-		ROM = memregion("subsyscg")->base();
-		return ROM[(m_video.cgrom*0x800)+(offset-0x800)];
-	}
-
-	if(offset >= 0x410 && offset <= 0x42b)
-		return fm77av_alu_r(offset-0x410);
-
-	switch(offset)
-	{
-		case 0x400:
-		case 0x401:
-			return fm7_sub_keyboard_r(offset-0x400);
-		case 0x402:
-			return fm7_cancel_ack();
-		case 0x403:
-			return fm7_sub_beeper_r();
-		case 0x404:
-			return fm7_attn_irq_r();
-		case 0x408:
-			return fm7_crt_r();
-		case 0x409:
-			return fm7_vram_access_r();
-		case 0x40a:
-			return fm7_sub_busyflag_r();
-		case 0x430:
-			return fm77av_video_flags_r();
-		case 0x431:
-		case 0x432:
-			return fm77av_key_encoder_r(offset-0x431);
-		default:
-			logerror("Unmapped read from sub CPU port 0xd%03x via MMR banking\n",offset);
-			return 0xff;
-	}
-}
-
-void fm7_state::fm7_sub_ram_ports_banked_w(offs_t offset, uint8_t data)
-{
-	uint8_t* RAM = memregion("maincpu")->base();
-
-	if(!m_video.sub_halt)
-		return;
-
-	if(offset < 0x380)  // work RAM
-	{
-		RAM[0x1d000+offset] = data;
-		return;
-	}
-	if(offset >= 0x380 && offset < 0x400) // shared RAM
-	{
-		m_shared_ram[offset-0x380] = data;
-		return;
-	}
-	if(offset >= 0x500 && offset < 0x800) // work RAM
-	{
-		RAM[0x1d000+offset] = data;
-		return;
-	}
-
-	if(offset >= 0x410 && offset <= 0x42b)
-	{
-		fm77av_alu_w(offset-0x410,data);
-		return;
-	}
-
-	switch(offset)
-	{
-		case 0x408:
-			fm7_crt_w(data);
-			break;
-		case 0x409:
-			fm7_vram_access_w(data);
-			break;
-		case 0x40a:
-			fm7_sub_busyflag_w(data);
-			break;
-		case 0x40e:
-		case 0x40f:
-			fm7_vram_offset_w(offset-0x40e,data);
-			break;
-		case 0x430:
-			fm77av_video_flags_w(data);
-			break;
-		case 0x431:
-		case 0x432:
-			fm77av_key_encoder_w(offset-0x431,data);
-			break;
-		default:
-			logerror("Unmapped write of 0x%02x to sub CPU port 0xd%03x via MMR banking\n",data,offset);
-	}
-}
-
-uint8_t fm7_state::fm7_console_ram_banked_r(offs_t offset)
-{
-	uint8_t* RAM = memregion("maincpu")->base();
-
-	if(!m_video.sub_halt)
-		return 0xff;
-
-	return RAM[0x1c000+offset];
-}
-
-void fm7_state::fm7_console_ram_banked_w(offs_t offset, uint8_t data)
-{
-	uint8_t* RAM = memregion("maincpu")->base();
-
-	if(!m_video.sub_halt)
-		return;
-
-	RAM[0x1c000+offset] = data;
 }
 
 void fm7_state::video_start()
 {
+	m_video.sub_busy = 0;
+	m_video.sub_halt = 0;
 	m_video.vram_access = 0;
 	m_video.crt_enable = 0;
 	m_video.vram_offset = 0x0000;
@@ -1411,11 +1099,14 @@ void fm7_state::video_start()
 	m_video.multi_page = 0;
 	m_video.subrom = 0;
 	m_video.cgrom = 0;
+	m_video.modestatus = 0;
 	m_video.fine_offset = 0;
 	m_video.nmi_mask = 0;
 	m_video.active_video_page = 0;
 	m_video.display_video_page = 0;
 	m_video.vsync_flag = 0;
+
+	m_alu.command = 0;
 }
 
 uint32_t fm7_state::screen_update_fm7(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

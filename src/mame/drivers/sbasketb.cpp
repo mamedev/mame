@@ -50,7 +50,6 @@ CPU/Video Board Parts:
 #include "machine/gen_latch.h"
 #include "machine/konami1.h"
 #include "machine/watchdog.h"
-#include "sound/volt_reg.h"
 
 #include "speaker.h"
 
@@ -233,9 +232,6 @@ void sbasketb_state::sbasketb(machine_config &config)
 	TRACKFLD_AUDIO(config, m_soundbrd, 0, m_audiocpu, m_vlm);
 
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	SN76489(config, m_sn, XTAL(14'318'181) / 8).add_route(ALL_OUTPUTS, "speaker", 1.0);
 

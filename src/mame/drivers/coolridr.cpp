@@ -320,7 +320,7 @@ public:
 		m_workram_h(*this, "workrah"),
 		m_sound_dma(*this, "sound_dma"),
 		m_soundram(*this, "soundram%u", 1U),
-		m_rom(*this, "share1"),
+		m_rom(*this, "maincpu"),
 		m_compressedgfx(*this, "compressedgfx"),
 		m_io_config(*this, "CONFIG"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -358,7 +358,7 @@ public:
 	required_shared_ptr<uint32_t> m_workram_h;
 	required_shared_ptr<uint32_t> m_sound_dma;
 	required_shared_ptr_array<uint16_t, 2> m_soundram;
-	required_shared_ptr<uint32_t> m_rom;
+	required_region_ptr<uint32_t> m_rom;
 	required_region_ptr<uint8_t> m_compressedgfx;
 	required_ioport m_io_config;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -2779,7 +2779,7 @@ void coolridr_state::dma_w(address_space &space, offs_t offset, uint32_t data, u
 
 void coolridr_state::system_h1_map(address_map &map)
 {
-	map(0x00000000, 0x001fffff).rom().share("share1").nopw();
+	map(0x00000000, 0x001fffff).rom().nopw();
 	map(0x01000000, 0x01ffffff).rom().region("gfx_data", 0x0000000);
 
 	map(0x03f40000, 0x03f4ffff).ram().share("txt_vram");//text tilemap + "lineram"
@@ -2790,7 +2790,7 @@ void coolridr_state::system_h1_map(address_map &map)
 	map(0x0400001c, 0x0400001f).w(FUNC(coolridr_state::fb_data_w));
 
 	map(0x06000000, 0x060fffff).ram().share("workrah");
-	map(0x20000000, 0x201fffff).rom().share("share1");
+	map(0x20000000, 0x201fffff).rom().region("maincpu", 0);
 
 	map(0x60000000, 0x600003ff).nopw();
 }

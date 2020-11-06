@@ -333,7 +333,7 @@ void isa8_cga_4enlinea_device::device_start()
 
 	//m_isa->install_device(0x3bf, 0x3bf, 0, 0, nullptr, write8_delegate(*this, FUNC(isa8_cga_4enlinea_device::_4enlinea_mode_control_w)));
 	m_isa->install_device(0x3d0, 0x3df, read8sm_delegate(*this, FUNC(isa8_cga_4enlinea_device::_4enlinea_io_read)), write8sm_delegate(*this, FUNC(isa8_cga_device::io_write)));
-	m_isa->install_bank(0x8000, 0xbfff, "bank1", &m_vram[0]);
+	m_isa->install_bank(0x8000, 0xbfff, &m_vram[0]);
 
 	// Initialise the CGA palette
 	int i;

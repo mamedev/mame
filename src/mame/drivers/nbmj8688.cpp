@@ -38,7 +38,6 @@ TODO:
 #include "sound/3812intf.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
@@ -2579,9 +2578,6 @@ void nbmj8688_state::NBMJDRV_4096(machine_config &config)
 	psg.add_route(ALL_OUTPUTS, "speaker", 0.35);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void nbmj8688_state::NBMJDRV_256(machine_config &config)
@@ -2692,7 +2688,6 @@ void nbmj8688_state::barline(machine_config &config)
 	YM3812(config.replace(), "psg", 20000000/8).add_route(ALL_OUTPUTS, "speaker", 0.35);
 
 	config.device_remove("dac");
-	config.device_remove("vref");
 }
 
 void nbmj8688_state::mbmj_p16bit(machine_config &config)
@@ -2767,9 +2762,6 @@ void nbmj8688_state::mbmj_p16bit_LCD(machine_config &config)
 	psg.add_route(ALL_OUTPUTS, "speaker", 0.35);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void nbmj8688_state::bijokkoy(machine_config &config)

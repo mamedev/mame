@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, Olivier Galibert
 /*
-    Mitsubishi M5074x 8-bit microcontroller family
+    Mitsubishi M5074x/5075x 8-bit microcontroller family
 */
 
 #include "emu.h"
@@ -11,19 +11,19 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define IRQ_CNTRREQ (0x80)
-#define IRQ_CNTRENA (0x40)
-#define IRQ_TMR1REQ (0x20)
-#define IRQ_TMR1ENA (0x10)
-#define IRQ_TMR2REQ (0x08)
-#define IRQ_TMR2ENA (0x04)
-#define IRQ_INTREQ  (0x02)
-#define IRQ_INTENA  (0x01)
+static constexpr u8 IRQ_CNTRREQ = 0x80;
+static constexpr u8 IRQ_CNTRENA = 0x40;
+static constexpr u8 IRQ_TMR1REQ = 0x20;
+static constexpr u8 IRQ_TMR1ENA = 0x10;
+static constexpr u8 IRQ_TMR2REQ = 0x08;
+static constexpr u8 IRQ_TMR2ENA = 0x04;
+static constexpr u8 IRQ_INTREQ  = 0x02;
+static constexpr u8 IRQ_INTENA  = 0x01;
 
-#define TMRC_TMRXREQ (0x80)
-#define TMRC_TMRXENA (0x40)
-#define TMRC_TMRXHLT (0x20)
-#define TMRC_TMRXMDE (0x0c)
+static constexpr u8 TMRC_TMRXREQ = 0x80;
+static constexpr u8 TMRC_TMRXENA = 0x40;
+static constexpr u8 TMRC_TMRXHLT = 0x20;
+static constexpr u8 TMRC_TMRXMDE = 0x0c;
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -31,6 +31,7 @@
 
 DEFINE_DEVICE_TYPE(M50740, m50740_device, "m50740", "Mitsubishi M50740")
 DEFINE_DEVICE_TYPE(M50741, m50741_device, "m50741", "Mitsubishi M50741")
+DEFINE_DEVICE_TYPE(M50753, m50753_device, "m50753", "Mitsubishi M50753")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -39,9 +40,9 @@ DEFINE_DEVICE_TYPE(M50741, m50741_device, "m50741", "Mitsubishi M50741")
 //-------------------------------------------------
 //  m5074x_device - constructor
 //-------------------------------------------------
-m5074x_device::m5074x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map) :
+m5074x_device::m5074x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int addrbits, address_map_constructor internal_map) :
 	m740_device(mconfig, type, tag, owner, clock),
-	m_program_config("program", ENDIANNESS_LITTLE, 8, 13, 0, internal_map),
+	m_program_config("program", ENDIANNESS_LITTLE, 8, addrbits, 0, internal_map),
 	m_read_p(*this),
 	m_write_p(*this),
 	m_intctrl(0),
@@ -163,20 +164,13 @@ void m5074x_device::execute_set_input(int inputnum, int state)
 {
 	switch (inputnum)
 	{
-		case M5074X_INT1_LINE:
-			if (state == ASSERT_LINE)
-			{
-				m_intctrl |= IRQ_INTREQ;
-			}
-			else
-			{
-				m_intctrl &= ~IRQ_INTREQ;
-			}
-			break;
-
-		case M5074X_SET_OVERFLOW:   // the base 740 class can handle this
-			m740_device::execute_set_input(M740_SET_OVERFLOW, state);
-			break;
+	case M5074X_INT1_LINE:
+		// FIXME: edge-triggered
+		if (state == ASSERT_LINE)
+		{
+			m_intctrl |= IRQ_INTREQ;
+		}
+		break;
 	}
 
 	recalc_irqs();
@@ -319,6 +313,12 @@ uint8_t m5074x_device::ports_r(offs_t offset)
 
 		case 9:
 			return m_ddrs[3];
+
+		case 0xa:
+			return read_port(4);
+
+		case 0xb:
+			return m_ddrs[4];
 	}
 
 	return 0xff;
@@ -366,6 +366,16 @@ void m5074x_device::ports_w(offs_t offset, uint8_t data)
 		case 9: // p3 ddr
 			send_port(3, m_ports[3] & data);
 			m_ddrs[3] = data;
+			break;
+
+		case 0xa: // p4
+			send_port(4, data & m_ddrs[4]);
+			m_ports[4] = data;
+			break;
+
+		case 0xb: // p4 ddr
+			send_port(4, m_ports[4] & data);
+			m_ddrs[4] = data;
 			break;
 	}
 }
@@ -429,24 +439,25 @@ void m5074x_device::tmrirq_w(offs_t offset, uint8_t data)
 			break;
 
 		case 5:
-			m_intctrl = data;
+			// Interrupt request bits can only be reset
+			m_intctrl = data & (m_intctrl | ~(IRQ_CNTRREQ | IRQ_INTREQ));
 			recalc_irqs();
 			break;
 
 		case 6:
-			m_tmrctrl = data;
+			m_tmrctrl = data & (m_tmrctrl | ~TMRC_TMRXREQ);
 			recalc_irqs();
 			break;
 	}
 }
 
-/* M50740 - baseline for this familiy */
+// M50740 - baseline for this family
 void m50740_device::m50740_map(address_map &map)
 {
 	map(0x0000, 0x005f).ram();
 	map(0x00e0, 0x00e9).rw(FUNC(m50740_device::ports_r), FUNC(m50740_device::ports_w));
 	map(0x00f9, 0x00ff).rw(FUNC(m50740_device::tmrirq_r), FUNC(m50740_device::tmrirq_w));
-	map(0x1400, 0x1fff).rom().region(M5074X_INTERNAL_ROM_REGION, 0);
+	map(0x1400, 0x1fff).rom().region(DEVICE_SELF, 0);
 }
 
 m50740_device::m50740_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -455,17 +466,17 @@ m50740_device::m50740_device(const machine_config &mconfig, const char *tag, dev
 }
 
 m50740_device::m50740_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	m5074x_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(m50740_device::m50740_map), this))
+	m5074x_device(mconfig, type, tag, owner, clock, 13, address_map_constructor(FUNC(m50740_device::m50740_map), this))
 {
 }
 
-/* M50741 - 50740 with a larger internal ROM */
+// M50741 - 50740 with a larger internal ROM
 void m50741_device::m50741_map(address_map &map)
 {
 	map(0x0000, 0x005f).ram();
 	map(0x00e0, 0x00e9).rw(FUNC(m50741_device::ports_r), FUNC(m50741_device::ports_w));
 	map(0x00f9, 0x00ff).rw(FUNC(m50741_device::tmrirq_r), FUNC(m50741_device::tmrirq_w));
-	map(0x1000, 0x1fff).rom().region("internal", 0);
+	map(0x1000, 0x1fff).rom().region(DEVICE_SELF, 0);
 }
 
 m50741_device::m50741_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -474,6 +485,144 @@ m50741_device::m50741_device(const machine_config &mconfig, const char *tag, dev
 }
 
 m50741_device::m50741_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	m5074x_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(m50741_device::m50741_map), this))
+	m5074x_device(mconfig, type, tag, owner, clock, 13, address_map_constructor(FUNC(m50741_device::m50741_map), this))
 {
+}
+
+// M50753 - M5074X with more pins, more RAM, more ROM, A-D, PWM, serial I/O (TODO)
+void m50753_device::m50753_map(address_map &map)
+{
+	map(0x0000, 0x00bf).ram();
+	map(0x00e0, 0x00eb).rw(FUNC(m50753_device::ports_r), FUNC(m50753_device::ports_w));
+	map(0x00ee, 0x00ee).r(FUNC(m50753_device::in_r));
+	map(0x00ef, 0x00ef).r(FUNC(m50753_device::ad_r));
+	map(0x00f2, 0x00f2).w(FUNC(m50753_device::ad_start_w));
+	map(0x00f3, 0x00f3).rw(FUNC(m50753_device::ad_control_r), FUNC(m50753_device::ad_control_w));
+	map(0x00f5, 0x00f5).rw(FUNC(m50753_device::pwm_control_r), FUNC(m50753_device::pwm_control_w));
+	map(0x00f9, 0x00ff).rw(FUNC(m50753_device::tmrirq_r), FUNC(m50753_device::tmrirq_w));
+	map(0xe800, 0xffff).rom().region(DEVICE_SELF, 0);
+}
+
+// interrupt bits on 50753 are slightly different from the 740/741.
+static constexpr u8 IRQ_50753_INT1REQ = 0x80;
+static constexpr u8 IRQ_50753_INTADC = 0x20;
+static constexpr u8 IRQ_50753_INT2REQ = 0x02;
+
+m50753_device::m50753_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	m50753_device(mconfig, M50753, tag, owner, clock)
+{
+}
+
+m50753_device::m50753_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	m5074x_device(mconfig, type, tag, owner, clock, 16, address_map_constructor(FUNC(m50753_device::m50753_map), this)),
+	m_ad_in(*this),
+	m_in_p(*this),
+	m_ad_control(0),
+	m_pwm_enabled(false)
+{
+}
+
+void m50753_device::device_start()
+{
+	m5074x_device::device_start();
+
+	m_ad_in.resolve_all_safe(0);
+	m_in_p.resolve_safe(0);
+
+	save_item(NAME(m_ad_control));
+	save_item(NAME(m_pwm_enabled));
+}
+
+void m50753_device::device_reset()
+{
+	m5074x_device::device_reset();
+
+	m_ad_control = 0;
+	m_pwm_enabled = false;
+}
+
+uint8_t m50753_device::in_r()
+{
+	return m_in_p();
+}
+
+uint8_t m50753_device::ad_r()
+{
+	m_intctrl &= ~IRQ_50753_INTADC;
+	recalc_irqs();
+
+	return m_ad_in[m_ad_control & 0x07]();
+}
+
+void m50753_device::ad_start_w(uint8_t data)
+{
+	logerror("%s: A-D start (IN%d)\n", machine().describe_context(), m_ad_control & 0x07);
+
+	// starting a conversion.  M50753 documentation says conversion time is 72 microseconds.
+	m_timers[TIMER_ADC]->adjust(attotime::from_usec(72));
+}
+
+uint8_t m50753_device::ad_control_r()
+{
+	return m_ad_control;
+}
+
+void m50753_device::ad_control_w(uint8_t data)
+{
+	m_ad_control = data & 0x0f;
+}
+
+uint8_t m50753_device::pwm_control_r()
+{
+	return m_pwm_enabled ? 0x01 : 0x00;
+}
+
+void m50753_device::pwm_control_w(uint8_t data)
+{
+	m_pwm_enabled = BIT(data, 0);
+}
+
+void m50753_device::execute_set_input(int inputnum, int state)
+{
+	switch (inputnum)
+	{
+	case M50753_INT1_LINE:
+		// FIXME: edge-triggered
+		if (state == ASSERT_LINE)
+		{
+			m_intctrl |= IRQ_50753_INT1REQ;
+		}
+		break;
+
+	case M50753_INT2_LINE:
+		// FIXME: edge-triggered
+		if (state == ASSERT_LINE)
+		{
+			m_intctrl |= IRQ_50753_INT2REQ;
+		}
+		break;
+	}
+
+	recalc_irqs();
+}
+
+void m50753_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_ADC:
+		m_timers[TIMER_ADC]->adjust(attotime::never);
+
+		// if interrupt source is the ADC, do it.
+		if (m_ad_control & 4)
+		{
+			m_intctrl |= IRQ_50753_INTADC;
+			recalc_irqs();
+		}
+		break;
+
+	default:
+		m5074x_device::device_timer(timer, id, param, ptr);
+		break;
+	}
 }

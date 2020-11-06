@@ -409,7 +409,7 @@ uint8_t igspoker_state::exp_rom_r(offs_t offset)
 void igspoker_state::igspoker_prg_map(address_map &map)
 {
 	map(0x0000, 0xefff).rom();
-	map(0xf000, 0xffff).ram().region("maincpu", 0xf000);
+	map(0xf000, 0xffff).ram();
 }
 
 void igspoker_state::igspoker_io_map(address_map &map)

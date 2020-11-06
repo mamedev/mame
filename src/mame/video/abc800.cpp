@@ -274,10 +274,6 @@ uint32_t abc800m_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 void abc800_state::video_start()
 {
-	// allocate memory
-	m_char_ram.allocate(m_char_ram_size);
-	m_video_ram.allocate(ABC800_VIDEO_RAM_SIZE);
-
 	// register for state saving
 	save_item(NAME(m_hrs));
 	save_item(NAME(m_fgctl));

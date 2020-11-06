@@ -51,7 +51,6 @@ ToDO:
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/votrax.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 #include "taito.lh"
@@ -362,9 +361,6 @@ void taito_state::taito(machine_config &config)
 
 	SPEAKER(config, "speaker").front_center();
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.475); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	PIA6821(config, m_pia);
 	//m_pia->readpa_handler().set(FUNC(taito_state::pia_pa_r));

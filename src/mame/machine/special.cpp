@@ -113,18 +113,11 @@ void special_state::specimx_portc_w(uint8_t data)
 	m_dac->write(BIT(data, 5)); //beeper
 }
 
-void special_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_DEVICE_CALLBACK_MEMBER(special_state::pit_timer)
 {
-	switch (id)
-	{
-	case TIMER_PIT8253_GATES:
-		m_pit->write_gate0(0);
-		m_pit->write_gate1(0);
-		m_pit->write_gate2(0);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in special_state::device_timer");
-	}
+	m_pit->write_gate0(0);
+	m_pit->write_gate1(0);
+	m_pit->write_gate2(0);
 }
 
 
@@ -152,13 +145,13 @@ void special_state::specimx_set_bank(offs_t i, uint8_t data)
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	uint8_t *ram = m_ram->pointer();
 
-	space.install_write_bank(0xc000, 0xffbf, "bank3");
-	space.install_write_bank(0xffc0, 0xffdf, "bank4");
+	space.install_write_bank(0xc000, 0xffbf, m_bank3);
+	space.install_write_bank(0xffc0, 0xffdf, m_bank4);
 	m_bank4->set_base(ram + 0xffc0);
 	switch(i)
 	{
 		case 0 :
-			space.install_write_bank(0x0000, 0x8fff, "bank1");
+			space.install_write_bank(0x0000, 0x8fff, m_bank1);
 			space.install_write_handler(0x9000, 0xbfff, write8sm_delegate(*this, FUNC(special_state::video_memory_w)));
 
 			m_bank1->set_base(ram);
@@ -166,8 +159,8 @@ void special_state::specimx_set_bank(offs_t i, uint8_t data)
 			m_bank3->set_base(ram + 0xc000);
 			break;
 		case 1 :
-			space.install_write_bank(0x0000, 0x8fff, "bank1");
-			space.install_write_bank(0x9000, 0xbfff, "bank2");
+			space.install_write_bank(0x0000, 0x8fff, m_bank1);
+			space.install_write_bank(0x9000, 0xbfff, m_bank2);
 
 			m_bank1->set_base(ram + 0x10000);
 			m_bank2->set_base(ram + 0x19000);
@@ -240,12 +233,12 @@ void special_state::erik_set_bank()
 	uint8_t *ram = m_ram->pointer();
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	space.install_write_bank(0x0000, 0x3fff, "bank1");
-	space.install_write_bank(0x4000, 0x8fff, "bank2");
-	space.install_write_bank(0x9000, 0xbfff, "bank3");
-	space.install_write_bank(0xc000, 0xefff, "bank4");
-	space.install_write_bank(0xf000, 0xf7ff, "bank5");
-	space.install_write_bank(0xf800, 0xffff, "bank6");
+	space.install_write_bank(0x0000, 0x3fff, m_bank1);
+	space.install_write_bank(0x4000, 0x8fff, m_bank2);
+	space.install_write_bank(0x9000, 0xbfff, m_bank3);
+	space.install_write_bank(0xc000, 0xefff, m_bank4);
+	space.install_write_bank(0xf000, 0xf7ff, m_bank5);
+	space.install_write_bank(0xf800, 0xffff, m_bank6);
 
 	switch(bank1)
 	{
@@ -325,7 +318,7 @@ void special_state::machine_reset()
 	{
 		m_specimx_color = 0xF0;  // default for -bios 1/2, since they don't have colour
 		specimx_set_bank(2, 0); // Initial load ROM disk
-		timer_set(attotime::zero, TIMER_PIT8253_GATES);
+		m_pit_timer->adjust(attotime::zero);
 	}
 }
 

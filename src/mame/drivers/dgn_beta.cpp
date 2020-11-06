@@ -142,22 +142,6 @@ static constexpr rgb_t dgnbeta_pens[] =
 
 void dgn_beta_state::dgnbeta_map(address_map &map)
 {
-	map(0x0000, 0x0FFF).bankrw("bank1");
-	map(0x1000, 0x1FFF).bankrw("bank2");
-	map(0x2000, 0x2FFF).bankrw("bank3");
-	map(0x3000, 0x3FFF).bankrw("bank4");
-	map(0x4000, 0x4FFF).bankrw("bank5");
-	map(0x5000, 0x5FFF).bankrw("bank6");
-	map(0x6000, 0x6FFF).bankrw("bank7").share("videoram");
-	map(0x7000, 0x7FFF).bankrw("bank8");
-	map(0x8000, 0x8FFF).bankrw("bank9");
-	map(0x9000, 0x9FFF).bankrw("bank10");
-	map(0xA000, 0xAFFF).bankrw("bank11");
-	map(0xB000, 0xBFFF).bankrw("bank12");
-	map(0xC000, 0xCFFF).bankrw("bank13");
-	map(0xD000, 0xDFFF).bankrw("bank14");
-	map(0xE000, 0xEFFF).bankrw("bank15");
-	map(0xF000, 0xFBFF).bankrw("bank16");
 	map(0xfC00, 0xfC1F).noprw();
 	map(0xFC20, 0xFC23).rw(m_pia_0, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xFC24, 0xFC27).rw(m_pia_1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
@@ -172,8 +156,6 @@ void dgn_beta_state::dgnbeta_map(address_map &map)
 	map(0xfce4, 0xfdff).noprw();
 	map(0xFE00, 0xFE0F).rw(FUNC(dgn_beta_state::dgn_beta_page_r), FUNC(dgn_beta_state::dgn_beta_page_w));
 	map(0xfe10, 0xfEff).noprw();
-	map(0xFF00, 0xFFFF).bankrw("bank17");
-
 }
 
 
@@ -414,4 +396,4 @@ ROM_START(dgnbeta)
 ROM_END
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS           INIT        COMPANY            FULLNAME             FLAGS
-COMP( 1984, dgnbeta, 0,      0,      dgnbeta, dgnbeta, dgn_beta_state, empty_init, "Dragon Data Ltd", "Dragon 128 (Beta)", MACHINE_NO_SOUND )
+COMP( 1984, dgnbeta, 0,      0,      dgnbeta, dgnbeta, dgn_beta_state, empty_init, "Dragon Data Ltd", "Dragon 128 (Beta)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

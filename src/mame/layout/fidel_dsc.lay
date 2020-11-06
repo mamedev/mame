@@ -8,8 +8,32 @@ license:CC0
 
 	<element name="black"><rect><color red="0.17" green="0.15" blue="0.15" /></rect></element>
 	<element name="white"><rect><color red="0.81" green="0.8" blue="0.79" /></rect></element>
-	<element name="disk_black"><disk><color red="0.17" green="0.15" blue="0.15" /></disk></element>
-	<element name="disk_white"><disk><color red="0.81" green="0.8" blue="0.79" /></disk></element>
+
+	<element name="btn_white">
+		<disk>
+			<bounds xc="0" yc="0" width="7" height="7" />
+			<color red="0.17" green="0.15" blue="0.15" />
+		</disk>
+		<disk>
+			<bounds xc="0" yc="0" width="5.2" height="5.2" />
+			<color red="0.81" green="0.8" blue="0.79" />
+		</disk>
+	</element>
+
+	<element name="btn_black">
+		<disk>
+			<bounds xc="0" yc="0" width="7" height="7" />
+			<color red="0.17" green="0.15" blue="0.15" />
+		</disk>
+		<disk>
+			<bounds xc="0" yc="0" width="6.2" height="6.2" />
+			<color red="0.81" green="0.8" blue="0.79" />
+		</disk>
+		<disk>
+			<bounds xc="0" yc="0" width="5" height="5" />
+			<color red="0.17" green="0.15" blue="0.15" />
+		</disk>
+	</element>
 
 	<element name="digit" defstate="0">
 		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
@@ -21,10 +45,7 @@ license:CC0
 	</element>
 
 	<element name="hlb" defstate="0">
-		<text string=" ">
-			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
-			<color red="0.0" green="0.0" blue="0.0" />
-		</text>
+		<rect><color alpha="0" /></rect> <!-- force unit square element bounds -->
 		<disk state="1">
 			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
 			<color red="1.0" green="1.0" blue="1.0" />
@@ -268,7 +289,7 @@ license:CC0
 	<element name="cwhite"><rect><color red="0.81" green="0.8" blue="0.79" /></rect></element>
 
 	<element name="hlbb" defstate="0">
-		<text string=" "><bounds x="0" y="0" width="1" height="1" /></text>
+		<rect><color alpha="0" /></rect> <!-- force unit square element bounds -->
 		<disk state="1">
 			<bounds x="0.12" y="0.12" width="0.76" height="0.76" />
 			<color red="0" green="0" blue="0" />
@@ -276,7 +297,7 @@ license:CC0
 	</element>
 
 	<element name="piece" defstate="0">
-		<text string=" "><bounds x="0" y="0" width="1" height="1" /></text>
+		<rect><color alpha="0" /></rect> <!-- force unit square element bounds -->
 		<disk state="1">
 			<bounds x="0.1" y="0.1" width="0.8" height="0.8" />
 			<color red="1" green="0.9" blue="0.6" />
@@ -344,7 +365,7 @@ license:CC0
 				<param name="xl" start="15" increment="20" />
 				<param name="xi" start="0" increment="1" />
 				<element ref="cblack"><bounds x="~x~" y="~y~" width="10" height="10" /></element>
-				<element ref="text_e~yi~~xi~"><bounds x="~xl~" y="~yl~" width="4.9" height="2.48" /></element>
+				<element ref="text_e~yi~~xi~"><bounds x="~xl~" y="~yl~" width="4.8" height="2.35" /></element>
 			</repeat>
 		</repeat>
 		<repeat count="5">
@@ -356,7 +377,7 @@ license:CC0
 				<param name="xl" start="5" increment="20" />
 				<param name="xi" start="0" increment="1" />
 				<element ref="cblack"><bounds x="~x~" y="~y~" width="10" height="10" /></element>
-				<element ref="text_o~yi~~xi~"><bounds x="~xl~" y="~yl~" width="4.9" height="2.48" /></element>
+				<element ref="text_o~yi~~xi~"><bounds x="~xl~" y="~yl~" width="4.8" height="2.35" /></element>
 			</repeat>
 		</repeat>
 
@@ -523,28 +544,15 @@ license:CC0
 
 	<!-- right side -->
 
-		<element ref="disk_black"><bounds x="107" y="14.5" width="7" height="7" /></element>
-		<element ref="disk_black"><bounds x="107" y="24.5" width="7" height="7" /></element>
-		<element ref="disk_black"><bounds x="107" y="34.5" width="7" height="7" /></element>
-		<element ref="disk_black"><bounds x="107" y="44.5" width="7" height="7" /></element>
-		<element ref="disk_black"><bounds x="107" y="54.5" width="7" height="7" /></element>
-		<element ref="disk_black"><bounds x="107" y="64.5" width="7" height="7" /></element>
-		<element ref="disk_black"><bounds x="107" y="74.5" width="7" height="7" /></element>
-		<element ref="disk_black"><bounds x="107" y="84.5" width="7" height="7" /></element>
-		<element ref="disk_black"><bounds x="107" y="94.5" width="7" height="7" /></element>
-
-		<element ref="disk_white"><bounds x="107.9" y="15.4" width="5.2" height="5.2" /></element>
-		<element ref="disk_white"><bounds x="107.9" y="25.4" width="5.2" height="5.2" /></element>
-		<element ref="disk_white"><bounds x="107.9" y="35.4" width="5.2" height="5.2" /></element>
-		<element ref="disk_white"><bounds x="107.9" y="45.4" width="5.2" height="5.2" /></element>
-		<element ref="disk_white"><bounds x="107.9" y="55.4" width="5.2" height="5.2" /></element>
-		<element ref="disk_white"><bounds x="107.9" y="65.4" width="5.2" height="5.2" /></element>
-		<element ref="disk_white"><bounds x="107.9" y="75.4" width="5.2" height="5.2" /></element>
-
-		<element ref="disk_white"><bounds x="107.4" y="84.9" width="6.2" height="6.2" /></element>
-		<element ref="disk_white"><bounds x="107.4" y="94.9" width="6.2" height="6.2" /></element>
-		<element ref="disk_black"><bounds x="108" y="85.5" width="5" height="5" /></element>
-		<element ref="disk_black"><bounds x="108" y="95.5" width="5" height="5" /></element>
+		<element ref="btn_white"><bounds x="107" y="14.5" width="7" height="7" /></element>
+		<element ref="btn_white"><bounds x="107" y="24.5" width="7" height="7" /></element>
+		<element ref="btn_white"><bounds x="107" y="34.5" width="7" height="7" /></element>
+		<element ref="btn_white"><bounds x="107" y="44.5" width="7" height="7" /></element>
+		<element ref="btn_white"><bounds x="107" y="54.5" width="7" height="7" /></element>
+		<element ref="btn_white"><bounds x="107" y="64.5" width="7" height="7" /></element>
+		<element ref="btn_white"><bounds x="107" y="74.5" width="7" height="7" /></element>
+		<element ref="btn_black"><bounds x="107" y="84.5" width="7" height="7" /></element>
+		<element ref="btn_black"><bounds x="107" y="94.5" width="7" height="7" /></element>
 
 		<element ref="text_re"><bounds x="108" y="16.5" width="5" height="3" /></element>
 		<element ref="text_pb"><bounds x="108" y="26.5" width="5" height="3" /></element>

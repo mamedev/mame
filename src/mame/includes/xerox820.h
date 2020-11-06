@@ -22,6 +22,7 @@
 #include "machine/z80sio.h"
 #include "sound/spkrdev.h"
 #include "sound/beep.h"
+#include "machine/timer.h"
 #include "imagedev/floppy.h"
 #include "imagedev/snapquik.h"
 #include "emupal.h"
@@ -136,6 +137,7 @@ public:
 	bigboard_state(const machine_config &mconfig, device_type type, const char *tag)
 		: xerox820_state(mconfig, type, tag)
 		, m_beeper(*this, "beeper")
+		, m_beep_timer(*this, "beep_timer")
 	{ }
 
 	void kbpio_pa_w(uint8_t data);
@@ -144,9 +146,10 @@ public:
 protected:
 	virtual void machine_reset() override;
 
-	TIMER_CALLBACK_MEMBER(bigboard_beepoff);
+	TIMER_DEVICE_CALLBACK_MEMBER(beep_timer);
 
 	required_device<beep_device> m_beeper;
+	required_device<timer_device> m_beep_timer;
 
 	bool m_bit5;
 };

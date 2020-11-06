@@ -59,15 +59,6 @@ Apple color FPD      01           11           10   (FPD = Full Page Display)
 #include "machine/ram.h"
 #include "render.h"
 
-// 4-level grayscale
-void mac_state::macgsc_palette(palette_device &palette) const
-{
-	palette.set_pen_color(0, 0xff, 0xff, 0xff);
-	palette.set_pen_color(1, 0x7f, 0x7f, 0x7f);
-	palette.set_pen_color(2, 0x3f, 0x3f, 0x3f);
-	palette.set_pen_color(3, 0x00, 0x00, 0x00);
-}
-
 VIDEO_START_MEMBER(mac_state,mac)
 {
 }
@@ -112,68 +103,6 @@ uint32_t mac_state::screen_update_macse30(screen_device &screen, bitmap_ind16 &b
 			{
 				line[x + b] = (word >> (15 - b)) & 0x0001;
 			}
-		}
-	}
-	return 0;
-}
-
-uint32_t mac_state::screen_update_macprtb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	uint16_t const *const video_ram = (const uint16_t *) m_vram16.target();
-
-	for (int y = 0; y < 400; y++)
-	{
-		uint16_t *const line = &bitmap.pix(y);
-
-		for (int x = 0; x < 640; x += 16)
-		{
-			uint16_t const word = video_ram[((y * 640)/16) + ((x/16))];
-			for (int b = 0; b < 16; b++)
-			{
-				line[x + b] = (word >> (15 - b)) & 0x0001;
-			}
-		}
-	}
-	return 0;
-}
-
-uint32_t mac_state::screen_update_macpb140(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	uint16_t const *const video_ram = (const uint16_t *) m_vram.target();
-
-	for (int y = 0; y < 400; y++)
-	{
-		uint16_t *const line = &bitmap.pix(y);
-
-		for (int x = 0; x < 640; x += 16)
-		{
-			uint16_t const word = video_ram[((y * 640)/16) + ((x/16)^1)];
-			for (int b = 0; b < 16; b++)
-			{
-				line[x + b] = (word >> (15 - b)) & 0x0001;
-			}
-		}
-	}
-	return 0;
-}
-
-uint32_t mac_state::screen_update_macpb160(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	uint8_t const *const vram8 = (uint8_t *)m_vram.target();
-
-	for (int y = 0; y < 400; y++)
-	{
-		uint16_t *line = &bitmap.pix(y);
-
-		for (int x = 0; x < 640/4; x++)
-		{
-			uint8_t const pixels = vram8[(y * 160) + (BYTE4_XOR_BE(x))];
-
-			*line++ = ((pixels>>6)&3);
-			*line++ = ((pixels>>4)&3);
-			*line++ = ((pixels>>2)&3);
-			*line++ = (pixels&3);
-
 		}
 	}
 	return 0;
@@ -781,75 +710,3 @@ uint32_t mac_state::screen_update_macsonora(screen_device &screen, bitmap_rgb32 
 	return 0;
 }
 
-uint32_t mac_state::screen_update_macpbwd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)/* Color PowerBooks using an off-the-shelf WD video chipset */
-{
-	uint8_t const *vram8 = (uint8_t *)m_vram.target();
-
-//    vram8 += 0x40000;
-
-	for (int y = 0; y < 480; y++)
-	{
-		uint32_t *scanline = &bitmap.pix(y);
-		for (int x = 0; x < 640; x++)
-		{
-			uint8_t const pixels = vram8[(y * 640) + (BYTE4_XOR_BE(x))];
-			*scanline++ = m_rbv_palette[pixels];
-		}
-	}
-
-	return 0;
-}
-
-uint32_t mac_state::macwd_r(offs_t offset, uint32_t mem_mask)
-{
-	switch (offset)
-	{
-		case 0xf6:
-			if (m_screen->vblank())
-			{
-				return 0xffffffff;
-			}
-			else
-			{
-				return 0;
-			}
-
-		default:
-//            printf("macwd_r: @ %x, mask %08x (PC=%x)\n", offset, mem_mask, m_maincpu->pc());
-			break;
-	}
-	return 0;
-}
-
-void mac_state::macwd_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	switch (offset)
-	{
-		case 0xf2:
-			if (mem_mask == 0xff000000) // DAC control
-			{
-				m_rbv_clutoffs = data>>24;
-				m_rbv_count = 0;
-			}
-			else if (mem_mask == 0x00ff0000)    // DAC data
-			{
-				m_rbv_colors[m_rbv_count++] = (data>>16)&0xff;
-				if (m_rbv_count == 3)
-				{
-//                    printf("RAMDAC: color %d = %02x %02x %02x\n", m_rbv_clutoffs, m_rbv_colors[0], m_rbv_colors[1], m_rbv_colors[2]);
-					m_rbv_palette[m_rbv_clutoffs] = rgb_t(m_rbv_colors[0], m_rbv_colors[1], m_rbv_colors[2]);
-					m_rbv_clutoffs++;
-					m_rbv_count = 0;
-				}
-			}
-			else
-			{
-				printf("macwd: Unknown DAC write, data %08x, mask %08x\n", data, mem_mask);
-			}
-			break;
-
-		default:
-//            printf("macwd_w: %x @ %x, mask %08x (PC=%x)\n", data, offset, mem_mask, m_maincpu->pc());
-			break;
-	}
-}

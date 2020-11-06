@@ -61,13 +61,11 @@ void pc1350_state::machine_start()
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	space.install_readwrite_bank(0x6000, 0x6fff, "bank1");
-	membank("bank1")->set_base(&m_ram->pointer()[0x0000]);
+	space.install_ram(0x6000, 0x6fff, &m_ram->pointer()[0x0000]);
 
 	if (m_ram->size() >= 0x3000)
 	{
-		space.install_readwrite_bank(0x4000, 0x5fff, "bank2");
-		membank("bank2")->set_base(&m_ram->pointer()[0x1000]);
+		space.install_ram(0x4000, 0x5fff, &m_ram->pointer()[0x1000]);
 	}
 	else
 	{
@@ -76,8 +74,7 @@ void pc1350_state::machine_start()
 
 	if (m_ram->size() >= 0x5000)
 	{
-		space.install_readwrite_bank(0x2000, 0x3fff, "bank3");
-		membank("bank3")->set_base(&m_ram->pointer()[0x3000]);
+		space.install_ram(0x2000, 0x3fff, &m_ram->pointer()[0x3000]);
 	}
 	else
 	{

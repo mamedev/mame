@@ -100,6 +100,7 @@ public:
 		, m_bank2(*this, "bank2")
 		, m_bankdev(*this, "bankdev")
 		, m_bbcconfig(*this, "BBCCONFIG")
+		, m_motor_led(*this, "motor_led")
 	{ }
 
 	enum class monitor_type
@@ -158,8 +159,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(speech_rsq_w);
 	DECLARE_WRITE_LINE_MEMBER(speech_wsq_w);
 	DECLARE_WRITE_LINE_MEMBER(kbd_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(capslock_led_w);
-	DECLARE_WRITE_LINE_MEMBER(shiftlock_led_w);
 	uint8_t via_system_porta_r();
 	void via_system_porta_w(uint8_t data);
 	uint8_t via_system_portb_r();
@@ -256,6 +255,8 @@ protected:
 	optional_memory_bank m_bank2; //           bbcbp bbcbp128 bbcm
 	optional_device<address_map_bank_device> m_bankdev; //    bbcm
 	optional_ioport m_bbcconfig;
+
+	output_finder<> m_motor_led;
 
 	int m_romsel;           // This is the latch that holds the sideways ROM bank to read
 	int m_paged_ram;        // BBC B+ memory handling
@@ -404,6 +405,7 @@ public:
 	void abc110(machine_config &config);
 	void acw443(machine_config &config);
 	void abc310(machine_config &config);
+	void cfa3000bp(machine_config &config);
 	void econx25(machine_config &config);
 	void reutapm(machine_config &config);
 
@@ -420,7 +422,10 @@ protected:
 class bbcm_state : public bbc_state
 {
 public:
-	using bbc_state::bbc_state;
+	bbcm_state(const machine_config &mconfig, device_type type, const char *tag)
+		: bbc_state(mconfig, type, tag)
+		, m_power_led(*this, "power_led")
+	{ }
 
 	void bbcm(machine_config &config);
 	void bbcmt(machine_config &config);
@@ -452,6 +457,8 @@ protected:
 	void bbcmc_bankdev(address_map &map);
 	void autoc15_bankdev(address_map &map);
 	void bbcm_fetch(address_map &map);
+
+	output_finder<> m_power_led;
 };
 
 

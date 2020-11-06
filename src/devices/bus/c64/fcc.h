@@ -42,8 +42,8 @@ protected:
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override { }
-	virtual void nvram_read(emu_file &file) override { if (m_nvram != nullptr) { file.read(m_nvram, m_nvram.bytes()); } }
-	virtual void nvram_write(emu_file &file) override { if (m_nvram != nullptr) { file.write(m_nvram, m_nvram.bytes()); } }
+	virtual void nvram_read(emu_file &file) override { if (m_nvram != nullptr) { file.read(m_nvram.get(), 0x2000); } }
+	virtual void nvram_write(emu_file &file) override { if (m_nvram != nullptr) { file.write(m_nvram.get(), 0x2000); } }
 
 	// device_c64_expansion_card_interface overrides
 	virtual uint8_t c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2) override;
@@ -59,8 +59,8 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(mainlatch_int) { m_slot->nmi_w(state); }
 	uint8_t rom_r(offs_t offset) { return m_romx[offset]; } // cartridge cpu rom
-	uint8_t nvram_r(offs_t offset) { return m_nvram[offset & m_nvram.mask()]; }
-	void nvram_w(offs_t offset, uint8_t data) { m_nvram[offset & m_nvram.mask()] = data; }
+	uint8_t nvram_r(offs_t offset) { return m_nvram[offset & 0x1fff]; }
+	void nvram_w(offs_t offset, uint8_t data) { m_nvram[offset & 0x1fff] = data; }
 
 	void c64_fcc_map(address_map &map);
 };

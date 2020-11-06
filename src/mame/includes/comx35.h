@@ -38,7 +38,7 @@ public:
 			m_ram(*this, RAM_TAG),
 			m_exp(*this, EXPANSION_TAG),
 			m_rom(*this, CDP1802_TAG),
-			m_char_ram(*this, "char_ram"),
+			m_char_ram(*this, "char_ram", COMX35_CHARRAM_SIZE, ENDIANNESS_LITTLE),
 			m_d6(*this, "D6"),
 			m_modifiers(*this, "MODIFIERS")
 	{ }
@@ -50,7 +50,7 @@ public:
 	required_device<ram_device> m_ram;
 	required_device<comx_expansion_slot_device> m_exp;
 	required_memory_region m_rom;
-	optional_shared_ptr<uint8_t> m_char_ram;
+	memory_share_creator<uint8_t> m_char_ram;
 	required_ioport m_d6;
 	required_ioport m_modifiers;
 

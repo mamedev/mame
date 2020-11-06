@@ -120,10 +120,10 @@ public:
 	dreamwld_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_spriteram(*this, "spriteram")
-		, m_vram(*this, "vram_%u", 0U, u8(32))
+		, m_vram{{*this, "vram_0", 0x2000, ENDIANNESS_BIG}, {*this, "vram_1", 0x2000, ENDIANNESS_BIG}}
 		, m_vregs(*this, "vregs")
 		, m_workram(*this, "workram")
-		, m_lineram(*this, "lineram", 32)
+		, m_lineram(*this, "lineram", 0x400, ENDIANNESS_BIG)
 		, m_spritelut(*this, "spritelut")
 		, m_okibank(*this, "oki%ubank", 1)
 		, m_dsw(*this, "DSW")
@@ -146,10 +146,10 @@ protected:
 private:
 	/* memory pointers */
 	required_shared_ptr<u32> m_spriteram;
-	required_shared_ptr_array<u16, 2> m_vram;
+	memory_share_creator<u16> m_vram[2];
 	required_shared_ptr<u32> m_vregs;
 	required_shared_ptr<u32> m_workram;
-	required_shared_ptr<u16> m_lineram;
+	memory_share_creator<u16> m_lineram;
 	required_memory_region m_spritelut;
 	optional_memory_bank_array<2> m_okibank;
 	required_ioport m_dsw;
@@ -417,9 +417,9 @@ void dreamwld_state::baryon_map(address_map &map)
 
 	map(0x400000, 0x401fff).ram().share("spriteram");
 	map(0x600000, 0x601fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
-	map(0x800000, 0x801fff).rw(FUNC(dreamwld_state::vram_r<0>), FUNC(dreamwld_state::vram_w<0>)).share("vram_0");
-	map(0x802000, 0x803fff).rw(FUNC(dreamwld_state::vram_r<1>), FUNC(dreamwld_state::vram_w<1>)).share("vram_1");
-	map(0x804000, 0x8043ff).rw(FUNC(dreamwld_state::lineram_r), FUNC(dreamwld_state::lineram_w)).share("lineram");  // linescroll
+	map(0x800000, 0x801fff).rw(FUNC(dreamwld_state::vram_r<0>), FUNC(dreamwld_state::vram_w<0>));
+	map(0x802000, 0x803fff).rw(FUNC(dreamwld_state::vram_r<1>), FUNC(dreamwld_state::vram_w<1>));
+	map(0x804000, 0x8043ff).rw(FUNC(dreamwld_state::lineram_r), FUNC(dreamwld_state::lineram_w));  // linescroll
 	map(0x804400, 0x805fff).ram().share("vregs");
 
 	map(0xc00000, 0xc00003).portr("INPUTS");

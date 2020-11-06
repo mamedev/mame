@@ -6,6 +6,7 @@
 #pragma once
 
 #include "machine/74259.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/namco.h"
 #include "emupal.h"
@@ -43,6 +44,7 @@ protected:
 	void bigbucks_map(address_map &map);
 	void bigbucks_portmap(address_map &map);
 	void birdiy_map(address_map &map);
+	void cannonbp_map(address_map &map);
 	void crushs_map(address_map &map);
 	void crushs_portmap(address_map &map);
 	void dremshpr_map(address_map &map);
@@ -163,7 +165,6 @@ public:
 	void init_ponpoko();
 	void init_eyes();
 	void init_woodpek();
-	void init_cannonbp();
 	void init_jumpshot();
 	void init_mspacii();
 	void init_pacplus();
@@ -175,7 +176,6 @@ public:
 	void init_mschamp();
 	void init_mbrush();
 	void init_pengomc1();
-	void init_clubpacma();
 
 protected:
 	TILEMAP_MAPPER_MEMBER(pacman_scan_rows);
@@ -208,6 +208,7 @@ private:
 
 public:
 	void birdiy(machine_config &config);
+	void cannonbp(machine_config &config);
 	void rocktrv2(machine_config &config);
 	void mspacman(machine_config &config);
 	void dremshpr(machine_config &config);
@@ -262,6 +263,28 @@ protected:
 
 	void epos_map(address_map &map);
 	void epos_portmap(address_map &map);
+};
+
+class clubpacm_state : public pacman_state
+{
+public:
+	clubpacm_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pacman_state(mconfig, type, tag)
+		, m_sublatch(*this, "sublatch")
+		, m_players(*this, "P%u", 1)
+	{ }
+
+	void clubpacm(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(clubpacm_input_r);
+
+	void init_clubpacma();
+
+protected:
+	void clubpacm_map(address_map &map);
+
+	required_device<generic_latch_8_device> m_sublatch;
+	required_ioport_array<2> m_players;
 };
 
 #endif // MAME_INCLUDES_PACMAN_H

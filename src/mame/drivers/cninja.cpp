@@ -145,6 +145,14 @@ void cninja_state::cninjabl_map(address_map &map)
 	map(0x1b4000, 0x1b4001).w(m_spriteram[0], FUNC(buffered_spriteram16_device::write)); /* DMA flag */
 }
 
+void cninja_state::cninjabl2_map(address_map &map)
+{
+	cninja_map(map);
+
+	map(0x180000, 0x18ffff).ram();
+	map(0x1b4000, 0x1b4001).r(FUNC(cninja_state::cninjabl2_sprite_dma_r));
+}	
+
 uint16_t cninja_state::edrandy_protection_region_8_146_r(offs_t offset)
 {
 	int real_address = 0x1a0000 + (offset *2);
@@ -909,6 +917,7 @@ void cninja_state::stoneage(machine_config &config)
 void cninja_state::cninjabl2(machine_config &config)
 {
 	stoneage(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cninja_state::cninjabl2_map);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cninja_state::cninjabl2_s_map);
 
 	m_screen->set_screen_update(FUNC(cninja_state::screen_update_cninjabl2));
@@ -2169,9 +2178,6 @@ ROM_END
 
 void cninja_state::init_cninjabl2()
 {
-	m_maincpu->space(AS_PROGRAM).install_ram(0x180000, 0x18ffff);
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x1b4000, 0x1b4001, read16smo_delegate(*this, FUNC(cninja_state::cninjabl2_sprite_dma_r)));
-
 	m_okibank->configure_entries(0, 8, memregion("oki2")->base(), 0x10000);
 }
 

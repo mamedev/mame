@@ -4,38 +4,56 @@ license:CC0
 -->
 <mamelayout version="2">
 	<element name="lev1" defstate="0">
-		<text string="1" state="1">
-			<color red="0.36" green="0.32" blue="0.34" />
+		<rect>
+			<color red="0.541" green="0.572" blue="0.580" />
+		</rect>
+		<text string="1">
+			<color state="0" red="0.514" green="0.533" blue="0.545" />
+			<color state="1" red="0.360" green="0.325" blue="0.345" />
 		</text>
 	</element>
 	<element name="lev2" defstate="0">
-		<text string="2" state="1">
-			<color red="0.36" green="0.32" blue="0.34" />
+		<rect>
+			<color red="0.541" green="0.572" blue="0.580" />
+		</rect>
+		<text string="2">
+			<color state="0" red="0.514" green="0.533" blue="0.545" />
+			<color state="1" red="0.360" green="0.325" blue="0.345" />
 		</text>
 	</element>
 	<element name="lev3" defstate="0">
-		<text string="3" state="1">
-			<color red="0.36" green="0.32" blue="0.34" />
+		<rect>
+			<color red="0.541" green="0.572" blue="0.580" />
+		</rect>
+		<text string="3">
+			<color state="0" red="0.514" green="0.533" blue="0.545" />
+			<color state="1" red="0.360" green="0.325" blue="0.345" />
 		</text>
 	</element>
 	<element name="lev4" defstate="0">
-		<text string="4" state="1">
-			<color red="0.36" green="0.32" blue="0.34" />
+		<rect>
+			<color red="0.541" green="0.572" blue="0.580" />
+		</rect>
+		<text string="4">
+			<color state="0" red="0.514" green="0.533" blue="0.545" />
+			<color state="1" red="0.360" green="0.325" blue="0.345" />
 		</text>
 	</element>
 	<element name="disk" defstate="0">
-		<disk state="1">
-			<color red="0.36" green="0.32" blue="0.34" />
+		<disk>
+			<color state="0" red="0.514" green="0.533" blue="0.545" />
+			<color state="1" red="0.360" green="0.325" blue="0.345" />
 		</disk>
 	</element>
 	<element name="rect" defstate="0">
-		<rect state="1">
-			<color red="0.36" green="0.32" blue="0.34" />
+		<rect>
+			<color state="0" red="0.514" green="0.533" blue="0.545" />
+			<color state="1" red="0.360" green="0.325" blue="0.345" />
 		</rect>
 	</element>
 	<element name="digit">
 		<led7seg>
-			<color red="1" green="1" blue="1" />
+			<color red="0.360" green="0.325" blue="0.345" />
 		</led7seg>
 	</element>
 
@@ -45,16 +63,16 @@ license:CC0
 		</screen>
 
 		<element name="LEV1" ref="lev1">
-			<bounds x="36" y="2" width="3" height="4" />
+			<bounds x="34" y="2" width="2.5" height="4" />
 		</element>
 		<element name="LEV2" ref="lev2">
-			<bounds x="38" y="2" width="3" height="4" />
+			<bounds x="36.5" y="2" width="2.5" height="4" />
 		</element>
 		<element name="LEV3" ref="lev3">
-			<bounds x="40" y="2" width="3" height="4" />
+			<bounds x="39" y="2" width="2.5" height="4" />
 		</element>
 		<element name="LEV4" ref="lev4">
-			<bounds x="42" y="2" width="3" height="4" />
+			<bounds x="41.5" y="2" width="2.5" height="4" />
 		</element>
 
 		<element name="TICK0" ref="rect">

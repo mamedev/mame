@@ -48,17 +48,17 @@ void vic10_standard_cartridge_device::device_start()
 
 uint8_t vic10_standard_cartridge_device::vic10_cd_r(offs_t offset, uint8_t data, int lorom, int uprom, int exram)
 {
-	if (!lorom && m_lorom.bytes())
+	if (!lorom && m_lorom)
 	{
-		data = m_lorom[offset & m_lorom.mask()];
+		data = m_lorom[offset];
 	}
-	else if (!exram && m_exram.bytes())
+	else if (!exram && m_exram)
 	{
-		data = m_exram[offset & m_exram.mask()];
+		data = m_exram[offset];
 	}
-	else if (!uprom && m_uprom.bytes())
+	else if (!uprom && m_uprom)
 	{
-		data = m_uprom[offset & m_uprom.mask()];
+		data = m_uprom[offset];
 	}
 
 	return data;
@@ -71,8 +71,8 @@ uint8_t vic10_standard_cartridge_device::vic10_cd_r(offs_t offset, uint8_t data,
 
 void vic10_standard_cartridge_device::vic10_cd_w(offs_t offset, uint8_t data, int lorom, int uprom, int exram)
 {
-	if (!exram && m_exram.bytes())
+	if (!exram && m_exram)
 	{
-		m_exram[offset & m_exram.mask()] = data;
+		m_exram[offset] = data;
 	}
 }

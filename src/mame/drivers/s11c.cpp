@@ -190,7 +190,7 @@ void s11c_state::s11c(machine_config &config)
 	m_pia34->ca2_handler().set(m_bg, FUNC(s11c_bg_device::resetq_w));
 	m_bg->pb_cb().set(m_pia34, FUNC(pia6821_device::portb_w));
 	m_bg->cb2_cb().set(m_pia34, FUNC(pia6821_device::cb1_w));
-	m_bg->add_route(ALL_OUTPUTS, "speaker", 1.0);
+	m_bg->add_route(ALL_OUTPUTS, "speaker", 1.5638);
 }
 
 // Unless otherwise noted, assume S11 Background Sound Board jumpers W2/W3 are

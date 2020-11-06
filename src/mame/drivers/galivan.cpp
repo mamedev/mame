@@ -32,7 +32,6 @@ TODO
 #include "cpu/z80/z80.h"
 #include "sound/3526intf.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 
@@ -475,9 +474,6 @@ void galivan_state::galivan(machine_config &config)
 
 	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // unknown DAC
 	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void dangarj_state::dangarj(machine_config &config)
@@ -522,9 +518,6 @@ void galivan_state::ninjemak(machine_config &config)
 
 	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
 	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void galivan_state::youmab(machine_config &config)
@@ -1124,9 +1117,9 @@ ROM_END
 void galivan_state::youmab_extra_bank_w(uint8_t data)
 {
 	if (data == 0xff)
-		membank("bank2")->set_entry(1);
+		m_rombank->set_entry(1);
 	else if (data == 0x00)
-		membank("bank2")->set_entry(0);
+		m_rombank->set_entry(0);
 	else
 		printf("data %03x\n", data);
 }
@@ -1172,12 +1165,11 @@ void galivan_state::init_youmab()
 {
 	// TODO: move all of this to an address map instead
 	m_maincpu->space(AS_IO).install_write_handler(0x82, 0x82, write8smo_delegate(*this, FUNC(galivan_state::youmab_extra_bank_w))); // banks rom at 0x8000? writes 0xff and 0x00 before executing code there
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x7fff, "bank3");
-	membank("bank3")->set_base(memregion("maincpu")->base());
+	m_maincpu->space(AS_PROGRAM).install_rom(0x0000, 0x7fff, memregion("maincpu")->base());
 
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0x8000, 0xbfff, "bank2");
-	membank("bank2")->configure_entries(0, 2, memregion("user2")->base(), 0x4000);
-	membank("bank2")->set_entry(0);
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0x8000, 0xbfff, m_rombank);
+	m_rombank->configure_entries(0, 2, memregion("user2")->base(), 0x4000);
+	m_rombank->set_entry(0);
 
 	m_maincpu->space(AS_IO).install_write_handler(0x81, 0x81, write8smo_delegate(*this, FUNC(galivan_state::youmab_81_w))); // ?? often, alternating values
 	m_maincpu->space(AS_IO).install_write_handler(0x84, 0x84, write8smo_delegate(*this, FUNC(galivan_state::youmab_84_w))); // ?? often, sequence..

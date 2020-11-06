@@ -17,31 +17,33 @@
 #include "corefile.h"
 #include "osdcore.h"
 
+#include <cstdint>
 #include <list>
 #include <memory>
 #include <string>
 #include <utility>
 
 
+namespace util {
 
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
 
 /* Error types */
-enum png_error
+enum class png_error
 {
-	PNGERR_NONE,
-	PNGERR_OUT_OF_MEMORY,
-	PNGERR_UNKNOWN_FILTER,
-	PNGERR_FILE_ERROR,
-	PNGERR_BAD_SIGNATURE,
-	PNGERR_DECOMPRESS_ERROR,
-	PNGERR_FILE_TRUNCATED,
-	PNGERR_FILE_CORRUPT,
-	PNGERR_UNKNOWN_CHUNK,
-	PNGERR_COMPRESS_ERROR,
-	PNGERR_UNSUPPORTED_FORMAT
+	NONE,
+	OUT_OF_MEMORY,
+	UNKNOWN_FILTER,
+	FILE_ERROR,
+	BAD_SIGNATURE,
+	DECOMPRESS_ERROR,
+	FILE_TRUNCATED,
+	FILE_CORRUPT,
+	UNKNOWN_CHUNK,
+	COMPRESS_ERROR,
+	UNSUPPORTED_FORMAT
 };
 
 
@@ -57,7 +59,7 @@ public:
 
 	~png_info() { free_data(); }
 
-	png_error read_file(util::core_file &fp);
+	png_error read_file(core_file &fp);
 	png_error copy_to_bitmap(bitmap_argb32 &bitmap, bool &hasalpha);
 	png_error expand_buffer_8bit();
 
@@ -66,7 +68,7 @@ public:
 	void free_data();
 	void reset() { free_data(); operator=(png_info()); }
 
-	static png_error verify_header(util::core_file &fp);
+	static png_error verify_header(core_file &fp);
 
 	std::unique_ptr<std::uint8_t []>    image;
 	std::uint32_t                       width, height;
@@ -99,12 +101,14 @@ private:
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-png_error png_read_bitmap(util::core_file &fp, bitmap_argb32 &bitmap);
+png_error png_read_bitmap(core_file &fp, bitmap_argb32 &bitmap);
 
-png_error png_write_bitmap(util::core_file &fp, png_info *info, bitmap_t const &bitmap, int palette_length, const rgb_t *palette);
+png_error png_write_bitmap(core_file &fp, png_info *info, bitmap_t const &bitmap, int palette_length, const rgb_t *palette);
 
-png_error mng_capture_start(util::core_file &fp, bitmap_t &bitmap, unsigned rate);
-png_error mng_capture_frame(util::core_file &fp, png_info &info, bitmap_t const &bitmap, int palette_length, const rgb_t *palette);
-png_error mng_capture_stop(util::core_file &fp);
+png_error mng_capture_start(core_file &fp, bitmap_t &bitmap, unsigned rate);
+png_error mng_capture_frame(core_file &fp, png_info &info, bitmap_t const &bitmap, int palette_length, const rgb_t *palette);
+png_error mng_capture_stop(core_file &fp);
+
+} // namespace util
 
 #endif // MAME_LIB_UTIL_PNG_H

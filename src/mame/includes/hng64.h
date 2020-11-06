@@ -172,9 +172,9 @@ public:
 		m_comm(*this, "network"),
 		m_rtc(*this, "rtc"),
 		m_mainram(*this, "mainram"),
-		m_cart(*this, "cart"),
+		m_cart(*this, "gameprg"),
 		m_sysregs(*this, "sysregs"),
-		m_rombase(*this, "rombase"),
+		m_rombase(*this, "user1"),
 		m_spriteram(*this, "spriteram"),
 		m_spriteregs(*this, "spriteregs"),
 		m_videoram(*this, "videoram"),
@@ -232,9 +232,9 @@ private:
 	required_device<msm6242_device> m_rtc;
 
 	required_shared_ptr<uint32_t> m_mainram;
-	required_shared_ptr<uint32_t> m_cart;
+	required_region_ptr<uint32_t> m_cart;
 	required_shared_ptr<uint32_t> m_sysregs;
-	required_shared_ptr<uint32_t> m_rombase;
+	required_region_ptr<uint32_t> m_rombase;
 	required_shared_ptr<uint32_t> m_spriteram;
 	required_shared_ptr<uint32_t> m_spriteregs;
 	required_shared_ptr<uint32_t> m_videoram;

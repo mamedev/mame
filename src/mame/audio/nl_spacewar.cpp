@@ -133,8 +133,8 @@ NETLIST_START(spacewar)
 	Q_2N3904(Q2)    // NPN
 #endif
 	Q_2N6426(Q3)    // NPN Darlington
-//	Q_2N6292(Q4)    // NPN -- not used
-//	Q_2N6107(Q5)    // PNP -- not used
+//  Q_2N6292(Q4)    // NPN -- not used
+//  Q_2N6107(Q5)    // PNP -- not used
 	Q_2N6426(Q6)    // NPN Darlington
 	Q_2N3904(Q7)    // NPN
 

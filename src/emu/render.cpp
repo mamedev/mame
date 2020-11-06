@@ -1371,9 +1371,9 @@ render_primitive_list &render_target::get_primitives()
 	{
 		// if we are not in the running stage, draw an outer box
 		render_primitive *prim = list.alloc(render_primitive::QUAD);
-		set_render_bounds_xy(prim->bounds, 0.0f, 0.0f, (float)m_width, (float)m_height);
+		prim->bounds.set_xy(0.0f, 0.0f, (float)m_width, (float)m_height);
 		prim->full_bounds = prim->bounds;
-		set_render_color(&prim->color, 1.0f, 0.1f, 0.1f, 0.1f);
+		prim->color.set(1.0f, 0.1f, 0.1f, 0.1f);
 		prim->texture.base = nullptr;
 		prim->flags = PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA);
 		list.append(*prim);
@@ -1381,9 +1381,9 @@ render_primitive_list &render_target::get_primitives()
 		if (m_width > 1 && m_height > 1)
 		{
 			prim = list.alloc(render_primitive::QUAD);
-			set_render_bounds_xy(prim->bounds, 1.0f, 1.0f, (float)(m_width - 1), (float)(m_height - 1));
+			prim->bounds.set_xy(1.0f, 1.0f, float(m_width - 1), float(m_height - 1));
 			prim->full_bounds = prim->bounds;
-			set_render_color(&prim->color, 1.0f, 0.0f, 0.0f, 0.0f);
+			prim->color.set(1.0f, 0.0f, 0.0f, 0.0f);
 			prim->texture.base = nullptr;
 			prim->flags = PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA);
 			list.append(*prim);
@@ -1535,7 +1535,7 @@ bool render_target::map_point_input(s32 target_x, s32 target_y, ioport_port *&in
 				if (item.has_input())
 				{
 					// point successfully mapped
-					input_port = item.input_tag_and_mask(input_mask);
+					std::tie(input_port, input_mask) = item.input_tag_and_mask();
 					input_x = (target_f.first - bounds.x0) / bounds.width();
 					input_y = (target_f.second - bounds.y0) / bounds.height();
 					return true;
@@ -1665,7 +1665,7 @@ void render_target::load_layout_files(util::xml::data_node const &rootnode, bool
 
 	// if there's an explicit file, load that first
 	const std::string &basename = m_manager.machine().basename();
-	have_artwork |= load_layout_file(m_manager.machine().root_device(), basename.c_str(), rootnode);
+	have_artwork |= load_layout_file(m_manager.machine().root_device(), rootnode, m_manager.machine().options().art_path(), basename.c_str());
 
 	// if we're only loading this file, we know our final result
 	if (!singlefile)
@@ -2084,7 +2084,7 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 		}
 
 		// try to parse it
-		if (!load_layout_file(m_manager.machine().root_device(), nullptr, *root))
+		if (!load_layout_file(m_manager.machine().root_device(), *root, m_manager.machine().options().art_path(), nullptr))
 			throw emu_fatalerror("Couldn't parse generated layout??");
 	}
 }
@@ -2111,7 +2111,7 @@ bool render_target::load_layout_file(const char *dirname, const internal_layout 
 	zerr = inflateInit(&stream);
 	if (zerr != Z_OK)
 	{
-		fatalerror("could not inflateInit");
+		osd_printf_error("render_target::load_layout_file: zlib initialization error\n");
 		return false;
 	}
 
@@ -2127,23 +2127,21 @@ bool render_target::load_layout_file(const char *dirname, const internal_layout 
 	}
 	else if (zerr != Z_OK)
 	{
-		fatalerror("decompression error\n");
+		osd_printf_error("render_target::load_layout_file: zlib decompression error\n");
+		inflateEnd(&stream);
 		return false;
 	}
 
 	// clean up
 	zerr = inflateEnd(&stream);
 	if (zerr != Z_OK)
-	{
-		fatalerror("inflateEnd error\n");
-		return false;
-	}
+		osd_printf_error("render_target::load_layout_file: zlib cleanup error\n");
 
 	util::xml::file::ptr rootnode(util::xml::file::string_read(reinterpret_cast<char const *>(tempout.get()), nullptr));
 	tempout.reset();
 
 	// if we didn't get a properly-formatted XML file, record a warning and exit
-	if (!load_layout_file(device ? *device : m_manager.machine().root_device(), dirname, *rootnode))
+	if (!load_layout_file(device ? *device : m_manager.machine().root_device(), *rootnode, m_manager.machine().options().art_path(), dirname))
 	{
 		osd_printf_warning("Improperly formatted XML string, ignoring\n");
 		return false;
@@ -2157,28 +2155,39 @@ bool render_target::load_layout_file(const char *dirname, const internal_layout 
 bool render_target::load_layout_file(const char *dirname, const char *filename)
 {
 	// build the path and optionally prepend the directory
-	std::string fname = std::string(filename).append(".lay");
+	std::string fname;
 	if (dirname)
-		fname.insert(0, PATH_SEPARATOR).insert(0, dirname);
+		fname.append(dirname).append(PATH_SEPARATOR);
+	fname.append(filename).append(".lay");
 
-	// attempt to open the file; bail if we can't
-	emu_file layoutfile(m_manager.machine().options().art_path(), OPEN_FLAG_READ);
-	layoutfile.set_restrict_to_mediapath(1);
-	osd_file::error const filerr(layoutfile.open(fname));
-	if (filerr != osd_file::error::NONE)
-		return false;
-
-	// read the file
+	// attempt to open matching files
 	util::xml::parse_options parseopt;
 	util::xml::parse_error parseerr;
 	parseopt.error = &parseerr;
-	util::xml::file::ptr rootnode(util::xml::file::read(layoutfile, &parseopt));
-	if (!rootnode)
+	emu_file layoutfile(m_manager.machine().options().art_path(), OPEN_FLAG_READ);
+	layoutfile.set_restrict_to_mediapath(1);
+	bool result(false);
+	for (osd_file::error filerr = layoutfile.open(fname); osd_file::error::NONE == filerr; filerr = layoutfile.open_next())
 	{
-		if (parseerr.error_message)
+		// read the file and parse as XML
+		util::xml::file::ptr const rootnode(util::xml::file::read(layoutfile, &parseopt));
+		if (rootnode)
+		{
+			// extract directory name from location of layout file
+			std::string artdir(layoutfile.fullpath());
+			auto const dirsep(std::find_if(artdir.rbegin(), artdir.rend(), &util::is_directory_separator));
+			artdir.erase(dirsep.base(), artdir.end());
+
+			// record a warning if we didn't get a properly-formatted XML file
+			if (!load_layout_file(m_manager.machine().root_device(), *rootnode, nullptr, artdir.c_str()))
+				osd_printf_warning("Improperly formatted XML layout file '%s', ignoring\n", filename);
+			else
+				result = true;
+		}
+		else if (parseerr.error_message)
 		{
 			osd_printf_warning(
-					"Error parsing XML file '%s' at line %d column %d: %s, ignoring\n",
+					"Error parsing XML layout file '%s' at line %d column %d: %s, ignoring\n",
 					filename,
 					parseerr.error_line,
 					parseerr.error_column,
@@ -2186,29 +2195,18 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 		}
 		else
 		{
-			osd_printf_warning("Error parsing XML file '%s', ignorning\n", filename);
+			osd_printf_warning("Error parsing XML layout file '%s', ignorning\n", filename);
 		}
-		return false;
 	}
-
-	// if we didn't get a properly-formatted XML file, record a warning and exit
-	if (!load_layout_file(m_manager.machine().root_device(), dirname, *rootnode))
-	{
-		osd_printf_warning("Improperly formatted XML file '%s', ignoring\n", filename);
-		return false;
-	}
-	else
-	{
-		return true;
-	}
+	return result;
 }
 
-bool render_target::load_layout_file(device_t &device, const char *dirname, util::xml::data_node const &rootnode)
+bool render_target::load_layout_file(device_t &device, util::xml::data_node const &rootnode, const char *searchpath, const char *dirname)
 {
 	// parse and catch any errors
 	try
 	{
-		m_filelist.emplace_back(device, rootnode, dirname);
+		m_filelist.emplace_back(device, rootnode, searchpath, dirname);
 	}
 	catch (emu_fatalerror &)
 	{
@@ -2237,7 +2235,7 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 	cliprect.y0 = xform.yoffs;
 	cliprect.x1 = xform.xoffs + xform.xscale;
 	cliprect.y1 = xform.yoffs + xform.yscale;
-	sect_render_bounds(cliprect, m_bounds);
+	cliprect &= m_bounds;
 
 	float root_xoffs = root_xform.xoffs + fabsf(root_xform.xscale - xform.xscale) * 0.5f;
 	float root_yoffs = root_xform.yoffs + fabsf(root_xform.yscale - xform.yscale) * 0.5f;
@@ -2247,7 +2245,7 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 	root_cliprect.y0 = root_yoffs;
 	root_cliprect.x1 = root_xoffs + root_xform.xscale;
 	root_cliprect.y1 = root_yoffs + root_xform.yscale;
-	sect_render_bounds(root_cliprect, m_bounds);
+	root_cliprect &= m_bounds;
 
 	// compute the container transform
 	object_transform container_xform;
@@ -2477,7 +2475,7 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 
 		// allocate a primitive
 		render_primitive *prim = list.alloc(render_primitive::QUAD);
-		set_render_bounds_wh(prim->bounds, xform.xoffs, xform.yoffs, xform.xscale, xform.yscale);
+		prim->bounds.set_wh(xform.xoffs, xform.yoffs, xform.xscale, xform.yscale);
 		prim->full_bounds = prim->bounds;
 		prim->color = container_xform.color;
 		width = render_round_nearest(prim->bounds.x1) - render_round_nearest(prim->bounds.x0);
@@ -2525,24 +2523,18 @@ void render_target::add_element_primitives(render_primitive_list &list, const ob
 		// compute the bounds
 		s32 width = render_round_nearest(xform.xscale);
 		s32 height = render_round_nearest(xform.yscale);
-		set_render_bounds_wh(prim->bounds, render_round_nearest(xform.xoffs), render_round_nearest(xform.yoffs), (float) width, (float) height);
+		prim->bounds.set_wh(render_round_nearest(xform.xoffs), render_round_nearest(xform.yoffs), float(width), float(height));
 		prim->full_bounds = prim->bounds;
 		if (xform.orientation & ORIENTATION_SWAP_XY)
 			std::swap(width, height);
-		width = std::min(width, m_maxtexwidth);
-		height = std::min(height, m_maxtexheight);
+		width = (std::min)(width, m_maxtexwidth);
+		height = (std::min)(height, m_maxtexheight);
 
 		// get the scaled texture and append it
-
 		texture->get_scaled(width, height, prim->texture, list, prim->flags);
 
 		// compute the clip rect
-		render_bounds cliprect;
-		cliprect.x0 = render_round_nearest(xform.xoffs);
-		cliprect.y0 = render_round_nearest(xform.yoffs);
-		cliprect.x1 = render_round_nearest(xform.xoffs + xform.xscale);
-		cliprect.y1 = render_round_nearest(xform.yoffs + xform.yscale);
-		sect_render_bounds(cliprect, m_bounds);
+		render_bounds cliprect = prim->bounds & m_bounds;
 
 		// determine UV coordinates and apply clipping
 		prim->texcoords = oriented_texcoords[xform.orientation];
@@ -2956,9 +2948,9 @@ void render_target::add_clear_extents(render_primitive_list &list)
 			if (x1 - x0 > 0)
 			{
 				render_primitive *prim = list.alloc(render_primitive::QUAD);
-				set_render_bounds_xy(prim->bounds, (float)x0, (float)y0, (float)x1, (float)y1);
+				prim->bounds.set_xy(float(x0), float(y0), float(x1), float(y1));
 				prim->full_bounds = prim->bounds;
-				set_render_color(&prim->color, 1.0f, 0.0f, 0.0f, 0.0f);
+				prim->color.set(1.0f, 0.0f, 0.0f, 0.0f);
 				prim->texture.base = nullptr;
 				prim->flags = PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA);
 				clearlist.append(*prim);
@@ -3012,7 +3004,7 @@ void render_target::add_clear_and_optimize_primitive_list(render_primitive_list 
 				if (PRIMFLAG_GET_BLENDMODE(prim.flags) == BLENDMODE_RGB_MULTIPLY)
 				{
 					// RGB multiply will multiply against 0, leaving nothing
-					set_render_color(&prim.color, 1.0f, 0.0f, 0.0f, 0.0f);
+					prim.color.set(1.0f, 0.0f, 0.0f, 0.0f);
 					prim.texture.base = nullptr;
 					prim.flags = (prim.flags & ~PRIMFLAG_BLENDMODE_MASK) | PRIMFLAG_BLENDMODE(BLENDMODE_NONE);
 				}

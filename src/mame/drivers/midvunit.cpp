@@ -153,7 +153,7 @@ void midvunit_state::midvunit_cmos_protect_w(uint32_t data)
 void midvunit_state::midvunit_cmos_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (!m_cmos_protected)
-		COMBINE_DATA(m_nvram + offset);
+		COMBINE_DATA(&m_nvram[offset]);
 }
 
 

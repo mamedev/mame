@@ -714,20 +714,57 @@ ROM_START( max10in1 )
 	ROM_LOAD( "csmaxxcasino10.bin", 0x000000, 0x200000, CRC(2a05e9af) SHA1(fcf591c22ce8773f72e9d0fa0bae545f6a82a063) )
 ROM_END
 
-CONS( 1997, bandgpad,    0,  0,  nes_sh6578,     nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Bandai", "Multi Game Player Gamepad", MACHINE_NOT_WORKING )
-CONS( 1997, bandggcn,    0,  0,  nes_sh6578,     nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Bandai", "Go! Go! Connie-chan! Asobou Mouse", MACHINE_NOT_WORKING )
+ROM_START( vsmaxx15 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "vsmaxx15n1_e28f008sa_89a2.bin", 0x00000, 0x100000, CRC(713955ce) SHA1(f5ff02055fd4574cedc2f056d19388207a7244c0) )
+ROM_END
 
-// possibly newer than 2001
-CONS( 2001, ts_handy11,  0,  0,  nes_sh6578,     nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Techno Source", "Handy Boy 11-in-1 (TV Play Power)", MACHINE_NOT_WORKING )
+ROM_START( vsmaxx25 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD( "vsmaxx25_am29lv160dt_000122c4.bin", 0x00000, 0x200000, CRC(0efd1625) SHA1(34e83f748af3eee475c5b2b24ff03c00c1b5b8ed) )
+ROM_END
+
+ROM_START( dgun806 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD( "dgpnpdgu806as29lv160be_000422c4.bin", 0x00000, 0x200000, CRC(576d6caf) SHA1(fdfa4712e6ed66d2af41ccfbfbf870cd01f7b0f7) )
+ROM_END
+
+
+
+
+CONS( 200?, maxx5in1,  0, 0,  nes_sh6578, nes_sh6578, nes_sh6578_state,  init_nes_sh6578, "Senario / JungleTac", "Vs Maxx 5-in-1 Casino / Senario Card & Casino Games", 0 ) // advertised on box as 'With Solitaire" (was there an even older version without it?)
+
+CONS( 200?, maxx6in1,  0, 0,  nes_sh6578, nes_sh6578, nes_sh6578_state,  init_nes_sh6578, "Senario / JungleTac", "Vs Maxx 6-in-1 Casino / Senario Card & Casino Games", 0 ) // advertised on box as "With Texas Hold 'Em" (which is the added game since the 5-in-1)
+
+CONS( 200?, max10in1,  0, 0,  nes_sh6578, nes_sh6578, nes_sh6578_max10in1_state,  init_nes_sh6578, "Senario / JungleTac", "Vs Maxx 10-in-1 Casino / Senario Card & Casino Games", 0 )
+
+// titles below have various issues (DMA, split interrupt timing etc.)
+
+// aka Wik!d Joystick, sometimes also called Air Blaster like the real Air Blaster game.  Wik!d seems a rebranding (a 'gift' company) so did ABL reuse the Air Blaster name here instead?
+CONS( 200?, ablwikid,    0,  0,  nes_sh6578_pal, nes_sh6578, nes_sh6578_abl_wikid_state, init_nes_sh6578, "Advance Bright Ltd. / JungleTac", "Wikid Joystick 14-in-1", MACHINE_NOT_WORKING )
+
+CONS( 2001?, ts_handy11,  0,  0,  nes_sh6578,     nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Techno Source / JungleTac", "Handy Boy 11-in-1 (TV Play Power)", MACHINE_NOT_WORKING ) // possibly newer than 2001
+
+// from a blue coloured unit, a yellow one exists, is it the same?
+CONS( 2004?, vsmaxx15,    0,  0,  nes_sh6578, nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Senario / JungleTac", "Vs Maxx 15-in-1", MACHINE_NOT_WORKING )
+
+// This is from the blue coloured unit with the 1p/2p slider (does it do anything / get read anywhere?)
+// A version of the 25-in-1 on VT hardware also exists, with the downgraded version of Big Racing & removed copyrights etc. (probably the purple tinted version without the 1p/2p slider)
+CONS( 2004?, vsmaxx25,    0,  0,  nes_sh6578, nes_sh6578, nes_sh6578_max10in1_state, init_nes_sh6578, "Senario / JungleTac", "Vs Maxx 25-in-1 (SH6578 hardware)", MACHINE_NOT_WORKING )
+
+// DGUN-806 on sticker on battery compartment. DreamGear had some other products with the same pad type but different DGUN numbers on the packaging, is the ROM the same?
+CONS( 2004?, dgun806,    0,  0,  nes_sh6578, nes_sh6578, nes_sh6578_max10in1_state, init_nes_sh6578, "dreamGEAR", "Plug 'N' Play 25-in-1 (DGUN-806)", MACHINE_NOT_WORKING )
+
+
+
+// titles below need inputs mapping to go further
+
+CONS( 1997, bandgpad,    0,  0,  nes_sh6578,     nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Bandai", "Multi Game Player Gamepad", MACHINE_NOT_WORKING )
+
+CONS( 1997, bandggcn,    0,  0,  nes_sh6578,     nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Bandai", "Go! Go! Connie-chan! Asobou Mouse", MACHINE_NOT_WORKING )
 
 CONS( 200?, cpatrolm,    0,  0,  nes_sh6578_pal, nes_sh6578, nes_sh6578_state, init_nes_sh6578, "TimeTop", "City Patrolman", MACHINE_NOT_WORKING )
 
-// ROM is banked
-CONS( 200?, ablwikid,    0,  0,  nes_sh6578_pal, nes_sh6578, nes_sh6578_abl_wikid_state, init_nes_sh6578, "Advance Bright Ltd.", "Wikid Joystick", MACHINE_NOT_WORKING ) // or Wik!d Joystick
+// Super Moto 3 https://youtu.be/DR5Y_r6C_qk - has JungleTac copyrights intact, and appears to have the SH6578 versions of the games
 
-CONS( 200?, maxx5in1,  0, 0,  nes_sh6578, nes_sh6578, nes_sh6578_state,  init_nes_sh6578, "Senario", "Vs Maxx 5-in-1 Casino / Senario Card & Casino Games", 0 ) // advertised on box as 'With Solitaire" (was there an even older version without it?)
-
-CONS( 200?, maxx6in1,  0, 0,  nes_sh6578, nes_sh6578, nes_sh6578_state,  init_nes_sh6578, "Senario", "Vs Maxx 6-in-1 Casino / Senario Card & Casino Games", 0 ) // advertised on box as "With Texas Hold 'Em" (which is the added game since the 5-in-1)
-
-CONS( 200?, max10in1,  0, 0,  nes_sh6578, nes_sh6578, nes_sh6578_max10in1_state,  init_nes_sh6578, "Senario", "Vs Maxx 10-in-1 Casino / Senario Card & Casino Games", 0 )
-
+// Handy Max 15-in-1 https://youtu.be/jQTUHj1cP-k - has JungleTac copyrights intact, and appears to have the SH6578 versions of the games

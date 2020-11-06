@@ -77,7 +77,7 @@ private:
 	required_device<cpu_device> m_cpu;
 	required_memory_bank m_rombank1;
 	required_memory_bank m_rombank2;
-	required_device<ram_device> m_ram;
+	required_shared_ptr<uint8_t> m_ram;
 	required_device<hc259_device> m_bitlatch;
 	required_region_ptr<uint8_t> m_rom;
 

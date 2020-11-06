@@ -87,7 +87,6 @@
         p911                "Distribution error"
         p911e,j,uc,kc       Hangs at POST, with IRQ3 it crashes at first 3d frame
         p9112               RTC self check bad
-        popn9               Doesn't boot: bad CHD?
         sscopex/sogeki      Security code error
         thrild2,a           Attract mode with partial graphics. Coins up. Hangs in car selection screen.
         thrild2c            Inf loop on blue screen
@@ -361,6 +360,8 @@ some other components. It will be documented at a later date.
 #include "speaker.h"
 
 
+namespace {
+
 #define VIPER_DEBUG_LOG
 #define VIPER_DEBUG_EPIC_INTS       0
 #define VIPER_DEBUG_EPIC_TIMERS     0
@@ -393,6 +394,10 @@ public:
 	void init_viperhd();
 
 	DECLARE_READ_LINE_MEMBER(ds2430_unk_r);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	uint32_t epic_r(offs_t offset);
@@ -435,9 +440,6 @@ private:
 	uint32_t m_mpc8240_regs[256/4];
 
 	void viper_map(address_map &map);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	TIMER_CALLBACK_MEMBER(epic_global_timer_callback);
 	TIMER_CALLBACK_MEMBER(ds2430_timer_callback);
@@ -533,7 +535,7 @@ private:
 	void mpc8240_epic_init();
 	void mpc8240_epic_reset(void);
 
-	// DS2430, to be device-ified, used at least by pyson.cpp, too
+	// DS2430, to be device-ified, used at least by kpython.cpp, too
 	enum
 	{
 		DS2430_STATE_ROM_COMMAND = 1,
@@ -2375,20 +2377,20 @@ void viper_state::machine_start()
 	save_item(NAME(m_epic.i2c_cr));
 	save_item(NAME(m_epic.i2c_sr));
 	save_item(NAME(m_epic.i2c_state));
-	for (int i = 0; i < MPC8240_NUM_INTERRUPTS; i ++)
-	{
-		save_item(NAME(m_epic.irq[i].vector), i);
-		save_item(NAME(m_epic.irq[i].priority), i);
-		save_item(NAME(m_epic.irq[i].destination), i); // written but never read
-		save_item(NAME(m_epic.irq[i].active), i);
-		save_item(NAME(m_epic.irq[i].pending), i);
-		save_item(NAME(m_epic.irq[i].mask), i);
-	}
-	for (int i = 0; i < 4; i ++)
-	{
-		save_item(NAME(m_epic.global_timer[i].base_count), i);
-		save_item(NAME(m_epic.global_timer[i].enable), i);
-	}
+
+	save_item(STRUCT_MEMBER(m_epic.irq, vector));
+	save_item(STRUCT_MEMBER(m_epic.irq, priority));
+	save_item(STRUCT_MEMBER(m_epic.irq, destination)); // written but never read
+	save_item(STRUCT_MEMBER(m_epic.irq, active));
+	save_item(STRUCT_MEMBER(m_epic.irq, pending));
+	save_item(STRUCT_MEMBER(m_epic.irq, mask));
+
+	save_item(STRUCT_MEMBER(m_epic.global_timer, base_count));
+	save_item(STRUCT_MEMBER(m_epic.global_timer, enable));
+
+	m_ds2430_data_count = 0;
+	m_ds2430_state = 0;
+	m_ds2430_reset = 0;
 }
 
 void viper_state::machine_reset()
@@ -2736,19 +2738,6 @@ ROM_START(p9112) /* dongle-protected version */
 	DISK_IMAGE( "b11a02", 0, SHA1(57665664321b78c1913d01f0d2c0b8d3efd42e04) )
 ROM_END
 
-ROM_START(popn9) //Note: this is actually a Konami Pyson HW! (PlayStation 2-based) move out of here.
-	VIPER_BIOS
-
-	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
-	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
-
-	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
-	ROM_LOAD("nvram.u39", 0x000000, 0x2000, NO_DUMP )
-
-	DISK_REGION( "ata:0:hdd:image" )
-	DISK_IMAGE( "c00jab", 0, BAD_DUMP SHA1(3763aaded9b45388a664edd84a3f7f8ff4101be4) )
-ROM_END
-
 ROM_START(sscopex)
 	VIPER_BIOS
 
@@ -3067,6 +3056,10 @@ ROM_START(mfightcc) //*
 	DISK_IMAGE( "c09c04", 0, SHA1(bf5f7447d74399d34edd4eb6dfcca7f6fc2154f2) )
 ROM_END
 
+
+} // Anonymous namespace
+
+
 /*****************************************************************************/
 
 /* Viper BIOS */
@@ -3091,7 +3084,6 @@ GAME(2001, p911e,     p911,      viper,     p911,   viper_state, init_vipercf,  
 GAME(2001, p911ea,    p911,      viper,     p911,   viper_state, init_vipercf,  ROT90,  "Konami", "Police 24/7 (ver EAA, alt)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, p911j,     p911,      viper,     p911,   viper_state, init_vipercf,  ROT90,  "Konami", "Keisatsukan Shinjuku 24ji (ver JAC)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, p9112,     kviper,    viper,     p911,   viper_state, init_vipercf,  ROT90,  "Konami", "Police 911 2 (VER. UAA:B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2003, popn9,     kviper,    viper,    viper,   viper_state, init_vipercf,  ROT0,  "Konami", "Pop'n Music 9 (ver JAB)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, sscopex,   kviper,    viper,    viper,   viper_state, init_vipercf,  ROT0,  "Konami", "Silent Scope EX (ver UAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, sogeki,    sscopex,   viper,    viper,   viper_state, init_vipercf,  ROT0,  "Konami", "Sogeki (ver JAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2002, sscopefh,  kviper,    viper,    viper,   viper_state, init_vipercf,  ROT0,  "Konami", "Silent Scope Fortune Hunter", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

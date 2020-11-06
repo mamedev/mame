@@ -1775,7 +1775,7 @@ if (CPUS["M680X0"]~=null) then
 		MAME_DIR .. "src/devices/cpu/m68000/m68kops.cpp",
 		MAME_DIR .. "src/devices/cpu/m68000/m68kops.h",
 		MAME_DIR .. "src/devices/cpu/m68000/m68000.h",
-		MAME_DIR .. "src/devices/cpu/m68000/m68kfpu.hxx",
+		MAME_DIR .. "src/devices/cpu/m68000/m68kfpu.cpp",
 		MAME_DIR .. "src/devices/cpu/m68000/m68kmmu.h",
 	}
 end
@@ -3014,6 +3014,7 @@ if (CPUS["NS32000"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/cpu/ns32000/ns32000.cpp",
 		MAME_DIR .. "src/devices/cpu/ns32000/ns32000.h",
+		MAME_DIR .. "src/devices/cpu/ns32000/slave.h",
 	}
 end
 
@@ -3328,4 +3329,24 @@ end
 if (CPUS["LC58"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/lc58/lc58d.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/lc58/lc58d.h")
+end
+
+--------------------------------------------------
+-- OKI MSM6502/6512 - Disassembler only
+--@src/devices/cpu/msm65x2/msm65x2.h,CPUS["MSM65X2"] = true
+--------------------------------------------------
+
+if (CPUS["MSM65X2"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/msm65x2/msm65x2d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/msm65x2/msm65x2d.h")
+end
+
+--------------------------------------------------
+-- Sanyo LC57 - Disassembler only
+--@src/devices/cpu/lc57/lc57.h,CPUS["LC57"] = true
+--------------------------------------------------
+
+if (CPUS["LC57"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/lc57/lc57d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/lc57/lc57d.h")
 end

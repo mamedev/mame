@@ -28,7 +28,8 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
-		m_spriteram(*this, "spriteram"),
+		m_spriteram(nullptr),
+		m_spriteram_size(0),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
@@ -50,7 +51,8 @@ public:
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
-	optional_shared_ptr<uint8_t> m_spriteram;
+	uint8_t *m_spriteram;
+	u32 m_spriteram_size;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;

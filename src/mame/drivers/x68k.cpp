@@ -1501,13 +1501,6 @@ void x68k_state::machine_reset()
 	//m_mfpdev->i7_w(1); // h-sync
 
 	// reset output values
-	output().set_value("key_led_kana",1);
-	output().set_value("key_led_romaji",1);
-	output().set_value("key_led_code",1);
-	output().set_value("key_led_caps",1);
-	output().set_value("key_led_insert",1);
-	output().set_value("key_led_hiragana",1);
-	output().set_value("key_led_fullsize",1);
 	std::fill(std::begin(m_eject_drv_out), std::end(m_eject_drv_out), 1);
 	std::fill(std::begin(m_ctrl_drv_out), std::end(m_ctrl_drv_out), 1);
 	std::fill(std::begin(m_access_drv_out), std::end(m_access_drv_out), 1);
@@ -1527,8 +1520,7 @@ void x68k_state::machine_start()
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	// install RAM handlers
 	m_spriteram = (uint16_t*)(memregion("user1")->base());
-	space.install_readwrite_bank(0x000000,m_ram->size()-1,"bank1");
-	membank("bank1")->set_base(m_ram->pointer());
+	space.install_ram(0x000000,m_ram->size()-1,m_ram->pointer());
 
 	// start mouse timer
 	m_mouse_timer->adjust(attotime::zero, 0, attotime::from_msec(1));  // a guess for now
@@ -1558,6 +1550,7 @@ void x68k_state::machine_start()
 	m_ioc.irqstatus = 0;
 	m_mouse.irqactive = false;
 	m_current_ipl = 0;
+	m_adpcm.rate = 0;
 }
 
 void x68k_state::driver_init()

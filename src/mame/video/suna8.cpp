@@ -17,46 +17,11 @@
     sent to the screen. Each sprite uses 4 bytes, held within the last
     page of tiles.
 
-    Set TILEMAPS to 1 to debug.
-    Press Z (you see the "tilemaps" in RAM) or
-    Press X (you see the "tilemaps" in ROM) then
-
-    - use Q&W to cycle through the pages.
-    - Use E&R to cycle through the tiles banks.
-    - Use A&S to cycle through the ROM banks (only with X pressed, of course).
-
 ***************************************************************************/
 
 #include "emu.h"
 #include "includes/suna8.h"
 #include "drawgfxt.ipp"
-
-/***************************************************************************
-    For Debug: there's no tilemap, just sprites.
-***************************************************************************/
-#if TILEMAPS
-TILE_GET_INFO_MEMBER(suna8_state::get_tile_info)
-{
-	uint8_t code, attr;
-
-	if (machine().input().code_pressed(KEYCODE_X))
-	{
-		uint8_t *rom = memregion("maincpu")->base() + 0x10000 + 0x4000 * m_trombank;
-		code = rom[ 2 * tile_index + 0 ];
-		attr = rom[ 2 * tile_index + 1 ];
-	}
-	else
-	{
-		code = m_spriteram[ 2 * tile_index + 0 ];
-		attr = m_spriteram[ 2 * tile_index + 1 ];
-	}
-	tileinfo.set(m_page / 8,
-			( (attr & 0x03) << 8 ) + code + m_tiles*0x400,
-			(attr >> 2) & 0xf,
-			TILE_FLIPYX( (attr >> 6) & 3 ));
-}
-#endif
-
 
 uint8_t suna8_state::banked_paletteram_r(offs_t offset)
 {
@@ -67,24 +32,18 @@ uint8_t suna8_state::banked_paletteram_r(offs_t offset)
 uint8_t suna8_state::suna8_banked_spriteram_r(offs_t offset)
 {
 	offset += m_spritebank * 0x2000;
-	return m_spriteram[offset];
+	return m_banked_spriteram[offset];
 }
 
 void suna8_state::suna8_spriteram_w(offs_t offset, uint8_t data)
 {
 	m_spriteram[offset] = data;
-#if TILEMAPS
-	m_bg_tilemap->mark_tile_dirty(offset/2);
-#endif
 }
 
 void suna8_state::suna8_banked_spriteram_w(offs_t offset, uint8_t data)
 {
 	offset += m_spritebank * 0x2000;
-	m_spriteram[offset] = data;
-#if TILEMAPS
-	m_bg_tilemap->mark_tile_dirty(offset/2);
-#endif
+	m_banked_spriteram[offset] = data;
 }
 
 /*
@@ -145,20 +104,6 @@ void suna8_state::suna8_vh_start_common(bool has_text, GFXBANK_TYPE_T gfxbank_ty
 	m_gfxbank       =   0;
 	m_gfxbank_type  =   gfxbank_type;
 	m_palettebank   =   0;
-
-	if (!m_has_text)
-	{
-		m_banked_paletteram.allocate(0x200 * 2);
-
-		m_spriteram.allocate(0x2000 * 2 * 2);   // 2 RAM banks, sparkman has 2 "chips"
-		memset(m_spriteram,0,0x2000 * 2 * 2);   // helps debugging
-	}
-
-#if TILEMAPS
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(suna8_state::get_tile_info)), TILEMAP_SCAN_COLS,
-			8, 8, 0x20*(m_has_text ? 4 : 16), 0x20);
-	m_bg_tilemap->set_transparent_pen(15);
-#endif
 }
 
 VIDEO_START_MEMBER(suna8_state,suna8_text)              { suna8_vh_start_common( true,  GFXBANK_TYPE_SPARKMAN); }
@@ -231,7 +176,7 @@ while (0)
 
 void suna8_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int start, int end, int which)
 {
-	uint8_t *spriteram = m_spriteram + which * 0x2000 * 2;
+	uint8_t *spriteram = m_spriteram ? m_spriteram : m_banked_spriteram + which * 0x2000 * 2;
 
 	int mx = 0; // multisprite x counter
 
@@ -459,7 +404,7 @@ void suna8_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 void suna8_state::draw_text_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int start, int end, int ypos, bool write_mask)
 {
-	uint8_t *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram ? m_spriteram.target() : m_banked_spriteram.target();
 
 	int max_x = m_screen->width() - 8;
 	int max_y = m_screen->height() - 8;
@@ -541,37 +486,6 @@ uint32_t suna8_state::screen_update_suna8(screen_device &screen, bitmap_ind16 &b
 {
 	// see hardhead, hardhea2 test mode (press button 2 for both players)
 	bitmap.fill(0xff, cliprect);
-
-#ifdef MAME_DEBUG
-#if TILEMAPS
-	if (machine().input().code_pressed(KEYCODE_Z) || machine().input().code_pressed(KEYCODE_X))
-	{
-		int max_tiles = memregion("gfx1")->bytes() / (0x400 * 0x20);
-
-		if (machine().input().code_pressed_once(KEYCODE_Q)) { m_page--;     machine().tilemap().mark_all_dirty();   }
-		if (machine().input().code_pressed_once(KEYCODE_W)) { m_page++;     machine().tilemap().mark_all_dirty();   }
-		if (machine().input().code_pressed_once(KEYCODE_E)) { m_tiles--;    machine().tilemap().mark_all_dirty();   }
-		if (machine().input().code_pressed_once(KEYCODE_R)) { m_tiles++;    machine().tilemap().mark_all_dirty();   }
-		if (machine().input().code_pressed_once(KEYCODE_A)) { m_trombank--; machine().tilemap().mark_all_dirty();   }
-		if (machine().input().code_pressed_once(KEYCODE_S)) { m_trombank++; machine().tilemap().mark_all_dirty();   }
-
-		m_trombank  &=  0xf;
-		m_page      &=  m_has_text ? 3 : (m_gfxdecode->gfx(1) ? 15 : 7);
-		m_tiles     %=  max_tiles;
-		if (m_tiles < 0) m_tiles += max_tiles;
-
-		m_bg_tilemap->set_scrollx(0, 0x100 * m_page);
-		m_bg_tilemap->set_scrolly(0, 0);
-		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-#if 1
-	popmessage("%02X %02X %02X - p%2X g%02X r%02X",
-						m_rombank, m_palettebank, m_spritebank,
-						m_page, m_tiles, m_trombank);
-#endif
-		return 0;
-	}
-#endif
-#endif
 
 	// Sprites
 	draw_sprites(screen, bitmap, cliprect, 0x1d00, 0x2000, 0);

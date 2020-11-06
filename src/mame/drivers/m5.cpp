@@ -560,10 +560,10 @@ void m5_state::mem64KBF_w(uint8_t data) //out 0x30
 			membank("bank6r")->set_base(ram_region->base()+0xc000);     membank("bank6w")->set_base(ram_region->base()+0xc000);
 			break;
 		case 1:
-			program.install_write_bank(0x0000,0x1fff,"bank1w");
-			program.install_write_bank(0x2000,0x3fff,"bank2w");
-			program.install_write_bank(0x4000,0x5fff,"bank3w");
-			program.install_write_bank(0x6000,0x6fff,"bank4w");
+			program.install_write_bank(0x0000,0x1fff,membank("bank1w"));
+			program.install_write_bank(0x2000,0x3fff,membank("bank2w"));
+			program.install_write_bank(0x4000,0x5fff,membank("bank3w"));
+			program.install_write_bank(0x6000,0x6fff,membank("bank4w"));
 			membank("bank1r")->set_base(ram_region->base()+0x0000);     membank("bank1w")->set_base(ram_region->base()+0x0000);
 			membank("bank2r")->set_base(ram_region->base()+0x2000);     membank("bank2w")->set_base(ram_region->base()+0x2000);
 			membank("bank3r")->set_base(ram_region->base()+0x4000);     membank("bank3w")->set_base(ram_region->base()+0x4000);
@@ -572,10 +572,10 @@ void m5_state::mem64KBF_w(uint8_t data) //out 0x30
 			membank("bank6r")->set_base(ram_region->base()+0xc000);     membank("bank6w")->set_base(ram_region->base()+0xc000);
 			break;
 		case 2:
-			program.install_write_bank(0x0000,0x1fff,"bank1w");
-			program.install_write_bank(0x2000,0x3fff,"bank2w");
-			program.install_write_bank(0x4000,0x5fff,"bank3w");
-			program.install_write_bank(0x6000,0x6fff,"bank4w");
+			program.install_write_bank(0x0000,0x1fff,membank("bank1w"));
+			program.install_write_bank(0x2000,0x3fff,membank("bank2w"));
+			program.install_write_bank(0x4000,0x5fff,membank("bank3w"));
+			program.install_write_bank(0x6000,0x6fff,membank("bank4w"));
 			membank("bank1r")->set_base(memregion(Z80_TAG)->base());    membank("bank1w")->set_base(ram_region->base()+0x0000);
 			membank("bank2r")->set_base(ram_region->base()+0x2000);     membank("bank2w")->set_base(ram_region->base()+0x2000);
 			membank("bank3r")->set_base(ram_region->base()+0x4000);     membank("bank3w")->set_base(ram_region->base()+0x4000);
@@ -594,8 +594,8 @@ void m5_state::mem64KBF_w(uint8_t data) //out 0x30
 			break;
 		case 4:
 			program.unmap_write(0x0000, 0x3fff);
-			program.install_write_bank(0x4000,0x5fff,"bank3w");
-			program.install_write_bank(0x6000,0x6fff,"bank4w");
+			program.install_write_bank(0x4000,0x5fff,membank("bank3w"));
+			program.install_write_bank(0x6000,0x6fff,membank("bank4w"));
 			membank("bank1r")->set_base(ram_region->base()+0x0000);
 			membank("bank2r")->set_base(ram_region->base()+0x2000);
 			membank("bank3r")->set_base(ram_region->base()+0x4000);     membank("bank3w")->set_base(ram_region->base()+0x4000);
@@ -604,10 +604,10 @@ void m5_state::mem64KBF_w(uint8_t data) //out 0x30
 			membank("bank6r")->set_base(ram_region->base()+0xc000);     membank("bank6w")->set_base(ram_region->base()+0xc000);
 			break;
 		case 5:
-			program.install_write_bank(0x0000,0x1fff,"bank1w");
-			program.install_write_bank(0x2000,0x3fff,"bank2w");
-			program.install_write_bank(0x4000,0x5fff,"bank3w");
-			program.install_write_bank(0x6000,0x6fff,"bank4w");
+			program.install_write_bank(0x0000,0x1fff,membank("bank1w"));
+			program.install_write_bank(0x2000,0x3fff,membank("bank2w"));
+			program.install_write_bank(0x4000,0x5fff,membank("bank3w"));
+			program.install_write_bank(0x6000,0x6fff,membank("bank4w"));
 			membank("bank1r")->set_base(memregion(Z80_TAG)->base());    membank("bank1w")->set_base(ram_region->base()+0x0000);
 			membank("bank2r")->set_base(m_cart_rom->base());            membank("bank2w")->set_base(ram_region->base()+0x2000);
 			membank("bank3r")->set_base(m_cart_rom->base()+0x2000);     membank("bank3w")->set_base(ram_region->base()+0x4000);
@@ -616,10 +616,10 @@ void m5_state::mem64KBF_w(uint8_t data) //out 0x30
 			membank("bank6r")->set_base(ram_region->base()+0xc000);     membank("bank6w")->set_base(ram_region->base()+0xc000);
 			break;
 		case 6:
-			program.install_write_bank(0x0000,0x1fff,"bank1w");
-			program.install_write_bank(0x2000,0x3fff,"bank2w");
-			program.install_write_bank(0x4000,0x5fff,"bank3w");
-			program.install_write_bank(0x6000,0x6fff,"bank4w");
+			program.install_write_bank(0x0000,0x1fff,membank("bank1w"));
+			program.install_write_bank(0x2000,0x3fff,membank("bank2w"));
+			program.install_write_bank(0x4000,0x5fff,membank("bank3w"));
+			program.install_write_bank(0x6000,0x6fff,membank("bank4w"));
 			membank("bank1r")->set_base(memregion(Z80_TAG)->base());    membank("bank1w")->set_base(ram_region->base()+0x0000);
 			membank("bank2r")->set_base(rom_region->base()+0x0000);     membank("bank2w")->set_base(ram_region->base()+0x2000);
 			membank("bank3r")->set_base(rom_region->base()+0x2000);     membank("bank3w")->set_base(ram_region->base()+0x4000);
@@ -628,11 +628,11 @@ void m5_state::mem64KBF_w(uint8_t data) //out 0x30
 			membank("bank6r")->set_base(ram_region->base()+0xc000);     membank("bank6w")->set_base(ram_region->base()+0xc000);
 			break;
 		case 7: //probably this won't work - it should redirect rw to another ram module
-			program.install_write_bank(0x0000,0x1fff,"bank1w");
-			program.install_write_bank(0x2000,0x3fff,"bank2w");
-			program.install_write_bank(0x4000,0x5fff,"bank3w");
-			program.install_write_bank(0x6000,0x6fff,"bank4w");
-			program.install_readwrite_bank(0x7000,0x7fff,"sram");
+			program.install_write_bank(0x0000,0x1fff,membank("bank1w"));
+			program.install_write_bank(0x2000,0x3fff,membank("bank2w"));
+			program.install_write_bank(0x4000,0x5fff,membank("bank3w"));
+			program.install_write_bank(0x6000,0x6fff,membank("bank4w"));
+			program.install_readwrite_bank(0x7000,0x7fff,membank("sram"));
 			membank("bank1r")->set_base(rom_region->base()+0x0000);     membank("bank1w")->set_base(rom_region->base()+0x0000);
 			membank("bank2r")->set_base(rom_region->base()+0x2000);     membank("bank2w")->set_base(rom_region->base()+0x2000);
 			membank("bank3r")->set_base(rom_region->base()+0x4000);     membank("bank3w")->set_base(rom_region->base()+0x4000);
@@ -1135,13 +1135,13 @@ void brno_state::romsel_w(uint8_t data) //out 6c
 
 	else
 	{
-		program.install_readwrite_bank(0x0000, 0x0fff, "bank1");
-		program.install_readwrite_bank(0x1000, 0x1fff, "bank2");
-		program.install_readwrite_bank(0x2000, 0x2fff, "bank3");
-		program.install_readwrite_bank(0x3000, 0x3fff, "bank4");
-		program.install_readwrite_bank(0x4000, 0x4fff, "bank5");
-		program.install_readwrite_bank(0x5000, 0x5fff, "bank6");
-		program.install_readwrite_bank(0x6000, 0x6fff, "bank7");
+		program.install_readwrite_bank(0x0000, 0x0fff, membank("bank1"));
+		program.install_readwrite_bank(0x1000, 0x1fff, membank("bank2"));
+		program.install_readwrite_bank(0x2000, 0x2fff, membank("bank3"));
+		program.install_readwrite_bank(0x3000, 0x3fff, membank("bank4"));
+		program.install_readwrite_bank(0x4000, 0x4fff, membank("bank5"));
+		program.install_readwrite_bank(0x5000, 0x5fff, membank("bank6"));
+		program.install_readwrite_bank(0x6000, 0x6fff, membank("bank7"));
 
 		m_romen=false;
 	}

@@ -31,7 +31,6 @@ the S14001A in the 70s), this time a 65C02 software solution.
 #include "machine/sensorboard.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/pwm.h"
 #include "speaker.h"
 
@@ -207,9 +206,6 @@ void chesster_state::chesster(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.5); // m74hc374b1.ic1 + 8l513_02.z2
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void chesster_state::kishon(machine_config &config)

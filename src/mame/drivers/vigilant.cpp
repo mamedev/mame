@@ -29,7 +29,6 @@ Bottom board - M75-B-A (all versions regardless of mask ROM/EPROM)
 #include "machine/gen_latch.h"
 #include "machine/rstbuf.h"
 #include "sound/2203intf.h"
-#include "sound/volt_reg.h"
 #include "sound/ym2151.h"
 #include "screen.h"
 #include "speaker.h"
@@ -528,9 +527,6 @@ void vigilant_state::vigilant(machine_config &config)
 	dac_8bit_r2r_device &dac(DAC_8BIT_R2R(config, "dac", 0)); // unknown DAC
 	dac.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	dac.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void vigilant_state::buccanrs(machine_config &config)
@@ -597,9 +593,6 @@ void vigilant_state::buccanrs(machine_config &config)
 	dac_8bit_r2r_device &dac(DAC_8BIT_R2R(config, "dac", 0)); // unknown DAC
 	dac.add_route(ALL_OUTPUTS, "lspeaker", 0.35);
 	dac.add_route(ALL_OUTPUTS, "rspeaker", 0.35);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void vigilant_state::kikcubic(machine_config &config)
@@ -650,11 +643,7 @@ void vigilant_state::kikcubic(machine_config &config)
 	dac_8bit_r2r_device &dac(DAC_8BIT_R2R(config, "dac", 0)); // unknown DAC
 	dac.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	dac.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
-
 
 
 /***************************************************************************

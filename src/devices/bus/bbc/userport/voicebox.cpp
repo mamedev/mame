@@ -41,8 +41,7 @@ void bbc_voicebox_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
 	SP0256(config, m_nsp, 3120000); // TODO: unknown crystal
-	m_nsp->data_request_callback().set(FUNC(bbc_voicebox_device::cb1_w));
-	m_nsp->standby_callback().set(FUNC(bbc_voicebox_device::cb2_w));
+	m_nsp->data_request_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_userport_slot_device::cb1_w)).invert();
 	m_nsp->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
@@ -78,14 +77,4 @@ void bbc_voicebox_device::device_start()
 void bbc_voicebox_device::pb_w(uint8_t data)
 {
 	m_nsp->ald_w(data & 0x3f);
-}
-
-WRITE_LINE_MEMBER(bbc_voicebox_device::cb1_w)
-{
-	m_slot->cb1_w(state);
-}
-
-WRITE_LINE_MEMBER(bbc_voicebox_device::cb2_w)
-{
-	m_slot->cb2_w(state);
 }

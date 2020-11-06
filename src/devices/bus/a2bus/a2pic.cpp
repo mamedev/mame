@@ -1,292 +1,495 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont
-/*********************************************************************
-
-    a2pic.c
-
-    Apple II Parallel Interface Card (670-0021)
-
-*********************************************************************/
-
+// copyright-holders:Vas Crabb
 #include "emu.h"
 #include "a2pic.h"
 
-/***************************************************************************
-    PARAMETERS
-***************************************************************************/
+//#define VERBOSE 1
+//#define LOG_OUTPUT_FUNC osd_printf_info
+#include "logmacro.h"
 
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
+namespace {
 
-DEFINE_DEVICE_TYPE(A2BUS_PIC, a2bus_pic_device, "a2pic", "Apple Parallel Interface Card")
-
-#define PIC_ROM_REGION  "pic_rom"
-#define PIC_CENTRONICS_TAG "pic_ctx"
-
-ROM_START( pic )
-	ROM_REGION(0x000200, PIC_ROM_REGION, 0)
-	ROM_LOAD( "341-0057.bin", 0x000000, 0x000200, CRC(0d2d84ee) SHA1(bfc5b863d37e59875a6159528eb0f2b6082063b5) )
+ROM_START(pic)
+	ROM_REGION(0x0200, "prom", 0)
+	ROM_LOAD( "341-0057.7b", 0x0000, 0x0200, CRC(0a6b084b) SHA1(de8aa285dcac88b1cc80ec9128b092833f5174b6) )
 ROM_END
 
-static INPUT_PORTS_START( pic )
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x07, 0x00, "Strobe length (SW1-3)" )
-	PORT_DIPSETTING(    0x00, "1 microsecond" )
-	PORT_DIPSETTING(    0x01, "3 microseconds" )
-	PORT_DIPSETTING(    0x02, "5 microseconds" )
-	PORT_DIPSETTING(    0x03, "7 microseconds" )
-	PORT_DIPSETTING(    0x04, "9 microseconds" )
-	PORT_DIPSETTING(    0x05, "11 microseconds" )
-	PORT_DIPSETTING(    0x06, "13 microseconds" )
-	PORT_DIPSETTING(    0x07, "15 microseconds" )
 
-	PORT_DIPNAME( 0x08, 0x08, "Strobe polarity (SW4)" )
-	PORT_DIPSETTING(    0x00, "Positive" )
-	PORT_DIPSETTING(    0x08, "Negative" )
+INPUT_PORTS_START(pic)
+	PORT_START("SW1")
+	PORT_DIPNAME(0x07, 0x07, "Strobe Length")               PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPSETTING(   0x07, "1 microsecond")
+	PORT_DIPSETTING(   0x06, "3 microseconds")
+	PORT_DIPSETTING(   0x05, "5 microseconds")
+	PORT_DIPSETTING(   0x04, "7 microseconds")
+	PORT_DIPSETTING(   0x03, "9 microseconds")
+	PORT_DIPSETTING(   0x02, "11 microseconds")
+	PORT_DIPSETTING(   0x01, "13 microseconds")
+	PORT_DIPSETTING(   0x00, "15 microseconds")
+	PORT_DIPNAME(0x08, 0x00, "Strobe Output Polarity")      PORT_DIPLOCATION("SW1:4")       PORT_CHANGED_MEMBER(DEVICE_SELF, a2bus_pic_device, sw1_strobe, 0)
+	PORT_DIPSETTING(   0x08, "Positive")
+	PORT_DIPSETTING(   0x00, "Negative")
+	PORT_DIPNAME(0x10, 0x00, "Acknowledge Input Polarity")  PORT_DIPLOCATION("SW1:5")       PORT_CHANGED_MEMBER(DEVICE_SELF, a2bus_pic_device, sw1_ack, 0)
+	PORT_DIPSETTING(   0x10, "Positive")
+	PORT_DIPSETTING(   0x00, "Negative")
+	PORT_DIPNAME(0x20, 0x20, "Firmware")                    PORT_DIPLOCATION("SW1:6")       PORT_CHANGED_MEMBER(DEVICE_SELF, a2bus_pic_device, sw1_firmware, 0)
+	PORT_DIPSETTING(   0x20, "Parallel Printer")    // ROM #341-0005 - auto LF after CR
+	PORT_DIPSETTING(   0x00, "Centronics")          // ROM #341-0019 - no auto LF after CR
+	PORT_DIPNAME(0x40, 0x40, "Interrupt")                   PORT_DIPLOCATION("SW1:7")       PORT_CHANGED_MEMBER(DEVICE_SELF, a2bus_pic_device, sw1_irq, 0)
+	PORT_DIPSETTING(   0x40, "Disabled")
+	PORT_DIPSETTING(   0x00, "Enabled")
 
-	PORT_DIPNAME( 0x10, 0x10, "Acknowledge polarity (SW5)" )
-	PORT_DIPSETTING(    0x00, "Positive" )
-	PORT_DIPSETTING(    0x10, "Negative" )
-
-	PORT_DIPNAME( 0x20, 0x20, "Firmware (SW6)" )
-	PORT_DIPSETTING(    0x00, "Parallel Printer (341-0005)" )
-	PORT_DIPSETTING(    0x20, "Centronics (341-0019)" )
-
-	PORT_DIPNAME( 0x40, 0x00, "Use interrupts (SW7)" )
-	PORT_DIPSETTING(    0x00, "Off" )
-	PORT_DIPSETTING(    0x40, "On" )
+	PORT_START("X")
+	PORT_CONFNAME(0x01, 0x01, "PROM Addressing")
+	PORT_CONFSETTING(   0x00, "Flat (X1)")
+	PORT_CONFSETTING(   0x01, "Standard (X2)")
+	PORT_CONFNAME(0x02, 0x02, "Data Output")                PORT_CHANGED_MEMBER(DEVICE_SELF, a2bus_pic_device, x_data_out, 0)
+	PORT_CONFSETTING(   0x00, "Disabled (X3)")
+	PORT_CONFSETTING(   0x02, "Enabled (X4)")
+	PORT_CONFNAME(0x04, 0x04, "Character Width")            PORT_CHANGED_MEMBER(DEVICE_SELF, a2bus_pic_device, x_char_width, 0)
+	PORT_CONFSETTING(   0x00, "7-bit (X5)")
+	PORT_CONFSETTING(   0x04, "8-bit (X6)")
 INPUT_PORTS_END
 
-//-------------------------------------------------
-//  input_ports - device-specific input ports
-//-------------------------------------------------
+} // anonymous namespace
 
-ioport_constructor a2bus_pic_device::device_input_ports() const
-{
-	return INPUT_PORTS_NAME( pic );
-}
 
-//-------------------------------------------------
-//  device_add_mconfig - add device configuration
-//-------------------------------------------------
 
-void a2bus_pic_device::device_add_mconfig(machine_config &config)
-{
-	CENTRONICS(config, m_ctx, centronics_devices, "printer");
-	m_ctx->set_data_input_buffer(m_ctx_data_in);
-	m_ctx->ack_handler().set(FUNC(a2bus_pic_device::ack_w));
+DEFINE_DEVICE_TYPE(A2BUS_PIC, a2bus_pic_device, "a2pic", "Apple II Parallel Interface Card")
 
-	INPUT_BUFFER(config, m_ctx_data_in);
-	OUTPUT_LATCH(config, m_ctx_data_out);
-	m_ctx->set_output_latch(*m_ctx_data_out);
-}
 
-//-------------------------------------------------
-//  rom_region - device-specific ROM region
-//-------------------------------------------------
 
-const tiny_rom_entry *a2bus_pic_device::device_rom_region() const
-{
-	return ROM_NAME( pic );
-}
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-a2bus_pic_device::a2bus_pic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	a2bus_pic_device(mconfig, A2BUS_PIC, tag, owner, clock)
-{
-}
-
-a2bus_pic_device::a2bus_pic_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, type, tag, owner, clock),
+a2bus_pic_device::a2bus_pic_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, A2BUS_PIC, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
-	m_dsw1(*this, "DSW1"),
-	m_ctx(*this, PIC_CENTRONICS_TAG),
-	m_ctx_data_in(*this, "ctx_data_in"),
-	m_ctx_data_out(*this, "ctx_data_out"), m_rom(nullptr),
-	m_started(false), m_ack(0), m_irqenable(false), m_autostrobe(false), m_timer(nullptr)
+	m_printer_conn(*this, "prn"),
+	m_printer_out(*this, "prn_out"),
+	m_input_sw1(*this, "SW1"),
+	m_input_x(*this, "X"),
+	m_prom(*this, "prom"),
+	m_strobe_timer(nullptr),
+	m_firmware_base(0x0000U),
+	m_data_latch(0x00U),
+	m_autostrobe_disable(0U),
+	m_ack_latch(0U),
+	m_irq_enable(0U),
+	m_ack_in(1U),
+	m_perror_in(1U),
+	m_select_in(1U),
+	m_fault_in(1U)
 {
 }
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
 
-void a2bus_pic_device::device_start()
+
+//----------------------------------------------
+//  DIP switch/jumper handlers
+//----------------------------------------------
+
+INPUT_CHANGED_MEMBER(a2bus_pic_device::sw1_strobe)
 {
-	m_rom = device().machine().root_device().memregion(this->subtag(PIC_ROM_REGION).c_str())->base();
-
-	m_timer = timer_alloc(0, nullptr);
-	m_timer->adjust(attotime::never);
-
-	save_item(NAME(m_ack));
-	save_item(NAME(m_irqenable));
-	save_item(NAME(m_autostrobe));
+	m_printer_conn->write_strobe(BIT(m_input_sw1->read(), 3) ^ (m_strobe_timer->enabled() ? 0U : 1U));
 }
 
-void a2bus_pic_device::device_reset()
-{
-	m_started = true;
-	m_ack = 0;
-	m_irqenable = false;
-	m_autostrobe = false;
-	lower_slot_irq();
-	m_timer->adjust(attotime::never);
 
-	// set initial state of the strobe line depending on the dipswitch
-	clear_strobe();
+INPUT_CHANGED_MEMBER(a2bus_pic_device::sw1_ack)
+{
+	if (m_ack_in != BIT(m_input_sw1->read(), 4))
+		set_ack_latch();
 }
 
-void a2bus_pic_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
-{
-	clear_strobe();
 
-	m_timer->adjust(attotime::never);
+INPUT_CHANGED_MEMBER(a2bus_pic_device::sw1_firmware)
+{
+	m_firmware_base = BIT(m_input_sw1->read(), 5) << 8;
 }
 
-/*-------------------------------------------------
-    read_cnxx - called for reads from this card's cnxx space
--------------------------------------------------*/
 
-uint8_t a2bus_pic_device::read_cnxx(uint8_t offset)
+INPUT_CHANGED_MEMBER(a2bus_pic_device::sw1_irq)
 {
-	m_autostrobe = true;
-
-	if (m_dsw1->read() & 0x20)
+	if (m_ack_latch && m_irq_enable)
 	{
-		return m_rom[(offset&0xff) | 0x100];
+		if (BIT(m_input_sw1->read(), 6))
+			lower_slot_irq();
+		else
+			raise_slot_irq();
+	}
+}
+
+
+INPUT_CHANGED_MEMBER(a2bus_pic_device::x_data_out)
+{
+	if (m_data_latch && !BIT(m_input_x->read(), 1))
+	{
+		m_data_latch = 0x00U;
+		m_printer_out->write(0x00U);
+	}
+}
+
+
+INPUT_CHANGED_MEMBER(a2bus_pic_device::x_char_width)
+{
+	if (BIT(m_data_latch, 7))
+		m_printer_out->write(m_data_latch & (BIT(m_input_x->read(), 2) ? 0xffU : 0x7fU));
+}
+
+
+
+//----------------------------------------------
+//  device_a2bus_card_interface implementation
+//----------------------------------------------
+
+u8 a2bus_pic_device::read_c0nx(u8 offset)
+{
+	if (!machine().side_effects_disabled())
+		LOG("Read C0n%01X\n", offset);
+
+	switch (offset & 0x07U)
+	{
+	case 3U:
+		return 0x97U | (m_perror_in << 5) | (m_select_in << 6) | (m_fault_in << 3);
+
+	case 4U:
+		return (m_ack_latch << 7) | (m_ack_in ^ BIT(m_input_sw1->read(), 4));
+
+	case 5U:
+		logerror("500ns negative strobe not implemented\n");
+		break;
+
+	case 6U:
+		if (!machine().side_effects_disabled())
+			enable_irq();
+		break;
+
+	case 7U:
+		if (!machine().side_effects_disabled())
+			reset_mode();
+		break;
 	}
 
-	return m_rom[(offset&0xff)];
+	return 0x00U;
 }
 
-/*-------------------------------------------------
-    read_c0nx - called for reads from this card's c0nx space
--------------------------------------------------*/
-
-uint8_t a2bus_pic_device::read_c0nx(uint8_t offset)
+void a2bus_pic_device::write_c0nx(u8 offset, u8 data)
 {
-	uint8_t rv = 0;
+	LOG("Write C0n%01X=%02X\n", offset, data);
 
-	switch (offset)
+	switch (offset & 0x07U)
 	{
-		case 3:
-			return m_ctx_data_in->read();
+	case 0U:
+		{
+			ioport_value const x(m_input_x->read());
 
-		case 4:
-			rv = m_ack;
-
-			// clear flip-flop
-			if (m_dsw1->read() & 0x10)    // negative polarity
+			// latch output data - remember MSB can be forced low by jumper
+			if (BIT(x, 1))
 			{
-				m_ack |= 0x80;
+				LOG("Latch data %02X\n", data);
+				m_data_latch = data;
+				m_printer_out->write(data & (BIT(x, 2) ? 0xffU : 0x7fU));
 			}
 			else
 			{
-				m_ack &= ~0x80;
+				LOG("Output disabled, not latching data\n");
 			}
 
-			return rv;
-
-		case 6: // does reading this really work?
-			m_irqenable = true;
-			break;
-
-		case 7:
-			m_irqenable = false;
-			m_autostrobe = false;
-			lower_slot_irq();
-			break;
-
-	}
-
-	return 0;
-}
-
-/*-------------------------------------------------
-    write_c0nx - called for writes to this card's c0nx space
--------------------------------------------------*/
-
-void a2bus_pic_device::write_c0nx(uint8_t offset, uint8_t data)
-{
-	switch (offset)
-	{
-		case 0: // set data out and send a strobe
-			m_ctx_data_out->write(data);
-
-			if (m_autostrobe)
-			{
+			// start strobe if autostrobe is enabled
+			if (!m_autostrobe_disable)
 				start_strobe();
-			}
-			break;
+		}
+		break;
 
-		case 2: // send a strobe
-			start_strobe();
-			break;
+	case 2U:
+		start_strobe();
+		break;
 
-		case 6: // enable interrupt on ACK
-			m_irqenable = true;
-			break;
+	case 5U:
+		logerror("500ns negative strobe not implemented\n");
+		break;
 
-		case 7: // disable and acknowledge IRQ, reset ACK flip-flop, disable autostrobe
-			m_irqenable = false;
-			m_autostrobe = false;
-			lower_slot_irq();
-			break;
+	case 6U:
+		enable_irq();
+		break;
+
+	case 7U:
+		reset_mode();
+		break;
 	}
 }
 
-WRITE_LINE_MEMBER( a2bus_pic_device::ack_w )
+
+u8 a2bus_pic_device::read_cnxx(u8 offset)
 {
-	if (m_started)
+	if (BIT(m_input_x->read(), 0))
 	{
-		uint8_t dsw1 = m_dsw1->read();
-
-		if (dsw1 & 0x10)    // negative polarity
-		{
-			m_ack = (state == ASSERT_LINE) ? 0x00 : 0x80;
-		}
+		if (!BIT(offset, 6) || (BIT(offset, 7) && !m_ack_latch))
+			offset |= 0x40U;
 		else
-		{
-			m_ack = (state == ASSERT_LINE) ? 0x80 : 0x00;
-		}
+			offset &= 0xbfU;
+	}
 
-		m_ack |= 0x40;  // set ACK flip-flop
+	if (!machine().side_effects_disabled())
+	{
+		if (m_autostrobe_disable)
+			LOG("Enabling autostrobe\n");
+		m_autostrobe_disable = 0U;
+	}
 
-		if ((dsw1 & 0x40) && (m_irqenable))
+	return m_prom[m_firmware_base | offset];
+}
+
+
+void a2bus_pic_device::write_cnxx(u8 offset, u8 data)
+{
+	LOG("Write Cn%02X=%02X (bus conflict)\n", offset, data);
+
+	if (m_autostrobe_disable)
+		LOG("Enabling autostrobe\n");
+	m_autostrobe_disable = 0U;
+}
+
+
+
+//----------------------------------------------
+//  device_t implementation
+//----------------------------------------------
+
+tiny_rom_entry const *a2bus_pic_device::device_rom_region() const
+{
+	return ROM_NAME(pic);
+}
+
+
+void a2bus_pic_device::device_add_mconfig(machine_config &config)
+{
+	CENTRONICS(config, m_printer_conn, centronics_devices, "printer");
+	m_printer_conn->ack_handler().set(FUNC(a2bus_pic_device::ack_w));
+	m_printer_conn->perror_handler().set(FUNC(a2bus_pic_device::perror_w));
+	m_printer_conn->select_handler().set(FUNC(a2bus_pic_device::select_w));
+	m_printer_conn->fault_handler().set(FUNC(a2bus_pic_device::fault_w));
+
+	OUTPUT_LATCH(config, m_printer_out);
+	m_printer_conn->set_output_latch(*m_printer_out);
+}
+
+
+ioport_constructor a2bus_pic_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(pic);
+}
+
+
+void a2bus_pic_device::device_start()
+{
+	m_strobe_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a2bus_pic_device::release_strobe), this));
+
+	m_firmware_base = 0x0100U;
+	m_data_latch = 0xffU;
+
+	save_item(NAME(m_data_latch));
+	save_item(NAME(m_autostrobe_disable));
+	save_item(NAME(m_ack_latch));
+	save_item(NAME(m_irq_enable));
+	save_item(NAME(m_ack_in));
+	save_item(NAME(m_perror_in));
+	save_item(NAME(m_select_in));
+	save_item(NAME(m_fault_in));
+}
+
+
+void a2bus_pic_device::device_reset()
+{
+	ioport_value const sw1(m_input_sw1->read());
+	ioport_value const x(m_input_x->read());
+
+	m_firmware_base = BIT(sw1, 5) << 8;
+	m_autostrobe_disable = 1U;
+
+	if (!BIT(x, 1))
+	{
+		m_data_latch = 0x00U;
+		m_printer_out->write(0x00U);
+	}
+
+	m_printer_conn->write_strobe(BIT(sw1, 3) ^ (m_strobe_timer->enabled() ? 0U : 1U));
+
+	reset_mode();
+}
+
+
+
+//----------------------------------------------
+//  printer status inputs
+//----------------------------------------------
+
+WRITE_LINE_MEMBER(a2bus_pic_device::ack_w)
+{
+	if (bool(state) != bool(m_ack_in))
+	{
+		m_ack_in = state ? 1U : 0U;
+		LOG("/ACK=%u\n", m_ack_in);
+		if (started() && (m_ack_in != BIT(m_input_sw1->read(), 4)))
 		{
-			raise_slot_irq();
+			LOG("Active /ACK edge\n");
+			set_ack_latch();
 		}
 	}
 }
+
+
+WRITE_LINE_MEMBER(a2bus_pic_device::perror_w)
+{
+	if (bool(state) != bool(m_perror_in))
+	{
+		m_perror_in = state ? 1U : 0U;
+		LOG("PAPER EMPTY=%u\n", m_perror_in);
+	}
+}
+
+
+WRITE_LINE_MEMBER(a2bus_pic_device::select_w)
+{
+	if (bool(state) != bool(m_select_in))
+	{
+		m_select_in = state ? 1U : 0U;
+		LOG("SELECT=%u\n", m_select_in);
+	}
+}
+
+
+WRITE_LINE_MEMBER(a2bus_pic_device::fault_w)
+{
+	if (bool(state) != bool(m_fault_in))
+	{
+		m_fault_in = state ? 1U : 0U;
+		LOG("/FAULT=%u\n", m_fault_in);
+	}
+}
+
+
+
+//----------------------------------------------
+//  timer handlers
+//----------------------------------------------
+
+TIMER_CALLBACK_MEMBER(a2bus_pic_device::release_strobe)
+{
+	int const state(BIT(~m_input_sw1->read(), 3));
+	LOG("Output /STROBE=%d\n", state);
+	m_printer_conn->write_strobe(state);
+}
+
+
+
+//----------------------------------------------
+//  helpers
+//----------------------------------------------
+
+void a2bus_pic_device::reset_mode()
+{
+	if (!m_autostrobe_disable)
+		LOG("Disabling autostrobe\n");
+	else
+		LOG("Autostrobe already disabled\n");
+	m_autostrobe_disable = 1U;
+	disable_irq();
+	set_ack_latch();
+}
+
 
 void a2bus_pic_device::start_strobe()
 {
-	int usec = ((m_dsw1->read() & 7) * 2) + 1;  // strobe length in microseconds
-
-	if (m_dsw1->read() & 0x8)   // negative polarity
+	ioport_value const sw1(m_input_sw1->read());
+	unsigned const cycles(15U - ((sw1 & 0x07U) << 1));
+	int const state(BIT(sw1, 3));
+	if (!m_strobe_timer->enabled())
 	{
-		m_ctx->write_strobe(CLEAR_LINE);
+		LOG("Output /STROBE=%d for %u cycles\n", state, cycles);
+		clear_ack_latch();
+		m_printer_conn->write_strobe(state);
 	}
 	else
 	{
-		m_ctx->write_strobe(ASSERT_LINE);
+		LOG("Adjust /STROBE=%d remaining to %u cycles\n", state, cycles);
 	}
-
-	m_timer->adjust(attotime::from_usec(usec), 0, attotime::never);
+	m_strobe_timer->adjust(attotime::from_ticks(cycles, clock()));
 }
 
-void a2bus_pic_device::clear_strobe()
+
+void a2bus_pic_device::set_ack_latch()
 {
-	if (m_dsw1->read() & 0x8)   // negative polarity
+	if (m_strobe_timer->enabled())
 	{
-		m_ctx->write_strobe(ASSERT_LINE);
+		LOG("Active strobe prevents acknowledge latch from being set\n");
+	}
+	else if (!m_ack_latch)
+	{
+		LOG("Setting acknowledge latch\n");
+		m_ack_latch = 1U;
+		if (m_irq_enable && !BIT(m_input_sw1->read(), 6))
+		{
+			LOG("Asserting slot IRQ\n");
+			raise_slot_irq();
+		}
 	}
 	else
 	{
-		m_ctx->write_strobe(CLEAR_LINE);
+		LOG("Acknowledge latch already set\n");
+	}
+}
+
+
+void a2bus_pic_device::clear_ack_latch()
+{
+	if (m_ack_latch)
+	{
+		LOG("Clearing acknowledge latch\n");
+		m_ack_latch = 0U;
+		if (m_irq_enable && !BIT(m_input_sw1->read(), 6))
+		{
+			LOG("Releasing slot IRQ\n");
+			lower_slot_irq();
+		}
+	}
+	else
+	{
+		LOG("Acknowledge latch already clear\n");
+	}
+}
+
+
+void a2bus_pic_device::enable_irq()
+{
+	if (!m_irq_enable)
+	{
+		LOG("Enabling IRQ\n");
+		m_irq_enable = 1U;
+		if (m_ack_latch && !BIT(m_input_sw1->read(), 6))
+		{
+			LOG("Asserting slot IRQ\n");
+			raise_slot_irq();
+		}
+	}
+	else
+	{
+		LOG("IRQ already enabled\n");
+	}
+}
+
+
+void a2bus_pic_device::disable_irq()
+{
+	if (m_irq_enable)
+	{
+		LOG("Disabling IRQ\n");
+		m_irq_enable = 0U;
+		if (m_ack_latch && !BIT(m_input_sw1->read(), 6))
+		{
+			LOG("Releasing slot IRQ\n");
+			lower_slot_irq();
+		}
+	}
+	else
+	{
+		LOG("IRQ already disabled\n");
 	}
 }

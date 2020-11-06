@@ -3,14 +3,6 @@
 
 /*
 
-Driver is marked as NOT WORKING because interaction between BIOS and 68k side is
-not fully understood.  The BIOS often doesn't register that a game has been started
-and leaves the 'PRESS P1 OR P2 START' message onscreen during gameplay as a result.
-If this happens, the games usually then crash when you run out of lives as they end
-up in an unknown state.
-
-
-
 About MegaPlay:
 
 Megaplay games are specially designed Genesis games, produced for arcade use.
@@ -67,6 +59,9 @@ public:
 	DECLARE_READ_LINE_MEMBER(start1_r);
 	DECLARE_READ_LINE_MEMBER(start2_r);
 
+protected:
+	virtual void machine_reset() override;
+
 private:
 
 	uint16_t extra_ram_r(offs_t offset);
@@ -89,7 +84,6 @@ private:
 	uint8_t vdp1_count_r(offs_t offset);
 
 	DECLARE_VIDEO_START(megplay);
-	DECLARE_MACHINE_RESET(megaplay);
 	uint32_t screen_update_megplay(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void megaplay_bios_io_map(address_map &map);
@@ -656,12 +650,12 @@ uint32_t mplay_state::screen_update_megplay(screen_device &screen, bitmap_rgb32 
 	return 0;
 }
 
-MACHINE_RESET_MEMBER(mplay_state,megaplay)
+void mplay_state::machine_reset()
 {
 	m_bios_mode = MP_ROM;
 	m_bios_bank_addr = 0;
 	m_readpos = 1;
-	MACHINE_RESET_CALL_MEMBER(megadriv);
+	md_base_state::machine_reset();
 }
 
 void mplay_state::megaplay(machine_config &config)
@@ -1014,18 +1008,18 @@ didn't have original Sega part numbers it's probably a converted TWC cart
 ** Probably reused cart case
 */
 
-/* -- */ GAME( 1993, megaplay, 0,        megaplay, megaplay, mplay_state, init_megaplay, ROT0, "Sega", "Mega Play BIOS",                      MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-/* 01 */ GAME( 1993, mp_sonic, megaplay, megaplay, mp_sonic, mplay_state, init_megaplay, ROT0, "Sega", "Sonic The Hedgehog (Mega Play)",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-/* 02 */ GAME( 1993, mp_gaxe2, megaplay, megaplay, mp_gaxe2, mplay_state, init_megaplay, ROT0, "Sega", "Golden Axe II (Mega Play) (Rev B)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-/* 02 */ GAME( 1993, mp_gaxe2a,mp_gaxe2, megaplay, mp_gaxe2, mplay_state, init_megaplay, ROT0, "Sega", "Golden Axe II (Mega Play)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-/* 03 */ GAME( 1993, mp_gslam, megaplay, megaplay, mp_gslam, mplay_state, init_megaplay, ROT0, "Sega", "Grand Slam (Mega Play)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-/* 04 */ GAME( 1993, mp_twcup, megaplay, megaplay, mp_twc,   mplay_state, init_megaplay, ROT0, "Sega", "Tecmo World Cup (Mega Play)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-/* 05 */ GAME( 1993, mp_sor2,  megaplay, megaplay, mp_sor2,  mplay_state, init_megaplay, ROT0, "Sega", "Streets of Rage II (Mega Play)",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-/* 06 */ GAME( 1993, mp_bio,   megaplay, megaplay, mp_bio,   mplay_state, init_megaplay, ROT0, "Sega", "Bio-hazard Battle (Mega Play)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-/* 07 */ GAME( 1993, mp_soni2, megaplay, megaplay, mp_soni2, mplay_state, init_megaplay, ROT0, "Sega", "Sonic The Hedgehog 2 (Mega Play)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+/* -- */ GAME( 1993, megaplay, 0,        megaplay, megaplay, mplay_state, init_megaplay, ROT0, "Sega", "Mega Play BIOS",                      MACHINE_IS_BIOS_ROOT | MACHINE_IMPERFECT_GRAPHICS )
+/* 01 */ GAME( 1993, mp_sonic, megaplay, megaplay, mp_sonic, mplay_state, init_megaplay, ROT0, "Sega", "Sonic The Hedgehog (Mega Play)",      MACHINE_IMPERFECT_GRAPHICS )
+/* 02 */ GAME( 1993, mp_gaxe2, megaplay, megaplay, mp_gaxe2, mplay_state, init_megaplay, ROT0, "Sega", "Golden Axe II (Mega Play) (Rev B)",   MACHINE_IMPERFECT_GRAPHICS )
+/* 02 */ GAME( 1993, mp_gaxe2a,mp_gaxe2, megaplay, mp_gaxe2, mplay_state, init_megaplay, ROT0, "Sega", "Golden Axe II (Mega Play)",           MACHINE_IMPERFECT_GRAPHICS )
+/* 03 */ GAME( 1993, mp_gslam, megaplay, megaplay, mp_gslam, mplay_state, init_megaplay, ROT0, "Sega", "Grand Slam (Mega Play)",              MACHINE_IMPERFECT_GRAPHICS )
+/* 04 */ GAME( 1993, mp_twcup, megaplay, megaplay, mp_twc,   mplay_state, init_megaplay, ROT0, "Sega", "Tecmo World Cup (Mega Play)",         MACHINE_IMPERFECT_GRAPHICS )
+/* 05 */ GAME( 1993, mp_sor2,  megaplay, megaplay, mp_sor2,  mplay_state, init_megaplay, ROT0, "Sega", "Streets of Rage II (Mega Play)",      MACHINE_IMPERFECT_GRAPHICS )
+/* 06 */ GAME( 1993, mp_bio,   megaplay, megaplay, mp_bio,   mplay_state, init_megaplay, ROT0, "Sega", "Bio-hazard Battle (Mega Play)",       MACHINE_IMPERFECT_GRAPHICS )
+/* 07 */ GAME( 1993, mp_soni2, megaplay, megaplay, mp_soni2, mplay_state, init_megaplay, ROT0, "Sega", "Sonic The Hedgehog 2 (Mega Play)",    MACHINE_IMPERFECT_GRAPHICS )
 /* 08 - Columns 3? see below */
 /* 09 */ GAME( 1993, mp_shnb3, megaplay, megaplay, mp_shnb3, mplay_state, init_megaplay, ROT0, "Sega", "Shinobi III (Mega Play)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-/* 10 */ GAME( 1993, mp_gunhe, megaplay, megaplay, mp_gunhe, mplay_state, init_megaplay, ROT0, "Sega", "Gunstar Heroes (Mega Play)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-/* 11 */ GAME( 1993, mp_mazin, megaplay, megaplay, mp_mazin, mplay_state, init_megaplay, ROT0, "Sega", "Mazin Wars / Mazin Saga (Mega Play)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+/* 10 */ GAME( 1993, mp_gunhe, megaplay, megaplay, mp_gunhe, mplay_state, init_megaplay, ROT0, "Sega", "Gunstar Heroes (Mega Play)",          MACHINE_IMPERFECT_GRAPHICS )
+/* 11 */ GAME( 1993, mp_mazin, megaplay, megaplay, mp_mazin, mplay_state, init_megaplay, ROT0, "Sega", "Mazin Wars / Mazin Saga (Mega Play)", MACHINE_IMPERFECT_GRAPHICS )
 
-/* ?? */ GAME( 1993, mp_col3,  megaplay, megaplay, mp_col3,  mplay_state, init_megaplay, ROT0, "Sega", "Columns III (Mega Play)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+/* ?? */ GAME( 1993, mp_col3,  megaplay, megaplay, mp_col3,  mplay_state, init_megaplay, ROT0, "Sega", "Columns III (Mega Play)",             MACHINE_IMPERFECT_GRAPHICS )

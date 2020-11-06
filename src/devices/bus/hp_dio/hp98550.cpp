@@ -76,7 +76,9 @@ dio32_98550_device::dio32_98550_device(const machine_config &mconfig, device_typ
 	m_catseye(*this, "catseye%d", 0),
 	m_space_config("vram", ENDIANNESS_BIG, 8, 23, 0, address_map_constructor(FUNC(dio32_98550_device::map), this)),
 	m_rom(*this, "hp98550a_rom"),
-	m_vram(*this, { "vram_video", "vram_overlay"})
+	m_vram(*this, { "vram_video", "vram_overlay"}),
+	m_intreg(0),
+	m_ints(0)
 {
 }
 

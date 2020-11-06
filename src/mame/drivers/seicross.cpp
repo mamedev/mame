@@ -47,7 +47,6 @@ This info came from http://www.ne.jp/asahi/cc-sakura/akkun/old/fryski.html
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -418,9 +417,6 @@ void seicross_state::no_nvram(machine_config &config)
 	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	DAC_4BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.12); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 

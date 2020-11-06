@@ -16,7 +16,7 @@
 #define LOG_REGS    (1U <<  4)
 #define LOG_DATA    (1U <<  5)
 
-//#define VERBOSE  (LOG_CMD | LOG_INT | LOG_SEEK | LOG_REGS | LOG_DATA)
+#define VERBOSE  (LOG_CMD | LOG_INT | LOG_SEEK | LOG_REGS | LOG_DATA)
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -46,7 +46,11 @@ DEFINE_DEVICE_TYPE(WD1010, wd1010_device, "wd1010", "Western Digital WD1010-05")
 wd1010_device::wd1010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, WD1010, tag, owner, clock),
 	m_out_intrq_cb(*this),
+	m_out_bdrq_cb(*this),
+	m_out_bcs_cb(*this),
 	m_out_bcr_cb(*this),
+	m_out_dirin_cb(*this),
+	m_out_wg_cb(*this),
 	m_in_data_cb(*this),
 	m_out_data_cb(*this),
 	m_intrq(0),
@@ -83,13 +87,18 @@ void wd1010_device::device_start()
 
 	// resolve callbacks
 	m_out_intrq_cb.resolve_safe();
+	m_out_bdrq_cb.resolve_safe();
+	m_out_bcs_cb.resolve_safe();
 	m_out_bcr_cb.resolve_safe();
+	m_out_dirin_cb.resolve_safe();
+	m_out_wg_cb.resolve_safe();
 	m_in_data_cb.resolve_safe(0);
 	m_out_data_cb.resolve_safe();
 
 	// allocate timer
 	m_seek_timer = timer_alloc(TIMER_SEEK);
-	m_data_timer = timer_alloc(TIMER_DATA);
+	m_read_timer = timer_alloc(TIMER_READ);
+	m_write_timer = timer_alloc(TIMER_WRITE);
 
 	// register for save states
 	save_item(NAME(m_intrq));
@@ -156,14 +165,12 @@ void wd1010_device::device_timer(emu_timer &timer, device_timer_id tid, int para
 
 		break;
 
-	case TIMER_DATA:
+	case TIMER_READ:
+		cmd_read_sector();
+		break;
 
-		// check if data is ready or continue waiting
-		if (m_brdy)
-			cmd_write_sector();
-		else
-			m_data_timer->adjust(attotime::from_usec(35));
-
+	case TIMER_WRITE:
+		cmd_write_sector();
 		break;
 	}
 }
@@ -203,6 +210,26 @@ void wd1010_device::set_intrq(int state)
 		LOGINT("INT 0\n");
 		m_intrq = 0;
 		m_out_intrq_cb(0);
+	}
+}
+
+//-------------------------------------------------
+//  set_bdrq - set drq status
+//-------------------------------------------------
+
+void wd1010_device::set_bdrq(int state)
+{
+	if ((!(m_status & STATUS_DRQ)) && state == 1)
+	{
+		LOGINT("DRQ 1\n");
+		m_status |= STATUS_DRQ;
+		m_out_bdrq_cb(1);
+	}
+	else if ((m_status & STATUS_DRQ) && state == 0)
+	{
+		LOGINT("DRQ 0\n");
+		m_status &= ~STATUS_DRQ;
+		m_out_bdrq_cb(0);
 	}
 }
 
@@ -303,6 +330,16 @@ void wd1010_device::drdy_w(int state)
 void wd1010_device::brdy_w(int state)
 {
 	m_brdy = state;
+}
+
+int wd1010_device::sc_r()
+{
+	return m_status & STATUS_SC ? 1 : 0;
+}
+
+int wd1010_device::tk000_r()
+{
+	return m_drives[drive()].cylinder == 0 ? 1 : 0;
 }
 
 uint8_t wd1010_device::read(offs_t offset)
@@ -423,13 +460,13 @@ void wd1010_device::write(offs_t offset, uint8_t data)
 			if ((m_command >> 4) != CMD_SCAN_ID)
 				m_status &= ~STATUS_SC;
 
-			int amount = 0;
+			int seek = 0;
 			int target = 0;
 
 			switch (m_command >> 4)
 			{
 			case CMD_RESTORE:
-				amount = m_drives[drive()].cylinder;
+				seek = m_drives[drive()].cylinder;
 				target = 0;
 				break;
 
@@ -437,15 +474,17 @@ void wd1010_device::write(offs_t offset, uint8_t data)
 			case CMD_READ_SECTOR:
 			case CMD_WRITE_SECTOR:
 			case CMD_WRITE_FORMAT:
-				amount = abs(m_drives[drive()].cylinder - m_cylinder);
+				seek = m_drives[drive()].cylinder - m_cylinder;
 				target = m_cylinder;
 				break;
 			}
 
-			if ((m_command >> 4) != CMD_SCAN_ID)
-				LOGSEEK("Seeking %d cylinders to %d\n", amount, target);
+			m_out_dirin_cb(seek > 0 ? 1 : 0);
 
-			m_seek_timer->adjust(get_stepping_rate() * amount, target);
+			if ((m_command >> 4) != CMD_SCAN_ID)
+				LOGSEEK("Seeking %d cylinders to %d\n", seek, target);
+
+			m_seek_timer->adjust(get_stepping_rate() * abs(seek), target);
 		}
 
 		break;
@@ -465,11 +504,29 @@ void wd1010_device::cmd_restore()
 
 void wd1010_device::cmd_read_sector()
 {
+	if (m_status & STATUS_DRQ)
+	{
+		if (m_brdy)
+		{
+			set_bdrq(0);
+
+			// if there's nothing left we're done
+			if (m_sector_count == 0)
+			{
+				end_command();
+				return;
+			}
+		}
+		else
+		{
+			// continue waiting for the buffer to be ready
+			m_read_timer->adjust(attotime::from_usec(35));
+			return;
+		}
+	}
+
 	hard_disk_file *file = m_drives[drive()].drive->get_hard_disk_file();
 	hard_disk_info *info = hard_disk_get_info(file);
-
-	m_out_bcr_cb(1);
-	m_out_bcr_cb(0);
 
 	// verify that we can read
 	if (head() > info->heads)
@@ -479,90 +536,111 @@ void wd1010_device::cmd_read_sector()
 
 		set_error(ERR_AC);
 		end_command();
+		return;
+	}
+
+	uint8_t buffer[512];
+
+	m_out_bcr_cb(1);
+	m_out_bcr_cb(0);
+
+	m_out_bcs_cb(1);
+
+	LOGDATA("--> Transferring sector to buffer (lba = %08x)\n", get_lbasector());
+
+	hard_disk_read(file, get_lbasector(), buffer);
+
+	for (int i = 0; i < 512; i++)
+		m_out_data_cb(buffer[i]);
+
+	// multi-sector read
+	if (BIT(m_command, 2))
+	{
+		m_sector_number++;
+		m_sector_count--;
 	}
 	else
 	{
-		uint8_t buffer[512];
-
-		while (m_sector_count > 0)
-		{
-			LOGDATA("--> Transferring sector to buffer (lba = %08x)\n", get_lbasector());
-
-			hard_disk_read(file, get_lbasector(), buffer);
-
-			for (int i = 0; i < 512; i++)
-				m_out_data_cb(buffer[i]);
-
-			m_out_bcr_cb(1);
-			m_out_bcr_cb(0);
-
-			// save last read head and sector number
-			m_drives[drive()].head = head();
-			m_drives[drive()].sector = m_sector_number;
-
-			if (BIT(m_command, 2))
-			{
-				m_sector_number++;
-				m_sector_count--;
-			}
-			else
-				break;
-		}
-
-		end_command();
+		m_sector_count = 0;
 	}
+
+	if (m_sector_count == 0)
+	{
+		m_out_bcr_cb(1);
+		m_out_bcr_cb(0);
+	}
+
+	m_out_bcs_cb(0);
+
+	set_bdrq(1);
+
+	// interrupt at bdrq time?
+	if (BIT(m_command, 3) == 0)
+		set_intrq(1);
+
+	// now wait for brdy
+	m_read_timer->adjust(attotime::from_usec(35));
 }
 
 void wd1010_device::cmd_write_sector()
 {
-	if (!(m_status & STATUS_DRQ))
-	{
-		LOGDATA("Setting DATA REQUEST\n");
-		m_status |= STATUS_DRQ;
-		m_data_timer->adjust(attotime::from_usec(35));
-		return;
-	}
+	set_bdrq(1);
 
+	// wait if the buffer isn't ready
 	if (m_brdy == 0)
 	{
-		m_data_timer->adjust(attotime::from_usec(35));
+		m_write_timer->adjust(attotime::from_usec(35));
 		return;
 	}
-
-	LOGDATA("Clearing DATA REQUEST\n");
-	m_status &= ~STATUS_DRQ;
 
 	hard_disk_file *file = m_drives[drive()].drive->get_hard_disk_file();
 	uint8_t buffer[512];
 
-	while (m_sector_count > 0)
+	set_bdrq(0);
+
+	m_out_bcr_cb(1);
+	m_out_bcr_cb(0);
+
+	m_out_bcs_cb(1);
+
+	m_out_wg_cb(1);
+
+	if ((m_command >> 4) == CMD_WRITE_FORMAT)
 	{
-		if ((m_command >> 4) == CMD_WRITE_FORMAT)
-		{
-			// we ignore the format specification and fill everything with 0xe5
-			std::fill(std::begin(buffer), std::end(buffer), 0xe5);
-		}
-		else
-		{
-			// get data for sector from buffer chip
-			for (int i = 0; i < 512; i++)
-				buffer[i] = m_in_data_cb();
-		}
-
-		hard_disk_write(file, get_lbasector(), buffer);
-
-		// save last read head and sector number
-		m_drives[drive()].head = head();
-		m_drives[drive()].sector = m_sector_number;
-
-		if (BIT(m_command, 2))
-		{
-			m_sector_number++;
-			m_sector_count--;
-		}
-		else
-			break;
+		// we ignore the format specification and fill everything with 0xe5
+		std::fill(std::begin(buffer), std::end(buffer), 0xe5);
 	}
+	else
+	{
+		// get data for sector from buffer chip
+		for (int i = 0; i < 512; i++)
+			buffer[i] = m_in_data_cb();
+	}
+
+	hard_disk_write(file, get_lbasector(), buffer);
+
+	// save last read head and sector number
+	m_drives[drive()].head = head();
+	m_drives[drive()].sector = m_sector_number;
+
+	// multi-sector write
+	if (BIT(m_command, 2) && m_sector_count > 0)
+	{
+		m_sector_number++;
+		m_sector_count--;
+
+		// schedule another run if we aren't finished yet
+		if (m_sector_count > 0)
+		{
+			m_out_bcs_cb(0);
+			m_out_wg_cb(0);
+			m_write_timer->adjust(attotime::from_usec(35));
+			return;
+		}
+	}
+
+	m_out_bcs_cb(0);
+	m_out_wg_cb(0);
 
 	end_command();
 }

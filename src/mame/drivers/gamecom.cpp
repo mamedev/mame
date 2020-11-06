@@ -32,7 +32,6 @@ Game Status:
 #include "emu.h"
 #include "includes/gamecom.h"
 
-#include "sound/volt_reg.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -42,13 +41,11 @@ Game Status:
 
 void gamecom_state::gamecom_mem_map(address_map &map)
 {
-	map(0x0000, 0x0013).ram().region("maincpu", 0x00);
+	map(0x0000, 0x03ff).ram().share("maincpu");
 	map(0x0014, 0x0017).rw(FUNC(gamecom_state::gamecom_pio_r), FUNC(gamecom_state::gamecom_pio_w));        // buttons
-	map(0x0018, 0x001F).ram().region("maincpu", 0x18);
 	map(0x0020, 0x007F).rw(FUNC(gamecom_state::gamecom_internal_r), FUNC(gamecom_state::gamecom_internal_w));/* CPU internal register file */
-	map(0x0080, 0x03FF).ram().region("maincpu", 0x80);                     /* RAM */
-	map(0x0400, 0x0FFF).noprw();                                                /* Nothing */
-	map(0x1000, 0x1FFF).rom();                                                /* Internal ROM (initially), or External ROM/Flash. Controlled by MMU0 (never swapped out in game.com) */
+	map(0x0400, 0x0FFF).noprw();                                          /* Nothing */
+	map(0x1000, 0x1FFF).rom().region("maincpu", 0);                       /* Internal ROM (initially), or External ROM/Flash. Controlled by MMU0 (never swapped out in game.com) */
 	map(0x2000, 0x3FFF).bankr("bank1");                                   /* External ROM/Flash. Controlled by MMU1 */
 	map(0x4000, 0x5FFF).bankr("bank2");                                   /* External ROM/Flash. Controlled by MMU2 */
 	map(0x6000, 0x7FFF).bankr("bank3");                                   /* External ROM/Flash. Controlled by MMU3 */
@@ -286,10 +283,6 @@ void gamecom_state::gamecom(machine_config &config)
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC (Digital audio)
 	DAC_4BIT_R2R(config, m_dac0, 0).add_route(ALL_OUTPUTS, "speaker", 0.05); // unknown DAC (Frequency modulation)
 	DAC_4BIT_R2R(config, m_dac1, 0).add_route(ALL_OUTPUTS, "speaker", 0.05); // unknown DAC (Frequency modulation)
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac0", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac0", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, "cartslot1", generic_linear_slot, "gamecom_cart", "bin,tgc").set_device_load(FUNC(gamecom_state::cart1_load));
@@ -298,8 +291,8 @@ void gamecom_state::gamecom(machine_config &config)
 }
 
 ROM_START( gamecom )
-	ROM_REGION( 0x2000, "maincpu", 0 )
-	ROM_LOAD( "internal.bin", 0x1000,  0x1000, CRC(a0cec361) SHA1(03368237e8fed4a8724f3b4a1596cf4b17c96d33) )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "internal.bin", 0x0000,  0x1000, CRC(a0cec361) SHA1(03368237e8fed4a8724f3b4a1596cf4b17c96d33) )
 
 	ROM_REGION( 0x40000, "kernel", 0 )
 	ROM_LOAD( "external.bin", 0x00000, 0x40000, CRC(e235a589) SHA1(97f782e72d738f4d7b861363266bf46b438d9b50) )

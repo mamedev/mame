@@ -229,7 +229,6 @@ Notes - Has jumper setting for 122HZ or 61HZ)
 #include "machine/input_merger.h"
 #include "machine/mb14241.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -685,9 +684,6 @@ void fortyl_state::common(machine_config &config)
 	// pin 22 Noise Output  not mapped
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.2); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void fortyl_state::_40love(machine_config &config)

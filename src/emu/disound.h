@@ -109,6 +109,7 @@ protected:
 	std::vector<sound_route> m_route_list;      // list of sound routes
 	int             m_outputs;                  // number of outputs from this instance
 	int             m_auto_allocated_inputs;    // number of auto-allocated inputs targeting us
+	u32             m_specified_inputs_mask;    // mask of inputs explicitly specified (not counting auto-allocated)
 };
 
 // iterator

@@ -66,7 +66,10 @@ dio16_98265a_device::dio16_98265a_device(const machine_config &mconfig, device_t
 	m_spc(*this, "scsibus:7:mb87030"),
 	m_sw1(*this, "SW1"),
 	m_sw2(*this, "SW2"),
-	m_irq_state(false)
+	m_installed_io(false),
+	m_control(0),
+	m_irq_state(false),
+	m_dmar0(false)
 {
 }
 

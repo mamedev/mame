@@ -42,10 +42,9 @@ public:
 		m_timekeeper(*this, "m48t02"),
 		m_soundlatch(*this, "soundlatch"),
 		m_soundlatch2(*this, "soundlatch2"),
-		m_main_ram(*this, "main_ram", 0),
-		m_nvram(*this, "nvram", 0),
-		m_video(*this, "video", 0),
-		m_main_rom(*this, "main_rom", 0),
+		m_nvram(*this, "nvram"),
+		m_video(*this, "video"),
+		m_main_rom(*this, "maincpu"),
 		m_grom(*this, "gfx1"),
 		m_soundbank(*this, "soundbank")
 	{ }
@@ -89,10 +88,9 @@ protected:
 	required_device<generic_latch_8_device> m_soundlatch;
 	optional_device<generic_latch_8_device> m_soundlatch2;
 
-	optional_shared_ptr<u16> m_main_ram;
 	optional_shared_ptr<u16> m_nvram;
 	optional_shared_ptr<u16> m_video;
-	optional_shared_ptr<u16> m_main_rom;
+	optional_region_ptr<u16> m_main_rom;
 
 	required_region_ptr<u8> m_grom;
 	required_memory_bank m_soundbank;
@@ -194,7 +192,7 @@ protected:
 	void draw_rle(u16 *base, u16 color);
 	virtual void shiftreg_clear(u16 *base, u16 *zbase);
 	void handle_video_command();
-	void update_interrupts(int vint, int xint, int qint);
+	virtual void update_interrupts(int vint, int xint, int qint);
 	void bloodstm_map(address_map &map);
 	void itech020_map(address_map &map);
 	void sound_020_map(address_map &map);
@@ -263,6 +261,39 @@ protected:
 	required_ioport m_gas;
 
 	u8 m_tms_spinning[2];
+};
+
+class shoottv_state : public itech32_state
+{
+public:
+	shoottv_state(const machine_config &mconfig, device_type type, const char *tag) :
+		itech32_state(mconfig, type, tag),
+		m_buttons(*this, "P%u", 1U),
+		m_dips(*this, "DIPS"),
+		m_gun_x(*this, "GUNX%u", 1U),
+		m_gun_y(*this, "GUNY%u", 1U),
+		m_nvram_b(*this, "nvram_b"),
+		m_gun_timer(nullptr)
+	{ }
+
+	void shoottv(machine_config &config);
+
+private:
+	void driver_init() override;
+	void video_start() override;
+
+	void update_interrupts(int vint, int xint, int qint) override;
+
+	void shoottv_map(address_map &map);
+
+	TIMER_CALLBACK_MEMBER(gun_interrupt);
+
+	required_ioport_array<3> m_buttons;
+	required_ioport m_dips;
+	required_ioport_array<2> m_gun_x;
+	required_ioport_array<2> m_gun_y;
+	optional_shared_ptr<u16> m_nvram_b;
+	emu_timer *m_gun_timer;
 };
 
 #endif // MAME_INCLUDES_ITECH32_H

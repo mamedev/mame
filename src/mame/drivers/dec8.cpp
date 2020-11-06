@@ -203,7 +203,7 @@ void dec8_state::ghostb_bank_w(uint8_t data)
 	flip_screen_set(BIT(data, 3));
 }
 
-void dec8_state::csilver_control_w(uint8_t data)
+void csilver_state::csilver_control_w(uint8_t data)
 {
 	/*
 	    Bit 0x0f - ROM bank switch.
@@ -222,7 +222,7 @@ void dec8_state::dec8_sound_w(uint8_t data)
 	m_m6502_timer->adjust(m_audiocpu->cycles_to_attotime(3));
 }
 
-WRITE_LINE_MEMBER(dec8_state::csilver_adpcm_int)
+WRITE_LINE_MEMBER(csilver_state::csilver_adpcm_int)
 {
 	m_toggle ^= 1;
 	if (m_toggle)
@@ -232,18 +232,18 @@ WRITE_LINE_MEMBER(dec8_state::csilver_adpcm_int)
 	m_msm5205next <<= 4;
 }
 
-uint8_t dec8_state::csilver_adpcm_reset_r()
+uint8_t csilver_state::csilver_adpcm_reset_r()
 {
 	m_msm->reset_w(0);
 	return 0;
 }
 
-void dec8_state::csilver_adpcm_data_w(uint8_t data)
+void csilver_state::csilver_adpcm_data_w(uint8_t data)
 {
 	m_msm5205next = data;
 }
 
-void dec8_state::csilver_sound_bank_w(uint8_t data)
+void csilver_state::csilver_sound_bank_w(uint8_t data)
 {
 	m_soundbank->set_entry((data & 0x08) >> 3);
 }
@@ -455,48 +455,48 @@ void dec8_state::meikyuh_map(address_map &map)
 	map(0x8000, 0xffff).rom();
 }
 
-void dec8_state::csilver_map(address_map &map)
+void csilver_state::csilver_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram().share("share1");
 	map(0x1000, 0x13ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
 	map(0x1400, 0x17ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
-	map(0x1800, 0x1800).portr("IN1").w(FUNC(dec8_state::sub_irq_off_w));
-	map(0x1801, 0x1801).portr("IN0").w(FUNC(dec8_state::main_irq_off_w));
-	map(0x1802, 0x1802).w(FUNC(dec8_state::main_firq_off_w));
-	map(0x1803, 0x1803).portr("IN2").w(FUNC(dec8_state::main_irq_on_w));
-	map(0x1804, 0x1804).portr("DSW1").w(FUNC(dec8_state::sub_irq_on_w));
-	map(0x1805, 0x1805).portr("DSW0").w(FUNC(dec8_state::dec8_mxc06_karn_buffer_spriteram_w)); /* Dip 1, DMA */
-	map(0x1807, 0x1807).w(FUNC(dec8_state::flip_screen_w));
-	map(0x1808, 0x180b).w(FUNC(dec8_state::dec8_scroll2_w));
-	map(0x180c, 0x180c).w(FUNC(dec8_state::dec8_sound_w));
-	map(0x180d, 0x180d).w(FUNC(dec8_state::csilver_control_w));
-	map(0x180e, 0x180f).w(FUNC(dec8_state::dec8_i8751_w));
-	map(0x1c00, 0x1c00).r(FUNC(dec8_state::i8751_h_r));
-	map(0x1e00, 0x1e00).r(FUNC(dec8_state::i8751_l_r));
-	map(0x2000, 0x27ff).ram().w(FUNC(dec8_state::dec8_videoram_w));
+	map(0x1800, 0x1800).portr("IN1").w(FUNC(csilver_state::sub_irq_off_w));
+	map(0x1801, 0x1801).portr("IN0").w(FUNC(csilver_state::main_irq_off_w));
+	map(0x1802, 0x1802).w(FUNC(csilver_state::main_firq_off_w));
+	map(0x1803, 0x1803).portr("IN2").w(FUNC(csilver_state::main_irq_on_w));
+	map(0x1804, 0x1804).portr("DSW1").w(FUNC(csilver_state::sub_irq_on_w));
+	map(0x1805, 0x1805).portr("DSW0").w(FUNC(csilver_state::dec8_mxc06_karn_buffer_spriteram_w)); /* Dip 1, DMA */
+	map(0x1807, 0x1807).w(FUNC(csilver_state::flip_screen_w));
+	map(0x1808, 0x180b).w(FUNC(csilver_state::dec8_scroll2_w));
+	map(0x180c, 0x180c).w(FUNC(csilver_state::dec8_sound_w));
+	map(0x180d, 0x180d).w(FUNC(csilver_state::csilver_control_w));
+	map(0x180e, 0x180f).w(FUNC(csilver_state::dec8_i8751_w));
+	map(0x1c00, 0x1c00).r(FUNC(csilver_state::i8751_h_r));
+	map(0x1e00, 0x1e00).r(FUNC(csilver_state::i8751_l_r));
+	map(0x2000, 0x27ff).ram().w(FUNC(csilver_state::dec8_videoram_w));
 	map(0x2800, 0x2fff).ram().share("spriteram");
 	map(0x3000, 0x37ff).ram().share("share2");
-	map(0x3800, 0x3fff).rw(FUNC(dec8_state::dec8_bg_data_r), FUNC(dec8_state::dec8_bg_data_w)).share("bg_data");
+	map(0x3800, 0x3fff).rw(FUNC(csilver_state::dec8_bg_data_r), FUNC(csilver_state::dec8_bg_data_w)).share("bg_data");
 	map(0x4000, 0x7fff).bankr("mainbank");
 	map(0x8000, 0xffff).rom();
 }
 
-void dec8_state::csilver_sub_map(address_map &map)
+void csilver_state::csilver_sub_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram().share("share1");
 	map(0x1000, 0x13ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
 	map(0x1400, 0x17ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
-	map(0x1800, 0x1800).w(FUNC(dec8_state::sub_irq_off_w));
-	map(0x1801, 0x1801).w(FUNC(dec8_state::main_irq_off_w));
-	map(0x1802, 0x1802).w(FUNC(dec8_state::main_firq_off_w));
-	map(0x1803, 0x1803).portr("IN2").w(FUNC(dec8_state::main_irq_on_w));
-	map(0x1804, 0x1804).portr("DSW1").w(FUNC(dec8_state::sub_irq_on_w));
-	map(0x1805, 0x1805).portr("DSW0").w(FUNC(dec8_state::dec8_mxc06_karn_buffer_spriteram_w)); /* DMA */
-	map(0x180c, 0x180c).w(FUNC(dec8_state::dec8_sound_w));
-	map(0x2000, 0x27ff).ram().w(FUNC(dec8_state::dec8_videoram_w)).share("videoram");
+	map(0x1800, 0x1800).w(FUNC(csilver_state::sub_irq_off_w));
+	map(0x1801, 0x1801).w(FUNC(csilver_state::main_irq_off_w));
+	map(0x1802, 0x1802).w(FUNC(csilver_state::main_firq_off_w));
+	map(0x1803, 0x1803).portr("IN2").w(FUNC(csilver_state::main_irq_on_w));
+	map(0x1804, 0x1804).portr("DSW1").w(FUNC(csilver_state::sub_irq_on_w));
+	map(0x1805, 0x1805).portr("DSW0").w(FUNC(csilver_state::dec8_mxc06_karn_buffer_spriteram_w)); /* DMA */
+	map(0x180c, 0x180c).w(FUNC(csilver_state::dec8_sound_w));
+	map(0x2000, 0x27ff).ram().w(FUNC(csilver_state::dec8_videoram_w)).share("videoram");
 	map(0x2800, 0x2fff).ram().share("spriteram");
 	map(0x3000, 0x37ff).ram().share("share2");
-	map(0x3800, 0x3fff).rw(FUNC(dec8_state::dec8_bg_data_r), FUNC(dec8_state::dec8_bg_data_w));
+	map(0x3800, 0x3fff).rw(FUNC(csilver_state::dec8_bg_data_r), FUNC(csilver_state::dec8_bg_data_w));
 	map(0x4000, 0xffff).rom();
 }
 
@@ -573,7 +573,7 @@ void dec8_state::cobra_map(address_map &map)
 	map(0x2000, 0x27ff).ram().w(FUNC(dec8_state::dec8_videoram_w)).share("videoram");
 	map(0x2800, 0x2fff).ram().share("spriteram");
 	map(0x3000, 0x31ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
-	map(0x3200, 0x37ff).writeonly(); /* Unused */
+	map(0x3200, 0x37ff).nopw(); /* Unused */
 	map(0x3800, 0x3800).portr("IN0");    /* Player 1 */
 	map(0x3801, 0x3801).portr("IN1");    /* Player 2 */
 	map(0x3802, 0x3802).portr("DSW0");   /* Dip 1 */
@@ -623,15 +623,15 @@ void dec8_state::ym3526_s_map(address_map &map)
 }
 
 /* Captain Silver - same sound system as Pocket Gal */
-void dec8_state::csilver_s_map(address_map &map)
+void csilver_state::csilver_s_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
 	map(0x0800, 0x0801).w("ym1", FUNC(ym2203_device::write));
 	map(0x1000, 0x1001).w("ym2", FUNC(ym3526_device::write));
-	map(0x1800, 0x1800).w(FUNC(dec8_state::csilver_adpcm_data_w)); /* ADPCM data for the MSM5205 chip */
-	map(0x2000, 0x2000).w(FUNC(dec8_state::csilver_sound_bank_w));
+	map(0x1800, 0x1800).w(FUNC(csilver_state::csilver_adpcm_data_w)); /* ADPCM data for the MSM5205 chip */
+	map(0x2000, 0x2000).w(FUNC(csilver_state::csilver_sound_bank_w));
 	map(0x3000, 0x3000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x3400, 0x3400).r(FUNC(dec8_state::csilver_adpcm_reset_r)); /* ? not sure */
+	map(0x3400, 0x3400).r(FUNC(csilver_state::csilver_adpcm_reset_r)); /* ? not sure */
 	map(0x4000, 0x7fff).bankr("soundbank");
 	map(0x8000, 0xffff).rom();
 }
@@ -747,7 +747,7 @@ void dec8_state::srdarwin_mcu_to_main_w(uint8_t data)
 }
 
 
-void dec8_state::csilver_mcu_to_main_w(uint8_t data)
+void csilver_state::csilver_mcu_to_main_w(uint8_t data)
 {
 	if (~data & 0x10)
 		m_i8751_port0 = m_i8751_value >> 8;
@@ -1784,9 +1784,15 @@ WRITE_LINE_MEMBER(dec8_state::shackled_coin_irq)
 
 void dec8_state::machine_start()
 {
+	uint8_t *ROM = memregion("maincpu")->base();
+	uint32_t max_bank = (memregion("maincpu")->bytes() - 0x10000) / 0x4000;
+	m_mainbank->configure_entries(0, max_bank, &ROM[0x10000], 0x4000);
+
 	m_i8751_timer = timer_alloc(TIMER_DEC8_I8751);
 	m_m6502_timer = timer_alloc(TIMER_DEC8_M6502);
+
 	m_i8751_p2 = 0xff;
+	m_latch = 0;
 
 	save_item(NAME(m_secclr));
 	save_item(NAME(m_i8751_p2));
@@ -1805,8 +1811,6 @@ void dec8_state::machine_start()
 	save_item(NAME(m_cred2));
 	save_item(NAME(m_credits));
 	save_item(NAME(m_snd));
-	save_item(NAME(m_msm5205next));
-	save_item(NAME(m_toggle));
 
 	save_item(NAME(m_scroll2));
 	save_item(NAME(m_bg_control));
@@ -1815,18 +1819,14 @@ void dec8_state::machine_start()
 
 void dec8_state::machine_reset()
 {
-	int i;
-
 	m_i8751_port0 = m_i8751_port1 = 0;
 	m_i8751_return = m_i8751_value = 0;
 	m_coinage_id = 0;
 	m_coin1 = m_coin2 = m_credits = m_snd = 0;
 	m_need1 = m_need2 = m_cred1 = m_cred2 = 1;
-	m_msm5205next = 0;
-	m_toggle = 0;
 
 	m_scroll2[0] = m_scroll2[1] = m_scroll2[2] = m_scroll2[3] = 0;
-	for (i = 0; i < 0x20; i++)
+	for (int i = 0; i < 0x20; i++)
 	{
 		m_bg_control[i] = 0;
 		m_pf1_control[i] = 0;
@@ -1835,6 +1835,26 @@ void dec8_state::machine_reset()
 	// reset clears LS273 latch, which disables NMI
 	if (m_nmigate.found())
 		ghostb_bank_w(0);
+}
+
+
+void csilver_state::machine_start()
+{
+	dec8_state::machine_start();
+
+	uint8_t *RAM = memregion("audiocpu")->base();
+	m_soundbank->configure_entries(0, 2, &RAM[0], 0x4000);
+
+	save_item(NAME(m_msm5205next));
+	save_item(NAME(m_toggle));
+}
+
+void csilver_state::machine_reset()
+{
+	dec8_state::machine_reset();
+
+	m_msm5205next = 0;
+	m_toggle = 0;
 }
 
 
@@ -2143,26 +2163,26 @@ void dec8_state::meikyuh(machine_config &config)
 }
 
 
-void dec8_state::csilver(machine_config &config)
+void csilver_state::csilver(machine_config &config)
 {
 	/* basic machine hardware */
 	MC6809E(config, m_maincpu, XTAL(12'000'000)/8); /* verified on pcb */
-	m_maincpu->set_addrmap(AS_PROGRAM, &dec8_state::csilver_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &csilver_state::csilver_map);
 
 	MC6809E(config, m_subcpu, XTAL(12'000'000)/8); /* verified on pcb */
-	m_subcpu->set_addrmap(AS_PROGRAM, &dec8_state::csilver_sub_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &csilver_state::csilver_sub_map);
 
 	M6502(config, m_audiocpu, XTAL(12'000'000)/8); /* verified on pcb */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &dec8_state::csilver_s_map); /* NMIs are caused by the main CPU */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &csilver_state::csilver_s_map); /* NMIs are caused by the main CPU */
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	I8751(config, m_mcu, XTAL(8'000'000));
-	m_mcu->port_in_cb<0>().set(FUNC(dec8_state::i8751_port0_r));
-	m_mcu->port_out_cb<0>().set(FUNC(dec8_state::i8751_port0_w));
-	m_mcu->port_in_cb<1>().set(FUNC(dec8_state::i8751_port1_r));
-	m_mcu->port_out_cb<1>().set(FUNC(dec8_state::i8751_port1_w));
-	m_mcu->port_out_cb<2>().set(FUNC(dec8_state::csilver_mcu_to_main_w));
+	m_mcu->port_in_cb<0>().set(FUNC(csilver_state::i8751_port0_r));
+	m_mcu->port_out_cb<0>().set(FUNC(csilver_state::i8751_port0_w));
+	m_mcu->port_in_cb<1>().set(FUNC(csilver_state::i8751_port1_r));
+	m_mcu->port_out_cb<1>().set(FUNC(csilver_state::i8751_port1_w));
+	m_mcu->port_out_cb<2>().set(FUNC(csilver_state::csilver_mcu_to_main_w));
 	m_mcu->port_in_cb<3>().set_ioport("I8751");
 
 	config.set_perfect_quantum(m_maincpu);
@@ -2178,14 +2198,14 @@ void dec8_state::csilver(machine_config &config)
 //  m_screen->set_size(32*8, 32*8);
 //  m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
 	set_screen_raw_params_data_east(config);
-	m_screen->set_screen_update(FUNC(dec8_state::screen_update_lastmisn));
+	m_screen->set_screen_update(FUNC(csilver_state::screen_update_lastmisn));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set_inputline(m_subcpu, INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_shackled);
 	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
 
-	MCFG_VIDEO_START_OVERRIDE(dec8_state,lastmisn)
+	MCFG_VIDEO_START_OVERRIDE(csilver_state,lastmisn)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2203,7 +2223,7 @@ void dec8_state::csilver(machine_config &config)
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.70);
 
 	MSM5205(config, m_msm, XTAL(384'000)); /* verified on pcb */
-	m_msm->vck_legacy_callback().set(FUNC(dec8_state::csilver_adpcm_int));  /* interrupt function */
+	m_msm->vck_legacy_callback().set(FUNC(csilver_state::csilver_adpcm_int));  /* interrupt function */
 	m_msm->set_prescaler_selector(msm5205_device::S48_4B);      /* 8KHz */
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.88);
 }
@@ -3700,59 +3720,39 @@ ROM_START( cobracomjb )
 	ROM_LOAD( "pal16l8a-2cn.bin", 0x0000, 0x0104, CRC(3ef8cf68) SHA1(9410a139fb10628bc612d198f5c9f04b2b34f52f) )
 ROM_END
 
-/******************************************************************************/
-
-void dec8_state::init_dec8()
-{
-	if (m_mainbank.found())
-	{
-		uint8_t *ROM = memregion("maincpu")->base();
-		uint32_t max_bank = (memregion("maincpu")->bytes() - 0x10000) / 0x4000;
-		m_mainbank->configure_entries(0, max_bank, &ROM[0x10000], 0x4000);
-	}
-	m_latch = 0;
-}
-
-void dec8_state::init_csilver()
-{
-	uint8_t *RAM = memregion("audiocpu")->base();
-	m_soundbank->configure_entries(0, 2, &RAM[0], 0x4000);
-	init_dec8();
-}
-
 
 /******************************************************************************/
 
-GAME( 1986, lastmisn,   0,        lastmisn, lastmisn,  dec8_state, init_dec8,    ROT270, "Data East Corporation", "Last Mission (World revision 8)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, lastmisnu6, lastmisn, lastmisn, lastmisn,  dec8_state, init_dec8,    ROT270, "Data East USA",         "Last Mission (US revision 6)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, lastmisnu5, lastmisn, lastmisn, lastmisn,  dec8_state, init_dec8,    ROT270, "Data East USA",         "Last Mission (US revision 5)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, lastmisnj,  lastmisn, lastmisn, lastmisnj, dec8_state, init_dec8,    ROT270, "Data East Corporation", "Last Mission (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, shackled,   0,        shackled, shackled,  dec8_state, init_dec8,    ROT0,   "Data East USA",         "Shackled (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, breywood,   shackled, shackled, breywood,  dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Breywood (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, gondo,      0,        gondo,    gondo,     dec8_state, init_dec8,    ROT270, "Data East Corporation", "Gondomania (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, gondou,     gondo,    gondo,    gondo,     dec8_state, init_dec8,    ROT270, "Data East USA",         "Gondomania (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, makyosen,   gondo,    gondo,    gondo,     dec8_state, init_dec8,    ROT270, "Data East Corporation", "Makyou Senshi (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, garyoret,   0,        garyoret, garyoret,  dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Garyo Retsuden (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ghostb,     0,        ghostb,   ghostb,    dec8_state, init_dec8,    ROT0,   "Data East USA",         "The Real Ghostbusters (US 2 Players, revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ghostb2a,   ghostb,   ghostb,   ghostb2a,  dec8_state, init_dec8,    ROT0,   "Data East USA",         "The Real Ghostbusters (US 2 Players)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ghostb3,    ghostb,   ghostb,   ghostb3,   dec8_state, init_dec8,    ROT0,   "Data East USA",         "The Real Ghostbusters (US 3 Players, revision 3B?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ghostb3a,   ghostb,   ghostb,   ghostb3,   dec8_state, init_dec8,    ROT0,   "Data East USA",         "The Real Ghostbusters (US 3 Players, revision 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // ROMs confirmed working on PCB - stalls in demo mode
-GAME( 1987, meikyuh,    ghostb,   meikyuh,  meikyuh,   dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, meikyuha,   ghostb,   meikyuh,  meikyuh,   dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, csilver,    0,        csilver,  csilver,   dec8_state, init_csilver, ROT0,   "Data East Corporation", "Captain Silver (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, csilverj,   csilver,  csilver,  csilverj,  dec8_state, init_csilver, ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, csilverja,  csilver,  csilver,  csilverj,  dec8_state, init_csilver, ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, oscar,      0,        oscar,    oscar,     dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Psycho-Nics Oscar (World revision 0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, oscaru,     oscar,    oscar,    oscarj,    dec8_state, init_dec8,    ROT0,   "Data East USA",         "Psycho-Nics Oscar (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, oscarj1,    oscar,    oscar,    oscarj,    dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, oscarj2,    oscar,    oscar,    oscarj,    dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, srdarwin,   0,        srdarwin, srdarwin,  dec8_state, init_dec8,    ROT270, "Data East Corporation", "Super Real Darwin (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, srdarwinj,  srdarwin, srdarwin, srdarwinj, dec8_state, init_dec8,    ROT270, "Data East Corporation", "Super Real Darwin (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lastmisn,   0,        lastmisn, lastmisn,  dec8_state,    empty_init, ROT270, "Data East Corporation", "Last Mission (World revision 8)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lastmisnu6, lastmisn, lastmisn, lastmisn,  dec8_state,    empty_init, ROT270, "Data East USA",         "Last Mission (US revision 6)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lastmisnu5, lastmisn, lastmisn, lastmisn,  dec8_state,    empty_init, ROT270, "Data East USA",         "Last Mission (US revision 5)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lastmisnj,  lastmisn, lastmisn, lastmisnj, dec8_state,    empty_init, ROT270, "Data East Corporation", "Last Mission (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, shackled,   0,        shackled, shackled,  dec8_state,    empty_init, ROT0,   "Data East USA",         "Shackled (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, breywood,   shackled, shackled, breywood,  dec8_state,    empty_init, ROT0,   "Data East Corporation", "Breywood (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, gondo,      0,        gondo,    gondo,     dec8_state,    empty_init, ROT270, "Data East Corporation", "Gondomania (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, gondou,     gondo,    gondo,    gondo,     dec8_state,    empty_init, ROT270, "Data East USA",         "Gondomania (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, makyosen,   gondo,    gondo,    gondo,     dec8_state,    empty_init, ROT270, "Data East Corporation", "Makyou Senshi (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, garyoret,   0,        garyoret, garyoret,  dec8_state,    empty_init, ROT0,   "Data East Corporation", "Garyo Retsuden (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ghostb,     0,        ghostb,   ghostb,    dec8_state,    empty_init, ROT0,   "Data East USA",         "The Real Ghostbusters (US 2 Players, revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ghostb2a,   ghostb,   ghostb,   ghostb2a,  dec8_state,    empty_init, ROT0,   "Data East USA",         "The Real Ghostbusters (US 2 Players)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ghostb3,    ghostb,   ghostb,   ghostb3,   dec8_state,    empty_init, ROT0,   "Data East USA",         "The Real Ghostbusters (US 3 Players, revision 3B?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ghostb3a,   ghostb,   ghostb,   ghostb3,   dec8_state,    empty_init, ROT0,   "Data East USA",         "The Real Ghostbusters (US 3 Players, revision 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // ROMs confirmed working on PCB - stalls in demo mode
+GAME( 1987, meikyuh,    ghostb,   meikyuh,  meikyuh,   dec8_state,    empty_init, ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, meikyuha,   ghostb,   meikyuh,  meikyuh,   dec8_state,    empty_init, ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, csilver,    0,        csilver,  csilver,   csilver_state, empty_init, ROT0,   "Data East Corporation", "Captain Silver (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, csilverj,   csilver,  csilver,  csilverj,  csilver_state, empty_init, ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, csilverja,  csilver,  csilver,  csilverj,  csilver_state, empty_init, ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, oscar,      0,        oscar,    oscar,     dec8_state,    empty_init, ROT0,   "Data East Corporation", "Psycho-Nics Oscar (World revision 0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, oscaru,     oscar,    oscar,    oscarj,    dec8_state,    empty_init, ROT0,   "Data East USA",         "Psycho-Nics Oscar (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, oscarj1,    oscar,    oscar,    oscarj,    dec8_state,    empty_init, ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, oscarj2,    oscar,    oscar,    oscarj,    dec8_state,    empty_init, ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, srdarwin,   0,        srdarwin, srdarwin,  dec8_state,    empty_init, ROT270, "Data East Corporation", "Super Real Darwin (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, srdarwinj,  srdarwin, srdarwin, srdarwinj, dec8_state,    empty_init, ROT270, "Data East Corporation", "Super Real Darwin (Japan)", MACHINE_SUPPORTS_SAVE )
 
 // Unlike most Deco games of this period Cobra Command does not seem to have a Data East USA release.  Instead the Data East Corporation release
 // was used in the US as evidenced by boards with the EL romset bearing AAMA seal stickers (American Amusement Machine Association)
-GAME( 1988, cobracom,   0,        cobracom, cobracom,  dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Cobra-Command (World/US revision 5)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cobracoma,  cobracom, cobracom, cobracom,  dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Cobra-Command (World/US revision 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cobracomb,  cobracom, cobracom, cobracom,  dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Cobra-Command (World/US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cobracomj,  cobracom, cobracom, cobracom,  dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Cobra-Command (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cobracomjb, cobracom, cobracom, cobracom,  dec8_state, init_dec8,    ROT0,   "bootleg",               "Cobra-Command (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cobracom,   0,        cobracom, cobracom,  dec8_state,    empty_init, ROT0,   "Data East Corporation", "Cobra-Command (World/US revision 5)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cobracoma,  cobracom, cobracom, cobracom,  dec8_state,    empty_init, ROT0,   "Data East Corporation", "Cobra-Command (World/US revision 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cobracomb,  cobracom, cobracom, cobracom,  dec8_state,    empty_init, ROT0,   "Data East Corporation", "Cobra-Command (World/US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cobracomj,  cobracom, cobracom, cobracom,  dec8_state,    empty_init, ROT0,   "Data East Corporation", "Cobra-Command (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cobracomjb, cobracom, cobracom, cobracom,  dec8_state,    empty_init, ROT0,   "bootleg",               "Cobra-Command (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )

@@ -31,7 +31,6 @@ TODO:
 #include "sound/2203intf.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/jangou_blitter.h"
 #include "video/resnet.h"
 #include "emupal.h"
@@ -418,8 +417,8 @@ void nightgal_state::sexygal_audionmi_w(uint8_t data)
 void nightgal_state::sweetgal_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x807f).ram().share("sound_ram");
-	map(0xe000, 0xefff).rw(FUNC(nightgal_state::royalqn_comm_r), FUNC(nightgal_state::royalqn_comm_w)).share("comms_ram");
+	map(0x8000, 0x807f).lrw8([this](offs_t off) { return m_sound_ram[off]; }, "snd_r", [this](offs_t off, u8 data) { m_sound_ram[off] = data; }, "snd_w");
+	map(0xe000, 0xefff).rw(FUNC(nightgal_state::royalqn_comm_r), FUNC(nightgal_state::royalqn_comm_w));
 	map(0xf000, 0xffff).ram();
 }
 
@@ -834,9 +833,6 @@ void nightgal_state::sexygal(machine_config &config)
 	sampleclk.signal_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "mono", 0.25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	config.device_remove("aysnd");
 

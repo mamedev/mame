@@ -667,6 +667,12 @@ void sunplus_gcm394_base_device::unkarea_78b2_w(uint16_t data) { LOGMASKED(LOG_G
 void sunplus_gcm394_base_device::unkarea_78b8_w(uint16_t data) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_78b8_w %04x\n", machine().describe_context(), data); m_78b8 = data; }
 void sunplus_gcm394_base_device::unkarea_78f0_w(uint16_t data) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_78f0_w %04x\n", machine().describe_context(), data); m_78f0 = data; }
 
+uint16_t sunplus_gcm394_base_device::unkarea_78c0_r()
+{
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_78c0_r\n", machine().describe_context());
+	return machine().rand();
+}
+
 uint16_t sunplus_gcm394_base_device::unkarea_78d0_r()
 {
 	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_78d0_r\n", machine().describe_context());
@@ -964,6 +970,8 @@ void sunplus_gcm394_base_device::base_internal_map(address_map &map)
 	map(0x0078b2, 0x0078b2).rw(FUNC(sunplus_gcm394_base_device::unkarea_78b2_r), FUNC(sunplus_gcm394_base_device::unkarea_78b2_w));  // 78b2 TimeBase C Control Register (P_TimeBaseC_Ctrl)
 
 	map(0x0078b8, 0x0078b8).w(FUNC(sunplus_gcm394_base_device::unkarea_78b8_w));  // 78b8 TimeBase Counter Reset Register  (P_TimeBase_Reset)
+
+	map(0x0078c0, 0x0078c0).r(FUNC(sunplus_gcm394_base_device::unkarea_78c0_r)); // beijuehh
 
 	map(0x0078d0, 0x0078d0).r(FUNC(sunplus_gcm394_base_device::unkarea_78d0_r)); // jak_s500
 	map(0x0078d8, 0x0078d8).r(FUNC(sunplus_gcm394_base_device::unkarea_78d8_r)); // jak_tsh

@@ -5,27 +5,27 @@
 //  window.h - Win32 window handling
 //
 //============================================================
+#ifndef MAME_OSD_WINDOWS_WINDOW_H
+#define MAME_OSD_WINDOWS_WINDOW_H
 
-#ifndef __WIN_WINDOW__
-#define __WIN_WINDOW__
+#pragma once
+
+#include "render.h"
+
+#include "modules/osdwindow.h"
+#include "modules/lib/osdlib.h"
+
+#include <chrono>
+#include <list>
+#include <memory>
+#include <mutex>
+#include <utility>
+#include <vector>
 
 // standard windows headers
 #include <windows.h>
 #include <windowsx.h>
 #include <mmsystem.h>
-
-#include <chrono>
-#include <mutex>
-#include <memory>
-#include <list>
-
-#include "render.h"
-
-#include "modules/osdwindow.h"
-
-//============================================================
-//  PARAMETERS
-//============================================================
 
 
 //============================================================
@@ -128,7 +128,7 @@ public:
 	u32                 m_targetvismask;
 
 	// input info
-	std::chrono::system_clock::time_point  m_lastclicktime;
+	std::chrono::steady_clock::time_point  m_lastclicktime;
 	int                                    m_lastclickx;
 	int                                    m_lastclicky;
 
@@ -206,4 +206,4 @@ static inline int rect_height(const RECT *rect)
 	return rect->bottom - rect->top;
 }
 
-#endif
+#endif // MAME_OSD_WINDOWS_WINDOW_H

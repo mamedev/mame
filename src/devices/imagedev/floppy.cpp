@@ -459,7 +459,7 @@ image_init_result floppy_image_device::call_load()
 	io.filler = 0xff;
 	int best = 0;
 	floppy_image_format_t *best_format = nullptr;
-	for(floppy_image_format_t *format = fif_list; format; format = format->next) {
+	for (floppy_image_format_t *format = fif_list; format; format = format->next) {
 		int score = format->identify(&io, form_factor);
 		if(score > best) {
 			best = score;
@@ -467,15 +467,13 @@ image_init_result floppy_image_device::call_load()
 		}
 	}
 
-	if(!best_format)
-	{
+	if (!best_format) {
 		seterror(IMAGE_ERROR_INVALIDIMAGE, "Unable to identify the image format");
 		return image_init_result::FAIL;
 	}
 
 	image = std::make_unique<floppy_image>(tracks, sides, form_factor);
-	if (!best_format->load(&io, form_factor, image.get()))
-	{
+	if (!best_format->load(&io, form_factor, image.get())) {
 		seterror(IMAGE_ERROR_UNSUPPORTED, "Incompatible image format or corrupted data");
 		image.reset();
 		return image_init_result::FAIL;

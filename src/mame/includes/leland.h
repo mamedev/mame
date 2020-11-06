@@ -42,7 +42,7 @@ public:
 		, m_slave_bankslot(*this, "slavebank")
 		, m_slave_base(*this, "slave")
 		, m_eeprom(*this, "eeprom")
-		, m_battery_ram(*this, "battery")
+		, m_battery_ram(*this, "battery", 0x3000, ENDIANNESS_LITTLE)
 		, m_palette(*this, "palette")
 		, m_screen(*this, "screen")
 		, m_gfxdecode(*this, "gfxdecode")
@@ -94,7 +94,7 @@ protected:
 	required_memory_bank m_slave_bankslot;
 	required_region_ptr<u8> m_slave_base;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_shared_ptr<u8> m_battery_ram;
+	memory_share_creator<u8> m_battery_ram;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -138,6 +138,7 @@ protected:
 	struct vram_state_data m_vram_state[2];
 
 	void slave_map_program(address_map &map);
+	void asylum_slave_map_program(address_map &map);
 
 	TIMER_CALLBACK_MEMBER(leland_delayed_mvram_w);
 
@@ -268,6 +269,7 @@ public:
 
 	void ataxx(machine_config &config);
 	void wsf(machine_config &config);
+	void asylum(machine_config &config);
 
 private:
 	u8 ataxx_trackball_r(offs_t offset);

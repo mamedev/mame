@@ -39,6 +39,7 @@ public:
 		, m_terminal(*this, "terminal")
 		, m_io_keyboard(*this, "X%u", 0U)
 		, m_digits(*this, "digit%d", 0U)
+		, m_led(*this, "led0")
 	{ }
 
 	void dct11em(machine_config &config);
@@ -72,6 +73,7 @@ private:
 	required_device<generic_terminal_device> m_terminal;
 	required_ioport_array<5> m_io_keyboard;
 	output_finder<12> m_digits;
+	output_finder<> m_led;
 };
 
 void dct11em_state::mem_map(address_map &map)
@@ -152,7 +154,7 @@ void dct11em_state::portc_w(u8 data)
 		m_digits[data] = m_seg_lower;
 		m_digits[data+6] = m_seg_upper;
 	}
-	output().set_value("led0", (data!=9));
+	m_led = (data!=9);
 }
 
 u8 dct11em_state::portc_r()
@@ -201,6 +203,8 @@ void dct11em_state::machine_reset()
 void dct11em_state::machine_start()
 {
 	m_digits.resolve();
+	m_led.resolve();
+
 	save_item(NAME(m_seg_lower));
 	save_item(NAME(m_seg_upper));
 	save_item(NAME(m_portc));

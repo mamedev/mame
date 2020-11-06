@@ -1284,7 +1284,7 @@ bagmanj:
 bagmanm2:
 bagmanmc:
 bagmans:
-bagmans2:
+bagmans4:
 bagnard:
 bagnarda:
 bagnardi:
@@ -17758,7 +17758,6 @@ suprmrio:
 suprmrioa:
 suprmriobl:
 suprmriobl2:
-suprmriobl3:
 @:maincpu,program,6675,8b,05,00
 @:maincpu,program,7d7,6,00,00
 

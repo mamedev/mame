@@ -93,7 +93,7 @@ timekeeper_device::timekeeper_device(const machine_config &mconfig, device_type 
 	, device_nvram_interface(mconfig, *this)
 	, m_reset_cb(*this)
 	, m_irq_cb(*this)
-	, m_default_data(*this, DEVICE_SELF, size)
+	, m_default_data(*this, DEVICE_SELF)
 	, m_size(size)
 {
 }

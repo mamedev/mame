@@ -27,14 +27,29 @@
 #include "emu.h"
 #include "cpu/avr8/avr8.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/hd44780.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
+#define LOG_PORT_A		(1 << 1)
+#define LOG_PORT_B		(1 << 2)
+#define LOG_PORT_C		(1 << 3)
+#define LOG_PORT_D		(1 << 4)
+#define LOG_PORT_E		(1 << 5)
+#define LOG_PORT_F		(1 << 6)
+#define LOG_PORT_G		(1 << 7)
+#define LOG_PORT_H		(1 << 8)
+#define LOG_PORT_J		(1 << 9)
+#define LOG_PORT_K		(1 << 10)
+#define LOG_PORT_L		(1 << 11)
+#define LOG_LCD_CLK		(1 << 12)
+#define LOG_LCD_SHIFT	(1 << 13)
+
+#define VERBOSE			(0)
+#include "logmacro.h"
+
 #define MASTER_CLOCK    16000000
-#define LOG_PORTS 0
 
 //Port A bits:
 //Bit 0 unused
@@ -157,16 +172,45 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_lcdc(*this, "hd44780"),
-		m_dac(*this, "dac")
+		m_dac(*this, "dac"),
+		m_io_keypad(*this, "keypad")
 	{
 	}
 
 	void replicator(machine_config &config);
 
-	void init_replicator();
-
 private:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	void palette_init(palette_device &palette) const;
+
+	void prg_map(address_map &map);
+	void data_map(address_map &map);
+
+	uint8_t port_a_r();
+	uint8_t port_b_r();
+	uint8_t port_c_r();
+	uint8_t port_d_r();
+	uint8_t port_e_r();
+	uint8_t port_f_r();
+	uint8_t port_g_r();
+	uint8_t port_h_r();
+	uint8_t port_j_r();
+	uint8_t port_k_r();
+	uint8_t port_l_r();
+
+	void port_a_w(uint8_t data);
+	void port_b_w(uint8_t data);
+	void port_c_w(uint8_t data);
+	void port_d_w(uint8_t data);
+	void port_e_w(uint8_t data);
+	void port_f_w(uint8_t data);
+	void port_g_w(uint8_t data);
+	void port_h_w(uint8_t data);
+	void port_j_w(uint8_t data);
+	void port_k_w(uint8_t data);
+	void port_l_w(uint8_t data);
 
 	uint8_t m_port_a;
 	uint8_t m_port_b;
@@ -180,367 +224,390 @@ private:
 	uint8_t m_port_k;
 	uint8_t m_port_l;
 
-	uint8_t shift_register_value;
+	uint8_t m_shift_register_value;
 
 	required_device<avr8_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
 	required_device<dac_bit_interface> m_dac;
-
-	uint8_t port_r(offs_t offset);
-	void port_w(offs_t offset, uint8_t data);
-	virtual void machine_reset() override;
-	void replicator_palette(palette_device &palette) const;
-	void replicator_data_map(address_map &map);
-	void replicator_io_map(address_map &map);
-	void replicator_prg_map(address_map &map);
+	required_ioport m_io_keypad;
 };
 
-void replicator_state::machine_start()
+uint8_t replicator_state::port_a_r()
 {
-}
-
-uint8_t replicator_state::port_r(offs_t offset)
-{
-	switch( offset )
-	{
-		case AVR8_IO_PORTA:
-		{
-#if LOG_PORTS
-		printf("[%08X] Port A READ (A-axis signals + B-axis STEP&DIR)\n", m_maincpu->m_shifted_pc);
-#endif
-		return 0x00;
-		}
-		case AVR8_IO_PORTB:
-		{
-#if LOG_PORTS
-		printf("[%08X] Port B READ (SD-CS; 1280-MISO/MOSI/SCK; EX2-FAN/HEAT/PWR-CHECK; BLINK)\n", m_maincpu->m_shifted_pc);
-#endif
-		return 0x00;
-		}
-		case AVR8_IO_PORTC:
-		{
-#if LOG_PORTS
-		printf("[%08X] Port C READ (1280-EX1/EX2; LCD-signals; R&G-LED; DETECT)\n", m_maincpu->m_shifted_pc);
-#endif
-		return DETECT; //indicated that the Interface board is present.
-		}
-		case AVR8_IO_PORTD:
-		{
-#if LOG_PORTS
-		printf("[%08X] Port D READ (SDA/SCL; 1280-EX-TX/RX)\n", m_maincpu->m_shifted_pc);
-#endif
-		return 0x00;
-		}
-		case AVR8_IO_PORTE:
-		{
-#if LOG_PORTS
-		printf("[%08X] Port E READ (1280-TX/RX; THERMO-signals)\n", m_maincpu->m_shifted_pc);
-#endif
-		return 0x00;
-		}
-		case AVR8_IO_PORTF:
-		{
-#if LOG_PORTS
-		printf("[%08X] Port F READ (X-axis & Y-axis signals)\n", m_maincpu->m_shifted_pc);
-#endif
-		return 0x00;
-		}
-		case AVR8_IO_PORTG:
-		{
-#if LOG_PORTS
-		printf("[%08X] Port G READ (BUZZ; Cutoff-sr-check; B-axis EN; 1280-EX3/EX4)\n", m_maincpu->m_shifted_pc);
-#endif
-		return 0x00;
-		}
-		case AVR8_IO_PORTH:
-		{
-#if LOG_PORTS
-		printf("[%08X] Port H READ (cuttoff-text/reset; EX1-FAN/HEAT/PWR-CHECK; SD-CD/SD-WP)\n", m_maincpu->m_shifted_pc);
-#endif
-		return 0x00;
-		}
-		case AVR8_IO_PORTJ:
-		{
-#if LOG_PORTS
-		printf("[%08X] Port J READ (Interface buttons; POTS-SCL; B-axis-POT)\n", m_maincpu->m_shifted_pc);
-#endif
-		return ioport("keypad")->read();
-		}
-		case AVR8_IO_PORTK:
-		{
-#if LOG_PORTS
-		printf("[%08X] Port K READ (Z-axis signals; HBP-THERM; 1280-EX5/6/7)\n", m_maincpu->m_shifted_pc);
-#endif
-		return 0x00;
-		}
-		case AVR8_IO_PORTL:
-		{
-#if LOG_PORTS
-		printf("[%08X] Port L READ (HBP; EXTRA-FET; X-MIN/MAX; Y-MIN/MAX; Z-MIN/MAX)\n", m_maincpu->m_shifted_pc);
-#endif
-		return 0x00;
-		}
-	}
+	LOGMASKED(LOG_PORT_A, "%s: Port A READ (A-axis signals + B-axis STEP&DIR)\n", machine().describe_context());
 	return 0;
 }
 
-void replicator_state::port_w(offs_t offset, uint8_t data)
+uint8_t replicator_state::port_b_r()
 {
-	switch( offset )
+	LOGMASKED(LOG_PORT_B, "%s: Port B READ (SD-CS; 1280-MISO/MOSI/SCK; EX2-FAN/HEAT/PWR-CHECK; BLINK)\n", machine().describe_context());
+	return 0;
+}
+
+uint8_t replicator_state::port_c_r()
+{
+	LOGMASKED(LOG_PORT_C, "%s: Port C READ (1280-EX1/EX2; LCD-signals; R&G-LED; DETECT)\n", machine().describe_context());
+	return DETECT; //indicated that the Interface board is present.
+}
+
+uint8_t replicator_state::port_d_r()
+{
+	LOGMASKED(LOG_PORT_D, "%s: Port D READ (SDA/SCL; 1280-EX-TX/RX)\n", machine().describe_context());
+	return 0;
+}
+
+uint8_t replicator_state::port_e_r()
+{
+	LOGMASKED(LOG_PORT_E, "%s: Port E READ (1280-TX/RX; THERMO-signals)\n", machine().describe_context());
+	return 0;
+}
+
+uint8_t replicator_state::port_f_r()
+{
+	LOGMASKED(LOG_PORT_F, "%s: Port F READ (X-axis & Y-axis signals)\n", machine().describe_context());
+	return 0;
+}
+
+uint8_t replicator_state::port_g_r()
+{
+	LOGMASKED(LOG_PORT_G, "%s: Port G READ (BUZZ; Cutoff-sr-check; B-axis EN; 1280-EX3/EX4)\n", machine().describe_context());
+	return 0;
+}
+
+uint8_t replicator_state::port_h_r()
+{
+	LOGMASKED(LOG_PORT_H, "%s: Port H READ (cuttoff-text/reset; EX1-FAN/HEAT/PWR-CHECK; SD-CD/SD-WP)\n", machine().describe_context());
+	return 0;
+}
+
+uint8_t replicator_state::port_j_r()
+{
+	LOGMASKED(LOG_PORT_J, "%s: Port J READ (Interface buttons; POTS-SCL; B-axis-POT)\n", machine().describe_context());
+	return m_io_keypad->read();
+}
+
+uint8_t replicator_state::port_k_r()
+{
+	LOGMASKED(LOG_PORT_K, "%s: Port K READ (Z-axis signals; HBP-THERM; 1280-EX5/6/7)\n", machine().describe_context());
+	return 0;
+}
+
+uint8_t replicator_state::port_l_r()
+{
+	LOGMASKED(LOG_PORT_L, "%s: Port L READ (HBP; EXTRA-FET; X-MIN/MAX; Y-MIN/MAX; Z-MIN/MAX)\n", machine().describe_context());
+	return 0;
+}
+
+void replicator_state::port_a_w(uint8_t data)
+{
+	if (data == m_port_a) return;
+
+	const uint8_t old = m_port_a;
+	const uint8_t changed = data ^ old;
+
+	if (changed & A_AXIS_DIR)
+		LOGMASKED(LOG_PORT_A, "%s: [A] A_AXIS_DIR: %d\n", machine().describe_context(), data & A_AXIS_DIR ? 1 : 0);
+	if (changed & A_AXIS_STEP)
+		LOGMASKED(LOG_PORT_A, "%s: [A] A_AXIS_STEP: %d\n", machine().describe_context(), data & A_AXIS_STEP ? 1 : 0);
+	if (changed & A_AXIS_EN)
+		LOGMASKED(LOG_PORT_A, "%s: [A] A_AXIS_EN: %d\n", machine().describe_context(), data & A_AXIS_EN ? 1 : 0);
+	if (changed & A_AXIS_POT)
+		LOGMASKED(LOG_PORT_A, "%s: [A] A_AXIS_POT: %d\n", machine().describe_context(), data & A_AXIS_POT ? 1 : 0);
+	if (changed & B_AXIS_DIR)
+		LOGMASKED(LOG_PORT_A, "%s: [A] B_AXIS_DIR: %d\n", machine().describe_context(), data & B_AXIS_DIR ? 1 : 0);
+	if (changed & B_AXIS_STEP)
+		LOGMASKED(LOG_PORT_A, "%s: [A] B_AXIS_STEP: %d\n", machine().describe_context(), data & B_AXIS_STEP ? 1 : 0);
+
+	m_port_a = data;
+}
+
+void replicator_state::port_b_w(uint8_t data)
+{
+	if (data == m_port_b) return;
+
+	const uint8_t old = m_port_b;
+	const uint8_t changed = data ^ old;
+
+	if (changed & SD_CS)
+		LOGMASKED(LOG_PORT_B, "%s: [B] SD Card Chip Select: %d\n", machine().describe_context(), data & SD_CS ? 1 : 0);
+	if (changed & SCK_1280)
+		LOGMASKED(LOG_PORT_B, "%s: [B] 1280-SCK: %d\n", machine().describe_context(), data & SCK_1280 ? 1 : 0);
+	if (changed & MOSI_1280)
+		LOGMASKED(LOG_PORT_B, "%s: [B] 1280-MOSI: %d\n", machine().describe_context(), data & MOSI_1280 ? 1 : 0);
+	if (changed & MISO_1280)
+		LOGMASKED(LOG_PORT_B, "%s: [B] 1280-MISO: %d\n", machine().describe_context(), data & MISO_1280 ? 1 : 0);
+	if (changed & EX2_PWR_CHECK)
+		LOGMASKED(LOG_PORT_B, "%s: [B] EX2-PWR-CHECK: %d\n", machine().describe_context(), data & EX2_PWR_CHECK ? 1 : 0);
+	if (changed & EX2_HEAT)
+		LOGMASKED(LOG_PORT_B, "%s: [B] EX2_HEAT: %d\n", machine().describe_context(), data & EX2_HEAT ? 1 : 0);
+	if (changed & EX2_FAN)
+		LOGMASKED(LOG_PORT_B, "%s: [B] EX2_FAN: %d\n", machine().describe_context(), data & EX2_FAN ? 1 : 0);
+	if (changed & BLINK)
+		LOGMASKED(LOG_PORT_B, "%s: [B] BLINK: %d\n", machine().describe_context(), data & BLINK ? 1 : 0);
+
+	m_port_b = data;
+}
+
+void replicator_state::port_c_w(uint8_t data)
+{
+	if (data == m_port_c) return;
+
+	const uint8_t old_port_c = m_port_c;
+	const uint8_t changed = data ^ old_port_c;
+
+	if(changed & EX2_1280)
+		LOGMASKED(LOG_PORT_C, "%s: [C] EX2_1280: %d\n", machine().describe_context(), data & EX2_1280 ? 1 : 0);
+	if(changed & EX1_1280)
+		LOGMASKED(LOG_PORT_C, "%s: [C] EX1_1280: %d\n", machine().describe_context(), data & EX1_1280 ? 1 : 0);
+	if(changed & LCD_CLK)
+		LOGMASKED(LOG_PORT_C, "%s: [C] LCD_CLK: %d\n", machine().describe_context(), data & LCD_CLK ? 1 : 0);
+	if(changed & LCD_DATA)
+		LOGMASKED(LOG_PORT_C, "%s: [C] LCD_DATA: %d\n", machine().describe_context(), data & LCD_DATA ? 1 : 0);
+	if(changed & LCD_STROBE)
+		LOGMASKED(LOG_PORT_C, "%s: [C] LCD_STROBE: %d\n", machine().describe_context(), data & LCD_STROBE ? 1 : 0);
+	if(changed & RLED)
+		LOGMASKED(LOG_PORT_C, "%s: [C] RLED: %d\n", machine().describe_context(), data & RLED ? 1 : 0);
+	if(changed & GLED)
+		LOGMASKED(LOG_PORT_C, "%s: [C] GLED: %d\n", machine().describe_context(), data & GLED ? 1 : 0);
+	if(changed & DETECT)
+		LOGMASKED(LOG_PORT_C, "%s: [C] DETECT: %d\n", machine().describe_context(), data & DETECT ? 1 : 0);
+
+	if (changed & LCD_CLK)
 	{
-		case AVR8_IO_PORTA:
+		/* The LCD is interfaced by an 8-bit shift register (74HC4094). */
+		if (data & LCD_CLK) // CLK positive edge
 		{
-			if (data == m_port_a) break;
-#if LOG_PORTS
-			uint8_t old_port_a = m_port_a;
-			uint8_t changed = data ^ old_port_a;
-
-			printf("[%08X] ", m_maincpu->m_shifted_pc);
-			if(changed & A_AXIS_DIR) printf("[A] A_AXIS_DIR: %s\n", data & A_AXIS_DIR ? "HIGH" : "LOW");
-			if(changed & A_AXIS_STEP) printf("[A] A_AXIS_STEP: %s\n", data & A_AXIS_STEP ? "HIGH" : "LOW");
-			if(changed & A_AXIS_EN) printf("[A] A_AXIS_EN: %s\n", data & A_AXIS_EN ? "HIGH" : "LOW");
-			if(changed & A_AXIS_POT) printf("[A] A_AXIS_POT: %s\n", data & A_AXIS_POT ? "HIGH" : "LOW");
-			if(changed & B_AXIS_DIR) printf("[A] B_AXIS_DIR: %s\n", data & B_AXIS_DIR ? "HIGH" : "LOW");
-			if(changed & B_AXIS_STEP) printf("[A] B_AXIS_STEP: %s\n", data & B_AXIS_STEP ? "HIGH" : "LOW");
-#endif
-			m_port_a = data;
-			break;
-		}
-		case AVR8_IO_PORTB:
-		{
-			if (data == m_port_b) break;
-#if LOG_PORTS
-			uint8_t old_port_b = m_port_b;
-			uint8_t changed = data ^ old_port_b;
-
-			printf("[%08X] ", m_maincpu->m_shifted_pc);
-			if(changed & SD_CS) printf("[B] SD Card Chip Select: %s\n", data & SD_CS ? "HIGH" : "LOW");
-			if(changed & SCK_1280) printf("[B] 1280-SCK: %s\n", data & SCK_1280 ? "HIGH" : "LOW");
-			if(changed & MOSI_1280) printf("[B] 1280-MOSI: %s\n", data & MOSI_1280 ? "HIGH" : "LOW");
-			if(changed & MISO_1280) printf("[B] 1280-MISO: %s\n", data & MISO_1280 ? "HIGH" : "LOW");
-			if(changed & EX2_PWR_CHECK) printf("[B] EX2-PWR-CHECK: %s\n", data & EX2_PWR_CHECK ? "HIGH" : "LOW");
-			if(changed & EX2_HEAT) printf("[B] EX2_HEAT: %s\n", data & EX2_HEAT ? "HIGH" : "LOW");
-			if(changed & EX2_FAN) printf("[B] EX2_FAN: %s\n", data & EX2_FAN ? "HIGH" : "LOW");
-			if(changed & BLINK) printf("[B] BLINK: %s\n", data & BLINK ? "HIGH" : "LOW");
-#endif
-			m_port_b = data;
-			break;
-		}
-		case AVR8_IO_PORTC:
-		{
-			if (data == m_port_c) break;
-
-			uint8_t old_port_c = m_port_c;
-			uint8_t changed = data ^ old_port_c;
-#if LOG_PORTS
-			printf("[%08X] ", m_maincpu->m_shifted_pc);
-			if(changed & EX2_1280) printf("[C] EX2_1280: %s\n", data & EX2_1280 ? "HIGH" : "LOW");
-			if(changed & EX1_1280) printf("[C] EX1_1280: %s\n", data & EX1_1280 ? "HIGH" : "LOW");
-			if(changed & LCD_CLK) printf("[C] LCD_CLK: %s\n", data & LCD_CLK ? "HIGH" : "LOW");
-			if(changed & LCD_DATA) printf("[C] LCD_DATA: %s\n", data & LCD_DATA ? "HIGH" : "LOW");
-			if(changed & LCD_STROBE) printf("[C] LCD_STROBE: %s\n", data & LCD_STROBE ? "HIGH" : "LOW");
-			if(changed & RLED) printf("[C] RLED: %s\n", data & RLED ? "HIGH" : "LOW");
-			if(changed & GLED) printf("[C] GLED: %s\n", data & GLED ? "HIGH" : "LOW");
-			if(changed & DETECT) printf("[C] DETECT: %s\n", data & DETECT ? "HIGH" : "LOW");
-#endif
-			if (changed & LCD_CLK){
-				/* The LCD is interfaced by an 8-bit shift register (74HC4094). */
-				if (data & LCD_CLK){//CLK positive edge
-					shift_register_value = (shift_register_value << 1) | ((data & LCD_DATA) >> 3);
-					//printf("[%08X] ", m_maincpu->m_shifted_pc);
-					//printf("[C] LCD CLK positive edge. shift_register=0x%02X\n", shift_register_value);
-				}
-			}
-
-			if(changed & LCD_STROBE){
-				if (data & LCD_STROBE){ //STROBE positive edge
-					logerror("LCD shift register = %02X\n", shift_register_value);
-					m_lcdc->rs_w(BIT(shift_register_value, 1));
-					m_lcdc->rw_w(BIT(shift_register_value, 2));
-					m_lcdc->e_w(BIT(shift_register_value, 3));
-					m_lcdc->db_w(shift_register_value & 0xF0);
-				}
-			}
-			m_port_c = data;
-
-			break;
-		}
-		case AVR8_IO_PORTD:
-		{
-			if (data == m_port_d) break;
-#if LOG_PORTS
-			uint8_t old_port_d = m_port_d;
-			uint8_t changed = data ^ old_port_d;
-
-			printf("[%08X] ", m_maincpu->m_shifted_pc);
-			if(changed & PORTD_SCL) printf("[D] PORTD_SCL: %s\n", data & PORTD_SCL ? "HIGH" : "LOW");
-			if(changed & PORTD_SDA) printf("[D] PORTD_SDA: %s\n", data & PORTD_SDA ? "HIGH" : "LOW");
-			if(changed & EX_RX_1280) printf("[D] EX_RX_1280: %s\n", data & EX_RX_1280 ? "HIGH" : "LOW");
-			if(changed & EX_TX_1280) printf("[D] EX_TX_1280: %s\n", data & EX_TX_1280 ? "HIGH" : "LOW");
-#endif
-			m_port_d = data;
-			break;
-		}
-		case AVR8_IO_PORTE:
-		{
-			if (data == m_port_e) break;
-#if LOG_PORTS
-			uint8_t old_port_e = m_port_e;
-			uint8_t changed = data ^ old_port_e;
-
-			printf("[%08X] ", m_maincpu->m_shifted_pc);
-			if(changed & RX_1280) printf("[E] 1280-RX: %s\n", data & RX_1280 ? "HIGH" : "LOW");
-			if(changed & TX_1280) printf("[E] 1280-TX: %s\n", data & TX_1280 ? "HIGH" : "LOW");
-			if(changed & THERMO_SCK) printf("[E] THERMO-SCK: %s\n", data & THERMO_SCK ? "HIGH" : "LOW");
-			if(changed & THERMO_CS1) printf("[E] THERMO-CS1: %s\n", data & THERMO_CS1 ? "HIGH" : "LOW");
-			if(changed & THERMO_CS2) printf("[E] THERMO-CS2: %s\n", data & THERMO_CS2 ? "HIGH" : "LOW");
-			if(changed & THERMO_DO) printf("[E] THERMO-DO: %s\n", data & THERMO_DO ? "HIGH" : "LOW");
-#endif
-			m_port_e = data;
-			break;
-		}
-		case AVR8_IO_PORTF:
-		{
-			if (data == m_port_f) break;
-#if LOG_PORTS
-			uint8_t old_port_f = m_port_f;
-			uint8_t changed = data ^ old_port_f;
-
-			printf("[%08X] ", m_maincpu->m_shifted_pc);
-			if(changed & X_AXIS_DIR) printf("[F] X_AXIS_DIR: %s\n", data & X_AXIS_DIR ? "HIGH" : "LOW");
-			if(changed & X_AXIS_STEP) printf("[F] X_AXIS_STEP: %s\n", data & X_AXIS_STEP ? "HIGH" : "LOW");
-			if(changed & X_AXIS_EN) printf("[F] X_AXIS_EN: %s\n", data & X_AXIS_EN ? "HIGH" : "LOW");
-			if(changed & X_AXIS_POT) printf("[F] X_AXIS_POT: %s\n", data & X_AXIS_POT ? "HIGH" : "LOW");
-			if(changed & Y_AXIS_DIR) printf("[F] Y_AXIS_DIR: %s\n", data & Y_AXIS_DIR ? "HIGH" : "LOW");
-			if(changed & Y_AXIS_STEP) printf("[F] Y_AXIS_STEP: %s\n", data & Y_AXIS_STEP ? "HIGH" : "LOW");
-			if(changed & Y_AXIS_EN) printf("[F] Y_AXIS_EN: %s\n", data & Y_AXIS_EN ? "HIGH" : "LOW");
-			if(changed & Y_AXIS_POT) printf("[F] Y_AXIS_POT: %s\n", data & Y_AXIS_POT ? "HIGH" : "LOW");
-#endif
-			m_port_f = data;
-			break;
-		}
-		case AVR8_IO_PORTG:
-		{
-			if (data == m_port_g) break;
-
-			uint8_t old_port_g = m_port_g;
-			uint8_t changed = data ^ old_port_g;
-
-#if LOG_PORTS
-			printf("[%08X] ", m_maincpu->m_shifted_pc);
-			if(changed & EX4_1280) printf("[G] EX4_1280: %s\n", data & EX4_1280 ? "HIGH" : "LOW");
-			if(changed & EX3_1280) printf("[G] EX3_1280: %s\n", data & EX3_1280 ? "HIGH" : "LOW");
-			if(changed & B_AXIS_EN) printf("[G] B_AXIS_EN: %s\n", data & B_AXIS_EN ? "HIGH" : "LOW");
-			if(changed & CUTOFF_SR_CHECK) printf("[G] CUTOFF_SR_CHECK: %s\n", data & CUTOFF_SR_CHECK ? "HIGH" : "LOW");
-			if(changed & BUZZ) printf("[G] BUZZ: %s\n", data & BUZZ ? "HIGH" : "LOW");
-#endif
-
-			if (changed & BUZZ)
-			{
-				m_dac->write(BIT(data, 5));
-			}
-
-			m_port_g = data;
-			break;
-		}
-		case AVR8_IO_PORTH:
-		{
-			if (data == m_port_h) break;
-#if LOG_PORTS
-			uint8_t old_port_h = m_port_h;
-			uint8_t changed = data ^ old_port_h;
-
-			printf("[%08X] ", m_maincpu->m_shifted_pc);
-			if(changed & CUTOFF_TEST) printf("[H] CUTOFF_TEST: %s\n", data & CUTOFF_TEST ? "HIGH" : "LOW");
-			if(changed & CUTOFF_RESET) printf("[H] CUTOFF_RESET: %s\n", data & CUTOFF_RESET ? "HIGH" : "LOW");
-			if(changed & EX1_PWR_CHECK) printf("[H] EX1_PWR_CHECK: %s\n", data & EX1_PWR_CHECK ? "HIGH" : "LOW");
-			if(changed & EX1_HEAT) printf("[H] EX1_HEAT: %s\n", data & EX1_HEAT ? "HIGH" : "LOW");
-			if(changed & EX1_FAN) printf("[H] EX1_FAN: %s\n", data & EX1_FAN ? "HIGH" : "LOW");
-			if(changed & SD_WP) printf("[H] SD_WP: %s\n", data & SD_WP ? "HIGH" : "LOW");
-			if(changed & SD_CD) printf("[H] SD_CD: %s\n", data & SD_CD ? "HIGH" : "LOW");
-#endif
-			m_port_h = data;
-			break;
-		}
-		case AVR8_IO_PORTJ:
-		{
-			if (data == m_port_j) break;
-#if LOG_PORTS
-			uint8_t old_port_j = m_port_j;
-			uint8_t changed = data ^ old_port_j;
-
-			printf("[%08X] ", m_maincpu->m_shifted_pc);
-			if(changed & BUTTON_CENTER) printf("[J] BUTTON_CENTER: %s\n", data & BUTTON_CENTER ? "HIGH" : "LOW");
-			if(changed & BUTTON_RIGHT) printf("[J] BUTTON_RIGHT: %s\n", data & BUTTON_RIGHT ? "HIGH" : "LOW");
-			if(changed & BUTTON_LEFT) printf("[J] BUTTON_LEFT: %s\n", data & BUTTON_LEFT ? "HIGH" : "LOW");
-			if(changed & BUTTON_DOWN) printf("[J] BUTTON_DOWN: %s\n", data & BUTTON_DOWN ? "HIGH" : "LOW");
-			if(changed & BUTTON_UP) printf("[J] BUTTON_UP: %s\n", data & BUTTON_UP ? "HIGH" : "LOW");
-			if(changed & POTS_SCL) printf("[J] POTS_SCL: %s\n", data & POTS_SCL ? "HIGH" : "LOW");
-			if(changed & B_AXIS_POT) printf("[J] B_AXIS_POT: %s\n", data & B_AXIS_POT ? "HIGH" : "LOW");
-#endif
-			m_port_j = data;
-			break;
-		}
-		case AVR8_IO_PORTK:
-		{
-			if (data == m_port_k) break;
-#if LOG_PORTS
-			uint8_t old_port_k = m_port_k;
-			uint8_t changed = data ^ old_port_k;
-
-			printf("[%08X] ", m_maincpu->m_shifted_pc);
-			if(changed & Z_AXIS_DIR) printf("[K] Z_AXIS_DIR: %s\n", data & Z_AXIS_DIR ? "HIGH" : "LOW");
-			if(changed & Z_AXIS_STEP) printf("[K] Z_AXIS_STEP: %s\n", data & Z_AXIS_STEP ? "HIGH" : "LOW");
-			if(changed & Z_AXIS_EN) printf("[K] Z_AXIS_EN: %s\n", data & Z_AXIS_EN ? "HIGH" : "LOW");
-			if(changed & Z_AXIS_POT) printf("[K] Z_AXIS_POT: %s\n", data & Z_AXIS_POT ? "HIGH" : "LOW");
-			if(changed & EX7_1280) printf("[K] EX7_1280: %s\n", data & EX7_1280 ? "HIGH" : "LOW");
-			if(changed & EX6_1280) printf("[K] EX6_1280: %s\n", data & EX6_1280 ? "HIGH" : "LOW");
-			if(changed & EX5_1280) printf("[K] EX5_1280: %s\n", data & EX5_1280 ? "HIGH" : "LOW");
-			if(changed & HBP_THERM) printf("[K] HBP_THERM: %s\n", data & HBP_THERM ? "HIGH" : "LOW");
-#endif
-			m_port_k = data;
-			break;
-		}
-		case AVR8_IO_PORTL:
-		{
-			if (data == m_port_l) break;
-#if LOG_PORTS
-			uint8_t old_port_l = m_port_l;
-			uint8_t changed = data ^ old_port_l;
-
-			printf("[%08X] ", m_maincpu->m_shifted_pc);
-			if(changed & X_MIN) printf("[L] X_MIN: %s\n", data & X_MIN ? "HIGH" : "LOW");
-			if(changed & X_MAX) printf("[L] X_MAX: %s\n", data & X_MAX ? "HIGH" : "LOW");
-			if(changed & Y_MIN) printf("[L] Y_MIN: %s\n", data & Y_MIN ? "HIGH" : "LOW");
-			if(changed & Y_MAX) printf("[L] Y_MAX: %s\n", data & Y_MAX ? "HIGH" : "LOW");
-			if(changed & HBP) printf("[L] HBP: %s\n", data & HBP ? "HIGH" : "LOW");
-			if(changed & EXTRA_FET) printf("[L] EXTRA_FET: %s\n", data & EXTRA_FET ? "HIGH" : "LOW");
-			if(changed & Z_MIN) printf("[L] Z_MIN: %s\n", data & Z_MIN ? "HIGH" : "LOW");
-			if(changed & Z_MAX) printf("[L] Z_MAX: %s\n", data & Z_MAX ? "HIGH" : "LOW");
-#endif
-			m_port_l = data;
-			break;
+			m_shift_register_value = (m_shift_register_value << 1) | ((data & LCD_DATA) >> 3);
+			LOGMASKED(LOG_LCD_CLK, "%s: [C] LCD CLK positive edge. shift_register=0x%02X\n", machine().describe_context(), m_shift_register_value);
 		}
 	}
+
+	if (changed & LCD_STROBE)
+	{
+		if (data & LCD_STROBE) // STROBE positive edge
+		{
+			LOGMASKED(LOG_LCD_SHIFT, "%s: LCD shift register = %02X\n", machine().describe_context(), m_shift_register_value);
+			m_lcdc->rs_w(BIT(m_shift_register_value, 1));
+			m_lcdc->rw_w(BIT(m_shift_register_value, 2));
+			m_lcdc->e_w(BIT(m_shift_register_value, 3));
+			m_lcdc->db_w(m_shift_register_value & 0xF0);
+		}
+	}
+
+	m_port_c = data;
+}
+
+void replicator_state::port_d_w(uint8_t data)
+{
+	if (data == m_port_d) return;
+
+	const uint8_t old = m_port_d;
+	const uint8_t changed = data ^ old;
+
+	if (changed & PORTD_SCL)
+		LOGMASKED(LOG_PORT_D, "%s: [D] PORTD_SCL: %d\n", machine().describe_context(), data & PORTD_SCL ? 1 : 0);
+	if (changed & PORTD_SDA)
+		LOGMASKED(LOG_PORT_D, "%s: [D] PORTD_SDA: %d\n", machine().describe_context(), data & PORTD_SDA ? 1 : 0);
+	if (changed & EX_RX_1280)
+		LOGMASKED(LOG_PORT_D, "%s: [D] EX_RX_1280: %d\n", machine().describe_context(), data & EX_RX_1280 ? 1 : 0);
+	if (changed & EX_TX_1280)
+		LOGMASKED(LOG_PORT_D, "%s: [D] EX_TX_1280: %d\n", machine().describe_context(), data & EX_TX_1280 ? 1 : 0);
+
+	m_port_d = data;
+}
+
+void replicator_state::port_e_w(uint8_t data)
+{
+	if (data == m_port_e) return;
+
+	const uint8_t old = m_port_e;
+	const uint8_t changed = data ^ old;
+
+	if (changed & RX_1280)
+		LOGMASKED(LOG_PORT_E, "%s: [E] 1280-RX: %d\n", machine().describe_context(), data & RX_1280 ? 1 : 0);
+	if (changed & TX_1280)
+		LOGMASKED(LOG_PORT_E, "%s: [E] 1280-TX: %d\n", machine().describe_context(), data & TX_1280 ? 1 : 0);
+	if (changed & THERMO_SCK)
+		LOGMASKED(LOG_PORT_E, "%s: [E] THERMO-SCK: %d\n", machine().describe_context(), data & THERMO_SCK ? 1 : 0);
+	if (changed & THERMO_CS1)
+		LOGMASKED(LOG_PORT_E, "%s: [E] THERMO-CS1: %d\n", machine().describe_context(), data & THERMO_CS1 ? 1 : 0);
+	if (changed & THERMO_CS2)
+		LOGMASKED(LOG_PORT_E, "%s: [E] THERMO-CS2: %d\n", machine().describe_context(), data & THERMO_CS2 ? 1 : 0);
+	if (changed & THERMO_DO)
+		LOGMASKED(LOG_PORT_E, "%s: [E] THERMO-DO: %d\n", machine().describe_context(), data & THERMO_DO ? 1 : 0);
+
+	m_port_e = data;
+}
+
+void replicator_state::port_f_w(uint8_t data)
+{
+	if (data == m_port_f) return;
+
+	const uint8_t old = m_port_f;
+	const uint8_t changed = data ^ old;
+
+	if (changed & X_AXIS_DIR)
+		LOGMASKED(LOG_PORT_F, "%s: [F] X_AXIS_DIR: %d\n", machine().describe_context(), data & X_AXIS_DIR ? 1 : 0);
+	if (changed & X_AXIS_STEP)
+		LOGMASKED(LOG_PORT_F, "%s: [F] X_AXIS_STEP: %d\n", machine().describe_context(), data & X_AXIS_STEP ? 1 : 0);
+	if (changed & X_AXIS_EN)
+		LOGMASKED(LOG_PORT_F, "%s: [F] X_AXIS_EN: %d\n", machine().describe_context(), data & X_AXIS_EN ? 1 : 0);
+	if (changed & X_AXIS_POT)
+		LOGMASKED(LOG_PORT_F, "%s: [F] X_AXIS_POT: %d\n", machine().describe_context(), data & X_AXIS_POT ? 1 : 0);
+	if (changed & Y_AXIS_DIR)
+		LOGMASKED(LOG_PORT_F, "%s: [F] Y_AXIS_DIR: %d\n", machine().describe_context(), data & Y_AXIS_DIR ? 1 : 0);
+	if (changed & Y_AXIS_STEP)
+		LOGMASKED(LOG_PORT_F, "%s: [F] Y_AXIS_STEP: %d\n", machine().describe_context(), data & Y_AXIS_STEP ? 1 : 0);
+	if (changed & Y_AXIS_EN)
+		LOGMASKED(LOG_PORT_F, "%s: [F] Y_AXIS_EN: %d\n", machine().describe_context(), data & Y_AXIS_EN ? 1 : 0);
+	if (changed & Y_AXIS_POT)
+		LOGMASKED(LOG_PORT_F, "%s: [F] Y_AXIS_POT: %d\n", machine().describe_context(), data & Y_AXIS_POT ? 1 : 0);
+
+	m_port_f = data;
+}
+
+void replicator_state::port_g_w(uint8_t data)
+{
+	if (data == m_port_g) return;
+
+	const uint8_t old = m_port_g;
+	const uint8_t changed = data ^ old;
+
+	if (changed & EX4_1280)
+		LOGMASKED(LOG_PORT_G, "%s: [G] EX4_1280: %d\n", machine().describe_context(), data & EX4_1280 ? 1 : 0);
+	if (changed & EX3_1280)
+		LOGMASKED(LOG_PORT_G, "%s: [G] EX3_1280: %d\n", machine().describe_context(), data & EX3_1280 ? 1 : 0);
+	if (changed & B_AXIS_EN)
+		LOGMASKED(LOG_PORT_G, "%s: [G] B_AXIS_EN: %d\n", machine().describe_context(), data & B_AXIS_EN ? 1 : 0);
+	if (changed & CUTOFF_SR_CHECK)
+		LOGMASKED(LOG_PORT_G, "%s: [G] CUTOFF_SR_CHECK: %d\n", machine().describe_context(), data & CUTOFF_SR_CHECK ? 1 : 0);
+	if (changed & BUZZ)
+		LOGMASKED(LOG_PORT_G, "%s: [G] BUZZ: %d\n", machine().describe_context(), data & BUZZ ? 1 : 0);
+
+	if (changed & BUZZ)
+	{
+		m_dac->write(BIT(data, 5));
+	}
+
+	m_port_g = data;
+}
+
+void replicator_state::port_h_w(uint8_t data)
+{
+	if (data == m_port_h) return;
+
+	const uint8_t old = m_port_h;
+	const uint8_t changed = data ^ old;
+
+	if (changed & CUTOFF_TEST)
+		LOGMASKED(LOG_PORT_H, "%s: [H] CUTOFF_TEST: %d\n", machine().describe_context(), data & CUTOFF_TEST ? 1 : 0);
+	if (changed & CUTOFF_RESET)
+		LOGMASKED(LOG_PORT_H, "%s: [H] CUTOFF_RESET: %d\n", machine().describe_context(), data & CUTOFF_RESET ? 1 : 0);
+	if (changed & EX1_PWR_CHECK)
+		LOGMASKED(LOG_PORT_H, "%s: [H] EX1_PWR_CHECK: %d\n", machine().describe_context(), data & EX1_PWR_CHECK ? 1 : 0);
+	if (changed & EX1_HEAT)
+		LOGMASKED(LOG_PORT_H, "%s: [H] EX1_HEAT: %d\n", machine().describe_context(), data & EX1_HEAT ? 1 : 0);
+	if (changed & EX1_FAN)
+		LOGMASKED(LOG_PORT_H, "%s: [H] EX1_FAN: %d\n", machine().describe_context(), data & EX1_FAN ? 1 : 0);
+	if (changed & SD_WP)
+		LOGMASKED(LOG_PORT_H, "%s: [H] SD_WP: %d\n", machine().describe_context(), data & SD_WP ? 1 : 0);
+	if (changed & SD_CD)
+		LOGMASKED(LOG_PORT_H, "%s: [H] SD_CD: %d\n", machine().describe_context(), data & SD_CD ? 1 : 0);
+
+	m_port_h = data;
+}
+
+void replicator_state::port_j_w(uint8_t data)
+{
+	if (data == m_port_j) return;
+
+	const uint8_t old = m_port_j;
+	const uint8_t changed = data ^ old;
+
+	if (changed & BUTTON_CENTER)
+		LOGMASKED(LOG_PORT_J, "%s: [J] BUTTON_CENTER: %d\n", machine().describe_context(), data & BUTTON_CENTER ? 1 : 0);
+	if (changed & BUTTON_RIGHT)
+		LOGMASKED(LOG_PORT_J, "%s: [J] BUTTON_RIGHT: %d\n", machine().describe_context(), data & BUTTON_RIGHT ? 1 : 0);
+	if (changed & BUTTON_LEFT)
+		LOGMASKED(LOG_PORT_J, "%s: [J] BUTTON_LEFT: %d\n", machine().describe_context(), data & BUTTON_LEFT ? 1 : 0);
+	if (changed & BUTTON_DOWN)
+		LOGMASKED(LOG_PORT_J, "%s: [J] BUTTON_DOWN: %d\n", machine().describe_context(), data & BUTTON_DOWN ? 1 : 0);
+	if (changed & BUTTON_UP)
+		LOGMASKED(LOG_PORT_J, "%s: [J] BUTTON_UP: %d\n", machine().describe_context(), data & BUTTON_UP ? 1 : 0);
+	if (changed & POTS_SCL)
+		LOGMASKED(LOG_PORT_J, "%s: [J] POTS_SCL: %d\n", machine().describe_context(), data & POTS_SCL ? 1 : 0);
+	if (changed & B_AXIS_POT)
+		LOGMASKED(LOG_PORT_J, "%s: [J] B_AXIS_POT: %d\n", machine().describe_context(), data & B_AXIS_POT ? 1 : 0);
+
+	m_port_j = data;
+}
+
+void replicator_state::port_k_w(uint8_t data)
+{
+	if (data == m_port_k) return;
+
+	const uint8_t old = m_port_k;
+	const uint8_t changed = data ^ old;
+
+	if (changed & Z_AXIS_DIR)
+		LOGMASKED(LOG_PORT_K, "%s: [K] Z_AXIS_DIR: %d\n", machine().describe_context(), data & Z_AXIS_DIR ? 1 : 0);
+	if (changed & Z_AXIS_STEP)
+		LOGMASKED(LOG_PORT_K, "%s: [K] Z_AXIS_STEP: %d\n", machine().describe_context(), data & Z_AXIS_STEP ? 1 : 0);
+	if (changed & Z_AXIS_EN)
+		LOGMASKED(LOG_PORT_K, "%s: [K] Z_AXIS_EN: %d\n", machine().describe_context(), data & Z_AXIS_EN ? 1 : 0);
+	if (changed & Z_AXIS_POT)
+		LOGMASKED(LOG_PORT_K, "%s: [K] Z_AXIS_POT: %d\n", machine().describe_context(), data & Z_AXIS_POT ? 1 : 0);
+	if (changed & EX7_1280)
+		LOGMASKED(LOG_PORT_K, "%s: [K] EX7_1280: %d\n", machine().describe_context(), data & EX7_1280 ? 1 : 0);
+	if (changed & EX6_1280)
+		LOGMASKED(LOG_PORT_K, "%s: [K] EX6_1280: %d\n", machine().describe_context(), data & EX6_1280 ? 1 : 0);
+	if (changed & EX5_1280)
+		LOGMASKED(LOG_PORT_K, "%s: [K] EX5_1280: %d\n", machine().describe_context(), data & EX5_1280 ? 1 : 0);
+	if (changed & HBP_THERM)
+		LOGMASKED(LOG_PORT_K, "%s: [K] HBP_THERM: %d\n", machine().describe_context(), data & HBP_THERM ? 1 : 0);
+
+	m_port_k = data;
+}
+
+void replicator_state::port_l_w(uint8_t data)
+{
+	if (data == m_port_l) return;
+
+	const uint8_t old_port_l = m_port_l;
+	const uint8_t changed = data ^ old_port_l;
+
+	if (changed & X_MIN)
+		LOGMASKED(LOG_PORT_L, "%s: [L] X_MIN: %d\n", machine().describe_context(), data & X_MIN ? 1 : 0);
+	if (changed & X_MAX)
+		LOGMASKED(LOG_PORT_L, "%s: [L] X_MAX: %d\n", machine().describe_context(), data & X_MAX ? 1 : 0);
+	if (changed & Y_MIN)
+		LOGMASKED(LOG_PORT_L, "%s: [L] Y_MIN: %d\n", machine().describe_context(), data & Y_MIN ? 1 : 0);
+	if (changed & Y_MAX)
+		LOGMASKED(LOG_PORT_L, "%s: [L] Y_MAX: %d\n", machine().describe_context(), data & Y_MAX ? 1 : 0);
+	if (changed & HBP)
+		LOGMASKED(LOG_PORT_L, "%s: [L] HBP: %d\n", machine().describe_context(), data & HBP ? 1 : 0);
+	if (changed & EXTRA_FET)
+		LOGMASKED(LOG_PORT_L, "%s: [L] EXTRA_FET: %d\n", data & EXTRA_FET ? 1 : 0);
+	if (changed & Z_MIN)
+		LOGMASKED(LOG_PORT_L, "%s: [L] Z_MIN: %d\n", machine().describe_context(), data & Z_MIN ? 1 : 0);
+	if (changed & Z_MAX)
+		LOGMASKED(LOG_PORT_L, "%s: [L] Z_MAX: %d\n", machine().describe_context(), data & Z_MAX ? 1 : 0);
+
+	m_port_l = data;
 }
 
 /****************************************************\
 * Address maps                                       *
 \****************************************************/
 
-void replicator_state::replicator_prg_map(address_map &map)
+void replicator_state::prg_map(address_map &map)
 {
 	map(0x0000, 0x1FFFF).rom();
 }
 
-void replicator_state::replicator_data_map(address_map &map)
+void replicator_state::data_map(address_map &map)
 {
 	map(0x0200, 0x21FF).ram();  /* ATMEGA1280 Internal SRAM */
-}
-
-void replicator_state::replicator_io_map(address_map &map)
-{
-	map(AVR8_IO_PORTA, AVR8_IO_PORTL).rw(FUNC(replicator_state::port_r), FUNC(replicator_state::port_w));
 }
 
 /****************************************************\
@@ -560,13 +627,25 @@ INPUT_PORTS_END
 * Machine definition                                 *
 \****************************************************/
 
-void replicator_state::init_replicator()
+void replicator_state::machine_start()
 {
+	save_item(NAME(m_shift_register_value));
+	save_item(NAME(m_port_a));
+	save_item(NAME(m_port_b));
+	save_item(NAME(m_port_c));
+	save_item(NAME(m_port_d));
+	save_item(NAME(m_port_e));
+	save_item(NAME(m_port_f));
+	save_item(NAME(m_port_g));
+	save_item(NAME(m_port_h));
+	save_item(NAME(m_port_j));
+	save_item(NAME(m_port_k));
+	save_item(NAME(m_port_l));
 }
 
 void replicator_state::machine_reset()
 {
-	shift_register_value = 0;
+	m_shift_register_value = 0;
 	m_port_a = 0;
 	m_port_b = 0;
 	m_port_c = 0;
@@ -580,7 +659,7 @@ void replicator_state::machine_reset()
 	m_port_l = 0;
 }
 
-void replicator_state::replicator_palette(palette_device &palette) const
+void replicator_state::palette_init(palette_device &palette) const
 {
 	// These colors were picked with the color picker in Inkscape, based on a photo of the LCD used in the Replicator 1 3d printer:
 	palette.set_pen_color(0, rgb_t(0xca, 0xe7, 0xeb));
@@ -605,15 +684,38 @@ GFXDECODE_END
 void replicator_state::replicator(machine_config &config)
 {
 	ATMEGA1280(config, m_maincpu, MASTER_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &replicator_state::replicator_prg_map);
-	m_maincpu->set_addrmap(AS_DATA, &replicator_state::replicator_data_map);
-	m_maincpu->set_addrmap(AS_IO, &replicator_state::replicator_io_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &replicator_state::prg_map);
+	m_maincpu->set_addrmap(AS_DATA, &replicator_state::data_map);
 
 	m_maincpu->set_eeprom_tag("eeprom");
 	m_maincpu->set_low_fuses(0xff);
 	m_maincpu->set_high_fuses(0xda);
 	m_maincpu->set_extended_fuses(0xf4);
 	m_maincpu->set_lock_bits(0x0f);
+
+	m_maincpu->gpio_in<AVR8_IO_PORTA>().set(FUNC(replicator_state::port_a_r));
+	m_maincpu->gpio_in<AVR8_IO_PORTB>().set(FUNC(replicator_state::port_b_r));
+	m_maincpu->gpio_in<AVR8_IO_PORTC>().set(FUNC(replicator_state::port_c_r));
+	m_maincpu->gpio_in<AVR8_IO_PORTD>().set(FUNC(replicator_state::port_d_r));
+	m_maincpu->gpio_in<AVR8_IO_PORTE>().set(FUNC(replicator_state::port_e_r));
+	m_maincpu->gpio_in<AVR8_IO_PORTF>().set(FUNC(replicator_state::port_f_r));
+	m_maincpu->gpio_in<AVR8_IO_PORTG>().set(FUNC(replicator_state::port_g_r));
+	m_maincpu->gpio_in<AVR8_IO_PORTH>().set(FUNC(replicator_state::port_h_r));
+	m_maincpu->gpio_in<AVR8_IO_PORTJ>().set(FUNC(replicator_state::port_j_r));
+	m_maincpu->gpio_in<AVR8_IO_PORTK>().set(FUNC(replicator_state::port_k_r));
+	m_maincpu->gpio_in<AVR8_IO_PORTL>().set(FUNC(replicator_state::port_l_r));
+
+	m_maincpu->gpio_out<AVR8_IO_PORTA>().set(FUNC(replicator_state::port_a_w));
+	m_maincpu->gpio_out<AVR8_IO_PORTB>().set(FUNC(replicator_state::port_b_w));
+	m_maincpu->gpio_out<AVR8_IO_PORTC>().set(FUNC(replicator_state::port_c_w));
+	m_maincpu->gpio_out<AVR8_IO_PORTD>().set(FUNC(replicator_state::port_d_w));
+	m_maincpu->gpio_out<AVR8_IO_PORTE>().set(FUNC(replicator_state::port_e_w));
+	m_maincpu->gpio_out<AVR8_IO_PORTF>().set(FUNC(replicator_state::port_f_w));
+	m_maincpu->gpio_out<AVR8_IO_PORTG>().set(FUNC(replicator_state::port_g_w));
+	m_maincpu->gpio_out<AVR8_IO_PORTH>().set(FUNC(replicator_state::port_h_w));
+	m_maincpu->gpio_out<AVR8_IO_PORTJ>().set(FUNC(replicator_state::port_j_w));
+	m_maincpu->gpio_out<AVR8_IO_PORTK>().set(FUNC(replicator_state::port_k_w));
+	m_maincpu->gpio_out<AVR8_IO_PORTL>().set(FUNC(replicator_state::port_l_w));
 
 	/*TODO: Add an ATMEGA8U2 for USB-Serial communications */
 
@@ -626,7 +728,7 @@ void replicator_state::replicator(machine_config &config)
 	screen.set_visarea(0, 120-1, 0, 18*2-1);
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette", FUNC(replicator_state::replicator_palette), 2);
+	PALETTE(config, "palette", FUNC(replicator_state::palette_init), 2);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_replicator);
 
 	HD44780(config, "hd44780", 0).set_lcd_size(4, 20);
@@ -635,8 +737,6 @@ void replicator_state::replicator(machine_config &config)
 	/* A piezo is connected to the PORT G bit 5 (OC0B pin driven by Timer/Counter #4) */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac, 0).add_route(0, "speaker", 0.5);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
 ROM_START( replica1 )
@@ -720,5 +820,5 @@ ROM_START( replica1 )
 	ROM_REGION( 0x1000, "eeprom", ROMREGION_ERASEFF )
 ROM_END
 
-/*   YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT             COMPANY     FULLNAME */
-COMP(2012, replica1, 0,      0,      replicator, replicator, replicator_state, init_replicator, "Makerbot", "Replicator 1 desktop 3d printer", MACHINE_NOT_WORKING)
+/*   YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY     FULLNAME */
+COMP(2012, replica1, 0,      0,      replicator, replicator, replicator_state, empty_init, "Makerbot", "Replicator 1 desktop 3d printer", MACHINE_NOT_WORKING)

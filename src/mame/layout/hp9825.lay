@@ -6,9 +6,44 @@ Hewlett-Packard 9825 Layout
 -->
 <mamelayout version="2">
 	<element name="dotmatrix5dot">
-		<dotmatrix5dot>
-			<color red="1.0" green="0" blue="0" />
-		</dotmatrix5dot>
+		<rect>
+			<bounds x="-0.05" width="5.55" y="-0.05" height="1.1" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+		<disk state="0" statemask="0x01">
+			<bounds x="0.0" />
+			<color red="0.25" green="0.25" blue="0.25" />
+		</disk>
+		<disk state="0" statemask="0x02">
+			<bounds x="1.1" />
+			<color red="0.25" green="0.25" blue="0.25" />
+		</disk>
+		<disk state="0" statemask="0x04">
+			<bounds x="2.2" />
+			<color red="0.25" green="0.25" blue="0.25" />
+		</disk>
+		<disk state="0" statemask="0x08">
+			<bounds x="3.3" />
+			<color red="0.25" green="0.25" blue="0.25" /></disk>
+		<disk state="0" statemask="0x10">
+			<bounds x="4.4" />
+			<color red="0.25" green="0.25" blue="0.25" />
+		</disk>
+		<disk statemask="0x01">
+			<bounds x="0.0" />
+		</disk>
+		<disk statemask="0x02">
+			<bounds x="1.1" />
+		</disk>
+		<disk statemask="0x04">
+			<bounds x="2.2" />
+		</disk>
+		<disk statemask="0x08">
+			<bounds x="3.3" />
+		</disk>
+		<disk statemask="0x10">
+			<bounds x="4.4" />
+		</disk>
 	</element>
 
 	<element name="run_light" defstate="0">
@@ -34,6 +69,7 @@ Hewlett-Packard 9825 Layout
 				<param name="rowidx" start="0" increment="1" />
 				<element name="char_~digitidx~_~rowidx~" ref="dotmatrix5dot" state="0">
 					<bounds x="~digit_x~" y="~rowidx~" width="5" height="1" />
+					<color red="1.0" green="0.0" blue="0.0" />
 				</element>
 			</repeat>
 		</repeat>

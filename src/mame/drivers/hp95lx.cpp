@@ -66,7 +66,6 @@
 #include "machine/bankdev.h"
 #include "machine/ram.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 
 #include "screen.h"
 #include "emupal.h"
@@ -752,10 +751,6 @@ void hp95lx_state::hp95lx(machine_config &config)
 
 	SPEAKER(config, "speaker").front_center();
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
-
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, m_dac, 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, m_dac, -1.0, DAC_VREF_NEG_INPUT);
 
 	// XXX When the AC adapter is plugged in, the LCD refresh rate is 73.14 Hz.
 	// XXX When the AC adapter is not plugged in (ie, running off of batteries) the refresh rate is 56.8 Hz.

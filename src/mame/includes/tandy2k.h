@@ -70,7 +70,7 @@ public:
 		m_rs232(*this, RS232_TAG),
 		m_kb(*this, TANDY2K_KEYBOARD_TAG),
 		m_hires_ram(*this, "hires_ram"),
-		m_char_ram(*this, "char_ram"),
+		m_char_ram(*this, "char_ram", 0x1000, ENDIANNESS_LITTLE),
 		m_pc_keyboard(*this, "pc_keyboard"),
 		m_dma_mux(0),
 		m_kbdclk(0),
@@ -138,7 +138,7 @@ private:
 	required_device<rs232_port_device> m_rs232;
 	required_device<tandy2k_keyboard_device> m_kb;
 	required_shared_ptr<uint16_t> m_hires_ram;
-	optional_shared_ptr<uint8_t> m_char_ram;
+	memory_share_creator<uint8_t> m_char_ram;
 	required_device<pc_keyboard_device> m_pc_keyboard; // temporary until the tandy keyboard has a rom dump
 
 	virtual void machine_start() override;

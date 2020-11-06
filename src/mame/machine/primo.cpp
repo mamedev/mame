@@ -53,7 +53,7 @@ void primo_state::update_memory()
 			membank("bank1")->set_base(m_cart2_rom->base());
 			break;
 		case 0x02:  /* RAM */
-			space.install_write_bank(0x0000, 0x3fff, "bank1");
+			space.install_write_bank(0x0000, 0x3fff, membank("bank1"));
 			membank("bank1")->set_base(memregion("maincpu")->base());
 			break;
 		case 0x03:  /* EPROM extension 2 */

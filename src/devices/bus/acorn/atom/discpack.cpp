@@ -85,10 +85,11 @@ void atom_discpack_device::device_start()
 
 	space.install_device(0x0a00, 0x0a03, *m_fdc, &i8271_device::map);
 	space.install_readwrite_handler(0x0a04, 0x0a04, 0, 0x1f8, 0, read8smo_delegate(*m_fdc, FUNC(i8271_device::data_r)), write8smo_delegate(*m_fdc, FUNC(i8271_device::data_w)));
-	space.install_ram(0x2000, 0x23ff);
-	space.install_ram(0x2400, 0x27ff);
-	space.install_ram(0x3c00, 0x3fff);
+	space.install_ram(0x2000, 0x27ff, m_ram);
+	space.install_ram(0x3c00, 0x3fff, m_ram+0x800);
 	space.install_rom(0xe000, 0xefff, m_dos_rom->base());
+
+	save_item(NAME(m_ram));
 }
 
 

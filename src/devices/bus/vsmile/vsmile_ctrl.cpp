@@ -277,8 +277,10 @@ TIMER_CALLBACK_MEMBER(vsmile_ctrl_device_base::rts_timer_expired)
 
 
 #include "pad.h"
+#include "mat.h"
 
 void vsmile_controllers(device_slot_interface &device)
 {
 	device.option_add("joy", VSMILE_PAD);
+	device.option_add("mat", VSMILE_MAT);
 }

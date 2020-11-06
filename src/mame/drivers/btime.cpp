@@ -2165,8 +2165,7 @@ void btime_state::init_disco()
 
 void btime_state::init_cookrace()
 {
-	m_audiocpu->space(AS_PROGRAM).install_read_bank(0x0200, 0x0fff, "bank10");
-	membank("bank10")->set_base(memregion("audiocpu")->base() + 0xe200);
+	m_audiocpu->space(AS_PROGRAM).install_rom(0x0200, 0x0fff, memregion("audiocpu")->base() + 0xe200);
 	m_audio_nmi_enable_type = AUDIO_ENABLE_DIRECT;
 }
 
@@ -2180,8 +2179,7 @@ void btime_state::init_wtennis()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc15f, 0xc15f, read8smo_delegate(*this, FUNC(btime_state::wtennis_reset_hack_r)));
 
-	m_audiocpu->space(AS_PROGRAM).install_read_bank(0x0200, 0x0fff, "bank10");
-	membank("bank10")->set_base(memregion("audiocpu")->base() + 0xe200);
+	m_audiocpu->space(AS_PROGRAM).install_rom(0x0200, 0x0fff, memregion("audiocpu")->base() + 0xe200);
 	m_audio_nmi_enable_type = AUDIO_ENABLE_AY8910;
 }
 

@@ -146,7 +146,6 @@ class driver_device;
 // declared in emumem.h
 class address_space;
 class memory_bank;
-class memory_block;
 class memory_manager;
 class memory_region;
 class memory_share;

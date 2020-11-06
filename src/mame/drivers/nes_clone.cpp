@@ -11,6 +11,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "machine/bankdev.h"
 
 class nes_clone_state : public driver_device
 {
@@ -52,8 +53,9 @@ protected:
 	uint8_t m_latch0;
 	uint8_t m_latch1;
 
-private:
 	required_device<ppu2c0x_device> m_ppu;
+
+private:
 
 	void nes_clone_map(address_map &map);
 };
@@ -108,6 +110,85 @@ private:
 	void bank_w(uint8_t data);
 	int m_rombase;
 };
+
+
+class nes_clone_afbm7800_state : public nes_clone_state
+{
+public:
+	nes_clone_afbm7800_state(const machine_config& mconfig, device_type type, const char* tag) :
+		nes_clone_state(mconfig, type, tag),
+		m_prgbank(*this, "prgbank%u", 0),
+		m_cbank(*this, "cbank%u", 0),
+		m_nametables(*this, "nametable%u", 0),
+		m_charbank(*this, "charbank"),
+		m_ntbank(*this, "ntbank"),
+		m_rom_solderpad_bank(*this, "rom_sldpad_bank")
+	{ }
+	void nes_clone_afbm7800(machine_config& config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	// configured at startup
+	uint8_t m_maxchrbank;
+
+	void nes_clone_afbm7800_map(address_map &map);
+
+	void mapper_6000_w(uint8_t data);
+	void mapper_6001_w(uint8_t data);
+	void mapper_6002_w(uint8_t data);
+	void mapper_6003_w(uint8_t data);
+
+	void mapper_8000_w(uint8_t data);
+	void mapper_8001_w(uint8_t data);
+	void mapper_a000_w(uint8_t data);
+	void mapper_a001_w(uint8_t data);
+	void mapper_c000_w(uint8_t data);
+	void mapper_c001_w(uint8_t data);
+	void mapper_e000_w(uint8_t data);
+	void mapper_e001_w(uint8_t data);
+
+	uint8_t solderpad_r(offs_t offset);
+
+	uint8_t vram_r(offs_t offset);
+	void vram_w(offs_t offset, uint8_t data);
+
+	uint8_t m_banksel;
+	uint8_t m_bankregs[8];
+	uint8_t m_extraregs[4];
+
+	void update_banks();
+	void multigam3_mmc3_scanline_cb(int scanline, int vblank, int blanked);
+	int16_t m_multigam3_mmc3_scanline_counter;
+	uint8_t m_multigam3_mmc3_scanline_latch;
+	uint8_t m_mmc3_irq_enable;
+
+	std::vector<u8> m_vram;
+
+	uint8_t m_ntmirror;
+	uint8_t m_ramprot;
+
+	void update_nt_mirroring();
+	std::vector<u8> m_nt_ram;
+
+	void multigam_nt_w(offs_t offset, uint8_t data);
+	uint8_t multigam_nt_r(offs_t offset);
+
+	void vram_map(address_map &map);
+	void ntram_map(address_map &map);
+	void romarea_map(address_map &map);
+
+	required_memory_bank_array<4> m_prgbank;
+	required_memory_bank_array<6> m_cbank;
+	required_memory_bank_array<4> m_nametables;
+
+	required_device<address_map_bank_device> m_charbank;
+	required_device<address_map_bank_device> m_ntbank;
+	required_device<address_map_bank_device> m_rom_solderpad_bank;
+};
+
 
 void nes_clone_state::sprite_dma_w(address_space &space, uint8_t data)
 {
@@ -243,15 +324,6 @@ void nes_clone_state::machine_start()
 	save_item(NAME(m_latch1));
 }
 
-//  m_nt_ram = std::make_unique<uint8_t[]>(0x1000);
-//  m_nt_page[0] = m_nt_ram.get();
-//  m_nt_page[1] = m_nt_ram.get() + 0x400;
-//  m_nt_page[2] = m_nt_ram.get() + 0x800;
-//  m_nt_page[3] = m_nt_ram.get() + 0xc00;
-
-//  m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(*this, FUNC(nes_clone_state::nes_clone_nt_r)), write8_delegate(*this, FUNC(nes_clone_state::nes_clone_nt_w)));
-//  m_ppu->space(AS_PROGRAM).install_read_bank(0x0000, 0x1fff, "bank1");
-//  membank("bank1")->set_base(memregion("gfx1")->base());
 
 void nes_clone_state::nes_clone(machine_config &config)
 {
@@ -299,6 +371,10 @@ void nes_clone_state::nes_clone_pal(machine_config &config)
 	m_maincpu->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
+/**************************************************
+ Dance 2000 Specifics
+**************************************************/
+
 void nes_clone_dnce2000_state::nes_clone_dnce2000(machine_config& config)
 {
 	nes_clone_pal(config);
@@ -333,6 +409,10 @@ void nes_clone_dnce2000_state::bank_w(uint8_t data)
 	m_rombase = data;
 }
 
+/**************************************************
+ Virtual Ping Pong Specifics
+**************************************************/
+
 void nes_clone_vtvppong_state::nes_clone_vtvppong(machine_config& config)
 {
 	nes_clone_pal(config);
@@ -345,6 +425,444 @@ void nes_clone_vtvppong_state::nes_clone_vtvppong_map(address_map& map)
 	map(0x8000, 0xffff).rom().region("maincpu", 0x38000);
 }
 
+/**************************************************
+ Atari Flashback Specifics
+**************************************************/
+
+void nes_clone_afbm7800_state::nes_clone_afbm7800(machine_config& config)
+{
+	nes_clone_pal(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_clone_afbm7800_state::nes_clone_afbm7800_map);
+
+	ADDRESS_MAP_BANK(config, "charbank").set_map(&nes_clone_afbm7800_state::vram_map).set_options(ENDIANNESS_NATIVE, 8, 14, 0x2000);
+	ADDRESS_MAP_BANK(config, "ntbank").set_map(&nes_clone_afbm7800_state::ntram_map).set_options(ENDIANNESS_NATIVE, 8, 12, 0x1000);
+	ADDRESS_MAP_BANK(config, "rom_sldpad_bank").set_map(&nes_clone_afbm7800_state::romarea_map).set_options(ENDIANNESS_NATIVE, 8, 16, 0x8000);
+
+}
+
+void nes_clone_afbm7800_state::update_banks()
+{
+	uint8_t innerbankmask;
+	uint8_t outerbank;
+
+	uint8_t selected_banks[4] = { 0x00, 0x00, 0x00, 0x00 };
+
+	if (m_extraregs[1] & 1) // ROM or solder pad select
+	{
+		m_rom_solderpad_bank->set_bank(1);
+	}
+	else
+	{
+		m_rom_solderpad_bank->set_bank(0);
+	}
+
+	if (m_extraregs[0] & 0x40)
+	{
+		innerbankmask = 0x0f;
+		outerbank = (m_extraregs[0] & 0x07) << 4;
+	}
+	else
+	{
+		innerbankmask = 0x1f;
+		outerbank = (m_extraregs[0] & 0x06) << 4;
+	}
+
+	if ((m_extraregs[3] & 0x03) == 0x00) // MMC3 style mode
+	{
+		selected_banks[1] = outerbank | (m_bankregs[7] & innerbankmask);
+		selected_banks[3] = outerbank | (0x1f & innerbankmask);
+
+		if (m_banksel & 0x40)
+		{
+			selected_banks[0] = outerbank | (0x1e & innerbankmask);
+			selected_banks[2] = outerbank | (m_bankregs[6] & innerbankmask);
+
+		}
+		else
+		{
+			selected_banks[0] = outerbank | (m_bankregs[6] & innerbankmask);
+			selected_banks[2] = outerbank | (0x1e & innerbankmask);
+		}
+	}
+	else if ((m_extraregs[3] & 0x03) == 0x03)
+	{
+		int basebank = (m_bankregs[6] & innerbankmask);
+
+		selected_banks[0] = outerbank | (basebank + 0);
+		selected_banks[1] = outerbank | (basebank + 1);
+		selected_banks[2] = outerbank | (basebank + 2);
+		selected_banks[3] = outerbank | (basebank + 3);
+	}
+	else // 01 and 02 cases
+	{
+		int basebank = (m_bankregs[6] & innerbankmask);
+
+		selected_banks[0] = outerbank | (basebank + 0);
+		selected_banks[1] = outerbank | (basebank + 1);
+		selected_banks[2] = outerbank | (basebank + 0);
+		selected_banks[3] = outerbank | (basebank + 1);
+	}
+
+	m_prgbank[0]->set_entry(selected_banks[0]);
+	m_prgbank[1]->set_entry(selected_banks[1]);
+	m_prgbank[2]->set_entry(selected_banks[2]);
+	m_prgbank[3]->set_entry(selected_banks[3]);
+
+	// chrbank stuff
+
+	uint8_t selected_chrbanks[6] = { 0x00, 0x02, 0x04, 0x05, 0x06, 0x07 };
+
+	if (m_extraregs[3] & 0x10)
+	{
+		int outerchrbank = m_extraregs[2] & 0xf;
+		m_charbank->set_bank(0);
+
+		// should also have m_extraregs[0] & 0x38) applied?
+
+		selected_chrbanks[0] = (outerchrbank << 3) | 0x0;
+		selected_chrbanks[1] = (outerchrbank << 3) | 0x2;
+		selected_chrbanks[2] = (outerchrbank << 3) | 0x4;
+		selected_chrbanks[3] = (outerchrbank << 3) | 0x5;
+		selected_chrbanks[4] = (outerchrbank << 3) | 0x6;
+		selected_chrbanks[5] = (outerchrbank << 3) | 0x7;
+	}
+	else // MMC3 mode
+	{
+		int bankmask;
+		int outerchrbank;
+
+		/* not correct? desert falcon
+		if (m_extraregs[0] & 0x80)
+		{
+		    bankmask = 0x0f;
+		    outerchrbank = (m_extraregs[0] & 0x38) << 1;
+		}
+		else
+		*/
+		{
+			bankmask = 0x1f;
+			outerchrbank = (m_extraregs[0] & 0x30) << 1;
+		}
+
+		if (m_banksel & 0x80)
+			m_charbank->set_bank(1);
+		else
+			m_charbank->set_bank(0);
+
+		selected_chrbanks[0] = (outerchrbank | (m_bankregs[0] & bankmask));
+		selected_chrbanks[1] = (outerchrbank | (m_bankregs[1] & bankmask));
+		selected_chrbanks[2] = (outerchrbank | (m_bankregs[2] & bankmask));
+		selected_chrbanks[3] = (outerchrbank | (m_bankregs[3] & bankmask));
+		selected_chrbanks[4] = (outerchrbank | (m_bankregs[4] & bankmask));
+		selected_chrbanks[5] = (outerchrbank | (m_bankregs[5] & bankmask));
+	}
+
+	// have to mask with m_maxchrbank because otherwise banks are set at 0x40 (would lower banks atually be chrrom?)
+	m_cbank[0]->set_entry((selected_chrbanks[0] & m_maxchrbank)>>1);
+	m_cbank[1]->set_entry((selected_chrbanks[1] & m_maxchrbank)>>1);
+	m_cbank[2]->set_entry((selected_chrbanks[2] & m_maxchrbank));
+	m_cbank[3]->set_entry((selected_chrbanks[3] & m_maxchrbank));
+	m_cbank[4]->set_entry((selected_chrbanks[4] & m_maxchrbank));
+	m_cbank[5]->set_entry((selected_chrbanks[5] & m_maxchrbank));
+
+}
+
+void nes_clone_afbm7800_state::update_nt_mirroring()
+{
+	if (m_ntmirror & 1)
+	{
+		m_nametables[0]->set_entry(0);
+		m_nametables[1]->set_entry(0);
+		m_nametables[2]->set_entry(1);
+		m_nametables[3]->set_entry(1);
+	}
+	else
+	{
+		m_nametables[0]->set_entry(0);
+		m_nametables[1]->set_entry(1);
+		m_nametables[2]->set_entry(0);
+		m_nametables[3]->set_entry(1);
+	}
+}
+
+void nes_clone_afbm7800_state::mapper_8000_w(uint8_t data)
+{
+	m_banksel = data;
+	update_banks();
+}
+
+void nes_clone_afbm7800_state::mapper_8001_w(uint8_t data)
+{
+	m_bankregs[m_banksel & 0x7] = data;
+	update_banks();
+}
+
+void nes_clone_afbm7800_state::mapper_a000_w(uint8_t data)
+{
+	// nametable mirroring
+	m_ntmirror = data;
+	update_nt_mirroring();
+}
+
+void nes_clone_afbm7800_state::mapper_a001_w(uint8_t data)
+{
+	// ram protect
+	m_ramprot = data;
+}
+
+void nes_clone_afbm7800_state::mapper_c000_w(uint8_t data)
+{
+	// irq latch
+	m_multigam3_mmc3_scanline_counter = data ^ 0xff;
+}
+
+void nes_clone_afbm7800_state::mapper_c001_w(uint8_t data)
+{
+	// irq reload
+	m_multigam3_mmc3_scanline_latch = data;
+}
+
+void nes_clone_afbm7800_state::mapper_e000_w(uint8_t data)
+{
+	// irq disable
+	m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+	m_mmc3_irq_enable = 0;
+}
+
+void nes_clone_afbm7800_state::mapper_e001_w(uint8_t data)
+{
+	// irq enable
+	m_mmc3_irq_enable = 1;
+}
+
+
+
+void nes_clone_afbm7800_state::multigam3_mmc3_scanline_cb( int scanline, int vblank, int blanked )
+{
+	if (m_mmc3_irq_enable)
+	{
+		if (!vblank && !blanked)
+		{
+			if (--m_multigam3_mmc3_scanline_counter == -1)
+			{
+				m_multigam3_mmc3_scanline_counter = m_multigam3_mmc3_scanline_latch;
+				m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+			}
+		}
+	}
+}
+
+
+
+void nes_clone_afbm7800_state::mapper_6000_w(uint8_t data)
+{
+	if (m_ramprot & 0x80)
+	{
+		if (!(m_extraregs[3] & 0x80))
+		{
+			m_extraregs[0] = data;
+			update_banks();
+		}
+	}
+}
+
+void nes_clone_afbm7800_state::mapper_6001_w(uint8_t data)
+{
+	if (m_ramprot & 0x80)
+	{
+		m_extraregs[1] = data;
+		update_banks();
+	}
+}
+
+void nes_clone_afbm7800_state::mapper_6002_w(uint8_t data)
+{
+	if (m_ramprot & 0x80)
+	{
+		m_extraregs[2] = data;
+		update_banks();
+	}
+}
+
+void nes_clone_afbm7800_state::mapper_6003_w(uint8_t data)
+{
+	if (m_ramprot & 0x80)
+	{
+		if (!(m_extraregs[3] & 0x80))
+		{
+			m_extraregs[3] = data;
+			update_banks();
+		}
+	}
+}
+
+void nes_clone_afbm7800_state::nes_clone_afbm7800_map(address_map &map)
+{
+	nes_clone_basemap(map);
+
+	map(0x6000, 0x6000).mirror(0x1ffc).w(FUNC(nes_clone_afbm7800_state::mapper_6000_w));
+	map(0x6001, 0x6001).mirror(0x1ffc).w(FUNC(nes_clone_afbm7800_state::mapper_6001_w));
+	map(0x6002, 0x6002).mirror(0x1ffc).w(FUNC(nes_clone_afbm7800_state::mapper_6002_w));
+	map(0x6003, 0x6003).mirror(0x1ffc).w(FUNC(nes_clone_afbm7800_state::mapper_6003_w));
+
+	map(0x8000, 0xffff).m(m_rom_solderpad_bank, FUNC(address_map_bank_device::amap8));
+
+	map(0x8000, 0x8000).mirror(0x1ffe).w(FUNC(nes_clone_afbm7800_state::mapper_8000_w));
+	map(0x8001, 0x8001).mirror(0x1ffe).w(FUNC(nes_clone_afbm7800_state::mapper_8001_w));
+	map(0xa000, 0xa000).mirror(0x1ffe).w(FUNC(nes_clone_afbm7800_state::mapper_a000_w));
+	map(0xa001, 0xa001).mirror(0x1ffe).w(FUNC(nes_clone_afbm7800_state::mapper_a001_w));
+	map(0xc000, 0xc000).mirror(0x1ffe).w(FUNC(nes_clone_afbm7800_state::mapper_c000_w));
+	map(0xc001, 0xc001).mirror(0x1ffe).w(FUNC(nes_clone_afbm7800_state::mapper_c001_w));
+	map(0xe000, 0xe000).mirror(0x1ffe).w(FUNC(nes_clone_afbm7800_state::mapper_e000_w));
+	map(0xe001, 0xe001).mirror(0x1ffe).w(FUNC(nes_clone_afbm7800_state::mapper_e001_w));
+}
+
+uint8_t nes_clone_afbm7800_state::solderpad_r(offs_t offset)
+{
+	logerror("%s: solderpad read\n", machine().describe_context());
+	return 0x00;
+}
+
+void nes_clone_afbm7800_state::romarea_map(address_map &map)
+{
+	// when (m_extraregs[1] & 1) == 1
+	map(0x0000, 0x1fff).bankr("prgbank0");
+	map(0x2000, 0x3fff).bankr("prgbank1");
+	map(0x4000, 0x5fff).bankr("prgbank2");
+	map(0x6000, 0x7fff).bankr("prgbank3");
+
+	// when (m_extraregs[1] & 1) == 1
+
+	map(0x8000, 0xffff).r(FUNC(nes_clone_afbm7800_state::solderpad_r));
+
+}
+
+void nes_clone_afbm7800_state::vram_map(address_map &map)
+{
+	// in MMC3 mode when (m_banksel & 0x80) == 0x00 or when not in MMC3 mode
+	map(0x0000, 0x07ff).bankrw("cbank0");
+	map(0x0800, 0x0fff).bankrw("cbank1");
+	map(0x1000, 0x13ff).bankrw("cbank2");
+	map(0x1400, 0x17ff).bankrw("cbank3");
+	map(0x1800, 0x1bff).bankrw("cbank4");
+	map(0x1c00, 0x1fff).bankrw("cbank5");
+
+	// in MMC3 mode when (m_banksel & 0x80) == 0x80
+	map(0x2000, 0x23ff).bankrw("cbank2");
+	map(0x2400, 0x27ff).bankrw("cbank3");
+	map(0x2800, 0x2bff).bankrw("cbank4");
+	map(0x2c00, 0x2fff).bankrw("cbank5");
+	map(0x3000, 0x37ff).bankrw("cbank0");
+	map(0x3800, 0x3fff).bankrw("cbank1");
+}
+
+void nes_clone_afbm7800_state::ntram_map(address_map& map)
+{
+	map(0x0000, 0x03ff).bankrw("nametable0");
+	map(0x0400, 0x07ff).bankrw("nametable1");
+	map(0x0800, 0x0bff).bankrw("nametable2");
+	map(0x0c00, 0x0fff).bankrw("nametable3");
+}
+
+void nes_clone_afbm7800_state::machine_reset()
+{
+	nes_clone_state::machine_reset();
+
+	m_banksel = 0;
+
+	m_bankregs[0] = 0x00;
+	m_bankregs[1] = 0x00;
+	m_bankregs[2] = 0x00;
+	m_bankregs[3] = 0x00;
+	m_bankregs[4] = 0x00;
+	m_bankregs[5] = 0x00;
+	m_bankregs[6] = 0x00;
+	m_bankregs[7] = 0x00;
+
+	m_extraregs[0] = 0x00;
+	m_extraregs[1] = 0x00;
+	m_extraregs[2] = 0x00;
+	m_extraregs[3] = 0x00;
+
+	m_ntmirror = 0;
+	m_ramprot = 0;
+
+	update_banks();
+	update_nt_mirroring();
+
+	m_multigam3_mmc3_scanline_counter = 0;
+	m_multigam3_mmc3_scanline_latch = 0;
+	m_mmc3_irq_enable = 0;
+}
+
+uint8_t nes_clone_afbm7800_state::vram_r(offs_t offset)
+{
+	return m_charbank->read8(offset);
+}
+
+void nes_clone_afbm7800_state::vram_w(offs_t offset, uint8_t data)
+{
+	m_charbank->write8(offset, data);
+}
+
+uint8_t nes_clone_afbm7800_state::multigam_nt_r(offs_t offset)
+{
+	return m_ntbank->read8(offset);
+}
+
+void nes_clone_afbm7800_state::multigam_nt_w(offs_t offset, uint8_t data)
+{
+	m_ntbank->write8(offset, data);
+}
+
+void nes_clone_afbm7800_state::machine_start()
+{
+	nes_clone_state::machine_start();
+
+
+	uint8_t* ROM = memregion("maincpu")->base();
+
+	for (int i = 0; i < 4; i++)
+		m_prgbank[i]->configure_entries(0, 0x100000 / 0x2000, &ROM[0x00000], 0x02000);
+
+	m_vram.resize(0x8000);
+
+	m_maxchrbank = (0x8000/0x400)-1;
+
+	for (int i = 0; i < 2; i++)
+		m_cbank[i]->configure_entries(0, 0x8000 / 0x800, &m_vram[0], 0x800);
+
+	for (int i = 2; i < 6; i++)
+		m_cbank[i]->configure_entries(0, 0x8000 / 0x400, &m_vram[0], 0x400);
+
+	m_nt_ram.resize(0x800);
+
+	for (int i = 0; i < 4; i++)
+		m_nametables[i]->configure_entries(0, 0x800 / 0x400, &m_nt_ram[0], 0x400);
+
+	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x0000, 0x1fff, read8sm_delegate(*this, FUNC(nes_clone_afbm7800_state::vram_r)), write8sm_delegate(*this, FUNC(nes_clone_afbm7800_state::vram_w)));
+	m_ppu->set_scanline_callback(*this, FUNC(nes_clone_afbm7800_state::multigam3_mmc3_scanline_cb));
+
+	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8sm_delegate(*this, FUNC(nes_clone_afbm7800_state::multigam_nt_r)), write8sm_delegate(*this, FUNC(nes_clone_afbm7800_state::multigam_nt_w)));
+
+	save_item(NAME(m_vram));
+	save_item(NAME(m_nt_ram));
+
+	save_item(NAME(m_multigam3_mmc3_scanline_counter));
+	save_item(NAME(m_multigam3_mmc3_scanline_latch));
+	save_item(NAME(m_mmc3_irq_enable));
+
+	save_item(NAME(m_ntmirror));
+	save_item(NAME(m_ramprot));
+
+	save_item(NAME(m_banksel));
+	save_item(NAME(m_bankregs));
+	save_item(NAME(m_extraregs));
+}
+
+/**************************************************
+ Sudoku Specifics
+**************************************************/
 
 void nes_clone_suduko_state::machine_reset()
 {
@@ -445,6 +963,12 @@ ROM_START( papsudok )
 	ROM_LOAD( "sudoku2.bin", 0x00000, 0x80000, CRC(d1ffcc1e) SHA1(2010e60933a08d0b9271ef37f338758aacba6d2d) )
 ROM_END
 
+ROM_START( nytsudo )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "nytsudoku.bin", 0x00000, 0x80000, CRC(9aab1977) SHA1(6948f34d67204287418cdf79f1ca0fa0c26670e3) )
+ROM_END
+
+
 ROM_START( pjoypj001 )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "powerjoy_pj001_lh28f008sc_89a6.bin", 0x00000, 0x100000, CRC(e655e0aa) SHA1(c96d3422e26451c366fee2151fedccb95014cbc7) )
@@ -475,13 +999,10 @@ void nes_clone_state::init_nes_clone()
 {
 }
 
-CONS( 200?, pjoypj001, 0, 0, nes_clone, nes_clone, nes_clone_state, init_nes_clone, "Trump Grand", "PowerJoy (PJ001, NES based plug & play)", MACHINE_NOT_WORKING )
 
+// aka 'Atari Flashback' or 'Atari Flashback 1'
 // "Flashback Mini 7800 uses normal NES-style hardware, together with a mapper chipset similar to the Waixing kk33xx cartridges (NES 2.0 Mapper 534)"
-CONS( 2004, afbm7800,  0,  0,  nes_clone,    nes_clone, nes_clone_state, init_nes_clone, "Atari", "Atari Flashback Mini 7800", MACHINE_NOT_WORKING )
-
-CONS( 200?, vtvppong,  0,  0,  nes_clone_vtvppong,    nes_clone, nes_clone_vtvppong_state, init_vtvppong, "<unknown>", "Virtual TV Ping Pong", MACHINE_NOT_WORKING )
-
+CONS( 2004, afbm7800,  0,  0,  nes_clone_afbm7800,    nes_clone, nes_clone_afbm7800_state, init_nes_clone, "Atari / Nice Code", "Atari Flashback Mini 7800", 0 )
 
 CONS( 200?, dnce2000, 0, 0, nes_clone_dnce2000, dnce2000, nes_clone_dnce2000_state, init_nes_clone, "Shenzhen Soyin Electric Appliance Ind. Co., Ltd.", "Dance 2000 / Hot 2000 (Jin Bao TV Dancing Carpet, SY-2000-04)", 0 )
 
@@ -489,3 +1010,9 @@ CONS( 200?, dnce2000, 0, 0, nes_clone_dnce2000, dnce2000, nes_clone_dnce2000_sta
 // Has 2 sets of 4 buttons in circular 'direction pad' layouts (on the left for directions, on the right for functions) and 9 red numbered buttons with red power LED on left of them, and reset button on right
 // Alt. version was released with 'New York Times' titlescreen
 CONS( 200?, papsudok,     0,  0,  nes_clone_suduko, papsudok, nes_clone_suduko_state, init_sudoku, "Nice Code", "Plug and Play Sudoku Game (NES based)", 0 ) // plays, but unclear how 'save' feature is meant to work, is it meant to save after shutdown or not? no obvious writes
+
+CONS( 200?, nytsudo,      0,  0,  nes_clone_suduko, papsudok, nes_clone_suduko_state, init_sudoku, "Excalibur / Nice Code", "The New York Times Sudoku", 0 ) // based on the above
+
+CONS( 200?, vtvppong,  0,  0,  nes_clone_vtvppong,    nes_clone, nes_clone_vtvppong_state, init_vtvppong, "<unknown>", "Virtual TV Ping Pong", MACHINE_NOT_WORKING )
+
+CONS( 200?, pjoypj001, 0, 0, nes_clone, nes_clone, nes_clone_state, init_nes_clone, "Trump Grand", "PowerJoy (PJ001, NES based plug & play)", MACHINE_NOT_WORKING )

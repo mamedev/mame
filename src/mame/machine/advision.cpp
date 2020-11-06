@@ -33,8 +33,11 @@ void advision_state::machine_start()
 	m_bank1->configure_entry(0, memregion(I8048_TAG)->base());
 	if (m_cart_rom)
 		m_bank1->configure_entry(1, m_cart_rom->base());
-	m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x0000, 0x03ff, "bank1");
+	m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x0000, 0x03ff, m_bank1);
 	m_bank1->set_entry(0);
+
+	m_sound_d = 0;
+	m_sound_g = 0;
 
 	/* allocate external RAM */
 	m_ext_ram.resize(0x400);

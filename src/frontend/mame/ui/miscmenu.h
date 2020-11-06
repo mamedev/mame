@@ -7,7 +7,6 @@
     Internal MAME menus for the user interface.
 
 ***************************************************************************/
-
 #ifndef MAME_FRONTEND_UI_MISCMENU_H
 #define MAME_FRONTEND_UI_MISCMENU_H
 
@@ -23,17 +22,6 @@
 
 
 namespace ui {
-
-class menu_keyboard_mode : public menu
-{
-public:
-	menu_keyboard_mode(mame_ui_manager &mui, render_container &container);
-	virtual ~menu_keyboard_mode();
-
-private:
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
-};
 
 class menu_network_devices : public menu
 {

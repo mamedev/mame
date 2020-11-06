@@ -3788,9 +3788,7 @@ ROM_END
 void galaxold_state::init_guttangt()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_read_bank( 0x2000, 0x27ff, "cpubank" );
-	uint8_t *rom = memregion("maincpu")->base();
-	membank("cpubank")->set_base(rom + 0x2000);
+	space.install_rom( 0x2000, 0x27ff, memregion("maincpu")->base() + 0x2000);
 }
 
 

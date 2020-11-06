@@ -23,7 +23,6 @@
 #include "sound/ym2413.h"
 #include "sound/upd7759.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/segaic16.h"
 #include "video/sega16sp.h"
 #include "screen.h"

@@ -164,8 +164,8 @@ void crvision_state::crvision_map(address_map &map)
 	map(0x1000, 0x1003).mirror(0x0ffc).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x2000, 0x2001).mirror(0x0ffe).r(TMS9929_TAG, FUNC(tms9928a_device::read));
 	map(0x3000, 0x3001).mirror(0x0ffe).w(TMS9929_TAG, FUNC(tms9928a_device::write));
-	map(0x4000, 0x7fff).bankr(BANK_ROM2);
-	map(0x8000, 0xbfff).bankr(BANK_ROM1);
+	map(0x4000, 0x7fff).rom().share(BANK_ROM2);
+	map(0x8000, 0xbfff).rom().share(BANK_ROM1);
 //  map(0xc000, 0xe7ff).bankrw(3);
 	map(0xe800, 0xe800).w(m_cent_data_out, FUNC(output_latch_device::write));
 	map(0xe801, 0xe801).r("cent_status_in", FUNC(input_buffer_device::read));
@@ -184,8 +184,8 @@ void laser2001_state::lasr2001_map(address_map &map)
 	map(0x1000, 0x1003).mirror(0x0ffc).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x2000, 0x2001).mirror(0x0ffe).r(TMS9929_TAG, FUNC(tms9928a_device::read));
 	map(0x3000, 0x3001).mirror(0x0ffe).w(TMS9929_TAG, FUNC(tms9928a_device::write));
-	map(0x4000, 0x7fff).bankrw(BANK_ROM2);
-	map(0x8000, 0xbfff).bankrw(BANK_ROM1);
+	map(0x4000, 0x7fff).ram().share(BANK_ROM2);
+	map(0x8000, 0xbfff).ram().share(BANK_ROM1);
 	map(0xc000, 0xffff).rom().region(M6502_TAG, 0);
 }
 
@@ -922,6 +922,7 @@ void laser2001_state::lasr2001(machine_config &config)
 	// software list
 	SOFTWARE_LIST(config, "cart_list").set_original("crvision");
 	SOFTWARE_LIST(config, "cart_list2").set_original("laser2001_cart");
+	SOFTWARE_LIST(config, "flop_list").set_original("laser2001_flop");
 }
 
 /***************************************************************************

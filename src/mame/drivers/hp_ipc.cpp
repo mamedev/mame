@@ -372,7 +372,6 @@ Software to look for
 #include "machine/cop452.h"
 #include "speaker.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "machine/input_merger.h"
 #include "bus/hp_ipc_io/hp_ipc_io.h"
 
@@ -822,8 +821,6 @@ void hp_ipc_state::hp_ipc_base(machine_config &config)
 	COP452(config , m_spkr , 2_MHz_XTAL);
 	SPEAKER(config, "mono").front_center();
 	DAC_1BIT(config, m_dac , 0).add_route(ALL_OUTPUTS, "mono", 0.5, AUTO_ALLOC_INPUT, 0);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	m_spkr->oa_w().set(m_dac , FUNC(dac_1bit_device::write));
 
 	// IO slots

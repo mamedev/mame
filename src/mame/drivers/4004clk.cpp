@@ -12,7 +12,6 @@
 #include "cpu/mcs40/mcs40.h"
 #include "machine/clock.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 #include "4004clk.lh"
@@ -151,8 +150,6 @@ void nixieclock_state::_4004clk(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	clock_device &clk(CLOCK(config, "clk", 60));
 	clk.signal_handler().set_inputline("maincpu", I4004_TEST_LINE);

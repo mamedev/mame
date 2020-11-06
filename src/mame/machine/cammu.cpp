@@ -98,22 +98,54 @@ DEFINE_DEVICE_TYPE(CAMMU_C3,  cammu_c3_device,  "c3",  "C1/C3 CAMMU")
 
 cammu_c4t_device::cammu_c4t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cammu_c4_device(mconfig, CAMMU_C4T, tag, owner, clock)
+	, m_ram_line(0)
+	, m_htlb_offset(0)
+	, m_c4_bus_poll(0)
+	, m_bio_control(0)
+	, m_bio_address_tag(0)
+	, m_cache_data_lo(0)
+	, m_cache_data_hi(0)
+	, m_cache_cpu_tag(0)
+	, m_cache_system_tag_valid(0)
+	, m_cache_system_tag(0)
+	, m_tlb_va_line(0)
+	, m_tlb_ra_line(0)
 {
 }
 
 cammu_c4i_device::cammu_c4i_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cammu_c4_device(mconfig, CAMMU_C4I, tag, owner, clock)
+	, m_reset(0)
+	, m_clr_s_data_tlb(0)
+	, m_clr_u_data_tlb(0)
+	, m_clr_s_insn_tlb(0)
+	, m_clr_u_insn_tlb(0)
+	, m_test_data(0)
+	, m_test_address(0)
 {
 }
 
 cammu_c4_device::cammu_c4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: cammu_device(mconfig, type, tag, owner, clock)
+	, m_s_pdo(0)
+	, m_u_pdo(0)
+	, m_control(0)
+	, m_i_fault(0)
+	, m_fault_address_1(0)
+	, m_fault_address_2(0)
+	, m_fault_data_1_lo(0)
+	, m_fault_data_1_hi(0)
+	, m_fault_data_2_lo(0)
+	, m_fault_data_2_hi(0)
 {
 }
 
 cammu_c3_device::cammu_c3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cammu_device(mconfig, CAMMU_C3, tag, owner, clock)
 	, m_linked{ this }
+	, m_s_pdo(0)
+	, m_u_pdo(0)
+	, m_fault(0)
 	, m_control(CID_C3)
 {
 }

@@ -17,7 +17,6 @@ Bruce Tomlin (hardware info)
 #include "machine/6522via.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
-#include "sound/volt_reg.h"
 #include "video/vector.h"
 
 #include "softlist.h"
@@ -112,9 +111,6 @@ void vectrex_base_state::vectrex_base(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	MC1408(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // mc1408.ic301 (also used for vector generation)
-	voltage_regulator_device &vreg(VOLTAGE_REGULATOR(config, "vref", 0));
-	vreg.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vreg.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	AY8912(config, m_ay8912, 6_MHz_XTAL / 4);
 	m_ay8912->port_a_read_callback().set_ioport("BUTTONS");

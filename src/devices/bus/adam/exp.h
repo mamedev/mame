@@ -100,7 +100,7 @@ protected:
 
 	adam_expansion_slot_device *m_slot;
 
-	optional_shared_ptr<uint8_t> m_rom;
+	std::unique_ptr<uint8_t[]> m_rom;
 };
 
 

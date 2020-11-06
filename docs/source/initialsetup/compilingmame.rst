@@ -101,8 +101,9 @@ with MSYS2 and the **pacman** package manager.
   ``mingw-w64-i686-python``.
 * For debugging you may want to install ``gdb``.
 * To link using the LLVM linker (generally much faster than the GNU linker),
-  you'll need ``mingw-w64-x86_64-lld`` for 64-bit builds, or
-  ``mingw-w64-i686-lld`` for 32-bit builds.
+  you'll need ``mingw-w64-x86_64-lld`` and ``mingw-w64-x86_64-libc++`` for
+  64-bit builds, or ``mingw-w64-i686-lld`` and ``mingw-w64-i686-libc++`` for
+  32-bit builds.
 * To build against the portable SDL interfaces, you'll need
   ``mingw-w64-x86_64-SDL2`` and ``mingw-w64-x86_64-SDL2_ttf`` for 64-bit builds,
   or ``mingw-w64-i686-SDL2`` and ``mingw-w64-i686-SDL2_ttf`` for 32-bit builds.
@@ -117,6 +118,28 @@ with MSYS2 and the **pacman** package manager.
   up the environment variables ``MINGW32`` to ``/mingw32`` and ``MINGW64`` to an
   empty string (e.g. using the command **export MINGW32=/mingw32 MINGW64=** in
   the Bash shell).
+
+For example you could use these commands to ensure you have the packages you
+need to compile MAME, omitting the ones for configurations you don’t plan to
+build for or combining multiple **pacman** commands to install more packages at
+once::
+
+    pacman -Syu
+    pacman -S curl git make
+    pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-libc++ mingw-w64-x86_64-lld mingw-w64-x86_64-python
+    pacman -S mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_ttf
+    pacman -S mingw-w64-x86_64-qt5
+    pacman -S mingw-w64-i686-gcc mingw-w64-i686-libc++ mingw-w64-i686-lld mingw-w64-i686-python
+    pacman -S mingw-w64-i686-SDL2 mingw-w64-i686-SDL2_ttf
+    pacman -S mingw-w64-i686-qt5
+
+You could use these commands to install the current version of the
+mame-essentials package and add the MAME package repository to your pacman
+configuration::
+
+    curl -O "https://repo.mamedev.org/x86_64/mame-essentials-1.0.6-1-x86_64.pkg.tar.xz"
+    pacman -U mame-essentials-1.0.6-1-x86_64.pkg.tar.xz
+    echo -e '\n[mame]\nInclude = /etc/pacman.d/mirrorlist.mame' >> /etc/pacman.conf
 
 Building with Microsoft Visual Studio
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -135,6 +158,50 @@ Building with Microsoft Visual Studio
   MAME.
 * The MSYS2 environment is still required to generate the project files, convert
   built-in layouts, compile UI translations, etc.
+
+Some notes about the MSYS2 environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+MSYS2 uses the pacman tool from Arch Linux for package management.  There is a
+`page on the Arch Linux wiki <https://wiki.archlinux.org/index.php/Pacman>`_
+with helpful information on using the pacman package management tool.
+
+The MSYS2 environment includes two kinds of tools: MSYS2 tools designed to work
+in a UNIX-like environment on top of Windows, and MinGW tools designed to work
+in a more Windows-like environment.  The MSYS2 tools are installed in
+``/usr/bin`` while the MinGW tools are installed in ``/ming64/bin`` and/or
+``/mingw32/bin`` (relative to the MSYS2 installation directory).  MSYS2 tools
+work best in an MSYS2 terminal, while MinGW tools work best in a Microsoft
+command prompt.
+
+The most obvious symptom of this is that arrow keys don’t work in interactive
+programs if you run them in the wrong kind of terminal.  If you run MinGW gdb or
+python from an MSYS2 terminal window, command history won’t work and it may not
+be possible to interrupt an attached program with gdb.  Similarly it may be very
+difficult to edit using MSYS2 vim in a Microsoft command prompt window.
+
+MAME is built using the MinGW compilers, so the MinGW directories are included
+earlier in the ``PATH`` for the build environments.  If you want to use an
+interactive MSYS2 program from an MSYS2 shell, you may need to type the absolute
+path to avoid using the MinGW equivalent instead.
+
+MSYS2 gdb may have issues debugging MinGW programs like MAME.  You may get
+better results by installing the MinGW version of gdb and running it from a
+Microsoft command prompt window to debug MAME.
+
+GNU make supports both POSIX-style shells (e.g. bash) and the Microsoft cmd.exe
+shell.  One issue to be aware of when using the cmd.exe shell is that the
+``copy`` command doesn’t provide a useful exit status, so file copy tasks can
+fail silently.
+
+It is not possible to cross-compile a 32-bit version of MAME using 64-bit MinGW
+tools on Windows, the 32-bit MinGW tools must be used.  This causes issues due
+to the size of MAME.  It is not possible to link a full 32-bit MAME build
+including the SDL OS-dependent layer and the Qt debugger.  GNU ld and lld will
+both run out of memory, leaving an output file that doesn’t work.  It’s also
+impossible to make a 32-bit build with full local variable symbols.  GCC may run
+out of memory, and certain source files may exceed the limit of 32,768 sections
+imposed by the PE/COFF object file format.
 
 
 .. _compiling-fedora:

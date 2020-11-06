@@ -210,7 +210,7 @@ void ms32_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, con
 void ms32_state::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect,int priority)
 {
 	// TODO: registers 0x40 / 0x44 and 0x50 / 0x54 are used, unknown meaning
-    // Given how this works out it is most likely that 0x*0 controls X axis while 0x*4 Y, 
+    // Given how this works out it is most likely that 0x*0 controls X axis while 0x*4 Y,
     // nothing is known to diverge between settings so far (i.e. bbbxing sets 0xffff to 0x4* and 0x0000 to 0x5*).
     //             0x4*   0x5*  ROZ should wrap?
     // bbbxing:  0xffff 0x0000  0 (match presentation)
@@ -221,7 +221,7 @@ void ms32_state::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rec
     // suchie2:  0x0000 0x0000  0?
     // bnstars:  0x0000 0x0000  ?
     // hayaosi3: 0x0000 0x0000  ?
-	// akiss:    0xffff 0x0000  0 (gal riichi, cfr. attract mode)
+    // akiss:    0xffff 0x0000  0 (gal riichi, cfr. attract mode)
     // Maybe wrapping is done by limit boundaries rather than individual bits, so that bbbxing and p47aces abuses of this behaviour?
     // Are we missing a ROZ plane size as well?
     
@@ -238,7 +238,7 @@ void ms32_state::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rec
 
 		while (y <= maxy)
 		{
-			u16 *lineaddr = m_lineram + 8 * (y & 0xff);
+			u16 *lineaddr = &m_lineram[8 * (y & 0xff)];
 
 			int start2x = (lineaddr[0x00/4] & 0xffff) | ((lineaddr[0x04/4] & 3) << 16);
 			int start2y = (lineaddr[0x08/4] & 0xffff) | ((lineaddr[0x0c/4] & 3) << 16);

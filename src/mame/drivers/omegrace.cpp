@@ -383,7 +383,7 @@ void omegrace_state::main_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x4bff).ram();
 	map(0x5c00, 0x5cff).ram().share("nvram"); /* NVRAM */
-	map(0x8000, 0x8fff).ram().share("dvg:vectorram").region("maincpu", 0x8000); /* vector ram */
+	map(0x8000, 0x8fff).ram().share("dvg:vectorram"); /* vector ram */
 	map(0x9000, 0x9fff).rom(); /* vector rom */
 }
 

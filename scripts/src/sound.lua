@@ -10,6 +10,8 @@
 ----------------------------------------------------------------------------
 
 files {
+	MAME_DIR .. "src/devices/sound/flt_biquad.cpp",
+	MAME_DIR .. "src/devices/sound/flt_biquad.h",
 	MAME_DIR .. "src/devices/sound/flt_vol.cpp",
 	MAME_DIR .. "src/devices/sound/flt_vol.h",
 	MAME_DIR .. "src/devices/sound/flt_rc.cpp",
@@ -1415,17 +1417,6 @@ if (SOUNDS["PCD3311"]~=null) then
 end
 
 ---------------------------------------------------
--- Voltage Regulator
---@src/devices/sound/volt_reg.h,SOUNDS["VOLT_REG"] = true
----------------------------------------------------
-if (SOUNDS["VOLT_REG"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/sound/volt_reg.cpp",
-		MAME_DIR .. "src/devices/sound/volt_reg.h",
-	}
-end
-
----------------------------------------------------
 -- DAC-76 COMDAC
 --@src/devices/sound/dac76.h,SOUNDS["DAC76"] = true
 ---------------------------------------------------
@@ -1601,5 +1592,17 @@ if (SOUNDS["RP2C33_SOUND"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/rp2c33_snd.cpp",
 		MAME_DIR .. "src/devices/sound/rp2c33_snd.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/sound/tt5665.h,SOUNDS["TT5665"] = true
+---------------------------------------------------
+
+if (SOUNDS["TT5665"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/tt5665.cpp",
+		MAME_DIR .. "src/devices/sound/tt5665.h",
 	}
 end

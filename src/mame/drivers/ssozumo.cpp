@@ -17,7 +17,6 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/10/04
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -228,9 +227,6 @@ void ssozumo_state::ssozumo(machine_config &config)
 	YM2149(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "speaker", 0.3);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.3); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 

@@ -49,7 +49,6 @@ Year + Game             Main CPU  Sound CPU  Sound                         Video
 #include "sound/3526intf.h"
 #include "sound/dac.h"
 #include "sound/sn76496.h"
-#include "sound/volt_reg.h"
 #include "sound/ym2151.h"
 #include "speaker.h"
 
@@ -839,9 +838,6 @@ void fantland_state::fantland(machine_config &config)
 	YM2151(config, "ymsnd", 3000000).add_route(0, "speaker", 0.35).add_route(1, "speaker", 0.35);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 

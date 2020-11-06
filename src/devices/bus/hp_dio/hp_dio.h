@@ -83,8 +83,8 @@ public:
 	//         due to the varying bus widths.  Using all install_memory() shields you from this problem.
 	//         Either know what you're doing (m_prgwidth is available to cards for this purpose) or
 	//         only use these for 32-bit DIO-II cards.
-	void install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data);
-	void install_rom(offs_t start, offs_t end, const char *tag, uint8_t *data);
+	void install_bank(offs_t start, offs_t end, uint8_t *data);
+	void install_rom(offs_t start, offs_t end, uint8_t *data);
 
 	void unmap_bank(offs_t start, offs_t end);
 	void unmap_rom(offs_t start, offs_t end);

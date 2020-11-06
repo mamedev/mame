@@ -429,7 +429,6 @@ protected:
 
 	u8 m_syscontrol[0x20];
 	bool m_dsp_irq_enabled;
-	emu_timer *m_ar_tb_interrupt[2];
 	u16 m_dsp_master_bioz;
 	std::unique_ptr<u32[]> m_pointram;
 	int m_old_coin_state;
@@ -466,7 +465,7 @@ protected:
 	unsigned m_LitSurfaceCount;
 	unsigned m_LitSurfaceIndex;
 	int m_pointrom_size;
-	s32 *m_pointrom;
+	std::unique_ptr<s32[]> m_pointrom;
 	std::unique_ptr<u8[]> m_dirtypal;
 	std::unique_ptr<bitmap_ind16> m_mix_bitmap;
 	tilemap_t *m_bgtilemap;
@@ -504,7 +503,8 @@ public:
 	namcos22s_state(const machine_config &mconfig, device_type type, const char *tag) :
 		namcos22_state(mconfig, type, tag),
 		m_motor_timer(*this, "motor_timer"),
-		m_pc_pedal_interrupt(*this, "pc_p_int")
+		m_pc_pedal_interrupt(*this, "pc_p_int"),
+		m_ar_tb_interrupt(*this, "ar_tb_int%u", 0)
 	{ }
 
 	void namcos22s(machine_config &config);
@@ -539,8 +539,6 @@ protected:
 	virtual void draw_text_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
 private:
-	DECLARE_MACHINE_START(adillor);
-
 	void install_130_speedup();
 	void install_141_speedup();
 
@@ -577,7 +575,7 @@ private:
 	INTERRUPT_GEN_MEMBER(namcos22s_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(adillor_trackball_update);
-	TIMER_CALLBACK_MEMBER(adillor_trackball_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(adillor_trackball_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(propcycl_pedal_update);
 	TIMER_DEVICE_CALLBACK_MEMBER(propcycl_pedal_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(alpine_steplock_callback);
@@ -589,6 +587,7 @@ private:
 
 	optional_device<timer_device> m_motor_timer;
 	optional_device<timer_device> m_pc_pedal_interrupt;
+	optional_device_array<timer_device, 2> m_ar_tb_interrupt;
 
 	int m_spotram_enable;
 	int m_spotram_address;

@@ -330,9 +330,8 @@ void px8_state::gah40m_w(offs_t offset, uint8_t data)
 
 		*/
 
-		output().set_value("led_0", BIT(data, 0));
-		output().set_value("led_1", BIT(data, 1));
-		output().set_value("led_2", BIT(data, 2));
+		for (int i = 0; i < 3; i++)
+			m_leds[i] = BIT(data, i);
 		break;
 
 	case GAH40M_IER:
@@ -714,6 +713,8 @@ GFXDECODE_END
 
 void px8_state::machine_start()
 {
+	m_leds.resolve();
+
 	/* register for state saving */
 	save_item(NAME(m_ier));
 	save_item(NAME(m_isr));

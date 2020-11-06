@@ -227,7 +227,37 @@
 
 #include "emu.h"
 
-#include "includes/interpro.h"
+#include "cpu/clipper/clipper.h"
+#include "machine/cammu.h"
+
+#include "machine/interpro_ioga.h"
+#include "machine/interpro_mcga.h"
+#include "machine/interpro_sga.h"
+#include "machine/interpro_arbga.h"
+
+#include "imagedev/floppy.h"
+#include "machine/ram.h"
+#include "machine/28fxxx.h"
+#include "machine/mc146818.h"
+#include "machine/z80scc.h"
+#include "machine/upd765.h"
+#include "machine/i82586.h"
+
+#include "machine/ncr5390.h"
+#include "machine/nscsi_bus.h"
+#include "bus/nscsi/cd.h"
+#include "bus/nscsi/hd.h"
+
+#include "bus/rs232/rs232.h"
+
+#include "bus/interpro/sr/sr.h"
+#include "bus/interpro/sr/sr_cards.h"
+#include "bus/interpro/keyboard/keyboard.h"
+#include "bus/interpro/mouse/mouse.h"
+
+#include "formats/pc_dsk.h"
+#include "softlist.h"
+
 #include "machine/input_merger.h"
 
 #include "debugger.h"
@@ -236,6 +266,350 @@
 
 #define VERBOSE 0
 #include "logmacro.h"
+
+namespace {
+
+class interpro_state : public driver_device
+{
+public:
+	interpro_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "cpu")
+		, m_ram(*this, "ram")
+		, m_mcga(*this, "mcga")
+		, m_sga(*this, "sga")
+		, m_fdc(*this, "fdc")
+		, m_scc1(*this, "scc1")
+		, m_scc2(*this, "scc2")
+		, m_rtc(*this, "rtc")
+		, m_scsibus(*this, "scsi")
+		, m_eth(*this, "eth")
+		, m_ioga(*this, "ioga")
+		, m_eprom(*this, "eprom")
+		, m_softlist(*this, "softlist")
+		, m_diag_led(*this, "digit0")
+	{
+	}
+
+	required_device<clipper_device> m_maincpu;
+	required_device<ram_device> m_ram;
+
+	required_device<interpro_mcga_device> m_mcga;
+	required_device<interpro_sga_device> m_sga;
+	required_device<upd765_family_device> m_fdc;
+	required_device<z80scc_device> m_scc1;
+	required_device<z80scc_device> m_scc2;
+	required_device<mc146818_device> m_rtc;
+	required_device<nscsi_bus_device> m_scsibus;
+	required_device<i82586_base_device> m_eth;
+	required_device<interpro_ioga_device> m_ioga;
+	required_region_ptr<u16> m_eprom;
+
+	required_device<software_list_device> m_softlist;
+
+	void init_common();
+
+	virtual u32 unmapped_r(address_space &space, offs_t offset);
+	virtual void unmapped_w(offs_t offset, u32 data);
+
+	enum error_mask : u16
+	{
+		ERROR_BPID4    = 0x0001,
+		ERROR_SRXMMBE  = 0x0002,
+		ERROR_SRXHOG   = 0x0004,
+		ERROR_SRXNEM   = 0x0008,
+		ERROR_SRXVALID = 0x0010,
+		ERROR_CBUSNMI  = 0x0020,
+		ERROR_CBUSBG   = 0x00c0,
+		ERROR_BG       = 0x0070,
+		ERROR_BUSHOG   = 0x0080
+	};
+	u16 error_r();
+
+	void led_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+
+	enum status_mask : u16
+	{
+		STATUS_YELLOW_ZONE = 0x0001,
+		STATUS_SRNMI       = 0x0002,
+		STATUS_PWRLOSS     = 0x0004,
+		STATUS_RED_ZONE    = 0x0008,
+		STATUS_BP          = 0x00f0
+	};
+	u16 status_r() { return m_status; }
+
+	virtual u16 ctrl1_r() = 0;
+	virtual void ctrl1_w(offs_t offset, u16 data, u16 mem_mask = ~0) = 0;
+	virtual u16 ctrl2_r() = 0;
+	virtual void ctrl2_w(offs_t offset, u16 data, u16 mem_mask = ~0) = 0;
+
+	u8 nodeid_r(address_space &space, offs_t offset);
+
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
+
+	void ioga(machine_config &config);
+	void interpro_serial(machine_config &config);
+	void interpro(machine_config &config);
+	static void interpro_scsi_adapter(device_t *device);
+	static void interpro_cdrom(device_t *device);
+	void interpro_boot_map(address_map &map);
+	void interpro_common_map(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	output_finder<> m_diag_led;
+	emu_timer *m_reset_timer;
+
+	u16 m_error;
+	u16 m_status;
+	u16 m_led;
+};
+
+class emerald_state : public interpro_state
+{
+public:
+	emerald_state(const machine_config &mconfig, device_type type, const char *tag)
+		: interpro_state(mconfig, type, tag)
+		, m_d_cammu(*this, "cammu_d")
+		, m_i_cammu(*this, "cammu_i")
+		, m_scsi(*this, "scsi:7:host")
+		, m_bus(*this, "slot")
+	{
+	}
+
+	void error_w(u8 data) { m_error = data; }
+
+	enum ctrl1_mask : u16
+	{
+		CTRL1_FLOPLOW    = 0x0001, // 3.5" floppy select
+		CTRL1_FLOPRDY    = 0x0002, // floppy ready enable?
+		CTRL1_LEDENA     = 0x0004, // led display enable
+		CTRL1_LEDDP      = 0x0008, // led right decimal point enable
+		CTRL1_ETHLOOP    = 0x0010, // ethernet loopback enable?
+		CTRL1_ETHDTR     = 0x0020, // modem dtr pin enable?
+		CTRL1_ETHRMOD    = 0x0040, // remote modem configured (read)?
+		CTRL1_CLIPRESET  = 0x0040, // hard reset (write)?
+		CTRL1_FIFOACTIVE = 0x0080  // plotter fifo active?
+	};
+	u16 ctrl1_r() override { return m_ctrl1; }
+	void ctrl1_w(offs_t offset, u16 data, u16 mem_mask = ~0) override;
+
+	enum ctrl2_mask : u16
+	{
+		CTRL2_PWRUP     = 0x0001, // power supply voltage adjust?
+		CRTL2_PWRENA    = 0x0002, // ?
+		CTRL2_HOLDOFF   = 0x0004, // power supply shut down delay
+		CTRL2_EXTNMIENA = 0x0008, // power nmi enable
+		CTRL2_COLDSTART = 0x0010, // cold start flag
+		CTRL2_RESET     = 0x0020, // soft reset
+		CTRL2_BUSENA    = 0x0040, // clear bus grant error
+		CTRL2_FRCPARITY = 0x0080, // ?
+
+		CTRL2_WMASK     = 0x000f
+	};
+	u16 ctrl2_r() override { return m_ctrl2; }
+	void ctrl2_w(offs_t offset, u16 data, u16 mem_mask = ~0) override;
+
+	required_device<cammu_c3_device> m_d_cammu;
+	required_device<cammu_c3_device> m_i_cammu;
+	required_device<ncr53c90a_device> m_scsi;
+	required_device<srx_bus_device> m_bus;
+
+	void emerald(machine_config &config);
+	void ip6000(machine_config &config);
+	void interpro_82586_map(address_map &map);
+	void emerald_base_map(address_map &map);
+	void emerald_main_map(address_map &map);
+	void emerald_io_map(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	u16 m_ctrl1;
+	u16 m_ctrl2;
+};
+
+class turquoise_state : public interpro_state
+{
+public:
+	turquoise_state(const machine_config &mconfig, device_type type, const char *tag)
+		: interpro_state(mconfig, type, tag)
+		, m_d_cammu(*this, "cammu_d")
+		, m_i_cammu(*this, "cammu_i")
+		, m_kbd_port(*this, "kbd")
+		, m_mse_port(*this, "mse")
+		, m_scsi(*this, "scsi:7:host")
+		, m_bus(*this, "slot")
+	{
+	}
+
+	void error_w(u8 data) { m_error = data; }
+
+	enum ctrl1_mask : u16
+	{
+		CTRL1_FLOPLOW    = 0x0001, // 3.5" floppy select
+		CTRL1_FLOPRDY    = 0x0002, // floppy ready enable?
+		CTRL1_LEDENA     = 0x0004, // led display enable
+		CTRL1_LEDDP      = 0x0008, // led right decimal point enable
+		CTRL1_ETHLOOP    = 0x0010, // ethernet loopback enable?
+		CTRL1_ETHDTR     = 0x0020, // modem dtr pin enable?
+		CTRL1_ETHRMOD    = 0x0040, // remote modem configured (read)?
+		CTRL1_CLIPRESET  = 0x0040, // hard reset (write)?
+		CTRL1_FIFOACTIVE = 0x0080  // plotter fifo active?
+	};
+	u16 ctrl1_r() override { return m_ctrl1; }
+	void ctrl1_w(offs_t offset, u16 data, u16 mem_mask = ~0) override;
+
+	enum ctrl2_mask : u16
+	{
+		CTRL2_PWRUP     = 0x0001, // power supply voltage adjust?
+		CRTL2_PWRENA    = 0x0002, // ?
+		CTRL2_HOLDOFF   = 0x0004, // power supply shut down delay
+		CTRL2_EXTNMIENA = 0x0008, // power nmi enable
+		CTRL2_COLDSTART = 0x0010, // cold start flag
+		CTRL2_RESET     = 0x0020, // soft reset
+		CTRL2_BUSENA    = 0x0040, // clear bus grant error
+		CTRL2_FRCPARITY = 0x0080, // ?
+
+		CTRL2_WMASK     = 0x000f
+	};
+	u16 ctrl2_r() override { return m_ctrl2; }
+	void ctrl2_w(offs_t offset, u16 data, u16 mem_mask = ~0) override;
+
+	required_device<cammu_c3_device> m_d_cammu;
+	required_device<cammu_c3_device> m_i_cammu;
+	required_device<interpro_keyboard_port_device> m_kbd_port;
+	required_device<interpro_mouse_port_device> m_mse_port;
+	required_device<ncr53c90a_device> m_scsi;
+	required_device<cbus_bus_device> m_bus;
+
+	void turquoise(machine_config &config);
+	void ip2000(machine_config &config);
+	void interpro_82586_map(address_map &map);
+	void turquoise_base_map(address_map &map);
+	void turquoise_main_map(address_map &map);
+	void turquoise_io_map(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	u16 m_ctrl1;
+	u16 m_ctrl2;
+};
+
+class sapphire_state : public interpro_state
+{
+public:
+	sapphire_state(const machine_config &mconfig, device_type type, const char *tag)
+		: interpro_state(mconfig, type, tag)
+		, m_mmu(*this, "cammu")
+		, m_scsi(*this, "scsi:7:host")
+		, m_arbga(*this, "arbga")
+		, m_flash_lsb(*this, "flash_lsb")
+		, m_flash_msb(*this, "flash_msb")
+	{
+	}
+
+	virtual u32 unmapped_r(address_space &space, offs_t offset) override;
+	virtual void unmapped_w(offs_t offset, u32 data) override;
+
+	enum ctrl1_mask : u16
+	{
+		CTRL1_FLOPLOW    = 0x0001, // 3.5" floppy select
+								   // unused
+		CTRL1_LEDENA     = 0x0004, // led display enable
+		CTRL1_LEDDP      = 0x0008, // led right decimal point enable
+		CTRL1_MMBE       = 0x0010, // mmbe enable
+		CTRL1_ETHDTR     = 0x0020, // modem dtr pin enable
+		CTRL1_ETHRMOD    = 0x0040, // 0 = sytem configured for remote modems
+		CTRL1_FIFOACTIVE = 0x0080  // 0 = plotter fifos reset
+	};
+	u16 ctrl1_r() override { return m_ctrl1; }
+	void ctrl1_w(offs_t offset, u16 data, u16 mem_mask = ~0) override;
+
+	enum ctrl2_mask : u16
+	{
+		CTRL2_PWRUP     = 0x0003, // power supply voltage adjust
+		CTRL2_HOLDOFF   = 0x0004, // power supply shut down delay
+		CTRL2_EXTNMIENA = 0x0008, // power nmi enable
+		CTRL2_COLDSTART = 0x0010, // cold start flag
+		CTRL2_RESET     = 0x0020, // soft reset
+		CTRL2_BUSENA    = 0x0040, // clear bus grant error
+		CTRL2_FLASHEN   = 0x0080, // flash eprom write enable
+	};
+	u16 ctrl2_r() override { return m_ctrl2; }
+	void ctrl2_w(offs_t offset, u16 data, u16 mem_mask = ~0) override;
+
+	required_device<cammu_c4_device> m_mmu;
+	required_device<ncr53c94_device> m_scsi;
+	required_device<interpro_arbga_device> m_arbga;
+	required_device<intel_28f010_device> m_flash_lsb;
+	required_device<intel_28f010_device> m_flash_msb;
+
+	void sapphire(machine_config &config);
+
+	void interpro_82596_map(address_map &map);
+	void sapphire_base_map(address_map &map);
+	void sapphire_main_map(address_map &map);
+	void sapphire_io_map(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	u16 m_ctrl1;
+	u16 m_ctrl2;
+};
+
+class cbus_sapphire_state : public sapphire_state
+{
+public:
+	cbus_sapphire_state(const machine_config &mconfig, device_type type, const char *tag)
+		: sapphire_state(mconfig, type, tag)
+		, m_kbd_port(*this, "kbd")
+		, m_mse_port(*this, "mse")
+		, m_bus(*this, "slot")
+	{
+	}
+
+	void cbus_sapphire(machine_config &config);
+
+	void ip2500(machine_config &config);
+	void ip2400(machine_config &config);
+	void ip2700(machine_config &config);
+	void ip2800(machine_config &config);
+
+protected:
+	required_device<interpro_keyboard_port_device> m_kbd_port;
+	required_device<interpro_mouse_port_device> m_mse_port;
+	required_device<cbus_bus_device> m_bus;
+};
+
+class srx_sapphire_state : public sapphire_state
+{
+public:
+	srx_sapphire_state(const machine_config &mconfig, device_type type, const char *tag)
+		: sapphire_state(mconfig, type, tag)
+		, m_bus(*this, "slot")
+	{
+	}
+
+	void srx_sapphire(machine_config &config);
+
+	void ip6400(machine_config &config);
+	void ip6700(machine_config &config);
+	void ip6800(machine_config &config);
+
+protected:
+	required_device<srx_bus_device> m_bus;
+};
 
 void interpro_state::machine_start()
 {
@@ -538,7 +912,7 @@ void interpro_state::interpro_common_map(address_map &map)
 	map(0x7f000600, 0x7f000600).w(m_rtc, FUNC(mc146818_device::write));
 
 	// the system board id prom
-	map(0x7f000700, 0x7f00077f).rom().region(INTERPRO_IDPROM_TAG, 0);
+	map(0x7f000700, 0x7f00077f).rom().region("idprom", 0);
 
 	map(0x7f0fff00, 0x7f0fffff).m(m_ioga, FUNC(interpro_ioga_device::map));
 }
@@ -565,7 +939,7 @@ void emerald_state::emerald_base_map(address_map &map)
 
 	map(0x7f000300, 0x7f000300).w(FUNC(emerald_state::error_w));
 
-	map(0x7f000600, 0x7f00067f).rom().region(INTERPRO_NODEID_TAG, 0);
+	map(0x7f000600, 0x7f00067f).rom().region("nodeid", 0);
 }
 
 void emerald_state::emerald_main_map(address_map &map)
@@ -574,8 +948,8 @@ void emerald_state::emerald_main_map(address_map &map)
 
 	emerald_base_map(map);
 
-	map(0x00000000, 0x00ffffff).ram().share(RAM_TAG);
-	map(0x7f100000, 0x7f13ffff).lr16([this] (offs_t offset) { return m_eprom[offset]; }, INTERPRO_EPROM_TAG);
+	map(0x00000000, 0x00ffffff).ram().share("ram");
+	map(0x7f100000, 0x7f13ffff).lr16([this] (offs_t offset) { return m_eprom[offset]; }, "eprom");
 }
 
 void turquoise_state::turquoise_base_map(address_map &map)
@@ -600,7 +974,7 @@ void turquoise_state::turquoise_base_map(address_map &map)
 
 	map(0x7f000300, 0x7f000300).w(FUNC(turquoise_state::error_w));
 
-	map(0x7f000600, 0x7f00067f).rom().region(INTERPRO_NODEID_TAG, 0);
+	map(0x7f000600, 0x7f00067f).rom().region("nodeid", 0);
 }
 
 void turquoise_state::turquoise_main_map(address_map &map)
@@ -609,8 +983,8 @@ void turquoise_state::turquoise_main_map(address_map &map)
 
 	turquoise_base_map(map);
 
-	map(0x00000000, 0x00ffffff).ram().share(RAM_TAG);
-	map(0x7f100000, 0x7f13ffff).lr16([this] (offs_t offset) { return m_eprom[offset]; }, INTERPRO_EPROM_TAG);
+	map(0x00000000, 0x00ffffff).ram().share("ram");
+	map(0x7f100000, 0x7f13ffff).lr16([this] (offs_t offset) { return m_eprom[offset]; }, "eprom");
 }
 
 void sapphire_state::sapphire_base_map(address_map &map)
@@ -645,13 +1019,13 @@ void sapphire_state::sapphire_main_map(address_map &map)
 
 	sapphire_base_map(map);
 
-	map(0x00000000, 0x00ffffff).ram().share(RAM_TAG);
-	map(0x7f100000, 0x7f11ffff).lr16([this] (offs_t offset) { return m_eprom[offset]; }, INTERPRO_EPROM_TAG);
+	map(0x00000000, 0x00ffffff).ram().share("ram");
+	map(0x7f100000, 0x7f11ffff).lr16([this] (offs_t offset) { return m_eprom[offset]; }, "eprom");
 	map(0x7f180000, 0x7f1fffff).rw(m_flash_lsb, FUNC(intel_28f010_device::read), FUNC(intel_28f010_device::write)).umask32(0x00ff00ff).mask(0x3ffff);
 	map(0x7f180000, 0x7f1fffff).rw(m_flash_msb, FUNC(intel_28f010_device::read), FUNC(intel_28f010_device::write)).umask32(0xff00ff00).mask(0x3ffff);
 
 	// HACK: for SRX bus Sapphire only
-	//map(0x8f007f80, 0x8f007fff).rom().region(INTERPRO_IDPROM_TAG, 0);
+	//map(0x8f007f80, 0x8f007fff).rom().region("idprom", 0);
 }
 
 void emerald_state::emerald_io_map(address_map &map)
@@ -715,7 +1089,7 @@ void interpro_state::interpro_serial(machine_config &config)
 	 * RS-232 signal; possibly it should be DSR?
 	 */
 	// scc1 channel A (serial port 1)
-	rs232_port_device &port1(RS232_PORT(config, INTERPRO_SERIAL_PORT1_TAG, default_rs232_devices, nullptr));
+	rs232_port_device &port1(RS232_PORT(config, "serial1", default_rs232_devices, nullptr));
 	port1.cts_handler().set(m_scc1, FUNC(z80scc_device::ctsa_w));
 	port1.dcd_handler().set(m_scc1, FUNC(z80scc_device::dcda_w));
 	port1.rxd_handler().set(m_scc1, FUNC(z80scc_device::rxa_w));
@@ -724,7 +1098,7 @@ void interpro_state::interpro_serial(machine_config &config)
 	m_scc1->out_wreqa_callback().set(m_ioga, FUNC(interpro_ioga_device::drq_serial1)).invert();
 
 	// scc1 channel B (serial port 2)
-	rs232_port_device &port2(RS232_PORT(config, INTERPRO_SERIAL_PORT2_TAG, default_rs232_devices, nullptr));
+	rs232_port_device &port2(RS232_PORT(config, "serial2", default_rs232_devices, nullptr));
 	port2.cts_handler().set(m_scc1, FUNC(z80scc_device::ctsb_w));
 	port2.dcd_handler().set(m_scc1, FUNC(z80scc_device::dcdb_w));
 	port2.rxd_handler().set(m_scc1, FUNC(z80scc_device::rxb_w));
@@ -735,7 +1109,7 @@ void interpro_state::interpro_serial(machine_config &config)
 	m_scc1->out_int_callback().set(scc_int, FUNC(input_merger_device::in_w<0>));
 
 	// scc2 channel B (serial port 0)
-	rs232_port_device &port0(RS232_PORT(config, INTERPRO_SERIAL_PORT0_TAG, default_rs232_devices, nullptr));
+	rs232_port_device &port0(RS232_PORT(config, "serial0", default_rs232_devices, nullptr));
 	port0.cts_handler().set(m_scc2, FUNC(z80scc_device::ctsb_w));
 	port0.dcd_handler().set(m_scc2, FUNC(z80scc_device::dcdb_w));
 	port0.ri_handler().set(m_scc2, FUNC(z80scc_device::syncb_w));
@@ -762,8 +1136,8 @@ void interpro_state::interpro_scsi_adapter(device_t *device)
 
 	adapter.set_clock(24_MHz_XTAL);
 
-	adapter.irq_handler_cb().set(":" INTERPRO_IOGA_TAG, FUNC(interpro_ioga_device::ir0_w));
-	adapter.drq_handler_cb().set(":" INTERPRO_IOGA_TAG, FUNC(interpro_ioga_device::drq_scsi));
+	adapter.irq_handler_cb().set(":ioga", FUNC(interpro_ioga_device::ir0_w));
+	adapter.drq_handler_cb().set(":ioga", FUNC(interpro_ioga_device::drq_scsi));
 }
 
 void interpro_state::interpro_cdrom(device_t *device)
@@ -779,8 +1153,8 @@ void interpro_state::ioga(machine_config &config)
 
 	// ioga dma and serial dma channels
 	//m_ioga->dma_r_callback<0>().set(unknown); // plotter
-	m_ioga->dma_r_callback<1>().set(INTERPRO_SCSI_DEVICE_TAG, FUNC(ncr53c90a_device::dma_r));
-	m_ioga->dma_w_callback<1>().set(INTERPRO_SCSI_DEVICE_TAG, FUNC(ncr53c90a_device::dma_w));
+	m_ioga->dma_r_callback<1>().set("scsi:7:host", FUNC(ncr53c90a_device::dma_r));
+	m_ioga->dma_w_callback<1>().set("scsi:7:host", FUNC(ncr53c90a_device::dma_w));
 	m_ioga->dma_r_callback<2>().set(m_fdc, FUNC(upd765_family_device::dma_r));
 	m_ioga->dma_w_callback<2>().set(m_fdc, FUNC(upd765_family_device::dma_w));
 	m_ioga->serial_dma_r_callback<0>().set(m_scc2, FUNC(z80scc_device::db_r));
@@ -819,20 +1193,20 @@ void interpro_state::interpro(machine_config &config)
 	// scsi bus and devices
 	NSCSI_BUS(config, m_scsibus, 0);
 
-	nscsi_connector &harddisk(NSCSI_CONNECTOR(config, INTERPRO_SCSI_TAG ":0", 0));
+	nscsi_connector &harddisk(NSCSI_CONNECTOR(config, "scsi:0", 0));
 	interpro_scsi_devices(harddisk);
 	harddisk.set_default_option("harddisk");
 
-	nscsi_connector &cdrom(NSCSI_CONNECTOR(config, INTERPRO_SCSI_TAG ":4", 0));
+	nscsi_connector &cdrom(NSCSI_CONNECTOR(config, "scsi:4", 0));
 	interpro_scsi_devices(cdrom);
 	cdrom.set_default_option("cdrom");
 	cdrom.set_option_machine_config("cdrom", interpro_cdrom);
 
-	interpro_scsi_devices(NSCSI_CONNECTOR(config, INTERPRO_SCSI_TAG ":1", 0));
-	interpro_scsi_devices(NSCSI_CONNECTOR(config, INTERPRO_SCSI_TAG ":2", 0));
-	interpro_scsi_devices(NSCSI_CONNECTOR(config, INTERPRO_SCSI_TAG ":3", 0));
-	interpro_scsi_devices(NSCSI_CONNECTOR(config, INTERPRO_SCSI_TAG ":5", 0));
-	interpro_scsi_devices(NSCSI_CONNECTOR(config, INTERPRO_SCSI_TAG ":6", 0));
+	interpro_scsi_devices(NSCSI_CONNECTOR(config, "scsi:1", 0));
+	interpro_scsi_devices(NSCSI_CONNECTOR(config, "scsi:2", 0));
+	interpro_scsi_devices(NSCSI_CONNECTOR(config, "scsi:3", 0));
+	interpro_scsi_devices(NSCSI_CONNECTOR(config, "scsi:5", 0));
+	interpro_scsi_devices(NSCSI_CONNECTOR(config, "scsi:6", 0));
 
 	// ethernet
 
@@ -853,7 +1227,7 @@ void emerald_state::emerald(machine_config &config)
 	m_maincpu->set_addrmap(0, &emerald_state::emerald_main_map);
 	m_maincpu->set_addrmap(1, &emerald_state::emerald_io_map);
 	m_maincpu->set_addrmap(2, &emerald_state::interpro_boot_map);
-	m_maincpu->set_irq_acknowledge_callback(INTERPRO_IOGA_TAG, FUNC(interpro_ioga_device::acknowledge_interrupt));
+	m_maincpu->set_irq_acknowledge_callback(m_ioga, FUNC(interpro_ioga_device::acknowledge_interrupt));
 
 	CAMMU_C3(config, m_i_cammu, 0);
 	m_i_cammu->exception_callback().set(m_maincpu, FUNC(clipper_device::set_exception));
@@ -875,8 +1249,8 @@ void emerald_state::emerald(machine_config &config)
 	m_fdc->drq_wr_callback().set(m_ioga, FUNC(interpro_ioga_device::drq_floppy));
 
 	// connect a 3.5" drive at id 3
-	//FLOPPY_CONNECTOR(config, INTERPRO_FDC_TAG ":2", "525hd", FLOPPY_525_HD, true, interpro_state::floppy_formats).enable_sound(false);
-	FLOPPY_CONNECTOR(config, INTERPRO_FDC_TAG ":3", "35hd", FLOPPY_35_HD, true, interpro_state::floppy_formats).enable_sound(false);
+	//FLOPPY_CONNECTOR(config, "fdc:2", "525hd", FLOPPY_525_HD, true, interpro_state::floppy_formats).enable_sound(false);
+	FLOPPY_CONNECTOR(config, "fdc:3", "35hd", FLOPPY_35_HD, true, interpro_state::floppy_formats).enable_sound(false);
 
 	// serial controllers and ports
 	SCC85C30(config, m_scc1, 4.9152_MHz_XTAL);
@@ -884,11 +1258,11 @@ void emerald_state::emerald(machine_config &config)
 	interpro_serial(config);
 
 	// scsi host adapter
-	nscsi_connector &adapter(NSCSI_CONNECTOR(config, INTERPRO_SCSI_TAG ":7", 0));
-	adapter.option_add_internal(INTERPRO_SCSI_ADAPTER_TAG, NCR53C90A);
-	adapter.set_default_option(INTERPRO_SCSI_ADAPTER_TAG);
+	nscsi_connector &adapter(NSCSI_CONNECTOR(config, "scsi:7", 0));
+	adapter.option_add_internal("host", NCR53C90A);
+	adapter.set_default_option("host");
 	adapter.set_fixed(true);
-	adapter.set_option_machine_config(INTERPRO_SCSI_ADAPTER_TAG, interpro_scsi_adapter);
+	adapter.set_option_machine_config("host", interpro_scsi_adapter);
 
 	// ethernet controller
 	I82586(config, m_eth, 10_MHz_XTAL);
@@ -919,7 +1293,7 @@ void turquoise_state::turquoise(machine_config &config)
 	m_maincpu->set_addrmap(0, &turquoise_state::turquoise_main_map);
 	m_maincpu->set_addrmap(1, &turquoise_state::turquoise_io_map);
 	m_maincpu->set_addrmap(2, &turquoise_state::interpro_boot_map);
-	m_maincpu->set_irq_acknowledge_callback(INTERPRO_IOGA_TAG, FUNC(interpro_ioga_device::acknowledge_interrupt));
+	m_maincpu->set_irq_acknowledge_callback(m_ioga, FUNC(interpro_ioga_device::acknowledge_interrupt));
 
 	CAMMU_C3(config, m_i_cammu, 0);
 	m_i_cammu->exception_callback().set(m_maincpu, FUNC(clipper_device::set_exception));
@@ -941,7 +1315,7 @@ void turquoise_state::turquoise(machine_config &config)
 	m_fdc->drq_wr_callback().set(m_ioga, FUNC(interpro_ioga_device::drq_floppy));
 
 	// connect a 3.5" drive at id 3
-	FLOPPY_CONNECTOR(config, INTERPRO_FDC_TAG ":3", "35hd", FLOPPY_35_HD, true, interpro_state::floppy_formats).enable_sound(false);
+	FLOPPY_CONNECTOR(config, "fdc:3", "35hd", FLOPPY_35_HD, true, interpro_state::floppy_formats).enable_sound(false);
 
 	// serial controllers and ports
 	SCC85C30(config, m_scc1, 4.9152_MHz_XTAL);
@@ -958,11 +1332,11 @@ void turquoise_state::turquoise(machine_config &config)
 	m_mse_port->state_func().set(m_ioga, FUNC(interpro_ioga_device::mouse_status_w));
 
 	// scsi host adapter
-	nscsi_connector &adapter(NSCSI_CONNECTOR(config, INTERPRO_SCSI_TAG ":7", 0));
-	adapter.option_add_internal(INTERPRO_SCSI_ADAPTER_TAG, NCR53C90A);
-	adapter.set_default_option(INTERPRO_SCSI_ADAPTER_TAG);
+	nscsi_connector &adapter(NSCSI_CONNECTOR(config, "scsi:7", 0));
+	adapter.option_add_internal("host", NCR53C90A);
+	adapter.set_default_option("host");
 	adapter.set_fixed(true);
-	adapter.set_option_machine_config(INTERPRO_SCSI_ADAPTER_TAG, interpro_scsi_adapter);
+	adapter.set_option_machine_config("host", interpro_scsi_adapter);
 
 	// ethernet controller
 	I82586(config, m_eth, 10_MHz_XTAL);
@@ -993,7 +1367,7 @@ void sapphire_state::sapphire(machine_config &config)
 	m_maincpu->set_addrmap(0, &sapphire_state::sapphire_main_map);
 	m_maincpu->set_addrmap(1, &sapphire_state::sapphire_io_map);
 	m_maincpu->set_addrmap(2, &sapphire_state::interpro_boot_map);
-	m_maincpu->set_irq_acknowledge_callback(INTERPRO_IOGA_TAG, FUNC(interpro_ioga_device::acknowledge_interrupt));
+	m_maincpu->set_irq_acknowledge_callback(m_ioga, FUNC(interpro_ioga_device::acknowledge_interrupt));
 
 	// FIXME: 2400/6400 should be C4T cammu?
 	CAMMU_C4I(config, m_mmu, 0);
@@ -1008,7 +1382,7 @@ void sapphire_state::sapphire(machine_config &config)
 	m_fdc->drq_wr_callback().set(m_ioga, FUNC(interpro_ioga_device::drq_floppy));
 
 	// connect a 3.5" drive at id 1
-	FLOPPY_CONNECTOR(config, INTERPRO_FDC_TAG ":1", "35hd", FLOPPY_35_HD, true, interpro_state::floppy_formats).enable_sound(false);
+	FLOPPY_CONNECTOR(config, "fdc:1", "35hd", FLOPPY_35_HD, true, interpro_state::floppy_formats).enable_sound(false);
 
 	// srx arbiter gate array
 	INTERPRO_ARBGA(config, m_arbga, 0);
@@ -1019,11 +1393,11 @@ void sapphire_state::sapphire(machine_config &config)
 	interpro_serial(config);
 
 	// scsi host adapter
-	nscsi_connector &adapter(NSCSI_CONNECTOR(config, INTERPRO_SCSI_TAG ":7", 0));
-	adapter.option_add_internal(INTERPRO_SCSI_ADAPTER_TAG, NCR53C94);
-	adapter.set_default_option(INTERPRO_SCSI_ADAPTER_TAG);
+	nscsi_connector &adapter(NSCSI_CONNECTOR(config, "scsi:7", 0));
+	adapter.option_add_internal("host", NCR53C94);
+	adapter.set_default_option("host");
 	adapter.set_fixed(true);
-	adapter.set_option_machine_config(INTERPRO_SCSI_ADAPTER_TAG, interpro_scsi_adapter);
+	adapter.set_option_machine_config("host", interpro_scsi_adapter);
 
 	// ethernet controller
 	I82596_LE16(config, m_eth, 20_MHz_XTAL);
@@ -1048,8 +1422,8 @@ void turquoise_state::ip2000(machine_config &config)
 	m_kbd_port->set_default_option("lle_en_us");
 	m_mse_port->set_default_option("interpro_mouse");
 
-	CBUS_SLOT(config, INTERPRO_SLOT_TAG ":0", 0, m_bus, cbus_cards, "mpcb963", false);
-	CBUS_SLOT(config, INTERPRO_SLOT_TAG ":1", 0, m_bus, cbus_cards, nullptr, false);
+	CBUS_SLOT(config, "slot:0", 0, m_bus, cbus_cards, "mpcb963", false);
+	CBUS_SLOT(config, "slot:1", 0, m_bus, cbus_cards, nullptr, false);
 
 	m_softlist->set_filter("2000");
 }
@@ -1104,8 +1478,8 @@ void cbus_sapphire_state::ip2400(machine_config &config)
 	m_kbd_port->set_default_option("lle_en_us");
 	m_mse_port->set_default_option("interpro_mouse");
 
-	CBUS_SLOT(config, INTERPRO_SLOT_TAG ":0", 0, m_bus, cbus_cards, "msmt070", false);
-	CBUS_SLOT(config, INTERPRO_SLOT_TAG ":1", 0, m_bus, cbus_cards, nullptr, false);
+	CBUS_SLOT(config, "slot:0", 0, m_bus, cbus_cards, "msmt070", false);
+	CBUS_SLOT(config, "slot:1", 0, m_bus, cbus_cards, nullptr, false);
 
 	m_softlist->set_filter("2400");
 }
@@ -1122,8 +1496,8 @@ void cbus_sapphire_state::ip2500(machine_config &config)
 	m_kbd_port->set_default_option("lle_en_us");
 	m_mse_port->set_default_option("interpro_mouse");
 
-	CBUS_SLOT(config, INTERPRO_SLOT_TAG ":0", 0, m_bus, cbus_cards, "msmt070", false);
-	CBUS_SLOT(config, INTERPRO_SLOT_TAG ":1", 0, m_bus, cbus_cards, nullptr, false);
+	CBUS_SLOT(config, "slot:0", 0, m_bus, cbus_cards, "msmt070", false);
+	CBUS_SLOT(config, "slot:1", 0, m_bus, cbus_cards, nullptr, false);
 
 	m_softlist->set_filter("2500");
 }
@@ -1139,8 +1513,8 @@ void cbus_sapphire_state::ip2700(machine_config &config)
 	m_kbd_port->set_default_option("lle_en_us");
 	m_mse_port->set_default_option("interpro_mouse");
 
-	CBUS_SLOT(config, INTERPRO_SLOT_TAG ":0", 0, m_bus, cbus_cards, "msmt070", false);
-	CBUS_SLOT(config, INTERPRO_SLOT_TAG ":1", 0, m_bus, cbus_cards, nullptr, false);
+	CBUS_SLOT(config, "slot:0", 0, m_bus, cbus_cards, "msmt070", false);
+	CBUS_SLOT(config, "slot:1", 0, m_bus, cbus_cards, nullptr, false);
 
 	m_softlist->set_filter("2700");
 }
@@ -1157,8 +1531,8 @@ void cbus_sapphire_state::ip2800(machine_config &config)
 	m_kbd_port->set_default_option("lle_en_us");
 	m_mse_port->set_default_option("interpro_mouse");
 
-	CBUS_SLOT(config, INTERPRO_SLOT_TAG ":0", 0, m_bus, cbus_cards, "msmt070", false);
-	CBUS_SLOT(config, INTERPRO_SLOT_TAG ":1", 0, m_bus, cbus_cards, nullptr, false);
+	CBUS_SLOT(config, "slot:0", 0, m_bus, cbus_cards, "msmt070", false);
+	CBUS_SLOT(config, "slot:1", 0, m_bus, cbus_cards, nullptr, false);
 
 	m_softlist->set_filter("2800");
 }
@@ -1168,10 +1542,10 @@ void emerald_state::ip6000(machine_config &config)
 	emerald(config);
 
 	// default is 6040 with EDGE-1 graphics
-	SRX_SLOT(config, INTERPRO_SLOT_TAG ":1", 0, m_bus, srx_cards, nullptr, false);
-	SRX_SLOT(config, INTERPRO_SLOT_TAG ":2", 0, m_bus, srx_cards, nullptr, false);
-	SRX_SLOT(config, INTERPRO_SLOT_TAG ":3", 0, m_bus, srx_cards, nullptr, false);
-	SRX_SLOT(config, INTERPRO_SLOT_TAG ":4", 0, m_bus, srx_cards, "mpcb828", false);
+	SRX_SLOT(config, "slot:1", 0, m_bus, srx_cards, nullptr, false);
+	SRX_SLOT(config, "slot:2", 0, m_bus, srx_cards, nullptr, false);
+	SRX_SLOT(config, "slot:3", 0, m_bus, srx_cards, nullptr, false);
+	SRX_SLOT(config, "slot:4", 0, m_bus, srx_cards, "mpcb828", false);
 
 	m_softlist->set_filter("6000");
 }
@@ -1184,14 +1558,14 @@ void srx_sapphire_state::ip6400(machine_config &config)
 	m_mmu->set_cammu_id(cammu_c4i_device::CID_C4IR0);
 
 	// default is 6450 with GT II graphics
-	SRX_SLOT(config, INTERPRO_SLOT_TAG ":1", 0, m_bus, srx_cards, nullptr, false);
-	SRX_SLOT(config, INTERPRO_SLOT_TAG ":2", 0, m_bus, srx_cards, nullptr, false);
-	SRX_SLOT(config, INTERPRO_SLOT_TAG ":3", 0, m_bus, srx_cards, nullptr, false);
-	SRX_SLOT(config, INTERPRO_SLOT_TAG ":4", 0, m_bus, srx_cards, "mpcbb68", false);
+	SRX_SLOT(config, "slot:1", 0, m_bus, srx_cards, nullptr, false);
+	SRX_SLOT(config, "slot:2", 0, m_bus, srx_cards, nullptr, false);
+	SRX_SLOT(config, "slot:3", 0, m_bus, srx_cards, nullptr, false);
+	SRX_SLOT(config, "slot:4", 0, m_bus, srx_cards, "mpcbb68", false);
 
 	// EDGE-2 graphics (6480)
-	//SRX_SLOT(config, INTERPRO_SLOT_TAG ":3", 0, m_bus, srx_cards, "mpcb030", false);
-	//SRX_SLOT(config, INTERPRO_SLOT_TAG ":4", 0, m_bus, srx_cards, "mpcba63", false);
+	//SRX_SLOT(config, "slot:3", 0, m_bus, srx_cards, "mpcb030", false);
+	//SRX_SLOT(config, "slot:4", 0, m_bus, srx_cards, "mpcba63", false);
 
 	m_softlist->set_filter("6400");
 }
@@ -1205,10 +1579,10 @@ void srx_sapphire_state::ip6700(machine_config &config)
 	m_mmu->set_cammu_id(cammu_c4i_device::CID_C4IR2);
 
 	// default is 6780 with EDGE-2 Plus graphics
-	SRX_SLOT(config, INTERPRO_SLOT_TAG ":1", 0, m_bus, srx_cards, nullptr, false);
-	SRX_SLOT(config, INTERPRO_SLOT_TAG ":2", 0, m_bus, srx_cards, nullptr, false);
-	SRX_SLOT(config, INTERPRO_SLOT_TAG ":3", 0, m_bus, srx_cards, "msmt094", false);
-	SRX_SLOT(config, INTERPRO_SLOT_TAG ":4", 0, m_bus, srx_cards, "mpcb896", false);
+	SRX_SLOT(config, "slot:1", 0, m_bus, srx_cards, nullptr, false);
+	SRX_SLOT(config, "slot:2", 0, m_bus, srx_cards, nullptr, false);
+	SRX_SLOT(config, "slot:3", 0, m_bus, srx_cards, "msmt094", false);
+	SRX_SLOT(config, "slot:4", 0, m_bus, srx_cards, "mpcb896", false);
 
 	m_softlist->set_filter("6700");
 }
@@ -1222,22 +1596,22 @@ void srx_sapphire_state::ip6800(machine_config &config)
 	m_mmu->set_cammu_id(cammu_c4i_device::CID_C4IR2);
 
 	// default is 6880 with EDGE-2 Plus graphics
-	SRX_SLOT(config, INTERPRO_SLOT_TAG ":1", 0, m_bus, srx_cards, nullptr, false);
-	SRX_SLOT(config, INTERPRO_SLOT_TAG ":2", 0, m_bus, srx_cards, nullptr, false);
-	SRX_SLOT(config, INTERPRO_SLOT_TAG ":3", 0, m_bus, srx_cards, "msmt094", false);
-	SRX_SLOT(config, INTERPRO_SLOT_TAG ":4", 0, m_bus, srx_cards, "mpcb896", false);
+	SRX_SLOT(config, "slot:1", 0, m_bus, srx_cards, nullptr, false);
+	SRX_SLOT(config, "slot:2", 0, m_bus, srx_cards, nullptr, false);
+	SRX_SLOT(config, "slot:3", 0, m_bus, srx_cards, "msmt094", false);
+	SRX_SLOT(config, "slot:4", 0, m_bus, srx_cards, "mpcb896", false);
 
 	m_softlist->set_filter("6800");
 }
 
 ROM_START(ip2000)
-	ROM_REGION32_LE(0x80, INTERPRO_NODEID_TAG, 0)
+	ROM_REGION32_LE(0x80, "nodeid", 0)
 	ROM_LOAD32_BYTE("nodeid.bin", 0x0, 0x20, CRC(a38397a6) SHA1(9f45fb932bbe231c95b3d5470dcd1fa1c846486f))
 
-	ROM_REGION32_LE(0x80, INTERPRO_IDPROM_TAG, 0)
+	ROM_REGION32_LE(0x80, "idprom", 0)
 	ROM_LOAD32_BYTE("mpcb962a.bin", 0x0, 0x20, CRC(e391342c) SHA1(02e03aad760b6651b8599c3a41c7c457983ee97d))
 
-	ROM_REGION16_LE(0x40000, INTERPRO_EPROM_TAG, 0)
+	ROM_REGION16_LE(0x40000, "eprom", 0)
 	ROM_SYSTEM_BIOS(0, "ip2000", "InterPro/InterServe 20x0 EPROM")
 	ROMX_LOAD("mprgm530e__26_apr_91k.u171", 0x00001, 0x20000, CRC(e4c470cb) SHA1(ff1917bfa963988d739a9dbf0b8f034fe49f2f8c), ROM_SKIP(1) | ROM_BIOS(0))
 	ROMX_LOAD("mprgm540e__06_may_91k.u172", 0x00000, 0x20000, CRC(03225843) SHA1(03cfcd5b8ae0057240ef808a40108cb5d082eb63), ROM_SKIP(1) | ROM_BIOS(0))
@@ -1245,126 +1619,128 @@ ROM_END
 
 ROM_START(ip2400)
 	// feature[0] & 0x02: C4I cammu if set
-	ROM_REGION32_LE(0x80, INTERPRO_IDPROM_TAG, 0)
+	ROM_REGION32_LE(0x80, "idprom", 0)
 	ROM_LOAD32_BYTE("msmt0470.bin", 0x0, 0x20, CRC(498c80df) SHA1(18a49732ac9d04b20a77747c1b946c2e88abb087))
 
-	ROM_REGION16_LE(0x20000, INTERPRO_EPROM_TAG, 0)
+	ROM_REGION16_LE(0x20000, "eprom", 0)
 	ROM_SYSTEM_BIOS(0, "ip2400", "InterPro/InterServe 24x0 EPROM")
 	ROMX_LOAD("mprgw510b__05_16_92.u35", 0x00000, 0x20000, CRC(3b2c4545) SHA1(4e4c98d1cd1035a04be8527223f44d0b687ec3ef), ROM_BIOS(0))
 
-	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_lsb", 0)
+	ROM_REGION(0x20000, "flash_lsb", 0)
 	ROM_LOAD_OPTIONAL("y225.u76", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
 
-	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_msb", 0)
+	ROM_REGION(0x20000, "flash_msb", 0)
 	ROM_LOAD_OPTIONAL("y226.u67", 0x00000, 0x20000, CRC(54d95730) SHA1(a4e114dee1567d8aa31eed770f7cc366588f395c))
 ROM_END
 
 ROM_START(ip2500)
-	ROM_REGION32_LE(0x80, INTERPRO_IDPROM_TAG, 0)
+	ROM_REGION32_LE(0x80, "idprom", 0)
 	ROM_LOAD32_BYTE("msmt1000.bin", 0x0, 0x20, CRC(548046c0) SHA1(ce7646e868f3aa35642d7f9348f6b9e91693918e))
 
-	ROM_REGION16_LE(0x20000, INTERPRO_EPROM_TAG, 0)
+	ROM_REGION16_LE(0x20000, "eprom", 0)
 	ROM_SYSTEM_BIOS(0, "ip2500", "InterPro/InterServe 25x0 EPROM")
 	ROMX_LOAD("ip2500_eprom.bin", 0x00000, 0x20000, NO_DUMP, ROM_BIOS(0))
 
-	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_lsb", 0)
+	ROM_REGION(0x20000, "flash_lsb", 0)
 	ROM_LOAD_OPTIONAL("y225.u76", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
 
-	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_msb", 0)
+	ROM_REGION(0x20000, "flash_msb", 0)
 	ROM_LOAD_OPTIONAL("y226.u67", 0x00000, 0x20000, CRC(54d95730) SHA1(a4e114dee1567d8aa31eed770f7cc366588f395c))
 ROM_END
 
 ROM_START(ip2700)
 	// feature[0] & 0x04: supports RETRY if clear
-	ROM_REGION32_LE(0x80, INTERPRO_IDPROM_TAG, 0)
+	ROM_REGION32_LE(0x80, "idprom", 0)
 	ROM_LOAD32_BYTE("msmt1280.bin", 0x0, 0x20, CRC(32d833af) SHA1(7225c5f5670fe49d86556a2cb453ae6fe09e3e19))
 
-	ROM_REGION16_LE(0x20000, INTERPRO_EPROM_TAG, 0)
+	ROM_REGION16_LE(0x20000, "eprom", 0)
 	ROM_SYSTEM_BIOS(0, "ip2700", "InterPro/InterServe 27x0 EPROM")
 	ROMX_LOAD("mprgz530a__9405181.u35", 0x00000, 0x20000, CRC(467ce7bd) SHA1(53faee40d5df311f53b24c930e434cbf94a5c4aa), ROM_BIOS(0))
 
-	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_lsb", 0)
+	ROM_REGION(0x20000, "flash_lsb", 0)
 	ROM_LOAD_OPTIONAL("y225.u76", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
 
-	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_msb", 0)
+	ROM_REGION(0x20000, "flash_msb", 0)
 	ROM_LOAD_OPTIONAL("y226.u67", 0x00000, 0x20000, CRC(54d95730) SHA1(a4e114dee1567d8aa31eed770f7cc366588f395c))
 ROM_END
 
 ROM_START(ip2800)
-	ROM_REGION32_LE(0x80, INTERPRO_IDPROM_TAG, 0)
+	ROM_REGION32_LE(0x80, "idprom", 0)
 	ROM_LOAD32_BYTE("msmt1450.bin", 0x0, 0x20, CRC(61c7a305) SHA1(efcd045cbdfda8df44eaad761b0ba99367973cd7))
 
-	ROM_REGION16_LE(0x20000, INTERPRO_EPROM_TAG, 0)
+	ROM_REGION16_LE(0x20000, "eprom", 0)
 	ROM_SYSTEM_BIOS(0, "ip2800", "InterPro/InterServe 28x0 EPROM")
 	ROMX_LOAD("ip2800_eprom.bin", 0x00000, 0x20000, CRC(467ce7bd) SHA1(53faee40d5df311f53b24c930e434cbf94a5c4aa), ROM_BIOS(0))
 
-	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_lsb", 0)
+	ROM_REGION(0x20000, "flash_lsb", 0)
 	ROM_LOAD_OPTIONAL("y225.u76", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
 
-	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_msb", 0)
+	ROM_REGION(0x20000, "flash_msb", 0)
 	ROM_LOAD_OPTIONAL("y226.u67", 0x00000, 0x20000, CRC(54d95730) SHA1(a4e114dee1567d8aa31eed770f7cc366588f395c))
 ROM_END
 
 ROM_START(ip6000)
-	ROM_REGION32_LE(0x80, INTERPRO_NODEID_TAG, 0)
+	ROM_REGION32_LE(0x80, "nodeid", 0)
 	ROM_LOAD32_BYTE("nodeid.bin", 0x0, 0x20, CRC(a38397a6) SHA1(9f45fb932bbe231c95b3d5470dcd1fa1c846486f))
 
 	// feature[0] & 0x01: 1/4 bus clock if clear
 	// feature[0] & 0x02: configurable console port if clear
-	ROM_REGION32_LE(0x80, INTERPRO_IDPROM_TAG, 0)
+	ROM_REGION32_LE(0x80, "idprom", 0)
 	ROM_LOAD32_BYTE("mpcb765b.bin", 0x0, 0x20, CRC(6da05794) SHA1(fef8a9c17491f3d3ceb35c56a628f47d49166b57))
 
-	ROM_REGION16_LE(0x40000, INTERPRO_EPROM_TAG, 0)
+	ROM_REGION16_LE(0x40000, "eprom", 0)
 	ROM_SYSTEM_BIOS(0, "ip6000", "InterPro/InterServe 60x0 EPROM")
 	ROMX_LOAD("mprgg360f__04_may_90v.u336", 0x00001, 0x20000, CRC(9e8b798b) SHA1(54412e26a468e038fb44ffa322ed3ddfae423c17), ROM_SKIP(1) | ROM_BIOS(0))
 	ROMX_LOAD("mprgg350f__04_may_90v.u349", 0x00000, 0x20000, CRC(32ab99fd) SHA1(202a6082bade8a084b8cd25109daff8443f6a5c7), ROM_SKIP(1) | ROM_BIOS(0))
 ROM_END
 
 ROM_START(ip6400)
-	ROM_REGION32_LE(0x80, INTERPRO_IDPROM_TAG, 0)
+	ROM_REGION32_LE(0x80, "idprom", 0)
 	ROM_LOAD32_BYTE("msmt046b.bin", 0x0, 0x20, CRC(3e8ffc77) SHA1(719a3f8b01bb506c9cb876506d63d167550bcd0a))
 
 	// FIXME: use 2400 eprom until we have a 6400 dump
-	ROM_REGION16_LE(0x20000, INTERPRO_EPROM_TAG, 0)
+	ROM_REGION16_LE(0x20000, "eprom", 0)
 	ROM_SYSTEM_BIOS(0, "ip6400", "InterPro/InterServe 64x0 EPROM")
 	ROMX_LOAD("ip6400_eprom.bin", 0x00000, 0x20000, BAD_DUMP CRC(3b2c4545) SHA1(4e4c98d1cd1035a04be8527223f44d0b687ec3ef), ROM_BIOS(0))
 
-	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_lsb", 0)
+	ROM_REGION(0x20000, "flash_lsb", 0)
 	ROM_LOAD_OPTIONAL("flash.lsb", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
 
-	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_msb", 0)
+	ROM_REGION(0x20000, "flash_msb", 0)
 	ROM_LOAD_OPTIONAL("flash.msb", 0x00000, 0x20000, CRC(54d95730) SHA1(a4e114dee1567d8aa31eed770f7cc366588f395c))
 ROM_END
 
 ROM_START(ip6700)
-	ROM_REGION32_LE(0x80, INTERPRO_IDPROM_TAG, 0)
+	ROM_REGION32_LE(0x80, "idprom", 0)
 	ROM_LOAD32_BYTE("msmt127b.bin", 0x0, 0x20, CRC(cc112f65) SHA1(8533a31b4733fd91bb87effcd276fc93f2858629))
 
-	ROM_REGION16_LE(0x20000, INTERPRO_EPROM_TAG, 0)
+	ROM_REGION16_LE(0x20000, "eprom", 0)
 	ROM_SYSTEM_BIOS(0, "ip6700", "InterPro/InterServe 67x0 EPROM")
 	ROMX_LOAD("mprgz530a.u144", 0x00000, 0x20000, CRC(467ce7bd) SHA1(53faee40d5df311f53b24c930e434cbf94a5c4aa), ROM_BIOS(0))
 
-	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_lsb", 0)
+	ROM_REGION(0x20000, "flash_lsb", 0)
 	ROM_LOAD_OPTIONAL("y225.u117", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
 
-	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_msb", 0)
+	ROM_REGION(0x20000, "flash_msb", 0)
 	ROM_LOAD_OPTIONAL("y226.u130", 0x00000, 0x20000, CRC(54d95730) SHA1(a4e114dee1567d8aa31eed770f7cc366588f395c))
 ROM_END
 
 ROM_START(ip6800)
-	ROM_REGION32_LE(0x80, INTERPRO_IDPROM_TAG, 0)
+	ROM_REGION32_LE(0x80, "idprom", 0)
 	ROM_LOAD32_BYTE("msmt127b.bin", 0x0, 0x20, CRC(cc112f65) SHA1(8533a31b4733fd91bb87effcd276fc93f2858629))
 
-	ROM_REGION16_LE(0x20000, INTERPRO_EPROM_TAG, 0)
+	ROM_REGION16_LE(0x20000, "eprom", 0)
 	ROM_SYSTEM_BIOS(0, "ip6800", "InterPro/InterServe 68x0 EPROM")
 	ROMX_LOAD("mprgz530a__9406270.u144", 0x00000, 0x20000, CRC(467ce7bd) SHA1(53faee40d5df311f53b24c930e434cbf94a5c4aa), ROM_BIOS(0))
 
-	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_lsb", 0)
+	ROM_REGION(0x20000, "flash_lsb", 0)
 	ROM_LOAD_OPTIONAL("y225.u117", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
 
-	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_msb", 0)
+	ROM_REGION(0x20000, "flash_msb", 0)
 	ROM_LOAD_OPTIONAL("y226.u130", 0x00000, 0x20000, CRC(54d95730) SHA1(a4e114dee1567d8aa31eed770f7cc366588f395c))
 ROM_END
+
+}
 
 /*    YEAR   NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS                INIT        COMPANY        FULLNAME                    FLAGS */
 COMP( 1990,  ip2000,  0,      0,      ip2000,  0,     turquoise_state,     init_common,"Intergraph",  "InterPro/InterServe 20x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

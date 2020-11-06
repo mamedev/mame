@@ -73,7 +73,6 @@ ToDo:
 #include "machine/6821pia.h"
 #include "machine/timer.h"
 #include "audio/bally.h"
-#include "render.h"
 #include "speaker.h"
 
 //#define VERBOSE 1
@@ -1440,10 +1439,6 @@ void by35_state::machine_start()
 void by35_state::machine_reset()
 {
 	genpin_class::machine_reset();
-
-	render_target *target = machine().render().first_target();
-
-	target->set_view(0);
 
 	m_u10a = 0;
 	m_u10b = 0;

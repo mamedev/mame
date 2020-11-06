@@ -115,8 +115,8 @@ public:
 		: dragon64_state(mconfig, type, tag)
 		, m_crtc(*this, "crtc")
 		, m_palette(*this, "palette")
-		, m_plus_ram(*this, "plus_ram")
-		, m_video_ram(*this, "video_ram")
+		, m_plus_ram(*this, "plus_ram", 0x10000, ENDIANNESS_BIG)
+		, m_video_ram(*this, "video_ram", 0x800, ENDIANNESS_BIG)
 		, m_char_rom(*this, "chargen")
 	{
 	}
@@ -133,8 +133,8 @@ protected:
 private:
 	required_device<hd6845s_device> m_crtc;
 	required_device<palette_device> m_palette;
-	optional_shared_ptr<uint8_t> m_plus_ram;
-	optional_shared_ptr<uint8_t> m_video_ram;
+	memory_share_creator<uint8_t> m_plus_ram;
+	memory_share_creator<uint8_t> m_video_ram;
 	required_memory_region m_char_rom;
 };
 
