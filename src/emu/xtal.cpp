@@ -125,6 +125,7 @@ const double XTAL::known_xtals[] = {
 	  5'911'000, /* 5.911_MHz_XTAL         Philips Videopac Plus G7400 */
 	  5'990'400, /* 5.9904_MHz_XTAL        Luxor ABC 800 keyboard (Keytronic custom part #48-300-008 is equivalent) */
 	  6'000'000, /* 6_MHz_XTAL             American Poker II, Taito SJ System */
+	  6'048'000, /* 6.048_MHz_XTAL         Hektor II */
 	  6'144'000, /* 6.144_MHz_XTAL         Used on Alpha Denshi early 80's games sound board, Casio FP-200 and Namco Universal System 16 */
 	  6'400'000, /* 6.4_MHz_XTAL           Textel Compact */
 	  6'500'000, /* 6.5_MHz_XTAL           Jupiter Ace, Roland QDD interface */

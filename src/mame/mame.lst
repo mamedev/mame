@@ -15943,6 +15943,8 @@ interact                        //
 victor                          //
 
 @source:hektor.cpp
+hektor                          // Hektor
+hektor2                         // Hektor II
 hektor3                         // Hektor III
 
 @source:hexion.cpp
