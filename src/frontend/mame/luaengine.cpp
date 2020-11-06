@@ -1454,37 +1454,14 @@ void lua_engine::initialize()
 			return table;
 		}));
 
-	machine_type.set("slot_options_list", [this](running_machine &r, bool full, std::string delim) {
-			std::string result;
-			if (delim.compare(std::string(""))==0) delim = std::string("\n");
+	machine_type.set("slots", sol::property([this](running_machine &r) {
+			sol::table table = sol().create_table();
 			for (device_slot_interface &slot : slot_interface_iterator(r.root_device()))
 			{
-				if (slot.has_selectable_options())
-				{
-					if (full)
-					{
-						std::string value = machine().options().slot_option(slot.slot_name()).value();
-						if (value.compare(std::string("")) != 0)
-						{
-							result += "-" + std::string(slot.slot_name()) + " " + value + delim;
-						}
-						else
-						{
-							result += "-" + std::string(slot.slot_name()) + " " + "\"\"" + delim;
-						}
-					}
-					else  // not full list, just specified values
-					{
-						std::string specified_value = machine().options().slot_option(slot.slot_name()).specified_value();
-						if (specified_value.compare(std::string("")) != 0)
-						{
-							result += "-" + std::string(slot.slot_name()) + " " + specified_value + delim;
-						}
-					}
-				}
+				table[slot.slot_name()] = &slot;
 			}
-			return result;
-		});
+			return table;
+		}));
 
 	machine_type.set("images", sol::property([this](running_machine &r) {
 			sol::table image_table = sol().create_table();
@@ -1500,6 +1477,19 @@ void lua_engine::initialize()
 			[](running_machine &m) { m.popmessage(); }));
 	machine_type.set("logerror", [](running_machine &m, const char *str) { m.logerror("[luaengine] %s\n", str); } );
 	sol().registry().set_usertype("machine", machine_type);
+
+
+	auto device_slot_interface_type = sol().registry().create_simple_usertype<device_slot_interface>("new", sol::no_constructor);
+	device_slot_interface_type.set("slot_name", &device_slot_interface::slot_name);
+	device_slot_interface_type.set("fixed", &device_slot_interface::fixed);
+	device_slot_interface_type.set("has_selectable_options", &device_slot_interface::has_selectable_options);
+	device_slot_interface_type.set("default_option", &device_slot_interface::default_option);
+	device_slot_interface_type.set("get_current_option", [this](device_slot_interface &slot) {
+			return  machine().options().slot_option(slot.slot_name()).value();
+		});
+	sol().registry().set_usertype("device_slot_interface", device_slot_interface_type);
+
+
 
 
 /*  game_driver library
