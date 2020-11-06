@@ -452,7 +452,6 @@ void ms32_bnstars_state::video_start()
 
 u32 ms32_bnstars_state::screen_update_bnstars_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	printf("start left\n");
 	screen.priority().fill(0, cliprect);
 
 	bitmap.fill(0, cliprect);   /* bg color */
