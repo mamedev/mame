@@ -34,14 +34,13 @@ To Do:
 
 #include "emu.h"
 #include "includes/tetrisp2.h"
-#include "machine/jalcrpt.h"
 #include "screen.h"
 
 
 WRITE_LINE_MEMBER(tetrisp2_state::flipscreen_w)
 {
 	machine().tilemap().set_flip_all(state ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
-	// TODO: sprite device
+	// TODO: sprite device(s)
 	m_rot_ofsx = state ? 0x053f : 0x400;
 	m_rot_ofsy = state ? 0x04df : 0x400;
 }

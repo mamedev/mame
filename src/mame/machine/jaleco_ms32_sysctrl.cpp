@@ -301,8 +301,8 @@ void jaleco_ms32_sysctrl_device::timer_ack_w(u16 data)
 
 void jaleco_ms32_sysctrl_device::sound_reset_w(u16 data)
 {
-	// data shouldn't matter
-	m_sound_reset_cb(1);
+	m_sound_reset_cb(data & 1);
+	logerror("%s: sound_reset_w %02x\n", this->tag(), data);
 }
 
 void jaleco_ms32_sysctrl_device::vblank_ack_w(u16 data)
