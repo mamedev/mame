@@ -120,7 +120,10 @@ public:
 	uint32_t sh4_des_keyl_r();
 	void sh4_des_keyh_w(uint32_t data);     // 14000034
 	uint32_t sh4_des_keyh_r();
-
+	uint64_t shared_6154_sdram_r(offs_t offset);
+	void shared_6154_sdram_w(offs_t offset, uint64_t data, uint64_t mem_mask);
+	uint32_t shared_sh4_sdram_r(offs_t offset);
+	void shared_sh4_sdram_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 	uint64_t i2cmem_dimm_r();
 	void i2cmem_dimm_w(uint64_t data);
 	uint8_t pic_dimm_r(offs_t offset);
@@ -147,9 +150,11 @@ private:
 	required_device<sega_315_6154_device> m_315_6154;
 	required_device<idegdrom_device> m_idegdrom;
 	required_ioport m_debug_dipswitches;
+	optional_region_ptr<uint8_t> picdata;
 
 	const char *image_tag;
-	optional_region_ptr<uint8_t> picdata;
+	address_space *space_sh4;
+	address_space *space_6154;
 
 	uint32_t dimm_cur_address;
 	uint8_t picbus;
