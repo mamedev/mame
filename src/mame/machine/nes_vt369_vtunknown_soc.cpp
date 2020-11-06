@@ -7,6 +7,7 @@
 
 // this has a new RGB555 mode
 DEFINE_DEVICE_TYPE(NES_VT369_SOC, nes_vt369_alt_soc_device, "nes_vt369_soc", "VT369 series System on a Chip")
+DEFINE_DEVICE_TYPE(NES_VT369_SOC_SWAP, nes_vt369_alt_swap_d5_d6_soc_device, "nes_vt369_soc_swap", "VT369 series System on a Chip (with opcode swapping)")
 
 // uncertain
 DEFINE_DEVICE_TYPE(NES_VTUNKNOWN_SOC_CY, nes_vt369_soc_device, "nes_vtunknown_soc_cy", "VTxx series System on a Chip (CY)")
@@ -36,6 +37,11 @@ nes_vt369_alt_soc_device::nes_vt369_alt_soc_device(const machine_config& mconfig
 
 nes_vt369_alt_soc_device::nes_vt369_alt_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
 	nes_vt369_alt_soc_device(mconfig, NES_VT369_SOC, tag, owner, clock)
+{
+}
+
+nes_vt369_alt_swap_d5_d6_soc_device::nes_vt369_alt_swap_d5_d6_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+	nes_vt369_alt_soc_device(mconfig, NES_VT369_SOC_SWAP, tag, owner, clock)
 {
 }
 
@@ -293,6 +299,13 @@ uint8_t nes_vt369_alt_soc_device::vthh_414a_r()
 	return 0x80;
 }
 
+uint8_t nes_vt369_alt_soc_device::extra_rom_r()
+{
+	// this reads from the 'extra ROM' area (serial style protocol) and code is copied on gtct885 to e00 in RAM, jumps to it at EDF9: jsr $0e1c
+	return machine().rand();
+}
+
+
 void nes_vt369_alt_soc_device::nes_vt_hh_map(address_map &map)
 {
 	nes_vt02_vt03_soc_device::nes_vt_map(map);
@@ -301,6 +314,36 @@ void nes_vt369_alt_soc_device::nes_vt_hh_map(address_map &map)
 
 	map(0x414a, 0x414a).r(FUNC(nes_vt369_alt_soc_device::vthh_414a_r));
 	map(0x411d, 0x411d).w(FUNC(nes_vt369_alt_soc_device::vtfp_411d_w));
+
+	map(0x4153, 0x4153).r(FUNC(nes_vt369_alt_soc_device::extra_rom_r)); // extra SPI? / SEEPROM port?
+}
+
+
+void nes_vt369_alt_swap_d5_d6_soc_device::encryption_4169_w(uint8_t data)
+{
+	if (data == 0x01)
+		downcast<n2a03_core_swap_op_d5_d6 &>(*m_maincpu).set_encryption_state(false);
+	else if (data == 0x00)
+		downcast<n2a03_core_swap_op_d5_d6 &>(*m_maincpu).set_encryption_state(true);
+	else
+		logerror("%s: encryption_4169_w %02x\n", machine().describe_context(), data);
+}
+
+void nes_vt369_alt_swap_d5_d6_soc_device::nes_vt_hh_swap_map(address_map &map)
+{
+	nes_vt369_alt_soc_device::nes_vt_hh_map(map);
+
+	map(0x4169, 0x4169).w(FUNC(nes_vt369_alt_swap_d5_d6_soc_device::encryption_4169_w));
+}
+
+
+
+void nes_vt369_alt_swap_d5_d6_soc_device::device_add_mconfig(machine_config& config)
+{
+	nes_vt02_vt03_soc_device::device_add_mconfig(config);
+
+	N2A03_CORE_SWAP_OP_D5_D6(config.replace(), m_maincpu, NTSC_APU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt369_alt_swap_d5_d6_soc_device::nes_vt_hh_swap_map);
 }
 
 /***********************************************************************************************************************************************************/

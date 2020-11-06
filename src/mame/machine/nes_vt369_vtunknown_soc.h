@@ -80,10 +80,23 @@ protected:
 
 	void nes_vt_hh_map(address_map& map);
 
+	uint8_t extra_rom_r();
 	uint8_t vthh_414a_r();
 	void vtfp_411d_w(uint8_t data);
-
 };
+
+class nes_vt369_alt_swap_d5_d6_soc_device : public nes_vt369_alt_soc_device
+{
+public:
+	nes_vt369_alt_swap_d5_d6_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+
+	virtual void device_add_mconfig(machine_config& config) override;
+
+private:
+	void encryption_4169_w(uint8_t data);
+	void nes_vt_hh_swap_map(address_map &map);
+};
+
 
 class nes_vtunknown_soc_dg_device : public nes_vt09_soc_device
 {
@@ -120,6 +133,7 @@ protected:
 DECLARE_DEVICE_TYPE(NES_VTUNKNOWN_SOC_CY, nes_vt369_soc_device)
 DECLARE_DEVICE_TYPE(NES_VTUNKNOWN_SOC_BT, nes_vtunknown_soc_bt_device)
 DECLARE_DEVICE_TYPE(NES_VT369_SOC, nes_vt369_alt_soc_device)
+DECLARE_DEVICE_TYPE(NES_VT369_SOC_SWAP, nes_vt369_alt_swap_d5_d6_soc_device)
 
 DECLARE_DEVICE_TYPE(NES_VTUNKNOWN_SOC_DG, nes_vtunknown_soc_dg_device)
 DECLARE_DEVICE_TYPE(NES_VTUNKNOWN_SOC_FA, nes_vtunknown_soc_fa_device)
