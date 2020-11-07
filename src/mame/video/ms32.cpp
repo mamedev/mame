@@ -112,6 +112,9 @@ VIDEO_START_MEMBER(ms32_state,f1superb)
 /********** PALETTE WRITES **********/
 
 
+// TODO: fix p47aces brightness
+// intro text should actually appear one line at a time instead of fading-in altogether,
+// see https://youtu.be/PQsefFtqAwA
 void ms32_state::update_color(int color)
 {
 	int r,g,b;
@@ -120,18 +123,17 @@ void ms32_state::update_color(int color)
 	   affecting bg & sprites, not fg.
 	   The second brightness control might apply to shadows, see gametngk.
 	 */
-	// TODO : p47aces : brightness are disabled sometimes, see https://youtu.be/PQsefFtqAwA
 	if (~color & 0x4000)
 	{
-		r = ((m_palram[color*2] & 0xff00) >>8 ) * m_brt_r / 0x100;
-		g = ((m_palram[color*2] & 0x00ff) >>0 ) * m_brt_g / 0x100;
-		b = ((m_palram[color*2+1] & 0x00ff) >>0 ) * m_brt_b / 0x100;
+		r = ((m_palram[color*2] & 0xff00) >> 8 ) * m_brt_r / 0x100;
+		g = ((m_palram[color*2] & 0x00ff) >> 0 ) * m_brt_g / 0x100;
+		b = ((m_palram[color*2+1] & 0x00ff) >> 0 ) * m_brt_b / 0x100;
 	}
 	else
 	{
-		r = ((m_palram[color*2] & 0xff00) >>8 );
-		g = ((m_palram[color*2] & 0x00ff) >>0 );
-		b = ((m_palram[color*2+1] & 0x00ff) >>0 );
+		r = ((m_palram[color*2] & 0xff00) >> 8 );
+		g = ((m_palram[color*2] & 0x00ff) >> 0 );
+		b = ((m_palram[color*2+1] & 0x00ff) >> 0 );
 	}
 
 	m_palette->set_pen_color(color,rgb_t(r,g,b));
@@ -144,6 +146,7 @@ void ms32_state::ms32_brightness_w(offs_t offset, u32 data, u32 mem_mask)
 
 	if (m_brt[offset] != oldword)
 	{
+		// TODO: bank "1" is for sprite colors
 		int bank = ((offset & 2) >> 1) * 0x4000;
 		//int i;
 
@@ -343,7 +346,8 @@ u32 ms32_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 	 */
 	int i;
 
-	for (i = 0;i < 0x10000;i++) // colors 0x3000-0x3fff are not used
+	// TODO: move to a cache system
+	for (i = 0; i < 0x10000; i++) // colors 0x3000-0x3fff are not used
 		update_color(i);
 
 	scrollx = m_tx_scroll[0x00/4] + m_tx_scroll[0x08/4] + 0x18;
@@ -417,9 +421,12 @@ u32 ms32_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 	}
 
 	// tile-sprite mixing
-	/* this mixing is nowhere near as accurate, it should be using ALL the data in
-	   the priority ram, probably for per-pixel / pen mixing, or more levels
-	   than are supported here..  I don't know, it will need hw tests I think */
+	// TODO: spaghetti code
+	// TODO: complete guesswork and missing many spots
+	// TODO: move to a reusable function
+	/* it should be using ALL the data in the priority ram, probably for 
+	   per-pixel / pen mixing, or more levels than are supported here..  
+	   I don't know, it will need hw tests I think */
 	{
 		pen_t const *const paldata = m_palette->pens();
 		bitmap.fill(0, cliprect);
@@ -452,7 +459,6 @@ u32 ms32_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 				if (m_priram[(spritepri | 0x0a00 | 0x0100) / 2] & 0x38) primask |= 1 << 6;
 				if (m_priram[(spritepri | 0x0a00 | 0x0000) / 2] & 0x38) primask |= 1 << 7;
 
-				// TODO: spaghetti code ...
 				if (primask == 0x00)
 				{
 					if (src_tilepri==0x00)

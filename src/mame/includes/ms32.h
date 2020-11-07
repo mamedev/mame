@@ -33,7 +33,7 @@ public:
 		m_bg_scroll(*this, "bg_scroll"),
 		m_mahjong_input_select(*this, "mahjong_select"),
 		m_priram(*this, "priram"),
-		m_palram(*this, "palram"),
+		m_palram(*this, "palram", 0x20000, ENDIANNESS_LITTLE),
 		m_rozram(*this, "rozram"),
 		m_lineram(*this, "lineram"),
 		m_sprram(*this, "sprram"),
@@ -95,7 +95,7 @@ private:
 	optional_shared_ptr<u32> m_bg_scroll;
 	optional_shared_ptr<u32> m_mahjong_input_select;
 	optional_shared_ptr<u8> m_priram;
-	optional_shared_ptr<u16> m_palram;
+	memory_share_creator<u16> m_palram;
 	optional_shared_ptr<u16> m_rozram;
 	optional_shared_ptr<u16> m_lineram;
 	optional_shared_ptr<u16> m_sprram;

@@ -657,7 +657,7 @@ void ms32_state::ms32_map(address_map &map)
 //	0xfd410000 ROZ1 palette
 //	0xfd420000 ROZ0 palette?
 //	0xfd430000 ASCII palette
-	map(0xc1400000, 0xc143ffff).rw(FUNC(ms32_state::ms32_palram_r16), FUNC(ms32_state::ms32_palram_w16)).umask32(0x0000ffff).mirror(0x3c1c0000).share("palram");
+	map(0xc1400000, 0xc143ffff).rw(FUNC(ms32_state::ms32_palram_r16), FUNC(ms32_state::ms32_palram_w16)).umask32(0x0000ffff).mirror(0x3c1c0000);
 //  map(0xc1440000, 0xc145ffff) // mirrors of palram, handled above
 
 //	0xfe000000 ROZ1 VRAM (16-bits wide, 0x10000 in size)
