@@ -984,7 +984,7 @@ CONS( 201?, rd5_240,    0,        0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtun
 CONS( 201?, hkb502,   0,      0,  nes_vt369_vtunknown_hh_4mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "HKB-502 268-in-1 (set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 201?, hkb502a,  hkb502, 0,  nes_vt369_vtunknown_hh_4mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "HKB-502 268-in-1 (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
-// uses a LCD with resolution of 160x128 (image scaled to fit)
+// uses a LCD with resolution of 160x128 (image scaled to fit for some games, others run natively at 160x128)
 // contains a protection chip, command 80 XX returns a byte
 CONS( 201?, lxcap,    0,      0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Lexibook", "Cyber Arcade Pocket (JL1895)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
