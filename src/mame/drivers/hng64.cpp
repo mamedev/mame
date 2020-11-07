@@ -6,17 +6,17 @@ Driver by David Haywood, ElSemi, Andrew Gardner and Angelo Salese
 
 
 Notes:
-  * The top board is likely identical for all revisions and all "versions" of the hardware.
+  * The main board is identical for all revisions and all "versions" of the hardware.
     It contains the main MIPS CPU and a secondary communications KL5C80.
 
-  * The bottom board is what changes between hardware "versions".  It has a Toshiba MCU with
-    a protected internal ROM.  This MCU controls (at least) the inputs per game and communicates
+  * The I/O board is what changes between hardware "versions".  It has a Toshiba MCU with a protected
+    internal ROM which has been dumped. This MCU controls (at least) the inputs per game and communicates
     with the main board through dualport RAM.
 
   * I believe that this secondary board is used as a protection device.
     The "board type" code comes from it in dualport RAM, and each game reads its inputs differently through dualport.
-    It's capable of changing the input ports dynamically (maybe explaining Roads Edge's "do not touch" quote below).
-    It probably has a lot to do with the network (Roads Edge network connectors are on this board).
+    It's capable of changing the input ports dynamically.
+    It has nothing to do with the network. The network connector and all network hardware is located on the main board.
 
   * The Toshiba CPU datasheet is here : http://kr.ic-on-line.cn/IOL/viewpdf/TMP87CH40N_1029113.htm
 
@@ -62,180 +62,454 @@ ToDo:
   * Correct cpu speed
   * How to use the FPGA data ('ROM1')
 
-*/
 
-/*
-NeoGeo Hyper 64 (Main Board)
-SNK, 1997
+------------------------------------------------------------------------------
+Hyper NeoGeo 64, SNK 1997-1999
+Hardware info by Guru
 
-This is a 3D system comprising one large PCB with many custom smt components
-on both sides, one interface PCB with JAMMA connector and sound circuitry, and
-one game cartridge. Only the Main PCB and interface PCB are detailed here.
+This is a 3D system comprising....
+- One large PCB with many custom surface-mounted components on both sides.
+- One separate interface PCB with JAMMA and/or several other connectors, I/O microcontroller, dualport RAM, video DAC and sound amp circuitry.
+- One game cartridge inside a metal case.
 
-PCB Layout (Top)
-----------------
+There are only 7 games on this system. In some cases the game name changes depending on the BIOS region.
+The games in order of release are....
+001 Roads Edge / Round Trip
+002 Samurai Shodown 64 / Samurai Spirits 64
+003 Xtreme Rally / Off Beat Racer!
+004 Beast Busters 2nd Nightmare
+005 Samurai Shodown: Warrior's Rage / Samurai Spirits 2: Asura Zanmaden
+006 Fatal Fury: Wild Ambition / Garou Densetsu: Wild Ambition
+007 Buriki One: World Grapple Tournament '99 in Tokyo
+
+When powering a Hyper Neogeo 64 board, all four +5v pins on the JAMMA connector should have +5v going to them and ALL of the grounds should be
+connected, not just a couple. This is due to the main board requiring several amps to operate. Additionally, the power connector on the I/O
+board must be connected to the main board 5-pin connector otherwise the main board will not power up. The I/O board power connector is not
+optional. It is recommended to use a 15-Amp PSU to power the game.
+
+A correctly powered board will display a blue screen with white text as the game boots up.
+However the two Samurai Showdown games show a solid blue screen for a few seconds then a black screen with white text....
+'NOW I/O INITIALIZING SEQUENCE 1'
+and after a few seconds...
+'NOW I/O INITIALIZING SEQUENCE 2'
+
+The main board has one version. Any main board will play any game. The only thing that changes between main boards is the BIOS, either
+Japan, US or Export regions and the BIOS is easily changed by simply reflashing the ROM. There is another BIOS just for Korea which is said
+to only play the Samurai Showdown games. If you have this version and want to play other games, simply reflash the ROM to one of the more
+useful regions. For the three main BIOS dumps (excluding Korea), all of them will run any game with in-game differences like a changed title
+screen and some text shown in either English or a different language. The language can be changed between Japanese and English in the test
+mode but it doesn't change all texts. To have a fully English version of a game use a USA or World region BIOS. All chips on the main board
+are identical regardless of the region. The communication flashROM has been dumped from driving, fighting and gun main boards and was
+identical.
+Several BIOS ROMs were dumped from fighting, driving and the gun boards and matched existing archives.
+There are only 4 known BIOS regions.... Japan, USA, Export and Korea.
+
+
+Main Board PCB Layout (Top)
+---------------------
 
 LVS-MAC SNK 1997.06.02
 |--------------------------------------------------------------|
-|              CONN9                                           |
+|CON4          CON9                           CON1         IC2 |
+|                                               DPRAM1     LED2|
+|   ASIC1        ASIC3       U4   CPU1               U28   LED1|
+|                                                       ROM1   |
 |                                                              |
-|   ASIC1           ASIC3            CPU1                      |
-|                                                              |
-|                                               DPRAM1         |
-|                        OSC2        ASIC5                 ROM1|
-|   FSRAM1               OSC2                                  |
-|   FSRAM2                                             FPGA1   |
-|   FSRAM3                           ASIC10       OSC4         |
+|                  OSC2 OSC1      ASIC5  U24        FPGA1      |
+|   FSRAM1                                                     |
+|   FSRAM2                                                 CON8|
+|   FSRAM3                        ASIC10            OSC4       |
 |                                                              |
 |                                                 CPU3  IC4    |
-|   PSRAM1  ASIC7   ASIC8            DSP1 OSC3    SRAM5        |
-|   PSRAM2                                              FROM1  |
+|   PSRAM1  ASIC7   ASIC8         DSP1            SRAM5     IC3|
+|   PSRAM2                           OSC3               FROM1  |
 |                                                              |
 |                                                              |
-|              CONN10                                          |
+|              CON10                           CON6            |
 |--------------------------------------------------------------|
+Note All ICs shown.
 
-No.  PCB Label  IC Markings               IC Package
-----------------------------------------------------
-01   ASIC1      NEO64-REN                 QFP304
-02   ASIC3      NEO64-GTE                 QFP208
-03   ASIC5      NEO64-SYS                 QFP208
-04   ASIC7      NEO64-BGC                 QFP240
-05   ASIC8      NEO64-SPR                 QFP208
-06   ASIC10     NEO64-SCC                 QFP208
-07   CPU1       NEC D30200GD-100 VR4300   QFP120
-08   CPU3       KL5C80A12CFP              QFP80
-09   DPRAM1*    IDT7133 LA35J             PLCC68
-10   DSP1       L7A1045 L6028 DSP-A       QFP120
-11   FPGA1      ALTERA EPF10K10QC208-4    QFP208
-12   FROM1      MBM29F400B-12             TSOP48 (archived as FROM1.BIN)
-13   FSRAM1     TC55V1664AJ-15            SOJ44
-14   FSRAM2     TC55V1664AJ-15            SOJ44
-15   FSRAM3     TC55V1664AJ-15            SOJ44
-16   IC4        SMC COM20020-5ILJ         PLCC28
-17   OSC1       M33.333 KDS 7M            -
-18   OSC2       M50.113 KDS 7L            -
-19   OSC3       A33.868 KDS 7M            -
-20   OSC4       A40.000 KDS 7L            -
-21   PSRAM1     TC551001BFL-70L           SOP32
-22   PSRAM2     TC551001BFL-70L           SOP32
-23   ROM1       ALTERA EPC1PC8            DIP8   (130817 bytes, archived as ROM1.BIN)
-24   SRAM5      TC55257DFL-85L            SOP28
+No.  PCB Label  IC Markings               IC Package   Use
+----------------------------------------------------------------------------------------------------------------------------------------
+01   ASIC1      NEO64-REN                 QFP304       3D Render Engine
+02   ASIC3      NEO64-GTE                 QFP208       2D Transform Engine
+03   ASIC5      NEO64-SYS                 QFP208       System Bus Controller
+04   ASIC7      NEO64-BGC                 QFP240       Background GFX Controller
+05   ASIC8      NEO64-SPR                 QFP208       Sprite Generator
+06   ASIC10     NEO64-SCC                 QFP208       Scroll Character Controller
+07   CPU1       NEC D30200GD-100 VR4300   QFP120       NEC VR4300 CPU; Clock Input 33.333MHz on pin 16. DivMode0=1, DivMode1=1; MasterClock=33.333MHz; PClock (Internal)=99.999MHz (i.e. 100MHz), TClock=33.333MHz
+08   CPU3       KL5C80A12CFP              QFP80        Communication CPU (Z80-based) with on-board peripherals and 512b RAM. Clock input 10.000MHz on pin 24 [40/4]
+09   DPRAM1*    IDT7133 LA35J             PLCC68       IDT7133 Dual-Port RAM
+10   DSP1       L7A1045 L6028 DSP-A       QFP120       L7A1045 DSP-A
+11   FPGA1      ALTERA EPF10K10QC208-4    QFP208       Altera FPGA, programmed as a network controller
+12   FROM1      MBM29F400B-12             TSOP48       Communication program, same on all versions of the main board. Dumped as FROM1.BIN
+13   FSRAM1     TC55V1664AJ-15            SOJ44        Static RAM
+14   FSRAM2     TC55V1664AJ-15            SOJ44        Static RAM
+15   FSRAM3     TC55V1664AJ-15            SOJ44        Static RAM
+16   IC4        SMC COM20020-5ILJ         PLCC28       5Mbps ARCNet Controller
+17   OSC1       M33.333 KDS 7M            7050         33.333MHz Oscillator, connected to the VR4300 CPU and NEO64-GTE
+18   OSC2       M50.113 KDS 7L            7050         50.113MHz Oscillator, connected to NEO64-BGC
+19   OSC3       A33.868 KDS 7M            7050         33.868MHz Oscillator, connected directly to the DSP-A
+20   OSC4       A40.000 KDS 7L            7050         40MHz Oscillator, connected to the Altera FPGA
+21   PSRAM1     TC551001BFL-70L           SOP32        Static RAM
+22   PSRAM2     TC551001BFL-70L           SOP32        Static RAM
+23   ROM1       ALTERA EPC1PC8            DIP8         FPGA Configuration IC. Dumped as ROM1.BIN (130817 bytes)
+24   SRAM5      TC55257DFL-85L            SOP28        Static RAM
+25   U4         LVX245                    TSSOP20      Logic
+26   IC3        75ALS181                  SOIC14       EIA 422/EIA 485 Differential Driver/Receiver
+27   U28        LCX16245                  TSSOP48      Logic
+28   U24        LCX157                    TSSOP16      Logic
+29   IC2        PQ3DF53                   TO-3P        3.3V 5A Regulator
+30   LED1                                              Lights up for 1/2 second at power-on then goes off
+31   LED2                                              Lights up when the power-up communication test passes and stays on
+32   CON9                                              \
+33   CON10                                             / Game cart plugs in here
+34   CON4                                              Power from I/O board plugs in here
+35   CON1                                              Unknown connector (accessible from the top for an option board)
+36   CON6                                              Unknown connector (accessible from the top for an option board)
+37   CON8                                              15 pin JST NH connector for network data (connects to 75ALS181)
 
-    * The IDT 7133 / 7143 lack interrupts and just act as 0x1000 bytes (2x 0x800 16-bit words) of RAM
+   * The IDT 7133 / 7143 lacks interrupts and just acts as 0x1000 bytes (2x 0x800 16-bit words) of RAM
      IDT 7133 - 32K (2K X 16 Bit) MASTER Dual-Port SRAM
      IDT 7143 - 32K (2K X 16 Bit) SLAVE Dual-Port SRAM
 
 
-PCB Layout (Bottom)
+Main Board PCB Layout (Bottom)
+---------------------
 
+LVS-MAC SNK 1997.06.02
 |--------------------------------------------------------------|
-|             CONN10                                           |
 |                                                              |
+|   U5  U6  U7  U8  U9  U10  U11 U12                           |
 |                                                              |
-|   PSRAM4  ASIC9                   SRAM4     CPU2  Y1         |
-|   PSRAM3         SRAM1            SRAM3                      |
-|                  SRAM2                                       |
-|                                                              |
-|   FSRAM6                        DRAM3                        |
-|   FSRAM5                                                     |
+|   PSRAM4  ASIC9            CON2   SRAM4     CPU2  Y1         |
+|   PSRAM3             SRAM1  CON3  SRAM3                      |
+|                      SRAM2                                   |
+|                                 U26         U23              |
+|   FSRAM6                        DRAM3  U21  U22              |
+|   FSRAM5                                       CON5          |
 |   FSRAM4                        DRAM1                        |
-|                   BROM1         DRAM2                        |
-|                                                              |
-|                                                              |
-|   ASIC2           ASIC4         ASIC6                        |
-|                                                              |
-|             CONN9                                            |
+|               U31    BROM1      DRAM2  U20  U27              |
+|                                        U19                   |
+|                                        U17                   |
+|   ASIC2              ASIC4      ASIC6  U16                   |
+|                                        U18                   |
+|                 U3 U2 U1          IC1                        |
 |--------------------------------------------------------------|
+Note All ICs shown.
 
-No.  PCB Label  IC Markings               IC Package
-----------------------------------------------------
-01   ASIC2      NEO64-REN                 QFP304
-02   ASIC4      NEO64-TRI2                QFP208
-03   ASIC6      NEO64-CVR                 QFP120
-04   ASIC9      NEO64-CAL                 QFP208
-05   BROM1      MBM29F400B-12             TSOP48  (archived as BROM1.BIN)
-06   CPU2       NEC D70236AGJ-16 V53A     QFP120
-07   DRAM1      HY51V18164BJC-60          SOJ42
-08   DRAM2      HY51V18164BJC-60          SOJ42
-09   DRAM3      HY51V18164BJC-60          SOJ42
-10   FSRAM4     TC55V1664AJ-15            SOJ44
-11   FSRAM5     TC55V1664AJ-15            SOJ44
-12   FSRAM6     TC55V1664AJ-15            SOJ44
-13   PSRAM3     TC551001BFL-70L           SOP32
-14   PSRAM4     TC551001BFL-70L           SOP32
-15   SRAM1      TC55257DFL-85L            SOP28
-16   SRAM2      TC55257DFL-85L            SOP28
-17   SRAM3      TC551001BFL-70L           SOP32
-18   SRAM4      TC551001BFL-70L           SOP32
-19   Y1         D320L7                    XTAL (32MHz)
+No.  PCB Label  IC Markings               IC Package   Use
+----------------------------------------------------------------------------------------------------------------------------------------
+01   ASIC2      NEO64-REN                 QFP304       3D Render Engine
+02   ASIC4      NEO64-TRI2                QFP208       Triangle Engine
+03   ASIC6      NEO64-CVR                 QFP120       Possible RAM Controller (wired to the CPU)
+04   ASIC9      NEO64-CAL                 QFP208       I/O <-> Main board System Arbitrator (connected to I/O PCB via CON2/CON3)
+05   BROM1      MBM29F400B-12             TSOP48       BIOS, dumped as BROM1.BIN
+06   CPU2       NEC D70236AGJ-16 V53A     QFP120       NEC V53A CPU (code compatible with V20/V30). Clock input 32MHz. Internal Clock=Input Clock/2 (i.e. 16MHz)
+07   DRAM1      HY51V18164BJC-60          SOJ42        Dynamic RAM
+08   DRAM2      HY51V18164BJC-60          SOJ42        Dynamic RAM
+09   DRAM3      HY51V18164BJC-60          SOJ42        Dynamic RAM
+10   FSRAM4     TC55V1664AJ-15            SOJ44        Static RAM
+11   FSRAM5     TC55V1664AJ-15            SOJ44        Static RAM
+12   FSRAM6     TC55V1664AJ-15            SOJ44        Static RAM
+13   PSRAM3     TC551001BFL-70L           SOP32        Static RAM
+14   PSRAM4     TC551001BFL-70L           SOP32        Static RAM
+15   SRAM1      TC55257DFL-85L            SOP28        Static RAM
+16   SRAM2      TC55257DFL-85L            SOP28        Static RAM
+17   SRAM3      TC551001BFL-70L           SOP32        Static RAM
+18   SRAM4      TC551001BFL-70L           SOP32        Static RAM
+19   Y1         D320L7                    XTAL         32MHz Crystal tied directly to the V53A
+20   U5         LCX16374                  TSSOP48      Logic
+21   U6         LCX16374                  TSSOP48      Logic
+22   U7         LCX16374                  TSSOP48      Logic
+23   U8         LCX16374                  TSSOP48      Logic
+24   U9         LCX16374                  TSSOP48      Logic
+25   U10        LCX16374                  TSSOP48      Logic
+26   U11        LCX16374                  TSSOP48      Logic
+27   U12        LCX16374                  TSSOP48      Logic
+28   U26        S32X245                   TSSOP40      Logic
+29   CON2                                              \
+30   CON3                                              / I/O board plugs in here
+31   IC1        PST573J                   MMP-3A       System Reset, trigger 2.7V
+32   U16        LCX16245                  TSSOP48      Logic
+33   U17        LCX16245                  TSSOP48      Logic
+34   U18        LCX16245                  TSSOP48      Logic
+35   U19        LCX16245                  TSSOP48      Logic
+36   U20        LCX16245                  TSSOP48      Logic
+37   U21        LCX16245                  TSSOP48      Logic
+38   U22        LCX16245                  TSSOP48      Logic
+39   U23        LCX16245                  TSSOP48      Logic
+40   U27        LCX16245                  TSSOP48      Logic
+41   U31        S32X245                   TSSOP40      Logic
+42   U1         S32X245                   TSSOP40      Logic
+43   U2         S32X245                   TSSOP40      Logic
+44   U3         S32X245                   TSSOP40      Logic
+45   CON5       -                                      Unknown connector (accessible from the bottom for an option board)
+
+It seems that although there are extra connectors for option boards, none were actually made or used on any game.
+It is possible the option connectors were for factory testing.
 
 
-INTERFACE PCB
--------------
+I/O Boards
+----------
+
+A special I/O board is required to boot the system which plugs into two custom connectors on the bottom of the main board.
+There are 3 types:
+LVS-IOJ runs the driving games and the Samurai Showdown games.
+LVS-JAM runs all of the fighting games.
+LVS-IGX runs the gun game (Beast Busters 2nd Nightmare).
+Note using an incompatible game and I/O board combination will result in an error at bootup 'MACHINE CODE ERROR'
+For the driving games the network is also checked.
+As a work-around, to satisfy the network check on driving games simply join CON8 pins 1, 3, 5, 6, 7 & 8 then the
+network check will pass and the game will start.
+
+All of the I/O boards look completely different. Two boards are JAMMA. The third type doesn't have an edge connector and instead uses
+several JST connectors. The main control chip on this board is a Toshiba TMP87PH40AN (or TMP87CH40AN) microcontroller with an internal 32kb
+program. The MCU from any I/O board can be swapped across different I/O boards and works fine. Several chips have been documented and were
+all marked the same so there is only one revision of the control chip and it is identical on all versions of the I/O boards. The
+microcontroller has an external serial EEPROM connected to it to configure the control mode 'ID Code' which it puts into the dualport RAM on
+the I/O board and the game software checks it. I (Guru) confirmed that swapping the EEPROM from the LVS-JAM board onto a LVS-IOJ board
+allows the other fighting games to boot and run. An EEPROM from a driving I/O board was re-programmed with the LVS-JAM EEPROM dump and put
+onto the LVS-JAM I/O board and it worked fine. So to summarise, the driving I/O board can be converted to run all of the fighting games
+simply by re-programming the EEPROM using the LVS-JAM dump in MAME.
+
+The first I/O board 'LVS-IOJ' dated 6-6-1997 has a JAMMA edge connector and runs the driving games and the two Samurai Showdown games. Note
+the first game on this system was Roads Edge, so while this has been known as the 1st rev fighting I/O board, it is actually the driving I/O
+board that just happens to play the two Samurai Showdown games. The two custom connectors on the I/O board that plug into the main board do
+not have power running to them. There is a 6 pin JST VH connector on the back of the I/O board directly below the JAMMA power pins which
+must be plugged into the main board. This cable powers the main board so without it the game will not boot up. There is a small volume pot
+accessible on the front and two JST XH connectors for connection of extra buttons and other controls for the driving games. The JST
+connectors join with wires to some JST VL connectors in a bracket mounted to the bottom of the main board metal frame for MVS cabinet
+wiring hookups. The volume pot does nothing when the JAMMA connector is used. The output of the volume pot is connected to one of the JST
+connectors and only affects the volume when set to the MVS 3-Channel mode. Located just above the DPRAM1 chip, there are resistor pads
+labelled 'MONO' and '3ch' with a small 2.2k-ohm surface-mounted resistor (marked 222). The default factory position is '3ch'. When the
+resistor is moved to the mono position, amplified audio comes out through the JAMMA connector. However note the volume pot does not work, it
+is only for the 3-channel MVS audio. To change the JAMMA volume use the volume pot in the cabinet.
+
+LVS-IOJ SNK 1997.6.6
+|---------------------------------------------|
+|     VOL   CON2  J A M M A                   |
+|                                     OPAMP1  |
+| IC2                                         |
+|                                        IC1  |
+| IC3               U2                        |
+|                           IC8               |
+| IC4            IOCTR1          IC7  OPAMP2  |
+|                    8MHz                  IC6|
+|                      U17  U19    CON3       |
+|SW1   DPRAM1   BT1              CON1  IC5    |
+|---------------------------------------------|
+
+No.  PCB Label  IC Markings               IC Package   Use
+----------------------------------------------------------------------------------------------------------------------------------------
+01   DPRAM1     IDT 71321 LA55PF *        QFP64        IDT 71321 High Speed 2k x8-bit Dual-Port Static Ram with Interrupts
+02   IC5        MC44200FT                 QFP44        Triple 8-bit Video DAC
+03   IOCTR1     TOSHIBA TMP87CH40N-4828   SDIP64       I/O Microcontroller with 32kb internal ROM. Clock Input 8.000MHz. Marked 'SNK-IOJ1.00A'. Dumped as TMP87PH40AN.BIN
+04   U17        EPSON RTC62423            SOP24        Real-Time Clock. Clock input 32.768kHz
+05   U19        TC55257DFL-85L            SOP28        Static RAM
+06   IC1        NEC C1891ACY              DIP20-400mil NEC uPC1891 Matrix Surround Sound Processor
+07   BT1        2430                                   3V Coin Battery with Solder Tags
+08   SW1                                               4 position DIPSW; Appears to be unused
+09   U2         BR9020F                   SOP8         2k-bit (128 words x 16-bit) Serial EEPROM. Dumped as LVS-IOJ-BR9020F.U2
+10   OPAMP1     AD8044                    SOIC14       Quad 150MHz Rail to Rail Amplifier
+11   IC3        TA8201                                 Audio Power AMP
+12   IC4        TA8201                                 Audio Power Amp
+13   OPAMP3     uPC844                    SOIC14       Quad Operational Amplifier
+14   OPAMP2     uPC844                    SOIC14       Quad Operational Amplifier
+15   IC2        TA8201                                 16-bit Stereo D/A converter
+16   IC5        BU9480F                   SOP8         16-bit Stereo D/A converter
+17   IC6        78D05                                  5V regulator
+18   IC7        78D05                                  5V regulator
+19   IC8        BU9480F                   SOP8         16-bit Stereo D/A converter
+20   CON1                                              \
+21   CON3                                              / Plugs into main board here
+22   CON2                                              6 pin JST VH connector for power. Tied to the main board CON4
+                                                       Pinout and wiring for CON2 to CON4:
+                                                       CON2 -> CON4 (Main Board)
+                                                       1    ->  1 (pink wire)
+                                                       2    ->  2 (orange wire)
+                                                       3    ->  3 (white wire)
+                                                       4 no connection
+                                                       5 -> tied to 4 pin connector on front bracket (red wire +5V)
+                                                       6 -> tied to 4 pin connector on front bracket (red wire +5V)
+                                                               CON4 pin 4 tied to 4 pin connector on front bracket (black wire GND)
+                                                               CON4 pin 5 tied to 4 pin connector on front bracket (black wire GND)
+Notes:
+       1. The game cart plugs into the main PCB on the TOP side into CONN9 & CONN10
+       2. If the game cart is not plugged in, the hardware shows nothing on screen or shows a black or blue screen filled with vertical lines.
+       3. The IOCTR I/O MCU runs at 8 MHz. 87CH and 87PH types exist but they are functionally equivalent.
+       4. Syncs measured at the JAMMA connector using Samurai Spirits 2 and the 1st I/O board. During gameplay and attract the syncs
+          definitely change. For example the Hyper Neogeo logo that shows at the start causes my WG D9200 monitor to emit a noise when the sync
+          changes and in-game the sync meter can't lock onto the frequency because it is changing. Meaning measuring the syncs is not all that
+          helpful, but anyway....
+          HSync - 16.28kHz
+          VSync - ~60Hz
+
+
+The second I/O board 'LVS-IGX' dated 10-11-1997 does not have a JAMMA edge connector. It has the same 6-pin JST VH power connector on the
+bottom of the board. There are several JST XA connectors for hooking up the controls. There is no audio power AMP or volume pot on the
+board. This board only runs the gun game 'Beast Busters 2nd Nightmare'.
+
+LVS-IGX SNK 1997.11.10
+|---------------------------------------------|
+| CON9  CON2 CON11   CON10     CON4  CON12 IC1|
+|                          IC3 IC4 OPAMP1     |
+|          U3      CON13                      |
+|                                      OPAMP3 |
+|      CON7   CON8  CON5    CON6  CON14       |
+|                              OPAMP2         |
+|    IOCTR1                        IC5 IC6 IC7|
+|       8MHz                       IC2        |
+|                      U21  U19    CON3       |
+|SW1   DPRAM1   BT1              CON1         |
+|---------------------------------------------|
+
+No.  PCB Label  IC Markings               IC Package   Use
+----------------------------------------------------------------------------------------------------------------------------------------
+01   DPRAM1     IDT 71321 LA55PF *        QFP64        IDT 71321 High Speed 2k x8-bit Dual-Port Static Ram with Interrupts
+02   IC2        MC44200FT                 QFP44        Triple 8-bit Video DAC
+03   IOCTR1     TOSHIBA TMP87CH40N-4828   SDIP64       I/O Microcontroller with 32kb internal ROM. Clock Input 8.000MHz. Marked 'SNK-IOJ1.00A'. Dumped as TMP87PH40AN.BIN
+04   U19        EPSON RTC62423            SOP24        Real-Time Clock. Clock input 32.768kHz
+05   U21        W24258S-70LE              SOP28        Static RAM
+06   IC1        NEC C1891ACY              DIP20-400mil NEC uPC1891 Matrix Surround Sound Processor
+07   BT1        2430                                   3V Coin Battery with Solder Tags
+08   SW1                                               4 position DIPSW; Appears to be unused
+09   OPAMP2     AD8044                    SOIC14       Quad 150MHz Rail to Rail Amplifier
+10   OPAMP3     uPC844                    SOIC14       Quad Operational Amplifier
+11   OPAMP1     uPC844                    SOIC14       Quad Operational Amplifier
+12   IC5        BU9480F                   SOP8         16-bit Stereo D/A converter
+13   IC6        BU9480F                   SOP8         16-bit Stereo D/A converter
+14   IC7        BU9480F                   SOP8         16-bit Stereo D/A converter
+15   IC3        78D05                                  5V regulator
+16   IC4        78D05                                  5V regulator
+17   U3         BR9020F                   SOP8         2k-bit (128 words x 16-bit) Serial EEPROM. Dumped as LVS-IGX-BR9020F.U3
+18   CON11                                             6 pin JST XA connector
+19   CON12                                             12 pin JST XA connector
+20   CON4                                              4 pin JST VH connector
+21   CON10                                             13 pin JST XA connector
+22   CON13                                             20 pin JST NH connector
+23   CON7                                              15 pin JST XA connector
+24   CON8                                              4 pin JST XA connector
+25   CON5                                              20 pin JST XA connector
+26   CON6                                              11 pin JST XA connector
+27   CON14                                             5 pin JST XA connector
+28   CON1                                              \
+29   CON3                                              / Plugs into main board here
+30   CON2                                              6 pin JST VH connector for power. Tied to the main board CON4
+                                                       Pinout and wiring for CON2 to CON4:
+                                                       CON2 -> CON4 (Main Board)
+                                                       1    ->  1 (pink wire)
+                                                       2    ->  2 (orange wire)
+                                                       3    ->  3 (white wire)
+                                                       4 no connection
+                                                       5 -> tied to 4 pin connector on front bracket (red wire +5V)
+                                                       6 -> tied to 4 pin connector on front bracket (red wire +5V)
+                                                               CON4 pin 4 tied to 4 pin connector on front bracket (black wire GND)
+                                                               CON4 pin 5 tied to 4 pin connector on front bracket (black wire GND)
+Notes:
+       1. The game cart plugs into the main PCB on the TOP side into CONN9 & CONN10
+       2. If the game cart is not plugged in, the hardware shows nothing on screen or shows a black or blue screen filled with vertical lines.
+       3. The IOCTR I/O MCU runs at 8 MHz. 87CH and 87PH types exist but they are functionally equivalent.
+
+
+The third and final I/O board 'LVS-JAM' dated 1-20-1999 has a JAMMA edge connector. There is a 5 pin JST VH connector on the back of the I/O
+board directly below the JAMMA power pins which must be plugged into the main board. Note it has 5 pins, not 6 pins like the first I/O
+board. This board has several JST XA connectors on the top and front of the board. The JST XA connectors are used when the board is set to
+MVS mode using a switch labelled MVS/JAMMA. In JAMMA mode the JST connectors are not used. Those JST connectors join with wires to a bracket
+mounted to the bottom of the main board metal frame which contains several JST VL connectors. There is a thumb-wheel type potentiometer to
+adjust the volume. There are two toggle switches. One selects between mono/audio or MVS 2-channel audio. The other one selects between JAMMA
+controls and MVS controls. This board can run all of the fighting games.
 
 LVS-JAM SNK 1999.1.20
 |---------------------------------------------|
-|                 J A M M A                   |
+| VOL CON5 CON3    J A M M A            CON9  |
 |                                             |
-|                                             |
-|                                             |
-|     SW3             SW1                     |
-|                                             |
-| IC6                       IOCTR1            |
-|                           BACKUP            |
-|                           BKRAM1            |
-|     SW2   BT1  DPRAM1              IC1      |
+| IC3                                         |
+|                     SW1       U3            |
+|     SW3                                     |
+| IC4                       IOCTR1    OPAMP1  |
+| IC6  OPAMP3               BACKUP            |
+|     IC5                   BKRAM1            |
+| IC2 CON10                     CON4          |
+|     SW2   BT1  DPRAM1       CON2   IC1      |
 |---------------------------------------------|
 
-No.  PCB Label  IC Markings               IC Package
-----------------------------------------------------
-01   DPRAM1     IDT 71321 LA55PF          QFP64 *
-02   IC1        MC44200FT                 QFP44
-03   IOCTR1     TOSHIBA TMP87CH40N-4828   SDIP64
-04   BACKUP     EPSON RTC62423            SOP24
-05   BKRAM1     W24258S-70LE              SOP28
-06   IC6        NEC C1891ACY              DIP20
-07   BT1        3V Coin Battery
-08   SW1        2 position DIPSW  OFF = JAMMA       ON = MVS
-09   SW2        4 position DIPSW
-10   SW3        2 position DIPSW  OFF = MONO/JAMMA  ON = 2CH MVS
-
+No.  PCB Label  IC Markings               IC Package   Use
+----------------------------------------------------------------------------------------------------------------------------------------
+01   DPRAM1     IDT 71321 LA55PF *        QFP64        IDT 71321 High Speed 2k x8-bit Dual-Port Static Ram with Interrupts
+02   IC1        MC44200FT                 QFP44        Triple 8-bit Video DAC
+03   IOCTR1     TOSHIBA TMP87CH40N-4828   SDIP64       I/O Microcontroller with 32kb internal ROM. Clock Input 8.000MHz. Marked 'SNK-IOJ1.00A'. Dumped as TMP87PH40AN.BIN
+04   BACKUP     EPSON RTC62423            SOP24        Real-Time Clock. Clock input 32.768kHz
+05   BKRAM1     W24258S-70LE              SOP28        Static RAM
+06   IC6        NEC C1891ACY              DIP20-400mil NEC uPC1891 Matrix Surround Sound Processor
+07   BT1        2430                                   3V Coin Battery with Solder Tags
+08   SW1                                               2 position DIPSW for controls; OFF = JAMMA, ON = MVS
+09   SW2                                               4 position DIPSW; Appears to be unused
+10   SW3                                               2 position DIPSW for audio output. OFF = MONO/JAMMA, ON = 2CH MVS
+11   OPAMP1     AD8044                    SOIC14       Quad 150MHz Rail to Rail Amplifier
+12   IC3        TA7252                                 Audio Power AMP
+13   IC4        TA7252                                 Audio Power Amp
+14   OPAMP3     uPC844                    SOIC14       Quad Operational Amplifier
+15   OPAMP2     uPC844                    SOIC14       Quad Operational Amplifier
+16   IC2        BU9480F                   SOP8         16-bit Stereo D/A converter
+17   IC5        BU9480F                   SOP8         16-bit Stereo D/A converter
+18   U3         BR9020F                   SOP8         2k-bit (128 words x 16-bit) Serial EEPROM. Dumped as LVS-JAM-BR9020F.U3
+19   CON4                                              \
+20   CON2                                              / Plugs into main board here
+21   CON10                                             8 pin JST XA connector
+22   CON6                                              3 pin JST XA connector
+23   CON7                                              15 pin JST XA connector
+24   CON1                                              12 pin JST XA connector
+25   CON8                                              9 pin JST XA connector
+26   CON5                                              4 pin JST XA connector
+27   CON9                                              2x 10-pin Hirose HIF3BA-20PA-2.54DS(71) IDC flat cable connector
+28   CON3                                              5 pin JST VH connector for power. Tied to the main board CON4
+                                                       Pinout and wiring for CON3 to CON4:
+                                                       CON3 -> CON4 (Main Board)
+                                                       1    ->  1 (red wire)
+                                                       2    ->  2 (red wire)
+                                                       3    ->  3 (white wire)
+                                                       4    ->  4 (black wire)
+                                                       5    ->  5 (black wire)
 Notes:
        1. The game cart plugs into the main PCB on the TOP side into CONN9 & CONN10
-       2. If the game cart is not plugged in, the hardware shows nothing on screen.
-       3. The IOCTR I/O MCU runs at 8 MHz.
+       2. If the game cart is not plugged in, the hardware shows nothing on screen or shows a black or blue screen filled with vertical lines.
+       3. The IOCTR I/O MCU runs at 8 MHz. TMP87CH and TMP87PH types exist but they are functionally equivalent.
 
        *"IDT71321 is function-compatible (but not pin-compatible) with MB8421" ( src\devices\machine\mb8421.cpp )
-        It appears unlikely the interrupt function of the DPRAM is unused unless address pins are all inverted as
-        there aren't any accesses to 7ff / 7fe outside of the RAM testing, commands are put at byte 0 by the MIPS
+        The INTL & INTR pins are not connected to anything on the PCB.
+        There aren't any accesses to 7ff / 7fe outside of the RAM testing, commands are put at byte 0 by the MIPS
 
-Hyper Neo Geo game cartridges
------------------------------
 
-The game carts contains nothing except a huge pile of surface mounted ROMs
-on both sides of the PCB. On a DG1 cart all the roms are 32Mbits, for the
-DG2 cart the SC and SP roms are 64Mbit.
+Hyper Neogeo game cartridges
+----------------------------
+
+The game carts contain a large amount of surface mounted ROMs on both sides of the PCB.
+On a DG1 cart all the roms are 32Mbits, for the DG2 cart the SC and SP roms are 64Mbit.
 The DG1 cart can accept a maximum of 96 ROMs
 The DG2 cart can accept a maximum of 84 ROMs
 
-
-The actual carts are mostly only about 1/3rd to 1/2 populated.
+The actual carts are only about 1/4 to 1/3rd populated.
 Some of the IC locations between DG1 and DG2 are different also. See the source code below
 for the exact number of ROMs used per game and ROM placements.
 
-Games that use the LVS-DG1 cart: Road's Edge, Samurai Shodown 64 / Samurai Spirits 64
+Games that use the LVS-DG1 cart: Road's Edge / Round Trip
+                                 Xtreme Rally / Off Beat Racer!
+                                 Beast Busters 2nd Nightmare
+                                 Samurai Shodown 64 / Samurai Spirits 64
 
-Games that use the LVS-DG2 cart: Fatal Fury: Wild Ambition, Buriki One, SS 64 II
+Games that use the LVS-DG2 cart: Fatal Fury: Wild Ambition
+                                 Buriki One
+                                 Samurai Shodown: Warrior's Rage / Samurai Spirits 2: Asura Zanmaden
 
-There might be Rev.A boards for Buriki and Round Trip, we have Rev. B
+There might be a Rev.A program for Buriki One and Round Trip, we have Rev. B dumps.
 
 pr = program
-sc = scroll characters?
+sc = scroll characters
 sd = sound
 tx = textures
-sp = sprites?
-vt = vertex?
+sp = sprites
+vt = vertex (3D data)
 
 Top
 ---
@@ -263,7 +537,7 @@ LVS-DG1
 |                                                                            |
 |                                                                            |
 |                                                                            |
-|                            PR15A.95   PR13A.93   PR11A.91   PR09A.89       |
+|  PQ3TZ53                   PR15A.95   PR13A.93   PR11A.91   PR09A.89       |
 |                                                                            |
 |                                                                            |
 |                                                                            |
@@ -281,6 +555,8 @@ LVS-DG1
 |                                                                            |
 |                                                                            |
 |----------------------------------------------------------------------------|
+Notes:
+      PQ3TZ53 - 3.3V 0.5A Voltage Regulator
 
 Bottom
 ------
@@ -300,11 +576,11 @@ LVS-DG1
 |                                                                            |
 | SC11A.51  SC12A.52   SP21A.73   SP22A.74   SP23A.75   SP24A.76    SD04A.80 |
 |                                                                            |
-|                                                                            |
+|               LCX138 LCX138 LCX138                                         |
 |                                                                            |
 |                            PR16A.96   PR14A.94   PR12A.92   PR10A.90       |
 |                                                                            |
-|                                                                            |
+| LCX138 LCX138 LCX138 LCX138 LCX138 LCX138                                  |
 |                                                                            |
 | TX04A.4    TX04A.12        VT24A.40   VT23A.39   VT22A.38   PR08A.88       |
 |                                                                            |
@@ -324,7 +600,8 @@ LVS-DG1
 |                         |----------------------|                           |
 |                         |----------------------|                           |
 |----------------------------------------------------------------------------|
-
+Notes:
+      LCX138 - 3.3V Logic. Powered by the PQ3TZ53 on the other side of the PCB.
 
 Top
 ---
@@ -352,7 +629,7 @@ LVS-DG2
 |                                                                            |
 |                                                                            |
 |                                                                            |
-|                            PR15A.95   PR13A.93   PR11A.91   PR09A.89       |
+|  PQ3TZ53                   PR15A.95   PR13A.93   PR11A.91   PR09A.89       |
 |                                                                            |
 |                                                                            |
 |                                                                            |
@@ -370,6 +647,8 @@ LVS-DG2
 |                                                                            |
 |                                                                            |
 |----------------------------------------------------------------------------|
+Notes:
+      PQ3TZ53 - 3.3V 0.5A Voltage Regulator
 
 Bottom
 ------
@@ -389,11 +668,11 @@ LVS-DG2
 |                                                                            |
 | SC07A.102  SC08A.104  SP05A.106  SP06A.110  SP07A.114  SP08A.118  SD04A.80 |
 |                                                                            |
-|                                                                            |
+|               LCX138 LCX138 LCX138                                         |
 |                                                                            |
 |                            PR16A.96   PR14A.94   PR12A.92   PR10A.90       |
 |                                                                            |
-|                                                                            |
+| LCX138 LCX138 LCX138 LCX138 LCX138 LCX138                                  |
 |                                                                            |
 | TX04A.4    TX04A.12        VT24A.40   VT23A.39   VT22A.38   PR08A.88       |
 |                                                                            |
@@ -414,29 +693,13 @@ LVS-DG2
 |                         |----------------------|                           |
 |----------------------------------------------------------------------------|
  Notes:
+      LCX138 - 3.3V Logic. Powered by the PQ3TZ53 on the other side of the PCB.
+
       Not all ROM positions are populated, check the source for exact ROM usage.
       ROMs are mirrored. i.e. TX/PR/SP/SC etc ROMs line up on both sides of the PCB.
       There are 4 copies of each TX ROM on the PCB.
 
-
-----
-
-info from Daemon
-
-There are various types of neogeo64 boards:
-FIGHTING (revision 1 & 2), RACING, SHOOTING, and SAMURAI SHODOWN ONLY (Korean)
-(MACHINE CODE ERROR): Is given when you try to put a "RACING GAME" on a "FIGHTING" board.
-
-FIGHTING boards will ONLY play fighting games.
-
-RACING boards will ONLY play racing games (and you need the extra gimmicks
-to connect analog wheel and pedals, otherwise it gives you yet another
-error).
-
-Shooter boards will only work with Beast Busters 2.
-
-And the Korean board only plays Samurai Shodown games (wont play Buriki One
-or Fatal Fury for example).
+------------------------------------------------------------------------------
 */
 
 

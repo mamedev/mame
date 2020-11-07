@@ -114,4 +114,4 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 199?, tdbingo,  0, kongs470, tdbingo, kongs470_state, empty_init, ROT0, "Konami", "Trio de Bingo", MACHINE_IS_SKELETON )
+GAME( 1995, tdbingo,  0, kongs470, tdbingo, kongs470_state, empty_init, ROT0, "Konami", "Trio de Bingo", MACHINE_IS_SKELETON )
