@@ -120,4 +120,5 @@ ROM_START( iquest )
 ROM_END
 
 //    year, name,        parent,    compat, machine,            input,            class,                  init,       company,    fullname,                         flags
+// it is unknown if the versions of IQuest without 4.0 on the case have different system ROM
 CONS( 200?, iquest,      0,         0,      leapfrog_iquest,    leapfrog_iquest,  leapfrog_iquest_state,  empty_init, "LeapFrog", "IQuest 4.0 (US)",                    MACHINE_IS_SKELETON )
