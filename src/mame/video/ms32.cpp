@@ -695,5 +695,6 @@ WRITE_LINE_MEMBER(ms32_state::flipscreen_w)
 	m_tx_tilemap->set_flip(state ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	m_bg_tilemap->set_flip(state ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	m_bg_tilemap_alt->set_flip(state ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_roz_tilemap->set_flip(state ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	// TODO: sprite device
 }

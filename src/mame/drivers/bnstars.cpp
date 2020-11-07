@@ -162,6 +162,7 @@ private:
 	void ms32_roz0_ram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void ms32_roz1_ram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void bnstars1_mahjong_select_w(u32 data);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_dual_w);
 	TILE_GET_INFO_MEMBER(get_ms32_tx0_tile_info);
 	TILE_GET_INFO_MEMBER(get_ms32_tx1_tile_info);
 	TILE_GET_INFO_MEMBER(get_ms32_bg0_tile_info);
@@ -178,6 +179,16 @@ private:
 };
 
 
+WRITE_LINE_MEMBER(ms32_bnstars_state::flipscreen_dual_w)
+{
+	for (int chip = 0; chip < 2; chip++)
+	{
+		m_ms32_bg_tilemap[chip]->set_flip(state ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+		m_ms32_tx_tilemap[chip]->set_flip(state ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+		m_ms32_roz_tilemap[chip]->set_flip(state ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+		// TODO: sprite device
+	}
+}
 
 TILE_GET_INFO_MEMBER(ms32_bnstars_state::get_ms32_tx0_tile_info)
 {
@@ -727,7 +738,7 @@ void ms32_bnstars_state::bnstars(machine_config &config)
 	m_right_screen->set_palette("palette2");
 
 	JALECO_MS32_SYSCTRL(config, m_sysctrl, XTAL(48'000'000), m_screen);
-	m_sysctrl->flip_screen_cb().set(FUNC(ms32_bnstars_state::flipscreen_w));
+	m_sysctrl->flip_screen_cb().set(FUNC(ms32_bnstars_state::flipscreen_dual_w));
 	m_sysctrl->vblank_cb().set(FUNC(ms32_bnstars_state::vblank_irq_w));
 	m_sysctrl->field_cb().set(FUNC(ms32_bnstars_state::field_irq_w));
 	m_sysctrl->prg_timer_cb().set(FUNC(ms32_bnstars_state::timer_irq_w));
