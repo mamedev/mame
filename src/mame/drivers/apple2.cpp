@@ -158,33 +158,33 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_jp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_dodo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_jp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_dodo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	uint8_t ram_r(offs_t offset);
-	void ram_w(offs_t offset, uint8_t data);
-	uint8_t keyb_data_r();
-	uint8_t keyb_strobe_r();
-	void keyb_strobe_w(uint8_t data);
-	uint8_t cassette_toggle_r();
-	void cassette_toggle_w(uint8_t data);
-	uint8_t speaker_toggle_r();
-	void speaker_toggle_w(uint8_t data);
-	uint8_t utility_strobe_r();
-	void utility_strobe_w(uint8_t data);
-	uint8_t switches_r(offs_t offset);
-	uint8_t flags_r(offs_t offset);
-	uint8_t controller_strobe_r();
-	void controller_strobe_w(uint8_t data);
-	uint8_t c080_r(offs_t offset);
-	void c080_w(offs_t offset, uint8_t data);
-	uint8_t c100_r(offs_t offset);
-	void c100_w(offs_t offset, uint8_t data);
-	uint8_t c800_r(offs_t offset);
-	void c800_w(offs_t offset, uint8_t data);
-	uint8_t inh_r(offs_t offset);
-	void inh_w(offs_t offset, uint8_t data);
+	u8 ram_r(offs_t offset);
+	void ram_w(offs_t offset, u8 data);
+	u8 keyb_data_r();
+	u8 keyb_strobe_r();
+	void keyb_strobe_w(u8 data);
+	u8 cassette_toggle_r();
+	void cassette_toggle_w(u8 data);
+	u8 speaker_toggle_r();
+	void speaker_toggle_w(u8 data);
+	u8 utility_strobe_r();
+	void utility_strobe_w(u8 data);
+	u8 switches_r(offs_t offset);
+	u8 flags_r(offs_t offset);
+	u8 controller_strobe_r();
+	void controller_strobe_w(u8 data);
+	u8 c080_r(offs_t offset);
+	void c080_w(offs_t offset, u8 data);
+	u8 c100_r(offs_t offset);
+	void c100_w(offs_t offset, u8 data);
+	u8 c800_r(offs_t offset);
+	void c800_w(offs_t offset, u8 data);
+	u8 inh_r(offs_t offset);
+	void inh_w(offs_t offset, u8 data);
 	DECLARE_WRITE_LINE_MEMBER(a2bus_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(a2bus_nmi_w);
 	DECLARE_WRITE_LINE_MEMBER(a2bus_inh_w);
@@ -201,23 +201,20 @@ public:
 	void apple2p(machine_config &config);
 	void apple2_map(address_map &map);
 	void inhbank_map(address_map &map);
+
 private:
-	int m_speaker_state;
-	int m_cassette_state;
+	int m_speaker_state, m_cassette_state;
 
-	double m_joystick_x1_time;
-	double m_joystick_y1_time;
-	double m_joystick_x2_time;
-	double m_joystick_y2_time;
+	double m_joystick_x1_time, m_joystick_y1_time, m_joystick_x2_time, m_joystick_y2_time;
 
-	uint16_t m_lastchar, m_strobe;
-	uint8_t m_transchar;
+	u16 m_lastchar, m_strobe;
+	u8 m_transchar;
 	bool m_anykeydown;
 
 	int m_inh_slot;
 	int m_cnxx_slot;
 
-	uint8_t *m_ram_ptr;
+	u8 *m_ram_ptr;
 	int m_ram_size;
 
 	int m_inh_bank;
@@ -226,7 +223,7 @@ private:
 
 	device_a2bus_card_interface *m_slotdevice[8];
 
-	uint8_t read_floatingbus();
+	u8 read_floatingbus();
 
 	offs_t dasm_trampoline(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 };
@@ -405,7 +402,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2_state::apple2_interrupt)
 }
 
 
-uint32_t apple2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 apple2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// always update the flash timer here so it's smooth regardless of mode switches
 	m_video->m_flash = ((machine().time() * 4).seconds() & 1) ? true : false;
@@ -466,7 +463,7 @@ uint32_t apple2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-uint32_t apple2_state::screen_update_jp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 apple2_state::screen_update_jp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// always update the flash timer here so it's smooth regardless of mode switches
 	m_video->m_flash = ((machine().time() * 4).seconds() & 1) ? true : false;
@@ -506,7 +503,7 @@ uint32_t apple2_state::screen_update_jp(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-uint32_t apple2_state::screen_update_dodo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 apple2_state::screen_update_dodo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// always update the flash timer here so it's smooth regardless of mode switches
 	m_video->m_flash = ((machine().time() * 4).seconds() & 1) ? true : false;
@@ -550,75 +547,75 @@ uint32_t apple2_state::screen_update_dodo(screen_device &screen, bitmap_ind16 &b
     I/O
 ***************************************************************************/
 
-uint8_t apple2_state::keyb_data_r()
+u8 apple2_state::keyb_data_r()
 {
 	// keyboard latch
 	return m_transchar | m_strobe;
 }
 
-uint8_t apple2_state::keyb_strobe_r()
+u8 apple2_state::keyb_strobe_r()
 {
 	// reads any key down, clears strobe
-	uint8_t rv = m_transchar | (m_anykeydown ? 0x80 : 0x00);
+	u8 rv = m_transchar | (m_anykeydown ? 0x80 : 0x00);
 	if (!machine().side_effects_disabled())
 		m_strobe = 0;
 	return rv;
 }
 
-void apple2_state::keyb_strobe_w(uint8_t data)
+void apple2_state::keyb_strobe_w(u8 data)
 {
 	// clear keyboard latch
 	m_strobe = 0;
 }
 
-uint8_t apple2_state::cassette_toggle_r()
+u8 apple2_state::cassette_toggle_r()
 {
 	if (!machine().side_effects_disabled())
 		cassette_toggle_w(0);
 	return read_floatingbus();
 }
 
-void apple2_state::cassette_toggle_w(uint8_t data)
+void apple2_state::cassette_toggle_w(u8 data)
 {
 	m_cassette_state ^= 1;
 	m_cassette->output(m_cassette_state ? 1.0f : -1.0f);
 }
 
-uint8_t apple2_state::speaker_toggle_r()
+u8 apple2_state::speaker_toggle_r()
 {
 	if (!machine().side_effects_disabled())
 		speaker_toggle_w(0);
 	return read_floatingbus();
 }
 
-void apple2_state::speaker_toggle_w(uint8_t data)
+void apple2_state::speaker_toggle_w(u8 data)
 {
 	m_speaker_state ^= 1;
 	m_speaker->level_w(m_speaker_state);
 }
 
-uint8_t apple2_state::utility_strobe_r()
+u8 apple2_state::utility_strobe_r()
 {
 	if (!machine().side_effects_disabled())
 		utility_strobe_w(0);
 	return read_floatingbus();
 }
 
-void apple2_state::utility_strobe_w(uint8_t data)
+void apple2_state::utility_strobe_w(u8 data)
 {
 	// low pulse on pin 5 of game I/O connector
 	m_gameio->strobe_w(0);
 	m_gameio->strobe_w(1);
 }
 
-uint8_t apple2_state::switches_r(offs_t offset)
+u8 apple2_state::switches_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 		m_softlatch->write_bit((offset & 0x0e) >> 1, offset & 0x01);
 	return read_floatingbus();
 }
 
-uint8_t apple2_state::flags_r(offs_t offset)
+u8 apple2_state::flags_r(offs_t offset)
 {
 	u8 uFloatingBus7 = read_floatingbus() & 0x7f;
 
@@ -659,14 +656,14 @@ uint8_t apple2_state::flags_r(offs_t offset)
 	return 0;
 }
 
-uint8_t apple2_state::controller_strobe_r()
+u8 apple2_state::controller_strobe_r()
 {
 	if (!machine().side_effects_disabled())
 		controller_strobe_w(0);
 	return read_floatingbus();
 }
 
-void apple2_state::controller_strobe_w(uint8_t data)
+void apple2_state::controller_strobe_w(u8 data)
 {
 	m_joystick_x1_time = machine().time().as_double() + m_x_calibration * m_gameio->pdl0_r();
 	m_joystick_y1_time = machine().time().as_double() + m_y_calibration * m_gameio->pdl1_r();
@@ -674,7 +671,7 @@ void apple2_state::controller_strobe_w(uint8_t data)
 	m_joystick_y2_time = machine().time().as_double() + m_y_calibration * m_gameio->pdl3_r();
 }
 
-uint8_t apple2_state::c080_r(offs_t offset)
+u8 apple2_state::c080_r(offs_t offset)
 {
 	if(!machine().side_effects_disabled())
 	{
@@ -692,7 +689,7 @@ uint8_t apple2_state::c080_r(offs_t offset)
 	return read_floatingbus();
 }
 
-void apple2_state::c080_w(offs_t offset, uint8_t data)
+void apple2_state::c080_w(offs_t offset, u8 data)
 {
 	int slot;
 
@@ -705,7 +702,7 @@ void apple2_state::c080_w(offs_t offset, uint8_t data)
 	}
 }
 
-uint8_t apple2_state::c100_r(offs_t offset)
+u8 apple2_state::c100_r(offs_t offset)
 {
 	int slotnum;
 
@@ -724,7 +721,7 @@ uint8_t apple2_state::c100_r(offs_t offset)
 	return read_floatingbus();
 }
 
-void apple2_state::c100_w(offs_t offset, uint8_t data)
+void apple2_state::c100_w(offs_t offset, u8 data)
 {
 	int slotnum;
 
@@ -741,11 +738,11 @@ void apple2_state::c100_w(offs_t offset, uint8_t data)
 	}
 }
 
-uint8_t apple2_state::c800_r(offs_t offset)
+u8 apple2_state::c800_r(offs_t offset)
 {
 	if (offset == 0x7ff)
 	{
-		uint8_t rv = 0xff;
+		u8 rv = 0xff;
 
 		if ((m_cnxx_slot != -1) && (m_slotdevice[m_cnxx_slot] != nullptr))
 		{
@@ -768,7 +765,7 @@ uint8_t apple2_state::c800_r(offs_t offset)
 	return read_floatingbus();
 }
 
-void apple2_state::c800_w(offs_t offset, uint8_t data)
+void apple2_state::c800_w(offs_t offset, u8 data)
 {
 	if ((m_cnxx_slot != -1) && (m_slotdevice[m_cnxx_slot] != nullptr))
 	{
@@ -786,7 +783,7 @@ void apple2_state::c800_w(offs_t offset, uint8_t data)
 	}
 }
 
-uint8_t apple2_state::inh_r(offs_t offset)
+u8 apple2_state::inh_r(offs_t offset)
 {
 	if (m_inh_slot != -1)
 	{
@@ -797,7 +794,7 @@ uint8_t apple2_state::inh_r(offs_t offset)
 	return read_floatingbus();
 }
 
-void apple2_state::inh_w(offs_t offset, uint8_t data)
+void apple2_state::inh_w(offs_t offset, u8 data)
 {
 	if ((m_inh_slot != -1) && (m_slotdevice[m_inh_slot] != nullptr))
 	{
@@ -806,7 +803,7 @@ void apple2_state::inh_w(offs_t offset, uint8_t data)
 }
 
 // floating bus code from old machine/apple2: now works reasonably well with French Touch and Deater "vapor lock" stuff
-uint8_t apple2_state::read_floatingbus()
+u8 apple2_state::read_floatingbus()
 {
 	enum
 	{
@@ -934,7 +931,7 @@ uint8_t apple2_state::read_floatingbus()
     ADDRESS MAP
 ***************************************************************************/
 
-uint8_t apple2_state::ram_r(offs_t offset)
+u8 apple2_state::ram_r(offs_t offset)
 {
 	if (offset < m_ram_size)
 	{
@@ -944,7 +941,7 @@ uint8_t apple2_state::ram_r(offs_t offset)
 	return 0xff;
 }
 
-void apple2_state::ram_w(offs_t offset, uint8_t data)
+void apple2_state::ram_w(offs_t offset, u8 data)
 {
 	if (offset < m_ram_size)
 	{
@@ -1000,7 +997,7 @@ READ_LINE_MEMBER(apple2_state::ay3600_control_r)
 	return CLEAR_LINE;
 }
 
-static const uint8_t a2_key_remap[0x32][4] =
+static const u8 a2_key_remap[0x32][4] =
 {
 /*    norm shft ctrl both */
 	{ 0x33,0x23,0x33,0x23 },    /* 3 #     00     */
