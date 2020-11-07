@@ -149,7 +149,7 @@ void zeropnt_state::zeropnt_map(address_map &map)
 	map(0x80018a, 0x80018a).w("ymsnd", FUNC(ym3812_device::write_port_w));
 	map(0x80018c, 0x80018c).rw("ymsnd", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
 	map(0x80018e, 0x80018e).w(FUNC(zeropnt_state::zeropnt_okibank_leds_w));   //
-	map(0x8001e0, 0x8001e1).writeonly();   // ? IRQ Ack
+	map(0x8001e0, 0x8001e1).nopw();   // ? IRQ Ack
 	map(0x904000, 0x90ffff).rw(FUNC(zeropnt_state::vram_r), FUNC(zeropnt_state::vram_w)).share("vram");     // Layers 1, 2, 0
 	map(0x920000, 0x923fff).ram(); // ? 0
 	map(0x930000, 0x9307ff).rw(FUNC(zeropnt_state::spriteram_r), FUNC(zeropnt_state::spriteram_w)).share("spriteram");   // Sprites

@@ -881,7 +881,8 @@ void pipedrm_state::init_pipedrm()
 {
 	const memory_share *share = memshare("palette");
 	/* sprite RAM lives at the end of palette RAM */
-	m_spriteram.set_target((uint8_t*)share->ptr() + 0xc00, 0x400);
+	m_spriteram = (uint8_t*)share->ptr() + 0xc00;
+	m_spriteram_size = 0x400;
 	m_maincpu->space(AS_PROGRAM).install_ram(0xcc00, 0xcfff, m_spriteram);
 }
 

@@ -177,8 +177,8 @@ void diverboy_state::diverboy_map(address_map &map)
 	map(0x180008, 0x180009).portr("COINS");
 //  map(0x18000a, 0x18000b).nopr();
 //  map(0x18000c, 0x18000d).nopw();
-	map(0x320000, 0x3207ff).writeonly(); /* ?? */
-	map(0x322000, 0x3227ff).writeonly(); /* ?? */
+	map(0x320000, 0x3207ff).nopw(); /* ?? */
+	map(0x322000, 0x3227ff).nopw(); /* ?? */
 //  map(0x340000, 0x340001).nopw();
 //  map(0x340002, 0x340003).nopw();
 }

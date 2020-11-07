@@ -82,6 +82,7 @@ public:
 		, m_videoram(*this, "videoram")
 		, m_decrypted_opcodes(*this, "decrypted_opcodes")
 		, m_lamps(*this, "lamp%u", 0U)
+		, m_bank1(*this, "bank1")
 	{ }
 
 	/* video extension callbacks */
@@ -437,6 +438,8 @@ protected:
 	required_shared_ptr<uint8_t> m_videoram;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	output_finder<2> m_lamps;
+
+	memory_bank_creator m_bank1;
 
 	int m_bullets_base;
 	int m_sprites_base;

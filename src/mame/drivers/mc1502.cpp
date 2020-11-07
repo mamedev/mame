@@ -177,8 +177,7 @@ void mc1502_state::init_mc1502()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
-	program.install_readwrite_bank(0, m_ram->size() - 1, "bank10");
-	membank("bank10")->set_base(m_ram->pointer());
+	program.install_ram(0, m_ram->size() - 1, m_ram->pointer());
 }
 
 MACHINE_START_MEMBER(mc1502_state, mc1502)

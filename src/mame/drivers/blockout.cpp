@@ -107,7 +107,7 @@ void blockout_state::main_map(address_map &map)
 	map(0x100012, 0x100013).w(FUNC(blockout_state::blockout_irq5_ack_w));
 	map(0x100015, 0x100015).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x100016, 0x100017).nopw();    /* don't know, maybe reset sound CPU */
-	map(0x180000, 0x1bffff).rw(FUNC(blockout_state::videoram_r), FUNC(blockout_state::videoram_w)).share("videoram");
+	map(0x180000, 0x1bffff).rw(FUNC(blockout_state::videoram_r), FUNC(blockout_state::videoram_w));
 	map(0x1d4000, 0x1dffff).ram(); /* work RAM */
 	map(0x1f4000, 0x1fffff).ram(); /* work RAM */
 	map(0x200000, 0x207fff).ram().share("frontvideoram");
@@ -128,7 +128,7 @@ void blockout_state::agress_map(address_map &map)
 	map(0x100012, 0x100013).w(FUNC(blockout_state::blockout_irq5_ack_w));
 	map(0x100015, 0x100015).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x100016, 0x100017).nopw();    /* don't know, maybe reset sound CPU */
-	map(0x180000, 0x1bffff).rw(FUNC(blockout_state::videoram_r), FUNC(blockout_state::videoram_w)).share("videoram");
+	map(0x180000, 0x1bffff).rw(FUNC(blockout_state::videoram_r), FUNC(blockout_state::videoram_w));
 	map(0x1d4000, 0x1dffff).ram(); /* work RAM */
 	map(0x1f4000, 0x1fffff).ram(); /* work RAM */
 	map(0x200000, 0x207fff).ram().share("frontvideoram");

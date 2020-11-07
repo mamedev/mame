@@ -50,8 +50,8 @@ void asc88_device::device_start()
 void asc88_device::device_reset()
 {
 	const offs_t baseaddr = 0xc0000 | (u32(m_baseaddr->read()) << 14);
-	m_isa->install_rom(this, baseaddr, baseaddr | 0x37ff, "asc88", "bios");
-	m_isa->install_bank(baseaddr | 0x3800, baseaddr | 0x3fef, "ascram", m_ram.get());
+	m_isa->install_rom(this, baseaddr, baseaddr | 0x37ff, "bios");
+	m_isa->install_bank(baseaddr | 0x3800, baseaddr | 0x3fef, m_ram.get());
 	m_isa->install_memory(baseaddr | 0x3ff0, baseaddr | 0x3ff7,
 			read8sm_delegate(*m_scsic, FUNC(ncr5380n_device::read)),
 			write8sm_delegate(*m_scsic, FUNC(ncr5380n_device::write)));

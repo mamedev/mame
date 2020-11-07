@@ -72,7 +72,7 @@ void isa16_svga_tgui9680_device::device_start()
 {
 	set_isa_device();
 
-	m_isa->install_rom(this, 0xc0000, 0xc7fff, "tgui9680", "tgui9680");
+	m_isa->install_rom(this, 0xc0000, 0xc7fff, "tgui9680");
 
 	m_isa->install_device(0x3b0, 0x3bf, read8sm_delegate(*m_vga, FUNC(trident_vga_device::port_03b0_r)), write8sm_delegate(*m_vga, FUNC(trident_vga_device::port_03b0_w)));
 	m_isa->install_device(0x3c0, 0x3cf, read8sm_delegate(*m_vga, FUNC(trident_vga_device::port_03c0_r)), write8sm_delegate(*m_vga, FUNC(trident_vga_device::port_03c0_w)));

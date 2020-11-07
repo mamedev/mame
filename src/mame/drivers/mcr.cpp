@@ -715,6 +715,24 @@ void mcr_state::cpu_90009_portmap(address_map &map)
 	map(0xf0, 0xf3).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 }
 
+void mcr_state::cpu_90009_dp_map(address_map &map)
+{
+	cpu_90009_map(map);
+	map(0x8000, 0x81ff).ram(); 	// meter ram, is it battery backed?
+}
+
+void mcr_state::cpu_90009_dp_portmap(address_map &map)
+{
+	cpu_90009_portmap(map);
+	map(0x24, 0x24).portr("P24");
+	map(0x28, 0x28).portr("P28");
+	map(0x2c, 0x2c).portr("P2C");
+
+	map(0x2c, 0x2c).w(FUNC(mcr_dpoker_state::lamps1_w));
+	map(0x30, 0x30).w(FUNC(mcr_dpoker_state::lamps2_w));
+	map(0x34, 0x34).w(FUNC(mcr_dpoker_state::output_w));
+	map(0x3f, 0x3f).w(FUNC(mcr_dpoker_state::meters_w));
+}
 
 
 /*************************************
@@ -1794,6 +1812,9 @@ void mcr_state::mcr_90009(machine_config &config)
 void mcr_dpoker_state::mcr_90009_dp(machine_config &config)
 {
 	mcr_90009(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mcr_state::cpu_90009_dp_map);
+	m_maincpu->set_addrmap(AS_IO, &mcr_state::cpu_90009_dp_portmap);
 
 	/* basic machine hardware */
 	TIMER(config, "coinin").configure_generic(FUNC(mcr_dpoker_state::coin_in_callback));
@@ -2901,7 +2922,7 @@ void mcr_dpoker_state::init_dpoker()
 	m_ssio->set_custom_input(0, 0x8e, *this, FUNC(mcr_dpoker_state::ip0_r));
 
 	// meter ram, is it battery backed?
-	m_maincpu->space(AS_PROGRAM).install_ram(0x8000, 0x81ff);
+	m_maincpu->space(AS_PROGRAM).install_ram(0x8000, 0x81ff, m_meter_ram);
 
 	// extra I/O
 	m_maincpu->space(AS_IO).install_read_port(0x24, 0x24, "P24");

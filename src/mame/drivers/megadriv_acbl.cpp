@@ -1042,11 +1042,8 @@ void md_boot_state::init_mk3mdb()
 void md_boot_state::init_ssf2mdb()
 {
 	m_maincpu->space(AS_PROGRAM).nop_write(0xA130F0, 0xA130FF); // custom banking is disabled (!)
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0x400000, 0x5fffff, "bank5");
+	m_maincpu->space(AS_PROGRAM).install_rom(0x400000, 0x5fffff, memregion( "maincpu" )->base() + 0x400000);
 	m_maincpu->space(AS_PROGRAM).unmap_write(0x400000, 0x5fffff);
-
-	membank("bank5")->set_base(memregion( "maincpu" )->base() + 0x400000 );
-
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770070, 0x770075, read16sm_delegate(*this, FUNC(md_boot_state::dsw_r)));
 
 	init_megadrij();

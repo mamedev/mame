@@ -29,14 +29,14 @@ public:
 		m_tx_scroll(*this, "tx_scroll"),
 		m_bg_scroll(*this, "bg_scroll"),
 		m_mahjong_input_select(*this, "mahjong_select"),
-		m_priram(*this, "priram", 32),
-		m_palram(*this, "palram", 32),
-		m_rozram(*this, "rozram", 32),
-		m_lineram(*this, "lineram", 32),
-		m_sprram(*this, "sprram", 32),
-		m_txram(*this, "txram", 32),
-		m_bgram(*this, "bgram", 32),
-		m_f1superb_extraram(*this, "f1sb_extraram", 32),
+		m_priram(*this, "priram"),
+		m_palram(*this, "palram"),
+		m_rozram(*this, "rozram"),
+		m_lineram(*this, "lineram"),
+		m_sprram(*this, "sprram"),
+		m_txram(*this, "txram"),
+		m_bgram(*this, "bgram"),
+		m_f1superb_extraram(*this, "f1sb_extraram"),
 		m_z80bank(*this, "z80bank%u", 1)
 	{ }
 

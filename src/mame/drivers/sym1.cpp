@@ -261,22 +261,22 @@ void sym1_state::via3_a_w(uint8_t data)
 	if ((m_wp->read() & 0x01) && !(data & 0x01)) {
 		cpu0space.nop_write(0xa600, 0xa67f);
 	} else {
-		cpu0space.install_write_bank(0xa600, 0xa67f, "bank5");
+		cpu0space.install_write_bank(0xa600, 0xa67f, membank("bank5"));
 	}
 	if ((m_wp->read() & 0x02) && !(data & 0x02)) {
 		cpu0space.nop_write(0x0400, 0x07ff);
 	} else {
-		cpu0space.install_write_bank(0x0400, 0x07ff, "bank2");
+		cpu0space.install_write_bank(0x0400, 0x07ff, membank("bank2"));
 	}
 	if ((m_wp->read() & 0x04) && !(data & 0x04)) {
 		cpu0space.nop_write(0x0800, 0x0bff);
 	} else {
-		cpu0space.install_write_bank(0x0800, 0x0bff, "bank3");
+		cpu0space.install_write_bank(0x0800, 0x0bff, membank("bank3"));
 	}
 	if ((m_wp->read() & 0x08) && !(data & 0x08)) {
 		cpu0space.nop_write(0x0c00, 0x0fff);
 	} else {
-		cpu0space.install_write_bank(0x0c00, 0x0fff, "bank4");
+		cpu0space.install_write_bank(0x0c00, 0x0fff, membank("bank4"));
 	}
 }
 
@@ -296,9 +296,8 @@ void sym1_state::machine_reset()
 {
 	// make 0xf800 to 0xffff point to the last half of the monitor ROM
 	// so that the CPU can find its reset vectors
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0xf800, 0xffff, "bank1");
+	m_maincpu->space(AS_PROGRAM).install_rom(0xf800, 0xffff, m_monitor + 0x800);
 	m_maincpu->space(AS_PROGRAM).nop_write(0xf800, 0xffff);
-	membank("bank1")->set_base(m_monitor + 0x800);
 	m_maincpu->reset();
 }
 

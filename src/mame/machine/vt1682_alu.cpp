@@ -283,8 +283,7 @@ void vrt_vt1682_alu_device::alu_oprand_6_mult_w(uint8_t data)
 	m_alu_out[1] = (result >> 8) & 0xff;
 	m_alu_out[2] = (result >> 16) & 0xff;
 	m_alu_out[3] = (result >> 24) & 0xff;
-
-	// oprands 5/6 cleared?
+	// 4/5 untouched? or set to 0?
 }
 
 
@@ -327,7 +326,7 @@ void vrt_vt1682_alu_device::alu_oprand_6_div_w(uint8_t data)
 	m_alu_oprand_div[1] = data;
 
 	uint32_t param1 = (m_alu_oprand[3] << 24) | (m_alu_oprand[2] << 16) | (m_alu_oprand[1] << 8) | m_alu_oprand[0];
-	// sources say the mult registers areu sed here, but that makes little sense?
+	// sources say the mult registers are used here, but that makes little sense?
 	uint32_t param2 = (m_alu_oprand_div[1] << 8) | m_alu_oprand_div[0];
 
 	if (param2 != 0)
@@ -335,15 +334,14 @@ void vrt_vt1682_alu_device::alu_oprand_6_div_w(uint8_t data)
 		//if (!m_is_sound_alu) popmessage("------------------------------------------ DIVISION REQUESTED ------------------------------------\n");
 
 		uint32_t result = param1 / param2;
+		uint32_t remainder = param1 % param2;
 
 		m_alu_out[0] = result & 0xff;
 		m_alu_out[1] = (result >> 8) & 0xff;
 		m_alu_out[2] = (result >> 16) & 0xff;
 		m_alu_out[3] = (result >> 24) & 0xff;
 
-		// should be the remainder?
-		m_alu_out[4] = 0x00;// machine().rand();
-		m_alu_out[5] = 0x00;// machine().rand();
-
+		m_alu_out[4] = remainder & 0xff;
+		m_alu_out[5] = (remainder >> 8) & 0xff;
 	}
 }

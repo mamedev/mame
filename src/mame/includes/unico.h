@@ -21,9 +21,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_oki(*this, "oki"),
 		m_leds(*this, "led%u", 0U),
-		m_vram(*this, "vram", 0),
-		m_scroll(*this, "scroll", 0),
-		m_spriteram(*this, "spriteram", 0)
+		m_vram(*this, "vram"),
+		m_scroll(*this, "scroll"),
+		m_spriteram(*this, "spriteram")
 	{ }
 
 	void burglarx(machine_config &config);

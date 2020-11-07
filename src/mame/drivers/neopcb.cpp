@@ -19,6 +19,8 @@ public:
 		, m_cmc_prot(*this, "cmc50")
 		, m_pcm2_prot(*this, "pcm2")
 		, m_pvc_prot(*this, "pvc")
+		, m_cpu_bank(*this, "cpu_bank")
+		, m_bios_bank(*this, "bios_bank")
 	{
 	}
 
@@ -52,6 +54,8 @@ private:
 	required_device<cmc_prot_device> m_cmc_prot;
 	required_device<pcm2_prot_device> m_pcm2_prot;
 	required_device<pvc_prot_device> m_pvc_prot;
+	memory_bank_creator m_cpu_bank;
+	memory_bank_creator m_bios_bank;
 };
 
 
@@ -66,7 +70,7 @@ void neopcb_state::device_post_load()
 {
 	ngarcade_base_state::device_post_load();
 
-	membank("cpu_bank")->set_base(m_region_maincpu->base() + m_bank_base);
+	m_cpu_bank->set_base(m_region_maincpu->base() + m_bank_base);
 }
 
 void neopcb_state::neopcb(machine_config &config)
@@ -86,7 +90,7 @@ void neopcb_state::neopcb(machine_config &config)
 
 INPUT_CHANGED_MEMBER(neopcb_state::select_bios)
 {
-	membank("bios_bank")->set_entry(newval ? 0 : 1);
+	m_bios_bank->set_entry(newval ? 0 : 1);
 }
 
 static INPUT_PORTS_START( dualbios )
@@ -457,7 +461,7 @@ void neopcb_state::write_bankpvc(offs_t offset, uint16_t data, uint16_t mem_mask
 	if (offset >= 0xff8)
 	{
 		m_bank_base = m_pvc_prot->get_bank_base();
-		membank("cpu_bank")->set_base(m_region_maincpu->base() + m_bank_base);
+		m_cpu_bank->set_base(m_region_maincpu->base() + m_bank_base);
 	}
 }
 
@@ -465,8 +469,8 @@ void neopcb_state::install_common()
 {
 	// install memory bank
 	m_maincpu->space(AS_PROGRAM).install_rom(0x000080, 0x0fffff, (uint16_t *)m_region_maincpu->base() + 0x80/2);
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0x200000, 0x2fffff, "cpu_bank");
-	membank("cpu_bank")->set_base(m_region_maincpu->base() + 0x100000);
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0x200000, 0x2fffff, m_cpu_bank);
+	m_cpu_bank->set_base(m_region_maincpu->base() + 0x100000);
 
 	// install protection handlers + bankswitch handler
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2fe000, 0x2fffff, read16sm_delegate(*m_pvc_prot, FUNC(pvc_prot_device::protection_r)));
@@ -483,9 +487,9 @@ void neopcb_state::install_common()
 
 void neopcb_state::install_banked_bios()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0xc00000, 0xc1ffff, 0x0e0000, "bios_bank");
-	membank("bios_bank")->configure_entries(0, 2, memregion("mainbios")->base(), 0x20000);
-	membank("bios_bank")->set_entry(1);
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0xc00000, 0xc1ffff, 0x0e0000, m_bios_bank);
+	m_bios_bank->configure_entries(0, 2, memregion("mainbios")->base(), 0x20000);
+	m_bios_bank->set_entry(1);
 
 }
 

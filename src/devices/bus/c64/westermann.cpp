@@ -61,17 +61,17 @@ uint8_t c64_westermann_cartridge_device::c64_cd_r(offs_t offset, uint8_t data, i
 {
 	if (!roml)
 	{
-		data = m_roml[offset & m_roml.mask()];
+		data = m_roml[offset];
 	}
 	else if (!romh)
 	{
-		if (m_romh.bytes())
+		if (m_romh)
 		{
-			data = m_romh[offset & m_romh.mask()];
+			data = m_romh[offset];
 		}
 		else
 		{
-			data = m_roml[offset & m_roml.mask()];
+			data = m_roml[offset];
 		}
 	}
 	else if (!io2)

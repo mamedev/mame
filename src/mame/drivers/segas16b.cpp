@@ -10293,7 +10293,7 @@ void isgsm_state::main_bank_change_w(uint16_t data)
 void isgsm_state::isgsm_map(address_map &map)
 {
 
-	map(0x000000, 0x0fffff).bankr(ISGSM_MAIN_BANK).region("bios", 0); // this area is ALWAYS read-only, even when the game is banked in
+	map(0x000000, 0x0fffff).bankr(ISGSM_MAIN_BANK); // this area is ALWAYS read-only, even when the game is banked in
 	map(0x200000, 0x23ffff).ram(); // used during startup for decompression
 	map(0x3f0000, 0x3fffff).w(FUNC(isgsm_state::rom_5704_bank_w));
 	map(0x400000, 0x40ffff).rw(m_segaic16vid, FUNC(segaic16_video_device::tileram_r), FUNC(segaic16_video_device::tileram_w)).share("tileram");

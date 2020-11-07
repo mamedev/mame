@@ -41,7 +41,7 @@ private:
 	address_space_config m_rom_config;
 	typename memory_access<AddrWidth, DataWidth, AddrShift, Endian>::cache m_rom_cache;
 
-	memory_bank *m_bank;
+	memory_bank_creator m_bank;
 	int m_cur_bank, m_bank_count;
 
 	virtual void interface_pre_start() override;

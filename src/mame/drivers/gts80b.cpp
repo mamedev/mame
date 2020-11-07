@@ -23,6 +23,8 @@
 #include "gts80b.lh"
 
 
+namespace {
+
 class gts80b_state : public genpin_class
 {
 public:
@@ -385,6 +387,9 @@ void gts80b_state::machine_reset()
 {
 	m_in_cmd_mode[0] = false;
 	m_in_cmd_mode[1] = false;
+	m_dispcmd = 0;
+	m_digit[0] = 0;
+	m_digit[1] = 0;
 }
 
 void gts80b_state::init_gts80b()
@@ -1804,6 +1809,9 @@ ROM_START(topsound)
 	ROM_LOAD("yrom1a.snd",0xe000,0x2000, CRC(a62e3b94) SHA1(59636c2ac7ebbd116a0eb39479c97299ba391906))
 	ROM_LOAD("yrom2a.snd",0xc000,0x2000, CRC(66645a3f) SHA1(f06261af81e6b1829d639933297d2461a8c993fc))
 ROM_END
+
+} // Anonymous namespace
+
 
 GAME(1985, bountyh,   0,        gts80b_s,  gts80b, gts80b_state, init_gts80b, ROT0, "Gottlieb",               "Bounty Hunter",                             MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1985, bountyhg,  bountyh,  gts80b_s,  gts80b, gts80b_state, init_gts80b, ROT0, "Gottlieb",               "Bounty Hunter (German)",                    MACHINE_IS_SKELETON_MECHANICAL)

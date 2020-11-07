@@ -47,6 +47,8 @@ public:
 	void tx_16x_clock_w(bool state);
 	void rx_16x_clock_w(bool state);
 
+	int get_tx_rate() const { return tx_baud_rate; }
+
 private:
 	/* Registers */
 	uint8_t CR;  /* Command register */
@@ -163,7 +165,9 @@ private:
 	uint8_t half_period;
 	emu_timer *duart_timer;
 
-	double get_ct_rate();
+	bool m_irq_state;
+
+	uint32_t get_ct_rate();
 	uint16_t get_ct_count();
 	void start_ct(int count);
 	virtual int calc_baud(int ch, bool rx, uint8_t data);

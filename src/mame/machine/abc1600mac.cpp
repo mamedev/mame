@@ -112,8 +112,8 @@ abc1600_mac_device::abc1600_mac_device(const machine_config &mconfig, const char
 	device_memory_interface(mconfig, *this),
 	m_space_config("program", ENDIANNESS_LITTLE, 8, 22, 0, address_map_constructor(FUNC(abc1600_mac_device::program_map), this)),
 	m_rom(*this, "boot"),
-	m_segment_ram(*this, "segment_ram"),
-	m_page_ram(*this, "page_ram"),
+	m_segment_ram(*this, "segment_ram", 0x400, ENDIANNESS_LITTLE),
+	m_page_ram(*this, "page_ram", 0x800, ENDIANNESS_LITTLE),
 	m_watchdog(*this, "watchdog"),
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_task(0),
@@ -128,10 +128,6 @@ abc1600_mac_device::abc1600_mac_device(const machine_config &mconfig, const char
 
 void abc1600_mac_device::device_start()
 {
-	// allocate memory
-	m_segment_ram.allocate(0x400);
-	m_page_ram.allocate(0x400);
-
 	// HACK fill segment RAM or abcenix won't boot
 	memset(m_segment_ram, 0xcd, 0x400);
 	//memset(m_page_ram, 0xcd, 0x400);

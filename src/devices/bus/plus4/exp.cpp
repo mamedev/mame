@@ -37,10 +37,6 @@ DEFINE_DEVICE_TYPE(PLUS4_EXPANSION_SLOT, plus4_expansion_slot_device, "plus4_exp
 
 device_plus4_expansion_card_interface::device_plus4_expansion_card_interface(const machine_config &mconfig, device_t &device) :
 	device_interface(device, "plus4exp"),
-	m_c1l(*this, "c1l"),
-	m_c1h(*this, "c1h"),
-	m_c2l(*this, "c2l"),
-	m_c2h(*this, "c2h"),
 	m_c1l_mask(0),
 	m_c1h_mask(0),
 	m_c2l_mask(0),

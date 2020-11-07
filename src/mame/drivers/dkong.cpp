@@ -530,7 +530,7 @@ MACHINE_RESET_MEMBER(dkong_state,dkong)
 
 MACHINE_RESET_MEMBER(dkong_state,ddk)
 {
-	dk_braze_a15(!membank("bank1")->entry());
+	dk_braze_a15(!m_bank1->entry());
 }
 
 MACHINE_RESET_MEMBER(dkong_state,strtheat)
@@ -540,9 +540,9 @@ MACHINE_RESET_MEMBER(dkong_state,strtheat)
 	MACHINE_RESET_CALL_MEMBER(dkong);
 
 	/* The initial state of the counter is 0x08 */
-	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
+	m_bank1->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 	m_decrypt_counter = 0x08;
-	membank("bank1")->set_entry(0);
+	m_bank1->set_entry(0);
 }
 
 MACHINE_RESET_MEMBER(dkong_state,drakton)
@@ -552,9 +552,9 @@ MACHINE_RESET_MEMBER(dkong_state,drakton)
 	MACHINE_RESET_CALL_MEMBER(dkong);
 
 	/* The initial state of the counter is 0x09 */
-	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
+	m_bank1->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 	m_decrypt_counter = 0x09;
-	membank("bank1")->set_entry(1);
+	m_bank1->set_entry(1);
 }
 
 
@@ -649,10 +649,10 @@ uint8_t dkong_state::epos_decrypt_rom(offs_t offset)
 
 	switch(m_decrypt_counter)
 	{
-		case 0x08:  membank("bank1")->set_entry(0);      break;
-		case 0x09:  membank("bank1")->set_entry(1);      break;
-		case 0x0A:  membank("bank1")->set_entry(2);      break;
-		case 0x0B:  membank("bank1")->set_entry(3);      break;
+		case 0x08:  m_bank1->set_entry(0);      break;
+		case 0x09:  m_bank1->set_entry(1);      break;
+		case 0x0A:  m_bank1->set_entry(2);      break;
+		case 0x0B:  m_bank1->set_entry(3);      break;
 		default:
 			logerror("Invalid counter = %02X\n",m_decrypt_counter);
 			break;
@@ -1619,8 +1619,8 @@ uint8_t dkong_state::braze_eeprom_r()
 
 WRITE_LINE_MEMBER(dkong_state::dk_braze_a15)
 {
-	membank("bank1")->set_entry(state & 0x01);
-	membank("bank2")->set_entry(state & 0x01);
+	m_bank1->set_entry(state & 0x01);
+	m_bank2->set_entry(state & 0x01);
 }
 
 void dkong_state::dk_braze_a15_w(uint8_t data)
@@ -3576,7 +3576,7 @@ void dkong_state::init_drakton()
 			{7,1,4,0,3,6,2,5},
 	};
 
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x3fff, "bank1" );
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x3fff, m_bank1 );
 
 	/* While the PAL supports up to 16 decryption methods, only four
 	    are actually used in the PAL.  Therefore, we'll take a little
@@ -3598,7 +3598,7 @@ void dkong_state::init_strtheat()
 			{6,3,4,1,0,7,2,5},
 	};
 
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x3fff, "bank1" );
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x3fff, m_bank1 );
 
 	/* While the PAL supports up to 16 decryption methods, only four
 	    are actually used in the PAL.  Therefore, we'll take a little
@@ -3617,15 +3617,15 @@ void dkong_state::dk_braze_decrypt()
 {
 	m_decrypted = std::make_unique<uint8_t[]>(0x10000);
 
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x5fff, "bank1");
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0x8000, 0xffff, "bank2");
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x5fff, m_bank1);
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0x8000, 0xffff, m_bank2);
 
 	braze_decrypt_rom(m_decrypted.get());
 
-	membank("bank1")->configure_entries(0, 2, m_decrypted.get(), 0x8000);
-	membank("bank1")->set_entry(0);
-	membank("bank2")->configure_entries(0, 2, m_decrypted.get(), 0x8000);
-	membank("bank2")->set_entry(0);
+	m_bank1->configure_entries(0, 2, m_decrypted.get(), 0x8000);
+	m_bank1->set_entry(0);
+	m_bank2->configure_entries(0, 2, m_decrypted.get(), 0x8000);
+	m_bank2->set_entry(0);
 }
 
 void dkong_state::init_dkonghs()

@@ -82,8 +82,7 @@ protected:
 	// construction/destruction
 	device_portfolio_memory_card_slot_interface(const machine_config &mconfig, device_t &device);
 
-	optional_shared_ptr<uint8_t> m_rom;
-	optional_shared_ptr<uint8_t> m_nvram;
+	std::unique_ptr<uint8_t[]> m_rom;
 
 	portfolio_memory_card_slot_device *m_slot;
 };

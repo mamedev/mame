@@ -1279,7 +1279,7 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 		}
 
 		// remember the base and length
-		m_region = machine().memory().region_alloc(regiontag.c_str(), regionlength, width, endianness);
+		m_region = machine().memory().region_alloc(regiontag, regionlength, width, endianness);
 		LOG("Allocated %X bytes @ %p\n", m_region->bytes(), m_region->base());
 
 		if (ROMREGION_ISERASE(region)) // clear the region if it's requested

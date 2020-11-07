@@ -89,9 +89,6 @@ WRITE_LINE_MEMBER( tmc600_state::prd_w )
 
 void tmc600_state::video_start()
 {
-	// allocate memory
-	m_color_ram.allocate(TMC600_PAGE_RAM_SIZE);
-
 	// state saving
 	save_item(NAME(m_vismac_reg_latch));
 	save_item(NAME(m_vismac_color_latch));

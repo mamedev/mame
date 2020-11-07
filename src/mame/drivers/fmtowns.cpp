@@ -2729,7 +2729,7 @@ void towns_state::driver_start()
 	save_pointer(m_video.towns_video_reg,"Video registers",2);
 
 	if (m_ram->size() > 0x100000)
-		m_maincpu->space(AS_PROGRAM).install_ram(0x100000,m_ram->size()-1,nullptr);
+		m_maincpu->space(AS_PROGRAM).install_ram(0x100000,m_ram->size()-1,m_ram->pointer() + 0x100000);
 }
 
 void marty_state::driver_start()

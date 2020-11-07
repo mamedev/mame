@@ -127,7 +127,7 @@ uint16_t tmnt_state::k053245_scattered_word_r(offs_t offset)
 
 void tmnt_state::k053245_scattered_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA(m_spriteram + offset);
+	COMBINE_DATA(&m_spriteram[offset]);
 
 	if (!(offset & 0x0031))
 	{
@@ -714,7 +714,7 @@ void tmnt_state::tmnt2_1c0800_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	uint16_t src[4], mod[24];
 	uint8_t keepaspect, xlock, ylock, zlock;
 
-	COMBINE_DATA(m_tmnt2_1c0800 + offset);
+	COMBINE_DATA(&m_tmnt2_1c0800[offset]);
 
 	if (offset != 0x18/2 || !ACCESSING_BITS_8_15)
 		return;

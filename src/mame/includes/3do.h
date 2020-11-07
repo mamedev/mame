@@ -20,7 +20,7 @@ public:
 	_3do_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_dram(*this, "dram"),
+		m_dram(*this, "dram", 0x200000, ENDIANNESS_BIG),
 		m_vram(*this, "vram"),
 		m_nvram(*this, "nvram"),
 		m_screen(*this, "screen"),
@@ -160,7 +160,7 @@ private:
 	};
 
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<uint32_t> m_dram;
+	memory_share_creator<uint32_t> m_dram;
 	required_shared_ptr<uint32_t> m_vram;
 	required_device<nvram_device> m_nvram;
 	required_device<screen_device> m_screen;

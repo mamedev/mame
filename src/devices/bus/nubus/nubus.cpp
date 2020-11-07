@@ -185,11 +185,10 @@ void nubus_device::install_writeonly_device(offs_t start, offs_t end, write32_de
 	}
 }
 
-void nubus_device::install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data)
+void nubus_device::install_bank(offs_t start, offs_t end, uint8_t *data)
 {
 //  printf("install_bank: %s @ %x->%x\n", tag, start, end);
-	m_space->install_readwrite_bank(start, end, 0, tag);
-	machine().root_device().membank(siblingtag(tag).c_str())->set_base(data);
+	m_space->install_rom(start, end, data);
 }
 
 void nubus_device::set_irq_line(int slot, int state)
@@ -278,14 +277,9 @@ void device_nubus_card_interface::interface_pre_start()
 	}
 }
 
-void device_nubus_card_interface::install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data)
+void device_nubus_card_interface::install_bank(offs_t start, offs_t end, uint8_t *data)
 {
-	char bank[256];
-
-	// append an underscore and the slot name to the bank so it's guaranteed unique
-	snprintf(bank, sizeof(bank), "%s_%s", tag, m_nubus_slottag);
-
-	nubus().install_bank(start, end, bank, data);
+	nubus().install_bank(start, end, data);
 }
 
 void device_nubus_card_interface::install_declaration_rom(device_t *dev, const char *romregion, bool mirror_all_mb, bool reverse_rom)
@@ -424,20 +418,18 @@ void device_nubus_card_interface::install_declaration_rom(device_t *dev, const c
 
 	// now install the ROM
 	uint32_t addr = get_slotspace() + 0x01000000;
-	char bankname[128];
-	snprintf(bankname, sizeof(bankname), "rom_%s", m_nubus_slottag);
 	addr -= romlen;
 //  printf("Installing ROM at %x, length %x\n", addr, romlen);
 	if (mirror_all_mb)  // mirror the declaration ROM across all 16 megs of the slot space
 	{
 		uint32_t off = 0;
 		while(off < 0x1000000) {
-			nubus().install_bank(addr + off, addr+off+romlen-1, bankname, &m_declaration_rom[0]);
+			nubus().install_bank(addr + off, addr+off+romlen-1, &m_declaration_rom[0]);
 			off += romlen;
 		}
 	}
 	else
 	{
-		nubus().install_bank(addr, addr+romlen-1, bankname, &m_declaration_rom[0]);
+		nubus().install_bank(addr, addr+romlen-1, &m_declaration_rom[0]);
 	}
 }

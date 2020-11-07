@@ -233,7 +233,7 @@ void buggychl_state::buggychl_map(address_map &map)
 	map(0xd820, 0xd83f).ram(); // TODO
 	map(0xd840, 0xd85f).writeonly().share("scrollv");
 	map(0xdb00, 0xdbff).writeonly().share("scrollh");
-	map(0xdc04, 0xdc04).writeonly(); /* should be fg scroll */
+	map(0xdc04, 0xdc04).nopw(); /* should be fg scroll */
 	map(0xdc06, 0xdc06).w(FUNC(buggychl_state::buggychl_bg_scrollx_w));
 }
 

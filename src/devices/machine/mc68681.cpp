@@ -62,7 +62,7 @@ static const char *const duart68681_reg_read_names[0x10] =
 
 static const char *const duart68681_reg_write_names[0x10] =
 {
-	"MRA", "CSRA", "CRA", "THRA", "ACR", "IMR", "CRUR", "CTLR", "MRB", "CSRB", "CRB", "THRB", "IVR", "OPCR", "Set OP Bits", "Reset OP Bits"
+	"MRA", "CSRA", "CRA", "THRA", "ACR", "IMR", "CTUR", "CTLR", "MRB", "CSRB", "CRB", "THRB", "IVR", "OPCR", "Set OP Bits", "Reset OP Bits"
 };
 
 static const int baud_rate_ACR_0[] =     { 50, 110, 134, 200, 300,  600,   1200,  1050,  2400,   4800, 7200, 9600, 38400, 0, 0, 0 }; /* xr68c681 X=0 */
@@ -219,6 +219,7 @@ void duart_base_device::device_start()
 	save_item(NAME(IPCR));
 	save_item(NAME(IP_last_state));
 	save_item(NAME(half_period));
+	save_item(NAME(m_irq_state));
 }
 
 void mc68681_device::device_start()
@@ -254,6 +255,7 @@ void duart_base_device::device_reset()
 	// "reset clears internal registers (SRA, SRB, IMR, ISR, OPR, OPCR) puts OP0-7 in the high state, stops the counter/timer, and puts channels a/b in the inactive state"
 	IPCR = 0;
 
+	m_irq_state = false;
 	write_irq(CLEAR_LINE);
 	write_outport(OPR ^ 0xff);
 }
@@ -312,13 +314,21 @@ void duart_base_device::update_interrupts()
 	*/
 	if ((ISR & IMR) != 0)
 	{
-		LOG("68681: Interrupt line active (IMR & ISR = %02X)\n", (ISR & IMR));
-		write_irq(ASSERT_LINE);
+		if (!m_irq_state)
+		{
+			m_irq_state = true;
+			LOG("Interrupt line active (IMR & ISR = %02X)\n", (ISR & IMR));
+			write_irq(ASSERT_LINE);
+		}
 	}
 	else
 	{
-		LOG("68681: Interrupt line not active (IMR & ISR = %02X)\n", ISR & IMR);
-		write_irq(CLEAR_LINE);
+		if (m_irq_state)
+		{
+			m_irq_state = false;
+			LOG("Interrupt line not active (IMR & ISR = %02X)\n", ISR & IMR);
+			write_irq(CLEAR_LINE);
+		}
 	}
 	if (OPCR & 0xf0)
 	{
@@ -370,9 +380,9 @@ uint8_t mc68681_device::get_irq_vector()
 	return IVR;
 }
 
-double duart_base_device::get_ct_rate()
+uint32_t duart_base_device::get_ct_rate()
 {
-	double rate = 0.0f;
+	uint32_t rate = 0;
 
 	if (ACR & 0x40)
 	{
@@ -398,10 +408,14 @@ double duart_base_device::get_ct_rate()
 		switch ((ACR >> 4) & 3)
 		{
 		case 0: // IP2
-		case 1: // TxCA
-		case 2: // TxCB
 			//logerror( "68681 (%s): Unhandled timer/counter mode %d\n", device->tag(), (duart68681->ACR >> 4) & 3);
 			rate = clock();
+			break;
+		case 1: // TxCA
+			rate = m_chanA->get_tx_rate();
+			break;
+		case 2: // TxCB
+			rate = m_chanB->get_tx_rate();
 			break;
 		case 3: // X1/CLK / 16
 			rate = clock() / 16;
@@ -414,14 +428,14 @@ double duart_base_device::get_ct_rate()
 
 uint16_t duart_base_device::get_ct_count()
 {
-	double clock = get_ct_rate();
-	return (duart_timer->remaining() * clock).as_double();
+	uint32_t clock = get_ct_rate();
+	return duart_timer->remaining().as_ticks(clock);
 }
 
 void duart_base_device::start_ct(int count)
 {
-	double clock = get_ct_rate();
-	duart_timer->adjust(attotime::from_hz(clock) * count, 0);
+	uint32_t clock = get_ct_rate();
+	duart_timer->adjust(attotime::from_ticks(count, clock), 0);
 }
 
 TIMER_CALLBACK_MEMBER(duart_base_device::duart_timer_callback)
@@ -468,6 +482,10 @@ TIMER_CALLBACK_MEMBER(duart_base_device::duart_timer_callback)
 	}
 	else
 	{
+		// assert OP3 counter ready
+		if ((OPCR & 0xc) == 0x4)
+			OPR |= 0x8;
+
 		// Counter mode
 		set_ISR_bits(INT_COUNTER_READY);
 		start_ct(0xffff);
@@ -630,12 +648,18 @@ uint8_t duart_base_device::read(offs_t offset)
 	}
 
 	case 0x0f: /* Stop counter command */
-		clear_ISR_bits(INT_COUNTER_READY);
 
 		// Stop the counter only
 		if (!(ACR & 0x40))
-			duart_timer->adjust(attotime::never);
+		{
+			duart_timer->enable(false);
 
+			// clear OP3 counter ready
+			if ((OPCR & 0xc) == 0x4)
+				OPR &= ~0x8;
+		}
+
+		clear_ISR_bits(INT_COUNTER_READY);
 		break;
 
 	default:
@@ -783,7 +807,7 @@ void xr68c681_device::write(offs_t offset, uint8_t data)
 void duart_base_device::write(offs_t offset, uint8_t data)
 {
 	offset &= 0x0f;
-	LOG("Writing 68681 (%s) reg %x (%s) with %04x\n", tag(), offset, duart68681_reg_write_names[offset], data);
+	LOG("Writing 68681 (%s) reg %x (%s) with %02x\n", tag(), offset, duart68681_reg_write_names[offset], data);
 	switch (offset)
 	{
 	case 0x00: /* MRA */
@@ -1118,7 +1142,7 @@ int xr68c681_device::calc_baud(int ch, bool rx, uint8_t data)
 
 void duart_base_device::clear_ISR_bits(int mask)
 {
-	if ((ISR & mask) != 0)
+	if (ISR & mask)
 	{
 		ISR &= ~mask;
 		update_interrupts();
@@ -1127,7 +1151,7 @@ void duart_base_device::clear_ISR_bits(int mask)
 
 void duart_base_device::set_ISR_bits(int mask)
 {
-	if ((~ISR & mask) != 0)
+	if (!(ISR & mask))
 	{
 		ISR |= mask;
 		update_interrupts();

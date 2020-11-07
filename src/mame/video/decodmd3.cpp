@@ -100,7 +100,6 @@ void decodmd_type3_device::crtc_register_w(offs_t offset, uint16_t data, uint16_
 
 MC6845_UPDATE_ROW( decodmd_type3_device::crtc_update_row )
 {
-	uint8_t *RAM = m_ram->pointer();
 	uint8_t intensity;
 	uint16_t addr = ((ma & 0x7ff) << 2) | ((ra & 0x02) << 12);
 	addr += ((ra & 0x01) * 24);
@@ -109,12 +108,12 @@ MC6845_UPDATE_ROW( decodmd_type3_device::crtc_update_row )
 	{
 		for (int dot = 0; dot < 8; dot++)
 		{
-			intensity = ((RAM[addr + 1] >> (7-dot) & 0x01) << 1) | (RAM[addr + 0x801] >> (7-dot) & 0x01);
+			intensity = ((m_ram[addr + 1] >> (7-dot) & 0x01) << 1) | (m_ram[addr + 0x801] >> (7-dot) & 0x01);
 			bitmap.pix(y, x + dot) = rgb_t(0x3f * intensity, 0x2a * intensity, 0x00);
 		}
 		for (int dot = 8; dot < 16; dot++)
 		{
-			intensity = ((RAM[addr] >> (15-dot) & 0x01) << 1) | (RAM[addr + 0x800] >> (15-dot) & 0x01);
+			intensity = ((m_ram[addr] >> (15-dot) & 0x01) << 1) | (m_ram[addr + 0x800] >> (15-dot) & 0x01);
 			bitmap.pix(y, x + dot) = rgb_t(0x3f * intensity, 0x2a * intensity, 0x00);
 		}
 		addr += 2;
@@ -124,7 +123,7 @@ MC6845_UPDATE_ROW( decodmd_type3_device::crtc_update_row )
 void decodmd_type3_device::decodmd3_map(address_map &map)
 {
 	map(0x00000000, 0x000fffff).bankr("dmdrom");
-	map(0x00800000, 0x0080ffff).bankrw("dmdram");
+	map(0x00800000, 0x0080ffff).ram().share("dmdram");
 	map(0x00c00010, 0x00c00011).rw(FUNC(decodmd_type3_device::crtc_status_r), FUNC(decodmd_type3_device::crtc_address_w));
 	map(0x00c00012, 0x00c00013).w(FUNC(decodmd_type3_device::crtc_register_w));
 	map(0x00c00020, 0x00c00021).rw(FUNC(decodmd_type3_device::latch_r), FUNC(decodmd_type3_device::status_w));
@@ -152,8 +151,6 @@ void decodmd_type3_device::device_add_mconfig(machine_config &config)
 	screen.set_visarea(0, 192-1, 0, 64-1);
 	screen.set_screen_update("dmd6845", FUNC(mc6845_device::screen_update));
 	screen.set_refresh_hz(60);
-
-	RAM(config, RAM_TAG).set_default_size("64K");
 }
 
 
@@ -161,9 +158,8 @@ decodmd_type3_device::decodmd_type3_device(const machine_config &mconfig, const 
 	: device_t(mconfig, DECODMD3, tag, owner, clock)
 	, m_cpu(*this,"dmdcpu")
 	, m_mc6845(*this,"dmd6845")
-	, m_ram(*this,RAM_TAG)
-	, m_rambank(*this,"dmdram")
 	, m_rombank(*this,"dmdrom")
+	, m_ram(*this, "dmdram")
 	, m_rom(*this, finder_base::DUMMY_TAG)
 {
 }
@@ -174,11 +170,6 @@ void decodmd_type3_device::device_start()
 
 void decodmd_type3_device::device_reset()
 {
-	uint8_t* RAM = m_ram->pointer();
-
-	memset(RAM,0,0x10000);
-	m_rambank->configure_entry(0, &RAM[0]);
-	m_rambank->set_entry(0);
 	m_rombank->configure_entry(0, &m_rom[0]);
 	m_rombank->set_entry(0);
 }

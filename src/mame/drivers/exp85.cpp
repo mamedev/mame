@@ -167,11 +167,7 @@ DEVICE_INPUT_DEFAULTS_END
 
 void exp85_state::machine_start()
 {
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-
 	/* setup memory banking */
-	program.install_read_bank(0x0000, 0x07ff, "bank1");
-	program.unmap_write(0x0000, 0x07ff);
 	membank("bank1")->configure_entry(0, m_rom->base() + 0xf000);
 	membank("bank1")->configure_entry(1, m_rom->base());
 	membank("bank1")->set_entry(0);

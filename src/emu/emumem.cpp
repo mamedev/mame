@@ -30,9 +30,16 @@
 //  DEBUGGING
 //**************************************************************************
 
-#define VERBOSE         (0)
+#define VERBOSE 0
 
-#define VPRINTF(x)  do { if (VERBOSE) printf x; } while (0)
+#if VERBOSE
+template <typename Format, typename... Params> static void VPRINTF(Format &&fmt, Params &&...args)
+{
+	util::stream_format(std::cerr, std::forward<Format>(fmt), std::forward<Params>(args)...);
+}
+#else
+template <typename Format, typename... Params> static void VPRINTF(Format &&, Params &&...) {}
+#endif
 
 #define VALIDATE_REFCOUNTS 0
 
@@ -269,10 +276,6 @@ template <> struct handler_width<write64s_delegate> { static constexpr int value
 template <> struct handler_width<write64sm_delegate> { static constexpr int value = 3; };
 template <> struct handler_width<write64mo_delegate> { static constexpr int value = 3; };
 template <> struct handler_width<write64smo_delegate> { static constexpr int value = 3; };
-
-// other address map constants
-const int MEMORY_BLOCK_CHUNK = 65536;                   // minimum chunk size of allocated memory blocks
-
 } // anonymous namespace
 
 
@@ -307,7 +310,6 @@ public:
 
 	void unmap_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, read_or_write readorwrite, bool quiet) override;
 	void install_ram_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, read_or_write readorwrite, void *baseptr) override;
-	void install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string rtag, std::string wtag) override;
 	void install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, memory_bank *rbank, memory_bank *wbank) override;
 	void install_readwrite_port(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string rtag, std::string wtag) override;
 	void install_device_delegate(offs_t addrstart, offs_t addrend, device_t &device, address_map_constructor &map, u64 unitmask = 0, int cswidth = 0) override;
@@ -713,11 +715,11 @@ private:
 	template<int AccessWidth, typename READ> std::enable_if_t<(Width == AccessWidth)>
 	install_read_handler_helper(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, u64 unitmask, int cswidth, const READ &handler_r)
 	{
-		VPRINTF(("address_space::install_read_handler(%s-%s mask=%s mirror=%s, space width=%d, handler width=%d, %s, %s)\n",
-				 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
-				 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars),
-				 8 << Width, 8 << AccessWidth,
-				 handler_r.name(), core_i64_hex_format(unitmask, data_width() / 4)));
+		VPRINTF("address_space::install_read_handler(%*x-%*x mask=%*x mirror=%*x, space width=%d, handler width=%d, %s, %*x)\n",
+				m_addrchars, addrstart, m_addrchars, addrend,
+				m_addrchars, addrmask, m_addrchars, addrmirror,
+				8 << Width, 8 << AccessWidth,
+				handler_r.name(), data_width() / 4, unitmask);
 
 		offs_t nstart, nend, nmask, nmirror;
 		u64 nunitmask;
@@ -734,11 +736,11 @@ private:
 	install_read_handler_helper(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, u64 unitmask, int cswidth,
 								const READ &handler_r)
 	{
-		VPRINTF(("address_space::install_read_handler(%s-%s mask=%s mirror=%s, space width=%d, handler width=%d, %s, %s)\n",
-				 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
-				 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars),
-				 8 << Width, 8 << AccessWidth,
-				 handler_r.name(), core_i64_hex_format(unitmask, data_width() / 4)));
+		VPRINTF("address_space::install_read_handler(%*x-%*x mask=%*x mirror=%*x, space width=%d, handler width=%d, %s, %*x)\n",
+				m_addrchars, addrstart, m_addrchars, addrend,
+				m_addrchars, addrmask, m_addrchars, addrmirror,
+				8 << Width, 8 << AccessWidth,
+				handler_r.name(), data_width() / 4, unitmask);
 
 		offs_t nstart, nend, nmask, nmirror;
 		u64 nunitmask;
@@ -765,11 +767,11 @@ private:
 	install_write_handler_helper(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, u64 unitmask, int cswidth,
 								 const WRITE &handler_w)
 	{
-		VPRINTF(("address_space::install_write_handler(%s-%s mask=%s mirror=%s, space width=%d, handler width=%d, %s, %s)\n",
-				 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
-				 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars),
-				 8 << Width, 8 << AccessWidth,
-				 handler_w.name(), core_i64_hex_format(unitmask, data_width() / 4)));
+		VPRINTF("address_space::install_write_handler(%*x-%*x mask=%*x mirror=%*x, space width=%d, handler width=%d, %s, %*x)\n",
+				m_addrchars, addrstart, m_addrchars, addrend,
+				m_addrchars, addrmask, m_addrchars, addrmirror,
+				8 << Width, 8 << AccessWidth,
+				handler_w.name(), data_width() / 4, unitmask);
 
 		offs_t nstart, nend, nmask, nmirror;
 		u64 nunitmask;
@@ -786,11 +788,11 @@ private:
 	install_write_handler_helper(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, u64 unitmask, int cswidth,
 								 const WRITE &handler_w)
 	{
-		VPRINTF(("address_space::install_write_handler(%s-%s mask=%s mirror=%s, space width=%d, handler width=%d, %s, %s)\n",
-				 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
-				 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars),
-				 8 << Width, 8 << AccessWidth,
-				 handler_w.name(), core_i64_hex_format(unitmask, data_width() / 4)));
+		VPRINTF("address_space::install_write_handler(%*x-%*x mask=%*x mirror=%*x, space width=%d, handler width=%d, %s, %*x)\n",
+				m_addrchars, addrstart, m_addrchars, addrend,
+				m_addrchars, addrmask, m_addrchars, addrmirror,
+				8 << Width, 8 << AccessWidth,
+				handler_w.name(), data_width() / 4, unitmask);
 
 		offs_t nstart, nend, nmask, nmirror;
 		u64 nunitmask;
@@ -820,11 +822,11 @@ private:
 									 const READ  &handler_r,
 									 const WRITE &handler_w)
 	{
-		VPRINTF(("address_space::install_readwrite_handler(%s-%s mask=%s mirror=%s, space width=%d, handler width=%d, %s, %s, %s)\n",
-				 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
-				 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars),
-				 8 << Width, 8 << AccessWidth,
-				 handler_r.name(), handler_w.name(), core_i64_hex_format(unitmask, data_width() / 4)));
+		VPRINTF("address_space::install_readwrite_handler(%*x-%*x mask=%*x mirror=%*x, space width=%d, handler width=%d, %s, %s, %*x)\n",
+				m_addrchars, addrstart, m_addrchars, addrend,
+				m_addrchars, addrmask, m_addrchars, addrmirror,
+				8 << Width, 8 << AccessWidth,
+				handler_r.name(), handler_w.name(), data_width() / 4, unitmask);
 
 		offs_t nstart, nend, nmask, nmirror;
 		u64 nunitmask;
@@ -847,11 +849,11 @@ private:
 									 const READ  &handler_r,
 									 const WRITE &handler_w)
 	{
-		VPRINTF(("address_space::install_readwrite_handler(%s-%s mask=%s mirror=%s, space width=%d, handler width=%d, %s, %s, %s)\n",
-				 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
-				 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars),
-				 8 << Width, 8 << AccessWidth,
-				 handler_r.name(), handler_w.name(), core_i64_hex_format(unitmask, data_width() / 4)));
+		VPRINTF("address_space::install_readwrite_handler(%*x-%*x mask=%*x mirror=%*x, space width=%d, handler width=%d, %s, %s, %*x)\n",
+				m_addrchars, addrstart, m_addrchars, addrend,
+				m_addrchars, addrmask, m_addrchars, addrmirror,
+				8 << Width, 8 << AccessWidth,
+				handler_r.name(), handler_w.name(), data_width() / 4, unitmask);
 
 		offs_t nstart, nend, nmask, nmirror;
 		u64 nunitmask;
@@ -894,8 +896,15 @@ private:
 //-------------------------------------------------
 
 memory_manager::memory_manager(running_machine &machine)
-	: m_machine(machine),
-	  m_initialized(false)
+	: m_machine(machine)
+{
+}
+
+//-------------------------------------------------
+//  ~memory_manager - free the allocated memory banks
+//-------------------------------------------------
+
+memory_manager::~memory_manager()
 {
 }
 
@@ -1012,38 +1021,50 @@ void memory_manager::initialize()
 	for (auto const memory : memories)
 		memory->populate_from_maps();
 
-	// allocate memory needed to back each address space
-	for (auto const memory : memories)
-		memory->allocate_memory();
-
-	// find all the allocated pointers
-	for (auto const memory : memories)
-		memory->locate_memory();
-
 	// disable logging of unmapped access when no one receives it
 	if (!machine().options().log() && !machine().options().oslog() && !(machine().debug_flags & DEBUG_FLAG_ENABLED))
 		for (auto const memory : memories)
 			memory->set_log_unmap(false);
-
-	// we are now initialized
-	m_initialized = true;
 }
+
+
+//-------------------------------------------------
+//  allocate_memory - allocate some ram and register it for saving
+//-------------------------------------------------
+
+void *memory_manager::allocate_memory(device_t &dev, int spacenum, std::string name, u8 width, size_t bytes)
+{
+	void *const ptr = m_datablocks.emplace(m_datablocks.end(), malloc(bytes))->get();
+	memset(ptr, 0, bytes);
+	machine().save().save_memory(&dev, "memory", dev.tag(), spacenum, name.c_str(), ptr, width/8, u32(bytes) / (width/8));
+	return ptr;
+}
+
 
 
 //-------------------------------------------------
 //  region_alloc - allocates memory for a region
 //-------------------------------------------------
 
-memory_region *memory_manager::region_alloc(const char *name, u32 length, u8 width, endianness_t endian)
+memory_region *memory_manager::region_alloc(std::string name, u32 length, u8 width, endianness_t endian)
 {
-	osd_printf_verbose("Region '%s' created\n", name);
 	// make sure we don't have a region of the same name; also find the end of the list
 	if (m_regionlist.find(name) != m_regionlist.end())
 		fatalerror("region_alloc called with duplicate region name \"%s\"\n", name);
 
 	// allocate the region
-	m_regionlist.emplace(name, std::make_unique<memory_region>(machine(), name, length, width, endian));
-	return m_regionlist.find(name)->second.get();
+	return m_regionlist.emplace(name, std::make_unique<memory_region>(machine(), name, length, width, endian)).first->second.get();
+}
+
+
+//-------------------------------------------------
+//  region_find - find a region by name
+//-------------------------------------------------
+
+memory_region *memory_manager::region_find(std::string name)
+{
+	auto i = m_regionlist.find(name);
+	return i != m_regionlist.end() ? i->second.get() : nullptr;
 }
 
 
@@ -1051,60 +1072,81 @@ memory_region *memory_manager::region_alloc(const char *name, u32 length, u8 wid
 //  region_free - releases memory for a region
 //-------------------------------------------------
 
-void memory_manager::region_free(const char *name)
+void memory_manager::region_free(std::string name)
 {
 	m_regionlist.erase(name);
 }
 
 
 //-------------------------------------------------
-//  region_containing - helper to determine if
-//  a block of memory is part of a region
+//  anonymous_alloc - allocates a anonymousd memory zone
 //-------------------------------------------------
 
-memory_region *memory_manager::region_containing(const void *memory, offs_t bytes) const
+void *memory_manager::anonymous_alloc(address_space &space, size_t bytes, u8 width, offs_t start, offs_t end)
 {
-	const u8 *data = reinterpret_cast<const u8 *>(memory);
-
-	// look through the region list and return the first match
-	for (auto &region : m_regionlist)
-		if (data >= region.second->base() && (data + bytes) <= region.second->end())
-			return region.second.get();
-
-	// didn't find one
-	return nullptr;
+	std::string name = util::string_format("%x-%x", start, end);
+	return allocate_memory(space.device(), space.spacenum(), name, width, bytes);
 }
 
-memory_bank *memory_manager::find(const char *tag) const
+
+//-------------------------------------------------
+//  share_alloc - allocates a shared memory zone
+//-------------------------------------------------
+
+memory_share *memory_manager::share_alloc(device_t &dev, std::string name, u8 width, size_t bytes, endianness_t endianness)
 {
-	auto bank = m_banklist.find(tag);
-	if (bank != m_banklist.end())
-		return bank->second.get();
-	return nullptr;
+	// make sure we don't have a share of the same name; also find the end of the list
+	if (m_sharelist.find(name) != m_sharelist.end())
+		fatalerror("share_alloc called with duplicate share name \"%s\"\n", name);
+
+	// allocate and register the memory
+	void *ptr = allocate_memory(dev, 0, name, width, bytes);
+
+	// allocate the region
+	return m_sharelist.emplace(name, std::make_unique<memory_share>(name, width, bytes, endianness, ptr)).first->second.get();
 }
 
-memory_bank *memory_manager::find(address_space &space, offs_t addrstart, offs_t addrend) const
-{
-	// try to find an exact match
-	for (auto &bank : m_banklist)
-		if (bank.second->anonymous() && bank.second->references_space(space, read_or_write::READWRITE) && bank.second->matches_exactly(addrstart, addrend))
-			return bank.second.get();
 
-	// not found
-	return nullptr;
+//-------------------------------------------------
+//  share_find - find a share by name
+//-------------------------------------------------
+
+memory_share *memory_manager::share_find(std::string name)
+{
+	auto i = m_sharelist.find(name);
+	return i != m_sharelist.end() ? i->second.get() : nullptr;
 }
 
-memory_bank *memory_manager::allocate(address_space &space, offs_t addrstart, offs_t addrend, const char *tag)
+
+
+//-------------------------------------------------
+//  share_alloc - allocates a banking zone
+//-------------------------------------------------
+
+memory_bank *memory_manager::bank_alloc(device_t &device, std::string name)
 {
-	auto bank = std::make_unique<memory_bank>(space, m_banklist.size(), addrstart, addrend, tag);
-	std::string temptag;
-	if (tag == nullptr) {
-		temptag = string_format("anon_%p", bank.get());
-		tag = temptag.c_str();
-	}
-	m_banklist.emplace(tag, std::move(bank));
-	return m_banklist.find(tag)->second.get();
+	// allocate the bank
+	auto const ins = m_banklist.emplace(name, std::make_unique<memory_bank>(device, name));
+
+	// make sure we don't have a bank of the same name
+	if (!ins.second)
+		fatalerror("bank_alloc called with duplicate bank name \"%s\"\n", name);
+
+	return ins.first->second.get();
 }
+
+
+//-------------------------------------------------
+//  bank_find - find a bank by name
+//-------------------------------------------------
+
+memory_bank *memory_manager::bank_find(std::string name)
+{
+	auto i = m_banklist.find(name);
+	return i != m_banklist.end() ? i->second.get() : nullptr;
+}
+
+
 
 //**************************************************************************
 //  ADDRESS SPACE CONFIG
@@ -1412,15 +1454,23 @@ void address_space::prepare_map()
 		{
 			// if we can't find it, add it to our map
 			std::string fulltag = entry.m_devbase.subtag(entry.m_share);
-			if (m_manager.m_sharelist.find(fulltag) == m_manager.m_sharelist.end())
+			memory_share *share = m_manager.share_find(fulltag);
+			if (!share)
 			{
-				VPRINTF(("Creating share '%s' of length 0x%X\n", fulltag.c_str(), entry.m_addrend + 1 - entry.m_addrstart));
-				m_manager.m_sharelist.emplace(fulltag.c_str(), std::make_unique<memory_share>(m_config.data_width(), address_to_byte(entry.m_addrend + 1 - entry.m_addrstart), endianness()));
+				VPRINTF("Creating share '%s' of length 0x%X\n", fulltag.c_str(), entry.m_addrend + 1 - entry.m_addrstart);
+				share = m_manager.share_alloc(m_device, fulltag, m_config.data_width(), address_to_byte(entry.m_addrend + 1 - entry.m_addrstart), endianness());
 			}
+			else
+			{
+				std::string result = share->compare(m_config.data_width(), address_to_byte(entry.m_addrend + 1 - entry.m_addrstart), endianness());
+				if (!result.empty())
+					fatalerror("%s\n", result);
+			}
+			entry.m_memory = share->ptr();
 		}
 
-		// if this is a ROM handler without a specified region, attach it to the implicit region
-		if (m_spacenum == 0 && entry.m_read.m_type == AMH_ROM && entry.m_region == nullptr)
+		// if this is a ROM handler without a specified region and not shared, attach it to the implicit region
+		if (m_spacenum == AS_PROGRAM && entry.m_read.m_type == AMH_ROM && entry.m_region == nullptr && entry.m_share == nullptr)
 		{
 			// make sure it fits within the memory region before doing so, however
 			if (entry.m_addrend < devregionsize)
@@ -1431,7 +1481,7 @@ void address_space::prepare_map()
 		}
 
 		// validate adjusted addresses against implicit regions
-		if (entry.m_region != nullptr && entry.m_share == nullptr)
+		if (entry.m_region != nullptr)
 		{
 			// determine full tag
 			std::string fulltag = entry.m_devbase.subtag(entry.m_region);
@@ -1444,6 +1494,9 @@ void address_space::prepare_map()
 			// validate the region
 			if (entry.m_rgnoffs + m_config.addr2byte(entry.m_addrend - entry.m_addrstart + 1) > region->bytes())
 				fatalerror("device '%s' %s space memory map entry %X-%X extends beyond region \"%s\" size (%X)\n", m_device.tag(), m_name, entry.m_addrstart, entry.m_addrend, entry.m_region, region->bytes());
+
+			if (entry.m_share != nullptr)
+				fatalerror("device '%s' %s space memory map entry %X-%X has both .region() and .share()\n", m_device.tag(), m_name, entry.m_addrstart, entry.m_addrend);
 		}
 
 		// convert any region-relative entries to their memory pointers
@@ -1455,6 +1508,10 @@ void address_space::prepare_map()
 			// set the memory address
 			entry.m_memory = m_manager.machine().root_device().memregion(fulltag)->base() + entry.m_rgnoffs;
 		}
+
+		// allocate anonymous ram when needed
+		if (!entry.m_memory && (entry.m_read.m_type == AMH_RAM || entry.m_write.m_type == AMH_RAM))
+			entry.m_memory = m_manager.anonymous_alloc(*this, address_to_byte(entry.m_addrend + 1 - entry.m_addrstart), m_config.data_width(), entry.m_addrstart, entry.m_addrend);
 	}
 }
 
@@ -1509,7 +1566,7 @@ void address_space::populate_map_entry(const address_map_entry &entry, read_or_w
 			// fall through to the RAM case otherwise
 
 		case AMH_RAM:
-			install_ram_generic(entry.m_addrstart, entry.m_addrend, entry.m_addrmirror, readorwrite, nullptr);
+			install_ram_generic(entry.m_addrstart, entry.m_addrend, entry.m_addrmirror, readorwrite, entry.m_memory);
 			break;
 
 		case AMH_NOP:
@@ -1641,9 +1698,15 @@ void address_space::populate_map_entry(const address_map_entry &entry, read_or_w
 			break;
 
 		case AMH_BANK:
-			install_bank_generic(entry.m_addrstart, entry.m_addrend, entry.m_addrmirror,
-								 (readorwrite == read_or_write::READ) ? entry.m_devbase.subtag(data.m_tag) : "",
-								 (readorwrite == read_or_write::WRITE) ? entry.m_devbase.subtag(data.m_tag) : "");
+			{
+				std::string tag = entry.m_devbase.subtag(data.m_tag);
+				memory_bank *bank = m_manager.bank_find(tag);
+				if (!bank)
+					bank = m_manager.bank_alloc(entry.m_devbase, tag);
+				install_bank_generic(entry.m_addrstart, entry.m_addrend, entry.m_addrmirror,
+									 (readorwrite == read_or_write::READ) ? bank : nullptr,
+									 (readorwrite == read_or_write::WRITE) ? bank : nullptr);
+			}
 			break;
 
 		case AMH_DEVICE_SUBMAP:
@@ -1651,157 +1714,6 @@ void address_space::populate_map_entry(const address_map_entry &entry, read_or_w
 	}
 }
 
-//-------------------------------------------------
-//  allocate_memory - determine all neighboring
-//  address ranges and allocate memory to back
-//  them
-//-------------------------------------------------
-
-void address_space::allocate_memory()
-{
-	auto &blocklist = m_manager.m_blocklist;
-
-	// make a first pass over the memory map and track blocks with hardcoded pointers
-	// we do this to make sure they are found by space_find_backing_memory first
-	// do it back-to-front so that overrides work correctly
-	int tail = blocklist.size();
-	for (address_map_entry &entry : m_map->m_entrylist)
-		if (entry.m_memory != nullptr)
-			blocklist.insert(blocklist.begin() + tail, std::make_unique<memory_block>(*this, entry.m_addrstart, entry.m_addrend, entry.m_memory));
-
-	// loop over all blocks just allocated and assign pointers from them
-	address_map_entry *unassigned = nullptr;
-
-	for (auto memblock = blocklist.begin() + tail; memblock != blocklist.end(); ++memblock)
-		unassigned = block_assign_intersecting(memblock->get()->addrstart(), memblock->get()->addrend(), memblock->get()->data());
-
-	// if we don't have an unassigned pointer yet, try to find one
-	if (unassigned == nullptr)
-		unassigned = block_assign_intersecting(~0, 0, nullptr);
-
-	// loop until we've assigned all memory in this space
-	while (unassigned != nullptr)
-	{
-		// work in MEMORY_BLOCK_CHUNK-sized chunks
-		offs_t curblockstart = unassigned->m_addrstart / MEMORY_BLOCK_CHUNK;
-		offs_t curblockend = unassigned->m_addrend / MEMORY_BLOCK_CHUNK;
-
-		// loop while we keep finding unassigned blocks in neighboring MEMORY_BLOCK_CHUNK chunks
-		bool changed;
-		do
-		{
-			changed = false;
-
-			// scan for unmapped blocks in the adjusted map
-			for (address_map_entry &entry : m_map->m_entrylist)
-				if (entry.m_memory == nullptr && &entry != unassigned && needs_backing_store(entry))
-				{
-					// get block start/end blocks for this block
-					offs_t blockstart = entry.m_addrstart / MEMORY_BLOCK_CHUNK;
-					offs_t blockend = entry.m_addrend / MEMORY_BLOCK_CHUNK;
-
-					// if we intersect or are adjacent, adjust the start/end
-					if (blockstart <= curblockend + 1 && blockend >= curblockstart - 1)
-					{
-						if (blockstart < curblockstart)
-							curblockstart = blockstart, changed = true;
-						if (blockend > curblockend)
-							curblockend = blockend, changed = true;
-					}
-				}
-		} while (changed);
-
-		// we now have a block to allocate; do it
-		offs_t curaddrstart = curblockstart * MEMORY_BLOCK_CHUNK;
-		offs_t curaddrend = curblockend * MEMORY_BLOCK_CHUNK + (MEMORY_BLOCK_CHUNK - 1);
-		auto block = std::make_unique<memory_block>(*this, curaddrstart, curaddrend);
-
-		// assign memory that intersected the new block
-		unassigned = block_assign_intersecting(curaddrstart, curaddrend, block.get()->data());
-		blocklist.push_back(std::move(block));
-	}
-}
-
-
-//-------------------------------------------------
-//  locate_memory - find all the requested
-//  pointers into the final allocated memory
-//-------------------------------------------------
-
-void address_space::locate_memory()
-{
-	// once this is done, find the starting bases for the banks
-	for (auto &bank : m_manager.banks())
-		if (bank.second->base() == nullptr && bank.second->references_space(*this, read_or_write::READWRITE))
-		{
-			// set the initial bank pointer
-			for (address_map_entry &entry : m_map->m_entrylist)
-				if (entry.m_addrstart == bank.second->addrstart() && entry.m_memory != nullptr)
-				{
-					bank.second->set_base(entry.m_memory);
-					VPRINTF(("assigned bank '%s' pointer to memory from range %08X-%08X [%p]\n", bank.second->tag(), entry.m_addrstart, entry.m_addrend, entry.m_memory));
-					break;
-				}
-		}
-}
-
-
-
-
-//-------------------------------------------------
-//  block_assign_intersecting - find all
-//  intersecting blocks and assign their pointers
-//-------------------------------------------------
-
-address_map_entry *address_space::block_assign_intersecting(offs_t addrstart, offs_t addrend, u8 *base)
-{
-	address_map_entry *unassigned = nullptr;
-
-	// loop over the adjusted map and assign memory to any blocks we can
-	for (address_map_entry &entry : m_map->m_entrylist)
-	{
-		// if we haven't assigned this block yet, see if we have a mapped shared pointer for it
-		if (entry.m_memory == nullptr && entry.m_share != nullptr)
-		{
-			std::string fulltag = entry.m_devbase.subtag(entry.m_share);
-			auto share = m_manager.shares().find(fulltag);
-			if (share != m_manager.shares().end() && share->second->ptr() != nullptr)
-			{
-				entry.m_memory = share->second->ptr();
-				VPRINTF(("memory range %08X-%08X -> shared_ptr '%s' [%p]\n", entry.m_addrstart, entry.m_addrend, entry.m_share, entry.m_memory));
-			}
-			else
-			{
-				VPRINTF(("memory range %08X-%08X -> shared_ptr '%s' but not found\n", entry.m_addrstart, entry.m_addrend, entry.m_share));
-			}
-		}
-
-		// otherwise, look for a match in this block
-		if (entry.m_memory == nullptr && entry.m_addrstart >= addrstart && entry.m_addrend <= addrend)
-		{
-			entry.m_memory = base + m_config.addr2byte(entry.m_addrstart - addrstart);
-			VPRINTF(("memory range %08X-%08X -> found in block from %08X-%08X [%p]\n", entry.m_addrstart, entry.m_addrend, addrstart, addrend, entry.m_memory));
-		}
-
-		// if we're the first match on a shared pointer, assign it now
-		if (entry.m_memory != nullptr && entry.m_share != nullptr)
-		{
-			std::string fulltag = entry.m_devbase.subtag(entry.m_share);
-			auto share = m_manager.shares().find(fulltag);
-			if (share != m_manager.shares().end() && share->second->ptr() == nullptr)
-			{
-				share->second->set_ptr(entry.m_memory);
-				VPRINTF(("setting shared_ptr '%s' = %p\n", entry.m_share, entry.m_memory));
-			}
-		}
-
-		// keep track of the first unassigned entry
-		if (entry.m_memory == nullptr && unassigned == nullptr && needs_backing_store(entry))
-			unassigned = &entry;
-	}
-
-	return unassigned;
-}
 
 
 memory_passthrough_handler *address_space::install_read_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u8  &data, u8  mem_mask)> tap, memory_passthrough_handler *mph)
@@ -1905,11 +1817,11 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void address_
 
 template<int Level, int Width, int AddrShift, endianness_t Endian> void address_space_specific<Level, Width, AddrShift, Endian>::unmap_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, read_or_write readorwrite, bool quiet)
 {
-	VPRINTF(("address_space::unmap(%s-%s mirror=%s, %s, %s)\n",
-				core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
-				core_i64_hex_format(addrmirror, m_addrchars),
-				(readorwrite == read_or_write::READ) ? "read" : (readorwrite == read_or_write::WRITE) ? "write" : (readorwrite == read_or_write::READWRITE) ? "read/write" : "??",
-				quiet ? "quiet" : "normal"));
+	VPRINTF("address_space::unmap(%*x-%*x mirror=%*x, %s, %s)\n",
+			m_addrchars, addrstart, m_addrchars, addrend,
+			m_addrchars, addrmirror,
+			(readorwrite == read_or_write::READ) ? "read" : (readorwrite == read_or_write::WRITE) ? "write" : (readorwrite == read_or_write::READWRITE) ? "read/write" : "??",
+			quiet ? "quiet" : "normal");
 
 	offs_t nstart, nend, nmask, nmirror;
 	check_optimize_mirror("unmap_generic", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
@@ -2026,10 +1938,10 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void address_
 
 template<int Level, int Width, int AddrShift, endianness_t Endian> void address_space_specific<Level, Width, AddrShift, Endian>::install_readwrite_port(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string rtag, std::string wtag)
 {
-	VPRINTF(("address_space::install_readwrite_port(%s-%s mirror=%s, read=\"%s\" / write=\"%s\")\n",
-				core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
-				core_i64_hex_format(addrmirror, m_addrchars),
-				rtag.empty() ? "(none)" : rtag.c_str(), wtag.empty() ? "(none)" : wtag.c_str()));
+	VPRINTF("address_space::install_readwrite_port(%*x-%*x mirror=%*x, read=\"%s\" / write=\"%s\")\n",
+			m_addrchars, addrstart, m_addrchars, addrend,
+			m_addrchars, addrmirror,
+			rtag.empty() ? "(none)" : rtag.c_str(), wtag.empty() ? "(none)" : wtag.c_str());
 
 	offs_t nstart, nend, nmask, nmirror;
 	check_optimize_mirror("install_readwrite_port", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
@@ -2068,48 +1980,12 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void address_
 //  mapping to a particular bank
 //-------------------------------------------------
 
-template<int Level, int Width, int AddrShift, endianness_t Endian> void address_space_specific<Level, Width, AddrShift, Endian>::install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string rtag, std::string wtag)
-{
-	VPRINTF(("address_space::install_readwrite_bank(%s-%s mirror=%s, read=\"%s\" / write=\"%s\")\n",
-				core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
-				core_i64_hex_format(addrmirror, m_addrchars),
-				rtag.empty() ? "(none)" : rtag.c_str(), wtag.empty() ? "(none)" : wtag.c_str()));
-
-	offs_t nstart, nend, nmask, nmirror;
-	check_optimize_mirror("install_bank_generic", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
-
-	// map the read bank
-	if (rtag != "")
-	{
-		std::string fulltag = device().siblingtag(rtag);
-		memory_bank &bank = bank_find_or_allocate(fulltag.c_str(), addrstart, addrend, addrmirror, read_or_write::READ);
-
-		auto hand_r = new handler_entry_read_memory_bank<Width, AddrShift, Endian>(this, bank);
-		hand_r->set_address_info(nstart, nmask);
-		m_root_read->populate(nstart, nend, nmirror, hand_r);
-	}
-
-	// map the write bank
-	if (wtag != "")
-	{
-		std::string fulltag = device().siblingtag(wtag);
-		memory_bank &bank = bank_find_or_allocate(fulltag.c_str(), addrstart, addrend, addrmirror, read_or_write::WRITE);
-
-		auto hand_w = new handler_entry_write_memory_bank<Width, AddrShift, Endian>(this, bank);
-		hand_w->set_address_info(nstart, nmask);
-		m_root_write->populate(nstart, nend, nmirror, hand_w);
-	}
-
-	invalidate_caches(rtag != "" ? wtag != "" ? read_or_write::READWRITE : read_or_write::READ : read_or_write::WRITE);
-}
-
-
 template<int Level, int Width, int AddrShift, endianness_t Endian> void address_space_specific<Level, Width, AddrShift, Endian>::install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, memory_bank *rbank, memory_bank *wbank)
 {
-	VPRINTF(("address_space::install_readwrite_bank(%s-%s mirror=%s, read=\"%s\" / write=\"%s\")\n",
-				core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
-				core_i64_hex_format(addrmirror, m_addrchars),
-				(rbank != nullptr) ? rbank->tag() : "(none)", (wbank != nullptr) ? wbank->tag() : "(none)"));
+	VPRINTF("address_space::install_readwrite_bank(%*x-%*x mirror=%*x, read=\"%s\" / write=\"%s\")\n",
+			m_addrchars, addrstart, m_addrchars, addrend,
+			m_addrchars, addrmirror,
+			(rbank != nullptr) ? rbank->tag() : "(none)", (wbank != nullptr) ? wbank->tag() : "(none)");
 
 	offs_t nstart, nend, nmask, nmirror;
 	check_optimize_mirror("install_bank_generic", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
@@ -2141,11 +2017,11 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void address_
 
 template<int Level, int Width, int AddrShift, endianness_t Endian> void address_space_specific<Level, Width, AddrShift, Endian>::install_ram_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, read_or_write readorwrite, void *baseptr)
 {
-	VPRINTF(("address_space::install_ram_generic(%s-%s mirror=%s, %s, %p)\n",
-				core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
-				core_i64_hex_format(addrmirror, m_addrchars),
-				(readorwrite == read_or_write::READ) ? "read" : (readorwrite == read_or_write::WRITE) ? "write" : (readorwrite == read_or_write::READWRITE) ? "read/write" : "??",
-				baseptr));
+	VPRINTF("address_space::install_ram_generic(%s-%s mirror=%s, %s, %p)\n",
+			m_addrchars, addrstart, m_addrchars, addrend,
+			m_addrchars, addrmirror,
+			(readorwrite == read_or_write::READ) ? "read" : (readorwrite == read_or_write::WRITE) ? "write" : (readorwrite == read_or_write::READWRITE) ? "read/write" : "??",
+			baseptr);
 
 	offs_t nstart, nend, nmask, nmirror;
 	check_optimize_mirror("install_ram_generic", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
@@ -2153,39 +2029,7 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void address_
 	// map for read
 	if (readorwrite == read_or_write::READ || readorwrite == read_or_write::READWRITE)
 	{
-		// find a bank and map it
-		memory_bank &bank = bank_find_or_allocate(nullptr, addrstart, addrend, addrmirror, read_or_write::READ);
-
-		// if we are provided a pointer, set it
-		if (baseptr != nullptr)
-			bank.set_base(baseptr);
-
-		// if we don't have a bank pointer yet, try to find one
-		if (bank.base() == nullptr)
-		{
-			void *backing = find_backing_memory(addrstart, addrend);
-			if (backing != nullptr)
-				bank.set_base(backing);
-		}
-
-		// if we still don't have a pointer, and we're past the initialization phase, allocate a new block
-		if (bank.base() == nullptr && m_manager.m_initialized)
-		{
-			if (m_manager.machine().phase() >= machine_phase::RESET)
-				fatalerror("Attempted to call install_ram_generic() after initialization time without a baseptr!\n");
-			auto block = std::make_unique<memory_block>(*this, addrstart, addrend);
-			bank.set_base(block.get()->data());
-			m_manager.m_blocklist.push_back(std::move(block));
-		}
-
-		auto hand_r = new handler_entry_read_memory<Width, AddrShift, Endian>(this);
-		if (bank.base())
-			hand_r->set_base(static_cast<uX *>(bank.base()));
-		else {
-			delayed_ref(hand_r);
-			bank.add_notifier([this, hand_r](void *base) { hand_r->set_base(static_cast<uX *>(base)); delayed_unref(hand_r); });
-		}
-
+		auto hand_r = new handler_entry_read_memory<Width, AddrShift, Endian>(this, baseptr);
 		hand_r->set_address_info(nstart, nmask);
 		m_root_read->populate(nstart, nend, nmirror, hand_r);
 	}
@@ -2193,39 +2037,7 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void address_
 	// map for write
 	if (readorwrite == read_or_write::WRITE || readorwrite == read_or_write::READWRITE)
 	{
-		// find a bank and map it
-		memory_bank &bank = bank_find_or_allocate(nullptr, addrstart, addrend, addrmirror, read_or_write::WRITE);
-
-		// if we are provided a pointer, set it
-		if (baseptr != nullptr)
-			bank.set_base(baseptr);
-
-		// if we don't have a bank pointer yet, try to find one
-		if (bank.base() == nullptr)
-		{
-			void *backing = find_backing_memory(addrstart, addrend);
-			if (backing != nullptr)
-				bank.set_base(backing);
-		}
-
-		// if we still don't have a pointer, and we're past the initialization phase, allocate a new block
-		if (bank.base() == nullptr && m_manager.m_initialized)
-		{
-			if (m_manager.machine().phase() >= machine_phase::RESET)
-				fatalerror("Attempted to call install_ram_generic() after initialization time without a baseptr!\n");
-			auto block = std::make_unique<memory_block>(*this, address_to_byte(addrstart), address_to_byte_end(addrend));
-			bank.set_base(block.get()->data());
-			m_manager.m_blocklist.push_back(std::move(block));
-		}
-
-		auto hand_w = new handler_entry_write_memory<Width, AddrShift, Endian>(this);
-		if (bank.base())
-			hand_w->set_base(static_cast<uX *>(bank.base()));
-		else {
-			delayed_ref(hand_w);
-			bank.add_notifier([this, hand_w](void *base) { hand_w->set_base(static_cast<uX *>(base)); delayed_unref(hand_w); });
-		}
-
+		auto hand_w = new handler_entry_write_memory<Width, AddrShift, Endian>(this, baseptr);
 		hand_w->set_address_info(nstart, nmask);
 		m_root_write->populate(nstart, nend, nmirror, hand_w);
 	}
@@ -2237,76 +2049,6 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void address_
 //**************************************************************************
 //  MEMORY MAPPING HELPERS
 //**************************************************************************
-
-//-------------------------------------------------
-//  find_backing_memory - return a pointer to
-//  the base of RAM associated with the given
-//  device and offset
-//-------------------------------------------------
-
-void *address_space::find_backing_memory(offs_t addrstart, offs_t addrend)
-{
-	VPRINTF(("address_space::find_backing_memory('%s',%s,%08X-%08X) -> ", m_device.tag(), m_name, addrstart, addrend));
-
-	if (m_map == nullptr)
-		return nullptr;
-
-	// look in the address map first, last winning for overrides
-	void *result = nullptr;
-	for (address_map_entry &entry : m_map->m_entrylist)
-	{
-		if (entry.m_memory != nullptr && addrstart >= entry.m_addrstart && addrend <= entry.m_addrend)
-		{
-			VPRINTF(("found in entry %08X-%08X [%p]\n", entry.m_addrstart, entry.m_addrend, (u8 *)entry.m_memory + address_to_byte(addrstart - entry.m_addrstart)));
-			result = (u8 *)entry.m_memory + address_to_byte(addrstart - entry.m_addrstart);
-		}
-	}
-	if (result)
-		return result;
-
-	// if not found there, look in the allocated blocks
-	for (auto &block : m_manager.m_blocklist)
-		if (block->contains(*this, addrstart, addrend))
-		{
-			VPRINTF(("found in allocated memory block %08X-%08X [%p]\n", block->addrstart(), block->addrend(), block->data() + address_to_byte(addrstart - block->addrstart())));
-			return block->data() + address_to_byte(addrstart - block->addrstart());
-		}
-
-	VPRINTF(("did not find\n"));
-	return nullptr;
-}
-
-
-//-------------------------------------------------
-//  space_needs_backing_store - return whether a
-//  given memory map entry implies the need of
-//  allocating and registering memory
-//-------------------------------------------------
-
-bool address_space::needs_backing_store(const address_map_entry &entry)
-{
-	// if we are sharing, and we don't have a pointer yet, create one
-	if (entry.m_share != nullptr)
-	{
-		std::string fulltag = entry.m_devbase.subtag(entry.m_share);
-		auto share = m_manager.shares().find(fulltag);
-		if (share != m_manager.shares().end() && share->second->ptr() == nullptr)
-			return true;
-	}
-
-	// if we're writing to any sort of bank or RAM, then yes, we do need backing
-	if (entry.m_write.m_type == AMH_BANK || entry.m_write.m_type == AMH_RAM)
-		return true;
-
-	// if we're reading from RAM or from ROM outside of address space 0 or its region, then yes, we do need backing
-	memory_region *region = m_manager.machine().root_device().memregion(m_device.tag());
-	if (entry.m_read.m_type == AMH_RAM ||
-		(entry.m_read.m_type == AMH_ROM && (m_spacenum != 0 || region == nullptr || entry.m_addrstart >= region->bytes())))
-		return true;
-
-	// all other cases don't need backing
-	return false;
-}
 
 int address_space::add_change_notifier(std::function<void (read_or_write)> n)
 {
@@ -2327,92 +2069,6 @@ void address_space::remove_change_notifier(int id)
 
 
 //**************************************************************************
-//  BANKING HELPERS
-//**************************************************************************
-
-//-------------------------------------------------
-//  bank_find_or_allocate - allocate a new
-//  bank, or find an existing one, and return the
-//  read/write handler
-//-------------------------------------------------
-
-memory_bank &address_space::bank_find_or_allocate(const char *tag, offs_t addrstart, offs_t addrend, offs_t addrmirror, read_or_write readorwrite)
-{
-	// adjust the addresses, handling mirrors and such
-	offs_t addrmask = ~addrmirror;
-	adjust_addresses(addrstart, addrend, addrmask, addrmirror);
-
-	// look up the bank by name, or else by byte range
-	memory_bank *membank = tag ? m_manager.find(tag) : m_manager.find(*this, addrstart, addrend);
-
-	// if we don't have a bank yet, create a new one
-	if (!membank)
-		membank = m_manager.allocate(*this, addrstart, addrend, tag);
-
-	// add a reference for this space
-	membank->add_reference(*this, readorwrite);
-	return *membank;
-}
-
-
-//**************************************************************************
-//  MEMORY BLOCK
-//**************************************************************************
-
-//-------------------------------------------------
-//  memory_block - constructor
-//-------------------------------------------------
-
-memory_block::memory_block(address_space &space, offs_t addrstart, offs_t addrend, void *memory)
-	: m_machine(space.m_manager.machine()),
-		m_space(space),
-		m_addrstart(addrstart),
-		m_addrend(addrend),
-		m_data(reinterpret_cast<u8 *>(memory))
-{
-	offs_t const length = space.address_to_byte(addrend + 1 - addrstart);
-	VPRINTF(("block_allocate('%s',%s,%08X,%08X,%p)\n", space.device().tag(), space.name(), addrstart, addrend, memory));
-
-	// allocate a block if needed
-	if (m_data == nullptr)
-	{
-		if (length < 4096)
-		{
-			m_allocated.resize(length);
-			memset(&m_allocated[0], 0, length);
-			m_data = &m_allocated[0];
-		}
-		else
-		{
-			m_allocated.resize(length + 0xfff);
-			memset(&m_allocated[0], 0, length + 0xfff);
-			m_data = reinterpret_cast<u8 *>((reinterpret_cast<uintptr_t>(&m_allocated[0]) + 0xfff) & ~0xfff);
-		}
-	}
-
-	// register for saving, but only if we're not part of a memory region
-	if (space.m_manager.region_containing(m_data, length) != nullptr)
-		VPRINTF(("skipping save of this memory block as it is covered by a memory region\n"));
-	else
-	{
-		int bytes_per_element = space.data_width() / 8;
-		std::string name = string_format("%08x-%08x", addrstart, addrend);
-		machine().save().save_memory(&space.device(), "memory", space.device().tag(), space.spacenum(), name.c_str(), m_data, bytes_per_element, (u32)length / bytes_per_element);
-	}
-}
-
-
-//-------------------------------------------------
-//  memory_block - destructor
-//-------------------------------------------------
-
-memory_block::~memory_block()
-{
-}
-
-
-
-//**************************************************************************
 //  MEMORY BANK
 //**************************************************************************
 
@@ -2420,27 +2076,13 @@ memory_block::~memory_block()
 //  memory_bank - constructor
 //-------------------------------------------------
 
-memory_bank::memory_bank(address_space &space, int index, offs_t addrstart, offs_t addrend, const char *tag)
-	: m_machine(space.m_manager.machine()),
-	  m_anonymous(tag == nullptr),
-	  m_addrstart(addrstart),
-	  m_addrend(addrend),
+memory_bank::memory_bank(device_t &device, std::string tag)
+	: m_machine(device.machine()),
 	  m_curentry(0)
 {
-	// generate an internal tag if we don't have one
-	if (tag == nullptr)
-	{
-		m_tag = string_format("~%d~", index);
-		m_name = string_format("Internal bank #%d", index);
-	}
-	else
-	{
-		m_tag = tag;
-		m_name = string_format("Bank '%s'", tag);
-	}
-
-	if (!m_anonymous && machine().save().registration_allowed())
-		machine().save().save_item(&space.device(), "memory", m_tag.c_str(), 0, NAME(m_curentry));
+	m_tag = std::move(tag);
+	m_name = string_format("Bank '%s'", m_tag);
+	machine().save().save_item(&device, "memory", m_tag.c_str(), 0, NAME(m_curentry));
 }
 
 
@@ -2450,35 +2092,6 @@ memory_bank::memory_bank(address_space &space, int index, offs_t addrstart, offs
 
 memory_bank::~memory_bank()
 {
-}
-
-
-//-------------------------------------------------
-//  references_space - walk the list of references
-//  to find a match against the provided space
-//  and read/write
-//-------------------------------------------------
-
-bool memory_bank::references_space(const address_space &space, read_or_write readorwrite) const
-{
-	for (auto &ref : m_reflist)
-		if (ref->matches(space, readorwrite))
-			return true;
-	return false;
-}
-
-
-//-------------------------------------------------
-//  add_reference - add a new reference to the
-//  given space
-//-------------------------------------------------
-
-void memory_bank::add_reference(address_space &space, read_or_write readorwrite)
-{
-	// if we already have a reference, skip it
-	if (references_space(space, readorwrite))
-		return;
-	m_reflist.push_back(std::make_unique<bank_reference>(space, readorwrite));
 }
 
 
@@ -2498,19 +2111,8 @@ void memory_bank::set_base(void *base)
 		m_curentry = 0;
 	}
 	m_entries[m_curentry] = reinterpret_cast<u8 *>(base);
-	for(const auto &cb : m_alloc_notifier)
-		cb(base);
-	m_alloc_notifier.clear();
 }
 
-
-//-------------------------------------------------
-//  add_notifier - add a function used to notify when the allocation is done
-//-------------------------------------------------
-void memory_bank::add_notifier(std::function<void (void *)> cb)
-{
-	m_alloc_notifier.emplace_back(std::move(cb));
-}
 
 //-------------------------------------------------
 //  set_entry - set the base to a pre-configured
@@ -2520,8 +2122,6 @@ void memory_bank::add_notifier(std::function<void (void *)> cb)
 void memory_bank::set_entry(int entrynum)
 {
 	// validate
-	if (m_anonymous)
-		throw emu_fatalerror("memory_bank::set_entry called for anonymous bank");
 	if (entrynum < 0 || entrynum >= int(m_entries.size()))
 		throw emu_fatalerror("memory_bank::set_entry called with out-of-range entry %d", entrynum);
 	if (m_entries[entrynum] == nullptr)
@@ -2573,9 +2173,9 @@ void memory_bank::configure_entries(int startentry, int numentries, void *base, 
 //  memory_region - constructor
 //-------------------------------------------------
 
-memory_region::memory_region(running_machine &machine, const char *name, u32 length, u8 width, endianness_t endian)
+memory_region::memory_region(running_machine &machine, std::string name, u32 length, u8 width, endianness_t endian)
 	: m_machine(machine),
-		m_name(name),
+	    m_name(std::move(name)),
 		m_buffer(length),
 		m_endianness(endian),
 		m_bitwidth(width * 8),
@@ -2583,3 +2183,17 @@ memory_region::memory_region(running_machine &machine, const char *name, u32 len
 {
 	assert(width == 1 || width == 2 || width == 4 || width == 8);
 }
+
+std::string memory_share::compare(u8 width, size_t bytes, endianness_t endianness) const
+{
+	if (width != m_bitwidth)
+		return util::string_format("share %s found with unexpected width (expected %d, found %d)", m_name, width, m_bitwidth);
+	if (bytes != m_bytes)
+		return util::string_format("share %s found with unexpected size (expected %x, found %x)", m_name, bytes, m_bytes);
+	if (endianness != m_endianness && m_bitwidth != 8)
+		return util::string_format("share %s found with unexpected endianness (expected %s, found %s)", m_name,
+								   endianness == ENDIANNESS_LITTLE ? "little" : "big",
+								   m_endianness == ENDIANNESS_LITTLE ? "little" : "big");
+	return "";
+}
+

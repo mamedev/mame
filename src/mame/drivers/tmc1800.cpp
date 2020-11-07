@@ -703,8 +703,6 @@ void tmc2000_state::machine_start()
 {
 	m_led.resolve();
 
-	m_colorram.allocate(TMC2000_COLORRAM_SIZE);
-
 	// randomize color RAM contents
 	for (uint16_t addr = 0; addr < TMC2000_COLORRAM_SIZE; addr++)
 	{

@@ -58,7 +58,7 @@ public:
 		m_kb(*this, TRS80M2_KEYBOARD_TAG),
 		m_rom(*this, Z80_TAG),
 		m_char_rom(*this, MC6845_TAG),
-		m_video_ram(*this, "video_ram")
+		m_video_ram(*this, "video_ram", 0x800, ENDIANNESS_LITTLE)
 	{
 	}
 
@@ -120,7 +120,7 @@ protected:
 	required_device<trs80m2_keyboard_device> m_kb;
 	required_memory_region m_rom;
 	required_memory_region m_char_rom;
-	optional_shared_ptr<uint8_t> m_video_ram;
+	memory_share_creator<uint8_t> m_video_ram;
 
 	// memory state
 	int m_boot_rom;

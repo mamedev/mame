@@ -32,7 +32,7 @@ public:
 		m_brake(*this, "BRAKE"),
 		m_wheel(*this, "WHEEL"),
 		m_workram(*this, "workram"),
-		m_shareram(*this, "shareram", 32) { }
+		m_shareram(*this, "shareram") { }
 
 	void namcofl(machine_config &config);
 

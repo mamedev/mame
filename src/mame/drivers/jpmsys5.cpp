@@ -793,6 +793,8 @@ void jpmsys5_state::machine_start()
 {
 	m_lamps.resolve();
 	m_sys5leds.resolve();
+
+	m_lamp_strobe = 0;
 }
 
 void jpmsys5_state::machine_reset()

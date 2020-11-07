@@ -1730,8 +1730,7 @@ void exidy_state::init_phantoma()
 	m_color_latch[0] = 0x09;
 
 	/* the ROM is actually mapped high */
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0xf800, 0xffff, "bank1");
-	membank("bank1")->set_base(memregion("maincpu")->base() + 0xf800);
+	m_maincpu->space(AS_PROGRAM).install_rom(0xf800, 0xffff, memregion("maincpu")->base() + 0xf800);
 }
 
 

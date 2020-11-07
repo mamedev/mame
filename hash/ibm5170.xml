@@ -8890,45 +8890,45 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- hangs at Sierra logo -->
-	<software name="alienleg" supported="no">
-		<description>Alien Legacy (v1.00)</description>
+	<software name="alienleg">
+		<description>Alien Legacy</description>
 		<year>1994</year>
 		<publisher>Sierra</publisher>
+		<info name="developer" value="Ybarra Productions" />
 		<info name="version" value="1.00" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="Alien Legacy (USA) (Disk 1).img" size="1474560" crc="f7f16180" sha1="61f1a9c36a756fe67344699e9a5a3880f07b5da5"/>
+				<rom name="Alien Legacy [Sierra] [1994] [3.5HD] [Disk 1 of 7].img" size="1474560" crc="1a0a4531" sha1="f242f696e60e25a71c7abf85e3ec44182bce7780"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="Alien Legacy (USA) (Disk 2).img" size="1474560" crc="542fa624" sha1="b09684af9ff178677ecfb352041ed4f9fdd0ee42"/>
+				<rom name="Alien Legacy [Sierra] [1994] [3.5HD] [Disk 2 of 7].img" size="1474560" crc="542fa624" sha1="b09684af9ff178677ecfb352041ed4f9fdd0ee42"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="Alien Legacy (USA) (Disk 3).img" size="1474560" crc="fd3d1f2c" sha1="6fb671829d2cb8255325438cb479f63ca39c08d8"/>
+				<rom name="Alien Legacy [Sierra] [1994] [3.5HD] [Disk 3 of 7].img" size="1474560" crc="fd3d1f2c" sha1="6fb671829d2cb8255325438cb479f63ca39c08d8"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="Alien Legacy (USA) (Disk 4).img" size="1474560" crc="ef83eecf" sha1="ad23c8dbc75fdda672e5b94c00ff09969c549919"/>
+				<rom name="Alien Legacy [Sierra] [1994] [3.5HD] [Disk 4 of 7].img" size="1474560" crc="ef83eecf" sha1="ad23c8dbc75fdda672e5b94c00ff09969c549919"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="Alien Legacy (USA) (Disk 5).img" size="1474560" crc="91d6629c" sha1="c40c0d9e6435a7616b4eb9ee891694e779cdc869"/>
+				<rom name="Alien Legacy [Sierra] [1994] [3.5HD] [Disk 5 of 7].img" size="1474560" crc="91d6629c" sha1="c40c0d9e6435a7616b4eb9ee891694e779cdc869"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="Alien Legacy (USA) (Disk 6).img" size="1474560" crc="bc2335da" sha1="a7e8fe69bd3f9ffde3a3471b9796b5122562d115"/>
+				<rom name="Alien Legacy [Sierra] [1994] [3.5HD] [Disk 6 of 7].img" size="1474560" crc="bc2335da" sha1="a7e8fe69bd3f9ffde3a3471b9796b5122562d115"/>
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="Alien Legacy (USA) (Disk 7).img" size="1474560" crc="3e3556ee" sha1="dbbfecc253cd1b08744087d60a9a032975b544a2"/>
+				<rom name="Alien Legacy [Sierra] [1994] [3.5HD] [Disk 7 of 7].img" size="1474560" crc="3e3556ee" sha1="dbbfecc253cd1b08744087d60a9a032975b544a2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12359,6 +12359,49 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="legacy">
+		<description>The Legacy: Realm of Terror (Euro)</description>
+		<year>1993</year>
+		<publisher>MicroProse</publisher>
+		<info name="developer" value="Magnetic Scrolls/MicroProse" />
+		<info name="version" value="1.154 Apr 21 1993 19:52:07 European Release" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Legacy [MicroProse] [1993] [3.5HD] [Disk 1 of 7].img" size="1474560" crc="d4df80db" sha1="21406873e0887db78c689a45ba92a5d2636a0619" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Legacy [MicroProse] [1993] [3.5HD] [Disk 2 of 7].img" size="1474560" crc="c83a2ca1" sha1="d381460174a89d4d65f26c1387a1542566004ff2" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Legacy [MicroProse] [1993] [3.5HD] [Disk 3 of 7].img" size="1474560" crc="7dee65b0" sha1="20e03f04ab93a55144ce96a3d6484cd2d85543f5" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Legacy [MicroProse] [1993] [3.5HD] [Disk 4 of 7].img" size="1474560" crc="45297f2d" sha1="0fdb8777d556bc9abafc69a44c78a6a474da6d31" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Legacy [MicroProse] [1993] [3.5HD] [Disk 5 of 7].img" size="1474560" crc="1e26e7ea" sha1="b2690c9599730e8ebcb04690413e22ca4d1ab48f" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Legacy [MicroProse] [1993] [3.5HD] [Disk 6 of 7].img" size="1474560" crc="52aaae7e" sha1="3fe8b28bb2faaecf70f2af4aea184c69cdad84e1" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Legacy [MicroProse] [1993] [3.5HD] [Disk 7 of 7].img" size="1474560" crc="b235575d" sha1="734d5775903d15a901937b7b872b1e175daaedd8" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lslvga">
 		<description>Leisure Suit Larry 1: In the Land of the Lounge Lizards (3.5", VGA release, v2.1)</description>
 		<year>1991</year>
@@ -13613,6 +13656,39 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="prophecy">
+		<description>The Prophecy (USA)</description>
+		<year>1993</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Coktel Vision" />
+		<info name="version" value="1.000.000 02-09-93" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Prophecy [Sierra] [1993] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="2b02f3eb" sha1="d664f455af610b9a4ad72e66b26d15b00eedf1b3" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Prophecy [Sierra] [1993] [3.5HD] [Disk 2 of 5].img" size="1474560" crc="4b65e326" sha1="c1cc49d4d186a961c1b5d60a767f083b304c8c45" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Prophecy [Sierra] [1993] [3.5HD] [Disk 3 of 5].img" size="1474560" crc="ba19173d" sha1="86b6b7a7dfcd81951c6761e4f08b0fcc81830b5b" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Prophecy [Sierra] [1993] [3.5HD] [Disk 4 of 5].img" size="1474560" crc="bd798f22" sha1="c0e02fbbfaa4af011793af4b608cf3988b1f5793" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Prophecy [Sierra] [1993] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="3fb8ef2a" sha1="0f4795e52d577c32ea99396dc128517ea70d7cc1" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="quarantin">
 		<description>Quarantine</description>
 		<year>1994</year>
@@ -13841,6 +13917,39 @@ license:CC0
 		<part name="flop7" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
 				<rom name="disk7.img" size="1228800" crc="dc023701" sha1="7bf8ab14b4c000598ed77f3eb3d465c9ca4f405e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rott">
+		<description>Rise of the Triad: Dark War</description>
+		<year>1995</year>
+		<publisher>FormGen</publisher>
+		<info name="developer" value="Apogee" />
+		<info name="version" value="v1.2a Registered" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Rise of the Triad [Apogee] [1995] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="5ced55b4" sha1="866555c6dac2016d8ad48be3882386681f17ad95" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Rise of the Triad [Apogee] [1995] [3.5HD] [Disk 2 of 5].img" size="1474560" crc="12d34527" sha1="b9ad7930d5b4bbe2a385fbd170018aa707124fef" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Rise of the Triad [Apogee] [1995] [3.5HD] [Disk 3 of 5].img" size="1474560" crc="c6115a9f" sha1="0d7ed3ffab9fd83e0a060522b500468a915c5a66" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Rise of the Triad [Apogee] [1995] [3.5HD] [Disk 4 of 5].img" size="1474560" crc="ffa3437e" sha1="6676757332e6c5dc130d76836a3bfcba0b2f1b0e" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Rise of the Triad [Apogee] [1995] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="6652c413" sha1="d45dee8251dbcb20e96397905f823642ac00624f" />
 			</dataarea>
 		</part>
 	</software>
@@ -15450,6 +15559,42 @@ license:CC0
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="X-COM - Terror from the Deep (Europe) (Disk 4).img" size="1474560" crc="9a0c4b32" sha1="f896427120ff68cf560d295c5d898172f669f87a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xargon1">
+		<description>Xargon: Volume 1 - Beyond Reality</description>
+		<year>1994</year>
+		<publisher>The B&amp;N Companies</publisher>
+		<info name="developer" value="Epic MegaGames" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Xargon - Beyond Reality [The B&amp;N Companies] [1994] [3.5DD] [Disk 1 of 1].img" size="737280" crc="6ef0b422" sha1="7401a02c4b1f46a6064e8c70f090c7a67c2bb222"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xargon2">
+		<description>Xargon: Volume 2 - The Secret Chamber</description>
+		<year>1994</year>
+		<publisher>The B&amp;N Companies</publisher>
+		<info name="developer" value="Epic MegaGames" />
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Xargon - The Secret Chamber [The B&amp;N Companies] [1994] [3.5DD] [Disk 1 of 1].img" size="737280" crc="3a3f72aa" sha1="121d29b0824d6f1e6b979b19b8a8936140e48fce"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xargon3">
+		<description>Xargon: Volume 3 - Xargon's Fury</description>
+		<year>1994</year>
+		<publisher>The B&amp;N Companies</publisher>
+		<info name="developer" value="Epic MegaGames" />
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Xargon - Xargon's Fury [The B&amp;N Companies] [1994] [3.5DD] [Disk 1 of 1].img" size="737280" crc="fc55d317" sha1="08609f89ff4a5e942e527316617940fd11f5ee28"/>
 			</dataarea>
 		</part>
 	</software>

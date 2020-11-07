@@ -50,10 +50,12 @@ public:
 		, m_tileram(*this, "tileram")
 		, m_objectram(*this, "objectram")
 		, m_paletteram(*this, "paletteram")
+		, m_bank1(*this, "bank1")
 	{
 	}
 
 	void decocass(machine_config &config);
+	void decocrom(machine_config &config);
 
 	void init_decocass();
 	void init_decocrom();
@@ -94,6 +96,7 @@ private:
 	required_shared_ptr<uint8_t> m_tileram;
 	required_shared_ptr<uint8_t> m_objectram;
 	required_shared_ptr<uint8_t> m_paletteram;
+	optional_memory_bank         m_bank1;
 
 	size_t    m_bgvideoram_size;
 
@@ -210,6 +213,7 @@ private:
 	void cdsteljn_mux_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(decocass_audio_nmi_gen);
 	void decocass_map(address_map &map);
+	void decocrom_map(address_map &map);
 	void decocass_sound_map(address_map &map);
 
 	void draw_edge(bitmap_ind16 &bitmap, const rectangle &cliprect, int which, bool opaque);

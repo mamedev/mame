@@ -479,15 +479,14 @@ const char *device_image_interface::get_feature(const char *feature_name) const
 //  load_software_region -
 //-------------------------------------------------
 
-bool device_image_interface::load_software_region(const char *tag, optional_shared_ptr<u8> &ptr)
+bool device_image_interface::load_software_region(const char *tag, std::unique_ptr<u8[]> &ptr)
 {
 	size_t size = get_software_region_length(tag);
 
 	if (size)
 	{
-		ptr.allocate(size);
-
-		memcpy(ptr, get_software_region(tag), size);
+		ptr = std::make_unique<u8[]>(size);
+		memcpy(ptr.get(), get_software_region(tag), size);
 	}
 
 	return size > 0;

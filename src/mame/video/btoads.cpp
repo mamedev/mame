@@ -196,8 +196,8 @@ void btoads_state::render_sprite_row(uint16_t *sprite_source, uint32_t address)
 	int color = (~*m_sprite_control >> 8) & 0xf0;
 	int srcoffs = m_sprite_source_offs << 8;
 	int srcend = srcoffs + (width << 8);
-	int srcstep = 0x100 - m_sprite_scale[0];
-	int dststep = 0x100 - m_sprite_scale[8];
+	int srcstep = 0x100 - (m_sprite_scale[0] & 0xffff);
+	int dststep = 0x100 - (m_sprite_scale[4] & 0xffff);
 	int dstoffs = m_sprite_dest_offs << 8;
 
 	/* non-shadow case */
@@ -260,7 +260,13 @@ TMS340X0_TO_SHIFTREG_CB_MEMBER(btoads_state::to_shiftreg)
 	/* reads from this region set the sprite source address */
 	else if (address >= 0xa8000000 && address <= 0xabffffff)
 	{
-		memcpy(shiftreg, &m_vram_fg_data[(address & 0x7fc000) >> 4], 0x400);
+		const u32 *src = &m_vram_fg_data[(address & 0x7fc000) >> 5];
+		u16 *dest = shiftreg;
+		for(unsigned int i=0; i != 0x100; i++) {
+			*dest++ = *src;
+			*dest++ = *src >> 16;
+			src++;
+		}
 		m_sprite_source_offs = (address & 0x003fff) >> 3;
 	}
 
@@ -282,11 +288,17 @@ TMS340X0_FROM_SHIFTREG_CB_MEMBER(btoads_state::from_shiftreg)
 		;
 
 	/* writes to this region copy standard data */
-	else if (address >= 0xa8000000 && address <= 0xabffffff)
+	else if (address >= 0xa8000000 && address <= 0xabffffff) {
+		const u16 *src = shiftreg;
+		u32 *dest = &m_vram_fg_data[(address & 0x7fc000) >> 5];
+		for(unsigned int i=0; i != 0x100; i++) {
+			*dest++ = src[0] | (src[1] << 16);
+			src += 2;
+		}
 		memcpy(&m_vram_fg_data[(address & 0x7fc000) >> 4], shiftreg, 0x400);
 
 	/* writes to this region render the current sprite data */
-	else if (address >= 0xac000000 && address <= 0xafffffff)
+	} else if (address >= 0xac000000 && address <= 0xafffffff)
 		render_sprite_row(shiftreg, address);
 
 	else

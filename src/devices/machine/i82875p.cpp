@@ -443,7 +443,7 @@ void i82875p_overflow_device::overflow_map(address_map &map)
 {
 	map(0x000, 0x007).rw(FUNC(i82875p_overflow_device::dram_row_boundary_r), FUNC(i82875p_overflow_device::dram_row_boundary_w));
 	map(0x010, 0x013).rw(FUNC(i82875p_overflow_device::dram_row_attribute_r), FUNC(i82875p_overflow_device::dram_row_attribute_w));
-	map(0x060, 0x064).rw(FUNC(i82875p_overflow_device::dram_timing_r), FUNC(i82875p_overflow_device::dram_timing_w));
+	map(0x060, 0x063).rw(FUNC(i82875p_overflow_device::dram_timing_r), FUNC(i82875p_overflow_device::dram_timing_w));
 	map(0x068, 0x06b).rw(FUNC(i82875p_overflow_device::dram_controller_mode_r), FUNC(i82875p_overflow_device::dram_controller_mode_w));
 }
 

@@ -86,8 +86,8 @@ public:
 		m_cassette(*this, CASSETTE_TAG),
 		m_ram(*this, RAM_TAG),
 		m_rom(*this, Z80_TAG),
-		m_video_ram(*this, "video_ram"),
-		m_char_ram(*this, "char_ram"),
+		m_video_ram(*this, "video_ram", 0x4000, ENDIANNESS_LITTLE),
+		m_char_ram(*this, "char_ram", 0x800, ENDIANNESS_LITTLE),
 		m_io_sb(*this, "SB"),
 		m_ctc_z0(0),
 		m_sio_txcb(0),
@@ -106,8 +106,8 @@ public:
 	optional_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
-	optional_shared_ptr<uint8_t> m_video_ram;
-	optional_shared_ptr<uint8_t> m_char_ram;
+	memory_share_creator<uint8_t> m_video_ram;
+	memory_share_creator<uint8_t> m_char_ram;
 	required_ioport m_io_sb;
 
 	virtual void machine_start() override;
@@ -276,7 +276,7 @@ public:
 		m_rad_prom(*this, "rad"),
 		m_hru2_prom(*this, "hru"),
 		m_char_rom(*this, MC6845_TAG),
-		m_attr_ram(*this, "attr_ram")
+		m_attr_ram(*this, "attr_ram", 0x800, ENDIANNESS_LITTLE)
 	{ }
 
 	required_device<mc6845_device> m_crtc;
@@ -285,7 +285,7 @@ public:
 	required_memory_region m_rad_prom;
 	required_memory_region m_hru2_prom;
 	required_memory_region m_char_rom;
-	optional_shared_ptr<uint8_t> m_attr_ram;
+	memory_share_creator<uint8_t> m_attr_ram;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

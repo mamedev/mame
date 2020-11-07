@@ -301,6 +301,13 @@ void model2_tgp_state::machine_reset()
 	m_copro_tgp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
+void model2o_gtx_state::machine_reset()
+{
+	model2_tgp_state::machine_reset();
+
+	m_gtx_state = 0;
+}
+
 void model2a_state::machine_reset()
 {
 	model2_tgp_state::machine_reset();
@@ -318,6 +325,9 @@ void model2b_state::machine_reset()
 	m_copro_adsp->set_input_line(SHARC_INPUT_FLAG0, ASSERT_LINE);
 	// clear FIFOOUT buffer full flag on SHARC
 	m_copro_adsp->set_input_line(SHARC_INPUT_FLAG1, CLEAR_LINE);
+
+	m_iop_data = 0;
+	m_iop_write_num = 0;
 }
 
 void model2c_state::machine_reset()
@@ -7088,9 +7098,9 @@ void model2_state::init_doa()
 }
 
 // Model 2 (TGPs, Model 1 sound board)
-GAME( 1994, daytona,    0,       daytona,      daytona, model2o_state,  empty_init,   ROT0, "Sega", "Daytona USA (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, daytonase,  daytona, daytona,      daytona, model2o_state,  empty_init,   ROT0, "Sega", "Daytona USA Special Edition (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, daytona93,  daytona, daytona,      daytona, model2o_state,  empty_init,   ROT0, "Sega", "Daytona USA (Japan)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, daytona,    0,       daytona,      daytona, model2o_state,  empty_init,   ROT0, "Sega", "Daytona USA (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, daytonase,  daytona, daytona,      daytona, model2o_state,  empty_init,   ROT0, "Sega", "Daytona USA Special Edition (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, daytona93,  daytona, daytona,      daytona, model2o_state,  empty_init,   ROT0, "Sega", "Daytona USA", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, daytonas,   daytona, daytona,      daytona, model2o_state,  empty_init,   ROT0, "Sega", "Daytona USA (With Saturn Adverts)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994?,daytonat,   daytona, daytona,      daytona, model2o_state,  empty_init,   ROT0, "hack (Kyle Hodgetts)", "Daytona USA (Turbo hack, set 1)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994?,daytonata,  daytona, daytona,      daytona, model2o_state,  empty_init,   ROT0, "hack (Kyle Hodgetts)", "Daytona USA (Turbo hack, set 2)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )

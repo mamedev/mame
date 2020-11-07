@@ -145,7 +145,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
 		m_crtc(*this, "crtc"),
-		m_vram(*this, "vram"),
+		m_vram(*this, "vram", 0x10000, ENDIANNESS_LITTLE),
 		m_fontram(*this, "fram"),
 		m_dma1(*this, "dma1"),
 		m_dma2(*this, "dma2"),
@@ -238,7 +238,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<scn2674_device> m_crtc;
-	required_shared_ptr<uint8_t> m_vram;
+	memory_share_creator<uint8_t> m_vram;
 	required_shared_ptr<uint8_t> m_fontram;
 	required_device<am9517a_device> m_dma1;
 	required_device<am9517a_device> m_dma2;
@@ -760,7 +760,7 @@ void octopus_state::machine_start()
 	m_vidctrl = 0xff;
 
 	// install RAM
-	m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x0000,m_ram->size()-1,"main_ram_bank");
+	m_maincpu->space(AS_PROGRAM).install_ram(0x0000,m_ram->size()-1,m_ram->pointer());
 	m_maincpu->space(AS_PROGRAM).nop_readwrite(m_ram->size(),0xcffff);
 }
 
@@ -773,13 +773,11 @@ void octopus_state::machine_reset()
 	m_current_drive = 0;
 	m_rtc_address = true;
 	m_rtc_data = false;
-	membank("main_ram_bank")->set_base(m_ram->pointer());
 	m_kb_uart->write_dsr(1);  // DSR is used to determine if a keyboard is connected?  If DSR is high, then the CHAR_OUT BIOS function will not output to the screen.
 }
 
 void octopus_state::video_start()
 {
-	m_vram.allocate(0x10000);
 }
 
 uint8_t octopus_state::video_latch_r(offs_t offset)

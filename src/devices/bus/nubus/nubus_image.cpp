@@ -89,9 +89,8 @@ image_init_result nubus_image_device::messimg_disk_image_device::call_load()
 		return image_init_result::FAIL;
 	}
 
-	m_data = make_unique_clear<uint8_t[]>(m_size);
 	fseek(0, SEEK_SET);
-	fread(m_data.get(), m_size);
+	fread(m_data, m_size);
 	m_ejected = false;
 
 	return image_init_result::PASS;

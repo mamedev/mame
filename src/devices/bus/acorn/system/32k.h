@@ -38,6 +38,7 @@ protected:
 
 private:
 	required_ioport m_links;
+	u8 m_ram[32768];
 };
 
 

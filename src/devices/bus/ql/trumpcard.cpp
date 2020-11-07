@@ -114,7 +114,7 @@ ql_trump_card_device::ql_trump_card_device(const machine_config &mconfig, device
 	m_floppy0(*this, WD1772_TAG":0"),
 	m_floppy1(*this, WD1772_TAG":1"),
 	m_rom(*this, "rom"),
-	m_ram(*this, "ram"),
+	m_ram(*this, "ram", ram_size, ENDIANNESS_BIG),
 	m_ram_size(ram_size),
 	m_rom_en(false)
 {
@@ -142,9 +142,6 @@ ql_trump_card_768k_device::ql_trump_card_768k_device(const machine_config &mconf
 
 void ql_trump_card_device::device_start()
 {
-	// allocate memory
-	m_ram.allocate(m_ram_size);
-
 	// state saving
 	save_item(NAME(m_rom_en));
 }

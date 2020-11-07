@@ -33,7 +33,7 @@ void lisa_state::lisa_fdc_map(address_map &map)
 	map(0x0000, 0x03ff).ram().share("fdc_ram");             /* RAM (shared with 68000) */
 	map(0x0400, 0x07ff).rw(FUNC(lisa_state::lisa_fdc_io_r), FUNC(lisa_state::lisa_fdc_io_w)); /* disk controller (IWM and TTL logic) */
 	map(0x0800, 0x0fff).noprw();
-	map(0x1000, 0x1fff).rom().region("fdccpu", 0x1000).share("fdc_rom");     /* ROM */
+	map(0x1000, 0x1fff).rom().region("fdccpu", 0x1000);     /* ROM */
 }
 
 void lisa_state::lisa210_fdc_map(address_map &map)
@@ -43,7 +43,7 @@ void lisa_state::lisa210_fdc_map(address_map &map)
 	map(0x0400, 0x07ff).noprw();                                     /* nothing, or RAM wrap-around ??? */
 	map(0x0800, 0x0bff).rw(FUNC(lisa_state::lisa_fdc_io_r), FUNC(lisa_state::lisa_fdc_io_w)); /* disk controller (IWM and TTL logic) */
 	map(0x0c00, 0x0fff).noprw();                                     /* nothing, or IO port wrap-around ??? */
-	map(0x1000, 0x1fff).rom().region("fdccpu", 0x1000).share("fdc_rom");         /* ROM */
+	map(0x1000, 0x1fff).rom().region("fdccpu", 0x1000);         /* ROM */
 }
 
 

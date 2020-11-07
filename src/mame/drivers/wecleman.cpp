@@ -317,7 +317,7 @@ uint16_t wecleman_state::wecleman_protection_r()
 void wecleman_state::wecleman_protection_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 2) m_prot_state = data & 0x2000;
-	if (!m_prot_state) COMBINE_DATA(m_protection_ram + offset);
+	if (!m_prot_state) COMBINE_DATA(&m_protection_ram[offset]);
 }
 
 
@@ -551,22 +551,22 @@ void wecleman_state::wecleman_map(address_map &map)
 
 
 
-void wecleman_state::hotchase_map(address_map &map)
+void hotchase_state::hotchase_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x040000, 0x041fff).ram();                                 // RAM
 	map(0x060000, 0x063fff).ram();                                 // RAM
-	map(0x080000, 0x080011).ram().w(FUNC(wecleman_state::blitter_w)).share("blitter_regs");   // Blitter
+	map(0x080000, 0x080011).ram().w(FUNC(hotchase_state::blitter_w)).share("blitter_regs");   // Blitter
 	map(0x100000, 0x100fff).rw("k051316_1", FUNC(k051316_device::read), FUNC(k051316_device::write)).umask16(0x00ff); // Background
 	map(0x101000, 0x10101f).w("k051316_1", FUNC(k051316_device::ctrl_w)).umask16(0x00ff);   // Background Ctrl
 	map(0x102000, 0x102fff).rw("k051316_2", FUNC(k051316_device::read), FUNC(k051316_device::write)).umask16(0x00ff); // Foreground
 	map(0x103000, 0x10301f).w("k051316_2", FUNC(k051316_device::ctrl_w)).umask16(0x00ff);   // Foreground Ctrl
-	map(0x110000, 0x111fff).ram().w(FUNC(wecleman_state::hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w)).share("paletteram");
+	map(0x110000, 0x111fff).ram().w(FUNC(hotchase_state::hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w)).share("paletteram");
 	map(0x120000, 0x123fff).ram().share("share1");                  // Shared with sub CPU
 	map(0x130000, 0x130fff).ram().share("spriteram");   // Sprites
 	map(0x140001, 0x140001).w("soundlatch", FUNC(generic_latch_8_device::write));    // To sound CPU
-	map(0x140002, 0x140003).w(FUNC(wecleman_state::selected_ip_w));    // Selects accelerator / wheel /
-	map(0x140004, 0x140005).w(FUNC(wecleman_state::irqctrl_w));    // Main CPU controls the other CPUs
+	map(0x140002, 0x140003).w(FUNC(hotchase_state::selected_ip_w));    // Selects accelerator / wheel /
+	map(0x140004, 0x140005).w(FUNC(hotchase_state::irqctrl_w));    // Main CPU controls the other CPUs
 	map(0x140006, 0x140007).nopr(); // Watchdog reset
 	map(0x140010, 0x140011).portr("IN0");    // Coins + brake + gear
 	map(0x140012, 0x140013).portr("IN1");    // ?? bit 4 from sound cpu
@@ -594,7 +594,7 @@ void wecleman_state::wecleman_sub_map(address_map &map)
                         Hot Chase Sub CPU Handlers
 ***************************************************************************/
 
-void wecleman_state::hotchase_sub_map(address_map &map)
+void hotchase_state::hotchase_sub_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom(); // ROM
 	map(0x020000, 0x020fff).ram().share("roadram"); // Road
@@ -665,7 +665,7 @@ void wecleman_state::wecleman_sound_map(address_map &map)
                         Hot Chase Sound CPU Handlers
 ***************************************************************************/
 
-void wecleman_state::hotchase_sound_control_w(offs_t offset, uint8_t data)
+void hotchase_state::hotchase_sound_control_w(offs_t offset, uint8_t data)
 {
 //  int reg[8];
 
@@ -712,7 +712,7 @@ void wecleman_state::hotchase_sound_control_w(offs_t offset, uint8_t data)
 	}
 }
 
-void wecleman_state::hotchase_sound_hs_w(uint8_t data)
+void hotchase_state::hotchase_sound_hs_w(uint8_t data)
 {
 	m_hotchase_sound_hs = true;
 }
@@ -720,27 +720,27 @@ void wecleman_state::hotchase_sound_hs_w(uint8_t data)
 /* Read and write handlers for one K007232 chip:
    even and odd register are mapped swapped */
 template<int Chip>
-uint8_t wecleman_state::hotchase_k007232_r(offs_t offset)
+uint8_t hotchase_state::hotchase_k007232_r(offs_t offset)
 {
 	return m_k007232[Chip]->read(offset ^ 1);
 }
 
 template<int Chip>
-void wecleman_state::hotchase_k007232_w(offs_t offset, uint8_t data)
+void hotchase_state::hotchase_k007232_w(offs_t offset, uint8_t data)
 {
 	m_k007232[Chip]->write(offset ^ 1, data);
 }
 
-void wecleman_state::hotchase_sound_map(address_map &map)
+void hotchase_state::hotchase_sound_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x1000, 0x100d).rw(FUNC(wecleman_state::hotchase_k007232_r<0>), FUNC(wecleman_state::hotchase_k007232_w<0>));   // 3 x K007232
-	map(0x2000, 0x200d).rw(FUNC(wecleman_state::hotchase_k007232_r<1>), FUNC(wecleman_state::hotchase_k007232_w<1>));
-	map(0x3000, 0x300d).rw(FUNC(wecleman_state::hotchase_k007232_r<2>), FUNC(wecleman_state::hotchase_k007232_w<2>));
-	map(0x4000, 0x4007).w(FUNC(wecleman_state::hotchase_sound_control_w)); // Sound volume, banking, etc.
+	map(0x1000, 0x100d).rw(FUNC(hotchase_state::hotchase_k007232_r<0>), FUNC(hotchase_state::hotchase_k007232_w<0>));   // 3 x K007232
+	map(0x2000, 0x200d).rw(FUNC(hotchase_state::hotchase_k007232_r<1>), FUNC(hotchase_state::hotchase_k007232_w<1>));
+	map(0x3000, 0x300d).rw(FUNC(hotchase_state::hotchase_k007232_r<2>), FUNC(hotchase_state::hotchase_k007232_w<2>));
+	map(0x4000, 0x4007).w(FUNC(hotchase_state::hotchase_sound_control_w)); // Sound volume, banking, etc.
 	map(0x5000, 0x5000).nopw();   // 0 at start of IRQ service, 1 at end (irq mask?)
 	map(0x6000, 0x6000).r("soundlatch", FUNC(generic_latch_8_device::read)); // From main CPU (Read on IRQ)
-	map(0x7000, 0x7000).w(FUNC(wecleman_state::hotchase_sound_hs_w));    // ACK signal to main CPU
+	map(0x7000, 0x7000).w(FUNC(hotchase_state::hotchase_sound_hs_w));    // ACK signal to main CPU
 	map(0x8000, 0xffff).rom();
 }
 
@@ -1031,7 +1031,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(wecleman_state::wecleman_scanline)
 		m_maincpu->set_input_line(5, HOLD_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(wecleman_state::hotchase_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(hotchase_state::hotchase_scanline)
 {
 	int scanline = param;
 
@@ -1039,12 +1039,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(wecleman_state::hotchase_scanline)
 		m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
-MACHINE_RESET_MEMBER(wecleman_state, wecleman)
+void wecleman_state::machine_reset()
 {
 	m_k007232[0]->set_bank( 0, 1 );
 }
 
-MACHINE_START_MEMBER(wecleman_state, wecleman)
+void wecleman_state::machine_start()
 {
 	m_led.resolve();
 }
@@ -1065,9 +1065,6 @@ void wecleman_state::wecleman(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
-	MCFG_MACHINE_START_OVERRIDE(wecleman_state, wecleman)
-	MCFG_MACHINE_RESET_OVERRIDE(wecleman_state, wecleman)
-
 	adc0804_device &adc(ADC0804(config, "adc", 640000)); // unknown "ADCCLK" (generated on video board?)
 	adc.vin_callback().set(FUNC(wecleman_state::selected_ip_r));
 
@@ -1082,8 +1079,6 @@ void wecleman_state::wecleman(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wecleman);
 
 	PALETTE(config, m_palette).set_entries(2048);
-
-	MCFG_VIDEO_START_OVERRIDE(wecleman_state,wecleman)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1104,17 +1099,12 @@ void wecleman_state::wecleman(machine_config &config)
                         Hot Chase Hardware Definitions
 ***************************************************************************/
 
-INTERRUPT_GEN_MEMBER(wecleman_state::hotchase_sound_timer)
+INTERRUPT_GEN_MEMBER(hotchase_state::hotchase_sound_timer)
 {
 	device.execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
-MACHINE_START_MEMBER(wecleman_state, hotchase)
-{
-	m_led.resolve();
-}
-
-MACHINE_RESET_MEMBER(wecleman_state, hotchase)
+void hotchase_state::machine_reset()
 {
 	int i;
 
@@ -1128,27 +1118,24 @@ MACHINE_RESET_MEMBER(wecleman_state, hotchase)
 }
 
 
-void wecleman_state::hotchase(machine_config &config)
+void hotchase_state::hotchase(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 10000000);   /* 10 MHz - PCB is drawn in one set's readme */
-	m_maincpu->set_addrmap(AS_PROGRAM, &wecleman_state::hotchase_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(wecleman_state::hotchase_scanline), "screen", 0, 1);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hotchase_state::hotchase_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(hotchase_state::hotchase_scanline), "screen", 0, 1);
 
 	M68000(config, m_subcpu, 10000000);   /* 10 MHz - PCB is drawn in one set's readme */
-	m_subcpu->set_addrmap(AS_PROGRAM, &wecleman_state::hotchase_sub_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &hotchase_state::hotchase_sub_map);
 
 	MC6809E(config, m_audiocpu, 3579545 / 2);    /* 3.579/2 MHz - PCB is drawn in one set's readme */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &wecleman_state::hotchase_sound_map);
-	m_audiocpu->set_periodic_int(FUNC(wecleman_state::hotchase_sound_timer), attotime::from_hz(496));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &hotchase_state::hotchase_sound_map);
+	m_audiocpu->set_periodic_int(FUNC(hotchase_state::hotchase_sound_timer), attotime::from_hz(496));
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
-	MCFG_MACHINE_RESET_OVERRIDE(wecleman_state, hotchase)
-	MCFG_MACHINE_START_OVERRIDE(wecleman_state, hotchase)
-
 	adc0804_device &adc(ADC0804(config, "adc", 640000)); // unknown clock (generated on video board?)
-	adc.vin_callback().set(FUNC(wecleman_state::selected_ip_r));
+	adc.vin_callback().set(FUNC(hotchase_state::selected_ip_r));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1156,24 +1143,22 @@ void wecleman_state::hotchase(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(320 +16, 256);
 	m_screen->set_visarea(0, 320-1, 0, 224-1);
-	m_screen->set_screen_update(FUNC(wecleman_state::screen_update_hotchase));
+	m_screen->set_screen_update(FUNC(hotchase_state::screen_update_hotchase));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hotchase);
 	PALETTE(config, m_palette).set_entries(8192);
 
-	MCFG_VIDEO_START_OVERRIDE(wecleman_state, hotchase)
-
 	K051316(config, m_k051316[0], 0);
 	m_k051316[0]->set_palette(m_palette);
 	m_k051316[0]->set_offsets(-0xb0 / 2, -16);
 	m_k051316[0]->set_wrap(1);
-	m_k051316[0]->set_zoom_callback(FUNC(wecleman_state::hotchase_zoom_callback_1));
+	m_k051316[0]->set_zoom_callback(FUNC(hotchase_state::hotchase_zoom_callback_1));
 
 	K051316(config, m_k051316[1], 0);
 	m_k051316[1]->set_palette(m_palette);
 	m_k051316[1]->set_offsets(-0xb0 / 2, -16);
-	m_k051316[1]->set_zoom_callback(FUNC(wecleman_state::hotchase_zoom_callback_2));
+	m_k051316[1]->set_zoom_callback(FUNC(hotchase_state::hotchase_zoom_callback_2));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1690,7 +1675,7 @@ ROM_END
     in a ROM module definition.  This routine unpacks each sprite nibble
     into a byte, doubling the memory consumption. */
 
-void wecleman_state::hotchase_sprite_decode( int num16_banks, int bank_size )
+void hotchase_state::hotchase_sprite_decode( int num16_banks, int bank_size )
 {
 	uint8_t *base;
 	int i;
@@ -1737,7 +1722,7 @@ void wecleman_state::hotchase_sprite_decode( int num16_banks, int bank_size )
 }
 
 /* Unpack sprites data and do some patching */
-void wecleman_state::init_hotchase()
+void hotchase_state::init_hotchase()
 {
 //  uint16_t *RAM1 = (uint16_t) memregion("maincpu")->base(); /* Main CPU patches */
 //  RAM[0x1140/2] = 0x0015; RAM[0x195c/2] = 0x601A; // faster self test
@@ -1760,5 +1745,5 @@ GAMEL( 1988, weclemanb, wecleman, wecleman, wecleman, wecleman_state, init_wecle
 GAMEL( 1986, weclemanc, wecleman, wecleman, wecleman, wecleman_state, init_wecleman, ROT0, "Konami", "WEC Le Mans 24 (v1.26)", 0, layout_wecleman )
 // a version 1.21 is known to exist too, see https://www.youtube.com/watch?v=4l8vYJi1OeU
 
-GAMEL( 1988, hotchase,  0,        hotchase, hotchase, wecleman_state, init_hotchase, ROT0, "Konami", "Hot Chase (set 1)", 0, layout_wecleman )
-GAMEL( 1988, hotchasea, hotchase, hotchase, hotchase, wecleman_state, init_hotchase, ROT0, "Konami", "Hot Chase (set 2)", 0, layout_wecleman )
+GAMEL( 1988, hotchase,  0,        hotchase, hotchase, hotchase_state, init_hotchase, ROT0, "Konami", "Hot Chase (set 1)", 0, layout_wecleman )
+GAMEL( 1988, hotchasea, hotchase, hotchase, hotchase, hotchase_state, init_hotchase, ROT0, "Konami", "Hot Chase (set 2)", 0, layout_wecleman )

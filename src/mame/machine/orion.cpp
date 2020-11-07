@@ -253,7 +253,7 @@ void orion_state::orionz80_switch_bank()
 	bank_select = (m_orionz80_dispatcher & 0x0c) >> 2;
 	segment_select = m_orionz80_dispatcher & 0x03;
 
-	space.install_write_bank(0x0000, 0x3fff, "bank1");
+	space.install_write_bank(0x0000, 0x3fff, m_bank1);
 	if ((m_orionz80_dispatcher & 0x80)==0)
 	{ // dispatcher on
 		m_bank1->set_base(m_ram->pointer() + 0x10000 * bank_select + segment_select * 0x4000 );
@@ -311,8 +311,8 @@ void orion_z80_state::machine_reset()
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	space.unmap_write(0x0000, 0x3fff);
-	space.install_write_bank(0x4000, 0xefff, "bank2");
-	space.install_write_bank(0xf000, 0xf3ff, "bank3");
+	space.install_write_bank(0x4000, 0xefff, m_bank2);
+	space.install_write_bank(0xf000, 0xf3ff, m_bank3);
 
 	space.install_write_handler(0xf400, 0xf4ff, write8sm_delegate(*this, FUNC(orion_z80_state::orion128_system_w)));
 	space.install_write_handler(0xf500, 0xf5ff, write8sm_delegate(*this, FUNC(orion_z80_state::orion128_romdisk_w)));
@@ -390,15 +390,14 @@ void orion_state::orionpro_bank_switch()
 	if (is128==1)
 		page = m_orionpro_128_page & 7;
 
-	space.install_write_bank(0x0000, 0x1fff, "bank1");
-	space.install_write_bank(0x2000, 0x3fff, "bank2");
-	space.install_write_bank(0x4000, 0x7fff, "bank3");
-	space.install_write_bank(0x8000, 0xbfff, "bank4");
-	space.install_write_bank(0xc000, 0xefff, "bank5");
-	space.install_write_bank(0xf000, 0xf3ff, "bank6");
-	space.install_write_bank(0xf400, 0xf7ff, "bank7");
-	space.install_write_bank(0xf800, 0xffff, "bank8");
-
+	space.install_write_bank(0x0000, 0x1fff, m_bank1);
+	space.install_write_bank(0x2000, 0x3fff, m_bank2);
+	space.install_write_bank(0x4000, 0x7fff, m_bank3);
+	space.install_write_bank(0x8000, 0xbfff, m_bank4);
+	space.install_write_bank(0xc000, 0xefff, m_bank5);
+	space.install_write_bank(0xf000, 0xf3ff, m_bank6);
+	space.install_write_bank(0xf400, 0xf7ff, m_bank7);
+	space.install_write_bank(0xf800, 0xffff, m_bank8);
 
 	if ((m_orionpro_dispatcher & 0x01)==0x00)
 	{   // RAM0 segment disabled

@@ -410,9 +410,6 @@ void mtech_state::set_genz80_as_md()
 {
 	address_space &prg = m_z80snd->space(AS_PROGRAM);
 
-	prg.install_readwrite_bank(0x0000, 0x1fff, "bank1");
-	machine().root_device().membank("bank1")->set_base(m_genz80.z80_prgram.get());
-
 	prg.install_ram(0x0000, 0x1fff, m_genz80.z80_prgram.get());
 
 	prg.install_readwrite_handler(0x4000, 0x4003, read8sm_delegate(*m_ymsnd, FUNC(ym2612_device::read)), write8sm_delegate(*m_ymsnd, FUNC(ym2612_device::write)));

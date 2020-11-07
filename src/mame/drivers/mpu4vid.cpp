@@ -217,7 +217,7 @@ public:
 		mpu4_state(mconfig, type, tag),
 		m_videocpu(*this, "video"),
 		m_scn2674(*this, "scn2674_vid"),
-		m_vid_vidram(*this, "vid_vidram"),
+		m_vid_vidram(*this, "vid_vidram", 0x20000, ENDIANNESS_BIG),
 		m_vid_mainram(*this, "vid_mainram"),
 		m_acia_0(*this, "acia6850_0"),
 		m_acia_1(*this, "acia6850_1"),
@@ -270,7 +270,7 @@ public:
 private:
 	required_device<m68000_base_device> m_videocpu;
 	optional_device<scn2674_device> m_scn2674;
-	optional_shared_ptr<uint16_t> m_vid_vidram;
+	memory_share_creator<uint16_t> m_vid_vidram;
 	optional_shared_ptr<uint16_t> m_vid_mainram;
 	required_device<acia6850_device> m_acia_0;
 	required_device<acia6850_device> m_acia_1;
@@ -500,8 +500,6 @@ void mpu4vid_state::mpu4_vid_vidram_w(offs_t offset, uint16_t data, uint16_t mem
 
 void mpu4vid_state::video_start()
 {
-	m_vid_vidram.allocate(0x20000/2);
-
 	memset(m_vid_vidram,0,0x20000);
 
 	/* find first empty slot to decode gfx */
@@ -512,7 +510,15 @@ void mpu4vid_state::video_start()
 	assert(m_gfx_index != MAX_GFX_ELEMENTS);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(m_gfx_index+0, std::make_unique<gfx_element>(m_palette, mpu4_vid_char_8x8_layout, reinterpret_cast<uint8_t *>(m_vid_vidram.target()), NATIVE_ENDIAN_VALUE_LE_BE(8,0), m_palette->entries() / 16, 0));
+	m_gfxdecode->set_gfx(
+			m_gfx_index+0,
+			std::make_unique<gfx_element>(
+				m_palette,
+				mpu4_vid_char_8x8_layout,
+				reinterpret_cast<uint8_t *>(m_vid_vidram.target()),
+				NATIVE_ENDIAN_VALUE_LE_BE(8,0),
+				m_palette->entries() / 16,
+				0));
 }
 
 EF9369_COLOR_UPDATE( mpu4vid_state::ef9369_color_update )

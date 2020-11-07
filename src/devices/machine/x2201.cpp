@@ -45,7 +45,7 @@ DEFINE_DEVICE_TYPE(X2201, x2201_device, "x2201", "Xicor X2201 1024x1 NOVRAM")
 x2201_device::x2201_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, X2201, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
-	, m_default_data(*this, DEVICE_SELF, 1024 / 8)
+	, m_default_data(*this, DEVICE_SELF)
 	, m_cs(false)
 	, m_store(false)
 	, m_array_recall(false)
@@ -61,7 +61,7 @@ void x2201_device::device_start()
 {
 	// create arrays
 	m_ram = make_unique_clear<u8[]>(1024 / 8);
-	m_eeprom = std::make_unique<u8[]>(1028 / 8);
+	m_eeprom = std::make_unique<u8[]>(1024 / 8);
 
 	// register state for saving
 	save_pointer(NAME(m_ram), 1024 / 8);

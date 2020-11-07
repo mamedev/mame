@@ -92,17 +92,15 @@ private:
 		// configuration
 		void set_decrypt(fd1089_base_device *fd1089);
 		void set_decrypt(fd1094_device *fd1094);
-		void clear() { set(nullptr, nullptr, 0, 0, ~0, nullptr); }
-		void set(memory_bank *bank, memory_bank *decrypted_bank, offs_t start, offs_t end, offs_t rgnoffs, u8 *src);
+		void clear() { set(0, 0, ~0, nullptr); }
+		void *set(offs_t start, offs_t end, offs_t rgnoffs, void *src);
 
 		// updating
-		void update();
+		void *update();
 		void reset() { m_fd1089_decrypted.clear(); if (m_fd1094_cache != nullptr) m_fd1094_cache->reset(); }
 
 	private:
 		// internal state
-		memory_bank *      m_bank;
-		memory_bank *      m_decrypted_bank;
 		offs_t             m_start;
 		offs_t             m_end;
 		offs_t             m_rgnoffs;

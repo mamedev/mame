@@ -170,7 +170,7 @@ void shangkid_state::shangkid_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 	const uint8_t *source, *finish;
 
 	finish = m_spriteram;
-	source = m_spriteram+0x200;
+	source = &m_spriteram[0x200];
 	while( source>finish ){
 		source -= 8;
 		draw_sprite(source, bitmap,cliprect );

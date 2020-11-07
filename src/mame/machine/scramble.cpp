@@ -85,7 +85,7 @@ void scramble_state::cavelon_banksw()
 	   to keep the CPU core happy at the boundaries */
 
 	m_cavelon_bank = !m_cavelon_bank;
-	membank("bank1")->set_entry(m_cavelon_bank);
+	m_cavelon_bank_object->set_entry(m_cavelon_bank);
 }
 
 uint8_t scramble_state::cavelon_banksw_r(offs_t offset)
@@ -178,9 +178,8 @@ void scramble_state::init_tazmaniet()
 void scramble_state::init_mariner()
 {
 	/* extra ROM */
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0x5800, 0x67ff, "bank1");
+	m_maincpu->space(AS_PROGRAM).install_rom(0x5800, 0x67ff, memregion("maincpu")->base() + 0x5800);
 	m_maincpu->space(AS_PROGRAM).unmap_write(0x5800, 0x67ff);
-	membank("bank1")->set_base(memregion("maincpu")->base() + 0x5800);
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x9008, 0x9008, read8smo_delegate(*this, FUNC(scramble_state::mariner_protection_2_r)));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xb401, 0xb401, read8smo_delegate(*this, FUNC(scramble_state::mariner_protection_1_r)));
@@ -254,8 +253,8 @@ void scramble_state::init_cavelon()
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	/* banked ROM */
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x3fff, "bank1");
-	membank("bank1")->configure_entries(0, 2, &ROM[0x00000], 0x10000);
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x3fff, m_cavelon_bank_object);
+	m_cavelon_bank_object->configure_entries(0, 2, &ROM[0x00000], 0x10000);
 	cavelon_banksw();
 
 	/* A15 switches memory banks */

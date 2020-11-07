@@ -54,6 +54,8 @@ public:
 		m_uart_clock(*this, "uart_clock"),
 		m_nvram(*this, "nvram"),
 		m_fdc(*this, "upd765"),
+		m_bankhandler_r(*this, "bank%u", 1U),
+		m_bankhandler_w(*this, "bank%u", 5U),
 		m_nc_type(variant)
 	{
 	}
@@ -109,6 +111,7 @@ protected: // HACK FOR MC6845
 	required_device<clock_device> m_uart_clock;
 	required_device<nvram_device> m_nvram;
 	optional_device<upd765a_device> m_fdc;
+	required_memory_bank_array<4> m_bankhandler_r, m_bankhandler_w;
 
 	char m_memory_config[4];
 	emu_timer *m_keyboard_timer;

@@ -380,8 +380,7 @@ void pce220_state::boot_bank_w(uint8_t data)
 	if (data & 0x01)
 	{
 		address_space &space_prg = m_maincpu->space(AS_PROGRAM);
-		space_prg.install_read_bank(0x0000, 0x3fff, m_banks[0]);
-		space_prg.install_write_bank(0x0000, 0x3fff, m_banks[0]);
+		space_prg.install_readwrite_bank(0x0000, 0x3fff, m_banks[0]);
 		m_banks[0]->set_entry(0);
 	}
 }

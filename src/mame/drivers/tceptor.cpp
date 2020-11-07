@@ -147,7 +147,7 @@ void tceptor_state::m6502_a_map(address_map &map)
 	map(0x0300, 0x030f).ram();
 	map(0x2000, 0x2001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x3000, 0x30ff).ram().share("share3");
-	map(0x3c01, 0x3c01).writeonly();
+	map(0x3c01, 0x3c01).nopw();
 	map(0x8000, 0xffff).rom();
 }
 
@@ -157,7 +157,7 @@ void tceptor_state::m6502_b_map(address_map &map)
 	map(0x0000, 0x00ff).ram().share("share2");
 	map(0x0100, 0x01ff).ram();
 	map(0x4000, 0x4000).w("dac", FUNC(dac_byte_interface::data_w));
-	map(0x5000, 0x5000).writeonly();           // voice ctrl??
+	map(0x5000, 0x5000).nopw();           // voice ctrl??
 	map(0x8000, 0xffff).rom();
 }
 
@@ -167,7 +167,7 @@ void tceptor_state::m68k_map(address_map &map)
 	map(0x000000, 0x00ffff).rom();         // M68K ERROR 1
 	map(0x100000, 0x10ffff).rom();         // not sure
 	map(0x200000, 0x203fff).ram();         // M68K ERROR 0
-	map(0x300000, 0x300001).writeonly();
+	map(0x300000, 0x300001).nopw();
 	map(0x400000, 0x4001ff).writeonly().share("sprite_ram");
 	map(0x500000, 0x51ffff).w(m_c45_road, FUNC(namco_c45_road_device::write));
 	map(0x600000, 0x600001).w(FUNC(tceptor_state::m68k_irq_enable_w));    // not sure

@@ -22,9 +22,6 @@
 
 void qix_state::video_start()
 {
-	/* allocate memory for the full video RAM */
-	m_videoram.allocate(256 * 256);
-
 	/* initialize the palette */
 	for (int x = 0; x < 0x400; x++)
 		set_pen(x);

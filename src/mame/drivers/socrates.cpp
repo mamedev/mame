@@ -139,7 +139,7 @@ protected:
 	optional_device<generic_slot_device> m_cart;
 	memory_region *m_cart_reg;
 	required_memory_region m_bios_reg;
-	required_memory_region m_vram_reg;
+	required_shared_ptr<u8> m_vram_reg;
 	required_device<address_map_bank_device> m_rombank1;
 	optional_device<address_map_bank_device> m_rombank2; // iqunlimz only
 	required_device<address_map_bank_device> m_rambank1;
@@ -406,33 +406,27 @@ void socrates_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 void socrates_state::init_socrates()
 {
-	uint8_t *gfx = memregion("vram")->base();
-
 	/* fill vram with its init powerup bit pattern, so startup has the checkerboard screen */
 	for (int i = 0; i < 0x10000; i++)
-		gfx[i] = (((i&0x1)?0x00:0xFF)^((i&0x100)?0x00:0xff));
+		m_vram_reg[i] = (((i&0x1)?0x00:0xFF)^((i&0x100)?0x00:0xff));
 	m_maincpu->set_clock_scale(0.45f); /// TODO: RAM access waitstates etc. aren't emulated - slow the CPU to compensate
 	m_kbmcu_type = 0;
 }
 
 void socrates_state::init_iqunlimz()
 {
-	uint8_t *gfx = memregion("vram")->base();
-
 	/* fill vram with its init powerup bit pattern, so startup has the checkerboard screen... is this even right for the iqunlimz? */
 	for (int i = 0; i < 0x20000; i++)
-		gfx[i] = (((i&0x1)?0x00:0xFF)^((i&0x100)?0x00:0xff));
+		m_vram_reg[i] = (((i&0x1)?0x00:0xFF)^((i&0x100)?0x00:0xff));
 	//m_maincpu->set_clock_scale(0.45f); /// TODO: RAM access waitstates etc. aren't emulated - slow the CPU to compensate
 	m_kbmcu_type = 1;
 }
 
 void socrates_state::init_vpainter()
 {
-	uint8_t *gfx = memregion("vram")->base();
-
 	/* fill vram with its init powerup bit pattern, so startup has the checkerboard screen */
 	for (int i = 0; i < 0x10000; i++)
-		gfx[i] = (((i&0x1)?0x00:0xFF)^((i&0x100)?0x00:0xff));
+		m_vram_reg[i] = (((i&0x1)?0x00:0xFF)^((i&0x100)?0x00:0xff));
 	m_maincpu->set_clock_scale(0.45f); /// TODO: RAM access waitstates etc. aren't emulated - slow the CPU to compensate
 	m_kbmcu_type = 2;
 }
@@ -811,7 +805,7 @@ uint32_t socrates_state::screen_update_socrates(screen_device &screen, bitmap_in
 {
 	static const uint8_t fixedcolors[8] = {
 			0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0xF7 };
-	uint8_t const *const videoram = m_vram_reg->base();
+	uint8_t const *const videoram = m_vram_reg;
 	int lineoffset = 0; // if display ever tries to display data at 0xfxxx, offset line displayed by 0x1000
 	for (int y = 0; y < 228; y++)
 	{
@@ -878,12 +872,12 @@ int iqunlimz_state::get_color(int index, int y)
 	if (index < 8)
 		return m_colors[index];
 	else
-		return m_vram_reg->as_u8(0xf000 + ((index & 0x0f) << 8) + ((m_scroll_offset + y + 1) & 0xff));
+		return m_vram_reg[0xf000 + ((index & 0x0f) << 8) + ((m_scroll_offset + y + 1) & 0xff)];
 }
 
 uint32_t iqunlimz_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *videoram = m_vram_reg->base();
+	uint8_t *videoram = m_vram_reg;
 
 	// bitmap layer
 	for (int y=0; y<224; y++)
@@ -1016,7 +1010,7 @@ void socrates_state::socrates_rombank_map(address_map &map)
 void socrates_state::socrates_rambank_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).ram().region("vram", 0).mirror(0x30000);
+	map(0x0000, 0xffff).ram().share("vram").mirror(0x30000);
 }
 
 void socrates_state::socrates_io(address_map &map)
@@ -1065,7 +1059,7 @@ void iqunlimz_state::iqunlimz_rombank_map(address_map &map)
 void iqunlimz_state::iqunlimz_rambank_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x3ffff).ram().region("vram", 0);
+	map(0x0000, 0x3ffff).ram().share("vram");
 }
 
 void iqunlimz_state::iqunlimz_io(address_map &map)
@@ -1613,8 +1607,6 @@ ROM_START(socrates)
 	*/
 	ROM_LOAD("27-00817-000-000.u1", 0x00000, 0x40000, CRC(80f5aa20) SHA1(4fd1ff7f78b5dd2582d5de6f30633e4e4f34ca8f)) // Label: "(Vtech) 27-00817-000-000 // (C)1987 VIDEO TECHNOLOGY // 8811 D"
 
-	ROM_REGION(0x10000, "vram", ROMREGION_ERASEFF) /* fill with ff, driver_init changes this to the 'correct' startup pattern */
-
 	ROM_REGION(0x800, "kbmcu", ROMREGION_ERASEFF)
 	ROM_LOAD("tmp42c40p1844.u6", 0x000, 0x200, NO_DUMP) /* keyboard IR decoder MCU */
 
@@ -1633,8 +1625,6 @@ ROM_START(socratfc)
 	ROM_REGION(0x80000, "maincpu", ROMREGION_ERASEVAL(0xF3))
 	/* Socrates SAITOUT (French Canadian) NTSC */
 	ROM_LOAD("27-00884-001-000.u1", 0x00000, 0x40000, CRC(042d9d21) SHA1(9ffc67b2721683b2536727d0592798fbc4d061cb)) // Label: "(Vtech) 27-00884-001-000 // (C)1988 VIDEO TECHNOLOGY // 8911 D"
-
-	ROM_REGION(0x10000, "vram", ROMREGION_ERASEFF) /* fill with ff, driver_init changes this to the 'correct' startup pattern */
 
 	ROM_REGION(0x800, "kbmcu", ROMREGION_ERASEFF)
 	ROM_LOAD("tmp42c40p1844.u6", 0x000, 0x200, NO_DUMP) /* keyboard IR decoder MCU */
@@ -1657,8 +1647,6 @@ ROM_START(profweis)
 	ROM_SYSTEM_BIOS(1, "88", "1988")
 	ROMX_LOAD("27-00885-000-000.u1", 0x00000, 0x40000, CRC(fcaf8850) SHA1(a99011ee6a1ef63461c00d062278951252f117db), ROM_BIOS(1)) // Label: "(Vtech) 27-00885-000-000 // (C)1988 VIDEO TECHNOLOGY // 8844 D"
 
-	ROM_REGION(0x10000, "vram", ROMREGION_ERASEFF) /* fill with ff, driver_init changes this to the 'correct' startup pattern */
-
 	ROM_REGION(0x800, "kbmcu", ROMREGION_ERASEFF)
 	ROM_LOAD("tmp42c40p1844.u6", 0x000, 0x200, NO_DUMP) /* keyboard IR decoder MCU */
 
@@ -1676,8 +1664,6 @@ ROM_START( iqunlimz )
 
 	ROM_REGION(0x1000, "kbmcu", ROMREGION_ERASEFF)
 	ROM_LOAD("kbmcu.bin", 0x0000, 0x1000, NO_DUMP) /* keyboard reader MCU */
-
-	ROM_REGION( 0x40000, "vram", ROMREGION_ERASE )
 ROM_END
 
 ROM_START( vpainter )
@@ -1690,8 +1676,6 @@ ROM_START( vpainter )
 	///TODO: get rid of these regions in the status_read function or make it socrates-specific
 	ROM_REGION(0x2000, "speechint", ROMREGION_ERASE00) // doesn't exist? on vpainter, presumably reads as all zeroes
 	ROM_REGION(0x10000, "speechext", ROMREGION_ERASE00) // doesn't exist? on vpainter, presumably reads as all zeroes
-
-	ROM_REGION( 0x10000, "vram", ROMREGION_ERASE )
 ROM_END
 
 /******************************************************************************

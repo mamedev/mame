@@ -336,6 +336,7 @@ VIDEOS["I4100"] = true
 VIDEOS["I8275"] = true
 VIDEOS["JANGOU_BLITTER"] = true
 --VIDEOS["LC7582"] = true
+--VIDEOS["LC7985"] = true
 VIDEOS["M50458"] = true
 VIDEOS["MB90082"] = true
 VIDEOS["MB_VCU"] = true
@@ -2501,6 +2502,7 @@ files {
 	MAME_DIR .. "src/mame/video/3dom2_te.cpp",
 	MAME_DIR .. "src/mame/video/3dom2_te.h",
 	MAME_DIR .. "src/mame/drivers/konblands.cpp",
+	MAME_DIR .. "src/mame/drivers/kongs470.cpp",
 	MAME_DIR .. "src/mame/drivers/konmedal.cpp",
 	MAME_DIR .. "src/mame/drivers/konmedal68k.cpp",
 	MAME_DIR .. "src/mame/drivers/kontest.cpp",

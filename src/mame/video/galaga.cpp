@@ -177,28 +177,25 @@ WRITE_LINE_MEMBER(galaga_state::gatsbee_bank_w)
 
 void galaga_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	uint8_t *spriteram = m_galaga_ram1 + 0x380;
-	uint8_t *spriteram_2 = m_galaga_ram2 + 0x380;
-	uint8_t *spriteram_3 = m_galaga_ram3 + 0x380;
-	int offs;
+	uint8_t *spriteram = &m_galaga_ram1[0x380];
+	uint8_t *spriteram_2 = &m_galaga_ram2[0x380];
+	uint8_t *spriteram_3 = &m_galaga_ram3[0x380];
 
-
-	for (offs = 0;offs < 0x80;offs += 2)
+	for (int offs = 0; offs < 0x80; offs += 2)
 	{
 		static const int gfx_offs[2][2] =
 		{
 			{ 0, 1 },
 			{ 2, 3 }
 		};
-		int sprite = spriteram[offs] & 0x7f;
-		int color = spriteram[offs+1] & 0x3f;
-		int sx = spriteram_2[offs+1] - 40 + 0x100*(spriteram_3[offs+1] & 3);
+		const int sprite = spriteram[offs] & 0x7f;
+		const int color = spriteram[offs + 1] & 0x3f;
+		int sx = spriteram_2[offs + 1] - 40 + 0x100*(spriteram_3[offs + 1] & 3);
 		int sy = 256 - spriteram_2[offs] + 1;   // sprites are buffered and delayed by one scanline
 		int flipx = (spriteram_3[offs] & 0x01);
 		int flipy = (spriteram_3[offs] & 0x02) >> 1;
-		int sizex = (spriteram_3[offs] & 0x04) >> 2;
-		int sizey = (spriteram_3[offs] & 0x08) >> 3;
-		int x,y;
+		const int sizex = (spriteram_3[offs] & 0x04) >> 2;
+		const int sizey = (spriteram_3[offs] & 0x08) >> 3;
 
 		sy -= 16 * sizey;
 		sy = (sy & 0xff) - 32;  // fix wraparound
@@ -209,9 +206,9 @@ void galaga_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect 
 			flipy ^= 1;
 		}
 
-		for (y = 0;y <= sizey;y++)
+		for (int y = 0; y <= sizey; y++)
 		{
-			for (x = 0;x <= sizex;x++)
+			for (int x = 0; x <= sizex; x++)
 			{
 				m_gfxdecode->gfx(1)->transmask(bitmap,cliprect,
 					sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],

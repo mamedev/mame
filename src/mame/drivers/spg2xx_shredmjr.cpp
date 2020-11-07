@@ -203,6 +203,11 @@ ROM_START( taikeegr )
 	ROM_LOAD16_WORD_SWAP( "taikee_guitar.bin", 0x000000, 0x800000, CRC(8cbe2feb) SHA1(d72e816f259ba6a6260d6bbaf20c5e9b2cf7140b) )
 ROM_END
 
+ROM_START( rockstar )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "29gl064.bin", 0x000000, 0x800000, CRC(40de50ff) SHA1(b33ae7a3d32911addf833998d7419f4830be5a07) )
+ROM_END
+
 ROM_START( shredmjr )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "shredmasterjr.bin", 0x000000, 0x800000, CRC(95a6dcf1) SHA1(44893cd6ebe6b7f33a73817b72ae7be70c3126dc) )
@@ -221,16 +226,24 @@ ROM_END
 
 
 
-// there are multiple versions of this with different songs, was also sold by dreamGEAR as 'Shredmaster Jr.' (different title screen)
-// for the UK version the title screen always shows "Guitar Rock", however there are multiple boxes with different titles and song selections.
-// ROM is glued on the underside and soldered to the PCB, very difficult to remove without damaging.
-CONS( 2007, taikeegr,    0,        0,        taikeegrp,    taikeegr, shredmjr_game_state, init_taikeegr, "TaiKee", "Rockstar Guitar / Guitar Rock (PAL)", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // timing not quite correct yet
-CONS( 2007, shredmjr,    taikeegr, 0,        shredmjr,     taikeegr, shredmjr_game_state, init_taikeegr, "dreamGEAR", "Shredmaster Jr (NTSC)", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // ^
 
-// doesn't have a Senario logo ingame, but does on box.
+
+// These were all sold as different products, use a different sets of songs / presentation styles (2D or perspective gameplay, modified titlescreens etc.)
+// and sometimes even slightly different hardware, so aren't set as clones of each other
+
+// box title not confirmed, Guitar Rock on title screen, has Bon Jovi etc.
+CONS( 2007, taikeegr,    0,        0,        taikeegrp,    taikeegr, shredmjr_game_state, init_taikeegr, "TaiKee", "Guitar Rock (PAL)", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // timing not quite correct yet
+
+// Plug 'N' Play Rockstar Guitar on box, Guitar Rock on title screen, has Manic Street Preachers etc.
+CONS( 2007, rockstar,    0,        0,        taikeegrp,    taikeegr, shredmjr_game_state, init_taikeegr, "Ultimate Products / TaiKee", "Plug 'N' Play Rockstar Guitar / Guitar Rock (PAL)", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // timing not quite correct yet
+
+// dreamGEAR branded presentation, modified hardware (buttons read in a different way) same song seletion as taikeegr
+CONS( 2007, shredmjr,    0,        0,        shredmjr,     taikeegr, shredmjr_game_state, init_taikeegr, "dreamGEAR", "Shredmaster Jr (NTSC)", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // ^
+
+// doesn't have a Senario logo ingame, but does on box.  unique song selection
 CONS( 200?, guitarst,    0,        0,        taikeegr,     taikeegr, shredmjr_game_state, init_taikeegr, "Senario", "Guitar Star (US, Senario, NTSC)", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // ^
 
-// this one has a different song selection (same as one in the alt undumped Rockstar Guitar / Guitar Rock.  It was sold as a different product, so hasn't been set as a clone.
+// This one has the same songs as 'rockstar' but different game style / presentation. 
 // Unit found in Ireland "imported by Cathay Product Sourcing Ltd." on the box, with address in Ireland
 // ITEM #01109 on instruction sheet, no manufacturer named on either box or instructions
 CONS( 200?, guitarstp,   0,        0,        taikeegrp,    guitarstp,shredmjr_game_state, init_taikeegr, "<unknown>", "Guitar Star (Europe, PAL)", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // ^
