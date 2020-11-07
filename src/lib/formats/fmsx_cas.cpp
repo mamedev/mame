@@ -3,6 +3,7 @@
 #include <cassert>
 
 #include "formats/fmsx_cas.h"
+#include "formats/tzx_cas.cpp"
 
 
 #define CAS_PERIOD        (16)
@@ -143,4 +144,5 @@ static const cassette_image::Format fmsx_cas_format =
 
 CASSETTE_FORMATLIST_START(fmsx_cassette_formats)
 	CASSETTE_FORMAT(fmsx_cas_format)
+	CASSETTE_FORMAT(tsx_cassette_format)
 CASSETTE_FORMATLIST_END
