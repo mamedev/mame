@@ -10,7 +10,6 @@ Single board version with Dual Screen output
 for the time being most of this driver is copied
 from ms32.cpp, with some adjustments for dual screen.
 
-
 Main PCB
 --------
 
@@ -248,10 +247,10 @@ void ms32_bnstars_state::ms32_bg1_ram_w(offs_t offset, u16 data, u16 mem_mask)
 
 /* ROZ Layers */
 
-// a
+// TODO: merge with main ms32.cpp
 void ms32_bnstars_state::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, int chip)
 {
-	/* TODO: registers 0x40/4 / 0x44/4 and 0x50/4 / 0x54/4 are used, meaning unknown */
+	// TODO: registers 0x40/4 / 0x44/4 and 0x50/4 / 0x54/4 are used, meaning unknown
 
 	if (m_ms32_roz_ctrl[chip][0x5c/4] & 1)   /* "super" mode */
 		throw emu_fatalerror("Super mode in bnstars1?");
@@ -465,7 +464,7 @@ void ms32_bnstars_state::bnstars1_mahjong_select_w(u32 data)
 
 void ms32_bnstars_state::bnstars_map(address_map &map)
 {
-	// TODO: derive from base memory map
+	// TODO: derive from base ms32.cpp memory map
 	map(0x00000000, 0x001fffff).rom();
 
 	map(0xfc800000, 0xfc800003).w(FUNC(ms32_bnstars_state::sound_command_w));
