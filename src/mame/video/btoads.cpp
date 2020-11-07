@@ -24,7 +24,7 @@
 
 void btoads_state::video_start()
 {
-	/* initialize the swapped pointers */
+	// initialize the swapped pointers
 	m_vram_fg_draw = m_vram_fg0;
 	m_vram_fg_display = m_vram_fg1;
 
@@ -51,7 +51,7 @@ void btoads_state::misc_control_w(offs_t offset, uint16_t data, uint16_t mem_mas
 {
 	COMBINE_DATA(&m_misc_control);
 
-	/* bit 3 controls sound reset line */
+	// bit 3 controls sound reset line
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (m_misc_control & 8) ? CLEAR_LINE : ASSERT_LINE);
 }
 
@@ -60,12 +60,12 @@ void btoads_state::display_control_w(offs_t offset, uint16_t data, uint16_t mem_
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		/* allow multiple changes during display */
+		// allow multiple changes during display
 		int scanline = m_screen->vpos();
 		if (scanline > 0)
 			m_screen->update_partial(scanline - 1);
 
-		/* bit 15 controls which page is rendered and which page is displayed */
+		// bit 15 controls which page is rendered and which page is displayed
 		if (data & 0x8000)
 		{
 			m_vram_fg_draw = m_vram_fg1;
@@ -77,7 +77,7 @@ void btoads_state::display_control_w(offs_t offset, uint16_t data, uint16_t mem_
 			m_vram_fg_display = m_vram_fg1;
 		}
 
-		/* stash the remaining data for later */
+		// stash the remaining data for later
 		m_screen_control = data >> 8;
 	}
 }
@@ -92,11 +92,11 @@ void btoads_state::display_control_w(offs_t offset, uint16_t data, uint16_t mem_
 
 void btoads_state::scroll0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	/* allow multiple changes during display */
+	// allow multiple changes during display
 //  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
 
-	/* upper bits are Y scroll, lower bits are X scroll */
+	// upper bits are Y scroll, lower bits are X scroll
 	if (ACCESSING_BITS_8_15)
 		m_yscroll0 = data >> 8;
 	if (ACCESSING_BITS_0_7)
@@ -106,11 +106,11 @@ void btoads_state::scroll0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 void btoads_state::scroll1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	/* allow multiple changes during display */
+	// allow multiple changes during display
 //  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
 
-	/* upper bits are Y scroll, lower bits are X scroll */
+	// upper bits are Y scroll, lower bits are X scroll
 	if (ACCESSING_BITS_8_15)
 		m_yscroll1 = data >> 8;
 	if (ACCESSING_BITS_0_7)
@@ -200,9 +200,9 @@ void btoads_state::render_sprite_row(uint16_t *sprite_source, uint32_t address)
 	int dststep = 0x100 - (m_sprite_scale[4] & 0xffff);
 	int dstoffs = m_sprite_dest_offs << 8;
 
-	/* non-shadow case */
 	if (!(m_misc_control & 0x10))
 	{
+		// non-shadow case
 		for ( ; srcoffs < srcend; srcoffs += srcstep, dstoffs += dststep)
 		{
 			uint16_t src = sprite_source[(srcoffs >> 10) & 0x1ff];
@@ -214,10 +214,9 @@ void btoads_state::render_sprite_row(uint16_t *sprite_source, uint32_t address)
 			}
 		}
 	}
-
-	/* shadow case */
 	else
 	{
+		// shadow case
 		for ( ; srcoffs < srcend; srcoffs += srcstep, dstoffs += dststep)
 		{
 			uint16_t src = sprite_source[(srcoffs >> 10) & 0x1ff];
@@ -246,30 +245,30 @@ TMS340X0_TO_SHIFTREG_CB_MEMBER(btoads_state::to_shiftreg)
 {
 	address &= ~0x40000000;
 
-	/* reads from this first region are usual shift register reads */
 	if (address >= 0xa0000000 && address <= 0xa3ffffff)
+	{
+		// reads from this first region are usual shift register reads
 		memcpy(shiftreg, &m_vram_fg_display[(address & 0x3fffff) >> 4], 0x200);
-
-	/* reads from this region set the sprite destination address */
+	}
 	else if (address >= 0xa4000000 && address <= 0xa7ffffff)
 	{
+		// reads from this region set the sprite destination address
 		m_sprite_dest_base = &m_vram_fg_draw[(address & 0x3fc000) >> 4];
 		m_sprite_dest_offs = (address & 0x003fff) >> 5;
 	}
-
-	/* reads from this region set the sprite source address */
 	else if (address >= 0xa8000000 && address <= 0xabffffff)
 	{
+		// reads from this region set the sprite source address
 		const u32 *src = &m_vram_fg_data[(address & 0x7fc000) >> 5];
 		u16 *dest = shiftreg;
-		for(unsigned int i=0; i != 0x100; i++) {
+		for (unsigned int i = 0; i != 0x100; i++)
+		{
 			*dest++ = *src;
 			*dest++ = *src >> 16;
 			src++;
 		}
 		m_sprite_source_offs = (address & 0x003fff) >> 3;
 	}
-
 	else
 		logerror("%s:btoads_to_shiftreg(%08X)\n", machine().describe_context(), address);
 }
@@ -279,28 +278,32 @@ TMS340X0_FROM_SHIFTREG_CB_MEMBER(btoads_state::from_shiftreg)
 {
 	address &= ~0x40000000;
 
-	/* writes to this first region are usual shift register writes */
 	if (address >= 0xa0000000 && address <= 0xa3ffffff)
+	{
+		// writes to this first region are usual shift register writes
 		memcpy(&m_vram_fg_display[(address & 0x3fc000) >> 4], shiftreg, 0x200);
-
-	/* writes to this region are ignored for our purposes */
+	}
 	else if (address >= 0xa4000000 && address <= 0xa7ffffff)
-		;
-
-	/* writes to this region copy standard data */
-	else if (address >= 0xa8000000 && address <= 0xabffffff) {
+	{
+		// writes to this region are ignored for our purposes
+	}
+	else if (address >= 0xa8000000 && address <= 0xabffffff)
+	{
+		// writes to this region copy standard data
 		const u16 *src = shiftreg;
 		u32 *dest = &m_vram_fg_data[(address & 0x7fc000) >> 5];
-		for(unsigned int i=0; i != 0x100; i++) {
+		for (unsigned int i = 0; i != 0x100; i++)
+		{
 			*dest++ = src[0] | (src[1] << 16);
 			src += 2;
 		}
 		memcpy(&m_vram_fg_data[(address & 0x7fc000) >> 4], shiftreg, 0x400);
-
-	/* writes to this region render the current sprite data */
-	} else if (address >= 0xac000000 && address <= 0xafffffff)
+	}
+	else if (address >= 0xac000000 && address <= 0xafffffff)
+	{
+		// writes to this region render the current sprite data
 		render_sprite_row(shiftreg, address);
-
+	}
 	else
 		logerror("%s:btoads_from_shiftreg(%08X)\n", machine().describe_context(), address);
 }
@@ -498,7 +501,7 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(btoads_state::scanline_update)
 		char name[10];
 		FILE *f;
 
-		while (machine().input().code_pressed(KEYCODE_X)) ;
+		while (machine().input().code_pressed(KEYCODE_X)) { }
 
 		sprintf(name, "disp%d.log", m_xcount++);
 		f = fopen(name, "w");
@@ -509,12 +512,11 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(btoads_state::scanline_update)
 			uint16_t *base = (i == 0) ? (uint16_t *)m_vram_fg_display : (i == 1) ? m_vram_bg0 : m_vram_bg1;
 			int xscr = (i == 0) ? 0 : (i == 1) ? m_xscroll0 : m_xscroll1;
 			int yscr = (i == 0) ? 0 : (i == 1) ? m_yscroll0 : m_yscroll1;
-			int y;
 
-			for (y = 0; y < 224; y++)
+			for (int y = 0; y < 224; y++)
 			{
 				uint32_t offs = ((y + yscr) & 0xff) * TOWORD(0x4000);
-				for (x = 0; x < 256; x++)
+				for (int x = 0; x < 256; x++)
 				{
 					uint16_t pix = base[offs + ((x + xscr) & 0xff)];
 					fprintf(f, "%02X%02X", pix & 0xff, pix >> 8);

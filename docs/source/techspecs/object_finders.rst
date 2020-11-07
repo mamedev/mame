@@ -343,6 +343,8 @@ finder array types are provided.  The object finder array type names have
 +------------------------+------------------------------+
 | optional_shared_ptr    | optional_shared_ptr_array    |
 +------------------------+------------------------------+
+| memory_share_creator   | memory_share_array_creator   |
++------------------------+------------------------------+
 
 A common case for an object array finder is a key matrix::
 
@@ -435,3 +437,23 @@ brace-enclosed initialiser list of tags::
     private:
         required_device_array<dm9368_device, 6> m_digits;
     };
+
+If the underlying object finders require additional constructor arguments,
+supply them after the tag format and index offset (the same values will be used
+for all elements of the array)::
+
+    class dreamwld_state : public driver_device
+    {
+    public:
+	dreamwld_state(const machine_config &mconfig, device_type type, const char *tag) :
+            driver_device(mconfig, type, tag),
+            m_vram(*this, "vram_%u", 0U, 0x2000U, ENDIANNESS_BIG)
+        {
+        }
+
+    private:
+	memory_share_array_creator<u16, 2> m_vram;
+    };
+
+This finds or creates memory shares with tags ``vram_0`` and ``vram_1``, each of
+of which is 8 KiB organised as 4,096 big-Endian 16-bit words.

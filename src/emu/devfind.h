@@ -1334,6 +1334,8 @@ protected:
 	endianness_t const m_endianness;
 };
 
+template <typename PointerType, unsigned Count> using memory_share_array_creator = object_array_finder<memory_share_creator<PointerType>, Count>;
+
 
 
 //**************************************************************************

@@ -120,10 +120,10 @@ public:
 	dreamwld_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_spriteram(*this, "spriteram")
-		, m_vram{{*this, "vram_0", 0x2000, ENDIANNESS_BIG}, {*this, "vram_1", 0x2000, ENDIANNESS_BIG}}
+		, m_vram(*this, "vram_%u", 0U, 0x2000U, ENDIANNESS_BIG)
 		, m_vregs(*this, "vregs")
 		, m_workram(*this, "workram")
-		, m_lineram(*this, "lineram", 0x400, ENDIANNESS_BIG)
+		, m_lineram(*this, "lineram", 0x400U, ENDIANNESS_BIG)
 		, m_spritelut(*this, "spritelut")
 		, m_okibank(*this, "oki%ubank", 1)
 		, m_dsw(*this, "DSW")
@@ -146,7 +146,7 @@ protected:
 private:
 	/* memory pointers */
 	required_shared_ptr<u32> m_spriteram;
-	memory_share_creator<u16> m_vram[2];
+	memory_share_array_creator<u16, 2> m_vram;
 	required_shared_ptr<u32> m_vregs;
 	required_shared_ptr<u32> m_workram;
 	memory_share_creator<u16> m_lineram;

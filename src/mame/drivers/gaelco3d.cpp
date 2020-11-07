@@ -378,7 +378,7 @@ WRITE_LINE_MEMBER(gaelco3d_state::fp_analog_clock_w)
 uint32_t gaelco3d_state::tms_m68k_ram_r(offs_t offset)
 {
 //  logerror("%s:tms_m68k_ram_r(%04X) = %08X\n", machine().describe_context(), offset, !(offset & 1) ? ((int32_t)m_m68k_ram_base[offset/2] >> 16) : (int)(int16_t)m_m68k_ram_base[offset/2]);
-	if(offset & 1)
+	if (offset & 1)
 		return (int32_t)(int16_t)m_m68k_ram_base[offset >> 1];
 	else
 		return (int32_t)(int16_t)(m_m68k_ram_base[offset >> 1] >> 16);
@@ -387,7 +387,7 @@ uint32_t gaelco3d_state::tms_m68k_ram_r(offs_t offset)
 
 void gaelco3d_state::tms_m68k_ram_w(offs_t offset, uint32_t data)
 {
-	if(offset & 1)
+	if (offset & 1)
 		m_m68k_ram_base[offset >> 1] = (m_m68k_ram_base[offset >> 1] & 0xffff0000) | (data & 0xffff);
 	else
 		m_m68k_ram_base[offset >> 1] = (m_m68k_ram_base[offset >> 1] & 0xffff) | (data << 16);

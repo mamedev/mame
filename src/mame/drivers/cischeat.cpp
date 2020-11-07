@@ -223,12 +223,12 @@ void cischeat_state::leds_out_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 void cischeat_state::bigrun_map(address_map &map)
 {
-	map(0x000000, 0x07ffff).rom();                                                                 // ROM
+	map(0x000000, 0x07ffff).rom();                                                  // ROM
 	map(0x080000, 0x080001).portr("IN1").w(FUNC(cischeat_state::leds_out_w));       // Coins
 	map(0x080002, 0x080003).portr("IN2").w(FUNC(cischeat_state::unknown_out_w));    // Buttons
 	map(0x080004, 0x080005).portr("IN3").w(FUNC(cischeat_state::motor_out_w));      // Motor Limit Switches
 	map(0x080006, 0x080007).portr("IN4").w(FUNC(cischeat_state::wheel_out_w));      // DSW 1 & 2
-	map(0x080008, 0x080009).r(m_soundlatch2, FUNC(generic_latch_16_device::read));   // From sound cpu
+	map(0x080008, 0x080009).r(m_soundlatch2, FUNC(generic_latch_16_device::read));  // From sound cpu
 	map(0x08000a, 0x08000b).w(m_soundlatch, FUNC(generic_latch_16_device::write));  // To sound cpu
 	map(0x08000c, 0x08000d).nopw();            // ??
 	map(0x080010, 0x080011).rw(FUNC(cischeat_state::bigrun_ip_select_r), FUNC(cischeat_state::ip_select_w));
@@ -236,9 +236,9 @@ void cischeat_state::bigrun_map(address_map &map)
 	map(0x082000, 0x082005).rw("scroll0", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
 	map(0x082008, 0x08200d).rw("scroll1", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
 	map(0x082100, 0x082105).rw("scroll2", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
-	map(0x082108, 0x082109).noprw();                 // ? written with 0 only
-	map(0x082200, 0x082201).portr("IN5");    // DSW 3 (4 bits)
-	map(0x082208, 0x082209).noprw();                 // watchdog reset
+	map(0x082108, 0x082109).noprw();                    // ? written with 0 only
+	map(0x082200, 0x082201).portr("IN5");               // DSW 3 (4 bits)
+	map(0x082208, 0x082209).noprw();                    // watchdog reset
 	map(0x082308, 0x082309).w(FUNC(cischeat_state::cischeat_comms_w));
 	map(0x082400, 0x082401).w(FUNC(cischeat_state::active_layers_w));
 
@@ -252,13 +252,13 @@ void cischeat_state::bigrun_map(address_map &map)
 
 	/* Only writes to the first 0x40000 bytes affect the tilemaps:             */
 	/* either these games support larger tilemaps or have more ram than needed */
-	map(0x090000, 0x093fff).ram().w("scroll0", FUNC(megasys1_tilemap_device::write)).share("scroll0");     // Scroll ram 0
-	map(0x094000, 0x097fff).ram().w("scroll1", FUNC(megasys1_tilemap_device::write)).share("scroll1");     // Scroll ram 1
-	map(0x098000, 0x09bfff).ram().w("scroll2", FUNC(megasys1_tilemap_device::write)).share("scroll2");     // Scroll ram 2
+	map(0x090000, 0x093fff).ram().w("scroll0", FUNC(megasys1_tilemap_device::write)).share("scroll0");  // Scroll ram 0
+	map(0x094000, 0x097fff).ram().w("scroll1", FUNC(megasys1_tilemap_device::write)).share("scroll1");  // Scroll ram 1
+	map(0x098000, 0x09bfff).ram().w("scroll2", FUNC(megasys1_tilemap_device::write)).share("scroll2");  // Scroll ram 2
 
-	map(0x09c000, 0x09ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");            // Palettes
-	map(0x0f0000, 0x0fffff).ram().share("ram");                                         // RAM
-	map(0x100000, 0x13ffff).rom().region("user1", 0);                                                        // ROM
+	map(0x09c000, 0x09ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");         // Palettes
+	map(0x0f0000, 0x0fffff).ram().share("ram");                                                         // RAM
+	map(0x100000, 0x13ffff).rom().region("user1", 0);                                                   // ROM
 }
 
 
@@ -310,13 +310,13 @@ void cischeat_state::cischeat_map(address_map &map)
 
 	/* Only writes to the first 0x40000 bytes affect the tilemaps:             */
 	/* either these games support larger tilemaps or have more ram than needed */
-	map(0x0a0000, 0x0a7fff).ram().w("scroll0", FUNC(megasys1_tilemap_device::write)).share("scroll0");     // Scroll ram 0
-	map(0x0a8000, 0x0affff).ram().w("scroll1", FUNC(megasys1_tilemap_device::write)).share("scroll1");     // Scroll ram 1
-	map(0x0b0000, 0x0b7fff).ram().w("scroll2", FUNC(megasys1_tilemap_device::write)).share("scroll2");     // Scroll ram 2
-	map(0x0b8000, 0x0bffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");              // Palettes
+	map(0x0a0000, 0x0a7fff).ram().w("scroll0", FUNC(megasys1_tilemap_device::write)).share("scroll0");  // Scroll ram 0
+	map(0x0a8000, 0x0affff).ram().w("scroll1", FUNC(megasys1_tilemap_device::write)).share("scroll1");  // Scroll ram 1
+	map(0x0b0000, 0x0b7fff).ram().w("scroll2", FUNC(megasys1_tilemap_device::write)).share("scroll2");  // Scroll ram 2
+	map(0x0b8000, 0x0bffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");         // Palettes
 
-	map(0x0f0000, 0x0fffff).ram().share("ram");                                             // RAM
-	map(0x100000, 0x17ffff).rom().region("user1", 0);                                                            // ROM
+	map(0x0f0000, 0x0fffff).ram().share("ram");                                                         // RAM
+	map(0x100000, 0x17ffff).rom().region("user1", 0);                                                   // ROM
 }
 
 
@@ -892,18 +892,18 @@ void captflag_state::oki2_map(address_map &map)
 
 void cischeat_state::bigrun_map2(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom();                                                 // ROM
-	map(0x040000, 0x043fff).ram().share("share1");                              // Shared RAM (with Main CPU)
-	map(0x080000, 0x0807ff).ram().share("roadram.0");   // Road RAM
-	map(0x0c0000, 0x0c3fff).ram();                                                 // RAM
+	map(0x000000, 0x03ffff).rom();                          // ROM
+	map(0x040000, 0x043fff).ram().share("share1");          // Shared RAM (with Main CPU)
+	map(0x080000, 0x0807ff).ram().share("roadram.0");       // Road RAM
+	map(0x0c0000, 0x0c3fff).ram();                          // RAM
 }
 
 void cischeat_state::bigrun_map3(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom();                                                 // ROM
-	map(0x040000, 0x043fff).ram().share("share2");                              // Shared RAM (with Main CPU)
-	map(0x080000, 0x0807ff).ram().share("roadram.1");   // Road RAM
-	map(0x0c0000, 0x0c3fff).ram();                                                 // RAM
+	map(0x000000, 0x03ffff).rom();                          // ROM
+	map(0x040000, 0x043fff).ram().share("share2");          // Shared RAM (with Main CPU)
+	map(0x080000, 0x0807ff).ram().share("roadram.1");       // Road RAM
+	map(0x0c0000, 0x0c3fff).ram();                          // RAM
 }
 
 
@@ -913,22 +913,22 @@ void cischeat_state::bigrun_map3(address_map &map)
 
 void cischeat_state::cischeat_map2(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom();                                                 // ROM
-	map(0x040000, 0x047fff).ram().share("share1");                              // Shared RAM (with Main CPU)
-	map(0x080000, 0x0807ff).ram().share("roadram.0");   // Road RAM
-	map(0x0c0000, 0x0c3fff).ram();                                                 // RAM
-	map(0x100000, 0x100001).nopw();                                            // watchdog
-	map(0x200000, 0x23ffff).rom().region("cpu2", 0x40000);                                       // ROM
+	map(0x000000, 0x03ffff).rom();                          // ROM
+	map(0x040000, 0x047fff).ram().share("share1");          // Shared RAM (with Main CPU)
+	map(0x080000, 0x0807ff).ram().share("roadram.0");       // Road RAM
+	map(0x0c0000, 0x0c3fff).ram();                          // RAM
+	map(0x100000, 0x100001).nopw();                         // watchdog
+	map(0x200000, 0x23ffff).rom().region("cpu2", 0x40000);  // ROM
 }
 
 void cischeat_state::cischeat_map3(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom();                                                 // ROM
-	map(0x040000, 0x047fff).ram().share("share2");                              // Shared RAM (with Main CPU)
-	map(0x080000, 0x0807ff).ram().share("roadram.1");   // Road RAM
-	map(0x0c0000, 0x0c3fff).ram();                                                 // RAM
-	map(0x100000, 0x100001).nopw();                                            // watchdog
-	map(0x200000, 0x23ffff).rom().region("cpu3", 0x40000);                                       // ROM
+	map(0x000000, 0x03ffff).rom();                          // ROM
+	map(0x040000, 0x047fff).ram().share("share2");          // Shared RAM (with Main CPU)
+	map(0x080000, 0x0807ff).ram().share("roadram.1");       // Road RAM
+	map(0x0c0000, 0x0c3fff).ram();                          // RAM
+	map(0x100000, 0x100001).nopw();                         // watchdog
+	map(0x200000, 0x23ffff).rom().region("cpu3", 0x40000);  // ROM
 }
 
 
@@ -939,20 +939,20 @@ void cischeat_state::cischeat_map3(address_map &map)
 
 void cischeat_state::f1gpstar_map2(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom();                                                 // ROM
-	map(0x080000, 0x087fff).ram().share("share1");                              // Shared RAM (with Main CPU)
+	map(0x000000, 0x03ffff).rom();                          // ROM
+	map(0x080000, 0x087fff).ram().share("share1");          // Shared RAM (with Main CPU)
 	map(0x100000, 0x1007ff).ram().share("roadram.0");   // Road RAM
-	map(0x180000, 0x183fff).ram();                                                 // RAM
-	map(0x200000, 0x200001).nopw();                                            // watchdog
+	map(0x180000, 0x183fff).ram();                          // RAM
+	map(0x200000, 0x200001).nopw();                         // watchdog
 }
 
 void cischeat_state::f1gpstar_map3(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom();                                                 // ROM
-	map(0x080000, 0x087fff).ram().share("share2");                              // Shared RAM (with Main CPU)
-	map(0x100000, 0x1007ff).ram().share("roadram.1");   // Road RAM
-	map(0x180000, 0x183fff).ram();                                                 // RAM
-	map(0x200000, 0x200001).nopw();                                            // watchdog
+	map(0x000000, 0x03ffff).rom();                          // ROM
+	map(0x080000, 0x087fff).ram().share("share2");          // Shared RAM (with Main CPU)
+	map(0x100000, 0x1007ff).ram().share("roadram.1");       // Road RAM
+	map(0x180000, 0x183fff).ram();                          // RAM
+	map(0x200000, 0x200001).nopw();                         // watchdog
 }
 
 

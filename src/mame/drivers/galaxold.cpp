@@ -446,7 +446,7 @@ void galaxold_state::guttang_rombank_w(uint8_t data)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 //  printf("rombank %02x\n",data);
-	space.install_rom( 0x2000, 0x27ff, memregion("maincpu")->base() + (data & 1 ? 0x4000 : 0x2000));
+	space.install_rom(0x2000, 0x27ff, memregion("maincpu")->base() + (data & 1 ? 0x4000 : 0x2000));
 }
 
 
@@ -3779,7 +3779,7 @@ ROM_END
 
 void galaxold_state::init_guttangt()
 {
-	m_maincpu->space(AS_PROGRAM).install_rom( 0x2000, 0x27ff, memregion("maincpu")->base() + 0x2000);
+	m_maincpu->space(AS_PROGRAM).install_rom(0x2000, 0x27ff, memregion("maincpu")->base() + 0x2000);
 }
 
 
