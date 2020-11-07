@@ -70,6 +70,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_via(*this, "via"),
+		m_extram(*this, "extram", 0x800, ENDIANNESS_LITTLE),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
 		m_cart(*this, "cartslot"),
@@ -90,6 +91,7 @@ private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<via6522_device> m_via;
+	memory_share_creator<u8> m_extram;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
 	required_device<generic_slot_device> m_cart;
@@ -176,7 +178,7 @@ DEVICE_IMAGE_LOAD_MEMBER(ggm_state::cartridge)
 
 	// extra ram (optional)
 	if (image.get_feature("ram"))
-		m_maincpu->space(AS_PROGRAM).install_ram(0x0800, 0x0fff, nullptr);
+		m_maincpu->space(AS_PROGRAM).install_ram(0x0800, 0x0fff, m_extram);
 
 	return image_init_result::PASS;
 }
