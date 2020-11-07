@@ -1099,7 +1099,10 @@ ROM_START( pjoys60 )
 	ROM_LOAD( "power joy supermax 60-in-1.prg", 0x00000, 0x400000, CRC(1ab45228) SHA1(d148924afc39fc588235331a1a30df6e0d8e1e18) )
 ROM_END
 
-
+ROM_START( joysti30 )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "joystick30.bin", 0x00000, 0x400000, CRC(b3f089af) SHA1(478d53d38eeffdbc4a1271d0e060aeb29e919502) )
+ROM_END
 
 // CoolBoy AEF-390 8bit Console, B8VPCBVer03 20130703 0401E2015897A
 ROM_START( mc_8x6cb )
@@ -1363,6 +1366,9 @@ CONS( 200?, dgun853,   0,  0,  nes_vt_vh2009_8mb,        nes_vt, nes_vt_swap_op_
 CONS( 200?, silv35,    0,  0,  nes_vt_vh2009_4mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "SilverLit / JungleTac", "35 in 1 Super Twins", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 2004, vsmaxxvd,  0,  0,  nes_vt_vh2009_8mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Senario / JungleTac",   "Vs Maxx Video Extreme 50-in-1 (with Speed Racer and Snood)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 200?, vsmaxx77,  0,  0,  nes_vt_vh2009_8mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Senario / JungleTac",   "Vs Maxx Wireless 77-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, joysti30,  0,  0,  nes_vt_vh2009_4mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "WinFun / JungleTac",    "Joystick 30", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // doesn't show WinFun onscreen, but packaging does
+
+
 // die is marked as VH2009, as above, but no scrambled opcodes here
 CONS( 201?, techni4,   0,  0,  nes_vt_pal_2mb,           nes_vt, nes_vt_state,               empty_init, "Technigame", "Technigame Super 4-in-1 Sports (PAL)", MACHINE_IMPERFECT_GRAPHICS )
 
