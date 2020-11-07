@@ -248,60 +248,13 @@ void ms32_bnstars_state::ms32_bg1_ram_w(offs_t offset, u16 data, u16 mem_mask)
 
 /* ROZ Layers */
 
+// a
 void ms32_bnstars_state::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, int chip)
 {
 	/* TODO: registers 0x40/4 / 0x44/4 and 0x50/4 / 0x54/4 are used, meaning unknown */
 
 	if (m_ms32_roz_ctrl[chip][0x5c/4] & 1)   /* "super" mode */
-	{
 		throw emu_fatalerror("Super mode in bnstars1?");
-		return;
-		/*
-		rectangle my_clip;
-		int y,maxy;
-
-		my_clip.min_x = cliprect.min_x;
-		my_clip.max_x = cliprect.max_x;
-
-		y = cliprect.min_y;
-		maxy = cliprect.max_y;
-
-		while (y <= maxy)
-		{
-		    u32 *lineaddr = ms32_lineram + 8 * (y & 0xff);
-
-		    int start2x = (lineaddr[0x00/4] & 0xffff) | ((lineaddr[0x04/4] & 3) << 16);
-		    int start2y = (lineaddr[0x08/4] & 0xffff) | ((lineaddr[0x0c/4] & 3) << 16);
-		    int incxx  = (lineaddr[0x10/4] & 0xffff) | ((lineaddr[0x14/4] & 1) << 16);
-		    int incxy  = (lineaddr[0x18/4] & 0xffff) | ((lineaddr[0x1c/4] & 1) << 16);
-		    int startx = (m_ms32_roz_ctrl[0x00/4] & 0xffff) | ((m_ms32_roz_ctrl[0x04/4] & 3) << 16);
-		    int starty = (m_ms32_roz_ctrl[0x08/4] & 0xffff) | ((m_ms32_roz_ctrl[0x0c/4] & 3) << 16);
-		    int offsx  = m_ms32_roz_ctrl[0x30/4];
-		    int offsy  = m_ms32_roz_ctrl[0x34/4];
-
-		    my_clip.min_y = my_clip.max_y = y;
-
-		    offsx += (m_ms32_roz_ctrl[0x38/4] & 1) * 0x400;   // ??? gratia, hayaosi1...
-		    offsy += (m_ms32_roz_ctrl[0x3c/4] & 1) * 0x400;   // ??? gratia, hayaosi1...
-
-		    // extend sign
-		    if (start2x & 0x20000) start2x |= ~0x3ffff;
-		    if (start2y & 0x20000) start2y |= ~0x3ffff;
-		    if (startx & 0x20000) startx |= ~0x3ffff;
-		    if (starty & 0x20000) starty |= ~0x3ffff;
-		    if (incxx & 0x10000) incxx |= ~0x1ffff;
-		    if (incxy & 0x10000) incxy |= ~0x1ffff;
-
-		    m_ms32_roz_tilemap->draw_roz(screen, bitmap, &my_clip,
-		            (start2x+startx+offsx)<<16, (start2y+starty+offsy)<<16,
-		            incxx<<8, incxy<<8, 0, 0,
-		            1, // Wrap
-		            0, priority);
-
-		    y++;
-		}
-		*/
-	}
 	else    /* "simple" mode */
 	{
 		int startx = (m_ms32_roz_ctrl[chip][0x00/4] & 0xffff) | ((m_ms32_roz_ctrl[chip][0x04/4] & 3) << 16);
@@ -498,31 +451,16 @@ template <int P>
 CUSTOM_INPUT_MEMBER(ms32_bnstars_state::mahjong_ctrl_r)
 {
 	required_ioport_array<4> &keys = (P == 0) ? m_p1_keys : m_p2_keys;
-
-	switch (m_bnstars1_mahjong_select & 0x2080)
-	{
-		default:
-			logerror("unk bnstars1_r %08x\n",m_bnstars1_mahjong_select);
-			return 0xff;
-
-		case 0x0000:
-			return keys[0]->read();
-
-		case 0x0080:
-			return keys[1]->read();
-
-		case 0x2000:
-			return keys[2]->read();
-
-		case 0x2080:
-			return keys[3]->read();
-	}
+	// different routing than main ms32.cpp, using 0x2080 as mask
+	u8 which = (BIT(m_bnstars1_mahjong_select, 13) << 1) | 
+				BIT(m_bnstars1_mahjong_select, 7);
+	return keys[which]->read();
 }
 
 void ms32_bnstars_state::bnstars1_mahjong_select_w(u32 data)
 {
 	m_bnstars1_mahjong_select = data;
-//  printf("%08x\n",m_bnstars1_mahjong_select);
+//	logerror("%08x\n",m_bnstars1_mahjong_select);
 }
 
 void ms32_bnstars_state::bnstars_map(address_map &map)
@@ -545,7 +483,7 @@ void ms32_bnstars_state::bnstars_map(address_map &map)
 	map(0xfce00c00, 0xfce00c17).writeonly().share("tx1_scroll");
 	map(0xfce00c20, 0xfce00c37).writeonly().share("bg1_scroll");
 
-	map(0xfce00e00, 0xfce00e03).w(FUNC(ms32_bnstars_state::bnstars1_mahjong_select_w)); // ?
+	map(0xfce00e00, 0xfce00e03).w(FUNC(ms32_bnstars_state::bnstars1_mahjong_select_w));
 
 	map(0xfd000000, 0xfd000003).r(FUNC(ms32_bnstars_state::sound_result_r));
 

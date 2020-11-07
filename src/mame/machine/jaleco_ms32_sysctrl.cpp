@@ -151,7 +151,7 @@ void jaleco_ms32_sysctrl_device::device_reset()
 void jaleco_ms32_sysctrl_device::flush_prg_timer()
 {
 	attotime step;
-	if (m_timer.irq_enable == true)
+	if (m_timer.irq_enable)
 	{
 		//const u16 htotal = m_crtc.horz_blank + m_crtc.horz_display;
 		// TODO: unknown actual timings, with interval = 2 it should fire an irq every 16 scanlines in p47aces v1.1
