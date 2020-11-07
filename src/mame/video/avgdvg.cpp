@@ -29,13 +29,6 @@
 #define VGVECTOR 0
 #define VGCLIP 1
 
-#define OP0 (m_op & 1)
-#define OP1 (m_op & 2)
-#define OP2 (m_op & 4)
-#define OP3 (m_op & 8)
-
-#define ST3 (m_state_latch & 8)
-
 
 /*************************************
  *
@@ -191,14 +184,14 @@ void avgdvg_device_base::vg_add_clip(int xmin, int ymin, int xmax, int ymax)
 void dvg_device::update_databus() // dvg_data
 {
 	// DVG uses low bit of state for address
-	m_data = m_memspace->read_byte(m_membase | (m_pc << 1) | (m_state_latch & 1));
+	m_data = m_memspace->read_byte(m_membase + (m_pc << 1) + (m_state_latch & 1));
 }
 
 u8 dvg_device::state_addr() // dvg_state_addr
 {
 	u8 addr = ((((m_state_latch >> 4) ^ 1) & 1) << 7) | (m_state_latch & 0xf);
 
-	if (OP3)
+	if (OP3())
 		addr |= ((m_op & 7) << 4);
 
 	return addr;
@@ -206,7 +199,7 @@ u8 dvg_device::state_addr() // dvg_state_addr
 
 int dvg_device::handler_0() // dvg_dmapush
 {
-	if (!OP0)
+	if (!OP0())
 	{
 		m_sp = (m_sp + 1) & 0xf;
 		m_stack[m_sp & 3] = m_pc;
@@ -216,7 +209,7 @@ int dvg_device::handler_0() // dvg_dmapush
 
 int dvg_device::handler_1() // dvg_dmald
 {
-	if (OP0)
+	if (OP0())
 	{
 		m_pc = m_stack[m_sp & 3];
 		m_sp = (m_sp - 1) & 0xf;
@@ -262,11 +255,11 @@ int dvg_device::handler_2() //dvg_gostrobe
 
 	int fin = 0xfff - (((2 << scale) & 0x7ff) ^ 0xfff);
 
-	/* Count up or down */
+	// Count up or down
 	const int dx = (m_dvx & 0x400) ? -1 : +1;
 	const int dy = (m_dvy & 0x400) ? -1 : +1;
 
-	/* Scale factor for rate multipliers */
+	// Scale factor for rate multipliers
 	const int mx = (m_dvx << 2) & 0xfff;
 	const int my = (m_dvy << 2) & 0xfff;
 
@@ -315,15 +308,12 @@ int dvg_device::handler_2() //dvg_gostrobe
 
 		if (countx)
 		{
-			/* Is y valid and x entering or leaving the valid range? */
-			if (((m_ypos & 0x400) == 0)
-				&& ((m_xpos ^ (m_xpos + dx)) & 0x400))
+			// Is y valid and x entering or leaving the valid range?
+			if (!(m_ypos & 0x400) && ((m_xpos ^ (m_xpos + dx)) & 0x400))
 			{
-				if ((m_xpos + dx) & 0x400)
-					/* We are leaving the valid range */
+				if ((m_xpos + dx) & 0x400)  // We are leaving the valid range
 					dvg_draw_to(m_xpos, m_ypos, m_intensity);
-				else
-					/* We are entering the valid range */
+				else                        // We are entering the valid range
 					dvg_draw_to((m_xpos + dx) & 0xfff, m_ypos, 0);
 			}
 			m_xpos = (m_xpos + dx) & 0xfff;
@@ -331,10 +321,9 @@ int dvg_device::handler_2() //dvg_gostrobe
 
 		if (county)
 		{
-			if (((m_xpos & 0x400) == 0)
-				&& ((m_ypos ^ (m_ypos + dy)) & 0x400))
+			if (!(m_xpos & 0x400) && ((m_ypos ^ (m_ypos + dy)) & 0x400))
 			{
-				if ((m_xpos & 0x400) == 0)
+				if (!(m_xpos & 0x400))
 				{
 					if ((m_ypos + dy) & 0x400)
 						dvg_draw_to(m_xpos, m_ypos, m_intensity);
@@ -344,7 +333,6 @@ int dvg_device::handler_2() //dvg_gostrobe
 			}
 			m_ypos = (m_ypos + dy) & 0xfff;
 		}
-
 	}
 
 	dvg_draw_to(m_xpos, m_ypos, m_intensity);
@@ -354,9 +342,9 @@ int dvg_device::handler_2() //dvg_gostrobe
 
 int dvg_device::handler_3() // dvg_haltstrobe
 {
-	m_halt = OP0;
+	m_halt = OP0();
 
-	if (!OP0)
+	if (!OP0())
 	{
 		m_xpos = m_dvx & 0xfff;
 		m_ypos = m_dvy & 0xfff;
@@ -367,7 +355,7 @@ int dvg_device::handler_3() // dvg_haltstrobe
 
 int dvg_device::handler_7() // dvg_latch3
 {
-	m_dvx = (m_dvx & 0xff) |  ((m_data & 0xf) << 8);
+	m_dvx = (m_dvx & 0xff) | ((m_data & 0xf) << 8);
 	m_intensity = m_data >> 4;
 	return 0;
 }
@@ -378,7 +366,7 @@ int dvg_device::handler_6() // dvg_latch2
 	if (m_op != 0xf)
 		m_dvx = (m_dvx & 0xf00) | m_data;
 
-	if ((m_op & 0xa) == 0xa)
+	if (OP1() && OP3())
 		m_scale = m_intensity;
 
 	m_pc++;
@@ -387,8 +375,7 @@ int dvg_device::handler_6() // dvg_latch2
 
 int dvg_device::handler_5() //  dvg_latch1
 {
-	m_dvy = (m_dvy & 0xff)
-		| ((m_data & 0xf) << 8);
+	m_dvy = (m_dvy & 0xff) | ((m_data & 0xf) << 8);
 	m_op = m_data >> 4;
 
 	if (m_op == 0xf)
@@ -440,14 +427,14 @@ void dvg_device::vgrst() // dvg_vgrst
 u8 avg_device::state_addr() // avg_state_addr
 {
 	return (((m_state_latch >> 4) ^ 1) << 7)
-		| (m_op << 4)
-		| (m_state_latch & 0xf);
+			| (m_op << 4)
+			| (m_state_latch & 0xf);
 }
 
 
 void avg_device::update_databus() // avg_data
 {
-	m_data = m_memspace->read_byte(m_membase | (m_pc ^ 1));
+	m_data = m_memspace->read_byte(m_membase + (m_pc ^ 1));
 }
 
 void avg_device::vggo() // avg_vggo
@@ -479,8 +466,7 @@ int avg_device::handler_1() // avg_latch1
 	m_op = m_data >> 5;
 
 	m_int_latch = 0;
-	m_dvy = (m_dvy12 << 12)
-		| ((m_data & 0xf) << 8);
+	m_dvy = (m_dvy12 << 12) | ((m_data & 0xf) << 8);
 	m_dvx = 0;
 	m_pc++;
 
@@ -499,8 +485,8 @@ int avg_device::handler_3() // avg_latch3
 {
 	m_int_latch = m_data >> 4;
 	m_dvx = ((m_int_latch & 1) << 12)
-		| ((m_data & 0xf) << 8)
-		| (m_dvx & 0xff);
+			| ((m_data & 0xf) << 8)
+			| (m_dvx & 0xff);
 	m_pc++;
 
 	return 0;
@@ -508,7 +494,7 @@ int avg_device::handler_3() // avg_latch3
 
 int avg_device::handler_4() // avg_strobe0
 {
-	if (OP0)
+	if (OP0())
 	{
 		m_stack[m_sp & 3] = m_pc;
 	}
@@ -534,10 +520,10 @@ int avg_device::handler_4() // avg_strobe0
 			m_dvy = (m_dvy & 0x1000) | ((m_dvy << 1) & 0x1fff);
 			m_dvx = (m_dvx & 0x1000) | ((m_dvx << 1) & 0x1fff);
 			m_timer >>= 1;
-			m_timer |= 0x4000 | (OP1 << 6);
+			m_timer |= 0x4000 | (OP1() << 7);
 		}
 
-		if (OP1)
+		if (OP1())
 			m_timer &= 0xff;
 	}
 
@@ -547,9 +533,9 @@ int avg_device::handler_4() // avg_strobe0
 
 int avg_device::avg_common_strobe1()
 {
-	if (OP2)
+	if (OP2())
 	{
-		if (OP1)
+		if (OP1())
 			m_sp = (m_sp - 1) & 0xf;
 		else
 			m_sp = (m_sp + 1) & 0xf;
@@ -559,14 +545,14 @@ int avg_device::avg_common_strobe1()
 
 int avg_device::handler_5() // avg_strobe1
 {
-	if (!OP2)
+	if (!OP2())
 	{
 		for (int i = m_bin_scale; i > 0; i--)
 		{
 			m_timer >>= 1;
-			m_timer |= 0x4000 | (OP1 << 6);
+			m_timer |= 0x4000 | (OP1() << 7);
 		}
-		if (OP1)
+		if (OP1())
 			m_timer &= 0xff;
 	}
 
@@ -576,9 +562,9 @@ int avg_device::handler_5() // avg_strobe1
 
 int avg_device::avg_common_strobe2()
 {
-	if (OP2)
+	if (OP2())
 	{
-		if (OP0)
+		if (OP0())
 		{
 			m_pc = m_dvy << 1;
 
@@ -625,7 +611,7 @@ int avg_device::avg_common_strobe2()
 
 int avg_device::handler_6() // avg_strobe2
 {
-	if (!OP2 && !m_dvy12)
+	if (!OP2() && !m_dvy12)
 	{
 		m_color = m_dvy & 0x7;
 		m_intensity = (m_dvy >> 4) & 0xf;
@@ -638,11 +624,11 @@ int avg_device::avg_common_strobe3()
 {
 	int cycles = 0;
 
-	m_halt = OP0;
+	m_halt = OP0();
 
-	if ((m_op & 5) == 0)
+	if (!OP0() && !OP2())
 	{
-		if (OP1)
+		if (OP1())
 		{
 			cycles = 0x100 - (m_timer & 0xff);
 		}
@@ -655,7 +641,8 @@ int avg_device::avg_common_strobe3()
 		m_xpos += ((((m_dvx >> 3) ^ m_xdac_xor) - 0x200) * cycles * (m_scale ^ 0xff)) >> 4;
 		m_ypos -= ((((m_dvy >> 3) ^ m_ydac_xor) - 0x200) * cycles * (m_scale ^ 0xff)) >> 4;
 	}
-	if (OP2)
+
+	if (OP2())
 	{
 		cycles = 0x8000 - m_timer;
 		m_timer = 0;
@@ -671,10 +658,13 @@ int avg_device::handler_7() // avg_strobe3
 {
 	const int cycles = avg_common_strobe3();
 
-	if ((m_op & 5) == 0)
+	if (!OP0() && !OP2())
 	{
-		vg_add_point_buf(m_xpos, m_ypos, vector_device::color111(m_color),
-							(((m_int_latch >> 1) == 1)? m_intensity: m_int_latch & 0xe) << 4);
+		vg_add_point_buf(
+				m_xpos,
+				m_ypos,
+				vector_device::color111(m_color),
+				(((m_int_latch >> 1) == 1) ? m_intensity : m_int_latch & 0xe) << 4);
 	}
 
 	return cycles;
@@ -688,7 +678,7 @@ int avg_device::handler_7() // avg_strobe3
 
 int avg_tempest_device::handler_6() // tempest_strobe2
 {
-	if (!OP2 && !m_dvy12)
+	if (!OP2() && !m_dvy12)
 	{
 		// Contrary to previous documentation in MAME, Tempest does not have the m_enspkl bit.
 		if (m_dvy & 0x800)
@@ -704,7 +694,7 @@ int avg_tempest_device::handler_7() // tempest_strobe3
 {
 	const int cycles = avg_common_strobe3();
 
-	if ((m_op & 5) == 0)
+	if (!OP0() && !OP2())
 	{
 		const u8 data = m_colorram[m_color];
 		const u8 bit3 = BIT(~data, 3);
@@ -765,7 +755,7 @@ int avg_mhavoc_device::handler_1() //  mhavoc_latch1
 
 int avg_mhavoc_device::handler_6() // mhavoc_strobe2
 {
-	if (!OP2)
+	if (!OP2())
 	{
 		if (m_dvy12)
 		{
@@ -781,11 +771,7 @@ int avg_mhavoc_device::handler_6() // mhavoc_strobe2
 			if (m_dvy & 0x800)
 			{
 				m_enspkl = 1;
-				m_spkl_shift = ((m_dvy >> 3) & 1)
-					| ((m_dvy >> 1) & 2)
-					| ((m_dvy << 1) & 4)
-					| ((m_dvy << 2) & 8)
-					| ((machine().rand() & 0x7) << 4);
+				m_spkl_shift = bitswap<4>(m_dvy, 1, 1, 2, 3) | ((machine().rand() & 0x7) << 4);
 			}
 			else
 			{
@@ -805,12 +791,12 @@ int avg_mhavoc_device::handler_6() // mhavoc_strobe2
 
 int avg_mhavoc_device::handler_7()  // mhavoc_strobe3
 {
-	m_halt = OP0;
+	m_halt = OP0();
 	int cycles = 0;
 
-	if ((m_op & 5) == 0)
+	if (!OP0() && !OP2())
 	{
-		if (OP1)
+		if (OP1())
 		{
 			cycles = 0x100 - (m_timer & 0xff);
 		}
@@ -869,7 +855,8 @@ int avg_mhavoc_device::handler_7()  // mhavoc_strobe3
 					(((m_int_latch >> 1) == 1) ? m_intensity : m_int_latch & 0xe) << 4);
 		}
 	}
-	if (OP2)
+
+	if (OP2())
 	{
 		cycles = 0x8000 - m_timer;
 		m_timer = 0;
@@ -886,7 +873,7 @@ void avg_mhavoc_device::update_databus() // mhavoc_data
 	if (m_pc & 0x2000)
 		m_data = m_bank_region[(m_map << 13) | ((m_pc ^ 1) & 0x1fff)];
 	else
-		m_data = m_memspace->read_byte(m_membase | (m_pc ^ 1));
+		m_data = m_memspace->read_byte(m_membase + (m_pc ^ 1));
 }
 
 void avg_mhavoc_device::vgrst() // mhavoc_vgrst
@@ -904,12 +891,12 @@ void avg_mhavoc_device::vgrst() // mhavoc_vgrst
 
 void avg_starwars_device::update_databus() // starwars_data
 {
-	m_data = m_memspace->read_byte(m_membase | m_pc);
+	m_data = m_memspace->read_byte(m_membase + m_pc);
 }
 
 int avg_starwars_device::handler_6() // starwars_strobe2
 {
-	if (!OP2 && !m_dvy12)
+	if (!OP2() && !m_dvy12)
 	{
 		m_intensity = m_dvy & 0xff;
 		m_color = (m_dvy >> 8) & 0xf;
@@ -922,7 +909,7 @@ int avg_starwars_device::handler_7() // starwars_strobe3
 {
 	const int cycles = avg_common_strobe3();
 
-	if ((m_op & 5) == 0)
+	if (!OP0() && !OP2())
 	{
 		vg_add_point_buf(
 				m_xpos,
@@ -942,7 +929,7 @@ int avg_starwars_device::handler_7() // starwars_strobe3
 
 void avg_quantum_device::update_databus() // quantum_data
 {
-	m_data = m_memspace->read_word(m_membase | m_pc);
+	m_data = m_memspace->read_word(m_membase + m_pc);
 }
 
 void avg_quantum_device::vggo() // tempest_vggo
@@ -1001,7 +988,7 @@ int avg_quantum_device::handler_3() // quantum_latch3
 
 int avg_quantum_device::handler_4() // quantum_strobe0
 {
-	if (OP0)
+	if (OP0())
 	{
 		m_stack[m_sp & 3] = m_pc;
 	}
@@ -1025,7 +1012,7 @@ int avg_quantum_device::handler_4() // quantum_strobe0
 
 int avg_quantum_device::handler_5() //  quantum_strobe1
 {
-	if (!OP2)
+	if (!OP2())
 	{
 		for (int i = m_bin_scale; i > 0; i--)
 		{
@@ -1039,7 +1026,7 @@ int avg_quantum_device::handler_5() //  quantum_strobe1
 
 int avg_quantum_device::handler_6() // quantum_strobe2
 {
-	if (!OP2 && !m_dvy12 && (m_dvy & 0x800))
+	if (!OP2() && !m_dvy12 && (m_dvy & 0x800))
 	{
 		m_color = m_dvy & 0xf;
 		m_intensity = (m_dvy >> 4) & 0xf;
@@ -1052,9 +1039,9 @@ int avg_quantum_device::handler_7() // quantum_strobe3
 {
 	int cycles = 0;
 
-	m_halt = OP0;
+	m_halt = OP0();
 
-	if ((m_op & 5) == 0)
+	if (!OP0() && !OP2())
 	{
 		const u16 data = m_colorram[m_color];
 		const u8 bit3 = BIT(~data, 3);
@@ -1083,7 +1070,7 @@ int avg_quantum_device::handler_7() // quantum_strobe3
 				rgb_t(r, g, b),
 				((m_int_latch == 2) ? m_intensity : m_int_latch) << 4);
 	}
-	if (OP2)
+	if (OP2())
 	{
 		cycles = 0x4000 - m_timer;
 		m_timer = 0;
@@ -1130,7 +1117,7 @@ int avg_bzone_device::handler_1() // bzone_latch1
 
 int avg_bzone_device::handler_6() // bzone_strobe2
 {
-	if (!OP2 && !m_dvy12)
+	if (!OP2() && !m_dvy12)
 	{
 		m_intensity = (m_dvy >> 4) & 0xf;
 
@@ -1153,13 +1140,16 @@ int avg_bzone_device::handler_6() // bzone_strobe2
 
 int avg_bzone_device::handler_7() // bzone_strobe3
 {
-	/* Battle Zone is B/W */
+	// Battle Zone is B/W
 	const int cycles = avg_common_strobe3();
 
-	if ((m_op & 5) == 0)
+	if (!OP0() && !OP2())
 	{
-		vg_add_point_buf(m_xpos, m_ypos, vector_device::color111(7),
-							(((m_int_latch >> 1) == 1)? m_intensity: m_int_latch & 0xe) << 4);
+		vg_add_point_buf(
+				m_xpos,
+				m_ypos,
+				vector_device::color111(7),
+				(((m_int_latch >> 1) == 1) ? m_intensity : m_int_latch & 0xe) << 4);
 	}
 
 	return cycles;
@@ -1206,7 +1196,7 @@ TIMER_CALLBACK_MEMBER(avgdvg_device_base::run_state_machine)
 		// Get next state
 		m_state_latch = (m_state_latch & 0x10) | (m_prom[state_addr()] & 0xf);
 
-		if (ST3)
+		if (ST3())
 		{
 			// Read vector RAM/ROM
 			update_databus();
@@ -1420,32 +1410,25 @@ avgdvg_device_base::avgdvg_device_base(const machine_config &mconfig, device_typ
 	m_vector(*this, finder_base::DUMMY_TAG),
 	m_memspace(*this, finder_base::DUMMY_TAG, -1),
 	m_membase(0),
+	m_nvect(0),
+	m_pc(0),
+	m_sp(0),
+	m_dvx(0),
+	m_dvy(0),
+	m_stack{ 0, 0, 0, 0 },
+	m_data(0),
+	m_state_latch(0),
+	m_scale(0),
+	m_intensity(0),
+	m_op(0),
+	m_halt(0),
+	m_sync_halt(0),
+	m_xpos(0),
+	m_ypos(0),
 	m_prom(*this, "prom"),
 	m_vg_run_timer(nullptr),
 	m_vg_halt_timer(nullptr)
 {
-	m_pc = 0;
-	m_sp = 0;
-	m_dvx = 0;
-	m_dvy = 0;
-	m_stack[0] = 0;
-	m_stack[1] = 0;
-	m_stack[2] = 0;
-	m_stack[3] = 0;
-	m_data = 0;
-
-	m_state_latch = 0;
-	m_scale = 0;
-	m_intensity = 0;
-
-	m_op = 0;
-	m_halt = 0;
-	m_sync_halt = 0;
-
-	m_xpos = 0;
-	m_ypos = 0;
-
-	m_nvect = 0;
 }
 
 dvg_device::dvg_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :

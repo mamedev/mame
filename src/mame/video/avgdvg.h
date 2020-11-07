@@ -62,6 +62,13 @@ protected:
 	virtual void vggo() = 0;
 	virtual void vgrst() = 0;
 
+	u8 OP0() const { return BIT(m_op, 0); }
+	u8 OP1() const { return BIT(m_op, 1); }
+	u8 OP2() const { return BIT(m_op, 2); }
+	u8 OP3() const { return BIT(m_op, 3); }
+
+	u8 ST3() const { return BIT(m_state_latch, 3); }
+
 	void apply_flipping(int &x, int &y) const;
 	void vg_set_halt(int dummy);
 
@@ -75,8 +82,6 @@ protected:
 
 	int m_xmin, m_ymin;
 	int m_xcenter, m_ycenter;
-
-	bool m_flip_x, m_flip_y;
 
 	int m_nvect;
 	vgvector m_vectbuf[MAXVECT];
@@ -105,6 +110,8 @@ private:
 
 	required_region_ptr<u8> m_prom;
 	emu_timer *m_vg_run_timer, *m_vg_halt_timer;
+
+	bool m_flip_x, m_flip_y;
 };
 
 
