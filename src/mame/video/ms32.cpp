@@ -69,7 +69,7 @@ void ms32_state::video_start()
 	m_bg_tilemap_alt = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_state::get_ms32_bg_tile_info)),  TILEMAP_SCAN_ROWS, 16,16, 256, 16); // alt layout, controller by register?
 	m_roz_tilemap    = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_state::get_ms32_roz_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 128,128);
 
-	size_t size = m_sprram.bytes() / 4;
+	size_t size = m_sprram.bytes() / 2;
 	m_sprram_buffer = make_unique_clear<u16[]>(size);
 
 	/* set up tile layers */
@@ -692,7 +692,7 @@ WRITE_LINE_MEMBER(ms32_state::screen_vblank)
 {
 	if (state)
 	{
-		std::copy_n(&m_sprram[0], m_sprram.bytes() / 4, &m_sprram_buffer[0]);
+		std::copy_n(&m_sprram[0], m_sprram.bytes() / 2, &m_sprram_buffer[0]);
 	}
 }
 
