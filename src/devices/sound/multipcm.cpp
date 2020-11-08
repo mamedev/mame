@@ -695,27 +695,27 @@ void multipcm_device::sound_stream_update(sound_stream &stream, std::vector<read
 					{
 						case 0:
 						{ // .abc .... ....
-							u16 w0 = read_word(adr);
+							u16 w0 = read_byte(adr)<<8 | read_byte(adr+1);
 							csample = (w0 & 0x0fff) << 4;
 							break;
 						}
 						case 1:
 						{ // C... ..AB ....
-							u16 w0 = read_word(adr);
-							u16 w1 = read_word(adr + 2);
+							u16 w0 = read_byte(adr) << 8 | read_byte(adr + 1);
+							u16 w1 = read_byte(adr + 2) << 8 | read_byte(adr + 3);
 							csample = ((w0 & 0xf000) >> 8) | ((w1 & 0x00ff) << 8);
 							break;
 						}
 						case 2:
 						{ // .... bc.. ...a
-							u16 w0 = read_word(adr + 2);
-							u16 w1 = read_word(adr + 4);
+							u16 w0 = read_byte(adr + 2) << 8 | read_byte(adr + 3);
+							u16 w1 = read_byte(adr + 4) << 8 | read_byte(adr + 5);
 							csample = ((w0 & 0xff00) >> 4) | ((w1 & 0x000f) << 12);
 							break;
 						}
 						case 3:
 						{ // .... .... ABC.
-							u16 w1 = read_word(adr + 4);
+							u16 w1 = read_byte(adr + 4) << 8 | read_byte(adr + 5);
 							csample = w1 & 0xfff0;
 							break;
 						}
