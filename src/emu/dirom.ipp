@@ -1,10 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+#ifndef MAME_EMU_DIROM_IPP
+#define MAME_EMU_DIROM_IPP
+
+#pragma once
 
 template<int AddrWidth, int DataWidth, int AddrShift, endianness_t Endian>
 device_rom_interface<AddrWidth, DataWidth, AddrShift, Endian>::device_rom_interface(const machine_config &mconfig, device_t &device) :
 	device_memory_interface(mconfig, device),
-	m_rom_tag(device.basetag()),
+	m_rom_region(device, DEVICE_SELF),
 	m_rom_config("rom", Endian, 8 << DataWidth, AddrWidth, AddrShift),
 	m_bank(device, "bank"),
 	m_cur_bank(-1)
@@ -33,7 +37,7 @@ template<int AddrWidth, int DataWidth, int AddrShift, endianness_t Endian>
 void device_rom_interface<AddrWidth, DataWidth, AddrShift, Endian>::set_rom_bank(int bank)
 {
 	if(!m_bank)
-		emu_fatalerror("%s: device_rom_interface::set_rom_bank called without banking setup", device().tag());
+		throw emu_fatalerror("%s: device_rom_interface::set_rom_bank called without banking setup", device().tag());
 
 	if(bank >= m_bank_count) {
 		device().logerror("Warning: requested bank %x higher than actual bank count %x\n", bank, m_bank_count);
@@ -50,6 +54,8 @@ void device_rom_interface<AddrWidth, DataWidth, AddrShift, Endian>::set_rom_bank
 template<int AddrWidth, int DataWidth, int AddrShift, endianness_t Endian>
 void device_rom_interface<AddrWidth, DataWidth, AddrShift, Endian>::interface_post_load()
 {
+	device_memory_interface::interface_post_load();
+
 	if(m_bank)
 		m_bank->set_entry(m_cur_bank);
 }
@@ -57,9 +63,9 @@ void device_rom_interface<AddrWidth, DataWidth, AddrShift, Endian>::interface_po
 template<int AddrWidth, int DataWidth, int AddrShift, endianness_t Endian>
 void device_rom_interface<AddrWidth, DataWidth, AddrShift, Endian>::set_rom(const void *base, u32 size)
 {
-	u32 mend = m_rom_config.addr_width() == 32 ? 0xffffffff : (1 << m_rom_config.addr_width()) - 1;
-	u32 rend = size-1;
-	m_bank_count = mend == 0xffffffff ? 1 : (rend+1) / (mend+1);
+	const u32 mend = make_bitmask<u32>(m_rom_config.addr_width());
+	const u32 rend = size-1;
+	m_bank_count = (mend == 0xffffffff) ? 1 : (rend+1) / (mend+1);
 	if(m_bank_count < 1)
 		m_bank_count = 1;
 
@@ -86,24 +92,52 @@ void device_rom_interface<AddrWidth, DataWidth, AddrShift, Endian>::set_rom(cons
 }
 
 template<int AddrWidth, int DataWidth, int AddrShift, endianness_t Endian>
+void device_rom_interface<AddrWidth, DataWidth, AddrShift, Endian>::interface_validity_check(validity_checker &valid) const
+{
+	device_memory_interface::interface_validity_check(valid);
+
+	if(has_configured_map(0)) {
+		const auto rom_target = m_rom_region.finder_target();
+		if((&rom_target.first != &device()) || strcmp(rom_target.second, DEVICE_SELF))
+			osd_printf_error("Address map and ROM region both specified\n");
+	}
+}
+
+template<int AddrWidth, int DataWidth, int AddrShift, endianness_t Endian>
 void device_rom_interface<AddrWidth, DataWidth, AddrShift, Endian>::interface_pre_start()
 {
+	device_memory_interface::interface_pre_start();
+
 	if(!has_space(0))
 		return;
 
 	space().cache(m_rom_cache);
 
-	device().save_item(NAME(m_cur_bank));
-	device().save_item(NAME(m_bank_count));
-
 	if(!has_configured_map(0)) {
-		memory_region *reg = device().owner()->memregion(m_rom_tag);
-		if(reg)
-			set_rom(reg->base(), reg->bytes());
+		if(m_rom_region.found())
+			set_rom(m_rom_region->base(), m_rom_region->bytes());
 		else {
-			device().logerror("ROM region '%s' not found\n", m_rom_tag);
-			u32 end = m_rom_config.addr_width() == 32 ? 0xffffffff : (1 << m_rom_config.addr_width()) - 1;
-			space().unmap_read(0, end);
+			const auto rom_target = m_rom_region.finder_target();
+			if((&rom_target.first != &device()) || strcmp(rom_target.second, DEVICE_SELF))
+				throw emu_fatalerror("%s: device_rom_interface ROM region '%s' not found", device().tag(), rom_target.first.subtag(rom_target.second));
+
+			device().logerror("ROM region '%s' not found\n", rom_target.first.subtag(rom_target.second));
+			space().unmap_read(0, make_bitmask<offs_t>(m_rom_config.addr_width()));
 		}
+	} else {
+		const auto rom_target = m_rom_region.finder_target();
+		if((&rom_target.first != &device()) || strcmp(rom_target.second, DEVICE_SELF))
+			throw emu_fatalerror("%s: device_rom_interface has configured address map and ROM region", device().tag());
 	}
 }
+
+template<int AddrWidth, int DataWidth, int AddrShift, endianness_t Endian>
+void device_rom_interface<AddrWidth, DataWidth, AddrShift, Endian>::interface_post_start()
+{
+	device_memory_interface::interface_post_start();
+
+	device().save_item(NAME(m_cur_bank));
+	device().save_item(NAME(m_bank_count));
+}
+
+#endif // MAME_EMU_DIROM_IPP

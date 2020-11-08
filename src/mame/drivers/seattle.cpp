@@ -738,7 +738,7 @@ void seattle_state::wheel_board_w(offs_t offset, uint32_t data)
 		}
 		else if (BIT(data, 9) || BIT(data, 8))
 		{
-			logerror("%08X:wheel_board_w(%d) = %08X\n", m_maincpu->pc(), offset, data);
+			//logerror("%08X:wheel_board_w(%d) = %08X\n", m_maincpu->pc(), offset, data);
 		}
 		else
 		{
@@ -818,7 +818,7 @@ CUSTOM_INPUT_MEMBER(seattle_state::i40_r)
 			//logerror("%s: i40_r: select: %x index: %d data: %x\n", machine().describe_context(), m_i40_data, index, data);
 			break;
 		}
-		logerror("%s: i40_r: select: %x index: %d data: %x\n", machine().describe_context(), m_i40_data, index, data);
+		//logerror("%s: i40_r: select: %x index: %d data: %x\n", machine().describe_context(), m_i40_data, index, data);
 		//if (m_i40_data & 0x1000)
 		//  printf("%s: i40_r: select: %x index: %d data: %x\n", machine().describe_context().c_str(), m_i40_data, index, data);
 		//m_i40_data &= ~0x1000;
@@ -1761,10 +1761,12 @@ static INPUT_PORTS_START( blitz99 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_NAME("P3 A")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3) PORT_NAME("P3 B")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3) PORT_NAME("P3 Turbo")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(seattle_state, i40_r)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4) PORT_NAME("P4 A")
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4) PORT_NAME("P4 B")
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4) PORT_NAME("P4 Turbo")
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("8WAY_P4")
 	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_PLAYER(4) PORT_8WAY

@@ -82,14 +82,18 @@ of the top edge and height using ``y`` and ``height`` attributes, vertical
 centre and height using ``yc`` and ``height`` attributes, or top and bottom
 edges using ``top`` and ``bottom`` attributes.
 
-These three ``bounds`` elements are equivalent::
+These three ``bounds`` elements are equivalent:
+
+.. code-block:: XML
 
     <bounds x="455" y="120" width="12" height="8" />
     <bounds xc="461" yc="124" width="12" height="8" />
     <bounds left="455" top="120" right="467" bottom="128" />
 
 It’s possible to use different schemes in the horizontal and vertical
-directions.  For example, these equivalent ``bounds`` elements are also valid::
+directions.  For example, these equivalent ``bounds`` elements are also valid:
+
+.. code-block:: XML
 
     <bounds x="455" top="120" width="12" bottom="128" />
     <bounds left="455" yc="124" right="467" height="8" />
@@ -113,7 +117,9 @@ channel values are not pre-multiplied by the alpha value.
 
 Component and view item colour is specified using ``color`` elements.
 Meaningful attributes are ``red``, ``green``, ``blue`` and ``alpha``.  This
-example ``color`` element specifies all channel values::
+example ``color`` element specifies all channel values:
+
+.. code-block:: XML
 
     <color red="0.85" green="0.4" blue="0.3" alpha="1.0" />
 
@@ -131,7 +137,9 @@ Parameters are named variables that can be used in most attributes.  To use
 a parameter in an attribute, surround its name with tilde (~) characters.  If a
 parameter is not defined, no substitution occurs.  Here is an examples showing
 two instances of parameter use – the values of the ``digitno`` and ``x``
-parameters will be substituted for ``~digitno~`` and ``~x~``::
+parameters will be substituted for ``~digitno~`` and ``~x~``:
+
+.. code-block:: XML
 
     <element name="digit~digitno~" ref="digit">
         <bounds x="~x~" y="80" width="25" height="40" />
@@ -166,7 +174,9 @@ Value parameters are assigned using a ``param`` element with ``name`` and
 ``view`` elements other ``group`` definition elements).  A value parameter may
 be reassigned at any point.
 
-Here’s an example assigning the value “4” to the value parameter “firstdigit”::
+Here’s an example assigning the value “4” to the value parameter “firstdigit”:
+
+.. code-block:: XML
 
     <param name="firstdigit" value="4" />
 
@@ -175,7 +185,9 @@ Generator parameters are assigned using a ``param`` element with ``name`` and
 attributes.  Generator parameters may only appear inside ``repeat`` elements
 (see :ref:`layout-parts-repeats` for details).  A generator parameter must not
 be reassigned in the same scope (an identically named parameter may be defined
-in a child scope).  Here are some example generator parameters::
+in a child scope).  Here are some example generator parameters:
+
+.. code-block:: XML
 
     <param name="nybble" start="3" increment="-1" />
     <param name="switchpos" start="74" increment="156" />
@@ -189,25 +201,24 @@ The ``increment`` attribute must be an integer or floating-point number to be
 added to the parameter’s value.  The ``lshift`` and ``rshift`` attributes must
 be non-negative integers specifying numbers of bits to shift the parameter’s
 value to the left or right.  The increment and shift are applied at the end of
-the repeating block before the next iteration starts.  If both an increment and
-shift are supplied, the increment is applied before the shift.
+the repeating block before the next iteration starts.  The parameter’s value
+will be interpreted as an integer or floating-point number before the increment
+and/or shift are applied.  If both an increment and shift are supplied, the
+increment is applied before the shift.
 
 If the ``increment`` attribute is present and is a floating-point number, the
-parameter’s value will be interpreted as an integer or floating-point number and
-converted to a floating-point number before the increment is added.  If the
-``increment`` attribute is present and is an integer, the parameter’s value will
-be interpreted as an integer or floating number before the increment is added.
-The increment will be converted to a floating-point number before the addition
-if the parameter’s value is a floating-point number.
+parameter’s value will be converted to a floating-point number if necessary
+before the increment is added.  If the ``increment`` attribute is present and is
+an integer while the parameter’s value is a floating-point number, the increment
+will be converted to a floating-point number before the addition.
 
 If the ``lshift`` and/or ``rshift`` attributes are present and not equal, the
-parameter’s value will be interpreted as an integer or floating-point number,
-converted to an integer as necessary, and shifted accordingly.  Shifting to the
-left is defined as shifting towards the most significant bit.  If both
-``lshift`` and ``rshift`` are supplied, they are netted off before being
-applied.  This means you cannot, for example, use equal ``lshift`` and
-``rshift`` attributes to clear bits at one end of a parameter’s value after the
-first iteration.
+parameter’s value will be converted to an integer if necessary, and shifted
+accordingly.  Shifting to the left is defined as shifting towards the most
+significant bit.  If both ``lshift`` and ``rshift`` are supplied, they are
+netted off before being applied.  This means you cannot, for example, use equal
+``lshift`` and ``rshift`` attributes to clear bits at one end of a parameter’s
+value after the first iteration.
 
 It is an error if a ``param`` element has neither ``value`` nor ``start``
 attributes, and it is an error if a ``param`` element has both a ``value``
@@ -342,7 +353,9 @@ are supported.
 The top-level element of a MAME layout file must be a ``mamelayout`` element
 with a ``version`` attribute.  The ``version`` attribute must be an integer.
 Currently MAME only supports version 2, and will not load any other version.
-This is an example opening tag for a top-level ``mamelayout`` element::
+This is an example opening tag for a top-level ``mamelayout`` element:
+
+.. code-block:: XML
 
     <mamelayout version="2">
 
@@ -575,21 +588,27 @@ reel
     ``symbollist``, ``stateoffset``, ``numsymbolsvisible``, ``reelreversed``,
     and ``beltreel``.
 
-An example element that draws a static left-aligned text string::
+An example element that draws a static left-aligned text string:
+
+.. code-block:: XML
 
     <element name="label_reset_cpu">
         <text string="CPU" align="1"><color red="1.0" green="1.0" blue="1.0" /></text>
     </element>
 
 An example element that displays a circular LED where the intensity depends on
-the state of an active-high output::
+the state of an active-high output:
+
+.. code-block:: XML
 
     <element name="led" defstate="0">
         <rect state="0"><color red="0.43" green="0.35" blue="0.39" /></rect>
         <rect state="1"><color red="1.0" green="0.18" blue="0.20" /></rect>
     </element>
 
-An example element for a button that gives visual feedback when clicked::
+An example element for a button that gives visual feedback when clicked:
+
+.. code-block:: XML
 
     <element name="btn_rst">
         <rect state="0"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.2" green="0.2" blue="0.2" /></rect>
@@ -601,7 +620,9 @@ An example element for a button that gives visual feedback when clicked::
     </element>
 
 An example of an element that draws a seven-segment LED display using external
-segment images::
+segment images:
+
+.. code-block:: XML
 
     <element name="digit_a" defstate="0">
         <image file="a_off.png" />
@@ -616,7 +637,9 @@ segment images::
     </element>
 
 An example of a bar graph that grows vertically and changes colour from green,
-through yellow, to red as the state increases::
+through yellow, to red as the state increases:
+
+.. code-block:: XML
 
     <element name="pedal">
         <rect>
@@ -630,7 +653,9 @@ through yellow, to red as the state increases::
 
 An example of a bar graph that grows horizontally to the left or right and
 changes colour from green, through yellow, to red as the state changes from the
-neutral position::
+neutral position:
+
+.. code-block:: XML
 
     <element name="wheel">
         <rect>
@@ -671,7 +696,9 @@ loaded in the order they appear, from top to bottom.
 Views are created with ``view`` elements inside the top-level ``mamelayout``
 element.  Each ``view`` element must have a ``name`` attribute, supplying its
 human-readable name for use in the user interface and command-line options.
-This is an example of a valid opening tag for a ``view`` element::
+This is an example of a valid opening tag for a ``view`` element:
+
+.. code-block:: XML
 
     <view name="Control panel">
 
@@ -777,7 +804,9 @@ unit square (origin at 0,0 and height and width both equal to 1).  In the
 absence of a ``bounds`` child element, groups are expanded with no
 translation/scaling (note that groups may position screens/elements outside
 their bounds).  This example shows a view instantiating and positioning a
-screen, an individual layout element, and two element groups::
+screen, an individual layout element, and two element groups:
+
+.. code-block:: XML
 
     <view name="LED Displays, Terminal and Keypad">
         <screen index="0"><bounds x="0" y="132" width="320" height="240" /></screen>
@@ -816,7 +845,9 @@ initially visible, or ``no`` if it should be initially hidden.  Collections are
 initially visible by default.
 
 Here is an example demonstrating the use of collections to allow parts of a view
-to be hidden by the user::
+to be hidden by the user:
+
+.. code-block:: XML
 
     <view name="LED Displays, CRT and Keypad">
         <collection name="LED Displays">
@@ -854,14 +885,18 @@ identifier.  It is an error if a layout file contains multiple group definitions
 with identical ``name`` attributes.  The value of the ``name`` attribute is used
 when instantiating the group from a view or another group.  This is an example
 opening tag for a group definition element inside the top-level ``mamelayout``
-element::
+element:
+
+.. code-block:: XML
 
     <group name="panel">
 
 This group may then be instantiated in a view or another group element using a
 group reference element, optionally supplying destination bounds, orientation,
 and/or modifier colour.  The ``ref`` attribute identifies the group to
-instantiate – in this example, destination bounds are supplied::
+instantiate – in this example, destination bounds are supplied:
+
+.. code-block:: XML
 
     <group ref="panel"><bounds x="87" y="58" width="23" height="23.5" /></group>
 
@@ -880,7 +915,9 @@ groups’ bounds are only used for the purpose of calculating the coordinate
 transform when instantiating a group.  A group may position screens and/or
 elements outside its bounds, and they will not be cropped.
 
-To demonstrate how bounds calculation works, consider this example::
+To demonstrate how bounds calculation works, consider this example:
+
+.. code-block:: XML
 
     <group name="autobounds">
         <!-- bounds automatically calculated with origin at (5,10), width 30, and height 15 -->
@@ -900,7 +937,9 @@ To demonstrate how bounds calculation works, consider this example::
 
 This is relatively straightforward, as all elements inherently fall within the
 group’s automatically computed bounds.  Now consider what happens if a group
-positions elements outside its explicit bounds::
+positions elements outside its explicit bounds:
+
+.. code-block:: XML
 
     <group name="periphery">
         <!-- elements are above the top edge and to the right of the right edge of the bounds -->
@@ -967,7 +1006,9 @@ child elements are used (:ref:`layout-parts`, :ref:`layout-parts-groups`, and
 inside the parameter scope of its lexical (DOM) parent element.
 
 Generating white number labels from zero to eleven named ``label_0``,
-``label_1``, and so on (inside the top-level ``mamelayout`` element)::
+``label_1``, and so on (inside the top-level ``mamelayout`` element):
+
+.. code-block:: XML
 
     <repeat count="12">
         <param name="labelnum" start="0" increment="1" />
@@ -978,7 +1019,9 @@ Generating white number labels from zero to eleven named ``label_0``,
 
 A horizontal row of forty digital displays, with five units space between them,
 controlled by outputs ``digit0`` to ``digit39`` (inside a ``group`` or ``view``
-element)::
+element):
+
+.. code-block:: XML
 
     <repeat count="40">
         <param name="i" start="0" increment="1" />
@@ -989,7 +1032,9 @@ element)::
     </repeat>
 
 Eight five-by-seven dot matrix displays in a row, with pixels controlled by
-outputs ``Dot_000`` to ``Dot_764`` (inside a ``group`` or ``view`` element)::
+outputs ``Dot_000`` to ``Dot_764`` (inside a ``group`` or ``view`` element):
+
+.. code-block:: XML
 
     <repeat count="8"> <!-- 8 digits -->
         <param name="digitno" start="1" increment="1" />
@@ -1008,7 +1053,9 @@ outputs ``Dot_000`` to ``Dot_764`` (inside a ``group`` or ``view`` element)::
     </repeat>
 
 Two horizontally separated, clickable, four-by-four keypads (inside a ``group``
-or ``view`` element)::
+or ``view`` element):
+
+.. code-block:: XML
 
     <repeat count="2">
         <param name="group" start="0" increment="4" />
@@ -1038,7 +1085,9 @@ takes its initial value from the correspondingly named parameter in the
 enclosing scope, but does not modify it.
 
 Generating a chequerboard pattern with alternating alpha values 0.4 and 0.2
-(inside a ``group`` or ``view`` element)::
+(inside a ``group`` or ``view`` element):
+
+.. code-block:: XML
 
     <repeat count="4">
         <param name="pairy" start="3" increment="20" />
@@ -1117,7 +1166,9 @@ the item’s animation state, see :ref:`layout-interact-itemanim`).
 The ``inputtag`` attribute specifies the tag path of an I/O port relative to the
 device that caused the layout file to be loaded.  The ``inputmask`` attribute
 must be an integer specifying the bits of the I/O port field that the item
-should activate.  This sample shows instantiation of clickable buttons::
+should activate.  This sample shows instantiation of clickable buttons:
+
+.. code-block:: XML
 
     <element ref="btn_3" inputtag="X2" inputmask="0x10">
         <bounds x="2.30" y="4.325" width="1.0" height="1.0" />
@@ -1148,7 +1199,9 @@ If the ``element`` element has a ``name`` attribute, the element state value
 will be taken from the value of the correspondingly named emulated output.  Note
 that output names are global, which can become an issue when a machine uses
 multiple instances of the same type of device.  This example shows how digital
-displays may be connected to emulated outputs::
+displays may be connected to emulated outputs:
+
+.. code-block:: XML
 
     <element name="digit6" ref="digit"><bounds x="16" y="16" width="48" height="80" /></element>
     <element name="digit5" ref="digit"><bounds x="64" y="16" width="48" height="80" /></element>
@@ -1238,7 +1291,9 @@ all 32 bits being set.
 
 This example shows elements with independent element state and animation state,
 using the animation state taken from emulated outputs to control their
-position::
+position:
+
+.. code-block:: XML
 
     <repeat count="5">
         <param name="x" start="10" increment="9" />
@@ -1260,7 +1315,9 @@ position::
 
 This example shows elements with independent element state and animation state,
 using the animation state taken from an emulated positional input to control
-their positions::
+their positions:
+
+.. code-block:: XML
 
         <repeat count="4">
             <param name="y" start="1" increment="3" />

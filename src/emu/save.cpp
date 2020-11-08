@@ -190,13 +190,13 @@ void save_manager::save_memory(device_t *device, const char *module, const char 
 
 	// create the full name
 	std::string totalname;
-	if (tag != nullptr)
+	if (tag)
 		totalname = string_format("%s/%s/%X/%s", module, tag, index, name);
 	else
 		totalname = string_format("%s/%X/%s", module, index, name);
 
 	// insert us into the list
-	m_entry_list.emplace_back(std::make_unique<state_entry>(val, totalname, device, module, tag ? tag : "", index, valsize, valcount, blockcount, stride));
+	m_entry_list.emplace_back(std::make_unique<state_entry>(val, std::move(totalname), device, module, tag ? tag : "", index, valsize, valcount, blockcount, stride));
 }
 
 
@@ -961,12 +961,15 @@ void rewinder::report_error(save_error error, rewind_operation operation)
 //  state_entry - constructor
 //-------------------------------------------------
 
-save_manager::state_entry::state_entry(void *data, std::string name, device_t *device, std::string module, std::string tag, int index, u8 size, u32 valcount, u32 blockcount, u32 stride)
+save_manager::state_entry::state_entry(
+		void *data,
+		std::string &&name, device_t *device, std::string &&module, std::string &&tag, int index,
+		u8 size, u32 valcount, u32 blockcount, u32 stride)
 	: m_data(data)
-	, m_name(name)
+	, m_name(std::move(name))
 	, m_device(device)
-	, m_module(module)
-	, m_tag(tag)
+	, m_module(std::move(module))
+	, m_tag(std::move(tag))
 	, m_index(index)
 	, m_typesize(size)
 	, m_typecount(valcount)

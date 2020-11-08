@@ -52,6 +52,7 @@ protected:
 	optional_ioport m_io1;
 	uint8_t m_latch0;
 	uint8_t m_latch1;
+	uint8_t m_previous_port0;
 
 	required_device<ppu2c0x_device> m_ppu;
 
@@ -74,7 +75,7 @@ private:
 	virtual void machine_reset() override;
 	uint8_t rom_r(offs_t offset);
 	void bank_w(uint8_t data);
-	int m_rombase;
+	uint8_t m_rombase;
 };
 
 class nes_clone_vtvppong_state : public nes_clone_state
@@ -91,25 +92,44 @@ private:
 	void nes_clone_vtvppong_map(address_map& map);
 };
 
-class nes_clone_suduko_state : public nes_clone_state
+class nes_clone_sudoku_state : public nes_clone_state
 {
 public:
-	nes_clone_suduko_state(const machine_config& mconfig, device_type type, const char* tag) :
+	nes_clone_sudoku_state(const machine_config& mconfig, device_type type, const char* tag) :
 		nes_clone_state(mconfig, type, tag)
 	{ }
 
 	void init_sudoku();
 
-	void nes_clone_suduko(machine_config& config);
+	void nes_clone_sudoku(machine_config& config);
 
 private:
-	void nes_clone_suduko_map(address_map& map);
+	void nes_clone_sudoku_map(address_map& map);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint8_t rom_r(offs_t offset);
 	void bank_w(uint8_t data);
-	int m_rombase;
+	uint8_t m_rombase;
 };
+
+class nes_clone_vtvsocr_state : public nes_clone_state
+{
+public:
+	nes_clone_vtvsocr_state(const machine_config& mconfig, device_type type, const char* tag) :
+		nes_clone_state(mconfig, type, tag)
+	{ }
+
+	void nes_clone_vtvsocr(machine_config& config);
+
+private:
+	void nes_clone_vtvsocr_map(address_map& map);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	uint8_t rom_r(offs_t offset);
+	void bank_w(offs_t offset, uint8_t data);
+	uint8_t m_bankregs[4];
+};
+
 
 
 class nes_clone_afbm7800_state : public nes_clone_state
@@ -218,11 +238,16 @@ uint8_t nes_clone_state::in1_r()
 void nes_clone_state::in0_w(uint8_t data)
 {
 	//logerror("%s: in0_w %02x\n", machine().describe_context(), data);
-	if (data & 0x01)
-		return;
+	if ((data & 0x01) != (m_previous_port0 & 0x01))
+	{
+		if (data & 0x01)
+		{
+			m_latch0 = m_io0->read();
+			m_latch1 = m_io1->read();
+		}
+	}
 
-	m_latch0 = m_io0->read();
-	m_latch1 = m_io1->read();
+	m_previous_port0 = data;
 }
 
 
@@ -312,6 +337,7 @@ void nes_clone_state::machine_reset()
 {
 	m_latch0 = 0;
 	m_latch1 = 0;
+	m_previous_port0 = 0;
 }
 
 
@@ -864,43 +890,42 @@ void nes_clone_afbm7800_state::machine_start()
  Sudoku Specifics
 **************************************************/
 
-void nes_clone_suduko_state::machine_reset()
+void nes_clone_sudoku_state::machine_reset()
 {
 	nes_clone_state::machine_reset();
 	m_rombase = 0;
 }
 
-void nes_clone_suduko_state::machine_start()
+void nes_clone_sudoku_state::machine_start()
 {
 	nes_clone_state::machine_start();
 	save_item(NAME(m_rombase));
 }
 
-void nes_clone_suduko_state::nes_clone_suduko(machine_config& config)
+void nes_clone_sudoku_state::nes_clone_sudoku(machine_config& config)
 {
 	nes_clone(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &nes_clone_suduko_state::nes_clone_suduko_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_clone_sudoku_state::nes_clone_sudoku_map);
 }
 
-void nes_clone_suduko_state::nes_clone_suduko_map(address_map& map)
+void nes_clone_sudoku_state::nes_clone_sudoku_map(address_map& map)
 {
 	nes_clone_basemap(map);
-	map(0x8000, 0xffff).rw(FUNC(nes_clone_suduko_state::rom_r), FUNC(nes_clone_suduko_state::bank_w));
+	map(0x8000, 0xffff).rw(FUNC(nes_clone_sudoku_state::rom_r), FUNC(nes_clone_sudoku_state::bank_w));
 }
 
-uint8_t nes_clone_suduko_state::rom_r(offs_t offset)
+uint8_t nes_clone_sudoku_state::rom_r(offs_t offset)
 {
 	return m_mainrom[(offset + (m_rombase * 0x8000)) & (m_mainromsize - 1)];
 }
 
-void nes_clone_suduko_state::bank_w(uint8_t data)
+void nes_clone_sudoku_state::bank_w(uint8_t data)
 {
 	logerror("%04x: bank_w %02x\n", machine().describe_context(), data);
 	m_rombase = data;
 }
 
-
-void nes_clone_suduko_state::init_sudoku()
+void nes_clone_sudoku_state::init_sudoku()
 {
 	u8 *src = memregion("maincpu")->base();
 	int len = memregion("maincpu")->bytes();
@@ -921,9 +946,57 @@ void nes_clone_suduko_state::init_sudoku()
 
 		std::copy(buffer.begin(), buffer.end(), &src[0]);
 	}
-
-
 }
+
+/**************************************************
+ Soccer Specifics
+ INES Mapper 178 / NES 2.0 Mapper 551 clone or similar?
+**************************************************/
+
+void nes_clone_vtvsocr_state::machine_reset()
+{
+	nes_clone_state::machine_reset();
+	m_bankregs[0] = 0;
+	m_bankregs[1] = 0;
+	m_bankregs[2] = 0;
+	m_bankregs[3] = 0;
+}
+
+void nes_clone_vtvsocr_state::machine_start()
+{
+	nes_clone_state::machine_start();
+	save_item(NAME(m_bankregs));
+}
+
+void nes_clone_vtvsocr_state::nes_clone_vtvsocr(machine_config& config)
+{
+	nes_clone(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_clone_vtvsocr_state::nes_clone_vtvsocr_map);
+}
+
+void nes_clone_vtvsocr_state::nes_clone_vtvsocr_map(address_map& map)
+{
+	nes_clone_basemap(map);
+	map(0x4800, 0x4803).w(FUNC(nes_clone_vtvsocr_state::bank_w));
+	map(0x8000, 0xffff).r(FUNC(nes_clone_vtvsocr_state::rom_r));
+}
+
+uint8_t nes_clone_vtvsocr_state::rom_r(offs_t offset)
+{
+	int bank = m_bankregs[1] >> 1;
+	return m_mainrom[(offset + (bank * 0x8000)) & (m_mainromsize - 1)];
+}
+
+void nes_clone_vtvsocr_state::bank_w(offs_t offset, uint8_t data)
+{
+	logerror("%04x: bank_w %02x %02x\n", machine().describe_context(), offset, data);
+	m_bankregs[offset] = data;
+}
+
+/**************************************************
+ Ping Pong Specifics
+**************************************************/
+
 
 void nes_clone_vtvppong_state::init_vtvppong()
 {
@@ -995,6 +1068,12 @@ ROM_START( vtvppong )
 	ROM_LOAD( "vtvpongppu.bin", 0x00000, 0x20000, CRC(474dfc0c) SHA1(4d0afab111e40172ae0b31e94f1b74b73a18385f) )
 ROM_END
 
+ROM_START( vtvsocr )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	// 8-bit ROM, but byteswapped for encryption?
+	ROM_LOAD16_WORD_SWAP( "virtualtvsoccer.bin", 0x00000, 0x40000, CRC(2cfe42aa) SHA1(c2cafdbd5cc6491c94efd3f1be4b70c9de737b46) )
+ROM_END
+
 void nes_clone_state::init_nes_clone()
 {
 }
@@ -1009,10 +1088,12 @@ CONS( 200?, dnce2000, 0, 0, nes_clone_dnce2000, dnce2000, nes_clone_dnce2000_sta
 // Black pad marked 'SUDOKU' with tails on the S and U characters looping over the logo.  Box says "Plug and Play Sudoku"
 // Has 2 sets of 4 buttons in circular 'direction pad' layouts (on the left for directions, on the right for functions) and 9 red numbered buttons with red power LED on left of them, and reset button on right
 // Alt. version was released with 'New York Times' titlescreen
-CONS( 200?, papsudok,     0,  0,  nes_clone_suduko, papsudok, nes_clone_suduko_state, init_sudoku, "Nice Code", "Plug and Play Sudoku Game (NES based)", 0 ) // plays, but unclear how 'save' feature is meant to work, is it meant to save after shutdown or not? no obvious writes
+CONS( 200?, papsudok,     0,  0,  nes_clone_sudoku, papsudok, nes_clone_sudoku_state, init_sudoku, "Nice Code", "Plug and Play Sudoku Game (NES based)", 0 ) // plays, but unclear how 'save' feature is meant to work, is it meant to save after shutdown or not? no obvious writes
 
-CONS( 200?, nytsudo,      0,  0,  nes_clone_suduko, papsudok, nes_clone_suduko_state, init_sudoku, "Excalibur / Nice Code", "The New York Times Sudoku", 0 ) // based on the above
+CONS( 200?, nytsudo,      0,  0,  nes_clone_sudoku, papsudok, nes_clone_sudoku_state, init_sudoku, "Excalibur / Nice Code", "The New York Times Sudoku", 0 ) // based on the above
 
 CONS( 200?, vtvppong,  0,  0,  nes_clone_vtvppong,    nes_clone, nes_clone_vtvppong_state, init_vtvppong, "<unknown>", "Virtual TV Ping Pong", MACHINE_NOT_WORKING )
 
 CONS( 200?, pjoypj001, 0, 0, nes_clone, nes_clone, nes_clone_state, init_nes_clone, "Trump Grand", "PowerJoy (PJ001, NES based plug & play)", MACHINE_NOT_WORKING )
+
+CONS( 200?, vtvsocr,     0,  0,  nes_clone_vtvsocr, nes_clone, nes_clone_vtvsocr_state, init_nes_clone, "<unknown>", "Virtual TV Soccer", MACHINE_NOT_WORKING )

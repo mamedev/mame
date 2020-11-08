@@ -275,8 +275,9 @@ void hyprduel_state::hyprduel_map(address_map &map)
 
 void hyprduel_state::hyprduel_map2(address_map &map)
 {
-	map(0x000000, 0x003fff).ram().share("sharedram1");                      /* shadow ($c00000 - $c03fff : vector) */
-	map(0x004000, 0x007fff).readonly().nopw().share("sharedram3");         /* shadow ($fe4000 - $fe7fff : read only) */
+	map(0x000000, 0x007fff).ram().share("sharedram1");                      /* shadow ($c00000 - $c03fff : vector) */
+	map(0x004000, 0x01ffff).readonly().nopw().share("sharedram3");         /* shadow ($fe4000 - $fe7fff : read only) */
+	map(0x008000, 0x01ffff).unmaprw();
 	map(0x400000, 0x400003).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
 	map(0x400005, 0x400005).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x800000, 0x800001).noprw();
@@ -306,8 +307,9 @@ void hyprduel_state::magerror_map(address_map &map)
 
 void hyprduel_state::magerror_map2(address_map &map)
 {
-	map(0x000000, 0x003fff).ram().share("sharedram1");                      /* shadow ($c00000 - $c03fff : vector) */
-	map(0x004000, 0x007fff).readonly().nopw().share("sharedram3");     /* shadow ($fe4000 - $fe7fff : read only) */
+	map(0x000000, 0x01ffff).ram().share("sharedram1");                      /* shadow ($c00000 - $c03fff : vector) */
+	map(0x004000, 0x01ffff).readonly().nopw().share("sharedram3");     /* shadow ($fe4000 - $fe7fff : read only) */
+	map(0x008000, 0x01ffff).unmaprw();
 	map(0x400000, 0x400003).noprw();
 	map(0x800000, 0x800003).nopr().w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff);
 	map(0x800005, 0x800005).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));

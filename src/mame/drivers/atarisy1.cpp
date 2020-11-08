@@ -250,7 +250,7 @@ uint8_t atarisy1_state::adc_r(offs_t offset)
 	if (!m_adc.found())
 		return 0xff;
 
-	int value = m_adc->data_r();
+	const u8 value = m_adc->data_r();
 
 	if (!machine().side_effects_disabled())
 		adc_w(offset, 0);
@@ -266,7 +266,7 @@ void atarisy1_state::adc_w(offs_t offset, uint8_t data)
 
 	m_adc->address_offset_start_w(offset & 7, 0);
 
-	/* the A4 bit enables/disables joystick IRQs */
+	// the A4 bit enables/disables joystick IRQs
 	m_ajsint->in_w<0>(!BIT(offset, 3));
 }
 

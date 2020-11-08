@@ -15943,6 +15943,8 @@ interact                        //
 victor                          //
 
 @source:hektor.cpp
+hektor                          // Hektor
+hektor2                         // Hektor II
 hektor3                         // Hektor III
 
 @source:hexion.cpp
@@ -19037,6 +19039,9 @@ spiceup                         // Spice It Up
 sultanw                         // Sultan W
 whiterus                        // White Russia
 rapfire5                        // Rapid Fire 5
+
+@source:kongs470.cpp
+tdbingo                         //
 
 @source:konin.cpp
 konin                           //
@@ -32230,6 +32235,7 @@ dnce2000
 vtvppong
 papsudok
 nytsudo
+vtvsocr
 
 @source:nes_sh6578.cpp
 bandgpad
@@ -32275,6 +32281,7 @@ dgun853
 silv35
 vsmaxxvd
 vsmaxx77
+joysti30
 techni4
 senwld
 protpp
@@ -32327,6 +32334,7 @@ ventur25
 vgpocket
 vgpmini
 vgtablet
+joypad65
 
 @source:nes_vt32.cpp
 dgun2573
@@ -32340,6 +32348,15 @@ mc_pg150
 mc_hh210
 dvnimbus
 unkra200
+dgun2577
+lxcyber
+gtct885
+rd5_240
+hkb502
+hkb502a
+lxcap
+retro400
+myarccn
 fapocket
 sy889
 sy888b
@@ -32361,9 +32378,13 @@ rtvgc300
 rtvgc300fz
 red5mam
 denv150
+egame150
 lpgm240
+tup240
 otrail
 zonefusn
+sealvt
+gcs2mgp
 
 @source:newbrain.cpp
 newbrain                        //

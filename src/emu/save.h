@@ -106,7 +106,7 @@ class save_manager
 	{
 	public:
 		// construction/destruction
-		state_entry(void *data, std::string name, device_t *device, std::string module, std::string tag, int index, u8 size, u32 valcount, u32 blockcount, u32 stride);
+		state_entry(void *data, std::string &&name, device_t *device, std::string &&module, std::string &&tag, int index, u8 size, u32 valcount, u32 blockcount, u32 stride);
 
 		// helpers
 		void flip_data();

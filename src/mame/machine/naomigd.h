@@ -85,7 +85,7 @@ public:
 		image_tag = _image_tag;
 	}
 
-	uint8_t *memory(uint32_t &size) { size = dimm_data_size; return dimm_data; }
+	uint8_t *memory(uint32_t &size) { size = dimm_data_size; return dimm_data.get(); }
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
@@ -172,8 +172,8 @@ private:
 	uint64_t dimm_des_key;
 
 	// Note: voluntarily not saved into the state
-	uint8_t *dimm_des_data;
-	uint8_t *dimm_data;
+	std::unique_ptr<uint8_t[]> dimm_des_data;
+	std::unique_ptr<uint8_t[]> dimm_data;
 	uint32_t dimm_data_size;
 
 	static const uint32_t DES_LEFTSWAP[];

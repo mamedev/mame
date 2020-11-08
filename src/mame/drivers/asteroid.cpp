@@ -323,9 +323,9 @@ void asteroid_state::asteroid_map(address_map &map)
 	map(0x0000, 0x01ff).ram();
 	map(0x0200, 0x02ff).bankrw("ram1");
 	map(0x0300, 0x03ff).bankrw("ram2");
-	map(0x2000, 0x2007).r(FUNC(asteroid_state::asteroid_IN0_r)).nopw();    // IN0
-	map(0x2400, 0x2407).r(FUNC(asteroid_state::asteroid_IN1_r));    // IN1
-	map(0x2800, 0x2803).r(FUNC(asteroid_state::asteroid_DSW1_r)).nopw();   // DSW1
+	map(0x2000, 0x2007).r(FUNC(asteroid_state::asteroid_IN0_r)).nopw();     // IN0
+	map(0x2400, 0x2407).r(FUNC(asteroid_state::asteroid_IN1_r));            // IN1
+	map(0x2800, 0x2803).r(FUNC(asteroid_state::asteroid_DSW1_r)).nopw();    // DSW1
 	map(0x3000, 0x3000).w(m_dvg, FUNC(dvg_device::go_w));
 	map(0x3200, 0x3200).w("outlatch", FUNC(output_latch_device::write));
 	map(0x3400, 0x3400).w("watchdog", FUNC(watchdog_timer_device::reset_w));
@@ -333,8 +333,8 @@ void asteroid_state::asteroid_map(address_map &map)
 	map(0x3a00, 0x3a00).w(FUNC(asteroid_state::asteroid_thump_w));
 	map(0x3c00, 0x3c07).w("audiolatch", FUNC(ls259_device::write_d7));
 	map(0x3e00, 0x3e00).w(FUNC(asteroid_state::asteroid_noise_reset_w));
-	map(0x4000, 0x47ff).ram().share("dvg:vectorram");
-	map(0x5000, 0x57ff).rom();                     // Vector ROM
+	map(0x4000, 0x47ff).ram();                     // vector RAM
+	map(0x5000, 0x57ff).rom();                     // vector ROM
 	map(0x6800, 0x7fff).rom();
 }
 
@@ -345,9 +345,9 @@ void asteroid_state::astdelux_map(address_map &map)
 	map(0x0000, 0x01ff).ram();
 	map(0x0200, 0x02ff).bankrw("ram1");
 	map(0x0300, 0x03ff).bankrw("ram2");
-	map(0x2000, 0x2007).r(FUNC(asteroid_state::asteroid_IN0_r)).nopw();    // IN0
-	map(0x2400, 0x2407).r(FUNC(asteroid_state::asteroid_IN1_r)).nopw();    // IN1
-	map(0x2800, 0x2803).r(FUNC(asteroid_state::asteroid_DSW1_r));   // DSW1
+	map(0x2000, 0x2007).r(FUNC(asteroid_state::asteroid_IN0_r)).nopw(); // IN0
+	map(0x2400, 0x2407).r(FUNC(asteroid_state::asteroid_IN1_r)).nopw(); // IN1
+	map(0x2800, 0x2803).r(FUNC(asteroid_state::asteroid_DSW1_r));	    // DSW1
 	map(0x2c00, 0x2c0f).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x2c40, 0x2c7f).r(FUNC(asteroid_state::earom_read));
 	map(0x3000, 0x3000).w(m_dvg, FUNC(dvg_device::go_w));
@@ -357,8 +357,8 @@ void asteroid_state::astdelux_map(address_map &map)
 	map(0x3a00, 0x3a00).w(FUNC(asteroid_state::earom_control_w));
 	map(0x3c00, 0x3c07).w("audiolatch", FUNC(ls259_device::write_d7));
 	map(0x3e00, 0x3e00).w(FUNC(asteroid_state::asteroid_noise_reset_w));
-	map(0x4000, 0x47ff).ram().share("dvg:vectorram");
-	map(0x4800, 0x57ff).rom();                     // Vector ROM
+	map(0x4000, 0x47ff).ram();                     // vector RAM
+	map(0x4800, 0x57ff).rom();                     // vector ROM
 	map(0x6000, 0x7fff).rom();
 }
 
@@ -376,8 +376,8 @@ void asteroid_state::llander_map(address_map &map)
 	map(0x3400, 0x3400).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x3c00, 0x3c00).w(FUNC(asteroid_state::llander_sounds_w));
 	map(0x3e00, 0x3e00).w(FUNC(asteroid_state::llander_snd_reset_w));
-	map(0x4000, 0x47ff).ram().share("dvg:vectorram");
-	map(0x4800, 0x5fff).rom();                     // Vector ROM
+	map(0x4000, 0x47ff).ram();                     // vector RAM
+	map(0x4800, 0x5fff).rom();                     // vector ROM
 	map(0x5800, 0x5800).nopw(); // INC access?
 	map(0x6000, 0x7fff).rom();
 }
@@ -762,7 +762,8 @@ void asteroid_state::asteroid_base(machine_config &config)
 	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
 
 	DVG(config, m_dvg, 0);
-	m_dvg->set_vector_tag("vector");
+	m_dvg->set_vector("vector");
+	m_dvg->set_memory(m_maincpu, AS_PROGRAM, 0x4000);
 }
 
 void asteroid_state::asteroid(machine_config &config)

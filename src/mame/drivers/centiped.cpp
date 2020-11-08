@@ -742,12 +742,14 @@ void centiped_state::centipdb_map(address_map &map)
 	map(0x0c03, 0x0c03).mirror(0x4000).portr("IN3");
 	map(0x1000, 0x1001).mirror(0x4000).w(m_aysnd, FUNC(ay8910_device::data_address_w));
 	map(0x1001, 0x1001).mirror(0x4000).r(m_aysnd, FUNC(ay8910_device::data_r));
+	map(0x1002, 0x100f).mirror(0x4000).noprw();
 	map(0x1400, 0x140f).mirror(0x4000).w(FUNC(centiped_state::centiped_paletteram_w)).share("paletteram");
-	map(0x1600, 0x163f).mirror(0x4000).w(FUNC(centiped_state::earom_write));
+	map(0x1600, 0x163f).mirror(0x4000).nopr().w(FUNC(centiped_state::earom_write));
 	map(0x1680, 0x1680).mirror(0x4000).w(FUNC(centiped_state::earom_control_w));
 	map(0x1700, 0x173f).mirror(0x4000).r(FUNC(centiped_state::earom_read));
 	map(0x1800, 0x1800).mirror(0x4000).w(FUNC(centiped_state::irq_ack_w));
-	map(0x1c00, 0x1c07).mirror(0x4000).w("outlatch", FUNC(ls259_device::write_d7));
+	map(0x1c00, 0x1c07).mirror(0x4000).nopr().w("outlatch", FUNC(ls259_device::write_d7));
+	map(0x2000, 0x2000).mirror(0x4000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x2000, 0x27ff).rom();
 	map(0x2800, 0x3fff).mirror(0x4000).rom();
 	map(0x6000, 0x67ff).rom();

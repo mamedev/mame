@@ -444,17 +444,9 @@ void galaxold_state::scrambleo_map(address_map &map)
 
 void galaxold_state::guttang_rombank_w(uint8_t data)
 {
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 //  printf("rombank %02x\n",data);
-	if (data&1)
-	{
-		uint8_t *rom = memregion("maincpu")->base();
-		membank("cpubank")->set_base(rom + 0x4000);
-	}
-	else
-	{
-		uint8_t *rom = memregion("maincpu")->base();
-		membank("cpubank")->set_base(rom + 0x2000);
-	}
+	space.install_rom(0x2000, 0x27ff, memregion("maincpu")->base() + (data & 1 ? 0x4000 : 0x2000));
 }
 
 
@@ -3787,8 +3779,7 @@ ROM_END
 
 void galaxold_state::init_guttangt()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_rom( 0x2000, 0x27ff, memregion("maincpu")->base() + 0x2000);
+	m_maincpu->space(AS_PROGRAM).install_rom(0x2000, 0x27ff, memregion("maincpu")->base() + 0x2000);
 }
 
 

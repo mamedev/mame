@@ -734,7 +734,7 @@ void naomi_gdrom_board::sh4_control_w(uint32_t data)
 	}
 	else
 	{
-		m_315_6154->memory()->install_ram(0x10000000, 0x10000000 + dimm_data_size - 1, dimm_des_data);
+		m_315_6154->memory()->install_ram(0x10000000, 0x10000000 + dimm_data_size - 1, dimm_des_data.get());
 	}
 	if (((old & 1) == 0) && ((dimm_control & 1) == 1))
 		set_reset_out();
@@ -1016,22 +1016,22 @@ void naomi_gdrom_board::device_start()
 		if (file_start) {
 			uint32_t file_rounded_size = (file_size + 2047) & -2048;
 			for (dimm_data_size = 4096; dimm_data_size < file_rounded_size; dimm_data_size <<= 1);
-			dimm_data = auto_alloc_array(machine(), uint8_t, dimm_data_size);
-			dimm_des_data = auto_alloc_array(machine(), uint8_t, dimm_data_size);
+			dimm_data = std::make_unique<uint8_t[]>(dimm_data_size);
+			dimm_des_data = std::make_unique<uint8_t[]>(dimm_data_size);
 			if (dimm_data_size != file_rounded_size)
-				memset(dimm_data + file_rounded_size, 0, dimm_data_size - file_rounded_size);
+				memset(&dimm_data[file_rounded_size], 0, dimm_data_size - file_rounded_size);
 
 			// read encrypted data into dimm_des_data
 			uint32_t sectors = file_rounded_size / 2048;
 			for (uint32_t sec = 0; sec != sectors; sec++)
-				cdrom_read_data(gdromfile, file_start + sec, dimm_des_data + 2048 * sec, CD_TRACK_MODE1);
+				cdrom_read_data(gdromfile, file_start + sec, &dimm_des_data[2048 * sec], CD_TRACK_MODE1);
 
 			uint32_t des_subkeys[32];
 			des_generate_subkeys(rev64(key), des_subkeys);
 
 			// decrypt read data from dimm_des_data to dimm_data
 			for (int i = 0; i < file_rounded_size; i += 8)
-				write_from_qword(dimm_data + i, rev64(des_encrypt_decrypt(true, rev64(read_to_qword(dimm_des_data + i)), des_subkeys)));
+				write_from_qword(&dimm_data[i], rev64(des_encrypt_decrypt(true, rev64(read_to_qword(&dimm_des_data[i])), des_subkeys)));
 		}
 
 		cdrom_close(gdromfile);
@@ -1080,9 +1080,9 @@ void naomi_gdrom_board::device_reset()
 		dimm_offsetl = 0;
 		dimm_parameterl = 0;
 		dimm_parameterh = 0;
-		m_315_6154->memory()->install_ram(0x10000000, 0x10000000 + dimm_data_size - 1, dimm_des_data);
+		m_315_6154->memory()->install_ram(0x10000000, 0x10000000 + dimm_data_size - 1, dimm_des_data.get());
 		if (work_mode == 2) // invalidate dimm memory contents by setting the first 2048 bytes to 0
-			memset(dimm_des_data, 0, 2048);
+			memset(dimm_des_data.get(), 0, 2048);
 	}
 	else
 	{
@@ -1101,12 +1101,12 @@ ioport_constructor naomi_gdrom_board::device_input_ports() const
 
 void naomi_gdrom_board::board_setup_address(uint32_t address, bool is_dma)
 {
-	dimm_cur_address = address & (dimm_data_size-1);
+	dimm_cur_address = address & (dimm_data_size - 1);
 }
 
 void naomi_gdrom_board::board_get_buffer(uint8_t *&base, uint32_t &limit)
 {
-	base = dimm_data + dimm_cur_address;
+	base = &dimm_data[dimm_cur_address];
 	limit = dimm_data_size - dimm_cur_address;
 }
 

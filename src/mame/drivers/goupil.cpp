@@ -578,6 +578,7 @@ void goupil_g1_state::goupil_g1(machine_config &config)
 	EF9364(config, m_ef9364, VIDEO_CLOCK);
 	m_ef9364->set_palette_tag("palette");
 	m_ef9364->set_nb_of_pages(1);
+	m_ef9364->set_erase(0x7f);
 
 	m_via_video->writepa_handler().set(FUNC(goupil_g1_state::via_video_pba_w));
 	m_via_video->writepb_handler().set(FUNC(goupil_g1_state::via_video_pbb_w));

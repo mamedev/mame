@@ -318,13 +318,13 @@ protected:
 
 	void ctrl_w(u8 data)
 	{
-		/* bit 0 flips screen */
-		flip_screen_set(data & 0x01);
+		// bit 0 flips screen
+		flip_screen_set(BIT(data, 0));
 
-		/* bit 4 changes tilemaps priority */
-		m_bg2_priority = data & 0x10;
+		// bit 4 changes tilemaps priority
+		m_bg2_priority = BIT(data, 4);
 
-		/* bit 5 used but unknown */
+		// bit 5 used but unknown
 	}
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
@@ -352,7 +352,7 @@ protected:
 
 	virtual void video_start() override
 	{
-		/* Register for save/restore */
+		// Register for save/restore
 		save_item(NAME(m_bg2_priority));
 	}
 
@@ -388,8 +388,8 @@ protected:
 		m_screen->register_screen_bitmap(m_bg_bitmap[0]);
 		m_screen->register_screen_bitmap(m_bg_bitmap[1]);
 
-		/* Register for save/restore */
-		save_item(NAME(m_bg2_priority)); // Not used atm
+		// Register for save/restore
+		save_item(NAME(m_bg2_priority)); // Not used ATM
 	}
 
 	void popbingo_tile_callback(u16 attr, u32 &code, u32 &color)
