@@ -69,8 +69,8 @@ void ms32_state::video_start()
 	m_bg_tilemap_alt = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_state::get_ms32_bg_tile_info)),  TILEMAP_SCAN_ROWS, 16,16, 256, 16); // alt layout, controller by register?
 	m_roz_tilemap    = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_state::get_ms32_roz_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 128,128);
 
-	size_t size = m_sprram.bytes() / 2;
-	m_sprram_buffer = make_unique_clear<u16[]>(size);
+	m_objectram_size = m_sprram.bytes() / sizeof(m_sprram[0]);
+	m_sprram_buffer = make_unique_clear<u16[]>(m_objectram_size);
 
 	/* set up tile layers */
 	m_screen->register_screen_bitmap(m_temp_bitmap_tilemaps);
@@ -90,7 +90,7 @@ void ms32_state::video_start()
 	m_brt[0] = m_brt[1] = 0xffff;
 	m_sprite_ctrl[0x10/4] = 0x8000;
 
-	save_pointer(NAME(m_sprram_buffer), size);
+	save_pointer(NAME(m_sprram_buffer), m_objectram_size);
 	save_item(NAME(m_irqreq));
 	save_item(NAME(m_temp_bitmap_tilemaps));
 	save_item(NAME(m_temp_bitmap_sprites));
@@ -168,7 +168,7 @@ void ms32_state::ms32_brightness_w(offs_t offset, u32 data, u32 mem_mask)
 /* SPRITES based on tetrisp2 for now, readd priority bits later */
 void ms32_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, const rectangle &cliprect, u16 *sprram_top)
 {
-	const size_t sprite_tail = (0x20000 - 0x10) / 2;
+	const size_t sprite_tail = m_objectram_size - 8; //(0x20000 - 0x10) / 2;
 	u16 *source = sprram_top;
 	u16 *finish = sprram_top + sprite_tail;
 	// TODO: sprite control 0x10 also uses bits 0-11 for sprite start address? 
@@ -692,7 +692,7 @@ WRITE_LINE_MEMBER(ms32_state::screen_vblank)
 {
 	if (state)
 	{
-		std::copy_n(&m_sprram[0], m_sprram.bytes() / 2, &m_sprram_buffer[0]);
+		std::copy_n(&m_sprram[0], m_objectram_size, &m_sprram_buffer[0]);
 	}
 }
 

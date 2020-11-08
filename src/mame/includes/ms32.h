@@ -105,7 +105,10 @@ private:
 
 	optional_memory_bank_array<2> m_z80bank;
 	std::unique_ptr<u8[]> m_nvram_8;
+
 	std::unique_ptr<u16[]> m_sprram_buffer;
+	size_t m_objectram_size;
+
 	u32 m_to_main;
 	u16 m_irqreq;
 	tilemap_t *m_tx_tilemap;
