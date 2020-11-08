@@ -225,7 +225,7 @@ void mu5_state::mu5(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MULTIPCM(config, m_ymw258, 9400000);
+	MULTIPCM(config, m_ymw258, 7500000);
 	m_ymw258->set_addrmap(0, &mu5_state::ymw258_map);
 	m_ymw258->add_route(0, "lspeaker", 1.0);
 	m_ymw258->add_route(1, "rspeaker", 1.0);
