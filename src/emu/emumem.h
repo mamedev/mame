@@ -1372,29 +1372,23 @@ public:
 	void install_read_port(offs_t addrstart, offs_t addrend, const char *rtag) { install_read_port(addrstart, addrend, 0, rtag); }
 	void install_write_port(offs_t addrstart, offs_t addrend, const char *wtag) { install_write_port(addrstart, addrend, 0, wtag); }
 	void install_readwrite_port(offs_t addrstart, offs_t addrend, const char *rtag, const char *wtag) { install_readwrite_port(addrstart, addrend, 0, rtag, wtag); }
-	void install_read_bank(offs_t addrstart, offs_t addrend, const char *tag) { install_read_bank(addrstart, addrend, 0, tag); }
-	void install_write_bank(offs_t addrstart, offs_t addrend, const char *tag) { install_write_bank(addrstart, addrend, 0, tag); }
-	void install_readwrite_bank(offs_t addrstart, offs_t addrend, const char *tag) { install_readwrite_bank(addrstart, addrend, 0, tag); }
 	void install_read_bank(offs_t addrstart, offs_t addrend, memory_bank *bank) { install_read_bank(addrstart, addrend, 0, bank); }
 	void install_write_bank(offs_t addrstart, offs_t addrend, memory_bank *bank) { install_write_bank(addrstart, addrend, 0, bank); }
 	void install_readwrite_bank(offs_t addrstart, offs_t addrend, memory_bank *bank) { install_readwrite_bank(addrstart, addrend, 0, bank); }
-	void install_rom(offs_t addrstart, offs_t addrend, void *baseptr = nullptr) { install_rom(addrstart, addrend, 0, baseptr); }
-	void install_writeonly(offs_t addrstart, offs_t addrend, void *baseptr = nullptr) { install_writeonly(addrstart, addrend, 0, baseptr); }
-	void install_ram(offs_t addrstart, offs_t addrend, void *baseptr = nullptr) { install_ram(addrstart, addrend, 0, baseptr); }
+	void install_rom(offs_t addrstart, offs_t addrend, void *baseptr) { install_rom(addrstart, addrend, 0, baseptr); }
+	void install_writeonly(offs_t addrstart, offs_t addrend, void *baseptr) { install_writeonly(addrstart, addrend, 0, baseptr); }
+	void install_ram(offs_t addrstart, offs_t addrend, void *baseptr) { install_ram(addrstart, addrend, 0, baseptr); }
 
 	// install ports, banks, RAM (with mirror/mask)
 	void install_read_port(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *rtag) { install_readwrite_port(addrstart, addrend, addrmirror, rtag, ""); }
 	void install_write_port(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *wtag) { install_readwrite_port(addrstart, addrend, addrmirror, "", wtag); }
 	virtual void install_readwrite_port(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string rtag, std::string wtag) = 0;
-	void install_read_bank(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *tag) { install_bank_generic(addrstart, addrend, addrmirror, tag, ""); }
-	void install_write_bank(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *tag) { install_bank_generic(addrstart, addrend, addrmirror, "", tag); }
-	void install_readwrite_bank(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *tag)  { install_bank_generic(addrstart, addrend, addrmirror, tag, tag); }
 	void install_read_bank(offs_t addrstart, offs_t addrend, offs_t addrmirror, memory_bank *bank) { install_bank_generic(addrstart, addrend, addrmirror, bank, nullptr); }
 	void install_write_bank(offs_t addrstart, offs_t addrend, offs_t addrmirror, memory_bank *bank) { install_bank_generic(addrstart, addrend, addrmirror, nullptr, bank); }
 	void install_readwrite_bank(offs_t addrstart, offs_t addrend, offs_t addrmirror, memory_bank *bank)  { install_bank_generic(addrstart, addrend, addrmirror, bank, bank); }
-	void install_rom(offs_t addrstart, offs_t addrend, offs_t addrmirror, void *baseptr = nullptr) { install_ram_generic(addrstart, addrend, addrmirror, read_or_write::READ, baseptr); }
-	void install_writeonly(offs_t addrstart, offs_t addrend, offs_t addrmirror, void *baseptr = nullptr) { install_ram_generic(addrstart, addrend, addrmirror, read_or_write::WRITE, baseptr); }
-	void install_ram(offs_t addrstart, offs_t addrend, offs_t addrmirror, void *baseptr = nullptr) { install_ram_generic(addrstart, addrend, addrmirror, read_or_write::READWRITE, baseptr); }
+	void install_rom(offs_t addrstart, offs_t addrend, offs_t addrmirror, void *baseptr) { install_ram_generic(addrstart, addrend, addrmirror, read_or_write::READ, baseptr); }
+	void install_writeonly(offs_t addrstart, offs_t addrend, offs_t addrmirror, void *baseptr) { install_ram_generic(addrstart, addrend, addrmirror, read_or_write::WRITE, baseptr); }
+	void install_ram(offs_t addrstart, offs_t addrend, offs_t addrmirror, void *baseptr) { install_ram_generic(addrstart, addrend, addrmirror, read_or_write::READWRITE, baseptr); }
 
 	// install device memory maps
 	template <typename T> void install_device(offs_t addrstart, offs_t addrend, T &device, void (T::*map)(address_map &map), u64 unitmask = 0, int cswidth = 0) {
@@ -1594,8 +1588,6 @@ public:
 	// setup
 	void prepare_map();
 	void populate_from_map(address_map *map = nullptr);
-	void allocate_memory();
-	void locate_memory();
 
 	template<int Width, int AddrShift, endianness_t Endian> handler_entry_read_unmapped <Width, AddrShift, Endian> *get_unmap_r() const { return static_cast<handler_entry_read_unmapped <Width, AddrShift, Endian> *>(m_unmap_r); }
 	template<int Width, int AddrShift, endianness_t Endian> handler_entry_write_unmapped<Width, AddrShift, Endian> *get_unmap_w() const { return static_cast<handler_entry_write_unmapped<Width, AddrShift, Endian> *>(m_unmap_w); }
@@ -1608,13 +1600,8 @@ protected:
 	void populate_map_entry(const address_map_entry &entry, read_or_write readorwrite);
 	virtual void unmap_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, read_or_write readorwrite, bool quiet) = 0;
 	virtual void install_ram_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, read_or_write readorwrite, void *baseptr) = 0;
-	virtual void install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string rtag, std::string wtag) = 0;
 	virtual void install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, memory_bank *rbank, memory_bank *wbank) = 0;
 	void adjust_addresses(offs_t &start, offs_t &end, offs_t &mask, offs_t &mirror);
-	void *find_backing_memory(offs_t addrstart, offs_t addrend);
-	bool needs_backing_store(const address_map_entry &entry);
-	memory_bank &bank_find_or_allocate(const char *tag, offs_t addrstart, offs_t addrend, offs_t addrmirror, read_or_write readorwrite);
-	address_map_entry *block_assign_intersecting(offs_t bytestart, offs_t byteend, u8 *base);
 	void check_optimize_all(const char *function, int width, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, u64 unitmask, int cswidth, offs_t &nstart, offs_t &nend, offs_t &nmask, offs_t &nmirror, u64 &nunitmask, int &ncswidth);
 	void check_optimize_mirror(const char *function, offs_t addrstart, offs_t addrend, offs_t addrmirror, offs_t &nstart, offs_t &nend, offs_t &nmask, offs_t &nmirror);
 	void check_address(const char *function, offs_t addrstart, offs_t addrend);
@@ -1647,93 +1634,22 @@ protected:
 };
 
 
-// ======================> memory_block
-
-// a memory block is a chunk of RAM associated with a range of memory in a device's address space
-class memory_block
-{
-	DISABLE_COPYING(memory_block);
-
-public:
-	// construction/destruction
-	memory_block(address_space &space, offs_t start, offs_t end, void *memory = nullptr);
-	~memory_block();
-
-	// getters
-	running_machine &machine() const { return m_machine; }
-	offs_t addrstart() const { return m_addrstart; }
-	offs_t addrend() const { return m_addrend; }
-	u8 *data() const { return m_data; }
-
-	// is the given range contained by this memory block?
-	bool contains(address_space &space, offs_t addrstart, offs_t addrend) const
-	{
-		return (&space == &m_space && m_addrstart <= addrstart && m_addrend >= addrend);
-	}
-
-private:
-	// internal state
-	running_machine &       m_machine;              // need the machine to free our memory
-	address_space &         m_space;                // which address space are we associated with?
-	offs_t                  m_addrstart, m_addrend; // start/end for verifying a match
-	u8 *                    m_data;                 // pointer to the data for this block
-	std::vector<u8>         m_allocated;            // pointer to the actually allocated block
-};
-
-
 // ======================> memory_bank
 
 // a memory bank is a global pointer to memory that can be shared across devices and changed dynamically
 class memory_bank
 {
-	// a bank reference is an entry in a list of address spaces that reference a given bank
-	class bank_reference
-	{
-	public:
-		// construction/destruction
-		bank_reference(address_space &space, read_or_write readorwrite)
-			: m_space(space),
-				m_readorwrite(readorwrite) { }
-
-		// getters
-		address_space &space() const { return m_space; }
-
-		// does this reference match the space+read/write combination?
-		bool matches(const address_space &space, read_or_write readorwrite) const
-		{
-			return (&space == &m_space && (readorwrite == read_or_write::READWRITE || readorwrite == m_readorwrite));
-		}
-
-	private:
-		// internal state
-		address_space &         m_space;            // address space that references us
-		read_or_write           m_readorwrite;      // used for read or write?
-
-	};
-
 public:
 	// construction/destruction
-	memory_bank(address_space &space, int index, offs_t start, offs_t end, const char *tag = nullptr);
+	memory_bank(device_t &device, std::string tag);
 	~memory_bank();
 
 	// getters
 	running_machine &machine() const { return m_machine; }
 	int entry() const { return m_curentry; }
-	bool anonymous() const { return m_anonymous; }
-	offs_t addrstart() const { return m_addrstart; }
 	void *base() const { return m_entries.empty() ? nullptr : m_entries[m_curentry]; }
-	const char *tag() const { return m_tag.c_str(); }
-	const char *name() const { return m_name.c_str(); }
-
-	// compare a range against our range
-	bool matches_exactly(offs_t addrstart, offs_t addrend) const { return (m_addrstart == addrstart && m_addrend == addrend); }
-	bool fully_covers(offs_t addrstart, offs_t addrend) const { return (m_addrstart <= addrstart && m_addrend >= addrend); }
-	bool is_covered_by(offs_t addrstart, offs_t addrend) const { return (m_addrstart >= addrstart && m_addrend <= addrend); }
-	bool straddles(offs_t addrstart, offs_t addrend) const { return (m_addrstart < addrend && m_addrend > addrstart); }
-
-	// track and verify address space references to this bank
-	bool references_space(const address_space &space, read_or_write readorwrite) const;
-	void add_reference(address_space &space, read_or_write readorwrite);
+	const std::string &tag() const { return m_tag; }
+	const std::string &name() const { return m_name; }
 
 	// set the base explicitly
 	void set_base(void *base);
@@ -1742,20 +1658,14 @@ public:
 	void configure_entry(int entrynum, void *base);
 	void configure_entries(int startentry, int numentries, void *base, offs_t stride);
 	void set_entry(int entrynum);
-	void add_notifier(std::function<void (void *)> cb);
 
 private:
 	// internal state
 	running_machine &       m_machine;              // need the machine to free our memory
 	std::vector<u8 *>       m_entries;              // the entries
-	bool                    m_anonymous;            // are we anonymous or explicit?
-	offs_t                  m_addrstart;            // start offset
-	offs_t                  m_addrend;              // end offset
 	int                     m_curentry;             // current entry
 	std::string             m_name;                 // friendly name for this bank
 	std::string             m_tag;                  // tag for this bank
-	std::vector<std::unique_ptr<bank_reference>> m_reflist;     // list of address spaces referencing this bank
-	std::vector<std::function<void (void *)>> m_alloc_notifier; // list of notifier targets when allocating
 };
 
 
@@ -1766,26 +1676,28 @@ class memory_share
 {
 public:
 	// construction/destruction
-	memory_share(u8 width, size_t bytes, endianness_t endianness, void *ptr = nullptr)
-		: m_ptr(ptr),
-			m_bytes(bytes),
-			m_endianness(endianness),
-			m_bitwidth(width),
-			m_bytewidth(width <= 8 ? 1 : width <= 16 ? 2 : width <= 32 ? 4 : 8)
+	memory_share(std::string name, u8 width, size_t bytes, endianness_t endianness, void *ptr)
+		: m_name(name),
+		  m_ptr(ptr),
+		  m_bytes(bytes),
+		  m_endianness(endianness),
+		  m_bitwidth(width),
+		  m_bytewidth(width <= 8 ? 1 : width <= 16 ? 2 : width <= 32 ? 4 : 8)
 	{ }
 
 	// getters
+	const std::string &name() const { return m_name; }
 	void *ptr() const { return m_ptr; }
 	size_t bytes() const { return m_bytes; }
 	endianness_t endianness() const { return m_endianness; }
 	u8 bitwidth() const { return m_bitwidth; }
 	u8 bytewidth() const { return m_bytewidth; }
 
-	// setters
-	void set_ptr(void *ptr) { m_ptr = ptr; }
+	std::string compare(u8 width, size_t bytes, endianness_t endianness) const;
 
 private:
 	// internal state
+	std::string             m_name;                 // share name
 	void *                  m_ptr;                  // pointer to the memory backing the region
 	size_t                  m_bytes;                // size of the shared region in bytes
 	endianness_t            m_endianness;           // endianness of the memory
@@ -1801,18 +1713,16 @@ private:
 class memory_region
 {
 	DISABLE_COPYING(memory_region);
-
-	friend class memory_manager;
 public:
 	// construction/destruction
-	memory_region(running_machine &machine, const char *name, u32 length, u8 width, endianness_t endian);
+	memory_region(running_machine &machine, std::string name, u32 length, u8 width, endianness_t endian);
 
 	// getters
 	running_machine &machine() const { return m_machine; }
 	u8 *base() { return (m_buffer.size() > 0) ? &m_buffer[0] : nullptr; }
 	u8 *end() { return base() + m_buffer.size(); }
 	u32 bytes() const { return m_buffer.size(); }
-	const char *name() const { return m_name.c_str(); }
+	const std::string &name() const { return m_name; }
 
 	// flag expansion
 	endianness_t endianness() const { return m_endianness; }
@@ -1844,39 +1754,55 @@ class memory_manager
 {
 	friend class address_space;
 	template<int Level, int Width, int AddrShift, endianness_t Endian> friend class address_space_specific;
-	friend memory_region::memory_region(running_machine &machine, const char *name, u32 length, u8 width, endianness_t endian);
 public:
 	// construction/destruction
 	memory_manager(running_machine &machine);
+	~memory_manager();
+
+	// initialize the memory spaces from the memory maps of the devices
 	void initialize();
 
 	// getters
 	running_machine &machine() const { return m_machine; }
+
+	// used for the debugger interface memory views
 	const std::unordered_map<std::string, std::unique_ptr<memory_bank>> &banks() const { return m_banklist; }
 	const std::unordered_map<std::string, std::unique_ptr<memory_region>> &regions() const { return m_regionlist; }
 	const std::unordered_map<std::string, std::unique_ptr<memory_share>> &shares() const { return m_sharelist; }
 
-	// regions
-	memory_region *region_alloc(const char *name, u32 length, u8 width, endianness_t endian);
-	void region_free(const char *name);
-	memory_region *region_containing(const void *memory, offs_t bytes) const;
+	// anonymous memory zones
+	void *anonymous_alloc(address_space &space, size_t bytes, u8 width, offs_t start, offs_t end);
 
-	memory_bank *find(const char *tag) const;
-	memory_bank *find(address_space &space, offs_t addrstart, offs_t addrend) const;
-	memory_bank *allocate(address_space &space, offs_t addrstart, offs_t addrend, const char *tag = nullptr);
+	// shares
+	memory_share *share_alloc(device_t &dev, std::string name, u8 width, size_t bytes, endianness_t endianness);
+	memory_share *share_find(std::string name);
+
+	// banks
+	memory_bank *bank_alloc(device_t &device, std::string tag);
+	memory_bank *bank_find(std::string tag);
+
+	// regions
+	memory_region *region_alloc(std::string name, u32 length, u8 width, endianness_t endian);
+	memory_region *region_find(std::string name);
+	void region_free(std::string name);
 
 private:
-	void allocate(device_memory_interface &memory);
+	struct stdlib_deleter { void operator()(void *p) const { free(p); } };
 
 	// internal state
 	running_machine &           m_machine;              // reference to the machine
-	bool                        m_initialized;          // have we completed initialization?
 
-	std::vector<std::unique_ptr<memory_block>>   m_blocklist;            // head of the list of memory blocks
-
+	std::vector<std::unique_ptr<void, stdlib_deleter>>               m_datablocks;           // list of memory blocks to free on exit
 	std::unordered_map<std::string, std::unique_ptr<memory_bank>>    m_banklist;             // data gathered for each bank
 	std::unordered_map<std::string, std::unique_ptr<memory_share>>   m_sharelist;            // map for share lookups
 	std::unordered_map<std::string, std::unique_ptr<memory_region>>  m_regionlist;           // list of memory regions
+
+
+	// Allocate the address spaces
+	void allocate(device_memory_interface &memory);
+
+	// Allocate some ram and register it for saving
+	void *allocate_memory(device_t &dev, int spacenum, std::string name, u8 width, size_t bytes);
 };
 
 

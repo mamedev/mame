@@ -145,7 +145,7 @@ void magtouch_state::magtouch_map(address_map &map)
 	map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0);
 	map(0x000d0000, 0x000d1fff).ram().share("nvram");
 	map(0x000d8000, 0x000dffff).bankr("rombank");
-	map(0x000f0000, 0x000fffff).ram().region("bios", 0);
+	map(0x000f0000, 0x000fffff).rom().region("bios", 0);
 	map(0xffff0000, 0xffffffff).rom().region("bios", 0);
 }
 

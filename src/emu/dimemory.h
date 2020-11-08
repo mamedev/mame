@@ -103,8 +103,6 @@ public:
 	}
 	void prepare_maps() { for (auto const &space : m_addrspace) { if (space) { space->prepare_map(); } } }
 	void populate_from_maps() { for (auto const &space : m_addrspace) { if (space) { space->populate_from_map(); } } }
-	void allocate_memory() { for (auto const &space : m_addrspace) { if (space) { space->allocate_memory(); } } }
-	void locate_memory() { for (auto const &space : m_addrspace) { if (space) { space->locate_memory(); } } }
 	void set_log_unmap(bool log) { for (auto const &space : m_addrspace) { if (space) { space->set_log_unmap(log); } } }
 
 protected:

@@ -661,10 +661,8 @@ void ngp_state::machine_start()
 		std::string region_tag;
 		uint8_t *cart = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str())->base();
 
-		m_maincpu->space(AS_PROGRAM).install_read_bank(0x200000, 0x3fffff, "flash0");
-		m_maincpu->space(AS_PROGRAM).install_read_bank(0x800000, 0x9fffff, "flash1");
-		membank("flash0")->set_base(cart);
-		membank("flash1")->set_base(cart + 0x200000);
+		m_maincpu->space(AS_PROGRAM).install_rom(0x200000, 0x3fffff, cart);
+		m_maincpu->space(AS_PROGRAM).install_rom(0x800000, 0x9fffff, cart + 0x200000);
 
 		m_flash_chip[0].data = cart;
 		m_flash_chip[0].org_data[0] = m_flash_chip[0].data[0];

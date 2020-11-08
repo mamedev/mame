@@ -1654,14 +1654,10 @@ void trackfld_state::init_atlantol()
 	space.nop_write(0x1000, 0x1000);
 
 	/* unmapped areas read as ROM */
-	space.install_read_bank(0x0000, 0x11ff, "bank10");
-	space.install_read_bank(0x1380, 0x17ff, "bank11");
-	space.install_read_bank(0x2000, 0x27ff, "bank12");
-	space.install_read_bank(0x4000, 0x5fff, "bank13");
-	membank("bank10")->set_base(&rom[0x0000]);
-	membank("bank11")->set_base(&rom[0x1380]);
-	membank("bank12")->set_base(&rom[0x2000]);
-	membank("bank13")->set_base(&rom[0x4000]);
+	space.install_rom(0x0000, 0x11ff, &rom[0x0000]);
+	space.install_rom(0x1380, 0x17ff, &rom[0x1380]);
+	space.install_rom(0x2000, 0x27ff, &rom[0x2000]);
+	space.install_rom(0x4000, 0x5fff, &rom[0x4000]);
 }
 
 void trackfld_state::init_mastkin()

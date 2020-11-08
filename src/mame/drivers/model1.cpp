@@ -867,6 +867,9 @@ void model1_state::machine_reset()
 	irq_init();
 	copro_reset();
 
+	m_irq_status = 0;
+	m_last_irq = 0;
+
 	if (!strcmp(machine().system().name, "swa") ||
 		!strcmp(machine().system().name, "swaj"))
 	{

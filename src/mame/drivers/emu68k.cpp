@@ -63,7 +63,7 @@ void emu68k_state::proteus1_map(address_map &map)
 	map(0x000000, 0x01ffff).rom().region("program", 0);
 	map(0x600080, 0x600083).rw("lcdc", FUNC(hd44780_device::read), FUNC(hd44780_device::write)).umask16(0x00ff);
 	map(0x600100, 0x60012f).rw(m_mfp, FUNC(mc68901_device::read), FUNC(mc68901_device::write)).umask16(0x00ff);
-	map(0x800000, 0x8003ff).writeonly(); // ???
+	map(0x800000, 0x8003ff).nopw(); // ???
 	map(0xffc000, 0xffffff).ram();
 }
 
@@ -72,7 +72,7 @@ void emu68k_state::proteusxr_map(address_map &map)
 	map(0x000000, 0x01ffff).rom().region("program", 0);
 	map(0x400000, 0x400001).nopw(); // ???
 	map(0x700000, 0x700003).rw("lcdc", FUNC(hd44780_device::read), FUNC(hd44780_device::write)).umask16(0x00ff);
-	map(0x800000, 0x8003ff).writeonly(); // ???
+	map(0x800000, 0x8003ff).nopw(); // ???
 	map(0x900000, 0x90002f).rw(m_mfp, FUNC(mc68901_device::read), FUNC(mc68901_device::write)).umask16(0x00ff);
 	map(0xa00000, 0xa00001).nopr(); // watchdog?
 	map(0xb00000, 0xb00001).nopw(); // ???
@@ -84,7 +84,7 @@ void emu68k_state::vintkeys_map(address_map &map)
 	map(0x000000, 0x03ffff).rom().region("program", 0);
 	map(0x600080, 0x600083).rw("lcdc", FUNC(hd44780_device::read), FUNC(hd44780_device::write)).umask16(0x00ff);
 	map(0x600100, 0x60012f).rw(m_mfp, FUNC(mc68901_device::read), FUNC(mc68901_device::write)).umask16(0x00ff);
-	map(0x800000, 0x8003ff).writeonly(); // ???
+	map(0x800000, 0x8003ff).nopw(); // ???
 	map(0xffc000, 0xffffff).ram();
 }
 
@@ -93,7 +93,7 @@ void emu68k_state::phatt_map(address_map &map)
 	map(0x000000, 0x07ffff).rom().region("program", 0);
 	map(0x600080, 0x600083).rw("lcdc", FUNC(hd44780_device::read), FUNC(hd44780_device::write)).umask16(0x00ff);
 	map(0x600100, 0x60012f).rw(m_mfp, FUNC(mc68901_device::read), FUNC(mc68901_device::write)).umask16(0x00ff);
-	map(0x800000, 0x8003ff).writeonly(); // ???
+	map(0x800000, 0x8003ff).nopw(); // ???
 	map(0xffc000, 0xffffff).ram();
 }
 

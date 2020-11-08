@@ -97,7 +97,12 @@ public:
 	pcat_nit_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag),
 			m_uart(*this, "ns16450_0"),
-			m_microtouch(*this, "microtouch") { }
+			m_microtouch(*this, "microtouch"),
+		    m_bios_region(*this, "bios"),
+		    m_disk_bios_region(*this, "disk_bios"),
+		    m_bios_share(*this, "bios"),
+		    m_disk_bios_share(*this, "disk_bios")
+	{ }
 
 	void bonanza(machine_config &config);
 	void pcat_nit(machine_config &config);
@@ -108,6 +113,10 @@ private:
 	std::unique_ptr<uint8_t[]> m_banked_nvram;
 	required_device<ns16450_device> m_uart;
 	required_device<microtouch_device> m_microtouch;
+	required_region_ptr<uint32_t> m_bios_region;
+	required_region_ptr<uint32_t> m_disk_bios_region;
+	required_shared_ptr<uint32_t> m_bios_share;
+	required_shared_ptr<uint32_t> m_disk_bios_share;
 
 	void pcat_nit_rombank_w(uint8_t data);
 	uint8_t pcat_nit_io_r(offs_t offset);
@@ -131,7 +140,7 @@ void pcat_nit_state::pcat_nit_rombank_w(uint8_t data)
 	if ( data & 0x40 )
 	{
 		// rom bank
-		mspace.install_read_bank(0x000d8000, 0x000dffff, "rombank" );
+		mspace.install_read_bank(0x000d8000, 0x000dffff, membank("rombank") );
 		mspace.unmap_write(0x000d8000, 0x000dffff);
 
 		if ( data & 0x80 )
@@ -148,9 +157,7 @@ void pcat_nit_state::pcat_nit_rombank_w(uint8_t data)
 		// nvram bank
 		mspace.unmap_readwrite(0x000d8000, 0x000dffff);
 
-		mspace.install_readwrite_bank(0x000d8000, 0x000d9fff, "nvrambank" );
-
-		membank("nvrambank")->set_base(m_banked_nvram.get());
+		mspace.install_ram(0x000d8000, 0x000d9fff, m_banked_nvram.get());
 
 	}
 }
@@ -160,10 +167,10 @@ void pcat_nit_state::pcat_map(address_map &map)
 	map(0x00000000, 0x0009ffff).ram();
 	map(0x000a0000, 0x000bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
 	map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0).nopw();
-	map(0x000d0000, 0x000d3fff).ram().region("disk_bios", 0);
+	map(0x000d0000, 0x000d3fff).ram().share("disk_bios");
 	map(0x000d7000, 0x000d7000).w(FUNC(pcat_nit_state::pcat_nit_rombank_w));
 	map(0x000d8000, 0x000dffff).bankr("rombank");
-	map(0x000f0000, 0x000fffff).ram().region("bios", 0);
+	map(0x000f0000, 0x000fffff).ram().share("bios");
 	map(0xffff0000, 0xffffffff).rom().region("bios", 0);
 }
 
@@ -172,10 +179,10 @@ void pcat_nit_state::bonanza_map(address_map &map)
 	map(0x00000000, 0x0009ffff).ram();
 	map(0x000a0000, 0x000bffff).rw("vga", FUNC(cirrus_gd5428_device::mem_r), FUNC(cirrus_gd5428_device::mem_w));
 	map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0).nopw();
-	map(0x000d0000, 0x000d3fff).ram().region("disk_bios", 0);
+	map(0x000d0000, 0x000d3fff).ram().share("disk_bios");
 	map(0x000d7000, 0x000d7000).w(FUNC(pcat_nit_state::pcat_nit_rombank_w));
 	map(0x000d8000, 0x000dffff).bankr("rombank");
-	map(0x000f0000, 0x000fffff).ram().region("bios", 0);
+	map(0x000f0000, 0x000fffff).ram().share("bios");
 	map(0xffff0000, 0xffffffff).rom().region("bios", 0);
 }
 
@@ -229,6 +236,10 @@ void pcat_nit_state::machine_start()
 {
 	membank("rombank")->configure_entries(0, 0x80, memregion("game_prg")->base(), 0x8000 );
 	membank("rombank")->set_entry(0);
+
+	// There's some shadow ram control registers missing somehwere
+	memcpy(m_bios_share, m_bios_region, 0x10000);
+	memcpy(m_disk_bios_share, m_disk_bios_region, 0x4000);
 }
 
 void pcat_nit_state::pcat_nit(machine_config &config)

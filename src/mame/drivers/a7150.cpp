@@ -340,18 +340,18 @@ void a7150_state::k7070_cpu_banked(address_map &map)
 	map.unmap_value_high();
 	// default map: IML=0, MSEL=0.  ROM + local RAM.
 	map(0x00000, 0x01fff).rom().region("user2", 0);
-	map(0x02000, 0x07fff).bankrw("kgs_ram1");
-	map(0x08000, 0x0ffff).bankrw("kgs_ram2");
+	map(0x02000, 0x07fff).ram().share("kgs_ram1");
+	map(0x08000, 0x0ffff).ram().share("kgs_ram2");
 	// IML=1, MSEL=0.   local RAM only.
-	map(0x10000, 0x11fff).bankrw("kgs_ram0");
-	map(0x12000, 0x17fff).bankrw("kgs_ram1");
-	map(0x18000, 0x1ffff).bankrw("kgs_ram2");
+	map(0x10000, 0x11fff).ram().share("kgs_ram0");
+	map(0x12000, 0x17fff).ram().share("kgs_ram1");
+	map(0x18000, 0x1ffff).ram().share("kgs_ram2");
 	// IML=0, MSEL=1.  ROM + local RAM.
 	map(0x20000, 0x21fff).rom().region("user2", 0);
-	map(0x22000, 0x27fff).bankrw("kgs_ram1");
+	map(0x22000, 0x27fff).ram().share("kgs_ram1");
 	// IML=1, MSEL=1.   local RAM only.
-	map(0x30000, 0x31fff).bankrw("kgs_ram0");
-	map(0x32000, 0x37fff).bankrw("kgs_ram1");
+	map(0x30000, 0x31fff).ram().share("kgs_ram0");
+	map(0x32000, 0x37fff).ram().share("kgs_ram1");
 	map(0x38000, 0x3ffff).ram().share("video_ram");
 }
 

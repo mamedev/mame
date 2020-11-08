@@ -481,8 +481,8 @@ void sorcerer_state::sorcerer(machine_config &config)
 	INPUT_BUFFER(config, "cent_status_in");
 
 	/* quickload */
-	SNAPSHOT(config, "snapshot", "snp", attotime::from_seconds(2)).set_load_callback(FUNC(sorcerer_state::snapshot_cb));
-	QUICKLOAD(config, "quickload", "bin", attotime::from_seconds(3)).set_load_callback(FUNC(sorcerer_state::quickload_cb));
+	SNAPSHOT(config, "snapshot", "snp", attotime::from_seconds(4)).set_load_callback(FUNC(sorcerer_state::snapshot_cb));
+	QUICKLOAD(config, "quickload", "bin", attotime::from_seconds(4)).set_load_callback(FUNC(sorcerer_state::quickload_cb));
 
 	CASSETTE(config, m_cassette1);
 	m_cassette1->set_formats(sorcerer_cassette_formats);

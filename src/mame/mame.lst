@@ -13900,6 +13900,7 @@ chinatow                        // 1998 unknown
 crystal                         // (c) 1998 J.C.D. srl
 cuoreuno                        // (c) 1996 C.M.C.
 cuoreunoa                       // (c) 1996 C.M.C.
+cuoreunob                       // (c) 1996 C.M.C.
 elephfam                        // (c) 1997 C.M.C.
 elephfmb                        // (c) 1996 C.M.C.
 funquiz                         // (c) 198? Fun World
@@ -14898,6 +14899,7 @@ jak_dchp
 jak_ddhp
 jak_prhp
 zippity
+zippityuk
 
 @source:geneve.cpp
 geneve                          // 1987 Myarc Geneve 9640
@@ -15643,6 +15645,7 @@ circusp                         //
 cntforce                        //
 eclipse                         //
 forceii                         //
+grand8                          //
 hh                              //
 hh_1                            //
 jamesb                          //
@@ -15940,6 +15943,8 @@ interact                        //
 victor                          //
 
 @source:hektor.cpp
+hektor                          // Hektor
+hektor2                         // Hektor II
 hektor3                         // Hektor III
 
 @source:hexion.cpp
@@ -16775,6 +16780,9 @@ in207376                        // Informer 207/376
 @source:informer_213.cpp
 in213                           // Informer 213
 in213ae                         // Informer 213 AE
+
+@source:innotv_innotabmax.cpp
+innotv
 
 @source:instantm.cpp
 instantm                        //
@@ -19031,6 +19039,9 @@ spiceup                         // Spice It Up
 sultanw                         // Sultan W
 whiterus                        // White Russia
 rapfire5                        // Rapid Fire 5
+
+@source:kongs470.cpp
+tdbingo                         //
 
 @source:konin.cpp
 konin                           //
@@ -22281,6 +22292,7 @@ rad_ssoc                        // (c)2004 Radica
 rad_sonic
 rad_sonicp
 rad_orun
+msi_sf2
 
 @source:megadriv_sunplus_hybrid.cpp
 reactmd
@@ -32223,6 +32235,7 @@ dnce2000
 vtvppong
 papsudok
 nytsudo
+vtvsocr
 
 @source:nes_sh6578.cpp
 bandgpad
@@ -32268,6 +32281,7 @@ dgun853
 silv35
 vsmaxxvd
 vsmaxx77
+joysti30
 techni4
 senwld
 protpp
@@ -32320,6 +32334,7 @@ ventur25
 vgpocket
 vgpmini
 vgtablet
+joypad65
 
 @source:nes_vt32.cpp
 dgun2573
@@ -32333,6 +32348,15 @@ mc_pg150
 mc_hh210
 dvnimbus
 unkra200
+dgun2577
+lxcyber
+gtct885
+rd5_240
+hkb502
+hkb502a
+lxcap
+retro400
+myarccn
 fapocket
 sy889
 sy888b
@@ -32354,9 +32378,13 @@ rtvgc300
 rtvgc300fz
 red5mam
 denv150
+egame150
 lpgm240
+tup240
 otrail
 zonefusn
+sealvt
+gcs2mgp
 
 @source:newbrain.cpp
 newbrain                        //
@@ -38335,6 +38363,7 @@ sentx6pd
 
 @source:spg2xx_shredmjr.cpp
 taikeegr                        //
+rockstar
 shredmjr                        //
 guitarst
 guitarstp
@@ -42676,6 +42705,9 @@ yiear2                          // GX407 (c) 1985
 
 @source:ymdx11.cpp
 dx11                            //
+
+@source:ymmu5.cpp
+mu5                             // 1994 MU-5
 
 @source:ymmu50.cpp
 mu50                            // 1995 MU-50

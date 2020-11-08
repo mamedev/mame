@@ -2139,7 +2139,7 @@ void cps3_state::cps3_map(address_map &map)
 	map(0x03000000, 0x030003ff).ram(); // 'FRAM' (sfiii and warzard memory test mode ONLY, and only odd bytes)
 
 	map(0x04000000, 0x0407ffff).ram().share("spriteram"); // Sprite RAM
-	map(0x04080000, 0x040bffff).rw(FUNC(cps3_state::colourram_r), FUNC(cps3_state::colourram_w)).share("colourram");  // Colour RAM 0x20000 colours
+	map(0x04080000, 0x040bffff).rw(FUNC(cps3_state::colourram_r), FUNC(cps3_state::colourram_w));  // Colour RAM 0x20000 colours
 	// PPU registers
 	map(0x040c0000, 0x040c0007).nopr(); // ?? warzard reads this but not use values, dev/debug leftovers ?
 	map(0x040c000c, 0x040c000d).r(FUNC(cps3_state::dma_status_r));

@@ -115,7 +115,7 @@ uint16_t offtwall_state::bankrom_r(address_space &space, offs_t offset)
 			return us >> 16;
 	}
 
-	return m_bankrom_base[(m_bank_offset + offset) & 0x3fff];
+	return m_bankrom_base[0x38000 | ((m_bank_offset + offset) & 0x3fff)];
 }
 
 
@@ -212,7 +212,7 @@ uint16_t offtwall_state::unknown_verify_r(offs_t offset)
 void offtwall_state::main_map(address_map &map)
 {
 	map(0x000000, 0x037fff).rom();
-	map(0x038000, 0x03ffff).r(FUNC(offtwall_state::bankrom_r)).region("maincpu", 0x38000).share("bankrom_base");
+	map(0x038000, 0x03ffff).r(FUNC(offtwall_state::bankrom_r));
 	map(0x120000, 0x120fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0x260000, 0x260001).portr("260000");
 	map(0x260002, 0x260003).portr("260002");

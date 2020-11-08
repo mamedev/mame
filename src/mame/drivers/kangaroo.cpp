@@ -274,7 +274,7 @@ void kangaroo_state::main_map(address_map &map)
 
 void kangaroo_state::sound_map(address_map &map)
 {
-	map(0x0000, 0x0fff).rom();
+	map(0x0000, 0x0fff).rom().region("audiocpu", 0);
 	map(0x4000, 0x43ff).mirror(0x0c00).ram();
 	map(0x6000, 0x6000).mirror(0x0fff).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0x7000, 0x7000).mirror(0x0fff).w("aysnd", FUNC(ay8910_device::data_w));

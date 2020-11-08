@@ -27,7 +27,7 @@ public:
 		m_sharedram(*this, "sharedram"),
 		m_dswb_io(*this, "DSWB"),
 		m_tjump_io(*this, "TJUMP"),
-		m_spriteram(*this, "spriteram"),
+		m_spriteram(*this, "spriteram", 0x800, ENDIANNESS_BIG),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_ymsnd(*this, "ymsnd"),
@@ -66,7 +66,7 @@ protected:
 	std::unique_ptr<u16[]> m_tilevram[0];   //  \/
 	*/
 
-	optional_shared_ptr<u16> m_spriteram;
+	memory_share_creator<u16> m_spriteram;
 	std::unique_ptr<u16[]> m_buffered_spriteram;
 	std::unique_ptr<u16[]> m_spritesizeram;
 	std::unique_ptr<u16[]> m_buffered_spritesizeram;

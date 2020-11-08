@@ -174,6 +174,8 @@ Video sync   6 F   Video sync                 Post   6 F   Post
 #include "speaker.h"
 
 
+namespace {
+
 #define HALLEYS_DEBUG 0
 
 
@@ -235,6 +237,7 @@ public:
 	void init_halleysp();
 
 protected:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
@@ -1916,9 +1919,13 @@ INPUT_PORTS_END
 //**************************************************************************
 // Machine Definitions and Initializations
 
-void halleys_state::machine_reset()
+void halleys_state::machine_start()
 {
 	m_mVectorType     = 0;
+}
+
+void halleys_state::machine_reset()
+{
 	m_firq_level      = 0;
 	m_blitter_busy    = 0;
 	m_collision_count = 0;
@@ -2269,6 +2276,8 @@ void halleys_state::init_halley87()
 
 	init_common();
 }
+
+} // Anonymous namespace
 
 
 //**************************************************************************

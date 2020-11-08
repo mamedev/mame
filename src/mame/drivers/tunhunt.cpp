@@ -134,13 +134,13 @@ void tunhunt_state::main_map(address_map &map)
 {
 	map.global_mask(0x7fff);
 	map(0x0000, 0x03ff).ram().share("workram"); /* Work RAM */
-	map(0x1080, 0x10ff).writeonly();
-	map(0x1200, 0x12ff).writeonly();
-	map(0x1400, 0x14ff).writeonly();
+	map(0x1080, 0x10ff).nopw();
+	map(0x1200, 0x12ff).nopw();
+	map(0x1400, 0x14ff).nopw();
 	map(0x1600, 0x160f).writeonly().share("paletteram");    /* COLRAM (D7-D4 SHADE; D3-D0 COLOR) */
-	map(0x1800, 0x1800).writeonly();   /* SHEL0H */
-	map(0x1a00, 0x1a00).writeonly();   /* SHEL1H */
-	map(0x1c00, 0x1c00).writeonly();   /* MOBJV */
+	map(0x1800, 0x1800).nopw();   /* SHEL0H */
+	map(0x1a00, 0x1a00).nopw();   /* SHEL1H */
+	map(0x1c00, 0x1c00).nopw();   /* MOBJV */
 	map(0x1e00, 0x1eff).w(FUNC(tunhunt_state::videoram_w)).share("videoram");  /* ALPHA */
 	map(0x2000, 0x2000).nopw();    /* watchdog */
 	map(0x2000, 0x2007).r(FUNC(tunhunt_state::button_r));

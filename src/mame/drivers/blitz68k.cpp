@@ -1012,7 +1012,7 @@ void blitz68k_state::cjffruit_map(address_map &map)
 	map(0x8fc000, 0x8fc001).w(FUNC(blitz68k_state::cjffruit_leds3_w)).share("leds2");
 
 	map(0x8fe000, 0x8fe003).w(FUNC(blitz68k_state::blit_flags_w));    // flipx,y,solid,trans
-	map(0x8fe004, 0x8fe005).writeonly();
+	map(0x8fe004, 0x8fe005).nopw();
 	map(0x8fe006, 0x8fe007).w(FUNC(blitz68k_state::crtc_lpen_w));  // 0x8fe006: 0->1, 0x8fe007: 1->0
 
 	map(0xc40000, 0xc40001).rw(FUNC(blitz68k_state::crtc_r), FUNC(blitz68k_state::crtc_w));
@@ -1112,7 +1112,7 @@ void blitz68k_state::deucesw2_map(address_map &map)
 	map(0x89c000, 0x89c001).w(FUNC(blitz68k_state::deucesw2_leds3_w)).share("leds2");
 
 	map(0x89e000, 0x89e003).w(FUNC(blitz68k_state::blit_flags_w));    // flipx,y,solid,trans
-	map(0x89e004, 0x89e005).writeonly();
+	map(0x89e004, 0x89e005).nopw();
 	map(0x89e006, 0x89e007).w(FUNC(blitz68k_state::crtc_lpen_w));  // 0x89e006: 0->1, 0x89e007: 1->0
 
 	map(0xc00000, 0xc00001).rw(FUNC(blitz68k_state::crtc_r), FUNC(blitz68k_state::crtc_w));
@@ -1288,7 +1288,7 @@ void blitz68k_state::hermit_map(address_map &map)
 	map(0x9e8000, 0x9e8001).w(FUNC(blitz68k_state::hermit_leds2_w)).share("leds1");
 
 	map(0x9f0000, 0x9f0003).w(FUNC(blitz68k_state::blit_flags_w));    // flipx,y,solid,trans
-	map(0x9f0004, 0x9f0005).writeonly();
+	map(0x9f0004, 0x9f0005).nopw();
 	map(0x9f0006, 0x9f0007).w(FUNC(blitz68k_state::crtc_lpen_w));  // 0x9f0006: 0->1, 0x9f0007: 1->0
 
 	map(0xb00000, 0xb00001).rw(FUNC(blitz68k_state::crtc_r), FUNC(blitz68k_state::crtc_w));  // triggered by MCU?

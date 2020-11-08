@@ -19,7 +19,6 @@ TILE_GET_INFO_MEMBER(tsamurai_state::get_bg_tile_info)
 	uint8_t attributes = m_bg_videoram[2*tile_index+1];
 	int tile_number = m_bg_videoram[2*tile_index];
 	tile_number += (( attributes & 0xc0 ) >> 6 ) * 256;  /* legacy */
-	tile_number += (( attributes & 0x20 ) >> 5 ) * 1024; /* Mission 660 add-on*/
 	tileinfo.set(0,
 			tile_number,
 			attributes & 0x1f,
@@ -27,6 +26,28 @@ TILE_GET_INFO_MEMBER(tsamurai_state::get_bg_tile_info)
 }
 
 TILE_GET_INFO_MEMBER(tsamurai_state::get_fg_tile_info)
+{
+	int tile_number = m_videoram[tile_index];
+	if (m_textbank1 & 0x01) tile_number += 256; /* legacy */
+	tileinfo.set(1,
+			tile_number,
+			m_colorram[((tile_index&0x1f)*2)+1] & 0x1f,
+			0);
+}
+
+TILE_GET_INFO_MEMBER(m660_state::get_bg_tile_info)
+{
+	uint8_t attributes = m_bg_videoram[2*tile_index+1];
+	int tile_number = m_bg_videoram[2*tile_index];
+	tile_number += (( attributes & 0xc0 ) >> 6 ) * 256;  /* legacy */
+	tile_number += (( attributes & 0x20 ) >> 5 ) * 1024; /* Mission 660 add-on*/
+	tileinfo.set(0,
+			tile_number,
+			attributes & 0x1f,
+			0);
+}
+
+TILE_GET_INFO_MEMBER(m660_state::get_fg_tile_info)
 {
 	int tile_number = m_videoram[tile_index];
 	if (m_textbank1 & 0x01) tile_number += 256; /* legacy */
@@ -44,13 +65,9 @@ TILE_GET_INFO_MEMBER(tsamurai_state::get_fg_tile_info)
 
 ***************************************************************************/
 
-void tsamurai_state::video_start()
-{
-	//save_item(NAME(m_flicker));
-	save_item(NAME(m_textbank1));
-}
 
-VIDEO_START_MEMBER(tsamurai_state, tsamurai)
+
+void tsamurai_state::video_start()
 {
 	m_background = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tsamurai_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
 	m_foreground = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tsamurai_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
@@ -58,14 +75,17 @@ VIDEO_START_MEMBER(tsamurai_state, tsamurai)
 	m_background->set_transparent_pen(0);
 	m_foreground->set_transparent_pen(0);
 
+	m_bgcolor = 0;
+	m_numsprites = 32;
+
 	save_item(NAME(m_bgcolor));
-	video_start();
 }
 
-VIDEO_START_MEMBER(tsamurai_state, m660)
+void m660_state::video_start()
 {
-	VIDEO_START_CALL_MEMBER(tsamurai);
+	tsamurai_state::video_start();
 
+	m_textbank2 = 0;
 	save_item(NAME(m_textbank2));
 }
 
@@ -97,7 +117,7 @@ WRITE_LINE_MEMBER(tsamurai_state::textbank1_w)
 	m_foreground->mark_all_dirty();
 }
 
-WRITE_LINE_MEMBER(tsamurai_state::textbank2_w)
+WRITE_LINE_MEMBER(m660_state::textbank2_w)
 {
 	m_textbank2 = state;
 	m_foreground->mark_all_dirty();
@@ -106,14 +126,15 @@ WRITE_LINE_MEMBER(tsamurai_state::textbank2_w)
 void tsamurai_state::bg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_bg_videoram[offset]=data;
-	offset = offset/2;
-	m_background->mark_tile_dirty(offset);
+	m_background->mark_tile_dirty(offset/2);
 }
+
 void tsamurai_state::fg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset]=data;
 	m_foreground->mark_tile_dirty(offset);
 }
+
 void tsamurai_state::fg_colorram_w(offs_t offset, uint8_t data)
 {
 	if( m_colorram[offset]!=data )
@@ -139,9 +160,8 @@ void tsamurai_state::fg_colorram_w(offs_t offset, uint8_t data)
 void tsamurai_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	gfx_element *gfx = m_gfxdecode->gfx(2);
-	const uint8_t *source = m_spriteram+32*4-4;
+	const uint8_t *source = m_spriteram+m_numsprites*4-4;
 	const uint8_t *finish = m_spriteram; /* ? */
-	m_flicker = 1-m_flicker;
 
 	while( source>=finish )
 	{
@@ -228,7 +248,7 @@ VS Gong Fight runs on older hardware
 ***************************************************************************/
 
 
-void tsamurai_state::vsgongf_color_w(uint8_t data)
+void vsgongf_state::vsgongf_color_w(uint8_t data)
 {
 	if( m_vsgongf_color != data )
 	{
@@ -238,7 +258,7 @@ void tsamurai_state::vsgongf_color_w(uint8_t data)
 }
 
 
-TILE_GET_INFO_MEMBER(tsamurai_state::get_vsgongf_tile_info)
+TILE_GET_INFO_MEMBER(vsgongf_state::get_vsgongf_tile_info)
 {
 	int tile_number = m_videoram[tile_index];
 	int color = m_vsgongf_color&0x1f;
@@ -249,15 +269,17 @@ TILE_GET_INFO_MEMBER(tsamurai_state::get_vsgongf_tile_info)
 			0);
 }
 
-VIDEO_START_MEMBER(tsamurai_state,vsgongf)
+void vsgongf_state::video_start()
 {
-	m_foreground = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tsamurai_state::get_vsgongf_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
+	m_foreground = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(vsgongf_state::get_vsgongf_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
+
+	m_numsprites = 16;
 
 	save_item(NAME(m_vsgongf_color));
-	video_start();
+	save_item(NAME(m_textbank1));
 }
 
-uint32_t tsamurai_state::screen_update_vsgongf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t vsgongf_state::screen_update_vsgongf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	#ifdef MAME_DEBUG
 	if( machine().input().code_pressed( KEYCODE_Q ) ){

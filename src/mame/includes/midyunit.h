@@ -37,7 +37,7 @@ public:
 		, m_term2_adc(*this, "adc")
 		, m_nvram(*this, "nvram")
 		, m_generic_paletteram_16(*this, "paletteram")
-		, m_gfx_rom(*this, "gfx_rom", 16)
+		, m_gfx_rom(*this, "gfx_rom")
 		, m_mainram(*this, "mainram")
 		, m_ports(*this, { { "IN0", "IN1", "IN2", "DSW", "UNK0", "UNK1" } })
 	{
@@ -116,6 +116,7 @@ private:
 	optional_ioport_array<6> m_ports;
 
 	std::unique_ptr<uint16_t[]> m_cmos_ram;
+	std::unique_ptr<uint8_t[]> m_hidden_ram;
 	uint32_t m_cmos_page;
 	uint16_t m_prot_result;
 	uint16_t m_prot_sequence[3];

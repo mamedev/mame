@@ -208,12 +208,12 @@ void btoads_state::main_map(address_map &map)
 	map(0x20000400, 0x2000047f).w(FUNC(btoads_state::misc_control_w));
 	map(0x40000000, 0x4000001f).nopw();    /* watchdog? */
 	map(0x60000000, 0x6003ffff).rw(FUNC(btoads_state::nvram_r), FUNC(btoads_state::nvram_w)).umask32(0x000000ff);
-	map(0xa0000000, 0xa03fffff).rw(FUNC(btoads_state::vram_fg_display_r), FUNC(btoads_state::vram_fg_display_w)).share("vram_fg0");
-	map(0xa4000000, 0xa43fffff).rw(FUNC(btoads_state::vram_fg_draw_r), FUNC(btoads_state::vram_fg_draw_w)).share("vram_fg1");
+	map(0xa0000000, 0xa03fffff).rw(FUNC(btoads_state::vram_fg_display_r), FUNC(btoads_state::vram_fg_display_w));
+	map(0xa4000000, 0xa43fffff).rw(FUNC(btoads_state::vram_fg_draw_r), FUNC(btoads_state::vram_fg_draw_w));
 	map(0xa8000000, 0xa87fffff).ram().share("vram_fg_data");
 	map(0xa8800000, 0xa8ffffff).nopw();
-	map(0xb0000000, 0xb03fffff).rw(FUNC(btoads_state::vram_bg0_r), FUNC(btoads_state::vram_bg0_w)).share("vram_bg0");
-	map(0xb4000000, 0xb43fffff).rw(FUNC(btoads_state::vram_bg1_r), FUNC(btoads_state::vram_bg1_w)).share("vram_bg1");
+	map(0xb0000000, 0xb03fffff).rw(FUNC(btoads_state::vram_bg0_r), FUNC(btoads_state::vram_bg0_w));
+	map(0xb4000000, 0xb43fffff).rw(FUNC(btoads_state::vram_bg1_r), FUNC(btoads_state::vram_bg1_w));
 	map(0xfc000000, 0xffffffff).rom().region("user1", 0);
 }
 

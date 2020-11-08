@@ -124,10 +124,10 @@ VIDEO_START_MEMBER(bosco_state,bosco)
 	m_bg_tilemap->configure_groups(*m_gfxdecode->gfx(0), 0x1f);
 	m_fg_tilemap->configure_groups(*m_gfxdecode->gfx(0), 0x1f);
 
-	m_spriteram = m_videoram + 0x03d4;
+	m_spriteram = &m_videoram[0x03d4];
 	m_spriteram_size = 0x0c;
 	m_spriteram2 = m_spriteram + 0x0800;
-	m_bosco_radarx = m_videoram + 0x03f0;
+	m_bosco_radarx = &m_videoram[0x03f0];
 	m_bosco_radary = m_bosco_radarx + 0x0800;
 
 	m_bosco_starclr = 1;

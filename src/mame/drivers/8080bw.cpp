@@ -2226,7 +2226,7 @@ void _8080bw_state::yosakdon_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x3fff).ram().share("main_ram");
-	map(0x4000, 0x43ff).writeonly(); /* what's this? */
+	map(0x4000, 0x43ff).nopw(); /* what's this? */
 }
 
 void _8080bw_state::yosakdon_io_map(address_map &map)

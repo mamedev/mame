@@ -347,8 +347,7 @@ void macpb030_state::machine_reset()
 	offs_t memory_mirror = memory_end & ~(memory_size - 1);
 
 	space.unmap_write(0x00000000, memory_end);
-	space.install_read_bank(0x00000000, memory_end & ~memory_mirror, memory_mirror, "bank1");
-	membank("bank1")->set_base(m_rom_ptr);
+	space.install_rom(0x00000000, memory_end & ~memory_mirror, memory_mirror, m_rom_ptr);
 
 	// start 60.15 Hz timer
 	m_6015_timer->adjust(attotime::from_hz(60.15), 0, attotime::from_hz(60.15));
@@ -505,8 +504,7 @@ u32 macpb030_state::rom_switch_r(offs_t offset)
 		void *memory_data = m_ram->pointer();
 		offs_t memory_mirror = memory_end & ~memory_end;
 
-		space.install_readwrite_bank(0x00000000, memory_end & ~memory_mirror, memory_mirror, "bank1");
-		membank("bank1")->set_base(memory_data);
+		space.install_ram(0x00000000, memory_end & ~memory_mirror, memory_mirror, memory_data);
 		m_overlay = false;
 	}
 

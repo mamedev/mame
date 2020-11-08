@@ -186,7 +186,7 @@ void pc6001_state::system_latch_w(uint8_t data)
 {
 	static const uint16_t startaddr[] = {0xC000, 0xE000, 0x8000, 0xA000 };
 
-	m_video_ram =  m_ram + startaddr[(data >> 1) & 0x03] - 0x8000;
+	m_video_ram =  &m_ram[startaddr[(data >> 1) & 0x03] - 0x8000];
 
 	cassette_latch_control((data & 8) == 8);
 	m_sys_latch = data;

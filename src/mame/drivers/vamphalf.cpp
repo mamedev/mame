@@ -78,14 +78,15 @@ public:
 	vamphalf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_wram(*this,  "wram")
-		, m_wram32(*this, "wram32")
-		, m_okibank(*this, "okibank")
+		, m_wram(*this,"wram")
+		, m_wram32(*this,"wram32")
+		, m_qs1000_bank(*this, "qs1000_bank")
+		, m_okibank(*this,"okibank")
 		, m_palette(*this, "palette")
 		, m_soundlatch(*this, "soundlatch")
 		, m_eeprom(*this, "eeprom")
 		, m_gfxdecode(*this, "gfxdecode")
-		, m_tiles(*this, "tiles", 0U)
+		, m_tiles(*this,"tiles")
 		, m_okiregion(*this, "oki%u", 1)
 		, m_photosensors(*this, "PHOTO_SENSORS")
 		, m_has_extra_gfx(false)
@@ -156,6 +157,8 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<u16> m_wram;
 	optional_shared_ptr<u32> m_wram32;
+
+	memory_bank_creator m_qs1000_bank;
 
 	u16 m_semicom_prot_data[2];
 	int m_semicom_prot_idx;
@@ -500,7 +503,7 @@ void vamphalf_state::qs1000_p3_w(u8 data)
 	if (!BIT(data, 5))
 		m_soundlatch->acknowledge_w();
 
-	membank("qs1000:data")->set_entry(data & 7);
+	m_qs1000_bank->set_entry(data & 7);
 }
 
 
@@ -3325,8 +3328,8 @@ void vamphalf_qdsp_state::init_misncrft()
 	m_flip_bit = 1;
 
 	// Configure the QS1000 ROM banking. Care must be taken not to overlap the 256b internal RAM
-	m_qdsp_cpu->space(AS_IO).install_read_bank(0x0100, 0xffff, "data");
-	membank("qs1000:data")->configure_entries(0, 16, memregion("qs1000:cpu")->base() + 0x100, 0x8000-0x100);
+	m_qdsp_cpu->space(AS_IO).install_read_bank(0x0100, 0xffff, m_qs1000_bank);
+	m_qs1000_bank->configure_entries(0, 16, memregion("qs1000:cpu")->base() + 0x100, 0x8000-0x100);
 }
 
 void vamphalf_state::init_coolmini()
@@ -3408,8 +3411,8 @@ void vamphalf_qdsp_state::init_wyvernwg()
 	m_semicom_prot_data[1] = 1;
 
 	// Configure the QS1000 ROM banking. Care must be taken not to overlap the 256b internal RAM
-	m_qdsp_cpu->space(AS_IO).install_read_bank(0x0100, 0xffff, "data");
-	membank("qs1000:data")->configure_entries(0, 16, memregion("qs1000:cpu")->base() + 0x100, 0x8000-0x100);
+	m_qdsp_cpu->space(AS_IO).install_read_bank(0x0100, 0xffff, m_qs1000_bank);
+	m_qs1000_bank->configure_entries(0, 16, memregion("qs1000:cpu")->base() + 0x100, 0x8000-0x100);
 
 	save_item(NAME(m_semicom_prot_idx));
 	save_item(NAME(m_semicom_prot_which));
@@ -3432,8 +3435,8 @@ void vamphalf_qdsp_state::init_yorijori()
 //  romx[BYTE4_XOR_BE(0x8ff1)] = 0;
 
 	// Configure the QS1000 ROM banking. Care must be taken not to overlap the 256b internal RAM
-	m_qdsp_cpu->space(AS_IO).install_read_bank(0x0100, 0xffff, "data");
-	membank("qs1000:data")->configure_entries(0, 16, memregion("qs1000:cpu")->base() + 0x100, 0x8000-0x100);
+	m_qdsp_cpu->space(AS_IO).install_read_bank(0x0100, 0xffff, m_qs1000_bank);
+	m_qs1000_bank->configure_entries(0, 16, memregion("qs1000:cpu")->base() + 0x100, 0x8000-0x100);
 }
 
 void vamphalf_nvram_state::init_finalgdr()

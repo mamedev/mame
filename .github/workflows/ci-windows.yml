@@ -35,7 +35,7 @@ jobs:
         install: git make mingw-w64-x86_64-gcc mingw-w64-x86_64-python
     - uses: actions/checkout@master
     - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v1.0.1
+      uses: microsoft/setup-msbuild@v1.0.2
     - name: Generate build files
       shell: msys2 {0}
       env:

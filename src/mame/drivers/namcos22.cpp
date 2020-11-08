@@ -2889,7 +2889,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22s_state::propcycl_pedal_update)
 
 // Armadillo Racing
 
-TIMER_CALLBACK_MEMBER(namcos22s_state::adillor_trackball_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(namcos22s_state::adillor_trackball_interrupt)
 {
 	m_mcu->set_input_line((param & 1) ? M37710_LINE_TIMERA2OUT : M37710_LINE_TIMERA3OUT, (param & 2) ? ASSERT_LINE : CLEAR_LINE);
 	m_mcu->pulse_input_line((param & 1) ? M37710_LINE_TIMERA2IN : M37710_LINE_TIMERA3IN, m_mcu->minimum_quantum_time());
@@ -2923,7 +2923,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22s_state::adillor_trackball_update)
 		if (t[axis] > (1.0 / range))
 		{
 			attotime freq = attotime::from_hz(base + range * t[axis]);
-			m_ar_tb_interrupt[axis]->adjust(std::min(freq, m_ar_tb_interrupt[axis]->remaining()), params[axis], freq);
+			m_ar_tb_interrupt[axis]->adjust(std::min(freq, m_ar_tb_interrupt[axis]->time_left()), params[axis], freq);
 		}
 		else
 		{
@@ -3885,20 +3885,13 @@ void namcos22s_state::propcycl(machine_config &config)
 	TIMER(config, m_pc_pedal_interrupt).configure_generic(FUNC(namcos22s_state::propcycl_pedal_interrupt));
 }
 
-MACHINE_START_MEMBER(namcos22s_state,adillor)
-{
-	machine_start();
-
-	for (auto & elem : m_ar_tb_interrupt)
-		elem = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcos22s_state::adillor_trackball_interrupt),this));
-}
-
 void namcos22s_state::adillor(machine_config &config)
 {
 	namcos22s(config);
 
 	TIMER(config, "ar_tb_upd").configure_periodic(FUNC(namcos22s_state::adillor_trackball_update), attotime::from_msec(20));
-	MCFG_MACHINE_START_OVERRIDE(namcos22s_state,adillor)
+	for (int i = 0; i < 2; i++)
+		TIMER(config, m_ar_tb_interrupt[i]).configure_generic(FUNC(namcos22s_state::adillor_trackball_interrupt));
 }
 
 

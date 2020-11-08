@@ -24,7 +24,7 @@ class psikyo_state : public driver_device
 public:
 	psikyo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_vram(*this, "vram_%u", 0U, (u8)32)
+		, m_vram(*this, "vram_%u", 0U)
 		, m_vregs(*this, "vregs")
 		, m_bootleg_spritebuffer(*this, "boot_spritebuf")
 		, m_spritelut(*this, "spritelut")

@@ -379,7 +379,7 @@ void dc_cons_state::dc_flash_w(offs_t offset, uint8_t data)
 void dc_cons_state::dc_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).rom().nopw();             // BIOS
-	map(0x00200000, 0x0021ffff).rw(FUNC(dc_cons_state::dc_flash_r), FUNC(dc_cons_state::dc_flash_w)).region("dcflash", 0x20000);
+	map(0x00200000, 0x0021ffff).rw(FUNC(dc_cons_state::dc_flash_r), FUNC(dc_cons_state::dc_flash_w));
 	map(0x005f6800, 0x005f69ff).rw(FUNC(dc_cons_state::dc_sysctrl_r), FUNC(dc_cons_state::dc_sysctrl_w));
 	map(0x005f6c00, 0x005f6cff).m(m_maple, FUNC(maple_dc_device::amap));
 	map(0x005f7000, 0x005f701f).rw(m_ata, FUNC(ata_interface_device::cs1_r), FUNC(ata_interface_device::cs1_w)).umask64(0x0000ffff0000ffff);

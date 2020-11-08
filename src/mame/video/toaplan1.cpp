@@ -192,7 +192,6 @@ void toaplan1_state::vram_alloc()
 
 void toaplan1_state::spritevram_alloc()
 {
-	m_spriteram.allocate(TOAPLAN1_SPRITERAM_SIZE / 2);
 	m_buffered_spriteram = make_unique_clear<u16[]>(TOAPLAN1_SPRITERAM_SIZE / 2);
 	m_spritesizeram = make_unique_clear<u16[]>(TOAPLAN1_SPRITESIZERAM_SIZE / 2);
 	m_buffered_spritesizeram = make_unique_clear<u16[]>(TOAPLAN1_SPRITESIZERAM_SIZE / 2);

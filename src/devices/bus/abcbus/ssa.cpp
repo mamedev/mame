@@ -121,7 +121,7 @@ abc_super_smartaid_device::abc_super_smartaid_device(const machine_config &mconf
 	m_rom_1(*this, "ssa1"),
 	m_rom_2(*this, "ssa2"),
 	m_prom(*this, "ssa3"),
-	m_nvram(*this, "nvram"),
+	m_nvram(*this, "nvram", 0x800, ENDIANNESS_LITTLE),
 	m_rom_bank(0),
 	m_prom_bank(0)
 {
@@ -143,9 +143,6 @@ void abc_super_smartaid_device::device_start()
 	{
 		m_rom_2->base()[i] = bitswap<8>(m_rom_2->base()[i], 2, 6, 1, 4, 3, 5, 7, 0);
 	}
-
-	// allocate memory
-	m_nvram.allocate(0x800);
 
 	// state saving
 	save_item(NAME(m_rom_bank));

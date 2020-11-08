@@ -110,8 +110,8 @@ void fantland_state::fantland_map(address_map &map)
 	map(0xa3002, 0xa3002).w(FUNC(fantland_state::soundlatch_w));
 	map(0xa3002, 0xa3003).portr("a3002");
 
-	map(0xa4000, 0xa67ff).rw(FUNC(fantland_state::spriteram_r), FUNC(fantland_state::spriteram_w)).share("spriteram");
-	map(0xc0000, 0xcffff).rw(FUNC(fantland_state::spriteram2_r), FUNC(fantland_state::spriteram2_w)).share("spriteram2");
+	map(0xa4000, 0xa67ff).rw(FUNC(fantland_state::spriteram_r), FUNC(fantland_state::spriteram_w));
+	map(0xc0000, 0xcffff).rw(FUNC(fantland_state::spriteram2_r), FUNC(fantland_state::spriteram2_w));
 
 	map(0xe0000, 0xfffff).rom().region("maincpu", 0xe0000);
 }

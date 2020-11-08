@@ -958,6 +958,7 @@ void cvs_state::machine_reset()
 	m_stars_on = 0;
 	m_scroll_reg = 0;
 	m_stars_scroll = 0;
+	m_s2650_flag = 0;
 }
 
 void cvs_state::cvs(machine_config &config)

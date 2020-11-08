@@ -24,7 +24,9 @@ public:
 		m_dsw_sel(*this, "dsw_sel"),
 		m_cocktail(*this, "COCKTAIL"),
 		m_ram1(*this, "ram1"),
-		m_ram2(*this, "ram2")
+		m_ram2(*this, "ram2"),
+		m_sram1(*this, "ram1", 0x100, ENDIANNESS_LITTLE),
+		m_sram2(*this, "ram2", 0x100, ENDIANNESS_LITTLE)
 	{ }
 
 	/* devices */
@@ -39,6 +41,8 @@ public:
 	/* memory banks */
 	optional_memory_bank m_ram1;
 	optional_memory_bank m_ram2;
+	memory_share_creator<u8> m_sram1;
+	memory_share_creator<u8> m_sram2;
 
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_left_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_center_w);

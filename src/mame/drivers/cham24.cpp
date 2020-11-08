@@ -94,6 +94,7 @@ public:
 	void cham24_set_mirroring( int mirroring );
 	void cham24(machine_config &config);
 	void cham24_map(address_map &map);
+	void cham24_ppu_map(address_map &map);
 };
 
 
@@ -229,6 +230,12 @@ void cham24_state::cham24_map(address_map &map)
 	map(0x8000, 0xffff).rom().w(FUNC(cham24_state::cham24_mapper_w));
 }
 
+void cham24_state::cham24_ppu_map(address_map &map)
+{
+	map(0x0000, 0x1fff).bankr("bank1");
+	map(0x2000, 0x3eff).rw(FUNC(cham24_state::nt_r), FUNC(cham24_state::nt_w));
+}
+
 static INPUT_PORTS_START( cham24 )
 	PORT_START("P1") /* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
@@ -272,7 +279,6 @@ void cham24_state::machine_reset()
 	memcpy(&dst[0xc000], &src[0x0f8000], 0x4000);
 
 	/* uses 8K swapping, all ROM!*/
-	m_ppu->space(AS_PROGRAM).install_read_bank(0x0000, 0x1fff, "bank1");
 	membank("bank1")->set_base(memregion("gfx1")->base());
 
 	m_nt_page[0] = m_nt_ram.get();
@@ -302,6 +308,7 @@ void cham24_state::cham24(machine_config &config)
 	screen.set_screen_update("ppu", FUNC(ppu2c0x_device::screen_update));
 
 	PPU_2C02(config, m_ppu);
+	m_ppu->set_addrmap(0, &cham24_state::cham24_ppu_map);
 	m_ppu->set_cpu_tag(m_maincpu);
 	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 

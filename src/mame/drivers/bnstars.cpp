@@ -106,14 +106,14 @@ class bnstars_state : public ms32_state
 public:
 	bnstars_state(const machine_config &mconfig, device_type type, const char *tag)
 		: ms32_state(mconfig, type, tag)
-		, m_ms32_tx0_ram(*this, "tx0_ram", 32)
-		, m_ms32_tx1_ram(*this, "tx1_ram", 32)
-		, m_ms32_bg0_ram(*this, "bg0_ram", 32)
-		, m_ms32_bg1_ram(*this, "bg1_ram", 32)
-		, m_ms32_roz0_ram(*this, "roz0_ram", 32)
-		, m_ms32_roz1_ram(*this, "roz1_ram", 32)
+		, m_ms32_tx0_ram(*this, "tx0_ram", 0x4000, ENDIANNESS_LITTLE)
+		, m_ms32_tx1_ram(*this, "tx1_ram", 0x4000, ENDIANNESS_LITTLE)
+		, m_ms32_bg0_ram(*this, "bg0_ram", 0x4000, ENDIANNESS_LITTLE)
+		, m_ms32_bg1_ram(*this, "bg1_ram", 0x4000, ENDIANNESS_LITTLE)
+		, m_ms32_roz0_ram(*this, "roz0_ram", 0x10000, ENDIANNESS_LITTLE)
+		, m_ms32_roz1_ram(*this, "roz1_ram", 0x10000, ENDIANNESS_LITTLE)
 		, m_ms32_roz_ctrl(*this, "roz_ctrl.%u", 0)
-		, m_ms32_spram(*this, "spram", 32)
+		, m_ms32_spram(*this, "spram", 0x20000, ENDIANNESS_LITTLE)
 		, m_ms32_tx0_scroll(*this, "tx0_scroll")
 		, m_ms32_bg0_scroll(*this, "bg0_scroll")
 		, m_ms32_tx1_scroll(*this, "tx1_scroll")
@@ -133,14 +133,14 @@ private:
 	tilemap_t *m_ms32_tx_tilemap[2];
 	tilemap_t *m_ms32_bg_tilemap[2];
 	tilemap_t *m_ms32_roz_tilemap[2];
-	required_shared_ptr<u16> m_ms32_tx0_ram;
-	required_shared_ptr<u16> m_ms32_tx1_ram;
-	required_shared_ptr<u16> m_ms32_bg0_ram;
-	required_shared_ptr<u16> m_ms32_bg1_ram;
-	required_shared_ptr<u16> m_ms32_roz0_ram;
-	required_shared_ptr<u16> m_ms32_roz1_ram;
+	memory_share_creator<u16> m_ms32_tx0_ram;
+	memory_share_creator<u16> m_ms32_tx1_ram;
+	memory_share_creator<u16> m_ms32_bg0_ram;
+	memory_share_creator<u16> m_ms32_bg1_ram;
+	memory_share_creator<u16> m_ms32_roz0_ram;
+	memory_share_creator<u16> m_ms32_roz1_ram;
 	required_shared_ptr_array<u32, 2> m_ms32_roz_ctrl;
-	required_shared_ptr<u16> m_ms32_spram;
+	memory_share_creator<u16> m_ms32_spram;
 	required_shared_ptr<u32> m_ms32_tx0_scroll;
 	required_shared_ptr<u32> m_ms32_bg0_scroll;
 	required_shared_ptr<u32> m_ms32_tx1_scroll;
@@ -754,20 +754,20 @@ void bnstars_state::bnstars_map(address_map &map)
 	map(0xfd200000, 0xfd237fff).rw("palette2", FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette2");
 	map(0xfd400000, 0xfd437fff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
 	map(0xfe000000, 0xfe01ffff).lr16(
-		NAME([this] (offs_t offset) -> u16 { return m_ms32_roz1_ram[offset]; })).w(FUNC(bnstars_state::ms32_roz1_ram_w)).umask32(0x0000ffff).share("roz1_ram");
+		NAME([this] (offs_t offset) -> u16 { return m_ms32_roz1_ram[offset]; })).w(FUNC(bnstars_state::ms32_roz1_ram_w)).umask32(0x0000ffff);
 	map(0xfe400000, 0xfe41ffff).lr16(
-		NAME([this] (offs_t offset) -> u16 { return m_ms32_roz0_ram[offset]; })).w(FUNC(bnstars_state::ms32_roz0_ram_w)).umask32(0x0000ffff).share("roz0_ram");
+		NAME([this] (offs_t offset) -> u16 { return m_ms32_roz0_ram[offset]; })).w(FUNC(bnstars_state::ms32_roz0_ram_w)).umask32(0x0000ffff);
 	map(0xfe800000, 0xfe83ffff).lrw16(
 		NAME([this] (offs_t offset) -> u16 { return m_ms32_spram[offset]; }),
-		NAME([this] (offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_ms32_spram[offset]); })).umask32(0x0000ffff).share("spram");
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_ms32_spram[offset]); })).umask32(0x0000ffff);
 	map(0xfea00000, 0xfea07fff).lr16(
-		NAME([this] (offs_t offset) -> u16 { return m_ms32_tx1_ram[offset]; })).w(FUNC(bnstars_state::ms32_tx1_ram_w)).umask32(0x0000ffff).share("tx1_ram");
+		NAME([this] (offs_t offset) -> u16 { return m_ms32_tx1_ram[offset]; })).w(FUNC(bnstars_state::ms32_tx1_ram_w)).umask32(0x0000ffff);
 	map(0xfea08000, 0xfea0ffff).lr16(
-		NAME([this] (offs_t offset) -> u16 { return m_ms32_bg1_ram[offset]; })).w(FUNC(bnstars_state::ms32_bg1_ram_w)).umask32(0x0000ffff).share("bg1_ram");
+		NAME([this] (offs_t offset) -> u16 { return m_ms32_bg1_ram[offset]; })).w(FUNC(bnstars_state::ms32_bg1_ram_w)).umask32(0x0000ffff);
 	map(0xfec00000, 0xfec07fff).lr16(
-		NAME([this] (offs_t offset) -> u16 { return m_ms32_tx0_ram[offset]; })).w(FUNC(bnstars_state::ms32_tx0_ram_w)).umask32(0x0000ffff).share("tx0_ram");
+		NAME([this] (offs_t offset) -> u16 { return m_ms32_tx0_ram[offset]; })).w(FUNC(bnstars_state::ms32_tx0_ram_w)).umask32(0x0000ffff);
 	map(0xfec08000, 0xfec0ffff).lr16(
-		NAME([this] (offs_t offset) -> u16 { return m_ms32_bg0_ram[offset]; })).w(FUNC(bnstars_state::ms32_bg0_ram_w)).umask32(0x0000ffff).share("bg0_ram");
+		NAME([this] (offs_t offset) -> u16 { return m_ms32_bg0_ram[offset]; })).w(FUNC(bnstars_state::ms32_bg0_ram_w)).umask32(0x0000ffff);
 
 	map(0xfee00000, 0xfee1ffff).ram();
 	map(0xffe00000, 0xffffffff).rom().region("maincpu", 0);

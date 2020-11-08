@@ -120,6 +120,7 @@ private:
 	void famicombox_bankswitch(uint8_t bank);
 	void famicombox_reset();
 	void famibox_map(address_map &map);
+	void famibox_ppu_map(address_map &map);
 };
 
 /******************************************************
@@ -388,6 +389,12 @@ void famibox_state::famibox_map(address_map &map)
 	map(0xc000, 0xffff).bankr("cpubank2");
 }
 
+void famibox_state::famibox_ppu_map(address_map &map)
+{
+	map(0x0000, 0x1fff).bankr("ppubank1");
+	map(0x2000, 0x3eff).rw(FUNC(famibox_state::famibox_nt_r), FUNC(famibox_state::famibox_nt_w));
+}
+
 /******************************************************
 
    Inputs
@@ -510,11 +517,7 @@ void famibox_state::machine_start()
 	m_nt_page[2] = m_nt_ram.get() + 0x800;
 	m_nt_page[3] = m_nt_ram.get() + 0xc00;
 
-	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8sm_delegate(*this, FUNC(famibox_state::famibox_nt_r)), write8sm_delegate(*this, FUNC(famibox_state::famibox_nt_w)));
-	m_ppu->space(AS_PROGRAM).install_read_bank(0x0000, 0x1fff, "ppubank1");
-
 	famicombox_bankswitch(0);
-
 
 	m_attract_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(famibox_state::famicombox_attract_timer_callback),this));
 	m_gameplay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(famibox_state::famicombox_gameplay_timer_callback),this));
@@ -539,6 +542,7 @@ void famibox_state::famibox(machine_config &config)
 	screen.set_screen_update("ppu", FUNC(ppu2c0x_device::screen_update));
 
 	PPU_2C02(config, m_ppu);
+	m_ppu->set_addrmap(0, &famibox_state::famibox_ppu_map);
 	m_ppu->set_cpu_tag(m_maincpu);
 	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 

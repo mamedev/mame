@@ -46,22 +46,22 @@ Notes:
 #include "speaker.h"
 
 
-uint8_t gameplan_state::trvquest_question_r(offs_t offset)
+uint8_t trvquest_state::question_r(offs_t offset)
 {
-	return memregion("questions")->base()[*m_trvquest_question * 0x2000 + offset];
+	return m_questions_region[*m_question * 0x2000 + offset];
 }
 
-WRITE_LINE_MEMBER(gameplan_state::trvquest_coin_w)
+WRITE_LINE_MEMBER(trvquest_state::coin_w)
 {
 	machine().bookkeeping().coin_counter_w(0, ~state & 1);
 }
 
-WRITE_LINE_MEMBER(gameplan_state::trvquest_misc_w)
+WRITE_LINE_MEMBER(trvquest_state::misc_w)
 {
 	// data & 1 -> led on/off ?
 }
 
-void gameplan_state::cpu_map(address_map &map)
+void trvquest_state::cpu_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share("nvram"); // cmos ram
 	map(0x2000, 0x27ff).ram(); // main ram
@@ -71,8 +71,8 @@ void gameplan_state::cpu_map(address_map &map)
 	map(0x3830, 0x3831).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0x3840, 0x3841).w("ay2", FUNC(ay8910_device::address_data_w));
 	map(0x3850, 0x3850).nopr(); //watchdog_reset_r ?
-	map(0x8000, 0x9fff).r(FUNC(gameplan_state::trvquest_question_r));
-	map(0xa000, 0xa000).writeonly().share("trvquest_q");
+	map(0x8000, 0x9fff).r(FUNC(trvquest_state::question_r));
+	map(0xa000, 0xa000).writeonly().share(m_question);
 	map(0xa000, 0xa000).nopr(); // bogus read from the game code when reads question roms
 	map(0xb000, 0xffff).rom();
 }
@@ -152,35 +152,20 @@ static INPUT_PORTS_START( trvquest )
 INPUT_PORTS_END
 
 
-MACHINE_START_MEMBER(gameplan_state,trvquest)
+void trvquest_state::machine_start()
 {
-	/* register for save states */
-	save_item(NAME(m_video_x));
-	save_item(NAME(m_video_y));
-	save_item(NAME(m_video_command));
-	save_item(NAME(m_video_data));
+	gameplan_state::machine_start();
 
-	/* this is needed for trivia quest */
 	m_via_0->write_pb5(1);
 }
 
-MACHINE_RESET_MEMBER(gameplan_state,trvquest)
-{
-	m_video_x = 0;
-	m_video_y = 0;
-	m_video_command = 0;
-	m_video_data = 0;
-}
 
-void gameplan_state::trvquest(machine_config &config)
+void trvquest_state::trvquest(machine_config &config)
 {
 	M6809(config, m_maincpu, XTAL(6'000'000)/4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &gameplan_state::cpu_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &trvquest_state::cpu_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
-
-	MCFG_MACHINE_START_OVERRIDE(gameplan_state,trvquest)
-	MCFG_MACHINE_RESET_OVERRIDE(gameplan_state,trvquest)
 
 	/* video hardware */
 	trvquest_video(config);
@@ -193,20 +178,20 @@ void gameplan_state::trvquest(machine_config &config)
 
 	/* via */
 	VIA6522(config, m_via_0, XTAL(6'000'000)/4);
-	m_via_0->writepa_handler().set(FUNC(gameplan_state::video_data_w));
-	m_via_0->writepb_handler().set(FUNC(gameplan_state::gameplan_video_command_w));
-	m_via_0->ca2_handler().set(FUNC(gameplan_state::video_command_trigger_w));
+	m_via_0->writepa_handler().set(FUNC(trvquest_state::video_data_w));
+	m_via_0->writepb_handler().set(FUNC(trvquest_state::gameplan_video_command_w));
+	m_via_0->ca2_handler().set(FUNC(trvquest_state::video_command_trigger_w));
 
 	VIA6522(config, m_via_1, XTAL(6'000'000)/4);
 	m_via_1->readpa_handler().set_ioport("IN0");
 	m_via_1->readpb_handler().set_ioport("IN1");
-	m_via_1->ca2_handler().set(FUNC(gameplan_state::trvquest_coin_w));
+	m_via_1->ca2_handler().set(FUNC(trvquest_state::coin_w));
 
 	VIA6522(config, m_via_2, XTAL(6'000'000)/4);
 	m_via_2->readpa_handler().set_ioport("UNK");
 	m_via_2->readpb_handler().set_ioport("DSW");
-	m_via_2->ca2_handler().set(FUNC(gameplan_state::trvquest_misc_w));
-	m_via_2->irq_handler().set(FUNC(gameplan_state::via_irq));
+	m_via_2->ca2_handler().set(FUNC(trvquest_state::misc_w));
+	m_via_2->irq_handler().set(FUNC(trvquest_state::via_irq));
 }
 
 ROM_START( trvquest )
@@ -230,4 +215,4 @@ ROM_START( trvquest )
 	ROM_LOAD( "roma", 0x16000, 0x2000, CRC(b4bcaf33) SHA1(c6b08fb8d55b2834d0c6c5baff9f544c795e4c15) )
 ROM_END
 
-GAME( 1984, trvquest, 0, trvquest, trvquest, gameplan_state, empty_init, ROT90, "Sunn / Techstar", "Trivia Quest", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, trvquest, 0, trvquest, trvquest, trvquest_state, empty_init, ROT90, "Sunn / Techstar", "Trivia Quest", MACHINE_SUPPORTS_SAVE )

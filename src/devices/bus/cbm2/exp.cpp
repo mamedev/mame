@@ -36,10 +36,7 @@ DEFINE_DEVICE_TYPE(CBM2_EXPANSION_SLOT, cbm2_expansion_slot_device, "cbm2_expans
 //-------------------------------------------------
 
 device_cbm2_expansion_card_interface::device_cbm2_expansion_card_interface(const machine_config &mconfig, device_t &device) :
-	device_interface(device, "cbm2exp"),
-	m_bank1(*this, "bank1"),
-	m_bank2(*this, "bank2"),
-	m_bank3(*this, "bank3")
+	device_interface(device, "cbm2exp")
 {
 	m_slot = dynamic_cast<cbm2_expansion_slot_device *>(device.owner());
 }
@@ -107,17 +104,17 @@ image_init_result cbm2_expansion_slot_device::call_load()
 
 			if (is_filetype("20"))
 			{
-				m_card->m_bank1.allocate(size);
+				m_card->m_bank1 = std::make_unique<uint8_t[]>(size);
 				fread(m_card->m_bank1, size);
 			}
 			else if (is_filetype("40"))
 			{
-				m_card->m_bank2.allocate(size);
+				m_card->m_bank2 = std::make_unique<uint8_t[]>(size);
 				fread(m_card->m_bank2, size);
 			}
 			else if (is_filetype("60"))
 			{
-				m_card->m_bank3.allocate(size);
+				m_card->m_bank3 = std::make_unique<uint8_t[]>(size);
 				fread(m_card->m_bank3, size);
 			}
 		}

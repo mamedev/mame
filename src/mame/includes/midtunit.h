@@ -92,6 +92,7 @@ private:
 	/* protection */
 	uint8_t    m_mk_prot_index;
 	uint16_t   m_mk2_prot_data;
+	std::unique_ptr<uint8_t[]> m_hidden_ram;
 
 	const uint32_t *m_nbajam_prot_table;
 	uint16_t   m_nbajam_prot_queue[5];

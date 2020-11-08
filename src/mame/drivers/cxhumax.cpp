@@ -1018,6 +1018,7 @@ void cxhumax_state::machine_reset()
 	m_rommode_reg=0;
 	m_xoemask_reg=0;
 	memset(m_extdesc_regs,0,sizeof(m_extdesc_regs));
+	memset(m_drm1_regs,0,sizeof(m_drm1_regs));
 
 	m_pll_regs[SREG_MPG_0_INTFRAC_REG] = (0x1A << 25) /* integer */ | 0x5D1764 /* fraction */;
 	m_pll_regs[SREG_MPG_1_INTFRAC_REG] = (0x1A << 25) /* integer */ | 0x5D1764 /* fraction */;

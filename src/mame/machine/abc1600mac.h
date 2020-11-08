@@ -105,8 +105,8 @@ private:
 	const address_space_config m_space_config;
 
 	required_memory_region m_rom;
-	optional_shared_ptr<uint8_t> m_segment_ram;
-	optional_shared_ptr<uint16_t> m_page_ram;
+	memory_share_creator<uint8_t> m_segment_ram;
+	memory_share_creator<uint16_t> m_page_ram;
 
 	required_device<watchdog_timer_device> m_watchdog;
 

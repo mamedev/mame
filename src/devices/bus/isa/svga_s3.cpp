@@ -82,7 +82,7 @@ void isa16_svga_s3_device::device_start()
 {
 	set_isa_device();
 
-	m_isa->install_rom(this, 0xc0000, 0xc7fff, "svga", "s3_764");
+	m_isa->install_rom(this, 0xc0000, 0xc7fff, "s3_764");
 
 	m_isa->install_device(0x03b0, 0x03bf, read8sm_delegate(*m_vga, FUNC(s3_vga_device::port_03b0_r)), write8sm_delegate(*m_vga, FUNC(s3_vga_device::port_03b0_w)));
 	m_isa->install_device(0x03c0, 0x03cf, read8sm_delegate(*m_vga, FUNC(s3_vga_device::port_03c0_r)), write8sm_delegate(*m_vga, FUNC(s3_vga_device::port_03c0_w)));
@@ -196,7 +196,7 @@ void isa16_s3virge_device::device_start()
 {
 	set_isa_device();
 
-	m_isa->install_rom(this, 0xc0000, 0xc7fff, "svga", "s3virge");
+	m_isa->install_rom(this, 0xc0000, 0xc7fff, "s3virge");
 
 	m_isa->install_device(0x03b0, 0x03bf, read8sm_delegate(*m_vga, FUNC(s3virge_vga_device::port_03b0_r)), write8sm_delegate(*m_vga, FUNC(s3virge_vga_device::port_03b0_w)));
 	m_isa->install_device(0x03c0, 0x03cf, read8sm_delegate(*m_vga, FUNC(s3virge_vga_device::port_03c0_r)), write8sm_delegate(*m_vga, FUNC(s3virge_vga_device::port_03c0_w)));
@@ -302,7 +302,7 @@ void isa16_s3virgedx_device::device_start()
 {
 	set_isa_device();
 
-	m_isa->install_rom(this, 0xc0000, 0xc7fff, "svga", "s3virgedx");
+	m_isa->install_rom(this, 0xc0000, 0xc7fff, "s3virgedx");
 
 	m_isa->install_device(0x03b0, 0x03bf, read8sm_delegate(*m_vga, FUNC(s3virge_vga_device::port_03b0_r)), write8sm_delegate(*m_vga, FUNC(s3virge_vga_device::port_03b0_w)));
 	m_isa->install_device(0x03c0, 0x03cf, read8sm_delegate(*m_vga, FUNC(s3virge_vga_device::port_03c0_r)), write8sm_delegate(*m_vga, FUNC(s3virge_vga_device::port_03c0_w)));
@@ -400,7 +400,7 @@ void isa16_stealth3d2kpro_device::device_start()
 {
 	set_isa_device();
 
-	m_isa->install_rom(this, 0xc0000, 0xc7fff, "svga", "stealth3d");
+	m_isa->install_rom(this, 0xc0000, 0xc7fff, "stealth3d");
 
 	m_isa->install_device(0x03b0, 0x03bf, read8sm_delegate(*m_vga, FUNC(s3virge_vga_device::port_03b0_r)), write8sm_delegate(*m_vga, FUNC(s3virge_vga_device::port_03b0_w)));
 	m_isa->install_device(0x03c0, 0x03cf, read8sm_delegate(*m_vga, FUNC(s3virge_vga_device::port_03c0_r)), write8sm_delegate(*m_vga, FUNC(s3virge_vga_device::port_03c0_w)));

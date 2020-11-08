@@ -4,7 +4,7 @@
 
    Leapfrog IQuest
 
-   has LCD display, resolution unknown
+   has LCD display
 
 *******************************************************************************/
 
@@ -102,8 +102,8 @@ void leapfrog_iquest_state::leapfrog_iquest(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(10));
-	m_screen->set_size(160, 160);
-	m_screen->set_visarea(0, 160-1, 0, 160-1);
+	m_screen->set_size(90, 64);
+	m_screen->set_visarea(0, 90-1, 0, 64-1);
 	m_screen->set_screen_update(FUNC(leapfrog_iquest_state::screen_update));
 	//m_screen->screen_vblank().set(FUNC(leapfrog_iquest_state::screen_vblank));
 
@@ -120,4 +120,5 @@ ROM_START( iquest )
 ROM_END
 
 //    year, name,        parent,    compat, machine,            input,            class,                  init,       company,    fullname,                         flags
-CONS( 200?, iquest,      0,         0,      leapfrog_iquest,    leapfrog_iquest,  leapfrog_iquest_state,  empty_init, "LeapFrog", "IQuest (US)",                    MACHINE_IS_SKELETON )
+// it is unknown if the versions of IQuest without 4.0 on the case have different system ROM
+CONS( 200?, iquest,      0,         0,      leapfrog_iquest,    leapfrog_iquest,  leapfrog_iquest_state,  empty_init, "LeapFrog", "IQuest 4.0 (US)",                    MACHINE_IS_SKELETON )

@@ -151,8 +151,8 @@ public:
 	{
 		m_iospace->install_device(addrstart, addrend, device, map, unitmask);
 	}
-	void install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data);
-	void install_rom(device_t *dev, offs_t start, offs_t end, const char *tag, const char *region);
+	void install_bank(offs_t start, offs_t end, uint8_t *data);
+	void install_rom(device_t *dev, offs_t start, offs_t end, const char *region);
 	template<typename R, typename W> void install_memory(offs_t start, offs_t end, R rhandler, W whandler)
 	{
 		install_space(AS_ISA_MEM, start, end, rhandler, whandler);
