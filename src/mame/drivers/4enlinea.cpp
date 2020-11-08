@@ -743,6 +743,18 @@ ROM_START( k7_olym )
 	ROM_LOAD( "b1_gal16v8a.ic4",  0x0117, 0x0117, NO_DUMP ) // protected
 ROM_END
 
+ROM_START( k7_olym30 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dardos_k7_3.0_21-11-94_27c512.ic19", 0x00000, 0x10000,  CRC(87af55a6) SHA1(7d12ce7afe8a50ba895f05029c1bd05a3641f7fd) )
+
+	ROM_REGION( 0x0800, "eeprom", 0 )
+	ROM_LOAD( "x24c16p.bin", 0x0000, 0x0800, NO_DUMP )
+
+	ROM_REGION( 0x0300, "plds", 0 )
+	ROM_LOAD( "a1_gal16v8a.ic11", 0x0000, 0x0117, NO_DUMP ) // protected
+	ROM_LOAD( "b1_gal16v8a.ic4",  0x0117, 0x0117, NO_DUMP ) // protected
+ROM_END
+
 
 ROM_START( sprtdart )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -762,7 +774,8 @@ ROM_END
 ***********************************/
 
 //    YEAR  NAME      PARENT    MACHINE    INPUT     CLASS            INIT        ROT   COMPANY                                      FULLNAME                       FLAGS
-GAME( 1991, 4enlinea, 0,        _4enlinea, 4enlinea, _4enlinea_state, empty_init, ROT0, "Compumatic / CIC Play",                     "Cuatro en Linea (rev. A-07)", MACHINE_NOT_WORKING )
-GAME( 1991, 4enlineb, 4enlinea, _4enlinea, 4enlinea, _4enlinea_state, empty_init, ROT0, "Compumatic / CIC Play",                     "Cuatro en Linea (rev. A-06)", MACHINE_NOT_WORKING )
-GAME( 1994, k7_olym,  0,        k7_olym,   k7_olym,  _4enlinea_state, empty_init, ROT0, "K7 Kursaal",                                "Olympic Darts (K7)",          MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
-GAME( 1993, sprtdart, 0,        k7_olym,   k7_olym,  _4enlinea_state, empty_init, ROT0, "Compumatic / Desarrollos y Recambios S.L.", "Sport Dart TV",               MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1991, 4enlinea,  0,        _4enlinea, 4enlinea, _4enlinea_state, empty_init, ROT0, "Compumatic / CIC Play",                     "Cuatro en Linea (rev. A-07)", MACHINE_NOT_WORKING )
+GAME( 1991, 4enlineb,  4enlinea, _4enlinea, 4enlinea, _4enlinea_state, empty_init, ROT0, "Compumatic / CIC Play",                     "Cuatro en Linea (rev. A-06)", MACHINE_NOT_WORKING )
+GAME( 1994, k7_olym,   0,        k7_olym,   k7_olym,  _4enlinea_state, empty_init, ROT0, "K7 Kursaal / NMI Electronics",              "Olympic Darts K7 (v3.11)",    MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1994, k7_olym30, k7_olym,  k7_olym,   k7_olym,  _4enlinea_state, empty_init, ROT0, "K7 Kursaal / NMI Electronics",              "Olympic Darts K7 (v3.00)",    MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1993, sprtdart,  0,        k7_olym,   k7_olym,  _4enlinea_state, empty_init, ROT0, "Compumatic / Desarrollos y Recambios S.L.", "Sport Dart TV",               MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
