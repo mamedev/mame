@@ -186,8 +186,9 @@ ROM_START(mface3)
 	ROMX_LOAD("mf3_50_13.rom", 0x0000, 0x2000, CRC(2d594640) SHA1(5d74d2e2e5a537639da92ff120f8a6d86f474495), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v50fe", "V50 FE")
 	ROMX_LOAD("mf3_50_fe.rom", 0x0000, 0x2000, CRC(b5c00f28) SHA1(983699a07665186f498f5827f9b35c442c2178ba), ROM_BIOS(1))
-	// ROM_SYSTEM_BIOS(2, "vxx9a", "Hard Micro Multiface 3 clone Vxx 9a")
-	// ROMX_LOAD("mf3_hm_9a.rom", 0x0000, 0x4000, CRC(2ce53095) SHA1(5fa286f1552f26575a14ab32125d59c26ce95978), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(2, "vxx9a", "Hard Micro Multiface 3 clone Vxx 9a")
+	ROMX_LOAD("mf3_hm_9a.rom", 0x0000, 0x2000, CRC(2ce53095) SHA1(5fa286f1552f26575a14ab32125d59c26ce95978), ROM_BIOS(2))
+	ROM_IGNORE(0x2000) // ROM is 16K, but contains two identical 8K halves
 ROM_END
 
 ROM_START(mprint)
