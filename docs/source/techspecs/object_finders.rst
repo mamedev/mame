@@ -73,7 +73,9 @@ its own child devices, inputs and ROM region.  The code samples here are based
 on the Apple II Parallel Printer Interface card, but a lot of things have been
 removed for clarity.
 
-Object finders are declared as members of the device class::
+Object finders are declared as members of the device class:
+
+.. code-block:: C++
 
     class a2bus_parprn_device : public device_t, public device_a2bus_card_interface
     {
@@ -98,7 +100,9 @@ Object finders are declared as members of the device class::
 We want to find a ``centronics_device``, an ``output_latch_device``, an I/O
 port, and an 8-bit memory region.
 
-In the constructor, we set the initial target for the object finders::
+In the constructor, we set the initial target for the object finders:
+
+.. code-block:: C++
 
     a2bus_parprn_device::a2bus_parprn_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
         device_t(mconfig, A2BUS_PARPRN, tag, owner, clock),
@@ -121,7 +125,9 @@ ensure the tag string remains valid until after validation and/or object
 resolution is complete.
 
 The memory region and I/O port come from the ROM definition and input
-definition, respectively::
+definition, respectively:
+
+.. code-block:: C++
 
     namespace {
 
@@ -164,7 +170,9 @@ Note that the tags ``"prom"`` and ``"CFG"`` match the tags passed to the object
 finders on construction.
 
 Child devices are instantiated in the device’s machine configuration member
-function::
+function:
+
+.. code-block:: C++
 
     void a2bus_parprn_device::device_add_mconfig(machine_config &config)
     {
@@ -183,7 +191,9 @@ its base device must be the same as the device being configured (the ``this``
 pointer of the machine configuration member function).
 
 After the emulated machine has been started, the object finders can be used in
-much the same way as pointers::
+much the same way as pointers:
+
+.. code-block:: C++
 
     void a2bus_parprn_device::write_c0nx(u8 offset, u8 data)
     {
@@ -209,7 +219,9 @@ Connections between devices
 
 Devices need to be connected together within a system.  For example the Sun SBus
 device needs access to the host CPU and address space.  Here’s how we declare
-the object finders in the device class (with all distractions removed)::
+the object finders in the device class (with all distractions removed):
+
+.. code-block:: C++
 
     DECLARE_DEVICE_TYPE(SBUS, sbus_device)
 
@@ -346,7 +358,9 @@ finder array types are provided.  The object finder array type names have
 | memory_share_creator   | memory_share_array_creator   |
 +------------------------+------------------------------+
 
-A common case for an object array finder is a key matrix::
+A common case for an object array finder is a key matrix:
+
+.. code-block:: C++
 
     class keyboard_base : public device_t, public device_mac_keyboard_interface
     {
@@ -383,7 +397,9 @@ underlying object finder type.  It supports indexing, iterators, and range-based
 ``for`` loops.
 
 Because an index offset is specified, the tags don’t need to use zero-based
-indices.  It’s common to use one-based indexing like this::
+indices.  It’s common to use one-based indexing like this:
+
+.. code-block:: C++
 
     class dooyong_state : public driver_device
     {
@@ -404,7 +420,9 @@ This causes ``m_bg`` to find devices with tags ``bg1`` and ``bg2``, while
 into the object finder arrays are still zero-based like any other C array.
 
 It’s also possible to other format conversions, like hexadecimal (``%x`` and
-``%X``) or character (``%c``)::
+``%X``) or character (``%c``):
+
+.. code-block:: C++
 
     class eurit_state : public driver_device
     {
@@ -423,7 +441,9 @@ In this case, the key matrix ports use tags ``KEYA``, ``KEYB``, ``KEYC``,
 ``KEYD`` and ``KEYE``.
 
 When the tags don’t follow a simple ascending sequence, you can supply a
-brace-enclosed initialiser list of tags::
+brace-enclosed initialiser list of tags:
+
+.. code-block:: C++
 
     class seabattl_state : public driver_device
     {
@@ -440,20 +460,223 @@ brace-enclosed initialiser list of tags::
 
 If the underlying object finders require additional constructor arguments,
 supply them after the tag format and index offset (the same values will be used
-for all elements of the array)::
+for all elements of the array):
+
+.. code-block:: C++
 
     class dreamwld_state : public driver_device
     {
     public:
-	dreamwld_state(const machine_config &mconfig, device_type type, const char *tag) :
+        dreamwld_state(machine_config const &mconfig, device_type type, char const *tag) :
             driver_device(mconfig, type, tag),
             m_vram(*this, "vram_%u", 0U, 0x2000U, ENDIANNESS_BIG)
         {
         }
 
     private:
-	memory_share_array_creator<u16, 2> m_vram;
+        memory_share_array_creator<u16, 2> m_vram;
     };
 
 This finds or creates memory shares with tags ``vram_0`` and ``vram_1``, each of
 of which is 8 KiB organised as 4,096 big-Endian 16-bit words.
+
+
+Optional object finders
+-----------------------
+
+Optional object finders don’t raise an error if the target object isn’t found.
+This is useful in two situations: ``driver_device`` implementations (state
+classes) representing a family of systems where some components aren’t present
+in all configurations, and devices that can optionally use a resource.  Optional
+object finders provide additional member functions for testing whether the
+target object was found.
+
+Optional system components
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Often a class is used to represent a family of related systems.  If a component
+isn’t present in all configurations, it may be convenient to use an optional
+object finder to access it.  We’ll use the Sega X-board device as an example:
+
+.. code-block:: C++
+
+    class segaxbd_state : public device_t
+    {
+    protected:
+        segaxbd_state(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock) :
+            device_t(mconfig, type, tag, owner, clock),
+            m_soundcpu(*this, "soundcpu"),
+            m_soundcpu2(*this, "soundcpu2"),
+            m_segaic16vid(*this, "segaic16vid"),
+            m_pc_0(0),
+            m_lastsurv_mux(0),
+            m_adc_ports(*this, "ADC%u", 0),
+            m_mux_ports(*this, "MUX%u", 0)
+        {
+        }
+
+	optional_device<z80_device> m_soundcpu;
+	optional_device<z80_device> m_soundcpu2;
+	required_device<mb3773_device> m_watchdog;
+	required_device<segaic16_video_device> m_segaic16vid;
+        bool m_adc_reverse[8];
+        u8 m_pc_0;
+        u8 m_lastsurv_mux;
+        optional_ioport_array<8> m_adc_ports;
+        optional_ioport_array<4> m_mux_ports;
+    };
+
+The ``optional_device`` and ``optional_ioport_array`` members are declared and
+constructed in the usual way.  Before accessing the target object, we call an
+object finder’s ``found()`` member function to check whether it’s present in the
+system (the explicit cast-to-Boolean operator can be used for the same purpose):
+
+.. code-block:: C++
+
+    void segaxbd_state::pc_0_w(u8 data)
+    {
+        m_pc_0 = data;
+
+        m_watchdog->write_line_ck(BIT(data, 6));
+
+        m_segaic16vid->set_display_enable(data & 0x20);
+
+        if (m_soundcpu.found())
+            m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+        if (m_soundcpu2.found())
+            m_soundcpu2->set_input_line(INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+    }
+
+Optional I/O ports provide a convenience member function called ``read_safe``
+that reads the port value if present, or returns the supplied default value
+otherwise:
+
+.. code-block:: C++
+
+    u8 segaxbd_state::analog_r()
+    {
+        int const which = (m_pc_0 >> 2) & 7;
+        u8 value = m_adc_ports[which].read_safe(0x10);
+
+        if (m_adc_reverse[which])
+            value = 255 - value;
+
+        return value;
+    }
+
+    uint8_t segaxbd_state::lastsurv_port_r()
+    {
+        return m_mux_ports[m_lastsurv_mux].read_safe(0xff);
+    }
+
+The ADC ports return 0x10 (16 decimal) if they are not present, while the
+multiplexed digital ports return 0xff (255 decimal) if they are not present.
+Note that ``read_safe`` is a member of the ``optional_ioport`` itself, and not
+a member of the target ``ioport_port`` object (the ``optional_ioport`` is not
+dereferenced when using it).
+
+There are some disadvantages to using optional object finders:
+
+* There’s no way to distinguish between the target not being present, and the
+  target not being found due to mismatched tags, making it more error-prone.
+* Checking whether the target is present may use CPU branch prediction
+  resources, potentially hurting performance if it happens very frequently.
+
+Consider whether optional object finders are the best solution, or whether
+creating a derived class for the system with additional components is more
+appropriate.
+
+Optional resources
+~~~~~~~~~~~~~~~~~~
+
+Some devices can optionally use certain resources.  If the host system doesn’t
+supply them, the device will still function, although some functionality may not
+be available.  For example, the Virtual Boy cartridge slot responds to three
+address spaces, called EXP, CHIP and ROM.  If the host system will never use one
+or more of them, it doesn’t need to supply a place for the cartridge to install
+the corresponding handlers.  (For example a copier may only use the ROM space.)
+
+Let’s look at how this is implemented.  The Virtual Boy cartridge slot device
+declares ``optional_address_space`` members for the three address spaces,
+``offs_t`` members for the base addresses in these spaces, and inline member
+functions for configuring them:
+
+.. code-block:: C++
+
+    class vboy_cart_slot_device :
+            public device_t,
+            public device_image_interface,
+            public device_single_card_slot_interface<device_vboy_cart_interface>
+    {
+    public:
+        vboy_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0U);
+
+	template <typename T> void set_exp(T &&tag, int no, offs_t base)
+        {
+            m_exp_space.set_tag(std::forward<T>(tag), no);
+            m_exp_base = base;
+        }
+	template <typename T> void set_chip(T &&tag, int no, offs_t base)
+        {
+            m_chip_space.set_tag(std::forward<T>(tag), no);
+            m_chip_base = base;
+        }
+	template <typename T> void set_rom(T &&tag, int no, offs_t base)
+        {
+            m_rom_space.set_tag(std::forward<T>(tag), no);
+            m_rom_base = base;
+        }
+
+    protected:
+        virtual void device_start() override;
+
+    private:
+        optional_address_space m_exp_space;
+        optional_address_space m_chip_space;
+        optional_address_space m_rom_space;
+        offs_t m_exp_base;
+        offs_t m_chip_base;
+        offs_t m_rom_base;
+
+	device_vboy_cart_interface *m_cart;
+    };
+
+    DECLARE_DEVICE_TYPE(VBOY_CART_SLOT, vboy_cart_slot_device)
+
+The object finders are constructed with dummy values for the tags and space
+numbers (``finder_base::DUMMY_TAG`` and -1):
+
+.. code-block:: C++
+
+    vboy_cart_slot_device::vboy_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+        device_t(mconfig, VBOY_CART_SLOT, tag, owner, clock),
+        device_image_interface(mconfig, *this),
+        device_single_card_slot_interface<device_vboy_cart_interface>(mconfig, *this),
+        m_exp_space(*this, finder_base::DUMMY_TAG, -1, 32),
+        m_chip_space(*this, finder_base::DUMMY_TAG, -1, 32),
+        m_rom_space(*this, finder_base::DUMMY_TAG, -1, 32),
+        m_exp_base(0U),
+        m_chip_base(0U),
+        m_rom_base(0U),
+        m_cart(nullptr)
+    {
+    }
+
+To help detect configuration errors, we’ll check for cases where address spaces
+have been configured but aren’t present:
+
+.. code-block:: C++
+
+    void vboy_cart_slot_device::device_start()
+    {
+        if (!m_exp_space && ((m_exp_space.finder_tag() != finder_base::DUMMY_TAG) || (m_exp_space.spacenum() >= 0)))
+            throw emu_fatalerror("%s: Address space %d of device %s not found (EXP)\n", tag(), m_exp_space.spacenum(), m_exp_space.finder_tag());
+
+        if (!m_chip_space && ((m_chip_space.finder_tag() != finder_base::DUMMY_TAG) || (m_chip_space.spacenum() >= 0)))
+            throw emu_fatalerror("%s: Address space %d of device %s not found (CHIP)\n", tag(), m_chip_space.spacenum(), m_chip_space.finder_tag());
+
+        if (!m_rom_space && ((m_rom_space.finder_tag() != finder_base::DUMMY_TAG) || (m_rom_space.spacenum() >= 0)))
+            throw emu_fatalerror("%s: Address space %d of device %s not found (ROM)\n", tag(), m_rom_space.spacenum(), m_rom_space.finder_tag());
+
+        m_cart = get_card_device();
+    }

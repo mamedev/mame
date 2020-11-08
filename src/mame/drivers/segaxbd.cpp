@@ -477,7 +477,7 @@ WRITE_LINE_MEMBER(segaxbd_state::timer_irq_w)
 uint8_t segaxbd_state::analog_r()
 {
 	// on the write, latch the selected input port and stash the value
-	int which = (m_pc_0 >> 2) & 7;
+	const int which = (m_pc_0 >> 2) & 7;
 	uint8_t value = m_adc_ports[which].read_safe(0x10);
 
 	// reverse some port values
