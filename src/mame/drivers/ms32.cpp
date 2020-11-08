@@ -647,10 +647,10 @@ void ms32_state::ms32_map(address_map &map)
 //  map(0xc0008000, 0xc01fffff) // mirrors of nvramram, handled above
 
 //	0xfd180000 Priority RAM (8-bits wide, 0x2000 in size)
-	map(0xc1180000, 0xc1187fff).rw(FUNC(ms32_state::ms32_priram_r8), FUNC(ms32_state::ms32_priram_w8)).umask32(0x000000ff).mirror(0x3c038000).share("priram");
+	map(0xc1180000, 0xc1187fff).rw(FUNC(ms32_state::ms32_priram_r8), FUNC(ms32_state::ms32_priram_w8)).umask32(0x000000ff).mirror(0x3c038000);
 //  map(0xc1188000, 0xc11bffff) // mirrors of priram, handled above
 
-//	0xfd200000 ???
+//	0xfd200000 palette related, unknown
 //	0xfd400000 paletteram (16-bits wide, 0x20000 in size)
 //	0xfd400000 object palette
 //	0xfd408000 Background palette
@@ -661,24 +661,24 @@ void ms32_state::ms32_map(address_map &map)
 //  map(0xc1440000, 0xc145ffff) // mirrors of palram, handled above
 
 //	0xfe000000 ROZ1 VRAM (16-bits wide, 0x10000 in size)
-	map(0xc2000000, 0xc201ffff).rw(FUNC(ms32_state::ms32_rozram_r16), FUNC(ms32_state::ms32_rozram_w16)).umask32(0x0000ffff).mirror(0x3c1e0000).share("rozram");
+	map(0xc2000000, 0xc201ffff).rw(FUNC(ms32_state::ms32_rozram_r16), FUNC(ms32_state::ms32_rozram_w16)).umask32(0x0000ffff).mirror(0x3c1e0000);
 //  map(0xc2020000, 0xc21fffff) // mirrors of rozram, handled above 
 
 //	0xfe200000 ROZ1 line RAM (16-bits wide, 0x1000 in size)
-	map(0xc2200000, 0xc2201fff).rw(FUNC(ms32_state::ms32_lineram_r16), FUNC(ms32_state::ms32_lineram_w16)).umask32(0x0000ffff).mirror(0x3c1fe000).share("lineram");
+	map(0xc2200000, 0xc2201fff).rw(FUNC(ms32_state::ms32_lineram_r16), FUNC(ms32_state::ms32_lineram_w16)).umask32(0x0000ffff).mirror(0x3c1fe000);
 //  map(0xc2202000, 0xc23fffff) // mirrors of lineram, handled above
 
 //	0xfe400000 ROZ0 VRAM?
 //	0xfe600000 ROZ0 line RAM?
-//	0xfe800000 object layer VRAM (16-bits wide, 0x20000 in size)
-	map(0xc2800000, 0xc281ffff).rw(FUNC(ms32_state::ms32_sprram_r16), FUNC(ms32_state::ms32_sprram_w16)).umask32(0x0000ffff).mirror(0x3c1e0000).share("sprram");
+//	0xfe800000 object layer VRAM (16-bits wide, 0x10000 in size)
+	map(0xc2800000, 0xc281ffff).rw(FUNC(ms32_state::ms32_sprram_r16), FUNC(ms32_state::ms32_sprram_w16)).umask32(0x0000ffff).mirror(0x3c1e0000);
 //  map(0xc2820000, 0xc29fffff) // mirrors of sprram, handled above
 
 //	0xfec00000 ASCII layer VRAM (16-bits wide, 0x4000 in size)
-	map(0xc2c00000, 0xc2c07fff).rw(FUNC(ms32_state::ms32_txram_r16), FUNC(ms32_state::ms32_txram_w16)).umask32(0x0000ffff).mirror(0x3c1f0000).share("txram");
+	map(0xc2c00000, 0xc2c07fff).rw(FUNC(ms32_state::ms32_txram_r16), FUNC(ms32_state::ms32_txram_w16)).umask32(0x0000ffff).mirror(0x3c1f0000);
 
 //	0xfec08000 Background layer VRAM (16-bits wide, 0x4000 in size)
-	map(0xc2c08000, 0xc2c0ffff).rw(FUNC(ms32_state::ms32_bgram_r16), FUNC(ms32_state::ms32_bgram_w16)).umask32(0x0000ffff).mirror(0x3c1f0000).share("bgram");
+	map(0xc2c08000, 0xc2c0ffff).rw(FUNC(ms32_state::ms32_bgram_r16), FUNC(ms32_state::ms32_bgram_w16)).umask32(0x0000ffff).mirror(0x3c1f0000);
 //  map(0xc2c10000, 0xc2dfffff) // mirrors of txram / bg, handled above
 
 //	0xfee00000 Scratch RAM
@@ -758,7 +758,7 @@ void ms32_state::f1superb_map(address_map &map)
 	map(0xfd140000, 0xfd143fff).ram(); // used when you start enabling fpu ints
 	map(0xfd144000, 0xfd145fff).ram(); // same data here
 
-	map(0xfdc00000, 0xfdc1ffff).rw(FUNC(ms32_state::ms32_extra_r16), FUNC(ms32_state::ms32_extra_w16)).umask32(0x0000ffff).share("f1sb_extraram"); // definitely line ram
+	map(0xfdc00000, 0xfdc1ffff).rw(FUNC(ms32_state::ms32_extra_r16), FUNC(ms32_state::ms32_extra_w16)).umask32(0x0000ffff); // definitely line ram
 	map(0xfde00000, 0xfde1ffff).ram(); // scroll info for lineram?
 }
 

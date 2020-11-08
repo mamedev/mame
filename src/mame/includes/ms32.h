@@ -32,14 +32,14 @@ public:
 		m_tx_scroll(*this, "tx_scroll"),
 		m_bg_scroll(*this, "bg_scroll"),
 		m_mahjong_input_select(*this, "mahjong_select"),
-		m_priram(*this, "priram"),
+		m_priram(*this, "priram",  0x2000, ENDIANNESS_LITTLE),
 		m_palram(*this, "palram", 0x20000, ENDIANNESS_LITTLE),
-		m_rozram(*this, "rozram"),
-		m_lineram(*this, "lineram"),
-		m_sprram(*this, "sprram"),
-		m_txram(*this, "txram"),
-		m_bgram(*this, "bgram"),
-		m_f1superb_extraram(*this, "f1sb_extraram"),
+		m_rozram(*this, "rozram", 0x10000, ENDIANNESS_LITTLE),
+		m_lineram(*this, "lineram", 0x1000, ENDIANNESS_LITTLE),
+		m_sprram(*this, "sprram", 0x10000, ENDIANNESS_LITTLE),
+		m_txram(*this, "txram", 0x4000, ENDIANNESS_LITTLE),
+		m_bgram(*this, "bgram", 0x4000, ENDIANNESS_LITTLE),
+		m_f1superb_extraram(*this, "f1sb_extraram", 0x10000, ENDIANNESS_LITTLE),
 		m_z80bank(*this, "z80bank%u", 1)
 	{ }
 
@@ -94,14 +94,14 @@ private:
 	optional_shared_ptr<u32> m_tx_scroll;
 	optional_shared_ptr<u32> m_bg_scroll;
 	optional_shared_ptr<u32> m_mahjong_input_select;
-	optional_shared_ptr<u8> m_priram;
+	memory_share_creator<u8> m_priram;
 	memory_share_creator<u16> m_palram;
-	optional_shared_ptr<u16> m_rozram;
-	optional_shared_ptr<u16> m_lineram;
-	optional_shared_ptr<u16> m_sprram;
-	optional_shared_ptr<u16> m_txram;
-	optional_shared_ptr<u16> m_bgram;
-	optional_shared_ptr<u16> m_f1superb_extraram;
+	memory_share_creator<u16> m_rozram;
+	memory_share_creator<u16> m_lineram;
+	memory_share_creator<u16> m_sprram;
+	memory_share_creator<u16> m_txram;
+	memory_share_creator<u16> m_bgram;
+	memory_share_creator<u16> m_f1superb_extraram;
 
 	optional_memory_bank_array<2> m_z80bank;
 	std::unique_ptr<u8[]> m_nvram_8;

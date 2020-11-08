@@ -89,7 +89,7 @@ void ms32_state::video_start()
 	// tp2m32 doesn't set the brightness registers so we need sensible defaults
 	m_brt[0] = m_brt[1] = 0xffff;
 	m_sprite_ctrl[0x10/4] = 0x8000;
-	
+
 	save_pointer(NAME(m_sprram_buffer), size);
 	save_item(NAME(m_irqreq));
 	save_item(NAME(m_temp_bitmap_tilemaps));
@@ -445,8 +445,8 @@ u32 ms32_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 				u8 src_tilepri = srcptr_tilepri[xx];
 				u16 src_spri = srcptr_spri[xx];
 				//u8 src_spripri;// = srcptr_spripri[xx];
-				u16 spridat = ((src_spri&0x0fff));
-				u8  spritepri =     ((src_spri&0xf000) >> 8);
+				u16 spridat = (src_spri & 0x0fff);
+				u8  spritepri = ((src_spri & 0xf000) >> 8);
 				int primask = 0;
 
 				// get sprite priority value back out of bitmap/colour data (this is done in draw_sprite for standalone hw)
