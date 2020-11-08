@@ -79,7 +79,6 @@ private:
 	u8 m_dotclock_setting;
 	inline u32 get_dotclock_frequency();
 	bool m_flip_screen_state;
-	inline u16 clamp_to_12bits_neg(u16 raw_data);
 	struct {
 		u16 horz_blank, horz_display, vert_blank, vert_display;
 	}m_crtc;

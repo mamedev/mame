@@ -1751,7 +1751,6 @@ void tetrisp2_state::rockn2(machine_config &config)
 	/* video hardware */
 	constexpr XTAL pixel_clock = XTAL(48'000'000)/8;
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	// TODO: during POST it sets up a vertical size of 487, is it trying to setup an interlace setting?
     m_screen->set_raw(pixel_clock, 384, 0, 320, 263, 0, 224);
 	m_screen->set_screen_update(FUNC(tetrisp2_state::screen_update_rockntread));
 	m_screen->set_palette(m_palette);

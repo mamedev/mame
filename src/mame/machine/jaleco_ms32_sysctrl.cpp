@@ -181,10 +181,11 @@ void jaleco_ms32_sysctrl_device::device_timer(emu_timer &timer, device_timer_id 
 //  READ/WRITE HANDLERS
 //*****************************************************************************
 
-inline u16 jaleco_ms32_sysctrl_device::clamp_to_12bits_neg(u16 raw_data)
+static constexpr u16 clamp_to_12bits_neg(u16 raw_data)
 {
 	// each write has a 12 bit resolution, for both CRTC and timer interval
-	// TODO: nndmseal sets up bit 12, reason?
+	// TODO: nndmseal: on POST it sets up a 0x1000 for vblank_blank, possibly for screen disable?
+	// TODO: rockn2: on POST it sets up a vertical size of 487, is it trying to setup an interlace setting?
 	return 0x1000 - (raw_data & 0xfff);
 }
 
