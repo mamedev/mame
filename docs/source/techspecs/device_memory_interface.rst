@@ -57,7 +57,8 @@ describing its configuration.  Some examples to look up when needed:
   `v60_device <https://git.redump.net/mame/tree/src/devices/cpu/v60/v60.cpp?h=mame0226>`_
 * Conditional ``AS_OPCODES``:
   `z80_device <https://git.redump.net/mame/tree/src/devices/cpu/z80/z80.cpp?h=mame0226>`_
-* Inherit configuration and add a space: m6801_device
+* Inherit configuration and add a space:
+  `hd647180x_device <https://git.redump.net/mame/tree/src/devices/cpu/z180/hd647180x.cpp?h=mame0226>`_
 * Inherit configuration and modify a space:
   `tmpz84c011_device <https://git.redump.net/mame/tree/src/devices/cpu/z80/tmpz84c011.cpp?h=mame0226>`_
 

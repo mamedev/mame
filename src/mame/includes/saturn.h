@@ -85,7 +85,7 @@ protected:
 	attotime  m_sinit_boost_timeslice;
 
 	struct {
-		uint16_t    **framebuffer_display_lines;
+		std::unique_ptr<uint16_t * []> framebuffer_display_lines;
 		int       framebuffer_mode;
 		int       framebuffer_double_interlace;
 		int       fbcr_accessed;
@@ -96,9 +96,9 @@ protected:
 		int       framebuffer_clear_on_next_frame;
 		rectangle system_cliprect;
 		rectangle user_cliprect;
-		std::unique_ptr<uint16_t[]>   framebuffer[2];
-		uint16_t    **framebuffer_draw_lines;
-		std::unique_ptr<uint8_t[]>     gfx_decode;
+		std::unique_ptr<uint16_t []> framebuffer[2];
+		std::unique_ptr<uint16_t * []> framebuffer_draw_lines;
+		std::unique_ptr<uint8_t []> gfx_decode;
 		uint16_t    lopr;
 		uint16_t    copr;
 		uint16_t    ewdr;
