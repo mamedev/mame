@@ -296,7 +296,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="ffrevng10" supported="no" cloneof="ffrevenge">
+	<software name="ffrevng10" supported="no" cloneof="ffreveng">
 		<description>Final Fight Revenge / Final Revenge (JUET 990714 V1.000)</description>
 		<year>1999</year>
 		<publisher>Capcom</publisher>
