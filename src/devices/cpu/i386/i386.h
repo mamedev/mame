@@ -400,7 +400,7 @@ protected:
 	bool translate_address(int pl, int type, uint32_t *address, uint32_t *error);
 	void CHANGE_PC(uint32_t pc);
 	inline void NEAR_BRANCH(int32_t offs);
-	inline uint8_t FETCH();
+	virtual uint8_t FETCH();
 	inline uint16_t FETCH16();
 	inline uint32_t FETCH32();
 	inline uint8_t READ8(uint32_t ea) { return READ8PL(ea, m_CPL); }
@@ -1568,9 +1568,18 @@ protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_reset() override;
-	address_space_config m_io_config;
+	address_space_config m_386ex_io_config;
+
+	device_memory_interface::space_config_vector memory_space_config() const override
+	{
+	       return space_config_vector {
+		       std::make_pair(AS_PROGRAM, &m_program_config),
+		       std::make_pair(AS_IO,      &m_386ex_io_config)
+	       };
+	}
 
 private:
+	virtual uint8_t FETCH() override;
 	uint16_t m_INTCFG;
 	uint16_t m_CS_address[8];
 	uint16_t m_CS_mask[8];

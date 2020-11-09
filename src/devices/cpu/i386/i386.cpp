@@ -72,7 +72,7 @@ i386sx_device::i386sx_device(const machine_config &mconfig, const char *tag, dev
 
 i386ex_device::i386ex_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i386_device(mconfig, I386EX, tag, owner, clock, 16, 26, 16)
-        , m_io_config("io", ENDIANNESS_LITTLE, 16, 16, 0)
+        , m_386ex_io_config("io", ENDIANNESS_LITTLE, 16, 16, 0)
 	, m_uart0(*this, "uart0")
 	, m_uart1(*this, "uart1")
 	, m_pit(*this, "pit")
@@ -585,6 +585,28 @@ void i386_device::NEAR_BRANCH(int32_t offs)
 	m_eip += offs;
 	m_pc += offs;
 }
+
+uint8_t i386ex_device::FETCH()
+{
+	uint8_t value;
+	uint16_t value16;
+	uint32_t address = m_pc, error;
+
+	if(!translate_address(m_CPL,TRANSLATE_FETCH,&address,&error))
+		PF_THROW(error);
+
+//	value16 = mem_pr16((address & m_a20_mask) >> 1);
+	value16 = 0xabcd;
+	value = (value16 >> (8*(address%2))) & 0xff;
+#ifdef DEBUG_MISSING_OPCODE
+	m_opcode_bytes[m_opcode_bytes_length] = value;
+	m_opcode_bytes_length = (m_opcode_bytes_length + 1) & 15;
+#endif
+	m_eip++;
+	m_pc++;
+	return value;
+}
+
 
 uint8_t i386_device::FETCH()
 {
