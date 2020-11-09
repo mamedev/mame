@@ -208,7 +208,7 @@ uint8_t ie15_device::kb_s_red_r()
 // active high; active = setup mode
 uint8_t ie15_device::kb_s_sdv_r()
 {
-	return m_kb_control & ie15_keyboard_device::IE_KB_SDV ? IE_TRUE : 0;
+	return m_kbd_sdv ? IE_TRUE : 0;
 }
 
 // active high; active = keypress detected on aux keypad
@@ -365,6 +365,7 @@ void ie15_device::flag_w(offs_t offset, uint8_t data)
 		break;
 	case 4:
 		m_kb_ruslat = data;
+		m_keyboard->set_ruslat(!!data);
 		break;
 	default:
 		break;
@@ -470,6 +471,11 @@ void ie15_device::kbd_put(uint16_t data)
 	}
 }
 
+WRITE_LINE_MEMBER( ie15_device::kbd_sdv )
+{
+	m_kbd_sdv = state;
+}
+
 void ie15_device::device_resolve_objects()
 {
 	m_rs232_conn_dtr_handler.resolve_safe();
@@ -503,6 +509,7 @@ void ie15_device::device_reset()
 	memset(&m_video, 0, sizeof(m_video));
 	m_kb_ruslat = m_long_beep = m_kb_control = m_kb_data = m_kb_flag0 = 0;
 	m_kb_flag = IE_TRUE;
+	m_kbd_sdv = false;
 
 	m_hblank = 1;
 	m_hblank_timer->adjust(m_screen->time_until_pos(0, IE15_HORZ_START));
@@ -603,7 +610,7 @@ void ie15_device::update_leds()
 	m_dup_led = BIT(data, ie15_keyboard_device::IE_KB_DUP_BIT) ^ 1;
 	m_lin_led = BIT(data, ie15_keyboard_device::IE_KB_LIN_BIT) ^ 1;
 	m_red_led = BIT(data, ie15_keyboard_device::IE_KB_RED_BIT) ^ 1;
-	m_sdv_led = BIT(m_kb_control, ie15_keyboard_device::IE_KB_SDV_BIT) ^ 1;
+	m_sdv_led = m_kbd_sdv ^ 1;
 	m_prd_led = 1; // XXX
 }
 
@@ -677,7 +684,9 @@ void ie15_device::ie15core(machine_config &config)
 	config.set_default_layout(layout_ie15);
 
 	/* Devices */
-	IE15_KEYBOARD(config, m_keyboard, 0).keyboard_cb().set(FUNC(ie15_device::kbd_put));
+	IE15_KEYBOARD(config, m_keyboard, 0);
+	m_keyboard->keyboard_cb().set(FUNC(ie15_device::kbd_put));
+	m_keyboard->sdv_cb().set(FUNC(ie15_device::kbd_sdv));
 
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 2400);
