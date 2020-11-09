@@ -16061,4 +16061,78 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="deathcrb">
+		<description>Death in the Caribbean</description>
+		<year>1983</year>
+		<publisher>Micro Fun</publisher>
+		<info name="release" value="2020-11-07"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234798">
+				<rom name="death in the caribbean side a.woz" size="234798" crc="6ea59a9b" sha1="8d63ae9bc2cabeeae3e56a763f14cef91035115c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234798">
+				<rom name="death in the caribbean side b.woz" size="234798" crc="af03363c" sha1="0fe806b9c68a9b2d47d626b32cadaab0f272a188"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brwdtime">
+		<description>Borrowed Time</description>
+		<year>1985</year>
+		<publisher>Activision</publisher>
+		<info name="release" value="2020-11-09"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234787">
+				<rom name="borrowed time side a.woz" size="234787" crc="0048da0f" sha1="a415e827eb2111260eadf73fc6d9e2d2df250b78"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234787">
+				<rom name="borrowed time side b.woz" size="234787" crc="17d975c7" sha1="26af7cbcf1b7bbcf7fd0ffdb47c5439de52855e7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cgclair">
+		<description>Cave Girl Clair</description>
+		<year>1984</year>
+		<publisher>Addison-Wesley</publisher>
+		<info name="release" value="2020-11-09"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234791">
+				<rom name="cave girl clair.woz" size="234791" crc="b6a09b11" sha1="780169fa88ff4e7d205715750d2e099a2f5c6dca"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="advkrist">
+		<description>The Adventures of Kristen and Her Family</description>
+		<year>1985</year>
+		<publisher>Rhiannon</publisher>
+		<info name="release" value="2020-11-09"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241436">
+				<rom name="the adventures of kristen and her family.woz" size="241436" crc="942f949f" sha1="b1e5280508e28b926cc613cfa336a7b387b86184"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
