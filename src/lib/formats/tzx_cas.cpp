@@ -304,16 +304,15 @@ static int tsx_msx_handle_block( int16_t **buffer, const uint8_t *bytes, int pau
 	int bit1_samples = tcycles_to_samplecount(bit1);
 	int data_index;
 	int size = 0;
-	int bit1_pulsos = (bitcfg & 0b00001111);
-	int bit0_pulsos = (bitcfg & 0b11110000) >> 4;
-	int valarranque = (bytecfg & 0b00100000) >> 5;
-	int bitsarranque = (bytecfg & 0b11000000) >> 6;
-	int valparada = (bytecfg & 0b00000100) >> 2;
-	int bitsparada = (bytecfg & 0b00011000) >> 3;
+	int bit1_pulses = (bitcfg & 0b00001111);
+	int bit0_pulses = (bitcfg & 0b11110000) >> 4;
+	int startvalue = (bytecfg & 0b00100000) >> 5;
+	int startbits = (bytecfg & 0b11000000) >> 6;
+	int stopvalue = (bytecfg & 0b00000100) >> 2;
+	int stopbits = (bytecfg & 0b00011000) >> 3;
 	
 
-	/* Uncomment this to include into error.log a fully detailed analysis of each block */
-//  LOG_FORMATS("tzx_cas_block_size: pilot_length = %d, pilot_samples = %d, sync1_samples = %d, sync2_samples = %d, bit0_samples = %d, bit1_samples = %d\n", pilot_length, pilot_samples, sync1_samples, sync2_samples, bit0_samples, bit1_samples);
+
 
 	/* PILOT */
 	for ( ; pilot_length > 0; pilot_length--)
@@ -325,24 +324,23 @@ static int tsx_msx_handle_block( int16_t **buffer, const uint8_t *bytes, int pau
 	
 	
 		/* data */
-	int bits_arranque = (valarranque & 0x01) ? bit1_samples : bit0_samples;
-	int bits_parada = (valparada & 0x01) ? bit1_samples : bit0_samples;
-	int multiarranque = bitsarranque * ((valarranque & 0x01) ? bit1_pulsos : bit0_pulsos)/2;
-	int multiparada = bitsparada* ((valparada & 0x01) ? bit1_pulsos : bit0_pulsos) / 2;
+	int start_bits = (startvalue & 0x01) ? bit1_samples : bit0_samples;
+	int stop_bits = (stopvalue & 0x01) ? bit1_samples : bit0_samples;
+	int multistart = startbits * ((startvalue & 0x01) ? bit1_pulses : bit0_pulses)/2;
+	int multistop = stopbits* ((stopvalue & 0x01) ? bit1_pulses : bit0_pulses) / 2;
 	for (data_index = 0; data_index < data_size; data_index++)
 	{
 		uint8_t byte = bytes[data_index];
-		//int bits_to_go = (data_index == (data_size - 1)) ? bits_in_last_byte : 8;
 		
 		
 		
-		for (int arranque = 0; arranque < multiarranque; arranque++)
+		for (int startloop = 0; startloop < multistart; startloop++)
 		{
-			tzx_output_wave(buffer, bits_arranque);
-			size += bits_arranque;
+			tzx_output_wave(buffer, start_bits);
+			size += start_bits;
 			toggle_wave_data();
-			tzx_output_wave(buffer, bits_arranque);
-			size += bits_arranque;
+			tzx_output_wave(buffer, start_bits);
+			size += start_bits;
 			toggle_wave_data();
 		}
 		
@@ -350,7 +348,7 @@ static int tsx_msx_handle_block( int16_t **buffer, const uint8_t *bytes, int pau
 		for (;bits_to_go > 0; (byte>>=1) , bits_to_go--)
 		{
 			int bit_samples = (byte & 0x01) ? bit1_samples : bit0_samples;
-			for (int pulsos = 0; pulsos < ((byte & 0x01) ? bit1_pulsos : bit0_pulsos)/2; pulsos++)
+			for (int pulsesloop = 0; pulsesloop < ((byte & 0x01) ? bit1_pulses : bit0_pulses)/2; pulsesloop++)
 			{
 				tzx_output_wave(buffer, bit_samples);
 				size += bit_samples;
@@ -362,13 +360,13 @@ static int tsx_msx_handle_block( int16_t **buffer, const uint8_t *bytes, int pau
 			
 			
 		}
-		for (int parada = 0; parada < multiparada; parada++)
+		for (int stoploop = 0; stoploop < multistop; stoploop++)
 		{
-			tzx_output_wave(buffer, bits_parada);
-			size += bits_parada;
+			tzx_output_wave(buffer, stop_bits);
+			size += stop_bits;
 			toggle_wave_data();
-			tzx_output_wave(buffer, bits_parada);
-			size += bits_parada;
+			tzx_output_wave(buffer, stop_bits);
+			size += stop_bits;
 			toggle_wave_data();
 		}
 	}
