@@ -16,13 +16,6 @@ DECLARE_DEVICE_TYPE(AGAT_KEYBOARD, agat_keyboard_device)
 
 
 /***************************************************************************
-    REUSABLE I/O PORTS
-***************************************************************************/
-
-INPUT_PORTS_EXTERN( agat_keyboard );
-
-
-/***************************************************************************
     TYPE DECLARATIONS
 ***************************************************************************/
 
@@ -30,25 +23,20 @@ INPUT_PORTS_EXTERN( agat_keyboard );
 class agat_keyboard_device : public device_t, protected device_matrix_keyboard_interface<6U>
 {
 public:
-	typedef device_delegate<void (u16 character)> output_delegate;
-
 	agat_keyboard_device(
 		const machine_config &mconfig,
 		const char *tag,
 		device_t *owner,
 		u32 clock);
 
-	template <typename... T>
-	void set_keyboard_callback(T &&... args)
-	{
-		m_keyboard_cb.set(std::forward<T>(args)...);
-	}
-
 	virtual ioport_constructor device_input_ports() const override;
 
+	auto out_callback() { return m_keyboard_cb.bind(); }
 	auto out_meta_callback() { return m_out_meta_cb.bind(); }
+	auto out_reset_callback() { return m_out_reset_cb.bind(); }
 
 	DECLARE_INPUT_CHANGED_MEMBER(meta_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(reset_changed);
 
 protected:
 	agat_keyboard_device(
@@ -61,22 +49,22 @@ protected:
 	virtual void device_reset() override;
 	virtual void key_make(u8 row, u8 column) override;
 	virtual void key_repeat(u8 row, u8 column) override;
-	virtual void send_key(u16 code);
-	virtual bool translate(u8 code, u16 &translated) const;
 
 	required_ioport m_modifiers;
 
 private:
 	virtual void will_scan_row(u8 row) override;
 
+	bool translate(u8 code, u16 &translated) const;
 	void send_translated(u8 code);
 	attotime typematic_delay() const;
 	attotime typematic_period() const;
 
 	bool			 m_meta;
 	u16              m_last_modifiers;
-	output_delegate  m_keyboard_cb;
+	devcb_write8     m_keyboard_cb;
 	devcb_write_line m_out_meta_cb;
+	devcb_write_line m_out_reset_cb;
 };
 
 #endif // MAME_MACHINE_AGATKEYB_H

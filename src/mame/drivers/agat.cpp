@@ -153,7 +153,7 @@ public:
 	uint8_t controller_strobe_r();
 	void controller_strobe_w(uint8_t data);
 
-	void kbd_put(u16 data);
+	void kbd_put(u8 data);
 	DECLARE_WRITE_LINE_MEMBER( kbd_meta );
 
 protected:
@@ -454,7 +454,7 @@ void agat9_state::machine_reset()
     I/O
 ***************************************************************************/
 
-void agat_base_state::kbd_put(u16 data)
+void agat_base_state::kbd_put(u8 data)
 {
 	if (!m_strobe)
 	{
@@ -1236,8 +1236,9 @@ void agat7_state::agat7(machine_config &config)
 	ADDRESS_MAP_BANK(config, m_upperbank).set_map(&agat7_state::inhbank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x3000);
 
 	agat_keyboard_device &keyboard(AGAT_KEYBOARD(config, "keyboard", 0));
-	keyboard.set_keyboard_callback(FUNC(agat_base_state::kbd_put));
+	keyboard.out_callback().set(FUNC(agat_base_state::kbd_put));
 	keyboard.out_meta_callback().set(FUNC(agat_base_state::kbd_meta));
+	keyboard.out_reset_callback().set([this](bool state) { m_maincpu->reset(); });
 
 	/*
 	 * slot 0 is reserved for SECAM encoder or Apple II compat card.
@@ -1281,8 +1282,9 @@ void agat9_state::agat9(machine_config &config)
 	ADDRESS_MAP_BANK(config, m_upperbank).set_map(&agat9_state::inhbank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x10000);
 
 	agat_keyboard_device &keyboard(AGAT_KEYBOARD(config, "keyboard", 0));
-	keyboard.set_keyboard_callback(FUNC(agat_base_state::kbd_put));
+	keyboard.out_callback().set(FUNC(agat_base_state::kbd_put));
 	keyboard.out_meta_callback().set(FUNC(agat_base_state::kbd_meta));
+	keyboard.out_reset_callback().set([this](bool state) { m_maincpu->reset(); });
 
 	A2BUS(config, m_a2bus, 0);
 	m_a2bus->set_space(m_maincpu, AS_PROGRAM);

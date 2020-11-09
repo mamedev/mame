@@ -21,6 +21,7 @@ INPUT_PORTS_START( agat_keyboard )
 	PORT_BIT(0x0001U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Ctrl")  PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL)             PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
 	PORT_BIT(0x0002U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT)   PORT_CODE(KEYCODE_RSHIFT)               PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x0004U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Meta")  PORT_CODE(KEYCODE_LALT)     PORT_CHAR(UCHAR_MAMEKEY(LALT)) PORT_CHANGED_MEMBER(DEVICE_SELF, agat_keyboard_device, meta_changed, 0)
+	PORT_BIT(0x0008U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F10)      PORT_CHAR(UCHAR_MAMEKEY(F10)) PORT_CHANGED_MEMBER(DEVICE_SELF, agat_keyboard_device, reset_changed, 0)
 
 	PORT_START("AGATKBD_ROW0")
 	PORT_BIT(0x0001U, IP_ACTIVE_HIGH, IPT_UNUSED   )
@@ -41,7 +42,7 @@ INPUT_PORTS_START( agat_keyboard )
 	PORT_BIT(0x8000U, IP_ACTIVE_HIGH, IPT_UNUSED   )
 
 	PORT_START("AGATKBD_ROW1")
-	PORT_BIT(0x0001U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Num 1")    PORT_CODE(KEYCODE_7_PAD) PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
+	PORT_BIT(0x0001U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Num 1") PORT_CODE(KEYCODE_7_PAD) PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
 	PORT_BIT(0x0002U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Num 2") PORT_CODE(KEYCODE_8_PAD) PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
 	PORT_BIT(0x0004U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Num 3") PORT_CODE(KEYCODE_9_PAD) PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
 	PORT_BIT(0x0008U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Num 4") PORT_CODE(KEYCODE_4_PAD) PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
@@ -158,6 +159,7 @@ agat_keyboard_device::agat_keyboard_device(
 	, m_last_modifiers(0U)
 	, m_keyboard_cb(*this)
 	, m_out_meta_cb(*this)
+	, m_out_reset_cb(*this)
 {
 }
 
@@ -178,12 +180,13 @@ void agat_keyboard_device::device_start()
 {
 	m_keyboard_cb.resolve();
 	m_out_meta_cb.resolve();
+	m_out_reset_cb.resolve();
 
 	save_item(NAME(m_last_modifiers));
+	save_item(NAME(m_meta));
 }
 
 
-// XXX add system reset
 void agat_keyboard_device::device_reset()
 {
 	reset_key_state();
@@ -208,18 +211,20 @@ void agat_keyboard_device::key_repeat(u8 row, u8 column)
 }
 
 
-void agat_keyboard_device::send_key(u16 code)
-{
-	m_keyboard_cb(code);
-}
-
-
 INPUT_CHANGED_MEMBER(agat_keyboard_device::meta_changed)
 {
 	if (oldval)
 	{
 		m_meta ^= 1;
 		m_out_meta_cb(m_meta);
+	}
+}
+
+INPUT_CHANGED_MEMBER(agat_keyboard_device::reset_changed)
+{
+	if ((m_modifiers->read() & 9) == 9)
+	{
+		m_out_reset_cb(true);
 	}
 }
 
@@ -264,7 +269,7 @@ void agat_keyboard_device::send_translated(u8 code)
 {
 	u16 translated;
 	if (translate(code, translated))
-		send_key(translated);
+		m_keyboard_cb(translated);
 }
 
 
