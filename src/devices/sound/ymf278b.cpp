@@ -264,10 +264,10 @@ void ymf278b_device::sound_stream_update(sound_stream &stream, std::vector<read_
 					case 1:
 						if (slot->stepptr & 0x10000)
 							sample = read_byte(slot->startaddr + (slot->stepptr>>17)*3+2)<<8 |
-								(read_byte(slot->startaddr + (slot->stepptr>>17)*3+1) << 4 & 0xf0);
+								(read_byte(slot->startaddr + (slot->stepptr>>17)*3+1) & 0xf0);
 						else
 							sample = read_byte(slot->startaddr + (slot->stepptr>>17)*3)<<8 |
-								(read_byte(slot->startaddr + (slot->stepptr>>17)*3+1) & 0xf0);
+								((read_byte(slot->startaddr + (slot->stepptr>>17)*3+1) << 4) & 0xf0);
 						break;
 
 					// 16 bit
