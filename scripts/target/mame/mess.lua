@@ -3590,6 +3590,7 @@ files {
 	MAME_DIR .. "src/mame/video/mz80.cpp",
 	MAME_DIR .. "src/mame/machine/mz80.cpp",
 	MAME_DIR .. "src/mame/drivers/mz2000.cpp",
+	MAME_DIR .. "src/mame/drivers/wizard.cpp",
 	MAME_DIR .. "src/mame/drivers/x1.cpp",
 	MAME_DIR .. "src/mame/includes/x1.h",
 	MAME_DIR .. "src/mame/machine/x1.cpp",

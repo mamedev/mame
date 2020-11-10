@@ -42158,6 +42158,9 @@ wiz                             // (c) 1985 Seibu Kaihatsu
 wizt                            // (c) 1985 Taito Corporation
 wizta                           // (c) 1985 Taito Corporation
 
+@source:wizard.cpp
+iq7000                          //
+
 @source:wmg.cpp
 wmg                             // Williams 6in1 Multigame, Clay Cowgill
 

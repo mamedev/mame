@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+
+<softwarelist name="wizard_cart" description="Sharp Wizard series cartridges">
+
+	<software name="3dssheet" supported="no">
+		<description>3 Dimensional Spreadsheet (IQ-8B01)</description>
+		<year>1990</year>
+		<publisher>PCSG</publisher>
+		<part name="cart" interface="wizard_cart">
+			<dataarea name="rom" size="0x20000">
+				<rom name="3dssheet.bin" size="0x20000" crc="c0440ad2" sha1="f7bb4eb99755ff0cc2496724e55d7be70552069a" />
+			</dataarea>
+			<dataarea name="sram" size="0x10000">
+				<rom name="3dssheet_sram.bin" size="0x10000" crc="25920e43" sha1="8581044402aca56da9147f13abd8a58af861c473" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="8ltransl" supported="no">
+		<description>8-Language Translator (IQ-703A)</description>
+		<year>1988</year>
+		<publisher>Sharp Corporation</publisher>
+		<part name="cart" interface="wizard_cart">
+			<dataarea name="rom" size="0x40000">
+				<rom name="8ltransl.bin" size="0x40000" crc="eb755572" sha1="bf2a43c30cdee042824f1ffb5063e23c183c5c29" />
+			</dataarea>
+			<dataarea name="sram" size="0x10000">
+				<rom name="8ltransl_sram.bin" size="0x10000" status="nodump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timeexpm" supported="no">
+		<description>Time Expense Manager (IQ-701A)</description>
+		<year>1988</year>
+		<publisher>Traveling Software, Inc.</publisher>
+		<part name="cart" interface="wizard_cart">
+			<dataarea name="rom" size="0x10000">
+				<rom name="timeexpm.bin" size="0x10000" crc="16d8d9e3" sha1="37eb163e86a0b57fc87c68d09e77020b26b217e5" />
+			</dataarea>
+			<dataarea name="sram" size="0x8000">
+				<rom name="timeexpm_sram.bin" size="0x8000" crc="f82cdc90" sha1="b0a2626c4d18a1b255548e0b1a61265b0aaa9656" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
