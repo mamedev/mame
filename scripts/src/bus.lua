@@ -2423,6 +2423,8 @@ if (BUSES["A2BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2bus/ssbapple.h",
 		MAME_DIR .. "src/devices/bus/a2bus/ssprite.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/ssprite.h",
+		MAME_DIR .. "src/devices/bus/a2bus/suprterminal.cpp",
+		MAME_DIR .. "src/devices/bus/a2bus/suprterminal.h",
 		MAME_DIR .. "src/devices/bus/a2bus/timemasterho.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/timemasterho.h",
 		MAME_DIR .. "src/devices/bus/a2bus/transwarp.cpp",
