@@ -9,7 +9,7 @@ license:CC0
 Known carts list
 
 SERIAL         | TITLE                                                   | DUMPED
----------------------------------------------------------------------------------
+_________________________________________________________________________________
 ?               Golfpac Practice Analysis Card                            NO
 ?               IQ-World                                                  NO
 ?               IQ Plus                                                   NO
@@ -54,10 +54,10 @@ IQ-8D01A        English Dictionary                                        NO
 
 
 Cart pinout
------------------------------------------------
+______________________________________________
 1  VCC      
-2  -----  NC    
-3  -----  NC    
+2  NC    
+3  NC    
 4  VBATT      
 5  VCC?  Connects to pin 9 of TSOP32  (unused)    
 6  A15      
@@ -90,15 +90,15 @@ Cart pinout
 33  /CE    EPROM  
 34  /WR      
 35  /OE      
-36  -----  NC    
+36  NC    
 37  gpio  A18?    
 38  gpio  A17    
 39  gpio  A16    
-40  -----  ----  \  NC
-41  -----  ----  /  NC
-42  -----  NC  GPIO  
-43  -----  NC  GPIO  
-44  -----  NC    
+40  \  NC
+41  /  NC
+42  NC  GPIO  
+43  NC  GPIO  
+44  NC    
 45  GND      
 
 -->
