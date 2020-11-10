@@ -69,7 +69,7 @@ void ms32_state::video_start()
 	m_bg_tilemap_alt = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_state::get_ms32_bg_tile_info)),  TILEMAP_SCAN_ROWS, 16,16, 256, 16); // alt layout, controller by register?
 	m_roz_tilemap    = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_state::get_ms32_roz_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 128,128);
 
-	m_objectram_size = m_sprram.bytes() / sizeof(m_sprram[0]);
+	m_objectram_size = m_sprram.length();
 	m_sprram_buffer = make_unique_clear<u16[]>(m_objectram_size);
 
 	/* set up tile layers */
@@ -91,7 +91,6 @@ void ms32_state::video_start()
 	m_sprite_ctrl[0x10/4] = 0x8000;
 
 	save_pointer(NAME(m_sprram_buffer), m_objectram_size);
-	save_item(NAME(m_irqreq));
 	save_item(NAME(m_temp_bitmap_tilemaps));
 	save_item(NAME(m_temp_bitmap_sprites));
 	save_item(NAME(m_temp_bitmap_sprites_pri));
@@ -344,10 +343,9 @@ u32 ms32_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 	   The two registers might be somewhat related to the width and height of the
 	   tilemaps, but there's something that just doesn't fit.
 	 */
-	int i;
 
 	// TODO: move to a cache system
-	for (i = 0; i < 0x10000; i++) // colors 0x3000-0x3fff are not used
+	for (int i = 0; i < m_palette->entries(); i++) // colors 0x3000-0x3fff are not used
 		update_color(i);
 
 	scrollx = m_tx_scroll[0x00/4] + m_tx_scroll[0x08/4] + 0x18;

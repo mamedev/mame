@@ -100,11 +100,12 @@ ROMs    : MR96004-10.1  [125661cd] (IC5 - Samples)
 #include "tilemap.h"
 
 
-class ms32_bnstars_state : public ms32_state
+class ms32_bnstars_state : public ms32_base_state
 {
 public:
 	ms32_bnstars_state(const machine_config &mconfig, device_type type, const char *tag)
-		: ms32_state(mconfig, type, tag)
+		: ms32_base_state(mconfig, type, tag)
+		, m_sysctrl(*this, "sysctrl")
 		, m_ms32_tx0_ram(*this, "tx0_ram", 0x4000, ENDIANNESS_LITTLE)
 		, m_ms32_tx1_ram(*this, "tx1_ram", 0x4000, ENDIANNESS_LITTLE)
 		, m_ms32_bg0_ram(*this, "bg0_ram", 0x4000, ENDIANNESS_LITTLE)
@@ -120,7 +121,7 @@ public:
 		, m_ms32_bg1_scroll(*this, "bg1_scroll")
 		, m_p1_keys(*this, "P1KEY.%u", 0)
 		, m_p2_keys(*this, "P2KEY.%u", 0)
-//		, m_screen(*this, "lscreen")
+		, m_screen(*this, "screen")
 		, m_right_screen(*this, "rscreen")
 	{ }
 
@@ -132,6 +133,8 @@ public:
 
 private:
 
+	// TODO: subclass the device for dual screen config
+	required_device<jaleco_ms32_sysctrl_device> m_sysctrl;
 	tilemap_t *m_ms32_tx_tilemap[2];
 	tilemap_t *m_ms32_bg_tilemap[2];
 	tilemap_t *m_ms32_roz_tilemap[2];
@@ -151,7 +154,7 @@ private:
 
 	required_ioport_array<4> m_p1_keys;
 	required_ioport_array<4> m_p2_keys;
-//	required_device<screen_device> m_screen;
+	required_device<screen_device> m_screen;
 	required_device<screen_device> m_right_screen;
 
 	u32 m_bnstars1_mahjong_select;
@@ -462,8 +465,7 @@ CUSTOM_INPUT_MEMBER(ms32_bnstars_state::mahjong_ctrl_r)
 {
 	required_ioport_array<4> &keys = (P == 0) ? m_p1_keys : m_p2_keys;
 	// different routing than main ms32.cpp, using 0x2080 as mask
-	u8 which = (BIT(m_bnstars1_mahjong_select, 13) << 1) | 
-				BIT(m_bnstars1_mahjong_select, 7);
+	u8 which = bitswap<2>(m_bnstars1_mahjong_select, 13, 7);
 	return keys[which]->read();
 }
 
@@ -533,7 +535,7 @@ void ms32_bnstars_state::bnstars_sound_map(address_map &map)
 	map(0x3f10, 0x3f10).rw(FUNC(ms32_bnstars_state::latch_r), FUNC(ms32_bnstars_state::to_main_w));
 	map(0x3f20, 0x3f2f).rw("ymf1", FUNC(ymf271_device::read), FUNC(ymf271_device::write));
 	map(0x3f40, 0x3f40).nopw();   /* YMF271 pin 4 (bit 1) , YMF271 pin 39 (bit 4) */
-	map(0x3f70, 0x3f70).nopw();   // watchdog? banking? very noisy
+	map(0x3f70, 0x3f70).nopw();   // watchdog?
 	map(0x3f80, 0x3f80).w(FUNC(ms32_bnstars_state::ms32_snd_bank_w));
 	map(0x4000, 0x7fff).ram();
 	map(0x8000, 0xbfff).bankr("z80bank1");
@@ -703,7 +705,7 @@ void ms32_bnstars_state::bnstars(machine_config &config)
 {
 	V70(config, m_maincpu, XTAL(40'000'000)/2); // 20MHz (40MHz / 2)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ms32_bnstars_state::bnstars_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(ms32_state::irq_callback));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(ms32_bnstars_state::irq_callback));
 
 	Z80(config, m_audiocpu, XTAL(8'000'000)); // 8MHz present on sound PCB, Verified
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ms32_bnstars_state::bnstars_sound_map);

@@ -521,7 +521,7 @@ u32 ms32_state::ms32_read_inputs3()
 }
 
 
-void ms32_state::sound_command_w(u32 data)
+void ms32_base_state::sound_command_w(u32 data)
 {
 	m_soundlatch->write(data & 0xff);
 
@@ -529,7 +529,7 @@ void ms32_state::sound_command_w(u32 data)
 	m_maincpu->spin_until_time(attotime::from_usec(40));
 }
 
-u32 ms32_state::sound_result_r()
+u32 ms32_base_state::sound_result_r()
 {
 	return m_to_main^0xff;
 }
@@ -681,10 +681,10 @@ void ms32_state::ms32_map(address_map &map)
 	map(0xc2c08000, 0xc2c0ffff).rw(FUNC(ms32_state::ms32_bgram_r16), FUNC(ms32_state::ms32_bgram_w16)).umask32(0x0000ffff).mirror(0x3c1f0000);
 //  map(0xc2c10000, 0xc2dfffff) // mirrors of txram / bg, handled above
 
-//	0xfee00000 Scratch RAM
-	map(0xc2e00000, 0xc2e1ffff).ram().share("mainram").mirror(0x3c0e0000); 		// mainram is 32-bit wide, 0x20000 in size
-//	0xffc00000 ROM
-	map(0xc3e00000, 0xc3ffffff).rom().region("maincpu", 0).mirror(0x3c000000); 	// ROM is 32-bit wide, 0x200000 in size
+//	0xfee00000 Scratch RAM (32-bit wide, 0x20000 in size)
+	map(0xc2e00000, 0xc2e1ffff).ram().mirror(0x3c0e0000);
+//	0xffc00000 ROM (32-bit wide, 0x200000 in size)
+	map(0xc3e00000, 0xc3ffffff).rom().region("maincpu", 0).mirror(0x3c000000);
 
 	// I/O section
 	// TODO: mirrors like above?
@@ -1621,7 +1621,7 @@ GFXDECODE_END
 */
 
 
-IRQ_CALLBACK_MEMBER(ms32_state::irq_callback)
+IRQ_CALLBACK_MEMBER(ms32_base_state::irq_callback)
 {
 	int i;
 	for(i=15; i>=0 && !(m_irqreq & (1<<i)); i--);
@@ -1631,37 +1631,37 @@ IRQ_CALLBACK_MEMBER(ms32_state::irq_callback)
 	return i;
 }
 
-void ms32_state::irq_init()
+void ms32_base_state::irq_init()
 {
 	m_irqreq = 0;
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-void ms32_state::irq_raise(int level)
+void ms32_base_state::irq_raise(int level)
 {
 	m_irqreq |= (1<<level);
 	m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(ms32_state::timer_irq_w)
+WRITE_LINE_MEMBER(ms32_base_state::timer_irq_w)
 {
 	if (state)
 		irq_raise(0);
 }
 
-WRITE_LINE_MEMBER(ms32_state::vblank_irq_w)
+WRITE_LINE_MEMBER(ms32_base_state::vblank_irq_w)
 {
 	if (state)
 		irq_raise(10);
 }
 
-WRITE_LINE_MEMBER(ms32_state::field_irq_w)
+WRITE_LINE_MEMBER(ms32_base_state::field_irq_w)
 {
 	if (state)
 		irq_raise(9);
 }
 
-WRITE_LINE_MEMBER(ms32_state::sound_reset_line_w)
+WRITE_LINE_MEMBER(ms32_base_state::sound_reset_line_w)
 {
 	if (state)
 		m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
@@ -1691,18 +1691,18 @@ WRITE_LINE_MEMBER(ms32_state::sound_reset_line_w)
  code at $38 reads the 2nd command latch ??
 */
 
-u8 ms32_state::latch_r()
+u8 ms32_base_state::latch_r()
 {
 	return m_soundlatch->read()^0xff;
 }
 
-void ms32_state::ms32_snd_bank_w(u8 data)
+void ms32_base_state::ms32_snd_bank_w(u8 data)
 {
 	m_z80bank[0]->set_entry((data >> 0) & 0x0F);
 	m_z80bank[1]->set_entry((data >> 4) & 0x0F);
 }
 
-void ms32_state::to_main_w(u8 data)
+void ms32_base_state::to_main_w(u8 data)
 {
 	m_to_main=data;
 	irq_raise(1);
@@ -1726,7 +1726,12 @@ void ms32_state::ms32_sound_map(address_map &map)
 
 /********** MACHINE INIT **********/
 
-void ms32_state::machine_reset()
+void ms32_base_state::machine_start()
+{
+	save_item(NAME(m_irqreq));
+}
+
+void ms32_base_state::machine_reset()
 {
 	for (int bank = 0; bank < 2; bank++)
 		m_z80bank[bank]->set_entry(bank);
@@ -1763,7 +1768,7 @@ void ms32_state::ms32(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(ms32_state::screen_vblank));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ms32);
-	PALETTE(config, m_palette).set_entries(0x10000);
+	PALETTE(config, m_palette).set_entries(0x8000);
 
 	JALECO_MEGASYSTEM32_SPRITE(config, m_sprite, XTAL(48'000'000)/8);
 	m_sprite->set_palette(m_palette);
@@ -2622,7 +2627,7 @@ ROM_START( wpksocv2 )
 ROM_END
 
 
-void ms32_state::configure_banks()
+void ms32_base_state::configure_banks()
 {
 	save_item(NAME(m_to_main));
 	for (int bank = 0; bank < 2; bank++)

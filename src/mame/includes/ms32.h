@@ -13,34 +13,72 @@
 #include "screen.h"
 #include "tilemap.h"
 
-class ms32_state : public driver_device
+class ms32_base_state : public driver_device
+{
+public:
+	ms32_base_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_soundlatch(*this, "soundlatch")
+		, m_z80bank(*this, "z80bank%u", 1)
+		, m_palette(*this, "palette")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_sprite(*this, "sprite")
+		, m_sprite_ctrl(*this, "sprite_ctrl")
+	{ }
+	
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_memory_bank_array<2> m_z80bank;
+	required_device<palette_device> m_palette;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<ms32_sprite_device> m_sprite;
+	required_shared_ptr<u32> m_sprite_ctrl;
+
+protected:
+	DECLARE_WRITE_LINE_MEMBER(timer_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(field_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(sound_reset_line_w);
+
+	void ms32_snd_bank_w(u8 data);
+	IRQ_CALLBACK_MEMBER(irq_callback);
+	void configure_banks();
+	u8 latch_r();
+	void to_main_w(u8 data);
+	u32 sound_result_r();
+	void sound_command_w(u32 data);
+	void irq_raise(int level);
+	void irq_init();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	u32 m_to_main;
+	u16 m_irqreq;
+};
+
+class ms32_state : public ms32_base_state
 {
 public:
 	ms32_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_palette(*this, "palette"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_sysctrl(*this, "sysctrl"),
-		m_sprite(*this, "sprite"),
-		m_soundlatch(*this, "soundlatch"),
-		m_sprite_ctrl(*this, "sprite_ctrl"),
-		m_screen(*this, "screen"),
-		m_mainram(*this, "mainram"),
-		m_roz_ctrl(*this, "roz_ctrl"),
-		m_tx_scroll(*this, "tx_scroll"),
-		m_bg_scroll(*this, "bg_scroll"),
-		m_mahjong_input_select(*this, "mahjong_select"),
-		m_priram(*this, "priram",  0x2000, ENDIANNESS_LITTLE),
-		m_palram(*this, "palram", 0x20000, ENDIANNESS_LITTLE),
-		m_rozram(*this, "rozram", 0x10000, ENDIANNESS_LITTLE),
-		m_lineram(*this, "lineram", 0x1000, ENDIANNESS_LITTLE),
-		m_sprram(*this, "sprram", 0x10000, ENDIANNESS_LITTLE),
-		m_txram(*this, "txram", 0x4000, ENDIANNESS_LITTLE),
-		m_bgram(*this, "bgram", 0x4000, ENDIANNESS_LITTLE),
-		m_f1superb_extraram(*this, "f1sb_extraram", 0x10000, ENDIANNESS_LITTLE),
-		m_z80bank(*this, "z80bank%u", 1)
+		ms32_base_state(mconfig, type, tag)
+		, m_sysctrl(*this, "sysctrl")
+		, m_screen(*this, "screen")
+		, m_roz_ctrl(*this, "roz_ctrl")
+		, m_tx_scroll(*this, "tx_scroll")
+		, m_bg_scroll(*this, "bg_scroll")
+		, m_mahjong_input_select(*this, "mahjong_select")
+		, m_priram(*this, "priram",  0x2000, ENDIANNESS_LITTLE)
+		, m_palram(*this, "palram", 0x20000, ENDIANNESS_LITTLE)
+		, m_rozram(*this, "rozram", 0x10000, ENDIANNESS_LITTLE)
+		, m_lineram(*this, "lineram", 0x1000, ENDIANNESS_LITTLE)
+		, m_sprram(*this, "sprram", 0x10000, ENDIANNESS_LITTLE)
+		, m_txram(*this, "txram", 0x4000, ENDIANNESS_LITTLE)
+		, m_bgram(*this, "bgram", 0x4000, ENDIANNESS_LITTLE)
+		, m_f1superb_extraram(*this, "f1sb_extraram", 0x10000, ENDIANNESS_LITTLE)
 	{ }
 
 	void ms32(machine_config &config);
@@ -55,45 +93,20 @@ public:
 	void init_f1superb();
 	void init_ss92046_01();
 
-	IRQ_CALLBACK_MEMBER(irq_callback);
 	DECLARE_CUSTOM_INPUT_MEMBER(mahjong_ctrl_r);
 
 protected:
-
-	void configure_banks();
-
-	void ms32_snd_bank_w(u8 data);
-
-	u8 latch_r();
-	void to_main_w(u8 data);
-	u32 sound_result_r();
-	void sound_command_w(u32 data);
-	void sound_reset_w(u32 data);
-
-	required_device<palette_device> m_palette;
-	required_device<gfxdecode_device> m_gfxdecode;
-
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	optional_device<jaleco_ms32_sysctrl_device> m_sysctrl;
-	required_device<ms32_sprite_device> m_sprite;
-	optional_device<generic_latch_8_device> m_soundlatch;
-	optional_shared_ptr<u32> m_sprite_ctrl;
+	required_device<jaleco_ms32_sysctrl_device> m_sysctrl;
+	required_device<screen_device> m_screen;
 
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
-	DECLARE_WRITE_LINE_MEMBER(timer_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(field_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(sound_reset_line_w);
-	void irq_raise(int level);
+	virtual void video_start() override;
 
-	optional_device<screen_device> m_screen;
 private:
-	optional_shared_ptr<u32> m_mainram;
-	optional_shared_ptr<u32> m_roz_ctrl;
-	optional_shared_ptr<u32> m_tx_scroll;
-	optional_shared_ptr<u32> m_bg_scroll;
-	optional_shared_ptr<u32> m_mahjong_input_select;
+	required_shared_ptr<u32> m_roz_ctrl;
+	required_shared_ptr<u32> m_tx_scroll;
+	required_shared_ptr<u32> m_bg_scroll;
+	required_shared_ptr<u32> m_mahjong_input_select;
 	memory_share_creator<u8> m_priram;
 	memory_share_creator<u16> m_palram;
 	memory_share_creator<u16> m_rozram;
@@ -103,14 +116,11 @@ private:
 	memory_share_creator<u16> m_bgram;
 	memory_share_creator<u16> m_f1superb_extraram;
 
-	optional_memory_bank_array<2> m_z80bank;
 	std::unique_ptr<u8[]> m_nvram_8;
 
 	std::unique_ptr<u16[]> m_sprram_buffer;
 	size_t m_objectram_size;
 
-	u32 m_to_main;
-	u16 m_irqreq;
 	tilemap_t *m_tx_tilemap;
 	tilemap_t *m_roz_tilemap;
 	tilemap_t *m_bg_tilemap;
@@ -154,12 +164,10 @@ private:
 	TILE_GET_INFO_MEMBER(get_ms32_roz_tile_info);
 	TILE_GET_INFO_MEMBER(get_ms32_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_ms32_extra_tile_info);
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+
 	DECLARE_VIDEO_START(f1superb);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
-	void irq_init();
 	void update_color(int color);
 	void draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, const rectangle &cliprect, u16 *sprram_top);
 	void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect,int priority);
