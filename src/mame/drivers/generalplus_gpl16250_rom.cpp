@@ -516,9 +516,7 @@ static INPUT_PORTS_START( beijuehh )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Menu")
 	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -677,16 +675,54 @@ void beijuehh_game_state::beijuehh(machine_config &config)
 	m_maincpu->portc_in().set_ioport("IN2");
 	m_maincpu->portd_in().set_ioport("IN3");
 
+	m_maincpu->portb_out().set(FUNC(beijuehh_game_state::beijuehh_portb_w));
 	m_maincpu->portd_out().set(FUNC(beijuehh_game_state::beijuehh_portd_w));
 }
 
+
+void beijuehh_game_state::beijuehh_portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	if (m_maincpu->pc() < 0xf000)
+	{
+		// 00a0 bits are banking
+		logerror("%s: portb write %04x\n", machine().describe_context(), data);
+
+		if (data & 0x0020)
+			m_bank |= 0x04;
+		else
+			m_bank &= ~0x04;
+
+		if (data & 0x0080)
+			m_bank |= 0x08;
+		else
+			m_bank &= ~0x08;
+
+		m_upperbase = m_bank * (0x400000);
+	}
+	m_portb_data = data;
+}
+
+
 void beijuehh_game_state::beijuehh_portd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	if (m_maincpu->pc() < 0x10000)
+	if (m_maincpu->pc() < 0xf000)
 	{
-		logerror("%s: port write %04x\n", machine().describe_context().c_str(), data);
-	}
+		// c000 bits are banking
+		logerror("%s: portd write %04x\n", machine().describe_context(), data);
 
+		if (data & 0x4000)
+			m_bank |= 0x02;
+		else
+			m_bank &= ~0x02;
+
+		if (data & 0x8000)
+			m_bank |= 0x01;
+		else
+			m_bank &= ~0x01;
+
+		m_upperbase = m_bank * (0x400000);
+	}
+	m_portd_data = data;
 }
 
 
@@ -706,8 +742,11 @@ void beijuehh_game_state::machine_reset()
 	// overall very similar to marc101 / marc250 units, seems to have the port based
 	// 'timer' checks for protection(?) too
 
-	int bank = 0;
-	m_upperbase = bank * (0x400000);
+	m_portb_data = 0;
+	m_portd_data = 0;
+	m_bank = 0;
+
+	m_upperbase = 0 * (0x400000);
 	gcm394_game_state::machine_reset();
 
 	//m_maincpu->set_paldisplaybank_high_hack(0);

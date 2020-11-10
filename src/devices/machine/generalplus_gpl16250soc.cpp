@@ -487,6 +487,9 @@ uint16_t sunplus_gcm394_base_device::ioarea_7869_portb_buffer_r()
 void sunplus_gcm394_base_device::ioarea_7869_portb_buffer_w(uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_IO, "%s:sunplus_gcm394_base_device::ioarea_7869_portb_buffer_w %04x\n", machine().describe_context(), data);
+
+	if (m_portb_out) // buffer writes must update output state too, beijuehh requires it for banking
+		m_portb_out(data);
 }
 
 void sunplus_gcm394_base_device::ioarea_7868_portb_w(uint16_t data)
@@ -598,6 +601,9 @@ uint16_t sunplus_gcm394_base_device::ioarea_7879_portd_buffer_r()
 void sunplus_gcm394_base_device::ioarea_7879_portd_buffer_w(uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_IO, "%s:sunplus_gcm394_base_device::ioarea_7879_portd_buffer_w %04x\n", machine().describe_context(), data);
+
+	if (m_portd_out) // buffer writes must update output state too, beijuehh requires it for banking
+		m_portd_out(data);
 }
 
 

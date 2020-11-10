@@ -132,7 +132,12 @@ private:
 
 	virtual uint16_t cs0_r(offs_t offset) override;
 
+	void beijuehh_portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void beijuehh_portd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	uint16_t m_portb_data;
+	uint16_t m_portd_data;
+	uint8_t m_bank;
 };
 
 
