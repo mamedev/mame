@@ -1277,6 +1277,38 @@ void lua_engine::initialize()
 		}));
 	sol().registry().set_usertype("core_options", core_options_type);
 
+/*  emu_options library
+ *
+ * manager:options()
+ * manager:machine():options()
+ *
+ * options:slot_option() - retrieves a specific slot option
+ *
+ * options.entries[] - get table of option entries (k=name, v=core_options::entry)
+ */
+
+	auto emu_options_type = sol().registry().create_simple_usertype<emu_options>("new", sol::no_constructor, sol::base_classes, sol::bases<core_options>());
+	emu_options_type.set("slot_option", [](emu_options &opts, const std::string &name) { return &opts.slot_option(name); });
+	sol().registry().set_usertype("emu_options", emu_options_type);
+
+/*  slot_option library
+ *
+ * manager:options():slot_option("name")
+ * manager:machine():options():slot_option("name")
+ *
+ * slot_option:value()
+ * slot_option:specified_value()
+ * slot_option:bios()
+ * slot_option:default_card_software()
+ */
+
+	auto slot_option_type = sol().registry().create_simple_usertype<slot_option>("new", sol::no_constructor);
+	slot_option_type.set("value", &slot_option::value);
+	slot_option_type.set("specified_value", &slot_option::specified_value);
+	slot_option_type.set("bios", &slot_option::bios);
+	slot_option_type.set("default_card_software", &slot_option::default_card_software);
+	slot_option_type.set("specify", [](slot_option &opt, std::string &&text) { opt.specify(std::move(text)); });
+	sol().registry().set_usertype("slot_option", slot_option_type);
 
 /*  core_options::entry library
  *
@@ -1361,7 +1393,7 @@ void lua_engine::initialize()
  * machine:ioport() - get ioport_manager
  * machine:parameters() - get parameter_manager
  * machine:memory() - get memory_manager
- * machine:options() - get machine core_options
+ * machine:options() - get machine emu_options
  * machine:outputs() - get output_manager
  * machine:input() - get input_manager
  * machine:uiinput() - get ui_input_manager
@@ -1415,7 +1447,7 @@ void lua_engine::initialize()
 	machine_type.set("ioport", &running_machine::ioport);
 	machine_type.set("parameters", &running_machine::parameters);
 	machine_type.set("memory", &running_machine::memory);
-	machine_type.set("options", [](running_machine &m) { return static_cast<core_options *>(&m.options()); });
+	machine_type.set("options", &running_machine::options);
 	machine_type.set("outputs", &running_machine::output);
 	machine_type.set("input", &running_machine::input);
 	machine_type.set("uiinput", &running_machine::ui_input);
@@ -1461,6 +1493,12 @@ void lua_engine::initialize()
 				image_table[image.instance_name()] = &image;
 			}
 			return image_table;
+		}));
+	machine_type.set("slots", sol::property([this](running_machine &r) {
+			sol::table slot_table = sol().create_table();
+			for(device_slot_interface &slot : slot_interface_iterator(r.root_device()))
+				slot_table[slot.slot_name()] = &slot;
+			return slot_table;
 		}));
 	machine_type.set("popmessage", sol::overload(
 			[](running_machine &m, const char *str) { m.popmessage("%s", str); },
@@ -2984,6 +3022,38 @@ void lua_engine::initialize()
 	image_type.set("must_be_loaded", sol::property(&device_image_interface::must_be_loaded));
 	sol().registry().set_usertype("image", image_type);
 
+/*  device_slot_interface library
+ *
+ * manager:machine().slots[slot_name]
+ *
+ * slot:fixed()
+ * slot:has_selectable_options()
+ *
+ * slot.options[] - get options table (k=name, v=device_slot_interface::slot_option)
+ */
+
+	auto slot_type = sol().registry().create_simple_usertype<device_slot_interface>("new", sol::no_constructor);
+	slot_type.set("fixed", &device_slot_interface::fixed);
+	slot_type.set("has_selectable_options", &device_slot_interface::has_selectable_options);
+	slot_type.set("default_option", &device_slot_interface::default_option);
+	slot_type.set("options", sol::property([this](device_slot_interface &slot) {
+			sol::table option_table = sol().create_table();
+			for (auto &x : slot.option_list())
+				option_table[x.first] = &*x.second;
+			return option_table;
+		}));
+	sol().registry().set_usertype("slot", slot_type);
+
+/*  device_slot_interface::slot_option library
+ *
+ * manager:machine().slots[slot_name].options[option_name]
+ *
+ * slot_option:selectable()
+ */
+
+	auto dislot_option_type = sol().registry().create_simple_usertype<device_slot_interface::slot_option>("new", sol::no_constructor);
+	dislot_option_type.set("selectable", &device_slot_interface::slot_option::selectable);
+	sol().registry().set_usertype("dislot_option", dislot_option_type);
 
 /*  mame_machine_manager library
  *
@@ -2991,14 +3061,14 @@ void lua_engine::initialize()
  * mame_manager - alias of manager
  *
  * manager:machine() - running machine
- * manager:options() - core options
+ * manager:options() - emu options
  * manager:plugins() - plugin options
  * manager:ui() - mame ui manager
  */
 
 	sol().registry().new_usertype<mame_machine_manager>("manager", "new", sol::no_constructor,
 			"machine", &machine_manager::machine,
-			"options", [](mame_machine_manager &m) { return static_cast<core_options *>(&m.options()); },
+			"options", &machine_manager::options,
 			"plugins", [this](mame_machine_manager &m) {
 				sol::table table = sol().create_table();
 				for (auto &curentry : m.plugins().plugins())
