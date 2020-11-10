@@ -132,7 +132,7 @@ public:
 	uint16_t spriteram_r(offs_t offset);
 
 	uint16_t video_7051_r();
-	uint16_t video_70e0_r();
+	uint16_t video_70e0_prng_r();
 
 	auto write_video_irq_callback() { return m_video_irq_cb.bind(); };
 

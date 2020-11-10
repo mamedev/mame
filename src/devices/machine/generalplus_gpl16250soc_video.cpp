@@ -994,10 +994,11 @@ uint16_t gcm394_base_video_device::video_7051_r()
 	return retdat;
 }
 
-uint16_t gcm394_base_video_device::video_70e0_r()
+uint16_t gcm394_base_video_device::video_70e0_prng_r()
 {
-	uint16_t retdat = machine().rand();
-	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_70e0_r (returning %04x)\n", machine().describe_context(), retdat);
+	// several games in the beijuehh use this to generate random pieces / enemies, bit 0x8000 can't be set or it will generate a negative index into tables
+	uint16_t retdat = machine().rand() & 0x7fff;
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_70e0_prng_r (returning %04x)\n", machine().describe_context(), retdat);
 	return retdat;
 }
 
