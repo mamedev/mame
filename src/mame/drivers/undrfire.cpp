@@ -76,7 +76,7 @@
 
     Chase Bombers proto sports lots of gfx bugs;
 
-	Sprites are delayed, but not yet implemented
+    Sprites are delayed, but not yet implemented
 
     Gun calibration
     ---------------
