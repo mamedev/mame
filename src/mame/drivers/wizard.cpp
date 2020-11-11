@@ -24,6 +24,37 @@ IQ-9000G
 IQ-9200G
 
 Sharp followed up with the Zaurus series (see drivers/zaurus.cpp)
+
+Models IQ-7000, IQ-7100M, OZ-7200 WIZARD, IQ-7300M, IQ-7520M, IQ-7700M, and IQ-7720M
+use the following screen layout (96x64 square pixels + custom segments at the right):
+____________________________________
+| 96 x 64 pixels LCD                |
+| 16 cols x 8 lines (5 x 7 chars)   | BATT
+| 12 cols x 4 lines (8 x 16 chars)  | CARD
+|                                   | EDIT
+|                                   | SHIFT
+|                                   | CAPS
+|                                   | ✱ 🅂
+|                                   | � 🕭
+|                                   | ↑ ↓
+|___________________________________| ← →
+
+IQ-8100M, IQ-8200, IQ-8300M and IQ-8500M models use a 240x64 screen (40 cols x 8 lines with 
+6x8 chars or 30 cols x 4 lines with 8x16 chars).
+IQ-8900G, IQ-8920G and OZ-9520 WIZARD models use a 240x160 screen.
+IQ-9000G and IQ-9200G models use a 320x240 screen.
+
+IQ-700 hardware notes:
+-32 Kbytes RAM.
+-32,768 Hz clock crystal oscillation frecuency (as per manual).
+-Supports the Sharp CE-50P external printer.
+-Supports a cassette interface for saving and loading data (connected through the CE-50P printer).
+-Supports PC connection through Sharp PC-LINK software.
+-Supports data communication between two Organizers.
+
+More info:
+-SHARP PC-E500 CPU Instruction Table: http://www.andrewwoods3d.com/pce500/insttabl.html
+
 */
 
 #include "emu.h"
@@ -131,4 +162,4 @@ ROM_END
 } // Anonymous namespace
 
 
-CONS( 2015, iq7000, 0, 0, iq7000, iq7000, wizard_state, empty_init, "Sharp", "IQ-7000", MACHINE_IS_SKELETON )
+CONS( 1988, iq7000, 0, 0, iq7000, iq7000, wizard_state, empty_init, "Sharp", "IQ-7000", MACHINE_IS_SKELETON )
