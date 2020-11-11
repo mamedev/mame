@@ -28,7 +28,7 @@ List of games, initially taken from http://videogamesdensetsu.tumblr.com/post/14
   *RX121 Hello Kitty no Eikaiwa / ハローキティの英会話
   *RX122 Son Gokū no Bōken / そんごくうの冒険
   *RX123 Paint Ehon: Cinderella Monogatari / ペイント絵本シンデレラ物語
-  *RX124 Chibimaruko-chan no Tashizan Hikizan / ちびまる子ちゃんのたしざんひきざん
+  *RX124 Chibi Maruko-chan no Tashizan Hikizan / ちびまる子ちゃんのたしざんひきざん
 -->
 
 <softwarelist name="picno" description="Konami Picno cartridges">
@@ -276,7 +276,7 @@ List of games, initially taken from http://videogamesdensetsu.tumblr.com/post/14
 	</software>
 
 	<software name="chibitahi" supported="no">
-		<description>Chibimaruko-chan no Tashizan Hikizan</description>
+		<description>Chibi Maruko-chan no Tashizan Hikizan</description>
 		<year>1995</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="RX124"/>
