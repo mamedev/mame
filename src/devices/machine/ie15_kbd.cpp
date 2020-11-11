@@ -62,8 +62,6 @@ void ie15_keyboard_device::key_make(uint8_t row, uint8_t column)
 		key_code |= (IE_KB_DK << 8);
 	}
 
-	logerror("key_make row %d col %d key_code %04X (%02X)\n", row, column, key_code, key_code & 0x7f);
-
 	m_keyboard_cb(offs_t(0), key_code);
 }
 
