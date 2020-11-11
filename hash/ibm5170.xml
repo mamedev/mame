@@ -15668,7 +15668,7 @@ license:CC0
 		<year>1994</year>
 		<publisher>The B&amp;N Companies</publisher>
 		<info name="developer" value="Epic MegaGames" />
-		<part name="flop2" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Xargon - The Secret Chamber [The B&amp;N Companies] [1994] [3.5DD] [Disk 1 of 1].img" size="737280" crc="3a3f72aa" sha1="121d29b0824d6f1e6b979b19b8a8936140e48fce"/>
 			</dataarea>
@@ -15680,7 +15680,7 @@ license:CC0
 		<year>1994</year>
 		<publisher>The B&amp;N Companies</publisher>
 		<info name="developer" value="Epic MegaGames" />
-		<part name="flop3" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Xargon - Xargon's Fury [The B&amp;N Companies] [1994] [3.5DD] [Disk 1 of 1].img" size="737280" crc="fc55d317" sha1="08609f89ff4a5e942e527316617940fd11f5ee28"/>
 			</dataarea>
