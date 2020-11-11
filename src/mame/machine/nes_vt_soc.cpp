@@ -352,7 +352,7 @@ void nes_vt02_vt03_soc_device::scrambled_410x_w(uint16_t offset, uint8_t data)
 		break;
 
 	case 0xa:
-		logerror("vt03_410aw %02x\n", data);
+		logerror("vt03_410a_w %02x\n", data);
 		m_410x[0xa] = data;
 		update_banks();
 		break;

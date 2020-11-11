@@ -1274,6 +1274,12 @@ ROM_START( ppgc200g )
 	ROM_LOAD( "m29dw641.u2", 0x00000, 0x800000, CRC(b16dc677) SHA1(c1984fde4caf9345d41d127db946d1c21ec43ae0) )
 ROM_END
 
+ROM_START( dgun2869 ) 
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	// 80000-bffff would not read consistently, but also appears to be missing some data entirely
+	ROM_LOAD( "dgun2869.bin", 0x00000, 0x1000000, BAD_DUMP CRC(00ab846e) SHA1(721a6edf69d2eb75ee815eb3567c07d4d163d65f) ) // 29GL128
+ROM_END
+
 
 void nes_vt_state::init_protpp()
 {
@@ -1449,3 +1455,7 @@ CONS( 200?, dgun2500,  0,  0,  nes_vt_16mb, nes_vt, nes_vt_state, empty_init, "d
 // Also available in handheld form where Supreme 200 is also shown on the main menu background
 // unclear if this is VT03 or VT09, the boot logo needs either VT09 or PAL mode for the DMA to be correct, dump is from a PAL unit
 CONS( 201?, ppgc200g,   0,         0,  nes_vt_pal_8mb, nes_vt, nes_vt_state, empty_init, "Fizz Creations", "Plug & Play Game Controller with 200 Games (Supreme 200)", MACHINE_IMPERFECT_GRAPHICS )
+
+// unknown tech level, it's most likely a vt09 or vt369 but isn't using any of the extended features
+// NOT WORKING for now due to Flash ROM being faulty, giving inconsistent reads for some game areas (eg. Fishing) and seemingly having data entirely missing for Crystal Ball
+CONS( 201?, dgun2869,  0,         0,  nes_vt_16mb,     nes_vt, nes_vt_state, empty_init, "dreamGEAR", "My Arcade Retro Micro Controller - 220 Built-In Video Games (DGUN-2869)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
