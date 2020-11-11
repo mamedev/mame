@@ -14,6 +14,7 @@ ________________________________________________________________________________
 ?               IQ-World                                                  NO
 ?               IQ Plus                                                   NO
 ?               Games Card                                                NO
+?               Gold Card - RAM Card 128 K With Battery                   N/A
 IQ-701A         Time Expense Manager                                      YES
 IQ-702A         Thesaurus Dictionary English                              NO
 IQ-703A         8-Languaje Translator                                     YES
@@ -25,6 +26,7 @@ OZ-708A         North American City Guide                                 NO
 IQ-711B         Bilingual Dictionary English-French French-English        NO
 IQ-712B         Bilingual Dictionary British-Deutsch Deutsch-British      NO
 IQ-714          Dictionnaire Synonymique Français                         NO
+OZ-715A         Bilingual Dictionary American-Español Español-American    NO
 IQ-717          Box Jockey                                                NO
 IQ-718M         Organizer Chess                                           NO
 IQ-719          Organizer Tetris                                          NO
@@ -34,23 +36,30 @@ IQ-722M         Investment Planner                                        NO
 IQ-7300M        Protection Card                                           N/A
 IQ-770          Program Card 64 BASIC                                     NO
 IQ-771          Program Card 32 BASIC (16)                                NO
+IQ-776          EPROM Card 128 (128K Bytes EPROM and 32 K Bytes RAM)      N/A
 IQ-780          RAM Card 32                                               N/A
 IQ-781 / OZ-781 RAM Card 64                                               N/A
 IQ-782          RAM Card 128                                              N/A
+IQ-783          RAM Card 256                                              N/A
 IQ-794A         Program Card BASIC Utility Software                       NO
-IQ-870          Program Card 32 BASIC (40/16)                             NO
-IQ-871          Program Card 128 BASIC                                    NO
 OZ-8000         Protection Card                                           N/A
 OZ-8200         Protection Card                                           N/A
+IQ-870          Program Card 32 BASIC (40/16)                             NO
+IQ-871          Program Card 128 BASIC                                    NO
 IQ-8A01         Organizer Hatris                                          NO
 IQ-8A02M        Backgammon for Electronic Organizer                       NO
 IQ-8B01         3 Dimesional Spreadsheet for Electronic Organizer (40/16) NO
 OZ-8B02         Organizer Fax                                             NO
 IQ-8B03         Scientific Computer Card BASIC (40/16)                    NO
+IQ-8B04M        3 Dimesional Spreadsheet (40/16, multi language)          NO
 IQ-8C01         Holy Bible for Electronic Organizer                       NO
 IQ-8C02         Encyclopaedia of Wine                                     NO
 IQ-8C04         11-Languaje Translator                                    NO
 IQ-8D01A        English Dictionary                                        NO
+CE-902          Program Card 256 BASIC                                    NO
+IQ-9B01         PenCell Spreadsheet                                       NO
+AC-1E           Nikon F90/N90 Card                                        NO
+AC-2E           Nikon F90x/N90s Card                                      NO
 
 
 Cart pinout
