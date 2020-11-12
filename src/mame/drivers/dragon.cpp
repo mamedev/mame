@@ -75,7 +75,7 @@ void dragon_alpha_state::dgnalpha_io1(address_map &map)
 	map(0x0c, 0x0c).mirror(0x10).rw(m_fdc, FUNC(wd2797_device::data_r), FUNC(wd2797_device::data_w));
 	map(0x0d, 0x0d).mirror(0x10).rw(m_fdc, FUNC(wd2797_device::sector_r), FUNC(wd2797_device::sector_w));
 	map(0x0e, 0x0e).mirror(0x10).rw(m_fdc, FUNC(wd2797_device::track_r), FUNC(wd2797_device::track_w));
-	map(0x0f, 0x0f).mirror(0x10).rw(m_fdc, FUNC(wd2797_device::data_r), FUNC(wd2797_device::cmd_w));
+	map(0x0f, 0x0f).mirror(0x10).rw(m_fdc, FUNC(wd2797_device::status_r), FUNC(wd2797_device::cmd_w));
 }
 
 
@@ -443,8 +443,8 @@ void dragon_alpha_state::dgnalpha(machine_config &config)
 	// pia 2
 	pia6821_device &pia2(PIA6821(config, PIA2_TAG, 0));
 	pia2.writepa_handler().set(FUNC(dragon_alpha_state::pia2_pa_w));
-	pia2.irqa_handler().set(m_firqs, FUNC(input_merger_device::in_w<0>));
-	pia2.irqb_handler().set(m_firqs, FUNC(input_merger_device::in_w<1>));
+	pia2.irqa_handler().set(m_firqs, FUNC(input_merger_device::in_w<2>));
+	pia2.irqb_handler().set(m_firqs, FUNC(input_merger_device::in_w<3>));
 
 	// software lists
 	SOFTWARE_LIST(config, "dgnalpha_flop_list").set_original("dgnalpha_flop");
