@@ -16135,4 +16135,49 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="advsarah">
+		<description>The Adventures of Sarah and Her Friends</description>
+		<year>1985</year>
+		<publisher>Rhiannon</publisher>
+		<info name="release" value="2020-11-11"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234779">
+				<rom name="the adventures of sarah and her friends.woz" size="234779" crc="5ed3d668" sha1="d5a742a2c17baa48695a5b2daa0b48cfd9e456ac"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chelsssi">
+		<description>Chelsea of the South Sea Islands</description>
+		<year>1984</year>
+		<publisher>Addison-Wesley</publisher>
+		<info name="release" value="2020-11-12"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234808">
+				<rom name="chelsea of the south sea islands.woz" size="234808" crc="79396b23" sha1="d27d0df160427403786ebf52dee20b45d1552e3e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jennypr">
+		<description>Jenny of the Prairie</description>
+		<year>1983</year>
+		<publisher>Rhiannon</publisher>
+		<info name="release" value="2020-11-12"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234777">
+				<rom name="jenny of the prairie.woz" size="234777" crc="eddbf992" sha1="ae94333e5c846f51505bf699715011c51cc99785"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
