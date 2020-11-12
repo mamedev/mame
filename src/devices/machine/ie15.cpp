@@ -19,17 +19,24 @@
 #include "ie15.lh"
 
 
-#define VERBOSE_DBG 1       /* general debug messages */
+//#define LOG_GENERAL (1U << 0) //defined in logmacro.h already
+#define LOG_RAM      (1U << 1)
+#define LOG_CPU      (1U << 2)
+#define LOG_KBD      (1U << 3)
+#define LOG_SCANLINE (1U << 4)
+#define LOG_SERIAL   (1U << 5)
 
-#define DBG_LOG(N,M,A) \
-	do { \
-		if(VERBOSE_DBG>=N) \
-		{ \
-			if( M ) \
-				logerror("%11.6f at %s: %-10s",machine().time().as_double(),machine().describe_context(),(char*)M ); \
-			logerror A; \
-		} \
-	} while (0)
+#define VERBOSE (LOG_GENERAL|LOG_KBD)
+//#define LOG_OUTPUT_FUNC printf
+#include "logmacro.h"
+
+#define LOGM(...)      LOGMASKED(LOG_RAM,  __VA_ARGS__)
+#define LOGCPU(...)    LOGMASKED(LOG_CPU,  __VA_ARGS__)
+#define LOGKBD(...)    LOGMASKED(LOG_KBD,  __VA_ARGS__)
+#define LOGSERIAL(...) LOGMASKED(LOG_SERIAL,  __VA_ARGS__)
+
+
+#define _PRINT(ch) (std::isprint(ch & 127)?(ch & 127):' ')
 
 
 ie15_device::ie15_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
@@ -75,7 +82,7 @@ uint8_t ie15_device::mem_r()
 	ret = m_p_videoram[m_video.ptr1];
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0 && m_video.ptr1 >= SCREEN_PAGE)
 	{
-		DBG_LOG(2, "memory", ("R @ %03x == %02x\n", m_video.ptr1, ret));
+		LOGM("memory R @ %03x == %02x\n", m_video.ptr1, ret);
 	}
 	m_video.ptr1++;
 	m_video.ptr1 &= 0xfff;
@@ -89,7 +96,7 @@ void ie15_device::mem_w(uint8_t data)
 	{
 		if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0 && m_video.ptr1 >= SCREEN_PAGE)
 		{
-			DBG_LOG(2, "memory", ("W @ %03x <- %02x\n", m_video.ptr1, data));
+			LOGM("memory W @ %03x <- %02x\n", m_video.ptr1, data);
 		}
 		m_p_videoram[m_video.ptr1++] = data;
 		m_video.ptr1 &= 0xfff;
@@ -100,7 +107,7 @@ void ie15_device::mem_addr_inc_w(uint8_t data)
 {
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
-		DBG_LOG(2, "memory", ("++ %03x\n", m_video.ptr1));
+		LOGM("memory addr ++ %03x\n", m_video.ptr1);
 	}
 	m_video.ptr1++;
 	m_video.ptr1 &= 0xfff;
@@ -111,7 +118,7 @@ void ie15_device::mem_addr_dec_w(uint8_t data)
 {
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
-		DBG_LOG(2, "memory", ("-- %03x\n", m_video.ptr1));
+		LOGM("memory addr -- %03x\n", m_video.ptr1);
 	}
 	m_video.ptr1--;
 	m_video.ptr1 &= 0xfff;
@@ -126,7 +133,7 @@ void ie15_device::mem_addr_lo_w(uint8_t data)
 	tmp |= ((data >> 4) & 0xf);
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
-		DBG_LOG(2, "memory", ("lo %03x <- %02x = %03x\n", m_video.ptr1, data, tmp));
+		LOGM("memory addr lo %03x <- %02x = %03x\n", m_video.ptr1, data, tmp);
 	}
 	m_video.ptr1 = tmp;
 	if (m_video.enable) m_video.ptr2 = tmp;
@@ -140,7 +147,7 @@ void ie15_device::mem_addr_hi_w(uint8_t data)
 	tmp |= (data << 4);
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
-		DBG_LOG(2, "memory", ("hi %03x <- %02x = %03x\n", m_video.ptr1, data, tmp));
+		LOGM("memory addr hi %03x <- %02x = %03x\n", m_video.ptr1, data, tmp);
 	}
 	m_video.ptr1 = tmp;
 	if (m_video.enable) m_video.ptr2 = tmp;
@@ -157,7 +164,7 @@ void ie15_device::beep_w(uint8_t data)
 
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
-		DBG_LOG(1, "beep", ("(%s)\n", m_long_beep ? "short" : "long"));
+		LOG("beep (%s)\n", m_long_beep ? "short" : "long");
 	}
 	machine().scheduler().timer_set(attotime::from_msec(length), timer_expired_delegate(FUNC(ie15_device::ie15_beepoff),this));
 	m_beeper->set_state(1);
@@ -168,7 +175,7 @@ void ie15_device::beep_w(uint8_t data)
 // active high
 uint8_t ie15_device::kb_r()
 {
-	DBG_LOG(2, "keyboard", ("R %02X '%c'\n", m_kb_data, m_kb_data < 0x20 ? ' ' : m_kb_data));
+	LOGKBD("keyboard data R %02X '%c'\n", m_kb_data, _PRINT(m_kb_data));
 	return m_kb_data;
 }
 
@@ -178,7 +185,7 @@ uint8_t ie15_device::kb_ready_r()
 	m_kb_flag &= IE_TRUE;
 	if (m_kb_flag != m_kb_flag0)
 	{
-		DBG_LOG(2, "keyboard", ("? %c\n", m_kb_flag ? 'n' : 'y'));
+		LOGKBD("keyboard ready? %c\n", m_kb_flag ? 'n' : 'y');
 		m_kb_flag0 = m_kb_flag;
 	}
 	return m_kb_flag;
@@ -187,7 +194,7 @@ uint8_t ie15_device::kb_ready_r()
 // active low
 void ie15_device::kb_ready_w(uint8_t data)
 {
-	DBG_LOG(2, "keyboard", ("clear ready\n"));
+	LOGKBD("keyboard clear ready\n");
 	m_kb_flag = IE_TRUE | ie15_keyboard_device::IE_KB_ACK;
 }
 
@@ -201,7 +208,7 @@ uint8_t ie15_device::kb_s_red_r()
 // active high; active = setup mode
 uint8_t ie15_device::kb_s_sdv_r()
 {
-	return m_kb_control & ie15_keyboard_device::IE_KB_SDV ? IE_TRUE : 0;
+	return m_kbd_sdv ? IE_TRUE : 0;
 }
 
 // active high; active = keypress detected on aux keypad
@@ -283,13 +290,13 @@ uint8_t ie15_device::serial_tx_ready_r()
 uint8_t ie15_device::serial_r()
 {
 	m_serial_rx_ready = IE_TRUE;
-	DBG_LOG(1,"serial",("R %02X '%c'\n", m_serial_rx_char, m_serial_rx_char < 0x20?' ':m_serial_rx_char&127));
+	LOGSERIAL("serial R %02X '%c'\n", m_serial_rx_char, _PRINT(m_serial_rx_char));
 	return m_serial_rx_char;
 }
 
 void ie15_device::serial_w(uint8_t data)
 {
-	DBG_LOG(1, "serial", ("W %02X '%c'\n", data, data < 0x20 ? ' ' : data & 127));
+	LOGSERIAL("serial W %02X '%c'\n", data, _PRINT(data));
 
 	m_serial_tx_ready = IE_FALSE;
 	transmit_register_setup(data);
@@ -335,7 +342,7 @@ uint8_t ie15_device::flag_r(offs_t offset)
 	}
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
-		DBG_LOG(2, "flag", ("read %d: ?\n", offset));
+		LOGCPU("flag read %d: ?\n", offset);
 	}
 	return 0;
 }
@@ -358,13 +365,14 @@ void ie15_device::flag_w(offs_t offset, uint8_t data)
 		break;
 	case 4:
 		m_kb_ruslat = data;
+		m_keyboard->set_ruslat(!!data);
 		break;
 	default:
 		break;
 	}
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0 && !offset)
 	{
-		DBG_LOG(2, "flag", ("%sset %d\n", data ? "" : "re", offset));
+		LOGCPU("flag %sset %d\n", data ? "" : "re", offset);
 	}
 }
 
@@ -453,8 +461,7 @@ INPUT_PORTS_END
 
 void ie15_device::kbd_put(uint16_t data)
 {
-	DBG_LOG(2,"keyboard",("W %02X<-%02X '%c' %02X (%c)\n", m_kb_data, data, 'x' /* data < 0x20 ? ' ' : (data & 255) */,
-		m_kb_flag, m_kb_flag ? 'n' : 'y'));
+	LOGKBD("keyboard data W %02X<-%02X '%c' %02X (%c)\n", m_kb_data, data, _PRINT(data), m_kb_flag, m_kb_flag ? 'n' : 'y');
 	m_kb_control = (data >> 8) & 255;
 	// send new key only when firmware has processed previous one
 	if (m_kb_flag == IE_TRUE)
@@ -462,6 +469,11 @@ void ie15_device::kbd_put(uint16_t data)
 		m_kb_data = data & 255;
 		m_kb_flag = 0;
 	}
+}
+
+WRITE_LINE_MEMBER( ie15_device::kbd_sdv )
+{
+	m_kbd_sdv = state;
 }
 
 void ie15_device::device_resolve_objects()
@@ -497,6 +509,7 @@ void ie15_device::device_reset()
 	memset(&m_video, 0, sizeof(m_video));
 	m_kb_ruslat = m_long_beep = m_kb_control = m_kb_data = m_kb_flag0 = 0;
 	m_kb_flag = IE_TRUE;
+	m_kbd_sdv = false;
 
 	m_hblank = 1;
 	m_hblank_timer->adjust(m_screen->time_until_pos(0, IE15_HORZ_START));
@@ -597,14 +610,14 @@ void ie15_device::update_leds()
 	m_dup_led = BIT(data, ie15_keyboard_device::IE_KB_DUP_BIT) ^ 1;
 	m_lin_led = BIT(data, ie15_keyboard_device::IE_KB_LIN_BIT) ^ 1;
 	m_red_led = BIT(data, ie15_keyboard_device::IE_KB_RED_BIT) ^ 1;
-	m_sdv_led = BIT(m_kb_control, ie15_keyboard_device::IE_KB_SDV_BIT) ^ 1;
+	m_sdv_led = m_kbd_sdv ^ 1;
 	m_prd_led = 1; // XXX
 }
 
 /*
-    VBlank is active for 3 topmost on-screen rows and 1 at the bottom; however, control flag 3
-   overrides VBlank,
-    allowing status line to be switched on and off.
+    VBlank is active for 3 topmost on-screen rows and 1 at the bottom.
+	However, control flag 3 overrides VBlank, allowing status line
+	to be switched on and off.
 */
 void ie15_device::scanline_callback()
 {
@@ -614,10 +627,10 @@ void ie15_device::scanline_callback()
 	m_vpos %= IE15_TOTAL_VERT;
 	m_marker_scanline = (m_vpos % 11) > 7;
 
-	DBG_LOG(3,"scanline_cb",
-		("addr %03x frame %d x %.4d y %.3d row %.2d e:c:s %d:%d:%d\n",
+	LOGMASKED(LOG_SCANLINE,
+		"addr %03x frame %d x %.4d y %.3d row %.2d e:c:s %d:%d:%d\n",
 		m_video.ptr2, (int)m_screen->frame_number(), m_screen->hpos(), y,
-		y%11, m_video.enable, m_video.cursor, m_video.line25));
+		y%11, m_video.enable, m_video.cursor, m_video.line25);
 
 	if (y < IE15_VERT_START) return;
 	y -= IE15_VERT_START;
@@ -671,7 +684,9 @@ void ie15_device::ie15core(machine_config &config)
 	config.set_default_layout(layout_ie15);
 
 	/* Devices */
-	IE15_KEYBOARD(config, m_keyboard, 0).keyboard_cb().set(FUNC(ie15_device::kbd_put));
+	IE15_KEYBOARD(config, m_keyboard, 0);
+	m_keyboard->keyboard_cb().set(FUNC(ie15_device::kbd_put));
+	m_keyboard->sdv_cb().set(FUNC(ie15_device::kbd_sdv));
 
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 2400);
