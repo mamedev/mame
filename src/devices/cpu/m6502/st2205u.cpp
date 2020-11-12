@@ -926,8 +926,26 @@ u8 st2205u_base_device::dcnth_r()
 
 void st2205u_base_device::dcnth_w(u8 data)
 {
-	m_dcnt[m_dctr >> 1] = (m_dcnt[m_dctr >> 1] & 0x7f00) | data;
-	// TODO: start DMA here
+	m_dcnt[m_dctr >> 1] = (data & 0x7f) << 8 | (m_dcnt[m_dctr >> 1] & 0x00ff);
+
+	// start DMA
+	int source = m_dptr[(m_dctr & 2) + 0];
+	int dest = m_dptr[(m_dctr & 2) + 1];
+	int length = m_dcnt[m_dctr >> 1] << 1;
+
+	if ((m_dbkr[(m_dctr & 2) + 0] != 0x8000) || (m_dbkr[(m_dctr & 2) + 1] != 0x8000) || (m_dmod[m_dctr >> 1] != 0x30))
+		logerror("%s: unhandled DMA parameter %04x %04x %02x\n", machine().describe_context(), m_dbkr[(m_dctr & 2) + 0], m_dbkr[(m_dctr & 2) + 1], m_dmod[m_dctr >> 1]);
+
+	address_space& mem = this->space(AS_PROGRAM);
+
+	// FIXME: DMA should be performed in the execution loop and consume bus cycles, not happen instantly
+	for (int i = 0; i < length; i++)
+	{
+		uint8_t byte = mem.read_byte(source);
+		mem.write_byte(dest, byte);
+		source++;
+		dest++;
+	}
 }
 
 u8 st2205u_base_device::dctr_r()
