@@ -414,10 +414,13 @@ void dragon_alpha_state::dgnalpha(machine_config &config)
 	sam().set_addrmap(4, &dragon_alpha_state::d64_io0);
 	sam().set_addrmap(5, &dragon_alpha_state::dgnalpha_io1);
 
+	// input merger
+	INPUT_MERGER_ANY_HIGH(config, m_nmis).output_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);;
+
 	// cartridge
 	cococart_slot_device &cartslot(COCOCART_SLOT(config, CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), dragon_cart, nullptr));
 	cartslot.cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
-	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	cartslot.nmi_callback().set(m_nmis, FUNC(input_merger_device::in_w<0>));
 	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 
 	// acia
