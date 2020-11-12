@@ -938,6 +938,7 @@ void st2205u_base_device::dcnth_w(u8 data)
 
 	address_space& mem = this->space(AS_PROGRAM);
 
+	// FIXME: DMA should be performed in the execution loop and consume bus cycles, not happen instantly
 	for (int i = 0; i < length; i++)
 	{
 		uint8_t byte = mem.read_byte(source);
