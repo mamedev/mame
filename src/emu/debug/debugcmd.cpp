@@ -3767,10 +3767,15 @@ void debugger_commands::execute_memdump(int ref, const std::vector<std::string> 
 						for (memory_entry &entry : entries[mode])
 						{
 							if (octal)
-								fprintf(file, "%0*o - %0*o", nc, entry.start, nc, entry.end);
+								fprintf(file, "%0*o - %0*o:", nc, entry.start, nc, entry.end);
 							else
-								fprintf(file, "%0*x - %0*x", nc, entry.start, nc, entry.end);
-							fprintf(file, ": %s\n", entry.entry->name().c_str());
+								fprintf(file, "%0*x - %0*x:", nc, entry.start, nc, entry.end);
+							for(const auto &c : entry.context)
+								if(c.disabled)
+									fprintf(file, " %s[off]", c.view->name().c_str());
+								else
+									fprintf(file, " %s[%d]", c.view->name().c_str(), c.slot);
+							fprintf(file, " %s\n", entry.entry->name().c_str());
 						}
 						fprintf(file, "\n");
 					}

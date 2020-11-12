@@ -149,6 +149,7 @@ class memory_bank;
 class memory_manager;
 class memory_region;
 class memory_share;
+class memory_view;
 
 // declared in emuopts.h
 class emu_options;
