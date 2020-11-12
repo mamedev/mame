@@ -290,7 +290,7 @@ void undrfire_state::draw_sprites_cbombers(screen_device &screen, bitmap_ind16 &
 
 			if (pritable)
 			{
-				sprite_ptr->primask = u32(~1) << u32(pritable[priority]);
+				sprite_ptr->primask = u32(~1) << pritable[priority];
 				sprite_ptr++;
 			}
 			else
