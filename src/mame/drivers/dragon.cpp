@@ -76,7 +76,7 @@ void dragon_alpha_state::dgnalpha_io1(address_map &map)
 	map(0x0c, 0x0c).mirror(0x10).rw(m_fdc, FUNC(wd2797_device::data_r), FUNC(wd2797_device::data_w));
 	map(0x0d, 0x0d).mirror(0x10).rw(m_fdc, FUNC(wd2797_device::sector_r), FUNC(wd2797_device::sector_w));
 	map(0x0e, 0x0e).mirror(0x10).rw(m_fdc, FUNC(wd2797_device::track_r), FUNC(wd2797_device::track_w));
-	map(0x0f, 0x0f).mirror(0x10).rw(m_fdc, FUNC(wd2797_device::data_r), FUNC(wd2797_device::cmd_w));
+	map(0x0f, 0x0f).mirror(0x10).rw(m_fdc, FUNC(wd2797_device::status_r), FUNC(wd2797_device::cmd_w));
 }
 
 
