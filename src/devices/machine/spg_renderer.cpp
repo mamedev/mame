@@ -685,6 +685,7 @@ void spg_renderer_device::draw_sprite(bool read_from_csspace, int extended_sprit
 
 	// various games don't want the flip bits in the usual place, wrlshunt for example, there's probably a bit to control this
 	// and likewise these bits probably now have a different meaning, so this shouldn't be trusted
+	// beijuehh does NOT want this either (see characters in 'empire fighter')
 	if (extended_sprites_mode)
 	{
 		if (highres || alt_extrasprite_hack)
