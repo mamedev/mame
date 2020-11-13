@@ -37269,7 +37269,8 @@ deerhuntc                       // (c) 2000 Sammy USA Corporation
 deerhuntd                       // (c) 2000 Sammy USA Corporation
 deerhunte                       // (c) 2000 Sammy USA Corporation
 deerhuntj                       // (c) 2000 Sammy USA Corporation
-endrichs                        // (c) 199? E.N.Tiger
+endrichs                        // (c) 1999 E.N.Tiger
+endrichsa                       // (c) 1999 E.N.Tiger
 funcube                         // (c) 2000 Namco
 funcube2                        // (c) 2001 Namco
 funcube3                        // (c) 2001 Namco
@@ -39545,7 +39546,8 @@ ringrage                        // 1992.?? D21 (c) 1992 Taito Corporation Japan 
 ringragej                       // 1992.09 D21 (c) 1992 Taito Corporation (Japan)
 ringrageu                       // 1992.02 D21 (c) 1992 Taito America Corporation (US)
 scfinals                        // 1994.?? D68 (c) 1993 Taito Corporation Japan (World)
-scfinalso                       // 1994.?? D68 (c) 1993 Taito Corporation Japan (World)
+scfinalso                       // 1994.?? D68 (c) 1993 Taito Corporation Japan (World) - single PCB
+scfinalsoc                      // 1994.?? D68 (c) 1993 Taito Corporation Japan (World) - F3 cartridge
 spcinv95                        // 1995.?? E06 (c) 1995 Taito Corporation Japan (World)
 spcinv95u                       // 1995.05 E06 (c) 1995 Taito America Corporation (US)
 spcinvdj                        // 1994.09 D93 (c) 1994 Taito Corporation (Japan)
@@ -42955,9 +42957,10 @@ ftimpact                        // Fighters' Impact (Ver 2.02O)
 ftimpactj                       // Fighters' Impact (Ver 2.02J)
 ftimpactu                       // Fighters' Impact (Ver 2.02A)
 ftimpcta                        // Fighters' Impact A (Ver 2.00J)
-gdarius                         // G-Darius (Ver 2.01J)
+gdarius                         // G-Darius (Ver 2.02O)
 gdarius2                        // G-Darius Ver.2 (Ver 2.03J)
-gdariusb                        // G-Darius (Ver 2.02A)
+gdariusj                        // G-Darius (Ver 2.01J)
+gdariusu                        // G-Darius (Ver 2.02A)
 glpracr                         // Gallop Racer (English Ver 10.17.K)
 glpracr2                        // Gallop Racer 2 (USA)
 glpracr2j                       // Gallop Racer 2 (JAPAN)
