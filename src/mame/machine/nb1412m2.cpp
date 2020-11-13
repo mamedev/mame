@@ -145,6 +145,9 @@ device_memory_interface::space_config_vector nb1412m2_device::memory_space_confi
 
 void nb1412m2_device::device_start()
 {
+	// assumes it can make an address mask with m_data.length() - 1
+	assert(!(m_data.length() & (m_data.length() - 1)));
+
 	save_item(NAME(m_command));
 	save_item(NAME(m_rom_address));
 	save_item(NAME(m_dac_start_address));
@@ -197,7 +200,7 @@ void nb1412m2_device::device_timer(emu_timer &timer, device_timer_id id, int par
 				dac_value = m_data[m_dac_current_address];
 				m_dac_cb(dac_value);
 				m_dac_current_address++;
-				m_dac_current_address&= m_data.mask();
+				m_dac_current_address &= m_data.length() - 1;
 				if(dac_value == 0x80)
 					m_dac_playback = false;
 			}

@@ -477,7 +477,7 @@ public:
 	/// Allows pointer-member-style access to members of the target
 	/// object.  Asserts that the target object has been found.
 	/// \return Pointer to target object if found, or nullptr otherwise.
-	virtual ObjectClass *operator->() const { assert(m_target); return m_target; }
+	ObjectClass *operator->() const { assert(m_target); return m_target; }
 
 protected:
 	/// \brief Designated constructor
@@ -818,9 +818,9 @@ public:
 	/// \brief Pointer member access operator
 	///
 	/// Allows pointer-member-style access to members of the target
-	/// memory bank object.
+	/// memory bank object.  Asserts that the target has been found.
 	/// \return Pointer to found or created bank object.
-	memory_bank *operator->() const { return m_target; }
+	memory_bank *operator->() const { assert(m_target); return m_target; }
 
 protected:
 	virtual bool findit(validity_checker *valid) override;
@@ -931,9 +931,9 @@ template <unsigned Count> using required_ioport_array = ioport_array_finder<Coun
 /// \brief Address space finder template
 ///
 /// Template argument is whether the address space is required.  It is a
-/// validation error if a required address space is not found.  This class is
-/// generally not used directly, instead the optional_address_space and
-/// required_address_space helpers are used.
+/// validation error if a required address space is not found.  This
+/// class is generally not used directly, instead the
+/// optional_address_space and required_address_space helpers are used.
 /// \sa optional_address_space required_address_space
 template <bool Required>
 class address_space_finder : public object_finder_base<address_space, Required>
@@ -941,11 +941,12 @@ class address_space_finder : public object_finder_base<address_space, Required>
 public:
 	/// \brief Address space finder constructor
 	/// \param [in] base Base device to search from.
-	/// \param [in] tag Address space tag to search for.  This is not copied,
-	///   it is the caller's responsibility to ensure this pointer
-	///   remains valid until resolution time.
+	/// \param [in] tag Address space device tag to search for.
+	///   This is not copied, it is the caller's responsibility to
+	///   ensure this pointer remains valid until resolution time.
 	/// \param [in] spacenum Address space number.
-	/// \param [in] width Specific data width (optional).
+	/// \param [in] width Required data width in bits, or zero if
+	///   any data width is acceptable.
 	address_space_finder(device_t &base, char const *tag, int spacenum, u8 width = 0);
 
 	/// \brief Set search tag and space number
@@ -963,9 +964,9 @@ public:
 
 	/// \brief Set search tag and space number
 	///
-	/// Allows search tag to be changed after construction.  Note that
-	/// this must be done before resolution time to take effect.  Also
-	/// note that the tag is not copied.
+	/// Allows search tag and address space number to be changed after
+	/// construction.  Note that this must be done before resolution
+	/// time to take effect.  Also note that the tag is not copied.
 	/// \param [in] tag Updated search tag relative to the current
 	///   device being configured.  This is not copied, it is the
 	///   caller's responsibility to ensure this pointer remains valid
@@ -975,19 +976,30 @@ public:
 
 	/// \brief Set search tag and space number
 	///
-	/// Allows search tag to be changed after construction.  Note that
-	/// this must be done before resolution time to take effect.
+	/// Allows search tag and address space number to be changed after
+	/// construction.  Note that this must be done before resolution
+	/// time to take effect.  Also note that the tag is not copied.
 	/// \param [in] finder Object finder to take the search base and tag
 	///   from.
 	/// \param [in] spacenum Address space number.
 	void set_tag(finder_base const &finder, int spacenum) { finder_base::set_tag(finder); this->m_spacenum = spacenum; }
 
+	/// \brief Set search tag and space number
+	///
+	/// Allows search tag and address space number to be changed after
+	/// construction.  Note that this must be done before resolution
+	/// time to take effect.  Also note that the tag is not copied.
+	/// \param [in] finder Address space finder to take the search base,
+	///   tag and address space number from.
+	template <bool R> void set_tag(address_space_finder<R> const &finder) { set_tag(finder, finder.spacenum()); }
+
 	/// \brief Set data width of space
 	///
-	/// Allows data width to be specified after construction.  Note that
-	/// this must be done before resolution time to take effect.
-	/// \param [in] width Data width in bits (0 = don't care).
-	void set_data_width(u8 width) { this->m_data_width = width; }
+	/// Allows data width to be specified after construction.  Note
+	/// that this must be done before resolution time to take effect.
+	/// \param [in] width Required data width in bits, or zero if any
+	///   data width is acceptable.
+	void set_data_width(u8 width) { assert(!this->m_resolved); this->m_data_width = width; }
 
 	/// \brief Get space number
 	///
@@ -1068,21 +1080,13 @@ public:
 	///
 	/// \return Length in units of elements or zero if no matching
 	///   memory region has been found.
-	u32 length() const { return m_length; }
+	size_t length() const { return m_length; }
 
 	/// \brief Get length in units of bytes
 	///
 	/// \return Length in units of bytes or zero if no matching memory
 	///   region has been found.
-	u32 bytes() const { return m_length * sizeof(PointerType); }
-
-	/// \brief Get index mask
-	///
-	/// Returns the length in units of elements minus one, which can be
-	/// used as a mask for index values if the length is a power of two.
-	/// Result is undefined if no matching memory region has been found.
-	/// \return Length in units of elements minus one.
-	u32 mask() const { return m_length - 1; }
+	size_t bytes() const { return m_length * sizeof(PointerType); }
 
 private:
 	/// \brief Find memory region base pointer
@@ -1178,15 +1182,13 @@ public:
 	///
 	/// \return Length in units of elements or zero if no matching
 	///   memory region has been found.
-	u32 length() const { return m_bytes / sizeof(PointerType); }
+	size_t length() const { return m_bytes / sizeof(PointerType); }
 
 	/// \brief Get length in bytes
 	///
 	/// \return Length in bytes or zero if no matching memory share has
 	///   been found.
-	u32 bytes() const { return m_bytes; }
-
-	u32 mask() const { return m_bytes - 1; } // FIXME: wrong when sizeof(PointerType) != 1
+	size_t bytes() const { return m_bytes; }
 
 private:
 	/// \brief Find memory share base pointer

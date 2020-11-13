@@ -127,8 +127,7 @@ void *finder_base::find_memshare(u8 width, size_t &bytes, bool required) const
 	// check the width and warn if not correct
 	if (width != 0 && share->bitwidth() != width)
 	{
-		if (required)
-			osd_printf_warning("Shared ptr '%s' found but is width %d, not %d as requested\n", m_tag, share->bitwidth(), width);
+		osd_printf_warning("Shared ptr '%s' found but is width %d, not %d as requested\n", m_tag, share->bitwidth(), width);
 		return nullptr;
 	}
 
@@ -168,8 +167,7 @@ address_space *finder_base::find_addrspace(int spacenum, u8 width, bool required
 	address_space &space(memory->space(spacenum));
 	if (width != 0 && width != space.data_width())
 	{
-		if (required)
-			osd_printf_warning("Device '%s' found but address space #%d has the wrong data width (expected %d, found %d)\n", m_tag, spacenum, width, space.data_width());
+		osd_printf_warning("Device '%s' found but address space #%d has the wrong data width (expected %d, found %d)\n", m_tag, spacenum, width, space.data_width());
 		return nullptr;
 	}
 
@@ -186,7 +184,7 @@ bool finder_base::validate_addrspace(int spacenum, u8 width, bool required) cons
 {
 	// look up the device and return false if not found
 	device_t *const device(m_base.get().subdevice(m_tag));
-	if (device == nullptr)
+	if (!device)
 		return report_missing(false, "address space", required);
 
 	// check for memory interface and a configuration for the designated space
@@ -395,13 +393,13 @@ bool memory_share_creator<PointerType>::findit(validity_checker *valid)
 	memory_share *const share = manager.share_find(tag);
 	if (share)
 	{
-		m_target = share;
 		std::string const result = share->compare(m_width, m_bytes, m_endianness);
 		if (!result.empty())
 		{
 			osd_printf_error("%s\n", result);
 			return false;
 		}
+		m_target = share;
 	}
 	else
 	{
