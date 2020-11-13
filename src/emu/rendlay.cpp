@@ -4475,6 +4475,10 @@ layout_view::item::item(
 	{
 		throw layout_syntax_error(util::string_format("item of type %s require an element tag", itemnode.get_name()));
 	}
+
+	// this can be called before resolving tags, make it return something valid
+	m_bounds = m_rawbounds;
+	m_get_bounds = bounds_delegate(&emu::render::detail::bounds_step::get, &const_cast<emu::render::detail::bounds_step &>(m_bounds.front()));
 }
 
 
