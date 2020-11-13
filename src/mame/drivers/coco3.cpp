@@ -262,8 +262,8 @@ void coco3_state::coco3(machine_config &config)
 	m_maincpu->set_dasm_override(FUNC(coco_state::dasm_override));
 
 	// devices
-	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);;
-	INPUT_MERGER_ANY_HIGH(config, m_firqs).output_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);;
+	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
+	INPUT_MERGER_ANY_HIGH(config, m_firqs).output_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 
 	pia6821_device &pia0(PIA6821(config, PIA0_TAG, 0));
 	pia0.writepa_handler().set(FUNC(coco_state::pia0_pa_w));

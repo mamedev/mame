@@ -260,8 +260,8 @@ void dragon_state::dragon_base(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &dragon_state::dragon_mem);
 
 	// devices
-	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);;
-	INPUT_MERGER_ANY_HIGH(config, m_firqs).output_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);;
+	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
+	INPUT_MERGER_ANY_HIGH(config, m_firqs).output_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 
 	pia6821_device &pia0(PIA6821(config, PIA0_TAG, 0));
 	pia0.writepa_handler().set(FUNC(coco_state::pia0_pa_w));
@@ -415,7 +415,7 @@ void dragon_alpha_state::dgnalpha(machine_config &config)
 	sam().set_addrmap(5, &dragon_alpha_state::dgnalpha_io1);
 
 	// input merger
-	INPUT_MERGER_ANY_HIGH(config, m_nmis).output_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);;
+	INPUT_MERGER_ANY_HIGH(config, m_nmis).output_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	// cartridge
 	cococart_slot_device &cartslot(COCOCART_SLOT(config, CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), dragon_cart, nullptr));
