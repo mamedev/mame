@@ -1429,7 +1429,7 @@ GAME(1993,  lah_107,       lah_112,  de_3_dmd2, de_3, de_3_state, empty_init, RO
 GAME(1993,  lah_106c,      lah_112,  de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Last Action Hero (1.06 Canada)",                              MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1993,  lah_104f,      lah_112,  de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Last Action Hero (1.04 France)",                              MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1993,  lah_104s,      lah_112,  de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Last Action Hero (1.04 Spain)",                               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1992,  lw3_208, 0      0,       de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Lethal Weapon 3 (2.08)",                                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  lw3_208,       0,        de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Lethal Weapon 3 (2.08)",                                      MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  lw3_207,       lw3_208,  de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Lethal Weapon 3 (2.07)",                                      MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  lw3_207c,      lw3_208,  de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Lethal Weapon 3 (2.07 Canada)",                               MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  lw3_205,       lw3_208,  de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Lethal Weapon 3 (2.05)",                                      MACHINE_IS_SKELETON_MECHANICAL)
