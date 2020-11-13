@@ -38,6 +38,7 @@
 #include "bus/coco/coco_rs232.h"
 #include "bus/coco/coco_ssc.h"
 #include "bus/coco/coco_stecomp.h"
+#include "bus/coco/coco_sym12.h"
 #include "bus/coco/coco_t4426.h"
 
 #include "cpu/m6809/m6809.h"
@@ -423,6 +424,7 @@ void coco_cart(device_slot_interface &device)
 	device.option_add("rs232", COCO_RS232);
 	device.option_add("ssc", COCO_SSC);
 	device.option_add("stecomp", COCO_STEREO_COMPOSER);
+	device.option_add("sym12", COCO_SYM12);
 }
 
 //-------------------------------------------------
