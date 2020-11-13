@@ -46,6 +46,7 @@ TODO:
 - ss22 poly translucency is probably more limited than currently emulated, not supporting stacked layers
 - there's a sprite limit per scanline, eg. timecris submarine explosion smoke partially erases sprites on real hardware
 - cybrcycc speed dial needle polygon is missing
+- propcycl high score entry magnification effect is flipped horizontally
 - global offset is wrong in non-super22 servicemode video test, and above that, it flickers in acedrvrw, victlapw
 - ridgerac fogging isn't applied to the upper/side part of the sky (best seen when driving down a hill), it's fine in ridgera2,
   czram contents is rather odd here and partly cleared (probably the cause?):
