@@ -212,8 +212,8 @@ protected:
 	optional_shared_ptr<uint32_t> m_workram;
 	optional_shared_ptr<uint32_t> m_psacram;
 	optional_shared_ptr<uint32_t> m_subpaletteram32;
-	optional_shared_ptr<uint16_t> m_k053936_0_ctrl;
-	optional_shared_ptr<uint16_t> m_k053936_0_linectrl;
+	optional_shared_ptr<uint32_t> m_k053936_0_ctrl;
+	optional_shared_ptr<uint32_t> m_k053936_0_linectrl;
 	optional_shared_ptr<uint16_t> m_k053936_0_ctrl_16;
 	optional_shared_ptr<uint16_t> m_k053936_0_linectrl_16;
 	optional_shared_ptr<uint32_t> m_generic_paletteram_32;
