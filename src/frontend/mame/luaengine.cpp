@@ -955,7 +955,7 @@ void lua_engine::initialize()
  * file:fullpath() -
 */
 
-	auto file_type = emu.new_usertype<emu_file>(sol::call_constructor, sol::initializers(
+	auto file_type = emu.new_usertype<emu_file>("file", sol::call_constructor, sol::initializers(
 				[](emu_file &file, u32 flags) { new (&file) emu_file(flags); },
 				[](emu_file &file, const char *path, u32 flags) { new (&file) emu_file(path, flags); },
 				[](emu_file &file, const char *mode) {
@@ -1045,7 +1045,6 @@ void lua_engine::initialize()
 	file_type.set("size", &emu_file::size);
 	file_type.set("filename", &emu_file::filename);
 	file_type.set("fullpath", &emu_file::fullpath);
-	emu.set("file", file_type);
 
 
 /*  thread library
@@ -1062,7 +1061,7 @@ void lua_engine::initialize()
  * thread.yield - check if thread is yielded
  */
 
-	auto thread_type = emu.new_usertype<context>(sol::call_constructor, sol::constructors<sol::types<>>());
+	auto thread_type = emu.new_usertype<context>("thread", sol::call_constructor, sol::constructors<sol::types<>>());
 	thread_type.set("start", [](context &ctx, const char *scr) {
 			std::string script(scr);
 			if(ctx.busy)
@@ -1115,7 +1114,7 @@ void lua_engine::initialize()
 		}));
 	thread_type.set("busy", sol::readonly(&context::busy));
 	thread_type.set("yield", sol::readonly(&context::yield));
-	emu.set("thread", thread_type);
+	//emu.set("thread", thread_type);
 
 
 /*  save_item library
@@ -1130,7 +1129,7 @@ void lua_engine::initialize()
  * item:write(offset, value) - write entry value by index
  */
 
-	auto item_type = emu.new_usertype<save_item>(sol::call_constructor, sol::initializers([this](save_item &item, int index) {
+	auto item_type = emu.new_usertype<save_item>("item", sol::call_constructor, sol::initializers([this](save_item &item, int index) {
 					if(machine().save().indexed_item(index, item.base, item.size, item.valcount, item.blockcount, item.stride))
 					{
 						item.count = item.valcount * item.blockcount;
@@ -1215,7 +1214,6 @@ void lua_engine::initialize()
 					break;
 			}
 		});
-	emu.set("item", item_type);
 
 
 /*  core_options library
@@ -1769,7 +1767,7 @@ void lua_engine::initialize()
  * space.map[] - table of address map entries (k=index, v=address_map_entry)
  */
 
-	auto addr_space_type = sol().registry().new_usertype<addr_space>(sol::call_constructor, sol::constructors<sol::types<address_space &, device_memory_interface &>>());
+	auto addr_space_type = sol().registry().new_usertype<addr_space>("addr_space", sol::call_constructor, sol::constructors<sol::types<address_space &, device_memory_interface &>>());
 	addr_space_type.set("read_i8", &addr_space::mem_read<int8_t>);
 	addr_space_type.set("read_u8", &addr_space::mem_read<uint8_t>);
 	addr_space_type.set("read_i16", &addr_space::mem_read<int16_t>);
@@ -1918,7 +1916,6 @@ void lua_engine::initialize()
 			}
 			return map;
 		}));
-	sol().registry().set("addr_space", addr_space_type);
 
 
 /*  ioport_manager library
