@@ -296,7 +296,6 @@ void speaker_sound_device::level_w(int new_level)
 
 	/* Finally update speaker state before returning */
 	m_level = new_level;
-
 }
 
 

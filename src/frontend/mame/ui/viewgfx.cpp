@@ -307,9 +307,8 @@ again:
 				break;
 			}
 
-			// fall through...
 			state.mode++;
-
+			[[fallthrough]];
 		case UI_GFX_GFXSET:
 			// if we have graphics sets, display them
 			if (state.gfxset.devcount > 0)
@@ -318,9 +317,8 @@ again:
 				break;
 			}
 
-			// fall through...
 			state.mode++;
-
+			[[fallthrough]];
 		case UI_GFX_TILEMAP:
 			// if we have tilemaps, display them
 			if (mui.machine().tilemap().count() > 0)

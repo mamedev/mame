@@ -12,8 +12,7 @@
 
 DEFINE_DEVICE_TYPE_NS(HP_46060B_MOUSE, bus::hp_hil, hle_hp_46060b_device, "hp_46060b", "HP 46060B Mouse")
 
-namespace bus {
-	namespace hp_hil {
+namespace bus::hp_hil {
 
 namespace {
 
@@ -128,4 +127,3 @@ INPUT_CHANGED_MEMBER(hle_hp_46060b_device::mouse_button)
 }
 
 } // namesapce bus::hp_hil
-} // namespace bus

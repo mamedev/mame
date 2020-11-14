@@ -257,7 +257,7 @@ void psikyo_state::get_sprites()
 			for (int dx = xstart; dx != xend; dx += xinc)
 			{
 				m_sprite_ptr_pre->gfx = 0;
-				m_sprite_ptr_pre->code = m_spritelut[code & m_spritelut.mask()];
+				m_sprite_ptr_pre->code = m_spritelut[code & (m_spritelut.length() - 1)];
 				m_sprite_ptr_pre->color = attr >> 8;
 				m_sprite_ptr_pre->flipx = flipx;
 				m_sprite_ptr_pre->flipy = flipy;
@@ -364,7 +364,7 @@ void psikyo_state::get_sprites_bootleg()
 			for (int dx = xstart; dx != xend; dx += xinc)
 			{
 				m_sprite_ptr_pre->gfx = 0;
-				m_sprite_ptr_pre->code = m_spritelut[code & m_spritelut.mask()];
+				m_sprite_ptr_pre->code = m_spritelut[code & (m_spritelut.length() - 1)];
 				m_sprite_ptr_pre->color = attr >> 8;
 				m_sprite_ptr_pre->flipx = flipx;
 				m_sprite_ptr_pre->flipy = flipy;

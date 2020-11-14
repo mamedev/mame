@@ -771,7 +771,8 @@ int avg_mhavoc_device::handler_6() // mhavoc_strobe2
 			if (m_dvy & 0x800)
 			{
 				m_enspkl = 1;
-				m_spkl_shift = bitswap<4>(m_dvy, 1, 1, 2, 3) | ((machine().rand() & 0x7) << 4);
+				// sparkle LFSR bits 4,5,6 here come from alpha CPU address bus bits 0,1,2, they're not truly random.
+				m_spkl_shift = bitswap<4>(m_dvy, 0, 1, 2, 3) | ((machine().rand() & 0x7) << 4);
 			}
 			else
 			{

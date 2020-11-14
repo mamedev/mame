@@ -372,6 +372,7 @@ void nes_cart_slot_device::call_load_ines()
 
 		case 0x8:   // it's iNES 2.0 format
 			ines20 = true;
+			[[fallthrough]];
 		case 0x0:
 		default:
 			mapper |= header[7] & 0xf0;
@@ -840,6 +841,7 @@ const char * nes_cart_slot_device::get_default_card_ines(get_default_card_softwa
 
 		case 0x8:   // it's iNES 2.0 format
 			ines20 = true;
+			[[fallthrough]];
 		case 0x0:
 		default:
 			mapper |= ROM[7] & 0xf0;

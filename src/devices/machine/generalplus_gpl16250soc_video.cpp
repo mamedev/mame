@@ -38,6 +38,7 @@ gcm394_base_video_device::gcm394_base_video_device(const machine_config &mconfig
 	m_rowzoom(*this, "^rowzoom"),
 	m_alt_extrasprite_hack(0),
 	m_alt_tile_addressing(0),
+	m_use_legacy_mode(false),
 	m_renderer(*this, "renderer")
 {
 }
@@ -333,10 +334,18 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 
 	// jak_s500 briely sets pen 0 of the layer to magenta, but then ends up erasing it
 
-	const uint32_t page0_addr = (m_page0_addr_msb << 16) | m_page0_addr_lsb;
-	const uint32_t page1_addr = (m_page1_addr_msb << 16) | m_page1_addr_lsb;
-	const uint32_t page2_addr = (m_page2_addr_msb << 16) | m_page2_addr_lsb;
-	const uint32_t page3_addr = (m_page3_addr_msb << 16) | m_page3_addr_lsb;
+	uint32_t page0_addr = (m_page0_addr_msb << 16) | m_page0_addr_lsb;
+	uint32_t page1_addr = (m_page1_addr_msb << 16) | m_page1_addr_lsb;
+	uint32_t page2_addr = (m_page2_addr_msb << 16) | m_page2_addr_lsb;
+	uint32_t page3_addr = (m_page3_addr_msb << 16) | m_page3_addr_lsb;
+
+	if (m_use_legacy_mode)
+	{
+		page0_addr = page0_addr * 0x40;
+		page1_addr = page1_addr * 0x40;
+		page2_addr = page2_addr * 0x40;
+		page3_addr = page3_addr * 0x40;
+	}
 
 
 	if (0)
@@ -389,7 +398,10 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 	address_space &mem = m_cpu->space(AS_PROGRAM);
 
 
-	const uint32_t sprites_addr = (m_sprite_702d_gfxbase_msb << 16) | m_sprite_7022_gfxbase_lsb;
+	uint32_t sprites_addr = (m_sprite_702d_gfxbase_msb << 16) | m_sprite_7022_gfxbase_lsb;
+
+	if (m_use_legacy_mode)
+		sprites_addr *= 0x40;
 
 	for (uint32_t scanline = (uint32_t)cliprect.min_y; scanline <= (uint32_t)cliprect.max_y; scanline++)
 	{
@@ -402,7 +414,7 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 			m_renderer->draw_page(true, true, m_alt_tile_addressing ? false : true, m_703a_palettebank, cliprect, scanline, i, page2_addr, m_tmap2_scroll, m_tmap2_regs, mem, m_paletteram, m_rowscroll, 2);
 			m_renderer->draw_page(true, true, m_alt_tile_addressing ? false : true, m_703a_palettebank, cliprect, scanline, i, page3_addr, m_tmap3_scroll, m_tmap3_regs, mem, m_paletteram, m_rowscroll, 3);
 
-			m_renderer->draw_sprites(true, true, m_alt_extrasprite_hack ? true : false, m_703a_palettebank, highres, cliprect, scanline, i, sprites_addr, mem, m_paletteram, m_spriteram, -1);
+			m_renderer->draw_sprites(true, m_use_legacy_mode ? 2 : 1, m_alt_extrasprite_hack ? true : false, m_703a_palettebank, highres, cliprect, scanline, i, sprites_addr, mem, m_paletteram, m_spriteram, -1);
 		}
 
 		m_renderer->apply_saturation_and_fade(bitmap, cliprect, scanline);
@@ -982,10 +994,11 @@ uint16_t gcm394_base_video_device::video_7051_r()
 	return retdat;
 }
 
-uint16_t gcm394_base_video_device::video_70e0_r()
+uint16_t gcm394_base_video_device::video_70e0_prng_r()
 {
-	uint16_t retdat = machine().rand();
-	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_70e0_r (returning %04x)\n", machine().describe_context(), retdat);
+	// several games in the beijuehh use this to generate random pieces / enemies, bit 0x8000 can't be set or it will generate a negative index into tables
+	uint16_t retdat = machine().rand() & 0x7fff;
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_70e0_prng_r (returning %04x)\n", machine().describe_context(), retdat);
 	return retdat;
 }
 

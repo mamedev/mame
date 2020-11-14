@@ -97,7 +97,7 @@ bool psx_analog_controller_device::get_pad(int count, uint8_t *odata, uint8_t id
 					case CONFIG_MODE: // 43
 						if(count == 3)
 							m_temp = idata;
-						/* no break */
+						[[fallthrough]];
 					case QUERY_PAD_STATE: // 42
 						*odata = pad_data(count, true);
 						break;
@@ -142,7 +142,7 @@ bool psx_analog_controller_device::get_pad(int count, uint8_t *odata, uint8_t id
 						{
 							case 3:
 								m_temp = idata;
-								/* no break */
+								[[fallthrough]];
 							default:
 								*odata = 0x00;
 								break;
@@ -181,7 +181,7 @@ bool psx_analog_controller_device::get_pad(int count, uint8_t *odata, uint8_t id
 			case 3:
 				if(m_cmd == CONFIG_MODE)
 					m_temp = idata;
-				/* no break */
+				[[fallthrough]];
 			default:
 				*odata = pad_data(count, true);
 				break;
@@ -207,7 +207,7 @@ bool psx_analog_controller_device::get_pad(int count, uint8_t *odata, uint8_t id
 			case 3:
 				if(m_cmd == CONFIG_MODE)
 					m_temp = idata;
-				/* no break */
+				[[fallthrough]];
 			default:
 				*odata = pad_data(count, false);
 				break;

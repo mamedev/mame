@@ -1011,6 +1011,9 @@ GFXDECODE_END
 
 void psikyo_state::machine_start()
 {
+	// assumes it can make an address mask with m_spritelut.length() - 1
+	assert(!(m_spritelut.length() & (m_spritelut.length() - 1)));
+
 	save_item(NAME(m_mcu_status));
 	save_item(NAME(m_tilemap_bank));
 }

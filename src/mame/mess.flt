@@ -42,6 +42,7 @@ alesis_qs.cpp
 alfaskop41xx.cpp
 alphajuno.cpp
 alphasma.cpp
+alphatan.cpp
 alphatpc16.cpp
 alphatpx.cpp
 alphatro.cpp
@@ -1110,6 +1111,7 @@ vtech2.cpp
 vtech_eu3a12.cpp
 wangpc.cpp
 wicat.cpp
+wizard.cpp
 wrinkles.cpp
 wswan.cpp
 wxstar4000.cpp

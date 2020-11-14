@@ -192,6 +192,7 @@ void isbc_215g_device::io_w(offs_t offset, uint16_t data)
 				find_sector();
 			else if(m_amsrch)
 				logerror("isbc_215g: address search without read gate\n");
+			[[fallthrough]];
 		case 0x01:
 			m_stepdir = (data & 0x80) ? 1 : 0;
 			break;

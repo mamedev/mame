@@ -8,9 +8,9 @@ Compiling MAME
 All Platforms
 -------------
 
-* To compile MAME, you need a C++14 compiler and runtime library.  We
-  support building with GCC version 7.2 or later and clang version 5 or
-  later.  MAME should run with GNU libstdc++ version 5.1 or later.
+* To compile MAME, you need a C++17 compiler and runtime library.  We
+  support building with GCC version 7.2 or later and clang version 6 or
+  later.  MAME should run with GNU libstdc++ version 7.2 or later.
 
 * Whenever you are changing build parameters, (such as switching between
   a SDL-based build and a native Windows renderer one, or adding tools
@@ -613,7 +613,7 @@ Using a GCC/GNU libstdc++ installation in a non-standard location on Linux
 GCC may be built and installed to a custom location, typically by supplying the
 **--prefix=** option to the **configure** command.  This may be useful if you
 want to build MAME on a Linux distribution that still uses a version of GNU
-libstdC++ that predates C++14 support.  To use an alternate GCC installation to,
+libstdC++ that predates C++17 support.  To use an alternate GCC installation to,
 build MAME, set the C and C++ compilers to the full paths to the **gcc** and
 **g++** commands, and add the library path to the run-time search path.  If you
 installed GCC in /opt/local/gcc72, you might use a command like this:

@@ -408,6 +408,7 @@ MACHINE_START_MEMBER(system1_state,system2)
 
 void system1_state::machine_reset()
 {
+	m_dakkochn_mux_data = 0;
 }
 
 

@@ -427,6 +427,7 @@ void cxhumax_state::cx_uart2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 					}
 				}
 			}
+			[[fallthrough]];
 		default:
 			COMBINE_DATA(&m_uart2_regs[offset]); break;
 	}
@@ -684,7 +685,7 @@ uint32_t cxhumax_state::cx_i2c1_r(offs_t offset)
 	switch(offset) {
 		case I2C_STAT_REG:
 			data |= m_i2cmem->read_sda()<<3;
-			// fall
+			[[fallthrough]];
 		default:
 			data |= m_i2c1_regs[offset]; break;
 	}
@@ -745,7 +746,7 @@ void cxhumax_state::cx_i2c1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		case I2C_STAT_REG:
 			/* The interrupt status bit may be cleared by writing (anything) to the status register, which also clears the acknowledge status. */
 			data&=~(I2C_WACK_BIT|I2C_INT_BIT);
-			// fall
+			[[fallthrough]];
 		default:
 			COMBINE_DATA(&m_i2c1_regs[offset]);
 	}

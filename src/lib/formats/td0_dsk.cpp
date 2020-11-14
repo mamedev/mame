@@ -874,7 +874,8 @@ bool td0_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 					return false; // single side hd?
 				break;
 			}
-			/* no break; could be qd, won't know until tracks are counted */
+			// could be qd, won't know until tracks are counted
+			[[fallthrough]];
 		case 1:
 			if(head_count == 2)
 				image->set_variant(floppy_image::DSDD);
@@ -891,7 +892,7 @@ bool td0_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 				break;
 			} else
 				image->set_variant(floppy_image::SSDD);
-			break;
+			break; // FIXME: comment below says "no break" but this is a breal
 			/* no break */
 		case 3:
 			if(head_count == 2)

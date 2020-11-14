@@ -75,6 +75,7 @@ void twincobr_state::twincobr_dsp_w(u16 data)
 	switch (m_main_ram_seg)
 	{
 	case 0x30000:   if ((m_dsp_addr_w < 3) && (data == 0)) m_dsp_execute = 1;
+		[[fallthrough]];
 	case 0x40000:
 	case 0x50000:  {address_space &mainspace = m_maincpu->space(AS_PROGRAM);
 					mainspace.write_word(m_main_ram_seg + m_dsp_addr_w, data);
@@ -125,6 +126,7 @@ void twincobr_state::wardner_dsp_w(u16 data)
 	switch (m_main_ram_seg)
 	{
 	case 0x7000:    if ((m_dsp_addr_w < 3) && (data == 0)) m_dsp_execute = 1;
+		[[fallthrough]];
 	case 0x8000:
 	case 0xa000:   {address_space &mainspace = m_maincpu->space(AS_PROGRAM);
 					mainspace.write_byte(m_main_ram_seg + (m_dsp_addr_w + 0), (data & 0xff));

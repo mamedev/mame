@@ -5211,6 +5211,7 @@ void mips3_device::execute_run()
 						machine().debug_break();
 					break;
 				}
+				[[fallthrough]];
 			case 0x31:  /* LWC1 */
 				if (!(SR & SR_COP1))
 				{
@@ -5233,16 +5234,17 @@ void mips3_device::execute_run()
 						machine().debug_break();
 					break;
 				}
+				[[fallthrough]];
 			case 0x35:  /* LDC1 */
-			if (!(SR & SR_COP1))
-			{
-				m_badcop_value = 1;
-				generate_exception(EXCEPTION_BADCOP, 1);
+				if (!(SR & SR_COP1))
+				{
+					m_badcop_value = 1;
+					generate_exception(EXCEPTION_BADCOP, 1);
+					break;
+				}
+				if (RDOUBLE(SIMMVAL+RSVAL32, &temp64))
+					set_cop1_reg64(RTREG, temp64);
 				break;
-			}
-			if (RDOUBLE(SIMMVAL+RSVAL32, &temp64))
-				set_cop1_reg64(RTREG, temp64);
-			break;
 			case 0x36:  handle_ldc2(op); break;
 			case 0x37:  /* LD */        if (RDOUBLE(SIMMVAL+RSVAL32, &temp64) && RTREG) RTVAL64 = temp64;       break;
 			case 0x38:  /* SC */

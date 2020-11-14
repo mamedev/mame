@@ -23,7 +23,7 @@
 
 DEFINE_DEVICE_TYPE_NS(V9938_COLORBUS, bus::ti99::colorbus, v9938_colorbus_device, "v9938_colorbus", "V9938 Color bus")
 
-namespace bus { namespace ti99 { namespace colorbus {
+namespace bus::ti99::colorbus {
 
 v9938_colorbus_device::v9938_colorbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	:   device_t(mconfig, V9938_COLORBUS, tag, owner, clock),
@@ -67,7 +67,7 @@ void device_v9938_colorbus_interface::interface_config_complete()
 	m_colorbus = dynamic_cast<v9938_colorbus_device*>(device().owner());
 }
 
-} } } // end namespace bus::ti99::colorbus
+} // end namespace bus::ti99::colorbus
 
 void ti99_colorbus_options(device_slot_interface &device)
 {

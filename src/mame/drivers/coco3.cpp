@@ -262,13 +262,16 @@ void coco3_state::coco3(machine_config &config)
 	m_maincpu->set_dasm_override(FUNC(coco_state::dasm_override));
 
 	// devices
+	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
+	INPUT_MERGER_ANY_HIGH(config, m_firqs).output_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
+
 	pia6821_device &pia0(PIA6821(config, PIA0_TAG, 0));
 	pia0.writepa_handler().set(FUNC(coco_state::pia0_pa_w));
 	pia0.writepb_handler().set(FUNC(coco_state::pia0_pb_w));
 	pia0.ca2_handler().set(FUNC(coco_state::pia0_ca2_w));
 	pia0.cb2_handler().set(FUNC(coco_state::pia0_cb2_w));
-	pia0.irqa_handler().set(FUNC(coco_state::pia0_irq_a));
-	pia0.irqb_handler().set(FUNC(coco_state::pia0_irq_b));
+	pia0.irqa_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));
+	pia0.irqb_handler().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 
 	pia6821_device &pia1(PIA6821(config, PIA1_TAG, 0));
 	pia1.readpa_handler().set(FUNC(coco_state::pia1_pa_r));
@@ -277,8 +280,8 @@ void coco3_state::coco3(machine_config &config)
 	pia1.writepb_handler().set(FUNC(coco_state::pia1_pb_w));
 	pia1.ca2_handler().set(FUNC(coco_state::pia1_ca2_w));
 	pia1.cb2_handler().set(FUNC(coco_state::pia1_cb2_w));
-	pia1.irqa_handler().set(FUNC(coco_state::pia1_firq_a));
-	pia1.irqb_handler().set(FUNC(coco_state::pia1_firq_b));
+	pia1.irqa_handler().set(m_firqs, FUNC(input_merger_device::in_w<0>));
+	pia1.irqb_handler().set(m_firqs, FUNC(input_merger_device::in_w<1>));
 
 	// Becker Port device
 	COCO_DWSOCK(config, DWSOCK_TAG, 0);
@@ -309,8 +312,8 @@ void coco3_state::coco3(machine_config &config)
 	m_gime->set_screen(COMPOSITE_SCREEN_TAG);
 	m_gime->hsync_wr_callback().set(PIA0_TAG, FUNC(pia6821_device::ca1_w));
 	m_gime->fsync_wr_callback().set(PIA0_TAG, FUNC(pia6821_device::cb1_w));
-	m_gime->irq_wr_callback().set(FUNC(coco3_state::gime_irq_w));
-	m_gime->firq_wr_callback().set(FUNC(coco3_state::gime_firq_w));
+	m_gime->irq_wr_callback().set(m_irqs, FUNC(input_merger_device::in_w<2>));
+	m_gime->firq_wr_callback().set(m_firqs, FUNC(input_merger_device::in_w<2>));
 	m_gime->floating_bus_rd_callback().set(FUNC(coco3_state::floating_bus_r));
 
 	// composite monitor
@@ -351,8 +354,8 @@ void coco3_state::coco3p(machine_config &config)
 	m_gime->set_screen(COMPOSITE_SCREEN_TAG);
 	m_gime->hsync_wr_callback().set(PIA0_TAG, FUNC(pia6821_device::ca1_w));
 	m_gime->fsync_wr_callback().set(PIA0_TAG, FUNC(pia6821_device::cb1_w));
-	m_gime->irq_wr_callback().set(FUNC(coco3_state::gime_irq_w));
-	m_gime->firq_wr_callback().set(FUNC(coco3_state::gime_firq_w));
+	m_gime->irq_wr_callback().set(m_irqs, FUNC(input_merger_device::in_w<2>));
+	m_gime->firq_wr_callback().set(m_firqs, FUNC(input_merger_device::in_w<2>));
 	m_gime->floating_bus_rd_callback().set(FUNC(coco3_state::floating_bus_r));
 }
 

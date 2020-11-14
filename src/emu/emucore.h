@@ -288,18 +288,19 @@ private:
 [[noreturn]] void report_bad_device_cast(const device_t *dev, const std::type_info &src_type, const std::type_info &dst_type);
 
 template <typename Dest, typename Source>
-inline std::enable_if_t<std::is_base_of<device_t, Source>::value> report_bad_cast(Source *const src)
+inline void report_bad_cast(Source *src)
 {
-	if (src) report_bad_device_cast(src, typeid(Source), typeid(Dest));
-	else report_bad_cast(typeid(Source), typeid(Dest));
-}
-
-template <typename Dest, typename Source>
-inline std::enable_if_t<!std::is_base_of<device_t, Source>::value> report_bad_cast(Source *const src)
-{
-	device_t const *dev(dynamic_cast<device_t const *>(src));
-	if (dev) report_bad_device_cast(dev, typeid(Source), typeid(Dest));
-	else report_bad_cast(typeid(Source), typeid(Dest));
+	if constexpr (std::is_base_of_v<device_t, Source>)
+	{
+		if (src) report_bad_device_cast(src, typeid(Source), typeid(Dest));
+		else report_bad_cast(typeid(Source), typeid(Dest));
+	}
+	else
+	{
+		device_t const *dev(dynamic_cast<device_t const *>(src));
+		if (dev) report_bad_device_cast(dev, typeid(Source), typeid(Dest));
+		else report_bad_cast(typeid(Source), typeid(Dest));
+	}
 }
 
 // template function for casting from a base class to a derived class that is checked

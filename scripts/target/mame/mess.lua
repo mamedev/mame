@@ -1645,6 +1645,8 @@ createMESSProjects(_target, _subtarget, "agat")
 files {
 	MAME_DIR .. "src/mame/drivers/agat.cpp",
 	MAME_DIR .. "src/mame/includes/apple2.h",
+	MAME_DIR .. "src/mame/machine/agatkeyb.cpp",
+	MAME_DIR .. "src/mame/machine/agatkeyb.h",
 	MAME_DIR .. "src/mame/video/agat7.cpp",
 	MAME_DIR .. "src/mame/video/agat7.h",
 	MAME_DIR .. "src/mame/video/agat9.cpp",
@@ -3588,6 +3590,7 @@ files {
 	MAME_DIR .. "src/mame/video/mz80.cpp",
 	MAME_DIR .. "src/mame/machine/mz80.cpp",
 	MAME_DIR .. "src/mame/drivers/mz2000.cpp",
+	MAME_DIR .. "src/mame/drivers/wizard.cpp",
 	MAME_DIR .. "src/mame/drivers/x1.cpp",
 	MAME_DIR .. "src/mame/includes/x1.h",
 	MAME_DIR .. "src/mame/machine/x1.cpp",
@@ -3762,11 +3765,12 @@ files {
 
 createMESSProjects(_target, _subtarget, "tangerin")
 files {
+	MAME_DIR .. "src/mame/drivers/alphatan.cpp",
+	MAME_DIR .. "src/mame/drivers/hhtiger.cpp",
 	MAME_DIR .. "src/mame/drivers/microtan.cpp",
 	MAME_DIR .. "src/mame/includes/microtan.h",
 	MAME_DIR .. "src/mame/machine/microtan.cpp",
 	MAME_DIR .. "src/mame/video/microtan.cpp",
-	MAME_DIR .. "src/mame/drivers/hhtiger.cpp",
 	MAME_DIR .. "src/mame/drivers/oric.cpp",
 }
 

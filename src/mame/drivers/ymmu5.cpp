@@ -225,7 +225,7 @@ void mu5_state::mu5(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MULTIPCM(config, m_ymw258, 9400000);
+	MULTIPCM(config, m_ymw258, 7500000);
 	m_ymw258->set_addrmap(0, &mu5_state::ymw258_map);
 	m_ymw258->add_route(0, "lspeaker", 1.0);
 	m_ymw258->add_route(1, "rspeaker", 1.0);
@@ -247,8 +247,8 @@ ROM_START( mu5 )
 	ROM_REGION(0x200000, "ymw258", 0)
 	ROM_LOAD("yamaha_mu5_waverom_xp50280-801.bin", 0x000000, 0x200000, CRC(e0913030) SHA1(369f8df4942b6717c142ca8c4913e556dafae187))
 
-	ROM_REGION(257524, "screen", 0)
-	ROM_LOAD("mu5lcd.svg", 0, 257524, CRC(a9a6f561) SHA1(c90d973bfb12755e99cf54d9323a54b773b48bba))
+	ROM_REGION(261774, "screen", 0)
+	ROM_LOAD("mu5lcd.svg", 0, 261774, CRC(3cccbb88) SHA1(3db0b16f27b501ff8d8ac3fb631dd315571230d3))
 ROM_END
 
 CONS(1994, mu5, 0, 0, mu5, mu5, mu5_state, empty_init, "Yamaha", "MU-5", MACHINE_NOT_WORKING )

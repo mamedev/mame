@@ -860,7 +860,7 @@ inline void cosmac_device::run_state()
 	{
 	case cosmac_state::STATE_0_FETCH:
 		m_op = 0;
-
+		[[fallthrough]];
 	case cosmac_state::STATE_0_FETCH_2ND:
 		fetch_instruction();
 		break;
@@ -872,7 +872,7 @@ inline void cosmac_device::run_state()
 
 	case cosmac_state::STATE_1_EXECUTE:
 		sample_ef_lines();
-
+		[[fallthrough]];
 	case cosmac_state::STATE_1_EXECUTE_2ND:
 		execute_instruction();
 		debug();

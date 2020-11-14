@@ -465,19 +465,19 @@ uint8_t ti99_8_state::psi_input(offs_t offset)
 	case tms9901_device::INT6:
 		if (m_keyboard_column >= 14)
 			return BIT(m_joyport->read_port(),0);
-
+		[[fallthrough]];
 	case tms9901_device::INT7_P15:
 		if (m_keyboard_column >= 14)
 			return BIT(m_joyport->read_port(),4);
-
+		[[fallthrough]];
 	case tms9901_device::INT8_P14:
 		if (m_keyboard_column >= 14)
 			return BIT(m_joyport->read_port(),1);
-
+		[[fallthrough]];
 	case tms9901_device::INT9_P13:
 		if (m_keyboard_column >= 14)
 			return BIT(m_joyport->read_port(),2);
-
+		[[fallthrough]];
 	case tms9901_device::INT10_P12:
 		if (m_keyboard_column >= 14)
 			return BIT(m_joyport->read_port(),3);

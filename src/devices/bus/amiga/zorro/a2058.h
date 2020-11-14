@@ -17,7 +17,7 @@
 #include "machine/autoconfig.h"
 
 
-namespace bus { namespace amiga { namespace zorro {
+namespace bus::amiga::zorro {
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -47,7 +47,7 @@ private:
 	int m_ram_size;
 };
 
-} } } // namespace bus::amiga::zorro
+} // namespace bus::amiga::zorro
 
 // device type definition
 DECLARE_DEVICE_TYPE_NS(ZORRO_A2058, bus::amiga::zorro, a2058_device)

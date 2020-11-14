@@ -154,7 +154,7 @@ using write32smo_delegate = device_delegate<void (u32)>;
 using write64smo_delegate = device_delegate<void (u64)>;
 
 
-namespace emu { namespace detail {
+namespace emu::detail {
 
 // TODO: replace with std::void_t when we move to C++17
 template <typename... T> struct void_wrapper { using type = void; };
@@ -456,7 +456,7 @@ constexpr int handler_entry_dispatch_lowbits(int highbits, int width, int ashift
 		width + ashift;
 }
 
-} } // namespace emu::detail
+} // namespace emu::detail
 
 
 // ======================> memory_units_descritor forwards declaration
@@ -992,7 +992,7 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void dispatch
 
 // memory_access_specific does uncached but faster accesses by shortcutting the address_space virtual call
 
-namespace emu { namespace detail {
+namespace emu::detail {
 
 template<int Level, int Width, int AddrShift, endianness_t Endian> class memory_access_specific
 {
@@ -1166,7 +1166,8 @@ private:
 
 	void set(address_space *space, std::pair<void *, void *> rw);
 };
-}}
+
+} // namespace emu::detail
 
 
 // ======================> memory_access cache/specific type dispatcher

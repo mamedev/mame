@@ -28,8 +28,7 @@ DEFINE_DEVICE_TYPE_NS(DIO32_SLOT, bus::hp_dio, dio32_slot_device, "dio32_slot", 
 DEFINE_DEVICE_TYPE_NS(DIO16, bus::hp_dio, dio16_device, "dio16", "16-bit DIO bus")
 DEFINE_DEVICE_TYPE_NS(DIO32, bus::hp_dio, dio32_device, "dio32", "32-bit DIO-II bus")
 
-namespace bus {
-	namespace hp_dio {
+namespace bus::hp_dio {
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -354,7 +353,6 @@ void device_dio32_card_interface::interface_pre_start()
 }
 
 } // namespace bus::hp_dio
-} // namespace bus
 
 void dio16_cards(device_slot_interface & device)
 {

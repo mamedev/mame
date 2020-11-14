@@ -36,7 +36,7 @@
 DEFINE_DEVICE_TYPE_NS(ZORRO_BUDDHA, bus::amiga::zorro, buddha_device, "zorro_buddha", "Buddha IDE controller")
 
 
-namespace bus { namespace amiga { namespace zorro {
+namespace bus::amiga::zorro {
 
 //-------------------------------------------------
 //  mmio_map - device-specific memory mapped I/O
@@ -326,4 +326,4 @@ void buddha_device::ide_1_cs1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	m_ata_1->cs1_w((offset >> 1) & 0x07, data, mem_mask);
 }
 
-} } } // namespace bus::amiga::zorro
+} // namespace bus::amiga::zorro

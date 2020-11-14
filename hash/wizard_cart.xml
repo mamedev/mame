@@ -1,0 +1,159 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+
+<!--
+
+Known carts list
+
+SERIAL         | TITLE                                                   | DUMPED
+_________________________________________________________________________________
+?               Golfpac Practice Analysis Card                            NO
+?               IQ-World                                                  NO
+?               IQ Plus                                                   NO
+?               Games Card                                                NO
+?               Gold Card - RAM Card 128 K With Battery                   N/A
+IQ-701A         Time Expense Manager                                      YES
+IQ-702A         Thesaurus Dictionary English                              NO
+IQ-703A         8-Languaje Translator                                     YES
+IQ-704B         Thesaurus Dictionary British                              NO
+IQ-705A         Money Planner                                             NO
+IQ-706A         3 Dimesional Spreadsheet for Electronic Organizer (16/16) YES
+IQ-707          Scientific Computer Card BASIC (16)                       NO
+OZ-708A         North American City Guide                                 NO
+IQ-711B         Bilingual Dictionary English-French French-English        NO
+IQ-712B         Bilingual Dictionary British-Deutsch Deutsch-British      NO
+IQ-714          Dictionnaire Synonymique Français                         NO
+OZ-715A         Bilingual Dictionary American-Español Español-American    NO
+IQ-717          Box Jockey                                                NO
+IQ-718M         Organizer Chess                                           NO
+IQ-719          Organizer Tetris                                          NO
+IQ-720          English-Chinese Dictionary                                NO
+IQ-721          Organizer Golf                                            NO
+IQ-722M         Investment Planner                                        NO
+IQ-7300M        Protection Card                                           N/A
+IQ-770          Program Card 64 BASIC                                     NO
+IQ-771          Program Card 32 BASIC (16)                                NO
+IQ-776          EPROM Card 128 (128K Bytes EPROM and 32 K Bytes RAM)      N/A
+IQ-780          RAM Card 32                                               N/A
+IQ-781 / OZ-781 RAM Card 64                                               N/A
+IQ-782          RAM Card 128                                              N/A
+IQ-783          RAM Card 256                                              N/A
+IQ-794A         Program Card BASIC Utility Software                       NO
+OZ-8000         Protection Card                                           N/A
+OZ-8200         Protection Card                                           N/A
+IQ-870          Program Card 32 BASIC (40/16)                             NO
+IQ-871          Program Card 128 BASIC                                    NO
+IQ-8A01         Organizer Hatris                                          NO
+IQ-8A02M        Backgammon for Electronic Organizer                       NO
+IQ-8B01         3 Dimesional Spreadsheet for Electronic Organizer (40/16) NO
+OZ-8B02         Organizer Fax                                             NO
+IQ-8B03         Scientific Computer Card BASIC (40/16)                    NO
+IQ-8B04M        3 Dimesional Spreadsheet (40/16, multi language)          NO
+IQ-8C01         Holy Bible for Electronic Organizer                       NO
+IQ-8C02         Encyclopaedia of Wine                                     NO
+IQ-8C04         11-Languaje Translator                                    NO
+IQ-8D01A        English Dictionary                                        NO
+CE-902          Program Card 256 BASIC                                    NO
+IQ-9B01         PenCell Spreadsheet                                       NO
+AC-1E           Nikon F90/N90 Card                                        NO
+AC-2E           Nikon F90x/N90s Card                                      NO
+
+
+Cart pinout
+______________________________________________
+1  VCC      
+2  NC    
+3  NC    
+4  VBATT      
+5  VCC?  Connects to pin 9 of TSOP32  (unused)    
+6  A15      
+7  A14      
+8  A13      
+9  A12      
+10  A11      
+11  A10      
+12  A9      
+13  A8      
+14  A7      
+15  A6      
+16  A5      
+17  A4      
+18  A3      
+19  A2      
+20  A1      
+21  A0      
+22  D0      
+23  D1      
+24  D2      
+25  D3      
+26  D4      
+27  D5      
+28  D6      
+29  D7      
+30  /CE    Mask ROM  
+31  /CE    SRAM 1  
+32  /CE    SRAM 2  
+33  /CE    EPROM  
+34  /WR      
+35  /OE      
+36  NC    
+37  gpio  A18?    
+38  gpio  A17    
+39  gpio  A16    
+40  \  NC
+41  /  NC
+42  NC  GPIO  
+43  NC  GPIO  
+44  NC    
+45  GND      
+
+-->
+
+<softwarelist name="wizard_cart" description="Sharp Wizard series cartridges">
+
+	<software name="3dssheet" supported="no">
+		<description>3 Dimensional Spreadsheet (IQ-8B01)</description>
+		<year>1990</year>
+		<publisher>PCSG</publisher>
+		<part name="cart" interface="wizard_cart">
+			<dataarea name="rom" size="0x20000">
+				<rom name="3dssheet.bin" size="0x20000" crc="c0440ad2" sha1="f7bb4eb99755ff0cc2496724e55d7be70552069a" />
+			</dataarea>
+			<dataarea name="sram" size="0x10000">
+				<rom name="3dssheet_sram.bin" size="0x10000" crc="25920e43" sha1="8581044402aca56da9147f13abd8a58af861c473" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="8ltransl" supported="no">
+		<description>8-Language Translator (IQ-703A)</description>
+		<year>1988</year>
+		<publisher>Sharp Corporation</publisher>
+		<part name="cart" interface="wizard_cart">
+			<dataarea name="rom" size="0x40000">
+				<rom name="8ltransl.bin" size="0x40000" crc="eb755572" sha1="bf2a43c30cdee042824f1ffb5063e23c183c5c29" />
+			</dataarea>
+			<dataarea name="sram" size="0x10000">
+				<rom name="8ltransl_sram.bin" size="0x10000" status="nodump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timeexpm" supported="no">
+		<description>Time Expense Manager (IQ-701A)</description>
+		<year>1988</year>
+		<publisher>Traveling Software, Inc.</publisher>
+		<part name="cart" interface="wizard_cart">
+			<dataarea name="rom" size="0x10000">
+				<rom name="timeexpm.bin" size="0x10000" crc="16d8d9e3" sha1="37eb163e86a0b57fc87c68d09e77020b26b217e5" />
+			</dataarea>
+			<dataarea name="sram" size="0x8000">
+				<rom name="timeexpm_sram.bin" size="0x8000" crc="f82cdc90" sha1="b0a2626c4d18a1b255548e0b1a61265b0aaa9656" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

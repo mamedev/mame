@@ -738,6 +738,7 @@ void ef9345_device::makechar(uint16_t x, uint16_t y)
 				makechar_16x40(x, y);
 				break;
 			}
+			[[fallthrough]];
 		case MODE8x80:
 			logerror("Unemulated EF9345 mode: %02x\n", m_char_mode);
 			break;

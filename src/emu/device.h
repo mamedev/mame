@@ -64,7 +64,7 @@ static const char DEVICE_SELF_OWNER[] = "^";
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-namespace emu { namespace detail {
+namespace emu::detail {
 
 class device_type_impl_base;
 
@@ -310,7 +310,7 @@ public:
 
 inline device_registrar::const_iterator &device_registrar::const_iterator::operator++() { m_type = m_type->m_next; return *this; }
 
-} } // namespace emu::detail
+} // namespace emu::detail
 
 
 // device types
@@ -341,6 +341,7 @@ constexpr auto driver_device_creator = &emu::detail::driver_tag_func<DriverClass
 		extern template class device_finder<Class, true>;
 
 #define DECLARE_DEVICE_TYPE_NS(Type, Namespace, Class) \
+		namespace Namespace { class Class; } \
 		extern emu::detail::device_type_impl<Namespace::Class> const &Type; \
 		extern template class device_finder<Namespace::Class, false>; \
 		extern template class device_finder<Namespace::Class, true>;

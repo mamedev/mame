@@ -235,6 +235,7 @@ void ds1994_device::ds1994_rom_cmd(void)
 			case ROMCMD_SEARCHINT:
 				verboselog(0, "timer_main rom_command not implemented %02x\n", m_shift);
 				m_state[m_state_ptr] = STATE_COMMAND;
+				break;
 			default:
 				verboselog(0, "timer_main rom_command not found %02x\n", m_shift);
 				m_state[m_state_ptr] = STATE_IDLE;

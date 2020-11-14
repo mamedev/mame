@@ -230,6 +230,7 @@ uint8_t bbc_opus8272_device::read(offs_t offset)
 	case 0x06:
 		if (m_floppy0->get_device()) m_floppy0->get_device()->mon_w(1);
 		if (m_floppy1->get_device()) m_floppy1->get_device()->mon_w(1);
+		[[fallthrough]];
 	case 0x04:
 		data = m_fdc->msr_r();
 		break;
@@ -237,6 +238,7 @@ uint8_t bbc_opus8272_device::read(offs_t offset)
 	case 0x05:
 		if (m_floppy0->get_device()) m_floppy0->get_device()->mon_w(0);
 		if (m_floppy1->get_device()) m_floppy1->get_device()->mon_w(0);
+		[[fallthrough]];
 	case 0x07:
 		data = m_fdc->fifo_r();
 		break;
@@ -262,6 +264,7 @@ void bbc_opus8272_device::write(offs_t offset, uint8_t data)
 	case 0x05:
 		if (m_floppy0->get_device()) m_floppy0->get_device()->mon_w(0);
 		if (m_floppy1->get_device()) m_floppy1->get_device()->mon_w(0);
+		[[fallthrough]];
 	case 0x07:
 		m_fdc->fifo_w(data);
 		break;

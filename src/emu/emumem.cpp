@@ -1034,7 +1034,7 @@ void memory_manager::initialize()
 
 void *memory_manager::allocate_memory(device_t &dev, int spacenum, std::string name, u8 width, size_t bytes)
 {
-	void *const ptr = m_datablocks.emplace(m_datablocks.end(), malloc(bytes))->get();
+	void *const ptr = m_datablocks.emplace_back(malloc(bytes)).get();
 	memset(ptr, 0, bytes);
 	machine().save().save_memory(&dev, "memory", dev.tag(), spacenum, name.c_str(), ptr, width/8, u32(bytes) / (width/8));
 	return ptr;
@@ -1564,7 +1564,7 @@ void address_space::populate_map_entry(const address_map_entry &entry, read_or_w
 			if (readorwrite == read_or_write::WRITE)
 				return;
 			// fall through to the RAM case otherwise
-
+			[[fallthrough]];
 		case AMH_RAM:
 			install_ram_generic(entry.m_addrstart, entry.m_addrend, entry.m_addrmirror, readorwrite, entry.m_memory);
 			break;

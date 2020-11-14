@@ -790,6 +790,7 @@ uint32_t model3_state::pci_device_get_reg()
 					logerror("pci_device_get_reg: Device 11, unknown reg %02X", reg);
 					break;
 			}
+			[[fallthrough]]; // FIXME: really?
 
 		case 13:        /* Real3D Controller chip */
 			switch(reg)

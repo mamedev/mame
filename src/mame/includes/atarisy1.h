@@ -87,7 +87,7 @@ protected:
 	optional_device<adc0808_device> m_adc;
 	optional_device<input_merger_device> m_ajsint;
 
-	/* playfield parameters */
+	// playfield parameters
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<tilemap_device> m_alpha_tilemap;
 	required_shared_ptr<uint16_t> m_xscroll;
@@ -97,19 +97,19 @@ protected:
 	uint16_t          m_playfield_priority_pens;
 	required_device<timer_device> m_yscroll_reset_timer;
 
-	/* INT3 tracking */
+	// INT3 tracking
 	int             m_next_timer_scanline;
 	required_device<timer_device> m_scanline_timer;
 	required_device<timer_device> m_int3off_timer;
 	uint8_t           m_scanline_int_state;
 
-	/* speech */
+	// speech
 	optional_device<tms5220_device> m_tms;
 
 	required_device<ls259_device> m_outlatch;
 	optional_device<via6522_device> m_via;
 
-	/* graphics bank tracking */
+	// graphics bank tracking
 	uint8_t           m_bank_gfx[3][8];
 	uint8_t           m_bank_color_shift[MAX_GFX_ELEMENTS];
 	uint8_t           m_bankselect;

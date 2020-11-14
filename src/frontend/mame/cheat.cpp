@@ -160,7 +160,7 @@ cheat_parameter::cheat_parameter(cheat_manager &manager, symbol_table &symbols, 
 		util::xml::data_node::int_format const format(itemnode->get_attribute_int_format("value"));
 
 		// allocate and append a new item
-		item &curitem(*m_itemlist.emplace(m_itemlist.end(), itemnode->get_value(), value, format));
+		item &curitem(m_itemlist.emplace_back(itemnode->get_value(), value, format));
 
 		// ensure the maximum expands to suit
 		m_maxval = std::max(m_maxval, curitem.value());

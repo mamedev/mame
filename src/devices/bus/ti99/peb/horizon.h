@@ -18,8 +18,9 @@
 
 #include "peribox.h"
 #include "machine/ram.h"
+#include "machine/74259.h"
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 class horizon_ramdisk_device : public device_t, public device_ti99_peribox_card_interface, public device_nvram_interface
 {
@@ -45,26 +46,38 @@ protected:
 	void nvram_write(emu_file &file) override;
 
 private:
-	void    setbit(int& page, int pattern, bool set);
-
 	required_device<ram_device> m_ram;
-	required_device<ram_device> m_nvram;
-	required_device<ram_device> m_ros;
+	required_device<ram_device> m_dsrram;
+	required_device<ram_device> m_optram;
+	required_device<ls259_device> m_crulatch_u4;
+	required_device<ls259_device> m_crulatch_u3;
+
+	void    get_mem_size(int& ramsize, int& dsrsize);
+	void    get_address_prefix();
+	void    read_write(offs_t offset, uint8_t *value, bool write);
+
+	bool    m_32k_installed;
+	bool    m_phoenix_accessed;
+	bool    m_dsr32k;
+	bool    m_128kx8;
+	bool    m_geneve_mode;
+	bool    m_phoenix_split;
+	bool    m_hideswitch;
+	bool    m_rambo_supported;
 
 	int     m_page;
+	int     m_bank;
+	int     m_ramsize;
 
-	int     m_cru_horizon;
-	int     m_cru_phoenix;
-	bool    m_timode;
-	bool    m_32k_installed;
-	bool    m_split_mode;
-	bool    m_rambo_mode;
-	bool    m_hideswitch;
-	bool    m_use_rambo;
-	bool    m_genmod_fix;
+	int     m_cru_base_horizon;
+	int     m_cru_base_phoenix;
+
+	// Debugging
+	int     m_current_bank;
+	int     m_current_page;
 };
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb
 
 DECLARE_DEVICE_TYPE_NS(TI99_HORIZON, bus::ti99::peb, horizon_ramdisk_device)
 

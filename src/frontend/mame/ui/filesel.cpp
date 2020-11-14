@@ -202,7 +202,7 @@ menu_file_selector::file_selector_entry &menu_file_selector::append_entry(
 	entry.fullpath = std::move(entry_fullpath);
 
 	// find the end of the list
-	return *m_entrylist.emplace(m_entrylist.end(), std::move(entry));
+	return m_entrylist.emplace_back(std::move(entry));
 }
 
 

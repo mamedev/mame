@@ -99,6 +99,9 @@ void ef9364_device::set_color_entry( int index, uint8_t r, uint8_t g, uint8_t b 
 
 void ef9364_device::device_start()
 {
+	// assumes it can make an address mask with m_charset.length() - 1
+	assert(!(m_charset.length() & (m_charset.length() - 1)));
+
 	m_textram = &space(0);
 
 	bitplane_xres = NB_OF_COLUMNS*8;
@@ -190,7 +193,7 @@ uint32_t ef9364_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 				{
 					unsigned char c = m_textram->read_byte( ( r * NB_OF_COLUMNS ) + ( x>>3 ) );
 
-					if( m_charset[((c<<3) + y) & m_charset.mask()] & (0x80>>(x&7)) )
+					if( BIT(m_charset[((c<<3) + y) & (m_charset.length() - 1)], 7 - (x & 7)) )
 						m_screen_out.pix((r*12)+y, x) = palette[1];
 					else
 						m_screen_out.pix((r*12)+y, x) = palette[0];

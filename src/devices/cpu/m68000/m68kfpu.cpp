@@ -1748,7 +1748,7 @@ void m68000_base_device::fmovem(u16 w2)
 			case 1: // Dynamic register list, postincrement or control addressing mode.
 				// FIXME: not really tested, but seems to work
 				reglist = REG_D()[(reglist >> 4) & 7];
-
+				[[fallthrough]];
 			case 0:     // Static register list, predecrement or control addressing mode
 			{
 				for (i=0; i < 8; i++)
@@ -1807,7 +1807,7 @@ void m68000_base_device::fmovem(u16 w2)
 			case 3: // Dynamic register list, predecrement addressing mode.
 				// FIXME: not really tested, but seems to work
 				reglist = REG_D()[(reglist >> 4) & 7];
-
+				[[fallthrough]];
 			case 2:     // Static register list, postincrement or control addressing mode
 			{
 				for (i=0; i < 8; i++)

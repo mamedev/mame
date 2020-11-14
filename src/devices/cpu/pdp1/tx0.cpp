@@ -710,6 +710,7 @@ void tx0_8kw_device::execute_instruction_8kw()
 
 		case 21:    /* TRansfer indeXed */
 			indexed_address_eval();
+			[[fallthrough]];
 		case 20:    /* TRAnsfer */
 			PC = MAR & 0017777;
 			m_cycle = 0;    /* instruction only takes one cycle if branch
@@ -815,6 +816,7 @@ void tx0_8kw_device::execute_instruction_8kw()
 		{
 		case 1:     /* STore indeXed */
 			indexed_address_eval();
+			[[fallthrough]];
 		case 0:     /* STOre */
 			tx0_write(MAR, (MBR = AC));
 			break;
@@ -853,6 +855,7 @@ void tx0_8kw_device::execute_instruction_8kw()
 
 		case 5:     /* Store Lr indeXed */
 			indexed_address_eval();
+			[[fallthrough]];
 		case 4:     /* Store LR */
 			tx0_write(MAR, (MBR = LR));
 			break;
@@ -863,6 +866,7 @@ void tx0_8kw_device::execute_instruction_8kw()
 
 		case 9:     /* ADd indeXed */
 			indexed_address_eval();
+			[[fallthrough]];
 		case 8:     /* ADD */
 			MBR = tx0_read(MAR);
 
@@ -890,12 +894,14 @@ void tx0_8kw_device::execute_instruction_8kw()
 
 		case 13:    /* Load Lr indeXed */
 			indexed_address_eval();
+			[[fallthrough]];
 		case 12:    /* Load LR */
 			LR = MBR = tx0_read(MAR);
 			break;
 
 		case 15:    /* Load Ac indeXed */
 			indexed_address_eval();
+			[[fallthrough]];
 		case 14:    /* LoaD Ac */
 			AC = MBR = tx0_read(MAR);
 			break;

@@ -196,41 +196,33 @@ uint32_t mpu5_state::mpu5_mem_r(offs_t offset, uint32_t mem_mask)
 	switch ( cs )
 	{
 		case 2:
-		{
 			switch (addr & 0xf0)
 			{
 				case 0xd0:
-				{
 					logerror("%08x PIC read\n", pc);
 					break;
-				}
+
 				case 0xe0:
-				{
 					logerror("%08x DUART read\n", pc);
 					break;
-				}
 
 				case 0xf0:
-				{
 					return asic_r32(offset&3,mem_mask);
-				}
 
 				default:
-				logerror("%08x maincpu read access offset %08x mem_mask %08x cs %d\n", pc, offset*4, mem_mask, cs);
-				break;
+					logerror("%08x maincpu read access offset %08x mem_mask %08x cs %d\n", pc, offset*4, mem_mask, cs);
 			}
-		}
-		break;
+			break;
 
 		case 3:
 		case 4:
 			offset &=0x3fff;
-			return (m_mainram[offset]);
+			return m_mainram[offset];
 
-		case 1:if (offset < 0x100000) // make sure to log an error instead of crashing when reading beyond end of region
-			return m_cpuregion[offset];
-
-
+		case 1:
+			if (offset < 0x100000) // make sure to log an error instead of crashing when reading beyond end of region
+				return m_cpuregion[offset];
+			[[fallthrough]];
 		default:
 			logerror("%08x maincpu read access offset %08x mem_mask %08x cs %d\n", pc, offset*4, mem_mask, cs);
 
@@ -245,7 +237,6 @@ void mpu5_state::asic_w8(offs_t offset, uint8_t data)
 	switch (offset)
 	{
 		case 0x03:
-		{
 			if (m_led_strobe_temp != data)
 			{
 				m_led_strobe_temp = data;
@@ -253,61 +244,54 @@ void mpu5_state::asic_w8(offs_t offset, uint8_t data)
 				switch (m_led_strobe_temp)
 				{
 					case 0x00:
-					m_led_strobe = 0;
-					break;
+						m_led_strobe = 0;
+						break;
 					case 0x01:
-					m_led_strobe = 1;
-					break;
+						m_led_strobe = 1;
+						break;
 					case 0x02:
-					m_led_strobe = 2;
-					break;
+						m_led_strobe = 2;
+						break;
 					case 0x04:
-					m_led_strobe = 3;
-					break;
+						m_led_strobe = 3;
+						break;
 					case 0x08:
-					m_led_strobe = 4;
-					break;
+						m_led_strobe = 4;
+						break;
 					case 0x10:
-					m_led_strobe = 5;
-					break;
+						m_led_strobe = 5;
+						break;
 					case 0x20:
-					m_led_strobe = 6;
-					break;
+						m_led_strobe = 6;
+						break;
 					case 0x40:
-					m_led_strobe = 7;
-					break;
+						m_led_strobe = 7;
+						break;
 					case 0x80:
-					m_led_strobe = 8;
-					break;
+						m_led_strobe = 8;
+						break;
 				}
 			}
 			break;
-		}
 
 		case 0x09:
-		{
 			//Assume SEC fitted for now
 			m_sec->data_w(~data&0x01);
 			m_sec->clk_w(~data&0x02);
 			m_sec->cs_w(~data&0x04);
-		}
+			[[fallthrough]];
 		case 0x0b:
-		{
-			output().set_value("statuslamp1", ((data&0x10) != 0));
-
-			output().set_value("statuslamp2", ((data&0x20) != 0));
+			output().set_value("statuslamp1", BIT(data, 4));
+			output().set_value("statuslamp2", BIT(data, 5));
 
 			if (data & 0x40)
 			{
-//              m_dsp_pin =1;
+				//m_dsp_pin = 1;
 			}
-		}
-		break;
+			break;
+
 		default:
-		{
-			int pc = m_maincpu->pc();
-			logerror("%08x maincpu write to ASIC - offset %01x data %02x\n", pc, offset, data);
-		}
+			logerror("%s: maincpu write to ASIC - offset %01x data %02x\n", machine().describe_context(), offset, data);
 	}
 }
 

@@ -60,6 +60,7 @@ Heavy use is made of sprite zooming.
 
     [*  00=over BG0, 01=BG1, 10=BG2, 11=BG3 ]
     [or 00=over BG1, 01=BG2, 10=BG3, 11=BG3 ]
+    [or controlled by TC0360PRI             ]
 
 ***************************************************************/
 
@@ -197,7 +198,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 }
 
 
-void undrfire_state::draw_sprites_cbombers(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,const u32 *primasks,int x_offs,int y_offs)
+void undrfire_state::draw_sprites_cbombers(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,const u8 *pritable,int x_offs,int y_offs)
 {
 	int sprites_flipscreen = 0;
 
@@ -287,9 +288,9 @@ void undrfire_state::draw_sprites_cbombers(screen_device &screen, bitmap_ind16 &
 			sprite_ptr->zoomx = zx << 12;
 			sprite_ptr->zoomy = zy << 12;
 
-			if (primasks)
+			if (pritable)
 			{
-				sprite_ptr->primask = primasks[priority];
+				sprite_ptr->primask = u32(~1) << pritable[priority];
 				sprite_ptr++;
 			}
 			else
@@ -463,17 +464,36 @@ u32 undrfire_state::screen_update_undrfire(screen_device &screen, bitmap_ind16 &
 }
 
 
+/*
+	TC0360PRI Priority format for chase bombers
+
+	Offset Bits      Description
+	       7654 3210
+	00     0001 1100 Unknown
+	01     0000 1111 Unknown
+	04     xxxx ---- TC0480SCP Layer 3 Priority
+	       ---- xxxx TC0480SCP Layer 2 Priority
+	05     xxxx ---- TC0480SCP Layer 1 Priority
+	       ---- xxxx TC0480SCP Layer 0 Priority
+	06     xxxx ---- TC0480SCP Text Layer Priority
+	       ---- 0000 Unknown
+	07     xxxx ---- TC0620SCC Layer 0 Priority
+	       ---- xxxx TC0620SCC Layer 1 Priority
+	08     xxxx ---- Sprite Priority Bank 1
+	       ---- xxxx Sprite Priority Bank 0
+	09     xxxx ---- Sprite Priority Bank 3
+	       ---- xxxx Sprite Priority Bank 2
+
+	Values are 0 (Bottommost) ... f (Topmost)
+	Other registers are unknown/unused
+*/
+
 u32 undrfire_state::screen_update_cbombers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	u8 layer[5];
 	u8 scclayer[3];
 
 #ifdef MAME_DEBUG
-	if (machine().input().code_pressed_once (KEYCODE_X))
-	{
-		m_dislayer[5] ^= 1;
-		popmessage("scc text: %01x",m_dislayer[5]);
-	}
 	if (machine().input().code_pressed_once (KEYCODE_C))
 	{
 		m_dislayer[0] ^= 1;
@@ -498,10 +518,16 @@ u32 undrfire_state::screen_update_cbombers(screen_device &screen, bitmap_ind16 &
 		popmessage("bg3: %01x",m_dislayer[3]);
 	}
 
-	if (machine().input().code_pressed_once (KEYCODE_M))
+	if (machine().input().code_pressed_once (KEYCODE_X))
 	{
 		m_dislayer[4] ^= 1;
-		popmessage("sprites: %01x",m_dislayer[4]);
+		popmessage("text: %01x",m_dislayer[4]);
+	}
+
+	if (machine().input().code_pressed_once (KEYCODE_M))
+	{
+		m_dislayer[5] ^= 1;
+		popmessage("sprites: %01x",m_dislayer[5]);
 	}
 #endif
 
@@ -520,63 +546,61 @@ u32 undrfire_state::screen_update_cbombers(screen_device &screen, bitmap_ind16 &
 	scclayer[1] = scclayer[0] ^ 1;
 	scclayer[2] = 2;
 
+	u8 tc0480scp_pri[5];
+	u8 tc0620scc_pri[2];
+	u8 sprite_pri[4];
+
+	// parse priority values
+	tc0480scp_pri[layer[0]] = m_tc0360pri->read(5) & 0x0f;
+	tc0480scp_pri[layer[1]] = (m_tc0360pri->read(5) >> 4) & 0x0f;
+	tc0480scp_pri[layer[2]] = m_tc0360pri->read(4) & 0x0f;
+	tc0480scp_pri[layer[3]] = (m_tc0360pri->read(4) >> 4) & 0x0f;
+	tc0480scp_pri[layer[4]] = (m_tc0360pri->read(6) >> 4) & 0x0f;
+
+	tc0620scc_pri[scclayer[0]] = (m_tc0360pri->read(7) >> 4) & 0x0f;
+	tc0620scc_pri[scclayer[1]] = m_tc0360pri->read(7) & 0x0f;
+
+	sprite_pri[0] = m_tc0360pri->read(8) & 0x0f;
+	sprite_pri[1] = (m_tc0360pri->read(8) >> 4) & 0x0f;
+	sprite_pri[2] = m_tc0360pri->read(9) & 0x0f;
+	sprite_pri[3] = (m_tc0360pri->read(9) >> 4) & 0x0f;
+
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(0, cliprect);   /* wrong color? */
 
-
-/* The "SCC" chip seems to be a 6bpp TC0100SCN. It has a
-   bottom layer usually full of bright garish colors that
-   vaguely mimic the structure of the layers on top. Seems
-   pointless - it's always hidden by other layers. Does it
-   serve some blending pupose ? */
-
-	// TODO : Wrong; TC0360PRI isn't hooked up
-	m_tc0620scc->tilemap_draw(screen, bitmap, cliprect, scclayer[0], TILEMAP_DRAW_OPAQUE, 0);
-	m_tc0620scc->tilemap_draw(screen, bitmap, cliprect, scclayer[1], 0, 0);
-
-#ifdef MAME_DEBUG
-	if (m_dislayer[layer[0]]==0)
-#endif
-	m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[0], 0, 1);
-
-#ifdef MAME_DEBUG
-	if (m_dislayer[layer[1]]==0)
-#endif
-	m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 2);
-
-#ifdef MAME_DEBUG
-	if (m_dislayer[layer[2]]==0)
-#endif
-	m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[2], 0, 4);
-
-#ifdef MAME_DEBUG
-	if (m_dislayer[layer[3]]==0)
-#endif
-	m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[3], 0, 8);
-
-#ifdef MAME_DEBUG
-	if (m_dislayer[4]==0)
-#endif
-	/* Sprites have variable priority (we kludge this on road levels) */
+	for (int p = 0; p < 16; p++)
 	{
-		if ((m_tc0480scp->pri_reg_r() & 0x3) == 3)  /* on road levels kludge sprites up 1 priority */
+		// TODO: verify layer order when multiple tilemap layers has same priority value
+		const u8 prival = p + 1; // +1 for pdrawgfx
+
+		for (int scc = 0; scc < 2; scc++)
 		{
-			static const u32 primasks[4] = {0xfff0, 0xff00, 0x0, 0x0};
-			draw_sprites_cbombers(screen, bitmap, cliprect, primasks, 80, -208);
+			if (tc0620scc_pri[scclayer[scc]] == p)
+				m_tc0620scc->tilemap_draw(screen, bitmap, cliprect, scclayer[scc], (scc == 0) ? TILEMAP_DRAW_OPAQUE : 0, prival, 0);
 		}
-		else
+
+		for (int scp = 0; scp < 4; scp++)
 		{
-			static const u32 primasks[4] = {0xfffc, 0xfff0, 0xff00, 0x0};
-			draw_sprites_cbombers(screen, bitmap, cliprect, primasks, 80, -208);
+#ifdef MAME_DEBUG
+			if (m_dislayer[layer[scp]]==0)
+#endif
+			if (tc0480scp_pri[layer[scp]] == p)
+				m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[scp], 0, prival, 0);
 		}
+#ifdef MAME_DEBUG
+		if (m_dislayer[layer[4]]==0)
+#endif
+		if (tc0480scp_pri[layer[4]] == p)
+			m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[4], 0, prival, 0);
 	}
 
+	/* Sprites have variable priority */
 #ifdef MAME_DEBUG
 	if (m_dislayer[5]==0)
 #endif
-	m_tc0620scc->tilemap_draw(screen, bitmap, cliprect, scclayer[2], 0, 0); /* TC0620SCC text layer */
+	draw_sprites_cbombers(screen, bitmap, cliprect, sprite_pri, 80, -208);
 
-	m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[4], 0, 0);    /* TC0480SCP text layer */
+	m_tc0620scc->tilemap_draw(screen, bitmap, cliprect, scclayer[2], 0, 0); // TODO: correct?
 
 /* Enable this to see rotation (?) control words */
 #if 0

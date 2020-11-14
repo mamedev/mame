@@ -367,7 +367,7 @@ void menu_crosshair::populate(float &customtop, float &custombottom)
 			if (crosshair.is_used())
 			{
 				// CROSSHAIR_ITEM_VIS - allocate a data item and fill it
-				crosshair_item_data &visdata(*m_data.emplace(m_data.end()));
+				crosshair_item_data &visdata(m_data.emplace_back());
 				visdata.crosshair = &crosshair;
 				visdata.type = CROSSHAIR_ITEM_VIS;
 				visdata.player = player;
@@ -376,7 +376,7 @@ void menu_crosshair::populate(float &customtop, float &custombottom)
 				visdata.defvalue = CROSSHAIR_VISIBILITY_DEFAULT;
 
 				// CROSSHAIR_ITEM_PIC - allocate a data item and fill it
-				crosshair_item_data &picdata(*m_data.emplace(m_data.end()));
+				crosshair_item_data &picdata(m_data.emplace_back());
 				picdata.crosshair = &crosshair;
 				picdata.type = CROSSHAIR_ITEM_PIC;
 				picdata.player = player;
@@ -385,7 +385,7 @@ void menu_crosshair::populate(float &customtop, float &custombottom)
 		}
 
 		// CROSSHAIR_ITEM_AUTO_TIME - allocate a data item and fill it
-		crosshair_item_data &timedata(*m_data.emplace(m_data.end()));
+		crosshair_item_data &timedata(m_data.emplace_back());
 		timedata.type = CROSSHAIR_ITEM_AUTO_TIME;
 		timedata.min = CROSSHAIR_VISIBILITY_AUTOTIME_MIN;
 		timedata.max = CROSSHAIR_VISIBILITY_AUTOTIME_MAX;

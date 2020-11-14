@@ -323,6 +323,7 @@ void altos8600_state::hd_w(offs_t offset, u8 data)
 						m_stat |= 0xa;
 						break;
 					}
+					[[fallthrough]];
 				case 0x4:
 					m_secoff = 0;
 					m_stat |= 1;
