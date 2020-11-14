@@ -268,8 +268,8 @@ inline void s3520cf_device::rtc_write(u8 offset,u8 data)
 			case 0xa: m_rtc.month = (m_cntrl1 & 2) ? 1 : m_rtc.month + 0x10; check_overflow(); break;
 			case 0xb: m_rtc.year = (m_cntrl1 & 2) ? m_rtc.year & 0xf0 : m_rtc.year + 1; check_overflow(); break;
 			case 0xc: m_rtc.year = (m_cntrl1 & 2) ? m_rtc.year & 0x0f : m_rtc.year + 0x10; check_overflow(); break;
-			case 0xd: m_cntrl1 = data & 0xf;
-			case 0xe: m_cntrl2 = data & 0xf;
+			case 0xd: m_cntrl1 = data & 0xf; break;
+			case 0xe: m_cntrl2 = data & 0xf; break;
 			}
 	}
 }

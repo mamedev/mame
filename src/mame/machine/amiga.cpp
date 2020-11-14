@@ -1176,11 +1176,11 @@ uint16_t amiga_state::custom_chip_r(offs_t offset)
 		case REG_JOY0DAT:
 			if (m_joy0dat_port.found())
 				return joy0dat_r();
-
+			[[fallthrough]]; // FIXME: Really?  Fall through to potentially reading the other joystick?
 		case REG_JOY1DAT:
 			if (m_joy1dat_port.found())
 				return joy1dat_r();
-
+			[[fallthrough]]; // TODO: check that this is correct
 		case REG_POTGOR:
 			return m_potgo_port.read_safe(0x5500);
 

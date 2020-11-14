@@ -4384,8 +4384,8 @@ ROM_START( gdarius )
 	TAITOFX1_BIOS
 
 	ROM_REGION32_LE( 0x01000000, "bankedroms", 0 )
-	ROM_LOAD16_BYTE( "e39-06.4",     0x0000001, 0x100000, CRC(2980c30d) SHA1(597321642125c3ae37581c2d9abc2723c7909996) )
-	ROM_LOAD16_BYTE( "e39-05.3",     0x0000000, 0x100000, CRC(750e5b13) SHA1(68fe9cbd7d506cfd587dccc40b6ae0b0b6ee7c29) )
+	ROM_LOAD16_BYTE( "e39-09.ic4",   0x0000001, 0x100000, CRC(f457794d) SHA1(43571770b239298e3442d3da8aa4f4507380d639) )
+	ROM_LOAD16_BYTE( "e39-10.ic3",   0x0000000, 0x100000, CRC(6ba4d941) SHA1(75f2d8c920d29102c09e041fc3198e32ad57dbaf) )
 	ROM_LOAD( "e39-01.1",            0x0400000, 0x400000, CRC(bdaaa251) SHA1(a42daa706ee859c2b66be179e08c0ad7990f919e) )
 	ROM_LOAD( "e39-02.2",            0x0800000, 0x400000, CRC(a47aab5d) SHA1(64b58e47035ad9d8d6dcaf475cbcc3ad85f4d82f) )
 	ROM_LOAD( "e39-03.12",           0x0c00000, 0x400000, CRC(a883b6a5) SHA1(b8d00d944c90f8cd9c2b076688f4c68b2e6d557a) )
@@ -4400,12 +4400,32 @@ ROM_START( gdarius )
 	ROM_LOAD( "tt07", 0x000000, 0x000008, CRC(ccf2f332) SHA1(6eb07cd5fab29f5536fd94aa88a2b09f28cc3494) )
 ROM_END
 
-ROM_START( gdariusb )
+ROM_START( gdariusu )
 	TAITOFX1_BIOS
 
 	ROM_REGION32_LE( 0x01000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "e39-08.ic4",   0x0000001, 0x100000, CRC(835049db) SHA1(2b230c8fd6c6ea4e30740fda28f631344b018b79) )
 	ROM_LOAD16_BYTE( "e39-10.ic3",   0x0000000, 0x100000, CRC(6ba4d941) SHA1(75f2d8c920d29102c09e041fc3198e32ad57dbaf) )
+	ROM_LOAD( "e39-01.1",            0x0400000, 0x400000, CRC(bdaaa251) SHA1(a42daa706ee859c2b66be179e08c0ad7990f919e) )
+	ROM_LOAD( "e39-02.2",            0x0800000, 0x400000, CRC(a47aab5d) SHA1(64b58e47035ad9d8d6dcaf475cbcc3ad85f4d82f) )
+	ROM_LOAD( "e39-03.12",           0x0c00000, 0x400000, CRC(a883b6a5) SHA1(b8d00d944c90f8cd9c2b076688f4c68b2e6d557a) )
+
+	ROM_REGION( 0x080000, ":taito_zoom:mn10200", 0 )
+	ROM_LOAD( "e39-07.14",    0x0000000, 0x080000, CRC(2252c7c1) SHA1(92b9908e0d87cad6587f1acc0eef69eaae8c6a98) )
+
+	ROM_REGION32_LE( 0x400000, ":taito_zoom:zsg2", 0 )
+	ROM_LOAD( "e39-04.27",    0x0000000, 0x400000, CRC(6ee35e68) SHA1(fdfe63203d8cecf84cb869039fb893d5b63cdd67) )
+
+	ROM_REGION( 0x8, "cat702_2", 0 )
+	ROM_LOAD( "tt07", 0x000000, 0x000008, CRC(ccf2f332) SHA1(6eb07cd5fab29f5536fd94aa88a2b09f28cc3494) )
+ROM_END
+
+ROM_START( gdariusj )
+	TAITOFX1_BIOS
+
+	ROM_REGION32_LE( 0x01000000, "bankedroms", 0 )
+	ROM_LOAD16_BYTE( "e39-06.4",     0x0000001, 0x100000, CRC(2980c30d) SHA1(597321642125c3ae37581c2d9abc2723c7909996) )
+	ROM_LOAD16_BYTE( "e39-05.3",     0x0000000, 0x100000, CRC(750e5b13) SHA1(68fe9cbd7d506cfd587dccc40b6ae0b0b6ee7c29) )
 	ROM_LOAD( "e39-01.1",            0x0400000, 0x400000, CRC(bdaaa251) SHA1(a42daa706ee859c2b66be179e08c0ad7990f919e) )
 	ROM_LOAD( "e39-02.2",            0x0800000, 0x400000, CRC(a47aab5d) SHA1(64b58e47035ad9d8d6dcaf475cbcc3ad85f4d82f) )
 	ROM_LOAD( "e39-03.12",           0x0c00000, 0x400000, CRC(a883b6a5) SHA1(b8d00d944c90f8cd9c2b076688f4c68b2e6d557a) )
@@ -5321,8 +5341,9 @@ GAME( 1996, ftimpact,  ftimpcta, coh1000tb,   znt,      taito_fx1b_state, empty_
 GAME( 1996, ftimpactu, ftimpcta, coh1000tb,   znt,      taito_fx1b_state, empty_init, ROT0, "Taito", "Fighters' Impact (Ver 2.02A)",   MACHINE_IMPERFECT_SOUND )
 GAME( 1996, ftimpactj, ftimpcta, coh1000tb,   znt,      taito_fx1b_state, empty_init, ROT0, "Taito", "Fighters' Impact (Ver 2.02J)",   MACHINE_IMPERFECT_SOUND )
 GAME( 1997, ftimpcta,  coh1000t, coh1000tb,   znt,      taito_fx1b_state, empty_init, ROT0, "Taito", "Fighters' Impact A (Ver 2.00J)", MACHINE_IMPERFECT_SOUND )
-GAME( 1997, gdarius,   gdarius2, coh1002tb,   znt,      gdarius_state,    empty_init, ROT0, "Taito", "G-Darius (Ver 2.01J)",           MACHINE_IMPERFECT_SOUND )
-GAME( 1997, gdariusb,  gdarius2, coh1002tb,   znt,      gdarius_state,    empty_init, ROT0, "Taito", "G-Darius (Ver 2.02A)",           MACHINE_IMPERFECT_SOUND )
+GAME( 1997, gdarius,   gdarius2, coh1002tb,   znt,      gdarius_state,    empty_init, ROT0, "Taito", "G-Darius (Ver 2.02O)",           MACHINE_IMPERFECT_SOUND )
+GAME( 1997, gdariusu,  gdarius2, coh1002tb,   znt,      gdarius_state,    empty_init, ROT0, "Taito", "G-Darius (Ver 2.02A)",           MACHINE_IMPERFECT_SOUND )
+GAME( 1997, gdariusj,  gdarius2, coh1002tb,   znt,      gdarius_state,    empty_init, ROT0, "Taito", "G-Darius (Ver 2.01J)",           MACHINE_IMPERFECT_SOUND )
 GAME( 1997, gdarius2,  coh1000t, coh1002tb,   znt,      gdarius_state,    empty_init, ROT0, "Taito", "G-Darius Ver.2 (Ver 2.03J)",     MACHINE_IMPERFECT_SOUND )
 
 /* Eighting / Raizing */

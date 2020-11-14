@@ -899,7 +899,7 @@ void tx0_state::magtape_callback()
 	{
 	case MTS_UNSELECTING:
 		m_magtape.state = MTS_UNSELECTED;
-
+		[[fallthrough]];
 	case MTS_UNSELECTED:
 		if (m_magtape.sel_pending)
 		{
@@ -960,7 +960,7 @@ void tx0_state::magtape_callback()
 			}
 			break;
 		}
-
+		[[fallthrough]];
 	case MTS_SELECTED:
 		switch (m_magtape.command)
 		{
@@ -1254,7 +1254,7 @@ void tx0_state::magtape_callback()
 				{
 					m_magtape.u.write.state = MTWTS_STATE1;
 				}
-
+				[[fallthrough]];
 			case MTWTS_STATE1:
 				if (m_magtape.u.write.counter)
 				{
@@ -1282,7 +1282,7 @@ void tx0_state::magtape_callback()
 						m_magtape.u.write.counter = 3;
 					}
 				}
-
+				[[fallthrough]];
 			case MTWTS_STATE2:
 				if (m_magtape.u.write.counter != 0)
 				{

@@ -143,7 +143,7 @@
 
 DEFINE_DEVICE_TYPE_NS(TI99_PGRAM, bus::ti99::peb, pgram_device, "ti99_pgram", "PGRAM(+) memory card")
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 pgram_device::pgram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
 	  device_t(mconfig, TI99_PGRAM, tag, owner, clock),
@@ -561,4 +561,4 @@ ioport_constructor pgram_device::device_input_ports() const
 	return INPUT_PORTS_NAME( pgram_switches );
 }
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb

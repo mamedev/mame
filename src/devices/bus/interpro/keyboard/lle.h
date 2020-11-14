@@ -12,7 +12,7 @@
 #include "machine/bankdev.h"
 #include "sound/spkrdev.h"
 
-namespace bus { namespace interpro { namespace keyboard {
+namespace bus::interpro::keyboard {
 
 class lle_device_base
 	: public device_t
@@ -66,7 +66,7 @@ public:
 	virtual tiny_rom_entry const *device_rom_region() const override;
 };
 
-} } } // namespace bus::interpro::keyboard
+} // namespace bus::interpro::keyboard
 
 DECLARE_DEVICE_TYPE_NS(INTERPRO_LLE_EN_US_KEYBOARD, bus::interpro::keyboard, lle_en_us_device)
 

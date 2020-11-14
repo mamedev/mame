@@ -231,6 +231,7 @@ static LRESULT CALLBACK output_window_proc(HWND wnd, UINT message, WPARAM wparam
 				output.machine().pause();
 			else if (lparam == 0 && output.machine().paused())
 				output.machine().resume();
+			break;
 		case IM_MAME_SAVESTATE:
 			if (lparam == 0)
 				output.machine().schedule_load("auto");

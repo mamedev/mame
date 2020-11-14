@@ -1280,6 +1280,7 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 	// pause the system when we start a menu or resize
 	case WM_ENTERSIZEMOVE:
 		window->m_resize_state = RESIZE_STATE_RESIZING;
+		[[fallthrough]];
 	case WM_ENTERMENULOOP:
 		winwindow_ui_pause(window->machine(), TRUE);
 		break;
@@ -1287,6 +1288,7 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 	// unpause the system when we stop a menu or resize and force a redraw
 	case WM_EXITSIZEMOVE:
 		window->m_resize_state = RESIZE_STATE_PENDING;
+		[[fallthrough]];
 	case WM_EXITMENULOOP:
 		winwindow_ui_pause(window->machine(), FALSE);
 		InvalidateRect(wnd, nullptr, FALSE);

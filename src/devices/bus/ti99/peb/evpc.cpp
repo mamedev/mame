@@ -54,7 +54,7 @@
 
 DEFINE_DEVICE_TYPE_NS(TI99_EVPC, bus::ti99::peb, snug_enhanced_video_device, "ti99_evpc", "SNUG Enhanced Video Processor Card")
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 #define NOVRAM_SIZE 256
 #define EVPC_CRU_BASE 0x1400
@@ -519,6 +519,4 @@ void snug_enhanced_video_device::device_add_mconfig(machine_config& config)
 	V9938_COLORBUS(config, m_colorbus, 0, ti99_colorbus_options, nullptr);
 }
 
-} } } // end namespace bus::ti99::peb
-
-
+} // end namespace bus::ti99::peb

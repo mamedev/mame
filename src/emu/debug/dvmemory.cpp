@@ -490,25 +490,25 @@ void debug_view_memory::view_char(int chval)
 			break;
 
 		default:
-		{
-			static const char hexvals[] = "0123456789abcdef";
-			char *hexchar = (char *)strchr(hexvals, tolower(chval));
-			if (hexchar == nullptr)
-				break;
+			{
+				static const char hexvals[] = "0123456789abcdef";
+				char *hexchar = (char *)strchr(hexvals, tolower(chval));
+				if (hexchar == nullptr)
+					break;
 
-			const debug_view_memory_source &source = downcast<const debug_view_memory_source &>(*m_source);
-			offs_t address = (source.m_space != nullptr) ? source.m_space->byte_to_address(pos.m_address) : pos.m_address;
-			u64 data;
-			bool ismapped = read(m_bytes_per_chunk, address, data);
-			if (!ismapped)
-				break;
+				const debug_view_memory_source &source = downcast<const debug_view_memory_source &>(*m_source);
+				offs_t address = (source.m_space != nullptr) ? source.m_space->byte_to_address(pos.m_address) : pos.m_address;
+				u64 data;
+				bool ismapped = read(m_bytes_per_chunk, address, data);
+				if (!ismapped)
+					break;
 
-			data &= ~(u64(0x0f) << pos.m_shift);
-			data |= u64(hexchar - hexvals) << pos.m_shift;
-			write(m_bytes_per_chunk, address, data);
+				data &= ~(u64(0x0f) << pos.m_shift);
+				data |= u64(hexchar - hexvals) << pos.m_shift;
+				write(m_bytes_per_chunk, address, data);
+			}
 			// fall through to the right-arrow press
-		}
-
+			[[fallthrough]];
 		case DCH_RIGHT:
 			if (pos.m_shift == 0 && pos.m_address != m_maxaddr)
 			{

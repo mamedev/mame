@@ -502,6 +502,7 @@ u32 arm7_disassembler::arm7_disasm( std::ostream &stream, uint32_t pc, uint32_t 
 				/* look for mov pc,lr */
 				if (((opcode >> 12) & 0x0f) == 15 && ((opcode >> 0) & 0x0f) == 14 && (opcode & 0x02000000) == 0)
 					dasmflags = STEP_OUT;
+				[[fallthrough]];
 			case 0x0f:
 				WriteDataProcessingOperand(stream, opcode, 1, 0, 1);
 				break;

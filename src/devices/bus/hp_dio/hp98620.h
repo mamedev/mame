@@ -9,8 +9,7 @@
 #include "hp_dio.h"
 
 
-namespace bus {
-	namespace hp_dio {
+namespace bus::hp_dio {
 
 class dio16_98620_device :
 		public device_t,
@@ -125,7 +124,7 @@ private:
 	bool m_dmar[2];
 };
 
-} } // namespace bus::hp_dio
+} // namespace bus::hp_dio
 
 DECLARE_DEVICE_TYPE_NS(HPDIO_98620, bus::hp_dio, dio16_98620_device)
 

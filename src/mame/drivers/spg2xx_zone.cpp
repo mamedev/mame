@@ -351,6 +351,11 @@ ROM_START( react )
 	ROM_CONTINUE(0x3800000, 0x0800000)
 ROM_END
 
+ROM_START( lx_jg7410 )
+	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "55lv100.u4", 0x0000, 0x8000000, CRC(60476576) SHA1(83592e43d9169c95f6b22903e8d708e96ad02611) )
+ROM_END
+
 // These have games from Waixing and were likely manufactured  by Subor and sold by Ultimate Products Ltd.
 // Many of these games are rewrites of VT1682 based titles, which in turn were based on older NES/VT ones
 // Badminton hangs in units where it is present (cause not yet investigated), otherwise everything runs
@@ -369,5 +374,6 @@ CONS( 2010, zone60,   0, 0, wireless60, wirels60, wireless60_state,  empty_init,
 CONS( 200?, zone100,  0, 0, wireless60, wirels60, wireless60_state,  init_zone100,    "Ultimate Products (HK) Ltd / Jungle's Soft",  "Zone 100",                            MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // unit was black, menus still show white controllers, unlike wireless 60
 CONS( 2010, wirels60, 0, 0, wireless60, wirels60, wireless60_state,  empty_init,      "Kids Station Toys Inc / Jungle Soft",         "Wireless 60",                         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2011, lx_jg7415,0, 0, wireless60, wirels60, wireless60_state,  init_lx_jg7415,  "Lexibook / JungleTac",                        "Lexibook JG7415 120-in-1",            MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2012, lx_jg7410,0, 0, wireless60, wirels60, wireless60_state,  init_zone100,    "Lexibook / JungleTac",                        "Lexibook JG7410 100-in-1",            MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // (c)2012 and JG7410_01 on box, JG7410 in other places
 
 

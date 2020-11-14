@@ -52,15 +52,18 @@ k007232_device::k007232_device(const machine_config &mconfig, const char *tag, d
 
 void k007232_device::device_start()
 {
+	// assumes it can make an address mask with m_rom.length() - 1
+	assert (!m_rom.found() || !(m_rom.length() & (m_rom.length() - 1)));
+
 	m_pcmlimit = 1 << 17;
 	// default mapping (bankswitched ROM)
-	if ((m_rom.target() != nullptr) && (!has_configured_map(0)))
+	if (m_rom.found() && !has_configured_map(0))
 	{
 		if (m_rom.bytes() > 0x20000)
 			space(0).install_read_handler(0x00000, std::min<offs_t>(0x1ffff, m_rom.bytes() - 1), read8sm_delegate(*this, FUNC(k007232_device::read_rom_default)));
 		else
 		{
-			space(0).install_rom(0x00000, m_rom.mask(), m_rom.target());
+			space(0).install_rom(0x00000, m_rom.length() - 1, m_rom.target());
 			m_pcmlimit = m_rom.bytes();
 		}
 	}

@@ -21,14 +21,14 @@ List of games, initially taken from http://videogamesdensetsu.tumblr.com/post/14
    RX114 ???
   *RX115 Dokkin Shinri Game / どっきん心理ゲーム
   *RX116 Kanji Club / 漢字俱楽部
-   RX117 Picno de Kuku / ピクノで九九
+  *RX117 Picno de Kuku / ピクノで九九
   *RX118 Shirayuki-hime Monogatari / しらゆきひめ物語
   *RX119 Nontan to Issho Anime Stamp / ノンタンといっしょ アニメスタンプ
    RX120 Manfī no Fushigi na Bōken / マンフィーのふしぎなぼうけん
   *RX121 Hello Kitty no Eikaiwa / ハローキティの英会話
   *RX122 Son Gokū no Bōken / そんごくうの冒険
   *RX123 Paint Ehon: Cinderella Monogatari / ペイント絵本シンデレラ物語
-   RX124 Chibimaruko-chan no Tashizan Hikizan / ちびまる子ちゃんのたしざんひきざん
+  *RX124 Chibi Maruko-chan no Tashizan Hikizan / ちびまる子ちゃんのたしざんひきざん
 -->
 
 <softwarelist name="picno" description="Konami Picno cartridges">
@@ -235,6 +235,19 @@ List of games, initially taken from http://videogamesdensetsu.tumblr.com/post/14
 		</part>
 	</software>
 
+	<software name="picnokuku" supported="no">
+		<description>Picno de Kuku</description>
+		<year>1994</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="RX117"/>
+		<info name="alt_title" value="ピクノで九九"/>
+		<part name="cart" interface="picno_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="rx117.bin" size="524288" crc="13996ddd" sha1="a4f4e22f7fbbe3be86c642af252b332017d4f00d" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="shm" supported="no">
 		<description>Shirayuki-hime Monogatari</description>
 		<year>1994</year>
@@ -258,6 +271,19 @@ List of games, initially taken from http://videogamesdensetsu.tumblr.com/post/14
 		<part name="cart" interface="picno_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="rx122.bin" size="524288" crc="c3f8338d" sha1="f3f7508acb20a887d4cc9c831e2cf336656a3871" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chibitahi" supported="no">
+		<description>Chibi Maruko-chan no Tashizan Hikizan</description>
+		<year>1995</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="RX124"/>
+		<info name="alt_title" value="ちびまる子ちゃんのたしざんひきざん"/>
+		<part name="cart" interface="picno_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="rx124.bin" size="524288" crc="120d41e0" sha1="857c18d9feffcb68c9177940163026a3320173fc" />
 			</dataarea>
 		</part>
 	</software>

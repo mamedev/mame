@@ -93,6 +93,7 @@ II Plus: RAM options reduced to 16/32/48 KB.
 #include "bus/a2bus/ssprite.h"
 #include "bus/a2bus/timemasterho.h"
 #include "bus/a2bus/transwarp.h"
+#include "bus/a2bus/suprterminal.h"
 
 #include "bus/a2gameio/gameio.h"
 
@@ -1326,6 +1327,7 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("applesurance", A2BUS_APPLESURANCE);  /* Applesurance Diagnostic Controller */
 //  device.option_add("magicmusician", A2BUS_MAGICMUSICIAN);    /* Magic Musician Card */
 	device.option_add("byte8251", A2BUS_BYTE8251); /* BYTE Magazine 8251 serial card */
+	device.option_add("suprterm", A2BUS_SUPRTERMINAL); /* M&R Enterprises SUP'R'TERMINAL 80-column card */
 }
 
 void apple2_state::apple2_common(machine_config &config)

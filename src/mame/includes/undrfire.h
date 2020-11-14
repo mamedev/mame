@@ -7,6 +7,7 @@
 
 #include "machine/eepromser.h"
 #include "video/tc0100scn.h"
+#include "video/tc0360pri.h"
 #include "video/tc0480scp.h"
 #include "emupal.h"
 
@@ -19,6 +20,7 @@ public:
 		m_subcpu(*this, "sub"),
 		m_tc0620scc(*this, "tc0620scc"),
 		m_tc0480scp(*this, "tc0480scp"),
+		m_tc0360pri(*this, "tc0360pri"),
 		m_eeprom(*this, "eeprom"),
 		m_ram(*this, "ram"),
 		m_shared_ram(*this, "shared_ram"),
@@ -58,6 +60,7 @@ private:
 	optional_device<cpu_device> m_subcpu;
 	required_device<tc0620scc_device> m_tc0620scc;
 	required_device<tc0480scp_device> m_tc0480scp;
+	optional_device<tc0360pri_device> m_tc0360pri; // cbombers
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_shared_ptr<u32> m_ram;
 	optional_shared_ptr<u16> m_shared_ram;
@@ -89,7 +92,7 @@ private:
 	u32 screen_update_cbombers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(undrfire_interrupt);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,const u32 *primasks,int x_offs,int y_offs);
-	void draw_sprites_cbombers(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,const u32 *primasks,int x_offs,int y_offs);
+	void draw_sprites_cbombers(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,const u8* pritable,int x_offs,int y_offs);
 
 	void cbombers_cpua_map(address_map &map);
 	void cbombers_cpub_map(address_map &map);

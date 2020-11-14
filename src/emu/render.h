@@ -172,10 +172,12 @@ struct render_texinfo
 };
 
 
-namespace emu { namespace render { namespace detail {
+namespace emu::render::detail {
 
 struct bounds_step
 {
+	constexpr render_bounds get() const { return bounds; }
+
 	int             state;
 	render_bounds   bounds;
 	render_bounds   delta;
@@ -184,6 +186,8 @@ using bounds_vector = std::vector<bounds_step>;
 
 struct color_step
 {
+	constexpr render_color get() const { return color; }
+
 	int             state;
 	render_color    color;
 	render_color    delta;
@@ -194,7 +198,7 @@ using color_vector = std::vector<color_step>;
 class layout_environment;
 class view_environment;
 
-} } } // namespace emu::render::detail
+} // namespace emu::render::detail
 
 
 // ======================> render_layer_config
@@ -744,8 +748,8 @@ public:
 		// getters
 		layout_element *element() const { return m_element; }
 		screen_device *screen() { return m_screen; }
-		render_bounds bounds() const;
-		render_color color() const;
+		render_bounds bounds() const { return m_get_bounds(); }
+		render_color color() const { return m_get_color(); }
 		int blend_mode() const { return m_blend_mode; }
 		u32 visibility_mask() const { return m_visibility_mask; }
 		int orientation() const { return m_orientation; }
@@ -757,7 +761,7 @@ public:
 		bool clickthrough() const { return m_clickthrough; }
 
 		// fetch state based on configured source
-		int state() const;
+		int state() const { return m_get_elem_state(); }
 
 		// resolve tags, if any
 		void resolve_tags();
@@ -765,8 +769,18 @@ public:
 	private:
 		using bounds_vector = emu::render::detail::bounds_vector;
 		using color_vector = emu::render::detail::color_vector;
+		using state_delegate = delegate<int ()>;
+		using bounds_delegate = delegate<render_bounds ()>;
+		using color_delegate = delegate<render_color ()>;
 
-		int animation_state() const;
+		int get_output() const;
+		int get_input_raw() const;
+		int get_input_field_cached() const;
+		int get_input_field_conditional() const;
+		int get_anim_output() const;
+		int get_anim_input() const;
+		render_bounds get_interpolated_bounds() const;
+		render_color get_interpolated_color() const;
 
 		static layout_element *find_element(view_environment &env, util::xml::data_node const &itemnode, element_map &elemmap);
 		static bounds_vector make_bounds(view_environment &env, util::xml::data_node const &itemnode, layout_group::transform const &trans);
@@ -780,10 +794,12 @@ public:
 
 		// internal state
 		layout_element *const   m_element;          // pointer to the associated element (non-screens only)
+		state_delegate          m_get_elem_state;   // resolved element state function
+		state_delegate          m_get_anim_state;   // resolved animation state function
+		bounds_delegate         m_get_bounds;       // resolved bounds function
+		color_delegate          m_get_color;        // resolved color function
 		output_finder<>         m_output;           // associated output
 		output_finder<>         m_animoutput;       // associated output for animation if different
-		bool const              m_have_output;      // whether we actually have an output
-		bool const              m_have_animoutput;  // whether we actually have an output for animation
 		ioport_port *           m_animinput_port;   // input port used for animation
 		ioport_value const      m_animmask;         // mask for animation state
 		u8 const                m_animshift;        // shift for animation state
@@ -804,6 +820,8 @@ public:
 		std::string const       m_input_tag;        // input tag of this item
 		std::string const       m_animinput_tag;    // tag of input port for animation state
 		bounds_vector const     m_rawbounds;        // raw (original) bounds of the item
+		bool const              m_have_output;      // whether we actually have an output
+		bool const              m_have_animoutput;  // whether we actually have an output for animation
 		bool const              m_has_clickthrough; // whether clickthrough was explicitly configured
 	};
 	using item_list = std::list<item>;

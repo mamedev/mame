@@ -1979,6 +1979,7 @@ static imgtoolerr_t amiga_image_nextenum(imgtool::directory &enumeration, imgtoo
 	case ST_LINKDIR:
 
 		ent.directory = 1;
+		[[fallthrough]];
 
 	case ST_LINKFILE:
 	{

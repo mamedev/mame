@@ -360,6 +360,7 @@ void ws_rom_sram_device::write_io(offs_t offset, uint8_t data)
 	{
 		case 0x01:  // SRAM bank to select
 			m_nvram_base = (data * 0x10000) & (m_nvram.size() -  1);
+			[[fallthrough]];
 		default:
 			ws_rom_device::write_io(offset, data);
 			break;

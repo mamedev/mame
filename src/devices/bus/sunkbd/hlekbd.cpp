@@ -145,7 +145,7 @@ DEFINE_DEVICE_TYPE_NS(SUN_TYPE5_JP_HLE_KEYBOARD, bus::sunkbd, hle_type5_jp_devic
 
 
 
-namespace bus { namespace sunkbd {
+namespace bus::sunkbd {
 
 namespace {
 
@@ -1279,4 +1279,4 @@ ioport_constructor hle_type5_jp_device::device_input_ports() const
 	return INPUT_PORTS_NAME(hle_type5_jp_device);
 }
 
-} } // namespace bus::sunkbd
+} // namespace bus::sunkbd

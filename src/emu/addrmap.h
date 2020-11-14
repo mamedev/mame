@@ -87,11 +87,13 @@ class address_map_entry
 	}
 
 	template <typename T, typename U>
-	static std::enable_if_t<std::is_convertible<std::add_pointer_t<U>, std::add_pointer_t<T> >::value, T *> make_pointer(U &obj)
-	{ return &downcast<T &>(obj); }
-	template <typename T, typename U>
-	static std::enable_if_t<!std::is_convertible<std::add_pointer_t<U>, std::add_pointer_t<T> >::value, T *> make_pointer(U &obj)
-	{ return &dynamic_cast<T &>(obj); }
+	static T *make_pointer(U &obj)
+	{
+		if constexpr (std::is_convertible_v<std::add_pointer_t<U>, std::add_pointer_t<T> >)
+			return &downcast<T &>(obj);
+		else
+			return &dynamic_cast<T &>(obj);
+	}
 
 	template <typename T> static std::enable_if_t<emu::detail::is_device_implementation<T>::value, const char *> get_tag(T &obj) { return obj.tag(); }
 	template <typename T> static std::enable_if_t<emu::detail::is_device_interface<T>::value, const char *> get_tag(T &obj) { return obj.device().tag(); }

@@ -21,8 +21,7 @@
 
 DEFINE_DEVICE_TYPE_NS(HPDIO_98544, bus::hp_dio, dio16_98544_device, "dio98544", "HP98544 high-res monochrome DIO video card")
 
-namespace bus {
-	namespace hp_dio {
+namespace bus::hp_dio {
 
 ROM_START( hp98544 )
 	ROM_REGION( 0x2000, HP98544_ROM_REGION, 0 )
@@ -186,4 +185,3 @@ uint32_t dio16_98544_device::screen_update(screen_device &screen, bitmap_rgb32 &
 }
 
 } // namespace bus::hp_dio
-} // namespace bus

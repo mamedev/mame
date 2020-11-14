@@ -130,7 +130,7 @@ enum
 // Hexbus instance
 DEFINE_DEVICE_TYPE_NS(IBC, bus::hexbus, ibc_device,  "ibc",  "Intelligent Peripheral Bus Controller")
 
-namespace bus { namespace hexbus {
+namespace bus::hexbus {
 
 ibc_device::ibc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, IBC, tag, owner, clock),
@@ -358,5 +358,5 @@ void ibc_device::device_reset()
 	m_disable = true;
 }
 
-}   }
+} // namespace bus::hexbus
 

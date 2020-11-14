@@ -604,7 +604,7 @@ LRESULT debugview_info::view_proc(UINT message, WPARAM wparam, LPARAM lparam)
 	case WM_SYSKEYDOWN:
 		if (wparam != VK_F10)
 			return DefWindowProc(m_wnd, message, wparam, lparam);
-			// (fall through)
+		[[fallthrough]];
 	case WM_KEYDOWN:
 		{
 			if (m_owner.handle_key(wparam, lparam))

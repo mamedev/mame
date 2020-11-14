@@ -599,6 +599,12 @@ ROM_START( dgun2593 )
 	ROM_LOAD( "dreamgear300.bin", 0x00000, 0x8000000, CRC(4fe0ed02) SHA1(a55590557bacca65ed9a17c5bcf0a4e5cb223126) )
 ROM_END
 
+ROM_START( 240in1ar )
+	ROM_REGION( 0x8000000, "mainrom", 0 )
+	ROM_LOAD( "mw-106-2g.u3", 0x00000, 0x8000000, CRC(c46d2ca9) SHA1(0fff7d3461ff620c5b5e43f54f9e7badd089b951) )
+ROM_END
+
+
 ROM_START( rtvgc300 )
 	ROM_REGION( 0x8000000, "mainrom", 0 )
 	// some of the higher address lines might be swapped
@@ -716,8 +722,14 @@ ROM_START( gcs2mgp )
 	ROM_LOAD( "gcs2_v4.u3", 0x00000, 0x1000000, CRC(3b5be765) SHA1(c54f1a732d638b0ee582ca822715c9d3a3af5ef3) )
 ROM_END
 
+// VT369 using BGA on Subboards
 
-// below use SPI ROMs
+ROM_START( retro400 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "retro fc 400-in-1.bin", 0x00000, 0x1000000, CRC(4bf9991b) SHA1(ce9cac61cfc950d832d47afc76eb6c1488eeb2ca) )
+ROM_END
+
+// VT369 using SPI ROMs
 
 ROM_START( lpgm240 )
 	ROM_REGION( 0x800000, "mainrom", 0 )
@@ -826,12 +838,6 @@ ROM_START( egame150 )
 	ROM_LOAD( "rom.bin", 0x00000, 0x800000, CRC(a19644ea) SHA1(01c004d126edf792f71c1e9ed98b3c96d9278a69) )
 ROM_END
 
-ROM_START( retro400 )
-	ROM_REGION( 0x1000000, "mainrom", 0 )
-	ROM_LOAD( "retro fc 400-in-1.bin", 0x00000, 0x1000000, CRC(4bf9991b) SHA1(ce9cac61cfc950d832d47afc76eb6c1488eeb2ca) )
-ROM_END
-
-
 ROM_START( mog_m320 )
 	ROM_REGION( 0x800000, "mainrom", 0 )
 	ROM_LOAD( "w25q64fv.bin", 0x00000, 0x800000, CRC(3c5e1b36) SHA1(4bcbf35ebf2b1714ccde5de758a89a6a39528f89) )
@@ -938,14 +944,18 @@ CONS( 200?, zonefusn,  0,         0,  nes_vt369_vtunknown_fp_16mb,     nes_vt369
 // same as above but without Jungle's Soft boot logo? model number taken from cover of manual
 CONS( 200?, sealvt,    zonefusn,  0,  nes_vt369_vtunknown_fp_16mb,     nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Lexibook / Sit Up Limited / Jungle's Soft", "Seal 30-in-1 (VT based, Model FN098134)",  MACHINE_NOT_WORKING )
 
-// NOT SPI roms, start with '6a' 
+// NOT SPI roms, code start with '6a' (possibly encrypted opcode after jump from an internal bootstrap ROM?)
 
-// uncertain, intial code isn't valid? scrambled?
-CONS( 201?, red5mam,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init, "Red5", "Mini Arcade Machine (Red5)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
-// uncertain, very similar to red5mam
+// Uncertain, intial code isn't valid? scrambled?
+CONS( 201?, red5mam,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init, "Red5", "Mini Arcade Machine (Red5, 'Xtra Game')", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
+// Uncertain, very similar to red5mam
 CONS( 2016, dgun2593,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init, "dreamGEAR", "My Arcade Retro Arcade Machine - 300 Handheld Video Games (DGUN-2593)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
-// similar, starts with a '6a' ror a opcode which is presumably encrypted / extended, then normal looking code, then unknown instructions
+// Similar, starts with a '6a' ror a opcode which is presumably encrypted / extended, then normal looking code, then unknown instructions
 CONS( 200?, gcs2mgp,   0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init, "Jungle's Soft", "Mini Game Player 48-in-1",  MACHINE_NOT_WORKING )
+// Not the same as the other 240-in-1 machine from Thumbs Up below (tup240) This one makes greater use of newer VT features with most games having sampled music, not APU sound.
+// Several of the games contained in here are buggy / broken on real hardware (see https://www.youtube.com/watch?v=-mgGNaDQ1HE )
+CONS( 201?, 240in1ar,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init, "Thumbs Up", "Mini Arcade Machine (Thumbs Up, 240IN1ARC)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
+
 
 /*****************************************************************************
 * below are VT369 games that use BGA on sub

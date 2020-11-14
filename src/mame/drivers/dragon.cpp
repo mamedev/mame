@@ -76,7 +76,7 @@ void dragon_alpha_state::dgnalpha_io1(address_map &map)
 	map(0x0c, 0x0c).mirror(0x10).rw(m_fdc, FUNC(wd2797_device::data_r), FUNC(wd2797_device::data_w));
 	map(0x0d, 0x0d).mirror(0x10).rw(m_fdc, FUNC(wd2797_device::sector_r), FUNC(wd2797_device::sector_w));
 	map(0x0e, 0x0e).mirror(0x10).rw(m_fdc, FUNC(wd2797_device::track_r), FUNC(wd2797_device::track_w));
-	map(0x0f, 0x0f).mirror(0x10).rw(m_fdc, FUNC(wd2797_device::data_r), FUNC(wd2797_device::cmd_w));
+	map(0x0f, 0x0f).mirror(0x10).rw(m_fdc, FUNC(wd2797_device::status_r), FUNC(wd2797_device::cmd_w));
 }
 
 
@@ -262,13 +262,16 @@ void dragon_state::dragon_base(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &dragon_state::dragon_mem);
 
 	// devices
+	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
+	INPUT_MERGER_ANY_HIGH(config, m_firqs).output_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
+
 	pia6821_device &pia0(PIA6821(config, PIA0_TAG, 0));
 	pia0.writepa_handler().set(FUNC(coco_state::pia0_pa_w));
 	pia0.writepb_handler().set(FUNC(coco_state::pia0_pb_w));
 	pia0.ca2_handler().set(FUNC(coco_state::pia0_ca2_w));
 	pia0.cb2_handler().set(FUNC(coco_state::pia0_cb2_w));
-	pia0.irqa_handler().set(FUNC(coco_state::pia0_irq_a));
-	pia0.irqb_handler().set(FUNC(coco_state::pia0_irq_b));
+	pia0.irqa_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));
+	pia0.irqb_handler().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 
 	pia6821_device &pia1(PIA6821(config, PIA1_TAG, 0));
 	pia1.readpa_handler().set(FUNC(coco_state::pia1_pa_r));
@@ -277,8 +280,8 @@ void dragon_state::dragon_base(machine_config &config)
 	pia1.writepb_handler().set(FUNC(coco_state::pia1_pb_w));
 	pia1.ca2_handler().set(FUNC(coco_state::pia1_ca2_w));
 	pia1.cb2_handler().set(FUNC(coco_state::pia1_cb2_w));
-	pia1.irqa_handler().set(FUNC(coco_state::pia1_firq_a));
-	pia1.irqb_handler().set(FUNC(coco_state::pia1_firq_b));
+	pia1.irqa_handler().set(m_firqs, FUNC(input_merger_device::in_w<0>));
+	pia1.irqb_handler().set(m_firqs, FUNC(input_merger_device::in_w<1>));
 
 	SAM6883(config, m_sam, 14.218_MHz_XTAL, m_maincpu);
 	m_sam->set_addrmap(0, &dragon_state::coco_ram);
@@ -351,7 +354,7 @@ void dragon64_state::dragon64(machine_config &config)
 	// acia
 	mos6551_device &acia(MOS6551(config, "acia", 0));
 	acia.set_xtal(1.8432_MHz_XTAL);
-	acia.irq_handler().set(FUNC(dragon64_state::acia_irq));
+	acia.irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<2>));
 	acia.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
@@ -363,11 +366,6 @@ void dragon64_state::dragon64(machine_config &config)
 	// software lists
 	SOFTWARE_LIST(config, "dragon_flex_list").set_original("dragon_flex");
 	SOFTWARE_LIST(config, "dragon_os9_list").set_original("dragon_os9");
-}
-
-WRITE_LINE_MEMBER( dragon64_state::acia_irq )
-{
-	m_maincpu->set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void dragon64_state::dragon64h(machine_config &config)
@@ -418,10 +416,13 @@ void dragon_alpha_state::dgnalpha(machine_config &config)
 	sam().set_addrmap(4, &dragon_alpha_state::d64_io0);
 	sam().set_addrmap(5, &dragon_alpha_state::dgnalpha_io1);
 
+	// input merger
+	INPUT_MERGER_ANY_HIGH(config, m_nmis).output_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
+
 	// cartridge
 	cococart_slot_device &cartslot(COCOCART_SLOT(config, CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), dragon_cart, nullptr));
 	cartslot.cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
-	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	cartslot.nmi_callback().set(m_nmis, FUNC(input_merger_device::in_w<0>));
 	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 
 	// acia
@@ -447,8 +448,8 @@ void dragon_alpha_state::dgnalpha(machine_config &config)
 	// pia 2
 	pia6821_device &pia2(PIA6821(config, PIA2_TAG, 0));
 	pia2.writepa_handler().set(FUNC(dragon_alpha_state::pia2_pa_w));
-	pia2.irqa_handler().set(FUNC(dragon_alpha_state::pia2_firq_a));
-	pia2.irqb_handler().set(FUNC(dragon_alpha_state::pia2_firq_b));
+	pia2.irqa_handler().set(m_firqs, FUNC(input_merger_device::in_w<2>));
+	pia2.irqb_handler().set(m_firqs, FUNC(input_merger_device::in_w<3>));
 
 	// software lists
 	SOFTWARE_LIST(config, "dgnalpha_flop_list").set_original("dgnalpha_flop");

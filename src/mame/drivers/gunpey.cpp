@@ -201,6 +201,39 @@ Release:                         November 1999
 #include "screen.h"
 #include "speaker.h"
 
+namespace {
+
+struct state_s
+{
+	unsigned char *buf;
+	unsigned char bits;
+	int num_bits;
+	unsigned char colour[16];
+	int basex;
+	int ix, iy, iw;
+	int dx, dy;
+	int ow, oh;
+	int ox, oy;
+
+	void set_o(unsigned char v);
+	unsigned char get_o(int x, int y) const;
+
+	static void hn_bytes_new_colour(state_s &s, unsigned char v, int n);
+	static void hn_bytes_prev_colour(state_s &s, unsigned char v, int n);
+	static void hn_copy_directly(state_s &s, unsigned char v, int n);
+	static void hn_copy_plus_one(state_s &s, unsigned char v, int n);
+	static void hn_copy_minus_one(state_s &s, unsigned char v, int n);
+};
+
+
+struct huffman_node_s
+{
+	const char *bits;
+	void (*func)(state_s &, unsigned char, int);
+	int arg0_bits;
+	int arg1_val;
+};
+
 
 class gunpey_state : public driver_device
 {
@@ -214,21 +247,14 @@ public:
 		, m_blit_rom(*this, "blit_data")
 	{ }
 
-	// TODO: make these non-static and private
-	static void set_o(struct state_s *s, unsigned char v);
-	static unsigned char get_o(struct state_s *s, int x, int y);
-	static void hn_bytes_new_colour(struct state_s *s, unsigned char v, int n);
-	static void hn_bytes_prev_colour(struct state_s *s, unsigned char v, int n);
-	static void hn_copy_directly(struct state_s *s, unsigned char v, int n);
-	static void hn_copy_plus_one(struct state_s *s, unsigned char v, int n);
-	static void hn_copy_minus_one(struct state_s *s, unsigned char v, int n);
-
 	void gunpey(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-
-	void init_gunpey();
-private:
 
 	void status_w(offs_t offset, uint8_t data);
 	uint8_t status_r(offs_t offset);
@@ -239,7 +265,6 @@ private:
 	void output_w(uint8_t data);
 	void vram_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void vregs_addr_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	TIMER_CALLBACK_MEMBER(blitter_end);
@@ -269,8 +294,8 @@ private:
 	uint8_t get_vrom_byte(int x, int y);
 	int write_dest_byte(uint8_t usedata);
 	int decompress_sprite(unsigned char *buf, int ix, int iy, int ow, int oh, int dx, int dy);
-	int next_node(struct huffman_node_s **res, struct state_s *s);
-	int get_next_bit(struct state_s *s);
+	int next_node(const huffman_node_s **res, state_s *s);
+	int get_next_bit(state_s *s);
 
 	uint8_t m_irq_cause, m_irq_mask;
 	std::unique_ptr<uint16_t[]> m_blit_buffer;
@@ -286,6 +311,9 @@ private:
 
 void gunpey_state::video_start()
 {
+	// assumes it can make an address mask from m_blit_rom.length() - 1
+	assert(!(m_blit_rom.length() & (m_blit_rom.length() - 1)));
+
 	m_blit_buffer = std::make_unique<uint16_t[]>(512*512);
 	m_vram = std::make_unique<uint8_t[]>(0x400000);
 	std::fill_n(&m_vram[0], 0x400000, 0xff);
@@ -641,23 +669,10 @@ int gunpey_state::write_dest_byte(uint8_t usedata)
 
 inline uint8_t gunpey_state::get_vrom_byte(int x, int y)
 {
-	return m_blit_rom[((x)+2048 * (y)) & m_blit_rom.mask()];
+	return m_blit_rom[((x)+2048 * (y)) & (m_blit_rom.length() - 1)];
 }
 
-struct state_s
-{
-	unsigned char *buf;
-	unsigned char bits;
-	int num_bits;
-	unsigned char colour[16];
-	int basex;
-	int ix, iy, iw;
-	int dx, dy;
-	int ow, oh;
-	int ox, oy;
-};
-
-inline int gunpey_state::get_next_bit(struct state_s *s)
+inline int gunpey_state::get_next_bit(state_s *s)
 {
 	if (s->num_bits == 0)
 	{
@@ -680,178 +695,156 @@ inline int gunpey_state::get_next_bit(struct state_s *s)
 }
 
 
-void gunpey_state::set_o(struct state_s *s, unsigned char v)
+void state_s::set_o(unsigned char v)
 {
-	assert(s->ox >= 0);
-	assert(s->ox < s->ow);
-	assert(s->ox < 256);
-	assert(s->oy >= 0);
-	assert(s->oy < s->oh);
-	assert(s->oy < 256);
+	assert(ox >= 0);
+	assert(ox < ow);
+	assert(ox < 256);
+	assert(oy >= 0);
+	assert(oy < oh);
+	assert(oy < 256);
 
 	unsigned char a = v;
-	for (int i = 0; i < sizeof(s->colour) / sizeof(*s->colour); i++)
+	for (int i = 0; i < ARRAY_LENGTH(colour); i++)
 	{
-		unsigned char b = s->colour[i];
-		s->colour[i] = a;
+		unsigned char b = colour[i];
+		colour[i] = a;
 		a = b;
 		if (a == v)
 			break;
 	}
 
-	s->buf[((s->dx + s->ox++) & 0x7ff) + (((s->dy + s->oy) & 0x7ff) * 0x800)] = v;
+	buf[((dx + ox++) & 0x7ff) + (((dy + oy) & 0x7ff) * 0x800)] = v;
 }
 
 
-unsigned char gunpey_state::get_o(struct state_s *s, int x, int y)
+unsigned char state_s::get_o(int x, int y) const
 {
 	assert(x >= 0);
-	assert(x < s->ow);
+	assert(x < ow);
 	assert(x < 256);
 	assert(y >= 0);
-	assert(y < s->oh);
+	assert(y < oh);
 	assert(y < 256);
 
-	return s->buf[((s->dx + x) & 0x7ff) + (((s->dy + y) & 0x7ff) * 0x800)];
+	return buf[((dx + x) & 0x7ff) + (((dy + y) & 0x7ff) * 0x800)];
 }
 
 
-void gunpey_state::hn_bytes_new_colour(struct state_s *s, unsigned char v, int n)
+void state_s::hn_bytes_new_colour(state_s &s, unsigned char v, int n)
 {
 	for (int i = 0; i < n; i++)
-	{
-		set_o(s, v);
-	}
+		s.set_o(v);
 }
 
 
-void gunpey_state::hn_bytes_prev_colour(struct state_s *s, unsigned char v, int n)
+void state_s::hn_bytes_prev_colour(state_s &s, unsigned char v, int n)
 {
-	int c = s->colour[v];
+	int c = s.colour[v];
 
 	for (int i = 0; i < n; i++)
-	{
-		set_o(s, c);
-	}
+		s.set_o(c);
 }
 
 
-void gunpey_state::hn_copy_directly(struct state_s *s, unsigned char v, int n)
+void state_s::hn_copy_directly(state_s &s, unsigned char v, int n)
 {
 	for (int i = 0; i < n; i++)
 	{
-		if ((s->ox / 12) & 1)
-		{
-			set_o(s, get_o(s, s->ox, s->oy + 1));
-		}
+		if ((s.ox / 12) & 1)
+			s.set_o(s.get_o(s.ox, s.oy + 1));
 		else
-		{
-			set_o(s, get_o(s, s->ox, s->oy - 1));
-		}
+			s.set_o(s.get_o(s.ox, s.oy - 1));
 	}
 }
 
 
 
-void gunpey_state::hn_copy_plus_one(struct state_s *s, unsigned char v, int n)
+void state_s::hn_copy_plus_one(state_s &s, unsigned char v, int n)
 {
 	for (int i = 0; i < n; i++)
 	{
-		if ((s->ox / 12) & 1)
-		{
-			set_o(s, get_o(s, s->ox + 1, s->oy + 1));
-		}
+		if ((s.ox / 12) & 1)
+			s.set_o(s.get_o(s.ox + 1, s.oy + 1));
 		else
-		{
-			set_o(s, get_o(s, s->ox + 1, s->oy - 1));
-		}
+			s.set_o(s.get_o(s.ox + 1, s.oy - 1));
 	}
 }
 
 
-void gunpey_state::hn_copy_minus_one(struct state_s *s, unsigned char v, int n)
+void state_s::hn_copy_minus_one(state_s &s, unsigned char v, int n)
 {
 	for (int i = 0; i < n; i++)
 	{
-		if ((s->ox / 12) & 1)
-		{
-			set_o(s, get_o(s, s->ox - 1, s->oy + 1));
-		}
+		if ((s.ox / 12) & 1)
+			s.set_o(s.get_o(s.ox - 1, s.oy + 1));
 		else
-		{
-			set_o(s, get_o(s, s->ox - 1, s->oy - 1));
-		}
+			s.set_o(s.get_o(s.ox - 1, s.oy - 1));
 	}
 }
 
 
-static struct huffman_node_s
-{
-	const char *bits;
-	void (*func)(struct state_s *, unsigned char, int);
-	int arg0_bits;
-	int arg1_val;
-} hn[] = {
-	{ "11",                 gunpey_state::hn_bytes_new_colour,   8,  1 },
-	{ "10111",              gunpey_state::hn_bytes_new_colour,   8,  2 },
-	{ "10110011",           gunpey_state::hn_bytes_new_colour,   8,  3 },
-	{ "1010011000",         gunpey_state::hn_bytes_new_colour,   8,  4 },
-	{ "1010101010000",      gunpey_state::hn_bytes_new_colour,   8,  5 },
-	{ "101010001011110",    gunpey_state::hn_bytes_new_colour,   8,  6 },
-	{ "101010010101110",    gunpey_state::hn_bytes_new_colour,   8,  7 },
-	{ "101010010101111",    gunpey_state::hn_bytes_new_colour,   8,  8 },
-	{ "101010010101100",    gunpey_state::hn_bytes_new_colour,   8,  9 },
-	{ "10101000101100",     gunpey_state::hn_bytes_new_colour,   8, 10 },
-	{ "101010010101101",    gunpey_state::hn_bytes_new_colour,   8, 11 },
-	{ "10101000101101",     gunpey_state::hn_bytes_new_colour,   8, 12 },
-	{ "0",                  gunpey_state::hn_bytes_prev_colour,  4,  1 },
-	{ "100",                gunpey_state::hn_bytes_prev_colour,  4,  2 },
-	{ "101011",             gunpey_state::hn_bytes_prev_colour,  4,  3 },
-	{ "1010010",            gunpey_state::hn_bytes_prev_colour,  4,  4 },
-	{ "101010100",          gunpey_state::hn_bytes_prev_colour,  4,  5 },
-	{ "1010100100",         gunpey_state::hn_bytes_prev_colour,  4,  6 },
-	{ "10101010110",        gunpey_state::hn_bytes_prev_colour,  4,  7 },
-	{ "10100111000",        gunpey_state::hn_bytes_prev_colour,  4,  8 },
-	{ "101010101001",       gunpey_state::hn_bytes_prev_colour,  4,  9 },
-	{ "101001111000",       gunpey_state::hn_bytes_prev_colour,  4, 10 },
-	{ "101010010100",       gunpey_state::hn_bytes_prev_colour,  4, 11 },
-	{ "1010011001",         gunpey_state::hn_bytes_prev_colour,  4, 12 },
-	{ "101101",             gunpey_state::hn_copy_directly,      0,  2 },
-	{ "10101011",           gunpey_state::hn_copy_directly,      0,  3 },
-	{ "101010011",          gunpey_state::hn_copy_directly,      0,  4 },
-	{ "101001101",          gunpey_state::hn_copy_directly,      0,  5 },
-	{ "1010011111",         gunpey_state::hn_copy_directly,      0,  6 },
-	{ "1010100011",         gunpey_state::hn_copy_directly,      0,  7 },
-	{ "10101000100",        gunpey_state::hn_copy_directly,      0,  8 },
-	{ "101010101111",       gunpey_state::hn_copy_directly,      0,  9 },
-	{ "101001110010",       gunpey_state::hn_copy_directly,      0, 10 },
-	{ "1010011100111",      gunpey_state::hn_copy_directly,      0, 11 },
-	{ "101100101",          gunpey_state::hn_copy_directly,      0, 12 },
-	{ "1011000",            gunpey_state::hn_copy_plus_one,      0,  2 },
-	{ "101010000",          gunpey_state::hn_copy_plus_one,      0,  3 },
-	{ "10101001011",        gunpey_state::hn_copy_plus_one,      0,  4 },
-	{ "101010001010",       gunpey_state::hn_copy_plus_one,      0,  5 },
-	{ "1010101011101",      gunpey_state::hn_copy_plus_one,      0,  6 },
-	{ "1010101011100",      gunpey_state::hn_copy_plus_one,      0,  7 },
-	{ "1010011110010",      gunpey_state::hn_copy_plus_one,      0,  8 },
-	{ "10101000101110",     gunpey_state::hn_copy_plus_one,      0,  9 },
-	{ "101010001011111",    gunpey_state::hn_copy_plus_one,      0, 10 },
-	{ "1010011110011",      gunpey_state::hn_copy_plus_one,      0, 11 },
-	{ "101000",             gunpey_state::hn_copy_minus_one,     0,  2 },
-	{ "101100100",          gunpey_state::hn_copy_minus_one,     0,  3 },
-	{ "1010011101",         gunpey_state::hn_copy_minus_one,     0,  4 },
-	{ "10101010101",        gunpey_state::hn_copy_minus_one,     0,  5 },
-	{ "101001111011",       gunpey_state::hn_copy_minus_one,     0,  6 },
-	{ "101001111010",       gunpey_state::hn_copy_minus_one,     0,  7 },
-	{ "1010101010001",      gunpey_state::hn_copy_minus_one,     0,  8 },
-	{ "1010011100110",      gunpey_state::hn_copy_minus_one,     0,  9 },
-	{ "10101001010101",     gunpey_state::hn_copy_minus_one,     0, 10 },
-	{ "10101001010100",     gunpey_state::hn_copy_minus_one,     0, 11 },
-	{ NULL },
+static const huffman_node_s hn[] = {
+	{ "11",                 state_s::hn_bytes_new_colour,   8,  1 },
+	{ "10111",              state_s::hn_bytes_new_colour,   8,  2 },
+	{ "10110011",           state_s::hn_bytes_new_colour,   8,  3 },
+	{ "1010011000",         state_s::hn_bytes_new_colour,   8,  4 },
+	{ "1010101010000",      state_s::hn_bytes_new_colour,   8,  5 },
+	{ "101010001011110",    state_s::hn_bytes_new_colour,   8,  6 },
+	{ "101010010101110",    state_s::hn_bytes_new_colour,   8,  7 },
+	{ "101010010101111",    state_s::hn_bytes_new_colour,   8,  8 },
+	{ "101010010101100",    state_s::hn_bytes_new_colour,   8,  9 },
+	{ "10101000101100",     state_s::hn_bytes_new_colour,   8, 10 },
+	{ "101010010101101",    state_s::hn_bytes_new_colour,   8, 11 },
+	{ "10101000101101",     state_s::hn_bytes_new_colour,   8, 12 },
+	{ "0",                  state_s::hn_bytes_prev_colour,  4,  1 },
+	{ "100",                state_s::hn_bytes_prev_colour,  4,  2 },
+	{ "101011",             state_s::hn_bytes_prev_colour,  4,  3 },
+	{ "1010010",            state_s::hn_bytes_prev_colour,  4,  4 },
+	{ "101010100",          state_s::hn_bytes_prev_colour,  4,  5 },
+	{ "1010100100",         state_s::hn_bytes_prev_colour,  4,  6 },
+	{ "10101010110",        state_s::hn_bytes_prev_colour,  4,  7 },
+	{ "10100111000",        state_s::hn_bytes_prev_colour,  4,  8 },
+	{ "101010101001",       state_s::hn_bytes_prev_colour,  4,  9 },
+	{ "101001111000",       state_s::hn_bytes_prev_colour,  4, 10 },
+	{ "101010010100",       state_s::hn_bytes_prev_colour,  4, 11 },
+	{ "1010011001",         state_s::hn_bytes_prev_colour,  4, 12 },
+	{ "101101",             state_s::hn_copy_directly,      0,  2 },
+	{ "10101011",           state_s::hn_copy_directly,      0,  3 },
+	{ "101010011",          state_s::hn_copy_directly,      0,  4 },
+	{ "101001101",          state_s::hn_copy_directly,      0,  5 },
+	{ "1010011111",         state_s::hn_copy_directly,      0,  6 },
+	{ "1010100011",         state_s::hn_copy_directly,      0,  7 },
+	{ "10101000100",        state_s::hn_copy_directly,      0,  8 },
+	{ "101010101111",       state_s::hn_copy_directly,      0,  9 },
+	{ "101001110010",       state_s::hn_copy_directly,      0, 10 },
+	{ "1010011100111",      state_s::hn_copy_directly,      0, 11 },
+	{ "101100101",          state_s::hn_copy_directly,      0, 12 },
+	{ "1011000",            state_s::hn_copy_plus_one,      0,  2 },
+	{ "101010000",          state_s::hn_copy_plus_one,      0,  3 },
+	{ "10101001011",        state_s::hn_copy_plus_one,      0,  4 },
+	{ "101010001010",       state_s::hn_copy_plus_one,      0,  5 },
+	{ "1010101011101",      state_s::hn_copy_plus_one,      0,  6 },
+	{ "1010101011100",      state_s::hn_copy_plus_one,      0,  7 },
+	{ "1010011110010",      state_s::hn_copy_plus_one,      0,  8 },
+	{ "10101000101110",     state_s::hn_copy_plus_one,      0,  9 },
+	{ "101010001011111",    state_s::hn_copy_plus_one,      0, 10 },
+	{ "1010011110011",      state_s::hn_copy_plus_one,      0, 11 },
+	{ "101000",             state_s::hn_copy_minus_one,     0,  2 },
+	{ "101100100",          state_s::hn_copy_minus_one,     0,  3 },
+	{ "1010011101",         state_s::hn_copy_minus_one,     0,  4 },
+	{ "10101010101",        state_s::hn_copy_minus_one,     0,  5 },
+	{ "101001111011",       state_s::hn_copy_minus_one,     0,  6 },
+	{ "101001111010",       state_s::hn_copy_minus_one,     0,  7 },
+	{ "1010101010001",      state_s::hn_copy_minus_one,     0,  8 },
+	{ "1010011100110",      state_s::hn_copy_minus_one,     0,  9 },
+	{ "10101001010101",     state_s::hn_copy_minus_one,     0, 10 },
+	{ "10101001010100",     state_s::hn_copy_minus_one,     0, 11 },
+	{ nullptr,              nullptr,                        0,  0 },
 };
 
 
-int gunpey_state::next_node(struct huffman_node_s **res, struct state_s *s)
+int gunpey_state::next_node(const huffman_node_s **res, state_s *s)
 {
 	char bits[128];
 
@@ -882,8 +875,8 @@ int gunpey_state::next_node(struct huffman_node_s **res, struct state_s *s)
 
 int gunpey_state::decompress_sprite(unsigned char *buf, int ix, int iy, int ow, int oh, int dx, int dy)
 {
-	struct huffman_node_s *n;
-	struct state_s s;
+	const huffman_node_s *n;
+	state_s s;
 	unsigned char v;
 	int eol;
 
@@ -922,7 +915,7 @@ int gunpey_state::decompress_sprite(unsigned char *buf, int ix, int iy, int ow, 
 			v |= get_next_bit(&s) << i;
 		}
 
-		n->func(&s, v, n->arg1_val);
+		n->func(s, v, n->arg1_val);
 
 		if ((s.ox % 12) == 0)
 		{
@@ -1250,8 +1243,6 @@ ROM_START( gunpey )
 	ROM_LOAD( "gp_rom5.622",  0x000000, 0x400000,  CRC(f79903e0) SHA1(4fd50b4138e64a48ec1504eb8cd172a229e0e965)) // 1xxxxxxxxxxxxxxxxxxxxx = 0xFF
 ROM_END
 
-void gunpey_state::init_gunpey()
-{
-}
+} // anonymous namespace
 
-GAME( 2000, gunpey, 0, gunpey, gunpey, gunpey_state, init_gunpey, ROT0, "Bandai / Banpresto", "Gunpey (Japan)", 0 )
+GAME( 2000, gunpey, 0, gunpey, gunpey, gunpey_state, empty_init, ROT0, "Bandai / Banpresto", "Gunpey (Japan)", 0 )

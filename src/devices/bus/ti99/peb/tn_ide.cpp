@@ -146,7 +146,7 @@ DEFINE_DEVICE_TYPE_NS(TI99_IDE, bus::ti99::peb, nouspikel_ide_card_device, "ti99
 #define ATALATCHODD_TAG "atalatch_odd"
 #define RAM512_TAG "sram512"
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 enum
 {
@@ -733,4 +733,4 @@ ioport_constructor nouspikel_ide_card_device::device_input_ports() const
 	return INPUT_PORTS_NAME(tn_ide);
 }
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb

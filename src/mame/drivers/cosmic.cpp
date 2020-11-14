@@ -280,6 +280,7 @@ void cosmic_state::cosmica_sound_output_w(offs_t offset, uint8_t data)
 					break;
 				}
 			}
+			[[fallthrough]]; // FIXME: really?
 
 		case 3: /*Dive Bombing Type B (G.S.B)*/
 			if (data)

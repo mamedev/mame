@@ -24,7 +24,7 @@
 #include "machine/74259.h"
 #include "machine/74123.h"
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 class snug_bwg_device : public device_t, public device_ti99_peribox_card_interface
 {
@@ -132,7 +132,7 @@ private:
 	required_device<ttl74123_device> m_motormf;
 };
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb
 
 DECLARE_DEVICE_TYPE_NS(TI99_BWG, bus::ti99::peb, snug_bwg_device)
 

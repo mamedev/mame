@@ -86,8 +86,13 @@ constexpr layout_group::transform identity_transform{{ {{ 1.0F, 0.0F, 0.0F }}, {
 
 
 //**************************************************************************
-//  INLINE HELPERS
+//  HELPERS
 //**************************************************************************
+
+constexpr int get_state_dummy(layout_view::item &item)
+{
+	return 0;
+}
 
 inline void render_bounds_transform(render_bounds &bounds, layout_group::transform const &trans)
 {
@@ -133,7 +138,7 @@ class layout_reference_error : public std::out_of_range { using std::out_of_rang
 } // anonymous namespace
 
 
-namespace emu { namespace render { namespace detail {
+namespace emu::render::detail {
 
 class layout_environment
 {
@@ -950,7 +955,7 @@ public:
 	u32 visibility_mask() const { return m_visibility_mask; }
 };
 
-} } } // namespace emu::render::detail
+} // namespace emu::render::detail
 
 
 namespace {
@@ -1165,7 +1170,7 @@ layout_element::layout_element(environment &env, util::xml::data_node const &ele
 			throw layout_syntax_error(util::string_format("unknown element component %s", compnode->get_name()));
 
 		// insert the new component into the list
-		component const &newcomp(**m_complist.emplace(m_complist.end(), make_func->second(env, *compnode)));
+		component const &newcomp(*m_complist.emplace_back(make_func->second(env, *compnode)));
 
 		// accumulate bounds
 		if (first)
@@ -4425,8 +4430,6 @@ layout_view::item::item(
 	: m_element(find_element(env, itemnode, elemmap))
 	, m_output(env.device(), env.get_attribute_string(itemnode, "name", ""))
 	, m_animoutput(env.device(), make_animoutput_tag(env, itemnode))
-	, m_have_output(env.get_attribute_string(itemnode, "name", "")[0])
-	, m_have_animoutput(!make_animoutput_tag(env, itemnode).empty())
 	, m_animinput_port(nullptr)
 	, m_animmask(make_animmask(env, itemnode))
 	, m_animshift(get_state_shift(m_animmask))
@@ -4444,6 +4447,8 @@ layout_view::item::item(
 	, m_input_tag(make_input_tag(env, itemnode))
 	, m_animinput_tag(make_animinput_tag(env, itemnode))
 	, m_rawbounds(make_bounds(env, itemnode, trans))
+	, m_have_output(env.get_attribute_string(itemnode, "name", "")[0])
+	, m_have_animoutput(!make_animoutput_tag(env, itemnode).empty())
 	, m_has_clickthrough(env.get_attribute_string(itemnode, "clickthrough", "")[0])
 {
 	// fetch common data
@@ -4470,6 +4475,10 @@ layout_view::item::item(
 	{
 		throw layout_syntax_error(util::string_format("item of type %s require an element tag", itemnode.get_name()));
 	}
+
+	// this can be called before resolving tags, make it return something valid
+	m_bounds = m_rawbounds;
+	m_get_bounds = bounds_delegate(&emu::render::detail::bounds_step::get, &const_cast<emu::render::detail::bounds_step &>(m_bounds.front()));
 }
 
 
@@ -4482,71 +4491,13 @@ layout_view::item::~item()
 }
 
 
-//-------------------------------------------------
-//  bounds - get bounds for current state
-//-------------------------------------------------
-
-render_bounds layout_view::item::bounds() const
-{
-	if (m_bounds.size() == 1U)
-		return m_bounds.front().bounds;
-	else
-		return interpolate_bounds(m_bounds, animation_state());
-}
-
-
-//-------------------------------------------------
-//  color - get color for current state
-//-------------------------------------------------
-
-render_color layout_view::item::color() const
-{
-	if (m_color.size() == 1U)
-		return m_color.front().color;
-	else
-		return interpolate_color(m_color, animation_state());
-}
-
-
-//-------------------------------------------------
-//  state - fetch state based on configured source
-//-------------------------------------------------
-
-int layout_view::item::state() const
-{
-	assert(m_element);
-
-	if (m_have_output)
-	{
-		// if configured to track an output, fetch its value
-		return m_output;
-	}
-	else if (m_input_port)
-	{
-		// if configured to an input, fetch the input value
-		if (m_input_raw)
-		{
-			return (m_input_port->read() & m_input_mask) >> m_input_shift;
-		}
-		else
-		{
-			ioport_field const *const field(m_input_field ? m_input_field : m_input_port->field(m_input_mask));
-			if (field)
-				return ((m_input_port->read() ^ field->defvalue()) & m_input_mask) ? 1 : 0;
-		}
-	}
-
-	// default to zero
-	return 0;
-}
-
-
 //---------------------------------------------
 //  resolve_tags - resolve tags, if any are set
 //---------------------------------------------
 
 void layout_view::item::resolve_tags()
 {
+	// resolve element state output and set default value
 	if (m_have_output)
 	{
 		m_output.resolve();
@@ -4554,12 +4505,15 @@ void layout_view::item::resolve_tags()
 			m_output = m_element->default_state();
 	}
 
+	// resolve animation state output
 	if (m_have_animoutput)
 		m_animoutput.resolve();
 
+	// resolve animation state input
 	if (!m_animinput_tag.empty())
 		m_animinput_port = m_element->machine().root_device().ioport(m_animinput_tag);
 
+	// resolve element state input
 	if (!m_input_tag.empty())
 	{
 		m_input_port = m_element->machine().root_device().ioport(m_input_tag);
@@ -4581,21 +4535,125 @@ void layout_view::item::resolve_tags()
 				m_clickthrough = false;
 		}
 	}
+
+	// choose optimal element state function
+	if (m_have_output)
+		m_get_elem_state = state_delegate(&item::get_output, this);
+	else if (!m_input_port)
+		m_get_elem_state = state_delegate(&get_state_dummy, this);
+	else if (m_input_raw)
+		m_get_elem_state = state_delegate(&item::get_input_raw, this);
+	else if (m_input_field)
+		m_get_elem_state = state_delegate(&item::get_input_field_cached, this);
+	else
+		m_get_elem_state = state_delegate(&item::get_input_field_conditional, this);
+
+	// choose optimal animation state function
+	if (m_have_animoutput)
+		m_get_anim_state = state_delegate(&item::get_anim_output, this);
+	else if (m_animinput_port)
+		m_get_anim_state = state_delegate(&item::get_anim_input, this);
+	else
+		m_get_anim_state = m_get_elem_state;
+
+	// choose optional bounds and colour functions
+	m_get_bounds = (m_bounds.size() == 1U)
+			? bounds_delegate(&emu::render::detail::bounds_step::get, &const_cast<emu::render::detail::bounds_step &>(m_bounds.front()))
+			: bounds_delegate(&item::get_interpolated_bounds, this);
+	m_get_color = (m_color.size() == 1U)
+			? color_delegate(&emu::render::detail::color_step::get, &const_cast<emu::render::detail::color_step &>(m_color.front()))
+			: color_delegate(&item::get_interpolated_color, this);
 }
 
 
 //---------------------------------------------
-//  find_element - find element definition
+//  get_output - get element state output
 //---------------------------------------------
 
-inline int layout_view::item::animation_state() const
+int layout_view::item::get_output() const
 {
-	if (m_have_animoutput)
-		return (s32(m_animoutput) & m_animmask) >> m_animshift;
-	else if (m_animinput_port)
-		return (m_animinput_port->read() & m_animmask) >> m_animshift;
-	else
-		return state();
+	assert(m_have_output);
+	return int(s32(m_output));
+}
+
+
+//---------------------------------------------
+//  get_input_raw - get element state input
+//---------------------------------------------
+
+int layout_view::item::get_input_raw() const
+{
+	assert(m_input_port);
+	return int(std::make_signed_t<ioport_value>((m_input_port->read() & m_input_mask) >> m_input_shift));
+}
+
+
+//---------------------------------------------
+//  get_input_field_cached - element state
+//---------------------------------------------
+
+int layout_view::item::get_input_field_cached() const
+{
+	assert(m_input_port);
+	assert(m_input_field);
+	return ((m_input_port->read() ^ m_input_field->defvalue()) & m_input_mask) ? 1 : 0;
+}
+
+
+//---------------------------------------------
+//  get_input_field_conditional - element state
+//---------------------------------------------
+
+int layout_view::item::get_input_field_conditional() const
+{
+	assert(m_input_port);
+	assert(!m_input_field);
+	ioport_field const *const field(m_input_port->field(m_input_mask));
+	return (field && ((m_input_port->read() ^ field->defvalue()) & m_input_mask)) ? 1 : 0;
+}
+
+
+//---------------------------------------------
+//  get_anim_output - get animation output
+//---------------------------------------------
+
+int layout_view::item::get_anim_output() const
+{
+	assert(m_have_animoutput);
+	return int(unsigned((u32(s32(m_animoutput) & m_animmask) >> m_animshift)));
+}
+
+
+//---------------------------------------------
+//  get_anim_input - get animation input
+//---------------------------------------------
+
+int layout_view::item::get_anim_input() const
+{
+	assert(m_animinput_port);
+	return int(std::make_signed_t<ioport_value>((m_animinput_port->read() & m_animmask) >> m_animshift));
+}
+
+
+//---------------------------------------------
+//  get_interpolated_bounds - animated bounds
+//---------------------------------------------
+
+render_bounds layout_view::item::get_interpolated_bounds() const
+{
+	assert(m_bounds.size() > 1U);
+	return interpolate_bounds(m_bounds, m_get_anim_state());
+}
+
+
+//---------------------------------------------
+//  get_interpolated_color - animated color
+//---------------------------------------------
+
+render_color layout_view::item::get_interpolated_color() const
+{
+	assert(m_color.size() > 1U);
+	return interpolate_color(m_color, m_get_anim_state());
 }
 
 

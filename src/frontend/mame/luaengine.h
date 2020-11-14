@@ -22,9 +22,8 @@
 #pragma GCC diagnostic ignored "-Wnoexcept-type"
 #endif
 
-#define SOL_SAFE_USERTYPE
-//#define SOL_CHECK_ARGUMENTS
-#include "sol2/sol.hpp"
+#define SOL_SAFE_USERTYPE 1
+#include "sol/sol.hpp"
 
 struct lua_State;
 

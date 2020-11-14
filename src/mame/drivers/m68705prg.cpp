@@ -168,7 +168,7 @@ protected:
 		m_pb_val = data;
 
 		u8 const *const ptr(m_eprom_image->get_rom_base());
-		m_mcu->pa_w(ptr ? ptr[m_addr & m_mcu_region.mask()] : 0xff);
+		m_mcu->pa_w(ptr ? ptr[m_addr & (m_mcu_region.length() - 1)] : 0xff);
 
 		m_digits[0] = s_7seg[(m_addr >> 0) & 0x0f];
 		m_digits[1] = s_7seg[(m_addr >> 4) & 0x0f];

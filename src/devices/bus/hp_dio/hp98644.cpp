@@ -17,8 +17,7 @@
 
 DEFINE_DEVICE_TYPE_NS(HPDIO_98644, bus::hp_dio, dio16_98644_device, "dio98644", "HP98644A Asynchronous Serial Interface")
 
-namespace bus {
-	namespace hp_dio {
+namespace bus::hp_dio {
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -242,4 +241,3 @@ void dio16_98644_device::io_w(offs_t offset, uint16_t data)
 }
 
 } // namespace bus::hp_dio
-} // namespace bus

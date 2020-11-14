@@ -2599,6 +2599,7 @@ void uniform::update()
 			break;
 		case CU_CHROMA_CONVERSION_GAIN:
 			m_shader->set_vector("ConversionGain", 3, &options->chroma_conversion_gain[0]);
+			break;
 		case CU_CHROMA_Y_GAIN:
 			m_shader->set_vector("YGain", 3, &options->chroma_y_gain[0]);
 			break;

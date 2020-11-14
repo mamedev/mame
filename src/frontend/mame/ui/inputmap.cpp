@@ -84,7 +84,7 @@ void menu_input_general::populate(float &customtop, float &custombottom)
 				for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 				{
 					// build an entry for the standard sequence
-					input_item_data &item(*data.emplace(data.end()));
+					input_item_data &item(data.emplace_back());
 					item.ref = &entry;
 					item.seqtype = seqtype;
 					item.seq = machine().ioport().type_seq(entry.type(), entry.player(), seqtype);
@@ -155,7 +155,7 @@ void menu_input_specific::populate(float &customtop, float &custombottom)
 					for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 					{
 						// build an entry for the standard sequence
-						input_item_data &item(*data.emplace(data.end()));
+						input_item_data &item(data.emplace_back());
 						item.ref = &field;
 						item.seqtype = seqtype;
 						item.seq = field.seq(seqtype);

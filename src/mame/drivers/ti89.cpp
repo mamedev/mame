@@ -79,6 +79,7 @@ void ti68k_state::ti68k_io_w(offs_t offset, uint16_t data)
 			break;
 		case 0x0b:
 			m_timer_val = data & 0xff;
+			[[fallthrough]]; // FIXME: really?
 		case 0x0c:
 			m_kb_mask = data & 0x03ff;
 			break;

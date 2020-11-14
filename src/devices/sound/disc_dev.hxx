@@ -633,10 +633,12 @@ DISCRETE_STEP(dsd_555_cc)
 		{
 			case 1:
 				r_discharge = DSD_555_CC__RDIS;
+				[[fallthrough]];
 			case 0:
 				break;
 			case 3:
 				r_discharge = RES_2_PARALLEL(DSD_555_CC__RDIS, DSD_555_CC__RGND);
+				[[fallthrough]];
 			case 2:
 				r_charge = DSD_555_CC__RGND;
 				vi       = i * r_charge;
@@ -944,10 +946,12 @@ DISCRETE_RESET(dsd_555_cc)
 		{
 			case 1:
 				r_discharge = DSD_555_CC__RDIS;
+				[[fallthrough]];
 			case 0:
 				break;
 			case 3:
 				r_discharge = RES_2_PARALLEL(DSD_555_CC__RDIS, DSD_555_CC__RGND);
+				[[fallthrough]];
 			case 2:
 				r_charge = DSD_555_CC__RGND;
 				break;

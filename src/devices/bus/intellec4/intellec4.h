@@ -114,7 +114,7 @@ to implement the card in both systems.
 #pragma once
 
 
-namespace bus { namespace intellec4 {
+namespace bus::intellec4 {
 
 class univ_slot_device;
 class univ_bus_device;
@@ -247,7 +247,7 @@ private:
 	unsigned        m_index;
 };
 
-} } // namespace bus::intellec4
+} // namespace bus::intellec4
 
 
 DECLARE_DEVICE_TYPE_NS(INTELLEC4_UNIV_SLOT, bus::intellec4, univ_slot_device)

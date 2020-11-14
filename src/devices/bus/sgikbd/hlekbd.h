@@ -11,7 +11,7 @@
 #include "diserial.h"
 
 
-namespace bus { namespace sgikbd {
+namespace bus::sgikbd {
 
 class hle_device : public device_t
 	, public device_buffered_serial_interface<16U>
@@ -109,7 +109,7 @@ private:
 	uint8_t     m_led_state;
 };
 
-} } // namespace bus::sgikbd
+} // namespace bus::sgikbd
 
 
 DECLARE_DEVICE_TYPE_NS(SGI_HLE_KEYBOARD, bus::sgikbd, hle_device)

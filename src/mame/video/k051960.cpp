@@ -175,6 +175,9 @@ void k051960_device::set_plane_order(int order)
 
 void k051960_device::device_start()
 {
+	// assumes it can make an address mask with m_sprite_rom.length() - 1
+	assert(!(m_sprite_rom.length() & (m_sprite_rom.length() - 1)));
+
 	// make sure our screen is started
 	if (!screen().started())
 		throw device_missing_dependencies();
@@ -262,7 +265,7 @@ int k051960_device::k051960_fetchromdata( int byte )
 	m_k051960_cb(&code, &color, &pri, &shadow);
 
 	addr = (code << 7) | (off1 << 2) | byte;
-	addr &= m_sprite_rom.mask();
+	addr &= m_sprite_rom.length() - 1;
 
 //  popmessage("%s: addr %06x", machine().describe_context(), addr);
 

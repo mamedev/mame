@@ -14180,17 +14180,105 @@ license:CC0
 	</software>
 
 	<software name="simant">
-		<description>SimAnt</description>
-		<year>1991</year>
+		<description>SimAnt (3.5", v1.08)</description>
+		<year>1992</year>
 		<publisher>Maxis</publisher>
+		<info name="version" value="1.08" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="simant.img" size="737280" crc="a909b075" sha1="3036c42da40576e0dcdc78238f9154aad1474232"/>
+				<rom name="SimAnt (v1.08) [Maxis] [1992] [3.5DD] [Disk 1 of 2] [Install Disk].img" size="737280" crc="a70ec01f" sha1="0f4f26dbd9303cbff96c9f21b6c1bec8866acd1f"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="simantd2.img" size="737280" crc="77b35cd5" sha1="4283c141e768cc27f2b1d5d8d33a8181a23f89ce"/>
+				<rom name="SimAnt (v1.08) [Maxis] [1992] [3.5DD] [Disk 2 of 2] [Data Disk].img" size="737280" crc="8bb95ed3" sha1="645a03ee24ff564ab027620f00a0ab37a00fb41f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simanta" cloneof="simant">
+		<description>SimAnt (3.5", v1.06)</description>
+		<year>1991</year>
+		<publisher>Maxis</publisher>
+		<info name="version" value="1.06" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="SimAnt (v1.06) [Maxis] [1991] [3.5DD] [Disk 1 of 2] [Install Disk].img" size="737280" crc="febf9bdb" sha1="985d7c0dbb275bf25a73b5af2b080eaff7cb7bd8"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="SimAnt (v1.06) [Maxis] [1991] [3.5DD] [Disk 2 of 2] [Data Disk].img" size="737280" crc="50c33437" sha1="ea5f27b5dae44849e0ac003d89d246d98587711d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simant525" cloneof="simant">
+		<description>SimAnt (5.25", v1.08)</description>
+		<year>1992</year>
+		<publisher>Maxis</publisher>
+		<info name="version" value="1.08" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="SimAnt (v1.08) [Maxis] [1992] [5.25DD] [Disk 1 of 4] [Install Disk].img" size="368640" crc="5e92d840" sha1="6f6c0b277f863629c8939384815c6a4de450c6f6"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="SimAnt (v1.08) [Maxis] [1992] [5.25DD] [Disk 2 of 4] [Program Disk].img" size="368640" crc="0d34f94d" sha1="18b5912774a28dfd64793468f174b2c020d58f6b"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="SimAnt (v1.08) [Maxis] [1992] [5.25DD] [Disk 3 of 4] [Program Data Disk].img" size="368640" crc="b759b84b" sha1="9da114568b5de7080086fa0fa419995b8ae931a1"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="SimAnt (v1.08) [Maxis] [1992] [5.25DD] [Disk 4 of 4] [Data Disk].img" size="368640" crc="e4f60677" sha1="59319ce8ad2a8ac3b4ee374a5d8255f28347d9a6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simant525a" cloneof="simant">
+		<description>SimAnt (5.25", v1.06)</description>
+		<year>1991</year>
+		<publisher>Maxis</publisher>
+		<info name="version" value="1.06" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="SimAnt (v1.06) [Maxis] [1991] [5.25DD] [Disk 1 of 4] [Install Disk].img" size="368640" crc="b3f8946e" sha1="9c4d70672b386c0f3b7b9f010fb836e17181aae3"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="SimAnt (v1.06) [Maxis] [1991] [5.25DD] [Disk 2 of 4] [Program Disk].img" size="368640" crc="164e2a52" sha1="76c39eef32ef42218ac3c3ad26f23cd95625c649"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="SimAnt (v1.06) [Maxis] [1991] [5.25DD] [Disk 3 of 4] [Program Data Disk].img" size="368640" crc="b3fc64d4" sha1="7f0f4aa970a5556badef8aad141e24a6e436d30f"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="SimAnt (v1.06) [Maxis] [1991] [5.25DD] [Disk 4 of 4] [Data Disk].img" size="368640" crc="f6373773" sha1="59f0b16575c90aac168fa91272924ae4536ced07"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simantwin">
+		<description>SimAnt (windows 3.x release)</description>
+		<year>1992</year>
+		<publisher>Maxis</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="SimAnt (win 3.x release) [Maxis] [1992] [3.5DD] [Disk 1 of 2].img" size="737280" crc="5ec6bb7d" sha1="7666d4e9b3d78ca109481c5225ebc51e286b51f8"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="SimAnt (win 3.x release) [Maxis] [1992] [3.5DD] [Disk 2 of 2].img" size="737280" crc="a40d89ee" sha1="7c5effdd95af637577d01ffa0faa40290d63ba19"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15580,7 +15668,7 @@ license:CC0
 		<year>1994</year>
 		<publisher>The B&amp;N Companies</publisher>
 		<info name="developer" value="Epic MegaGames" />
-		<part name="flop2" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Xargon - The Secret Chamber [The B&amp;N Companies] [1994] [3.5DD] [Disk 1 of 1].img" size="737280" crc="3a3f72aa" sha1="121d29b0824d6f1e6b979b19b8a8936140e48fce"/>
 			</dataarea>
@@ -15592,7 +15680,7 @@ license:CC0
 		<year>1994</year>
 		<publisher>The B&amp;N Companies</publisher>
 		<info name="developer" value="Epic MegaGames" />
-		<part name="flop3" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Xargon - Xargon's Fury [The B&amp;N Companies] [1994] [3.5DD] [Disk 1 of 1].img" size="737280" crc="fc55d317" sha1="08609f89ff4a5e942e527316617940fd11f5ee28"/>
 			</dataarea>

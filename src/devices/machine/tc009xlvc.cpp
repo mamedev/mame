@@ -214,6 +214,9 @@ void tc0090lvc_device::device_post_load()
 
 void tc0090lvc_device::device_start()
 {
+	// rom_r assumes it can make a mask with (m_rom.length() - 1)
+	assert(!(m_rom.length() & (m_rom.length() - 1)));
+
 	m_tile_cb.resolve();
 
 	std::fill_n(&m_vram[0], m_vram.bytes(), 0);

@@ -45,7 +45,7 @@ enum
 #define GENEVE_PFM512A_TAG     "pfm512a"
 #define GENEVE_KEYBOARD_CONN_TAG "keybconn"
 
-namespace bus { namespace ti99 { namespace internal {
+namespace bus::ti99::internal {
 
 /*****************************************************************************/
 
@@ -318,7 +318,7 @@ private:
 	int     m_sndready;
 };
 
-} } } // end namespace bus::ti99::internal
+} // end namespace bus::ti99::internal
 
 DECLARE_DEVICE_TYPE_NS(GENEVE_GATE_ARRAY,   bus::ti99::internal, geneve_gate_array_device)
 DECLARE_DEVICE_TYPE_NS(GENEVE_PAL,          bus::ti99::internal, geneve_pal_device)

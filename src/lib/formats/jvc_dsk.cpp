@@ -152,13 +152,13 @@ bool jvc_format::parse_header(io_generic *io, int &header_size, int &tracks, int
 		osd_printf_info("jvc_format: sector attribute flag unsupported\n");
 		return false;
 	case 4: base_sector_id = header[3];
-		// no break
+		[[fallthrough]];
 	case 3: sector_size = 128 << header[2];
-		// no break
+		[[fallthrough]];
 	case 2: heads = header[1];
-		// no break
+		[[fallthrough]];
 	case 1: sectors = header[0];
-		// no break
+		[[fallthrough]];
 	case 0: tracks = (size - header_size) / sector_size / sectors / heads;
 		break;
 	}

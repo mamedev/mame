@@ -692,6 +692,7 @@ offs_t tms9900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 
 	default:
 		osd_printf_error("debbugger internal error, file %s, line %d\n", __FILE__, __LINE__);
+		[[fallthrough]];
 	case illegal:
 		util::stream_format(stream, "data >%04x", OP);
 		break;

@@ -68,12 +68,12 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_eeprom(*this, "eeprom"),
-		m_textram(*this, "textram"),
-		m_spriteram(*this, "spriteram"),
-		m_charram(*this, "charram"),
-		m_line_ram(*this, "line_ram"),
-		m_pf_ram(*this, "pf_ram"),
-		m_pivot_ram(*this, "pivot_ram"),
+		m_textram(*this, "textram", 0x2000, ENDIANNESS_BIG),
+		m_spriteram(*this, "spriteram", 0x10000, ENDIANNESS_BIG),
+		m_charram(*this, "charram", 0x2000, ENDIANNESS_BIG),
+		m_line_ram(*this, "line_ram", 0x10000, ENDIANNESS_BIG),
+		m_pf_ram(*this, "pf_ram", 0xc000, ENDIANNESS_BIG),
+		m_pivot_ram(*this, "pivot_ram", 0x10000, ENDIANNESS_BIG),
 		m_input(*this, "IN.%u", 0),
 		m_dial(*this, "DIAL.%u", 0),
 		m_eepromin(*this, "EEPROMIN"),
@@ -155,12 +155,12 @@ protected:
 	required_device<palette_device> m_palette;
 	optional_device<eeprom_serial_base_device> m_eeprom;
 
-	required_shared_ptr<u16> m_textram;
-	required_shared_ptr<u16> m_spriteram;
-	required_shared_ptr<u16> m_charram;
-	required_shared_ptr<u16> m_line_ram;
-	required_shared_ptr<u16> m_pf_ram;
-	required_shared_ptr<u16> m_pivot_ram;
+	memory_share_creator<u16> m_textram;
+	memory_share_creator<u16> m_spriteram;
+	memory_share_creator<u16> m_charram;
+	memory_share_creator<u16> m_line_ram;
+	memory_share_creator<u16> m_pf_ram;
+	memory_share_creator<u16> m_pivot_ram;
 
 	optional_ioport_array<6> m_input;
 	optional_ioport_array<2> m_dial;
