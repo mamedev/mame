@@ -1176,6 +1176,9 @@ mks50                           //
 asma2k                          //
 asmapro                         //
 
+@source:alphatan.cpp
+alphatan                        // 1981 AlphaTantel
+
 @source:alphatpx.cpp
 alphatp1
 alphatp2
