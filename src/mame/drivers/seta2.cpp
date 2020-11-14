@@ -3412,8 +3412,8 @@ PCB Number: P0-142A
 Ram M1 are NEC D43001GU-70LL
 Ram M2 are LGS GM76C8128ALLFW70
 
-KUP-U06-I03 U06 Program rom ST27C4001 (even)
-KUP-U07-I03 U07 Program rom ST27C4001 (odd)
+KUP U06 I03 U06 Program rom ST27C4001 (even)
+KUP U07 I03 U07 Program rom ST27C4001 (odd)
 
 KUS-U18-I00 U18 Mask rom (Samples 23C32000 32Mbit)
 
@@ -3426,17 +3426,17 @@ KUC-U41-I00 U41 Mask rom (Graphics 23C32000 32Mbit)
 
 ROM_START( pzlbowl )
 	ROM_REGION( 0x100000, "maincpu", 0 )    // TMP68301 Code
-	ROM_LOAD16_BYTE( "kup-u06.i03", 0x000000, 0x080000, CRC(314e03ac) SHA1(999398e55161dd75570d418f4c9899e3bf311cc8) )
-	ROM_LOAD16_BYTE( "kup-u07.i03", 0x000001, 0x080000, CRC(a0423a04) SHA1(9539023c5c2f2bf72ee3fb6105443ffd3d61e2f8) )
+	ROM_LOAD16_BYTE( "kup_u06_i03.u6", 0x000000, 0x080000, CRC(314e03ac) SHA1(999398e55161dd75570d418f4c9899e3bf311cc8) )
+	ROM_LOAD16_BYTE( "kup_u07_i03.u7", 0x000001, 0x080000, CRC(a0423a04) SHA1(9539023c5c2f2bf72ee3fb6105443ffd3d61e2f8) )
 
 	ROM_REGION( 0x1000000, "sprites", 0 )   // Sprites
-	ROM_LOAD64_WORD( "kuc-u38.i00", 0x000000, 0x400000, CRC(3db24172) SHA1(89c39963e15c53b799994185d0c8b2e795478939) )
-	ROM_LOAD64_WORD( "kuc-u39.i00", 0x000002, 0x400000, CRC(9b26619b) SHA1(ea7a0bf46641d15353217b01e761d1a148bee4e7) )
-	ROM_LOAD64_WORD( "kuc-u40.i00", 0x000004, 0x400000, CRC(7e49a2cf) SHA1(d24683addbc54515c33fb620ac500e6702bd9e17) )
-	ROM_LOAD64_WORD( "kuc-u41.i00", 0x000006, 0x400000, CRC(2febf19b) SHA1(8081ac590c0463529777b5e4817305a1a6f6ea41) )
+	ROM_LOAD64_WORD( "kuc-u38-i00.u38", 0x000000, 0x400000, CRC(3db24172) SHA1(89c39963e15c53b799994185d0c8b2e795478939) )
+	ROM_LOAD64_WORD( "kuc-u39-i00.u39", 0x000002, 0x400000, CRC(9b26619b) SHA1(ea7a0bf46641d15353217b01e761d1a148bee4e7) )
+	ROM_LOAD64_WORD( "kuc-u40-i00.u40", 0x000004, 0x400000, CRC(7e49a2cf) SHA1(d24683addbc54515c33fb620ac500e6702bd9e17) )
+	ROM_LOAD64_WORD( "kuc-u41-i00.u41", 0x000006, 0x400000, CRC(2febf19b) SHA1(8081ac590c0463529777b5e4817305a1a6f6ea41) )
 
 	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
-	ROM_LOAD( "kus-u18.i00", 0x000000, 0x400000, CRC(e2b1dfcf) SHA1(fb0b8be119531a1a27efa46ed7b86b05a37ed585) )
+	ROM_LOAD( "kus-u18-i00.u18", 0x000000, 0x400000, CRC(e2b1dfcf) SHA1(fb0b8be119531a1a27efa46ed7b86b05a37ed585) )
 ROM_END
 
 /***************************************************************************
@@ -3744,7 +3744,7 @@ Note:
 ROM_START( endrichs ) // Memory Test doesn't show version like the set below
 	ROM_REGION( 0x100000, "maincpu", 0 )    // TMP68301 Code
 	ROM_LOAD16_BYTE( "endless_riches_u2_prg_even_v1.21_9-1-99.u2", 0x00000, 0x80000, CRC(bae6456c) SHA1(edbf4dc01095b9882243acf2bc8aecab8d9a1414) ) // handwritten label:  Endless Riches U2 PRG EVEN V1.21 9/1/99
-	ROM_LOAD16_BYTE( "endless_riches_u2_prg_odd_v1.21_9-1-99.u3",  0x00001, 0x80000, CRC(2b0529d6) SHA1(b85fc5d598081bc96ecdecb5663de698c4b95e27) ) // handwritten label:  Endless Riches U2 PRG ODD V1.21 9/1/99
+	ROM_LOAD16_BYTE( "endless_riches_u3_prg_odd_v1.21_9-1-99.u3",  0x00001, 0x80000, CRC(2b0529d6) SHA1(b85fc5d598081bc96ecdecb5663de698c4b95e27) ) // handwritten label:  Endless Riches U3 PRG ODD V1.21 9/1/99
 
 	ROM_REGION( 0x800000, "sprites", 0 )    // Sprites
 	ROM_LOAD64_WORD( "kfc-u16-c00.u16", 0x000000, 0x200000, CRC(cbfe5e0f) SHA1(6c7c8088c43231997ac47ce05cf43c78c1fdad47) )
