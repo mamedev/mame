@@ -105,7 +105,7 @@ int sol_lua_push(sol::types<osd_file::error>, lua_State *L, osd_file::error &&va
 	switch(value)
 	{
 		case osd_file::error::NONE:
-			return sol::stack::push(L, sol::nil);
+			return sol::stack::push(L, sol::lua_nil);
 		case osd_file::error::FAILURE:
 			strerror = "failure";
 			break;
@@ -628,7 +628,7 @@ sol::object lua_engine::call_plugin(const std::string &name, sol::object in)
 		else
 			return res.get<sol::object>();
 	}
-	return sol::make_object(sol(), sol::nil);
+	return sol::make_object(sol(), sol::lua_nil);
 }
 
 void lua_engine::menu_populate(const std::string &menu, std::vector<std::tuple<std::string, std::string, std::string>> &menu_list)
@@ -915,7 +915,7 @@ void lua_engine::initialize()
 	emu["driver_find"] = [this](const char *driver) -> sol::object {
 			int i = driver_list::find(driver);
 			if(i == -1)
-				return sol::make_object(sol(), sol::nil);
+				return sol::make_object(sol(), sol::lua_nil);
 			return sol::make_object(sol(), driver_list::driver(i));
 		};
 	emu["wait"] = lua_CFunction([](lua_State *L) {
@@ -1004,7 +1004,7 @@ void lua_engine::initialize()
 			[](emu_file &file) { return file.tell(); },
 			[this](emu_file &file, s64 offset, int whence) -> sol::object {
 				if(file.seek(offset, whence))
-					return sol::make_object(sol(), sol::nil);
+					return sol::make_object(sol(), sol::lua_nil);
 				else
 					return sol::make_object(sol(), file.tell());
 			},
@@ -1020,9 +1020,9 @@ void lua_engine::initialize()
 					}
 				}
 				if(wval < 0 || wval >= 3)
-					return sol::make_object(sol(), sol::nil);
+					return sol::make_object(sol(), sol::lua_nil);
 				if(file.seek(0, wval))
-					return sol::make_object(sol(), sol::nil);
+					return sol::make_object(sol(), sol::lua_nil);
 				return sol::make_object(sol(), file.tell());
 			},
 			[this](emu_file &file, const char* whence, s64 offset) -> sol::object {
@@ -1037,9 +1037,9 @@ void lua_engine::initialize()
 					}
 				}
 				if(wval < 0 || wval >= 3)
-					return sol::make_object(sol(), sol::nil);
+					return sol::make_object(sol(), sol::lua_nil);
 				if(file.seek(offset, wval))
-					return sol::make_object(sol(), sol::nil);
+					return sol::make_object(sol(), sol::lua_nil);
 				return sol::make_object(sol(), file.tell());
 			}));
 	file_type.set("size", &emu_file::size);
@@ -1149,7 +1149,7 @@ void lua_engine::initialize()
 	item_type.set("count", sol::readonly(&save_item::count));
 	item_type.set("read", [this](save_item &item, int offset) -> sol::object {
 			if(!item.base || (offset >= item.count))
-				return sol::make_object(sol(), sol::nil);
+				return sol::make_object(sol(), sol::lua_nil);
 			const void *const data = reinterpret_cast<const uint8_t *>(item.base) + (item.stride * (offset / item.valcount));
 			uint64_t ret = 0;
 			switch(item.size)
@@ -1298,7 +1298,7 @@ void lua_engine::initialize()
 		},
 		[this](core_options::entry &e) -> sol::object {
 			if (e.type() == core_options::option_type::INVALID)
-				return sol::make_object(sol(), sol::nil);
+				return sol::make_object(sol(), sol::lua_nil);
 			switch(e.type())
 			{
 				case core_options::option_type::BOOLEAN:
@@ -1400,7 +1400,7 @@ void lua_engine::initialize()
 	machine_type.set("uiinput", &running_machine::ui_input);
 	machine_type.set("debugger", [this](running_machine &m) -> sol::object {
 			if(!(m.debug_flags & DEBUG_FLAG_ENABLED))
-				return sol::make_object(sol(), sol::nil);
+				return sol::make_object(sol(), sol::lua_nil);
 			return sol::make_object(sol(), &m.debugger());
 		});
 	machine_type.set("paused", sol::property(&running_machine::paused));
@@ -1687,7 +1687,7 @@ void lua_engine::initialize()
 	device_type.set("owner", &device_t::owner);
 	device_type.set("debug", [this](device_t &dev) -> sol::object {
 			if(!(dev.machine().debug_flags & DEBUG_FLAG_ENABLED) || !dynamic_cast<cpu_device *>(&dev)) // debugger not enabled or not cpu
-				return sol::make_object(sol(), sol::nil);
+				return sol::make_object(sol(), sol::lua_nil);
 			return sol::make_object(sol(), dev.debug());
 		});
 	device_type.set("spaces", sol::property([this](device_t &dev) {
@@ -2326,27 +2326,27 @@ void lua_engine::initialize()
 		});
 	input_type.set("seq_poll", [this](input_manager &input) -> sol::object {
 			if (!m_seq_poll)
-				return sol::make_object(sol(), sol::nil);
+				return sol::make_object(sol(), sol::lua_nil);
 			return sol::make_object(sol(), m_seq_poll->poll());
 		});
 	input_type.set("seq_poll_final", [this](input_manager &input) -> sol::object {
 			if (!m_seq_poll)
-				return sol::make_object(sol(), sol::nil);
+				return sol::make_object(sol(), sol::lua_nil);
 			return sol::make_object(sol(), sol::make_user(m_seq_poll->valid() ? input_seq(m_seq_poll->sequence()) : input_seq()));
 		});
 	input_type.set("seq_poll_modified", [this](input_manager &input) -> sol::object {
 			if (!m_seq_poll)
-				return sol::make_object(sol(), sol::nil);
+				return sol::make_object(sol(), sol::lua_nil);
 			return sol::make_object(sol(), m_seq_poll->modified());
 		});
 	input_type.set("seq_poll_valid", [this](input_manager &input) -> sol::object {
 			if (!m_seq_poll)
-				return sol::make_object(sol(), sol::nil);
+				return sol::make_object(sol(), sol::lua_nil);
 			return sol::make_object(sol(), m_seq_poll->valid());
 		});
 	input_type.set("seq_poll_sequence", [this](input_manager &input) -> sol::object {
 			if (!m_seq_poll)
-				return sol::make_object(sol(), sol::nil);
+				return sol::make_object(sol(), sol::lua_nil);
 			return sol::make_object(sol(), sol::make_user(input_seq(m_seq_poll->sequence())));
 	});
 	input_type.set("device_classes", sol::property([this](input_manager &input) {
@@ -2665,7 +2665,7 @@ void lua_engine::initialize()
 
 			// and save the snapshot
 			machine().video().save_snapshot(&sdev, file);
-			return sol::make_object(sol(), sol::nil);
+			return sol::make_object(sol(), sol::lua_nil);
 		});
 	screen_dev_type.set("type", [](screen_device &sdev) {
 			switch (sdev.screen_type())
