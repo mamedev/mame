@@ -1022,7 +1022,7 @@ void tlcs90_device::decode()
 				if (b0 == 0xfe) {
 					OPCC( LDI+b1-0x58,14,18 )   NONE( 1 )       NONE( 2 )                   return;
 				}
-				[[fallthrough]]; // FIXME: really?
+				return;
 
 				case 0x60:                                                                              // ADD A,g
 				case 0x61:                                                                              // ADC A,g
