@@ -24,6 +24,7 @@
 #define LOG_WRITE        (1U<<7)   // Write operation
 #define LOG_GROM         (1U<<8)   // GROM access
 #define LOG_RPK          (1U<<9)   // RPK handler
+#define LOG_WARNW        (1U<<10)  // Warn when writing to cartridge space
 
 #define VERBOSE ( LOG_GENERAL | LOG_WARN )
 #include "logmacro.h"
@@ -538,7 +539,9 @@ void ti99_cartridge_pcb::write(offs_t offset, uint8_t data)
 {
 	if (m_romspace_selected)
 	{
-		if (m_ram_ptr == nullptr) LOGMASKED(LOG_WARN, "Cannot write to cartridge ROM space at %04x\n", offset | 0x6000);
+		// Do not warn by default; devices like Horizon will create a lot of
+		// meaningless warnings at this point
+		if (m_ram_ptr == nullptr) LOGMASKED(LOG_WARNW, "Cannot write to cartridge ROM space at %04x\n", offset | 0x6000);
 		else
 		{
 			// Check if we have RAM in the ROM socket
