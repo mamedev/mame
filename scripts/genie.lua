@@ -483,6 +483,9 @@ configuration { "vs20*" }
 	buildoptions {
 		"/bigobj",
 	}
+	buildoptions_cpp {
+		"/std:c++17",
+	}
 	flags {
 		"ExtraWarnings",
 	}
