@@ -1997,9 +1997,14 @@ void mpu4vid_state::mpu4_vid_bt_a00002_w(offs_t offset, uint8_t data)
 {
 	switch (m_bt_which)
 	{
-	case 0: m_btpal_r[m_bt_palbase] = data;
-	case 1: m_btpal_g[m_bt_palbase] = data;
-	case 2: m_btpal_b[m_bt_palbase] = data;
+	case 0:
+		m_btpal_r[m_bt_palbase] = data;
+		[[fallthrough]]; // FIXME: really?
+	case 1:
+		m_btpal_g[m_bt_palbase] = data;
+		[[fallthrough]]; // FIXME: really?
+	case 2:
+		m_btpal_b[m_bt_palbase] = data;
 	}
 
 	m_bt_which++;

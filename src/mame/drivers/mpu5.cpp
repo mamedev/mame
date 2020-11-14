@@ -275,12 +275,11 @@ void mpu5_state::asic_w8(offs_t offset, uint8_t data)
 			break;
 
 		case 0x09:
-		{
 			//Assume SEC fitted for now
 			m_sec->data_w(~data&0x01);
 			m_sec->clk_w(~data&0x02);
 			m_sec->cs_w(~data&0x04);
-		}
+			[[fallthrough]];
 		case 0x0b:
 			output().set_value("statuslamp1", BIT(data, 4));
 			output().set_value("statuslamp2", BIT(data, 5));

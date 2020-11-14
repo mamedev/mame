@@ -1222,7 +1222,7 @@ bool zeus2_device::zeus2_fifo_process(const uint32_t *data, int numwords)
 				return false;
 			zeus_trans[3] = convert_float(data[1]);
 			dataoffs = 1;
-
+			[[fallthrough]];
 		/* 0x07: set matrix and point (crusnexo) */
 		case 0x07:
 			if (numwords < 13)
@@ -1294,6 +1294,7 @@ bool zeus2_device::zeus2_fifo_process(const uint32_t *data, int numwords)
 				}
 				break;
 			}
+			[[fallthrough]];
 		// 0x1b: thegrid
 		// 0x1c: crusnexo (4 words)
 		case 0x1b:
@@ -1471,6 +1472,7 @@ void zeus2_device::zeus2_draw_model(uint32_t baseaddr, uint16_t count, int logit
 					case 0x00: // crusnexo
 						if (logit && curoffs == count)
 							logerror(" end cmd 00\n");
+						[[fallthrough]];
 					case 0x21:  /* thegrid */
 					case 0x22:  /* crusnexo */
 						// Sets 0x68 (uv float offset) and texture line and mode

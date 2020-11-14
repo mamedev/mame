@@ -229,6 +229,7 @@ void hle_device_base::tra_complete()
 					m_y_delta);
 			//break; uncommenting this causes problems with early versions of Solaris
 		}
+		[[fallthrough]];
 	case 1U:
 		LOG("Sent %s (B=%X->%x X=%d Y=%d) - sending X delta\n",
 				(1U == m_phase) ? "button state" : "Y delta",

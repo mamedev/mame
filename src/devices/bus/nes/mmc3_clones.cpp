@@ -775,6 +775,7 @@ void nes_pikay2k_device::write_h(offs_t offset, uint8_t data)
 
 		case 0x2000:
 			m_reg[0] = 0;
+			[[fallthrough]];
 		default:
 			txrom_write(offset, data);
 			break;

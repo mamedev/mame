@@ -220,6 +220,7 @@ void gb_rom_tama5_device::write_ram(offs_t offset, uint8_t data)
 				case 0x40:      /* Unknown, some kind of read */
 					if ((m_tama5_addr & 0x1f) == 0x12)
 						m_tama5_data = 0xff;
+					[[fallthrough]];
 				case 0x80:      /* Unknown, some kind of read (when 07=01)/write (when 07=00/02) */
 				default:
 					logerror( "%s Unknown addressing mode\n", machine().describe_context() );

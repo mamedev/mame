@@ -86,11 +86,11 @@ bool dspp_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 		{
 			case 0:
 				describe_special(op, desc);
-
+				[[fallthrough]]; // FIXME: really?
 			case 1:
 			case 2:
 				describe_branch(op, desc);
-
+				[[fallthrough]]; // FIXME: really?
 			case 3:
 				describe_complex_branch(op, desc);
 		}

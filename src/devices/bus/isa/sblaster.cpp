@@ -556,6 +556,7 @@ void sb_device::process_fifo(uint8_t cmd)
 					{
 						case 0x0f:  // read asp reg
 							queue_r(0);
+							[[fallthrough]];
 						case 0x0e:  // write asp reg
 						case 0x02:  // get asp version
 						case 0x04:  // set asp mode register

@@ -155,6 +155,7 @@ bool mips3_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 		case 0x22:  // LWL
 		case 0x26:  // LWR
 			desc.regin[0] |= REGFLAG_R(RTREG);
+			[[fallthrough]];
 		case 0x20:  // LB
 		case 0x21:  // LH
 		case 0x23:  // LW

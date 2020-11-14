@@ -427,6 +427,7 @@ void cxhumax_state::cx_uart2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 					}
 				}
 			}
+			[[fallthrough]];
 		default:
 			COMBINE_DATA(&m_uart2_regs[offset]); break;
 	}

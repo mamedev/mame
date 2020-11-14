@@ -1050,6 +1050,7 @@ void m68851_pmove_put(u32 ea, u16 modes)
 			pmmu_atc_flush();
 		}
 	}
+	[[fallthrough]];
 	case 1:
 		logerror("680x0: unknown PMOVE case 1, PC %x\n", m_pc);
 		break;

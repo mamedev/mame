@@ -225,6 +225,11 @@ configuration { "gmake or ninja" }
 buildoptions_cpp {
 	"-x c++",
 }
+if _OPTIONS["gcc"]~=nil and not string.find(_OPTIONS["gcc"], "clang") then
+	buildoptions_cpp {
+		"-Wno-error=implicit-fallthrough",
+	}
+end
 
 configuration { "vs*" }
 buildoptions {

@@ -551,6 +551,7 @@ void pdp1_device::device_start()
 	{
 	default:
 		m_extend_support = 0;
+		[[fallthrough]];
 	case 0:     /* no extension */
 		m_extended_address_mask = 07777;
 		m_address_extension_mask = 00000;

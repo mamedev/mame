@@ -587,6 +587,7 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 			// Daisukiss bad shadow filter
 			case  4:
 				if (k & 0x3000 || k == 0x0800) continue;
+				[[fallthrough]];
 
 			// Tokkae shadow masking (INACCURATE)
 			case  5:

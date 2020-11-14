@@ -88,125 +88,104 @@ namespace sol
 	};
 	template<>
 	struct is_container<core_options> : std::false_type {}; // don't convert core_optons to a table directly
-	namespace stack
+	sol::buffer *sol_lua_get(sol::types<buffer *>, lua_State *L, int index, sol::stack::record &tracking)
 	{
-		template <>
-		struct pusher<osd_file::error>
-		{
-			static int push(lua_State *L, osd_file::error error)
-			{
-				const char *strerror;
-				switch(error)
-				{
-					case osd_file::error::NONE:
-						return stack::push(L, sol::nil);
-					case osd_file::error::FAILURE:
-						strerror = "failure";
-						break;
-					case osd_file::error::OUT_OF_MEMORY:
-						strerror = "out_of_memory";
-						break;
-					case osd_file::error::NOT_FOUND:
-						strerror = "not_found";
-						break;
-					case osd_file::error::ACCESS_DENIED:
-						strerror = "access_denied";
-						break;
-					case osd_file::error::ALREADY_OPEN:
-						strerror = "already_open";
-						break;
-					case osd_file::error::TOO_MANY_FILES:
-						strerror = "too_many_files";
-						break;
-					case osd_file::error::INVALID_DATA:
-						strerror = "invalid_data";
-						break;
-					case osd_file::error::INVALID_ACCESS:
-						strerror = "invalid_access";
-						break;
-					default:
-						strerror = "unknown_error";
-						break;
-				}
-				return stack::push(L, strerror);
-			}
-		};
-		template <>
-		struct checker<sol::buffer *>
-		{
-			template <typename Handler>
-			static bool check (lua_State* L, int index, Handler&& handler, record& tracking)
-			{
-				return stack::check<int>(L, index, handler);
-			}
-		};
-		template <>
-		struct getter<sol::buffer *>
-		{
-			static sol::buffer *get(lua_State* L, int index, record& tracking)
-			{
-				return new sol::buffer(stack::get<int>(L, index), L);
-			}
-		};
-		template <>
-		struct pusher<sol::buffer *>
-		{
-			static int push(lua_State* L, sol::buffer *buff)
-			{
-				delete buff;
-				return 1;
-			}
-		};
-		template <>
-		struct pusher<map_handler_type>
-		{
-			static int push(lua_State *L, map_handler_type type)
-			{
-				const char *typestr;
-				switch(type)
-				{
-					case AMH_NONE:
-						typestr = "none";
-						break;
-					case AMH_RAM:
-						typestr = "ram";
-						break;
-					case AMH_ROM:
-						typestr = "rom";
-						break;
-					case AMH_NOP:
-						typestr = "nop";
-						break;
-					case AMH_UNMAP:
-						typestr = "unmap";
-						break;
-					case AMH_DEVICE_DELEGATE:
-					case AMH_DEVICE_DELEGATE_M:
-					case AMH_DEVICE_DELEGATE_S:
-					case AMH_DEVICE_DELEGATE_SM:
-					case AMH_DEVICE_DELEGATE_MO:
-					case AMH_DEVICE_DELEGATE_SMO:
-						typestr = "delegate";
-						break;
-					case AMH_PORT:
-						typestr = "port";
-						break;
-					case AMH_BANK:
-						typestr = "bank";
-						break;
-					case AMH_DEVICE_SUBMAP:
-						typestr = "submap";
-						break;
-					default:
-						typestr = "unknown";
-						break;
-				}
-				return stack::push(L, typestr);
-			}
-		};
+		return new sol::buffer(stack::get<int>(L, index), L);
+	}
+	int sol_lua_push(sol::types<buffer *>, lua_State *L, buffer *value)
+	{
+		delete value;
+		return 1;
 	}
 }
 
+int sol_lua_push(sol::types<osd_file::error>, lua_State *L, osd_file::error &&value)
+{
+	const char *strerror;
+	switch(value)
+	{
+		case osd_file::error::NONE:
+			return sol::stack::push(L, sol::nil);
+		case osd_file::error::FAILURE:
+			strerror = "failure";
+			break;
+		case osd_file::error::OUT_OF_MEMORY:
+			strerror = "out_of_memory";
+			break;
+		case osd_file::error::NOT_FOUND:
+			strerror = "not_found";
+			break;
+		case osd_file::error::ACCESS_DENIED:
+			strerror = "access_denied";
+			break;
+		case osd_file::error::ALREADY_OPEN:
+			strerror = "already_open";
+			break;
+		case osd_file::error::TOO_MANY_FILES:
+			strerror = "too_many_files";
+			break;
+		case osd_file::error::INVALID_DATA:
+			strerror = "invalid_data";
+			break;
+		case osd_file::error::INVALID_ACCESS:
+			strerror = "invalid_access";
+			break;
+		default:
+			strerror = "unknown_error";
+			break;
+	}
+	return sol::stack::push(L, strerror);
+}
+
+template <typename Handler>
+bool sol_lua_check(sol::types<osd_file::error>, lua_State *L, int index, Handler &&handler, sol::stack::record &tracking)
+{
+	return sol::stack::check<int>(L, index, std::forward<Handler>(handler));
+}
+
+int sol_lua_push(sol::types<map_handler_type>, lua_State *L, map_handler_type &&value)
+{
+	const char *typestr;
+	switch(value)
+	{
+		case AMH_NONE:
+			typestr = "none";
+			break;
+		case AMH_RAM:
+			typestr = "ram";
+			break;
+		case AMH_ROM:
+			typestr = "rom";
+			break;
+		case AMH_NOP:
+			typestr = "nop";
+			break;
+		case AMH_UNMAP:
+			typestr = "unmap";
+			break;
+		case AMH_DEVICE_DELEGATE:
+		case AMH_DEVICE_DELEGATE_M:
+		case AMH_DEVICE_DELEGATE_S:
+		case AMH_DEVICE_DELEGATE_SM:
+		case AMH_DEVICE_DELEGATE_MO:
+		case AMH_DEVICE_DELEGATE_SMO:
+			typestr = "delegate";
+			break;
+		case AMH_PORT:
+			typestr = "port";
+			break;
+		case AMH_BANK:
+			typestr = "bank";
+			break;
+		case AMH_DEVICE_SUBMAP:
+			typestr = "submap";
+			break;
+		default:
+			typestr = "unknown";
+			break;
+	}
+	return sol::stack::push(L, typestr);
+}
 
 namespace
 {
@@ -1966,7 +1945,7 @@ void lua_engine::initialize()
 			return port_table;
 		}));
 	ioport_manager_type.set("type_seq", [](ioport_manager &m, ioport_type type, int player, input_seq_type seqtype) {
-			return sol::make_user(m.type_seq(type, player, seqtype));
+			return sol::make_user(input_seq(m.type_seq(type, player, seqtype)));
 		});
 	sol().registry().set("ioport", ioport_manager_type);
 
@@ -2080,7 +2059,7 @@ void lua_engine::initialize()
 
 	auto ioport_field_type = sol().registry().new_usertype<ioport_field>("new", sol::no_constructor);
 	ioport_field_type.set("set_value", &ioport_field::set_value);
-	ioport_field_type.set("set_input_seq", [](ioport_field &f, const std::string &seq_type_string, sol::user<input_seq> seq) {
+	ioport_field_type.set("set_input_seq", [](ioport_field &f, const std::string &seq_type_string, const input_seq &seq) {
 			input_seq_type seq_type = s_seq_type_parser(seq_type_string);
 			ioport_field::user_settings settings;
 			f.get_user_settings(settings);
@@ -2089,15 +2068,15 @@ void lua_engine::initialize()
 		});
 	ioport_field_type.set("input_seq", [](ioport_field &f, const std::string &seq_type_string) {
 			input_seq_type seq_type = s_seq_type_parser(seq_type_string);
-			return sol::make_user(f.seq(seq_type));
+			return sol::make_user(input_seq(f.seq(seq_type)));
 		});
-	ioport_field_type.set("set_default_input_seq", [](ioport_field &f, const std::string &seq_type_string, sol::user<input_seq> seq) {
+	ioport_field_type.set("set_default_input_seq", [](ioport_field &f, const std::string &seq_type_string, const input_seq &seq) {
 			input_seq_type seq_type = s_seq_type_parser(seq_type_string);
 			f.set_defseq(seq_type, seq);
 		});
 	ioport_field_type.set("default_input_seq", [](ioport_field &f, const std::string &seq_type_string) {
 			input_seq_type seq_type = s_seq_type_parser(seq_type_string);
-			return sol::make_user(f.defseq(seq_type));
+			return sol::make_user(input_seq(f.defseq(seq_type)));
 		});
 	ioport_field_type.set("keyboard_codes", [this](ioport_field &f, int which) {
 			sol::table result = sol().create_table();
@@ -2316,14 +2295,14 @@ void lua_engine::initialize()
 
 	auto input_type = sol().registry().new_usertype<input_manager>("new", sol::no_constructor);
 	input_type.set("code_from_token", [](input_manager &input, const char *token) { return sol::make_user(input.code_from_token(token)); });
-	input_type.set("code_pressed", [](input_manager &input, sol::user<input_code> code) { return input.code_pressed(code); });
-	input_type.set("code_to_token", [](input_manager &input, sol::user<input_code> code) { return input.code_to_token(code); });
-	input_type.set("code_name", [](input_manager &input, sol::user<input_code> code) { return input.code_name(code); });
-	input_type.set("seq_from_tokens", [](input_manager &input, const char *tokens) { input_seq seq; input.seq_from_tokens(seq, tokens); return sol::make_user(seq); });
-	input_type.set("seq_pressed", [](input_manager &input, sol::user<input_seq> seq) { return input.seq_pressed(seq); });
-	input_type.set("seq_to_tokens", [](input_manager &input, sol::user<input_seq> seq) { return input.seq_to_tokens(seq); });
-	input_type.set("seq_name", [](input_manager &input, sol::user<input_seq> seq) { return input.seq_name(seq); });
-	input_type.set("seq_clean", [](input_manager &input, sol::user<input_seq> seq) { input_seq cleaned_seq = input.seq_clean(seq); return sol::make_user(cleaned_seq); });
+	input_type.set("code_pressed", [](input_manager &input, const input_code &code) { return input.code_pressed(code); });
+	input_type.set("code_to_token", [](input_manager &input, const input_code &code) { return input.code_to_token(code); });
+	input_type.set("code_name", [](input_manager &input, const input_code &code) { return input.code_name(code); });
+	input_type.set("seq_from_tokens", [](input_manager &input, const char *tokens) { input_seq seq; input.seq_from_tokens(seq, tokens); return sol::make_user(std::move(seq)); });
+	input_type.set("seq_pressed", [](input_manager &input, const input_seq &seq) { return input.seq_pressed(seq); });
+	input_type.set("seq_to_tokens", [](input_manager &input, const input_seq &seq) { return input.seq_to_tokens(seq); });
+	input_type.set("seq_name", [](input_manager &input, const input_seq &seq) { return input.seq_name(seq); });
+	input_type.set("seq_clean", [](input_manager &input, const input_seq &seq) { return sol::make_user(input.seq_clean(seq)); });
 	input_type.set("seq_poll_start", [this](input_manager &input, const char *cls_string, sol::object seq) {
 			if (!m_seq_poll)
 				m_seq_poll.reset(new input_sequence_poller(input));
@@ -2353,7 +2332,7 @@ void lua_engine::initialize()
 	input_type.set("seq_poll_final", [this](input_manager &input) -> sol::object {
 			if (!m_seq_poll)
 				return sol::make_object(sol(), sol::nil);
-			return sol::make_object(sol(), sol::make_user(m_seq_poll->valid() ? m_seq_poll->sequence() : input_seq()));
+			return sol::make_object(sol(), sol::make_user(m_seq_poll->valid() ? input_seq(m_seq_poll->sequence()) : input_seq()));
 		});
 	input_type.set("seq_poll_modified", [this](input_manager &input) -> sol::object {
 			if (!m_seq_poll)
@@ -2368,7 +2347,7 @@ void lua_engine::initialize()
 	input_type.set("seq_poll_sequence", [this](input_manager &input) -> sol::object {
 			if (!m_seq_poll)
 				return sol::make_object(sol(), sol::nil);
-			return sol::make_object(sol(), sol::make_user(m_seq_poll->sequence()));
+			return sol::make_object(sol(), sol::make_user(input_seq(m_seq_poll->sequence())));
 	});
 	input_type.set("device_classes", sol::property([this](input_manager &input) {
 			sol::table result = sol().create_table();
@@ -2449,7 +2428,7 @@ void lua_engine::initialize()
 	input_device_item_type.set("token", sol::property(&input_device_item::token));
 	input_device_item_type.set("code", [](input_device_item &item) {
 			input_code code(item.device().devclass(), item.device().devindex(), item.itemclass(), ITEM_MODIFIER_NONE, item.itemid());
-			return sol::make_user(code);
+			return sol::make_user(std::move(code));
 		});
 	sol().registry().set("input_device_item", input_device_item_type);
 
@@ -2974,7 +2953,8 @@ void lua_engine::initialize()
 	image_type.set("create", [](device_image_interface &di, const std::string &filename) { return di.create(filename); });
 	image_type.set("crc", &device_image_interface::crc);
 	image_type.set("display", [](device_image_interface &di) { return di.call_display(); });
-	image_type.set("device", sol::property(static_cast<const device_t &(device_image_interface::*)() const>(&device_image_interface::device)));
+	// FIXME: the next line is causing sol3 to try instantiating device_t for some reason
+	//image_type.set("device", sol::property(static_cast<const device_t & (device_image_interface::*)() const>(&device_image_interface::device));
 	image_type.set("instance_name", sol::property(&device_image_interface::instance_name));
 	image_type.set("brief_instance_name", sol::property(&device_image_interface::brief_instance_name));
 	image_type.set("is_readable", sol::property(&device_image_interface::is_readable));

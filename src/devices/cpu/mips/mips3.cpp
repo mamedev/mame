@@ -5211,6 +5211,7 @@ void mips3_device::execute_run()
 						machine().debug_break();
 					break;
 				}
+				[[fallthrough]];
 			case 0x31:  /* LWC1 */
 				if (!(SR & SR_COP1))
 				{
@@ -5233,6 +5234,7 @@ void mips3_device::execute_run()
 						machine().debug_break();
 					break;
 				}
+				[[fallthrough]];
 			case 0x35:  /* LDC1 */
 				if (!(SR & SR_COP1))
 				{

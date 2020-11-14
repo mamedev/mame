@@ -1630,7 +1630,7 @@ void voodoo_device::recompute_video_memory()
 	{
 		case 3: /* reserved */
 			logerror("VOODOO.ERROR:Unexpected memory configuration in recompute_video_memory!\n");
-
+			[[fallthrough]];
 		case 0: /* 2 color buffers, 1 aux buffer */
 			fbi.rgboffs[2] = ~0;
 			fbi.auxoffs = 2 * buffer_pages * 0x1000;
@@ -4591,6 +4591,7 @@ uint32_t voodoo_device::register_r(voodoo_device *vd, offs_t offset)
 		case fbiAfuncFail:
 		case fbiPixelsOut:
 			vd->update_statistics(true);
+			[[fallthrough]];
 		case fbiTrianglesOut:
 			result = vd->reg[regnum].u & 0xffffff;
 			break;

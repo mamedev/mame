@@ -1111,14 +1111,18 @@ void lynx_state::suzy_write(offs_t offset, uint8_t data)
 			break;
 		case HPOSSTRTL:
 			m_blitter.x_pos = data;
+			[[fallthrough]]; // FIXME: really?
 		case HPOSSTRTH:
 			m_blitter.x_pos &= 0xff;
 			m_blitter.x_pos |= data<<8;
+			[[fallthrough]]; // FIXME: really?
 		case VPOSSTRTL:
 			m_blitter.y_pos = data;
+			[[fallthrough]]; // FIXME: really?
 		case VPOSSTRTH:
 			m_blitter.y_pos &= 0xff;
 			m_blitter.y_pos |= data<<8;
+			[[fallthrough]]; // FIXME: really?
 		case SPRHSIZL:
 			m_blitter.width = data;
 			break;
