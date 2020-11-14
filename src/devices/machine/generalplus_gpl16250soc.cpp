@@ -487,6 +487,9 @@ uint16_t sunplus_gcm394_base_device::ioarea_7869_portb_buffer_r()
 void sunplus_gcm394_base_device::ioarea_7869_portb_buffer_w(uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_IO, "%s:sunplus_gcm394_base_device::ioarea_7869_portb_buffer_w %04x\n", machine().describe_context(), data);
+
+	if (m_portb_out) // buffer writes must update output state too, beijuehh requires it for banking
+		m_portb_out(data);
 }
 
 void sunplus_gcm394_base_device::ioarea_7868_portb_w(uint16_t data)
@@ -598,6 +601,9 @@ uint16_t sunplus_gcm394_base_device::ioarea_7879_portd_buffer_r()
 void sunplus_gcm394_base_device::ioarea_7879_portd_buffer_w(uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_IO, "%s:sunplus_gcm394_base_device::ioarea_7879_portd_buffer_w %04x\n", machine().describe_context(), data);
+
+	if (m_portd_out) // buffer writes must update output state too, beijuehh requires it for banking
+		m_portd_out(data);
 }
 
 
@@ -852,7 +858,7 @@ void sunplus_gcm394_base_device::base_internal_map(address_map &map)
 	map(0x007087, 0x007087).w(m_spg_video, FUNC(gcm394_base_video_device::video_7087_w));
 	map(0x007088, 0x007088).w(m_spg_video, FUNC(gcm394_base_video_device::video_7088_w));
 
-	map(0x0070e0, 0x0070e0).r(m_spg_video, FUNC(gcm394_base_video_device::video_70e0_r)); // gormiti checks this
+	map(0x0070e0, 0x0070e0).r(m_spg_video, FUNC(gcm394_base_video_device::video_70e0_prng_r)); // gormiti checks this
 
 	// ######################################################################################################################################################################################
 	// 73xx-77xx = video ram

@@ -113,4 +113,32 @@ protected:
 private:
 };
 
+class beijuehh_game_state : public gcm394_game_state
+{
+public:
+	beijuehh_game_state(const machine_config& mconfig, device_type type, const char* tag) :
+		gcm394_game_state(mconfig, type, tag)
+	{
+	}
+
+	void beijuehh(machine_config &config);
+
+protected:
+
+	virtual void machine_reset() override;
+
+private:
+	int m_upperbase;
+
+	virtual uint16_t cs0_r(offs_t offset) override;
+
+	void beijuehh_portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void beijuehh_portd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	uint16_t m_portb_data;
+	uint16_t m_portd_data;
+	uint8_t m_bank;
+};
+
+
 #endif

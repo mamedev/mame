@@ -88,6 +88,7 @@ public:
 	//void set_pal_sprites_hack(int pal_sprites) { m_spg_video->set_pal_sprites(pal_sprites); }
 	//void set_pal_back_hack(int pal_back) { m_spg_video->set_pal_back(pal_back); }
 	void set_alt_extrasprite_hack(int alt_extrasprite_hack) { m_spg_video->set_alt_extrasprite(alt_extrasprite_hack); }
+	void set_legacy_video_mode() { m_spg_video->set_legacy_video_mode(); }
 
 	void set_romtype(int romtype) { m_romtype = romtype; }
 
