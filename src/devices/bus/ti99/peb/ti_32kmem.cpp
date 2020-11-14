@@ -33,7 +33,7 @@
 
 DEFINE_DEVICE_TYPE_NS(TI99_32KMEM, bus::ti99::peb, ti_32k_expcard_device, "ti99_32kmem", "TI-99 32KiB memory expansion card")
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 #define RAMREGION "ram32k"
 
@@ -107,4 +107,4 @@ void ti_32k_expcard_device::device_add_mconfig(machine_config &config)
 	m_ram->set_default_value(0);
 }
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb

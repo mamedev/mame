@@ -82,7 +82,7 @@
 
 DEFINE_DEVICE_TYPE_NS(TI99_IOPORT, bus::ti99::internal, ioport_device, "ti99_ioport", "TI-99 I/O Port")
 
-namespace bus { namespace ti99 { namespace internal {
+namespace bus::ti99::internal {
 
 ioport_device::ioport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	:   device_t(mconfig, TI99_IOPORT, tag, owner, clock),
@@ -171,7 +171,7 @@ WRITE_LINE_MEMBER(ioport_attached_device::set_ready)
 	m_ioport->m_console_ready(state);
 }
 
-}   }   } // end namespace bus::ti99::internal
+} // end namespace bus::ti99::internal
 
 void ti99_ioport_options_plain(device_slot_interface &device)
 {

@@ -141,7 +141,7 @@
 
 DEFINE_DEVICE_TYPE_NS(TI99_HORIZON, bus::ti99::peb, horizon_ramdisk_device, "ti99_horizon", "Horizon 4000B RAMdisk")
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 #define CRULATCH1_TAG "u4_latch"
 #define CRULATCH2_TAG "u3_latch"
@@ -586,4 +586,4 @@ ioport_constructor horizon_ramdisk_device::device_input_ports() const
 	return INPUT_PORTS_NAME(horizon);
 }
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb

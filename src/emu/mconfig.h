@@ -31,7 +31,7 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-namespace emu { namespace detail {
+namespace emu::detail {
 
 class machine_config_replace
 {
@@ -43,7 +43,7 @@ private:
 	friend class ::machine_config;
 };
 
-} } // namesapce emu::detail
+} // namespace emu::detail
 
 
 /// \brief Internal layout description

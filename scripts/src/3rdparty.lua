@@ -1544,15 +1544,13 @@ project "portaudio"
 				"-Wno-sometimes-uninitialized",
 			}
 		else
-			if (version >= 40600) then
-				buildoptions_c {
-					"-Wno-unused-but-set-variable",
-					"-Wno-maybe-uninitialized",
-					"-Wno-sometimes-uninitialized",
-					"-w",
-					"-Wno-incompatible-pointer-types-discards-qualifiers",
-				}
-			end
+			buildoptions_c {
+				"-Wno-unused-but-set-variable",
+				"-Wno-maybe-uninitialized",
+				"-Wno-sometimes-uninitialized",
+				"-w",
+				"-Wno-incompatible-pointer-types-discards-qualifiers",
+			}
 		end
 		if string.find(_OPTIONS["gcc"], "clang") and version >= 100000 then
 			buildoptions_c {

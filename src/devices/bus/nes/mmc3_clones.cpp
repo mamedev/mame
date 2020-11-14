@@ -2488,6 +2488,7 @@ void nes_pjoy84_device::write_m(offs_t offset, uint8_t data)
 		case 0x03:
 			if (m_reg[3] & 0x80)
 				return; // else we act as if offset & 3 = 1,2
+			[[fallthrough]];
 		case 0x01:
 		case 0x02:
 			m_reg[offset & 0x03] = data;

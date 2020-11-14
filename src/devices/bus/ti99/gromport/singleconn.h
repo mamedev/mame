@@ -11,7 +11,7 @@
 
 #include "cartridges.h"
 
-namespace bus { namespace ti99 { namespace gromport {
+namespace bus::ti99::gromport {
 
 class ti99_single_cart_conn_device : public cartridge_connector_device
 {
@@ -36,7 +36,8 @@ protected:
 private:
 	ti99_cartridge_device *m_cartridge;
 };
-} } } // end namespace bus::ti99::gromport
+
+} // end namespace bus::ti99::gromport
 
 DECLARE_DEVICE_TYPE_NS(TI99_GROMPORT_SINGLE, bus::ti99::gromport, ti99_single_cart_conn_device)
 

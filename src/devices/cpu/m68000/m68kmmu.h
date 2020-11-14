@@ -1140,7 +1140,7 @@ void m68851_pmove_put(u32 ea, u16 modes)
 				break;
 			}
 			// fall through; unknown PMOVE mode unless MC68020 with MC68851
-
+			[[fallthrough]];
 		default:
 			logerror("680x0: PMOVE to unknown MMU register %x, PC %x\n", (modes>>10) & 7, m_pc);
 			break;

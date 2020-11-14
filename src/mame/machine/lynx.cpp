@@ -717,9 +717,11 @@ void lynx_state::lynx_blitter()
 				case 0x30: // width, height, tilt, stretch
 					m_blitter.tilt = lynx_read_ram(m_blitter.scb + SCB_TILT) | (lynx_read_ram(m_blitter.scb + SCB_TILT + 1) << 8);
 					m_blitter.memory_accesses+=2;
+					[[fallthrough]];
 				case 0x20: // width, height, stretch
 					m_blitter.stretch = lynx_read_ram(m_blitter.scb + SCB_STRETCH) | (lynx_read_ram(m_blitter.scb + SCB_STRETCH + 1) << 8);
 					m_blitter.memory_accesses+=2;
+					[[fallthrough]];
 				case 0x10: // width, height
 					m_blitter.width = lynx_read_ram(m_blitter.scb + SCB_SPRHSIZ) | (lynx_read_ram(m_blitter.scb + SCB_SPRHSIZ + 1) << 8);
 					m_blitter.height = lynx_read_ram(m_blitter.scb + SCB_SPRVSIZ) | (lynx_read_ram(m_blitter.scb + SCB_SPRVSIZ + 1) << 8);

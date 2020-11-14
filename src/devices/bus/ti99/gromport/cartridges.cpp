@@ -31,7 +31,7 @@
 
 DEFINE_DEVICE_TYPE_NS(TI99_CART, bus::ti99::gromport, ti99_cartridge_device, "ti99cart", "TI-99 cartridge")
 
-namespace bus { namespace ti99 { namespace gromport {
+namespace bus::ti99::gromport {
 
 #define CARTGROM_TAG "grom_contents"
 #define CARTROM_TAG "rom_contents"
@@ -1874,5 +1874,4 @@ ti99_cartridge_device::rpk* ti99_cartridge_device::rpk_reader::open(emu_options 
 	return newrpk;
 }
 
-} } } // end namespace bus::ti99::gromport
-
+} // end namespace bus::ti99::gromport

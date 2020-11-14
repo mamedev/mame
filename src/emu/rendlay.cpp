@@ -138,7 +138,7 @@ class layout_reference_error : public std::out_of_range { using std::out_of_rang
 } // anonymous namespace
 
 
-namespace emu { namespace render { namespace detail {
+namespace emu::render::detail {
 
 class layout_environment
 {
@@ -955,7 +955,7 @@ public:
 	u32 visibility_mask() const { return m_visibility_mask; }
 };
 
-} } } // namespace emu::render::detail
+} // namespace emu::render::detail
 
 
 namespace {
@@ -1170,7 +1170,7 @@ layout_element::layout_element(environment &env, util::xml::data_node const &ele
 			throw layout_syntax_error(util::string_format("unknown element component %s", compnode->get_name()));
 
 		// insert the new component into the list
-		component const &newcomp(**m_complist.emplace(m_complist.end(), make_func->second(env, *compnode)));
+		component const &newcomp(*m_complist.emplace_back(make_func->second(env, *compnode)));
 
 		// accumulate bounds
 		if (first)

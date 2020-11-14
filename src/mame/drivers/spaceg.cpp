@@ -283,7 +283,7 @@ void spaceg_state::zvideoram_w(offs_t offset, uint8_t data)
 		// draw
 		case 0:
 			vram_data &= ~(0xff00 >> xoff);
-			// (fall through)
+			[[fallthrough]];
 		case 1:
 			vram_data |= sdata;
 

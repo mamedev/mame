@@ -15,7 +15,7 @@
 #include "unzip.h"
 #include "xmlfile.h"
 
-namespace bus { namespace ti99 { namespace gromport {
+namespace bus::ti99::gromport {
 
 class ti99_cartridge_pcb;
 
@@ -372,7 +372,8 @@ private:
 	bool    m_grom_read_mode;
 	bool    m_grom_address_mode;
 };
-} } } // end namespace bus::ti99::gromport
+
+} // end namespace bus::ti99::gromport
 
 DECLARE_DEVICE_TYPE_NS(TI99_CART, bus::ti99::gromport, ti99_cartridge_device)
 

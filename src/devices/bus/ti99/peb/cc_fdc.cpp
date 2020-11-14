@@ -68,7 +68,7 @@ DEFINE_DEVICE_TYPE_NS(CCDCC_PALU1, bus::ti99::peb, ccdcc_palu1_device, CCDCC_PAL
 DEFINE_DEVICE_TYPE_NS(CCFDC_PALU12, bus::ti99::peb, ccfdc_palu12_device, CCFDC_PALU12_TAG, "CorComp FDC PAL u12")
 DEFINE_DEVICE_TYPE_NS(CCFDC_PALU6, bus::ti99::peb, ccfdc_palu6_device, CCFDC_PALU6_TAG, "CorComp FDC PAL u6")
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 // ----------------------------------
 
@@ -826,4 +826,5 @@ void ccfdc_palu6_device::device_config_complete()
 	m_board = static_cast<corcomp_fdca_device*>(owner());
 	m_decpal = static_cast<ccfdc_dec_pal_device*>(owner()->subdevice(CCFDC_PALU12_TAG));
 }
-} } } // end namespace bus::ti99::peb
+
+} // end namespace bus::ti99::peb

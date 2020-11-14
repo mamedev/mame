@@ -21,8 +21,7 @@
 
 DEFINE_DEVICE_TYPE_NS(HPDIO_HUMAN_INTERFACE, bus::hp_dio, human_interface_device, "human_interface", "HP human interface card")
 
-namespace bus {
-	namespace hp_dio {
+namespace bus::hp_dio {
 
 void human_interface_device::device_add_mconfig(machine_config &config)
 {
@@ -389,4 +388,3 @@ uint8_t human_interface_device::dmack_r_in(int channel)
 }
 
 } // namespace bus::hp_dio
-} // namespace bus

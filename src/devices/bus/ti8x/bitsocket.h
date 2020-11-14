@@ -19,7 +19,7 @@
 #include "imagedev/bitbngr.h"
 
 
-namespace bus { namespace ti8x {
+namespace bus::ti8x {
 
 class bit_socket_device
 		: public device_t
@@ -47,7 +47,7 @@ private:
 	bool                                m_tip_in, m_ring_in;
 };
 
-} } // namespace bus::ti8x
+} // namespace bus::ti8x
 
 
 DECLARE_DEVICE_TYPE_NS(TI8X_BIT_SOCKET, bus::ti8x, bit_socket_device)

@@ -1896,6 +1896,7 @@ uint8_t towns_state::towns_cdrom_r(offs_t offset)
 			{
 				return towns_cdrom_read_byte_software();
 			}
+			[[fallthrough]];
 		default:
 			return 0x00;
 	}

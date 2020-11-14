@@ -172,7 +172,7 @@ struct render_texinfo
 };
 
 
-namespace emu { namespace render { namespace detail {
+namespace emu::render::detail {
 
 struct bounds_step
 {
@@ -198,7 +198,7 @@ using color_vector = std::vector<color_step>;
 class layout_environment;
 class view_environment;
 
-} } } // namespace emu::render::detail
+} // namespace emu::render::detail
 
 
 // ======================> render_layer_config

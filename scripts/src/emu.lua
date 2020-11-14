@@ -24,6 +24,7 @@ includedirs {
 	MAME_DIR .. "src/lib",
 	MAME_DIR .. "src/lib/util",
 	MAME_DIR .. "3rdparty",
+	MAME_DIR .. "3rdparty/sol2",
 	GEN_DIR  .. "emu",
 	GEN_DIR  .. "emu/layout",
 }

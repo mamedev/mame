@@ -134,7 +134,7 @@ DEFINE_DEVICE_TYPE_NS(TI99_MOFETTA, bus::ti99::internal, mofetta_device, "ti998_
 DEFINE_DEVICE_TYPE_NS(TI99_OSO, bus::ti99::internal, oso_device, "ti998_oso", "TI-99/8 Hexbus interface")
 DEFINE_DEVICE_TYPE_NS(TI99_AMIGO, bus::ti99::internal, amigo_device, "ti998_amigo", "TI-99/8 Address space mapper")
 
-namespace bus { namespace ti99 { namespace internal {
+namespace bus::ti99::internal {
 
 enum
 {
@@ -2748,5 +2748,4 @@ void oso_device::device_start()
 	save_item(NAME(m_xmit));
 }
 
-} } } // end namespace bus::ti99::internal
-
+} // end namespace bus::ti99::internal

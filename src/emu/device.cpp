@@ -20,7 +20,7 @@
 //  DEVICE TYPE REGISTRATION
 //**************************************************************************
 
-namespace emu { namespace detail {
+namespace emu::detail {
 
 namespace {
 
@@ -66,7 +66,7 @@ device_type_impl_base *device_registrar::register_device(device_type_impl_base &
 	return nullptr;
 }
 
-} } // namespace emu::detail
+} // namespace emu::detail
 
 emu::detail::device_registrar const registered_device_types;
 

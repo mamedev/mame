@@ -30,7 +30,7 @@
 
 DEFINE_DEVICE_TYPE_NS(TI99_SAMSMEM, bus::ti99::peb, sams_memory_expansion_device, "ti99_sams", "SuperAMS memory expansion card")
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 #define SAMS_CRU_BASE 0x1e00
 
@@ -144,4 +144,4 @@ void sams_memory_expansion_device::device_reset()
 	for (auto & elem : m_mapper) elem = 0;
 }
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb

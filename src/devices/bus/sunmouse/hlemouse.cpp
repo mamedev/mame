@@ -30,7 +30,7 @@
 DEFINE_DEVICE_TYPE_NS(SUN_1200BAUD_HLE_MOUSE, bus::sunmouse, hle_1200baud_device, "sunmouse_hle1200", "Sun Mouse (1200 Baud, HLE)")
 DEFINE_DEVICE_TYPE_NS(SUN_4800BAUD_HLE_MOUSE, bus::sunmouse, hle_4800baud_device, "sunmouse_hle4800", "Sun Mouse (4800 Baud, HLE)")
 
-namespace bus { namespace sunmouse {
+namespace bus::sunmouse {
 
 namespace {
 
@@ -311,4 +311,4 @@ hle_4800baud_device::hle_4800baud_device(
 {
 }
 
-} } // namespace bus::sunmouse
+} // namespace bus::sunmouse

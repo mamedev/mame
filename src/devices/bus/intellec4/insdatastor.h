@@ -144,7 +144,7 @@ P2 outputs (40-pin IDC)
 
 #include "intellec4.h"
 
-namespace bus { namespace intellec4 {
+namespace bus::intellec4 {
 
 class imm4_22_device : public device_t, public device_univ_card_interface, public device_image_interface
 {
@@ -192,7 +192,7 @@ private:
 	std::unique_ptr<u8 []>  m_prom;
 };
 
-} } // namespace bus::intellec4
+} // namespace bus::intellec4
 
 DECLARE_DEVICE_TYPE_NS(INTELLEC4_INST_DATA_STORAGE, bus::intellec4, imm4_22_device)
 

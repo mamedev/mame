@@ -263,6 +263,7 @@ void nubus_image_device::file_cmd_w(uint32_t data)
 		break;
 	case kFileCmdGetFirstListing:
 		filectx.dirp = osd::directory::open((const char *)filectx.curdir);
+		[[fallthrough]];
 	case kFileCmdGetNextListing:
 		if (filectx.dirp) {
 			osd::directory::entry const *const dp = filectx.dirp->read();

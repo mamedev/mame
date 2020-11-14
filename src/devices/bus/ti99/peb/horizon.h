@@ -20,7 +20,7 @@
 #include "machine/ram.h"
 #include "machine/74259.h"
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 class horizon_ramdisk_device : public device_t, public device_ti99_peribox_card_interface, public device_nvram_interface
 {
@@ -77,7 +77,7 @@ private:
 	int     m_current_page;
 };
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb
 
 DECLARE_DEVICE_TYPE_NS(TI99_HORIZON, bus::ti99::peb, horizon_ramdisk_device)
 

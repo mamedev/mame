@@ -168,13 +168,10 @@ void bfm_swp_state::bfm_swp_mem_w(offs_t offset, uint32_t data, uint32_t mem_mas
 	{
 		default:
 			logerror("%08x maincpu write access offset %08x data %08x mem_mask %08x cs %d\n", pc, offset*4, data, mem_mask, cs);
-
+			[[fallthrough]];
 		case 2:
 			offset&=0x3fff;
 			COMBINE_DATA(&m_mainram[offset]);
-			break;
-
-
 	}
 
 }

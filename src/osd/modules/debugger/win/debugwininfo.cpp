@@ -300,6 +300,7 @@ bool debugwin_info::handle_command(WPARAM wparam, LPARAM lparam)
 
 		case ID_RUN_AND_HIDE:
 			debugger().hide_all();
+			[[fallthrough]];
 		case ID_RUN:
 			machine().debugger().console().get_visible_cpu()->debug()->go();
 			return true;
