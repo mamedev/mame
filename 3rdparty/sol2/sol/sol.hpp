@@ -4533,7 +4533,7 @@ namespace sol {
 	class bad_optional_access : public std::exception {
 	public:
 		bad_optional_access() = default;
-		const char* what() const noexcept {
+		const char* what() const noexcept override {
 			return "Optional has no value";
 		}
 	};
