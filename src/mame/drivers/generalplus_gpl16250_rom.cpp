@@ -622,7 +622,9 @@ CONS(201?, myac220,   0,       0, tkmag220, tkmag220, tkmag220_game_state,  empt
 CONS(2012, imgame,    0,       0, tkmag220, tkmag220, tkmag220_game_state,  empty_init,      "I'm Game / Senca",      "I'm Game! GP120 (Family Sport 120-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 // a 180 game Family Sport I'm Game! also exists (and some Famiclones)
 
-// inputs + banking needs figuring out, there are lower capacity versions too, was sold with note that 'X-Racer III crashes in-game'
+// Also sold as 'BornKid 220 in 1' There are lower capacity versions too, was sold with note that 'X-Racer III crashes in-game'
+// Does the 'Helicopter' game work properly on real hardware? The function at 0x0D2BE7 uses RAM address 0x2372 for the upper bits of the tile base offset calculation
+// but that RAM address doesn't appear to be written anywhere in the code, resulting in scrolling being entirely broken.
 CONS(201?, beijuehh,    0,       0, beijuehh, beijuehh, beijuehh_game_state,  empty_init,      "Beijue",      "Beijue 16 Bit Handheld Games 220-in-1 (Game Boy style case)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // die on this one is 'GCM420'
