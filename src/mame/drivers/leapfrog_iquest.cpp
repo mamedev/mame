@@ -14,6 +14,7 @@
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "machine/bankdev.h"
 
 #include "screen.h"
 #include "softlist.h"
@@ -28,6 +29,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_cart(*this, "cartslot")
 		, m_screen(*this, "screen")
+		, m_rombank(*this, "rombank")
 		, m_cart_region(nullptr)
 	{ }
 
@@ -47,7 +49,23 @@ private:
 	required_device<mcs51_cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 	required_device<screen_device> m_screen;
+
+	void rom_map(address_map &map);
+
+	required_device<address_map_bank_device> m_rombank;
 	memory_region *m_cart_region;
+
+	uint8_t m_lowerbank[2];
+	uint8_t m_upperbank[2];
+
+	uint8_t lowerbank_r(offs_t offset);
+	uint8_t upperbank_r(offs_t offset);
+	void lowerbank_w(offs_t offset, uint8_t data);
+	void upperbank_w(offs_t offset, uint8_t data);
+
+	uint8_t romlower_r(offs_t offset);
+	uint8_t romupper_r(offs_t offset);
+
 };
 
 
@@ -63,15 +81,64 @@ void leapfrog_iquest_state::machine_start()
 
 void leapfrog_iquest_state::machine_reset()
 {
+	m_lowerbank[0] = m_lowerbank[1] = 0x00;
+	m_upperbank[0] = m_upperbank[1] = 0x00;
+	m_rombank->set_bank(0);
+}
+
+
+uint8_t leapfrog_iquest_state::lowerbank_r(offs_t offset)
+{
+	return m_lowerbank[offset];
+}
+
+uint8_t leapfrog_iquest_state::upperbank_r(offs_t offset)
+{
+	return m_upperbank[offset];
+}
+
+
+void leapfrog_iquest_state::lowerbank_w(offs_t offset, uint8_t data)
+{
+	m_lowerbank[offset] = data;
+}
+
+void leapfrog_iquest_state::upperbank_w(offs_t offset, uint8_t data)
+{
+	m_upperbank[offset] = data;
+}
+
+void leapfrog_iquest_state::rom_map(address_map &map)
+{
+	map(0x00000000, 0x003fffff).rom().region("maincpu", 0);
+}
+
+uint8_t leapfrog_iquest_state::romlower_r(offs_t offset)
+{
+	uint32_t bank = ((m_lowerbank[0] << 8) | (m_lowerbank[1])) * 0x8000;
+	return m_rombank->read8(bank + offset);
+}
+
+uint8_t leapfrog_iquest_state::romupper_r(offs_t offset)
+{
+	uint32_t bank = ((m_upperbank[0] << 8) | (m_upperbank[1])) * 0x8000;
+	return m_rombank->read8(bank + offset);
 }
 
 void leapfrog_iquest_state::prog_map(address_map &map)
 {
-	map(0x0000, 0xffff).rom().region("maincpu", 0x10000); // TODO: banking
+
+	map(0xc260, 0xc52f).ram(); // = clears 0x2d0 bytes (90*64 / 8) display buffer?
+	map(0xc530, 0xc7ff).ram(); // = clears 0x2d0 bytes (90*64 / 8) display buffer?
+
+	map(0x0000, 0x7fff).r(FUNC(leapfrog_iquest_state::romlower_r));
+	map(0x8000, 0xffff).r(FUNC(leapfrog_iquest_state::romupper_r));
 }
 
 void leapfrog_iquest_state::ext_map(address_map &map)
 {
+	map(0xfc06, 0xfc07).rw(FUNC(leapfrog_iquest_state::lowerbank_r), FUNC(leapfrog_iquest_state::lowerbank_w));
+	map(0xfc08, 0xfc09).rw(FUNC(leapfrog_iquest_state::upperbank_r), FUNC(leapfrog_iquest_state::upperbank_w));
 }
 
 DEVICE_IMAGE_LOAD_MEMBER(leapfrog_iquest_state::cart_load)
@@ -110,6 +177,8 @@ void leapfrog_iquest_state::leapfrog_iquest(machine_config &config)
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "leapfrog_iquest_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
 	m_cart->set_device_load(FUNC(leapfrog_iquest_state::cart_load));
+
+	ADDRESS_MAP_BANK(config, "rombank").set_map(&leapfrog_iquest_state::rom_map).set_options(ENDIANNESS_LITTLE, 8, 31, 0x80000000);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("leapfrog_iquest_cart");
 }
