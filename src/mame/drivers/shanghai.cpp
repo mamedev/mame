@@ -716,6 +716,6 @@ GAME( 1988, shanghai,  0,        shanghai, shanghai, shanghai_state, empty_init,
 GAME( 1988, shanghaij, shanghai, shanghai, shanghai, shanghai_state, empty_init, ROT0, "Sunsoft", "Shanghai (Japan)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, shangha2,  0,        shangha2, shangha2, shanghai_state, empty_init, ROT0, "Sunsoft", "Shanghai II (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, shangha2a, shangha2, shangha2, shangha2, shanghai_state, empty_init, ROT0, "Sunsoft", "Shanghai II (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 199?, blktch2,   0,        shangha2, shangha2, shanghai_state, init_blktch2, ROT0, "<unknown>", "Black Touch II", MACHINE_SUPPORTS_SAVE ) // hacked from Shanghai II
+GAME( 199?, blktch2,   0,        shangha2, shangha2, shanghai_state, init_blktch2, ROT0, "<unknown>", "Black Touch II (Korea)", MACHINE_SUPPORTS_SAVE ) // hacked from Shanghai II
 GAME( 1990, kothello,  0,        kothello, kothello, shanghai_state, empty_init, ROT0, "Success", "Kyuukyoku no Othello",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
