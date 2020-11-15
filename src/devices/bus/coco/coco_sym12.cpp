@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:tim lidnner
+// copyright-holders:tim lindner
 /***************************************************************************
 
     coco_sym12.cpp
@@ -52,7 +52,7 @@ namespace
 		virtual void device_start() override
 		{
 			// install handlers
- 			install_readwrite_handler( 0xFF60, 0xFF63, read8sm_delegate(*m_pia, FUNC(pia6821_device::read)), write8sm_delegate(*m_pia, FUNC(pia6821_device::write)));
+ 			install_readwrite_handler( 0xff60, 0xff63, read8sm_delegate(*m_pia, FUNC(pia6821_device::read)), write8sm_delegate(*m_pia, FUNC(pia6821_device::write)));
 		}
 
 		u8 read_porta();
@@ -76,7 +76,6 @@ namespace
 		pia.writepa_handler().set(*this, FUNC(coco_symphony_twelve_device::write_porta));
 		pia.readpa_handler().set(*this, FUNC(coco_symphony_twelve_device::read_porta));
 		pia.writepb_handler().set(*this, FUNC(coco_symphony_twelve_device::write_portb));
-	// 	pia.readpb_handler().set(*this, FUNC(coco_symphony_twelve_device::read_psg));
 
 		SPEAKER(config, "s12_l").front_left();
 		SPEAKER(config, "s12_r").front_right();
@@ -107,19 +106,19 @@ namespace
 		uint8_t b_output = m_pia->b_output();
 		u8 result = 0;
 
-		if( (b_output & 0x03) == 0x01) {
+		if ((b_output & 0x03) == 0x01) {
 			result |= m_ay8910[0]->data_r();
 		}
 
-		if( (b_output & 0x0c) == 0x04) {
+		if ((b_output & 0x0c) == 0x04) {
 			result |= m_ay8910[1]->data_r();
 		}
 
-		if( (b_output & 0x30) == 0x10) {
+		if ((b_output & 0x30) == 0x10) {
 			result |= m_ay8910[2]->data_r();
 		}
 
-		if( (b_output & 0xc0) == 0x40) {
+		if ((b_output & 0xc0) == 0x40) {
 			result |= m_ay8910[3]->data_r();
 		}
 
@@ -138,35 +137,35 @@ namespace
 
 	void coco_symphony_twelve_device::write_psg(u8 bus, u8 data)
 	{
-		if( (bus & 0x03) == 0x03) {
+		if ((bus & 0x03) == 0x03) {
 			m_ay8910[0]->address_w(data);
 		}
 
-		if( (bus & 0x03) == 0x02) {
+		if ((bus & 0x03) == 0x02) {
 			m_ay8910[0]->data_w(data);
 		}
 
-		if( (bus & 0x0c) == 0x0c) {
+		if ((bus & 0x0c) == 0x0c) {
 			m_ay8910[1]->address_w(data);
 		}
 
-		if( (bus & 0x0c) == 0x08) {
+		if ((bus & 0x0c) == 0x08) {
 			m_ay8910[1]->data_w(data);
 		}
 
-		if( (bus & 0x30) == 0x30) {
+		if ((bus & 0x30) == 0x30) {
 			m_ay8910[2]->address_w(data);
 		}
 
-		if( (bus & 0x30) == 0x20) {
+		if ((bus & 0x30) == 0x20) {
 			m_ay8910[2]->data_w(data);
 		}
 
-		if( (bus & 0xc0) == 0xc0) {
+		if ((bus & 0xc0) == 0xc0) {
 			m_ay8910[3]->address_w(data);
 		}
 
-		if( (bus & 0xc0) == 0x80) {
+		if ((bus & 0xc0) == 0x80) {
 			m_ay8910[3]->data_w(data);
 		}
 	}
