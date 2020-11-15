@@ -44,6 +44,8 @@ public:
 	void shangha2(machine_config &config);
 	void kothello(machine_config &config);
 
+	void init_blktch2();
+
 private:
 	void shanghai_coin_w(uint8_t data);
 	void shanghai_palette(palette_device &palette) const;
@@ -601,6 +603,37 @@ ROM_END
 
 
 /*
+Sea Hunter (?) by unknown manufacturer
+
+The not working PCB has the following main components:
+
+1 chip covered by the 'Sea Hunter' sticker (HD63484)
+1 scratched off chip (near 2203) (V30?)
+1 YM2203C
+2 8-dip banks (near 2203)
+1 18 MHz OSC (near the chip covered by the sticker)
+1 16 MHz OSC (near 2203 and scratched off chip)
+4 ROMs (mix of 27C010A and 27C1001)
+2 PALs
+2 HM6264 SRAMs
+
+Strings in ROMs seem to point to a tile-matching game from a Korean manufacturer.
+*/
+
+
+ROM_START( blktch2 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "1-c25.e7", 0x80001, 0x20000, CRC(ff4dd98d) SHA1(69c9229537a25aaaa82cd6b80eea85a91b6243d1) )
+	ROM_LOAD16_BYTE( "3-c35.f7", 0x80000, 0x20000, CRC(94297664) SHA1(2b8f979db92e4979e35ff22747a7076aa687e5da) )
+	ROM_LOAD16_BYTE( "2-c26.e8", 0xc0001, 0x20000, CRC(eb4f06c7) SHA1(3ef68edc48d33011d0f9eb78f3ad0cc58136e69c) )
+	ROM_LOAD16_BYTE( "4-c36.f8", 0xc0000, 0x20000, CRC(dcbf1619) SHA1(8333b661021bbe5de371bfcea121a69c2727df12) )
+
+	ROM_REGION( 0x208, "plds", 0 )
+	ROM_LOAD( "pal16l8.c13", 0x000, 0x104, NO_DUMP)
+	ROM_LOAD( "pal16l8.c14", 0x104, 0x104, NO_DUMP)
+ROM_END
+
+/*
 
 Kyuukyoku no Othello
 Success Corp. 1990
@@ -667,10 +700,22 @@ ROM_START( kothello )
 	ROM_LOAD( "rom6.7m",   0x00000, 0x10000, CRC(4ab1335d) SHA1(3a803e8a7e9b0c2a26ee23e7ac9c89c70cf2504b))
 ROM_END
 
+void shanghai_state::init_blktch2()
+{
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+
+	for (int i = 0x00000; i < 0x100000 / 2; i++)
+	{
+		rom[i] = bitswap<16>(rom[i], 15, 14, 13, 11, 12, 10, 9, 8, 7, 6, 5, 4, 3, 1, 2, 0);
+		rom[i] = ((rom[i] & 0x00ff) << 8) | ((rom[i] & 0xff00) >> 8);
+	}
+}
 
 
 GAME( 1988, shanghai,  0,        shanghai, shanghai, shanghai_state, empty_init, ROT0, "Sunsoft", "Shanghai (World)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1988, shanghaij, shanghai, shanghai, shanghai, shanghai_state, empty_init, ROT0, "Sunsoft", "Shanghai (Japan)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, shangha2,  0,        shangha2, shangha2, shanghai_state, empty_init, ROT0, "Sunsoft", "Shanghai II (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, shangha2a, shangha2, shangha2, shangha2, shanghai_state, empty_init, ROT0, "Sunsoft", "Shanghai II (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, blktch2,   0,        shangha2, shangha2, shanghai_state, init_blktch2, ROT0, "<unknown>", "Black Touch II (Korea)", MACHINE_SUPPORTS_SAVE ) // hacked from Shanghai II
 GAME( 1990, kothello,  0,        kothello, kothello, shanghai_state, empty_init, ROT0, "Success", "Kyuukyoku no Othello",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+
