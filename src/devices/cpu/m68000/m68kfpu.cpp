@@ -2097,6 +2097,11 @@ void m68000_base_device::m68040_fpu_op1()
 				m68040_do_fsave(addr, -1, 1);
 				break;
 
+			case 6: // (An) + (Xn) + d8
+				addr = EA_AY_IX_16();
+				m68040_do_fsave(addr, -1, 1);
+				break;
+
 			case 7: //
 				switch (reg)
 				{
@@ -2141,6 +2146,11 @@ void m68000_base_device::m68040_fpu_op1()
 
 			case 5: // (D16, An)
 				addr = EA_AY_DI_16();
+				m68040_do_frestore(addr, -1);
+				break;
+
+			case 6: // (An) + (Xn) + d8
+				addr = EA_AY_IX_16();
 				m68040_do_frestore(addr, -1);
 				break;
 
