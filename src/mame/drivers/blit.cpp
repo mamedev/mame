@@ -85,9 +85,11 @@ public:
 	void blit(machine_config &config);
 	void blit_mem(address_map &map);
 
-private:
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<acia6850_device> m_acia0;
@@ -97,19 +99,13 @@ private:
 	required_shared_ptr<uint16_t> m_p_ram;
 	required_region_ptr<uint16_t> m_sysrom;
 
-	// Pointer to System ROMs needed by bootvect_r and masking RAM buffer for post reset accesses
-	uint16_t m_sysram[4];
-	bool m_sysram_on;
-
-	uint8_t *m_videoram;
-	uint32_t m_videostart = 0; // 0x27000;
+	memory_passthrough_handler *m_rom_shadow_tap;
+	int m_videostart = 0;
 };
 
 void blit_state::blit_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x000000, 0x000007).r(FUNC(blit_state::bootvect_r));   /* ROM mirror just during reset */
-	map(0x000000, 0x000007).w(FUNC(blit_state::bootvect_w));   /* After first write we act as RAM */
 	map(0x000000, 0x03ffff).ram().share("p_ram");
 	map(0x040000, 0x045fff).rom().region(M68K_TAG, 0);
 	// octal 0000, 0002 - 16-bit
@@ -162,9 +158,7 @@ DEVICE_INPUT_DEFAULTS_END
 void blit_state::start_write(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOG("START <- %04X (addr %06X)\n", data, data << 2);
-	m_videostart = data << 2;
-	m_videoram = (uint8_t *)m_maincpu->space(AS_PROGRAM).get_read_ptr(m_videostart);
-	assert(m_videoram != NULL);
+	m_videostart = data << 1;
 }
 
 WRITE_LINE_MEMBER(blit_state::system_clock_write)
@@ -176,19 +170,6 @@ WRITE_LINE_MEMBER(blit_state::system_clock_write)
 	m_acia1->write_rxc(state);
 }
 
-/* Boot vector handler, the PCB hardwires the first 8 bytes from 0xff800000 to 0x0 at reset */
-uint16_t blit_state::bootvect_r(offs_t offset)
-{
-	return m_sysram_on ? m_sysram[offset] : m_sysrom[offset];
-}
-
-void blit_state::bootvect_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	m_sysram[offset % sizeof(m_sysram)] &= ~mem_mask;
-	m_sysram[offset % sizeof(m_sysram)] |= (data & mem_mask);
-	m_sysram_on = true;
-}
-
 void blit_state::vblank_ack(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
@@ -197,8 +178,7 @@ void blit_state::vblank_ack(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint32_t blit_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t gfx = 0;
-	int x, y, z, fg, bg;
+	int fg, bg;
 
 	if (BIT(*m_misccr, 0))
 	{
@@ -209,22 +189,17 @@ uint32_t blit_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 		fg = 1; bg = 0;
 	}
 
-	for (y = 0; y < 1024; y++)
+	for (int y = 0; y < 1024; y++)
 	{
 		uint16_t *p = &bitmap.pix(y);
 
-		for (x = 0; x < 800 / 8; x += 2)
+		for (int x = 0; x < 800 / 16; x += 1)
 		{
-			gfx = m_videoram[x + y * 100 + 1];
+			uint16_t gfx;
 
-			for (z = 7; z >= 0; z--)
-			{
-				*p++ = BIT(gfx, z) ? fg : bg;
-			}
+			gfx = m_p_ram[m_videostart + x + y * 50];
 
-			gfx = m_videoram[x + y * 100];
-
-			for (z = 7; z >= 0; z--)
+			for (int z = 15; z >= 0; z--)
 			{
 				*p++ = BIT(gfx, z) ? fg : bg;
 			}
@@ -236,18 +211,28 @@ uint32_t blit_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 
 void blit_state::machine_start()
 {
-	m_videoram = (uint8_t *)m_maincpu->space(AS_PROGRAM).get_read_ptr(m_videostart);
-	assert(m_videoram != NULL);
-
-	save_pointer(NAME(m_sysram), sizeof(m_sysram));
 }
 
 void blit_state::machine_reset()
 {
-	*m_misccr = 0;
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	program.install_rom(0x000000, 0x000007, m_sysrom);   // do it here for F3
+	m_rom_shadow_tap = program.install_read_tap(0x040000, 0x045fff, "rom_shadow_r",[this](offs_t offset, u16 &data, u16 mem_mask)
+	{
+		if (!machine().side_effects_disabled())
+		{
+			// delete this tap
+			m_rom_shadow_tap->remove();
 
-	m_sysram_on = false;
-	memcpy(m_p_ram.target(), m_sysrom, 8);
+			// reinstall ram over the rom shadow
+			m_maincpu->space(AS_PROGRAM).install_ram(0x000000, 0x000007, m_p_ram);
+		}
+
+		// return the original data
+		return data;
+	});
+
+	*m_misccr = 0;
 
 	m_maincpu->reset();
 }
