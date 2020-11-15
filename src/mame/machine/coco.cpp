@@ -694,8 +694,7 @@ void coco_state::poll_joystick(bool *joyin, uint8_t *buttons)
 			{
 				/* conventional joystick */
 				joyval = analog->input(joystick, joystick_axis);
-				float joyval_f = joyval / 10.0;
-				joyin_value = (dac_output() <= joyval_f);
+				joyin_value = (dac_output() <= (joyval / 10));
 			}
 			break;
 
