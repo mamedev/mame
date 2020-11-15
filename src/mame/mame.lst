@@ -1176,6 +1176,9 @@ mks50                           //
 asma2k                          //
 asmapro                         //
 
+@source:alphatan.cpp
+alphatan                        // 1981 AlphaTantel
+
 @source:alphatpx.cpp
 alphatp1
 alphatp2
@@ -11800,50 +11803,51 @@ torp_e21                        //
 aar_101                         //
 btmn_101                        //
 btmn_103                        //
+btmn_103f                       //
+btmn_103g                       //
 btmn_106                        //
-btmn_f13                        //
-btmn_g13                        //
 ckpt_a17                        //
+gnr_200                         //
 gnr_300                         //
 gnr_300d                        //
 gnr_300f                        //
-gnr_200                         //
 hook_401                        //
-hook_401p                       //
+hook_401_p                      //
 hook_404                        //
 hook_408                        //
+jupk_305                        // (c) 1993 Data East
 jupk_501                        //
+jupk_501g                       //
 jupk_513                        //
-jupk_g51                        //
+lah_104f                        //
+lah_104s                        //
 lah_106c                        //
 lah_107                         //
+lah_108s                        //
 lah_110                         //
 lah_112                         //
-lah_f104                        //
-lah_l104                        //
-lah_l108                        //
 lw3_200                         //
 lw3_203                         //
-lw3_204                         // (c) 1992 Data East
+lw3_204e                        // (c) 1992 Data East
 lw3_205                         //
 lw3_207                         //
 lw3_207c                        //
 lw3_208                         //
 mj_130                          //
-rab_103                         //
+rab_103s                        //
 rab_130                         //
 rab_320                         //
 stwr_101                        //
+stwr_101g                       //
 stwr_102                        //
+stwr_102e                       //
 stwr_103                        //
+stwr_103_a104                   //
 stwr_104                        //
 stwr_106                        //
-stwr_106s                       //
-stwr_a046                       //
-stwr_a14                        //
-stwr_e12                        //
-stwr_g11                        //
-tftc_104                        //
+stwr_106_a046                   //
+stwr_106_s105                   //
+tftc_104s                       //
 tftc_200                        //
 tftc_300                        //
 tftc_302                        //
@@ -11852,10 +11856,10 @@ tmnt_103                        //
 tmnt_104                        //
 tmnt_104g                       //
 tomy_102                        //
+tomy_300h                       //
 tomy_400                        //
-tomy_h30                        //
 trek_110                        //
-trek_11a                        //
+trek_110_a027                   //
 trek_117                        //
 trek_120                        //
 trek_200                        //
@@ -32317,6 +32321,7 @@ mc_89in1
 mc_tv200
 dgun2500
 ppgc200g
+dgun2869
 
 @source:nes_vt09.cpp
 msiwwe
@@ -32372,6 +32377,7 @@ lxcmcyfz
 lxcmcydp
 lxcmcysp
 lxcmcycr
+lxcmcypj
 lxcmcypp
 lxccminn
 lxccplan

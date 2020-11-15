@@ -146,6 +146,7 @@ const double XTAL::known_xtals[] = {
 	  8'467'200, /* 8.4672_MHz_XTAL        Subsino's Ying Hua Lian */
 	  8'664'000, /* 8.664_MHz_XTAL         Touchmaster */
 	  8'700'000, /* 8.7_MHz_XTAL           Tandberg TDV 2324 */
+	  8'860'000, /* 8.86_MHz_XTAL          AlphaTantel */
 	  8'867'000, /* 8.867_MHz_XTAL         Philips G7400 (~2x PAL subcarrier) */
 	  8'867'236, /* 8.867236_MHz_XTAL      RCA CDP1869 PAL color clock (~2x PAL subcarrier) */
 	  8'867'238, /* 8.867238_MHz_XTAL      ETI-660 (~2x PAL subcarrier) */

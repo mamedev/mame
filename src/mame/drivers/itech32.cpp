@@ -632,13 +632,13 @@ u16 drivedge_state::gas_r()
 
 u16 itech32_state::wcbowl_prot_result_r()
 {
-	return m_nvram[0x111d/2];
+	return m_nvram16[0x111d/2];
 }
 
 
 u8 itech32_state::itech020_prot_result_r()
 {
-	u32 result = ((u32 *)m_nvram.target())[m_itech020_prot_address >> 2];
+	u32 result = ((u32 *)m_nvram32.target())[m_itech020_prot_address >> 2];
 	result >>= (~m_itech020_prot_address & 3) * 8;
 	return result & 0xff;
 }
@@ -850,7 +850,7 @@ u32 drivedge_state::tms2_speedup_r(address_space &space)
 void itech32_state::nvram_init(nvram_device &nvram, void *base, size_t length)
 {
 	// if nvram is the main RAM, don't overwrite exception vectors
-	int start = (base == m_nvram) ? 0x80 : 0x00;
+	int start = (!m_main_ram32) && (base == m_nvram32 || base == m_nvram16) ? 0x80 : 0x00;
 	for (int i = start; i < length; i++)
 		((u8 *)base)[i] = machine().rand();
 }
@@ -860,7 +860,7 @@ void drivedge_state::nvram_init(nvram_device &nvram, void *base, size_t length)
 	itech32_state::nvram_init(nvram, base, length);
 
 	// due to accessing uninitialized RAM, we need this hack
-	((u32 *)m_nvram.target())[0x2ce4/4] = 0x0000001e;
+	m_nvram32[0x2ce4/4] = 0x0000001e;
 }
 
 /*************************************
@@ -882,7 +882,7 @@ void itech32_state::timekill_map(address_map &map)
 	map(0x068000, 0x068003).w(FUNC(itech32_state::timekill_colorbc_w));
 	map(0x070000, 0x070001).nopw();    /* noisy */
 	map(0x078001, 0x078001).w(FUNC(itech32_state::sound_data_w));
-	map(0x080000, 0x08007f).rw(FUNC(itech32_state::video_r), FUNC(itech32_state::video_w)).share("video");
+	map(0x080000, 0x08007f).rw(FUNC(itech32_state::video_r), FUNC(itech32_state::video_w));
 	map(0x0a0000, 0x0a0001).w(FUNC(itech32_state::int1_ack_w));
 	map(0x0c0000, 0x0c7fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x100000, 0x17ffff).rom().region("user1", 0);
@@ -902,7 +902,7 @@ void itech32_state::bloodstm_map(address_map &map)
 	map(0x380001, 0x380001).w(FUNC(itech32_state::color_w<1>));
 	map(0x400000, 0x400001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x480001, 0x480001).w(FUNC(itech32_state::sound_data_w));
-	map(0x500000, 0x5000ff).rw(FUNC(itech32_state::bloodstm_video_r), FUNC(itech32_state::bloodstm_video_w)).share("video");
+	map(0x500000, 0x5000ff).rw(FUNC(itech32_state::bloodstm_video_r), FUNC(itech32_state::bloodstm_video_w));
 	map(0x580000, 0x59ffff).ram().w(FUNC(itech32_state::bloodstm_paletteram_w)).share("palette");
 	map(0x700001, 0x700001).w(FUNC(itech32_state::bloodstm_plane_w));
 	map(0x780000, 0x780001).portr("EXTRA");
@@ -971,12 +971,12 @@ map(0x000c00, 0x007fff).mirror(0x40000).rw(FUNC(itech32_state::test2_r), FUNC(it
 	map(0x180001, 0x180001).w(FUNC(drivedge_state::color_w<0>));
 	map(0x1a0000, 0x1bffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0x1c0000, 0x1c0003).nopw();
-	map(0x1e0000, 0x1e0113).rw(FUNC(drivedge_state::bloodstm_video_r), FUNC(drivedge_state::bloodstm_video_w)).share("video");
+	map(0x1e0000, 0x1e0113).rw(FUNC(drivedge_state::bloodstm_video_r), FUNC(drivedge_state::bloodstm_video_w));
 	map(0x1e4000, 0x1e4003).w(FUNC(drivedge_state::tms_reset_assert_w));
 	map(0x1ec000, 0x1ec003).w(FUNC(drivedge_state::tms_reset_clear_w));
 	map(0x200000, 0x200003).portr("200000");
-	map(0x280000, 0x280fff).ram().w(FUNC(drivedge_state::tms1_68k_ram_w)).share("tms1_ram");
-	map(0x300000, 0x300fff).ram().w(FUNC(drivedge_state::tms2_68k_ram_w)).share("tms2_ram");
+	map(0x280000, 0x280fff).ram().lr32(NAME([this](offs_t offset) { return m_tms1_ram[offset]; })).w(FUNC(drivedge_state::tms1_68k_ram_w));
+	map(0x300000, 0x300fff).ram().lr32(NAME([this](offs_t offset) { return m_tms2_ram[offset]; })).w(FUNC(drivedge_state::tms2_68k_ram_w));
 	map(0x380000, 0x380003).nopw(); // .w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x600000, 0x607fff).rom().region("user1", 0);
 }
@@ -1008,7 +1008,7 @@ void itech32_state::itech020_map(address_map &map)
 	map(0x380003, 0x380003).w(FUNC(itech32_state::color_w<0>));
 	map(0x400000, 0x400003).w("watchdog", FUNC(watchdog_timer_device::reset32_w));
 	map(0x480001, 0x480001).w(FUNC(itech32_state::sound_data_w));
-	map(0x500000, 0x5000ff).rw(FUNC(itech32_state::bloodstm_video_r), FUNC(itech32_state::bloodstm_video_w)).share("video");
+	map(0x500000, 0x5000ff).rw(FUNC(itech32_state::bloodstm_video_r), FUNC(itech32_state::bloodstm_video_w));
 	map(0x578000, 0x57ffff).nopr();             /* touched by protection */
 	map(0x580000, 0x59ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0x600000, 0x603fff).ram().share("nvram");
@@ -4629,7 +4629,12 @@ ROM_END
 
 void itech32_state::init_program_rom()
 {
-	memcpy(m_nvram, m_main_rom, 0x80);
+	if(m_main_ram32)
+		memcpy(m_main_ram32, m_main_rom32, 0x80);
+	else if(m_nvram16)
+		memcpy(m_nvram16, m_main_rom16, 0x80);
+	else
+		memcpy(m_nvram32, m_main_rom32, 0x80);
 }
 
 

@@ -452,7 +452,7 @@ void namco_device::polepos_sound_w(offs_t offset, uint8_t data)
 
 	case 0x23:
 		voice->waveform_select = data & 7;
-		/* fall through */
+		[[fallthrough]];
 	case 0x02:
 	case 0x03:
 		voice->volume[0] = voice->volume[1] = 0;

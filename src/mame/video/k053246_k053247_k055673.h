@@ -40,7 +40,7 @@ Callback procedures for non-standard shadows:
 	#define GX_ZBUFSIZE  0x600000
 #else
 	#define GX_ZBUFW     576
-	#define GX_ZBUFH     224
+	#define GX_ZBUFH     256
 	#define GX_ZPAGESIZE (GX_ZBUFW*GX_ZBUFH)
 	#define GX_ZBUFSIZE  ((GX_ZBUFW*GX_ZBUFH)*2)
 #endif

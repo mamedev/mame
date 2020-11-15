@@ -168,7 +168,9 @@ MC6845_UPDATE_ROW(tanbus_ravdu_device::crtc_update_row)
 
 	for (int column = 0; column < x_count; column++)
 	{
-		m_trom->write(m_videoram[(ma + column) & 0x7ff]);
+		uint8_t code = m_videoram[(ma + column) & 0x7ff];
+
+		m_trom->write(code);
 
 		m_trom->f1_w(1);
 		m_trom->f1_w(0);
@@ -178,7 +180,9 @@ MC6845_UPDATE_ROW(tanbus_ravdu_device::crtc_update_row)
 			m_trom->tr6_w(1);
 			m_trom->tr6_w(0);
 
-			int const col = m_trom->get_rgb() ^ ((column == cursor_x) ? 7 : 0);
+			int col = m_trom->get_rgb() ^ ((column == cursor_x) ? 7 : 0);
+
+			if (BIT(code, 7)) col ^= 0x07;
 
 			int const r = BIT(col, 0) * 0xff;
 			int const g = BIT(col, 1) * 0xff;

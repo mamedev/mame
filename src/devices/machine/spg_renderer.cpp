@@ -597,7 +597,7 @@ void spg_renderer_device::draw_page(bool read_from_csspace, bool has_extended_ti
 	}
 }
 
-void spg_renderer_device::draw_sprite(bool read_from_csspace, bool has_extended_sprites, bool alt_extrasprite_hack, uint32_t palbank, bool highres, const rectangle& cliprect, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, uint32_t base_addr, address_space &spc, uint16_t* paletteram, uint16_t* spriteram)
+void spg_renderer_device::draw_sprite(bool read_from_csspace, int extended_sprites_mode, bool alt_extrasprite_hack, uint32_t palbank, bool highres, const rectangle& cliprect, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, uint32_t base_addr, address_space &spc, uint16_t* paletteram, uint16_t* spriteram)
 {
 	uint32_t tilegfxdata_addr = spritegfxdata_addr;
 	uint32_t tile = spriteram[base_addr + 0];
@@ -658,7 +658,7 @@ void spg_renderer_device::draw_sprite(bool read_from_csspace, bool has_extended_
 	uint32_t words_per_tile;
 
 	// good for gormiti, smartfp, wrlshunt, paccon, jak_totm, jak_s500, jak_gtg
-	if (has_extended_sprites && ((m_video_regs_42 & 0x0010) == 0x10))
+	if (extended_sprites_mode && ((m_video_regs_42 & 0x0010) == 0x10))
 	{
 		// paccon and smartfp use this mode
 		words_per_tile = 8;
@@ -685,7 +685,8 @@ void spg_renderer_device::draw_sprite(bool read_from_csspace, bool has_extended_
 
 	// various games don't want the flip bits in the usual place, wrlshunt for example, there's probably a bit to control this
 	// and likewise these bits probably now have a different meaning, so this shouldn't be trusted
-	if (has_extended_sprites)
+	// beijuehh does NOT want this either (see characters in 'empire fighter')
+	if (extended_sprites_mode)
 	{
 		if (highres || alt_extrasprite_hack)
 		{
@@ -696,10 +697,13 @@ void spg_renderer_device::draw_sprite(bool read_from_csspace, bool has_extended_
 
 	uint32_t palette_offset = (attr & 0x0f00) >> 4;
 
-	if (has_extended_sprites)
+	if (extended_sprites_mode)
 	{
-		// guess, tkmag220 / myac220 don't set this bit and expect all sprite palettes to be from the same bank as background palettes
-		if (palbank & 1)
+		// TODO: tkmag220 / myac220 don't set this bit and expect all sprite palettes to be from the same bank as background palettes
+		// beijuehh (extended_sprites_mode == 2) appears to disagree with that logic, it has this set, but expects palettes and sprites
+		// from the first bank but also needs the attr & 0x8000 check below for the 'pause' graphics so isn't ignoring the 'extended'
+		// capabilities entirely.
+		if ((palbank & 1) && (extended_sprites_mode != 2))
 			palette_offset |= 0x100;
 
 		// many other gpl16250 sets have this bit set when they want the upper 256 colours on a per-sprite basis, seems like an extended feature
@@ -743,7 +747,7 @@ void spg_renderer_device::draw_sprite(bool read_from_csspace, bool has_extended_
 	}
 }
 
-void spg_renderer_device::draw_sprites(bool read_from_csspace, bool has_extended_sprites, bool alt_extrasprite_hack, uint32_t palbank, bool highres, const rectangle &cliprect, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, address_space &spc, uint16_t* paletteram, uint16_t* spriteram, int sprlimit)
+void spg_renderer_device::draw_sprites(bool read_from_csspace, int extended_sprites_mode, bool alt_extrasprite_hack, uint32_t palbank, bool highres, const rectangle &cliprect, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, address_space &spc, uint16_t* paletteram, uint16_t* spriteram, int sprlimit)
 {
 	if (!(m_video_regs_42 & 0x0001))
 	{
@@ -760,7 +764,7 @@ void spg_renderer_device::draw_sprites(bool read_from_csspace, bool has_extended
 
 	for (uint32_t n = 0; n < sprlimit; n++)
 	{
-		draw_sprite(read_from_csspace, has_extended_sprites, alt_extrasprite_hack, palbank, highres, cliprect, scanline, priority, spritegfxdata_addr, 4 * n, spc, paletteram, spriteram);
+		draw_sprite(read_from_csspace, extended_sprites_mode, alt_extrasprite_hack, palbank, highres, cliprect, scanline, priority, spritegfxdata_addr, 4 * n, spc, paletteram, spriteram);
 	}
 }
 

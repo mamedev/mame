@@ -26,9 +26,9 @@ DEFINE_DEVICE_TYPE(BBC_TUBE_ARM, bbc_tube_arm_device, "bbc_tube_arm", "ARM Evalu
 void bbc_tube_arm_device::tube_arm_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000000, 0x03fffff).rw(FUNC(bbc_tube_arm_device::ram_r), FUNC(bbc_tube_arm_device::ram_w));
+	map(0x0000000, 0x03fffff).ram().share(RAM_TAG);
 	map(0x0400000, 0x0ffffff).noprw();
-	map(0x1000000, 0x100001f).rw("ula", FUNC(tube_device::parasite_r), FUNC(tube_device::parasite_w)).umask32(0x000000ff);
+	map(0x1000000, 0x100001f).rw(m_ula, FUNC(tube_device::parasite_r), FUNC(tube_device::parasite_w)).umask32(0x000000ff);
 	map(0x3000000, 0x3003fff).rom().region("bootstrap", 0).mirror(0xc000);
 }
 
@@ -53,12 +53,12 @@ ROM_END
 
 void bbc_tube_arm_device::device_add_mconfig(machine_config &config)
 {
-	ARM(config, m_arm, 20_MHz_XTAL / 3);
-	m_arm->set_addrmap(AS_PROGRAM, &bbc_tube_arm_device::tube_arm_mem);
+	ARM(config, m_maincpu, 20_MHz_XTAL / 3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bbc_tube_arm_device::tube_arm_mem);
 
 	TUBE(config, m_ula);
-	m_ula->pnmi_handler().set_inputline(m_arm, ARM_FIRQ_LINE);
-	m_ula->pirq_handler().set_inputline(m_arm, ARM_IRQ_LINE);
+	m_ula->pnmi_handler().set_inputline(m_maincpu, ARM_FIRQ_LINE);
+	m_ula->pirq_handler().set_inputline(m_maincpu, ARM_IRQ_LINE);
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("4M").set_default_value(0);
@@ -87,11 +87,10 @@ const tiny_rom_entry *bbc_tube_arm_device::device_rom_region() const
 bbc_tube_arm_device::bbc_tube_arm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, BBC_TUBE_ARM, tag, owner, clock)
 	, device_bbc_tube_interface(mconfig, *this)
-	, m_arm(*this, "arm")
+	, m_maincpu(*this, "maincpu")
 	, m_ula(*this, "ula")
 	, m_ram(*this, "ram")
 	, m_bootstrap(*this, "bootstrap")
-	, m_rom_select(true)
 {
 }
 
@@ -109,8 +108,19 @@ void bbc_tube_arm_device::device_start()
 
 void bbc_tube_arm_device::device_reset()
 {
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+
 	/* enable the reset vector to be fetched from ROM */
-	m_rom_select = true;
+	m_maincpu->space(AS_PROGRAM).install_rom(0x000000, 0x003fff, 0x3fc000, m_bootstrap->base());
+
+	m_rom_shadow_tap = program.install_write_tap(0x0000000, 0x03fffff, "rom_shadow_w",[this](offs_t offset, u32 &data, u32 mem_mask)
+	{
+		/* delete this tap */
+		m_rom_shadow_tap->remove();
+
+		/* install ram */
+		m_maincpu->space(AS_PROGRAM).install_ram(0x0000000, 0x03fffff, m_ram->pointer());
+	});
 }
 
 
@@ -126,25 +136,4 @@ uint8_t bbc_tube_arm_device::host_r(offs_t offset)
 void bbc_tube_arm_device::host_w(offs_t offset, uint8_t data)
 {
 	m_ula->host_w(offset, data);
-}
-
-
-uint8_t bbc_tube_arm_device::ram_r(offs_t offset)
-{
-	uint8_t data;
-
-	if (m_rom_select)
-		data = m_bootstrap->base()[offset & 0x3fff];
-	else
-		data = m_ram->pointer()[offset];
-
-	return data;
-}
-
-void bbc_tube_arm_device::ram_w(offs_t offset, uint8_t data)
-{
-	/* clear ROM select on first write */
-	if (!machine().side_effects_disabled()) m_rom_select = false;
-
-	m_ram->pointer()[offset] = data;
 }
