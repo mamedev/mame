@@ -127,16 +127,15 @@ uint8_t leapfrog_iquest_state::romupper_r(offs_t offset)
 
 void leapfrog_iquest_state::prog_map(address_map &map)
 {
-
-	map(0xc260, 0xc52f).ram(); // = clears 0x2d0 bytes (90*64 / 8) display buffer?
-	map(0xc530, 0xc7ff).ram(); // = clears 0x2d0 bytes (90*64 / 8) display buffer?
-
 	map(0x0000, 0x7fff).r(FUNC(leapfrog_iquest_state::romlower_r));
 	map(0x8000, 0xffff).r(FUNC(leapfrog_iquest_state::romupper_r));
 }
 
 void leapfrog_iquest_state::ext_map(address_map &map)
 {
+	map(0xc260, 0xc52f).ram(); // = clears 0x2d0 bytes (90*64 / 8) display buffer?
+	map(0xc530, 0xc7ff).ram(); // = clears 0x2d0 bytes (90*64 / 8) display buffer?
+
 	map(0xfc06, 0xfc07).rw(FUNC(leapfrog_iquest_state::lowerbank_r), FUNC(leapfrog_iquest_state::lowerbank_w));
 	map(0xfc08, 0xfc09).rw(FUNC(leapfrog_iquest_state::upperbank_r), FUNC(leapfrog_iquest_state::upperbank_w));
 }
