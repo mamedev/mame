@@ -1266,9 +1266,9 @@ void lua_engine::initialize()
  * options.entries[] - get table of option entries (k=name, v=core_options::entry)
  */
 
-	auto emu_options_type = sol().registry().create_simple_usertype<emu_options>("new", sol::no_constructor, sol::base_classes, sol::bases<core_options>());
+	auto emu_options_type = sol().registry().new_usertype<emu_options>("new", sol::no_constructor, sol::base_classes, sol::bases<core_options>());
 	emu_options_type.set("slot_option", [](emu_options &opts, const std::string &name) { return &opts.slot_option(name); });
-	sol().registry().set_usertype("emu_options", emu_options_type);
+	sol().registry().set("emu_options", emu_options_type);
 
 /*  slot_option library
  *
@@ -1281,13 +1281,13 @@ void lua_engine::initialize()
  * slot_option:default_card_software()
  */
 
-	auto slot_option_type = sol().registry().create_simple_usertype<slot_option>("new", sol::no_constructor);
+	auto slot_option_type = sol().registry().new_usertype<slot_option>("new", sol::no_constructor);
 	slot_option_type.set("value", &slot_option::value);
 	slot_option_type.set("specified_value", &slot_option::specified_value);
 	slot_option_type.set("bios", &slot_option::bios);
 	slot_option_type.set("default_card_software", &slot_option::default_card_software);
 	slot_option_type.set("specify", [](slot_option &opt, std::string &&text) { opt.specify(std::move(text)); });
-	sol().registry().set_usertype("slot_option", slot_option_type);
+	sol().registry().set("slot_option", slot_option_type);
 
 /*  core_options::entry library
  *
@@ -3012,7 +3012,7 @@ void lua_engine::initialize()
  * slot.options[] - get options table (k=name, v=device_slot_interface::slot_option)
  */
 
-	auto slot_type = sol().registry().create_simple_usertype<device_slot_interface>("new", sol::no_constructor);
+	auto slot_type = sol().registry().new_usertype<device_slot_interface>("new", sol::no_constructor);
 	slot_type.set("fixed", &device_slot_interface::fixed);
 	slot_type.set("has_selectable_options", &device_slot_interface::has_selectable_options);
 	slot_type.set("default_option", &device_slot_interface::default_option);
@@ -3022,7 +3022,7 @@ void lua_engine::initialize()
 				option_table[x.first] = &*x.second;
 			return option_table;
 		}));
-	sol().registry().set_usertype("slot", slot_type);
+	sol().registry().set("slot", slot_type);
 
 /*  device_slot_interface::slot_option library
  *
@@ -3031,9 +3031,9 @@ void lua_engine::initialize()
  * slot_option:selectable()
  */
 
-	auto dislot_option_type = sol().registry().create_simple_usertype<device_slot_interface::slot_option>("new", sol::no_constructor);
+	auto dislot_option_type = sol().registry().new_usertype<device_slot_interface::slot_option>("new", sol::no_constructor);
 	dislot_option_type.set("selectable", &device_slot_interface::slot_option::selectable);
-	sol().registry().set_usertype("dislot_option", dislot_option_type);
+	sol().registry().set("dislot_option", dislot_option_type);
 
 /*  mame_machine_manager library
  *
