@@ -9,7 +9,6 @@
 
     - floppy support (I/O 0xe6-0xe7 = drive 1, 0xea-0xeb = drive 2)
     - modem
-    - "old" version of BASIC ROM
 
 Dick Smith catalog numbers, taken from advertisements:
 
@@ -420,7 +419,7 @@ ROM_START( aquarius )
 	ROM_SYSTEM_BIOS(0, "s2", "S2")
 	ROMX_LOAD("aq_s2.u2", 0x0000, 0x2000, CRC(5cfa5b42) SHA1(02c8ee11e911d1aa346812492d14284b6870cb3e), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "s1", "S1")
-	ROMX_LOAD("aq.u2", 0x0000, 0x2000, NO_DUMP, ROM_BIOS(1))
+	ROMX_LOAD("aq.u2", 0x0000, 0x2000, CRC(28d0fdbd) SHA1(58019da049b611a07adc6456cc9d77d92423d62a), ROM_BIOS(1))
 
 	/* charrom */
 	ROM_REGION(0x0800, "gfx1", 0)
