@@ -141,7 +141,7 @@ EPF8452AQC160-3 - Altera FLEX EPF8452AQC160-3 FPGA (QFP160)
           A179B - TI SN75179B Differential Driver and Receiver Pair (DIP8)
          ADM485 - Analog Devices ADM485 +5 V Low Power EIA RS-485 Transceiver (SOIC8)
         PCM1725 - Burr-Brown PCM1725 Stereo Audio Digital to Analog Converter 16 Bits, 96kHz Sampling (SOIC14)
-            JP1 - set to 2-3. Alt setting is 1-2
+            JP1 - AICA clock Source; Default From Motherboard set to 2-3. Alt setting is 1-2 from Cart Bus (G2 Expansion BD; Multiboard Clock; other Cart Slot Peripherals that provide Aica Clock)
             JP4 - set to 2-3. Alt setting is 1-2
         CN1/2/3 - Connectors for ROM cart or GDROM DIMM Unit
         CN25/26 - Connectors for Filter Board
