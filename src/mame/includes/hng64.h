@@ -326,7 +326,7 @@ private:
 	float m_lightStrength;
 	float m_lightVector[3];
 
-	uint32_t hng64_com_r(offs_t offset);
+	uint32_t hng64_com_r(offs_t offset, uint32_t mem_mask = ~0);
 	void hng64_com_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void hng64_com_share_w(offs_t offset, uint8_t data);
 	uint8_t hng64_com_share_r(offs_t offset);

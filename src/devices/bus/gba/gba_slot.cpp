@@ -659,13 +659,13 @@ image_init_result gba_cart_slot_device::call_load()
 		{
 			case 2 * 1024 * 1024:
 				memcpy(ROM + 0x200000, ROM, 0x200000);
-				// intentional fall-through
+				[[fallthrough]];
 			case 4 * 1024 * 1024:
 				memcpy(ROM + 0x400000, ROM, 0x400000);
-				// intentional fall-through
+				[[fallthrough]];
 			case 8 * 1024 * 1024:
 				memcpy(ROM + 0x800000, ROM, 0x800000);
-				// intentional fall-through
+				[[fallthrough]];
 			case 16 * 1024 * 1024:
 				memcpy(ROM + 0x1000000, ROM, 0x1000000);
 				break;

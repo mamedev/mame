@@ -805,7 +805,7 @@ void spg2xx_io_device::io_w(offs_t offset, uint16_t data)
 
 	case REG_IOA_DATA: case REG_IOB_DATA: case REG_IOC_DATA:
 		offset++;
-		// Intentional fallthrough - we redirect data register writes to the buffer register.
+		[[fallthrough]]; // we redirect data register writes to the buffer register.
 
 	case REG_IOA_BUFFER: case REG_IOA_ATTRIB:
 	case REG_IOB_BUFFER: case REG_IOB_ATTRIB:

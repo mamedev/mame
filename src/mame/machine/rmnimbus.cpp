@@ -1075,6 +1075,7 @@ uint8_t rmnimbus_state::scsi_r(offs_t offset)
 		case 0x08 :
 			result = m_scsi_data_in->read();
 			hdc_post_rw();
+			break;
 		default:
 			break;
 	}

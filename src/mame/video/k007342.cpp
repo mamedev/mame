@@ -169,6 +169,7 @@ void k007342_device::vreg_w(offs_t offset, uint8_t data)
 			break;
 		case 0x06:  /* scroll y (register 1) */
 			m_scrolly[1] = data;
+			break;
 		case 0x07:  /* unused */
 			break;
 	}

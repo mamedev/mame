@@ -30,7 +30,7 @@ TIMER_CALLBACK_MEMBER(svision_state::svision_pet_timer)
 			{
 				m_pet.input = m_joy2->read();
 			}
-			/* fall through */
+			[[fallthrough]];
 
 		case 0x02: case 0x04: case 0x06: case 0x08:
 		case 0x0a: case 0x0c: case 0x0e:

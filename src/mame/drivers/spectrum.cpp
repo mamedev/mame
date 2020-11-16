@@ -721,7 +721,8 @@ void spectrum_state::init_spectrum()
 	switch (m_ram->size())
 	{
 		case 48*1024:
-			m_specmem->space(AS_PROGRAM).install_ram(0x8000, 0xffff, nullptr); // Fall through
+			m_specmem->space(AS_PROGRAM).install_ram(0x8000, 0xffff, nullptr);
+			[[fallthrough]];
 		case 16*1024:
 			m_specmem->space(AS_PROGRAM).install_ram(0x5b00, 0x7fff, nullptr);
 	}

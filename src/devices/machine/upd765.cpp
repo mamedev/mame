@@ -3193,7 +3193,7 @@ void upd72067_device::auxcmd_w(uint8_t data)
 		for(unsigned i = 0; i < 4; i++)
 			if(flopi[i].dev)
 				flopi[i].dev->mon_w(!BIT(data, i + 4));
-		// fall through
+		[[fallthrough]];
 	case 0x03: // enable external mode
 	case 0x0b: // control internal mode
 	case 0x0f: // select format
