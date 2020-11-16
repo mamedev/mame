@@ -2625,7 +2625,7 @@ void sega_multi32_state::device_add_mconfig(machine_config &config)
 	ymsnd.add_route(1, "lspeaker", 0.40);
 	ymsnd.add_route(0, "rspeaker", 0.40);
 
-	MULTIPCM(config, m_multipcm, MASTER_CLOCK/4);
+	MULTIPCM(config, m_multipcm, MULTI32_CLOCK/4);
 	m_multipcm->set_addrmap(0, &sega_multi32_state::multipcm_map);
 	m_multipcm->add_route(1, "lspeaker", 1.0);
 	m_multipcm->add_route(0, "rspeaker", 1.0);
