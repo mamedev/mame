@@ -22,22 +22,17 @@ public:
 		, m_audiocpu(*this, "audiocpu")
 		, m_soundlatch(*this, "soundlatch")
 		, m_z80bank(*this, "z80bank%u", 1)
-		, m_palette(*this, "palette")
-		, m_gfxdecode(*this, "gfxdecode")
-		, m_sprite(*this, "sprite")
 		, m_sprite_ctrl(*this, "sprite_ctrl")
 	{ }
+	
+protected:
 	
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_memory_bank_array<2> m_z80bank;
-	required_device<palette_device> m_palette;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<ms32_sprite_device> m_sprite;
 	required_shared_ptr<u32> m_sprite_ctrl;
 
-protected:
 	DECLARE_WRITE_LINE_MEMBER(timer_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(field_irq_w);
@@ -67,6 +62,9 @@ public:
 		ms32_base_state(mconfig, type, tag)
 		, m_sysctrl(*this, "sysctrl")
 		, m_screen(*this, "screen")
+		, m_sprite(*this, "sprite")
+		, m_palette(*this, "palette")
+		, m_gfxdecode(*this, "gfxdecode")
 		, m_roz_ctrl(*this, "roz_ctrl")
 		, m_tx_scroll(*this, "tx_scroll")
 		, m_bg_scroll(*this, "bg_scroll")
@@ -98,6 +96,9 @@ public:
 protected:
 	required_device<jaleco_ms32_sysctrl_device> m_sysctrl;
 	required_device<screen_device> m_screen;
+	required_device<ms32_sprite_device> m_sprite;
+	required_device<palette_device> m_palette;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	virtual void video_start() override;

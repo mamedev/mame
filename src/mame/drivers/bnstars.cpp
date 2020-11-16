@@ -106,17 +106,20 @@ public:
 	ms32_bnstars_state(const machine_config &mconfig, device_type type, const char *tag)
 		: ms32_base_state(mconfig, type, tag)
 		, m_sysctrl(*this, "sysctrl")
+		, m_screen(*this, "screen.%u", 0U)
+		, m_gfxdecode(*this, "gfxdecode.%u", 0U)
+		, m_palette(*this, "palette.%u", 0U)
+		, m_paletteram(*this, "paletteram.%u", 0U, 0x20000U, ENDIANNESS_LITTLE)
 		, m_ascii_vram(*this, "ascii_vram_%u", 0U, 0x4000U, ENDIANNESS_LITTLE)
 		, m_ascii_ctrl(*this, "ascii_ctrl.%u", 0U)
 		, m_scroll_vram(*this, "scroll_vram_%u", 0U, 0x4000U, ENDIANNESS_LITTLE)
 		, m_scroll_ctrl(*this, "scroll_ctrl.%u", 0U)
 		, m_rotate_vram(*this, "rotate_vram_%u", 0U, 0x10000U, ENDIANNESS_LITTLE)
 		, m_rotate_ctrl(*this, "rotate_ctrl.%u", 0U)
-		, m_object_vram(*this, "objram_%u", 0U, 0x20000U, ENDIANNESS_LITTLE)
+		, m_sprite(*this, "sprite.%u", 0U)
+		, m_object_vram(*this, "objram_%u", 0U, 0x10000U, ENDIANNESS_LITTLE)
 		, m_p1_keys(*this, "P1KEY.%u", 0)
 		, m_p2_keys(*this, "P2KEY.%u", 0)
-		, m_screen(*this, "screen")
-		, m_right_screen(*this, "rscreen")
 	{ }
 
 	void bnstars(machine_config &config);
@@ -130,6 +133,12 @@ private:
 	// TODO: subclass this device for dual screen config
 	required_device<jaleco_ms32_sysctrl_device> m_sysctrl;
 	
+	required_device_array<screen_device, 2> m_screen;
+
+	required_device_array<gfxdecode_device, 2> m_gfxdecode;
+	required_device_array<palette_device, 2> m_palette;
+	memory_share_array_creator<u16, 2> m_paletteram;
+
 	memory_share_array_creator<u16, 2> m_ascii_vram;
 	required_shared_ptr_array<u32, 2> m_ascii_ctrl;
 	memory_share_array_creator<u16, 2> m_scroll_vram;
@@ -137,12 +146,11 @@ private:
 	memory_share_array_creator<u16, 2> m_rotate_vram;
 	required_shared_ptr_array<u32, 2> m_rotate_ctrl;
 
+	required_device_array<ms32_sprite_device, 2> m_sprite;
 	memory_share_array_creator<u16, 2> m_object_vram;
 
 	required_ioport_array<4> m_p1_keys;
 	required_ioport_array<4> m_p2_keys;
-	required_device<screen_device> m_screen;
-	required_device<screen_device> m_right_screen;
 
 	u32 m_bnstars1_mahjong_select;
 	template <int chip> void ascii_vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -153,12 +161,14 @@ private:
 	template <int chip> u16 rotate_vram_r(offs_t offset);
 	template <int chip> void object_vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	template <int chip> u16 object_vram_r(offs_t offset);
+	template <int chip> void palette_ram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	template <int chip> u16 palette_ram_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_dual_w);
 	template <int chip> TILE_GET_INFO_MEMBER(get_ascii_tile_info);
 	template <int chip> TILE_GET_INFO_MEMBER(get_scroll_tile_info);
 	template <int chip> TILE_GET_INFO_MEMBER(get_rotate_tile_info);
-	template <int which> void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u16 *sprram_top);
+	template <int chip> void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
+	template <int chip> void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	tilemap_t *m_ascii_tilemap[2];
 	tilemap_t *m_scroll_tilemap[2];
 	tilemap_t *m_rotate_tilemap[2];
@@ -229,34 +239,34 @@ template <int chip> void ms32_bnstars_state::object_vram_w(offs_t offset, u16 da
 template <int chip> TILE_GET_INFO_MEMBER(ms32_bnstars_state::get_ascii_tile_info)
 {
 	int tileno, colour;
-	const int gfx_region[2] = {2, 5};
+//	const int gfx_region[2] = {2, 5};
 
 	tileno = m_ascii_vram[chip][tile_index *2+0] & 0x0000ffff;
 	colour = m_ascii_vram[chip][tile_index *2+1] & 0x0000000f;
 
-	tileinfo.set(gfx_region[chip], tileno, colour, 0);
+	tileinfo.set(2, tileno, colour, 0);
 }
 
 template <int chip> TILE_GET_INFO_MEMBER(ms32_bnstars_state::get_scroll_tile_info)
 {
 	int tileno, colour;
-	const int gfx_region[2] = {1, 4};
+//	const int gfx_region[2] = {1, 4};
 
 	tileno = m_scroll_vram[chip][tile_index *2+0] & 0x0000ffff;
 	colour = m_scroll_vram[chip][tile_index *2+1] & 0x0000000f;
 
-	tileinfo.set(gfx_region[chip], tileno, colour, 0);
+	tileinfo.set(1, tileno, colour, 0);
 }
 
 template <int chip> TILE_GET_INFO_MEMBER(ms32_bnstars_state::get_rotate_tile_info)
 {
 	int tileno, colour;
-	const int gfx_region[2] = {0, 3};
+//	const int gfx_region[2] = {0, 3};
 
 	tileno = m_rotate_vram[chip][tile_index *2+0] & 0x0000ffff;
 	colour = m_rotate_vram[chip][tile_index *2+1] & 0x0000000f;
 
-	tileinfo.set(gfx_region[chip], tileno, colour, 0);
+	tileinfo.set(0, tileno, colour, 0);
 }
 
 
@@ -299,10 +309,11 @@ template <int chip> void ms32_bnstars_state::draw_roz(screen_device &screen, bit
 	}
 }
 
-// TODO: merge with ms32_state, fix priority
-void ms32_bnstars_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u16 *sprram_top)
+// TODO: move to the sprite chip, fix priority
+template <int chip> void ms32_bnstars_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const size_t sprite_tail = (0x20000 - 0x10) / 2;
+	u16 *sprram_top = m_object_vram[chip];
+	const size_t sprite_tail = m_object_vram[chip].length() - 8;
 	u16 *source = sprram_top;
 	u16 *finish = sprram_top + sprite_tail;
 	const bool reverseorder = (m_sprite_ctrl[0x10/4] & 0x8000) == 0x0000;
@@ -325,7 +336,7 @@ void ms32_bnstars_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitma
 		u16 xzoom, yzoom;
 		u32 pri_mask = 0;
 
-		m_sprite->extract_parameters(source, disable, pri, flipx, flipy, code, color, tx, ty, xsize, ysize, sx, sy, xzoom, yzoom);
+		m_sprite[chip]->extract_parameters(source, disable, pri, flipx, flipy, code, color, tx, ty, xsize, ysize, sx, sy, xzoom, yzoom);
 
 		if (disable || !xzoom || !yzoom)
 			continue;
@@ -353,7 +364,7 @@ void ms32_bnstars_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitma
 		else
 			pri_mask = 0xfe;
 
-		m_sprite->prio_zoom_transpen(bitmap,cliprect,
+		m_sprite[chip]->prio_zoom_transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx, flipy,
@@ -366,18 +377,18 @@ void ms32_bnstars_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitma
 
 void ms32_bnstars_state::video_start()
 {
-	m_ascii_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_bnstars_state::get_ascii_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 8, 64,64);
-	m_ascii_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_bnstars_state::get_ascii_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 64,64);
+	m_ascii_tilemap[0] = &machine().tilemap().create(*m_gfxdecode[0], tilemap_get_info_delegate(*this, FUNC(ms32_bnstars_state::get_ascii_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 8, 64,64);
+	m_ascii_tilemap[1] = &machine().tilemap().create(*m_gfxdecode[1], tilemap_get_info_delegate(*this, FUNC(ms32_bnstars_state::get_ascii_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 64,64);
 	m_ascii_tilemap[0]->set_transparent_pen(0);
 	m_ascii_tilemap[1]->set_transparent_pen(0);
 
-	m_scroll_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_bnstars_state::get_scroll_tile_info<0>)), TILEMAP_SCAN_ROWS, 16,16, 64,64);
-	m_scroll_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_bnstars_state::get_scroll_tile_info<1>)), TILEMAP_SCAN_ROWS, 16,16, 64,64);
+	m_scroll_tilemap[0] = &machine().tilemap().create(*m_gfxdecode[0], tilemap_get_info_delegate(*this, FUNC(ms32_bnstars_state::get_scroll_tile_info<0>)), TILEMAP_SCAN_ROWS, 16,16, 64,64);
+	m_scroll_tilemap[1] = &machine().tilemap().create(*m_gfxdecode[1], tilemap_get_info_delegate(*this, FUNC(ms32_bnstars_state::get_scroll_tile_info<1>)), TILEMAP_SCAN_ROWS, 16,16, 64,64);
 	m_scroll_tilemap[0]->set_transparent_pen(0);
 	m_scroll_tilemap[1]->set_transparent_pen(0);
 
-	m_rotate_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_bnstars_state::get_rotate_tile_info<0>)),TILEMAP_SCAN_ROWS, 16,16,128,128);
-	m_rotate_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_bnstars_state::get_rotate_tile_info<1>)),TILEMAP_SCAN_ROWS, 16,16,128,128);
+	m_rotate_tilemap[0] = &machine().tilemap().create(*m_gfxdecode[0], tilemap_get_info_delegate(*this, FUNC(ms32_bnstars_state::get_rotate_tile_info<0>)),TILEMAP_SCAN_ROWS, 16,16,128,128);
+	m_rotate_tilemap[1] = &machine().tilemap().create(*m_gfxdecode[1], tilemap_get_info_delegate(*this, FUNC(ms32_bnstars_state::get_rotate_tile_info<1>)),TILEMAP_SCAN_ROWS, 16,16,128,128);
 	m_rotate_tilemap[0]->set_transparent_pen(0);
 	m_rotate_tilemap[1]->set_transparent_pen(0);
 }
@@ -398,17 +409,33 @@ template <int which> u32 ms32_bnstars_state::screen_update_dual(screen_device &s
 	m_ascii_tilemap[which]->set_scrolly(0, m_ascii_ctrl[which][0x0c/4] + m_ascii_ctrl[which][0x14/4]);
 	m_ascii_tilemap[which]->draw(screen, bitmap, cliprect, 0, 4);
 
-	draw_sprites(screen, bitmap, cliprect, m_object_vram[which]);
+	draw_sprites<which>(screen, bitmap, cliprect);
 
 	return 0;
 }
 
+template <int chip> u16 ms32_bnstars_state::palette_ram_r(offs_t offset)
+{
+	return m_paletteram[chip][offset];
+}
+
+template <int chip> void ms32_bnstars_state::palette_ram_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_paletteram[chip][offset]);
+	// TODO: support for RGB brightness
+	u32 pal_data = (m_paletteram[chip][offset | 1] << 16) | m_paletteram[chip][offset & ~1];
+	const int b = ((pal_data & 0xff0000) >> 16);
+	const int r = ((pal_data & 0x00ff00) >> 8);
+	const int g = ((pal_data & 0x0000ff) >> 0);
+
+	m_palette[chip]->set_pen_color(offset >> 1, rgb_t(r, g, b));
+}
 
 template <int P>
 CUSTOM_INPUT_MEMBER(ms32_bnstars_state::mahjong_ctrl_r)
 {
 	required_ioport_array<4> &keys = (P == 0) ? m_p1_keys : m_p2_keys;
-	// different routing than main ms32.cpp, using 0x2080 as mask
+	// different routing than other ms32.cpp mahjong games, using 0x2080 as mask
 	u8 which = bitswap<2>(m_bnstars1_mahjong_select, 13, 7);
 	return keys[which]->read();
 }
@@ -446,8 +473,9 @@ void ms32_bnstars_state::bnstars_map(address_map &map)
 	/* wrote together */
 	map(0xfd040000, 0xfd047fff).ram(); // priority ram
 	map(0xfd080000, 0xfd087fff).ram();
-	map(0xfd200000, 0xfd237fff).rw("palette2", FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette2");
-	map(0xfd400000, 0xfd437fff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
+	// for some reason ***38*** isn't accessed by these two
+	map(0xfd200000, 0xfd23ffff).rw(FUNC(ms32_bnstars_state::palette_ram_r<1>), FUNC(ms32_bnstars_state::palette_ram_w<1>)).umask32(0x0000ffff);
+	map(0xfd400000, 0xfd43ffff).rw(FUNC(ms32_bnstars_state::palette_ram_r<0>), FUNC(ms32_bnstars_state::palette_ram_w<0>)).umask32(0x0000ffff);
 	
 	map(0xfe000000, 0xfe01ffff).rw(FUNC(ms32_bnstars_state::rotate_vram_r<1>), FUNC(ms32_bnstars_state::rotate_vram_w<1>)).umask32(0x0000ffff);
 	map(0xfe400000, 0xfe41ffff).rw(FUNC(ms32_bnstars_state::rotate_vram_r<0>), FUNC(ms32_bnstars_state::rotate_vram_w<0>)).umask32(0x0000ffff);
@@ -628,11 +656,13 @@ INPUT_PORTS_END
 static GFXLAYOUT_RAW( bglayout, 16, 16, 16*8, 16*16*8 )
 static GFXLAYOUT_RAW( txlayout, 8, 8, 8*8, 8*8*8 )
 
-static GFXDECODE_START( gfx_bnstars )
+static GFXDECODE_START( gfx_bnstars_left )
 	GFXDECODE_ENTRY( "gfx2", 0, bglayout,     0x5000, 0x10 ) /* Roz scr1 */
 	GFXDECODE_ENTRY( "gfx4", 0, bglayout,     0x1000, 0x10 ) /* Bg scr1 */
 	GFXDECODE_ENTRY( "gfx5", 0, txlayout,     0x6000, 0x10 ) /* Tx scr1 */
+GFXDECODE_END
 
+static GFXDECODE_START( gfx_bnstars_right )
 	GFXDECODE_ENTRY( "gfx3", 0, bglayout,     0x5000, 0x10 ) /* Roz scr2 */
 	GFXDECODE_ENTRY( "gfx6", 0, bglayout,     0x1000, 0x10 ) /* Bg scr2 */
 	GFXDECODE_ENTRY( "gfx7", 0, txlayout,     0x6000, 0x10 ) /* Tx scr2 */
@@ -648,35 +678,29 @@ void ms32_bnstars_state::bnstars(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ms32_bnstars_state::bnstars_sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(60000));
-
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bnstars);
-
-	auto &palette(PALETTE(config, "palette"));
-	palette.set_format(palette_device::xBRG_888, 0x8000);
-	palette.set_membits(16);
-
-	auto &palette2(PALETTE(config, "palette2"));
-	palette2.set_format(palette_device::xBRG_888, 0x8000);
-	palette2.set_membits(16);
-
-	JALECO_MEGASYSTEM32_SPRITE(config, m_sprite, XTAL(48'000'000)); // 48MHz for video?
-	m_sprite->set_palette(m_palette);
-	m_sprite->set_color_base(0);
-	m_sprite->set_color_entries(16);
-
+	
 	config.set_default_layout(layout_dualhsxs);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(XTAL(48'000'000)/8, 384, 0, 320, 263, 0, 224); // default CRTC setup
-	m_screen->set_screen_update(FUNC(ms32_bnstars_state::screen_update_dual<0>));
-	m_screen->set_palette("palette");
+	for (unsigned i=0; i < 2; i++)
+	{
+		PALETTE(config, m_palette[i]).set_entries(0x8000);
+		
+		SCREEN(config, m_screen[i], SCREEN_TYPE_RASTER);
+		m_screen[i]->set_raw(XTAL(48'000'000)/8, 384, 0, 320, 263, 0, 224); // default CRTC setup
+		m_screen[i]->set_palette(m_palette[i]);
+		
+		JALECO_MEGASYSTEM32_SPRITE(config, m_sprite[i], XTAL(48'000'000)); // 48MHz for video?
+		m_sprite[i]->set_palette(m_palette[i]);
+		m_sprite[i]->set_color_base(0);
+		m_sprite[i]->set_color_entries(16);
+	}
 
-	SCREEN(config, m_right_screen, SCREEN_TYPE_RASTER);
-	m_right_screen->set_raw(XTAL(48'000'000)/8, 384, 0, 320, 263, 0, 224); // default CRTC setup
-	m_right_screen->set_screen_update(FUNC(ms32_bnstars_state::screen_update_dual<1>));
-	m_right_screen->set_palette("palette2");
+	GFXDECODE(config, m_gfxdecode[0], m_palette[0], gfx_bnstars_left);
+	GFXDECODE(config, m_gfxdecode[1], m_palette[1], gfx_bnstars_right);
+	m_screen[0]->set_screen_update(FUNC(ms32_bnstars_state::screen_update_dual<0>));
+	m_screen[1]->set_screen_update(FUNC(ms32_bnstars_state::screen_update_dual<1>));
 
-	JALECO_MS32_SYSCTRL(config, m_sysctrl, XTAL(48'000'000), m_screen);
+	JALECO_MS32_SYSCTRL(config, m_sysctrl, XTAL(48'000'000), m_screen[0]);
 	m_sysctrl->flip_screen_cb().set(FUNC(ms32_bnstars_state::flipscreen_dual_w));
 	m_sysctrl->vblank_cb().set(FUNC(ms32_bnstars_state::vblank_irq_w));
 	m_sysctrl->field_cb().set(FUNC(ms32_bnstars_state::field_irq_w));
@@ -712,7 +736,7 @@ ROM_START( bnstars1 )
 	ROM_LOAD32_BYTE( "mb-93142.39", 0x000000, 0x80000, CRC(56b98539) SHA1(5eb0e77729b31e6a100c1b43813a39fea57bedee) )
 
 	/* Sprites - shared by both screens? */
-	ROM_REGION( 0x1000000, "sprite", 0 ) /* sprites */
+	ROM_REGION( 0x1000000, "sprite.0", 0 ) /* sprites */
 	ROM_LOAD32_WORD( "mr96004-01.20",   0x0000000, 0x200000, CRC(3366d104) SHA1(2de0cabe2ead777b5b02cade7f2003ef7f90b75b) )
 	ROM_LOAD32_WORD( "mr96004-02.28",   0x0000002, 0x200000, CRC(ad556664) SHA1(4b36f8d8d9efa37cf515af41d14433e7eafa27a2) )
 	ROM_LOAD32_WORD( "mr96004-03.21",   0x0400000, 0x200000, CRC(b399e2b1) SHA1(9b6a00a219db8d66dcf592160b7b5f7a86b8f0c9) )
@@ -721,6 +745,9 @@ ROM_START( bnstars1 )
 	ROM_LOAD32_WORD( "mr96004-06.30",   0x0800002, 0x200000, CRC(fc6daad7) SHA1(99f14ac6b06ad9a8a3d2e9f69b693c7ce420a47d) )
 	ROM_LOAD32_WORD( "mr96004-07.23",   0x0c00000, 0x200000, CRC(177e32fa) SHA1(3ca1f397dc28f1fa3a4136705b92c63e4e438f05) )
 	ROM_LOAD32_WORD( "mr96004-08.31",   0x0c00002, 0x200000, CRC(f6df27b2) SHA1(60590976020d86bdccd4eaf57b349ea31bec6830) )
+
+	ROM_REGION( 0x1000000, "sprite.1", 0 )
+	ROM_COPY( "sprite.0", 0, 0, 0x1000000)
 
 	/* Roz Tiles #1 (Screen 1) */
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* roz tiles */
