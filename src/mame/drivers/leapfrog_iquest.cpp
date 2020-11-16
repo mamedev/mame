@@ -63,9 +63,21 @@ private:
 	void lowerbank_w(offs_t offset, uint8_t data);
 	void upperbank_w(offs_t offset, uint8_t data);
 
-	uint8_t romlower_r(offs_t offset);
-	uint8_t romupper_r(offs_t offset);
+	uint8_t m_iobank[2];
 
+	uint8_t iobank_r(offs_t offset);
+	void iobank_w(offs_t offset, uint8_t data);
+
+
+	uint8_t lowerwindow_r(offs_t offset);
+	uint8_t upperwindow_r(offs_t offset);
+
+	uint8_t iowindow_r(offs_t offset);
+	void iowindow_w(offs_t offset, uint8_t data);
+
+	uint8_t unk_ff80_r();
+	void unk_ff80_w(uint8_t data);
+	uint8_t m_ff80;
 };
 
 
@@ -83,7 +95,10 @@ void leapfrog_iquest_state::machine_reset()
 {
 	m_lowerbank[0] = m_lowerbank[1] = 0x00;
 	m_upperbank[0] = m_upperbank[1] = 0x00;
+	m_iobank[0] = m_iobank[1] = 0x00;
+
 	m_rombank->set_bank(0);
+	m_ff80 = 0x00;
 }
 
 
@@ -108,36 +123,82 @@ void leapfrog_iquest_state::upperbank_w(offs_t offset, uint8_t data)
 	m_upperbank[offset] = data;
 }
 
+uint8_t leapfrog_iquest_state::iobank_r(offs_t offset)
+{
+	return m_iobank[offset];
+}
+
+
+void leapfrog_iquest_state::iobank_w(offs_t offset, uint8_t data)
+{
+	//printf("iobank_w %d, %02x\n", offset, data);
+	m_iobank[offset] = data;
+}
+
+
 void leapfrog_iquest_state::rom_map(address_map &map)
 {
 	map(0x00000000, 0x003fffff).rom().region("maincpu", 0);
+	map(0x00400000, 0x007fffff).ram();
 }
 
-uint8_t leapfrog_iquest_state::romlower_r(offs_t offset)
+uint8_t leapfrog_iquest_state::lowerwindow_r(offs_t offset)
 {
 	uint32_t bank = ((m_lowerbank[0] << 8) | (m_lowerbank[1])) * 0x8000;
 	return m_rombank->read8(bank + offset);
 }
 
-uint8_t leapfrog_iquest_state::romupper_r(offs_t offset)
+uint8_t leapfrog_iquest_state::upperwindow_r(offs_t offset)
 {
 	uint32_t bank = ((m_upperbank[0] << 8) | (m_upperbank[1])) * 0x8000;
 	return m_rombank->read8(bank + offset);
 }
 
+uint8_t leapfrog_iquest_state::iowindow_r(offs_t offset)
+{
+	uint32_t bank = ((m_iobank[0] << 8) | (m_iobank[1])) * 0x8000;
+	return m_rombank->read8(bank + offset);
+}
+
+void leapfrog_iquest_state::iowindow_w(offs_t offset, uint8_t data)
+{
+	uint32_t bank = ((m_iobank[0] << 8) | (m_iobank[1])) * 0x8000;
+	m_rombank->write8(bank + offset, data);
+}
+
+
 void leapfrog_iquest_state::prog_map(address_map &map)
 {
-	map(0x0000, 0x7fff).r(FUNC(leapfrog_iquest_state::romlower_r));
-	map(0x8000, 0xffff).r(FUNC(leapfrog_iquest_state::romupper_r));
+	map(0x0000, 0x7fff).r(FUNC(leapfrog_iquest_state::lowerwindow_r));
+	map(0x8000, 0xffff).r(FUNC(leapfrog_iquest_state::upperwindow_r));
 }
+
+uint8_t leapfrog_iquest_state::unk_ff80_r()
+{
+	return m_ff80;
+}
+
+void leapfrog_iquest_state::unk_ff80_w(uint8_t data)
+{
+	m_ff80 = data;
+}
+
+
 
 void leapfrog_iquest_state::ext_map(address_map &map)
 {
+	map(0x0000, 0x7fff).rw(FUNC(leapfrog_iquest_state::iowindow_r), FUNC(leapfrog_iquest_state::iowindow_w)); // assume this accesses the same space, with different bank register
+
 	map(0xc260, 0xc52f).ram(); // = clears 0x2d0 bytes (90*64 / 8) display buffer?
 	map(0xc530, 0xc7ff).ram(); // = clears 0x2d0 bytes (90*64 / 8) display buffer?
 
 	map(0xfc06, 0xfc07).rw(FUNC(leapfrog_iquest_state::lowerbank_r), FUNC(leapfrog_iquest_state::lowerbank_w));
 	map(0xfc08, 0xfc09).rw(FUNC(leapfrog_iquest_state::upperbank_r), FUNC(leapfrog_iquest_state::upperbank_w));
+
+	map(0xfc0a, 0xfc0b).rw(FUNC(leapfrog_iquest_state::iobank_r), FUNC(leapfrog_iquest_state::iobank_w));
+
+
+	map(0xff80, 0xff80).rw(FUNC(leapfrog_iquest_state::unk_ff80_r), FUNC(leapfrog_iquest_state::unk_ff80_w));
 }
 
 DEVICE_IMAGE_LOAD_MEMBER(leapfrog_iquest_state::cart_load)
