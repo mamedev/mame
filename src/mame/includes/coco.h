@@ -185,7 +185,7 @@ protected:
 		ioport_port *m_input[2][2];
 		ioport_port *m_buttons;
 
-		uint8_t input(int joystick, int axis) const { return m_input[joystick][axis] ? m_input[joystick][axis]->read() : 0x00; }
+		uint32_t input(int joystick, int axis) const { return m_input[joystick][axis] ? m_input[joystick][axis]->read() : 0x00; }
 		uint8_t buttons(void) const { return m_buttons ? m_buttons->read() : 0x00; }
 	};
 
