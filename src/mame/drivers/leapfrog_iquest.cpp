@@ -84,6 +84,24 @@ private:
 	uint8_t unk_fc3f_r();
 	void unk_fc3f_w(uint8_t data);
 
+	void unk_fc22_w(uint8_t data);
+
+	uint8_t unk_fce5_r();
+	void unk_fce5_w(uint8_t data);
+
+	uint8_t m_fce5;
+
+	uint8_t unk_ff00_01_r(offs_t offset);
+
+	void unk_ff81_84_w(offs_t offset, uint8_t data);
+
+	uint8_t m_ff81_84[4];
+
+
+	uint8_t unk_ff91_93_r(offs_t offset);
+	void unk_ff91_93_w(offs_t offset, uint8_t data);
+
+	uint8_t m_ff91_93[3];
 };
 
 
@@ -105,6 +123,10 @@ void leapfrog_iquest_state::machine_reset()
 
 	m_rombank->set_bank(0);
 	m_ff80 = 0x00;
+
+	m_fce5 = 0x00;
+
+	m_ff91_93[0] = m_ff91_93[1] = m_ff91_93[2] = 0x00;
 }
 
 
@@ -186,6 +208,7 @@ uint8_t leapfrog_iquest_state::unk_ff80_r()
 
 void leapfrog_iquest_state::unk_ff80_w(uint8_t data)
 {
+	// must return what is written for some startup tests
 	m_ff80 = data;
 }
 
@@ -208,6 +231,57 @@ void leapfrog_iquest_state::unk_fc3f_w(uint8_t data)
 {
 }
 
+void leapfrog_iquest_state::unk_fc22_w(uint8_t data)
+{
+}
+
+uint8_t leapfrog_iquest_state::unk_ff00_01_r(offs_t offset)
+{
+	// read around the time of fc22 writes
+	return 0x00;
+}
+
+uint8_t leapfrog_iquest_state::unk_fce5_r()
+{
+	return 0x00;// m_fce5;// machine().rand();
+}
+
+void leapfrog_iquest_state::unk_fce5_w(uint8_t data)
+{
+	// repeated read/write pattern on this address
+	m_fce5 = data;
+}
+
+uint8_t leapfrog_iquest_state::unk_ff91_93_r(offs_t offset)
+{
+	return 0x00;// m_ff91_93[offset];
+}
+
+
+
+void leapfrog_iquest_state::unk_ff91_93_w(offs_t offset, uint8_t data)
+{
+	// these 3 values are written together
+	m_ff91_93[offset] = data;
+
+	// form is ff then 2 other values, maybe an address? blitter pointer?
+
+	if (offset == 2)
+		logerror("%s: write to ff91 to ff93 region %02x %02x %02x\n", machine().describe_context(), m_ff91_93[0], m_ff91_93[1], m_ff91_93[2]);
+}
+
+void leapfrog_iquest_state::unk_ff81_84_w(offs_t offset, uint8_t data)
+{
+	// these 4 values are written together, with FFA8 before and FFA9 after
+	// form is usually 00 00 then 2 used values, maybe coordinates?
+	// used in conjunction with unk_ff91_93_w writes above
+	m_ff81_84[offset] = data;
+
+	if (offset == 3)
+		logerror("%s: write to ff81 to ff84 region %02x %02x %02x %02x\n", machine().describe_context(), m_ff81_84[0], m_ff81_84[1], m_ff81_84[2], m_ff81_84[3]);
+}
+
+
 void leapfrog_iquest_state::ext_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rw(FUNC(leapfrog_iquest_state::iowindow_r), FUNC(leapfrog_iquest_state::iowindow_w)); // assume this accesses the same space, with different bank register
@@ -215,17 +289,26 @@ void leapfrog_iquest_state::ext_map(address_map &map)
 	map(0xc260, 0xc52f).ram(); // = clears 0x2d0 bytes (90*64 / 8) display buffer?
 	map(0xc530, 0xc7ff).ram(); // = clears 0x2d0 bytes (90*64 / 8) display buffer?
 
-	map(0xfc06, 0xfc07).rw(FUNC(leapfrog_iquest_state::lowerbank_r), FUNC(leapfrog_iquest_state::lowerbank_w));
-	map(0xfc08, 0xfc09).rw(FUNC(leapfrog_iquest_state::upperbank_r), FUNC(leapfrog_iquest_state::upperbank_w));
-
-	map(0xfc0a, 0xfc0b).rw(FUNC(leapfrog_iquest_state::iobank_r), FUNC(leapfrog_iquest_state::iobank_w));
-
-
 	map(0xfc00, 0xfc00).r(FUNC(leapfrog_iquest_state::unk_fc00_r));
+
+	map(0xfc06, 0xfc07).rw(FUNC(leapfrog_iquest_state::lowerbank_r), FUNC(leapfrog_iquest_state::lowerbank_w)); // ROM / RAM window in main space at 0000-7fff
+	map(0xfc08, 0xfc09).rw(FUNC(leapfrog_iquest_state::upperbank_r), FUNC(leapfrog_iquest_state::upperbank_w)); // ROM / RAM window in main space at 8000-ffff 
+	map(0xfc0a, 0xfc0b).rw(FUNC(leapfrog_iquest_state::iobank_r), FUNC(leapfrog_iquest_state::iobank_w)); // ROM / RAM window in ext space at 0000-7fff
+
+	map(0xfc22, 0xfc22).w(FUNC(leapfrog_iquest_state::unk_fc22_w));
+
 	map(0xfc2f, 0xfc2f).r(FUNC(leapfrog_iquest_state::unk_fc2f_r));
 	map(0xfc3f, 0xfc3f).rw(FUNC(leapfrog_iquest_state::unk_fc3f_r), FUNC(leapfrog_iquest_state::unk_fc3f_w));
 
+	map(0xfce5, 0xfce5).rw(FUNC(leapfrog_iquest_state::unk_fce5_r), FUNC(leapfrog_iquest_state::unk_fce5_w));
+
+	map(0xff00, 0xff01).r(FUNC(leapfrog_iquest_state::unk_ff00_01_r));
+
 	map(0xff80, 0xff80).rw(FUNC(leapfrog_iquest_state::unk_ff80_r), FUNC(leapfrog_iquest_state::unk_ff80_w));
+
+	map(0xff81, 0xff84).w(FUNC(leapfrog_iquest_state::unk_ff81_84_w));
+
+	map(0xff91, 0xff93).rw(FUNC(leapfrog_iquest_state::unk_ff91_93_r), FUNC(leapfrog_iquest_state::unk_ff91_93_w));
 }
 
 DEVICE_IMAGE_LOAD_MEMBER(leapfrog_iquest_state::cart_load)
