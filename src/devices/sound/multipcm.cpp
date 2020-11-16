@@ -481,7 +481,7 @@ multipcm_device::multipcm_device(const machine_config &mconfig, const char *tag,
 
 void multipcm_device::device_start()
 {
-	const float clock_divider = 180.0f;
+	const float clock_divider = 224.0f;
 	m_rate = (float)clock() / clock_divider;
 
 	m_stream = stream_alloc(0, 2, m_rate);
@@ -622,7 +622,7 @@ void multipcm_device::device_start()
 
 void multipcm_device::device_clock_changed()
 {
-	const float clock_divider = 180.0f;
+	const float clock_divider = 224.0f;
 	m_rate = (float)clock() / clock_divider;
 	m_stream->set_sample_rate(m_rate);
 
