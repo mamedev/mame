@@ -528,8 +528,16 @@ uint8_t leapfrog_iquest_state::rx()
 // doesn't help?
 WRITE_LINE_MEMBER(leapfrog_iquest_state::rx_line_hack)
 {
+	/*
 	m_maincpu->set_input_line(MCS51_RX_LINE, ASSERT_LINE);
 	m_maincpu->set_input_line(MCS51_RX_LINE, CLEAR_LINE);
+	*/
+
+	// HACK: force past the wait loop if we're treating ff80 - ffff as RAM
+	address_space& spc = m_maincpu->space(AS_DATA);
+	uint8_t readdat = spc.read_byte(0x24);
+	readdat &= ~0x08;
+	spc.write_byte(0x24, readdat);
 }
 
 
@@ -549,7 +557,7 @@ void leapfrog_iquest_state::leapfrog_iquest(machine_config &config)
 	m_screen->set_size(90, 64);
 	m_screen->set_visarea(0, 90-1, 0, 64-1);
 	m_screen->set_screen_update(FUNC(leapfrog_iquest_state::screen_update));
-	//m_screen->screen_vblank().set(FUNC(leapfrog_iquest_state::rx_line_hack));
+	m_screen->screen_vblank().set(FUNC(leapfrog_iquest_state::rx_line_hack));
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "leapfrog_iquest_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
