@@ -2919,8 +2919,7 @@ void lua_engine::initialize()
 	image_type.set("create", [](device_image_interface &di, const std::string &filename) { return di.create(filename); });
 	image_type.set("crc", &device_image_interface::crc);
 	image_type.set("display", [](device_image_interface &di) { return di.call_display(); });
-	// FIXME: the next line is causing sol3 to try instantiating device_t for some reason
-	//image_type.set("device", sol::property(static_cast<const device_t & (device_image_interface::*)() const>(&device_image_interface::device));
+	image_type.set("device", sol::property(static_cast<device_t & (device_image_interface::*)()>(&device_image_interface::device)));
 	image_type.set("instance_name", sol::property(&device_image_interface::instance_name));
 	image_type.set("brief_instance_name", sol::property(&device_image_interface::brief_instance_name));
 	image_type.set("is_readable", sol::property(&device_image_interface::is_readable));
