@@ -12,6 +12,11 @@
 #include "luaengine.ipp"
 
 
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wshift-count-overflow"
+#endif
+
+
 namespace {
 
 //-------------------------------------------------
