@@ -352,7 +352,10 @@ or for the later writes  0x10000-0x17fff, 0x20000-0x27fff  (the b448 is from 0x2
 
 each of the blocks pointed to is preceded by a 0x00 byte? (maybe 0x00 is a terminator for previous block?)
 
-what are these blocks? sound data? video data?
+the blocks being pointed at during startup appear to be debug text? is this a debug terminal output or
+some kind of DMA?
+
+or maybe this is just a RAM area and these are temporary storage for the debug print function?
 
 */
 
@@ -369,7 +372,20 @@ void leapfrog_iquest_state::unk_ff91_93_w(offs_t offset, uint8_t data)
 	// form is ff then 2 other values, these are pointers into the main space it seems
 
 	if (offset == 2)
+	{
 		logerror("%s: write to ff91 to ff93 region %02x %02x %02x (current banks are %08x %08x %08x)\n", machine().describe_context(), m_ff91_93[0], m_ff91_93[1], m_ff91_93[2], ((m_lowerbank[0] << 8) | (m_lowerbank[1])) * 0x8000, ((m_upperbank[0] << 8) | (m_upperbank[1])) * 0x8000, ((m_iobank[0] << 8) | (m_iobank[1])) * 0x8000);
+
+		uint16_t pointer = (m_ff91_93[1] << 8) | (m_ff91_93[2]);
+
+		address_space& spc = m_maincpu->space(AS_PROGRAM);
+		uint8_t readdat = 0x00;
+
+		do
+		{
+			 readdat = spc.read_byte(pointer++);
+		//	 printf("%c", readdat);
+		} while (readdat != 0x00);
+	}
 }
 
 void leapfrog_iquest_state::unk_ff81_84_w(offs_t offset, uint8_t data)
@@ -380,7 +396,23 @@ void leapfrog_iquest_state::unk_ff81_84_w(offs_t offset, uint8_t data)
 	m_ff81_84[offset] = data;
 
 	if (offset == 3)
+	{
 		logerror("%s: write to ff81 to ff84 region %02x %02x %02x %02x\n", machine().describe_context(), m_ff81_84[0], m_ff81_84[1], m_ff81_84[2], m_ff81_84[3]);
+
+		uint16_t pointer = (m_ff81_84[2] << 8) | (m_ff81_84[3]);
+
+		if (pointer != 0x00)
+		{
+			address_space& spc = m_maincpu->space(AS_PROGRAM);
+			uint8_t readdat = 0x00;
+
+			do
+			{
+				readdat = spc.read_byte(pointer++);
+			//	printf("%c", readdat);
+			} while (readdat != 0x00);
+		}
+	}
 }
 
 uint8_t leapfrog_iquest_state::unk_ffa8_r()
@@ -488,4 +520,4 @@ ROM_END
 
 //    year, name,        parent,    compat, machine,            input,            class,                  init,       company,    fullname,                         flags
 // it is unknown if the versions of IQuest without 4.0 on the case have different system ROM
-CONS( 200?, iquest,      0,         0,      leapfrog_iquest,    leapfrog_iquest,  leapfrog_iquest_state,  empty_init, "LeapFrog", "IQuest 4.0 (US)",                    MACHINE_IS_SKELETON )
+CONS( 2004, iquest,      0,         0,      leapfrog_iquest,    leapfrog_iquest,  leapfrog_iquest_state,  empty_init, "LeapFrog", "IQuest 4.0 (US)",                    MACHINE_IS_SKELETON )
