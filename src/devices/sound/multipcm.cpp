@@ -83,6 +83,7 @@ void multipcm_device::init_sample(sample_t *sample, uint32_t index)
 
 	sample->m_start = (read_byte(address) << 16) | (read_byte(address + 1) << 8) | read_byte(address + 2);
 	sample->m_format = (sample->m_start>>20) & 0xfe;
+	logerror("format = %02x\n", sample->m_format);
 	sample->m_start &= 0x3fffff;
 	sample->m_loop = (read_byte(address + 3) << 8) | read_byte(address + 4);
 	sample->m_end = 0xffff - ((read_byte(address + 5) << 8) | read_byte(address + 6));
