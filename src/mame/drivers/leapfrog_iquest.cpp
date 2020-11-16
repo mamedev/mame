@@ -109,6 +109,7 @@ private:
 	void tx(uint8_t data);
 	uint8_t rx();
 
+	DECLARE_WRITE_LINE_MEMBER(rx_line_hack);
 };
 
 
@@ -477,7 +478,7 @@ void leapfrog_iquest_state::ext_map(address_map &map)
 	// (which eventually can reach)
 	// 016991: c2 23     clr   $24.3
 	// however I'm uncertain how to get the driver to trigger this at all.
-#if 0
+#if 1
 	map(0xff80, 0xffff).ram();
 #else
 	
@@ -523,10 +524,13 @@ uint8_t leapfrog_iquest_state::rx()
 	return machine().rand();
 }
 
-// maybe need these?
-//	m_maincpu->set_input_line(MCS51_RX_LINE, ASSERT_LINE);
-//	m_maincpu->set_input_line(MCS51_RX_LINE, CLEAR_LINE);
 
+// doesn't help?
+WRITE_LINE_MEMBER(leapfrog_iquest_state::rx_line_hack)
+{
+	m_maincpu->set_input_line(MCS51_RX_LINE, ASSERT_LINE);
+	m_maincpu->set_input_line(MCS51_RX_LINE, CLEAR_LINE);
+}
 
 
 void leapfrog_iquest_state::leapfrog_iquest(machine_config &config)
@@ -536,7 +540,6 @@ void leapfrog_iquest_state::leapfrog_iquest(machine_config &config)
 	I8032(config, m_maincpu, 96000000/10); // unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &leapfrog_iquest_state::prog_map);
 	m_maincpu->set_addrmap(AS_IO, &leapfrog_iquest_state::ext_map);
-	//m_maincpu->set_vblank_int("screen", FUNC(leapfrog_iquest_state::irq0_line_hold));
 	m_maincpu->serial_tx_cb().set(FUNC(leapfrog_iquest_state::tx));
 	m_maincpu->serial_rx_cb().set(FUNC(leapfrog_iquest_state::rx));
 
@@ -546,7 +549,7 @@ void leapfrog_iquest_state::leapfrog_iquest(machine_config &config)
 	m_screen->set_size(90, 64);
 	m_screen->set_visarea(0, 90-1, 0, 64-1);
 	m_screen->set_screen_update(FUNC(leapfrog_iquest_state::screen_update));
-	//m_screen->screen_vblank().set(FUNC(leapfrog_iquest_state::screen_vblank));
+	//m_screen->screen_vblank().set(FUNC(leapfrog_iquest_state::rx_line_hack));
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "leapfrog_iquest_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
