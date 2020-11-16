@@ -214,7 +214,7 @@ void retro_execute(){
 void free_man(){
 
 	util::archive_file::cache_clear();
-	retro_manager->reset();
+	delete retro_manager;
 }
 #endif
 
